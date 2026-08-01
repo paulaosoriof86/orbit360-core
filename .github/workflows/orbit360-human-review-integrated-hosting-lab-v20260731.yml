@@ -1,4 +1,4 @@
-name: Orbit 360 · Human review integrated · Hosting LAB once
+name: Orbit 360 · Recibos/Cartera · Hosting LAB final visual closure
 on:
   push:
     branches: [ays/backend-tenant-lab-v99-20260703]
@@ -16,19 +16,20 @@ env:
   ORBIT360_REQUEST: .github/orbit360-requests/human-review-integrated-hosting-lab-v20260731.json
   ORBIT360_POLICIES_BLOB: 46b197a77c162c88af498b5a89a759386a36e9e7
   ORBIT360_READMODEL_BLOB: 2dd34645d08b0836ebeaa369376364ac760a2f74
-  ORBIT360_RECEIPTS_BLOB: e70d9fca334f1938eb84ec94f88d9cce7236d509
-  ORBIT360_STATIC_RUN: '30669391345'
-  ORBIT360_STATIC_ARTIFACT: '8808188706'
-  ORBIT360_STATIC_DIGEST: sha256:7eac3a5e2ddfcd9fa47673b475811033eaf05ba83f27f72e61ed6474b11dda3d
+  ORBIT360_RECEIPTS_BLOB: bd2beaeded48d2ec2780f3830ca91f5e475fca20
+  ORBIT360_STATIC_RUN: '30674768540'
+  ORBIT360_STATIC_ARTIFACT: '8810023039'
+  ORBIT360_STATIC_DIGEST: sha256:f643502998ae9be1616dcb6d49bc890f0abc0c9d741b5ed84131479ad74a06e1
+  ORBIT360_PREVIOUS_HOSTING_RUN: '30670430241'
   ORBIT360_PROJECT_ID: ays-orbit-360-lab
   ORBIT360_CHANNEL_ID: orbit360-ays-lab
   ORBIT360_LAB_URL: https://ays-orbit-360-lab--orbit360-ays-lab-fj1zxnk2.web.app
   EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
 jobs:
-  hosting_human_review_once:
-    name: Hosting LAB único · revisión humana integral
+  hosting_final_visual_closure:
+    name: Hosting LAB final · badge Recibo + revisión integral
     runs-on: ubuntu-24.04
-    timeout-minutes: 35
+    timeout-minutes: 40
     steps:
       - name: Checkout SHA exacto
         uses: actions/checkout@v4
@@ -39,14 +40,14 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Verificar autorización y lineage exacto
+      - name: Verificar autorización macro y lineage exacto
         shell: bash
         run: |
           set -euo pipefail
           test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
           test "$GITHUB_RUN_ATTEMPT" = '1'
           test -f "$ORBIT360_REQUEST"
-          jq -e '.schemaVersion=="orbit360-human-review-integrated-hosting-authorization-v1" and .approved==true and .phrase=="AUTORIZO HOSTING LAB CORRECCION INTEGRAL REVISION HUMANA POLIZAS VEHICULOS RECIBOS 20260731" and .branch==env.ORBIT360_BRANCH and .policiesBlob==env.ORBIT360_POLICIES_BLOB and .readModelBlob==env.ORBIT360_READMODEL_BLOB and .receiptsProjectionBlob==env.ORBIT360_RECEIPTS_BLOB and .staticRun==(env.ORBIT360_STATIC_RUN|tonumber) and .staticArtifact==(env.ORBIT360_STATIC_ARTIFACT|tonumber) and .staticDigest==env.ORBIT360_STATIC_DIGEST and .projectId==env.ORBIT360_PROJECT_ID and .channelId==env.ORBIT360_CHANNEL_ID and .scope.hostingLab==true and .scope.browserVisual==true and .scope.hydrationDiagnostic==true and .scope.rules==false and .scope.functions==false and .scope.storage==false and .scope.dataWrites==false and .scope.cobros==false and .scope.production==false and .scope.main==false and .scope.merge==false and .allowedDeployExecutions==1' "$ORBIT360_REQUEST" >/dev/null
+          jq -e '.schemaVersion=="orbit360-human-review-integrated-hosting-authorization-v2" and .approved==true and .phrase=="AUTORIZO 1 HOSTING LAB FINAL RECIBOS CARTERA BADGE 20260801" and .branch==env.ORBIT360_BRANCH and .policiesBlob==env.ORBIT360_POLICIES_BLOB and .readModelBlob==env.ORBIT360_READMODEL_BLOB and .receiptsProjectionBlob==env.ORBIT360_RECEIPTS_BLOB and .staticRun==(env.ORBIT360_STATIC_RUN|tonumber) and .staticArtifact==(env.ORBIT360_STATIC_ARTIFACT|tonumber) and .staticDigest==env.ORBIT360_STATIC_DIGEST and .previousHostingRun==(env.ORBIT360_PREVIOUS_HOSTING_RUN|tonumber) and .reason=="FUNCTIONAL_DEFECT_RECEIPT_HERO_BADGE_STRETCH" and .projectId==env.ORBIT360_PROJECT_ID and .channelId==env.ORBIT360_CHANNEL_ID and .scope.hostingLab==true and .scope.browserVisual==true and .scope.sanitizedVisualEvidence==true and .scope.hydrationDiagnostic==true and .scope.rules==false and .scope.functions==false and .scope.storage==false and .scope.dataWrites==false and .scope.cobros==false and .scope.production==false and .scope.main==false and .scope.merge==false and .allowedDeployExecutions==1' "$ORBIT360_REQUEST" >/dev/null
           AUTHORIZED_HEAD="$(jq -r '.authorizedHead' "$ORBIT360_REQUEST")"
           test -n "$AUTHORIZED_HEAD"
           git merge-base --is-ancestor "$AUTHORIZED_HEAD" HEAD
@@ -64,24 +65,26 @@ jobs:
           node --check tools/orbit360-receipts-portfolio-visual-lab-v910-20260730.mjs
           node --check tools/orbit360-human-review-visual-lab-v20260731.mjs
           node --check tools/orbit360-receipts-portfolio-hydration-diagnostic-v910-20260730.mjs
+          node --check tools/orbit360-test-receipt-hero-badge-browser-v20260801.mjs
+          node --check tools/orbit360-human-review-screenshots-sanitized-v20260731.mjs
           node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
           jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="9.1.0" and .failed==0 and .operationalWrites==0 and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
       - name: Static completo antes de Hosting
         shell: bash
         run: |
           set -euo pipefail
-          node tools/orbit360-test-receipts-portfolio-visual-projection-v910.mjs > "$EVIDENCE_DIR/human-review-static-base-v20260731.json"
-          jq -e '.status=="VISUAL_PROJECTION_STATIC_READY" and .failed==0 and .passed==.total and .lifecycleExit==0 and .firestoreWrites==0 and .operationalWrites==0' "$EVIDENCE_DIR/human-review-static-base-v20260731.json" >/dev/null
-          node tools/orbit360-test-client360-policy-vehicle-readmodel-v1199c-20260731.mjs > "$EVIDENCE_DIR/human-review-readmodel-v20260731.json"
-          jq -e '.ok==true and .indexedSummary==true and .synchronousClientShape==true and .fullPagePolicy==true and .fullPageVehicle==true and .noUndefinedNaN==true and .writes==0' "$EVIDENCE_DIR/human-review-readmodel-v20260731.json" >/dev/null
-          node tools/orbit360-test-human-visual-contract-v20260731.mjs > "$EVIDENCE_DIR/human-review-contract-v20260731.json"
-          jq -e '.status=="HUMAN_VISUAL_STATIC_READY" and .failed==0 and .passed==.total and .firestoreWrites==0 and .deployExecuted==false' "$EVIDENCE_DIR/human-review-contract-v20260731.json" >/dev/null
-          node tools/orbit360-test-importa-polizas-p0.mjs > "$EVIDENCE_DIR/human-review-importa-polizas-v20260731.json"
-          jq -e '.status=="PASS" and .premiumInference==false and .paymentDimensionsSeparated==true' "$EVIDENCE_DIR/human-review-importa-polizas-v20260731.json" >/dev/null
-          node tools/orbit360-test-importa-cartera-p0.mjs > "$EVIDENCE_DIR/human-review-importa-cartera-v20260731.json"
-          jq -e '.status=="PASS" and .duplicateStatementUpdated==true and .dualSourceExactConciliated==true and .singleSourceNotConciliated==true and .oneToOneRecurringDisambiguation==true and .sourceDifferencesPreserved==true and .balanceReconciliationSeparatedFromPayment==true and .firestoreWrites==0 and .operationalWrites==0' "$EVIDENCE_DIR/human-review-importa-cartera-v20260731.json" >/dev/null
-          node tools/orbit360-test-importa-transversal-v20260731.mjs > "$EVIDENCE_DIR/human-review-importa-transversal-v20260731.json"
-          jq -e '.status=="IMPORTA_TRANSVERSAL_IDEMPOTENCY_READY" and .exactUpdate==true and .probableHold==true and .oneToOneMatcher==true and .sourceDifferencesPreserved==true and .balancePaymentSemanticsSeparated==true and .firestoreWrites==0 and .operationalWrites==0 and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/human-review-importa-transversal-v20260731.json" >/dev/null
+          node tools/orbit360-test-receipts-portfolio-visual-projection-v910.mjs > "$EVIDENCE_DIR/human-review-static-base-v20260801.json"
+          jq -e '.status=="VISUAL_PROJECTION_STATIC_READY" and .failed==0 and .passed==.total and .lifecycleExit==0 and .firestoreWrites==0 and .operationalWrites==0' "$EVIDENCE_DIR/human-review-static-base-v20260801.json" >/dev/null
+          node tools/orbit360-test-client360-policy-vehicle-readmodel-v1199c-20260731.mjs > "$EVIDENCE_DIR/human-review-readmodel-v20260801.json"
+          jq -e '.ok==true and .indexedSummary==true and .synchronousClientShape==true and .fullPagePolicy==true and .fullPageVehicle==true and .noUndefinedNaN==true and .writes==0' "$EVIDENCE_DIR/human-review-readmodel-v20260801.json" >/dev/null
+          node tools/orbit360-test-human-visual-contract-v20260731.mjs > "$EVIDENCE_DIR/human-review-contract-v20260801.json"
+          jq -e '.status=="HUMAN_VISUAL_STATIC_READY" and .failed==0 and .passed==.total and (.checks|map(select(.id=="RECEIPT_HERO_BADGE_COMPACT" and .ok==true))|length)==1 and .firestoreWrites==0 and .deployExecuted==false' "$EVIDENCE_DIR/human-review-contract-v20260801.json" >/dev/null
+          node tools/orbit360-test-importa-polizas-p0.mjs > "$EVIDENCE_DIR/human-review-importa-polizas-v20260801.json"
+          jq -e '.status=="PASS" and .premiumInference==false and .paymentDimensionsSeparated==true' "$EVIDENCE_DIR/human-review-importa-polizas-v20260801.json" >/dev/null
+          node tools/orbit360-test-importa-cartera-p0.mjs > "$EVIDENCE_DIR/human-review-importa-cartera-v20260801.json"
+          jq -e '.status=="PASS" and .duplicateStatementUpdated==true and .dualSourceExactConciliated==true and .singleSourceNotConciliated==true and .oneToOneRecurringDisambiguation==true and .sourceDifferencesPreserved==true and .balanceReconciliationSeparatedFromPayment==true and .firestoreWrites==0 and .operationalWrites==0' "$EVIDENCE_DIR/human-review-importa-cartera-v20260801.json" >/dev/null
+          node tools/orbit360-test-importa-transversal-v20260731.mjs > "$EVIDENCE_DIR/human-review-importa-transversal-v20260801.json"
+          jq -e '.status=="IMPORTA_TRANSVERSAL_IDEMPOTENCY_READY" and .exactUpdate==true and .probableHold==true and .oneToOneMatcher==true and .sourceDifferencesPreserved==true and .balancePaymentSemanticsSeparated==true and .firestoreWrites==0 and .operationalWrites==0 and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/human-review-importa-transversal-v20260801.json" >/dev/null
       - name: Instalar herramientas después del gate
         shell: bash
         run: |
@@ -99,20 +102,20 @@ jobs:
           set -euo pipefail
           SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-${SA_ORBIT_360_LAB:-${SA_DEFAULT:-}}}"
           test -n "$SERVICE_ACCOUNT"
-          KEY_FILE="${RUNNER_TEMP}/orbit360-human-review-hosting.json"
+          KEY_FILE="${RUNNER_TEMP}/orbit360-human-review-hosting-final.json"
           printf '%s' "$SERVICE_ACCOUNT" > "$KEY_FILE"
           chmod 600 "$KEY_FILE"
           test "$(jq -r '.project_id // empty' "$KEY_FILE")" = "$ORBIT360_PROJECT_ID"
           echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
           echo "ORBIT360_TEMP_KEY_FILE=$KEY_FILE" >> "$GITHUB_ENV"
-      - name: Deploy único Hosting LAB
+      - name: Deploy único Hosting LAB final
         shell: bash
         run: |
           set -euo pipefail
-          firebase hosting:channel:deploy "$ORBIT360_CHANNEL_ID" --project "$ORBIT360_PROJECT_ID" --expires 7d --non-interactive --json > "$EVIDENCE_DIR/human-review-hosting-deploy-raw-v20260731.json"
-          test -s "$EVIDENCE_DIR/human-review-hosting-deploy-raw-v20260731.json"
-          jq -n --arg head "$GITHUB_SHA" '{schemaVersion:"orbit360-human-review-hosting-deploy-v2",ok:true,status:"HOSTING_LAB_DEPLOY_PASS",sourceHead:$head,hostingDeployExecutions:1,rulesDeployExecutions:0,functionsDeploy:false,storageDeploy:false,firestoreDataWrites:0,operationalWrites:0,production:false,containsPII:false,containsSecrets:false}' > "$EVIDENCE_DIR/human-review-hosting-deploy-v20260731.json"
-      - name: Paridad remota activos críticos
+          firebase hosting:channel:deploy "$ORBIT360_CHANNEL_ID" --project "$ORBIT360_PROJECT_ID" --expires 7d --non-interactive --json > "$EVIDENCE_DIR/human-review-hosting-final-deploy-raw-v20260801.json"
+          test -s "$EVIDENCE_DIR/human-review-hosting-final-deploy-raw-v20260801.json"
+          jq -n --arg head "$GITHUB_SHA" '{schemaVersion:"orbit360-human-review-hosting-final-deploy-v1",ok:true,status:"HOSTING_LAB_FINAL_DEPLOY_PASS",sourceHead:$head,hostingDeployExecutions:1,rulesDeployExecutions:0,functionsDeploy:false,storageDeploy:false,firestoreDataWrites:0,operationalWrites:0,production:false,containsPII:false,containsSecrets:false}' > "$EVIDENCE_DIR/human-review-hosting-final-deploy-v20260801.json"
+      - name: Paridad remota 12/12 activos críticos
         shell: bash
         run: |
           set -euo pipefail
@@ -123,7 +126,7 @@ jobs:
             tmp="${RUNNER_TEMP}/remote-$(basename "$f")"
             ok=false
             for i in $(seq 1 30); do
-              if curl -fsSL --retry 2 "${ORBIT360_LAB_URL}/${f}?orbitHuman=${GITHUB_SHA}-${i}" -o "$tmp"; then
+              if curl -fsSL --retry 2 "${ORBIT360_LAB_URL}/${f}?orbitFinal=${GITHUB_SHA}-${i}" -o "$tmp"; then
                 remote_sha="$(sha256sum "$tmp" | awk '{print $1}')"
                 if [ "$remote_sha" = "$local_sha" ]; then ok=true; break; fi
               fi
@@ -132,7 +135,7 @@ jobs:
             test "$ok" = true
             pass=$((pass+1))
           done
-          jq -n --argjson pass "$pass" '{schemaVersion:"orbit360-human-review-parity-v2",ok:($pass==12),criticalAssets:12,passed:$pass,failed:(12-$pass),hostingLab:true,production:false,containsPII:false,containsSecrets:false}' > "$EVIDENCE_DIR/human-review-parity-v20260731.json"
+          jq -n --argjson pass "$pass" '{schemaVersion:"orbit360-human-review-final-parity-v1",ok:($pass==12),criticalAssets:12,passed:$pass,failed:(12-$pass),hostingLab:true,production:false,containsPII:false,containsSecrets:false}' > "$EVIDENCE_DIR/human-review-final-parity-v20260801.json"
           test "$pass" = '12'
       - name: Hidratación exacta
         env:
@@ -161,49 +164,76 @@ jobs:
         run: |
           set -euo pipefail
           node tools/orbit360-human-review-visual-lab-v20260731.mjs
-          jq -e '.ok==true and .status=="HUMAN_REVIEW_VISUAL_LAB_PASS" and .counts.clientes==430 and .counts.polizas==1373 and .counts.vehiculos==1032 and .counts.recibosEsperados==1293 and .counts.carteraPrimas==673 and .counts.cobros==0 and .checks.globalPoliciesResponsive==true and .checks.globalPoliciesPaginated==true and .checks.policyPremiumSemantic==true and .checks.policyQualityFailClosed==true and .checks.vehicleFullPage==true and .checks.receiptDetail==true and .checks.reportedPaymentNotCobro==true and .checks.portfolioReconciledVisible==true and .checks.portfolioNotPayment==true and .checks.downstreamZero==true and .checks.noPageErrors==true and .checks.noTechnicalCopy==true and .firestoreWrites==0 and .operationalWrites==0 and .productionTouched==false' "$EVIDENCE_DIR/human-review-visual-lab-v20260731.json" >/dev/null
-      - name: Cerrar evidencia sanitizada
+          jq -e '.ok==true and .status=="HUMAN_REVIEW_VISUAL_LAB_PASS" and .counts.clientes==430 and .counts.polizas==1373 and .counts.vehiculos==1032 and .counts.recibosEsperados==1293 and .counts.carteraPrimas==673 and .counts.cobros==0 and .checks.globalPoliciesResponsive==true and .checks.globalPoliciesPaginated==true and .checks.globalPoliciesPremiumHeaderVisible==true and .checks.policyPremiumSemantic==true and .checks.policyQualityFailClosed==true and .checks.vehicleFullPage==true and .checks.vehicleSemanticFieldsVisible==true and .checks.receiptDetail==true and .checks.receiptSemanticFieldsVisible==true and .checks.reportedPaymentNotCobro==true and .checks.portfolioReconciledVisible==true and .checks.portfolioNotPayment==true and .checks.portfolioTraceVisible==true and .checks.downstreamZero==true and .checks.noPageErrors==true and .checks.noTechnicalCopy==true and .firestoreWrites==0 and .operationalWrites==0 and .productionTouched==false' "$EVIDENCE_DIR/human-review-visual-lab-v20260731.json" >/dev/null
+      - name: Browser contract badge compacto
+        env:
+          ORBIT360_LAB_LOGIN_EMAIL: orbit.lab@demo.com
+          ORBIT360_LAB_LOGIN_PASSWORD: ${{ secrets.ORBIT360_LAB_LOGIN_PASSWORD }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-test-receipt-hero-badge-browser-v20260801.mjs
+          jq -e '.ok==true and .status=="RECEIPT_HERO_BADGE_BROWSER_PASS" and .check=="RECEIPT_HERO_BADGE_COMPACT" and .metrics.badgeHeight>0 and .metrics.badgeHeight<=32 and .metrics.heightRatio<=0.55 and .metrics.heroAlignItems=="flex-start" and .metrics.badgeAlignSelf=="flex-start" and .metrics.badgeFlexGrow=="0" and .metrics.badgeFlexShrink=="0" and .pageErrors==0 and .firestoreWrites==0 and .operationalWrites==0 and .hostingDeployExecutions==0 and .production==false' "$EVIDENCE_DIR/receipt-hero-badge-browser-v20260801.json" >/dev/null
+      - name: Evidencia visual sanitizada fail-closed
+        env:
+          ORBIT360_LAB_LOGIN_EMAIL: orbit.lab@demo.com
+          ORBIT360_LAB_LOGIN_PASSWORD: ${{ secrets.ORBIT360_LAB_LOGIN_PASSWORD }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-human-review-screenshots-sanitized-v20260731.mjs
+          jq -e '.schemaVersion=="orbit360-human-review-sanitized-screens-v3" and .ok==true and .status=="SANITIZED_VISUAL_SET_READY" and .securityFailClosed==true and (.screens|length)==6 and .sanitization.residualDynamicText==0 and .sanitization.residualVisibleFormValues==0 and .containsPII==false and .containsSecrets==false and .firestoreWrites==0 and .operationalWrites==0 and .hostingDeployExecutions==0 and .production==false' "$EVIDENCE_DIR/human-review-sanitized-screens-v20260731.json" >/dev/null
+      - name: Cerrar evidencia final sanitizada
         if: always()
         shell: bash
         run: |
           set +e
-          DEPLOY=false; PARITY=false; HYDRATION=false; BASE=false; HUMAN=false
-          jq -e '.ok==true and .hostingDeployExecutions==1' "$EVIDENCE_DIR/human-review-hosting-deploy-v20260731.json" >/dev/null 2>&1 && DEPLOY=true
-          jq -e '.ok==true and .passed==12' "$EVIDENCE_DIR/human-review-parity-v20260731.json" >/dev/null 2>&1 && PARITY=true
+          DEPLOY=false; PARITY=false; HYDRATION=false; BASE=false; HUMAN=false; BADGE=false; VISUAL=false
+          jq -e '.ok==true and .hostingDeployExecutions==1' "$EVIDENCE_DIR/human-review-hosting-final-deploy-v20260801.json" >/dev/null 2>&1 && DEPLOY=true
+          jq -e '.ok==true and .passed==12' "$EVIDENCE_DIR/human-review-final-parity-v20260801.json" >/dev/null 2>&1 && PARITY=true
           jq -e '.ok==true and .state.counts.recibosEsperados==1293 and .state.counts.carteraPrimas==673' "$EVIDENCE_DIR/receipts-portfolio-hydration-diagnostic-v910.json" >/dev/null 2>&1 && HYDRATION=true
           jq -e '.ok==true and .status=="VISUAL_LAB_PASS"' "$EVIDENCE_DIR/receipts-portfolio-visual-lab-v910.json" >/dev/null 2>&1 && BASE=true
           jq -e '.ok==true and .status=="HUMAN_REVIEW_VISUAL_LAB_PASS"' "$EVIDENCE_DIR/human-review-visual-lab-v20260731.json" >/dev/null 2>&1 && HUMAN=true
-          jq -n --argjson deploy "$DEPLOY" --argjson parity "$PARITY" --argjson hydration "$HYDRATION" --argjson base "$BASE" --argjson human "$HUMAN" '{schemaVersion:"orbit360-human-review-hosting-final-v2",ok:($deploy and $parity and $hydration and $base and $human),status:(if ($deploy and $parity and $hydration and $base and $human) then "HOSTING_LAB_HUMAN_REVIEW_INTEGRATED_PASS" else "HOSTING_LAB_HUMAN_REVIEW_INTEGRATED_FAIL" end),hostingDeploy:$deploy,remoteParity:$parity,hydration:$hydration,baseVisual:$base,humanVisual:$human,hostingDeployExecutions:(if $deploy then 1 else 0 end),rulesDeployExecutions:0,functionsDeploy:false,storageDeploy:false,firestoreDataWrites:0,operationalWrites:0,production:false,containsPII:false,containsSecrets:false}' > "$EVIDENCE_DIR/human-review-hosting-final-v20260731.json"
+          jq -e '.ok==true and .status=="RECEIPT_HERO_BADGE_BROWSER_PASS"' "$EVIDENCE_DIR/receipt-hero-badge-browser-v20260801.json" >/dev/null 2>&1 && BADGE=true
+          jq -e '.ok==true and .status=="SANITIZED_VISUAL_SET_READY" and .containsPII==false and .containsSecrets==false' "$EVIDENCE_DIR/human-review-sanitized-screens-v20260731.json" >/dev/null 2>&1 && VISUAL=true
+          jq -n --argjson deploy "$DEPLOY" --argjson parity "$PARITY" --argjson hydration "$HYDRATION" --argjson base "$BASE" --argjson human "$HUMAN" --argjson badge "$BADGE" --argjson visual "$VISUAL" '{schemaVersion:"orbit360-receipts-portfolio-final-visual-closure-v1",ok:($deploy and $parity and $hydration and $base and $human and $badge and $visual),status:(if ($deploy and $parity and $hydration and $base and $human and $badge and $visual) then "RECEIPTS_PORTFOLIO_FINAL_VISUAL_CLOSURE_PASS" else "RECEIPTS_PORTFOLIO_FINAL_VISUAL_CLOSURE_FAIL" end),hostingDeploy:$deploy,remoteParity:$parity,hydration:$hydration,baseVisual:$base,humanVisual:$human,receiptHeroBadgeCompact:$badge,sanitizedVisualEvidence:$visual,hostingDeployExecutions:(if $deploy then 1 else 0 end),rulesDeployExecutions:0,functionsDeploy:false,storageDeploy:false,firestoreDataWrites:0,operationalWrites:0,production:false,containsPII:false,containsSecrets:false}' > "$EVIDENCE_DIR/receipts-portfolio-final-visual-closure-v20260801.json"
       - name: Limpiar credencial temporal
         if: always()
         shell: bash
         run: |
           set +e
           if [ -n "${ORBIT360_TEMP_KEY_FILE:-}" ]; then rm -f "$ORBIT360_TEMP_KEY_FILE"; fi
-      - name: Subir evidencia sanitizada
+      - name: Subir evidencia final sanitizada
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: orbit360-human-review-integrated-hosting-${{ github.run_id }}
+          name: orbit360-receipts-portfolio-final-visual-closure-${{ github.run_id }}
           path: |
             orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
-            orbit360-platform/runtime-gate-crm-v20260716/human-review-static-base-v20260731.json
-            orbit360-platform/runtime-gate-crm-v20260716/human-review-readmodel-v20260731.json
-            orbit360-platform/runtime-gate-crm-v20260716/human-review-contract-v20260731.json
-            orbit360-platform/runtime-gate-crm-v20260716/human-review-importa-polizas-v20260731.json
-            orbit360-platform/runtime-gate-crm-v20260716/human-review-importa-cartera-v20260731.json
-            orbit360-platform/runtime-gate-crm-v20260716/human-review-importa-transversal-v20260731.json
-            orbit360-platform/runtime-gate-crm-v20260716/human-review-hosting-deploy-v20260731.json
-            orbit360-platform/runtime-gate-crm-v20260716/human-review-parity-v20260731.json
+            orbit360-platform/runtime-gate-crm-v20260716/human-review-static-base-v20260801.json
+            orbit360-platform/runtime-gate-crm-v20260716/human-review-readmodel-v20260801.json
+            orbit360-platform/runtime-gate-crm-v20260716/human-review-contract-v20260801.json
+            orbit360-platform/runtime-gate-crm-v20260716/human-review-importa-polizas-v20260801.json
+            orbit360-platform/runtime-gate-crm-v20260716/human-review-importa-cartera-v20260801.json
+            orbit360-platform/runtime-gate-crm-v20260716/human-review-importa-transversal-v20260801.json
+            orbit360-platform/runtime-gate-crm-v20260716/human-review-hosting-final-deploy-v20260801.json
+            orbit360-platform/runtime-gate-crm-v20260716/human-review-final-parity-v20260801.json
             orbit360-platform/runtime-gate-crm-v20260716/receipts-portfolio-hydration-diagnostic-v910.json
             orbit360-platform/runtime-gate-crm-v20260716/receipts-portfolio-visual-lab-v910.json
             orbit360-platform/runtime-gate-crm-v20260716/human-review-visual-lab-v20260731.json
-            orbit360-platform/runtime-gate-crm-v20260716/human-review-hosting-final-v20260731.json
+            orbit360-platform/runtime-gate-crm-v20260716/receipt-hero-badge-browser-v20260801.json
+            orbit360-platform/runtime-gate-crm-v20260716/human-review-sanitized-screens-v20260731.json
+            orbit360-platform/runtime-gate-crm-v20260716/human-review-sanitized-screens/*.png
+            orbit360-platform/runtime-gate-crm-v20260716/receipts-portfolio-final-visual-closure-v20260801.json
           if-no-files-found: warn
           retention-days: 30
       - name: Publicar estado
         if: always()
         uses: actions/github-script@v7
+        env:
+          EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/receipts-portfolio-final-visual-closure-v20260801.json
         with:
           script: |
-            const fs=require('fs');const f='orbit360-platform/runtime-gate-crm-v20260716/human-review-hosting-final-v20260731.json';let state='failure',description='Human review integrated LAB failed';try{const p=JSON.parse(fs.readFileSync(f,'utf8'));if(p.ok&&p.status==='HOSTING_LAB_HUMAN_REVIEW_INTEGRATED_PASS'){state='success';description='Human review integrated LAB PASS';}}catch(e){}await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/human-review-integrated-hosting-lab',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
+            const fs=require('fs');let state='failure',description='Receipts/portfolio final visual closure failed';
+            try{const p=JSON.parse(fs.readFileSync(process.env.EVIDENCE,'utf8'));if(p.ok&&p.status==='RECEIPTS_PORTFOLIO_FINAL_VISUAL_CLOSURE_PASS'){state='success';description='Receipts/portfolio final visual closure PASS';}}catch(e){}
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/receipts-portfolio-final-visual-closure',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
