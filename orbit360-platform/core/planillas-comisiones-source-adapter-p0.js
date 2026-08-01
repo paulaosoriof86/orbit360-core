@@ -3,6 +3,8 @@
    - Sin acceso a Orbit.store, Firestore, navegador o datos reales.
    - Detecta aliases, normaliza filas y genera dry-run inmutable.
    - País, moneda y periodo deben ser explícitos/confiables.
+   - Acepta fuentes mensuales sin fecha exacta solo con opt-in explícito.
+   - Deduplica únicamente cuando existe identidad fuerte suficiente.
    ============================================================ */
 (function (root, factory) {
   const api = factory();
@@ -158,7 +160,7 @@
     if (!country) reasons.push('COUNTRY_MISSING');
     if (!currency) reasons.push('CURRENCY_MISSING');
     if (!sourcePeriod) reasons.push('PERIOD_MISSING');
-    if (!paymentDate) reasons.push('PAYMENT_DATE_INVALID');
+    if (!paymentDate && !(ctx.allowPeriodOnly === true && sourcePeriod)) reasons.push('PAYMENT_DATE_INVALID');
     if (!record.policyNumber) reasons.push('POLICY_KEY_MISSING');
     if (!netPremium.valid) reasons.push('NET_PREMIUM_MISSING_OR_INVALID');
     if (!intermediaryCommission.valid) reasons.push('INTERMEDIARY_COMMISSION_MISSING_OR_INVALID');
@@ -178,8 +180,34 @@
     });
   }
 
+  function hasStrongIdentity(record) {
+    if (!record || !record.policyNumber) return false;
+    return Boolean(
+      record.paymentDate ||
+      record.incomeRelation ||
+      record.requirement ||
+      record.series ||
+      record.invoice ||
+      record.extraReference
+    );
+  }
+
   function identity(record) {
-    return [record.country, record.currency, record.policyNumber, record.paymentDate, record.series, record.invoice, record.netPremium, record.intermediaryCommission].join('|');
+    return [
+      record.country,
+      record.currency,
+      record.product,
+      record.policyNumber,
+      record.incomeRelation,
+      record.paymentDate,
+      record.requirement,
+      record.series,
+      record.invoice,
+      record.paymentNumber,
+      record.branch,
+      record.netPremium,
+      record.intermediaryCommission
+    ].join('|');
   }
 
   function dryRun(input) {
@@ -190,20 +218,24 @@
     const proposals = rows.map((row, index) => {
       const proposal = normalizeRow(headers, row, Object.assign({}, baseContext, { sourceRow: index + 2 }));
       if (proposal.decision !== 'CANDIDATE') return proposal;
+      const dedupeEligible = hasStrongIdentity(proposal.record);
+      if (!dedupeEligible) return Object.freeze(Object.assign({}, proposal, { dedupeEligible: false }));
       const key = identity(proposal.record);
-      if (seen.has(key)) return Object.freeze({ decision: 'OMIT_DUPLICATE', reasons: Object.freeze(['DUPLICATE_SOURCE_ROW']), record: proposal.record, writes: 0, commissionRateInferred: false });
+      if (seen.has(key)) return Object.freeze({ decision: 'OMIT_DUPLICATE', reasons: Object.freeze(['DUPLICATE_SOURCE_ROW']), record: proposal.record, writes: 0, commissionRateInferred: false, dedupeEligible: true });
       seen.add(key);
-      return proposal;
+      return Object.freeze(Object.assign({}, proposal, { dedupeEligible: true }));
     });
-    const summary = { total: proposals.length, candidate: 0, requiresValidation: 0, periodMismatch: 0, duplicate: 0, writes: 0 };
+    const summary = { total: proposals.length, candidate: 0, requiresValidation: 0, periodMismatch: 0, duplicate: 0, weakIdentityPreserved: 0, writes: 0 };
     proposals.forEach(item => {
-      if (item.decision === 'CANDIDATE') summary.candidate++;
-      else if (item.decision === 'REQUIERE_VALIDACION') summary.requiresValidation++;
+      if (item.decision === 'CANDIDATE') {
+        summary.candidate++;
+        if (item.dedupeEligible === false) summary.weakIdentityPreserved++;
+      } else if (item.decision === 'REQUIERE_VALIDACION') summary.requiresValidation++;
       else if (item.decision === 'HOLD_PERIOD_MISMATCH') summary.periodMismatch++;
       else if (item.decision === 'OMIT_DUPLICATE') summary.duplicate++;
     });
     return Object.freeze({
-      schemaVersion: 'orbit360-planillas-comisiones-source-dryrun-v1',
+      schemaVersion: 'orbit360-planillas-comisiones-source-dryrun-v1.1',
       headerMap: buildHeaderMap(headers),
       proposals: Object.freeze(proposals),
       summary: Object.freeze(summary),
@@ -214,7 +246,7 @@
   }
 
   return Object.freeze({
-    schemaVersion: 'orbit360-planillas-comisiones-source-adapter-v1',
+    schemaVersion: 'orbit360-planillas-comisiones-source-adapter-v1.1',
     aliases: ALIASES,
     norm,
     parseNumber,
@@ -223,6 +255,7 @@
     normalizeCurrency,
     buildHeaderMap,
     normalizeRow,
+    hasStrongIdentity,
     dryRun
   });
 });
