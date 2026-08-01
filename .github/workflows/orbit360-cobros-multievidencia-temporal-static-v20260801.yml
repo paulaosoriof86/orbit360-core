@@ -1,0 +1,78 @@
+name: Orbit 360 · Cobros · multi-evidence temporal static
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-triggers/cobros-multievidencia-temporal-static-v20260801.json'
+permissions:
+  contents: read
+  statuses: write
+concurrency:
+  group: orbit360-cobros-multievidencia-temporal-static-v20260801
+  cancel-in-progress: false
+env:
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  TRIGGER: .github/orbit360-triggers/cobros-multievidencia-temporal-static-v20260801.json
+  EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/cobros-multievidencia-temporal-static-v20260801.json
+jobs:
+  multi_evidence_temporal_static:
+    name: Gate 10.3 · temporal multi-evidence reconciliation
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout SHA exacto
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verificar trigger y lineage
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          jq -e '.schemaVersion=="orbit360-cobros-multievidencia-temporal-static-trigger-v1" and .approved==true and .gateId=="block10.3-cobros-multievidencia-temporal-static-v20260801" and .contractVersion=="10.3.0" and .branch==env.ORBIT360_BRANCH and .scope.static==true and .scope.realPayloadsInRepo==false and .scope.browser==false and .scope.secrets==false and .scope.firestoreRead==false and .scope.writes==false and .scope.deploy==false and .scope.production==false' "$TRIGGER" >/dev/null
+          AUTHORIZED_HEAD="$(jq -r '.authorizedHead' "$TRIGGER")"
+          test -n "$AUTHORIZED_HEAD"
+          git merge-base --is-ancestor "$AUTHORIZED_HEAD" HEAD
+          bad="$(git diff --name-only "$AUTHORIZED_HEAD"..HEAD | grep -Ev '^\.github/orbit360-triggers/cobros-multievidencia-temporal-static-v20260801\.json$' || true)"
+          test -z "$bad"
+      - name: Verificar gate predecessor 10.2
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-cobros-real-payload-replay-v20260801.mjs
+          jq -e '.status=="GO_GATE_CONTRACT" and .domainStatus=="COBROS_REAL_PAYLOAD_REPLAY_STATIC_READY" and .failed==0 and .cobrosWrites==0 and .finmovsWrites==0' orbit360-platform/runtime-gate-crm-v20260716/cobros-real-payload-replay-static-v20260801.json >/dev/null
+      - name: Validar gate multievidencia 10.3
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check orbit360-platform/core/importa-cobros-evidencia-temporal-p0.js
+          node --check tools/orbit360-test-importa-cobros-evidencia-temporal-p0-v20260801.mjs
+          node --check tools/orbit360-validar-cobros-multievidencia-static-v20260801.mjs
+          node tools/orbit360-validar-cobros-multievidencia-static-v20260801.mjs
+          jq -e '.status=="GO_GATE_CONTRACT" and .domainStatus=="COBROS_MULTIEVIDENCIA_TEMPORAL_STATIC_READY" and .contractVersion=="10.3.0" and .failed==0 and .registeredSources==10 and .postCutoffPaymentAllowed==true and .absenceAloneCreatesCobro==false and .commissionAloneCreatesCobro==false and .stalePlanillasUsed==false and .staleBankStatementsUsed==false and .staleFinancialFilesUsed==false and .realRowsStoredInRepo==0 and .cobrosWrites==0 and .finmovsWrites==0 and .firestoreWrites==0 and .operationalWrites==0 and .containsPII==false and .containsPolicyNumbers==false and .containsSecrets==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE" >/dev/null
+      - name: Subir evidencia sanitizada
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-cobros-multievidencia-temporal-static-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/cobros-multievidencia-temporal-static-v20260801.json
+            orbit360-platform/docs/REGISTRO-FUENTES-CONCILIACION-MULTIEVIDENCIA-20260801.json
+            orbit360-platform/docs/ACADEMIA-CONCILIACION-MULTIEVIDENCIA-TEMPORAL-20260801.md
+          if-no-files-found: error
+          retention-days: 30
+      - name: Publicar estado
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          EVIDENCE_FILE: ${{ env.EVIDENCE }}
+        with:
+          script: |
+            const fs=require('fs');let state='failure',description='Cobros multi-evidence temporal static blocked';
+            try{const p=JSON.parse(fs.readFileSync(process.env.EVIDENCE_FILE,'utf8'));if(p.status==='GO_GATE_CONTRACT'&&p.domainStatus==='COBROS_MULTIEVIDENCIA_TEMPORAL_STATIC_READY'&&p.failed===0){state='success';description='Cobros multi-evidence temporal static PASS';}}catch(e){}
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/cobros-multievidencia-temporal-static',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
