@@ -137,7 +137,8 @@ Hasta completar ese diagnóstico no se presentan decisiones privadas ni se prepa
 ## Corte documentado
 
 ```text
-HEAD al registrar STOP_RETRY: d36a0214027d716cd5c59eba8b2264a8948c21b5
-último run ejecutado: 30708670724
+HEAD del segundo y último trigger: 7689c9d1e00967fc3f4333365443b79282584406
+run final ejecutado: 30708670724
+resultado final del gate: 63/64 PASS · BLOCKED
 tercer run: prohibido
 ```
