@@ -4,8 +4,8 @@
   "gateContractVersion": "10.8.0",
   "owner": "cobros-private-authorization-materializer-p0",
   "ownerVersion": "20260801.1-private-readonly-materializer",
-  "status": "REGISTERED",
-  "classification": "SECRETO_DATO_REAL",
+  "status": "STOP_RETRY_RECOVERY_PREFLIGHT",
+  "classification": "VALIDATOR_STALE",
   "patternClassification": "REPLICABLE_CLAUDE_ACUMULADO",
   "executionProfile": {
     "mode": "STATIC_ATTESTATION_ONLY",
@@ -46,8 +46,21 @@
     "packageGrantsAuthorization": false,
     "historicalCardLast": true,
     "historicalRequiresReinforcedAuthorization": true,
-    "reactivatesPolicy": false,
+    "policyReactivation": {
+      "ownerField": "reactivatePolicy",
+      "auditField": "reactivatesPolicy",
+      "value": false
+    },
     "createsFinmov": false,
     "autoApply": false
+  },
+  "recovery": {
+    "authorizedByUser": true,
+    "authorizedAt": "2026-08-01T10:55:00-06:00",
+    "previousRuns": [30708592194, 30708670724],
+    "directValidatorRequiredBeforeReopen": true,
+    "requiredDirectResult": "64/64 PASS",
+    "newGateIdForbidden": true,
+    "productionAuthorizationGranted": false
   }
 }
