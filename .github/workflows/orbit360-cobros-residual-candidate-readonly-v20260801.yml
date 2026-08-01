@@ -1,0 +1,121 @@
+name: Orbit 360 · Cobros residual · candidate read-only
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-diagnostics/cobros-residual-candidate-readonly-v20260801.json'
+permissions:
+  contents: read
+  statuses: write
+concurrency:
+  group: orbit360-cobros-residual-candidate-readonly-v20260801
+  cancel-in-progress: false
+env:
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  GATE_ID: block10.9-cobros-controlled-write-lab-v20260801
+  LIFECYCLE_PATH: tools/orbit360-validator-lifecycle-contract-cobros-controlled-write-lab-v20260801.json
+  MARKER_PATH: .github/orbit360-diagnostics/cobros-residual-candidate-readonly-v20260801.json
+  PACKAGE_PATH: /tmp/orbit360-cobros-residual-candidate-private.json
+  EVIDENCE_PATH: orbit360-platform/runtime-gate-crm-v20260716/cobros-residual-candidate-readonly-v20260801.json
+jobs:
+  verify:
+    name: Cobros residual · one candidate live read-only preflight
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - name: Checkout SHA exacto
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verificar alcance residual y replay bloqueado
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
+          jq -e '.schemaVersion=="orbit360-cobros-residual-candidate-readonly-request-v1" and .gateId==env.GATE_ID and .contractVersion=="10.9.0" and .mode=="READ_ONLY_RESIDUAL_CANDIDATE_PREFLIGHT" and .approved==true and .sourceRows==9 and .appliedAndVerified==5 and .residualRows==4 and .candidateCount==1 and .holdCount==3 and .privatePackage.driveFileId=="1KHeHbNmJSvYZgzUcop57LiR4KdB-PxOh" and .privatePackage.sha256=="ccc37815c1f90fa3965d8eb87273c4746873ba79ec57fd6987d41b6016769411" and .privatePackage.logicalSha256=="b9798a225530a4473dcd356e158211b94e1700bbb03dd988df344a8358c213ae" and .capabilities.secrets==true and .capabilities.firestoreRead==true and .capabilities.writes==false and .capabilities.browser==false and .capabilities.deploy==false and .capabilities.production==false' "$MARKER_PATH" >/dev/null
+          jq -e '.status=="RESIDUAL_CANDIDATE_READONLY_ACTIVE" and .executionProfile.mode=="READ_ONLY_RESIDUAL_CANDIDATE_PREFLIGHT" and .executionProfile.phase=="LAB_DATA_CONTRACT_REPAIR_DRYRUN" and .executionProfile.capabilities.writes==false and .residualCandidateReadOnlyAuthorized==true and .writeAuthorized==false and .newResidualWriteAuthorized==false and .requestReplayBlocked==true and .requestSemanticallyConsumed==true and .additionalExecutionProhibited==true' "$LIFECYCLE_PATH" >/dev/null
+      - name: Gate canónico antes de secrets y Firestore
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
+          node --check tools/orbit360-validar-gate-contracts-engine-cobros-controlled-write-preflight-v20260801.mjs
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$GATE_ID"
+          jq -e '.status=="GO_GATE_CONTRACT" and .classification=="READ_ONLY_RESIDUAL_CANDIDATE_PREFLIGHT_READY" and .canonicalPhase=="LAB_DATA_CONTRACT_REPAIR_DRYRUN" and .phase=="READ_ONLY_RESIDUAL_CANDIDATE_PREFLIGHT" and .requestState=="SEALED_NO_REPLAY" and .executionAuthorized==false and .labWriteAuthorized==false and .writeEligible==0 and .residualCandidateReadOnlyAuthorized==true and .residualCandidateCount==1 and .residualHoldCount==3 and .requestReplayBlocked==true and .failed==0 and .operationalWrites==0 and .deployExecuted==false and .productionTouched==false' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json >/dev/null
+      - name: Preparar dependencia aislada
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm init -y >/dev/null 2>&1
+          npm install --no-save firebase-admin@13.4.0 >/dev/null 2>&1
+      - name: Descargar paquete privado exacto
+        env:
+          SA_ORBIT360_LAB: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}'
+          SA_ORBIT_360_LAB: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}'
+          SA_DEFAULT: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
+        shell: bash
+        run: |
+          set -euo pipefail
+          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-${SA_ORBIT_360_LAB:-${SA_DEFAULT:-}}}"; test -n "$SERVICE_ACCOUNT"; export SERVICE_ACCOUNT
+          PACKAGE_ID="$(jq -r '.privatePackage.driveFileId' "$MARKER_PATH")"
+          PACKAGE_SHA="$(jq -r '.privatePackage.sha256' "$MARKER_PATH")"
+          export PACKAGE_ID PACKAGE_SHA
+          node <<'NODE'
+          const fs=require('fs'),crypto=require('crypto');
+          const b64=o=>Buffer.from(JSON.stringify(o)).toString('base64url');
+          (async()=>{
+            const sa=JSON.parse(process.env.SERVICE_ACCOUNT),now=Math.floor(Date.now()/1000);
+            if(sa.project_id!=='ays-orbit-360-lab')throw new Error('ENVIRONMENT_FAILURE:PROJECT_ID_MISMATCH');
+            const unsigned=b64({alg:'RS256',typ:'JWT'})+'.'+b64({iss:sa.client_email,scope:'https://www.googleapis.com/auth/drive.readonly',aud:'https://oauth2.googleapis.com/token',iat:now,exp:now+900});
+            const sig=crypto.sign('RSA-SHA256',Buffer.from(unsigned),sa.private_key).toString('base64url');
+            const tokenResponse=await fetch('https://oauth2.googleapis.com/token',{method:'POST',headers:{'content-type':'application/x-www-form-urlencoded'},body:new URLSearchParams({grant_type:'urn:ietf:params:oauth:grant-type:jwt-bearer',assertion:unsigned+'.'+sig})});
+            const token=await tokenResponse.json();if(!tokenResponse.ok||!token.access_token)throw new Error('ENVIRONMENT_FAILURE:OAUTH_'+tokenResponse.status);
+            const response=await fetch(`https://www.googleapis.com/drive/v3/files/${process.env.PACKAGE_ID}?alt=media&supportsAllDrives=true`,{headers:{authorization:`Bearer ${token.access_token}`}});
+            if(!response.ok)throw new Error('ENVIRONMENT_FAILURE:DRIVE_'+response.status);
+            const bytes=Buffer.from(await response.arrayBuffer()),sha=crypto.createHash('sha256').update(bytes).digest('hex');
+            if(sha!==process.env.PACKAGE_SHA)throw new Error('DATA_CONTRACT_FAILURE:PRIVATE_PACKAGE_SHA');fs.writeFileSync(process.env.PACKAGE_PATH,bytes);
+          })().catch(e=>{console.error(String(e.message||e));process.exit(41);});
+          NODE
+      - name: Ejecutar preflight residual read-only
+        env:
+          SA_ORBIT360_LAB: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}'
+          SA_ORBIT_360_LAB: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}'
+          SA_DEFAULT: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
+        shell: bash
+        run: |
+          set -euo pipefail
+          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-${SA_ORBIT_360_LAB:-${SA_DEFAULT:-}}}"; test -n "$SERVICE_ACCOUNT"; export SERVICE_ACCOUNT
+          export ORBIT360_COBROS_LIFECYCLE="$LIFECYCLE_PATH"
+          export ORBIT360_COBROS_RESIDUAL_PACKAGE="$PACKAGE_PATH"
+          export ORBIT360_COBROS_RESIDUAL_PACKAGE_SHA256="$(jq -r '.privatePackage.sha256' "$MARKER_PATH")"
+          export ORBIT360_COBROS_RESIDUAL_PACKAGE_LOGICAL_SHA256="$(jq -r '.privatePackage.logicalSha256' "$MARKER_PATH")"
+          export ORBIT360_COBROS_RESIDUAL_EVIDENCE="$EVIDENCE_PATH"
+          node --check tools/orbit360-verificar-cobros-residual-candidate-readonly-v20260801.mjs
+          node tools/orbit360-verificar-cobros-residual-candidate-readonly-v20260801.mjs
+          jq -e '(.status=="RESIDUAL_CANDIDATE_READONLY_PASS" or .status=="RESIDUAL_CANDIDATE_READONLY_HOLD") and .ok==true and .lifecycleVerified==true and .packageVerified==true and .counts.polizas==1373 and .counts.recibosEsperados==1294 and .counts.cobros==5 and .counts.finmovs==0 and .requestReplayBlocked==true and .writeAuthorized==false and .firestoreRead==true and .firestoreWrites==0 and .operationalWrites==0 and .browserExecuted==false and .deployExecuted==false and .productionTouched==false and .containsPII==false and .containsPolicyNumbers==false and .containsAmounts==false and .containsIds==false and .containsSecrets==false' "$EVIDENCE_PATH" >/dev/null
+          rm -f "$PACKAGE_PATH"
+      - name: Subir evidencia sanitizada
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-cobros-residual-candidate-readonly-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/cobros-residual-candidate-readonly-v20260801.json
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Publicar estado
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          EVIDENCE_FILE: ${{ env.EVIDENCE_PATH }}
+        with:
+          script: |
+            const fs=require('fs');let state='failure',description='Cobros residual read-only preflight failed';
+            try{const p=JSON.parse(fs.readFileSync(process.env.EVIDENCE_FILE,'utf8'));if(p.status==='RESIDUAL_CANDIDATE_READONLY_PASS'&&p.candidate.eligible===true&&p.firestoreWrites===0){state='success';description='Cobros residual read-only: 1 candidate eligible; 3 HOLD';}else if(p.status==='RESIDUAL_CANDIDATE_READONLY_HOLD'&&p.firestoreWrites===0){state='success';description='Cobros residual read-only: candidate remains HOLD; zero writes';}}catch(e){}
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/cobros-residual-candidate-readonly',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
