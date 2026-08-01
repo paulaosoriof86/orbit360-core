@@ -10,7 +10,7 @@
   'use strict';
   const root=typeof window!=='undefined'?window:globalThis;
   root.Orbit=root.Orbit||{};
-  const VERSION='20260801.1-multi-evidence-temporal';
+  const VERSION='20260801.2-multi-evidence-temporal-lineage';
   const TYPES=new Set(['estado_cartera_aseguradora','planilla_comisiones']);
   const TARGET={
     estado_cartera_aseguradora:'evidenciasCarteraTemporal',
@@ -32,7 +32,12 @@
     match=raw.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})/);
     return match?`${match[3]}-${String(match[2]).padStart(2,'0')}-${String(match[1]).padStart(2,'0')}`:raw.slice(0,10);
   };
-  const dateValue=value=>{const parsed=Date.parse(`${date(value)}T00:00:00Z`);return Number.isFinite(parsed)?parsed:null;};
+  const dateValue=value=>{
+    const normalized=date(value);
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(normalized))return null;
+    const parsed=Date.parse(`${normalized}T00:00:00Z`);
+    return Number.isFinite(parsed)?parsed:null;
+  };
   const defaultCurrency=country=>String(country||'').toUpperCase()==='GT'?'GTQ':String(country||'').toUpperCase()==='CO'?'COP':'';
   const normalizeInstallment=value=>{
     const raw=text(value).toUpperCase().replace(/^'/,'');
@@ -89,16 +94,17 @@
     normalized.sourceKey=[type,t.sourceHash,t.file,t.sheet,t.row,caseIdentity(normalized)].join('|');
     return normalized;
   }
-  function insurerKey(row){return text(row.insurerId)||norm(row.insurerName);}
-  function policyKey(row){return text(row.policyId)||compact(row.policyNumber);}
+  function insurerKey(row){return text(row&&row.insurerId)||norm(row&&row.insurerName);}
+  function policyKey(row){return text(row&&row.policyId)||compact(row&&row.policyNumber);}
   function caseIdentity(row){
-    const receipt=text(row.receiptId)||compact(row.receiptNumber);
+    const receipt=text(row&&row.receiptId)||compact(row&&row.receiptNumber);
     if(receipt)return `receipt:${receipt}`;
-    const policy=policyKey(row),endorsement=normalizeEndorsement(row.endorsement),installment=normalizeInstallment(row.installment);
+    const policy=policyKey(row),endorsement=normalizeEndorsement(row&&row.endorsement),installment=normalizeInstallment(row&&row.installment);
     if(policy&&endorsement)return `policy_endorsement:${policy}:${endorsement}`;
-    if(policy&&installment)return `policy_installment:${policy}:${installment}:${date(row.dueDate)}`;
+    if(policy&&installment)return `policy_installment:${policy}:${installment}:${date(row&&row.dueDate)}`;
     return policy?`policy:${policy}`:'';
   }
+  function lineageKey(row){return `${insurerKey(row)}|${caseIdentity(row)}`;}
   function matchQuality(left,right){
     if(!left||!right||!policyKey(left)||policyKey(left)!==policyKey(right))return 'NONE';
     const leftReceipt=text(left.receiptId)||compact(left.receiptNumber),rightReceipt=text(right.receiptId)||compact(right.receiptNumber);
@@ -110,7 +116,7 @@
     return 'POLICY_ONLY';
   }
   function isStrongQuality(value){return value==='EXACT_RECEIPT'||value==='EXACT_ENDORSEMENT'||value==='EXACT_INSTALLMENT';}
-  function paymentDate(row){return date(row.paymentDate||row.date||row.fechaPago||row.fecha_recaudo);}
+  function paymentDate(row){return date(row&& (row.paymentDate||row.date||row.fechaPago||row.fecha_recaudo));}
   function normalizePayment(row){
     return {
       policyId:text(first(row,['policyId','polizaId','poliza_id'])),
@@ -122,30 +128,50 @@
       insurerId:text(first(row,['insurerId','aseguradoraId','aseguradora_id'])),
       insurerName:text(first(row,['insurerName','aseguradoraNombre','aseguradora'])),
       paymentDate:paymentDate(row),currency:text(first(row,['currency','moneda'])),
-      amount:number(first(row,['amount','monto','total_recaudado'])),sourceKey:text(row.sourceKey||row.proposalIdentity)
+      amount:number(first(row,['amount','monto','total_recaudado'])),sourceKey:text(row&& (row.sourceKey||row.proposalIdentity))
+    };
+  }
+  function normalizeSource(source){
+    const rows=(source.rows||[]).map(raw=>normalize(source.sourceType,raw,{
+      ...source.trace,sourceHash:source.sourceHash,cutoff:source.cutoff,completeSnapshot:source.completeSnapshot
+    }));
+    const stagedRows=rows.filter(row=>row.status==='STAGED');
+    const insurerKeys=[...new Set(stagedRows.map(insurerKey).filter(Boolean))];
+    return {
+      sourceType:source.sourceType,sourceHash:text(source.sourceHash),cutoff:date(source.cutoff),
+      cutoffValue:dateValue(source.cutoff),completeSnapshot:source.completeSnapshot===true,
+      insurerKeys,rows,stagedRows
     };
   }
   function evaluate(input={}){
-    const rows=[];
-    for(const source of input.sources||[])for(const raw of source.rows||[])
-      rows.push(normalize(source.sourceType,raw,{...source.trace,sourceHash:source.sourceHash,cutoff:source.cutoff,completeSnapshot:source.completeSnapshot}));
+    const batches=(input.sources||[]).map(normalizeSource);
+    const rows=batches.flatMap(batch=>batch.rows);
     const holds=rows.filter(row=>row.status==='HOLD').map(row=>({action:'HOLD',reason:row.reason,missing:row.missing,trace:row.trace,sourceKey:row.sourceKey}));
-    const staged=rows.filter(row=>row.status==='STAGED');
-    const snapshots=staged.filter(row=>row.sourceType==='estado_cartera_aseguradora');
-    const commissions=staged.filter(row=>row.sourceType==='planilla_comisiones');
+    const snapshots=rows.filter(row=>row.status==='STAGED'&&row.sourceType==='estado_cartera_aseguradora');
+    const commissions=rows.filter(row=>row.status==='STAGED'&&row.sourceType==='planilla_comisiones');
     const payments=(input.payments||input.proposals||[]).map(normalizePayment);
     const cases=[];
 
-    for(const current of snapshots){
+    const lineages=new Map();
+    for(const snapshot of snapshots){
+      const key=lineageKey(snapshot);
+      if(!lineages.has(key))lineages.set(key,[]);
+      lineages.get(key).push(snapshot);
+    }
+
+    for(const lineageRows of lineages.values()){
+      lineageRows.sort((left,right)=>(dateValue(left.trace.cutoff)??Number.MAX_SAFE_INTEGER)-(dateValue(right.trace.cutoff)??Number.MAX_SAFE_INTEGER));
+      const current=lineageRows[0];
       const currentCutoff=dateValue(current.trace.cutoff);
-      const laterSources=(input.sources||[]).filter(source=>source.sourceType==='estado_cartera_aseguradora'&&source.completeSnapshot===true&&
-        insurerKey({insurerId:source.insurerId,insurerName:source.insurerName})===insurerKey(current)&&dateValue(source.cutoff)>currentCutoff);
+      const currentInsurer=insurerKey(current);
+      const laterBatches=batches.filter(batch=>batch.sourceType==='estado_cartera_aseguradora'&&batch.completeSnapshot===true&&
+        batch.cutoffValue!=null&&currentCutoff!=null&&batch.cutoffValue>currentCutoff&&batch.insurerKeys.includes(currentInsurer));
       let laterComparable=false,laterStillPending=false,laterCutoff='';
-      for(const source of laterSources){
-        laterComparable=true;laterCutoff=date(source.cutoff);
-        const laterRows=(source.rows||[]).map(raw=>normalize(source.sourceType,raw,{...source.trace,sourceHash:source.sourceHash,cutoff:source.cutoff,completeSnapshot:true}))
-          .filter(row=>row.status==='STAGED');
-        if(laterRows.some(row=>isStrongQuality(matchQuality(current,row)))){laterStillPending=true;break;}
+      for(const batch of laterBatches.sort((a,b)=>a.cutoffValue-b.cutoffValue)){
+        laterComparable=true;laterCutoff=batch.cutoff;
+        if(batch.stagedRows.some(row=>insurerKey(row)===currentInsurer&&isStrongQuality(matchQuality(current,row)))){
+          laterStillPending=true;break;
+        }
       }
       const paymentMatches=payments.map(row=>({row,quality:matchQuality(current,row)})).filter(item=>isStrongQuality(item.quality));
       const commissionMatches=commissions.map(row=>({row,quality:matchQuality(current,row)})).filter(item=>isStrongQuality(item.quality));
@@ -163,16 +189,16 @@
       else if(disappeared)status='CLEARED_OR_ADJUSTED_REQUIRES_VALIDATION';
       else if(commissionRecognition)status='COMMISSION_RECOGNITION_REQUIRES_VALIDATION';
       cases.push({
-        caseIdentity:caseIdentity(current),insurer:insurerKey(current),status,
+        lineageKey:lineageKey(current),caseIdentity:caseIdentity(current),insurer:currentInsurer,status,
         pendingCutoff:current.trace.cutoff,laterCutoff,laterComparable,laterStillPending,disappeared,
         directPayment,commissionRecognition,postCutoffPaymentValid:validPostCutoffPayment,
         evidenceCount:1+paymentMatches.length+commissionMatches.length+(laterComparable?1:0),
-        autoApply:false,writes:0,reactivatesPolicy:false
+        sourceSnapshotCount:lineageRows.length,autoApply:false,writes:0,reactivatesPolicy:false
       });
     }
 
     for(const commission of commissions){
-      const linked=cases.some(item=>item.caseIdentity===caseIdentity(commission));
+      const linked=cases.some(item=>item.lineageKey===lineageKey(commission));
       if(!linked)holds.push({action:'HOLD',reason:'COMMISSION_WITHOUT_STRONG_PAYMENT_OR_PORTFOLIO_MATCH',sourceKey:commission.sourceKey,trace:commission.trace});
     }
     const totals={
@@ -185,13 +211,13 @@
     };
     return {
       version:VERSION,status:holds.length?'MULTI_EVIDENCE_REQUIRES_VALIDATION':'MULTI_EVIDENCE_READY',
-      cases,holds,totals,allowPostCutoffPayment:true,absenceAloneCreatesCobro:false,
-      commissionAloneCreatesCobro:false,bankRequestedOnlyForSpecificHold:true,
+      cases,holds,totals,oneTemporalLineagePerCase:true,allowPostCutoffPayment:true,
+      absenceAloneCreatesCobro:false,commissionAloneCreatesCobro:false,bankRequestedOnlyForSpecificHold:true,
       cobrosWrites:0,finmovsWrites:0,firestoreWrites:0,operationalWrites:0,
       browserExecuted:false,deployExecuted:false,productionTouched:false
     };
   }
   root.Orbit.importaCobrosEvidenciaTemporalP0=Object.freeze({
-    VERSION,TYPES,TARGET,normalize,caseIdentity,matchQuality,evaluate
+    VERSION,TYPES,TARGET,normalize,caseIdentity,lineageKey,matchQuality,evaluate
   });
 })();
