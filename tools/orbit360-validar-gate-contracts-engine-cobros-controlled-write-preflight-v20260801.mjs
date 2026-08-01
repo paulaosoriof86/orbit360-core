@@ -13,7 +13,7 @@ const CANONICAL_EVIDENCE='orbit360-platform/runtime-gate-crm-v20260716/preflight
 const LIFECYCLE='tools/orbit360-validator-lifecycle-contract-cobros-controlled-write-lab-v20260801.json';
 const REQUEST='.github/orbit360-requests/cobros-controlled-write-lab-v20260801.json';
 const PHRASE='AUTORIZO ARMAR Y EJECUTAR GATE 10.9 COBROS LAB CINCO CASOS SIN DEPLOY NI PRODUCCION';
-const PACKAGE_SHA='15a573e16514d702066b2500a43d714b382830638fc1e253a1a704b9e0616576';
+const PACKAGE_SHA='cc01fa733166c2201da6e4ac37c231d42692caf6bba3797208fed23b3a1c737a';
 const PACKAGE_LOGICAL='997bfc0614b4a65e8c4b5e7832996fbbe6b0063f9f0efdf3ca99b57aa79f4ff8';
 
 function readJson(rel){return JSON.parse(fs.readFileSync(path.join(ROOT,rel),'utf8'));}
