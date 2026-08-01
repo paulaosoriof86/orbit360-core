@@ -1,0 +1,37 @@
+{
+  "schemaVersion": "orbit360-cobros-authorization-package-static-trigger-v1",
+  "approved": true,
+  "gateId": "block10.6-cobros-authorization-package-static-v20260801",
+  "contractVersion": "10.6.0",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "authorizedHead": "bafe375fd485423bcfbfcc43298f606b1f852ee8",
+  "expected": {
+    "cards": 5,
+    "direct": 4,
+    "historical": 1,
+    "authorizationGranted": 0,
+    "writeEligible": 0,
+    "duplicateIdempotencyKeys": 0
+  },
+  "controls": {
+    "packageGrantsAuthorization": false,
+    "privateMaterializationRequired": true,
+    "privateValuesStoredInRepo": false,
+    "partialBatchDecisionAllowed": true,
+    "reinforcedAuthorizationForHistorical": true,
+    "preWriteSnapshotRequired": true,
+    "rollbackRequired": true,
+    "reactivatesPolicy": false,
+    "createsFinmov": false
+  },
+  "scope": {
+    "static": true,
+    "realPayloadsInRepo": false,
+    "browser": false,
+    "secrets": false,
+    "firestoreRead": false,
+    "writes": false,
+    "deploy": false,
+    "production": false
+  }
+}
