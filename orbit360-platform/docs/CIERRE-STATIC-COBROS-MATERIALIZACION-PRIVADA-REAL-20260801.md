@@ -1,17 +1,45 @@
-# Cierre estático — Materialización privada real de Cobros
+# Cierre técnico parcial — Materialización privada real de Cobros
 
 Fecha: 2026-08-01  
 Tenant: `alianzas-soluciones`  
 Rama: `ays/backend-tenant-lab-v99-20260703`  
 PR: #5 draft/open
 
-## Estado
+## Estado del producto
 
 `PRIVATE_AUTHORIZATION_MATERIALIZATION_REAL_ATTESTED`
 
 Las referencias privadas de las cinco tarjetas del paquete 10.6 sí continuaban disponibles en el runtime seguro. Se resolvieron contra las fuentes registradas y los paquetes canónicos privados, sin solicitar archivos adicionales.
 
-## Resultado real
+## Estado del gate 10.8
+
+`STOP_RETRY_VALIDATOR_STALE`
+
+El cierre formal del gate permanece bloqueado después de dos ejecuciones. No existe una tercera ejecución autorizada.
+
+```text
+primer run: 30708592194
+primer fallo: predecesor 10.7 / AUDIT_STATUS
+clasificación: VALIDATOR_STALE
+segunda ejecución: 30708670724
+predecesor 10.7: 46/46 PASS
+gate 10.8: 63/64 PASS
+único fallo: OWNER_reactivatesPolicy:false
+clasificación: VALIDATOR_STALE
+```
+
+La segunda falla no corresponde al producto. El validador busca literalmente `reactivatesPolicy:false`, mientras el owner canónico expresa la misma prohibición con `reactivatePolicy:false` y las pruebas conductuales confirman que ninguna tarjeta reactiva pólizas.
+
+Conforme a la regla de dos fallos en la misma etapa:
+
+- se activa `STOP_RETRY`;
+- no se crea otro trigger;
+- no se ejecuta una tercera corrida;
+- no se toca el owner ni las tarjetas;
+- no se abre Firebase, navegador, deploy ni producción;
+- la corrección futura deberá comenzar por el contrato del validador y probarse fuera del gate cerrado antes de reabrirlo.
+
+## Resultado real preservado
 
 ```text
 tarjetas materializadas en memoria: 5
@@ -94,4 +122,14 @@ Su autorización permanece separada de los cuatro casos directos.
 
 ## Siguiente acción exacta
 
-Cerrar el gate 10.8 estático. Después, la siguiente frontera será presentar las decisiones a Dirección mediante un canal privado autorizado. Cualquier ejecución posterior requerirá un gate independiente de escritura con snapshot, idempotencia, operación atómica y rollback.
+Mantener congelado el gate 10.8. En el siguiente bloque de recuperación metodológica se deberá:
+
+```text
+alinear el nombre contractual del control owner/validator
+→ ejecutar prueba estática directa del validador fuera del workflow
+→ demostrar 64/64 sin nuevo trigger
+→ registrar la corrección conjunta de owner/validator/workflow/docs
+→ decidir explícitamente si se reabre el mismo gate
+```
+
+Hasta completar ese diagnóstico no se presentan decisiones privadas ni se prepara un gate de escritura.
