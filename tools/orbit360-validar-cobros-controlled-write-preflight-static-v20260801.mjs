@@ -62,8 +62,11 @@ try{
   check('OWNER_ROLLBACK',owner.includes('RESTORE_EXISTING_RECEIPT_FROM_SNAPSHOT')&&owner.includes('REMOVE_INSERTED_COBRO_BY_IDEMPOTENCY')&&owner.includes('REMOVE_INSERTED_HISTORICAL_RECEIPT'));
 
   const genericWriter=read('genericWriter');
-  check('GENERIC_WRITER_COBROS_BLOCKED',/HARD_BLOCKED_COLLECTIONS[\s\S]*['"]cobros['"]/.test(genericWriter));
-  check('GENERIC_WRITER_NO_COBROS_ALLOWED',!/ALLOWED_COLLECTIONS[\s\S]{0,600}['"]cobros['"]/.test(genericWriter));
+  const allowedArray=(genericWriter.match(/const\s+ALLOWED_COLLECTIONS\s*=\s*\[([\s\S]*?)\];/)||[])[1]||'';
+  const blockedArray=(genericWriter.match(/const\s+HARD_BLOCKED_COLLECTIONS\s*=\s*\[([\s\S]*?)\];/)||[])[1]||'';
+  check('GENERIC_WRITER_ARRAYS_PARSED',Boolean(allowedArray)&&Boolean(blockedArray));
+  check('GENERIC_WRITER_COBROS_BLOCKED',/['"]cobros['"]/.test(blockedArray));
+  check('GENERIC_WRITER_NO_COBROS_ALLOWED',!/['"]cobros['"]/.test(allowedArray));
 
   const run=spawnSync(process.execPath,[files.test],{cwd:ROOT,encoding:'utf8',maxBuffer:4*1024*1024});
   check('TEST_EXIT',run.status===0);
