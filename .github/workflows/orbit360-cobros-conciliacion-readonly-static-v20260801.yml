@@ -35,13 +35,15 @@ jobs:
           set -euo pipefail
           test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
           test "$GITHUB_RUN_ATTEMPT" = '1'
-          jq -e '.schemaVersion=="orbit360-cobros-conciliacion-readonly-static-trigger-v1" and .approved==true and .gateId=="block10-cobros-conciliacion-readonly-static-v20260801" and .contractVersion=="10.0.0" and .branch==env.ORBIT360_BRANCH and .classification=="DATA_CONTRACT_FAILURE" and .scope.static==true and .scope.browser==false and .scope.secrets==false and .scope.firestoreRead==false and .scope.writes==false and .scope.deploy==false and .scope.production==false' "$TRIGGER" >/dev/null
+          jq -e '.schemaVersion=="orbit360-cobros-conciliacion-readonly-static-trigger-v1" and .approved==true and .gateId=="block10-cobros-conciliacion-readonly-static-v20260801" and .contractVersion=="10.0.0" and .branch==env.ORBIT360_BRANCH and .classification=="VALIDATOR_STALE" and .scope.static==true and .scope.browser==false and .scope.secrets==false and .scope.firestoreRead==false and .scope.writes==false and .scope.deploy==false and .scope.production==false' "$TRIGGER" >/dev/null
           AUTHORIZED_HEAD="$(jq -r '.authorizedHead' "$TRIGGER")"
           test -n "$AUTHORIZED_HEAD"
           git merge-base --is-ancestor "$AUTHORIZED_HEAD" HEAD
           bad="$(git diff --name-only "$AUTHORIZED_HEAD"..HEAD | grep -Ev '^\.github/orbit360-triggers/cobros-conciliacion-readonly-static-v20260801\.json$' || true)"
           test -z "$bad"
-      - name: Preflight canónico vigente
+      - name: Preflight canónico cerrado de Recibos
+        env:
+          ORBIT360_RECEIPTS_GATE_PHASE: AUTHORIZED_WRITE
         shell: bash
         run: |
           set -euo pipefail
@@ -55,7 +57,7 @@ jobs:
           node --check tools/orbit360-test-cobros-conciliacion-readonly-v20260801.mjs
           node --check tools/orbit360-validar-cobros-conciliacion-readonly-v20260801.mjs
           node tools/orbit360-validar-cobros-conciliacion-readonly-v20260801.mjs
-          jq -e '.status=="COBROS_CONCILIACION_READONLY_STATIC_READY" and .contractVersion=="10.0.0" and .failed==0 and .canonicalQueue=="conciliaciones" and .projectedDomainQueue=="conciliacionesPrimas" and .testResult.legacyCobrosActionsFrozen==true and .testResult.fifoOldestFirst==true and .testResult.historicalExigibleIncluded==true and .testResult.expiredPolicyReactivated==false and .testResult.partialPaymentSupported==true and .testResult.excessPaymentPreserved==true and .sourceEvidence.reports==2 and .sourceEvidence.rows==9 and .sourceEvidence.candidates==5 and .sourceEvidence.holdOrNoMatch==4 and .sourceEvidence.rowLevelReplay==false and .firestoreWrites==0 and .operationalWrites==0 and .cobrosWrites==0 and .finmovsWrites==0 and .secretsRead==false and .firestoreRead==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false and .containsPII==false and .containsSecrets==false' "$EVIDENCE" >/dev/null
+          jq -e '.status=="GO_GATE_CONTRACT" and .domainStatus=="COBROS_CONCILIACION_READONLY_STATIC_READY" and .contractVersion=="10.0.0" and .failed==0 and .canonicalQueue=="conciliaciones" and .projectedDomainQueue=="conciliacionesPrimas" and .testResult.legacyCobrosActionsFrozen==true and .testResult.fifoOldestFirst==true and .testResult.historicalExigibleIncluded==true and .testResult.expiredPolicyReactivated==false and .testResult.partialPaymentSupported==true and .testResult.excessPaymentPreserved==true and .sourceEvidence.reports==2 and .sourceEvidence.rows==9 and .sourceEvidence.candidates==5 and .sourceEvidence.holdOrNoMatch==4 and .sourceEvidence.rowLevelReplay==false and .firestoreWrites==0 and .operationalWrites==0 and .cobrosWrites==0 and .finmovsWrites==0 and .secretsRead==false and .firestoreRead==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false and .containsPII==false and .containsSecrets==false' "$EVIDENCE" >/dev/null
       - name: Subir evidencia sanitizada
         uses: actions/upload-artifact@v4
         with:
@@ -73,5 +75,5 @@ jobs:
         with:
           script: |
             const fs=require('fs');let state='failure',description='Cobros reconciliation read-only static blocked';
-            try{const p=JSON.parse(fs.readFileSync(process.env.EVIDENCE_FILE,'utf8'));if(p.status==='COBROS_CONCILIACION_READONLY_STATIC_READY'&&p.failed===0){state='success';description='Cobros reconciliation read-only static PASS';}}catch(e){}
+            try{const p=JSON.parse(fs.readFileSync(process.env.EVIDENCE_FILE,'utf8'));if(p.status==='GO_GATE_CONTRACT'&&p.domainStatus==='COBROS_CONCILIACION_READONLY_STATIC_READY'&&p.failed===0){state='success';description='Cobros reconciliation read-only static PASS';}}catch(e){}
             await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/cobros-conciliacion-readonly-static',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
