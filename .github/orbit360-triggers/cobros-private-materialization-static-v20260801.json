@@ -1,0 +1,39 @@
+{
+  "schemaVersion": "orbit360-cobros-private-materialization-static-trigger-v1",
+  "approved": true,
+  "gateId": "block10.7-cobros-private-materialization-static-v20260801",
+  "contractVersion": "10.7.0",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "authorizedHead": "5cb81d4b5e2fa33db2412e41b86bd4d441c7117e",
+  "expected": {
+    "cards": 5,
+    "direct": 4,
+    "historical": 1,
+    "authorizationGranted": 0,
+    "writeEligible": 0,
+    "remainingPrivateCardsAfterDisposal": 0,
+    "duplicateRefs": 0,
+    "duplicateIdempotencyKeys": 0
+  },
+  "controls": {
+    "ephemeralSessionRequired": true,
+    "persistAllowed": false,
+    "privateCardsEnumerable": false,
+    "serializedPayloadContainsPrivateValues": false,
+    "packageGrantsAuthorization": false,
+    "sourceProofsMinimumPerCard": 2,
+    "disposalRequired": true,
+    "reactivatesPolicy": false,
+    "createsFinmov": false
+  },
+  "scope": {
+    "static": true,
+    "realPayloadsInRepo": false,
+    "browser": false,
+    "secrets": false,
+    "firestoreRead": false,
+    "writes": false,
+    "deploy": false,
+    "production": false
+  }
+}
