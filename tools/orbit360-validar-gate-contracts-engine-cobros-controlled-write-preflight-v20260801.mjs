@@ -12,13 +12,14 @@ const SPECIFIC_EVIDENCE='orbit360-platform/runtime-gate-crm-v20260716/cobros-con
 const CANONICAL_EVIDENCE='orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json';
 const LIFECYCLE='tools/orbit360-validator-lifecycle-contract-cobros-controlled-write-lab-v20260801.json';
 const REQUEST='.github/orbit360-requests/cobros-controlled-write-lab-v20260801.json';
+const DIAGNOSIS='.github/orbit360-diagnostics/cobros-controlled-write-lab-v20260801.json';
 const PHRASE='AUTORIZO ARMAR Y EJECUTAR GATE 10.9 COBROS LAB CINCO CASOS SIN DEPLOY NI PRODUCCION';
 const PACKAGE_SHA='cc01fa733166c2201da6e4ac37c231d42692caf6bba3797208fed23b3a1c737a';
 const PACKAGE_LOGICAL='997bfc0614b4a65e8c4b5e7832996fbbe6b0063f9f0efdf3ca99b57aa79f4ff8';
 
 function readJson(rel){return JSON.parse(fs.readFileSync(path.join(ROOT,rel),'utf8'));}
 function write(payload){const target=path.join(ROOT,CANONICAL_EVIDENCE);fs.mkdirSync(path.dirname(target),{recursive:true});fs.writeFileSync(target,JSON.stringify(payload,null,2)+'\n','utf8');}
-function armedPayload(){
+function validateRequest(){
   if(!fs.existsSync(path.join(ROOT,REQUEST)))throw new Error('AUTHORIZED_REQUEST_MISSING');
   const request=readJson(REQUEST),refs=request.authorizationRefs||[];
   if(request.schemaVersion!=='orbit360-cobros-controlled-write-lab-request-v1'||request.gateId!==GATE||request.contractVersion!==VERSION||request.approved!==true||request.phrase!==PHRASE)throw new Error('AUTHORIZED_REQUEST_INVALID');
@@ -27,13 +28,23 @@ function armedPayload(){
   if(refs.length!==5||new Set(refs).size!==5||!refs.every(x=>/^cob-auth-[a-f0-9]{24}$/.test(x)))throw new Error('AUTHORIZED_REQUEST_REFS');
   if(request.privatePackage?.driveFileId!=='1FGpp_v6ZTs52VEeOnsH2IxoNCqWwVoAD'||request.privatePackage?.sha256!==PACKAGE_SHA||request.privatePackage?.logicalSha256!==PACKAGE_LOGICAL)throw new Error('AUTHORIZED_PACKAGE_MISMATCH');
   if(request.capabilities?.secrets!==true||request.capabilities?.firestoreRead!==true||request.capabilities?.writes!==true||request.capabilities?.runtime!==false||request.capabilities?.browser!==false||request.capabilities?.deploy!==false||request.capabilities?.functionsDeploy!==false||request.capabilities?.rulesDeploy!==false||request.capabilities?.production!==false)throw new Error('AUTHORIZED_CAPABILITIES_MISMATCH');
-  return {schemaVersion:'orbit360-cobros-controlled-write-canonical-armed-v1',gateId:GATE,contractVersion:VERSION,status:'GO_GATE_CONTRACT',classification:'AUTHORIZED_LAB_WRITE_CONTRACT_READY',canonicalPhase:'LAB_DATA_CONTRACT_REPAIR_APPLY',phase:'ARMED_BY_EXPLICIT_LAB_AUTHORIZATION',requestExists:true,requestState:'EXACT_AUTHORIZED_REQUIRED',privatePackageVerifiedByContract:true,packageCanonicalization:'node-json-stable-sort-v1',plan:{cases:5,direct:4,historical:1,atomicGroups:5,snapshots:11,operations:10,rollbacks:11,cobros:5,receiptUpdates:4,receiptCreates:1,policyWrites:0,finmovs:0},executionAuthorized:true,labWriteAuthorized:true,writeEligible:5,genericWriterRemainsBlockedForCobros:true,failed:0,failedCheckIds:[],dataAccess:false,secretAccess:false,operationalWrites:0,evidenceWrites:1,secretsRead:false,firestoreRead:false,runtimeExecuted:false,browserExecuted:false,rulesApplied:false,deployExecuted:false,productionTouched:false,containsPII:false,containsPolicyNumbers:false,containsAmounts:false,containsSecrets:false};
+  return request;
+}
+function base(plan){return {gateId:GATE,contractVersion:VERSION,plan,genericWriterRemainsBlockedForCobros:true,failed:0,failedCheckIds:[],dataAccess:false,secretAccess:false,operationalWrites:0,evidenceWrites:1,secretsRead:false,firestoreRead:false,runtimeExecuted:false,browserExecuted:false,rulesApplied:false,deployExecuted:false,productionTouched:false,containsPII:false,containsPolicyNumbers:false,containsAmounts:false,containsSecrets:false};}
+function armedPayload(){validateRequest();return {schemaVersion:'orbit360-cobros-controlled-write-canonical-armed-v1',status:'GO_GATE_CONTRACT',classification:'AUTHORIZED_LAB_WRITE_CONTRACT_READY',canonicalPhase:'LAB_DATA_CONTRACT_REPAIR_APPLY',phase:'ARMED_BY_EXPLICIT_LAB_AUTHORIZATION',requestExists:true,requestState:'EXACT_AUTHORIZED_REQUIRED',privatePackageVerifiedByContract:true,packageCanonicalization:'node-json-stable-sort-v1',executionAuthorized:true,labWriteAuthorized:true,writeEligible:5,...base({cases:5,direct:4,historical:1,atomicGroups:5,snapshots:11,operations:10,rollbacks:11,cobros:5,receiptUpdates:4,receiptCreates:1,policyWrites:0,finmovs:0})};}
+function diagnosisPayload(lifecycle){
+  validateRequest();if(!fs.existsSync(path.join(ROOT,DIAGNOSIS)))throw new Error('DIAGNOSIS_REQUEST_MISSING');const d=readJson(DIAGNOSIS);
+  if(d.schemaVersion!=='orbit360-cobros-controlled-write-lab-diagnosis-request-v1'||d.gateId!==GATE||d.contractVersion!==VERSION||d.mode!=='READ_ONLY_ROOT_CAUSE_DIAGNOSIS'||d.approved!==true)throw new Error('DIAGNOSIS_REQUEST_INVALID');
+  if(d.capabilities?.secrets!==true||d.capabilities?.firestoreRead!==true||d.capabilities?.writes!==false||d.capabilities?.runtime!==false||d.capabilities?.browser!==false||d.capabilities?.deploy!==false||d.capabilities?.functionsDeploy!==false||d.capabilities?.rulesDeploy!==false||d.capabilities?.production!==false)throw new Error('DIAGNOSIS_CAPABILITIES_MISMATCH');
+  if(lifecycle.status!=='ROOT_CAUSE_DIAGNOSIS_ACTIVE'||lifecycle.executionProfile?.mode!=='READ_ONLY_ROOT_CAUSE_DIAGNOSIS'||lifecycle.writeAuthorized!==false||lifecycle.thirdExecutionProhibited!==true||lifecycle.diagnosisAuthorized!==true)throw new Error('DIAGNOSIS_LIFECYCLE_INVALID');
+  return {schemaVersion:'orbit360-cobros-controlled-write-canonical-diagnosis-v1',status:'GO_GATE_CONTRACT',classification:'READ_ONLY_ROOT_CAUSE_DIAGNOSIS_READY',canonicalPhase:'LAB_DATA_CONTRACT_REPAIR_DIAGNOSIS',phase:'READ_ONLY_ROOT_CAUSE_DIAGNOSIS',requestExists:true,requestState:'WRITE_FROZEN_DIAGNOSIS_ONLY',privatePackageVerifiedByContract:true,packageCanonicalization:'node-json-stable-sort-v1',executionAuthorized:false,labWriteAuthorized:false,writeEligible:0,diagnosisAuthorized:true,diagnosisCaseOrdinal:3,thirdExecutionProhibited:true,...base({cases:5,direct:4,historical:1,atomicGroups:5,snapshots:11,operations:10,rollbacks:11,cobros:5,receiptUpdates:4,receiptCreates:1,policyWrites:0,finmovs:0})};
 }
 try{
   if(process.argv[2]!==GATE)throw new Error('GATE_ID_MISMATCH');
   if(String(process.env.ORBIT360_BRANCH||'')!=='ays/backend-tenant-lab-v99-20260703')throw new Error('BRANCH_MISMATCH');
   const lifecycle=readJson(LIFECYCLE);let payload;
-  if(lifecycle.currentPhase==='ARMED_BY_EXPLICIT_LAB_AUTHORIZATION')payload=armedPayload();
+  if(lifecycle.status==='ROOT_CAUSE_DIAGNOSIS_ACTIVE')payload=diagnosisPayload(lifecycle);
+  else if(lifecycle.currentPhase==='ARMED_BY_EXPLICIT_LAB_AUTHORIZATION')payload=armedPayload();
   else{
     const run=spawnSync(process.execPath,[SPECIFIC],{cwd:ROOT,encoding:'utf8',maxBuffer:16*1024*1024});if(run.status!==0)throw new Error('SPECIFIC_VALIDATOR_FAILED_'+run.status);
     const sourcePath=path.join(ROOT,SPECIFIC_EVIDENCE);if(!fs.existsSync(sourcePath))throw new Error('SPECIFIC_EVIDENCE_MISSING');
