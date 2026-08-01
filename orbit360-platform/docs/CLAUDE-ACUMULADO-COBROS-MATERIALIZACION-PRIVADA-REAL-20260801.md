@@ -4,7 +4,7 @@ Fecha: 2026-08-01
 Clasificación de datos: `SECRETO_DATO_REAL`  
 Clasificación del patrón: `REPLICABLE_CLAUDE_ACUMULADO`
 
-## Patrón reusable
+## Patrón reusable de privacidad
 
 ```text
 cola sanitizada
@@ -16,6 +16,22 @@ cola sanitizada
 → decisión humana separada
 → gate de escritura independiente
 ```
+
+## Patrón reusable de recuperación de gates
+
+```text
+dos fallos en la misma etapa
+→ STOP_RETRY
+→ clasificar causa
+→ congelar producto si VALIDATOR_STALE
+→ alinear ownerField y auditField sin renombrar el producto
+→ ejecutar validador directamente fuera del workflow
+→ exigir PASS completo
+→ sincronizar lifecycle, workflow, registro, docs y Academia
+→ reabrir el mismo gate solo con autorización
+```
+
+Regla: la prueba conductual debe prevalecer sobre búsquedas de tokens literales. Un owner no debe modificarse para imitar un nombre obsoleto del validador.
 
 ## Reglas UX reutilizables
 
@@ -38,7 +54,8 @@ cola sanitizada
 - autorización y escritura como fronteras distintas;
 - operación histórica reforzada y atómica;
 - prohibición de reactivar póliza;
-- prohibición de crear `finmov` desde cobro.
+- prohibición de crear `finmov` desde cobro;
+- evidencia directa completa antes de reabrir un gate detenido.
 
 ## No transferir a Claude
 
@@ -54,4 +71,4 @@ cola sanitizada
 
 ## Impacto Academia
 
-La candidata debe enseñar por rol la diferencia entre evidencia, materialización, autorización y escritura, incluyendo el tratamiento especial de obligaciones históricas exigibles.
+La candidata debe enseñar por rol la diferencia entre evidencia, materialización, autorización y escritura, y también entre defecto funcional y validador obsoleto.
