@@ -4,16 +4,16 @@
   "gateId": "block10.9-cobros-controlled-write-lab-v20260801",
   "gateContractVersion": "10.9.0",
   "owner": "orbit360-cobros-controlled-write-lab-v20260801",
-  "ownerVersion": "20260801.8-write-pass-closed",
-  "status": "CLOSED_WRITE_PASS",
-  "classification": "GO_LAB_COBROS_CONTROLLED_WRITE",
+  "ownerVersion": "20260801.9-post-close-readonly-active",
+  "status": "POST_CLOSE_READONLY_VERIFICATION_ACTIVE",
+  "classification": "GO_LAB_COBROS_CONTROLLED_WRITE_PENDING_POST_CLOSE_VERIFY",
   "patternClassification": "BACKEND_PROTEGIDO_NO_CLAUDE",
   "executionProfile": {
-    "mode": "CLOSED",
-    "phase": "VERIFIED_OR_ROLLED_BACK",
+    "mode": "READ_ONLY_POST_CLOSE_VERIFICATION",
+    "phase": "LAB_DATA_CONTRACT_REPAIR_DRYRUN",
     "capabilities": {
-      "secrets": false,
-      "firestoreRead": false,
+      "secrets": true,
+      "firestoreRead": true,
       "writes": false,
       "runtime": false,
       "browser": false,
@@ -32,10 +32,11 @@
     "PRIVATE_PACKAGE_REPAIRED",
     "READ_ONLY_REVALIDATION",
     "FINAL_REOPEN_AFTER_ROOT_CAUSE_PROOF",
-    "CLOSED_WRITE_PASS"
+    "CLOSED_WRITE_PASS",
+    "POST_CLOSE_RELATION_VERIFICATION"
   ],
-  "currentPhase": "VERIFIED_OR_ROLLED_BACK",
-  "outcome": "WRITE_PASS",
+  "currentPhase": "POST_CLOSE_RELATION_VERIFICATION",
+  "outcome": "WRITE_PASS_PENDING_POST_CLOSE_RELATION_VERIFICATION",
   "humanDecisionRecorded": true,
   "executionAuthorized": false,
   "labWriteAuthorized": false,
@@ -49,6 +50,7 @@
   "additionalExecutionProhibited": true,
   "finalReopenAfterRootCauseProof": true,
   "diagnosisRequestPath": ".github/orbit360-diagnostics/cobros-controlled-write-lab-v20260801.json",
+  "postCloseVerificationRequestPath": ".github/orbit360-diagnostics/cobros-post-close-relations-readonly-v20260801.json",
   "requestPath": ".github/orbit360-requests/cobros-controlled-write-lab-v20260801.json",
   "privatePackage": {
     "driveFileId": "1FGpp_v6ZTs52VEeOnsH2IxoNCqWwVoAD",
@@ -208,5 +210,26 @@
     "productionTouched": false,
     "requestReplayBlocked": true
   },
-  "nextAction": "DOCUMENT_GATE_10_9_CLOSURE_AND_CONTINUE_NEXT_COBROS_CONCILIATION_BLOCK_PER_PLAN"
+  "postCloseVerification": {
+    "requestedAt": "2026-08-01T12:26:00-06:00",
+    "sourceExecutionRun": 30712176452,
+    "sourceExecutionArtifact": 8822218777,
+    "scope": "FIVE_COBRO_RECEIPT_POLICY_RELATIONS_AND_ZERO_FINMOVS",
+    "expectedCounts": {
+      "polizas": 1373,
+      "recibosEsperados": 1294,
+      "cobros": 5,
+      "finmovs": 0
+    },
+    "expectedDirectCases": 4,
+    "expectedHistoricalCases": 1,
+    "verifyRequestReplayBlocked": true,
+    "verifyPolicyStatePreserved": true,
+    "verifyReceiptRelationship": true,
+    "verifyAuthorizationAndIdempotency": true,
+    "verifyNoFinmov": true,
+    "writesAllowed": false,
+    "productionAllowed": false
+  },
+  "nextAction": "RUN_READ_ONLY_POST_CLOSE_RELATION_VERIFICATION"
 }
