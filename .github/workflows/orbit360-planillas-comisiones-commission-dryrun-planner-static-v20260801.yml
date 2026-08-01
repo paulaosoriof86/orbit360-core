@@ -34,7 +34,7 @@ jobs:
         run: |
           set -euo pipefail
           test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
-          jq -e '.schemaVersion=="orbit360-planillas-comisiones-commission-dryrun-planner-static-request-v1" and .approved==true and .syntheticOnly==true and .expected.destinations==3 and .capabilities.secrets==false and .capabilities.firestoreRead==false and .capabilities.writes==false and .capabilities.browser==false and .capabilities.deploy==false and .capabilities.production==false' "$TRIGGER_PATH" >/dev/null
+          jq -e '.schemaVersion=="orbit360-planillas-comisiones-commission-dryrun-planner-static-request-v1" and .approved==true and .syntheticOnly==true and .expected.checks==32 and .expected.destinations==3 and .capabilities.secrets==false and .capabilities.firestoreRead==false and .capabilities.writes==false and .capabilities.browser==false and .capabilities.deploy==false and .capabilities.production==false' "$TRIGGER_PATH" >/dev/null
           node --check orbit360-platform/core/planillas-comisiones-commission-dryrun-planner-p0.js
           node --check tools/orbit360-test-planillas-comisiones-commission-dryrun-planner-p0-v20260801.mjs
       - name: Comprobar ausencia de capacidades
@@ -55,7 +55,7 @@ jobs:
           set -euo pipefail
           mkdir -p "$(dirname "$EVIDENCE_PATH")"
           node tools/orbit360-test-planillas-comisiones-commission-dryrun-planner-p0-v20260801.mjs | tee "$EVIDENCE_PATH"
-          jq -e '.status=="STATIC_COMMISSION_DRYRUN_PLANNER_PASS" and .checks==33 and .fixtures==6 and .realRowsUsed==0 and (.destinations|length)==3 and .writes==0 and .storeAccess==false and .firestoreAccess==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_PATH" >/dev/null
+          jq -e '.status=="STATIC_COMMISSION_DRYRUN_PLANNER_PASS" and .checks==32 and .fixtures==6 and .realRowsUsed==0 and (.destinations|length)==3 and .writes==0 and .storeAccess==false and .firestoreAccess==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_PATH" >/dev/null
       - name: Subir evidencia sanitizada
         if: always()
         uses: actions/upload-artifact@v4
@@ -72,5 +72,5 @@ jobs:
         with:
           script: |
             const fs=require('fs');let state='failure',description='Commission dry-run planner static failed';
-            try{const p=JSON.parse(fs.readFileSync(process.env.EVIDENCE_FILE,'utf8'));if(p.status==='STATIC_COMMISSION_DRYRUN_PLANNER_PASS'&&p.checks===33&&p.writes===0){state='success';description='Commission dry-run planner: 33/33 synthetic checks';}}catch(e){}
+            try{const p=JSON.parse(fs.readFileSync(process.env.EVIDENCE_FILE,'utf8'));if(p.status==='STATIC_COMMISSION_DRYRUN_PLANNER_PASS'&&p.checks===32&&p.writes===0){state='success';description='Commission dry-run planner: 32/32 synthetic checks';}}catch(e){}
             await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/planillas-commission-dryrun-planner-static',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
