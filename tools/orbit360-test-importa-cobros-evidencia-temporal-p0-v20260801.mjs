@@ -40,15 +40,20 @@ const payments=[
 ];
 const result=engine.evaluate({sources:[oldSnapshot,laterSnapshot,commissions],payments});
 const byCase=new Map(result.cases.map(item=>[item.caseIdentity,item]));
-assert.equal(result.version,'20260801.1-multi-evidence-temporal');
+assert.equal(result.version,'20260801.2-multi-evidence-temporal-lineage');
+assert.equal(result.oneTemporalLineagePerCase,true);
+assert.equal(result.cases.length,4);
 assert.equal(byCase.get('receipt:r1').status,'CORROBORATED_COLLECTION');
 assert.equal(byCase.get('receipt:r1').postCutoffPaymentValid,true);
 assert.equal(byCase.get('receipt:r1').directPayment,true);
 assert.equal(byCase.get('receipt:r1').commissionRecognition,true);
+assert.equal(byCase.get('receipt:r1').sourceSnapshotCount,1);
 assert.equal(byCase.get('receipt:r2').status,'STILL_PENDING_AT_LATER_CUTOFF');
+assert.equal(byCase.get('receipt:r2').sourceSnapshotCount,2);
 assert.equal(byCase.get('receipt:r3').status,'CLEARED_OR_ADJUSTED_REQUIRES_VALIDATION');
 assert.equal(byCase.get('receipt:r3').disappeared,true);
 assert.equal(byCase.get('receipt:r4').status,'STILL_PENDING_AT_LATER_CUTOFF');
+assert.equal(byCase.get('receipt:r4').commissionRecognition,true);
 assert.ok(result.holds.some(item=>item.reason==='COMMISSION_WITHOUT_STRONG_PAYMENT_OR_PORTFOLIO_MATCH'));
 assert.equal(result.allowPostCutoffPayment,true);
 assert.equal(result.absenceAloneCreatesCobro,false);
@@ -61,6 +66,7 @@ assert.equal(result.operationalWrites,0);
 assert.equal(result.productionTouched,false);
 console.log(JSON.stringify({
   status:'COBROS_TEMPORAL_MULTI_EVIDENCE_ENGINE_PASS',version:result.version,
+  oneTemporalLineagePerCase:result.oneTemporalLineagePerCase,cases:result.cases.length,
   corroborated:result.totals.corroborated,postCutoffPayments:result.totals.postCutoffPayments,
   stillPending:result.totals.stillPending,clearedRequiresValidation:result.totals.clearedRequiresValidation,
   commissionUnmatchedHold:true,absenceAloneCreatesCobro:false,commissionAloneCreatesCobro:false,
