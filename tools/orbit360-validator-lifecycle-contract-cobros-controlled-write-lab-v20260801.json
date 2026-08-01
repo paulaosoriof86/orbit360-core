@@ -1,6 +1,7 @@
 {
   "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
   "validatorLifecycleRevision": "phase-capability-contract-v1",
+  "validatorRevision": "20260801.2-exact-array-boundary",
   "gateId": "block10.9-cobros-controlled-write-lab-v20260801",
   "gateContractVersion": "10.9.0",
   "owner": "cobros-controlled-write-gate-p0",
@@ -68,5 +69,13 @@
     "containsPolicyNumbers": false,
     "containsAmounts": false,
     "containsSecrets": false
+  },
+  "rootCauseHistory": {
+    "firstRun": 30710503705,
+    "classification": "VALIDATOR_STALE",
+    "failedLayer": "generic writer allowed-list parser",
+    "cause": "fixed-width scan reached the following HARD_BLOCKED_COLLECTIONS array",
+    "productChanged": false,
+    "ownerChanged": false
   }
 }
