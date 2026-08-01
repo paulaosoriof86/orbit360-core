@@ -1,56 +1,41 @@
 # Autorización read-only — Planillas y Comisiones
 
-Fecha y hora: 2026-08-01 14:21 -06:00  
-Repositorio: `paulaosoriof86/orbit360-core`  
-Rama obligatoria: `ays/backend-tenant-lab-v99-20260703`  
-PR: `#5`, debe permanecer draft/open  
-Estado: `AUTHORIZED_WAITING_CURRENT_SOURCES`
+Fecha: 2026-08-01  
+Rama: `ays/backend-tenant-lab-v99-20260703`  
+PR: #5 draft/open  
+Estado: `READONLY_AUTHORIZATION_CONSUMED`
 
-## Alcance expresamente autorizado
+## Alcance
 
-Se registra autorización para ejecutar, cuando estén disponibles las fuentes vigentes del periodo exacto:
+La autorización cubrió la validación privada de las fuentes recibidas, ejecución del adaptador, dry-run sanitizado y cruce read-only contra pólizas, recibos y cobros LAB.
 
-1. recibir y verificar la planilla de comisiones de Mapfre correspondiente a julio de 2026;
-2. recibir y verificar la planilla de comisiones de Aseguradora General correspondiente a los tres cobros conciliados;
-3. comprobar archivo, hoja, fila, país, moneda, periodo y trazabilidad;
-4. procesar las fuentes en paquete privado y modo read-only;
-5. ejecutar `planillas-comisiones-source-adapter-p0` sin conexión a UI, `Orbit.store` ni writer productivo;
-6. generar dry-run con decisiones `CREAR_CANDIDATO`, `OMITIR_DUPLICADO`, `REQUIERE_VALIDACION` y `HOLD_PERIOD_MISMATCH`;
-7. mantener excluidos los cuatro casos residuales de Cobros que permanecen en `HOLD`;
-8. producir evidencia sanitizada antes de cualquier nueva decisión de escritura.
-
-## No autorizado
-
-Esta autorización no permite:
-
-- escribir registros de comisión;
-- crear `finmovs`;
-- modificar cobros, recibos, pólizas, cartera o datos de clientes;
-- inferir tasas de comisión;
-- reutilizar planillas de otro periodo;
-- usar movimientos financieros, banco o histórico para sustituir una planilla de comisiones;
-- reabrir o reproducir el gate 10.9 de Cobros;
-- conectar el adaptador a `index.html`, UI, `Orbit.store` o importador productivo;
-- ejecutar navegador, deploy, Functions, Rules, Storage o producción;
-- modificar `main`, hacer merge o cerrar el PR.
-
-## Condición de ejecución
-
-No se arma gate operativo ni dry-run de casos hasta disponer de al menos una fuente vigente y verificable del periodo exacto. La ausencia de fuente mantiene el estado `SOURCE_MISSING`; no se crean filas sintéticas para sustituir datos reales.
-
-## Fuente pendiente exacta
-
-- Mapfre: planilla de comisiones de julio de 2026 que cubra los dos cobros conciliados.
-- Aseguradora General: planilla de comisiones que cubra los tres cobros conciliados de julio de 2026.
-
-## Siguiente acción exacta
+## Resultado
 
 ```text
-recibir una o ambas planillas vigentes
-→ validar periodo y estructura
-→ empaquetar de forma privada
-→ ejecutar adaptación read-only
-→ generar dry-run sanitizado
-→ reportar candidatos y bloqueos
-→ solicitar autorización separada solo si existieran escrituras elegibles
+archivos: 19
+filas observadas: 67
+candidatas CRM: 65
+omitidas: 2
+adaptador estático: PASS 42/42
+linkage LAB: PASS
+run: 30718081323
+artifact: 8823967179
+escrituras: 0
+finanzas activadas: no
 ```
+
+## Límites preservados
+
+No se autorizaron escrituras de comisiones, finmovs, CxC, CxP, liquidaciones, modificaciones de cobros/recibos/pólizas, navegador, deploy, producción, main ni merge.
+
+## Estado derivado
+
+```text
+póliza única: 10
+póliza no encontrada: 29
+póliza ambigua: 26
+relaciones póliza-recibo únicas: 2
+cobros relacionados: 0
+```
+
+La siguiente etapa es el análisis read-only de causa raíz de los 55 HOLD de identidad de póliza. Toda escritura futura requiere dry-run inequívoco y autorización separada.
