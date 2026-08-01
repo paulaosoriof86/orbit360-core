@@ -4,7 +4,7 @@
   "gateId": "block10.9-cobros-controlled-write-lab-v20260801",
   "gateContractVersion": "10.9.0",
   "owner": "orbit360-cobros-controlled-write-lab-v20260801",
-  "ownerVersion": "20260801.2-node-canonical-digest",
+  "ownerVersion": "20260801.3-drive-exact-physical-digest",
   "status": "ARMED_BY_EXPLICIT_LAB_AUTHORIZATION",
   "classification": "BACKEND_PROTEGIDO_NO_CLAUDE",
   "patternClassification": "REPLICABLE_CLAUDE_ACUMULADO",
@@ -39,7 +39,7 @@
   "requestPath": ".github/orbit360-requests/cobros-controlled-write-lab-v20260801.json",
   "privatePackage": {
     "driveFileId": "1FGpp_v6ZTs52VEeOnsH2IxoNCqWwVoAD",
-    "sha256": "15a573e16514d702066b2500a43d714b382830638fc1e253a1a704b9e0616576",
+    "sha256": "cc01fa733166c2201da6e4ac37c231d42692caf6bba3797208fed23b3a1c737a",
     "logicalSha256": "997bfc0614b4a65e8c4b5e7832996fbbe6b0063f9f0efdf3ca99b57aa79f4ff8",
     "canonicalization": "node-json-stable-sort-v1"
   },
@@ -93,6 +93,6 @@
     "failedBeforeFirestore": true,
     "executionAttempted": false,
     "operationalWrites": 0,
-    "correctedLayer": "private package logical digest canonicalization"
+    "correctedLayer": "private package logical and Drive physical digest canonicalization"
   }
 }
