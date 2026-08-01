@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "orbit360-planillas-comisiones-policy-identity-resolver-static-request-v1",
+  "approved": true,
+  "syntheticOnly": true,
+  "reason": "Validate the reusable policy identity resolver with synthetic fixtures before the live read-only root-cause diagnostic.",
+  "expected": {
+    "checks": 19,
+    "fixtures": 9,
+    "realRowsUsed": 0,
+    "writes": 0
+  },
+  "capabilities": {
+    "secrets": false,
+    "firestoreRead": false,
+    "writes": false,
+    "runtime": false,
+    "browser": false,
+    "deploy": false,
+    "functionsDeploy": false,
+    "rulesDeploy": false,
+    "production": false
+  }
+}
