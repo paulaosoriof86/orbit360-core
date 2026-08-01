@@ -1,0 +1,34 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
+  "gateId": "block10-cobros-conciliacion-readonly-static-v20260801",
+  "gateContractVersion": "10.0.0",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
+  "executionProfile": {
+    "phase": "COBROS_CONCILIACION_READONLY_STATIC_QUALIFICATION",
+    "capabilities": {
+      "secrets": false,
+      "firestoreRead": false,
+      "writes": false,
+      "runtime": false,
+      "browser": false,
+      "deploy": false,
+      "functionsDeploy": false,
+      "rulesDeploy": false,
+      "production": false
+    }
+  },
+  "canonicalOwner": "orbit360-platform/modules/conciliaciones.js",
+  "canonicalQueue": "conciliaciones",
+  "projectedDomainQueue": "conciliacionesPrimas",
+  "requiredFiles": [
+    "orbit360-platform/modules/conciliaciones.js",
+    "tools/orbit360-test-cobros-conciliacion-readonly-v20260801.mjs",
+    "tools/orbit360-cobros-conciliacion-source-evidence-v20260801.json",
+    "orbit360-platform/docs/CONTRATO-CANONICO-COBROS-CONCILIACION-READONLY-20260801.md",
+    "orbit360-platform/docs/ACADEMIA-IMPACT-COBROS-CONCILIACION-READONLY-20260801.md"
+  ],
+  "successStatus": "COBROS_CONCILIACION_READONLY_STATIC_READY",
+  "writeAuthorized": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
