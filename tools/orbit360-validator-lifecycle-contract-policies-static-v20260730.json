@@ -3,7 +3,7 @@
   "gateId": "block7-policies-static-v20260730",
   "gateContractVersion": "7.0.1",
   "validatorLifecycleRevision": "phase-capability-contract-v1",
-  "status": "POLICIES_COUNTRY_PROJECTION_DIAGNOSTIC_AUTHORIZED",
+  "status": "POLICIES_COUNTRY_PROJECTION_DIAGNOSTIC_RESUME_AUTHORIZED",
   "executionProfile": {
     "phase": "LAB_DATA_CONTRACT_REPAIR_DRYRUN",
     "capabilities": {
@@ -37,6 +37,8 @@
     "diagnosticWithinAuthorizedReadOnlyScope": true,
     "diagnosticExecutionsAllowed": 1,
     "diagnosticConsumed": false,
+    "diagnosticResumeAllowedOnce": true,
+    "diagnosticResumeSequence": 2,
     "additionalPreviewAuthorized": false,
     "productionAuthorized": false
   },
@@ -63,6 +65,34 @@
       "productionTouched": false
     }
   },
+  "diagnosticHistory": {
+    "firstRun": {
+      "run": 30723931071,
+      "job": 91432109841,
+      "artifact": 8825711437,
+      "artifactDigest": "sha256:bb6b14b289df020d041c34314d126b605ca1118683a1187230c836e331e321ed",
+      "classification": "VALIDATOR_STALE",
+      "reportedStatus": "POLICIES_COUNTRY_PROJECTION_DIAGNOSTIC_INCONCLUSIVE",
+      "rootCause": "NESTED_COUNTRY_COUNTED_AS_TOP_LEVEL_FIRESTORE_FIELD",
+      "canonicalPreflightPassed": 17,
+      "canonicalPreflightFailed": 0,
+      "firestoreRead": true,
+      "firestoreWrites": 0,
+      "operationalWrites": 0,
+      "browserExecuted": false,
+      "deployExecuted": false,
+      "productionTouched": false,
+      "usefulEvidencePreserved": true
+    },
+    "validatorCorrection": {
+      "revision": "top-level-country-v2",
+      "topLevelPaisSeparated": true,
+      "topLevelCountrySeparated": true,
+      "nestedCountryEvidenceReportedSeparately": true,
+      "countryInferenceAllowed": false,
+      "countryWriteAllowed": false
+    }
+  },
   "diagnosticScope": {
     "collections": [
       "clientes",
@@ -74,6 +104,8 @@
       "cobros"
     ],
     "countryFields": ["pais", "country"],
+    "measureTopLevelFields": true,
+    "measureNestedEvidenceSeparately": true,
     "measureCurrentPaisProjection": true,
     "measureLogicalCountryProjection": true,
     "measureExactRelationshipDerivation": true,
