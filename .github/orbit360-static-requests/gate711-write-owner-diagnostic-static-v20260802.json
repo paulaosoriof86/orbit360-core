@@ -2,8 +2,18 @@
   "schemaVersion": "orbit360-gate711-write-owner-diagnostic-static-request-v1",
   "gateId": "block7-canonical-runtime-cumulative-visual-lab-v20260801",
   "approved": true,
-  "allowedExecutions": 1,
-  "consumed": false,
+  "allowedExecutions": 0,
+  "consumed": true,
+  "consumedByRun": 30761659406,
+  "consumedAt": "2026-08-02T12:40:53-06:00",
+  "result": {
+    "status": "GATE711_WRITE_OWNER_DIAGNOSTIC_STATIC_PASS",
+    "classification": "GO_STATIC_WRITE_OWNER_DIAGNOSTIC",
+    "checks": "14/14",
+    "job": 91533207774,
+    "artifact": 8837642889,
+    "artifactDigest": "sha256:857ad8d9032865d64e7d8912a1b12912c63ab0d0cbdc4542ef6687aa32ceeb0e"
+  },
   "parentHead": "b06bf5ef9100e3d02fbf86093b2d7dc293b9162c",
   "capabilities": {
     "secrets": false,
@@ -16,6 +26,7 @@
     "main": false,
     "merge": false
   },
+  "replayAllowed": false,
   "containsPII": false,
   "containsValues": false,
   "containsSecrets": false
