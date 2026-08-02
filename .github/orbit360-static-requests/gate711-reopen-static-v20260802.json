@@ -1,0 +1,42 @@
+{
+  "schemaVersion": "orbit360-gate711-static-reopen-authorization-v1",
+  "gateId": "block7-canonical-runtime-cumulative-visual-lab-v20260801",
+  "contractVersion": "7.11.0",
+  "approved": true,
+  "allowedExecutions": 1,
+  "consumed": false,
+  "authorizationRef": "user_authorizes_single_readonly_gate711_after_static_passes_20260802T1215-0600",
+  "authorizationText": "Autorizo una única ejecución read-only del gate 7.11 sobre el HEAD vigente, únicamente después de obtener los dos PASS estáticos y GO_GATE_CONTRACT; con identidad existente, snapshot antes y después, cero escrituras, cero reimportación, cero deploy y cero producción. Si reaparece la misma etapa o familia de fallo, aplicar STOP_RETRY inmediato.",
+  "authorizationTextDigest": "e35f8fe9b7d09aebbcd19508ce531da6c94c73e70c4b6530f2c5622ae1c4275b",
+  "authorizedBy": "Paula Osorio",
+  "authorizedAt": "2026-08-02T12:15:00-06:00",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "sourceHead": "293e5652e8fc0becb8ce036d40a926d296c4fae2",
+  "capabilities": {
+    "secrets": false,
+    "firestoreRead": false,
+    "writes": false,
+    "runtime": false,
+    "browser": false,
+    "preview": false,
+    "deploy": false,
+    "production": false,
+    "main": false,
+    "merge": false
+  },
+  "runtimeBoundary": {
+    "allowedExecutions": 1,
+    "onlyAfterStaticPasses": true,
+    "newImmutableRequestRequired": true,
+    "identityExistingOnly": true,
+    "snapshotBeforeAfter": true,
+    "writes": false,
+    "reimport": false,
+    "deploy": false,
+    "production": false,
+    "stopRetryOnSameStageOrFamily": true
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
