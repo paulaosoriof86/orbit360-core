@@ -4,6 +4,7 @@ on:
     branches: [ays/backend-tenant-lab-v99-20260703]
     paths:
       - '.github/orbit360-requests/policies-authority-canonical-dryrun-readonly-v20260801.json'
+      - '.github/orbit360-requests/policies-authority-canonical-dryrun-readonly-resume-v20260801.json'
 permissions:
   contents: read
   statuses: write
@@ -16,6 +17,7 @@ env:
   ORBIT360_PROJECT_ID: ays-orbit-360-lab
   ORBIT360_TENANT_ID: alianzas-soluciones
   ORBIT360_REQUEST_FILE: .github/orbit360-requests/policies-authority-canonical-dryrun-readonly-v20260801.json
+  ORBIT360_RESUME_FILE: .github/orbit360-requests/policies-authority-canonical-dryrun-readonly-resume-v20260801.json
   ORBIT360_LIFECYCLE_FILE: tools/orbit360-validator-lifecycle-contract-policies-authority-canonical-dryrun-readonly-v20260801.json
   EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
 jobs:
@@ -34,13 +36,14 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Verificar autorización y límites
+      - name: Verificar autorización, reanudación y límites
         shell: bash
         run: |
           set -euo pipefail
           test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
-          jq -e '.schemaVersion=="orbit360-policies-authority-canonical-dryrun-readonly-request-v1" and .gateId=="block7-policies-authority-canonical-dryrun-readonly-v20260801" and .contractVersion=="7.4.0" and .approved==true and .allowedExecutions==1 and .consumed==false and .branch=="ays/backend-tenant-lab-v99-20260703" and .pullRequest==5 and .authorityDecision.declared==true and .authorityDecision.migrationAuthorized==false and .scope.deleteSeedsAllowed==false and .scope.verifyRelationships==true and .capabilities.firestoreRead==true and .capabilities.writes==false and .capabilities.runtime==false and .capabilities.browser==false and .capabilities.preview==false and .capabilities.deploy==false and .capabilities.rulesDeploy==false and .capabilities.functionsDeploy==false and .capabilities.production==false' "$ORBIT360_REQUEST_FILE" >/dev/null
-          jq -e '.status=="POLICIES_AUTHORITY_CANONICAL_DRYRUN_READONLY_AUTHORIZED" and .executionProfile.phase=="LAB_DATA_CONTRACT_REPAIR_DRYRUN" and .authorization.allowedExecutions==1 and .authorization.consumed==false and .authorityDecision.declared==true and .authorityDecision.migrationAuthorized==false and .guards.firestoreDataWritesAllowed==false and .guards.seedDeletionAllowed==false and .guards.browserAllowed==false and .guards.previewAllowed==false and .guards.hostingDeployAllowed==false and .guards.productionAllowed==false' "$ORBIT360_LIFECYCLE_FILE" >/dev/null
+          jq -e '.schemaVersion=="orbit360-policies-authority-canonical-dryrun-readonly-request-v1" and .gateId=="block7-policies-authority-canonical-dryrun-readonly-v20260801" and .contractVersion=="7.4.0" and .approved==true and .allowedExecutions==1 and .branch=="ays/backend-tenant-lab-v99-20260703" and .pullRequest==5 and .authorityDecision.declared==true and .authorityDecision.migrationAuthorized==false and .scope.deleteSeedsAllowed==false and .scope.verifyRelationships==true and .capabilities.firestoreRead==true and .capabilities.writes==false and .capabilities.runtime==false and .capabilities.browser==false and .capabilities.preview==false and .capabilities.deploy==false and .capabilities.rulesDeploy==false and .capabilities.functionsDeploy==false and .capabilities.production==false' "$ORBIT360_REQUEST_FILE" >/dev/null
+          jq -e '.schemaVersion=="orbit360-policies-authority-canonical-dryrun-resume-v1" and .gateId=="block7-policies-authority-canonical-dryrun-readonly-v20260801" and .contractVersion=="7.4.0" and .approved==true and .allowedResumeExecutions==1 and .consumed==false and .scopeUnchanged==true and .previousRun==30726085370 and .previousArtifact==8826383629 and .rootCauseCode=="VALIDATOR_STALE_COMPOSITE_RELATION_COLLAPSED"' "$ORBIT360_RESUME_FILE" >/dev/null
+          jq -e '.status=="POLICIES_AUTHORITY_CANONICAL_DRYRUN_VALIDATOR_STALE_RESUME_AUTHORIZED" and .executionProfile.phase=="LAB_DATA_CONTRACT_REPAIR_DRYRUN" and .authorization.validExecutionsAllowed==1 and .authorization.attemptsUsed==1 and .authorization.validExecutionConsumed==false and .authorization.resumeExecutionsAllowed==1 and .authorization.consumed==false and .rootCause.code=="VALIDATOR_STALE_COMPOSITE_RELATION_COLLAPSED" and .scope.compositeRelationsAreIndependent==true and .authorityDecision.declared==true and .authorityDecision.migrationAuthorized==false and .guards.firestoreDataWritesAllowed==false and .guards.seedDeletionAllowed==false and .guards.browserAllowed==false and .guards.previewAllowed==false and .guards.hostingDeployAllowed==false and .guards.productionAllowed==false' "$ORBIT360_LIFECYCLE_FILE" >/dev/null
       - name: Gate canónico antes de secrets y Firestore
         shell: bash
         run: |
@@ -50,7 +53,7 @@ jobs:
           node --check tools/orbit360-policies-authority-canonical-dryrun-lib-v20260801.mjs
           node --check tools/orbit360-preparar-policies-authority-canonical-dryrun-readonly-v20260801.mjs
           node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
-          jq -e '.status=="GO_GATE_CONTRACT" and .classification=="POLICIES_AUTHORITY_CANONICAL_DRYRUN_READONLY_READY" and .executionAuthorized==true and .firestoreReadAuthorized==true and .authorityDeclared==true and .dryrunAuthorized==true and .writeAuthorized==false and .seedDeletionAuthorized==false and .browserAuthorized==false and .previewAuthorized==false and .deployAuthorized==false and .migrationApplyAuthorized==false and .failed==0 and .operationalWrites==0 and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+          jq -e '.status=="GO_GATE_CONTRACT" and .classification=="POLICIES_AUTHORITY_CANONICAL_DRYRUN_RESUME_READY" and .executionAuthorized==true and .firestoreReadAuthorized==true and .authorityDeclared==true and .dryrunAuthorized==true and .validatorStaleCorrected==true and .writeAuthorized==false and .seedDeletionAuthorized==false and .browserAuthorized==false and .previewAuthorized==false and .deployAuthorized==false and .migrationApplyAuthorized==false and .failed==0 and .operationalWrites==0 and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
       - name: Instalar dependencia aislada
         shell: bash
         run: |
@@ -73,12 +76,12 @@ jobs:
           echo "ORBIT360_TEMP_KEY_FILE=$KEY_FILE" >> "$GITHUB_ENV"
           echo "ORBIT360_PRODUCT_PROJECT_ID=$ORBIT360_PROJECT_ID" >> "$GITHUB_ENV"
           echo "ORBIT360_PRODUCT_TENANT_ID=$ORBIT360_TENANT_ID" >> "$GITHUB_ENV"
-      - name: Ejecutar dry-run de reconciliación hacia canónica
+      - name: Ejecutar dry-run corregido de reconciliación hacia canónica
         shell: bash
         run: |
           set -euo pipefail
           node tools/orbit360-preparar-policies-authority-canonical-dryrun-readonly-v20260801.mjs
-          jq -e '.ok==true and .status=="POLICIES_AUTHORITY_CANONICAL_DRYRUN_READONLY_PASS" and .authorityDecision.declared==true and .authorityDecision.authoritativePath=="tenantId/{tenantId}/{collection}" and .summary.totalCanonical==445 and .summary.totalLegacy==4837 and .summary.planItems==4842 and ((.summary.actions.CREATE+.summary.actions.UPDATE+.summary.actions.OMIT+.summary.actions.HOLD)==4842) and .summary.canonicalSeedHolds==5 and .summary.preservedAdditionalRequiresValidationClientsAndInsurers==20 and .summary.migrationApplyAuthorized==false and .summary.seedDeletionAuthorized==false and .summary.evidenceComplete==true and .cumulativeVisualGuard.manifestMatches==true and .firestoreRead==true and .firestoreWrites==0 and .operationalWrites==0 and .reimportExecuted==false and .seedDeletionExecuted==false and .frontendAdapted==false and .browserExecuted==false and .previewExecuted==false and .deployExecuted==false and .rulesApplied==false and .functionsDeployed==false and .productionTouched==false and .mainTouched==false and .mergeExecuted==false and .containsPII==false and .containsPolicyNumbers==false and .containsAmounts==false and .containsDocumentIds==false and .containsValues==false and .containsSecrets==false' "$EVIDENCE_DIR/policies-authority-canonical-dryrun-readonly-v20260801.json" >/dev/null
+          jq -e '.ok==true and .status=="POLICIES_AUTHORITY_CANONICAL_DRYRUN_READONLY_PASS" and .classification=="GO_LAB_CANONICAL_DRYRUN_READY" and .authorityDecision.declared==true and .authorityDecision.authoritativePath=="tenantId/{tenantId}/{collection}" and .summary.totalCanonical==445 and .summary.totalLegacy==4837 and .summary.planItems==4842 and .summary.actions.CREATE==4377 and .summary.actions.UPDATE==0 and .summary.actions.OMIT==440 and .summary.actions.HOLD==25 and .summary.canonicalSeedHolds==5 and .summary.preservedAdditionalRequiresValidationClientsAndInsurers==20 and .relationshipAudit.documentsWithBlockedRequiredRelationshipGroups==0 and .summary.migrationApplyAuthorized==false and .summary.seedDeletionAuthorized==false and .summary.evidenceComplete==true and .cumulativeVisualGuard.manifestMatches==true and .firestoreRead==true and .firestoreWrites==0 and .operationalWrites==0 and .reimportExecuted==false and .seedDeletionExecuted==false and .frontendAdapted==false and .browserExecuted==false and .previewExecuted==false and .deployExecuted==false and .rulesApplied==false and .functionsDeployed==false and .productionTouched==false and .mainTouched==false and .mergeExecuted==false and .containsPII==false and .containsPolicyNumbers==false and .containsAmounts==false and .containsDocumentIds==false and .containsValues==false and .containsSecrets==false' "$EVIDENCE_DIR/policies-authority-canonical-dryrun-readonly-v20260801.json" >/dev/null
       - name: Subir evidencia sanitizada
         if: always()
         uses: actions/upload-artifact@v4
@@ -96,8 +99,8 @@ jobs:
           EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/policies-authority-canonical-dryrun-readonly-v20260801.json
         with:
           script: |
-            const fs=require('fs');let state='failure',description='Authority/canonical dry-run failed';
-            try{const p=JSON.parse(fs.readFileSync(process.env.EVIDENCE,'utf8'));if(p.ok===true&&p.status==='POLICIES_AUTHORITY_CANONICAL_DRYRUN_READONLY_PASS'&&p.firestoreWrites===0&&p.summary?.migrationApplyAuthorized===false){state='success';description='Authority declared; canonical dry-run ready; zero writes';}}catch(e){}
+            const fs=require('fs');let state='failure',description='Authority/canonical dry-run resume failed';
+            try{const p=JSON.parse(fs.readFileSync(process.env.EVIDENCE,'utf8'));if(p.ok===true&&p.status==='POLICIES_AUTHORITY_CANONICAL_DRYRUN_READONLY_PASS'&&p.classification==='GO_LAB_CANONICAL_DRYRUN_READY'&&p.firestoreWrites===0&&p.relationshipAudit?.documentsWithBlockedRequiredRelationshipGroups===0){state='success';description='Authority declared; corrected canonical dry-run ready; zero writes';}}catch(e){}
             await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/policies-authority-canonical-dryrun-readonly',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
       - name: Limpiar identidad temporal
         if: always()
