@@ -1,0 +1,57 @@
+{
+  "schemaVersion": "orbit360-gate711-release-critical-static-request-v1",
+  "gateId": "block7-canonical-runtime-cumulative-visual-lab-v20260801",
+  "contractVersion": "7.11.1",
+  "observabilityRevision": "v3",
+  "validatorStaleCorrection": "OPS_WORKFLOW_BRIDGE_SEMANTIC_ASSERTION",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "parentHead": "8b09199df124e7e6d8bac6714f96ed9419e27757",
+  "productHead": "997fca628f95dd397dba347700a6bc644fe840f0",
+  "approved": true,
+  "approvalRef": "user_directive_proceed_stable_release_critical_crm_ops_leads_20260802T1702-0600",
+  "allowedExecutions": 1,
+  "consumed": false,
+  "priorFailure": {
+    "run": 30771793126,
+    "job": 91560080475,
+    "artifact": 8840747763,
+    "artifactDigest": "sha256:629fc01acead21af7d9f1f6891b9e083b34300fc1cbb486fc8dd5d59ac134a54",
+    "failedCheck": "OPS_WORKFLOW_BRIDGE",
+    "classification": "VALIDATOR_STALE",
+    "productDefect": false,
+    "replayAllowed": false
+  },
+  "scope": {
+    "singleGate": true,
+    "singleCandidate": true,
+    "crm": true,
+    "ops": true,
+    "leads": true,
+    "academiaStaticIntegrity": true,
+    "academiaRuntimeContentBlocking": false,
+    "cloudLedgerRequired": true,
+    "cloudDispatchExecuted": false
+  },
+  "capabilities": {
+    "secrets": false,
+    "firestoreRead": false,
+    "runtime": false,
+    "browser": false,
+    "writes": false,
+    "deploy": false,
+    "production": false
+  },
+  "expected": {
+    "status": "GATE711_RELEASE_CRITICAL_STATIC_PASS",
+    "classification": "GO_STATIC_RELEASE_CRITICAL_CRM_OPS_LEADS",
+    "checks": "38/38",
+    "productDiffFromLockedHead": 0,
+    "academiaRuntimePrerequisite": false,
+    "cloudPackageSent": false,
+    "observableCommitStatus": "orbit360/gate711-release-critical-static"
+  },
+  "stopRetryOnRepeatedStageOrFailureFamily": true,
+  "containsPII": false,
+  "containsSecrets": false
+}
