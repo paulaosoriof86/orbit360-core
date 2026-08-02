@@ -1,0 +1,86 @@
+{
+  "schemaVersion": "orbit360-policies-dual-path-reconciliation-readonly-request-v1",
+  "gateId": "block7-policies-dual-path-reconciliation-readonly-v20260801",
+  "contractVersion": "7.2.0",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "approved": true,
+  "authorizedBy": "Paula Osorio",
+  "authorizedAt": "2026-08-01T18:08:00-06:00",
+  "authorizationText": "Autorizo ejecutar en LAB un gate único read-only de reconciliación entre la ruta canónica y la ruta heredada para Clientes, Aseguradoras, Pólizas, Vehículos, Recibos, Cartera y Cobros, comparando conteos, IDs, digests y esquemas sin filtro de país; sin escrituras, reimportación, navegador, preview, deploy ni producción, y sin declarar una ruta autoritativa hasta presentar la evidencia sanitizada.",
+  "allowedExecutions": 1,
+  "consumed": false,
+  "scope": {
+    "tenantId": "alianzas-soluciones",
+    "projectId": "ays-orbit-360-lab",
+    "collections": [
+      "clientes",
+      "aseguradoras",
+      "polizas",
+      "vehiculos",
+      "recibosEsperados",
+      "carteraPrimas",
+      "cobros"
+    ],
+    "canonicalPathTemplate": "tenants/{tenantId}/data/{collection}/items",
+    "legacyPathTemplate": "tenantId/{tenantId}/{collection}",
+    "countryFilterApplied": false,
+    "compareCounts": true,
+    "compareIds": true,
+    "compareDigests": true,
+    "compareSchemas": true,
+    "compareValuesInSanitizedEvidence": false,
+    "declareAuthoritativePath": false
+  },
+  "legacyExpectedBaseline": {
+    "clientes": 430,
+    "aseguradoras": 30,
+    "polizas": 1373,
+    "vehiculos": 1032,
+    "recibosEsperados": 1294,
+    "carteraPrimas": 673,
+    "cobros": 5
+  },
+  "capabilities": {
+    "secrets": true,
+    "firestoreRead": true,
+    "writes": false,
+    "runtime": false,
+    "browser": false,
+    "preview": false,
+    "deploy": false,
+    "rulesDeploy": false,
+    "functionsDeploy": false,
+    "production": false
+  },
+  "authorityDecision": {
+    "declared": false,
+    "authoritativePath": "",
+    "decisionAuthorized": false
+  },
+  "cumulativeVisualGuard": {
+    "required": true,
+    "baselineSourceCommit": "f982dc9744f96ea51a40b311ffdbf60a078222da",
+    "assemblyMode": "LATEST_ACCEPTED_PLUS_HEAD_INCREMENTAL",
+    "manifestRequired": true,
+    "noParallelShell": true,
+    "noReducedShell": true,
+    "noModuleFragmentation": true,
+    "noModuleDowngrade": true,
+    "selectiveIntegrationOnly": true,
+    "futureVisualCandidateMustUseCurrentHeadOrAuditedDescendant": true,
+    "bestVersionSelectionRequiresEvidence": true,
+    "visualizationAuthorized": false
+  },
+  "humanApproval": {
+    "clientes": true,
+    "polizas": false,
+    "vehiculos": false,
+    "recibos": false,
+    "cartera": false,
+    "restoCrm": false,
+    "automatedGateMaySetApproval": false
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
