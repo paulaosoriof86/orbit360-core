@@ -1,8 +1,8 @@
 {
   "schemaVersion": "orbit360-gate711-rootfix-lifecycle-registry-v1",
   "gateId": "block7-canonical-runtime-cumulative-visual-lab-v20260801",
-  "activeLifecycleFile": "tools/orbit360-validator-lifecycle-contract-gate711-macro-readonly-rerun-v20260802.json",
-  "authorizationRef": "user_authorizes_single_macro_readonly_gate711_rerun_20260802T1504-0600",
+  "activeLifecycleFile": "tools/orbit360-validator-lifecycle-contract-gate711-macro-readonly-final-v20260802.json",
+  "authorizationRef": "user_authorizes_single_macro_readonly_gate711_final_20260802T1631-0600",
   "allowedLifecycleStatuses": [
     "CANONICAL_RUNTIME_CUMULATIVE_VISUAL_LAB_AUTHORIZED",
     "CANONICAL_RUNTIME_CUMULATIVE_VISUAL_LAB_STOP_RETRY"
