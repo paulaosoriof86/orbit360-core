@@ -4,7 +4,8 @@
   "gateContractVersion": "7.11.0",
   "validatorLifecycleRevision": "phase-capability-contract-v1",
   "legalDeferredOrderRevision": "gate711-legal-deferred-order-v2",
-  "status": "CANONICAL_RUNTIME_CUMULATIVE_VISUAL_LAB_AUTHORIZED",
+  "authorizationBindingRevision": "gate711-lifecycle-request-exact-binding-v1",
+  "status": "CANONICAL_RUNTIME_CUMULATIVE_VISUAL_LAB_STOP_RETRY",
   "executionProfile": {
     "phase": "LAB_RUNTIME_GATE",
     "capabilities": {
@@ -26,9 +27,33 @@
     "authorizedAt": "2026-08-02T10:01:00-06:00",
     "authorizationRef": "user_continue_next_exact_action_20260802",
     "explicit": true,
-    "allowedExecutions": 1,
-    "consumed": false,
-    "macroBlockWithoutMicroAuthorizations": true
+    "allowedExecutions": 0,
+    "consumed": true,
+    "consumedAt": "2026-08-02T10:20:04-06:00",
+    "macroBlockWithoutMicroAuthorizations": true,
+    "additionalExecutionsAllowed": false
+  },
+  "stopRetry": {
+    "active": true,
+    "activatedAt": "2026-08-02T10:20:04-06:00",
+    "trigger": "Same preflight stage failed twice",
+    "stage": "Gate canónico antes de secrets, Firestore y navegador",
+    "runs": [30756305124, 30756380638],
+    "classification": "VALIDATOR_STALE / PIPELINE_MECHANISM_FAILURE",
+    "firstFailure": "CANONICAL_LIFECYCLE_REVISION_MISMATCH",
+    "secondFailure": "AUTHORIZATION reference hardcoded to historical authorization",
+    "productFrozen": true,
+    "requestCreationAllowed": false,
+    "runtimeRetryAllowed": false,
+    "requiredBeforeReopen": [
+      "Static authorization binding PASS",
+      "Static Legal deferred order PASS",
+      "Canonical preflight PASS without secrets",
+      "New immutable authorization request"
+    ],
+    "mechanismFixCommit": "248a92a7e951c07aed06a6501272ac97142f2e18",
+    "authorizationStaticValidatorCommit": "196cdc6e7c00554925f68d0d5864918bfd06fae7",
+    "workflowBindingCommit": "3ba18f92aa8686ac9f00c135ba856a0d9358e77d"
   },
   "priorAttempts": [
     {
@@ -47,29 +72,41 @@
       "job": 91517783012,
       "classification": "VALIDATOR_STALE",
       "failedStage": "canonical_store_hydrated / first client click",
-      "rootCause": "Legal deferred render was checked before store hydration and falsely classified as already accepted; visible modal later blocked the client click and crossed the write guard boundary",
+      "rootCause": "Legal deferred render was checked before store hydration and falsely classified as already accepted",
       "productChanged": false,
       "dataChanged": false,
       "authChanged": false,
       "storeValidated": true,
       "corrected": true,
-      "fixCommit": "90a174666f20ffdb8cf88c5149ac1fcf08b2f802",
-      "staticGuardCommit": "1c01decffb3f9506807f1faeec83ebd487da79be",
-      "workflowCommit": "eed237e8f555b496b1170e6693fedd1024006d3f"
+      "fixCommit": "90a174666f20ffdb8cf88c5149ac1fcf08b2f802"
     },
     {
       "run": 30756305124,
       "job": 91518930317,
       "classification": "VALIDATOR_STALE",
       "failedStage": "CANONICAL_PREFLIGHT_ENTRYPOINT",
-      "rootCause": "Lifecycle revision label changed although the canonical phase-capability composition remained v1",
+      "rootCause": "Lifecycle revision label changed although canonical composition remained v1",
       "secretAccess": false,
       "firestoreRead": false,
       "runtimeExecuted": false,
       "browserExecuted": false,
       "operationalWrites": 0,
       "corrected": true,
-      "correction": "Restore canonical validatorLifecycleRevision and register Legal ordering in a separate revision field"
+      "fixCommit": "874135432f681b26453a9843cb346567a921dd81"
+    },
+    {
+      "run": 30756380638,
+      "job": 91519136227,
+      "classification": "VALIDATOR_STALE / PIPELINE_MECHANISM_FAILURE",
+      "failedStage": "AUTHORIZATION",
+      "rootCause": "Engine required the historical authorizationRef instead of exact lifecycle-request binding",
+      "secretAccess": false,
+      "firestoreRead": false,
+      "runtimeExecuted": false,
+      "browserExecuted": false,
+      "operationalWrites": 0,
+      "corrected": true,
+      "fixCommit": "248a92a7e951c07aed06a6501272ac97142f2e18"
     }
   ],
   "sourceStaticGate": {
@@ -143,6 +180,7 @@
     "acceptLegalAfterStoreHydration": true,
     "legalSettledBeforeWriteGuard": true,
     "staticLegalOrderValidator": "tools/orbit360-validar-legal-deferred-order-gate711-v20260802.mjs",
+    "staticAuthorizationBindingValidator": "tools/orbit360-validar-authorization-binding-gate711-v20260802.mjs",
     "snapshotBeforeAndAfter": true,
     "installBrowserWriteGuard": true,
     "verifyStoreOwner": true,
