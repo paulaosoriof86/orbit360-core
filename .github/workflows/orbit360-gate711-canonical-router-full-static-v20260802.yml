@@ -1,0 +1,114 @@
+name: Orbit 360 · Gate 7.11 · canonical router full · static
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-static-requests/gate711-canonical-router-full-static-v20260802.json'
+permissions:
+  contents: read
+  statuses: write
+concurrency:
+  group: orbit360-gate711-canonical-router-full-static-v20260802
+  cancel-in-progress: false
+jobs:
+  validate:
+    name: Gate 7.11 · router canónico completo · cero runtime
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout exacto
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Preparar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Ejecutar router canónico completo sobre paquete efímero
+        shell: bash
+        run: |
+          set -euo pipefail
+          STATIC_REQUEST='.github/orbit360-static-requests/gate711-canonical-router-full-static-v20260802.json'
+          LIFECYCLE_TEMPLATE='tools/orbit360-gate711-canonical-lifecycle-template-v20260802.json'
+          REQUEST_TEMPLATE='.github/orbit360-templates/gate711-canonical-runtime-request-template-v20260802.json'
+          CANONICAL_LIFECYCLE='tools/orbit360-validator-lifecycle-contract-canonical-runtime-cumulative-visual-lab-v20260801.json'
+          CANONICAL_REQUEST='.github/orbit360-requests/canonical-runtime-cumulative-visual-lab-v20260801.json'
+          OUT='orbit360-platform/runtime-gate-crm-v20260716/gate711-canonical-router-full-static-v20260802.json'
+          AUTH_REF='static_synthetic_gate711_canonical_router_20260802'
+
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          test "$(git rev-parse HEAD^)" = "$(jq -r '.parentHead' "$STATIC_REQUEST")"
+          mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
+          test "${#CHANGED[@]}" = '1'
+          test "${CHANGED[0]}" = "$STATIC_REQUEST"
+          jq -e '.scope=="full_canonical_router_static_only" and .secrets==false and .firestoreRead==false and .runtime==false and .browser==false and .writes==false and .deploy==false and .production==false and .approvedForExecution==true and .allowedExecutions==1 and .consumed==false' "$STATIC_REQUEST" >/dev/null
+
+          cp "$LIFECYCLE_TEMPLATE" "$CANONICAL_LIFECYCLE"
+          cp "$REQUEST_TEMPLATE" "$CANONICAL_REQUEST"
+
+          tmp_lifecycle="$(mktemp)"
+          jq --arg auth "$AUTH_REF" '
+            .status="CANONICAL_RUNTIME_CUMULATIVE_VISUAL_LAB_AUTHORIZED" |
+            .authorization.authorizedBy="STATIC_SYNTHETIC_ONLY" |
+            .authorization.authorizedAt="2026-08-02T00:00:00Z" |
+            .authorization.authorizationRef=$auth |
+            .authorization.explicit=true |
+            .authorization.allowedExecutions=1 |
+            .authorization.consumed=false |
+            .authorization.macroBlockWithoutMicroAuthorizations=true
+          ' "$CANONICAL_LIFECYCLE" > "$tmp_lifecycle"
+          mv "$tmp_lifecycle" "$CANONICAL_LIFECYCLE"
+
+          tmp_request="$(mktemp)"
+          jq --arg auth "$AUTH_REF" --arg parent "$GITHUB_SHA" '
+            .authorizationRef=$auth |
+            .approved=true |
+            .allowedExecutions=1 |
+            .consumed=false |
+            .parentHead=$parent
+          ' "$CANONICAL_REQUEST" > "$tmp_request"
+          mv "$tmp_request" "$CANONICAL_REQUEST"
+
+          node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
+          node --check tools/orbit360-validar-gate-contracts-engine-canonical-runtime-cumulative-visual-lab-v20260801.mjs
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs block7-canonical-runtime-cumulative-visual-lab-v20260801
+
+          PREFLIGHT='orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json'
+          jq -e '.status=="GO_GATE_CONTRACT" and .classification=="CANONICAL_RUNTIME_CUMULATIVE_VISUAL_LAB_READY" and .failed==0 and .executionAuthorized==true and .secretAccessAuthorized==true and .firestoreReadAuthorized==true and .writeAuthorized==false and .runtimeAuthorized==true and .browserAuthorized==true and .previewAuthorized==false and .deployAuthorized==false and .productionAuthorized==false and .firestoreDataWrites==0 and .operationalWrites==0 and .dataAccess==false and .secretAccess==false and .firestoreRead==false and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false and .authorizationBinding.lifecycleRefPresent==true and .authorizationBinding.requestMatchesLifecycle==true' "$PREFLIGHT" >/dev/null
+
+          node <<'NODE'
+          const fs=require('fs');
+          const path=require('path');
+          const p=JSON.parse(fs.readFileSync('orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json','utf8'));
+          const payload={schemaVersion:'orbit360-gate711-canonical-router-full-static-v1',gateId:p.gateId,status:'GATE711_CANONICAL_ROUTER_FULL_STATIC_PASS',classification:'GO_STATIC_FULL_CANONICAL_ROUTER',contractVersion:p.contractVersion,total:p.total,passed:p.passed,failed:p.failed,failedCheckIds:p.failedCheckIds,validatorLifecycleRevision:'phase-capability-contract-v1',macroLifecycleRevision:'macro-rootfix-then-full-canonical-v3',executionAuthorizedSynthetic:p.executionAuthorized===true,authorizationBinding:p.authorizationBinding,secretAccess:false,firestoreRead:false,runtimeExecuted:false,browserExecuted:false,firestoreWrites:0,operationalWrites:0,reimportExecuted:false,deployExecuted:false,production:false,containsPII:false,containsSecrets:false,ok:p.failed===0&&p.status==='GO_GATE_CONTRACT'};
+          const out='orbit360-platform/runtime-gate-crm-v20260716/gate711-canonical-router-full-static-v20260802.json';
+          fs.mkdirSync(path.dirname(out),{recursive:true});fs.writeFileSync(out,JSON.stringify(payload,null,2)+'\n');
+          console.log(JSON.stringify(payload,null,2));process.exit(payload.ok?0:41);
+          NODE
+          jq -e '.ok==true and .status=="GATE711_CANONICAL_ROUTER_FULL_STATIC_PASS" and .failed==0 and .secretAccess==false and .firestoreRead==false and .runtimeExecuted==false and .browserExecuted==false and .firestoreWrites==0 and .operationalWrites==0 and .deployExecuted==false and .production==false' "$OUT" >/dev/null
+
+      - name: Subir evidencia
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-gate711-canonical-router-full-static-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/gate711-canonical-router-full-static-v20260802.json
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Publicar estado
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/gate711-canonical-router-full-static-v20260802.json
+        with:
+          script: |
+            const fs=require('fs');let state='failure',description='Gate 7.11 full canonical router static FAIL';
+            try{const p=JSON.parse(fs.readFileSync(process.env.EVIDENCE,'utf8'));if(p.ok===true&&p.failed===0){state='success';description='Gate 7.11 full canonical router static PASS';}}catch(e){}
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/gate711-full-canonical-router-static',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
