@@ -3,15 +3,16 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {chromium} from 'playwright';
-import {authenticateWithOwner,acceptLegalOnce} from './orbit360-gate-bootstrap-auth-legal-normalized-v20260729.mjs';
+import {acceptLegalOnce} from './orbit360-gate-bootstrap-auth-legal-normalized-v20260729.mjs';
 import {TECHNICAL_COPY_PATTERN} from './orbit360-visible-technical-copy-predicate-v20260729.mjs';
 
 const ROOT=process.cwd();
 const OUT=path.join(ROOT,'orbit360-platform/runtime-gate-crm-v20260716/canonical-runtime-cumulative-visual-lab-v20260801.json');
 const SHOTS=path.join(ROOT,'orbit360-platform/runtime-gate-crm-v20260716/visual-sanitized-v20260801');
 const BASE_URL=String(process.env.ORBIT360_BASE_URL||'').trim();
-const EMAIL=String(process.env.ORBIT360_LAB_LOGIN_EMAIL||'orbit.lab@demo.com').trim();
-const KEY=String(process.env.ORBIT360_LAB_LOGIN_PASSWORD||'').trim();
+const TOKEN_FILE=String(process.env.ORBIT360_CUSTOM_TOKEN_FILE||'').trim();
+const EXPECTED_UID='woJlxR1iFEeiQZvTscPj4qQ5Qc73';
+const EXPECTED_EMAIL='orbit.lab@demo.com';
 const DIGEST='19e1927d39f6b713ee12504f8762bc42ead9de6e365bb0f12162d2a0c8f8469b';
 const EXPECTED={clientes:430,aseguradoras:30,polizas:1373,vehiculos:1032,recibosEsperados:1294,carteraPrimas:673,cobros:5,asesores:7};
 const RAW={clientes:430,aseguradoras:30,polizas:1375,vehiculos:1033,recibosEsperados:1294,carteraPrimas:673,cobros:7};
@@ -19,22 +20,12 @@ const SEEDS={clientes:0,aseguradoras:0,polizas:2,vehiculos:1,recibosEsperados:0,
 const REQUIRES={clientes:16,aseguradoras:12,polizas:1373,vehiculos:60,recibosEsperados:307,carteraPrimas:263,cobros:0};
 const API=['all','get','where','find','insert','update','remove','on','_emit','pref','setPref','init','reseed','raw'];
 
-const report={schemaVersion:'orbit360-canonical-runtime-cumulative-visual-lab-v1',gateId:'block7-canonical-runtime-cumulative-visual-lab-v20260801',contractVersion:'7.11.0',generatedAt:new Date().toISOString(),stage:'init',canonicalSnapshotDigest:DIGEST,checks:{},dataset:{},store:{},roles:{},routes:{},screenshots:[],browserDiagnostics:{pageErrors:[],consoleErrors:[],failedRequests:[]},writeGuard:{installed:false,calls:[]},firestoreRead:true,firestoreWrites:0,operationalWrites:0,reimportExecuted:false,hostingDeploy:false,previewDeploy:false,functionsDeploy:false,rulesDeploy:false,production:false,main:false,merge:false,containsPII:false,containsDocumentIds:false,containsValues:false,containsSecrets:false,ok:false};
+const report={schemaVersion:'orbit360-canonical-runtime-cumulative-visual-lab-v1',gateId:'block7-canonical-runtime-cumulative-visual-lab-v20260801',contractVersion:'7.11.0',generatedAt:new Date().toISOString(),stage:'init',canonicalSnapshotDigest:DIGEST,authMode:'existing_custom_token_readonly',checks:{},dataset:{},store:{},roles:{},routes:{},screenshots:[],browserDiagnostics:{pageErrors:[],consoleErrors:[],failedRequests:[]},writeGuard:{installed:false,calls:[]},firestoreRead:true,firestoreWrites:0,operationalWrites:0,reimportExecuted:false,hostingDeploy:false,previewDeploy:false,functionsDeploy:false,rulesDeploy:false,production:false,main:false,merge:false,containsPII:false,containsDocumentIds:false,containsValues:false,containsSecrets:false,ok:false};
 function clean(v){return String(v==null?'':v).replace(/https?:\/\/[^/\s]+/g,'').replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi,'[email]').replace(/[A-Za-z0-9_-]{40,}/g,'[redacted]').replace(/\s+/g,' ').trim().slice(0,360);}
 function save(){fs.mkdirSync(path.dirname(OUT),{recursive:true});fs.mkdirSync(SHOTS,{recursive:true});fs.writeFileSync(OUT,JSON.stringify(report,null,2)+'\n','utf8');}
 function stage(name){report.stage=name;console.log('ORBIT360_CANONICAL_RUNTIME_STAGE:'+name);}
 function requireState(value,code,detail=''){if(!value)throw new Error(code+(detail?':'+clean(detail):''));}
 async function bounded(name,fn,ms=30000){stage(name);let timer;try{return await Promise.race([Promise.resolve().then(fn),new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error('PIPELINE_STEP_TIMEOUT:'+name)),ms);})]);}finally{clearTimeout(timer);}}
-function validationCategory(row){
-  if(!row||typeof row!=='object')return'UNKNOWN';
-  const bool=value=>{if(value===true||value===false)return value;const v=String(value==null?'':value).trim().toLowerCase();if(['true','si','sí','yes','1'].includes(v))return true;if(['false','no','0'].includes(v))return false;return null;};
-  const nonEmpty=value=>value!==null&&value!==undefined&&value!==''&&(!Array.isArray(value)||value.length>0)&&(typeof value!=='object'||Array.isArray(value)||Object.keys(value).length>0);
-  const requires=bool(row.requiereValidacion),status=String(row.validationStatus||row.estadoValidacion||'').toLowerCase();
-  const quality=[row.motivosCalidad,row.motivoCalidad,row.alertasCalidad,row.motivosPendientes,row.calidad_datos].some(nonEmpty);
-  if(requires===true||quality||/(requiere|hold|pendiente|review|validacion)/.test(status))return'REQUIRES_VALIDATION';
-  if(requires===false||/(validado|aprobado|pass|ok|complete)/.test(status))return'VALIDATED_OR_CLEAR';
-  return'UNKNOWN';
-}
 async function selectRole(page,role){
   const result=await page.evaluate(target=>{
     const allowed=Orbit.session&&Orbit.session.allowedRoles?Orbit.session.allowedRoles():[];
@@ -97,7 +88,9 @@ let browser;
 const watchdog=setTimeout(()=>{report.error='GATE_TIMEOUT:'+report.stage;save();process.exit(124);},900000);
 try{
   requireState(/^https?:\/\//.test(BASE_URL),'BASE_URL_INVALID');
-  requireState(KEY.length>=12,'LAB_PASSWORD_MISSING');
+  requireState(TOKEN_FILE&&fs.existsSync(TOKEN_FILE),'CUSTOM_TOKEN_FILE_MISSING');
+  const customToken=fs.readFileSync(TOKEN_FILE,'utf8').trim();
+  requireState(customToken.length>100,'CUSTOM_TOKEN_INVALID');
   fs.mkdirSync(SHOTS,{recursive:true});
   browser=await chromium.launch({headless:true});
   const context=await browser.newContext({viewport:{width:1440,height:1000}});
@@ -108,7 +101,19 @@ try{
   page.on('requestfailed',request=>{if(report.browserDiagnostics.failedRequests.length<20)report.browserDiagnostics.failedRequests.push({path:(()=>{try{return new URL(request.url()).pathname;}catch{return'';}})(),error:clean(request.failure()&&request.failure().errorText)});});
 
   await bounded('open_local_checkout',()=>page.goto(BASE_URL,{waitUntil:'domcontentloaded'}),70000);
-  await authenticateWithOwner(page,{email:EMAIL,key:KEY,runtime:'20260717-2',bounded,requireState,report});
+  await bounded('firebase_auth_ready',()=>page.waitForFunction(()=>window.firebase&&typeof firebase.auth==='function'&&firebase.apps&&firebase.apps.length>0,{timeout:45000,polling:100}),50000);
+  const authResult=await bounded('existing_custom_token_signin',()=>page.evaluate(async({token,uid,email})=>{
+    const credential=await firebase.auth().signInWithCustomToken(token);
+    const user=credential&&credential.user||firebase.auth().currentUser;
+    return{uid:String(user&&user.uid||''),email:String(user&&user.email||'').toLowerCase()};
+  },{token:customToken,uid:EXPECTED_UID,email:EXPECTED_EMAIL}),45000);
+  requireState(authResult.uid===EXPECTED_UID&&authResult.email===EXPECTED_EMAIL,'CANONICAL_AUTH_IDENTITY_MISMATCH');
+  await bounded('canonical_auth_guard_acceptance',()=>page.waitForFunction(({uid,email})=>{
+    const user=window.firebase&&firebase.auth&&firebase.auth().currentUser;
+    return user&&String(user.uid||'')===uid&&String(user.email||'').toLowerCase()===email&&!document.body.classList.contains('pre-auth')&&document.body.dataset.authBackend==='firestore-lab';
+  },{uid:EXPECTED_UID,email:EXPECTED_EMAIL},{timeout:45000,polling:100}),50000);
+  report.checks.existingIdentity=true;
+
   const legalVisible=await page.locator('[data-legal-gate]:visible').count();
   if(legalVisible)await acceptLegalOnce(page,{bounded,requireState,report});
   else{report.legalGateMode='already_accepted_in_context';report.checks.legalOneClick=true;}
@@ -118,7 +123,7 @@ try{
     return Object.entries(expected).every(([name,count])=>(S.all(name)||[]).length===count);
   },EXPECTED,{timeout:150000,polling:250}),160000);
 
-  const state=await page.evaluate(({expected,raw,seeds,requires,api,digest})=>{
+  const state=await page.evaluate(({expected,api,digest})=>{
     const S=Orbit.store,status=S._labStatus?S._labStatus():{};
     const category=row=>{
       const bool=value=>{if(value===true||value===false)return value;const v=String(value==null?'':value).trim().toLowerCase();if(['true','si','sí','yes','1'].includes(v))return true;if(['false','no','0'].includes(v))return false;return null;};
@@ -129,7 +134,7 @@ try{
     const operational={},validation={},paths={},authorities={};
     Object.keys(expected).forEach(name=>{operational[name]=(S.all(name)||[]).length;validation[name]=(S.all(name)||[]).filter(row=>category(row)==='REQUIRES_VALIDATION').length;paths[name]=S._collectionPath?S._collectionPath(name):'';authorities[name]=S._collectionAuthority?S._collectionAuthority(name):'';});
     return{operational,validation,rawCounts:status.rawCounts||{},operationalCounts:status.operationalCounts||{},excludedSeedCounts:status.excludedSeedCounts||{},paths,authorities,apiMissing:api.filter(name=>typeof S[name]!=='function'),singleReadOwner:S.__singleReadOwner===true,canonicalReadModel:S.__canonicalReadModelV79===true,digest:String(status.canonicalSnapshotDigest||OrbitBackend&&OrbitBackend.canonicalSnapshotDigest||''),snapshotAttached:Boolean(status.snapshotAttached),snapshotErrors:status.snapshotErrors||{},bridge:Orbit.receiptsPortfolioProjectionV920&&Orbit.receiptsPortfolioProjectionV920.status?Orbit.receiptsPortfolioProjectionV920.status():null,allowedRoles:Orbit.session&&Orbit.session.allowedRoles?Orbit.session.allowedRoles():[]};
-  },{expected:EXPECTED,raw:RAW,seeds:SEEDS,requires:REQUIRES,api:API,digest:DIGEST});
+  },{expected:EXPECTED,api:API,digest:DIGEST});
   report.store=state;
   Object.entries(EXPECTED).forEach(([name,count])=>requireState(state.operational[name]===count,'OPERATIONAL_COUNT_INVALID',name+':'+state.operational[name]));
   Object.entries(RAW).forEach(([name,count])=>requireState(state.rawCounts[name]===count,'RAW_COUNT_INVALID',name+':'+state.rawCounts[name]));
