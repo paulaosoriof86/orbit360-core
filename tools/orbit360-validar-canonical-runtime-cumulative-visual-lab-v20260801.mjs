@@ -63,6 +63,44 @@ async function shot(page,name,masks=[]){
   await page.screenshot({path:file,fullPage:true,mask:locators,maskColor:'#D8D8D8'});
   report.screenshots.push({name:name+'.png',sanitized:true,maskedSelectors:masks});
 }
+async function settleLegalGateAfterHydration(page){
+  const observed=await bounded('legal_owner_settled_after_hydration',async()=>{
+    await page.waitForFunction(()=>{
+      const visible=Array.from(document.querySelectorAll('[data-legal-gate]')).filter(node=>{const style=getComputedStyle(node),rect=node.getBoundingClientRect();return style.display!=='none'&&style.visibility!=='hidden'&&rect.width>0&&rect.height>0;}).length;
+      const legal=window.Orbit&&Orbit.legal;
+      const accepted=legal&&typeof legal.aceptaciones==='function'?Object.keys(legal.aceptaciones()||{}).length:0;
+      const state=legal&&legal.__gateState||{};
+      const pending=Object.values(state.pendingScopes||{}).some(Boolean);
+      const done=Object.values(state.doneScopes||{}).some(Boolean);
+      return visible===1||accepted>0||done||pending;
+    },null,{timeout:20000,polling:100});
+    return page.evaluate(()=>{
+      const visible=Array.from(document.querySelectorAll('[data-legal-gate]')).filter(node=>{const style=getComputedStyle(node),rect=node.getBoundingClientRect();return style.display!=='none'&&style.visibility!=='hidden'&&rect.width>0&&rect.height>0;}).length;
+      const legal=window.Orbit&&Orbit.legal;
+      const accepted=legal&&typeof legal.aceptaciones==='function'?Object.keys(legal.aceptaciones()||{}).length:0;
+      const state=legal&&legal.__gateState||{};
+      return{visible,accepted,pending:Object.values(state.pendingScopes||{}).some(Boolean),done:Object.values(state.doneScopes||{}).some(Boolean)};
+    });
+  },24000);
+  requireState(observed.visible<=1,'LEGAL_DUPLICATE_VISIBLE',String(observed.visible));
+  if(observed.visible===1||observed.pending){
+    await acceptLegalOnce(page,{bounded,requireState,report});
+  }else{
+    requireState(observed.accepted>0||observed.done,'LEGAL_OWNER_UNSETTLED',JSON.stringify(observed));
+    report.legalGateMode='canonical_owner_already_completed';
+    report.checks.legalOneClick=true;
+  }
+  await bounded('legal_gate_absent_before_write_guard',async()=>{
+    await page.waitForFunction(()=>{
+      const visible=Array.from(document.querySelectorAll('[data-legal-gate]')).some(node=>{const style=getComputedStyle(node),rect=node.getBoundingClientRect();return style.display!=='none'&&style.visibility!=='hidden'&&rect.width>0&&rect.height>0;});
+      const legal=window.Orbit&&Orbit.legal;
+      const state=legal&&legal.__gateState||{};
+      const pending=Object.values(state.pendingScopes||{}).some(Boolean);
+      return !visible&&!pending;
+    },null,{timeout:20000,polling:100});
+  },22000);
+  report.checks.legalSettledBeforeWriteGuard=true;
+}
 async function inspectClientDetail(page,role,label){
   const row=page.locator('#host table.tbl tbody tr.clickable').first();
   if(await row.count()===0)return{available:false};
@@ -114,14 +152,12 @@ try{
   },{uid:EXPECTED_UID,email:EXPECTED_EMAIL},{timeout:45000,polling:100}),50000);
   report.checks.existingIdentity=true;
 
-  const legalVisible=await page.locator('[data-legal-gate]:visible').count();
-  if(legalVisible)await acceptLegalOnce(page,{bounded,requireState,report});
-  else{report.legalGateMode='already_accepted_in_context';report.checks.legalOneClick=true;}
-
   await bounded('canonical_store_hydrated',()=>page.waitForFunction(expected=>{
     const S=window.Orbit&&Orbit.store;if(!S||S.__canonicalReadModelV79!==true||S.__singleReadOwner!==true)return false;
     return Object.entries(expected).every(([name,count])=>(S.all(name)||[]).length===count);
   },EXPECTED,{timeout:150000,polling:250}),160000);
+
+  await settleLegalGateAfterHydration(page);
 
   const state=await page.evaluate(({expected,api,digest})=>{
     const S=Orbit.store,status=S._labStatus?S._labStatus():{};
