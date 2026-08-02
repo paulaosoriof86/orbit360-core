@@ -1,13 +1,19 @@
 {
   "schemaVersion": "orbit360-gate711-lifecycle-registry-static-request-v1",
   "gateId": "block7-canonical-runtime-cumulative-visual-lab-v20260801",
-  "approved": true,
-  "allowedExecutions": 1,
-  "consumed": false,
+  "approved": false,
+  "allowedExecutions": 0,
+  "consumed": true,
+  "consumedByRun": 30766213542,
+  "consumedByJob": 91545306596,
+  "artifact": 8839016087,
+  "artifactDigest": "sha256:53b86815827caed22436bda9e16511ce182b261f2d6edc0d917482cfdc8d92e7",
+  "status": "GATE711_ROOTFIX_STATIC_READINESS_PASS",
+  "checks": "12/12",
   "parentHead": "50b204cd13e0fc909e3773798e4f98ba330456e9",
   "failedMacroRun": 30766141784,
   "failedMacroJob": 91545118385,
-  "classification": "VALIDATOR_STALE",
+  "classification": "VALIDATOR_STALE_CORRECTED",
   "failedCheck": "LIFECYCLE_MATCHES_LEDGER",
   "activeLifecycleFile": "tools/orbit360-validator-lifecycle-contract-gate711-macro-readonly-v20260802.json",
   "capabilities": {
@@ -21,6 +27,7 @@
     "main": false,
     "merge": false
   },
+  "requestReplayBlocked": true,
   "containsPII": false,
   "containsValues": false,
   "containsSecrets": false
