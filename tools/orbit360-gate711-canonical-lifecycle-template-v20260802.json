@@ -51,7 +51,8 @@
     "ownerContentVersion": "20260802.1"
   },
   "staticReadiness": {
-    "status": "GATE711_ACADEMIA_BOOTSTRAP_FULL_STATIC_PASS",
+    "status": "GATE711_ROOTFIX_STATIC_READINESS_PASS",
+    "fullStaticStatus": "GATE711_ACADEMIA_BOOTSTRAP_FULL_STATIC_PASS",
     "manifestDiagnosticRun": 30770685200,
     "manifestDiagnosticArtifact": 8840415775,
     "fullStaticRun": 30770882763,
