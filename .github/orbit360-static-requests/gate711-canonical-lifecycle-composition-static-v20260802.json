@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "orbit360-gate711-canonical-lifecycle-composition-static-request-v1",
+  "gateId": "block7-canonical-runtime-cumulative-visual-lab-v20260801",
+  "parentHead": "d55d8239e4ea2c06a4cb0575b6af13436e727ff8",
+  "failedRun": 30767242588,
+  "failedCheck": "CANONICAL_PREFLIGHT_ENTRYPOINT",
+  "error": "CANONICAL_LIFECYCLE_REVISION_MISMATCH",
+  "scope": "static_synthetic_only",
+  "secrets": false,
+  "firestoreRead": false,
+  "runtime": false,
+  "browser": false,
+  "writes": false,
+  "deploy": false,
+  "production": false,
+  "approvedForExecution": true,
+  "allowedExecutions": 1,
+  "consumed": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
