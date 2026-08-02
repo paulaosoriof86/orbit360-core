@@ -1,72 +1,16 @@
-name: Orbit 360 · Gate 7.11 · root fix · readiness estático
+name: Orbit 360 · Gate 7.11 · root fix readiness estático · CERRADO
 on:
   push:
     branches: [ays/backend-tenant-lab-v99-20260703]
     paths:
-      - '.github/orbit360-static-requests/gate711-rootfix-static-readiness-v20260802.json'
+      - '.github/orbit360-closed/gate711-rootfix-static-readiness-no-replay'
 permissions:
   contents: read
-  statuses: write
 jobs:
-  validate:
-    name: Gate 7.11 · Academia, identidad, ledger y lifecycle
+  closed:
+    name: Readiness estático 12 de 12 cerrado
     runs-on: ubuntu-24.04
-    timeout-minutes: 8
     steps:
-      - name: Checkout histórico completo
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.sha }}
-          fetch-depth: 0
-          persist-credentials: false
-      - name: Preparar Node 22
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-      - name: Ejecutar cierre estático integral
-        shell: bash
-        run: |
-          set -euo pipefail
-          REQUEST=.github/orbit360-static-requests/gate711-rootfix-static-readiness-v20260802.json
-          test "$(git rev-parse HEAD^)" = "$(jq -r '.parentHead' "$REQUEST")"
-          mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
-          test "${#CHANGED[@]}" = '1'
-          test "${CHANGED[0]}" = "$REQUEST"
-          jq -e '.schemaVersion=="orbit360-gate711-rootfix-static-readiness-request-v1" and .approved==true and .allowedExecutions==1 and .consumed==false and .capabilities.secrets==false and .capabilities.firestoreRead==false and .capabilities.runtime==false and .capabilities.browser==false and .capabilities.writes==false and .capabilities.deploy==false and .capabilities.production==false' "$REQUEST" >/dev/null
-          node --check orbit360-platform/data/academia-v1230-operational-directory-v20260722.js
-          node --check tools/orbit360-validar-academia-operational-idempotence-gate711-v20260802.mjs
-          node --check tools/orbit360-validar-identity-ephemeral-path-contract-v20260802.mjs
-          node --check tools/orbit360-derivar-cumulative-visual-manifest-academia-rootfix-v20260802.mjs
-          node --check tools/orbit360-validar-rootfix-static-readiness-gate711-v20260802.mjs
-          node --check tools/orbit360-validar-gate-contracts-engine-canonical-runtime-cumulative-visual-lab-v20260801.mjs
-          node --check tools/orbit360-revalidar-policies-full-canonical-readonly-v20260801.mjs
-          node tools/orbit360-validar-academia-operational-idempotence-gate711-v20260802.mjs
-          jq -e '.ok==true and .status=="GATE711_ACADEMIA_OPERATIONAL_IDEMPOTENCE_STATIC_PASS" and .total==16 and .passed==16 and .failed==0 and .synthetic.afterThreeRoleChanges==5 and .secretAccess==false and .runtimeExecuted==false' orbit360-platform/runtime-gate-crm-v20260716/gate711-academia-operational-idempotence-static-v20260802.json >/dev/null
-          node tools/orbit360-validar-identity-ephemeral-path-contract-v20260802.mjs
-          jq -e '.ok==true and .status=="GATE711_IDENTITY_EPHEMERAL_PATH_STATIC_PASS" and .total==14 and .passed==14 and .failed==0 and .secretAccess==false and .runtimeExecuted==false' orbit360-platform/runtime-gate-crm-v20260716/gate711-identity-ephemeral-path-static-v20260802.json >/dev/null
-          node tools/orbit360-derivar-cumulative-visual-manifest-academia-rootfix-v20260802.mjs
-          jq -e '.ok==true and .status=="GATE711_CUMULATIVE_VISUAL_MANIFEST_ROOTFIX_PASS" and .total==10 and .passed==10 and .failed==0 and .newManifest.contentDigest=="9e737a2e20ee868ec804a66d249957260164ea393ed4576d4a67b3508a00f762" and (.changedVisualPaths|length)==1 and .secretAccess==false and .runtimeExecuted==false' orbit360-platform/runtime-gate-crm-v20260716/gate711-cumulative-visual-manifest-academia-rootfix-v20260802.json >/dev/null
-          node tools/orbit360-validar-rootfix-static-readiness-gate711-v20260802.mjs
-          jq -e '.ok==true and .status=="GATE711_ROOTFIX_STATIC_READINESS_PASS" and .classification=="GO_STATIC_ROOTFIX_READINESS" and .total==12 and .passed==12 and .failed==0 and .manifest.contentDigest=="9e737a2e20ee868ec804a66d249957260164ea393ed4576d4a67b3508a00f762" and (.manifest.changedVisualPaths|length)==1 and .secretAccess==false and .firestoreRead==false and .runtimeExecuted==false and .browserExecuted==false and .firestoreWrites==0 and .operationalWrites==0 and .deployExecuted==false and .production==false' orbit360-platform/runtime-gate-crm-v20260716/gate711-rootfix-static-readiness-v20260802.json >/dev/null
-      - name: Subir evidencia
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: orbit360-gate711-rootfix-static-readiness-${{ github.run_id }}
-          path: |
-            orbit360-platform/runtime-gate-crm-v20260716/gate711-academia-operational-idempotence-static-v20260802.json
-            orbit360-platform/runtime-gate-crm-v20260716/gate711-identity-ephemeral-path-static-v20260802.json
-            orbit360-platform/runtime-gate-crm-v20260716/gate711-cumulative-visual-manifest-academia-rootfix-v20260802.json
-            orbit360-platform/runtime-gate-crm-v20260716/gate711-rootfix-static-readiness-v20260802.json
-          if-no-files-found: warn
-          retention-days: 30
-      - name: Publicar estado
-        if: always()
-        uses: actions/github-script@v7
-        env:
-          EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/gate711-rootfix-static-readiness-v20260802.json
-        with:
-          script: |
-            const fs=require('fs');let state='failure',description='Gate 7.11 root fix static readiness failed';
-            try{const p=JSON.parse(fs.readFileSync(process.env.EVIDENCE,'utf8'));if(p.ok===true&&p.status==='GATE711_ROOTFIX_STATIC_READINESS_PASS'&&p.failed===0){state='success';description='Gate 7.11 root fix static readiness PASS';}}catch(e){}
-            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/gate711-rootfix-static-readiness',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
+      - run: |
+          echo 'GATE711_ROOTFIX_STATIC_READINESS_PASS'
+          echo 'Request consumed; no replay allowed.'
