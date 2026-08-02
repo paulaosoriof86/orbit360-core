@@ -2,7 +2,7 @@
   "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
   "gateId": "block7-canonical-runtime-cumulative-visual-lab-v20260801",
   "gateContractVersion": "7.11.1",
-  "status": "GATE711_RELEASE_CRITICAL_STATIC_READY",
+  "status": "GATE711_RELEASE_CRITICAL_VALIDATOR_STALE_CORRECTED_STATIC_READY",
   "phase": "SOURCE_ONLY_STATIC_GATE",
   "decisionRef": "user_directive_proceed_stable_release_critical_crm_ops_leads_20260802T1702-0600",
   "authorization": {
@@ -31,9 +31,34 @@
     "academia": "STATIC_INTEGRITY_NONBLOCKING_CONTENT",
     "cloudDispatch": "DOCUMENTED_NOT_SENT"
   },
+  "priorExecution": {
+    "run": 30771793126,
+    "job": 91560080475,
+    "artifact": 8840747763,
+    "artifactDigest": "sha256:629fc01acead21af7d9f1f6891b9e083b34300fc1cbb486fc8dd5d59ac134a54",
+    "checksPassed": 37,
+    "checksTotal": 38,
+    "failedCheck": "OPS_WORKFLOW_BRIDGE",
+    "reportedClassification": "DATA_CONTRACT_FAILURE",
+    "rootCauseClassification": "VALIDATOR_STALE",
+    "consumed": true,
+    "replayAllowed": false
+  },
+  "validatorStaleCorrection": {
+    "productDefect": false,
+    "productFilesChanged": 0,
+    "validatorFile": "tools/orbit360-validar-gate711-release-critical-static-v20260802.mjs",
+    "correctionCommit": "de9b8b7c73c6558e3c05f7836b79979ec99e11a1",
+    "staleAssertion": "literal local variable name col.def.nombre",
+    "correctedAssertion": "semantic pattern .def.nombre equals Emisiones independent of local variable name",
+    "ownerEvidence": "board.find(c => c && c.def && c.def.nombre === 'Emisiones')",
+    "sameStageRetry": false,
+    "correctionRunAllowedOnce": true
+  },
   "expectedEvidence": {
     "status": "GATE711_RELEASE_CRITICAL_STATIC_PASS",
     "classification": "GO_STATIC_RELEASE_CRITICAL_CRM_OPS_LEADS",
+    "checks": "38/38",
     "academiaRuntimePrerequisite": false,
     "cloudPackageSent": false,
     "runtimeExecuted": false,
@@ -51,7 +76,8 @@
     "deployAllowed": false,
     "productionAllowed": false,
     "mainAllowed": false,
-    "mergeAllowed": false
+    "mergeAllowed": false,
+    "stopRetryOnRepeatedStageOrFailureFamily": true
   },
   "containsPII": false,
   "containsSecrets": false
