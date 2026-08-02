@@ -3,7 +3,7 @@
   "gateId": "block7-policies-full-canonical-revalidation-readonly-v20260801",
   "gateContractVersion": "7.9.0",
   "validatorLifecycleRevision": "phase-capability-contract-v1",
-  "status": "POLICIES_FULL_CANONICAL_REVALIDATION_READONLY_AUTHORIZED",
+  "status": "POLICIES_FULL_CANONICAL_REVALIDATION_READONLY_CLOSED",
   "executionProfile": {
     "phase": "LAB_DATA_CONTRACT_REPAIR_DRYRUN",
     "capabilities": {
@@ -26,16 +26,28 @@
     "authorizationRef": "user_authorized_full_canonical_revalidation_post_78_20260801",
     "explicit": true,
     "allowedExecutions": 1,
-    "consumed": false
+    "consumed": true,
+    "consumedByRun": 30731043017,
+    "requestReplayBlocked": true
+  },
+  "executionResult": {
+    "run": 30731043017,
+    "job": 91451425024,
+    "artifact": 8827973728,
+    "artifactDigest": "sha256:22b0329c611fe297d116223e82db8c8f4cacf336526ddaa628942c8f5e85d272",
+    "head": "2261c016487d505eea00b2fc83818c9eaf35bf5f",
+    "status": "POLICIES_FULL_CANONICAL_REVALIDATION_READONLY_PASS",
+    "classification": "GO_LAB_FULL_CANONICAL_REVALIDATED",
+    "preflightPassed": 16,
+    "preflightFailed": 0,
+    "firestoreWrites": 0,
+    "operationalWrites": 0,
+    "closed": true
   },
   "sourceWriteGate": {
     "gateId": "block7-policies-held-parents-controlled-write-lab-v20260801",
     "contractVersion": "7.8.0",
     "run": 30730683228,
-    "job": 91450453030,
-    "artifact": 8827868101,
-    "artifactDigest": "sha256:933d4f2d54173460b3d34ec92c49262c97d07ff6e424353a230d15f166a47bf6",
-    "head": "6cd5e9f9dfcaf7f156b5d733236b3db4eea6368e",
     "status": "POLICIES_HELD_PARENTS_CONTROLLED_WRITE_CLOSED",
     "closed": true
   },
@@ -46,15 +58,29 @@
     "reopened": false,
     "additionalAttemptsAllowed": false
   },
-  "expectedBaseline": {
+  "sealedState": {
     "sourceSnapshotDigest": "88b8e16b0d4531b2f5c0ce2b1a21068837853080943f7584f6f3fab0cc2ff18d",
-    "targetSnapshotDigest": "19e1927d39f6b713ee12504f8762bc42ead9de6e365bb0f12162d2a0c8f8469b",
+    "canonicalSnapshotDigest": "19e1927d39f6b713ee12504f8762bc42ead9de6e365bb0f12162d2a0c8f8469b",
     "sourceDocuments": 4837,
-    "targetDocuments": 4842,
+    "canonicalDocuments": 4842,
     "sharedOperationalIds": 4837,
     "sourceOnlyIds": 0,
     "targetOnlySeeds": 5,
-    "targetOnlyByCollection": {
+    "exactPayloads": 4397,
+    "semanticEquivalentPayloads": 440,
+    "criticalConflicts": 0,
+    "nonEquivalentPayloads": 0,
+    "businessSchemaMatches": 4837,
+    "businessSchemaMismatches": 0,
+    "validationMatches": 4837,
+    "validationMismatches": 0,
+    "requiresValidationPreserved": 2031,
+    "operationalSeedMarkers": 0
+  },
+  "targetOnlySeeds": {
+    "total": 5,
+    "allSeedLike": true,
+    "byCollection": {
       "clientes": 0,
       "aseguradoras": 0,
       "polizas": 2,
@@ -62,33 +88,33 @@
       "recibosEsperados": 0,
       "carteraPrimas": 0,
       "cobros": 2
-    },
-    "operationalRelationDocuments": 4377,
-    "operationalRelationGroups": 6428
+    }
   },
-  "scope": {
-    "collections": ["clientes", "aseguradoras", "polizas", "vehiculos", "recibosEsperados", "carteraPrimas", "cobros"],
-    "verifyCounts": true,
-    "verifyIdSets": true,
-    "verifyDigests": true,
-    "verifyExactPayloads": true,
-    "verifyBusinessProjection": true,
-    "verifyBusinessSchema": true,
-    "verifyValidationState": true,
-    "verifyTargetOnlySeeds": true,
-    "verifyAllRelations": true,
-    "sealCanonicalDigest": true,
-    "emitDocumentIds": false,
-    "emitBusinessValues": false
+  "relationVerification": {
+    "documents": 4377,
+    "requiredGroups": 6428,
+    "sourceResolvedGroups": 6428,
+    "canonicalResolvedGroups": 6428,
+    "sourceBlockedGroups": 0,
+    "canonicalBlockedGroups": 0
+  },
+  "validationDistribution": {
+    "clientes": 16,
+    "aseguradoras": 12,
+    "polizas": 1373,
+    "vehiculos": 60,
+    "recibosEsperados": 307,
+    "carteraPrimas": 263,
+    "cobros": 0,
+    "total": 2031
   },
   "cumulativeVisualGuard": {
     "required": true,
-    "requiredBranch": "ays/backend-tenant-lab-v99-20260703",
-    "pullRequest": 5,
     "trackedFileCount": 308,
     "pathDigest": "0c3dbf222646ea46b57e838359ac56fff3994268a97e0d682508bd747a29f3c4",
     "contentDigest": "5b32b90815929acc341cfd4ae7c1e5f76d819e1a6a1b4091d13800508ab9b647",
     "indexDigest": "54df4a1977573ccc6a0702bd0012f2835fcef4cb529e327d16918c4b420382a4",
+    "manifestReverified": true,
     "noParallelShell": true,
     "noReducedShell": true,
     "noModuleFragmentation": true,
@@ -117,7 +143,20 @@
     "productionAllowed": false,
     "mainAllowed": false,
     "mergeAllowed": false,
-    "reopenFrozenGateAllowed": false
+    "reopenFrozenGateAllowed": false,
+    "additionalExecutionsAllowed": false
+  },
+  "nextGateCondition": {
+    "newAuthorizationRequired": true,
+    "requiredGateType": "CUMULATIVE_FRONTEND_CANONICAL_READ_ADAPTER_STATIC",
+    "canonicalDigestRequired": "19e1927d39f6b713ee12504f8762bc42ead9de6e365bb0f12162d2a0c8f8469b",
+    "preserveOrbitStoreApi": true,
+    "preserveAllModules": true,
+    "writesAllowed": false,
+    "browserAuthorized": false,
+    "previewAuthorized": false,
+    "deployAuthorized": false,
+    "visualizationAuthorized": false
   },
   "containsPII": false,
   "containsSecrets": false
