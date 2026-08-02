@@ -4,14 +4,24 @@
   "contractVersion": "7.11.0",
   "authorizationRef": "user_continue_next_exact_action_20260802",
   "approved": true,
-  "allowedExecutions": 1,
-  "consumed": false,
+  "allowedExecutions": 0,
+  "consumed": true,
+  "consumedAt": "2026-08-02T10:20:04-06:00",
+  "status": "STOP_RETRY",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
   "parentHead": "874135432f681b26453a9843cb346567a921dd81",
   "projectId": "ays-orbit-360-lab",
   "tenantId": "alianzas-soluciones",
   "canonicalSnapshotDigest": "19e1927d39f6b713ee12504f8762bc42ead9de6e365bb0f12162d2a0c8f8469b",
+  "stopRetry": {
+    "active": true,
+    "reason": "Same preflight stage failed twice",
+    "runs": [30756305124, 30756380638],
+    "requestReplayAllowed": false,
+    "runtimeRetryAllowed": false,
+    "newAuthorizationRequired": true
+  },
   "retry": {
     "sameGate": true,
     "priorAttempts": [
@@ -44,6 +54,18 @@
         "runtimeExecuted": false,
         "browserExecuted": false,
         "fixCommit": "874135432f681b26453a9843cb346567a921dd81"
+      },
+      {
+        "runId": 30756380638,
+        "jobId": 91519136227,
+        "classification": "VALIDATOR_STALE / PIPELINE_MECHANISM_FAILURE",
+        "failedStage": "AUTHORIZATION",
+        "rootCause": "Historical authorizationRef hardcoded in preflight engine",
+        "secretAccess": false,
+        "firestoreRead": false,
+        "runtimeExecuted": false,
+        "browserExecuted": false,
+        "fixCommit": "248a92a7e951c07aed06a6501272ac97142f2e18"
       }
     ],
     "productChanged": false,
@@ -92,11 +114,11 @@
     "automatedGateMaySetHumanApproval": false
   },
   "capabilities": {
-    "secrets": true,
-    "firestoreRead": true,
+    "secrets": false,
+    "firestoreRead": false,
     "writes": false,
-    "runtime": true,
-    "browser": true,
+    "runtime": false,
+    "browser": false,
     "preview": false,
     "deploy": false,
     "rulesDeploy": false,
