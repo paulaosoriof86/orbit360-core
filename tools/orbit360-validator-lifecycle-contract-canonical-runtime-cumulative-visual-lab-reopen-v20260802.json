@@ -5,15 +5,15 @@
   "validatorLifecycleRevision": "phase-capability-contract-v1",
   "legalDeferredOrderRevision": "gate711-legal-deferred-order-v2",
   "authorizationBindingRevision": "gate711-lifecycle-request-exact-binding-v1",
-  "status": "CANONICAL_RUNTIME_CUMULATIVE_VISUAL_LAB_AUTHORIZED",
+  "status": "CANONICAL_RUNTIME_CUMULATIVE_VISUAL_LAB_STOP_RETRY",
   "executionProfile": {
     "phase": "LAB_RUNTIME_GATE",
     "capabilities": {
-      "secrets": true,
-      "firestoreRead": true,
+      "secrets": false,
+      "firestoreRead": false,
       "writes": false,
-      "runtime": true,
-      "browser": true,
+      "runtime": false,
+      "browser": false,
       "deploy": false,
       "functionsDeploy": false,
       "rulesDeploy": false,
@@ -27,43 +27,80 @@
     "authorizedAt": "2026-08-02T12:15:00-06:00",
     "authorizationRef": "user_authorizes_single_readonly_gate711_after_static_passes_20260802T1215-0600",
     "explicit": true,
-    "allowedExecutions": 1,
-    "consumed": false,
+    "allowedExecutions": 0,
+    "consumed": true,
+    "consumedByRun": 30761050790,
+    "consumedAt": "2026-08-02T12:26:43-06:00",
     "macroBlockWithoutMicroAuthorizations": true,
     "additionalExecutionsAllowed": false
-  },
-  "reopenedFromStopRetry": {
-    "priorLifecycle": "tools/orbit360-validator-lifecycle-contract-canonical-runtime-cumulative-visual-lab-v20260801.json",
-    "priorStatus": "CANONICAL_RUNTIME_CUMULATIVE_VISUAL_LAB_STOP_RETRY",
-    "rootCauseCorrected": true,
-    "sameStageOrFamilyStopsImmediately": true
   },
   "staticReopenEvidence": {
     "run": 30760809119,
     "job": 91530818480,
     "artifact": 8837378178,
     "artifactDigest": "sha256:73fa60b0617683e4ad5af55a39719cc5d7b90e588b5057ac8923dcf9428ba28f",
-    "auditedHead": "54918b31730bddedf600c672f117a2edba78ac3b",
-    "authorizationBinding": {
-      "status": "GATE711_AUTHORIZATION_BINDING_STATIC_PASS",
-      "passed": 15,
-      "failed": 0
-    },
-    "legalDeferredOrder": {
-      "status": "GATE711_LEGAL_DEFERRED_ORDER_STATIC_PASS",
-      "passed": 11,
-      "failed": 0
-    },
-    "preflight": {
-      "status": "GO_GATE_CONTRACT",
-      "passed": 18,
-      "failed": 0
-    },
+    "authorizationBinding": "GATE711_AUTHORIZATION_BINDING_STATIC_PASS",
+    "authorizationChecks": "15/15",
+    "legalDeferredOrder": "GATE711_LEGAL_DEFERRED_ORDER_STATIC_PASS",
+    "legalChecks": "11/11",
+    "preflight": "GO_GATE_CONTRACT",
+    "preflightChecks": "18/18",
     "secretAccess": false,
     "firestoreRead": false,
     "runtimeExecuted": false,
     "browserExecuted": false,
-    "operationalWrites": 0
+    "operationalWrites": 0,
+    "ok": true
+  },
+  "runtimeExecution": {
+    "run": 30761050790,
+    "job": 91531489938,
+    "head": "820d1bb942e371104b481dde467485820bc8d103",
+    "artifact": 8837477628,
+    "artifactDigest": "sha256:3a21df03735b11b1b5b25b430a421918db40a9992d43b543571245e159729877",
+    "preflight": "GO_GATE_CONTRACT",
+    "preflightChecks": "17/17",
+    "identity": "CANONICAL_BROWSER_EXISTING_IDENTITY_READY",
+    "storeContract": true,
+    "datasetValidated": true,
+    "legalOneClick": true,
+    "legalSettledBeforeWriteGuard": true,
+    "rolesVisited": ["Dirección", "Operativo", "Asesor"],
+    "sanitizedScreenshots": 13,
+    "status": "CANONICAL_RUNTIME_CUMULATIVE_VISUAL_LAB_FAIL",
+    "classification": "BROWSER_WRITE_ATTEMPT",
+    "writeGuardCalls": [
+      {"operation": "insert", "roleTransition": "Dirección"},
+      {"operation": "insert", "roleTransition": "Operativo"},
+      {"operation": "insert", "roleTransition": "Asesor"}
+    ],
+    "browserWriteAttempts": 3,
+    "firestoreWrites": 0,
+    "operationalWrites": 0,
+    "reimportExecuted": false,
+    "hostingDeploy": false,
+    "previewDeploy": false,
+    "production": false,
+    "finalSnapshotProduced": false,
+    "cleanupPipelineError": "server_pid unbound variable after runtime failure"
+  },
+  "stopRetry": {
+    "active": true,
+    "activatedAt": "2026-08-02T12:26:43-06:00",
+    "trigger": "BROWSER_WRITE_ATTEMPT family repeated three times in the single authorized execution",
+    "stage": "multi-role cumulative visual runtime",
+    "classification": "FUNCTIONAL_DEFECT_OR_VALIDATOR_CONTRACT_FAILURE_REQUIRES_OWNER_DIAGNOSIS",
+    "productFrozen": true,
+    "requestReplayAllowed": false,
+    "runtimeRetryAllowed": false,
+    "newRequestAllowed": false,
+    "requiredBeforeReopen": [
+      "Identify the canonical owner of each role-transition insert",
+      "Determine whether role-change auditing is mandatory product behavior or an invalid automatic write",
+      "Correct only the responsible owner or the read-only gate contract",
+      "Add stack-aware synthetic validation for zero-write role switching",
+      "Obtain static PASS and a new explicit authorization"
+    ]
   },
   "sourceStaticGate": {
     "gateId": "block7-canonical-store-cumulative-adapter-static-v20260801",
@@ -79,12 +116,6 @@
     "canonicalSnapshotDigest": "19e1927d39f6b713ee12504f8762bc42ead9de6e365bb0f12162d2a0c8f8469b",
     "closed": true
   },
-  "cumulativeManifest": {
-    "trackedFileCount": 309,
-    "pathDigest": "517056dee1200503b2e7295a333cb804bc71271bbaa87847fa762da025f276f1",
-    "contentDigest": "83cc01dacf180b8ca9693df7117030228479992d6db4c59fab53def2e94acafd",
-    "indexDigest": "b57b6581ee02d2dde42a8a2c1272d57f19b7ad6809d13a1d25111f3d71a96074"
-  },
   "expectedOperationalCounts": {
     "clientes": 430,
     "aseguradoras": 30,
@@ -94,25 +125,6 @@
     "carteraPrimas": 673,
     "cobros": 5,
     "asesores": 7
-  },
-  "scope": {
-    "serveExactCheckoutLocally": true,
-    "useExistingLabIdentity": true,
-    "acceptLegalOnce": true,
-    "acceptLegalAfterStoreHydration": true,
-    "legalSettledBeforeWriteGuard": true,
-    "snapshotBeforeAndAfter": true,
-    "installBrowserWriteGuard": true,
-    "verifyStoreOwner": true,
-    "verifyCanonicalPaths": true,
-    "verifyApiContract": true,
-    "verifySeedExclusion": true,
-    "verifyRequiresValidation": true,
-    "roles": ["Dirección", "Operativo", "Asesor"],
-    "viewports": ["desktop", "tablet", "mobile"],
-    "routes": ["cliente360", "aseguradoras", "polizas"],
-    "sanitizedScreenshots": true,
-    "singleCumulativeVisualReview": true
   },
   "guards": {
     "firestoreDataWritesAllowed": false,
