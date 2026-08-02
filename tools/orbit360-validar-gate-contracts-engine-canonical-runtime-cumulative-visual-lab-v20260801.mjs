@@ -16,19 +16,23 @@ const BROWSER='tools/orbit360-validar-canonical-runtime-cumulative-visual-lab-v2
 const IDENTITY='tools/orbit360-preparar-identidad-browser-canonica-readonly-v20260801.mjs';
 const REVALIDATOR='tools/orbit360-revalidar-policies-full-canonical-readonly-v20260801.mjs';
 const WORKFLOW='.github/workflows/orbit360-canonical-runtime-cumulative-visual-lab-v20260801.yml';
+const ACADEMIA_BOOTSTRAP='orbit360-platform/core/academia-static-content-write-policy-v20260729.js';
+const ACADEMIA_OWNER='orbit360-platform/data/academia-v1230-operational-directory-v20260722.js';
 const DIGEST='19e1927d39f6b713ee12504f8762bc42ead9de6e365bb0f12162d2a0c8f8469b';
 const PATH_DIGEST='517056dee1200503b2e7295a333cb804bc71271bbaa87847fa762da025f276f1';
-const CONTENT_DIGEST='9e737a2e20ee868ec804a66d249957260164ea393ed4576d4a67b3508a00f762';
+const CONTENT_DIGEST='3d25a83218a4373513e1fff24ea9b12817d4c47be0fad08777e7f94867b3f676';
 const INDEX_DIGEST='b57b6581ee02d2dde42a8a2c1272d57f19b7ad6809d13a1d25111f3d71a96074';
 
-function read(rel){return JSON.parse(fs.readFileSync(path.join(ROOT,rel),'utf8'));}
+function readJson(rel){return JSON.parse(fs.readFileSync(path.join(ROOT,rel),'utf8'));}
+function readText(rel){return fs.readFileSync(path.join(ROOT,rel),'utf8');}
 function save(payload){fs.mkdirSync(path.dirname(OUT),{recursive:true});fs.writeFileSync(OUT,JSON.stringify(payload,null,2)+'\n','utf8');}
 const checks=[];const add=(id,ok)=>checks.push({id,ok:Boolean(ok)});
 try{
   add('GATE',process.argv[2]===GATE);
-  const required=[LIFECYCLE,REQUEST,GATE79,GATE710,CUMULATIVE,BROWSER,IDENTITY,REVALIDATOR,WORKFLOW,'tools/orbit360-validar-gate-contracts-v20260717.mjs','orbit360-platform/index.html','orbit360-platform/data/store-firestore-lab.local.js','orbit360-platform/core/backend-lab-auth-guard.js'];
+  const required=[LIFECYCLE,REQUEST,GATE79,GATE710,CUMULATIVE,BROWSER,IDENTITY,REVALIDATOR,WORKFLOW,ACADEMIA_BOOTSTRAP,ACADEMIA_OWNER,'tools/orbit360-validar-gate-contracts-v20260717.mjs','orbit360-platform/index.html','orbit360-platform/data/store-firestore-lab.local.js','orbit360-platform/core/backend-lab-auth-guard.js'];
   const missing=required.filter(rel=>!fs.existsSync(path.join(ROOT,rel)));add('FILES',missing.length===0);if(missing.length)throw new Error('PIPELINE_MECHANISM_FAILURE:FILES:'+missing.join(','));
-  const lifecycle=read(LIFECYCLE),request=read(REQUEST),gate79=read(GATE79),gate710=read(GATE710),cumulative=read(CUMULATIVE);
+  const lifecycle=readJson(LIFECYCLE),request=readJson(REQUEST),gate79=readJson(GATE79),gate710=readJson(GATE710),cumulative=readJson(CUMULATIVE);
+  const bootstrap=readText(ACADEMIA_BOOTSTRAP),owner=readText(ACADEMIA_OWNER);
   add('LIFECYCLE',lifecycle.gateId===GATE&&lifecycle.gateContractVersion===VERSION&&lifecycle.status==='CANONICAL_RUNTIME_CUMULATIVE_VISUAL_LAB_AUTHORIZED');
   add('PHASE',lifecycle.executionProfile?.phase==='LAB_RUNTIME_GATE');
   const c=lifecycle.executionProfile?.capabilities||{};
@@ -40,8 +44,9 @@ try{
   add('BRANCH',request.branch==='ays/backend-tenant-lab-v99-20260703'&&request.pullRequest===5&&request.projectId==='ays-orbit-360-lab'&&request.tenantId==='alianzas-soluciones');
   add('GATE_79',gate79.status==='POLICIES_FULL_CANONICAL_REVALIDATION_READONLY_CLOSED'&&gate79.sealedState?.canonicalSnapshotDigest===DIGEST&&gate79.guards?.additionalExecutionsAllowed===false);
   add('GATE_710',gate710.status==='CANONICAL_STORE_CUMULATIVE_ADAPTER_STATIC_CLOSED'&&gate710.solution?.singleReadOwner==='Orbit.store'&&gate710.guards?.additionalExecutionsAllowed===false&&gate710.authorization?.requestReplayBlocked===true);
-  add('CUMULATIVE',cumulative.status==='CUMULATIVE_VISUAL_CANDIDATE_MANIFEST_SEALED'&&cumulative.manifest?.trackedFileCount===309&&cumulative.manifest?.pathDigest===PATH_DIGEST&&cumulative.manifest?.contentDigest===CONTENT_DIGEST&&cumulative.manifest?.indexDigest===INDEX_DIGEST&&cumulative.canonicalReadModel?.singleReadOwner==='Orbit.store');
+  add('CUMULATIVE',cumulative.status==='CUMULATIVE_VISUAL_CANDIDATE_MANIFEST_SEALED'&&cumulative.contractVersion==='1.3.0'&&cumulative.manifest?.trackedFileCount===309&&cumulative.manifest?.pathDigest===PATH_DIGEST&&cumulative.manifest?.contentDigest===CONTENT_DIGEST&&cumulative.manifest?.indexDigest===INDEX_DIGEST&&cumulative.canonicalReadModel?.singleReadOwner==='Orbit.store');
   add('DIGESTS',request.canonicalSnapshotDigest===DIGEST&&request.cumulativeManifest?.trackedFileCount===309&&request.cumulativeManifest?.pathDigest===PATH_DIGEST&&request.cumulativeManifest?.contentDigest===CONTENT_DIGEST&&request.cumulativeManifest?.indexDigest===INDEX_DIGEST);
+  add('ACADEMIA_OWNER_CONNECTED',bootstrap.includes("BOOTSTRAP_VERSION='20260802.2'")&&bootstrap.includes("data/academia-v1230-operational-directory-v20260722.js?v=20260802-2")&&bootstrap.includes("script.async=false")&&bootstrap.includes("data-orbit-academia-operational-owner")&&owner.includes("F='20260802.1'")&&!owner.includes("addEventListener('orbit:session'"));
   add('COUNTS',request.expectedOperationalCounts?.clientes===430&&request.expectedOperationalCounts?.aseguradoras===30&&request.expectedOperationalCounts?.polizas===1373&&request.expectedOperationalCounts?.vehiculos===1032&&request.expectedOperationalCounts?.recibosEsperados===1294&&request.expectedOperationalCounts?.carteraPrimas===673&&request.expectedOperationalCounts?.cobros===5&&request.expectedOperationalCounts?.asesores===7);
   add('IDENTITY',request.identity?.existingOnly===true&&request.identity?.createUser===false&&request.identity?.updateUser===false&&request.identity?.customTokenEphemeral===true&&request.identity?.expectedUid==='woJlxR1iFEeiQZvTscPj4qQ5Qc73'&&request.identity?.expectedEmail==='orbit.lab@demo.com');
   add('VISUAL_SCOPE',request.scope?.exactCheckoutLocalServe===true&&request.scope?.snapshotBeforeAfter===true&&request.scope?.browserWriteGuard===true&&request.scope?.roles===3&&request.scope?.viewports===3&&request.scope?.routes===3&&request.scope?.sanitizedScreenshots===true&&request.scope?.singleCumulativeVisualReview===true);
