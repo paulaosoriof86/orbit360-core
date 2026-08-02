@@ -35,7 +35,7 @@ preflight: 17/17
 controles estáticos: 48/48
 ```
 
-Esta segunda ejecución fue redundante y se clasificó como `PIPELINE_MECHANISM_DUPLICATE_STATIC_REPLAY`. No abrió secrets, Firestore, runtime ni navegador y no produjo escrituras. El disparador por push quedó eliminado, el request quedó consumido y no se admiten nuevas ejecuciones del gate 7.10.
+Esta segunda ejecución fue redundante y se clasificó como `PIPELINE_MECHANISM_DUPLICATE_STATIC_REPLAY`. No abrió secrets, Firestore, runtime ni navegador y no produjo escrituras. El disparador por push quedó eliminado, el despacho manual quedó bloqueado, el request quedó consumido y no se admiten nuevas ejecuciones del gate 7.10.
 
 ## Causa raíz
 
@@ -137,6 +137,26 @@ VALIDATOR_STALE
 ```
 
 Se corrigió el universo del validador antes de la segunda ejecución. No se modificaron archivos de producto para complacer el scanner.
+
+## Replay de pipeline corregido
+
+Después del PASS aceptado, una actualización del request coincidió con el cierre del lifecycle y produjo una ejecución estática redundante. La evidencia fue equivalente y no tuvo capacidades externas ni impacto de producto o datos.
+
+Clasificación:
+
+```text
+PIPELINE_MECHANISM_DUPLICATE_STATIC_REPLAY
+```
+
+Correctivos definitivos:
+
+```text
+request consumido
+workflow sin trigger por push
+manual dispatch bloqueado
+lifecycle cerrado
+additionalExecutionsAllowed: false
+```
 
 ## Delta de runtime
 
