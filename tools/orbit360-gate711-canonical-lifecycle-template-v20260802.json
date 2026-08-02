@@ -3,7 +3,7 @@
   "gateId": "block7-canonical-runtime-cumulative-visual-lab-v20260801",
   "gateContractVersion": "7.11.0",
   "validatorLifecycleRevision": "phase-capability-contract-v1",
-  "macroLifecycleRevision": "macro-rootfix-then-full-canonical-v3",
+  "macroLifecycleRevision": "macro-rootfix-then-full-canonical-v5",
   "status": "CANONICAL_LIFECYCLE_TEMPLATE_STATIC_READY",
   "executionProfile": {
     "phase": "LAB_RUNTIME_GATE",
@@ -30,7 +30,7 @@
     "consumed": true,
     "macroBlockWithoutMicroAuthorizations": true,
     "additionalExecutionsAllowed": false,
-    "authorizedProductHead": "6ebcb7e82545a6a6810ecf55d2cc8b8ad2783979"
+    "authorizedProductHead": "997fca628f95dd397dba347700a6bc644fe840f0"
   },
   "sequence": {
     "step1": "targeted_rootfix_runtime_readonly",
@@ -38,38 +38,32 @@
     "sameCheckout": true,
     "sameIdentity": true,
     "sameLocalServer": true,
-    "snapshots": [
-      "before",
-      "afterRootFix",
-      "afterFullGate"
-    ],
+    "snapshots": ["before", "afterRootFix", "afterFullGate"],
     "allSnapshotsMustMatch": true,
     "automaticStopRetry": true
   },
   "rootCause": {
     "classification": "FUNCTIONAL_DEFECT",
-    "owner": "orbit360-platform/data/academia-v1230-operational-directory-v20260722.js",
-    "function": "apply",
-    "invalidTrigger": "orbit:session",
-    "rootFixCommit": "fd49e1b15e69d1f023727b4ff92190852bcae1e0",
-    "rootFixVersion": "20260802.1"
+    "owner": "orbit360-platform/core/academia-static-content-write-policy-v20260729.js",
+    "loadedRuntimeOwner": "orbit360-platform/data/academia-v1230-operational-directory-v20260722.js",
+    "rootFixCommit": "997fca628f95dd397dba347700a6bc644fe840f0",
+    "rootFixVersion": "20260802.2",
+    "ownerContentVersion": "20260802.1"
   },
   "staticReadiness": {
-    "run": 30766213542,
-    "job": 91545306596,
-    "artifact": 8839016087,
-    "artifactDigest": "sha256:53b86815827caed22436bda9e16511ce182b261f2d6edc0d917482cfdc8d92e7",
+    "manifestDiagnosticRun": 30770685200,
+    "manifestDiagnosticArtifact": 8840415775,
     "status": "GATE711_ROOTFIX_STATIC_READINESS_PASS",
-    "checks": "12/12",
-    "academia": "16/16",
+    "checks": "14/14",
+    "academiaOwnerIdempotence": "16/16",
     "identity": "14/14",
-    "manifest": "10/10",
-    "lifecycleRegistry": "12/12"
+    "bootstrapOwner": "8/8",
+    "canonicalRouter": "PENDING_STATIC_REVALIDATION"
   },
   "cumulativeManifest": {
     "trackedFileCount": 309,
     "pathDigest": "517056dee1200503b2e7295a333cb804bc71271bbaa87847fa762da025f276f1",
-    "contentDigest": "9e737a2e20ee868ec804a66d249957260164ea393ed4576d4a67b3508a00f762",
+    "contentDigest": "3d25a83218a4373513e1fff24ea9b12817d4c47be0fad08777e7f94867b3f676",
     "indexDigest": "b57b6581ee02d2dde42a8a2c1272d57f19b7ad6809d13a1d25111f3d71a96074"
   },
   "canonicalData": {
