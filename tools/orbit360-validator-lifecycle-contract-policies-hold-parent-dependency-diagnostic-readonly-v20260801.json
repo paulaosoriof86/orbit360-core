@@ -1,0 +1,117 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
+  "gateId": "block7-policies-hold-parent-dependency-diagnostic-readonly-v20260801",
+  "gateContractVersion": "7.7.0",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
+  "status": "POLICIES_HOLD_PARENT_DEPENDENCY_DIAGNOSTIC_READONLY_AUTHORIZED",
+  "executionProfile": {
+    "phase": "LAB_DATA_CONTRACT_REPAIR_DRYRUN",
+    "capabilities": {
+      "secrets": true,
+      "firestoreRead": true,
+      "writes": false,
+      "runtime": false,
+      "browser": false,
+      "deploy": false,
+      "functionsDeploy": false,
+      "rulesDeploy": false,
+      "production": false
+    }
+  },
+  "singleGate": true,
+  "blockOwner": "Policies",
+  "authorization": {
+    "authorizedBy": "Paula Osorio",
+    "authorizedAt": "2026-08-01T20:28:00-06:00",
+    "authorizationRef": "user_authorized_hold_parent_dependency_diagnostic_readonly_20260801",
+    "explicit": true,
+    "allowedExecutions": 1,
+    "consumed": false
+  },
+  "sourceFrozenGate": {
+    "gateId": "block7-policies-canonical-postwrite-revalidation-readonly-v20260801",
+    "contractVersion": "7.6.0",
+    "status": "POLICIES_CANONICAL_POSTWRITE_REVALIDATION_FROZEN_DATA_CONTRACT_FAILURE",
+    "firstRun": 30727254049,
+    "secondRun": 30727341881,
+    "additionalAttemptsAllowed": false,
+    "rootCauseCode": "CANONICAL_POLICIES_REFERENCE_EXCLUDED_VALIDATION_PARENTS"
+  },
+  "sourceWriteGate": {
+    "gateId": "block7-policies-canonical-controlled-write-lab-v20260801",
+    "contractVersion": "7.5.0",
+    "run": 30726870258,
+    "job": 91440059984,
+    "artifact": 8826656778,
+    "artifactDigest": "sha256:170f450128cd228e3a8ce53c072fcd91cfb38ff4ad6a0dc5ae73116b84e8b945",
+    "status": "POLICIES_CANONICAL_CONTROLLED_WRITE_CLOSED",
+    "closed": true
+  },
+  "scope": {
+    "tenantId": "alianzas-soluciones",
+    "projectId": "ays-orbit-360-lab",
+    "heldClients": 16,
+    "heldInsurers": 4,
+    "countAffectedPolicies": true,
+    "measureClientInsurerIntersection": true,
+    "traceVehicles": true,
+    "traceReceipts": true,
+    "tracePortfolio": true,
+    "traceCollections": true,
+    "classifyRestrictedParentMigration": true,
+    "compareStrategies": true,
+    "emitDocumentIds": false,
+    "emitBusinessValues": false
+  },
+  "expectedBaseline": {
+    "sourceSnapshotDigest": "88b8e16b0d4531b2f5c0ce2b1a21068837853080943f7584f6f3fab0cc2ff18d",
+    "targetSnapshotAfterDigest": "724e1efbbc29f60791350ea180ef54230ecf888f9914b98fc70fda62ca6ac305",
+    "sourceTotal": 4837,
+    "targetTotal": 4822,
+    "sourcePolicies": 1373,
+    "targetPolicies": 1375,
+    "heldClients": 16,
+    "heldInsurers": 4,
+    "minimumAffectedPolicies": 1
+  },
+  "cumulativeVisualGuard": {
+    "required": true,
+    "requiredBranch": "ays/backend-tenant-lab-v99-20260703",
+    "pullRequest": 5,
+    "trackedFileCount": 308,
+    "pathDigest": "0c3dbf222646ea46b57e838359ac56fff3994268a97e0d682508bd747a29f3c4",
+    "contentDigest": "5b32b90815929acc341cfd4ae7c1e5f76d819e1a6a1b4091d13800508ab9b647",
+    "indexDigest": "54df4a1977573ccc6a0702bd0012f2835fcef4cb529e327d16918c4b420382a4",
+    "noParallelShell": true,
+    "noReducedShell": true,
+    "noModuleFragmentation": true,
+    "noModuleDowngrade": true,
+    "visualizationAuthorizedByThisGate": false
+  },
+  "humanApproval": {
+    "clientes": true,
+    "polizas": false,
+    "vehiculos": false,
+    "recibos": false,
+    "cartera": false,
+    "restoCrm": false,
+    "automatedGateMaySetApproval": false
+  },
+  "guards": {
+    "firestoreDataWritesAllowed": false,
+    "operationalWritesAllowed": 0,
+    "reimportAllowed": false,
+    "frontendAdaptationAllowed": false,
+    "browserAllowed": false,
+    "previewAllowed": false,
+    "hostingDeployAllowed": false,
+    "firestoreRulesDeployAllowed": false,
+    "functionsDeployAllowed": false,
+    "productionAllowed": false,
+    "mainAllowed": false,
+    "mergeAllowed": false,
+    "reopenFrozenGateAllowed": false
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
