@@ -9,8 +9,9 @@ PR: #5 draft/open
 ```text
 GATE711_RELEASE_CRITICAL_STATIC_PASS_CLOSED
 GATE711_RUNTIME_PACKAGE_READINESS_PASS_CLOSED
-CRM_OPS_LEADS_RUNTIME_READONLY_PENDING_AUTHORIZATION
-ACADEMIA_STATIC_INTEGRITY_PRESENT
+GATE711_RUNTIME_AUTHORIZATION_CONSUMED_STOP_RETRY
+GATE711_RUNTIME_ROUTER_COMPAT_PASS_CLOSED
+CRM_OPS_LEADS_RUNTIME_READONLY_PENDING_NEW_AUTHORIZATION
 ACADEMIA_CONTENT_RUNTIME_NONBLOCKING
 CLOUD_CLAUDE_PACKAGE_DOCUMENTED_NOT_SENT
 HOSTING_DEPLOY_NOT_EXECUTED
@@ -40,107 +41,127 @@ cobros: 5
 asesores: 7
 ```
 
-## Decisión de alcance
+## Alcance release-critical
 
-Se conserva una sola candidata acumulativa. No se permite shell reducido, candidata paralela ni aprobación humana fragmentada.
-
-El bloqueo release-critical del Gate 7.11 es:
+Una sola candidata acumulativa:
 
 - shell, router, auth, legal, multirol, scopes y `Orbit.store`;
 - Cliente 360 y Aseguradoras;
 - Pólizas y Vehículos;
 - Recibos esperados, Cartera y Cobros;
-- Ops;
-- Leads;
-- responsive Dirección desktop, Operativo tablet y Asesor móvil;
-- estados honestos, cero copy técnico y cero intentos de escritura.
+- Ops y Leads;
+- Dirección desktop, Operativo tablet y Asesor móvil;
+- estados honestos, cero copy técnico y cero escrituras.
 
-Academia permanece dentro del producto y debe conservar integridad estática y no romper owners compartidos. Completar o regenerar todas sus lecciones no bloquea esta salida. El antiguo focused runtime de Academia fue retirado del camino crítico.
+Academia conserva integridad estática, pero la completitud de sus lecciones y su focused runtime no bloquean este release.
 
-## Cierre estático release-critical
+## Evidencia estática cerrada
+
+Release-critical:
 
 ```text
 run: 30771933766
 job: 91560447718
 artifact: 8840787308
-artifactDigest: sha256:0c99399ed79fa6036128a6343a70ade6101d4a61aef7e5e6dd561ae8514a28f6
-requestCommit: 61560bccdbec034c11983603f3f15b0feff58fa2
-status: GATE711_RELEASE_CRITICAL_STATIC_PASS
+checks: 38/38 PASS
 classification: GO_STATIC_RELEASE_CRITICAL_CRM_OPS_LEADS
-checks: 38/38
-product freeze: PASS
+productFreeze: PASS
 ```
 
-La ejecución previa `30771793126` fue clasificada definitivamente como `VALIDATOR_STALE`: exigía el nombre local `col.def.nombre`, aunque el owner correcto usa `c.def.nombre`. El producto no cambió; solo se corrigió la aserción semántica.
-
-## Cierre del paquete runtime inerte
-
-El macro runtime quedó preparado para una única sesión acumulativa:
-
-```text
-un Chromium
-un browser context
-un legal
-un write guard
-CRM + Ops + Leads
-Dirección desktop
-Operativo tablet
-Asesor móvil
-14 capturas sanitizadas
-snapshot antes/después
-cero deploy
-```
-
-Readiness final:
+Package readiness:
 
 ```text
 run: 30772261072
 job: 91561337917
 artifact: 8840893567
-artifactDigest: sha256:279ca4a885e9c35c7e263f958da7d43cfed8ef590ff40a8630fc280a8cc1cbab
-requestCommit: ce109e0b1d2bebf618da9bfc8470dbfc7249621c
-status: GATE711_RUNTIME_PACKAGE_READINESS_PASS
+checks: 38/38 PASS
 classification: GO_STATIC_RUNTIME_PACKAGE_CRM_OPS_LEADS
-checks: 38/38
 packageInert: true
-authorizationActive: false
 ```
 
-La primera validación del paquete (`30772197420`) obtuvo 37/38 porque el validador confundió la definición de `settleLegal` con su única invocación. Clasificación definitiva: `VALIDATOR_STALE`. No hubo defecto del macro ni del producto.
-
-Capacidades utilizadas en los dos cierres estáticos:
+## Runtime autorizado consumido
 
 ```text
-secrets: no
-Firestore read/write: 0/0
-runtime/browser: no/no
-Cloud enviado: no
-deploy/Hosting: no/no
-production/main/merge: no/no/no
+run: 30772737476
+job: 91562610825
+requestCommit: 9a0b4fbf062aa7731065a36c363858024cfec4d2
+artifact: 8841039787
+artifactDigest: sha256:faedbb562500ed403746818bfb0e77ff13adb15000fe38c545e4ee59be3e6664
 ```
 
-## Cloud / Claude / Academia
+Primer fallo:
 
-Documentación acumulada:
+```text
+stage: CANONICAL_PREFLIGHT_ENTRYPOINT
+status: VALIDATOR_STALE
+classification: PIPELINE_MECHANISM_FAILURE
+error: CANONICAL_LIFECYCLE_REVISION_MISMATCH
+```
 
-1. `SINCRONIZACION-CLOUD-CLAUDE-ACUMULADA-20260802.md`
-2. `ADDENDUM-SINCRONIZACION-CLOUD-CLAUDE-RUNTIME-UNIFICADO-20260802.md`
+La ejecución terminó antes de secrets, Firestore, identidad, snapshot, servidor y navegador:
 
-Estado verificable:
+```text
+secretsRead: false
+firestoreRead: false
+firestoreWrites: 0
+operationalWrites: 0
+runtimeExecuted: false
+browserExecuted: false
+deployExecuted: false
+productionTouched: false
+```
+
+La autorización quedó consumida y el replay está bloqueado.
+
+## Causa raíz y correctivo
+
+El lifecycle materializado:
+
+1. omitía `validatorLifecycleRevision: phase-capability-contract-v1`;
+2. incluía el alias `credentialRead` dentro del objeto de capacidades;
+3. no era compatible con la igualdad exacta exigida por el router canónico.
+
+La readiness anterior no comparaba el template contra ese contrato real.
+
+Correctivos:
+
+- template con revisión canónica explícita;
+- perfil `LAB_RUNTIME_GATE` con exactamente nueve capacidades;
+- retiro del alias del objeto canónico;
+- nuevo validador lifecycle-router.
+
+Evidencia correctiva:
+
+```text
+run: 30772843811
+job: 91562895150
+artifact: 8841072752
+artifactDigest: sha256:770f3127b280fbf6b95725df38b1bf65c7c444825fa631dc00d0b3e9dd454537
+routerCompatibility: 12/12 PASS
+packageReadiness: 38/38 PASS
+productFreeze: PASS
+```
+
+No se utilizaron credenciales, Firestore, runtime, navegador, deploy ni producción en el correctivo.
+
+## Cloud / Claude
 
 ```text
 Hosting posterior al root fix: NO EJECUTADO
-paquete Claude/Cloud reutilizable: NO ENVIADO
+paquete Claude/Cloud reutilizable: DOCUMENTADO / NO ENVIADO
 datos reales A&S: NO ENVIADOS
 secretos/credenciales: NO ENVIADOS
 ```
 
-El próximo paquete externo será un delta sanitizado. Incluirá arquitectura, UX, patrones reutilizables y actualizaciones de Academia; excluirá backend protegido, writers, datos reales, credenciales, requests, lifecycles y workflows de deploy. Ese despacho no bloquea la visualización ni la aprobación acumulativa de CRM/Ops/Leads.
+Fuentes vigentes:
+
+1. `SINCRONIZACION-CLOUD-CLAUDE-ACUMULADA-20260802.md`
+2. `ADDENDUM-SINCRONIZACION-CLOUD-CLAUDE-RUNTIME-UNIFICADO-20260802.md`
 
 ## Aprobación humana
 
 ```text
-Clientes: aprobado previamente y conservado como baseline
+Clientes: aprobado previamente
 Aseguradoras: baseline acumulativo
 Pólizas: pendiente
 Vehículos: pendiente
@@ -151,31 +172,17 @@ Ops: pendiente
 Leads: pendiente
 ```
 
-La revisión siguiente debe ser una sola visualización acumulativa sobre el mismo descendiente auditado.
-
 ## Documentación vigente
 
-1. `CIERRE-STOP-RETRY-GATE711-ACADEMIA-OWNER-BOOTSTRAP-20260802.md`
-2. `CIERRE-VALIDATOR-STALE-GATE711-OPS-BRIDGE-20260802.md`
-3. `CIERRE-READINESS-MACRO-RUNTIME-GATE711-CRM-OPS-LEADS-20260802.md`
+1. `CIERRE-STOP-RETRY-GATE711-RUNTIME-LIFECYCLE-ROUTER-20260802.md`
+2. `CIERRE-READINESS-MACRO-RUNTIME-GATE711-CRM-OPS-LEADS-20260802.md`
+3. `CIERRE-STOP-RETRY-GATE711-ACADEMIA-OWNER-BOOTSTRAP-20260802.md`
 4. `SINCRONIZACION-CLOUD-CLAUDE-ACUMULADA-20260802.md`
-5. `ADDENDUM-SINCRONIZACION-CLOUD-CLAUDE-RUNTIME-UNIFICADO-20260802.md`
-6. `tools/orbit360-gate711-release-critical-scope-v20260802.json`
-7. `tools/orbit360-validator-lifecycle-contract-gate711-release-critical-static-v20260802.json`
 
 ## Siguiente frontera exacta
 
-No corresponde otra auditoría, readiness, validador paralelo ni retorno a Academia.
+No corresponde otra auditoría ni retorno a Academia.
 
-La única acción siguiente es materializar, con autorización explícita de riesgo, un request y lifecycle nuevos desde los templates auditados y ejecutar una sola vez el macro read-only sobre `997fca628f95dd397dba347700a6bc644fe840f0`:
+Cualquier nueva ejecución runtime requiere una nueva autorización explícita porque la autorización de las 17:38 fue consumida por el run `30772737476` y STOP_RETRY impide reutilizarla.
 
-1. preflight contractual obligatorio antes de credenciales;
-2. identidad existente;
-3. snapshot antes;
-4. checkout exacto servido localmente;
-5. una sesión acumulativa CRM/Ops/Leads;
-6. snapshot después idéntico;
-7. evidencia y 14 capturas sanitizadas;
-8. cero escrituras, reimportación, deploy o producción.
-
-No incluye focused runtime de Academia y no admite microautorizaciones. Después del PASS corresponde una única revisión visual humana acumulativa y, solo luego, un macro separado de go-live con autorización productiva explícita.
+La siguiente autorización deberá cubrir un único macro read-only nuevo, derivado del template ya compatible 12/12 con el router y conservando package readiness 38/38. Después del PASS corresponde una sola revisión visual humana acumulativa; el go-live permanece separado y requiere autorización productiva explícita.
