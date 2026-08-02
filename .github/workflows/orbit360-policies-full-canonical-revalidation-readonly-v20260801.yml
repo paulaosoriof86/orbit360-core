@@ -1,0 +1,105 @@
+name: Orbit 360 · Pólizas · revalidación canónica completa read-only
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-requests/policies-full-canonical-revalidation-readonly-v20260801.json'
+permissions:
+  contents: read
+  statuses: write
+concurrency:
+  group: orbit360-policies-full-canonical-revalidation-readonly-v20260801
+  cancel-in-progress: false
+env:
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  ORBIT360_GATE_ID: block7-policies-full-canonical-revalidation-readonly-v20260801
+  ORBIT360_PROJECT_ID: ays-orbit-360-lab
+  ORBIT360_TENANT_ID: alianzas-soluciones
+  ORBIT360_REQUEST_FILE: .github/orbit360-requests/policies-full-canonical-revalidation-readonly-v20260801.json
+  ORBIT360_LIFECYCLE_FILE: tools/orbit360-validator-lifecycle-contract-policies-full-canonical-revalidation-readonly-v20260801.json
+  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+jobs:
+  revalidate:
+    name: Pólizas · canónica completa · 4,837 compartidos + 5 seeds
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Checkout SHA exacto
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Preparar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verificar autorización y límites
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
+          jq -e '.schemaVersion=="orbit360-policies-full-canonical-revalidation-request-v1" and .gateId=="block7-policies-full-canonical-revalidation-readonly-v20260801" and .contractVersion=="7.9.0" and .approved==true and .allowedExecutions==1 and .consumed==false and .authorizationRef=="user_authorized_full_canonical_revalidation_post_78_20260801" and .scope.sourceDocuments==4837 and .scope.targetDocuments==4842 and .scope.sharedOperationalIds==4837 and .scope.sourceOnlyIds==0 and .scope.targetOnlySeeds==5 and .scope.verifyAllRelations==true and .scope.sealCanonicalDigest==true and .capabilities.firestoreRead==true and .capabilities.writes==false and .capabilities.runtime==false and .capabilities.browser==false and .capabilities.preview==false and .capabilities.deploy==false and .capabilities.production==false' "$ORBIT360_REQUEST_FILE" >/dev/null
+          jq -e '.status=="POLICIES_FULL_CANONICAL_REVALIDATION_READONLY_AUTHORIZED" and .executionProfile.phase=="LAB_DATA_CONTRACT_REPAIR_DRYRUN" and .authorization.allowedExecutions==1 and .authorization.consumed==false and .expectedBaseline.sourceDocuments==4837 and .expectedBaseline.targetDocuments==4842 and .expectedBaseline.sharedOperationalIds==4837 and .expectedBaseline.targetOnlySeeds==5 and .guards.firestoreDataWritesAllowed==false and .guards.operationalWritesAllowed==0 and .guards.reopenFrozenGateAllowed==false' "$ORBIT360_LIFECYCLE_FILE" >/dev/null
+      - name: Gate canónico antes de secrets y Firestore
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
+          node --check tools/orbit360-validar-gate-contracts-engine-policies-full-canonical-revalidation-readonly-v20260801.mjs
+          node --check tools/orbit360-revalidar-policies-full-canonical-readonly-v20260801.mjs
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
+          jq -e '.status=="GO_GATE_CONTRACT" and .classification=="POLICIES_FULL_CANONICAL_REVALIDATION_READONLY_READY" and .executionAuthorized==true and .firestoreReadAuthorized==true and .writeAuthorized==false and .canonicalDigestSealAuthorized==true and .frozenGateReopenAuthorized==false and .frontendAdaptationAuthorized==false and .browserAuthorized==false and .previewAuthorized==false and .deployAuthorized==false and .productionAuthorized==false and .failed==0 and .operationalWrites==0' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+      - name: Instalar dependencia aislada
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false --ignore-scripts firebase-admin@13 >/dev/null
+      - name: Resolver identidad LAB
+        env:
+          SA_ORBIT360_LAB: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}'
+          SA_ORBIT_360_LAB: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}'
+          SA_DEFAULT: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
+        shell: bash
+        run: |
+          set -euo pipefail
+          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-${SA_ORBIT_360_LAB:-${SA_DEFAULT:-}}}"
+          test -n "$SERVICE_ACCOUNT"
+          KEY_FILE="$RUNNER_TEMP/orbit360-policies-full-canonical-revalidation.json"
+          printf '%s' "$SERVICE_ACCOUNT" > "$KEY_FILE"; chmod 600 "$KEY_FILE"
+          test "$(jq -r '.project_id // empty' "$KEY_FILE")" = "$ORBIT360_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
+          echo "ORBIT360_TEMP_KEY_FILE=$KEY_FILE" >> "$GITHUB_ENV"
+          echo "ORBIT360_PRODUCT_PROJECT_ID=$ORBIT360_PROJECT_ID" >> "$GITHUB_ENV"
+          echo "ORBIT360_PRODUCT_TENANT_ID=$ORBIT360_TENANT_ID" >> "$GITHUB_ENV"
+      - name: Ejecutar revalidación completa
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-revalidar-policies-full-canonical-readonly-v20260801.mjs
+          jq -e '.ok==true and .status=="POLICIES_FULL_CANONICAL_REVALIDATION_READONLY_PASS" and .classification=="GO_LAB_FULL_CANONICAL_REVALIDATED" and .summary.sourceDocuments==4837 and .summary.targetDocuments==4842 and .summary.sharedOperationalIds==4837 and .summary.targetOnlySeeds==5 and (.summary.exactPayloads + .summary.semanticEquivalentPayloads)==4837 and .summary.businessSchemaMatches==4837 and .summary.validationMatches==4837 and .summary.requiresValidationPreserved==2031 and .summary.relationDocuments==4377 and .summary.relationGroupsResolved==6428 and .summary.canonicalDigestSealed=="19e1927d39f6b713ee12504f8762bc42ead9de6e365bb0f12162d2a0c8f8469b" and .parity.criticalConflicts==0 and .parity.nonEquivalentPayloads==0 and .parity.businessSchemaMismatches==0 and .parity.validationMismatches==0 and .parity.operationalSeedMarkers==0 and .targetOnlySeeds.total==5 and .targetOnlySeeds.allSeedLike==true and .relations.sourceBlockedGroups==0 and .relations.targetBlockedGroups==0 and .cumulativeVisualGuard.manifestMatches==true and .firestoreRead==true and .firestoreWrites==0 and .operationalWrites==0 and .reimportExecuted==false and .frontendAdapted==false and .browserExecuted==false and .previewExecuted==false and .deployExecuted==false and .productionTouched==false and .containsPII==false and .containsDocumentIds==false and .containsValues==false and .containsSecrets==false' "$EVIDENCE_DIR/policies-full-canonical-revalidation-readonly-v20260801.json" >/dev/null
+      - name: Subir evidencia sanitizada
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-policies-full-canonical-revalidation-readonly-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/policies-full-canonical-revalidation-readonly-v20260801.json
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Publicar estado observable
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/policies-full-canonical-revalidation-readonly-v20260801.json
+        with:
+          script: |
+            const fs=require('fs');let state='failure',description='Full canonical revalidation failed';
+            try{const p=JSON.parse(fs.readFileSync(process.env.EVIDENCE,'utf8'));if(p.ok===true&&p.status==='POLICIES_FULL_CANONICAL_REVALIDATION_READONLY_PASS'&&p.summary?.sharedOperationalIds===4837&&p.targetOnlySeeds?.total===5&&p.firestoreWrites===0){state='success';description='4,837 operational IDs + 5 seeds revalidated; zero writes';}}catch(e){}
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/policies-full-canonical-revalidation-readonly',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
+      - name: Limpiar identidad temporal
+        if: always()
+        shell: bash
+        run: |
+          if [ -n "${ORBIT360_TEMP_KEY_FILE:-}" ] && [ -f "$ORBIT360_TEMP_KEY_FILE" ]; then shred -u "$ORBIT360_TEMP_KEY_FILE" || rm -f "$ORBIT360_TEMP_KEY_FILE"; fi
