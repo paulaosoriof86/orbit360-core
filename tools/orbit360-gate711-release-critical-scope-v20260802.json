@@ -1,0 +1,108 @@
+{
+  "schemaVersion": "orbit360-gate711-release-critical-scope-v1",
+  "gateId": "block7-canonical-runtime-cumulative-visual-lab-v20260801",
+  "gateContractVersion": "7.11.1",
+  "status": "RELEASE_CRITICAL_SCOPE_DEFINED_STATIC_PENDING",
+  "decisionAt": "2026-08-02T17:02:00-06:00",
+  "decisionSource": "user_directive_prioritize_crm_ops_leads_single_cumulative_release_20260802",
+  "requiredBranch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "productHead": "997fca628f95dd397dba347700a6bc644fe840f0",
+  "cumulativeManifest": {
+    "trackedFileCount": 309,
+    "pathDigest": "517056dee1200503b2e7295a333cb804bc71271bbaa87847fa762da025f276f1",
+    "contentDigest": "3d25a83218a4373513e1fff24ea9b12817d4c47be0fad08777e7f94867b3f676",
+    "indexDigest": "b57b6581ee02d2dde42a8a2c1272d57f19b7ad6809d13a1d25111f3d71a96074"
+  },
+  "canonicalSnapshotDigest": "19e1927d39f6b713ee12504f8762bc42ead9de6e365bb0f12162d2a0c8f8469b",
+  "singleCandidatePolicy": {
+    "required": true,
+    "parallelCandidateAllowed": false,
+    "reducedShellAllowed": false,
+    "fragmentedHumanApprovalAllowed": false,
+    "approvedBaselineMustRemainIncluded": true,
+    "correctionsMustLandOnSameAuditedDescendant": true
+  },
+  "releaseCriticalBlockingScope": {
+    "sharedOwners": [
+      "shell",
+      "router",
+      "authentication",
+      "legal",
+      "multirol",
+      "scopes",
+      "Orbit.store",
+      "canonical read model",
+      "responsive navigation",
+      "technical copy guard"
+    ],
+    "crm": [
+      "Cliente 360",
+      "Aseguradoras",
+      "Polizas",
+      "Vehiculos",
+      "Recibos esperados",
+      "Cartera",
+      "Cobros",
+      "Calidad",
+      "fichas y relaciones"
+    ],
+    "ops": [
+      "tablero operativo",
+      "gestiones",
+      "emisiones",
+      "filtros",
+      "permisos Direccion y Operativo",
+      "restriccion honesta para Asesor"
+    ],
+    "leads": [
+      "pipeline comercial",
+      "sincronizacion visible con Ops",
+      "alcance por rol",
+      "estados vacios honestos",
+      "responsive"
+    ]
+  },
+  "runtimeRoleRouteMatrix": {
+    "Direccion": ["cliente360", "aseguradoras", "polizas", "ops", "leads"],
+    "Operativo": ["cliente360", "polizas", "ops", "leads"],
+    "Asesor": ["cliente360", "polizas", "leads", "ops_restricted"]
+  },
+  "academiaBoundary": {
+    "presentInCumulativeCandidate": true,
+    "staticIntegrityRequired": true,
+    "mustNotBreakGlobalBootstrap": true,
+    "runtimeContentCompletenessBlocksThisRelease": false,
+    "focusedAcademiaRuntimePrerequisiteRemoved": true,
+    "pendingLearningUpdatesMustBeDocumented": true,
+    "dispatchChannel": "Claude_or_equivalent_cloud_generation_when_package_is_authorized",
+    "dispatchStatus": "NOT_SENT"
+  },
+  "cloudBoundary": {
+    "hostingOrCloudDeployExecuted": false,
+    "claudePackageSent": false,
+    "backendProtectedContentMayBeSent": false,
+    "realDataMayBeSent": false,
+    "secretsMayBeSent": false,
+    "reusablePatternsMustBeAccumulated": true,
+    "nextDispatchMustUseOneSanitizedDeltaPackage": true,
+    "dispatchDoesNotBlockCriticalRuntimeUnlessSharedShellRegresses": true
+  },
+  "gateSequence": [
+    "static_release_critical_readiness",
+    "single_readonly_runtime_crm_ops_leads",
+    "single_cumulative_human_visual_review",
+    "single_go_live_macro_only_after_explicit_production_authorization"
+  ],
+  "guards": {
+    "writesAllowed": false,
+    "reimportAllowed": false,
+    "deployAllowedInStaticPreparation": false,
+    "productionAllowedInStaticPreparation": false,
+    "mainAllowed": false,
+    "mergeAllowed": false,
+    "stopRetryOnRepeatedStageOrFailureFamily": true
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
