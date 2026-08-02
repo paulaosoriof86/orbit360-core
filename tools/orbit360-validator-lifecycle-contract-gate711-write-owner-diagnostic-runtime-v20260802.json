@@ -44,13 +44,29 @@
     "priorFirestoreWrites": 0,
     "priorOperationalWrites": 0
   },
+  "diagnosticPreflightHistory": [
+    {
+      "run": 30761975290,
+      "job": 91534026699,
+      "head": "4a0ed6edf7a4884828a9df21b61afd5261a7a7a8",
+      "stage": "preflight_before_secrets",
+      "classification": "VALIDATOR_STALE",
+      "failedCheck": "TRIGGER_ROLE_CAPTURED",
+      "secretAccess": false,
+      "firestoreRead": false,
+      "runtimeExecuted": false,
+      "browserExecuted": false,
+      "writes": 0
+    }
+  ],
   "staticDiagnosticEvidence": {
-    "run": 30761659406,
-    "job": 91533207774,
-    "artifact": 8837642889,
-    "artifactDigest": "sha256:857ad8d9032865d64e7d8912a1b12912c63ab0d0cbdc4542ef6687aa32ceeb0e",
+    "baselineRun": 30761659406,
+    "baselineJob": 91533207774,
+    "baselineArtifact": 8837642889,
+    "baselineArtifactDigest": "sha256:857ad8d9032865d64e7d8912a1b12912c63ab0d0cbdc4542ef6687aa32ceeb0e",
     "status": "GATE711_WRITE_OWNER_DIAGNOSTIC_STATIC_PASS",
-    "checks": "14/14",
+    "expectedChecks": "17/17",
+    "validatorRevision": "v3-trigger-role-exact-binding",
     "secretAccess": false,
     "firestoreRead": false,
     "runtimeExecuted": false,
