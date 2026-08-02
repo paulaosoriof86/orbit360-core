@@ -3,7 +3,7 @@
   "gateId": "block7-canonical-store-cumulative-adapter-static-v20260801",
   "gateContractVersion": "7.10.0",
   "validatorLifecycleRevision": "phase-capability-contract-v1",
-  "status": "CANONICAL_STORE_CUMULATIVE_ADAPTER_STATIC_AUTHORIZED",
+  "status": "CANONICAL_STORE_CUMULATIVE_ADAPTER_STATIC_CLOSED",
   "executionProfile": {
     "phase": "STATIC_PREFLIGHT",
     "capabilities": {
@@ -26,10 +26,11 @@
     "authorizationRef": "user_proceed_definitive_solutions_no_trial_error_20260801",
     "explicit": true,
     "allowedExecutions": 2,
-    "attemptsUsed": 1,
-    "consumed": false,
-    "resumeAttempt": 2,
-    "additionalAttemptsAfterResume": false
+    "attemptsUsed": 2,
+    "consumed": true,
+    "consumedByRun": 30732429713,
+    "requestReplayBlocked": true,
+    "additionalAttemptsAllowed": false
   },
   "attempts": {
     "first": {
@@ -52,18 +53,39 @@
       "runtimeExecuted": false,
       "browserExecuted": false,
       "invalidated": true
+    },
+    "second": {
+      "run": 30732429713,
+      "job": 91455058689,
+      "artifact": 8828406898,
+      "artifactDigest": "sha256:69b839474c08c3e01c4c65b8899a331d788921e25be3acda935f0c94a76c9a4e",
+      "head": "0203a2adb2dd0173c23c4a7d275ae340bd3bc0f6",
+      "status": "CANONICAL_STORE_CUMULATIVE_ADAPTER_STATIC_PASS",
+      "classification": "GO_STATIC_CANONICAL_STORE_ADAPTER",
+      "preflightPassed": 17,
+      "preflightFailed": 0,
+      "staticChecksPassed": 48,
+      "staticChecksFailed": 0,
+      "firestoreRead": false,
+      "firestoreWrites": 0,
+      "operationalWrites": 0,
+      "runtimeExecuted": false,
+      "browserExecuted": false,
+      "closed": true
     }
   },
   "validatorCorrection": {
     "classification": "VALIDATOR_STALE",
     "rootCause": "STATIC_SCANNER_INCLUDED_COMMENTS_AND_DORMANT_UNLOADED_MODULE",
-    "commentTokenCorrected": "localStorage",
-    "activeModuleGraphRequired": true,
-    "dormantModule": "orbit360-platform/modules/importar-initial-tenant-lab.js",
-    "dormantModuleRuntimeReferences": 0,
-    "dormantModuleClassification": "TEMPORAL_RETIRO",
+    "corrections": [
+      "scan executable localStorage access instead of comments",
+      "derive active module graph from index and active loaders",
+      "classify dormant importer as TEMPORAL_RETIRO",
+      "synchronize lifecycle, preflight and workflow for attempt 2 of 2"
+    ],
     "productFilesChangedByCorrection": 0,
-    "sameGateResumeAllowedOnce": true
+    "sameGateResumeUsedOnce": true,
+    "stopRetryRequired": false
   },
   "sourceGate": {
     "gateId": "block7-policies-full-canonical-revalidation-readonly-v20260801",
@@ -76,34 +98,40 @@
     "canonicalSnapshotDigest": "19e1927d39f6b713ee12504f8762bc42ead9de6e365bb0f12162d2a0c8f8469b",
     "closed": true
   },
-  "baseline": {
-    "commit": "a0c430d7ae2856b5fe45207fb0820dcd9bb45809",
-    "trackedFiles": 308,
-    "pathDigest": "0c3dbf222646ea46b57e838359ac56fff3994268a97e0d682508bd747a29f3c4",
-    "contentDigest": "5b32b90815929acc341cfd4ae7c1e5f76d819e1a6a1b4091d13800508ab9b647",
-    "indexDigest": "54df4a1977573ccc6a0702bd0012f2835fcef4cb529e327d16918c4b420382a4"
-  },
-  "allowedRuntimeDelta": [
-    "orbit360-platform/index.html",
-    "orbit360-platform/core/backend-lab-init.js",
-    "orbit360-platform/core/backend-lab-canonical-view-sync.js",
-    "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
-    "orbit360-platform/data/store-firestore-lab.local.js"
-  ],
-  "contract": {
-    "canonicalCollections": ["clientes", "aseguradoras", "polizas", "vehiculos", "recibosEsperados", "carteraPrimas", "cobros"],
+  "solution": {
+    "singleReadOwner": "Orbit.store",
+    "canonicalCollections": 7,
     "canonicalPathTemplate": "tenants/{tenantId}/data/{collection}/items",
     "legacyUnmigratedPathTemplate": "tenantId/{tenantId}/{collection}",
-    "singleReadOwner": "Orbit.store",
-    "preservePublicApi": ["all", "get", "where", "find", "insert", "update", "remove", "on", "_emit", "pref", "setPref", "init", "reseed", "raw"],
-    "excludeCanonicalSeedsOperationally": true,
-    "preserveRequiresValidation": true,
-    "directFirestoreInActiveModulesAllowed": false,
-    "parallelFirestoreListenersInVisualBridgeAllowed": false,
-    "parallelStoreCacheInVisualBridgeAllowed": false,
-    "oldReceiptsPortfolioProjectionRuntimeAllowed": false,
-    "allModulesPreserved": true,
-    "dormantTemporalArtifactsMustHaveZeroRuntimeReferences": true
+    "publicApiPreserved": ["all", "get", "where", "find", "insert", "update", "remove", "on", "_emit", "pref", "setPref", "init", "reseed", "raw"],
+    "publicApiMissing": [],
+    "operationalSeedExclusion": true,
+    "requiresValidationPreserved": true,
+    "directFirestoreListenersInBridge": 0,
+    "parallelBridgeCache": false,
+    "oldProjectionLoaded": false,
+    "modulesPreserved": 62,
+    "activeModulesValidated": 52,
+    "dormantModules": 10,
+    "activeModuleDirectFirestoreViolations": 0,
+    "dormantInitialImporterRuntimeReferences": 0
+  },
+  "cumulativeManifest": {
+    "trackedFileCount": 309,
+    "pathDigest": "517056dee1200503b2e7295a333cb804bc71271bbaa87847fa762da025f276f1",
+    "contentDigest": "83cc01dacf180b8ca9693df7117030228479992d6db4c59fab53def2e94acafd",
+    "indexDigest": "b57b6581ee02d2dde42a8a2c1272d57f19b7ad6809d13a1d25111f3d71a96074",
+    "counts": {
+      "index": 1,
+      "modules": 62,
+      "core": 183,
+      "styles": 10,
+      "data": 53
+    },
+    "noParallelShell": true,
+    "noReducedShell": true,
+    "noModuleFragmentation": true,
+    "noModuleDowngrade": true
   },
   "humanApproval": {
     "clientes": true,
@@ -126,7 +154,18 @@
     "productionAllowed": false,
     "mainAllowed": false,
     "mergeAllowed": false,
-    "reopenFrozenGateAllowed": false
+    "reopenFrozenGateAllowed": false,
+    "additionalExecutionsAllowed": false
+  },
+  "nextMacroBlock": {
+    "newMicroAuthorizationRequired": false,
+    "type": "LAB_CANONICAL_RUNTIME_AND_SINGLE_CUMULATIVE_VISUAL_REVIEW",
+    "reuseGate710Solution": true,
+    "reuseGate79CanonicalDigest": true,
+    "dataWritesAllowed": false,
+    "reimportAllowed": false,
+    "productionAllowed": false,
+    "deployRequiresSeparateRiskBoundaryOnlyIfNeeded": true
   },
   "containsPII": false,
   "containsSecrets": false
