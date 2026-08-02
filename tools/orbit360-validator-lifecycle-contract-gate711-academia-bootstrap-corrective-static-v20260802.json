@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
+  "gateId": "block7-canonical-runtime-cumulative-visual-lab-v20260801",
+  "gateContractVersion": "7.11.0",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
+  "macroLifecycleRevision": "academia-bootstrap-corrective-static-v1",
+  "status": "CANONICAL_RUNTIME_CUMULATIVE_VISUAL_LAB_STOP_RETRY",
+  "closureState": "ACADEMIA_OWNER_CONNECTION_CORRECTED_STATIC_VALIDATION_PENDING",
+  "executionProfile": {
+    "phase": "STATIC_VALIDATOR_CORRECTIVE_CLOSED",
+    "capabilities": {
+      "secrets": false,
+      "firestoreRead": false,
+      "writes": false,
+      "runtime": false,
+      "browser": false,
+      "deploy": false,
+      "functionsDeploy": false,
+      "rulesDeploy": false,
+      "production": false
+    }
+  },
+  "authorization": {
+    "authorizedBy": "STOP_RETRY_STATIC_CORRECTIVE_ONLY",
+    "authorizationRef": "gate711_academia_bootstrap_corrective_static_20260802",
+    "explicit": true,
+    "allowedExecutions": 0,
+    "consumed": true,
+    "additionalExecutionsAllowed": false,
+    "authorizedProductHead": "997fca628f95dd397dba347700a6bc644fe840f0"
+  },
+  "rootCause": {
+    "classification": "FUNCTIONAL_DEFECT",
+    "owner": "orbit360-platform/core/academia-static-content-write-policy-v20260729.js",
+    "missingRuntimeOwner": "orbit360-platform/data/academia-v1230-operational-directory-v20260722.js",
+    "rootFixCommit": "997fca628f95dd397dba347700a6bc644fe840f0",
+    "rootFixVersion": "20260802.2"
+  },
+  "staticReadiness": {
+    "status": "GATE711_ROOTFIX_STATIC_READINESS_PASS",
+    "checks": "14/14",
+    "manifestDiagnosticRun": 30770685200,
+    "runtimeLoadingCoverageRequired": true
+  },
+  "cumulativeManifest": {
+    "trackedFileCount": 309,
+    "pathDigest": "517056dee1200503b2e7295a333cb804bc71271bbaa87847fa762da025f276f1",
+    "contentDigest": "3d25a83218a4373513e1fff24ea9b12817d4c47be0fad08777e7f94867b3f676",
+    "indexDigest": "b57b6581ee02d2dde42a8a2c1272d57f19b7ad6809d13a1d25111f3d71a96074"
+  },
+  "humanApproval": {
+    "clientes": true,
+    "polizas": false,
+    "vehiculos": false,
+    "recibos": false,
+    "cartera": false,
+    "cobros": false,
+    "restoCrm": false,
+    "automatedGateMaySetApproval": false
+  },
+  "guards": {
+    "requestReplayAllowed": false,
+    "runtimeRetryAllowed": false,
+    "newRuntimeRequestAllowed": false,
+    "firestoreDataWritesAllowed": false,
+    "operationalWritesAllowed": 0,
+    "reimportAllowed": false,
+    "hostingDeployAllowed": false,
+    "previewDeployAllowed": false,
+    "productionAllowed": false,
+    "mainAllowed": false,
+    "mergeAllowed": false
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
