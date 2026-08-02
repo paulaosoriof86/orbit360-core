@@ -1,0 +1,76 @@
+name: Orbit 360 · Store canónico · adaptación acumulativa estática
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-requests/canonical-store-cumulative-adapter-static-v20260801.json'
+permissions:
+  contents: read
+  statuses: write
+concurrency:
+  group: orbit360-canonical-store-cumulative-adapter-static-v20260801
+  cancel-in-progress: false
+env:
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  ORBIT360_GATE_ID: block7-canonical-store-cumulative-adapter-static-v20260801
+  ORBIT360_REQUEST_FILE: .github/orbit360-requests/canonical-store-cumulative-adapter-static-v20260801.json
+  ORBIT360_LIFECYCLE_FILE: tools/orbit360-validator-lifecycle-contract-canonical-store-cumulative-adapter-static-v20260801.json
+  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+jobs:
+  validate:
+    name: Store canónico · contrato, owners y regresión estática
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout SHA exacto
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Preparar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verificar autorización y límites
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
+          jq -e '.schemaVersion=="orbit360-canonical-store-cumulative-adapter-static-request-v1" and .gateId=="block7-canonical-store-cumulative-adapter-static-v20260801" and .contractVersion=="7.10.0" and .approved==true and .allowedExecutions==1 and .consumed==false and .branch=="ays/backend-tenant-lab-v99-20260703" and .pullRequest==5 and .baselineCommit=="a0c430d7ae2856b5fe45207fb0820dcd9bb45809" and .canonicalSnapshotDigest=="19e1927d39f6b713ee12504f8762bc42ead9de6e365bb0f12162d2a0c8f8469b" and .scope.canonicalCollections==7 and .scope.singleReadOwner=="Orbit.store" and .scope.preservePublicApi==true and .scope.excludeSeedsOperationally==true and .scope.preserveRequiresValidation==true and .scope.scanAllModules==true and .scope.allowedRuntimeDeltaFiles==5 and .capabilities.secrets==false and .capabilities.firestoreRead==false and .capabilities.writes==false and .capabilities.runtime==false and .capabilities.browser==false and .capabilities.preview==false and .capabilities.deploy==false and .capabilities.production==false' "$ORBIT360_REQUEST_FILE" >/dev/null
+          jq -e '.status=="CANONICAL_STORE_CUMULATIVE_ADAPTER_STATIC_AUTHORIZED" and .executionProfile.phase=="STATIC_PREFLIGHT" and .authorization.allowedExecutions==1 and .authorization.consumed==false and .guards.firestoreDataWritesAllowed==false and .guards.operationalWritesAllowed==0 and .guards.browserAllowed==false and .guards.previewAllowed==false and .guards.hostingDeployAllowed==false and .guards.productionAllowed==false' "$ORBIT360_LIFECYCLE_FILE" >/dev/null
+      - name: Gate canónico antes de cualquier capacidad externa
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
+          node --check tools/orbit360-validar-gate-contracts-engine-canonical-store-cumulative-adapter-static-v20260801.mjs
+          node --check tools/orbit360-validar-canonical-store-cumulative-adapter-static-v20260801.mjs
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
+          jq -e '.status=="GO_GATE_CONTRACT" and .classification=="CANONICAL_STORE_CUMULATIVE_ADAPTER_STATIC_READY" and .executionAuthorized==true and .staticValidationAuthorized==true and .secretAccessAuthorized==false and .firestoreReadAuthorized==false and .writeAuthorized==false and .runtimeAuthorized==false and .browserAuthorized==false and .previewAuthorized==false and .deployAuthorized==false and .productionAuthorized==false and .failed==0 and .operationalWrites==0' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+      - name: Validar solución acumulativa completa
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-canonical-store-cumulative-adapter-static-v20260801.mjs
+          jq -e '.ok==true and .status=="CANONICAL_STORE_CUMULATIVE_ADAPTER_STATIC_PASS" and .classification=="GO_STATIC_CANONICAL_STORE_ADAPTER" and .summary.failedChecks==0 and .summary.allowedRuntimeDeltaFiles==5 and .summary.actualRuntimeDeltaFiles==5 and .summary.modulesPreserved==62 and .summary.canonicalCollections==7 and .summary.newTrackedFileCount==309 and .manifest.trackedFileCount==309 and .manifest.counts.index==1 and .manifest.counts.modules==62 and .manifest.counts.core==183 and .manifest.counts.styles==10 and .manifest.counts.data==53 and .api.missing|length==0 and .ownership.readOwner=="Orbit.store" and .ownership.directFirestoreListenersInBridge==0 and .ownership.parallelBridgeCache==false and .routing.perCollection==true and .seedPolicy.operationalSeedExclusion==true and .seedPolicy.requiresValidationPreserved==true and .moduleScan.directFirestoreViolations|length==0 and .firestoreRead==false and .firestoreWrites==0 and .operationalWrites==0 and .runtimeExecuted==false and .browserExecuted==false and .previewExecuted==false and .deployExecuted==false and .productionTouched==false and .containsPII==false and .containsDocumentIds==false and .containsValues==false and .containsSecrets==false' "$EVIDENCE_DIR/canonical-store-cumulative-adapter-static-v20260801.json" >/dev/null
+      - name: Subir evidencia sanitizada
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-canonical-store-cumulative-adapter-static-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/canonical-store-cumulative-adapter-static-v20260801.json
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Publicar estado observable
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/canonical-store-cumulative-adapter-static-v20260801.json
+        with:
+          script: |
+            const fs=require('fs');let state='failure',description='Canonical store cumulative adapter static validation failed';
+            try{const p=JSON.parse(fs.readFileSync(process.env.EVIDENCE,'utf8'));if(p.ok===true&&p.status==='CANONICAL_STORE_CUMULATIVE_ADAPTER_STATIC_PASS'&&p.summary?.failedChecks===0&&p.firestoreWrites===0){state='success';description='Canonical store single-owner adapter PASS; zero runtime/data writes';}}catch(e){}
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/canonical-store-cumulative-adapter-static',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
