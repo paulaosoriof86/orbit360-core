@@ -2,7 +2,8 @@
   "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
   "gateId": "block7-canonical-runtime-cumulative-visual-lab-v20260801",
   "gateContractVersion": "7.11.0",
-  "validatorLifecycleRevision": "phase-capability-contract-v1-legal-deferred-order-v2",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
+  "legalDeferredOrderRevision": "gate711-legal-deferred-order-v2",
   "status": "CANONICAL_RUNTIME_CUMULATIVE_VISUAL_LAB_AUTHORIZED",
   "executionProfile": {
     "phase": "LAB_RUNTIME_GATE",
@@ -55,6 +56,20 @@
       "fixCommit": "90a174666f20ffdb8cf88c5149ac1fcf08b2f802",
       "staticGuardCommit": "1c01decffb3f9506807f1faeec83ebd487da79be",
       "workflowCommit": "eed237e8f555b496b1170e6693fedd1024006d3f"
+    },
+    {
+      "run": 30756305124,
+      "job": 91518930317,
+      "classification": "VALIDATOR_STALE",
+      "failedStage": "CANONICAL_PREFLIGHT_ENTRYPOINT",
+      "rootCause": "Lifecycle revision label changed although the canonical phase-capability composition remained v1",
+      "secretAccess": false,
+      "firestoreRead": false,
+      "runtimeExecuted": false,
+      "browserExecuted": false,
+      "operationalWrites": 0,
+      "corrected": true,
+      "correction": "Restore canonical validatorLifecycleRevision and register Legal ordering in a separate revision field"
     }
   ],
   "sourceStaticGate": {
