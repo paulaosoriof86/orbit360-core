@@ -1,0 +1,143 @@
+{
+  "schemaVersion": "orbit360-auditoria-sanitizada-reconciliacion-dual-path-v1",
+  "date": "2026-08-01",
+  "gateId": "block7-policies-dual-path-reconciliation-readonly-v20260801",
+  "contractVersion": "7.2.0",
+  "run": 30724917136,
+  "job": 91434669696,
+  "artifact": 8825989653,
+  "artifactDigest": "sha256:19b9cddbd5a08af61655f0d59423608329fd3fda39da8786ab5c31940fb28885",
+  "auditedHead": "c1bbe8e8f446747c51eaa3672e0b59fb2823d08c",
+  "status": "POLICIES_DUAL_PATH_RECONCILIATION_READONLY_PASS",
+  "classification": "GO_LAB_DUAL_PATH_RECONCILIATION_READONLY",
+  "countryFilterApplied": false,
+  "authorityDeclared": false,
+  "paths": {
+    "canonical": "tenants/{tenantId}/data/{collection}/items",
+    "legacy": "tenantId/{tenantId}/{collection}"
+  },
+  "summary": {
+    "collections": 7,
+    "canonicalDocuments": 445,
+    "legacyDocuments": 4837,
+    "sharedIds": 440,
+    "equalContent": 0,
+    "divergentContent": 440,
+    "onlyCanonical": 5,
+    "onlyLegacy": 4397,
+    "pathsEqual": false,
+    "legacyBaselineMatches": true,
+    "evidenceComplete": true
+  },
+  "collections": {
+    "clientes": {
+      "canonical": 414,
+      "legacy": 430,
+      "shared": 414,
+      "divergent": 414,
+      "onlyCanonical": 0,
+      "onlyLegacy": 16,
+      "canonicalFields": 59,
+      "legacyFields": 63
+    },
+    "aseguradoras": {
+      "canonical": 26,
+      "legacy": 30,
+      "shared": 26,
+      "divergent": 26,
+      "onlyCanonical": 0,
+      "onlyLegacy": 4,
+      "canonicalFields": 60,
+      "legacyFields": 62
+    },
+    "polizas": {
+      "canonical": 2,
+      "legacy": 1373,
+      "shared": 0,
+      "onlyCanonical": 2,
+      "onlyLegacy": 1373,
+      "canonicalFields": 18,
+      "legacyFields": 43
+    },
+    "vehiculos": {
+      "canonical": 1,
+      "legacy": 1032,
+      "shared": 0,
+      "onlyCanonical": 1,
+      "onlyLegacy": 1032,
+      "canonicalFields": 13,
+      "legacyFields": 32
+    },
+    "recibosEsperados": {
+      "canonical": 0,
+      "legacy": 1294,
+      "shared": 0,
+      "onlyCanonical": 0,
+      "onlyLegacy": 1294,
+      "canonicalFields": 0,
+      "legacyFields": 56
+    },
+    "carteraPrimas": {
+      "canonical": 0,
+      "legacy": 673,
+      "shared": 0,
+      "onlyCanonical": 0,
+      "onlyLegacy": 673,
+      "canonicalFields": 0,
+      "legacyFields": 22
+    },
+    "cobros": {
+      "canonical": 2,
+      "legacy": 5,
+      "shared": 0,
+      "onlyCanonical": 2,
+      "onlyLegacy": 5,
+      "canonicalFields": 13,
+      "legacyFields": 40
+    }
+  },
+  "cumulativeVisualCandidate": {
+    "manifestSourceHead": "c1bbe8e8f446747c51eaa3672e0b59fb2823d08c",
+    "trackedFiles": 308,
+    "indexFiles": 1,
+    "moduleFiles": 62,
+    "coreFiles": 182,
+    "styleFiles": 10,
+    "dataFiles": 53,
+    "pathDigest": "0c3dbf222646ea46b57e838359ac56fff3994268a97e0d682508bd747a29f3c4",
+    "contentDigest": "5b32b90815929acc341cfd4ae7c1e5f76d819e1a6a1b4091d13800508ab9b647",
+    "indexDigest": "54df4a1977573ccc6a0702bd0012f2835fcef4cb529e327d16918c4b420382a4",
+    "noFragmentationContract": true,
+    "noReducedShell": true,
+    "noParallelShell": true,
+    "futureVisualCandidateMustUseSameHeadOrAuditedDescendant": true
+  },
+  "security": {
+    "firestoreRead": true,
+    "firestoreWrites": 0,
+    "operationalWrites": 0,
+    "reimportExecuted": false,
+    "browserExecuted": false,
+    "previewExecuted": false,
+    "deployExecuted": false,
+    "rulesApplied": false,
+    "functionsDeployed": false,
+    "productionTouched": false,
+    "mainTouched": false,
+    "mergeExecuted": false
+  },
+  "humanApproval": {
+    "clientes": true,
+    "polizas": false,
+    "vehiculos": false,
+    "recibos": false,
+    "cartera": false,
+    "restoCrm": false
+  },
+  "containsPII": false,
+  "containsPolicyNumbers": false,
+  "containsAmounts": false,
+  "containsDocumentIds": false,
+  "containsValues": false,
+  "containsSecrets": false
+}
