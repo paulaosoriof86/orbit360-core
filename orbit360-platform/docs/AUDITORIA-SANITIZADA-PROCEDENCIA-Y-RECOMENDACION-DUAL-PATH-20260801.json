@@ -1,0 +1,109 @@
+{
+  "schemaVersion": "orbit360-auditoria-sanitizada-procedencia-recomendacion-dual-path-v1",
+  "date": "2026-08-01",
+  "gateId": "block7-policies-dual-path-provenance-recommendation-readonly-v20260801",
+  "contractVersion": "7.3.0",
+  "status": "POLICIES_DUAL_PATH_PROVENANCE_RECOMMENDATION_READONLY_PASS",
+  "classification": "GO_LAB_DUAL_PATH_PROVENANCE_RECOMMENDATION_READONLY",
+  "execution": {
+    "run": 30725611682,
+    "job": 91436616116,
+    "artifact": 8826213716,
+    "artifactDigest": "sha256:b2501961cb362cbaf84114cd511627cb6e0a7530ee662ed6d756b5c707b6ea78",
+    "head": "fee83234c4850f37769fd15590de25689037ef20",
+    "preflightPassed": 15,
+    "preflightFailed": 0
+  },
+  "scope": {
+    "collections": 7,
+    "canonicalOnlyClassified": 5,
+    "legacyOnlyTotal": 4397,
+    "legacyOnlyClientsAndInsurers": 20,
+    "sharedClassified": 440,
+    "recommendationsProduced": 7
+  },
+  "sharedProjection": {
+    "clientes": {
+      "shared": 414,
+      "businessEquivalent": 414,
+      "criticalConflicts": 0,
+      "validationAligned": 414
+    },
+    "aseguradoras": {
+      "shared": 26,
+      "businessEquivalent": 26,
+      "criticalConflicts": 0,
+      "validationAligned": 26
+    },
+    "conclusion": "Las divergencias de digest pertenecen a envolvente técnica, procedencia o representación; no se hallaron diferencias de negocio en los 440 IDs compartidos."
+  },
+  "canonicalOnly": {
+    "polizas": {"count": 2,"classification": "SEED_BOOTSTRAP_NON_OPERATIONAL"},
+    "vehiculos": {"count": 1,"classification": "SEED_BOOTSTRAP_NON_OPERATIONAL"},
+    "cobros": {"count": 2,"classification": "SEED_BOOTSTRAP_NON_OPERATIONAL"}
+  },
+  "legacyValidation": {
+    "clientes": {"requiresValidation": 16,"validatedOrClear": 414},
+    "aseguradoras": {"requiresValidation": 12,"validatedOrClear": 18,"legacyOnlyRequiresValidation": 4},
+    "polizas": {"requiresValidation": 1373,"validatedOrClear": 0},
+    "vehiculos": {"requiresValidation": 60,"validatedOrClear": 972},
+    "recibosEsperados": {"requiresValidation": 307,"validatedOrClear": 987},
+    "carteraPrimas": {"requiresValidation": 263,"validatedOrClear": 410},
+    "cobros": {"requiresValidation": 0,"validatedOrClear": 5}
+  },
+  "importBatchEvidence": {
+    "canonicalBatchDocuments": 1,
+    "legacyBatchDocuments": 1,
+    "clientBatchReferencesUnresolved": 414,
+    "insurerBatchReferencesResolvedLegacy": 26,
+    "insurerBatchReferencesUnresolved": 26,
+    "interpretation": "La procedencia por sourceTrace/sourceRefs está presente, pero algunas referencias de batch no corresponden a documentos disponibles y deberán normalizarse o mantenerse en HOLD durante el dry-run."
+  },
+  "recommendations": {
+    "binding": false,
+    "authorityDeclared": false,
+    "clientes": {"route": "LEGACY_ROUTE","confidence": "MEDIUM","canonicalRole": "DERIVED_READ_MODEL_AFTER_RECONCILIATION"},
+    "aseguradoras": {"route": "LEGACY_ROUTE","confidence": "MEDIUM","canonicalRole": "DERIVED_READ_MODEL_AFTER_RECONCILIATION"},
+    "polizas": {"route": "LEGACY_ROUTE","confidence": "HIGH","canonicalRole": "EMPTY_OR_QUARANTINED_UNTIL_CONTROLLED_MIGRATION"},
+    "vehiculos": {"route": "LEGACY_ROUTE","confidence": "HIGH","canonicalRole": "EMPTY_OR_QUARANTINED_UNTIL_CONTROLLED_MIGRATION"},
+    "recibosEsperados": {"route": "LEGACY_ROUTE","confidence": "HIGH","canonicalRole": "EMPTY_OR_QUARANTINED_UNTIL_CONTROLLED_MIGRATION"},
+    "carteraPrimas": {"route": "LEGACY_ROUTE","confidence": "HIGH","canonicalRole": "EMPTY_OR_QUARANTINED_UNTIL_CONTROLLED_MIGRATION"},
+    "cobros": {"route": "LEGACY_ROUTE","confidence": "HIGH","canonicalRole": "EMPTY_OR_QUARANTINED_UNTIL_CONTROLLED_MIGRATION"}
+  },
+  "cumulativeVisualGuard": {
+    "trackedFileCount": 308,
+    "pathDigest": "0c3dbf222646ea46b57e838359ac56fff3994268a97e0d682508bd747a29f3c4",
+    "contentDigest": "5b32b90815929acc341cfd4ae7c1e5f76d819e1a6a1b4091d13800508ab9b647",
+    "indexDigest": "54df4a1977573ccc6a0702bd0012f2835fcef4cb529e327d16918c4b420382a4",
+    "manifestMatches": true,
+    "noFragmentationContract": true
+  },
+  "safety": {
+    "firestoreRead": true,
+    "firestoreWrites": 0,
+    "operationalWrites": 0,
+    "reimportExecuted": false,
+    "frontendAdapted": false,
+    "browserExecuted": false,
+    "previewExecuted": false,
+    "deployExecuted": false,
+    "rulesApplied": false,
+    "functionsDeployed": false,
+    "productionTouched": false,
+    "mainTouched": false,
+    "mergeExecuted": false
+  },
+  "humanApproval": {
+    "clientes": true,
+    "polizas": false,
+    "vehiculos": false,
+    "recibos": false,
+    "cartera": false,
+    "restoCrm": false
+  },
+  "containsPII": false,
+  "containsDocumentIds": false,
+  "containsPolicyNumbers": false,
+  "containsAmounts": false,
+  "containsSecrets": false
+}
