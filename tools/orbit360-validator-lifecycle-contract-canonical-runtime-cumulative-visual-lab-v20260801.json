@@ -1,0 +1,138 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
+  "gateId": "block7-canonical-runtime-cumulative-visual-lab-v20260801",
+  "gateContractVersion": "7.11.0",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
+  "status": "CANONICAL_RUNTIME_CUMULATIVE_VISUAL_LAB_AUTHORIZED",
+  "executionProfile": {
+    "phase": "LAB_RUNTIME_GATE",
+    "capabilities": {
+      "secrets": true,
+      "firestoreRead": true,
+      "writes": false,
+      "runtime": true,
+      "browser": true,
+      "deploy": false,
+      "functionsDeploy": false,
+      "rulesDeploy": false,
+      "production": false
+    }
+  },
+  "singleGate": true,
+  "blockOwner": "Orbit.store + cumulative frontend",
+  "authorization": {
+    "authorizedBy": "Paula Osorio",
+    "authorizedAt": "2026-08-01T22:05:00-06:00",
+    "authorizationRef": "user_proceed_definitive_solutions_no_trial_error_20260801",
+    "explicit": true,
+    "allowedExecutions": 1,
+    "consumed": false,
+    "macroBlockWithoutMicroAuthorizations": true
+  },
+  "sourceStaticGate": {
+    "gateId": "block7-canonical-store-cumulative-adapter-static-v20260801",
+    "contractVersion": "7.10.0",
+    "acceptedRun": 30732429713,
+    "latestEquivalentAuditedRun": 30732451326,
+    "status": "CANONICAL_STORE_CUMULATIVE_ADAPTER_STATIC_CLOSED",
+    "closed": true,
+    "singleReadOwner": "Orbit.store"
+  },
+  "sourceDataGate": {
+    "gateId": "block7-policies-full-canonical-revalidation-readonly-v20260801",
+    "contractVersion": "7.9.0",
+    "run": 30731043017,
+    "status": "POLICIES_FULL_CANONICAL_REVALIDATION_READONLY_CLOSED",
+    "canonicalSnapshotDigest": "19e1927d39f6b713ee12504f8762bc42ead9de6e365bb0f12162d2a0c8f8469b",
+    "closed": true
+  },
+  "cumulativeManifest": {
+    "trackedFileCount": 309,
+    "pathDigest": "517056dee1200503b2e7295a333cb804bc71271bbaa87847fa762da025f276f1",
+    "contentDigest": "83cc01dacf180b8ca9693df7117030228479992d6db4c59fab53def2e94acafd",
+    "indexDigest": "b57b6581ee02d2dde42a8a2c1272d57f19b7ad6809d13a1d25111f3d71a96074"
+  },
+  "expectedOperationalCounts": {
+    "clientes": 430,
+    "aseguradoras": 30,
+    "polizas": 1373,
+    "vehiculos": 1032,
+    "recibosEsperados": 1294,
+    "carteraPrimas": 673,
+    "cobros": 5,
+    "asesores": 7
+  },
+  "expectedRawCanonicalCounts": {
+    "clientes": 430,
+    "aseguradoras": 30,
+    "polizas": 1375,
+    "vehiculos": 1033,
+    "recibosEsperados": 1294,
+    "carteraPrimas": 673,
+    "cobros": 7
+  },
+  "expectedSeedExclusion": {
+    "clientes": 0,
+    "aseguradoras": 0,
+    "polizas": 2,
+    "vehiculos": 1,
+    "recibosEsperados": 0,
+    "carteraPrimas": 0,
+    "cobros": 2,
+    "total": 5
+  },
+  "expectedRequiresValidation": {
+    "clientes": 16,
+    "aseguradoras": 12,
+    "polizas": 1373,
+    "vehiculos": 60,
+    "recibosEsperados": 307,
+    "carteraPrimas": 263,
+    "cobros": 0,
+    "total": 2031
+  },
+  "scope": {
+    "serveExactCheckoutLocally": true,
+    "usePublicFirebaseHostingInit": true,
+    "useExistingLabIdentity": true,
+    "authenticateThroughCanonicalLogin": true,
+    "acceptLegalOnce": true,
+    "snapshotBeforeAndAfter": true,
+    "installBrowserWriteGuard": true,
+    "verifyStoreOwner": true,
+    "verifyCanonicalPaths": true,
+    "verifyApiContract": true,
+    "verifySeedExclusion": true,
+    "verifyRequiresValidation": true,
+    "verifyRelationsThroughExistingModules": true,
+    "roles": ["Dirección", "Operativo", "Asesor"],
+    "viewports": ["desktop", "tablet", "mobile"],
+    "routes": ["cliente360", "aseguradoras", "polizas"],
+    "sanitizedScreenshots": true,
+    "singleCumulativeVisualReview": true
+  },
+  "guards": {
+    "firestoreDataWritesAllowed": false,
+    "operationalWritesAllowed": 0,
+    "reimportAllowed": false,
+    "hostingDeployAllowed": false,
+    "previewDeployAllowed": false,
+    "firestoreRulesDeployAllowed": false,
+    "functionsDeployAllowed": false,
+    "productionAllowed": false,
+    "mainAllowed": false,
+    "mergeAllowed": false,
+    "newParallelReadOwnerAllowed": false
+  },
+  "humanApproval": {
+    "clientes": true,
+    "polizas": false,
+    "vehiculos": false,
+    "recibos": false,
+    "cartera": false,
+    "restoCrm": false,
+    "automatedGateMaySetApproval": false
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
