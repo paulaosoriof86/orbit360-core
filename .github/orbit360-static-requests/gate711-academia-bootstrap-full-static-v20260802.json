@@ -15,7 +15,23 @@
   "writes": false,
   "deploy": false,
   "production": false,
-  "approved": true,
-  "allowedExecutions": 1,
-  "consumed": false
+  "approved": false,
+  "allowedExecutions": 0,
+  "consumed": true,
+  "consumedAt": "2026-08-02T16:47:50-06:00",
+  "executionResult": {
+    "run": 30770882763,
+    "job": 91557712968,
+    "artifact": 8840476390,
+    "artifactDigest": "sha256:0445b1906c502c5981e2006b9a5de7f5f06334a01d06b08d33e81811a47c8675",
+    "status": "GATE711_ACADEMIA_BOOTSTRAP_FULL_STATIC_PASS",
+    "bootstrapOwnerChecks": "8/8",
+    "rootFixReadinessChecks": "14/14",
+    "canonicalRouterChecks": "18/18",
+    "secretAccess": false,
+    "firestoreRead": false,
+    "runtimeExecuted": false,
+    "browserExecuted": false,
+    "writes": 0
+  }
 }
