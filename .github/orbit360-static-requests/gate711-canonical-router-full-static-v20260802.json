@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "orbit360-gate711-canonical-router-full-static-request-v1",
+  "gateId": "block7-canonical-runtime-cumulative-visual-lab-v20260801",
+  "parentHead": "972b3095cf1fe88efb7bf83a97ff17225a465927",
+  "authorizedProductHead": "6ebcb7e82545a6a6810ecf55d2cc8b8ad2783979",
+  "scope": "full_canonical_router_static_only",
+  "secrets": false,
+  "firestoreRead": false,
+  "runtime": false,
+  "browser": false,
+  "writes": false,
+  "deploy": false,
+  "production": false,
+  "approvedForExecution": true,
+  "allowedExecutions": 1,
+  "consumed": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
