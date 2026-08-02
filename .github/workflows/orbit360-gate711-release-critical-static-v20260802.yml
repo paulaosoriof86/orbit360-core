@@ -1,0 +1,141 @@
+name: Orbit 360 · Gate 7.11 · release critical static
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-static-requests/gate711-release-critical-static-run-v20260802.json'
+
+permissions:
+  contents: read
+  statuses: write
+
+concurrency:
+  group: orbit360-gate711-release-critical-static-v20260802
+  cancel-in-progress: false
+
+env:
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  ORBIT360_GATE_ID: block7-canonical-runtime-cumulative-visual-lab-v20260801
+  ORBIT360_CONTRACT_VERSION: 7.11.1
+  ORBIT360_PRODUCT_HEAD: 997fca628f95dd397dba347700a6bc644fe840f0
+  ORBIT360_REQUEST_FILE: .github/orbit360-static-requests/gate711-release-critical-static-run-v20260802.json
+  ORBIT360_LIFECYCLE_FILE: tools/orbit360-validator-lifecycle-contract-gate711-release-critical-static-v20260802.json
+  ORBIT360_EVIDENCE_FILE: orbit360-platform/runtime-gate-crm-v20260716/gate711-release-critical-static-v20260802.json
+
+jobs:
+  static:
+    name: Source-only · CRM Ops Leads · Academia nonblocking
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - name: Checkout SHA exacto
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Preparar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verificar request inmutable y lineage
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          test "$(git rev-parse HEAD^)" = "$(jq -r '.parentHead' "$ORBIT360_REQUEST_FILE")"
+          mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
+          test "${#CHANGED[@]}" = '1'
+          test "${CHANGED[0]}" = "$ORBIT360_REQUEST_FILE"
+          jq -e --arg gate "$ORBIT360_GATE_ID" --arg version "$ORBIT360_CONTRACT_VERSION" --arg product "$ORBIT360_PRODUCT_HEAD" '
+            .schemaVersion=="orbit360-gate711-release-critical-static-request-v1" and
+            .gateId==$gate and
+            .contractVersion==$version and
+            .productHead==$product and
+            .branch=="ays/backend-tenant-lab-v99-20260703" and
+            .pullRequest==5 and
+            .approved==true and
+            .allowedExecutions==1 and
+            .consumed==false and
+            .capabilities.secrets==false and
+            .capabilities.firestoreRead==false and
+            .capabilities.runtime==false and
+            .capabilities.browser==false and
+            .capabilities.writes==false and
+            .capabilities.deploy==false and
+            .capabilities.production==false
+          ' "$ORBIT360_REQUEST_FILE" >/dev/null
+          jq -e --arg gate "$ORBIT360_GATE_ID" --arg version "$ORBIT360_CONTRACT_VERSION" --arg product "$ORBIT360_PRODUCT_HEAD" '
+            .gateId==$gate and
+            .gateContractVersion==$version and
+            .status=="GATE711_RELEASE_CRITICAL_STATIC_READY" and
+            .sourceLock.productHead==$product and
+            .authorization.explicitSourceOnlyProceed==true and
+            .authorization.allowedExecutions==1 and
+            .authorization.consumed==false and
+            .guards.productMutationAllowed==false and
+            .guards.firestoreWritesAllowed==false and
+            .guards.operationalWritesAllowed==0 and
+            .guards.deployAllowed==false and
+            .guards.productionAllowed==false
+          ' "$ORBIT360_LIFECYCLE_FILE" >/dev/null
+
+      - name: Verificar freeze del producto acumulativo
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t PRODUCT_DIFF < <(git diff --name-only "$ORBIT360_PRODUCT_HEAD"..HEAD -- \
+            orbit360-platform/index.html \
+            orbit360-platform/modules \
+            orbit360-platform/core \
+            orbit360-platform/styles \
+            orbit360-platform/data)
+          if [ "${#PRODUCT_DIFF[@]}" -ne 0 ]; then
+            printf 'Producto cambió fuera del source-only block:\n%s\n' "${PRODUCT_DIFF[*]}"
+            exit 41
+          fi
+
+      - name: Ejecutar Gate 7.11 estático release critical
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-validar-gate711-release-critical-static-v20260802.mjs
+          node --check tools/orbit360-validar-gate711-ops-leads-runtime-v20260802.mjs
+          node --check tools/orbit360-validar-canonical-runtime-cumulative-visual-lab-v20260801.mjs
+          node tools/orbit360-validar-gate711-release-critical-static-v20260802.mjs
+          jq -e --arg gate "$ORBIT360_GATE_ID" --arg version "$ORBIT360_CONTRACT_VERSION" --arg product "$ORBIT360_PRODUCT_HEAD" '
+            .ok==true and
+            .gateId==$gate and
+            .contractVersion==$version and
+            .productHead==$product and
+            .status=="GATE711_RELEASE_CRITICAL_STATIC_PASS" and
+            .classification=="GO_STATIC_RELEASE_CRITICAL_CRM_OPS_LEADS" and
+            .failed==0 and
+            .academiaRuntimePrerequisite==false and
+            .cloudPackageSent==false and
+            .firestoreReads==0 and
+            .firestoreWrites==0 and
+            .operationalWrites==0 and
+            .runtimeExecuted==false and
+            .browserExecuted==false and
+            .deployExecuted==false and
+            .productionTouched==false and
+            .containsPII==false and
+            .containsSecrets==false
+          ' "$ORBIT360_EVIDENCE_FILE" >/dev/null
+
+      - name: Guardar evidencia sanitizada
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gate711-release-critical-static-v20260802
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/gate711-release-critical-static-v20260802.json
+            tools/orbit360-gate711-release-critical-scope-v20260802.json
+            orbit360-platform/docs/SINCRONIZACION-CLOUD-CLAUDE-ACUMULADA-20260802.md
+          if-no-files-found: error
+          retention-days: 14
