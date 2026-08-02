@@ -30,7 +30,8 @@
     "consumed": true,
     "consumedByRun": 30732429713,
     "requestReplayBlocked": true,
-    "additionalAttemptsAllowed": false
+    "workflowPushTriggerDisabled": true,
+    "additionalExecutionsAllowed": false
   },
   "attempts": {
     "first": {
@@ -71,8 +72,32 @@
       "operationalWrites": 0,
       "runtimeExecuted": false,
       "browserExecuted": false,
+      "accepted": true,
       "closed": true
     }
+  },
+  "duplicateStaticReplay": {
+    "observed": true,
+    "classification": "PIPELINE_MECHANISM_DUPLICATE_STATIC_REPLAY",
+    "cause": "REQUEST_AND_LIFECYCLE_UPDATE_TRIGGERED_A_REDUNDANT_PUSH_RUN_AFTER_ACCEPTED_PASS",
+    "run": 30732451326,
+    "job": 91455115850,
+    "artifact": 8828413796,
+    "artifactDigest": "sha256:6abbd30d2abeab57abe6cd5f7d1e34fa449646709b5dca6b21ef1f387797bf72",
+    "head": "5f3ec91e827b7b3ecb8a4fb4d8c493268632f9a4",
+    "status": "CANONICAL_STORE_CUMULATIVE_ADAPTER_STATIC_PASS",
+    "preflightPassed": 17,
+    "staticChecksPassed": 48,
+    "staticChecksFailed": 0,
+    "equivalentToAcceptedPass": true,
+    "productOrDataImpact": false,
+    "firestoreRead": false,
+    "firestoreWrites": 0,
+    "operationalWrites": 0,
+    "runtimeExecuted": false,
+    "browserExecuted": false,
+    "replayMechanismCorrected": true,
+    "workflowPushTriggerDisabled": true
   },
   "validatorCorrection": {
     "classification": "VALIDATOR_STALE",
@@ -114,7 +139,8 @@
     "activeModulesValidated": 52,
     "dormantModules": 10,
     "activeModuleDirectFirestoreViolations": 0,
-    "dormantInitialImporterRuntimeReferences": 0
+    "dormantInitialImporterRuntimeReferences": 0,
+    "runtimeDeltaFiles": 5
   },
   "cumulativeManifest": {
     "trackedFileCount": 309,
