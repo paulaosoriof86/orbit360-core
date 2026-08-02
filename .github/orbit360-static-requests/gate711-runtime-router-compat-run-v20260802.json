@@ -1,0 +1,42 @@
+{
+  "schemaVersion": "orbit360-gate711-runtime-router-compat-request-v1",
+  "gateId": "block7-canonical-runtime-cumulative-visual-lab-v20260801",
+  "productHead": "997fca628f95dd397dba347700a6bc644fe840f0",
+  "parentHead": "b88d3ba3624adced0906059627fa7205f2f94b99",
+  "approved": true,
+  "allowedExecutions": 1,
+  "consumed": false,
+  "purpose": "Cerrar cobertura faltante entre lifecycle materializado y router canónico antes de cualquier nueva autorización runtime.",
+  "priorRuntimeFailure": {
+    "run": 30772737476,
+    "job": 91562610825,
+    "artifact": 8841039787,
+    "artifactDigest": "sha256:faedbb562500ed403746818bfb0e77ff13adb15000fe38c545e4ee59be3e6664",
+    "classification": "VALIDATOR_STALE / PIPELINE_MECHANISM_FAILURE",
+    "failedStage": "CANONICAL_PREFLIGHT_ENTRYPOINT",
+    "error": "CANONICAL_LIFECYCLE_REVISION_MISMATCH",
+    "replayAllowed": false,
+    "secretsRead": false,
+    "firestoreRead": false,
+    "runtimeExecuted": false,
+    "browserExecuted": false,
+    "operationalWrites": 0
+  },
+  "expectedCorrection": {
+    "validatorLifecycleRevision": "phase-capability-contract-v1",
+    "exactCapabilityProfile": "LAB_RUNTIME_GATE",
+    "credentialReadAliasAllowedInsideCanonicalCapabilities": false,
+    "productFilesChanged": 0
+  },
+  "capabilities": {
+    "secrets": false,
+    "firestoreRead": false,
+    "runtime": false,
+    "browser": false,
+    "writes": false,
+    "deploy": false,
+    "production": false
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
