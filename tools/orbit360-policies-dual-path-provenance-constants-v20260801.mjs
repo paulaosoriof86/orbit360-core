@@ -124,8 +124,8 @@ export const CRITICAL = {
 };
 
 export const VISUAL_SEAL = {
-  trackedFileCount: 308,
-  pathDigest: '0c3dbf222646ea46b57e838359ac56fff3994268a97e0d682508bd747a29f3c4',
-  contentDigest: '5b32b90815929acc341cfd4ae7c1e5f76d819e1a6a1b4091d13800508ab9b647',
-  indexDigest: '54df4a1977573ccc6a0702bd0012f2835fcef4cb529e327d16918c4b420382a4'
+  trackedFileCount: 309,
+  pathDigest: '517056dee1200503b2e7295a333cb804bc71271bbaa87847fa762da025f276f1',
+  contentDigest: '83cc01dacf180b8ca9693df7117030228479992d6db4c59fab53def2e94acafd',
+  indexDigest: 'b57b6581ee02d2dde42a8a2c1272d57f19b7ad6809d13a1d25111f3d71a96074'
 };
