@@ -1,0 +1,21 @@
+schemaVersion: orbit360-identity-ephemeral-path-workflow-contract-v1
+status: STATIC_CONTRACT_ONLY
+revision: 20260802.1
+owner: tools/orbit360-preparar-identidad-browser-canonica-readonly-v20260801.mjs
+requirements:
+  sameStep: true
+  tokenRoot: RUNNER_TEMP
+  configRoot: orbit360-platform/core
+  tokenPermissions: "0600"
+  writesAllowed: false
+  deployAllowed: false
+referenceShell: |
+  KEY_FILE="$RUNNER_TEMP/orbit360-service-account.json"
+  TOKEN_FILE="$RUNNER_TEMP/orbit360-browser-token.txt"
+  CONFIG_FILE="$GITHUB_WORKSPACE/orbit360-platform/core/auth-firebase.config.local.js"
+  export ORBIT360_CUSTOM_TOKEN_FILE="$TOKEN_FILE"
+  export ORBIT360_LOCAL_FIREBASE_CONFIG_FILE="$CONFIG_FILE"
+  node tools/orbit360-preparar-identidad-browser-canonica-readonly-v20260801.mjs
+  test -s "$TOKEN_FILE"
+  test -s "$CONFIG_FILE"
+  jq -e '.explicitTokenPathHonored==true and .explicitConfigPathHonored==true and .authWrites==0 and .firestoreWrites==0 and .operationalWrites==0' orbit360-platform/runtime-gate-crm-v20260716/canonical-browser-identity-readonly-v20260801.json >/dev/null
