@@ -1,0 +1,93 @@
+name: Orbit 360 · Gate 7.11 · canonical lifecycle composition · static
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-static-requests/gate711-canonical-lifecycle-composition-static-v20260802.json'
+permissions:
+  contents: read
+  statuses: write
+concurrency:
+  group: orbit360-gate711-canonical-lifecycle-composition-static-v20260802
+  cancel-in-progress: false
+jobs:
+  validate:
+    name: Gate 7.11 · composición canónica · cero runtime
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout exacto
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Preparar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validar composición y reproducir causa raíz
+        shell: bash
+        run: |
+          set -euo pipefail
+          REQUEST='.github/orbit360-static-requests/gate711-canonical-lifecycle-composition-static-v20260802.json'
+          TEMPLATE='tools/orbit360-gate711-canonical-lifecycle-template-v20260802.json'
+          FAILED='tools/orbit360-validator-lifecycle-contract-gate711-macro-readonly-rerun-v20260802.json'
+          ROUTER='tools/orbit360-validar-gate-contracts-v20260717.mjs'
+          OUT='orbit360-platform/runtime-gate-crm-v20260716/gate711-canonical-lifecycle-composition-static-v20260802.json'
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          test "$(git rev-parse HEAD^)" = "$(jq -r '.parentHead' "$REQUEST")"
+          mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
+          test "${#CHANGED[@]}" = '1'
+          test "${CHANGED[0]}" = "$REQUEST"
+          node <<'NODE'
+          const fs=require('fs');
+          const path=require('path');
+          const template=JSON.parse(fs.readFileSync('tools/orbit360-gate711-canonical-lifecycle-template-v20260802.json','utf8'));
+          const failed=JSON.parse(fs.readFileSync('tools/orbit360-validator-lifecycle-contract-gate711-macro-readonly-rerun-v20260802.json','utf8'));
+          const router=fs.readFileSync('tools/orbit360-validar-gate-contracts-v20260717.mjs','utf8');
+          const canonical='phase-capability-contract-v1';
+          const expected={secrets:true,firestoreRead:true,writes:false,runtime:true,browser:true,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false};
+          const checks=[
+            {id:'ROUTER_CANONICAL_REVISION_DECLARED',ok:router.includes("const CANONICAL_LIFECYCLE_COMPOSITION='phase-capability-contract-v1'")},
+            {id:'ROUTER_ENFORCES_CANONICAL_REVISION',ok:router.includes('lifecycle.validatorLifecycleRevision!==CANONICAL_LIFECYCLE_COMPOSITION')},
+            {id:'ROUTER_LAB_RUNTIME_PROFILE_DECLARED',ok:router.includes('"LAB_RUNTIME_GATE":{"secrets":true,"firestoreRead":true,"writes":false,"runtime":true,"browser":true,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false}')},
+            {id:'PREVIOUS_FAILURE_REPRODUCED',ok:failed.pipelineFailure?.receivedLifecycleRevision!==canonical&&failed.macroExecution?.error==='CANONICAL_LIFECYCLE_REVISION_MISMATCH'},
+            {id:'TEMPLATE_CANONICAL_REVISION',ok:template.validatorLifecycleRevision===canonical},
+            {id:'MACRO_REVISION_SEPARATED',ok:template.macroLifecycleRevision==='macro-rootfix-then-full-canonical-v3'},
+            {id:'PHASE_MATCHES_ROUTER',ok:template.executionProfile?.phase==='LAB_RUNTIME_GATE'},
+            {id:'CAPABILITIES_MATCH_ROUTER',ok:JSON.stringify(template.executionProfile?.capabilities)===JSON.stringify(expected)},
+            {id:'AUTHORIZATION_INERT',ok:template.authorizationTemplate?.explicit===false&&template.authorizationTemplate?.allowedExecutions===0&&template.authorizationTemplate?.consumed===true},
+            {id:'NO_WRITES_DEPLOY_PRODUCTION',ok:template.guards?.firestoreDataWritesAllowed===false&&template.guards?.operationalWritesAllowed===0&&template.guards?.reimportAllowed===false&&template.guards?.hostingDeployAllowed===false&&template.guards?.previewDeployAllowed===false&&template.guards?.productionAllowed===false},
+            {id:'ROOT_FIX_PRESERVED',ok:template.rootCause?.rootFixCommit==='fd49e1b15e69d1f023727b4ff92190852bcae1e0'&&template.staticReadiness?.status==='GATE711_ROOTFIX_STATIC_READINESS_PASS'},
+            {id:'APPROVAL_BOUNDARY_PRESERVED',ok:template.humanApproval?.clientes===true&&template.humanApproval?.polizas===false&&template.humanApproval?.vehiculos===false&&template.humanApproval?.recibos===false&&template.humanApproval?.cartera===false}
+          ];
+          const failedChecks=checks.filter(x=>!x.ok);
+          const payload={schemaVersion:'orbit360-gate711-canonical-lifecycle-composition-static-v1',gateId:'block7-canonical-runtime-cumulative-visual-lab-v20260801',status:failedChecks.length?'GATE711_CANONICAL_LIFECYCLE_COMPOSITION_STATIC_FAIL':'GATE711_CANONICAL_LIFECYCLE_COMPOSITION_STATIC_PASS',classification:failedChecks.length?'PIPELINE_MECHANISM_FAILURE':'GO_STATIC_CANONICAL_LIFECYCLE_COMPOSITION',rootCause:{classification:'PIPELINE_MECHANISM_FAILURE',failedRun:30767242588,error:'CANONICAL_LIFECYCLE_REVISION_MISMATCH',canonicalRevision:canonical},checks,total:checks.length,passed:checks.length-failedChecks.length,failed:failedChecks.length,failedCheckIds:failedChecks.map(x=>x.id),secretAccess:false,firestoreRead:false,runtimeExecuted:false,browserExecuted:false,firestoreWrites:0,operationalWrites:0,reimportExecuted:false,deployExecuted:false,production:false,containsPII:false,containsSecrets:false,ok:failedChecks.length===0};
+          const out='orbit360-platform/runtime-gate-crm-v20260716/gate711-canonical-lifecycle-composition-static-v20260802.json';
+          fs.mkdirSync(path.dirname(out),{recursive:true});fs.writeFileSync(out,JSON.stringify(payload,null,2)+'\n');
+          console.log(JSON.stringify(payload,null,2));process.exit(payload.ok?0:41);
+          NODE
+          jq -e '.ok==true and .status=="GATE711_CANONICAL_LIFECYCLE_COMPOSITION_STATIC_PASS" and .total==12 and .passed==12 and .failed==0 and .secretAccess==false and .firestoreRead==false and .runtimeExecuted==false and .browserExecuted==false and .firestoreWrites==0 and .operationalWrites==0' "$OUT" >/dev/null
+
+      - name: Subir evidencia
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-gate711-canonical-lifecycle-composition-static-${{ github.run_id }}
+          path: orbit360-platform/runtime-gate-crm-v20260716/gate711-canonical-lifecycle-composition-static-v20260802.json
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Publicar estado
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/gate711-canonical-lifecycle-composition-static-v20260802.json
+        with:
+          script: |
+            const fs=require('fs');let state='failure',description='Gate 7.11 canonical lifecycle static FAIL';
+            try{const p=JSON.parse(fs.readFileSync(process.env.EVIDENCE,'utf8'));if(p.ok===true&&p.passed===12){state='success';description='Gate 7.11 canonical lifecycle static 12/12 PASS';}}catch(e){}
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/gate711-canonical-lifecycle-static',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
