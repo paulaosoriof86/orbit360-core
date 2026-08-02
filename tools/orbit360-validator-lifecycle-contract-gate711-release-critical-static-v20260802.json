@@ -2,13 +2,13 @@
   "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
   "gateId": "block7-canonical-runtime-cumulative-visual-lab-v20260801",
   "gateContractVersion": "7.11.1",
-  "status": "GATE711_RELEASE_CRITICAL_VALIDATOR_STALE_CORRECTED_STATIC_READY",
-  "phase": "SOURCE_ONLY_STATIC_GATE",
+  "status": "GATE711_RELEASE_CRITICAL_STATIC_PASS_CLOSED",
+  "phase": "SOURCE_ONLY_STATIC_GATE_CLOSED",
   "decisionRef": "user_directive_proceed_stable_release_critical_crm_ops_leads_20260802T1702-0600",
   "authorization": {
     "explicitSourceOnlyProceed": true,
     "allowedExecutions": 1,
-    "consumed": false,
+    "consumed": true,
     "secrets": false,
     "firestoreRead": false,
     "runtime": false,
@@ -39,7 +39,6 @@
     "checksPassed": 37,
     "checksTotal": 38,
     "failedCheck": "OPS_WORKFLOW_BRIDGE",
-    "reportedClassification": "DATA_CONTRACT_FAILURE",
     "rootCauseClassification": "VALIDATOR_STALE",
     "consumed": true,
     "replayAllowed": false
@@ -51,20 +50,35 @@
     "correctionCommit": "de9b8b7c73c6558e3c05f7836b79979ec99e11a1",
     "staleAssertion": "literal local variable name col.def.nombre",
     "correctedAssertion": "semantic pattern .def.nombre equals Emisiones independent of local variable name",
-    "ownerEvidence": "board.find(c => c && c.def && c.def.nombre === 'Emisiones')",
-    "sameStageRetry": false,
-    "correctionRunAllowedOnce": true
+    "ownerEvidence": "board.find(c => c && c.def && c.def.nombre === 'Emisiones')"
   },
-  "expectedEvidence": {
+  "closureEvidence": {
+    "run": 30771933766,
+    "job": 91560447718,
+    "artifact": 8840787308,
+    "artifactDigest": "sha256:0c99399ed79fa6036128a6343a70ade6101d4a61aef7e5e6dd561ae8514a28f6",
+    "requestCommit": "61560bccdbec034c11983603f3f15b0feff58fa2",
     "status": "GATE711_RELEASE_CRITICAL_STATIC_PASS",
     "classification": "GO_STATIC_RELEASE_CRITICAL_CRM_OPS_LEADS",
     "checks": "38/38",
+    "productFreeze": "PASS",
     "academiaRuntimePrerequisite": false,
     "cloudPackageSent": false,
+    "firestoreReads": 0,
+    "firestoreWrites": 0,
+    "operationalWrites": 0,
     "runtimeExecuted": false,
     "browserExecuted": false,
     "deployExecuted": false,
     "productionTouched": false
+  },
+  "nextFrontier": {
+    "phase": "SINGLE_READONLY_RUNTIME_CRM_OPS_LEADS",
+    "authorizationRequired": true,
+    "focusedAcademiaRuntime": false,
+    "microAuthorizations": false,
+    "deploy": false,
+    "production": false
   },
   "guards": {
     "requestReplayAllowed": false,
