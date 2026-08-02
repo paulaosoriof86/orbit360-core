@@ -1,9 +1,8 @@
 /* ============================================================
-   Orbit 360 - Backend LAB Firebase init v1.121
-   Initializes Firebase only in ?orbitBackend=firestore-lab.
-   Accepts Firebase Hosting reserved init when the default app
-   is already initialized; local mode still reads ignored config.
-   No secrets are versioned or exposed.
+   Orbit 360 - Backend LAB Firebase init v1.122
+   Inicializa Firebase solo en ?orbitBackend=firestore-lab.
+   Declara el read model canónico sellado y mantiene un único owner
+   de lectura: Orbit.store. No expone secretos ni crea renderers.
    ============================================================ */
 (function(){
   'use strict';
@@ -19,9 +18,13 @@
     tenantId: tenant,
     tenant: tenant,
     firebaseInit: 'pending',
-    firebaseInitVersion: 'v1.121',
+    firebaseInitVersion: 'v1.122',
+    canonicalSnapshotDigest: '19e1927d39f6b713ee12504f8762bc42ead9de6e365bb0f12162d2a0c8f8469b',
     featureFlags: Object.assign({}, window.OrbitBackend && window.OrbitBackend.featureFlags || {}, {
-      aseguradorasKnowledgeAutoMount: false
+      aseguradorasKnowledgeAutoMount: false,
+      canonicalReadModelV79: true,
+      canonicalStoreSingleOwner: true,
+      canonicalSeedExclusion: true
     })
   });
 
@@ -46,9 +49,6 @@
   }
 
   if (tenant === 'alianzas-soluciones') {
-    /* El catálogo documental puede consultarse desde la ficha aprobada, pero
-       el runtime de extracción/persistencia continúa fuera del render principal
-       y no habilita Cotizador ni Comparativo automáticamente. */
     window.__orbitAysKnowledgeRuntimePromise = Promise.resolve({
       status: 'catalog_visible_runtime_controlled',
       autoMount: false,
@@ -56,17 +56,11 @@
       enablesComparativo: false
     });
 
-    /*
-     * Bootstrap canónico del LAB.
-     * Los perfiles iniciales y el importador inicial fueron artefactos temporales
-     * de carga y no deben reactivarse en cada sesión del tenant. Los datos ya
-     * persistidos se consumen por Orbit.store y por las capas canónicas vigentes.
-     */
     loadScriptOnce('core/aseguradoras-bank-accounts-provider-lab-v20260721.js?v=20260721-1', 'bank-account-provider');
     loadScriptOnce('core/backend-lab-advisor-write-bridge.js?v=20260717-1', 'advisor-write-bridge');
     loadScriptOnce('core/backend-lab-auth-guard.js?v=20260717-1', 'auth-guard', function(){
       loadScriptOnce('core/backend-lab-import-readiness-guard.js?v=20260717-1', 'import-readiness', function(){
-        loadScriptOnce('core/backend-lab-canonical-view-sync.js?v=20260717-1', 'canonical-view-sync');
+        loadScriptOnce('core/backend-lab-canonical-view-sync.js?v=20260801-canonical-v79', 'canonical-view-sync');
       });
     });
   }
@@ -85,12 +79,10 @@
       window.__FIREBASE_CONFIG__,
       window.firebaseConfig
     ];
-
     for (var i = 0; i < candidates.length; i++) {
       var cfg = candidates[i];
       if (cfg && typeof cfg === 'object' && (cfg.projectId || cfg.authDomain)) return cfg;
     }
-
     if (window.Orbit && window.Orbit.firebaseConfig) return window.Orbit.firebaseConfig;
     if (window.OrbitBackend && window.OrbitBackend.firebaseConfig) return window.OrbitBackend.firebaseConfig;
     return null;
@@ -112,8 +104,6 @@
       return;
     }
 
-    /* Firebase Hosting /__/firebase/init.js initializes the default app
-       directly and does not need to expose a second global config object. */
     if (window.firebase.apps && window.firebase.apps.length > 0) {
       var existingApp = typeof window.firebase.app === 'function' ? window.firebase.app() : window.firebase.apps[0];
       var existingConfig = existingApp && existingApp.options ? existingApp.options : {};
@@ -129,7 +119,6 @@
       window.OrbitBackend.firebaseInitError = 'Local config did not expose a recognized Firebase config object';
       return;
     }
-
     if (!config.projectId || !config.authDomain) {
       window.OrbitBackend.firebaseInit = 'config-incomplete';
       window.OrbitBackend.firebaseInitError = 'Firebase LAB config requires projectId and authDomain';
