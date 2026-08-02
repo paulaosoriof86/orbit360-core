@@ -5,7 +5,7 @@
   "validatorLifecycleRevision": "phase-capability-contract-v1",
   "macroLifecycleRevision": "academia-bootstrap-corrective-static-v1",
   "status": "CANONICAL_RUNTIME_CUMULATIVE_VISUAL_LAB_STOP_RETRY",
-  "closureState": "ACADEMIA_OWNER_CONNECTION_CORRECTED_STATIC_VALIDATION_PENDING",
+  "closureState": "ACADEMIA_OWNER_CONNECTION_CORRECTED_STATIC_PASS_RUNTIME_PENDING_NEW_AUTHORIZATION",
   "executionProfile": {
     "phase": "STATIC_VALIDATOR_CORRECTIVE_CLOSED",
     "capabilities": {
@@ -34,13 +34,22 @@
     "owner": "orbit360-platform/core/academia-static-content-write-policy-v20260729.js",
     "missingRuntimeOwner": "orbit360-platform/data/academia-v1230-operational-directory-v20260722.js",
     "rootFixCommit": "997fca628f95dd397dba347700a6bc644fe840f0",
-    "rootFixVersion": "20260802.2"
+    "rootFixVersion": "20260802.2",
+    "runtimeFailureRun": 30770397329
   },
   "staticReadiness": {
     "status": "GATE711_ROOTFIX_STATIC_READINESS_PASS",
     "checks": "14/14",
+    "bootstrapOwnerChecks": "8/8",
+    "canonicalRouterChecks": "18/18",
     "manifestDiagnosticRun": 30770685200,
-    "runtimeLoadingCoverageRequired": true
+    "manifestDiagnosticArtifact": 8840415775,
+    "fullStaticRun": 30770882763,
+    "fullStaticJob": 91557712968,
+    "fullStaticArtifact": 8840476390,
+    "fullStaticArtifactDigest": "sha256:0445b1906c502c5981e2006b9a5de7f5f06334a01d06b08d33e81811a47c8675",
+    "runtimeLoadingCoverageRequired": true,
+    "runtimeLoadingCoverageStaticPass": true
   },
   "cumulativeManifest": {
     "trackedFileCount": 309,
