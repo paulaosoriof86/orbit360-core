@@ -1,0 +1,65 @@
+{
+  "schemaVersion": "orbit360-policies-hold-parent-dependency-diagnostic-request-v1",
+  "gateId": "block7-policies-hold-parent-dependency-diagnostic-readonly-v20260801",
+  "contractVersion": "7.7.0",
+  "authorizationRef": "user_authorized_hold_parent_dependency_diagnostic_readonly_20260801",
+  "approved": true,
+  "allowedExecutions": 1,
+  "consumed": false,
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "parentHead": "eee6940ed87429e4bd2045ab04722d7122427694",
+  "tenantId": "alianzas-soluciones",
+  "projectId": "ays-orbit-360-lab",
+  "digests": {
+    "sourceSnapshot": "88b8e16b0d4531b2f5c0ce2b1a21068837853080943f7584f6f3fab0cc2ff18d",
+    "targetSnapshotAfter": "724e1efbbc29f60791350ea180ef54230ecf888f9914b98fc70fda62ca6ac305"
+  },
+  "scope": {
+    "heldClients": 16,
+    "heldInsurers": 4,
+    "countAffectedPolicies": true,
+    "measureIntersection": true,
+    "traceVehicles": true,
+    "traceReceipts": true,
+    "tracePortfolio": true,
+    "traceCollections": true,
+    "classifyRestrictedParentMigration": true,
+    "compareStrategies": true,
+    "emitDocumentIds": false,
+    "emitBusinessValues": false
+  },
+  "capabilities": {
+    "secrets": true,
+    "firestoreRead": true,
+    "writes": false,
+    "runtime": false,
+    "browser": false,
+    "preview": false,
+    "deploy": false,
+    "rulesDeploy": false,
+    "functionsDeploy": false,
+    "production": false,
+    "main": false,
+    "merge": false
+  },
+  "cumulativeVisualGuard": {
+    "required": true,
+    "trackedFileCount": 308,
+    "pathDigest": "0c3dbf222646ea46b57e838359ac56fff3994268a97e0d682508bd747a29f3c4",
+    "contentDigest": "5b32b90815929acc341cfd4ae7c1e5f76d819e1a6a1b4091d13800508ab9b647",
+    "indexDigest": "54df4a1977573ccc6a0702bd0012f2835fcef4cb529e327d16918c4b420382a4",
+    "noModuleFragmentation": true,
+    "noModuleDowngrade": true
+  },
+  "humanApproval": {
+    "clientes": true,
+    "polizas": false,
+    "vehiculos": false,
+    "recibos": false,
+    "cartera": false,
+    "restoCrm": false
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
