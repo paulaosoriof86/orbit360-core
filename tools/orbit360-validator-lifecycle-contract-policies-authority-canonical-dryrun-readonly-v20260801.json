@@ -3,7 +3,7 @@
   "gateId": "block7-policies-authority-canonical-dryrun-readonly-v20260801",
   "gateContractVersion": "7.4.0",
   "validatorLifecycleRevision": "phase-capability-contract-v1",
-  "status": "POLICIES_AUTHORITY_CANONICAL_DRYRUN_READONLY_AUTHORIZED",
+  "status": "POLICIES_AUTHORITY_CANONICAL_DRYRUN_VALIDATOR_STALE_RESUME_AUTHORIZED",
   "executionProfile": {
     "phase": "LAB_DATA_CONTRACT_REPAIR_DRYRUN",
     "capabilities": {
@@ -25,8 +25,37 @@
     "authorizedAt": "2026-08-01T18:47:00-06:00",
     "authorizationRef": "user_authorized_legacy_authority_and_canonical_dryrun_readonly_20260801",
     "explicit": true,
-    "allowedExecutions": 1,
+    "validExecutionsAllowed": 1,
+    "attemptsUsed": 1,
+    "validExecutionConsumed": false,
+    "resumeExecutionsAllowed": 1,
+    "resumeScopeUnchanged": true,
+    "originalRequestConsumedByAttempt": true,
     "consumed": false
+  },
+  "previousAttempt": {
+    "run": 30726085370,
+    "job": 91437962618,
+    "artifact": 8826383629,
+    "artifactDigest": "sha256:403484a8ee13fcd528aa986494cb44e15dc5d74d32eea9489599df365c00babe",
+    "head": "410da79a5f2b9d7e28a1c847e3990d0bd9ac960d",
+    "technicalStatus": "POLICIES_AUTHORITY_CANONICAL_DRYRUN_READONLY_PASS",
+    "classification": "VALIDATOR_STALE",
+    "invalidatedFinding": "678_RELATIONSHIP_HOLDS",
+    "firestoreWrites": 0,
+    "operationalWrites": 0,
+    "browser": false,
+    "preview": false,
+    "deploy": false,
+    "production": false
+  },
+  "rootCause": {
+    "code": "VALIDATOR_STALE_COMPOSITE_RELATION_COLLAPSED",
+    "affectedCollections": ["carteraPrimas", "cobros"],
+    "staleRule": "POLIZA_OR_RECIBO_SINGLE_GROUP",
+    "correctRule": "POLIZA_AND_RECIBO_INDEPENDENT_EXACT_GROUPS",
+    "productFrozen": true,
+    "dataDefectDeclared": false
   },
   "sourceProvenanceGate": {
     "gateId": "block7-policies-dual-path-provenance-recommendation-readonly-v20260801",
@@ -67,6 +96,7 @@
     "normalizeResolvableBatchReferences": true,
     "holdUnresolvedBatchReferences": true,
     "verifyRelationships": true,
+    "compositeRelationsAreIndependent": true,
     "emitPlanDigest": true,
     "emitDocumentIds": false,
     "emitBusinessValues": false
