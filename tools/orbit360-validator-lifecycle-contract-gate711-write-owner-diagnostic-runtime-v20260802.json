@@ -101,6 +101,45 @@
     "operationalWrites": 0,
     "ok": true
   },
+  "rootFixVerificationHistory": [
+    {
+      "run": 30762677578,
+      "job": 91535916849,
+      "head": "2a3f20311965990d1e017eb1f58c720b19d6fd1e",
+      "stage": "initial_canonical_snapshot",
+      "classification": "DATA_CONTRACT_FAILURE",
+      "rootCause": "cumulative visual manifest still sealed to pre-root-fix content digest",
+      "preflight": "GO_GATE_CONTRACT",
+      "staticAcademia": "16/16",
+      "staticIdentityPaths": "12/12",
+      "identity": "CANONICAL_BROWSER_EXISTING_IDENTITY_READY",
+      "browserExecuted": false,
+      "rootFixRuntimeExecuted": false,
+      "firestoreWrites": 0,
+      "operationalWrites": 0,
+      "deployExecuted": false,
+      "production": false
+    }
+  ],
+  "manifestRootFixEvidence": {
+    "run": 30762785016,
+    "job": 91536205495,
+    "artifact": 8837976901,
+    "artifactDigest": "sha256:33f00fa4239bc42acaef8facb68a4aadadc1a05699805192a96cb4834175c783",
+    "status": "GATE711_CUMULATIVE_VISUAL_MANIFEST_ROOTFIX_PASS",
+    "checks": "10/10",
+    "baseHead": "820d1bb942e371104b481dde467485820bc8d103",
+    "auditedHead": "b3959201cd1a7566583454a1aaf85964cfb74965",
+    "changedVisualPaths": ["orbit360-platform/data/academia-v1230-operational-directory-v20260722.js"],
+    "trackedFileCountUnchanged": true,
+    "pathDigestUnchanged": true,
+    "indexDigestUnchanged": true,
+    "secretAccess": false,
+    "firestoreRead": false,
+    "runtimeExecuted": false,
+    "browserExecuted": false,
+    "ok": true
+  },
   "sourceStaticGate": {
     "gateId": "block7-canonical-store-cumulative-adapter-static-v20260801",
     "contractVersion": "7.10.0",
@@ -118,7 +157,7 @@
   "cumulativeManifest": {
     "trackedFileCount": 309,
     "pathDigest": "517056dee1200503b2e7295a333cb804bc71271bbaa87847fa762da025f276f1",
-    "contentDigest": "83cc01dacf180b8ca9693df7117030228479992d6db4c59fab53def2e94acafd",
+    "contentDigest": "9e737a2e20ee868ec804a66d249957260164ea393ed4576d4a67b3508a00f762",
     "indexDigest": "b57b6581ee02d2dde42a8a2c1272d57f19b7ad6809d13a1d25111f3d71a96074"
   },
   "expectedOperationalCounts": {
