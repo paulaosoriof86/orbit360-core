@@ -18,7 +18,7 @@ const REVALIDATOR='tools/orbit360-revalidar-policies-full-canonical-readonly-v20
 const WORKFLOW='.github/workflows/orbit360-canonical-runtime-cumulative-visual-lab-v20260801.yml';
 const DIGEST='19e1927d39f6b713ee12504f8762bc42ead9de6e365bb0f12162d2a0c8f8469b';
 const PATH_DIGEST='517056dee1200503b2e7295a333cb804bc71271bbaa87847fa762da025f276f1';
-const CONTENT_DIGEST='83cc01dacf180b8ca9693df7117030228479992d6db4c59fab53def2e94acafd';
+const CONTENT_DIGEST='9e737a2e20ee868ec804a66d249957260164ea393ed4576d4a67b3508a00f762';
 const INDEX_DIGEST='b57b6581ee02d2dde42a8a2c1272d57f19b7ad6809d13a1d25111f3d71a96074';
 
 function read(rel){return JSON.parse(fs.readFileSync(path.join(ROOT,rel),'utf8'));}
