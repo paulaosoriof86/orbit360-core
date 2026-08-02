@@ -92,10 +92,12 @@ const RELATION_RULES = {
     {group: 'poliza', parents: ['polizas'], pattern: /(poliza|policy)/i}
   ],
   carteraPrimas: [
-    {group: 'poliza_o_recibo', parents: ['polizas','recibosEsperados'], pattern: /(poliza|policy|recibo|receipt)/i}
+    {group: 'poliza', parents: ['polizas'], pattern: /(poliza|policy)/i},
+    {group: 'recibo', parents: ['recibosEsperados'], pattern: /(recibo|receipt)/i}
   ],
   cobros: [
-    {group: 'poliza_o_recibo', parents: ['polizas','recibosEsperados'], pattern: /(poliza|policy|recibo|receipt)/i}
+    {group: 'poliza', parents: ['polizas'], pattern: /(poliza|policy)/i},
+    {group: 'recibo', parents: ['recibosEsperados'], pattern: /(recibo|receipt)/i}
   ]
 };
 
