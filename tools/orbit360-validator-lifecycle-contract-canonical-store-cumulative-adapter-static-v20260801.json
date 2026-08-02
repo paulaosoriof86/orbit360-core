@@ -25,8 +25,45 @@
     "authorizedAt": "2026-08-01T22:05:00-06:00",
     "authorizationRef": "user_proceed_definitive_solutions_no_trial_error_20260801",
     "explicit": true,
-    "allowedExecutions": 1,
-    "consumed": false
+    "allowedExecutions": 2,
+    "attemptsUsed": 1,
+    "consumed": false,
+    "resumeAttempt": 2,
+    "additionalAttemptsAfterResume": false
+  },
+  "attempts": {
+    "first": {
+      "run": 30732248630,
+      "job": 91454585409,
+      "artifact": 8828350772,
+      "artifactDigest": "sha256:0e670033ebe96d1c275e6cb4a0fc24bf2adee776942f9b18935b5f732e56d7fe",
+      "head": "820f5483198be8a5a77a7a550d22c20f82fe8e06",
+      "status": "CANONICAL_STORE_CUMULATIVE_ADAPTER_STATIC_FAIL",
+      "classification": "MIXED_VALIDATOR_STALE_AND_DORMANT_SCOPE_FALSE_POSITIVE",
+      "preflightPassed": 16,
+      "preflightFailed": 0,
+      "staticChecksPassed": 43,
+      "staticChecksFailed": 2,
+      "failedCheckIds": ["STORE_NO_LOCALSTORAGE", "MODULES_USE_STORE_ONLY"],
+      "productDefectConfirmed": false,
+      "firestoreRead": false,
+      "firestoreWrites": 0,
+      "operationalWrites": 0,
+      "runtimeExecuted": false,
+      "browserExecuted": false,
+      "invalidated": true
+    }
+  },
+  "validatorCorrection": {
+    "classification": "VALIDATOR_STALE",
+    "rootCause": "STATIC_SCANNER_INCLUDED_COMMENTS_AND_DORMANT_UNLOADED_MODULE",
+    "commentTokenCorrected": "localStorage",
+    "activeModuleGraphRequired": true,
+    "dormantModule": "orbit360-platform/modules/importar-initial-tenant-lab.js",
+    "dormantModuleRuntimeReferences": 0,
+    "dormantModuleClassification": "TEMPORAL_RETIRO",
+    "productFilesChangedByCorrection": 0,
+    "sameGateResumeAllowedOnce": true
   },
   "sourceGate": {
     "gateId": "block7-policies-full-canonical-revalidation-readonly-v20260801",
@@ -61,11 +98,12 @@
     "preservePublicApi": ["all", "get", "where", "find", "insert", "update", "remove", "on", "_emit", "pref", "setPref", "init", "reseed", "raw"],
     "excludeCanonicalSeedsOperationally": true,
     "preserveRequiresValidation": true,
-    "directFirestoreInModulesAllowed": false,
+    "directFirestoreInActiveModulesAllowed": false,
     "parallelFirestoreListenersInVisualBridgeAllowed": false,
     "parallelStoreCacheInVisualBridgeAllowed": false,
     "oldReceiptsPortfolioProjectionRuntimeAllowed": false,
-    "allModulesPreserved": true
+    "allModulesPreserved": true,
+    "dormantTemporalArtifactsMustHaveZeroRuntimeReferences": true
   },
   "humanApproval": {
     "clientes": true,
