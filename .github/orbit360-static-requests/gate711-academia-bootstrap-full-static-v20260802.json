@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "orbit360-gate711-academia-bootstrap-full-static-request-v1",
+  "gateId": "block7-canonical-runtime-cumulative-visual-lab-v20260801",
+  "parentHead": "8c4a159f98b076f50462a3d70642f8eda5986205",
+  "manifestDigest": "3d25a83218a4373513e1fff24ea9b12817d4c47be0fad08777e7f94867b3f676",
+  "scope": ["bootstrap_owner", "rootfix_readiness", "canonical_router"],
+  "secrets": false,
+  "firestore": false,
+  "runtime": false,
+  "browser": false,
+  "writes": false,
+  "deploy": false,
+  "production": false,
+  "approved": true,
+  "allowedExecutions": 1,
+  "consumed": false
+}
