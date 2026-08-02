@@ -4,7 +4,7 @@ on:
   push:
     branches: [ays/backend-tenant-lab-v99-20260703]
     paths:
-      - '.github/orbit360-static-requests/gate711-release-critical-static-run-v20260802-v2.json'
+      - '.github/orbit360-static-requests/gate711-release-critical-static-run-v20260802-v3.json'
 
 permissions:
   contents: read
@@ -19,7 +19,7 @@ env:
   ORBIT360_GATE_ID: block7-canonical-runtime-cumulative-visual-lab-v20260801
   ORBIT360_CONTRACT_VERSION: 7.11.1
   ORBIT360_PRODUCT_HEAD: 997fca628f95dd397dba347700a6bc644fe840f0
-  ORBIT360_REQUEST_FILE: .github/orbit360-static-requests/gate711-release-critical-static-run-v20260802-v2.json
+  ORBIT360_REQUEST_FILE: .github/orbit360-static-requests/gate711-release-critical-static-run-v20260802-v3.json
   ORBIT360_LIFECYCLE_FILE: tools/orbit360-validator-lifecycle-contract-gate711-release-critical-static-v20260802.json
   ORBIT360_EVIDENCE_FILE: orbit360-platform/runtime-gate-crm-v20260716/gate711-release-critical-static-v20260802.json
   ORBIT360_STATUS_CONTEXT: orbit360/gate711-release-critical-static
@@ -61,7 +61,7 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Verificar request inmutable y lineage
+      - name: Verificar request inmutable, lineage y cierre validator stale
         shell: bash
         run: |
           set -euo pipefail
@@ -81,7 +81,13 @@ jobs:
             .approved==true and
             .allowedExecutions==1 and
             .consumed==false and
-            .observabilityRevision=="v2" and
+            .observabilityRevision=="v3" and
+            .validatorStaleCorrection=="OPS_WORKFLOW_BRIDGE_SEMANTIC_ASSERTION" and
+            .priorFailure.run==30771793126 and
+            .priorFailure.job==91560080475 and
+            .priorFailure.artifact==8840747763 and
+            .priorFailure.classification=="VALIDATOR_STALE" and
+            .priorFailure.replayAllowed==false and
             .capabilities.secrets==false and
             .capabilities.firestoreRead==false and
             .capabilities.runtime==false and
@@ -93,11 +99,17 @@ jobs:
           jq -e --arg gate "$ORBIT360_GATE_ID" --arg version "$ORBIT360_CONTRACT_VERSION" --arg product "$ORBIT360_PRODUCT_HEAD" '
             .gateId==$gate and
             .gateContractVersion==$version and
-            .status=="GATE711_RELEASE_CRITICAL_STATIC_READY" and
+            .status=="GATE711_RELEASE_CRITICAL_VALIDATOR_STALE_CORRECTED_STATIC_READY" and
             .sourceLock.productHead==$product and
             .authorization.explicitSourceOnlyProceed==true and
             .authorization.allowedExecutions==1 and
             .authorization.consumed==false and
+            .priorExecution.run==30771793126 and
+            .priorExecution.rootCauseClassification=="VALIDATOR_STALE" and
+            .priorExecution.replayAllowed==false and
+            .validatorStaleCorrection.productDefect==false and
+            .validatorStaleCorrection.productFilesChanged==0 and
+            .validatorStaleCorrection.correctionRunAllowedOnce==true and
             .guards.productMutationAllowed==false and
             .guards.firestoreWritesAllowed==false and
             .guards.operationalWritesAllowed==0 and
@@ -135,6 +147,8 @@ jobs:
             .productHead==$product and
             .status=="GATE711_RELEASE_CRITICAL_STATIC_PASS" and
             .classification=="GO_STATIC_RELEASE_CRITICAL_CRM_OPS_LEADS" and
+            .total==38 and
+            .passed==38 and
             .failed==0 and
             .academiaRuntimePrerequisite==false and
             .cloudPackageSent==false and
@@ -153,12 +167,14 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: gate711-release-critical-static-v20260802-v2
+          name: gate711-release-critical-static-v20260802-v3
           path: |
             orbit360-platform/runtime-gate-crm-v20260716/gate711-release-critical-static-v20260802.json
             tools/orbit360-gate711-release-critical-scope-v20260802.json
+            tools/orbit360-validator-lifecycle-contract-gate711-release-critical-static-v20260802.json
+            orbit360-platform/docs/CIERRE-VALIDATOR-STALE-GATE711-OPS-BRIDGE-20260802.md
             orbit360-platform/docs/SINCRONIZACION-CLOUD-CLAUDE-ACUMULADA-20260802.md
-          if-no-files-found: warn
+          if-no-files-found: error
           retention-days: 14
 
       - name: Publicar estado observable final
