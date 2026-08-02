@@ -51,14 +51,18 @@
     "ownerContentVersion": "20260802.1"
   },
   "staticReadiness": {
+    "status": "GATE711_ACADEMIA_BOOTSTRAP_FULL_STATIC_PASS",
     "manifestDiagnosticRun": 30770685200,
     "manifestDiagnosticArtifact": 8840415775,
-    "status": "GATE711_ROOTFIX_STATIC_READINESS_PASS",
-    "checks": "14/14",
+    "fullStaticRun": 30770882763,
+    "fullStaticJob": 91557712968,
+    "fullStaticArtifact": 8840476390,
+    "fullStaticArtifactDigest": "sha256:0445b1906c502c5981e2006b9a5de7f5f06334a01d06b08d33e81811a47c8675",
     "academiaOwnerIdempotence": "16/16",
     "identity": "14/14",
     "bootstrapOwner": "8/8",
-    "canonicalRouter": "PENDING_STATIC_REVALIDATION"
+    "rootFixReadiness": "14/14",
+    "canonicalRouter": "18/18 PASS"
   },
   "cumulativeManifest": {
     "trackedFileCount": 309,
