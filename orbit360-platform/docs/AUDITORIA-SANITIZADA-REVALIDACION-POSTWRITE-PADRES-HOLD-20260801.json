@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "orbit360-postwrite-parent-hold-root-cause-audit-v1",
+  "date": "2026-08-01",
+  "gateId": "block7-policies-canonical-postwrite-revalidation-readonly-v20260801",
+  "contractVersion": "7.6.0",
+  "status": "FROZEN_AFTER_TWO_FAILURES",
+  "classification": "DATA_CONTRACT_FAILURE",
+  "rootCauseCode": "CANONICAL_POLICIES_REFERENCE_EXCLUDED_VALIDATION_PARENTS",
+  "confidence": "HIGH",
+  "attempts": [
+    {
+      "run": 30727254049,
+      "job": 91441116427,
+      "artifact": 8826767205,
+      "artifactDigest": "sha256:feef90a2fc6e46d5e2602118806b5a5a4db42887bdaa0fb151e4d6f602e85695",
+      "classification": "VALIDATOR_STALE",
+      "firestoreWrites": 0,
+      "invalidated": true
+    },
+    {
+      "run": 30727341881,
+      "job": 91441364988,
+      "artifact": 8826798071,
+      "artifactDigest": "sha256:8cc12cebddb4d954f7f7bc9f7dc1c484ae040e330635567bd3a1704e215f526f",
+      "classification": "DATA_CONTRACT_FAILURE",
+      "failureBoundary": "POLIZAS_RELATION_VALIDATION",
+      "firestoreWrites": 0,
+      "invalidated": false
+    }
+  ],
+  "verified": {
+    "sourceSnapshotDigest": "88b8e16b0d4531b2f5c0ce2b1a21068837853080943f7584f6f3fab0cc2ff18d",
+    "targetSnapshotAfterDigest": "724e1efbbc29f60791350ea180ef54230ecf888f9914b98fc70fda62ca6ac305",
+    "sourceTotal": 4837,
+    "targetTotal": 4822,
+    "clientsSemanticParity": 414,
+    "insurersSemanticParity": 26,
+    "clientValidationHoldsExcluded": 16,
+    "insurerValidationHoldsExcluded": 4,
+    "canonicalSeedHolds": 5,
+    "criticalConflictsClientsInsurers": 0,
+    "validationMismatchesClientsInsurers": 0
+  },
+  "inferenceBasis": {
+    "writePayloadParityPreviouslyPassed": true,
+    "createdUnresolvedBatchReferencesPreviouslyZero": true,
+    "seedClassificationPreviouslyPassed": true,
+    "legacyRelationshipAuditUsedAllParents": true,
+    "canonicalRelationshipAuditUsesOnlyMigratedParents": true,
+    "exactAffectedPolicyCountKnown": false
+  },
+  "security": {
+    "firestoreWrites": 0,
+    "operationalWrites": 0,
+    "frontendAdapted": false,
+    "browserExecuted": false,
+    "previewExecuted": false,
+    "deployExecuted": false,
+    "productionTouched": false,
+    "mainTouched": false,
+    "mergeExecuted": false
+  },
+  "next": {
+    "newAuthorizationRequired": true,
+    "gateType": "READONLY_PARENT_DEPENDENCY_ROOT_CAUSE_DRYRUN",
+    "writesAllowed": false,
+    "mustCountAffectedPolicies": true,
+    "mustTraceDownstreamDependencies": true,
+    "mustCompareResolutionAlternatives": true
+  },
+  "containsPII": false,
+  "containsDocumentIds": false,
+  "containsBusinessValues": false,
+  "containsSecrets": false
+}
