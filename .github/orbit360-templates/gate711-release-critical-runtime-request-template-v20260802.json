@@ -1,0 +1,110 @@
+{
+  "schemaVersion": "orbit360-release-critical-runtime-request-template-v1",
+  "gateId": "block7-canonical-runtime-cumulative-visual-lab-v20260801",
+  "baseContractVersion": "7.11.0",
+  "releaseCriticalScopeRevision": "7.11.1",
+  "status": "INERT_TEMPLATE_PENDING_EXPLICIT_AUTHORIZATION",
+  "authorizationRef": "PENDING_NEW_EXPLICIT_AUTHORIZATION",
+  "approved": false,
+  "allowedExecutions": 0,
+  "consumed": true,
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "authorizedProductHead": "997fca628f95dd397dba347700a6bc644fe840f0",
+  "parentHead": "PENDING_NEW_EXPLICIT_AUTHORIZATION",
+  "projectProfile": "AYS_ORBIT360_LAB",
+  "tenantProfile": "ALIANZAS_SOLUCIONES",
+  "canonicalSnapshotDigest": "19e1927d39f6b713ee12504f8762bc42ead9de6e365bb0f12162d2a0c8f8469b",
+  "staticClosureEvidence": {
+    "run": 30771933766,
+    "job": 91560447718,
+    "artifact": 8840787308,
+    "artifactDigest": "sha256:0c99399ed79fa6036128a6343a70ade6101d4a61aef7e5e6dd561ae8514a28f6",
+    "status": "GATE711_RELEASE_CRITICAL_STATIC_PASS",
+    "classification": "GO_STATIC_RELEASE_CRITICAL_CRM_OPS_LEADS",
+    "checks": "38/38",
+    "productFreeze": "PASS",
+    "academiaRuntimePrerequisite": false,
+    "cloudPackageSent": false
+  },
+  "macroSequence": [
+    "canonical_contract_preflight_before_secrets",
+    "existing_identity_readonly",
+    "canonical_snapshot_before",
+    "serve_exact_checkout_locally_without_deploy",
+    "single_browser_runtime_crm_ops_leads",
+    "canonical_snapshot_after_and_exact_compare"
+  ],
+  "executionInvariants": {
+    "sameCheckout": true,
+    "sameIdentity": true,
+    "singleBrowserSession": true,
+    "legalOnce": true,
+    "allSnapshotsMustMatch": true,
+    "microAuthorizations": false,
+    "focusedAcademiaRuntime": false
+  },
+  "cumulativeManifest": {
+    "trackedFileCount": 309,
+    "pathDigest": "517056dee1200503b2e7295a333cb804bc71271bbaa87847fa762da025f276f1",
+    "contentDigest": "3d25a83218a4373513e1fff24ea9b12817d4c47be0fad08777e7f94867b3f676",
+    "indexDigest": "b57b6581ee02d2dde42a8a2c1272d57f19b7ad6809d13a1d25111f3d71a96074"
+  },
+  "expectedOperationalCounts": {
+    "clientes": 430,
+    "aseguradoras": 30,
+    "polizas": 1373,
+    "vehiculos": 1032,
+    "recibosEsperados": 1294,
+    "carteraPrimas": 673,
+    "cobros": 5,
+    "asesores": 7
+  },
+  "identity": {
+    "profileRef": "canonical-existing-lab-identity-v20260801",
+    "existingOnly": true,
+    "createUser": false,
+    "updateUser": false,
+    "customTokenEphemeral": true,
+    "derivePublicWebConfigReadOnly": true
+  },
+  "releaseCriticalScope": {
+    "routes": ["cliente360", "aseguradoras", "polizas", "ops", "leads"],
+    "directionDesktop": ["cliente360", "aseguradoras", "polizas", "ops", "leads"],
+    "operationalTablet": ["cliente360", "polizas", "ops", "leads"],
+    "advisorMobile": ["cliente360", "polizas", "leads", "ops_restricted"],
+    "academiaPresent": true,
+    "academiaContentCompletenessBlocksRelease": false,
+    "focusedAcademiaRuntime": false,
+    "expectedSanitizedScreenshots": 14
+  },
+  "intendedCapabilitiesAfterAuthorization": {
+    "credentialRead": true,
+    "firestoreRead": true,
+    "writes": false,
+    "runtime": true,
+    "browser": true,
+    "preview": false,
+    "deploy": false,
+    "rulesDeploy": false,
+    "functionsDeploy": false,
+    "production": false,
+    "main": false,
+    "merge": false
+  },
+  "humanApproval": {
+    "clientes": true,
+    "polizas": false,
+    "vehiculos": false,
+    "recibos": false,
+    "cartera": false,
+    "cobros": false,
+    "ops": false,
+    "leads": false,
+    "restoCrm": false
+  },
+  "stopRetryOnSameStageOrFamily": true,
+  "containsPII": false,
+  "containsValues": false,
+  "containsSecrets": false
+}
