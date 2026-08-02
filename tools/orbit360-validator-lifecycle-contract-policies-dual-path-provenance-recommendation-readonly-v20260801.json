@@ -3,7 +3,7 @@
   "gateId": "block7-policies-dual-path-provenance-recommendation-readonly-v20260801",
   "gateContractVersion": "7.3.0",
   "validatorLifecycleRevision": "phase-capability-contract-v1",
-  "status": "POLICIES_DUAL_PATH_PROVENANCE_RECOMMENDATION_READONLY_AUTHORIZED",
+  "status": "POLICIES_DUAL_PATH_PROVENANCE_RECOMMENDATION_READONLY_CLOSED",
   "executionProfile": {
     "phase": "LAB_DATA_CONTRACT_REPAIR_DRYRUN",
     "capabilities": {
@@ -26,7 +26,8 @@
     "authorizationRef": "user_authorized_dual_path_provenance_recommendation_readonly_20260801",
     "explicit": true,
     "allowedExecutions": 1,
-    "consumed": false
+    "consumed": true,
+    "consumedByRun": 30725611682
   },
   "sourceReconciliation": {
     "gateId": "block7-policies-dual-path-reconciliation-readonly-v20260801",
@@ -37,46 +38,101 @@
     "artifactDigest": "sha256:19b9cddbd5a08af61655f0d59423608329fd3fda39da8786ab5c31940fb28885",
     "head": "c1bbe8e8f446747c51eaa3672e0b59fb2823d08c",
     "status": "POLICIES_DUAL_PATH_RECONCILIATION_READONLY_PASS",
-    "counts": {
-      "clientes": {"canonical": 414,"legacy": 430,"shared": 414,"onlyCanonical": 0,"onlyLegacy": 16},
-      "aseguradoras": {"canonical": 26,"legacy": 30,"shared": 26,"onlyCanonical": 0,"onlyLegacy": 4},
-      "polizas": {"canonical": 2,"legacy": 1373,"shared": 0,"onlyCanonical": 2,"onlyLegacy": 1373},
-      "vehiculos": {"canonical": 1,"legacy": 1032,"shared": 0,"onlyCanonical": 1,"onlyLegacy": 1032},
-      "recibosEsperados": {"canonical": 0,"legacy": 1294,"shared": 0,"onlyCanonical": 0,"onlyLegacy": 1294},
-      "carteraPrimas": {"canonical": 0,"legacy": 673,"shared": 0,"onlyCanonical": 0,"onlyLegacy": 673},
-      "cobros": {"canonical": 2,"legacy": 5,"shared": 0,"onlyCanonical": 2,"onlyLegacy": 5}
-    },
     "closed": true
   },
-  "scope": {
-    "tenantId": "alianzas-soluciones",
-    "projectId": "ays-orbit-360-lab",
-    "collections": ["clientes","aseguradoras","polizas","vehiculos","recibosEsperados","carteraPrimas","cobros"],
-    "canonicalPathTemplate": "tenants/{tenantId}/data/{collection}/items",
-    "legacyPathTemplate": "tenantId/{tenantId}/{collection}",
-    "countryFilterApplied": false,
-    "classifyCanonicalOnly": 5,
-    "classifyLegacyOnlyClients": 16,
-    "classifyLegacyOnlyInsurers": 4,
-    "classifySharedDivergences": 440,
-    "aggregateProvenanceAcrossCollections": true,
-    "inspectSourceRefs": true,
-    "inspectSourceTrace": true,
-    "inspectImportBatchRefs": true,
-    "inspectValidationStatus": true,
-    "recommendAuthoritativeRoutePerCollection": true,
-    "declareAuthoritativeRoute": false,
-    "includeValuesInEvidence": false,
-    "includeIdsInEvidence": false
+  "executionResult": {
+    "run": 30725611682,
+    "job": 91436616116,
+    "artifact": 8826213716,
+    "artifactDigest": "sha256:b2501961cb362cbaf84114cd511627cb6e0a7530ee662ed6d756b5c707b6ea78",
+    "head": "fee83234c4850f37769fd15590de25689037ef20",
+    "status": "POLICIES_DUAL_PATH_PROVENANCE_RECOMMENDATION_READONLY_PASS",
+    "classification": "GO_LAB_DUAL_PATH_PROVENANCE_RECOMMENDATION_READONLY",
+    "preflightPassed": 15,
+    "preflightFailed": 0,
+    "collectionsAnalyzed": 7,
+    "canonicalOnlyClassified": 5,
+    "legacyOnlyTotal": 4397,
+    "legacyOnlyClientsAndInsurers": 20,
+    "sharedClassified": 440,
+    "recommendationsProduced": 7,
+    "authorityDeclared": false,
+    "recommendationsBinding": false,
+    "closed": true
   },
-  "recommendationBoundary": {
-    "recommendationAllowed": true,
-    "authorityDeclarationAllowed": false,
-    "migrationPlanAllowed": false,
-    "adapterPlanAllowed": false,
-    "frontendChangeAllowed": false,
-    "recommendationRequiresEvidenceCodes": true,
-    "recommendationIsNonBinding": true
+  "provenanceFindings": {
+    "sharedClientes": {
+      "total": 414,
+      "businessProjectionEquivalent": 414,
+      "validationAligned": 414,
+      "criticalConflicts": 0
+    },
+    "sharedAseguradoras": {
+      "total": 26,
+      "businessProjectionEquivalent": 26,
+      "validationAligned": 26,
+      "criticalConflicts": 0
+    },
+    "legacyOnlyRequiresValidation": {
+      "clientes": 16,
+      "aseguradoras": 4,
+      "polizas": 1373,
+      "vehiculos": 60,
+      "recibosEsperados": 307,
+      "carteraPrimas": 263,
+      "cobros": 0
+    },
+    "canonicalOnlySeedBootstrap": {
+      "polizas": 2,
+      "vehiculos": 1,
+      "cobros": 2
+    },
+    "importBatchEvidence": {
+      "canonicalBatchDocuments": 1,
+      "legacyBatchDocuments": 1,
+      "clientBatchReferencesUnresolved": 414,
+      "insurerBatchReferencesResolvedLegacy": 26,
+      "insurerBatchReferencesUnresolved": 26
+    }
+  },
+  "routeRecommendations": {
+    "binding": false,
+    "authorityDeclared": false,
+    "clientes": {
+      "recommendedRoute": "LEGACY_ROUTE",
+      "confidence": "MEDIUM",
+      "canonicalRole": "DERIVED_READ_MODEL_AFTER_RECONCILIATION"
+    },
+    "aseguradoras": {
+      "recommendedRoute": "LEGACY_ROUTE",
+      "confidence": "MEDIUM",
+      "canonicalRole": "DERIVED_READ_MODEL_AFTER_RECONCILIATION"
+    },
+    "polizas": {
+      "recommendedRoute": "LEGACY_ROUTE",
+      "confidence": "HIGH",
+      "canonicalRole": "EMPTY_OR_QUARANTINED_UNTIL_CONTROLLED_MIGRATION"
+    },
+    "vehiculos": {
+      "recommendedRoute": "LEGACY_ROUTE",
+      "confidence": "HIGH",
+      "canonicalRole": "EMPTY_OR_QUARANTINED_UNTIL_CONTROLLED_MIGRATION"
+    },
+    "recibosEsperados": {
+      "recommendedRoute": "LEGACY_ROUTE",
+      "confidence": "HIGH",
+      "canonicalRole": "EMPTY_OR_QUARANTINED_UNTIL_CONTROLLED_MIGRATION"
+    },
+    "carteraPrimas": {
+      "recommendedRoute": "LEGACY_ROUTE",
+      "confidence": "HIGH",
+      "canonicalRole": "EMPTY_OR_QUARANTINED_UNTIL_CONTROLLED_MIGRATION"
+    },
+    "cobros": {
+      "recommendedRoute": "LEGACY_ROUTE",
+      "confidence": "HIGH",
+      "canonicalRole": "EMPTY_OR_QUARANTINED_UNTIL_CONTROLLED_MIGRATION"
+    }
   },
   "cumulativeVisualGuard": {
     "required": true,
@@ -88,6 +144,7 @@
     "pathDigest": "0c3dbf222646ea46b57e838359ac56fff3994268a97e0d682508bd747a29f3c4",
     "contentDigest": "5b32b90815929acc341cfd4ae7c1e5f76d819e1a6a1b4091d13800508ab9b647",
     "indexDigest": "54df4a1977573ccc6a0702bd0012f2835fcef4cb529e327d16918c4b420382a4",
+    "manifestReverified": true,
     "noParallelShell": true,
     "noReducedShell": true,
     "noModuleFragmentation": true,
@@ -99,7 +156,7 @@
     "declared": false,
     "authoritativePath": "",
     "decisionAuthorized": false,
-    "recommendationAuthorized": true,
+    "recommendationAuthorized": false,
     "requiresSeparateDeclarationAuthorization": true
   },
   "humanApproval": {
@@ -126,6 +183,22 @@
     "authorityDeclarationAllowed": false,
     "mainAllowed": false,
     "mergeAllowed": false
+  },
+  "security": {
+    "firestoreRead": true,
+    "firestoreWrites": 0,
+    "operationalWrites": 0,
+    "reimportExecuted": false,
+    "frontendAdapted": false,
+    "browserExecuted": false,
+    "previewExecuted": false,
+    "deployExecuted": false,
+    "rulesApplied": false,
+    "functionsDeployed": false,
+    "productionTouched": false,
+    "mainTouched": false,
+    "mergeExecuted": false,
+    "requestReplayBlocked": true
   },
   "containsPII": false,
   "containsSecrets": false
