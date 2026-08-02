@@ -1,0 +1,30 @@
+{
+  "schemaVersion": "orbit360-policies-authority-canonical-dryrun-resume-v1",
+  "gateId": "block7-policies-authority-canonical-dryrun-readonly-v20260801",
+  "contractVersion": "7.4.0",
+  "approved": true,
+  "allowedResumeExecutions": 1,
+  "consumed": false,
+  "scopeUnchanged": true,
+  "authorizationRef": "user_authorized_legacy_authority_and_canonical_dryrun_readonly_20260801",
+  "previousRun": 30726085370,
+  "previousJob": 91437962618,
+  "previousArtifact": 8826383629,
+  "previousArtifactDigest": "sha256:403484a8ee13fcd528aa986494cb44e15dc5d74d32eea9489599df365c00babe",
+  "previousHead": "410da79a5f2b9d7e28a1c847e3990d0bd9ac960d",
+  "rootCauseCode": "VALIDATOR_STALE_COMPOSITE_RELATION_COLLAPSED",
+  "invalidatedFinding": "678_RELATIONSHIP_HOLDS",
+  "correctedRule": "POLIZA_AND_RECIBO_INDEPENDENT_EXACT_GROUPS",
+  "capabilities": {
+    "secrets": true,
+    "firestoreRead": true,
+    "writes": false,
+    "runtime": false,
+    "browser": false,
+    "preview": false,
+    "deploy": false,
+    "rulesDeploy": false,
+    "functionsDeploy": false,
+    "production": false
+  }
+}
