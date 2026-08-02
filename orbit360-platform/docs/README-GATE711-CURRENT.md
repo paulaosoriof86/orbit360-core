@@ -6,82 +6,89 @@ Fecha: 2026-08-02
 
 ```text
 CANONICAL_RUNTIME_CUMULATIVE_VISUAL_LAB_STOP_RETRY
-PRODUCT_FROZEN
-PIPELINE_ROOT_CAUSE_FIXED_STATICALLY
-FULL_CANONICAL_ROUTER_STATIC_PASS
-RUNTIME_VERIFICATION_PENDING
+ACADEMIA_BOOTSTRAP_ROOT_FIX_STATIC_PASS
+RUNTIME_VERIFICATION_PENDING_NEW_AUTHORIZATION
 ```
 
-## Producto canónico preservado
+## Producto canónico corregido
 
 ```text
-authorizedProductHead:
-6ebcb7e82545a6a6810ecf55d2cc8b8ad2783979
-
-canonicalSnapshotDigest:
-19e1927d39f6b713ee12504f8762bc42ead9de6e365bb0f12162d2a0c8f8469b
-
-cumulativeManifestDigest:
-9e737a2e20ee868ec804a66d249957260164ea393ed4576d4a67b3508a00f762
+productHead: 997fca628f95dd397dba347700a6bc644fe840f0
+canonicalSnapshotDigest: 19e1927d39f6b713ee12504f8762bc42ead9de6e365bb0f12162d2a0c8f8469b
+cumulativeManifestDigest: 3d25a83218a4373513e1fff24ea9b12817d4c47be0fad08777e7f94867b3f676
+trackedFileCount: 309
+singleReadOwner: Orbit.store
 ```
 
-## Reejecución autorizada
+## Macro autorizado consumido
 
 ```text
-run: 30767242588
-job: 91548028728
-status: STOP_RETRY
-classification: PIPELINE_MECHANISM_FAILURE
-stage: preflight_before_secrets
-failedCheck: CANONICAL_PREFLIGHT_ENTRYPOINT
-error: CANONICAL_LIFECYCLE_REVISION_MISMATCH
+run: 30770397329
+job: 91556441298
+preflight: 17/17 PASS
+identity: PASS
+snapshotBefore: PASS
+rootFixRuntime: FAIL
+fullGate711: NOT_EXECUTED
+firestoreWrites: 0
+operationalWrites: 0
 ```
 
-El registry pasó `12/12`; el router canónico detectó que la etiqueta particular del macro había reemplazado indebidamente el contrato transversal.
-
-## Corrección de causa raíz
-
-Forma canónica:
+Primer fallo real:
 
 ```text
-validatorLifecycleRevision: phase-capability-contract-v1
-macroLifecycleRevision: macro-rootfix-then-full-canonical-v3
+classification: FUNCTIONAL_DEFECT
+failedCheck: ACADEMIA_OWNER_NOT_LOADED_IN_ACTIVE_INDEX
 ```
 
-Prueba de composición:
+El archivo de contenido 1.232 existía, pero el bootstrap activo no lo cargaba.
+
+## Correctivo
 
 ```text
-run: 30767368027
-status: GATE711_CANONICAL_LIFECYCLE_COMPOSITION_STATIC_PASS
-checks: 12/12
+bootstrap owner: orbit360-platform/core/academia-static-content-write-policy-v20260729.js
+loaded owner: orbit360-platform/data/academia-v1230-operational-directory-v20260722.js
+bootstrap version: 20260802.2
+content version: 20260802.1
 ```
 
-Router canónico completo:
+La carga es única, sincrónica y protegida contra duplicados. No se modificaron `index.html`, módulos, datos, store ni backend protegido.
+
+## Evidencia estática cerrada
+
+Manifest:
 
 ```text
-run: 30767576595
-job: 91548922446
-artifact: 8839440457
-digest: sha256:60d23212e26a6e0905765ba82faba368baf76b849fc590b05efac1282f339fcd
-status: GATE711_CANONICAL_ROUTER_FULL_STATIC_PASS
-classification: GO_STATIC_FULL_CANONICAL_ROUTER
+run: 30770685200
+artifact: 8840415775
+status: PASS
+```
+
+Suite integral:
+
+```text
+run: 30770882763
+job: 91557712968
+artifact: 8840476390
+digest: sha256:0445b1906c502c5981e2006b9a5de7f5f06334a01d06b08d33e81811a47c8675
+bootstrap owner: 8/8 PASS
+root fix readiness: 14/14 PASS
+canonical router: 18/18 PASS
 failed: 0
 ```
 
-Ambas pruebas se ejecutaron sin secrets, Firestore, runtime, navegador, escrituras, reimportación, deploy ni producción.
+Las pruebas correctivas no usaron secrets, Firestore, runtime ni navegador y produjeron cero escrituras.
 
 ## Seguridad
 
 ```text
-macro request: consumido
-macro workflow: cerrado
-macro lifecycle: STOP_RETRY
+runtime request: consumido
+runtime workflow: cerrado
 static requests: consumidos
 static workflows: cerrados
-plantillas lifecycle/request: inertes
+runtime replay: bloqueado
 autorizaciones activas: 0
-runtime retry/replay: bloqueado
-producto/datos: congelados
+producción/main/merge/deploy: sin cambios
 ```
 
 ## Aprobación humana
@@ -101,9 +108,8 @@ Resto CRM: pendiente
 1. `CIERRE-CAUSA-RAIZ-ACADEMIA-SESSION-WRITES-GATE711-20260802.md`
 2. `CIERRE-STOP-RETRY-GATE711-MACRO-LIFECYCLE-REGISTRY-20260802.md`
 3. `CIERRE-STOP-RETRY-GATE711-RERUN-CANONICAL-LIFECYCLE-20260802.md`
+4. `CIERRE-STOP-RETRY-GATE711-ACADEMIA-OWNER-BOOTSTRAP-20260802.md`
 
 ## Siguiente frontera
 
-La preparación estática está cerrada. No corresponde crear más validadores ni solicitar microautorizaciones.
-
-Una futura autorización explícita deberá cubrir un único macro read-only: runtime focalizado del root fix y, solo con PASS y snapshots idénticos, Gate 7.11 completo. Hasta entonces no existe ejecución activa.
+No corresponde otra auditoría ni otro validador. Una nueva autorización explícita deberá cubrir un único macro read-only sobre `997fca628f95dd397dba347700a6bc644fe840f0`: runtime focalizado de Academia y, solo con PASS y snapshots idénticos, Gate 7.11 acumulativo completo.
