@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "orbit360-gate711-academia-bootstrap-manifest-diagnostic-static-request-v1",
+  "gateId": "block7-canonical-runtime-cumulative-visual-lab-v20260801",
+  "parentHead": "70843f1e5817d0165646dfe3426387bf88ffd136",
+  "scope": "manifest_and_bootstrap_only",
+  "secrets": false,
+  "firestore": false,
+  "runtime": false,
+  "browser": false,
+  "writes": false,
+  "deploy": false,
+  "production": false,
+  "approved": true,
+  "allowedExecutions": 1,
+  "consumed": false
+}
