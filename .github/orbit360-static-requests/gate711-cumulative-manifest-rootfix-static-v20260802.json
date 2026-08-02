@@ -1,0 +1,24 @@
+{
+  "schemaVersion": "orbit360-gate711-cumulative-manifest-rootfix-static-request-v1",
+  "gateId": "block7-canonical-runtime-cumulative-visual-lab-v20260801",
+  "approved": true,
+  "allowedExecutions": 1,
+  "consumed": false,
+  "parentHead": "488ba0ab85a21b1609fcc879ea1aa37faacf3f1c",
+  "baseVisualHead": "820d1bb942e371104b481dde467485820bc8d103",
+  "expectedChangedVisualOwner": "orbit360-platform/data/academia-v1230-operational-directory-v20260722.js",
+  "capabilities": {
+    "secrets": false,
+    "firestoreRead": false,
+    "runtime": false,
+    "browser": false,
+    "writes": false,
+    "deploy": false,
+    "production": false,
+    "main": false,
+    "merge": false
+  },
+  "containsPII": false,
+  "containsValues": false,
+  "containsSecrets": false
+}
