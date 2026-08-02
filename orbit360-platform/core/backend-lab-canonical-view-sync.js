@@ -1,7 +1,7 @@
 /* ============================================================
    Orbit 360 · Sincronización de vistas canónicas en Firestore LAB
    - No crea un renderer alterno ni reemplaza HTML del prototipo.
-   - Reutiliza Orbit.modules.aseguradoras y Orbit.modules.cliente360.
+   - Reutiliza módulos acumulativos y Orbit.store como único owner.
    - Re-renderiza cuando snapshots reales hidratan o actualizan datos.
    - Evita repintados repetidos con la misma firma de ruta/conteos.
    ============================================================ */
@@ -37,11 +37,8 @@
   }
 
   function canonicalModule(route) {
-    try {
-      return window.Orbit && Orbit.modules && Orbit.modules[route];
-    } catch (error) {
-      return null;
-    }
+    try { return window.Orbit && Orbit.modules && Orbit.modules[route]; }
+    catch (error) { return null; }
   }
 
   function renderSignature(route) {
@@ -83,9 +80,7 @@
     mod.render(host);
 
     try {
-      if (window.Orbit && Orbit.m1VisualIntegrity && typeof Orbit.m1VisualIntegrity.patch === 'function') {
-        Orbit.m1VisualIntegrity.patch();
-      }
+      if (window.Orbit && Orbit.m1VisualIntegrity && typeof Orbit.m1VisualIntegrity.patch === 'function') Orbit.m1VisualIntegrity.patch();
     } catch (error) {}
 
     try {
@@ -102,6 +97,7 @@
           carteraPrimas: collectionCount('carteraPrimas'),
           cobros: collectionCount('cobros'),
           renderer: 'prototype-canonical',
+          storeOwner: 'Orbit.store',
           deduplicatedRender: true
         }
       }));
@@ -129,12 +125,12 @@
   }
 
   function loadReceiptsPortfolioProjection() {
-    if (window.Orbit && Orbit.receiptsPortfolioProjectionV910) return;
-    if (document.querySelector('script[data-orbit-rp-v910]')) return;
+    if (window.Orbit && Orbit.receiptsPortfolioProjectionV920) return;
+    if (document.querySelector('script[data-orbit-rp-native]')) return;
     var script = document.createElement('script');
-    script.src = 'core/backend-lab-receipts-portfolio-projection-v910.js?v=20260731-1';
+    script.src = 'core/backend-lab-receipts-portfolio-native-bridge-v20260801.js?v=20260801-1';
     script.async = false;
-    script.dataset.orbitRpV910 = '1';
+    script.dataset.orbitRpNative = '1';
     script.onload = function () { schedule('*', true); };
     (document.head || document.documentElement).appendChild(script);
   }
@@ -145,9 +141,7 @@
   window.addEventListener('orbit:backend:write-ok', function (event) {
     schedule(event && event.detail && event.detail.collection || '', true);
   });
-  window.addEventListener('hashchange', function () {
-    schedule('*', true);
-  });
+  window.addEventListener('hashchange', function () { schedule('*', true); });
 
   window.OrbitLabCanonicalViewSync = {
     schedule: schedule,
@@ -157,6 +151,7 @@
         tenantId: tenant,
         route: routeKey(),
         renderer: 'prototype-canonical',
+        storeOwner: 'Orbit.store',
         clientes: collectionCount('clientes'),
         aseguradoras: collectionCount('aseguradoras'),
         polizas: collectionCount('polizas'),
