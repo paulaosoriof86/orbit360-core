@@ -3,6 +3,7 @@
   "gateId": "block7-canonical-runtime-cumulative-visual-lab-v20260801",
   "baseGateContractVersion": "7.11.0",
   "releaseCriticalScopeRevision": "7.11.1",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
   "status": "INERT_TEMPLATE_PENDING_EXPLICIT_AUTHORIZATION",
   "phase": "LAB_RUNTIME_GATE_PENDING",
   "sourceLock": {
@@ -22,7 +23,7 @@
   "intendedExecutionProfileAfterAuthorization": {
     "phase": "LAB_RUNTIME_GATE",
     "capabilities": {
-      "credentialRead": true,
+      "secrets": true,
       "firestoreRead": true,
       "writes": false,
       "runtime": true,
@@ -42,6 +43,15 @@
     "status": "GATE711_RELEASE_CRITICAL_STATIC_PASS_CLOSED",
     "checks": "38/38",
     "productFreeze": "PASS"
+  },
+  "runtimePackageReadinessEvidence": {
+    "run": 30772261072,
+    "job": 91561337917,
+    "artifact": 8840893567,
+    "artifactDigest": "sha256:279ca4a885e9c35c7e263f958da7d43cfed8ef590ff40a8630fc280a8cc1cbab",
+    "status": "GATE711_RUNTIME_PACKAGE_READINESS_PASS",
+    "checks": "38/38",
+    "knownCoverageGapClosedBy": "tools/orbit360-validar-gate711-runtime-router-compat-v20260802.mjs"
   },
   "scope": {
     "singleGate": true,
