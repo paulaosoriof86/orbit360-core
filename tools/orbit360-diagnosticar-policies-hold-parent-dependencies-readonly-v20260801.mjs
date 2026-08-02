@@ -47,7 +47,7 @@ function sourceBacked(value){
   }
   return false;
 }
-function add(map,key,n=1){map[key]=(map[key]||0)+n;}
+function add(target,key,n=1){if(target instanceof Map)target.set(key,(target.get(key)||0)+n);else target[key]=(target[key]||0)+n;}
 function exactTargetParity(rows,targetMap){let exact=0,missing=0,mismatch=0;for(const row of rows){if(!targetMap.has(row.id)){missing++;continue;}if(rowHash(row.id,row.data)===rowHash(row.id,targetMap.get(row.id)))exact++;else mismatch++;}return{exact,missing,mismatch};}
 function aggregateParentClassification(ids,sourceMap,usage){
   const categories={};const migratable=new Set(),correction=new Set(),unused=new Set();let validationHolds=0,sourceBackedCount=0,seedMarkers=0,referencedParents=0,totalPolicyLinks=0;
