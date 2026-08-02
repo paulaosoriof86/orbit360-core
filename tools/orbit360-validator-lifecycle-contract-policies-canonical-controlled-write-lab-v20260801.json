@@ -1,0 +1,119 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
+  "gateId": "block7-policies-canonical-controlled-write-lab-v20260801",
+  "gateContractVersion": "7.5.0",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
+  "status": "POLICIES_CANONICAL_CONTROLLED_WRITE_AUTHORIZED",
+  "executionProfile": {
+    "phase": "LAB_DATA_CONTRACT_REPAIR_APPLY",
+    "capabilities": {
+      "secrets": true,
+      "firestoreRead": true,
+      "writes": true,
+      "runtime": false,
+      "browser": false,
+      "deploy": false,
+      "functionsDeploy": false,
+      "rulesDeploy": false,
+      "production": false
+    }
+  },
+  "singleGate": true,
+  "blockOwner": "Policies",
+  "authorization": {
+    "authorizedBy": "Paula Osorio",
+    "authorizedAt": "2026-08-01T19:11:00-06:00",
+    "authorizationRef": "user_authorized_canonical_controlled_write_4377_20260801",
+    "explicit": true,
+    "allowedExecutions": 1,
+    "consumed": false
+  },
+  "sourceDryRun": {
+    "gateId": "block7-policies-authority-canonical-dryrun-readonly-v20260801",
+    "contractVersion": "7.4.0",
+    "run": 30726233391,
+    "job": 91438371555,
+    "artifact": 8826436742,
+    "artifactDigest": "sha256:96a31790713ffc1ffa71db23bfdc34134e4ddb23555c1ce67ca3870eb17dd48a",
+    "head": "8f4b077421dec382cfb3665d93add5f559c8656a",
+    "status": "POLICIES_AUTHORITY_CANONICAL_DRYRUN_READONLY_PASS",
+    "closed": true,
+    "sourceSnapshotDigest": "88b8e16b0d4531b2f5c0ce2b1a21068837853080943f7584f6f3fab0cc2ff18d",
+    "targetSnapshotDigest": "9ec5e02509d6fa3cfc1450de8db42e0fd71c0d52e612bd6d9c0119186fc5f3d8",
+    "planSetDigest": "bd1852e73c21c61d98baed4bda129b027cd1a3ec2a265b6749dbc7c0eb25df47"
+  },
+  "authorityDecision": {
+    "declared": true,
+    "authoritativeRoute": "tenantId/{tenantId}/{collection}",
+    "canonicalRoute": "tenants/{tenantId}/data/{collection}/items",
+    "canonicalRole": "MULTI_TENANT_DESTINATION_AND_READ_MODEL",
+    "frontendAdaptationAuthorized": false
+  },
+  "writePlan": {
+    "createOnly": true,
+    "createDocuments": 4377,
+    "updateDocuments": 0,
+    "omitEquivalentDocuments": 440,
+    "holdDocuments": 25,
+    "holdAdditionalClients": 16,
+    "holdAdditionalInsurers": 4,
+    "holdCanonicalSeeds": 5,
+    "unresolvedImportBatchReferencesExcluded": 440,
+    "collections": {
+      "clientes": {"create": 0, "omit": 414, "hold": 16},
+      "aseguradoras": {"create": 0, "omit": 26, "hold": 4},
+      "polizas": {"create": 1373, "omit": 0, "hold": 2},
+      "vehiculos": {"create": 1032, "omit": 0, "hold": 1},
+      "recibosEsperados": {"create": 1294, "omit": 0, "hold": 0},
+      "carteraPrimas": {"create": 673, "omit": 0, "hold": 0},
+      "cobros": {"create": 5, "omit": 0, "hold": 2}
+    }
+  },
+  "transactionControl": {
+    "snapshotRequired": true,
+    "idempotencyRequired": true,
+    "createPreconditionRequired": true,
+    "chunkedCompensatingRollbackRequired": true,
+    "postVerificationRequired": true,
+    "rollbackVerificationRequired": true,
+    "maxBatchWrites": 400,
+    "targetOverwriteAllowed": false,
+    "seedDeletionAllowed": false,
+    "holdWriteAllowed": false,
+    "unresolvedBatchReferenceWriteAllowed": false
+  },
+  "cumulativeVisualGuard": {
+    "required": true,
+    "trackedFileCount": 308,
+    "pathDigest": "0c3dbf222646ea46b57e838359ac56fff3994268a97e0d682508bd747a29f3c4",
+    "contentDigest": "5b32b90815929acc341cfd4ae7c1e5f76d819e1a6a1b4091d13800508ab9b647",
+    "indexDigest": "54df4a1977573ccc6a0702bd0012f2835fcef4cb529e327d16918c4b420382a4",
+    "visualizationAuthorizedByThisGate": false
+  },
+  "humanApproval": {
+    "clientes": true,
+    "polizas": false,
+    "vehiculos": false,
+    "recibos": false,
+    "cartera": false,
+    "restoCrm": false,
+    "automatedGateMaySetApproval": false
+  },
+  "guards": {
+    "firestoreDataWritesAllowed": true,
+    "operationalWritesAllowed": 4377,
+    "reimportAllowed": false,
+    "seedDeletionAllowed": false,
+    "browserAllowed": false,
+    "previewAllowed": false,
+    "hostingDeployAllowed": false,
+    "firestoreRulesDeployAllowed": false,
+    "functionsDeployAllowed": false,
+    "productionAllowed": false,
+    "frontendAdaptationAllowed": false,
+    "mainAllowed": false,
+    "mergeAllowed": false
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
