@@ -1,0 +1,113 @@
+{
+  "schemaVersion": "orbit360-sanitized-audit-v1",
+  "date": "2026-08-01",
+  "gateId": "block7-policies-authority-canonical-dryrun-readonly-v20260801",
+  "contractVersion": "7.4.0",
+  "status": "POLICIES_AUTHORITY_CANONICAL_DRYRUN_READONLY_PASS",
+  "classification": "GO_LAB_CANONICAL_DRYRUN_READY",
+  "execution": {
+    "run": 30726233391,
+    "job": 91438371555,
+    "artifact": 8826436742,
+    "artifactDigest": "sha256:96a31790713ffc1ffa71db23bfdc34134e4ddb23555c1ce67ca3870eb17dd48a",
+    "head": "8f4b077421dec382cfb3665d93add5f559c8656a",
+    "preflightPassed": 17,
+    "preflightFailed": 0
+  },
+  "authority": {
+    "declared": true,
+    "operationalSource": "tenantId/{tenantId}/{collection}",
+    "canonicalDestination": "tenants/{tenantId}/data/{collection}/items",
+    "declarationIsDocumentary": true,
+    "migrationApplied": false
+  },
+  "plan": {
+    "canonicalBefore": 445,
+    "legacySource": 4837,
+    "planItems": 4842,
+    "create": 4377,
+    "update": 0,
+    "omit": 440,
+    "hold": 25,
+    "canonicalSeedHolds": 5,
+    "additionalClientInsurerValidationHolds": 20,
+    "blockedRelationshipDocuments": 0
+  },
+  "byCollection": {
+    "clientes": {"create": 0, "update": 0, "omit": 414, "hold": 16},
+    "aseguradoras": {"create": 0, "update": 0, "omit": 26, "hold": 4},
+    "polizas": {"create": 1373, "update": 0, "omit": 0, "hold": 2},
+    "vehiculos": {"create": 1032, "update": 0, "omit": 0, "hold": 1},
+    "recibosEsperados": {"create": 1294, "update": 0, "omit": 0, "hold": 0},
+    "carteraPrimas": {"create": 673, "update": 0, "omit": 0, "hold": 0},
+    "cobros": {"create": 5, "update": 0, "omit": 0, "hold": 2}
+  },
+  "validation": {
+    "createPreservingRequiresValidation": 2003,
+    "createSourceBacked": 2374,
+    "sharedBusinessEquivalentOmitted": 440,
+    "additionalValidationHolds": 20,
+    "seedQuarantineHolds": 5
+  },
+  "importBatchPlan": {
+    "normalize": 26,
+    "hold": 440,
+    "none": 4402,
+    "referencesInferred": false
+  },
+  "relationships": {
+    "clienteResolved": 1373,
+    "aseguradoraResolved": 1373,
+    "polizaResolved": 3004,
+    "reciboResolved": 678,
+    "blockedRequiredGroups": 0
+  },
+  "validatorStaleCorrection": {
+    "firstRun": 30726085370,
+    "firstArtifact": 8826383629,
+    "rootCause": "VALIDATOR_STALE_COMPOSITE_RELATION_COLLAPSED",
+    "invalidatedFalseHolds": 678,
+    "corrected": true,
+    "dataDefect": false
+  },
+  "digests": {
+    "sourceSnapshot": "88b8e16b0d4531b2f5c0ce2b1a21068837853080943f7584f6f3fab0cc2ff18d",
+    "targetSnapshot": "9ec5e02509d6fa3cfc1450de8db42e0fd71c0d52e612bd6d9c0119186fc5f3d8",
+    "planSet": "bd1852e73c21c61d98baed4bda129b027cd1a3ec2a265b6749dbc7c0eb25df47"
+  },
+  "cumulativeVisualGuard": {
+    "trackedFiles": 308,
+    "pathDigest": "0c3dbf222646ea46b57e838359ac56fff3994268a97e0d682508bd747a29f3c4",
+    "contentDigest": "5b32b90815929acc341cfd4ae7c1e5f76d819e1a6a1b4091d13800508ab9b647",
+    "indexDigest": "54df4a1977573ccc6a0702bd0012f2835fcef4cb529e327d16918c4b420382a4",
+    "manifestMatches": true
+  },
+  "controls": {
+    "firestoreWrites": 0,
+    "operationalWrites": 0,
+    "reimport": false,
+    "seedDeletion": false,
+    "frontendAdaptation": false,
+    "browser": false,
+    "preview": false,
+    "deploy": false,
+    "rules": false,
+    "functions": false,
+    "production": false,
+    "main": false,
+    "merge": false
+  },
+  "humanApproval": {
+    "clientes": true,
+    "polizas": false,
+    "vehiculos": false,
+    "recibos": false,
+    "cartera": false,
+    "restoCrm": false
+  },
+  "containsPII": false,
+  "containsDocumentIds": false,
+  "containsPolicyNumbers": false,
+  "containsAmounts": false,
+  "containsSecrets": false
+}
