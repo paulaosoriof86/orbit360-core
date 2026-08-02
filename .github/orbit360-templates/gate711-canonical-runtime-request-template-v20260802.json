@@ -8,7 +8,7 @@
   "consumed": true,
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
-  "authorizedProductHead": "6ebcb7e82545a6a6810ecf55d2cc8b8ad2783979",
+  "authorizedProductHead": "997fca628f95dd397dba347700a6bc644fe840f0",
   "parentHead": "PENDING_NEW_EXPLICIT_AUTHORIZATION",
   "projectId": "ays-orbit-360-lab",
   "tenantId": "alianzas-soluciones",
@@ -23,18 +23,19 @@
     "microAuthorizations": false
   },
   "rootFix": {
-    "owner": "orbit360-platform/data/academia-v1230-operational-directory-v20260722.js",
-    "commit": "fd49e1b15e69d1f023727b4ff92190852bcae1e0",
-    "version": "20260802.1",
-    "staticReadinessRun": 30766213542,
-    "staticReadinessArtifact": 8839016087,
-    "staticReadinessArtifactDigest": "sha256:53b86815827caed22436bda9e16511ce182b261f2d6edc0d917482cfdc8d92e7",
+    "owner": "orbit360-platform/core/academia-static-content-write-policy-v20260729.js",
+    "loadedRuntimeOwner": "orbit360-platform/data/academia-v1230-operational-directory-v20260722.js",
+    "commit": "997fca628f95dd397dba347700a6bc644fe840f0",
+    "version": "20260802.2",
+    "ownerContentVersion": "20260802.1",
+    "manifestDiagnosticRun": 30770685200,
+    "manifestDiagnosticArtifact": 8840415775,
     "staticReadinessStatus": "GATE711_ROOTFIX_STATIC_READINESS_PASS"
   },
   "cumulativeManifest": {
     "trackedFileCount": 309,
     "pathDigest": "517056dee1200503b2e7295a333cb804bc71271bbaa87847fa762da025f276f1",
-    "contentDigest": "9e737a2e20ee868ec804a66d249957260164ea393ed4576d4a67b3508a00f762",
+    "contentDigest": "3d25a83218a4373513e1fff24ea9b12817d4c47be0fad08777e7f94867b3f676",
     "indexDigest": "b57b6581ee02d2dde42a8a2c1272d57f19b7ad6809d13a1d25111f3d71a96074"
   },
   "expectedOperationalCounts": {
