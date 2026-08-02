@@ -1,0 +1,108 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
+  "gateId": "block7-canonical-runtime-cumulative-visual-lab-v20260801",
+  "gateContractVersion": "7.11.0",
+  "validatorLifecycleRevision": "macro-rootfix-then-full-v1",
+  "status": "CANONICAL_RUNTIME_CUMULATIVE_VISUAL_LAB_AUTHORIZED",
+  "executionProfile": {
+    "phase": "LAB_RUNTIME_GATE",
+    "capabilities": {
+      "secrets": true,
+      "firestoreRead": true,
+      "writes": false,
+      "runtime": true,
+      "browser": true,
+      "deploy": false,
+      "functionsDeploy": false,
+      "rulesDeploy": false,
+      "production": false
+    }
+  },
+  "singleGate": true,
+  "blockOwner": "Orbit.store + cumulative frontend",
+  "authorization": {
+    "authorizedBy": "Paula Osorio",
+    "authorizedAt": "2026-08-02T14:37:00-06:00",
+    "authorizationRef": "user_authorizes_single_macro_readonly_rootfix_then_gate711_20260802T1437-0600",
+    "authorizationText": "Autorizo un único macro-bloque read-only para ejecutar la verificación runtime focalizada del root fix de Academia y, solamente si obtiene PASS con cero escrituras y snapshots iguales, ejecutar inmediatamente el Gate 7.11 completo sobre la misma candidata acumulativa; sin microautorizaciones, reimportación, deploy ni producción, y con STOP_RETRY automático si reaparece una etapa o familia de fallo.",
+    "explicit": true,
+    "allowedExecutions": 1,
+    "consumed": false,
+    "macroBlockWithoutMicroAuthorizations": true,
+    "additionalExecutionsAllowed": false
+  },
+  "sequence": {
+    "step1": "targeted_rootfix_runtime_readonly",
+    "step2": "full_gate711_readonly_only_if_step1_passes",
+    "sameCheckout": true,
+    "sameIdentity": true,
+    "sameLocalServer": true,
+    "snapshots": ["before", "afterRootFix", "afterFullGate"],
+    "allSnapshotsMustMatch": true,
+    "automaticStopRetry": true
+  },
+  "rootCause": {
+    "classification": "FUNCTIONAL_DEFECT",
+    "owner": "orbit360-platform/data/academia-v1230-operational-directory-v20260722.js",
+    "function": "apply",
+    "invalidTrigger": "orbit:session",
+    "rootFixCommit": "fd49e1b15e69d1f023727b4ff92190852bcae1e0",
+    "rootFixVersion": "20260802.1"
+  },
+  "staticReadiness": {
+    "run": 30763065758,
+    "job": 91536947955,
+    "artifact": 8838060757,
+    "artifactDigest": "sha256:67b3704b69a801976232109f82a0a35995e6beed292063e00cadcaef19c59f2f",
+    "status": "GATE711_ROOTFIX_STATIC_READINESS_PASS",
+    "checks": "12/12",
+    "academia": "16/16",
+    "identity": "14/14",
+    "manifest": "10/10"
+  },
+  "cumulativeManifest": {
+    "trackedFileCount": 309,
+    "pathDigest": "517056dee1200503b2e7295a333cb804bc71271bbaa87847fa762da025f276f1",
+    "contentDigest": "9e737a2e20ee868ec804a66d249957260164ea393ed4576d4a67b3508a00f762",
+    "indexDigest": "b57b6581ee02d2dde42a8a2c1272d57f19b7ad6809d13a1d25111f3d71a96074"
+  },
+  "canonicalData": {
+    "snapshotDigest": "19e1927d39f6b713ee12504f8762bc42ead9de6e365bb0f12162d2a0c8f8469b",
+    "singleReadOwner": "Orbit.store",
+    "expectedOperationalCounts": {
+      "clientes": 430,
+      "aseguradoras": 30,
+      "polizas": 1373,
+      "vehiculos": 1032,
+      "recibosEsperados": 1294,
+      "carteraPrimas": 673,
+      "cobros": 5,
+      "asesores": 7
+    }
+  },
+  "guards": {
+    "firestoreDataWritesAllowed": false,
+    "operationalWritesAllowed": 0,
+    "reimportAllowed": false,
+    "hostingDeployAllowed": false,
+    "previewDeployAllowed": false,
+    "firestoreRulesDeployAllowed": false,
+    "functionsDeployAllowed": false,
+    "productionAllowed": false,
+    "mainAllowed": false,
+    "mergeAllowed": false,
+    "newParallelReadOwnerAllowed": false
+  },
+  "humanApproval": {
+    "clientes": true,
+    "polizas": false,
+    "vehiculos": false,
+    "recibos": false,
+    "cartera": false,
+    "cobros": false,
+    "restoCrm": false,
+    "automatedGateMaySetApproval": false
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
