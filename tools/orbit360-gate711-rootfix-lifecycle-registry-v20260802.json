@@ -1,15 +1,15 @@
 {
   "schemaVersion": "orbit360-gate711-rootfix-lifecycle-registry-v1",
   "gateId": "block7-canonical-runtime-cumulative-visual-lab-v20260801",
-  "activeLifecycleFile": "tools/orbit360-validator-lifecycle-contract-gate711-macro-readonly-final-v20260802.json",
-  "authorizationRef": "user_authorizes_single_macro_readonly_gate711_final_20260802T1631-0600",
+  "activeLifecycleFile": "tools/orbit360-validator-lifecycle-contract-gate711-academia-bootstrap-corrective-static-v20260802.json",
+  "authorizationRef": "gate711_academia_bootstrap_corrective_static_20260802",
   "allowedLifecycleStatuses": [
     "CANONICAL_RUNTIME_CUMULATIVE_VISUAL_LAB_AUTHORIZED",
     "CANONICAL_RUNTIME_CUMULATIVE_VISUAL_LAB_STOP_RETRY"
   ],
-  "requiredManifestDigest": "9e737a2e20ee868ec804a66d249957260164ea393ed4576d4a67b3508a00f762",
-  "requiredRootFixCommit": "fd49e1b15e69d1f023727b4ff92190852bcae1e0",
-  "requiredRootFixVersion": "20260802.1",
+  "requiredManifestDigest": "3d25a83218a4373513e1fff24ea9b12817d4c47be0fad08777e7f94867b3f676",
+  "requiredRootFixCommit": "997fca628f95dd397dba347700a6bc644fe840f0",
+  "requiredRootFixVersion": "20260802.2",
   "requiredStaticReadinessStatus": "GATE711_ROOTFIX_STATIC_READINESS_PASS",
   "requiredApprovalBoundary": {
     "clientes": true,
