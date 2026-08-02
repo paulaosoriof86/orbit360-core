@@ -1,10 +1,17 @@
 {
   "schemaVersion": "orbit360-cumulative-visual-candidate-contract-v1",
-  "contractVersion": "1.0.0",
-  "status": "CUMULATIVE_VISUAL_CANDIDATE_REQUIRED",
+  "contractVersion": "1.0.1",
+  "status": "CUMULATIVE_VISUAL_CANDIDATE_MANIFEST_SEALED",
   "requiredBranch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
   "baselineSourceCommit": "f982dc9744f96ea51a40b311ffdbf60a078222da",
+  "manifestSourceHead": "c1bbe8e8f446747c51eaa3672e0b59fb2823d08c",
+  "sourceGate": {
+    "gateId": "block7-policies-dual-path-reconciliation-readonly-v20260801",
+    "run": 30724917136,
+    "artifact": 8825989653,
+    "artifactDigest": "sha256:19b9cddbd5a08af61655f0d59423608329fd3fda39da8786ab5c31940fb28885"
+  },
   "compositionPolicy": {
     "baseline": "LATEST_AUDITED_ACCEPTED_PLUS_INCREMENTAL_HEAD",
     "singleCandidate": true,
@@ -26,6 +33,17 @@
       "orbit360-platform/data"
     ],
     "trackedFilesOnly": true,
+    "trackedFileCount": 308,
+    "rootCounts": {
+      "index": 1,
+      "modules": 62,
+      "core": 182,
+      "styles": 10,
+      "data": 53
+    },
+    "pathDigest": "0c3dbf222646ea46b57e838359ac56fff3994268a97e0d682508bd747a29f3c4",
+    "contentDigest": "5b32b90815929acc341cfd4ae7c1e5f76d819e1a6a1b4091d13800508ab9b647",
+    "indexDigest": "54df4a1977573ccc6a0702bd0012f2835fcef4cb529e327d16918c4b420382a4",
     "includeFileContentDigest": true,
     "includePathDigest": true,
     "includeRootCounts": true,
@@ -38,6 +56,8 @@
     "mustPreserveAllTrackedModules": true,
     "mustExplainEveryRemovedOrReplacedModule": true,
     "mustProveNoRegressionPerModuleOwner": true,
+    "mustRecomputeManifestAfterAuthorizedChanges": true,
+    "mustCompareNewManifestAgainstThisSeal": true,
     "mustNotInferApprovalFromAutomatedSmoke": true,
     "requiresSeparateAuthorization": true
   },
