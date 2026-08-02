@@ -68,7 +68,7 @@ try {
 
   add('OPS_OWNER', all(ops, ['Orbit.modules.ops', 'C().opsBoard()', 'Tablero interno del equipo', 'Sincronizado con Orbit Leads', 'ops-toolbar', 'kanban']));
   add('OPS_ROLE_BOUNDARY', all(ops, ['Orbit.session.esAsesor', 'restricted()', "location.hash='#/leads'"]));
-  add('OPS_WORKFLOW_BRIDGE', all(opsBridge, ['workflowType === \'issuance_request\'', "col.def.nombre === 'Emisiones'", 'Orbit.store.get', 'C.__opsWorkflowsV1201']));
+  add('OPS_WORKFLOW_BRIDGE', all(opsBridge, [/workflowType\s*===\s*['"]issuance_request['"]/, /\.def\.nombre\s*===\s*['"]Emisiones['"]/, 'Orbit.store.get', 'C.__opsWorkflowsV1201']));
   add('LEADS_OWNER', all(leads, ['Orbit.modules.leads', 'C().leadsBoard()', 'C().metricasLeads()', 'Sincronizado con Orbit Ops', 'kanban']));
   add('SHARED_CYCLE', ops.includes('const U = Orbit.ui, K = Orbit.kit, C = () => Orbit.ciclo') && leads.includes('const U = Orbit.ui, K = Orbit.kit, C = () => Orbit.ciclo'));
   add('NO_PARALLEL_STORAGE', !/\b(?:localStorage|sessionStorage|indexedDB)\b/.test(ops + leads + opsBridge) && !/firebase\.firestore|onSnapshot\s*\(/.test(ops + leads + opsBridge));
