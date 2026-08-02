@@ -26,7 +26,26 @@
     "authorizationRef": "user_authorized_canonical_postwrite_revalidation_readonly_20260801",
     "explicit": true,
     "allowedExecutions": 1,
+    "attemptsUsed": 1,
+    "validExecutionConsumed": false,
     "consumed": false
+  },
+  "validatorStaleCorrection": {
+    "firstRun": 30727254049,
+    "firstJob": 91441116427,
+    "firstArtifact": 8826767205,
+    "firstArtifactDigest": "sha256:feef90a2fc6e46d5e2602118806b5a5a4db42887bdaa0fb151e4d6f602e85695",
+    "firstHead": "d0ec374d73fcb42c8fddead3475bceb728203617",
+    "classification": "VALIDATOR_STALE",
+    "rootCauseCode": "VALIDATOR_STALE_UNDEFINED_EVIDENCE_PROPERTY",
+    "invalidatedFinding": "NO_DATA_FINDING_PRODUCED",
+    "sourceDigestMatched": true,
+    "targetDigestMatched": true,
+    "firestoreWrites": 0,
+    "operationalWrites": 0,
+    "correctedProperty": "exactCreatedParity: exactParity",
+    "dataDefectDeclared": false,
+    "corrected": true
   },
   "sourceWriteGate": {
     "gateId": "block7-policies-canonical-controlled-write-lab-v20260801",
