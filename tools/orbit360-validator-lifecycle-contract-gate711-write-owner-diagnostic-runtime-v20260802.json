@@ -44,7 +44,7 @@
     "priorFirestoreWrites": 0,
     "priorOperationalWrites": 0
   },
-  "diagnosticPreflightHistory": [
+  "diagnosticAttemptHistory": [
     {
       "run": 30761975290,
       "job": 91534026699,
@@ -57,8 +57,38 @@
       "runtimeExecuted": false,
       "browserExecuted": false,
       "writes": 0
+    },
+    {
+      "run": 30762084237,
+      "job": 91534321338,
+      "head": "5e05b36d6e028294ba2eaeb1c565c1f36f95c48b",
+      "stage": "identity_ephemeral_path_after_prepare",
+      "classification": "PIPELINE_MECHANISM_FAILURE",
+      "rootCause": "identity preparer ignored explicit same-step token path and wrote fixed canonical path",
+      "preflight": "GO_GATE_CONTRACT",
+      "identity": "CANONICAL_BROWSER_EXISTING_IDENTITY_READY",
+      "secretAccess": true,
+      "firestoreRead": true,
+      "runtimeExecuted": false,
+      "browserExecuted": false,
+      "diagnosticExecuted": false,
+      "firestoreWrites": 0,
+      "operationalWrites": 0,
+      "deployExecuted": false,
+      "production": false
     }
   ],
+  "rootFix": {
+    "owner": "tools/orbit360-preparar-identidad-browser-canonica-readonly-v20260801.mjs",
+    "classification": "PIPELINE_MECHANISM_FAILURE",
+    "explicitTokenPathHonored": true,
+    "explicitConfigPathHonored": true,
+    "tokenPathBoundedToRunnerTemp": true,
+    "configPathBoundedToCore": true,
+    "sameStepContract": true,
+    "staticValidator": "tools/orbit360-validar-identity-ephemeral-path-contract-v20260802.mjs",
+    "expectedStaticChecks": "12/12"
+  },
   "staticDiagnosticEvidence": {
     "baselineRun": 30761659406,
     "baselineJob": 91533207774,
