@@ -3,7 +3,7 @@ on:
   push:
     branches: [ays/backend-tenant-lab-v99-20260703]
     paths:
-      - '.github/orbit360-requests/gate711-write-owner-diagnostic-runtime-v20260802.json'
+      - '.github/orbit360-requests/gate711-write-owner-diagnostic-runtime-final-v20260802.json'
 permissions:
   contents: read
   statuses: write
@@ -11,7 +11,7 @@ concurrency:
   group: orbit360-gate711-write-owner-diagnostic-runtime-v20260802
   cancel-in-progress: false
 env:
-  REQUEST_FILE: .github/orbit360-requests/gate711-write-owner-diagnostic-runtime-v20260802.json
+  REQUEST_FILE: .github/orbit360-requests/gate711-write-owner-diagnostic-runtime-final-v20260802.json
   LIFECYCLE_FILE: tools/orbit360-validator-lifecycle-contract-gate711-write-owner-diagnostic-runtime-v20260802.json
   CANONICAL_REQUEST_FILE: .github/orbit360-requests/canonical-runtime-cumulative-visual-lab-v20260801.json
   CANONICAL_LIFECYCLE_FILE: tools/orbit360-validator-lifecycle-contract-canonical-runtime-cumulative-visual-lab-v20260801.json
@@ -45,11 +45,11 @@ jobs:
           test "${#CHANGED[@]}" = '1'
           test "${CHANGED[0]}" = "$REQUEST_FILE"
           jq -e '.schemaVersion=="orbit360-canonical-runtime-cumulative-visual-lab-request-v1" and .gateId=="block7-canonical-runtime-cumulative-visual-lab-v20260801" and .contractVersion=="7.11.0" and .authorizationRef=="user_continue_urgent_root_cause_macro_gate711_20260802T1245-0600" and .approved==true and .allowedExecutions==1 and .consumed==false and .diagnosticOnly==true and .identity.existingOnly==true and .identity.createUser==false and .identity.updateUser==false and .scope.snapshotBeforeAfter==true and .scope.browserWriteGuard==true and .scope.captureValues==false and .scope.capturePII==false and .scope.captureSecrets==false and .capabilities.secrets==true and .capabilities.firestoreRead==true and .capabilities.writes==false and .capabilities.runtime==true and .capabilities.browser==true and .capabilities.deploy==false and .capabilities.production==false' "$REQUEST_FILE" >/dev/null
-          jq -e '.status=="CANONICAL_RUNTIME_CUMULATIVE_VISUAL_LAB_AUTHORIZED" and .diagnosticOnly==true and .authorization.authorizationRef=="user_continue_urgent_root_cause_macro_gate711_20260802T1245-0600" and .authorization.allowedExecutions==1 and .authorization.consumed==false and .staticDiagnosticEvidence.status=="GATE711_WRITE_OWNER_DIAGNOSTIC_STATIC_PASS" and .staticDiagnosticEvidence.checks=="14/14" and .guards.firestoreDataWritesAllowed==false and .guards.operationalWritesAllowed==0 and .guards.reimportAllowed==false and .guards.hostingDeployAllowed==false and .guards.productionAllowed==false' "$LIFECYCLE_FILE" >/dev/null
+          jq -e '.status=="CANONICAL_RUNTIME_CUMULATIVE_VISUAL_LAB_AUTHORIZED" and .diagnosticOnly==true and .authorization.authorizationRef=="user_continue_urgent_root_cause_macro_gate711_20260802T1245-0600" and .authorization.allowedExecutions==1 and .authorization.consumed==false and .staticDiagnosticEvidence.status=="GATE711_WRITE_OWNER_DIAGNOSTIC_STATIC_PASS" and .staticDiagnosticEvidence.expectedChecks=="17/17" and .staticDiagnosticEvidence.validatorRevision=="v3-trigger-role-exact-binding" and .guards.firestoreDataWritesAllowed==false and .guards.operationalWritesAllowed==0 and .guards.reimportAllowed==false and .guards.hostingDeployAllowed==false and .guards.productionAllowed==false' "$LIFECYCLE_FILE" >/dev/null
           node --check tools/orbit360-diagnosticar-browser-write-owner-gate711-v20260802.mjs
           node --check tools/orbit360-validar-write-owner-diagnostic-contract-v20260802.mjs
           node tools/orbit360-validar-write-owner-diagnostic-contract-v20260802.mjs
-          jq -e '.ok==true and .status=="GATE711_WRITE_OWNER_DIAGNOSTIC_STATIC_PASS" and .failed==0 and .secretAccess==false and .firestoreRead==false and .runtimeExecuted==false and .browserExecuted==false and .containsPII==false and .containsValues==false and .containsSecrets==false' "$EVIDENCE_DIR/gate711-write-owner-diagnostic-static-v20260802.json" >/dev/null
+          jq -e '.ok==true and .status=="GATE711_WRITE_OWNER_DIAGNOSTIC_STATIC_PASS" and .total==17 and .passed==17 and .failed==0 and .secretAccess==false and .firestoreRead==false and .runtimeExecuted==false and .browserExecuted==false and .containsPII==false and .containsValues==false and .containsSecrets==false' "$EVIDENCE_DIR/gate711-write-owner-diagnostic-static-v20260802.json" >/dev/null
           cp "$REQUEST_FILE" "$CANONICAL_REQUEST_FILE"
           cp "$LIFECYCLE_FILE" "$CANONICAL_LIFECYCLE_FILE"
           node tools/orbit360-validar-gate-contracts-v20260717.mjs block7-canonical-runtime-cumulative-visual-lab-v20260801
