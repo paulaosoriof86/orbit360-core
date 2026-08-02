@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "orbit360-gate711-write-owner-diagnostic-static-request-v1",
+  "gateId": "block7-canonical-runtime-cumulative-visual-lab-v20260801",
+  "approved": true,
+  "allowedExecutions": 1,
+  "consumed": false,
+  "parentHead": "b06bf5ef9100e3d02fbf86093b2d7dc293b9162c",
+  "capabilities": {
+    "secrets": false,
+    "firestoreRead": false,
+    "runtime": false,
+    "browser": false,
+    "writes": false,
+    "deploy": false,
+    "production": false,
+    "main": false,
+    "merge": false
+  },
+  "containsPII": false,
+  "containsValues": false,
+  "containsSecrets": false
+}
