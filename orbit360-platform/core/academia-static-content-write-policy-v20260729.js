@@ -4,6 +4,8 @@
   window.Orbit=window.Orbit||{};
   var Orbit=window.Orbit;
   var VERSION='20260730.1';
+  var BOOTSTRAP_VERSION='20260802.2';
+  var OPERATIONAL_OWNER_SRC='data/academia-v1230-operational-directory-v20260722.js?v=20260802-2';
   var transientByCollection={};
   var recent=[];
   var installed=false;
@@ -94,6 +96,17 @@
       });
     }finally{reapplying=false;}
   }
+  function ensureOperationalDirectoryOwner(){
+    if(Orbit.academiaOperationalDirectoryV20260722&&Orbit.academiaOperationalDirectoryV20260722.rootFix==='20260802.1')return true;
+    if(document.querySelector('script[data-orbit-academia-operational-owner="20260722"]'))return true;
+    var script=document.createElement('script');
+    script.src=OPERATIONAL_OWNER_SRC;
+    script.async=false;
+    script.setAttribute('data-orbit-academia-operational-owner','20260722');
+    script.setAttribute('data-orbit-bootstrap-version',BOOTSTRAP_VERSION);
+    (document.head||document.documentElement).appendChild(script);
+    return true;
+  }
   function install(){
     var store=Orbit.store;
     if(!store||store.__firestoreLabExplicit!==true||typeof store.insert!=='function'||typeof store.update!=='function')return false;
@@ -116,15 +129,15 @@
     };
     if(originalRemove)store.remove=function(collection,id){return originalRemove(collection,id);};
     if(originalInit)store.init=function(seed){var result=originalInit(seed);hydrateSeed(store,seed);return result;};
-    store._transientStaticStatus=function(){return {version:VERSION,installed:true,total:recent.length,collections:Object.keys(transientByCollection).sort(),recent:recent.slice(-20)};};
+    store._transientStaticStatus=function(){return {version:VERSION,bootstrapVersion:BOOTSTRAP_VERSION,installed:true,total:recent.length,collections:Object.keys(transientByCollection).sort(),recent:recent.slice(-20)};};
     store.__academiaStaticWritePolicyVersion=VERSION;
     if(typeof store.on==='function')store.on('*',function(collection){
       if(collection&&collection!=='*')reapplyCollection(store,collection);
       else Object.keys(transientByCollection).forEach(function(col){reapplyCollection(store,col);});
     });
     installed=true;
-    Orbit.academiaStaticContentWritePolicy={version:VERSION,installed:true,classify:classify,install:install,status:store._transientStaticStatus,writesStore:false,durableWritesBypassedForStaticContent:true};
-    try{document.dispatchEvent(new CustomEvent('orbit:academia-static-write-policy',{detail:{version:VERSION,installed:true}}));}catch(e){}
+    Orbit.academiaStaticContentWritePolicy={version:VERSION,bootstrapVersion:BOOTSTRAP_VERSION,installed:true,classify:classify,install:install,status:store._transientStaticStatus,writesStore:false,durableWritesBypassedForStaticContent:true,operationalOwnerLoadedByBootstrap:true};
+    try{document.dispatchEvent(new CustomEvent('orbit:academia-static-write-policy',{detail:{version:VERSION,bootstrapVersion:BOOTSTRAP_VERSION,installed:true}}));}catch(e){}
     return true;
   }
   function watchStoreAssignments(){
@@ -139,7 +152,8 @@
       if(current)install();
     }catch(e){}
   }
-  Orbit.academiaStaticContentWritePolicy={version:VERSION,installed:false,classify:classify,install:install,status:function(){return {version:VERSION,installed:installed,total:recent.length};},writesStore:false,durableWritesBypassedForStaticContent:true};
+  Orbit.academiaStaticContentWritePolicy={version:VERSION,bootstrapVersion:BOOTSTRAP_VERSION,installed:false,classify:classify,install:install,status:function(){return {version:VERSION,bootstrapVersion:BOOTSTRAP_VERSION,installed:installed,total:recent.length};},writesStore:false,durableWritesBypassedForStaticContent:true,operationalOwnerLoadedByBootstrap:true};
+  ensureOperationalDirectoryOwner();
   watchStoreAssignments();
   var attempts=0;(function waitForStore(){if(install())return;if(attempts++<400)setTimeout(waitForStore,5);}());
 }());
