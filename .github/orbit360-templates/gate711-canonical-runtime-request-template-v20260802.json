@@ -34,7 +34,8 @@
     "fullStaticJob": 91557712968,
     "fullStaticArtifact": 8840476390,
     "fullStaticArtifactDigest": "sha256:0445b1906c502c5981e2006b9a5de7f5f06334a01d06b08d33e81811a47c8675",
-    "staticReadinessStatus": "GATE711_ACADEMIA_BOOTSTRAP_FULL_STATIC_PASS",
+    "staticReadinessStatus": "GATE711_ROOTFIX_STATIC_READINESS_PASS",
+    "fullStaticStatus": "GATE711_ACADEMIA_BOOTSTRAP_FULL_STATIC_PASS",
     "bootstrapOwnerChecks": "8/8",
     "rootFixReadinessChecks": "14/14",
     "canonicalRouterChecks": "18/18"
