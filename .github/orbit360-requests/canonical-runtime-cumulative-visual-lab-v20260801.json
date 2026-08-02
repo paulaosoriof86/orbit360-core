@@ -2,28 +2,46 @@
   "schemaVersion": "orbit360-canonical-runtime-cumulative-visual-lab-request-v1",
   "gateId": "block7-canonical-runtime-cumulative-visual-lab-v20260801",
   "contractVersion": "7.11.0",
-  "authorizationRef": "user_proceed_definitive_solutions_no_trial_error_20260801",
+  "authorizationRef": "user_continue_next_exact_action_20260802",
   "approved": true,
   "allowedExecutions": 1,
   "consumed": false,
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
-  "parentHead": "a7af4a3d2c035fa97154f95e19f918d013062747",
+  "parentHead": "f2946264fe5a0e4656b724665b7440d07e712ba5",
   "projectId": "ays-orbit-360-lab",
   "tenantId": "alianzas-soluciones",
   "canonicalSnapshotDigest": "19e1927d39f6b713ee12504f8762bc42ead9de6e365bb0f12162d2a0c8f8469b",
   "retry": {
     "sameGate": true,
-    "classification": "PIPELINE_MECHANISM_FAILURE",
-    "priorRunId": 30733245148,
-    "priorJobId": 91457131076,
-    "failedStep": "Derivar web config e identidad existente",
-    "rootCause": "GITHUB_ENV written and read inside the same workflow step",
+    "priorAttempts": [
+      {
+        "runId": 30733245148,
+        "jobId": 91457131076,
+        "classification": "PIPELINE_MECHANISM_FAILURE",
+        "failedStage": "Derivar web config e identidad existente",
+        "rootCause": "GITHUB_ENV written and read inside the same workflow step",
+        "fixCommit": "60942f4b15f0ad0d2e704e933b54b6349e4368f4"
+      },
+      {
+        "runId": 30755865296,
+        "jobId": 91517783012,
+        "classification": "VALIDATOR_STALE",
+        "failedStage": "canonical_store_hydrated / first client click",
+        "rootCause": "Legal deferred render checked before store hydration and falsely marked as already accepted",
+        "fixCommit": "90a174666f20ffdb8cf88c5149ac1fcf08b2f802",
+        "staticGuardCommit": "1c01decffb3f9506807f1faeec83ebd487da79be",
+        "workflowCommit": "eed237e8f555b496b1170e6693fedd1024006d3f",
+        "lifecycleCommit": "149792b80e0313e3b3b965e6e2fbe253f5145b35",
+        "documentationCommit": "f2946264fe5a0e4656b724665b7440d07e712ba5"
+      }
+    ],
     "productChanged": false,
     "dataChanged": false,
     "authChanged": false,
-    "staticSyntheticPass": true,
-    "fixCommit": "60942f4b15f0ad0d2e704e933b54b6349e4368f4"
+    "legalOwnerChanged": false,
+    "staticSyntheticRequiredBeforeSecrets": true,
+    "stopRetryOnSameStageOrFamily": true
   },
   "cumulativeManifest": {
     "trackedFileCount": 309,
