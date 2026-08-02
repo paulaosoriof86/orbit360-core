@@ -1,0 +1,50 @@
+{
+  "schemaVersion": "orbit360-gate711-runtime-package-readiness-request-v1",
+  "gateId": "block7-canonical-runtime-cumulative-visual-lab-v20260801",
+  "productHead": "997fca628f95dd397dba347700a6bc644fe840f0",
+  "parentHead": "45d7da169d7760540ed80a8e72460729fb0fef64",
+  "approved": true,
+  "approvalRef": "user_directive_proceed_stable_release_critical_crm_ops_leads_20260802T1702-0600",
+  "allowedExecutions": 1,
+  "consumed": false,
+  "validatorStaleCorrection": "RUNTIME_SINGLE_SESSION_DEFINITION_VS_INVOCATION",
+  "priorFailure": {
+    "run": 30772197420,
+    "job": 91561171817,
+    "artifact": 8840873512,
+    "artifactDigest": "sha256:92cabe9c606b1c5639708b83ed940702e36dbf8e406cb082cd4c962dbaf1b8f4",
+    "classification": "VALIDATOR_STALE",
+    "failedCheck": "RUNTIME_SINGLE_SESSION",
+    "productDefect": false,
+    "replayAllowed": false
+  },
+  "scope": {
+    "packageInert": true,
+    "singleBrowserRuntimeSource": true,
+    "singleLegalAcceptance": true,
+    "crm": true,
+    "ops": true,
+    "leads": true,
+    "focusedAcademiaRuntime": false,
+    "cloudPackageSent": false
+  },
+  "capabilities": {
+    "secrets": false,
+    "firestoreRead": false,
+    "runtime": false,
+    "browser": false,
+    "writes": false,
+    "deploy": false,
+    "production": false
+  },
+  "expected": {
+    "status": "GATE711_RUNTIME_PACKAGE_READINESS_PASS",
+    "classification": "GO_STATIC_RUNTIME_PACKAGE_CRM_OPS_LEADS",
+    "checks": "38/38",
+    "productDiff": 0,
+    "authorizationActive": false
+  },
+  "stopRetryOnSameStageOrFailureFamily": true,
+  "containsPII": false,
+  "containsSecrets": false
+}
