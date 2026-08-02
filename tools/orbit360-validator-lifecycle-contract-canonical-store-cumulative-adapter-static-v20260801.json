@@ -1,0 +1,95 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
+  "gateId": "block7-canonical-store-cumulative-adapter-static-v20260801",
+  "gateContractVersion": "7.10.0",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
+  "status": "CANONICAL_STORE_CUMULATIVE_ADAPTER_STATIC_AUTHORIZED",
+  "executionProfile": {
+    "phase": "STATIC_PREFLIGHT",
+    "capabilities": {
+      "secrets": false,
+      "firestoreRead": false,
+      "writes": false,
+      "runtime": false,
+      "browser": false,
+      "deploy": false,
+      "functionsDeploy": false,
+      "rulesDeploy": false,
+      "production": false
+    }
+  },
+  "singleGate": true,
+  "blockOwner": "Orbit.store",
+  "authorization": {
+    "authorizedBy": "Paula Osorio",
+    "authorizedAt": "2026-08-01T22:05:00-06:00",
+    "authorizationRef": "user_proceed_definitive_solutions_no_trial_error_20260801",
+    "explicit": true,
+    "allowedExecutions": 1,
+    "consumed": false
+  },
+  "sourceGate": {
+    "gateId": "block7-policies-full-canonical-revalidation-readonly-v20260801",
+    "contractVersion": "7.9.0",
+    "run": 30731043017,
+    "job": 91451425024,
+    "artifact": 8827973728,
+    "artifactDigest": "sha256:22b0329c611fe297d116223e82db8c8f4cacf336526ddaa628942c8f5e85d272",
+    "status": "POLICIES_FULL_CANONICAL_REVALIDATION_READONLY_CLOSED",
+    "canonicalSnapshotDigest": "19e1927d39f6b713ee12504f8762bc42ead9de6e365bb0f12162d2a0c8f8469b",
+    "closed": true
+  },
+  "baseline": {
+    "commit": "a0c430d7ae2856b5fe45207fb0820dcd9bb45809",
+    "trackedFiles": 308,
+    "pathDigest": "0c3dbf222646ea46b57e838359ac56fff3994268a97e0d682508bd747a29f3c4",
+    "contentDigest": "5b32b90815929acc341cfd4ae7c1e5f76d819e1a6a1b4091d13800508ab9b647",
+    "indexDigest": "54df4a1977573ccc6a0702bd0012f2835fcef4cb529e327d16918c4b420382a4"
+  },
+  "allowedRuntimeDelta": [
+    "orbit360-platform/index.html",
+    "orbit360-platform/core/backend-lab-init.js",
+    "orbit360-platform/core/backend-lab-canonical-view-sync.js",
+    "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+    "orbit360-platform/data/store-firestore-lab.local.js"
+  ],
+  "contract": {
+    "canonicalCollections": ["clientes", "aseguradoras", "polizas", "vehiculos", "recibosEsperados", "carteraPrimas", "cobros"],
+    "canonicalPathTemplate": "tenants/{tenantId}/data/{collection}/items",
+    "legacyUnmigratedPathTemplate": "tenantId/{tenantId}/{collection}",
+    "singleReadOwner": "Orbit.store",
+    "preservePublicApi": ["all", "get", "where", "find", "insert", "update", "remove", "on", "_emit", "pref", "setPref", "init", "reseed", "raw"],
+    "excludeCanonicalSeedsOperationally": true,
+    "preserveRequiresValidation": true,
+    "directFirestoreInModulesAllowed": false,
+    "parallelFirestoreListenersInVisualBridgeAllowed": false,
+    "parallelStoreCacheInVisualBridgeAllowed": false,
+    "oldReceiptsPortfolioProjectionRuntimeAllowed": false,
+    "allModulesPreserved": true
+  },
+  "humanApproval": {
+    "clientes": true,
+    "polizas": false,
+    "vehiculos": false,
+    "recibos": false,
+    "cartera": false,
+    "restoCrm": false,
+    "automatedGateMaySetApproval": false
+  },
+  "guards": {
+    "firestoreDataWritesAllowed": false,
+    "operationalWritesAllowed": 0,
+    "reimportAllowed": false,
+    "browserAllowed": false,
+    "previewAllowed": false,
+    "hostingDeployAllowed": false,
+    "firestoreRulesDeployAllowed": false,
+    "functionsDeployAllowed": false,
+    "productionAllowed": false,
+    "mainAllowed": false,
+    "mergeAllowed": false,
+    "reopenFrozenGateAllowed": false
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
