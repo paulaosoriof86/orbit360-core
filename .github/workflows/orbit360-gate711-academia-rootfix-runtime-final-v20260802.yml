@@ -1,0 +1,148 @@
+name: Orbit 360 · Gate 7.11 · cierre root fix Academia · runtime
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-requests/gate711-academia-rootfix-runtime-final-v20260802.json'
+permissions:
+  contents: read
+  statuses: write
+concurrency:
+  group: orbit360-gate711-academia-rootfix-runtime-final-v20260802
+  cancel-in-progress: false
+env:
+  REQUEST_FILE: .github/orbit360-requests/gate711-academia-rootfix-runtime-final-v20260802.json
+  LIFECYCLE_FILE: tools/orbit360-validator-lifecycle-contract-gate711-write-owner-diagnostic-runtime-v20260802.json
+  CANONICAL_REQUEST_FILE: .github/orbit360-requests/canonical-runtime-cumulative-visual-lab-v20260801.json
+  CANONICAL_LIFECYCLE_FILE: tools/orbit360-validator-lifecycle-contract-canonical-runtime-cumulative-visual-lab-v20260801.json
+  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+  PROJECT_ID: ays-orbit-360-lab
+  TENANT_ID: alianzas-soluciones
+  MANIFEST_DIGEST: 9e737a2e20ee868ec804a66d249957260164ea393ed4576d4a67b3508a00f762
+jobs:
+  verify:
+    name: Gate 7.11 · root fix Academia · Dirección, Operativo y Asesor
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Checkout SHA exacto
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Preparar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Preflight rector y ledger antes de secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = 'ays/backend-tenant-lab-v99-20260703'
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          test "$(git rev-parse HEAD^)" = "$(jq -r '.parentHead' "$REQUEST_FILE")"
+          mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
+          test "${#CHANGED[@]}" = '1'
+          test "${CHANGED[0]}" = "$REQUEST_FILE"
+          jq -e --arg manifest "$MANIFEST_DIGEST" '.schemaVersion=="orbit360-canonical-runtime-cumulative-visual-lab-request-v1" and .gateId=="block7-canonical-runtime-cumulative-visual-lab-v20260801" and .contractVersion=="7.11.0" and .authorizationRef=="user_continue_urgent_root_cause_macro_gate711_20260802T1245-0600" and .approved==true and .allowedExecutions==1 and .consumed==false and .rootFixVerificationOnly==true and .cumulativeManifest.contentDigest==$manifest and .identity.existingOnly==true and .identity.createUser==false and .identity.updateUser==false and .scope.snapshotBeforeAfter==true and .scope.browserWriteGuard==true and .scope.roles==3 and .scope.viewports==3 and .scope.routes==3 and .capabilities.secrets==true and .capabilities.firestoreRead==true and .capabilities.writes==false and .capabilities.runtime==true and .capabilities.browser==true and .capabilities.deploy==false and .capabilities.production==false' "$REQUEST_FILE" >/dev/null
+          jq -e --arg manifest "$MANIFEST_DIGEST" '.status=="CANONICAL_RUNTIME_CUMULATIVE_VISUAL_LAB_AUTHORIZED" and .rootFixVerificationOnly==true and .authorization.authorizationRef=="user_continue_urgent_root_cause_macro_gate711_20260802T1245-0600" and .authorization.allowedExecutions==1 and .authorization.consumed==false and .diagnosticEvidence.status=="GATE711_BROWSER_WRITE_OWNER_DIAGNOSTIC_CAPTURED" and .rootCause.classification=="FUNCTIONAL_DEFECT" and .rootFix.commit=="fd49e1b15e69d1f023727b4ff92190852bcae1e0" and .staticRootFixEvidence.status=="GATE711_ACADEMIA_OPERATIONAL_IDEMPOTENCE_STATIC_PASS" and .manifestRootFixEvidence.status=="GATE711_CUMULATIVE_VISUAL_MANIFEST_ROOTFIX_PASS" and .cumulativeManifest.contentDigest==$manifest and .guards.firestoreDataWritesAllowed==false and .guards.operationalWritesAllowed==0 and .guards.reimportAllowed==false and .guards.hostingDeployAllowed==false and .guards.productionAllowed==false' "$LIFECYCLE_FILE" >/dev/null
+          node --check orbit360-platform/data/academia-v1230-operational-directory-v20260722.js
+          node --check tools/orbit360-validar-academia-operational-idempotence-gate711-v20260802.mjs
+          node --check tools/orbit360-validar-identity-ephemeral-path-contract-v20260802.mjs
+          node --check tools/orbit360-derivar-cumulative-visual-manifest-academia-rootfix-v20260802.mjs
+          node --check tools/orbit360-verificar-academia-zero-writes-role-switch-gate711-v20260802.mjs
+          node tools/orbit360-validar-academia-operational-idempotence-gate711-v20260802.mjs
+          jq -e '.ok==true and .status=="GATE711_ACADEMIA_OPERATIONAL_IDEMPOTENCE_STATIC_PASS" and .total==16 and .passed==16 and .failed==0 and .synthetic.afterThreeRoleChanges==5 and .secretAccess==false and .runtimeExecuted==false' "$EVIDENCE_DIR/gate711-academia-operational-idempotence-static-v20260802.json" >/dev/null
+          node tools/orbit360-validar-identity-ephemeral-path-contract-v20260802.mjs
+          jq -e '.ok==true and .status=="GATE711_IDENTITY_EPHEMERAL_PATH_STATIC_PASS" and .total==12 and .passed==12 and .failed==0 and .secretAccess==false and .runtimeExecuted==false' "$EVIDENCE_DIR/gate711-identity-ephemeral-path-static-v20260802.json" >/dev/null
+          node tools/orbit360-derivar-cumulative-visual-manifest-academia-rootfix-v20260802.mjs
+          jq -e --arg manifest "$MANIFEST_DIGEST" '.ok==true and .status=="GATE711_CUMULATIVE_VISUAL_MANIFEST_ROOTFIX_PASS" and .total==10 and .passed==10 and .failed==0 and .newManifest.contentDigest==$manifest and (.changedVisualPaths|length)==1 and .changedVisualPaths[0]=="orbit360-platform/data/academia-v1230-operational-directory-v20260722.js" and .secretAccess==false and .runtimeExecuted==false' "$EVIDENCE_DIR/gate711-cumulative-visual-manifest-academia-rootfix-v20260802.json" >/dev/null
+          cp "$REQUEST_FILE" "$CANONICAL_REQUEST_FILE"
+          cp "$LIFECYCLE_FILE" "$CANONICAL_LIFECYCLE_FILE"
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs block7-canonical-runtime-cumulative-visual-lab-v20260801
+          jq -e '.status=="GO_GATE_CONTRACT" and .classification=="CANONICAL_RUNTIME_CUMULATIVE_VISUAL_LAB_READY" and .executionAuthorized==true and .secretAccessAuthorized==true and .firestoreReadAuthorized==true and .writeAuthorized==false and .runtimeAuthorized==true and .browserAuthorized==true and .deployAuthorized==false and .productionAuthorized==false and .failed==0 and .authorizationBinding.requestMatchesLifecycle==true' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+      - name: Instalar dependencias controladas
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false --ignore-scripts firebase-admin@13 firebase@11 google-auth-library@9 playwright@1.52.0 >/dev/null
+          npx playwright install --with-deps chromium >/dev/null
+      - name: Ejecutar cierre runtime read-only
+        env:
+          SA_ORBIT360_LAB: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}'
+          SA_ORBIT_360_LAB: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}'
+          SA_DEFAULT: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
+        shell: bash
+        run: |
+          set -euo pipefail
+          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-${SA_ORBIT_360_LAB:-${SA_DEFAULT:-}}}"
+          test -n "$SERVICE_ACCOUNT"
+          KEY_FILE="$RUNNER_TEMP/orbit360-gate711-academia-final-service-account.json"
+          TOKEN_FILE="$RUNNER_TEMP/orbit360-gate711-academia-final-token.txt"
+          CONFIG_FILE="$GITHUB_WORKSPACE/orbit360-platform/core/auth-firebase.config.local.js"
+          SERVER_PID=''
+          cleanup() {
+            if [ -n "${SERVER_PID:-}" ]; then kill "$SERVER_PID" 2>/dev/null || true; fi
+            if [ -f "$KEY_FILE" ]; then shred -u "$KEY_FILE" || rm -f "$KEY_FILE"; fi
+            if [ -f "$TOKEN_FILE" ]; then shred -u "$TOKEN_FILE" || rm -f "$TOKEN_FILE"; fi
+            rm -f "$CONFIG_FILE"
+          }
+          trap cleanup EXIT
+          printf '%s' "$SERVICE_ACCOUNT" > "$KEY_FILE"
+          chmod 600 "$KEY_FILE"
+          test "$(jq -r '.project_id // empty' "$KEY_FILE")" = "$PROJECT_ID"
+          export GOOGLE_APPLICATION_CREDENTIALS="$KEY_FILE"
+          export ORBIT360_PRODUCT_PROJECT_ID="$PROJECT_ID"
+          export ORBIT360_PRODUCT_TENANT_ID="$TENANT_ID"
+          export ORBIT360_CUSTOM_TOKEN_FILE="$TOKEN_FILE"
+          export ORBIT360_LOCAL_FIREBASE_CONFIG_FILE="$CONFIG_FILE"
+          node tools/orbit360-preparar-identidad-browser-canonica-readonly-v20260801.mjs
+          jq -e '.ok==true and .status=="CANONICAL_BROWSER_EXISTING_IDENTITY_READY" and .eligibleExistingIdentityCount==1 and .uidMatched==true and .emailMatched==true and .customTokenCreatedEphemeral==true and .explicitConfigPathHonored==true and .explicitTokenPathHonored==true and .authWrites==0 and .firestoreWrites==0 and .operationalWrites==0 and .containsPII==false and .containsSecrets==false' "$EVIDENCE_DIR/canonical-browser-identity-readonly-v20260801.json" >/dev/null
+          test -s "$TOKEN_FILE"
+          test -s "$CONFIG_FILE"
+          node tools/orbit360-revalidar-policies-full-canonical-readonly-v20260801.mjs
+          jq -e '.ok==true and .status=="POLICIES_FULL_CANONICAL_REVALIDATION_READONLY_PASS" and .digests.canonicalDigestSealed=="19e1927d39f6b713ee12504f8762bc42ead9de6e365bb0f12162d2a0c8f8469b" and .cumulativeVisualGuard.manifestMatches==true and .cumulativeVisualGuard.contentDigest=="9e737a2e20ee868ec804a66d249957260164ea393ed4576d4a67b3508a00f762" and .firestoreWrites==0 and .operationalWrites==0' "$EVIDENCE_DIR/policies-full-canonical-revalidation-readonly-v20260801.json" >/dev/null
+          cp "$EVIDENCE_DIR/policies-full-canonical-revalidation-readonly-v20260801.json" "$EVIDENCE_DIR/gate711-academia-root-fix-before-v20260802.json"
+          python3 -m http.server 4173 --directory orbit360-platform >"$RUNNER_TEMP/orbit360-gate711-academia-final-http.log" 2>&1 &
+          SERVER_PID=$!
+          for i in $(seq 1 40); do
+            if curl -fsS 'http://127.0.0.1:4173/index.html' >/dev/null; then break; fi
+            sleep 0.25
+          done
+          curl -fsS 'http://127.0.0.1:4173/index.html' >/dev/null
+          export ORBIT360_BASE_URL='http://127.0.0.1:4173/index.html?orbitBackend=firestore-lab&tenant=alianzas-soluciones#/inicio'
+          node tools/orbit360-verificar-academia-zero-writes-role-switch-gate711-v20260802.mjs
+          jq -e '.ok==true and .status=="GATE711_ACADEMIA_ZERO_WRITES_ROLE_SWITCH_RUNTIME_PASS" and .classification=="ROOT_FIX_RUNTIME_VERIFIED" and .checks.identity==true and .checks.store==true and .checks.legalSettled==true and .checks.rootFixMarker==true and .checks.staticContentReadyBeforeGuard==true and .checks.rolesVisited==3 and .checks.contentReadyAfterRoles==true and .checks.zeroWriteAttempts==true and (.writeGuard.calls|length)==0 and .firestoreWrites==0 and .operationalWrites==0 and .reimportExecuted==false and .deployExecuted==false and .production==false and .containsPII==false and .containsValues==false and .containsSecrets==false' "$EVIDENCE_DIR/gate711-academia-zero-writes-role-switch-runtime-v20260802.json" >/dev/null
+          node tools/orbit360-revalidar-policies-full-canonical-readonly-v20260801.mjs
+          jq -e '.ok==true and .status=="POLICIES_FULL_CANONICAL_REVALIDATION_READONLY_PASS" and .digests.canonicalDigestSealed=="19e1927d39f6b713ee12504f8762bc42ead9de6e365bb0f12162d2a0c8f8469b" and .cumulativeVisualGuard.manifestMatches==true and .firestoreWrites==0 and .operationalWrites==0' "$EVIDENCE_DIR/policies-full-canonical-revalidation-readonly-v20260801.json" >/dev/null
+          cp "$EVIDENCE_DIR/policies-full-canonical-revalidation-readonly-v20260801.json" "$EVIDENCE_DIR/gate711-academia-root-fix-after-v20260802.json"
+          test "$(jq -r '.digests.sourceSnapshotDigest' "$EVIDENCE_DIR/gate711-academia-root-fix-before-v20260802.json")" = "$(jq -r '.digests.sourceSnapshotDigest' "$EVIDENCE_DIR/gate711-academia-root-fix-after-v20260802.json")"
+          test "$(jq -r '.digests.targetSnapshotDigest' "$EVIDENCE_DIR/gate711-academia-root-fix-before-v20260802.json")" = "$(jq -r '.digests.targetSnapshotDigest' "$EVIDENCE_DIR/gate711-academia-root-fix-after-v20260802.json")"
+      - name: Subir evidencia sanitizada
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-gate711-academia-rootfix-runtime-final-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/gate711-academia-operational-idempotence-static-v20260802.json
+            orbit360-platform/runtime-gate-crm-v20260716/gate711-identity-ephemeral-path-static-v20260802.json
+            orbit360-platform/runtime-gate-crm-v20260716/gate711-cumulative-visual-manifest-academia-rootfix-v20260802.json
+            orbit360-platform/runtime-gate-crm-v20260716/canonical-browser-identity-readonly-v20260801.json
+            orbit360-platform/runtime-gate-crm-v20260716/policies-full-canonical-revalidation-readonly-v20260801.json
+            orbit360-platform/runtime-gate-crm-v20260716/gate711-academia-root-fix-before-v20260802.json
+            orbit360-platform/runtime-gate-crm-v20260716/gate711-academia-zero-writes-role-switch-runtime-v20260802.json
+            orbit360-platform/runtime-gate-crm-v20260716/gate711-academia-root-fix-after-v20260802.json
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Publicar estado observable
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/gate711-academia-zero-writes-role-switch-runtime-v20260802.json
+        with:
+          script: |
+            const fs=require('fs');let state='failure',description='Gate 7.11 Academia root fix final failed';
+            try{const p=JSON.parse(fs.readFileSync(process.env.EVIDENCE,'utf8'));if(p.ok===true&&p.status==='GATE711_ACADEMIA_ZERO_WRITES_ROLE_SWITCH_RUNTIME_PASS'&&p.firestoreWrites===0&&p.operationalWrites===0&&p.writeGuard?.calls?.length===0){state='success';description='Academia root cause closed; three roles produce zero writes';}}catch(e){}
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/gate711-academia-rootfix-runtime-final',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
