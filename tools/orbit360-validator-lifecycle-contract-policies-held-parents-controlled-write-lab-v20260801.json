@@ -3,7 +3,7 @@
   "gateId": "block7-policies-held-parents-controlled-write-lab-v20260801",
   "gateContractVersion": "7.8.0",
   "validatorLifecycleRevision": "phase-capability-contract-v1",
-  "status": "POLICIES_HELD_PARENTS_CONTROLLED_WRITE_AUTHORIZED",
+  "status": "POLICIES_HELD_PARENTS_CONTROLLED_WRITE_CLOSED",
   "executionProfile": {
     "phase": "LAB_DATA_CONTRACT_REPAIR_APPLY",
     "capabilities": {
@@ -26,7 +26,14 @@
     "authorizationRef": "user_authorized_held_parents_controlled_write_20_20260801",
     "explicit": true,
     "allowedExecutions": 1,
-    "consumed": false
+    "consumed": true,
+    "consumedByRun": 30730683228,
+    "requestReplayBlocked": true,
+    "replayBlockMechanisms": [
+      "TARGET_SNAPSHOT_DIGEST_CHANGED",
+      "CREATE_PRECONDITION_REJECTS_EXISTING_DOCUMENTS",
+      "LIFECYCLE_CLOSED"
+    ]
   },
   "sourceDiagnostic": {
     "gateId": "block7-policies-hold-parent-dependency-diagnostic-readonly-v20260801",
@@ -37,6 +44,29 @@
     "artifactDigest": "sha256:f1656d5f1a2a59468ba734e46574eb0536f1da19a640be3d5db535b5eeb794ec",
     "head": "ed5efd9a47f743dcef9d3c5fc252232213b3c9a1",
     "status": "POLICIES_HOLD_PARENT_DEPENDENCY_DIAGNOSTIC_READONLY_CLOSED",
+    "closed": true
+  },
+  "executionResult": {
+    "run": 30730683228,
+    "job": 91450453030,
+    "artifact": 8827868101,
+    "artifactDigest": "sha256:933d4f2d54173460b3d34ec92c49262c97d07ff6e424353a230d15f166a47bf6",
+    "head": "6cd5e9f9dfcaf7f156b5d733236b3db4eea6368e",
+    "status": "POLICIES_HELD_PARENTS_CONTROLLED_WRITE_PASS",
+    "classification": "GO_LAB_HELD_PARENTS_CONTROLLED_WRITE_CLOSED",
+    "preflightPassed": 17,
+    "preflightFailed": 0,
+    "atomicBatchesPlanned": 1,
+    "atomicBatchesCommitted": 1,
+    "createdClients": 16,
+    "createdInsurers": 4,
+    "createdDocuments": 20,
+    "updatedDocuments": 0,
+    "overwrittenDocuments": 0,
+    "firestoreWrites": 20,
+    "operationalWrites": 20,
+    "rollbackExecuted": false,
+    "postVerificationPassed": true,
     "closed": true
   },
   "writePlan": {
@@ -58,36 +88,56 @@
   "digests": {
     "sourceSnapshotDigest": "88b8e16b0d4531b2f5c0ce2b1a21068837853080943f7584f6f3fab0cc2ff18d",
     "targetSnapshotBeforeDigest": "724e1efbbc29f60791350ea180ef54230ecf888f9914b98fc70fda62ca6ac305",
-    "dryRunPlanDigest": "de72758f0f2097471bb9183879b8039154b0c063d79e7678393575a5a97f97c8"
+    "dryRunPlanDigest": "de72758f0f2097471bb9183879b8039154b0c063d79e7678393575a5a97f97c8",
+    "targetSnapshotAfterDigest": "19e1927d39f6b713ee12504f8762bc42ead9de6e365bb0f12162d2a0c8f8469b"
   },
-  "expectedBefore": {
-    "clientes": 414,
-    "aseguradoras": 26,
-    "polizas": 1375,
-    "vehiculos": 1033,
-    "recibosEsperados": 1294,
-    "carteraPrimas": 673,
-    "cobros": 7,
-    "total": 4822
+  "collectionResult": {
+    "clientes": {"before": 414, "created": 16, "after": 430},
+    "aseguradoras": {"before": 26, "created": 4, "after": 30},
+    "polizas": {"before": 1375, "created": 0, "after": 1375},
+    "vehiculos": {"before": 1033, "created": 0, "after": 1033},
+    "recibosEsperados": {"before": 1294, "created": 0, "after": 1294},
+    "carteraPrimas": {"before": 673, "created": 0, "after": 673},
+    "cobros": {"before": 7, "created": 0, "after": 7},
+    "total": {"before": 4822, "created": 20, "after": 4842}
   },
-  "expectedAfter": {
-    "clientes": 430,
-    "aseguradoras": 30,
-    "polizas": 1375,
-    "vehiculos": 1033,
-    "recibosEsperados": 1294,
-    "carteraPrimas": 673,
-    "cobros": 7,
-    "total": 4842
+  "snapshotAndRollback": {
+    "privateSnapshotCreated": true,
+    "snapshotEntries": 4822,
+    "snapshotStoredInArtifact": false,
+    "snapshotDigest": "724e1efbbc29f60791350ea180ef54230ecf888f9914b98fc70fda62ca6ac305",
+    "singleAtomicBatch": true,
+    "createOnly": true,
+    "createPreconditionsUsed": true,
+    "rollbackAvailable": true,
+    "rollbackRequired": false,
+    "rollbackExecuted": false
+  },
+  "postVerification": {
+    "countsMatch": true,
+    "contentMatch": true,
+    "sourceUnchanged": true,
+    "createdPayloadsMatch": true,
+    "requiresValidationPreserved": true,
+    "affectedPoliciesVerified": 75,
+    "affectedDescendantsVerified": 162,
+    "allPolicyRelationsResolved": true,
+    "unresolvedBatchReferencesWritten": 0
+  },
+  "sourceFrozenGate": {
+    "gateId": "block7-policies-canonical-postwrite-revalidation-readonly-v20260801",
+    "contractVersion": "7.6.0",
+    "status": "POLICIES_CANONICAL_POSTWRITE_REVALIDATION_FROZEN_DATA_CONTRACT_FAILURE",
+    "reopened": false,
+    "additionalAttemptsAllowed": false
   },
   "cumulativeVisualGuard": {
     "required": true,
-    "requiredBranch": "ays/backend-tenant-lab-v99-20260703",
-    "pullRequest": 5,
     "trackedFileCount": 308,
     "pathDigest": "0c3dbf222646ea46b57e838359ac56fff3994268a97e0d682508bd747a29f3c4",
     "contentDigest": "5b32b90815929acc341cfd4ae7c1e5f76d819e1a6a1b4091d13800508ab9b647",
     "indexDigest": "54df4a1977573ccc6a0702bd0012f2835fcef4cb529e327d16918c4b420382a4",
+    "manifestReverified": true,
     "noParallelShell": true,
     "noReducedShell": true,
     "noModuleFragmentation": true,
@@ -104,8 +154,8 @@
     "automatedGateMaySetApproval": false
   },
   "guards": {
-    "firestoreDataWritesAllowed": true,
-    "operationalWritesAllowed": 20,
+    "firestoreDataWritesAllowed": false,
+    "operationalWritesAllowed": 0,
     "updatesAllowed": 0,
     "overwritesAllowed": 0,
     "reimportAllowed": false,
@@ -118,7 +168,39 @@
     "productionAllowed": false,
     "mainAllowed": false,
     "mergeAllowed": false,
-    "reopenFrozenGateAllowed": false
+    "reopenFrozenGateAllowed": false,
+    "additionalExecutionsAllowed": false
+  },
+  "security": {
+    "firestoreRead": true,
+    "firestoreWrites": 20,
+    "operationalWrites": 20,
+    "reimportExecuted": false,
+    "frontendAdapted": false,
+    "browserExecuted": false,
+    "previewExecuted": false,
+    "deployExecuted": false,
+    "rulesApplied": false,
+    "functionsDeployed": false,
+    "productionTouched": false,
+    "mainTouched": false,
+    "mergeExecuted": false
+  },
+  "nextGateCondition": {
+    "newAuthorizationRequired": true,
+    "requiredGateType": "FULL_CANONICAL_POST_PARENT_WRITE_REVALIDATION_READONLY",
+    "sourceDocuments": 4837,
+    "canonicalDocuments": 4842,
+    "operationalSharedIdsExpected": 4837,
+    "canonicalSeedHoldsExpected": 5,
+    "verifyAllPolicies": 1373,
+    "verifyAllVehicles": 1032,
+    "verifyAllReceipts": 1294,
+    "verifyAllPortfolio": 673,
+    "verifyAllCollections": 5,
+    "writesAllowed": false,
+    "frontendAdaptationAuthorized": false,
+    "visualizationAuthorized": false
   },
   "containsPII": false,
   "containsSecrets": false
