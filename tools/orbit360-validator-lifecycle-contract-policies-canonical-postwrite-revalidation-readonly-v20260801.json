@@ -3,7 +3,7 @@
   "gateId": "block7-policies-canonical-postwrite-revalidation-readonly-v20260801",
   "gateContractVersion": "7.6.0",
   "validatorLifecycleRevision": "phase-capability-contract-v1",
-  "status": "POLICIES_CANONICAL_POSTWRITE_REVALIDATION_READONLY_AUTHORIZED",
+  "status": "POLICIES_CANONICAL_POSTWRITE_REVALIDATION_FROZEN_DATA_CONTRACT_FAILURE",
   "executionProfile": {
     "phase": "LAB_DATA_CONTRACT_REPAIR_DRYRUN",
     "capabilities": {
@@ -26,26 +26,62 @@
     "authorizationRef": "user_authorized_canonical_postwrite_revalidation_readonly_20260801",
     "explicit": true,
     "allowedExecutions": 1,
-    "attemptsUsed": 1,
+    "attemptsUsed": 2,
     "validExecutionConsumed": false,
-    "consumed": false
+    "consumed": true,
+    "requestReplayBlocked": true,
+    "frozenAfterSecondFailure": true
   },
-  "validatorStaleCorrection": {
-    "firstRun": 30727254049,
-    "firstJob": 91441116427,
-    "firstArtifact": 8826767205,
-    "firstArtifactDigest": "sha256:feef90a2fc6e46d5e2602118806b5a5a4db42887bdaa0fb151e4d6f602e85695",
-    "firstHead": "d0ec374d73fcb42c8fddead3475bceb728203617",
-    "classification": "VALIDATOR_STALE",
-    "rootCauseCode": "VALIDATOR_STALE_UNDEFINED_EVIDENCE_PROPERTY",
-    "invalidatedFinding": "NO_DATA_FINDING_PRODUCED",
-    "sourceDigestMatched": true,
-    "targetDigestMatched": true,
-    "firestoreWrites": 0,
-    "operationalWrites": 0,
-    "correctedProperty": "exactCreatedParity: exactParity",
-    "dataDefectDeclared": false,
-    "corrected": true
+  "attempts": {
+    "first": {
+      "run": 30727254049,
+      "job": 91441116427,
+      "artifact": 8826767205,
+      "artifactDigest": "sha256:feef90a2fc6e46d5e2602118806b5a5a4db42887bdaa0fb151e4d6f602e85695",
+      "head": "d0ec374d73fcb42c8fddead3475bceb728203617",
+      "classification": "VALIDATOR_STALE",
+      "rootCauseCode": "VALIDATOR_STALE_UNDEFINED_EVIDENCE_PROPERTY",
+      "sourceDigestMatched": true,
+      "targetDigestMatched": true,
+      "firestoreWrites": 0,
+      "operationalWrites": 0,
+      "invalidated": true
+    },
+    "second": {
+      "run": 30727341881,
+      "job": 91441364988,
+      "artifact": 8826798071,
+      "artifactDigest": "sha256:8cc12cebddb4d954f7f7bc9f7dc1c484ae040e330635567bd3a1704e215f526f",
+      "head": "0cb64b10dc14b90f45666c8c692b01570500fc94",
+      "classification": "DATA_CONTRACT_FAILURE",
+      "sourceDigestMatched": true,
+      "targetDigestMatched": true,
+      "clientsSemanticParity": 414,
+      "insurersSemanticParity": 26,
+      "clientValidationHoldsExcluded": 16,
+      "insurerValidationHoldsExcluded": 4,
+      "failureBoundary": "POLIZAS_RELATION_VALIDATION",
+      "firestoreWrites": 0,
+      "operationalWrites": 0
+    }
+  },
+  "rootCause": {
+    "classification": "DATA_CONTRACT_FAILURE",
+    "code": "CANONICAL_POLICIES_REFERENCE_EXCLUDED_VALIDATION_PARENTS",
+    "confidence": "HIGH",
+    "evidence": [
+      "GATE_7_5_CREATED_PAYLOADS_MATCHED_EXACTLY",
+      "GATE_7_5_UNRESOLVED_BATCH_REFS_WRITTEN_ZERO",
+      "GATE_7_4_SEEDS_AND_VALIDATION_CLASSIFICATION_CONFIRMED",
+      "GATE_7_6_CLIENTS_AND_INSURERS_PASSED",
+      "GATE_7_6_FAILED_AT_POLICIES_RELATION_BOUNDARY",
+      "GATE_7_4_RELATIONS_USED_FULL_430_CLIENTS_AND_30_INSURERS",
+      "GATE_7_6_RELATIONS_USED_CANONICAL_414_CLIENTS_AND_26_INSURERS"
+    ],
+    "interpretation": "At least one migrated policy depends on one or more of the 16 client or 4 insurer records intentionally excluded from the canonical operational set because they remain REQUIERE_VALIDACION.",
+    "exactAffectedPolicyCountKnown": false,
+    "dataCorruptionDeclared": false,
+    "writeRollbackRequired": false
   },
   "sourceWriteGate": {
     "gateId": "block7-policies-canonical-controlled-write-lab-v20260801",
@@ -58,44 +94,16 @@
     "status": "POLICIES_CANONICAL_CONTROLLED_WRITE_CLOSED",
     "closed": true
   },
-  "scope": {
-    "tenantId": "alianzas-soluciones",
-    "projectId": "ays-orbit-360-lab",
-    "collections": ["clientes", "aseguradoras", "polizas", "vehiculos", "recibosEsperados", "carteraPrimas", "cobros"],
-    "countryFilterApplied": false,
-    "compareCounts": true,
-    "compareIds": true,
-    "compareDigests": true,
-    "compareSchemas": true,
-    "verifyRelationships": true,
-    "verifyValidationPreservation": true,
-    "verifyHoldExclusion": true,
-    "verifyUnresolvedBatchReferencesAbsentFromCreated": true,
-    "emitDocumentIds": false,
-    "emitBusinessValues": false
-  },
-  "expectedBaseline": {
-    "sourceTotal": 4837,
-    "targetTotal": 4822,
-    "operationalSharedIds": 4817,
-    "exactCreatedParity": 4377,
-    "semanticProjectionParity": 440,
-    "legacyOnlyValidationHolds": 20,
-    "canonicalOnlySeedHolds": 5,
-    "relationshipBlockedDocuments": 0,
-    "validationMismatches": 0,
-    "unresolvedBatchReferencesInCreated": 0,
+  "verifiedState": {
     "sourceSnapshotDigest": "88b8e16b0d4531b2f5c0ce2b1a21068837853080943f7584f6f3fab0cc2ff18d",
     "targetSnapshotAfterDigest": "724e1efbbc29f60791350ea180ef54230ecf888f9914b98fc70fda62ca6ac305",
-    "counts": {
-      "clientes": {"source": 430, "target": 414, "shared": 414, "sourceOnlyHold": 16, "targetOnlySeed": 0},
-      "aseguradoras": {"source": 30, "target": 26, "shared": 26, "sourceOnlyHold": 4, "targetOnlySeed": 0},
-      "polizas": {"source": 1373, "target": 1375, "shared": 1373, "sourceOnlyHold": 0, "targetOnlySeed": 2},
-      "vehiculos": {"source": 1032, "target": 1033, "shared": 1032, "sourceOnlyHold": 0, "targetOnlySeed": 1},
-      "recibosEsperados": {"source": 1294, "target": 1294, "shared": 1294, "sourceOnlyHold": 0, "targetOnlySeed": 0},
-      "carteraPrimas": {"source": 673, "target": 673, "shared": 673, "sourceOnlyHold": 0, "targetOnlySeed": 0},
-      "cobros": {"source": 5, "target": 7, "shared": 5, "sourceOnlyHold": 0, "targetOnlySeed": 2}
-    }
+    "sourceTotal": 4837,
+    "targetTotal": 4822,
+    "clientsSemanticParity": 414,
+    "insurersSemanticParity": 26,
+    "legacyOnlyValidationHolds": 20,
+    "canonicalOnlySeedHolds": 5,
+    "firestoreWritesAcrossRevalidationAttempts": 0
   },
   "cumulativeVisualGuard": {
     "required": true,
@@ -132,7 +140,18 @@
     "functionsDeployAllowed": false,
     "productionAllowed": false,
     "mainAllowed": false,
-    "mergeAllowed": false
+    "mergeAllowed": false,
+    "additionalAttemptsAllowed": false
+  },
+  "nextGateCondition": {
+    "newAuthorizationRequired": true,
+    "requiredGateType": "READONLY_PARENT_DEPENDENCY_ROOT_CAUSE_DRYRUN",
+    "mustCountAffectedPolicies": true,
+    "mustClassifyHeldClientsVsHeldInsurers": true,
+    "mustTraceDownstreamDependencies": true,
+    "mayRecommendMigratingValidatedHoldParents": true,
+    "mayRecommendHoldingDependentPolicies": true,
+    "writesAllowed": false
   },
   "containsPII": false,
   "containsSecrets": false
