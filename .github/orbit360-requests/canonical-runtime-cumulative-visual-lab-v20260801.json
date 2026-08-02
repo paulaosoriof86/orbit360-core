@@ -12,6 +12,19 @@
   "projectId": "ays-orbit-360-lab",
   "tenantId": "alianzas-soluciones",
   "canonicalSnapshotDigest": "19e1927d39f6b713ee12504f8762bc42ead9de6e365bb0f12162d2a0c8f8469b",
+  "retry": {
+    "sameGate": true,
+    "classification": "PIPELINE_MECHANISM_FAILURE",
+    "priorRunId": 30733245148,
+    "priorJobId": 91457131076,
+    "failedStep": "Derivar web config e identidad existente",
+    "rootCause": "GITHUB_ENV written and read inside the same workflow step",
+    "productChanged": false,
+    "dataChanged": false,
+    "authChanged": false,
+    "staticSyntheticPass": true,
+    "fixCommit": "60942f4b15f0ad0d2e704e933b54b6349e4368f4"
+  },
   "cumulativeManifest": {
     "trackedFileCount": 309,
     "pathDigest": "517056dee1200503b2e7295a333cb804bc71271bbaa87847fa762da025f276f1",
