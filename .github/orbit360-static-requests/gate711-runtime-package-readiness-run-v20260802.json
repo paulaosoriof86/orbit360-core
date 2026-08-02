@@ -1,0 +1,37 @@
+{
+  "schemaVersion": "orbit360-gate711-runtime-package-readiness-request-v1",
+  "gateId": "block7-canonical-runtime-cumulative-visual-lab-v20260801",
+  "productHead": "997fca628f95dd397dba347700a6bc644fe840f0",
+  "parentHead": "6f2a5591854f133b6e56a3e7ad83de1bd99edefe",
+  "approved": true,
+  "approvalRef": "user_directive_proceed_stable_release_critical_crm_ops_leads_20260802T1702-0600",
+  "allowedExecutions": 1,
+  "consumed": false,
+  "scope": {
+    "packageInert": true,
+    "singleBrowserRuntimeSource": true,
+    "singleLegalAcceptance": true,
+    "crm": true,
+    "ops": true,
+    "leads": true,
+    "focusedAcademiaRuntime": false,
+    "cloudPackageSent": false
+  },
+  "capabilities": {
+    "secrets": false,
+    "firestoreRead": false,
+    "runtime": false,
+    "browser": false,
+    "writes": false,
+    "deploy": false,
+    "production": false
+  },
+  "expected": {
+    "status": "GATE711_RUNTIME_PACKAGE_READINESS_PASS",
+    "classification": "GO_STATIC_RUNTIME_PACKAGE_CRM_OPS_LEADS",
+    "productDiff": 0,
+    "authorizationActive": false
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
