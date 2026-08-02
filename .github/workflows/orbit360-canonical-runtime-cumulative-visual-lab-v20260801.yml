@@ -51,8 +51,11 @@ jobs:
           node --check tools/orbit360-preparar-identidad-browser-canonica-readonly-v20260801.mjs
           node --check tools/orbit360-validar-canonical-runtime-cumulative-visual-lab-v20260801.mjs
           node --check tools/orbit360-validar-legal-deferred-order-gate711-v20260802.mjs
+          node --check tools/orbit360-validar-authorization-binding-gate711-v20260802.mjs
+          node tools/orbit360-validar-authorization-binding-gate711-v20260802.mjs
+          jq -e '.ok==true and .status=="GATE711_AUTHORIZATION_BINDING_STATIC_PASS" and .classification=="GO_STATIC_AUTHORIZATION_BINDING" and .failed==0 and .secretAccess==false and .firestoreRead==false and .firestoreWrites==0 and .operationalWrites==0 and .runtimeExecuted==false and .browserExecuted==false' "$EVIDENCE_DIR/gate711-authorization-binding-static-v20260802.json" >/dev/null
           node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
-          jq -e '.status=="GO_GATE_CONTRACT" and .classification=="CANONICAL_RUNTIME_CUMULATIVE_VISUAL_LAB_READY" and .executionAuthorized==true and .secretAccessAuthorized==true and .firestoreReadAuthorized==true and .writeAuthorized==false and .runtimeAuthorized==true and .browserAuthorized==true and .previewAuthorized==false and .deployAuthorized==false and .productionAuthorized==false and .failed==0 and .operationalWrites==0' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+          jq -e '.status=="GO_GATE_CONTRACT" and .classification=="CANONICAL_RUNTIME_CUMULATIVE_VISUAL_LAB_READY" and .executionAuthorized==true and .secretAccessAuthorized==true and .firestoreReadAuthorized==true and .writeAuthorized==false and .runtimeAuthorized==true and .browserAuthorized==true and .previewAuthorized==false and .deployAuthorized==false and .productionAuthorized==false and .failed==0 and .operationalWrites==0 and .authorizationBinding.lifecycleRefPresent==true and .authorizationBinding.requestMatchesLifecycle==true' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
           node tools/orbit360-validar-legal-deferred-order-gate711-v20260802.mjs
           jq -e '.ok==true and .status=="GATE711_LEGAL_DEFERRED_ORDER_STATIC_PASS" and .classification=="GO_STATIC_LEGAL_DEFERRED_ORDER" and .failed==0 and .productFilesChanged==0 and .dataFilesChanged==0 and .firestoreReads==0 and .firestoreWrites==0 and .operationalWrites==0 and .runtimeExecuted==false and .browserExecuted==false' "$EVIDENCE_DIR/gate711-legal-deferred-order-static-v20260802.json" >/dev/null
       - name: Instalar dependencias controladas
@@ -138,6 +141,7 @@ jobs:
           name: orbit360-canonical-runtime-cumulative-visual-lab-${{ github.run_id }}
           path: |
             orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/gate711-authorization-binding-static-v20260802.json
             orbit360-platform/runtime-gate-crm-v20260716/gate711-legal-deferred-order-static-v20260802.json
             orbit360-platform/runtime-gate-crm-v20260716/canonical-browser-identity-readonly-v20260801.json
             orbit360-platform/runtime-gate-crm-v20260716/canonical-runtime-before-v20260801.json
