@@ -13,11 +13,18 @@ const TENANT='alianzas-soluciones';
 const EXPECTED_UID='woJlxR1iFEeiQZvTscPj4qQ5Qc73';
 const EXPECTED_EMAIL='orbit.lab@demo.com';
 const OUT=path.join(ROOT,'orbit360-platform/runtime-gate-crm-v20260716/canonical-browser-identity-readonly-v20260801.json');
-const CONFIG=path.join(ROOT,'orbit360-platform/core/auth-firebase.config.local.js');
-const TOKEN=path.join(process.env.RUNNER_TEMP||'/tmp','orbit360-canonical-browser-token.txt');
+const DEFAULT_CONFIG=path.join(ROOT,'orbit360-platform/core/auth-firebase.config.local.js');
+const DEFAULT_TOKEN=path.join(process.env.RUNNER_TEMP||'/tmp','orbit360-canonical-browser-token.txt');
 const PRIVILEGED=new Set(['Dirección','SuperAdmin','AdminTenant']);
 function text(v){return String(v==null?'':v).trim();}
 function safe(v){return text(v).replace(/[A-Za-z0-9_-]{30,}/g,'[redacted]').replace(/[\w.+-]+@[\w.-]+/g,'[email]').slice(0,300);}
+function resolveBoundedPath(raw,fallback,allowedRoot,code){
+  const candidate=path.resolve(text(raw)||fallback),root=path.resolve(allowedRoot);
+  if(candidate!==root&&!candidate.startsWith(root+path.sep))throw new Error(`ENVIRONMENT_FAILURE:${code}`);
+  return candidate;
+}
+const CONFIG=resolveBoundedPath(process.env.ORBIT360_LOCAL_FIREBASE_CONFIG_FILE,DEFAULT_CONFIG,path.join(ROOT,'orbit360-platform/core'),'CONFIG_PATH_OUTSIDE_ALLOWED_ROOT');
+const TOKEN=resolveBoundedPath(process.env.ORBIT360_CUSTOM_TOKEN_FILE,DEFAULT_TOKEN,process.env.RUNNER_TEMP||'/tmp','TOKEN_PATH_OUTSIDE_RUNNER_TEMP');
 function save(payload){fs.mkdirSync(path.dirname(OUT),{recursive:true});fs.writeFileSync(OUT,JSON.stringify({...payload,containsPII:false,containsSecrets:false},null,2)+'\n','utf8');}
 async function resolveWebConfig(){
   const google=new GoogleAuth({scopes:['https://www.googleapis.com/auth/cloud-platform.read-only']});const client=await google.getClient();
@@ -49,8 +56,10 @@ try{
   const token=await auth.createCustomToken(candidate.uid,{orbitTenant:TENANT,orbitReadOnlyVisualGate:true});
   const publicConfig={apiKey:config.apiKey,authDomain:config.authDomain,projectId:config.projectId,storageBucket:config.storageBucket||'',messagingSenderId:config.messagingSenderId||'',appId:config.appId};
   const js=`window.ORBIT_FIREBASE_LAB_CONFIG=${JSON.stringify(publicConfig)};\nwindow.OrbitBackend=Object.assign({},window.OrbitBackend||{},{firebaseConfigSource:'firebase-management-api-readonly',firebaseConfigScope:'lab-only',firebaseConfigTenant:'${TENANT}'});\n`;
+  fs.mkdirSync(path.dirname(CONFIG),{recursive:true});
+  fs.mkdirSync(path.dirname(TOKEN),{recursive:true});
   fs.writeFileSync(CONFIG,js,'utf8');fs.writeFileSync(TOKEN,token,'utf8');fs.chmodSync(TOKEN,0o600);
   if(process.env.GITHUB_ENV)fs.appendFileSync(process.env.GITHUB_ENV,`ORBIT360_CUSTOM_TOKEN_FILE=${TOKEN}\nORBIT360_LOCAL_FIREBASE_CONFIG_FILE=${CONFIG}\n`);
-  save({schemaVersion:'orbit360-canonical-browser-identity-readonly-v1',projectId:PROJECT,tenantId:TENANT,status:'CANONICAL_BROWSER_EXISTING_IDENTITY_READY',classification:'GO_LAB_EXISTING_IDENTITY_READONLY',webConfigDerivedReadOnly:true,webAppCount,authRead:true,firestoreRead:true,authUserCount,membershipCount,eligibleExistingIdentityCount:1,uidMatched:true,emailMatched:true,activeRoleAssigned:Boolean(candidate.activeRole),roleCount:candidate.roles.length,countryCount:candidate.countries.length,customTokenCreatedEphemeral:true,configWrittenToIgnoredLocalFile:true,tokenWrittenToRunnerTemp:true,authWrites:0,firestoreWrites:0,operationalWrites:0,ok:true});
+  save({schemaVersion:'orbit360-canonical-browser-identity-readonly-v1',projectId:PROJECT,tenantId:TENANT,status:'CANONICAL_BROWSER_EXISTING_IDENTITY_READY',classification:'GO_LAB_EXISTING_IDENTITY_READONLY',webConfigDerivedReadOnly:true,webAppCount,authRead:true,firestoreRead:true,authUserCount,membershipCount,eligibleExistingIdentityCount:1,uidMatched:true,emailMatched:true,activeRoleAssigned:Boolean(candidate.activeRole),roleCount:candidate.roles.length,countryCount:candidate.countries.length,customTokenCreatedEphemeral:true,configWrittenToIgnoredLocalFile:true,tokenWrittenToRunnerTemp:true,explicitConfigPathHonored:CONFIG===path.resolve(text(process.env.ORBIT360_LOCAL_FIREBASE_CONFIG_FILE)||DEFAULT_CONFIG),explicitTokenPathHonored:TOKEN===path.resolve(text(process.env.ORBIT360_CUSTOM_TOKEN_FILE)||DEFAULT_TOKEN),authWrites:0,firestoreWrites:0,operationalWrites:0,ok:true});
 }catch(error){save({schemaVersion:'orbit360-canonical-browser-identity-readonly-v1',projectId:PROJECT,tenantId:TENANT,status:'CANONICAL_BROWSER_EXISTING_IDENTITY_FAIL',classification:text(error&&error.message).split(':')[0]||'DATA_CONTRACT_FAILURE',error:safe(error&&error.message||error),authWrites:0,firestoreWrites:0,operationalWrites:0,ok:false});process.exitCode=41;
 }finally{if(app)await deleteApp(app).catch(()=>{});}
