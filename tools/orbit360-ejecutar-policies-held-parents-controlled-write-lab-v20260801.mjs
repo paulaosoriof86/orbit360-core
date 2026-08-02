@@ -26,7 +26,7 @@ function save(payload){fs.mkdirSync(path.dirname(OUT),{recursive:true});fs.write
 function rowHash(id,data){return sha(JSON.stringify({id,data:normalizeRaw(data)}));}
 function rowContentDigest(rows){return sha([...rows].sort((a,b)=>a.id.localeCompare(b.id)).map(row=>`${row.id}:${rowHash(row.id,row.data)}`).join('\n'));}
 function rowIdDigest(rows){return sha([...rows].map(row=>row.id).sort().join('\n'));}
-function globalDigest(snapshot){return sha(COLLECTIONS.map(collection=>`${collection}:${snapshot[collection].contentDigest}`).join('\n'));}
+function globalDigest(summary){return sha(COLLECTIONS.map(collection=>`${collection}:${summary[collection].contentDigest}`).join('\n'));}
 function nonEmpty(value){if(value===null||value===undefined||value==='')return false;if(Array.isArray(value))return value.length>0;if(typeof value==='object')return Object.keys(value).length>0;return true;}
 function primitives(value,prefix='',output=[]){
   if(value===null||value===undefined)return output;
@@ -38,9 +38,9 @@ function primitives(value,prefix='',output=[]){
 }
 function normalizeRef(value){const raw=text(value);if(!raw)return'';if(raw.includes('/'))return raw.split('/').filter(Boolean).pop()||raw;return raw;}
 function resolveRelation(data,known,pattern){
-  const values=primitives(data);const patterned=values.filter(item=>pattern.test(item.path));const candidates=new Set();
+  const values=primitives(data),patterned=values.filter(item=>pattern.test(item.path)),candidates=new Set();
   for(const item of patterned){const ref=normalizeRef(item.value);if(known.has(ref))candidates.add(ref);}
-  if(!candidates.size){for(const item of values){const ref=normalizeRef(item.value);if(known.has(ref))candidates.add(ref);}}
+  if(!candidates.size)for(const item of values){const ref=normalizeRef(item.value);if(known.has(ref))candidates.add(ref);}
   if(candidates.size===1)return{status:'RESOLVED',id:[...candidates][0]};
   if(candidates.size>1)return{status:'AMBIGUOUS',id:''};
   return{status:patterned.some(item=>nonEmpty(item.value))?'UNRESOLVED':'MISSING',id:''};
@@ -66,111 +66,82 @@ async function readState(db){
   return{source,target};
 }
 function summarize(rowsByCollection){const out={};for(const collection of COLLECTIONS){const rows=rowsByCollection[collection];out[collection]={count:rows.length,idDigest:rowIdDigest(rows),contentDigest:rowContentDigest(rows)};}return out;}
-function exactTargetParity(rows,targetMap){let exact=0,missing=0,mismatch=0;for(const row of rows){if(!targetMap.has(row.id)){missing++;continue;}if(rowHash(row.id,row.data)===rowHash(row.id,targetMap.get(row.id)))exact++;else mismatch++;}return{exact,missing,mismatch};}
-function aggregateParentClassification(ids,sourceMap,usage){
-  const categories={};const migratable=new Set(),correction=new Set(),unused=new Set();let validationHolds=0,sourceBackedCount=0,seedMarkers=0,referencedParents=0,totalPolicyLinks=0;const digestRows=[];
+function exactParity(row,targetMap){const data=targetMap.get(row.id);return Boolean(data)&&rowHash(row.id,row.data)===rowHash(row.id,data);}
+function classifyParents(ids,sourceMap,usage){
+  const categories={},migratable=new Set(),correction=new Set(),unused=new Set();let validationHolds=0,sourceBackedCount=0,seedMarkers=0,referencedParents=0,totalPolicyLinks=0;const digestRows=[];
   for(const id of [...ids].sort()){
     const data=sourceMap.get(id),validation=validationCategory(data),backed=sourceBacked(data),seed=seedLike(data),links=usage.get(id)||0;
     if(validation==='REQUIRES_VALIDATION')validationHolds++;if(backed)sourceBackedCount++;if(seed)seedMarkers++;if(links>0){referencedParents++;totalPolicyLinks+=links;}
-    let category;
-    if(links===0){category='HOLD_NO_ACTIVE_POLICY_DEPENDENCY';unused.add(id);}
-    else if(validation==='REQUIRES_VALIDATION'&&backed&&!seed){category='MIGRATE_RESTRICTED_PRESERVE_REQUIRES_VALIDACION';migratable.add(id);}
-    else{category='CREATE_CORRECTION_MANAGEMENT_BEFORE_PARENT_MIGRATION';correction.add(id);}
+    let category;if(links===0){category='HOLD_NO_ACTIVE_POLICY_DEPENDENCY';unused.add(id);}else if(validation==='REQUIRES_VALIDATION'&&backed&&!seed){category='MIGRATE_RESTRICTED_PRESERVE_REQUIRES_VALIDACION';migratable.add(id);}else{category='CREATE_CORRECTION_MANAGEMENT_BEFORE_PARENT_MIGRATION';correction.add(id);}
     add(categories,category);digestRows.push(`${sha(id)}|${category}|${validation}|${backed?'1':'0'}|${seed?'1':'0'}|${links}`);
   }
   return{summary:{total:ids.size,validationHolds,sourceBacked:sourceBackedCount,seedMarkers,referencedParents,totalPolicyLinks,categories,digest:sha(digestRows.join('\n'))},migratable,correction,unused};
 }
-function buildDependencyPlan(source,target){
-  const sourceMaps=Object.fromEntries(COLLECTIONS.map(collection=>[collection,new Map(source[collection].map(row=>[row.id,row.data]))]));
-  const targetMaps=Object.fromEntries(COLLECTIONS.map(collection=>[collection,new Map(target[collection].map(row=>[row.id,row.data]))]));
-  const sourceSets=Object.fromEntries(COLLECTIONS.map(collection=>[collection,new Set(sourceMaps[collection].keys())]));
-  const targetSets=Object.fromEntries(COLLECTIONS.map(collection=>[collection,new Set(targetMaps[collection].keys())]));
-  const heldClients=new Set([...sourceSets.clientes].filter(id=>!targetSets.clientes.has(id)));
-  const heldInsurers=new Set([...sourceSets.aseguradoras].filter(id=>!targetSets.aseguradoras.has(id)));
-  const clientUsage=new Map(),insurerUsage=new Map(),affectedPolicyIds=new Set(),clientAffected=new Set(),insurerAffected=new Set(),bothAffected=new Set(),policyParentLinks=new Map();
-  let policyRelationBlocked=0,policyExactTargetParity=0,policyTargetMissing=0,policyTargetMismatch=0;
+function buildPlan(source,target){
+  const sourceMaps=Object.fromEntries(COLLECTIONS.map(c=>[c,new Map(source[c].map(row=>[row.id,row.data]))]));
+  const targetMaps=Object.fromEntries(COLLECTIONS.map(c=>[c,new Map(target[c].map(row=>[row.id,row.data]))]));
+  const sourceSets=Object.fromEntries(COLLECTIONS.map(c=>[c,new Set(sourceMaps[c].keys())]));
+  const targetSets=Object.fromEntries(COLLECTIONS.map(c=>[c,new Set(targetMaps[c].keys())]));
+  const heldClients=new Set([...sourceSets.clientes].filter(id=>!targetSets.clientes.has(id))),heldInsurers=new Set([...sourceSets.aseguradoras].filter(id=>!targetSets.aseguradoras.has(id)));
+  const clientUsage=new Map(),insurerUsage=new Map(),affectedPolicies=new Map(),clientAffected=new Set(),insurerAffected=new Set(),bothAffected=new Set();let policyRelationBlocked=0,policyExactTargetParity=0,policyTargetMissing=0,policyTargetMismatch=0;
   for(const row of source.polizas){
-    const client=resolveRelation(row.data,sourceSets.clientes,/(cliente|contratante|asegurado|customer|client)/i);
-    const insurer=resolveRelation(row.data,sourceSets.aseguradoras,/(aseguradora|insurer|compania|company)/i);
+    const client=resolveRelation(row.data,sourceSets.clientes,/(cliente|contratante|asegurado|customer|client)/i),insurer=resolveRelation(row.data,sourceSets.aseguradoras,/(aseguradora|insurer|compania|company)/i);
     if(client.status!=='RESOLVED'||insurer.status!=='RESOLVED'){policyRelationBlocked++;continue;}
-    const usesClient=heldClients.has(client.id),usesInsurer=heldInsurers.has(insurer.id);
-    if(usesClient){add(clientUsage,client.id);clientAffected.add(row.id);}if(usesInsurer){add(insurerUsage,insurer.id);insurerAffected.add(row.id);}
-    if(usesClient||usesInsurer){affectedPolicyIds.add(row.id);policyParentLinks.set(row.id,{clientId:usesClient?client.id:'',insurerId:usesInsurer?insurer.id:''});if(usesClient&&usesInsurer)bothAffected.add(row.id);}
-    if(!targetMaps.polizas.has(row.id))policyTargetMissing++;else if(rowHash(row.id,row.data)===rowHash(row.id,targetMaps.polizas.get(row.id)))policyExactTargetParity++;else policyTargetMismatch++;
+    const usesClient=heldClients.has(client.id),usesInsurer=heldInsurers.has(insurer.id);if(usesClient){add(clientUsage,client.id);clientAffected.add(row.id);}if(usesInsurer){add(insurerUsage,insurer.id);insurerAffected.add(row.id);}
+    if(usesClient||usesInsurer){affectedPolicies.set(row.id,{row,clientId:client.id,insurerId:insurer.id,usesClient,usesInsurer});if(usesClient&&usesInsurer)bothAffected.add(row.id);}
+    if(!targetMaps.polizas.has(row.id))policyTargetMissing++;else if(exactParity(row,targetMaps.polizas))policyExactTargetParity++;else policyTargetMismatch++;
   }
-  const clientClass=aggregateParentClassification(heldClients,sourceMaps.clientes,clientUsage);
-  const insurerClass=aggregateParentClassification(heldInsurers,sourceMaps.aseguradoras,insurerUsage);
-  const correctionPolicyIds=new Set();for(const [policyId,links] of policyParentLinks){if((links.clientId&&clientClass.correction.has(links.clientId))||(links.insurerId&&insurerClass.correction.has(links.insurerId)))correctionPolicyIds.add(policyId);}
-  const restrictedPolicyIds=new Set([...affectedPolicyIds].filter(id=>!correctionPolicyIds.has(id)));
-  const descendants={vehiculos:{total:0,correctionPath:0,exactTargetParity:0,blocked:0},recibos:{total:0,correctionPath:0,exactTargetParity:0,blocked:0},cartera:{total:0,correctionPath:0,exactTargetParity:0,blocked:0},cobros:{total:0,correctionPath:0,exactTargetParity:0,blocked:0}};
-  const affectedReceiptIds=new Set(),correctionReceiptIds=new Set(),diagnosticRows=[];
-  for(const row of source.vehiculos){const rel=resolveRelation(row.data,sourceSets.polizas,/(poliza|policy)/i);if(rel.status!=='RESOLVED'){descendants.vehiculos.blocked++;continue;}if(affectedPolicyIds.has(rel.id)){descendants.vehiculos.total++;if(correctionPolicyIds.has(rel.id))descendants.vehiculos.correctionPath++;descendants.vehiculos.exactTargetParity+=exactTargetParity([row],targetMaps.vehiculos).exact;diagnosticRows.push(`vehiculo|${sha(row.id)}|${correctionPolicyIds.has(rel.id)?'CORRECTION':'RESTRICTED'}`);}}
-  for(const row of source.recibosEsperados){const rel=resolveRelation(row.data,sourceSets.polizas,/(poliza|policy)/i);if(rel.status!=='RESOLVED'){descendants.recibos.blocked++;continue;}if(affectedPolicyIds.has(rel.id)){affectedReceiptIds.add(row.id);descendants.recibos.total++;if(correctionPolicyIds.has(rel.id)){correctionReceiptIds.add(row.id);descendants.recibos.correctionPath++;}descendants.recibos.exactTargetParity+=exactTargetParity([row],targetMaps.recibosEsperados).exact;diagnosticRows.push(`recibo|${sha(row.id)}|${correctionPolicyIds.has(rel.id)?'CORRECTION':'RESTRICTED'}`);}}
-  for(const [collection,key] of [['carteraPrimas','cartera'],['cobros','cobros']])for(const row of source[collection]){
-    const policy=resolveRelation(row.data,sourceSets.polizas,/(poliza|policy)/i),receipt=resolveRelation(row.data,sourceSets.recibosEsperados,/(recibo|receipt)/i);
-    if(policy.status!=='RESOLVED'||receipt.status!=='RESOLVED'){descendants[key].blocked++;continue;}
-    if(affectedPolicyIds.has(policy.id)||affectedReceiptIds.has(receipt.id)){descendants[key].total++;const correction=correctionPolicyIds.has(policy.id)||correctionReceiptIds.has(receipt.id);if(correction)descendants[key].correctionPath++;descendants[key].exactTargetParity+=exactTargetParity([row],targetMaps[collection]).exact;diagnosticRows.push(`${key}|${sha(row.id)}|${correction?'CORRECTION':'RESTRICTED'}`);}
+  const clients=classifyParents(heldClients,sourceMaps.clientes,clientUsage),insurers=classifyParents(heldInsurers,sourceMaps.aseguradoras,insurerUsage),correctionPolicies=new Set();
+  for(const [id,link] of affectedPolicies)if((link.usesClient&&clients.correction.has(link.clientId))||(link.usesInsurer&&insurers.correction.has(link.insurerId)))correctionPolicies.add(id);
+  const descendants={vehiculos:[],recibosEsperados:[],carteraPrimas:[],cobros:[]},affectedReceiptIds=new Set(),diagnosticRows=[];let descendantBlocked=0;
+  for(const row of source.vehiculos){const rel=resolveRelation(row.data,sourceSets.polizas,/(poliza|policy)/i);if(rel.status!=='RESOLVED'){descendantBlocked++;continue;}if(affectedPolicies.has(rel.id)){descendants.vehiculos.push(row);diagnosticRows.push(`vehiculo|${sha(row.id)}|${correctionPolicies.has(rel.id)?'CORRECTION':'RESTRICTED'}`);}}
+  for(const row of source.recibosEsperados){const rel=resolveRelation(row.data,sourceSets.polizas,/(poliza|policy)/i);if(rel.status!=='RESOLVED'){descendantBlocked++;continue;}if(affectedPolicies.has(rel.id)){descendants.recibosEsperados.push(row);affectedReceiptIds.add(row.id);diagnosticRows.push(`recibo|${sha(row.id)}|${correctionPolicies.has(rel.id)?'CORRECTION':'RESTRICTED'}`);}}
+  for(const [collection,label] of [['carteraPrimas','cartera'],['cobros','cobros']])for(const row of source[collection]){
+    const policy=resolveRelation(row.data,sourceSets.polizas,/(poliza|policy)/i),receipt=resolveRelation(row.data,sourceSets.recibosEsperados,/(recibo|receipt)/i);if(policy.status!=='RESOLVED'||receipt.status!=='RESOLVED'){descendantBlocked++;continue;}
+    if(affectedPolicies.has(policy.id)||affectedReceiptIds.has(receipt.id)){descendants[collection].push(row);diagnosticRows.push(`${label}|${sha(row.id)}|${correctionPolicies.has(policy.id)?'CORRECTION':'RESTRICTED'}`);}
   }
-  for(const [id,links] of policyParentLinks)diagnosticRows.push(`poliza|${sha(id)}|${links.clientId?'C':'-'}${links.insurerId?'I':'-'}|${correctionPolicyIds.has(id)?'CORRECTION':'RESTRICTED'}`);
-  return{
-    sourceMaps,targetMaps,sourceSets,targetSets,heldClients,heldInsurers,clientClass,insurerClass,affectedPolicyIds,policyParentLinks,clientAffected,insurerAffected,bothAffected,correctionPolicyIds,restrictedPolicyIds,descendants,
-    policyRelationBlocked,policyExactTargetParity,policyTargetMissing,policyTargetMismatch,
-    planDigest:sha(diagnosticRows.sort().join('\n'))
-  };
+  for(const [id,link] of affectedPolicies)diagnosticRows.push(`poliza|${sha(id)}|${link.usesClient?'C':'-'}${link.usesInsurer?'I':'-'}|${correctionPolicies.has(id)?'CORRECTION':'RESTRICTED'}`);
+  return{sourceMaps,targetMaps,sourceSets,targetSets,heldClients,heldInsurers,clients,insurers,affectedPolicies,clientAffected,insurerAffected,bothAffected,correctionPolicies,descendants,descendantBlocked,policyRelationBlocked,policyExactTargetParity,policyTargetMissing,policyTargetMismatch,planDigest:sha(diagnosticRows.sort().join('\n'))};
 }
 function verifyPlan(plan){
-  const descendantTotal=Object.values(plan.descendants).reduce((n,item)=>n+item.total,0);
-  return plan.heldClients.size===16&&plan.heldInsurers.size===4&&plan.clientClass.summary.validationHolds===16&&plan.insurerClass.summary.validationHolds===4&&plan.clientClass.summary.sourceBacked===16&&plan.insurerClass.summary.sourceBacked===4&&plan.clientClass.summary.seedMarkers===0&&plan.insurerClass.summary.seedMarkers===0&&plan.clientClass.summary.referencedParents===16&&plan.insurerClass.summary.referencedParents===4&&plan.clientClass.migratable.size===16&&plan.insurerClass.migratable.size===4&&plan.correctionPolicyIds.size===0&&plan.clientClass.unused.size===0&&plan.insurerClass.unused.size===0&&plan.affectedPolicyIds.size===75&&plan.clientAffected.size===52&&plan.insurerAffected.size===23&&plan.bothAffected.size===0&&plan.policyRelationBlocked===0&&plan.policyExactTargetParity===1373&&plan.policyTargetMissing===0&&plan.policyTargetMismatch===0&&plan.descendants.vehiculos.total===47&&plan.descendants.recibos.total===76&&plan.descendants.cartera.total===38&&plan.descendants.cobros.total===1&&descendantTotal===162&&Object.values(plan.descendants).every(item=>item.blocked===0&&item.exactTargetParity===item.total)&&plan.planDigest===EXPECTED.planDigest;
+  const descendantTotal=Object.values(plan.descendants).reduce((n,rows)=>n+rows.length,0);
+  return plan.heldClients.size===16&&plan.heldInsurers.size===4&&plan.clients.summary.validationHolds===16&&plan.insurers.summary.validationHolds===4&&plan.clients.summary.sourceBacked===16&&plan.insurers.summary.sourceBacked===4&&plan.clients.summary.seedMarkers===0&&plan.insurers.summary.seedMarkers===0&&plan.clients.summary.referencedParents===16&&plan.insurers.summary.referencedParents===4&&plan.clients.migratable.size===16&&plan.insurers.migratable.size===4&&plan.clients.correction.size===0&&plan.insurers.correction.size===0&&plan.clients.unused.size===0&&plan.insurers.unused.size===0&&plan.affectedPolicies.size===75&&plan.clientAffected.size===52&&plan.insurerAffected.size===23&&plan.bothAffected.size===0&&plan.policyRelationBlocked===0&&plan.policyExactTargetParity===1373&&plan.policyTargetMissing===0&&plan.policyTargetMismatch===0&&plan.descendantBlocked===0&&plan.descendants.vehiculos.length===47&&plan.descendants.recibosEsperados.length===76&&plan.descendants.carteraPrimas.length===38&&plan.descendants.cobros.length===1&&descendantTotal===162&&Object.entries(plan.descendants).every(([c,rows])=>rows.every(row=>exactParity(row,plan.targetMaps[c])))&&plan.planDigest===EXPECTED.planDigest;
 }
 
 let app,db,batchCommitted=false;const createdRefs=[];
 const result={schemaVersion:'orbit360-policies-held-parents-controlled-write-evidence-v1',gateId:GATE,contractVersion:VERSION,status:'STARTED',classification:'',authorizationRef:AUTH_REF,requestVerified:false,lifecycleVerified:false,digestsVerified:false,planVerified:false,snapshot:{created:false,private:false,entries:0,digest:'',pathStoredInArtifact:false},before:{},after:{},plan:{createClients:0,createInsurers:0,createDocuments:0,updateDocuments:0,overwriteDocuments:0,preserveRequiresValidation:0,affectedPolicies:0,affectedDescendants:0,dryRunPlanDigest:'',expectedPostTargetDigest:'',unresolvedBatchReferences:0},execution:{attempted:false,atomicBatchesPlanned:1,atomicBatchesCommitted:0,createdDocuments:0,createOnly:true,overwriteAttempts:0,idempotencyMode:'SINGLE_ATOMIC_BATCH_CREATE_PRECONDITION_PLUS_SNAPSHOT_DIGEST'},postVerification:{executed:false,countsMatch:false,contentMatch:false,sourceUnchanged:false,createdPayloadsMatch:false,requiresValidationPreserved:false,affectedPoliciesVerified:0,affectedDescendantsVerified:0,allPolicyRelationsResolved:false},rollback:{requiredOnFailure:true,executed:false,deletedDocuments:0,restoredSnapshot:false},cumulativeVisualGuard:{},firestoreRead:false,firestoreWrites:0,operationalWrites:0,reimportExecuted:false,frontendAdapted:false,browserExecuted:false,previewExecuted:false,deployExecuted:false,rulesApplied:false,functionsDeployed:false,productionTouched:false,mainTouched:false,mergeExecuted:false,ok:false};
-
-async function rollback(){
-  if(!db||!batchCommitted||!createdRefs.length)return;
-  result.rollback.executed=true;const batch=db.batch();for(const ref of createdRefs)batch.delete(ref);await batch.commit();result.firestoreWrites+=createdRefs.length;result.rollback.deletedDocuments=createdRefs.length;
-  const restoredState=await readState(db),restoredSummary=summarize(restoredState.target);result.rollback.restoredSnapshot=globalDigest(restoredSummary)===EXPECTED.targetBeforeDigest;
-  if(!result.rollback.restoredSnapshot)throw new Error('SECURITY_FAILURE:ROLLBACK_SNAPSHOT_MISMATCH');
-}
+async function rollback(){if(!db||!batchCommitted||!createdRefs.length)return;result.rollback.executed=true;const batch=db.batch();for(const ref of createdRefs)batch.delete(ref);await batch.commit();result.firestoreWrites+=createdRefs.length;result.rollback.deletedDocuments=createdRefs.length;const restored=await readState(db);result.rollback.restoredSnapshot=globalDigest(summarize(restored.target))===EXPECTED.targetBeforeDigest;if(!result.rollback.restoredSnapshot)throw new Error('SECURITY_FAILURE:ROLLBACK_SNAPSHOT_MISMATCH');}
 
 try{
-  const requestPath=process.env.ORBIT360_REQUEST_FILE||'',lifecyclePath=process.env.ORBIT360_LIFECYCLE_FILE||'';
-  if(!requestPath||!lifecyclePath||!fs.existsSync(requestPath)||!fs.existsSync(lifecyclePath))throw new Error('ENVIRONMENT_FAILURE:CONTROL_FILES_MISSING');
+  const requestPath=process.env.ORBIT360_REQUEST_FILE||'',lifecyclePath=process.env.ORBIT360_LIFECYCLE_FILE||'';if(!requestPath||!lifecyclePath||!fs.existsSync(requestPath)||!fs.existsSync(lifecyclePath))throw new Error('ENVIRONMENT_FAILURE:CONTROL_FILES_MISSING');
   const request=JSON.parse(fs.readFileSync(requestPath,'utf8')),lifecycle=JSON.parse(fs.readFileSync(lifecyclePath,'utf8'));
   if(request.schemaVersion!=='orbit360-policies-held-parents-controlled-write-request-v1'||request.gateId!==GATE||request.contractVersion!==VERSION||request.approved!==true||request.consumed!==false||request.authorizationRef!==AUTH_REF||request.allowedExecutions!==1)throw new Error('SECURITY_FAILURE:REQUEST_INVALID');
-  if(request.scope?.createClients!==16||request.scope?.createInsurers!==4||request.scope?.createDocuments!==20||request.scope?.updateDocuments!==0||request.scope?.preserveRequiresValidation!==20||request.scope?.verifyAffectedPolicies!==75||request.scope?.verifyAffectedDescendants!==162)throw new Error('SECURITY_FAILURE:REQUEST_SCOPE');
-  result.requestVerified=true;
-  if(lifecycle.gateId!==GATE||lifecycle.gateContractVersion!==VERSION||lifecycle.status!=='POLICIES_HELD_PARENTS_CONTROLLED_WRITE_AUTHORIZED'||lifecycle.executionProfile?.phase!=='LAB_DATA_CONTRACT_REPAIR_APPLY'||lifecycle.executionProfile?.capabilities?.writes!==true||lifecycle.guards?.operationalWritesAllowed!==20||lifecycle.guards?.updatesAllowed!==0||lifecycle.guards?.overwritesAllowed!==0||lifecycle.authorization?.consumed!==false)throw new Error('SECURITY_FAILURE:LIFECYCLE_INVALID');
-  result.lifecycleVerified=true;
+  if(request.scope?.createClients!==16||request.scope?.createInsurers!==4||request.scope?.createDocuments!==20||request.scope?.updateDocuments!==0||request.scope?.preserveRequiresValidation!==20||request.scope?.verifyAffectedPolicies!==75||request.scope?.verifyAffectedDescendants!==162)throw new Error('SECURITY_FAILURE:REQUEST_SCOPE');result.requestVerified=true;
+  if(lifecycle.gateId!==GATE||lifecycle.gateContractVersion!==VERSION||lifecycle.status!=='POLICIES_HELD_PARENTS_CONTROLLED_WRITE_AUTHORIZED'||lifecycle.executionProfile?.phase!=='LAB_DATA_CONTRACT_REPAIR_APPLY'||lifecycle.executionProfile?.capabilities?.writes!==true||lifecycle.guards?.operationalWritesAllowed!==20||lifecycle.guards?.updatesAllowed!==0||lifecycle.guards?.overwritesAllowed!==0||lifecycle.authorization?.consumed!==false)throw new Error('SECURITY_FAILURE:LIFECYCLE_INVALID');result.lifecycleVerified=true;
   if(text(process.env.ORBIT360_PRODUCT_PROJECT_ID)!==PROJECT||text(process.env.ORBIT360_PRODUCT_TENANT_ID)!==TENANT||!process.env.GOOGLE_APPLICATION_CREDENTIALS)throw new Error('ENVIRONMENT_FAILURE:WRITE_TARGET');
   app=getApps()[0]||initializeApp({credential:applicationDefault(),projectId:PROJECT});db=getFirestore(app);db.settings({ignoreUndefinedProperties:true});result.firestoreRead=true;
 
-  const state=await readState(db),sourceSummary=summarize(state.source),targetSummary=summarize(state.target);
-  for(const collection of COLLECTIONS){if(state.source[collection].length!==EXPECTED.source[collection]||state.target[collection].length!==EXPECTED.targetBefore[collection])throw new Error(`DATA_CONTRACT_FAILURE:PREWRITE_COUNT_DRIFT_${collection}`);result.before[collection]={source:state.source[collection].length,target:state.target[collection].length,targetIdDigest:targetSummary[collection].idDigest,targetContentDigest:targetSummary[collection].contentDigest};}
-  const sourceDigest=globalDigest(sourceSummary),targetBeforeDigest=globalDigest(targetSummary);
-  if(sourceDigest!==EXPECTED.sourceDigest||targetBeforeDigest!==EXPECTED.targetBeforeDigest||request.digests?.sourceSnapshot!==sourceDigest||request.digests?.targetSnapshotBefore!==targetBeforeDigest||request.digests?.dryRunPlan!==EXPECTED.planDigest)throw new Error('DATA_CONTRACT_FAILURE:SNAPSHOT_OR_PLAN_DIGEST_MISMATCH');
-  result.digestsVerified=true;result.snapshot={created:true,private:true,entries:COLLECTIONS.reduce((n,c)=>n+state.target[c].length,0),digest:targetBeforeDigest,pathStoredInArtifact:false};
-  const privateSnapshotPath=path.join(process.env.RUNNER_TEMP||'/tmp',`orbit360-held-parents-target-snapshot-${process.pid}.json`);fs.writeFileSync(privateSnapshotPath,JSON.stringify(Object.fromEntries(COLLECTIONS.map(c=>[c,state.target[c].map(row=>({id:row.id,digest:rowHash(row.id,row.data)}))])),null,2),'utf8');
+  const state=await readState(db),sourceSummary=summarize(state.source),targetSummary=summarize(state.target);for(const c of COLLECTIONS){if(state.source[c].length!==EXPECTED.source[c]||state.target[c].length!==EXPECTED.targetBefore[c])throw new Error(`DATA_CONTRACT_FAILURE:PREWRITE_COUNT_DRIFT_${c}`);result.before[c]={source:state.source[c].length,target:state.target[c].length,targetIdDigest:targetSummary[c].idDigest,targetContentDigest:targetSummary[c].contentDigest};}
+  const sourceDigest=globalDigest(sourceSummary),targetBeforeDigest=globalDigest(targetSummary);if(sourceDigest!==EXPECTED.sourceDigest||targetBeforeDigest!==EXPECTED.targetBeforeDigest||request.digests?.sourceSnapshot!==sourceDigest||request.digests?.targetSnapshotBefore!==targetBeforeDigest||request.digests?.dryRunPlan!==EXPECTED.planDigest)throw new Error('DATA_CONTRACT_FAILURE:SNAPSHOT_OR_PLAN_DIGEST_MISMATCH');result.digestsVerified=true;
+  result.snapshot={created:true,private:true,entries:COLLECTIONS.reduce((n,c)=>n+state.target[c].length,0),digest:targetBeforeDigest,pathStoredInArtifact:false};const privateSnapshotPath=path.join(process.env.RUNNER_TEMP||'/tmp',`orbit360-held-parents-target-snapshot-${process.pid}.json`);fs.writeFileSync(privateSnapshotPath,JSON.stringify(Object.fromEntries(COLLECTIONS.map(c=>[c,state.target[c].map(row=>({id:row.id,digest:rowHash(row.id,row.data)}))])),null,2),'utf8');
 
-  const plan=buildDependencyPlan(state.source,state.target);if(!verifyPlan(plan))throw new Error('DATA_CONTRACT_FAILURE:DRYRUN_PLAN_RECOMPUTE_MISMATCH');result.planVerified=true;
+  const plan=buildPlan(state.source,state.target);if(!verifyPlan(plan))throw new Error('DATA_CONTRACT_FAILURE:DRYRUN_PLAN_RECOMPUTE_MISMATCH');result.planVerified=true;
   const creates=[];for(const id of [...plan.heldClients].sort())creates.push({collection:'clientes',id,data:plan.sourceMaps.clientes.get(id)});for(const id of [...plan.heldInsurers].sort())creates.push({collection:'aseguradoras',id,data:plan.sourceMaps.aseguradoras.get(id)});
-  const [canonicalBatchSnap,legacyBatchSnap]=await Promise.all([db.collection('tenants').doc(TENANT).collection('importBatches').get(),db.collection('tenantId').doc(TENANT).collection('importBatches').get()]);const knownBatches=new Set([...canonicalBatchSnap.docs.map(doc=>doc.id),...legacyBatchSnap.docs.map(doc=>doc.id)]);
-  let unresolvedBatchReferences=0;for(const item of creates)for(const ref of batchReferences(item.data))if(!knownBatches.has(ref))unresolvedBatchReferences++;
-  if(unresolvedBatchReferences!==0)throw new Error('DATA_CONTRACT_FAILURE:UNRESOLVED_BATCH_REFERENCE_IN_HELD_PARENT');
-  result.plan={createClients:16,createInsurers:4,createDocuments:20,updateDocuments:0,overwriteDocuments:0,preserveRequiresValidation:20,affectedPolicies:75,affectedDescendants:162,dryRunPlanDigest:plan.planDigest,expectedPostTargetDigest:'',unresolvedBatchReferences};
-  const expectedTargetRows=Object.fromEntries(COLLECTIONS.map(c=>[c,[...state.target[c]]]));for(const item of creates)expectedTargetRows[item.collection].push({id:item.id,data:item.data});const expectedAfterSummary=summarize(expectedTargetRows);result.plan.expectedPostTargetDigest=globalDigest(expectedAfterSummary);
+  const [canonicalBatchSnap,legacyBatchSnap]=await Promise.all([db.collection('tenants').doc(TENANT).collection('importBatches').get(),db.collection('tenantId').doc(TENANT).collection('importBatches').get()]),knownBatches=new Set([...canonicalBatchSnap.docs.map(doc=>doc.id),...legacyBatchSnap.docs.map(doc=>doc.id)]);let unresolvedBatchReferences=0;for(const item of creates)for(const ref of batchReferences(item.data))if(!knownBatches.has(ref))unresolvedBatchReferences++;if(unresolvedBatchReferences!==0)throw new Error('DATA_CONTRACT_FAILURE:UNRESOLVED_BATCH_REFERENCE_IN_HELD_PARENT');
+  const expectedTargetRows=Object.fromEntries(COLLECTIONS.map(c=>[c,[...state.target[c]]]));for(const item of creates)expectedTargetRows[item.collection].push({id:item.id,data:item.data});const expectedAfterSummary=summarize(expectedTargetRows);
+  result.plan={createClients:16,createInsurers:4,createDocuments:20,updateDocuments:0,overwriteDocuments:0,preserveRequiresValidation:20,affectedPolicies:75,affectedDescendants:162,dryRunPlanDigest:plan.planDigest,expectedPostTargetDigest:globalDigest(expectedAfterSummary),unresolvedBatchReferences};
   result.cumulativeVisualGuard=visualManifest(ROOT);if(result.cumulativeVisualGuard.manifestMatches!==true)throw new Error('DATA_CONTRACT_FAILURE:CUMULATIVE_VISUAL_DRIFT');
 
-  result.execution.attempted=true;const batch=db.batch();for(const item of creates){const ref=db.collection('tenants').doc(TENANT).collection('data').doc(item.collection).collection('items').doc(item.id);batch.create(ref,item.data);createdRefs.push(ref);}await batch.commit();batchCommitted=true;result.execution.atomicBatchesCommitted=1;result.execution.createdDocuments=20;result.firestoreWrites=20;result.operationalWrites=20;
+  result.execution.attempted=true;const writeBatch=db.batch();for(const item of creates){const ref=db.collection('tenants').doc(TENANT).collection('data').doc(item.collection).collection('items').doc(item.id);writeBatch.create(ref,item.data);createdRefs.push(ref);}await writeBatch.commit();batchCommitted=true;result.execution.atomicBatchesCommitted=1;result.execution.createdDocuments=20;result.firestoreWrites=20;result.operationalWrites=20;
 
-  result.postVerification.executed=true;const afterState=await readState(db),afterSourceSummary=summarize(afterState.source),afterTargetSummary=summarize(afterState.target);let countsMatch=true,contentMatch=true;
-  for(const collection of COLLECTIONS){result.after[collection]={source:afterState.source[collection].length,target:afterState.target[collection].length,targetIdDigest:afterTargetSummary[collection].idDigest,targetContentDigest:afterTargetSummary[collection].contentDigest};if(afterState.target[collection].length!==EXPECTED.targetAfter[collection])countsMatch=false;if(afterTargetSummary[collection].contentDigest!==expectedAfterSummary[collection].contentDigest||afterTargetSummary[collection].idDigest!==expectedAfterSummary[collection].idDigest)contentMatch=false;}
-  const afterSourceDigest=globalDigest(afterSourceSummary);const afterPlan=buildDependencyPlan(afterState.source,afterState.target);let createdPayloadsMatch=true,validationPreserved=true;
-  for(const item of creates){const targetData=afterPlan.targetMaps[item.collection].get(item.id);if(!targetData||rowHash(item.id,targetData)!==rowHash(item.id,item.data))createdPayloadsMatch=false;if(validationCategory(targetData)!=='REQUIRES_VALIDATION')validationPreserved=false;}
-  const allPolicyRelationsResolved=afterPlan.policyRelationBlocked===0&&afterPlan.policyTargetMissing===0&&afterPlan.policyTargetMismatch===0&&afterPlan.policyExactTargetParity===1373;
-  const affectedDescendantsVerified=Object.values(afterPlan.descendants).reduce((n,item)=>n+item.exactTargetParity,0);
-  result.postVerification={executed:true,countsMatch,contentMatch,sourceUnchanged:afterSourceDigest===sourceDigest,createdPayloadsMatch,requiresValidationPreserved:validationPreserved,affectedPoliciesVerified:afterPlan.affectedPolicyIds.size,affectedDescendantsVerified,allPolicyRelationsResolved};
-  if(!countsMatch||!contentMatch||!result.postVerification.sourceUnchanged||!createdPayloadsMatch||!validationPreserved||afterPlan.affectedPolicyIds.size!==75||affectedDescendantsVerified!==162||!allPolicyRelationsResolved||globalDigest(afterTargetSummary)!==result.plan.expectedPostTargetDigest)throw new Error('DATA_CONTRACT_FAILURE:POST_VERIFICATION');
+  result.postVerification.executed=true;const afterState=await readState(db),afterSourceSummary=summarize(afterState.source),afterTargetSummary=summarize(afterState.target),afterMaps=Object.fromEntries(COLLECTIONS.map(c=>[c,new Map(afterState.target[c].map(row=>[row.id,row.data]))])),afterSets=Object.fromEntries(COLLECTIONS.map(c=>[c,new Set(afterMaps[c].keys())]));let countsMatch=true,contentMatch=true;
+  for(const c of COLLECTIONS){result.after[c]={source:afterState.source[c].length,target:afterState.target[c].length,targetIdDigest:afterTargetSummary[c].idDigest,targetContentDigest:afterTargetSummary[c].contentDigest};if(afterState.target[c].length!==EXPECTED.targetAfter[c])countsMatch=false;if(afterTargetSummary[c].contentDigest!==expectedAfterSummary[c].contentDigest||afterTargetSummary[c].idDigest!==expectedAfterSummary[c].idDigest)contentMatch=false;}
+  let createdPayloadsMatch=true,validationPreserved=true;for(const item of creates){const targetData=afterMaps[item.collection].get(item.id);if(!targetData||rowHash(item.id,targetData)!==rowHash(item.id,item.data))createdPayloadsMatch=false;if(validationCategory(targetData)!=='REQUIRES_VALIDATION')validationPreserved=false;}
+  let allPolicyRelationsResolved=true,allPolicyPayloadsExact=true;for(const row of state.source.polizas){const client=resolveRelation(row.data,plan.sourceSets.clientes,/(cliente|contratante|asegurado|customer|client)/i),insurer=resolveRelation(row.data,plan.sourceSets.aseguradoras,/(aseguradora|insurer|compania|company)/i);if(client.status!=='RESOLVED'||insurer.status!=='RESOLVED'||!afterSets.clientes.has(client.id)||!afterSets.aseguradoras.has(insurer.id))allPolicyRelationsResolved=false;if(!exactParity(row,afterMaps.polizas))allPolicyPayloadsExact=false;}
+  let affectedPoliciesVerified=0;for(const {row,clientId,insurerId} of plan.affectedPolicies.values())if(exactParity(row,afterMaps.polizas)&&afterSets.clientes.has(clientId)&&afterSets.aseguradoras.has(insurerId))affectedPoliciesVerified++;
+  let affectedDescendantsVerified=0;for(const [c,rows] of Object.entries(plan.descendants))for(const row of rows)if(exactParity(row,afterMaps[c]))affectedDescendantsVerified++;
+  result.postVerification={executed:true,countsMatch,contentMatch,sourceUnchanged:globalDigest(afterSourceSummary)===sourceDigest,createdPayloadsMatch,requiresValidationPreserved:validationPreserved,affectedPoliciesVerified,affectedDescendantsVerified,allPolicyRelationsResolved:allPolicyRelationsResolved&&allPolicyPayloadsExact};
+  if(!countsMatch||!contentMatch||!result.postVerification.sourceUnchanged||!createdPayloadsMatch||!validationPreserved||affectedPoliciesVerified!==75||affectedDescendantsVerified!==162||!result.postVerification.allPolicyRelationsResolved||globalDigest(afterTargetSummary)!==result.plan.expectedPostTargetDigest)throw new Error('DATA_CONTRACT_FAILURE:POST_VERIFICATION');
   result.status='POLICIES_HELD_PARENTS_CONTROLLED_WRITE_PASS';result.classification='GO_LAB_HELD_PARENTS_CONTROLLED_WRITE_CLOSED';result.ok=true;try{fs.rmSync(privateSnapshotPath,{force:true});}catch{}
 }catch(error){result.status='POLICIES_HELD_PARENTS_CONTROLLED_WRITE_FAIL';result.classification=text(error&&error.message).split(':')[0]||'DATA_CONTRACT_FAILURE';result.error=safeError(error);try{await rollback();}catch(rollbackError){result.rollback.error=safeError(rollbackError);result.classification='SECURITY_FAILURE';}result.ok=false;}
 save(result);if(app)await deleteApp(app).catch(()=>{});process.exit(result.ok?0:41);
