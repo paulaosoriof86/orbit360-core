@@ -1,0 +1,69 @@
+name: Orbit 360 · Gate 7.11 · auditoría estática de reapertura
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-static-requests/gate711-reopen-static-v20260802.json'
+permissions:
+  contents: read
+  statuses: write
+concurrency:
+  group: orbit360-gate711-reopen-static-v20260802
+  cancel-in-progress: false
+env:
+  STATIC_REQUEST: .github/orbit360-static-requests/gate711-reopen-static-v20260802.json
+  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+jobs:
+  audit:
+    name: Gate 7.11 · dos PASS estáticos + GO_GATE_CONTRACT
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - name: Checkout SHA exacto
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 2
+          persist-credentials: false
+      - name: Preparar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verificar autorización estática fail-closed
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = 'ays/backend-tenant-lab-v99-20260703'
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          test "$(git rev-parse HEAD^)" = "$(jq -r '.sourceHead' "$STATIC_REQUEST")"
+          jq -e '.schemaVersion=="orbit360-gate711-static-reopen-authorization-v1" and .gateId=="block7-canonical-runtime-cumulative-visual-lab-v20260801" and .contractVersion=="7.11.0" and .approved==true and .allowedExecutions==1 and .consumed==false and .branch=="ays/backend-tenant-lab-v99-20260703" and .pullRequest==5 and .capabilities.secrets==false and .capabilities.firestoreRead==false and .capabilities.writes==false and .capabilities.runtime==false and .capabilities.browser==false and .capabilities.deploy==false and .capabilities.production==false and .runtimeBoundary.allowedExecutions==1 and .runtimeBoundary.onlyAfterStaticPasses==true and .runtimeBoundary.newImmutableRequestRequired==true and .runtimeBoundary.writes==false and .runtimeBoundary.reimport==false and .runtimeBoundary.deploy==false and .runtimeBoundary.production==false' "$STATIC_REQUEST" >/dev/null
+      - name: Ejecutar auditoría estática prospectiva
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-auditar-reapertura-gate711-static-v20260802.mjs
+          node tools/orbit360-auditar-reapertura-gate711-static-v20260802.mjs
+          jq -e '.ok==true and .status=="GATE711_AUTHORIZATION_BINDING_STATIC_PASS" and .classification=="GO_STATIC_AUTHORIZATION_BINDING" and .failed==0 and .secretAccess==false and .firestoreRead==false and .firestoreWrites==0 and .operationalWrites==0 and .runtimeExecuted==false and .browserExecuted==false and .production==false' "$EVIDENCE_DIR/gate711-authorization-binding-static-v20260802.json" >/dev/null
+          jq -e '.ok==true and .status=="GATE711_LEGAL_DEFERRED_ORDER_STATIC_PASS" and .classification=="GO_STATIC_LEGAL_DEFERRED_ORDER" and .failed==0 and .productFilesChanged==0 and .dataFilesChanged==0 and .secretAccess==false and .firestoreRead==false and .firestoreWrites==0 and .operationalWrites==0 and .runtimeExecuted==false and .browserExecuted==false and .production==false' "$EVIDENCE_DIR/gate711-legal-deferred-order-static-v20260802.json" >/dev/null
+          jq -e '.ok==true and .status=="GO_GATE_CONTRACT" and .classification=="CANONICAL_RUNTIME_CUMULATIVE_VISUAL_LAB_READY" and .failed==0 and .executionAuthorized==false and .secretAccessAuthorized==false and .firestoreReadAuthorized==false and .writeAuthorized==false and .runtimeAuthorized==false and .browserAuthorized==false and .previewAuthorized==false and .deployAuthorized==false and .productionAuthorized==false and .firestoreWrites==0 and .operationalWrites==0 and .runtimeExecuted==false and .browserExecuted==false' "$EVIDENCE_DIR/gate711-reopen-preflight-sanitized-v20260802.json" >/dev/null
+      - name: Subir evidencia sanitizada
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-gate711-reopen-static-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/gate711-authorization-binding-static-v20260802.json
+            orbit360-platform/runtime-gate-crm-v20260716/gate711-legal-deferred-order-static-v20260802.json
+            orbit360-platform/runtime-gate-crm-v20260716/gate711-reopen-preflight-sanitized-v20260802.json
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Publicar estado observable
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/gate711-reopen-preflight-sanitized-v20260802.json
+        with:
+          script: |
+            const fs=require('fs');let state='failure',description='Gate 7.11 static reopen audit failed';
+            try{const p=JSON.parse(fs.readFileSync(process.env.EVIDENCE,'utf8'));if(p.ok===true&&p.status==='GO_GATE_CONTRACT'&&p.secretAccess===false&&p.firestoreRead===false&&p.runtimeExecuted===false){state='success';description='Gate 7.11 static reopen audit PASS; no secrets or runtime';}}catch(e){}
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/gate711-static-reopen-audit',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
