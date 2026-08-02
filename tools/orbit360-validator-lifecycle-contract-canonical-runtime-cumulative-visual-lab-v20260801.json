@@ -2,7 +2,7 @@
   "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
   "gateId": "block7-canonical-runtime-cumulative-visual-lab-v20260801",
   "gateContractVersion": "7.11.0",
-  "validatorLifecycleRevision": "phase-capability-contract-v1",
+  "validatorLifecycleRevision": "phase-capability-contract-v1-legal-deferred-order-v2",
   "status": "CANONICAL_RUNTIME_CUMULATIVE_VISUAL_LAB_AUTHORIZED",
   "executionProfile": {
     "phase": "LAB_RUNTIME_GATE",
@@ -22,13 +22,41 @@
   "blockOwner": "Orbit.store + cumulative frontend",
   "authorization": {
     "authorizedBy": "Paula Osorio",
-    "authorizedAt": "2026-08-01T22:05:00-06:00",
-    "authorizationRef": "user_proceed_definitive_solutions_no_trial_error_20260801",
+    "authorizedAt": "2026-08-02T10:01:00-06:00",
+    "authorizationRef": "user_continue_next_exact_action_20260802",
     "explicit": true,
     "allowedExecutions": 1,
     "consumed": false,
     "macroBlockWithoutMicroAuthorizations": true
   },
+  "priorAttempts": [
+    {
+      "run": 30733245148,
+      "job": 91457131076,
+      "classification": "PIPELINE_MECHANISM_FAILURE",
+      "failedStage": "Derivar web config e identidad existente",
+      "rootCause": "GITHUB_ENV written and read inside the same workflow step",
+      "productChanged": false,
+      "dataChanged": false,
+      "corrected": true,
+      "fixCommit": "60942f4b15f0ad0d2e704e933b54b6349e4368f4"
+    },
+    {
+      "run": 30755865296,
+      "job": 91517783012,
+      "classification": "VALIDATOR_STALE",
+      "failedStage": "canonical_store_hydrated / first client click",
+      "rootCause": "Legal deferred render was checked before store hydration and falsely classified as already accepted; visible modal later blocked the client click and crossed the write guard boundary",
+      "productChanged": false,
+      "dataChanged": false,
+      "authChanged": false,
+      "storeValidated": true,
+      "corrected": true,
+      "fixCommit": "90a174666f20ffdb8cf88c5149ac1fcf08b2f802",
+      "staticGuardCommit": "1c01decffb3f9506807f1faeec83ebd487da79be",
+      "workflowCommit": "eed237e8f555b496b1170e6693fedd1024006d3f"
+    }
+  ],
   "sourceStaticGate": {
     "gateId": "block7-canonical-store-cumulative-adapter-static-v20260801",
     "contractVersion": "7.10.0",
@@ -97,6 +125,9 @@
     "useExistingLabIdentity": true,
     "authenticateThroughCanonicalLogin": true,
     "acceptLegalOnce": true,
+    "acceptLegalAfterStoreHydration": true,
+    "legalSettledBeforeWriteGuard": true,
+    "staticLegalOrderValidator": "tools/orbit360-validar-legal-deferred-order-gate711-v20260802.mjs",
     "snapshotBeforeAndAfter": true,
     "installBrowserWriteGuard": true,
     "verifyStoreOwner": true,
