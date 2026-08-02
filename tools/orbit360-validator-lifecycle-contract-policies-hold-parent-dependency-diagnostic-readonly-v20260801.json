@@ -3,7 +3,7 @@
   "gateId": "block7-policies-hold-parent-dependency-diagnostic-readonly-v20260801",
   "gateContractVersion": "7.7.0",
   "validatorLifecycleRevision": "phase-capability-contract-v1",
-  "status": "POLICIES_HOLD_PARENT_DEPENDENCY_DIAGNOSTIC_READONLY_AUTHORIZED",
+  "status": "POLICIES_HOLD_PARENT_DEPENDENCY_DIAGNOSTIC_READONLY_CLOSED",
   "executionProfile": {
     "phase": "LAB_DATA_CONTRACT_REPAIR_DRYRUN",
     "capabilities": {
@@ -26,7 +26,23 @@
     "authorizationRef": "user_authorized_hold_parent_dependency_diagnostic_readonly_20260801",
     "explicit": true,
     "allowedExecutions": 1,
-    "consumed": false
+    "consumed": true,
+    "consumedByRun": 30729179105,
+    "requestReplayBlocked": true
+  },
+  "executionResult": {
+    "run": 30729179105,
+    "job": 91446254893,
+    "artifact": 8827379189,
+    "artifactDigest": "sha256:f1656d5f1a2a59468ba734e46574eb0536f1da19a640be3d5db535b5eeb794ec",
+    "head": "ed5efd9a47f743dcef9d3c5fc252232213b3c9a1",
+    "status": "POLICIES_HOLD_PARENT_DEPENDENCY_DIAGNOSTIC_READONLY_PASS",
+    "classification": "GO_LAB_HOLD_PARENT_DEPENDENCY_DIAGNOSED",
+    "preflightPassed": 15,
+    "preflightFailed": 0,
+    "firestoreWrites": 0,
+    "operationalWrites": 0,
+    "closed": true
   },
   "sourceFrozenGate": {
     "gateId": "block7-policies-canonical-postwrite-revalidation-readonly-v20260801",
@@ -35,44 +51,52 @@
     "firstRun": 30727254049,
     "secondRun": 30727341881,
     "additionalAttemptsAllowed": false,
-    "rootCauseCode": "CANONICAL_POLICIES_REFERENCE_EXCLUDED_VALIDATION_PARENTS"
+    "rootCauseCode": "CANONICAL_POLICIES_REFERENCE_EXCLUDED_VALIDATION_PARENTS",
+    "reopened": false
   },
-  "sourceWriteGate": {
-    "gateId": "block7-policies-canonical-controlled-write-lab-v20260801",
-    "contractVersion": "7.5.0",
-    "run": 30726870258,
-    "job": 91440059984,
-    "artifact": 8826656778,
-    "artifactDigest": "sha256:170f450128cd228e3a8ce53c072fcd91cfb38ff4ad6a0dc5ae73116b84e8b945",
-    "status": "POLICIES_CANONICAL_CONTROLLED_WRITE_CLOSED",
-    "closed": true
-  },
-  "scope": {
-    "tenantId": "alianzas-soluciones",
-    "projectId": "ays-orbit-360-lab",
-    "heldClients": 16,
-    "heldInsurers": 4,
-    "countAffectedPolicies": true,
-    "measureClientInsurerIntersection": true,
-    "traceVehicles": true,
-    "traceReceipts": true,
-    "tracePortfolio": true,
-    "traceCollections": true,
-    "classifyRestrictedParentMigration": true,
-    "compareStrategies": true,
-    "emitDocumentIds": false,
-    "emitBusinessValues": false
-  },
-  "expectedBaseline": {
+  "verifiedState": {
     "sourceSnapshotDigest": "88b8e16b0d4531b2f5c0ce2b1a21068837853080943f7584f6f3fab0cc2ff18d",
     "targetSnapshotAfterDigest": "724e1efbbc29f60791350ea180ef54230ecf888f9914b98fc70fda62ca6ac305",
     "sourceTotal": 4837,
     "targetTotal": 4822,
-    "sourcePolicies": 1373,
-    "targetPolicies": 1375,
     "heldClients": 16,
     "heldInsurers": 4,
-    "minimumAffectedPolicies": 1
+    "affectedPolicies": 75,
+    "policyLinksToHeldClients": 52,
+    "policyLinksToHeldInsurers": 23,
+    "policyIntersection": 0,
+    "policyExactTargetParity": 1373,
+    "policyRelationBlocked": 0
+  },
+  "heldParentClassification": {
+    "total": 20,
+    "validationHolds": 20,
+    "sourceBacked": 20,
+    "seedMarkers": 0,
+    "referencedParents": 20,
+    "restrictedMigrationCandidates": 20,
+    "correctionManagementParents": 0,
+    "unusedHoldParents": 0,
+    "classification": "MIGRATE_RESTRICTED_PRESERVE_REQUIRES_VALIDACION"
+  },
+  "descendantTrace": {
+    "vehicles": 47,
+    "receipts": 76,
+    "portfolio": 38,
+    "collections": 1,
+    "total": 162,
+    "blocked": 0,
+    "exactTargetParity": 162
+  },
+  "strategyRecommendation": {
+    "preferred": "MIGRATE_REFERENCED_HOLD_PARENTS_RESTRICTED_PRESERVING_REQUIERE_VALIDACION",
+    "restrictedParentCreates": 20,
+    "policiesPreserved": 75,
+    "descendantsPreserved": 162,
+    "correctionManagementCases": 0,
+    "dryRunPlanDigest": "de72758f0f2097471bb9183879b8039154b0c063d79e7678393575a5a97f97c8",
+    "binding": false,
+    "writeAuthorized": false
   },
   "cumulativeVisualGuard": {
     "required": true,
@@ -82,6 +106,7 @@
     "pathDigest": "0c3dbf222646ea46b57e838359ac56fff3994268a97e0d682508bd747a29f3c4",
     "contentDigest": "5b32b90815929acc341cfd4ae7c1e5f76d819e1a6a1b4091d13800508ab9b647",
     "indexDigest": "54df4a1977573ccc6a0702bd0012f2835fcef4cb529e327d16918c4b420382a4",
+    "manifestReverified": true,
     "noParallelShell": true,
     "noReducedShell": true,
     "noModuleFragmentation": true,
@@ -110,7 +135,21 @@
     "productionAllowed": false,
     "mainAllowed": false,
     "mergeAllowed": false,
-    "reopenFrozenGateAllowed": false
+    "reopenFrozenGateAllowed": false,
+    "additionalExecutionsAllowed": false
+  },
+  "nextGateCondition": {
+    "newAuthorizationRequired": true,
+    "requiredGateType": "CONTROLLED_CREATE_ONLY_HELD_PARENTS_LAB",
+    "createHeldClients": 16,
+    "createHeldInsurers": 4,
+    "preserveRequiresValidation": true,
+    "snapshotRequired": true,
+    "idempotencyRequired": true,
+    "postVerificationRequired": true,
+    "rollbackRequired": true,
+    "frontendAdaptationAuthorized": false,
+    "visualizationAuthorized": false
   },
   "containsPII": false,
   "containsSecrets": false
