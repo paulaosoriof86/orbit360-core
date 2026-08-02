@@ -10,7 +10,17 @@
   "writes": false,
   "deploy": false,
   "production": false,
-  "approved": true,
-  "allowedExecutions": 1,
-  "consumed": false
+  "approved": false,
+  "allowedExecutions": 0,
+  "consumed": true,
+  "executionResult": {
+    "run": 30770685200,
+    "job": 91557182655,
+    "artifact": 8840415775,
+    "artifactDigest": "sha256:5c7fc9dcf03a616ce4d94588adf6542d9c7ce1b5c9ce8a2caa38effa084355a3",
+    "status": "GATE711_ACADEMIA_BOOTSTRAP_MANIFEST_DIAGNOSTIC_PASS",
+    "trackedFileCount": 309,
+    "contentDigest": "3d25a83218a4373513e1fff24ea9b12817d4c47be0fad08777e7f94867b3f676",
+    "writes": 0
+  }
 }
