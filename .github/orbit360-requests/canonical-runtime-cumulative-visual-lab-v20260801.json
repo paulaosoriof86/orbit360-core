@@ -8,7 +8,7 @@
   "consumed": false,
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
-  "parentHead": "f2946264fe5a0e4656b724665b7440d07e712ba5",
+  "parentHead": "874135432f681b26453a9843cb346567a921dd81",
   "projectId": "ays-orbit-360-lab",
   "tenantId": "alianzas-soluciones",
   "canonicalSnapshotDigest": "19e1927d39f6b713ee12504f8762bc42ead9de6e365bb0f12162d2a0c8f8469b",
@@ -31,9 +31,19 @@
         "rootCause": "Legal deferred render checked before store hydration and falsely marked as already accepted",
         "fixCommit": "90a174666f20ffdb8cf88c5149ac1fcf08b2f802",
         "staticGuardCommit": "1c01decffb3f9506807f1faeec83ebd487da79be",
-        "workflowCommit": "eed237e8f555b496b1170e6693fedd1024006d3f",
-        "lifecycleCommit": "149792b80e0313e3b3b965e6e2fbe253f5145b35",
-        "documentationCommit": "f2946264fe5a0e4656b724665b7440d07e712ba5"
+        "workflowCommit": "eed237e8f555b496b1170e6693fedd1024006d3f"
+      },
+      {
+        "runId": 30756305124,
+        "jobId": 91518930317,
+        "classification": "VALIDATOR_STALE",
+        "failedStage": "CANONICAL_PREFLIGHT_ENTRYPOINT",
+        "rootCause": "Lifecycle revision label mismatch while canonical composition remained phase-capability-contract-v1",
+        "secretAccess": false,
+        "firestoreRead": false,
+        "runtimeExecuted": false,
+        "browserExecuted": false,
+        "fixCommit": "874135432f681b26453a9843cb346567a921dd81"
       }
     ],
     "productChanged": false,
