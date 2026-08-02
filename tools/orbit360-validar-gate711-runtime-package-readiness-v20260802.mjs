@@ -55,7 +55,7 @@ try {
 
   add('RUNTIME_IDENTITY', all(runtime, ["status = 'GATE711_RELEASE_CRITICAL_RUNTIME_PASS'", "classification = 'GO_LAB_RELEASE_CRITICAL_CRM_OPS_LEADS'", "authMode: 'existing_custom_token_readonly'"]));
   add('RUNTIME_DATASET', all(runtime, ['clientes: 430', 'aseguradoras: 30', 'polizas: 1373', 'vehiculos: 1032', 'recibosEsperados: 1294', 'carteraPrimas: 673', 'cobros: 5', 'asesores: 7', 'REQUIRED_STORE_API']));
-  add('RUNTIME_SINGLE_SESSION', count(runtime, 'chromium.launch') === 1 && count(runtime, 'browser.newContext') === 1 && count(runtime, 'settleLegal(page)') === 1 && runtime.includes('legalSettledBeforeWriteGuard'));
+  add('RUNTIME_SINGLE_SESSION', count(runtime, 'chromium.launch') === 1 && count(runtime, 'browser.newContext') === 1 && count(runtime, 'async function settleLegal(page)') === 1 && count(runtime, 'await settleLegal(page);') === 1 && runtime.includes('legalSettledBeforeWriteGuard'));
   add('RUNTIME_ROLE_MATRIX', all(runtime, ["role: 'Dirección'", "role: 'Operativo'", "role: 'Asesor'", "ops: 'restricted'", "#/cliente360", "#/aseguradoras", "#/polizas", "#/ops", "#/leads"]));
   add('RUNTIME_SAFETY', all(runtime, ['RUNTIME_WRITE_GUARD', 'firestoreWrites: 0', 'operationalWrites: 0', 'reimportExecuted: false', 'hostingDeploy: false', 'previewDeploy: false', 'production: false', 'containsPII: false', 'containsSecrets: false']));
   add('RUNTIME_ACADEMIA_BOUNDARY', runtime.includes('focusedRuntimePrerequisite: false') && runtime.includes('contentCompletenessBlocksRelease: false') && !runtime.includes("#/academia") && !runtime.includes('academia_root_fix_ready'));
