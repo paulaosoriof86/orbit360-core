@@ -1,0 +1,125 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
+  "gateId": "block7-policies-held-parents-controlled-write-lab-v20260801",
+  "gateContractVersion": "7.8.0",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
+  "status": "POLICIES_HELD_PARENTS_CONTROLLED_WRITE_AUTHORIZED",
+  "executionProfile": {
+    "phase": "LAB_DATA_CONTRACT_REPAIR_APPLY",
+    "capabilities": {
+      "secrets": true,
+      "firestoreRead": true,
+      "writes": true,
+      "runtime": false,
+      "browser": false,
+      "deploy": false,
+      "functionsDeploy": false,
+      "rulesDeploy": false,
+      "production": false
+    }
+  },
+  "singleGate": true,
+  "blockOwner": "Policies",
+  "authorization": {
+    "authorizedBy": "Paula Osorio",
+    "authorizedAt": "2026-08-01T21:21:00-06:00",
+    "authorizationRef": "user_authorized_held_parents_controlled_write_20_20260801",
+    "explicit": true,
+    "allowedExecutions": 1,
+    "consumed": false
+  },
+  "sourceDiagnostic": {
+    "gateId": "block7-policies-hold-parent-dependency-diagnostic-readonly-v20260801",
+    "contractVersion": "7.7.0",
+    "run": 30729179105,
+    "job": 91446254893,
+    "artifact": 8827379189,
+    "artifactDigest": "sha256:f1656d5f1a2a59468ba734e46574eb0536f1da19a640be3d5db535b5eeb794ec",
+    "head": "ed5efd9a47f743dcef9d3c5fc252232213b3c9a1",
+    "status": "POLICIES_HOLD_PARENT_DEPENDENCY_DIAGNOSTIC_READONLY_CLOSED",
+    "closed": true
+  },
+  "writePlan": {
+    "createClients": 16,
+    "createInsurers": 4,
+    "createDocuments": 20,
+    "updateDocuments": 0,
+    "overwriteDocuments": 0,
+    "preserveRequiresValidation": 20,
+    "affectedPoliciesToVerify": 75,
+    "affectedDescendantsToVerify": 162,
+    "atomicBatchCount": 1,
+    "createOnly": true,
+    "snapshotRequired": true,
+    "idempotencyRequired": true,
+    "postVerificationRequired": true,
+    "rollbackRequired": true
+  },
+  "digests": {
+    "sourceSnapshotDigest": "88b8e16b0d4531b2f5c0ce2b1a21068837853080943f7584f6f3fab0cc2ff18d",
+    "targetSnapshotBeforeDigest": "724e1efbbc29f60791350ea180ef54230ecf888f9914b98fc70fda62ca6ac305",
+    "dryRunPlanDigest": "de72758f0f2097471bb9183879b8039154b0c063d79e7678393575a5a97f97c8"
+  },
+  "expectedBefore": {
+    "clientes": 414,
+    "aseguradoras": 26,
+    "polizas": 1375,
+    "vehiculos": 1033,
+    "recibosEsperados": 1294,
+    "carteraPrimas": 673,
+    "cobros": 7,
+    "total": 4822
+  },
+  "expectedAfter": {
+    "clientes": 430,
+    "aseguradoras": 30,
+    "polizas": 1375,
+    "vehiculos": 1033,
+    "recibosEsperados": 1294,
+    "carteraPrimas": 673,
+    "cobros": 7,
+    "total": 4842
+  },
+  "cumulativeVisualGuard": {
+    "required": true,
+    "requiredBranch": "ays/backend-tenant-lab-v99-20260703",
+    "pullRequest": 5,
+    "trackedFileCount": 308,
+    "pathDigest": "0c3dbf222646ea46b57e838359ac56fff3994268a97e0d682508bd747a29f3c4",
+    "contentDigest": "5b32b90815929acc341cfd4ae7c1e5f76d819e1a6a1b4091d13800508ab9b647",
+    "indexDigest": "54df4a1977573ccc6a0702bd0012f2835fcef4cb529e327d16918c4b420382a4",
+    "noParallelShell": true,
+    "noReducedShell": true,
+    "noModuleFragmentation": true,
+    "noModuleDowngrade": true,
+    "visualizationAuthorizedByThisGate": false
+  },
+  "humanApproval": {
+    "clientes": true,
+    "polizas": false,
+    "vehiculos": false,
+    "recibos": false,
+    "cartera": false,
+    "restoCrm": false,
+    "automatedGateMaySetApproval": false
+  },
+  "guards": {
+    "firestoreDataWritesAllowed": true,
+    "operationalWritesAllowed": 20,
+    "updatesAllowed": 0,
+    "overwritesAllowed": 0,
+    "reimportAllowed": false,
+    "frontendAdaptationAllowed": false,
+    "browserAllowed": false,
+    "previewAllowed": false,
+    "hostingDeployAllowed": false,
+    "firestoreRulesDeployAllowed": false,
+    "functionsDeployAllowed": false,
+    "productionAllowed": false,
+    "mainAllowed": false,
+    "mergeAllowed": false,
+    "reopenFrozenGateAllowed": false
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
