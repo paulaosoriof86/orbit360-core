@@ -1,16 +1,27 @@
 {
   "schemaVersion": "orbit360-cumulative-visual-candidate-contract-v1",
-  "contractVersion": "1.0.1",
+  "contractVersion": "1.1.0",
   "status": "CUMULATIVE_VISUAL_CANDIDATE_MANIFEST_SEALED",
   "requiredBranch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
-  "baselineSourceCommit": "f982dc9744f96ea51a40b311ffdbf60a078222da",
-  "manifestSourceHead": "c1bbe8e8f446747c51eaa3672e0b59fb2823d08c",
+  "baselineSourceCommit": "a0c430d7ae2856b5fe45207fb0820dcd9bb45809",
+  "manifestSourceHead": "5f3ec91e827b7b3ecb8a4fb4d8c493268632f9a4",
   "sourceGate": {
-    "gateId": "block7-policies-dual-path-reconciliation-readonly-v20260801",
-    "run": 30724917136,
-    "artifact": 8825989653,
-    "artifactDigest": "sha256:19b9cddbd5a08af61655f0d59423608329fd3fda39da8786ab5c31940fb28885"
+    "gateId": "block7-canonical-store-cumulative-adapter-static-v20260801",
+    "contractVersion": "7.10.0",
+    "run": 30732451326,
+    "job": 91455115850,
+    "artifact": 8828413796,
+    "artifactDigest": "sha256:6abbd30d2abeab57abe6cd5f7d1e34fa449646709b5dca6b21ef1f387797bf72",
+    "status": "CANONICAL_STORE_CUMULATIVE_ADAPTER_STATIC_PASS"
+  },
+  "canonicalReadModel": {
+    "snapshotDigest": "19e1927d39f6b713ee12504f8762bc42ead9de6e365bb0f12162d2a0c8f8469b",
+    "singleReadOwner": "Orbit.store",
+    "canonicalCollections": ["clientes", "aseguradoras", "polizas", "vehiculos", "recibosEsperados", "carteraPrimas", "cobros"],
+    "operationalSeedExclusion": true,
+    "requiresValidationPreserved": true,
+    "parallelReadOwnersAllowed": false
   },
   "compositionPolicy": {
     "baseline": "LATEST_AUDITED_ACCEPTED_PLUS_INCREMENTAL_HEAD",
@@ -33,17 +44,17 @@
       "orbit360-platform/data"
     ],
     "trackedFilesOnly": true,
-    "trackedFileCount": 308,
+    "trackedFileCount": 309,
     "rootCounts": {
       "index": 1,
       "modules": 62,
-      "core": 182,
+      "core": 183,
       "styles": 10,
       "data": 53
     },
-    "pathDigest": "0c3dbf222646ea46b57e838359ac56fff3994268a97e0d682508bd747a29f3c4",
-    "contentDigest": "5b32b90815929acc341cfd4ae7c1e5f76d819e1a6a1b4091d13800508ab9b647",
-    "indexDigest": "54df4a1977573ccc6a0702bd0012f2835fcef4cb529e327d16918c4b420382a4",
+    "pathDigest": "517056dee1200503b2e7295a333cb804bc71271bbaa87847fa762da025f276f1",
+    "contentDigest": "83cc01dacf180b8ca9693df7117030228479992d6db4c59fab53def2e94acafd",
+    "indexDigest": "b57b6581ee02d2dde42a8a2c1272d57f19b7ad6809d13a1d25111f3d71a96074",
     "includeFileContentDigest": true,
     "includePathDigest": true,
     "includeRootCounts": true,
@@ -58,10 +69,14 @@
     "mustProveNoRegressionPerModuleOwner": true,
     "mustRecomputeManifestAfterAuthorizedChanges": true,
     "mustCompareNewManifestAgainstThisSeal": true,
+    "mustUseOrbitStoreAsSingleReadOwner": true,
+    "mustExcludeCanonicalSeedsOperationally": true,
+    "mustPreserveRequiresValidation": true,
     "mustNotInferApprovalFromAutomatedSmoke": true,
     "requiresSeparateAuthorization": true
   },
   "moduleOwnersPreserved": [
+    "Orbit.store",
     "PWA",
     "Router",
     "Legal",
