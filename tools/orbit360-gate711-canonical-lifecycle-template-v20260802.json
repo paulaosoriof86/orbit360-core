@@ -1,0 +1,87 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
+  "gateId": "block7-canonical-runtime-cumulative-visual-lab-v20260801",
+  "gateContractVersion": "7.11.0",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
+  "macroLifecycleRevision": "macro-rootfix-then-full-canonical-v3",
+  "status": "CANONICAL_LIFECYCLE_TEMPLATE_STATIC_READY",
+  "executionProfile": {
+    "phase": "LAB_RUNTIME_GATE",
+    "capabilities": {
+      "secrets": true,
+      "firestoreRead": true,
+      "writes": false,
+      "runtime": true,
+      "browser": true,
+      "deploy": false,
+      "functionsDeploy": false,
+      "rulesDeploy": false,
+      "production": false
+    }
+  },
+  "authorizationTemplate": {
+    "explicit": false,
+    "allowedExecutions": 0,
+    "consumed": true,
+    "macroBlockWithoutMicroAuthorizations": true,
+    "authorizationRef": "PENDING_NEW_EXPLICIT_AUTHORIZATION",
+    "authorizedProductHead": "PENDING_NEW_EXPLICIT_AUTHORIZATION"
+  },
+  "sequence": {
+    "step1": "targeted_rootfix_runtime_readonly",
+    "step2": "full_gate711_readonly_only_if_step1_passes",
+    "sameCheckout": true,
+    "sameIdentity": true,
+    "sameLocalServer": true,
+    "allSnapshotsMustMatch": true,
+    "automaticStopRetry": true
+  },
+  "rootCause": {
+    "classification": "FUNCTIONAL_DEFECT",
+    "owner": "orbit360-platform/data/academia-v1230-operational-directory-v20260722.js",
+    "function": "apply",
+    "invalidTrigger": "orbit:session",
+    "rootFixCommit": "fd49e1b15e69d1f023727b4ff92190852bcae1e0",
+    "rootFixVersion": "20260802.1"
+  },
+  "staticReadiness": {
+    "status": "GATE711_ROOTFIX_STATIC_READINESS_PASS",
+    "checks": "12/12",
+    "academia": "16/16",
+    "identity": "14/14",
+    "manifest": "10/10",
+    "lifecycleRegistry": "12/12"
+  },
+  "cumulativeManifest": {
+    "trackedFileCount": 309,
+    "contentDigest": "9e737a2e20ee868ec804a66d249957260164ea393ed4576d4a67b3508a00f762"
+  },
+  "canonicalData": {
+    "snapshotDigest": "19e1927d39f6b713ee12504f8762bc42ead9de6e365bb0f12162d2a0c8f8469b",
+    "singleReadOwner": "Orbit.store"
+  },
+  "guards": {
+    "firestoreDataWritesAllowed": false,
+    "operationalWritesAllowed": 0,
+    "reimportAllowed": false,
+    "hostingDeployAllowed": false,
+    "previewDeployAllowed": false,
+    "firestoreRulesDeployAllowed": false,
+    "functionsDeployAllowed": false,
+    "productionAllowed": false,
+    "mainAllowed": false,
+    "mergeAllowed": false
+  },
+  "humanApproval": {
+    "clientes": true,
+    "polizas": false,
+    "vehiculos": false,
+    "recibos": false,
+    "cartera": false,
+    "cobros": false,
+    "restoCrm": false,
+    "automatedGateMaySetApproval": false
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
