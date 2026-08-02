@@ -1,0 +1,138 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
+  "gateId": "block7-canonical-runtime-cumulative-visual-lab-v20260801",
+  "gateContractVersion": "7.11.0",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
+  "legalDeferredOrderRevision": "gate711-legal-deferred-order-v2",
+  "authorizationBindingRevision": "gate711-lifecycle-request-exact-binding-v1",
+  "status": "CANONICAL_RUNTIME_CUMULATIVE_VISUAL_LAB_AUTHORIZED",
+  "executionProfile": {
+    "phase": "LAB_RUNTIME_GATE",
+    "capabilities": {
+      "secrets": true,
+      "firestoreRead": true,
+      "writes": false,
+      "runtime": true,
+      "browser": true,
+      "deploy": false,
+      "functionsDeploy": false,
+      "rulesDeploy": false,
+      "production": false
+    }
+  },
+  "singleGate": true,
+  "blockOwner": "Orbit.store + cumulative frontend",
+  "diagnosticOnly": true,
+  "diagnosticPurpose": "identify exact owner of three blocked Orbit.store.insert calls",
+  "authorization": {
+    "authorizedBy": "Paula Osorio",
+    "authorizedAt": "2026-08-02T12:45:00-06:00",
+    "authorizationRef": "user_continue_urgent_root_cause_macro_gate711_20260802T1245-0600",
+    "authorizationText": "por favor continúa pero necesitamos urgentemente solucionar causa raíz porque nuevamente he dado muchas autorizaciónes y seguimos dando vueltas",
+    "explicit": true,
+    "allowedExecutions": 1,
+    "consumed": false,
+    "macroBlockWithoutMicroAuthorizations": true,
+    "additionalExecutionsAllowed": false
+  },
+  "priorStopRetry": {
+    "preserved": true,
+    "runtimeGateReplayAllowed": false,
+    "diagnosticExceptionOnly": true,
+    "priorRun": 30761050790,
+    "priorClassification": "BROWSER_WRITE_ATTEMPT",
+    "priorFirestoreWrites": 0,
+    "priorOperationalWrites": 0
+  },
+  "staticDiagnosticEvidence": {
+    "run": 30761659406,
+    "job": 91533207774,
+    "artifact": 8837642889,
+    "artifactDigest": "sha256:857ad8d9032865d64e7d8912a1b12912c63ab0d0cbdc4542ef6687aa32ceeb0e",
+    "status": "GATE711_WRITE_OWNER_DIAGNOSTIC_STATIC_PASS",
+    "checks": "14/14",
+    "secretAccess": false,
+    "firestoreRead": false,
+    "runtimeExecuted": false,
+    "browserExecuted": false,
+    "operationalWrites": 0,
+    "ok": true
+  },
+  "sourceStaticGate": {
+    "gateId": "block7-canonical-store-cumulative-adapter-static-v20260801",
+    "contractVersion": "7.10.0",
+    "status": "CANONICAL_STORE_CUMULATIVE_ADAPTER_STATIC_CLOSED",
+    "closed": true,
+    "singleReadOwner": "Orbit.store"
+  },
+  "sourceDataGate": {
+    "gateId": "block7-policies-full-canonical-revalidation-readonly-v20260801",
+    "contractVersion": "7.9.0",
+    "status": "POLICIES_FULL_CANONICAL_REVALIDATION_READONLY_CLOSED",
+    "canonicalSnapshotDigest": "19e1927d39f6b713ee12504f8762bc42ead9de6e365bb0f12162d2a0c8f8469b",
+    "closed": true
+  },
+  "cumulativeManifest": {
+    "trackedFileCount": 309,
+    "pathDigest": "517056dee1200503b2e7295a333cb804bc71271bbaa87847fa762da025f276f1",
+    "contentDigest": "83cc01dacf180b8ca9693df7117030228479992d6db4c59fab53def2e94acafd",
+    "indexDigest": "b57b6581ee02d2dde42a8a2c1272d57f19b7ad6809d13a1d25111f3d71a96074"
+  },
+  "expectedOperationalCounts": {
+    "clientes": 430,
+    "aseguradoras": 30,
+    "polizas": 1373,
+    "vehiculos": 1032,
+    "recibosEsperados": 1294,
+    "carteraPrimas": 673,
+    "cobros": 5,
+    "asesores": 7
+  },
+  "scope": {
+    "serveExactCheckoutLocally": true,
+    "useExistingLabIdentity": true,
+    "acceptLegalOnce": true,
+    "acceptLegalAfterStoreHydration": true,
+    "legalSettledBeforeWriteGuard": true,
+    "snapshotBeforeAndAfter": true,
+    "installBrowserWriteGuard": true,
+    "verifyStoreOwner": true,
+    "verifyCanonicalPaths": true,
+    "verifyApiContract": true,
+    "verifySeedExclusion": true,
+    "verifyRequiresValidation": true,
+    "roles": ["Dirección", "Operativo", "Asesor"],
+    "viewports": ["desktop", "tablet", "mobile"],
+    "routes": ["inicio"],
+    "sanitizedOwnerTrace": true,
+    "captureValues": false,
+    "capturePII": false,
+    "captureSecrets": false,
+    "singleCumulativeVisualReview": false,
+    "diagnosticOnly": true
+  },
+  "guards": {
+    "firestoreDataWritesAllowed": false,
+    "operationalWritesAllowed": 0,
+    "reimportAllowed": false,
+    "hostingDeployAllowed": false,
+    "previewDeployAllowed": false,
+    "firestoreRulesDeployAllowed": false,
+    "functionsDeployAllowed": false,
+    "productionAllowed": false,
+    "mainAllowed": false,
+    "mergeAllowed": false,
+    "newParallelReadOwnerAllowed": false
+  },
+  "humanApproval": {
+    "clientes": true,
+    "polizas": false,
+    "vehiculos": false,
+    "recibos": false,
+    "cartera": false,
+    "restoCrm": false,
+    "automatedGateMaySetApproval": false
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
