@@ -3,7 +3,7 @@
   "gateId": "block7-policies-canonical-controlled-write-lab-v20260801",
   "gateContractVersion": "7.5.0",
   "validatorLifecycleRevision": "phase-capability-contract-v1",
-  "status": "POLICIES_CANONICAL_CONTROLLED_WRITE_AUTHORIZED",
+  "status": "POLICIES_CANONICAL_CONTROLLED_WRITE_CLOSED",
   "executionProfile": {
     "phase": "LAB_DATA_CONTRACT_REPAIR_APPLY",
     "capabilities": {
@@ -26,7 +26,13 @@
     "authorizationRef": "user_authorized_canonical_controlled_write_4377_20260801",
     "explicit": true,
     "allowedExecutions": 1,
-    "consumed": false
+    "consumed": true,
+    "consumedByRun": 30726870258,
+    "requestReplayBlocked": true,
+    "replayBlockMechanisms": [
+      "TARGET_SNAPSHOT_DIGEST_CHANGED",
+      "CREATE_PRECONDITION_REJECTS_EXISTING_DOCUMENTS"
+    ]
   },
   "sourceDryRun": {
     "gateId": "block7-policies-authority-canonical-dryrun-readonly-v20260801",
@@ -37,50 +43,73 @@
     "artifactDigest": "sha256:96a31790713ffc1ffa71db23bfdc34134e4ddb23555c1ce67ca3870eb17dd48a",
     "head": "8f4b077421dec382cfb3665d93add5f559c8656a",
     "status": "POLICIES_AUTHORITY_CANONICAL_DRYRUN_READONLY_PASS",
-    "closed": true,
-    "sourceSnapshotDigest": "88b8e16b0d4531b2f5c0ce2b1a21068837853080943f7584f6f3fab0cc2ff18d",
-    "targetSnapshotDigest": "9ec5e02509d6fa3cfc1450de8db42e0fd71c0d52e612bd6d9c0119186fc5f3d8",
-    "planSetDigest": "bd1852e73c21c61d98baed4bda129b027cd1a3ec2a265b6749dbc7c0eb25df47"
+    "closed": true
+  },
+  "executionResult": {
+    "run": 30726870258,
+    "job": 91440059984,
+    "artifact": 8826656778,
+    "artifactDigest": "sha256:170f450128cd228e3a8ce53c072fcd91cfb38ff4ad6a0dc5ae73116b84e8b945",
+    "head": "67b76a23419dea01c273f1524feda7b8f1578395",
+    "status": "POLICIES_CANONICAL_CONTROLLED_WRITE_PASS",
+    "classification": "GO_LAB_CANONICAL_CONTROLLED_WRITE_CLOSED",
+    "preflightPassed": 17,
+    "preflightFailed": 0,
+    "batchesPlanned": 11,
+    "batchesCommitted": 11,
+    "createdDocuments": 4377,
+    "updatedDocuments": 0,
+    "overwrittenDocuments": 0,
+    "omittedEquivalentDocuments": 440,
+    "holdDocuments": 25,
+    "firestoreWrites": 4377,
+    "operationalWrites": 4377,
+    "rollbackExecuted": false,
+    "postVerificationPassed": true,
+    "closed": true
   },
   "authorityDecision": {
     "declared": true,
     "authoritativeRoute": "tenantId/{tenantId}/{collection}",
+    "authoritativeRole": "CURRENT_OPERATIONAL_SOURCE",
     "canonicalRoute": "tenants/{tenantId}/data/{collection}/items",
     "canonicalRole": "MULTI_TENANT_DESTINATION_AND_READ_MODEL",
     "frontendAdaptationAuthorized": false
   },
-  "writePlan": {
-    "createOnly": true,
-    "createDocuments": 4377,
-    "updateDocuments": 0,
-    "omitEquivalentDocuments": 440,
-    "holdDocuments": 25,
-    "holdAdditionalClients": 16,
-    "holdAdditionalInsurers": 4,
-    "holdCanonicalSeeds": 5,
-    "unresolvedImportBatchReferencesExcluded": 440,
-    "collections": {
-      "clientes": {"create": 0, "omit": 414, "hold": 16},
-      "aseguradoras": {"create": 0, "omit": 26, "hold": 4},
-      "polizas": {"create": 1373, "omit": 0, "hold": 2},
-      "vehiculos": {"create": 1032, "omit": 0, "hold": 1},
-      "recibosEsperados": {"create": 1294, "omit": 0, "hold": 0},
-      "carteraPrimas": {"create": 673, "omit": 0, "hold": 0},
-      "cobros": {"create": 5, "omit": 0, "hold": 2}
-    }
+  "collectionResult": {
+    "clientes": {"before": 414, "created": 0, "after": 414, "omit": 414, "hold": 16},
+    "aseguradoras": {"before": 26, "created": 0, "after": 26, "omit": 26, "hold": 4},
+    "polizas": {"before": 2, "created": 1373, "after": 1375, "omit": 0, "hold": 2},
+    "vehiculos": {"before": 1, "created": 1032, "after": 1033, "omit": 0, "hold": 1},
+    "recibosEsperados": {"before": 0, "created": 1294, "after": 1294, "omit": 0, "hold": 0},
+    "carteraPrimas": {"before": 0, "created": 673, "after": 673, "omit": 0, "hold": 0},
+    "cobros": {"before": 2, "created": 5, "after": 7, "omit": 0, "hold": 2}
   },
-  "transactionControl": {
-    "snapshotRequired": true,
-    "idempotencyRequired": true,
-    "createPreconditionRequired": true,
-    "chunkedCompensatingRollbackRequired": true,
-    "postVerificationRequired": true,
-    "rollbackVerificationRequired": true,
-    "maxBatchWrites": 400,
-    "targetOverwriteAllowed": false,
-    "seedDeletionAllowed": false,
-    "holdWriteAllowed": false,
-    "unresolvedBatchReferenceWriteAllowed": false
+  "digests": {
+    "sourceSnapshotDigest": "88b8e16b0d4531b2f5c0ce2b1a21068837853080943f7584f6f3fab0cc2ff18d",
+    "targetSnapshotBeforeDigest": "9ec5e02509d6fa3cfc1450de8db42e0fd71c0d52e612bd6d9c0119186fc5f3d8",
+    "planSetDigest": "bd1852e73c21c61d98baed4bda129b027cd1a3ec2a265b6749dbc7c0eb25df47",
+    "targetSnapshotAfterDigest": "724e1efbbc29f60791350ea180ef54230ecf888f9914b98fc70fda62ca6ac305"
+  },
+  "snapshotAndRollback": {
+    "privateSnapshotCreated": true,
+    "snapshotEntries": 445,
+    "snapshotStoredInArtifact": false,
+    "snapshotDigest": "9ec5e02509d6fa3cfc1450de8db42e0fd71c0d52e612bd6d9c0119186fc5f3d8",
+    "createOnly": true,
+    "createPreconditionsUsed": true,
+    "rollbackAvailable": true,
+    "rollbackRequired": false,
+    "rollbackExecuted": false
+  },
+  "postVerification": {
+    "countsMatch": true,
+    "contentMatch": true,
+    "sourceUnchanged": true,
+    "createdPayloadsMatch": true,
+    "unresolvedImportBatchReferencesWritten": 0,
+    "seedDeletionExecuted": false,
+    "holdDocumentsWritten": 0
   },
   "cumulativeVisualGuard": {
     "required": true,
@@ -88,6 +117,12 @@
     "pathDigest": "0c3dbf222646ea46b57e838359ac56fff3994268a97e0d682508bd747a29f3c4",
     "contentDigest": "5b32b90815929acc341cfd4ae7c1e5f76d819e1a6a1b4091d13800508ab9b647",
     "indexDigest": "54df4a1977573ccc6a0702bd0012f2835fcef4cb529e327d16918c4b420382a4",
+    "manifestReverified": true,
+    "noParallelShell": true,
+    "noReducedShell": true,
+    "noModuleFragmentation": true,
+    "noModuleDowngrade": true,
+    "futureVisualCandidateMustUseSameHeadOrAuditedDescendant": true,
     "visualizationAuthorizedByThisGate": false
   },
   "humanApproval": {
@@ -100,8 +135,8 @@
     "automatedGateMaySetApproval": false
   },
   "guards": {
-    "firestoreDataWritesAllowed": true,
-    "operationalWritesAllowed": 4377,
+    "firestoreDataWritesAllowed": false,
+    "operationalWritesAllowed": 0,
     "reimportAllowed": false,
     "seedDeletionAllowed": false,
     "browserAllowed": false,
@@ -113,6 +148,29 @@
     "frontendAdaptationAllowed": false,
     "mainAllowed": false,
     "mergeAllowed": false
+  },
+  "security": {
+    "firestoreRead": true,
+    "firestoreWrites": 4377,
+    "operationalWrites": 4377,
+    "reimportExecuted": false,
+    "seedDeletionExecuted": false,
+    "frontendAdapted": false,
+    "browserExecuted": false,
+    "previewExecuted": false,
+    "deployExecuted": false,
+    "rulesApplied": false,
+    "functionsDeployed": false,
+    "productionTouched": false,
+    "mainTouched": false,
+    "mergeExecuted": false
+  },
+  "nextGateCondition": {
+    "postWriteReadonlyRevalidationRequired": true,
+    "frontendReadSwitchAuthorized": false,
+    "visualizationAuthorized": false,
+    "humanVisualApprovalStillRequired": true,
+    "controlledWriteRequiresNewAuthorization": true
   },
   "containsPII": false,
   "containsSecrets": false
