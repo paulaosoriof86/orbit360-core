@@ -1,0 +1,112 @@
+{
+  "schemaVersion": "orbit360-canonical-runtime-cumulative-visual-lab-request-v1",
+  "gateId": "block7-canonical-runtime-cumulative-visual-lab-v20260801",
+  "contractVersion": "7.11.0",
+  "authorizationRef": "user_continue_urgent_root_cause_macro_gate711_20260802T1245-0600",
+  "approved": true,
+  "allowedExecutions": 1,
+  "consumed": false,
+  "rootFixVerificationOnly": true,
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "parentHead": "f4124ca567f808e7370b6ce6641457c797e5efb8",
+  "projectId": "ays-orbit-360-lab",
+  "tenantId": "alianzas-soluciones",
+  "canonicalSnapshotDigest": "19e1927d39f6b713ee12504f8762bc42ead9de6e365bb0f12162d2a0c8f8469b",
+  "rootCause": {
+    "classification": "FUNCTIONAL_DEFECT",
+    "owner": "orbit360-platform/data/academia-v1230-operational-directory-v20260722.js",
+    "function": "apply",
+    "trigger": "orbit:session",
+    "diagnosticRun": 30762248796,
+    "diagnosticArtifact": 8837830086,
+    "attempts": 15
+  },
+  "rootFix": {
+    "commit": "fd49e1b15e69d1f023727b4ff92190852bcae1e0",
+    "version": "20260802.1",
+    "sessionListenerRemoved": true,
+    "targetOnlyIdempotentUpsert": true,
+    "staticRun": 30762515438,
+    "staticArtifact": 8837895052,
+    "staticStatus": "GATE711_ACADEMIA_OPERATIONAL_IDEMPOTENCE_STATIC_PASS",
+    "staticChecks": "16/16"
+  },
+  "manifestResolution": {
+    "run": 30762785016,
+    "job": 91536205495,
+    "artifact": 8837976901,
+    "artifactDigest": "sha256:33f00fa4239bc42acaef8facb68a4aadadc1a05699805192a96cb4834175c783",
+    "status": "GATE711_CUMULATIVE_VISUAL_MANIFEST_ROOTFIX_PASS",
+    "checks": "10/10",
+    "onlyChangedVisualPath": "orbit360-platform/data/academia-v1230-operational-directory-v20260722.js"
+  },
+  "cumulativeManifest": {
+    "trackedFileCount": 309,
+    "pathDigest": "517056dee1200503b2e7295a333cb804bc71271bbaa87847fa762da025f276f1",
+    "contentDigest": "9e737a2e20ee868ec804a66d249957260164ea393ed4576d4a67b3508a00f762",
+    "indexDigest": "b57b6581ee02d2dde42a8a2c1272d57f19b7ad6809d13a1d25111f3d71a96074"
+  },
+  "expectedOperationalCounts": {
+    "clientes": 430,
+    "aseguradoras": 30,
+    "polizas": 1373,
+    "vehiculos": 1032,
+    "recibosEsperados": 1294,
+    "carteraPrimas": 673,
+    "cobros": 5,
+    "asesores": 7
+  },
+  "identity": {
+    "existingOnly": true,
+    "createUser": false,
+    "updateUser": false,
+    "customTokenEphemeral": true,
+    "expectedUid": "woJlxR1iFEeiQZvTscPj4qQ5Qc73",
+    "expectedEmail": "orbit.lab@demo.com",
+    "derivePublicWebConfigReadOnly": true
+  },
+  "scope": {
+    "exactCheckoutLocalServe": true,
+    "snapshotBeforeAfter": true,
+    "browserWriteGuard": true,
+    "singleReadOwner": "Orbit.store",
+    "canonicalCollections": 7,
+    "roles": 3,
+    "viewports": 3,
+    "routes": 3,
+    "sanitizedScreenshots": true,
+    "singleCumulativeVisualReview": true,
+    "automatedGateMaySetHumanApproval": false,
+    "rootFixVerificationOnly": true,
+    "captureValues": false,
+    "capturePII": false,
+    "captureSecrets": false
+  },
+  "capabilities": {
+    "secrets": true,
+    "firestoreRead": true,
+    "writes": false,
+    "runtime": true,
+    "browser": true,
+    "preview": false,
+    "deploy": false,
+    "rulesDeploy": false,
+    "functionsDeploy": false,
+    "production": false,
+    "main": false,
+    "merge": false
+  },
+  "humanApproval": {
+    "clientes": true,
+    "polizas": false,
+    "vehiculos": false,
+    "recibos": false,
+    "cartera": false,
+    "restoCrm": false
+  },
+  "stopRetryOnSameStageOrFamily": true,
+  "containsPII": false,
+  "containsValues": false,
+  "containsSecrets": false
+}
