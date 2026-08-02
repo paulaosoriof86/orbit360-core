@@ -80,11 +80,14 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          TOKEN_FILE="$RUNNER_TEMP/orbit360-canonical-browser-token.txt"
+          CONFIG_FILE="$GITHUB_WORKSPACE/orbit360-platform/core/auth-firebase.config.local.js"
           node tools/orbit360-preparar-identidad-browser-canonica-readonly-v20260801.mjs
           jq -e '.ok==true and .status=="CANONICAL_BROWSER_EXISTING_IDENTITY_READY" and .classification=="GO_LAB_EXISTING_IDENTITY_READONLY" and .projectId=="ays-orbit-360-lab" and .tenantId=="alianzas-soluciones" and .eligibleExistingIdentityCount==1 and .uidMatched==true and .emailMatched==true and .customTokenCreatedEphemeral==true and .authWrites==0 and .firestoreWrites==0 and .operationalWrites==0 and .containsPII==false and .containsSecrets==false' "$EVIDENCE_DIR/canonical-browser-identity-readonly-v20260801.json" >/dev/null
-          test -n "${ORBIT360_CUSTOM_TOKEN_FILE:-}"
-          test -s "$ORBIT360_CUSTOM_TOKEN_FILE"
-          test -s orbit360-platform/core/auth-firebase.config.local.js
+          test -s "$TOKEN_FILE"
+          test -s "$CONFIG_FILE"
+          echo "ORBIT360_CUSTOM_TOKEN_FILE=$TOKEN_FILE" >> "$GITHUB_ENV"
+          echo "ORBIT360_LOCAL_FIREBASE_CONFIG_FILE=$CONFIG_FILE" >> "$GITHUB_ENV"
       - name: Snapshot canónico inicial
         shell: bash
         run: |
