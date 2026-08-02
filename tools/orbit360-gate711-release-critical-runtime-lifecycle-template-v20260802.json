@@ -1,0 +1,93 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-template-v1",
+  "gateId": "block7-canonical-runtime-cumulative-visual-lab-v20260801",
+  "baseGateContractVersion": "7.11.0",
+  "releaseCriticalScopeRevision": "7.11.1",
+  "status": "INERT_TEMPLATE_PENDING_EXPLICIT_AUTHORIZATION",
+  "phase": "LAB_RUNTIME_GATE_PENDING",
+  "sourceLock": {
+    "productHead": "997fca628f95dd397dba347700a6bc644fe840f0",
+    "requiredBranch": "ays/backend-tenant-lab-v99-20260703",
+    "pullRequest": 5,
+    "productPathsMayChange": false
+  },
+  "authorization": {
+    "authorizationRef": "PENDING_NEW_EXPLICIT_AUTHORIZATION",
+    "explicit": false,
+    "allowedExecutions": 0,
+    "consumed": true,
+    "macroBlockWithoutMicroAuthorizations": true,
+    "additionalExecutionsAllowed": false
+  },
+  "intendedExecutionProfileAfterAuthorization": {
+    "phase": "LAB_RUNTIME_GATE",
+    "capabilities": {
+      "credentialRead": true,
+      "firestoreRead": true,
+      "writes": false,
+      "runtime": true,
+      "browser": true,
+      "deploy": false,
+      "functionsDeploy": false,
+      "rulesDeploy": false,
+      "production": false
+    }
+  },
+  "staticClosureEvidence": {
+    "lifecycle": "tools/orbit360-validator-lifecycle-contract-gate711-release-critical-static-v20260802.json",
+    "run": 30771933766,
+    "job": 91560447718,
+    "artifact": 8840787308,
+    "artifactDigest": "sha256:0c99399ed79fa6036128a6343a70ade6101d4a61aef7e5e6dd561ae8514a28f6",
+    "status": "GATE711_RELEASE_CRITICAL_STATIC_PASS_CLOSED",
+    "checks": "38/38",
+    "productFreeze": "PASS"
+  },
+  "scope": {
+    "singleGate": true,
+    "singleCandidate": true,
+    "singleBrowserSession": true,
+    "legalOnce": true,
+    "snapshotBeforeAndAfter": true,
+    "browserWriteGuard": true,
+    "singleReadOwner": "Orbit.store",
+    "roles": ["Dirección", "Operativo", "Asesor"],
+    "viewports": ["desktop", "tablet", "mobile"],
+    "routes": ["cliente360", "aseguradoras", "polizas", "ops", "leads"],
+    "advisorOpsRestricted": true,
+    "sanitizedScreenshots": 14,
+    "singleCumulativeVisualReview": true,
+    "focusedAcademiaRuntime": false,
+    "academiaStaticIntegrityRequired": true,
+    "academiaContentCompletenessBlocksRelease": false,
+    "cloudPackageSent": false
+  },
+  "guards": {
+    "firestoreDataWritesAllowed": false,
+    "operationalWritesAllowed": 0,
+    "reimportAllowed": false,
+    "hostingDeployAllowed": false,
+    "previewDeployAllowed": false,
+    "firestoreRulesDeployAllowed": false,
+    "functionsDeployAllowed": false,
+    "productionAllowed": false,
+    "mainAllowed": false,
+    "mergeAllowed": false,
+    "newParallelReadOwnerAllowed": false,
+    "stopRetryOnSameStageOrFailureFamily": true
+  },
+  "humanApproval": {
+    "clientes": true,
+    "polizas": false,
+    "vehiculos": false,
+    "recibos": false,
+    "cartera": false,
+    "cobros": false,
+    "ops": false,
+    "leads": false,
+    "restoCrm": false,
+    "automatedGateMaySetApproval": false
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
