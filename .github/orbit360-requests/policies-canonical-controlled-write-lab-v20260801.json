@@ -1,0 +1,69 @@
+{
+  "schemaVersion": "orbit360-policies-canonical-controlled-write-request-v1",
+  "gateId": "block7-policies-canonical-controlled-write-lab-v20260801",
+  "contractVersion": "7.5.0",
+  "authorizationRef": "user_authorized_canonical_controlled_write_4377_20260801",
+  "approved": true,
+  "allowedExecutions": 1,
+  "consumed": false,
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "parentHead": "cbacee49d46f10a06e5928a92296779067389829",
+  "tenantId": "alianzas-soluciones",
+  "projectId": "ays-orbit-360-lab",
+  "digests": {
+    "sourceSnapshot": "88b8e16b0d4531b2f5c0ce2b1a21068837853080943f7584f6f3fab0cc2ff18d",
+    "targetSnapshot": "9ec5e02509d6fa3cfc1450de8db42e0fd71c0d52e612bd6d9c0119186fc5f3d8",
+    "planSet": "bd1852e73c21c61d98baed4bda129b027cd1a3ec2a265b6749dbc7c0eb25df47"
+  },
+  "scope": {
+    "createDocuments": 4377,
+    "updateDocuments": 0,
+    "omitEquivalentDocuments": 440,
+    "holdDocuments": 25,
+    "holdAdditionalClients": 16,
+    "holdAdditionalInsurers": 4,
+    "holdCanonicalSeeds": 5,
+    "writeHoldDocuments": false,
+    "deleteSeeds": false,
+    "unresolvedImportBatchReferences": 440,
+    "writeUnresolvedImportBatchReferences": false,
+    "snapshotRequired": true,
+    "idempotencyRequired": true,
+    "postVerificationRequired": true,
+    "rollbackRequired": true,
+    "collections": {
+      "clientes": {"create": 0, "omit": 414, "hold": 16},
+      "aseguradoras": {"create": 0, "omit": 26, "hold": 4},
+      "polizas": {"create": 1373, "omit": 0, "hold": 2},
+      "vehiculos": {"create": 1032, "omit": 0, "hold": 1},
+      "recibosEsperados": {"create": 1294, "omit": 0, "hold": 0},
+      "carteraPrimas": {"create": 673, "omit": 0, "hold": 0},
+      "cobros": {"create": 5, "omit": 0, "hold": 2}
+    }
+  },
+  "capabilities": {
+    "secrets": true,
+    "firestoreRead": true,
+    "writes": true,
+    "runtime": false,
+    "browser": false,
+    "preview": false,
+    "deploy": false,
+    "rulesDeploy": false,
+    "functionsDeploy": false,
+    "production": false,
+    "main": false,
+    "merge": false
+  },
+  "humanApproval": {
+    "clientes": true,
+    "polizas": false,
+    "vehiculos": false,
+    "recibos": false,
+    "cartera": false,
+    "restoCrm": false
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
