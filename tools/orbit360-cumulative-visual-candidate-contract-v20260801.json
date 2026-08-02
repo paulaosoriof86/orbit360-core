@@ -1,0 +1,62 @@
+{
+  "schemaVersion": "orbit360-cumulative-visual-candidate-contract-v1",
+  "contractVersion": "1.0.0",
+  "status": "CUMULATIVE_VISUAL_CANDIDATE_REQUIRED",
+  "requiredBranch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "baselineSourceCommit": "f982dc9744f96ea51a40b311ffdbf60a078222da",
+  "compositionPolicy": {
+    "baseline": "LATEST_AUDITED_ACCEPTED_PLUS_INCREMENTAL_HEAD",
+    "singleCandidate": true,
+    "parallelCandidatesAllowed": false,
+    "fullReplacementAllowed": false,
+    "selectiveIntegrationRequired": true,
+    "moduleDowngradeAllowed": false,
+    "partialModuleSelectionAllowed": false,
+    "reducedShellAllowed": false,
+    "historicalShellReuseWithoutAuditAllowed": false,
+    "bestVersionPerModuleRequiresEvidence": true
+  },
+  "manifest": {
+    "roots": [
+      "orbit360-platform/index.html",
+      "orbit360-platform/modules",
+      "orbit360-platform/core",
+      "orbit360-platform/styles",
+      "orbit360-platform/data"
+    ],
+    "trackedFilesOnly": true,
+    "includeFileContentDigest": true,
+    "includePathDigest": true,
+    "includeRootCounts": true,
+    "excludeRuntimeEvidence": true,
+    "excludeGeneratedPreviewShells": true
+  },
+  "futureVisualizationBarrier": {
+    "mustUseManifestFromGate": true,
+    "mustUseSameHeadOrAuditedDescendant": true,
+    "mustPreserveAllTrackedModules": true,
+    "mustExplainEveryRemovedOrReplacedModule": true,
+    "mustProveNoRegressionPerModuleOwner": true,
+    "mustNotInferApprovalFromAutomatedSmoke": true,
+    "requiresSeparateAuthorization": true
+  },
+  "moduleOwnersPreserved": [
+    "PWA",
+    "Router",
+    "Legal",
+    "Access",
+    "client projection",
+    "Aseguradoras",
+    "Clientes",
+    "Polizas",
+    "Vehiculos",
+    "Recibos",
+    "Cartera",
+    "Cobros",
+    "PlanillasComisiones",
+    "Academia"
+  ],
+  "containsPII": false,
+  "containsSecrets": false
+}
