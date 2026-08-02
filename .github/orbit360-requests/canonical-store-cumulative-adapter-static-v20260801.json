@@ -11,7 +11,7 @@
   "additionalAttemptsAfterResume": false,
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
-  "parentHead": "b15af714cbb15f4b5d7153d4cdd8cee9747efbee",
+  "parentHead": "0203a2adb2dd0173c23c4a7d275ae340bd3bc0f6",
   "baselineCommit": "a0c430d7ae2856b5fe45207fb0820dcd9bb45809",
   "canonicalSnapshotDigest": "19e1927d39f6b713ee12504f8762bc42ead9de6e365bb0f12162d2a0c8f8469b",
   "allowedRuntimeDeltaDigest": "44499018d95febe633d4977ef3c707b62cceeef70284086ac3b8d49f02e39df4",
@@ -23,6 +23,7 @@
     "excludeSeedsOperationally": true,
     "preserveRequiresValidation": true,
     "scanAllModules": true,
+    "scanRuntimeModuleGraph": true,
     "allowedRuntimeDeltaFiles": 5,
     "computeCumulativeManifest": true,
     "oldParallelProjectionAllowed": false
