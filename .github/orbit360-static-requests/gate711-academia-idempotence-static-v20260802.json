@@ -1,0 +1,24 @@
+{
+  "schemaVersion": "orbit360-gate711-academia-idempotence-static-request-v1",
+  "gateId": "block7-canonical-runtime-cumulative-visual-lab-v20260801",
+  "approved": true,
+  "allowedExecutions": 1,
+  "consumed": false,
+  "parentHead": "48cdee53e2ba22bce63f8cd316d28ef90d0f2120",
+  "owner": "orbit360-platform/data/academia-v1230-operational-directory-v20260722.js",
+  "rootFixCommit": "fd49e1b15e69d1f023727b4ff92190852bcae1e0",
+  "capabilities": {
+    "secrets": false,
+    "firestoreRead": false,
+    "runtime": false,
+    "browser": false,
+    "writes": false,
+    "deploy": false,
+    "production": false,
+    "main": false,
+    "merge": false
+  },
+  "containsPII": false,
+  "containsValues": false,
+  "containsSecrets": false
+}
