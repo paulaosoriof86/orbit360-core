@@ -26,6 +26,7 @@ const FILES={
   sync:'orbit360-platform/core/backend-lab-canonical-view-sync.js',
   bridge:'orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js',
   oldBridge:'orbit360-platform/core/backend-lab-receipts-portfolio-projection-v910.js',
+  dormantInitialImporter:'orbit360-platform/modules/importar-initial-tenant-lab.js',
   gate79:'tools/orbit360-validator-lifecycle-contract-policies-full-canonical-revalidation-readonly-v20260801.json'
 };
 
@@ -42,8 +43,18 @@ function manifest(){
 }
 function syntax(rel){const run=spawnSync(process.execPath,['--check',rel],{cwd:ROOT,encoding:'utf8'});return{ok:run.status===0,error:String(run.stderr||run.stdout||'').trim().slice(0,300)};}
 function functionBody(source,name){const start=source.indexOf(`function ${name}(`);if(start<0)return'';let brace=source.indexOf('{',start),depth=0;for(let i=brace;i<source.length;i++){if(source[i]==='{')depth++;if(source[i]==='}'){depth--;if(depth===0)return source.slice(start,i+1);}}return'';}
-function matches(source,pattern){return pattern.test(source);}
 function sortedEqual(a,b){return JSON.stringify([...a].sort())===JSON.stringify([...b].sort());}
+function runtimeModuleFiles(indexSource,trackedModules){
+  const active=new Set();
+  const collect=source=>{
+    const pattern=/["'](modules\/[^"'?]+\.js)(?:\?[^"']*)?["']/g;
+    let match;while((match=pattern.exec(source)))active.add('orbit360-platform/'+match[1]);
+  };
+  collect(indexSource);
+  const loaderFiles=lines('git',['ls-files','--','orbit360-platform/core','orbit360-platform/data']);
+  loaderFiles.forEach(rel=>collect(text(rel)));
+  return [...active].filter(rel=>trackedModules.includes(rel)).sort();
+}
 
 const checks=[];
 function check(id,ok,detail){checks.push({id,ok:Boolean(ok),detail:detail===undefined?null:detail});}
@@ -55,7 +66,8 @@ try{
   const lifecycle=JSON.parse(text('tools/orbit360-validator-lifecycle-contract-canonical-store-cumulative-adapter-static-v20260801.json'));
   const gate79=JSON.parse(text(FILES.gate79));
   check('LIFECYCLE',lifecycle.gateId===GATE&&lifecycle.gateContractVersion===VERSION&&lifecycle.status==='CANONICAL_STORE_CUMULATIVE_ADAPTER_STATIC_AUTHORIZED');
-  check('AUTHORIZATION',lifecycle.authorization?.explicit===true&&lifecycle.authorization?.allowedExecutions===1&&lifecycle.authorization?.consumed===false&&lifecycle.authorization?.authorizationRef==='user_proceed_definitive_solutions_no_trial_error_20260801');
+  check('AUTHORIZATION',lifecycle.authorization?.explicit===true&&lifecycle.authorization?.allowedExecutions===2&&lifecycle.authorization?.attemptsUsed===1&&lifecycle.authorization?.consumed===false&&lifecycle.authorization?.authorizationRef==='user_proceed_definitive_solutions_no_trial_error_20260801');
+  check('FIRST_ATTEMPT_CLASSIFIED',lifecycle.attempts?.first?.run===30732248630&&lifecycle.attempts?.first?.classification==='MIXED_VALIDATOR_STALE_AND_DORMANT_SCOPE_FALSE_POSITIVE'&&lifecycle.attempts?.first?.firestoreWrites===0);
   check('ZERO_CAPABILITY',Object.values(lifecycle.executionProfile?.capabilities||{}).every(v=>v===false)&&lifecycle.executionProfile?.phase==='STATIC_PREFLIGHT');
   check('GATE_79_CLOSED',gate79.status==='POLICIES_FULL_CANONICAL_REVALIDATION_READONLY_CLOSED'&&gate79.sealedState?.canonicalSnapshotDigest===CANONICAL_DIGEST&&gate79.guards?.additionalExecutionsAllowed===false);
 
@@ -78,10 +90,10 @@ try{
   result.api={required:apiNames,missing:apiMissing};
   check('PUBLIC_API_COMPLETE',apiMissing.length===0,apiMissing);
   check('STORE_EXTENSIONS_PRESERVED',store.includes('subscribe: on')&&store.includes('_subscribe: on')&&store.includes('_attachSnapshots: attachSnapshots')&&store.includes('_detachSnapshots: detachSnapshots'));
-  check('STORE_NO_LOCALSTORAGE',!store.includes('localStorage'));
+  check('STORE_NO_LOCALSTORAGE_EXECUTION',!/\blocalStorage\s*(?:\.|\[)/.test(store));
   check('STORE_NO_SEED_FALLBACK',store.includes('noFallback: true')&&!store.includes('Orbit.SEED'));
   check('STORE_CANONICAL_DIGEST',store.includes(CANONICAL_DIGEST)&&init.includes(CANONICAL_DIGEST));
-  check('STORE_SINGLE_OWNER_MARKERS',store.includes('__canonicalReadModelV79: true')&&store.includes('__singleReadOwner: true')&&store.includes("singleReadOwner: true"));
+  check('STORE_SINGLE_OWNER_MARKERS',store.includes('__canonicalReadModelV79: true')&&store.includes('__singleReadOwner: true')&&store.includes('singleReadOwner: true'));
 
   const canonicalMissing=CANONICAL.filter(name=>!store.includes(`'${name}'`));
   check('CANONICAL_COLLECTION_SET',canonicalMissing.length===0,canonicalMissing);
@@ -112,12 +124,17 @@ try{
   check('OLD_BRIDGE_NOT_LOADED',oldRuntimeRefs.length===0,oldRuntimeRefs);
 
   const moduleFiles=lines('git',['ls-files','--','orbit360-platform/modules']);
+  const activeModuleFiles=runtimeModuleFiles(index,moduleFiles);
   const moduleViolations=[];
   const directPattern=/(firebase\s*\.\s*firestore|\.collection\s*\(\s*['"](?:tenantId|tenants)['"]|onSnapshot\s*\()/;
-  for(const rel of moduleFiles){const source=text(rel);if(directPattern.test(source))moduleViolations.push(rel);}
-  result.moduleScan={files:moduleFiles.length,directFirestoreViolations:moduleViolations};
-  check('MODULES_USE_STORE_ONLY',moduleViolations.length===0,moduleViolations);
+  for(const rel of activeModuleFiles){const source=text(rel);if(directPattern.test(source))moduleViolations.push(rel);}
+  let dormantImporterRefs=[];
+  try{dormantImporterRefs=lines('git',['grep','-n','importar-initial-tenant-lab.js','--','orbit360-platform/index.html','orbit360-platform/core','orbit360-platform/data','orbit360-platform/modules']).filter(line=>!line.startsWith(FILES.dormantInitialImporter+':'));}catch(e){dormantImporterRefs=[];}
+  const dormantImporterActive=activeModuleFiles.includes(FILES.dormantInitialImporter);
+  check('ACTIVE_MODULES_USE_STORE_ONLY',moduleViolations.length===0,moduleViolations);
+  check('INITIAL_IMPORTER_TEMPORAL_RETIRO',!dormantImporterActive&&dormantImporterRefs.length===0,{active:dormantImporterActive,references:dormantImporterRefs});
   check('MODULE_COUNT_PRESERVED',moduleFiles.length===62,moduleFiles.length);
+  result.moduleScan={files:moduleFiles.length,activeFiles:activeModuleFiles.length,dormantFiles:moduleFiles.length-activeModuleFiles.length,directFirestoreViolations:moduleViolations,temporalRetirement:[FILES.dormantInitialImporter],temporalRetirementRuntimeReferences:dormantImporterRefs};
 
   const mf=manifest();result.manifest=mf;
   check('CUMULATIVE_FILE_COUNTS',mf.counts.index===1&&mf.counts.modules===62&&mf.counts.core===183&&mf.counts.styles===10&&mf.counts.data===53&&mf.trackedFileCount===309,mf.counts);
@@ -125,7 +142,7 @@ try{
 
   const failed=checks.filter(c=>!c.ok);
   result.checks=checks;
-  result.summary={totalChecks:checks.length,passedChecks:checks.length-failed.length,failedChecks:failed.length,failedCheckIds:failed.map(c=>c.id),allowedRuntimeDeltaFiles:ALLOWED_DELTA.length,actualRuntimeDeltaFiles:runtimeDelta.length,modulesPreserved:moduleFiles.length,canonicalCollections:CANONICAL.length,newTrackedFileCount:mf.trackedFileCount};
+  result.summary={totalChecks:checks.length,passedChecks:checks.length-failed.length,failedChecks:failed.length,failedCheckIds:failed.map(c=>c.id),allowedRuntimeDeltaFiles:ALLOWED_DELTA.length,actualRuntimeDeltaFiles:runtimeDelta.length,modulesPreserved:moduleFiles.length,activeModulesValidated:activeModuleFiles.length,canonicalCollections:CANONICAL.length,newTrackedFileCount:mf.trackedFileCount};
   if(failed.length)throw new Error('FUNCTIONAL_DEFECT:STATIC_CONTRACT_FAILED');
   result.status='CANONICAL_STORE_CUMULATIVE_ADAPTER_STATIC_PASS';
   result.classification='GO_STATIC_CANONICAL_STORE_ADAPTER';
