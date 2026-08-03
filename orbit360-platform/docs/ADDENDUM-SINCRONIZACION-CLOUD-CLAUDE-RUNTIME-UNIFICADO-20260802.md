@@ -1,6 +1,6 @@
 # ADDENDUM — SINCRONIZACIÓN CLOUD / CLAUDE / RUNTIME UNIFICADO
 
-Fecha: 2026-08-02  
+Fecha: 2026-08-03  
 Documento padre: `SINCRONIZACION-CLOUD-CLAUDE-ACUMULADA-20260802.md`  
 Estado: `ACUMULADO / NO_ENVIADO / NO_DEPLOY`
 
@@ -24,6 +24,10 @@ Este addendum no sustituye el ledger acumulado. Agrega los patrones derivados de
 | CL-087 | Evidencia | La cardinalidad de capturas debe derivarse de la matriz ejecutable, no mantenerse como número manual separado. | `REPLICABLE_CLAUDE_INMEDIATO` | `IMPLEMENTADO` |
 | CL-088 | Diagnóstico | Todo `pageerror` debe registrar etapa, rol, ruta, etiqueta y stack sanitizado para ubicar el owner real sin repetir el runtime. | `REPLICABLE_CLAUDE_ACUMULADO` | `IMPLEMENTADO` |
 | CL-089 | Academia | Incluir la diferencia entre defecto funcional, `SECURITY_FAILURE`, `VALIDATOR_STALE` y `PIPELINE_MECHANISM_FAILURE`, usando el caso de un bridge que intenta mutar un owner congelado. | `ACADEMIA_ACTUALIZAR` | `PENDIENTE_ENVIO` |
+| CL-090 | Validadores | Un sello de manifest es un consumidor contractual. Cada cambio autorizado de producto debe actualizar conjuntamente el manifest canónico y todos los sellos que lo comparan; actualizar solo el contrato principal deja validadores obsoletos. | `REPLICABLE_CLAUDE_ACUMULADO` | `IMPLEMENTADO` |
+| CL-091 | Causa raíz | Un fallo `CUMULATIVE_VISUAL_DRIFT` no prueba drift de datos si el expected seal pertenece a una candidata anterior. Antes de tocar datos debe compararse la revisión, fuente y digest del sello con la candidata autorizada. | `ACADEMIA_ACTUALIZAR` | `PENDIENTE_ENVIO` |
+| CL-092 | Evidencia | Todo validador que puede cerrar con código distinto de cero debe escribir y publicar evidencia sanitizada antes de terminar; el artefacto no puede depender únicamente de una copia posterior al PASS. | `REPLICABLE_CLAUDE_INMEDIATO` | `IMPLEMENTADO` |
+| CL-093 | Gates | Ante `STOP_RETRY`, el cierre debe incluir causa raíz, owner, solución, evidencia y frontera siguiente. Informar solo la etapa fallida no cumple el contrato de causa raíz. | `ACADEMIA_ACTUALIZAR` y `REPLICABLE_CLAUDE_ACUMULADO` | `IMPLEMENTADO_EN_LIFECYCLE` |
 
 ## Evidencia vigente
 
@@ -47,9 +51,25 @@ run 30776380035
 artifact 8842172646
 sha256:5b8fd7acfcafabf25538f34288a241472065855dacf69c18b8bb4748a30147cb
 49/49 PASS
+
+runtime detenido en snapshot inicial:
+run 30814564387
+job 91689019904
+artifact 8856180726
+sha256:c3384a1375eb8b311c6c47055020f2ca4d9666f8be87a554439c8f2fe9533d1f
+classification VALIDATOR_STALE
+rootCause VISUAL_SEAL_PRE_ROOTFIX
+
+correctivo de sello y observabilidad:
+run 30814915626
+job 91690157955
+artifact 8856299679
+sha256:3bbeb8af22f0b2ca1d8630735b4169f267249cf92d8b2d3a989308d754751641
+commit a9549f3487522a3e450742de2649b5ad41f3b1e9
+PASS
 ```
 
-Cierres incluidos:
+Cierres preservados:
 
 ```text
 release-critical static: 38/38
@@ -70,7 +90,7 @@ No se envían:
 - backend protegido, writers o adaptadores Firestore;
 - rutas internas, IDs de proyecto o evidencia no sanitizada.
 
-El delta externo describirá CL-084 a CL-089 como arquitectura y criterio reusable. No incluirá el código operativo del guard, los owners A&S ni identificadores del runtime.
+El delta externo describirá CL-084 a CL-093 como arquitectura y criterio reusable. No incluirá código operativo, owners A&S ni identificadores sensibles del runtime.
 
 ## Estado Cloud
 
@@ -83,4 +103,4 @@ datos reales enviados: no
 secretos enviados: no
 ```
 
-CL-076 a CL-089 viajarán en el próximo delta sanitizado junto con CL-001 a CL-075. El envío Cloud/Claude no bloquea la ejecución ni la visualización del release crítico CRM/Ops/Leads.
+CL-076 a CL-093 viajarán en el próximo delta sanitizado junto con CL-001 a CL-075. El envío Cloud/Claude no bloquea la ejecución ni la visualización del release crítico CRM/Ops/Leads.
