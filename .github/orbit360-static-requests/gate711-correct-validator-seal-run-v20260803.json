@@ -1,0 +1,26 @@
+{
+  "schemaVersion": "orbit360-gate711-validator-seal-corrective-request-v1",
+  "productHead": "267f7231b46d65b80c167f54567a67503b6a6793",
+  "parentHead": "7a445b671b168964020ec4b7d15867f345a92c7d",
+  "approved": true,
+  "allowedExecutions": 1,
+  "consumed": false,
+  "sourceRuntimeRun": 30814564387,
+  "sourceRuntimeJob": 91689019904,
+  "sourceRuntimeArtifact": 8856180726,
+  "failedStage": "Snapshot canónico inicial",
+  "classification": "VALIDATOR_STALE",
+  "rootCause": "VISUAL_SEAL_PRE_ROOTFIX",
+  "capabilities": {
+    "secrets": false,
+    "firestoreRead": false,
+    "runtime": false,
+    "browser": false,
+    "writes": false,
+    "deploy": false,
+    "production": false
+  },
+  "stopRetry": true,
+  "containsPII": false,
+  "containsSecrets": false
+}
