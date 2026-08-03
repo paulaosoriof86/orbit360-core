@@ -1,0 +1,46 @@
+{
+  "schemaVersion": "orbit360-gate711-runtime-package-readiness-request-v1",
+  "gateId": "block7-canonical-runtime-cumulative-visual-lab-v20260801",
+  "productHead": "997fca628f95dd397dba347700a6bc644fe840f0",
+  "parentHead": "5bc1a14b841dd5b405ca9f0d11edcf6614141461",
+  "status": "AUTHORIZED_SOURCE_ONLY_CORRECTIVE",
+  "approved": true,
+  "allowedExecutions": 1,
+  "consumed": false,
+  "pipelineCorrection": "IDENTITY_EPHEMERAL_PATH_EXPORT",
+  "priorFailure": {
+    "run": 30774123443,
+    "job": 91566222407,
+    "artifact": 8841443031,
+    "artifactDigest": "sha256:ce6ec1619c7b5e87dbc583c23e806a139ca823ca6ec25740c5867f6f42fc69a1",
+    "classification": "PIPELINE_MECHANISM_FAILURE",
+    "failedStage": "PREPARE_EXISTING_IDENTITY_READONLY",
+    "rootCause": "Workflow shell variables TOKEN_FILE and CONFIG_FILE were not exported before the identity helper executed; the helper produced valid canonical files but the step tested a different token path.",
+    "identityEvidenceOk": true,
+    "secretsRead": true,
+    "firestoreRead": true,
+    "firestoreWrites": 0,
+    "operationalWrites": 0,
+    "runtimeExecuted": false,
+    "browserExecuted": false,
+    "replayAllowed": false
+  },
+  "expectedCorrection": {
+    "exportCustomTokenPathBeforeHelper": true,
+    "exportFirebaseConfigPathBeforeHelper": true,
+    "explicitTokenPathHonoredRequired": true,
+    "explicitConfigPathHonoredRequired": true,
+    "packageReadinessChecks": "38/38"
+  },
+  "capabilities": {
+    "secrets": false,
+    "firestoreRead": false,
+    "runtime": false,
+    "browser": false,
+    "writes": false,
+    "deploy": false,
+    "production": false
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
