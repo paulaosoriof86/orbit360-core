@@ -4,14 +4,14 @@
   "contractVersion": "7.11.0",
   "releaseCriticalScopeRevision": "7.11.1",
   "status": "AUTHORIZED_SINGLE_EXECUTION",
-  "authorizationRef": "user_authorizes_single_readonly_gate711_release_critical_20260802T1738-0600",
+  "authorizationRef": "user_authorizes_single_readonly_gate711_release_critical_20260802T1815-0600",
   "approved": true,
   "allowedExecutions": 1,
   "consumed": false,
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
   "authorizedProductHead": "997fca628f95dd397dba347700a6bc644fe840f0",
-  "parentHead": "62878a4b2f5a61913760591a735e988f4096b165",
+  "parentHead": "1e687b213f1cd99f4a11fe4aa74064522a5119bc",
   "projectId": "ays-orbit-360-lab",
   "tenantId": "alianzas-soluciones",
   "canonicalSnapshotDigest": "19e1927d39f6b713ee12504f8762bc42ead9de6e365bb0f12162d2a0c8f8469b",
@@ -36,6 +36,15 @@
     "classification": "GO_STATIC_RUNTIME_PACKAGE_CRM_OPS_LEADS",
     "checks": "38/38",
     "packageInert": true
+  },
+  "routerCompatibilityEvidence": {
+    "run": 30772843811,
+    "job": 91562895150,
+    "artifact": 8841072752,
+    "artifactDigest": "sha256:770f3127b280fbf6b95725df38b1bf65c7c444825fa631dc00d0b3e9dd454537",
+    "status": "GATE711_RUNTIME_ROUTER_COMPAT_PASS",
+    "classification": "GO_STATIC_RUNTIME_ROUTER_COMPAT",
+    "checks": "12/12"
   },
   "macroSequence": {
     "canonicalContractPreflightBeforeSecrets": true,
