@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "orbit360-gate711-runtime-chain-static-request-v1",
+  "gateId": "block7-canonical-runtime-cumulative-visual-lab-v20260801",
+  "productHead": "997fca628f95dd397dba347700a6bc644fe840f0",
+  "parentHead": "4319997cbf05a684536d238e3a7083261c9b188c",
+  "approved": true,
+  "allowedExecutions": 1,
+  "consumed": false,
+  "scope": "FULL_PIPELINE_PRODUCER_CONSUMER_CHAIN",
+  "includes": [
+    "authorization-freeze",
+    "canonical-preflight",
+    "service-account-handoff",
+    "existing-identity-handoff",
+    "snapshot-before",
+    "local-server",
+    "browser-runtime",
+    "snapshot-after",
+    "artifact-evidence",
+    "temporary-cleanup",
+    "observable-status"
+  ],
+  "capabilities": {
+    "secrets": false,
+    "firestoreRead": false,
+    "runtime": false,
+    "browser": false,
+    "writes": false,
+    "deploy": false,
+    "production": false
+  },
+  "stopRetry": true,
+  "containsPII": false,
+  "containsSecrets": false
+}
