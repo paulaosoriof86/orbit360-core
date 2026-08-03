@@ -1,0 +1,24 @@
+{
+  "schemaVersion": "orbit360-gate711-pageerror-accion-diagnostic-request-v1",
+  "productHead": "997fca628f95dd397dba347700a6bc644fe840f0",
+  "parentHead": "04990c3e4a2eb281666dfb970cd96a870c9ca2ce",
+  "approved": true,
+  "allowedExecutions": 1,
+  "consumed": false,
+  "sourceRun": 30774888921,
+  "sourceArtifact": 8841696348,
+  "error": "Cannot read properties of undefined (reading accion)",
+  "scope": "SOURCE_SCAN_ONLY",
+  "capabilities": {
+    "secrets": false,
+    "firestoreRead": false,
+    "runtime": false,
+    "browser": false,
+    "writes": false,
+    "deploy": false,
+    "production": false
+  },
+  "stopRetry": true,
+  "containsPII": false,
+  "containsSecrets": false
+}
