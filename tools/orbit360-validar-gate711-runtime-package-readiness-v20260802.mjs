@@ -63,11 +63,12 @@ try {
 
   const preflightPos = workflow.indexOf('node tools/orbit360-validar-gate-contracts-v20260717.mjs');
   const credentialPos = workflow.indexOf('Resolver identidad de servicio LAB');
+  const identityPos = workflow.indexOf('Preparar identidad existente read-only');
   const snapshotBeforePos = workflow.indexOf('Snapshot canónico inicial');
   const servePos = workflow.indexOf('Servir checkout exacto sin deploy');
   const runtimePos = workflow.indexOf('node tools/orbit360-validar-gate711-release-critical-runtime-v20260802.mjs');
   const snapshotAfterPos = workflow.indexOf('Snapshot final y comparación exacta');
-  add('WORKFLOW_ORDER', preflightPos >= 0 && credentialPos > preflightPos && snapshotBeforePos > credentialPos && servePos > snapshotBeforePos && runtimePos > servePos && snapshotAfterPos > runtimePos);
+  add('WORKFLOW_ORDER', preflightPos >= 0 && credentialPos > preflightPos && identityPos > credentialPos && snapshotBeforePos > identityPos && servePos > snapshotBeforePos && runtimePos > servePos && snapshotAfterPos > runtimePos && all(workflow, ['export ORBIT360_CUSTOM_TOKEN_FILE="$TOKEN_FILE"', 'export ORBIT360_LOCAL_FIREBASE_CONFIG_FILE="$CONFIG_FILE"', '.explicitTokenPathHonored==true', '.explicitConfigPathHonored==true']));
   add('WORKFLOW_MANDATORY_PREFLIGHT', all(workflow, ['Gate contractual obligatorio antes de secrets', 'tools/orbit360-validar-gate-contracts-v20260717.mjs', 'GO_GATE_CONTRACT', 'GATE711_RELEASE_CRITICAL_STATIC_PASS']));
   add('WORKFLOW_ONE_RUNTIME', count(workflow, 'node tools/orbit360-validar-gate711-release-critical-runtime-v20260802.mjs') === 1 && !workflow.includes('node tools/orbit360-validar-canonical-runtime-cumulative-visual-lab-v20260801.mjs') && !workflow.includes('node tools/orbit360-validar-gate711-ops-leads-runtime-v20260802.mjs'));
   add('WORKFLOW_NO_ACADEMIA_PREREQ', !workflow.includes('academia_root_fix_ready') && !workflow.includes('targeted_rootfix_runtime_readonly') && !workflow.includes('focused Academia'));
