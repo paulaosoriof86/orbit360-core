@@ -212,8 +212,10 @@ jobs:
           set -euo pipefail
           TOKEN_FILE="$RUNNER_TEMP/orbit360-gate711-browser-token.txt"
           CONFIG_FILE="$GITHUB_WORKSPACE/orbit360-platform/core/auth-firebase.config.local.js"
+          export ORBIT360_CUSTOM_TOKEN_FILE="$TOKEN_FILE"
+          export ORBIT360_LOCAL_FIREBASE_CONFIG_FILE="$CONFIG_FILE"
           node tools/orbit360-preparar-identidad-browser-canonica-readonly-v20260801.mjs
-          jq -e '.ok==true and .status=="CANONICAL_BROWSER_EXISTING_IDENTITY_READY" and .classification=="GO_LAB_EXISTING_IDENTITY_READONLY" and .eligibleExistingIdentityCount==1 and .uidMatched==true and .emailMatched==true and .customTokenCreatedEphemeral==true and .authWrites==0 and .firestoreWrites==0 and .operationalWrites==0 and .containsPII==false and .containsSecrets==false' "$EVIDENCE_DIR/canonical-browser-identity-readonly-v20260801.json" >/dev/null
+          jq -e '.ok==true and .status=="CANONICAL_BROWSER_EXISTING_IDENTITY_READY" and .classification=="GO_LAB_EXISTING_IDENTITY_READONLY" and .eligibleExistingIdentityCount==1 and .uidMatched==true and .emailMatched==true and .customTokenCreatedEphemeral==true and .explicitTokenPathHonored==true and .explicitConfigPathHonored==true and .authWrites==0 and .firestoreWrites==0 and .operationalWrites==0 and .containsPII==false and .containsSecrets==false' "$EVIDENCE_DIR/canonical-browser-identity-readonly-v20260801.json" >/dev/null
           test -s "$TOKEN_FILE"
           test -s "$CONFIG_FILE"
           echo "ORBIT360_CUSTOM_TOKEN_FILE=$TOKEN_FILE" >> "$GITHUB_ENV"
