@@ -4,69 +4,50 @@
   "gateContractVersion": "7.11.0",
   "releaseCriticalScopeRevision": "7.11.1",
   "validatorLifecycleRevision": "phase-capability-contract-v1",
-  "status": "CANONICAL_RUNTIME_CUMULATIVE_VISUAL_LAB_STOP_RETRY_CLOSED",
-  "phase": "LAB_RUNTIME_GATE_CLOSED_AFTER_BROWSER_FAILURE",
+  "status": "CANONICAL_RUNTIME_CUMULATIVE_VISUAL_LAB_AUTHORIZED",
+  "phase": "LAB_RUNTIME_GATE",
   "sourceLock": {
-    "authorizedProductHead": "997fca628f95dd397dba347700a6bc644fe840f0",
-    "postRootFixProductHead": "267f7231b46d65b80c167f54567a67503b6a6793",
+    "productHead": "267f7231b46d65b80c167f54567a67503b6a6793",
     "requiredBranch": "ays/backend-tenant-lab-v99-20260703",
     "pullRequest": 5,
-    "productPathsChangedByAuthorizedRootFix": [
-      "orbit360-platform/index.html",
-      "orbit360-platform/modules/crm-v1198-operational-bridge.js"
-    ]
+    "productPathsMayChange": false
+  },
+  "executionProfile": {
+    "phase": "LAB_RUNTIME_GATE",
+    "capabilities": {
+      "secrets": true,
+      "firestoreRead": true,
+      "writes": false,
+      "runtime": true,
+      "browser": true,
+      "deploy": false,
+      "functionsDeploy": false,
+      "rulesDeploy": false,
+      "production": false
+    }
   },
   "authorization": {
     "authorizedBy": "Paula Osorio",
-    "authorizedAt": "2026-08-02T18:30:00-06:00",
-    "authorizationRef": "user_authorizes_proceed_solution_and_required_step_20260802T1830-0600",
+    "authorizedAt": "2026-08-03T06:36:00-06:00",
+    "authorizationRef": "user_authorizes_single_gate711_post_rootfix_readonly_20260803T0636-0600",
     "explicit": true,
     "allowedExecutions": 1,
-    "consumed": true,
-    "consumedByRun": 30774888921,
+    "consumed": false,
     "macroBlockWithoutMicroAuthorizations": true,
     "additionalExecutionsAllowed": false,
-    "replayAllowed": false
+    "replayAllowed": false,
+    "mandatoryRootCauseAndSolutionOnStop": true
   },
-  "runtimeEvidence": {
-    "run": 30774888921,
-    "job": 91568393456,
-    "artifact": 8841696348,
-    "artifactDigest": "sha256:f1ad7dc910b8047ff8f9dce8fb132ca953b91dcc048807576f00490fa3da3e1c",
-    "preflight": "PASS",
-    "existingIdentity": "PASS",
-    "snapshotBefore": "PASS",
-    "localServer": "PASS",
-    "browserReached": true,
-    "rolesAndRoutesTraversed": true,
-    "sanitizedScreenshots": 13,
-    "writeGuardCalls": 0,
-    "firestoreWrites": 0,
-    "operationalWrites": 0,
-    "snapshotAfter": "NOT_EXECUTED",
-    "failure": "Cannot read properties of undefined (reading 'accion')"
-  },
-  "rootCause": {
-    "classification": "SECURITY_FAILURE",
-    "code": "FROZEN_MODULE_INTERNAL_GUARD_REGISTRY",
-    "owner": "orbit360-platform/modules/crm-v1198-operational-bridge.js",
-    "protectedOwner": "orbit360-platform/modules/conciliaciones.js",
-    "description": "El bridge intentaba almacenar __guardV1198 dentro de un módulo Object.freeze. La escritura silenciosa fallaba y la lectura posterior de [accion] producía la excepción, interrumpiendo la instalación de guards posteriores.",
-    "productDefect": true,
-    "dataDefect": false,
-    "authDefect": false,
-    "academiaDefect": false
-  },
-  "rootFix": {
-    "run": 30775623141,
-    "job": 91570495651,
-    "artifact": 8841926663,
-    "artifactDigest": "sha256:ce683b51b0b0ff05bf11b5028d04e6ef8727cfc23c2ba797a8e9718e837d3904",
-    "commit": "267f7231b46d65b80c167f54567a67503b6a6793",
-    "externalRegistry": "WeakMap",
-    "conciliacionesMode": "self_guarded_readonly",
-    "immutableUnwrappedAllowed": false,
-    "conciliacionesFrozenPreserved": true
+  "staticClosureEvidence": {
+    "run": 30771933766,
+    "job": 91560447718,
+    "artifact": 8840787308,
+    "artifactDigest": "sha256:0c99399ed79fa6036128a6343a70ade6101d4a61aef7e5e6dd561ae8514a28f6",
+    "status": "GATE711_RELEASE_CRITICAL_STATIC_PASS_CLOSED",
+    "checks": "38/38",
+    "productFreeze": "PASS",
+    "academiaRuntimePrerequisite": false,
+    "cloudPackageSent": false
   },
   "postRootFixReadiness": {
     "run": 30776380035,
@@ -81,11 +62,54 @@
       "runtimePackageReadiness": "38/38",
       "runtimeChain": "56/56",
       "routerCompatibility": "12/12"
-    },
-    "secretsAccessed": false,
-    "firestoreReads": 0,
-    "runtimeExecuted": false,
-    "browserExecuted": false
+    }
+  },
+  "rootFixEvidence": {
+    "classification": "SECURITY_FAILURE",
+    "rootCause": "FROZEN_MODULE_INTERNAL_GUARD_REGISTRY",
+    "run": 30775623141,
+    "job": 91570495651,
+    "artifact": 8841926663,
+    "artifactDigest": "sha256:ce683b51b0b0ff05bf11b5028d04e6ef8727cfc23c2ba797a8e9718e837d3904",
+    "productHead": "267f7231b46d65b80c167f54567a67503b6a6793",
+    "externalGuardRegistry": "WeakMap",
+    "conciliacionesMode": "self_guarded_readonly",
+    "immutableUnwrappedAllowed": false
+  },
+  "cumulativeManifest": {
+    "trackedFileCount": 309,
+    "pathDigest": "517056dee1200503b2e7295a333cb804bc71271bbaa87847fa762da025f276f1",
+    "contentDigest": "3dc0b2c699bde118d944e9304c725748b49c56619da8acf8040a36fdab37b06e",
+    "indexDigest": "aa40982bffd5a453c56dd07e2aa75745128890cb81fa940c2dac6e051fa2e9d6"
+  },
+  "expectedOperationalCounts": {
+    "clientes": 430,
+    "aseguradoras": 30,
+    "polizas": 1373,
+    "vehiculos": 1032,
+    "recibosEsperados": 1294,
+    "carteraPrimas": 673,
+    "cobros": 5,
+    "asesores": 7
+  },
+  "scope": {
+    "singleGate": true,
+    "singleCandidate": true,
+    "singleBrowserSession": true,
+    "legalOnce": true,
+    "snapshotBeforeAndAfter": true,
+    "browserWriteGuard": true,
+    "singleReadOwner": "Orbit.store",
+    "roles": ["Dirección", "Operativo", "Asesor"],
+    "viewports": ["desktop", "tablet", "mobile"],
+    "routes": ["cliente360", "aseguradoras", "polizas", "ops", "leads"],
+    "advisorOpsRestricted": true,
+    "sanitizedScreenshots": 13,
+    "singleCumulativeVisualReview": true,
+    "focusedAcademiaRuntime": false,
+    "academiaStaticIntegrityRequired": true,
+    "academiaContentCompletenessBlocksRelease": false,
+    "cloudPackageSent": false
   },
   "guards": {
     "firestoreDataWritesAllowed": false,
@@ -98,9 +122,21 @@
     "productionAllowed": false,
     "mainAllowed": false,
     "mergeAllowed": false,
+    "newParallelReadOwnerAllowed": false,
     "stopRetryOnSameStageOrFailureFamily": true
   },
-  "nextRuntimeRequiresNewExplicitAuthorization": true,
+  "humanApproval": {
+    "clientes": true,
+    "polizas": false,
+    "vehiculos": false,
+    "recibos": false,
+    "cartera": false,
+    "cobros": false,
+    "ops": false,
+    "leads": false,
+    "restoCrm": false,
+    "automatedGateMaySetApproval": false
+  },
   "containsPII": false,
   "containsSecrets": false
 }
