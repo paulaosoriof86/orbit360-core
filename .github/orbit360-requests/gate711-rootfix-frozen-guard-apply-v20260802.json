@@ -1,0 +1,26 @@
+{
+  "schemaVersion": "orbit360-gate711-rootfix-frozen-guard-apply-request-v1",
+  "productHead": "997fca628f95dd397dba347700a6bc644fe840f0",
+  "parentHead": "52aee351cde0d88b74c30d14507903640bc8d024",
+  "approved": true,
+  "allowedExecutions": 1,
+  "consumed": false,
+  "sourceRun": 30774888921,
+  "sourceArtifact": 8841696348,
+  "classification": "SECURITY_FAILURE",
+  "rootCause": "FROZEN_MODULE_INTERNAL_GUARD_REGISTRY",
+  "allowedProductFiles": [
+    "orbit360-platform/index.html",
+    "orbit360-platform/modules/crm-v1198-operational-bridge.js"
+  ],
+  "capabilities": {
+    "secrets": false,
+    "firestoreRead": false,
+    "writes": false,
+    "deploy": false,
+    "production": false
+  },
+  "stopRetry": true,
+  "containsPII": false,
+  "containsSecrets": false
+}
