@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "orbit360-gate711-source-snapshot-diagnostic-request-v1",
+  "productHead": "997fca628f95dd397dba347700a6bc644fe840f0",
+  "parentHead": "69c9b235d229cbd26c8b5f9858b86cfd459f689b",
+  "approved": true,
+  "allowedExecutions": 1,
+  "consumed": false,
+  "sourceRun": 30774888921,
+  "sourceArtifact": 8841696348,
+  "scope": "CORE_MODULES_SOURCE_ONLY",
+  "capabilities": {
+    "secrets": false,
+    "firestoreRead": false,
+    "runtime": false,
+    "browser": false,
+    "writes": false,
+    "deploy": false,
+    "production": false
+  },
+  "stopRetry": true,
+  "containsPII": false,
+  "containsSecrets": false
+}
