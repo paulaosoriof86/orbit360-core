@@ -1,0 +1,188 @@
+name: Orbit 360 · Gate 7.11 · root fix frozen guard
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-requests/gate711-rootfix-frozen-guard-apply-v20260802.json'
+
+permissions:
+  contents: write
+  statuses: write
+
+concurrency:
+  group: orbit360-gate711-rootfix-frozen-guard-apply-v20260802
+  cancel-in-progress: false
+
+env:
+  BRANCH: ays/backend-tenant-lab-v99-20260703
+  PRODUCT_HEAD: 997fca628f95dd397dba347700a6bc644fe840f0
+  REQUEST_FILE: .github/orbit360-requests/gate711-rootfix-frozen-guard-apply-v20260802.json
+  STATUS_CONTEXT: orbit360/gate711-rootfix-frozen-guard
+
+jobs:
+  apply:
+    name: Source fix · bridge externo · cero backend y datos
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - name: Checkout SHA exacto
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+
+      - name: Publicar estado pending
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          jq -n --arg state pending --arg context "$STATUS_CONTEXT" --arg description "Gate 7.11 aplicando root fix frozen guard" --arg target_url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" '{state:$state,context:$context,description:$description,target_url:$target_url}' > "$RUNNER_TEMP/status.json"
+          curl -fsS -X POST -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" -d @"$RUNNER_TEMP/status.json" >/dev/null
+
+      - name: Verificar autorización, rama y freeze
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "$BRANCH"
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          test "$(git rev-parse HEAD^)" = "$(jq -r '.parentHead' "$REQUEST_FILE")"
+          mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
+          test "${#CHANGED[@]}" = '1'
+          test "${CHANGED[0]}" = "$REQUEST_FILE"
+          jq -e --arg product "$PRODUCT_HEAD" '.schemaVersion=="orbit360-gate711-rootfix-frozen-guard-apply-request-v1" and .productHead==$product and .approved==true and .allowedExecutions==1 and .consumed==false and .sourceRun==30774888921 and .sourceArtifact==8841696348 and .classification=="SECURITY_FAILURE" and .rootCause=="FROZEN_MODULE_INTERNAL_GUARD_REGISTRY" and .allowedProductFiles==["orbit360-platform/index.html","orbit360-platform/modules/crm-v1198-operational-bridge.js"] and .capabilities.secrets==false and .capabilities.firestoreRead==false and .capabilities.writes==false and .capabilities.deploy==false and .capabilities.production==false' "$REQUEST_FILE" >/dev/null
+          mapfile -t PRODUCT_DIFF < <(git diff --name-only "$PRODUCT_HEAD"..HEAD -- orbit360-platform/index.html orbit360-platform/modules orbit360-platform/core orbit360-platform/styles orbit360-platform/data)
+          test "${#PRODUCT_DIFF[@]}" = '0'
+
+      - name: Aplicar parche exacto
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          bridge=Path('orbit360-platform/modules/crm-v1198-operational-bridge.js')
+          text=bridge.read_text(encoding='utf-8')
+          anchor="  const baseStore = () => Orbit.store;\n"
+          insertion="""  const baseStore = () => Orbit.store;
+          const guardRegistry = Orbit.__crmV1198GuardRegistry instanceof WeakMap
+            ? Orbit.__crmV1198GuardRegistry
+            : new WeakMap();
+          const guardDiagnostics = Array.isArray(Orbit.__crmV1198GuardDiagnostics)
+            ? Orbit.__crmV1198GuardDiagnostics
+            : [];
+          Orbit.__crmV1198GuardRegistry = guardRegistry;
+          Orbit.__crmV1198GuardDiagnostics = guardDiagnostics;
+          """
+          if text.count(anchor)!=1: raise SystemExit('ANCHOR_COUNT_INVALID')
+          if 'Orbit.__crmV1198GuardRegistry' in text: raise SystemExit('ROOT_FIX_ALREADY_PRESENT')
+          text=text.replace(anchor,insertion,1)
+          old="""  function guardAction(moduleName, actionName, collection, moduleKey, permission) {
+            const mod = Orbit.modules[moduleName];
+            if (!mod || typeof mod[actionName] !== 'function') return;
+            mod.__guardV1198 = mod.__guardV1198 || {};
+            if (mod.__guardV1198[actionName]) return;
+            const original = mod[actionName].bind(mod); mod.__guardV1198[actionName] = original;
+            mod[actionName] = function (id) {
+              if (id && collection && !recordAllowed(collection, id, moduleKey)) return toast('Registro fuera de tu alcance');
+              if (permission && !A.can(moduleKey, permission)) return toast('No tienes permiso para realizar esta acción');
+              return original.apply(mod, arguments);
+            };
+          }
+          """
+          new="""  function immutableSelfGuarded(moduleName, actionName, mod) {
+            return moduleName === 'conciliaciones' && actionName === 'accion' && Object.isFrozen(mod) &&
+              Orbit.cobrosConciliacionReadOnly && Orbit.cobrosConciliacionReadOnly.operationalWrites === 0 &&
+              Orbit.cobrosConciliacionReadOnly.firestoreWrites === 0;
+          }
+
+          function guardAction(moduleName, actionName, collection, moduleKey, permission) {
+            const mod = Orbit.modules[moduleName];
+            if (!mod || typeof mod[actionName] !== 'function') return;
+            let state = guardRegistry.get(mod);
+            if (!state) { state = Object.create(null); guardRegistry.set(mod, state); }
+            if (state[actionName]) return;
+            const original = mod[actionName].bind(mod);
+            const descriptor = Object.getOwnPropertyDescriptor(mod, actionName);
+            const mutable = Object.isExtensible(mod) && (!descriptor || descriptor.writable !== false);
+            if (!mutable) {
+              const mode = immutableSelfGuarded(moduleName, actionName, mod) ? 'self_guarded_readonly' : 'immutable_unwrapped';
+              state[actionName] = { original, mode };
+              guardDiagnostics.push({ moduleName, actionName, mode });
+              return;
+            }
+            mod[actionName] = function (id) {
+              if (id && collection && !recordAllowed(collection, id, moduleKey)) return toast('Registro fuera de tu alcance');
+              if (permission && !A.can(moduleKey, permission)) return toast('No tienes permiso para realizar esta acción');
+              return original.apply(mod, arguments);
+            };
+            state[actionName] = { original, mode: 'wrapped' };
+            guardDiagnostics.push({ moduleName, actionName, mode: 'wrapped' });
+          }
+          """
+          if text.count(old)!=1: raise SystemExit('UNSAFE_BLOCK_COUNT_INVALID')
+          text=text.replace(old,new,1)
+          bridge.write_text(text,encoding='utf-8')
+
+          index=Path('orbit360-platform/index.html')
+          html=index.read_text(encoding='utf-8')
+          oldv='modules/crm-v1198-operational-bridge.js?v=20260711'
+          newv='modules/crm-v1198-operational-bridge.js?v=20260802-1'
+          if html.count(oldv)!=1: raise SystemExit('INDEX_VERSION_COUNT_INVALID')
+          html=html.replace(oldv,newv,1)
+          index.write_text(html,encoding='utf-8')
+          PY
+
+      - name: Validar root fix y alcance
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check orbit360-platform/modules/crm-v1198-operational-bridge.js
+          grep -Fq 'Orbit.__crmV1198GuardRegistry' orbit360-platform/modules/crm-v1198-operational-bridge.js
+          grep -Fq "mode = immutableSelfGuarded(moduleName, actionName, mod) ? 'self_guarded_readonly' : 'immutable_unwrapped'" orbit360-platform/modules/crm-v1198-operational-bridge.js
+          ! grep -Fq 'mod.__guardV1198[actionName]' orbit360-platform/modules/crm-v1198-operational-bridge.js
+          grep -Fq 'modules/crm-v1198-operational-bridge.js?v=20260802-1' orbit360-platform/index.html
+          grep -Fq 'Orbit.modules.conciliaciones = Object.freeze' orbit360-platform/modules/conciliaciones.js
+          mapfile -t DIFF < <(git diff --name-only)
+          test "${#DIFF[@]}" = '2'
+          printf '%s\n' "${DIFF[@]}" | sort > "$RUNNER_TEMP/diff.txt"
+          printf '%s\n' orbit360-platform/index.html orbit360-platform/modules/crm-v1198-operational-bridge.js | sort > "$RUNNER_TEMP/expected.txt"
+          cmp -s "$RUNNER_TEMP/diff.txt" "$RUNNER_TEMP/expected.txt"
+          git diff --check
+
+      - name: Crear commit incremental
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'orbit360-gate-bot'
+          git config user.email 'orbit360-gate-bot@users.noreply.github.com'
+          git add orbit360-platform/index.html orbit360-platform/modules/crm-v1198-operational-bridge.js
+          git commit -m 'fix(security): respetar modulo congelado en guards CRM'
+          FIX_COMMIT="$(git rev-parse HEAD)"
+          echo "$FIX_COMMIT" > "$RUNNER_TEMP/fix-commit.txt"
+          git push origin "HEAD:$BRANCH"
+
+      - name: Guardar evidencia source-only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gate711-rootfix-frozen-guard-v20260802
+          path: |
+            ${{ runner.temp }}/fix-commit.txt
+            ${{ runner.temp }}/diff.txt
+            orbit360-platform/modules/crm-v1198-operational-bridge.js
+            orbit360-platform/index.html
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Publicar estado final
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          JOB_STATUS: ${{ job.status }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "$JOB_STATUS" = success ]; then STATE=success; DESCRIPTION="Gate 7.11 root fix frozen guard aplicado"; else STATE=failure; DESCRIPTION="Gate 7.11 root fix FAIL / STOP_RETRY"; fi
+          jq -n --arg state "$STATE" --arg context "$STATUS_CONTEXT" --arg description "$DESCRIPTION" --arg target_url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" '{state:$state,context:$context,description:$description,target_url:$target_url}' > "$RUNNER_TEMP/status-final.json"
+          curl -fsS -X POST -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" -d @"$RUNNER_TEMP/status-final.json" >/dev/null
