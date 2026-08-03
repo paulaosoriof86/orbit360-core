@@ -7,28 +7,31 @@ PR: #5 draft/open
 ## Estado rector
 
 ```text
-GATE711_RELEASE_CRITICAL_STATIC_PASS_CLOSED
-GATE711_RUNTIME_ROUTER_COMPAT_PASS_CLOSED
-GATE711_RUNTIME_PACKAGE_READINESS_PATH_CONTRACT_PASS_CLOSED
-GATE711_RUNTIME_AUTHORIZATION_1815_CONSUMED_STOP_RETRY
-CRM_OPS_LEADS_RUNTIME_READONLY_PENDING_NEW_AUTHORIZATION
+GATE711_SECURITY_ROOT_FIX_CLOSED
+GATE711_POST_ROOTFIX_MANIFEST_CLOSED
+GATE711_POST_ROOTFIX_PACKAGE_SEALED
+GATE711_POST_ROOTFIX_READINESS_49_OF_49_PASS
+GATE711_PRIOR_RUNTIME_AUTHORIZATION_CONSUMED_STOP_RETRY
+CRM_OPS_LEADS_RUNTIME_POST_ROOTFIX_PENDING_ONE_NEW_AUTHORIZATION
 ACADEMIA_CONTENT_RUNTIME_NONBLOCKING
 CLOUD_CLAUDE_PACKAGE_DOCUMENTED_NOT_SENT
 HOSTING_DEPLOY_NOT_EXECUTED
 PRODUCTION_NOT_EXECUTED
 ```
 
-## Producto canónico acumulativo
+## Candidata acumulativa vigente
 
 ```text
-productHead: 997fca628f95dd397dba347700a6bc644fe840f0
+productHead: 267f7231b46d65b80c167f54567a67503b6a6793
 canonicalSnapshotDigest: 19e1927d39f6b713ee12504f8762bc42ead9de6e365bb0f12162d2a0c8f8469b
-cumulativeManifestDigest: 3d25a83218a4373513e1fff24ea9b12817d4c47be0fad08777e7f94867b3f676
 trackedFileCount: 309
+pathDigest: 517056dee1200503b2e7295a333cb804bc71271bbaa87847fa762da025f276f1
+contentDigest: 3dc0b2c699bde118d944e9304c725748b49c56619da8acf8040a36fdab37b06e
+indexDigest: aa40982bffd5a453c56dd07e2aa75745128890cb81fa940c2dac6e051fa2e9d6
 singleReadOwner: Orbit.store
 ```
 
-Conteos operativos esperados:
+Conteos esperados:
 
 ```text
 clientes: 430
@@ -41,154 +44,146 @@ cobros: 5
 asesores: 7
 ```
 
-## Alcance release-critical
-
-Una sola candidata acumulativa:
-
-- shell, router, auth, legal, multirol, scopes y `Orbit.store`;
-- Cliente 360 y Aseguradoras;
-- Pólizas y Vehículos;
-- Recibos esperados, Cartera y Cobros;
-- Ops y Leads;
-- Dirección desktop, Operativo tablet y Asesor móvil;
-- estados honestos, cero copy técnico y cero escrituras.
-
-Academia conserva integridad estática, pero la completitud de sus lecciones y su focused runtime no bloquean este release.
-
-## Evidencia estática cerrada
+## Runtime que reveló el defecto real
 
 ```text
-release-critical static:
-run 30771933766 · 38/38 PASS
-artifact 8840787308
-
-lifecycle-router compatibility:
-run 30772843811 · 12/12 PASS
-artifact 8841072752
-
-package readiness inicial:
-run 30772261072 · 38/38 PASS
-artifact 8840893567
-
-package readiness con rutas efímeras:
-run 30774296503 · 38/38 PASS
-artifact 8841489287
-sha256:ec4a75a9ec951306279c31b5d09d1545b11dae76b578c0dcd3d69bd11c26cc03
-```
-
-Todos estos cierres preservaron el product freeze y no utilizaron deploy ni producción.
-
-## Ejecución runtime autorizada a las 18:15
-
-```text
-run: 30774123443
-job: 91566222407
-requestCommit: 5e9fce8c9d681b6a7eec9145d725107df9848b5e
-artifact: 8841443031
-artifactDigest: sha256:ce6ec1619c7b5e87dbc583c23e806a139ca823ca6ec25740c5867f6f42fc69a1
+run: 30774888921
+job: 91568393456
+artifact: 8841696348
+digest: sha256:f1ad7dc910b8047ff8f9dce8fb132ca953b91dcc048807576f00490fa3da3e1c
 conclusion: FAILURE / STOP_RETRY
 ```
 
-Etapas verificadas:
+Este run avanzó más allá de los bloqueos anteriores:
 
 ```text
-autorización inmutable y product freeze: PASS
-preflight contractual: 18/18 PASS
-release-critical static: 38/38 PASS
-dependencias: PASS
-cuenta de servicio LAB: PASS
-helper de identidad existente: PASS
-postcheck de ruta efímera: FAIL
-snapshot inicial: NOT_EXECUTED
-servidor local: NOT_EXECUTED
-runtime CRM/Ops/Leads: NOT_EXECUTED
+preflight contractual: PASS
+identidad existente: PASS
+rutas efímeras: PASS
+snapshot inicial: PASS
+servidor local: PASS
+Firebase/Auth/Orbit.store: PASS
+conteos operativos: PASS
+legal: PASS
+Dirección desktop: recorrida
+Operativo tablet: recorrido
+Asesor móvil: recorrido
+CRM/Ops/Leads: recorridos
+capturas sanitizadas: 13
+write guard calls: 0
+Firestore writes: 0
+operational writes: 0
 snapshot final: NOT_EXECUTED
 ```
 
-Evidencia de identidad:
+Error:
 
 ```text
-status: CANONICAL_BROWSER_EXISTING_IDENTITY_READY
-classification: GO_LAB_EXISTING_IDENTITY_READONLY
-eligibleExistingIdentityCount: 1
-uidMatched: true
-emailMatched: true
-customTokenCreatedEphemeral: true
-authWrites: 0
-firestoreWrites: 0
-operationalWrites: 0
+Cannot read properties of undefined (reading 'accion')
 ```
 
-## Clasificación y causa raíz
+## Causa raíz cerrada
 
 ```text
-classification: PIPELINE_MECHANISM_FAILURE
-failedStage: PREPARE_EXISTING_IDENTITY_READONLY_POSTCHECK
-error: EPHEMERAL_TOKEN_PATH_POSTCHECK_MISMATCH
+classification: SECURITY_FAILURE
+code: FROZEN_MODULE_INTERNAL_GUARD_REGISTRY
+owner: modules/crm-v1198-operational-bridge.js
+protected owner: modules/conciliaciones.js
 ```
 
-El workflow calculaba rutas para el token y la configuración, pero no las exportaba antes de invocar el helper. El helper creó correctamente la identidad y el token en su fallback canónico; el step posterior comprobó otra ruta y produjo un falso fallo.
+Conciliaciones publica un owner `Object.freeze`. El bridge intentaba crear `__guardV1198` dentro del objeto congelado; la escritura fallaba y la lectura posterior de `[accion]` se ejecutaba sobre `undefined`, interrumpiendo la instalación de guards posteriores.
 
-No fue un defecto de producto, Academia, Auth, membresías, datos, CRM, Ops o Leads.
+No fue un defecto de datos, identidad, membresías, Firestore, Academia ni del navegador.
 
-## Correctivo cerrado
+## Root fix
 
-Archivos:
-
-- `.github/workflows/orbit360-gate711-release-critical-runtime-v20260802.yml`
-- `tools/orbit360-validar-gate711-runtime-package-readiness-v20260802.mjs`
-
-Cambios:
+El registro de guards se movió a un `WeakMap` externo:
 
 ```text
-export ORBIT360_CUSTOM_TOKEN_FILE="$TOKEN_FILE"
-export ORBIT360_LOCAL_FIREBASE_CONFIG_FILE="$CONFIG_FILE"
-explicitTokenPathHonored: obligatorio
-explicitConfigPathHonored: obligatorio
+mutable owners: wrapped
+Conciliaciones frozen/read-only: self_guarded_readonly
+otro owner inmutable no reconocido: immutable_unwrapped (prohibido por gate)
 ```
 
-Commits:
+Conciliaciones permanece congelado y read-only.
+
+Evidencia:
 
 ```text
-workflow fix: cbd04a88cb6b0d4c59b0cf927401f68a8ba6bbb9
-readiness coverage: 7ddc43c5d745d5ce4ba9a5d26a1321101cfe22b1
-request consumido sellado: 0a260231df36ebb0f90e36ef015f8211642ece94
+run: 30775623141
+job: 91570495651
+artifact: 8841926663
+digest: sha256:ce683b51b0b0ff05bf11b5028d04e6ef8727cfc23c2ba797a8e9718e837d3904
+commit: 267f7231b46d65b80c167f54567a67503b6a6793
 ```
 
-La validación source-only `30774296503` confirmó nuevamente 38/38 PASS, cero secretos, cero Firestore, cero navegador y cero cambios de producto.
+Cambios de producto exactos:
 
-## Seguridad y replay
+1. `orbit360-platform/modules/crm-v1198-operational-bridge.js`
+2. `orbit360-platform/index.html`
+
+## Paquete post-rootfix
 
 ```text
-autorización 18:15: consumida
-request status: CONSUMED_STOP_RETRY
+package commit: ef0664335bd3085dc7b21b4988f408fed1ac4145
+```
+
+Actualizaciones:
+
+- nueva candidata y digests;
+- 13 capturas calculadas desde la matriz real;
+- diagnóstico de `pageerror` con etapa, rol, ruta y stack;
+- verificación de `Orbit.__crmV1198GuardDiagnostics`;
+- cero `immutable_unwrapped`;
+- Conciliaciones obligatorio en `self_guarded_readonly`;
+- una sesión, un legal, un write guard y snapshots antes/después.
+
+## Cierre estable post-rootfix
+
+```text
+run: 30776380035
+job: 91572556496
+artifact: 8842172646
+digest: sha256:5b8fd7acfcafabf25538f34288a241472065855dacf69c18b8bb4748a30147cb
+status: GATE711_POST_ROOTFIX_READINESS_PASS
+classification: GO_STATIC_POST_ROOTFIX_RUNTIME_READY
+checks: 49/49
+```
+
+Cierres contenidos:
+
+```text
+release-critical static: 38/38
+runtime package readiness: 38/38
+runtime chain: 56/56
+router compatibility: 12/12
+```
+
+El cierre fue source-only: cero secretos, Firestore, navegador, deploy y producción.
+
+## Seguridad y autorización
+
+La autorización que produjo el run `30774888921` quedó consumida y no puede reutilizarse.
+
+```text
 replayAllowed: false
 additionalExecutionsAllowed: false
-STOP_RETRY: active
-firestoreWrites: 0
-operationalWrites: 0
-reimportación: no
-Hosting/deploy: no/no
-producción/main/merge: no/no/no
+STOP_RETRY: closed after root fix
 ```
 
-Aunque la cuenta de servicio fue leída y el helper hizo lecturas de Auth/Firestore autorizadas, los archivos temporales se limpiaron y ningún secreto fue incorporado a la evidencia.
+El próximo runtime debe materializar un request y lifecycle nuevos sobre `267f7231b46d65b80c167f54567a67503b6a6793` y la evidencia 49/49.
 
 ## Cloud / Claude / Academia
 
 ```text
-Hosting posterior al root fix: NO EJECUTADO
-paquete Claude/Cloud reutilizable: DOCUMENTADO / NO ENVIADO
-datos reales A&S: NO ENVIADOS
-secretos/credenciales: NO ENVIADOS
+Hosting: NO EJECUTADO
+paquete Cloud/Claude: DOCUMENTADO / NO ENVIADO
+datos reales: NO ENVIADOS
+secretos: NO ENVIADOS
+Academia focused runtime: NO BLOQUEANTE
 ```
 
-Fuentes vigentes:
-
-1. `SINCRONIZACION-CLOUD-CLAUDE-ACUMULADA-20260802.md`
-2. `ADDENDUM-SINCRONIZACION-CLOUD-CLAUDE-RUNTIME-UNIFICADO-20260802.md`
-
-El addendum incluye CL-081 a CL-083: exportación de rutas temporales, validación productor-consumidor y diferencia entre identidad válida y fallo posterior del pipeline. Solo viajarán como patrón sanitizado; no se enviarán rutas, UID, correos, tokens, secrets ni backend protegido.
+Patrón reusable nuevo: un bridge no debe almacenar metadata dentro de owners congelados; debe usar registro externo y contrato explícito para owners self-guarded read-only.
 
 ## Aprobación humana
 
@@ -204,19 +199,10 @@ Ops: pendiente
 Leads: pendiente
 ```
 
-## Documentación vigente
+## Próxima frontera única
 
-1. `CIERRE-STOP-RETRY-GATE711-IDENTIDAD-RUTAS-EFIMERAS-20260802.md`
-2. `CIERRE-STOP-RETRY-GATE711-RUNTIME-LIFECYCLE-ROUTER-20260802.md`
-3. `CIERRE-READINESS-MACRO-RUNTIME-GATE711-CRM-OPS-LEADS-20260802.md`
-4. `CIERRE-STOP-RETRY-GATE711-ACADEMIA-OWNER-BOOTSTRAP-20260802.md`
-5. `SINCRONIZACION-CLOUD-CLAUDE-ACUMULADA-20260802.md`
-6. `ADDENDUM-SINCRONIZACION-CLOUD-CLAUDE-RUNTIME-UNIFICADO-20260802.md`
+No corresponde otra auditoría, readiness, retorno a Academia ni apertura de otro módulo.
 
-## Siguiente frontera exacta
+La única acción siguiente es una ejecución read-only post-rootfix del Gate 7.11 sobre `267f7231b46d65b80c167f54567a67503b6a6793`. Después de un PASS corresponde una sola revisión visual humana acumulativa. Producción continúa separada y requiere autorización explícita.
 
-No corresponde otra auditoría, otro readiness ni retorno a Academia.
-
-Cualquier nueva ejecución runtime requiere una nueva autorización explícita porque la autorización de las 18:15 fue consumida por el run `30774123443`. El nuevo request y lifecycle deberán derivarse del workflow corregido y del package readiness 38/38 del run `30774296503`.
-
-Después de un PASS corresponde una sola revisión visual humana acumulativa. El go-live permanece separado y requiere autorización productiva explícita.
+Documento de causa raíz: `CIERRE-ROOT-FIX-SEGURIDAD-GATE711-GUARDS-INMUTABLES-20260802.md`.
