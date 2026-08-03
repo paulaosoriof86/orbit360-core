@@ -129,13 +129,7 @@ error: EPHEMERAL_TOKEN_PATH_POSTCHECK_MISMATCH
 
 El workflow calculaba rutas para el token y la configuración, pero no las exportaba antes de invocar el helper. El helper creó correctamente la identidad y el token en su fallback canónico; el step posterior comprobó otra ruta y produjo un falso fallo.
 
-No fue un defecto de:
-
-- producto;
-- Academia;
-- Auth o membresías;
-- datos;
-- CRM, Ops o Leads.
+No fue un defecto de producto, Academia, Auth, membresías, datos, CRM, Ops o Leads.
 
 ## Correctivo cerrado
 
@@ -158,6 +152,7 @@ Commits:
 ```text
 workflow fix: cbd04a88cb6b0d4c59b0cf927401f68a8ba6bbb9
 readiness coverage: 7ddc43c5d745d5ce4ba9a5d26a1321101cfe22b1
+request consumido sellado: 0a260231df36ebb0f90e36ef015f8211642ece94
 ```
 
 La validación source-only `30774296503` confirmó nuevamente 38/38 PASS, cero secretos, cero Firestore, cero navegador y cero cambios de producto.
@@ -166,6 +161,7 @@ La validación source-only `30774296503` confirmó nuevamente 38/38 PASS, cero s
 
 ```text
 autorización 18:15: consumida
+request status: CONSUMED_STOP_RETRY
 replayAllowed: false
 additionalExecutionsAllowed: false
 STOP_RETRY: active
@@ -192,7 +188,7 @@ Fuentes vigentes:
 1. `SINCRONIZACION-CLOUD-CLAUDE-ACUMULADA-20260802.md`
 2. `ADDENDUM-SINCRONIZACION-CLOUD-CLAUDE-RUNTIME-UNIFICADO-20260802.md`
 
-El addendum incluye ahora CL-081 a CL-083: exportación de rutas temporales, validación productor-consumidor y diferencia entre identidad válida y fallo posterior del pipeline. Solo viajarán como patrón sanitizado; no se enviarán rutas, UID, correos, tokens, secrets ni backend protegido.
+El addendum incluye CL-081 a CL-083: exportación de rutas temporales, validación productor-consumidor y diferencia entre identidad válida y fallo posterior del pipeline. Solo viajarán como patrón sanitizado; no se enviarán rutas, UID, correos, tokens, secrets ni backend protegido.
 
 ## Aprobación humana
 
