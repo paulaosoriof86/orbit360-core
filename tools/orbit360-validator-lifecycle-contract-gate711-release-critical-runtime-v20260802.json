@@ -4,96 +4,125 @@
   "gateContractVersion": "7.11.0",
   "releaseCriticalScopeRevision": "7.11.1",
   "validatorLifecycleRevision": "phase-capability-contract-v1",
-  "status": "CANONICAL_RUNTIME_CUMULATIVE_VISUAL_LAB_STOP_RETRY_CLOSED",
-  "phase": "LAB_RUNTIME_GATE_CLOSED_AT_INITIAL_SNAPSHOT",
+  "status": "CANONICAL_RUNTIME_CUMULATIVE_VISUAL_LAB_AUTHORIZED",
+  "phase": "LAB_RUNTIME_GATE",
   "sourceLock": {
     "productHead": "267f7231b46d65b80c167f54567a67503b6a6793",
     "requiredBranch": "ays/backend-tenant-lab-v99-20260703",
     "pullRequest": 5,
-    "productPathsChanged": false
+    "productPathsMayChange": false
+  },
+  "executionProfile": {
+    "phase": "LAB_RUNTIME_GATE",
+    "capabilities": {
+      "secrets": true,
+      "firestoreRead": true,
+      "writes": false,
+      "runtime": true,
+      "browser": true,
+      "deploy": false,
+      "functionsDeploy": false,
+      "rulesDeploy": false,
+      "production": false
+    }
   },
   "authorization": {
     "authorizedBy": "Paula Osorio",
-    "authorizedAt": "2026-08-03T06:36:00-06:00",
-    "authorizationRef": "user_authorizes_single_gate711_post_rootfix_readonly_20260803T0636-0600",
+    "authorizedAt": "2026-08-03T07:06:00-06:00",
+    "authorizationRef": "user_authorizes_single_gate711_after_snapshot_corrective_20260803T0706-0600",
     "explicit": true,
     "allowedExecutions": 1,
-    "consumed": true,
-    "consumedByRun": 30814564387,
+    "consumed": false,
     "macroBlockWithoutMicroAuthorizations": true,
     "additionalExecutionsAllowed": false,
     "replayAllowed": false,
     "mandatoryRootCauseAndSolutionOnStop": true
   },
-  "runtimeEvidence": {
-    "run": 30814564387,
-    "job": 91689019904,
-    "requestCommit": "394673affdf51f0367bf6b92a7c6ca7559522e18",
-    "artifact": 8856180726,
-    "artifactDigest": "sha256:c3384a1375eb8b311c6c47055020f2ca4d9666f8be87a554439c8f2fe9533d1f",
-    "authorizationAndFreeze": "PASS",
-    "canonicalPreflight": "18/18 PASS",
-    "releaseCriticalStatic": "38/38 PASS",
-    "dependencies": "PASS",
-    "serviceIdentity": "PASS",
-    "existingIdentityReadOnly": "PASS",
-    "initialSnapshot": "FAIL",
-    "localServer": "NOT_EXECUTED",
-    "browserRuntime": "NOT_EXECUTED",
-    "finalSnapshot": "NOT_EXECUTED",
-    "temporaryCleanup": "PASS",
-    "firestoreWrites": 0,
-    "operationalWrites": 0,
-    "deployExecuted": false,
-    "productionTouched": false
+  "staticClosureEvidence": {
+    "run": 30771933766,
+    "job": 91560447718,
+    "artifact": 8840787308,
+    "artifactDigest": "sha256:0c99399ed79fa6036128a6343a70ade6101d4a61aef7e5e6dd561ae8514a28f6",
+    "status": "GATE711_RELEASE_CRITICAL_STATIC_PASS_CLOSED",
+    "checks": "38/38",
+    "productFreeze": "PASS",
+    "academiaRuntimePrerequisite": false,
+    "cloudPackageSent": false
   },
-  "rootCause": {
+  "postRootFixReadiness": {
+    "run": 30776380035,
+    "job": 91572556496,
+    "artifact": 8842172646,
+    "artifactDigest": "sha256:5b8fd7acfcafabf25538f34288a241472065855dacf69c18b8bb4748a30147cb",
+    "status": "GATE711_POST_ROOTFIX_READINESS_PASS",
+    "classification": "GO_STATIC_POST_ROOTFIX_RUNTIME_READY",
+    "checks": "49/49",
+    "closures": {
+      "releaseCriticalStatic": "38/38",
+      "runtimePackageReadiness": "38/38",
+      "runtimeChain": "56/56",
+      "routerCompatibility": "12/12"
+    }
+  },
+  "snapshotValidatorCorrective": {
     "classification": "VALIDATOR_STALE",
-    "code": "VISUAL_SEAL_PRE_ROOTFIX",
-    "failedStage": "Snapshot canónico inicial",
-    "validator": "tools/orbit360-revalidar-policies-full-canonical-readonly-v20260801.mjs",
-    "staleOwner": "tools/orbit360-policies-dual-path-provenance-constants-v20260801.mjs",
-    "staleSeal": {
-      "contentDigest": "3d25a83218a4373513e1fff24ea9b12817d4c47be0fad08777e7f94867b3f676",
-      "indexDigest": "b57b6581ee02d2dde42a8a2c1272d57f19b7ad6809d13a1d25111f3d71a96074",
-      "revision": "academia-bootstrap-rootfix-20260802.2"
-    },
-    "authorizedCurrentSeal": {
-      "trackedFileCount": 309,
-      "pathDigest": "517056dee1200503b2e7295a333cb804bc71271bbaa87847fa762da025f276f1",
-      "contentDigest": "3dc0b2c699bde118d944e9304c725748b49c56619da8acf8040a36fdab37b06e",
-      "indexDigest": "aa40982bffd5a453c56dd07e2aa75745128890cb81fa940c2dac6e051fa2e9d6"
-    },
-    "deterministicFailure": "visualManifest compared the current authorized candidate against the pre-rootfix seal and necessarily raised DATA_CONTRACT_FAILURE:CUMULATIVE_VISUAL_DRIFT",
-    "productDefect": false,
-    "dataDriftProvenByThisRun": false,
-    "identityDefect": false,
-    "browserDefect": false
-  },
-  "solution": {
-    "status": "IMPLEMENTED_SOURCE_ONLY",
+    "rootCause": "VISUAL_SEAL_PRE_ROOTFIX",
     "run": 30814915626,
     "job": 91690157955,
     "artifact": 8856299679,
     "artifactDigest": "sha256:3bbeb8af22f0b2ca1d8630735b4169f267249cf92d8b2d3a989308d754751641",
     "commit": "a9549f3487522a3e450742de2649b5ad41f3b1e9",
-    "updatedSealRevision": "security-frozen-guard-rootfix-20260803.1",
+    "status": "PASS",
     "visualSealMatchesAuthorizedManifest": true,
-    "snapshotValidatorPrintsSanitizedFailureEvidence": true,
-    "changedFiles": [
-      "tools/orbit360-policies-dual-path-provenance-constants-v20260801.mjs",
-      "tools/orbit360-revalidar-policies-full-canonical-readonly-v20260801.mjs"
-    ],
-    "productFilesChanged": 0,
-    "firestoreReads": 0,
-    "firestoreWrites": 0,
-    "runtimeExecuted": false,
-    "browserExecuted": false
+    "sanitizedFailureEvidenceObservable": true,
+    "productFilesChanged": 0
   },
-  "evidenceLimitation": {
-    "rawSnapshotFailureJsonUploaded": false,
-    "reason": "the runtime artifact list omitted policies-full-canonical-revalidation-readonly-v20260801.json and the before copy was not created after validator exit",
-    "mitigationImplemented": "the validator now prints its sanitized result before exit so any future snapshot failure exposes the exact cause in logs"
+  "rootFixEvidence": {
+    "classification": "SECURITY_FAILURE",
+    "rootCause": "FROZEN_MODULE_INTERNAL_GUARD_REGISTRY",
+    "run": 30775623141,
+    "job": 91570495651,
+    "artifact": 8841926663,
+    "artifactDigest": "sha256:ce683b51b0b0ff05bf11b5028d04e6ef8727cfc23c2ba797a8e9718e837d3904",
+    "productHead": "267f7231b46d65b80c167f54567a67503b6a6793",
+    "externalGuardRegistry": "WeakMap",
+    "conciliacionesMode": "self_guarded_readonly",
+    "immutableUnwrappedAllowed": false
+  },
+  "cumulativeManifest": {
+    "trackedFileCount": 309,
+    "pathDigest": "517056dee1200503b2e7295a333cb804bc71271bbaa87847fa762da025f276f1",
+    "contentDigest": "3dc0b2c699bde118d944e9304c725748b49c56619da8acf8040a36fdab37b06e",
+    "indexDigest": "aa40982bffd5a453c56dd07e2aa75745128890cb81fa940c2dac6e051fa2e9d6"
+  },
+  "expectedOperationalCounts": {
+    "clientes": 430,
+    "aseguradoras": 30,
+    "polizas": 1373,
+    "vehiculos": 1032,
+    "recibosEsperados": 1294,
+    "carteraPrimas": 673,
+    "cobros": 5,
+    "asesores": 7
+  },
+  "scope": {
+    "singleGate": true,
+    "singleCandidate": true,
+    "singleBrowserSession": true,
+    "legalOnce": true,
+    "snapshotBeforeAndAfter": true,
+    "browserWriteGuard": true,
+    "singleReadOwner": "Orbit.store",
+    "roles": ["Dirección", "Operativo", "Asesor"],
+    "viewports": ["desktop", "tablet", "mobile"],
+    "routes": ["cliente360", "aseguradoras", "polizas", "ops", "leads"],
+    "advisorOpsRestricted": true,
+    "sanitizedScreenshots": 13,
+    "singleCumulativeVisualReview": true,
+    "focusedAcademiaRuntime": false,
+    "academiaStaticIntegrityRequired": true,
+    "academiaContentCompletenessBlocksRelease": false,
+    "cloudPackageSent": false
   },
   "guards": {
     "firestoreDataWritesAllowed": false,
@@ -106,9 +135,21 @@
     "productionAllowed": false,
     "mainAllowed": false,
     "mergeAllowed": false,
+    "newParallelReadOwnerAllowed": false,
     "stopRetryOnSameStageOrFailureFamily": true
   },
-  "nextRuntimeRequiresNewExplicitAuthorization": true,
+  "humanApproval": {
+    "clientes": true,
+    "polizas": false,
+    "vehiculos": false,
+    "recibos": false,
+    "cartera": false,
+    "cobros": false,
+    "ops": false,
+    "leads": false,
+    "restoCrm": false,
+    "automatedGateMaySetApproval": false
+  },
   "containsPII": false,
   "containsSecrets": false
 }
