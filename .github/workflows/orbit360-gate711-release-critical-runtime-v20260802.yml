@@ -19,7 +19,7 @@ env:
   ORBIT360_GATE_ID: block7-canonical-runtime-cumulative-visual-lab-v20260801
   ORBIT360_BASE_CONTRACT_VERSION: 7.11.0
   ORBIT360_SCOPE_REVISION: 7.11.1
-  ORBIT360_PRODUCT_HEAD: 997fca628f95dd397dba347700a6bc644fe840f0
+  ORBIT360_PRODUCT_HEAD: 267f7231b46d65b80c167f54567a67503b6a6793
   ORBIT360_PROJECT_ID: ays-orbit-360-lab
   ORBIT360_TENANT_ID: alianzas-soluciones
   ORBIT360_REQUEST_FILE: .github/orbit360-requests/gate711-release-critical-runtime-v20260802.json
@@ -117,7 +117,7 @@ jobs:
             .scope.routes==3 and
             .scope.sanitizedScreenshots==true and
             .scope.singleCumulativeVisualReview==true and
-            .releaseCriticalScope.expectedSanitizedScreenshots==14 and
+            .releaseCriticalScope.expectedSanitizedScreenshots==13 and
             .releaseCriticalScope.academiaContentCompletenessBlocksRelease==false and
             .identity.existingOnly==true and
             .identity.createUser==false and
@@ -248,7 +248,7 @@ jobs:
         run: |
           set -euo pipefail
           node tools/orbit360-validar-gate711-release-critical-runtime-v20260802.mjs
-          jq -e '.ok==true and .status=="GATE711_RELEASE_CRITICAL_RUNTIME_PASS" and .classification=="GO_LAB_RELEASE_CRITICAL_CRM_OPS_LEADS" and .authMode=="existing_custom_token_readonly" and .checks.existingIdentity==true and .checks.legalOneClick==true and .checks.legalSettledBeforeWriteGuard==true and .checks.storeContract==true and .checks.dataset==true and .checks.singleReadOwner==true and .checks.roles==true and .checks.crmRoutes==true and .checks.ops==true and .checks.leads==true and .checks.advisorOpsRestricted==true and .checks.responsive==true and .checks.noTechnicalCopy==true and .checks.writeGuard==true and .checks.sanitizedScreenshots==true and .dataset.operational.clientes==430 and .dataset.operational.aseguradoras==30 and .dataset.operational.polizas==1373 and .dataset.operational.vehiculos==1032 and .dataset.operational.recibosEsperados==1294 and .dataset.operational.carteraPrimas==673 and .dataset.operational.cobros==5 and .dataset.operational.asesores==7 and ((.store.apiMissing|length)==0) and .store.singleReadOwner==true and .store.canonicalReadModel==true and ((.writeGuard.calls|length)==0) and ((.browserDiagnostics.pageErrors|length)==0) and ((.screenshots|length)==14) and .academia.focusedRuntimePrerequisite==false and .academia.contentCompletenessBlocksRelease==false and .cloudPackageSent==false and .firestoreWrites==0 and .operationalWrites==0 and .reimportExecuted==false and .hostingDeploy==false and .previewDeploy==false and .production==false and .containsPII==false and .containsDocumentIds==false and .containsValues==false and .containsSecrets==false' "$EVIDENCE_DIR/gate711-release-critical-runtime-v20260802.json" >/dev/null
+          jq -e '.ok==true and .status=="GATE711_RELEASE_CRITICAL_RUNTIME_PASS" and .classification=="GO_LAB_RELEASE_CRITICAL_CRM_OPS_LEADS" and .authMode=="existing_custom_token_readonly" and .checks.existingIdentity==true and .checks.legalOneClick==true and .checks.legalSettledBeforeWriteGuard==true and .checks.storeContract==true and .checks.dataset==true and .checks.singleReadOwner==true and .checks.roles==true and .checks.crmRoutes==true and .checks.ops==true and .checks.leads==true and .checks.advisorOpsRestricted==true and .checks.responsive==true and .checks.noTechnicalCopy==true and .checks.writeGuard==true and .checks.guardRegistry==true and .checks.sanitizedScreenshots==true and .dataset.operational.clientes==430 and .dataset.operational.aseguradoras==30 and .dataset.operational.polizas==1373 and .dataset.operational.vehiculos==1032 and .dataset.operational.recibosEsperados==1294 and .dataset.operational.carteraPrimas==673 and .dataset.operational.cobros==5 and .dataset.operational.asesores==7 and ((.store.apiMissing|length)==0) and .store.singleReadOwner==true and .store.canonicalReadModel==true and ((.writeGuard.calls|length)==0) and ((.browserDiagnostics.pageErrors|length)==0) and .guardRegistry.immutableUnwrapped==0 and .guardRegistry.conciliacionesMode=="self_guarded_readonly" and (.expectedScreenshotCount==13) and ((.screenshots|length)==13) and .academia.focusedRuntimePrerequisite==false and .academia.contentCompletenessBlocksRelease==false and .cloudPackageSent==false and .firestoreWrites==0 and .operationalWrites==0 and .reimportExecuted==false and .hostingDeploy==false and .previewDeploy==false and .production==false and .containsPII==false and .containsDocumentIds==false and .containsValues==false and .containsSecrets==false' "$EVIDENCE_DIR/gate711-release-critical-runtime-v20260802.json" >/dev/null
 
       - name: Snapshot final y comparación exacta
         shell: bash

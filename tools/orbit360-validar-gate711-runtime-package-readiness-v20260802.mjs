@@ -7,7 +7,7 @@ import { spawnSync } from 'node:child_process';
 
 const ROOT = process.cwd();
 const OUT = path.join(ROOT, 'orbit360-platform/runtime-gate-crm-v20260716/gate711-runtime-package-readiness-v20260802.json');
-const PRODUCT_HEAD = '997fca628f95dd397dba347700a6bc644fe840f0';
+const PRODUCT_HEAD = '267f7231b46d65b80c167f54567a67503b6a6793';
 const files = {
   staticLifecycle: 'tools/orbit360-validator-lifecycle-contract-gate711-release-critical-static-v20260802.json',
   scope: 'tools/orbit360-gate711-release-critical-scope-v20260802.json',
@@ -49,7 +49,7 @@ try {
   add('SCOPE_LOCK', scope.productHead === PRODUCT_HEAD && scope.singleCandidatePolicy?.required === true && scope.singleCandidatePolicy?.parallelCandidateAllowed === false && scope.academiaBoundary?.runtimeContentCompletenessBlocksThisRelease === false);
   add('REQUEST_TEMPLATE_INERT', requestTemplate.status === 'INERT_TEMPLATE_PENDING_EXPLICIT_AUTHORIZATION' && requestTemplate.approved === false && requestTemplate.allowedExecutions === 0 && requestTemplate.consumed === true && requestTemplate.authorizedProductHead === PRODUCT_HEAD);
   add('REQUEST_TEMPLATE_SINGLE_SESSION', requestTemplate.executionInvariants?.singleBrowserSession === true && requestTemplate.executionInvariants?.legalOnce === true && requestTemplate.executionInvariants?.microAuthorizations === false && requestTemplate.executionInvariants?.focusedAcademiaRuntime === false);
-  add('REQUEST_TEMPLATE_SCOPE', requestTemplate.releaseCriticalScope?.expectedSanitizedScreenshots === 14 && requestTemplate.releaseCriticalScope?.academiaContentCompletenessBlocksRelease === false && Array.isArray(requestTemplate.releaseCriticalScope?.routes) && requestTemplate.releaseCriticalScope.routes.includes('ops') && requestTemplate.releaseCriticalScope.routes.includes('leads'));
+  add('REQUEST_TEMPLATE_SCOPE', requestTemplate.releaseCriticalScope?.expectedSanitizedScreenshots === 13 && requestTemplate.releaseCriticalScope?.academiaContentCompletenessBlocksRelease === false && Array.isArray(requestTemplate.releaseCriticalScope?.routes) && requestTemplate.releaseCriticalScope.routes.includes('ops') && requestTemplate.releaseCriticalScope.routes.includes('leads'));
   add('LIFECYCLE_TEMPLATE_INERT', lifecycleTemplate.status === 'INERT_TEMPLATE_PENDING_EXPLICIT_AUTHORIZATION' && lifecycleTemplate.authorization?.explicit === false && lifecycleTemplate.authorization?.allowedExecutions === 0 && lifecycleTemplate.authorization?.consumed === true && lifecycleTemplate.sourceLock?.productHead === PRODUCT_HEAD);
   add('LIFECYCLE_TEMPLATE_GUARDS', lifecycleTemplate.scope?.singleBrowserSession === true && lifecycleTemplate.scope?.legalOnce === true && lifecycleTemplate.scope?.focusedAcademiaRuntime === false && lifecycleTemplate.scope?.academiaContentCompletenessBlocksRelease === false && lifecycleTemplate.guards?.firestoreDataWritesAllowed === false && lifecycleTemplate.guards?.operationalWritesAllowed === 0 && lifecycleTemplate.guards?.hostingDeployAllowed === false && lifecycleTemplate.guards?.productionAllowed === false);
 
@@ -57,9 +57,9 @@ try {
   add('RUNTIME_DATASET', all(runtime, ['clientes: 430', 'aseguradoras: 30', 'polizas: 1373', 'vehiculos: 1032', 'recibosEsperados: 1294', 'carteraPrimas: 673', 'cobros: 5', 'asesores: 7', 'REQUIRED_STORE_API']));
   add('RUNTIME_SINGLE_SESSION', count(runtime, 'chromium.launch') === 1 && count(runtime, 'browser.newContext') === 1 && count(runtime, 'async function settleLegal(page)') === 1 && count(runtime, 'await settleLegal(page);') === 1 && runtime.includes('legalSettledBeforeWriteGuard'));
   add('RUNTIME_ROLE_MATRIX', all(runtime, ["role: 'Dirección'", "role: 'Operativo'", "role: 'Asesor'", "ops: 'restricted'", "#/cliente360", "#/aseguradoras", "#/polizas", "#/ops", "#/leads"]));
-  add('RUNTIME_SAFETY', all(runtime, ['RUNTIME_WRITE_GUARD', 'firestoreWrites: 0', 'operationalWrites: 0', 'reimportExecuted: false', 'hostingDeploy: false', 'previewDeploy: false', 'production: false', 'containsPII: false', 'containsSecrets: false']));
+  add('RUNTIME_SAFETY', all(runtime, ['RUNTIME_WRITE_GUARD', 'Orbit.__crmV1198GuardDiagnostics', "'self_guarded_readonly'", "'immutable_unwrapped'", 'guardRegistry', 'firestoreWrites: 0', 'operationalWrites: 0', 'reimportExecuted: false', 'hostingDeploy: false', 'previewDeploy: false', 'production: false', 'containsPII: false', 'containsSecrets: false']));
   add('RUNTIME_ACADEMIA_BOUNDARY', runtime.includes('focusedRuntimePrerequisite: false') && runtime.includes('contentCompletenessBlocksRelease: false') && !runtime.includes("#/academia") && !runtime.includes('academia_root_fix_ready'));
-  add('RUNTIME_SCREENSHOTS', runtime.includes("report.screenshots.length === 14") && runtime.includes('maskedOperationalContent: true'));
+  add('RUNTIME_SCREENSHOTS', runtime.includes('const expectedScreenshotCount = plans.reduce') && runtime.includes("expectedScreenshotCount === 13") && runtime.includes('report.screenshots.length === expectedScreenshotCount') && runtime.includes('maskedOperationalContent: true'));
 
   const preflightPos = workflow.indexOf('node tools/orbit360-validar-gate-contracts-v20260717.mjs');
   const credentialPos = workflow.indexOf('Resolver identidad de servicio LAB');
@@ -74,7 +74,7 @@ try {
   add('WORKFLOW_NO_ACADEMIA_PREREQ', !workflow.includes('academia_root_fix_ready') && !workflow.includes('targeted_rootfix_runtime_readonly') && !workflow.includes('focused Academia'));
   add('WORKFLOW_IMMUTABLE_REQUEST', all(workflow, ['GITHUB_RUN_ATTEMPT', 'git rev-parse HEAD^', 'git diff-tree --no-commit-id --name-only -r HEAD', 'allowedExecutions==1', 'consumed==false']));
   add('WORKFLOW_PRODUCT_FREEZE', workflow.includes('git diff --name-only "$ORBIT360_PRODUCT_HEAD"..HEAD') && workflow.includes("test \"${#PRODUCT_DIFF[@]}\" = '0'"));
-  add('WORKFLOW_SNAPSHOTS', all(workflow, ['gate711-release-critical-before-v20260802.json', 'gate711-release-critical-after-v20260802.json', 'sourceSnapshotDigest', 'targetSnapshotDigest']));
+  add('WORKFLOW_SNAPSHOTS', all(workflow, ['gate711-release-critical-before-v20260802.json', 'gate711-release-critical-after-v20260802.json', 'sourceSnapshotDigest', 'targetSnapshotDigest', '.guardRegistry.immutableUnwrapped==0', '.guardRegistry.conciliacionesMode=="self_guarded_readonly"', '.expectedScreenshotCount==13']));
   add('WORKFLOW_NO_DEPLOY', !/firebase\s+deploy|gcloud\s+run\s+deploy|firebase\s+hosting:channel:deploy|git\s+push\s+origin\s+main/i.test(workflow));
   add('WORKFLOW_STATUS_OBSERVABLE', workflow.includes('orbit360/gate711-release-critical-runtime') && workflow.includes('STOP_RETRY'));
 

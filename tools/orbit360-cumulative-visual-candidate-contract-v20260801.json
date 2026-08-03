@@ -1,11 +1,11 @@
 {
   "schemaVersion": "orbit360-cumulative-visual-candidate-contract-v1",
-  "contractVersion": "1.3.0",
+  "contractVersion": "1.4.0",
   "status": "CUMULATIVE_VISUAL_CANDIDATE_MANIFEST_SEALED",
   "requiredBranch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
   "baselineSourceCommit": "a0c430d7ae2856b5fe45207fb0820dcd9bb45809",
-  "manifestSourceHead": "c82c750b1f993b9522902070397158dd8717b29a",
+  "manifestSourceHead": "267f7231b46d65b80c167f54567a67503b6a6793",
   "sourceGate": {
     "gateId": "block7-canonical-store-cumulative-adapter-static-v20260801",
     "contractVersion": "7.10.0",
@@ -29,7 +29,9 @@
     "manifestDerivationJob": 91557182655,
     "manifestDerivationArtifact": 8840415775,
     "manifestDerivationArtifactDigest": "sha256:5c7fc9dcf03a616ce4d94588adf6542d9c7ce1b5c9ce8a2caa38effa084355a3",
-    "changedVisualPaths": ["orbit360-platform/core/academia-static-content-write-policy-v20260729.js"],
+    "changedVisualPaths": [
+      "orbit360-platform/core/academia-static-content-write-policy-v20260729.js"
+    ],
     "trackedFileCountUnchanged": true,
     "pathDigestUnchanged": true,
     "indexDigestUnchanged": true,
@@ -39,7 +41,15 @@
   "canonicalReadModel": {
     "snapshotDigest": "19e1927d39f6b713ee12504f8762bc42ead9de6e365bb0f12162d2a0c8f8469b",
     "singleReadOwner": "Orbit.store",
-    "canonicalCollections": ["clientes", "aseguradoras", "polizas", "vehiculos", "recibosEsperados", "carteraPrimas", "cobros"],
+    "canonicalCollections": [
+      "clientes",
+      "aseguradoras",
+      "polizas",
+      "vehiculos",
+      "recibosEsperados",
+      "carteraPrimas",
+      "cobros"
+    ],
     "operationalSeedExclusion": true,
     "requiresValidationPreserved": true,
     "parallelReadOwnersAllowed": false
@@ -74,9 +84,9 @@
       "data": 53
     },
     "pathDigest": "517056dee1200503b2e7295a333cb804bc71271bbaa87847fa762da025f276f1",
-    "contentDigest": "3d25a83218a4373513e1fff24ea9b12817d4c47be0fad08777e7f94867b3f676",
-    "indexDigest": "b57b6581ee02d2dde42a8a2c1272d57f19b7ad6809d13a1d25111f3d71a96074",
-    "previousContentDigest": "9e737a2e20ee868ec804a66d249957260164ea393ed4576d4a67b3508a00f762",
+    "contentDigest": "3dc0b2c699bde118d944e9304c725748b49c56619da8acf8040a36fdab37b06e",
+    "indexDigest": "aa40982bffd5a453c56dd07e2aa75745128890cb81fa940c2dac6e051fa2e9d6",
+    "previousContentDigest": "3d25a83218a4373513e1fff24ea9b12817d4c47be0fad08777e7f94867b3f676",
     "includeFileContentDigest": true,
     "includePathDigest": true,
     "includeRootCounts": true,
@@ -116,5 +126,36 @@
     "Academia"
   ],
   "containsPII": false,
-  "containsSecrets": false
+  "containsSecrets": false,
+  "authorizedSecurityRootFix": {
+    "classification": "SECURITY_FAILURE",
+    "rootCause": "FROZEN_MODULE_INTERNAL_GUARD_REGISTRY",
+    "sourceRuntimeRun": 30774888921,
+    "sourceRuntimeArtifact": 8841696348,
+    "applyRun": 30775623141,
+    "applyJob": 91570495651,
+    "applyArtifact": 8841926663,
+    "applyArtifactDigest": "sha256:ce683b51b0b0ff05bf11b5028d04e6ef8727cfc23c2ba797a8e9718e837d3904",
+    "productHead": "267f7231b46d65b80c167f54567a67503b6a6793",
+    "changedProductPaths": [
+      "orbit360-platform/index.html",
+      "orbit360-platform/modules/crm-v1198-operational-bridge.js"
+    ],
+    "externalGuardRegistry": "WeakMap",
+    "immutableOwnerMode": "self_guarded_readonly",
+    "unsafeInternalRegistryRemoved": true,
+    "conciliacionesFrozenPreserved": true,
+    "operationalWrites": 0,
+    "firestoreWrites": 0
+  },
+  "postRootFixManifestEvidence": {
+    "run": 30775729377,
+    "artifact": 8841965500,
+    "artifactDigest": "sha256:1c2ae7576d058f6d7c72aae95e8c5122efde217293d2c2f04d7e2167bbe09aa4",
+    "status": "GATE711_POST_ROOTFIX_MANIFEST_PASS",
+    "trackedFileCount": 309,
+    "pathDigest": "517056dee1200503b2e7295a333cb804bc71271bbaa87847fa762da025f276f1",
+    "contentDigest": "3dc0b2c699bde118d944e9304c725748b49c56619da8acf8040a36fdab37b06e",
+    "indexDigest": "aa40982bffd5a453c56dd07e2aa75745128890cb81fa940c2dac6e051fa2e9d6"
+  }
 }

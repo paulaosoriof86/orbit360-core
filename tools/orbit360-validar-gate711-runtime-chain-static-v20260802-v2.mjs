@@ -6,7 +6,7 @@ import {spawnSync} from 'node:child_process';
 
 const ROOT=process.cwd();
 const OUT=path.join(ROOT,'orbit360-platform/runtime-gate-crm-v20260716/gate711-runtime-chain-static-v20260802-v2.json');
-const PRODUCT='997fca628f95dd397dba347700a6bc644fe840f0';
+const PRODUCT='267f7231b46d65b80c167f54567a67503b6a6793';
 const GATE='block7-canonical-runtime-cumulative-visual-lab-v20260801';
 const BRANCH='ays/backend-tenant-lab-v99-20260703';
 const F={
@@ -64,9 +64,10 @@ try{
  add('INDEX_BACKEND_ORDER',pos(index,'core/backend-lab-loader.js')>=0&&pos(index,'core/backend-lab-loader.js')<pos(index,'core/backend-lab-init.js')&&pos(index,'core/backend-lab-init.js')<pos(index,'data/store-firestore-lab.local.js'));
 
  add('RUNTIME_OUTPUT',runtime.includes('gate711-release-critical-runtime-v20260802.json')&&workflow.includes('$EVIDENCE_DIR/gate711-release-critical-runtime-v20260802.json'));
- add('RUNTIME_SHOTS',runtime.includes('visual-sanitized-gate711-release-critical-v20260802')&&workflow.includes('visual-sanitized-gate711-release-critical-v20260802/*.png')&&runtime.includes('report.screenshots.length === 14')&&workflow.includes('(.screenshots|length)==14'));
+ add('RUNTIME_SHOTS',runtime.includes('visual-sanitized-gate711-release-critical-v20260802')&&workflow.includes('visual-sanitized-gate711-release-critical-v20260802/*.png')&&runtime.includes('expectedScreenshotCount === 13')&&runtime.includes('report.screenshots.length === expectedScreenshotCount')&&workflow.includes('(.expectedScreenshotCount==13)')&&workflow.includes('((.screenshots|length)==13)'));
  add('RUNTIME_ONE_SESSION',count(runtime,'chromium.launch')===1&&count(runtime,'browser.newContext')===1&&count(runtime,'context.newPage')===1&&count(runtime,'await settleLegal(page);')===1);
  add('RUNTIME_WRITE_GUARD',has(runtime,"['insert', 'update', 'remove', 'setPref']",'RUNTIME_WRITE_GUARD','final.writeCalls.length === 0'));
+ add('RUNTIME_GUARD_REGISTRY',has(runtime,'Orbit.__crmV1198GuardDiagnostics',"'self_guarded_readonly'","'immutable_unwrapped'",'guardState.immutableUnwrapped === 0',"guardState.conciliacionesMode === 'self_guarded_readonly'")&&has(workflow,'.checks.guardRegistry==true','.guardRegistry.immutableUnwrapped==0','.guardRegistry.conciliacionesMode=="self_guarded_readonly"'));
  add('RUNTIME_COUNTS',has(runtime,'clientes: 430','aseguradoras: 30','polizas: 1373','vehiculos: 1032','recibosEsperados: 1294','carteraPrimas: 673','cobros: 5','asesores: 7'));
  add('RUNTIME_MATRIX',has(runtime,"role: 'Dirección'","role: 'Operativo'","role: 'Asesor'","ops: 'restricted'","#/cliente360","#/aseguradoras","#/polizas","#/ops","#/leads"));
  add('RUNTIME_ALWAYS_SAVES',has(runtime,'finally {','save();','process.exit(report.ok ? 0 : 41)'));
@@ -78,7 +79,7 @@ try{
  add('FINAL_STATUS_ALWAYS',/- name: Publicar estado observable final[\s\S]*?if: always\(\)/.test(workflow));
  add('NO_DEPLOY',!/firebase\s+deploy|hosting:channel:deploy|gcloud\s+run\s+deploy|git\s+push\s+origin\s+main|gh\s+pr\s+merge/i.test(workflow));
  add('NO_ACADEMIA_RUNTIME',!workflow.includes('academia_root_fix_ready')&&!runtime.includes("#/academia"));
- add('READINESS_PATH_CONTRACT',has(readiness,'WORKFLOW_IDENTITY_PATH_CONTRACT','explicitTokenPathHonored','explicitConfigPathHonored'));
+ add('READINESS_PATH_CONTRACT',has(readiness,'export ORBIT360_CUSTOM_TOKEN_FILE="$TOKEN_FILE"','export ORBIT360_LOCAL_FIREBASE_CONFIG_FILE="$CONFIG_FILE"','.explicitTokenPathHonored==true','.explicitConfigPathHonored==true'));
  for(const rel of [F.readiness,F.identity,F.snapshot,F.runtime]){const s=syntax(rel);add('SYNTAX_'+path.basename(rel).replace(/[^A-Za-z0-9]+/g,'_').toUpperCase(),s.ok,s.detail);}
  const failed=checks.filter(c=>!c.ok);const result={schemaVersion:'orbit360-gate711-runtime-chain-static-evidence-v2',gateId:GATE,productHead:PRODUCT,branch:BRANCH,status:failed.length?'GATE711_RUNTIME_CHAIN_STATIC_FAIL':'GATE711_RUNTIME_CHAIN_STATIC_PASS',classification:failed.length?'PIPELINE_MECHANISM_FAILURE':'GO_STATIC_RUNTIME_CHAIN_END_TO_END',total:checks.length,passed:checks.length-failed.length,failed:failed.length,failedCheckIds:failed.map(c=>c.id),checks,productFilesChanged:0,secretsAccessed:false,firestoreReads:0,firestoreWrites:0,operationalWrites:0,runtimeExecuted:false,browserExecuted:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false,ok:failed.length===0};
  fs.mkdirSync(path.dirname(OUT),{recursive:true});fs.writeFileSync(OUT,JSON.stringify(result,null,2)+'\n','utf8');console.log(JSON.stringify(result,null,2));process.exit(failed.length?41:0);

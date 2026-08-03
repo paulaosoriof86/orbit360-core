@@ -9,7 +9,7 @@ const ROOT = process.cwd();
 const OUT = path.join(ROOT, 'orbit360-platform/runtime-gate-crm-v20260716/gate711-release-critical-static-v20260802.json');
 const GATE_ID = 'block7-canonical-runtime-cumulative-visual-lab-v20260801';
 const VERSION = '7.11.1';
-const PRODUCT_HEAD = '997fca628f95dd397dba347700a6bc644fe840f0';
+const PRODUCT_HEAD = '267f7231b46d65b80c167f54567a67503b6a6793';
 
 const files = {
   scope: 'tools/orbit360-gate711-release-critical-scope-v20260802.json',

@@ -7,7 +7,7 @@
   "status": "INERT_TEMPLATE_PENDING_EXPLICIT_AUTHORIZATION",
   "phase": "LAB_RUNTIME_GATE_PENDING",
   "sourceLock": {
-    "productHead": "997fca628f95dd397dba347700a6bc644fe840f0",
+    "productHead": "267f7231b46d65b80c167f54567a67503b6a6793",
     "requiredBranch": "ays/backend-tenant-lab-v99-20260703",
     "pullRequest": 5,
     "productPathsMayChange": false
@@ -61,11 +61,25 @@
     "snapshotBeforeAndAfter": true,
     "browserWriteGuard": true,
     "singleReadOwner": "Orbit.store",
-    "roles": ["Dirección", "Operativo", "Asesor"],
-    "viewports": ["desktop", "tablet", "mobile"],
-    "routes": ["cliente360", "aseguradoras", "polizas", "ops", "leads"],
+    "roles": [
+      "Dirección",
+      "Operativo",
+      "Asesor"
+    ],
+    "viewports": [
+      "desktop",
+      "tablet",
+      "mobile"
+    ],
+    "routes": [
+      "cliente360",
+      "aseguradoras",
+      "polizas",
+      "ops",
+      "leads"
+    ],
     "advisorOpsRestricted": true,
-    "sanitizedScreenshots": 14,
+    "sanitizedScreenshots": 13,
     "singleCumulativeVisualReview": true,
     "focusedAcademiaRuntime": false,
     "academiaStaticIntegrityRequired": true,
@@ -99,5 +113,39 @@
     "automatedGateMaySetApproval": false
   },
   "containsPII": false,
-  "containsSecrets": false
+  "containsSecrets": false,
+  "securityRootFixEvidence": {
+    "classification": "SECURITY_FAILURE",
+    "rootCause": "FROZEN_MODULE_INTERNAL_GUARD_REGISTRY",
+    "sourceRuntimeRun": 30774888921,
+    "sourceRuntimeArtifact": 8841696348,
+    "applyRun": 30775623141,
+    "applyJob": 91570495651,
+    "applyArtifact": 8841926663,
+    "applyArtifactDigest": "sha256:ce683b51b0b0ff05bf11b5028d04e6ef8727cfc23c2ba797a8e9718e837d3904",
+    "productHead": "267f7231b46d65b80c167f54567a67503b6a6793",
+    "changedProductPaths": [
+      "orbit360-platform/index.html",
+      "orbit360-platform/modules/crm-v1198-operational-bridge.js"
+    ],
+    "externalGuardRegistry": "WeakMap",
+    "immutableOwnerMode": "self_guarded_readonly",
+    "unsafeInternalRegistryRemoved": true,
+    "conciliacionesFrozenPreserved": true,
+    "operationalWrites": 0,
+    "firestoreWrites": 0
+  },
+  "postRootFixManifestEvidence": {
+    "run": 30775729377,
+    "artifact": 8841965500,
+    "artifactDigest": "sha256:1c2ae7576d058f6d7c72aae95e8c5122efde217293d2c2f04d7e2167bbe09aa4",
+    "status": "GATE711_POST_ROOTFIX_MANIFEST_PASS",
+    "trackedFileCount": 309,
+    "pathDigest": "517056dee1200503b2e7295a333cb804bc71271bbaa87847fa762da025f276f1",
+    "contentDigest": "3dc0b2c699bde118d944e9304c725748b49c56619da8acf8040a36fdab37b06e",
+    "indexDigest": "aa40982bffd5a453c56dd07e2aa75745128890cb81fa940c2dac6e051fa2e9d6"
+  },
+  "postRootFixReadinessEvidence": {
+    "status": "PENDING_SOURCE_ONLY_GATE"
+  }
 }

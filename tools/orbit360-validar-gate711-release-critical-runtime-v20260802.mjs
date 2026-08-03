@@ -40,7 +40,9 @@ const report = {
   store: {},
   roles: {},
   screenshots: [],
+  runtimeContext: { role: '', route: '', label: '' },
   browserDiagnostics: { pageErrors: [], consoleErrors: [], failedRequests: [] },
+  guardRegistry: { total: 0, immutableUnwrapped: 0, conciliacionesMode: '' },
   writeGuard: { installed: false, calls: [] },
   academia: {
     presentInCandidate: true,
@@ -220,7 +222,17 @@ try {
   page.setDefaultTimeout(20000);
   page.setDefaultNavigationTimeout(60000);
   page.on('pageerror', error => {
-    if (report.browserDiagnostics.pageErrors.length < 12) report.browserDiagnostics.pageErrors.push(clean(error && error.message || error));
+    if (report.browserDiagnostics.pageErrors.length < 12) {
+      report.browserDiagnostics.pageErrors.push({
+        message: clean(error && error.message || error),
+        stack: clean(error && error.stack || ''),
+        stage: report.stage,
+        role: clean(report.runtimeContext.role),
+        route: clean(report.runtimeContext.route),
+        label: clean(report.runtimeContext.label),
+        at: new Date().toISOString()
+      });
+    }
   });
   page.on('console', message => {
     if (message.type() === 'error' && report.browserDiagnostics.consoleErrors.length < 20) report.browserDiagnostics.consoleErrors.push(clean(message.text()));
@@ -308,13 +320,20 @@ try {
       ], ops: 'restricted', leads: 'visible'
     }
   ];
+  const expectedScreenshotCount = plans.reduce((total, plan) => total + plan.crm.length + 2, 0);
+  requireState(expectedScreenshotCount === 13, 'SCREENSHOT_PLAN_CARDINALITY_INVALID', String(expectedScreenshotCount));
+  report.expectedScreenshotCount = expectedScreenshotCount;
 
   for (const plan of plans) {
+    report.runtimeContext = { role: plan.role, route: 'role_selection', label: plan.label };
+    stage('role_' + plan.label);
     await page.setViewportSize(plan.viewport);
     await selectRole(page, plan.role);
     report.roles[plan.role] = { viewport: plan.viewport, crm: {} };
 
     for (const crmRoute of plan.crm) {
+      report.runtimeContext = { role: plan.role, route: crmRoute.hash, label: plan.label + '-' + crmRoute.key };
+      stage('route_' + plan.label + '_' + crmRoute.key);
       await route(page, crmRoute.hash);
       const health = await visibleHealth(page, plan.label + '-' + crmRoute.key);
       const semantic = await routeSemantic(page, crmRoute.semantic, plan.label + '-' + crmRoute.key);
@@ -322,6 +341,8 @@ try {
       await screenshot(page, plan.label + '-' + crmRoute.key);
     }
 
+    report.runtimeContext = { role: plan.role, route: '#/ops', label: plan.label + '-ops' };
+    stage('route_' + plan.label + '_ops');
     await route(page, '#/ops');
     const opsHealth = await visibleHealth(page, plan.label + '-ops');
     const opsState = await page.evaluate(() => {
@@ -342,6 +363,8 @@ try {
     }
     await screenshot(page, plan.label + '-ops');
 
+    report.runtimeContext = { role: plan.role, route: '#/leads', label: plan.label + '-leads' };
+    stage('route_' + plan.label + '_leads');
     await route(page, '#/leads');
     const leadsHealth = await visibleHealth(page, plan.label + '-leads');
     const leadsState = await page.evaluate(() => {
@@ -362,6 +385,30 @@ try {
     report.roles[plan.role].leads = { health: leadsHealth, state: leadsState, expected: plan.leads };
   }
 
+  report.runtimeContext = { role: '', route: 'guard_registry_verification', label: 'guard-registry' };
+  stage('guard_registry_verification');
+  const guardState = await page.evaluate(() => {
+    const rows = Array.isArray(Orbit.__crmV1198GuardDiagnostics)
+      ? Orbit.__crmV1198GuardDiagnostics.map(row => ({
+          moduleName: String(row && row.moduleName || ''),
+          actionName: String(row && row.actionName || ''),
+          mode: String(row && row.mode || '')
+        }))
+      : [];
+    const conciliaciones = rows.find(row => row.moduleName === 'conciliaciones' && row.actionName === 'accion');
+    return {
+      total: rows.length,
+      immutableUnwrapped: rows.filter(row => row.mode === 'immutable_unwrapped').length,
+      conciliacionesMode: conciliaciones ? conciliaciones.mode : '',
+      rows
+    };
+  });
+  report.guardRegistry = guardState;
+  requireState(guardState.immutableUnwrapped === 0, 'CRM_GUARD_IMMUTABLE_UNWRAPPED', JSON.stringify(guardState.rows));
+  requireState(guardState.conciliacionesMode === 'self_guarded_readonly', 'CONCILIACIONES_GUARD_MODE_INVALID', guardState.conciliacionesMode);
+  report.checks.guardRegistry = true;
+
+  stage('browser_matrix_complete');
   const final = await page.evaluate(() => ({
     writeCalls: window.__orbitGate711ReleaseCriticalWriteGuard && window.__orbitGate711ReleaseCriticalWriteGuard.calls || [],
     activeRole: Orbit.session && Orbit.session.rol ? Orbit.session.rol() : ''
@@ -369,7 +416,7 @@ try {
   report.writeGuard.calls = final.writeCalls;
   requireState(final.writeCalls.length === 0, 'BROWSER_WRITE_ATTEMPT', JSON.stringify(final.writeCalls));
   requireState(report.browserDiagnostics.pageErrors.length === 0, 'BROWSER_PAGE_ERRORS', JSON.stringify(report.browserDiagnostics.pageErrors));
-  requireState(report.screenshots.length === 14, 'SCREENSHOT_COVERAGE_INCOMPLETE', String(report.screenshots.length));
+  requireState(report.screenshots.length === expectedScreenshotCount, 'SCREENSHOT_COVERAGE_INCOMPLETE', String(report.screenshots.length));
 
   report.checks.roles = true;
   report.checks.crmRoutes = true;
