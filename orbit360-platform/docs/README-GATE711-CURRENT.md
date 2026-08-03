@@ -8,9 +8,9 @@ PR: #5 draft/open
 
 ```text
 GATE711_RELEASE_CRITICAL_STATIC_PASS_CLOSED
-GATE711_RUNTIME_PACKAGE_READINESS_PASS_CLOSED
-GATE711_RUNTIME_AUTHORIZATION_CONSUMED_STOP_RETRY
 GATE711_RUNTIME_ROUTER_COMPAT_PASS_CLOSED
+GATE711_RUNTIME_PACKAGE_READINESS_PATH_CONTRACT_PASS_CLOSED
+GATE711_RUNTIME_AUTHORIZATION_1815_CONSUMED_STOP_RETRY
 CRM_OPS_LEADS_RUNTIME_READONLY_PENDING_NEW_AUTHORIZATION
 ACADEMIA_CONTENT_RUNTIME_NONBLOCKING
 CLOUD_CLAUDE_PACKAGE_DOCUMENTED_NOT_SENT
@@ -57,94 +57,128 @@ Academia conserva integridad estática, pero la completitud de sus lecciones y s
 
 ## Evidencia estática cerrada
 
-Release-critical:
-
 ```text
-run: 30771933766
-job: 91560447718
-artifact: 8840787308
-checks: 38/38 PASS
-classification: GO_STATIC_RELEASE_CRITICAL_CRM_OPS_LEADS
-productFreeze: PASS
+release-critical static:
+run 30771933766 · 38/38 PASS
+artifact 8840787308
+
+lifecycle-router compatibility:
+run 30772843811 · 12/12 PASS
+artifact 8841072752
+
+package readiness inicial:
+run 30772261072 · 38/38 PASS
+artifact 8840893567
+
+package readiness con rutas efímeras:
+run 30774296503 · 38/38 PASS
+artifact 8841489287
+sha256:ec4a75a9ec951306279c31b5d09d1545b11dae76b578c0dcd3d69bd11c26cc03
 ```
 
-Package readiness:
+Todos estos cierres preservaron el product freeze y no utilizaron deploy ni producción.
+
+## Ejecución runtime autorizada a las 18:15
 
 ```text
-run: 30772261072
-job: 91561337917
-artifact: 8840893567
-checks: 38/38 PASS
-classification: GO_STATIC_RUNTIME_PACKAGE_CRM_OPS_LEADS
-packageInert: true
+run: 30774123443
+job: 91566222407
+requestCommit: 5e9fce8c9d681b6a7eec9145d725107df9848b5e
+artifact: 8841443031
+artifactDigest: sha256:ce6ec1619c7b5e87dbc583c23e806a139ca823ca6ec25740c5867f6f42fc69a1
+conclusion: FAILURE / STOP_RETRY
 ```
 
-## Runtime autorizado consumido
+Etapas verificadas:
 
 ```text
-run: 30772737476
-job: 91562610825
-requestCommit: 9a0b4fbf062aa7731065a36c363858024cfec4d2
-artifact: 8841039787
-artifactDigest: sha256:faedbb562500ed403746818bfb0e77ff13adb15000fe38c545e4ee59be3e6664
+autorización inmutable y product freeze: PASS
+preflight contractual: 18/18 PASS
+release-critical static: 38/38 PASS
+dependencias: PASS
+cuenta de servicio LAB: PASS
+helper de identidad existente: PASS
+postcheck de ruta efímera: FAIL
+snapshot inicial: NOT_EXECUTED
+servidor local: NOT_EXECUTED
+runtime CRM/Ops/Leads: NOT_EXECUTED
+snapshot final: NOT_EXECUTED
 ```
 
-Primer fallo:
+Evidencia de identidad:
 
 ```text
-stage: CANONICAL_PREFLIGHT_ENTRYPOINT
-status: VALIDATOR_STALE
-classification: PIPELINE_MECHANISM_FAILURE
-error: CANONICAL_LIFECYCLE_REVISION_MISMATCH
-```
-
-La ejecución terminó antes de secrets, Firestore, identidad, snapshot, servidor y navegador:
-
-```text
-secretsRead: false
-firestoreRead: false
+status: CANONICAL_BROWSER_EXISTING_IDENTITY_READY
+classification: GO_LAB_EXISTING_IDENTITY_READONLY
+eligibleExistingIdentityCount: 1
+uidMatched: true
+emailMatched: true
+customTokenCreatedEphemeral: true
+authWrites: 0
 firestoreWrites: 0
 operationalWrites: 0
-runtimeExecuted: false
-browserExecuted: false
-deployExecuted: false
-productionTouched: false
 ```
 
-La autorización quedó consumida y el replay está bloqueado.
-
-## Causa raíz y correctivo
-
-El lifecycle materializado:
-
-1. omitía `validatorLifecycleRevision: phase-capability-contract-v1`;
-2. incluía el alias `credentialRead` dentro del objeto de capacidades;
-3. no era compatible con la igualdad exacta exigida por el router canónico.
-
-La readiness anterior no comparaba el template contra ese contrato real.
-
-Correctivos:
-
-- template con revisión canónica explícita;
-- perfil `LAB_RUNTIME_GATE` con exactamente nueve capacidades;
-- retiro del alias del objeto canónico;
-- nuevo validador lifecycle-router.
-
-Evidencia correctiva:
+## Clasificación y causa raíz
 
 ```text
-run: 30772843811
-job: 91562895150
-artifact: 8841072752
-artifactDigest: sha256:770f3127b280fbf6b95725df38b1bf65c7c444825fa631dc00d0b3e9dd454537
-routerCompatibility: 12/12 PASS
-packageReadiness: 38/38 PASS
-productFreeze: PASS
+classification: PIPELINE_MECHANISM_FAILURE
+failedStage: PREPARE_EXISTING_IDENTITY_READONLY_POSTCHECK
+error: EPHEMERAL_TOKEN_PATH_POSTCHECK_MISMATCH
 ```
 
-No se utilizaron credenciales, Firestore, runtime, navegador, deploy ni producción en el correctivo.
+El workflow calculaba rutas para el token y la configuración, pero no las exportaba antes de invocar el helper. El helper creó correctamente la identidad y el token en su fallback canónico; el step posterior comprobó otra ruta y produjo un falso fallo.
 
-## Cloud / Claude
+No fue un defecto de:
+
+- producto;
+- Academia;
+- Auth o membresías;
+- datos;
+- CRM, Ops o Leads.
+
+## Correctivo cerrado
+
+Archivos:
+
+- `.github/workflows/orbit360-gate711-release-critical-runtime-v20260802.yml`
+- `tools/orbit360-validar-gate711-runtime-package-readiness-v20260802.mjs`
+
+Cambios:
+
+```text
+export ORBIT360_CUSTOM_TOKEN_FILE="$TOKEN_FILE"
+export ORBIT360_LOCAL_FIREBASE_CONFIG_FILE="$CONFIG_FILE"
+explicitTokenPathHonored: obligatorio
+explicitConfigPathHonored: obligatorio
+```
+
+Commits:
+
+```text
+workflow fix: cbd04a88cb6b0d4c59b0cf927401f68a8ba6bbb9
+readiness coverage: 7ddc43c5d745d5ce4ba9a5d26a1321101cfe22b1
+```
+
+La validación source-only `30774296503` confirmó nuevamente 38/38 PASS, cero secretos, cero Firestore, cero navegador y cero cambios de producto.
+
+## Seguridad y replay
+
+```text
+autorización 18:15: consumida
+replayAllowed: false
+additionalExecutionsAllowed: false
+STOP_RETRY: active
+firestoreWrites: 0
+operationalWrites: 0
+reimportación: no
+Hosting/deploy: no/no
+producción/main/merge: no/no/no
+```
+
+Aunque la cuenta de servicio fue leída y el helper hizo lecturas de Auth/Firestore autorizadas, los archivos temporales se limpiaron y ningún secreto fue incorporado a la evidencia.
+
+## Cloud / Claude / Academia
 
 ```text
 Hosting posterior al root fix: NO EJECUTADO
@@ -157,6 +191,8 @@ Fuentes vigentes:
 
 1. `SINCRONIZACION-CLOUD-CLAUDE-ACUMULADA-20260802.md`
 2. `ADDENDUM-SINCRONIZACION-CLOUD-CLAUDE-RUNTIME-UNIFICADO-20260802.md`
+
+El addendum incluye ahora CL-081 a CL-083: exportación de rutas temporales, validación productor-consumidor y diferencia entre identidad válida y fallo posterior del pipeline. Solo viajarán como patrón sanitizado; no se enviarán rutas, UID, correos, tokens, secrets ni backend protegido.
 
 ## Aprobación humana
 
@@ -174,15 +210,17 @@ Leads: pendiente
 
 ## Documentación vigente
 
-1. `CIERRE-STOP-RETRY-GATE711-RUNTIME-LIFECYCLE-ROUTER-20260802.md`
-2. `CIERRE-READINESS-MACRO-RUNTIME-GATE711-CRM-OPS-LEADS-20260802.md`
-3. `CIERRE-STOP-RETRY-GATE711-ACADEMIA-OWNER-BOOTSTRAP-20260802.md`
-4. `SINCRONIZACION-CLOUD-CLAUDE-ACUMULADA-20260802.md`
+1. `CIERRE-STOP-RETRY-GATE711-IDENTIDAD-RUTAS-EFIMERAS-20260802.md`
+2. `CIERRE-STOP-RETRY-GATE711-RUNTIME-LIFECYCLE-ROUTER-20260802.md`
+3. `CIERRE-READINESS-MACRO-RUNTIME-GATE711-CRM-OPS-LEADS-20260802.md`
+4. `CIERRE-STOP-RETRY-GATE711-ACADEMIA-OWNER-BOOTSTRAP-20260802.md`
+5. `SINCRONIZACION-CLOUD-CLAUDE-ACUMULADA-20260802.md`
+6. `ADDENDUM-SINCRONIZACION-CLOUD-CLAUDE-RUNTIME-UNIFICADO-20260802.md`
 
 ## Siguiente frontera exacta
 
-No corresponde otra auditoría ni retorno a Academia.
+No corresponde otra auditoría, otro readiness ni retorno a Academia.
 
-Cualquier nueva ejecución runtime requiere una nueva autorización explícita porque la autorización de las 17:38 fue consumida por el run `30772737476` y STOP_RETRY impide reutilizarla.
+Cualquier nueva ejecución runtime requiere una nueva autorización explícita porque la autorización de las 18:15 fue consumida por el run `30774123443`. El nuevo request y lifecycle deberán derivarse del workflow corregido y del package readiness 38/38 del run `30774296503`.
 
-La siguiente autorización deberá cubrir un único macro read-only nuevo, derivado del template ya compatible 12/12 con el router y conservando package readiness 38/38. Después del PASS corresponde una sola revisión visual humana acumulativa; el go-live permanece separado y requiere autorización productiva explícita.
+Después de un PASS corresponde una sola revisión visual humana acumulativa. El go-live permanece separado y requiere autorización productiva explícita.
