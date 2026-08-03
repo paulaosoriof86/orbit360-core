@@ -1,0 +1,154 @@
+name: Orbit 360 · Gate 7.11 · correctivo visual seal
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-static-requests/gate711-correct-validator-seal-run-v20260803.json'
+
+permissions:
+  contents: write
+  statuses: write
+
+concurrency:
+  group: orbit360-gate711-correct-validator-seal-v20260803
+  cancel-in-progress: false
+
+env:
+  BRANCH: ays/backend-tenant-lab-v99-20260703
+  PRODUCT_HEAD: 267f7231b46d65b80c167f54567a67503b6a6793
+  REQUEST_FILE: .github/orbit360-static-requests/gate711-correct-validator-seal-run-v20260803.json
+  STATUS_CONTEXT: orbit360/gate711-validator-seal-corrective
+
+jobs:
+  correct:
+    name: Source-only · VISUAL_SEAL + evidencia observable
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - name: Checkout SHA exacto
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+
+      - name: Publicar estado pending
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          jq -n --arg state pending --arg context "$STATUS_CONTEXT" --arg description "Gate 7.11 corrigiendo VISUAL_SEAL obsoleto" --arg target_url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" '{state:$state,context:$context,description:$description,target_url:$target_url}' > "$RUNNER_TEMP/status.json"
+          curl -fsS -X POST -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" -d @"$RUNNER_TEMP/status.json" >/dev/null
+
+      - name: Preparar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verificar request y freeze
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "$BRANCH"
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          test "$(git rev-parse HEAD^)" = "$(jq -r '.parentHead' "$REQUEST_FILE")"
+          mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
+          test "${#CHANGED[@]}" = '1'
+          test "${CHANGED[0]}" = "$REQUEST_FILE"
+          jq -e --arg product "$PRODUCT_HEAD" '.schemaVersion=="orbit360-gate711-validator-seal-corrective-request-v1" and .productHead==$product and .approved==true and .allowedExecutions==1 and .consumed==false and .sourceRuntimeRun==30814564387 and .failedStage=="Snapshot canónico inicial" and .classification=="VALIDATOR_STALE" and .rootCause=="VISUAL_SEAL_PRE_ROOTFIX" and .capabilities.secrets==false and .capabilities.firestoreRead==false and .capabilities.runtime==false and .capabilities.browser==false and .capabilities.writes==false and .capabilities.deploy==false and .capabilities.production==false' "$REQUEST_FILE" >/dev/null
+          mapfile -t PRODUCT_DIFF < <(git diff --name-only "$PRODUCT_HEAD"..HEAD -- orbit360-platform/index.html orbit360-platform/modules orbit360-platform/core orbit360-platform/styles orbit360-platform/data)
+          test "${#PRODUCT_DIFF[@]}" = '0'
+
+      - name: Aplicar correctivo exacto
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          constants=Path('tools/orbit360-policies-dual-path-provenance-constants-v20260801.mjs')
+          text=constants.read_text(encoding='utf-8')
+          replacements={
+            "contentDigest: '3d25a83218a4373513e1fff24ea9b12817d4c47be0fad08777e7f94867b3f676'":"contentDigest: '3dc0b2c699bde118d944e9304c725748b49c56619da8acf8040a36fdab37b06e'",
+            "indexDigest: 'b57b6581ee02d2dde42a8a2c1272d57f19b7ad6809d13a1d25111f3d71a96074'":"indexDigest: 'aa40982bffd5a453c56dd07e2aa75745128890cb81fa940c2dac6e051fa2e9d6'",
+            "sealRevision: 'academia-bootstrap-rootfix-20260802.2'":"sealRevision: 'security-frozen-guard-rootfix-20260803.1'",
+            "sourceRun: 30770685200":"sourceRun: 30775729377",
+            "sourceArtifact: 8840415775":"sourceArtifact: 8841965500"
+          }
+          for old,new in replacements.items():
+            if text.count(old)!=1: raise SystemExit('CONSTANT_ANCHOR_INVALID:'+old)
+            text=text.replace(old,new,1)
+          constants.write_text(text,encoding='utf-8')
+
+          validator=Path('tools/orbit360-revalidar-policies-full-canonical-readonly-v20260801.mjs')
+          text=validator.read_text(encoding='utf-8')
+          old="save(result);if(app)await deleteApp(app).catch(()=>{});process.exit(result.ok?0:41);"
+          new="save(result);console.log(JSON.stringify(result,null,2));if(app)await deleteApp(app).catch(()=>{});process.exit(result.ok?0:41);"
+          if text.count(old)!=1: raise SystemExit('OBSERVABILITY_ANCHOR_INVALID')
+          validator.write_text(text.replace(old,new,1),encoding='utf-8')
+          PY
+
+      - name: Validar seal contra manifest actual
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-policies-dual-path-provenance-constants-v20260801.mjs
+          node --check tools/orbit360-revalidar-policies-full-canonical-readonly-v20260801.mjs
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import path from 'node:path';
+          import crypto from 'node:crypto';
+          import {execFileSync} from 'node:child_process';
+          import {VISUAL_SEAL} from './tools/orbit360-policies-dual-path-provenance-constants-v20260801.mjs';
+          const sha=v=>crypto.createHash('sha256').update(String(v)).digest('hex');
+          const roots=['orbit360-platform/index.html','orbit360-platform/modules','orbit360-platform/core','orbit360-platform/styles','orbit360-platform/data'];
+          const files=execFileSync('git',['ls-files','--',...roots],{encoding:'utf8'}).split(/\r?\n/).map(x=>x.trim()).filter(Boolean).filter(f=>!f.includes('/runtime-gate-')).sort();
+          const rows=files.map(file=>({file,digest:sha(fs.readFileSync(path.join(process.cwd(),file)))}));
+          const actual={trackedFileCount:rows.length,pathDigest:sha(rows.map(r=>r.file).join('\n')),contentDigest:sha(rows.map(r=>`${r.file}:${r.digest}`).join('\n')),indexDigest:rows.find(r=>r.file==='orbit360-platform/index.html')?.digest||''};
+          const expected={trackedFileCount:309,pathDigest:'517056dee1200503b2e7295a333cb804bc71271bbaa87847fa762da025f276f1',contentDigest:'3dc0b2c699bde118d944e9304c725748b49c56619da8acf8040a36fdab37b06e',indexDigest:'aa40982bffd5a453c56dd07e2aa75745128890cb81fa940c2dac6e051fa2e9d6'};
+          if(JSON.stringify(actual)!==JSON.stringify(expected)||JSON.stringify(VISUAL_SEAL).includes('3d25a83218a4373513e1fff24ea9b12817d4c47be0fad08777e7f94867b3f676')||VISUAL_SEAL.contentDigest!==expected.contentDigest||VISUAL_SEAL.indexDigest!==expected.indexDigest)process.exit(41);
+          fs.mkdirSync('orbit360-platform/runtime-gate-crm-v20260716',{recursive:true});
+          fs.writeFileSync('orbit360-platform/runtime-gate-crm-v20260716/gate711-validator-seal-corrective-v20260803.json',JSON.stringify({schemaVersion:'orbit360-gate711-validator-seal-corrective-evidence-v1',status:'GATE711_VALIDATOR_SEAL_CORRECTIVE_PASS',classification:'GO_STATIC_SNAPSHOT_VALIDATOR_CURRENT',sourceRuntimeRun:30814564387,rootCause:'VISUAL_SEAL_PRE_ROOTFIX',actual,visualSeal:VISUAL_SEAL,validatorNowPrintsSanitizedResult:true,productFilesChanged:0,secretsAccessed:false,firestoreReads:0,firestoreWrites:0,operationalWrites:0,runtimeExecuted:false,browserExecuted:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false,ok:true},null,2)+'\n');
+          NODE
+          jq -e '.ok==true and .status=="GATE711_VALIDATOR_SEAL_CORRECTIVE_PASS" and .classification=="GO_STATIC_SNAPSHOT_VALIDATOR_CURRENT" and .rootCause=="VISUAL_SEAL_PRE_ROOTFIX" and .actual.trackedFileCount==309 and .actual.contentDigest=="3dc0b2c699bde118d944e9304c725748b49c56619da8acf8040a36fdab37b06e" and .actual.indexDigest=="aa40982bffd5a453c56dd07e2aa75745128890cb81fa940c2dac6e051fa2e9d6" and .validatorNowPrintsSanitizedResult==true and .productFilesChanged==0 and .secretsAccessed==false and .firestoreReads==0 and .firestoreWrites==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' orbit360-platform/runtime-gate-crm-v20260716/gate711-validator-seal-corrective-v20260803.json >/dev/null
+          git diff --check
+          mapfile -t DIFF < <(git diff --name-only | sort)
+          test "${#DIFF[@]}" = '2'
+          printf '%s\n' "${DIFF[@]}" > "$RUNNER_TEMP/diff.txt"
+          printf '%s\n' tools/orbit360-policies-dual-path-provenance-constants-v20260801.mjs tools/orbit360-revalidar-policies-full-canonical-readonly-v20260801.mjs | sort > "$RUNNER_TEMP/expected.txt"
+          cmp -s "$RUNNER_TEMP/diff.txt" "$RUNNER_TEMP/expected.txt"
+
+      - name: Crear commit correctivo
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'orbit360-gate-bot'
+          git config user.email 'orbit360-gate-bot@users.noreply.github.com'
+          git add tools/orbit360-policies-dual-path-provenance-constants-v20260801.mjs tools/orbit360-revalidar-policies-full-canonical-readonly-v20260801.mjs
+          git commit -m 'fix(gate711): actualizar visual seal y observabilidad del snapshot'
+          git rev-parse HEAD > "$RUNNER_TEMP/fix-commit.txt"
+          git push origin "HEAD:$BRANCH"
+
+      - name: Guardar evidencia
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gate711-validator-seal-corrective-v20260803
+          path: |
+            ${{ runner.temp }}/fix-commit.txt
+            ${{ runner.temp }}/diff.txt
+            orbit360-platform/runtime-gate-crm-v20260716/gate711-validator-seal-corrective-v20260803.json
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Publicar estado final
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          JOB_STATUS: ${{ job.status }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "$JOB_STATUS" = success ]; then STATE=success; DESCRIPTION="Gate 7.11 VISUAL_SEAL correctivo PASS"; else STATE=failure; DESCRIPTION="Gate 7.11 VISUAL_SEAL correctivo FAIL / STOP_RETRY"; fi
+          jq -n --arg state "$STATE" --arg context "$STATUS_CONTEXT" --arg description "$DESCRIPTION" --arg target_url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" '{state:$state,context:$context,description:$description,target_url:$target_url}' > "$RUNNER_TEMP/status-final.json"
+          curl -fsS -X POST -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" -d @"$RUNNER_TEMP/status-final.json" >/dev/null
