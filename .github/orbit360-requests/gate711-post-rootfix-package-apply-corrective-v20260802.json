@@ -1,0 +1,24 @@
+{
+  "schemaVersion": "orbit360-gate711-post-rootfix-package-apply-corrective-request-v1",
+  "productHead": "267f7231b46d65b80c167f54567a67503b6a6793",
+  "parentHead": "418dac937aac70a45b5e7c4676b0cc3f86e6501b",
+  "approved": true,
+  "allowedExecutions": 1,
+  "consumed": false,
+  "priorRun": 30776043004,
+  "priorFailedCheck": "READINESS_PATH_CONTRACT",
+  "classification": "VALIDATOR_STALE",
+  "correction": "SEMANTIC_PATH_CONTRACT",
+  "capabilities": {
+    "secrets": false,
+    "firestoreRead": false,
+    "runtime": false,
+    "browser": false,
+    "writes": false,
+    "deploy": false,
+    "production": false
+  },
+  "stopRetry": true,
+  "containsPII": false,
+  "containsSecrets": false
+}
