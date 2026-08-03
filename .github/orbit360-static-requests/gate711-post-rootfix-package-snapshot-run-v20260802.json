@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "orbit360-gate711-post-rootfix-package-snapshot-request-v1",
+  "productHead": "267f7231b46d65b80c167f54567a67503b6a6793",
+  "parentHead": "1577ee59491e567b155a744b99c8aaafa54a5436",
+  "approved": true,
+  "allowedExecutions": 1,
+  "consumed": false,
+  "scope": "RUNTIME_CONTRACTS_VALIDATORS_AND_DOCS_ONLY",
+  "capabilities": {
+    "secrets": false,
+    "firestoreRead": false,
+    "runtime": false,
+    "browser": false,
+    "writes": false,
+    "deploy": false,
+    "production": false
+  },
+  "stopRetry": true,
+  "containsPII": false,
+  "containsSecrets": false
+}
