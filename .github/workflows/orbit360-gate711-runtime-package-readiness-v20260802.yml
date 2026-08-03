@@ -4,7 +4,7 @@ on:
   push:
     branches: [ays/backend-tenant-lab-v99-20260703]
     paths:
-      - '.github/orbit360-static-requests/gate711-runtime-package-readiness-run-v20260802-v2.json'
+      - '.github/orbit360-static-requests/gate711-runtime-package-readiness-run-v20260802-v3.json'
 
 permissions:
   contents: read
@@ -16,7 +16,7 @@ concurrency:
 
 env:
   ORBIT360_PRODUCT_HEAD: 997fca628f95dd397dba347700a6bc644fe840f0
-  REQUEST_FILE: .github/orbit360-static-requests/gate711-runtime-package-readiness-run-v20260802-v2.json
+  REQUEST_FILE: .github/orbit360-static-requests/gate711-runtime-package-readiness-run-v20260802-v3.json
   EVIDENCE_FILE: orbit360-platform/runtime-gate-crm-v20260716/gate711-runtime-package-readiness-v20260802.json
   STATUS_CONTEXT: orbit360/gate711-runtime-package-readiness
 
@@ -47,7 +47,7 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Verificar request inmutable, producto congelado y cierre validator stale
+      - name: Verificar request inmutable, producto congelado y cierre de rutas efímeras
         shell: bash
         run: |
           set -euo pipefail
@@ -56,7 +56,7 @@ jobs:
           mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
           test "${#CHANGED[@]}" = '1'
           test "${CHANGED[0]}" = "$REQUEST_FILE"
-          jq -e --arg product "$ORBIT360_PRODUCT_HEAD" '.schemaVersion=="orbit360-gate711-runtime-package-readiness-request-v1" and .gateId=="block7-canonical-runtime-cumulative-visual-lab-v20260801" and .productHead==$product and .approved==true and .allowedExecutions==1 and .consumed==false and .validatorStaleCorrection=="RUNTIME_SINGLE_SESSION_DEFINITION_VS_INVOCATION" and .priorFailure.run==30772197420 and .priorFailure.job==91561171817 and .priorFailure.artifact==8840873512 and .priorFailure.classification=="VALIDATOR_STALE" and .priorFailure.failedCheck=="RUNTIME_SINGLE_SESSION" and .priorFailure.replayAllowed==false and .capabilities.secrets==false and .capabilities.firestoreRead==false and .capabilities.runtime==false and .capabilities.browser==false and .capabilities.writes==false and .capabilities.deploy==false and .capabilities.production==false' "$REQUEST_FILE" >/dev/null
+          jq -e --arg product "$ORBIT360_PRODUCT_HEAD" '.schemaVersion=="orbit360-gate711-runtime-package-readiness-request-v1" and .gateId=="block7-canonical-runtime-cumulative-visual-lab-v20260801" and .productHead==$product and .approved==true and .allowedExecutions==1 and .consumed==false and .pipelineCorrection=="IDENTITY_EPHEMERAL_PATH_EXPORT" and .priorFailure.run==30774123443 and .priorFailure.job==91566222407 and .priorFailure.artifact==8841443031 and .priorFailure.classification=="PIPELINE_MECHANISM_FAILURE" and .priorFailure.failedStage=="PREPARE_EXISTING_IDENTITY_READONLY" and .priorFailure.replayAllowed==false and .capabilities.secrets==false and .capabilities.firestoreRead==false and .capabilities.runtime==false and .capabilities.browser==false and .capabilities.writes==false and .capabilities.deploy==false and .capabilities.production==false' "$REQUEST_FILE" >/dev/null
           mapfile -t PRODUCT_DIFF < <(git diff --name-only "$ORBIT360_PRODUCT_HEAD"..HEAD -- orbit360-platform/index.html orbit360-platform/modules orbit360-platform/core orbit360-platform/styles orbit360-platform/data)
           test "${#PRODUCT_DIFF[@]}" = '0'
 
@@ -73,7 +73,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: gate711-runtime-package-readiness-v20260802-v2
+          name: gate711-runtime-package-readiness-v20260802-v3
           path: |
             orbit360-platform/runtime-gate-crm-v20260716/gate711-runtime-package-readiness-v20260802.json
             .github/orbit360-templates/gate711-release-critical-runtime-request-template-v20260802.json
