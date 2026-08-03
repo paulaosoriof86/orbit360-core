@@ -35,9 +35,9 @@ export const CRITICAL = {
 export const VISUAL_SEAL = {
   trackedFileCount: 309,
   pathDigest: '517056dee1200503b2e7295a333cb804bc71271bbaa87847fa762da025f276f1',
-  contentDigest: '3d25a83218a4373513e1fff24ea9b12817d4c47be0fad08777e7f94867b3f676',
-  indexDigest: 'b57b6581ee02d2dde42a8a2c1272d57f19b7ad6809d13a1d25111f3d71a96074',
-  sealRevision: 'academia-bootstrap-rootfix-20260802.2',
-  sourceRun: 30770685200,
-  sourceArtifact: 8840415775
+  contentDigest: '3dc0b2c699bde118d944e9304c725748b49c56619da8acf8040a36fdab37b06e',
+  indexDigest: 'aa40982bffd5a453c56dd07e2aa75745128890cb81fa940c2dac6e051fa2e9d6',
+  sealRevision: 'security-frozen-guard-rootfix-20260803.1',
+  sourceRun: 30775729377,
+  sourceArtifact: 8841965500
 };
