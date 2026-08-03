@@ -16,6 +16,14 @@ Orbit.modules = Orbit.modules || {};
   Orbit.__crmV1198 = true;
   const U = Orbit.ui;
   const baseStore = () => Orbit.store;
+const guardRegistry = Orbit.__crmV1198GuardRegistry instanceof WeakMap
+  ? Orbit.__crmV1198GuardRegistry
+  : new WeakMap();
+const guardDiagnostics = Array.isArray(Orbit.__crmV1198GuardDiagnostics)
+  ? Orbit.__crmV1198GuardDiagnostics
+  : [];
+Orbit.__crmV1198GuardRegistry = guardRegistry;
+Orbit.__crmV1198GuardDiagnostics = guardDiagnostics;
 
   function esc(v) { return U && U.esc ? U.esc(String(v == null ? '' : v)) : String(v || ''); }
   function toast(v) { try { U.toast(v); } catch (e) {} }
@@ -336,18 +344,35 @@ Orbit.modules = Orbit.modules || {};
     });
   }
 
-  function guardAction(moduleName, actionName, collection, moduleKey, permission) {
-    const mod = Orbit.modules[moduleName];
-    if (!mod || typeof mod[actionName] !== 'function') return;
-    mod.__guardV1198 = mod.__guardV1198 || {};
-    if (mod.__guardV1198[actionName]) return;
-    const original = mod[actionName].bind(mod); mod.__guardV1198[actionName] = original;
-    mod[actionName] = function (id) {
-      if (id && collection && !recordAllowed(collection, id, moduleKey)) return toast('Registro fuera de tu alcance');
-      if (permission && !A.can(moduleKey, permission)) return toast('No tienes permiso para realizar esta acción');
-      return original.apply(mod, arguments);
-    };
+  function immutableSelfGuarded(moduleName, actionName, mod) {
+  return moduleName === 'conciliaciones' && actionName === 'accion' && Object.isFrozen(mod) &&
+    Orbit.cobrosConciliacionReadOnly && Orbit.cobrosConciliacionReadOnly.operationalWrites === 0 &&
+    Orbit.cobrosConciliacionReadOnly.firestoreWrites === 0;
+}
+
+function guardAction(moduleName, actionName, collection, moduleKey, permission) {
+  const mod = Orbit.modules[moduleName];
+  if (!mod || typeof mod[actionName] !== 'function') return;
+  let state = guardRegistry.get(mod);
+  if (!state) { state = Object.create(null); guardRegistry.set(mod, state); }
+  if (state[actionName]) return;
+  const original = mod[actionName].bind(mod);
+  const descriptor = Object.getOwnPropertyDescriptor(mod, actionName);
+  const mutable = Object.isExtensible(mod) && (!descriptor || descriptor.writable !== false);
+  if (!mutable) {
+    const mode = immutableSelfGuarded(moduleName, actionName, mod) ? 'self_guarded_readonly' : 'immutable_unwrapped';
+    state[actionName] = { original, mode };
+    guardDiagnostics.push({ moduleName, actionName, mode });
+    return;
   }
+  mod[actionName] = function (id) {
+    if (id && collection && !recordAllowed(collection, id, moduleKey)) return toast('Registro fuera de tu alcance');
+    if (permission && !A.can(moduleKey, permission)) return toast('No tienes permiso para realizar esta acción');
+    return original.apply(mod, arguments);
+  };
+  state[actionName] = { original, mode: 'wrapped' };
+  guardDiagnostics.push({ moduleName, actionName, mode: 'wrapped' });
+}
 
   function enhanceGeneric(host, moduleKey) {
     if (!host) return;
