@@ -1,0 +1,24 @@
+{
+  "schemaVersion": "orbit360-gate711-runtime-chain-static-corrective-request-v1",
+  "productHead": "997fca628f95dd397dba347700a6bc644fe840f0",
+  "parentHead": "189731738dd843fc82abfa8f72b44e1c785aadef",
+  "approved": true,
+  "allowedExecutions": 1,
+  "consumed": false,
+  "priorRun": 30774758537,
+  "priorResult": "54/55_VALIDATOR_STALE",
+  "failedCheck": "READINESS_PATH_CONTRACT",
+  "correction": "SEMANTIC_COVERAGE_INSTEAD_OF_LITERAL_IDENTIFIER",
+  "capabilities": {
+    "secrets": false,
+    "firestoreRead": false,
+    "runtime": false,
+    "browser": false,
+    "writes": false,
+    "deploy": false,
+    "production": false
+  },
+  "stopRetry": true,
+  "containsPII": false,
+  "containsSecrets": false
+}
