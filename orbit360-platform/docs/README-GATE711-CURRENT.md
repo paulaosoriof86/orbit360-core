@@ -1,6 +1,6 @@
 # Gate 7.11 — referencia vigente
 
-Fecha: 2026-08-02  
+Fecha: 2026-08-03  
 Rama: `ays/backend-tenant-lab-v99-20260703`  
 PR: #5 draft/open
 
@@ -11,9 +11,10 @@ GATE711_SECURITY_ROOT_FIX_CLOSED
 GATE711_POST_ROOTFIX_MANIFEST_CLOSED
 GATE711_POST_ROOTFIX_PACKAGE_SEALED
 GATE711_POST_ROOTFIX_READINESS_49_OF_49_PASS
-GATE711_PRIOR_RUNTIME_AUTHORIZATION_CONSUMED_STOP_RETRY
-CRM_OPS_LEADS_RUNTIME_POST_ROOTFIX_PENDING_ONE_NEW_AUTHORIZATION
-ACADEMIA_CONTENT_RUNTIME_NONBLOCKING
+GATE711_RUNTIME_30814564387_CONSUMED_STOP_RETRY
+GATE711_SNAPSHOT_VALIDATOR_STALE_ROOT_CAUSE_CLOSED
+GATE711_VISUAL_SEAL_CORRECTIVE_PASS
+CRM_OPS_LEADS_RUNTIME_PENDING_NEW_AUTHORIZATION
 CLOUD_CLAUDE_PACKAGE_DOCUMENTED_NOT_SENT
 HOSTING_DEPLOY_NOT_EXECUTED
 PRODUCTION_NOT_EXECUTED
@@ -23,7 +24,7 @@ PRODUCTION_NOT_EXECUTED
 
 ```text
 productHead: 267f7231b46d65b80c167f54567a67503b6a6793
-canonicalSnapshotDigest: 19e1927d39f6b713ee12504f8762bc42ead9de6e365bb0f12162d2a0c8f8469b
+canonicalSnapshotDigest esperado: 19e1927d39f6b713ee12504f8762bc42ead9de6e365bb0f12162d2a0c8f8469b
 trackedFileCount: 309
 pathDigest: 517056dee1200503b2e7295a333cb804bc71271bbaa87847fa762da025f276f1
 contentDigest: 3dc0b2c699bde118d944e9304c725748b49c56619da8acf8040a36fdab37b06e
@@ -31,147 +32,143 @@ indexDigest: aa40982bffd5a453c56dd07e2aa75745128890cb81fa940c2dac6e051fa2e9d6
 singleReadOwner: Orbit.store
 ```
 
-Conteos esperados:
+No hubo cambios de producto después del root fix de seguridad.
+
+## Ejecución autorizada del 3 de agosto
 
 ```text
-clientes: 430
-aseguradoras: 30
-pólizas: 1,373
-vehículos: 1,032
-recibos esperados: 1,294
-cartera: 673
-cobros: 5
-asesores: 7
-```
-
-## Runtime que reveló el defecto real
-
-```text
-run: 30774888921
-job: 91568393456
-artifact: 8841696348
-digest: sha256:f1ad7dc910b8047ff8f9dce8fb132ca953b91dcc048807576f00490fa3da3e1c
+run: 30814564387
+job: 91689019904
+requestCommit: 394673affdf51f0367bf6b92a7c6ca7559522e18
+artifact: 8856180726
+artifactDigest: sha256:c3384a1375eb8b311c6c47055020f2ca4d9666f8be87a554439c8f2fe9533d1f
 conclusion: FAILURE / STOP_RETRY
 ```
 
-Este run avanzó más allá de los bloqueos anteriores:
+Etapas:
 
 ```text
-preflight contractual: PASS
-identidad existente: PASS
-rutas efímeras: PASS
-snapshot inicial: PASS
-servidor local: PASS
-Firebase/Auth/Orbit.store: PASS
-conteos operativos: PASS
-legal: PASS
-Dirección desktop: recorrida
-Operativo tablet: recorrido
-Asesor móvil: recorrido
-CRM/Ops/Leads: recorridos
-capturas sanitizadas: 13
-write guard calls: 0
+autorización inmutable y product freeze: PASS
+preflight contractual antes de secrets: 18/18 PASS
+release-critical static: 38/38 PASS
+dependencias: PASS
+cuenta de servicio LAB: PASS
+identidad existente read-only: PASS
+snapshot canónico inicial: FAIL
+servidor local: NOT_EXECUTED
+browser CRM/Ops/Leads: NOT_EXECUTED
+snapshot final: NOT_EXECUTED
+limpieza de temporales: PASS
+```
+
+Seguridad:
+
+```text
+Auth writes: 0
 Firestore writes: 0
 operational writes: 0
-snapshot final: NOT_EXECUTED
+reimportación: no
+deploy: no
+producción/main/merge: no/no/no
 ```
 
-Error:
+## Causa raíz obligatoria del STOP
 
 ```text
-Cannot read properties of undefined (reading 'accion')
+classification: VALIDATOR_STALE
+code: VISUAL_SEAL_PRE_ROOTFIX
+failedStage: Snapshot canónico inicial
+staleOwner: tools/orbit360-policies-dual-path-provenance-constants-v20260801.mjs
+consumer: tools/orbit360-revalidar-policies-full-canonical-readonly-v20260801.mjs
 ```
 
-## Causa raíz cerrada
+El revalidador calculaba el manifest actual, pero lo comparaba contra un `VISUAL_SEAL` anterior al root fix:
 
 ```text
-classification: SECURITY_FAILURE
-code: FROZEN_MODULE_INTERNAL_GUARD_REGISTRY
-owner: modules/crm-v1198-operational-bridge.js
-protected owner: modules/conciliaciones.js
+sello obsoleto contentDigest: 3d25a83218a4373513e1fff24ea9b12817d4c47be0fad08777e7f94867b3f676
+sello obsoleto indexDigest: b57b6581ee02d2dde42a8a2c1272d57f19b7ad6809d13a1d25111f3d71a96074
+revisión obsoleta: academia-bootstrap-rootfix-20260802.2
 ```
 
-Conciliaciones publica un owner `Object.freeze`. El bridge intentaba crear `__guardV1198` dentro del objeto congelado; la escritura fallaba y la lectura posterior de `[accion]` se ejecutaba sobre `undefined`, interrumpiendo la instalación de guards posteriores.
-
-No fue un defecto de datos, identidad, membresías, Firestore, Academia ni del navegador.
-
-## Root fix
-
-El registro de guards se movió a un `WeakMap` externo:
+La candidata autorizada ya tenía:
 
 ```text
-mutable owners: wrapped
-Conciliaciones frozen/read-only: self_guarded_readonly
-otro owner inmutable no reconocido: immutable_unwrapped (prohibido por gate)
+contentDigest: 3dc0b2c699bde118d944e9304c725748b49c56619da8acf8040a36fdab37b06e
+indexDigest: aa40982bffd5a453c56dd07e2aa75745128890cb81fa940c2dac6e051fa2e9d6
 ```
 
-Conciliaciones permanece congelado y read-only.
+Por ello, incluso con datos sin cambios, `visualManifest()` necesariamente devolvía `manifestMatches=false` y el revalidador cerraba con `DATA_CONTRACT_FAILURE:CUMULATIVE_VISUAL_DRIFT`.
 
-Evidencia:
+Esto **no prueba drift de datos** y no corresponde corregir clientes, aseguradoras, pólizas, recibos, cartera o cobros. Tampoco fue un defecto de identidad, navegador ni del producto acumulativo.
+
+## Solución aplicada
 
 ```text
-run: 30775623141
-job: 91570495651
-artifact: 8841926663
-digest: sha256:ce683b51b0b0ff05bf11b5028d04e6ef8727cfc23c2ba797a8e9718e837d3904
-commit: 267f7231b46d65b80c167f54567a67503b6a6793
+run: 30814915626
+job: 91690157955
+artifact: 8856299679
+digest: sha256:3bbeb8af22f0b2ca1d8630735b4169f267249cf92d8b2d3a989308d754751641
+commit: a9549f3487522a3e450742de2649b5ad41f3b1e9
+status: PASS
 ```
 
-Cambios de producto exactos:
+Cambios exactos:
 
-1. `orbit360-platform/modules/crm-v1198-operational-bridge.js`
-2. `orbit360-platform/index.html`
+1. `tools/orbit360-policies-dual-path-provenance-constants-v20260801.mjs`
+   - `VISUAL_SEAL` sincronizado con el manifest autorizado;
+   - nueva revisión `security-frozen-guard-rootfix-20260803.1`;
+   - fuente actualizada al manifest run `30775729377`.
+2. `tools/orbit360-revalidar-policies-full-canonical-readonly-v20260801.mjs`
+   - imprime siempre el resultado JSON sanitizado antes de terminar;
+   - cualquier STOP futuro del snapshot mostrará su causa exacta en logs.
 
-## Paquete post-rootfix
+El correctivo fue source-only:
 
 ```text
-package commit: ef0664335bd3085dc7b21b4988f408fed1ac4145
+product files changed: 0
+secrets: no
+Firestore reads/writes: 0/0
+runtime/browser: no/no
+deploy/production: no/no
 ```
 
-Actualizaciones:
+## Limitación de evidencia corregida
 
-- nueva candidata y digests;
-- 13 capturas calculadas desde la matriz real;
-- diagnóstico de `pageerror` con etapa, rol, ruta y stack;
-- verificación de `Orbit.__crmV1198GuardDiagnostics`;
-- cero `immutable_unwrapped`;
-- Conciliaciones obligatorio en `self_guarded_readonly`;
-- una sesión, un legal, un write guard y snapshots antes/después.
+El workflow fallido no incluyó en el artefacto el archivo interno `policies-full-canonical-revalidation-readonly-v20260801.json`, y la copia `before` no llegó a crearse porque el validador terminó con código 41. La causa del sello obsoleto es determinística por inspección del productor y consumidor, pero el detalle interno del error no quedó en aquel artefacto.
 
-## Cierre estable post-rootfix
+La solución incorpora observabilidad obligatoria para que esa omisión no vuelva a ocurrir.
+
+## Autorización y replay
 
 ```text
-run: 30776380035
-job: 91572556496
-artifact: 8842172646
-digest: sha256:5b8fd7acfcafabf25538f34288a241472065855dacf69c18b8bb4748a30147cb
-status: GATE711_POST_ROOTFIX_READINESS_PASS
-classification: GO_STATIC_POST_ROOTFIX_RUNTIME_READY
-checks: 49/49
+autorización del 3 de agosto: CONSUMIDA
+consumedByRun: 30814564387
+replayAllowed: false
+additionalExecutionsAllowed: false
 ```
 
-Cierres contenidos:
+No se reejecutará ese run. El lifecycle quedó cerrado con la causa raíz y la solución asociadas.
+
+## Estado previo preservado
+
+El root fix de seguridad del bridge CRM continúa vigente:
 
 ```text
+productHead: 267f7231b46d65b80c167f54567a67503b6a6793
+external guard registry: WeakMap
+Conciliaciones: self_guarded_readonly
+immutable_unwrapped: prohibido
+```
+
+Readiness anterior preservado:
+
+```text
+run 30776380035 · 49/49 PASS
 release-critical static: 38/38
 runtime package readiness: 38/38
 runtime chain: 56/56
 router compatibility: 12/12
 ```
-
-El cierre fue source-only: cero secretos, Firestore, navegador, deploy y producción.
-
-## Seguridad y autorización
-
-La autorización que produjo el run `30774888921` quedó consumida y no puede reutilizarse.
-
-```text
-replayAllowed: false
-additionalExecutionsAllowed: false
-STOP_RETRY: closed after root fix
-```
-
-El próximo runtime debe materializar un request y lifecycle nuevos sobre `267f7231b46d65b80c167f54567a67503b6a6793` y la evidencia 49/49.
 
 ## Cloud / Claude / Academia
 
@@ -183,26 +180,12 @@ secretos: NO ENVIADOS
 Academia focused runtime: NO BLOQUEANTE
 ```
 
-Patrón reusable nuevo: un bridge no debe almacenar metadata dentro de owners congelados; debe usar registro externo y contrato explícito para owners self-guarded read-only.
-
-## Aprobación humana
-
-```text
-Clientes: aprobado previamente
-Aseguradoras: baseline acumulativo
-Pólizas: pendiente
-Vehículos: pendiente
-Recibos: pendiente
-Cartera: pendiente
-Cobros: pendiente
-Ops: pendiente
-Leads: pendiente
-```
+Patrón nuevo: cada cambio autorizado del manifest debe actualizar conjuntamente el sello consumido por snapshots; los validadores deben producir evidencia sanitizada incluso cuando fallan.
 
 ## Próxima frontera única
 
-No corresponde otra auditoría, readiness, retorno a Academia ni apertura de otro módulo.
+No corresponde reimportar datos, modificar producto, retornar a Academia ni repetir el run fallido.
 
-La única acción siguiente es una ejecución read-only post-rootfix del Gate 7.11 sobre `267f7231b46d65b80c167f54567a67503b6a6793`. Después de un PASS corresponde una sola revisión visual humana acumulativa. Producción continúa separada y requiere autorización explícita.
+La única acción siguiente es una nueva ejecución read-only del mismo macro, sobre la misma candidata `267f7231b46d65b80c167f54567a67503b6a6793`, usando el validador de snapshot corregido en `a9549f3487522a3e450742de2649b5ad41f3b1e9`.
 
-Documento de causa raíz: `CIERRE-ROOT-FIX-SEGURIDAD-GATE711-GUARDS-INMUTABLES-20260802.md`.
+Esa ejecución requiere autorización explícita nueva porque la anterior fue consumida. Si vuelve a ocurrir un STOP, deberá informarse de inmediato la causa raíz soportada por la evidencia JSON ahora observable, el owner exacto y la solución, sin iniciar una nueva ronda de reintentos.
