@@ -1,0 +1,71 @@
+name: Orbit 360 · Gate 7.11 · diagnóstico pageerror accion
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-static-requests/gate711-pageerror-accion-diagnostic-run-v20260802.json'
+
+permissions:
+  contents: read
+  statuses: write
+
+concurrency:
+  group: orbit360-gate711-pageerror-accion-diagnostic-v20260802
+  cancel-in-progress: false
+
+env:
+  PRODUCT_HEAD: 997fca628f95dd397dba347700a6bc644fe840f0
+  REQUEST_FILE: .github/orbit360-static-requests/gate711-pageerror-accion-diagnostic-run-v20260802.json
+  EVIDENCE_FILE: orbit360-platform/runtime-gate-crm-v20260716/gate711-pageerror-accion-diagnostic-v20260802.json
+  STATUS_CONTEXT: orbit360/gate711-pageerror-accion-diagnostic
+
+jobs:
+  diagnose:
+    name: Source-only · localizar owner de accion
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout SHA exacto
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Preparar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verificar request y freeze
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          test "$(git rev-parse HEAD^)" = "$(jq -r '.parentHead' "$REQUEST_FILE")"
+          mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
+          test "${#CHANGED[@]}" = '1'
+          test "${CHANGED[0]}" = "$REQUEST_FILE"
+          jq -e --arg product "$PRODUCT_HEAD" '.schemaVersion=="orbit360-gate711-pageerror-accion-diagnostic-request-v1" and .productHead==$product and .approved==true and .allowedExecutions==1 and .consumed==false and .sourceRun==30774888921 and .error=="Cannot read properties of undefined (reading accion)" and .capabilities.secrets==false and .capabilities.firestoreRead==false and .capabilities.runtime==false and .capabilities.browser==false and .capabilities.writes==false and .capabilities.deploy==false and .capabilities.production==false' "$REQUEST_FILE" >/dev/null
+          mapfile -t PRODUCT_DIFF < <(git diff --name-only "$PRODUCT_HEAD"..HEAD -- orbit360-platform/index.html orbit360-platform/modules orbit360-platform/core orbit360-platform/styles orbit360-platform/data)
+          test "${#PRODUCT_DIFF[@]}" = '0'
+
+      - name: Escanear referencias accion
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-diagnosticar-pageerror-accion-v20260802.mjs
+          node tools/orbit360-diagnosticar-pageerror-accion-v20260802.mjs
+          jq -e '.ok==true and .status=="PAGEERROR_ACCION_SOURCE_SCAN_COMPLETE" and .classification=="ROOT_CAUSE_DIAGNOSTIC_SOURCE_ONLY" and .productFilesChanged==0 and .secretsAccessed==false and .firestoreReads==0 and .firestoreWrites==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_FILE" >/dev/null
+
+      - name: Guardar evidencia
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gate711-pageerror-accion-diagnostic-v20260802
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/gate711-pageerror-accion-diagnostic-v20260802.json
+            tools/orbit360-diagnosticar-pageerror-accion-v20260802.mjs
+          if-no-files-found: error
+          retention-days: 14
