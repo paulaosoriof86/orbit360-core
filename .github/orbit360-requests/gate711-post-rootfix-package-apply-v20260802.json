@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "orbit360-gate711-post-rootfix-package-apply-request-v1",
+  "productHead": "267f7231b46d65b80c167f54567a67503b6a6793",
+  "parentHead": "56d6943648a35e9dc13931fac7d70d93e31cb43b",
+  "approved": true,
+  "allowedExecutions": 1,
+  "consumed": false,
+  "rootFixRun": 30775623141,
+  "manifestRun": 30775729377,
+  "localTransformationValidated": true,
+  "allowedFiles": [
+    ".github/orbit360-templates/gate711-release-critical-runtime-request-template-v20260802.json",
+    ".github/workflows/orbit360-gate711-release-critical-runtime-v20260802.yml",
+    "tools/orbit360-cumulative-visual-candidate-contract-v20260801.json",
+    "tools/orbit360-gate711-release-critical-runtime-lifecycle-template-v20260802.json",
+    "tools/orbit360-gate711-release-critical-scope-v20260802.json",
+    "tools/orbit360-validar-gate-contracts-engine-canonical-runtime-cumulative-visual-lab-v20260801.mjs",
+    "tools/orbit360-validar-gate711-release-critical-runtime-v20260802.mjs",
+    "tools/orbit360-validar-gate711-release-critical-static-v20260802.mjs",
+    "tools/orbit360-validar-gate711-runtime-chain-static-v20260802-v2.mjs",
+    "tools/orbit360-validar-gate711-runtime-package-readiness-v20260802.mjs"
+  ],
+  "capabilities": {
+    "secrets": false,
+    "firestoreRead": false,
+    "runtime": false,
+    "browser": false,
+    "writes": false,
+    "deploy": false,
+    "production": false
+  },
+  "stopRetry": true,
+  "containsPII": false,
+  "containsSecrets": false
+}
