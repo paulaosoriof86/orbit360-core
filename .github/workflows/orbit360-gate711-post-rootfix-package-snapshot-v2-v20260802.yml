@@ -1,0 +1,92 @@
+name: Orbit 360 · Gate 7.11 · snapshot paquete post root fix v2
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-static-requests/gate711-post-rootfix-package-snapshot-run-v2-v20260802.json'
+
+permissions:
+  contents: read
+  statuses: write
+
+env:
+  PRODUCT_HEAD: 267f7231b46d65b80c167f54567a67503b6a6793
+  REQUEST_FILE: .github/orbit360-static-requests/gate711-post-rootfix-package-snapshot-run-v2-v20260802.json
+  STATUS_CONTEXT: orbit360/gate711-post-rootfix-package-snapshot
+
+jobs:
+  snapshot:
+    name: Source-only · contratos completos · incluye .github
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout SHA exacto
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Publicar estado pending
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          jq -n --arg state pending --arg context "$STATUS_CONTEXT" --arg description "Gate 7.11 snapshot paquete completo" --arg target_url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" '{state:$state,context:$context,description:$description,target_url:$target_url}' > "$RUNNER_TEMP/status.json"
+          curl -fsS -X POST -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" -d @"$RUNNER_TEMP/status.json" >/dev/null
+
+      - name: Verificar request y freeze
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          test "$(git rev-parse HEAD^)" = "$(jq -r '.parentHead' "$REQUEST_FILE")"
+          mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
+          test "${#CHANGED[@]}" = '1'
+          test "${CHANGED[0]}" = "$REQUEST_FILE"
+          jq -e --arg product "$PRODUCT_HEAD" '.schemaVersion=="orbit360-gate711-post-rootfix-package-snapshot-request-v2" and .productHead==$product and .approved==true and .allowedExecutions==1 and .consumed==false and .capabilities.secrets==false and .capabilities.firestoreRead==false and .capabilities.runtime==false and .capabilities.browser==false and .capabilities.writes==false and .capabilities.deploy==false and .capabilities.production==false' "$REQUEST_FILE" >/dev/null
+          mapfile -t PRODUCT_DIFF < <(git diff --name-only "$PRODUCT_HEAD"..HEAD -- orbit360-platform/index.html orbit360-platform/modules orbit360-platform/core orbit360-platform/styles orbit360-platform/data)
+          test "${#PRODUCT_DIFF[@]}" = '0'
+
+      - name: Construir snapshot completo
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p package-snapshot/.github/workflows package-snapshot/.github/orbit360-templates package-snapshot/tools package-snapshot/orbit360-platform/docs
+          cp .github/workflows/orbit360-gate711-release-critical-runtime-v20260802.yml package-snapshot/.github/workflows/
+          cp .github/workflows/orbit360-gate711-runtime-package-readiness-v20260802.yml package-snapshot/.github/workflows/
+          cp .github/orbit360-templates/gate711-release-critical-runtime-request-template-v20260802.json package-snapshot/.github/orbit360-templates/
+          cp tools/orbit360-gate711-release-critical-runtime-lifecycle-template-v20260802.json package-snapshot/tools/
+          cp tools/orbit360-gate711-release-critical-scope-v20260802.json package-snapshot/tools/
+          cp tools/orbit360-cumulative-visual-candidate-contract-v20260801.json package-snapshot/tools/
+          cp tools/orbit360-validar-gate711-release-critical-runtime-v20260802.mjs package-snapshot/tools/
+          cp tools/orbit360-validar-gate711-runtime-package-readiness-v20260802.mjs package-snapshot/tools/
+          cp tools/orbit360-validar-gate711-release-critical-static-v20260802.mjs package-snapshot/tools/
+          cp tools/orbit360-validar-gate-contracts-engine-canonical-runtime-cumulative-visual-lab-v20260801.mjs package-snapshot/tools/
+          cp tools/orbit360-validar-gate711-runtime-chain-static-v20260802-v2.mjs package-snapshot/tools/
+          cp orbit360-platform/docs/README-GATE711-CURRENT.md package-snapshot/orbit360-platform/docs/
+          cp orbit360-platform/docs/ADDENDUM-SINCRONIZACION-CLOUD-CLAUDE-RUNTIME-UNIFICADO-20260802.md package-snapshot/orbit360-platform/docs/
+          find package-snapshot -type f -print0 | sort -z | xargs -0 sha256sum > package-snapshot/SHA256SUMS.txt
+
+      - name: Guardar snapshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: gate711-post-rootfix-package-snapshot-v2-v20260802
+          path: package-snapshot
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Publicar estado final
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          JOB_STATUS: ${{ job.status }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "$JOB_STATUS" = success ]; then STATE=success; DESCRIPTION="Gate 7.11 snapshot paquete completo PASS"; else STATE=failure; DESCRIPTION="Gate 7.11 snapshot paquete completo FAIL / STOP_RETRY"; fi
+          jq -n --arg state "$STATE" --arg context "$STATUS_CONTEXT" --arg description "$DESCRIPTION" --arg target_url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" '{state:$state,context:$context,description:$description,target_url:$target_url}' > "$RUNNER_TEMP/status-final.json"
+          curl -fsS -X POST -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" -d @"$RUNNER_TEMP/status-final.json" >/dev/null
