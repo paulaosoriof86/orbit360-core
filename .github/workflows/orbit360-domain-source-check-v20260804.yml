@@ -1,0 +1,83 @@
+name: Orbit 360 domain source check
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'functions/**'
+      - 'orbit360-platform/core/tenant-domain-config-client.js'
+      - 'orbit360-platform/core/ops-leads-domain-client.js'
+      - 'orbit360-platform/core/cobros-reconciliation-domain-client.js'
+      - 'orbit360-platform/modules/config-domain-v20260804-bridge.js'
+      - 'orbit360-platform/modules/ops-leads-domain-v20260804-bridge.js'
+      - 'tools/orbit360-cobros-inferencia-secuencial-v20260804.mjs'
+      - 'tools/orbit360-cobros-replay-inferencial-completo-v20260804.mjs'
+      - '.github/workflows/orbit360-domain-source-check-v20260804.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Functions syntax
+        working-directory: functions
+        run: npm run check
+
+      - name: Browser clients syntax
+        run: |
+          node --check orbit360-platform/core/tenant-domain-config-client.js
+          node --check orbit360-platform/core/ops-leads-domain-client.js
+          node --check orbit360-platform/core/cobros-reconciliation-domain-client.js
+          node --check orbit360-platform/modules/config-domain-v20260804-bridge.js
+          node --check orbit360-platform/modules/ops-leads-domain-v20260804-bridge.js
+          node --check orbit360-platform/core/backend-lab-init.js
+
+      - name: Inference tools syntax
+        run: |
+          node --check tools/orbit360-cobros-inferencia-secuencial-v20260804.mjs
+          node --check tools/orbit360-cobros-replay-inferencial-completo-v20260804.mjs
+
+      - name: Inference fixtures
+        run: |
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          import { inferReconciliation } from './tools/orbit360-cobros-inferencia-secuencial-v20260804.mjs';
+
+          const base = { polizaId: 'pol-1', polizaNumero: 'P-1', vigenciaInicio: '2026-01-01', vigenciaFin: '2026-12-31', moneda: 'GTQ' };
+          const receipts = [1,2,3,4,5,6].map(cuota => ({ ...base, id: `r-${cuota}`, cuota, estadoOperativo: cuota >= 5 ? 'Pendiente' : 'Pagado', primaTotal: 100 }));
+          const commissionRows = [{ ...base, id: 'plan-5', cuota: 5, comisionAS: 10, tipoFuente: 'Planilla de comisión', periodo: '2026-05' }];
+          const portfolioRows = [5,6].map(cuota => ({ ...base, id: `car-${cuota}`, cuota, decision: 'balance completo autoridad saldo', estado: 'Pendiente' }));
+          const result = inferReconciliation({ receipts, reportedPayments: [], insurerPayments: [], commissionRows, portfolioRows });
+          const byId = Object.fromEntries(result.rows.map(row => [row.receiptId, row]));
+          assert.equal(byId['r-5'].outcome, 'CONCILIADO_RECONOCIMIENTO_ASEGURADORA');
+          assert.equal(byId['r-1'].outcome, 'CONCILIADO_SECUENCIA_PLANILLA');
+          assert.equal(byId['r-4'].outcome, 'CONCILIADO_SECUENCIA_PLANILLA');
+          assert.equal(byId['r-6'].outcome, 'PENDIENTE_SEGUN_ASEGURADORA');
+
+          const portfolioOnly = inferReconciliation({ receipts, reportedPayments: [], insurerPayments: [], commissionRows: [], portfolioRows });
+          const portfolioById = Object.fromEntries(portfolioOnly.rows.map(row => [row.receiptId, row]));
+          assert.equal(portfolioById['r-1'].outcome, 'CONCILIADO_SECUENCIA_CARTERA');
+          assert.equal(portfolioById['r-4'].outcome, 'CONCILIADO_SECUENCIA_CARTERA');
+          assert.equal(portfolioById['r-5'].outcome, 'PENDIENTE_SEGUN_ASEGURADORA');
+          console.log(JSON.stringify({ ok: true, counts: result.counts, portfolioCounts: portfolioOnly.counts }));
+          NODE
+
+      - name: Protected boundaries
+        run: |
+          ! grep -RniE 'Paula|Carlos|Samuel|alianzas-soluciones' functions/tenant-domain-config.js functions/ops-leads-domain.js functions/cobros-reconciliation-domain.js
+          grep -q 'tenantDomainConfigBackendActive: false' orbit360-platform/core/backend-lab-init.js
+          grep -q 'opsLeadsDomainBackendActive: false' orbit360-platform/core/backend-lab-init.js
+          grep -q 'cobrosReconciliationDomainActive: false' orbit360-platform/core/backend-lab-init.js
