@@ -35,10 +35,26 @@ const stable = value => {
 };
 const same = (a, b) => JSON.stringify(stable(a)) === JSON.stringify(stable(b));
 const sanitizeError = error => String(error?.message || error || '').replace(/[\r\n]+/g, ' ').slice(0, 700);
+const sanitizeStack = error => String(error?.stack || '')
+  .replace(/[\r\n]+/g, ' | ')
+  .replace(/(?:[A-Za-z]:)?[^ |]*(?:runner|work|tmp)[^ |]*/gi, '<path>')
+  .slice(0, 1200);
+
+let stage = 'bootstrap';
+const classifyFailure = error => {
+  const message = sanitizeError(error);
+  if (error instanceof ReferenceError || /\b(?:store|observed) is not defined\b/i.test(message)) return 'VALIDATOR_STALE';
+  if (/PUBLIC_AUTH_OWNERS_NOT_EXACT|PRIVATE_IDENTITY_MISSING|ENOENT|ECONN|ETIMEDOUT|Timeout/i.test(message)) return 'ENVIRONMENT_FAILURE';
+  if (/BROWSER_PROFILE_FAILED|RC12_BROWSER_MEMBERSHIP_SMOKE_FAILED/i.test(message)) return 'FUNCTIONAL_DEFECT';
+  return stage.startsWith('validator') || stage.startsWith('assertions')
+    ? 'PIPELINE_MECHANISM_FAILURE'
+    : 'ENVIRONMENT_FAILURE';
+};
 const writeEvidence = payload => {
   fs.mkdirSync(path.dirname(EVIDENCE_FILE), { recursive: true });
   fs.writeFileSync(EVIDENCE_FILE, JSON.stringify({
     ...payload,
+    stage: payload.stage || stage,
     firestoreWrites: 0,
     authWrites: 0,
     userCreates: 0,
@@ -81,12 +97,15 @@ function assetsExact(pub, local) {
 }
 
 try {
+  stage = 'admin-init';
   adminApp();
   const auth = getAuth(app);
+  stage = 'private-identity-read';
   const privatePayload = JSON.parse(fs.readFileSync(PRIVATE_FILE, 'utf8'));
   const localAssets = localOwnerHashes();
   let publicAssets = {};
   let exact = false;
+  stage = 'public-owner-parity';
   for (let attempt = 0; attempt < 24; attempt++) {
     publicAssets = await publicOwnerHashes();
     exact = assetsExact(publicAssets, localAssets);
@@ -95,10 +114,12 @@ try {
   }
   if (!exact) throw new Error('PUBLIC_AUTH_OWNERS_NOT_EXACT_RC12');
 
+  stage = 'browser-launch';
   const browser = await chromium.launch({ headless: true });
   const results = {};
   try {
     for (const profile of ['direccion', 'operativo', 'asesor']) {
+      stage = `browser-${profile}-identity`;
       const expected = privatePayload[profile];
       if (!expected?.uid) throw new Error(`PRIVATE_IDENTITY_MISSING_${profile}`);
       const customToken = await auth.createCustomToken(expected.uid, { orbitSmoke: true, tenantId: TENANT, profile });
@@ -106,9 +127,11 @@ try {
       const page = await context.newPage();
       const consoleErrors = [];
       page.on('console', msg => { if (msg.type() === 'error') consoleErrors.push(String(msg.text()).slice(0, 300)); });
+      stage = `browser-${profile}-navigation`;
       await page.goto(`${LIVE_URL}/#/cliente360`, { waitUntil: 'domcontentloaded', timeout: 60000 });
       await page.waitForFunction(() => window.firebase && typeof firebase.auth === 'function', null, { timeout: 60000 });
       await page.evaluate(async token => { await firebase.auth().signInWithCustomToken(token); }, customToken);
+      stage = `browser-${profile}-readiness`;
       await page.waitForFunction(() => {
         try {
           const projection = window.Orbit?.auth?.productUser;
@@ -118,6 +141,7 @@ try {
       }, null, { timeout: 90000 });
       await page.waitForTimeout(1800);
 
+      stage = `browser-${profile}-observe`;
       const observed = await page.evaluate(() => {
         const projection = window.Orbit?.auth?.productUser || null;
         const mapped = window.Orbit?.auth?.user?.() || null;
@@ -153,11 +177,13 @@ try {
         };
       });
 
+      stage = `assertions-${profile}`;
       const projection = observed.projection || {};
       const expectedMembership = expected.membership || {};
       const body = observed.bodyText || '';
       const emailDigest = sha(String(observed.mapped?.email || '').toLowerCase());
       const uidDigest = sha(String(observed.mapped?.uid || ''));
+      const observedStore = observed.store || {};
       const checks = {
         canonicalHost: observed.location.hostname === new URL(LIVE_URL).hostname,
         directUrlNormalized: observed.location.search.includes('orbitBackend=firestore-lab') && observed.location.search.includes(`tenant=${TENANT}`),
@@ -175,8 +201,8 @@ try {
         dataScopesFromMembership: same(projection.dataScopes || {}, expectedMembership.dataScopes || {}),
         modulesExtraFromMembership: same(projection.modulesExtra || [], expectedMembership.modulesExtra || []),
         modulesRestrictedFromMembership: same(projection.modulesRestricted || [], expectedMembership.modulesRestricted || []),
-        storeFirestore: store?.mode === 'firestore-lab' && store?.authAuthority === 'tenant-membership' && store?.membershipRequired === true,
-        snapshotsAttached: store?.snapshotAttached === true,
+        storeFirestore: observedStore.mode === 'firestore-lab' && observedStore.authAuthority === 'tenant-membership' && observedStore.membershipRequired === true,
+        snapshotsAttached: observedStore.snapshotAttached === true,
         clientsReal: observed.clientCount === 430,
         insurersReal: observed.insurerCount === 30,
         policiesReal: observed.policyCount >= 1373,
@@ -222,6 +248,8 @@ try {
           policyCount: observed.policyCount,
           authBackend: observed.authBackend,
           authStage: observed.authStage,
+          storeMode: observedStore.mode || '',
+          snapshotAttached: observedStore.snapshotAttached === true,
           consoleErrorCount: consoleErrors.length
         },
         checks,
@@ -235,6 +263,7 @@ try {
     await browser.close();
   }
 
+  stage = 'assertions-summary';
   const checks = {
     publicOwnersExactlyRc12: exact,
     directionPass: results.direccion?.ok === true,
@@ -244,7 +273,7 @@ try {
   };
   const ok = Object.values(checks).every(Boolean);
   writeEvidence({
-    schemaVersion: 'orbit360-gravicentra-rc12-membership-browser-smoke-v2',
+    schemaVersion: 'orbit360-gravicentra-rc12-membership-browser-smoke-v3',
     generatedAt: new Date().toISOString(),
     projectId: PROJECT,
     tenantId: TENANT,
@@ -265,14 +294,17 @@ try {
   });
   if (!ok) throw new Error('RC12_BROWSER_MEMBERSHIP_SMOKE_FAILED');
 } catch (error) {
+  const classification = classifyFailure(error);
   writeEvidence({
-    schemaVersion: 'orbit360-gravicentra-rc12-membership-browser-smoke-error-v1',
+    schemaVersion: 'orbit360-gravicentra-rc12-membership-browser-smoke-error-v2',
     generatedAt: new Date().toISOString(),
     projectId: PROJECT,
     tenantId: TENANT,
     liveUrl: LIVE_URL,
-    classification: 'FUNCTIONAL_DEFECT',
+    classification,
+    secondaryClassification: classification === 'VALIDATOR_STALE' ? 'PIPELINE_MECHANISM_FAILURE' : '',
     error: sanitizeError(error),
+    sanitizedStack: sanitizeStack(error),
     tokenCreationExecuted: true,
     tokenPersistence: false,
     firestoreRead: true,
@@ -281,7 +313,7 @@ try {
     productionTouched: true,
     ok: false
   });
-  console.error(sanitizeError(error));
+  console.error(`${classification}: ${sanitizeError(error)}`);
   process.exit(41);
 } finally {
   if (app) await deleteApp(app).catch(() => {});
