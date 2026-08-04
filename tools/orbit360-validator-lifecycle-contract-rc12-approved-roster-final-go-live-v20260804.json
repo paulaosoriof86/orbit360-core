@@ -3,7 +3,7 @@
   "gateId": "block7.15-rc12-approved-roster-final-go-live-v20260804",
   "gateContractVersion": "7.15.1",
   "validatorLifecycleRevision": "phase-capability-contract-v1",
-  "status": "RC12_APPROVED_ROSTER_FINAL_GO_LIVE_POST_ROOTFIX_AUTHORIZED",
+  "status": "RC12_APPROVED_ROSTER_FINAL_GO_LIVE_POST_ROLLBACK_AUTHORIZED",
   "executionProfile": {
     "phase": "GRAVICENTRA_RC12_APPROVED_ROSTER_FINAL_GO_LIVE",
     "capabilities": {
@@ -32,10 +32,11 @@
     "requiredForExecution": true,
     "activeRequest": true,
     "allowedExecutions": 1,
-    "request": ".github/orbit360-requests/rc12-approved-roster-final-go-live-resume-v20260804.json",
+    "request": ".github/orbit360-requests/rc12-approved-roster-final-postrollback-v20260804.json",
     "replayAllowed": false,
-    "previousRun": 30908259200,
-    "previousDecision": "RC12_APPROVED_ROSTER_RECONCILIATION_NO_GO_NO_WRITE"
+    "previousRun": 30911627137,
+    "previousDecision": "APPROVED_ROSTER_ROLLBACK_RECOVERY_PASS",
+    "authorizationSource": "user_authorizes_single_final_post_rollback_rc12_20260804T0734-0600"
   },
   "target": {
     "projectId": "ays-orbit-360-lab",
@@ -129,7 +130,10 @@
     "mergeAllowed": false,
     "repeatGate711Allowed": false,
     "openGeneralPredeployAllowed": false,
-    "stopRetryOnSameFailureFamily": true
+    "stopRetryOnSameFailureFamily": true,
+    "postRollbackRecoveryPassRequired": true,
+    "gate713AbsolutePathCorrected": true,
+    "rollbackReadBeforeWriteCorrected": true
   },
   "cloudClaude": {
     "backendClassification": "BACKEND_PROTEGIDO_NO_CLAUDE",
@@ -148,5 +152,16 @@
     "digestVerificationRequired": true,
     "rawEmailPersistenceAllowed": false,
     "evidence": "orbit360-platform/runtime-gate-crm-v20260716/rc12-approved-roster-reconciler-rootfix-static.json"
+  },
+  "postRollbackRecovery": {
+    "run": 30911627137,
+    "job": 91999553849,
+    "artifact": 8893311529,
+    "artifactDigest": "sha256:8dc8bf7f5210e0c283032171d3ff4028eaa2be33060213dbd088e838621ad844",
+    "evidence": "orbit360-platform/runtime-gate-crm-v20260716/rc12-approved-roster-rollback-recovery-final.json",
+    "remainingOwnedMemberships": 0,
+    "remainingOwnedUsers": 0,
+    "gate713AbsolutePathCorrected": true,
+    "rollbackReadBeforeWriteCorrected": true
   }
 }
