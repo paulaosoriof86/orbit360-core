@@ -1,0 +1,131 @@
+name: Gravicentra Insurance RC1.2 · resume pre-risk membership go-live
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-requests/gravicentra-insurance-rc12-membership-go-live-resume-v20260803.json'
+
+permissions:
+  contents: read
+  statuses: write
+
+concurrency:
+  group: orbit360-gravicentra-rc12-membership-go-live-v20260803
+  cancel-in-progress: false
+
+env:
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  ORBIT360_REQUEST_FILE: .github/orbit360-requests/gravicentra-insurance-rc12-membership-go-live-resume-v20260803.json
+  ORBIT360_RELEASE_BRANCH: release/gravicentra-insurance-rc1-2-membership-auth-20260803
+  ORBIT360_RELEASE_COMMIT: b699ba329960cd830121b57452ce558399aa84fb
+  ORBIT360_BASE_RELEASE_COMMIT: 1eb7daea580c0807d867a663086defc021435993
+  ORBIT360_PROJECT_ID: ays-orbit-360-lab
+  ORBIT360_TENANT_ID: alianzas-soluciones
+  ORBIT360_LIVE_URL: https://ays-orbit-360-lab.web.app
+  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+  STATUS_CONTEXT: orbit360/gravicentra-rc12-membership-go-live-resume
+
+jobs:
+  resume_membership_go_live:
+    name: RC1.2 · resume after pre-risk path fix
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - name: Checkout del request de reanudación
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Preparar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verificar reanudación de la misma autorización sin secretos
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          jq -e '.status=="RESUME_PRE_RISK_SAME_AUTHORIZATION" and .failedRun==30877460688 and .failedJob==91891705926 and .rootCause=="EVIDENCE_PATH_RESOLUTION" and .previousGateStatus=="PASS_14_OF_14" and .previousSecretsRead==false and .previousFirestoreRead==false and .previousAuthRead==false and .previousDeployExecuted==false and .previousProductionTouched==false and .releaseBranch==env.ORBIT360_RELEASE_BRANCH and .releaseCommit==env.ORBIT360_RELEASE_COMMIT and .newAuthorization==false and .consumed==false' "$ORBIT360_REQUEST_FILE" >/dev/null
+          git fetch --no-tags origin "$ORBIT360_RELEASE_BRANCH"
+          test "$(git rev-parse FETCH_HEAD)" = "$ORBIT360_RELEASE_COMMIT"
+          test "$(git merge-base "$ORBIT360_BASE_RELEASE_COMMIT" "$ORBIT360_RELEASE_COMMIT")" = "$ORBIT360_BASE_RELEASE_COMMIT"
+          RC12_ROOT="$RUNNER_TEMP/gravicentra-insurance-rc12"
+          git worktree add --detach "$RC12_ROOT" "$ORBIT360_RELEASE_COMMIT"
+          echo "ORBIT360_RC12_ROOT=$RC12_ROOT" >> "$GITHUB_ENV"
+          echo "ORBIT360_RC1_ROOT=$RC12_ROOT" >> "$GITHUB_ENV"
+          echo "ORBIT360_RC12_PRIVATE_IDENTITIES=$RUNNER_TEMP/gravicentra-rc12-identities.json" >> "$GITHUB_ENV"
+          test "$(jq -r '.hosting.public' "$RC12_ROOT/firebase.json")" = 'orbit360-platform'
+
+      - name: Gate antirregresión con owner de ruta corregido
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check "$ORBIT360_RC12_ROOT/tools/orbit360-validar-auth-membership-antiregression-v20260803.mjs"
+          ORBIT360_AUTH_MEMBERSHIP_EVIDENCE="$EVIDENCE_DIR/rc12-auth-membership-antiregression.json" \
+            node "$ORBIT360_RC12_ROOT/tools/orbit360-validar-auth-membership-antiregression-v20260803.mjs"
+          jq -e '.status=="PASS" and .classification=="GO_STATIC_AUTH_MEMBERSHIP" and .passed==14 and .failed==0 and .releaseBlocking==true and .deployAuthorized==false and .firestoreRead==false and .firestoreWrites==0 and .authWrites==0 and .productionTouched==false' "$EVIDENCE_DIR/rc12-auth-membership-antiregression.json" >/dev/null
+          node --check tools/orbit360-gravicentra-rc12-membership-runtime-v20260803.mjs
+          node --check tools/orbit360-gravicentra-rc12-browser-membership-smoke-v20260803.mjs
+          node --check tools/orbit360-gravicentra-rc1-go-live-helper-v20260803.mjs
+          bash -n tools/orbit360-gravicentra-rc12-membership-macro-v20260803.sh
+          test -z "$(git -C "$ORBIT360_RC12_ROOT" diff --name-only)"
+
+      - name: Ejecutar único macro post-gate
+        id: macro
+        env:
+          SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+          SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        shell: bash
+        run: |
+          set +e
+          bash tools/orbit360-gravicentra-rc12-membership-macro-v20260803.sh
+          CODE=$?
+          echo "exit_code=$CODE" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Publicar estado observable
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          FINAL: orbit360-platform/runtime-gate-crm-v20260716/gravicentra-rc12-membership-go-live-final.json
+        with:
+          script: |
+            const fs=require('fs');
+            let state='failure',description='RC1.2 sin cierre observable';
+            try{
+              const f=JSON.parse(fs.readFileSync(process.env.FINAL,'utf8'));
+              if(f.decision==='RC12_MEMBERSHIP_GO_LIVE_PASS'){state='success';description='RC1.2 · acceso normal · 3 perfiles · PASS';}
+              else if(f.decision==='RC12_ROLLED_BACK_SAFE'){description='RC1.2 falló · rollback seguro ejecutado';}
+              else description=`RC1.2: ${f.decision}`;
+            }catch(e){}
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:process.env.STATUS_CONTEXT,description:description.slice(0,140),target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
+
+      - name: Subir evidencia sanitizada
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-insurance-rc12-membership-go-live-resume-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/rc12-auth-membership-antiregression.json
+            orbit360-platform/runtime-gate-crm-v20260716/gravicentra-rc12-membership-identities.json
+            orbit360-platform/runtime-gate-crm-v20260716/gravicentra-rc1-go-live-before.json
+            orbit360-platform/runtime-gate-crm-v20260716/gravicentra-rc12-membership-browser-smoke.json
+            orbit360-platform/runtime-gate-crm-v20260716/gravicentra-rc1-go-live-smoke.json
+            orbit360-platform/runtime-gate-crm-v20260716/gravicentra-rc1-go-live-rollback.json
+            orbit360-platform/runtime-gate-crm-v20260716/gravicentra-rc12-membership-go-live-final.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Exigir cierre observable
+        if: always()
+        shell: bash
+        run: |
+          test -f "$EVIDENCE_DIR/gravicentra-rc12-membership-go-live-final.json"
+          jq -e '(.decision=="RC12_MEMBERSHIP_GO_LIVE_PASS" and .productionMaintained==true and .rollbackExecuted==false and .ok==true) or (.decision=="RC12_ROLLED_BACK_SAFE" and .productionMaintained==false and .rollbackExecuted==true and .ok==false) or (.decision|test("NO_GO|NO_PRODUCTION_CHANGE|STOP"))' "$EVIDENCE_DIR/gravicentra-rc12-membership-go-live-final.json" >/dev/null
+          test "${{ steps.macro.outputs.exit_code }}" = '0'
