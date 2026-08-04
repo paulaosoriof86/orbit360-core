@@ -1,0 +1,85 @@
+name: Orbit 360 · Block 12 · observador read-only
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-requests/block12-observer-v20260804.json'
+
+permissions:
+  contents: read
+  actions: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  observe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout solicitud exacta
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 2
+
+      - name: Verificar alcance read-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          REQUEST='.github/orbit360-requests/block12-observer-v20260804.json'
+          mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
+          test "${#CHANGED[@]}" = '1'
+          test "${CHANGED[0]}" = "$REQUEST"
+          jq -e '
+            .schemaVersion=="orbit360-block12-observer-request-v1" and
+            .status=="AUTHORIZED_READ_ONLY" and
+            .targetWorkflow=="orbit360-block12-operational-runtime-lab-rootfix5-v20260804.yml" and
+            .targetHeadSha=="50a285b891b143470582df687ebdf71befb23482" and
+            .firebase==false and .secrets==false and .writes==false and .deploy==false
+          ' "$REQUEST" >/dev/null
+
+      - name: Consultar run y pasos activos
+        id: observe
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          RUNS="$RUNNER_TEMP/runs.json"
+          gh api --method GET \
+            "repos/${GITHUB_REPOSITORY}/actions/workflows/orbit360-block12-operational-runtime-lab-rootfix5-v20260804.yml/runs" \
+            -f branch='ays/backend-tenant-lab-v99-20260703' \
+            -f event='push' \
+            -f per_page='20' > "$RUNS"
+          RUN_ID="$(jq -r '[.workflow_runs[] | select(.head_sha=="50a285b891b143470582df687ebdf71befb23482")][0].id // empty' "$RUNS")"
+          test -n "$RUN_ID"
+          gh api --method GET "repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}" > "$RUNNER_TEMP/run.json"
+          gh api --method GET "repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}/jobs?per_page=100" > "$RUNNER_TEMP/jobs.json"
+          STATUS="$(jq -r '.status' "$RUNNER_TEMP/run.json")"
+          CONCLUSION="$(jq -r '.conclusion // ""' "$RUNNER_TEMP/run.json")"
+          JOB_STATUS="$(jq -r '.jobs[0].status // "unknown"' "$RUNNER_TEMP/jobs.json")"
+          JOB_CONCLUSION="$(jq -r '.jobs[0].conclusion // ""' "$RUNNER_TEMP/jobs.json")"
+          ACTIVE_STEP="$(jq -r '[.jobs[].steps[]? | select(.status=="in_progress")][0].name // empty' "$RUNNER_TEMP/jobs.json")"
+          if [ -z "$ACTIVE_STEP" ]; then ACTIVE_STEP="$(jq -r '[.jobs[].steps[]? | select(.status=="completed")][-1].name // "sin paso observable"' "$RUNNER_TEMP/jobs.json")"; fi
+          jq -n \
+            --arg runId "$RUN_ID" \
+            --arg status "$STATUS" \
+            --arg conclusion "$CONCLUSION" \
+            --arg jobStatus "$JOB_STATUS" \
+            --arg jobConclusion "$JOB_CONCLUSION" \
+            --arg activeStep "$ACTIVE_STEP" \
+            --arg updatedAt "$(jq -r '.updated_at' "$RUNNER_TEMP/run.json")" \
+            '{schemaVersion:"orbit360-block12-observer-v1",runId:$runId,status:$status,conclusion:$conclusion,jobStatus:$jobStatus,jobConclusion:$jobConclusion,activeStep:$activeStep,updatedAt:$updatedAt,readOnly:true,firebaseTouched:false,deployExecuted:false}' > "$RUNNER_TEMP/observer.json"
+          echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"
+          echo "status=$STATUS" >> "$GITHUB_OUTPUT"
+          echo "conclusion=$CONCLUSION" >> "$GITHUB_OUTPUT"
+          echo "active_step=$ACTIVE_STEP" >> "$GITHUB_OUTPUT"
+
+      - name: Publicar estado observable en PR 5
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh api "repos/${GITHUB_REPOSITORY}/issues/5/comments" -f body="## Block 12 · observador read-only\n\n- Run: \`${{ steps.observe.outputs.run_id }}\`\n- Estado: \`${{ steps.observe.outputs.status }}\`\n- Conclusión: \`${{ steps.observe.outputs.conclusion }}\`\n- Paso observable: \`${{ steps.observe.outputs.active_step }}\`\n- Alcance del observador: sin Firebase, secretos, escrituras ni deploy." >/dev/null
