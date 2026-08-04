@@ -3,6 +3,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { createHash } from 'node:crypto';
 
 const ROOT = process.cwd();
 const FILES = Object.freeze({
@@ -15,13 +16,16 @@ const FILES = Object.freeze({
 });
 const OUT = process.env.ORBIT360_AUTH_MEMBERSHIP_EVIDENCE ||
   'orbit360-platform/runtime-gate-crm-v20260716/rc12-auth-membership-antiregression.json';
-const FORBIDDEN = Object.freeze([
-  'orbit.lab@demo.com',
-  'woJlxR1iFEeiQZvTscPj4qQ5Qc73'
-]);
+const FORBIDDEN_DIGESTS = Object.freeze({
+  technicalEmail: 'df9b0695cd8953be630689ec343ab3f25e3a7d400a8c2370a485e319f3e93d04',
+  technicalUid: 'f612197b077c598edd61d757c1e2995be7a3b17300602ce4802bccefed216a72'
+});
 
 function read(rel) {
   return fs.readFileSync(path.join(ROOT, rel), 'utf8');
+}
+function sha256(value) {
+  return createHash('sha256').update(String(value), 'utf8').digest('hex');
 }
 function compileJavascript(source, id) {
   try {
@@ -34,6 +38,12 @@ function compileJavascript(source, id) {
 function check(id, ok, detail = '') {
   return { id, ok: Boolean(ok), detail: String(detail || '').slice(0, 700) };
 }
+function containsDigest(source, digest, type) {
+  const candidates = type === 'email'
+    ? (source.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi) || []).map((value) => value.toLowerCase())
+    : (source.match(/\b[A-Za-z0-9]{28}\b/g) || []);
+  return candidates.some((value) => sha256(value) === digest);
+}
 
 const source = Object.fromEntries(Object.entries(FILES).map(([key, rel]) => [key, read(rel)]));
 const activeOwners = source.auth + '\n' + source.store + '\n' + source.guard;
@@ -41,8 +51,8 @@ const checks = [
   compileJavascript(source.auth, 'AUTH_SYNTAX'),
   compileJavascript(source.store, 'STORE_SYNTAX'),
   compileJavascript(source.guard, 'GUARD_SYNTAX'),
-  check('NO_TECHNICAL_EMAIL_ACTIVE', !activeOwners.includes(FORBIDDEN[0])),
-  check('NO_TECHNICAL_UID_ACTIVE', !activeOwners.includes(FORBIDDEN[1])),
+  check('NO_TECHNICAL_EMAIL_ACTIVE', !containsDigest(activeOwners, FORBIDDEN_DIGESTS.technicalEmail, 'email')),
+  check('NO_TECHNICAL_UID_ACTIVE', !containsDigest(activeOwners, FORBIDDEN_DIGESTS.technicalUid, 'uid')),
   check('AUTH_MEMBERSHIP_OWNER',
     source.auth.includes('Auth canónico por membresía v1.80') &&
     source.auth.includes('activeProjection(user)') &&
@@ -79,7 +89,7 @@ const checks = [
   check('MULTITENANT_RUNTIME',
     source.auth.includes('tenantId()') &&
     source.store.includes('const tenantId = params.get') &&
-    source.guard.includes('if (mode !== \'firestore-lab\' || !tenant) return;')),
+    source.guard.includes("if (mode !== 'firestore-lab' || !tenant) return;")),
   check('SEED_FAIL_CLOSED',
     source.store.includes('seedLike(row)') &&
     source.store.includes('operationalRows(collection)') &&
@@ -91,7 +101,7 @@ const checks = [
 
 const failed = checks.filter((item) => !item.ok);
 const result = {
-  schemaVersion: 'orbit360-auth-membership-antiregression-v1',
+  schemaVersion: 'orbit360-auth-membership-antiregression-v2',
   status: failed.length ? 'FAIL' : 'PASS',
   classification: failed.length ? 'SECURITY_FAILURE' : 'GO_STATIC_AUTH_MEMBERSHIP',
   checkedAt: new Date().toISOString(),
@@ -102,7 +112,7 @@ const result = {
   checks,
   activeOwners: [FILES.auth, FILES.store, FILES.guard],
   membershipOwner: FILES.access,
-  forbiddenMarkers: FORBIDDEN.map((value) => `sha256:${Buffer.from(value).toString('base64url').slice(0, 16)}`),
+  forbiddenMarkerDigests: Object.values(FORBIDDEN_DIGESTS).map((digest) => `sha256:${digest}`),
   releaseBlocking: true,
   deployAuthorized: false,
   firestoreRead: false,
