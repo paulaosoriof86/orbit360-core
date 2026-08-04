@@ -1,0 +1,244 @@
+name: Gravicentra Insurance RC1.1 · real data runtime go-live
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-requests/gravicentra-insurance-rc11-real-data-go-live-v20260803.json'
+
+permissions:
+  contents: read
+  statuses: write
+
+concurrency:
+  group: orbit360-gravicentra-rc11-real-data-go-live-v20260803
+  cancel-in-progress: false
+
+env:
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  ORBIT360_PREDEPLOY_GATE_ID: block7-gravicentra-insurance-rc1-predeploy-readonly-v20260803
+  ORBIT360_RC11_REQUEST_FILE: .github/orbit360-requests/gravicentra-insurance-rc11-real-data-go-live-v20260803.json
+  ORBIT360_RELEASE_BRANCH: release/gravicentra-insurance-rc1-1-real-data-runtime-20260803
+  ORBIT360_RELEASE_COMMIT: 1eb7daea580c0807d867a663086defc021435993
+  ORBIT360_BASE_RELEASE_COMMIT: 27cb7dfcda8568280ebef15993a953364304f29b
+  ORBIT360_PROJECT_ID: ays-orbit-360-lab
+  ORBIT360_TENANT_ID: alianzas-soluciones
+  ORBIT360_LIVE_URL: https://ays-orbit-360-lab.web.app
+  ORBIT360_EXPECTED_CLIENTS: '430'
+  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+  STATUS_CONTEXT: orbit360/gravicentra-rc11-real-data-go-live
+
+jobs:
+  corrective_go_live:
+    name: RC1.1 · Hosting · browser real · rollback automático
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    steps:
+      - name: Checkout del request exacto
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Preparar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Contrato canónico antes de credenciales
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
+          node --check tools/orbit360-gravicentra-rc11-real-data-go-live-guard-v20260803.mjs
+          node --check tools/orbit360-gravicentra-rc11-browser-real-data-smoke-v20260803.mjs
+          node --check tools/orbit360-gravicentra-rc1-go-live-helper-v20260803.mjs
+          unset ORBIT360_REQUEST_FILE || true
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_PREDEPLOY_GATE_ID"
+          jq -e '.status=="GO_GATE_CONTRACT" and .staticReady==true and .requestPresent==false and .executionAuthorized==false and .secretAccess==false and .firestoreRead==false and .writeAuthorized==false and .deployAuthorized==false and .productionAuthorized==false and .failed==0' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+
+      - name: Validar autorización macro RC1.1 inmutable
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-gravicentra-rc11-real-data-go-live-guard-v20260803.mjs
+          jq -e '.status=="RC11_REAL_DATA_GO_LIVE_AUTHORIZED" and .classification=="RC11_REAL_DATA_MACRO_READY" and .failed==0 and .hostingDeployAuthorized==true and .browserAuthorized==true and .firestoreReadAuthorized==true and .rollbackAuthorized==true and .firestoreWritesAuthorized==false and .authWritesAuthorized==false and .rulesDeployAuthorized==false and .functionsDeployAuthorized==false and .mainAuthorized==false and .mergeAuthorized==false and .secretAccess==false and .firestoreRead==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/gravicentra-rc11-real-data-go-live-guard.json" >/dev/null
+
+      - name: Preparar candidata RC1.1 exacta
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --no-tags origin "$ORBIT360_RELEASE_BRANCH"
+          test "$(git rev-parse FETCH_HEAD)" = "$ORBIT360_RELEASE_COMMIT"
+          mapfile -t PRODUCT_DIFF < <(git diff --name-only "$ORBIT360_BASE_RELEASE_COMMIT".."$ORBIT360_RELEASE_COMMIT" -- orbit360-platform/index.html orbit360-platform/core orbit360-platform/modules orbit360-platform/styles orbit360-platform/data)
+          test "${#PRODUCT_DIFF[@]}" = '1'
+          test "${PRODUCT_DIFF[0]}" = 'orbit360-platform/core/backend-lab-loader.js'
+          RC11_ROOT="$RUNNER_TEMP/gravicentra-insurance-rc11"
+          git worktree add --detach "$RC11_ROOT" "$ORBIT360_RELEASE_COMMIT"
+          echo "ORBIT360_RC11_ROOT=$RC11_ROOT" >> "$GITHUB_ENV"
+          echo "ORBIT360_RC1_ROOT=$RC11_ROOT" >> "$GITHUB_ENV"
+          test "$(jq -r '.hosting.public' "$RC11_ROOT/firebase.json")" = 'orbit360-platform'
+          node tools/orbit360-canonical-host-runtime-failclosed-test-v20260803.mjs > "$EVIDENCE_DIR/gravicentra-rc11-static-runtime.json"
+          jq -e '.status=="PASS" and .classification=="GO_STATIC_RUNTIME_ROOT_FIX" and .failed==0 and .firestoreRead==false and .firestoreWrites==0 and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/gravicentra-rc11-static-runtime.json" >/dev/null
+
+      - name: Instalar herramientas después de los guards
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --global firebase-tools@latest
+          npm install --no-save --package-lock=false --ignore-scripts firebase-admin@13 google-auth-library@9 playwright@1.52.0
+          npx playwright install --with-deps chromium
+
+      - name: Resolver identidad existente
+        env:
+          SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+          SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          EXISTING_LOGIN_PASSWORD: ${{ secrets.ORBIT360_LAB_LOGIN_PASSWORD }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-${SA_ORBIT_360_LAB:-${SA_DEFAULT:-}}}"
+          test -n "$SERVICE_ACCOUNT"
+          test ${#EXISTING_LOGIN_PASSWORD} -ge 8
+          KEY_FILE="$RUNNER_TEMP/gravicentra-rc11-service-account.json"
+          printf '%s' "$SERVICE_ACCOUNT" > "$KEY_FILE"
+          chmod 600 "$KEY_FILE"
+          test "$(jq -r '.project_id // empty' "$KEY_FILE")" = "$ORBIT360_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
+          echo "ORBIT360_TEMP_KEY_FILE=$KEY_FILE" >> "$GITHUB_ENV"
+          echo "ORBIT360_EXISTING_LOGIN_PASSWORD=$EXISTING_LOGIN_PASSWORD" >> "$GITHUB_ENV"
+          echo "ORBIT360_EXISTING_LOGIN_EMAIL=orbit.lab@demo.com" >> "$GITHUB_ENV"
+
+      - name: Snapshot inicial y ancla exacta de rollback
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-gravicentra-rc1-go-live-helper-v20260803.mjs before
+          jq -e '.ok==true and .checks.dataComplete==true and .checks.hostingReadable==true and .checks.rollbackAnchorAvailable==true and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/gravicentra-rc1-go-live-before.json" >/dev/null
+
+      - name: Deploy exclusivo de Firebase Hosting
+        id: deploy
+        shell: bash
+        run: |
+          set +e
+          (cd "$ORBIT360_RC11_ROOT" && firebase deploy --only hosting --project "$ORBIT360_PROJECT_ID" --config firebase.json --non-interactive)
+          CODE=$?
+          echo "exit_code=$CODE" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Smoke de navegador con runtime y datos reales
+        id: browser
+        if: steps.deploy.outputs.exit_code == '0'
+        shell: bash
+        run: |
+          set +e
+          node tools/orbit360-gravicentra-rc11-browser-real-data-smoke-v20260803.mjs
+          CODE=$?
+          echo "exit_code=$CODE" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Verificar datos before/after y release
+        id: data_smoke
+        if: steps.deploy.outputs.exit_code == '0' && steps.browser.outputs.exit_code == '0'
+        shell: bash
+        run: |
+          set +e
+          node tools/orbit360-gravicentra-rc1-go-live-helper-v20260803.mjs smoke
+          CODE=$?
+          echo "exit_code=$CODE" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Rollback exacto ante cualquier criterio bloqueante
+        id: rollback
+        if: steps.deploy.outputs.exit_code != '0' || steps.browser.outputs.exit_code != '0' || steps.data_smoke.outputs.exit_code != '0'
+        shell: bash
+        run: |
+          set +e
+          node tools/orbit360-gravicentra-rc1-go-live-helper-v20260803.mjs rollback
+          CODE=$?
+          echo "exit_code=$CODE" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Cerrar decisión única
+        if: always()
+        env:
+          DEPLOY_CODE: ${{ steps.deploy.outputs.exit_code }}
+          BROWSER_CODE: ${{ steps.browser.outputs.exit_code }}
+          DATA_CODE: ${{ steps.data_smoke.outputs.exit_code }}
+          ROLLBACK_CODE: ${{ steps.rollback.outputs.exit_code }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          DECISION='PIPELINE_STOP_BEFORE_DEPLOY'
+          CLASSIFICATION='PIPELINE_MECHANISM_FAILURE'
+          MAINTAINED=false
+          ROLLED_BACK=false
+          OK=false
+          if [ "${DEPLOY_CODE:-}" = "0" ] && [ "${BROWSER_CODE:-}" = "0" ] && [ "${DATA_CODE:-}" = "0" ]; then
+            DECISION='RC11_REAL_DATA_GO_LIVE_PASS'
+            CLASSIFICATION='PRODUCTION_SMOKE_PASS'
+            MAINTAINED=true
+            OK=true
+          elif [ "${ROLLBACK_CODE:-}" = "0" ]; then
+            DECISION='RC11_ROLLED_BACK_SAFE'
+            CLASSIFICATION='FUNCTIONAL_DEFECT'
+            ROLLED_BACK=true
+          elif [ "${DEPLOY_CODE:-}" != "0" ]; then
+            DECISION='RC11_DEPLOY_FAILED_ROLLBACK_UNCONFIRMED'
+            CLASSIFICATION='ENVIRONMENT_FAILURE'
+          else
+            DECISION='RC11_ROLLBACK_FAILED_ESCALATE'
+            CLASSIFICATION='ENVIRONMENT_FAILURE'
+          fi
+          jq -n --arg decision "$DECISION" --arg classification "$CLASSIFICATION" --arg releaseCommit "$ORBIT360_RELEASE_COMMIT" --arg deployCode "${DEPLOY_CODE:-}" --arg browserCode "${BROWSER_CODE:-}" --arg dataCode "${DATA_CODE:-}" --arg rollbackCode "${ROLLBACK_CODE:-}" --argjson maintained "$MAINTAINED" --argjson rolledBack "$ROLLED_BACK" --argjson ok "$OK" '{schemaVersion:"orbit360-gravicentra-insurance-rc11-real-data-go-live-final-v1",decision:$decision,classification:$classification,releaseCommit:$releaseCommit,deployExitCode:$deployCode,browserExitCode:$browserCode,dataSmokeExitCode:$dataCode,rollbackExitCode:$rollbackCode,productionMaintained:$maintained,rollbackExecuted:$rolledBack,ok:$ok,firestoreWrites:0,authWrites:0,operationalWrites:0,reimportExecuted:false,functionsDeployed:false,rulesApplied:false,mainTouched:false,mergeExecuted:false,containsPII:false,containsSecrets:false}' > "$EVIDENCE_DIR/gravicentra-rc11-real-data-go-live-final.json"
+
+      - name: Publicar estado observable
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          FINAL: orbit360-platform/runtime-gate-crm-v20260716/gravicentra-rc11-real-data-go-live-final.json
+        with:
+          script: |
+            const fs=require('fs');
+            let state='failure',description='RC1.1 sin cierre observable';
+            try{
+              const f=JSON.parse(fs.readFileSync(process.env.FINAL,'utf8'));
+              if(f.decision==='RC11_REAL_DATA_GO_LIVE_PASS'){state='success';description='Gravicentra RC1.1 · datos reales visibles · browser PASS';}
+              else if(f.decision==='RC11_ROLLED_BACK_SAFE'){description='RC1.1 falló · rollback seguro ejecutado';}
+              else description=`Gravicentra RC1.1: ${f.decision}`;
+            }catch(e){}
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:process.env.STATUS_CONTEXT,description:description.slice(0,140),target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
+
+      - name: Subir evidencia sanitizada
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-insurance-rc11-real-data-go-live-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/gravicentra-rc11-real-data-go-live-guard.json
+            orbit360-platform/runtime-gate-crm-v20260716/gravicentra-rc11-static-runtime.json
+            orbit360-platform/runtime-gate-crm-v20260716/gravicentra-rc1-go-live-before.json
+            orbit360-platform/runtime-gate-crm-v20260716/gravicentra-rc11-browser-real-data-smoke.json
+            orbit360-platform/runtime-gate-crm-v20260716/gravicentra-rc1-go-live-smoke.json
+            orbit360-platform/runtime-gate-crm-v20260716/gravicentra-rc1-go-live-rollback.json
+            orbit360-platform/runtime-gate-crm-v20260716/gravicentra-rc11-real-data-go-live-final.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Limpiar temporales
+        if: always()
+        shell: bash
+        run: |
+          if [ -n "${ORBIT360_TEMP_KEY_FILE:-}" ] && [ -f "$ORBIT360_TEMP_KEY_FILE" ]; then shred -u "$ORBIT360_TEMP_KEY_FILE" || rm -f "$ORBIT360_TEMP_KEY_FILE"; fi
+          if [ -n "${ORBIT360_RC11_ROOT:-}" ] && [ -d "$ORBIT360_RC11_ROOT" ]; then git worktree remove --force "$ORBIT360_RC11_ROOT" || true; fi
+
+      - name: Exigir PASS real o rollback seguro
+        if: always()
+        shell: bash
+        run: |
+          jq -e '(.decision=="RC11_REAL_DATA_GO_LIVE_PASS" and .productionMaintained==true and .rollbackExecuted==false and .ok==true) or (.decision=="RC11_ROLLED_BACK_SAFE" and .productionMaintained==false and .rollbackExecuted==true and .ok==false)' "$EVIDENCE_DIR/gravicentra-rc11-real-data-go-live-final.json" >/dev/null
