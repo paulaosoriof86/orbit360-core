@@ -11,6 +11,21 @@ on:
       - 'orbit360-platform/modules/ops-workflows-v1201-bridge.js'
       - 'orbit360-platform/core/access-scope.js'
       - 'orbit360-platform/docs/PAQUETE-ACUMULADO-CLAUDE-ORBIT360-20260804.md'
+      - 'orbit360-platform/docs/ADDENDUM-OPS-ASESOR-Y-MOMENTO-ENTREGA-CLAUDE-20260804.md'
+      - 'tools/orbit360-cobros-inferencia-secuencial-v20260804.mjs'
+      - 'tools/orbit360-validar-ops-advisor-y-cobros-source-v20260804.mjs'
+      - '.github/workflows/orbit360-ops-advisor-cobros-source-v20260804.yml'
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'functions/**'
+      - 'orbit360-platform/modules/ops.js'
+      - 'orbit360-platform/modules/ops-workflows-v1201-bridge.js'
+      - 'orbit360-platform/core/access-scope.js'
+      - 'orbit360-platform/docs/PAQUETE-ACUMULADO-CLAUDE-ORBIT360-20260804.md'
+      - 'orbit360-platform/docs/ADDENDUM-OPS-ASESOR-Y-MOMENTO-ENTREGA-CLAUDE-20260804.md'
       - 'tools/orbit360-cobros-inferencia-secuencial-v20260804.mjs'
       - 'tools/orbit360-validar-ops-advisor-y-cobros-source-v20260804.mjs'
       - '.github/workflows/orbit360-ops-advisor-cobros-source-v20260804.yml'
