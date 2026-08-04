@@ -1,206 +1,113 @@
 # Addendum Cloud / Claude / Academia — autenticación multiusuario RC1.2
 
 Fecha: 2026-08-03  
-Estado: documentado en core; pendiente de envío externo y pendiente de deploy.
+Estado: documentado en core; pendiente de envío externo y pendiente de corrección del contrato de membership Dirección.
 
-## 1. Objetivo reusable
+## Resultado vigente
 
-Convertir la autenticación de una validación técnica monousuario a un patrón comercializable multi-tenant:
-
-```text
-Firebase Auth
-→ tenantId
-→ membership por UID
-→ roles asignados
-→ rol activo/default
-→ advisorId / teamId
-→ países y scopes
-→ módulos base + extras - restringidos
-→ Orbit.store
-```
-
-El patrón no depende de A&S, de un correo específico ni de un asesor específico. A&S continúa siendo el primer tenant y su información se resuelve únicamente mediante configuración y datos de backend.
-
-## 2. Clasificación para Cloud / Claude
-
-### CL-121 — REPLICABLE_CLAUDE_INMEDIATO
-
-**Login multiusuario sin identidad técnica visible**
-
-- campo de correo vacío o con placeholder corporativo;
-- no prellenar usuarios demo en un host productivo;
-- estados: preparando sesión, validando credenciales, validando membresía, acceso autorizado y acceso bloqueado;
-- copy cliente-facing, sin mencionar LAB, Firebase, backend o UID.
-
-### CL-122 — REPLICABLE_CLAUDE_INMEDIATO
-
-**Identidad y rol derivados de membership**
-
-- nombre/avatar del usuario autenticado;
-- rol activo real;
-- selector únicamente con roles asignados;
-- advisorId no editable desde UI;
-- menú derivado de permisos.
-
-### CL-123 — REPLICABLE_CLAUDE_ACUMULADO
-
-**Shell fail-closed por tenant y membership**
-
-- no mostrar módulos ni datos antes de membership válida;
-- no usar datos seed como fallback;
-- relación vacía debe mostrarse como estado honesto, no como datos ficticios;
-- cierre de sesión inmediato si la membership está inactiva o pertenece a otro tenant.
-
-### CL-124 — BACKEND_PROTEGIDO_NO_CLAUDE
-
-**Resolución canónica de acceso**
+RC1.2 corrigió los owners de autenticación del frontend, pero el macrobloque productivo cerró antes del deploy porque no pudo resolver una identidad normal elegible para Dirección.
 
 ```text
-tenants/{tenantId}/members/{uid}
+decisión: RC12_NORMAL_IDENTITIES_NO_GO
+clasificación técnica emitida: SECURITY_FAILURE
+clasificación de remediación: DATA_CONTRACT_FAILURE con impacto de seguridad
+candidata: b699ba329960cd830121b57452ce558399aa84fb
+deploy: no
+producción modificada: no
+Firestore writes: 0
+Auth writes: 0
 ```
 
-Claude no debe recibir:
+## Patrón reusable consolidado
 
-- credenciales;
-- UID reales;
-- reglas de Firestore;
-- rutas de secretos;
-- scripts de deploy;
-- datos reales de memberships;
-- lógica de snapshots protegida.
+### CL-121 — Auth no define permisos
 
-Sí puede recibir el contrato conceptual de roles, scopes y estados.
+Firebase Auth acredita la identidad. La membership del tenant define roles, rol activo, advisorId, países, scopes y módulos.
 
-### CL-125 — ACADEMIA_ACTUALIZAR
+### CL-122 — Store fail-closed por membership
 
-**Diferencia entre autenticar e autorizar**
+`Orbit.store` no conecta snapshots si no existe una proyección activa y válida para el mismo UID y tenant.
 
-La Academia debe enseñar que:
+### CL-123 — Guard sin identidad técnica
 
-- Firebase Auth confirma quién es el usuario;
-- la membership confirma a qué tenant pertenece;
-- roles/scopes determinan qué puede ver y hacer;
-- autenticación exitosa sin membership válida no concede acceso;
-- un usuario técnico de pruebas no representa un flujo productivo.
+El guard no puede fijar correo, UID, rol ni asesor. Solo sincroniza la sesión después de validar la membership.
 
-### CL-126 — ACADEMIA_ACTUALIZAR
+### CL-124 — Smoke con usuario normal
 
-**Prevención de regresiones por composición de candidata**
+Una prueba con cuenta técnica no demuestra operabilidad multiusuario. Dirección, Operativo y Asesor deben validarse con identidades normales existentes.
 
-- una mejora puede existir en un owner y perderse al mezclar versiones antiguas de otros owners;
-- la candidata debe validarse como conjunto;
-- un smoke debe usar al menos una identidad normal y no únicamente la identidad técnica;
-- los gates negativos son tan importantes como los positivos.
+### CL-125 — Gate antirregresión
 
-### CL-127 — REPLICABLE_CLAUDE_ACUMULADO
+Una candidata queda bloqueada si reintroduce identidad técnica, UID fijo, rol o asesor forzado, fallback seed o pérdida de la API de `Orbit.store`.
 
-**Estados UI recomendados**
+### CL-126 — Evidencia sanitizada
+
+Los artefactos conservan hashes, roles, scopes, conteos y resultados; no correos, UID, contraseñas ni tokens.
+
+### CL-127 — Sin cuentas paralelas
+
+La ausencia o inconsistencia de una membership se corrige sobre el usuario existente. No se crea una identidad paralela para superar un gate.
+
+### CL-128 — Gate de Auth y contrato de membership son controles distintos
+
+El gate estático puede aprobar Auth, Store y Guard, mientras el contrato de datos falla por ausencia o inconsistencia de la membership productiva.
+
+### CL-129 — Diagnóstico por causa de rechazo
+
+El diagnóstico debe separar: UID ausente, tenant inconsistente, estado inactivo, roles ausentes, rol activo/default inválido, advisorId faltante, usuario Auth inexistente, usuario deshabilitado, correo ausente, proveedor ausente e identidad técnica excluida.
+
+### CL-130 — Un NO_GO no se corrige debilitando seguridad
+
+No se debe reactivar la cuenta técnica, tolerar roles inventados ni abrir scopes globales. Se corrige el owner contractual.
+
+### CL-131 — Dos etapas de preflight
+
+1. Gate estático antes de secretos.
+2. Contrato read-only de memberships/Auth antes de snapshots y deploy.
+
+### CL-132 — Academia debe enseñar la diferencia entre código y datos de acceso
+
+- `FUNCTIONAL_DEFECT`: lógica incorrecta de Auth/Store/Guard.
+- `VALIDATOR_STALE`: prueba que no representa el acceso real.
+- `PIPELINE_MECHANISM_FAILURE`: workflow o ruta de evidencia incorrectos.
+- `DATA_CONTRACT_FAILURE`: membership/Auth no cumple el contrato.
+- `SECURITY_FAILURE`: el sistema tendría que degradar seguridad para continuar.
+
+## Evidencia vigente
 
 ```text
-login-ready
-signing-in
-validating-membership
-inside
-blocked-membership
-session-expired
+run inicial: 30877460688
+causa inicial: EVIDENCE_PATH_RESOLUTION
+gate real: PASS 14/14
+secretos leídos en run inicial: no
+
+run reanudado: 30877589549
+job: 91892068434
+artifact: 8880091323
+digest: sha256:b45e69e3d256f075ca67c8a4eebacff3db03aa6eff1b152a02c6885701318268
+error: ACTIVE_NORMAL_MEMBERSHIP_NOT_FOUND_DIRECCION
 ```
 
-Nunca mostrar mensajes como:
+## Owner y siguiente acción
 
 ```text
-usuario LAB
-UID esperado
-snapshot owner
-Firestore mode
-seed fallback
+owner: tenants/{tenantId}/members/{uid} + Firebase Auth user con el mismo uid
 ```
 
-## 3. Impacto en el prototipo comercializable
-
-El prototipo debe conservar dos carriles separados:
-
-### Prototipo local
-
-- puede utilizar datos ficticios;
-- debe estar claramente separado del host productivo;
-- no comparte sesión, preferencias ni identidad con tenants reales.
-
-### Runtime de tenant
-
-- exige Auth + membership;
-- no puede caer al seed;
-- resuelve branding, roles, países, módulos y scopes desde configuración;
-- permite incorporar nuevos tenants sin fork ni hardcode.
-
-## 4. Impacto en Academia por rol
-
-### Dirección
-
-- entiende diferencia entre usuario, membership, rol activo y alcance de datos;
-- aprende a revisar cambios que abren scope `todos`;
-- valida que los usuarios técnicos no sustituyan pruebas reales.
-
-### Operativo
-
-- conoce los módulos que dependen de su membership;
-- reporta ausencia o asignación incorrecta mediante gestión de corrección;
-- no intenta resolver acceso creando cuentas paralelas.
-
-### Asesor
-
-- accede únicamente a clientes y relaciones autorizadas;
-- advisorId proviene del backend;
-- no puede reasignarse ni ampliar su scope desde la interfaz.
-
-### Equipo técnico / implementación
-
-- ejecuta el gate antirregresión antes de secretos;
-- diferencia `FUNCTIONAL_DEFECT`, `SECURITY_FAILURE`, `VALIDATOR_STALE` y `PIPELINE_MECHANISM_FAILURE`;
-- no declara PASS usando exclusivamente una identidad técnica.
-
-## 5. Contrato de gate reusable
-
-Antes de cualquier release:
+Se preparó el diagnóstico sanitizado:
 
 ```text
-1. no correo técnico en owners activos
-2. no UID fijo
-3. no rol o asesor forzado
-4. Auth espera membership
-5. Store espera membership
-6. Guard espera membership
-7. API Orbit.store preservada
-8. host productivo sin seed
-9. identidad normal entra con sus roles/scopes
-10. identidad sin membership queda bloqueada
+tools/orbit360-diagnosticar-memberships-normales-v20260803.mjs
 ```
 
-## 6. Estado de sincronización
+Debe ejecutarse una sola vez en modo read-only. Solo después de conocer la causa específica se podrá proponer un diff mínimo sobre la membership del usuario existente.
+
+## Estado externo
 
 ```text
-core RC1.2 actualizado: sí
-documentación profunda: sí
-gate antirregresión: sí
-Academia documentada: sí
-Cloud/Claude clasificado: sí
-enviado externamente: no
-incorporado en prototipo Cloud: no
-desplegado en producción: no
+documentado en core: sí
+rama viva sincronizada: sí
+enviado a Cloud/Claude: no
+incorporado al prototipo comercializable: pendiente
+producción RC1.2: no desplegada
 ```
-
-## 7. Regla de continuidad
-
-Cualquier mejora futura de Auth, Store, roles o membresías debe actualizar conjuntamente:
-
-```text
-owner funcional
-contrato de membership
-guard de sesión
-store
-gate antirregresión
-workflow de release
-documentación Cloud/Claude
-Academia
-```
-
-No se permite cerrar uno de estos componentes dejando los demás en una versión histórica.
