@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "orbit360-rc12-forensic-module-audit-request-v1",
+  "status": "AUTHORIZED_STATIC_FORENSIC_AUDIT",
+  "authorizedAt": "2026-08-03T22:40:00-06:00",
+  "baseline": "27cb7dfcda8568280ebef15993a953364304f29b",
+  "candidate": "b699ba329960cd830121b57452ce558399aa84fb",
+  "liveBranch": "ays/backend-tenant-lab-v99-20260703",
+  "scope": {
+    "allNavigationModules": true,
+    "primaryAndBridgeScripts": true,
+    "lastTouchCommits": true,
+    "baselineParity": true,
+    "liveParity": true,
+    "approvalEvidence": true,
+    "sharedStoreIntegration": true,
+    "backendMaturity": true,
+    "gapsAndNextActions": true
+  },
+  "firestoreRead": false,
+  "authRead": false,
+  "writes": false,
+  "deploy": false,
+  "productionTouched": false,
+  "consumed": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
