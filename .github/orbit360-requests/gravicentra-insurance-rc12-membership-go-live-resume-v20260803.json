@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "orbit360-gravicentra-rc12-membership-go-live-resume-v1",
+  "status": "RESUME_PRE_RISK_SAME_AUTHORIZATION",
+  "failedRun": 30877460688,
+  "failedJob": 91891705926,
+  "rootCause": "EVIDENCE_PATH_RESOLUTION",
+  "previousGateStatus": "PASS_14_OF_14",
+  "previousSecretsRead": false,
+  "previousFirestoreRead": false,
+  "previousAuthRead": false,
+  "previousDeployExecuted": false,
+  "previousProductionTouched": false,
+  "releaseBranch": "release/gravicentra-insurance-rc1-2-membership-auth-20260803",
+  "releaseCommit": "b699ba329960cd830121b57452ce558399aa84fb",
+  "tenantId": "alianzas-soluciones",
+  "projectId": "ays-orbit-360-lab",
+  "newAuthorization": false,
+  "retryOfProduct": false,
+  "resumeBoundary": "after_static_gate_before_secrets",
+  "consumed": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
