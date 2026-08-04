@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "orbit360-functions-dependency-rootfix-source-request-v1",
+  "status": "AUTHORIZED_SOURCE_ONLY",
+  "approved": true,
+  "allowedExecutions": 1,
+  "consumed": false,
+  "replayAllowed": false,
+  "previousRunId": 30949139231,
+  "previousFailureCode": "MODULE_NOT_FOUND_@firebase/app",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "parentHead": "c3e079f80987b1d0631069c97a596100170901ae",
+  "secrets": false,
+  "firebaseCommands": false,
+  "firestoreRead": false,
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "deploy": false,
+  "production": false,
+  "main": false,
+  "merge": false
+}
