@@ -1,0 +1,82 @@
+name: Orbit 360 · registrar Gate 7.15 padrón aprobado final
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-requests/register-gate715-approved-roster-final-v20260804.json'
+
+permissions:
+  contents: write
+  statuses: write
+
+concurrency:
+  group: orbit360-register-gate715-approved-roster-final-v20260804
+  cancel-in-progress: false
+
+env:
+  REQUEST: .github/orbit360-requests/register-gate715-approved-roster-final-v20260804.json
+  STATUS_CONTEXT: orbit360/register-gate715-approved-roster-final
+
+jobs:
+  register:
+    name: Gate 7.15 · registro source-only
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout exacto
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Preparar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Validar frontera source-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = 'ays/backend-tenant-lab-v99-20260703'
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          jq -e '.schemaVersion=="orbit360-register-gate715-request-v1" and .status=="AUTHORIZED_SOURCE_ONLY" and .candidate=="b699ba329960cd830121b57452ce558399aa84fb" and .secrets==false and .firestoreRead==false and .authRead==false and .writes==false and .browser==false and .deploy==false and .production==false and .consumed==false' "$REQUEST" >/dev/null
+          node --check tools/orbit360-registrar-gate715-approved-roster-final-v20260804.mjs
+          node --check tools/orbit360-validar-gate-contracts-engine-rc12-approved-roster-final-go-live-v20260804.mjs
+          node --check tools/orbit360-provisionar-roster-aprobado-final-rc12-v20260804.mjs
+          bash -n tools/orbit360-rc12-approved-roster-final-go-live-macro-v20260804.sh
+
+      - name: Registrar gate y fase
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-registrar-gate715-approved-roster-final-v20260804.mjs
+          node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
+          grep -F 'block7.15-rc12-approved-roster-final-go-live-v20260804' tools/orbit360-validar-gate-contracts-v20260717.mjs
+          grep -F 'GRAVICENTRA_RC12_APPROVED_ROSTER_FINAL_GO_LIVE' tools/orbit360-validar-gate-contracts-v20260717.mjs
+          git diff --check
+
+      - name: Persistir registro contractual
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add tools/orbit360-validar-gate-contracts-v20260717.mjs
+          git commit -m 'gate: registrar 7.15 padrón aprobado y publicación final'
+          git push origin HEAD:ays/backend-tenant-lab-v99-20260703
+
+      - name: Publicar estado
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.sha,
+              state: '${{ job.status }}' === 'success' ? 'success' : 'failure',
+              context: process.env.STATUS_CONTEXT,
+              description: '${{ job.status }}' === 'success' ? 'Gate 7.15 registrado · source-only PASS' : 'Gate 7.15 registro incompleto',
+              target_url: `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
+            });
