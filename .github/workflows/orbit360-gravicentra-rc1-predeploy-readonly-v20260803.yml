@@ -4,7 +4,7 @@ on:
   push:
     branches: [ays/backend-tenant-lab-v99-20260703]
     paths:
-      - '.github/orbit360-requests/gravicentra-insurance-rc1-predeploy-readonly-v20260803.json'
+      - '.github/orbit360-requests/gravicentra-insurance-rc1-predeploy-readonly-resume-v20260803.json'
 
 permissions:
   contents: read
@@ -16,8 +16,8 @@ concurrency:
 
 env:
   ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
-  ORBIT360_GATE_ID: block7-canonical-runtime-cumulative-visual-lab-v20260801
-  ORBIT360_REQUEST_FILE: .github/orbit360-requests/gravicentra-insurance-rc1-predeploy-readonly-v20260803.json
+  ORBIT360_GATE_ID: block7-gravicentra-insurance-rc1-predeploy-readonly-v20260803
+  ORBIT360_REQUEST_FILE: .github/orbit360-requests/gravicentra-insurance-rc1-predeploy-readonly-resume-v20260803.json
   ORBIT360_RELEASE_BRANCH: release/gravicentra-insurance-rc1-20260803
   ORBIT360_RELEASE_COMMIT: 27cb7dfcda8568280ebef15993a953364304f29b
   ORBIT360_BASELINE_PRODUCT_HEAD: 267f7231b46d65b80c167f54567a67503b6a6793
@@ -57,7 +57,7 @@ jobs:
           test "${#CHANGED[@]}" = '1'
           test "${CHANGED[0]}" = "$ORBIT360_REQUEST_FILE"
           jq -e --arg branch "$ORBIT360_BRANCH" --arg releaseBranch "$ORBIT360_RELEASE_BRANCH" --arg releaseCommit "$ORBIT360_RELEASE_COMMIT" --arg project "$ORBIT360_PROJECT_ID" --arg tenant "$ORBIT360_TENANT_ID" --arg url "$ORBIT360_LIVE_URL" '
-            .schemaVersion=="orbit360-gravicentra-insurance-rc1-predeploy-readonly-request-v1" and
+            .schemaVersion=="orbit360-gravicentra-insurance-rc1-predeploy-readonly-resume-request-v1" and
             .status=="AUTHORIZED_SINGLE_EXECUTION" and
             .approved==true and
             .allowedExecutions==1 and
@@ -69,9 +69,12 @@ jobs:
             .projectId==$project and
             .tenantId==$tenant and
             .liveUrl==$url and
+            .scope.contractPreflightBeforeSecrets==true and
             .scope.firestoreRead==true and
             .scope.hostingRead==true and
             .scope.publicAssetRead==true and
+            .scope.featureFlagRead==true and
+            .scope.backupAndRollbackReadiness==true and
             .scope.writes==false and
             .scope.reimport==false and
             .scope.deploy==false and
@@ -80,7 +83,10 @@ jobs:
             .scope.productionWrites==false and
             .scope.main==false and
             .scope.merge==false and
-            .requiredDecision==["GO_FULL","GO_LIMITED_SCOPE","NO_GO"]
+            .requiredDecision==["GO_FULL","GO_LIMITED_SCOPE","NO_GO"] and
+            .stopRetry==true and
+            .repeatGate711==false and
+            .openGeneralAudit==false
           ' "$ORBIT360_REQUEST_FILE" >/dev/null
 
       - name: Contrato vigente antes de secrets
@@ -88,8 +94,9 @@ jobs:
         run: |
           set -euo pipefail
           node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
+          node --check tools/orbit360-validar-gate-contracts-engine-gravicentra-rc1-predeploy-readonly-v20260803.mjs
           node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
-          jq -e '.status=="GO_GATE_CONTRACT" and .failed==0 and .writeAuthorized==false and .deployAuthorized==false and .productionAuthorized==false and .operationalWrites==0 and .secretAccess==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+          jq -e '.status=="GO_GATE_CONTRACT" and .classification=="GRAVICENTRA_RC1_PREDEPLOY_READONLY_EXECUTION_READY" and .staticReady==true and .requestPresent==true and .executionAuthorized==true and .secretAccessAuthorized==true and .firestoreReadAuthorized==true and .writeAuthorized==false and .runtimeAuthorized==true and .browserAuthorized==false and .deployAuthorized==false and .rulesDeployAuthorized==false and .functionsDeployAuthorized==false and .productionAuthorized==false and .failed==0 and .operationalWrites==0 and .secretAccess==false and .firestoreRead==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
 
       - name: Verificar sello RC1 y delta de producto permitido
         shell: bash
