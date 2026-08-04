@@ -1,11 +1,31 @@
 {
   "schemaVersion": "orbit360-gravicentra-rc12-membership-go-live-request-v1",
-  "status": "AUTHORIZED_SINGLE_MACRO",
+  "status": "CONSUMED_NO_GO",
   "authorizedAt": "2026-08-03T22:15:00-06:00",
+  "consumedAt": "2026-08-03T22:25:36-06:00",
   "releaseBranch": "release/gravicentra-insurance-rc1-2-membership-auth-20260803",
   "releaseCommit": "b699ba329960cd830121b57452ce558399aa84fb",
   "tenantId": "alianzas-soluciones",
   "projectId": "ays-orbit-360-lab",
+  "result": {
+    "decision": "RC12_NORMAL_IDENTITIES_NO_GO",
+    "classification": "DATA_CONTRACT_FAILURE_WITH_SECURITY_IMPACT",
+    "failedRun": 30877589549,
+    "failedJob": 91892068434,
+    "artifact": 8880091323,
+    "artifactDigest": "sha256:b45e69e3d256f075ca67c8a4eebacff3db03aa6eff1b152a02c6885701318268",
+    "gate": "PASS_14_OF_14",
+    "error": "ACTIVE_NORMAL_MEMBERSHIP_NOT_FOUND_DIRECCION",
+    "rootCauseOwner": "tenants/{tenantId}/members/{uid} + matching Firebase Auth user",
+    "deployExecuted": false,
+    "productionTouched": false,
+    "firestoreWrites": 0,
+    "authWrites": 0,
+    "userCreates": 0,
+    "userUpdates": 0,
+    "passwordReads": 0,
+    "passwordWrites": 0
+  },
   "scope": {
     "antiregressionFirst": true,
     "membershipsReadOnly": true,
@@ -38,7 +58,7 @@
     "generalPredeploy": false
   },
   "retryAuthorized": false,
-  "consumed": false,
+  "consumed": true,
   "containsPII": false,
   "containsSecrets": false
 }
