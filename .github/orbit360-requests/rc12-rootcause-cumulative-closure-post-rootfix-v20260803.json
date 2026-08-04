@@ -23,6 +23,8 @@
   "newAuthorization": false,
   "resumeBoundary": "after_validator_rootfix_before_secrets",
   "normalizerDocumentUidGuard": true,
+  "triggerRevision": 2,
+  "triggerReason": "workflow_registered_after_initial_request_event",
   "consumed": false,
   "containsPII": false,
   "containsSecrets": false
