@@ -1,0 +1,96 @@
+name: Orbit 360 · correctivo único root fix padrón aprobado
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-requests/rootfix-approved-roster-reconciler-corrective-v20260804.json'
+
+permissions:
+  contents: write
+  statuses: write
+
+concurrency:
+  group: orbit360-rootfix-approved-roster-reconciler-corrective-v20260804
+  cancel-in-progress: false
+
+env:
+  REQUEST: .github/orbit360-requests/rootfix-approved-roster-reconciler-corrective-v20260804.json
+  PATCHER: tools/orbit360-aplicar-rootfix-roster-digest-source-lock-v20260804.mjs
+  PROOF: orbit360-platform/runtime-gate-crm-v20260716/rc12-approved-roster-reconciler-rootfix-static.json
+  STATUS_CONTEXT: orbit360/rootfix-approved-roster-reconciler-corrective
+
+jobs:
+  corrective:
+    name: Correctivo variable · aplicar y persistir root fix
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout exacto
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Preparar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Validar frontera source-only y STOP_RETRY
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = 'ays/backend-tenant-lab-v99-20260703'
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          jq -e '.schemaVersion=="orbit360-rootfix-approved-roster-reconciler-corrective-request-v1" and .status=="AUTHORIZED_SINGLE_SOURCE_CORRECTIVE" and .priorRun==30908742658 and .failureCode=="APPROVED_SOURCE_COMMIT_REFERENCE_ERROR" and .candidate=="b699ba329960cd830121b57452ce558399aa84fb" and .secrets==false and .firestoreRead==false and .authRead==false and .writes==false and .browser==false and .deploy==false and .production==false and .consumed==false and .stopRetryIfFailsAgain==true' "$REQUEST" >/dev/null
+          grep -F "provisioner.includes(APPROVED_SOURCE_COMMIT)" "$PATCHER"
+
+      - name: Corregir referencia y aplicar root fix
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('tools/orbit360-aplicar-rootfix-roster-digest-source-lock-v20260804.mjs')
+          s=p.read_text(encoding='utf-8')
+          old="provisioner.includes(APPROVED_SOURCE_COMMIT)"
+          new="provisioner.includes(SOURCE_COMMIT)"
+          assert s.count(old)==1
+          p.write_text(s.replace(old,new),encoding='utf-8')
+          PY
+          node --check "$PATCHER"
+          node "$PATCHER"
+          node --check tools/orbit360-provisionar-roster-aprobado-final-rc12-v20260804.mjs
+          node --check tools/orbit360-validar-gate-contracts-engine-rc12-approved-roster-final-go-live-v20260804.mjs
+          node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
+          jq -e '.decision=="APPROVED_ROSTER_RECONCILER_ROOTFIX_STATIC_PASS" and .classification=="GO_STATIC_VALIDATOR_ROOTFIX" and .rawEmailStored==false and .firestoreRead==false and .firestoreWrites==0 and .authRead==false and .authWrites==0 and .userCreates==0 and .browserExecuted==false and .deployExecuted==false and .productionTouched==false and .ok==true' "$PROOF" >/dev/null
+          ! grep -RE '@aysseguros\.com' tools/orbit360-provisionar-roster-aprobado-final-rc12-v20260804.mjs "$PROOF"
+          git diff --check
+
+      - name: Exigir delta exacto
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t FILES < <(git diff --name-only)
+          printf '%s\n' "${FILES[@]}"
+          test "${#FILES[@]}" = '6'
+          for F in "$PATCHER" tools/orbit360-provisionar-roster-aprobado-final-rc12-v20260804.mjs tools/orbit360-validator-lifecycle-contract-rc12-approved-roster-final-go-live-v20260804.json tools/orbit360-validar-gate-contracts-engine-rc12-approved-roster-final-go-live-v20260804.mjs tools/orbit360-validar-gate-contracts-v20260717.mjs "$PROOF"; do
+            printf '%s\n' "${FILES[@]}" | grep -Fx "$F"
+          done
+
+      - name: Persistir root fix aprobado
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$PATCHER" tools/orbit360-provisionar-roster-aprobado-final-rc12-v20260804.mjs tools/orbit360-validator-lifecycle-contract-rc12-approved-roster-final-go-live-v20260804.json tools/orbit360-validar-gate-contracts-engine-rc12-approved-roster-final-go-live-v20260804.mjs tools/orbit360-validar-gate-contracts-v20260717.mjs "$PROOF"
+          git commit -m 'auth: cerrar root fix de reconciliación por digest'
+          git push origin HEAD:ays/backend-tenant-lab-v99-20260703
+
+      - name: Publicar estado
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state:'${{ job.status }}'==='success'?'success':'failure',context:process.env.STATUS_CONTEXT,description:'${{ job.status }}'==='success'?'Root fix reconciliador · PASS source-only':'STOP_RETRY · root fix reconciliador falló',target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
