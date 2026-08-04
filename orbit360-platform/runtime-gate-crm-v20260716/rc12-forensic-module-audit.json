@@ -1,0 +1,1935 @@
+{
+  "schemaVersion": "orbit360-forensic-cumulative-module-audit-v1",
+  "generatedAt": "2026-08-04T04:46:58.498Z",
+  "baseline": "27cb7dfcda8568280ebef15993a953364304f29b",
+  "candidate": "b699ba329960cd830121b57452ce558399aa84fb",
+  "live": "origin/ays/backend-tenant-lab-v99-20260703",
+  "decision": "GO_STATIC_CUMULATIVE_MODULE_PARITY_WITH_MATURITY_GAPS",
+  "classification": "GO_STATIC_ARCHITECTURE",
+  "guarantees": {
+    "candidateDescendsFromBaseline": true,
+    "moduleTreeParityBaseline": true,
+    "moduleTreeParityLive": true,
+    "noPostBaselineModuleChangesInLive": true,
+    "candidateOnlyChangesAllowedRuntimeOwners": true,
+    "allActiveModulesSyntaxAndRegistration": true
+  },
+  "counts": {
+    "routes": 31,
+    "loadedModuleScripts": 47,
+    "moduleFiles": 62,
+    "workedActiveModules": 31,
+    "sharedStoreIntegrated": 30,
+    "moduleSpecificStrongEvidence": 31,
+    "backendExplicitlyComplete": 0,
+    "modulesWithMaturityGaps": 22,
+    "failedModules": 0
+  },
+  "limits": {
+    "staticAuditOnly": true,
+    "doesNotClaimAllModuleRuntimeApproval": true,
+    "doesNotClaimBackendCompleteFromFilePresence": true,
+    "runtimeRequiredAfterAuthentication": true
+  },
+  "candidateDiffFiles": [
+    ".github/orbit360-requests/rc12-membership-auth-source-v20260803.json",
+    ".github/workflows/orbit360-rc12-membership-auth-source-v20260803.yml",
+    "orbit360-platform/core/auth.js",
+    "orbit360-platform/core/backend-lab-auth-guard.js",
+    "orbit360-platform/core/backend-lab-loader.js",
+    "orbit360-platform/data/store-firestore-lab.local.js",
+    "orbit360-platform/docs/ADDENDUM-CLOUD-ACADEMIA-AUTH-MULTIUSUARIO-RC12-20260803.md",
+    "orbit360-platform/docs/DIAGNOSTICO-CAUSA-RAIZ-REGRESION-AUTH-MEMBERSHIP-RC12-20260803.md",
+    "orbit360-platform/runtime-gate-crm-v20260716/rc12-auth-membership-source-review.json",
+    "tools/orbit360-apply-rc12-membership-auth-v20260803.mjs",
+    "tools/orbit360-validar-auth-membership-antiregression-v20260803.mjs"
+  ],
+  "livePostBaselineModuleDiffs": [],
+  "candidateUnexpectedProductDiffs": [],
+  "modules": [
+    {
+      "route": "inicio",
+      "primary": "orbit360-platform/modules/inicio.js",
+      "relatedScripts": [
+        "orbit360-platform/modules/inicio.js"
+      ],
+      "implementation": "WORKED_ACTIVE_MODULE",
+      "loaded": true,
+      "registered": true,
+      "syntaxOk": true,
+      "storeRefs": 6,
+      "directStorageRefs": 0,
+      "demoMarkers": 0,
+      "todoMarkers": 0,
+      "backend": "SHARED_ORBIT_STORE_INTEGRATED",
+      "backendComplete": false,
+      "domainMaturity": "OPERATIVE_DASHBOARD_SHARED_STORE",
+      "expectedCollections": [
+        "clientes",
+        "polizas",
+        "cobros",
+        "asesores"
+      ],
+      "candidateBlob": "65d53441ace11987002d6b45c52db598e7baf989",
+      "baselineBlob": "65d53441ace11987002d6b45c52db598e7baf989",
+      "liveBlob": "65d53441ace11987002d6b45c52db598e7baf989",
+      "parityBaseline": true,
+      "parityLive": true,
+      "lastApprovedFileCommit": {
+        "commit": "1a9164d77c5277626dfb60e83803317f9b8f8bf9",
+        "date": "2026-07-05T14:12:58-06:00",
+        "message": "fix(ays): apply Claude v1142 inicio copy"
+      },
+      "lastCandidateFileCommit": {
+        "commit": "1a9164d77c5277626dfb60e83803317f9b8f8bf9",
+        "date": "2026-07-05T14:12:58-06:00",
+        "message": "fix(ays): apply Claude v1142 inicio copy"
+      },
+      "lastLiveFileCommit": {
+        "commit": "1a9164d77c5277626dfb60e83803317f9b8f8bf9",
+        "date": "2026-07-05T14:12:58-06:00",
+        "message": "fix(ays): apply Claude v1142 inicio copy"
+      },
+      "postBaselineTouchesInLive": [],
+      "approvalEvidence": "STRONG_REPOSITORY_EVIDENCE",
+      "evidenceFiles": [
+        "orbit360-platform/docs/ACUMULADO-CLAUDE-ZIP-20260702-142044.md",
+        "orbit360-platform/docs/ACUMULADO-CLAUDE-ZIP-20260702.md",
+        "orbit360-platform/docs/ADDENDUM-CONTROL-MAESTRO-CLAUDE-ACADEMIA-P09G-LOTE-20260710.md",
+        "orbit360-platform/docs/ADENDUM-MAESTRO-CONTROL-CAUSA-RAIZ-VALIDADORES-GATES-ORBIT360-AYS-20260717.md",
+        "orbit360-platform/docs/AUDITORIA-FORENSE-CANDIDATO-ACTIVO-CLAUDE-20260704-152321.md",
+        "orbit360-platform/docs/AUDITORIA-FORENSE-CANDIDATO-CLAUDE-20260704-193658.md",
+        "orbit360-platform/docs/AUDITORIA-FORENSE-CANDIDATO-CLAUDE-20260705-140141-V1142.md",
+        "orbit360-platform/docs/AUDITORIA-FORENSE.md",
+        "orbit360-platform/docs/AUDITORIA-PROFUNDA-ZIP-CLAUDE-20260702-142044.md",
+        "orbit360-platform/docs/AUDITORIA-REVALIDACION-CANDIDATO-CLAUDE-20260705-062855-PRIORIZADA.md"
+      ],
+      "gaps": []
+    },
+    {
+      "route": "cronograma",
+      "primary": "orbit360-platform/modules/cronograma.js",
+      "relatedScripts": [
+        "orbit360-platform/modules/cronograma.js"
+      ],
+      "implementation": "WORKED_ACTIVE_MODULE",
+      "loaded": true,
+      "registered": true,
+      "syntaxOk": true,
+      "storeRefs": 1,
+      "directStorageRefs": 0,
+      "demoMarkers": 0,
+      "todoMarkers": 0,
+      "backend": "SHARED_ORBIT_STORE_INTEGRATED",
+      "backendComplete": false,
+      "domainMaturity": "FRONTEND_WORKED_BACKEND_PARTIAL",
+      "expectedCollections": [
+        "gestiones",
+        "leads",
+        "renovaciones"
+      ],
+      "candidateBlob": "61ab769667e7b34b9fd2b046a2c9c974fbec9924",
+      "baselineBlob": "61ab769667e7b34b9fd2b046a2c9c974fbec9924",
+      "liveBlob": "61ab769667e7b34b9fd2b046a2c9c974fbec9924",
+      "parityBaseline": true,
+      "parityLive": true,
+      "lastApprovedFileCommit": {
+        "commit": "d677e203a74c7f58d828ff99e8d7e3e0599abd3e",
+        "date": "2026-07-01T15:31:09-06:00",
+        "message": "chore: checkpoint clean Claude v99 base for backend lab"
+      },
+      "lastCandidateFileCommit": {
+        "commit": "d677e203a74c7f58d828ff99e8d7e3e0599abd3e",
+        "date": "2026-07-01T15:31:09-06:00",
+        "message": "chore: checkpoint clean Claude v99 base for backend lab"
+      },
+      "lastLiveFileCommit": {
+        "commit": "d677e203a74c7f58d828ff99e8d7e3e0599abd3e",
+        "date": "2026-07-01T15:31:09-06:00",
+        "message": "chore: checkpoint clean Claude v99 base for backend lab"
+      },
+      "postBaselineTouchesInLive": [],
+      "approvalEvidence": "STRONG_REPOSITORY_EVIDENCE",
+      "evidenceFiles": [
+        "orbit360-platform/docs/AUDITORIA-CONTAMINACION-ORBIT-ORBIA-CXORBIA-20260701.md",
+        "orbit360-platform/docs/AUDITORIA-FORENSE-CANDIDATO-ACTIVO-CLAUDE-20260704-152321.md",
+        "orbit360-platform/docs/AUDITORIA-FORENSE.md",
+        "orbit360-platform/docs/BITACORA-CAMBIOS.md",
+        "orbit360-platform/docs/BITACORA-ERRORES.md",
+        "orbit360-platform/docs/INSTRUCCION-PROYECTO-CHATGPT.md",
+        "orbit360-platform/docs/MEJORAS-DETECTADAS.md",
+        "orbit360-platform/docs/MIGRACION-MAESTRO.md",
+        "orbit360-platform/docs/PROMPT-SIGUIENTE-SESION.md",
+        "orbit360-platform/docs/REGISTRO-P0-OPERACIONES-CALENDARIO-MARKETING-20260709.md"
+      ],
+      "gaps": [
+        "completar backend/gate del dominio indicado"
+      ]
+    },
+    {
+      "route": "ops",
+      "primary": "orbit360-platform/modules/ops.js",
+      "relatedScripts": [
+        "orbit360-platform/modules/crm-v1198-operational-bridge.js",
+        "orbit360-platform/modules/issuance-endosos-v1201-bridge.js",
+        "orbit360-platform/modules/issuance-endosos-v1201-refinements.js",
+        "orbit360-platform/modules/ops-workflows-v1201-bridge.js",
+        "orbit360-platform/modules/ops.js"
+      ],
+      "implementation": "WORKED_ACTIVE_MODULE",
+      "loaded": true,
+      "registered": true,
+      "syntaxOk": true,
+      "storeRefs": 5,
+      "directStorageRefs": 0,
+      "demoMarkers": 0,
+      "todoMarkers": 1,
+      "backend": "SHARED_ORBIT_STORE_INTEGRATED",
+      "backendComplete": false,
+      "domainMaturity": "RUNTIME_WORKED_EMPTY_RELATIONS_ALLOWED",
+      "expectedCollections": [
+        "gestiones"
+      ],
+      "candidateBlob": "bcbac36ece8ef8d30527214b4a8594538c10f658",
+      "baselineBlob": "bcbac36ece8ef8d30527214b4a8594538c10f658",
+      "liveBlob": "bcbac36ece8ef8d30527214b4a8594538c10f658",
+      "parityBaseline": true,
+      "parityLive": true,
+      "lastApprovedFileCommit": {
+        "commit": "8ab1f251d91d51e731cd2c6481a49a2f259111f8",
+        "date": "2026-06-25T23:28:42-06:00",
+        "message": "Actualizar prototipo orbit360 automatizaciones IA y docs"
+      },
+      "lastCandidateFileCommit": {
+        "commit": "8ab1f251d91d51e731cd2c6481a49a2f259111f8",
+        "date": "2026-06-25T23:28:42-06:00",
+        "message": "Actualizar prototipo orbit360 automatizaciones IA y docs"
+      },
+      "lastLiveFileCommit": {
+        "commit": "8ab1f251d91d51e731cd2c6481a49a2f259111f8",
+        "date": "2026-06-25T23:28:42-06:00",
+        "message": "Actualizar prototipo orbit360 automatizaciones IA y docs"
+      },
+      "postBaselineTouchesInLive": [],
+      "approvalEvidence": "STRONG_REPOSITORY_EVIDENCE",
+      "evidenceFiles": [
+        "orbit360-platform/docs/ACTUALIZACION-DELTA-CLAUDE-CRM-V1201-20260711.md",
+        "orbit360-platform/docs/AUDITORIA-BLOQUE-OPS-LEADS-PORTAL-SINIESTROS-PLANTILLAS-AUTOMATIZACIONES-V1330-20260707.md",
+        "orbit360-platform/docs/AUDITORIA-CANDIDATA-CLAUDE-V1214-20260712-084423.md",
+        "orbit360-platform/docs/AUDITORIA-CONTAMINACION-ORBIT-ORBIA-CXORBIA-20260701.md",
+        "orbit360-platform/docs/AUDITORIA-COTIZADOR-COMPARATIVO-V1330-Y-FUENTE-AYS-V110-20260707.md",
+        "orbit360-platform/docs/AUDITORIA-DELTA-CANDIDATA-CLAUDE-V1250-20260714.md",
+        "orbit360-platform/docs/AUDITORIA-DIAGNOSTICO-OPS-RUTEO-NOTIFICACIONES-V123-20260704.md",
+        "orbit360-platform/docs/AUDITORIA-FORENSE-CANDIDATO-ACTIVO-CLAUDE-20260704-152321.md",
+        "orbit360-platform/docs/AUDITORIA-FORENSE.md",
+        "orbit360-platform/docs/AUDITORIA-Y-CORRECCION-UNICA-CANDIDATA-CLAUDE-V1212-20260712.md"
+      ],
+      "gaps": []
+    },
+    {
+      "route": "leads",
+      "primary": "orbit360-platform/modules/leads.js",
+      "relatedScripts": [
+        "orbit360-platform/modules/crm-v1198-operational-bridge.js",
+        "orbit360-platform/modules/leads.js"
+      ],
+      "implementation": "WORKED_ACTIVE_MODULE",
+      "loaded": true,
+      "registered": true,
+      "syntaxOk": true,
+      "storeRefs": 1,
+      "directStorageRefs": 0,
+      "demoMarkers": 0,
+      "todoMarkers": 0,
+      "backend": "SHARED_ORBIT_STORE_INTEGRATED",
+      "backendComplete": false,
+      "domainMaturity": "RUNTIME_WORKED_EMPTY_RELATIONS_ALLOWED",
+      "expectedCollections": [
+        "leads"
+      ],
+      "candidateBlob": "e25b6ea1660a415e3ebdba3c22ccfcd8e1236765",
+      "baselineBlob": "e25b6ea1660a415e3ebdba3c22ccfcd8e1236765",
+      "liveBlob": "e25b6ea1660a415e3ebdba3c22ccfcd8e1236765",
+      "parityBaseline": true,
+      "parityLive": true,
+      "lastApprovedFileCommit": {
+        "commit": "317f3fb0a36a748d82d42b0d96d30fc9f0533684",
+        "date": "2026-07-06T21:22:13-06:00",
+        "message": "feat(ays): empalme real completo v1330 candidato 20260706"
+      },
+      "lastCandidateFileCommit": {
+        "commit": "317f3fb0a36a748d82d42b0d96d30fc9f0533684",
+        "date": "2026-07-06T21:22:13-06:00",
+        "message": "feat(ays): empalme real completo v1330 candidato 20260706"
+      },
+      "lastLiveFileCommit": {
+        "commit": "317f3fb0a36a748d82d42b0d96d30fc9f0533684",
+        "date": "2026-07-06T21:22:13-06:00",
+        "message": "feat(ays): empalme real completo v1330 candidato 20260706"
+      },
+      "postBaselineTouchesInLive": [],
+      "approvalEvidence": "STRONG_REPOSITORY_EVIDENCE",
+      "evidenceFiles": [
+        "orbit360-platform/docs/ADDENDUM-CLAUDE-ACADEMIA-PROFUNDA-COMPLETA-POST-PAQUETE-V1330-20260709.md",
+        "orbit360-platform/docs/AUDITORIA-BLOQUE-OPS-LEADS-PORTAL-SINIESTROS-PLANTILLAS-AUTOMATIZACIONES-V1330-20260707.md",
+        "orbit360-platform/docs/AUDITORIA-DELTA-CANDIDATA-CLAUDE-V1250-20260714.md",
+        "orbit360-platform/docs/AUDITORIA-FORENSE-CANDIDATO-ACTIVO-CLAUDE-20260704-152321.md",
+        "orbit360-platform/docs/AUDITORIA-FORENSE-CANDIDATO-CLAUDE-20260704-193658.md",
+        "orbit360-platform/docs/AUDITORIA-FORENSE-CANDIDATO-CLAUDE-20260704-202655.md",
+        "orbit360-platform/docs/AUDITORIA-FORENSE.md",
+        "orbit360-platform/docs/AUDITORIA-PROTOTIPO-CLAUDE-V197-20260703.md",
+        "orbit360-platform/docs/BITACORA-CAMBIOS.md",
+        "orbit360-platform/docs/BITACORA-ERRORES.md"
+      ],
+      "gaps": []
+    },
+    {
+      "route": "aseguradoras",
+      "primary": "orbit360-platform/modules/aseguradoras.js",
+      "relatedScripts": [
+        "orbit360-platform/modules/aseguradoras-batch-admin-copy-p09l.js",
+        "orbit360-platform/modules/aseguradoras-batch-admin-form-p09j.js",
+        "orbit360-platform/modules/aseguradoras-candidate-actions.js",
+        "orbit360-platform/modules/aseguradoras-frontend-projection-v20260716.js",
+        "orbit360-platform/modules/aseguradoras-knowledge-p09.js",
+        "orbit360-platform/modules/aseguradoras-knowledge-panel-p09f.js",
+        "orbit360-platform/modules/aseguradoras-op2-closure-bridge.js",
+        "orbit360-platform/modules/aseguradoras-op2-operational-resources.js",
+        "orbit360-platform/modules/aseguradoras-op2-permission-guard.js",
+        "orbit360-platform/modules/aseguradoras-p02-sensitive.js",
+        "orbit360-platform/modules/aseguradoras-v1197-ux-bridge.js",
+        "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js",
+        "orbit360-platform/modules/aseguradoras-v1202-resources-bridge.js",
+        "orbit360-platform/modules/aseguradoras-validation-ui-p09fix.js",
+        "orbit360-platform/modules/aseguradoras.js"
+      ],
+      "implementation": "WORKED_ACTIVE_MODULE",
+      "loaded": true,
+      "registered": true,
+      "syntaxOk": true,
+      "storeRefs": 2,
+      "directStorageRefs": 0,
+      "demoMarkers": 0,
+      "todoMarkers": 31,
+      "backend": "SHARED_ORBIT_STORE_INTEGRATED",
+      "backendComplete": false,
+      "domainMaturity": "REAL_DATA_MIGRATED_READONLY",
+      "expectedCollections": [
+        "aseguradoras"
+      ],
+      "candidateBlob": "992b482b6bba24b3b4486b273a5345075d1aa7ca",
+      "baselineBlob": "992b482b6bba24b3b4486b273a5345075d1aa7ca",
+      "liveBlob": "992b482b6bba24b3b4486b273a5345075d1aa7ca",
+      "parityBaseline": true,
+      "parityLive": true,
+      "lastApprovedFileCommit": {
+        "commit": "6145e3b0a4173c582617bfc26dbfdc0c55b88b86",
+        "date": "2026-07-23T13:26:06Z",
+        "message": "fix(m1): consolidar directorio dinámico y persistencia"
+      },
+      "lastCandidateFileCommit": {
+        "commit": "6145e3b0a4173c582617bfc26dbfdc0c55b88b86",
+        "date": "2026-07-23T13:26:06Z",
+        "message": "fix(m1): consolidar directorio dinámico y persistencia"
+      },
+      "lastLiveFileCommit": {
+        "commit": "6145e3b0a4173c582617bfc26dbfdc0c55b88b86",
+        "date": "2026-07-23T13:26:06Z",
+        "message": "fix(m1): consolidar directorio dinámico y persistencia"
+      },
+      "postBaselineTouchesInLive": [],
+      "approvalEvidence": "STRONG_REPOSITORY_EVIDENCE",
+      "evidenceFiles": [
+        "orbit360-platform/docs/ACADEMIA-IMPACT-RULES-CANALES-LAB-PRODUCT-20260730.md",
+        "orbit360-platform/docs/ACADEMIA-M6-ACCESS-MEMBERSHIP-PROJECTION-20260730.md",
+        "orbit360-platform/docs/ACADEMIA-M6-ACTIONABILITY-VALIDATOR-20260730.md",
+        "orbit360-platform/docs/ACADEMIA-M6-CAUSA-RAIZ-READINESS-ROLLBACK-20260730.md",
+        "orbit360-platform/docs/ACADEMIA-M6-VIEWPORT-ACTIONABILITY-20260730.md",
+        "orbit360-platform/docs/ACADEMIA-PLANILLAS-COMISIONES-FUENTE-PERIODO-Y-PRIMA-NETA-20260801.md",
+        "orbit360-platform/docs/ACLARACION-ALCANCE-PRODUCCION-INFERIDA-NO-ARCHIVO-POLIZAS-20260703.md",
+        "orbit360-platform/docs/ACTUALIZACION-DELTA-CLAUDE-ASEGURADORAS-V1202-20260711.md",
+        "orbit360-platform/docs/ACTUALIZACION-DELTA-CLAUDE-COTIZADOR-COMPARATIVO-V1203-20260711.md",
+        "orbit360-platform/docs/ADDENDUM-CLAUDE-ACADEMIA-PROFUNDA-COMPLETA-POST-PAQUETE-V1330-20260709.md"
+      ],
+      "gaps": []
+    },
+    {
+      "route": "cotizador",
+      "primary": "orbit360-platform/modules/cotizador.js",
+      "relatedScripts": [
+        "orbit360-platform/modules/cotizador-v1203-source-gate.js",
+        "orbit360-platform/modules/cotizador.js"
+      ],
+      "implementation": "WORKED_ACTIVE_MODULE",
+      "loaded": true,
+      "registered": true,
+      "syntaxOk": true,
+      "storeRefs": 4,
+      "directStorageRefs": 0,
+      "demoMarkers": 0,
+      "todoMarkers": 11,
+      "backend": "SHARED_ORBIT_STORE_INTEGRATED",
+      "backendComplete": false,
+      "domainMaturity": "ADVANCED_PROTOTYPE_BACKEND_NOT_COMPLETE",
+      "expectedCollections": [
+        "cotizaciones",
+        "aseguradoras",
+        "tarifas"
+      ],
+      "candidateBlob": "bed763e25072d7cd59333b6a4a655ba5c32219f8",
+      "baselineBlob": "bed763e25072d7cd59333b6a4a655ba5c32219f8",
+      "liveBlob": "bed763e25072d7cd59333b6a4a655ba5c32219f8",
+      "parityBaseline": true,
+      "parityLive": true,
+      "lastApprovedFileCommit": {
+        "commit": "04b1317ab51db18c1619fb09f298d69d08336463",
+        "date": "2026-07-01T19:28:05-06:00",
+        "message": "feat: empalmar Orbit 360 v1.73 con backend LAB protegido"
+      },
+      "lastCandidateFileCommit": {
+        "commit": "04b1317ab51db18c1619fb09f298d69d08336463",
+        "date": "2026-07-01T19:28:05-06:00",
+        "message": "feat: empalmar Orbit 360 v1.73 con backend LAB protegido"
+      },
+      "lastLiveFileCommit": {
+        "commit": "04b1317ab51db18c1619fb09f298d69d08336463",
+        "date": "2026-07-01T19:28:05-06:00",
+        "message": "feat: empalmar Orbit 360 v1.73 con backend LAB protegido"
+      },
+      "postBaselineTouchesInLive": [],
+      "approvalEvidence": "STRONG_REPOSITORY_EVIDENCE",
+      "evidenceFiles": [
+        "orbit360-platform/docs/ACTUALIZACION-DELTA-CLAUDE-COTIZADOR-COMPARATIVO-V1203-20260711.md",
+        "orbit360-platform/docs/ACUMULADO-CLAUDE-ZIP-20260702-142044.md",
+        "orbit360-platform/docs/ADDENDUM-CLAUDE-ACADEMIA-PROFUNDA-COMPLETA-POST-PAQUETE-V1330-20260709.md",
+        "orbit360-platform/docs/ADDENDUM-CONTROL-MAESTRO-CLAUDE-ACADEMIA-P04-EXCEL-20260710.md",
+        "orbit360-platform/docs/ADDENDUM-CONTROL-MAESTRO-CLAUDE-ACADEMIA-P05-DOCUMENTOS-20260710.md",
+        "orbit360-platform/docs/ADDENDUM-CONTROL-MAESTRO-CLAUDE-ACADEMIA-P06-COTIZADORES-REALES-20260710.md",
+        "orbit360-platform/docs/ADDENDUM-CONTROL-MAESTRO-CLAUDE-ACADEMIA-P06B-P06C-20260710.md",
+        "orbit360-platform/docs/ADDENDUM-CONTROL-MAESTRO-CLAUDE-ACADEMIA-P09C-RUNNER-20260710.md",
+        "orbit360-platform/docs/ADDENDUM-CONTROL-MAESTRO-CLAUDE-ASEGURADORAS-MULTIFUENTE-20260710.md",
+        "orbit360-platform/docs/ADDENDUM-CONTROL-MAESTRO-CLAUDE-ASEGURADORAS-P02-SENSIBLES-20260710.md"
+      ],
+      "gaps": [
+        "completar backend/gate del dominio indicado"
+      ]
+    },
+    {
+      "route": "comparativo",
+      "primary": "orbit360-platform/modules/comparativo.js",
+      "relatedScripts": [
+        "orbit360-platform/modules/comparativo-v1203-operational-bridge.js",
+        "orbit360-platform/modules/comparativo.js"
+      ],
+      "implementation": "WORKED_ACTIVE_MODULE",
+      "loaded": true,
+      "registered": true,
+      "syntaxOk": true,
+      "storeRefs": 1,
+      "directStorageRefs": 0,
+      "demoMarkers": 0,
+      "todoMarkers": 8,
+      "backend": "SHARED_ORBIT_STORE_INTEGRATED",
+      "backendComplete": false,
+      "domainMaturity": "ADVANCED_PROTOTYPE_BACKEND_NOT_COMPLETE",
+      "expectedCollections": [
+        "cotizaciones",
+        "documentos"
+      ],
+      "candidateBlob": "b8299b3c01c0f049a214c21fd522f7c186aa828f",
+      "baselineBlob": "b8299b3c01c0f049a214c21fd522f7c186aa828f",
+      "liveBlob": "b8299b3c01c0f049a214c21fd522f7c186aa828f",
+      "parityBaseline": true,
+      "parityLive": true,
+      "lastApprovedFileCommit": {
+        "commit": "04b1317ab51db18c1619fb09f298d69d08336463",
+        "date": "2026-07-01T19:28:05-06:00",
+        "message": "feat: empalmar Orbit 360 v1.73 con backend LAB protegido"
+      },
+      "lastCandidateFileCommit": {
+        "commit": "04b1317ab51db18c1619fb09f298d69d08336463",
+        "date": "2026-07-01T19:28:05-06:00",
+        "message": "feat: empalmar Orbit 360 v1.73 con backend LAB protegido"
+      },
+      "lastLiveFileCommit": {
+        "commit": "04b1317ab51db18c1619fb09f298d69d08336463",
+        "date": "2026-07-01T19:28:05-06:00",
+        "message": "feat: empalmar Orbit 360 v1.73 con backend LAB protegido"
+      },
+      "postBaselineTouchesInLive": [],
+      "approvalEvidence": "STRONG_REPOSITORY_EVIDENCE",
+      "evidenceFiles": [
+        "orbit360-platform/docs/ACTUALIZACION-DELTA-CLAUDE-COTIZADOR-COMPARATIVO-V1203-20260711.md",
+        "orbit360-platform/docs/ACUMULADO-CLAUDE-ZIP-20260702-142044.md",
+        "orbit360-platform/docs/ADDENDUM-CLAUDE-ACADEMIA-PROFUNDA-COMPLETA-POST-PAQUETE-V1330-20260709.md",
+        "orbit360-platform/docs/ADDENDUM-MAESTRO-CONTINUIDAD-CLIENTES-MULTIROL-IMPORTADORES-20260709.md",
+        "orbit360-platform/docs/ADDENDUM-MAESTRO-PATRONES-REUTILIZABLES-CLAUDE-BACKEND-ORBIT360-20260707.md",
+        "orbit360-platform/docs/ADENDA-V181-MERCADO-RECAUDO-GENERAL.md",
+        "orbit360-platform/docs/AUDITORIA-ACCION-ASEGURADORAS-POST-CLIENTES-20260709.md",
+        "orbit360-platform/docs/AUDITORIA-ACCIONES-ADMINISTRATIVAS-DIRECTAS-V1330-20260707.md",
+        "orbit360-platform/docs/AUDITORIA-BLOQUE-POLIZAS-RENOVACIONES-CARTERA-V1330-20260707.md",
+        "orbit360-platform/docs/AUDITORIA-CANDIDATA-CLAUDE-V1187-20260711-214858-COTIZADOR-COMPARATIVO.md"
+      ],
+      "gaps": [
+        "completar backend/gate del dominio indicado"
+      ]
+    },
+    {
+      "route": "cliente360",
+      "primary": "orbit360-platform/modules/cliente360.js",
+      "relatedScripts": [
+        "orbit360-platform/modules/cliente360.js",
+        "orbit360-platform/modules/crm-v1198-operational-bridge.js"
+      ],
+      "implementation": "WORKED_ACTIVE_MODULE",
+      "loaded": true,
+      "registered": true,
+      "syntaxOk": true,
+      "storeRefs": 12,
+      "directStorageRefs": 0,
+      "demoMarkers": 1,
+      "todoMarkers": 18,
+      "backend": "SHARED_ORBIT_STORE_INTEGRATED",
+      "backendComplete": false,
+      "domainMaturity": "REAL_DATA_MIGRATED_READONLY",
+      "expectedCollections": [
+        "clientes",
+        "asesores",
+        "polizas",
+        "vehiculos",
+        "cobros"
+      ],
+      "candidateBlob": "01184d390b12ebfa2bbe7677831e134f838a399e",
+      "baselineBlob": "01184d390b12ebfa2bbe7677831e134f838a399e",
+      "liveBlob": "01184d390b12ebfa2bbe7677831e134f838a399e",
+      "parityBaseline": true,
+      "parityLive": true,
+      "lastApprovedFileCommit": {
+        "commit": "de7c8671883006386184cce3597513c092a7766d",
+        "date": "2026-07-07T14:36:27-06:00",
+        "message": "fix(ays): cliente360 prepara correo sin envio real v1330"
+      },
+      "lastCandidateFileCommit": {
+        "commit": "de7c8671883006386184cce3597513c092a7766d",
+        "date": "2026-07-07T14:36:27-06:00",
+        "message": "fix(ays): cliente360 prepara correo sin envio real v1330"
+      },
+      "lastLiveFileCommit": {
+        "commit": "de7c8671883006386184cce3597513c092a7766d",
+        "date": "2026-07-07T14:36:27-06:00",
+        "message": "fix(ays): cliente360 prepara correo sin envio real v1330"
+      },
+      "postBaselineTouchesInLive": [],
+      "approvalEvidence": "STRONG_REPOSITORY_EVIDENCE",
+      "evidenceFiles": [
+        "orbit360-platform/docs/ACADEMIA-IMPACT-RULES-CANALES-LAB-PRODUCT-20260730.md",
+        "orbit360-platform/docs/ACTUALIZACION-PLAN-VIVO-PORTAL-COBROS-CLIENTE360-DOCUMENTOS-20260708.md",
+        "orbit360-platform/docs/ACUMULADO-CLAUDE-ZIP-20260702-142044.md",
+        "orbit360-platform/docs/ADDENDUM-CLAUDE-ACADEMIA-PROFUNDA-COMPLETA-POST-PAQUETE-V1330-20260709.md",
+        "orbit360-platform/docs/ADDENDUM-CLAUDE-CLIENTE360-DOCUMENTOS-PARCHES-ROLES-V1330-20260709.md",
+        "orbit360-platform/docs/AUDITORIA-BLOQUE-OPS-LEADS-PORTAL-SINIESTROS-PLANTILLAS-AUTOMATIZACIONES-V1330-20260707.md",
+        "orbit360-platform/docs/AUDITORIA-BLOQUE-POLIZAS-RENOVACIONES-CARTERA-V1330-20260707.md",
+        "orbit360-platform/docs/AUDITORIA-CANDIDATA-CLAUDE-V1143-20260706.md",
+        "orbit360-platform/docs/AUDITORIA-CANDIDATA-CLAUDE-V1144-20260706.md",
+        "orbit360-platform/docs/AUDITORIA-CANDIDATA-CLAUDE-V1145-20260706.md"
+      ],
+      "gaps": [
+        "retirar marcadores demo/mock/seed del módulo activo"
+      ]
+    },
+    {
+      "route": "polizas",
+      "primary": "orbit360-platform/modules/polizas.js",
+      "relatedScripts": [
+        "orbit360-platform/modules/issuance-endosos-v1201-bridge.js",
+        "orbit360-platform/modules/issuance-endosos-v1201-refinements.js",
+        "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+        "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+        "orbit360-platform/modules/polizas.js",
+        "orbit360-platform/modules/renewals-v1201-issued-filter.js"
+      ],
+      "implementation": "WORKED_ACTIVE_MODULE",
+      "loaded": true,
+      "registered": true,
+      "syntaxOk": true,
+      "storeRefs": 1,
+      "directStorageRefs": 0,
+      "demoMarkers": 0,
+      "todoMarkers": 0,
+      "backend": "SHARED_ORBIT_STORE_INTEGRATED",
+      "backendComplete": false,
+      "domainMaturity": "REAL_DATA_MIGRATED_READONLY_VISUAL_APPROVAL_PENDING",
+      "expectedCollections": [
+        "polizas",
+        "vehiculos",
+        "recibosEsperados",
+        "carteraPrimas"
+      ],
+      "candidateBlob": "46b197a77c162c88af498b5a89a759386a36e9e7",
+      "baselineBlob": "46b197a77c162c88af498b5a89a759386a36e9e7",
+      "liveBlob": "46b197a77c162c88af498b5a89a759386a36e9e7",
+      "parityBaseline": true,
+      "parityLive": true,
+      "lastApprovedFileCommit": {
+        "commit": "f1aebf8afec798cb1b7a93b6e6d7742d505a95f2",
+        "date": "2026-07-31T14:41:19-06:00",
+        "message": "fix(polizas): index paginate and use canonical expected receipts"
+      },
+      "lastCandidateFileCommit": {
+        "commit": "f1aebf8afec798cb1b7a93b6e6d7742d505a95f2",
+        "date": "2026-07-31T14:41:19-06:00",
+        "message": "fix(polizas): index paginate and use canonical expected receipts"
+      },
+      "lastLiveFileCommit": {
+        "commit": "f1aebf8afec798cb1b7a93b6e6d7742d505a95f2",
+        "date": "2026-07-31T14:41:19-06:00",
+        "message": "fix(polizas): index paginate and use canonical expected receipts"
+      },
+      "postBaselineTouchesInLive": [],
+      "approvalEvidence": "STRONG_REPOSITORY_EVIDENCE",
+      "evidenceFiles": [
+        "orbit360-platform/docs/ACTUALIZACION-DELTA-CLAUDE-CRM-V1198-20260711.md",
+        "orbit360-platform/docs/ACUMULADO-CLAUDE-ZIP-20260702-142044.md",
+        "orbit360-platform/docs/ADDENDUM-CLIENTES-ASESORES-CALIDAD-DATOS-RESPUESTAS-PAULA-20260709.md",
+        "orbit360-platform/docs/ADDENDUM-MAESTRO-CONTINUIDAD-CLIENTES-MULTIROL-IMPORTADORES-20260709.md",
+        "orbit360-platform/docs/ADDENDUM-MAESTRO-PATRONES-REUTILIZABLES-CLAUDE-BACKEND-ORBIT360-20260707.md",
+        "orbit360-platform/docs/ADENDUM-ACADEMIA-PROFUNDA-INTERACTIVA-ORBIT360-AYS-20260704.md",
+        "orbit360-platform/docs/AUDITORIA-BLOQUE-FINANZAS-ASEGURADORAS-MARKETING-V1330-20260707.md",
+        "orbit360-platform/docs/AUDITORIA-BLOQUE-OPS-LEADS-PORTAL-SINIESTROS-PLANTILLAS-AUTOMATIZACIONES-V1330-20260707.md",
+        "orbit360-platform/docs/AUDITORIA-BLOQUE-POLIZAS-RENOVACIONES-CARTERA-V1330-20260707.md",
+        "orbit360-platform/docs/AUDITORIA-CANDIDATO-CLAUDE-20260704-140022.md"
+      ],
+      "gaps": [
+        "completar backend/gate del dominio indicado"
+      ]
+    },
+    {
+      "route": "cobros",
+      "primary": "orbit360-platform/modules/cobros.js",
+      "relatedScripts": [
+        "orbit360-platform/modules/cobros.js",
+        "orbit360-platform/modules/crm-v1198-operational-bridge.js",
+        "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+        "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js"
+      ],
+      "implementation": "WORKED_ACTIVE_MODULE",
+      "loaded": true,
+      "registered": true,
+      "syntaxOk": true,
+      "storeRefs": 1,
+      "directStorageRefs": 0,
+      "demoMarkers": 0,
+      "todoMarkers": 1,
+      "backend": "SHARED_ORBIT_STORE_INTEGRATED",
+      "backendComplete": false,
+      "domainMaturity": "REAL_DATA_MIGRATED_CONTROLLED_WRITES_EXIST_VISUAL_APPROVAL_PENDING",
+      "expectedCollections": [
+        "cobros",
+        "recibosEsperados",
+        "carteraPrimas"
+      ],
+      "candidateBlob": "5b657ff0819f1c942abf6e68549f83102ce830fb",
+      "baselineBlob": "5b657ff0819f1c942abf6e68549f83102ce830fb",
+      "liveBlob": "5b657ff0819f1c942abf6e68549f83102ce830fb",
+      "parityBaseline": true,
+      "parityLive": true,
+      "lastApprovedFileCommit": {
+        "commit": "a9502f7966ae2acd6525c9490d6ecf88151fb0ac",
+        "date": "2026-07-07T16:18:25-06:00",
+        "message": "fix(ays): cobros prepara recordatorios por lote v1330"
+      },
+      "lastCandidateFileCommit": {
+        "commit": "a9502f7966ae2acd6525c9490d6ecf88151fb0ac",
+        "date": "2026-07-07T16:18:25-06:00",
+        "message": "fix(ays): cobros prepara recordatorios por lote v1330"
+      },
+      "lastLiveFileCommit": {
+        "commit": "a9502f7966ae2acd6525c9490d6ecf88151fb0ac",
+        "date": "2026-07-07T16:18:25-06:00",
+        "message": "fix(ays): cobros prepara recordatorios por lote v1330"
+      },
+      "postBaselineTouchesInLive": [],
+      "approvalEvidence": "STRONG_REPOSITORY_EVIDENCE",
+      "evidenceFiles": [
+        "orbit360-platform/docs/ACADEMIA-COBROS-GATE10.9-WRITE-PASS-20260801.md",
+        "orbit360-platform/docs/ACADEMIA-CONCILIACION-MULTIEVIDENCIA-TEMPORAL-20260801.md",
+        "orbit360-platform/docs/ACADEMIA-GATE-UNICO-ESCRITURA-COBROS-20260801.md",
+        "orbit360-platform/docs/ACADEMIA-IMPACT-CARTERA-HISTORICA-EXIGIBLE-20260730.md",
+        "orbit360-platform/docs/ACADEMIA-IMPACT-IDEMPOTENCIA-CONCILIACION-IMPORTADOR-20260731.md",
+        "orbit360-platform/docs/ACADEMIA-IMPACT-RECIBOS-CARTERA-CONCILIACION-20260730.md",
+        "orbit360-platform/docs/ACADEMIA-IMPACT-REVISION-HUMANA-POLIZAS-RECIBOS-20260731.md",
+        "orbit360-platform/docs/ACADEMIA-IMPACT-VEHICULOS-IMPORTADOR-IDENTIDAD-20260730.md",
+        "orbit360-platform/docs/ACADEMIA-IMPACTO-AUDITORIA-UNIFICADA-V1330-20260708.md",
+        "orbit360-platform/docs/ACADEMIA-IMPACTO-CLIENTE360-DOCUMENTOS-PARCHES-ROLES-V1330-20260709.md"
+      ],
+      "gaps": [
+        "completar backend/gate del dominio indicado"
+      ]
+    },
+    {
+      "route": "conciliaciones",
+      "primary": "orbit360-platform/modules/conciliaciones.js",
+      "relatedScripts": [
+        "orbit360-platform/modules/conciliaciones.js"
+      ],
+      "implementation": "WORKED_ACTIVE_MODULE",
+      "loaded": true,
+      "registered": true,
+      "syntaxOk": true,
+      "storeRefs": 1,
+      "directStorageRefs": 0,
+      "demoMarkers": 0,
+      "todoMarkers": 0,
+      "backend": "SHARED_ORBIT_STORE_INTEGRATED",
+      "backendComplete": false,
+      "domainMaturity": "LOGIC_WORKED_BACKEND_PARTIAL",
+      "expectedCollections": [
+        "cobros",
+        "polizas",
+        "finmovs"
+      ],
+      "candidateBlob": "cc8684af6f7d7d1e967cf1d4b4459ee28ebc5bf8",
+      "baselineBlob": "cc8684af6f7d7d1e967cf1d4b4459ee28ebc5bf8",
+      "liveBlob": "cc8684af6f7d7d1e967cf1d4b4459ee28ebc5bf8",
+      "parityBaseline": true,
+      "parityLive": true,
+      "lastApprovedFileCommit": {
+        "commit": "57a1237b7a131c5f8b31dafcd1907c599180c092",
+        "date": "2026-07-31T19:44:41-06:00",
+        "message": "establish canonical read-only cobros reconciliation owner"
+      },
+      "lastCandidateFileCommit": {
+        "commit": "57a1237b7a131c5f8b31dafcd1907c599180c092",
+        "date": "2026-07-31T19:44:41-06:00",
+        "message": "establish canonical read-only cobros reconciliation owner"
+      },
+      "lastLiveFileCommit": {
+        "commit": "57a1237b7a131c5f8b31dafcd1907c599180c092",
+        "date": "2026-07-31T19:44:41-06:00",
+        "message": "establish canonical read-only cobros reconciliation owner"
+      },
+      "postBaselineTouchesInLive": [],
+      "approvalEvidence": "STRONG_REPOSITORY_EVIDENCE",
+      "evidenceFiles": [
+        "orbit360-platform/docs/ACADEMIA-PLANILLAS-COMISIONES-WRITE-ATOMICO-Y-BARRERA-VISUAL-20260801.md",
+        "orbit360-platform/docs/ACTUALIZACION-DELTA-CLAUDE-POLIZA-RECIBOS-V1199-20260711.md",
+        "orbit360-platform/docs/ACTUALIZACION-PLAN-VIVO-POST-EQUIPO-CONFIG-M5-V1330-20260708.md",
+        "orbit360-platform/docs/ADDENDUM-CLAUDE-ACADEMIA-PROFUNDA-COMPLETA-POST-PAQUETE-V1330-20260709.md",
+        "orbit360-platform/docs/ADDENDUM-MAESTRO-CONTROL-PLANE-GATES-INMUTABLES-ORBIT360-AYS-20260722.md",
+        "orbit360-platform/docs/ADENDA-V181-VALOR-AGREGADO-INTELIGENTE-MODULAR.md",
+        "orbit360-platform/docs/AUDITORIA-ACCIONES-ADMINISTRATIVAS-DIRECTAS-V1330-20260707.md",
+        "orbit360-platform/docs/AUDITORIA-BLOQUE-CONCILIACIONES-INTEGRACIONES-V1330-20260707.md",
+        "orbit360-platform/docs/AUDITORIA-BLOQUE-FINANZAS-ASEGURADORAS-MARKETING-V1330-20260707.md",
+        "orbit360-platform/docs/AUDITORIA-CANDIDATA-CLAUDE-V1143-20260706.md"
+      ],
+      "gaps": [
+        "completar backend/gate del dominio indicado"
+      ]
+    },
+    {
+      "route": "renovaciones",
+      "primary": "orbit360-platform/modules/renovaciones.js",
+      "relatedScripts": [
+        "orbit360-platform/modules/issuance-endosos-v1201-bridge.js",
+        "orbit360-platform/modules/issuance-endosos-v1201-refinements.js",
+        "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
+        "orbit360-platform/modules/renewals-v1200-permission-guard.js",
+        "orbit360-platform/modules/renewals-v1201-issued-filter.js",
+        "orbit360-platform/modules/renovaciones.js"
+      ],
+      "implementation": "WORKED_ACTIVE_MODULE",
+      "loaded": true,
+      "registered": true,
+      "syntaxOk": true,
+      "storeRefs": 1,
+      "directStorageRefs": 0,
+      "demoMarkers": 0,
+      "todoMarkers": 0,
+      "backend": "SHARED_ORBIT_STORE_INTEGRATED",
+      "backendComplete": false,
+      "domainMaturity": "LOGIC_WORKED_BACKEND_PARTIAL",
+      "expectedCollections": [
+        "polizas",
+        "gestiones"
+      ],
+      "candidateBlob": "b40cc7f07c328cd8a2be23025cf5ae73153ce353",
+      "baselineBlob": "b40cc7f07c328cd8a2be23025cf5ae73153ce353",
+      "liveBlob": "b40cc7f07c328cd8a2be23025cf5ae73153ce353",
+      "parityBaseline": true,
+      "parityLive": true,
+      "lastApprovedFileCommit": {
+        "commit": "65e309b0cd0420a3b790a52baa7e28c3d76ec3b7",
+        "date": "2026-07-07T10:56:35-06:00",
+        "message": "fix(ays): hotfixes renovaciones credenciales finanzas v1330"
+      },
+      "lastCandidateFileCommit": {
+        "commit": "65e309b0cd0420a3b790a52baa7e28c3d76ec3b7",
+        "date": "2026-07-07T10:56:35-06:00",
+        "message": "fix(ays): hotfixes renovaciones credenciales finanzas v1330"
+      },
+      "lastLiveFileCommit": {
+        "commit": "65e309b0cd0420a3b790a52baa7e28c3d76ec3b7",
+        "date": "2026-07-07T10:56:35-06:00",
+        "message": "fix(ays): hotfixes renovaciones credenciales finanzas v1330"
+      },
+      "postBaselineTouchesInLive": [],
+      "approvalEvidence": "STRONG_REPOSITORY_EVIDENCE",
+      "evidenceFiles": [
+        "orbit360-platform/docs/ACADEMIA-IMPACT-VEHICULOS-IMPORTADOR-IDENTIDAD-20260730.md",
+        "orbit360-platform/docs/ACADEMIA-IMPACTO-CLIENTE360-POLIZAS-VEHICULOS-FULLPAGE-20260731.md",
+        "orbit360-platform/docs/ACADEMIA-PLANILLAS-COMISIONES-FUENTE-PERIODO-Y-PRIMA-NETA-20260801.md",
+        "orbit360-platform/docs/ACLARACION-ALCANCE-PRODUCCION-INFERIDA-NO-ARCHIVO-POLIZAS-20260703.md",
+        "orbit360-platform/docs/ACUMULADO-CLAUDE-ZIP-20260702-142044.md",
+        "orbit360-platform/docs/ADDENDUM-CLAUDE-ACADEMIA-PROFUNDA-COMPLETA-POST-PAQUETE-V1330-20260709.md",
+        "orbit360-platform/docs/ADDENDUM-MAESTRO-PATRONES-REUTILIZABLES-CLAUDE-BACKEND-ORBIT360-20260707.md",
+        "orbit360-platform/docs/ADDENDUM-RENOVACIONES-PERMISOS-V1200B-20260711.md",
+        "orbit360-platform/docs/ADENDUM-ACADEMIA-PROFUNDA-INTERACTIVA-ORBIT360-AYS-20260704.md",
+        "orbit360-platform/docs/AUDITORIA-BLOQUE-FINANZAS-ASEGURADORAS-MARKETING-V1330-20260707.md"
+      ],
+      "gaps": [
+        "completar backend/gate del dominio indicado"
+      ]
+    },
+    {
+      "route": "cancelaciones",
+      "primary": "orbit360-platform/modules/cancelaciones.js",
+      "relatedScripts": [
+        "orbit360-platform/modules/cancelaciones.js"
+      ],
+      "implementation": "WORKED_ACTIVE_MODULE",
+      "loaded": true,
+      "registered": true,
+      "syntaxOk": true,
+      "storeRefs": 1,
+      "directStorageRefs": 0,
+      "demoMarkers": 0,
+      "todoMarkers": 1,
+      "backend": "SHARED_ORBIT_STORE_INTEGRATED",
+      "backendComplete": false,
+      "domainMaturity": "FRONTEND_WORKED_BACKEND_PARTIAL",
+      "expectedCollections": [
+        "polizas",
+        "cancelaciones"
+      ],
+      "candidateBlob": "0112ac6ac3aa0c50000d3a9532db9e573af2f9b0",
+      "baselineBlob": "0112ac6ac3aa0c50000d3a9532db9e573af2f9b0",
+      "liveBlob": "0112ac6ac3aa0c50000d3a9532db9e573af2f9b0",
+      "parityBaseline": true,
+      "parityLive": true,
+      "lastApprovedFileCommit": {
+        "commit": "c6f5bedbe2cbdc0e8a3703936dfac223a6c76bd4",
+        "date": "2026-07-07T16:42:44-06:00",
+        "message": "fix(ays): cancelaciones evita duplicar recuperaciones v1330"
+      },
+      "lastCandidateFileCommit": {
+        "commit": "c6f5bedbe2cbdc0e8a3703936dfac223a6c76bd4",
+        "date": "2026-07-07T16:42:44-06:00",
+        "message": "fix(ays): cancelaciones evita duplicar recuperaciones v1330"
+      },
+      "lastLiveFileCommit": {
+        "commit": "c6f5bedbe2cbdc0e8a3703936dfac223a6c76bd4",
+        "date": "2026-07-07T16:42:44-06:00",
+        "message": "fix(ays): cancelaciones evita duplicar recuperaciones v1330"
+      },
+      "postBaselineTouchesInLive": [],
+      "approvalEvidence": "STRONG_REPOSITORY_EVIDENCE",
+      "evidenceFiles": [
+        "orbit360-platform/docs/ACUMULADO-CLAUDE-ZIP-20260702-142044.md",
+        "orbit360-platform/docs/ADENDUM-ACADEMIA-PROFUNDA-INTERACTIVA-ORBIT360-AYS-20260704.md",
+        "orbit360-platform/docs/AUDITORIA-BLOQUE-MARKETING-CALIDAD-REPORTES-V1330-20260707.md",
+        "orbit360-platform/docs/AUDITORIA-BLOQUE-POLIZAS-RENOVACIONES-CARTERA-V1330-20260707.md",
+        "orbit360-platform/docs/AUDITORIA-CIERRE-CRM-TRANSVERSAL-V1198-20260711.md",
+        "orbit360-platform/docs/AUDITORIA-CIERRE-PARCIAL-NUCLEO-CRM-POST-HOTFIX-V1330-20260707.md",
+        "orbit360-platform/docs/AUDITORIA-DIAGNOSTICO-OPS-RUTEO-NOTIFICACIONES-V123-20260704.md",
+        "orbit360-platform/docs/AUDITORIA-FORENSE-CANDIDATO-ACTIVO-CLAUDE-20260704-152321.md",
+        "orbit360-platform/docs/AUDITORIA-FORENSE-CANDIDATO-CLAUDE-20260704-193658.md",
+        "orbit360-platform/docs/AUDITORIA-FORENSE-CANDIDATO-CLAUDE-20260704-202655.md"
+      ],
+      "gaps": [
+        "completar backend/gate del dominio indicado"
+      ]
+    },
+    {
+      "route": "siniestros",
+      "primary": "orbit360-platform/modules/siniestros.js",
+      "relatedScripts": [
+        "orbit360-platform/modules/siniestros.js"
+      ],
+      "implementation": "WORKED_ACTIVE_MODULE",
+      "loaded": true,
+      "registered": true,
+      "syntaxOk": true,
+      "storeRefs": 1,
+      "directStorageRefs": 0,
+      "demoMarkers": 0,
+      "todoMarkers": 2,
+      "backend": "SHARED_ORBIT_STORE_INTEGRATED",
+      "backendComplete": false,
+      "domainMaturity": "FRONTEND_WORKED_DATA_MIGRATION_PENDING",
+      "expectedCollections": [
+        "siniestros",
+        "polizas",
+        "clientes"
+      ],
+      "candidateBlob": "7a691dfe8d569448b7afcce5351f54bcbaced451",
+      "baselineBlob": "7a691dfe8d569448b7afcce5351f54bcbaced451",
+      "liveBlob": "7a691dfe8d569448b7afcce5351f54bcbaced451",
+      "parityBaseline": true,
+      "parityLive": true,
+      "lastApprovedFileCommit": {
+        "commit": "f16c262d754ece981d190398ab567b30ffa14ab7",
+        "date": "2026-07-07T16:41:57-06:00",
+        "message": "fix(ays): siniestros exige motivo en estados finales v1330"
+      },
+      "lastCandidateFileCommit": {
+        "commit": "f16c262d754ece981d190398ab567b30ffa14ab7",
+        "date": "2026-07-07T16:41:57-06:00",
+        "message": "fix(ays): siniestros exige motivo en estados finales v1330"
+      },
+      "lastLiveFileCommit": {
+        "commit": "f16c262d754ece981d190398ab567b30ffa14ab7",
+        "date": "2026-07-07T16:41:57-06:00",
+        "message": "fix(ays): siniestros exige motivo en estados finales v1330"
+      },
+      "postBaselineTouchesInLive": [],
+      "approvalEvidence": "STRONG_REPOSITORY_EVIDENCE",
+      "evidenceFiles": [
+        "orbit360-platform/docs/ACUMULADO-CLAUDE-ZIP-20260702-142044.md",
+        "orbit360-platform/docs/ADDENDUM-CLAUDE-ACADEMIA-PROFUNDA-COMPLETA-POST-PAQUETE-V1330-20260709.md",
+        "orbit360-platform/docs/ADDENDUM-MAESTRO-PATRONES-REUTILIZABLES-CLAUDE-BACKEND-ORBIT360-20260707.md",
+        "orbit360-platform/docs/ADENDUM-ACADEMIA-PROFUNDA-INTERACTIVA-ORBIT360-AYS-20260704.md",
+        "orbit360-platform/docs/AUDITORIA-ACCION-ASEGURADORAS-POST-CLIENTES-20260709.md",
+        "orbit360-platform/docs/AUDITORIA-BLOQUE-MARKETING-CALIDAD-REPORTES-V1330-20260707.md",
+        "orbit360-platform/docs/AUDITORIA-BLOQUE-OPS-LEADS-PORTAL-SINIESTROS-PLANTILLAS-AUTOMATIZACIONES-V1330-20260707.md",
+        "orbit360-platform/docs/AUDITORIA-CALIDAD-DATOS-AYS-V104-20260703.md",
+        "orbit360-platform/docs/AUDITORIA-CELULAR-MODULOS-VISIBLES-V1330-20260708.md",
+        "orbit360-platform/docs/AUDITORIA-CIERRE-PARCIAL-NUCLEO-CRM-POST-HOTFIX-V1330-20260707.md"
+      ],
+      "gaps": [
+        "completar backend/gate del dominio indicado"
+      ]
+    },
+    {
+      "route": "historial",
+      "primary": "orbit360-platform/modules/historial.js",
+      "relatedScripts": [
+        "orbit360-platform/modules/historial.js"
+      ],
+      "implementation": "WORKED_ACTIVE_MODULE",
+      "loaded": true,
+      "registered": true,
+      "syntaxOk": true,
+      "storeRefs": 1,
+      "directStorageRefs": 0,
+      "demoMarkers": 0,
+      "todoMarkers": 0,
+      "backend": "SHARED_ORBIT_STORE_INTEGRATED",
+      "backendComplete": false,
+      "domainMaturity": "FRONTEND_WORKED_BACKEND_PARTIAL",
+      "expectedCollections": [
+        "historial",
+        "gestiones"
+      ],
+      "candidateBlob": "c003c04e3697518ff92598c4f633a1b1973470a8",
+      "baselineBlob": "c003c04e3697518ff92598c4f633a1b1973470a8",
+      "liveBlob": "c003c04e3697518ff92598c4f633a1b1973470a8",
+      "parityBaseline": true,
+      "parityLive": true,
+      "lastApprovedFileCommit": {
+        "commit": "1b02f7ae30474135698157f86156933f11f9d234",
+        "date": "2026-07-07T13:22:35-06:00",
+        "message": "fix(ays): ampliar tipos historial v1330"
+      },
+      "lastCandidateFileCommit": {
+        "commit": "1b02f7ae30474135698157f86156933f11f9d234",
+        "date": "2026-07-07T13:22:35-06:00",
+        "message": "fix(ays): ampliar tipos historial v1330"
+      },
+      "lastLiveFileCommit": {
+        "commit": "1b02f7ae30474135698157f86156933f11f9d234",
+        "date": "2026-07-07T13:22:35-06:00",
+        "message": "fix(ays): ampliar tipos historial v1330"
+      },
+      "postBaselineTouchesInLive": [],
+      "approvalEvidence": "STRONG_REPOSITORY_EVIDENCE",
+      "evidenceFiles": [
+        "orbit360-platform/docs/ACADEMIA-IMPACTO-AUDITORIA-UNIFICADA-V1330-20260708.md",
+        "orbit360-platform/docs/ACADEMIA-IMPACTO-CLIENTE360-DOCUMENTOS-PARCHES-ROLES-V1330-20260709.md",
+        "orbit360-platform/docs/ACADEMIA-IMPACTO-CLIENTE360-POLIZAS-VEHICULOS-FULLPAGE-20260731.md",
+        "orbit360-platform/docs/ACADEMIA-POST-AUDITORIA-CANDIDATA-CLAUDE-V1330-20260708.md",
+        "orbit360-platform/docs/ACTUALIZACION-DELTA-CLAUDE-COTIZADOR-COMPARATIVO-V1203-20260711.md",
+        "orbit360-platform/docs/ACTUALIZACION-PLAN-VIVO-AUDITORIA-UNIFICADA-V1330-20260708.md",
+        "orbit360-platform/docs/ACTUALIZACION-PLAN-VIVO-CLIENTE360-DOCUMENTOS-PARCHES-ROLES-V1330-20260709.md",
+        "orbit360-platform/docs/ACTUALIZACION-PLAN-VIVO-EMPALME-HOTFIX-P0-PORTAL-V1330-20260708.md",
+        "orbit360-platform/docs/ACTUALIZACION-PLAN-VIVO-REAUDITORIA-CORREGIDA-183042-20260709.md",
+        "orbit360-platform/docs/ADDENDUM-CLAUDE-ACADEMIA-PROFUNDA-COMPLETA-POST-PAQUETE-V1330-20260709.md"
+      ],
+      "gaps": [
+        "completar backend/gate del dominio indicado"
+      ]
+    },
+    {
+      "route": "comisiones",
+      "primary": "orbit360-platform/modules/comisiones.js",
+      "relatedScripts": [
+        "orbit360-platform/modules/comisiones.js"
+      ],
+      "implementation": "WORKED_ACTIVE_MODULE",
+      "loaded": true,
+      "registered": true,
+      "syntaxOk": true,
+      "storeRefs": 1,
+      "directStorageRefs": 0,
+      "demoMarkers": 0,
+      "todoMarkers": 0,
+      "backend": "SHARED_ORBIT_STORE_INTEGRATED",
+      "backendComplete": false,
+      "domainMaturity": "CONTROLLED_DATA_LOADED_PARTIAL_HOLD_PRESENT",
+      "expectedCollections": [
+        "comisiones",
+        "planillaComisiones",
+        "documentos"
+      ],
+      "candidateBlob": "854b8740e92e373d9b46f41cc18c2ea010978a28",
+      "baselineBlob": "854b8740e92e373d9b46f41cc18c2ea010978a28",
+      "liveBlob": "854b8740e92e373d9b46f41cc18c2ea010978a28",
+      "parityBaseline": true,
+      "parityLive": true,
+      "lastApprovedFileCommit": {
+        "commit": "de23c01e23bae799ec7b305a393ccd3a22391e37",
+        "date": "2026-07-06T19:48:54-06:00",
+        "message": "feat(ays): empalmar comisiones v1330 candidata 20260706"
+      },
+      "lastCandidateFileCommit": {
+        "commit": "de23c01e23bae799ec7b305a393ccd3a22391e37",
+        "date": "2026-07-06T19:48:54-06:00",
+        "message": "feat(ays): empalmar comisiones v1330 candidata 20260706"
+      },
+      "lastLiveFileCommit": {
+        "commit": "de23c01e23bae799ec7b305a393ccd3a22391e37",
+        "date": "2026-07-06T19:48:54-06:00",
+        "message": "feat(ays): empalmar comisiones v1330 candidata 20260706"
+      },
+      "postBaselineTouchesInLive": [],
+      "approvalEvidence": "STRONG_REPOSITORY_EVIDENCE",
+      "evidenceFiles": [
+        "orbit360-platform/docs/ACADEMIA-CONCILIACION-MULTIEVIDENCIA-TEMPORAL-20260801.md",
+        "orbit360-platform/docs/ACADEMIA-IMPACTO-ROLES-PERMISOS-ACCIONES-SENSIBLES-V1330-20260708.md",
+        "orbit360-platform/docs/ACADEMIA-MATERIALIZACION-PRIVADA-REAL-COBROS-20260801.md",
+        "orbit360-platform/docs/ACADEMIA-PLANILLAS-COMISIONES-FUENTE-PERIODO-Y-PRIMA-NETA-20260801.md",
+        "orbit360-platform/docs/ACADEMIA-PLANILLAS-COMISIONES-WRITE-ATOMICO-Y-BARRERA-VISUAL-20260801.md",
+        "orbit360-platform/docs/ADDENDUM-CLAUDE-ACADEMIA-PROFUNDA-COMPLETA-POST-PAQUETE-V1330-20260709.md",
+        "orbit360-platform/docs/ADDENDUM-MAESTRO-CONTINUIDAD-CLIENTES-MULTIROL-IMPORTADORES-20260709.md",
+        "orbit360-platform/docs/ADDENDUM-MAESTRO-PATRONES-REUTILIZABLES-CLAUDE-BACKEND-ORBIT360-20260707.md",
+        "orbit360-platform/docs/ADENDUM-ACADEMIA-PROFUNDA-INTERACTIVA-ORBIT360-AYS-20260704.md",
+        "orbit360-platform/docs/AUDITORIA-ACCION-ASEGURADORAS-POST-CLIENTES-20260709.md"
+      ],
+      "gaps": [
+        "completar backend/gate del dominio indicado"
+      ]
+    },
+    {
+      "route": "importar",
+      "primary": "orbit360-platform/modules/importar.js",
+      "relatedScripts": [
+        "orbit360-platform/modules/importar-initial-tenant-lab.js",
+        "orbit360-platform/modules/importar-p0-confirmacion.js",
+        "orbit360-platform/modules/importar-p0-dashboard.js",
+        "orbit360-platform/modules/importar.js"
+      ],
+      "implementation": "WORKED_ACTIVE_MODULE",
+      "loaded": true,
+      "registered": true,
+      "syntaxOk": true,
+      "storeRefs": 0,
+      "directStorageRefs": 0,
+      "demoMarkers": 0,
+      "todoMarkers": 0,
+      "backend": "CORE_SERVICE_INTEGRATED_NO_DIRECT_STORE",
+      "backendComplete": false,
+      "domainMaturity": "IMPORTER_ARCHITECTURE_WORKED_PRODUCTIVE_GENERALIZATION_PENDING",
+      "expectedCollections": [
+        "importaciones",
+        "auditoria"
+      ],
+      "candidateBlob": "9741c455a9d332ea90231ad59053b57452b822eb",
+      "baselineBlob": "9741c455a9d332ea90231ad59053b57452b822eb",
+      "liveBlob": "9741c455a9d332ea90231ad59053b57452b822eb",
+      "parityBaseline": true,
+      "parityLive": true,
+      "lastApprovedFileCommit": {
+        "commit": "a0b6c0362667c787a7dfb4d2438fe9bef4a9909d",
+        "date": "2026-07-20T22:24:56-06:00",
+        "message": "fix(importers): make controlled-write loader deterministic"
+      },
+      "lastCandidateFileCommit": {
+        "commit": "a0b6c0362667c787a7dfb4d2438fe9bef4a9909d",
+        "date": "2026-07-20T22:24:56-06:00",
+        "message": "fix(importers): make controlled-write loader deterministic"
+      },
+      "lastLiveFileCommit": {
+        "commit": "a0b6c0362667c787a7dfb4d2438fe9bef4a9909d",
+        "date": "2026-07-20T22:24:56-06:00",
+        "message": "fix(importers): make controlled-write loader deterministic"
+      },
+      "postBaselineTouchesInLive": [],
+      "approvalEvidence": "STRONG_REPOSITORY_EVIDENCE",
+      "evidenceFiles": [
+        "orbit360-platform/docs/ACADEMIA-COBROS-GATE10.9-WRITE-PASS-20260801.md",
+        "orbit360-platform/docs/ACADEMIA-IMPACT-IDEMPOTENCIA-CONCILIACION-IMPORTADOR-20260731.md",
+        "orbit360-platform/docs/ACADEMIA-IMPACTO-CLIENTE360-POLIZAS-VEHICULOS-FULLPAGE-20260731.md",
+        "orbit360-platform/docs/ACADEMIA-POLIZAS-RUTAS-CANONICA-HEREDADA-Y-GATES-VISUALES-20260801.md",
+        "orbit360-platform/docs/ACTUALIZACION-DELTA-CLAUDE-ASEGURADORAS-V1202-20260711.md",
+        "orbit360-platform/docs/ADDENDUM-CLIENTES-ASESORES-CALIDAD-DATOS-RESPUESTAS-PAULA-20260709.md",
+        "orbit360-platform/docs/ADDENDUM-MAESTRO-CONTINUIDAD-CLIENTES-MULTIROL-IMPORTADORES-20260709.md",
+        "orbit360-platform/docs/ADDENDUM-MAESTRO-DIRECTORIO-OPERATIVO-USUARIOS-CUENTAS-20260722.md",
+        "orbit360-platform/docs/ADENDA-V181-MERCADO-RECAUDO-GENERAL.md",
+        "orbit360-platform/docs/ADENDUM-MAESTRO-CONTROL-CAUSA-RAIZ-VALIDADORES-GATES-ORBIT360-AYS-20260717.md"
+      ],
+      "gaps": [
+        "completar backend/gate del dominio indicado"
+      ]
+    },
+    {
+      "route": "calidad",
+      "primary": "orbit360-platform/modules/calidad.js",
+      "relatedScripts": [
+        "orbit360-platform/modules/calidad.js"
+      ],
+      "implementation": "WORKED_ACTIVE_MODULE",
+      "loaded": true,
+      "registered": true,
+      "syntaxOk": true,
+      "storeRefs": 1,
+      "directStorageRefs": 0,
+      "demoMarkers": 0,
+      "todoMarkers": 2,
+      "backend": "SHARED_ORBIT_STORE_INTEGRATED",
+      "backendComplete": false,
+      "domainMaturity": "FRONTEND_WORKED_SHARED_STORE",
+      "expectedCollections": [
+        "clientes",
+        "polizas"
+      ],
+      "candidateBlob": "c8cf5c9acce745ebfd4ae9f7df806fbb2797547d",
+      "baselineBlob": "c8cf5c9acce745ebfd4ae9f7df806fbb2797547d",
+      "liveBlob": "c8cf5c9acce745ebfd4ae9f7df806fbb2797547d",
+      "parityBaseline": true,
+      "parityLive": true,
+      "lastApprovedFileCommit": {
+        "commit": "8e7182023e57b44615791f8590a947498dd3641f",
+        "date": "2026-07-19T22:18:56-06:00",
+        "message": "fix(block1): integrar país y moneda en calidad de datos"
+      },
+      "lastCandidateFileCommit": {
+        "commit": "8e7182023e57b44615791f8590a947498dd3641f",
+        "date": "2026-07-19T22:18:56-06:00",
+        "message": "fix(block1): integrar país y moneda en calidad de datos"
+      },
+      "lastLiveFileCommit": {
+        "commit": "8e7182023e57b44615791f8590a947498dd3641f",
+        "date": "2026-07-19T22:18:56-06:00",
+        "message": "fix(block1): integrar país y moneda en calidad de datos"
+      },
+      "postBaselineTouchesInLive": [],
+      "approvalEvidence": "STRONG_REPOSITORY_EVIDENCE",
+      "evidenceFiles": [
+        "orbit360-platform/docs/ACADEMIA-IMPACT-CLIENTE360-CAMPOS-OPCIONALES-20260731.md",
+        "orbit360-platform/docs/ACADEMIA-IMPACT-RECIBOS-CARTERA-CONCILIACION-20260730.md",
+        "orbit360-platform/docs/ACADEMIA-IMPACT-REVISION-HUMANA-POLIZAS-RECIBOS-20260731.md",
+        "orbit360-platform/docs/ACADEMIA-IMPACT-VEHICULOS-IMPORTADOR-IDENTIDAD-20260730.md",
+        "orbit360-platform/docs/ACADEMIA-IMPACTO-CLIENTE360-POLIZAS-VEHICULOS-FULLPAGE-20260731.md",
+        "orbit360-platform/docs/ACADEMIA-INTEGRIDAD-REFERENCIAL-PADRES-HOLD-20260801.md",
+        "orbit360-platform/docs/ACADEMIA-INTEGRIDAD-REFERENCIAL-PADRES-HOLD-Y-READ-MODEL-20260801.md",
+        "orbit360-platform/docs/ACADEMIA-PADRES-RESTRINGIDOS-CREATE-ONLY-Y-CALIDAD-20260801.md",
+        "orbit360-platform/docs/ACADEMIA-PLANILLAS-COMISIONES-FUENTE-PERIODO-Y-PRIMA-NETA-20260801.md",
+        "orbit360-platform/docs/ACADEMIA-UNICO-OWNER-LECTURA-CANONICA-Y-VALIDADOR-ACTIVO-20260801.md"
+      ],
+      "gaps": []
+    },
+    {
+      "route": "plantillas",
+      "primary": "orbit360-platform/modules/plantillas.js",
+      "relatedScripts": [
+        "orbit360-platform/modules/plantillas.js"
+      ],
+      "implementation": "WORKED_ACTIVE_MODULE",
+      "loaded": true,
+      "registered": true,
+      "syntaxOk": true,
+      "storeRefs": 2,
+      "directStorageRefs": 0,
+      "demoMarkers": 2,
+      "todoMarkers": 3,
+      "backend": "SHARED_ORBIT_STORE_INTEGRATED",
+      "backendComplete": false,
+      "domainMaturity": "FRONTEND_WORKED_BACKEND_PARTIAL",
+      "expectedCollections": [
+        "plantillas"
+      ],
+      "candidateBlob": "66f570d725e82beebfffad6df4e86aa8ab4ebd08",
+      "baselineBlob": "66f570d725e82beebfffad6df4e86aa8ab4ebd08",
+      "liveBlob": "66f570d725e82beebfffad6df4e86aa8ab4ebd08",
+      "parityBaseline": true,
+      "parityLive": true,
+      "lastApprovedFileCommit": {
+        "commit": "15f6224754ecafed538a4d36bf7ecca70f43a9b0",
+        "date": "2026-07-07T12:34:20-06:00",
+        "message": "fix(ays): plantillas whatsapp con trazabilidad honesta"
+      },
+      "lastCandidateFileCommit": {
+        "commit": "15f6224754ecafed538a4d36bf7ecca70f43a9b0",
+        "date": "2026-07-07T12:34:20-06:00",
+        "message": "fix(ays): plantillas whatsapp con trazabilidad honesta"
+      },
+      "lastLiveFileCommit": {
+        "commit": "15f6224754ecafed538a4d36bf7ecca70f43a9b0",
+        "date": "2026-07-07T12:34:20-06:00",
+        "message": "fix(ays): plantillas whatsapp con trazabilidad honesta"
+      },
+      "postBaselineTouchesInLive": [],
+      "approvalEvidence": "STRONG_REPOSITORY_EVIDENCE",
+      "evidenceFiles": [
+        "orbit360-platform/docs/ACTUALIZACION-DELTA-CLAUDE-COTIZADOR-COMPARATIVO-V1203-20260711.md",
+        "orbit360-platform/docs/ADDENDUM-CLAUDE-ACADEMIA-PROFUNDA-COMPLETA-POST-PAQUETE-V1330-20260709.md",
+        "orbit360-platform/docs/ADDENDUM-NOTIFICACIONES-CORREO-POR-USUARIO-AUTORIZADO-20260704.md",
+        "orbit360-platform/docs/AUDITORIA-BLOQUE-CONFIG-EQUIPO-NOTIFICACIONES-CORREO-V1330-20260707.md",
+        "orbit360-platform/docs/AUDITORIA-BLOQUE-OPS-LEADS-PORTAL-SINIESTROS-PLANTILLAS-AUTOMATIZACIONES-V1330-20260707.md",
+        "orbit360-platform/docs/AUDITORIA-CANDIDATA-CLAUDE-V1187-20260711-214858-COTIZADOR-COMPARATIVO.md",
+        "orbit360-platform/docs/AUDITORIA-CELULAR-MODULOS-VISIBLES-V1330-20260708.md",
+        "orbit360-platform/docs/AUDITORIA-CIERRE-PARCIAL-NUCLEO-CRM-POST-HOTFIX-V1330-20260707.md",
+        "orbit360-platform/docs/AUDITORIA-COTIZADOR-COMPARATIVO-V1330-Y-FUENTE-AYS-V110-20260707.md",
+        "orbit360-platform/docs/AUDITORIA-FORENSE-CANDIDATO-ACTIVO-CLAUDE-20260704-152321.md"
+      ],
+      "gaps": [
+        "retirar marcadores demo/mock/seed del módulo activo",
+        "completar backend/gate del dominio indicado"
+      ]
+    },
+    {
+      "route": "reportes",
+      "primary": "orbit360-platform/modules/reportes.js",
+      "relatedScripts": [
+        "orbit360-platform/modules/reportes.js"
+      ],
+      "implementation": "WORKED_ACTIVE_MODULE",
+      "loaded": true,
+      "registered": true,
+      "syntaxOk": true,
+      "storeRefs": 1,
+      "directStorageRefs": 0,
+      "demoMarkers": 0,
+      "todoMarkers": 1,
+      "backend": "SHARED_ORBIT_STORE_INTEGRATED",
+      "backendComplete": false,
+      "domainMaturity": "FRONTEND_WORKED_EXPORT_BACKEND_PARTIAL",
+      "expectedCollections": [
+        "clientes",
+        "polizas",
+        "cobros",
+        "comisiones"
+      ],
+      "candidateBlob": "a84a61d7f09295af61da800d72609f9b0ada1d46",
+      "baselineBlob": "a84a61d7f09295af61da800d72609f9b0ada1d46",
+      "liveBlob": "a84a61d7f09295af61da800d72609f9b0ada1d46",
+      "parityBaseline": true,
+      "parityLive": true,
+      "lastApprovedFileCommit": {
+        "commit": "17afa5d8ada41b078cd84db092ace68420c8cb0d",
+        "date": "2026-07-07T14:12:29-06:00",
+        "message": "fix(ays): reportes honestidad programacion moneda v1330"
+      },
+      "lastCandidateFileCommit": {
+        "commit": "17afa5d8ada41b078cd84db092ace68420c8cb0d",
+        "date": "2026-07-07T14:12:29-06:00",
+        "message": "fix(ays): reportes honestidad programacion moneda v1330"
+      },
+      "lastLiveFileCommit": {
+        "commit": "17afa5d8ada41b078cd84db092ace68420c8cb0d",
+        "date": "2026-07-07T14:12:29-06:00",
+        "message": "fix(ays): reportes honestidad programacion moneda v1330"
+      },
+      "postBaselineTouchesInLive": [],
+      "approvalEvidence": "STRONG_REPOSITORY_EVIDENCE",
+      "evidenceFiles": [
+        "orbit360-platform/docs/ACTUALIZACION-PLAN-VIVO-EMPALME-HOTFIX-P0-ACADEMIA-POST-V1330-20260708.md",
+        "orbit360-platform/docs/ACTUALIZACION-PLAN-VIVO-PORTAL-COBROS-CLIENTE360-DOCUMENTOS-20260708.md",
+        "orbit360-platform/docs/ACTUALIZACION-PLAN-VIVO-RUNNER-VALIDACIONES-AGRUPADAS-V1330-20260708.md",
+        "orbit360-platform/docs/ADDENDUM-CLAUDE-ACADEMIA-PROFUNDA-COMPLETA-POST-PAQUETE-V1330-20260709.md",
+        "orbit360-platform/docs/ADDENDUM-CONTROL-MAESTRO-CLAUDE-ACADEMIA-P09N-OBSERVADOR-20260710.md",
+        "orbit360-platform/docs/ADENDA-V181-VALOR-AGREGADO-INTELIGENTE-MODULAR.md",
+        "orbit360-platform/docs/ADENDUM-ACADEMIA-PROFUNDA-INTERACTIVA-ORBIT360-AYS-20260704.md",
+        "orbit360-platform/docs/ALCANCE-DEFINITIVO-MOVIMIENTOS-HISTORICOS-GT-CO-20260703.md",
+        "orbit360-platform/docs/AUDITORIA-ACCION-ASEGURADORAS-POST-CLIENTES-20260709.md",
+        "orbit360-platform/docs/AUDITORIA-BLOQUE-MARKETING-CALIDAD-REPORTES-V1330-20260707.md"
+      ],
+      "gaps": [
+        "completar backend/gate del dominio indicado"
+      ]
+    },
+    {
+      "route": "ia",
+      "primary": "orbit360-platform/modules/ia.js",
+      "relatedScripts": [
+        "orbit360-platform/modules/ia.js"
+      ],
+      "implementation": "WORKED_ACTIVE_MODULE",
+      "loaded": true,
+      "registered": true,
+      "syntaxOk": true,
+      "storeRefs": 2,
+      "directStorageRefs": 0,
+      "demoMarkers": 0,
+      "todoMarkers": 3,
+      "backend": "SHARED_ORBIT_STORE_INTEGRATED",
+      "backendComplete": false,
+      "domainMaturity": "FRONTEND_WORKED_AI_BACKEND_NOT_CONNECTED",
+      "expectedCollections": [
+        "conocimiento",
+        "aseguradoras",
+        "documentos"
+      ],
+      "candidateBlob": "7ddd7effd8ffba2740388b8381dbc418bc4c709a",
+      "baselineBlob": "7ddd7effd8ffba2740388b8381dbc418bc4c709a",
+      "liveBlob": "7ddd7effd8ffba2740388b8381dbc418bc4c709a",
+      "parityBaseline": true,
+      "parityLive": true,
+      "lastApprovedFileCommit": {
+        "commit": "d677e203a74c7f58d828ff99e8d7e3e0599abd3e",
+        "date": "2026-07-01T15:31:09-06:00",
+        "message": "chore: checkpoint clean Claude v99 base for backend lab"
+      },
+      "lastCandidateFileCommit": {
+        "commit": "d677e203a74c7f58d828ff99e8d7e3e0599abd3e",
+        "date": "2026-07-01T15:31:09-06:00",
+        "message": "chore: checkpoint clean Claude v99 base for backend lab"
+      },
+      "lastLiveFileCommit": {
+        "commit": "d677e203a74c7f58d828ff99e8d7e3e0599abd3e",
+        "date": "2026-07-01T15:31:09-06:00",
+        "message": "chore: checkpoint clean Claude v99 base for backend lab"
+      },
+      "postBaselineTouchesInLive": [],
+      "approvalEvidence": "STRONG_REPOSITORY_EVIDENCE",
+      "evidenceFiles": [
+        "orbit360-platform/docs/ACADEMIA-AUTORIDAD-OPERATIVA-READ-MODEL-Y-DRYRUN-20260801.md",
+        "orbit360-platform/docs/ACADEMIA-AUTORIZACION-COBROS-20260801.md",
+        "orbit360-platform/docs/ACADEMIA-BLOQUE1-GATE-UI-EXTERNO-20260718.md",
+        "orbit360-platform/docs/ACADEMIA-BLOQUE1-IMPORT-DINAMICO-DETERMINISTA-20260718.md",
+        "orbit360-platform/docs/ACADEMIA-BLOQUE1-LIFECYCLE-DOCUMENTO-Y-GATES-20260718.md",
+        "orbit360-platform/docs/ACADEMIA-BLOQUE1-OWNER-UNICO-ASEGURADORAS-20260718.md",
+        "orbit360-platform/docs/ACADEMIA-BLOQUE1-PROPAGACION-DEPLOY-20260718.md",
+        "orbit360-platform/docs/ACADEMIA-CAUSA-RAIZ-SESSION-WRITES-IDEMPOTENCIA-20260802.md",
+        "orbit360-platform/docs/ACADEMIA-COBROS-GATE10.9-WRITE-PASS-20260801.md",
+        "orbit360-platform/docs/ACADEMIA-COLA-CONTROLADA-COBROS-20260801.md"
+      ],
+      "gaps": []
+    },
+    {
+      "route": "academia",
+      "primary": "orbit360-platform/modules/academia.js",
+      "relatedScripts": [
+        "orbit360-platform/modules/academia.js"
+      ],
+      "implementation": "WORKED_ACTIVE_MODULE",
+      "loaded": true,
+      "registered": true,
+      "syntaxOk": true,
+      "storeRefs": 1,
+      "directStorageRefs": 0,
+      "demoMarkers": 1,
+      "todoMarkers": 8,
+      "backend": "SHARED_ORBIT_STORE_INTEGRATED",
+      "backendComplete": false,
+      "domainMaturity": "DEEP_CONTENT_WORKED_DURABLE_BACKEND_PARTIAL",
+      "expectedCollections": [
+        "academia",
+        "progreso"
+      ],
+      "candidateBlob": "8b38bdb73e2175531aaefe5ac19d7d24395b7ffa",
+      "baselineBlob": "8b38bdb73e2175531aaefe5ac19d7d24395b7ffa",
+      "liveBlob": "8b38bdb73e2175531aaefe5ac19d7d24395b7ffa",
+      "parityBaseline": true,
+      "parityLive": true,
+      "lastApprovedFileCommit": {
+        "commit": "317f3fb0a36a748d82d42b0d96d30fc9f0533684",
+        "date": "2026-07-06T21:22:13-06:00",
+        "message": "feat(ays): empalme real completo v1330 candidato 20260706"
+      },
+      "lastCandidateFileCommit": {
+        "commit": "317f3fb0a36a748d82d42b0d96d30fc9f0533684",
+        "date": "2026-07-06T21:22:13-06:00",
+        "message": "feat(ays): empalme real completo v1330 candidato 20260706"
+      },
+      "lastLiveFileCommit": {
+        "commit": "317f3fb0a36a748d82d42b0d96d30fc9f0533684",
+        "date": "2026-07-06T21:22:13-06:00",
+        "message": "feat(ays): empalme real completo v1330 candidato 20260706"
+      },
+      "postBaselineTouchesInLive": [],
+      "approvalEvidence": "STRONG_REPOSITORY_EVIDENCE",
+      "evidenceFiles": [
+        "orbit360-platform/docs/ACADEMIA-POST-AUDITORIA-CANDIDATA-CLAUDE-V1330-20260708.md",
+        "orbit360-platform/docs/ACTUALIZACION-DELTA-CLAUDE-ASEGURADORAS-V1202-20260711.md",
+        "orbit360-platform/docs/ACTUALIZACION-DELTA-CLAUDE-COTIZADOR-COMPARATIVO-V1203-20260711.md",
+        "orbit360-platform/docs/ACTUALIZACION-DELTA-CLAUDE-CRM-V1201-20260711.md",
+        "orbit360-platform/docs/ACTUALIZACION-DELTA-CLAUDE-POLIZA-RECIBOS-V1199-20260711.md",
+        "orbit360-platform/docs/ACTUALIZACION-DELTA-CLAUDE-RENOVACIONES-V1200-20260711.md",
+        "orbit360-platform/docs/ADDENDUM-CLAUDE-ACADEMIA-PROFUNDA-COMPLETA-POST-PAQUETE-V1330-20260709.md",
+        "orbit360-platform/docs/ADDENDUM-CLAUDE-CLIENTE360-DOCUMENTOS-PARCHES-ROLES-V1330-20260709.md",
+        "orbit360-platform/docs/ADENDA-V181-MERCADO-RECAUDO-GENERAL.md",
+        "orbit360-platform/docs/ADENDA-V181-VALOR-AGREGADO-INTELIGENTE-MODULAR.md"
+      ],
+      "gaps": [
+        "retirar marcadores demo/mock/seed del módulo activo",
+        "completar backend/gate del dominio indicado"
+      ]
+    },
+    {
+      "route": "insights",
+      "primary": "orbit360-platform/modules/insights.js",
+      "relatedScripts": [
+        "orbit360-platform/modules/insights.js"
+      ],
+      "implementation": "WORKED_ACTIVE_MODULE",
+      "loaded": true,
+      "registered": true,
+      "syntaxOk": true,
+      "storeRefs": 2,
+      "directStorageRefs": 0,
+      "demoMarkers": 0,
+      "todoMarkers": 0,
+      "backend": "SHARED_ORBIT_STORE_INTEGRATED",
+      "backendComplete": false,
+      "domainMaturity": "FRONTEND_WORKED_SHARED_STORE",
+      "expectedCollections": [
+        "clientes",
+        "polizas",
+        "cobros",
+        "comisiones"
+      ],
+      "candidateBlob": "cb3e45ce4365c374d3b323b8878958bbf784a265",
+      "baselineBlob": "cb3e45ce4365c374d3b323b8878958bbf784a265",
+      "liveBlob": "cb3e45ce4365c374d3b323b8878958bbf784a265",
+      "parityBaseline": true,
+      "parityLive": true,
+      "lastApprovedFileCommit": {
+        "commit": "317f3fb0a36a748d82d42b0d96d30fc9f0533684",
+        "date": "2026-07-06T21:22:13-06:00",
+        "message": "feat(ays): empalme real completo v1330 candidato 20260706"
+      },
+      "lastCandidateFileCommit": {
+        "commit": "317f3fb0a36a748d82d42b0d96d30fc9f0533684",
+        "date": "2026-07-06T21:22:13-06:00",
+        "message": "feat(ays): empalme real completo v1330 candidato 20260706"
+      },
+      "lastLiveFileCommit": {
+        "commit": "317f3fb0a36a748d82d42b0d96d30fc9f0533684",
+        "date": "2026-07-06T21:22:13-06:00",
+        "message": "feat(ays): empalme real completo v1330 candidato 20260706"
+      },
+      "postBaselineTouchesInLive": [],
+      "approvalEvidence": "STRONG_REPOSITORY_EVIDENCE",
+      "evidenceFiles": [
+        "orbit360-platform/docs/ACUMULADO-CLAUDE-ZIP-20260702-142044.md",
+        "orbit360-platform/docs/AUDITORIA-FORENSE-CANDIDATO-ACTIVO-CLAUDE-20260704-152321.md",
+        "orbit360-platform/docs/AUDITORIA-FORENSE-CANDIDATO-CLAUDE-20260704-193658.md",
+        "orbit360-platform/docs/AUDITORIA-FORENSE-CANDIDATO-CLAUDE-20260704-202655.md",
+        "orbit360-platform/docs/AUDITORIA-FORENSE-CANDIDATO-CLAUDE-20260704-205210.md",
+        "orbit360-platform/docs/AUDITORIA-FORENSE.md",
+        "orbit360-platform/docs/AUDITORIA-PROFUNDA-ZIP-CLAUDE-20260702-142044.md",
+        "orbit360-platform/docs/AUDITORIA-REVALIDACION-CANDIDATO-CLAUDE-20260705-062855-PRIORIZADA.md",
+        "orbit360-platform/docs/AUDITORIA-ZIP-CLAUDE-20260702-142044.md",
+        "orbit360-platform/docs/BITACORA-CAMBIOS.md"
+      ],
+      "gaps": []
+    },
+    {
+      "route": "correo",
+      "primary": "orbit360-platform/modules/correo.js",
+      "relatedScripts": [
+        "orbit360-platform/modules/correo.js"
+      ],
+      "implementation": "WORKED_ACTIVE_MODULE",
+      "loaded": true,
+      "registered": true,
+      "syntaxOk": true,
+      "storeRefs": 2,
+      "directStorageRefs": 0,
+      "demoMarkers": 0,
+      "todoMarkers": 1,
+      "backend": "SHARED_ORBIT_STORE_INTEGRATED",
+      "backendComplete": false,
+      "domainMaturity": "FRONTEND_WORKED_INTEGRATION_NOT_PRODUCTION_CONNECTED",
+      "expectedCollections": [
+        "correo",
+        "plantillas"
+      ],
+      "candidateBlob": "6475f4c66c74abdc4224329c37c9a3024b3c4c85",
+      "baselineBlob": "6475f4c66c74abdc4224329c37c9a3024b3c4c85",
+      "liveBlob": "6475f4c66c74abdc4224329c37c9a3024b3c4c85",
+      "parityBaseline": true,
+      "parityLive": true,
+      "lastApprovedFileCommit": {
+        "commit": "49a9710ba50aeb4a57c4e7610be07a40b78a1cca",
+        "date": "2026-07-07T13:25:26-06:00",
+        "message": "fix(ays): correo preparado no enviado real v1330"
+      },
+      "lastCandidateFileCommit": {
+        "commit": "49a9710ba50aeb4a57c4e7610be07a40b78a1cca",
+        "date": "2026-07-07T13:25:26-06:00",
+        "message": "fix(ays): correo preparado no enviado real v1330"
+      },
+      "lastLiveFileCommit": {
+        "commit": "49a9710ba50aeb4a57c4e7610be07a40b78a1cca",
+        "date": "2026-07-07T13:25:26-06:00",
+        "message": "fix(ays): correo preparado no enviado real v1330"
+      },
+      "postBaselineTouchesInLive": [],
+      "approvalEvidence": "STRONG_REPOSITORY_EVIDENCE",
+      "evidenceFiles": [
+        "orbit360-platform/docs/ACADEMIA-GATE711-ZERO-WRITE-Y-DIAGNOSTICO-OWNER-20260802.md",
+        "orbit360-platform/docs/ACADEMIA-IMPACT-IDEMPOTENCIA-CONCILIACION-IMPORTADOR-20260731.md",
+        "orbit360-platform/docs/ACTUALIZACION-DELTA-CLAUDE-POLIZA-RECIBOS-V1199-20260711.md",
+        "orbit360-platform/docs/ACTUALIZACION-DELTA-CLAUDE-RENOVACIONES-V1200-20260711.md",
+        "orbit360-platform/docs/ACUMULADO-CLAUDE-ZIP-20260702-142044.md",
+        "orbit360-platform/docs/ADDENDUM-CLIENTES-ASESORES-CALIDAD-DATOS-RESPUESTAS-PAULA-20260709.md",
+        "orbit360-platform/docs/ADDENDUM-CLOUD-ACADEMIA-AUTH-MULTIUSUARIO-RC12-20260803.md",
+        "orbit360-platform/docs/ADDENDUM-CONTROL-MAESTRO-CLAUDE-ASEGURADORAS-P02-SENSIBLES-20260710.md",
+        "orbit360-platform/docs/ADDENDUM-CORREO-USUARIO-CREADO-POR-TENANT-ALTA-USUARIOS-20260704.md",
+        "orbit360-platform/docs/ADDENDUM-MAESTRO-CONTINUIDAD-CLIENTES-MULTIROL-IMPORTADORES-20260709.md"
+      ],
+      "gaps": []
+    },
+    {
+      "route": "automatizaciones",
+      "primary": "orbit360-platform/modules/automatizaciones.js",
+      "relatedScripts": [
+        "orbit360-platform/modules/automatizaciones.js"
+      ],
+      "implementation": "WORKED_ACTIVE_MODULE",
+      "loaded": true,
+      "registered": true,
+      "syntaxOk": true,
+      "storeRefs": 5,
+      "directStorageRefs": 0,
+      "demoMarkers": 0,
+      "todoMarkers": 10,
+      "backend": "SHARED_ORBIT_STORE_INTEGRATED",
+      "backendComplete": false,
+      "domainMaturity": "FRONTEND_WORKED_EXECUTION_BACKEND_NOT_COMPLETE",
+      "expectedCollections": [
+        "automatizaciones"
+      ],
+      "candidateBlob": "12edae90b682d93ee82d45f42e12ce61d00413f7",
+      "baselineBlob": "12edae90b682d93ee82d45f42e12ce61d00413f7",
+      "liveBlob": "12edae90b682d93ee82d45f42e12ce61d00413f7",
+      "parityBaseline": true,
+      "parityLive": true,
+      "lastApprovedFileCommit": {
+        "commit": "009b54afc5cbff855dc084c0a5df6e2c2fb9e97c",
+        "date": "2026-07-07T12:33:29-06:00",
+        "message": "fix(ays): automatizaciones no afirma envios reales"
+      },
+      "lastCandidateFileCommit": {
+        "commit": "009b54afc5cbff855dc084c0a5df6e2c2fb9e97c",
+        "date": "2026-07-07T12:33:29-06:00",
+        "message": "fix(ays): automatizaciones no afirma envios reales"
+      },
+      "lastLiveFileCommit": {
+        "commit": "009b54afc5cbff855dc084c0a5df6e2c2fb9e97c",
+        "date": "2026-07-07T12:33:29-06:00",
+        "message": "fix(ays): automatizaciones no afirma envios reales"
+      },
+      "postBaselineTouchesInLive": [],
+      "approvalEvidence": "STRONG_REPOSITORY_EVIDENCE",
+      "evidenceFiles": [
+        "orbit360-platform/docs/ACUMULADO-CLAUDE-ZIP-20260702-142044.md",
+        "orbit360-platform/docs/ADDENDUM-CLAUDE-ROLES-PERMISOS-ACCIONES-SENSIBLES-V1330-20260708.md",
+        "orbit360-platform/docs/ADENDA-V181-VALOR-AGREGADO-INTELIGENTE-MODULAR.md",
+        "orbit360-platform/docs/AUDITORIA-BLOQUE-CONFIG-EQUIPO-NOTIFICACIONES-CORREO-V1330-20260707.md",
+        "orbit360-platform/docs/AUDITORIA-BLOQUE-IMPORTA-COBROS-POST-EMPALME-V1330-20260707.md",
+        "orbit360-platform/docs/AUDITORIA-BLOQUE-MARKETING-CALIDAD-REPORTES-V1330-20260707.md",
+        "orbit360-platform/docs/AUDITORIA-BLOQUE-OPS-LEADS-PORTAL-SINIESTROS-PLANTILLAS-AUTOMATIZACIONES-V1330-20260707.md",
+        "orbit360-platform/docs/AUDITORIA-CANDIDATA-CLAUDE-V1143-20260706.md",
+        "orbit360-platform/docs/AUDITORIA-CANDIDATA-CLAUDE-V1144-20260706.md",
+        "orbit360-platform/docs/AUDITORIA-CANDIDATA-CLAUDE-V1145-20260706.md"
+      ],
+      "gaps": [
+        "completar backend/gate del dominio indicado"
+      ]
+    },
+    {
+      "route": "notificaciones",
+      "primary": "orbit360-platform/modules/notificaciones.js",
+      "relatedScripts": [
+        "orbit360-platform/modules/notificaciones.js"
+      ],
+      "implementation": "WORKED_ACTIVE_MODULE",
+      "loaded": true,
+      "registered": true,
+      "syntaxOk": true,
+      "storeRefs": 3,
+      "directStorageRefs": 0,
+      "demoMarkers": 0,
+      "todoMarkers": 2,
+      "backend": "SHARED_ORBIT_STORE_INTEGRATED",
+      "backendComplete": false,
+      "domainMaturity": "FRONTEND_WORKED_WHATSAPP_BACKEND_NOT_CONNECTED",
+      "expectedCollections": [
+        "notificaciones",
+        "plantillas"
+      ],
+      "candidateBlob": "9f9019a62a7ff94e3728947c128b43b6877269f1",
+      "baselineBlob": "9f9019a62a7ff94e3728947c128b43b6877269f1",
+      "liveBlob": "9f9019a62a7ff94e3728947c128b43b6877269f1",
+      "parityBaseline": true,
+      "parityLive": true,
+      "lastApprovedFileCommit": {
+        "commit": "0935334277b024ed85f6a4cd388698db1451f208",
+        "date": "2026-07-07T11:23:08-06:00",
+        "message": "fix(ays): honestidad whatsapp api pendiente"
+      },
+      "lastCandidateFileCommit": {
+        "commit": "0935334277b024ed85f6a4cd388698db1451f208",
+        "date": "2026-07-07T11:23:08-06:00",
+        "message": "fix(ays): honestidad whatsapp api pendiente"
+      },
+      "lastLiveFileCommit": {
+        "commit": "0935334277b024ed85f6a4cd388698db1451f208",
+        "date": "2026-07-07T11:23:08-06:00",
+        "message": "fix(ays): honestidad whatsapp api pendiente"
+      },
+      "postBaselineTouchesInLive": [],
+      "approvalEvidence": "STRONG_REPOSITORY_EVIDENCE",
+      "evidenceFiles": [
+        "orbit360-platform/docs/ACADEMIA-M6-CAUSA-RAIZ-READINESS-ROLLBACK-20260730.md",
+        "orbit360-platform/docs/ADDENDUM-CLAUDE-ACADEMIA-PROFUNDA-COMPLETA-POST-PAQUETE-V1330-20260709.md",
+        "orbit360-platform/docs/ADDENDUM-CORREO-USUARIO-CREADO-POR-TENANT-ALTA-USUARIOS-20260704.md",
+        "orbit360-platform/docs/ADDENDUM-MAESTRO-SEGUIMIENTO-BLOQUES-AVANCE-PENDIENTES-20260704.md",
+        "orbit360-platform/docs/ADDENDUM-NOTIFICACIONES-CORREO-POR-USUARIO-AUTORIZADO-20260704.md",
+        "orbit360-platform/docs/ADENDUM-ACADEMIA-PROFUNDA-INTERACTIVA-ORBIT360-AYS-20260704.md",
+        "orbit360-platform/docs/AUDITORIA-BLOQUE-CONFIG-EQUIPO-NOTIFICACIONES-CORREO-V1330-20260707.md",
+        "orbit360-platform/docs/AUDITORIA-BLOQUE-MARKETING-CALIDAD-REPORTES-V1330-20260707.md",
+        "orbit360-platform/docs/AUDITORIA-BLOQUE-OPS-LEADS-PORTAL-SINIESTROS-PLANTILLAS-AUTOMATIZACIONES-V1330-20260707.md",
+        "orbit360-platform/docs/AUDITORIA-CANDIDATA-CLAUDE-V1214-20260712-084423.md"
+      ],
+      "gaps": []
+    },
+    {
+      "route": "marketing",
+      "primary": "orbit360-platform/modules/marketing.js",
+      "relatedScripts": [
+        "orbit360-platform/modules/marketing.js"
+      ],
+      "implementation": "WORKED_ACTIVE_MODULE",
+      "loaded": true,
+      "registered": true,
+      "syntaxOk": true,
+      "storeRefs": 1,
+      "directStorageRefs": 0,
+      "demoMarkers": 0,
+      "todoMarkers": 0,
+      "backend": "SHARED_ORBIT_STORE_INTEGRATED",
+      "backendComplete": false,
+      "domainMaturity": "FRONTEND_WORKED_PRODUCTIVE_BACKEND_NOT_COMPLETE",
+      "expectedCollections": [
+        "marketing",
+        "calendarioContenido"
+      ],
+      "candidateBlob": "2b1d3dd29624b3388eac42c03dd80be9d879b3e9",
+      "baselineBlob": "2b1d3dd29624b3388eac42c03dd80be9d879b3e9",
+      "liveBlob": "2b1d3dd29624b3388eac42c03dd80be9d879b3e9",
+      "parityBaseline": true,
+      "parityLive": true,
+      "lastApprovedFileCommit": {
+        "commit": "0f12f1c742a36a43be61122ba6bad18a8a199465",
+        "date": "2026-07-07T14:10:09-06:00",
+        "message": "fix(ays): marketing honestidad ia publicaciones v1330"
+      },
+      "lastCandidateFileCommit": {
+        "commit": "0f12f1c742a36a43be61122ba6bad18a8a199465",
+        "date": "2026-07-07T14:10:09-06:00",
+        "message": "fix(ays): marketing honestidad ia publicaciones v1330"
+      },
+      "lastLiveFileCommit": {
+        "commit": "0f12f1c742a36a43be61122ba6bad18a8a199465",
+        "date": "2026-07-07T14:10:09-06:00",
+        "message": "fix(ays): marketing honestidad ia publicaciones v1330"
+      },
+      "postBaselineTouchesInLive": [],
+      "approvalEvidence": "STRONG_REPOSITORY_EVIDENCE",
+      "evidenceFiles": [
+        "orbit360-platform/docs/ACUMULADO-CLAUDE-ZIP-20260702-142044.md",
+        "orbit360-platform/docs/ADDENDUM-CLIENTES-ASESORES-CALIDAD-DATOS-RESPUESTAS-PAULA-20260709.md",
+        "orbit360-platform/docs/ADDENDUM-MAESTRO-CONTINUIDAD-CLIENTES-MULTIROL-IMPORTADORES-20260709.md",
+        "orbit360-platform/docs/ADENDA-V181-MERCADO-RECAUDO-GENERAL.md",
+        "orbit360-platform/docs/ADENDA-V181-VALOR-AGREGADO-INTELIGENTE-MODULAR.md",
+        "orbit360-platform/docs/AUDITORIA-BLOQUE-FINANZAS-ASEGURADORAS-MARKETING-V1330-20260707.md",
+        "orbit360-platform/docs/AUDITORIA-BLOQUE-MARKETING-CALIDAD-REPORTES-V1330-20260707.md",
+        "orbit360-platform/docs/AUDITORIA-CANDIDATO-CLAUDE-20260703-202245.md",
+        "orbit360-platform/docs/AUDITORIA-CANDIDATO-CLAUDE-20260704-134907.md",
+        "orbit360-platform/docs/AUDITORIA-CELULAR-MODULOS-VISIBLES-V1330-20260708.md"
+      ],
+      "gaps": [
+        "completar backend/gate del dominio indicado"
+      ]
+    },
+    {
+      "route": "portal",
+      "primary": "orbit360-platform/modules/portal.js",
+      "relatedScripts": [
+        "orbit360-platform/modules/portal-v1142-copyfix.js",
+        "orbit360-platform/modules/portal-v1198-scope-viewer-bridge.js",
+        "orbit360-platform/modules/portal.js"
+      ],
+      "implementation": "WORKED_ACTIVE_MODULE",
+      "loaded": true,
+      "registered": true,
+      "syntaxOk": true,
+      "storeRefs": 1,
+      "directStorageRefs": 0,
+      "demoMarkers": 3,
+      "todoMarkers": 5,
+      "backend": "SHARED_ORBIT_STORE_INTEGRATED",
+      "backendComplete": false,
+      "domainMaturity": "FRONTEND_WORKED_EXTERNAL_AUTH_BACKEND_NOT_COMPLETE",
+      "expectedCollections": [
+        "portal",
+        "clientes",
+        "polizas",
+        "documentos"
+      ],
+      "candidateBlob": "18931725de98e1ac630f85b269969f6aa6f0f50c",
+      "baselineBlob": "18931725de98e1ac630f85b269969f6aa6f0f50c",
+      "liveBlob": "18931725de98e1ac630f85b269969f6aa6f0f50c",
+      "parityBaseline": true,
+      "parityLive": true,
+      "lastApprovedFileCommit": {
+        "commit": "0e432e76ba36077e826af1ed3bfebef41d2a9bad",
+        "date": "2026-07-07T12:31:06-06:00",
+        "message": "fix(ays): honestidad portal cliente v1330"
+      },
+      "lastCandidateFileCommit": {
+        "commit": "0e432e76ba36077e826af1ed3bfebef41d2a9bad",
+        "date": "2026-07-07T12:31:06-06:00",
+        "message": "fix(ays): honestidad portal cliente v1330"
+      },
+      "lastLiveFileCommit": {
+        "commit": "0e432e76ba36077e826af1ed3bfebef41d2a9bad",
+        "date": "2026-07-07T12:31:06-06:00",
+        "message": "fix(ays): honestidad portal cliente v1330"
+      },
+      "postBaselineTouchesInLive": [],
+      "approvalEvidence": "STRONG_REPOSITORY_EVIDENCE",
+      "evidenceFiles": [
+        "orbit360-platform/docs/ACADEMIA-IMPACTO-ROLES-PERMISOS-ACCIONES-SENSIBLES-V1330-20260708.md",
+        "orbit360-platform/docs/ACTUALIZACION-DELTA-CLAUDE-CRM-V1198-20260711.md",
+        "orbit360-platform/docs/ACTUALIZACION-PLAN-VIVO-EMPALME-HOTFIX-P0-PORTAL-V1330-20260708.md",
+        "orbit360-platform/docs/ACTUALIZACION-PLAN-VIVO-PORTAL-COBROS-CLIENTE360-DOCUMENTOS-20260708.md",
+        "orbit360-platform/docs/ACUMULADO-CLAUDE-ZIP-20260702-142044.md",
+        "orbit360-platform/docs/ACUMULADO-CLAUDE-ZIP-20260702.md",
+        "orbit360-platform/docs/ADDENDUM-CLAUDE-ACADEMIA-PROFUNDA-COMPLETA-POST-PAQUETE-V1330-20260709.md",
+        "orbit360-platform/docs/ADDENDUM-CLAUDE-CLIENTE360-DOCUMENTOS-PARCHES-ROLES-V1330-20260709.md",
+        "orbit360-platform/docs/ADDENDUM-CLAUDE-ROLES-PERMISOS-ACCIONES-SENSIBLES-V1330-20260708.md",
+        "orbit360-platform/docs/ADDENDUM-CONTROL-MAESTRO-CLAUDE-ASEGURADORAS-P02-SENSIBLES-20260710.md"
+      ],
+      "gaps": [
+        "retirar marcadores demo/mock/seed del módulo activo",
+        "completar backend/gate del dominio indicado"
+      ]
+    },
+    {
+      "route": "finanzas",
+      "primary": "orbit360-platform/modules/finanzas.js",
+      "relatedScripts": [
+        "orbit360-platform/modules/finanzas.js"
+      ],
+      "implementation": "WORKED_ACTIVE_MODULE",
+      "loaded": true,
+      "registered": true,
+      "syntaxOk": true,
+      "storeRefs": 1,
+      "directStorageRefs": 0,
+      "demoMarkers": 0,
+      "todoMarkers": 4,
+      "backend": "SHARED_ORBIT_STORE_INTEGRATED",
+      "backendComplete": false,
+      "domainMaturity": "FRONTEND_DEEP_WORKED_REAL_MIGRATION_PENDING",
+      "expectedCollections": [
+        "finmovs",
+        "cxc",
+        "cxp",
+        "liquidaciones",
+        "conciliaciones"
+      ],
+      "candidateBlob": "66e40ad29bdfd9a71ddf386c1c3c876dec0249dc",
+      "baselineBlob": "66e40ad29bdfd9a71ddf386c1c3c876dec0249dc",
+      "liveBlob": "66e40ad29bdfd9a71ddf386c1c3c876dec0249dc",
+      "parityBaseline": true,
+      "parityLive": true,
+      "lastApprovedFileCommit": {
+        "commit": "1a4416f80014be2d2286aae3e10b75e1131ab419",
+        "date": "2026-07-08T12:37:08-06:00",
+        "message": "feat(orbit360): m5 conciliaciones gates v1330"
+      },
+      "lastCandidateFileCommit": {
+        "commit": "1a4416f80014be2d2286aae3e10b75e1131ab419",
+        "date": "2026-07-08T12:37:08-06:00",
+        "message": "feat(orbit360): m5 conciliaciones gates v1330"
+      },
+      "lastLiveFileCommit": {
+        "commit": "1a4416f80014be2d2286aae3e10b75e1131ab419",
+        "date": "2026-07-08T12:37:08-06:00",
+        "message": "feat(orbit360): m5 conciliaciones gates v1330"
+      },
+      "postBaselineTouchesInLive": [],
+      "approvalEvidence": "STRONG_REPOSITORY_EVIDENCE",
+      "evidenceFiles": [
+        "orbit360-platform/docs/ACADEMIA-PLANILLAS-COMISIONES-FUENTE-PERIODO-Y-PRIMA-NETA-20260801.md",
+        "orbit360-platform/docs/ACUMULADO-CLAUDE-ZIP-20260702-142044.md",
+        "orbit360-platform/docs/ACUMULADO-CLAUDE-ZIP-20260702.md",
+        "orbit360-platform/docs/AUDITORIA-BLOQUE-FINANZAS-ASEGURADORAS-MARKETING-V1330-20260707.md",
+        "orbit360-platform/docs/AUDITORIA-CANDIDATA-CLAUDE-V1143-20260706.md",
+        "orbit360-platform/docs/AUDITORIA-CANDIDATA-CLAUDE-V1144-20260706.md",
+        "orbit360-platform/docs/AUDITORIA-CANDIDATA-CLAUDE-V1145-20260706.md",
+        "orbit360-platform/docs/AUDITORIA-CELULAR-MODULOS-VISIBLES-V1330-20260708.md",
+        "orbit360-platform/docs/AUDITORIA-CONTAMINACION-ORBIT-ORBIA-CXORBIA-20260701.md",
+        "orbit360-platform/docs/AUDITORIA-FORENSE-CANDIDATO-ACTIVO-CLAUDE-20260704-152321.md"
+      ],
+      "gaps": [
+        "completar backend/gate del dominio indicado"
+      ]
+    },
+    {
+      "route": "equipo",
+      "primary": "orbit360-platform/modules/equipo.js",
+      "relatedScripts": [
+        "orbit360-platform/modules/equipo.js"
+      ],
+      "implementation": "WORKED_ACTIVE_MODULE",
+      "loaded": true,
+      "registered": true,
+      "syntaxOk": true,
+      "storeRefs": 1,
+      "directStorageRefs": 0,
+      "demoMarkers": 0,
+      "todoMarkers": 2,
+      "backend": "SHARED_ORBIT_STORE_INTEGRATED",
+      "backendComplete": false,
+      "domainMaturity": "MULTIROLE_CONTRACT_WORKED_ADMIN_WRITER_PARTIAL",
+      "expectedCollections": [
+        "members",
+        "asesores",
+        "roles"
+      ],
+      "candidateBlob": "add52277de4787b2f07bc384d380dfe245b0e431",
+      "baselineBlob": "add52277de4787b2f07bc384d380dfe245b0e431",
+      "liveBlob": "add52277de4787b2f07bc384d380dfe245b0e431",
+      "parityBaseline": true,
+      "parityLive": true,
+      "lastApprovedFileCommit": {
+        "commit": "87dbf36ad29720d4e41e50e7d849fea25118a040",
+        "date": "2026-07-15T17:07:39-06:00",
+        "message": "feat(equipo): self-service multirol metas país y auditoría reusable"
+      },
+      "lastCandidateFileCommit": {
+        "commit": "87dbf36ad29720d4e41e50e7d849fea25118a040",
+        "date": "2026-07-15T17:07:39-06:00",
+        "message": "feat(equipo): self-service multirol metas país y auditoría reusable"
+      },
+      "lastLiveFileCommit": {
+        "commit": "87dbf36ad29720d4e41e50e7d849fea25118a040",
+        "date": "2026-07-15T17:07:39-06:00",
+        "message": "feat(equipo): self-service multirol metas país y auditoría reusable"
+      },
+      "postBaselineTouchesInLive": [],
+      "approvalEvidence": "STRONG_REPOSITORY_EVIDENCE",
+      "evidenceFiles": [
+        "orbit360-platform/docs/ACADEMIA-COBROS-GATE10.9-WRITE-PASS-20260801.md",
+        "orbit360-platform/docs/ACADEMIA-IMPACT-COBROS-CONCILIACION-READONLY-20260801.md",
+        "orbit360-platform/docs/ACADEMIA-IMPACTO-DOCUMENTOS-STORAGE-ADJUNTOS-AYS-20260708.md",
+        "orbit360-platform/docs/ACADEMIA-IMPACTO-PORTAL-COBROS-CLIENTE360-DOCUMENTOS-V1330-20260708.md",
+        "orbit360-platform/docs/ACADEMIA-PARIDAD-FISICA-SEMANTICA-Y-GRAFO-CANONICO-20260801.md",
+        "orbit360-platform/docs/ACADEMIA-POLIZAS-RUTAS-CANONICA-HEREDADA-Y-GATES-VISUALES-20260801.md",
+        "orbit360-platform/docs/ADDENDUM-CLAUDE-ACADEMIA-PROFUNDA-COMPLETA-POST-PAQUETE-V1330-20260709.md",
+        "orbit360-platform/docs/ADDENDUM-CLAUDE-ROLES-PERMISOS-ACCIONES-SENSIBLES-V1330-20260708.md",
+        "orbit360-platform/docs/ADDENDUM-CLIENTES-ASESORES-CALIDAD-DATOS-RESPUESTAS-PAULA-20260709.md",
+        "orbit360-platform/docs/ADDENDUM-MAESTRO-CONTINUIDAD-CLIENTES-MULTIROL-IMPORTADORES-20260709.md"
+      ],
+      "gaps": [
+        "completar backend/gate del dominio indicado"
+      ]
+    },
+    {
+      "route": "configuracion",
+      "primary": "orbit360-platform/modules/configuracion.js",
+      "relatedScripts": [
+        "orbit360-platform/modules/configuracion.js"
+      ],
+      "implementation": "WORKED_ACTIVE_MODULE",
+      "loaded": true,
+      "registered": true,
+      "syntaxOk": true,
+      "storeRefs": 14,
+      "directStorageRefs": 1,
+      "demoMarkers": 1,
+      "todoMarkers": 13,
+      "backend": "SHARED_ORBIT_STORE_INTEGRATED",
+      "backendComplete": false,
+      "domainMaturity": "FRONTEND_WORKED_PERSISTENCE_PARTIAL",
+      "expectedCollections": [
+        "tenantConfig",
+        "catalogos"
+      ],
+      "candidateBlob": "e73fb9ecedcc1b781c87723952416c0428ae6202",
+      "baselineBlob": "e73fb9ecedcc1b781c87723952416c0428ae6202",
+      "liveBlob": "e73fb9ecedcc1b781c87723952416c0428ae6202",
+      "parityBaseline": true,
+      "parityLive": true,
+      "lastApprovedFileCommit": {
+        "commit": "176855dbea7d73efa0da5a3bc5a2e996dd99c4ae",
+        "date": "2026-07-09T16:55:41-06:00",
+        "message": "fix: limpiar nombre visible de fuente externa en configuracion"
+      },
+      "lastCandidateFileCommit": {
+        "commit": "176855dbea7d73efa0da5a3bc5a2e996dd99c4ae",
+        "date": "2026-07-09T16:55:41-06:00",
+        "message": "fix: limpiar nombre visible de fuente externa en configuracion"
+      },
+      "lastLiveFileCommit": {
+        "commit": "176855dbea7d73efa0da5a3bc5a2e996dd99c4ae",
+        "date": "2026-07-09T16:55:41-06:00",
+        "message": "fix: limpiar nombre visible de fuente externa en configuracion"
+      },
+      "postBaselineTouchesInLive": [],
+      "approvalEvidence": "STRONG_REPOSITORY_EVIDENCE",
+      "evidenceFiles": [
+        "orbit360-platform/docs/ACUMULADO-CLAUDE-ZIP-20260702-142044.md",
+        "orbit360-platform/docs/ACUMULADO-CLAUDE-ZIP-20260702.md",
+        "orbit360-platform/docs/ADDENDUM-CLAUDE-ACADEMIA-PROFUNDA-COMPLETA-POST-PAQUETE-V1330-20260709.md",
+        "orbit360-platform/docs/ADDENDUM-CLAUDE-ROLES-PERMISOS-ACCIONES-SENSIBLES-V1330-20260708.md",
+        "orbit360-platform/docs/ADDENDUM-MAESTRO-PATRONES-REUTILIZABLES-CLAUDE-BACKEND-ORBIT360-20260707.md",
+        "orbit360-platform/docs/ADENDA-V181-MERCADO-RECAUDO-GENERAL.md",
+        "orbit360-platform/docs/ADENDA-V181-VALOR-AGREGADO-INTELIGENTE-MODULAR.md",
+        "orbit360-platform/docs/AUDITORIA-ACCIONES-ADMINISTRATIVAS-DIRECTAS-V1330-20260707.md",
+        "orbit360-platform/docs/AUDITORIA-BLOQUE-CONCILIACIONES-INTEGRACIONES-V1330-20260707.md",
+        "orbit360-platform/docs/AUDITORIA-BLOQUE-CONFIG-EQUIPO-NOTIFICACIONES-CORREO-V1330-20260707.md"
+      ],
+      "gaps": [
+        "retirar marcadores demo/mock/seed del módulo activo",
+        "revisar persistencia directa fuera de Orbit.store",
+        "completar backend/gate del dominio indicado"
+      ]
+    }
+  ],
+  "firestoreRead": false,
+  "authRead": false,
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "deployExecuted": false,
+  "productionTouched": false,
+  "containsPII": false,
+  "containsSecrets": false,
+  "ok": true
+}
