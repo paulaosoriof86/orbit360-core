@@ -191,7 +191,7 @@ async function browserPhase() {
     const finalDiagnostics = await diagnostics();
     mark('BROWSER_PHASE_ERROR', finalDiagnostics);
     if (page) await page.screenshot({ path: SCREENSHOT, fullPage: true }).catch(() => {});
-    save(BROWSER_OUT, { schemaVersion: 'orbit360-block12-browser-v2', status: 'OPERATIONAL_RUNTIME_BROWSER_FAIL', classification: safe(error).split(':')[0] || 'PIPELINE_MECHANISM_FAILURE', verdict: 'FAIL', error: safe(error), passed: 0, failed: 1, results: [], bootstrap, pageErrors, consoleErrors, screenshot: fs.existsSync(SCREENSHOT) ? path.relative(ROOT, SCREENSHOT) : '', browserExecuted: true, realTenantWrites: 0, containsTokens: false, ok: false });
+    save(BROWSER_OUT, { schemaVersion: 'orbit360-block12-browser-v2', status: 'OPERATIONAL_RUNTIME_BROWSER_FAIL', classification: ((safe(error).match(/(SECURITY_FAILURE|FUNCTIONAL_DEFECT|VALIDATOR_STALE|DATA_CONTRACT_FAILURE|ENVIRONMENT_FAILURE|PIPELINE_MECHANISM_FAILURE)/) || [])[1] || 'PIPELINE_MECHANISM_FAILURE'), verdict: 'FAIL', error: safe(error), passed: 0, failed: 1, results: [], bootstrap, pageErrors, consoleErrors, screenshot: fs.existsSync(SCREENSHOT) ? path.relative(ROOT, SCREENSHOT) : '', browserExecuted: true, realTenantWrites: 0, containsTokens: false, ok: false });
     process.exitCode = 42;
   } finally {
     if (browser) await browser.close().catch(() => {});
@@ -246,7 +246,7 @@ async function cleanup(app) {
     schemaVersion: 'orbit360-block12-operational-runtime-final-v1',
     status: ok ? 'OPERATIONAL_RUNTIME_LAB_PASS' : 'OPERATIONAL_RUNTIME_LAB_FAIL',
     classification: ok ? 'GO_LAB_OPERATIONAL_RUNTIME_CUMULATIVE' : (browser.classification || (realTenantUnchanged ? 'FUNCTIONAL_DEFECT' : 'DATA_CONTRACT_FAILURE')),
-    gateId: 'block12-operational-runtime-lab-v20260804', contractVersion: '12.0.0',
+    gateId: 'block12-operational-runtime-lab-v20260804', contractVersion: '12.0.7',
     browser: { status: browser.status, passed: browser.passed || 0, failed: browser.failed || 0, screenshot: browser.screenshot || '' },
     runtimeChecks,
     rollback: { syntheticTenantCollectionsRemaining: tenantCollections.length, legacyCollectionsRemaining: legacyCollections.length, syntheticAuthUsersDeleted: authDeleted, syntheticAuthUsersRemaining: usersRemain, exact: cleanupOk },

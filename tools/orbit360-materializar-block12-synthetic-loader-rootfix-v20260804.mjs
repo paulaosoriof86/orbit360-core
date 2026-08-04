@@ -9,7 +9,7 @@ const write = (rel, value) => fs.writeFileSync(path.join(ROOT, rel), value, 'utf
 function replaceExact(source, before, after, code) {
   if (source.includes(after)) return source;
   if (!source.includes(before)) throw new Error(`PIPELINE_MECHANISM_FAILURE:${code}`);
-  return source.replace(before, after);
+  return source.replace(before, () => after);
 }
 
 {
@@ -50,7 +50,7 @@ function replaceExact(source, before, after, code) {
   source = replaceExact(
     source,
     '<script src="core/backend-lab-loader.js?v=20260801-canonical-v79"></script><script src="core/backend-lab-init.js?v=20260801-canonical-v79"></script>',
-    '<script src="core/backend-lab-loader.js?v=20260804-operational-rootfix7"></script><script src="core/backend-lab-init.js?v=20260804-operational-rootfix7"></script>',
+    '<script src="core/backend-lab-loader.js?v=20260804-operational-rootfix8"></script><script src="core/backend-lab-init.js?v=20260804-operational-rootfix8"></script>',
     'INDEX_LAB_BOOTSTRAP_CACHE_BUST'
   );
   write(rel, source);
@@ -65,7 +65,7 @@ function replaceExact(source, before, after, code) {
     "classification: ((safe(error).match(/(SECURITY_FAILURE|FUNCTIONAL_DEFECT|VALIDATOR_STALE|DATA_CONTRACT_FAILURE|ENVIRONMENT_FAILURE|PIPELINE_MECHANISM_FAILURE)/) || [])[1] || 'PIPELINE_MECHANISM_FAILURE')",
     'BROWSER_CLASSIFICATION_PARSER'
   );
-  source = replaceExact(source, "contractVersion: '12.0.0',", "contractVersion: '12.0.6',", 'FINAL_CONTRACT_VERSION');
+  source = replaceExact(source, "contractVersion: '12.0.0',", "contractVersion: '12.0.7',", 'FINAL_CONTRACT_VERSION');
   write(rel, source);
 }
 
@@ -75,7 +75,7 @@ function replaceExact(source, before, after, code) {
   source = replaceExact(
     source,
     '"block12-operational-runtime-lab-v20260804":{contractVersion:"12.0.5",lifecycle:"tools/orbit360-validator-lifecycle-contract-block12-operational-runtime-lab-v20260804.json",engine:"tools/orbit360-validar-gate-contracts-engine-block12-operational-runtime-lab-v20260804.mjs"}',
-    '"block12-operational-runtime-lab-v20260804":{contractVersion:"12.0.6",lifecycle:"tools/orbit360-validator-lifecycle-contract-block12-operational-runtime-lab-v20260804.json",engine:"tools/orbit360-validar-gate-contracts-engine-block12-operational-runtime-lab-v20260804.mjs"}',
+    '"block12-operational-runtime-lab-v20260804":{contractVersion:"12.0.7",lifecycle:"tools/orbit360-validator-lifecycle-contract-block12-operational-runtime-lab-v20260804.json",engine:"tools/orbit360-validar-gate-contracts-engine-block12-operational-runtime-lab-v20260804.mjs"}',
     'ROUTER_BLOCK12_1206'
   );
   write(rel, source);
@@ -84,38 +84,38 @@ function replaceExact(source, before, after, code) {
 {
   const rel = 'tools/orbit360-validar-gate-contracts-engine-block12-operational-runtime-lab-v20260804.mjs';
   let source = read(rel);
-  source = replaceExact(source, "const VERSION = '12.0.5';", "const VERSION = '12.0.6';", 'ENGINE_VERSION_1206');
+  source = replaceExact(source, "const VERSION = '12.0.5';", "const VERSION = '12.0.7';", 'ENGINE_VERSION_1206');
   source = replaceExact(
     source,
     "const REQUEST = process.env.ORBIT360_REQUEST_FILE || '.github/orbit360-requests/block12-operational-runtime-lab-rootfix6-v20260804.json';",
-    "const REQUEST = process.env.ORBIT360_REQUEST_FILE || '.github/orbit360-requests/block12-operational-runtime-lab-rootfix7-v20260804.json';",
-    'ENGINE_REQUEST_ROOTFIX7'
+    "const REQUEST = process.env.ORBIT360_REQUEST_FILE || '.github/orbit360-requests/block12-operational-runtime-lab-rootfix8-v20260804.json';",
+    'ENGINE_REQUEST_ROOTFIX8'
   );
   source = replaceExact(
     source,
     "  '.github/workflows/orbit360-block12-operational-runtime-lab-rootfix6-v20260804.yml',",
-    "  '.github/workflows/orbit360-block12-operational-runtime-lab-rootfix7-v20260804.yml',\n  'orbit360-platform/core/backend-lab-loader.js',\n  'orbit360-platform/index.html',",
-    'ENGINE_REQUIRED_ROOTFIX7'
+    "  '.github/workflows/orbit360-block12-operational-runtime-lab-rootfix8-v20260804.yml',\n  'orbit360-platform/core/backend-lab-loader.js',\n  'orbit360-platform/index.html',",
+    'ENGINE_REQUIRED_ROOTFIX8'
   );
   source = replaceExact(
     source,
     "lifecycle.status === 'OPERATIONAL_RUNTIME_LAB_BROWSER_HARNESS_ROOTFIX_READY'",
-    "lifecycle.status === 'OPERATIONAL_RUNTIME_LAB_SYNTHETIC_LOADER_ROOTFIX_READY'",
-    'ENGINE_LIFECYCLE_ROOTFIX7'
+    "lifecycle.status === 'OPERATIONAL_RUNTIME_LAB_SYNTHETIC_LOADER_MATERIALIZER_ROOTFIX_READY'",
+    'ENGINE_LIFECYCLE_ROOTFIX8'
   );
   const oldRequest = "request.schemaVersion === 'orbit360-block12-operational-runtime-lab-rootfix6-request-v1' && request.status === 'AUTHORIZED_AFTER_BROWSER_HARNESS_ROOTFIX' && request.approved === true && request.allowedExecutions === 1 && request.consumed === false && request.replayAllowed === false && request.retryAuthorized === true && request.previousRuntimeRunId === 30956309298 && request.previousRuntimeStatus === 'cancelled' && request.previousFailureClassification === 'PIPELINE_MECHANISM_FAILURE' && request.previousFailureCode === 'BROWSER_BOOTSTRAP_WAIT_TIMEOUT_WITHOUT_FINALLY_CLOSE' && request.previousScenariosPassed === 0 && request.previousScenariosFailed === 0 && request.previousRollbackExact === true && request.previousRealTenantUnchanged === true && request.rescueRunId === 30959450996 && request.rescueStatus === 'RUNTIME_HANG_RESCUE_PASS' && request.dependencyValidationRunId === 30950155722 && request.dependencyValidationStatus === 'FUNCTIONS_BOOTSTRAP_LOAD_PASS' && request.authorizationRef === lifecycle.authorization.source";
-  const newRequest = "request.schemaVersion === 'orbit360-block12-operational-runtime-lab-rootfix7-request-v1' && request.status === 'AUTHORIZED_AFTER_SYNTHETIC_LOADER_ROOTFIX' && request.approved === true && request.allowedExecutions === 1 && request.consumed === false && request.replayAllowed === false && request.retryAuthorized === true && request.previousRuntimeRunId === 30959959221 && request.previousRuntimeStatus === 'failure' && request.previousFailureClassification === 'DATA_CONTRACT_FAILURE' && request.previousFailureCode === 'SYNTHETIC_TENANT_BLOCKED_BY_LAB_LOADER_ALLOWLIST' && request.previousBootstrapState === 'sdk-not-ready' && request.previousFirebasePresent === false && request.previousRuntimeCenterPresent === true && request.previousScenariosPassed === 0 && request.previousScenariosFailed === 0 && request.previousRollbackExact === true && request.previousRealTenantUnchanged === true && request.browserHarnessRootfixHead === 'ae3f55968948c18f1c6ae40fdce93ee6552890d0' && request.dependencyValidationRunId === 30950155722 && request.dependencyValidationStatus === 'FUNCTIONS_BOOTSTRAP_LOAD_PASS' && request.authorizationRef === lifecycle.authorization.source";
-  source = replaceExact(source, oldRequest, newRequest, 'ENGINE_REQUEST_ACTIVE_ROOTFIX7');
+  const newRequest = "request.schemaVersion === 'orbit360-block12-operational-runtime-lab-rootfix8-request-v1' && request.status === 'AUTHORIZED_AFTER_MATERIALIZER_SAFE_SYNTHETIC_LOADER_ROOTFIX' && request.approved === true && request.allowedExecutions === 1 && request.consumed === false && request.replayAllowed === false && request.retryAuthorized === true && request.previousRuntimeRunId === 30959959221 && request.previousRuntimeStatus === 'failure' && request.previousFailureClassification === 'DATA_CONTRACT_FAILURE' && request.previousFailureCode === 'SYNTHETIC_TENANT_BLOCKED_BY_LAB_LOADER_ALLOWLIST' && request.previousStaticRunId === 30960388102 && request.previousStaticFailureClassification === 'PIPELINE_MECHANISM_FAILURE' && request.previousStaticFailureCode === 'STRING_REPLACEMENT_DOLLAR_APOSTROPHE_CORRUPTED_ENGINE' && request.previousStaticRunStoppedBeforeGate === true && request.previousBootstrapState === 'sdk-not-ready' && request.previousFirebasePresent === false && request.previousRuntimeCenterPresent === true && request.previousScenariosPassed === 0 && request.previousScenariosFailed === 0 && request.previousRollbackExact === true && request.previousRealTenantUnchanged === true && request.browserHarnessRootfixHead === 'ae3f55968948c18f1c6ae40fdce93ee6552890d0' && request.dependencyValidationRunId === 30950155722 && request.dependencyValidationStatus === 'FUNCTIONS_BOOTSTRAP_LOAD_PASS' && request.authorizationRef === lifecycle.authorization.source";
+  source = replaceExact(source, oldRequest, newRequest, 'ENGINE_REQUEST_ACTIVE_ROOTFIX8');
   source = replaceExact(
     source,
     "  const rootfixWorkflow = readText('.github/workflows/orbit360-block12-operational-runtime-lab-rootfix6-v20260804.yml');",
-    "  const rootfixWorkflow = readText('.github/workflows/orbit360-block12-operational-runtime-lab-rootfix7-v20260804.yml');",
-    'ENGINE_WORKFLOW_READ_ROOTFIX7'
+    "  const rootfixWorkflow = readText('.github/workflows/orbit360-block12-operational-runtime-lab-rootfix8-v20260804.yml');",
+    'ENGINE_WORKFLOW_READ_ROOTFIX8'
   );
   source = replaceExact(
     source,
     "  add('BROWSER_HARNESS_ROOTFIX', scope.browserBootstrapDiagnosticsRequired === true && scope.browserCloseFinallyRequired === true && scope.callTimeoutRequired === true && scope.hardProcessTimeoutRequired === true && harness.includes(\"schemaVersion: 'orbit360-block12-browser-v2'\") && harness.includes('BROWSER_PHASE_ERROR') && harness.includes('if (browser) await browser.close().catch') && readText('orbit360-platform/core/runtime-verification-center-v20260804.js').includes('withTimeout') && rootfixWorkflow.includes('timeout --signal=TERM --kill-after=15s 420s'));",
-    "  add('BROWSER_HARNESS_ROOTFIX', scope.browserBootstrapDiagnosticsRequired === true && scope.browserCloseFinallyRequired === true && scope.callTimeoutRequired === true && scope.hardProcessTimeoutRequired === true && harness.includes(\"schemaVersion: 'orbit360-block12-browser-v2'\") && harness.includes('BROWSER_PHASE_ERROR') && harness.includes('if (browser) await browser.close().catch') && readText('orbit360-platform/core/runtime-verification-center-v20260804.js').includes('withTimeout') && rootfixWorkflow.includes('timeout --signal=TERM --kill-after=15s 420s'));\n  const loader = readText('orbit360-platform/core/backend-lab-loader.js');\n  const index = readText('orbit360-platform/index.html');\n  add('SYNTHETIC_LOADER_CONTRACT', scope.syntheticTenantPattern === '^verify-block12-[0-9]+$' && scope.syntheticTenantAllowedOnlyOnOperationalPreview === true && scope.syntheticTenantRequiresVerificationMode === true && loader.includes('isOperationalVerificationPreviewHost') && loader.includes('isSyntheticVerificationTenant') && loader.includes('/^verify-block12-[0-9]+$/') && loader.includes('if (isSyntheticVerificationTenant) allowedTenants.push(requestedTenant)') && index.includes('backend-lab-loader.js?v=20260804-operational-rootfix7'));",
+    "  add('BROWSER_HARNESS_ROOTFIX', scope.browserBootstrapDiagnosticsRequired === true && scope.browserCloseFinallyRequired === true && scope.callTimeoutRequired === true && scope.hardProcessTimeoutRequired === true && harness.includes(\"schemaVersion: 'orbit360-block12-browser-v2'\") && harness.includes('BROWSER_PHASE_ERROR') && harness.includes('if (browser) await browser.close().catch') && readText('orbit360-platform/core/runtime-verification-center-v20260804.js').includes('withTimeout') && rootfixWorkflow.includes('timeout --signal=TERM --kill-after=15s 420s'));\n  const loader = readText('orbit360-platform/core/backend-lab-loader.js');\n  const index = readText('orbit360-platform/index.html');\n  add('SYNTHETIC_LOADER_CONTRACT', scope.syntheticTenantPattern === '^verify-block12-[0-9]+$' && scope.syntheticTenantAllowedOnlyOnOperationalPreview === true && scope.syntheticTenantRequiresVerificationMode === true && loader.includes('isOperationalVerificationPreviewHost') && loader.includes('isSyntheticVerificationTenant') && loader.includes('/^verify-block12-[0-9]+$/') && loader.includes('if (isSyntheticVerificationTenant) allowedTenants.push(requestedTenant)') && index.includes('backend-lab-loader.js?v=20260804-operational-rootfix8'));",
     'ENGINE_SYNTHETIC_LOADER_CHECK'
   );
   write(rel, source);
@@ -124,17 +124,17 @@ function replaceExact(source, before, after, code) {
 const assertions = [
   ['orbit360-platform/core/backend-lab-loader.js', 'v1.113-synthetic-verification-fail-closed'],
   ['orbit360-platform/core/backend-lab-loader.js', 'isSyntheticVerificationTenant'],
-  ['orbit360-platform/index.html', 'backend-lab-loader.js?v=20260804-operational-rootfix7'],
-  ['tools/orbit360-block12-operational-runtime-lab-v20260804.mjs', "contractVersion: '12.0.6'"],
-  ['tools/orbit360-validar-gate-contracts-v20260717.mjs', 'contractVersion:"12.0.6"'],
-  ['tools/orbit360-validar-gate-contracts-engine-block12-operational-runtime-lab-v20260804.mjs', "const VERSION = '12.0.6'"],
+  ['orbit360-platform/index.html', 'backend-lab-loader.js?v=20260804-operational-rootfix8'],
+  ['tools/orbit360-block12-operational-runtime-lab-v20260804.mjs', "contractVersion: '12.0.7'"],
+  ['tools/orbit360-validar-gate-contracts-v20260717.mjs', 'contractVersion:"12.0.7"'],
+  ['tools/orbit360-validar-gate-contracts-engine-block12-operational-runtime-lab-v20260804.mjs', "const VERSION = '12.0.7'"],
   ['tools/orbit360-validar-gate-contracts-engine-block12-operational-runtime-lab-v20260804.mjs', 'SYNTHETIC_LOADER_CONTRACT']
 ];
-for (const [rel, token] of assertions) if (!read(rel).includes(token)) throw new Error(`PIPELINE_MECHANISM_FAILURE:ROOTFIX7_ASSERTION:${rel}:${token}`);
+for (const [rel, token] of assertions) if (!read(rel).includes(token)) throw new Error(`PIPELINE_MECHANISM_FAILURE:ROOTFIX8_ASSERTION:${rel}:${token}`);
 console.log(JSON.stringify({
   schemaVersion:'orbit360-block12-synthetic-loader-rootfix-materialization-v1',
   status:'BLOCK12_SYNTHETIC_LOADER_ROOTFIX_MATERIALIZED',
-  gateContractVersion:'12.0.6',
+  gateContractVersion:'12.0.7',
   previousRuntimeRunId:30959959221,
   previousFailure:'SYNTHETIC_TENANT_BLOCKED_BY_LAB_LOADER_ALLOWLIST',
   syntheticPattern:'verify-block12-[0-9]+',
