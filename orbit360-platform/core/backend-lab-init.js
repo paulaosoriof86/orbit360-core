@@ -1,10 +1,10 @@
 /* ============================================================
-   Orbit 360 - Backend LAB Firebase init v1.125
+   Orbit 360 - Backend LAB Firebase init v1.126
    Inicializa Firebase solo en ?orbitBackend=firestore-lab.
    Declara el read model canónico sellado y mantiene un único owner
    de lectura: Orbit.store. No expone secretos ni crea renderers.
-   Carga adaptadores genéricos de onboarding, configuración, flujos y
-   conciliación detrás de compuertas runtime explícitas.
+   Carga adaptadores genéricos de onboarding, configuración, flujos,
+   conciliación e importaciones recurrentes detrás de compuertas.
    ============================================================ */
 (function(){
   'use strict';
@@ -20,7 +20,7 @@
     tenantId: tenant,
     tenant: tenant,
     firebaseInit: 'pending',
-    firebaseInitVersion: 'v1.125-domain-config-source',
+    firebaseInitVersion: 'v1.126-recurring-import-source',
     functionsRegion: (window.OrbitBackend && window.OrbitBackend.functionsRegion) || 'us-central1',
     canonicalSnapshotDigest: '19e1927d39f6b713ee12504f8762bc42ead9de6e365bb0f12162d2a0c8f8469b',
     featureFlags: Object.assign({}, window.OrbitBackend && window.OrbitBackend.featureFlags || {}, {
@@ -34,7 +34,9 @@
       opsLeadsDomainBackendSource: true,
       opsLeadsDomainBackendActive: false,
       cobrosReconciliationDomainSource: true,
-      cobrosReconciliationDomainActive: false
+      cobrosReconciliationDomainActive: false,
+      recurringInsuranceImportSource: true,
+      recurringInsuranceImportActive: false
     })
   });
 
@@ -91,10 +93,21 @@
     loadScriptOnce('core/cobros-reconciliation-domain-client.js?v=20260804-1', 'cobros-reconciliation-domain-client');
   }
 
+  function loadRecurringInsuranceImport() {
+    loadScriptOnce('core/recurring-insurance-import-client.js?v=20260804-1', 'recurring-import-client', function(){
+      loadScriptOnce('core/recurring-insurance-document-extractor.js?v=20260804-1', 'recurring-import-extractor', function(){
+        afterWindowLoad(function(){
+          loadScriptOnce('modules/importar-recurring-bridge-v20260804.js?v=20260804-2', 'recurring-import-bridge');
+        });
+      });
+    });
+  }
+
   loadTeamOnboarding();
   loadDomainConfiguration();
   loadWorkflowDomain();
   loadReconciliationDomain();
+  loadRecurringInsuranceImport();
 
   if (tenant === 'alianzas-soluciones') {
     window.__orbitAysKnowledgeRuntimePromise = Promise.resolve({
