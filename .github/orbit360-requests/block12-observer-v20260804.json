@@ -1,0 +1,10 @@
+{
+  "schemaVersion": "orbit360-block12-observer-request-v1",
+  "status": "AUTHORIZED_READ_ONLY",
+  "targetWorkflow": "orbit360-block12-operational-runtime-lab-rootfix5-v20260804.yml",
+  "targetHeadSha": "50a285b891b143470582df687ebdf71befb23482",
+  "firebase": false,
+  "secrets": false,
+  "writes": false,
+  "deploy": false
+}
