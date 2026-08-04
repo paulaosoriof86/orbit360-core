@@ -54,7 +54,7 @@ const GATE_CONFIG=Object.freeze({
   "block10.9-cobros-controlled-write-lab-v20260801":{contractVersion:"10.9.0",lifecycle:"tools/orbit360-validator-lifecycle-contract-cobros-controlled-write-lab-v20260801.json",engine:"tools/orbit360-validar-gate-contracts-engine-cobros-controlled-write-preflight-v20260801.mjs"},
   "block11-planillas-comisiones-linkage-readonly-v20260801":{contractVersion:"11.0.0",lifecycle:"tools/orbit360-validator-lifecycle-contract-planillas-comisiones-linkage-readonly-v20260801.json",engine:"tools/orbit360-validar-gate-contracts-engine-planillas-comisiones-linkage-readonly-v20260801.mjs"},
   "block12-operational-runtime-lab-v20260804":{contractVersion:"12.0.2",lifecycle:"tools/orbit360-validator-lifecycle-contract-block12-operational-runtime-lab-v20260804.json",engine:"tools/orbit360-validar-gate-contracts-engine-block12-operational-runtime-lab-v20260804.mjs"},
-  "block12-runtime-hang-rescue-lab-v20260804":{contractVersion:"12.0.3",lifecycle:"tools/orbit360-validator-lifecycle-contract-block12-runtime-hang-rescue-lab-v20260804.json",engine:"tools/orbit360-validar-gate-contracts-engine-block12-runtime-hang-rescue-lab-v20260804.mjs"}
+  "block12-runtime-hang-rescue-lab-v20260804":{contractVersion:"12.0.4",lifecycle:"tools/orbit360-validator-lifecycle-contract-block12-runtime-hang-rescue-lab-v20260804.json",engine:"tools/orbit360-validar-gate-contracts-engine-block12-runtime-hang-rescue-lab-v20260804.mjs"}
 });
 const PHASE_PROFILES=Object.freeze({
   "STATIC_PREFLIGHT":ZERO,
@@ -116,7 +116,8 @@ const PHASE_PROFILES=Object.freeze({
   "M4_FINAL_CANONICAL_MIGRATION_DRYRUN_EXECUTION":{"secrets":true,"firestoreRead":true,"writes":false,"runtime":true,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
   "M4_FINAL_CANONICAL_MIGRATION_WRITE_EXECUTION":{"secrets":true,"firestoreRead":true,"writes":true,"runtime":true,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
   "M4_FINAL_CANONICAL_REVALIDATION_READONLY_EXECUTION":{"secrets":true,"firestoreRead":true,"writes":false,"runtime":true,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
-  "OPERATIONAL_RUNTIME_LAB_EXECUTION":{secrets:true,firestoreRead:true,writes:true,runtime:true,browser:true,deploy:true,functionsDeploy:true,rulesDeploy:false,production:false}
+  "OPERATIONAL_RUNTIME_LAB_EXECUTION":{secrets:true,firestoreRead:true,writes:true,runtime:true,browser:true,deploy:true,functionsDeploy:true,rulesDeploy:false,production:false},
+  "RUNTIME_HANG_RESCUE_LAB_EXECUTION":{secrets:true,firestoreRead:true,writes:true,runtime:false,browser:false,deploy:true,functionsDeploy:true,rulesDeploy:false,production:false}
 });
 function readJson(rel){return JSON.parse(fs.readFileSync(path.join(ROOT,rel),'utf8'));}
 function exactCapabilities(actual,expected){const a=Object.keys(actual||{}).sort(),e=Object.keys(expected||{}).sort();return JSON.stringify(a)===JSON.stringify(e)&&e.every(key=>actual[key]===expected[key]);}
