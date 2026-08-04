@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "orbit360-auth-membership-antiregression-rootfix-v3",
+  "status": "PASS",
+  "classification": "GO_STATIC_AUTH_MEMBERSHIP",
+  "checkedAt": "2026-08-04T05:00:47.692Z",
+  "total": 16,
+  "passed": 16,
+  "failed": 0,
+  "failedCheckIds": [],
+  "checks": [
+    {"id":"AUTH_SYNTAX","ok":true,"detail":"syntax-ok"},
+    {"id":"STORE_SYNTAX","ok":true,"detail":"syntax-ok"},
+    {"id":"GUARD_SYNTAX","ok":true,"detail":"syntax-ok"},
+    {"id":"NO_TECHNICAL_EMAIL_ACTIVE","ok":true,"detail":""},
+    {"id":"NO_TECHNICAL_UID_ACTIVE","ok":true,"detail":""},
+    {"id":"AUTH_MEMBERSHIP_OWNER","ok":true,"detail":""},
+    {"id":"STORE_MEMBERSHIP_OWNER","ok":true,"detail":""},
+    {"id":"GUARD_MEMBERSHIP_OWNER","ok":true,"detail":""},
+    {"id":"ACCESS_MEMBERSHIP_SOURCE","ok":true,"detail":""},
+    {"id":"ACTIVE_SCRIPT_BINDING","ok":true,"detail":""},
+    {"id":"NO_FORCED_ROLE_OR_ADVISOR","ok":true,"detail":""},
+    {"id":"MULTITENANT_RUNTIME","ok":true,"detail":""},
+    {"id":"SEED_FAIL_CLOSED","ok":true,"detail":""},
+    {"id":"API_PRESERVED","ok":true,"detail":""},
+    {"id":"SOURCE_ROOT_RESOLVED","ok":true,"detail":""},
+    {"id":"OUTPUT_PATH_RESOLVED","ok":true,"detail":""}
+  ],
+  "activeOwners": [
+    "orbit360-platform/core/auth.js",
+    "orbit360-platform/data/store-firestore-lab.local.js",
+    "orbit360-platform/core/backend-lab-auth-guard.js"
+  ],
+  "membershipOwner": "orbit360-platform/core/access-role-session-owner-v20260728.js",
+  "sourceRootDigest": "01f8c5e7b791f30252ddb18dc049ad45e9b40d87236537404c61bbda0ad0b395",
+  "outputDirectoryDigest": "5bf30f238eb4963033f9663a0a21c7e7311a840b757cc434d8969755bfe673b5",
+  "outputPathAbsolute": true,
+  "sourceRootIndependentFromOutput": true,
+  "forbiddenMarkerDigests": [
+    "sha256:df9b0695cd8953be630689ec343ab3f25e3a7d400a8c2370a485e319f3e93d04",
+    "sha256:f612197b077c598edd61d757c1e2995be7a3b17300602ce4802bccefed216a72"
+  ],
+  "releaseBlocking": true,
+  "deployAuthorized": false,
+  "firestoreRead": false,
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "productionTouched": false,
+  "containsPII": false,
+  "containsSecrets": false,
+  "sourceRun": 30879344813,
+  "sourceArtifact": 8880678880,
+  "artifactDigest": "sha256:d045c531050b7d257b38c454fac780d3b1ce4da8b000fd08517357291e0a191e"
+}
