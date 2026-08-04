@@ -1,0 +1,62 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
+  "gateId": "block12-operational-runtime-lab-v20260804",
+  "gateContractVersion": "12.0.0",
+  "status": "OPERATIONAL_RUNTIME_LAB_AUTHORIZED",
+  "singleGate": true,
+  "macroClosure": true,
+  "executionProfile": {
+    "phase": "OPERATIONAL_RUNTIME_LAB_EXECUTION",
+    "capabilities": {
+      "secrets": true,
+      "firestoreRead": true,
+      "writes": true,
+      "runtime": true,
+      "browser": true,
+      "deploy": true,
+      "functionsDeploy": true,
+      "rulesDeploy": false,
+      "production": false
+    }
+  },
+  "authorization": {
+    "source": "user_authorizes_single_lab_macro_ops_leads_cobros_recurring_runtime_20260804T1345-0600",
+    "allowedExecutions": 1,
+    "consumed": false,
+    "replayAllowed": false,
+    "request": ".github/orbit360-requests/block12-operational-runtime-lab-v20260804.json"
+  },
+  "scope": {
+    "projectId": "ays-orbit-360-lab",
+    "branch": "ays/backend-tenant-lab-v99-20260703",
+    "pullRequest": 5,
+    "syntheticTenantRequired": true,
+    "maximumSyntheticAuthUsers": 3,
+    "maximumSyntheticMemberships": 3,
+    "exactFunctionNames": [
+      "orbit360OpsLeadsCommandLabV20260804",
+      "orbit360GetAdvisorOpsInboxLabV20260804",
+      "orbit360CobrosReconciliationCommandLabV20260804",
+      "orbit360RecurringInsuranceImportLabV20260804"
+    ],
+    "hostingChannel": "orbit360-operational-block12",
+    "runtimeRoutes": ["inicio", "ops", "leads", "cliente360", "aseguradoras", "polizas", "cobros", "conciliaciones", "importar"],
+    "snapshotBeforeAfter": true,
+    "rollbackSyntheticTenant": true,
+    "rollbackSyntheticAuth": true,
+    "inPlatformVerificationCenter": true,
+    "autoRunSupported": true,
+    "sanitizedEvidence": true,
+    "cumulativeVisualCandidate": true
+  },
+  "forbidden": {
+    "rulesDeploy": true,
+    "realTenantWrites": true,
+    "realDataReimport": true,
+    "production": true,
+    "main": true,
+    "merge": true,
+    "nonAllowlistedFunctions": true,
+    "secondExecution": true
+  }
+}
