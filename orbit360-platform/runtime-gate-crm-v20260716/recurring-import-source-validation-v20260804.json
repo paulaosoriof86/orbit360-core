@@ -1,0 +1,58 @@
+{
+  "schemaVersion": "orbit360-recurring-import-source-validation-v1",
+  "generatedAt": "2026-08-04T13:13:00-06:00",
+  "classification": "GO_RECURRING_IMPORT_SOURCE_ONLY",
+  "rootCauseClosed": [
+    "PIPELINE_MECHANISM_FAILURE",
+    "DATA_CONTRACT_FAILURE"
+  ],
+  "scope": {
+    "genericPrototype": true,
+    "tenantDataIncluded": false,
+    "tenantOperationalOverlayRequiredForClaude": false
+  },
+  "checks": 11,
+  "passed": 11,
+  "failed": 0,
+  "results": [
+    { "name": "tipos de fuente recurrente completos", "ok": true },
+    { "name": "idempotencia estable por tenant fuente hash y periodo", "ok": true },
+    { "name": "mapeo configurable normaliza fila válida", "ok": true },
+    { "name": "banco sin contraparte queda en validación", "ok": true },
+    { "name": "reverso nunca queda listo", "ok": true },
+    { "name": "duplicados se omiten en dry-run", "ok": true },
+    { "name": "confirmación crea evidencia y no cobros directos", "ok": true },
+    { "name": "rollback bloquea evidencia consumida", "ok": true },
+    { "name": "cliente no escribe Orbit.store", "ok": true },
+    { "name": "extractor y bridge preservan Orbit.store", "ok": true },
+    { "name": "paquete Claude genérico y acumulativo", "ok": true }
+  ],
+  "owners": [
+    "functions/recurring-insurance-import.js",
+    "orbit360-platform/core/recurring-insurance-import-client.js",
+    "orbit360-platform/core/recurring-insurance-document-extractor.js",
+    "orbit360-platform/modules/importar-recurring-bridge-v20260804.js",
+    "tools/orbit360-recurring-import-contract-v20260804.mjs",
+    "tools/orbit360-validar-recurring-import-source-v20260804.mjs"
+  ],
+  "featureFlags": {
+    "recurringInsuranceImportSource": true,
+    "recurringInsuranceImportActive": false
+  },
+  "integrity": {
+    "networkCalls": 0,
+    "firestoreReads": 0,
+    "firestoreWrites": 0,
+    "authReads": 0,
+    "authWrites": 0,
+    "deployExecuted": false,
+    "rulesChanged": false,
+    "productionTouched": false,
+    "mainTouched": false,
+    "mergeExecuted": false,
+    "containsPII": false,
+    "containsSecrets": false
+  },
+  "runtimeValidated": false,
+  "ok": true
+}
