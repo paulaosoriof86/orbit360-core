@@ -45,21 +45,28 @@ try {
       const topbar = document.querySelector('.topbar').getBoundingClientRect();
       const search = document.querySelector('.tb-search');
       const band = document.querySelector('.mod-band').getBoundingClientRect();
-      const shell = document.querySelector('#shell').getBoundingClientRect();
-      const overlayTop = getComputedStyle(document.querySelector('.sb-overlay')).top;
+      const shellStyle = getComputedStyle(document.querySelector('#shell'));
+      const sidebarStyle = getComputedStyle(document.querySelector('#sidebar'));
+      const overlayStyle = getComputedStyle(document.querySelector('.sb-overlay'));
       return {
         topbarTop: topbar.top,
         topbarBottom: topbar.bottom,
         topbarHeight: topbar.height,
         searchDisplay: getComputedStyle(search).display,
         bandTop: band.top,
-        shellTop: shell.top,
-        overlayTop,
+        shellPaddingTop: Number.parseFloat(shellStyle.paddingTop || '0'),
+        sidebarTop: Number.parseFloat(sidebarStyle.top || '0'),
+        overlayTop: Number.parseFloat(overlayStyle.top || '0'),
         clear: band.top >= topbar.bottom
       };
     });
 
-    const ok = metrics.clear && metrics.topbarHeight >= 103 && metrics.searchDisplay === 'flex' && metrics.shellTop >= metrics.topbarBottom;
+    const ok = metrics.clear &&
+      metrics.topbarHeight >= 103 &&
+      metrics.searchDisplay === 'flex' &&
+      metrics.shellPaddingTop >= metrics.topbarHeight &&
+      metrics.sidebarTop >= metrics.topbarHeight &&
+      metrics.overlayTop >= metrics.topbarHeight;
     results.push({ ...item, ok, metrics });
     await page.screenshot({ path: path.join(outputDir, `mobile-${item.route}.png`), fullPage: false });
   }
