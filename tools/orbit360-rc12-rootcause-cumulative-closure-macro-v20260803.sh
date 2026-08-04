@@ -195,7 +195,7 @@ fi
 set +e
 (
   cd "$ORBIT360_RC12_ROOT"
-  npx firebase-tools deploy --only hosting --project "$ORBIT360_PROJECT_ID" --non-interactive
+  firebase deploy --only hosting --project "$ORBIT360_PROJECT_ID" --config firebase.json --non-interactive
 )
 DEPLOY_CODE=$?
 set -e
