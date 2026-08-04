@@ -387,3 +387,31 @@ button.kpi-click:active{transform:translateY(0)}
 .drawer-back>.card{max-width:96vw}
 /* Banners y cabeceras: acciones bajan de línea sin romper */
 .page{overflow-x:hidden}
+
+/* ---------- SHELL RESPONSIVE CANÓNICO · móvil de dos filas ----------
+   Owner: Shell/Topbar. Una sola fuente de altura para topbar, shell,
+   sidebar y overlay. Evita que los encabezados de módulo queden ocultos. */
+@media(max-width:560px){
+  :root{--topbar-h:104px}
+  .topbar{
+    height:var(--topbar-h);
+    min-height:var(--topbar-h);
+    flex-wrap:wrap;
+    align-content:center;
+    row-gap:6px;
+    overflow:visible;
+    padding:6px 12px;
+  }
+  .tb-search{
+    display:flex;
+    order:99;
+    flex:0 0 100%;
+    min-width:0;
+    width:100%;
+    margin:0;
+    padding:6px 12px;
+  }
+  #shell{padding-top:var(--topbar-h)}
+  #sidebar{top:var(--topbar-h);height:calc(100vh - var(--topbar-h));max-height:none}
+  .sb-overlay{top:var(--topbar-h)}
+}
