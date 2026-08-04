@@ -1,9 +1,10 @@
 /* ============================================================
-   Orbit 360 - Backend LAB Firebase init v1.124
+   Orbit 360 - Backend LAB Firebase init v1.125
    Inicializa Firebase solo en ?orbitBackend=firestore-lab.
    Declara el read model canónico sellado y mantiene un único owner
    de lectura: Orbit.store. No expone secretos ni crea renderers.
-   Carga adaptadores genéricos de onboarding, Ops/Leads y conciliación.
+   Carga adaptadores genéricos de onboarding, configuración, flujos y
+   conciliación detrás de compuertas runtime explícitas.
    ============================================================ */
 (function(){
   'use strict';
@@ -19,7 +20,7 @@
     tenantId: tenant,
     tenant: tenant,
     firebaseInit: 'pending',
-    firebaseInitVersion: 'v1.124-domain-services-source',
+    firebaseInitVersion: 'v1.125-domain-config-source',
     functionsRegion: (window.OrbitBackend && window.OrbitBackend.functionsRegion) || 'us-central1',
     canonicalSnapshotDigest: '19e1927d39f6b713ee12504f8762bc42ead9de6e365bb0f12162d2a0c8f8469b',
     featureFlags: Object.assign({}, window.OrbitBackend && window.OrbitBackend.featureFlags || {}, {
@@ -28,6 +29,8 @@
       canonicalStoreSingleOwner: true,
       canonicalSeedExclusion: true,
       genericTeamOnboardingSource: true,
+      tenantDomainConfigBackendSource: true,
+      tenantDomainConfigBackendActive: false,
       opsLeadsDomainBackendSource: true,
       opsLeadsDomainBackendActive: false,
       cobrosReconciliationDomainSource: true,
@@ -68,6 +71,14 @@
     });
   }
 
+  function loadDomainConfiguration() {
+    loadScriptOnce('core/tenant-domain-config-client.js?v=20260804-1', 'tenant-domain-config-client', function(){
+      afterWindowLoad(function(){
+        loadScriptOnce('modules/config-domain-v20260804-bridge.js?v=20260804-1', 'tenant-domain-config-bridge');
+      });
+    });
+  }
+
   function loadWorkflowDomain() {
     loadScriptOnce('core/ops-leads-domain-client.js?v=20260804-1', 'ops-leads-domain-client', function(){
       afterWindowLoad(function(){
@@ -81,6 +92,7 @@
   }
 
   loadTeamOnboarding();
+  loadDomainConfiguration();
   loadWorkflowDomain();
   loadReconciliationDomain();
 
