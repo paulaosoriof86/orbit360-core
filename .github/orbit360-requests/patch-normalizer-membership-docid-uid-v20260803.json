@@ -1,0 +1,14 @@
+{
+  "schemaVersion": "orbit360-patch-normalizer-docid-uid-request-v1",
+  "status": "AUTHORIZED_SOURCE_ONLY",
+  "authorizedAt": "2026-08-03T22:40:00-06:00",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "secrets": false,
+  "firestoreRead": false,
+  "writes": false,
+  "deploy": false,
+  "production": false,
+  "consumed": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
