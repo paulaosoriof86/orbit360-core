@@ -101,7 +101,7 @@ try {
     if (!token) throw new Error('HOSTING_ACCESS_TOKEN_EMPTY');
     const siteId = new URL(LIVE_URL).hostname.split('.')[0];
     const headers = { authorization:`Bearer ${token}`, accept:'application/json' };
-    const siteResponse = await safeFetch(`https://firebasehosting.googleapis.com/v1beta1/sites/${siteId}`, {headers});
+    const siteResponse = await safeFetch(`https://firebasehosting.googleapis.com/v1beta1/projects/${PROJECT}/sites/${siteId}`, {headers});
     const site = await siteResponse.json().catch(() => ({}));
     const releasesResponse = await safeFetch(`https://firebasehosting.googleapis.com/v1beta1/sites/${siteId}/releases?pageSize=5`, {headers});
     const releasesPayload = await releasesResponse.json().catch(() => ({}));
