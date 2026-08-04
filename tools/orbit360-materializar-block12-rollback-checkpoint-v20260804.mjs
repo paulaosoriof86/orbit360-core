@@ -32,26 +32,29 @@ replaceExact(
   "    users[def.key] = { uid, token: await auth.createCustomToken(uid, { orbitTenant: tenantId, orbitSyntheticVerification: true }) };\n    persistState();\n  }",
   'PRIVATE_STATE_AFTER_EACH_USER'
 );
-replaceExact(
-  `  const state = {
+const lateState = `  const state = {
     schemaVersion: 'orbit360-block12-private-state-v1', projectId: PROJECT, realTenantId: REAL_TENANT, tenantId, runId,
     users, ids: fixtureIds, sourceHash: sha(\`${'${tenantId}'}|commission_statement|2026-08\`), webConfig, snapshotBefore: before
   };
   fs.mkdirSync(path.dirname(STATE_FILE), { recursive: true });
-  fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2), { encoding: 'utf8', mode: 0o600 });`,
-  '  persistState();',
-  'REMOVE_LATE_ONLY_STATE'
-);
+  fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2), { encoding: 'utf8', mode: 0o600 });`;
+if (source.includes(lateState)) source = source.replace(lateState, '  persistState();');
 replaceExact(
   '  const cleanupOk = tenantCollections.length === 0 && legacyCollections.length === 0 && usersRemain === 0 && authDeleted === 3;',
   '  const expectedSyntheticUsers = Object.keys(state.users || {}).length;\n  const cleanupOk = tenantCollections.length === 0 && legacyCollections.length === 0 && usersRemain === 0 && authDeleted === expectedSyntheticUsers;',
   'PARTIAL_AUTH_ROLLBACK_COUNT'
 );
+const prepareStart = source.indexOf('async function prepare(app)');
+const browserStart = source.indexOf('async function browserPhase()');
+const prepareSource = source.slice(prepareStart, browserStart);
+const stateDeclarations = (prepareSource.match(/\bconst state = \{/g) || []).length;
+if (stateDeclarations !== 1) throw new Error(`PIPELINE_MECHANISM_FAILURE:PREPARE_STATE_DECLARATION_COUNT_${stateDeclarations}`);
+if (!prepareSource.includes('const persistState = () =>') || !prepareSource.includes('persistState();\n  for (const def') || !source.includes('expectedSyntheticUsers')) throw new Error('PIPELINE_MECHANISM_FAILURE:ROLLBACK_CHECKPOINT_NOT_INSTALLED');
 fs.writeFileSync(file, source, 'utf8');
-if (!source.includes('const persistState = () =>') || !source.includes('persistState();\n  for (const def') || !source.includes('expectedSyntheticUsers')) throw new Error('PIPELINE_MECHANISM_FAILURE:ROLLBACK_CHECKPOINT_NOT_INSTALLED');
 console.log(JSON.stringify({
-  schemaVersion: 'orbit360-block12-rollback-checkpoint-v1',
+  schemaVersion: 'orbit360-block12-rollback-checkpoint-v2',
   status: 'ROLLBACK_CHECKPOINT_MATERIALIZED',
+  prepareStateDeclarationCount: stateDeclarations,
   stateBeforeOperationalWrites: true,
   stateAfterEachSyntheticIdentity: true,
   partialPreparationRollbackExact: true,
