@@ -76,9 +76,10 @@ const authSafe = user => {
   if (sha(String(user.email || '').toLowerCase()) === TECHNICAL_DIGESTS.email || sha(user.uid) === TECHNICAL_DIGESTS.uid) reasons.push('technical_identity_excluded');
   return { ok:reasons.length === 0, reasons, providers };
 };
-const eligibility = (membership, user) => {
+const eligibility = (membership, user, docId) => {
   const reasons = [];
   if (!membership.uid) reasons.push('membership_uid_missing');
+  if (docId && membership.uid && membership.uid !== docId) reasons.push('membership_document_id_uid_mismatch');
   if (membership.tenantId !== TENANT) reasons.push('membership_tenant_mismatch');
   if (!['active','activo'].includes(membership.status)) reasons.push('membership_inactive_or_missing_status');
   if (!membership.roles.length) reasons.push('membership_roles_missing');
@@ -131,7 +132,7 @@ try {
       const uid = membership.uid || doc.id;
       let user = null;
       try { user = await auth.getUser(uid); } catch (error) {}
-      const currentReasons = eligibility(membership, user);
+      const currentReasons = eligibility(membership, user, doc.id);
       const currentProfile = profile(membership);
       counters.profiles[currentProfile] += 1;
       if (!currentReasons.length) counters.eligible[currentProfile] += 1;
@@ -148,7 +149,7 @@ try {
       }
       const after = { ...before, ...patch };
       const afterMembership = normalize(after, doc.id);
-      const afterReasons = eligibility(afterMembership, user);
+      const afterReasons = eligibility(afterMembership, user, doc.id);
       const changedFields = Object.keys(patch).filter(field => digest(before[field]) !== digest(after[field]));
       const forbiddenChanges = changedFields.filter(field => !ALLOWED_PATCH_FIELDS.includes(field));
       const safeUser = authSafe(user);
@@ -259,7 +260,7 @@ try {
       const membership = normalize(doc.data() || {}, doc.id);
       let user = null;
       try { user = await auth.getUser(membership.uid || doc.id); } catch (error) {}
-      const rowReasons = eligibility(membership,user);
+      const rowReasons = eligibility(membership,user,doc.id);
       rowReasons.forEach(reason => { reasons[reason] = Number(reasons[reason] || 0) + 1; });
       if (!rowReasons.length) eligible[profile(membership)] += 1;
     }
