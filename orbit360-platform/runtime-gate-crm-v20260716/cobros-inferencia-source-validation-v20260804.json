@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "orbit360-cobros-inferencia-source-validation-v1",
+  "generatedAt": "2026-08-04T11:00:00-06:00",
+  "classification": "GO_COBROS_INFERENTIAL_ENGINE_SOURCE_ONLY",
+  "engine": "tools/orbit360-cobros-inferencia-secuencial-v20260804.mjs",
+  "checks": {
+    "syntax": true,
+    "commissionRecognizesCurrentInstallment": true,
+    "commissionInfersEarlierContinuousInstallments": true,
+    "completePortfolioInfersInstallmentsBeforeFirstPending": true,
+    "directInsurerPaymentReconcilesDirectly": true,
+    "pendingPortfolioRowsRemainPending": true
+  },
+  "fixtureOutcomeCounts": {
+    "CONCILIADO_SECUENCIA_PLANILLA": 4,
+    "CONCILIADO_RECONOCIMIENTO_ASEGURADORA": 1,
+    "CONCILIADO_SECUENCIA_CARTERA": 2,
+    "PENDIENTE_SEGUN_ASEGURADORA": 4,
+    "CONCILIADO_DIRECTO_ASEGURADORA": 1
+  },
+  "operationalInputExecuted": false,
+  "operationalCountsRecalculated": false,
+  "networkCalls": 0,
+  "firestoreReads": 0,
+  "firestoreWrites": 0,
+  "authReads": 0,
+  "authWrites": 0,
+  "deployExecuted": false,
+  "productionTouched": false,
+  "mainTouched": false,
+  "mergeExecuted": false,
+  "containsPII": false,
+  "containsSecrets": false,
+  "ok": true
+}
