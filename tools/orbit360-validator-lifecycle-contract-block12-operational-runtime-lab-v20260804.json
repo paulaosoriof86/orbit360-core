@@ -2,8 +2,8 @@
   "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
   "validatorLifecycleRevision": "phase-capability-contract-v1",
   "gateId": "block12-operational-runtime-lab-v20260804",
-  "gateContractVersion": "12.0.1",
-  "status": "OPERATIONAL_RUNTIME_LAB_DEPENDENCY_ROOTFIX_READY",
+  "gateContractVersion": "12.0.2",
+  "status": "OPERATIONAL_RUNTIME_LAB_ARTIFACT_POLICY_ROOTFIX_READY",
   "singleGate": true,
   "macroClosure": true,
   "executionProfile": {
@@ -21,15 +21,19 @@
     }
   },
   "authorization": {
-    "source": "user_proceeds_block12_after_dependency_rootfix_20260804T1424-0600",
+    "source": "user_demands_solve_and_advance_block12_20260804T1617-0600",
     "allowedExecutions": 1,
     "consumed": false,
     "replayAllowed": false,
-    "retryAuthorizedBecausePriorRuntimeStoppedBeforeFunctionCreation": true,
-    "previousRuntimeRunIds": [30945951133, 30948708843, 30949139231],
+    "retryAuthorizedAfterDemonstratedPipelineRootCause": true,
+    "previousRuntimeRunIds": [30945951133, 30948708843, 30949139231, 30950465823],
     "dependencyValidationRunId": 30950155722,
     "dependencyValidationStatus": "FUNCTIONS_BOOTSTRAP_LOAD_PASS",
-    "request": ".github/orbit360-requests/block12-operational-runtime-lab-rootfix4-v20260804.json"
+    "previousFailureClassification": "PIPELINE_MECHANISM_FAILURE",
+    "previousFailureCode": "FUNCTIONS_CREATED_ARTIFACT_CLEANUP_POLICY_EXIT_1",
+    "previousFunctionsCreated": 4,
+    "previousFunctionsDeletedByRollback": 4,
+    "request": ".github/orbit360-requests/block12-operational-runtime-lab-rootfix5-v20260804.json"
   },
   "scope": {
     "projectId": "ays-orbit-360-lab",
@@ -46,6 +50,8 @@
     ],
     "functionsPackageLockRequired": true,
     "functionsBootstrapLoadPassRequired": true,
+    "artifactCleanupPolicyAutomatic": true,
+    "postDeployFunctionVerificationRequired": true,
     "hostingChannel": "orbit360-operational-block12",
     "runtimeRoutes": [
       "inicio",
@@ -61,6 +67,7 @@
     "snapshotBeforeAfter": true,
     "rollbackSyntheticTenant": true,
     "rollbackSyntheticAuth": true,
+    "rollbackVerdictSeparatedFromRuntimeVerdict": true,
     "inPlatformVerificationCenter": true,
     "autoRunSupported": true,
     "sanitizedEvidence": true,
