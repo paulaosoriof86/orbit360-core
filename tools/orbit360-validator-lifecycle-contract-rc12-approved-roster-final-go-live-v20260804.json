@@ -1,0 +1,117 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
+  "gateId": "block7.15-rc12-approved-roster-final-go-live-v20260804",
+  "gateContractVersion": "7.15.0",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
+  "status": "RC12_APPROVED_ROSTER_FINAL_GO_LIVE_AUTHORIZED",
+  "executionProfile": {
+    "phase": "GRAVICENTRA_RC12_APPROVED_ROSTER_FINAL_GO_LIVE",
+    "capabilities": {
+      "secrets": true,
+      "firestoreRead": true,
+      "writes": true,
+      "runtime": true,
+      "browser": true,
+      "deploy": true,
+      "functionsDeploy": false,
+      "rulesDeploy": false,
+      "production": true
+    }
+  },
+  "singleGate": true,
+  "macroClosure": true,
+  "blockOwner": "approved roster Auth provisioning + memberships + Gate 7.13 + Hosting closure",
+  "release": {
+    "candidateId": "gravicentra-insurance-rc1.2-unified",
+    "baseline": "27cb7dfcda8568280ebef15993a953364304f29b",
+    "branch": "release/gravicentra-insurance-rc1-2-membership-auth-20260803",
+    "commit": "b699ba329960cd830121b57452ce558399aa84fb",
+    "liveBranch": "ays/backend-tenant-lab-v99-20260703"
+  },
+  "authorization": {
+    "requiredForExecution": true,
+    "activeRequest": true,
+    "allowedExecutions": 1,
+    "request": ".github/orbit360-requests/rc12-approved-roster-final-go-live-v20260804.json",
+    "replayAllowed": false
+  },
+  "target": {
+    "projectId": "ays-orbit-360-lab",
+    "tenantId": "alianzas-soluciones",
+    "liveUrl": "https://ays-orbit-360-lab.web.app"
+  },
+  "approvedRoster": {
+    "profiles": ["direction", "operations", "advisor"],
+    "people": ["Paula Osorio", "Carlos Castro", "Samuel Daza"],
+    "manifest": "orbit360-platform/runtime-gate-crm-v20260716/rc12-cumulative-candidate-unified-manifest.json",
+    "emailsStoredAsDigestsOnly": true,
+    "advisorIdSource": "existing canonical advisor record"
+  },
+  "requiredRuntimeProfiles": ["direccion", "operativo", "asesor"],
+  "requiredRuntimeModules": ["cliente360", "aseguradoras", "polizas", "cobros", "ops", "leads"],
+  "expectedOperationalCounts": {
+    "clientes": 430,
+    "aseguradoras": 30,
+    "polizas": 1373,
+    "vehiculos": 1032,
+    "recibosEsperados": 1294,
+    "carteraPrimas": 673,
+    "cobros": 5,
+    "asesores": 7
+  },
+  "provisioningBoundary": {
+    "membershipCollection": "tenants/{tenantId}/members",
+    "exactProfiles": ["direction", "operations", "advisor"],
+    "maximumAuthUsersCreated": 3,
+    "maximumAuthUsersUpdated": 0,
+    "maximumMembershipDocumentsWritten": 3,
+    "maximumMembershipDocumentsCreated": 3,
+    "maximumPasswordWrites": 3,
+    "passwordReadsAllowed": 0,
+    "maximumCustomTokensCreated": 3,
+    "tokenPersistenceAllowed": false,
+    "emailChangesToExistingUsersAllowed": false,
+    "providerChangesToExistingUsersAllowed": false,
+    "passwordChangesToExistingUsersAllowed": false,
+    "technicalIdentityChangesAllowed": false,
+    "existingUserMutationsAllowed": false,
+    "temporaryCredentialsExposedAllowed": false,
+    "temporaryCredentialsSentAllowed": false,
+    "atomicMembershipWrite": true,
+    "idempotentMembershipWrite": true,
+    "rollbackUsersCreated": true,
+    "rollbackMembershipsCreated": true,
+    "rollbackHosting": true
+  },
+  "guards": {
+    "unifiedCandidatePassBeforeSecrets": true,
+    "authAntiregressionPassBeforeSecrets": true,
+    "approvedRosterReconciliationBeforeWrite": true,
+    "exactlyOneCanonicalAdvisorRecordPerProfile": true,
+    "existingAuthUsersImmutable": true,
+    "missingUsersOnlyMayBeCreated": true,
+    "threeDistinctNormalUsersRequired": true,
+    "threeMembershipsRequiredBeforeGate713": true,
+    "gate713PostMembershipRequired": true,
+    "snapshotBeforeAfterRequired": true,
+    "hostingDeployOnlyAfterThreeProfilesPass": true,
+    "rollbackHostingOnSmokeFailure": true,
+    "rollbackProvisioningOnDownstreamFailure": true,
+    "reimportAllowed": false,
+    "firestoreRulesDeployAllowed": false,
+    "functionsDeployAllowed": false,
+    "mainAllowed": false,
+    "mergeAllowed": false,
+    "repeatGate711Allowed": false,
+    "openGeneralPredeployAllowed": false,
+    "stopRetryOnSameFailureFamily": true
+  },
+  "cloudClaude": {
+    "backendClassification": "BACKEND_PROTEGIDO_NO_CLAUDE",
+    "reusablePatternClassification": "REPLICABLE_CLAUDE_ACUMULADO",
+    "academiaClassification": "ACADEMIA_ACTUALIZAR",
+    "externalPackageSent": false
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
