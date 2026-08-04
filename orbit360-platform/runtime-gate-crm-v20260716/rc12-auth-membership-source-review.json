@@ -1,0 +1,47 @@
+{
+  "schemaVersion": "orbit360-rc12-auth-membership-source-review-v1",
+  "status": "SOURCE_PASS",
+  "classification": "GO_SOURCE_AUTH_MEMBERSHIP",
+  "releaseBranch": "release/gravicentra-insurance-rc1-2-membership-auth-20260803",
+  "baseReleaseCommit": "1eb7daea580c0807d867a663086defc021435993",
+  "sourceCommits": {
+    "authOwner": "7ba78de857f7075a56ffbdd70dc71185306d6483",
+    "storeOwner": "3f59da1e182b68220e375543cd7c25bfafb4b01e",
+    "regressionGate": "7648c6b5b8f9953a229a99ce7f0ee8c2cdf49852"
+  },
+  "owners": [
+    "orbit360-platform/core/auth.js",
+    "orbit360-platform/data/store-firestore-lab.local.js",
+    "orbit360-platform/core/backend-lab-auth-guard.js",
+    "orbit360-platform/core/access-role-session-owner-v20260728.js"
+  ],
+  "checks": {
+    "authUsesFirebaseAndTenantMembership": true,
+    "storeSnapshotsRequireActiveMembership": true,
+    "guardUsesMembershipProjection": true,
+    "rolesScopesAdvisorComeFromMembership": true,
+    "technicalEmailRemovedFromActiveOwners": true,
+    "technicalUidRemovedFromActiveOwners": true,
+    "forcedDirectionRemoved": true,
+    "forcedPaulaAdvisorRemoved": true,
+    "storeApiPreserved": true,
+    "canonicalAndLegacyPathsPreserved": true,
+    "seedExcludedFromCanonicalReads": true,
+    "permanentReleaseBlockingValidatorAdded": true
+  },
+  "syntax": {
+    "auth": "PASS_LOCAL_NODE_CHECK",
+    "store": "PASS_LOCAL_NODE_CHECK",
+    "guard": "SOURCE_REVIEWED"
+  },
+  "runtimeStatus": "NOT_EXECUTED",
+  "deployAuthorized": false,
+  "firestoreRead": false,
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "productionTouched": false,
+  "main": false,
+  "merge": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
