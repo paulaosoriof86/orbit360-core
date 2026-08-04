@@ -125,25 +125,77 @@ async function prepare(app) {
 async function browserPhase() {
   const state = readState();
   const { chromium } = await import('playwright');
-  const browser = await chromium.launch({ headless: true });
-  const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+  let browser = null;
+  let page = null;
   const pageErrors = [], consoleErrors = [];
-  page.on('pageerror', error => pageErrors.push(safe(error)));
-  page.on('console', message => { if (message.type() === 'error') consoleErrors.push(safe(message.text())); });
-  const base = text(process.env.ORBIT360_PREVIEW_URL);
-  if (!base) throw new Error('ENVIRONMENT_FAILURE:PREVIEW_URL_REQUIRED');
-  const url = `${base.replace(/#.*$/, '').replace(/\?$/, '')}${base.includes('?') ? '&' : '?'}orbitBackend=firestore-lab&tenant=${encodeURIComponent(state.tenantId)}&orbitVerify=auto#/inicio`;
-  await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 90000 });
-  await page.waitForFunction(() => window.firebase && firebase.apps && firebase.apps.length && window.Orbit && Orbit.runtimeVerification, null, { timeout: 90000 });
-  const context = { tenantId: state.tenantId, tokens: { direction: state.users.direction.token, advisorA: state.users.advisorA.token, advisorB: state.users.advisorB.token }, ids: state.ids, sourceHash: state.sourceHash };
-  await page.evaluate(ctx => window.dispatchEvent(new CustomEvent('orbit:verification-context', { detail: ctx })), context);
-  await page.waitForFunction(() => { const s = Orbit.runtimeVerification.state(); return !!s.finishedAt && s.running === false; }, null, { timeout: 180000 });
-  const result = await page.evaluate(() => { const value = Orbit.runtimeVerification.state(); delete value.context; return value; });
-  await page.screenshot({ path: SCREENSHOT, fullPage: true });
-  await browser.close();
-  const failed = (result.results || []).filter(item => item.status === 'FAIL');
-  save(BROWSER_OUT, { schemaVersion: 'orbit360-block12-browser-v1', status: failed.length ? 'OPERATIONAL_RUNTIME_BROWSER_FAIL' : 'OPERATIONAL_RUNTIME_BROWSER_PASS', classification: failed.length ? (failed[0].classification || 'FUNCTIONAL_DEFECT') : 'GO_LAB_IN_PLATFORM_RUNTIME', verdict: failed.length ? 'FAIL' : 'PASS', passed: (result.results || []).filter(item => item.status === 'PASS').length, failed: failed.length, results: result.results || [], pageErrors, consoleErrors, screenshot: path.relative(ROOT, SCREENSHOT), browserExecuted: true, realTenantWrites: 0, containsTokens: false, ok: failed.length === 0 && pageErrors.length === 0 });
-  if (failed.length || pageErrors.length) process.exitCode = 42;
+  const bootstrap = { stages: [], fallbackInjectionUsed: false };
+  const mark = (stage, detail = {}) => bootstrap.stages.push({ stage, at: new Date().toISOString(), detail });
+  const diagnostics = async () => {
+    if (!page) return {};
+    try {
+      return await page.evaluate(() => ({
+        href: location.href.replace(/[?#].*$/, ''),
+        readyState: document.readyState,
+        hasFirebase: !!window.firebase,
+        firebaseApps: window.firebase && Array.isArray(firebase.apps) ? firebase.apps.length : -1,
+        hasOrbit: !!window.Orbit,
+        hasRuntimeVerification: !!(window.Orbit && Orbit.runtimeVerification),
+        backendMode: window.OrbitBackend && OrbitBackend.mode || '',
+        firebaseInit: window.OrbitBackend && OrbitBackend.firebaseInit || '',
+        firebaseInitError: window.OrbitBackend && OrbitBackend.firebaseInitError || '',
+        runtimeScriptPresent: !!document.querySelector('script[data-orbit-lab-addon="runtime-verification-center"]'),
+        runtimeScriptLoaded: !!document.querySelector('script[data-orbit-lab-addon="runtime-verification-center"][data-loaded="1"]')
+      }));
+    } catch (error) { return { diagnosticError: safe(error) }; }
+  };
+  try {
+    browser = await chromium.launch({ headless: true });
+    page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+    page.on('pageerror', error => pageErrors.push(safe(error)));
+    page.on('console', message => { if (message.type() === 'error') consoleErrors.push(safe(message.text())); });
+    const base = text(process.env.ORBIT360_PREVIEW_URL);
+    if (!base) throw new Error('ENVIRONMENT_FAILURE:PREVIEW_URL_REQUIRED');
+    const url = `${base.replace(/#.*$/, "").replace(/\?$/, "")}${base.includes("?") ? "&" : "?"}orbitBackend=firestore-lab&tenant=${encodeURIComponent(state.tenantId)}&orbitVerify=auto#/inicio`;
+    mark('NAVIGATION_START');
+    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
+    mark('DOM_CONTENT_LOADED', await diagnostics());
+    await page.waitForFunction(() => document.readyState === 'complete', null, { timeout: 30000 });
+    mark('WINDOW_LOAD_COMPLETE', await diagnostics());
+    await page.waitForFunction(() => window.OrbitBackend && OrbitBackend.mode === 'firestore-lab' && OrbitBackend.firebaseInit && OrbitBackend.firebaseInit !== 'pending', null, { timeout: 30000 });
+    const backendState = await diagnostics();
+    mark('BACKEND_INIT_TERMINAL', backendState);
+    if (!['initialized', 'already-initialized'].includes(backendState.firebaseInit)) throw new Error(`ENVIRONMENT_FAILURE:FIREBASE_INIT_${backendState.firebaseInit || "UNKNOWN"}:${backendState.firebaseInitError || ""}`);
+    await page.waitForFunction(() => window.firebase && Array.isArray(firebase.apps) && firebase.apps.length > 0, null, { timeout: 30000 });
+    mark('FIREBASE_APP_READY', await diagnostics());
+    try {
+      await page.waitForFunction(() => window.Orbit && Orbit.runtimeVerification, null, { timeout: 20000 });
+    } catch (error) {
+      bootstrap.fallbackInjectionUsed = true;
+      mark('RUNTIME_CENTER_PRIMARY_LOAD_TIMEOUT', await diagnostics());
+      await page.addScriptTag({ url: new URL('core/runtime-verification-center-v20260804.js?v=20260804-2', base.endsWith('/') ? base : base + '/').href });
+      await page.waitForFunction(() => window.Orbit && Orbit.runtimeVerification, null, { timeout: 20000 });
+    }
+    mark('RUNTIME_CENTER_READY', await diagnostics());
+    const context = { tenantId: state.tenantId, tokens: { direction: state.users.direction.token, advisorA: state.users.advisorA.token, advisorB: state.users.advisorB.token }, ids: state.ids, sourceHash: state.sourceHash };
+    await page.evaluate(ctx => window.dispatchEvent(new CustomEvent('orbit:verification-context', { detail: ctx })), context);
+    mark('CONTEXT_DISPATCHED');
+    await page.waitForFunction(() => { const s = Orbit.runtimeVerification.state(); return !!s.finishedAt && s.running === false; }, null, { timeout: 300000 });
+    const result = await page.evaluate(() => { const value = Orbit.runtimeVerification.state(); delete value.context; return value; });
+    mark('SCENARIOS_FINISHED', { resultCount: (result.results || []).length });
+    await page.screenshot({ path: SCREENSHOT, fullPage: true });
+    const failed = (result.results || []).filter(item => item.status === 'FAIL');
+    const integrationOk = bootstrap.fallbackInjectionUsed === false;
+    save(BROWSER_OUT, { schemaVersion: 'orbit360-block12-browser-v2', status: failed.length || !integrationOk ? 'OPERATIONAL_RUNTIME_BROWSER_FAIL' : 'OPERATIONAL_RUNTIME_BROWSER_PASS', classification: failed.length ? (failed[0].classification || 'FUNCTIONAL_DEFECT') : (!integrationOk ? 'PIPELINE_MECHANISM_FAILURE' : 'GO_LAB_IN_PLATFORM_RUNTIME'), verdict: failed.length || !integrationOk ? 'FAIL' : 'PASS', passed: (result.results || []).filter(item => item.status === 'PASS').length, failed: failed.length + (integrationOk ? 0 : 1), results: result.results || [], bootstrap, pageErrors, consoleErrors, screenshot: path.relative(ROOT, SCREENSHOT), browserExecuted: true, realTenantWrites: 0, containsTokens: false, ok: failed.length === 0 && pageErrors.length === 0 && integrationOk });
+    if (failed.length || pageErrors.length || !integrationOk) process.exitCode = 42;
+  } catch (error) {
+    const finalDiagnostics = await diagnostics();
+    mark('BROWSER_PHASE_ERROR', finalDiagnostics);
+    if (page) await page.screenshot({ path: SCREENSHOT, fullPage: true }).catch(() => {});
+    save(BROWSER_OUT, { schemaVersion: 'orbit360-block12-browser-v2', status: 'OPERATIONAL_RUNTIME_BROWSER_FAIL', classification: safe(error).split(':')[0] || 'PIPELINE_MECHANISM_FAILURE', verdict: 'FAIL', error: safe(error), passed: 0, failed: 1, results: [], bootstrap, pageErrors, consoleErrors, screenshot: fs.existsSync(SCREENSHOT) ? path.relative(ROOT, SCREENSHOT) : '', browserExecuted: true, realTenantWrites: 0, containsTokens: false, ok: false });
+    process.exitCode = 42;
+  } finally {
+    if (browser) await browser.close().catch(() => {});
+  }
 }
 async function cleanup(app) {
   const auth = getAuth(app), db = getFirestore(app);

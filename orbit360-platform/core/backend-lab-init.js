@@ -20,7 +20,7 @@
     tenantId: tenant,
     tenant: tenant,
     firebaseInit: 'pending',
-    firebaseInitVersion: 'v1.127-operational-runtime-lab',
+    firebaseInitVersion: 'v1.128-browser-harness-rootfix',
     functionsRegion: (window.OrbitBackend && window.OrbitBackend.functionsRegion) || 'us-central1',
     functionNames: Object.assign({}, window.OrbitBackend && window.OrbitBackend.functionNames || {}, {
       opsLeads: 'orbit360OpsLeadsCommandLabV20260804',
@@ -115,7 +115,7 @@
   loadReconciliationDomain();
   loadRecurringInsuranceImport();
   if (/^(1|auto)$/i.test(params.get('orbitVerify') || '')) {
-    afterWindowLoad(function(){ loadScriptOnce('core/runtime-verification-center-v20260804.js?v=20260804-1', 'runtime-verification-center'); });
+    loadScriptOnce('core/runtime-verification-center-v20260804.js?v=20260804-2', 'runtime-verification-center');
   }
 
   if (tenant === 'alianzas-soluciones') {

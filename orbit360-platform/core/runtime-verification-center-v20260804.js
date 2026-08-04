@@ -14,6 +14,10 @@
   const text = value => String(value == null ? '' : value);
   const cleanError = error => text(error && (error.message || error)).replace(/[\w.+-]+@[\w.-]+/g, '[email]').replace(/[A-Za-z0-9_-]{30,}/g, '[id]').slice(0, 300);
   const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+  const withTimeout = (promise, ms, code) => Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error(`ENVIRONMENT_FAILURE:${code}:TIMEOUT_${ms}MS`)), ms))
+  ]);
   function fnNames() {
     const names = window.OrbitBackend && OrbitBackend.functionNames || {};
     return {
@@ -29,13 +33,13 @@
     return firebase.app().functions(region).httpsCallable(name);
   }
   async function call(name, payload) {
-    const response = await callable(name)(payload);
+    const response = await withTimeout(callable(name)(payload), 30000, `CALLABLE_${name}`);
     return response && response.data ? response.data : response;
   }
   async function signIn(token) {
     if (!token) throw new Error('Identidad sintética no disponible');
-    await firebase.auth().signOut().catch(() => {});
-    await firebase.auth().signInWithCustomToken(token);
+    await withTimeout(firebase.auth().signOut().catch(() => {}), 10000, 'AUTH_SIGNOUT');
+    await withTimeout(firebase.auth().signInWithCustomToken(token), 30000, 'AUTH_SIGNIN');
     await sleep(150);
   }
   function classify(error) {
