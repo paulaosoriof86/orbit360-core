@@ -1,6 +1,6 @@
 {
   "schemaVersion": "orbit360-gravicentra-rc12-membership-go-live-resume-v1",
-  "status": "RESUME_PRE_RISK_SAME_AUTHORIZATION",
+  "status": "CONSUMED_NO_GO",
   "failedRun": 30877460688,
   "failedJob": 91891705926,
   "rootCause": "EVIDENCE_PATH_RESOLUTION",
@@ -10,6 +10,13 @@
   "previousAuthRead": false,
   "previousDeployExecuted": false,
   "previousProductionTouched": false,
+  "resumedRun": 30877589549,
+  "resumedJob": 91892068434,
+  "resumedDecision": "RC12_NORMAL_IDENTITIES_NO_GO",
+  "resumedClassification": "DATA_CONTRACT_FAILURE_WITH_SECURITY_IMPACT",
+  "resumedError": "ACTIVE_NORMAL_MEMBERSHIP_NOT_FOUND_DIRECCION",
+  "resumedDeployExecuted": false,
+  "resumedProductionTouched": false,
   "releaseBranch": "release/gravicentra-insurance-rc1-2-membership-auth-20260803",
   "releaseCommit": "b699ba329960cd830121b57452ce558399aa84fb",
   "tenantId": "alianzas-soluciones",
@@ -17,7 +24,7 @@
   "newAuthorization": false,
   "retryOfProduct": false,
   "resumeBoundary": "after_static_gate_before_secrets",
-  "consumed": false,
+  "consumed": true,
   "containsPII": false,
   "containsSecrets": false
 }
