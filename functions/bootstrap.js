@@ -7,6 +7,7 @@ module.exports = Object.assign(
   require('./ops-leads-domain'),
   require('./ops-advisor-inbox'),
   require('./cobros-reconciliation-domain'),
+  require('./recurring-insurance-import'),
   require('./index'),
   require('./bank-accounts')
 );
