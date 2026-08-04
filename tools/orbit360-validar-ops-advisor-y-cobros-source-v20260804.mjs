@@ -91,8 +91,8 @@ check('Cartera completa infiere cuotas anteriores a la primera pendiente', () =>
 });
 check('Paquete Claude exige candidata acumulativa', () => {
   assert.match(packageDoc, /acumulativ/i);
-  assert.match(packageDoc, /empalme selectivo/i);
-  assert.match(packageDoc, /no reemplazar/i);
+  assert.match(packageDoc, /empalm(?:ar selectivamente|e selectivo)/i);
+  assert.match(packageDoc, /no es una orden para reemplazar|no reemplazar/i);
 });
 
 const failed = checks.filter(item => !item.ok);
