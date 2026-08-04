@@ -1,0 +1,73 @@
+{
+  "schemaVersion": "gravicentra-insurance-shell-mobile-focused-evidence-v1",
+  "date": "2026-08-03",
+  "classification": "FUNCTIONAL_DEFECT",
+  "owner": "Shell/Topbar responsive",
+  "baselineProductHead": "267f7231b46d65b80c167f54567a67503b6a6793",
+  "fixCommit": "12a52de72f541cf39aae3556fd52a2d444d57b17",
+  "viewport": "390x844",
+  "scope": [
+    "cliente360",
+    "polizas",
+    "leads"
+  ],
+  "environment": {
+    "type": "focused-local-layout-fixture",
+    "cssContract": "shared mobile topbar/shell/sidebar/overlay owner",
+    "backendUsed": false,
+    "secretsUsed": false,
+    "firestoreReads": 0,
+    "firestoreWrites": 0,
+    "operationalWrites": 0,
+    "deployExecuted": false,
+    "productionTouched": false
+  },
+  "result": {
+    "ok": true,
+    "topbarHeight": 104,
+    "topbarBottom": 104,
+    "moduleBandTop": 132,
+    "shellPaddingTop": 104,
+    "sidebarTop": 104,
+    "overlayTop": 104,
+    "searchDisplay": "flex",
+    "routesPassed": 3,
+    "routesFailed": 0
+  },
+  "routes": [
+    {
+      "route": "cliente360",
+      "ok": true,
+      "topbarHeight": 104,
+      "moduleBandTop": 132,
+      "clear": true
+    },
+    {
+      "route": "polizas",
+      "ok": true,
+      "topbarHeight": 104,
+      "moduleBandTop": 132,
+      "clear": true
+    },
+    {
+      "route": "leads",
+      "ok": true,
+      "topbarHeight": 104,
+      "moduleBandTop": 132,
+      "clear": true
+    }
+  ],
+  "digests": {
+    "report": "sha256:2fbde5f3a28d4b1f2fda86ac09206d6a3d0a22eea754e26b763882925cac5fff",
+    "cliente360Screenshot": "sha256:b90308b4063a5e1a6d324e1d6cbb8c502557d4c817c0a289977dc97c1088eeb7",
+    "polizasScreenshot": "sha256:36274e0efd122443e9d66163683dfa4dd726a203f4837f830f91173738d44f28",
+    "leadsScreenshot": "sha256:da43c51bcc1c7c06924d2b3505c738fd3f20d4ed15bb9655c272e6dcd0cf763c"
+  },
+  "limitations": [
+    "Focused layout evidence; it does not replace the previous Gate 7.11 runtime PASS.",
+    "The repository workflow remains a predeploy verification and has not been claimed as executed without retrievable evidence."
+  ],
+  "decision": "PASS_FOCUSED_LAYOUT_RC1_SEAL_ALLOWED",
+  "containsPII": false,
+  "containsSecrets": false
+}
