@@ -3,7 +3,7 @@
   "validatorLifecycleRevision": "phase-capability-contract-v1",
   "gateId": "block12-operational-runtime-lab-v20260804",
   "gateContractVersion": "12.0.1",
-  "status": "OPERATIONAL_RUNTIME_LAB_ROOTFIX_AUTHORIZED",
+  "status": "OPERATIONAL_RUNTIME_LAB_DEPENDENCY_ROOTFIX_READY",
   "singleGate": true,
   "macroClosure": true,
   "executionProfile": {
@@ -21,18 +21,15 @@
     }
   },
   "authorization": {
-    "source": "user_proceeds_block12_rootfix_continuation_20260804T1424-0600",
+    "source": "user_proceeds_block12_after_dependency_rootfix_20260804T1424-0600",
     "allowedExecutions": 1,
     "consumed": false,
     "replayAllowed": false,
-    "retryAuthorizedBecausePriorRunsStoppedBeforeSecrets": true,
-    "previousRunIds": [30945951133, 30948708843],
-    "previousFailureClassification": "PIPELINE_MECHANISM_FAILURE",
-    "previousFailureCodes": [
-      "CANONICAL_LIFECYCLE_REVISION_MISMATCH",
-      "PREPARE_STATE_DECLARATION_COUNT_2"
-    ],
-    "request": ".github/orbit360-requests/block12-operational-runtime-lab-rootfix2-v20260804.json"
+    "retryAuthorizedBecausePriorRuntimeStoppedBeforeFunctionCreation": true,
+    "previousRuntimeRunIds": [30945951133, 30948708843, 30949139231],
+    "dependencyValidationRunId": 30950155722,
+    "dependencyValidationStatus": "FUNCTIONS_BOOTSTRAP_LOAD_PASS",
+    "request": ".github/orbit360-requests/block12-operational-runtime-lab-rootfix4-v20260804.json"
   },
   "scope": {
     "projectId": "ays-orbit-360-lab",
@@ -47,6 +44,8 @@
       "orbit360CobrosReconciliationCommandLabV20260804",
       "orbit360RecurringInsuranceImportLabV20260804"
     ],
+    "functionsPackageLockRequired": true,
+    "functionsBootstrapLoadPassRequired": true,
     "hostingChannel": "orbit360-operational-block12",
     "runtimeRoutes": [
       "inicio",
