@@ -4,6 +4,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
+import { execFileSync } from 'node:child_process';
 import { applicationDefault, deleteApp, getApps, initializeApp } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 import { getFirestore } from 'firebase-admin/firestore';
@@ -16,6 +17,8 @@ const EVIDENCE_DIR = process.env.ORBIT360_EVIDENCE_DIR || 'orbit360-platform/run
 const PRIVATE_STATE = process.env.ORBIT360_APPROVED_ROSTER_PRIVATE_STATE || path.join(process.env.RUNNER_TEMP || ROOT, 'rc12-approved-roster-private-state.json');
 const PRIVATE_IDENTITIES = process.env.ORBIT360_RC12_PRIVATE_IDENTITIES || path.join(process.env.RUNNER_TEMP || ROOT, 'rc12-approved-roster-identities.json');
 const MANIFEST_FILE = path.join(ROOT, 'orbit360-platform/runtime-gate-crm-v20260716/rc12-cumulative-candidate-unified-manifest.json');
+const APPROVED_SOURCE_COMMIT = '34fa84a60ebc38b0035ed664da87ca78aaa73ff7';
+const APPROVED_SOURCE_PATH = 'orbit360-platform/runtime-gate-crm-v20260716/rc12-cumulative-candidate-unified-manifest.json';
 const FILES = Object.freeze({
   census: path.join(ROOT, EVIDENCE_DIR, 'rc12-approved-roster-census.json'),
   apply: path.join(ROOT, EVIDENCE_DIR, 'rc12-approved-roster-apply.json'),
@@ -62,6 +65,12 @@ function writePrivate(payload) {
 }
 function readPrivate() {
   return JSON.parse(fs.readFileSync(PRIVATE_STATE, 'utf8'));
+}
+function readApprovedRosterSource() {
+  const raw = execFileSync('git', ['show', `${APPROVED_SOURCE_COMMIT}:${APPROVED_SOURCE_PATH}`], { cwd: ROOT, encoding: 'utf8', maxBuffer: 4 * 1024 * 1024 });
+  const parsed = JSON.parse(raw);
+  if (!parsed?.approvedRoster) throw new Error('APPROVED_ROSTER_SOURCE_LOCK_MISSING');
+  return parsed.approvedRoster;
 }
 function writeIdentities(payload) {
   fs.writeFileSync(PRIVATE_IDENTITIES, JSON.stringify(payload), { encoding: 'utf8', mode: 0o600 });
@@ -131,17 +140,16 @@ function resolveAdvisor(contract, advisors) {
   const requiredTokens = tokens(contract.personRef || '');
   const nameMatches = advisors.filter(row => requiredTokens.length > 0 && requiredTokens.every(token => row.nameTokens.includes(token)));
   if (nameMatches.length !== 1) return { status: nameMatches.length ? 'ambiguous' : 'missing', source: 'canonical_name', candidates: nameMatches.length };
-  const advisor = nameMatches[0];
-  if (!advisor.email) return { status: 'missing_email', source: 'canonical_name', candidates: 1 };
-  if (advisor.emailSha256 !== contract.emailSha256) return { status: 'digest_mismatch', source: 'canonical_name', candidates: 1, observedEmailSha256: advisor.emailSha256 };
-  return { status: 'resolved', source: 'canonical_name_plus_digest', advisor };
+  return { status: 'resolved', source: 'canonical_name', advisor: nameMatches[0] };
 }
-function resolveAuth(contract, advisor, users) {
+function resolveAuth(contract, approvedEmail, users) {
+  const email = String(approvedEmail || '').trim().toLowerCase();
+  if (!email || sha(email) !== contract.emailSha256) return { status: 'approved_source_digest_mismatch', candidates: 0, user: null };
   const matches = users.filter(user => sha(String(user?.email || '').toLowerCase()) === contract.emailSha256);
   if (!matches.length) return { status: 'missing', candidates: 0, user: null };
   if (matches.length !== 1) return { status: 'ambiguous', candidates: matches.length, user: null };
   const user = matches[0];
-  if (String(user.email || '').toLowerCase() !== advisor.email) return { status: 'email_value_mismatch', candidates: 1, user: null };
+  if (String(user.email || '').toLowerCase() !== email) return { status: 'email_value_mismatch', candidates: 1, user: null };
   if (!validNormalUser(user)) return { status: 'existing_invalid', candidates: 1, user };
   return { status: 'existing_valid', candidates: 1, user };
 }
@@ -202,6 +210,7 @@ function publicProfile(item) {
 }
 async function resolveRoster() {
   const manifest = JSON.parse(fs.readFileSync(MANIFEST_FILE, 'utf8'));
+  const approvedSource = readApprovedRosterSource();
   const { auth, db } = admin();
   const [users, advisors, memberships] = await Promise.all([
     listAllUsers(auth),
@@ -216,15 +225,20 @@ async function resolveRoster() {
   for (const profile of PROFILE_KEYS) {
     const contract = manifest.approvedRoster?.[profile];
     if (!contract?.personRef || !/^[a-f0-9]{64}$/.test(contract?.emailSha256 || '')) throw new Error(`APPROVED_ROSTER_CONTRACT_INVALID_${profile.toUpperCase()}`);
+    const sourceContract = approvedSource?.[profile];
+    const approvedEmail = String(sourceContract?.email || '').trim().toLowerCase();
+    const sourcePerson = String(sourceContract?.person || '').trim();
+    if (!approvedEmail || sha(approvedEmail) !== contract.emailSha256 || clean(sourcePerson) !== clean(contract.personRef)) throw new Error(`APPROVED_ROSTER_SOURCE_LOCK_INVALID_${profile.toUpperCase()}`);
     const advisorResult = resolveAdvisor(contract, advisors);
     const authResult = advisorResult.status === 'resolved'
-      ? resolveAuth(contract, advisorResult.advisor, users)
+      ? resolveAuth(contract, approvedEmail, users)
       : { status: 'not_evaluated', candidates: 0, user: null };
     roster[profile] = {
       profile,
       runtimeProfile: PROFILES[profile],
       personRef: contract.personRef,
       emailSha256: contract.emailSha256,
+      approvedEmail,
       advisorStatus: advisorResult.status,
       advisorSource: advisorResult.source,
       advisor: advisorResult.advisor || null,
@@ -259,7 +273,7 @@ async function census() {
           profile,
           runtimeProfile: item.runtimeProfile,
           personRef: item.personRef,
-          email: item.advisor.email,
+          email: item.approvedEmail,
           emailSha256: item.emailSha256,
           displayName: item.advisor.name,
           advisor: stable(item.advisor),

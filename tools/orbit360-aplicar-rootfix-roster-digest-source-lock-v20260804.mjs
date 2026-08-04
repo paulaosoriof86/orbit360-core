@@ -148,7 +148,7 @@ fs.writeFileSync(ENTRYPOINT, entrypoint, 'utf8');
 
 const rawMarkers = /[A-Z0-9._%+-]+@aysseguros\.com/gi;
 const checks = {
-  sourceLockReaderPresent: provisioner.includes('readApprovedRosterSource()') && provisioner.includes(APPROVED_SOURCE_COMMIT),
+  sourceLockReaderPresent: provisioner.includes('readApprovedRosterSource()') && provisioner.includes(SOURCE_COMMIT),
   sourceLockDigestRequired: provisioner.includes('sha(approvedEmail) !== contract.emailSha256'),
   advisorEmailNoLongerRequired: !provisioner.includes("return { status: 'missing_email'"),
   approvedEmailPrivateOnly: provisioner.includes('email: item.approvedEmail') && !rawMarkers.test(provisioner),

@@ -7,9 +7,9 @@ import { execFileSync } from 'node:child_process';
 
 const ROOT = process.cwd();
 const GATE = 'block7.15-rc12-approved-roster-final-go-live-v20260804';
-const VERSION = '7.15.0';
+const VERSION = '7.15.1';
 const LIFECYCLE = 'tools/orbit360-validator-lifecycle-contract-rc12-approved-roster-final-go-live-v20260804.json';
-const REQUEST = process.env.ORBIT360_REQUEST_FILE || '.github/orbit360-requests/rc12-approved-roster-final-go-live-v20260804.json';
+const REQUEST = process.env.ORBIT360_REQUEST_FILE || '.github/orbit360-requests/rc12-approved-roster-final-go-live-resume-v20260804.json';
 const MANIFEST = 'orbit360-platform/runtime-gate-crm-v20260716/rc12-cumulative-candidate-unified-manifest.json';
 const UNIFICATION = 'orbit360-platform/runtime-gate-crm-v20260716/rc12-cumulative-candidate-unified-validation.json';
 const AUDIT = 'orbit360-platform/runtime-gate-crm-v20260716/rc12-forensic-module-audit.json';
@@ -30,6 +30,7 @@ const REQUIRED = [
   'tools/orbit360-gravicentra-rc12-browser-membership-smoke-v20260803.mjs',
   'tools/orbit360-gravicentra-rc1-go-live-helper-v20260803.mjs',
   'tools/orbit360-validar-auth-membership-antiregression-rootfix-v20260803.mjs',
+  'orbit360-platform/runtime-gate-crm-v20260716/rc12-approved-roster-reconciler-rootfix-static.json',
   'tools/orbit360-validator-lifecycle-contract-rc12-rootcause-cumulative-closure-v20260803.json',
   'tools/orbit360-validar-gate-contracts-engine-rc12-rootcause-cumulative-closure-v20260803.mjs'
 ];
@@ -54,9 +55,10 @@ try {
   const roster = manifest.approvedRoster || {};
 
   add('GATE_ID_VERSION', process.argv[2] === GATE && lifecycle.gateId === GATE && lifecycle.gateContractVersion === VERSION);
-  add('LIFECYCLE_AUTHORIZED', lifecycle.status === 'RC12_APPROVED_ROSTER_FINAL_GO_LIVE_AUTHORIZED' && lifecycle.singleGate === true && lifecycle.macroClosure === true);
+  add('LIFECYCLE_AUTHORIZED', lifecycle.status === 'RC12_APPROVED_ROSTER_FINAL_GO_LIVE_POST_ROOTFIX_AUTHORIZED' && lifecycle.singleGate === true && lifecycle.macroClosure === true);
   add('PHASE_CAPABILITIES', lifecycle.executionProfile?.phase === 'GRAVICENTRA_RC12_APPROVED_ROSTER_FINAL_GO_LIVE' && capabilities.secrets === true && capabilities.firestoreRead === true && capabilities.writes === true && capabilities.runtime === true && capabilities.browser === true && capabilities.deploy === true && capabilities.functionsDeploy === false && capabilities.rulesDeploy === false && capabilities.production === true);
-  add('REQUEST_ACTIVE', request.schemaVersion === 'orbit360-rc12-approved-roster-final-go-live-request-v1' && request.status === 'AUTHORIZED_SINGLE_MACRO' && request.approved === true && request.allowedExecutions === 1 && request.consumed === false && request.replayAllowed === false && request.retryAuthorized === false);
+  add('REQUEST_ACTIVE', request.schemaVersion === 'orbit360-rc12-approved-roster-final-go-live-request-v1' && request.status === 'AUTHORIZED_POST_ROOTFIX_RESUME' && request.approved === true && request.allowedExecutions === 1 && request.consumed === false && request.replayAllowed === false && request.retryAuthorized === false);
+  add('LIFECYCLE_REQUEST_BINDING', lifecycle.authorization?.request === REQUEST && lifecycle.authorization?.previousRun === 30908259200 && lifecycle.rootFix?.evidence === 'orbit360-platform/runtime-gate-crm-v20260716/rc12-approved-roster-reconciler-rootfix-static.json');
   add('REQUEST_BINDING', request.branch === LIVE_BRANCH && request.pullRequest === 5 && request.releaseBranch === RELEASE_BRANCH && request.releaseCommit === CANDIDATE && request.baseline === BASELINE && request.projectId === 'ays-orbit-360-lab' && request.tenantId === 'alianzas-soluciones');
   add('UNIFIED_CANDIDATE_PASS', unification.decision === 'CANDIDATE_UNIFICATION_STATIC_PASS' && unification.classification === 'GO_STATIC_CUMULATIVE_PRODUCT_DATA_BINDING' && unification.releaseCommit === CANDIDATE && unification.baseline === BASELINE && unification.passed === 22 && unification.failed === 0 && unification.ok === true && unification.reimportExecuted === false && unification.gate711Repeated === false);
   add('MANIFEST_BOUND', manifest.candidateId === 'gravicentra-insurance-rc1.2-unified' && manifest.releaseCommit === CANDIDATE && manifest.data?.reimportRequired === false && manifest.data?.dataLossObserved === false && manifest.access?.dataAbsent === false && manifest.store?.membershipRequired === true);

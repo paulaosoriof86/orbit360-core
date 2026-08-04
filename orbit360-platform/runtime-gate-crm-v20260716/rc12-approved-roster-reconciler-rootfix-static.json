@@ -1,0 +1,28 @@
+{
+  "schemaVersion": "orbit360-approved-roster-reconciler-rootfix-static-v1",
+  "generatedAt": "2026-08-04T12:43:36.982Z",
+  "decision": "APPROVED_ROSTER_RECONCILER_ROOTFIX_STATIC_PASS",
+  "classification": "GO_STATIC_VALIDATOR_ROOTFIX",
+  "sourceCommitSha256": "sha256:b14a07f6803febecbd4c640f1bdff62611f839bd2d0b69218bb1323287fc0e2d",
+  "sourcePathSha256": "sha256:1172cd6ca149ae64e879cdfcbb788da8645753cd29bc3a1883b1d3987bab75ea",
+  "rawEmailStored": false,
+  "firestoreRead": false,
+  "firestoreWrites": 0,
+  "authRead": false,
+  "authWrites": 0,
+  "userCreates": 0,
+  "browserExecuted": false,
+  "deployExecuted": false,
+  "productionTouched": false,
+  "checks": {
+    "sourceLockReaderPresent": true,
+    "sourceLockDigestRequired": true,
+    "advisorEmailNoLongerRequired": true,
+    "approvedEmailPrivateOnly": true,
+    "existingUsersRemainImmutable": true,
+    "lifecycleResumeBound": true,
+    "engineResumeBound": true,
+    "centralRegistryUpdated": true
+  },
+  "ok": true
+}

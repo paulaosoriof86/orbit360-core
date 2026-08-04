@@ -1,9 +1,9 @@
 {
   "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
   "gateId": "block7.15-rc12-approved-roster-final-go-live-v20260804",
-  "gateContractVersion": "7.15.0",
+  "gateContractVersion": "7.15.1",
   "validatorLifecycleRevision": "phase-capability-contract-v1",
-  "status": "RC12_APPROVED_ROSTER_FINAL_GO_LIVE_AUTHORIZED",
+  "status": "RC12_APPROVED_ROSTER_FINAL_GO_LIVE_POST_ROOTFIX_AUTHORIZED",
   "executionProfile": {
     "phase": "GRAVICENTRA_RC12_APPROVED_ROSTER_FINAL_GO_LIVE",
     "capabilities": {
@@ -32,8 +32,10 @@
     "requiredForExecution": true,
     "activeRequest": true,
     "allowedExecutions": 1,
-    "request": ".github/orbit360-requests/rc12-approved-roster-final-go-live-v20260804.json",
-    "replayAllowed": false
+    "request": ".github/orbit360-requests/rc12-approved-roster-final-go-live-resume-v20260804.json",
+    "replayAllowed": false,
+    "previousRun": 30908259200,
+    "previousDecision": "RC12_APPROVED_ROSTER_RECONCILIATION_NO_GO_NO_WRITE"
   },
   "target": {
     "projectId": "ays-orbit-360-lab",
@@ -41,14 +43,33 @@
     "liveUrl": "https://ays-orbit-360-lab.web.app"
   },
   "approvedRoster": {
-    "profiles": ["direction", "operations", "advisor"],
-    "people": ["Paula Osorio", "Carlos Castro", "Samuel Daza"],
+    "profiles": [
+      "direction",
+      "operations",
+      "advisor"
+    ],
+    "people": [
+      "Paula Osorio",
+      "Carlos Castro",
+      "Samuel Daza"
+    ],
     "manifest": "orbit360-platform/runtime-gate-crm-v20260716/rc12-cumulative-candidate-unified-manifest.json",
     "emailsStoredAsDigestsOnly": true,
     "advisorIdSource": "existing canonical advisor record"
   },
-  "requiredRuntimeProfiles": ["direccion", "operativo", "asesor"],
-  "requiredRuntimeModules": ["cliente360", "aseguradoras", "polizas", "cobros", "ops", "leads"],
+  "requiredRuntimeProfiles": [
+    "direccion",
+    "operativo",
+    "asesor"
+  ],
+  "requiredRuntimeModules": [
+    "cliente360",
+    "aseguradoras",
+    "polizas",
+    "cobros",
+    "ops",
+    "leads"
+  ],
   "expectedOperationalCounts": {
     "clientes": 430,
     "aseguradoras": 30,
@@ -61,7 +82,11 @@
   },
   "provisioningBoundary": {
     "membershipCollection": "tenants/{tenantId}/members",
-    "exactProfiles": ["direction", "operations", "advisor"],
+    "exactProfiles": [
+      "direction",
+      "operations",
+      "advisor"
+    ],
     "maximumAuthUsersCreated": 3,
     "maximumAuthUsersUpdated": 0,
     "maximumMembershipDocumentsWritten": 3,
@@ -113,5 +138,15 @@
     "externalPackageSent": false
   },
   "containsPII": false,
-  "containsSecrets": false
+  "containsSecrets": false,
+  "rootFix": {
+    "classification": "VALIDATOR_STALE",
+    "failureFamily": "ADVISOR_EMAIL_REQUIRED_WHEN_CANONICAL_RECORD_HAS_NO_EMAIL",
+    "owner": "tools/orbit360-provisionar-roster-aprobado-final-rc12-v20260804.mjs",
+    "approvedRosterSourceCommit": "34fa84a60ebc38b0035ed664da87ca78aaa73ff7",
+    "approvedRosterSourcePath": "orbit360-platform/runtime-gate-crm-v20260716/rc12-cumulative-candidate-unified-manifest.json",
+    "digestVerificationRequired": true,
+    "rawEmailPersistenceAllowed": false,
+    "evidence": "orbit360-platform/runtime-gate-crm-v20260716/rc12-approved-roster-reconciler-rootfix-static.json"
+  }
 }
