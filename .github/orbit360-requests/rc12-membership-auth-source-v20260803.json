@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "orbit360-rc12-membership-auth-source-request-v1",
+  "status": "AUTHORIZED_SOURCE_ONLY",
+  "branch": "release/gravicentra-insurance-rc1-2-membership-auth-20260803",
+  "baseReleaseCommit": "1eb7daea580c0807d867a663086defc021435993",
+  "scope": {
+    "sourceOnly": true,
+    "authenticationByTenantMembership": true,
+    "removeTechnicalIdentityLock": true,
+    "preserveRolesScopesAdvisor": true,
+    "firestoreRead": false,
+    "firestoreWrites": false,
+    "authWrites": false,
+    "deploy": false,
+    "rules": false,
+    "functions": false,
+    "main": false,
+    "merge": false
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
