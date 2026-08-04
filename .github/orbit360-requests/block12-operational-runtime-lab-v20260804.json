@@ -1,0 +1,43 @@
+{
+  "schemaVersion": "orbit360-block12-operational-runtime-lab-request-v1",
+  "status": "AUTHORIZED",
+  "approved": true,
+  "authorizationRef": "user_authorizes_single_lab_macro_ops_leads_cobros_recurring_runtime_20260804T1345-0600",
+  "allowedExecutions": 1,
+  "consumed": false,
+  "replayAllowed": false,
+  "retryAuthorized": false,
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "parentHead": "b85d80a7566032b250d2ca04eda5fce6a1931d7a",
+  "projectId": "ays-orbit-360-lab",
+  "gateId": "block12-operational-runtime-lab-v20260804",
+  "contractVersion": "12.0.0",
+  "scope": {
+    "syntheticTenantOnly": true,
+    "maximumSyntheticAuthUsers": 3,
+    "maximumSyntheticMemberships": 3,
+    "functionNames": [
+      "orbit360OpsLeadsCommandLabV20260804",
+      "orbit360GetAdvisorOpsInboxLabV20260804",
+      "orbit360CobrosReconciliationCommandLabV20260804",
+      "orbit360RecurringInsuranceImportLabV20260804"
+    ],
+    "hostingPreviewOnly": true,
+    "hostingChannel": "orbit360-operational-block12",
+    "productionHosting": false,
+    "inPlatformScenarios": true,
+    "rolesAndScopes": true,
+    "idempotency": true,
+    "notifications": true,
+    "snapshotBeforeAfter": true,
+    "rollbackExact": true,
+    "cumulativeVisualAfterPassOnly": true,
+    "realTenantWrites": false,
+    "realDataReimport": false,
+    "rules": false,
+    "production": false,
+    "main": false,
+    "merge": false
+  }
+}
