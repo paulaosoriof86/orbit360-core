@@ -1,0 +1,119 @@
+name: Orbit 360 · Functions dependency rootfix 3 · source only
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-requests/functions-dependency-rootfix3-source-v20260804.json'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: orbit360-functions-dependency-rootfix3-source-v20260804
+  cancel-in-progress: false
+
+env:
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  ORBIT360_REQUEST_FILE: .github/orbit360-requests/functions-dependency-rootfix3-source-v20260804.json
+  ORBIT360_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/functions-dependency-rootfix-source-v20260804.json
+
+jobs:
+  dependency-rootfix:
+    name: Install → validate bootstrap → seal lockfile
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout solicitud exacta
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 3
+          persist-credentials: true
+
+      - name: Preparar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verificar continuidad source-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
+          test "${#CHANGED[@]}" = '1'
+          test "${CHANGED[0]}" = "$ORBIT360_REQUEST_FILE"
+          PARENT="$(git rev-parse HEAD^)"
+          jq -e --arg parent "$PARENT" '
+            .schemaVersion=="orbit360-functions-dependency-rootfix3-source-request-v1" and
+            .status=="AUTHORIZED_SOURCE_ONLY_CONTINUATION" and
+            .approved==true and
+            .allowedExecutions==1 and
+            .consumed==false and
+            .replayAllowed==false and
+            .previousRunIds==[30949139231,30949801751,30949971161] and
+            .previousFailures==["MODULE_NOT_FOUND_@firebase/app","VALIDATOR_EXPECTED_TOOLING_DEPENDENCY_AS_RUNTIME","BASH_HEREDOC_WRAPPER_SYNTAX"] and
+            .branch=="ays/backend-tenant-lab-v99-20260703" and
+            .parentHead==$parent and
+            .secrets==false and
+            .firebaseCommands==false and
+            .firestoreRead==false and
+            .firestoreWrites==0 and
+            .authWrites==0 and
+            .deploy==false and
+            .production==false and
+            .main==false and
+            .merge==false
+          ' "$ORBIT360_REQUEST_FILE" >/dev/null
+
+      - name: Corregir owner e instalar árbol limpio
+        shell: bash
+        run: |
+          set -euo pipefail
+          node -e "const fs=require('fs');const f='functions/index.js';let s=fs.readFileSync(f,'utf8');const a=\"const { setGlobalOptions } = require('firebase-functions/v2/options');\";const b=\"const { setGlobalOptions } = require('firebase-functions/v2');\";if(!s.includes(a)){if(!s.includes(b))throw new Error('PIPELINE_MECHANISM_FAILURE:SET_GLOBAL_OPTIONS_OWNER_NOT_FOUND');s=s.replace(b,a)}fs.writeFileSync(f,s,'utf8')"
+          rm -rf functions/node_modules functions/package-lock.json
+          npm --prefix functions install --package-lock=true --include=prod
+
+      - name: Validar runtime reproducible
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-validar-functions-runtime-dependencies-v20260804.mjs
+          node tools/orbit360-validar-functions-runtime-dependencies-v20260804.mjs | tee "$RUNNER_TEMP/runtime-dependencies.json"
+          jq -e '.status=="FUNCTIONS_BOOTSTRAP_LOAD_PASS" and .classification=="GO_SOURCE_REPRODUCIBLE_FUNCTIONS_RUNTIME" and .requiredFunctionExports==true and .broadV2AggregatorLoaded==false and .unusedDatabaseProviderLoaded==false and .lockfileVersion>=3 and .firebaseCommandsExecuted==false and .firestoreRead==false and .firestoreWrites==0 and .authWrites==0 and .deployExecuted==false and .ok==true' "$RUNNER_TEMP/runtime-dependencies.json" >/dev/null
+          node --check functions/index.js
+          node --check functions/bootstrap.js
+          npm --prefix functions run check
+          git diff --check
+
+      - name: Sellar evidencia y lockfile
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$(dirname "$ORBIT360_EVIDENCE")"
+          jq '. + {
+            previousRunIds:[30949139231,30949801751,30949971161],
+            rootCause:"functions/index.js loaded firebase-functions/v2 aggregator for setGlobalOptions, activating an unused database provider; two source validators then failed before bootstrap due validator scope and Bash wrapper defects",
+            owner:"functions/index.js:setGlobalOptions import",
+            importAfter:"firebase-functions/v2/options",
+            sourceChecksPass:true
+          }' "$RUNNER_TEMP/runtime-dependencies.json" > "$ORBIT360_EVIDENCE"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add functions/index.js functions/package-lock.json "$ORBIT360_EVIDENCE"
+          git commit -m 'fix(functions): narrow options import and seal reproducible runtime'
+          git push origin HEAD:"$ORBIT360_BRANCH"
+
+      - name: Publicar cierre en PR 5
+        if: always()
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          STATUS="FUNCTIONS_DEPENDENCY_ROOTFIX_SOURCE_FAIL"; CLASSIFICATION="PIPELINE_MECHANISM_FAILURE"
+          if [ -f "$ORBIT360_EVIDENCE" ]; then STATUS="$(jq -r '.status' "$ORBIT360_EVIDENCE")"; CLASSIFICATION="$(jq -r '.classification' "$ORBIT360_EVIDENCE")"; fi
+          gh api "repos/${GITHUB_REPOSITORY}/issues/5/comments" -f body="## Functions dependency rootfix 3 · run ${GITHUB_RUN_ID}\n\n- Estado: \`${STATUS}\`\n- Clasificación: \`${CLASSIFICATION}\`\n- Alcance: source-only, sin secretos ni Firebase\n- Deploy/Rules/producción/main/merge: no" >/dev/null
