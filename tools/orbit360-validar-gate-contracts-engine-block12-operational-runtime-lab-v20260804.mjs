@@ -6,9 +6,9 @@ import { execFileSync } from 'node:child_process';
 
 const ROOT = process.cwd();
 const GATE = 'block12-operational-runtime-lab-v20260804';
-const VERSION = '12.0.0';
+const VERSION = '12.0.1';
 const LIFECYCLE = 'tools/orbit360-validator-lifecycle-contract-block12-operational-runtime-lab-v20260804.json';
-const REQUEST = process.env.ORBIT360_REQUEST_FILE || '.github/orbit360-requests/block12-operational-runtime-lab-v20260804.json';
+const REQUEST = process.env.ORBIT360_REQUEST_FILE || '.github/orbit360-requests/block12-operational-runtime-lab-rootfix2-v20260804.json';
 const OUT = path.join(ROOT, 'orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json');
 const REQUIRED = [
   LIFECYCLE,
@@ -22,7 +22,7 @@ const REQUIRED = [
   'orbit360-platform/core/backend-lab-init.js',
   'orbit360-platform/core/runtime-verification-center-v20260804.js',
   'tools/orbit360-block12-operational-runtime-lab-v20260804.mjs',
-  '.github/workflows/orbit360-block12-operational-runtime-lab-v20260804.yml'
+  '.github/workflows/orbit360-block12-operational-runtime-lab-rootfix2-v20260804.yml'
 ];
 const EXPECTED_FUNCTIONS = [
   'orbit360OpsLeadsCommandLabV20260804',
@@ -45,9 +45,9 @@ try {
   const scope = lifecycle.scope || {};
   const forbidden = lifecycle.forbidden || {};
   add('GATE_ID_VERSION', process.argv[2] === GATE && lifecycle.gateId === GATE && lifecycle.gateContractVersion === VERSION);
-  add('LIFECYCLE_ACTIVE', lifecycle.status === 'OPERATIONAL_RUNTIME_LAB_AUTHORIZED' && lifecycle.singleGate === true && lifecycle.macroClosure === true);
+  add('LIFECYCLE_ACTIVE', lifecycle.status === 'OPERATIONAL_RUNTIME_LAB_ROOTFIX_AUTHORIZED' && lifecycle.singleGate === true && lifecycle.macroClosure === true);
   add('CAPABILITIES_EXACT', lifecycle.executionProfile.phase === 'OPERATIONAL_RUNTIME_LAB_EXECUTION' && capabilities.secrets === true && capabilities.firestoreRead === true && capabilities.writes === true && capabilities.runtime === true && capabilities.browser === true && capabilities.deploy === true && capabilities.functionsDeploy === true && capabilities.rulesDeploy === false && capabilities.production === false);
-  add('REQUEST_ACTIVE', request.schemaVersion === 'orbit360-block12-operational-runtime-lab-request-v1' && request.status === 'AUTHORIZED' && request.approved === true && request.allowedExecutions === 1 && request.consumed === false && request.replayAllowed === false && request.authorizationRef === lifecycle.authorization.source);
+  add('REQUEST_ACTIVE', request.schemaVersion === 'orbit360-block12-operational-runtime-lab-rootfix2-request-v1' && request.status === 'AUTHORIZED_ROOTFIX_CONTINUATION' && request.approved === true && request.allowedExecutions === 1 && request.consumed === false && request.replayAllowed === false && request.retryAuthorized === true && Array.isArray(request.previousRunIds) && request.previousRunIds.length === 2 && request.previousRunIds[0] === 30945951133 && request.previousRunIds[1] === 30948708843 && request.previousRunsStoppedBeforeSecrets === true && request.authorizationRef === lifecycle.authorization.source);
   add('REQUEST_BINDING', request.branch === scope.branch && request.pullRequest === scope.pullRequest && request.projectId === scope.projectId && request.gateId === GATE && request.contractVersion === VERSION && request.parentHead === git(['rev-parse', 'HEAD^^']));
   add('SYNTHETIC_BOUNDARY', request.scope.syntheticTenantOnly === true && request.scope.maximumSyntheticAuthUsers === 3 && request.scope.maximumSyntheticMemberships === 3 && request.scope.realTenantWrites === false && request.scope.realDataReimport === false);
   add('FUNCTION_ALLOWLIST', equal([].concat(request.scope.functionNames || []).sort(), EXPECTED_FUNCTIONS.slice().sort()) && equal([].concat(scope.exactFunctionNames || []).sort(), EXPECTED_FUNCTIONS.slice().sort()));
@@ -62,7 +62,7 @@ try {
   const center = readText('orbit360-platform/core/runtime-verification-center-v20260804.js');
   add('IN_PLATFORM_SCENARIOS', ['OP-001','SEC-001','NTF-001','IMP-001','PAY-001','SYS-999','VEREDICTO'].every(token => center.includes(token)));
   add('NO_TENANT_DATA_IN_CENTER', !/AseGuate|El Roble|La Ceiba|Universales|Mapfre|Paula|Carlos|Samuel|Fernando|430 clientes|365|235/.test(center));
-  add('BRANCH_PR_HEAD', git(['rev-parse', '--abbrev-ref', 'HEAD']) === scope.branch && request.pullRequest === 5);
+  add('BRANCH_PR_HEAD', String(process.env.GITHUB_REF_NAME || process.env.ORBIT360_BRANCH || '') === scope.branch && request.pullRequest === 5);
   const failed = checks.filter(item => !item.ok);
   const ok = failed.length === 0;
   result = {

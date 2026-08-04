@@ -90,6 +90,15 @@ async function prepare(app) {
     { key: 'advisorB', role: 'Asesor', advisorId: fixtureIds.advisorB }
   ];
   const users = {};
+  const state = {
+    schemaVersion: 'orbit360-block12-private-state-v1', projectId: PROJECT, realTenantId: REAL_TENANT, tenantId, runId,
+    users, ids: fixtureIds, sourceHash: sha(`${tenantId}|commission_statement|2026-08`), webConfig, snapshotBefore: before
+  };
+  const persistState = () => {
+    fs.mkdirSync(path.dirname(STATE_FILE), { recursive: true });
+    fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2), { encoding: 'utf8', mode: 0o600 });
+  };
+  persistState();
   for (const def of userDefs) {
     const uid = `${fixtureIds.prefix}_${def.key}`.slice(0, 120);
     const email = `${fixtureIds.prefix}.${def.key}@example.com`.toLowerCase();
@@ -100,6 +109,7 @@ async function prepare(app) {
       permissions: def.role === 'Asesor' ? [] : ['ops_manage', 'leads_manage', 'gestiones_manage', 'imports_manage', 'cobros_manage', 'conciliaciones_manage']
     });
     users[def.key] = { uid, token: await auth.createCustomToken(uid, { orbitTenant: tenantId, orbitSyntheticVerification: true }) };
+    persistState();
   }
   await db.collection('tenants').doc(tenantId).collection('config').doc('workflow').set({ storageMode: 'canonicalV2', portalResponseEnabled: true, notificationChannels: ['in_app'], cadenceEnabled: true });
   const receiptColl = db.collection('tenants').doc(tenantId).collection('data').doc('recibosEsperados').collection('items');
@@ -109,12 +119,7 @@ async function prepare(app) {
   await db.collection('tenants').doc(tenantId).collection('data').doc('propuestasConciliacion').collection('items').doc(fixtureIds.proposal).set({
     id: fixtureIds.proposal, polizaId: fixtureIds.policy, reciboId: fixtureIds.receipt4, clienteId: fixtureIds.client, aseguradoraId: `${fixtureIds.prefix}_insurer`, moneda: 'GTQ', monto: 100, fechaPago: '2026-08-04', estado: 'PROPUESTA', conciliacionTipo: 'CONCILIADO_DIRECTO_ASEGURADORA'
   });
-  const state = {
-    schemaVersion: 'orbit360-block12-private-state-v1', projectId: PROJECT, realTenantId: REAL_TENANT, tenantId, runId,
-    users, ids: fixtureIds, sourceHash: sha(`${tenantId}|commission_statement|2026-08`), webConfig, snapshotBefore: before
-  };
-  fs.mkdirSync(path.dirname(STATE_FILE), { recursive: true });
-  fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2), { encoding: 'utf8', mode: 0o600 });
+  persistState();
   save(PREPARE_OUT, { schemaVersion: 'orbit360-block12-prepare-v1', status: 'SYNTHETIC_RUNTIME_READY', classification: 'GO_LAB_SYNTHETIC_FIXTURE', projectId: PROJECT, syntheticTenantHash: sha(tenantId), syntheticUsersCreated: 3, syntheticMembershipsCreated: 3, realTenantSnapshotBefore: before, configPreparedForHosting: true, firestoreWritesSynthetic: 10, realTenantWrites: 0, authWritesSynthetic: 3, rulesChanged: false, productionTouched: false, ok: true });
 }
 async function browserPhase() {
@@ -182,7 +187,8 @@ async function cleanup(app) {
   let usersRemain = 0;
   for (const user of Object.values(state.users || {})) { try { await auth.getUser(user.uid); usersRemain += 1; } catch (error) {} }
   const runtimeOk = Object.entries(runtimeChecks).filter(([key]) => key !== 'inspectionError').every(([, value]) => value === true) && !runtimeChecks.inspectionError;
-  const cleanupOk = tenantCollections.length === 0 && legacyCollections.length === 0 && usersRemain === 0 && authDeleted === 3;
+  const expectedSyntheticUsers = Object.keys(state.users || {}).length;
+  const cleanupOk = tenantCollections.length === 0 && legacyCollections.length === 0 && usersRemain === 0 && authDeleted === expectedSyntheticUsers;
   const ok = browser.ok === true && runtimeOk && cleanupOk && realTenantUnchanged;
   save(FINAL_OUT, {
     schemaVersion: 'orbit360-block12-operational-runtime-final-v1',

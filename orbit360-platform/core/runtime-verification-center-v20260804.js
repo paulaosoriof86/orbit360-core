@@ -159,14 +159,19 @@
         return { confirmed, rolled };
       }, value => value.confirmed.status === 'CONFIRMED' && value.rolled.status === 'ROLLED_BACK' && value.rolled.deletedEvidence === 1);
 
-      await step('PAY-001', 'Registrar evidencia directa, planilla y cartera', async () => {
+      await step('PAY-001', 'Registrar evidencia directa y planilla', async () => {
         const base = { tenantId, operation: 'register_evidence', reason: 'Evidencia sintética de conciliación' };
         const direct = await call(names.reconciliation, Object.assign({}, base, { payload: { id: ids.evidenceDirect, polizaId: ids.policy, reciboId: ids.receipt4, tipoFuente: 'insurer_payment_report', moneda: 'GTQ', monto: 100, cuota: 4, periodo: '2026-08' }, requestId: ids.requests.evidenceDirect }));
         const commission = await call(names.reconciliation, Object.assign({}, base, { payload: { id: ids.evidenceCommission, polizaId: ids.policy, reciboId: ids.receipt3, tipoFuente: 'commission_statement', moneda: 'GTQ', monto: 100, cuota: 3, comisionAS: 25, periodo: '2026-08' }, requestId: ids.requests.evidenceCommission }));
+        return { direct, commission };
+      }, value => value.direct.ok && value.commission.ok);
+      await step('PAY-002', 'Conciliación directa y secuencia por planilla', () => call(names.reconciliation, { tenantId, operation: 'preview_policy', payload: { polizaId: ids.policy }, reason: 'Vista previa inferencial por planilla', requestId: ids.requests.previewPolicy }), value => value.ok === true && value.counts.CONCILIADO_DIRECTO_ASEGURADORA === 1 && value.counts.CONCILIADO_RECONOCIMIENTO_ASEGURADORA === 1 && value.counts.CONCILIADO_SECUENCIA_PLANILLA >= 2);
+      await step('PAY-002B', 'Secuencia por cartera completa', async () => {
+        const base = { tenantId, operation: 'register_evidence', reason: 'Evidencia sintética de cartera completa' };
         const portfolio = await call(names.reconciliation, Object.assign({}, base, { payload: { id: ids.evidencePortfolio, polizaId: ids.policy, reciboId: ids.receipt4, tipoFuente: 'portfolio_statement', moneda: 'GTQ', monto: 100, cuota: 4, completitud: 'completo', periodo: '2026-08' }, requestId: ids.requests.evidencePortfolio }));
-        return { direct, commission, portfolio };
-      }, value => value.direct.ok && value.commission.ok && value.portfolio.ok);
-      await step('PAY-002', 'Conciliación directa e inferencial', () => call(names.reconciliation, { tenantId, operation: 'preview_policy', payload: { polizaId: ids.policy }, reason: 'Vista previa inferencial', requestId: ids.requests.previewPolicy }), value => value.ok === true && value.counts.CONCILIADO_DIRECTO_ASEGURADORA === 1 && value.counts.CONCILIADO_RECONOCIMIENTO_ASEGURADORA === 1 && value.counts.CONCILIADO_SECUENCIA_PLANILLA >= 2);
+        const preview = await call(names.reconciliation, { tenantId, operation: 'preview_policy', payload: { polizaId: ids.policy }, reason: 'Vista previa inferencial por cartera', requestId: ids.requests.previewPolicy });
+        return { portfolio, preview };
+      }, value => value.portfolio.ok === true && value.preview.ok === true && value.preview.counts.CONCILIADO_SECUENCIA_CARTERA >= 2);
       await step('PAY-003', 'Aplicar propuesta confirmada al recibo', () => call(names.reconciliation, { tenantId, operation: 'confirm_application', payload: { proposalId: ids.proposal, cobroId: ids.cobro, fechaPago: '2026-08-04', montoAplicado: 100 }, reason: 'Aplicación sintética confirmada', requestId: ids.requests.confirmProposal }), value => value.ok === true && value.cobroId === ids.cobro && value.applied === 100);
 
       state.finishedAt = new Date().toISOString();

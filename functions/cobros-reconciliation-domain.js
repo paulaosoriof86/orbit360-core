@@ -114,10 +114,10 @@ async function queryByPolicy(tenantId, collection, policyId) {
 }
 function evidenceType(row) {
   const source = norm([row.tipoFuente, row.sourceType, row.rolFuente, row.fuenteAutoridad, row.archivo].join(' '));
-  if (/comision|planilla/.test(source)) return 'COMMISSION_RECOGNITION';
-  if (/cartera|saldo|pendiente/.test(source)) return 'PORTFOLIO_SNAPSHOT';
-  if (/pago|cobro|ingreso|recaudo/.test(source)) return 'INSURER_PAYMENT';
-  if (/banco|bank/.test(source)) return 'BANK_SUPPORT';
+  if (/comision|planilla|commission recognition|commission statement/.test(source)) return 'COMMISSION_RECOGNITION';
+  if (/cartera|saldo|pendiente|portfolio snapshot|portfolio statement/.test(source)) return 'PORTFOLIO_SNAPSHOT';
+  if (/pago|cobro|ingreso|recaudo|insurer payment|payment report/.test(source)) return 'INSURER_PAYMENT';
+  if (/banco|bank|bank support/.test(source)) return 'BANK_SUPPORT';
   return 'OTHER';
 }
 function exactReceipt(evidence, receipts) {
