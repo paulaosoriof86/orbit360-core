@@ -1,0 +1,117 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
+  "gateId": "block7-gravicentra-insurance-rc1-predeploy-readonly-v20260803",
+  "gateContractVersion": "7.12.0",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
+  "status": "GRAVICENTRA_INSURANCE_RC1_PREDEPLOY_CONTRACT_STATIC_READY",
+  "executionProfile": {
+    "phase": "GRAVICENTRA_RC1_PREDEPLOY_READONLY",
+    "capabilities": {
+      "secrets": true,
+      "firestoreRead": true,
+      "writes": false,
+      "runtime": true,
+      "browser": false,
+      "deploy": false,
+      "functionsDeploy": false,
+      "rulesDeploy": false,
+      "production": false
+    }
+  },
+  "singleGate": true,
+  "macroClosure": true,
+  "blockOwner": "release contract + predeploy read-only probe",
+  "rootFix": {
+    "classification": [
+      "VALIDATOR_STALE",
+      "PIPELINE_MECHANISM_FAILURE"
+    ],
+    "sourceRun": 30868524436,
+    "sourceJob": 91865447742,
+    "sourceArtifact": 8877002560,
+    "rootCause": "PREDEPLOY_ROUTED_TO_HISTORICAL_GATE711_STOP_RETRY_CONTRACT",
+    "productFrozen": true,
+    "dataFrozen": true,
+    "sameExecutionRetryAllowed": false
+  },
+  "sourceGate711": {
+    "lifecycle": "tools/orbit360-validator-lifecycle-contract-gate711-release-critical-runtime-v20260802.json",
+    "requiredStatus": "CANONICAL_RUNTIME_CUMULATIVE_VISUAL_LAB_PASS_CLOSED",
+    "run": 30816576914,
+    "artifact": 8857032288,
+    "closed": true,
+    "replayAllowed": false
+  },
+  "releaseSeal": "tools/orbit360-gravicentra-insurance-rc1-release-seal-v20260803.json",
+  "release": {
+    "branch": "release/gravicentra-insurance-rc1-20260803",
+    "commit": "27cb7dfcda8568280ebef15993a953364304f29b",
+    "baselineProductHead": "267f7231b46d65b80c167f54567a67503b6a6793",
+    "allowedProductDiff": [
+      "orbit360-platform/styles/base.css"
+    ]
+  },
+  "authorization": {
+    "requiredForExecution": true,
+    "activeRequest": false,
+    "allowedExecutions": 0,
+    "previousRequestConsumedByRun": 30868524436,
+    "previousRequestReplayAllowed": false,
+    "newImmutableRequestRequired": true
+  },
+  "target": {
+    "projectId": "ays-orbit-360-lab",
+    "tenantId": "alianzas-soluciones",
+    "liveUrl": "https://ays-orbit-360-lab.web.app"
+  },
+  "expectedOperationalCounts": {
+    "clientes": 430,
+    "aseguradoras": 30,
+    "polizas": 1373,
+    "vehiculos": 1032,
+    "recibosEsperados": 1294,
+    "carteraPrimas": 673,
+    "cobros": 5,
+    "asesores": 7
+  },
+  "expectedCanonicalCounts": {
+    "clientes": 430,
+    "aseguradoras": 30,
+    "polizas": 1375,
+    "vehiculos": 1033,
+    "recibosEsperados": 1294,
+    "carteraPrimas": 673,
+    "cobros": 7
+  },
+  "requiredModules": [
+    "cliente360",
+    "aseguradoras",
+    "polizas",
+    "cobros",
+    "ops",
+    "leads"
+  ],
+  "guards": {
+    "firestoreDataWritesAllowed": false,
+    "operationalWritesAllowed": 0,
+    "reimportAllowed": false,
+    "hostingDeployAllowed": false,
+    "previewDeployAllowed": false,
+    "firestoreRulesDeployAllowed": false,
+    "functionsDeployAllowed": false,
+    "productionWritesAllowed": false,
+    "mainAllowed": false,
+    "mergeAllowed": false,
+    "repeatGate711Allowed": false,
+    "openGeneralAuditAllowed": false,
+    "stopRetryOnSameStageOrFailureFamily": true
+  },
+  "cloudClaude": {
+    "mechanismClassification": "BACKEND_PROTEGIDO_NO_CLAUDE",
+    "reusablePatternClassification": "REPLICABLE_CLAUDE_ACUMULADO",
+    "academiaClassification": "ACADEMIA_ACTUALIZAR",
+    "externalPackageSent": false
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
