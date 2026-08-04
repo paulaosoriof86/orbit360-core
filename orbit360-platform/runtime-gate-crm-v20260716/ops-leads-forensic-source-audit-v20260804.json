@@ -1,0 +1,81 @@
+{
+  "schemaVersion": "orbit360-ops-leads-forensic-source-audit-v1",
+  "generatedAt": "2026-08-04T11:00:00-06:00",
+  "classification": [
+    "DATA_CONTRACT_FAILURE",
+    "FUNCTIONAL_DEFECT"
+  ],
+  "decision": "FRONTEND_CYCLE_PARTIAL_PASS_PRODUCTIVE_BACKEND_NOT_COMPLETE",
+  "owners": {
+    "ops": "orbit360-platform/modules/ops.js",
+    "leads": "orbit360-platform/modules/leads.js",
+    "cycle": "orbit360-platform/core/ciclo.js",
+    "portal": "orbit360-platform/modules/portal.js",
+    "issuance": "orbit360-platform/core/issuance-workflow-v1201.js",
+    "opsIssuanceBridge": "orbit360-platform/modules/ops-workflows-v1201-bridge.js",
+    "store": "orbit360-platform/data/store-firestore-lab.local.js",
+    "notifications": "orbit360-platform/core/notify.js"
+  },
+  "flows": {
+    "portalRequestToOps": {
+      "frontend": "PASS",
+      "durableStore": "GENERIC_LEGACY_PATH",
+      "advisorNotification": "INCOMPLETE",
+      "portalResponse": "NOT_GUARANTEED"
+    },
+    "clientProfileRequestToOps": {
+      "frontend": "PASS",
+      "activityTrace": "PASS",
+      "notification": "PREPARED_NOT_DELIVERED"
+    },
+    "directOpsAssignment": {
+      "assignmentField": "PASS",
+      "advisorNotice": "PREPARED_NOT_DELIVERED",
+      "advisorVisibility": "FAIL_ACTIVE_ADVISOR_ROLE_CANNOT_SEE_OPS"
+    },
+    "quotationSentToLeadsOnly": {
+      "sharedStageProjection": "PASS_MANUAL_CYCLE",
+      "cotizadorComparativoAutomaticIntegration": "NOT_DEMONSTRATED"
+    },
+    "negotiationToInspectionOrIssuance": {
+      "leadsContinuity": "PASS",
+      "opsReappearance": "PASS"
+    },
+    "typedIssuanceRequest": {
+      "opsProjection": "PASS",
+      "protectedDomainBackend": "NOT_DEMONSTRATED"
+    },
+    "managementResolutionNotification": {
+      "browserPreparation": "PASS",
+      "providerDelivery": "FAIL",
+      "portalInboxWrite": "NOT_GUARANTEED"
+    }
+  },
+  "backend": {
+    "negociosAuthority": "legacy-unmigrated",
+    "gestionesAuthority": "legacy-unmigrated",
+    "protectedTransitionService": false,
+    "idempotentEventLedger": false,
+    "outbox": false,
+    "domainWriteAuthorization": false,
+    "confirmedNotificationProvider": false,
+    "gate711EndToEndWriteCoverage": false
+  },
+  "visualization": {
+    "mayShowFrontendWorkflow": true,
+    "mayClaimBackendComplete": false,
+    "mayClaimNotificationsAutomatic": false,
+    "mayClaimPortalBidirectionalComplete": false,
+    "mayClaimAdvisorManagementVisibility": false
+  },
+  "networkCalls": 0,
+  "firestoreReads": 0,
+  "firestoreWrites": 0,
+  "authReads": 0,
+  "authWrites": 0,
+  "deployExecuted": false,
+  "productionTouched": false,
+  "containsPII": false,
+  "containsSecrets": false,
+  "ok": true
+}
