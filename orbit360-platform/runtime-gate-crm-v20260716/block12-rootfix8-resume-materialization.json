@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "orbit360-block12-rootfix8-resume-materialization-v1",
+  "status": "ROOTFIX8_RESUME_SOURCE_PASS",
+  "previousRuns": [
+    30960388102,
+    30960636170,
+    30960797951
+  ],
+  "checks": {
+    "engineVersion": true,
+    "requestActiveFields": true,
+    "syntheticLoader": true,
+    "browserFinally": true,
+    "browserV2": true
+  },
+  "secretAccess": false,
+  "firestoreRead": false,
+  "deployExecuted": false,
+  "ok": true
+}
