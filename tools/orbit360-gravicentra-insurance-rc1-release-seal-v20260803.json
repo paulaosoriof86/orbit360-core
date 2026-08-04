@@ -1,0 +1,65 @@
+{
+  "schemaVersion": "orbit360-gravicentra-insurance-rc1-release-seal-v1",
+  "status": "RC1_SOURCE_SEALED",
+  "releaseBranch": "release/gravicentra-insurance-rc1-20260803",
+  "releaseCommit": "27cb7dfcda8568280ebef15993a953364304f29b",
+  "baselineProductHead": "267f7231b46d65b80c167f54567a67503b6a6793",
+  "mobileShellFixCommit": "12a52de72f541cf39aae3556fd52a2d444d57b17",
+  "allowedProductDiff": [
+    "orbit360-platform/styles/base.css"
+  ],
+  "sourceGate711": {
+    "lifecycle": "tools/orbit360-validator-lifecycle-contract-gate711-release-critical-runtime-v20260802.json",
+    "run": 30816576914,
+    "job": 91695714377,
+    "artifact": 8857032288,
+    "artifactDigest": "sha256:c985c315cf140c187abe0126791261c06f2d5e6c38b8f885f6b444c6bb804de5",
+    "status": "CANONICAL_RUNTIME_CUMULATIVE_VISUAL_LAB_PASS_CLOSED",
+    "snapshotDigest": "19e1927d39f6b713ee12504f8762bc42ead9de6e365bb0f12162d2a0c8f8469b",
+    "snapshotsByteIdentical": true
+  },
+  "operationalCounts": {
+    "clientes": 430,
+    "aseguradoras": 30,
+    "polizas": 1373,
+    "vehiculos": 1032,
+    "recibosEsperados": 1294,
+    "carteraPrimas": 673,
+    "cobros": 5,
+    "asesores": 7
+  },
+  "canonicalCounts": {
+    "clientes": 430,
+    "aseguradoras": 30,
+    "polizas": 1375,
+    "vehiculos": 1033,
+    "recibosEsperados": 1294,
+    "carteraPrimas": 673,
+    "cobros": 7
+  },
+  "requiredModules": [
+    "cliente360",
+    "aseguradoras",
+    "polizas",
+    "cobros",
+    "ops",
+    "leads"
+  ],
+  "historicalContractsRetainedForAuditOnly": [
+    ".github/orbit360-requests/canonical-runtime-cumulative-visual-lab-v20260801.json",
+    "tools/orbit360-validator-lifecycle-contract-canonical-runtime-cumulative-visual-lab-v20260801.json"
+  ],
+  "guards": {
+    "productMutationAllowed": false,
+    "dataWritesAllowed": false,
+    "reimportAllowed": false,
+    "deployAllowed": false,
+    "rulesDeployAllowed": false,
+    "functionsDeployAllowed": false,
+    "productionWritesAllowed": false,
+    "mainAllowed": false,
+    "mergeAllowed": false
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
