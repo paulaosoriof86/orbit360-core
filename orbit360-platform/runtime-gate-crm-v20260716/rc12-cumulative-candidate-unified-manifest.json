@@ -1,0 +1,134 @@
+{
+  "schemaVersion": "orbit360-cumulative-candidate-unified-manifest-v1",
+  "candidateId": "gravicentra-insurance-rc1.2-unified",
+  "generatedAt": "2026-08-04T01:40:00-06:00",
+  "classification": "PIPELINE_MECHANISM_FAILURE_ROOTFIX",
+  "rootCause": "release candidate was represented as a Hosting code tree while the accepted canonical data snapshot and its access precondition remained separate evidence; membership-gated snapshots therefore made the candidate appear empty",
+  "decision": "CANDIDATE_UNIFIED_DATA_PRESERVED_ACCESS_BLOCKED",
+  "repository": "paulaosoriof86/orbit360-core",
+  "requiredBranch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "baseline": "27cb7dfcda8568280ebef15993a953364304f29b",
+  "releaseBranch": "release/gravicentra-insurance-rc1-2-membership-auth-20260803",
+  "releaseCommit": "b699ba329960cd830121b57452ce558399aa84fb",
+  "hosting": {
+    "projectId": "ays-orbit-360-lab",
+    "site": "ays-orbit-360-lab",
+    "liveUrl": "https://ays-orbit-360-lab.web.app",
+    "publicDirectory": "orbit360-platform",
+    "deployStatus": "NOT_DEPLOYED_RC12"
+  },
+  "tenant": {
+    "tenantId": "alianzas-soluciones",
+    "backendMode": "firestore-lab",
+    "canonicalRuntime": "20260717-2"
+  },
+  "product": {
+    "moduleAudit": "orbit360-platform/runtime-gate-crm-v20260716/rc12-forensic-module-audit.json",
+    "routes": 31,
+    "loadedModuleScripts": 47,
+    "moduleFiles": 62,
+    "workedActiveModules": 31,
+    "sharedStoreIntegrated": 30,
+    "failedModules": 0,
+    "moduleTreeParityBaseline": true,
+    "moduleTreeParityLive": true,
+    "noPostBaselineModuleChangesInLive": true,
+    "requiredRuntimeModules": [
+      "cliente360",
+      "aseguradoras",
+      "polizas",
+      "cobros",
+      "ops",
+      "leads"
+    ]
+  },
+  "data": {
+    "authority": "accepted Gate 7.11 immutable snapshot",
+    "lifecycle": "tools/orbit360-validator-lifecycle-contract-gate711-release-critical-runtime-v20260802.json",
+    "sourceSnapshotDigest": "88b8e16b0d4531b2f5c0ce2b1a21068837853080943f7584f6f3fab0cc2ff18d",
+    "canonicalSnapshotDigest": "19e1927d39f6b713ee12504f8762bc42ead9de6e365bb0f12162d2a0c8f8469b",
+    "sourceDocuments": 4837,
+    "canonicalDocuments": 4842,
+    "sharedOperationalIds": 4837,
+    "targetOnlySeeds": 5,
+    "relationGroupsResolved": 6428,
+    "operationalCounts": {
+      "clientes": 430,
+      "aseguradoras": 30,
+      "polizas": 1373,
+      "vehiculos": 1032,
+      "recibosEsperados": 1294,
+      "carteraPrimas": 673,
+      "cobros": 5,
+      "asesores": 7
+    },
+    "canonicalCollections": [
+      "clientes",
+      "aseguradoras",
+      "polizas",
+      "vehiculos",
+      "recibosEsperados",
+      "carteraPrimas",
+      "cobros"
+    ],
+    "reimportRequired": false,
+    "dataLossObserved": false
+  },
+  "store": {
+    "owner": "orbit360-platform/data/store-firestore-lab.local.js",
+    "singleReadOwner": "Orbit.store",
+    "canonicalPathTemplate": "tenants/{tenantId}/data/{collection}/items",
+    "legacyPathTemplate": "tenantId/{tenantId}/{collection}",
+    "canonicalDigestBound": "19e1927d39f6b713ee12504f8762bc42ead9de6e365bb0f12162d2a0c8f8469b",
+    "noSeedFallback": true,
+    "membershipRequired": true,
+    "snapshotsAttachOnlyAfterMembership": true
+  },
+  "access": {
+    "classification": "DATA_CONTRACT_FAILURE",
+    "status": "BLOCKED_BY_MISSING_NORMAL_AUTH_IDENTITIES",
+    "authUsers": 2,
+    "validNormalAuthUsers": 1,
+    "technicalMemberships": 1,
+    "normalMembershipsCreated": 0,
+    "missingProfiles": ["direccion", "operativo", "asesor"],
+    "dataAbsent": false,
+    "dataInvisibleWithoutMembership": true
+  },
+  "approvedRoster": {
+    "direction": {
+      "person": "Paula Osorio",
+      "email": "finanzasyadmin@aysseguros.com",
+      "roles": ["SuperAdmin", "AdminTenant", "Asesor", "Operativo"],
+      "defaultRole": "SuperAdmin"
+    },
+    "operations": {
+      "person": "Carlos Castro",
+      "email": "carlos.castro@aysseguros.com",
+      "roles": ["Operativo", "Asesor"],
+      "defaultRole": "Operativo"
+    },
+    "advisor": {
+      "person": "Samuel Daza",
+      "email": "samuel.daza@aysseguros.com",
+      "roles": ["Asesor", "Operativo"],
+      "defaultRole": "Asesor",
+      "advisorIdSource": "existing canonical advisor record"
+    }
+  },
+  "integrity": {
+    "firestoreWrites": 0,
+    "authWrites": 0,
+    "reimportExecuted": false,
+    "hostingDeployExecuted": false,
+    "rulesApplied": false,
+    "functionsDeployed": false,
+    "mainTouched": false,
+    "mergeExecuted": false,
+    "gate711Repeated": false
+  },
+  "nextBoundary": "controlled Auth provisioning for approved roster, then exactly three memberships, Gate 7.13, Hosting-only deploy and three-profile smoke",
+  "containsSecrets": false,
+  "containsCredentials": false
+}
