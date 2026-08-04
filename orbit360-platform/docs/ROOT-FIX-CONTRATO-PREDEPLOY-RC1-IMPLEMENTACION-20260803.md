@@ -103,3 +103,57 @@ writes/deploy/production: 0/false/false
 ```
 
 Después corresponderá una nueva autorización única para crear el request de reanudación del predeploy. No se repetirá Gate 7.11.
+
+## Correctivo posterior al predeploy read-only
+
+La reanudación autorizada cerró correctamente con:
+
+```text
+run: 30870375543
+job: 91870978676
+artifact: 8877668933
+decisión emitida: GO_LIMITED_SCOPE
+```
+
+El producto, los módulos, los feature flags, los conteos operativos, los conteos canónicos, los activos públicos y las anclas de rollback resultaron correctos. La única condición que impidió `GO_FULL` fue `siteReadStatus:404` mientras `releasesReadStatus:200`, con cinco releases visibles y anclas exactas de versión actual y anterior.
+
+Clasificación corregida:
+
+```text
+VALIDATOR_STALE / PIPELINE_MECHANISM_FAILURE
+```
+
+Causa raíz:
+
+```text
+HOSTING_SITE_GET_RESOURCE_NAME_INCOMPLETE
+```
+
+El probe consultaba:
+
+```text
+GET /v1beta1/sites/{SITE_ID}
+```
+
+El método oficial `projects.sites.get` requiere:
+
+```text
+GET /v1beta1/projects/{PROJECT_ID}/sites/{SITE_ID}
+```
+
+La consulta de releases sí utiliza correctamente `sites/{SITE_ID}/releases`, por eso devolvió 200 y permitió recuperar las anclas de rollback.
+
+Correctivo aplicado en el owner real:
+
+```text
+tools/orbit360-gravicentra-rc1-predeploy-probe-v20260803.mjs
+```
+
+No se modificó RC1, Firestore, Hosting, datos, Rules, Functions, producción, main ni merge. No se repite el predeploy consumido: la evidencia ya confirmó candidato completo, datos completos, módulos presentes, sitio público accesible y rollback exacto. El correctivo queda sujeto a validación estática de sintaxis y contrato.
+
+Clasificación transversal:
+
+- mecanismo operativo: `BACKEND_PROTEGIDO_NO_CLAUDE`;
+- patrón reusable de nombres de recursos REST completos: `REPLICABLE_CLAUDE_ACUMULADO`;
+- caso académico `GO_LIMITED_SCOPE` falso por endpoint incorrecto: `ACADEMIA_ACTUALIZAR`;
+- datos reales y anclas internas: no se envían externamente.
