@@ -1,12 +1,14 @@
 /* ============================================================
-   Orbit 360 - Backend LAB loader v1.111
-   Loads Firebase SDK only for:
+   Orbit 360 - Backend LAB loader v1.112
+   Loads Firebase SDK for the canonical A&S Hosting site and for
+   authorized preview channels. Any direct canonical access is
+   normalized before the prototype can fall back to demo data.
+
+   Canonical A&S runtime:
    ?orbitBackend=firestore-lab&tenant=alianzas-soluciones
 
-   En el canal Hosting LAB normaliza cualquier acceso directo antes
-   de cargar el prototipo, para impedir fallback demo por URL incompleta.
    Local: uses ignored core/auth-firebase.config.local.js.
-   Firebase Hosting preview: uses reserved /__/firebase/init.js.
+   Firebase Hosting: uses reserved /__/firebase/init.js.
    No secrets are versioned.
    ============================================================ */
 (function(){
@@ -14,7 +16,9 @@
 
   var LAB_RUNTIME = '20260717-2';
   var hostname = String(window.location.hostname || '').toLowerCase();
-  var isAuthorizedLabHost = /^ays-orbit-360-lab--orbit360-ays-lab-[a-z0-9-]+\.web\.app$/i.test(hostname);
+  var isCanonicalLabHost = hostname === 'ays-orbit-360-lab.web.app' || hostname === 'ays-orbit-360-lab.firebaseapp.com';
+  var isPreviewLabHost = /^ays-orbit-360-lab--orbit360-ays-lab-[a-z0-9-]+\.web\.app$/i.test(hostname);
+  var isAuthorizedLabHost = isCanonicalLabHost || isPreviewLabHost;
   var initialParams = new URLSearchParams(window.location.search || '');
 
   if (isAuthorizedLabHost) {
@@ -25,7 +29,7 @@
     if (!canonicalMode || !canonicalTenant || !canonicalRuntime) {
       var targetHash = window.location.hash && window.location.hash !== '#'
         ? window.location.hash
-        : '#/aseguradoras';
+        : '#/cliente360';
       window.location.replace(
         'index.html?orbitBackend=firestore-lab&tenant=alianzas-soluciones&runtime=' +
         encodeURIComponent(LAB_RUNTIME) + targetHash
@@ -35,7 +39,7 @@
   }
 
   var params = new URLSearchParams(window.location.search || '');
-  var requestedMode = params.get('orbitBackend') || '';
+  var requestedMode = params.get('orbitBackend') || (isAuthorizedLabHost ? 'firestore-lab' : '');
   var requestedTenant = params.get('tenant') || 'alianzas-soluciones';
   var allowedTenants = ['alianzas-soluciones'];
   var isFirebaseHosting = /\.(web\.app|firebaseapp\.com)$/i.test(window.location.hostname || '');
@@ -62,14 +66,14 @@
     tenantId: requestedTenant,
     tenant: requestedTenant,
     loader: 'core/backend-lab-loader.js',
-    loaderVersion: 'v1.111',
+    loaderVersion: 'v1.112-canonical-host-fail-closed',
     runtimeVersion: LAB_RUNTIME,
+    canonicalHost: isCanonicalLabHost,
     firebaseLoader: 'pending',
     configSource: isFirebaseHosting ? 'firebase-hosting-reserved-init' : 'local-ignored-config',
     configLocal: isFirebaseHosting ? null : 'core/auth-firebase.config.local.js',
     noFallback: true,
     restrictions: {
-      noProduction: true,
       noSecretsInRepo: true,
       noSeedAsSource: true,
       noMainBranch: true
