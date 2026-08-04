@@ -67,17 +67,63 @@ source fallback: orbit360-platform/data/seed.js
 validator owner: tools/orbit360-gravicentra-rc1-go-live-helper-v20260803.mjs
 ```
 
-## Correctivo requerido
+## Root fix source-only implementado
 
-Crear RC1.1 incremental desde RC1 y:
+Se creó una candidata incremental, sin alterar RC1 histórica:
 
-1. reconocer de forma explícita el host canónico y su alias firebaseapp;
-2. normalizar toda navegación directa al runtime real A&S;
-3. bloquear fail-closed cualquier modo demo en el host canónico;
-4. añadir smoke browser real sobre la URL sin parámetros;
-5. exigir store Firestore, autenticación Firebase, conteos reales y cero semillas visibles;
-6. mantener datos, backend y RC1 histórica intactos;
-7. documentar el patrón para Cloud/Claude y Academia.
+```text
+branch: release/gravicentra-insurance-rc1-1-real-data-runtime-20260803
+base: 27cb7dfcda8568280ebef15993a953364304f29b
+fix commit: 1eb7daea580c0807d867a663086defc021435993
+archivo de producto: orbit360-platform/core/backend-lab-loader.js
+```
+
+La misma corrección quedó sincronizada en la rama viva:
+
+```text
+working branch commit: 6296bedb2370494e93f4c4a2e87b14bf704dd536
+```
+
+El loader v1.112 ahora:
+
+1. reconoce `ays-orbit-360-lab.web.app`;
+2. reconoce `ays-orbit-360-lab.firebaseapp.com`;
+3. conserva los previews autorizados;
+4. normaliza la URL directa al runtime Firestore de A&S;
+5. declara `noFallback:true` y `noSeedAsSource:true`;
+6. no contiene credenciales demo;
+7. preserva el comportamiento local del prototipo.
+
+## Validación nueva
+
+Se agregó un validador sin secretos:
+
+```text
+tools/orbit360-canonical-host-runtime-failclosed-test-v20260803.mjs
+.github/workflows/orbit360-canonical-host-runtime-failclosed-static-v20260803.yml
+```
+
+Debe comprobar:
+
+- redirect canónico correcto;
+- cero caída hacia scripts demo antes de normalizar;
+- modo `firestore-lab` en URL normalizada;
+- tenant `alianzas-soluciones`;
+- Firebase SDK y configuración reservada solicitados;
+- alias firebaseapp y previews preservados;
+- localhost sin cambios;
+- cero secretos, Firestore o deploy durante el test.
+
+El smoke posterior al deploy deberá ser de navegador y fallar ante cualquier `admin@demo.com`, seed ficticio o conteo renderizado distinto del real.
+
+## Cloud / Claude / Academia
+
+```text
+clasificación owner runtime: BACKEND_PROTEGIDO_NO_CLAUDE
+patrón reusable fail-closed: REPLICABLE_CLAUDE_ACUMULADO
+caso de falso PASS del smoke: ACADEMIA_ACTUALIZAR
+datos reales, IDs y credenciales: excluidos
+```
 
 ## Estado
 
@@ -85,6 +131,8 @@ Crear RC1.1 incremental desde RC1 y:
 RC1 desplegada: sí, pero visualmente inválida para operación
 Firestore real: preservado
 escrituras inesperadas: no detectadas
-root fix source-only: en preparación
-deploy correctivo: no autorizado todavía
+RC1.1 source-only: implementada
+validación estática: en ejecución
+deploy correctivo: no ejecutado
+producción modificada por este root fix: no
 ```
