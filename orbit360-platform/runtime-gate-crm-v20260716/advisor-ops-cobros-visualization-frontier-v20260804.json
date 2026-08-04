@@ -1,0 +1,61 @@
+{
+  "schemaVersion": "orbit360-advisor-ops-cobros-visualization-frontier-v1",
+  "sourceHeadBeforeManifest": "368fa0799fe3214ab65e343196b32c96fef5eef3",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pr": 5,
+  "status": "SOURCE_IMPLEMENTED_RUNTIME_PENDING",
+  "advisorOps": {
+    "moduleAccess": true,
+    "defaultScope": "own",
+    "otherAdvisorRecordsVisible": false,
+    "globalAdministrationVisible": false,
+    "readOnlyOperationalTracking": true,
+    "resolutionNotificationInSession": true,
+    "durableInboxBackendSource": true,
+    "runtimeValidated": false
+  },
+  "opsLeads": {
+    "singleBusinessEntity": true,
+    "stageProjection": true,
+    "portalRequest": true,
+    "clientProfileRequest": true,
+    "eventLedgerSource": true,
+    "notificationOutboxSource": true,
+    "providerDeliveryValidated": false
+  },
+  "cobros": {
+    "originalTemporaryReportedCount": 365,
+    "portfolioSequenceCandidates": 128,
+    "validPostCutoff": 2,
+    "pendingCommissionAndDirectOverlay": 235,
+    "remaining235IsFinalUnreconciledCount": false,
+    "materializationExecuted": false
+  },
+  "claude": {
+    "cumulativeCandidateRequired": true,
+    "packageV2Indexed": true,
+    "downloadableZipGenerated": false,
+    "manualDeliveryByUser": true,
+    "deliveryGate": [
+      "source_pass_ops_leads_advisor",
+      "complete_cobros_overlay",
+      "cumulative_manifest_same_head"
+    ]
+  },
+  "featureFlags": {
+    "tenantDomainConfigBackendActive": false,
+    "opsLeadsDomainBackendActive": false,
+    "cobrosReconciliationDomainActive": false
+  },
+  "integrity": {
+    "firestoreWrites": 0,
+    "authWrites": 0,
+    "deployExecuted": false,
+    "productionTouched": false,
+    "mainTouched": false,
+    "mergeExecuted": false,
+    "containsPII": false,
+    "containsSecrets": false
+  },
+  "ok": true
+}
