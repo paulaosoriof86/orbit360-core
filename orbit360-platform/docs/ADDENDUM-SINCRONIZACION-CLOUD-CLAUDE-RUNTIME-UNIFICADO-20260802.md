@@ -4,7 +4,7 @@ Fecha: 2026-08-03
 Documento padre: `SINCRONIZACION-CLOUD-CLAUDE-ACUMULADA-20260802.md`  
 Estado: `ACUMULADO / NO_ENVIADO / NO_DEPLOY`
 
-Este addendum no sustituye el ledger acumulado. Agrega los patrones derivados del cierre del paquete runtime crítico CRM/Ops/Leads.
+Este addendum no sustituye el ledger acumulado. Agrega los patrones derivados del cierre del paquete runtime crítico CRM/Ops/Leads y del cierre visual del shell móvil compartido.
 
 ## Ítems acumulados
 
@@ -28,6 +28,10 @@ Este addendum no sustituye el ledger acumulado. Agrega los patrones derivados de
 | CL-091 | Causa raíz | Un fallo `CUMULATIVE_VISUAL_DRIFT` no prueba drift de datos si el expected seal pertenece a una candidata anterior. Antes de tocar datos debe compararse la revisión, fuente y digest del sello con la candidata autorizada. | `ACADEMIA_ACTUALIZAR` | `PENDIENTE_ENVIO` |
 | CL-092 | Evidencia | Todo validador que puede cerrar con código distinto de cero debe escribir y publicar evidencia sanitizada antes de terminar; el artefacto no puede depender únicamente de una copia posterior al PASS. | `REPLICABLE_CLAUDE_INMEDIATO` | `IMPLEMENTADO` |
 | CL-093 | Gates | Ante `STOP_RETRY`, el cierre debe incluir causa raíz, owner, solución, evidencia y frontera siguiente. Informar solo la etapa fallida no cumple el contrato de causa raíz. | `ACADEMIA_ACTUALIZAR` y `REPLICABLE_CLAUDE_ACUMULADO` | `IMPLEMENTADO_EN_LIFECYCLE` |
+| CL-094 | Shell responsive | Cuando el chrome móvil pasa de una a varias filas, la altura debe existir como un único token consumido por topbar, shell, sidebar y overlay. | `REPLICABLE_CLAUDE_INMEDIATO` | `IMPLEMENTADO / PENDIENTE_ENVIO` |
+| CL-095 | Arquitectura | Un defecto visual repetido en varios módulos debe corregirse en el owner compartido y no mediante parches dentro de cada módulo o tenant. | `REPLICABLE_CLAUDE_INMEDIATO` | `IMPLEMENTADO / PENDIENTE_ENVIO` |
+| CL-096 | Multi-tenant | Los fixes del primer tenant solo son aceptables para el core cuando son tenant-neutral, configurables y heredables por módulos y tenants futuros. | `REPLICABLE_CLAUDE_INMEDIATO` | `IMPLEMENTADO / PENDIENTE_ENVIO` |
+| CL-097 | Academia | Enseñar a diferenciar defecto funcional compartido de defecto de módulo, validador obsoleto, falla de datos y falla de seguridad, usando el caso del offset móvil. | `ACADEMIA_ACTUALIZAR` | `DOCUMENTADO / PENDIENTE_ENVIO` |
 
 ## Evidencia vigente
 
@@ -67,6 +71,18 @@ artifact 8856299679
 sha256:3bbeb8af22f0b2ca1d8630735b4169f267249cf92d8b2d3a989308d754751641
 commit a9549f3487522a3e450742de2649b5ad41f3b1e9
 PASS
+
+Gate 7.11 acumulativo:
+run 30816576914
+artifact 8857032288
+sha256:c985c315cf140c187abe0126791261c06f2d5e6c38b8f885f6b444c6bb804de5
+status GATE711_RELEASE_CRITICAL_RUNTIME_PASS
+
+fix shell móvil compartido:
+commit 12a52de72f541cf39aae3556fd52a2d444d57b17
+owner orbit360-platform/styles/base.css
+classification FUNCTIONAL_DEFECT
+backend/data/deploy 0/0/0
 ```
 
 Cierres preservados:
@@ -90,7 +106,7 @@ No se envían:
 - backend protegido, writers o adaptadores Firestore;
 - rutas internas, IDs de proyecto o evidencia no sanitizada.
 
-El delta externo describirá CL-084 a CL-093 como arquitectura y criterio reusable. No incluirá código operativo, owners A&S ni identificadores sensibles del runtime.
+El delta externo describirá CL-084 a CL-097 como arquitectura y criterio reusable. No incluirá código operativo, owners A&S ni identificadores sensibles del runtime.
 
 ## Estado Cloud
 
@@ -103,4 +119,4 @@ datos reales enviados: no
 secretos enviados: no
 ```
 
-CL-076 a CL-093 viajarán en el próximo delta sanitizado junto con CL-001 a CL-075. El envío Cloud/Claude no bloquea la ejecución ni la visualización del release crítico CRM/Ops/Leads.
+CL-076 a CL-097 viajarán en el próximo delta sanitizado. El envío Cloud/Claude no bloquea la producción de A&S, pero su estado debe permanecer visible hasta existir evidencia real de recepción e incorporación en el prototipo comercializable.
