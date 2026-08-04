@@ -1,7 +1,7 @@
 # Gate 7.11 — referencia vigente
 
 Fecha: 2026-08-03  
-Rama de trabajo: `ays/backend-tenant-lab-v99-20260703`  
+Rama: `ays/backend-tenant-lab-v99-20260703`  
 PR: #5 draft/open
 
 ## Estado rector
@@ -17,7 +17,9 @@ VISUAL_REVIEW_10_PASS_3_SHARED_SHELL_DEFECT
 SHELL_MOBILE_CANONICAL_FIX_IMPLEMENTED
 SHELL_MOBILE_FOCUSED_LOCAL_VISUAL_PASS
 GRAVICENTRA_INSURANCE_RC1_SOURCE_SEALED
-SHELL_MOBILE_REPOSITORY_WORKFLOW_RESERVED_FOR_PREDEPLOY
+PREDEPLOY_RC1_NO_GO_VALIDATOR_STALE
+PREDEPLOY_RC1_STOPPED_BEFORE_SECRETS
+CANONICAL_CONTRACT_ROOT_FIX_PENDING
 CLOUD_CLAUDE_REUSABLE_DELTA_DOCUMENTED_NOT_SENT
 ACADEMIA_IMPACT_DOCUMENTED
 HOSTING_DEPLOY_NOT_EXECUTED
@@ -35,23 +37,16 @@ indexDigest: aa40982bffd5a453c56dd07e2aa75745128890cb81fa940c2dac6e051fa2e9d6
 singleReadOwner: Orbit.store
 ```
 
-No hubo cambios de producto durante el runtime Gate 7.11. Después de la revisión visual se autorizó un único correctivo frontend compartido.
-
-## Gravicentra Insurance RC1 sellada
+## Gravicentra Insurance RC1
 
 ```text
 releaseBranch: release/gravicentra-insurance-rc1-20260803
 releaseCommit: 27cb7dfcda8568280ebef15993a953364304f29b
-baselineProductHead: 267f7231b46d65b80c167f54567a67503b6a6793
 mobileShellFixCommit: 12a52de72f541cf39aae3556fd52a2d444d57b17
-status: RC1_SOURCE_SEALED / NOT_DEPLOYED / NOT_PRODUCTION
+status: SOURCE_SEALED / NOT_DEPLOYED / NOT_PRODUCTION
 ```
 
-La rama RC1 es inmutable. No recibirá nuevos commits ni parches. Un hallazgo bloqueante posterior exige RC2.
-
-Documento rector de la candidata:
-
-`GRAVICENTRA-INSURANCE-RC1-SEALED-20260803.md`
+La candidata agrega únicamente el correctivo compartido de `styles/base.css` sobre la base Gate 7.11 validada. No contiene parches por módulo ni hardcode A&S.
 
 ## Cierre runtime Gate 7.11
 
@@ -65,23 +60,7 @@ status: GATE711_RELEASE_CRITICAL_RUNTIME_PASS
 classification: GO_LAB_RELEASE_CRITICAL_CRM_OPS_LEADS
 ```
 
-## Secuencia cerrada
-
-```text
-autorización y product freeze: PASS
-preflight contractual antes de credenciales: 18/18 PASS
-release-critical static: 38/38 PASS
-identidad existente read-only: PASS
-snapshot canónico inicial: PASS
-checkout exacto servido localmente: PASS
-una sesión CRM/Ops/Leads: PASS
-snapshot canónico final: PASS
-comparación exacta before/after: PASS
-evidencia sanitizada: PASS
-limpieza de temporales: PASS
-```
-
-## Datos verificados
+## Datos preservados por la última evidencia aceptada
 
 ```text
 clientes: 430
@@ -94,123 +73,80 @@ cobros: 5
 asesores: 7
 ```
 
-## Seguridad y runtime preservados
+No corresponde reimportar ni modificar estos módulos para resolver el STOP contractual.
+
+## Predeploy RC1 — NO_GO
 
 ```text
-auth mode: existing_custom_token_readonly
-single browser session: true
-legal once: true
-write guard: PASS
-guards registrados: 11
-immutable_unwrapped: 0
-Conciliaciones: self_guarded_readonly
-page errors: 0
-console errors: 0
-failed requests: 0
-Auth writes: 0
-Firestore writes: 0
-operational writes: 0
+run: 30868524436
+job: 91865447742
+requestCommit: 4bbc75b5b1f95179628bb784be59cede6b26d58b
+artifact: 8877002560
+artifactDigest: sha256:d61c81d34fb9b69aee0eca9c232064aad94ebc28012c6df2985a8c7c4153da47
+decision: NO_GO
+classification: VALIDATOR_STALE / PIPELINE_MECHANISM_FAILURE
 ```
 
-No se ejecutaron reimportación, deploy, producción, main ni merge.
-
-## Snapshot before / after
+Etapa:
 
 ```text
-before file digest: 0f64a9a1f81b79bbca0dfaae2277bf47d01f3f3347a23b8dd54b2133c9041e94
-after file digest:  0f64a9a1f81b79bbca0dfaae2277bf47d01f3f3347a23b8dd54b2133c9041e94
-byte identical: true
-canonicalDigestSealed: 19e1927d39f6b713ee12504f8762bc42ead9de6e365bb0f12162d2a0c8f8469b
+autorización inmutable: PASS
+contrato vigente antes de secrets: FAIL
+checks: 12/18 PASS
+failed: LIFECYCLE, AUTHORIZATION, REQUEST, CUMULATIVE, DIGESTS, NO_WRITES
 ```
 
-## Revisión visual humana
+No se accedió a credenciales, Firestore, Hosting, versión pública, colecciones o feature flags. No hubo escrituras, deploy, Rules, Functions, producción, main o merge.
+
+## Causa raíz
+
+El entrypoint canónico continúa consumiendo:
 
 ```text
-capturas revisadas: 13
-PASS visual directo: 10
-defecto compartido: 3 capturas móviles
-rutas afectadas: Cliente 360, Pólizas, Leads
-clasificación: FUNCTIONAL_DEFECT
-owner: Shell/Topbar responsive
-datos/backend afectados: no/no
+.github/orbit360-requests/canonical-runtime-cumulative-visual-lab-v20260801.json
+tools/orbit360-validator-lifecycle-contract-canonical-runtime-cumulative-visual-lab-v20260801.json
 ```
 
-Causa raíz: el chrome móvil utilizaba dos filas, pero `#shell`, `#sidebar` y `.sb-overlay` conservaban el offset de `--topbar-h:56px`.
-
-## Correctivo canónico de shell móvil
+Esos archivos permanecen en `STOP_RETRY`, con autorización histórica consumida y manifest anterior. No fueron promovidos al cierre posterior PASS de:
 
 ```text
-commit de producto: 12a52de72f541cf39aae3556fd52a2d444d57b17
-archivo propietario: orbit360-platform/styles/base.css
-patrón: una sola altura móvil compartida por topbar, shell, sidebar y overlay
-hardcode A&S: no
-bridge por módulo: no
-backend/data writes: 0/0
+tools/orbit360-validator-lifecycle-contract-gate711-release-critical-runtime-v20260802.json
+run 30816576914
+status CANONICAL_RUNTIME_CUMULATIVE_VISUAL_LAB_PASS_CLOSED
 ```
 
-El fix es tenant-neutral, reutilizable y aplicable al prototipo comercializable. No modifica Cliente 360, Pólizas, Leads ni Ops de forma individual.
-
-Evidencia focalizada incorporada a la candidata:
+Owner:
 
 ```text
-file: orbit360-platform/docs/evidence/SHELL-MOBILE-RC1-FOCUSED-LOCAL-20260803.json
-result: PASS_FOCUSED_LAYOUT_RC1_SEAL_ALLOWED
-viewport: 390x844
-routesPassed/routesFailed: 3/0
+tools/orbit360-validar-gate-contracts-v20260717.mjs
+tools/orbit360-validar-gate-contracts-engine-canonical-runtime-cumulative-visual-lab-v20260801.mjs
 ```
 
-Validadores y workflow de predeploy:
-
-```text
-tools/orbit360-validar-shell-mobile-rc1-v20260803.mjs
-tools/orbit360-validar-shell-mobile-visual-v20260803.mjs
-.github/workflows/orbit360-shell-mobile-rc1-static-v20260803.yml
-```
-
-El workflow del repositorio permanece como verificación de predeploy. No se utiliza para reabrir desarrollo ni mover la rama RC1.
+El defecto no pertenece al producto, los módulos ni los datos.
 
 ## Cloud / Claude / Academia
 
 ```text
-ledger actualizado: sí
-ítems nuevos: CL-094 a CL-097
-clasificación: REPLICABLE_CLAUDE_INMEDIATO + ACADEMIA_ACTUALIZAR
-implementado en core: sí
-documentado en GitHub: sí
-enviado externamente a Cloud/Claude: no
-deploy Cloud/Hosting: no
+CL-094 a CL-097: shell móvil y release sellada
+CL-098 a CL-100: promoción contractual después de PASS
+paquete reusable documentado: sí
+paquete enviado: no
+recepción/incorporación: no/no
 ```
 
-Documento de cierre:
+Documentos:
 
-`CIERRE-FIX-SHELL-MOVIL-RC1-CLOUD-ACADEMIA-20260803.md`
+- `GRAVICENTRA-INSURANCE-RC1-SEALED-20260803.md`
+- `CIERRE-PREDEPLOY-GRAVICENTRA-RC1-NO-GO-VALIDATOR-STALE-20260803.md`
+- `ADDENDUM-PREDEPLOY-RC1-VALIDATOR-STALE-CLOUD-ACADEMIA-20260803.md`
 
-Ledger:
-
-`ADDENDUM-SINCRONIZACION-CLOUD-CLAUDE-RUNTIME-UNIFICADO-20260802.md`
-
-No se declarará sincronización Cloud/Claude sin evidencia efectiva de recepción e incorporación. El envío del delta reusable no debe bloquear la salida productiva de A&S.
-
-## Autorización Gate 7.11
+## Siguiente acción exacta
 
 ```text
-autorización: CONSUMIDA
-consumedByRun: 30816576914
-replayAllowed: false
-additionalExecutionsAllowed: false
+root fix source-only del registro/contrato canónico de predeploy
+→ PASS estático antes de secrets
+→ evidencia del correctivo
+→ una sola autorización de reanudación del predeploy
 ```
 
-No corresponde otro Gate 7.11, otra auditoría general ni reimportación.
-
-## Próxima frontera única
-
-```text
-predeploy focalizado sobre releaseCommit 27cb7dfcda8568280ebef15993a953364304f29b
-→ backup y rollback exactos
-→ confirmar proyecto, Hosting y target
-→ solicitar una sola autorización explícita de deploy
-→ deploy
-→ smoke productivo focalizado
-```
-
-Producción, Hosting, main y merge continúan sin autorización.
+No repetir Gate 7.11, no abrir otra auditoría general y no tocar RC1, datos o módulos.
