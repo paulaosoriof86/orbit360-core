@@ -2,236 +2,194 @@
 
 Fecha operativa: 2026-08-03  
 Producto: Gravicentra Insurance / Orbit 360  
-Tenant prioritario: `alianzas-soluciones`  
-Candidata correctiva: `release/gravicentra-insurance-rc1-2-membership-auth-20260803`
+Tenant prioritario: `alianzas-soluciones`
 
-## 1. Resumen ejecutivo
+## 1. Incidente
 
-La plataforma publicada en RC1.1 logró activar Firestore y mostrar información real, pero el acceso normal de los usuarios continuó bloqueado. El defecto no estaba en las contraseñas ni en las cuentas de Paula, Carlos, Samuel o Fernando. El runtime activo todavía conservaba dos validaciones históricas que aceptaban exclusivamente una identidad técnica de laboratorio.
+RC1.1 mostró datos reales, pero únicamente permitía el ingreso de una identidad técnica histórica. Los usuarios normales, incluida Dirección, eran rechazados aunque la arquitectura de membership ya existía.
 
-El problema ya había sido resuelto conceptualmente un mes antes mediante la proyección de membresías en:
+## 2. Causa raíz de la regresión fuente
 
-```text
-tenants/{tenantId}/members/{uid}
-```
+La candidata acumulativa combinó:
 
-Sin embargo, la candidata acumulativa se reconstruyó seleccionando una versión posterior del loader y del modelo de membresías, pero conservó versiones antiguas de `core/auth.js`, `data/store-firestore-lab.local.js` y `core/backend-lab-auth-guard.js`. El cierre anterior no tenía un gate negativo que impidiera esa combinación incoherente.
+- el owner vigente de membership `tenants/{tenantId}/members/{uid}`;
+- una versión histórica de `core/auth.js`;
+- una versión histórica de `data/store-firestore-lab.local.js`;
+- una versión histórica de `core/backend-lab-auth-guard.js`.
 
-## 2. Clasificación
+Los tres archivos históricos fijaban correo, UID, rol Dirección y asesor. No existía un gate negativo que impidiera reintroducirlos al reconstruir la candidata.
+
+Clasificación:
 
 ```text
 FUNCTIONAL_DEFECT
 SECURITY_FAILURE
-PIPELINE_MECHANISM_FAILURE
 VALIDATOR_STALE
+PIPELINE_MECHANISM_FAILURE
 ```
 
-No corresponde a:
+## 3. Root fix RC1.2
+
+RC1.2 sustituyó los tres owners por versiones basadas en:
+
+```text
+Firebase Auth
++
+membership activa del tenant
++
+roles/scopes/advisorId de la membership
+```
+
+El gate permanente valida 14 controles y bloquea identidad técnica, UID fijo, rol/asesor forzado, fallback seed, pérdida de API o scripts fuera del contrato.
+
+Candidata:
+
+```text
+release/gravicentra-insurance-rc1-2-membership-auth-20260803
+b699ba329960cd830121b57452ce558399aa84fb
+```
+
+## 4. Resultado del macrobloque autorizado
+
+### 4.1 Primera ejecución
+
+```text
+run: 30877460688
+job: 91891705926
+gate: PASS 14/14
+fallo: ruta incorrecta del JSON de evidencia
+clasificación: PIPELINE_MECHANISM_FAILURE
+secretos leídos: no
+Firebase leído: no
+deploy: no
+producción tocada: no
+```
+
+La ruta se corrigió y la misma autorización se reanudó desde la frontera pre-risk.
+
+### 4.2 Reanudación
+
+```text
+run: 30877589549
+job: 91892068434
+artifact: 8880091323
+digest: sha256:b45e69e3d256f075ca67c8a4eebacff3db03aa6eff1b152a02c6885701318268
+gate: PASS 14/14
+resultado: ACTIVE_NORMAL_MEMBERSHIP_NOT_FOUND_DIRECCION
+decisión: RC12_NORMAL_IDENTITIES_NO_GO
+```
+
+El flujo se detuvo antes de snapshot y deploy.
+
+## 5. Segunda causa raíz: contrato de datos de acceso
+
+Los owners de código ya estaban correctos, pero no se pudo resolver una identidad normal de Dirección que cumpliera todos estos criterios:
+
+1. documento de membership existente;
+2. UID presente;
+3. tenant `alianzas-soluciones`;
+4. estado `active` o `activo`;
+5. roles no vacíos;
+6. `defaultRole` incluido en roles;
+7. `activeRole` incluido en roles;
+8. rol activo canónico `SuperAdmin` o `AdminTenant`;
+9. usuario Firebase con el mismo UID;
+10. usuario no deshabilitado;
+11. correo presente;
+12. proveedor de acceso presente;
+13. identidad diferente de la identidad técnica excluida.
+
+Clasificación de ejecución:
+
+```text
+SECURITY_FAILURE
+```
+
+Clasificación de remediación:
 
 ```text
 DATA_CONTRACT_FAILURE
-ENVIRONMENT_FAILURE
-credencial incorrecta del usuario
-pérdida de datos
-necesidad de reimportación
+con impacto de seguridad
 ```
 
-## 3. Cadena exacta del defecto
+## 6. Owner exacto
 
 ```text
-modelo de membresías vigente
+tenants/{tenantId}/members/{uid}
 +
-Auth/Store/Guard históricos con usuario técnico
-→ Firebase acepta el correo normal
-→ guard compara contra correo/UID fijo
-→ sesión normal es cerrada
-→ store rechaza snapshots para el UID real
-→ usuario no puede ingresar con su acceso habitual
+Firebase Auth user con el mismo uid
 ```
 
-## 4. Por qué reapareció un problema cerrado
-
-La causa metodológica fue la ausencia de una regla de composición negativa en la candidata acumulativa. Los gates anteriores verificaron por separado:
-
-- que Firebase Auth funcionara;
-- que los datos reales existieran;
-- que el store pudiera hidratar 430 clientes;
-- que la membresía multirol existiera;
-- que el frontend mostrara los módulos.
-
-Pero no verificaron simultáneamente que **los tres owners activos de autenticación** estuvieran alineados con la membresía multiusuario. El smoke RC1.1 utilizó la misma identidad técnica que el código esperaba, por lo que produjo un falso PASS para el acceso normal.
-
-## 5. Owners exactos
-
-### Owner de autenticación
+No son owners del fallo:
 
 ```text
-orbit360-platform/core/auth.js
+core/auth.js
+data/store-firestore-lab.local.js
+core/backend-lab-auth-guard.js
 ```
 
-Antes:
+Esos tres owners aprobaron el gate 14/14.
 
-- prellenaba la cuenta técnica;
-- mapeaba cualquier sesión LAB como Dirección;
-- mostraba la aplicación después de Firebase Auth sin esperar membership.
+## 7. Por qué no se realizó deploy
 
-RC1.2:
-
-- solicita el correo real asignado;
-- espera la membresía activa del tenant;
-- obtiene rol, roles, advisorId, países y scopes desde membership;
-- no muestra la aplicación hasta completar la proyección autorizada.
-
-### Owner de datos
+El contrato autorizaba:
 
 ```text
-orbit360-platform/data/store-firestore-lab.local.js
+membership/Auth read-only
+→ snapshot
+→ Hosting deploy
+→ navegador 3 perfiles
 ```
 
-Antes:
+Al fallar la primera etapa de identidad normal, el flujo no podía avanzar sin degradar seguridad. No se generaron tokens, no se tomó snapshot y no se desplegó.
 
-- `canonicalAuthUser()` comparaba correo y UID contra constantes técnicas;
-- solo esa identidad podía conectar snapshots.
-
-RC1.2:
-
-- valida Firebase Auth + `Orbit.auth.productUser`;
-- exige UID, tenant, estado activo y roles válidos;
-- preserva la API pública de `Orbit.store`;
-- conserva rutas canónicas y rutas legacy por colección;
-- excluye seeds de las lecturas canónicas.
-
-### Guard de sesión
+## 8. Integridad
 
 ```text
-orbit360-platform/core/backend-lab-auth-guard.js
+Firestore reads: membership solamente
+Auth reads: metadatos solamente
+Firestore writes: 0
+Auth writes: 0
+usuarios creados: 0
+usuarios modificados: 0
+contraseñas leídas: 0
+contraseñas modificadas: 0
+tokens creados: 0
+Hosting deploy: 0
+rollback: no requerido
+Rules: no
+Functions: no
+reimportación: no
+main: no
+merge: no
 ```
 
-Antes:
+## 9. Diagnóstico exacto preparado
 
-- rechazaba cualquier usuario distinto del técnico;
-- forzaba Dirección y `ase-paula-osorio`.
-
-RC1.2:
-
-- acepta cualquier identidad con membership activa;
-- no fuerza rol ni asesor;
-- rearma snapshots después de la proyección autorizada.
-
-### Owner de membresía preservado
+Archivo:
 
 ```text
-orbit360-platform/core/access-role-session-owner-v20260728.js
+tools/orbit360-diagnosticar-memberships-normales-v20260803.mjs
 ```
 
-Este archivo ya contenía el modelo correcto y no fue reemplazado. Continúa resolviendo:
+Produce un censo agregado y sanitizado por causa de rechazo, sin conservar correos ni UID. Distingue entre ausencia de membership, inconsistencia de roles, estado inactivo, UID sin Auth, usuario deshabilitado, proveedor ausente e identidad técnica excluida.
 
-```text
-tenant
-uid
-roles
-defaultRole
-activeRole
-advisorId
-teamId
-countries
-dataScopes
-modulesExtra
-modulesRestricted
-status
-```
+No se ejecutó porque la autorización original quedó consumida y prohibía abrir otra lectura o escritura fuera del macrobloque.
 
-## 6. Correctivo estructural aplicado
+## 10. Solución correcta
 
-```text
-Auth v1.80 membership owner
-Store v1.80 membership owner
-Guard Firestore membership
-```
+1. Ejecutar una única lectura sanitizada del contrato membership/Auth.
+2. Identificar el criterio exacto que impide resolver Dirección.
+3. Preparar diff mínimo sobre la membership del usuario existente.
+4. No crear usuarios paralelos ni cambiar contraseñas.
+5. Ejecutar una operación idempotente con before/after y rollback si la corrección requiere escritura.
+6. Solo después reintentar RC1.2 desde la misma candidata o una candidata incremental sellada.
 
-Commits source-only:
+## 11. Prevención permanente
 
-```text
-auth:  7ba78de857f7075a56ffbdd70dc71185306d6483
-store: 3f59da1e182b68220e375543cd7c25bfafb4b01e
-gate:  7648c6b5b8f9953a229a99ce7f0ee8c2cdf49852
-```
-
-No se modificaron:
-
-```text
-usuarios Firebase
-contraseñas
-memberships Firestore
-Rules
-Functions
-datos operativos
-main
-PR mediante merge
-producción
-```
-
-## 7. Gate permanente antirregresión
-
-Se agregó:
-
-```text
-tools/orbit360-validar-auth-membership-antiregression-v20260803.mjs
-```
-
-El gate debe bloquear cualquier release si detecta:
-
-- correo técnico en Auth, Store o Guard activos;
-- UID técnico fijo;
-- rol Dirección forzado para todos;
-- asesor Paula forzado;
-- ausencia de validación por membership;
-- pérdida de la API pública de `Orbit.store`;
-- loader activo sin guard por membresía;
-- fallback seed en lecturas canónicas.
-
-Este gate es `releaseBlocking:true` y debe ejecutarse antes de secretos, navegador, Firebase o deploy.
-
-## 8. Evidencia source-only
-
-```text
-orbit360-platform/runtime-gate-crm-v20260716/
-rc12-auth-membership-source-review.json
-```
-
-Estado:
-
-```text
-SOURCE_PASS
-runtimeStatus: NOT_EXECUTED
-deployAuthorized: false
-productionTouched: false
-```
-
-## 9. Estado honesto
-
-```text
-RC1.1 en producción: datos reales, acceso normal defectuoso
-RC1.2 source-only: implementada
-RC1.2 desplegada: no
-Firestore leído durante el fix: no
-Firestore escrito: no
-Auth escrito: no
-```
-
-## 10. Siguiente cierre permitido
-
-Una única ejecución debe:
-
-1. ejecutar el gate antirregresión antes de credenciales;
-2. verificar que la membership de la identidad de prueba existe y está activa;
-3. desplegar exclusivamente Hosting desde RC1.2;
-4. abrir la URL canónica sin parámetros manuales;
-5. iniciar sesión con una identidad normal, no técnica;
-6. verificar roles/scopes/advisor desde membership;
-7. comprobar store Firestore y los 430 clientes;
-8. comprobar ausencia de identidad técnica y datos demo;
-9. confirmar snapshots y digests before/after idénticos;
-10. ejecutar rollback si falla cualquier criterio.
-
-No corresponde repetir Gate 7.11, predeploy general ni reimportar datos.
+- Gate estático antirregresión antes de secretos.
+- Gate de contrato membership/Auth antes de snapshot/deploy.
+- Smoke con identidades normales de Dirección, Operativo y Asesor.
+- Evidencia agregada sin PII.
+- Prohibición de cuentas técnicas como sustituto de usuarios reales.
+- Source, workflow, documentación, Cloud/Claude y Academia deben actualizarse juntos.
