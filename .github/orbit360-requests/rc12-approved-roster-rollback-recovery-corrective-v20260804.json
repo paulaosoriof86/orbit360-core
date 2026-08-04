@@ -1,0 +1,28 @@
+{
+  "schemaVersion": "orbit360-rc12-approved-roster-rollback-recovery-corrective-request-v1",
+  "status": "AUTHORIZED_SINGLE_VALIDATOR_CORRECTIVE",
+  "authorizedAt": "2026-08-04T06:58:00-06:00",
+  "authorizationRef": "same_user_authorized_rollback_boundary_20260804T0633-0600",
+  "approved": true,
+  "allowedExecutions": 1,
+  "consumed": false,
+  "replayAllowed": false,
+  "parentHead": "a92515df208deb09170e96ab4362fed95d31cead",
+  "priorRun": 30911448044,
+  "priorGate": {
+    "version": "7.15.2",
+    "passed": 13,
+    "failed": 1,
+    "failedCheckIds": ["ROLLBACK_OWNER_FIXED"]
+  },
+  "priorSecretsRead": false,
+  "priorFirestoreWrites": 0,
+  "priorAuthWrites": 0,
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "projectId": "ays-orbit-360-lab",
+  "tenantId": "alianzas-soluciones",
+  "validatorCorrection": "accept braced pre-read-then-delete owner implementation",
+  "stopRetryIfFailsAgain": true,
+  "containsPII": false,
+  "containsSecrets": false
+}
