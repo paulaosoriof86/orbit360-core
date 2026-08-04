@@ -1,0 +1,101 @@
+{
+  "schemaVersion": "orbit360-domain-services-source-manifest-v1",
+  "generatedAt": "2026-08-04T11:41:00-06:00",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pr": 5,
+  "classification": "SOURCE_IMPLEMENTED_RUNTIME_PENDING",
+  "domains": {
+    "teamOnboarding": {
+      "backendOwner": "functions/user-onboarding.js",
+      "clientOwner": "orbit360-platform/core/user-onboarding.js",
+      "uiBridge": "orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js",
+      "generic": true,
+      "tenantHardcoding": false,
+      "runtimeActive": false
+    },
+    "tenantDomainConfiguration": {
+      "backendOwner": "functions/tenant-domain-config.js",
+      "clientOwner": "orbit360-platform/core/tenant-domain-config-client.js",
+      "uiBridge": "orbit360-platform/modules/config-domain-v20260804-bridge.js",
+      "configurableDomains": ["workflow", "reconciliation"],
+      "localPrototypeSource": "Orbit.tenant",
+      "protectedSyncSource": true,
+      "runtimeActive": false
+    },
+    "opsLeads": {
+      "backendOwner": "functions/ops-leads-domain.js",
+      "clientOwner": "orbit360-platform/core/ops-leads-domain-client.js",
+      "uiBridge": "orbit360-platform/modules/ops-leads-domain-v20260804-bridge.js",
+      "features": [
+        "tenant-configurable-stages",
+        "single-business-two-projections",
+        "advisor-management-projection",
+        "idempotent-requests",
+        "workflow-events",
+        "notification-outbox",
+        "portal-notifications",
+        "roles-and-scopes",
+        "audit-digests"
+      ],
+      "runtimeActive": false
+    },
+    "paymentsReconciliation": {
+      "backendOwner": "functions/cobros-reconciliation-domain.js",
+      "clientOwner": "orbit360-platform/core/cobros-reconciliation-domain-client.js",
+      "inferenceOwner": "tools/orbit360-cobros-inferencia-secuencial-v20260804.mjs",
+      "fullReplayOwner": "tools/orbit360-cobros-replay-inferencial-completo-v20260804.mjs",
+      "features": [
+        "direct-insurer-payment",
+        "commission-recognition",
+        "commission-sequence",
+        "complete-portfolio-sequence",
+        "valid-platform-report",
+        "hold-on-conflict",
+        "human-confirmation-before-application",
+        "evidence-ledger"
+      ],
+      "operationalReplayExecuted": false,
+      "runtimeActive": false
+    }
+  },
+  "featureFlags": {
+    "tenantDomainConfigBackendActive": false,
+    "opsLeadsDomainBackendActive": false,
+    "cobrosReconciliationDomainActive": false
+  },
+  "claude": {
+    "packageIndex": "orbit360-platform/docs/PAQUETE-ACUMULADO-CLAUDE-ORBIT360-20260804.md",
+    "academyUpdate": "orbit360-platform/docs/ACADEMIA-ACTUALIZACION-ONBOARDING-COBROS-OPS-LEADS-20260804.md",
+    "externalDeliveryExecuted": false,
+    "containsSecrets": false,
+    "containsOperationalPII": false,
+    "protectedBackendExcludedFromReplacement": true
+  },
+  "integrity": {
+    "deployExecuted": false,
+    "functionsDeployed": false,
+    "rulesChanged": false,
+    "firestoreReads": 0,
+    "firestoreWrites": 0,
+    "authReads": 0,
+    "authWrites": 0,
+    "productionTouched": false,
+    "mainTouched": false,
+    "mergeExecuted": false,
+    "ciChecksObserved": 0,
+    "sourceSyntaxCheckCommandPrepared": "cd functions && npm run check",
+    "sourceSyntaxCheckExecutedInThisRunner": false
+  },
+  "remainingBeforeVisualCandidate": [
+    "execute-gate-contract-preflight",
+    "execute-source-syntax-and-contract-checks",
+    "mount-private-normalized-payment-sources",
+    "run-full-inferential-ledger",
+    "review-outcome-counts-and-holds",
+    "activate-domain-flags-in-controlled-lab",
+    "deploy-functions-and-hosting-only-with-explicit-authorization",
+    "run-end-to-end-role-and-flow-gate",
+    "build-single-cumulative-runtime-visual-candidate"
+  ],
+  "ok": true
+}
