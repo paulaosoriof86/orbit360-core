@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "orbit360-block12-runtime-hang-rescue-request-v1",
+  "status": "AUTHORIZED_RUNTIME_HANG_RESCUE",
+  "approved": true,
+  "allowedExecutions": 1,
+  "consumed": false,
+  "replayAllowed": false,
+  "authorizationRef": "user_continue_urgent_block12_runtime_hang_rescue_20260804T1708-0600",
+  "targetRunId": 30956309298,
+  "previousStatus": "in_progress",
+  "previousStep": "Ejecutar pruebas dentro de Orbit 360",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "projectId": "ays-orbit-360-lab",
+  "pullRequest": 5,
+  "parentHead": "0e860087db08b879947e9d87f5934264b34d88a9",
+  "syntheticTenantId": "verify-block12-30956309298",
+  "syntheticUserIds": [
+    "zztest_block12_30956309298_direction",
+    "zztest_block12_30956309298_advisorA",
+    "zztest_block12_30956309298_advisorB"
+  ],
+  "functionNames": [
+    "orbit360OpsLeadsCommandLabV20260804",
+    "orbit360GetAdvisorOpsInboxLabV20260804",
+    "orbit360CobrosReconciliationCommandLabV20260804",
+    "orbit360RecurringInsuranceImportLabV20260804"
+  ],
+  "hostingChannel": "orbit360-operational-block12",
+  "rules": false,
+  "realTenantWrites": false,
+  "realDataReimport": false,
+  "production": false,
+  "main": false,
+  "merge": false
+}
