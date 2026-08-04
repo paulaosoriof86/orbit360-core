@@ -1,0 +1,70 @@
+{
+  "schemaVersion": "orbit360-gravicentra-insurance-rc1-predeploy-readonly-resume-request-v1",
+  "status": "AUTHORIZED_SINGLE_EXECUTION",
+  "authorizationRef": "user_authorizes_single_gravicentra_rc1_predeploy_resume_readonly_20260803T1957-0600",
+  "approved": true,
+  "allowedExecutions": 1,
+  "consumed": false,
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "parentHead": "b33149004c8cd8c66524a7a0d5742b9dfa52f993",
+  "releaseBranch": "release/gravicentra-insurance-rc1-20260803",
+  "releaseCommit": "27cb7dfcda8568280ebef15993a953364304f29b",
+  "baselineProductHead": "267f7231b46d65b80c167f54567a67503b6a6793",
+  "projectId": "ays-orbit-360-lab",
+  "tenantId": "alianzas-soluciones",
+  "liveUrl": "https://ays-orbit-360-lab.web.app",
+  "requiredOperationalCounts": {
+    "clientes": 430,
+    "aseguradoras": 30,
+    "polizas": 1373,
+    "vehiculos": 1032,
+    "recibosEsperados": 1294,
+    "carteraPrimas": 673,
+    "cobros": 5,
+    "asesores": 7
+  },
+  "requiredCanonicalCounts": {
+    "clientes": 430,
+    "aseguradoras": 30,
+    "polizas": 1375,
+    "vehiculos": 1033,
+    "recibosEsperados": 1294,
+    "carteraPrimas": 673,
+    "cobros": 7
+  },
+  "requiredModules": [
+    "cliente360",
+    "aseguradoras",
+    "polizas",
+    "cobros",
+    "ops",
+    "leads"
+  ],
+  "scope": {
+    "contractPreflightBeforeSecrets": true,
+    "firestoreRead": true,
+    "hostingRead": true,
+    "publicAssetRead": true,
+    "featureFlagRead": true,
+    "backupAndRollbackReadiness": true,
+    "writes": false,
+    "reimport": false,
+    "deploy": false,
+    "functions": false,
+    "rules": false,
+    "productionWrites": false,
+    "main": false,
+    "merge": false
+  },
+  "requiredDecision": [
+    "GO_FULL",
+    "GO_LIMITED_SCOPE",
+    "NO_GO"
+  ],
+  "stopRetry": true,
+  "repeatGate711": false,
+  "openGeneralAudit": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
