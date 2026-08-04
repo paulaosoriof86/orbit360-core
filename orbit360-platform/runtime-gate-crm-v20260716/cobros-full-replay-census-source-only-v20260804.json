@@ -1,0 +1,90 @@
+{
+  "schemaVersion": "orbit360-cobros-full-replay-census-source-only-v1",
+  "generatedAt": "2026-08-04T10:26:00-06:00",
+  "classification": [
+    "PIPELINE_MECHANISM_FAILURE",
+    "DATA_CONTRACT_FAILURE",
+    "FUNCTIONAL_DEFECT"
+  ],
+  "decision": "FULL_COBROS_CENSUS_RECONSTRUCTED_ROW_LEVEL_REPLAY_TOOL_READY",
+  "source": {
+    "logicalName": "DRY-RUN-RECIBOS-CARTERA-CONCILIADO-AYS-20260730.xlsx",
+    "cutoff": "2026-07-30",
+    "status": "SOURCE_RECONCILED_READY",
+    "logicalSha256": "bb494a05aff75ff7baad39a07f23512187e39480d509f8ca1ace01e0b671362b",
+    "receiptIdDigest": "f700a11643a1e4e62a13c3894d6f1097acef2ad5edfc0a32703d0d9b2ed5facf",
+    "portfolioIdDigest": "144c8967704d1d06475144508e24cd8792ea8264faa7045eb50132316264bcd6"
+  },
+  "canonicalCounts": {
+    "policiesActive": 224,
+    "policiesWithCalendar": 223,
+    "receiptsCalendar": 1261,
+    "portfolioPending": 641,
+    "overdueOrDue": 99,
+    "future": 542,
+    "reportedPayments": 365,
+    "noPendingByInsurer": 211,
+    "receiptStatusHolds": 44,
+    "supersededSchedules": 20,
+    "cobrosCurrentlyMaterialized": 5
+  },
+  "currencyTotals": {
+    "GTQ": {
+      "pending": 289755.37,
+      "overdueOrDue": 44166.01,
+      "future": 245589.36
+    },
+    "COP": {
+      "pending": 11619295.17,
+      "overdueOrDue": 11619001.17,
+      "future": 294
+    }
+  },
+  "authoritySummary": [
+    {"authority":"AseGuate","pending":86,"overdue":5,"future":81,"GTQ":25784.74,"COP":0,"requiresValidation":0},
+    {"authority":"ElRoble","pending":252,"overdue":30,"future":222,"GTQ":89036.26,"COP":0,"requiresValidation":28},
+    {"authority":"GyT","pending":1,"overdue":1,"future":0,"GTQ":577.91,"COP":0,"requiresValidation":0},
+    {"authority":"LaCeiba","pending":8,"overdue":8,"future":0,"GTQ":3040.84,"COP":0,"requiresValidation":0},
+    {"authority":"Mapfre","pending":2,"overdue":1,"future":1,"GTQ":2780,"COP":0,"requiresValidation":0},
+    {"authority":"SIGA","pending":258,"overdue":51,"future":207,"GTQ":135608.61,"COP":11619295.17,"requiresValidation":0},
+    {"authority":"Universales","pending":34,"overdue":3,"future":31,"GTQ":32927.01,"COP":0,"requiresValidation":0}
+  ],
+  "materializationGap": {
+    "received": true,
+    "registeredBySourceAndHash": true,
+    "processedInDryRun": true,
+    "mappedToReceiptsAndPortfolio": true,
+    "fullRuntimeLedgerPersisted": false,
+    "confirmedCobrosWritten": 5,
+    "visualProjectionComplete": false
+  },
+  "requiredRuntimeCollections": [
+    "pagosReportados",
+    "evidenciasCobro",
+    "propuestasConciliacion",
+    "conciliacionHolds",
+    "cobros"
+  ],
+  "sourceTool": "tools/orbit360-cobros-full-replay-v20260804.mjs",
+  "sourceValidator": "tools/orbit360-validar-cobros-full-replay-source-v20260804.mjs",
+  "rowLevelReplay": {
+    "status": "READY_WHEN_CANONICAL_PRIVATE_WORKBOOK_IS_MOUNTED_TO_CONTROLLED_RUNNER",
+    "manualUserActionRequired": false,
+    "writes": 0
+  },
+  "visualizationBoundary": {
+    "existingEvidenceRoutes": ["cliente360", "aseguradoras", "polizas", "ops", "leads"],
+    "nextRequiredRoutes": ["vehiculos", "recibos", "cartera", "cobros", "conciliaciones", "comisiones", "equipo"],
+    "singleAccumulatedCandidateRequired": true
+  },
+  "firestoreReads": 0,
+  "firestoreWrites": 0,
+  "authReads": 0,
+  "authWrites": 0,
+  "deployExecuted": false,
+  "productionTouched": false,
+  "reimportExecuted": false,
+  "containsPII": false,
+  "containsSecrets": false,
+  "ok": true
+}
