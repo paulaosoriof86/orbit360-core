@@ -1,0 +1,118 @@
+name: Gravicentra Insurance RC1.2 · auditoría forense acumulativa
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-requests/rc12-forensic-module-audit-v20260803.json'
+
+permissions:
+  contents: write
+  statuses: write
+
+concurrency:
+  group: orbit360-rc12-forensic-module-audit-v20260803
+  cancel-in-progress: false
+
+env:
+  REQUEST: .github/orbit360-requests/rc12-forensic-module-audit-v20260803.json
+  BASELINE: 27cb7dfcda8568280ebef15993a953364304f29b
+  CANDIDATE: b699ba329960cd830121b57452ce558399aa84fb
+  LIVE_BRANCH: ays/backend-tenant-lab-v99-20260703
+  JSON_OUT: orbit360-platform/runtime-gate-crm-v20260716/rc12-forensic-module-audit.json
+  MD_OUT: orbit360-platform/docs/AUDITORIA-FORENSE-CANDIDATA-ACUMULATIVA-MODULOS-RC12-20260803.md
+  STATUS_CONTEXT: orbit360/rc12-forensic-module-audit
+
+jobs:
+  audit:
+    name: RC1.2 · paridad y madurez de todos los módulos
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout request exacto
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Preparar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validar autorización estática y fuentes
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "$LIVE_BRANCH"
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          jq -e '.status=="AUTHORIZED_STATIC_FORENSIC_AUDIT" and .baseline==env.BASELINE and .candidate==env.CANDIDATE and .liveBranch==env.LIVE_BRANCH and .firestoreRead==false and .authRead==false and .writes==false and .deploy==false and .productionTouched==false and .consumed==false' "$REQUEST" >/dev/null
+          git fetch --no-tags origin "$LIVE_BRANCH" release/gravicentra-insurance-rc1-2-membership-auth-20260803
+          test "$(git rev-parse origin/release/gravicentra-insurance-rc1-2-membership-auth-20260803)" = "$CANDIDATE"
+          test "$(git merge-base "$BASELINE" "$CANDIDATE")" = "$BASELINE"
+          node --check tools/orbit360-auditar-candidata-acumulativa-modulos-v20260803.mjs
+
+      - name: Ejecutar auditoría forense completa
+        shell: bash
+        run: |
+          set -euo pipefail
+          ORBIT360_AUDIT_BASELINE="$BASELINE" \
+          ORBIT360_AUDIT_CANDIDATE="$CANDIDATE" \
+          ORBIT360_AUDIT_LIVE="origin/$LIVE_BRANCH" \
+          ORBIT360_AUDIT_JSON="$JSON_OUT" \
+          ORBIT360_AUDIT_MD="$MD_OUT" \
+          node tools/orbit360-auditar-candidata-acumulativa-modulos-v20260803.mjs
+          jq -e '.decision=="GO_STATIC_CUMULATIVE_MODULE_PARITY_WITH_MATURITY_GAPS" and .ok==true and .guarantees.candidateDescendsFromBaseline==true and .guarantees.moduleTreeParityBaseline==true and .guarantees.moduleTreeParityLive==true and .guarantees.noPostBaselineModuleChangesInLive==true and .guarantees.candidateOnlyChangesAllowedRuntimeOwners==true and .guarantees.allActiveModulesSyntaxAndRegistration==true and .firestoreRead==false and .authRead==false and .firestoreWrites==0 and .authWrites==0 and .deployExecuted==false and .productionTouched==false' "$JSON_OUT" >/dev/null
+          git diff --check
+
+      - name: Persistir evidencia y documento maestro
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$JSON_OUT" "$MD_OUT"
+          git commit -m 'audit: cerrar matriz forense acumulativa RC1.2'
+          git push origin HEAD:"$LIVE_BRANCH"
+
+      - name: Publicar estado PASS
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.repos.createCommitStatus({
+              owner:context.repo.owner,
+              repo:context.repo.repo,
+              sha:context.sha,
+              state:'success',
+              context:process.env.STATUS_CONTEXT,
+              description:'RC1.2 · paridad de módulos y madurez auditadas',
+              target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
+            });
+
+      - name: Publicar estado FAIL
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.repos.createCommitStatus({
+              owner:context.repo.owner,
+              repo:context.repo.repo,
+              sha:context.sha,
+              state:'failure',
+              context:process.env.STATUS_CONTEXT,
+              description:'RC1.2 · divergencia o auditoría forense incompleta',
+              target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
+            });
+
+      - name: Subir evidencia
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rc12-forensic-module-audit-${{ github.run_id }}
+          path: |
+            ${{ env.JSON_OUT }}
+            ${{ env.MD_OUT }}
+          if-no-files-found: warn
+          retention-days: 30
