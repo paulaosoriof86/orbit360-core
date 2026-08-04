@@ -8,7 +8,7 @@ const ROOT = process.cwd();
 const GATE = 'block12-operational-runtime-lab-v20260804';
 const VERSION = '12.0.1';
 const LIFECYCLE = 'tools/orbit360-validator-lifecycle-contract-block12-operational-runtime-lab-v20260804.json';
-const REQUEST = process.env.ORBIT360_REQUEST_FILE || '.github/orbit360-requests/block12-operational-runtime-lab-rootfix2-v20260804.json';
+const REQUEST = process.env.ORBIT360_REQUEST_FILE || '.github/orbit360-requests/block12-operational-runtime-lab-rootfix4-v20260804.json';
 const OUT = path.join(ROOT, 'orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json');
 const REQUIRED = [
   LIFECYCLE,
@@ -22,7 +22,10 @@ const REQUIRED = [
   'orbit360-platform/core/backend-lab-init.js',
   'orbit360-platform/core/runtime-verification-center-v20260804.js',
   'tools/orbit360-block12-operational-runtime-lab-v20260804.mjs',
-  '.github/workflows/orbit360-block12-operational-runtime-lab-rootfix2-v20260804.yml'
+  '.github/workflows/orbit360-block12-operational-runtime-lab-rootfix4-v20260804.yml',
+  'functions/package-lock.json',
+  'tools/orbit360-validar-functions-runtime-dependencies-v20260804.mjs',
+  'orbit360-platform/runtime-gate-crm-v20260716/functions-dependency-rootfix-source-v20260804.json'
 ];
 const EXPECTED_FUNCTIONS = [
   'orbit360OpsLeadsCommandLabV20260804',
@@ -45,15 +48,17 @@ try {
   const scope = lifecycle.scope || {};
   const forbidden = lifecycle.forbidden || {};
   add('GATE_ID_VERSION', process.argv[2] === GATE && lifecycle.gateId === GATE && lifecycle.gateContractVersion === VERSION);
-  add('LIFECYCLE_ACTIVE', lifecycle.status === 'OPERATIONAL_RUNTIME_LAB_ROOTFIX_AUTHORIZED' && lifecycle.singleGate === true && lifecycle.macroClosure === true);
+  add('LIFECYCLE_ACTIVE', lifecycle.status === 'OPERATIONAL_RUNTIME_LAB_DEPENDENCY_ROOTFIX_READY' && lifecycle.singleGate === true && lifecycle.macroClosure === true);
   add('CAPABILITIES_EXACT', lifecycle.executionProfile.phase === 'OPERATIONAL_RUNTIME_LAB_EXECUTION' && capabilities.secrets === true && capabilities.firestoreRead === true && capabilities.writes === true && capabilities.runtime === true && capabilities.browser === true && capabilities.deploy === true && capabilities.functionsDeploy === true && capabilities.rulesDeploy === false && capabilities.production === false);
-  add('REQUEST_ACTIVE', request.schemaVersion === 'orbit360-block12-operational-runtime-lab-rootfix2-request-v1' && request.status === 'AUTHORIZED_ROOTFIX_CONTINUATION' && request.approved === true && request.allowedExecutions === 1 && request.consumed === false && request.replayAllowed === false && request.retryAuthorized === true && Array.isArray(request.previousRunIds) && request.previousRunIds.length === 2 && request.previousRunIds[0] === 30945951133 && request.previousRunIds[1] === 30948708843 && request.previousRunsStoppedBeforeSecrets === true && request.authorizationRef === lifecycle.authorization.source);
+  add('REQUEST_ACTIVE', request.schemaVersion === 'orbit360-block12-operational-runtime-lab-rootfix4-request-v1' && request.status === 'AUTHORIZED_AFTER_DEPENDENCY_PASS' && request.approved === true && request.allowedExecutions === 1 && request.consumed === false && request.replayAllowed === false && request.retryAuthorized === true && Array.isArray(request.previousRuntimeRunIds) && request.previousRuntimeRunIds.join(',') === '30945951133,30948708843,30949139231' && request.dependencyValidationRunId === 30950155722 && request.dependencyValidationStatus === 'FUNCTIONS_BOOTSTRAP_LOAD_PASS' && request.authorizationRef === lifecycle.authorization.source);
   add('REQUEST_BINDING', request.branch === scope.branch && request.pullRequest === scope.pullRequest && request.projectId === scope.projectId && request.gateId === GATE && request.contractVersion === VERSION && request.parentHead === git(['rev-parse', 'HEAD^^']));
   add('SYNTHETIC_BOUNDARY', request.scope.syntheticTenantOnly === true && request.scope.maximumSyntheticAuthUsers === 3 && request.scope.maximumSyntheticMemberships === 3 && request.scope.realTenantWrites === false && request.scope.realDataReimport === false);
   add('FUNCTION_ALLOWLIST', equal([].concat(request.scope.functionNames || []).sort(), EXPECTED_FUNCTIONS.slice().sort()) && equal([].concat(scope.exactFunctionNames || []).sort(), EXPECTED_FUNCTIONS.slice().sort()));
   add('HOSTING_BOUNDARY', request.scope.hostingPreviewOnly === true && request.scope.hostingChannel === scope.hostingChannel && request.scope.productionHosting === false);
   add('FORBIDDEN_BOUNDARY', forbidden.rulesDeploy === true && forbidden.realTenantWrites === true && forbidden.realDataReimport === true && forbidden.production === true && forbidden.main === true && forbidden.merge === true && request.scope.rules === false && request.scope.production === false && request.scope.main === false && request.scope.merge === false);
   add('EVIDENCE_AND_ROLLBACK', scope.snapshotBeforeAfter === true && scope.rollbackSyntheticTenant === true && scope.rollbackSyntheticAuth === true && scope.inPlatformVerificationCenter === true && scope.autoRunSupported === true && scope.sanitizedEvidence === true && scope.cumulativeVisualCandidate === true);
+  const dependencyEvidence = readJson('orbit360-platform/runtime-gate-crm-v20260716/functions-dependency-rootfix-source-v20260804.json');
+  add('FUNCTIONS_DEPENDENCY_PASS', scope.functionsPackageLockRequired === true && scope.functionsBootstrapLoadPassRequired === true && dependencyEvidence.status === 'FUNCTIONS_BOOTSTRAP_LOAD_PASS' && dependencyEvidence.classification === 'GO_SOURCE_REPRODUCIBLE_FUNCTIONS_RUNTIME' && dependencyEvidence.requiredFunctionExports === true && dependencyEvidence.broadV2AggregatorLoaded === false && dependencyEvidence.unusedDatabaseProviderLoaded === false && dependencyEvidence.lockfileVersion >= 3 && dependencyEvidence.ok === true);
   add('REQUIRED_FILES', REQUIRED.every(exists), REQUIRED.filter(rel => !exists(rel)).join(','));
   const functionSources = ['functions/ops-leads-domain.js','functions/ops-advisor-inbox.js','functions/cobros-reconciliation-domain.js','functions/recurring-insurance-import.js'].map(readText).join('\n');
   add('FUNCTION_EXPORTS_PRESENT', EXPECTED_FUNCTIONS.every(name => functionSources.includes(`exports.${name}`)));
