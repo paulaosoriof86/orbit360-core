@@ -1,0 +1,115 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
+  "gateId": "block7.13-rc12-membership-rootcause-cumulative-closure-v20260803",
+  "gateContractVersion": "7.13.0",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
+  "status": "RC12_ROOTCAUSE_CUMULATIVE_CLOSURE_AUTHORIZED",
+  "executionProfile": {
+    "phase": "GRAVICENTRA_RC12_ROOTCAUSE_CUMULATIVE_AUDIT_CLOSURE",
+    "capabilities": {
+      "secrets": true,
+      "firestoreRead": true,
+      "writes": true,
+      "runtime": true,
+      "browser": true,
+      "deploy": true,
+      "functionsDeploy": false,
+      "rulesDeploy": false,
+      "production": true
+    }
+  },
+  "singleGate": true,
+  "macroClosure": true,
+  "blockOwner": "membership contract + cumulative candidate + Hosting closure",
+  "release": {
+    "baseline": "27cb7dfcda8568280ebef15993a953364304f29b",
+    "branch": "release/gravicentra-insurance-rc1-2-membership-auth-20260803",
+    "commit": "b699ba329960cd830121b57452ce558399aa84fb",
+    "liveBranch": "ays/backend-tenant-lab-v99-20260703"
+  },
+  "forensicAudit": {
+    "evidence": "orbit360-platform/runtime-gate-crm-v20260716/rc12-forensic-module-audit.json",
+    "requiredDecision": "GO_STATIC_CUMULATIVE_MODULE_PARITY_WITH_MATURITY_GAPS",
+    "requiredModuleCount": 31,
+    "requiredFailedModules": 0,
+    "requiredModuleTreeParity": true
+  },
+  "authorization": {
+    "requiredForExecution": true,
+    "activeRequest": true,
+    "allowedExecutions": 1,
+    "request": ".github/orbit360-requests/rc12-rootcause-cumulative-closure-v20260803.json",
+    "replayAllowed": false
+  },
+  "target": {
+    "projectId": "ays-orbit-360-lab",
+    "tenantId": "alianzas-soluciones",
+    "liveUrl": "https://ays-orbit-360-lab.web.app"
+  },
+  "requiredProfiles": ["direccion", "operativo", "asesor"],
+  "expectedOperationalCounts": {
+    "clientes": 430,
+    "aseguradoras": 30,
+    "polizas": 1373,
+    "vehiculos": 1032,
+    "recibosEsperados": 1294,
+    "carteraPrimas": 673,
+    "cobros": 5,
+    "asesores": 7
+  },
+  "expectedCanonicalCounts": {
+    "clientes": 430,
+    "aseguradoras": 30,
+    "polizas": 1375,
+    "vehiculos": 1033,
+    "recibosEsperados": 1294,
+    "carteraPrimas": 673,
+    "cobros": 7
+  },
+  "requiredRuntimeModules": ["cliente360", "aseguradoras", "polizas", "cobros", "ops", "leads"],
+  "normalizationBoundary": {
+    "collection": "tenants/{tenantId}/members",
+    "maximumDocumentsWritten": 1,
+    "allowedFields": ["tenantId", "status", "roles", "defaultRole", "activeRole"],
+    "authWritesAllowed": 0,
+    "userCreatesAllowed": 0,
+    "userUpdatesAllowed": 0,
+    "passwordReadsAllowed": 0,
+    "passwordWritesAllowed": 0,
+    "advisorIdChangesAllowed": false,
+    "scopeChangesAllowed": false,
+    "emailChangesAllowed": false,
+    "providerChangesAllowed": false,
+    "uidChangesAllowed": false,
+    "atomic": true,
+    "idempotent": true,
+    "rollbackRequired": true
+  },
+  "guards": {
+    "diagnosticBeforeWrite": true,
+    "exactlyOneDirectionCandidateRequired": true,
+    "forensicAuditPassBeforeSecrets": true,
+    "authAntiregressionPassBeforeSecrets": true,
+    "hostingDeployOnlyAfterThreeProfilesPass": true,
+    "snapshotBeforeAfterRequired": true,
+    "rollbackHostingOnSmokeFailure": true,
+    "rollbackMembershipOnDownstreamFailure": true,
+    "reimportAllowed": false,
+    "firestoreRulesDeployAllowed": false,
+    "functionsDeployAllowed": false,
+    "mainAllowed": false,
+    "mergeAllowed": false,
+    "repeatGate711Allowed": false,
+    "openGeneralPredeployAllowed": false,
+    "stopRetryOnSameFailureFamily": true
+  },
+  "cloudClaude": {
+    "backendClassification": "BACKEND_PROTEGIDO_NO_CLAUDE",
+    "reusablePatternClassification": "REPLICABLE_CLAUDE_ACUMULADO",
+    "academiaClassification": "ACADEMIA_ACTUALIZAR",
+    "moduleAuditClassification": "REPLICABLE_CLAUDE_ACUMULADO",
+    "externalPackageSent": false
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
