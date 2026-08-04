@@ -412,4 +412,5 @@ async function execute(request) {
 }
 
 exports.orbit360RecurringInsuranceImport = onCall({ region: REGION, cors: true }, execute);
+exports.orbit360RecurringInsuranceImportLabV20260804 = onCall({ region: REGION, cors: true }, execute);
 exports.__recurringInsuranceImport = Object.freeze({ VERSION, SOURCE_TYPES, OPERATIONS, normalizeRow, batchPreview });

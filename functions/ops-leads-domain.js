@@ -372,4 +372,5 @@ async function executeCommand(request) {
 }
 
 exports.orbit360OpsLeadsCommand = onCall({ region: REGION, cors: true }, executeCommand);
+exports.orbit360OpsLeadsCommandLabV20260804 = onCall({ region: REGION, cors: true }, executeCommand);
 exports.__opsLeadsDomain = Object.freeze({ VERSION, DEFAULT_STAGES, OPERATIONS });

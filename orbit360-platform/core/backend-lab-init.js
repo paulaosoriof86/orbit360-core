@@ -1,5 +1,5 @@
 /* ============================================================
-   Orbit 360 - Backend LAB Firebase init v1.126
+   Orbit 360 - Backend LAB Firebase init v1.127
    Inicializa Firebase solo en ?orbitBackend=firestore-lab.
    Declara el read model canónico sellado y mantiene un único owner
    de lectura: Orbit.store. No expone secretos ni crea renderers.
@@ -20,8 +20,14 @@
     tenantId: tenant,
     tenant: tenant,
     firebaseInit: 'pending',
-    firebaseInitVersion: 'v1.126-recurring-import-source',
+    firebaseInitVersion: 'v1.127-operational-runtime-lab',
     functionsRegion: (window.OrbitBackend && window.OrbitBackend.functionsRegion) || 'us-central1',
+    functionNames: Object.assign({}, window.OrbitBackend && window.OrbitBackend.functionNames || {}, {
+      opsLeads: 'orbit360OpsLeadsCommandLabV20260804',
+      advisorInbox: 'orbit360GetAdvisorOpsInboxLabV20260804',
+      reconciliation: 'orbit360CobrosReconciliationCommandLabV20260804',
+      recurringImport: 'orbit360RecurringInsuranceImportLabV20260804'
+    }),
     canonicalSnapshotDigest: '19e1927d39f6b713ee12504f8762bc42ead9de6e365bb0f12162d2a0c8f8469b',
     featureFlags: Object.assign({}, window.OrbitBackend && window.OrbitBackend.featureFlags || {}, {
       aseguradorasKnowledgeAutoMount: false,
@@ -32,11 +38,11 @@
       tenantDomainConfigBackendSource: true,
       tenantDomainConfigBackendActive: false,
       opsLeadsDomainBackendSource: true,
-      opsLeadsDomainBackendActive: false,
+      opsLeadsDomainBackendActive: true,
       cobrosReconciliationDomainSource: true,
-      cobrosReconciliationDomainActive: false,
+      cobrosReconciliationDomainActive: true,
       recurringInsuranceImportSource: true,
-      recurringInsuranceImportActive: false
+      recurringInsuranceImportActive: true
     })
   });
 
@@ -108,6 +114,9 @@
   loadWorkflowDomain();
   loadReconciliationDomain();
   loadRecurringInsuranceImport();
+  if (/^(1|auto)$/i.test(params.get('orbitVerify') || '')) {
+    afterWindowLoad(function(){ loadScriptOnce('core/runtime-verification-center-v20260804.js?v=20260804-1', 'runtime-verification-center'); });
+  }
 
   if (tenant === 'alianzas-soluciones') {
     window.__orbitAysKnowledgeRuntimePromise = Promise.resolve({

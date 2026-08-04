@@ -295,4 +295,5 @@ async function execute(request) {
 }
 
 exports.orbit360CobrosReconciliationCommand = onCall({ region: REGION, cors: true }, execute);
+exports.orbit360CobrosReconciliationCommandLabV20260804 = onCall({ region: REGION, cors: true }, execute);
 exports.__cobrosReconciliationDomain = Object.freeze({ VERSION, OPERATIONS });

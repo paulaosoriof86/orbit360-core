@@ -32,7 +32,8 @@
     options = options || {};
     const tid = clean(options.tenantId || tenantId());
     if (!tid) throw new Error('No se pudo resolver el tenant activo.');
-    const fn = callable('orbit360RecurringInsuranceImport');
+    const configured = window.OrbitBackend && OrbitBackend.functionNames && OrbitBackend.functionNames.recurringImport;
+    const fn = callable(configured || 'orbit360RecurringInsuranceImport');
     return fn({
       tenantId: tid,
       operation,

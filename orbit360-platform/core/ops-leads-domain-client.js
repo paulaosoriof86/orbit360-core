@@ -8,7 +8,7 @@
   window.Orbit = window.Orbit || {};
 
   const VERSION = 'orbit360-ops-leads-domain-client-v1';
-  const FUNCTION_NAME = 'orbit360OpsLeadsCommand';
+  const FUNCTION_NAME = (window.OrbitBackend && OrbitBackend.functionNames && OrbitBackend.functionNames.opsLeads) || 'orbit360OpsLeadsCommand';
   const text = value => String(value == null ? '' : value).trim();
 
   function backend() { return window.OrbitBackend || {}; }

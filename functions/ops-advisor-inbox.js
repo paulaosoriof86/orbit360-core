@@ -145,4 +145,5 @@ async function inbox(request) {
 }
 
 exports.orbit360GetAdvisorOpsInbox = onCall({ region: REGION, cors: true }, inbox);
+exports.orbit360GetAdvisorOpsInboxLabV20260804 = onCall({ region: REGION, cors: true }, inbox);
 exports.__opsAdvisorInbox = Object.freeze({ VERSION });

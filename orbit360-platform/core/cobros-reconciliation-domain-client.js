@@ -7,7 +7,7 @@
   window.Orbit = window.Orbit || {};
 
   const VERSION = 'orbit360-cobros-reconciliation-client-v1';
-  const FUNCTION_NAME = 'orbit360CobrosReconciliationCommand';
+  const FUNCTION_NAME = (window.OrbitBackend && OrbitBackend.functionNames && OrbitBackend.functionNames.reconciliation) || 'orbit360CobrosReconciliationCommand';
   const text = value => String(value == null ? '' : value).trim();
   const backend = () => window.OrbitBackend || {};
   const tenantId = () => text(backend().tenantId || backend().tenant);
