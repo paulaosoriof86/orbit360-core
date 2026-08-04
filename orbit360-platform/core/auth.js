@@ -1,218 +1,86 @@
 /* ============================================================
-   Orbit 360 · Auth
-   Demo/local por defecto. Firebase Auth solo en ?orbitBackend=firestore-lab.
-   Login white-label: marca de producto Orbit 360, palette-adaptive,
-   slot de logo del cliente. NO usa branding A&S.
+   Orbit 360 · Auth canónico por membresía v1.80
+   - Demo/local separado del runtime Firestore.
+   - En Firestore acepta cualquier identidad Firebase con membresía
+     activa en tenants/{tenantId}/members/{uid}.
+   - Roles, advisorId, países y scopes provienen de la membresía.
+   - No contiene usuario técnico ni fuerza Dirección/Paula.
    ============================================================ */
 window.Orbit = window.Orbit || {};
 Orbit.auth = (function () {
+  'use strict';
+
   const KEY = 'orbit360_session';
   const CKEY = 'orbit360_confidencialidad';
   const DEMO_EMAIL = 'admin@demo.com';
   const DEMO_PASS = 'demo123';
-  const LAB_EMAIL = 'orbit.lab@demo.com';
+  let authBound = false;
+  let formBound = false;
+  let membershipGeneration = 0;
 
-  function isLab() {
+  function text(value) { return String(value == null ? '' : value).trim(); }
+  function isFirestoreRuntime() {
     try {
       const q = new URLSearchParams(location.search || '');
-      return q.get('orbitBackend') === 'firestore-lab' || (window.OrbitBackend && window.OrbitBackend.mode === 'firestore-lab');
-    } catch (e) { return false; }
+      return q.get('orbitBackend') === 'firestore-lab' || !!(window.OrbitBackend && String(OrbitBackend.mode || '').indexOf('firestore') >= 0);
+    } catch (error) { return false; }
   }
-
-  function expectedLabEmail() {
-    return (window.OrbitBackend && window.OrbitBackend.expectedEmail) || LAB_EMAIL;
+  function tenantId() {
+    try {
+      const q = new URLSearchParams(location.search || '');
+      return text(q.get('tenant') || (window.OrbitBackend && (OrbitBackend.tenantId || OrbitBackend.tenant)));
+    } catch (error) { return ''; }
   }
-
   function fbAuth() {
-    try { if (window.firebase && firebase.auth) return firebase.auth(); } catch (e) {}
-    try { if (window.auth && typeof window.auth.signInWithEmailAndPassword === 'function') return window.auth; } catch (e) {}
-    return null;
+    try { return window.firebase && typeof firebase.auth === 'function' ? firebase.auth() : null; }
+    catch (error) { return null; }
   }
-
   function fbUser() {
-    try { const a = fbAuth(); return a && a.currentUser ? a.currentUser : null; } catch (e) { return null; }
+    const auth = fbAuth();
+    return auth && auth.currentUser ? auth.currentUser : null;
   }
-
-  function mapFbUser(u) {
-    if (!u) return null;
+  function projection() {
+    try { return window.Orbit && Orbit.auth && Orbit.auth.productUser || null; }
+    catch (error) { return null; }
+  }
+  function activeProjection(user) {
+    const p = projection();
+    const status = text(p && p.status).toLowerCase();
+    if (!user || !p || p.productReadOnly !== true || p.__labMembershipProjection !== true) return null;
+    if (text(p.uid) !== text(user.uid)) return null;
+    if (!tenantId() || text(p.tenantId) !== tenantId()) return null;
+    if (status !== 'active' && status !== 'activo') return null;
+    if (!Array.isArray(p.roles) || !p.roles.length) return null;
+    if (!p.activeRole || p.roles.indexOf(p.activeRole) < 0) return null;
+    return p;
+  }
+  function roleLabel(role) {
+    if (role === 'SuperAdmin') return 'Dirección';
+    if (role === 'AdminTenant') return 'Administración';
+    return text(role) || 'Acceso autorizado';
+  }
+  function mapUser(user) {
+    if (!user) return null;
+    const p = activeProjection(user);
+    if (isFirestoreRuntime() && !p) return null;
     return {
-      nombre: u.displayName || (u.email || 'Usuario LAB'),
-      rol: 'Dirección',
-      email: u.email || '',
-      uid: u.uid || '',
+      nombre: text(user.displayName) || text(user.email) || 'Usuario',
+      rol: p ? p.activeRole : 'Dirección',
+      roles: p ? p.roles.slice() : ['Dirección'],
+      email: text(user.email),
+      uid: text(user.uid),
       tipo: 'interno',
-      backend: 'firestore-lab'
+      backend: p ? 'firestore-membership' : 'demo',
+      tenantId: p ? p.tenantId : '',
+      advisorId: p ? text(p.advisorId) : '',
+      countries: p ? (p.countries || []).slice() : [],
+      dataScopes: p ? Object.assign({}, p.dataScopes || {}) : {},
+      productReadOnly: !!p
     };
   }
-
-  function withTimeout(promise, milliseconds, code) {
-    let timer;
-    const timeout = new Promise((resolve, reject) => {
-      timer = setTimeout(() => {
-        const error = new Error(code || 'AUTH_TIMEOUT');
-        error.code = code || 'AUTH_TIMEOUT';
-        reject(error);
-      }, milliseconds);
-    });
-    return Promise.race([Promise.resolve(promise), timeout]).finally(() => clearTimeout(timer));
+  function setAuthStage(stage) {
+    try { document.body.dataset.authStage = stage || ''; } catch (error) {}
   }
-
-  function friendlyAuthError(error) {
-    const code = String(error && (error.code || error.message) || '');
-    if (/AUTH_PERSISTENCE_TIMEOUT/.test(code)) return 'El navegador no permitió preparar la sesión. Cierra esta ventana privada y vuelve a abrir el enlace LAB.';
-    if (/AUTH_SIGNIN_TIMEOUT/.test(code)) return 'El servicio de acceso no respondió. Vuelve a intentarlo en unos segundos.';
-    if (/auth\/(invalid-credential|wrong-password|user-not-found)/i.test(code)) return 'El usuario o la contraseña asignados no son válidos.';
-    if (/auth\/network-request-failed/i.test(code)) return 'No fue posible conectar con el servicio de acceso. Revisa la conexión y vuelve a intentarlo.';
-    if (/auth\/too-many-requests/i.test(code)) return 'El acceso está temporalmente limitado por varios intentos. Espera unos minutos y vuelve a intentarlo.';
-    if (/auth\/unauthorized-domain/i.test(code)) return 'Este canal de validación todavía no está autorizado para iniciar sesión.';
-    if (/auth\/operation-not-allowed/i.test(code)) return 'El acceso con usuario y contraseña no está habilitado en este entorno.';
-    return 'No fue posible iniciar sesión. Intenta nuevamente.';
-  }
-
-  function setAuthStage(value) {
-    try { document.body.dataset.authStage = value || ''; } catch (e) {}
-  }
-
-  async function configureLabPersistence(auth) {
-    if (!auth || typeof auth.setPersistence !== 'function') return;
-    let persistence = null;
-    try {
-      persistence = window.firebase && firebase.auth && firebase.auth.Auth && firebase.auth.Auth.Persistence
-        ? firebase.auth.Auth.Persistence
-        : null;
-    } catch (e) { persistence = null; }
-    if (!persistence) return;
-
-    try {
-      await withTimeout(auth.setPersistence(persistence.SESSION), 8000, 'AUTH_PERSISTENCE_TIMEOUT');
-    } catch (sessionError) {
-      try {
-        await withTimeout(auth.setPersistence(persistence.NONE), 8000, 'AUTH_PERSISTENCE_TIMEOUT');
-      } catch (memoryError) {
-        throw sessionError;
-      }
-    }
-  }
-
-  function aceptoConf() { try { return !!localStorage.getItem(CKEY); } catch (e) { return false; } }
-  function gateConfidencialidad() {
-    if (aceptoConf()) return;
-    const back = document.createElement('div');
-    back.className = 'drawer-back open'; back.style.cssText = 'display:grid;place-items:center;z-index:260';
-    back.innerHTML = `<div class="conf-modal">
-      <div class="conf-h"><span class="conf-ic">🔒</span><div><div class="nov-eyebrow">Antes de continuar</div><h2>Acuerdo de confidencialidad y tratamiento de datos</h2></div></div>
-      <div class="conf-body">
-        <p>El acceso a Orbit 360 implica el manejo de <b>información confidencial</b> de clientes, pólizas, finanzas y operación del intermediario.</p>
-        <ul>
-          <li>Usaré la información únicamente para las funciones que me han sido asignadas.</li>
-          <li>No divulgaré, copiaré ni extraeré datos de clientes o de la cartera fuera de la plataforma sin autorización.</li>
-          <li>Protegeré mis credenciales y mantendré la confidencialidad incluso después de terminar mi relación con la empresa.</li>
-          <li>Cumpliré la normativa de protección de datos personales aplicable en mi país de operación.</li>
-        </ul>
-        <label class="conf-chk"><input type="checkbox" id="conf-chk"> He leído y <b>acepto</b> el acuerdo de confidencialidad y el tratamiento de datos.</label>
-      </div>
-      <div class="conf-f"><button class="btn primary" id="conf-ok" disabled>Aceptar y continuar</button></div>
-    </div>`;
-    document.body.appendChild(back);
-    const chk = back.querySelector('#conf-chk'), ok = back.querySelector('#conf-ok');
-    chk.addEventListener('change', () => { ok.disabled = !chk.checked; });
-    ok.addEventListener('click', () => {
-      try { localStorage.setItem(CKEY, JSON.stringify({ aceptado: true, fecha: new Date().toISOString(), usuario: (user() || {}).email || '' })); } catch (e) {}
-      back.remove();
-    });
-  }
-
-  function authed() {
-    if (isLab()) return !!fbUser();
-    try { return !!localStorage.getItem(KEY); } catch (e) { return false; }
-  }
-
-  function login(userObj) {
-    if (isLab()) return mapFbUser(fbUser());
-    try { localStorage.setItem(KEY, JSON.stringify(userObj || { nombre: 'Andrea Beltrán', rol: 'Dirección', email: DEMO_EMAIL })); } catch (e) {}
-    return user();
-  }
-
-  async function loginFirebase(email, pass) {
-    const auth = fbAuth();
-    if (!auth || typeof auth.signInWithEmailAndPassword !== 'function') throw new Error('AUTH_NOT_AVAILABLE');
-    setAuthStage('preparing-session');
-    await configureLabPersistence(auth);
-    setAuthStage('signing-in');
-    const cred = await withTimeout(auth.signInWithEmailAndPassword(email, pass), 25000, 'AUTH_SIGNIN_TIMEOUT');
-    const current = cred && cred.user ? cred.user : fbUser();
-    if (!current) throw new Error('AUTH_USER_NOT_AVAILABLE');
-    setAuthStage('authenticated');
-    return mapFbUser(current);
-  }
-
-  function logout() {
-    if (isLab()) {
-      try { const a = fbAuth(); if (a && a.signOut) a.signOut(); } catch (e) {}
-    }
-    try { localStorage.removeItem(KEY); } catch (e) {}
-    location.reload();
-  }
-
-  function user() {
-    if (isLab()) return mapFbUser(fbUser());
-    try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { return null; }
-  }
-
-  function showApp() {
-    const lg = document.getElementById('login');
-    if (lg) { lg.classList.add('hidden'); setTimeout(() => lg.style.display = 'none', 480); }
-    document.body.classList.remove('pre-auth');
-    setAuthStage('inside');
-    setTimeout(function () {
-      const u = user() || {};
-      const tipo = u.tipo === 'socio' ? 'socio' : 'interno';
-      const scopeId = 'user:' + (u.email || 'demo');
-      if (Orbit.legal && Orbit.legal.gate) Orbit.legal.gate(tipo, scopeId);
-      else gateConfidencialidad();
-    }, 520);
-  }
-
-  function showLogin() {
-    const lg = document.getElementById('login');
-    if (lg) { lg.style.display = ''; lg.classList.remove('hidden'); }
-    document.body.classList.add('pre-auth');
-    if (!document.body.dataset.authStage || document.body.dataset.authStage === 'inside') setAuthStage('login-ready');
-    try { if (Orbit.applyBrand) Orbit.applyBrand(); } catch (e) {}
-    setTimeout(paintLoginDefaults, 0);
-  }
-
-  function paintLoginDefaults() {
-    const labMode = isLab();
-    const form = document.getElementById('login-form');
-    const email = document.getElementById('lg-user');
-    const pass = document.getElementById('lg-pass');
-    const labEmail = expectedLabEmail();
-
-    if (form) form.dataset.authMode = labMode ? 'firestore-lab' : 'demo';
-    if (email) email.dataset.authMode = labMode ? 'firestore-lab' : 'demo';
-    if (pass) pass.dataset.authMode = labMode ? 'firestore-lab' : 'demo';
-
-    function forceLabFields() {
-      if (!isLab()) return;
-      if (email && (!email.value || email.value === DEMO_EMAIL)) email.value = labEmail;
-      if (pass && pass.value === DEMO_PASS) pass.value = '';
-    }
-
-    if (labMode) {
-      try { localStorage.removeItem(KEY); } catch (e) {}
-      if (email) email.value = (!email.value || email.value === DEMO_EMAIL) ? labEmail : email.value;
-      if (pass && pass.value === DEMO_PASS) pass.value = '';
-      setTimeout(forceLabFields, 60);
-      setTimeout(forceLabFields, 250);
-      setTimeout(forceLabFields, 700);
-      return;
-    }
-
-    if (email && (!email.value || email.value === labEmail)) email.value = DEMO_EMAIL;
-    if (pass && !pass.value) pass.value = DEMO_PASS;
-  }
-
   function paintError(message) {
     const box = document.querySelector('.lg-box');
     if (!box) return;
@@ -225,7 +93,6 @@ Orbit.auth = (function () {
     }
     el.textContent = message || '';
   }
-
   function setSubmitting(form, active) {
     if (!form) return;
     const button = form.querySelector('button[type="submit"]');
@@ -235,66 +102,230 @@ Orbit.auth = (function () {
     button.disabled = !!active;
     button.textContent = active ? 'Validando acceso…' : button.dataset.label;
   }
-
-  function init() {
-    paintLoginDefaults();
-
+  function friendlyError(error) {
+    const code = text(error && (error.code || error.message));
+    if (code === 'AUTH_EMAIL_REQUIRED') return 'Ingresa el correo asignado a tu usuario.';
+    if (code === 'AUTH_PASSWORD_REQUIRED') return 'Ingresa la contraseña asignada para continuar.';
+    if (code === 'MEMBERSHIP_REQUIRED') return 'Tu usuario no tiene una membresía activa para esta organización.';
+    if (/auth\/(invalid-credential|wrong-password|user-not-found)/i.test(code)) return 'El usuario o la contraseña asignados no son válidos.';
+    if (/auth\/network-request-failed/i.test(code)) return 'No fue posible conectar con el servicio de acceso. Revisa la conexión y vuelve a intentarlo.';
+    if (/auth\/too-many-requests/i.test(code)) return 'El acceso está temporalmente limitado por varios intentos. Espera unos minutos y vuelve a intentarlo.';
+    if (/auth\/unauthorized-domain/i.test(code)) return 'Este dominio todavía no está autorizado para iniciar sesión.';
+    return 'No fue posible iniciar sesión. Intenta nuevamente.';
+  }
+  function withTimeout(promise, milliseconds, code) {
+    let timer;
+    const timeout = new Promise((resolve, reject) => {
+      timer = setTimeout(() => {
+        const error = new Error(code || 'TIMEOUT');
+        error.code = code || 'TIMEOUT';
+        reject(error);
+      }, milliseconds);
+    });
+    return Promise.race([Promise.resolve(promise), timeout]).finally(() => clearTimeout(timer));
+  }
+  async function configurePersistence(auth) {
+    if (!auth || typeof auth.setPersistence !== 'function') return;
+    let persistence = null;
+    try { persistence = firebase.auth.Auth.Persistence; } catch (error) { persistence = null; }
+    if (!persistence) return;
+    try { await withTimeout(auth.setPersistence(persistence.SESSION), 8000, 'AUTH_PERSISTENCE_TIMEOUT'); }
+    catch (error) { await withTimeout(auth.setPersistence(persistence.NONE), 8000, 'AUTH_PERSISTENCE_TIMEOUT'); }
+  }
+  function membershipStatus() {
+    try {
+      return Orbit.session && typeof Orbit.session.membershipProjectionStatus === 'function'
+        ? Orbit.session.membershipProjectionStatus() || {}
+        : {};
+    } catch (error) { return {}; }
+  }
+  function bindMembershipProjection() {
+    try {
+      if (Orbit.session && typeof Orbit.session.bindLabMembershipProjection === 'function') Orbit.session.bindLabMembershipProjection();
+    } catch (error) {}
+  }
+  function waitForMembership(user, generation) {
+    return new Promise((resolve) => {
+      let attempts = 0;
+      (function poll() {
+        if (generation !== membershipGeneration) return resolve(null);
+        const p = activeProjection(user);
+        if (p) return resolve(p);
+        const status = membershipStatus();
+        if (status.status === 'blocked') return resolve(null);
+        bindMembershipProjection();
+        attempts += 1;
+        if (attempts >= 180) return resolve(null);
+        setTimeout(poll, 100);
+      })();
+    });
+  }
+  function paintIdentity(user, p) {
+    const top = document.querySelector('.tb-user .who');
+    const avatar = document.querySelector('.tb-user .av');
+    const display = text(user && user.displayName) || text(user && user.email) || 'Usuario';
+    const initials = display.split(/\s+/).filter(Boolean).map((part) => part.charAt(0)).slice(0, 2).join('').toUpperCase() || 'U';
+    if (top) {
+      const safe = display.replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
+      top.innerHTML = '<b>' + safe + '</b><br><span id="tb-rol-lbl">' + roleLabel(p.activeRole) + ' · salir</span>';
+    }
+    if (avatar) avatar.textContent = initials;
+    try {
+      document.body.dataset.authBackend = 'firestore-membership';
+      document.body.dataset.authUid = text(user.uid);
+      document.body.dataset.authTenant = text(p.tenantId);
+    } catch (error) {}
+  }
+  function acceptedLegal() {
+    try { return !!localStorage.getItem(CKEY); } catch (error) { return false; }
+  }
+  function legalGate() {
+    if (acceptedLegal()) return;
+    if (Orbit.legal && typeof Orbit.legal.gate === 'function') {
+      const u = user() || {};
+      Orbit.legal.gate('interno', 'user:' + (u.uid || u.email || 'unknown'));
+    }
+  }
+  function showLogin(message) {
+    const lg = document.getElementById('login');
+    if (lg) { lg.style.display = ''; lg.classList.remove('hidden'); }
+    document.body.classList.add('pre-auth');
+    setAuthStage('login-ready');
+    const email = document.getElementById('lg-user');
+    const pass = document.getElementById('lg-pass');
+    if (isFirestoreRuntime()) {
+      if (email && (email.value === DEMO_EMAIL || /@demo\.com$/i.test(email.value || ''))) email.value = '';
+      if (pass && pass.value === DEMO_PASS) pass.value = '';
+    } else {
+      if (email && !email.value) email.value = DEMO_EMAIL;
+      if (pass && !pass.value) pass.value = DEMO_PASS;
+    }
+    paintError(message || '');
+    try { if (Orbit.applyBrand) Orbit.applyBrand(); } catch (error) {}
+  }
+  function showApp() {
+    const current = fbUser();
+    const p = activeProjection(current);
+    if (isFirestoreRuntime() && (!current || !p)) { showLogin('Tu usuario no tiene una membresía activa para esta organización.'); return false; }
+    const lg = document.getElementById('login');
+    if (lg) { lg.classList.add('hidden'); setTimeout(() => { lg.style.display = 'none'; }, 250); }
+    document.body.classList.remove('pre-auth');
+    setAuthStage('inside');
+    if (current && p) paintIdentity(current, p);
+    setTimeout(legalGate, 300);
+    return true;
+  }
+  async function loginFirebase(email, password) {
+    const auth = fbAuth();
+    if (!auth || typeof auth.signInWithEmailAndPassword !== 'function') throw new Error('AUTH_NOT_AVAILABLE');
+    await configurePersistence(auth);
+    return withTimeout(auth.signInWithEmailAndPassword(email, password), 25000, 'AUTH_SIGNIN_TIMEOUT');
+  }
+  async function acceptFirebaseUser(current) {
+    const generation = ++membershipGeneration;
+    if (!current) { showLogin(); return false; }
+    setAuthStage('validating-membership');
+    const p = await waitForMembership(current, generation);
+    if (generation !== membershipGeneration) return false;
+    if (!p) {
+      const auth = fbAuth();
+      try { if (auth && typeof auth.signOut === 'function') await auth.signOut(); } catch (error) {}
+      showLogin('Tu usuario no tiene una membresía activa para esta organización.');
+      return false;
+    }
+    try { if (Orbit.session && typeof Orbit.session.syncFromAuth === 'function') Orbit.session.syncFromAuth(); } catch (error) {}
+    paintError('');
+    showApp();
+    try { if (Orbit.store && typeof Orbit.store._attachSnapshots === 'function') Orbit.store._attachSnapshots(); } catch (error) {}
+    setTimeout(() => {
+      try {
+        if (Orbit.router && typeof Orbit.router.rebuildSidebar === 'function') Orbit.router.rebuildSidebar();
+        window.dispatchEvent(new HashChangeEvent('hashchange'));
+      } catch (error) {}
+    }, 250);
+    return true;
+  }
+  function bindForm() {
+    if (formBound) return;
     const form = document.getElementById('login-form');
-    if (form) form.addEventListener('submit', async e => {
-      e.preventDefault();
+    if (!form) return;
+    formBound = true;
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
       if (form.dataset.submitting === '1') return;
-      const labMode = isLab();
       const emailEl = document.getElementById('lg-user');
       const passEl = document.getElementById('lg-pass');
-      let email = (emailEl || {}).value || DEMO_EMAIL;
-      const pass = (passEl || {}).value || '';
-
-      if (labMode && (!email || email === DEMO_EMAIL)) {
-        email = expectedLabEmail();
-        if (emailEl) emailEl.value = email;
-      }
-
-      paintError('');
+      const email = text(emailEl && emailEl.value);
+      const password = String(passEl && passEl.value || '');
       setSubmitting(form, true);
-      setAuthStage('submitting');
-
+      paintError('');
       try {
-        if (labMode) {
-          if (!pass) throw new Error('AUTH_PASSWORD_REQUIRED');
-          if (pass === DEMO_PASS) throw new Error('AUTH_DEMO_PASSWORD_BLOCKED');
-          await loginFirebase(email, pass);
+        if (isFirestoreRuntime()) {
+          if (!email) throw new Error('AUTH_EMAIL_REQUIRED');
+          if (!password) throw new Error('AUTH_PASSWORD_REQUIRED');
+          setAuthStage('signing-in');
+          await loginFirebase(email, password);
         } else {
-          login({ nombre: 'Andrea Beltrán', rol: 'Dirección', email });
+          localStorage.setItem(KEY, JSON.stringify({ nombre: 'Andrea Beltrán', rol: 'Dirección', email: email || DEMO_EMAIL }));
+          showApp();
         }
-        paintError('');
-        showApp();
-      } catch (err) {
+      } catch (error) {
         setAuthStage('error');
-        const code = String(err && (err.code || err.message) || '');
-        if (code === 'AUTH_PASSWORD_REQUIRED') paintError('Ingresa la contraseña asignada para continuar.');
-        else if (code === 'AUTH_DEMO_PASSWORD_BLOCKED') paintError('Usa la contraseña asignada para este entorno, no la contraseña de demostración.');
-        else paintError(friendlyAuthError(err));
-        showLogin();
+        showLogin(friendlyError(error));
       } finally {
         setSubmitting(form, false);
       }
     });
-
-    const reset = document.getElementById('lg-reset');
-    if (reset) reset.addEventListener('click', e => { e.preventDefault(); logout(); });
-
-    if (isLab()) {
-      const auth = fbAuth();
-      if (auth && typeof auth.onAuthStateChanged === 'function') {
-        auth.onAuthStateChanged(function(u){ if (u) showApp(); else showLogin(); });
-      } else {
-        showLogin();
-      }
+  }
+  function bindFirebaseAuth() {
+    if (authBound || !isFirestoreRuntime()) return authBound;
+    const auth = fbAuth();
+    if (!auth || typeof auth.onAuthStateChanged !== 'function') return false;
+    authBound = true;
+    auth.onAuthStateChanged((current) => {
+      if (current) acceptFirebaseUser(current);
+      else { membershipGeneration += 1; showLogin(); }
+    });
+    return true;
+  }
+  function init() {
+    bindForm();
+    if (!isFirestoreRuntime()) {
+      try {
+        const saved = JSON.parse(localStorage.getItem(KEY) || 'null');
+        if (saved) showApp(); else showLogin();
+      } catch (error) { showLogin(); }
       return;
     }
-
-    if (authed()) showApp(); else showLogin();
+    let attempts = 0;
+    (function waitAuth() {
+      if (bindFirebaseAuth()) return;
+      attempts += 1;
+      if (attempts < 120) setTimeout(waitAuth, 100);
+      else showLogin('No fue posible inicializar el servicio de acceso.');
+    })();
+  }
+  function logout() {
+    membershipGeneration += 1;
+    if (isFirestoreRuntime()) {
+      try { if (Orbit.store && typeof Orbit.store._detachSnapshots === 'function') Orbit.store._detachSnapshots(); } catch (error) {}
+      const auth = fbAuth();
+      if (auth && typeof auth.signOut === 'function') auth.signOut().finally(() => location.reload());
+      else location.reload();
+      return;
+    }
+    try { localStorage.removeItem(KEY); } catch (error) {}
+    location.reload();
+  }
+  function user() {
+    if (isFirestoreRuntime()) return mapUser(fbUser());
+    try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (error) { return null; }
+  }
+  function authed() {
+    if (isFirestoreRuntime()) return !!mapUser(fbUser());
+    return !!user();
   }
 
-  return { init, authed, login, loginFirebase, logout, user, showLogin, showApp };
+  const api = { init, authed, loginFirebase, logout, user, showLogin, showApp };
+  return api;
 })();
