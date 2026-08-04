@@ -36,7 +36,7 @@ try {
   const requestParent=requestCommit?git(['rev-parse',requestCommit+'^']):'';
   const changed=git(['diff-tree','--no-commit-id','--name-only','-r',requestCommit]).split(/\r?\n/).filter(Boolean);
   git(['cat-file','-e',RELEASE+'^{commit}']);
-  const releaseRef=git(['rev-parse',RELEASE_BRANCH]);
+  const releaseRef=git(['rev-parse','refs/remotes/origin/'+RELEASE_BRANCH]);
   const productDiff=git(['diff','--name-only',BASE+'..'+RELEASE,'--','orbit360-platform/index.html','orbit360-platform/core','orbit360-platform/modules','orbit360-platform/styles','orbit360-platform/data']).split(/\r?\n/).filter(Boolean);
   const staticOut=execFileSync(process.execPath,[STATIC_TEST],{cwd:ROOT,encoding:'utf8',stdio:['ignore','pipe','pipe']});
 
