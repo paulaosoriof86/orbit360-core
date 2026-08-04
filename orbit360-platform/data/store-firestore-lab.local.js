@@ -1,63 +1,52 @@
 /* ============================================================
-   Orbit 360 - Store Firestore LAB v1.75
-   Propietario único de acceso a datos para el frontend acumulativo.
+   Orbit 360 · Store Firestore por membresía v1.80
+   Propietario único de datos para runtime multi-tenant.
 
-   - API pública preservada: all, get, where, find, insert, update,
-     remove, on, _emit, pref, setPref, init, reseed y raw.
-   - Las siete colecciones selladas por el gate 7.9 se resuelven en:
-     tenants/{tenantId}/data/{collection}/items
-   - Las colecciones aún no migradas conservan temporalmente su ruta
-     heredada por colección; nunca se mezclan dos rutas para una misma
-     colección.
-   - Los seeds canónicos permanecen físicamente disponibles para
-     auditoría, pero quedan excluidos de all/get/where/find/raw.
-   - REQUIERE_VALIDACION se conserva y nunca se filtra.
-   - Sin seed/localStorage como fuente de verdad.
+   - Preserva API: all/get/where/find/insert/update/remove/on/_emit,
+     pref/setPref/init/reseed/raw y snapshots.
+   - Autoriza por Firebase Auth + membresía activa del tenant.
+   - No contiene usuarios técnicos, UID fijos ni fallback a seed.
+   - Mantiene rutas canónicas y legacy por colección.
    ============================================================ */
-(function(){
+(function () {
   'use strict';
 
-  var w = window;
+  const w = window;
   w.Orbit = w.Orbit || {};
 
-  var params = new URLSearchParams(w.location.search || '');
-  var mode = params.get('orbitBackend') || (w.OrbitBackend && w.OrbitBackend.mode) || '';
-  var tenantId = params.get('tenant') || (w.OrbitBackend && (w.OrbitBackend.tenantId || w.OrbitBackend.tenant)) || 'alianzas-soluciones';
+  const params = new URLSearchParams(w.location.search || '');
+  const mode = params.get('orbitBackend') || (w.OrbitBackend && w.OrbitBackend.mode) || '';
+  const tenantId = params.get('tenant') || (w.OrbitBackend && (w.OrbitBackend.tenantId || w.OrbitBackend.tenant)) || '';
+  if (mode !== 'firestore-lab' || !tenantId) return;
 
-  if (mode !== 'firestore-lab' || tenantId !== 'alianzas-soluciones') return;
-
-  var CANONICAL_COLLECTIONS = [
-    'clientes','aseguradoras','polizas','vehiculos',
-    'recibosEsperados','carteraPrimas','cobros'
+  const CANONICAL_COLLECTIONS = [
+    'clientes', 'aseguradoras', 'polizas', 'vehiculos',
+    'recibosEsperados', 'carteraPrimas', 'cobros'
   ];
-  var CANONICAL_SET = new Set(CANONICAL_COLLECTIONS);
-  var COLLECTIONS = [
-    'clientes','polizas','cobros','comisiones','reclamos','gestiones','negocios','finmovs',
-    'contenidos','cursos','aseguradoras','asesores','vehiculos','recibosEsperados','carteraPrimas',
-    'acreedores','facturas','documentos','actividades','metas','presupuesto','plantillas',
-    'reportes_prog','notifs','avisos','correos','cancelaciones','novedades','tareas'
+  const CANONICAL_SET = new Set(CANONICAL_COLLECTIONS);
+  const COLLECTIONS = [
+    'clientes', 'polizas', 'cobros', 'comisiones', 'reclamos', 'gestiones', 'negocios', 'finmovs',
+    'contenidos', 'cursos', 'aseguradoras', 'asesores', 'vehiculos', 'recibosEsperados', 'carteraPrimas',
+    'acreedores', 'facturas', 'documentos', 'actividades', 'metas', 'presupuesto', 'plantillas',
+    'reportes_prog', 'notifs', 'avisos', 'correos', 'cancelaciones', 'novedades', 'tareas'
   ];
+  const SEALED_CANONICAL_DIGEST = '19e1927d39f6b713ee12504f8762bc42ead9de6e365bb0f12162d2a0c8f8469b';
 
-  var EXPECTED_UID = 'woJlxR1iFEeiQZvTscPj4qQ5Qc73';
-  var EXPECTED_EMAIL = 'orbit.lab@demo.com';
-  var SEALED_CANONICAL_DIGEST = '19e1927d39f6b713ee12504f8762bc42ead9de6e365bb0f12162d2a0c8f8469b';
+  const cache = {};
+  let prefs = {};
+  let listeners = [];
+  let unsubscribers = [];
+  let attachStarted = false;
 
-  var cache = {};
-  var prefs = {};
-  var listeners = [];
-  var unsubscribers = [];
-  var attachStarted = false;
-  var attachCompleted = false;
+  COLLECTIONS.forEach((name) => { cache[name] = []; });
 
-  COLLECTIONS.forEach(function(name){ cache[name] = []; });
-
-  var state = {
+  const state = {
     mode: 'firestore-lab',
-    tenantId: tenantId,
+    tenantId,
     tenant: tenantId,
-    expectedUid: EXPECTED_UID,
-    expectedEmail: EXPECTED_EMAIL,
-    apiVersion: 'v1.75-canonical-read-owner-v79',
+    authAuthority: 'tenant-membership',
+    membershipRequired: true,
+    apiVersion: 'v1.80-membership-auth-owner',
     source: 'data/store-firestore-lab.local.js',
     ready: true,
     status: 'booting',
@@ -80,280 +69,169 @@
     snapshotAttachedCount: 0,
     snapshotErrors: {},
     auth: null,
+    membership: null,
     authGatedSnapshots: true,
     noFallback: true,
     singleReadOwner: true,
-    cache: cache
+    cache
   };
 
-  function log(){
+  function text(value) { return String(value == null ? '' : value).trim(); }
+  function clone(value) {
+    if (!value || typeof value !== 'object') return value;
+    try { return JSON.parse(JSON.stringify(value)); }
+    catch (error) { return Array.isArray(value) ? value.slice() : Object.assign({}, value); }
+  }
+  function db() {
+    try { return w.firebase && typeof w.firebase.firestore === 'function' ? w.firebase.firestore() : null; }
+    catch (error) { return null; }
+  }
+  function authUser() {
+    try { return w.firebase && typeof w.firebase.auth === 'function' ? w.firebase.auth().currentUser : null; }
+    catch (error) { return null; }
+  }
+  function membershipProjection(user) {
     try {
-      var args = Array.prototype.slice.call(arguments);
-      args.unshift('[Orbit Firestore LAB v1.75]');
-      console.log.apply(console, args);
-    } catch(e) {}
+      const projection = w.Orbit && Orbit.auth && Orbit.auth.productUser;
+      const status = text(projection && projection.status).toLowerCase();
+      if (!user || !projection || projection.__labMembershipProjection !== true || projection.productReadOnly !== true) return null;
+      if (text(projection.uid) !== text(user.uid)) return null;
+      if (text(projection.tenantId) !== tenantId) return null;
+      if (status !== 'active' && status !== 'activo') return null;
+      if (!Array.isArray(projection.roles) || !projection.roles.length) return null;
+      if (!projection.activeRole || projection.roles.indexOf(projection.activeRole) < 0) return null;
+      return projection;
+    } catch (error) { return null; }
   }
-
-  function setError(message, extra){
+  function authorizedUser() {
+    const user = authUser();
+    const membership = membershipProjection(user);
+    state.auth = user ? { uid: text(user.uid), email: text(user.email) } : null;
+    state.membership = membership ? {
+      uid: text(membership.uid),
+      tenantId: text(membership.tenantId),
+      activeRole: text(membership.activeRole),
+      advisorId: text(membership.advisorId),
+      roles: (membership.roles || []).slice()
+    } : null;
+    return user && membership ? user : null;
+  }
+  function setError(message, extra) {
     state.lastError = message || 'unknown';
-    if (extra) state.lastExtra = String(extra && (extra.message || extra) || extra);
-    try { console.warn('[Orbit Firestore LAB v1.75]', message, extra || ''); } catch(e) {}
+    state.lastExtra = extra ? text(extra.message || extra) : null;
+    try { console.warn('[Orbit Store Membership]', state.lastError, state.lastExtra || ''); } catch (error) {}
   }
-
-  function emitBackendEvent(name, detail){
+  function emitBackendEvent(name, detail) {
     try {
       w.dispatchEvent(new CustomEvent(name, {
-        detail: Object.assign({ mode: mode, tenantId: tenantId }, detail || {})
+        detail: Object.assign({ mode, tenantId }, detail || {})
       }));
-    } catch(e) {}
+    } catch (error) {}
   }
-
-  function writeKey(collection, id, op){
-    return [collection || '_', id || '_', op || '_'].join('::');
-  }
-
-  function markRowSync(collection, id, patch){
-    if (!collection || !id) return;
-    var row = get(collection, id);
-    if (!row || typeof row !== 'object') return;
-    Object.keys(patch || {}).forEach(function(k){
-      if (patch[k] === undefined) delete row[k];
-      else row[k] = patch[k];
-    });
-    emit(collection);
-  }
-
-  function markPending(collection, id, op){
-    var now = new Date().toISOString();
-    var key = writeKey(collection, id, op);
-    state.lastWriteAt = now;
-    state.writeQueue = state.writeQueue.filter(function(item){ return item.key !== key; });
-    state.writeQueue.push({ key: key, collection: collection, id: id, op: op, status: 'pending', at: now });
-    markRowSync(collection, id, { _syncStatus: 'pending', _syncOp: op, _syncError: undefined, _syncAt: now });
-    emitBackendEvent('orbit:backend:write-pending', { collection: collection, id: id, op: op, at: now });
-  }
-
-  function markSynced(collection, id, op){
-    var now = new Date().toISOString();
-    var key = writeKey(collection, id, op);
-    state.lastWriteOkAt = now;
-    state.writeQueue = state.writeQueue.filter(function(item){ return item.key !== key; });
-    markRowSync(collection, id, { _syncStatus: 'synced', _syncOp: op, _syncError: undefined, _syncAt: now });
-    emitBackendEvent('orbit:backend:write-ok', { collection: collection, id: id, op: op, at: now });
-  }
-
-  function markWriteFailed(collection, id, op, error){
-    var now = new Date().toISOString();
-    var key = writeKey(collection, id, op);
-    var message = String(error && (error.message || error) || error || 'unknown');
-    state.lastWriteErrorAt = now;
-    state.writeQueue = state.writeQueue.filter(function(item){ return item.key !== key; });
-    state.writeErrors.push({ key: key, collection: collection, id: id, op: op, status: 'failed', at: now, error: message });
-    if (state.writeErrors.length > 100) state.writeErrors = state.writeErrors.slice(-100);
-    markRowSync(collection, id, { _syncStatus: 'failed', _syncOp: op, _syncError: message, _syncAt: now });
-    setError(op + ' failed: ' + collection, error);
-    emitBackendEvent('orbit:backend:write-error', { collection: collection, id: id, op: op, at: now, error: message });
-  }
-
-  function cleanForWrite(row){
-    var out = clone(row) || {};
-    delete out._syncStatus;
-    delete out._syncOp;
-    delete out._syncError;
-    delete out._syncAt;
-    return out;
-  }
-
-  function db(){
-    try {
-      if (w.firebase && typeof w.firebase.firestore === 'function') return w.firebase.firestore();
-    } catch(e) {}
-    try {
-      if (w.db) return w.db;
-    } catch(e) {}
-    return null;
-  }
-
-  function authUser(){
-    try {
-      if (w.firebase && typeof w.firebase.auth === 'function') return w.firebase.auth().currentUser || null;
-    } catch(e) {}
-    try {
-      if (w.auth && w.auth.currentUser) return w.auth.currentUser;
-    } catch(e) {}
-    return null;
-  }
-
-  function updateAuthState(){
-    var u = authUser();
-    state.auth = u ? { uid: u.uid || '', email: u.email || '' } : null;
-    return u;
-  }
-
-  function collectionAuthority(collection){
+  function collectionAuthority(collection) {
     return CANONICAL_SET.has(collection) ? 'canonical-v79' : 'legacy-unmigrated';
   }
-
-  function collectionPath(collection){
+  function collectionPath(collection) {
     return CANONICAL_SET.has(collection)
-      ? 'tenants/' + tenantId + '/data/' + collection + '/items'
-      : 'tenantId/' + tenantId + '/' + collection;
+      ? `tenants/${tenantId}/data/${collection}/items`
+      : `tenantId/${tenantId}/${collection}`;
   }
-
-  function collectionRef(collection){
-    var database = db();
+  function collectionRef(collection) {
+    const database = db();
     if (!database) return null;
-
-    try {
-      if (database.collection && database.doc) {
-        if (CANONICAL_SET.has(collection)) {
-          return database.collection('tenants').doc(tenantId)
-            .collection('data').doc(collection).collection('items');
-        }
-        return database.collection('tenantId').doc(tenantId).collection(collection);
-      }
-    } catch(e) {}
-
-    try {
-      if (typeof w.collection === 'function') {
-        return CANONICAL_SET.has(collection)
-          ? w.collection(database, 'tenants', tenantId, 'data', collection, 'items')
-          : w.collection(database, 'tenantId', tenantId, collection);
-      }
-    } catch(e) {}
-
-    return null;
+    if (CANONICAL_SET.has(collection)) {
+      return database.collection('tenants').doc(tenantId)
+        .collection('data').doc(collection).collection('items');
+    }
+    return database.collection('tenantId').doc(tenantId).collection(collection);
   }
-
-  function prefsDocRef(){
-    var database = db();
-    if (!database) return null;
-    try {
-      if (database.collection && database.doc) {
-        return database.collection('tenantId').doc(tenantId).collection('_prefs').doc('orbit360');
-      }
-    } catch(e) {}
-    try {
-      if (typeof w.doc === 'function') return w.doc(database, 'tenantId', tenantId, '_prefs', 'orbit360');
-    } catch(e) {}
-    return null;
+  function prefsDocRef() {
+    const database = db();
+    return database ? database.collection('tenantId').doc(tenantId).collection('_prefs').doc('orbit360') : null;
   }
-
-  function normalize(row, id){
-    var out = {};
-    if (row && typeof row === 'object') Object.keys(row).forEach(function(k){ out[k] = row[k]; });
+  function normalize(row, id) {
+    const out = row && typeof row === 'object' ? Object.assign({}, row) : {};
     if (!out.id && id) out.id = id;
     if (!out.tenantId) out.tenantId = tenantId;
     return out;
   }
-
-  function rowId(row){
+  function rowId(row) {
     return row && (row.id || row.uid || row.codigo || row.numero || row.poliza || row.key);
   }
-
-  function clone(row){
-    if (!row || typeof row !== 'object') return row;
-    try { return JSON.parse(JSON.stringify(row)); } catch(e) { return Object.assign({}, row); }
-  }
-
-  function boolish(value){
+  function boolish(value) {
     if (value === true || value === false) return value;
-    var clean = String(value == null ? '' : value).trim().toLowerCase();
-    if (['true','si','sí','yes','1'].indexOf(clean) >= 0) return true;
-    if (['false','no','0'].indexOf(clean) >= 0) return false;
+    const clean = text(value).toLowerCase();
+    if (['true', 'si', 'sí', 'yes', '1'].includes(clean)) return true;
+    if (['false', 'no', '0'].includes(clean)) return false;
     return null;
   }
-
-  function seedLike(row){
+  function seedLike(row) {
     if (!row || typeof row !== 'object') return false;
-    var marker = [row._loadedBy,row.origen,row.sourceType,row.origenRegistro]
-      .map(function(value){ return String(value == null ? '' : value); })
-      .join(' ').toLowerCase();
+    const marker = [row._loadedBy, row.origen, row.sourceType, row.origenRegistro]
+      .map((value) => text(value)).join(' ').toLowerCase();
     return boolish(row._seed) === true || /(seed|demo|prototype|prototipo|bootstrap|sample|mock)/.test(marker);
   }
-
-  function ensure(collection){
+  function ensure(collection) {
     if (!cache[collection]) cache[collection] = [];
     return cache[collection];
   }
-
-  function operationalRows(collection){
-    var rows = ensure(collection);
-    if (!CANONICAL_SET.has(collection)) return rows;
-    return rows.filter(function(row){ return !seedLike(row); });
+  function operationalRows(collection) {
+    const rows = ensure(collection);
+    return CANONICAL_SET.has(collection) ? rows.filter((row) => !seedLike(row)) : rows;
   }
-
-  function refreshCounts(collection){
-    var raw = ensure(collection).length;
-    var operational = operationalRows(collection).length;
+  function refreshCounts(collection) {
+    const raw = ensure(collection).length;
+    const operational = operationalRows(collection).length;
     state.rawCounts[collection] = raw;
     state.operationalCounts[collection] = operational;
     state.excludedSeedCounts[collection] = raw - operational;
   }
-
-  function emit(collection){
-    var changed = collection || '*';
-    listeners.slice().forEach(function(listener){ try { listener(changed); } catch(e) {} });
+  function emit(collection) {
+    const changed = collection || '*';
+    listeners.slice().forEach((listener) => { try { listener(changed); } catch (error) {} });
     try {
       w.dispatchEvent(new CustomEvent('orbit:store:emit', {
         detail: {
           collection: changed,
-          mode: mode,
-          tenantId: tenantId,
-          authority: collection === '*' ? 'mixed-by-collection' : collectionAuthority(collection)
+          mode,
+          tenantId,
+          authority: changed === '*' ? 'mixed-by-collection' : collectionAuthority(changed)
         }
       }));
-    } catch(e) {}
+      document.dispatchEvent(new CustomEvent('orbit:store', { detail: { collection: changed } }));
+    } catch (error) {}
   }
-
-  function upsertCache(collection, row){
-    var rows = ensure(collection);
-    var id = rowId(row);
-    var idx = rows.findIndex(function(r){ return rowId(r) === id; });
-    if (idx >= 0) rows[idx] = row;
+  function upsertCache(collection, row) {
+    const rows = ensure(collection);
+    const id = rowId(row);
+    const index = rows.findIndex((item) => rowId(item) === id);
+    if (index >= 0) rows[index] = row;
     else rows.push(row);
     refreshCounts(collection);
     emit(collection);
   }
-
-  function removeCache(collection, id){
-    var rows = ensure(collection);
-    var before = rows.length;
-    cache[collection] = rows.filter(function(row){ return rowId(row) !== id; });
+  function removeCache(collection, id) {
+    cache[collection] = ensure(collection).filter((row) => rowId(row) !== id);
     refreshCounts(collection);
-    if (cache[collection].length !== before) emit(collection);
+    emit(collection);
   }
-
-  function safeId(collection){
-    try {
-      var ref = collectionRef(collection);
-      if (ref && typeof ref.doc === 'function') return ref.doc().id;
-    } catch(e) {}
-    return collection + '_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+  function all(collection) { return operationalRows(collection).map(clone); }
+  function get(collection, id) {
+    const found = operationalRows(collection).find((row) => rowId(row) === id);
+    return found ? clone(found) : null;
   }
-
-  function all(collection){
-    return operationalRows(collection).slice();
-  }
-
-  function get(collection, id){
-    return operationalRows(collection).find(function(row){ return rowId(row) === id; }) || null;
-  }
-
-  function where(collection, fieldOrPredicate, opOrValue, maybeValue){
-    var rows = operationalRows(collection);
+  function where(collection, fieldOrPredicate, opOrValue, maybeValue) {
+    const rows = operationalRows(collection);
     if (typeof fieldOrPredicate === 'function') {
-      return rows.filter(function(row){ try { return !!fieldOrPredicate(row); } catch(e) { return false; } });
+      return rows.filter((row) => { try { return !!fieldOrPredicate(row); } catch (error) { return false; } }).map(clone);
     }
     if (fieldOrPredicate && typeof fieldOrPredicate === 'object') {
-      return rows.filter(function(row){
-        return Object.keys(fieldOrPredicate).every(function(key){ return row && row[key] === fieldOrPredicate[key]; });
-      });
+      return rows.filter((row) => Object.keys(fieldOrPredicate).every((key) => row && row[key] === fieldOrPredicate[key])).map(clone);
     }
-    var field = fieldOrPredicate;
-    var op = arguments.length >= 4 ? opOrValue : '==';
-    var value = arguments.length >= 4 ? maybeValue : opOrValue;
-    return rows.filter(function(row){
+    const field = fieldOrPredicate;
+    const op = arguments.length >= 4 ? opOrValue : '==';
+    const value = arguments.length >= 4 ? maybeValue : opOrValue;
+    return rows.filter((row) => {
       if (!row) return false;
       if (op === '==' || op === '=') return row[field] === value;
       if (op === '!=') return row[field] !== value;
@@ -361,253 +239,284 @@
       if (op === '>=') return row[field] >= value;
       if (op === '<') return row[field] < value;
       if (op === '<=') return row[field] <= value;
-      if (op === 'array-contains') return Array.isArray(row[field]) && row[field].indexOf(value) >= 0;
+      if (op === 'array-contains') return Array.isArray(row[field]) && row[field].includes(value);
       return row[field] === value;
-    });
+    }).map(clone);
   }
-
-  function find(collection, predicate){
-    if (typeof predicate === 'function') {
-      return operationalRows(collection).find(function(row){ try { return !!predicate(row); } catch(e) { return false; } }) || null;
-    }
-    if (predicate && typeof predicate === 'object') return where(collection, predicate)[0] || null;
-    return null;
+  function find(collection, predicate) {
+    const rows = where(collection, predicate);
+    return rows.length ? rows[0] : null;
   }
-
-  function insert(collection, payload){
-    var row = normalize(clone(payload) || {});
-    if (!row.id) row.id = safeId(collection);
-    row.tenantId = row.tenantId || tenantId;
-    row.createdAt = row.createdAt || new Date().toISOString();
-    row.updatedAt = new Date().toISOString();
-    var u = updateAuthState();
-    if (u) {
-      row.ownerUid = row.ownerUid || u.uid || '';
-      row.ownerEmail = row.ownerEmail || u.email || EXPECTED_EMAIL;
-    }
-    row._syncStatus = 'pending'; row._syncOp = 'insert'; row._syncAt = new Date().toISOString();
-    upsertCache(collection, row); markPending(collection, row.id, 'insert');
-    try {
-      var ref = collectionRef(collection);
-      if (!ref || typeof ref.doc !== 'function') throw new Error('firestore-not-ready');
-      ref.doc(row.id).set(cleanForWrite(row), { merge: true }).then(function(){ markSynced(collection, row.id, 'insert'); })
-        .catch(function(e){ markWriteFailed(collection, row.id, 'insert', e); });
-    } catch(e) { markWriteFailed(collection, row.id, 'insert', e); }
-    return row;
-  }
-
-  function update(collection, id, patch){
-    var current = get(collection, id) || { id: id, tenantId: tenantId };
-    var row = Object.assign({}, current, clone(patch) || {});
-    row.id = id; row.tenantId = row.tenantId || tenantId; row.updatedAt = new Date().toISOString();
-    row._syncStatus = 'pending'; row._syncOp = 'update'; row._syncAt = new Date().toISOString();
-    upsertCache(collection, row); markPending(collection, id, 'update');
-    try {
-      var ref = collectionRef(collection);
-      if (!ref || typeof ref.doc !== 'function') throw new Error('firestore-not-ready');
-      ref.doc(id).set(cleanForWrite(row), { merge: true }).then(function(){ markSynced(collection, id, 'update'); })
-        .catch(function(e){ markWriteFailed(collection, id, 'update', e); });
-    } catch(e) { markWriteFailed(collection, id, 'update', e); }
-    return row;
-  }
-
-  function remove(collection, id){
-    var previous = clone(get(collection, id));
-    markPending(collection, id, 'remove'); removeCache(collection, id);
-    try {
-      var ref = collectionRef(collection);
-      if (!ref || typeof ref.doc !== 'function') throw new Error('firestore-not-ready');
-      ref.doc(id).delete().then(function(){ markSynced(collection, id, 'remove'); }).catch(function(e){
-        if (previous) {
-          previous._syncStatus = 'failed'; previous._syncOp = 'remove';
-          previous._syncError = String(e && (e.message || e) || e); previous._syncAt = new Date().toISOString();
-          upsertCache(collection, previous);
-        }
-        markWriteFailed(collection, id, 'remove', e);
-      });
-    } catch(e) {
-      if (previous) {
-        previous._syncStatus = 'failed'; previous._syncOp = 'remove';
-        previous._syncError = String(e && (e.message || e) || e); previous._syncAt = new Date().toISOString();
-        upsertCache(collection, previous);
-      }
-      markWriteFailed(collection, id, 'remove', e);
-    }
-    return true;
-  }
-
-  function on(collection, callback){
+  function on(collection, callback) {
     if (typeof collection === 'function') { callback = collection; collection = '*'; }
-    var listener = function(changed){
-      if (collection === '*' || collection === changed || changed === '*') {
-        try { callback(changed); } catch(e) {}
+    const listener = (changed) => {
+      if (collection === '*' || changed === '*' || changed === collection) {
+        try { callback(changed); } catch (error) {}
       }
     };
     listeners.push(listener);
-    return function(){ listeners = listeners.filter(function(item){ return item !== listener; }); };
+    return () => { listeners = listeners.filter((item) => item !== listener); };
   }
-
-  function pref(key, def){
-    return Object.prototype.hasOwnProperty.call(prefs, key) ? prefs[key] : def;
+  function writeKey(collection, id, op) { return [collection || '_', id || '_', op || '_'].join('::'); }
+  function markPending(collection, id, op) {
+    const at = new Date().toISOString();
+    const key = writeKey(collection, id, op);
+    state.lastWriteAt = at;
+    state.writeQueue = state.writeQueue.filter((item) => item.key !== key);
+    state.writeQueue.push({ key, collection, id, op, status: 'pending', at });
+    emitBackendEvent('orbit:backend:write-pending', { collection, id, op, at });
   }
-
-  function setPref(key, value){
-    prefs[key] = value; markPending('__prefs', key, 'setPref'); emit('__prefs');
-    try {
-      var ref = prefsDocRef();
-      if (!ref) throw new Error('firestore-not-ready');
-      var payload = {}; payload[key] = value; payload.updatedAt = new Date().toISOString(); payload.tenantId = tenantId;
-      ref.set(payload, { merge: true }).then(function(){ markSynced('__prefs', key, 'setPref'); })
-        .catch(function(e){ markWriteFailed('__prefs', key, 'setPref', e); });
-    } catch(e) { markWriteFailed('__prefs', key, 'setPref', e); }
-    return value;
+  function markSynced(collection, id, op) {
+    const at = new Date().toISOString();
+    const key = writeKey(collection, id, op);
+    state.lastWriteOkAt = at;
+    state.writeQueue = state.writeQueue.filter((item) => item.key !== key);
+    emitBackendEvent('orbit:backend:write-ok', { collection, id, op, at });
   }
-
-  function init(){
-    var user = canonicalAuthUser();
-    state.status = state.snapshotAttached ? 'ready' : (user ? 'waiting-firestore' : 'waiting-auth');
-    return api;
+  function markFailed(collection, id, op, error) {
+    const at = new Date().toISOString();
+    const key = writeKey(collection, id, op);
+    const message = text(error && (error.message || error));
+    state.lastWriteErrorAt = at;
+    state.writeQueue = state.writeQueue.filter((item) => item.key !== key);
+    state.writeErrors.push({ key, collection, id, op, status: 'failed', at, error: message });
+    if (state.writeErrors.length > 100) state.writeErrors = state.writeErrors.slice(-100);
+    setError(`${op} failed: ${collection}`, error);
+    emitBackendEvent('orbit:backend:write-error', { collection, id, op, at, error: message });
   }
-
-  function reseed(){
-    COLLECTIONS.forEach(function(c){ cache[c] = []; refreshCounts(c); });
-    prefs = {}; state.writeQueue = []; state.writeErrors = []; emit('*'); return api;
-  }
-
-  function raw(){
-    var out = {};
-    COLLECTIONS.forEach(function(c){ out[c] = operationalRows(c).slice(); });
-    out.__prefs = prefs;
-    out.__backend = Object.assign({}, state, { cache: undefined });
-    return out;
-  }
-
-  function attachCollectionSnapshot(collection){
-    var ref = collectionRef(collection);
-    if (!ref) return false;
-    state.collectionPaths[collection] = collectionPath(collection);
-    state.collectionAuthorities[collection] = collectionAuthority(collection);
-    try {
-      var unsub = ref.onSnapshot(function(snap){
-        var rows = [];
-        try { snap.forEach(function(docSnap){ rows.push(normalize(docSnap.data() || {}, docSnap.id)); }); }
-        catch(e) { setError('snapshot parse failed: ' + collection, e); }
-        cache[collection] = rows;
-        refreshCounts(collection);
-        state.status = 'ready';
-        emit(collection);
-      }, function(error){
-        state.snapshotErrors[collection] = String(error && (error.message || error) || error);
-        setError('snapshot failed: ' + collection, error);
-      });
-      unsubscribers.push(unsub);
-      state.snapshotAttachedCount += 1;
-      return true;
-    } catch(e) {
-      state.snapshotErrors[collection] = String(e && (e.message || e) || e);
-      return false;
+  function requireWriteUser() {
+    const user = authorizedUser();
+    if (!user) {
+      const error = new Error('MEMBERSHIP_AUTH_REQUIRED');
+      error.code = 'MEMBERSHIP_AUTH_REQUIRED';
+      throw error;
     }
-  }
-
-  function attachPrefsSnapshot(){
-    var ref = prefsDocRef();
-    if (!ref || typeof ref.onSnapshot !== 'function') return false;
-    try {
-      var unsub = ref.onSnapshot(function(docSnap){
-        var data = {};
-        try { if (docSnap && docSnap.exists) data = docSnap.data() || {}; } catch(e) {}
-        Object.keys(data).forEach(function(k){ if (k !== 'tenantId' && k !== 'updatedAt' && k !== 'createdAt') prefs[k] = data[k]; });
-        emit('__prefs');
-      }, function(error){
-        state.snapshotErrors.__prefs = String(error && (error.message || error) || error);
-        setError('prefs snapshot failed', error);
-      });
-      unsubscribers.push(unsub);
-      return true;
-    } catch(e) {
-      state.snapshotErrors.__prefs = String(e && (e.message || e) || e);
-      return false;
-    }
-  }
-
-  function canonicalAuthUser(){
-    var user = updateAuthState();
-    var email = String(user && user.email || '').toLowerCase();
-    var uid = String(user && user.uid || '');
-    if (!user || email !== EXPECTED_EMAIL.toLowerCase() || (EXPECTED_UID && uid !== EXPECTED_UID)) return null;
     return user;
   }
-
-  function attachSnapshots(){
-    var user = canonicalAuthUser();
-    if (!user) {
-      state.status = 'waiting-auth'; state.snapshotAttached = false; state.snapshotAttachedCount = 0; return false;
+  function safeId(collection) {
+    const ref = collectionRef(collection);
+    return ref && typeof ref.doc === 'function'
+      ? ref.doc().id
+      : `${collection}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+  }
+  function cleanForWrite(row) {
+    const out = clone(row) || {};
+    delete out._syncStatus;
+    delete out._syncOp;
+    delete out._syncError;
+    delete out._syncAt;
+    return out;
+  }
+  function insert(collection, payload) {
+    const user = requireWriteUser();
+    const row = normalize(clone(payload) || {});
+    if (!row.id) row.id = safeId(collection);
+    const now = new Date().toISOString();
+    row.createdAt = row.createdAt || now;
+    row.updatedAt = now;
+    row.ownerUid = row.ownerUid || text(user.uid);
+    row.ownerEmail = row.ownerEmail || text(user.email);
+    row._syncStatus = 'pending'; row._syncOp = 'insert'; row._syncAt = now;
+    upsertCache(collection, row);
+    markPending(collection, row.id, 'insert');
+    const ref = collectionRef(collection);
+    if (!ref) { markFailed(collection, row.id, 'insert', new Error('firestore-not-ready')); return clone(row); }
+    ref.doc(row.id).set(cleanForWrite(row), { merge: true })
+      .then(() => markSynced(collection, row.id, 'insert'))
+      .catch((error) => markFailed(collection, row.id, 'insert', error));
+    return clone(row);
+  }
+  function update(collection, id, patch) {
+    const user = requireWriteUser();
+    const row = Object.assign({}, get(collection, id) || { id, tenantId }, clone(patch) || {});
+    row.id = id;
+    row.tenantId = row.tenantId || tenantId;
+    row.updatedAt = new Date().toISOString();
+    row.updatedByUid = text(user.uid);
+    row.updatedByEmail = text(user.email);
+    row._syncStatus = 'pending'; row._syncOp = 'update'; row._syncAt = row.updatedAt;
+    upsertCache(collection, row);
+    markPending(collection, id, 'update');
+    const ref = collectionRef(collection);
+    if (!ref) { markFailed(collection, id, 'update', new Error('firestore-not-ready')); return clone(row); }
+    ref.doc(id).set(cleanForWrite(row), { merge: true })
+      .then(() => markSynced(collection, id, 'update'))
+      .catch((error) => markFailed(collection, id, 'update', error));
+    return clone(row);
+  }
+  function remove(collection, id) {
+    requireWriteUser();
+    const previous = get(collection, id);
+    markPending(collection, id, 'remove');
+    removeCache(collection, id);
+    const ref = collectionRef(collection);
+    if (!ref) { if (previous) upsertCache(collection, previous); markFailed(collection, id, 'remove', new Error('firestore-not-ready')); return false; }
+    ref.doc(id).delete()
+      .then(() => markSynced(collection, id, 'remove'))
+      .catch((error) => { if (previous) upsertCache(collection, previous); markFailed(collection, id, 'remove', error); });
+    return true;
+  }
+  function pref(key, fallback) {
+    return Object.prototype.hasOwnProperty.call(prefs, key) ? prefs[key] : fallback;
+  }
+  function setPref(key, value) {
+    requireWriteUser();
+    prefs[key] = value;
+    emit('__prefs');
+    const ref = prefsDocRef();
+    if (!ref) return value;
+    const payload = { tenantId, updatedAt: new Date().toISOString() };
+    payload[key] = value;
+    ref.set(payload, { merge: true }).catch((error) => setError('setPref failed', error));
+    return value;
+  }
+  function attachCollectionSnapshot(collection) {
+    const ref = collectionRef(collection);
+    if (!ref || typeof ref.onSnapshot !== 'function') return false;
+    state.collectionPaths[collection] = collectionPath(collection);
+    state.collectionAuthorities[collection] = collectionAuthority(collection);
+    const unsubscribe = ref.onSnapshot((snapshot) => {
+      const rows = [];
+      snapshot.forEach((doc) => rows.push(normalize(doc.data() || {}, doc.id)));
+      cache[collection] = rows;
+      refreshCounts(collection);
+      state.status = 'ready';
+      emit(collection);
+    }, (error) => {
+      state.snapshotErrors[collection] = text(error && (error.message || error));
+      setError(`snapshot failed: ${collection}`, error);
+    });
+    unsubscribers.push(unsubscribe);
+    state.snapshotAttachedCount += 1;
+    return true;
+  }
+  function attachPrefsSnapshot() {
+    const ref = prefsDocRef();
+    if (!ref || typeof ref.onSnapshot !== 'function') return false;
+    const unsubscribe = ref.onSnapshot((documentSnapshot) => {
+      const data = documentSnapshot && documentSnapshot.exists ? documentSnapshot.data() || {} : {};
+      Object.keys(data).forEach((key) => {
+        if (!['tenantId', 'updatedAt', 'createdAt'].includes(key)) prefs[key] = data[key];
+      });
+      emit('__prefs');
+    }, (error) => {
+      state.snapshotErrors.__prefs = text(error && (error.message || error));
+      setError('prefs snapshot failed', error);
+    });
+    unsubscribers.push(unsubscribe);
+    return true;
+  }
+  function attachSnapshots() {
+    if (!authorizedUser()) {
+      state.status = 'waiting-membership';
+      state.snapshotAttached = false;
+      state.snapshotAttachedCount = 0;
+      return false;
     }
-    if (attachStarted) return state.snapshotAttached;
+    if (attachStarted && state.snapshotAttached) return true;
+    const database = db();
+    if (!database) { state.status = 'waiting-firestore'; return false; }
+    detachSnapshots();
     attachStarted = true;
-    if (!db()) {
-      attachStarted = false; state.status = 'waiting-firebase'; setError('Firebase SDK not ready'); return false;
-    }
     state.snapshotAttachedCount = 0;
     COLLECTIONS.forEach(attachCollectionSnapshot);
     attachPrefsSnapshot();
-    attachCompleted = state.snapshotAttachedCount === COLLECTIONS.length;
-    state.snapshotAttached = attachCompleted;
-    state.status = attachCompleted ? 'ready' : 'waiting-snapshots';
-    if (attachCompleted) log('single-owner snapshots attached', tenantId, state.snapshotAttachedCount);
-    else setError('Incomplete Firestore snapshot ownership: ' + state.snapshotAttachedCount + '/' + COLLECTIONS.length);
-    return attachCompleted;
+    state.snapshotAttached = state.snapshotAttachedCount === COLLECTIONS.length;
+    state.status = state.snapshotAttached ? 'ready' : 'waiting-snapshots';
+    if (!state.snapshotAttached) setError(`Incomplete Firestore snapshot ownership: ${state.snapshotAttachedCount}/${COLLECTIONS.length}`);
+    return state.snapshotAttached;
+  }
+  function detachSnapshots() {
+    unsubscribers.splice(0).forEach((unsubscribe) => { try { if (typeof unsubscribe === 'function') unsubscribe(); } catch (error) {} });
+    state.snapshotAttached = false;
+    state.snapshotAttachedCount = 0;
+    attachStarted = false;
+  }
+  function init() {
+    state.status = authorizedUser() ? 'waiting-firestore' : 'waiting-membership';
+    if (authorizedUser()) setTimeout(attachSnapshots, 0);
+    return api;
+  }
+  function reseed() {
+    COLLECTIONS.forEach((collection) => { cache[collection] = []; refreshCounts(collection); });
+    prefs = {};
+    state.writeQueue = [];
+    state.writeErrors = [];
+    emit('*');
+    return api;
+  }
+  function raw() {
+    const out = {};
+    COLLECTIONS.forEach((collection) => { out[collection] = all(collection); });
+    out.__prefs = clone(prefs);
+    out.__backend = Object.assign({}, state, { cache: undefined });
+    return out;
+  }
+  function bindMembershipLifecycle() {
+    w.addEventListener('orbit:membership-projection', (event) => {
+      const detail = event && event.detail || {};
+      if (detail.ready === true && detail.tenantBound === true) attachSnapshots();
+      else if (detail.status === 'blocked' || detail.status === 'waiting-auth') detachSnapshots();
+    });
+    let attempts = 0;
+    (function bindAuth() {
+      try {
+        const auth = w.firebase && typeof firebase.auth === 'function' ? firebase.auth() : null;
+        if (auth && typeof auth.onAuthStateChanged === 'function') {
+          auth.onAuthStateChanged((user) => {
+            if (!user) detachSnapshots();
+            else setTimeout(attachSnapshots, 150);
+          });
+          return;
+        }
+      } catch (error) {}
+      attempts += 1;
+      if (attempts < 120) setTimeout(bindAuth, 100);
+    })();
   }
 
-  function detachSnapshots(){
-    unsubscribers.splice(0).forEach(function(unsub){ try { if (typeof unsub === 'function') unsub(); } catch(e) {} });
-    state.snapshotAttached = false; state.snapshotAttachedCount = 0; attachStarted = false; attachCompleted = false;
-  }
-
-  var api = {
-    all: all, get: get, where: where, find: find,
-    insert: insert, update: update, remove: remove,
-    on: on, _emit: emit, pref: pref, setPref: setPref,
-    init: init, reseed: reseed, raw: raw,
+  const api = {
+    all, get, where, find, insert, update, remove,
+    on, _emit: emit, pref, setPref, init, reseed, raw,
     subscribe: on, _subscribe: on,
-    _labStatus: function(){ updateAuthState(); return Object.assign({}, state, { cache: undefined }); },
+    _labStatus: () => { authorizedUser(); return Object.assign({}, state, { cache: undefined }); },
     _attachSnapshots: attachSnapshots,
     _detachSnapshots: detachSnapshots,
     _collectionPath: collectionPath,
     _collectionAuthority: collectionAuthority,
-    _isOperationalRow: function(collection, row){ return !CANONICAL_SET.has(collection) || !seedLike(row); },
+    _isOperationalRow: (collection, row) => !CANONICAL_SET.has(collection) || !seedLike(row),
     __firestoreLabExplicit: true,
     __authGatedSnapshots: true,
+    __membershipAuthRequired: true,
     __canonicalReadModelV79: true,
     __singleReadOwner: true
   };
 
   w.Orbit.store = api;
   w.OrbitBackend = Object.assign({}, w.OrbitBackend || {}, {
-    mode: mode,
-    tenantId: tenantId,
+    mode,
+    tenantId,
     tenant: tenantId,
     noFallback: true,
     ready: true,
     source: 'data/store-firestore-lab.local.js',
-    apiVersion: 'v1.75-canonical-read-owner-v79',
+    apiVersion: 'v1.80-membership-auth-owner',
+    authAuthority: 'tenant-membership',
+    membershipRequired: true,
     collections: COLLECTIONS.slice(),
     canonicalCollections: CANONICAL_COLLECTIONS.slice(),
     canonicalSnapshotDigest: SEALED_CANONICAL_DIGEST,
     collectionPaths: state.collectionPaths,
     collectionAuthorities: state.collectionAuthorities,
-    expectedUid: EXPECTED_UID,
-    expectedEmail: EXPECTED_EMAIL,
     attachLabSnapshots: attachSnapshots,
     detachLabSnapshots: detachSnapshots,
     authGatedSnapshots: true,
+    membershipAuthRequired: true,
     singleReadOwner: true,
-    status: function(){ updateAuthState(); return Object.assign({}, state, { cache: undefined }); }
+    status: () => { authorizedUser(); return Object.assign({}, state, { cache: undefined }); }
   });
-
   w.ORBIT_BACKEND = w.OrbitBackend;
   w.ORBIT_LAB_COLLECTIONS = COLLECTIONS.slice();
   w.Orbit.__labStore = state;
-  state.status = canonicalAuthUser() ? 'waiting-firestore' : 'waiting-auth';
-  log('Store Firestore LAB v1.75 instalado. Tenant:', tenantId);
+  bindMembershipLifecycle();
 })();
