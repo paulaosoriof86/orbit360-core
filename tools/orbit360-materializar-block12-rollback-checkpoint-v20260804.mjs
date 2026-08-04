@@ -42,13 +42,19 @@ replaceExact(
   '  persistState();',
   'REMOVE_LATE_ONLY_STATE'
 );
+replaceExact(
+  '  const cleanupOk = tenantCollections.length === 0 && legacyCollections.length === 0 && usersRemain === 0 && authDeleted === 3;',
+  '  const expectedSyntheticUsers = Object.keys(state.users || {}).length;\n  const cleanupOk = tenantCollections.length === 0 && legacyCollections.length === 0 && usersRemain === 0 && authDeleted === expectedSyntheticUsers;',
+  'PARTIAL_AUTH_ROLLBACK_COUNT'
+);
 fs.writeFileSync(file, source, 'utf8');
-if (!source.includes('const persistState = () =>') || !source.includes('persistState();\n  for (const def')) throw new Error('PIPELINE_MECHANISM_FAILURE:ROLLBACK_CHECKPOINT_NOT_INSTALLED');
+if (!source.includes('const persistState = () =>') || !source.includes('persistState();\n  for (const def') || !source.includes('expectedSyntheticUsers')) throw new Error('PIPELINE_MECHANISM_FAILURE:ROLLBACK_CHECKPOINT_NOT_INSTALLED');
 console.log(JSON.stringify({
   schemaVersion: 'orbit360-block12-rollback-checkpoint-v1',
   status: 'ROLLBACK_CHECKPOINT_MATERIALIZED',
   stateBeforeOperationalWrites: true,
   stateAfterEachSyntheticIdentity: true,
+  partialPreparationRollbackExact: true,
   realTenantWrites: 0,
   secretAccess: false,
   deployExecuted: false,
