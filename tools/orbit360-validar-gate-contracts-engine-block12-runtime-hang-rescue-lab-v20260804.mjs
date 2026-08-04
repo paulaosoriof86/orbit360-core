@@ -8,7 +8,7 @@ const GATE = 'block12-runtime-hang-rescue-lab-v20260804';
 const VERSION = '12.0.4';
 const LIFECYCLE = 'tools/orbit360-validator-lifecycle-contract-block12-runtime-hang-rescue-lab-v20260804.json';
 const REQUEST = process.env.ORBIT360_REQUEST_FILE || '.github/orbit360-requests/block12-runtime-hang-rescue-rootfix-lab-v20260804.json';
-const OUT = path.join(ROOT, 'orbit360-platform/runtime-gate-crm-v20260716/block12-runtime-hang-rescue-preflight.json');
+const OUT = path.join(ROOT, 'orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json');
 const EXPECTED_FUNCTIONS = [
   'orbit360OpsLeadsCommandLabV20260804',
   'orbit360GetAdvisorOpsInboxLabV20260804',
