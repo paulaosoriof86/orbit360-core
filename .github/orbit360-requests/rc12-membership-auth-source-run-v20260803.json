@@ -3,11 +3,13 @@
   "status": "AUTHORIZED_SOURCE_ONLY",
   "releaseBranch": "release/gravicentra-insurance-rc1-2-membership-auth-20260803",
   "baseReleaseCommit": "1eb7daea580c0807d867a663086defc021435993",
+  "executionNonce": "20260803T2141-0600-regression-rootfix",
   "scope": {
     "sourceOnly": true,
     "authenticationByTenantMembership": true,
     "removeTechnicalIdentityLock": true,
     "preserveRolesScopesAdvisor": true,
+    "regressionGate": true,
     "firestoreRead": false,
     "firestoreWrites": false,
     "authWrites": false,
