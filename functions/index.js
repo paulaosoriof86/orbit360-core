@@ -4,7 +4,7 @@ const crypto = require('node:crypto');
 const { getApps, initializeApp } = require('firebase-admin/app');
 const { FieldValue, getFirestore } = require('firebase-admin/firestore');
 const { HttpsError, onCall } = require('firebase-functions/v2/https');
-const { setGlobalOptions } = require('firebase-functions/v2');
+const { setGlobalOptions } = require('firebase-functions/v2/options');
 const { SecretManagerServiceClient } = require('@google-cloud/secret-manager');
 
 const PROJECT_ID = process.env.GCLOUD_PROJECT || process.env.GOOGLE_CLOUD_PROJECT || 'ays-orbit-360-lab';

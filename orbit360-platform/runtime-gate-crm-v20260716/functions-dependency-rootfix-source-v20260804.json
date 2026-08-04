@@ -1,0 +1,39 @@
+{
+  "schemaVersion": "orbit360-functions-runtime-dependencies-validation-v1",
+  "status": "FUNCTIONS_BOOTSTRAP_LOAD_PASS",
+  "classification": "GO_SOURCE_REPRODUCIBLE_FUNCTIONS_RUNTIME",
+  "nodeEngine": "22",
+  "resolvedModuleCount": 5,
+  "exportCount": 24,
+  "requiredFunctionExports": true,
+  "broadV2AggregatorLoaded": false,
+  "unusedDatabaseProviderLoaded": false,
+  "versions": {
+    "firebaseAdmin": "13.10.0",
+    "firebaseFunctions": "7.3.0",
+    "databaseCompat": "2.1.5",
+    "firebaseApp": "",
+    "secretManager": "6.2.0"
+  },
+  "lockfileVersion": 3,
+  "packageLockSha256": "a98ab6db5a861ebca68a0019b404f433d9015f806f13e0184e827209ac95afe5",
+  "secretAccess": false,
+  "firebaseCommandsExecuted": false,
+  "firestoreRead": false,
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "deployExecuted": false,
+  "productionTouched": false,
+  "containsPII": false,
+  "containsSecrets": false,
+  "ok": true,
+  "previousRunIds": [
+    30949139231,
+    30949801751,
+    30949971161
+  ],
+  "rootCause": "functions/index.js loaded firebase-functions/v2 aggregator for setGlobalOptions, activating an unused database provider; two source validators then failed before bootstrap due validator scope and Bash wrapper defects",
+  "owner": "functions/index.js:setGlobalOptions import",
+  "importAfter": "firebase-functions/v2/options",
+  "sourceChecksPass": true
+}
