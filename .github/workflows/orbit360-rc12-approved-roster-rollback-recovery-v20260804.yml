@@ -1,0 +1,150 @@
+name: Gravicentra RC1.2 · recuperación exacta de rollback
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-requests/rc12-approved-roster-rollback-recovery-v20260804.json'
+
+permissions:
+  contents: write
+  statuses: write
+
+concurrency:
+  group: orbit360-rc12-approved-roster-rollback-recovery-v20260804
+  cancel-in-progress: false
+
+env:
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  ORBIT360_REQUEST_FILE: .github/orbit360-requests/rc12-approved-roster-rollback-recovery-v20260804.json
+  ORBIT360_GATE_ID: block7.15.2-rc12-approved-roster-rollback-recovery-v20260804
+  ORBIT360_PROJECT_ID: ays-orbit-360-lab
+  ORBIT360_TENANT_ID: alianzas-soluciones
+  ORBIT360_EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+  STATUS_CONTEXT: orbit360/rc12-approved-roster-rollback-recovery
+
+jobs:
+  recover:
+    name: Borrar 3 memberships y 3 usuarios creados por run 30910775651
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout request exacto
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Preparar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Verificar autorización de rollback y estado inmutable
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          jq -e '.schemaVersion=="orbit360-rc12-approved-roster-rollback-recovery-request-v1" and .status=="AUTHORIZED_ROLLBACK_RECOVERY_ONLY" and .approved==true and .allowedExecutions==1 and .consumed==false and .replayAllowed==false and .branch==env.ORBIT360_BRANCH and .pullRequest==5 and .releaseCommit=="b699ba329960cd830121b57452ce558399aa84fb" and .projectId==env.ORBIT360_PROJECT_ID and .tenantId==env.ORBIT360_TENANT_ID and .failedRun==30910775651 and .failedJob==91996692820 and .artifact==8892990988 and .artifactDigest=="sha256:4984ec2d39f8f1647f76dfdbb5d69a8fb849e8ce6d273289193467e0c7148281" and .scope.deleteExactlyThreeOwnedMemberships==true and .scope.deleteExactlyThreeOwnedAuthUsers==true and .scope.authCreates==false and .scope.authUpdates==false and .scope.membershipCreates==false and .scope.membershipUpdates==false and .scope.hostingDeploy==false and .scope.browser==false and .scope.reimport==false and .scope.rules==false and .scope.functions==false and .scope.main==false and .scope.merge==false and .scope.gate711==false' "$ORBIT360_REQUEST_FILE" >/dev/null
+          test "$(git rev-parse HEAD^)" = "$(jq -r '.parentHead' "$ORBIT360_REQUEST_FILE")"
+          mapfile -t DELTA < <(git diff-tree --no-commit-id --name-only -r HEAD)
+          test "${#DELTA[@]}" = '1'
+          test "${DELTA[0]}" = "$ORBIT360_REQUEST_FILE"
+          echo "ORBIT360_TEMP_KEY_FILE=$RUNNER_TEMP/rc12-rollback-recovery-service-account.json" >> "$GITHUB_ENV"
+
+      - name: Corregir owners y ejecutar Gate 7.15.2 antes de secretos
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-aplicar-rootfix-rollback-gate713-rc12-v20260804.mjs
+          node tools/orbit360-aplicar-rootfix-rollback-gate713-rc12-v20260804.mjs
+          node --check tools/orbit360-provisionar-roster-aprobado-final-rc12-v20260804.mjs
+          node --check tools/orbit360-validar-gate-contracts-engine-rc12-rootcause-cumulative-closure-v20260803.mjs
+          node --check tools/orbit360-recuperar-rollback-roster-rc12-v20260804.mjs
+          node --check tools/orbit360-validar-gate-contracts-engine-rc12-approved-roster-rollback-recovery-v20260804.mjs
+          node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
+          jq -e '.decision=="RC12_ROLLBACK_GATE713_ROOTFIX_STATIC_PASS" and .classification=="GO_STATIC_PIPELINE_ROOTFIX" and .secretAccess==false and .firestoreRead==false and .firestoreWrites==0 and .authRead==false and .authWrites==0 and .deployExecuted==false and .productionTouched==false and .ok==true' "$ORBIT360_EVIDENCE_DIR/rc12-rollback-gate713-rootfix-static.json" >/dev/null
+          ORBIT360_REQUEST_FILE="$ORBIT360_REQUEST_FILE" node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
+          jq -e '.status=="GO_GATE_CONTRACT" and .classification=="RC12_APPROVED_ROSTER_ROLLBACK_RECOVERY_READY" and .contractVersion=="7.15.2" and .failed==0 and .executionAuthorized==true and .secretAccessAuthorized==true and .firestoreReadAuthorized==true and .membershipDeletesAuthorized==3 and .authReadAuthorized==true and .authDeletesAuthorized==3 and .authCreatesAuthorized==0 and .authUpdatesAuthorized==0 and .membershipCreatesAuthorized==0 and .membershipUpdatesAuthorized==0 and .runtimeAuthorized==false and .browserAuthorized==false and .deployAuthorized==false and .productionAuthorized==false and .dataAccess==false and .secretAccess==false and .firestoreRead==false and .firestoreWrites==0 and .authRead==false and .authWrites==0 and .deployExecuted==false and .productionTouched==false' "$ORBIT360_EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+          cp "$ORBIT360_EVIDENCE_DIR/preflight-sanitizado.json" "$ORBIT360_EVIDENCE_DIR/rc12-rollback-recovery-preflight.json"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add tools/orbit360-provisionar-roster-aprobado-final-rc12-v20260804.mjs tools/orbit360-validar-gate-contracts-engine-rc12-rootcause-cumulative-closure-v20260803.mjs tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_EVIDENCE_DIR/rc12-rollback-gate713-rootfix-static.json"
+          git commit -m 'rootfix: repair RC1.2 rollback and Gate 7.13 path handling'
+          git push origin HEAD:"$ORBIT360_BRANCH"
+
+      - name: Instalar dependencia después del gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false --ignore-scripts firebase-admin@13
+
+      - name: Resolver proyecto Firebase existente
+        shell: bash
+        env:
+          SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+          SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          set -euo pipefail
+          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-${SA_ORBIT_360_LAB:-${SA_DEFAULT:-}}}"
+          test -n "$SERVICE_ACCOUNT"
+          printf '%s' "$SERVICE_ACCOUNT" > "$ORBIT360_TEMP_KEY_FILE"
+          chmod 600 "$ORBIT360_TEMP_KEY_FILE"
+          test "$(jq -r '.project_id // empty' "$ORBIT360_TEMP_KEY_FILE")" = "$ORBIT360_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$ORBIT360_TEMP_KEY_FILE" >> "$GITHUB_ENV"
+
+      - name: Ejecutar recuperación exacta
+        id: cleanup
+        shell: bash
+        run: |
+          set +e
+          node tools/orbit360-recuperar-rollback-roster-rc12-v20260804.mjs
+          CODE=$?
+          echo "exit_code=$CODE" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Publicar decisión observable
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          FINAL: orbit360-platform/runtime-gate-crm-v20260716/rc12-approved-roster-rollback-recovery.json
+        with:
+          script: |
+            const fs=require('fs');
+            let state='failure', description='RC1.2 rollback recovery sin evidencia';
+            try {
+              const f=JSON.parse(fs.readFileSync(process.env.FINAL,'utf8'));
+              if (f.decision==='APPROVED_ROSTER_ROLLBACK_RECOVERY_PASS' && f.ok===true) { state='success'; description='RC1.2 · 3 users + 3 memberships restaurados'; }
+              else description=`RC1.2 · ${f.decision}`;
+            } catch (_) {}
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:process.env.STATUS_CONTEXT,description:description.slice(0,140),target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
+
+      - name: Subir evidencia sanitizada
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rc12-approved-roster-rollback-recovery-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/rc12-rollback-gate713-rootfix-static.json
+            orbit360-platform/runtime-gate-crm-v20260716/rc12-rollback-recovery-preflight.json
+            orbit360-platform/runtime-gate-crm-v20260716/rc12-approved-roster-rollback-recovery.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Limpiar identidad de servicio
+        if: always()
+        shell: bash
+        run: |
+          if [ -n "${ORBIT360_TEMP_KEY_FILE:-}" ] && [ -f "$ORBIT360_TEMP_KEY_FILE" ]; then shred -u "$ORBIT360_TEMP_KEY_FILE" || rm -f "$ORBIT360_TEMP_KEY_FILE"; fi
+
+      - name: Exigir rollback PASS
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          FINAL="$ORBIT360_EVIDENCE_DIR/rc12-approved-roster-rollback-recovery.json"
+          test -f "$FINAL"
+          jq -e '.decision=="APPROVED_ROSTER_ROLLBACK_RECOVERY_PASS" and .classification=="ROLLBACK_PASS" and .membershipDeletes==3 and .authDeletes==3 and .remainingOwnedMemberships==0 and .remainingOwnedUsers==0 and .firestoreWrites==3 and .authWrites==3 and .authUsersCreated==0 and .authUsersUpdated==0 and .membershipDocumentsCreated==0 and .membershipDocumentsUpdated==0 and .hostingDeployAttempted==false and .browserExecuted==false and .reimportExecuted==false and .rulesApplied==false and .functionsDeployed==false and .mainTouched==false and .mergeExecuted==false and .gate711Executed==false and .productionTouched==false and .ok==true' "$FINAL" >/dev/null
+          test "${{ steps.cleanup.outputs.exit_code }}" = '0'
