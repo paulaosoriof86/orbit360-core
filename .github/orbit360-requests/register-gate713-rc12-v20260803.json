@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "orbit360-register-gate713-rc12-request-v1",
+  "status": "AUTHORIZED_SOURCE_ONLY",
+  "authorizedAt": "2026-08-03T22:40:00-06:00",
+  "gateId": "block7.13-rc12-membership-rootcause-cumulative-closure-v20260803",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "secrets": false,
+  "firestoreRead": false,
+  "writes": false,
+  "deploy": false,
+  "production": false,
+  "consumed": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
