@@ -90,9 +90,9 @@ jobs:
       - name: Resolver identidad de servicio existente
         shell: bash
         env:
-          SA_ORBIT360_LAB: ${{ secrets.SA_ORBIT360_LAB }}
-          SA_ORBIT_360_LAB: ${{ secrets.SA_ORBIT_360_LAB }}
-          SA_DEFAULT: ${{ secrets.SA_DEFAULT }}
+          SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+          SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
         run: |
           set -euo pipefail
           SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-${SA_ORBIT_360_LAB:-${SA_DEFAULT:-}}}"
