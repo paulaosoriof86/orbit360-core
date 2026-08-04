@@ -1,0 +1,189 @@
+name: Orbit 360 · Gravicentra Insurance RC1 · predeploy read-only
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-requests/gravicentra-insurance-rc1-predeploy-readonly-v20260803.json'
+
+permissions:
+  contents: read
+  statuses: write
+
+concurrency:
+  group: orbit360-gravicentra-insurance-rc1-predeploy-readonly-v20260803
+  cancel-in-progress: false
+
+env:
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  ORBIT360_GATE_ID: block7-canonical-runtime-cumulative-visual-lab-v20260801
+  ORBIT360_REQUEST_FILE: .github/orbit360-requests/gravicentra-insurance-rc1-predeploy-readonly-v20260803.json
+  ORBIT360_RELEASE_BRANCH: release/gravicentra-insurance-rc1-20260803
+  ORBIT360_RELEASE_COMMIT: 27cb7dfcda8568280ebef15993a953364304f29b
+  ORBIT360_BASELINE_PRODUCT_HEAD: 267f7231b46d65b80c167f54567a67503b6a6793
+  ORBIT360_PROJECT_ID: ays-orbit-360-lab
+  ORBIT360_TENANT_ID: alianzas-soluciones
+  ORBIT360_LIVE_URL: https://ays-orbit-360-lab.web.app
+  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+  STATUS_CONTEXT: orbit360/gravicentra-rc1-predeploy-readonly
+
+jobs:
+  predeploy:
+    name: Proyecto · Hosting · datos · flags · backup/rollback
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Checkout del request exacto
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Preparar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verificar autorización inmutable antes de capacidades
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          test -f "$ORBIT360_REQUEST_FILE"
+          test "$(git rev-parse HEAD^)" = "$(jq -r '.parentHead' "$ORBIT360_REQUEST_FILE")"
+          mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
+          test "${#CHANGED[@]}" = '1'
+          test "${CHANGED[0]}" = "$ORBIT360_REQUEST_FILE"
+          jq -e --arg branch "$ORBIT360_BRANCH" --arg releaseBranch "$ORBIT360_RELEASE_BRANCH" --arg releaseCommit "$ORBIT360_RELEASE_COMMIT" --arg project "$ORBIT360_PROJECT_ID" --arg tenant "$ORBIT360_TENANT_ID" --arg url "$ORBIT360_LIVE_URL" '
+            .schemaVersion=="orbit360-gravicentra-insurance-rc1-predeploy-readonly-request-v1" and
+            .status=="AUTHORIZED_SINGLE_EXECUTION" and
+            .approved==true and
+            .allowedExecutions==1 and
+            .consumed==false and
+            .branch==$branch and
+            .pullRequest==5 and
+            .releaseBranch==$releaseBranch and
+            .releaseCommit==$releaseCommit and
+            .projectId==$project and
+            .tenantId==$tenant and
+            .liveUrl==$url and
+            .scope.firestoreRead==true and
+            .scope.hostingRead==true and
+            .scope.publicAssetRead==true and
+            .scope.writes==false and
+            .scope.reimport==false and
+            .scope.deploy==false and
+            .scope.functions==false and
+            .scope.rules==false and
+            .scope.productionWrites==false and
+            .scope.main==false and
+            .scope.merge==false and
+            .requiredDecision==["GO_FULL","GO_LIMITED_SCOPE","NO_GO"]
+          ' "$ORBIT360_REQUEST_FILE" >/dev/null
+
+      - name: Contrato vigente antes de secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
+          jq -e '.status=="GO_GATE_CONTRACT" and .failed==0 and .writeAuthorized==false and .deployAuthorized==false and .productionAuthorized==false and .operationalWrites==0 and .secretAccess==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+
+      - name: Verificar sello RC1 y delta de producto permitido
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --no-tags origin "$ORBIT360_RELEASE_BRANCH"
+          test "$(git rev-parse FETCH_HEAD)" = "$ORBIT360_RELEASE_COMMIT"
+          git cat-file -e "$ORBIT360_RELEASE_COMMIT^{commit}"
+          mapfile -t PRODUCT_DIFF < <(git diff --name-only "$ORBIT360_BASELINE_PRODUCT_HEAD".."$ORBIT360_RELEASE_COMMIT" -- \
+            orbit360-platform/index.html \
+            orbit360-platform/core \
+            orbit360-platform/modules \
+            orbit360-platform/styles \
+            orbit360-platform/data)
+          test "${#PRODUCT_DIFF[@]}" = '1'
+          test "${PRODUCT_DIFF[0]}" = 'orbit360-platform/styles/base.css'
+          RC1_ROOT="$RUNNER_TEMP/gravicentra-insurance-rc1"
+          git worktree add --detach "$RC1_ROOT" "$ORBIT360_RELEASE_COMMIT"
+          echo "ORBIT360_RC1_ROOT=$RC1_ROOT" >> "$GITHUB_ENV"
+          test -f "$RC1_ROOT/orbit360-platform/index.html"
+          test -f "$RC1_ROOT/firebase.json"
+          test -f "$RC1_ROOT/firebase.product-rollback-safe.json"
+          node --check tools/orbit360-gravicentra-rc1-predeploy-probe-v20260803.mjs
+          jq -n \
+            --arg releaseBranch "$ORBIT360_RELEASE_BRANCH" \
+            --arg releaseCommit "$ORBIT360_RELEASE_COMMIT" \
+            --arg baseline "$ORBIT360_BASELINE_PRODUCT_HEAD" \
+            --arg changed "${PRODUCT_DIFF[0]}" \
+            '{ok:true,status:"RC1_SOURCE_SEAL_PASS",releaseBranch:$releaseBranch,releaseCommit:$releaseCommit,baselineProductHead:$baseline,productChangedFiles:[$changed],productDeltaAllowed:true,writes:0,deploy:false,containsPII:false,containsSecrets:false}' \
+            > "$EVIDENCE_DIR/gravicentra-rc1-source-seal.json"
+
+      - name: Instalar dependencias después del contrato
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false --ignore-scripts firebase-admin@13 google-auth-library@9 >/dev/null
+
+      - name: Resolver identidad de servicio existente
+        env:
+          SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+          SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-${SA_ORBIT_360_LAB:-${SA_DEFAULT:-}}}"
+          test -n "$SERVICE_ACCOUNT"
+          KEY_FILE="$RUNNER_TEMP/gravicentra-rc1-predeploy-service-account.json"
+          printf '%s' "$SERVICE_ACCOUNT" > "$KEY_FILE"
+          chmod 600 "$KEY_FILE"
+          test "$(jq -r '.project_id // empty' "$KEY_FILE")" = "$ORBIT360_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
+          echo "ORBIT360_TEMP_KEY_FILE=$KEY_FILE" >> "$GITHUB_ENV"
+
+      - name: Ejecutar predeploy read-only acumulativo
+        id: probe
+        shell: bash
+        run: |
+          set -o pipefail
+          node tools/orbit360-gravicentra-rc1-predeploy-probe-v20260803.mjs
+          jq -e '.decision=="GO_FULL" or .decision=="GO_LIMITED_SCOPE" or .decision=="NO_GO"' "$EVIDENCE_DIR/gravicentra-rc1-predeploy-readonly.json" >/dev/null
+
+      - name: Publicar estado observable
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          SUMMARY: orbit360-platform/runtime-gate-crm-v20260716/gravicentra-rc1-predeploy-readonly.json
+        with:
+          script: |
+            const fs=require('fs');
+            let state='failure',description='RC1 predeploy sin cierre observable';
+            try{
+              const s=JSON.parse(fs.readFileSync(process.env.SUMMARY,'utf8'));
+              if(s.decision==='GO_FULL'){state='success';description='Gravicentra Insurance RC1 predeploy GO_FULL';}
+              else if(s.decision==='GO_LIMITED_SCOPE'){state='success';description='Gravicentra Insurance RC1 predeploy GO_LIMITED_SCOPE';}
+              else {description=`Gravicentra Insurance RC1 predeploy NO_GO: ${s.classification||'unknown'}`;}
+            }catch(e){}
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:process.env.STATUS_CONTEXT,description:description.slice(0,140),target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
+
+      - name: Subir evidencia sanitizada
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-insurance-rc1-predeploy-readonly-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/gravicentra-rc1-source-seal.json
+            orbit360-platform/runtime-gate-crm-v20260716/gravicentra-rc1-predeploy-readonly.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Limpiar temporales
+        if: always()
+        shell: bash
+        run: |
+          if [ -n "${ORBIT360_TEMP_KEY_FILE:-}" ] && [ -f "$ORBIT360_TEMP_KEY_FILE" ]; then shred -u "$ORBIT360_TEMP_KEY_FILE" || rm -f "$ORBIT360_TEMP_KEY_FILE"; fi
+          if [ -n "${ORBIT360_RC1_ROOT:-}" ] && [ -d "$ORBIT360_RC1_ROOT" ]; then git worktree remove --force "$ORBIT360_RC1_ROOT" || true; fi
