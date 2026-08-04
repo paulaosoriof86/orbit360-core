@@ -1,0 +1,67 @@
+{
+  "schemaVersion": "orbit360-rc12-nominal-roster-retirement-v1",
+  "generatedAt": "2026-08-04T08:23:00-06:00",
+  "repository": "paulaosoriof86/orbit360-core",
+  "requiredBranch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "classification": [
+    "TEMPORAL_RETIRO",
+    "TENANT_AYS_ONLY",
+    "FUNCTIONAL_DEFECT",
+    "DATA_CONTRACT_FAILURE"
+  ],
+  "status": "RETIRED_DO_NOT_EXECUTE_AS_PRODUCT_ONBOARDING",
+  "retiredPatterns": [
+    "selection by person name",
+    "selection by fixed email digest",
+    "fixed three-profile roster as access solution",
+    "release script as substitute for product onboarding",
+    "membership creation without a generic administration workflow"
+  ],
+  "productContract": {
+    "source": "Equipo or another authorized tenant administration surface",
+    "identityMatch": "normalized validated email and optional existing uid",
+    "authorization": "active tenant membership with administration permission",
+    "protectedExecutor": "Admin SDK service outside the browser",
+    "operations": [
+      "create_or_link_auth_identity",
+      "create_or_update_membership",
+      "link_existing_advisor",
+      "send_secure_password_setup",
+      "deactivate",
+      "reactivate",
+      "change_roles_scopes_with_reason"
+    ],
+    "states": [
+      "pending",
+      "provisioning",
+      "invited",
+      "active",
+      "blocked",
+      "error"
+    ],
+    "rollback": "exact and auditable",
+    "passwordPolicy": "no temporary password generation or display"
+  },
+  "prohibited": {
+    "namesInGenericCode": true,
+    "emailsInGenericCode": true,
+    "tenantSpecificRolesInGenericCode": true,
+    "browserAdminSdk": true,
+    "silentDirectionProjection": true
+  },
+  "historicalArtifacts": {
+    "preserveAsEvidence": true,
+    "replayAllowed": false,
+    "promotionAllowed": false
+  },
+  "deployExecuted": false,
+  "productionTouched": false,
+  "rulesChanged": false,
+  "functionsChanged": false,
+  "reimportExecuted": false,
+  "mainTouched": false,
+  "mergeExecuted": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
