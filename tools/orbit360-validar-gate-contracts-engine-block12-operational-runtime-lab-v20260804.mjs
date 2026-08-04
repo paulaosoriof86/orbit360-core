@@ -6,9 +6,9 @@ import { execFileSync } from 'node:child_process';
 
 const ROOT = process.cwd();
 const GATE = 'block12-operational-runtime-lab-v20260804';
-const VERSION = '12.0.7';
+const VERSION = '12.0.8';
 const LIFECYCLE = 'tools/orbit360-validator-lifecycle-contract-block12-operational-runtime-lab-v20260804.json';
-const REQUEST = process.env.ORBIT360_REQUEST_FILE || '.github/orbit360-requests/block12-operational-runtime-lab-rootfix8-v20260804.json';
+const REQUEST = process.env.ORBIT360_REQUEST_FILE || '.github/orbit360-requests/block12-operational-runtime-lab-rootfix9-v20260804.json';
 const OUT = path.join(ROOT, 'orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json');
 const REQUIRED = [
   LIFECYCLE,
@@ -22,7 +22,7 @@ const REQUIRED = [
   'orbit360-platform/core/backend-lab-init.js',
   'orbit360-platform/core/runtime-verification-center-v20260804.js',
   'tools/orbit360-block12-operational-runtime-lab-v20260804.mjs',
-  '.github/workflows/orbit360-block12-operational-runtime-lab-rootfix8-v20260804.yml',
+  '.github/workflows/orbit360-block12-operational-runtime-lab-rootfix9-v20260804.yml',
   'orbit360-platform/core/backend-lab-loader.js',
   'orbit360-platform/index.html',
   'functions/package-lock.json',
@@ -50,7 +50,7 @@ try {
   const scope = lifecycle.scope || {};
   const forbidden = lifecycle.forbidden || {};
   add('GATE_ID_VERSION', process.argv[2] === GATE && lifecycle.gateId === GATE && lifecycle.gateContractVersion === VERSION);
-  add('LIFECYCLE_ACTIVE', lifecycle.status === 'OPERATIONAL_RUNTIME_LAB_SYNTHETIC_LOADER_MATERIALIZER_ROOTFIX_READY' && lifecycle.singleGate === true && lifecycle.macroClosure === true);
+  add('LIFECYCLE_ACTIVE', lifecycle.status === 'OPERATIONAL_RUNTIME_LAB_FUNCTIONS_SDK_ROOTFIX_READY' && lifecycle.singleGate === true && lifecycle.macroClosure === true);
   add('CAPABILITIES_EXACT', lifecycle.executionProfile.phase === 'OPERATIONAL_RUNTIME_LAB_EXECUTION' && capabilities.secrets === true && capabilities.firestoreRead === true && capabilities.writes === true && capabilities.runtime === true && capabilities.browser === true && capabilities.deploy === true && capabilities.functionsDeploy === true && capabilities.rulesDeploy === false && capabilities.production === false);
   add('REQUEST_ACTIVE', request.schemaVersion === 'orbit360-block12-operational-runtime-lab-rootfix8-request-v1' && request.status === 'AUTHORIZED_AFTER_MATERIALIZER_SAFE_SYNTHETIC_LOADER_ROOTFIX' && request.approved === true && request.allowedExecutions === 1 && request.consumed === false && request.replayAllowed === false && request.retryAuthorized === true && request.previousRuntimeRunId === 30959959221 && request.previousRuntimeStatus === 'failure' && request.previousFailureClassification === 'DATA_CONTRACT_FAILURE' && request.previousFailureCode === 'SYNTHETIC_TENANT_BLOCKED_BY_LAB_LOADER_ALLOWLIST' && request.previousStaticRunId === 30960388102 && request.previousStaticFailureClassification === 'PIPELINE_MECHANISM_FAILURE' && request.previousStaticFailureCode === 'STRING_REPLACEMENT_DOLLAR_APOSTROPHE_CORRUPTED_ENGINE' && request.previousStaticRunStoppedBeforeGate === true && request.previousBootstrapState === 'sdk-not-ready' && request.previousFirebasePresent === false && request.previousRuntimeCenterPresent === true && request.previousScenariosPassed === 0 && request.previousScenariosFailed === 0 && request.previousRollbackExact === true && request.previousRealTenantUnchanged === true && request.browserHarnessRootfixHead === 'ae3f55968948c18f1c6ae40fdce93ee6552890d0' && request.dependencyValidationRunId === 30950155722 && request.dependencyValidationStatus === 'FUNCTIONS_BOOTSTRAP_LOAD_PASS' && request.authorizationRef === lifecycle.authorization.source);
   add('REQUEST_BINDING', request.branch === scope.branch && request.pullRequest === scope.pullRequest && request.projectId === scope.projectId && request.gateId === GATE && request.contractVersion === VERSION && request.parentHead === git(['rev-parse', 'HEAD^^']));
@@ -59,15 +59,16 @@ try {
   add('HOSTING_BOUNDARY', request.scope.hostingPreviewOnly === true && request.scope.hostingChannel === scope.hostingChannel && request.scope.productionHosting === false);
   add('FORBIDDEN_BOUNDARY', forbidden.rulesDeploy === true && forbidden.realTenantWrites === true && forbidden.realDataReimport === true && forbidden.production === true && forbidden.main === true && forbidden.merge === true && request.scope.rules === false && request.scope.production === false && request.scope.main === false && request.scope.merge === false);
   add('EVIDENCE_AND_ROLLBACK', scope.snapshotBeforeAfter === true && scope.rollbackSyntheticTenant === true && scope.rollbackSyntheticAuth === true && scope.rollbackVerdictSeparatedFromRuntimeVerdict === true && scope.inPlatformVerificationCenter === true && scope.autoRunSupported === true && scope.sanitizedEvidence === true && scope.cumulativeVisualCandidate === true);
-  const rootfixWorkflow = readText('.github/workflows/orbit360-block12-operational-runtime-lab-rootfix8-v20260804.yml');
+  const rootfixWorkflow = readText('.github/workflows/orbit360-block12-operational-runtime-lab-rootfix9-v20260804.yml');
   add('DEPLOY_PIPELINE_ROOTFIX', scope.artifactCleanupPolicyAutomatic === true && scope.postDeployFunctionVerificationRequired === true && rootfixWorkflow.includes('firebase deploy') && rootfixWorkflow.includes('--force') && rootfixWorkflow.includes('FUNCTIONS_VERIFIED_4_OF_4') && rootfixWorkflow.includes('rollback.exact == true') && rootfixWorkflow.includes('realTenant.unchanged == true'));
   const harness = readText('tools/orbit360-block12-operational-runtime-lab-v20260804.mjs');
   add('BROWSER_HARNESS_ROOTFIX', scope.browserBootstrapDiagnosticsRequired === true && scope.browserCloseFinallyRequired === true && scope.callTimeoutRequired === true && scope.hardProcessTimeoutRequired === true && harness.includes("schemaVersion: 'orbit360-block12-browser-v2'") && harness.includes('BROWSER_PHASE_ERROR') && harness.includes('if (browser) await browser.close().catch') && readText('orbit360-platform/core/runtime-verification-center-v20260804.js').includes('withTimeout') && rootfixWorkflow.includes('timeout --signal=TERM --kill-after=15s 420s'));
   const loader = readText('orbit360-platform/core/backend-lab-loader.js');
   const index = readText('orbit360-platform/index.html');
-  add('SYNTHETIC_LOADER_CONTRACT', scope.syntheticTenantPattern === '^verify-block12-[0-9]+$' && scope.syntheticTenantAllowedOnlyOnOperationalPreview === true && scope.syntheticTenantRequiresVerificationMode === true && loader.includes('isOperationalVerificationPreviewHost') && loader.includes('isSyntheticVerificationTenant') && loader.includes('/^verify-block12-[0-9]+$/') && loader.includes('if (isSyntheticVerificationTenant) allowedTenants.push(requestedTenant)') && index.includes('backend-lab-loader.js?v=20260804-operational-rootfix8'));
+  add('SYNTHETIC_LOADER_CONTRACT', scope.syntheticTenantPattern === '^verify-block12-[0-9]+$' && scope.syntheticTenantAllowedOnlyOnOperationalPreview === true && scope.syntheticTenantRequiresVerificationMode === true && loader.includes('isOperationalVerificationPreviewHost') && loader.includes('isSyntheticVerificationTenant') && loader.includes('/^verify-block12-[0-9]+$/') && loader.includes('if (isSyntheticVerificationTenant) allowedTenants.push(requestedTenant)') && index.includes('backend-lab-loader.js?v=20260804-operational-rootfix9'));
   const loaderMaterializer = readText('tools/orbit360-materializar-block12-synthetic-loader-rootfix-v20260804.mjs');
   add('MATERIALIZER_REPLACEMENT_SAFE', scope.materializerUsesFunctionReplacement === true && scope.engineSyntaxPassRequired === true && loaderMaterializer.includes('return source.replace(before, () => after);'));
+  add('FUNCTIONS_SDK_CONTRACT', scope.firebaseFunctionsCompatSdkRequired === true && scope.callableSdkReadinessRequired === true && loader.includes('firebase-functions-compat.js') && center.includes("typeof firebase.functions !== 'function'") && rootfixWorkflow.includes('callableSdkReady'));
   const dependencyEvidence = readJson('orbit360-platform/runtime-gate-crm-v20260716/functions-dependency-rootfix-source-v20260804.json');
   add('FUNCTIONS_DEPENDENCY_PASS', scope.functionsPackageLockRequired === true && scope.functionsBootstrapLoadPassRequired === true && dependencyEvidence.status === 'FUNCTIONS_BOOTSTRAP_LOAD_PASS' && dependencyEvidence.classification === 'GO_SOURCE_REPRODUCIBLE_FUNCTIONS_RUNTIME' && dependencyEvidence.requiredFunctionExports === true && dependencyEvidence.broadV2AggregatorLoaded === false && dependencyEvidence.unusedDatabaseProviderLoaded === false && dependencyEvidence.lockfileVersion >= 3 && dependencyEvidence.ok === true);
   add('REQUIRED_FILES', REQUIRED.every(exists), REQUIRED.filter(rel => !exists(rel)).join(','));

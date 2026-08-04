@@ -1,5 +1,5 @@
 /* ============================================================
-   Orbit 360 - Backend LAB loader v1.113
+   Orbit 360 - Backend LAB loader v1.114
    Loads Firebase SDK for the canonical A&S Hosting site and for
    authorized preview channels. Any direct canonical access is
    normalized before the prototype can fall back to demo data.
@@ -71,7 +71,7 @@
     tenantId: requestedTenant,
     tenant: requestedTenant,
     loader: 'core/backend-lab-loader.js',
-    loaderVersion: 'v1.113-synthetic-verification-fail-closed',
+    loaderVersion: 'v1.114-callable-sdk-fail-closed',
     runtimeVersion: LAB_RUNTIME,
     canonicalHost: isCanonicalLabHost,
     operationalVerificationPreview: isOperationalVerificationPreviewHost,
@@ -95,6 +95,7 @@
     write('https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js');
     write('https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js');
     write('https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js');
+    write('https://www.gstatic.com/firebasejs/9.23.0/firebase-functions-compat.js');
     write(configSource);
     window.OrbitBackend.firebaseLoader = 'requested';
   } catch(e) {

@@ -53,7 +53,7 @@ const GATE_CONFIG=Object.freeze({
   "block9-receipts-portfolio-static-v20260730":{contractVersion:"9.1.0",lifecycle:"tools/orbit360-validator-lifecycle-contract-receipts-portfolio-static-v910-20260730.json",engine:"tools/orbit360-validar-gate-contracts-engine-receipts-portfolio-static-v910-20260730.mjs"},
   "block10.9-cobros-controlled-write-lab-v20260801":{contractVersion:"10.9.0",lifecycle:"tools/orbit360-validator-lifecycle-contract-cobros-controlled-write-lab-v20260801.json",engine:"tools/orbit360-validar-gate-contracts-engine-cobros-controlled-write-preflight-v20260801.mjs"},
   "block11-planillas-comisiones-linkage-readonly-v20260801":{contractVersion:"11.0.0",lifecycle:"tools/orbit360-validator-lifecycle-contract-planillas-comisiones-linkage-readonly-v20260801.json",engine:"tools/orbit360-validar-gate-contracts-engine-planillas-comisiones-linkage-readonly-v20260801.mjs"},
-  "block12-operational-runtime-lab-v20260804":{contractVersion:"12.0.7",lifecycle:"tools/orbit360-validator-lifecycle-contract-block12-operational-runtime-lab-v20260804.json",engine:"tools/orbit360-validar-gate-contracts-engine-block12-operational-runtime-lab-v20260804.mjs"},
+  "block12-operational-runtime-lab-v20260804":{contractVersion:"12.0.8",lifecycle:"tools/orbit360-validator-lifecycle-contract-block12-operational-runtime-lab-v20260804.json",engine:"tools/orbit360-validar-gate-contracts-engine-block12-operational-runtime-lab-v20260804.mjs"},
   "block12-runtime-hang-rescue-lab-v20260804":{contractVersion:"12.0.4",lifecycle:"tools/orbit360-validator-lifecycle-contract-block12-runtime-hang-rescue-lab-v20260804.json",engine:"tools/orbit360-validar-gate-contracts-engine-block12-runtime-hang-rescue-lab-v20260804.mjs"}
 });
 const PHASE_PROFILES=Object.freeze({

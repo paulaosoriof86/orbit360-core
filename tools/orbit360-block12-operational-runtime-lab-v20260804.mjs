@@ -138,6 +138,7 @@ async function browserPhase() {
         readyState: document.readyState,
         hasFirebase: !!window.firebase,
         firebaseApps: window.firebase && Array.isArray(firebase.apps) ? firebase.apps.length : -1,
+        callableSdkReady: !!(window.firebase && typeof firebase.functions === 'function'),
         hasOrbit: !!window.Orbit,
         hasRuntimeVerification: !!(window.Orbit && Orbit.runtimeVerification),
         backendMode: window.OrbitBackend && OrbitBackend.mode || '',
@@ -167,6 +168,8 @@ async function browserPhase() {
     if (!['initialized', 'already-initialized'].includes(backendState.firebaseInit)) throw new Error(`ENVIRONMENT_FAILURE:FIREBASE_INIT_${backendState.firebaseInit || "UNKNOWN"}:${backendState.firebaseInitError || ""}`);
     await page.waitForFunction(() => window.firebase && Array.isArray(firebase.apps) && firebase.apps.length > 0, null, { timeout: 30000 });
     mark('FIREBASE_APP_READY', await diagnostics());
+    await page.waitForFunction(() => window.firebase && typeof firebase.functions === 'function', null, { timeout: 30000 });
+    mark('CALLABLE_SDK_READY', await diagnostics());
     try {
       await page.waitForFunction(() => window.Orbit && Orbit.runtimeVerification, null, { timeout: 20000 });
     } catch (error) {
