@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "orbit360-rootfix-final-writer-gate714-request-v1",
+  "status": "AUTHORIZED_SOURCE_ONLY_AFTER_NO_WRITE",
+  "authorizedAt": "2026-08-04T01:24:00-06:00",
+  "failedRun": 30887559372,
+  "failedJob": 91922023880,
+  "classification": "PIPELINE_MECHANISM_FAILURE",
+  "rootCause": "jq_argument_name_mismatch_productionMaintained",
+  "substantiveDecision": "RC12_NORMAL_USERS_MISSING_NO_WRITE",
+  "secrets": false,
+  "firestoreRead": false,
+  "authRead": false,
+  "writes": false,
+  "browser": false,
+  "deploy": false,
+  "production": false,
+  "consumed": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
