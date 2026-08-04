@@ -1,0 +1,82 @@
+name: Gravicentra Insurance RC1.2 · apply membership auth source
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-requests/rc12-membership-auth-source-run-v20260803.json'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: orbit360-rc12-membership-auth-source-run-v20260803
+  cancel-in-progress: false
+
+jobs:
+  apply_source:
+    name: RC1.2 · aplicar owners de autenticación por membresía
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - name: Checkout request exacto
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Preparar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Contrato pre-risk
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = 'ays/backend-tenant-lab-v99-20260703'
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          test -f .github/orbit360-requests/rc12-membership-auth-source-run-v20260803.json
+          jq -e '.status=="AUTHORIZED_SOURCE_ONLY" and .scope.sourceOnly==true and .scope.firestoreRead==false and .scope.firestoreWrites==false and .scope.authWrites==false and .scope.deploy==false and .scope.rules==false and .scope.functions==false and .scope.main==false and .scope.merge==false' .github/orbit360-requests/rc12-membership-auth-source-run-v20260803.json >/dev/null
+
+      - name: Checkout candidata RC1.2
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --no-tags origin release/gravicentra-insurance-rc1-2-membership-auth-20260803
+          git switch -C release/gravicentra-insurance-rc1-2-membership-auth-20260803 FETCH_HEAD
+          test "$(git merge-base HEAD 1eb7daea580c0807d867a663086defc021435993)" = '1eb7daea580c0807d867a663086defc021435993'
+          node --check tools/orbit360-apply-rc12-membership-auth-v20260803.mjs
+
+      - name: Aplicar root fix source-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-apply-rc12-membership-auth-v20260803.mjs
+          node --check orbit360-platform/core/backend-lab-auth-guard.js
+          node --check orbit360-platform/core/auth.js
+          node --check orbit360-platform/data/store-firestore-lab.local.js
+          jq -e '.status=="PASS" and .classification=="GO_STATIC_MEMBERSHIP_AUTH_SOURCE" and .firestoreRead==false and .firestoreWrites==0 and .authWrites==0 and .deployExecuted==false and .productionTouched==false' orbit360-platform/runtime-gate-crm-v20260716/rc12-membership-auth-source.json >/dev/null
+          git diff --check
+
+      - name: Exigir delta exacto de owners
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t FILES < <(git diff --name-only)
+          test "${#FILES[@]}" = '3'
+          printf '%s\n' "${FILES[@]}" | grep -Fx 'orbit360-platform/core/auth.js'
+          printf '%s\n' "${FILES[@]}" | grep -Fx 'orbit360-platform/data/store-firestore-lab.local.js'
+          printf '%s\n' "${FILES[@]}" | grep -Fx 'orbit360-platform/runtime-gate-crm-v20260716/rc12-membership-auth-source.json'
+          test -z "$(git diff --name-only -- firestore.rules orbit360-platform/core/backend-lab-init.js orbit360-platform/core/access-role-session-owner-v20260728.js)"
+
+      - name: Commit y push RC1.2
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add orbit360-platform/core/auth.js orbit360-platform/data/store-firestore-lab.local.js orbit360-platform/runtime-gate-crm-v20260716/rc12-membership-auth-source.json
+          git commit -m 'auth: habilitar acceso por membresía activa del tenant'
+          git push origin HEAD:release/gravicentra-insurance-rc1-2-membership-auth-20260803
