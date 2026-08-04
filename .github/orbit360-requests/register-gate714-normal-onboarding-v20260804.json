@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "orbit360-register-gate714-request-v1",
+  "status": "AUTHORIZED_SOURCE_ONLY",
+  "authorizedAt": "2026-08-04T01:07:00-06:00",
+  "candidate": "b699ba329960cd830121b57452ce558399aa84fb",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "secrets": false,
+  "firestoreRead": false,
+  "authRead": false,
+  "writes": false,
+  "browser": false,
+  "deploy": false,
+  "production": false,
+  "consumed": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
