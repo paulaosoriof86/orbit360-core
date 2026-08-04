@@ -1,8 +1,9 @@
 /* ============================================================
-   Orbit 360 - Backend LAB Firebase init v1.122
+   Orbit 360 - Backend LAB Firebase init v1.123
    Inicializa Firebase solo en ?orbitBackend=firestore-lab.
    Declara el read model canónico sellado y mantiene un único owner
    de lectura: Orbit.store. No expone secretos ni crea renderers.
+   Carga el adaptador genérico de onboarding y lo integra con Equipo.
    ============================================================ */
 (function(){
   'use strict';
@@ -18,13 +19,15 @@
     tenantId: tenant,
     tenant: tenant,
     firebaseInit: 'pending',
-    firebaseInitVersion: 'v1.122',
+    firebaseInitVersion: 'v1.123-user-onboarding-source',
+    functionsRegion: (window.OrbitBackend && window.OrbitBackend.functionsRegion) || 'us-central1',
     canonicalSnapshotDigest: '19e1927d39f6b713ee12504f8762bc42ead9de6e365bb0f12162d2a0c8f8469b',
     featureFlags: Object.assign({}, window.OrbitBackend && window.OrbitBackend.featureFlags || {}, {
       aseguradorasKnowledgeAutoMount: false,
       canonicalReadModelV79: true,
       canonicalStoreSingleOwner: true,
-      canonicalSeedExclusion: true
+      canonicalSeedExclusion: true,
+      genericTeamOnboardingSource: true
     })
   });
 
@@ -47,6 +50,18 @@
     };
     document.head.appendChild(script);
   }
+
+  function loadTeamOnboarding() {
+    loadScriptOnce('core/user-onboarding.js?v=20260804-1', 'user-onboarding-core', function(){
+      var mountBridge = function(){
+        loadScriptOnce('modules/equipo-onboarding-v20260804-bridge.js?v=20260804-1', 'equipo-onboarding-bridge');
+      };
+      if (document.readyState === 'complete') setTimeout(mountBridge, 0);
+      else window.addEventListener('load', mountBridge, { once: true });
+    });
+  }
+
+  loadTeamOnboarding();
 
   if (tenant === 'alianzas-soluciones') {
     window.__orbitAysKnowledgeRuntimePromise = Promise.resolve({
