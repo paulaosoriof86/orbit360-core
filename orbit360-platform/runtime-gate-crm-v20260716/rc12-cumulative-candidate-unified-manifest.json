@@ -98,20 +98,20 @@
   },
   "approvedRoster": {
     "direction": {
-      "person": "Paula Osorio",
-      "email": "finanzasyadmin@aysseguros.com",
+      "personRef": "Paula Osorio",
+      "emailSha256": "9b663847979724e9491e1c655da32a7cb17a5f6ed26dba352de1eb811254b23f",
       "roles": ["SuperAdmin", "AdminTenant", "Asesor", "Operativo"],
       "defaultRole": "SuperAdmin"
     },
     "operations": {
-      "person": "Carlos Castro",
-      "email": "carlos.castro@aysseguros.com",
+      "personRef": "Carlos Castro",
+      "emailSha256": "f5d0c3103d4530ff47241e7b74efa3cbc823621fa6d5d10eb9412d3a0b172608",
       "roles": ["Operativo", "Asesor"],
       "defaultRole": "Operativo"
     },
     "advisor": {
-      "person": "Samuel Daza",
-      "email": "samuel.daza@aysseguros.com",
+      "personRef": "Samuel Daza",
+      "emailSha256": "e7b27df0137e9b87b1e7301a1ca85621b74bccb32f0171bfc9b2f580fedcf3d2",
       "roles": ["Asesor", "Operativo"],
       "defaultRole": "Asesor",
       "advisorIdSource": "existing canonical advisor record"
@@ -129,6 +129,7 @@
     "gate711Repeated": false
   },
   "nextBoundary": "controlled Auth provisioning for approved roster, then exactly three memberships, Gate 7.13, Hosting-only deploy and three-profile smoke",
+  "containsPII": false,
   "containsSecrets": false,
   "containsCredentials": false
 }
