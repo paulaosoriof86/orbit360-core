@@ -2,29 +2,33 @@
   "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
   "validatorLifecycleRevision": "phase-capability-contract-v1",
   "gateId": "block12-runtime-hang-rescue-lab-v20260804",
-  "gateContractVersion": "12.0.3",
-  "status": "RUNTIME_HANG_RESCUE_LAB_AUTHORIZED",
+  "gateContractVersion": "12.0.4",
+  "status": "RUNTIME_HANG_RESCUE_LAB_ROOTFIX_READY",
   "singleGate": true,
   "executionProfile": {
-    "phase": "RUNTIME_HANG_RESCUE_LAB",
+    "phase": "RUNTIME_HANG_RESCUE_LAB_EXECUTION",
     "capabilities": {
       "secrets": true,
       "firestoreRead": true,
       "writes": true,
-      "authWrites": true,
-      "deployDelete": true,
       "runtime": false,
       "browser": false,
+      "deploy": true,
+      "functionsDeploy": true,
       "rulesDeploy": false,
       "production": false
     }
   },
   "authorization": {
-    "source": "user_continue_urgent_block12_runtime_hang_rescue_20260804T1708-0600",
+    "source": "user_continue_urgent_block12_runtime_hang_rescue_rootfix_20260804T1714-0600",
     "allowedExecutions": 1,
     "consumed": false,
     "replayAllowed": false,
-    "request": ".github/orbit360-requests/block12-runtime-hang-rescue-lab-v20260804.json"
+    "previousRescueRunId": 30959160007,
+    "previousFailureClassification": "VALIDATOR_STALE",
+    "previousFailureCode": "CANONICAL_LIFECYCLE_PHASE_MISMATCH",
+    "previousRescueStoppedBeforeSecrets": true,
+    "request": ".github/orbit360-requests/block12-runtime-hang-rescue-rootfix-lab-v20260804.json"
   },
   "scope": {
     "projectId": "ays-orbit-360-lab",
