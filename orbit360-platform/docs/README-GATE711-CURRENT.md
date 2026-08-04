@@ -1,7 +1,7 @@
 # Gate 7.11 — referencia vigente
 
 Fecha: 2026-08-03  
-Rama: `ays/backend-tenant-lab-v99-20260703`  
+Rama de trabajo: `ays/backend-tenant-lab-v99-20260703`  
 PR: #5 draft/open
 
 ## Estado rector
@@ -16,7 +16,8 @@ GATE711_AUTHORIZATION_CONSUMED_NO_REPLAY
 VISUAL_REVIEW_10_PASS_3_SHARED_SHELL_DEFECT
 SHELL_MOBILE_CANONICAL_FIX_IMPLEMENTED
 SHELL_MOBILE_FOCUSED_LOCAL_VISUAL_PASS
-SHELL_MOBILE_CANONICAL_CI_EVIDENCE_PENDING
+GRAVICENTRA_INSURANCE_RC1_SOURCE_SEALED
+SHELL_MOBILE_REPOSITORY_WORKFLOW_RESERVED_FOR_PREDEPLOY
 CLOUD_CLAUDE_REUSABLE_DELTA_DOCUMENTED_NOT_SENT
 ACADEMIA_IMPACT_DOCUMENTED
 HOSTING_DEPLOY_NOT_EXECUTED
@@ -35,6 +36,22 @@ singleReadOwner: Orbit.store
 ```
 
 No hubo cambios de producto durante el runtime Gate 7.11. Después de la revisión visual se autorizó un único correctivo frontend compartido.
+
+## Gravicentra Insurance RC1 sellada
+
+```text
+releaseBranch: release/gravicentra-insurance-rc1-20260803
+releaseCommit: 27cb7dfcda8568280ebef15993a953364304f29b
+baselineProductHead: 267f7231b46d65b80c167f54567a67503b6a6793
+mobileShellFixCommit: 12a52de72f541cf39aae3556fd52a2d444d57b17
+status: RC1_SOURCE_SEALED / NOT_DEPLOYED / NOT_PRODUCTION
+```
+
+La rama RC1 es inmutable. No recibirá nuevos commits ni parches. Un hallazgo bloqueante posterior exige RC2.
+
+Documento rector de la candidata:
+
+`GRAVICENTRA-INSURANCE-RC1-SEALED-20260803.md`
 
 ## Cierre runtime Gate 7.11
 
@@ -133,7 +150,16 @@ backend/data writes: 0/0
 
 El fix es tenant-neutral, reutilizable y aplicable al prototipo comercializable. No modifica Cliente 360, Pólizas, Leads ni Ops de forma individual.
 
-Validadores y workflow focalizado:
+Evidencia focalizada incorporada a la candidata:
+
+```text
+file: orbit360-platform/docs/evidence/SHELL-MOBILE-RC1-FOCUSED-LOCAL-20260803.json
+result: PASS_FOCUSED_LAYOUT_RC1_SEAL_ALLOWED
+viewport: 390x844
+routesPassed/routesFailed: 3/0
+```
+
+Validadores y workflow de predeploy:
 
 ```text
 tools/orbit360-validar-shell-mobile-rc1-v20260803.mjs
@@ -141,7 +167,7 @@ tools/orbit360-validar-shell-mobile-visual-v20260803.mjs
 .github/workflows/orbit360-shell-mobile-rc1-static-v20260803.yml
 ```
 
-La comprobación local focalizada del layout resultó PASS para las tres rutas a 390×844. Esa evidencia es de apoyo; la promoción a RC1 requiere todavía recuperar el PASS y artefacto del workflow canónico del repositorio.
+El workflow del repositorio permanece como verificación de predeploy. No se utiliza para reabrir desarrollo ni mover la rama RC1.
 
 ## Cloud / Claude / Academia
 
@@ -179,11 +205,12 @@ No corresponde otro Gate 7.11, otra auditoría general ni reimportación.
 ## Próxima frontera única
 
 ```text
-obtener PASS y artefacto del workflow focalizado de shell móvil
-→ sellar nueva candidata acumulativa
-→ declarar GRAVICENTRA_INSURANCE_RC1
-→ preparar predeploy, backup y rollback
+predeploy focalizado sobre releaseCommit 27cb7dfcda8568280ebef15993a953364304f29b
+→ backup y rollback exactos
+→ confirmar proyecto, Hosting y target
 → solicitar una sola autorización explícita de deploy
+→ deploy
+→ smoke productivo focalizado
 ```
 
 Producción, Hosting, main y merge continúan sin autorización.
