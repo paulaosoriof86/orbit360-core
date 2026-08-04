@@ -5,6 +5,7 @@ module.exports = Object.assign(
   require('./user-onboarding'),
   require('./tenant-domain-config'),
   require('./ops-leads-domain'),
+  require('./ops-advisor-inbox'),
   require('./cobros-reconciliation-domain'),
   require('./index'),
   require('./bank-accounts')
