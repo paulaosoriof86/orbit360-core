@@ -1,0 +1,26 @@
+{
+  "schemaVersion": "orbit360-rootfix-evidence-path-gate713-request-v1",
+  "status": "AUTHORIZED_VALIDATOR_ROOTFIX_ONLY",
+  "authorizedAt": "2026-08-03T22:40:00-06:00",
+  "classification": "VALIDATOR_STALE",
+  "secondaryClassification": "PIPELINE_MECHANISM_FAILURE",
+  "failedRuns": [30877460688, 30879185924],
+  "candidate": "b699ba329960cd830121b57452ce558399aa84fb",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "scope": {
+    "sourceRootSeparated": true,
+    "absoluteOutputSupported": true,
+    "isolatedPathProof": true,
+    "productFrozen": true
+  },
+  "secrets": false,
+  "firestoreRead": false,
+  "authRead": false,
+  "writes": false,
+  "browser": false,
+  "deploy": false,
+  "production": false,
+  "consumed": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
