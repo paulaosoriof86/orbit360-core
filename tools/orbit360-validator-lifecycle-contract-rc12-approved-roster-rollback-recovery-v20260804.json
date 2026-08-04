@@ -1,0 +1,86 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
+  "gateId": "block7.15.2-rc12-approved-roster-rollback-recovery-v20260804",
+  "gateContractVersion": "7.15.2",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
+  "status": "RC12_APPROVED_ROSTER_ROLLBACK_RECOVERY_AUTHORIZED",
+  "executionProfile": {
+    "phase": "GRAVICENTRA_RC12_APPROVED_ROSTER_ROLLBACK_RECOVERY",
+    "capabilities": {
+      "secrets": true,
+      "firestoreRead": true,
+      "writes": true,
+      "runtime": false,
+      "browser": false,
+      "deploy": false,
+      "functionsDeploy": false,
+      "rulesDeploy": false,
+      "production": false
+    }
+  },
+  "singleGate": true,
+  "macroClosure": true,
+  "blockOwner": "rollback recovery for Auth users and tenant memberships created by run 30910775651",
+  "authorization": {
+    "requiredForExecution": true,
+    "activeRequest": true,
+    "allowedExecutions": 1,
+    "request": ".github/orbit360-requests/rc12-approved-roster-rollback-recovery-v20260804.json",
+    "replayAllowed": false,
+    "authorizationSource": "user_authorized_rollback_users_memberships_and_hosting_on_any_failure_20260804T0633-0600"
+  },
+  "target": {
+    "projectId": "ays-orbit-360-lab",
+    "tenantId": "alianzas-soluciones"
+  },
+  "incident": {
+    "failedRun": 30910775651,
+    "failedJob": 91996692820,
+    "artifact": 8892990988,
+    "artifactDigest": "sha256:4984ec2d39f8f1647f76dfdbb5d69a8fb849e8ce6d273289193467e0c7148281",
+    "authUsersCreated": 3,
+    "membershipsCreated": 3,
+    "hostingDeployAttempted": false,
+    "gate713Failure": "ABSOLUTE_REQUEST_PATH_JOINED_TO_ROOT",
+    "rollbackFailure": "FIRESTORE_TRANSACTION_READ_AFTER_WRITE"
+  },
+  "rollbackBoundary": {
+    "maximumMembershipDocumentsDeleted": 3,
+    "maximumAuthUsersDeleted": 3,
+    "authUsersCreatedAllowed": 0,
+    "authUsersUpdatedAllowed": 0,
+    "membershipDocumentsCreatedAllowed": 0,
+    "membershipDocumentsUpdatedAllowed": 0,
+    "passwordReadsAllowed": 0,
+    "passwordWritesAllowed": 0,
+    "hostingDeployAllowed": false,
+    "hostingRollbackRequired": false,
+    "exactOnboardingRunId": "30910775651",
+    "exactOnboardingVersion": "rc12-approved-roster-final-v1",
+    "creationWindowStart": "2026-08-04T12:49:45.000Z",
+    "creationWindowEnd": "2026-08-04T12:50:15.000Z",
+    "approvedRosterDigestRequired": true,
+    "technicalIdentityExcluded": true,
+    "preReadAllMembershipsBeforeDelete": true,
+    "idempotentVerificationRequired": true
+  },
+  "guards": {
+    "canonicalGateBeforeSecrets": true,
+    "exactThreeOwnedUsersRequired": true,
+    "exactThreeOwnedMembershipsRequired": true,
+    "noWriteOnAmbiguity": true,
+    "verifyAbsenceAfterDelete": true,
+    "fixGate713AbsolutePathOwner": true,
+    "fixRollbackTransactionOwner": true,
+    "reimportAllowed": false,
+    "firestoreRulesDeployAllowed": false,
+    "functionsDeployAllowed": false,
+    "hostingDeployAllowed": false,
+    "browserAllowed": false,
+    "mainAllowed": false,
+    "mergeAllowed": false,
+    "repeatGate711Allowed": false
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
