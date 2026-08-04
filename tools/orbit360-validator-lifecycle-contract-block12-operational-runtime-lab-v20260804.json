@@ -39,9 +39,13 @@
     "previousRealTenantUnchanged": true,
     "previousFunctionsRetained": false,
     "previousHostingRetained": false,
+    "previousGateRunId": 30961489455,
+    "previousGateFailureClassification": "PIPELINE_MECHANISM_FAILURE",
+    "previousGateFailureCode": "CENTER_TEMPORAL_DEAD_ZONE_IN_FUNCTIONS_SDK_CHECK",
+    "previousGateRunStoppedBeforeSecrets": true,
     "dependencyValidationRunId": 30950155722,
     "dependencyValidationStatus": "FUNCTIONS_BOOTSTRAP_LOAD_PASS",
-    "request": ".github/orbit360-requests/block12-operational-runtime-lab-rootfix9-v20260804.json"
+    "request": ".github/orbit360-requests/block12-operational-runtime-lab-rootfix9-resume-v20260804.json"
   },
   "scope": {
     "projectId": "ays-orbit-360-lab",
