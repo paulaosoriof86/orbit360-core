@@ -15,6 +15,7 @@ function check(name, fn) {
 
 const backend = read('functions/recurring-insurance-import.js');
 const client = read('orbit360-platform/core/recurring-insurance-import-client.js');
+const extractor = read('orbit360-platform/core/recurring-insurance-document-extractor.js');
 const bridge = read('orbit360-platform/modules/importar-recurring-bridge-v20260804.js');
 const claude = read('orbit360-platform/docs/PAQUETE-ACUMULADO-CLAUDE-ORBIT360-20260804-V2.md');
 
@@ -73,9 +74,12 @@ check('cliente no escribe Orbit store', () => {
   assert.match(client, /writesStoreDirectly: false/);
   assert.doesNotMatch(client, /Orbit\.store\.(insert|update|remove)/);
 });
-check('bridge preserva importador existente', () => {
+check('extractor y bridge preservan el store', () => {
+  assert.match(extractor, /writesStore: false/);
+  assert.doesNotMatch(extractor, /Orbit\.store\.(insert|update|remove)/);
   assert.match(bridge, /sin sobrescribir core\/importa\.js/i);
-  assert.match(bridge, /Orbit\.importa\.open/);
+  assert.match(bridge, /Orbit\.recurringDocumentExtractor\.extract/);
+  assert.doesNotMatch(bridge, /Orbit\.store\.(insert|update|remove)/);
 });
 check('paquete Claude es genérico y no depende de datos A&S', () => {
   assert.doesNotMatch(claude, /365|235|128|211|AseGuate|El Roble|La Ceiba|Universales|Mapfre|alianzas-soluciones/i);
