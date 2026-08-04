@@ -1,0 +1,170 @@
+name: Gravicentra Insurance RC1.2 · onboarding normal y cierre
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-requests/rc12-normal-onboarding-close-v20260804.json'
+
+permissions:
+  contents: read
+  statuses: write
+
+concurrency:
+  group: orbit360-rc12-normal-onboarding-close-v20260804
+  cancel-in-progress: false
+
+env:
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  ORBIT360_REQUEST_FILE: .github/orbit360-requests/rc12-normal-onboarding-close-v20260804.json
+  ORBIT360_GATE_ID: block7.14-rc12-normal-onboarding-close-v20260804
+  ORBIT360_RELEASE_BRANCH: release/gravicentra-insurance-rc1-2-membership-auth-20260803
+  ORBIT360_RELEASE_COMMIT: b699ba329960cd830121b57452ce558399aa84fb
+  ORBIT360_BASELINE: 27cb7dfcda8568280ebef15993a953364304f29b
+  ORBIT360_PROJECT_ID: ays-orbit-360-lab
+  ORBIT360_TENANT_ID: alianzas-soluciones
+  ORBIT360_LIVE_URL: https://ays-orbit-360-lab.web.app
+  ORBIT360_EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+  STATUS_CONTEXT: orbit360/rc12-normal-onboarding-close
+
+jobs:
+  close:
+    name: RC1.2 · censo · 3 memberships · Gate 7.13 · Hosting · 3 perfiles
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout request exacto
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Preparar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Verificar autorización, candidata y worktree sin secretos
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          jq -e '.schemaVersion=="orbit360-rc12-normal-onboarding-close-request-v1" and .status=="AUTHORIZED_SINGLE_MACRO" and .approved==true and .allowedExecutions==1 and .consumed==false and .retryAuthorized==false and .branch==env.ORBIT360_BRANCH and .pullRequest==5 and .releaseBranch==env.ORBIT360_RELEASE_BRANCH and .releaseCommit==env.ORBIT360_RELEASE_COMMIT and .baseline==env.ORBIT360_BASELINE and .projectId==env.ORBIT360_PROJECT_ID and .tenantId==env.ORBIT360_TENANT_ID' "$ORBIT360_REQUEST_FILE" >/dev/null
+          git fetch --no-tags origin "$ORBIT360_BRANCH" "$ORBIT360_RELEASE_BRANCH"
+          test "$(git rev-parse origin/$ORBIT360_RELEASE_BRANCH)" = "$ORBIT360_RELEASE_COMMIT"
+          test "$(git merge-base "$ORBIT360_BASELINE" "$ORBIT360_RELEASE_COMMIT")" = "$ORBIT360_BASELINE"
+          RC12_ROOT="$RUNNER_TEMP/gravicentra-insurance-rc12-normal-onboarding"
+          git worktree add --detach "$RC12_ROOT" "$ORBIT360_RELEASE_COMMIT"
+          echo "ORBIT360_RC12_ROOT=$RC12_ROOT" >> "$GITHUB_ENV"
+          echo "ORBIT360_RC1_ROOT=$RC12_ROOT" >> "$GITHUB_ENV"
+          echo "ORBIT360_RC12_PRIVATE_IDENTITIES=$RUNNER_TEMP/gravicentra-rc12-normal-identities.json" >> "$GITHUB_ENV"
+          echo "ORBIT360_NORMAL_ONBOARDING_PRIVATE_PLAN=$RUNNER_TEMP/gravicentra-rc12-normal-onboarding-plan.json" >> "$GITHUB_ENV"
+          echo "ORBIT360_TEMP_KEY_FILE=$RUNNER_TEMP/gravicentra-rc12-normal-onboarding-service-account.json" >> "$GITHUB_ENV"
+          test "$(jq -r '.hosting.public' "$RC12_ROOT/firebase.json")" = 'orbit360-platform'
+
+      - name: Gate 7.14, auditoría acumulativa y Auth antes de secretos
+        shell: bash
+        run: |
+          set -euo pipefail
+          ORBIT360_REQUEST_FILE="$ORBIT360_REQUEST_FILE" node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
+          jq -e '.status=="GO_GATE_CONTRACT" and .classification=="RC12_NORMAL_ONBOARDING_CLOSURE_READY" and .maximumFirestoreDocumentsWritten==3 and .maximumFirestoreDocumentsCreated==3 and .authWriteAuthorized==false and .deployAuthorized==true and .rulesDeployAuthorized==false and .functionsDeployAuthorized==false and .dataAccess==false and .secretAccess==false and .firestoreRead==false and .firestoreWrites==0 and .authWrites==0 and .deployExecuted==false and .productionTouched==false' "$ORBIT360_EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+          cp "$ORBIT360_EVIDENCE_DIR/preflight-sanitizado.json" "$ORBIT360_EVIDENCE_DIR/rc12-gate714-preflight.json"
+          jq -e '.decision=="GO_STATIC_CUMULATIVE_MODULE_PARITY_WITH_MATURITY_GAPS" and .ok==true and .counts.routes==31 and .counts.failedModules==0 and .guarantees.moduleTreeParityBaseline==true and .guarantees.moduleTreeParityLive==true' "$ORBIT360_EVIDENCE_DIR/rc12-forensic-module-audit.json" >/dev/null
+          ABS_OUT="$GITHUB_WORKSPACE/$ORBIT360_EVIDENCE_DIR/rc12-auth-membership-antiregression.json"
+          ORBIT360_AUTH_MEMBERSHIP_SOURCE_ROOT="$ORBIT360_RC12_ROOT" ORBIT360_AUTH_MEMBERSHIP_EVIDENCE="$ABS_OUT" node tools/orbit360-validar-auth-membership-antiregression-rootfix-v20260803.mjs
+          jq -e '.status=="PASS" and .total==16 and .passed==16 and .failed==0 and .outputPathAbsolute==true and .sourceRootIndependentFromOutput==true and .firestoreRead==false and .firestoreWrites==0 and .authWrites==0 and .productionTouched==false' "$ABS_OUT" >/dev/null
+          node --check tools/orbit360-onboarding-normal-rc12-v20260804.mjs
+          bash -n tools/orbit360-rc12-normal-onboarding-close-macro-v20260804.sh
+          grep -F 'firebase deploy --only hosting --project "$ORBIT360_PROJECT_ID" --config firebase.json --non-interactive' tools/orbit360-rc12-normal-onboarding-close-macro-v20260804.sh
+          test -z "$(git -C "$ORBIT360_RC12_ROOT" diff --name-only)"
+
+      - name: Instalar herramientas después de los gates
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --global firebase-tools@15.25.1
+          firebase --version
+          npm install --no-save --package-lock=false --ignore-scripts firebase-admin@13 google-auth-library@9 playwright@1.52.0
+          npx playwright install --with-deps chromium
+
+      - name: Resolver identidad de servicio existente
+        shell: bash
+        env:
+          SA_ORBIT360_LAB: ${{ secrets.SA_ORBIT360_LAB }}
+          SA_ORBIT_360_LAB: ${{ secrets.SA_ORBIT_360_LAB }}
+          SA_DEFAULT: ${{ secrets.SA_DEFAULT }}
+        run: |
+          set -euo pipefail
+          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-${SA_ORBIT_360_LAB:-${SA_DEFAULT:-}}}"
+          test -n "$SERVICE_ACCOUNT"
+          printf '%s' "$SERVICE_ACCOUNT" > "$ORBIT360_TEMP_KEY_FILE"
+          chmod 600 "$ORBIT360_TEMP_KEY_FILE"
+          test "$(jq -r '.project_id // empty' "$ORBIT360_TEMP_KEY_FILE")" = "$ORBIT360_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$ORBIT360_TEMP_KEY_FILE" >> "$GITHUB_ENV"
+
+      - name: Ejecutar macrobloque único autorizado
+        id: macro
+        shell: bash
+        run: |
+          set +e
+          bash tools/orbit360-rc12-normal-onboarding-close-macro-v20260804.sh
+          CODE=$?
+          echo "exit_code=$CODE" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Publicar decisión observable
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          FINAL: orbit360-platform/runtime-gate-crm-v20260716/rc12-normal-onboarding-close-final.json
+        with:
+          script: |
+            const fs=require('fs');
+            let state='failure', description='RC1.2 onboarding sin cierre observable';
+            try {
+              const f=JSON.parse(fs.readFileSync(process.env.FINAL,'utf8'));
+              if (f.decision==='RC12_NORMAL_ONBOARDING_CUMULATIVE_GO_LIVE_PASS') { state='success'; description='RC1.2 · onboarding normal · Hosting · PASS'; }
+              else description=`RC1.2 · ${f.decision}`;
+            } catch (e) {}
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:process.env.STATUS_CONTEXT,description:description.slice(0,140),target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
+
+      - name: Subir evidencia sanitizada
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rc12-normal-onboarding-close-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/rc12-gate714-preflight.json
+            orbit360-platform/runtime-gate-crm-v20260716/rc12-forensic-module-audit.json
+            orbit360-platform/runtime-gate-crm-v20260716/rc12-auth-membership-antiregression.json
+            orbit360-platform/runtime-gate-crm-v20260716/rc12-normal-auth-census.json
+            orbit360-platform/runtime-gate-crm-v20260716/rc12-normal-memberships-apply.json
+            orbit360-platform/runtime-gate-crm-v20260716/rc12-normal-memberships-verify.json
+            orbit360-platform/runtime-gate-crm-v20260716/rc12-normal-memberships-rollback.json
+            orbit360-platform/runtime-gate-crm-v20260716/rc12-gate713-post-onboarding.json
+            orbit360-platform/runtime-gate-crm-v20260716/gravicentra-rc12-membership-identities.json
+            orbit360-platform/runtime-gate-crm-v20260716/gravicentra-rc1-go-live-before.json
+            orbit360-platform/runtime-gate-crm-v20260716/gravicentra-rc12-membership-browser-smoke.json
+            orbit360-platform/runtime-gate-crm-v20260716/gravicentra-rc1-go-live-smoke.json
+            orbit360-platform/runtime-gate-crm-v20260716/gravicentra-rc1-go-live-rollback.json
+            orbit360-platform/runtime-gate-crm-v20260716/rc12-normal-onboarding-close-final.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Limpiar secretos y worktree
+        if: always()
+        shell: bash
+        run: |
+          if [ -n "${ORBIT360_TEMP_KEY_FILE:-}" ] && [ -f "$ORBIT360_TEMP_KEY_FILE" ]; then shred -u "$ORBIT360_TEMP_KEY_FILE" || rm -f "$ORBIT360_TEMP_KEY_FILE"; fi
+          if [ -n "${ORBIT360_RC12_PRIVATE_IDENTITIES:-}" ] && [ -f "$ORBIT360_RC12_PRIVATE_IDENTITIES" ]; then shred -u "$ORBIT360_RC12_PRIVATE_IDENTITIES" || rm -f "$ORBIT360_RC12_PRIVATE_IDENTITIES"; fi
+          if [ -n "${ORBIT360_NORMAL_ONBOARDING_PRIVATE_PLAN:-}" ] && [ -f "$ORBIT360_NORMAL_ONBOARDING_PRIVATE_PLAN" ]; then shred -u "$ORBIT360_NORMAL_ONBOARDING_PRIVATE_PLAN" || rm -f "$ORBIT360_NORMAL_ONBOARDING_PRIVATE_PLAN"; fi
+          if [ -n "${ORBIT360_RC12_ROOT:-}" ] && [ -d "$ORBIT360_RC12_ROOT" ]; then git worktree remove --force "$ORBIT360_RC12_ROOT" || true; fi
+
+      - name: Exigir PASS real o cierre seguro
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f "$ORBIT360_EVIDENCE_DIR/rc12-normal-onboarding-close-final.json"
+          jq -e '(.decision=="RC12_NORMAL_ONBOARDING_CUMULATIVE_GO_LIVE_PASS" and .productionMaintained==true and .ok==true) or ((.decision|test("NO_WRITE|ROLLED_BACK|NO_GO|FAILED")) and .productionMaintained==false and .ok==false)' "$ORBIT360_EVIDENCE_DIR/rc12-normal-onboarding-close-final.json" >/dev/null
+          test "${{ steps.macro.outputs.exit_code }}" = '0'
