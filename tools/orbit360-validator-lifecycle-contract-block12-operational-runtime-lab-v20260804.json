@@ -21,15 +21,18 @@
     }
   },
   "authorization": {
-    "source": "user_proceeds_block12_rootfix_macro_20260804T1424-0600",
+    "source": "user_proceeds_block12_rootfix_continuation_20260804T1424-0600",
     "allowedExecutions": 1,
     "consumed": false,
     "replayAllowed": false,
-    "retryAuthorizedBecausePreviousStoppedBeforeSecrets": true,
-    "previousRunId": 30945951133,
+    "retryAuthorizedBecausePriorRunsStoppedBeforeSecrets": true,
+    "previousRunIds": [30945951133, 30948708843],
     "previousFailureClassification": "PIPELINE_MECHANISM_FAILURE",
-    "previousFailureCode": "CANONICAL_LIFECYCLE_REVISION_MISMATCH",
-    "request": ".github/orbit360-requests/block12-operational-runtime-lab-rootfix-v20260804.json"
+    "previousFailureCodes": [
+      "CANONICAL_LIFECYCLE_REVISION_MISMATCH",
+      "PREPARE_STATE_DECLARATION_COUNT_2"
+    ],
+    "request": ".github/orbit360-requests/block12-operational-runtime-lab-rootfix2-v20260804.json"
   },
   "scope": {
     "projectId": "ays-orbit-360-lab",
