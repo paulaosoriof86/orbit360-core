@@ -1,0 +1,228 @@
+name: Gravicentra RC1.2 · Gate 7.15.1 post-STOP_RETRY y cierre
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-requests/rc12-gate7151-post-stop-retry-continuation-v20260804.json'
+
+permissions:
+  contents: write
+  statuses: write
+
+concurrency:
+  group: orbit360-rc12-gate7151-post-stop-retry-continuation-v20260804
+  cancel-in-progress: false
+
+env:
+  TRIGGER_REQUEST: .github/orbit360-requests/rc12-gate7151-post-stop-retry-continuation-v20260804.json
+  ORBIT360_REQUEST_FILE: .github/orbit360-requests/rc12-approved-roster-final-go-live-resume-v20260804.json
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  ORBIT360_GATE_ID: block7.15-rc12-approved-roster-final-go-live-v20260804
+  ORBIT360_RELEASE_BRANCH: release/gravicentra-insurance-rc1-2-membership-auth-20260803
+  ORBIT360_RELEASE_COMMIT: b699ba329960cd830121b57452ce558399aa84fb
+  ORBIT360_BASELINE: 27cb7dfcda8568280ebef15993a953364304f29b
+  ORBIT360_GATE711_BASELINE: 267f7231b46d65b80c167f54567a67503b6a6793
+  ORBIT360_PROJECT_ID: ays-orbit-360-lab
+  ORBIT360_TENANT_ID: alianzas-soluciones
+  ORBIT360_LIVE_URL: https://ays-orbit-360-lab.web.app
+  ORBIT360_EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+  STATUS_CONTEXT: orbit360/rc12-gate7151-post-stop-retry-close
+
+jobs:
+  close:
+    name: Gate 7.15.1 · Auth normal · memberships · Hosting · smoke
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    steps:
+      - name: Checkout trigger exacto
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Preparar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Verificar continuación única y candidata
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          jq -e '.schemaVersion=="orbit360-gate7151-post-stop-retry-continuation-request-v1" and .status=="AUTHORIZED_CONTINUATION_AFTER_VALIDATOR_STALE" and .approved==true and .allowedExecutions==1 and .consumed==false and .replayAllowed==false and .priorRun==30910363264 and .priorGate.passed==16 and .priorGate.failed==1 and .priorGate.failedCheckIds==["REQUEST_ACTIVE"] and .rootfixPersistedCommit=="19ce809fae7a3cc3102d2c90c3d763539893445e" and .releaseCommit==env.ORBIT360_RELEASE_COMMIT and .branch==env.ORBIT360_BRANCH and .projectId==env.ORBIT360_PROJECT_ID and .tenantId==env.ORBIT360_TENANT_ID and .scope.validatorRootfixOnlyBeforeSecrets==true and .scope.continueOriginalMacroAfterGatePass==true and .scope.reimport==false and .scope.rules==false and .scope.functions==false and .scope.main==false and .scope.merge==false and .scope.gate711==false' "$TRIGGER_REQUEST" >/dev/null
+          test "$(git rev-parse HEAD^)" = "$(jq -r '.parentHead' "$TRIGGER_REQUEST")"
+          mapfile -t DELTA < <(git diff-tree --no-commit-id --name-only -r HEAD)
+          test "${#DELTA[@]}" = '1'
+          test "${DELTA[0]}" = "$TRIGGER_REQUEST"
+          git fetch --no-tags origin "$ORBIT360_BRANCH" "$ORBIT360_RELEASE_BRANCH"
+          test "$(git rev-parse origin/$ORBIT360_RELEASE_BRANCH)" = "$ORBIT360_RELEASE_COMMIT"
+          test "$(git merge-base "$ORBIT360_BASELINE" "$ORBIT360_RELEASE_COMMIT")" = "$ORBIT360_BASELINE"
+          RC12_ROOT="$RUNNER_TEMP/gravicentra-insurance-rc12-gate7151-continuation"
+          git worktree add --detach "$RC12_ROOT" "$ORBIT360_RELEASE_COMMIT"
+          echo "ORBIT360_RC12_ROOT=$RC12_ROOT" >> "$GITHUB_ENV"
+          echo "ORBIT360_RC1_ROOT=$RC12_ROOT" >> "$GITHUB_ENV"
+          echo "ORBIT360_RC12_PRIVATE_IDENTITIES=$RUNNER_TEMP/gravicentra-rc12-identities.json" >> "$GITHUB_ENV"
+          echo "ORBIT360_APPROVED_ROSTER_PRIVATE_STATE=$RUNNER_TEMP/gravicentra-rc12-roster-state.json" >> "$GITHUB_ENV"
+          echo "ORBIT360_TEMP_KEY_FILE=$RUNNER_TEMP/gravicentra-rc12-service-account.json" >> "$GITHUB_ENV"
+          test "$(jq -r '.hosting.public' "$RC12_ROOT/firebase.json")" = 'orbit360-platform'
+
+      - name: Corregir REQUEST_ACTIVE y exigir Gate 7.15.1 PASS antes de secretos
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-corregir-gate7151-request-active-post-stop-retry-v20260804.mjs
+          node tools/orbit360-corregir-gate7151-request-active-post-stop-retry-v20260804.mjs
+          node --check tools/orbit360-validar-gate-contracts-engine-rc12-approved-roster-final-go-live-v20260804.mjs
+          jq -e '.decision=="GATE7151_REQUEST_ACTIVE_ROOTFIX_STATIC_PASS" and .classification=="GO_STATIC_VALIDATOR_ROOTFIX" and .priorGateResult.passed==16 and .priorGateResult.failed==1 and .priorGateResult.failedCheckIds==["REQUEST_ACTIVE"] and .secretAccess==false and .firestoreRead==false and .firestoreWrites==0 and .authRead==false and .authWrites==0 and .browserExecuted==false and .deployExecuted==false and .productionTouched==false and .ok==true' "$ORBIT360_EVIDENCE_DIR/rc12-gate7151-request-active-rootfix-static.json" >/dev/null
+          ORBIT360_REQUEST_FILE="$ORBIT360_REQUEST_FILE" node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
+          jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="7.15.1" and .classification=="RC12_APPROVED_ROSTER_FINAL_GO_LIVE_READY" and .total==17 and .passed==17 and .failed==0 and .maximumAuthUsersCreated==3 and .maximumAuthUsersUpdated==0 and .maximumMembershipDocumentsWritten==3 and .maximumMembershipDocumentsCreated==3 and .maximumPasswordWrites==3 and .passwordReadsAuthorized==0 and .customTokensAuthorized==3 and .authWriteAuthorized==true and .deployAuthorized==true and .hostingDeployOnly==true and .rulesDeployAuthorized==false and .functionsDeployAuthorized==false and .dataAccess==false and .secretAccess==false and .firestoreRead==false and .firestoreWrites==0 and .authWrites==0 and .userCreates==0 and .deployExecuted==false and .productionTouched==false' "$ORBIT360_EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+          cp "$ORBIT360_EVIDENCE_DIR/preflight-sanitizado.json" "$ORBIT360_EVIDENCE_DIR/rc12-gate7151-final-preflight.json"
+          jq -e '.decision=="CANDIDATE_UNIFICATION_STATIC_PASS" and .passed==22 and .failed==0 and .ok==true and .releaseCommit==env.ORBIT360_RELEASE_COMMIT and .reimportExecuted==false and .gate711Repeated==false' "$ORBIT360_EVIDENCE_DIR/rc12-cumulative-candidate-unified-validation.json" >/dev/null
+          ABS_OUT="$GITHUB_WORKSPACE/$ORBIT360_EVIDENCE_DIR/rc12-auth-membership-antiregression-final.json"
+          ORBIT360_AUTH_MEMBERSHIP_SOURCE_ROOT="$ORBIT360_RC12_ROOT" ORBIT360_AUTH_MEMBERSHIP_EVIDENCE="$ABS_OUT" node tools/orbit360-validar-auth-membership-antiregression-rootfix-v20260803.mjs
+          jq -e '.status=="PASS" and .total==16 and .passed==16 and .failed==0 and .firestoreRead==false and .firestoreWrites==0 and .authWrites==0 and .productionTouched==false' "$ABS_OUT" >/dev/null
+          node --check tools/orbit360-provisionar-roster-aprobado-final-rc12-v20260804.mjs
+          bash -n tools/orbit360-rc12-approved-roster-final-go-live-macro-v20260804.sh
+          grep -F 'firebase deploy --only hosting --project "$ORBIT360_PROJECT_ID" --config firebase.json --non-interactive' tools/orbit360-rc12-approved-roster-final-go-live-macro-v20260804.sh
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add tools/orbit360-validar-gate-contracts-engine-rc12-approved-roster-final-go-live-v20260804.mjs "$ORBIT360_EVIDENCE_DIR/rc12-gate7151-request-active-rootfix-static.json"
+          git commit -m 'validator: accept authorized post-stop-retry request in Gate 7.15.1'
+          git push origin HEAD:"$ORBIT360_BRANCH"
+          echo "ORBIT360_GATE7151_FIX_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+
+      - name: Registrar auditoría histórica y frontera de cobros
+        shell: bash
+        run: |
+          set -euo pipefail
+          HIST_AUTH="$RUNNER_TEMP/gate711-auth.js"
+          HIST_TEAM="$RUNNER_TEMP/gate711-equipo.js"
+          git show "$ORBIT360_GATE711_BASELINE:orbit360-platform/core/auth.js" > "$HIST_AUTH"
+          git show "$ORBIT360_GATE711_BASELINE:orbit360-platform/modules/equipo.js" > "$HIST_TEAM"
+          grep -F "const LAB_EMAIL = 'orbit.lab@demo.com'" "$HIST_AUTH" >/dev/null
+          grep -F "rol: 'Dirección'" "$HIST_AUTH" >/dev/null
+          grep -F "const team = S().all('asesores') || []" "$HIST_TEAM" >/dev/null
+          jq -e '.status=="SOURCE_PASS" and .checks.authUsesFirebaseAndTenantMembership==true and .checks.storeSnapshotsRequireActiveMembership==true and .checks.technicalEmailRemovedFromActiveOwners==true and .checks.technicalUidRemovedFromActiveOwners==true' "$ORBIT360_EVIDENCE_DIR/rc12-auth-membership-source-review.json" >/dev/null
+          jq -n --arg generatedAt "$(date -u +%Y-%m-%dT%H:%M:%SZ)" --arg fixCommit "$ORBIT360_GATE7151_FIX_COMMIT" '{schemaVersion:"orbit360-rc12-historical-access-audit-v2",generatedAt:$generatedAt,decision:"HISTORICAL_ACCESS_ROOT_CAUSE_CONFIRMED",classification:"PIPELINE_MECHANISM_FAILURE",validatorFixCommit:$fixCommit,findings:{teamUiWasAdvisorRegistry:true,teamUiCollection:"asesores",teamUiDidNotProvisionFirebaseAuth:true,gate711LabUsedFixedTechnicalIdentity:true,rc11ReintroducedHistoricalTechnicalOwners:true,rc12MembershipOwnersPass:true,connectedProjectMustMatchBeforeWrites:true},counts:{firebaseAuthUsersObservedInPriorCensus:2,advisorRecords:7,memberships:1},conclusion:"Seven records created in Equipo were advisor/team records. They were not proof of seven Firebase Auth accounts. Earlier successful access depended on a fixed LAB identity; the cumulative RC1.1 reconstruction reintroduced historical technical owners before RC1.2 corrected them.",firestoreRead:false,firestoreWrites:0,authRead:false,authWrites:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false,ok:true}' > "$ORBIT360_EVIDENCE_DIR/rc12-historical-access-audit.json"
+          jq '.cobrosSemantics + {schemaVersion:"orbit360-rc12-cobros-semantic-boundary-v2",generatedAt:(now|todateiso8601),decision:"COBROS_COUNT_SCOPE_CLARIFIED",classification:"DATA_CONTRACT_GAP",materializedCountIsCompleteUniverse:false,firestoreRead:false,firestoreWrites:0,authRead:false,authWrites:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false,ok:true}' "$ORBIT360_REQUEST_FILE" > "$ORBIT360_EVIDENCE_DIR/rc12-cobros-semantic-boundary.json"
+          jq -e '.materializedOperationalDocuments==5 and .canonicalDocuments==7 and .paymentsReportedNotReconciled==365 and .noOutstandingBalanceAccordingInsurer==211 and .receiptStatusHold==44 and .sigaExcluded==20 and .commissionDetailRows==67 and .commissionEligibleCrm==65 and .commissionExactPairs==8 and .financeActivated==false and .materializedCountIsCompleteUniverse==false and .ok==true' "$ORBIT360_EVIDENCE_DIR/rc12-cobros-semantic-boundary.json" >/dev/null
+
+      - name: Instalar herramientas después del Gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --global firebase-tools@15.25.1
+          firebase --version
+          npm install --no-save --package-lock=false --ignore-scripts firebase-admin@13 google-auth-library@9 playwright@1.52.0
+          npx playwright install --with-deps chromium
+
+      - name: Resolver y validar proyecto Firebase existente
+        shell: bash
+        env:
+          SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+          SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          set -euo pipefail
+          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-${SA_ORBIT_360_LAB:-${SA_DEFAULT:-}}}"
+          test -n "$SERVICE_ACCOUNT"
+          printf '%s' "$SERVICE_ACCOUNT" > "$ORBIT360_TEMP_KEY_FILE"
+          chmod 600 "$ORBIT360_TEMP_KEY_FILE"
+          SERVICE_PROJECT="$(jq -r '.project_id // empty' "$ORBIT360_TEMP_KEY_FILE")"
+          test "$SERVICE_PROJECT" = "$ORBIT360_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$ORBIT360_TEMP_KEY_FILE" >> "$GITHUB_ENV"
+          jq -n --arg project "$ORBIT360_PROJECT_ID" --arg serviceProject "$SERVICE_PROJECT" '{schemaVersion:"orbit360-firebase-project-binding-v1",projectId:$project,serviceAccountProjectId:$serviceProject,projectMatch:($project==$serviceProject),firestoreWrites:0,authWrites:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false,ok:($project==$serviceProject)}' > "$ORBIT360_EVIDENCE_DIR/rc12-firebase-project-binding.json"
+          jq -e '.projectMatch==true and .ok==true' "$ORBIT360_EVIDENCE_DIR/rc12-firebase-project-binding.json" >/dev/null
+
+      - name: Ejecutar macrobloque final reanudado
+        id: macro
+        shell: bash
+        run: |
+          set +e
+          bash tools/orbit360-rc12-approved-roster-final-go-live-macro-v20260804.sh
+          CODE=$?
+          echo "exit_code=$CODE" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Adjuntar auditorías a la decisión
+        if: always()
+        shell: bash
+        run: |
+          FINAL="$ORBIT360_EVIDENCE_DIR/rc12-approved-roster-final-go-live.json"
+          if [ -f "$FINAL" ]; then
+            jq --slurpfile access "$ORBIT360_EVIDENCE_DIR/rc12-historical-access-audit.json" --slurpfile cobros "$ORBIT360_EVIDENCE_DIR/rc12-cobros-semantic-boundary.json" --slurpfile project "$ORBIT360_EVIDENCE_DIR/rc12-firebase-project-binding.json" '. + {historicalAccessAudit:$access[0],cobrosSemantics:$cobros[0],firebaseProjectBinding:$project[0]}' "$FINAL" > "$FINAL.tmp"
+            mv "$FINAL.tmp" "$FINAL"
+          fi
+
+      - name: Publicar decisión observable
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          FINAL: orbit360-platform/runtime-gate-crm-v20260716/rc12-approved-roster-final-go-live.json
+        with:
+          script: |
+            const fs=require('fs');
+            let state='failure', description='RC1.2 cierre sin evidencia final';
+            try {
+              const f=JSON.parse(fs.readFileSync(process.env.FINAL,'utf8'));
+              if (f.decision==='RC12_APPROVED_ROSTER_CUMULATIVE_GO_LIVE_PASS' && f.ok===true) {
+                state='success'; description='RC1.2 · Auth normal · Hosting · smoke PASS';
+              } else description=`RC1.2 · ${f.decision}`;
+            } catch (_) {}
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:process.env.STATUS_CONTEXT,description:description.slice(0,140),target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
+
+      - name: Subir evidencia sanitizada
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rc12-gate7151-post-stop-retry-close-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/rc12-gate7151-request-active-rootfix-static.json
+            orbit360-platform/runtime-gate-crm-v20260716/rc12-gate7151-final-preflight.json
+            orbit360-platform/runtime-gate-crm-v20260716/rc12-historical-access-audit.json
+            orbit360-platform/runtime-gate-crm-v20260716/rc12-cobros-semantic-boundary.json
+            orbit360-platform/runtime-gate-crm-v20260716/rc12-firebase-project-binding.json
+            orbit360-platform/runtime-gate-crm-v20260716/rc12-cumulative-candidate-unified-validation.json
+            orbit360-platform/runtime-gate-crm-v20260716/rc12-auth-membership-antiregression-final.json
+            orbit360-platform/runtime-gate-crm-v20260716/rc12-approved-roster-census.json
+            orbit360-platform/runtime-gate-crm-v20260716/rc12-approved-roster-apply.json
+            orbit360-platform/runtime-gate-crm-v20260716/rc12-approved-roster-verify.json
+            orbit360-platform/runtime-gate-crm-v20260716/rc12-approved-roster-rollback.json
+            orbit360-platform/runtime-gate-crm-v20260716/rc12-gate713-post-approved-roster.json
+            orbit360-platform/runtime-gate-crm-v20260716/gravicentra-rc12-membership-identities.json
+            orbit360-platform/runtime-gate-crm-v20260716/gravicentra-rc1-go-live-before.json
+            orbit360-platform/runtime-gate-crm-v20260716/gravicentra-rc12-membership-browser-smoke.json
+            orbit360-platform/runtime-gate-crm-v20260716/gravicentra-rc1-go-live-smoke.json
+            orbit360-platform/runtime-gate-crm-v20260716/gravicentra-rc1-go-live-rollback.json
+            orbit360-platform/runtime-gate-crm-v20260716/rc12-approved-roster-final-go-live.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Limpiar secretos y worktree
+        if: always()
+        shell: bash
+        run: |
+          for FILE in "${ORBIT360_TEMP_KEY_FILE:-}" "${ORBIT360_RC12_PRIVATE_IDENTITIES:-}" "${ORBIT360_APPROVED_ROSTER_PRIVATE_STATE:-}"; do
+            if [ -n "$FILE" ] && [ -f "$FILE" ]; then shred -u "$FILE" || rm -f "$FILE"; fi
+          done
+          if [ -n "${ORBIT360_RC12_ROOT:-}" ] && [ -d "$ORBIT360_RC12_ROOT" ]; then git worktree remove --force "$ORBIT360_RC12_ROOT" || true; fi
+
+      - name: Exigir PASS real o cierre seguro
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          FINAL="$ORBIT360_EVIDENCE_DIR/rc12-approved-roster-final-go-live.json"
+          test -f "$FINAL"
+          jq -e '.historicalAccessAudit.ok==true and .cobrosSemantics.ok==true and .cobrosSemantics.materializedCountIsCompleteUniverse==false and .firebaseProjectBinding.ok==true' "$FINAL" >/dev/null
+          DECISION="$(jq -r '.decision // empty' "$FINAL")"
+          if [ "$DECISION" = 'RC12_APPROVED_ROSTER_CUMULATIVE_GO_LIVE_PASS' ]; then
+            jq -e '.productionMaintained==true and .ok==true and .deploySucceeded==true and .gate713Executed==true and .reimportExecuted==false and .rulesApplied==false and .functionsDeployed==false and .mainTouched==false and .mergeExecuted==false and .gate711Executed==false' "$FINAL" >/dev/null
+            test "${{ steps.macro.outputs.exit_code }}" = '0'
+          else
+            jq -e '.productionMaintained==false and .ok==false and (.decision|test("NO_GO|NO_WRITE|FAILED|ROLLED_BACK|ESCALATE"))' "$FINAL" >/dev/null
+            exit 41
+          fi
