@@ -1,0 +1,40 @@
+{
+  "schemaVersion": "orbit360-rc12-membership-no-go-summary-v1",
+  "generatedAt": "2026-08-04T04:25:36Z",
+  "decision": "RC12_NORMAL_IDENTITIES_NO_GO",
+  "classification": "DATA_CONTRACT_FAILURE_WITH_SECURITY_IMPACT",
+  "releaseBranch": "release/gravicentra-insurance-rc1-2-membership-auth-20260803",
+  "releaseCommit": "b699ba329960cd830121b57452ce558399aa84fb",
+  "gate": {
+    "status": "PASS",
+    "passed": 14,
+    "failed": 0
+  },
+  "runtime": {
+    "run": 30877589549,
+    "job": 91892068434,
+    "artifact": 8880091323,
+    "artifactDigest": "sha256:b45e69e3d256f075ca67c8a4eebacff3db03aa6eff1b152a02c6885701318268",
+    "error": "ACTIVE_NORMAL_MEMBERSHIP_NOT_FOUND_DIRECCION"
+  },
+  "rootCauseOwner": "tenants/{tenantId}/members/{uid} + matching Firebase Auth user",
+  "deployExecuted": false,
+  "productionTouched": false,
+  "rollbackExecuted": false,
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "userCreates": 0,
+  "userUpdates": 0,
+  "passwordReads": 0,
+  "passwordWrites": 0,
+  "tokensCreated": 0,
+  "reimportExecuted": false,
+  "functionsDeployed": false,
+  "rulesApplied": false,
+  "mainTouched": false,
+  "mergeExecuted": false,
+  "authorizationConsumed": true,
+  "nextAction": "Execute one sanitized read-only membership/Auth census before proposing any write.",
+  "containsPII": false,
+  "containsSecrets": false
+}
