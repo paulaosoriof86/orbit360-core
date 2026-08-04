@@ -1,0 +1,36 @@
+{
+  "schemaVersion": "orbit360-gate7151-request-active-rootfix-static-v1",
+  "generatedAt": "2026-08-04T12:48:56.839Z",
+  "decision": "GATE7151_REQUEST_ACTIVE_ROOTFIX_STATIC_PASS",
+  "classification": "GO_STATIC_VALIDATOR_ROOTFIX",
+  "priorRun": 30910363264,
+  "priorGateResult": {
+    "passed": 16,
+    "failed": 1,
+    "failedCheckIds": [
+      "REQUEST_ACTIVE"
+    ]
+  },
+  "owner": "tools/orbit360-validar-gate-contracts-engine-rc12-approved-roster-final-go-live-v20260804.mjs",
+  "checks": {
+    "postStopRetryRequired": true,
+    "retryAuthorizationRequired": true,
+    "priorFinalMacroBound": true,
+    "priorRootfixInitialBound": true,
+    "priorRootfixCorrectiveBound": true,
+    "failureFamilyBound": true,
+    "staleNegativeRemoved": true,
+    "gateVersionPreserved": true
+  },
+  "secretAccess": false,
+  "firestoreRead": false,
+  "firestoreWrites": 0,
+  "authRead": false,
+  "authWrites": 0,
+  "browserExecuted": false,
+  "deployExecuted": false,
+  "productionTouched": false,
+  "containsPII": false,
+  "containsSecrets": false,
+  "ok": true
+}
