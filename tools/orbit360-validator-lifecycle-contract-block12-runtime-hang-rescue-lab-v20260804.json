@@ -1,0 +1,65 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
+  "gateId": "block12-runtime-hang-rescue-lab-v20260804",
+  "gateContractVersion": "12.0.3",
+  "status": "RUNTIME_HANG_RESCUE_LAB_AUTHORIZED",
+  "singleGate": true,
+  "executionProfile": {
+    "phase": "RUNTIME_HANG_RESCUE_LAB",
+    "capabilities": {
+      "secrets": true,
+      "firestoreRead": true,
+      "writes": true,
+      "authWrites": true,
+      "deployDelete": true,
+      "runtime": false,
+      "browser": false,
+      "rulesDeploy": false,
+      "production": false
+    }
+  },
+  "authorization": {
+    "source": "user_continue_urgent_block12_runtime_hang_rescue_20260804T1708-0600",
+    "allowedExecutions": 1,
+    "consumed": false,
+    "replayAllowed": false,
+    "request": ".github/orbit360-requests/block12-runtime-hang-rescue-lab-v20260804.json"
+  },
+  "scope": {
+    "projectId": "ays-orbit-360-lab",
+    "branch": "ays/backend-tenant-lab-v99-20260703",
+    "pullRequest": 5,
+    "targetRunId": 30956309298,
+    "syntheticTenantId": "verify-block12-30956309298",
+    "syntheticUserIds": [
+      "zztest_block12_30956309298_direction",
+      "zztest_block12_30956309298_advisorA",
+      "zztest_block12_30956309298_advisorB"
+    ],
+    "exactFunctionNames": [
+      "orbit360OpsLeadsCommandLabV20260804",
+      "orbit360GetAdvisorOpsInboxLabV20260804",
+      "orbit360CobrosReconciliationCommandLabV20260804",
+      "orbit360RecurringInsuranceImportLabV20260804"
+    ],
+    "hostingChannel": "orbit360-operational-block12",
+    "cancelTargetRun": true,
+    "snapshotRealTenantBeforeAfter": true,
+    "cleanupSyntheticTenant": true,
+    "cleanupSyntheticAuth": true,
+    "cleanupFunctions": true,
+    "cleanupHostingPreview": true,
+    "sanitizedEvidence": true
+  },
+  "forbidden": {
+    "rulesDeploy": true,
+    "realTenantWrites": true,
+    "realDataReimport": true,
+    "production": true,
+    "main": true,
+    "merge": true,
+    "browserExecution": true,
+    "newFunctionalFixture": true
+  }
+}
