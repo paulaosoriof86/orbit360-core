@@ -2,8 +2,8 @@
   "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
   "validatorLifecycleRevision": "phase-capability-contract-v1",
   "gateId": "block12-operational-runtime-lab-v20260804",
-  "gateContractVersion": "12.0.6",
-  "status": "OPERATIONAL_RUNTIME_LAB_SYNTHETIC_LOADER_ROOTFIX_READY",
+  "gateContractVersion": "12.0.7",
+  "status": "OPERATIONAL_RUNTIME_LAB_SYNTHETIC_LOADER_MATERIALIZER_ROOTFIX_READY",
   "singleGate": true,
   "macroClosure": true,
   "executionProfile": {
@@ -21,18 +21,17 @@
     }
   },
   "authorization": {
-    "source": "user_continue_urgent_block12_synthetic_loader_rootfix_20260804T1731-0600",
+    "source": "user_continue_urgent_block12_materializer_safe_loader_rootfix_20260804T1734-0600",
     "allowedExecutions": 1,
     "consumed": false,
     "replayAllowed": false,
-    "retryAuthorizedAfterExactBootstrapDiagnosis": true,
+    "retryAuthorizedBecausePreviousStoppedBeforeGate": true,
     "previousRuntimeRunId": 30959959221,
-    "previousRuntimeStatus": "failure",
-    "previousFailureClassification": "DATA_CONTRACT_FAILURE",
-    "previousFailureCode": "SYNTHETIC_TENANT_BLOCKED_BY_LAB_LOADER_ALLOWLIST",
-    "previousBootstrapState": "sdk-not-ready",
-    "previousFirebasePresent": false,
-    "previousRuntimeCenterPresent": true,
+    "previousRuntimeFailureCode": "SYNTHETIC_TENANT_BLOCKED_BY_LAB_LOADER_ALLOWLIST",
+    "previousStaticRunId": 30960388102,
+    "previousStaticFailureClassification": "PIPELINE_MECHANISM_FAILURE",
+    "previousStaticFailureCode": "STRING_REPLACEMENT_DOLLAR_APOSTROPHE_CORRUPTED_ENGINE",
+    "previousStaticRunStoppedBeforeGate": true,
     "previousScenariosPassed": 0,
     "previousScenariosFailed": 0,
     "previousRollbackExact": true,
@@ -40,7 +39,7 @@
     "browserHarnessRootfixHead": "ae3f55968948c18f1c6ae40fdce93ee6552890d0",
     "dependencyValidationRunId": 30950155722,
     "dependencyValidationStatus": "FUNCTIONS_BOOTSTRAP_LOAD_PASS",
-    "request": ".github/orbit360-requests/block12-operational-runtime-lab-rootfix7-v20260804.json"
+    "request": ".github/orbit360-requests/block12-operational-runtime-lab-rootfix8-v20260804.json"
   },
   "scope": {
     "projectId": "ays-orbit-360-lab",
@@ -50,6 +49,8 @@
     "syntheticTenantPattern": "^verify-block12-[0-9]+$",
     "syntheticTenantAllowedOnlyOnOperationalPreview": true,
     "syntheticTenantRequiresVerificationMode": true,
+    "materializerUsesFunctionReplacement": true,
+    "engineSyntaxPassRequired": true,
     "maximumSyntheticAuthUsers": 3,
     "maximumSyntheticMemberships": 3,
     "exactFunctionNames": [
