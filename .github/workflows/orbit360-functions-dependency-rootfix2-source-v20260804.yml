@@ -1,0 +1,211 @@
+name: Orbit 360 · Functions dependency rootfix 2 · source only
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-requests/functions-dependency-rootfix2-source-v20260804.json'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: orbit360-functions-dependency-rootfix2-source-v20260804
+  cancel-in-progress: false
+
+env:
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  ORBIT360_REQUEST_FILE: .github/orbit360-requests/functions-dependency-rootfix2-source-v20260804.json
+  ORBIT360_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/functions-dependency-rootfix-source-v20260804.json
+
+jobs:
+  dependency-rootfix:
+    name: Resolve runtime tree → load bootstrap → seal lockfile
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout solicitud exacta
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 3
+          persist-credentials: true
+
+      - name: Preparar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verificar continuidad source-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
+          test "${#CHANGED[@]}" = '1'
+          test "${CHANGED[0]}" = "$ORBIT360_REQUEST_FILE"
+          PARENT="$(git rev-parse HEAD^)"
+          jq -e --arg parent "$PARENT" '
+            .schemaVersion=="orbit360-functions-dependency-rootfix2-source-request-v1" and
+            .status=="AUTHORIZED_SOURCE_ONLY_CONTINUATION" and
+            .approved==true and
+            .allowedExecutions==1 and
+            .consumed==false and
+            .replayAllowed==false and
+            .previousRunIds==[30949139231,30949801751] and
+            .previousFailures==["MODULE_NOT_FOUND_@firebase/app","VALIDATOR_EXPECTED_TOOLING_DEPENDENCY_AS_RUNTIME"] and
+            .branch=="ays/backend-tenant-lab-v99-20260703" and
+            .parentHead==$parent and
+            .secrets==false and
+            .firebaseCommands==false and
+            .firestoreRead==false and
+            .firestoreWrites==0 and
+            .authWrites==0 and
+            .deploy==false and
+            .production==false and
+            .main==false and
+            .merge==false
+          ' "$ORBIT360_REQUEST_FILE" >/dev/null
+
+      - name: Corregir import y resolver árbol limpio
+        shell: bash
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs = require('fs');
+          const file = 'functions/index.js';
+          let source = fs.readFileSync(file, 'utf8');
+          const before = "const { setGlobalOptions } = require('firebase-functions/v2');";
+          const after = "const { setGlobalOptions } = require('firebase-functions/v2/options');";
+          if (!source.includes(after)) {
+            if (!source.includes(before)) throw new Error('PIPELINE_MECHANISM_FAILURE:SET_GLOBAL_OPTIONS_OWNER_NOT_FOUND');
+            source = source.replace(before, after);
+          }
+          fs.writeFileSync(file, source, 'utf8');
+          const pkg = JSON.parse(fs.readFileSync('functions/package.json','utf8'));
+          if (pkg.engines?.node !== '22') throw new Error('DATA_CONTRACT_FAILURE:FUNCTIONS_NODE_ENGINE');
+          for (const dep of ['firebase-admin','firebase-functions','@google-cloud/secret-manager']) {
+            if (!pkg.dependencies?.[dep]) throw new Error(`DATA_CONTRACT_FAILURE:MISSING_RUNTIME_DEPENDENCY:${dep}`);
+          }
+          if (pkg.dependencies?.['google-auth-library']) throw new Error('DATA_CONTRACT_FAILURE:TOOLING_DEPENDENCY_LEAKED_TO_RUNTIME');
+          NODE
+          rm -rf functions/node_modules functions/package-lock.json
+          npm --prefix functions install --package-lock=true --include=prod
+
+      - name: Cargar bootstrap y verificar providers cargados
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm --prefix functions ls firebase-admin firebase-functions @firebase/database-compat @firebase/app @google-cloud/secret-manager --all --json > "$RUNNER_TEMP/dependency-tree.json" || true
+          (
+            cd functions
+            node - <<'NODE'
+            const required = [
+              'firebase-admin/app',
+              'firebase-admin/firestore',
+              'firebase-functions/v2/https',
+              'firebase-functions/v2/options',
+              '@google-cloud/secret-manager'
+            ];
+            const resolved = {};
+            for (const id of required) resolved[id] = require.resolve(id);
+            const exportsLoaded = require('./bootstrap.js');
+            const names = Object.keys(exportsLoaded || {});
+            const requiredExports = [
+              'orbit360OpsLeadsCommandLabV20260804',
+              'orbit360GetAdvisorOpsInboxLabV20260804',
+              'orbit360CobrosReconciliationCommandLabV20260804',
+              'orbit360RecurringInsuranceImportLabV20260804'
+            ];
+            for (const name of requiredExports) if (!names.includes(name)) throw new Error(`DATA_CONTRACT_FAILURE:MISSING_FUNCTION_EXPORT:${name}`);
+            const broadLoaded = Object.keys(require.cache).some(file => /firebase-functions[/\\]lib[/\\]v2[/\\]index\.js$/.test(file));
+            const databaseProviderLoaded = Object.keys(require.cache).some(file => /firebase-functions[/\\]lib[/\\](?:v2[/\\])?providers[/\\]database\.js$/.test(file));
+            if (broadLoaded) throw new Error('PIPELINE_MECHANISM_FAILURE:BROAD_V2_AGGREGATOR_STILL_LOADED');
+            if (databaseProviderLoaded) throw new Error('PIPELINE_MECHANISM_FAILURE:UNUSED_DATABASE_PROVIDER_LOADED');
+            console.log(JSON.stringify({status:'FUNCTIONS_BOOTSTRAP_LOAD_PASS',resolvedCount:Object.keys(resolved).length,exportCount:names.length,requiredFunctionExports:true,broadV2AggregatorLoaded:false,databaseProviderLoaded:false,ok:true},null,2));
+            NODE
+          ) | tee "$RUNNER_TEMP/bootstrap-load.json"
+          node --check functions/index.js
+          node --check functions/bootstrap.js
+          npm --prefix functions run check
+          test -f functions/package-lock.json
+          node - <<'NODE'
+          const fs = require('fs');
+          const lock = JSON.parse(fs.readFileSync('functions/package-lock.json','utf8'));
+          if (lock.lockfileVersion < 3) throw new Error('DATA_CONTRACT_FAILURE:LOCKFILE_VERSION');
+          const root = lock.packages?.[''] || {};
+          const expected = JSON.parse(fs.readFileSync('functions/package.json','utf8')).dependencies;
+          if (JSON.stringify(root.dependencies) !== JSON.stringify(expected)) throw new Error('DATA_CONTRACT_FAILURE:LOCKFILE_ROOT_DEPENDENCIES');
+          NODE
+          git diff --check
+
+      - name: Sellar evidencia y lockfile
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$(dirname "$ORBIT360_EVIDENCE")"
+          node - <<'NODE'
+          const fs = require('fs');
+          const crypto = require('crypto');
+          const sha = file => crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
+          const bootstrap = JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP + '/bootstrap-load.json','utf8'));
+          const pkg = JSON.parse(fs.readFileSync('functions/package.json','utf8'));
+          const lock = JSON.parse(fs.readFileSync('functions/package-lock.json','utf8'));
+          const packages = lock.packages || {};
+          const versionOf = name => packages[`node_modules/${name}`]?.version || '';
+          const out = {
+            schemaVersion:'orbit360-functions-dependency-rootfix-source-v2',
+            status:'FUNCTIONS_DEPENDENCY_ROOTFIX_SOURCE_PASS',
+            classification:'GO_SOURCE_REPRODUCIBLE_FUNCTIONS_RUNTIME',
+            previousRunIds:[30949139231,30949801751],
+            rootCause:'functions/index.js loaded the full firebase-functions/v2 aggregator for setGlobalOptions, activating the unused Realtime Database provider and its optional peer path',
+            owner:'functions/index.js:setGlobalOptions import',
+            importAfter:'firebase-functions/v2/options',
+            nodeEngine:pkg.engines.node,
+            versions:{
+              firebaseAdmin:versionOf('firebase-admin'),
+              firebaseFunctions:versionOf('firebase-functions'),
+              databaseCompat:versionOf('@firebase/database-compat'),
+              firebaseApp:versionOf('@firebase/app'),
+              secretManager:versionOf('@google-cloud/secret-manager')
+            },
+            bootstrapLoadPass:bootstrap.ok===true,
+            requiredFunctionExports:bootstrap.requiredFunctionExports===true,
+            broadV2AggregatorLoaded:false,
+            unusedDatabaseProviderLoaded:false,
+            lockfileVersion:lock.lockfileVersion,
+            packageLockSha256:sha('functions/package-lock.json'),
+            sourceChecksPass:true,
+            secretsRead:false,
+            firebaseCommandsExecuted:false,
+            firestoreRead:false,
+            firestoreWrites:0,
+            authWrites:0,
+            deployExecuted:false,
+            productionTouched:false,
+            mainTouched:false,
+            mergeExecuted:false,
+            containsPII:false,
+            containsSecrets:false,
+            ok:true
+          };
+          fs.writeFileSync(process.env.ORBIT360_EVIDENCE, JSON.stringify(out,null,2)+'\n','utf8');
+          NODE
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add functions/index.js functions/package-lock.json "$ORBIT360_EVIDENCE"
+          git commit -m 'fix(functions): narrow options import and seal reproducible runtime'
+          git push origin HEAD:"$ORBIT360_BRANCH"
+
+      - name: Publicar cierre en PR 5
+        if: always()
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          STATUS="FUNCTIONS_DEPENDENCY_ROOTFIX_SOURCE_FAIL"; CLASSIFICATION="PIPELINE_MECHANISM_FAILURE"
+          if [ -f "$ORBIT360_EVIDENCE" ]; then STATUS="$(jq -r '.status' "$ORBIT360_EVIDENCE")"; CLASSIFICATION="$(jq -r '.classification' "$ORBIT360_EVIDENCE")"; fi
+          gh api "repos/${GITHUB_REPOSITORY}/issues/5/comments" -f body="## Functions dependency rootfix 2 · run ${GITHUB_RUN_ID}\n\n- Estado: \`${STATUS}\`\n- Clasificación: \`${CLASSIFICATION}\`\n- Alcance: source-only, sin secretos ni Firebase\n- Deploy/Rules/producción/main/merge: no" >/dev/null
