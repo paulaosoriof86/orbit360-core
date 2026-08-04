@@ -1,0 +1,218 @@
+name: Orbit 360 · Block 12 · rescate de runtime colgado LAB
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-requests/block12-runtime-hang-rescue-lab-v20260804.json'
+
+permissions:
+  contents: write
+  actions: write
+  issues: write
+  pull-requests: write
+
+env:
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  ORBIT360_REQUEST_FILE: .github/orbit360-requests/block12-runtime-hang-rescue-lab-v20260804.json
+  ORBIT360_GATE_ID: block12-runtime-hang-rescue-lab-v20260804
+  ORBIT360_PROJECT_ID: ays-orbit-360-lab
+  ORBIT360_REAL_TENANT_ID: alianzas-soluciones
+  ORBIT360_TARGET_RUN_ID: '30956309298'
+  ORBIT360_EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+  ORBIT360_FUNCTIONS: orbit360OpsLeadsCommandLabV20260804,orbit360GetAdvisorOpsInboxLabV20260804,orbit360CobrosReconciliationCommandLabV20260804,orbit360RecurringInsuranceImportLabV20260804
+  ORBIT360_HOSTING_CHANNEL: orbit360-operational-block12
+
+jobs:
+  rescue:
+    name: Gate → cancelar run → limpiar sintético → verificar integridad
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - name: Checkout solicitud exacta
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 4
+          persist-credentials: true
+
+      - name: Preparar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verificar autorización exacta
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
+          test "${#CHANGED[@]}" = '1'
+          test "${CHANGED[0]}" = "$ORBIT360_REQUEST_FILE"
+          PARENT="$(git rev-parse HEAD^)"
+          jq -e --arg parent "$PARENT" '
+            .schemaVersion=="orbit360-block12-runtime-hang-rescue-request-v1" and
+            .status=="AUTHORIZED_RUNTIME_HANG_RESCUE" and
+            .approved==true and
+            .allowedExecutions==1 and
+            .consumed==false and
+            .replayAllowed==false and
+            .authorizationRef=="user_continue_urgent_block12_runtime_hang_rescue_20260804T1708-0600" and
+            .targetRunId==30956309298 and
+            .previousStatus=="in_progress" and
+            .previousStep=="Ejecutar pruebas dentro de Orbit 360" and
+            .branch=="ays/backend-tenant-lab-v99-20260703" and
+            .projectId=="ays-orbit-360-lab" and
+            .pullRequest==5 and
+            .parentHead==$parent and
+            .rules==false and .realTenantWrites==false and .realDataReimport==false and .production==false and .main==false and .merge==false
+          ' "$ORBIT360_REQUEST_FILE" >/dev/null
+
+      - name: Materializar gate canónico antes de secretos
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-materializar-block12-runtime-hang-rescue-gate-v20260804.mjs
+          node tools/orbit360-materializar-block12-runtime-hang-rescue-gate-v20260804.mjs
+          node --check tools/orbit360-validar-gate-contracts-engine-block12-runtime-hang-rescue-lab-v20260804.mjs
+          node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
+          node --check tools/orbit360-block12-runtime-hang-rescue-v20260804.mjs
+          git diff --check
+          test -z "$(git diff --name-only -- firestore.rules data/store.js orbit360-platform/data/store.js orbit360-platform/data/store-firestore-lab.local.js orbit360-platform/core/auth.js)"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add tools/orbit360-validar-gate-contracts-v20260717.mjs
+          git commit -m 'gate(block12): register runtime hang rescue'
+          git push origin HEAD:"$ORBIT360_BRANCH"
+          echo "ORBIT360_MATERIALIZED_HEAD=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+
+      - name: Ejecutar preflight contractual obligatorio
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
+          jq -e '.status=="GO_GATE_CONTRACT" and .classification=="RUNTIME_HANG_RESCUE_READY" and .contractVersion=="12.0.3" and .failed==0 and .executionAuthorized==true and .secretAccessAuthorized==true and .firestoreReadAuthorized==true and .writeAuthorized==true and .authWriteAuthorized==true and .deployDeleteAuthorized==true and .runtimeAuthorized==false and .browserAuthorized==false and .rulesDeployAuthorized==false and .productionAuthorized==false and .realTenantWritesAuthorized==false and .realDataReimportAuthorized==false and .secretAccess==false and .firestoreRead==false and .firestoreWrites==0 and .authWrites==0 and .deployExecuted==false' "$ORBIT360_EVIDENCE_DIR/block12-runtime-hang-rescue-preflight.json" >/dev/null
+
+      - name: Cancelar únicamente el run colgado
+        id: cancel
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          CURRENT="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${ORBIT360_TARGET_RUN_ID}" --jq '.status')"
+          if [ "$CURRENT" != completed ]; then
+            gh api --method POST "repos/${GITHUB_REPOSITORY}/actions/runs/${ORBIT360_TARGET_RUN_ID}/cancel" >/dev/null || true
+          fi
+          STATUS="$CURRENT"
+          CONCLUSION=""
+          for _ in $(seq 1 90); do
+            STATUS="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${ORBIT360_TARGET_RUN_ID}" --jq '.status')"
+            CONCLUSION="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${ORBIT360_TARGET_RUN_ID}" --jq '.conclusion // ""')"
+            [ "$STATUS" = completed ] && break
+            sleep 2
+          done
+          test "$STATUS" = completed
+          echo "status=$STATUS" >> "$GITHUB_OUTPUT"
+          echo "conclusion=$CONCLUSION" >> "$GITHUB_OUTPUT"
+
+      - name: Resolver identidad LAB después del gate
+        shell: bash
+        env:
+          SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+          SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          set -euo pipefail
+          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-${SA_ORBIT_360_LAB:-${SA_DEFAULT:-}}}"
+          test -n "$SERVICE_ACCOUNT"
+          KEY_FILE="$RUNNER_TEMP/orbit360-block12-rescue-service-account.json"
+          printf '%s' "$SERVICE_ACCOUNT" > "$KEY_FILE"
+          chmod 600 "$KEY_FILE"
+          test "$(jq -r '.project_id // empty' "$KEY_FILE")" = "$ORBIT360_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
+
+      - name: Instalar herramientas controladas
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false firebase-admin@13.10.0 firebase-tools@15.25.1 >/dev/null
+          npx firebase --version
+
+      - name: Retirar tenant y usuarios sintéticos
+        id: data_cleanup
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-block12-runtime-hang-rescue-v20260804.mjs
+          jq -e '.status=="RUNTIME_HANG_SYNTHETIC_CLEANUP_PASS" and .realTenantUnchanged==true and .syntheticTenantRemoved==true and .authUsersRemaining==0 and .realTenantWrites==0 and .rulesChanged==false and .productionTouched==false and .ok==true' "$ORBIT360_EVIDENCE_DIR/block12-runtime-hang-rescue-data-auth.json" >/dev/null
+
+      - name: Retirar Functions y canal preview temporales
+        id: deploy_cleanup
+        shell: bash
+        run: |
+          set -euo pipefail
+          for NAME in ${ORBIT360_FUNCTIONS//,/ }; do
+            npx firebase functions:delete "$NAME" --region us-central1 --project "$ORBIT360_PROJECT_ID" --force || true
+          done
+          npx firebase hosting:channel:delete "$ORBIT360_HOSTING_CHANNEL" --project "$ORBIT360_PROJECT_ID" --force || true
+          npx firebase functions:list --project "$ORBIT360_PROJECT_ID" --json > "$RUNNER_TEMP/functions-after-rescue.json" || true
+          npx firebase hosting:channel:list --project "$ORBIT360_PROJECT_ID" --json > "$RUNNER_TEMP/channels-after-rescue.json" || true
+          REMAINING=0
+          for NAME in ${ORBIT360_FUNCTIONS//,/ }; do grep -Fq "$NAME" "$RUNNER_TEMP/functions-after-rescue.json" && REMAINING=$((REMAINING+1)); done
+          CHANNEL_REMAINS=false
+          grep -Fq "$ORBIT360_HOSTING_CHANNEL" "$RUNNER_TEMP/channels-after-rescue.json" && CHANNEL_REMAINS=true
+          echo "functions_remaining=$REMAINING" >> "$GITHUB_OUTPUT"
+          echo "channel_remains=$CHANNEL_REMAINS" >> "$GITHUB_OUTPUT"
+          test "$REMAINING" = 0
+          test "$CHANNEL_REMAINS" = false
+
+      - name: Consolidar evidencia de rescate
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          DATA_OK=false
+          DATA_FILE="$ORBIT360_EVIDENCE_DIR/block12-runtime-hang-rescue-data-auth.json"
+          test -f "$DATA_FILE" && DATA_OK="$(jq -r '.ok // false' "$DATA_FILE")"
+          FUNCTIONS_REMAINING="${{ steps.deploy_cleanup.outputs.functions_remaining }}"
+          CHANNEL_REMAINS="${{ steps.deploy_cleanup.outputs.channel_remains }}"
+          CANCEL_STATUS="${{ steps.cancel.outputs.status }}"
+          CANCEL_CONCLUSION="${{ steps.cancel.outputs.conclusion }}"
+          PASS=false
+          if [ "$DATA_OK" = true ] && [ "$FUNCTIONS_REMAINING" = 0 ] && [ "$CHANNEL_REMAINS" = false ] && [ "$CANCEL_STATUS" = completed ]; then PASS=true; fi
+          jq -n \
+            --arg generatedAt "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            --arg head "${ORBIT360_MATERIALIZED_HEAD:-}" \
+            --arg cancelStatus "$CANCEL_STATUS" \
+            --arg cancelConclusion "$CANCEL_CONCLUSION" \
+            --arg functionsRemaining "$FUNCTIONS_REMAINING" \
+            --arg channelRemains "$CHANNEL_REMAINS" \
+            --argjson pass "$PASS" \
+            '{schemaVersion:"orbit360-block12-runtime-hang-rescue-final-v1",generatedAt:$generatedAt,gateId:"block12-runtime-hang-rescue-lab-v20260804",contractVersion:"12.0.3",targetRunId:30956309298,materializedHead:$head,status:(if $pass then "RUNTIME_HANG_RESCUE_PASS" else "RUNTIME_HANG_RESCUE_FAIL" end),classification:(if $pass then "GO_RESCUE_CLEAN" else "PIPELINE_MECHANISM_FAILURE" end),cancelStatus:$cancelStatus,cancelConclusion:$cancelConclusion,syntheticDataAuthCleanup:$pass,functionsRemaining:$functionsRemaining,hostingChannelRemains:$channelRemains,rulesDeployed:false,realDataReimported:false,productionTouched:false,mainTouched:false,mergeExecuted:false,containsPII:false,containsSecrets:false,ok:$pass}' > "$ORBIT360_EVIDENCE_DIR/block12-runtime-hang-rescue-final.json"
+          if [ "$PASS" != true ]; then exit 45; fi
+
+      - name: Publicar evidencias sanitizadas
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-block12-runtime-hang-rescue-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/block12-runtime-hang-rescue-preflight.json
+            orbit360-platform/runtime-gate-crm-v20260716/block12-runtime-hang-rescue-data-auth.json
+            orbit360-platform/runtime-gate-crm-v20260716/block12-runtime-hang-rescue-final.json
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Publicar decisión en PR 5
+        if: always()
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          FILE="$ORBIT360_EVIDENCE_DIR/block12-runtime-hang-rescue-final.json"
+          STATUS="RUNTIME_HANG_RESCUE_FAIL"; CLASSIFICATION="PIPELINE_MECHANISM_FAILURE"
+          if [ -f "$FILE" ]; then STATUS="$(jq -r '.status' "$FILE")"; CLASSIFICATION="$(jq -r '.classification' "$FILE")"; fi
+          gh api "repos/${GITHUB_REPOSITORY}/issues/5/comments" -f body="## Block 12 · rescate del runtime colgado · run ${GITHUB_RUN_ID}\n\n- Estado: \`${STATUS}\`\n- Clasificación: \`${CLASSIFICATION}\`\n- Run cancelado: \`30956309298\`\n- Tenant/usuarios/Functions/canal sintéticos: verificados por evidencia\n- Rules/reimportación real/producción/main/merge: no" >/dev/null
