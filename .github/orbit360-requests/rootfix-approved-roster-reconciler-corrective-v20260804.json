@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "orbit360-rootfix-approved-roster-reconciler-corrective-request-v1",
+  "status": "AUTHORIZED_SINGLE_SOURCE_CORRECTIVE",
+  "authorizedAt": "2026-08-04T05:59:00-06:00",
+  "authorizationRef": "same_user_macro_authorization_single_source_corrective",
+  "priorRun": 30908742658,
+  "failureCode": "APPROVED_SOURCE_COMMIT_REFERENCE_ERROR",
+  "candidate": "b699ba329960cd830121b57452ce558399aa84fb",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "secrets": false,
+  "firestoreRead": false,
+  "authRead": false,
+  "writes": false,
+  "browser": false,
+  "deploy": false,
+  "production": false,
+  "consumed": false,
+  "replayAllowed": false,
+  "stopRetryIfFailsAgain": true,
+  "containsPII": false,
+  "containsSecrets": false
+}
