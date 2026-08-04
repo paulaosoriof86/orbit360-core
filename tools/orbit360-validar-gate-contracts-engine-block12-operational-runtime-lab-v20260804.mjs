@@ -8,7 +8,7 @@ const ROOT = process.cwd();
 const GATE = 'block12-operational-runtime-lab-v20260804';
 const VERSION = '12.0.8';
 const LIFECYCLE = 'tools/orbit360-validator-lifecycle-contract-block12-operational-runtime-lab-v20260804.json';
-const REQUEST = process.env.ORBIT360_REQUEST_FILE || '.github/orbit360-requests/block12-operational-runtime-lab-rootfix9-v20260804.json';
+const REQUEST = process.env.ORBIT360_REQUEST_FILE || '.github/orbit360-requests/block12-operational-runtime-lab-rootfix9-resume-v20260804.json';
 const OUT = path.join(ROOT, 'orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json');
 const REQUIRED = [
   LIFECYCLE,
@@ -68,7 +68,7 @@ try {
   add('SYNTHETIC_LOADER_CONTRACT', scope.syntheticTenantPattern === '^verify-block12-[0-9]+$' && scope.syntheticTenantAllowedOnlyOnOperationalPreview === true && scope.syntheticTenantRequiresVerificationMode === true && loader.includes('isOperationalVerificationPreviewHost') && loader.includes('isSyntheticVerificationTenant') && loader.includes('/^verify-block12-[0-9]+$/') && loader.includes('if (isSyntheticVerificationTenant) allowedTenants.push(requestedTenant)') && index.includes('backend-lab-loader.js?v=20260804-operational-rootfix9'));
   const loaderMaterializer = readText('tools/orbit360-materializar-block12-synthetic-loader-rootfix-v20260804.mjs');
   add('MATERIALIZER_REPLACEMENT_SAFE', scope.materializerUsesFunctionReplacement === true && scope.engineSyntaxPassRequired === true && loaderMaterializer.includes('return source.replace(before, () => after);'));
-  add('FUNCTIONS_SDK_CONTRACT', scope.firebaseFunctionsCompatSdkRequired === true && scope.callableSdkReadinessRequired === true && loader.includes('firebase-functions-compat.js') && center.includes("typeof firebase.functions !== 'function'") && rootfixWorkflow.includes('callableSdkReady'));
+  add('FUNCTIONS_SDK_CONTRACT', scope.firebaseFunctionsCompatSdkRequired === true && scope.callableSdkReadinessRequired === true && loader.includes('firebase-functions-compat.js') && readText('orbit360-platform/core/runtime-verification-center-v20260804.js').includes("typeof firebase.functions !== 'function'") && rootfixWorkflow.includes('callableSdkReady'));
   const dependencyEvidence = readJson('orbit360-platform/runtime-gate-crm-v20260716/functions-dependency-rootfix-source-v20260804.json');
   add('FUNCTIONS_DEPENDENCY_PASS', scope.functionsPackageLockRequired === true && scope.functionsBootstrapLoadPassRequired === true && dependencyEvidence.status === 'FUNCTIONS_BOOTSTRAP_LOAD_PASS' && dependencyEvidence.classification === 'GO_SOURCE_REPRODUCIBLE_FUNCTIONS_RUNTIME' && dependencyEvidence.requiredFunctionExports === true && dependencyEvidence.broadV2AggregatorLoaded === false && dependencyEvidence.unusedDatabaseProviderLoaded === false && dependencyEvidence.lockfileVersion >= 3 && dependencyEvidence.ok === true);
   add('REQUIRED_FILES', REQUIRED.every(exists), REQUIRED.filter(rel => !exists(rel)).join(','));
