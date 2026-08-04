@@ -1,0 +1,80 @@
+name: Orbit 360 · root fix escritor final Gate 7.14
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-requests/rootfix-final-writer-gate714-v20260804.json'
+
+permissions:
+  contents: write
+  statuses: write
+
+concurrency:
+  group: orbit360-rootfix-final-writer-gate714-v20260804
+  cancel-in-progress: false
+
+env:
+  REQUEST: .github/orbit360-requests/rootfix-final-writer-gate714-v20260804.json
+  STATUS_CONTEXT: orbit360/rootfix-final-writer-gate714
+
+jobs:
+  rootfix:
+    name: Gate 7.14 · corregir escritor final · cero datos
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout exacto
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Preparar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Validar frontera source-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = 'ays/backend-tenant-lab-v99-20260703'
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          jq -e '.schemaVersion=="orbit360-rootfix-final-writer-gate714-request-v1" and .status=="AUTHORIZED_SOURCE_ONLY_AFTER_NO_WRITE" and .failedRun==30887559372 and .classification=="PIPELINE_MECHANISM_FAILURE" and .secrets==false and .firestoreRead==false and .authRead==false and .writes==false and .browser==false and .deploy==false and .production==false and .consumed==false' "$REQUEST" >/dev/null
+          node --check tools/orbit360-aplicar-rootfix-final-writer-gate714-v20260804.mjs
+          bash -n tools/orbit360-rc12-normal-onboarding-close-macro-v20260804.sh
+
+      - name: Aplicar y probar root fix
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-aplicar-rootfix-final-writer-gate714-v20260804.mjs
+          bash -n tools/orbit360-rc12-normal-onboarding-close-macro-v20260804.sh
+          grep -F 'productionMaintained:$productionMaintained' tools/orbit360-rc12-normal-onboarding-close-macro-v20260804.sh
+          ! grep -F 'productionMaintained:$production,' tools/orbit360-rc12-normal-onboarding-close-macro-v20260804.sh
+          git diff --check
+
+      - name: Persistir root fix
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add tools/orbit360-rc12-normal-onboarding-close-macro-v20260804.sh
+          git commit -m 'validator: corregir escritor final Gate 7.14'
+          git push origin HEAD:ays/backend-tenant-lab-v99-20260703
+
+      - name: Publicar estado
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.repos.createCommitStatus({
+              owner:context.repo.owner,
+              repo:context.repo.repo,
+              sha:context.sha,
+              state:'${{ job.status }}'==='success'?'success':'failure',
+              context:process.env.STATUS_CONTEXT,
+              description:'${{ job.status }}'==='success'?'Gate 7.14 · escritor final corregido · PASS':'Gate 7.14 · root fix incompleto',
+              target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
+            });
