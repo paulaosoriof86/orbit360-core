@@ -1,0 +1,347 @@
+name: Gravicentra Insurance RC1.2 · cierre final post-rollback
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-requests/rc12-approved-roster-final-postrollback-v20260804.json'
+
+permissions:
+  contents: write
+  statuses: write
+  pull-requests: write
+
+concurrency:
+  group: orbit360-rc12-final-postrollback-go-live-v20260804
+  cancel-in-progress: false
+
+env:
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  ORBIT360_REQUEST_FILE: .github/orbit360-requests/rc12-approved-roster-final-postrollback-v20260804.json
+  ORBIT360_GATE_ID: block7.15-rc12-approved-roster-final-go-live-v20260804
+  ORBIT360_RELEASE_BRANCH: release/gravicentra-insurance-rc1-2-membership-auth-20260803
+  ORBIT360_RELEASE_COMMIT: b699ba329960cd830121b57452ce558399aa84fb
+  ORBIT360_BASELINE: 27cb7dfcda8568280ebef15993a953364304f29b
+  ORBIT360_PROJECT_ID: ays-orbit-360-lab
+  ORBIT360_TENANT_ID: alianzas-soluciones
+  ORBIT360_LIVE_URL: https://ays-orbit-360-lab.web.app
+  ORBIT360_EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+  STATUS_CONTEXT: orbit360/rc12-final-postrollback-go-live
+
+jobs:
+  final-go-live:
+    name: Gate 7.15.1 · 3 Auth · 3 memberships · Gate 7.13 · Hosting · smoke
+    runs-on: ubuntu-24.04
+    timeout-minutes: 55
+    steps:
+      - name: Checkout solicitud exacta
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Preparar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Verificar autorización, rama, PR y candidata
+        uses: actions/github-script@v7
+        env:
+          REQUEST_FILE: ${{ env.ORBIT360_REQUEST_FILE }}
+        with:
+          script: |
+            const fs = require('fs');
+            const cp = require('child_process');
+            const req = JSON.parse(fs.readFileSync(process.env.REQUEST_FILE, 'utf8'));
+            const fail = m => { throw new Error(m); };
+            if (context.ref !== `refs/heads/${process.env.ORBIT360_BRANCH}`) fail('BRANCH_MISMATCH');
+            if (String(process.env.GITHUB_RUN_ATTEMPT) !== '1') fail('REPLAY_FORBIDDEN');
+            if (req.schemaVersion !== 'orbit360-rc12-approved-roster-final-go-live-request-v1' || req.status !== 'AUTHORIZED_FINAL_POST_ROLLBACK' || req.approved !== true || req.allowedExecutions !== 1 || req.consumed !== false || req.replayAllowed !== false || req.retryAuthorized !== false || req.postRollbackFinal !== true) fail('REQUEST_NOT_ACTIVE');
+            if (req.authorizationRef !== 'user_authorizes_single_final_post_rollback_rc12_20260804T0734-0600') fail('AUTHORIZATION_REF_MISMATCH');
+            if (req.branch !== process.env.ORBIT360_BRANCH || req.pullRequest !== 5 || req.releaseBranch !== process.env.ORBIT360_RELEASE_BRANCH || req.releaseCommit !== process.env.ORBIT360_RELEASE_COMMIT || req.baseline !== process.env.ORBIT360_BASELINE || req.projectId !== process.env.ORBIT360_PROJECT_ID || req.tenantId !== process.env.ORBIT360_TENANT_ID) fail('REQUEST_BINDING_MISMATCH');
+            if (req.priorRollbackRecovery?.run !== 30911627137 || req.priorRollbackRecovery?.decision !== 'APPROVED_ROSTER_ROLLBACK_RECOVERY_PASS' || req.priorRollbackRecovery?.remainingOwnedMemberships !== 0 || req.priorRollbackRecovery?.remainingOwnedUsers !== 0) fail('ROLLBACK_RECOVERY_NOT_BOUND');
+            const parent = cp.execFileSync('git', ['rev-parse', 'HEAD^'], {encoding:'utf8'}).trim();
+            if (parent !== req.parentHead) fail('REQUEST_PARENT_MISMATCH');
+            const delta = cp.execFileSync('git', ['diff-tree','--no-commit-id','--name-only','-r','HEAD'], {encoding:'utf8'}).trim().split(/\r?\n/).filter(Boolean);
+            if (delta.length !== 1 || delta[0] !== process.env.REQUEST_FILE) fail('REQUEST_COMMIT_NOT_EXACT');
+            const pr = (await github.rest.pulls.get({owner:context.repo.owner,repo:context.repo.repo,pull_number:5})).data;
+            if (pr.state !== 'open' || pr.draft !== true || pr.merged === true || pr.head.ref !== process.env.ORBIT360_BRANCH) fail('PR_NOT_DRAFT_OPEN');
+
+      - name: Verificar release inmutable y recuperación previa
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --no-tags origin "$ORBIT360_BRANCH" "$ORBIT360_RELEASE_BRANCH"
+          test "$(git rev-parse origin/$ORBIT360_RELEASE_BRANCH)" = "$ORBIT360_RELEASE_COMMIT"
+          test "$(git merge-base "$ORBIT360_BASELINE" "$ORBIT360_RELEASE_COMMIT")" = "$ORBIT360_BASELINE"
+          jq -e '.decision=="APPROVED_ROSTER_ROLLBACK_RECOVERY_PASS" and .classification=="ROLLBACK_PASS" and .gate.contractVersion=="7.15.2" and .gate.passed==14 and .gate.failed==0 and .rollback.membershipDeletes==3 and .rollback.authDeletes==3 and .rollback.remainingOwnedMemberships==0 and .rollback.remainingOwnedUsers==0 and .hosting.deployAttempted==false and .hosting.productionTouched==false and .ok==true' "$ORBIT360_EVIDENCE_DIR/rc12-approved-roster-rollback-recovery-final.json" >/dev/null
+
+      - name: Persistir bindings post-rollback y owners corregidos
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-aplicar-rootfix-final-postrollback-rc12-v20260804.mjs
+          node tools/orbit360-aplicar-rootfix-final-postrollback-rc12-v20260804.mjs
+          node --check tools/orbit360-validar-gate-contracts-engine-rc12-approved-roster-final-go-live-v20260804.mjs
+          node --check tools/orbit360-validar-gate-contracts-engine-rc12-rootcause-cumulative-closure-v20260803.mjs
+          node --check tools/orbit360-provisionar-roster-aprobado-final-rc12-v20260804.mjs
+          node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
+          bash -n tools/orbit360-rc12-approved-roster-final-go-live-macro-v20260804.sh
+          jq -e '.decision=="RC12_FINAL_POSTROLLBACK_ROOTFIX_STATIC_PASS" and .classification=="GO_STATIC_PIPELINE_ROOTFIX" and .checks.gate715RequestBound==true and .checks.lifecycleRequestBound==true and .checks.lifecycleRecoveryBound==true and .checks.gate713AbsolutePathPreserved==true and .checks.gate713EphemeralRequestBound==true and .checks.macroGate713RequestBound==true and .checks.rollbackReadBeforeWritePreserved==true and .checks.hostingOnlyPreserved==true and .checks.forbiddenOperationsAbsent==true and .secretAccess==false and .firestoreRead==false and .firestoreWrites==0 and .authRead==false and .authWrites==0 and .browserExecuted==false and .deployExecuted==false and .productionTouched==false and .ok==true' "$ORBIT360_EVIDENCE_DIR/rc12-final-postrollback-rootfix-static.json" >/dev/null
+          mapfile -t FILES < <({ git diff --name-only; git ls-files --others --exclude-standard; } | sort -u)
+          printf '%s\n' "${FILES[@]}"
+          test "${#FILES[@]}" = '5'
+          for F in \
+            tools/orbit360-validator-lifecycle-contract-rc12-approved-roster-final-go-live-v20260804.json \
+            tools/orbit360-validar-gate-contracts-engine-rc12-approved-roster-final-go-live-v20260804.mjs \
+            tools/orbit360-validar-gate-contracts-engine-rc12-rootcause-cumulative-closure-v20260803.mjs \
+            tools/orbit360-rc12-approved-roster-final-go-live-macro-v20260804.sh \
+            orbit360-platform/runtime-gate-crm-v20260716/rc12-final-postrollback-rootfix-static.json; do
+            printf '%s\n' "${FILES[@]}" | grep -Fx "$F"
+          done
+          git diff --check
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "${FILES[@]}"
+          git commit -m 'rootfix: bind final post-rollback RC1.2 closure'
+          git push origin HEAD:"$ORBIT360_BRANCH"
+          echo "ORBIT360_ROOTFIX_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+
+      - name: Preparar candidata exacta sin modificarla
+        shell: bash
+        run: |
+          set -euo pipefail
+          RC12_ROOT="$RUNNER_TEMP/gravicentra-insurance-rc12-final-postrollback"
+          git worktree add --detach "$RC12_ROOT" "$ORBIT360_RELEASE_COMMIT"
+          test "$(git -C "$RC12_ROOT" rev-parse HEAD)" = "$ORBIT360_RELEASE_COMMIT"
+          test -z "$(git -C "$RC12_ROOT" status --porcelain)"
+          test "$(jq -r '.hosting.public' "$RC12_ROOT/firebase.json")" = 'orbit360-platform'
+          echo "ORBIT360_RC12_ROOT=$RC12_ROOT" >> "$GITHUB_ENV"
+          echo "ORBIT360_RC1_ROOT=$RC12_ROOT" >> "$GITHUB_ENV"
+          echo "ORBIT360_RC12_PRIVATE_IDENTITIES=$RUNNER_TEMP/gravicentra-rc12-final-identities.json" >> "$GITHUB_ENV"
+          echo "ORBIT360_APPROVED_ROSTER_PRIVATE_STATE=$RUNNER_TEMP/gravicentra-rc12-final-roster-state.json" >> "$GITHUB_ENV"
+          echo "ORBIT360_TEMP_KEY_FILE=$RUNNER_TEMP/gravicentra-rc12-final-service-account.json" >> "$GITHUB_ENV"
+
+      - name: Gate 7.15.1 antes de secretos
+        shell: bash
+        run: |
+          set -euo pipefail
+          ORBIT360_REQUEST_FILE="$ORBIT360_REQUEST_FILE" node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
+          jq -e '.status=="GO_GATE_CONTRACT" and .classification=="RC12_APPROVED_ROSTER_FINAL_GO_LIVE_READY" and .contractVersion=="7.15.1" and .total==17 and .passed==17 and .failed==0 and .executionAuthorized==true and .secretAccessAuthorized==true and .firestoreReadAuthorized==true and .writeAuthorized==true and .maximumAuthUsersCreated==3 and .maximumAuthUsersUpdated==0 and .maximumMembershipDocumentsWritten==3 and .maximumMembershipDocumentsCreated==3 and .maximumPasswordWrites==3 and .passwordReadsAuthorized==0 and .customTokensAuthorized==3 and .authWriteAuthorized==true and .runtimeAuthorized==true and .browserAuthorized==true and .deployAuthorized==true and .hostingDeployOnly==true and .rulesDeployAuthorized==false and .functionsDeployAuthorized==false and .productionAuthorized==true and .dataAccess==false and .secretAccess==false and .firestoreRead==false and .firestoreWrites==0 and .authWrites==0 and .userCreates==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' "$ORBIT360_EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+          cp "$ORBIT360_EVIDENCE_DIR/preflight-sanitizado.json" "$ORBIT360_EVIDENCE_DIR/rc12-final-postrollback-gate7151.json"
+          ABS_OUT="$GITHUB_WORKSPACE/$ORBIT360_EVIDENCE_DIR/rc12-final-postrollback-auth-antiregression.json"
+          ORBIT360_AUTH_MEMBERSHIP_SOURCE_ROOT="$ORBIT360_RC12_ROOT" ORBIT360_AUTH_MEMBERSHIP_EVIDENCE="$ABS_OUT" node tools/orbit360-validar-auth-membership-antiregression-rootfix-v20260803.mjs
+          jq -e '.status=="PASS" and .total==16 and .passed==16 and .failed==0 and .outputPathAbsolute==true and .sourceRootIndependentFromOutput==true and .firestoreRead==false and .firestoreWrites==0 and .authWrites==0 and .productionTouched==false' "$ABS_OUT" >/dev/null
+
+      - name: Instalar herramientas después de Gate 7.15.1
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --global firebase-tools@15.25.1
+          firebase --version
+          npm install --no-save --package-lock=false --ignore-scripts firebase-admin@13 google-auth-library@9 playwright@1.52.0
+          npx playwright install --with-deps chromium
+
+      - name: Resolver identidad de servicio y proyecto exacto
+        shell: bash
+        env:
+          SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+          SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          set -euo pipefail
+          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-${SA_ORBIT_360_LAB:-${SA_DEFAULT:-}}}"
+          test -n "$SERVICE_ACCOUNT"
+          printf '%s' "$SERVICE_ACCOUNT" > "$ORBIT360_TEMP_KEY_FILE"
+          chmod 600 "$ORBIT360_TEMP_KEY_FILE"
+          SERVICE_PROJECT="$(jq -r '.project_id // empty' "$ORBIT360_TEMP_KEY_FILE")"
+          test "$SERVICE_PROJECT" = "$ORBIT360_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$ORBIT360_TEMP_KEY_FILE" >> "$GITHUB_ENV"
+          jq -n --arg project "$ORBIT360_PROJECT_ID" --arg serviceProject "$SERVICE_PROJECT" '{schemaVersion:"orbit360-firebase-project-binding-v2",projectId:$project,serviceAccountProjectId:$serviceProject,projectMatch:($project==$serviceProject),firestoreWrites:0,authWrites:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false,ok:($project==$serviceProject)}' > "$ORBIT360_EVIDENCE_DIR/rc12-final-postrollback-project-binding.json"
+          jq -e '.projectMatch==true and .ok==true' "$ORBIT360_EVIDENCE_DIR/rc12-final-postrollback-project-binding.json" >/dev/null
+
+      - name: Ejecutar macrobloque final autorizado
+        id: macro
+        shell: bash
+        run: |
+          set +e
+          bash tools/orbit360-rc12-approved-roster-final-go-live-macro-v20260804.sh
+          CODE=$?
+          echo "exit_code=$CODE" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Consolidar decisión y consumir autorización
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          FINAL="$ORBIT360_EVIDENCE_DIR/rc12-approved-roster-final-go-live.json"
+          test -f "$FINAL"
+          DECISION="$(jq -r '.decision // "UNKNOWN"' "$FINAL")"
+          OK="$(jq -r '.ok // false' "$FINAL")"
+          jq -n \
+            --arg generatedAt "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            --arg authorizationRef 'user_authorizes_single_final_post_rollback_rc12_20260804T0734-0600' \
+            --arg request "$ORBIT360_REQUEST_FILE" \
+            --arg requestCommit "$GITHUB_SHA" \
+            --arg rootfixCommit "${ORBIT360_ROOTFIX_COMMIT:-}" \
+            --arg runId "$GITHUB_RUN_ID" \
+            --arg jobId "$GITHUB_JOB" \
+            --arg decision "$DECISION" \
+            --arg macroExitCode "${{ steps.macro.outputs.exit_code }}" \
+            --argjson ok "$OK" \
+            '{schemaVersion:"orbit360-rc12-final-postrollback-consumption-v1",generatedAt:$generatedAt,authorizationRef:$authorizationRef,request:$request,requestCommit:$requestCommit,rootfixCommit:$rootfixCommit,runId:($runId|tonumber),job:$jobId,decision:$decision,macroExitCode:$macroExitCode,authorizationConsumed:true,allowedExecutionsRemaining:0,replayAllowed:false,reimportExecuted:false,rulesApplied:false,functionsDeployed:false,mainTouched:false,mergeExecuted:false,gate711Executed:false,containsPII:false,containsSecrets:false,ok:$ok}' > "$ORBIT360_EVIDENCE_DIR/rc12-final-postrollback-consumption.json"
+          BROWSER_OK=false; DATA_OK=false; GATE713_OK=false
+          [ -f "$ORBIT360_EVIDENCE_DIR/gravicentra-rc12-membership-browser-smoke.json" ] && BROWSER_OK="$(jq -r '.ok // false' "$ORBIT360_EVIDENCE_DIR/gravicentra-rc12-membership-browser-smoke.json")"
+          [ -f "$ORBIT360_EVIDENCE_DIR/gravicentra-rc1-go-live-smoke.json" ] && DATA_OK="$(jq -r '.ok // false' "$ORBIT360_EVIDENCE_DIR/gravicentra-rc1-go-live-smoke.json")"
+          [ -f "$ORBIT360_EVIDENCE_DIR/rc12-gate713-post-approved-roster.json" ] && GATE713_OK="$(jq -r '.status=="GO_GATE_CONTRACT"' "$ORBIT360_EVIDENCE_DIR/rc12-gate713-post-approved-roster.json")"
+          cat > orbit360-platform/docs/CIERRE-FINAL-POST-ROLLBACK-RC12-20260804.md <<EOF
+          # Cierre final post-rollback — Gravicentra Insurance RC1.2
+
+          Fecha: 2026-08-04
+
+          \`\`\`text
+          run: $GITHUB_RUN_ID
+          requestCommit: $GITHUB_SHA
+          rootfixCommit: ${ORBIT360_ROOTFIX_COMMIT:-}
+          releaseCommit: $ORBIT360_RELEASE_COMMIT
+          decision: $DECISION
+          macroExitCode: ${{ steps.macro.outputs.exit_code }}
+          Gate 7.15.1: ejecutado antes de secretos
+          Gate 7.13 PASS: $GATE713_OK
+          browser smoke PASS: $BROWSER_OK
+          data/Hosting smoke PASS: $DATA_OK
+          autorización consumida: sí
+          reimportación: no
+          Rules: no
+          Functions: no
+          main: no
+          merge: no
+          Gate 7.11: no
+          \`\`\`
+
+          La fuente operativa es la evidencia sanitizada del run. Los usuarios y memberships solo se conservan cuando la decisión final es \`RC12_APPROVED_ROSTER_CUMULATIVE_GO_LIVE_PASS\`; ante fallo se exige el rollback corregido.
+          EOF
+          cat > orbit360-platform/docs/ADDENDUM-CLOUD-ACADEMIA-CIERRE-FINAL-RC12-20260804.md <<EOF
+          # Addendum Cloud / Academia — cierre final RC1.2
+
+          Fecha: 2026-08-04
+
+          - El Gate 7.15.1 se ejecuta antes de secretos y separa autorización, producto y capacidades.
+          - Gate 7.13 admite una solicitud temporal absoluta únicamente cuando su contenido queda ligado al macrobloque autorizado y al rollback previo.
+          - El rollback de memberships lee y valida todos los documentos antes de borrar.
+          - Equipo, Firebase Auth y membership son tres owners coordinados; crear un registro de asesor no equivale a provisionar acceso.
+          - \`cobrosMaterializados\` no equivale al universo cobrado ni conciliable.
+          - Cloud/Claude externo: no enviado.
+
+          Clasificación: \`REPLICABLE_CLAUDE_ACUMULADO\`, \`ACADEMIA_ACTUALIZAR\` y \`BACKEND_PROTEGIDO_NO_CLAUDE\` para identidades y secretos.
+          EOF
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$ORBIT360_EVIDENCE_DIR/rc12-final-postrollback-consumption.json" orbit360-platform/docs/CIERRE-FINAL-POST-ROLLBACK-RC12-20260804.md orbit360-platform/docs/ADDENDUM-CLOUD-ACADEMIA-CIERRE-FINAL-RC12-20260804.md
+          git commit -m "docs: close final post-rollback RC1.2 as $DECISION"
+          git push origin HEAD:"$ORBIT360_BRANCH"
+
+      - name: Actualizar PR sin merge
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          FINAL: orbit360-platform/runtime-gate-crm-v20260716/rc12-approved-roster-final-go-live.json
+          CONSUMPTION: orbit360-platform/runtime-gate-crm-v20260716/rc12-final-postrollback-consumption.json
+        with:
+          script: |
+            const fs=require('fs');
+            let f={decision:'UNKNOWN',ok:false}, c={runId:context.runId};
+            try { f=JSON.parse(fs.readFileSync(process.env.FINAL,'utf8')); } catch (_) {}
+            try { c=JSON.parse(fs.readFileSync(process.env.CONSUMPTION,'utf8')); } catch (_) {}
+            const pass=f.decision==='RC12_APPROVED_ROSTER_CUMULATIVE_GO_LIVE_PASS' && f.ok===true;
+            const title=pass ? 'draft: Gravicentra Insurance RC1.2 · GO_LIVE_PASS · Auth normal y Hosting activo' : `draft: Gravicentra Insurance RC1.2 · ${f.decision} · STOP_RETRY`;
+            const body=`# Estado vigente — Gravicentra Insurance RC1.2\n\nFecha operativa: 2026-08-04  \nRama: \`${process.env.ORBIT360_BRANCH}\`  \nPR #5: **draft/open**, sin merge.\n\n## Decisión\n\n\`\`\`text\n${f.decision}\nrun: ${c.runId || context.runId}\nreleaseCommit: ${process.env.ORBIT360_RELEASE_COMMIT}\nGate 7.15.1 antes de secretos: sí\nGate 7.13 ejecutado: ${f.gate713Executed===true}\nAuth users creados: ${f.authCreates ?? 0}\nmemberships escritas: ${f.membershipWrites ?? 0}\ndeploy intentado: ${f.deployAttempted===true}\ndeploy conservado: ${pass}\nrollback provisioning: ${f.provisioningRollbackExecuted===true}\nrollback Hosting: ${f.hostingRollbackExecuted===true}\nreimportación: no\nRules/Functions: no\nmain/merge: no\nGate 7.11: no\nautorización consumida: sí\n\`\`\`\n\n## Fuente vigente\n\n- \`orbit360-platform/docs/CIERRE-FINAL-POST-ROLLBACK-RC12-20260804.md\`\n- evidencia sanitizada del run ${c.runId || context.runId}\n\nNo se envió información externa a Cloud/Claude.`;
+            await github.rest.pulls.update({owner:context.repo.owner,repo:context.repo.repo,pull_number:5,title,body,state:'open'});
+
+      - name: Publicar estado observable
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          FINAL: orbit360-platform/runtime-gate-crm-v20260716/rc12-approved-roster-final-go-live.json
+        with:
+          script: |
+            const fs=require('fs');
+            let state='failure', description='RC1.2 cierre final sin evidencia';
+            try {
+              const f=JSON.parse(fs.readFileSync(process.env.FINAL,'utf8'));
+              if (f.decision==='RC12_APPROVED_ROSTER_CUMULATIVE_GO_LIVE_PASS' && f.ok===true) { state='success'; description='RC1.2 · 3 Auth · 3 memberships · Hosting · smoke PASS'; }
+              else description=`RC1.2 · ${f.decision}`;
+            } catch (_) {}
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:process.env.STATUS_CONTEXT,description:description.slice(0,140),target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
+
+      - name: Subir evidencia sanitizada
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rc12-final-postrollback-go-live-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/rc12-final-postrollback-rootfix-static.json
+            orbit360-platform/runtime-gate-crm-v20260716/rc12-final-postrollback-gate7151.json
+            orbit360-platform/runtime-gate-crm-v20260716/rc12-final-postrollback-auth-antiregression.json
+            orbit360-platform/runtime-gate-crm-v20260716/rc12-final-postrollback-project-binding.json
+            orbit360-platform/runtime-gate-crm-v20260716/rc12-approved-roster-census.json
+            orbit360-platform/runtime-gate-crm-v20260716/rc12-approved-roster-apply.json
+            orbit360-platform/runtime-gate-crm-v20260716/rc12-approved-roster-verify.json
+            orbit360-platform/runtime-gate-crm-v20260716/rc12-approved-roster-rollback.json
+            orbit360-platform/runtime-gate-crm-v20260716/rc12-gate713-post-approved-roster.json
+            orbit360-platform/runtime-gate-crm-v20260716/gravicentra-rc12-membership-identities.json
+            orbit360-platform/runtime-gate-crm-v20260716/gravicentra-rc1-go-live-before.json
+            orbit360-platform/runtime-gate-crm-v20260716/gravicentra-rc12-membership-browser-smoke.json
+            orbit360-platform/runtime-gate-crm-v20260716/gravicentra-rc1-go-live-smoke.json
+            orbit360-platform/runtime-gate-crm-v20260716/gravicentra-rc1-go-live-rollback.json
+            orbit360-platform/runtime-gate-crm-v20260716/rc12-approved-roster-final-go-live.json
+            orbit360-platform/runtime-gate-crm-v20260716/rc12-final-postrollback-consumption.json
+            orbit360-platform/runtime-gate-crm-v20260716/rc12-cobros-semantic-contract-v20260804.json
+            orbit360-platform/runtime-gate-crm-v20260716/rc12-approved-roster-rollback-recovery-final.json
+            orbit360-platform/docs/CIERRE-FINAL-POST-ROLLBACK-RC12-20260804.md
+            orbit360-platform/docs/ADDENDUM-CLOUD-ACADEMIA-CIERRE-FINAL-RC12-20260804.md
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Limpiar secretos y worktree
+        if: always()
+        shell: bash
+        run: |
+          for FILE in "${ORBIT360_TEMP_KEY_FILE:-}" "${ORBIT360_RC12_PRIVATE_IDENTITIES:-}" "${ORBIT360_APPROVED_ROSTER_PRIVATE_STATE:-}"; do
+            if [ -n "$FILE" ] && [ -f "$FILE" ]; then shred -u "$FILE" || rm -f "$FILE"; fi
+          done
+          if [ -n "${ORBIT360_RC12_ROOT:-}" ] && [ -d "$ORBIT360_RC12_ROOT" ]; then git worktree remove --force "$ORBIT360_RC12_ROOT" || true; fi
+
+      - name: Exigir PASS real o rollback completo
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          FINAL="$ORBIT360_EVIDENCE_DIR/rc12-approved-roster-final-go-live.json"
+          test -f "$FINAL"
+          DECISION="$(jq -r '.decision // empty' "$FINAL")"
+          if [ "$DECISION" = 'RC12_APPROVED_ROSTER_CUMULATIVE_GO_LIVE_PASS' ]; then
+            jq -e '.classification=="PRODUCTION_SMOKE_PASS" and .releaseCommit==env.ORBIT360_RELEASE_COMMIT and .authCreates==3 and .membershipWrites==3 and .existingUserUpdates==0 and .temporaryCredentialsExposed==false and .temporaryCredentialsSent==false and .passwordReads==0 and .passwordWrites==3 and .deployAttempted==true and .deploySucceeded==true and .gate713Executed==true and .productionMaintained==true and .provisioningRollbackExecuted==false and .hostingRollbackExecuted==false and .authorizationConsumed==true and .reimportExecuted==false and .rulesApplied==false and .functionsDeployed==false and .mainTouched==false and .mergeExecuted==false and .gate711Executed==false and .ok==true' "$FINAL" >/dev/null
+            jq -e '.decision=="APPROVED_ROSTER_AUTH_AND_MEMBERSHIPS_APPLIED" and .userCreates==3 and .existingUserUpdates==0 and .passwordWrites==3 and .membershipWrites==3 and .membershipCreates==3 and .finalDistinctUsers==3 and .atomicMembershipTransaction==true and .rollbackStatePersisted==true and .ok==true' "$ORBIT360_EVIDENCE_DIR/rc12-approved-roster-apply.json" >/dev/null
+            jq -e '.decision=="THREE_APPROVED_NORMAL_IDENTITIES_AND_MEMBERSHIPS_PASS" and .finalProfiles==3 and .distinctUsers==3 and .firestoreWrites==0 and .authWrites==0 and .ok==true' "$ORBIT360_EVIDENCE_DIR/rc12-approved-roster-verify.json" >/dev/null
+            jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="7.13.0" and .failed==0 and .executionAuthorized==true' "$ORBIT360_EVIDENCE_DIR/rc12-gate713-post-approved-roster.json" >/dev/null
+            jq -e '.classification=="PRODUCTION_MEMBERSHIP_SMOKE_PASS" and .checks.directionPass==true and .checks.operativoPass==true and .checks.asesorPass==true and .checks.allProfilesPass==true and .profiles.direccion.observed.clientCount==430 and .profiles.operativo.observed.clientCount==430 and .profiles.asesor.observed.clientCount==430 and .profiles.direccion.observed.insurerCount==30 and .profiles.operativo.observed.insurerCount==30 and .profiles.asesor.observed.insurerCount==30 and .profiles.direccion.observed.policyCount>=1373 and .profiles.operativo.observed.policyCount>=1373 and .profiles.asesor.observed.policyCount>=1373 and .authWrites==0 and .firestoreWrites==0 and .ok==true' "$ORBIT360_EVIDENCE_DIR/gravicentra-rc12-membership-browser-smoke.json" >/dev/null
+            jq -e '.decision=="PRODUCTION_SMOKE_PASS" and .checks.assetsExactlyRc1==true and .checks.dataCountsComplete==true and .checks.dataUnchanged==true and .checks.modulesPresent==true and .checks.hostingReadable==true and .checks.newReleaseObserved==true and .checks.priorAnchorPreserved==true and .checks.rollbackAnchorAvailable==true and .data.source.clientes.count==430 and .data.source.aseguradoras.count==30 and .data.source.polizas.count==1373 and .data.source.vehiculos.count==1032 and .data.source.recibosEsperados.count==1294 and .data.source.carteraPrimas.count==673 and .data.source.cobros.count==5 and .data.canonical.clientes.count==430 and .data.canonical.aseguradoras.count==30 and .data.canonical.polizas.count==1375 and .data.canonical.vehiculos.count==1033 and .data.canonical.recibosEsperados.count==1294 and .data.canonical.carteraPrimas.count==673 and .data.canonical.cobros.count==7 and .modules.allRequiredPresent==true and .firestoreWrites==0 and .authWrites==0 and .ok==true' "$ORBIT360_EVIDENCE_DIR/gravicentra-rc1-go-live-smoke.json" >/dev/null
+            jq -e '.authorizationConsumed==true and .allowedExecutionsRemaining==0 and .replayAllowed==false and .decision=="RC12_APPROVED_ROSTER_CUMULATIVE_GO_LIVE_PASS" and .ok==true' "$ORBIT360_EVIDENCE_DIR/rc12-final-postrollback-consumption.json" >/dev/null
+            test "${{ steps.macro.outputs.exit_code }}" = '0'
+          else
+            jq -e '.productionMaintained==false and .ok==false and .authorizationConsumed==true and (.decision|test("NO_GO|FAILED|ROLLED_BACK|ESCALATE"))' "$FINAL" >/dev/null
+            AUTH_CREATES="$(jq -r '.authCreates // 0' "$FINAL")"
+            DEPLOY_ATTEMPTED="$(jq -r '.deployAttempted // false' "$FINAL")"
+            if [ "$AUTH_CREATES" -gt 0 ]; then
+              jq -e '.decision=="APPROVED_ROSTER_ROLLBACK_COMPLETE" and .remainingCreatedMemberships==0 and .remainingCreatedUsers==0 and .ok==true' "$ORBIT360_EVIDENCE_DIR/rc12-approved-roster-rollback.json" >/dev/null
+              jq -e '.provisioningRollbackExecuted==true' "$FINAL" >/dev/null
+            fi
+            if [ "$DEPLOY_ATTEMPTED" = 'true' ]; then
+              jq -e '.decision=="ROLLED_BACK_SAFE" and .checks.publicAssetsRestored==true and .checks.dataUnchanged==true and .ok==true' "$ORBIT360_EVIDENCE_DIR/gravicentra-rc1-go-live-rollback.json" >/dev/null
+              jq -e '.hostingRollbackExecuted==true' "$FINAL" >/dev/null
+            fi
+            exit 41
+          fi
