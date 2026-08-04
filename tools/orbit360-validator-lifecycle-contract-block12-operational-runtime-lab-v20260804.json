@@ -2,8 +2,8 @@
   "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
   "validatorLifecycleRevision": "phase-capability-contract-v1",
   "gateId": "block12-operational-runtime-lab-v20260804",
-  "gateContractVersion": "12.0.5",
-  "status": "OPERATIONAL_RUNTIME_LAB_BROWSER_HARNESS_ROOTFIX_READY",
+  "gateContractVersion": "12.0.6",
+  "status": "OPERATIONAL_RUNTIME_LAB_SYNTHETIC_LOADER_ROOTFIX_READY",
   "singleGate": true,
   "macroClosure": true,
   "executionProfile": {
@@ -21,30 +21,35 @@
     }
   },
   "authorization": {
-    "source": "user_continue_urgent_block12_browser_harness_rootfix_20260804T1719-0600",
+    "source": "user_continue_urgent_block12_synthetic_loader_rootfix_20260804T1731-0600",
     "allowedExecutions": 1,
     "consumed": false,
     "replayAllowed": false,
-    "retryAuthorizedAfterRuntimeHarnessRootCause": true,
-    "previousRuntimeRunId": 30956309298,
-    "previousRuntimeStatus": "cancelled",
-    "previousFailureClassification": "PIPELINE_MECHANISM_FAILURE",
-    "previousFailureCode": "BROWSER_BOOTSTRAP_WAIT_TIMEOUT_WITHOUT_FINALLY_CLOSE",
+    "retryAuthorizedAfterExactBootstrapDiagnosis": true,
+    "previousRuntimeRunId": 30959959221,
+    "previousRuntimeStatus": "failure",
+    "previousFailureClassification": "DATA_CONTRACT_FAILURE",
+    "previousFailureCode": "SYNTHETIC_TENANT_BLOCKED_BY_LAB_LOADER_ALLOWLIST",
+    "previousBootstrapState": "sdk-not-ready",
+    "previousFirebasePresent": false,
+    "previousRuntimeCenterPresent": true,
     "previousScenariosPassed": 0,
     "previousScenariosFailed": 0,
     "previousRollbackExact": true,
     "previousRealTenantUnchanged": true,
-    "rescueRunId": 30959450996,
-    "rescueStatus": "RUNTIME_HANG_RESCUE_PASS",
+    "browserHarnessRootfixHead": "ae3f55968948c18f1c6ae40fdce93ee6552890d0",
     "dependencyValidationRunId": 30950155722,
     "dependencyValidationStatus": "FUNCTIONS_BOOTSTRAP_LOAD_PASS",
-    "request": ".github/orbit360-requests/block12-operational-runtime-lab-rootfix6-v20260804.json"
+    "request": ".github/orbit360-requests/block12-operational-runtime-lab-rootfix7-v20260804.json"
   },
   "scope": {
     "projectId": "ays-orbit-360-lab",
     "branch": "ays/backend-tenant-lab-v99-20260703",
     "pullRequest": 5,
     "syntheticTenantRequired": true,
+    "syntheticTenantPattern": "^verify-block12-[0-9]+$",
+    "syntheticTenantAllowedOnlyOnOperationalPreview": true,
+    "syntheticTenantRequiresVerificationMode": true,
     "maximumSyntheticAuthUsers": 3,
     "maximumSyntheticMemberships": 3,
     "exactFunctionNames": [
@@ -62,17 +67,6 @@
     "callTimeoutRequired": true,
     "hardProcessTimeoutRequired": true,
     "hostingChannel": "orbit360-operational-block12",
-    "runtimeRoutes": [
-      "inicio",
-      "ops",
-      "leads",
-      "cliente360",
-      "aseguradoras",
-      "polizas",
-      "cobros",
-      "conciliaciones",
-      "importar"
-    ],
     "snapshotBeforeAfter": true,
     "rollbackSyntheticTenant": true,
     "rollbackSyntheticAuth": true,
@@ -90,6 +84,8 @@
     "main": true,
     "merge": true,
     "nonAllowlistedFunctions": true,
+    "arbitrarySyntheticTenant": true,
+    "syntheticTenantOnCanonicalHost": true,
     "secondFunctionalExecutionAfterRuntimeStarts": true
   }
 }
