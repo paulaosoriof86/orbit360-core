@@ -1,0 +1,105 @@
+{
+  "schemaVersion": "orbit360-cobros-full-materialization-contract-v1",
+  "generatedAt": "2026-08-04T09:38:00-06:00",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "classification": [
+    "FUNCTIONAL_DEFECT",
+    "DATA_CONTRACT_FAILURE",
+    "PIPELINE_MECHANISM_FAILURE"
+  ],
+  "decision": "SOURCE_DATA_PRESERVED_RUNTIME_MATERIALIZATION_INCOMPLETE",
+  "sourceUniverse": {
+    "rawCrmCollectionRows": 2157,
+    "operationalReportedPayments": 365,
+    "julyReportedPayments": 68,
+    "insurerDirectPaymentRowsInNarrowReplay": 9,
+    "commissionFilesReceived": 19,
+    "commissionSourcePackages": 10,
+    "commissionDetailRows": 67,
+    "commissionCrmEligibleRows": 65
+  },
+  "operationalReceiptReconciliation": {
+    "activePolicies": 224,
+    "activePoliciesWithCalendar": 223,
+    "operationalReceipts": 1261,
+    "pendingPortfolioReceipts": 641,
+    "dueOrOverdue": 99,
+    "future": 542,
+    "reportedPayments": 365,
+    "noPendingBalanceAccordingToInsurer": 211,
+    "receiptStatusHolds": 44,
+    "supersededOrExcludedSchedules": 20
+  },
+  "runtimeMaterialization": {
+    "cobrosConfirmed": 5,
+    "receiptsUpdated": 4,
+    "historicalReceiptCreated": 1,
+    "planillasComisiones": 5,
+    "comisionesDevengadas": 5,
+    "conciliacionesComisiones": 5,
+    "fullReportedPaymentLedger": 0,
+    "fullEvidenceLedger": 0,
+    "fullProposalQueue": 0,
+    "fullHoldQueue": 0
+  },
+  "rootCause": {
+    "gateScope": "Gate 10.9 was constructed and authorized for five preselected one-to-one cases, not for the complete registered source universe.",
+    "commissionSeparation": "Commission planillas were processed in a separate domain and only five aggregate relationships were written; eligible rows were not converted automatically into confirmed collections.",
+    "missingDurableContract": "The runtime has no complete durable ledger for reported payments, evidence, reconciliation proposals and holds.",
+    "uiProjection": "Cobros reads the materialized cobros collection; Conciliaciones reads conciliaciones and conciliacionesPrimas. Private dry-runs and source registries are not automatically projected into those collections."
+  },
+  "canonicalCollectionsRequired": {
+    "pagosReportados": "one durable row per normalized CRM payment report",
+    "evidenciasCobro": "insurer payment, portfolio timeline, commission and bank support with provenance",
+    "propuestasConciliacion": "scored links between evidence and operational receipts",
+    "conciliacionHolds": "all unresolved differences with reason and required action",
+    "cobros": "only confirmed and authorized applications"
+  },
+  "invariants": [
+    "reported payment is not automatically a confirmed collection",
+    "commission evidence alone does not apply a payment",
+    "portfolio disappearance alone does not apply a payment",
+    "bank evidence alone does not apply a payment",
+    "no source row may disappear because it is not yet confirmable",
+    "every source row must end as linked, proposed, held, omitted as duplicate, or requires validation",
+    "the same registered source hash must not be requested or imported again",
+    "no financial movement is created from the collections domain"
+  ],
+  "nextGate": {
+    "type": "full-source read-only replay before any write",
+    "scope": [
+      "all registered CRM payment rows",
+      "all operational receipt mappings",
+      "all insurer payment reports",
+      "all portfolio cutoffs",
+      "all CRM-eligible commission rows",
+      "specific bank supports when needed"
+    ],
+    "requiredResults": [
+      "source row census",
+      "deduplication by source hash and row identity",
+      "linked count",
+      "proposal count",
+      "hold count by reason",
+      "requires-validation count",
+      "unmatched count",
+      "exact per-row provenance",
+      "zero writes"
+    ],
+    "writeAuthorizationRequiredLater": true
+  },
+  "sourceOnly": true,
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "deployExecuted": false,
+  "productionTouched": false,
+  "reimportExecuted": false,
+  "rulesChanged": false,
+  "functionsDeployed": false,
+  "mainTouched": false,
+  "mergeExecuted": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
