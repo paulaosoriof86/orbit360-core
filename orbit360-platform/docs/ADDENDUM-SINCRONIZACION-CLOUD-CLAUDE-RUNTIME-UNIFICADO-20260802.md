@@ -4,7 +4,7 @@ Fecha: 2026-08-03
 Documento padre: `SINCRONIZACION-CLOUD-CLAUDE-ACUMULADA-20260802.md`  
 Estado: `ACUMULADO / NO_ENVIADO / NO_DEPLOY`
 
-Este addendum no sustituye el ledger acumulado. Agrega los patrones derivados del cierre del paquete runtime crítico CRM/Ops/Leads y del cierre visual del shell móvil compartido.
+Este addendum no sustituye el ledger acumulado. Agrega los patrones derivados del cierre del paquete runtime crítico CRM/Ops/Leads, del shell móvil compartido y del predeploy de Gravicentra Insurance RC1.
 
 ## Ítems acumulados
 
@@ -24,74 +24,55 @@ Este addendum no sustituye el ledger acumulado. Agrega los patrones derivados de
 | CL-087 | Evidencia | La cardinalidad de capturas debe derivarse de la matriz ejecutable, no mantenerse como número manual separado. | `REPLICABLE_CLAUDE_INMEDIATO` | `IMPLEMENTADO` |
 | CL-088 | Diagnóstico | Todo `pageerror` debe registrar etapa, rol, ruta, etiqueta y stack sanitizado para ubicar el owner real sin repetir el runtime. | `REPLICABLE_CLAUDE_ACUMULADO` | `IMPLEMENTADO` |
 | CL-089 | Academia | Incluir la diferencia entre defecto funcional, `SECURITY_FAILURE`, `VALIDATOR_STALE` y `PIPELINE_MECHANISM_FAILURE`, usando el caso de un bridge que intenta mutar un owner congelado. | `ACADEMIA_ACTUALIZAR` | `PENDIENTE_ENVIO` |
-| CL-090 | Validadores | Un sello de manifest es un consumidor contractual. Cada cambio autorizado de producto debe actualizar conjuntamente el manifest canónico y todos los sellos que lo comparan; actualizar solo el contrato principal deja validadores obsoletos. | `REPLICABLE_CLAUDE_ACUMULADO` | `IMPLEMENTADO` |
-| CL-091 | Causa raíz | Un fallo `CUMULATIVE_VISUAL_DRIFT` no prueba drift de datos si el expected seal pertenece a una candidata anterior. Antes de tocar datos debe compararse la revisión, fuente y digest del sello con la candidata autorizada. | `ACADEMIA_ACTUALIZAR` | `PENDIENTE_ENVIO` |
-| CL-092 | Evidencia | Todo validador que puede cerrar con código distinto de cero debe escribir y publicar evidencia sanitizada antes de terminar; el artefacto no puede depender únicamente de una copia posterior al PASS. | `REPLICABLE_CLAUDE_INMEDIATO` | `IMPLEMENTADO` |
-| CL-093 | Gates | Ante `STOP_RETRY`, el cierre debe incluir causa raíz, owner, solución, evidencia y frontera siguiente. Informar solo la etapa fallida no cumple el contrato de causa raíz. | `ACADEMIA_ACTUALIZAR` y `REPLICABLE_CLAUDE_ACUMULADO` | `IMPLEMENTADO_EN_LIFECYCLE` |
+| CL-090 | Validadores | Un sello de manifest es un consumidor contractual. Cada cambio autorizado de producto debe actualizar conjuntamente el manifest canónico y todos los sellos que lo comparan. | `REPLICABLE_CLAUDE_ACUMULADO` | `IMPLEMENTADO` |
+| CL-091 | Causa raíz | Un fallo `CUMULATIVE_VISUAL_DRIFT` no prueba drift de datos si el expected seal pertenece a una candidata anterior. | `ACADEMIA_ACTUALIZAR` | `PENDIENTE_ENVIO` |
+| CL-092 | Evidencia | Todo validador que puede cerrar con código distinto de cero debe escribir y publicar evidencia sanitizada antes de terminar. | `REPLICABLE_CLAUDE_INMEDIATO` | `IMPLEMENTADO` |
+| CL-093 | Gates | Ante `STOP_RETRY`, el cierre debe incluir causa raíz, owner, solución, evidencia y frontera siguiente. | `ACADEMIA_ACTUALIZAR` y `REPLICABLE_CLAUDE_ACUMULADO` | `IMPLEMENTADO_EN_LIFECYCLE` |
 | CL-094 | Shell responsive | Cuando el chrome móvil pasa de una a varias filas, la altura debe existir como un único token consumido por topbar, shell, sidebar y overlay. | `REPLICABLE_CLAUDE_INMEDIATO` | `IMPLEMENTADO / PENDIENTE_ENVIO` |
 | CL-095 | Arquitectura | Un defecto visual repetido en varios módulos debe corregirse en el owner compartido y no mediante parches dentro de cada módulo o tenant. | `REPLICABLE_CLAUDE_INMEDIATO` | `IMPLEMENTADO / PENDIENTE_ENVIO` |
 | CL-096 | Multi-tenant | Los fixes del primer tenant solo son aceptables para el core cuando son tenant-neutral, configurables y heredables por módulos y tenants futuros. | `REPLICABLE_CLAUDE_INMEDIATO` | `IMPLEMENTADO / PENDIENTE_ENVIO` |
-| CL-097 | Academia | Enseñar a diferenciar defecto funcional compartido de defecto de módulo, validador obsoleto, falla de datos y falla de seguridad, usando el caso del offset móvil. | `ACADEMIA_ACTUALIZAR` | `DOCUMENTADO / PENDIENTE_ENVIO` |
+| CL-097 | Academia | Enseñar a diferenciar defecto funcional compartido de defecto de módulo, validador obsoleto, falla de datos y falla de seguridad. | `ACADEMIA_ACTUALIZAR` | `DOCUMENTADO / PENDIENTE_ENVIO` |
+| CL-098 | Gates | Un gate cerrado y su siguiente predeploy son contratos distintos; una autorización runtime consumida no debe seguir siendo la fuente activa del predeploy. | `REPLICABLE_CLAUDE_ACUMULADO` | `IMPLEMENTADO / PENDIENTE_ENVIO` |
+| CL-099 | Registro | El entrypoint, lifecycle, engine, request, workflow, manifest y documentación deben promoverse juntos al cambiar de frontera. | `REPLICABLE_CLAUDE_ACUMULADO` | `IMPLEMENTADO / PENDIENTE_ENVIO` |
+| CL-100 | Academia | Diferenciar evidencia PASS, registro activo, autorización consumida y nueva autorización de frontera. | `ACADEMIA_ACTUALIZAR` | `DOCUMENTADO / PENDIENTE_ENVIO` |
+| CL-101 | Release | Una candidata sellada debe tener un contrato propio con commit, baseline y delta permitido; no depender de sellos históricos implícitos. | `REPLICABLE_CLAUDE_ACUMULADO` | `IMPLEMENTADO / PENDIENTE_ENVIO` |
+| CL-102 | Seguridad | El contrato estático debe probar capacidades futuras sin leer secretos ni datos. | mecanismo `BACKEND_PROTEGIDO_NO_CLAUDE`; criterio `REPLICABLE_CLAUDE_ACUMULADO` | `IMPLEMENTADO` |
+| CL-103 | Multi-tenant | El predeploy reutilizable valida configuración y contratos, no hardcodes del primer tenant. | `REPLICABLE_CLAUDE_ACUMULADO` | `IMPLEMENTADO / PENDIENTE_ENVIO` |
+| CL-104 | Evidencia | Un `NO_GO` de mecanismo no invalida la candidata ni los conteos previamente sellados si el STOP ocurre antes de capacidades. | `ACADEMIA_ACTUALIZAR` | `DOCUMENTADO / PENDIENTE_ENVIO` |
+| CL-105 | Continuidad | Tras un root fix de validador, la frontera debe ser una sola ejecución nueva; no repetir gates cerrados. | `REPLICABLE_CLAUDE_ACUMULADO` | `IMPLEMENTADO / PENDIENTE_ENVIO` |
+| CL-106 | APIs | Los métodos REST con resource name jerárquico deben construir el nombre completo (`projects/{project}/sites/{site}`), no inferir que todos los recursos usan la ruta corta. | `REPLICABLE_CLAUDE_ACUMULADO` | `IMPLEMENTADO / PENDIENTE_ENVIO` |
+| CL-107 | Diagnóstico | Si `projects.sites.get` falla pero `sites.releases.list`, el sitio público y las anclas de rollback responden, clasificar primero el endpoint del probe antes de declarar `ENVIRONMENT_FAILURE`. | `ACADEMIA_ACTUALIZAR` | `DOCUMENTADO / PENDIENTE_ENVIO` |
+| CL-108 | Gates | Un falso `GO_LIMITED_SCOPE` causado por el validador no obliga a repetir lecturas de producto ya completas; se corrige el owner y se preserva la evidencia obtenida. | `REPLICABLE_CLAUDE_ACUMULADO` | `IMPLEMENTADO / PENDIENTE_ENVIO` |
+| CL-109 | Release | El paso a deploy debe basarse en candidata completa, datos completos, sitio alcanzable, releases observables y rollback exacto; la versión pública puede diferir precisamente porque el deploy aún no ocurrió. | `REPLICABLE_CLAUDE_ACUMULADO` | `DOCUMENTADO / PENDIENTE_ENVIO` |
 
 ## Evidencia vigente
 
 ```text
-root fix seguridad:
-run 30775623141
-artifact 8841926663
-sha256:ce683b51b0b0ff05bf11b5028d04e6ef8727cfc23c2ba797a8e9718e837d3904
-productHead 267f7231b46d65b80c167f54567a67503b6a6793
-
-manifest post-rootfix:
-run 30775729377
-artifact 8841965500
-sha256:1c2ae7576d058f6d7c72aae95e8c5122efde217293d2c2f04d7e2167bbe09aa4
-
-paquete sellado:
-commit ef0664335bd3085dc7b21b4988f408fed1ac4145
-
-readiness estable post-rootfix:
-run 30776380035
-artifact 8842172646
-sha256:5b8fd7acfcafabf25538f34288a241472065855dacf69c18b8bb4748a30147cb
-49/49 PASS
-
-runtime detenido en snapshot inicial:
-run 30814564387
-job 91689019904
-artifact 8856180726
-sha256:c3384a1375eb8b311c6c47055020f2ca4d9666f8be87a554439c8f2fe9533d1f
-classification VALIDATOR_STALE
-rootCause VISUAL_SEAL_PRE_ROOTFIX
-
-correctivo de sello y observabilidad:
-run 30814915626
-job 91690157955
-artifact 8856299679
-sha256:3bbeb8af22f0b2ca1d8630735b4169f267249cf92d8b2d3a989308d754751641
-commit a9549f3487522a3e450742de2649b5ad41f3b1e9
-PASS
-
 Gate 7.11 acumulativo:
 run 30816576914
 artifact 8857032288
-sha256:c985c315cf140c187abe0126791261c06f2d5e6c38b8f885f6b444c6bb804de5
 status GATE711_RELEASE_CRITICAL_RUNTIME_PASS
 
-fix shell móvil compartido:
-commit 12a52de72f541cf39aae3556fd52a2d444d57b17
-owner orbit360-platform/styles/base.css
-classification FUNCTIONAL_DEFECT
-backend/data/deploy 0/0/0
-```
+RC1:
+release commit 27cb7dfcda8568280ebef15993a953364304f29b
+fix shell móvil 12a52de72f541cf39aae3556fd52a2d444d57b17
 
-Cierres preservados:
+predeploy read-only:
+run 30870375543
+artifact 8877668933
+sha256:f1a4d93b803c28b004612788631395e34b571064329a8428a6e24f595901274d
+formal decision GO_LIMITED_SCOPE
+candidateComplete true
+dataComplete true
+publicReachable true
+exactRollbackAnchorAvailable true
 
-```text
-release-critical static: 38/38
-runtime package readiness: 38/38
-runtime chain: 56/56
-router compatibility: 12/12
+root fix endpoint Hosting:
+commit 534cd25038b15cd9cc73875183c9aa66f8a5a4d5
+static run 30870532357
+artifact 8877714836
+sha256:5b9e038cc7faaacd0e95a128ce63e2a81bef37b779c12cd4430305d34793ff13
+status PASS
 ```
 
 ## Exclusiones obligatorias del paquete externo
@@ -101,12 +82,10 @@ No se envían:
 - service accounts, custom tokens o configuración Firebase local;
 - UID, correos, membresías, documentos o datos reales;
 - nombres de secrets;
-- lifecycle o request con autorización activa;
+- lifecycle o requests con autorización activa;
 - workflows operativos o capaces de ejecutar deploy;
 - backend protegido, writers o adaptadores Firestore;
-- rutas internas, IDs de proyecto o evidencia no sanitizada.
-
-El delta externo describirá CL-084 a CL-097 como arquitectura y criterio reusable. No incluirá código operativo, owners A&S ni identificadores sensibles del runtime.
+- IDs de proyecto, nombres de releases o evidencia no sanitizada.
 
 ## Estado Cloud
 
@@ -119,4 +98,4 @@ datos reales enviados: no
 secretos enviados: no
 ```
 
-CL-076 a CL-097 viajarán en el próximo delta sanitizado. El envío Cloud/Claude no bloquea la producción de A&S, pero su estado debe permanecer visible hasta existir evidencia real de recepción e incorporación en el prototipo comercializable.
+CL-076 a CL-109 viajarán en el próximo delta sanitizado. El envío Cloud/Claude no bloquea el deploy de A&S, pero su estado debe permanecer visible hasta existir evidencia real de recepción e incorporación en el prototipo comercializable.
