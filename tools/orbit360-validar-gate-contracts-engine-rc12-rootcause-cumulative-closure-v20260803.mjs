@@ -23,8 +23,8 @@ const REQUIRED_RUNTIME = ['cliente360','aseguradoras','polizas','cobros','ops','
 
 const checks = [];
 const add = (id, ok, detail = '') => checks.push({ id, ok:Boolean(ok), detail:String(detail || '').slice(0,600) });
-const read = rel => JSON.parse(fs.readFileSync(path.join(ROOT, rel), 'utf8'));
-const exists = rel => fs.existsSync(path.join(ROOT, rel));
+const read = rel => JSON.parse(fs.readFileSync(path.isAbsolute(rel) ? rel : path.join(ROOT, rel), 'utf8'));
+const exists = rel => fs.existsSync(path.isAbsolute(rel) ? rel : path.join(ROOT, rel));
 const git = args => execFileSync('git', args, { cwd:ROOT, encoding:'utf8' }).trim();
 const same = (a,b) => JSON.stringify(a) === JSON.stringify(b);
 const write = payload => {

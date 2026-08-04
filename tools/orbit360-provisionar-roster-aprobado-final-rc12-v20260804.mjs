@@ -331,6 +331,7 @@ async function deleteCreatedUsers(auth, state) {
 async function deleteCreatedMemberships(db, state) {
   let deleted = 0;
   await db.runTransaction(async tx => {
+    const owned = [];
     for (const profile of state.createdMembershipProfiles || []) {
       const item = state.roster?.[profile];
       if (!item?.uid) continue;
@@ -341,7 +342,10 @@ async function deleteCreatedMemberships(db, state) {
       if (data.onboardingVersion !== 'rc12-approved-roster-final-v1' || text(data.onboardingRunId) !== text(process.env.GITHUB_RUN_ID)) {
         throw new Error(`ROLLBACK_MEMBERSHIP_OWNERSHIP_MISMATCH_${profile.toUpperCase()}`);
       }
-      tx.delete(ref);
+      owned.push({ profile, ref });
+    }
+    for (const entry of owned) {
+      tx.delete(entry.ref);
       deleted += 1;
     }
   });

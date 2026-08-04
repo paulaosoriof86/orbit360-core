@@ -1,0 +1,30 @@
+{
+  "schemaVersion": "orbit360-rc12-rollback-gate713-rootfix-static-v1",
+  "generatedAt": "2026-08-04T12:59:45.565Z",
+  "decision": "RC12_ROLLBACK_GATE713_ROOTFIX_STATIC_PASS",
+  "classification": "GO_STATIC_PIPELINE_ROOTFIX",
+  "failedRun": 30910775651,
+  "owners": [
+    "tools/orbit360-provisionar-roster-aprobado-final-rc12-v20260804.mjs",
+    "tools/orbit360-validar-gate-contracts-engine-rc12-rootcause-cumulative-closure-v20260803.mjs",
+    "tools/orbit360-validar-gate-contracts-v20260717.mjs"
+  ],
+  "checks": {
+    "rollbackReadsBeforeWrites": true,
+    "rollbackOwnershipGuardsPreserved": true,
+    "gate713AbsoluteReadSupported": true,
+    "gate713AbsoluteExistsSupported": true,
+    "rollbackGateRegistered": true,
+    "rollbackPhaseRegistered": true
+  },
+  "secretAccess": false,
+  "firestoreRead": false,
+  "firestoreWrites": 0,
+  "authRead": false,
+  "authWrites": 0,
+  "deployExecuted": false,
+  "productionTouched": false,
+  "containsPII": false,
+  "containsSecrets": false,
+  "ok": true
+}
