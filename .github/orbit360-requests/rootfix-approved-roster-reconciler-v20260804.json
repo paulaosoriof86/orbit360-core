@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "orbit360-rootfix-approved-roster-reconciler-request-v1",
+  "status": "AUTHORIZED_POST_NO_WRITE_ROOTFIX",
+  "authorizedAt": "2026-08-04T05:59:00-06:00",
+  "authorizationRef": "same_user_macro_authorization_post_validator_stale_rootfix",
+  "priorRun": 30908259200,
+  "priorDecision": "RC12_APPROVED_ROSTER_RECONCILIATION_NO_GO_NO_WRITE",
+  "candidate": "b699ba329960cd830121b57452ce558399aa84fb",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "secrets": false,
+  "firestoreRead": false,
+  "authRead": false,
+  "writes": false,
+  "browser": false,
+  "deploy": false,
+  "production": false,
+  "consumed": false,
+  "replayAllowed": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
