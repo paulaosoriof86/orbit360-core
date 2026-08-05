@@ -1,0 +1,86 @@
+name: Orbit 360 · Block 12 · prueba sintética layout-free
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-requests/block12-layout-free-probe-synthetic-v20260804.json'
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: orbit360-block12-layout-free-probe-synthetic-v20260804
+  cancel-in-progress: false
+
+jobs:
+  layout-free-synthetic:
+    name: Validar probe sin layout sobre DOM grande
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 3
+          persist-credentials: true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verificar request source-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          REQUEST='.github/orbit360-requests/block12-layout-free-probe-synthetic-v20260804.json'
+          mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
+          test "${#CHANGED[@]}" = 1
+          test "${CHANGED[0]}" = "$REQUEST"
+          jq -e '.schemaVersion=="orbit360-block12-layout-free-probe-synthetic-request-v1" and .status=="AUTHORIZED_SOURCE_ONLY" and .approved==true and .allowedExecutions==1 and .firebase==false and .secrets==false and .firestoreRead==false and .writes==false and .deploy==false and .production==false and .main==false and .merge==false' "$REQUEST" >/dev/null
+
+      - name: Instalar navegador reproducible
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false playwright@1.52.0 >/dev/null
+          npx playwright install --with-deps chromium >/dev/null
+
+      - name: Ejecutar prueba sintética layout-free
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-validar-layout-free-probe-sintetico-v20260804.mjs
+          node --check tools/orbit360-block12-cumulative-visual-v20260804.mjs
+          node tools/orbit360-validar-layout-free-probe-sintetico-v20260804.mjs
+          jq -e '.status=="LAYOUT_FREE_PROBE_SYNTHETIC_PASS" and .classification=="GO_PIPELINE_MECHANISM" and .domNodes==50000 and .elapsedMs<2000 and .probe.hostPresent==true and .probe.hostMounted==true and .probe.hostChildCount==50000 and .probe.authenticated==true and .probe.loginExplicitlyOpen==false and .forbiddenPresent==[] and .innerTextUsed==false and .layoutApiUsed==false and .screenshotApiUsed==false and .cdpScreenshotUsed==false and .networkAccess==false and .firebaseCommandsExecuted==false and .firestoreWrites==0 and .authWrites==0 and .deployExecuted==false and .productionTouched==false and .ok==true' orbit360-platform/runtime-gate-crm-v20260716/block12-layout-free-probe-synthetic.json >/dev/null
+
+      - name: Sellar evidencia source-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add orbit360-platform/runtime-gate-crm-v20260716/block12-layout-free-probe-synthetic.json
+          git commit -m 'evidence(block12): seal layout-free probe synthetic pass'
+          git push origin HEAD:ays/backend-tenant-lab-v99-20260703
+
+      - name: Publicar evidencia
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-block12-layout-free-synthetic-${{ github.run_id }}
+          path: orbit360-platform/runtime-gate-crm-v20260716/block12-layout-free-probe-synthetic.json
+          retention-days: 14
+
+      - name: Publicar cierre en PR 5
+        if: always()
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          STATUS='LAYOUT_FREE_PROBE_SYNTHETIC_FAIL'
+          FILE='orbit360-platform/runtime-gate-crm-v20260716/block12-layout-free-probe-synthetic.json'
+          test -f "$FILE" && STATUS="$(jq -r '.status' "$FILE")"
+          gh api "repos/${GITHUB_REPOSITORY}/issues/5/comments" -f body="## Block 12 · prueba sintética layout-free · run ${GITHUB_RUN_ID}\n\n- Estado: \`${STATUS}\`\n- Firebase/secrets/escrituras/deploy/producción: no" >/dev/null
