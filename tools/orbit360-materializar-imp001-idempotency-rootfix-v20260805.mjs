@@ -62,7 +62,7 @@ fs.writeFileSync(EVIDENCE, JSON.stringify({
 console.log(JSON.stringify({
   status: 'IMP001_IDEMPOTENCY_RESPONSE_SOURCE_PASS',
   wrongPatternCountBefore: wrongCountBefore,
-  wrongPatternCountAfter,
+  wrongPatternCountAfter: wrongCountAfter,
   correctedPatternCount: correctCount,
   gateCheckInstalled: true,
   secretAccess: false,
