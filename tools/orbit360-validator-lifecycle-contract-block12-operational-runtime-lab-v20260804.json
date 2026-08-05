@@ -71,7 +71,7 @@
     "functionalReplayForbidden": true,
     "consumedRequest": ".github/orbit360-requests/block12-operational-runtime-layoutfree-lab-v20260804.json",
     "latestConsumedRuntimeRequest": ".github/orbit360-requests/block12-go-lab-candidate-visible-v4.json",
-    "latestConsumedRuntimeRequestBlob": "pending_readonly_verification",
+    "latestConsumedRuntimeRequestBlob": "e5e047840bd3aa99384584a1290622b5eed852b0",
     "futureRuntimeRequestTemplate": ".github/orbit360-requests/block12-go-lab-candidate-visible-v5.json",
     "futureRuntimeRequestMustUseNewPath": true,
     "consumptionLedger": "orbit360-platform/runtime-gate-crm-v20260716/rc-ays-lab-canonica-01-ledger-v20260804.json",
