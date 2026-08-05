@@ -2,9 +2,9 @@
   "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
   "validatorLifecycleRevision": "phase-capability-contract-v1",
   "gateId": "block10.10-cobros-full-ledger-write-lab-v20260805",
-  "gateContractVersion": "10.10.0",
+  "gateContractVersion": "10.10.1",
   "owner": "orbit360-cobros-full-ledger-write-lab-v20260805",
-  "ownerVersion": "20260805.2-private-package-ready",
+  "ownerVersion": "20260805.3-canonical-path-package-ready",
   "status": "PRIVATE_PACKAGE_READY_STATIC_NOT_AUTHORIZED",
   "classification": "STATIC_PACKAGE_READY_NO_ACCESS",
   "patternClassification": "BACKEND_PROTEGIDO_NO_CLAUDE",
@@ -39,6 +39,12 @@
       "rulesDeploy": false,
       "production": false
     }
+  },
+  "pathAuthority": {
+    "class": "canonical-v79-data-items",
+    "pattern": "tenants/{tenantId}/data/{collection}/items/{documentId}",
+    "legacyTenantIdPathProhibited": true,
+    "thirdPathPatternProhibited": true
   },
   "sourceLedger": {
     "count": 365,
@@ -80,12 +86,12 @@
   "mergeAuthorized": false,
   "privatePackageRequiredBeforeAuthorization": true,
   "privatePackage": {
-    "driveFileId": "1ZJQmC9liIAJyI6fbsxrfN1HN__HwFVI8",
-    "fileName": "ORBIT360-AYS-COBROS-FULL-LEDGER-WRITE-PRIVATE-20260805.txt",
+    "driveFileId": "1fwYktHt3Qj9BQjbjBox4XZBLO03NsZ0p",
+    "fileName": "ORBIT360-AYS-COBROS-FULL-LEDGER-WRITE-PRIVATE-V2-20260805.txt",
     "mimeType": "text/plain",
     "sizeBytes": 856802,
-    "sha256": "9dcbedba1a0f0606eb71518e4ab6d45bf0f6a1fabe6f7fc315ae4456e3742635",
-    "logicalSha256": "c12030710e3a170a286cf491ae0031da61fb07b2409dd020e5f5e3aad4a1936b",
+    "sha256": "a104f673b9516cf0874d47ee206c9a0eff458521ce01e182e4c45b38dfe23deb",
+    "logicalSha256": "42c2f4ce2cbde21126aa07cfe581e7f64a485f729b9dcf18b8ad9c938dace80b",
     "canonicalization": "node-json-stable-sort-v1",
     "downloadReadbackVerified": true,
     "counts": {
@@ -101,6 +107,11 @@
     "containsSecrets": false,
     "containsPasswords": false,
     "repositoryPersistenceProhibited": true
+  },
+  "supersededPrivatePackage": {
+    "driveFileId": "1ZJQmC9liIAJyI6fbsxrfN1HN__HwFVI8",
+    "contractVersion": "10.10.0",
+    "status": "SUPERSEDED_NO_USE"
   },
   "snapshotRequired": true,
   "idempotencyRequired": true,
