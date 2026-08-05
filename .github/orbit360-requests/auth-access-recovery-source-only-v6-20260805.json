@@ -1,0 +1,62 @@
+{
+  "schemaVersion": "orbit360-auth-access-recovery-source-only-request-v6",
+  "gateId": "block-auth-access-recovery-source-only-v6-20260805",
+  "rcId": "RC-AYS-LAB-CANONICA-01",
+  "status": "AUTHORIZED_ONCE",
+  "authorizationRef": "user_authorized_auth_access_source_only_v6_20260805T1133-0600",
+  "approved": true,
+  "allowedExecutions": 1,
+  "consumed": false,
+  "replayAllowed": false,
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "parentHead": "aa8e12c893036720771d73c61567a1b68245699b",
+  "scope": {
+    "validateRequest": true,
+    "validateProvenance": true,
+    "validateCanonicalPreflight": true,
+    "validateActorAuthorizationParity": true,
+    "validateOnboardingErrorCodePropagation": true,
+    "validateConditionalEvidencePersistence": true,
+    "validateTriStateIntegrity": true,
+    "validateSourceFixtures": true,
+    "secrets": false,
+    "firebase": false,
+    "firestore": false,
+    "auth": false,
+    "functions": false,
+    "hosting": false,
+    "browser": false,
+    "deploy": false,
+    "rules": false,
+    "reimport": false,
+    "crm": false,
+    "production": false,
+    "main": false,
+    "merge": false
+  },
+  "requiredActorChecks": [
+    "tenantMatch",
+    "statusActive",
+    "activeRoleAssigned",
+    "roleOrPermissionAuthorized",
+    "actorIdentityPresent"
+  ],
+  "requiredCallableEvidenceFields": [
+    "httpStatus",
+    "callableStatus",
+    "errorCode"
+  ],
+  "requiredIntegrityStates": [
+    "VERIFIED_UNCHANGED",
+    "VERIFIED_CHANGED",
+    "NOT_POSTVERIFIED"
+  ],
+  "evidenceBoundary": {
+    "containsPII": false,
+    "containsSecrets": false,
+    "fullEmails": false,
+    "passwords": false,
+    "actionLinks": false
+  }
+}
