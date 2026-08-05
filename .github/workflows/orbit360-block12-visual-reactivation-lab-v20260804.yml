@@ -7,7 +7,7 @@ on:
       - '.github/orbit360-requests/block12-operational-runtime-lab-rootfix9-resume-v20260804.json'
 
 permissions:
-  contents: write
+  contents: read
   statuses: write
   issues: write
   pull-requests: write
@@ -28,7 +28,7 @@ env:
 
 jobs:
   visual-reactivation:
-    name: Gate → Functions/Hosting → visual read-only → integridad
+    name: Gate → Functions/Hosting → video-frame read-only → integridad
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     steps:
@@ -36,15 +36,15 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
-          fetch-depth: 5
-          persist-credentials: true
+          fetch-depth: 3
+          persist-credentials: false
 
       - name: Preparar Node 22
         uses: actions/setup-node@v4
         with:
           node-version: '22'
 
-      - name: Verificar request visual único
+      - name: Verificar request video visual único
         shell: bash
         run: |
           set -euo pipefail
@@ -55,45 +55,30 @@ jobs:
           test "${CHANGED[0]}" = "$ORBIT360_REQUEST_FILE"
           PARENT="$(git rev-parse HEAD^)"
           jq -e --arg parent "$PARENT" '
-            .schemaVersion=="orbit360-block12-operational-runtime-lab-visual-rootfix-request-v1" and
-            .status=="AUTHORIZED_VISUAL_REACTIVATION_AFTER_FUNCTIONAL_PASS" and
+            .schemaVersion=="orbit360-block12-operational-runtime-lab-visual-video-request-v1" and
+            .status=="AUTHORIZED_VISUAL_VIDEO_REACTIVATION_AFTER_SYNTHETIC_PASS" and
             .approved==true and .allowedExecutions==1 and .consumed==false and .replayAllowed==false and .retryAuthorized==true and
-            .authorizationRef=="user_continue_block12_visual_rootfix_20260804T1933-0600" and
+            .authorizationRef=="user_continue_block12_visual_video_rootfix_20260804T1933-0600" and
             .previousRuntimeRunId==30962756387 and .previousFunctionalStatus=="PASS" and
             .previousFunctionalPassed==18 and .previousFunctionalFailed==0 and
-            .previousVisualStatus=="FAIL" and .previousVisualClassification=="PIPELINE_MECHANISM_FAILURE" and
-            .previousVisualFailureCode=="VISUAL_SCREENSHOT_FULLPAGE_TIMEOUT" and
-            .previousRollbackExact==true and .previousRealTenantUnchanged==true and
+            .previousVisualRunId==30968795206 and .previousVisualFailureFamily=="SCREENSHOT_API_BLOCKED" and
+            .stopRetryApplied==true and .replacementMechanism=="PLAYWRIGHT_RECORD_VIDEO_PLUS_FFMPEG_STATIC_FRAME" and
+            .videoSyntheticRunId==30969402434 and .videoSyntheticStatus=="VIDEO_FRAME_SYNTHETIC_PASS" and
             .functionalReplayForbidden==true and .branch=="ays/backend-tenant-lab-v99-20260703" and
             .pullRequest==5 and .projectId=="ays-orbit-360-lab" and
-            .gateId=="block12-operational-runtime-lab-v20260804" and .contractVersion=="12.0.9" and
+            .gateId=="block12-operational-runtime-lab-v20260804" and .contractVersion=="12.0.10" and
             .parentHead==$parent and .scope.syntheticTenant==false and .scope.syntheticAuthUsers==0 and
             .scope.syntheticMemberships==0 and .scope.functionalScenarioReplay==false and
             .scope.realTenantWrites==false and .scope.realDataReimport==false and
             .scope.rules==false and .scope.production==false and .scope.main==false and .scope.merge==false
           ' "$ORBIT360_REQUEST_FILE" >/dev/null
 
-      - name: Materializar root fix visual y contrato 12.0.9
-        shell: bash
-        run: |
-          set -euo pipefail
-          node tools/orbit360-materializar-block12-visual-rootfix-v20260804.mjs
-          jq -e '.status=="VISUAL_ROOTFIX_SOURCE_PASS" and .contractVersion=="12.0.9" and .runtimeFinalVersionAligned==true and .routerVersionAligned==true and .routerPhaseRegistered==true and .engineVersionAligned==true and .ok==true' "$ORBIT360_EVIDENCE_DIR/block12-visual-rootfix-source-v20260804.json" >/dev/null
-          git diff --check
-          test -z "$(git diff --name-only -- firestore.rules data/store.js orbit360-platform/data/store.js orbit360-platform/data/store-firestore-lab.local.js orbit360-platform/core/auth.js functions/ops-leads-domain.js functions/ops-advisor-inbox.js functions/cobros-reconciliation-domain.js functions/recurring-insurance-import.js)"
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add tools/orbit360-block12-operational-runtime-lab-v20260804.mjs tools/orbit360-validar-gate-contracts-v20260717.mjs tools/orbit360-validar-gate-contracts-engine-block12-operational-runtime-lab-v20260804.mjs tools/orbit360-gate-contract-registry-v20260717.json "$ORBIT360_EVIDENCE_DIR/block12-visual-rootfix-source-v20260804.json"
-          git commit -m 'gate(block12): materialize visual-only contract 12.0.9'
-          git push origin HEAD:"$ORBIT360_BRANCH"
-          echo "ORBIT360_MATERIALIZED_HEAD=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
-
       - name: Gate contractual obligatorio antes de secretos
         shell: bash
         run: |
           set -euo pipefail
           node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
-          jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="12.0.9" and .failed==0 and .executionAuthorized==true and .secretAccessAuthorized==true and .firestoreReadAuthorized==true and .writeAuthorized==false and .authWriteAuthorized==false and .maximumSyntheticAuthUsers==0 and .maximumSyntheticMemberships==0 and .runtimeAuthorized==false and .visualOnlyAuthorized==true and .browserAuthorized==true and .functionsDeployAuthorized==true and .hostingPreviewAuthorized==true and .rulesDeployAuthorized==false and .productionAuthorized==false and .realTenantWritesAuthorized==false and .realDataReimportAuthorized==false and .secretAccess==false and .firestoreRead==false and .firestoreWrites==0 and .authWrites==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false' "$ORBIT360_EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+          jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="12.0.10" and .failed==0 and .executionAuthorized==true and .secretAccessAuthorized==true and .firestoreReadAuthorized==true and .writeAuthorized==false and .authWriteAuthorized==false and .maximumSyntheticAuthUsers==0 and .maximumSyntheticMemberships==0 and .runtimeAuthorized==false and .visualOnlyAuthorized==true and .browserAuthorized==true and .functionsDeployAuthorized==true and .hostingPreviewAuthorized==true and .rulesDeployAuthorized==false and .productionAuthorized==false and .realTenantWritesAuthorized==false and .realDataReimportAuthorized==false and .secretAccess==false and .firestoreRead==false and .firestoreWrites==0 and .authWrites==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false' "$ORBIT360_EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
 
       - name: Resolver identidad LAB después del gate
         shell: bash
@@ -117,11 +102,12 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          npm install --no-save --package-lock=false firebase-admin@13.10.0 google-auth-library@9 playwright@1.52.0 firebase-tools@15.25.1 >/dev/null
+          npm install --no-save --package-lock=false firebase-admin@13.10.0 google-auth-library@9 playwright@1.52.0 ffmpeg-static@5.2.0 firebase-tools@15.25.1 >/dev/null
           npm --prefix functions ci --include=prod
           node tools/orbit360-validar-functions-runtime-dependencies-v20260804.mjs | tee "$RUNNER_TEMP/functions-runtime-pass.json"
           jq -e '.status=="FUNCTIONS_BOOTSTRAP_LOAD_PASS" and .ok==true' "$RUNNER_TEMP/functions-runtime-pass.json" >/dev/null
           npx playwright install --with-deps chromium >/dev/null
+          node --input-type=module -e "import ffmpegPath from 'ffmpeg-static'; import fs from 'node:fs'; if(!ffmpegPath || !fs.existsSync(ffmpegPath)) process.exit(1);"
 
       - name: Preparar config Hosting y snapshot read-only
         shell: bash
@@ -176,7 +162,7 @@ jobs:
           echo "url=$URL" >> "$GITHUB_OUTPUT"
           echo "deployed=true" >> "$GITHUB_OUTPUT"
 
-      - name: Verificar ocho rutas visuales read-only
+      - name: Verificar ocho rutas mediante video-frame read-only
         id: visual
         shell: bash
         run: |
@@ -207,7 +193,7 @@ jobs:
           VISUAL="$ORBIT360_EVIDENCE_DIR/block12-cumulative-visual-sanitized.json"
           INTEGRITY="$ORBIT360_EVIDENCE_DIR/block12-visual-readonly-integrity.json"
           VISUAL_OK=false; INTEGRITY_OK=false
-          test -f "$VISUAL" && VISUAL_OK="$(jq -r '(.status=="CUMULATIVE_VISUAL_LAB_PASS" and .routeCount==8 and .ok==true and ([.routes[] | select(.rendered!=true or .loginVisible==true or .technicalCopyDetected==true)] | length)==0 and (.pageErrors|length)==0)' "$VISUAL")"
+          test -f "$VISUAL" && VISUAL_OK="$(jq -r '(.schemaVersion=="orbit360-block12-cumulative-visual-v4" and .status=="CUMULATIVE_VISUAL_LAB_PASS" and .captureEngine=="playwright-record-video-plus-ffmpeg-static-frame" and .screenshotApisUsed==false and .cdpScreenshotUsed==false and .routeCount==8 and .ok==true and ([.routes[] | select(.rendered!=true or .loginVisible==true or .technicalCopyDetected==true or (.frameBytes // 0)<=1000)] | length)==0 and (.pageErrors|length)==0)' "$VISUAL")"
           test -f "$INTEGRITY" && INTEGRITY_OK="$(jq -r '(.status=="VISUAL_READONLY_INTEGRITY_PASS" and .unchanged==true and .firestoreWrites==0 and .authWrites==0 and .ok==true)' "$INTEGRITY")"
           PASS=false
           if [ "$VISUAL_OK" = true ] && [ "$INTEGRITY_OK" = true ] && [ "${{ steps.visual.outputs.exit_code }}" = 0 ] && [ "${{ steps.integrity.outputs.exit_code }}" = 0 ] && [ "${{ steps.functions_deploy.outputs.verified_count }}" = 4 ]; then PASS=true; fi
@@ -215,7 +201,7 @@ jobs:
             if [ "${{ steps.functions_deploy.outputs.attempted }}" = true ]; then for NAME in ${ORBIT360_FUNCTIONS//,/ }; do npx firebase functions:delete "$NAME" --region us-central1 --project "$ORBIT360_PROJECT_ID" --force || true; done; fi
             if [ "${{ steps.hosting_deploy.outputs.attempted }}" = true ]; then npx firebase hosting:channel:delete "$ORBIT360_HOSTING_CHANNEL" --project "$ORBIT360_PROJECT_ID" --force || true; fi
           fi
-          jq -n --arg generatedAt "$(date -u +%Y-%m-%dT%H:%M:%SZ)" --arg head "${ORBIT360_MATERIALIZED_HEAD:-}" --arg previewUrl "${ORBIT360_PREVIEW_URL:-}" --arg visualExit "${{ steps.visual.outputs.exit_code }}" --arg integrityExit "${{ steps.integrity.outputs.exit_code }}" --argjson pass "$PASS" '{schemaVersion:"orbit360-block12-visual-reactivation-decision-v1",generatedAt:$generatedAt,gateId:"block12-operational-runtime-lab-v20260804",contractVersion:"12.0.9",priorFunctionalRunId:30962756387,priorFunctionalPassed:18,priorFunctionalFailed:0,functionalReplayExecuted:false,materializedHead:$head,decision:(if $pass then "GO_LAB_OPERATIONAL_RUNTIME_AND_CUMULATIVE_VISUAL" else "STOP_BLOCK12_VISUAL_REACTIVATION" end),classification:(if $pass then "GO_LAB" else "PIPELINE_OR_VISUAL_FAILURE" end),previewUrl:(if $pass then $previewUrl else "" end),visualExitCode:$visualExit,integrityExitCode:$integrityExit,functionsKept:$pass,hostingPreviewKept:$pass,rulesDeployed:false,syntheticTenantCreated:false,syntheticAuthUsersCreated:0,realTenantWrites:0,realDataReimported:false,productionTouched:false,mainTouched:false,mergeExecuted:false,authorizationConsumed:true,allowedExecutionsRemaining:0,replayAllowed:false,containsPII:false,containsSecrets:false,ok:$pass}' > "$ORBIT360_EVIDENCE_DIR/block12-visual-reactivation-decision.json"
+          jq -n --arg generatedAt "$(date -u +%Y-%m-%dT%H:%M:%SZ)" --arg sourceHead "$(git rev-parse HEAD^)" --arg previewUrl "${ORBIT360_PREVIEW_URL:-}" --arg visualExit "${{ steps.visual.outputs.exit_code }}" --arg integrityExit "${{ steps.integrity.outputs.exit_code }}" --argjson pass "$PASS" '{schemaVersion:"orbit360-block12-visual-reactivation-decision-v2",generatedAt:$generatedAt,gateId:"block12-operational-runtime-lab-v20260804",contractVersion:"12.0.10",priorFunctionalRunId:30962756387,priorFunctionalPassed:18,priorFunctionalFailed:0,videoSyntheticRunId:30969402434,functionalReplayExecuted:false,sourceHead:$sourceHead,decision:(if $pass then "GO_LAB_OPERATIONAL_RUNTIME_AND_CUMULATIVE_VISUAL" else "STOP_BLOCK12_VISUAL_VIDEO_REACTIVATION" end),classification:(if $pass then "GO_LAB" else "PIPELINE_OR_VISUAL_FAILURE" end),previewUrl:(if $pass then $previewUrl else "" end),visualExitCode:$visualExit,integrityExitCode:$integrityExit,functionsKept:$pass,hostingPreviewKept:$pass,rulesDeployed:false,syntheticTenantCreated:false,syntheticAuthUsersCreated:0,realTenantWrites:0,realDataReimported:false,productionTouched:false,mainTouched:false,mergeExecuted:false,authorizationConsumed:true,allowedExecutionsRemaining:0,replayAllowed:false,containsPII:false,containsSecrets:false,ok:$pass}' > "$ORBIT360_EVIDENCE_DIR/block12-visual-reactivation-decision.json"
           if [ "$PASS" != true ]; then exit 45; fi
 
       - name: Publicar evidencias sanitizadas
@@ -225,7 +211,8 @@ jobs:
           name: orbit360-block12-visual-reactivation-${{ github.run_id }}
           path: |
             orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
-            orbit360-platform/runtime-gate-crm-v20260716/block12-visual-rootfix-source-v20260804.json
+            orbit360-platform/runtime-gate-crm-v20260716/block12-video-visual-contract-source-v20260804.json
+            orbit360-platform/runtime-gate-crm-v20260716/block12-video-frame-synthetic.json
             orbit360-platform/runtime-gate-crm-v20260716/block12-functional-pass-before-visual-rootfix-v20260804.json
             orbit360-platform/runtime-gate-crm-v20260716/block12-cumulative-visual-sanitized.json
             orbit360-platform/runtime-gate-crm-v20260716/block12-visual-readonly-integrity.json
@@ -241,8 +228,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           FILE="$ORBIT360_EVIDENCE_DIR/block12-visual-reactivation-decision.json"
-          DECISION="STOP_BLOCK12_VISUAL_REACTIVATION_BEFORE_DECISION"; CLASSIFICATION="PIPELINE_MECHANISM_FAILURE"; PREVIEW=""
+          DECISION="STOP_BLOCK12_VISUAL_VIDEO_BEFORE_DECISION"; CLASSIFICATION="PIPELINE_MECHANISM_FAILURE"; PREVIEW=""
           if [ -f "$FILE" ]; then DECISION="$(jq -r '.decision' "$FILE")"; CLASSIFICATION="$(jq -r '.classification' "$FILE")"; PREVIEW="$(jq -r '.previewUrl // ""' "$FILE")"; fi
-          BODY="## Block 12 · reactivación visual · run ${GITHUB_RUN_ID}\n\n- Decisión: \`${DECISION}\`\n- Clasificación: \`${CLASSIFICATION}\`\n- Runtime funcional reutilizado: \`30962756387 · 18/18 PASS\`\n- Repetición de escenarios funcionales: no\n- HEAD materializado: \`${ORBIT360_MATERIALIZED_HEAD:-no-materializado}\`\n- Rules/datos sintéticos/reimportación/producción/main/merge: no"
+          BODY="## Block 12 · reactivación visual video-frame · run ${GITHUB_RUN_ID}\n\n- Decisión: \`${DECISION}\`\n- Clasificación: \`${CLASSIFICATION}\`\n- Runtime funcional reutilizado: \`30962756387 · 18/18 PASS\`\n- Prueba sintética video-frame: \`30969402434 · PASS\`\n- Repetición de escenarios funcionales: no\n- Rules/datos sintéticos/reimportación/producción/main/merge: no"
           if [ -n "$PREVIEW" ]; then BODY="${BODY}\n- Candidata visual LAB: ${PREVIEW}"; fi
           gh api "repos/${GITHUB_REPOSITORY}/issues/5/comments" -f body="$BODY" >/dev/null
