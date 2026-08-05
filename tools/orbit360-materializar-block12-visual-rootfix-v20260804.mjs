@@ -44,11 +44,19 @@ const visualFailed = Object.entries(visualChecks).filter(([, ok]) => !ok).map(([
 if (visualFailed.length) throw new Error(`PIPELINE_MECHANISM_FAILURE:VISUAL_ROOTFIX_INCOMPLETE:${visualFailed.join(',')}`);
 
 let runtime = read(RUNTIME);
-runtime = replaceOnce(runtime, "contractVersion: '12.0.7'", `contractVersion: '${VERSION}'`, 'RUNTIME_FINAL_CONTRACT_VERSION');
+if (runtime.includes("contractVersion: '12.0.7'")) {
+  runtime = replaceOnce(runtime, "contractVersion: '12.0.7'", `contractVersion: '${VERSION}'`, 'RUNTIME_FINAL_CONTRACT_VERSION');
+} else if (!runtime.includes(`contractVersion: '${VERSION}'`)) {
+  throw new Error('PIPELINE_MECHANISM_FAILURE:RUNTIME_FINAL_CONTRACT_VERSION_UNEXPECTED');
+}
 write(RUNTIME, runtime);
 
 let router = read(ROUTER);
-router = replaceOnce(router, `"${GATE}":{contractVersion:"12.0.8"`, `"${GATE}":{contractVersion:"${VERSION}"`, 'ROUTER_GATE_VERSION');
+if (router.includes(`"${GATE}":{contractVersion:"12.0.8"`)) {
+  router = replaceOnce(router, `"${GATE}":{contractVersion:"12.0.8"`, `"${GATE}":{contractVersion:"${VERSION}"`, 'ROUTER_GATE_VERSION');
+} else if (!router.includes(`"${GATE}":{contractVersion:"${VERSION}"`)) {
+  throw new Error('PIPELINE_MECHANISM_FAILURE:ROUTER_GATE_VERSION_UNEXPECTED');
+}
 if (!router.includes('"OPERATIONAL_RUNTIME_LAB_VISUAL_REACTIVATION"')) {
   router = replaceOnce(
     router,
@@ -88,55 +96,89 @@ if (!registryMatches) {
 write(REGISTRY, JSON.stringify(registry, null, 2) + '\n');
 
 let engine = read(ENGINE);
-engine = replaceOnce(engine, "const VERSION = '12.0.8';", `const VERSION = '${VERSION}';`, 'ENGINE_VERSION');
-engine = replaceLine(engine, "add('LIFECYCLE_ACTIVE'", "  add('LIFECYCLE_ACTIVE', lifecycle.status === 'OPERATIONAL_RUNTIME_LAB_VISUAL_ROOTFIX_READY' && lifecycle.singleGate === true && lifecycle.macroClosure === true);", 'ENGINE_LIFECYCLE_ACTIVE');
-engine = replaceLine(engine, "add('CAPABILITIES_EXACT'", "  add('CAPABILITIES_EXACT', lifecycle.executionProfile.phase === 'OPERATIONAL_RUNTIME_LAB_VISUAL_REACTIVATION' && capabilities.secrets === true && capabilities.firestoreRead === true && capabilities.writes === false && capabilities.runtime === false && capabilities.browser === true && capabilities.deploy === true && capabilities.functionsDeploy === true && capabilities.rulesDeploy === false && capabilities.production === false);", 'ENGINE_CAPABILITIES');
-engine = replaceLine(engine, "add('REQUEST_ACTIVE'", "  add('REQUEST_ACTIVE', request.schemaVersion === 'orbit360-block12-operational-runtime-lab-visual-rootfix-request-v1' && request.status === 'AUTHORIZED_VISUAL_REACTIVATION_AFTER_FUNCTIONAL_PASS' && request.approved === true && request.allowedExecutions === 1 && request.consumed === false && request.replayAllowed === false && request.retryAuthorized === true && request.previousRuntimeRunId === 30962756387 && request.previousFunctionalStatus === 'PASS' && request.previousFunctionalPassed === 18 && request.previousFunctionalFailed === 0 && request.previousVisualStatus === 'FAIL' && request.previousVisualClassification === 'PIPELINE_MECHANISM_FAILURE' && request.previousVisualFailureCode === 'VISUAL_SCREENSHOT_FULLPAGE_TIMEOUT' && request.previousRollbackExact === true && request.previousRealTenantUnchanged === true && request.functionalReplayForbidden === true && request.authorizationRef === lifecycle.authorization.source);", 'ENGINE_REQUEST_ACTIVE');
-engine = replaceLine(engine, "add('SYNTHETIC_BOUNDARY'", "  add('READONLY_REACTIVATION_BOUNDARY', request.scope.syntheticTenant === false && request.scope.syntheticAuthUsers === 0 && request.scope.syntheticMemberships === 0 && request.scope.realTenantWrites === false && request.scope.realDataReimport === false && request.scope.functionalScenarioReplay === false);", 'ENGINE_READONLY_BOUNDARY');
-engine = replaceLine(engine, "add('EVIDENCE_AND_ROLLBACK'", "  add('EVIDENCE_AND_INTEGRITY', scope.snapshotBeforeAfter === true && scope.readonlyIntegrityBeforeAfter === true && scope.priorFunctionalPassEvidenceRequired === true && scope.functionalReplayForbidden === true && scope.sanitizedEvidence === true && scope.cumulativeVisualCandidate === true);", 'ENGINE_EVIDENCE_INTEGRITY');
-engine = replaceLine(engine, 'const rootfixWorkflow =', "  const rootfixWorkflow = readText('.github/workflows/orbit360-block12-visual-reactivation-lab-v20260804.yml');", 'ENGINE_WORKFLOW_PATH');
-engine = replaceLine(
-  engine,
-  "add('BROWSER_HARNESS_ROOTFIX'",
-  "  const visualHarness = readText('tools/orbit360-block12-cumulative-visual-v20260804.mjs');\n  add('VISUAL_HARNESS_ROOTFIX', scope.visualViewportCaptureRequired === true && scope.visualAnimationsDisabledRequired === true && scope.visualBrowserCloseFinallyRequired === true && visualHarness.includes('fullPage: false') && visualHarness.includes(\"animations: 'disabled'\") && visualHarness.includes(\"reducedMotion: 'reduce'\") && visualHarness.includes('VISUAL_SCREENSHOT_${route}') && visualHarness.includes('if (page) await page.close().catch') && visualHarness.includes('if (browser) await browser.close().catch') && rootfixWorkflow.includes('timeout --signal=TERM --kill-after=15s 240s'));",
-  'ENGINE_VISUAL_HARNESS'
-);
-engine = replaceLine(engine, "add('FUNCTIONS_SDK_CONTRACT'", "  add('FUNCTIONS_SDK_CONTRACT', scope.firebaseFunctionsCompatSdkRequired === true && loader.includes('firebase-functions-compat.js') && readText('orbit360-platform/core/runtime-verification-center-v20260804.js').includes(\"typeof firebase.functions !== 'function'\"));", 'ENGINE_FUNCTIONS_SDK');
-engine = replaceOnce(
-  engine,
-  "  'orbit360-platform/runtime-gate-crm-v20260716/functions-dependency-rootfix-source-v20260804.json'\n];",
-  "  'orbit360-platform/runtime-gate-crm-v20260716/functions-dependency-rootfix-source-v20260804.json',\n  'orbit360-platform/runtime-gate-crm-v20260716/block12-functional-pass-before-visual-rootfix-v20260804.json',\n  'tools/orbit360-block12-cumulative-visual-v20260804.mjs',\n  'tools/orbit360-block12-visual-readonly-integrity-v20260804.mjs',\n  'tools/orbit360-materializar-block12-visual-rootfix-v20260804.mjs',\n  '.github/workflows/orbit360-block12-visual-reactivation-lab-v20260804.yml',\n  'orbit360-platform/docs/CIERRE-BLOQUE12-RUNTIME-FUNCIONAL-Y-ROOTFIX-VISUAL-20260804.md'\n];",
-  'ENGINE_REQUIRED_FILES'
-);
-if (!engine.includes('const hasGateVersion =')) {
+const engineAlreadyMaterialized = engine.includes(`const VERSION = '${VERSION}';`) && engine.includes("PREVIOUS_FUNCTIONAL_PASS") && engine.includes("VISUAL_HARNESS_ROOTFIX");
+if (!engineAlreadyMaterialized) {
+  engine = replaceOnce(engine, "const VERSION = '12.0.8';", `const VERSION = '${VERSION}';`, 'ENGINE_VERSION');
+  engine = replaceLine(engine, "add('LIFECYCLE_ACTIVE'", "  add('LIFECYCLE_ACTIVE', lifecycle.status === 'OPERATIONAL_RUNTIME_LAB_VISUAL_ROOTFIX_READY' && lifecycle.singleGate === true && lifecycle.macroClosure === true);", 'ENGINE_LIFECYCLE_ACTIVE');
+  engine = replaceLine(engine, "add('CAPABILITIES_EXACT'", "  add('CAPABILITIES_EXACT', lifecycle.executionProfile.phase === 'OPERATIONAL_RUNTIME_LAB_VISUAL_REACTIVATION' && capabilities.secrets === true && capabilities.firestoreRead === true && capabilities.writes === false && capabilities.runtime === false && capabilities.browser === true && capabilities.deploy === true && capabilities.functionsDeploy === true && capabilities.rulesDeploy === false && capabilities.production === false);", 'ENGINE_CAPABILITIES');
+  engine = replaceLine(engine, "add('REQUEST_ACTIVE'", "  add('REQUEST_ACTIVE', request.schemaVersion === 'orbit360-block12-operational-runtime-lab-visual-rootfix-request-v1' && request.status === 'AUTHORIZED_VISUAL_REACTIVATION_AFTER_FUNCTIONAL_PASS' && request.approved === true && request.allowedExecutions === 1 && request.consumed === false && request.replayAllowed === false && request.retryAuthorized === true && request.previousRuntimeRunId === 30962756387 && request.previousFunctionalStatus === 'PASS' && request.previousFunctionalPassed === 18 && request.previousFunctionalFailed === 0 && request.previousVisualStatus === 'FAIL' && request.previousVisualClassification === 'PIPELINE_MECHANISM_FAILURE' && request.previousVisualFailureCode === 'VISUAL_SCREENSHOT_FULLPAGE_TIMEOUT' && request.previousRollbackExact === true && request.previousRealTenantUnchanged === true && request.functionalReplayForbidden === true && request.authorizationRef === lifecycle.authorization.source);", 'ENGINE_REQUEST_ACTIVE');
+  engine = replaceLine(engine, "add('SYNTHETIC_BOUNDARY'", "  add('READONLY_REACTIVATION_BOUNDARY', request.scope.syntheticTenant === false && request.scope.syntheticAuthUsers === 0 && request.scope.syntheticMemberships === 0 && request.scope.realTenantWrites === false && request.scope.realDataReimport === false && request.scope.functionalScenarioReplay === false);", 'ENGINE_READONLY_BOUNDARY');
+  engine = replaceLine(engine, "add('EVIDENCE_AND_ROLLBACK'", "  add('EVIDENCE_AND_INTEGRITY', scope.snapshotBeforeAfter === true && scope.readonlyIntegrityBeforeAfter === true && scope.priorFunctionalPassEvidenceRequired === true && scope.functionalReplayForbidden === true && scope.sanitizedEvidence === true && scope.cumulativeVisualCandidate === true);", 'ENGINE_EVIDENCE_INTEGRITY');
+  engine = replaceLine(engine, 'const rootfixWorkflow =', "  const rootfixWorkflow = readText('.github/workflows/orbit360-block12-visual-reactivation-lab-v20260804.yml');", 'ENGINE_WORKFLOW_PATH');
+  engine = replaceLine(
+    engine,
+    "add('BROWSER_HARNESS_ROOTFIX'",
+    "  const visualHarness = readText('tools/orbit360-block12-cumulative-visual-v20260804.mjs');\n  add('VISUAL_HARNESS_ROOTFIX', scope.visualViewportCaptureRequired === true && scope.visualAnimationsDisabledRequired === true && scope.visualBrowserCloseFinallyRequired === true && visualHarness.includes('fullPage: false') && visualHarness.includes(\"animations: 'disabled'\") && visualHarness.includes(\"reducedMotion: 'reduce'\") && visualHarness.includes('VISUAL_SCREENSHOT_${route}') && visualHarness.includes('if (page) await page.close().catch') && visualHarness.includes('if (browser) await browser.close().catch') && rootfixWorkflow.includes('timeout --signal=TERM --kill-after=15s 240s'));",
+    'ENGINE_VISUAL_HARNESS'
+  );
+  engine = replaceLine(engine, "add('FUNCTIONS_SDK_CONTRACT'", "  add('FUNCTIONS_SDK_CONTRACT', scope.firebaseFunctionsCompatSdkRequired === true && loader.includes('firebase-functions-compat.js') && readText('orbit360-platform/core/runtime-verification-center-v20260804.js').includes(\"typeof firebase.functions !== 'function'\"));", 'ENGINE_FUNCTIONS_SDK');
   engine = replaceOnce(
     engine,
-    'const equal = (a, b) => JSON.stringify(a) === JSON.stringify(b);',
-    "const equal = (a, b) => JSON.stringify(a) === JSON.stringify(b);\nconst hasGateVersion = (node, gateId, version) => {\n  if (!node || typeof node !== 'object') return false;\n  if (node.gateId === gateId && (node.contractVersion === version || node.gateContractVersion === version)) return true;\n  return Object.values(node).some(value => hasGateVersion(value, gateId, version));\n};",
-    'ENGINE_GATE_VERSION_HELPER'
+    "  'orbit360-platform/runtime-gate-crm-v20260716/functions-dependency-rootfix-source-v20260804.json'\n];",
+    "  'orbit360-platform/runtime-gate-crm-v20260716/functions-dependency-rootfix-source-v20260804.json',\n  'orbit360-platform/runtime-gate-crm-v20260716/block12-functional-pass-before-visual-rootfix-v20260804.json',\n  'tools/orbit360-block12-cumulative-visual-v20260804.mjs',\n  'tools/orbit360-block12-visual-readonly-integrity-v20260804.mjs',\n  'tools/orbit360-materializar-block12-visual-rootfix-v20260804.mjs',\n  '.github/workflows/orbit360-block12-visual-reactivation-lab-v20260804.yml',\n  'orbit360-platform/docs/CIERRE-BLOQUE12-RUNTIME-FUNCIONAL-Y-ROOTFIX-VISUAL-20260804.md'\n];",
+    'ENGINE_REQUIRED_FILES'
+  );
+  if (!engine.includes('const hasGateVersion =')) {
+    engine = replaceOnce(
+      engine,
+      'const equal = (a, b) => JSON.stringify(a) === JSON.stringify(b);',
+      "const equal = (a, b) => JSON.stringify(a) === JSON.stringify(b);\nconst hasGateVersion = (node, gateId, version) => {\n  if (!node || typeof node !== 'object') return false;\n  if (node.gateId === gateId && (node.contractVersion === version || node.gateContractVersion === version)) return true;\n  return Object.values(node).some(value => hasGateVersion(value, gateId, version));\n};",
+      'ENGINE_GATE_VERSION_HELPER'
+    );
+  }
+  const newChecks = [
+    "  add('IMPORT_IDEMPOTENCY_RESPONSE', !recurringSource.includes('Object.assign({ reused: true }, priorReq.data().result || {})') && recurringSource.includes('Object.assign({}, priorReq.data().result || {}, { reused: true })'));",
+    "  const priorFunctional = readJson('orbit360-platform/runtime-gate-crm-v20260716/block12-functional-pass-before-visual-rootfix-v20260804.json');",
+    "  add('PREVIOUS_FUNCTIONAL_PASS', priorFunctional.sourceRunId === 30962756387 && priorFunctional.runtime.status === 'OPERATIONAL_RUNTIME_BROWSER_PASS' && priorFunctional.runtime.passed === 18 && priorFunctional.runtime.failed === 0 && priorFunctional.cleanup.rollbackExact === true && priorFunctional.cleanup.realTenantUnchanged === true && priorFunctional.visual.failureCode === 'VISUAL_SCREENSHOT_FULLPAGE_TIMEOUT' && priorFunctional.ok === true);",
+    "  add('FINAL_CONTRACT_VERSION', readText('tools/orbit360-block12-operational-runtime-lab-v20260804.mjs').includes(\"contractVersion: '12.0.9'\"));",
+    "  const registryState = readJson('tools/orbit360-gate-contract-registry-v20260717.json');",
+    "  const routerState = readText('tools/orbit360-validar-gate-contracts-v20260717.mjs');",
+    "  add('REGISTRY_VERSION_SYNC', hasGateVersion(registryState, GATE, VERSION) && routerState.includes('block12-operational-runtime-lab-v20260804') && routerState.includes('contractVersion:\"12.0.9\"'));"
+  ].join('\n');
+  engine = replaceOnce(
+    engine,
+    "  add('IMPORT_IDEMPOTENCY_RESPONSE', !recurringSource.includes('Object.assign({ reused: true }, priorReq.data().result || {})') && recurringSource.includes('Object.assign({}, priorReq.data().result || {}, { reused: true })'));",
+    newChecks,
+    'ENGINE_NEW_CHECKS'
+  );
+  engine = replaceOnce(
+    engine,
+    '    writeAuthorized: ok,\n    authWriteAuthorized: ok,\n    maximumSyntheticAuthUsers: ok ? 3 : 0,\n    maximumSyntheticMemberships: ok ? 3 : 0,\n    runtimeAuthorized: ok,',
+    '    writeAuthorized: false,\n    authWriteAuthorized: false,\n    maximumSyntheticAuthUsers: 0,\n    maximumSyntheticMemberships: 0,\n    runtimeAuthorized: false,\n    visualOnlyAuthorized: ok,',
+    'ENGINE_OUTPUT_CAPABILITIES'
   );
 }
-const newChecks = [
-  "  add('IMPORT_IDEMPOTENCY_RESPONSE', !recurringSource.includes('Object.assign({ reused: true }, priorReq.data().result || {})') && recurringSource.includes('Object.assign({}, priorReq.data().result || {}, { reused: true })'));",
-  "  const priorFunctional = readJson('orbit360-platform/runtime-gate-crm-v20260716/block12-functional-pass-before-visual-rootfix-v20260804.json');",
-  "  add('PREVIOUS_FUNCTIONAL_PASS', priorFunctional.sourceRunId === 30962756387 && priorFunctional.runtime.status === 'OPERATIONAL_RUNTIME_BROWSER_PASS' && priorFunctional.runtime.passed === 18 && priorFunctional.runtime.failed === 0 && priorFunctional.cleanup.rollbackExact === true && priorFunctional.cleanup.realTenantUnchanged === true && priorFunctional.visual.failureCode === 'VISUAL_SCREENSHOT_FULLPAGE_TIMEOUT' && priorFunctional.ok === true);",
-  "  add('FINAL_CONTRACT_VERSION', readText('tools/orbit360-block12-operational-runtime-lab-v20260804.mjs').includes(\"contractVersion: '12.0.9'\"));",
-  "  const registryState = readJson('tools/orbit360-gate-contract-registry-v20260717.json');",
-  "  const routerState = readText('tools/orbit360-validar-gate-contracts-v20260717.mjs');",
-  "  add('REGISTRY_VERSION_SYNC', hasGateVersion(registryState, GATE, VERSION) && routerState.includes('block12-operational-runtime-lab-v20260804') && routerState.includes('contractVersion:\"12.0.9\"'));"
-].join('\n');
-engine = replaceOnce(
-  engine,
-  "  add('IMPORT_IDEMPOTENCY_RESPONSE', !recurringSource.includes('Object.assign({ reused: true }, priorReq.data().result || {})') && recurringSource.includes('Object.assign({}, priorReq.data().result || {}, { reused: true })'));",
-  newChecks,
-  'ENGINE_NEW_CHECKS'
-);
-engine = replaceOnce(
-  engine,
-  '    writeAuthorized: ok,\n    authWriteAuthorized: ok,\n    maximumSyntheticAuthUsers: ok ? 3 : 0,\n    maximumSyntheticMemberships: ok ? 3 : 0,\n    runtimeAuthorized: ok,',
-  '    writeAuthorized: false,\n    authWriteAuthorized: false,\n    maximumSyntheticAuthUsers: 0,\n    maximumSyntheticMemberships: 0,\n    runtimeAuthorized: false,\n    visualOnlyAuthorized: ok,',
-  'ENGINE_OUTPUT_CAPABILITIES'
-);
+
+if (engine.includes("add('DEPLOY_PIPELINE_ROOTFIX'")) {
+  engine = replaceLine(
+    engine,
+    "add('DEPLOY_PIPELINE_ROOTFIX'",
+    "  add('VISUAL_DEPLOY_PIPELINE', scope.artifactCleanupPolicyAutomatic === true && scope.postDeployFunctionVerificationRequired === true && rootfixWorkflow.includes('firebase deploy') && rootfixWorkflow.includes('--force') && rootfixWorkflow.includes('test \\\"$VERIFIED\\\" = 4') && rootfixWorkflow.includes('VISUAL_READONLY_INTEGRITY_PASS') && rootfixWorkflow.includes('functions:delete') && rootfixWorkflow.includes('hosting:channel:delete'));",
+    'ENGINE_VISUAL_DEPLOY_PIPELINE'
+  );
+} else if (!engine.includes("add('VISUAL_DEPLOY_PIPELINE'")) {
+  throw new Error('PIPELINE_MECHANISM_FAILURE:ENGINE_VISUAL_DEPLOY_PIPELINE_MISSING');
+}
+if (engine.includes("add('SYNTHETIC_LOADER_CONTRACT'")) {
+  engine = replaceLine(
+    engine,
+    "add('SYNTHETIC_LOADER_CONTRACT'",
+    "  add('REAL_TENANT_VISUAL_LOADER_CONTRACT', request.scope.syntheticTenant === false && forbidden.syntheticTenant === true && loader.includes(\"var allowedTenants = ['alianzas-soluciones']\") && loader.includes('isOperationalVerificationPreviewHost') && loader.includes(\"requestedTenant = params.get('tenant') || 'alianzas-soluciones'\") && index.includes('backend-lab-loader.js?v=20260804-operational-rootfix9'));",
+    'ENGINE_REAL_TENANT_LOADER'
+  );
+} else if (!engine.includes("add('REAL_TENANT_VISUAL_LOADER_CONTRACT'")) {
+  throw new Error('PIPELINE_MECHANISM_FAILURE:ENGINE_REAL_TENANT_LOADER_MISSING');
+}
+if (engine.includes("add('MATERIALIZER_REPLACEMENT_SAFE'")) {
+  engine = replaceLine(
+    engine,
+    "add('MATERIALIZER_REPLACEMENT_SAFE'",
+    "  const visualMaterializer = readText('tools/orbit360-materializar-block12-visual-rootfix-v20260804.mjs');\n  add('VISUAL_MATERIALIZER_SAFE', visualMaterializer.includes('replaceOnce') && visualMaterializer.includes('replaceLine') && visualMaterializer.includes('execFileSync(process.execPath') && visualMaterializer.includes(\"const VERSION = '12.0.9'\") && visualMaterializer.includes('engineAlreadyMaterialized'));",
+    'ENGINE_VISUAL_MATERIALIZER_SAFE'
+  );
+} else if (!engine.includes("add('VISUAL_MATERIALIZER_SAFE'")) {
+  throw new Error('PIPELINE_MECHANISM_FAILURE:ENGINE_VISUAL_MATERIALIZER_SAFE_MISSING');
+}
 write(ENGINE, engine);
 
 for (const file of [VISUAL, RUNTIME, ROUTER, ENGINE, 'tools/orbit360-block12-visual-readonly-integrity-v20260804.mjs']) {
