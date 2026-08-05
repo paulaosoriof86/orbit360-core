@@ -324,7 +324,7 @@ async function execute(request) {
     };
     return db.runTransaction(async tx => {
       const priorReq = await tx.get(req);
-      if (priorReq.exists && priorReq.data().status === 'committed') return Object.assign({ reused: true }, priorReq.data().result || {});
+      if (priorReq.exists && priorReq.data().status === 'committed') return Object.assign({}, priorReq.data().result || {}, { reused: true });
       const existing = await tx.get(batchRef(authz.tenantId, batchId));
       if (existing.exists) {
         const result = { ok: true, batchId, reused: true, status: existing.data().status };
