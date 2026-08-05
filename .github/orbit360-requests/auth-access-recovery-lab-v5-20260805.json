@@ -1,0 +1,68 @@
+{
+  "schemaVersion": "orbit360-auth-access-recovery-request-v5",
+  "gateId": "block-auth-access-recovery-lab-v5-20260805",
+  "rcId": "RC-AYS-LAB-CANONICA-01",
+  "status": "AUTHORIZED_ONCE",
+  "authorizationRef": "user_authorized_auth_access_runtime_v5_20260805T1048-0600",
+  "approved": true,
+  "allowedExecutions": 1,
+  "consumed": false,
+  "replayAllowed": false,
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "parentHead": "47cee752931475c55dd62375d549617c013698a8",
+  "projectId": "ays-orbit-360-lab",
+  "tenantId": "alianzas-soluciones",
+  "targetPeople": [
+    "paula",
+    "carlos",
+    "samuel"
+  ],
+  "scope": {
+    "planApprovedAccessConfig": true,
+    "applyApprovedAccessConfig": true,
+    "authCensusReadOnly": true,
+    "deployOnboardingFunctionOnlyIfAbsent": true,
+    "createOrLinkApprovedRealUsers": true,
+    "syncMembershipRolesCountriesScopes": true,
+    "sendPasswordEstablishmentOrReset": true,
+    "verifyIdentityMembershipContract": true,
+    "rollbackAuthMembershipsOnFailure": true,
+    "syntheticUsers": false,
+    "syntheticMemberships": false,
+    "hardcodedUsers": false,
+    "temporaryPasswords": false,
+    "otherFunctions": false,
+    "hosting": false,
+    "rules": false,
+    "reimport": false,
+    "crmWrites": false,
+    "production": false,
+    "main": false,
+    "merge": false
+  },
+  "accessConfigurationBoundary": {
+    "maximumDocuments": 3,
+    "allowedFields": [
+      "email",
+      "roles",
+      "defaultRole",
+      "activeRole",
+      "countries",
+      "dataScopes"
+    ]
+  },
+  "rootFix": {
+    "strategy": "READ_ALL_VALIDATE_ALL_WRITE_ALL",
+    "commit": "38aae846477a35025950869a207bf10be9337cc1",
+    "blobSha": "dda248ff0df08f69d95ac117d8a7262c055b1af6"
+  },
+  "evidenceBoundary": {
+    "containsPII": false,
+    "containsSecrets": false,
+    "fullEmails": false,
+    "passwords": false,
+    "temporaryPasswords": false,
+    "actionLinks": false
+  }
+}
