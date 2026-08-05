@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "orbit360-auth-access-recovery-final-sanitized-v5",
+  "stage": "NOT_EXECUTED",
+  "decision": "PENDING_RUNTIME_REQUEST",
+  "classification": "PENDING_RUNTIME_REQUEST",
+  "ok": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
