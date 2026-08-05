@@ -5,6 +5,7 @@ const { getApps, initializeApp } = require('firebase-admin/app');
 const { getAuth } = require('firebase-admin/auth');
 const { FieldValue, getFirestore } = require('firebase-admin/firestore');
 const { HttpsError, onCall } = require('firebase-functions/v2/https');
+const credentialSelfService = require('./user-credential-selfservice');
 
 const REGION = process.env.ORBIT360_FUNCTIONS_REGION || 'us-central1';
 const ONBOARDING_VERSION = 'orbit360-user-access-onboarding-v1';
@@ -17,7 +18,7 @@ const MANAGE_PERMISSIONS = new Set([
   'users_manage'
 ]);
 const VALID_SCOPES = new Set(['propios', 'equipo', 'todos', 'ninguno']);
-const VALID_OPERATIONS = new Set(['provision', 'sync', 'deactivate', 'reactivate', 'mark_invitation_sent']);
+const VALID_OPERATIONS = new Set(['provision', 'sync', 'deactivate', 'reactivate', 'mark_invitation_sent', 'set_temporary_password', 'complete_password_change']);
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 const ADVISOR_ID_RE = /^[A-Za-z0-9][A-Za-z0-9._:-]{1,159}$/;
 
@@ -269,10 +270,11 @@ async function resolveAuthUser(advisor, currentAdvisor, operation) {
   }
   if (user) {
     const currentEmail = normalizeEmail(user.email);
-    if (currentEmail && currentEmail !== advisor.email) {
+    const emailChanged = !!(currentEmail && currentEmail !== advisor.email);
+    if (emailChanged && operation !== 'sync') {
       throw new HttpsError('failed-precondition', 'El correo configurado no coincide con la identidad vinculada.');
     }
-    return { user, created: false };
+    return { user, created: false, emailChanged };
   }
   try {
     user = await auth.getUserByEmail(advisor.email);
@@ -323,7 +325,8 @@ async function rollbackAuth(authBefore, user, created) {
     }
     await auth.updateUser(user.uid, {
       disabled: authBefore.disabled,
-      displayName: authBefore.displayName || undefined
+      displayName: authBefore.displayName || undefined,
+      email: authBefore.email || undefined
     });
   } catch (error) {
     console.error('ORBIT360_ONBOARDING_AUTH_ROLLBACK_FAILED', error && error.code || 'unknown');
@@ -337,9 +340,15 @@ async function executeProvision(request) {
   const operation = normalized(input.operation || 'provision', 40);
   if (!tenantId) throw new HttpsError('invalid-argument', 'Tenant requerido.');
   if (!VALID_OPERATIONS.has(operation)) throw new HttpsError('invalid-argument', 'Operación de acceso inválida.');
+  if (operation === 'complete_password_change') {
+    return credentialSelfService.completePasswordChange({ request, tenantId, db, FieldValue, HttpsError, sha, text, locateAdvisor });
+  }
   const actor = await authorize(request, tenantId, operation);
   const located = await locateAdvisor(tenantId, advisorId);
   const desired = sanitizeAdvisor(input.advisor || located.data || {}, advisorId);
+  if (operation === 'set_temporary_password') {
+    return credentialSelfService.setTemporaryPassword({ request, tenantId, advisorId, advisor: desired, currentAdvisor: located.data || {}, located, actor, db, auth, FieldValue, HttpsError, sha, text, normalizeEmail });
+  }
   const reason = text(input.reason, 500);
   if (['sync', 'deactivate', 'reactivate'].includes(operation) && reason.length < 5) {
     throw new HttpsError('invalid-argument', 'El cambio requiere un motivo claro.');
@@ -418,11 +427,13 @@ async function executeProvision(request) {
 
   const authResolution = await resolveAuthUser(desired, located.data || {}, operation);
   const user = authResolution.user;
-  const authBefore = user ? { disabled: !!user.disabled, displayName: user.displayName || '' } : null;
+  const authBefore = user ? { disabled: !!user.disabled, displayName: user.displayName || '', email: user.email || '' } : null;
   const desiredDisabled = operation === 'deactivate' || desired.inactivo;
   let authChanged = false;
-  if (user && (user.disabled !== desiredDisabled || text(user.displayName, 180) !== desired.nombre)) {
-    await auth.updateUser(user.uid, { disabled: desiredDisabled, displayName: desired.nombre });
+  if (user && (user.disabled !== desiredDisabled || text(user.displayName, 180) !== desired.nombre || authResolution.emailChanged === true)) {
+    const authPatch = { disabled: desiredDisabled, displayName: desired.nombre };
+    if (authResolution.emailChanged === true) authPatch.email = desired.email;
+    await auth.updateUser(user.uid, authPatch);
     authChanged = true;
   }
 

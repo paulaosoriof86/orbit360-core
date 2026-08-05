@@ -98,6 +98,8 @@
       dataScopes: clone(source.dataScopes || {}),
       modulesExtra: unique(source.modulesExtra || []),
       modulesRestricted: unique(source.modulesRestricted || []),
+      mustChangePassword: source.mustChangePassword === true,
+      credentialState: text(source.credentialState).toLowerCase(),
       productReadOnly: true
     };
   }
@@ -303,6 +305,8 @@
       dataScopes: clone(scopes),
       modulesExtra: unique(data.modulesExtra || data.modulosExtra || []),
       modulesRestricted: unique(data.modulesRestricted || data.modulosRestringidos || []),
+      mustChangePassword: data.mustChangePassword === true,
+      credentialState: text(data.credentialState || data.estadoCredencial).toLowerCase(),
       status: text(data.status || data.estado).toLowerCase(),
       productReadOnly: true,
       __labMembershipProjection: true

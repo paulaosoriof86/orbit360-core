@@ -2,21 +2,253 @@
   "schemaVersion": "orbit360-auth-selfmanaged-credentials-runtime-gate-v1",
   "gateId": "block-auth-selfmanaged-credentials-runtime-v20260805",
   "contractVersion": "13.9.0",
-  "status": "NOT_EXECUTED",
-  "classification": "PENDING_AUTH_SELFMANAGED_REQUEST",
-  "failed": 1,
-  "failedCheckIds": ["AUTH_SELFMANAGED_REQUEST_NOT_EXECUTED"],
-  "executionAuthorized": false,
-  "secretAccessAuthorized": false,
-  "firestoreReadAuthorized": false,
-  "writeAuthorized": false,
-  "authWriteAuthorized": false,
-  "runtimeAuthorized": false,
-  "deployAuthorized": false,
-  "functionsDeployAuthorized": false,
-  "hostingDeployAuthorized": false,
+  "status": "GO_GATE_CONTRACT",
+  "classification": "AUTH_SELFMANAGED_CREDENTIALS_RUNTIME_READY",
+  "total": 43,
+  "passed": 43,
+  "failed": 0,
+  "failedCheckIds": [],
+  "checks": [
+    {
+      "id": "GATE_ID_VERSION",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "LIFECYCLE_AUTHORIZED_ONCE",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "CAPABILITIES_EXACT",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "PRIOR_RUNTIME_CONSUMED",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "PRIOR_REQUEST_IMMUTABLE",
+      "ok": true,
+      "detail": "67948651701480cf5dcc1c0b903cf6f6c77b6ee5"
+    },
+    {
+      "id": "REQUEST_ACTIVE",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "REQUEST_BINDING",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "REQUEST_SINGLE_FILE_COMMIT",
+      "ok": true,
+      "detail": ".github/orbit360-requests/auth-selfmanaged-credentials-runtime-20260805T1559-0600.json"
+    },
+    {
+      "id": "REQUEST_SCOPE",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "REQUEST_PROHIBITIONS",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "CONFIG_EXACT",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "CONFIG_BRAULIO_CONFIRMED",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "CONFIG_UNIQUE_EMAILS",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "FUNCTION_OPERATIONS",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "FUNCTION_EMAIL_SYNC",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "HELPER_ADMIN_AND_SELF",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "HELPER_NO_PASSWORD_OUTPUT",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "PROJECTION_FORCE_FLAG",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "INDEX_LOADS_OWNERS",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "FRONTEND_ADMIN_RESET",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "FRONTEND_FORCED_CHANGE",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "CURRENT_PASSWORD_NOT_READABLE",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "RUNTIME_DYNAMIC_N",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "RUNTIME_PATTERN",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "RUNTIME_PASSWORD_LOGIN",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "RUNTIME_NO_PASSWORD_PERSIST",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "RUNTIME_FORCE_FLAG",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "RUNTIME_CRM_INTEGRITY",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "DYNAMIC_FOUNDATION_PRESENT",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "CONTAINMENT_PRESENT",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "SELF_ADMIN_CONTRACT",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "SOURCE_OWNER_PRESENT",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "WORKFLOW_REQUEST_PATTERN",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "WORKFLOW_FULL_HISTORY",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "WORKFLOW_SOURCE_OWNER_BEFORE_SECRET",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "WORKFLOW_CURRENT_RUN_LEDGER_GUARD",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "WORKFLOW_FUNCTION_ONLY",
+      "ok": true,
+      "detail": "npx firebase deploy --project \"$ORBIT360_PROJECT_ID\" --only \"functions:orbit360ProvisionTeamAccess\" --non-interactive --force"
+    },
+    {
+      "id": "WORKFLOW_LAB_HOSTING_ONLY",
+      "ok": true,
+      "detail": "npx firebase deploy --project \"$ORBIT360_PROJECT_ID\" --only hosting --non-interactive"
+    },
+    {
+      "id": "WORKFLOW_NO_OTHER_DEPLOYS",
+      "ok": true,
+      "detail": "npx firebase deploy --project \"$ORBIT360_PROJECT_ID\" --only \"functions:orbit360ProvisionTeamAccess\" --non-interactive --force | npx firebase deploy --project \"$ORBIT360_PROJECT_ID\" --only hosting --non-interactive"
+    },
+    {
+      "id": "WORKFLOW_PASSWORDS_AFTER_FOUNDATION",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "WORKFLOW_CONTAINMENT",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "WORKFLOW_SINGLE_ATTEMPT",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "SOURCE_FIXTURES_PASS",
+      "ok": true,
+      "detail": "{\"schemaVersion\":\"orbit360-auth-selfmanaged-credentials-source-fixtures-v1\",\"checks\":{\"tenantConfigExactFour\":true,\"confirmedEmailsExact\":true,\"braulioCorrectSpelling\":true,\"countriesExact\":true,\"configContainsNoPasswords\":true,\"policyFirstNamePattern\":true,\"patternSamplesStrong\":true,\"patternNotPersistedInEvidence\":true,\"backendAdminReset\":true,\"backendSelfCompletion\":true,\"backendNoPasswordReturn\":true,\"functionOperationsPatchedBySourcefix\":true,\"authEmailRollbackSupported\":true,\"projectionPatched\":true,\"indexOwnersLoaded\":true,\"frontendAdminReset\":true,\"frontendOwnChange\":true,\"currentPasswordNeverReadable\":true,\"dynamicActiveUsers\":true,\"passwordLoginVerified\":true,\"crmIntegrityProtected\":true,\"containmentAvailable\":true,\"priorRuntimeConsumed\":true,\"protectedFunctionSingleOwner\":true},\"total\":24,\"passed\":24,\"failed\":0,\"failedCheckIds\":[],\"usersInPatternFixture\":7,\"identityOverrides\":"
+    }
+  ],
+  "executionAuthorized": true,
+  "secretAccessAuthorized": true,
+  "firestoreReadAuthorized": true,
+  "writeAuthorized": true,
+  "authWriteAuthorized": true,
+  "runtimeAuthorized": true,
+  "browserAuthorized": false,
+  "deployAuthorized": true,
+  "functionsDeployAuthorized": true,
+  "allowedFunctions": [
+    "orbit360ProvisionTeamAccess"
+  ],
+  "hostingDeployAuthorized": true,
+  "hostingTarget": "ays-orbit-360-lab",
+  "hostingDeploysMaximum": 1,
   "rulesDeployAuthorized": false,
   "productionAuthorized": false,
+  "identityOverridesRequired": 4,
+  "activeUserCountMode": "DYNAMIC_AT_RUNTIME",
+  "temporaryPasswordPolicy": "FIRST_NAME_123_STAR",
+  "forceChangeOnFirstLogin": true,
+  "currentPasswordReadable": false,
+  "passwordRollbackExact": false,
+  "failureContainmentRequired": true,
   "dataAccess": false,
   "secretAccess": false,
   "firestoreReads": 0,
@@ -26,8 +258,60 @@
   "runtimeExecuted": false,
   "deployExecuted": false,
   "productionTouched": false,
+  "fixture": {
+    "schemaVersion": "orbit360-auth-selfmanaged-credentials-source-fixtures-v1",
+    "checks": {
+      "tenantConfigExactFour": true,
+      "confirmedEmailsExact": true,
+      "braulioCorrectSpelling": true,
+      "countriesExact": true,
+      "configContainsNoPasswords": true,
+      "policyFirstNamePattern": true,
+      "patternSamplesStrong": true,
+      "patternNotPersistedInEvidence": true,
+      "backendAdminReset": true,
+      "backendSelfCompletion": true,
+      "backendNoPasswordReturn": true,
+      "functionOperationsPatchedBySourcefix": true,
+      "authEmailRollbackSupported": true,
+      "projectionPatched": true,
+      "indexOwnersLoaded": true,
+      "frontendAdminReset": true,
+      "frontendOwnChange": true,
+      "currentPasswordNeverReadable": true,
+      "dynamicActiveUsers": true,
+      "passwordLoginVerified": true,
+      "crmIntegrityProtected": true,
+      "containmentAvailable": true,
+      "priorRuntimeConsumed": true,
+      "protectedFunctionSingleOwner": true
+    },
+    "total": 24,
+    "passed": 24,
+    "failed": 0,
+    "failedCheckIds": [],
+    "usersInPatternFixture": 7,
+    "identityOverrides": 4,
+    "operationalCapabilitiesUsed": 0,
+    "containsPasswords": false,
+    "containsSecrets": false,
+    "ok": true
+  },
   "containsPII": false,
   "containsSecrets": false,
   "containsPasswords": false,
-  "ok": false
+  "ok": true,
+  "canonicalEntrypoint": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
+  "canonicalEngine": "tools/orbit360-validar-gate-contracts-engine-auth-selfmanaged-credentials-runtime-v20260805.mjs",
+  "canonicalLifecycleContract": "tools/orbit360-validator-lifecycle-contract-auth-selfmanaged-credentials-runtime-v20260805.json",
+  "canonicalLifecycleComposition": "phase-capability-contract-v1",
+  "engineEvidenceSource": "sync-file-evidence-not-stdout-v1",
+  "engineStdoutParsed": false,
+  "sourceTransformed": false,
+  "operationalWrites": 0,
+  "evidenceWrites": 1,
+  "secretsRead": false,
+  "firestoreRead": false,
+  "browserExecuted": false,
+  "rulesApplied": false
 }
