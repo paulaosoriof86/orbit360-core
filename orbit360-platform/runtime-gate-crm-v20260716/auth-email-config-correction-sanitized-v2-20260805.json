@@ -1,12 +1,22 @@
 {
   "schemaVersion": "orbit360-auth-email-config-correction-sanitized-v2",
-  "stage": "NOT_EXECUTED",
-  "classification": "PENDING_AUTHORIZED_EXECUTION",
-  "firestoreWrites": 0,
+  "stage": "AUTH_EMAIL_CONFIG_CORRECTION_PASS",
+  "decision": "GO_PAULA_OFFICIAL_ACCESS_EMAIL_CONFIGURED",
+  "classification": "DATA_CONTRACT_CORRECTED",
+  "tenantId": "alianzas-soluciones",
+  "advisorIdHash": "733f75bf9c2d12f2b1847a6754dbfef8b35e7371d2e84d7773871daebd9ac2eb",
+  "advisorPathHash": "61cdf63b9734ffb4da7a0d75fd0b7e283a04e3a33fc2dd99ae3048f87876f50a",
+  "source": "legacy_tenantId",
+  "officialEmailSha256": "9b663847979724e9491e1c655da32a7cb17a5f6ed26dba352de1eb811254b23f",
+  "changedFields": [
+    "email"
+  ],
+  "firestoreWrites": 1,
   "authWrites": 0,
   "membershipWrites": 0,
   "crmWrites": 0,
+  "fullEmailsExposed": 0,
   "containsPII": false,
   "containsSecrets": false,
-  "ok": false
+  "ok": true
 }

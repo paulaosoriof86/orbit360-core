@@ -1,11 +1,11 @@
 {
-  "schemaVersion": "orbit360-auth-access-recovery-preflight-v1",
-  "gateId": "block-auth-access-recovery-lab-v20260805",
-  "contractVersion": "13.0.0",
+  "schemaVersion": "orbit360-auth-access-recovery-gate-v2",
+  "gateId": "block-auth-access-recovery-lab-v2-20260805",
+  "contractVersion": "13.1.0",
   "status": "GO_GATE_CONTRACT",
-  "classification": "AUTH_ACCESS_RECOVERY_READY",
-  "total": 14,
-  "passed": 14,
+  "classification": "AUTH_ACCESS_RECOVERY_V2_READY",
+  "total": 13,
+  "passed": 13,
   "failed": 0,
   "failedCheckIds": [],
   "checks": [
@@ -15,7 +15,7 @@
       "detail": ""
     },
     {
-      "id": "LIFECYCLE_STATUS",
+      "id": "LIFECYCLE_AUTHORIZED_ONCE",
       "ok": true,
       "detail": ""
     },
@@ -35,37 +35,37 @@
       "detail": ""
     },
     {
-      "id": "REQUEST_SCOPE_POSITIVE",
+      "id": "OFFICIAL_EMAIL_DIGEST",
       "ok": true,
       "detail": ""
     },
     {
-      "id": "REQUEST_SCOPE_NEGATIVE",
+      "id": "TARGETS_EXACT",
       "ok": true,
       "detail": ""
     },
     {
-      "id": "BOUNDARY_EXACT",
+      "id": "SCOPE_POSITIVE",
       "ok": true,
       "detail": ""
     },
     {
-      "id": "SOURCE_EXPORT",
+      "id": "SCOPE_NEGATIVE",
       "ok": true,
       "detail": ""
     },
     {
-      "id": "BOOTSTRAP_EXPORT",
+      "id": "FUNCTION_ALLOWLIST",
       "ok": true,
       "detail": ""
     },
     {
-      "id": "CLIENT_RESET_FLOW",
+      "id": "PRIOR_CONSUMED",
       "ok": true,
       "detail": ""
     },
     {
-      "id": "EQUIPO_BRIDGE",
+      "id": "PRIOR_REQUEST_IMMUTABLE",
       "ok": true,
       "detail": ""
     },
@@ -73,21 +73,14 @@
       "id": "REQUIRED_FILES",
       "ok": true,
       "detail": ""
-    },
-    {
-      "id": "ONLY_REQUEST_TRIGGERED",
-      "ok": true,
-      "detail": ".github/orbit360-requests/auth-access-recovery-lab-v20260805.json"
     }
   ],
   "executionAuthorized": true,
   "secretAccessAuthorized": true,
   "firestoreReadAuthorized": true,
   "writeAuthorized": true,
-  "maximumAuthUsersCreated": 3,
-  "maximumAuthUsersUpdated": 3,
-  "maximumMembershipsCreated": 3,
-  "maximumMembershipsUpdated": 3,
+  "maximumAdvisorConfigurationDocumentsUpdated": 1,
+  "maximumAdvisorConfigurationFieldsUpdated": 1,
   "authWriteAuthorized": true,
   "runtimeAuthorized": true,
   "browserAuthorized": false,
@@ -109,11 +102,13 @@
   "browserExecuted": false,
   "deployExecuted": false,
   "productionTouched": false,
+  "officialAccessEmailSha256": "9b663847979724e9491e1c655da32a7cb17a5f6ed26dba352de1eb811254b23f",
+  "fullEmailsExposed": 0,
   "containsPII": false,
   "containsSecrets": false,
   "canonicalEntrypoint": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
-  "canonicalEngine": "tools/orbit360-validar-gate-contracts-engine-auth-access-recovery-lab-v20260805.mjs",
-  "canonicalLifecycleContract": "tools/orbit360-validator-lifecycle-contract-auth-access-recovery-lab-v20260805.json",
+  "canonicalEngine": "tools/orbit360-validar-gate-contracts-engine-auth-access-recovery-lab-v2-20260805.mjs",
+  "canonicalLifecycleContract": "tools/orbit360-validator-lifecycle-contract-auth-access-recovery-lab-v2-20260805.json",
   "canonicalLifecycleComposition": "phase-capability-contract-v1",
   "engineEvidenceSource": "sync-file-evidence-not-stdout-v1",
   "engineStdoutParsed": false,

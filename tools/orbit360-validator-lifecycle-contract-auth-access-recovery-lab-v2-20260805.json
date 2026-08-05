@@ -3,7 +3,7 @@
   "gateId": "block-auth-access-recovery-lab-v2-20260805",
   "gateContractVersion": "13.1.0",
   "validatorLifecycleRevision": "phase-capability-contract-v1",
-  "status": "AUTH_ACCESS_RECOVERY_V2_AUTHORIZED_ONCE",
+  "status": "AUTH_ACCESS_RECOVERY_V2_CONSUMED_STOP_RETRY",
   "executionProfile": {
     "phase": "AUTH_ACCESS_RECOVERY_LAB_V2",
     "capabilities": {
@@ -22,11 +22,11 @@
   "rcId": "RC-AYS-LAB-CANONICA-01",
   "authorization": {
     "requiredForExecution": true,
-    "activeRequest": true,
-    "allowedExecutions": 1,
+    "activeRequest": false,
+    "allowedExecutions": 0,
     "request": ".github/orbit360-requests/auth-access-recovery-lab-v2-20260805.json",
     "authorizationRef": "user_authorized_auth_access_recovery_v2_20260805T0852-0600",
-    "consumed": false,
+    "consumed": true,
     "replayAllowed": false,
     "newExplicitAuthorizationRequiredAfterExecution": true
   },
@@ -53,9 +53,27 @@
     "maximumFieldsChanged": 1
   },
   "requiredPeople": [
-    { "key": "paula", "nameTokens": ["paula", "osorio"] },
-    { "key": "carlos", "nameTokens": ["carlos", "castro"] },
-    { "key": "samuel", "nameTokens": ["samuel", "daza"] }
+    {
+      "key": "paula",
+      "nameTokens": [
+        "paula",
+        "osorio"
+      ]
+    },
+    {
+      "key": "carlos",
+      "nameTokens": [
+        "carlos",
+        "castro"
+      ]
+    },
+    {
+      "key": "samuel",
+      "nameTokens": [
+        "samuel",
+        "daza"
+      ]
+    }
   ],
   "accessBoundary": {
     "configurationOwner": "tenant advisor records",
@@ -65,7 +83,9 @@
     "maximumAuthUsersUpdated": 3,
     "maximumMembershipsCreated": 3,
     "maximumMembershipsUpdated": 3,
-    "allowedFunctionDeploys": ["orbit360ProvisionTeamAccess"],
+    "allowedFunctionDeploys": [
+      "orbit360ProvisionTeamAccess"
+    ],
     "passwordResetEmailAllowed": true,
     "passwordReadAllowed": false,
     "temporaryPasswordAllowed": false,
@@ -98,5 +118,13 @@
     "stopRetryOnFailure": true
   },
   "containsPII": false,
-  "containsSecrets": false
+  "containsSecrets": false,
+  "executionResult": {
+    "stage": "STOP_RETRY_CENSUS",
+    "decision": "STOP_RETRY",
+    "classification": "DATA_CONTRACT_FAILURE",
+    "ok": false,
+    "functionDeployed": false,
+    "emailConfigurationCorrected": true
+  }
 }
