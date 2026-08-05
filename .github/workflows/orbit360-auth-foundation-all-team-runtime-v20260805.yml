@@ -1,0 +1,383 @@
+name: Orbit 360 · Fundación Auth all-team runtime
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-requests/auth-foundation-all-team-runtime-v20260805.json'
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: orbit360-auth-foundation-all-team-runtime-v20260805
+  cancel-in-progress: false
+
+env:
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  ORBIT360_REQUEST_FILE: .github/orbit360-requests/auth-foundation-all-team-runtime-v20260805.json
+  ORBIT360_GATE_ID: block-auth-foundation-all-team-runtime-v20260805
+  ORBIT360_LIFECYCLE: tools/orbit360-validator-lifecycle-contract-auth-foundation-all-team-runtime-v20260805.json
+  ORBIT360_PROJECT_ID: ays-orbit-360-lab
+  ORBIT360_TENANT_ID: alianzas-soluciones
+  ORBIT360_EXPECTED_TEAM_USERS: '7'
+  ORBIT360_FUNCTION: orbit360ProvisionTeamAccess
+  ORBIT360_EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+  ORBIT360_FINAL_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/auth-foundation-all-team-runtime-final-sanitized-v20260805.json
+  ORBIT360_FUNCTION_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/auth-foundation-all-team-function-readiness-sanitized-v20260805.json
+  ORBIT360_CLOSURE: orbit360-platform/docs/CIERRE-AUTH-FOUNDATION-ALL-TEAM-RUNTIME-20260805.md
+  ORBIT360_PASSWORD_CONTINUE_URL: https://ays-orbit-360-lab.web.app/index.html?orbitBackend=firestore-lab&tenant=alianzas-soluciones#/inicio
+
+jobs:
+  auth-foundation-all-team:
+    name: Gate → censo 7/7 → bootstrap → correos → sesiones → cierre
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - name: Checkout request exacto con historia completa
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Verificar request único e inmutable
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
+          test "${#CHANGED[@]}" = '1'
+          test "${CHANGED[0]}" = "$ORBIT360_REQUEST_FILE"
+          PARENT="$(git rev-parse HEAD^)"
+          jq -e --arg parent "$PARENT" '
+            .schemaVersion=="orbit360-auth-foundation-all-team-runtime-request-v1" and
+            .gateId=="block-auth-foundation-all-team-runtime-v20260805" and
+            .rcId=="RC-AYS-LAB-CANONICA-01" and
+            .status=="AUTHORIZED_ONCE" and .approved==true and
+            .allowedExecutions==1 and .consumed==false and .replayAllowed==false and
+            .branch=="ays/backend-tenant-lab-v99-20260703" and .pullRequest==5 and
+            .projectId=="ays-orbit-360-lab" and .tenantId=="alianzas-soluciones" and
+            .parentHead==$parent and
+            .scope.realCensusAllActiveTeam==true and .scope.requireExactlySeven==true and
+            .scope.adminSdkBootstrap==true and .scope.createOrLinkMissingIdentities==true and
+            .scope.reconcileSevenMemberships==true and .scope.linkSevenTeamRecords==true and
+            .scope.sendSevenPasswordEmails==true and .scope.verifySevenSessions==true and
+            .scope.verifyThreeFunctionalProfiles==true and
+            .scope.deployOnlyOnboardingFunctionIfAbsent==true and
+            .scope.verifyFutureOnboardingReadiness==true and
+            .scope.crmSnapshotIntegrity==true and .scope.exactRollback==true and
+            .scope.syntheticUsers==false and .scope.hardcodedPeople==false and
+            .scope.temporaryPasswords==false and .scope.otherFunctions==false and
+            .scope.hosting==false and .scope.rules==false and .scope.reimport==false and
+            .scope.crmWrites==false and .scope.production==false and .scope.main==false and .scope.merge==false
+          ' "$ORBIT360_REQUEST_FILE" >/dev/null
+
+      - name: Validar sintaxis y fixtures acumulativos
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-auth-foundation-all-team-plan-v20260805.mjs
+          node --check tools/orbit360-auth-foundation-all-team-runtime-v20260805.mjs
+          node --check tools/orbit360-test-auth-foundation-all-team-runtime-source-v20260805.mjs
+          node --check tools/orbit360-validar-gate-contracts-engine-auth-foundation-all-team-runtime-v20260805.mjs
+          node --check tools/orbit360-register-auth-foundation-all-team-runtime-gate-v20260805.mjs
+          node tools/orbit360-test-auth-foundation-all-team-runtime-source-v20260805.mjs | tee "$RUNNER_TEMP/auth-foundation-runtime-fixtures.json"
+          jq -e '.ok==true and .usersCovered==7 and .functionalProfilesCovered==3 and .operationalCapabilitiesUsed==0' "$RUNNER_TEMP/auth-foundation-runtime-fixtures.json" >/dev/null
+          git diff --check HEAD^
+
+      - name: Registrar gate runtime únicamente en working tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-register-auth-foundation-all-team-runtime-gate-v20260805.mjs
+
+      - name: Gate canónico antes de secretos
+        id: preflight
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
+          jq -e '
+            .status=="GO_GATE_CONTRACT" and .contractVersion=="13.7.0" and
+            .failed==0 and .ok==true and
+            .executionAuthorized==true and .secretAccessAuthorized==true and
+            .firestoreReadAuthorized==true and .writeAuthorized==true and
+            .authWriteAuthorized==true and .runtimeAuthorized==true and
+            .functionsDeployAuthorized==true and .allowedFunctions==["orbit360ProvisionTeamAccess"] and
+            .hostingDeployAuthorized==false and .rulesDeployAuthorized==false and .productionAuthorized==false and
+            .expectedCurrentUsers==7 and .expectedIdentityCoverage=="7/7" and
+            .expectedFunctionalProfiles=="3/3" and
+            .maximumAuthCreates==7 and .maximumMembershipWrites==7 and .maximumTeamLinkWrites==7 and
+            .passwordEmailsRequired==7 and .sessionsRequired==7 and
+            .transactionStrategy=="READ_ALL_VALIDATE_ALL_WRITE_ALL" and
+            .sourceOnlyPrerequisitePass==true and
+            .dataAccess==false and .secretAccess==false and .firestoreReads==0 and .firestoreWrites==0 and
+            .authReads==0 and .authWrites==0 and .runtimeExecuted==false and .deployExecuted==false
+          ' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json >/dev/null
+
+      - name: Persistir registro canónico antes de runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! git diff --quiet -- tools/orbit360-validar-gate-contracts-v20260717.mjs; then
+            git config user.name orbit360-gate-bot
+            git config user.email orbit360-gate-bot@users.noreply.github.com
+            git add tools/orbit360-validar-gate-contracts-v20260717.mjs orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            git commit -m 'gate: register auth foundation all-team runtime [skip ci]'
+            git push origin "HEAD:$ORBIT360_BRANCH"
+          fi
+
+      - name: Resolver credencial LAB
+        env:
+          SA1: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          SA2: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+          SA3: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          SERVICE_ACCOUNT="${SA1:-${SA2:-${SA3:-}}}"
+          test -n "$SERVICE_ACCOUNT"
+          KEY="$RUNNER_TEMP/orbit360-auth-foundation-service-account.json"
+          printf '%s' "$SERVICE_ACCOUNT" > "$KEY"
+          chmod 600 "$KEY"
+          test "$(jq -r '.project_id // empty' "$KEY")" = "$ORBIT360_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY" >> "$GITHUB_ENV"
+          echo "ORBIT360_AUTH_FOUNDATION_PRIVATE_STATE=$RUNNER_TEMP/orbit360-auth-foundation-all-team-private.json" >> "$GITHUB_ENV"
+
+      - name: Instalar runtime reproducible
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false firebase-admin@13.10.0 firebase-tools@15.25.1 >/dev/null
+          npm --prefix functions ci --include=prod
+          node --check tools/orbit360-auth-foundation-all-team-runtime-v20260805.mjs
+          node --check functions/user-onboarding.js
+
+      - name: Resolver API web sin exponerla
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx firebase apps:list --project "$ORBIT360_PROJECT_ID" --json > "$RUNNER_TEMP/firebase-apps.json"
+          APP_ID="$(node - "$RUNNER_TEMP/firebase-apps.json" <<'NODE'
+          const fs=require('fs');
+          const data=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));
+          const found=[];
+          const walk=v=>{
+            if(!v)return;
+            if(Array.isArray(v))return v.forEach(walk);
+            if(typeof v==='object'){
+              const platform=String(v.platform||v.platformId||v.type||'').toUpperCase();
+              const appId=String(v.appId||v.app_id||'');
+              if(platform==='WEB'&&appId)found.push(appId);
+              Object.values(v).forEach(walk);
+            }
+          };
+          walk(data);
+          if(!found.length)process.exit(2);
+          process.stdout.write(found[0]);
+          NODE
+          )"
+          test -n "$APP_ID"
+          npx firebase apps:sdkconfig WEB "$APP_ID" --project "$ORBIT360_PROJECT_ID" > "$RUNNER_TEMP/firebase-web-config.txt"
+          API_KEY="$(node - "$RUNNER_TEMP/firebase-web-config.txt" <<'NODE'
+          const fs=require('fs');
+          const s=fs.readFileSync(process.argv[2],'utf8');
+          let key='';
+          try {
+            const data=JSON.parse(s);
+            const walk=v=>{ if(!v||key)return; if(Array.isArray(v))return v.forEach(walk); if(typeof v==='object'){if(typeof v.apiKey==='string')key=v.apiKey; else Object.values(v).forEach(walk);} };
+            walk(data);
+          } catch {}
+          if(!key){const m=s.match(/apiKey\s*[:=]\s*["']([^"']+)["']/);if(m)key=m[1];}
+          if(!key)process.exit(3);
+          process.stdout.write(key);
+          NODE
+          )"
+          test -n "$API_KEY"
+          echo "::add-mask::$API_KEY"
+          echo "ORBIT360_FIREBASE_WEB_API_KEY=$API_KEY" >> "$GITHUB_ENV"
+
+      - name: Censo real all-team 7/7 antes de escrituras
+        id: census
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-auth-foundation-all-team-runtime-v20260805.mjs census
+          jq -e '
+            .stage=="AUTH_FOUNDATION_ALL_TEAM_CENSUS_PASS" and .ok==true and
+            .activeTeamCount==7 and .plannedMembershipReconciliations==7 and .plannedTeamLinks==7 and
+            .functionalProfilesCovered==3 and .futureUserPathSupported==true and
+            .firestoreWrites==0 and .authWrites==0
+          ' "$ORBIT360_EVIDENCE_DIR/auth-foundation-all-team-runtime-census-sanitized-v20260805.json" >/dev/null
+
+      - name: Desplegar exclusivamente onboarding si falta
+        id: function
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx firebase functions:list --project "$ORBIT360_PROJECT_ID" --json > "$RUNNER_TEMP/functions-before.json"
+          BEFORE="$(node - "$RUNNER_TEMP/functions-before.json" <<'NODE'
+          const fs=require('fs');const s=fs.readFileSync(process.argv[2],'utf8');process.stdout.write(String((s.match(/orbit360ProvisionTeamAccess/g)||[]).length));
+          NODE
+          )"
+          DEPLOYED=false
+          if [ "$BEFORE" = 0 ]; then
+            npx firebase deploy --project "$ORBIT360_PROJECT_ID" --only "functions:orbit360ProvisionTeamAccess" --non-interactive --force
+            DEPLOYED=true
+          fi
+          npx firebase functions:list --project "$ORBIT360_PROJECT_ID" --json > "$RUNNER_TEMP/functions-after.json"
+          AFTER="$(node - "$RUNNER_TEMP/functions-after.json" <<'NODE'
+          const fs=require('fs');const s=fs.readFileSync(process.argv[2],'utf8');process.stdout.write(String((s.match(/orbit360ProvisionTeamAccess/g)||[]).length));
+          NODE
+          )"
+          test "$AFTER" -ge 1
+          echo "deployed=$DEPLOYED" >> "$GITHUB_OUTPUT"
+          export DEPLOYED
+          node --input-type=module - <<'NODE'
+          import fs from 'node:fs';
+          const payload={schemaVersion:'orbit360-auth-foundation-function-readiness-v1',stage:'AUTH_FOUNDATION_ONBOARDING_FUNCTION_READY',functionName:'orbit360ProvisionTeamAccess',available:true,deployedThisRun:process.env.DEPLOYED==='true',otherFunctionsDeployed:0,hostingDeploys:0,rulesDeploys:0,containsPII:false,containsSecrets:false,ok:true};
+          fs.writeFileSync(process.env.ORBIT360_FUNCTION_EVIDENCE,JSON.stringify(payload,null,2)+'\n');
+          NODE
+
+      - name: Aplicar bootstrap Admin SDK y reconciliación 7/7
+        id: apply
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-auth-foundation-all-team-runtime-v20260805.mjs apply
+          jq -e '
+            .stage=="AUTH_FOUNDATION_ALL_TEAM_APPLY_PASS" and .ok==true and
+            (.authUsersCreated + .authUsersLinked)==7 and
+            .membershipsWritten==7 and .teamRecordsLinked==7 and
+            .atomicTransaction==true and .transactionStrategy=="READ_ALL_VALIDATE_ALL_WRITE_ALL" and
+            .authUsersCreated<=7 and .firestoreWrites==14
+          ' "$ORBIT360_EVIDENCE_DIR/auth-foundation-all-team-runtime-apply-sanitized-v20260805.json" >/dev/null
+
+      - name: Enviar siete correos de establecimiento o recuperación
+        id: emails
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-auth-foundation-all-team-runtime-v20260805.mjs emails
+          jq -e '.stage=="AUTH_FOUNDATION_ALL_TEAM_EMAILS_PASS" and .ok==true and .emailsSent==7 and .actionLinksExposed==0' "$ORBIT360_EVIDENCE_DIR/auth-foundation-all-team-runtime-emails-sanitized-v20260805.json" >/dev/null
+
+      - name: Verificar siete sesiones autenticables por membership
+        id: sessions
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-auth-foundation-all-team-runtime-v20260805.mjs sessions
+          jq -e '.stage=="AUTH_FOUNDATION_ALL_TEAM_SESSIONS_PASS" and .ok==true and .sessionsVerified==7 and .tokensExposed==0' "$ORBIT360_EVIDENCE_DIR/auth-foundation-all-team-runtime-sessions-sanitized-v20260805.json" >/dev/null
+
+      - name: Verificar identidades memberships Equipo perfiles y CRM
+        id: verify
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-auth-foundation-all-team-runtime-v20260805.mjs verify
+          jq -e '
+            .stage=="AUTH_FOUNDATION_ALL_TEAM_RUNTIME_PASS" and .ok==true and
+            .identitiesVerified==7 and .membershipsVerified==7 and .teamLinksVerified==7 and
+            .passwordEmailsVerified==7 and .sessionsVerified==7 and .functionalProfilesVerified==3 and
+            .futureUserPathSupported==true and .crmIntegrity=="VERIFIED_UNCHANGED"
+          ' "$ORBIT360_EVIDENCE_DIR/auth-foundation-all-team-runtime-verify-sanitized-v20260805.json" >/dev/null
+
+      - name: Rollback exacto ante cualquier fallo
+        if: always() && steps.apply.outcome == 'success' && (steps.emails.outcome != 'success' || steps.sessions.outcome != 'success' || steps.verify.outcome != 'success' || steps.function.outcome != 'success')
+        id: rollback
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-auth-foundation-all-team-runtime-v20260805.mjs rollback
+
+      - name: Sellar evidencia final y consumir autorización
+        if: always() && steps.preflight.outcome == 'success'
+        shell: bash
+        env:
+          FUNCTION_DEPLOYED: ${{ steps.function.outputs.deployed }}
+          ROLLBACK_OUTCOME: ${{ steps.rollback.outcome }}
+        run: |
+          set -euo pipefail
+          node --input-type=module - <<'NODE'
+          import fs from 'node:fs';
+          const read=p=>fs.existsSync(p)?JSON.parse(fs.readFileSync(p,'utf8')):null;
+          const dir=process.env.ORBIT360_EVIDENCE_DIR;
+          const census=read(`${dir}/auth-foundation-all-team-runtime-census-sanitized-v20260805.json`);
+          const apply=read(`${dir}/auth-foundation-all-team-runtime-apply-sanitized-v20260805.json`);
+          const emails=read(`${dir}/auth-foundation-all-team-runtime-emails-sanitized-v20260805.json`);
+          const sessions=read(`${dir}/auth-foundation-all-team-runtime-sessions-sanitized-v20260805.json`);
+          const verify=read(`${dir}/auth-foundation-all-team-runtime-verify-sanitized-v20260805.json`);
+          const rollback=read(`${dir}/auth-foundation-all-team-runtime-rollback-sanitized-v20260805.json`);
+          const functionEvidence=read(process.env.ORBIT360_FUNCTION_EVIDENCE);
+          const ok=census?.ok===true&&apply?.ok===true&&emails?.ok===true&&sessions?.ok===true&&verify?.ok===true&&functionEvidence?.ok===true;
+          const failed=[census,apply,emails,sessions,verify,rollback].find(x=>x&&x.ok===false);
+          const integrity=verify?.crmIntegrity||rollback?.crmIntegrity||'NOT_POSTVERIFIED';
+          const final={schemaVersion:'orbit360-auth-foundation-all-team-runtime-final-v1',stage:ok?'AUTH_FOUNDATION_ALL_TEAM_RUNTIME_PASS':(failed?.stage||'STOP_RETRY_EVIDENCE_INCOMPLETE'),decision:ok?'GO_AUTH_FOUNDATION_SEVEN_REAL_USERS':'STOP_RETRY',classification:ok?'AUTH_FOUNDATION_ALL_TEAM_COMPLETE':(failed?.classification||'PIPELINE_MECHANISM_FAILURE'),errorCode:failed?.errorCode||'',identitiesVerified:verify?.identitiesVerified||0,membershipsVerified:verify?.membershipsVerified||0,teamLinksVerified:verify?.teamLinksVerified||0,passwordEmailsSent:emails?.emailsSent||0,sessionsVerified:sessions?.sessionsVerified||0,functionalProfilesVerified:verify?.functionalProfilesVerified||0,futureOnboardingReady:functionEvidence?.available===true,onboardingFunctionDeployedThisRun:process.env.FUNCTION_DEPLOYED==='true',otherFunctionsDeployed:0,crmIntegrity:integrity,rollbackAttempted:process.env.ROLLBACK_OUTCOME==='success',rollbackStage:rollback?.stage||'',temporaryPasswordsCreated:0,passwordsRead:0,actionLinksExposed:0,fullEmailsExposed:0,hostingDeploys:0,rulesDeploys:0,reimports:0,productionTouched:false,mainTouched:false,mergeExecuted:false,containsPII:false,containsSecrets:false,ok};
+          fs.writeFileSync(process.env.ORBIT360_FINAL_EVIDENCE,JSON.stringify(final,null,2)+'\n');
+          const lifecycle=JSON.parse(fs.readFileSync(process.env.ORBIT360_LIFECYCLE,'utf8'));
+          lifecycle.status=ok?'AUTH_FOUNDATION_ALL_TEAM_RUNTIME_CONSUMED_PASS':'AUTH_FOUNDATION_ALL_TEAM_RUNTIME_CONSUMED_STOP_RETRY';
+          lifecycle.authorization.activeRequest=false;
+          lifecycle.authorization.allowedExecutions=0;
+          lifecycle.authorization.consumed=true;
+          lifecycle.executionResult={stage:final.stage,decision:final.decision,classification:final.classification,errorCode:final.errorCode,crmIntegrity:final.crmIntegrity,ok};
+          fs.writeFileSync(process.env.ORBIT360_LIFECYCLE,JSON.stringify(lifecycle,null,2)+'\n');
+          fs.writeFileSync(process.env.ORBIT360_CLOSURE,`# CIERRE FUNDACIÓN AUTH ALL-TEAM RUNTIME\n\n\`\`\`text\n${final.stage}\n${final.classification}\nidentidades: ${final.identitiesVerified}/7\nmemberships: ${final.membershipsVerified}/7\nEquipo vinculado: ${final.teamLinksVerified}/7\ncorreos: ${final.passwordEmailsSent}/7\nsesiones: ${final.sessionsVerified}/7\nperfiles: ${final.functionalProfilesVerified}/3\nCRM: ${final.crmIntegrity}\n\`\`\`\n\n- onboarding futuro listo: ${final.futureOnboardingReady}\n- Function desplegada en este run: ${final.onboardingFunctionDeployedThisRun}\n- rollback intentado: ${final.rollbackAttempted}\n- Hosting/Rules/reimportación/producción/main/merge: 0\n`);
+          NODE
+
+      - name: Persistir evidencia y lifecycle sin tocar request
+        if: always() && steps.preflight.outcome == 'success'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name orbit360-gate-bot
+          git config user.email orbit360-gate-bot@users.noreply.github.com
+          CANDIDATES=(
+            tools/orbit360-validator-lifecycle-contract-auth-foundation-all-team-runtime-v20260805.json
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            "$ORBIT360_FUNCTION_EVIDENCE"
+            "$ORBIT360_FINAL_EVIDENCE"
+            "$ORBIT360_CLOSURE"
+          )
+          FILES=()
+          for file in "${CANDIDATES[@]}" "$ORBIT360_EVIDENCE_DIR"/auth-foundation-all-team-runtime-*-sanitized-v20260805.json; do
+            [ -f "$file" ] && FILES+=("$file")
+          done
+          test "${#FILES[@]}" -ge 3
+          git add "${FILES[@]}"
+          if ! git diff --cached --quiet; then
+            git commit -m 'auth: persist all-team foundation runtime result [skip ci]'
+            git push origin "HEAD:$ORBIT360_BRANCH"
+          fi
+
+      - name: Publicar artefacto sanitizado
+        if: always() && steps.preflight.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: auth-foundation-all-team-runtime-sanitized
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/auth-foundation-all-team-runtime-*-sanitized-v20260805.json
+            orbit360-platform/runtime-gate-crm-v20260716/auth-foundation-all-team-function-readiness-sanitized-v20260805.json
+            orbit360-platform/runtime-gate-crm-v20260716/auth-foundation-all-team-runtime-final-sanitized-v20260805.json
+            orbit360-platform/docs/CIERRE-AUTH-FOUNDATION-ALL-TEAM-RUNTIME-20260805.md
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Comentar cierre sanitizado en PR 5
+        if: always() && steps.preflight.outcome == 'success'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs=require('fs');
+            const p=process.env.ORBIT360_FINAL_EVIDENCE;
+            const e=fs.existsSync(p)?JSON.parse(fs.readFileSync(p,'utf8')):{stage:'STOP_RETRY_EVIDENCE_MISSING',classification:'PIPELINE_MECHANISM_FAILURE',ok:false};
+            const body=`## Fundación Auth all-team runtime — ${e.ok?'PASS':'STOP_RETRY'}\n\n\`\`\`text\n${e.stage}\n${e.classification}\nidentidades: ${e.identitiesVerified||0}/7\nmemberships: ${e.membershipsVerified||0}/7\nEquipo: ${e.teamLinksVerified||0}/7\ncorreos: ${e.passwordEmailsSent||0}/7\nsesiones: ${e.sessionsVerified||0}/7\nperfiles: ${e.functionalProfilesVerified||0}/3\nCRM: ${e.crmIntegrity||'NOT_POSTVERIFIED'}\n\`\`\``;
+            await github.rest.issues.createComment({owner:context.repo.owner,repo:context.repo.repo,issue_number:5,body});
+
+      - name: Exigir PASS final
+        if: always() && steps.preflight.outcome == 'success'
+        shell: bash
+        run: jq -e '.ok==true and .stage=="AUTH_FOUNDATION_ALL_TEAM_RUNTIME_PASS" and .identitiesVerified==7 and .membershipsVerified==7 and .teamLinksVerified==7 and .passwordEmailsSent==7 and .sessionsVerified==7 and .functionalProfilesVerified==3 and .crmIntegrity=="VERIFIED_UNCHANGED"' "$ORBIT360_FINAL_EVIDENCE" >/dev/null
