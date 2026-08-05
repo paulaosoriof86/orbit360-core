@@ -25,24 +25,29 @@ const RUNTIME = 'tools/orbit360-auth-selfmanaged-credentials-runtime-v20260805.m
 const DYNAMIC = 'tools/orbit360-auth-foundation-dynamic-team-runtime-v20260805.mjs';
 const CONTAIN = 'tools/orbit360-auth-selfmanaged-credentials-containment-v20260805.mjs';
 const TEST = 'tools/orbit360-test-auth-selfmanaged-credentials-source-v20260805.mjs';
+const OWNER = 'tools/orbit360-auth-selfmanaged-source-stage-owner-v20260805.mjs';
+const SEALER = 'tools/orbit360-auth-selfmanaged-final-sealer-v20260805.mjs';
 const WORKFLOW = '.github/workflows/orbit360-auth-selfmanaged-credentials-runtime-v20260805.yml';
 const OUT = path.join(ROOT, 'orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json');
-const CAP = Object.freeze({ secrets:true,firestoreRead:true,writes:true,runtime:true,browser:false,deploy:true,functionsDeploy:true,rulesDeploy:false,production:false });
+const CAP = Object.freeze({ secrets:true, firestoreRead:true, writes:true, runtime:true, browser:false, deploy:true, functionsDeploy:true, rulesDeploy:false, production:false });
 
 const checks = [];
-const add = (id, ok, detail='') => checks.push({ id, ok:Boolean(ok), detail:String(detail || '').slice(0,900) });
-const rel = file => path.join(ROOT,file);
-const read = file => JSON.parse(fs.readFileSync(rel(file),'utf8'));
-const text = file => fs.readFileSync(rel(file),'utf8');
-const git = args => execFileSync('git',args,{cwd:ROOT,encoding:'utf8'}).trim();
+const add = (id, ok, detail = '') => checks.push({ id, ok:Boolean(ok), detail:String(detail || '').slice(0,900) });
+const rel = file => path.join(ROOT, file);
+const json = file => JSON.parse(fs.readFileSync(rel(file), 'utf8'));
+const text = file => fs.readFileSync(rel(file), 'utf8');
+const git = args => execFileSync('git', args, { cwd:ROOT, encoding:'utf8' }).trim();
 const same = (a,b) => JSON.stringify(a) === JSON.stringify(b);
+const deployLines = source => source.split(/\r?\n/).map(line => line.trim()).filter(line => /(?:npx\s+)?firebase\s+deploy\b/.test(line));
+const projectIsLab = line => /--project\s+["']?\$ORBIT360_PROJECT_ID["']?/.test(line) || /--project\s+["']?ays-orbit-360-lab["']?/.test(line);
+const hasForbiddenDestination = line => /--project\s+["']?[^\s"']*(?:prod|production)[^\s"']*/i.test(line) || /--only\s+["']?(?:firestore:rules|storage|database)/i.test(line);
 
 let result;
 try {
-  const lifecycle = read(LIFECYCLE);
-  const prior = read(PRIOR_LIFECYCLE);
-  const request = read(REQUEST);
-  const config = read(CONFIG);
+  const lifecycle = json(LIFECYCLE);
+  const prior = json(PRIOR_LIFECYCLE);
+  const request = json(REQUEST);
+  const config = json(CONFIG);
   const fn = text(FUNCTION);
   const helper = text(HELPER);
   const projection = text(PROJECTION);
@@ -53,10 +58,15 @@ try {
   const runtime = text(RUNTIME);
   const dynamic = text(DYNAMIC);
   const contain = text(CONTAIN);
+  const owner = text(OWNER);
+  const sealer = text(SEALER);
   const workflow = text(WORKFLOW);
   const parent = git(['rev-parse','HEAD^']);
   const changed = git(['diff-tree','--no-commit-id','--name-only','-r','HEAD']).split(/\r?\n/).filter(Boolean);
   const scope = request.scope || {};
+  const deploys = deployLines(workflow);
+  const functionDeploys = deploys.filter(line => line.includes('functions:orbit360ProvisionTeamAccess'));
+  const hostingDeploys = deploys.filter(line => /--only\s+["']?hosting["']?(?:\s|$)/.test(line));
 
   add('GATE_ID_VERSION', process.argv[2] === GATE && lifecycle.gateId === GATE && lifecycle.gateContractVersion === VERSION);
   add('LIFECYCLE_AUTHORIZED_ONCE', lifecycle.status === 'AUTH_SELFMANAGED_CREDENTIALS_RUNTIME_AUTHORIZED_ONCE' && lifecycle.authorization?.activeRequest === true && lifecycle.authorization?.allowedExecutions === 1 && lifecycle.authorization?.consumed === false && lifecycle.authorization?.replayAllowed === false);
@@ -93,19 +103,21 @@ try {
   add('CONTAINMENT_PRESENT', contain.includes("status:'blocked_recovery'") && contain.includes('passwordRollbackExact:false'));
   add('SELF_ADMIN_CONTRACT', lifecycle.selfAdministration?.nameEditableFromEquipo === true && lifecycle.selfAdministration?.emailEditableFromEquipo === true && lifecycle.selfAdministration?.emailSyncsToAuth === true && lifecycle.selfAdministration?.temporaryPasswordReplaceableFromEquipo === true && lifecycle.selfAdministration?.firstLoginPasswordChangeRequired === true);
 
-  add('WORKFLOW_REQUEST_PATH', workflow.includes(".github/orbit360-requests/auth-selfmanaged-credentials-runtime-v20260805.json"));
+  add('SOURCE_OWNER_PRESENT', owner.includes('staleEvidenceInvalidated: true') && owner.includes("status: 'started'") && owner.includes("step.status = 'pass'") && owner.includes("step.status = 'fail'") && owner.includes('failedStepId'));
+  add('WORKFLOW_REQUEST_PATTERN', workflow.includes("auth-selfmanaged-credentials-runtime-*.json") && workflow.includes('ORBIT360_REQUEST_FILE=$REQUEST_FILE'));
   add('WORKFLOW_FULL_HISTORY', workflow.includes('fetch-depth: 0'));
-  add('WORKFLOW_GATE_BEFORE_SECRET', workflow.indexOf('Gate canónico antes de secretos') >= 0 && workflow.indexOf('Gate canónico antes de secretos') < workflow.indexOf('Resolver credencial LAB'));
-  add('WORKFLOW_FUNCTION_ONLY', workflow.includes('functions:orbit360ProvisionTeamAccess'));
-  add('WORKFLOW_LAB_HOSTING_ONLY', workflow.includes('--only hosting') && workflow.includes('--project "$ORBIT360_PROJECT_ID"') && !workflow.includes('production'));
-  add('WORKFLOW_NO_RULES_REIMPORT', !workflow.includes('firestore:rules') && !workflow.includes('reimport'));
+  add('WORKFLOW_SOURCE_OWNER_BEFORE_SECRET', workflow.indexOf('Ejecutar owner source-only con ledger') >= 0 && workflow.indexOf('Ejecutar owner source-only con ledger') < workflow.indexOf('Resolver credencial LAB'));
+  add('WORKFLOW_CURRENT_RUN_LEDGER_GUARD', sealer.includes("ledger?.runId === runId") && sealer.includes('staleEvidenceRejected:!currentRun') && workflow.includes('orbit360-auth-selfmanaged-final-sealer-v20260805.mjs'));
+  add('WORKFLOW_FUNCTION_ONLY', functionDeploys.length === 1 && projectIsLab(functionDeploys[0]) && !hasForbiddenDestination(functionDeploys[0]), functionDeploys.join(' | '));
+  add('WORKFLOW_LAB_HOSTING_ONLY', hostingDeploys.length === 1 && projectIsLab(hostingDeploys[0]) && !hasForbiddenDestination(hostingDeploys[0]), hostingDeploys.join(' | '));
+  add('WORKFLOW_NO_OTHER_DEPLOYS', deploys.length === 2 && deploys.every(line => projectIsLab(line) && !hasForbiddenDestination(line)), deploys.join(' | '));
   add('WORKFLOW_PASSWORDS_AFTER_FOUNDATION', workflow.indexOf('Asignar y verificar contraseñas temporales') > workflow.indexOf('Aplicar Fundación Auth dinámica'));
   add('WORKFLOW_CONTAINMENT', workflow.includes('Contener cualquier fallo posterior a la rotación'));
   add('WORKFLOW_SINGLE_ATTEMPT', workflow.includes('GITHUB_RUN_ATTEMPT') && workflow.includes("test \"$GITHUB_RUN_ATTEMPT\" = '1'"));
 
   let fixture;
-  try { fixture = JSON.parse(execFileSync(process.execPath,[TEST],{cwd:ROOT,encoding:'utf8'}).trim()); }
-  catch (error) { fixture = {ok:false,error:String(error?.stderr || error?.message || error).slice(0,900)}; }
+  try { fixture = JSON.parse(execFileSync(process.execPath, [TEST], { cwd:ROOT, encoding:'utf8' }).trim()); }
+  catch (error) { fixture = { ok:false, error:String(error?.stderr || error?.message || error).slice(0,900) }; }
   add('SOURCE_FIXTURES_PASS', fixture?.ok === true && fixture?.identityOverrides === 4 && fixture?.usersInPatternFixture === 7 && fixture?.operationalCapabilitiesUsed === 0, JSON.stringify(fixture));
 
   const failed = checks.filter(item => !item.ok);
@@ -192,7 +204,8 @@ try {
     ok:false
   };
 }
-fs.mkdirSync(path.dirname(OUT),{recursive:true});
-fs.writeFileSync(OUT,JSON.stringify(result,null,2)+'\n','utf8');
-console.log(JSON.stringify(result,null,2));
+
+fs.mkdirSync(path.dirname(OUT), { recursive:true });
+fs.writeFileSync(OUT, JSON.stringify(result, null, 2) + '\n', 'utf8');
+console.log(JSON.stringify(result, null, 2));
 process.exit(result.status === 'GO_GATE_CONTRACT' ? 0 : 41);
