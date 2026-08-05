@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "orbit360-auth-access-recovery-source-only-request-v4",
+  "gateId": "block-auth-access-recovery-source-only-v4-20260805",
+  "rcId": "RC-AYS-LAB-CANONICA-01",
+  "status": "AUTHORIZED_ONCE",
+  "authorizationRef": "user_authorized_auth_access_source_only_v4_20260805T0946-0600",
+  "approved": true,
+  "allowedExecutions": 1,
+  "consumed": false,
+  "replayAllowed": false,
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "parentHead": "241ccabf01751bb8923a70dfc9fd1c63059c14ef",
+  "projectId": "ays-orbit-360-lab",
+  "tenantId": "alianzas-soluciones",
+  "scope": {
+    "validateRequest": true,
+    "validateProvenance": true,
+    "validateCanonicalPreflight": true,
+    "validateAllowlists": true,
+    "validateAtomicity": true,
+    "validateIdempotency": true,
+    "validateRootFix": true,
+    "secrets": false,
+    "firebase": false,
+    "firestore": false,
+    "auth": false,
+    "functions": false,
+    "hosting": false,
+    "browser": false,
+    "deploy": false,
+    "rules": false,
+    "reimport": false,
+    "crm": false,
+    "production": false,
+    "main": false,
+    "merge": false
+  },
+  "rootFix": {
+    "strategy": "READ_ALL_VALIDATE_ALL_WRITE_ALL",
+    "commit": "38aae846477a35025950869a207bf10be9337cc1",
+    "file": "tools/orbit360-auth-access-config-repair-lab-v3-20260805.mjs",
+    "blobSha": "dda248ff0df08f69d95ac117d8a7262c055b1af6"
+  },
+  "evidenceBoundary": {
+    "sourceArtifactsOnly": true,
+    "containsPII": false,
+    "containsSecrets": false,
+    "fullEmails": false,
+    "passwords": false,
+    "actionLinks": false
+  }
+}
