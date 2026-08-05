@@ -26,6 +26,7 @@ env:
   ORBIT360_EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
   ORBIT360_SOURCE_BASELINE: 548cffa50cddfd93ad2118f5a06e9bb420699bde
   ORBIT360_FUNCTIONS: orbit360OpsLeadsCommandLabV20260804,orbit360GetAdvisorOpsInboxLabV20260804,orbit360CobrosReconciliationCommandLabV20260804,orbit360RecurringInsuranceImportLabV20260804
+  ORBIT360_RETENTION_CONTRACT_MARKERS: 'hostingPreviewKept:$retain functionsKept:$retain'
   # Request retirado e inmutable: .github/orbit360-requests/block12-operational-runtime-layoutfree-lab-v20260804.json
 
 jobs:
