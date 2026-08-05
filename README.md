@@ -7,9 +7,9 @@ La continuidad operativa vigente de A&S se rige por:
 1. `orbit360-platform/docs/FUENTES-RECTORAS-VIGENTES-ORBIT360-AYS-20260730.md`;
 2. `orbit360-platform/docs/PLAN-UNICO-SALIDA-RC-AYS-LAB-CANONICA-01-20260804.md`;
 3. `orbit360-platform/runtime-gate-crm-v20260716/rc-ays-lab-canonica-01-ledger-v20260804.json`;
-4. `orbit360-platform/docs/ESTADO-ACTIVO-MICROBLOQUE-2-5-RC-AYS-CANONICA-20260805.md`;
-5. `orbit360-platform/docs/CIERRE-MICROBLOQUE-2-4-PASS-REQUEST-V4-PROVENANCE-COMPOSITION-20260805.md`;
-6. `orbit360-platform/runtime-gate-crm-v20260716/rc-ays-lab-canonica-01-microblock24-pass-v20260805.json`;
+4. `orbit360-platform/docs/CIERRE-MICROBLOQUE-2-5-STOP-VISUAL-LEGAL-MODAL-PREVIEW-RETENIDO-20260805.md`;
+5. `orbit360-platform/runtime-gate-crm-v20260716/rc-ays-lab-canonica-01-microblock25-preview-retained-visual-review-stop-v20260805.json`;
+6. `orbit360-platform/docs/ESTADO-ACTIVO-MICROBLOQUE-2-6-CAPTURA-LEGAL-READINESS-20260805.md`;
 7. estado vivo del PR #5.
 
 RC activa:
@@ -28,7 +28,7 @@ PASS_CANONICAL_PREFLIGHT_COMPOSITION
 PASS_REQUEST_V4_PROVENANCE_COMPOSITION
 ```
 
-Evidencia vigente:
+Evidencia preservada:
 
 ```text
 runtime funcional: 30962756387 · 18/18 PASS
@@ -38,46 +38,39 @@ inner preflight canónico: 32/32 PASS
 request v4 + provenance: 30979519198 · 33/33 PASS
 ```
 
+Microbloque 2.5:
+
+```text
+run: 31005103975
+preflight: 32/32 PASS
+Functions: 4/4
+Hosting preview: retenido
+integridad: PASS
+snapshot before/after: idénticos
+workflow técnico: GO_LAB_CANDIDATE_VISIBLE
+revisión visual final: STOP_VISUAL_EVIDENCE_PREVIEW_RETAINED
+```
+
+URL LAB retenida:
+
+```text
+https://ays-orbit-360-lab--orbit360-operational-block12-w8ibrr6w.web.app
+```
+
+Las ocho capturas mostraron `Acuerdos legales` y no el contenido de las rutas. Esto es un fallo del mecanismo de captura, no una regresión funcional demostrada. El root fix de detección de overlays quedó en:
+
+```text
+6c443d0f40e6874675f8c1980ef0cdb353120031
+```
+
 Estado activo:
 
 ```text
-Microbloque 2.5
-Gate: GO_LAB_CANDIDATE_VISIBLE
-Estado: READY_AWAITING_NEW_EXPLICIT_LAB_DEPLOY_AUTHORIZATION
+Microbloque 2.6
+Gate: PASS_LEGAL_READINESS_CAPTURE_CONTRACT
+Estado: PENDING_SOURCE_ONLY_AUTHORIZATION
 ```
 
-Topología vigente:
+La siguiente acción es exclusivamente source-only. Debe preservar la URL, las cuatro Functions y el Hosting existentes. No se redepliega, no se ejecuta navegador, Firebase, Rules, reimportación, producción, main, merge ni la batería funcional 18/18.
 
-```text
-workflow runtime existente:
-.github/workflows/orbit360-block12-visual-layoutfree-reactivation-lab-v20260804.yml
-
-request runtime futuro ausente:
-.github/orbit360-requests/block12-go-lab-candidate-visible-v4.json
-
-request runtime v3 consumido e inmutable:
-.github/orbit360-requests/block12-go-lab-candidate-visible-v3.json
-
-request source-only v4 consumido e inmutable:
-.github/orbit360-requests/block12-go-lab-candidate-visible-v4-source-only.json
-```
-
-El checkout runtime usa `fetch-depth: 0` y valida expresamente la existencia del baseline congelado antes del preflight:
-
-```text
-git cat-file -e "$ORBIT360_SOURCE_BASELINE^{commit}"
-```
-
-El Microbloque 2.4 comprobó:
-
-```text
-baseline presente: sí
-baseline ancestro del parent HEAD: sí
-producto sin cambios: sí
-blob del request v3 inmutable: sí
-outer router exit: 0
-inner engine reached: true
-runtime y capacidades operativas: no
-```
-
-No crear el request runtime v4 sin una autorización LAB explícita nueva. No usar memoria, conversaciones o estados históricos para sustituir el ledger vivo.
+Los requests runtime v3, source-only v4 y runtime v4 están consumidos e inmutables. No usar memoria, conversaciones o estados históricos para sustituir el ledger vivo.
