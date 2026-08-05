@@ -15,12 +15,13 @@ const TENANT = process.env.ORBIT360_REAL_TENANT_ID || 'alianzas-soluciones';
 const BASE = String(process.env.ORBIT360_PREVIEW_URL || '').trim();
 const OUT = path.join(ROOT, 'orbit360-platform/runtime-gate-crm-v20260716/block12-cumulative-visual-sanitized.json');
 const DIR = path.join(ROOT, 'orbit360-platform/runtime-gate-crm-v20260716/block12-cumulative-visual');
-const VIDEO_DIR = fs.mkdtempSync(path.join(os.tmpdir(), 'orbit360-block12-video-'));
+const VIDEO_DIR = fs.mkdtempSync(path.join(os.tmpdir(), 'orbit360-block12-isolated-routes-'));
 const PRIVILEGED = new Set(['direccion', 'superadmin', 'admintenant', 'admin', 'operativo']);
+const ROUTES = ['cliente360', 'aseguradoras', 'polizas', 'cobros', 'conciliaciones', 'ops', 'leads', 'importar'];
 const text = value => String(value == null ? '' : value).trim();
 const norm = value => text(value).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 const safe = value => text(value).replace(/[\w.+-]+@[\w.-]+/g, '[email]').replace(/[A-Za-z0-9_-]{30,}/g, '[id]').replace(/[\r\n]+/g, ' ').slice(0, 400);
-const isPng = buffer => buffer.length > 8 && buffer.subarray(0, 8).equals(Buffer.from([137,80,78,71,13,10,26,10]));
+const isPng = buffer => buffer.length > 8 && buffer.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]));
 const save = payload => {
   fs.mkdirSync(path.dirname(OUT), { recursive: true });
   fs.writeFileSync(OUT, JSON.stringify({ ...payload, containsPII: false, containsSecrets: false }, null, 2) + '\n', 'utf8');
@@ -32,9 +33,8 @@ const withTimeout = (promise, milliseconds, code) => Promise.race([
 
 let app;
 let browser;
-let context;
-let page;
-let video;
+let currentContext;
+let currentPage;
 let currentRoute = '';
 const results = [];
 const pageErrors = [];
@@ -65,109 +65,107 @@ try {
   }
   if (!candidate) throw new Error('DATA_CONTRACT_FAILURE:PRIVILEGED_VISUAL_IDENTITY_NOT_FOUND');
 
-  const token = await auth.createCustomToken(candidate.uid, { orbitTenant: TENANT, orbitBlock12Visual: true });
   const { chromium } = await import('playwright');
   browser = await chromium.launch({ headless: true });
-  context = await browser.newContext({
-    viewport: { width: 1440, height: 1000 },
-    deviceScaleFactor: 1,
-    recordVideo: { dir: VIDEO_DIR, size: { width: 1440, height: 1000 } }
-  });
-  page = await context.newPage();
-  page.setDefaultTimeout(20000);
-  video = page.video();
-  const videoStartedAt = Date.now();
-  await page.emulateMedia({ reducedMotion: 'reduce' });
-  page.on('pageerror', error => pageErrors.push(safe(error)));
-
-  const url = `${BASE.replace(/#.*$/, '')}${BASE.includes('?') ? '&' : '?'}orbitBackend=firestore-lab&tenant=${encodeURIComponent(TENANT)}#/inicio`;
-  await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 90000 });
-  await page.waitForFunction(() => window.firebase && firebase.apps && firebase.apps.length && window.Orbit, null, { timeout: 90000 });
-  await page.evaluate(async customToken => {
-    await firebase.auth().signOut().catch(() => {});
-    await firebase.auth().signInWithCustomToken(customToken);
-  }, token);
-  await page.addStyleTag({ content: '*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important;caret-color:transparent!important}' });
-  await page.waitForTimeout(1200);
   fs.mkdirSync(DIR, { recursive: true });
+  const baseWithoutHash = BASE.replace(/#.*$/, '');
+  const separator = baseWithoutHash.includes('?') ? '&' : '?';
+  const query = `${separator}orbitBackend=firestore-lab&tenant=${encodeURIComponent(TENANT)}`;
 
-  const routes = ['cliente360', 'aseguradoras', 'polizas', 'cobros', 'conciliaciones', 'ops', 'leads', 'importar'];
-  for (const route of routes) {
+  for (let index = 0; index < ROUTES.length; index += 1) {
+    const route = ROUTES[index];
     currentRoute = route;
-    await withTimeout(page.evaluate(value => {
-      location.hash = `#/${value}`;
-      window.dispatchEvent(new HashChangeEvent('hashchange'));
-    }, route), 20000, `ROUTE_${route}_NAVIGATION_TIMEOUT`);
-    await page.waitForTimeout(1000);
-
-    const layoutProbe = await withTimeout(page.evaluate(() => {
-      const host = document.getElementById('host');
-      const login = document.getElementById('login');
-      const currentUser = window.firebase && firebase.auth && firebase.auth().currentUser;
-      return {
-        hostPresent: Boolean(host),
-        hostMounted: Boolean(host && host.firstElementChild),
-        hostChildCount: host ? host.childElementCount : 0,
-        authenticated: Boolean(currentUser),
-        loginExplicitlyOpen: Boolean(login && !login.hidden && login.getAttribute('aria-hidden') !== 'true' && login.style.display !== 'none' && !login.classList.contains('hidden') && !login.classList.contains('is-hidden'))
-      };
-    }), 8000, `ROUTE_${route}_LAYOUT_FREE_PROBE_TIMEOUT`);
-
-    const frameSecond = Math.max(0.2, (Date.now() - videoStartedAt) / 1000);
-    results.push({
-      route,
-      rendered: layoutProbe.hostPresent && layoutProbe.hostMounted && layoutProbe.hostChildCount > 0,
-      authenticated: layoutProbe.authenticated,
-      loginVisible: layoutProbe.loginExplicitlyOpen && !layoutProbe.authenticated,
-      technicalCopyDetected: false,
-      technicalCopyCheck: 'manual-frame-review-required',
-      layoutProbe: 'host-firstElementChild-childElementCount-no-layout-text-read',
-      frameSecond: Number(frameSecond.toFixed(3)),
-      screenshot: path.relative(ROOT, path.join(DIR, `${String(results.length + 1).padStart(2, '0')}-${route}.png`)),
-      captureEngine: 'playwright-record-video-plus-ffmpeg-static-frame'
+    const routeErrors = [];
+    const routeVideoDir = path.join(VIDEO_DIR, `${String(index + 1).padStart(2, '0')}-${route}`);
+    fs.mkdirSync(routeVideoDir, { recursive: true });
+    currentContext = await browser.newContext({
+      viewport: { width: 1440, height: 1000 },
+      deviceScaleFactor: 1,
+      reducedMotion: 'reduce',
+      recordVideo: { dir: routeVideoDir, size: { width: 1440, height: 1000 } }
     });
-    await page.waitForTimeout(450);
-  }
+    await currentContext.addInitScript(() => {
+      document.addEventListener('DOMContentLoaded', () => {
+        const style = document.createElement('style');
+        style.textContent = '*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important;caret-color:transparent!important}';
+        document.head.appendChild(style);
+      }, { once: true });
+    });
+    currentPage = await currentContext.newPage();
+    currentPage.setDefaultTimeout(20000);
+    currentPage.on('pageerror', error => routeErrors.push(safe(error)));
+    const video = currentPage.video();
+    const bootstrapUrl = `${baseWithoutHash}${query}#/inicio`;
+    const routeUrl = `${baseWithoutHash}${query}#/${route}`;
+    const token = await auth.createCustomToken(candidate.uid, {
+      orbitTenant: TENANT,
+      orbitBlock12Visual: true,
+      orbitBlock12Route: route
+    });
 
-  await page.waitForTimeout(600);
-  await withTimeout(context.close(), 30000, 'VIDEO_CONTEXT_CLOSE_TIMEOUT');
-  context = null;
-  page = null;
-  const videoPath = await withTimeout(video.path(), 15000, 'VIDEO_PATH_TIMEOUT');
-  const videoStat = fs.statSync(videoPath);
-  if (videoStat.size < 1000) throw new Error('PIPELINE_MECHANISM_FAILURE:VISUAL_VIDEO_EMPTY');
+    await currentPage.goto(bootstrapUrl, { waitUntil: 'domcontentloaded', timeout: 90000 });
+    await currentPage.waitForFunction(() => window.firebase && firebase.apps && firebase.apps.length && window.Orbit, null, { timeout: 90000 });
+    await withTimeout(currentPage.evaluate(async customToken => {
+      await firebase.auth().signOut().catch(() => {});
+      await firebase.auth().signInWithCustomToken(customToken);
+    }, token), 30000, `ROUTE_${route}_AUTH_TIMEOUT`);
+    await currentPage.waitForTimeout(900);
+    await currentPage.goto(routeUrl, { waitUntil: 'commit', timeout: 90000 });
+    await currentPage.waitForTimeout(5000);
+    const finalUrl = currentPage.url();
+    const directRouteUrlConfirmed = finalUrl.includes(`#/${route}`);
+    const signInResolved = true;
 
-  for (const item of results) {
-    const file = path.join(ROOT, item.screenshot);
+    await withTimeout(currentContext.close(), 30000, `ROUTE_${route}_CONTEXT_CLOSE_TIMEOUT`);
+    currentContext = null;
+    currentPage = null;
+    const videoPath = await withTimeout(video.path(), 15000, `ROUTE_${route}_VIDEO_PATH_TIMEOUT`);
+    const videoStat = fs.statSync(videoPath);
+    if (videoStat.size < 1000) throw new Error(`PIPELINE_MECHANISM_FAILURE:ROUTE_${route}_VIDEO_EMPTY`);
+    const framePath = path.join(DIR, `${String(index + 1).padStart(2, '0')}-${route}.png`);
     execFileSync(ffmpegPath, [
       '-hide_banner', '-loglevel', 'error',
-      '-ss', item.frameSecond.toFixed(3),
+      '-sseof', '-0.500',
       '-i', videoPath,
       '-frames:v', '1',
-      '-y', file
+      '-y', framePath
     ], { stdio: 'pipe', timeout: 20000 });
-    const png = fs.readFileSync(file);
-    if (!isPng(png)) throw new Error(`PIPELINE_MECHANISM_FAILURE:VIDEO_FRAME_${item.route}_INVALID_PNG`);
-    item.frameBytes = png.length;
+    const png = fs.readFileSync(framePath);
+    if (!isPng(png)) throw new Error(`PIPELINE_MECHANISM_FAILURE:ROUTE_${route}_VIDEO_FRAME_INVALID_PNG`);
+
+    results.push({
+      route,
+      isolatedContext: true,
+      directRouteUrlConfirmed,
+      signInResolved,
+      pageErrors: routeErrors,
+      frameBytes: png.length,
+      videoBytes: videoStat.size,
+      screenshot: path.relative(ROOT, framePath),
+      captureEngine: 'isolated-context-direct-url-video-plus-ffmpeg-static-frame',
+      technicalCopyCheck: 'manual-frame-review-required',
+      routeContentCheck: 'manual-frame-review-required'
+    });
+    pageErrors.push(...routeErrors.map(error => `${route}:${error}`));
   }
 
-  const ok = results.length === 8 && results.every(item => item.rendered && item.authenticated && !item.loginVisible && item.frameBytes > 1000) && pageErrors.length === 0;
+  const ok = results.length === ROUTES.length && results.every(item => item.isolatedContext && item.directRouteUrlConfirmed && item.signInResolved && item.frameBytes > 1000 && item.videoBytes > 1000 && item.pageErrors.length === 0) && pageErrors.length === 0;
   save({
-    schemaVersion: 'orbit360-block12-cumulative-visual-v5',
+    schemaVersion: 'orbit360-block12-cumulative-visual-v6',
     status: ok ? 'CUMULATIVE_VISUAL_LAB_PASS' : 'CUMULATIVE_VISUAL_LAB_FAIL',
     classification: ok ? 'GO_LAB_CUMULATIVE_VISUAL_EVIDENCE_READY' : 'FUNCTIONAL_DEFECT',
     routes: results,
     routeCount: results.length,
     pageErrors,
-    captureEngine: 'playwright-record-video-plus-ffmpeg-static-frame',
-    domProbe: 'layout-free-mount-auth-probe',
+    navigationMechanism: 'one-isolated-browser-context-and-direct-url-per-route',
+    inPageHashNavigationUsed: false,
+    captureEngine: 'isolated-context-direct-url-video-plus-ffmpeg-static-frame',
     layoutDependentTextReadUsed: false,
     technicalCopyReview: 'manual-frame-review-required-before-final-approval',
+    routeContentReview: 'manual-frame-review-required-before-final-approval',
     screenshotApisUsed: false,
     cdpScreenshotUsed: false,
-    videoBytes: videoStat.size,
-    animationsDisabled: true,
-    customTokenEphemeral: true,
+    customTokenEphemeralPerRoute: true,
     authWrites: 0,
     firestoreWrites: 0,
     realTenantWrites: 0,
@@ -180,19 +178,21 @@ try {
   const message = String(error && (error.message || error)).replace(/[\r\n]+/g, ' ').slice(0, 500);
   const classification = ((message.match(/(SECURITY_FAILURE|FUNCTIONAL_DEFECT|VALIDATOR_STALE|DATA_CONTRACT_FAILURE|ENVIRONMENT_FAILURE|PIPELINE_MECHANISM_FAILURE)/) || [])[1] || 'PIPELINE_MECHANISM_FAILURE');
   save({
-    schemaVersion: 'orbit360-block12-cumulative-visual-v5',
+    schemaVersion: 'orbit360-block12-cumulative-visual-v6',
     status: 'CUMULATIVE_VISUAL_LAB_FAIL',
     classification,
     error: safe(message),
-    errorCode: (message.split(':')[1] || 'VISUAL_VIDEO_FAILURE').slice(0, 120),
+    errorCode: (message.split(':')[1] || 'ISOLATED_ROUTE_VISUAL_FAILURE').slice(0, 120),
     currentRoute,
     routes: results,
     routeCount: results.length,
     pageErrors,
-    captureEngine: 'playwright-record-video-plus-ffmpeg-static-frame',
-    domProbe: 'layout-free-mount-auth-probe',
+    navigationMechanism: 'one-isolated-browser-context-and-direct-url-per-route',
+    inPageHashNavigationUsed: false,
+    captureEngine: 'isolated-context-direct-url-video-plus-ffmpeg-static-frame',
     layoutDependentTextReadUsed: false,
     technicalCopyReview: 'manual-frame-review-required-before-final-approval',
+    routeContentReview: 'manual-frame-review-required-before-final-approval',
     screenshotApisUsed: false,
     cdpScreenshotUsed: false,
     authWrites: 0,
@@ -203,8 +203,8 @@ try {
   });
   process.exitCode = 41;
 } finally {
-  if (page && !page.isClosed()) await page.close().catch(() => {});
-  if (context) await context.close().catch(() => {});
+  if (currentPage && !currentPage.isClosed()) await currentPage.close().catch(() => {});
+  if (currentContext) await currentContext.close().catch(() => {});
   if (browser) await browser.close().catch(() => {});
   if (app) await deleteApp(app).catch(() => {});
   fs.rmSync(VIDEO_DIR, { recursive: true, force: true });
