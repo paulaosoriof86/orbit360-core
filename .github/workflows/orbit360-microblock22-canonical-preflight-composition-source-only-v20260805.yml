@@ -1,0 +1,96 @@
+name: Orbit 360 · Microbloque 2.2 · composición canónica source-only
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-source-only/microblock22-canonical-preflight-composition-v20260805.json'
+
+permissions:
+  contents: read
+  statuses: write
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: orbit360-microblock22-canonical-preflight-composition-source-only
+  cancel-in-progress: false
+
+env:
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  ORBIT360_SOURCE_ONLY_REQUEST: .github/orbit360-source-only/microblock22-canonical-preflight-composition-v20260805.json
+  ORBIT360_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/microblock22-canonical-preflight-composition-source-only.json
+  ORBIT360_PREFLIGHT: orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+
+jobs:
+  source-only-composition:
+    name: Outer router + lifecycle + inner engine · cero capacidades
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - name: Checkout request source-only exacto
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 80
+          persist-credentials: false
+
+      - name: Preparar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verificar request source-only y frontera
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
+          test "${#CHANGED[@]}" = '1'
+          test "${CHANGED[0]}" = "$ORBIT360_SOURCE_ONLY_REQUEST"
+          PARENT="$(git rev-parse HEAD^)"
+          jq -e --arg parent "$PARENT" '
+            .schemaVersion=="orbit360-microblock22-source-only-request-v1" and
+            .rcId=="RC-AYS-LAB-CANONICA-01" and
+            .microblock=="2.2" and
+            .gate=="PASS_CANONICAL_PREFLIGHT_COMPOSITION" and
+            .status=="AUTHORIZED_SOURCE_ONLY_ONCE" and
+            .approved==true and .allowedExecutions==1 and .replayAllowed==false and
+            .branch=="ays/backend-tenant-lab-v99-20260703" and .pullRequest==5 and
+            .parentHead==$parent and
+            .runtimeAuthorized==false and .secretAccessAuthorized==false and
+            .firebaseAuthorized==false and .browserAuthorized==false and
+            .deployAuthorized==false and .rulesAuthorized==false and
+            .productionAuthorized==false and .mainAuthorized==false and .mergeAuthorized==false and
+            .functionalReplayAuthorized==false and .requestTriggerMutationAuthorized==false
+          ' "$ORBIT360_SOURCE_ONLY_REQUEST" >/dev/null
+
+      - name: Ejecutar composición canónica integrada source-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-canonical-preflight-composition-source-only-v20260805.mjs
+          jq -e '.status=="PASS_CANONICAL_PREFLIGHT_COMPOSITION" and .classification=="GO_SOURCE_ONLY_CONTROL_PLANE" and .failed==0 and .innerEngineReached==true and .innerPreflightStatus=="PASS_CANONICAL_PREFLIGHT_COMPOSITION" and .runtimeAuthorized==false and .secretAccess==false and .firebaseCommandsExecuted==false and .firestoreRead==false and .firestoreWrites==0 and .authWrites==0 and .browserExecuted==false and .deployExecuted==false and .rulesDeployed==false and .realDataReimported==false and .productionTouched==false and .mainTouched==false and .mergeExecuted==false and .functionalReplayExecuted==false and .nextRuntimeAuthorizationRequired==true and .containsPII==false and .containsSecrets==false and .ok==true' "$ORBIT360_EVIDENCE" >/dev/null
+          jq -e '.status=="PASS_CANONICAL_PREFLIGHT_COMPOSITION" and .sourceOnlyCompositionTest==true and .executionAuthorized==false and .secretAccessAuthorized==false and .firestoreReadAuthorized==false and .browserAuthorized==false and .deployAuthorized==false and .functionsDeployAuthorized==false and .hostingPreviewAuthorized==false and .rulesDeployAuthorized==false and .productionAuthorized==false and .secretAccess==false and .firestoreRead==false and .firestoreWrites==0 and .authWrites==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .ok==true' "$ORBIT360_PREFLIGHT" >/dev/null
+
+      - name: Publicar evidencia sanitizada
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-microblock22-source-only-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/microblock22-canonical-preflight-composition-source-only.json
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+          retention-days: 14
+          if-no-files-found: error
+
+      - name: Publicar resultado en PR 5
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          PASSED="$(jq -r '.passed' "$ORBIT360_EVIDENCE")"
+          TOTAL="$(jq -r '.total' "$ORBIT360_EVIDENCE")"
+          BODY="## RC-AYS-LAB-CANONICA-01 · Microbloque 2.2 · run ${GITHUB_RUN_ID}\n\n- Gate: \`PASS_CANONICAL_PREFLIGHT_COMPOSITION\`\n- Checks: \`${PASSED}/${TOTAL}\`\n- Outer router + inner engine: \`PASS\`\n- Runtime, secretos, Firebase, navegador y deploy: \`no\`\n- Rules, reimportación, producción, main y merge: \`no\`\n- Nueva autorización runtime requerida: \`sí\`"
+          gh api "repos/${GITHUB_REPOSITORY}/issues/5/comments" -f body="$BODY" >/dev/null
