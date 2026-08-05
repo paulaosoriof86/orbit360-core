@@ -1,0 +1,92 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
+  "gateId": "block-auth-foundation-all-team-source-only-v20260805",
+  "gateContractVersion": "13.6.0",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
+  "status": "AUTH_FOUNDATION_ALL_TEAM_SOURCE_ONLY_AUTHORIZED_ONCE",
+  "executionProfile": {
+    "phase": "AUTH_FOUNDATION_ALL_TEAM_SOURCE_ONLY",
+    "capabilities": {
+      "secrets": false,
+      "firestoreRead": false,
+      "writes": false,
+      "runtime": false,
+      "browser": false,
+      "deploy": false,
+      "functionsDeploy": false,
+      "rulesDeploy": false,
+      "production": false
+    }
+  },
+  "singleGate": true,
+  "singleMacroblock": true,
+  "rcId": "RC-AYS-LAB-CANONICA-01",
+  "authorization": {
+    "requiredForExecution": true,
+    "activeRequest": true,
+    "allowedExecutions": 1,
+    "request": ".github/orbit360-requests/auth-foundation-all-team-source-only-v20260805.json",
+    "authorizationRef": "user_directs_next_auth_foundation_source_only_20260805T1213-0600",
+    "authorizedAt": "2026-08-05T12:13:00-06:00",
+    "consumed": false,
+    "replayAllowed": false
+  },
+  "coverageContract": {
+    "currentActiveTeamExpected": 7,
+    "currentIdentityCoverageRequired": "7/7",
+    "functionalRoleProfiles": ["direccion", "operativo", "asesor"],
+    "functionalProfileCoverageRequired": "3/3",
+    "futureUsersSupported": true,
+    "dynamicRosterSource": "tenant_team_configuration",
+    "genericOwnerMayHardcodePeople": false,
+    "bootstrapAdminRequired": true,
+    "bootstrapAdminSource": "approved_tenant_configuration",
+    "normalOnboardingAfterBootstrap": true
+  },
+  "sourceValidationBoundary": {
+    "planOwner": "tools/orbit360-auth-foundation-all-team-plan-v20260805.mjs",
+    "testSuite": "tools/orbit360-test-auth-foundation-all-team-source-only-v20260805.mjs",
+    "existingBootstrapOwner": "tools/orbit360-provisionar-roster-aprobado-final-rc12-v20260804.mjs",
+    "normalOnboardingOwner": "functions/user-onboarding.js",
+    "teamOwner": "orbit360-platform/modules/equipo.js",
+    "teamBridge": "orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js",
+    "loginOwner": "orbit360-platform/core/auth.js",
+    "rulesOwner": "firestore.rules",
+    "requiredCurrentUsers": 7,
+    "requiredFunctionalProfiles": 3,
+    "networkAllowed": false,
+    "operationalWritesAllowed": false
+  },
+  "guards": {
+    "canonicalGateBeforeAnyCapability": true,
+    "requestSingleFileCommit": true,
+    "requestImmutable": true,
+    "priorAuthRequestsImmutableAndConsumed": true,
+    "runtimeV7AbsentAndSuspended": true,
+    "sevenCurrentUsersCovered": true,
+    "threeRoleProfilesCovered": true,
+    "futureUserPathGeneric": true,
+    "bootstrapSeparatedFromNormalOnboarding": true,
+    "noPersonHardcodeInGenericOwner": true,
+    "sourceFixturesOnly": true,
+    "stopRetryOnFailure": true
+  },
+  "prohibitions": {
+    "secrets": true,
+    "firebase": true,
+    "firestore": true,
+    "auth": true,
+    "functions": true,
+    "hosting": true,
+    "browser": true,
+    "deploy": true,
+    "rules": true,
+    "reimport": true,
+    "crm": true,
+    "production": true,
+    "main": true,
+    "merge": true
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
