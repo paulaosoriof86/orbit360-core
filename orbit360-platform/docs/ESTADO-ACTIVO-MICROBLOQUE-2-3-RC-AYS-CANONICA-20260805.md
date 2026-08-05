@@ -1,109 +1,78 @@
 # ESTADO ACTIVO — MICROBLOQUE 2.3
 
-Fecha local: 2026-08-04 23:08 GT  
+Fecha local: 2026-08-04 23:23 GT  
 RC: `RC-AYS-LAB-CANONICA-01`  
 Gate: `GO_LAB_CANDIDATE_VISIBLE`  
-Estado: `READY_AWAITING_NEW_EXPLICIT_LAB_DEPLOY_AUTHORIZATION`
+Estado: `STOP_RETRY_DEFINITIVE_BASELINE_PROVENANCE`
 
-## Entradas cerradas
-
-```text
-PASS_PLAN_PERSISTED
-PASS_CANONICAL_BASELINE
-PASS_ISOLATED_ROUTE_HARNESS
-PASS_CANONICAL_PREFLIGHT_COMPOSITION
-```
-
-Evidencia vigente:
+## Ejecución consumida
 
 ```text
-runtime funcional: 30962756387 · 18/18 PASS
-rutas aisladas sintéticas: 30971707956 · 8/8 PASS
-composición canónica: 30977179448 · 31/31 PASS
-inner preflight: 32/32 PASS
+run: 30977831814
+job: 92215587847
+request: d354bca083e4a952b4ec27ef1625486d530f075c
+artifact: 8918942209
 ```
 
-## Estado del control plane
+## Primera etapa fallida real
 
 ```text
-validatorLifecycleRevision: phase-capability-contract-v1
-visualHarnessRevision: isolated-context-direct-url-v6
-workflow runtime: existente y preparado
-request runtime v3: ausente
-runtime activo: no
+REQUEST_BASELINE_PROVENANCE_BEFORE_CANONICAL_PREFLIGHT
+PIPELINE_MECHANISM_FAILURE
+SOURCE_BASELINE_NOT_PRESENT_IN_SHALLOW_CHECKOUT
 ```
 
-El request anterior permanece consumido e inmutable. La nueva ejecución deberá crearse en:
+Error observado:
 
 ```text
-.github/orbit360-requests/block12-go-lab-candidate-visible-v3.json
+fatal: Invalid revision range 548cffa50cddfd93ad2118f5a06e9bb420699bde..HEAD^
 ```
 
-Ese archivo no existe todavía y no debe materializarse sin autorización explícita nueva.
+El checkout usó profundidad `80`, insuficiente para contener el baseline congelado.
 
-## Objetivo único
-
-Entregar una URL Hosting LAB retenida de la misma RC, con:
-
-1. preflight contractual antes de secretos;
-2. cuatro Functions LAB allowlisted;
-3. un solo Hosting preview LAB;
-4. snapshot A&S before;
-5. ocho rutas mediante un contexto aislado y URL directa por ruta;
-6. snapshot A&S after;
-7. before/after idénticos y cero escrituras;
-8. evidencia construida desde outputs observados;
-9. retención de la URL cuando producto e integridad pasen;
-10. cero repetición de los 18 escenarios funcionales.
-
-## Functions allowlisted
+## Frontera observada
 
 ```text
-orbit360OpsLeadsCommandLabV20260804
-orbit360GetAdvisorOpsInboxLabV20260804
-orbit360CobrosReconciliationCommandLabV20260804
-orbit360RecurringInsuranceImportLabV20260804
+preflight canónico ejecutado: no
+secretos: no
+Firebase: no
+Firestore read: no
+Firestore writes: 0
+Auth writes: 0
+Functions deploy intentado: no
+Functions verificadas: 0/4
+Hosting deploy intentado: no
+URL LAB: no
+browser: no
+rutas: 0/8
+snapshot before: no
+snapshot after: no
+Rules: no
+reimportación: no
+producción/main/merge: no
 ```
 
-## Rutas
+`0/4` significa `no ejecutado`, no fallo de Functions.
+
+## Root fix source-only aplicado
 
 ```text
-cliente360
-aseguradoras
-polizas
-cobros
-conciliaciones
-ops
-leads
-importar
+commit: ed655ef5221cf84c5930ba4ce07da586a6fca64f
+fetch-depth: 0
+guard: git cat-file -e "$ORBIT360_SOURCE_BASELINE^{commit}"
 ```
 
-## Restricciones
+El workflow existente fue corregido sin crear una variante. La modificación no activó runtime.
 
-- cero escrituras reales;
-- cero usuarios o memberships sintéticos;
-- no Rules;
-- no reimportación;
-- no producción;
-- no `main`;
-- no merge;
-- no workflow visual nuevo;
-- no navegación hash acumulativa;
-- no repetición de la batería funcional 18/18;
-- no modificación del request consumido anterior.
+## STOP_RETRY
 
-## Regla de decisión
-
-Retirar la candidata únicamente si se demuestra:
-
-- `SECURITY_FAILURE`;
-- `FUNCTIONAL_DEFECT` real;
-- integridad before/after distinta;
-- cross-tenant;
-- escritura no autorizada.
-
-Un fallo exclusivo del capturador no elimina Functions ni Hosting cuando producto e integridad hayan pasado; se conserva la URL y se clasifica el instrumento.
+- autorización consumida;
+- ejecuciones restantes: 0;
+- no rerun del run `30977831814`;
+- request v3 consumido e inmutable;
+- no nuevo request runtime sin autorización explícita;
+- no repetición de los 18 escenarios funcionales.
 
 ## Siguiente acción exacta
 
-Recibir autorización explícita nueva para una sola ejecución del Microbloque 2.3. La autorización debe cubrir el request v3, preflight, cuatro Functions, Hosting preview, ocho rutas aisladas y snapshots read-only; no cubre Rules, reimportación, producción, main o merge.
+Preparar source-only un nuevo path de request y sincronizarlo con el workflow existente, vinculado al HEAD vigente y con la corrección de provenance preservada. Después de un PASS source-only, solicitar una sola autorización LAB nueva. No incluye Rules, reimportación, producción, main o merge.
