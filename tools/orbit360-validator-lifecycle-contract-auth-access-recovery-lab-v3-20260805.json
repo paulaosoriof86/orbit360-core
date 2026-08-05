@@ -122,6 +122,27 @@
   "executionResult": {
     "stage": "STOP_RETRY_ACCESS_CONFIG_APPLY",
     "classification": "PIPELINE_MECHANISM_FAILURE",
-    "ok": false
+    "ok": false,
+    "accessConfigWritesCommitted": 0,
+    "authWrites": 0,
+    "membershipWrites": 0,
+    "functionDeployed": false,
+    "passwordEmailsSent": 0
+  },
+  "postmortem": {
+    "rootCauseCode": "FIRESTORE_TRANSACTION_READ_AFTER_WRITE",
+    "owner": "tools/orbit360-auth-access-config-repair-lab-v3-20260805.mjs",
+    "evidence": "orbit360-platform/runtime-gate-crm-v20260716/auth-access-v3-transaction-rootcause-sanitized-v20260805.json",
+    "closure": "orbit360-platform/docs/CIERRE-STOP-RETRY-AUTH-ACCESS-V3-TRANSACCION-20260805.md",
+    "rootFixCommit": "38aae846477a35025950869a207bf10be9337cc1",
+    "rootFixStrategy": "READ_ALL_VALIDATE_ALL_WRITE_ALL",
+    "requestImmutable": true,
+    "rerunAllowed": false
+  },
+  "nextBoundary": {
+    "newRequestPathRequired": true,
+    "newGateVersionRequired": true,
+    "sourceOnlyValidationRequiredBeforeRuntime": true,
+    "newExplicitAuthorizationRequired": true
   }
 }
