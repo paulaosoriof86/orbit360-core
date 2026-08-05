@@ -3,7 +3,7 @@
   "gateId": "block-auth-access-recovery-source-only-v6-20260805",
   "gateContractVersion": "13.5.0",
   "validatorLifecycleRevision": "phase-capability-contract-v1",
-  "status": "AUTH_ACCESS_RECOVERY_SOURCE_ONLY_V6_AUTHORIZED_ONCE",
+  "status": "AUTH_ACCESS_RECOVERY_SOURCE_ONLY_V6_CONSUMED_PASS",
   "executionProfile": {
     "phase": "AUTH_ACCESS_RECOVERY_SOURCE_ONLY_V6",
     "capabilities": {
@@ -22,12 +22,12 @@
   "rcId": "RC-AYS-LAB-CANONICA-01",
   "authorization": {
     "requiredForExecution": true,
-    "activeRequest": true,
-    "allowedExecutions": 1,
+    "activeRequest": false,
+    "allowedExecutions": 0,
     "request": ".github/orbit360-requests/auth-access-recovery-source-only-v6-20260805.json",
     "authorizationRef": "user_authorized_auth_access_source_only_v6_20260805T1133-0600",
     "authorizedAt": "2026-08-05T11:33:00-06:00",
-    "consumed": false,
+    "consumed": true,
     "replayAllowed": false
   },
   "priorRequests": [
@@ -134,5 +134,11 @@
     "merge": true
   },
   "containsPII": false,
-  "containsSecrets": false
+  "containsSecrets": false,
+  "executionResult": {
+    "stage": "AUTH_ACCESS_SOURCE_ONLY_V6_PASS",
+    "decision": "GO_AUTH_DIAGNOSTIC_CONTROL_PLANE",
+    "classification": "AUTH_ACCESS_SOURCE_ONLY_V6_READY",
+    "ok": true
+  }
 }

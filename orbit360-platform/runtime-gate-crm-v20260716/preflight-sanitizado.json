@@ -2,13 +2,173 @@
   "schemaVersion": "orbit360-auth-access-recovery-source-only-gate-v6",
   "gateId": "block-auth-access-recovery-source-only-v6-20260805",
   "contractVersion": "13.5.0",
-  "status": "NOT_EXECUTED",
-  "classification": "PENDING_SOURCE_ONLY_REQUEST",
-  "total": 0,
-  "passed": 0,
-  "failed": 1,
-  "failedCheckIds": [
-    "SOURCE_ONLY_REQUEST_NOT_EXECUTED"
+  "status": "GO_GATE_CONTRACT",
+  "classification": "AUTH_ACCESS_SOURCE_ONLY_V6_READY",
+  "total": 32,
+  "passed": 32,
+  "failed": 0,
+  "failedCheckIds": [],
+  "checks": [
+    {
+      "id": "GATE_ID_VERSION",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "LIFECYCLE_AUTHORIZED_ONCE",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "ZERO_CAPABILITIES",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "REQUEST_ACTIVE",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "REQUEST_BINDING",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "REQUEST_SINGLE_FILE_COMMIT",
+      "ok": true,
+      "detail": ".github/orbit360-requests/auth-access-recovery-source-only-v6-20260805.json"
+    },
+    {
+      "id": "SOURCE_SCOPE_POSITIVE",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "SOURCE_SCOPE_NEGATIVE",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "PRIOR_REQUESTS_IMMUTABLE_AND_CONSUMED",
+      "ok": true,
+      "detail": "auth-access-recovery-lab-v20260805.json:fffef59bd6065390d1e8b28128754a06d94340b5:true|auth-access-recovery-lab-v2-20260805.json:fd5963242de542105dd764371cf501f6814481e6:true|auth-access-recovery-lab-v3-20260805.json:f8363197646dc4046fda1933af535110270703ae:true|auth-access-recovery-source-only-v4-20260805.json:ad16d2b1fe41c88929eab59a6f92a6bdface08ad:true|auth-access-recovery-lab-v5-20260805.json:e4112b831cb6aec65c9232cdcc5c73c88b07c27f:true"
+    },
+    {
+      "id": "V5_STOP_RETRY_PREREQUISITE",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "V5_DUAL_ROOTCAUSE_PRESENT",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "FUTURE_RUNTIME_REQUEST_ABSENT",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "WORKFLOW_REUSED_V6_PATH",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "WORKFLOW_ZERO_CAPABILITIES",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "WORKFLOW_FULL_HISTORY",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "WORKFLOW_CANONICAL_GATE",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "WORKFLOW_NO_REQUEST_MUTATION",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "REQUIRED_FILES_PRESENT",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "ACTOR_PARITY_EXACT",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "ACTOR_PARITY_MATCHES_CALLABLE",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "CALLABLE_HTTP_STATUS_PROPAGATION",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "CALLABLE_STATUS_PROPAGATION",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "CALLABLE_ERROR_CODE_PROPAGATION",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "CALLABLE_SANITIZATION",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "CONDITIONAL_EVIDENCE_READS",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "CONDITIONAL_EVIDENCE_PERSIST_LIST",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "TRISTATE_INTEGRITY",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "MISSING_SCOPE_NOT_FALSE_CHANGE",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "LIFECYCLE_CONSUMPTION_SAFE",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "SOURCE_FIXTURES_PASS",
+      "ok": true,
+      "detail": "{\"ok\":true,\"actorParityCases\":2,\"actorRejectionCases\":1,\"callableErrorPropagationCases\":1,\"evidencePersistenceCases\":3,\"integrityStatesVerified\":[\"VERIFIED_UNCHANGED\",\"VERIFIED_CHANGED\",\"NOT_POSTVERIFIED\"],\"operationalCapabilitiesUsed\":0}"
+    },
+    {
+      "id": "TRISTATE_FIXTURES_PASS",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "SOURCE_FIXTURES_ZERO_CAPABILITIES",
+      "ok": true,
+      "detail": ""
+    }
   ],
   "executionAuthorized": false,
   "secretAccessAuthorized": false,
@@ -32,13 +192,37 @@
   "browserExecuted": false,
   "deployExecuted": false,
   "productionTouched": false,
-  "priorRequestsVerified": 0,
-  "actorAuthorizationParityValidated": false,
-  "callableErrorPropagationValidated": false,
-  "conditionalEvidencePersistenceValidated": false,
-  "triStateIntegrityValidated": false,
+  "priorRequestsVerified": 5,
+  "actorAuthorizationParityValidated": true,
+  "callableErrorPropagationValidated": true,
+  "conditionalEvidencePersistenceValidated": true,
+  "triStateIntegrityValidated": true,
   "futureRuntimeRequestAbsent": true,
+  "sourceFixtures": {
+    "ok": true,
+    "actorParityCases": 2,
+    "actorRejectionCases": 1,
+    "callableErrorPropagationCases": 1,
+    "evidencePersistenceCases": 3,
+    "integrityStatesVerified": [
+      "VERIFIED_UNCHANGED",
+      "VERIFIED_CHANGED",
+      "NOT_POSTVERIFIED"
+    ],
+    "operationalCapabilitiesUsed": 0
+  },
   "containsPII": false,
   "containsSecrets": false,
-  "ok": false
+  "ok": true,
+  "canonicalEntrypoint": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
+  "canonicalEngine": "tools/orbit360-validar-gate-contracts-engine-auth-access-recovery-source-only-v6-20260805.mjs",
+  "canonicalLifecycleContract": "tools/orbit360-validator-lifecycle-contract-auth-access-recovery-source-only-v6-20260805.json",
+  "canonicalLifecycleComposition": "phase-capability-contract-v1",
+  "engineEvidenceSource": "sync-file-evidence-not-stdout-v1",
+  "engineStdoutParsed": false,
+  "sourceTransformed": false,
+  "operationalWrites": 0,
+  "evidenceWrites": 1,
+  "secretsRead": false,
+  "rulesApplied": false
 }

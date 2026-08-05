@@ -8,6 +8,7 @@ import { applicationDefault, deleteApp, getApps, initializeApp } from 'firebase-
 import { getAuth } from 'firebase-admin/auth';
 import { getFirestore, FieldPath } from 'firebase-admin/firestore';
 import { GoogleAuth } from 'google-auth-library';
+import { buildOnboardingCallFailure, callableFailureEvidence } from './orbit360-auth-callable-error-contract-v6-20260805.mjs';
 
 const PROJECT = process.env.ORBIT360_PROJECT_ID || 'ays-orbit-360-lab';
 const TENANT = process.env.ORBIT360_REAL_TENANT_ID || 'alianzas-soluciones';
@@ -169,7 +170,9 @@ async function callOnboarding(idToken, payload) {
   });
   let body = {};
   try { body = await response.json(); } catch {}
-  if (!response.ok || body.error || body.result?.ok !== true) throw new Error(`FUNCTIONAL_DEFECT:ONBOARDING_CALL_FAILED_${text(body.error?.status || response.status, 80)}`);
+  if (!response.ok || body.error || body.result?.ok !== true) {
+    throw buildOnboardingCallFailure(response.status, body);
+  }
   return body.result;
 }
 async function sendReset(apiKey, targetEmail) {
@@ -363,12 +366,15 @@ async function recover() {
     await rollback(state, touched);
     const message = safeError(error);
     const classification = (message.match(/^(SECURITY_FAILURE|FUNCTIONAL_DEFECT|VALIDATOR_STALE|DATA_CONTRACT_FAILURE|ENVIRONMENT_FAILURE|PIPELINE_MECHANISM_FAILURE)/) || [])[1] || 'PIPELINE_MECHANISM_FAILURE';
+    const callableFailure = callableFailureEvidence(error);
     const failure = {
       schemaVersion: 'orbit360-auth-access-recovery-sanitized-v1',
       stage: 'STOP_RETRY_AUTH_ACCESS_RECOVERY',
       decision: 'STOP_RETRY_ROLLBACK_APPLIED',
       classification,
-      errorCode: text(message.split(':')[1] || 'AUTH_ACCESS_RECOVERY_FAILED', 160),
+      errorCode: callableFailure.errorCode,
+      httpStatus: callableFailure.httpStatus,
+      callableStatus: callableFailure.callableStatus,
       attemptedTargets: touched.map(item => item.key),
       emailsSentBeforeStop: emailsSent,
       rollbackAttempted: true,
@@ -402,12 +408,15 @@ try {
 } catch (error) {
   const message = safeError(error);
   const classification = (message.match(/^(SECURITY_FAILURE|FUNCTIONAL_DEFECT|VALIDATOR_STALE|DATA_CONTRACT_FAILURE|ENVIRONMENT_FAILURE|PIPELINE_MECHANISM_FAILURE)/) || [])[1] || 'PIPELINE_MECHANISM_FAILURE';
+  const callableFailure = callableFailureEvidence(error);
   writeJson(sanitizedPath, {
     schemaVersion: 'orbit360-auth-access-recovery-sanitized-v1',
     stage: mode === 'census' ? 'STOP_RETRY_CENSUS' : 'STOP_RETRY_AUTH_ACCESS_RECOVERY',
     decision: 'STOP_RETRY',
     classification,
-    errorCode: text(message.split(':')[1] || 'AUTH_ACCESS_RECOVERY_FAILED', 160),
+    errorCode: callableFailure.errorCode,
+    httpStatus: callableFailure.httpStatus,
+    callableStatus: callableFailure.callableStatus,
     firestoreWrites: 0,
     authWrites: 0,
     temporaryPasswordsCreated: 0,
