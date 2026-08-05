@@ -1,11 +1,11 @@
-# ESTADO ACTIVO — MICROBLOQUE 2.1
+# ESTADO VIGENTE — MICROBLOQUE 2.1
 
 Fecha: 2026-08-04  
 RC: `RC-AYS-LAB-CANONICA-01`  
 Gate: `GO_LAB_CANDIDATE_VISIBLE`  
-Estado: `CORRECTIVE_CONTINUATION_READY_AFTER_VALIDATOR_STALE`
+Estado: `STOP_RETRY_DEFINITIVE_CONTROL_PLANE`
 
-## Entradas cerradas
+## Entradas preservadas
 
 ```text
 PASS_PLAN_PERSISTED
@@ -13,72 +13,105 @@ PASS_CANONICAL_BASELINE
 PASS_ISOLATED_ROUTE_HARNESS
 ```
 
-Evidencia del arnés:
+Continúan válidos:
 
 ```text
-run: 30971707956
-rutas: 8/8
-mecanismo: ONE_ISOLATED_BROWSER_CONTEXT_AND_DIRECT_URL_PER_ROUTE
-Firebase/secrets/escrituras/deploy: no
+run funcional 30962756387: 18/18 PASS
+run sintético 30971707956: 8/8 PASS
+baseline: 430 clientes / 30 aseguradoras
+sourceBaseline: 548cffa50cddfd93ad2118f5a06e9bb420699bde
 ```
 
-## Primer intento preventivo
+## Autorización consumida
+
+La autorización del Microbloque 2.1 produjo dos intentos preventivos:
+
+### Run 30974443335
 
 ```text
-run: 30974443335
-status: VALIDATOR_STALE
-failed checks:
-- REQUEST_ACTIVE
-- VIDEO_LAYOUTFREE_HARNESS
-secret access: no
-Firestore: no
-Functions: no
-Hosting: no
-browser: no
+VALIDATOR_STALE
+REQUEST_ACTIVE
+VIDEO_LAYOUTFREE_HARNESS
+secretos: no
+Firebase: no
+deploy: no
 ```
 
-El request único y el baseline congelado pasaron. El preflight estaba desactualizado frente al request v2 y al arnés v6.
+### Run 30974745085
 
-## Correctivo cerrado
+```text
+VALIDATOR_STALE
+CANONICAL_PREFLIGHT_ENTRYPOINT
+CANONICAL_LIFECYCLE_REVISION_MISMATCH
+secretos: no
+Firebase: no
+deploy: no
+```
 
-Se sincronizaron:
+## Causa raíz definitiva
 
-- motor canónico Gate 12.0.11;
-- lifecycle `isolated-context-direct-url-v6`;
-- extensión de registro;
-- root cause `ROUTE_ASEGURADORAS_NAVIGATION_TIMEOUT`;
-- evidencia sintética 8/8;
-- política de retención segura;
-- documentación, Academia y acumulado Claude.
+Owner:
 
-No se modificaron producto, módulos, Store, datos, Auth, Functions ni Hosting.
+```text
+tools/orbit360-validar-gate-contracts-v20260717.mjs
+```
 
-## Objetivo único vigente
+El outer router exige:
 
-Entregar una URL Hosting LAB retenida de la misma candidata, con cuatro Functions LAB allowlisted, ocho rutas aisladas y snapshots before/after idénticos.
+```text
+validatorLifecycleRevision = phase-capability-contract-v1
+```
 
-## Ejecución exacta
+La generación del arnés aislado fue registrada incorrectamente en ese mismo campo como:
 
-1. preflight corregido antes de secretos;
-2. desplegar solo las cuatro Functions LAB allowlisted;
-3. desplegar un único Hosting preview LAB;
-4. snapshot A&S before y after;
-5. abrir Cliente 360, Aseguradoras, Pólizas, Cobros, Conciliaciones, Ops, Leads e Importar con contexto aislado y URL directa;
-6. exigir cero escrituras e integridad idéntica;
-7. retener URL si producto e integridad pasan;
-8. no repetir los 18 escenarios funcionales;
-9. no retirar la candidata por un fallo exclusivo del capturador.
+```text
+isolated-context-direct-url-v6
+```
+
+La composición canónica y la versión del arnés deben ser campos separados. El inner engine corregido no llegó a ejecutarse en el segundo run.
+
+## Resultado
+
+```text
+URL LAB: no producida
+Functions: 0/4
+Hosting: no desplegado
+rutas visuales: 0/8
+snapshots: no ejecutados
+Firestore writes: 0
+Auth writes: 0
+Rules: no
+reimportación: no
+producción/main/merge: no
+```
+
+La candidata y los datos permanecen intactos. No se demostró defecto funcional.
 
 ## STOP_RETRY
 
-Si el preflight vuelve a fallar en `REQUEST_ACTIVE`, `ISOLATED_ROUTE_HARNESS` o la misma etapa de control plane, se detiene definitivamente sin otro parche ni ejecución.
+Quedan prohibidos:
 
-## Prohibiciones
-
-Rules, reimportación, escrituras reales, producción, main, merge, otra candidata, otro workflow visual y navegación por hash acumulativa.
+- tercer request;
+- tercer run;
+- otro parche a esta familia;
+- otro workflow visual;
+- acceso a secretos;
+- despliegue LAB bajo esta autorización;
+- repetir los 18 escenarios.
 
 ## Siguiente acción exacta
 
-Emitir como último commit el request correctivo de continuación del run `30974443335` y ejecutar una sola vez el workflow visual existente.
+```text
+SOURCE_ONLY_CONTROL_PLANE_REDESIGN
+```
 
-Fuente de continuidad superior: ledger vivo y PR #5.
+Debe probar conjuntamente outer router e inner engine, conservar `phase-capability-contract-v1`, declarar `visualHarnessRevision` por separado y reparar el generador de evidencia que escribió un contador fijo de Functions.
+
+Esta acción no incluye runtime, secretos, Firebase, navegador o deploy. Después de un PASS estático integrado se requerirá una autorización explícita nueva.
+
+Fuentes vigentes:
+
+1. ledger de `RC-AYS-LAB-CANONICA-01`;
+2. `CIERRE-STOP-RETRY-MICROBLOQUE-2-1-GO-LAB-CANDIDATE-VISIBLE-20260805.md`;
+3. evidencia JSON `rc-ays-lab-canonica-01-microblock21-stop-retry-v20260805.json`;
+4. PR #5 draft/open.
