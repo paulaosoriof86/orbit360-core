@@ -1,11 +1,11 @@
 # PLAN ÚNICO DE SALIDA — RC-AYS-LAB-CANONICA-01
 
 Fecha de adopción: 2026-08-04  
-Última actualización: 2026-08-05 16:13 GT  
+Última actualización: 2026-08-05 17:45 GT  
 Rama obligatoria: `ays/backend-tenant-lab-v99-20260703`  
 PR: #5 draft/open  
 Baseline funcional congelado: `548cffa50cddfd93ad2118f5a06e9bb420699bde`  
-HEAD vivo al reanudar el plan: `7f16d257af5e40d7a6dfffd0d539ad10fd58615b`  
+HEAD vivo de esta actualización: `d076bcae270e17e69eea4e07130cdd2190cd25d9`  
 Producción, `main` y merge: no autorizados
 
 ## 1. Carácter vinculante
@@ -78,13 +78,13 @@ snapshots before/after: idénticos
 Firestore/Auth writes: 0
 ```
 
-URL retenida de la candidata visual anterior:
+URL vigente para revisión humana post-Auth:
 
 ```text
-https://ays-orbit-360-lab--orbit360-operational-block12-w8ibrr6w.web.app
+https://ays-orbit-360-lab.web.app/?orbitBackend=firestore-lab&tenant=alianzas-soluciones#/inicio
 ```
 
-Las capturas automáticas anteriores quedaron bloqueadas por `Acuerdos legales`. El modal no se desactiva globalmente y no constituye defecto funcional del producto.
+El modal legal se conserva y se acepta una sola vez. El incidente histórico del capturador no constituye defecto funcional del producto.
 
 ### 3.5 Ops/Leads durable
 
@@ -157,15 +157,15 @@ Auth queda cerrado técnica y operacionalmente. Solo se reabre si la revisión v
 
 ### Carril A — frontend, UX y Academia
 
-Frente activo: revisión visual controlada post-Auth en LAB.
+Frente activo: revisión visual controlada post-Auth en LAB por Dirección desktop, Operativo tablet y Asesor móvil.
 
 ### Carril B — backend, seguridad y acceso
 
-Auth cerrado. No hay nuevo desarrollo de arquitectura. Solo corrección focalizada si la evidencia visual demuestra un `FUNCTIONAL_DEFECT`, `DATA_CONTRACT_FAILURE`, `SECURITY_FAILURE` o `VALIDATOR_STALE`.
+Auth cerrado. No hay nuevo desarrollo de arquitectura. En Cobros se corrigió source-only un `DATA_CONTRACT_FAILURE` del owner de overlay; no hubo runtime, secretos, Firestore ni deploy.
 
 ### Carril C — datos reales y migración
 
-Continúa Bloque 4.0 de Cobros, exclusivamente read-only hasta completar la explicación exhaustiva de los 365 pagos.
+Continúa Bloque 4.0 de Cobros, exclusivamente read-only. Estado real: 132 pagos explicados y 233 pendientes de evidencia adicional.
 
 ## 5. Bloque visual activo — revisión post-Auth
 
@@ -191,10 +191,10 @@ Producción/main/merge: 0
 2. inicio de sesión real con identidad y membership del tenant;
 3. modal obligatorio `Crea tu contraseña personal`;
 4. copia clara, campos legibles y acción de cerrar sesión;
-5. aceptación legal una sola vez por sesión;
-6. navegación subyacente revisada con bypass exclusivamente efímero del overlay en el navegador de auditoría, sin escribir ni cambiar contraseña;
-7. menú, rol activo, nombre, responsive y estados de carga;
-8. rutas y permisos propios del perfil.
+5. aceptación legal una sola vez;
+6. menú, rol activo, nombre, responsive y estados de carga;
+7. rutas y permisos propios del perfil;
+8. cero textos técnicos, contraseñas visibles o accesos indebidos.
 
 ### 5.3 Rutas mínimas
 
@@ -246,22 +246,7 @@ menú móvil
 sin acceso indebido a Equipo, configuración global o datos de otros asesores
 ```
 
-### 5.4 Criterios de aprobación
-
-- sin texto técnico visible: Firebase, Firestore, backend, LAB, localStorage, mock, demo, smoke, secretos o credenciales;
-- sin credenciales precargadas ni correos demo;
-- modal de contraseña obligatorio claro y bloqueante;
-- contraste, tipografía, jerarquía y botones legibles;
-- menú móvil funcional;
-- ningún desbordamiento, solapamiento o recorte crítico;
-- rol, alcance y datos visibles coherentes con membership;
-- relaciones vacías mostradas de forma honesta;
-- Cliente 360 y Aseguradoras conservan lista, ficha y calidad/conocimiento;
-- estados de carga y error comprensibles;
-- cero exposición de contraseñas;
-- cero navegación a módulos no autorizados.
-
-### 5.5 Resultado posible
+### 5.4 Resultado posible
 
 ```text
 PASS_VISUAL_POST_AUTH
@@ -284,11 +269,11 @@ No se abre auditoría general ni se repite Auth.
 ## 6. Bloque 4.0 — replay completo read-only de Cobros
 
 ```text
-Gate: PASS_COBROS_FULL_REPLAY
-Estado: ACTIVE_READ_ONLY_MONTHLY_INTAKE_PARALLEL
+Gate objetivo: PASS_COBROS_FULL_REPLAY
+Estado: ACTIVE_READ_ONLY_PROGRESS_REQUIRES_MORE_EVIDENCE
 ```
 
-Punto de partida:
+Punto de partida protegido:
 
 ```text
 pólizas activas: 224
@@ -304,24 +289,110 @@ calendarios sustituidos: 20
 cobros existentes: 5
 ```
 
-Replay preservado:
+### 6.1 Avance real
 
 ```text
 secuencia de cartera: 128
 posteriores al corte: 2
-pendientes de overlay: 235
-invariante: 128 + 2 + 235 = 365
+propuestas únicas por planilla detallada: 2
+pendientes de evidencia adicional: 233
+invariante: 128 + 2 + 2 + 233 = 365
 ```
 
-Reglas:
+```text
+stage: COBROS_OVERLAY_PROGRESS
+classification: READ_ONLY_PROGRESS_REQUIRES_MORE_EVIDENCE
+rowLedgerCount: 365
+rowLedgerDigest: 3f129242c34934b3f87009a1d0cb4bded6861b376f3719349831d770b7825f5f
+ok: false
+```
+
+No se declara PASS con 233 pendientes.
+
+### 6.2 Root fix del owner
+
+Clasificación:
+
+```text
+DATA_CONTRACT_FAILURE
+```
+
+El owner v1 podía tomar la primera fila cuando una misma clave póliza/moneda/periodo aparecía varias veces en planilla. El owner v2 exige correspondencia uno a uno; toda clave repetida queda en HOLD.
+
+Owners vigentes:
+
+```text
+tools/orbit360-cobros-overlay-readonly-v2-20260805.mjs
+tools/orbit360-test-cobros-overlay-source-v2-20260805.mjs
+```
+
+Prueba:
+
+```text
+PASS_COBROS_OVERLAY_SOURCE_ONLY_V2
+16 PASS
+0 FAIL
+duplicateSourceKeyProtection: true
+```
+
+### 6.3 Clasificación de planillas
+
+```text
+filas recibidas: 67
+elegibles CRM: 65
+PLANILLA_ZERO_OMIT: 2
+PLANILLA_PERIOD_ONLY: 29
+PLANILLA_REVERSAL_HOLD: 2
+PLANILLA_DETAIL_AMBIGUOUS_HOLD: 10
+PLANILLA_DETAIL_CANDIDATE: 24
+```
+
+Cruce:
+
+```text
+propuestas únicas: 2
+filas con clave fuente ambigua: 10
+claves destino ambiguas: 0
+filas detalladas sin pago pendiente correspondiente: 22
+```
+
+### 6.4 Segmentación de los 233 pendientes
+
+```text
+GTQ: 209
+COP: 24
+pólizas distintas: 124
+Recibos por fecha límite: 154
+Cobranza efectuada histórica: 79
+```
+
+Prioridad:
+
+```text
+Aseguradora Guatemalteca: 41
+Seguros El Roble: 38
+Seguros Columna: 30
+Mapfre Seguros Guatemala: 22
+Seguros G&T: 17
+Aseguradora General: 16
+Aseguradora La Ceiba: 16
+Seguros Ficohsa: 14
+resto: 39
+```
+
+Las primeras tres concentran 109 casos. La siguiente evidencia debe ser reporte detallado de pago o recibo por aseguradora.
+
+### 6.5 Reglas no negociables
 
 - fuentes detalladas se cruzan fila por fila;
 - facturas o resúmenes agregados no crean cobros individuales;
 - evidencia agregada sin detalle queda en HOLD;
-- se preservan 128 casos de secuencia, 2 posteriores al corte y 5 cobros existentes;
+- se preservan 5 cobros existentes y 44 HOLD;
 - no se permite doble conteo;
 - banco no crea cobro sin conciliación;
-- cobros/recaudos no son finmovs.
+- histórico financiero no crea cobro;
+- cobros/recaudos no son finmovs;
+- ninguna propuesta actual escribe datos.
 
 Cierre requerido:
 
@@ -411,22 +482,24 @@ GO_PRODUCTION_A&S
 
 ## 11. Secuencia inmediata
 
-### Acción 1 — ahora
+### Acción 1 — revisión visual humana en paralelo
 
 ```text
-Revisión visual read-only post-Auth
 Dirección desktop
 Operativo tablet
 Asesor móvil
 ```
 
-### Acción 2 — en paralelo sin bloquear
+### Acción 2 — carril C activo
 
 ```text
-Continuar clasificación read-only de Cobros 365/365
+Cruzar reportes detallados de pago/recibo para los 233 pendientes
+Prioridad: Aseguradora Guatemalteca → El Roble → Columna
+Mismo owner v2
+Cero escrituras
 ```
 
-### Acción 3 — después de ambos PASS
+### Acción 3 — solo con 365/365
 
 ```text
 Preparar una sola autorización para materialización durable de Cobros en LAB
@@ -460,11 +533,11 @@ Solicitar autorización única de go-live
 | 2.1–2.4 | composición/provenance | PASS con incidentes de control plane ya cerrados |
 | 2.5 | `GO_LAB_CANDIDATE_VISIBLE` | GO técnico |
 | 2.6 | captura legal automática | diferido no bloqueante |
-| 2.7 | `AUTH_VISUAL_REVIEW_LAB` | activo read-only |
+| 2.7 | `AUTH_VISUAL_REVIEW_LAB` | activo read-only; feedback humano pendiente |
 | 3.0 | `OPS_LEADS_BACKEND_LAB_COMPLETE` | PASS |
 | 3.1 | Auth autoadministrable | PASS 7/7 |
-| 4.0 | `PASS_COBROS_FULL_REPLAY` | activo read-only |
-| 4.1 | `COBROS_REAL_LEDGER_COMPLETE` | pendiente autorización de escritura |
+| 4.0 | `PASS_COBROS_FULL_REPLAY` | 132/365; 233 requieren evidencia |
+| 4.1 | `COBROS_REAL_LEDGER_COMPLETE` | bloqueado hasta 365/365 y autorización de escritura |
 | 5.0 | `RC_ACCUMULATIVE_MODULES_COMPLETE` | pendiente |
 | 6.0 | `RELEASE_CANDIDATE_ACCEPTED` | pendiente |
 | 7.0 | `GO_PRODUCTION_A&S` | bloqueado hasta autorización |
