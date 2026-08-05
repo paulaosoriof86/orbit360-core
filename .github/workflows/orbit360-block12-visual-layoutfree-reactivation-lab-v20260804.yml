@@ -4,7 +4,7 @@ on:
   push:
     branches: [ays/backend-tenant-lab-v99-20260703]
     paths:
-      - '.github/orbit360-requests/block12-go-lab-candidate-visible-v3.json'
+      - '.github/orbit360-requests/block12-go-lab-candidate-visible-v4.json'
 
 permissions:
   contents: read
@@ -18,7 +18,7 @@ concurrency:
 
 env:
   ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
-  ORBIT360_REQUEST_FILE: .github/orbit360-requests/block12-go-lab-candidate-visible-v3.json
+  ORBIT360_REQUEST_FILE: .github/orbit360-requests/block12-go-lab-candidate-visible-v4.json
   ORBIT360_GATE_ID: block12-operational-runtime-lab-v20260804
   ORBIT360_PROJECT_ID: ays-orbit-360-lab
   ORBIT360_REAL_TENANT_ID: alianzas-soluciones
@@ -27,7 +27,9 @@ env:
   ORBIT360_SOURCE_BASELINE: 548cffa50cddfd93ad2118f5a06e9bb420699bde
   ORBIT360_FUNCTIONS: orbit360OpsLeadsCommandLabV20260804,orbit360GetAdvisorOpsInboxLabV20260804,orbit360CobrosReconciliationCommandLabV20260804,orbit360RecurringInsuranceImportLabV20260804
   ORBIT360_RETENTION_CONTRACT_MARKERS: 'hostingPreviewKept:$retain functionsKept:$retain'
-  # Request retirado e inmutable: .github/orbit360-requests/block12-operational-runtime-layoutfree-lab-v20260804.json
+  # Requests retirados e inmutables:
+  # .github/orbit360-requests/block12-operational-runtime-layoutfree-lab-v20260804.json
+  # .github/orbit360-requests/block12-go-lab-candidate-visible-v3.json
 
 jobs:
   lab-candidate-visible:
@@ -47,7 +49,7 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Verificar request único v3 y baseline congelado
+      - name: Verificar request único v4 y baseline congelado
         shell: bash
         run: |
           set -euo pipefail
@@ -70,7 +72,7 @@ jobs:
             .previousVisualRunId==30971226259 and .previousVisualFailureClassification=="PIPELINE_MECHANISM_FAILURE" and
             .previousVisualFailureCode=="ROUTE_ASEGURADORAS_NAVIGATION_TIMEOUT" and
             .isolatedSyntheticRunId==30971707956 and .isolatedSyntheticStatus=="ISOLATED_ROUTES_SYNTHETIC_PASS" and
-            .sourceOnlyCompositionRunId==30976772355 and .sourceOnlyCompositionStatus=="PASS_CANONICAL_PREFLIGHT_COMPOSITION" and
+            .sourceOnlyCompositionRunId==30977179448 and .sourceOnlyCompositionStatus=="PASS_CANONICAL_PREFLIGHT_COMPOSITION" and
             .replacementMechanism=="ONE_ISOLATED_BROWSER_CONTEXT_AND_DIRECT_URL_PER_ROUTE" and
             .functionalReplayForbidden==true and .retainPreviewOnCaptureOnlyFailure==true and
             .projectId=="ays-orbit-360-lab" and .gateId=="block12-operational-runtime-lab-v20260804" and
@@ -113,12 +115,12 @@ jobs:
           set -euo pipefail
           SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-${SA_ORBIT_360_LAB:-${SA_DEFAULT:-}}}"
           test -n "$SERVICE_ACCOUNT"
-          KEY_FILE="$RUNNER_TEMP/orbit360-microblock23-service-account.json"
+          KEY_FILE="$RUNNER_TEMP/orbit360-microblock25-service-account.json"
           printf '%s' "$SERVICE_ACCOUNT" > "$KEY_FILE"
           chmod 600 "$KEY_FILE"
           test "$(jq -r '.project_id // empty' "$KEY_FILE")" = "$ORBIT360_PROJECT_ID"
           echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
-          echo "ORBIT360_BLOCK12_VISUAL_INTEGRITY_STATE=$RUNNER_TEMP/orbit360-microblock23-integrity-private.json" >> "$GITHUB_ENV"
+          echo "ORBIT360_BLOCK12_VISUAL_INTEGRITY_STATE=$RUNNER_TEMP/orbit360-microblock25-integrity-private.json" >> "$GITHUB_ENV"
           echo "ORBIT360_LOCAL_FIREBASE_CONFIG_FILE=$GITHUB_WORKSPACE/orbit360-platform/core/auth-firebase.config.local.js" >> "$GITHUB_ENV"
 
       - name: Instalar herramientas reproducibles
@@ -331,5 +333,5 @@ jobs:
           INTEGRITY_EXIT: ${{ steps.integrity.outputs.exit_code }}
         run: |
           set -euo pipefail
-          BODY="## RC-AYS-LAB-CANONICA-01 · Microbloque 2.3 · run ${GITHUB_RUN_ID}\n\n- Decisión: \`${DECISION:-NO_DECISION}\`\n- Functions allowlisted verificadas: \`${FUNCTIONS_VERIFIED:-0}/4\`\n- Visual exit: \`${VISUAL_EXIT:-no-ejecutado}\`\n- Integridad exit: \`${INTEGRITY_EXIT:-no-ejecutado}\`\n- URL LAB retenida: ${PREVIEW_URL:-no}\n- Repetición de 18 escenarios: no\n- Rules, reimportación, producción, main o merge: no"
+          BODY="## RC-AYS-LAB-CANONICA-01 · Microbloque visual v4 · run ${GITHUB_RUN_ID}\n\n- Decisión: \`${DECISION:-NO_DECISION}\`\n- Functions allowlisted verificadas: \`${FUNCTIONS_VERIFIED:-0}/4\`\n- Visual exit: \`${VISUAL_EXIT:-no-ejecutado}\`\n- Integridad exit: \`${INTEGRITY_EXIT:-no-ejecutado}\`\n- URL LAB retenida: ${PREVIEW_URL:-no}\n- Repetición de 18 escenarios: no\n- Rules, reimportación, producción, main o merge: no"
           gh api "repos/${GITHUB_REPOSITORY}/issues/5/comments" -f body="$BODY" >/dev/null
