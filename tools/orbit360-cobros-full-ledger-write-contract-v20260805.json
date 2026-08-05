@@ -1,0 +1,126 @@
+{
+  "schemaVersion": "orbit360-cobros-full-ledger-write-contract-v1",
+  "gateId": "block10.10-cobros-full-ledger-write-lab-v20260805",
+  "contractVersion": "10.10.0",
+  "rcId": "RC-AYS-LAB-CANONICA-01",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "projectId": "ays-orbit-360-lab",
+  "tenantId": "alianzas-soluciones",
+  "source": {
+    "finalEvidence": "orbit360-platform/runtime-gate-crm-v20260716/cobros-full-replay-final-sanitized-v20260805.json",
+    "rowLedgerCount": 365,
+    "rowLedgerDigest": "96d7105912234de14deb5ad0190e537c1b71570519d086616acc9122cb2ca381",
+    "existingMaterializedCobros": 5,
+    "calendarHolds": 44
+  },
+  "durablePlan": {
+    "pagosReportados": 365,
+    "evidenciasCobro": 365,
+    "propuestasConciliacion": 132,
+    "conciliacionHolds": 233,
+    "cobrosLedgerRuns": 1,
+    "activeLedgerPointer": 1,
+    "maximumWrites": 1097,
+    "newCobros": 0,
+    "receiptWrites": 0,
+    "policyWrites": 0,
+    "finmovWrites": 0
+  },
+  "proposalBreakdown": {
+    "sequence": 128,
+    "postCutoff": 2,
+    "planillaDetail": 2
+  },
+  "holdBreakdown": {
+    "reportedPaymentNoUniqueReceiptLink": 233
+  },
+  "collections": {
+    "pagosReportados": "tenants/{tenantId}/pagosReportados/{deterministicId}",
+    "evidenciasCobro": "tenants/{tenantId}/evidenciasCobro/{deterministicId}",
+    "propuestasConciliacion": "tenants/{tenantId}/propuestasConciliacion/{deterministicId}",
+    "conciliacionHolds": "tenants/{tenantId}/conciliacionHolds/{deterministicId}",
+    "runManifest": "tenants/{tenantId}/cobrosLedgerRuns/{runId}",
+    "activePointer": "tenants/{tenantId}/configuracion_catalogo/cobrosLedger"
+  },
+  "atomicity": {
+    "strategy": "STAGE_CHUNKS_THEN_SINGLE_ACTIVE_POINTER",
+    "maximumChunkWrites": 400,
+    "allStageDocumentsCarryRunId": true,
+    "activationRequiresExactCountsAndDigest": true,
+    "readersMustUseActiveRunId": true,
+    "partialStageIsInvisible": true
+  },
+  "idempotency": {
+    "documentIds": "sha256(tenantId|sourceRowIdentity|documentClass)",
+    "sameDigest": "SKIP_AS_IDEMPOTENT",
+    "differentDigest": "STOP_DATA_CONTRACT_FAILURE",
+    "duplicateSourceRows": "HOLD_OR_OMIT_BY_LEDGER_DECISION",
+    "replayOfConsumedRequest": "PROHIBITED"
+  },
+  "snapshot": {
+    "before": [
+      "activeLedgerPointer",
+      "targetCollectionCounts",
+      "targetCollectionDigests",
+      "existingDocumentsForPlannedIds",
+      "cobrosCountAndDigest",
+      "receiptAndPolicyIntegrityDigest"
+    ],
+    "after": [
+      "activeLedgerPointer",
+      "targetCollectionCounts",
+      "targetCollectionDigests",
+      "cobrosCountAndDigest",
+      "receiptAndPolicyIntegrityDigest"
+    ]
+  },
+  "rollback": {
+    "deleteOnlyDocumentsCreatedByRunId": true,
+    "restorePreviousActivePointer": true,
+    "restorePreexistingDocumentsIfUpdated": true,
+    "cobrosRollback": "NOT_APPLICABLE_NO_NEW_COBROS",
+    "receiptRollback": "NOT_APPLICABLE_NO_RECEIPT_WRITES",
+    "policyRollback": "NOT_APPLICABLE_NO_POLICY_WRITES",
+    "finmovRollback": "NOT_APPLICABLE_NO_FINMOV_WRITES"
+  },
+  "verification": {
+    "exactCounts": true,
+    "exactLedgerDigest": true,
+    "all365RowsRepresented": true,
+    "proposals132": true,
+    "holds233": true,
+    "newCobrosZero": true,
+    "existingCobrosFivePreserved": true,
+    "calendarHoldsFortyFourPreserved": true,
+    "receiptPolicyIntegrityUnchanged": true,
+    "crmIntegrityUnchanged": true
+  },
+  "capabilitiesWhenPrepared": {
+    "secrets": false,
+    "firestoreRead": false,
+    "writes": false,
+    "runtime": false,
+    "browser": false,
+    "deploy": false,
+    "functionsDeploy": false,
+    "rulesDeploy": false,
+    "production": false
+  },
+  "prohibitions": [
+    "do not create cobros from proposals or holds",
+    "do not modify receipts, policies or financial movements",
+    "do not use bank or financial history as direct collection writes",
+    "do not deploy Functions, Hosting or Rules",
+    "do not touch production, main or merge",
+    "do not store real rows, PII, policy numbers, amounts, secrets or passwords in repository evidence"
+  ],
+  "authorizationRequired": true,
+  "executionAuthorized": false,
+  "writeAuthorized": false,
+  "sourceOnly": true,
+  "containsPII": false,
+  "containsSecrets": false,
+  "containsPasswords": false
+}
