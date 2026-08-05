@@ -32,13 +32,15 @@ const replaceLine = (source, marker, replacement, label) => {
 
 const visual = read(VISUAL);
 const visualChecks = {
-  viewportCapture: visual.includes('fullPage: false'),
-  animationsDisabled: visual.includes("animations: 'disabled'"),
-  reducedMotion: visual.includes("reducedMotion: 'reduce'"),
-  routeFailureCode: visual.includes('VISUAL_SCREENSHOT_${route}'),
-  pageCloseFinally: visual.includes('if (page) await page.close().catch'),
+  cdpSession: visual.includes('newCDPSession(page)'),
+  cdpCapture: visual.includes('Page.captureScreenshot'),
+  viewportOnly: visual.includes('captureBeyondViewport: false'),
+  playwrightScreenshotRemoved: !visual.includes('page.screenshot('),
+  timeoutGuard: visual.includes('CDP_SCREENSHOT_${route}_TIMEOUT'),
+  pngValidation: visual.includes('isPng(png)'),
+  cdpDetachFinally: visual.includes('if (cdp) await cdp.detach().catch'),
   browserCloseFinally: visual.includes('if (browser) await browser.close().catch'),
-  schemaV2: visual.includes("schemaVersion: 'orbit360-block12-cumulative-visual-v2'")
+  schemaV3: visual.includes("schemaVersion: 'orbit360-block12-cumulative-visual-v3'")
 };
 const visualFailed = Object.entries(visualChecks).filter(([, ok]) => !ok).map(([id]) => id);
 if (visualFailed.length) throw new Error(`PIPELINE_MECHANISM_FAILURE:VISUAL_ROOTFIX_INCOMPLETE:${visualFailed.join(',')}`);
@@ -96,7 +98,7 @@ if (!registryMatches) {
 write(REGISTRY, JSON.stringify(registry, null, 2) + '\n');
 
 let engine = read(ENGINE);
-const engineAlreadyMaterialized = engine.includes(`const VERSION = '${VERSION}';`) && engine.includes("PREVIOUS_FUNCTIONAL_PASS") && engine.includes("VISUAL_HARNESS_ROOTFIX");
+const engineAlreadyMaterialized = engine.includes(`const VERSION = '${VERSION}';`) && engine.includes('PREVIOUS_FUNCTIONAL_PASS') && engine.includes('VISUAL_HARNESS_ROOTFIX');
 if (!engineAlreadyMaterialized) {
   engine = replaceOnce(engine, "const VERSION = '12.0.8';", `const VERSION = '${VERSION}';`, 'ENGINE_VERSION');
   engine = replaceLine(engine, "add('LIFECYCLE_ACTIVE'", "  add('LIFECYCLE_ACTIVE', lifecycle.status === 'OPERATIONAL_RUNTIME_LAB_VISUAL_ROOTFIX_READY' && lifecycle.singleGate === true && lifecycle.macroClosure === true);", 'ENGINE_LIFECYCLE_ACTIVE');
@@ -149,6 +151,15 @@ if (!engineAlreadyMaterialized) {
   );
 }
 
+if (!engine.includes("'tools/orbit360-validar-cdp-screenshot-sintetico-v20260804.mjs'")) {
+  engine = replaceOnce(
+    engine,
+    "  'orbit360-platform/docs/CIERRE-BLOQUE12-RUNTIME-FUNCIONAL-Y-ROOTFIX-VISUAL-20260804.md'\n];",
+    "  'orbit360-platform/docs/CIERRE-BLOQUE12-RUNTIME-FUNCIONAL-Y-ROOTFIX-VISUAL-20260804.md',\n  'tools/orbit360-validar-cdp-screenshot-sintetico-v20260804.mjs',\n  'orbit360-platform/runtime-gate-crm-v20260716/block12-cdp-screenshot-synthetic.json',\n  'orbit360-platform/runtime-gate-crm-v20260716/block12-visual-cdp-rootcause-v20260804.json'\n];",
+    'ENGINE_CDP_REQUIRED_FILES'
+  );
+}
+
 if (engine.includes("add('DEPLOY_PIPELINE_ROOTFIX'")) {
   engine = replaceLine(
     engine,
@@ -179,6 +190,16 @@ if (engine.includes("add('MATERIALIZER_REPLACEMENT_SAFE'")) {
 } else if (!engine.includes("add('VISUAL_MATERIALIZER_SAFE'")) {
   throw new Error('PIPELINE_MECHANISM_FAILURE:ENGINE_VISUAL_MATERIALIZER_SAFE_MISSING');
 }
+if (engine.includes("add('VISUAL_HARNESS_ROOTFIX'")) {
+  engine = replaceLine(
+    engine,
+    "add('VISUAL_HARNESS_ROOTFIX'",
+    "  const cdpEvidence = readJson('orbit360-platform/runtime-gate-crm-v20260716/block12-cdp-screenshot-synthetic.json');\n  add('CDP_VISUAL_HARNESS_ROOTFIX', scope.visualViewportCaptureRequired === true && scope.visualAnimationsDisabledRequired === true && scope.visualBrowserCloseFinallyRequired === true && visualHarness.includes('newCDPSession(page)') && visualHarness.includes('Page.captureScreenshot') && visualHarness.includes('captureBeyondViewport: false') && !visualHarness.includes('page.screenshot(') && visualHarness.includes('CDP_SCREENSHOT_${route}_TIMEOUT') && visualHarness.includes('isPng(png)') && visualHarness.includes('if (cdp) await cdp.detach().catch') && visualHarness.includes('if (browser) await browser.close().catch') && cdpEvidence.status === 'CDP_SCREENSHOT_SYNTHETIC_PASS' && cdpEvidence.classification === 'GO_PIPELINE_MECHANISM' && cdpEvidence.captureEngine === 'chromium-cdp' && cdpEvidence.deployExecuted === false && cdpEvidence.ok === true);",
+    'ENGINE_CDP_VISUAL_HARNESS'
+  );
+} else if (!engine.includes("add('CDP_VISUAL_HARNESS_ROOTFIX'")) {
+  throw new Error('PIPELINE_MECHANISM_FAILURE:ENGINE_CDP_VISUAL_HARNESS_MISSING');
+}
 write(ENGINE, engine);
 
 for (const file of [VISUAL, RUNTIME, ROUTER, ENGINE, 'tools/orbit360-block12-visual-readonly-integrity-v20260804.mjs']) {
@@ -186,9 +207,9 @@ for (const file of [VISUAL, RUNTIME, ROUTER, ENGINE, 'tools/orbit360-block12-vis
 }
 
 const payload = {
-  schemaVersion: 'orbit360-block12-visual-rootfix-source-v1',
+  schemaVersion: 'orbit360-block12-visual-rootfix-source-v2',
   status: 'VISUAL_ROOTFIX_SOURCE_PASS',
-  classification: 'PIPELINE_MECHANISM_FAILURE_CORRECTED',
+  classification: 'PIPELINE_MECHANISM_FAILURE_CORRECTED_WITH_CDP',
   gateId: GATE,
   contractVersion: VERSION,
   visualChecks,
@@ -197,6 +218,8 @@ const payload = {
   routerPhaseRegistered: read(ROUTER).includes('"OPERATIONAL_RUNTIME_LAB_VISUAL_REACTIVATION"'),
   registryMatches,
   engineVersionAligned: read(ENGINE).includes("const VERSION = '12.0.9'"),
+  cdpSyntheticPass: JSON.parse(read('orbit360-platform/runtime-gate-crm-v20260716/block12-cdp-screenshot-synthetic.json')).status === 'CDP_SCREENSHOT_SYNTHETIC_PASS',
+  playwrightScreenshotRemoved: !read(VISUAL).includes('page.screenshot('),
   secretsRead: false,
   firebaseCommandsExecuted: false,
   firestoreRead: false,
