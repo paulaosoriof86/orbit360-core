@@ -1,4 +1,4 @@
-name: Orbit 360 · Block 12 · reactivación visual layout-free LAB
+name: Orbit 360 · Block 12 · candidata visual aislada LAB
 
 on:
   push:
@@ -24,11 +24,12 @@ env:
   ORBIT360_REAL_TENANT_ID: alianzas-soluciones
   ORBIT360_HOSTING_CHANNEL: orbit360-operational-block12
   ORBIT360_EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+  ORBIT360_SOURCE_BASELINE: 548cffa50cddfd93ad2118f5a06e9bb420699bde
   ORBIT360_FUNCTIONS: orbit360OpsLeadsCommandLabV20260804,orbit360GetAdvisorOpsInboxLabV20260804,orbit360CobrosReconciliationCommandLabV20260804,orbit360RecurringInsuranceImportLabV20260804
 
 jobs:
-  visual-layoutfree-reactivation:
-    name: Gate → Functions/Hosting → video layout-free → integridad
+  lab-candidate-visible:
+    name: Gate → 4 Functions → Hosting → 8 rutas aisladas → integridad
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     steps:
@@ -36,7 +37,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
-          fetch-depth: 3
+          fetch-depth: 40
           persist-credentials: false
 
       - name: Preparar Node 22
@@ -44,7 +45,7 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Verificar request layout-free único
+      - name: Verificar request único y baseline congelado
         shell: bash
         run: |
           set -euo pipefail
@@ -54,32 +55,48 @@ jobs:
           test "${#CHANGED[@]}" = '1'
           test "${CHANGED[0]}" = "$ORBIT360_REQUEST_FILE"
           PARENT="$(git rev-parse HEAD^)"
-          jq -e --arg parent "$PARENT" '
-            .schemaVersion=="orbit360-block12-operational-runtime-lab-visual-layoutfree-request-v1" and
-            .status=="AUTHORIZED_VISUAL_LAYOUTFREE_REACTIVATION_AFTER_SYNTHETIC_PASS" and
-            .approved==true and .allowedExecutions==1 and .consumed==false and .replayAllowed==false and .retryAuthorized==true and
-            .authorizationRef=="user_continue_block12_visual_layoutfree_rootfix_20260804T1933-0600" and
-            .previousRuntimeRunId==30962756387 and .previousFunctionalStatus=="PASS" and
-            .previousFunctionalPassed==18 and .previousFunctionalFailed==0 and
-            .previousVisualRunId==30970150174 and .previousVisualFailureClassification=="PIPELINE_MECHANISM_FAILURE" and
-            .previousVisualFailureCode=="ROUTE_POLIZAS_DOM_SNAPSHOT_TIMEOUT" and
-            .layoutSyntheticRunId==30970624742 and .layoutSyntheticStatus=="LAYOUT_FREE_PROBE_SYNTHETIC_PASS" and
-            .videoSyntheticRunId==30969402434 and .videoSyntheticStatus=="VIDEO_FRAME_SYNTHETIC_PASS" and
-            .functionalReplayForbidden==true and .branch=="ays/backend-tenant-lab-v99-20260703" and
-            .pullRequest==5 and .projectId=="ays-orbit-360-lab" and
-            .gateId=="block12-operational-runtime-lab-v20260804" and .contractVersion=="12.0.11" and
-            .parentHead==$parent and .scope.syntheticTenant==false and .scope.syntheticAuthUsers==0 and
-            .scope.syntheticMemberships==0 and .scope.functionalScenarioReplay==false and
-            .scope.realTenantWrites==false and .scope.realDataReimport==false and
-            .scope.rules==false and .scope.production==false and .scope.main==false and .scope.merge==false
+          jq -e --arg parent "$PARENT" --arg baseline "$ORBIT360_SOURCE_BASELINE" '
+            .schemaVersion=="orbit360-go-lab-candidate-visible-request-v2" and
+            .rcId=="RC-AYS-LAB-CANONICA-01" and
+            .status=="AUTHORIZED_GO_LAB_CANDIDATE_VISIBLE" and
+            .approved==true and .allowedExecutions==1 and .replayAllowed==false and
+            .authorizationRef=="user_authorized_microblock_2_1_20260804T2207-0600" and
+            .branch=="ays/backend-tenant-lab-v99-20260703" and .pullRequest==5 and
+            .sourceBaseline==$baseline and .parentHead==$parent and
+            .previousRuntimeRunId==30962756387 and .previousFunctionalPassed==18 and .previousFunctionalFailed==0 and
+            .previousVisualRunId==30971226259 and .previousVisualFailureClassification=="PIPELINE_MECHANISM_FAILURE" and
+            .previousVisualFailureCode=="ROUTE_ASEGURADORAS_NAVIGATION_TIMEOUT" and
+            .isolatedSyntheticRunId==30971707956 and .isolatedSyntheticStatus=="ISOLATED_ROUTES_SYNTHETIC_PASS" and
+            .replacementMechanism=="ONE_ISOLATED_BROWSER_CONTEXT_AND_DIRECT_URL_PER_ROUTE" and
+            .functionalReplayForbidden==true and .retainPreviewOnCaptureOnlyFailure==true and
+            .projectId=="ays-orbit-360-lab" and .gateId=="block12-operational-runtime-lab-v20260804" and
+            .contractVersion=="12.0.11" and
+            .scope.syntheticTenant==false and .scope.syntheticAuthUsers==0 and .scope.syntheticMemberships==0 and
+            .scope.functionalScenarioReplay==false and .scope.realTenantWrites==false and
+            .scope.realDataReimport==false and .scope.rules==false and .scope.production==false and
+            .scope.main==false and .scope.merge==false and (.scope.functionNames|length)==4 and
+            (.scope.visualRoutes|length)==8 and .scope.readonlyIntegrityBeforeAfter==true
           ' "$ORBIT360_REQUEST_FILE" >/dev/null
+          git diff --quiet "$ORBIT360_SOURCE_BASELINE"..HEAD^ -- \
+            orbit360-platform/index.html orbit360-platform/core orbit360-platform/modules \
+            orbit360-platform/styles orbit360-platform/data functions firebase.json firestore.rules \
+            tools/orbit360-block12-cumulative-visual-v20260804.mjs \
+            tools/orbit360-block12-visual-readonly-integrity-v20260804.mjs
 
       - name: Gate contractual obligatorio antes de secretos
         shell: bash
         run: |
           set -euo pipefail
           node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
-          jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="12.0.11" and .failed==0 and .executionAuthorized==true and .secretAccessAuthorized==true and .firestoreReadAuthorized==true and .writeAuthorized==false and .authWriteAuthorized==false and .maximumSyntheticAuthUsers==0 and .maximumSyntheticMemberships==0 and .runtimeAuthorized==false and .visualOnlyAuthorized==true and .browserAuthorized==true and .functionsDeployAuthorized==true and .hostingPreviewAuthorized==true and .rulesDeployAuthorized==false and .productionAuthorized==false and .realTenantWritesAuthorized==false and .realDataReimportAuthorized==false and .secretAccess==false and .firestoreRead==false and .firestoreWrites==0 and .authWrites==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false' "$ORBIT360_EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+          jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="12.0.11" and .failed==0 and
+            .executionAuthorized==true and .secretAccessAuthorized==true and .firestoreReadAuthorized==true and
+            .writeAuthorized==false and .authWriteAuthorized==false and .maximumSyntheticAuthUsers==0 and
+            .maximumSyntheticMemberships==0 and .runtimeAuthorized==false and .visualOnlyAuthorized==true and
+            .browserAuthorized==true and .functionsDeployAuthorized==true and .hostingPreviewAuthorized==true and
+            .rulesDeployAuthorized==false and .productionAuthorized==false and .realTenantWritesAuthorized==false and
+            .realDataReimportAuthorized==false and .secretAccess==false and .firestoreRead==false and
+            .firestoreWrites==0 and .authWrites==0 and .runtimeExecuted==false and .browserExecuted==false and
+            .deployExecuted==false' "$ORBIT360_EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
 
       - name: Resolver identidad LAB después del gate
         shell: bash
@@ -91,12 +108,12 @@ jobs:
           set -euo pipefail
           SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-${SA_ORBIT_360_LAB:-${SA_DEFAULT:-}}}"
           test -n "$SERVICE_ACCOUNT"
-          KEY_FILE="$RUNNER_TEMP/orbit360-block12-layoutfree-service-account.json"
+          KEY_FILE="$RUNNER_TEMP/orbit360-microblock21-service-account.json"
           printf '%s' "$SERVICE_ACCOUNT" > "$KEY_FILE"
           chmod 600 "$KEY_FILE"
           test "$(jq -r '.project_id // empty' "$KEY_FILE")" = "$ORBIT360_PROJECT_ID"
           echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
-          echo "ORBIT360_BLOCK12_VISUAL_INTEGRITY_STATE=$RUNNER_TEMP/orbit360-block12-layoutfree-integrity-private.json" >> "$GITHUB_ENV"
+          echo "ORBIT360_BLOCK12_VISUAL_INTEGRITY_STATE=$RUNNER_TEMP/orbit360-microblock21-integrity-private.json" >> "$GITHUB_ENV"
           echo "ORBIT360_LOCAL_FIREBASE_CONFIG_FILE=$GITHUB_WORKSPACE/orbit360-platform/core/auth-firebase.config.local.js" >> "$GITHUB_ENV"
 
       - name: Instalar herramientas reproducibles
@@ -110,12 +127,15 @@ jobs:
           npx playwright install --with-deps chromium >/dev/null
           node --input-type=module -e "import ffmpegPath from 'ffmpeg-static'; import fs from 'node:fs'; if(!ffmpegPath || !fs.existsSync(ffmpegPath)) process.exit(1);"
 
-      - name: Preparar config Hosting y snapshot read-only
+      - name: Preparar config, inventarios y snapshot before
         shell: bash
         run: |
           set -euo pipefail
+          npx firebase functions:list --project "$ORBIT360_PROJECT_ID" --json > "$RUNNER_TEMP/functions-before.json" || printf '{}\n' > "$RUNNER_TEMP/functions-before.json"
+          npx firebase hosting:channel:list --project "$ORBIT360_PROJECT_ID" --json > "$RUNNER_TEMP/channels-before.json" || printf '{}\n' > "$RUNNER_TEMP/channels-before.json"
           node --input-type=module - <<'NODE'
           import fs from 'node:fs';
+          import path from 'node:path';
           import { GoogleAuth } from 'google-auth-library';
           const project=process.env.ORBIT360_PROJECT_ID;
           const output=process.env.ORBIT360_LOCAL_FIREBASE_CONFIG_FILE;
@@ -123,48 +143,60 @@ jobs:
           const client=await google.getClient();
           const list=await client.request({url:`https://firebase.googleapis.com/v1beta1/projects/${project}/webApps`});
           const apps=[].concat(list.data?.apps||[]).filter(app=>String(app.state||'').toUpperCase()!=='DELETED').sort((a,b)=>String(a.appId||'').localeCompare(String(b.appId||'')));
-          if(!apps.length)throw new Error('DATA_CONTRACT_FAILURE:WEB_APP_NOT_FOUND');
+          if(!apps.length) throw new Error('DATA_CONTRACT_FAILURE:WEB_APP_NOT_FOUND');
           const response=await client.request({url:`https://firebase.googleapis.com/v1beta1/${apps[0].name}/config`});
           const config=response.data||{};
-          if(config.projectId!==project||!config.apiKey||!config.appId||!config.authDomain)throw new Error('DATA_CONTRACT_FAILURE:WEB_CONFIG_INCOMPLETE');
-          fs.mkdirSync(new URL('.',`file://${output}`).pathname,{recursive:true});
+          if(config.projectId!==project||!config.apiKey||!config.appId||!config.authDomain) throw new Error('DATA_CONTRACT_FAILURE:WEB_CONFIG_INCOMPLETE');
+          fs.mkdirSync(path.dirname(output),{recursive:true});
           fs.writeFileSync(output,`window.ORBIT_FIREBASE_LAB_CONFIG=${JSON.stringify({apiKey:config.apiKey,authDomain:config.authDomain,projectId:config.projectId,storageBucket:config.storageBucket||'',messagingSenderId:config.messagingSenderId||'',appId:config.appId})};\nwindow.OrbitBackend=Object.assign({},window.OrbitBackend||{},{firebaseConfigSource:'management-api',firebaseConfigScope:'lab-only'});\n`,'utf8');
           NODE
           node tools/orbit360-block12-visual-readonly-integrity-v20260804.mjs before
           jq -e '.status=="VISUAL_READONLY_SNAPSHOT_BEFORE_PASS" and .firestoreWrites==0 and .authWrites==0 and .ok==true' "$ORBIT360_EVIDENCE_DIR/block12-visual-readonly-integrity.json" >/dev/null
 
       - name: Desplegar y verificar cuatro Functions allowlisted
-        id: functions_deploy
+        id: functions
         shell: bash
         run: |
-          set -euo pipefail
+          set +e
           echo "attempted=true" >> "$GITHUB_OUTPUT"
           ONLY=""
           for NAME in ${ORBIT360_FUNCTIONS//,/ }; do ONLY="${ONLY}${ONLY:+,}functions:${NAME}"; done
           npx firebase deploy --project "$ORBIT360_PROJECT_ID" --only "$ONLY" --non-interactive --force | tee "$RUNNER_TEMP/functions-deploy.log"
-          npx firebase functions:list --project "$ORBIT360_PROJECT_ID" --json > "$RUNNER_TEMP/functions-after.json" || true
+          CODE=${PIPESTATUS[0]}
           VERIFIED=0
-          for NAME in ${ORBIT360_FUNCTIONS//,/ }; do grep -Fq "$NAME" "$RUNNER_TEMP/functions-after.json" && VERIFIED=$((VERIFIED+1)); done
-          test "$VERIFIED" = 4
+          npx firebase functions:list --project "$ORBIT360_PROJECT_ID" --json > "$RUNNER_TEMP/functions-after.json" || true
+          if [ "$CODE" = 0 ]; then
+            for NAME in ${ORBIT360_FUNCTIONS//,/ }; do grep -Fq "$NAME" "$RUNNER_TEMP/functions-after.json" && VERIFIED=$((VERIFIED+1)); done
+          fi
+          echo "exit_code=$CODE" >> "$GITHUB_OUTPUT"
           echo "verified_count=$VERIFIED" >> "$GITHUB_OUTPUT"
-          echo "deployed=true" >> "$GITHUB_OUTPUT"
+          test "$CODE" = 0 && test "$VERIFIED" = 4 && echo "deployed=true" >> "$GITHUB_OUTPUT" || echo "deployed=false" >> "$GITHUB_OUTPUT"
+          exit 0
 
       - name: Desplegar Hosting preview LAB
-        id: hosting_deploy
+        id: hosting
+        if: always() && steps.functions.outputs.verified_count == '4'
         shell: bash
         run: |
-          set -euo pipefail
+          set +e
           echo "attempted=true" >> "$GITHUB_OUTPUT"
           LOG="$RUNNER_TEMP/hosting-channel.log"
           npx firebase hosting:channel:deploy "$ORBIT360_HOSTING_CHANNEL" --expires 7d --project "$ORBIT360_PROJECT_ID" --non-interactive | tee "$LOG"
+          CODE=${PIPESTATUS[0]}
           URL="$(grep -Eo 'https://[-A-Za-z0-9.]+\.web\.app' "$LOG" | tail -1)"
-          test -n "$URL"
-          echo "ORBIT360_PREVIEW_URL=$URL" >> "$GITHUB_ENV"
+          echo "exit_code=$CODE" >> "$GITHUB_OUTPUT"
           echo "url=$URL" >> "$GITHUB_OUTPUT"
-          echo "deployed=true" >> "$GITHUB_OUTPUT"
+          if [ "$CODE" = 0 ] && [ -n "$URL" ]; then
+            echo "ORBIT360_PREVIEW_URL=$URL" >> "$GITHUB_ENV"
+            echo "deployed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "deployed=false" >> "$GITHUB_OUTPUT"
+          fi
+          exit 0
 
-      - name: Verificar ocho rutas mediante video layout-free
+      - name: Verificar ocho rutas aisladas y directas
         id: visual
+        if: always() && steps.hosting.outputs.deployed == 'true'
         shell: bash
         run: |
           set +e
@@ -175,64 +207,114 @@ jobs:
           echo "exit_code=$CODE" >> "$GITHUB_OUTPUT"
           exit 0
 
-      - name: Confirmar integridad final read-only
+      - name: Confirmar snapshot after e integridad
         id: integrity
         if: always()
         shell: bash
         run: |
           set +e
-          node tools/orbit360-block12-visual-readonly-integrity-v20260804.mjs after
-          CODE=$?
+          CODE=97
+          if [ -n "${ORBIT360_BLOCK12_VISUAL_INTEGRITY_STATE:-}" ] && [ -f "$ORBIT360_BLOCK12_VISUAL_INTEGRITY_STATE" ]; then
+            node tools/orbit360-block12-visual-readonly-integrity-v20260804.mjs after
+            CODE=$?
+          fi
           echo "exit_code=$CODE" >> "$GITHUB_OUTPUT"
           exit 0
 
-      - name: Consolidar evidencia o retirar preview
+      - name: Consolidar decisión y aplicar retención segura
+        id: decision
         if: always()
         shell: bash
+        env:
+          PREVIEW_URL: ${{ steps.hosting.outputs.url }}
+          FUNCTIONS_VERIFIED: ${{ steps.functions.outputs.verified_count }}
+          FUNCTIONS_ATTEMPTED: ${{ steps.functions.outputs.attempted }}
+          HOSTING_ATTEMPTED: ${{ steps.hosting.outputs.attempted }}
+          HOSTING_DEPLOYED: ${{ steps.hosting.outputs.deployed }}
+          VISUAL_EXIT: ${{ steps.visual.outputs.exit_code }}
+          INTEGRITY_EXIT: ${{ steps.integrity.outputs.exit_code }}
         run: |
           set -euo pipefail
           VISUAL="$ORBIT360_EVIDENCE_DIR/block12-cumulative-visual-sanitized.json"
           INTEGRITY="$ORBIT360_EVIDENCE_DIR/block12-visual-readonly-integrity.json"
-          VISUAL_OK=false; INTEGRITY_OK=false
-          test -f "$VISUAL" && VISUAL_OK="$(jq -r '(.schemaVersion=="orbit360-block12-cumulative-visual-v5" and .status=="CUMULATIVE_VISUAL_LAB_PASS" and .classification=="GO_LAB_CUMULATIVE_VISUAL_EVIDENCE_READY" and .captureEngine=="playwright-record-video-plus-ffmpeg-static-frame" and .domProbe=="layout-free-mount-auth-probe" and .layoutDependentTextReadUsed==false and .technicalCopyReview=="manual-frame-review-required-before-final-approval" and .screenshotApisUsed==false and .cdpScreenshotUsed==false and .routeCount==8 and .ok==true and ([.routes[] | select(.rendered!=true or .authenticated!=true or .loginVisible==true or (.frameBytes // 0)<=1000 or .technicalCopyCheck!="manual-frame-review-required")] | length)==0 and (.pageErrors|length)==0)' "$VISUAL")"
+          VISUAL_OK=false
+          INTEGRITY_OK=false
+          test -f "$VISUAL" && VISUAL_OK="$(jq -r '(.schemaVersion=="orbit360-block12-cumulative-visual-v6" and .status=="CUMULATIVE_VISUAL_LAB_PASS" and .classification=="GO_LAB_CUMULATIVE_VISUAL_EVIDENCE_READY" and .navigationMechanism=="one-isolated-browser-context-and-direct-url-per-route" and .inPageHashNavigationUsed==false and .captureEngine=="isolated-context-direct-url-video-plus-ffmpeg-static-frame" and .layoutDependentTextReadUsed==false and .screenshotApisUsed==false and .cdpScreenshotUsed==false and .customTokenEphemeralPerRoute==true and .routeCount==8 and .authWrites==0 and .firestoreWrites==0 and .realTenantWrites==0 and .ok==true and ([.routes[] | select(.isolatedContext!=true or .directRouteUrlConfirmed!=true or .signInResolved!=true or (.frameBytes // 0)<=1000 or (.videoBytes // 0)<=1000 or (.pageErrors|length)>0)] | length)==0 and (.pageErrors|length)==0)' "$VISUAL")"
           test -f "$INTEGRITY" && INTEGRITY_OK="$(jq -r '(.status=="VISUAL_READONLY_INTEGRITY_PASS" and .unchanged==true and .firestoreWrites==0 and .authWrites==0 and .ok==true)' "$INTEGRITY")"
+          FUNCTIONS_OK=false
+          HOSTING_OK=false
+          PRODUCT_OK=false
           PASS=false
-          if [ "$VISUAL_OK" = true ] && [ "$INTEGRITY_OK" = true ] && [ "${{ steps.visual.outputs.exit_code }}" = 0 ] && [ "${{ steps.integrity.outputs.exit_code }}" = 0 ] && [ "${{ steps.functions_deploy.outputs.verified_count }}" = 4 ]; then PASS=true; fi
-          if [ "$PASS" != true ]; then
-            if [ "${{ steps.functions_deploy.outputs.attempted }}" = true ]; then for NAME in ${ORBIT360_FUNCTIONS//,/ }; do npx firebase functions:delete "$NAME" --region us-central1 --project "$ORBIT360_PROJECT_ID" --force || true; done; fi
-            if [ "${{ steps.hosting_deploy.outputs.attempted }}" = true ]; then npx firebase hosting:channel:delete "$ORBIT360_HOSTING_CHANNEL" --project "$ORBIT360_PROJECT_ID" --force || true; fi
+          RETAIN=false
+          [ "${FUNCTIONS_VERIFIED:-0}" = 4 ] && FUNCTIONS_OK=true
+          [ "${HOSTING_DEPLOYED:-false}" = true ] && [ -n "${PREVIEW_URL:-}" ] && HOSTING_OK=true
+          [ "$FUNCTIONS_OK" = true ] && [ "$HOSTING_OK" = true ] && [ "$INTEGRITY_OK" = true ] && PRODUCT_OK=true
+          [ "$PRODUCT_OK" = true ] && [ "$VISUAL_OK" = true ] && [ "${VISUAL_EXIT:-99}" = 0 ] && [ "${INTEGRITY_EXIT:-99}" = 0 ] && PASS=true
+          [ "$PRODUCT_OK" = true ] && RETAIN=true
+
+          if [ "$RETAIN" != true ]; then
+            if [ "${FUNCTIONS_ATTEMPTED:-false}" = true ]; then
+              for NAME in ${ORBIT360_FUNCTIONS//,/ }; do
+                if ! grep -Fq "$NAME" "$RUNNER_TEMP/functions-before.json" 2>/dev/null; then
+                  npx firebase functions:delete "$NAME" --region us-central1 --project "$ORBIT360_PROJECT_ID" --force || true
+                fi
+              done
+            fi
+            if [ "${HOSTING_ATTEMPTED:-false}" = true ] && ! grep -Fq "$ORBIT360_HOSTING_CHANNEL" "$RUNNER_TEMP/channels-before.json" 2>/dev/null; then
+              npx firebase hosting:channel:delete "$ORBIT360_HOSTING_CHANNEL" --project "$ORBIT360_PROJECT_ID" --force || true
+            fi
           fi
-          jq -n --arg generatedAt "$(date -u +%Y-%m-%dT%H:%M:%SZ)" --arg sourceHead "$(git rev-parse HEAD^)" --arg previewUrl "${ORBIT360_PREVIEW_URL:-}" --arg visualExit "${{ steps.visual.outputs.exit_code }}" --arg integrityExit "${{ steps.integrity.outputs.exit_code }}" --argjson pass "$PASS" '{schemaVersion:"orbit360-block12-visual-reactivation-decision-v3",generatedAt:$generatedAt,gateId:"block12-operational-runtime-lab-v20260804",contractVersion:"12.0.11",priorFunctionalRunId:30962756387,priorFunctionalPassed:18,priorFunctionalFailed:0,videoSyntheticRunId:30969402434,layoutSyntheticRunId:30970624742,functionalReplayExecuted:false,sourceHead:$sourceHead,decision:(if $pass then "GO_LAB_OPERATIONAL_RUNTIME_AND_CUMULATIVE_VISUAL_EVIDENCE_READY" else "STOP_BLOCK12_VISUAL_LAYOUTFREE_REACTIVATION" end),classification:(if $pass then "GO_LAB_PENDING_MANUAL_FRAME_REVIEW" else "PIPELINE_OR_VISUAL_FAILURE" end),manualFrameReviewRequired:$pass,previewUrl:(if $pass then $previewUrl else "" end),visualExitCode:$visualExit,integrityExitCode:$integrityExit,functionsKept:$pass,hostingPreviewKept:$pass,rulesDeployed:false,syntheticTenantCreated:false,syntheticAuthUsersCreated:0,realTenantWrites:0,realDataReimported:false,productionTouched:false,mainTouched:false,mergeExecuted:false,authorizationConsumed:true,allowedExecutionsRemaining:0,replayAllowed:false,containsPII:false,containsSecrets:false,ok:$pass}' > "$ORBIT360_EVIDENCE_DIR/block12-visual-reactivation-decision.json"
-          if [ "$PASS" != true ]; then exit 45; fi
+
+          DECISION='STOP_LAB_CANDIDATE_REACTIVATION_ROLLED_BACK'
+          CLASSIFICATION='PIPELINE_OR_INTEGRITY_FAILURE'
+          if [ "$PASS" = true ]; then
+            DECISION='GO_LAB_CANDIDATE_VISIBLE'
+            CLASSIFICATION='GO_LAB_PENDING_MANUAL_FRAME_REVIEW'
+          elif [ "$RETAIN" = true ]; then
+            DECISION='STOP_VISUAL_EVIDENCE_PREVIEW_RETAINED'
+            CLASSIFICATION='PIPELINE_MECHANISM_FAILURE'
+          fi
+
+          jq -n \
+            --arg generatedAt "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            --arg requestCommit "$(git rev-parse HEAD)" \
+            --arg deployedSourceHead "$(git rev-parse HEAD^)" \
+            --arg sourceBaseline "$ORBIT360_SOURCE_BASELINE" \
+            --arg decision "$DECISION" --arg classification "$CLASSIFICATION" \
+            --arg previewUrl "${PREVIEW_URL:-}" \
+            --arg visualExit "${VISUAL_EXIT:-99}" --arg integrityExit "${INTEGRITY_EXIT:-99}" \
+            --argjson pass "$PASS" --argjson retain "$RETAIN" --argjson productOk "$PRODUCT_OK" \
+            --argjson visualOk "$VISUAL_OK" --argjson integrityOk "$INTEGRITY_OK" \
+            '{schemaVersion:"orbit360-go-lab-candidate-visible-decision-v1",generatedAt:$generatedAt,rcId:"RC-AYS-LAB-CANONICA-01",gateId:"GO_LAB_CANDIDATE_VISIBLE",contractGateId:"block12-operational-runtime-lab-v20260804",contractVersion:"12.0.11",requestCommit:$requestCommit,deployedSourceHead:$deployedSourceHead,sourceBaseline:$sourceBaseline,priorFunctionalRunId:30962756387,functionalReplayExecuted:false,isolatedSyntheticRunId:30971707956,decision:$decision,classification:$classification,productAndIntegrityPass:$productOk,visualEvidencePass:$visualOk,integrityPass:$integrityOk,previewUrl:(if $retain then $previewUrl else "" end),functionsVerified:4,functionsKept:$retain,hostingPreviewKept:$retain,manualFrameReviewRequired:$pass,visualExitCode:$visualExit,integrityExitCode:$integrityExit,rulesDeployed:false,realTenantWrites:0,authWrites:0,realDataReimported:false,productionTouched:false,mainTouched:false,mergeExecuted:false,authorizationConsumed:true,allowedExecutionsRemaining:0,replayAllowed:false,ok:$pass,containsPII:false,containsSecrets:false}' > "$ORBIT360_EVIDENCE_DIR/go-lab-candidate-visible-decision-v20260804.json"
+          echo "decision=$DECISION" >> "$GITHUB_OUTPUT"
+          echo "preview_url=$(if [ "$RETAIN" = true ]; then printf '%s' "${PREVIEW_URL:-}"; fi)" >> "$GITHUB_OUTPUT"
+          [ "$PASS" = true ] || exit 45
 
       - name: Publicar evidencias sanitizadas
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: orbit360-block12-visual-layoutfree-${{ github.run_id }}
+          name: orbit360-go-lab-candidate-visible-${{ github.run_id }}
           path: |
             orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
-            orbit360-platform/runtime-gate-crm-v20260716/block12-layoutfree-visual-contract-source-v20260804.json
-            orbit360-platform/runtime-gate-crm-v20260716/block12-layout-free-probe-synthetic.json
-            orbit360-platform/runtime-gate-crm-v20260716/block12-layout-probe-rootcause-v20260804.json
-            orbit360-platform/runtime-gate-crm-v20260716/block12-video-frame-synthetic.json
-            orbit360-platform/runtime-gate-crm-v20260716/block12-functional-pass-before-visual-rootfix-v20260804.json
             orbit360-platform/runtime-gate-crm-v20260716/block12-cumulative-visual-sanitized.json
-            orbit360-platform/runtime-gate-crm-v20260716/block12-visual-readonly-integrity.json
-            orbit360-platform/runtime-gate-crm-v20260716/block12-visual-reactivation-decision.json
             orbit360-platform/runtime-gate-crm-v20260716/block12-cumulative-visual/*.png
-          if-no-files-found: warn
+            orbit360-platform/runtime-gate-crm-v20260716/block12-visual-readonly-integrity.json
+            orbit360-platform/runtime-gate-crm-v20260716/go-lab-candidate-visible-decision-v20260804.json
           retention-days: 14
+          if-no-files-found: warn
 
-      - name: Publicar decisión en PR 5
+      - name: Publicar cierre sanitizado en PR 5
         if: always()
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
+          DECISION: ${{ steps.decision.outputs.decision }}
+          PREVIEW_URL: ${{ steps.decision.outputs.preview_url }}
+          FUNCTIONS_VERIFIED: ${{ steps.functions.outputs.verified_count }}
+          VISUAL_EXIT: ${{ steps.visual.outputs.exit_code }}
+          INTEGRITY_EXIT: ${{ steps.integrity.outputs.exit_code }}
         run: |
-          FILE="$ORBIT360_EVIDENCE_DIR/block12-visual-reactivation-decision.json"
-          DECISION="STOP_BLOCK12_LAYOUTFREE_BEFORE_DECISION"; CLASSIFICATION="PIPELINE_MECHANISM_FAILURE"; PREVIEW=""
-          if [ -f "$FILE" ]; then DECISION="$(jq -r '.decision' "$FILE")"; CLASSIFICATION="$(jq -r '.classification' "$FILE")"; PREVIEW="$(jq -r '.previewUrl // ""' "$FILE")"; fi
-          BODY="## Block 12 · reactivación visual layout-free · run ${GITHUB_RUN_ID}\n\n- Decisión: \`${DECISION}\`\n- Clasificación: \`${CLASSIFICATION}\`\n- Runtime funcional reutilizado: \`30962756387 · 18/18 PASS\`\n- Probe layout-free sintético: \`30970624742 · PASS\`\n- Repetición de escenarios funcionales: no\n- Rules/datos sintéticos/reimportación/producción/main/merge: no"
-          if [ -n "$PREVIEW" ]; then BODY="${BODY}\n- Candidata visual LAB: ${PREVIEW}"; fi
+          set -euo pipefail
+          BODY="## RC-AYS-LAB-CANONICA-01 · Microbloque 2.1 · run ${GITHUB_RUN_ID}\n\n- Decisión: \`${DECISION:-NO_DECISION}\`\n- Functions allowlisted verificadas: \`${FUNCTIONS_VERIFIED:-0}/4\`\n- Visual exit: \`${VISUAL_EXIT:-no-ejecutado}\`\n- Integridad exit: \`${INTEGRITY_EXIT:-no-ejecutado}\`\n- URL LAB retenida: ${PREVIEW_URL:-no}\n- Repetición de 18 escenarios: no\n- Rules, reimportación, producción, main o merge: no"
           gh api "repos/${GITHUB_REPOSITORY}/issues/5/comments" -f body="$BODY" >/dev/null
