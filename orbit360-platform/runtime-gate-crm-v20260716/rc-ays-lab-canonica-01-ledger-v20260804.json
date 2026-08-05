@@ -1,0 +1,130 @@
+{
+  "schemaVersion": "orbit360-rc-ays-canonical-ledger-v1",
+  "rcId": "RC-AYS-LAB-CANONICA-01",
+  "createdAt": "2026-08-04T21:38:00-06:00",
+  "updatedAt": "2026-08-04T21:38:00-06:00",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "pullRequestStateRequired": "draft/open",
+  "sourceBaseline": "548cffa50cddfd93ad2118f5a06e9bb420699bde",
+  "candidateHead": "548cffa50cddfd93ad2118f5a06e9bb420699bde",
+  "planPath": "orbit360-platform/docs/PLAN-UNICO-SALIDA-RC-AYS-LAB-CANONICA-01-20260804.md",
+  "planCommit": "79ebbd0c5edeb9bed09f733d54eb8c14393d56ba",
+  "ledgerPath": "orbit360-platform/runtime-gate-crm-v20260716/rc-ays-lab-canonica-01-ledger-v20260804.json",
+  "activeMacroblock": "1",
+  "activeMicroblock": "1.0",
+  "activeGate": "PASS_PLAN_PERSISTED",
+  "status": "DOCUMENTED_PENDING_PR_ANCHOR",
+  "closedFacts": {
+    "runtimeFunctionalRunId": 30962756387,
+    "runtimeFunctionalPassed": 18,
+    "runtimeFunctionalFailed": 0,
+    "runtimeFunctionalStatus": "PASS",
+    "visualRootCauseClassification": "PIPELINE_MECHANISM_FAILURE",
+    "visualRootCauseCode": "ROUTE_ASEGURADORAS_NAVIGATION_TIMEOUT",
+    "visualReplacementMechanism": "ONE_ISOLATED_BROWSER_CONTEXT_AND_DIRECT_URL_PER_ROUTE",
+    "stopRetryForInPageHashNavigation": true,
+    "cobrosReported": 365,
+    "cobrosConfirmedMaterializedAtSourceOnlyCut": 5,
+    "carteraPending": 641,
+    "carteraOverdueOrDemandable": 99,
+    "carteraFuture": 542,
+    "conciliationHolds": 44
+  },
+  "antiDriftControls": {
+    "singleRc": true,
+    "singleBranch": true,
+    "singlePr": true,
+    "singleOwnerPerRoute": true,
+    "singleGatePerClosure": true,
+    "stopRetryOnRepeatedFailureFamily": true,
+    "noGeneralAuditWithoutNewInput": true,
+    "noReimportToFixVisualization": true,
+    "noManualStepsForPaula": true,
+    "noProduction": true,
+    "noMain": true,
+    "noMerge": true
+  },
+  "microblocks": [
+    {
+      "id": "1.0",
+      "name": "Plan y ledger persistentes",
+      "status": "IN_PROGRESS",
+      "gate": "PASS_PLAN_PERSISTED",
+      "evidence": [
+        "planCommit:79ebbd0c5edeb9bed09f733d54eb8c14393d56ba"
+      ],
+      "writesToRealData": 0,
+      "deployExecuted": false,
+      "secretsUsed": false
+    },
+    {
+      "id": "1.1",
+      "name": "Reconciliacion forense focalizada del baseline",
+      "status": "PENDING",
+      "gate": "PASS_CANONICAL_BASELINE",
+      "scope": [
+        "owners",
+        "scripts loaded by index",
+        "bridges",
+        "module best versions",
+        "counts reconciliation",
+        "PR status correction"
+      ]
+    },
+    {
+      "id": "2.0",
+      "name": "Validador sintetico de rutas aisladas",
+      "status": "PENDING",
+      "gate": "PASS_ISOLATED_ROUTE_HARNESS"
+    },
+    {
+      "id": "2.1",
+      "name": "Visual LAB read-only retenida",
+      "status": "PENDING",
+      "gate": "GO_LAB_CANDIDATE_VISIBLE"
+    },
+    {
+      "id": "3.0",
+      "name": "Backend Ops Leads durable",
+      "status": "PENDING",
+      "gate": "OPS_LEADS_BACKEND_LAB_COMPLETE"
+    },
+    {
+      "id": "4.0",
+      "name": "Replay completo read-only de Cobros",
+      "status": "PENDING",
+      "gate": "PASS_COBROS_FULL_REPLAY"
+    },
+    {
+      "id": "4.1",
+      "name": "Materializacion durable de Cobros",
+      "status": "PENDING",
+      "gate": "COBROS_REAL_LEDGER_COMPLETE"
+    },
+    {
+      "id": "5.0",
+      "name": "Integracion acumulativa de modulos aprobados",
+      "status": "PENDING",
+      "gate": "RC_ACCUMULATIVE_MODULES_COMPLETE"
+    },
+    {
+      "id": "6.0",
+      "name": "Revision visual acumulativa",
+      "status": "PENDING",
+      "gate": "RELEASE_CANDIDATE_ACCEPTED"
+    },
+    {
+      "id": "7.0",
+      "name": "Go-live controlado",
+      "status": "BLOCKED_UNTIL_AUTHORIZATION",
+      "gate": "GO_PRODUCTION_A&S"
+    }
+  ],
+  "currentClassification": "PIPELINE_MECHANISM_FAILURE",
+  "currentOwner": "canonical continuity documentation and PR state",
+  "exactNextAction": "Anchor the plan and ledger in the live PR body, close microblock 1.0, then begin microblock 1.1 without Firebase, secrets, deploy or real-data writes.",
+  "containsPII": false,
+  "containsSecrets": false
+}
