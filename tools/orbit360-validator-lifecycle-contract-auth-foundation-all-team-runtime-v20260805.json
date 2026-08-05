@@ -1,0 +1,108 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
+  "gateId": "block-auth-foundation-all-team-runtime-v20260805",
+  "gateContractVersion": "13.7.0",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
+  "status": "AUTH_FOUNDATION_ALL_TEAM_RUNTIME_AUTHORIZED_ONCE",
+  "executionProfile": {
+    "phase": "AUTH_FOUNDATION_ALL_TEAM_RUNTIME",
+    "capabilities": {
+      "secrets": true,
+      "firestoreRead": true,
+      "writes": true,
+      "runtime": true,
+      "browser": false,
+      "deploy": true,
+      "functionsDeploy": true,
+      "rulesDeploy": false,
+      "production": false
+    }
+  },
+  "singleGate": true,
+  "singleMacroblock": true,
+  "rcId": "RC-AYS-LAB-CANONICA-01",
+  "authorization": {
+    "requiredForExecution": true,
+    "activeRequest": true,
+    "allowedExecutions": 1,
+    "request": ".github/orbit360-requests/auth-foundation-all-team-runtime-v20260805.json",
+    "authorizationRef": "user_authorized_auth_foundation_all_team_runtime_20260805T1234-0600",
+    "authorizedAt": "2026-08-05T12:34:00-06:00",
+    "consumed": false,
+    "replayAllowed": false
+  },
+  "sourceOnlyPrerequisite": {
+    "lifecycle": "tools/orbit360-validator-lifecycle-contract-auth-foundation-all-team-source-only-v20260805.json",
+    "requiredStatus": "AUTH_FOUNDATION_ALL_TEAM_SOURCE_ONLY_CONSUMED_PASS",
+    "requiredDecision": "GO_AUTH_FOUNDATION_ALL_TEAM_CONTROL_PLANE",
+    "requiredChecks": "29/29"
+  },
+  "coverageContract": {
+    "currentActiveTeamExpected": 7,
+    "currentIdentityCoverageRequired": "7/7",
+    "functionalRoleProfilesRequired": ["direccion", "operativo", "asesor"],
+    "functionalProfileCoverageRequired": "3/3",
+    "futureUsersSupported": true,
+    "dynamicRosterSource": "tenant_team_configuration",
+    "genericOwnerMayHardcodePeople": false
+  },
+  "runtimeBoundary": {
+    "projectId": "ays-orbit-360-lab",
+    "tenantId": "alianzas-soluciones",
+    "runtimeOwner": "tools/orbit360-auth-foundation-all-team-runtime-v20260805.mjs",
+    "planOwner": "tools/orbit360-auth-foundation-all-team-plan-v20260805.mjs",
+    "allowedFunction": "orbit360ProvisionTeamAccess",
+    "maximumAuthCreates": 7,
+    "maximumMembershipWrites": 7,
+    "maximumTeamLinkWrites": 7,
+    "passwordEmailsRequired": 7,
+    "sessionsRequired": 7,
+    "transactionStrategy": "READ_ALL_VALIDATE_ALL_WRITE_ALL",
+    "allowedTeamPatchFields": [
+      "authUid",
+      "accessProvisioned",
+      "accessState",
+      "onboardingState",
+      "invitacionEstado",
+      "membershipStatus",
+      "accessErrorCode",
+      "accessLastAttemptAt",
+      "accessOnboardingVersion"
+    ],
+    "crmCollectionsProtected": ["clientes", "polizas", "vehiculos", "recibos", "cartera", "cobros", "comisiones", "gestiones", "leads"],
+    "integrityStates": ["VERIFIED_UNCHANGED", "VERIFIED_CHANGED", "NOT_POSTVERIFIED"]
+  },
+  "guards": {
+    "canonicalGateBeforeSecrets": true,
+    "requestSingleFileCommit": true,
+    "requestImmutable": true,
+    "priorAuthRequestsImmutableAndConsumed": true,
+    "exactSevenBeforeWrite": true,
+    "duplicateEmailBlocked": true,
+    "incompleteContractBlocked": true,
+    "bootstrapUsesAdminSdk": true,
+    "bootstrapDoesNotDependOnCallable": true,
+    "normalOnboardingOnlyAfterBootstrap": true,
+    "functionDeployOnlyIfAbsent": true,
+    "otherFunctionsForbidden": true,
+    "temporaryPasswordsForbidden": true,
+    "actionLinksForbiddenInEvidence": true,
+    "rollbackExact": true,
+    "stopRetryOnFailure": true
+  },
+  "prohibitions": {
+    "syntheticUsers": true,
+    "hardcodedPeople": true,
+    "temporaryPasswordsExposed": true,
+    "otherFunctions": true,
+    "hosting": true,
+    "rules": true,
+    "reimport": true,
+    "crmWrites": true,
+    "production": true,
+    "main": true,
+    "merge": true
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
