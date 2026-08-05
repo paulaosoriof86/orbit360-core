@@ -4,7 +4,7 @@ on:
   push:
     branches: [ays/backend-tenant-lab-v99-20260703]
     paths:
-      - '.github/orbit360-requests/block12-operational-runtime-layoutfree-lab-v20260804.json'
+      - '.github/orbit360-requests/block12-go-lab-candidate-visible-v3.json'
 
 permissions:
   contents: read
@@ -18,7 +18,7 @@ concurrency:
 
 env:
   ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
-  ORBIT360_REQUEST_FILE: .github/orbit360-requests/block12-operational-runtime-layoutfree-lab-v20260804.json
+  ORBIT360_REQUEST_FILE: .github/orbit360-requests/block12-go-lab-candidate-visible-v3.json
   ORBIT360_GATE_ID: block12-operational-runtime-lab-v20260804
   ORBIT360_PROJECT_ID: ays-orbit-360-lab
   ORBIT360_REAL_TENANT_ID: alianzas-soluciones
@@ -26,6 +26,7 @@ env:
   ORBIT360_EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
   ORBIT360_SOURCE_BASELINE: 548cffa50cddfd93ad2118f5a06e9bb420699bde
   ORBIT360_FUNCTIONS: orbit360OpsLeadsCommandLabV20260804,orbit360GetAdvisorOpsInboxLabV20260804,orbit360CobrosReconciliationCommandLabV20260804,orbit360RecurringInsuranceImportLabV20260804
+  # Request retirado e inmutable: .github/orbit360-requests/block12-operational-runtime-layoutfree-lab-v20260804.json
 
 jobs:
   lab-candidate-visible:
@@ -37,7 +38,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
-          fetch-depth: 40
+          fetch-depth: 80
           persist-credentials: false
 
       - name: Preparar Node 22
@@ -45,7 +46,7 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Verificar request único y baseline congelado
+      - name: Verificar request único v3 y baseline congelado
         shell: bash
         run: |
           set -euo pipefail
@@ -56,17 +57,19 @@ jobs:
           test "${CHANGED[0]}" = "$ORBIT360_REQUEST_FILE"
           PARENT="$(git rev-parse HEAD^)"
           jq -e --arg parent "$PARENT" --arg baseline "$ORBIT360_SOURCE_BASELINE" '
-            .schemaVersion=="orbit360-go-lab-candidate-visible-request-v2" and
+            .schemaVersion=="orbit360-go-lab-candidate-visible-request-v3" and
             .rcId=="RC-AYS-LAB-CANONICA-01" and
             .status=="AUTHORIZED_GO_LAB_CANDIDATE_VISIBLE" and
+            .sourceOnlyCompositionTest==false and .runtimeExecutionAuthorized==true and
             .approved==true and .allowedExecutions==1 and .replayAllowed==false and
-            .authorizationRef=="user_authorized_microblock_2_1_20260804T2207-0600" and
+            (.authorizationRef|type)=="string" and (.authorizationRef|length)>0 and
             .branch=="ays/backend-tenant-lab-v99-20260703" and .pullRequest==5 and
             .sourceBaseline==$baseline and .parentHead==$parent and
             .previousRuntimeRunId==30962756387 and .previousFunctionalPassed==18 and .previousFunctionalFailed==0 and
             .previousVisualRunId==30971226259 and .previousVisualFailureClassification=="PIPELINE_MECHANISM_FAILURE" and
             .previousVisualFailureCode=="ROUTE_ASEGURADORAS_NAVIGATION_TIMEOUT" and
             .isolatedSyntheticRunId==30971707956 and .isolatedSyntheticStatus=="ISOLATED_ROUTES_SYNTHETIC_PASS" and
+            .sourceOnlyCompositionRunId==30976772355 and .sourceOnlyCompositionStatus=="PASS_CANONICAL_PREFLIGHT_COMPOSITION" and
             .replacementMechanism=="ONE_ISOLATED_BROWSER_CONTEXT_AND_DIRECT_URL_PER_ROUTE" and
             .functionalReplayForbidden==true and .retainPreviewOnCaptureOnlyFailure==true and
             .projectId=="ays-orbit-360-lab" and .gateId=="block12-operational-runtime-lab-v20260804" and
@@ -108,12 +111,12 @@ jobs:
           set -euo pipefail
           SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-${SA_ORBIT_360_LAB:-${SA_DEFAULT:-}}}"
           test -n "$SERVICE_ACCOUNT"
-          KEY_FILE="$RUNNER_TEMP/orbit360-microblock21-service-account.json"
+          KEY_FILE="$RUNNER_TEMP/orbit360-microblock23-service-account.json"
           printf '%s' "$SERVICE_ACCOUNT" > "$KEY_FILE"
           chmod 600 "$KEY_FILE"
           test "$(jq -r '.project_id // empty' "$KEY_FILE")" = "$ORBIT360_PROJECT_ID"
           echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
-          echo "ORBIT360_BLOCK12_VISUAL_INTEGRITY_STATE=$RUNNER_TEMP/orbit360-microblock21-integrity-private.json" >> "$GITHUB_ENV"
+          echo "ORBIT360_BLOCK12_VISUAL_INTEGRITY_STATE=$RUNNER_TEMP/orbit360-microblock23-integrity-private.json" >> "$GITHUB_ENV"
           echo "ORBIT360_LOCAL_FIREBASE_CONFIG_FILE=$GITHUB_WORKSPACE/orbit360-platform/core/auth-firebase.config.local.js" >> "$GITHUB_ENV"
 
       - name: Instalar herramientas reproducibles
@@ -221,7 +224,7 @@ jobs:
           echo "exit_code=$CODE" >> "$GITHUB_OUTPUT"
           exit 0
 
-      - name: Consolidar decisión y aplicar retención segura
+      - name: Consolidar decisión observada y aplicar retención segura
         id: decision
         if: always()
         shell: bash
@@ -275,17 +278,27 @@ jobs:
             CLASSIFICATION='PIPELINE_MECHANISM_FAILURE'
           fi
 
-          jq -n \
-            --arg generatedAt "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
-            --arg requestCommit "$(git rev-parse HEAD)" \
-            --arg deployedSourceHead "$(git rev-parse HEAD^)" \
-            --arg sourceBaseline "$ORBIT360_SOURCE_BASELINE" \
-            --arg decision "$DECISION" --arg classification "$CLASSIFICATION" \
-            --arg previewUrl "${PREVIEW_URL:-}" \
-            --arg visualExit "${VISUAL_EXIT:-99}" --arg integrityExit "${INTEGRITY_EXIT:-99}" \
-            --argjson pass "$PASS" --argjson retain "$RETAIN" --argjson productOk "$PRODUCT_OK" \
-            --argjson visualOk "$VISUAL_OK" --argjson integrityOk "$INTEGRITY_OK" \
-            '{schemaVersion:"orbit360-go-lab-candidate-visible-decision-v1",generatedAt:$generatedAt,rcId:"RC-AYS-LAB-CANONICA-01",gateId:"GO_LAB_CANDIDATE_VISIBLE",contractGateId:"block12-operational-runtime-lab-v20260804",contractVersion:"12.0.11",requestCommit:$requestCommit,deployedSourceHead:$deployedSourceHead,sourceBaseline:$sourceBaseline,priorFunctionalRunId:30962756387,functionalReplayExecuted:false,isolatedSyntheticRunId:30971707956,decision:$decision,classification:$classification,productAndIntegrityPass:$productOk,visualEvidencePass:$visualOk,integrityPass:$integrityOk,previewUrl:(if $retain then $previewUrl else "" end),functionsVerified:4,functionsKept:$retain,hostingPreviewKept:$retain,manualFrameReviewRequired:$pass,visualExitCode:$visualExit,integrityExitCode:$integrityExit,rulesDeployed:false,realTenantWrites:0,authWrites:0,realDataReimported:false,productionTouched:false,mainTouched:false,mergeExecuted:false,authorizationConsumed:true,allowedExecutionsRemaining:0,replayAllowed:false,ok:$pass,containsPII:false,containsSecrets:false}' > "$ORBIT360_EVIDENCE_DIR/go-lab-candidate-visible-decision-v20260804.json"
+          REQUEST_COMMIT="$(git rev-parse HEAD)" \
+          DEPLOYED_SOURCE_HEAD="$(git rev-parse HEAD^)" \
+          SOURCE_BASELINE="$ORBIT360_SOURCE_BASELINE" \
+          DECISION="$DECISION" CLASSIFICATION="$CLASSIFICATION" \
+          PREVIEW_URL="${PREVIEW_URL:-}" PREVIEW_RETAINED="$RETAIN" \
+          FUNCTIONS_EXPECTED='4' FUNCTIONS_VERIFIED="${FUNCTIONS_VERIFIED:-0}" \
+          FUNCTIONS_DEPLOY_ATTEMPTED="${FUNCTIONS_ATTEMPTED:-false}" FUNCTIONS_KEPT="$RETAIN" \
+          HOSTING_DEPLOY_ATTEMPTED="${HOSTING_ATTEMPTED:-false}" \
+          PRODUCT_AND_INTEGRITY_PASS="$PRODUCT_OK" VISUAL_EVIDENCE_PASS="$VISUAL_OK" INTEGRITY_PASS="$INTEGRITY_OK" \
+          MANUAL_FRAME_REVIEW_REQUIRED="$PASS" VISUAL_EXIT_CODE="${VISUAL_EXIT:-99}" INTEGRITY_EXIT_CODE="${INTEGRITY_EXIT:-99}" \
+          AUTHORIZATION_CONSUMED='true' ALLOWED_EXECUTIONS_REMAINING='0' OK="$PASS" \
+          node tools/orbit360-build-go-lab-candidate-visible-decision-v20260805.mjs
+
+          jq -e --arg decision "$DECISION" --argjson pass "$PASS" --argjson retain "$RETAIN" --argjson observed "${FUNCTIONS_VERIFIED:-0}" '
+            .schemaVersion=="orbit360-go-lab-candidate-visible-decision-v2" and
+            .decision==$decision and .ok==$pass and
+            .functionsExpected==4 and .functionsVerified==$observed and .observedCountersOnly==true and
+            .functionsKept==$retain and .hostingPreviewKept==$retain and
+            .rulesDeployed==false and .realTenantWrites==0 and .authWrites==0 and
+            .realDataReimported==false and .productionTouched==false and .mainTouched==false and .mergeExecuted==false
+          ' "$ORBIT360_EVIDENCE_DIR/go-lab-candidate-visible-decision-v20260804.json" >/dev/null
           echo "decision=$DECISION" >> "$GITHUB_OUTPUT"
           echo "preview_url=$(if [ "$RETAIN" = true ]; then printf '%s' "${PREVIEW_URL:-}"; fi)" >> "$GITHUB_OUTPUT"
           [ "$PASS" = true ] || exit 45
@@ -316,5 +329,5 @@ jobs:
           INTEGRITY_EXIT: ${{ steps.integrity.outputs.exit_code }}
         run: |
           set -euo pipefail
-          BODY="## RC-AYS-LAB-CANONICA-01 · Microbloque 2.1 · run ${GITHUB_RUN_ID}\n\n- Decisión: \`${DECISION:-NO_DECISION}\`\n- Functions allowlisted verificadas: \`${FUNCTIONS_VERIFIED:-0}/4\`\n- Visual exit: \`${VISUAL_EXIT:-no-ejecutado}\`\n- Integridad exit: \`${INTEGRITY_EXIT:-no-ejecutado}\`\n- URL LAB retenida: ${PREVIEW_URL:-no}\n- Repetición de 18 escenarios: no\n- Rules, reimportación, producción, main o merge: no"
+          BODY="## RC-AYS-LAB-CANONICA-01 · Microbloque 2.3 · run ${GITHUB_RUN_ID}\n\n- Decisión: \`${DECISION:-NO_DECISION}\`\n- Functions allowlisted verificadas: \`${FUNCTIONS_VERIFIED:-0}/4\`\n- Visual exit: \`${VISUAL_EXIT:-no-ejecutado}\`\n- Integridad exit: \`${INTEGRITY_EXIT:-no-ejecutado}\`\n- URL LAB retenida: ${PREVIEW_URL:-no}\n- Repetición de 18 escenarios: no\n- Rules, reimportación, producción, main o merge: no"
           gh api "repos/${GITHUB_REPOSITORY}/issues/5/comments" -f body="$BODY" >/dev/null
