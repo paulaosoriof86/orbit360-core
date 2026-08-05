@@ -112,6 +112,16 @@ try {
     await currentPage.waitForTimeout(900);
     await currentPage.goto(routeUrl, { waitUntil: 'commit', timeout: 90000 });
     await currentPage.waitForTimeout(5000);
+
+    const legalModalBlocking = await currentPage.evaluate(() => {
+      const candidates = Array.from(document.querySelectorAll('[role="dialog"], [aria-modal="true"], .modal, .modal-overlay, .dialog'));
+      return candidates.some(node => {
+        const value = String(node.textContent || '').replace(/\s+/g, ' ').trim().toLowerCase();
+        return value.includes('acuerdos legales') && value.includes('aceptar y continuar');
+      });
+    });
+    if (legalModalBlocking) throw new Error(`PIPELINE_MECHANISM_FAILURE:ROUTE_${route}_LEGAL_MODAL_BLOCKING_CAPTURE`);
+
     const finalUrl = currentPage.url();
     const directRouteUrlConfirmed = finalUrl.includes(`#/${route}`);
     const signInResolved = true;
@@ -138,6 +148,7 @@ try {
       isolatedContext: true,
       directRouteUrlConfirmed,
       signInResolved,
+      legalModalBlocking: false,
       pageErrors: routeErrors,
       frameBytes: png.length,
       videoBytes: videoStat.size,
@@ -149,7 +160,7 @@ try {
     pageErrors.push(...routeErrors.map(error => `${route}:${error}`));
   }
 
-  const ok = results.length === ROUTES.length && results.every(item => item.isolatedContext && item.directRouteUrlConfirmed && item.signInResolved && item.frameBytes > 1000 && item.videoBytes > 1000 && item.pageErrors.length === 0) && pageErrors.length === 0;
+  const ok = results.length === ROUTES.length && results.every(item => item.isolatedContext && item.directRouteUrlConfirmed && item.signInResolved && item.legalModalBlocking === false && item.frameBytes > 1000 && item.videoBytes > 1000 && item.pageErrors.length === 0) && pageErrors.length === 0;
   save({
     schemaVersion: 'orbit360-block12-cumulative-visual-v6',
     status: ok ? 'CUMULATIVE_VISUAL_LAB_PASS' : 'CUMULATIVE_VISUAL_LAB_FAIL',
@@ -161,6 +172,7 @@ try {
     inPageHashNavigationUsed: false,
     captureEngine: 'isolated-context-direct-url-video-plus-ffmpeg-static-frame',
     layoutDependentTextReadUsed: false,
+    legalModalBlockingDetectionRequired: true,
     technicalCopyReview: 'manual-frame-review-required-before-final-approval',
     routeContentReview: 'manual-frame-review-required-before-final-approval',
     screenshotApisUsed: false,
@@ -191,6 +203,7 @@ try {
     inPageHashNavigationUsed: false,
     captureEngine: 'isolated-context-direct-url-video-plus-ffmpeg-static-frame',
     layoutDependentTextReadUsed: false,
+    legalModalBlockingDetectionRequired: true,
     technicalCopyReview: 'manual-frame-review-required-before-final-approval',
     routeContentReview: 'manual-frame-review-required-before-final-approval',
     screenshotApisUsed: false,
