@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "orbit360-auth-access-recovery-final-sanitized-v2",
+  "stage": "NOT_EXECUTED",
+  "decision": "PENDING_AUTHORIZED_EXECUTION",
+  "classification": "PENDING_AUTHORIZED_EXECUTION",
+  "containsPII": false,
+  "containsSecrets": false,
+  "ok": false
+}
