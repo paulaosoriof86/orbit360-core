@@ -1,0 +1,90 @@
+{
+  "schemaVersion": "orbit360-rc-block-closure-v1",
+  "rcId": "RC-AYS-LAB-CANONICA-01",
+  "block": "3.0",
+  "gate": "OPS_LEADS_BACKEND_LAB_COMPLETE",
+  "closedAt": "2026-08-05T06:49:00-06:00",
+  "status": "PASS_REUSED_FUNCTIONAL_RUNTIME_AND_CURRENT_DEPLOY",
+  "classification": "GO_LAB_DURABLE_OPS_LEADS_COMPLETE",
+  "evidence": {
+    "functionalRunId": 30962756387,
+    "functionalSourceHead": "76377a4a95d9a834ac114e0654660a03c5f5046c",
+    "functionalPassed": 18,
+    "functionalFailed": 0,
+    "opsLeadsPassed": true,
+    "advisorOwnScopePassed": true,
+    "notificationsPassed": true,
+    "rollbackExact": true,
+    "realTenantUnchanged": true,
+    "currentDeployRunId": 31005103975,
+    "currentDeployRequestCommit": "924e7d740ee22d28ec22d0284d487d54f5ed0564",
+    "deployedSourceHead": "24b341483b6853269a125c60796f7b33edbfbb61",
+    "functionsVerified": 4,
+    "hostingPreviewRetained": true,
+    "integrityPassed": true,
+    "snapshotsIdentical": true,
+    "firestoreWritesDuringVisualRun": 0,
+    "authWritesDuringVisualRun": 0
+  },
+  "sourceOwners": {
+    "backendCommand": "functions/ops-leads-domain.js",
+    "backendAdvisorInbox": "functions/ops-advisor-inbox.js",
+    "backendBootstrap": "functions/bootstrap.js",
+    "clientCallable": "orbit360-platform/core/ops-leads-domain-client.js",
+    "uiBridge": "orbit360-platform/modules/ops-leads-domain-v20260804-bridge.js",
+    "labLoader": "orbit360-platform/core/backend-lab-init.js",
+    "cycleOwner": "orbit360-platform/core/ciclo.js",
+    "opsOwner": "orbit360-platform/modules/ops.js",
+    "leadsOwner": "orbit360-platform/modules/leads.js"
+  },
+  "contracts": {
+    "transactionalWrites": true,
+    "idempotentRequests": true,
+    "workflowEvents": true,
+    "notificationOutbox": true,
+    "portalNotifications": true,
+    "activeMembershipRequired": true,
+    "activeRoleAndScopes": true,
+    "ownTeamAllNone": true,
+    "legacyAndCanonicalStorageModes": true,
+    "clientBridgeLoadedDynamically": true,
+    "backendFeatureFlagActive": true,
+    "labCommandFunction": "orbit360OpsLeadsCommandLabV20260804",
+    "labInboxFunction": "orbit360GetAdvisorOpsInboxLabV20260804"
+  },
+  "provenance": {
+    "compareBase": "76377a4a95d9a834ac114e0654660a03c5f5046c",
+    "compareHead": "24b341483b6853269a125c60796f7b33edbfbb61",
+    "opsLeadsOwnersChanged": false,
+    "functionalReplayRequired": false,
+    "newRuntimeRequired": false,
+    "newDeployRequired": false
+  },
+  "manualVisualReview": {
+    "url": "https://ays-orbit-360-lab--orbit360-operational-block12-w8ibrr6w.web.app",
+    "pending": true,
+    "nonBlocking": true,
+    "legalAcceptanceOnce": true
+  },
+  "next": {
+    "block": "4.0",
+    "gate": "PASS_COBROS_FULL_REPLAY",
+    "mode": "READ_ONLY_SOURCE_AND_EXISTING_PRIVATE_EVIDENCE",
+    "runtimeAuthorizationRequiredAtStart": false
+  },
+  "forbidden": {
+    "rerunFunctional18": true,
+    "functionsRedeploy": true,
+    "hostingRedeploy": true,
+    "newVisualWorkflow": true,
+    "syntheticUsersOrMemberships": true,
+    "rules": true,
+    "reimport": true,
+    "production": true,
+    "main": true,
+    "merge": true
+  },
+  "containsPII": false,
+  "containsSecrets": false,
+  "ok": true
+}
