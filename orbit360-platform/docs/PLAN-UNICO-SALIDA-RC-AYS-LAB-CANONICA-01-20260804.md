@@ -1,7 +1,7 @@
 # PLAN ÚNICO DE SALIDA — RC-AYS-LAB-CANONICA-01
 
 Fecha de adopción: 2026-08-04  
-Última actualización: 2026-08-04 22:18 GT  
+Última actualización: 2026-08-04 22:24 GT  
 Rama obligatoria: `ays/backend-tenant-lab-v99-20260703`  
 PR: #5 draft/open  
 Baseline funcional congelado: `548cffa50cddfd93ad2118f5a06e9bb420699bde`  
@@ -9,7 +9,7 @@ Producción, `main` y merge: no autorizados
 
 ## 1. Carácter vinculante
 
-Este documento es el plan operativo rector para cerrar una sola candidata acumulativa A&S. Se aplica junto con el ledger vivo, el estado vigente del microbloque y la evidencia reciente. Ninguna conversación o workflow sustituye estas fuentes.
+Este documento es el plan rector para cerrar una sola candidata acumulativa A&S. Se aplica junto con el ledger vivo, el estado vigente y la evidencia del gate. Ninguna conversación o workflow sustituye estas fuentes.
 
 Precedencia:
 
@@ -98,7 +98,7 @@ Autorización: consumida
 URL LAB: no producida
 ```
 
-### Intento 1
+### Intento autorizado 1
 
 ```text
 run: 30974443335
@@ -107,9 +107,7 @@ REQUEST_ACTIVE
 VIDEO_LAYOUTFREE_HARNESS
 ```
 
-Se detuvo antes de secretos, Firebase, Functions, Hosting y navegador.
-
-### Intento 2
+### Intento autorizado 2
 
 ```text
 run: 30974745085
@@ -118,43 +116,50 @@ CANONICAL_PREFLIGHT_ENTRYPOINT
 CANONICAL_LIFECYCLE_REVISION_MISMATCH
 ```
 
-También se detuvo antes de secretos, Firebase, Functions, Hosting y navegador.
+Ambos se detuvieron antes de secretos, Firebase, Functions, Hosting y navegador.
 
 ### Causa raíz definitiva
-
-Clasificación:
 
 ```text
 VALIDATOR_STALE
 PIPELINE_MECHANISM_FAILURE
-```
-
-Owner:
-
-```text
-tools/orbit360-validar-gate-contracts-v20260717.mjs
+owner: tools/orbit360-validar-gate-contracts-v20260717.mjs
 ```
 
 El outer router exige `validatorLifecycleRevision = phase-capability-contract-v1`. La versión del arnés `isolated-context-direct-url-v6` fue colocada en ese campo y sustituyó erróneamente la composición canónica. El inner engine corregido no llegó a ejecutarse.
 
 No se demostró defecto funcional, pérdida de datos o fallo de las cuatro Functions.
 
+### Incidente administrativo de cierre
+
+Al actualizar el request para marcarlo consumido se modificó por error el mismo path disparador y se creó el run automático `30975037529`.
+
+```text
+request validation: FAIL
+preflight: SKIPPED
+secretos: SKIPPED
+Functions/Hosting/browser: SKIPPED
+```
+
+No cuenta como ejecución autorizada ni intento runtime; sí es un `PIPELINE_MECHANISM_FAILURE` del procedimiento de cierre. Desde este punto, el request disparador es inmutable y el consumo se registra solo en paths no disparadores.
+
 ### Hallazgo de evidencia
 
-El JSON consolidado escribió un literal `functionsVerified: 4`, aunque el job real registró `0/4` y nunca alcanzó deploy. Ese campo queda invalidado y debe corregirse en el futuro rediseño source-only.
+El JSON consolidado escribió un literal `functionsVerified: 4`, aunque los jobs observaron `0/4` y nunca alcanzaron deploy. Ese campo queda invalidado.
 
 ## 5. STOP_RETRY obligatorio
 
-Tras dos fallos en la misma etapa quedan prohibidos:
+Quedan prohibidos:
 
-- tercer request;
-- tercer run;
+- otro request autorizado;
+- otro run runtime;
 - otro parche de emergencia a esta familia;
 - otro workflow visual;
 - tocar producto, módulos o datos;
 - acceder a secretos;
 - desplegar Functions o Hosting bajo esta autorización;
-- repetir los 18 escenarios.
+- repetir los 18 escenarios;
+- volver a modificar el request disparador.
 
 La candidata y el baseline quedan congelados e intactos.
 
@@ -185,12 +190,13 @@ Objetivo:
 
 1. conservar `validatorLifecycleRevision = phase-capability-contract-v1`;
 2. declarar `visualHarnessRevision = isolated-context-direct-url-v6` por separado;
-3. sincronizar router, lifecycle, registro, engine, workflow y request conceptualmente;
+3. sincronizar conceptualmente router, lifecycle, registro, engine, workflow y request;
 4. probar outer router + inner engine como una unidad;
-5. comprobar que el JSON de decisión use outputs reales y no literales;
-6. emitir evidencia estática sin secretos, Firebase, navegador o deploy.
+5. separar request inmutable, ledger de consumo y evidencia final;
+6. comprobar que el JSON de decisión use outputs reales y no literales;
+7. emitir evidencia estática sin secretos, Firebase, navegador o deploy.
 
-Este rediseño no autoriza ejecución LAB. Solo después de un PASS estático integrado podrá solicitarse una autorización explícita nueva para una futura visualización.
+Este rediseño no autoriza ejecución LAB. Solo después de un PASS estático integrado podrá solicitarse una autorización explícita nueva.
 
 ## 8. Continuidad posterior
 
@@ -199,11 +205,11 @@ Después de resolver el control plane y obtener una nueva autorización:
 1. entregar una URL LAB retenida;
 2. cerrar Ops/Leads durable;
 3. ejecutar replay completo read-only de Cobros;
-4. materializar las colecciones correctas con atomicidad e idempotencia;
+4. materializar colecciones correctas con atomicidad e idempotencia;
 5. integrar módulos aprobados sobre la misma RC;
 6. presentar revisión Dirección/Operativo/Asesor;
 7. solicitar autorización productiva macro.
 
 ## 9. Regla de actualización
 
-Cada iteración debe actualizar simultáneamente avance, fuente, evidencia, gate, estado, ledger, plan y PR. No se abre una auditoría general ni un bloque periférico para evitar el siguiente paso exacto.
+Cada iteración actualiza simultáneamente avance, fuente, evidencia, gate, estado, ledger, plan y PR. No se abre una auditoría general ni un bloque periférico para evitar el siguiente paso exacto.
