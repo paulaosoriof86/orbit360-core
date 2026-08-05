@@ -56,7 +56,8 @@ const GATE_CONFIG=Object.freeze({
   "block12-operational-runtime-lab-v20260804":{contractVersion:"12.0.11",lifecycle:"tools/orbit360-validator-lifecycle-contract-block12-operational-runtime-lab-v20260804.json",engine:"tools/orbit360-validar-gate-contracts-engine-block12-operational-runtime-layoutfree-lab-v20260804.mjs"},
   "block12-runtime-hang-rescue-lab-v20260804":{contractVersion:"12.0.4",lifecycle:"tools/orbit360-validator-lifecycle-contract-block12-runtime-hang-rescue-lab-v20260804.json",engine:"tools/orbit360-validar-gate-contracts-engine-block12-runtime-hang-rescue-lab-v20260804.mjs"},
   "block-auth-access-recovery-lab-v20260805":{contractVersion:"13.0.0",lifecycle:"tools/orbit360-validator-lifecycle-contract-auth-access-recovery-lab-v20260805.json",engine:"tools/orbit360-validar-gate-contracts-engine-auth-access-recovery-lab-v20260805.mjs"},
-  "block-auth-access-recovery-lab-v2-20260805":{contractVersion:"13.1.0",lifecycle:"tools/orbit360-validator-lifecycle-contract-auth-access-recovery-lab-v2-20260805.json",engine:"tools/orbit360-validar-gate-contracts-engine-auth-access-recovery-lab-v2-20260805.mjs"}
+  "block-auth-access-recovery-lab-v2-20260805":{contractVersion:"13.1.0",lifecycle:"tools/orbit360-validator-lifecycle-contract-auth-access-recovery-lab-v2-20260805.json",engine:"tools/orbit360-validar-gate-contracts-engine-auth-access-recovery-lab-v2-20260805.mjs"},
+  "block-auth-access-recovery-lab-v3-20260805":{contractVersion:"13.2.0",lifecycle:"tools/orbit360-validator-lifecycle-contract-auth-access-recovery-lab-v3-20260805.json",engine:"tools/orbit360-validar-gate-contracts-engine-auth-access-recovery-lab-v3-20260805.mjs"}
 });
 const PHASE_PROFILES=Object.freeze({
   "STATIC_PREFLIGHT":ZERO,
@@ -122,7 +123,8 @@ const PHASE_PROFILES=Object.freeze({
   "OPERATIONAL_RUNTIME_LAB_VISUAL_REACTIVATION":{secrets:true,firestoreRead:true,writes:false,runtime:false,browser:true,deploy:true,functionsDeploy:true,rulesDeploy:false,production:false},
   "RUNTIME_HANG_RESCUE_LAB_EXECUTION":{secrets:true,firestoreRead:true,writes:true,runtime:false,browser:false,deploy:true,functionsDeploy:true,rulesDeploy:false,production:false},
   "AUTH_ACCESS_RECOVERY_LAB":{secrets:true,firestoreRead:true,writes:true,runtime:true,browser:false,deploy:true,functionsDeploy:true,rulesDeploy:false,production:false},
-  "AUTH_ACCESS_RECOVERY_LAB_V2":{secrets:true,firestoreRead:true,writes:true,runtime:true,browser:false,deploy:true,functionsDeploy:true,rulesDeploy:false,production:false}
+  "AUTH_ACCESS_RECOVERY_LAB_V2":{secrets:true,firestoreRead:true,writes:true,runtime:true,browser:false,deploy:true,functionsDeploy:true,rulesDeploy:false,production:false},
+  "AUTH_ACCESS_RECOVERY_LAB_V3":{secrets:true,firestoreRead:true,writes:true,runtime:true,browser:false,deploy:true,functionsDeploy:true,rulesDeploy:false,production:false}
 });
 function readJson(rel){return JSON.parse(fs.readFileSync(path.join(ROOT,rel),'utf8'));}
 function exactCapabilities(actual,expected){const a=Object.keys(actual||{}).sort(),e=Object.keys(expected||{}).sort();return JSON.stringify(a)===JSON.stringify(e)&&e.every(key=>actual[key]===expected[key]);}
