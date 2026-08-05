@@ -43,7 +43,7 @@
     "previousFunctionsRetained": false,
     "previousHostingRetained": false,
     "functionalReplayForbidden": true,
-    "request": ".github/orbit360-requests/block12-operational-runtime-lab-rootfix9-resume-v20260804.json"
+    "request": ".github/orbit360-requests/block12-operational-runtime-layoutfree-lab-v20260804.json"
   },
   "scope": {
     "projectId": "ays-orbit-360-lab",

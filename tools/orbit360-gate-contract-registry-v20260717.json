@@ -527,10 +527,10 @@
   "runtimeGateExtensions": [
     {
       "gateId": "block12-operational-runtime-lab-v20260804",
-      "contractVersion": "12.0.10",
+      "contractVersion": "12.0.11",
       "lifecycle": "tools/orbit360-validator-lifecycle-contract-block12-operational-runtime-lab-v20260804.json",
-      "engine": "tools/orbit360-validar-gate-contracts-engine-block12-operational-runtime-video-lab-v20260804.mjs",
-      "status": "OPERATIONAL_RUNTIME_LAB_VISUAL_VIDEO_READY"
+      "engine": "tools/orbit360-validar-gate-contracts-engine-block12-operational-runtime-layoutfree-lab-v20260804.mjs",
+      "status": "OPERATIONAL_RUNTIME_LAB_VISUAL_LAYOUTFREE_READY"
     }
   ]
 }

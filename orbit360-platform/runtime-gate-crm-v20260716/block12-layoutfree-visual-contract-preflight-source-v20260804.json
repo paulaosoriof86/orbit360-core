@@ -1,0 +1,199 @@
+{
+  "schemaVersion": "orbit360-block12-operational-runtime-lab-preflight-v1",
+  "gateId": "block12-operational-runtime-lab-v20260804",
+  "contractVersion": "12.0.11",
+  "status": "GO_GATE_CONTRACT",
+  "classification": "OPERATIONAL_RUNTIME_LAB_LAYOUTFREE_VISUAL_READY",
+  "total": 28,
+  "passed": 28,
+  "failed": 0,
+  "failedCheckIds": [],
+  "checks": [
+    {
+      "id": "GATE_ID_VERSION",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "LIFECYCLE_ACTIVE",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "CAPABILITIES_EXACT",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "REQUEST_ACTIVE",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "REQUEST_BINDING",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "READONLY_BOUNDARY",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "FUNCTION_ALLOWLIST",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "HOSTING_BOUNDARY",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "FORBIDDEN_BOUNDARY",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "EVIDENCE_AND_INTEGRITY",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "VIDEO_SYNTHETIC_PASS",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "LAYOUT_SYNTHETIC_PASS",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "ROOTCAUSE_BOUND",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "VIDEO_LAYOUTFREE_HARNESS",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "SOURCE_CONTRACT_PASS",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "DEPLOY_PIPELINE",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "REAL_TENANT_LOADER",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "FUNCTIONS_SDK_CONTRACT",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "FUNCTIONS_DEPENDENCY_PASS",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "REQUIRED_FILES",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "FUNCTION_EXPORTS_PRESENT",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "IMPORT_IDEMPOTENCY_RESPONSE",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "PREVIOUS_FUNCTIONAL_PASS",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "REGISTRY_ROUTER_SYNC",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "CLIENT_FLAGS_AND_CENTER",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "IN_PLATFORM_SCENARIOS_PRESERVED",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "NO_TENANT_DATA_IN_CENTER",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "BRANCH_PR",
+      "ok": true,
+      "detail": ""
+    }
+  ],
+  "executionAuthorized": true,
+  "secretAccessAuthorized": true,
+  "firestoreReadAuthorized": true,
+  "writeAuthorized": false,
+  "authWriteAuthorized": false,
+  "maximumSyntheticAuthUsers": 0,
+  "maximumSyntheticMemberships": 0,
+  "runtimeAuthorized": false,
+  "visualOnlyAuthorized": true,
+  "browserAuthorized": true,
+  "deployAuthorized": true,
+  "functionsDeployAuthorized": true,
+  "hostingPreviewAuthorized": true,
+  "exactFunctionNames": [
+    "orbit360OpsLeadsCommandLabV20260804",
+    "orbit360GetAdvisorOpsInboxLabV20260804",
+    "orbit360CobrosReconciliationCommandLabV20260804",
+    "orbit360RecurringInsuranceImportLabV20260804"
+  ],
+  "rulesDeployAuthorized": false,
+  "productionAuthorized": false,
+  "realTenantWritesAuthorized": false,
+  "realDataReimportAuthorized": false,
+  "dataAccess": false,
+  "secretAccess": false,
+  "firestoreRead": false,
+  "firestoreWrites": 0,
+  "authReads": 0,
+  "authWrites": 0,
+  "runtimeExecuted": false,
+  "browserExecuted": false,
+  "deployExecuted": false,
+  "productionTouched": false,
+  "containsPII": false,
+  "containsSecrets": false,
+  "canonicalEntrypoint": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
+  "canonicalEngine": "tools/orbit360-validar-gate-contracts-engine-block12-operational-runtime-layoutfree-lab-v20260804.mjs",
+  "canonicalLifecycleContract": "tools/orbit360-validator-lifecycle-contract-block12-operational-runtime-lab-v20260804.json",
+  "canonicalLifecycleComposition": "phase-capability-contract-v1",
+  "engineEvidenceSource": "sync-file-evidence-not-stdout-v1",
+  "engineStdoutParsed": false,
+  "sourceTransformed": false,
+  "operationalWrites": 0,
+  "evidenceWrites": 1,
+  "secretsRead": false,
+  "rulesApplied": false
+}
