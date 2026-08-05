@@ -1,7 +1,7 @@
 # PLAN ÚNICO DE SALIDA — RC-AYS-LAB-CANONICA-01
 
 Fecha de adopción: 2026-08-04  
-Última actualización: 2026-08-05 06:24 GT  
+Última actualización: 2026-08-05 06:55 GT  
 Rama obligatoria: `ays/backend-tenant-lab-v99-20260703`  
 PR: #5 draft/open  
 Baseline funcional congelado: `548cffa50cddfd93ad2118f5a06e9bb420699bde`  
@@ -9,7 +9,7 @@ Producción, `main` y merge: no autorizados
 
 ## 1. Carácter vinculante
 
-Este documento, el ledger vivo, el estado activo y la evidencia del gate rigen una sola candidata acumulativa A&S. Ninguna conversación sustituye estas fuentes.
+Este documento, el ledger vivo, el estado activo y la evidencia reciente rigen una sola candidata acumulativa A&S. Ninguna conversación sustituye estas fuentes.
 
 Precedencia:
 
@@ -55,89 +55,29 @@ reimportación requerida: no
 pérdida observada: no
 ```
 
-### Arnés aislado
+### Composición y continuidad
 
 ```text
-run: 30971707956
-rutas: 8/8
-mecanismo: ONE_ISOLATED_BROWSER_CONTEXT_AND_DIRECT_URL_PER_ROUTE
-```
-
-### Composición canónica
-
-```text
-run: 30977179448
-integrado: 31/31 PASS
+rutas aisladas: 30971707956 · 8/8 PASS
+composición canónica: 30977179448 · 31/31 PASS
 inner preflight: 32/32 PASS
+request v4/provenance: 30979519198 · 33/33 PASS
 ```
 
-### Request v4 y provenance
-
-```text
-run: 30979519198
-continuidad/provenance: 33/33 PASS
-inner preflight: 32/32 PASS
-outer router exit: 0
-inner engine reached: true
-```
-
-Demostrado: baseline presente, ancestro del parent HEAD, producto idéntico al baseline y requests anteriores inmutables.
-
-## 4. Historia de visualización LAB
-
-### Microbloque 2.1
-
-```text
-Estado: STOP_RETRY_DEFINITIVE_CONTROL_PLANE
-runs: 30974443335 y 30974745085
-URL: no
-```
-
-Causa: lifecycle/harness mezclados y evidencia con contador literal. Resuelta en 2.2.
-
-### Microbloque 2.2
-
-```text
-Estado: PASS_CANONICAL_PREFLIGHT_COMPOSITION
-run: 30977179448
-```
-
-### Microbloque 2.3
-
-```text
-Estado: STOP_RETRY_DEFINITIVE_BASELINE_PROVENANCE
-run: 30977831814
-URL: no
-```
-
-Causa: checkout superficial sin el baseline congelado. Root fix:
-
-```text
-fetch-depth: 0
-git cat-file -e "$ORBIT360_SOURCE_BASELINE^{commit}"
-```
-
-### Microbloque 2.4
-
-```text
-Estado: PASS_REQUEST_V4_PROVENANCE_COMPOSITION
-run: 30979519198
-runtime: no
-```
-
-### Microbloque 2.5
+## 4. Microbloque 2.5 — candidata LAB visible
 
 ```text
 run: 31005103975
 job: 92302991333
 workflow: success
 preflight: 32/32 PASS
-Functions: 4/4
-Hosting: PASS y retenido
+Functions allowlisted: 4/4
+Hosting preview: PASS y retenido
 integridad: PASS
 visual exit: 0
 integridad exit: 0
-snapshot before/after: idénticos
+snapshots before/after: idénticos
+Firestore/Auth writes: 0
 ```
 
 URL retenida:
@@ -146,59 +86,136 @@ URL retenida:
 https://ays-orbit-360-lab--orbit360-operational-block12-w8ibrr6w.web.app
 ```
 
-Decisiones separadas:
+Las ocho capturas automáticas mostraron el modal `Acuerdos legales`. Esto demuestra un fallo del capturador para reconocer overlays, no un defecto funcional de la candidata.
+
+Root fix source-only del capturador:
 
 ```text
-Técnica: GO_LAB_CANDIDATE_VISIBLE
-Final tras revisión manual: STOP_VISUAL_EVIDENCE_PREVIEW_RETAINED
+commit: 6c443d0f40e6874675f8c1980ef0cdb353120031
+error futuro: PIPELINE_MECHANISM_FAILURE:ROUTE_<route>_LEGAL_MODAL_BLOCKING_CAPTURE
 ```
 
-Las ocho capturas mostraron el modal `Acuerdos legales` y no el contenido de Cliente 360, Aseguradoras, Pólizas, Cobros, Conciliaciones, Ops, Leads e Importar.
+## 5. Decisión de continuidad del producto
 
-Clasificación:
+Por decisión de la dueña del producto, el modal legal no pausa la ruta técnica.
 
 ```text
-PIPELINE_MECHANISM_FAILURE
-secundaria: VALIDATOR_STALE
+revisión manual: disponible
+aceptación legal: una sola vez en la sesión
+captura automática: pendiente de corrección
+producto/backend: continúa
 ```
 
-Owner:
-
-```text
-tools/orbit360-block12-cumulative-visual-v20260804.mjs
-```
-
-El arnés validaba URL, autenticación, bytes y errores, pero no detectaba overlays bloqueantes. El root fix source-only quedó en:
-
-```text
-6c443d0f40e6874675f8c1980ef0cdb353120031
-```
-
-Ahora un modal legal bloqueante genera:
-
-```text
-PIPELINE_MECHANISM_FAILURE:ROUTE_<route>_LEGAL_MODAL_BLOCKING_CAPTURE
-```
-
-## 5. Frontera vigente
-
-La URL, las cuatro Functions y el Hosting quedan retenidos. No se redepliegan para resolver un fallo exclusivo de captura.
+No se desactiva globalmente el contrato legal. Paula puede abrir la URL, aceptar el acuerdo una vez y revisar la candidata. La aprobación visual permanece pendiente en paralelo.
 
 Quedan prohibidos:
 
 - rerun de `31005103975`;
-- modificar el request runtime v4 consumido;
-- redeploy de Functions o Hosting para la recaptura;
+- modificar requests consumidos;
+- redeploy de Functions o Hosting por el modal;
 - otro workflow visual;
-- crear usuarios o memberships sintéticos;
-- tocar producto o datos para ocultar el modal;
-- marcar una aceptación legal ficticia;
+- usuarios o memberships sintéticos;
 - repetir los 18 escenarios;
 - Rules, reimportación, producción, main o merge.
 
-## 6. Estado vivo
+El Microbloque 2.6 de recaptura queda diferido y no bloqueante.
 
-| Microbloque | Gate | Estado |
+## 6. Bloque 3.0 — Ops/Leads durable
+
+```text
+Gate: OPS_LEADS_BACKEND_LAB_COMPLETE
+Estado: PASS_REUSED_FUNCTIONAL_RUNTIME_AND_CURRENT_DEPLOY
+```
+
+Se cerró sin otra ejecución porque:
+
+1. el runtime `30962756387` ya demostró Ops/Leads, scope propio del asesor, notificaciones y rollback exacto;
+2. el run `31005103975` verificó las Functions desplegadas y la integridad del tenant;
+3. al comparar `76377a4a95d9a834ac114e0654660a03c5f5046c` con el source HEAD desplegado `24b341483b6853269a125c60796f7b33edbfbb61`, ningún owner de Ops/Leads cambió;
+4. `backend-lab-init.js` carga dinámicamente el cliente callable y el bridge durable con `opsLeadsDomainBackendActive: true`;
+5. repetir la batería 18/18 no produciría evidencia nueva.
+
+Owners cerrados:
+
+```text
+functions/ops-leads-domain.js
+functions/ops-advisor-inbox.js
+functions/bootstrap.js
+orbit360-platform/core/ops-leads-domain-client.js
+orbit360-platform/modules/ops-leads-domain-v20260804-bridge.js
+orbit360-platform/core/backend-lab-init.js
+orbit360-platform/core/ciclo.js
+orbit360-platform/modules/ops.js
+orbit360-platform/modules/leads.js
+```
+
+## 7. Bloque 4.0 — replay completo read-only de Cobros
+
+```text
+Gate: PASS_COBROS_FULL_REPLAY
+Estado: ACTIVE_READ_ONLY
+```
+
+Punto de partida:
+
+```text
+pólizas activas: 224
+pólizas con calendario: 223
+recibos de calendario: 1,261
+cartera pendiente: 641
+vencido/exigible: 99
+futuro: 542
+pagos reportados: 365
+sin pendiente según aseguradora: 211
+HOLD de estado: 44
+calendarios sustituidos: 20
+cobros existentes: 5
+```
+
+Replay parcial preservado:
+
+```text
+secuencia de cartera: 128
+posteriores al corte: 2
+pendientes de overlay: 235
+invariante: 128 + 2 + 235 = 365
+```
+
+Fuentes recuperadas sin pedir reenvío:
+
+- workbook canónico privado de recibos/cartera;
+- dry-run privado normalizado de planillas: 19 archivos, 10 paquetes, 67 filas, 65 elegibles CRM;
+- 8 paquetes exactos;
+- 1 planilla sin factura;
+- 1 fuente incompleta;
+- planilla detallada G&T julio: 8 filas;
+- Aseguradora General julio: agregado sin detalle de póliza;
+- factura El Roble julio: agregado sin detalle de póliza.
+
+Regla de evidencia:
+
+- las fuentes detalladas pueden cruzarse fila por fila;
+- una factura o resumen agregado no autoriza aplicar cobros individuales;
+- evidencia agregada sin detalle queda en HOLD explícito;
+- se preservan los 128 casos de secuencia, los 2 posteriores al corte y los 5 cobros existentes;
+- no se permite doble conteo.
+
+Frontera:
+
+```text
+Firestore writes: 0
+Auth writes: 0
+cobros aplicados: 0
+recibos modificados: 0
+reimportación: 0
+Functions/Hosting deploy: 0
+Rules: no
+producción/main/merge: no
+```
+
+## 8. Estado vivo
+
+| Bloque | Gate | Estado |
 |---|---|---|
 | 1.0 | `PASS_PLAN_PERSISTED` | PASS |
 | 1.1 | `PASS_CANONICAL_BASELINE` | PASS |
@@ -207,62 +224,35 @@ Quedan prohibidos:
 | 2.2 | `PASS_CANONICAL_PREFLIGHT_COMPOSITION` | PASS |
 | 2.3 | `GO_LAB_CANDIDATE_VISIBLE` | STOP_RETRY provenance |
 | 2.4 | `PASS_REQUEST_V4_PROVENANCE_COMPOSITION` | PASS |
-| 2.5 | `GO_LAB_CANDIDATE_VISIBLE` | STOP visual; preview retenido |
-| 2.6 | `PASS_LEGAL_READINESS_CAPTURE_CONTRACT` | pendiente autorización source-only |
-| 3.0 | `OPS_LEADS_BACKEND_LAB_COMPLETE` | pendiente después de aprobación visual |
-| 4.0 | `PASS_COBROS_FULL_REPLAY` | pendiente |
-| 4.1 | `COBROS_REAL_LEDGER_COMPLETE` | pendiente |
+| 2.5 | `GO_LAB_CANDIDATE_VISIBLE` | GO técnico; revisión manual pendiente no bloqueante |
+| 2.6 | `PASS_LEGAL_READINESS_CAPTURE_CONTRACT` | diferido no bloqueante |
+| 3.0 | `OPS_LEADS_BACKEND_LAB_COMPLETE` | PASS |
+| 4.0 | `PASS_COBROS_FULL_REPLAY` | activo read-only |
+| 4.1 | `COBROS_REAL_LEDGER_COMPLETE` | pendiente autorización de escritura |
 | 5.0 | `RC_ACCUMULATIVE_MODULES_COMPLETE` | pendiente |
 | 6.0 | `RELEASE_CANDIDATE_ACCEPTED` | pendiente |
 | 7.0 | `GO_PRODUCTION_A&S` | bloqueado hasta autorización |
 
-## 7. Siguiente acción exacta
-
-Microbloque 2.6:
+## 9. Siguiente acción exacta
 
 ```text
-PASS_LEGAL_READINESS_CAPTURE_CONTRACT
-SOURCE_ONLY
+BLOQUE 4.0
+PASS_COBROS_FULL_REPLAY
 ```
 
-Debe definir y validar:
+Completar la clasificación fila por fila de los 365 pagos reportados usando el workbook canónico, las planillas normalizadas y la evidencia vigente. El resultado debe:
 
-1. owner canónico del estado legal;
-2. presentación una sola vez;
-3. cero hardcode de usuario, tenant o aceptación;
-4. identidad visual lista sin escrituras reales de tenant ni Auth;
-5. detección de overlays antes de aceptar evidencia;
-6. reutilización de la URL retenida;
-7. siguiente ejecución limitada a navegador;
-8. prohibición de redeploy de Functions y Hosting.
+1. conservar 128 casos de secuencia;
+2. conservar 2 casos posteriores al corte;
+3. preservar 5 cobros existentes;
+4. cruzar planillas detalladas sin duplicar;
+5. dejar resúmenes agregados sin detalle en HOLD;
+6. explicar los 365 pagos mediante categorías exhaustivas;
+7. producir únicamente ledger sanitizado y digests;
+8. mantener cero escrituras.
 
-Frontera 2.6:
+Solo después del PASS se prepara el Bloque 4.1 de materialización durable, que requiere autorización explícita separada.
 
-```text
-secretos: no
-Firebase/Firestore/Auth: no
-Functions/Hosting: no
-navegador: no
-deploy: no
-Rules/reimportación: no
-producción/main/merge: no
-replay 18/18: no
-```
+## 10. Regla de actualización
 
-Solo después de un PASS source-only podrá solicitarse una autorización nueva para recaptura exclusivamente de navegador contra la URL retenida.
-
-## 8. Continuidad posterior
-
-Después de obtener frames aprobables:
-
-1. revisión visual Dirección/Operativo/Asesor;
-2. cierre Ops/Leads durable;
-3. replay completo read-only de Cobros;
-4. materialización durable;
-5. integración acumulativa;
-6. release candidate;
-7. go-live autorizado.
-
-## 9. Regla de actualización
-
-Cada iteración actualiza avance, fuente, implementación, evidencia, gate, estado, ledger, plan, Academia, acumulado Claude y PR. No se reabre una auditoría general ni se normaliza un falso GO visual.
+Cada iteración actualiza avance, fuente, implementación, evidencia, gate, estado, ledger, plan, Academia, acumulado Claude y PR. No se reabre una auditoría general ni se convierte un problema del capturador en bloqueo artificial del producto.
