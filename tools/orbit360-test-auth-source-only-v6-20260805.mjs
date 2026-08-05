@@ -189,7 +189,8 @@ try {
 
   console.log(JSON.stringify({
     ok: true,
-    actorParityCases: 3,
+    actorParityCases: 2,
+    actorRejectionCases: 1,
     callableErrorPropagationCases: 1,
     evidencePersistenceCases: 3,
     integrityStatesVerified: ['VERIFIED_UNCHANGED', 'VERIFIED_CHANGED', 'NOT_POSTVERIFIED'],
