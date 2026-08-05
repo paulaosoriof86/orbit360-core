@@ -1,0 +1,282 @@
+name: Orbit 360 · Recuperación controlada de acceso LAB v3
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-requests/auth-access-recovery-lab-v3-20260805.json'
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: orbit360-auth-access-recovery-lab-v3-20260805
+  cancel-in-progress: false
+
+env:
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  ORBIT360_REQUEST_FILE: .github/orbit360-requests/auth-access-recovery-lab-v3-20260805.json
+  ORBIT360_GATE_ID: block-auth-access-recovery-lab-v3-20260805
+  ORBIT360_PROJECT_ID: ays-orbit-360-lab
+  ORBIT360_REAL_TENANT_ID: alianzas-soluciones
+  ORBIT360_FUNCTIONS_REGION: us-central1
+  ORBIT360_FUNCTION: orbit360ProvisionTeamAccess
+  ORBIT360_LIFECYCLE: tools/orbit360-validator-lifecycle-contract-auth-access-recovery-lab-v3-20260805.json
+  ORBIT360_CONFIG_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/auth-access-config-repair-sanitized-v3-20260805.json
+  ORBIT360_AUTH_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/auth-access-recovery-sanitized-v3-20260805.json
+  ORBIT360_SCOPE_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/auth-access-scope-postverify-sanitized-v3-20260805.json
+  ORBIT360_ROLLBACK_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/auth-access-postverify-rollback-sanitized-v3-20260805.json
+  ORBIT360_FINAL_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/auth-access-recovery-final-sanitized-v3-20260805.json
+  ORBIT360_PREVIEW_URL: https://ays-orbit-360-lab.web.app
+
+jobs:
+  recover-access-v3:
+    name: Gate v3 → config aprobada → censo → onboarding → scopes
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Checkout request exacto
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Verificar request v3 único e inmutable
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
+          test "${#CHANGED[@]}" = '1'
+          test "${CHANGED[0]}" = "$ORBIT360_REQUEST_FILE"
+          PARENT="$(git rev-parse HEAD^)"
+          jq -e --arg parent "$PARENT" '
+            .schemaVersion=="orbit360-auth-access-recovery-request-v3" and
+            .gateId=="block-auth-access-recovery-lab-v3-20260805" and
+            .rcId=="RC-AYS-LAB-CANONICA-01" and
+            .status=="AUTHORIZED_ONCE" and .approved==true and
+            .allowedExecutions==1 and .consumed==false and .replayAllowed==false and
+            .branch=="ays/backend-tenant-lab-v99-20260703" and .pullRequest==5 and
+            .projectId=="ays-orbit-360-lab" and .tenantId=="alianzas-soluciones" and
+            .parentHead==$parent and
+            .scope.planApprovedAccessConfig==true and
+            .scope.applyApprovedAccessConfig==true and
+            .scope.authCensusReadOnly==true and
+            .scope.deployOnboardingFunctionOnlyIfAbsent==true and
+            .scope.createOrLinkApprovedRealUsers==true and
+            .scope.syncMembershipRolesCountriesScopes==true and
+            .scope.sendPasswordEstablishmentOrReset==true and
+            .scope.verifyIdentityMembershipContract==true and
+            .scope.rollbackAuthMembershipsOnFailure==true and
+            .scope.syntheticUsers==false and .scope.syntheticMemberships==false and
+            .scope.hardcodedUsers==false and .scope.temporaryPasswords==false and
+            .scope.otherFunctions==false and .scope.hosting==false and .scope.rules==false and
+            .scope.reimport==false and .scope.crmWrites==false and
+            .scope.production==false and .scope.main==false and .scope.merge==false
+          ' "$ORBIT360_REQUEST_FILE" >/dev/null
+
+      - name: Registrar gate v3 en working tree
+        run: node tools/orbit360-register-auth-access-gate-v3-20260805.mjs
+
+      - name: Gate canónico antes de secretos
+        id: preflight
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
+          jq -e '
+            .status=="GO_GATE_CONTRACT" and .contractVersion=="13.2.0" and .failed==0 and
+            .executionAuthorized==true and .secretAccessAuthorized==true and
+            .firestoreReadAuthorized==true and .writeAuthorized==true and
+            .maximumAdvisorDocumentsUpdated==3 and
+            .allowedAdvisorFields==["email","roles","defaultRole","activeRole","countries","dataScopes"] and
+            .authWriteAuthorized==true and .functionsDeployAuthorized==true and
+            .allowedFunctions==["orbit360ProvisionTeamAccess"] and
+            .hostingDeployAuthorized==false and .rulesDeployAuthorized==false and
+            .productionAuthorized==false and .dataAccess==false and .secretAccess==false and
+            .firestoreWrites==0 and .authWrites==0 and .deployExecuted==false
+          ' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json >/dev/null
+
+      - name: Persistir registro canónico sin nuevo runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! git diff --quiet -- tools/orbit360-validar-gate-contracts-v20260717.mjs; then
+            git config user.name orbit360-gate-bot
+            git config user.email orbit360-gate-bot@users.noreply.github.com
+            git add tools/orbit360-validar-gate-contracts-v20260717.mjs
+            git commit -m 'gate: register auth access recovery v3 [skip ci]'
+            git push origin "HEAD:$ORBIT360_BRANCH"
+          fi
+
+      - name: Resolver credencial LAB
+        env:
+          SA1: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          SA2: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+          SA3: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          SERVICE_ACCOUNT="${SA1:-${SA2:-${SA3:-}}}"
+          test -n "$SERVICE_ACCOUNT"
+          KEY="$RUNNER_TEMP/orbit360-auth-v3-service-account.json"
+          printf '%s' "$SERVICE_ACCOUNT" > "$KEY"
+          chmod 600 "$KEY"
+          test "$(jq -r '.project_id // empty' "$KEY")" = "$ORBIT360_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY" >> "$GITHUB_ENV"
+          echo "ORBIT360_ACCESS_CONFIG_PRIVATE=$RUNNER_TEMP/orbit360-access-config-v3-private.json" >> "$GITHUB_ENV"
+          echo "ORBIT360_AUTH_PRIVATE_STATE=$RUNNER_TEMP/orbit360-auth-v3-private.json" >> "$GITHUB_ENV"
+          echo "ORBIT360_ACCESS_CONFIG_EVIDENCE=$ORBIT360_CONFIG_EVIDENCE" >> "$GITHUB_ENV"
+          echo "ORBIT360_SCOPE_EVIDENCE=$ORBIT360_SCOPE_EVIDENCE" >> "$GITHUB_ENV"
+          echo "ORBIT360_ROLLBACK_EVIDENCE=$ORBIT360_ROLLBACK_EVIDENCE" >> "$GITHUB_ENV"
+
+      - name: Instalar runtime reproducible
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false firebase-admin@13.10.0 google-auth-library@9 firebase-tools@15.25.1 >/dev/null
+          npm --prefix functions ci --include=prod
+          node --check tools/orbit360-auth-access-config-repair-lab-v3-20260805.mjs
+          node --check tools/orbit360-auth-access-recovery-lab-v20260805.mjs
+          node --check tools/orbit360-auth-access-scope-postverify-lab-v2-20260805.mjs
+          node --check tools/orbit360-auth-access-postverify-rollback-lab-v2-20260805.mjs
+          node --check functions/user-onboarding.js
+
+      - name: Planificar configuración aprobada de acceso
+        id: config_plan
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-auth-access-config-repair-lab-v3-20260805.mjs plan
+          jq -e '
+            .stage=="AUTH_ACCESS_CONFIG_REPAIR_PLAN_PASS" and .ok==true and
+            .documentsObserved==3 and .firestoreWrites==0 and .authWrites==0 and .crmWrites==0 and
+            all(.profiles[]; (.changedFields - ["email","roles","defaultRole","activeRole","countries","dataScopes"] | length)==0)
+          ' "$ORBIT360_CONFIG_EVIDENCE" >/dev/null
+
+      - name: Aplicar configuración aprobada de acceso
+        id: config_apply
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-auth-access-config-repair-lab-v3-20260805.mjs apply
+          jq -e '
+            .stage=="AUTH_ACCESS_CONFIG_REPAIR_APPLY_PASS" and .ok==true and
+            (.profilesConfigured|length)==3 and .authWrites==0 and .membershipWrites==0 and .crmWrites==0
+          ' "$ORBIT360_CONFIG_EVIDENCE" >/dev/null
+
+      - name: Censo Auth/memberships y snapshot CRM
+        id: census
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-auth-access-recovery-lab-v20260805.mjs --mode census --private "$ORBIT360_AUTH_PRIVATE_STATE" --sanitized "$ORBIT360_AUTH_EVIDENCE"
+          jq -e '.stage=="CENSUS_READ_ONLY_PASS" and .ok==true and (.configuredTargets|length)==3 and .privilegedActorResolved==true and .firestoreWrites==0 and .authWrites==0' "$ORBIT360_AUTH_EVIDENCE" >/dev/null
+
+      - name: Desplegar exclusivamente onboarding si falta
+        id: function
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx firebase functions:list --project "$ORBIT360_PROJECT_ID" --json > "$RUNNER_TEMP/functions-before-v3.json"
+          BEFORE="$(node -e "const fs=require('fs');const s=fs.readFileSync(process.argv[1],'utf8');console.log((s.match(/orbit360ProvisionTeamAccess/g)||[]).length)" "$RUNNER_TEMP/functions-before-v3.json")"
+          DEPLOYED=false
+          if [ "$BEFORE" = 0 ]; then
+            npx firebase deploy --project "$ORBIT360_PROJECT_ID" --only "functions:$ORBIT360_FUNCTION" --non-interactive --force
+            DEPLOYED=true
+          fi
+          npx firebase functions:list --project "$ORBIT360_PROJECT_ID" --json > "$RUNNER_TEMP/functions-after-v3.json"
+          AFTER="$(node -e "const fs=require('fs');const s=fs.readFileSync(process.argv[1],'utf8');console.log((s.match(/orbit360ProvisionTeamAccess/g)||[]).length)" "$RUNNER_TEMP/functions-after-v3.json")"
+          test "$AFTER" -ge 1
+          echo "deployed=$DEPLOYED" >> "$GITHUB_OUTPUT"
+
+      - name: Crear o vincular identidades y memberships
+        id: recover
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-auth-access-recovery-lab-v20260805.mjs --mode recover --private "$ORBIT360_AUTH_PRIVATE_STATE" --sanitized "$ORBIT360_AUTH_EVIDENCE"
+          jq -e '
+            .stage=="AUTH_ACCESS_RECOVERY_PASS" and .ok==true and (.targets|length)==3 and
+            .passwordEstablishmentEmailsSent==3 and .nonTargetAuthUnchanged==true and
+            .nonTargetMembershipsUnchanged==true and .protectedCrmDataUnchanged==true and
+            .temporaryPasswordsCreated==0 and .fullEmailsExposed==0 and
+            .otherFunctionsDeployed==0 and .hostingDeploys==0 and .rulesDeploys==0 and .reimports==0
+          ' "$ORBIT360_AUTH_EVIDENCE" >/dev/null
+
+      - name: Verificar roles, países y scopes
+        id: scope
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-auth-access-scope-postverify-lab-v2-20260805.mjs
+          jq -e '.stage=="AUTH_ACCESS_SCOPE_POSTVERIFY_PASS" and .ok==true and (.targets|length)==3 and all(.targets[];.dataScopesVerified==true)' "$ORBIT360_SCOPE_EVIDENCE" >/dev/null
+
+      - name: Rollback Auth/memberships si falla postverificación
+        if: always() && steps.recover.outcome == 'success' && steps.scope.outcome != 'success'
+        shell: bash
+        run: node tools/orbit360-auth-access-postverify-rollback-lab-v2-20260805.mjs
+
+      - name: Sellar evidencia final y lifecycle
+        if: always() && steps.preflight.outcome == 'success'
+        shell: bash
+        env:
+          FUNCTION_DEPLOYED: ${{ steps.function.outputs.deployed }}
+        run: |
+          node --input-type=module - <<'NODE'
+          import fs from 'node:fs';
+          const read=p=>fs.existsSync(p)?JSON.parse(fs.readFileSync(p,'utf8')):null;
+          const config=read(process.env.ORBIT360_CONFIG_EVIDENCE),auth=read(process.env.ORBIT360_AUTH_EVIDENCE),scope=read(process.env.ORBIT360_SCOPE_EVIDENCE),rollback=read(process.env.ORBIT360_ROLLBACK_EVIDENCE);
+          const ok=config?.stage==='AUTH_ACCESS_CONFIG_REPAIR_APPLY_PASS'&&config?.ok===true&&auth?.stage==='AUTH_ACCESS_RECOVERY_PASS'&&auth?.ok===true&&scope?.stage==='AUTH_ACCESS_SCOPE_POSTVERIFY_PASS'&&scope?.ok===true;
+          const failed=[config,auth,scope].find(x=>x&&x.ok===false);
+          const final={schemaVersion:'orbit360-auth-access-recovery-final-sanitized-v3',stage:ok?'AUTH_ACCESS_RECOVERY_V3_PASS':(failed?.stage||'STOP_RETRY_EVIDENCE_INCOMPLETE'),decision:ok?'GO_REAL_IDENTITIES_MEMBERSHIPS_PASSWORD_AND_SCOPES':'STOP_RETRY',classification:ok?'AUTH_ACCESS_RECOVERY_COMPLETE':(failed?.classification||'PIPELINE_MECHANISM_FAILURE'),accessConfigurationComplete:config?.ok===true,functionDeployed:process.env.FUNCTION_DEPLOYED==='true',targets:auth?.targets||[],authUsersCreated:auth?.authUsersCreated??0,membershipsCreated:auth?.membershipsCreated??0,passwordEstablishmentEmailsSent:auth?.passwordEstablishmentEmailsSent??0,rolesCountriesVerified:auth?.ok===true,dataScopesVerified:scope?.ok===true,protectedCrmDataUnchanged:auth?.protectedCrmDataUnchanged===true,rollbackApplied:rollback?.ok===true,temporaryPasswordsCreated:0,fullEmailsExposed:0,otherFunctionsDeployed:0,hostingDeploys:0,rulesDeploys:0,reimports:0,productionTouched:false,mainTouched:false,mergeExecuted:false,containsPII:false,containsSecrets:false,ok};
+          fs.writeFileSync(process.env.ORBIT360_FINAL_EVIDENCE,JSON.stringify(final,null,2)+'\n');
+          const lifecycle=JSON.parse(fs.readFileSync(process.env.ORBIT360_LIFECYCLE,'utf8'));
+          lifecycle.status=ok?'AUTH_ACCESS_RECOVERY_V3_CONSUMED_PASS':'AUTH_ACCESS_RECOVERY_V3_CONSUMED_STOP_RETRY';lifecycle.authorization.activeRequest=false;lifecycle.authorization.allowedExecutions=0;lifecycle.authorization.consumed=true;lifecycle.executionResult={stage:final.stage,classification:final.classification,ok};
+          fs.writeFileSync(process.env.ORBIT360_LIFECYCLE,JSON.stringify(lifecycle,null,2)+'\n');
+          fs.writeFileSync('orbit360-platform/docs/CIERRE-AUTH-ACCESS-RECOVERY-LAB-V3-20260805.md',`# CIERRE AUTH ACCESS v3\n\n\`\`\`text\n${final.stage}\n${final.classification}\n\`\`\`\n\n- configuración de acceso completa: ${final.accessConfigurationComplete}\n- identidades creadas: ${final.authUsersCreated}\n- memberships creadas: ${final.membershipsCreated}\n- correos enviados: ${final.passwordEstablishmentEmailsSent}\n- scopes verificados: ${final.dataScopesVerified}\n- CRM protegido sin cambios: ${final.protectedCrmDataUnchanged}\n`);
+          NODE
+
+      - name: Persistir cierre sin modificar request
+        if: always() && steps.preflight.outcome == 'success'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name orbit360-access-bot
+          git config user.email orbit360-access-bot@users.noreply.github.com
+          for f in "$ORBIT360_LIFECYCLE" orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json "$ORBIT360_CONFIG_EVIDENCE" "$ORBIT360_AUTH_EVIDENCE" "$ORBIT360_SCOPE_EVIDENCE" "$ORBIT360_ROLLBACK_EVIDENCE" "$ORBIT360_FINAL_EVIDENCE" orbit360-platform/docs/CIERRE-AUTH-ACCESS-RECOVERY-LAB-V3-20260805.md; do
+            test -f "$f" && git add "$f"
+          done
+          if ! git diff --cached --quiet; then git commit -m 'auth: persist access recovery v3 result [skip ci]'; git push origin "HEAD:$ORBIT360_BRANCH"; fi
+
+      - name: Publicar evidencia sanitizada
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-auth-access-recovery-sanitized-v3-20260805
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/auth-access-config-repair-sanitized-v3-20260805.json
+            orbit360-platform/runtime-gate-crm-v20260716/auth-access-recovery-sanitized-v3-20260805.json
+            orbit360-platform/runtime-gate-crm-v20260716/auth-access-scope-postverify-sanitized-v3-20260805.json
+            orbit360-platform/runtime-gate-crm-v20260716/auth-access-postverify-rollback-sanitized-v3-20260805.json
+            orbit360-platform/runtime-gate-crm-v20260716/auth-access-recovery-final-sanitized-v3-20260805.json
+            orbit360-platform/docs/CIERRE-AUTH-ACCESS-RECOVERY-LAB-V3-20260805.md
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Comentar decisión en PR 5
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs=require('fs');let e={stage:'STOP_RETRY_EVIDENCE_MISSING',classification:'PIPELINE_MECHANISM_FAILURE',ok:false};try{e=JSON.parse(fs.readFileSync(process.env.ORBIT360_FINAL_EVIDENCE,'utf8'));}catch{}
+            await github.rest.issues.createComment({owner:context.repo.owner,repo:context.repo.repo,issue_number:5,body:`## AUTH Access Recovery v3 — ${e.ok?'PASS':'STOP_RETRY'}\n\n\`\`\`text\nstage: ${e.stage}\nclassification: ${e.classification}\nconfiguración acceso: ${e.accessConfigurationComplete===true}\nidentidades creadas: ${e.authUsersCreated||0}\nmemberships creadas: ${e.membershipsCreated||0}\ncorreos enviados: ${e.passwordEstablishmentEmailsSent||0}\nscopes verificados: ${e.dataScopesVerified===true}\nCRM protegido: ${e.protectedCrmDataUnchanged===true}\n\`\`\``});
+
+      - name: Fallar ante STOP_RETRY
+        if: always()
+        shell: bash
+        run: jq -e '.ok==true and .stage=="AUTH_ACCESS_RECOVERY_V3_PASS" and .dataScopesVerified==true' "$ORBIT360_FINAL_EVIDENCE" >/dev/null
