@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "orbit360-auth-access-recovery-sanitized-v1",
+  "stage": "STOP_RETRY_CENSUS",
+  "decision": "STOP_RETRY",
+  "classification": "DATA_CONTRACT_FAILURE",
+  "errorCode": "ADVISOR_PAULA_EMAIL_REQUIRED",
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "temporaryPasswordsCreated": 0,
+  "passwordsRead": 0,
+  "actionLinksExposed": 0,
+  "fullEmailsExposed": 0,
+  "productionTouched": false,
+  "mainTouched": false,
+  "mergeExecuted": false,
+  "containsPII": false,
+  "containsSecrets": false,
+  "ok": false
+}
