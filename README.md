@@ -7,34 +7,51 @@ La continuidad operativa vigente de A&S se rige por:
 1. `orbit360-platform/docs/FUENTES-RECTORAS-VIGENTES-ORBIT360-AYS-20260730.md`;
 2. `orbit360-platform/docs/PLAN-UNICO-SALIDA-RC-AYS-LAB-CANONICA-01-20260804.md`;
 3. `orbit360-platform/runtime-gate-crm-v20260716/rc-ays-lab-canonica-01-ledger-v20260804.json`;
-4. `orbit360-platform/docs/ESTADO-ACTIVO-MICROBLOQUE-2-1-RC-AYS-CANONICA-20260804.md`;
-5. `orbit360-platform/docs/CIERRE-STOP-RETRY-MICROBLOQUE-2-1-GO-LAB-CANDIDATE-VISIBLE-20260805.md`;
-6. `orbit360-platform/docs/INCIDENTE-CIERRE-REQUEST-DISPARADOR-MICROBLOQUE-2-1-20260805.md`;
-7. estado vivo del PR #5.
+4. `orbit360-platform/docs/CIERRE-MICROBLOQUE-2-2-PASS-CANONICAL-PREFLIGHT-COMPOSITION-20260805.md`;
+5. `orbit360-platform/docs/ESTADO-ACTIVO-MICROBLOQUE-2-3-RC-AYS-CANONICA-20260805.md`;
+6. estado vivo del PR #5.
 
-RC activa: `RC-AYS-LAB-CANONICA-01`.
+RC activa:
 
-Estado vigente:
+```text
+RC-AYS-LAB-CANONICA-01
+sourceBaseline: 548cffa50cddfd93ad2118f5a06e9bb420699bde
+```
+
+Gates cerrados:
 
 ```text
 PASS_PLAN_PERSISTED
 PASS_CANONICAL_BASELINE
 PASS_ISOLATED_ROUTE_HARNESS
-Microbloque 2.1: STOP_RETRY_DEFINITIVE_CONTROL_PLANE
+PASS_CANONICAL_PREFLIGHT_COMPOSITION
 ```
 
-La autorización de `GO_LAB_CANDIDATE_VISIBLE` está consumida. Los intentos autorizados `30974443335` y `30974745085` se detuvieron en el preflight antes de secretos, Firebase, Functions, Hosting y navegador. No existe URL LAB retenida.
-
-El run `30975037529` fue un disparo administrativo accidental producido al marcar consumido el mismo archivo que activaba el workflow. Fue rechazado en la validación del request antes del preflight; no cuenta como ejecución autorizada ni runtime. El request disparador no se vuelve a modificar.
-
-Causa raíz vigente:
+Evidencia vigente:
 
 ```text
-VALIDATOR_STALE + PIPELINE_MECHANISM_FAILURE
-owner: tools/orbit360-validar-gate-contracts-v20260717.mjs
-error: CANONICAL_LIFECYCLE_REVISION_MISMATCH
+runtime funcional: 30962756387 · 18/18 PASS
+rutas aisladas sintéticas: 30971707956 · 8/8 PASS
+composición canónica final: 30977179448 · 31/31 PASS
+inner preflight: 32/32 PASS
 ```
 
-No ejecutar otro request ni otro parche de esta familia. La siguiente acción es exclusivamente source-only: rediseñar y probar outer router + lifecycle + inner engine como una unidad, conservar `phase-capability-contract-v1`, declarar la revisión del arnés en un campo separado, separar request inmutable de ledger de consumo y corregir contadores de evidencia basados en literales.
+Estado activo:
+
+```text
+Microbloque 2.3
+Gate: GO_LAB_CANDIDATE_VISIBLE
+Estado: READY_AWAITING_NEW_EXPLICIT_LAB_DEPLOY_AUTHORIZATION
+```
+
+El workflow runtime existente está preparado para un request v3, pero permanece inerte:
+
+```text
+.github/orbit360-requests/block12-go-lab-candidate-visible-v3.json
+```
+
+Ese archivo no existe y no debe crearse sin autorización explícita nueva. El request anterior está consumido e inmutable.
+
+La próxima autorización podrá cubrir únicamente: preflight antes de secretos, cuatro Functions LAB allowlisted, un Hosting preview retenido, ocho rutas aisladas/directas y snapshots before/after idénticos. No cubre Rules, reimportación, producción, main, merge ni repetición de los 18 escenarios.
 
 No usar memoria, conversaciones o estados históricos para sustituir el ledger vivo.
