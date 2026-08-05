@@ -3,7 +3,7 @@
   "gateId": "block-auth-access-recovery-lab-v3-20260805",
   "gateContractVersion": "13.2.0",
   "validatorLifecycleRevision": "phase-capability-contract-v1",
-  "status": "AUTH_ACCESS_RECOVERY_V3_AUTHORIZED_ONCE",
+  "status": "AUTH_ACCESS_RECOVERY_V3_CONSUMED_STOP_RETRY",
   "executionProfile": {
     "phase": "AUTH_ACCESS_RECOVERY_LAB_V3",
     "capabilities": {
@@ -22,12 +22,12 @@
   "rcId": "RC-AYS-LAB-CANONICA-01",
   "authorization": {
     "requiredForExecution": true,
-    "activeRequest": true,
-    "allowedExecutions": 1,
+    "activeRequest": false,
+    "allowedExecutions": 0,
     "request": ".github/orbit360-requests/auth-access-recovery-lab-v3-20260805.json",
     "authorizationRef": "user_authorized_auth_access_recovery_v3_20260805T0924-0600",
     "authorizedAt": "2026-08-05T09:24:00-06:00",
-    "consumed": false,
+    "consumed": true,
     "replayAllowed": false
   },
   "priorAttempts": [
@@ -118,5 +118,10 @@
     "fixedBy": "tools/orbit360-auth-access-config-repair-lab-v3-20260805.mjs"
   },
   "containsPII": false,
-  "containsSecrets": false
+  "containsSecrets": false,
+  "executionResult": {
+    "stage": "STOP_RETRY_ACCESS_CONFIG_APPLY",
+    "classification": "PIPELINE_MECHANISM_FAILURE",
+    "ok": false
+  }
 }

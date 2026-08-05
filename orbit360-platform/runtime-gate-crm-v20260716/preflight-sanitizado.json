@@ -1,11 +1,11 @@
 {
-  "schemaVersion": "orbit360-auth-access-recovery-gate-v2",
-  "gateId": "block-auth-access-recovery-lab-v2-20260805",
-  "contractVersion": "13.1.0",
+  "schemaVersion": "orbit360-auth-access-recovery-gate-v3",
+  "gateId": "block-auth-access-recovery-lab-v3-20260805",
+  "contractVersion": "13.2.0",
   "status": "GO_GATE_CONTRACT",
-  "classification": "AUTH_ACCESS_RECOVERY_V2_READY",
-  "total": 13,
-  "passed": 13,
+  "classification": "AUTH_ACCESS_RECOVERY_V3_READY",
+  "total": 12,
+  "passed": 12,
   "failed": 0,
   "failedCheckIds": [],
   "checks": [
@@ -35,16 +35,6 @@
       "detail": ""
     },
     {
-      "id": "OFFICIAL_EMAIL_DIGEST",
-      "ok": true,
-      "detail": ""
-    },
-    {
-      "id": "TARGETS_EXACT",
-      "ok": true,
-      "detail": ""
-    },
-    {
       "id": "SCOPE_POSITIVE",
       "ok": true,
       "detail": ""
@@ -55,17 +45,22 @@
       "detail": ""
     },
     {
+      "id": "ACCESS_CONFIG_BOUNDARY",
+      "ok": true,
+      "detail": ""
+    },
+    {
       "id": "FUNCTION_ALLOWLIST",
       "ok": true,
       "detail": ""
     },
     {
-      "id": "PRIOR_CONSUMED",
+      "id": "PRIOR_ATTEMPTS_CONSUMED",
       "ok": true,
       "detail": ""
     },
     {
-      "id": "PRIOR_REQUEST_IMMUTABLE",
+      "id": "PRIOR_REQUESTS_IMMUTABLE",
       "ok": true,
       "detail": ""
     },
@@ -79,8 +74,15 @@
   "secretAccessAuthorized": true,
   "firestoreReadAuthorized": true,
   "writeAuthorized": true,
-  "maximumAdvisorConfigurationDocumentsUpdated": 1,
-  "maximumAdvisorConfigurationFieldsUpdated": 1,
+  "maximumAdvisorDocumentsUpdated": 3,
+  "allowedAdvisorFields": [
+    "email",
+    "roles",
+    "defaultRole",
+    "activeRole",
+    "countries",
+    "dataScopes"
+  ],
   "authWriteAuthorized": true,
   "runtimeAuthorized": true,
   "browserAuthorized": false,
@@ -102,13 +104,11 @@
   "browserExecuted": false,
   "deployExecuted": false,
   "productionTouched": false,
-  "officialAccessEmailSha256": "9b663847979724e9491e1c655da32a7cb17a5f6ed26dba352de1eb811254b23f",
-  "fullEmailsExposed": 0,
   "containsPII": false,
   "containsSecrets": false,
   "canonicalEntrypoint": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
-  "canonicalEngine": "tools/orbit360-validar-gate-contracts-engine-auth-access-recovery-lab-v2-20260805.mjs",
-  "canonicalLifecycleContract": "tools/orbit360-validator-lifecycle-contract-auth-access-recovery-lab-v2-20260805.json",
+  "canonicalEngine": "tools/orbit360-validar-gate-contracts-engine-auth-access-recovery-lab-v3-20260805.mjs",
+  "canonicalLifecycleContract": "tools/orbit360-validator-lifecycle-contract-auth-access-recovery-lab-v3-20260805.json",
   "canonicalLifecycleComposition": "phase-capability-contract-v1",
   "engineEvidenceSource": "sync-file-evidence-not-stdout-v1",
   "engineStdoutParsed": false,
