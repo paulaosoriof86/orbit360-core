@@ -2,7 +2,7 @@
   "schemaVersion": "orbit360-rc-ays-canonical-ledger-v1",
   "rcId": "RC-AYS-LAB-CANONICA-01",
   "createdAt": "2026-08-04T21:38:00-06:00",
-  "updatedAt": "2026-08-04T22:24:30-06:00",
+  "updatedAt": "2026-08-04T23:08:04-06:00",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
@@ -11,31 +11,44 @@
   "candidateHead": "548cffa50cddfd93ad2118f5a06e9bb420699bde",
   "planPath": "orbit360-platform/docs/PLAN-UNICO-SALIDA-RC-AYS-LAB-CANONICA-01-20260804.md",
   "ledgerPath": "orbit360-platform/runtime-gate-crm-v20260716/rc-ays-lab-canonica-01-ledger-v20260804.json",
-  "stopEvidencePath": "orbit360-platform/runtime-gate-crm-v20260716/rc-ays-lab-canonica-01-microblock21-stop-retry-v20260805.json",
-  "stopClosurePath": "orbit360-platform/docs/CIERRE-STOP-RETRY-MICROBLOQUE-2-1-GO-LAB-CANDIDATE-VISIBLE-20260805.md",
+  "microblock21StopEvidencePath": "orbit360-platform/runtime-gate-crm-v20260716/rc-ays-lab-canonica-01-microblock21-stop-retry-v20260805.json",
+  "microblock21StopClosurePath": "orbit360-platform/docs/CIERRE-STOP-RETRY-MICROBLOQUE-2-1-GO-LAB-CANDIDATE-VISIBLE-20260805.md",
   "requestConsumptionIncidentPath": "orbit360-platform/runtime-gate-crm-v20260716/rc-ays-lab-canonica-01-request-consumption-trigger-incident-v20260805.json",
+  "microblock22EvidencePath": "orbit360-platform/runtime-gate-crm-v20260716/rc-ays-lab-canonica-01-microblock22-pass-v20260805.json",
+  "microblock22ClosurePath": "orbit360-platform/docs/CIERRE-MICROBLOQUE-2-2-PASS-CANONICAL-PREFLIGHT-COMPOSITION-20260805.md",
+  "activeStatePath": "orbit360-platform/docs/ESTADO-ACTIVO-MICROBLOQUE-2-3-RC-AYS-CANONICA-20260805.md",
   "activeMacroblock": "2",
-  "activeMicroblock": "2.1",
+  "activeMicroblock": "2.3",
   "activeGate": "GO_LAB_CANDIDATE_VISIBLE",
-  "status": "STOP_RETRY_DEFINITIVE_CONTROL_PLANE",
+  "status": "READY_AWAITING_NEW_EXPLICIT_LAB_DEPLOY_AUTHORIZATION",
   "authorization": {
-    "reference": "user_authorized_microblock_2_1_20260804T2207-0600",
-    "consumed": true,
-    "authorizedExecutionAttempts": 2,
-    "allowedExecutionsRemaining": 0,
-    "replayAllowed": false,
-    "newAuthorizationRequiredForFutureRuntime": true
+    "microblock21Reference": "user_authorized_microblock_2_1_20260804T2207-0600",
+    "microblock21Consumed": true,
+    "microblock21AuthorizedExecutionAttempts": 2,
+    "microblock21AllowedExecutionsRemaining": 0,
+    "microblock21ReplayAllowed": false,
+    "microblock22SourceOnlyAuthorizedByContinuation": true,
+    "microblock22RuntimeAuthorized": false,
+    "microblock23Authorized": false,
+    "microblock23AllowedExecutions": 0,
+    "newExplicitAuthorizationRequiredForRuntime": true
   },
   "closedFacts": {
     "runtimeFunctionalRunId": 30962756387,
     "runtimeFunctionalPassed": 18,
     "runtimeFunctionalFailed": 0,
     "runtimeFunctionalStatus": "PASS",
-    "functionalReplayExecutedInMicroblock21": false,
+    "functionalReplayExecutedAfterRuntimePass": false,
     "canonicalBaselineStatus": "PASS",
     "isolatedRouteHarnessRunId": 30971707956,
     "isolatedRouteHarnessStatus": "PASS",
     "isolatedRouteHarnessRoutes": 8,
+    "canonicalPreflightCompositionRunId": 30977179448,
+    "canonicalPreflightCompositionStatus": "PASS_CANONICAL_PREFLIGHT_COMPOSITION",
+    "canonicalPreflightIntegratedChecks": 31,
+    "canonicalPreflightIntegratedFailed": 0,
+    "canonicalInnerPreflightChecks": 32,
+    "canonicalInnerPreflightFailed": 0,
     "visualReplacementMechanism": "ONE_ISOLATED_BROWSER_CONTEXT_AND_DIRECT_URL_PER_ROUTE",
     "canonicalClients": 430,
     "canonicalInsurers": 30,
@@ -59,7 +72,11 @@
     "access": "orbit360-platform/core/access-scope.js",
     "cliente360": "orbit360-platform/modules/cliente360.js",
     "aseguradoras": "orbit360-platform/modules/aseguradoras.js",
-    "gateContractEntrypoint": "tools/orbit360-validar-gate-contracts-v20260717.mjs"
+    "gateContractEntrypoint": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
+    "gateContractInnerEngine": "tools/orbit360-validar-gate-contracts-engine-block12-operational-runtime-layoutfree-lab-v20260804.mjs",
+    "validatorLifecycle": "tools/orbit360-validator-lifecycle-contract-block12-operational-runtime-lab-v20260804.json",
+    "visualWorkflow": ".github/workflows/orbit360-block12-visual-layoutfree-reactivation-lab-v20260804.yml",
+    "observedEvidenceBuilder": "tools/orbit360-build-go-lab-candidate-visible-decision-v20260805.mjs"
   },
   "microblock21": {
     "name": "Visual LAB read-only retenida",
@@ -82,10 +99,7 @@
         "requestCommit": "ee2f4890883ac9b8c1d8829ae7a40757d747d2ce",
         "classification": "VALIDATOR_STALE",
         "stage": "CANONICAL_PREFLIGHT_BEFORE_SECRETS",
-        "failedCheckIds": [
-          "REQUEST_ACTIVE",
-          "VIDEO_LAYOUTFREE_HARNESS"
-        ],
+        "failedCheckIds": ["REQUEST_ACTIVE", "VIDEO_LAYOUTFREE_HARNESS"],
         "secretAccess": false,
         "deployExecuted": false
       },
@@ -95,9 +109,7 @@
         "classification": "VALIDATOR_STALE",
         "secondaryClassification": "PIPELINE_MECHANISM_FAILURE",
         "stage": "CANONICAL_PREFLIGHT_ENTRYPOINT_BEFORE_SECRETS",
-        "failedCheckIds": [
-          "CANONICAL_PREFLIGHT_ENTRYPOINT"
-        ],
+        "failedCheckIds": ["CANONICAL_PREFLIGHT_ENTRYPOINT"],
         "error": "CANONICAL_LIFECYCLE_REVISION_MISMATCH",
         "secretAccess": false,
         "deployExecuted": false
@@ -107,8 +119,7 @@
       "owner": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
       "canonicalCompositionExpected": "phase-capability-contract-v1",
       "lifecycleRevisionObserved": "isolated-context-direct-url-v6",
-      "explanation": "The visual harness generation replaced the canonical lifecycle composition identifier instead of being declared in a separate field.",
-      "innerEngineReachedOnSecondAttempt": false,
+      "explanation": "The visual harness revision replaced the canonical lifecycle composition identifier instead of being declared separately.",
       "functionalDefectDemonstrated": false,
       "dataContractFailureDemonstrated": false
     },
@@ -116,7 +127,7 @@
       "field": "functionsVerified",
       "generatedDecisionValue": 4,
       "authoritativeObservedValue": 0,
-      "status": "INVALIDATED_FIXED_LITERAL",
+      "status": "FIXED_BY_OBSERVED_OUTPUT_BUILDER",
       "operationalImpact": false
     }
   },
@@ -138,77 +149,99 @@
     "futureRule": "Never modify a trigger request for closure; record consumption only in a non-triggering ledger or evidence path.",
     "requestFileMustNotBeModifiedAgain": true
   },
+  "microblock22": {
+    "name": "Rediseño source-only de composición canónica",
+    "gate": "PASS_CANONICAL_PREFLIGHT_COMPOSITION",
+    "status": "PASS",
+    "finalRunId": 30977179448,
+    "finalJobId": 92213524382,
+    "finalRequestCommit": "ac5b4e6acdeb9423f0ecff056c9e3f0026df3c55",
+    "artifactId": 8918683791,
+    "artifactDigest": "sha256:1c9a1e3f76e331604a046562337e03bfdbe5e2a7be7094746e14804b017692ec",
+    "integratedPassed": 31,
+    "integratedFailed": 0,
+    "innerPreflightPassed": 32,
+    "innerPreflightFailed": 0,
+    "outerRouterExitCode": 0,
+    "innerEngineReached": true,
+    "validatorLifecycleRevision": "phase-capability-contract-v1",
+    "visualHarnessRevision": "isolated-context-direct-url-v6",
+    "controlPlaneRevision": "canonical-preflight-composition-source-only-v1",
+    "observedFunctionsExpected": 4,
+    "observedFunctionsVerified": 0,
+    "observedCountersOnly": true,
+    "runtimeAuthorized": false,
+    "secretAccess": false,
+    "firebaseCommandsExecuted": false,
+    "firestoreRead": false,
+    "firestoreWrites": 0,
+    "authWrites": 0,
+    "browserExecuted": false,
+    "deployExecuted": false,
+    "rulesDeployed": false,
+    "realDataReimported": false,
+    "productionTouched": false,
+    "mainTouched": false,
+    "mergeExecuted": false,
+    "functionalReplayExecuted": false,
+    "sourceOnlyHistory": [
+      {
+        "runId": 30976516399,
+        "status": "STOP_SOURCE_ONLY_CONTROL_PLANE",
+        "classification": "VALIDATOR_STALE",
+        "passed": 28,
+        "failed": 3,
+        "rootCheck": "OBSERVED_EVIDENCE_BUILDER"
+      },
+      {
+        "runId": 30976772355,
+        "status": "PASS_CANONICAL_PREFLIGHT_COMPOSITION",
+        "passed": 31,
+        "failed": 0
+      },
+      {
+        "runId": 30977005176,
+        "status": "STOP_SOURCE_ONLY_CONTROL_PLANE",
+        "classification": "VALIDATOR_STALE",
+        "passed": 29,
+        "failed": 2,
+        "rootCheck": "RETENTION_POLICY"
+      },
+      {
+        "runId": 30977179448,
+        "status": "PASS_CANONICAL_PREFLIGHT_COMPOSITION",
+        "passed": 31,
+        "failed": 0
+      }
+    ]
+  },
+  "microblock23": {
+    "name": "Visual LAB read-only retenida con request v3",
+    "gate": "GO_LAB_CANDIDATE_VISIBLE",
+    "status": "READY_AWAITING_NEW_EXPLICIT_LAB_DEPLOY_AUTHORIZATION",
+    "runtimeWorkflow": ".github/workflows/orbit360-block12-visual-layoutfree-reactivation-lab-v20260804.yml",
+    "runtimeWorkflowPreparedCommit": "957b62aa2416d71e1ae1cada9bad61d2395bc46e",
+    "runtimeRequest": ".github/orbit360-requests/block12-go-lab-candidate-visible-v3.json",
+    "runtimeRequestExists": false,
+    "runtimeAuthorized": false,
+    "allowedExecutions": 0,
+    "previousFunctionalReplayForbidden": true,
+    "newWorkflowVariantForbidden": true,
+    "oldConsumedRequestImmutable": true
+  },
   "microblocks": [
-    {
-      "id": "1.0",
-      "name": "Plan y ledger persistentes",
-      "status": "PASS",
-      "gate": "PASS_PLAN_PERSISTED"
-    },
-    {
-      "id": "1.1",
-      "name": "Reconciliacion forense focalizada del baseline",
-      "status": "PASS",
-      "gate": "PASS_CANONICAL_BASELINE"
-    },
-    {
-      "id": "2.0",
-      "name": "Validador sintetico de rutas aisladas",
-      "status": "PASS",
-      "gate": "PASS_ISOLATED_ROUTE_HARNESS",
-      "runId": 30971707956,
-      "routeCount": 8
-    },
-    {
-      "id": "2.1",
-      "name": "Visual LAB read-only retenida",
-      "status": "STOP_RETRY_DEFINITIVE",
-      "gate": "GO_LAB_CANDIDATE_VISIBLE",
-      "authorizationConsumed": true,
-      "previewUrlProduced": false
-    },
-    {
-      "id": "2.2",
-      "name": "Rediseño source-only de composición canónica",
-      "status": "NEXT_SOURCE_ONLY_NOT_RUNTIME_AUTHORIZED",
-      "gate": "PASS_CANONICAL_PREFLIGHT_COMPOSITION"
-    },
-    {
-      "id": "3.0",
-      "name": "Backend Ops Leads durable",
-      "status": "BLOCKED_BY_MICROBLOCK_2_1_STOP",
-      "gate": "OPS_LEADS_BACKEND_LAB_COMPLETE"
-    },
-    {
-      "id": "4.0",
-      "name": "Replay completo read-only de Cobros",
-      "status": "PENDING_AFTER_CONTROL_PLANE_RESOLUTION",
-      "gate": "PASS_COBROS_FULL_REPLAY"
-    },
-    {
-      "id": "4.1",
-      "name": "Materializacion durable de Cobros",
-      "status": "PENDING",
-      "gate": "COBROS_REAL_LEDGER_COMPLETE"
-    },
-    {
-      "id": "5.0",
-      "name": "Integracion acumulativa de modulos aprobados",
-      "status": "PENDING",
-      "gate": "RC_ACCUMULATIVE_MODULES_COMPLETE"
-    },
-    {
-      "id": "6.0",
-      "name": "Revision visual acumulativa",
-      "status": "PENDING",
-      "gate": "RELEASE_CANDIDATE_ACCEPTED"
-    },
-    {
-      "id": "7.0",
-      "name": "Go-live controlado",
-      "status": "BLOCKED_UNTIL_AUTHORIZATION",
-      "gate": "GO_PRODUCTION_A&S"
-    }
+    {"id": "1.0", "name": "Plan y ledger persistentes", "status": "PASS", "gate": "PASS_PLAN_PERSISTED"},
+    {"id": "1.1", "name": "Reconciliación forense focalizada del baseline", "status": "PASS", "gate": "PASS_CANONICAL_BASELINE"},
+    {"id": "2.0", "name": "Validador sintético de rutas aisladas", "status": "PASS", "gate": "PASS_ISOLATED_ROUTE_HARNESS", "runId": 30971707956, "routeCount": 8},
+    {"id": "2.1", "name": "Visual LAB read-only retenida", "status": "STOP_RETRY_DEFINITIVE", "gate": "GO_LAB_CANDIDATE_VISIBLE", "authorizationConsumed": true, "previewUrlProduced": false},
+    {"id": "2.2", "name": "Rediseño source-only de composición canónica", "status": "PASS", "gate": "PASS_CANONICAL_PREFLIGHT_COMPOSITION", "runId": 30977179448},
+    {"id": "2.3", "name": "Visual LAB read-only retenida con request v3", "status": "READY_AWAITING_NEW_EXPLICIT_LAB_DEPLOY_AUTHORIZATION", "gate": "GO_LAB_CANDIDATE_VISIBLE"},
+    {"id": "3.0", "name": "Backend Ops Leads durable", "status": "PENDING_AFTER_MICROBLOCK_2_3", "gate": "OPS_LEADS_BACKEND_LAB_COMPLETE"},
+    {"id": "4.0", "name": "Replay completo read-only de Cobros", "status": "PENDING_AFTER_CONTROL_PLANE_AND_VISUAL", "gate": "PASS_COBROS_FULL_REPLAY"},
+    {"id": "4.1", "name": "Materialización durable de Cobros", "status": "PENDING", "gate": "COBROS_REAL_LEDGER_COMPLETE"},
+    {"id": "5.0", "name": "Integración acumulativa de módulos aprobados", "status": "PENDING", "gate": "RC_ACCUMULATIVE_MODULES_COMPLETE"},
+    {"id": "6.0", "name": "Revisión visual acumulativa", "status": "PENDING", "gate": "RELEASE_CANDIDATE_ACCEPTED"},
+    {"id": "7.0", "name": "Go-live controlado", "status": "BLOCKED_UNTIL_AUTHORIZATION", "gate": "GO_PRODUCTION_A&S"}
   ],
   "antiDriftControls": {
     "singleRc": true,
@@ -223,15 +256,14 @@
     "noProduction": true,
     "noMain": true,
     "noMerge": true,
-    "thirdAuthorizedRequestForbidden": true,
-    "thirdRuntimeAttemptForbidden": true,
-    "additionalPatchInCurrentFailureFamilyForbidden": true,
-    "triggerRequestImmutableFromNowOn": true
+    "oldTriggerRequestImmutable": true,
+    "runtimeRequestV3AbsentUntilAuthorization": true,
+    "newVisualWorkflowVariantForbidden": true,
+    "functionalReplayForbidden": true
   },
-  "currentClassification": "VALIDATOR_STALE",
-  "secondaryClassification": "PIPELINE_MECHANISM_FAILURE",
-  "currentOwner": "canonical gate contract outer entrypoint and lifecycle composition",
-  "exactNextAction": "Do not execute runtime. Redesign and validate source-only the canonical preflight composition by preserving phase-capability-contract-v1, declaring the isolated visual harness revision separately, testing outer router plus inner engine together, separating immutable trigger requests from consumption ledgers, and fixing evidence counters to use observed outputs. A new explicit authorization is required only after an integrated static PASS.",
+  "currentClassification": "GO_SOURCE_ONLY_CONTROL_PLANE",
+  "currentOwner": "existing visual LAB workflow with canonical outer router, separated lifecycle/harness revisions and observed evidence builder",
+  "exactNextAction": "Await a new explicit authorization for one Microblock 2.3 LAB execution. Only then create the v3 runtime request bound to the current parent HEAD and execute preflight before secrets, four allowlisted Functions, one retained Hosting preview, eight isolated direct routes and identical before/after snapshots, with zero real writes and no Rules, reimport, production, main, merge or functional replay.",
   "containsPII": false,
   "containsSecrets": false
 }
