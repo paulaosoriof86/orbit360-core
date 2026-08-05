@@ -1,7 +1,7 @@
 {
   "schemaVersion": "orbit360-cobros-full-ledger-write-contract-v1",
   "gateId": "block10.10-cobros-full-ledger-write-lab-v20260805",
-  "contractVersion": "10.10.1",
+  "contractVersion": "10.10.2",
   "rcId": "RC-AYS-LAB-CANONICA-01",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -20,9 +20,10 @@
     "evidenciasCobro": 365,
     "propuestasConciliacion": 132,
     "conciliacionHolds": 233,
-    "cobrosLedgerRuns": 1,
-    "cobrosLedgerControl": 1,
-    "maximumWrites": 1097,
+    "stageManifestCreate": 1,
+    "activationManifestUpdate": 1,
+    "activePointerWrite": 1,
+    "maximumWrites": 1098,
     "newCobros": 0,
     "receiptWrites": 0,
     "policyWrites": 0,
@@ -37,55 +38,61 @@
     "reportedPaymentNoUniqueReceiptLink": 233
   },
   "pathAuthority": {
-    "class": "canonical-v79-data-items",
+    "class": "canonical-v79-run-scoped-data-items",
     "membershipPathSeparate": "tenants/{tenantId}/members/{uid}",
     "legacyOperationalPathProhibited": "tenantId/{tenantId}/{collection}",
-    "thirdPathPatternProhibited": true
+    "directTargetCollectionStageWritesProhibited": true,
+    "thirdTenantRootPatternProhibited": true
   },
   "collections": {
-    "pagosReportados": "tenants/{tenantId}/data/pagosReportados/items/{deterministicId}",
-    "evidenciasCobro": "tenants/{tenantId}/data/evidenciasCobro/items/{deterministicId}",
-    "propuestasConciliacion": "tenants/{tenantId}/data/propuestasConciliacion/items/{deterministicId}",
-    "conciliacionHolds": "tenants/{tenantId}/data/conciliacionHolds/items/{deterministicId}",
     "runManifest": "tenants/{tenantId}/data/cobrosLedgerRuns/items/{runId}",
+    "pagosReportados": "tenants/{tenantId}/data/cobrosLedgerRuns/items/{runId}/pagosReportados/{deterministicId}",
+    "evidenciasCobro": "tenants/{tenantId}/data/cobrosLedgerRuns/items/{runId}/evidenciasCobro/{deterministicId}",
+    "propuestasConciliacion": "tenants/{tenantId}/data/cobrosLedgerRuns/items/{runId}/propuestasConciliacion/{deterministicId}",
+    "conciliacionHolds": "tenants/{tenantId}/data/cobrosLedgerRuns/items/{runId}/conciliacionHolds/{deterministicId}",
     "activePointer": "tenants/{tenantId}/data/cobrosLedgerControl/items/active"
   },
   "atomicity": {
-    "strategy": "STAGE_CHUNKS_THEN_SINGLE_ACTIVE_POINTER",
+    "strategy": "ISOLATED_RUN_SUBCOLLECTIONS_THEN_POINTER_TRANSACTION",
     "maximumChunkWrites": 400,
+    "runId": "cobledger_sha256(tenantId|sourceLedgerDigest|packageLogicalSha256)",
     "allStageDocumentsCarryRunId": true,
+    "stageDocumentsInvisibleToCurrentConsumers": true,
+    "activationTransactionWrites": 2,
     "activationRequiresExactCountsAndDigest": true,
-    "readersMustUseActiveRunId": true,
-    "partialStageIsInvisible": true
+    "activePointerSelectsOnlyCompleteRun": true,
+    "partialStageIsInvisible": true,
+    "block5ConsumerProjectionRequired": true
   },
   "idempotency": {
     "documentIds": "sha256(tenantId|sourceRowIdentity|documentClass)",
-    "sameDigest": "SKIP_AS_IDEMPOTENT",
-    "differentDigest": "STOP_DATA_CONTRACT_FAILURE",
+    "runIdDeterministic": true,
+    "sameRunAndDigest": "SKIP_AS_IDEMPOTENT",
+    "sameDocumentDifferentDigest": "STOP_DATA_CONTRACT_FAILURE",
     "duplicateSourceRows": "HOLD_OR_OMIT_BY_LEDGER_DECISION",
     "replayOfConsumedRequest": "PROHIBITED"
   },
   "snapshot": {
     "before": [
       "activeLedgerPointer",
-      "targetCollectionCounts",
-      "targetCollectionDigests",
-      "existingDocumentsForPlannedIds",
+      "existingRunManifest",
+      "existingRunSubcollectionCountsAndDigests",
       "cobrosCountAndDigest",
       "receiptAndPolicyIntegrityDigest"
     ],
     "after": [
       "activeLedgerPointer",
-      "targetCollectionCounts",
-      "targetCollectionDigests",
+      "activeRunManifest",
+      "runSubcollectionCountsAndDigests",
       "cobrosCountAndDigest",
       "receiptAndPolicyIntegrityDigest"
     ]
   },
   "rollback": {
-    "deleteOnlyDocumentsCreatedByRunId": true,
+    "deleteOnlyRunScopedDocuments": true,
     "restorePreviousActivePointer": true,
-    "restorePreexistingDocumentsIfUpdated": true,
+    "deleteRunManifestIfCreated": true,
+    "preexistingActiveRunUntouched": true,
     "cobrosRollback": "NOT_APPLICABLE_NO_NEW_COBROS",
     "receiptRollback": "NOT_APPLICABLE_NO_RECEIPT_WRITES",
     "policyRollback": "NOT_APPLICABLE_NO_POLICY_WRITES",
@@ -102,7 +109,8 @@
     "calendarHoldsFortyFourPreserved": true,
     "receiptPolicyIntegrityUnchanged": true,
     "crmIntegrityUnchanged": true,
-    "allPathsCanonicalDataItems": true
+    "activePointerTargetsCompleteRun": true,
+    "currentConsumersUnaffectedDuringStage": true
   },
   "capabilitiesWhenPrepared": {
     "secrets": false,
@@ -119,8 +127,9 @@
     "do not create cobros from proposals or holds",
     "do not modify receipts, policies or financial movements",
     "do not use bank or financial history as direct collection writes",
+    "do not stage documents in collections read by current consumers",
     "do not write ledger collections under tenantId legacy path",
-    "do not create a third tenant path pattern",
+    "do not create a third tenant root pattern",
     "do not deploy Functions, Hosting or Rules",
     "do not touch production, main or merge",
     "do not store real rows, PII, policy numbers, amounts, secrets or passwords in repository evidence"
