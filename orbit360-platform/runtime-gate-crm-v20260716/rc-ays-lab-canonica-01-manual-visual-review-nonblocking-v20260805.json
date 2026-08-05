@@ -1,0 +1,48 @@
+{
+  "schemaVersion": "orbit360-manual-visual-review-decision-v1",
+  "rcId": "RC-AYS-LAB-CANONICA-01",
+  "recordedAt": "2026-08-05T06:38:00-06:00",
+  "source": "user_direction_20260805T0638-0600",
+  "decision": "MANUAL_VISUAL_REVIEW_AVAILABLE_NON_BLOCKING",
+  "retainedPreviewUrl": "https://ays-orbit-360-lab--orbit360-operational-block12-w8ibrr6w.web.app",
+  "legalModal": {
+    "globalDisableAuthorized": false,
+    "globalDisableRequired": false,
+    "manualAcceptanceOnce": true,
+    "blocksAutomatedFrames": true,
+    "blocksProductProgress": false
+  },
+  "technicalState": {
+    "runId": 31005103975,
+    "preflightPassed": 32,
+    "functionsVerified": 4,
+    "hostingPreviewRetained": true,
+    "integrityPassed": true,
+    "snapshotsIdentical": true,
+    "firestoreWrites": 0,
+    "authWrites": 0,
+    "dataLossObserved": false
+  },
+  "visualState": {
+    "manualReviewPending": true,
+    "automatedCaptureApproved": false,
+    "reason": "Acuerdos legales overlay covered all automated frames",
+    "classification": "PIPELINE_MECHANISM_FAILURE",
+    "nonBlockingByProductOwnerDecision": true
+  },
+  "continuity": {
+    "nextBlock": "3.0",
+    "nextGate": "OPS_LEADS_BACKEND_LAB_COMPLETE",
+    "status": "ACTIVE_IN_PARALLEL_WITH_MANUAL_VISUAL_REVIEW",
+    "functionsRedeployForbidden": true,
+    "hostingRedeployForbidden": true,
+    "functionalReplayForbidden": true,
+    "rulesForbidden": true,
+    "reimportForbidden": true,
+    "productionForbidden": true,
+    "mainForbidden": true,
+    "mergeForbidden": true
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
