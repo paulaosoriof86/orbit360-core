@@ -44,7 +44,7 @@
   "latestGateRunStoppedBeforeSecrets": true,
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
-  "parentHead": "f2d4df55f2b335ab4b2f1ce046cfab68cc20d0e9",
+  "parentHead": "861ff123c02acea4e9c62efa68668df4f497e799",
   "projectId": "ays-orbit-360-lab",
   "gateId": "block12-operational-runtime-lab-v20260804",
   "contractVersion": "12.0.8",
@@ -90,5 +90,7 @@
   "latestRollbackExact": true,
   "latestRealTenantUnchanged": true,
   "imp001RootCause": "REUSED_TRUE_OVERWRITTEN_BY_PRIOR_RESULT_FALSE",
-  "imp001SourceFixStatus": "IMP001_IDEMPOTENCY_RESPONSE_SOURCE_PASS"
+  "imp001SourceFixStatus": "IMP001_IDEMPOTENCY_RESPONSE_SOURCE_PASS",
+  "runtimeTriggerMode": "EXTERNAL_CONNECTOR_COMMIT",
+  "runtimeTriggerReason": "GITHUB_TOKEN_PUSH_DOES_NOT_TRIGGER_WORKFLOWS"
 }
