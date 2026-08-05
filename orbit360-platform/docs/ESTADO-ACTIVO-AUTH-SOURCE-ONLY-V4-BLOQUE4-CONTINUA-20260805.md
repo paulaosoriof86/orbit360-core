@@ -85,3 +85,16 @@ Continúan sin pausa:
 - importador inteligente;
 - contrato planilla de comisiones → CxC/CxP → factura posterior;
 - flujo durable de pagos reportados por cliente.
+
+## Fuentes sincronizadas
+
+- lifecycle v4 consumido PASS;
+- registro canónico 13.3.0;
+- engine source-only v4;
+- workflow existente reutilizado;
+- evidencia sanitizada y ledger v4;
+- anexo del Plan Único;
+- README;
+- Academia;
+- acumulado Claude;
+- PR #5.
