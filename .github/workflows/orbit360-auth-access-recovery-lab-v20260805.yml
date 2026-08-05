@@ -26,7 +26,7 @@ env:
   ORBIT360_FUNCTION: orbit360ProvisionTeamAccess
   ORBIT360_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/auth-access-recovery-sanitized-v20260805.json
   ORBIT360_LIFECYCLE: tools/orbit360-validator-lifecycle-contract-auth-access-recovery-lab-v20260805.json
-  ORBIT360_PREVIEW_URL: https://ays-orbit-360-lab--orbit360-operational-block12-w8ibrr6w.web.app
+  ORBIT360_PREVIEW_URL: https://ays-orbit-360-lab.web.app
 
 jobs:
   recover-access:
@@ -147,7 +147,7 @@ jobs:
             --mode census \
             --private "$ORBIT360_AUTH_PRIVATE_STATE" \
             --sanitized "$ORBIT360_EVIDENCE"
-          jq -e '.stage=="CENSUS_READ_ONLY_PASS" and .configuredTargets|length==3 and .firestoreWrites==0 and .authWrites==0 and .ok==true' "$ORBIT360_EVIDENCE" >/dev/null
+          jq -e '.stage=="CENSUS_READ_ONLY_PASS" and (.configuredTargets|length)==3 and .firestoreWrites==0 and .authWrites==0 and .ok==true' "$ORBIT360_EVIDENCE" >/dev/null
 
       - name: Censar y desplegar exclusivamente onboarding si está ausente
         id: function
