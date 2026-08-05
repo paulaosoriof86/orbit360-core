@@ -1,6 +1,7 @@
 # PLAN ÚNICO DE SALIDA — RC-AYS-LAB-CANONICA-01
 
 Fecha de adopción: 2026-08-04  
+Última actualización: 2026-08-04 22:05 GT  
 Rama obligatoria: `ays/backend-tenant-lab-v99-20260703`  
 PR: #5 draft/open  
 Baseline funcional congelado: `548cffa50cddfd93ad2118f5a06e9bb420699bde`  
@@ -64,7 +65,37 @@ El run LAB `30962756387` cerró:
 
 No se repite esa batería salvo cambio funcional posterior en sus owners.
 
-### 3.2 Causa raíz visual vigente
+### 3.2 Baseline canónico
+
+Microbloque 1.1 cerrado:
+
+```text
+PASS_CANONICAL_BASELINE
+```
+
+Owners fundacionales:
+
+```text
+Router       → core/router.js
+Access       → core/access-scope.js
+Cliente 360  → modules/cliente360.js
+Aseguradoras → modules/aseguradoras.js
+```
+
+Las capas de bootstrap, sesión, ceilings, UX, importación, edición y directorio operativo quedaron clasificadas como soporte o compatibilidad, no como candidatas paralelas.
+
+Conteos reconciliados:
+
+```text
+M1/M4: 414 clientes / 26 aseguradoras
+Gate 7.8 create-only: +16 clientes / +4 aseguradoras
+Baseline acumulativo: 430 clientes / 30 aseguradoras
+Delta inexplicado: 0
+Reimportación requerida: no
+Pérdida de datos observada: no
+```
+
+### 3.3 Causa raíz visual vigente
 
 El último fallo demostrado pertenece al instrumento de validación:
 
@@ -73,17 +104,20 @@ PIPELINE_MECHANISM_FAILURE
 ROUTE_ASEGURADORAS_NAVIGATION_TIMEOUT
 ```
 
-Owner: navegación por hash dentro de una SPA mantenida en una sola sesión.
+Owner histórico: navegación por hash dentro de una SPA mantenida en una sola sesión.
 
-Mecanismo reemplazante único:
+El mecanismo reemplazante fue validado y cerrado en Microbloque 2.0:
 
 ```text
+PASS_ISOLATED_ROUTE_HARNESS
+run: 30971707956
 ONE_ISOLATED_BROWSER_CONTEXT_AND_DIRECT_URL_PER_ROUTE
+8/8 rutas PASS
 ```
 
 No se vuelven a crear variantes basadas en `fullPage`, layout probes, CDP, hash navigation acumulativa o workflows visuales paralelos.
 
-### 3.3 Cobros reales
+### 3.4 Cobros reales
 
 El universo preservado es:
 
@@ -119,265 +153,99 @@ Nunca se reemplaza una candidata por otra para corregir un validador. El validad
 
 Un fallo exclusivo de captura no invalida ni elimina automáticamente una candidata cuyo runtime, autenticación e integridad pasaron.
 
-El preview o las Functions solo se retiran automáticamente por:
+Solo se retira una candidata por:
 
 - `SECURITY_FAILURE`;
 - `FUNCTIONAL_DEFECT` demostrado;
+- integridad before/after distinta;
 - cross-tenant;
-- escritura no autorizada;
-- snapshot before/after distinto;
-- rollback fallido.
+- escritura no autorizada.
 
-### 4.3 Datos separados de visualización
+### 4.3 Un owner y un gate
 
-No se reimportan Clientes, Aseguradoras, Pólizas, Vehículos, Recibos o Cartera para resolver navegación, cache, permisos, proyección o capturas.
+Cada ruta mantiene un owner único. Bridges y refinements se clasifican como soporte, compatibilidad o retiro temporal. Cada cierre usa un solo gate.
 
-### 4.4 Un solo owner y un solo gate por cierre
+### 4.4 STOP_RETRY
 
-Cada ruta, dominio y gate debe tener un propietario único. Si cambia owner, bootstrap, ruta, selector o bridge, se actualizan juntos código, registro, preflight, workflow, documentación, Claude y Academia.
-
-### 4.5 STOP_RETRY real
-
-Si reaparece la misma etapa o familia de fallo:
-
-```text
-STOP_RETRY
-```
-
-Acciones obligatorias:
+Cuando reaparezca la misma etapa o familia de fallo:
 
 1. detener reintentos;
-2. no crear otro workflow, parche, gate o candidata;
-3. clasificar la causa;
-4. identificar owner exacto;
-5. reproducir fuera de riesgo cuando sea posible;
-6. corregir el mecanismo reusable;
-7. probar estática/sintéticamente;
-8. reabrir una sola ejecución sobre la misma candidata.
+2. conservar evidencia;
+3. identificar owner;
+4. corregir mecanismo, no producto distinto;
+5. ejecutar primero prueba estática/sintética;
+6. no crear otra candidata o workflow paralelo.
 
-## 5. Contrato anti-descarrilamiento por iteración
+## 5. Secuencia y estado vivo
+
+| Microbloque | Resultado/gate | Estado |
+|---|---|---|
+| 1.0 Plan y ledger persistentes | `PASS_PLAN_PERSISTED` | PASS |
+| 1.1 Baseline/owners/conteos | `PASS_CANONICAL_BASELINE` | PASS |
+| 2.0 Arnés sintético aislado | `PASS_ISOLATED_ROUTE_HARNESS` | PASS |
+| 2.1 Visual LAB retenida | `GO_LAB_CANDIDATE_VISIBLE` | listo; requiere autorización explícita de deploy LAB |
+| 3.0 Ops/Leads durable | `OPS_LEADS_BACKEND_LAB_COMPLETE` | pendiente |
+| 4.0 Replay completo Cobros read-only | `PASS_COBROS_FULL_REPLAY` | pendiente |
+| 4.1 Materialización durable Cobros | `COBROS_REAL_LEDGER_COMPLETE` | pendiente |
+| 5.0 Integración acumulativa aprobada | `RC_ACCUMULATIVE_MODULES_COMPLETE` | pendiente |
+| 6.0 Revisión visual humana | `RELEASE_CANDIDATE_ACCEPTED` | pendiente |
+| 7.0 Go-live | `GO_PRODUCTION_A&S` | bloqueado hasta autorización productiva |
+
+## 6. Microbloque activo: 2.1
+
+Objetivo: entregar una URL LAB retenida de la misma RC.
+
+Ejecución exacta:
+
+1. preflight contractual antes de secretos;
+2. cuatro Functions LAB allowlisted;
+3. un solo Hosting preview LAB;
+4. snapshot A&S before;
+5. ocho rutas mediante contexto aislado y URL directa;
+6. snapshot A&S after;
+7. integridad idéntica y cero escrituras;
+8. retener URL si producto e integridad pasan;
+9. no repetir los 18 escenarios funcionales;
+10. no eliminar la candidata por un fallo exclusivo de captura.
+
+Prohibiciones:
+
+- Rules;
+- reimportación;
+- escrituras reales;
+- producción;
+- `main`;
+- merge;
+- nuevo workflow visual;
+- navegación por hash acumulativa.
+
+Este microbloque usa Firebase Functions/Hosting LAB. No se ejecuta sin autorización explícita de deploy LAB.
+
+## 7. Continuidad posterior obligatoria
+
+Después de la URL LAB retenida:
+
+1. dejar Ops/Leads durable y conectado a la UI real;
+2. ejecutar el replay completo read-only de los 365 pagos;
+3. sellar diff de crear/actualizar/omitir/HOLD/requiere validación;
+4. materializar por operación atómica e idempotente las colecciones correctas;
+5. integrar visualmente todos los módulos aprobados sobre la misma RC;
+6. presentar revisión Dirección/Operativo/Asesor;
+7. solicitar una única autorización macro de producción.
+
+No se abre un bloque periférico entre estas etapas.
+
+## 8. Regla de actualización por iteración
 
 Toda iteración debe dejar simultáneamente:
 
-1. microbloque activo;
-2. source/base exacta;
-3. cambio implementado;
-4. evidencia;
-5. clasificación;
-6. gate y resultado;
-7. estado del candidato;
-8. impacto Carril A/B/C;
-9. acumulado Claude;
-10. impacto Academia;
-11. pendiente único;
-12. siguiente acción exacta.
+- avance visible;
+- fuente/base;
+- implementación o evidencia;
+- gate y estado;
+- pendiente único;
+- siguiente acción exacta;
+- actualización del ledger;
+- actualización del PR cuando cambie el microbloque activo.
 
-Si una iteración no actualiza el ledger o no deja avance verificable, no puede abrir el siguiente microbloque.
-
-No se permite:
-
-- una nueva auditoría general sin insumo nuevo;
-- repetir pruebas ya cerradas;
-- cambiar de rama;
-- crear otro PR;
-- crear una candidata paralela;
-- pedir PowerShell o pruebas manuales a Paula;
-- mezclar rebranding con la ruta crítica;
-- afirmar producción o visualización aprobada sin evidencia.
-
-## 6. Secuencia inalterable de macrobloques y gates
-
-### MACROBLOQUE 1 — Baseline canónico y control
-
-#### Microbloque 1.0 — Plan y ledger
-
-- documentar este plan;
-- crear ledger machine-readable;
-- congelar `sourceBaseline`;
-- actualizar estado vivo del PR;
-- registrar que no hubo deploy, secretos, Firebase ni escrituras.
-
-Gate:
-
-```text
-PASS_PLAN_PERSISTED
-```
-
-#### Microbloque 1.1 — Reconciliación forense focalizada
-
-Resolver únicamente:
-
-- owners activos por módulo/ruta;
-- scripts realmente cargados por `index.html`;
-- bridges activos, obsoletos o duplicados;
-- diferencia entre baseline histórico 414/26 y conteos observados posteriores;
-- mejor versión aceptada de cada módulo;
-- contradicción documental entre runtime 18/18 PASS y cuerpo antiguo del PR.
-
-No ejecuta Firebase ni cambia datos.
-
-Gate:
-
-```text
-PASS_CANONICAL_BASELINE
-```
-
-### MACROBLOQUE 2 — Visualización canónica retenida
-
-#### Microbloque 2.0 — Validador sintético aislado
-
-- ejecutar preflight contractual sin secretos;
-- ejecutar las ocho rutas en contextos aislados y URL directa;
-- comprobar ausencia de mecanismos prohibidos.
-
-Gate:
-
-```text
-PASS_ISOLATED_ROUTE_HARNESS
-```
-
-#### Microbloque 2.1 — Visual LAB read-only
-
-- desplegar únicamente cuatro Functions allowlisted y un Hosting preview;
-- snapshot A&S before;
-- autenticar identidades existentes;
-- verificar rutas directas;
-- snapshot A&S after idéntico;
-- cero escrituras y cero reimportación;
-- retener URL si producto e integridad pasan.
-
-Gate:
-
-```text
-GO_LAB_CANDIDATE_VISIBLE
-```
-
-### MACROBLOQUE 3 — Backend Ops/Leads durable
-
-- conservar Functions versionadas después del PASS;
-- verificar configuración por tenant, idempotencia, event ledger, outbox, scopes y resolución durable;
-- usar registros sintéticos reversibles;
-- cero hardcode de personas.
-
-Gate:
-
-```text
-OPS_LEADS_BACKEND_LAB_COMPLETE
-```
-
-### MACROBLOQUE 4 — Cobros y conciliaciones reales
-
-#### Microbloque 4.0 — Replay completo read-only
-
-Clasificar los 365 pagos como:
-
-- vinculado directo;
-- propuesta;
-- HOLD;
-- requiere validación;
-- sin contraparte;
-- duplicado por hash.
-
-Gate:
-
-```text
-PASS_COBROS_FULL_REPLAY
-```
-
-#### Microbloque 4.1 — Gate de materialización durable
-
-Escribir únicamente con diff, idempotencia, operación atómica, postverificación y rollback exacto:
-
-- `pagosReportados`;
-- `evidenciasCobro`;
-- `propuestasConciliacion`;
-- `conciliacionHolds`;
-- `cobros`, solo confirmados.
-
-Gate:
-
-```text
-COBROS_REAL_LEDGER_COMPLETE
-```
-
-### MACROBLOQUE 5 — Integración de módulos aprobados
-
-- comparar cada módulo contra su última evidencia aprobada;
-- empalmar solo deltas concretos;
-- retirar duplicidades;
-- conservar backend protegido;
-- registrar hash por módulo.
-
-Gate:
-
-```text
-RC_ACCUMULATIVE_MODULES_COMPLETE
-```
-
-### MACROBLOQUE 6 — Revisión visual acumulativa
-
-Roles/viewports mínimos:
-
-- Dirección desktop;
-- Operativo tablet;
-- Asesor móvil.
-
-Gate:
-
-```text
-PAULA_VISUAL_APPROVAL
-RELEASE_CANDIDATE_ACCEPTED
-```
-
-### MACROBLOQUE 7 — Producción
-
-Una autorización macro cubre backup, restore point, secrets, tenant, Auth/memberships, Rules, Functions, Hosting, datos autorizados, smoke, escritura reversible, rollback y go-live.
-
-Gate:
-
-```text
-GO_PRODUCTION_A&S
-```
-
-## 7. Tablero inicial
-
-| Bloque | Estado inicial | Gate | Siguiente acción |
-|---|---|---|---|
-| 1.0 Plan/ledger | EN EJECUCIÓN | `PASS_PLAN_PERSISTED` | crear ledger y actualizar PR |
-| 1.1 Baseline focalizado | PENDIENTE | `PASS_CANONICAL_BASELINE` | inventario owners/scripts/bridges/conteos |
-| 2 Visual LAB | PENDIENTE | `GO_LAB_CANDIDATE_VISIBLE` | solo tras 1.1 |
-| 3 Ops/Leads | FUNCIONAL PASS / persistencia pendiente | `OPS_LEADS_BACKEND_LAB_COMPLETE` | después de URL LAB |
-| 4 Cobros reales | source-only preparado | `COBROS_REAL_LEDGER_COMPLETE` | replay 365 y materialización |
-| 5 Integración módulos | PENDIENTE | `RC_ACCUMULATIVE_MODULES_COMPLETE` | misma candidata |
-| 6 Aprobación visual | PENDIENTE | `RELEASE_CANDIDATE_ACCEPTED` | tres roles/viewports |
-| 7 Producción | BLOQUEADO | `GO_PRODUCTION_A&S` | autorización macro final |
-
-## 8. Intervenciones de Paula
-
-Solo se requieren:
-
-1. revisión visual de la URL acumulativa;
-2. decisión sobre casos reales `REQUIERE_VALIDACION` que no puedan resolverse automáticamente;
-3. autorización única de producción después de aprobar la release candidate.
-
-## 9. Regla de continuidad entre conversaciones
-
-Toda conversación nueva debe comenzar leyendo:
-
-1. este plan;
-2. el ledger vivo;
-3. el HEAD actual de PR #5;
-4. la evidencia del microbloque activo.
-
-La respuesta inicial debe declarar:
-
-```text
-RC activa
-microbloque activo
-gate pendiente
-último PASS
-último STOP y causa raíz
-siguiente acción exacta
-```
-
-No se reconstruye el estado desde memoria ni se reabre una decisión cerrada.
+Una conversación futura debe leer este plan, el ledger y el PR antes de actuar.
