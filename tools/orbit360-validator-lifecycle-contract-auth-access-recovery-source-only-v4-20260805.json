@@ -1,0 +1,106 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
+  "gateId": "block-auth-access-recovery-source-only-v4-20260805",
+  "gateContractVersion": "13.3.0",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
+  "status": "AUTH_ACCESS_RECOVERY_SOURCE_ONLY_V4_AUTHORIZED_ONCE",
+  "executionProfile": {
+    "phase": "AUTH_ACCESS_RECOVERY_SOURCE_ONLY_V4",
+    "capabilities": {
+      "secrets": false,
+      "firestoreRead": false,
+      "writes": false,
+      "runtime": false,
+      "browser": false,
+      "deploy": false,
+      "functionsDeploy": false,
+      "rulesDeploy": false,
+      "production": false
+    }
+  },
+  "singleGate": true,
+  "rcId": "RC-AYS-LAB-CANONICA-01",
+  "authorization": {
+    "requiredForExecution": true,
+    "activeRequest": true,
+    "allowedExecutions": 1,
+    "request": ".github/orbit360-requests/auth-access-recovery-source-only-v4-20260805.json",
+    "authorizationRef": "user_authorized_auth_access_source_only_v4_20260805T0946-0600",
+    "authorizedAt": "2026-08-05T09:46:00-06:00",
+    "consumed": false,
+    "replayAllowed": false
+  },
+  "priorAttempts": [
+    {
+      "request": ".github/orbit360-requests/auth-access-recovery-lab-v20260805.json",
+      "blobSha": "fffef59bd6065390d1e8b28128754a06d94340b5",
+      "status": "CONSUMED_STOP_RETRY",
+      "immutable": true
+    },
+    {
+      "request": ".github/orbit360-requests/auth-access-recovery-lab-v2-20260805.json",
+      "blobSha": "fd5963242de542105dd764371cf501f6814481e6",
+      "status": "CONSUMED_STOP_RETRY",
+      "immutable": true
+    },
+    {
+      "request": ".github/orbit360-requests/auth-access-recovery-lab-v3-20260805.json",
+      "blobSha": "f8363197646dc4046fda1933af535110270703ae",
+      "status": "CONSUMED_STOP_RETRY",
+      "immutable": true
+    }
+  ],
+  "target": {
+    "repository": "paulaosoriof86/orbit360-core",
+    "branch": "ays/backend-tenant-lab-v99-20260703",
+    "pullRequest": 5,
+    "projectId": "ays-orbit-360-lab",
+    "tenantId": "alianzas-soluciones"
+  },
+  "sourceValidationBoundary": {
+    "workflowReused": ".github/workflows/orbit360-auth-access-recovery-lab-v3-20260805.yml",
+    "rootFixFile": "tools/orbit360-auth-access-config-repair-lab-v3-20260805.mjs",
+    "rootFixCommit": "38aae846477a35025950869a207bf10be9337cc1",
+    "rootFixBlobSha": "dda248ff0df08f69d95ac117d8a7262c055b1af6",
+    "transactionStrategy": "READ_ALL_VALIDATE_ALL_WRITE_ALL",
+    "maximumAdvisorDocuments": 3,
+    "allowedFields": [
+      "email",
+      "roles",
+      "defaultRole",
+      "activeRole",
+      "countries",
+      "dataScopes"
+    ],
+    "allowedFunction": "orbit360ProvisionTeamAccess",
+    "validateRequest": true,
+    "validateProvenance": true,
+    "validateCanonicalPreflight": true,
+    "validateAllowlists": true,
+    "validateAtomicity": true,
+    "validateIdempotency": true
+  },
+  "futureRuntime": {
+    "request": ".github/orbit360-requests/auth-access-recovery-lab-v5-20260805.json",
+    "requestMustRemainAbsent": true,
+    "newExplicitAuthorizationRequired": true,
+    "newGateVersionRequired": true
+  },
+  "guards": {
+    "requestSingleFileCommit": true,
+    "requestImmutable": true,
+    "priorRequestsImmutable": true,
+    "checkoutFullHistory": true,
+    "rootFixAncestorRequired": true,
+    "rootFixBlobRequired": true,
+    "canonicalGateBeforeAnyCapability": true,
+    "workflowMustContainNoSecretReferences": true,
+    "workflowMustContainNoFirebaseCommands": true,
+    "workflowMustContainNoFirestoreOrAuthRuntime": true,
+    "workflowMustContainNoDeploy": true,
+    "futureRuntimeRequestAbsent": true,
+    "stopRetryOnFailure": true
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
