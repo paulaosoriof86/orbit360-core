@@ -2,7 +2,7 @@
   "schemaVersion": "orbit360-rc-ays-canonical-ledger-v1",
   "rcId": "RC-AYS-LAB-CANONICA-01",
   "createdAt": "2026-08-04T21:38:00-06:00",
-  "updatedAt": "2026-08-04T22:18:30-06:00",
+  "updatedAt": "2026-08-04T22:24:30-06:00",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
@@ -13,6 +13,7 @@
   "ledgerPath": "orbit360-platform/runtime-gate-crm-v20260716/rc-ays-lab-canonica-01-ledger-v20260804.json",
   "stopEvidencePath": "orbit360-platform/runtime-gate-crm-v20260716/rc-ays-lab-canonica-01-microblock21-stop-retry-v20260805.json",
   "stopClosurePath": "orbit360-platform/docs/CIERRE-STOP-RETRY-MICROBLOQUE-2-1-GO-LAB-CANDIDATE-VISIBLE-20260805.md",
+  "requestConsumptionIncidentPath": "orbit360-platform/runtime-gate-crm-v20260716/rc-ays-lab-canonica-01-request-consumption-trigger-incident-v20260805.json",
   "activeMacroblock": "2",
   "activeMicroblock": "2.1",
   "activeGate": "GO_LAB_CANDIDATE_VISIBLE",
@@ -20,6 +21,7 @@
   "authorization": {
     "reference": "user_authorized_microblock_2_1_20260804T2207-0600",
     "consumed": true,
+    "authorizedExecutionAttempts": 2,
     "allowedExecutionsRemaining": 0,
     "replayAllowed": false,
     "newAuthorizationRequiredForFutureRuntime": true
@@ -74,7 +76,7 @@
     "firestoreRead": false,
     "firestoreWrites": 0,
     "authWrites": 0,
-    "attempts": [
+    "authorizedAttempts": [
       {
         "runId": 30974443335,
         "requestCommit": "ee2f4890883ac9b8c1d8829ae7a40757d747d2ce",
@@ -118,6 +120,24 @@
       "operationalImpact": false
     }
   },
+  "administrativeClosureIncident": {
+    "classification": "PIPELINE_MECHANISM_FAILURE",
+    "methodologicalError": true,
+    "runId": 30975037529,
+    "jobId": 92207191317,
+    "triggerCommit": "57bb0c11f7290fe0b98151a8687333eb7a3b8c0b",
+    "cause": "The request was marked consumed by modifying the same path configured as the workflow push trigger.",
+    "requestValidation": "FAIL",
+    "canonicalPreflight": "SKIPPED",
+    "secretAccess": false,
+    "firestoreRead": false,
+    "deployExecuted": false,
+    "browserExecuted": false,
+    "countsAsAuthorizedExecution": false,
+    "countsAsRuntimeAttempt": false,
+    "futureRule": "Never modify a trigger request for closure; record consumption only in a non-triggering ledger or evidence path.",
+    "requestFileMustNotBeModifiedAgain": true
+  },
   "microblocks": [
     {
       "id": "1.0",
@@ -146,6 +166,12 @@
       "gate": "GO_LAB_CANDIDATE_VISIBLE",
       "authorizationConsumed": true,
       "previewUrlProduced": false
+    },
+    {
+      "id": "2.2",
+      "name": "Rediseño source-only de composición canónica",
+      "status": "NEXT_SOURCE_ONLY_NOT_RUNTIME_AUTHORIZED",
+      "gate": "PASS_CANONICAL_PREFLIGHT_COMPOSITION"
     },
     {
       "id": "3.0",
@@ -197,14 +223,15 @@
     "noProduction": true,
     "noMain": true,
     "noMerge": true,
-    "thirdRequestForbidden": true,
+    "thirdAuthorizedRequestForbidden": true,
     "thirdRuntimeAttemptForbidden": true,
-    "additionalPatchInCurrentFailureFamilyForbidden": true
+    "additionalPatchInCurrentFailureFamilyForbidden": true,
+    "triggerRequestImmutableFromNowOn": true
   },
   "currentClassification": "VALIDATOR_STALE",
   "secondaryClassification": "PIPELINE_MECHANISM_FAILURE",
   "currentOwner": "canonical gate contract outer entrypoint and lifecycle composition",
-  "exactNextAction": "Do not execute runtime. Redesign and validate source-only the canonical preflight composition by preserving phase-capability-contract-v1, declaring the isolated visual harness revision separately, testing outer router plus inner engine together, and fixing evidence counters to use observed outputs. A new explicit authorization is required only after an integrated static PASS.",
+  "exactNextAction": "Do not execute runtime. Redesign and validate source-only the canonical preflight composition by preserving phase-capability-contract-v1, declaring the isolated visual harness revision separately, testing outer router plus inner engine together, separating immutable trigger requests from consumption ledgers, and fixing evidence counters to use observed outputs. A new explicit authorization is required only after an integrated static PASS.",
   "containsPII": false,
   "containsSecrets": false
 }
