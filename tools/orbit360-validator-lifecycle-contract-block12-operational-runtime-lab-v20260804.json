@@ -39,10 +39,13 @@
     "previousRealTenantUnchanged": true,
     "previousFunctionsRetained": false,
     "previousHostingRetained": false,
-    "previousGateRunId": 30961489455,
-    "previousGateFailureClassification": "PIPELINE_MECHANISM_FAILURE",
-    "previousGateFailureCode": "CENTER_TEMPORAL_DEAD_ZONE_IN_FUNCTIONS_SDK_CHECK",
-    "previousGateRunStoppedBeforeSecrets": true,
+    "previousGateRunIds": [30961489455, 30961823129],
+    "previousGateFailureClassification": "VALIDATOR_STALE",
+    "previousGateFailureCodes": [
+      "CENTER_TEMPORAL_DEAD_ZONE_IN_FUNCTIONS_SDK_CHECK",
+      "LIFECYCLE_OMITTED_CLOSED_MATERIALIZER_CAPABILITIES"
+    ],
+    "previousGateRunsStoppedBeforeSecrets": true,
     "dependencyValidationRunId": 30950155722,
     "dependencyValidationStatus": "FUNCTIONS_BOOTSTRAP_LOAD_PASS",
     "request": ".github/orbit360-requests/block12-operational-runtime-lab-rootfix9-resume-v20260804.json"
@@ -55,6 +58,8 @@
     "syntheticTenantPattern": "^verify-block12-[0-9]+$",
     "syntheticTenantAllowedOnlyOnOperationalPreview": true,
     "syntheticTenantRequiresVerificationMode": true,
+    "materializerUsesFunctionReplacement": true,
+    "engineSyntaxPassRequired": true,
     "firebaseFunctionsCompatSdkRequired": true,
     "callableSdkReadinessRequired": true,
     "maximumSyntheticAuthUsers": 3,
