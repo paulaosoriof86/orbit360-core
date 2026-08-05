@@ -2,6 +2,9 @@
 'use strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import os from 'node:os';
+import { execFileSync } from 'node:child_process';
+import ffmpegPath from 'ffmpeg-static';
 import { applicationDefault, deleteApp, getApps, initializeApp } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 import { getFirestore } from 'firebase-admin/firestore';
@@ -12,10 +15,12 @@ const TENANT = process.env.ORBIT360_REAL_TENANT_ID || 'alianzas-soluciones';
 const BASE = String(process.env.ORBIT360_PREVIEW_URL || '').trim();
 const OUT = path.join(ROOT, 'orbit360-platform/runtime-gate-crm-v20260716/block12-cumulative-visual-sanitized.json');
 const DIR = path.join(ROOT, 'orbit360-platform/runtime-gate-crm-v20260716/block12-cumulative-visual');
+const VIDEO_DIR = fs.mkdtempSync(path.join(os.tmpdir(), 'orbit360-block12-video-'));
 const PRIVILEGED = new Set(['direccion', 'superadmin', 'admintenant', 'admin', 'operativo']);
 const text = value => String(value == null ? '' : value).trim();
 const norm = value => text(value).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 const safe = value => text(value).replace(/[\w.+-]+@[\w.-]+/g, '[email]').replace(/[A-Za-z0-9_-]{30,}/g, '[id]').replace(/[\r\n]+/g, ' ').slice(0, 400);
+const isPng = buffer => buffer.length > 8 && buffer.subarray(0, 8).equals(Buffer.from([137,80,78,71,13,10,26,10]));
 const save = payload => {
   fs.mkdirSync(path.dirname(OUT), { recursive: true });
   fs.writeFileSync(OUT, JSON.stringify({ ...payload, containsPII: false, containsSecrets: false }, null, 2) + '\n', 'utf8');
@@ -24,18 +29,21 @@ const withTimeout = (promise, milliseconds, code) => Promise.race([
   promise,
   new Promise((_, reject) => setTimeout(() => reject(new Error(`PIPELINE_MECHANISM_FAILURE:${code}`)), milliseconds))
 ]);
-const isPng = buffer => buffer.length > 8 && buffer.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]));
 
 let app;
 let browser;
+let context;
 let page;
-let cdp;
+let video;
 let currentRoute = '';
 const results = [];
 const pageErrors = [];
 
 try {
   if (!BASE || !process.env.GOOGLE_APPLICATION_CREDENTIALS) throw new Error('ENVIRONMENT_FAILURE:VISUAL_INPUTS_REQUIRED');
+  if (!ffmpegPath || !fs.existsSync(ffmpegPath)) throw new Error('ENVIRONMENT_FAILURE:FFMPEG_STATIC_NOT_RESOLVED');
+  execFileSync(ffmpegPath, ['-version'], { stdio: 'ignore', timeout: 10000 });
+
   app = getApps()[0] || initializeApp({ credential: applicationDefault(), projectId: PROJECT });
   const auth = getAuth(app);
   const db = getFirestore(app);
@@ -60,9 +68,15 @@ try {
   const token = await auth.createCustomToken(candidate.uid, { orbitTenant: TENANT, orbitBlock12Visual: true });
   const { chromium } = await import('playwright');
   browser = await chromium.launch({ headless: true });
-  page = await browser.newPage({ viewport: { width: 1440, height: 1000 }, deviceScaleFactor: 1 });
-  cdp = await page.context().newCDPSession(page);
-  await cdp.send('Page.enable');
+  context = await browser.newContext({
+    viewport: { width: 1440, height: 1000 },
+    deviceScaleFactor: 1,
+    recordVideo: { dir: VIDEO_DIR, size: { width: 1440, height: 1000 } }
+  });
+  page = await context.newPage();
+  page.setDefaultTimeout(20000);
+  video = page.video();
+  const videoStartedAt = Date.now();
   await page.emulateMedia({ reducedMotion: 'reduce' });
   page.on('pageerror', error => pageErrors.push(safe(error)));
 
@@ -80,59 +94,70 @@ try {
   const routes = ['cliente360', 'aseguradoras', 'polizas', 'cobros', 'conciliaciones', 'ops', 'leads', 'importar'];
   for (const route of routes) {
     currentRoute = route;
-    await page.evaluate(value => {
+    await withTimeout(page.evaluate(value => {
       location.hash = `#/${value}`;
       window.dispatchEvent(new HashChangeEvent('hashchange'));
-    }, route);
-    await page.waitForTimeout(900);
-    await page.evaluate(() => {
+    }, route), 20000, `ROUTE_${route}_NAVIGATION_TIMEOUT`);
+    await page.waitForTimeout(1000);
+    await withTimeout(page.evaluate(() => {
       window.scrollTo(0, 0);
       document.documentElement.style.scrollBehavior = 'auto';
       document.body.style.scrollBehavior = 'auto';
-    });
+    }), 10000, `ROUTE_${route}_SCROLL_RESET_TIMEOUT`);
 
-    const snapshot = await page.evaluate(() => ({
+    const snapshot = await withTimeout(page.evaluate(() => ({
       hostText: String(document.querySelector('#host') && document.querySelector('#host').innerText || '').slice(0, 5000),
       loginVisible: !!(document.querySelector('#login') && getComputedStyle(document.querySelector('#login')).display !== 'none')
-    }));
+    })), 15000, `ROUTE_${route}_DOM_SNAPSHOT_TIMEOUT`);
     const forbidden = /firebase|firestore|backend|localstorage|\blab\b|mock|smoke|secret|credencial técnica/i.test(snapshot.hostText);
-    const file = path.join(DIR, `${String(results.length + 1).padStart(2, '0')}-${route}.png`);
-
-    const capture = await withTimeout(
-      cdp.send('Page.captureScreenshot', {
-        format: 'png',
-        fromSurface: true,
-        captureBeyondViewport: false,
-        optimizeForSpeed: true
-      }),
-      15000,
-      `CDP_SCREENSHOT_${route}_TIMEOUT`
-    );
-    const png = Buffer.from(String(capture && capture.data || ''), 'base64');
-    if (!isPng(png)) throw new Error(`PIPELINE_MECHANISM_FAILURE:CDP_SCREENSHOT_${route}_INVALID_PNG`);
-    fs.writeFileSync(file, png);
-
+    const frameSecond = Math.max(0.2, (Date.now() - videoStartedAt) / 1000);
     results.push({
       route,
       rendered: snapshot.hostText.trim().length > 20,
       loginVisible: snapshot.loginVisible,
       technicalCopyDetected: forbidden,
-      screenshot: path.relative(ROOT, file),
-      captureEngine: 'chromium-cdp'
+      frameSecond: Number(frameSecond.toFixed(3)),
+      screenshot: path.relative(ROOT, path.join(DIR, `${String(results.length + 1).padStart(2, '0')}-${route}.png`)),
+      captureEngine: 'playwright-record-video-plus-ffmpeg-static-frame'
     });
+    await page.waitForTimeout(450);
   }
 
-  const ok = results.every(item => item.rendered && !item.loginVisible && !item.technicalCopyDetected) && pageErrors.length === 0;
+  await page.waitForTimeout(600);
+  await withTimeout(context.close(), 30000, 'VIDEO_CONTEXT_CLOSE_TIMEOUT');
+  context = null;
+  page = null;
+  const videoPath = await withTimeout(video.path(), 15000, 'VIDEO_PATH_TIMEOUT');
+  const videoStat = fs.statSync(videoPath);
+  if (videoStat.size < 1000) throw new Error('PIPELINE_MECHANISM_FAILURE:VISUAL_VIDEO_EMPTY');
+
+  for (const item of results) {
+    const file = path.join(ROOT, item.screenshot);
+    execFileSync(ffmpegPath, [
+      '-hide_banner', '-loglevel', 'error',
+      '-ss', item.frameSecond.toFixed(3),
+      '-i', videoPath,
+      '-frames:v', '1',
+      '-y', file
+    ], { stdio: 'pipe', timeout: 20000 });
+    const png = fs.readFileSync(file);
+    if (!isPng(png)) throw new Error(`PIPELINE_MECHANISM_FAILURE:VIDEO_FRAME_${item.route}_INVALID_PNG`);
+    item.frameBytes = png.length;
+  }
+
+  const ok = results.length === 8 && results.every(item => item.rendered && !item.loginVisible && !item.technicalCopyDetected && item.frameBytes > 1000) && pageErrors.length === 0;
   save({
-    schemaVersion: 'orbit360-block12-cumulative-visual-v3',
+    schemaVersion: 'orbit360-block12-cumulative-visual-v4',
     status: ok ? 'CUMULATIVE_VISUAL_LAB_PASS' : 'CUMULATIVE_VISUAL_LAB_FAIL',
     classification: ok ? 'GO_LAB_CUMULATIVE_VISUAL_CANDIDATE' : 'FUNCTIONAL_DEFECT',
     routes: results,
     routeCount: results.length,
     pageErrors,
-    screenshotMode: 'chromium-cdp-viewport-direct',
+    captureEngine: 'playwright-record-video-plus-ffmpeg-static-frame',
+    screenshotApisUsed: false,
+    cdpScreenshotUsed: false,
+    videoBytes: videoStat.size,
     animationsDisabled: true,
-    playwrightScreenshotUsed: false,
     customTokenEphemeral: true,
     authWrites: 0,
     firestoreWrites: 0,
@@ -143,20 +168,21 @@ try {
   });
   if (!ok) process.exitCode = 42;
 } catch (error) {
-  const sanitizedError = safe(error);
-  const classification = ((sanitizedError.match(/(SECURITY_FAILURE|FUNCTIONAL_DEFECT|VALIDATOR_STALE|DATA_CONTRACT_FAILURE|ENVIRONMENT_FAILURE|PIPELINE_MECHANISM_FAILURE)/) || [])[1] || 'PIPELINE_MECHANISM_FAILURE');
+  const message = String(error && (error.message || error)).replace(/[\r\n]+/g, ' ').slice(0, 500);
+  const classification = ((message.match(/(SECURITY_FAILURE|FUNCTIONAL_DEFECT|VALIDATOR_STALE|DATA_CONTRACT_FAILURE|ENVIRONMENT_FAILURE|PIPELINE_MECHANISM_FAILURE)/) || [])[1] || 'PIPELINE_MECHANISM_FAILURE');
   save({
-    schemaVersion: 'orbit360-block12-cumulative-visual-v3',
+    schemaVersion: 'orbit360-block12-cumulative-visual-v4',
     status: 'CUMULATIVE_VISUAL_LAB_FAIL',
     classification,
-    error: sanitizedError,
+    error: safe(message),
+    errorCode: (message.split(':')[1] || 'VISUAL_VIDEO_FAILURE').slice(0, 120),
     currentRoute,
     routes: results,
     routeCount: results.length,
     pageErrors,
-    screenshotMode: 'chromium-cdp-viewport-direct',
-    animationsDisabled: true,
-    playwrightScreenshotUsed: false,
+    captureEngine: 'playwright-record-video-plus-ffmpeg-static-frame',
+    screenshotApisUsed: false,
+    cdpScreenshotUsed: false,
     authWrites: 0,
     firestoreWrites: 0,
     realTenantWrites: 0,
@@ -165,8 +191,9 @@ try {
   });
   process.exitCode = 41;
 } finally {
-  if (cdp) await cdp.detach().catch(() => {});
-  if (page) await page.close().catch(() => {});
+  if (page && !page.isClosed()) await page.close().catch(() => {});
+  if (context) await context.close().catch(() => {});
   if (browser) await browser.close().catch(() => {});
   if (app) await deleteApp(app).catch(() => {});
+  fs.rmSync(VIDEO_DIR, { recursive: true, force: true });
 }
