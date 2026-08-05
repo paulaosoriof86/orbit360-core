@@ -1,142 +1,196 @@
 # ESTADO ACTIVO — BLOQUE 4.0 · REPLAY COMPLETO READ-ONLY DE COBROS
 
-Fecha local: 2026-08-05 07:04 GT  
+Actualizado: 2026-08-05  
 RC: `RC-AYS-LAB-CANONICA-01`  
-Gate: `PASS_COBROS_FULL_REPLAY`  
-Estado: `ACTIVE_READ_ONLY_MONTHLY_INTAKE_PARALLEL`
+Gate objetivo: `PASS_COBROS_FULL_REPLAY`  
+Estado: `ACTIVE_READ_ONLY_PROGRESS_REQUIRES_MORE_EVIDENCE`
 
-## Punto de partida cerrado
+## Frente paralelo de revisión visual
 
-Bloque 3.0 Ops/Leads durable quedó cerrado mediante evidencia funcional reutilizada y despliegue actual verificado. No se requiere otro runtime, deploy o visual para iniciar Cobros.
-
-La revisión manual de la candidata continúa disponible en paralelo:
+La candidata vigente está disponible en:
 
 ```text
-https://ays-orbit-360-lab--orbit360-operational-block12-w8ibrr6w.web.app
+https://ays-orbit-360-lab.web.app/?orbitBackend=firestore-lab&tenant=alianzas-soluciones#/inicio
 ```
 
-El modal legal no bloquea la continuidad técnica. La aceptación se realiza una sola vez en la sesión humana.
+Auth autoadministrable está cerrado. La revisión visual humana continúa en paralelo y no altera este carril.
 
-## Universo vigente
+## Universo canónico
 
 ```text
 pagos reportados: 365
-conciliaciones propuestas por secuencia de cartera: 128
-pagos válidos posteriores al corte: 2
-pendientes de overlay adicional: 235
-cobros ya materializados: 5
-HOLD conocidos: 44
+cobros ya materializados preservados: 5
+HOLD de calendario preservados: 44
+Firestore/Auth/operational writes: 0
+deploys: 0
+reimportación: 0
+producción/main/merge: no
 ```
 
-Los 235 no son un resultado final. Deben cruzarse con las planillas vigentes y reportes directos, preservando los 128 + 2 ya explicados y los 5 cobros existentes, sin duplicidad.
-
-## Avance visible de la ingesta mensual
-
-La recepción de archivos mensuales queda activa sin esperar a que estén todos los documentos.
-
-Fuente detallada procesada read-only:
+Fuente privada canónica verificada:
 
 ```text
-Planilla G&T julio
-filas: 8
-coincidencias exactas contra calendario: 8
-filas ya fuera de cartera: 7
-nueva propuesta de conciliación: 1
+ORBIT360-AYS-RECIBOS-CARTERA-CANONICAL-PRIVATE-20260730
+sizeBytes: 443105
+pagos reportados: 365
+cartera canónica: 641
 ```
 
-Nueva propuesta:
+Fuente privada normalizada de planillas:
 
 ```text
-póliza: AUTO-519815
-cuota: 10/10
-moneda: GTQ
-monto planilla: 600.31
-estado previo: futuro_pendiente
-decisión: PROPOSE_COMMISSION_RECOGNITION_NO_WRITE
+archivos recibidos: 19
+paquetes: 10
+filas: 67
+elegibles CRM: 65
+paquete incompleto: 1
+planilla sin factura: 1
 ```
 
-Fuentes agregadas:
+## Avance real del overlay
 
 ```text
-Aseguradora General julio: soporte agregado/HOLD
-Factura El Roble julio: soporte de facturación de comisiones/HOLD
+secuencia de cartera: 128
+pagos posteriores al corte: 2
+propuestas únicas por planilla detallada: 2
+pagos explicados: 132
+pagos pendientes de evidencia adicional: 233
+invariante: 128 + 2 + 2 + 233 = 365
 ```
 
-Ninguna de estas fuentes agregadas crea cobros individuales.
+Resultado vigente:
+
+```text
+stage: COBROS_OVERLAY_PROGRESS
+classification: READ_ONLY_PROGRESS_REQUIRES_MORE_EVIDENCE
+rowLedgerCount: 365
+rowLedgerDigest: 3f129242c34934b3f87009a1d0cb4bded6861b376f3719349831d770b7825f5f
+ok: false
+```
+
+`ok:false` es correcto: el gate no puede declararse PASS mientras queden 233 pagos sin evidencia suficiente.
+
+## Causa raíz detectada y corregida
+
+Clasificación:
+
+```text
+DATA_CONTRACT_FAILURE
+```
+
+El owner v1 podía aplicar la primera fila de una planilla cuando la combinación póliza/moneda/periodo aparecía repetida. Eso podía crear una propuesta falsa aunque la fuente no fuera unívoca.
+
+Root fix:
+
+```text
+tools/orbit360-cobros-overlay-readonly-v2-20260805.mjs
+tools/orbit360-test-cobros-overlay-source-v2-20260805.mjs
+```
+
+Regla v2:
+
+- una clave de planilla repetida nunca genera conciliación;
+- las filas repetidas quedan en `PLANILLA_DETAIL_AMBIGUOUS_HOLD`;
+- solo una clave fuente única contra un único pago pendiente puede producir propuesta;
+- reversos, ceros, coincidencias por periodo y fuentes incompletas permanecen separados;
+- ninguna propuesta escribe datos.
+
+Prueba source-only:
+
+```text
+PASS_COBROS_OVERLAY_SOURCE_ONLY_V2
+16 PASS
+0 FAIL
+duplicateSourceKeyProtection: true
+```
+
+## Clasificación de las 67 filas de planilla
+
+```text
+PLANILLA_ZERO_OMIT: 2
+PLANILLA_PERIOD_ONLY: 29
+PLANILLA_REVERSAL_HOLD: 2
+PLANILLA_DETAIL_AMBIGUOUS_HOLD: 10
+PLANILLA_DETAIL_CANDIDATE: 24
+```
+
+Resultado del cruce:
+
+```text
+propuestas únicas: 2
+filas con clave fuente ambigua: 10
+claves destino ambiguas: 0
+filas detalladas sin pago pendiente correspondiente: 22
+```
+
+Una planilla de comisiones prueba recaudo únicamente cuando existe detalle suficiente y enlace unívoco. Una factura o resumen agregado no crea cobros individuales.
+
+## Segmentación de los 233 pendientes
+
+```text
+GTQ: 209
+COP: 24
+pólizas distintas: 124
+fuente Recibos por fecha límite: 154
+fuente Cobranza efectuada histórica: 79
+```
+
+Prioridad por aseguradora:
+
+| Aseguradora | País | Pendientes |
+|---|---:|---:|
+| Aseguradora Guatemalteca | GT | 41 |
+| Seguros El Roble | GT | 38 |
+| Seguros Columna | GT | 30 |
+| Mapfre Seguros Guatemala | GT | 22 |
+| Seguros G&T | GT | 17 |
+| Aseguradora General | GT | 16 |
+| Aseguradora La Ceiba | GT | 16 |
+| Seguros Ficohsa | GT | 14 |
+| Seguros Universales | GT | 9 |
+| Aseguradora Rural | GT | 8 |
+| Resto GT/CO | Mixto | 22 |
+
+Las tres primeras concentran 109 de los 233 casos.
 
 ## Readiness del importador recurrente
 
-Verificado en LAB:
-
-- Excel, CSV, PDF, Word e imagen;
-- hash e idempotencia;
-- staging y dry-run;
-- confirmación humana;
-- rollback antes del consumo;
-- tipos separados para calendario, pagos, cartera, comisiones, banco y soporte;
-- prohibición de banco → cobro directo;
-- Function LAB y feature flag activas.
-
-Decisión honesta:
+Estado vigente:
 
 ```text
 GO_ASSISTED_MONTHLY_INTAKE
 NOT_YET_GO_UNIVERSAL_SELF_SERVICE
 ```
 
-Causas raíz abiertas, sin bloquear la recepción desde ChatGPT:
+Se conservan:
+
+- staging y dry-run;
+- hash e idempotencia;
+- separación por tipo de fuente;
+- confirmación humana;
+- rollback antes del consumo;
+- prohibición banco → cobro directo;
+- prohibición histórico financiero → cobro;
+- soporte agregado solo como HOLD/propuesta.
+
+Pendientes de producto, sin bloquear este replay:
 
 ```text
 DATA_CONTRACT_FAILURE
-- el backend exige policyId de forma general, aunque algunas fuentes traen policyNumber, recibo o referencia de contraparte.
+- identidad de fuente debe aceptar policyId, policyNumber, recibo o referencia de contraparte según contrato.
 
 FUNCTIONAL_DEFECT
-- no está demostrado el editor completo de mapeo corregible y perfiles reutilizables por aseguradora/formato;
-- la extracción backend de documentos no tabulares no está demostrada de extremo a extremo.
+- editor completo de mapeo corregible y perfiles reutilizables por aseguradora/formato aún no demostrado end-to-end;
+- extracción de documentos no tabulares aún no demostrada end-to-end.
 ```
 
-Owners:
+## Evidencias vigentes
 
 ```text
-functions/recurring-insurance-import.js
-orbit360-platform/modules/importar-recurring-bridge-v20260804.js
-orbit360-platform/core/recurring-insurance-document-extractor.js
-```
-
-## Alcance
-
-1. Recuperar únicamente fuentes privadas vigentes ya disponibles.
-2. Aplicar el replay inferencial completo sobre el mismo contrato.
-3. Cruzar cartera, planillas y reportes directos por póliza, vigencia, moneda, cuota y evidencia.
-4. Clasificar cada pago como confirmado, inferido, pendiente o HOLD.
-5. Mantener trazabilidad y razón de cada decisión.
-6. Emitir evidencia sanitizada y conteo final.
-7. Preparar source-only el root fix del importador mensual sin alterar la candidata visible.
-
-## Restricciones
-
-```text
-Firestore writes: 0
-Auth writes: 0
-aplicación de cobros: 0
-modificación de recibos: 0
-reimportación: 0
-deploy Functions: 0
-deploy Hosting: 0
-Rules: no
-producción/main/merge: no
-```
-
-No utilizar estados bancarios aislados para crear cobros. No convertir ausencia en conciliación. No escribir desde histórico financiero. No duplicar los cinco cobros existentes.
-
-## Owners del replay
-
-```text
-replay completo: tools/orbit360-cobros-full-replay-v20260804.mjs
-inferencia secuencial: tools/orbit360-cobros-inferencia-secuencial-v20260804.mjs
-contrato: tools/orbit360-cobros-full-materialization-contract-v20260804.json
-evidencia previa: runtime-gate-crm-v20260716/cobros-full-replay-*.json
-readiness mensual: runtime-gate-crm-v20260716/bloque4-ingesta-mensual-readiness-sanitizada-v20260805.json
+runtime-gate-crm-v20260716/cobros-replay-inferencial-sanitizado-v20260804.json
+runtime-gate-crm-v20260716/cobros-overlay-source-test-v2-sanitized-v20260805.json
+runtime-gate-crm-v20260716/cobros-overlay-private-readonly-sanitized-v20260805.json
+runtime-gate-crm-v20260716/cobros-unresolved-segmentation-sanitized-v20260805.json
 ```
 
 ## Criterio de salida
@@ -152,8 +206,8 @@ ledger sanitizado
 
 ## Siguiente acción exacta
 
-1. Incorporar la propuesta G&T al ledger sanitizado sin escritura.
-2. Continuar la clasificación exhaustiva de los 365 pagos.
-3. Mantener los agregados en soporte/HOLD.
-4. Preparar el root fix source-only de identidad por tipo de fuente, mapeo corregible y perfiles reutilizables.
-5. Solo después preparar el Bloque 4.1 de materialización durable, que requiere autorización separada de escritura.
+1. Recuperar y cruzar únicamente reportes detallados de pago o recibo por aseguradora para los 233 pendientes.
+2. Priorizar Aseguradora Guatemalteca, El Roble y Columna: 109 casos.
+3. Mantener facturas, resúmenes agregados, banco e histórico financiero fuera de la aplicación automática de cobros.
+4. Reejecutar el mismo owner v2 sobre la misma base canónica, sin crear otro algoritmo paralelo.
+5. Solo con 365/365 preparar el Bloque 4.1 de materialización durable, sujeto a autorización explícita separada.
