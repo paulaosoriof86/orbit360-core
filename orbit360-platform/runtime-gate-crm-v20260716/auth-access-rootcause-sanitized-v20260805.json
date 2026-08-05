@@ -1,0 +1,69 @@
+{
+  "schemaVersion": "orbit360-auth-access-rootcause-sanitized-v1",
+  "generatedAt": "2026-08-05T07:46:00-06:00",
+  "rcId": "RC-AYS-LAB-CANONICA-01",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "classification": [
+    "DATA_CONTRACT_FAILURE",
+    "PIPELINE_MECHANISM_FAILURE",
+    "FUNCTIONAL_DEFECT"
+  ],
+  "observed": {
+    "firebaseAuthIdentityCountVisibleInScreenshot": 2,
+    "configuredRealUsersVisibleInAuthScreenshot": 0,
+    "historicalDemoEmailRememberedMatchesObservedIdentity": false,
+    "loginRequiresAuthIdentity": true,
+    "loginRequiresActiveMembership": true,
+    "runtimeVisualUsedEphemeralCustomToken": true
+  },
+  "sourceState": {
+    "onboardingBackendExists": true,
+    "onboardingExportedByBootstrap": true,
+    "teamBridgeExists": true,
+    "passwordSetupEmailSupportedByOnboarding": true,
+    "loginPasswordRecoveryVisible": false,
+    "latestCandidateFunctionAllowlistCount": 4,
+    "latestCandidateFunctionAllowlistIncludesOnboarding": false
+  },
+  "rootCause": {
+    "primaryOwner": ".github/workflows/orbit360-block12-visual-layoutfree-reactivation-lab-v20260804.yml",
+    "secondaryOwners": [
+      "functions/user-onboarding.js",
+      "orbit360-platform/core/user-onboarding.js",
+      "orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js",
+      "orbit360-platform/index.html"
+    ],
+    "code": "TEAM_RECORDS_NOT_COMPLETED_AS_AUTH_PLUS_MEMBERSHIP_AND_ONBOARDING_FUNCTION_NOT_DEPLOYED",
+    "explanation": "Creating an operational advisor record did not create a usable login because the deployed allowlist excluded the onboarding Function and the login has no visible recovery path."
+  },
+  "recoveryContract": {
+    "gateId": "block-auth-access-recovery-lab-v20260805",
+    "sourceOnlyPreparationAllowed": true,
+    "secretAccessAuthorized": false,
+    "firebaseReadAuthorized": false,
+    "firebaseWriteAuthorized": false,
+    "authWritesAuthorized": false,
+    "membershipWritesAuthorized": false,
+    "deployAuthorized": false,
+    "productionAuthorized": false,
+    "maximumTargetIdentitiesWhenExplicitlyAuthorized": 3,
+    "hardcodedUsersForbidden": true,
+    "hardcodedPasswordsForbidden": true,
+    "passwordsInEvidenceForbidden": true,
+    "actionLinksInEvidenceForbidden": true,
+    "existingFourFunctionsRedeployForbidden": true,
+    "rulesForbidden": true,
+    "reimportForbidden": true,
+    "mainForbidden": true,
+    "mergeForbidden": true
+  },
+  "parallelContinuity": {
+    "block4CobrosReadOnlyContinues": true,
+    "monthlyAssistedIntakeContinues": true,
+    "universalImporterRootFixContinues": true
+  },
+  "containsPII": false,
+  "containsSecrets": false,
+  "ok": true
+}
