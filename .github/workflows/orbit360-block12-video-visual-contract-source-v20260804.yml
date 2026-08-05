@@ -1,0 +1,213 @@
+name: Orbit 360 · Block 12 · contrato video visual source
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-requests/block12-video-visual-contract-source-v20260804.json'
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: orbit360-block12-video-visual-contract-source-v20260804
+  cancel-in-progress: false
+
+env:
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  ORBIT360_GATE_ID: block12-operational-runtime-lab-v20260804
+  ORBIT360_REQUEST_FILE: .github/orbit360-requests/block12-video-visual-contract-source-v20260804.json
+  ORBIT360_FIXTURE_FILE: .github/orbit360-requests/.block12-video-preflight-fixture.json
+  ORBIT360_EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+
+jobs:
+  source-contract:
+    name: Materializar y validar contrato 12.0.10 sin Firebase
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - name: Checkout request exacto
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 4
+          persist-credentials: true
+
+      - name: Preparar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verificar alcance source-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
+          test "${#CHANGED[@]}" = '1'
+          test "${CHANGED[0]}" = "$ORBIT360_REQUEST_FILE"
+          jq -e '
+            .schemaVersion=="orbit360-block12-video-visual-contract-source-request-v1" and
+            .status=="AUTHORIZED_SOURCE_ONLY" and .approved==true and
+            .allowedExecutions==1 and .consumed==false and .replayAllowed==false and
+            .gateId=="block12-operational-runtime-lab-v20260804" and
+            .targetContractVersion=="12.0.10" and
+            .videoSyntheticRunId==30969402434 and
+            .videoSyntheticStatus=="VIDEO_FRAME_SYNTHETIC_PASS" and
+            .firebase==false and .secrets==false and .firestoreRead==false and
+            .writes==false and .deploy==false and .production==false and
+            .main==false and .merge==false
+          ' "$ORBIT360_REQUEST_FILE" >/dev/null
+
+      - name: Materializar contrato video visual 12.0.10
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-materializar-block12-video-visual-contract-v20260804.mjs
+          node tools/orbit360-materializar-block12-video-visual-contract-v20260804.mjs
+          jq -e '
+            .status=="VIDEO_VISUAL_CONTRACT_SOURCE_PASS" and
+            .classification=="GO_SOURCE_VIDEO_VISUAL_CONTRACT" and
+            .gateId=="block12-operational-runtime-lab-v20260804" and
+            .contractVersion=="12.0.10" and
+            .videoSyntheticRunId==30969402434 and
+            .priorFunctionalRunId==30962756387 and
+            .priorFunctionalPassed==18 and .priorFunctionalFailed==0 and
+            .functionalReplayRequired==false and
+            .secretsRead==false and .firebaseCommandsExecuted==false and
+            .firestoreRead==false and .firestoreWrites==0 and .authWrites==0 and
+            .deployExecuted==false and .productionTouched==false and
+            .mainTouched==false and .mergeExecuted==false and .ok==true
+          ' "$ORBIT360_EVIDENCE_DIR/block12-video-visual-contract-source-v20260804.json" >/dev/null
+
+      - name: Crear fixture inerte y ejecutar preflight canónico
+        shell: bash
+        run: |
+          set -euo pipefail
+          PARENT="$(git rev-parse HEAD^)"
+          mkdir -p "$(dirname "$ORBIT360_FIXTURE_FILE")"
+          jq -n --arg parent "$PARENT" '{
+            schemaVersion:"orbit360-block12-operational-runtime-lab-visual-video-request-v1",
+            status:"AUTHORIZED_VISUAL_VIDEO_REACTIVATION_AFTER_SYNTHETIC_PASS",
+            approved:true,
+            allowedExecutions:1,
+            consumed:false,
+            replayAllowed:false,
+            retryAuthorized:true,
+            authorizationRef:"user_continue_block12_visual_video_rootfix_20260804T1933-0600",
+            previousRuntimeRunId:30962756387,
+            previousFunctionalStatus:"PASS",
+            previousFunctionalPassed:18,
+            previousFunctionalFailed:0,
+            previousVisualRunId:30968795206,
+            previousVisualFailureFamily:"SCREENSHOT_API_BLOCKED",
+            stopRetryApplied:true,
+            replacementMechanism:"PLAYWRIGHT_RECORD_VIDEO_PLUS_FFMPEG_STATIC_FRAME",
+            videoSyntheticRunId:30969402434,
+            videoSyntheticStatus:"VIDEO_FRAME_SYNTHETIC_PASS",
+            functionalReplayForbidden:true,
+            branch:"ays/backend-tenant-lab-v99-20260703",
+            pullRequest:5,
+            parentHead:$parent,
+            projectId:"ays-orbit-360-lab",
+            gateId:"block12-operational-runtime-lab-v20260804",
+            contractVersion:"12.0.10",
+            scope:{
+              syntheticTenant:false,
+              syntheticAuthUsers:0,
+              syntheticMemberships:0,
+              functionalScenarioReplay:false,
+              priorFunctionalEvidenceRunId:30962756387,
+              functionNames:[
+                "orbit360OpsLeadsCommandLabV20260804",
+                "orbit360GetAdvisorOpsInboxLabV20260804",
+                "orbit360CobrosReconciliationCommandLabV20260804",
+                "orbit360RecurringInsuranceImportLabV20260804"
+              ],
+              hostingPreviewOnly:true,
+              hostingChannel:"orbit360-operational-block12",
+              productionHosting:false,
+              visualRoutes:["cliente360","aseguradoras","polizas","cobros","conciliaciones","ops","leads","importar"],
+              readonlyIntegrityBeforeAfter:true,
+              realTenantWrites:false,
+              realDataReimport:false,
+              rules:false,
+              production:false,
+              main:false,
+              merge:false
+            }
+          }' > "$ORBIT360_FIXTURE_FILE"
+          ORBIT360_REQUEST_FILE="$ORBIT360_FIXTURE_FILE" node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
+          jq -e '
+            .status=="GO_GATE_CONTRACT" and .contractVersion=="12.0.10" and
+            .failed==0 and .executionAuthorized==true and
+            .secretAccessAuthorized==true and .firestoreReadAuthorized==true and
+            .writeAuthorized==false and .authWriteAuthorized==false and
+            .maximumSyntheticAuthUsers==0 and .maximumSyntheticMemberships==0 and
+            .runtimeAuthorized==false and .visualOnlyAuthorized==true and
+            .browserAuthorized==true and .functionsDeployAuthorized==true and
+            .hostingPreviewAuthorized==true and .rulesDeployAuthorized==false and
+            .productionAuthorized==false and .realTenantWritesAuthorized==false and
+            .realDataReimportAuthorized==false and .secretAccess==false and
+            .firestoreRead==false and .firestoreWrites==0 and .authWrites==0 and
+            .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false
+          ' "$ORBIT360_EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+          cp "$ORBIT360_EVIDENCE_DIR/preflight-sanitizado.json" "$ORBIT360_EVIDENCE_DIR/block12-video-visual-contract-preflight-source-v20260804.json"
+          rm -f "$ORBIT360_FIXTURE_FILE"
+
+      - name: Verificar límites y sellar source
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
+          node --check tools/orbit360-validar-gate-contracts-engine-block12-operational-runtime-video-lab-v20260804.mjs
+          node --check tools/orbit360-block12-operational-runtime-lab-v20260804.mjs
+          node --check tools/orbit360-block12-cumulative-visual-v20260804.mjs
+          git diff --check
+          test ! -e "$ORBIT360_FIXTURE_FILE"
+          test -z "$(git diff --name-only -- firestore.rules data/store.js orbit360-platform/data/store.js orbit360-platform/data/store-firestore-lab.local.js orbit360-platform/core/auth.js orbit360-platform/core/backend-lab-loader.js orbit360-platform/core/backend-lab-init.js functions/ops-leads-domain.js functions/ops-advisor-inbox.js functions/cobros-reconciliation-domain.js functions/recurring-insurance-import.js)"
+          mapfile -t MODIFIED < <(git diff --name-only)
+          printf '%s\n' "${MODIFIED[@]}" | sort -u > "$RUNNER_TEMP/modified.txt"
+          cat > "$RUNNER_TEMP/allowed.txt" <<'EOF'
+          orbit360-platform/runtime-gate-crm-v20260716/block12-video-visual-contract-preflight-source-v20260804.json
+          orbit360-platform/runtime-gate-crm-v20260716/block12-video-visual-contract-source-v20260804.json
+          tools/orbit360-block12-operational-runtime-lab-v20260804.mjs
+          tools/orbit360-gate-contract-registry-v20260717.json
+          tools/orbit360-validar-gate-contracts-v20260717.mjs
+          EOF
+          sed -i 's/^          //' "$RUNNER_TEMP/allowed.txt"
+          sort -u "$RUNNER_TEMP/allowed.txt" -o "$RUNNER_TEMP/allowed.txt"
+          diff -u "$RUNNER_TEMP/allowed.txt" "$RUNNER_TEMP/modified.txt"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add \
+            tools/orbit360-validar-gate-contracts-v20260717.mjs \
+            tools/orbit360-gate-contract-registry-v20260717.json \
+            tools/orbit360-block12-operational-runtime-lab-v20260804.mjs \
+            "$ORBIT360_EVIDENCE_DIR/block12-video-visual-contract-source-v20260804.json" \
+            "$ORBIT360_EVIDENCE_DIR/block12-video-visual-contract-preflight-source-v20260804.json"
+          git commit -m 'gate(block12): seal video visual contract 12.0.10'
+          git push origin HEAD:"$ORBIT360_BRANCH"
+
+      - name: Publicar evidencia source-only
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-block12-video-visual-contract-source-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/block12-video-visual-contract-source-v20260804.json
+            orbit360-platform/runtime-gate-crm-v20260716/block12-video-visual-contract-preflight-source-v20260804.json
+          retention-days: 14
+
+      - name: Publicar cierre en PR 5
+        if: always()
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          STATUS='VIDEO_VISUAL_CONTRACT_SOURCE_FAIL'
+          FILE="$ORBIT360_EVIDENCE_DIR/block12-video-visual-contract-source-v20260804.json"
+          test -f "$FILE" && STATUS="$(jq -r '.status' "$FILE")"
+          gh api "repos/${GITHUB_REPOSITORY}/issues/5/comments" -f body="## Block 12 · contrato video visual source · run ${GITHUB_RUN_ID}\n\n- Estado: \`${STATUS}\`\n- Contrato objetivo: \`12.0.10\`\n- Firebase/secrets/escrituras/deploy/producción: no" >/dev/null
