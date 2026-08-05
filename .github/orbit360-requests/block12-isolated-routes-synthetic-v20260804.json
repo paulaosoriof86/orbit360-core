@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "orbit360-block12-isolated-routes-synthetic-request-v1",
+  "status": "AUTHORIZED_SOURCE_ONLY",
+  "approved": true,
+  "allowedExecutions": 1,
+  "reason": "Run 30971226259 passed gate, Functions, Hosting and integrity but in-page hash navigation timed out on Aseguradoras; validate eight independent contexts and direct URLs before another LAB deploy",
+  "previousVisualRunId": 30971226259,
+  "previousFailureClassification": "PIPELINE_MECHANISM_FAILURE",
+  "previousFailureCode": "ROUTE_ASEGURADORAS_NAVIGATION_TIMEOUT",
+  "stopRetryApplied": true,
+  "replacementMechanism": "ONE_ISOLATED_BROWSER_CONTEXT_AND_DIRECT_URL_PER_ROUTE",
+  "firebase": false,
+  "secrets": false,
+  "firestoreRead": false,
+  "writes": false,
+  "deploy": false,
+  "production": false,
+  "main": false,
+  "merge": false
+}
