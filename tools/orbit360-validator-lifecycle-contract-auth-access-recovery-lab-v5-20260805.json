@@ -3,7 +3,7 @@
   "gateId": "block-auth-access-recovery-lab-v5-20260805",
   "gateContractVersion": "13.4.0",
   "validatorLifecycleRevision": "phase-capability-contract-v1",
-  "status": "AUTH_ACCESS_RECOVERY_V5_AUTHORIZED_ONCE",
+  "status": "AUTH_ACCESS_RECOVERY_V5_CONSUMED_STOP_RETRY",
   "executionProfile": {
     "phase": "AUTH_ACCESS_RECOVERY_LAB_V5",
     "capabilities": {
@@ -22,12 +22,12 @@
   "rcId": "RC-AYS-LAB-CANONICA-01",
   "authorization": {
     "requiredForExecution": true,
-    "activeRequest": true,
-    "allowedExecutions": 1,
+    "activeRequest": false,
+    "allowedExecutions": 0,
     "request": ".github/orbit360-requests/auth-access-recovery-lab-v5-20260805.json",
     "authorizationRef": "user_authorized_auth_access_runtime_v5_20260805T1048-0600",
     "authorizedAt": "2026-08-05T10:48:00-06:00",
-    "consumed": false,
+    "consumed": true,
     "replayAllowed": false
   },
   "priorRequests": [
@@ -147,6 +147,46 @@
     "production": true,
     "main": true,
     "merge": true
+  },
+  "executionResult": {
+    "stage": "STOP_RETRY_AUTH_ACCESS_RECOVERY",
+    "classification": "FUNCTIONAL_DEFECT",
+    "observedBy": "sanitized_pull_request_comment",
+    "canonicalPreflightPassed": true,
+    "accessConfigPlanPassed": true,
+    "accessConfigApplyPassed": true,
+    "censusPassed": true,
+    "onboardingFunctionAvailabilityPassed": true,
+    "onboardingCallPassed": false,
+    "scopePostverifyReached": false,
+    "passwordEmailsConfirmed": 0,
+    "authUsersCreatedConfirmed": 0,
+    "membershipsCreatedConfirmed": 0,
+    "protectedCrmIntegrityPostverifyReached": false,
+    "protectedCrmChangedObserved": false,
+    "rollbackAttemptedByRecoveryOwner": true,
+    "exactOnboardingRemoteStatusPersisted": false,
+    "ok": false
+  },
+  "postmortem": {
+    "primaryFailureFamily": "ONBOARDING_CALL_FAILED_STATUS_UNAVAILABLE",
+    "primaryOwner": "tools/orbit360-auth-access-recovery-lab-v20260805.mjs::callOnboarding",
+    "primaryDownstreamOwner": "functions/user-onboarding.js::executeProvision",
+    "primaryClassification": "FUNCTIONAL_DEFECT",
+    "secondaryFailureCode": "MISSING_OPTIONAL_SCOPE_EVIDENCE_BREAKS_RESULT_PERSISTENCE",
+    "secondaryOwner": ".github/workflows/orbit360-auth-access-recovery-lab-v3-20260805.yml::Persistir evidencia y cierre sin tocar request",
+    "secondaryClassification": "PIPELINE_MECHANISM_FAILURE",
+    "requestImmutable": true,
+    "rerunAllowed": false
+  },
+  "nextBoundary": {
+    "newRequestPathRequired": true,
+    "newGateVersionRequired": true,
+    "sourceOnlyDiagnosisRequiredBeforeRuntime": true,
+    "actorAuthorizationParityCheckRequired": true,
+    "onboardingErrorCodePersistenceRequired": true,
+    "conditionalEvidencePersistenceRequired": true,
+    "newExplicitRuntimeAuthorizationRequired": true
   },
   "containsPII": false,
   "containsSecrets": false
