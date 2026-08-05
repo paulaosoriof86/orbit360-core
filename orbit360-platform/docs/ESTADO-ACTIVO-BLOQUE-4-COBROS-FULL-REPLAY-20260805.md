@@ -1,42 +1,50 @@
 # ESTADO ACTIVO — BLOQUE 4.0 · REPLAY COMPLETO READ-ONLY DE COBROS
 
-Actualizado: 2026-08-05  
+Actualizado: 2026-08-05 18:00 GT  
 RC: `RC-AYS-LAB-CANONICA-01`  
-Gate objetivo: `PASS_COBROS_FULL_REPLAY`  
-Estado: `ACTIVE_READ_ONLY_PROGRESS_REQUIRES_MORE_EVIDENCE`
+Rama: `ays/backend-tenant-lab-v99-20260703`  
+PR: #5 draft/open
 
-## Frente paralelo de revisión visual
-
-La candidata vigente está disponible en:
+## Estado
 
 ```text
-https://ays-orbit-360-lab.web.app/?orbitBackend=firestore-lab&tenant=alianzas-soluciones#/inicio
+Gate: PASS_COBROS_FULL_REPLAY
+Decisión: GO_COBROS_LEDGER_COMPLETE_NO_WRITES
+Estado: CLOSED_PASS_READ_ONLY
 ```
 
-Auth autoadministrable está cerrado. La revisión visual humana continúa en paralelo y no altera este carril.
-
-## Universo canónico
+## Universo cerrado
 
 ```text
-pagos reportados: 365
-cobros ya materializados preservados: 5
-HOLD de calendario preservados: 44
-Firestore/Auth/operational writes: 0
-deploys: 0
-reimportación: 0
-producción/main/merge: no
+pagos reportados canónicos: 365
+propuestas por secuencia: 128
+post-corte pendientes de confirmación: 2
+propuestas por planilla detallada única: 2
+HOLD sin enlace único a recibo: 233
+requiere validación: 0
+filas explicadas: 365
+filas sin categoría: 0
 ```
 
-Fuente privada canónica verificada:
+```text
+128 + 2 + 2 + 233 = 365
+```
+
+El PASS acredita censo, clasificación y trazabilidad de todas las filas. No convierte automáticamente los 233 HOLD en cobros.
+
+## Fuentes
+
+Fuente canónica privada:
 
 ```text
 ORBIT360-AYS-RECIBOS-CARTERA-CANONICAL-PRIVATE-20260730
-sizeBytes: 443105
+bytes: 443105
+hojas: 8
 pagos reportados: 365
-cartera canónica: 641
+cartera: 641
 ```
 
-Fuente privada normalizada de planillas:
+Planillas normalizadas:
 
 ```text
 archivos recibidos: 19
@@ -47,167 +55,120 @@ paquete incompleto: 1
 planilla sin factura: 1
 ```
 
-## Avance real del overlay
+## Owners vigentes
 
 ```text
-secuencia de cartera: 128
-pagos posteriores al corte: 2
-propuestas únicas por planilla detallada: 2
-pagos explicados: 132
-pagos pendientes de evidencia adicional: 233
-invariante: 128 + 2 + 2 + 233 = 365
-```
-
-Resultado vigente:
-
-```text
-stage: COBROS_OVERLAY_PROGRESS
-classification: READ_ONLY_PROGRESS_REQUIRES_MORE_EVIDENCE
-rowLedgerCount: 365
-rowLedgerDigest: 3f129242c34934b3f87009a1d0cb4bded6861b376f3719349831d770b7825f5f
-ok: false
-```
-
-`ok:false` es correcto: el gate no puede declararse PASS mientras queden 233 pagos sin evidencia suficiente.
-
-## Causa raíz detectada y corregida
-
-Clasificación:
-
-```text
-DATA_CONTRACT_FAILURE
-```
-
-El owner v1 podía aplicar la primera fila de una planilla cuando la combinación póliza/moneda/periodo aparecía repetida. Eso podía crear una propuesta falsa aunque la fuente no fuera unívoca.
-
-Root fix:
-
-```text
+tools/orbit360-cobros-full-replay-v20260804.mjs
+tools/orbit360-cobros-inferencia-secuencial-v20260804.mjs
 tools/orbit360-cobros-overlay-readonly-v2-20260805.mjs
-tools/orbit360-test-cobros-overlay-source-v2-20260805.mjs
+tools/orbit360-cobros-overlay-hold-finalizer-v20260805.mjs
 ```
 
-Regla v2:
-
-- una clave de planilla repetida nunca genera conciliación;
-- las filas repetidas quedan en `PLANILLA_DETAIL_AMBIGUOUS_HOLD`;
-- solo una clave fuente única contra un único pago pendiente puede producir propuesta;
-- reversos, ceros, coincidencias por periodo y fuentes incompletas permanecen separados;
-- ninguna propuesta escribe datos.
-
-Prueba source-only:
+Pruebas:
 
 ```text
 PASS_COBROS_OVERLAY_SOURCE_ONLY_V2
-16 PASS
-0 FAIL
-duplicateSourceKeyProtection: true
+PASS_COBROS_HOLD_FINALIZER_SOURCE_ONLY
 ```
 
-## Clasificación de las 67 filas de planilla
+## Correcciones de causa raíz
+
+### Clave de planilla repetida
 
 ```text
-PLANILLA_ZERO_OMIT: 2
-PLANILLA_PERIOD_ONLY: 29
-PLANILLA_REVERSAL_HOLD: 2
-PLANILLA_DETAIL_AMBIGUOUS_HOLD: 10
-PLANILLA_DETAIL_CANDIDATE: 24
+clasificación: DATA_CONTRACT_FAILURE
 ```
 
-Resultado del cruce:
+Una misma combinación póliza/moneda/periodo no puede seleccionar arbitrariamente una fila. Toda clave repetida queda en `PLANILLA_DETAIL_AMBIGUOUS_HOLD`.
+
+### Fila autoritativa sin enlace único
+
+El contrato exige que toda fila termine vinculada, propuesta, HOLD, omitida o en validación. Una fila SIGA con pago reportado, sin pendiente y fuera de cartera, pero sin enlace unívoco a recibo, termina en:
 
 ```text
-propuestas únicas: 2
-filas con clave fuente ambigua: 10
-claves destino ambiguas: 0
-filas detalladas sin pago pendiente correspondiente: 22
+HOLD_REPORTED_PAYMENT_NO_UNIQUE_RECEIPT_LINK
 ```
 
-Una planilla de comisiones prueba recaudo únicamente cuando existe detalle suficiente y enlace unívoco. Una factura o resumen agregado no crea cobros individuales.
+No se aplica como cobro hasta que exista evidencia suficiente y autorización.
 
-## Segmentación de los 233 pendientes
+## Evidencia final
+
+```text
+rowLedgerCount: 365
+rowLedgerDigest: 96d7105912234de14deb5ad0190e537c1b71570519d086616acc9122cb2ca381
+cobros existentes preservados: 5
+HOLD de calendario preservados: 44
+```
+
+Archivos:
+
+```text
+runtime-gate-crm-v20260716/cobros-full-replay-final-sanitized-v20260805.json
+runtime-gate-crm-v20260716/cobros-hold-finalizer-source-test-sanitized-v20260805.json
+docs/CIERRE-BLOQUE-4-0-COBROS-FULL-REPLAY-20260805.md
+```
+
+## Frontera
+
+```text
+Firestore writes: 0
+Auth writes: 0
+operational writes: 0
+cobros aplicados: 0
+recibos modificados: 0
+reimportación: 0
+deploys: 0
+Rules: 0
+producción/main/merge: 0
+```
+
+No se usó banco ni histórico financiero para crear cobros. Facturas y resúmenes agregados no producen aplicaciones individuales.
+
+## Pendientes por fuente
+
+Los 233 HOLD permanecen segmentados para futuras liberaciones:
 
 ```text
 GTQ: 209
 COP: 24
 pólizas distintas: 124
-fuente Recibos por fecha límite: 154
-fuente Cobranza efectuada histórica: 79
+Aseguradora Guatemalteca: 41
+Seguros El Roble: 38
+Seguros Columna: 30
 ```
 
-Prioridad por aseguradora:
+Estos pendientes no reabren el censo. Los reportes detallados futuros podrán transformar HOLD concretos en propuestas mediante el mismo owner y trazabilidad.
 
-| Aseguradora | País | Pendientes |
-|---|---:|---:|
-| Aseguradora Guatemalteca | GT | 41 |
-| Seguros El Roble | GT | 38 |
-| Seguros Columna | GT | 30 |
-| Mapfre Seguros Guatemala | GT | 22 |
-| Seguros G&T | GT | 17 |
-| Aseguradora General | GT | 16 |
-| Aseguradora La Ceiba | GT | 16 |
-| Seguros Ficohsa | GT | 14 |
-| Seguros Universales | GT | 9 |
-| Aseguradora Rural | GT | 8 |
-| Resto GT/CO | Mixto | 22 |
+## Carriles
 
-Las tres primeras concentran 109 de los 233 casos.
+### Carril A
 
-## Readiness del importador recurrente
+Revisión visual post-Auth activa, pendiente feedback de Paula.
 
-Estado vigente:
+### Carril B
 
-```text
-GO_ASSISTED_MONTHLY_INTAKE
-NOT_YET_GO_UNIVERSAL_SELF_SERVICE
-```
+Owners source-only corregidos; backend desplegado no modificado.
 
-Se conservan:
+### Carril C
 
-- staging y dry-run;
-- hash e idempotencia;
-- separación por tipo de fuente;
-- confirmación humana;
-- rollback antes del consumo;
-- prohibición banco → cobro directo;
-- prohibición histórico financiero → cobro;
-- soporte agregado solo como HOLD/propuesta.
-
-Pendientes de producto, sin bloquear este replay:
-
-```text
-DATA_CONTRACT_FAILURE
-- identidad de fuente debe aceptar policyId, policyNumber, recibo o referencia de contraparte según contrato.
-
-FUNCTIONAL_DEFECT
-- editor completo de mapeo corregible y perfiles reutilizables por aseguradora/formato aún no demostrado end-to-end;
-- extracción de documentos no tabulares aún no demostrada end-to-end.
-```
-
-## Evidencias vigentes
-
-```text
-runtime-gate-crm-v20260716/cobros-replay-inferencial-sanitizado-v20260804.json
-runtime-gate-crm-v20260716/cobros-overlay-source-test-v2-sanitized-v20260805.json
-runtime-gate-crm-v20260716/cobros-overlay-private-readonly-sanitized-v20260805.json
-runtime-gate-crm-v20260716/cobros-unresolved-segmentation-sanitized-v20260805.json
-```
-
-## Criterio de salida
-
-```text
-PASS_COBROS_FULL_REPLAY
-365 pagos explicados sin doble conteo
-5 cobros existentes preservados
-HOLD explícitos
-cero escrituras
-ledger sanitizado
-```
+Bloque 4.0 cerrado. Siguiente frontera: materialización durable limitada y autorizada.
 
 ## Siguiente acción exacta
 
-1. Recuperar y cruzar únicamente reportes detallados de pago o recibo por aseguradora para los 233 pendientes.
-2. Priorizar Aseguradora Guatemalteca, El Roble y Columna: 109 casos.
-3. Mantener facturas, resúmenes agregados, banco e histórico financiero fuera de la aplicación automática de cobros.
-4. Reejecutar el mismo owner v2 sobre la misma base canónica, sin crear otro algoritmo paralelo.
-5. Solo con 365/365 preparar el Bloque 4.1 de materialización durable, sujeto a autorización explícita separada.
+```text
+BLOQUE 4.1
+COBROS_REAL_LEDGER_COMPLETE
+PENDIENTE AUTORIZACIÓN EXPLÍCITA
+```
+
+Debe preparar y, solo tras autorización, materializar en LAB:
+
+1. las propuestas autorizables del ledger;
+2. los pagos post-corte en la categoría correspondiente;
+3. los 233 HOLD sin convertirlos en cobros;
+4. snapshot previo;
+5. idempotencia;
+6. operación atómica;
+7. post-verificación;
+8. rollback exacto;
+9. cero producción.
