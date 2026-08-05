@@ -3,7 +3,7 @@
   "gateId": "block-auth-foundation-all-team-runtime-v20260805",
   "gateContractVersion": "13.7.0",
   "validatorLifecycleRevision": "phase-capability-contract-v1",
-  "status": "AUTH_FOUNDATION_ALL_TEAM_RUNTIME_AUTHORIZED_ONCE",
+  "status": "AUTH_FOUNDATION_ALL_TEAM_RUNTIME_CONSUMED_STOP_RETRY",
   "executionProfile": {
     "phase": "AUTH_FOUNDATION_ALL_TEAM_RUNTIME",
     "capabilities": {
@@ -23,12 +23,12 @@
   "rcId": "RC-AYS-LAB-CANONICA-01",
   "authorization": {
     "requiredForExecution": true,
-    "activeRequest": true,
-    "allowedExecutions": 1,
+    "activeRequest": false,
+    "allowedExecutions": 0,
     "request": ".github/orbit360-requests/auth-foundation-all-team-runtime-v20260805.json",
     "authorizationRef": "user_authorized_auth_foundation_all_team_runtime_20260805T1234-0600",
     "authorizedAt": "2026-08-05T12:34:00-06:00",
-    "consumed": false,
+    "consumed": true,
     "replayAllowed": false
   },
   "sourceOnlyPrerequisite": {
@@ -40,7 +40,11 @@
   "coverageContract": {
     "currentActiveTeamExpected": 7,
     "currentIdentityCoverageRequired": "7/7",
-    "functionalRoleProfilesRequired": ["direccion", "operativo", "asesor"],
+    "functionalRoleProfilesRequired": [
+      "direccion",
+      "operativo",
+      "asesor"
+    ],
     "functionalProfileCoverageRequired": "3/3",
     "futureUsersSupported": true,
     "dynamicRosterSource": "tenant_team_configuration",
@@ -69,8 +73,22 @@
       "accessLastAttemptAt",
       "accessOnboardingVersion"
     ],
-    "crmCollectionsProtected": ["clientes", "polizas", "vehiculos", "recibos", "cartera", "cobros", "comisiones", "gestiones", "leads"],
-    "integrityStates": ["VERIFIED_UNCHANGED", "VERIFIED_CHANGED", "NOT_POSTVERIFIED"]
+    "crmCollectionsProtected": [
+      "clientes",
+      "polizas",
+      "vehiculos",
+      "recibos",
+      "cartera",
+      "cobros",
+      "comisiones",
+      "gestiones",
+      "leads"
+    ],
+    "integrityStates": [
+      "VERIFIED_UNCHANGED",
+      "VERIFIED_CHANGED",
+      "NOT_POSTVERIFIED"
+    ]
   },
   "guards": {
     "canonicalGateBeforeSecrets": true,
@@ -104,5 +122,13 @@
     "merge": true
   },
   "containsPII": false,
-  "containsSecrets": false
+  "containsSecrets": false,
+  "executionResult": {
+    "stage": "AUTH_FOUNDATION_ALL_TEAM_CENSUS_STOP",
+    "decision": "STOP_RETRY",
+    "classification": "DATA_CONTRACT_FAILURE",
+    "errorCode": "TEAM_ROSTER_NOT_READY",
+    "crmIntegrity": "NOT_POSTVERIFIED",
+    "ok": false
+  }
 }
