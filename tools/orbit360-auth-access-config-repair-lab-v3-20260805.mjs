@@ -169,12 +169,17 @@ try {
     if (!fs.existsSync(PRIVATE)) throw new Error('PIPELINE_MECHANISM_FAILURE:PRIVATE_ACCESS_CONFIG_PLAN_MISSING');
     const plan = JSON.parse(fs.readFileSync(PRIVATE, 'utf8'));
     if (plan.tenantId !== TENANT || !Array.isArray(plan.plans) || plan.plans.length !== 3) throw new Error('DATA_CONTRACT_FAILURE:PRIVATE_ACCESS_CONFIG_PLAN_INVALID');
-    let documentsWritten = 0;
-    let fieldsWritten = 0;
-    await db.runTransaction(async tx => {
+
+    const writeSummary = await db.runTransaction(async tx => {
+      const snapshots = [];
       for (const item of plan.plans) {
         const ref = db.doc(item.path);
         const snap = await tx.get(ref);
+        snapshots.push({ item, ref, snap });
+      }
+
+      const pendingWrites = [];
+      for (const { item, ref, snap } of snapshots) {
         if (!snap.exists) throw new Error(`DATA_CONTRACT_FAILURE:${item.profile.toUpperCase()}_ADVISOR_DISAPPEARED`);
         const row = snap.data() || {};
         const currentView = Object.fromEntries(ALLOWED_FIELDS.map(field => [field, stable(row?.[field])]));
@@ -184,13 +189,18 @@ try {
           if (!ALLOWED_FIELDS.includes(field)) throw new Error('SECURITY_FAILURE:FIELD_OUTSIDE_ACCESS_CONFIG_ALLOWLIST');
           patch[field] = item.desired[field];
         }
-        if (Object.keys(patch).length) {
-          tx.update(ref, patch);
-          documentsWritten += 1;
-          fieldsWritten += Object.keys(patch).length;
-        }
+        if (Object.keys(patch).length) pendingWrites.push({ ref, patch });
       }
+
+      for (const { ref, patch } of pendingWrites) tx.update(ref, patch);
+      return {
+        documentsWritten: pendingWrites.length,
+        fieldsWritten: pendingWrites.reduce((sum, entry) => sum + Object.keys(entry.patch).length, 0)
+      };
     });
+
+    const documentsWritten = writeSummary.documentsWritten;
+    const fieldsWritten = writeSummary.fieldsWritten;
     for (const item of plan.plans) {
       const row = (await db.doc(item.path).get()).data() || {};
       for (const field of ALLOWED_FIELDS) if (digest(stable(row[field])) !== digest(stable(item.desired[field]))) throw new Error(`DATA_CONTRACT_FAILURE:${item.profile.toUpperCase()}_${field.toUpperCase()}_POSTVERIFY_FAILED`);
@@ -215,13 +225,19 @@ try {
   }
 } catch (error) {
   const message = safeError(error);
-  const classification = (message.match(/^(SECURITY_FAILURE|FUNCTIONAL_DEFECT|VALIDATOR_STALE|DATA_CONTRACT_FAILURE|ENVIRONMENT_FAILURE|PIPELINE_MECHANISM_FAILURE)/) || [])[1] || 'PIPELINE_MECHANISM_FAILURE';
+  const transactionReadAfterWrite = /reads?.*(before|prior to).*writes?|all reads.*all writes|transaction.*read.*write/i.test(message);
+  const classification = transactionReadAfterWrite
+    ? 'PIPELINE_MECHANISM_FAILURE'
+    : (message.match(/^(SECURITY_FAILURE|FUNCTIONAL_DEFECT|VALIDATOR_STALE|DATA_CONTRACT_FAILURE|ENVIRONMENT_FAILURE|PIPELINE_MECHANISM_FAILURE)/) || [])[1] || 'PIPELINE_MECHANISM_FAILURE';
+  const errorCode = transactionReadAfterWrite
+    ? 'FIRESTORE_TRANSACTION_READ_AFTER_WRITE'
+    : text(message.split(':')[1] || 'ACCESS_CONFIG_REPAIR_FAILED', 180);
   write(OUT, {
     schemaVersion: 'orbit360-auth-access-config-repair-sanitized-v3',
     stage: MODE === 'plan' ? 'STOP_RETRY_ACCESS_CONFIG_PLAN' : 'STOP_RETRY_ACCESS_CONFIG_APPLY',
     decision: 'STOP_RETRY',
     classification,
-    errorCode: text(message.split(':')[1] || 'ACCESS_CONFIG_REPAIR_FAILED', 180),
+    errorCode,
     firestoreWrites: 0,
     authWrites: 0,
     membershipWrites: 0,
@@ -230,7 +246,7 @@ try {
     containsSecrets: false,
     ok: false
   });
-  console.error(JSON.stringify({ ok: false, stage: MODE === 'plan' ? 'STOP_RETRY_ACCESS_CONFIG_PLAN' : 'STOP_RETRY_ACCESS_CONFIG_APPLY', classification }));
+  console.error(JSON.stringify({ ok: false, stage: MODE === 'plan' ? 'STOP_RETRY_ACCESS_CONFIG_PLAN' : 'STOP_RETRY_ACCESS_CONFIG_APPLY', classification, errorCode }));
   process.exitCode = 41;
 } finally {
   if (app) await deleteApp(app).catch(() => {});
