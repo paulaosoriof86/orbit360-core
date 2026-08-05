@@ -249,7 +249,7 @@ async function cleanup(app) {
     schemaVersion: 'orbit360-block12-operational-runtime-final-v1',
     status: ok ? 'OPERATIONAL_RUNTIME_LAB_PASS' : 'OPERATIONAL_RUNTIME_LAB_FAIL',
     classification: ok ? 'GO_LAB_OPERATIONAL_RUNTIME_CUMULATIVE' : (browser.classification || (realTenantUnchanged ? 'FUNCTIONAL_DEFECT' : 'DATA_CONTRACT_FAILURE')),
-    gateId: 'block12-operational-runtime-lab-v20260804', contractVersion: '12.0.7',
+    gateId: 'block12-operational-runtime-lab-v20260804', contractVersion: '12.0.9',
     browser: { status: browser.status, passed: browser.passed || 0, failed: browser.failed || 0, screenshot: browser.screenshot || '' },
     runtimeChecks,
     rollback: { syntheticTenantCollectionsRemaining: tenantCollections.length, legacyCollectionsRemaining: legacyCollections.length, syntheticAuthUsersDeleted: authDeleted, syntheticAuthUsersRemaining: usersRemain, exact: cleanupOk },
