@@ -24,7 +24,8 @@
   var catalog = [];
   var byId = {};
 
-  if (mode !== 'firestore-lab' || tenant !== 'alianzas-soluciones') return;
+  var migrationMode = new URLSearchParams(window.location.search || '').get('orbitInitialAdvisorMigration') === '1';
+  if (mode !== 'firestore-lab' || tenant !== 'alianzas-soluciones' || !migrationMode) return;
 
   function clone(value) {
     return JSON.parse(JSON.stringify(value));
@@ -88,7 +89,7 @@
   function validateConfig(config) {
     if (!config || config.schemaVersion !== 'orbit360.tenant-advisors.v1') throw new Error('Configuración de asesores inválida.');
     if (config.tenantId !== tenant) throw new Error('Tenant incorrecto en configuración de asesores.');
-    if (!Array.isArray(config.advisors) || config.advisors.length !== 7) throw new Error('El catálogo debe contener siete asesores.');
+    if (!Array.isArray(config.advisors) || config.advisors.length < 1) throw new Error('El catálogo inicial no contiene asesores.');
     var ids = {};
     config.advisors.forEach(function (row) {
       if (!row || !row.id || !row.nombre || row.estado !== 'activo' || ids[row.id]) throw new Error('Registro de asesor inválido.');

@@ -208,8 +208,13 @@ async function census() {
   if (new Set(ids).size !== ids.length) errors.push('TEAM_ID_DUPLICATE');
   if (new Set(emails).size !== emails.length) errors.push('TEAM_EMAIL_DUPLICATE');
   for (const item of normalized) for (const code of planTest.validateTeamRecord(item.record)) errors.push(`${sha(item.record.id).slice(0,12)}:${code}`);
-  const plan = errors.length ? null : buildFoundationPlan({ tenantId:TENANT, teamRecords:activeRows.map(row => ({ ...row.data, id:row.id })), authUsers:users.map(user => ({ uid:user.uid,email:user.email || '',emailVerified:user.emailVerified })), memberships:memberships.map(row => ({ uid:row.uid, ...row.data })), expectedActiveCount:normalized.length });
-  if (!plan?.ok) errors.push(plan?.errorCode || 'DYNAMIC_TEAM_PLAN_NOT_READY');
+  const functionalProfiles = new Set();
+  for (const item of normalized) {
+    if (item.record.roles.some(role => ['SuperAdmin','AdminTenant'].includes(role))) functionalProfiles.add('direccion');
+    if (item.record.roles.includes('Operativo')) functionalProfiles.add('operativo');
+    if (item.record.roles.includes('Asesor')) functionalProfiles.add('asesor');
+  }
+  const administrativeUsers = normalized.filter(item => item.record.roles.some(role => ['SuperAdmin','AdminTenant'].includes(role))).length;
 
   const records = normalized.map(item => {
     const user = findAuth(item.record, users);
@@ -263,7 +268,8 @@ async function census() {
     plannedMembershipReconciliations:targets.length,
     plannedTeamLinks:targets.length,
     plannedPasswordEmails:targets.length,
-    functionalProfilesCovered:plan.functionalProfilesCovered,
+    functionalProfilesCovered:functionalProfiles.size,
+    administrativeUsersObserved:administrativeUsers,
     futureUserPathSupported:true,
     firestoreReads:true,
     firestoreWrites:0,
@@ -444,7 +450,7 @@ async function verify() {
     }
     const crmAfter = await crmSnapshot(db);
     const crmIntegrity = digest(crmAfter) === digest(state.crmBefore) ? 'VERIFIED_UNCHANGED' : 'VERIFIED_CHANGED';
-    const ok = identities === state.activeCount && memberships === state.activeCount && teamLinks === state.activeCount && state.emailsSent.length === state.activeCount && state.sessionsVerified === true && profiles.size === 3 && crmIntegrity === 'VERIFIED_UNCHANGED';
+    const ok = identities === state.activeCount && memberships === state.activeCount && teamLinks === state.activeCount && state.emailsSent.length === state.activeCount && state.sessionsVerified === true && crmIntegrity === 'VERIFIED_UNCHANGED';
     writeJson(FILES.verify, publicBase({ stage:ok?'AUTH_DYNAMIC_TEAM_RUNTIME_PASS':'AUTH_DYNAMIC_TEAM_RUNTIME_STOP_RETRY', classification:ok?'AUTH_DYNAMIC_TEAM_COMPLETE':'FUNCTIONAL_DEFECT', activeUsers:state.activeCount, identitiesVerified:identities, membershipsVerified:memberships, teamLinksVerified:teamLinks, passwordEmailsVerified:state.emailsSent.length, sessionsVerified:state.sessionsVerified ? state.activeCount : 0, functionalProfilesVerified:profiles.size, futureUserPathSupported:true, crmIntegrity, firestoreReads:true, firestoreWrites:0, authReads:true, authWrites:0, ok }));
     return ok ? 0 : 41;
   } catch (error) {

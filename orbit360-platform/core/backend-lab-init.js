@@ -127,7 +127,7 @@
     });
 
     loadScriptOnce('core/aseguradoras-bank-accounts-provider-lab-v20260721.js?v=20260721-1', 'bank-account-provider');
-    loadScriptOnce('core/backend-lab-advisor-write-bridge.js?v=20260717-1', 'advisor-write-bridge');
+    // El catálogo inicial ya no se superpone al Equipo operativo.
     loadScriptOnce('core/backend-lab-auth-guard.js?v=20260717-1', 'auth-guard', function(){
       loadScriptOnce('core/backend-lab-import-readiness-guard.js?v=20260717-1', 'import-readiness', function(){
         loadScriptOnce('core/backend-lab-canonical-view-sync.js?v=20260801-canonical-v79', 'canonical-view-sync');

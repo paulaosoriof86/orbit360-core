@@ -2,24 +2,251 @@
   "schemaVersion": "orbit360-auth-foundation-dynamic-team-runtime-gate-v1",
   "gateId": "block-auth-foundation-roster-resolution-and-runtime-v20260805",
   "contractVersion": "13.8.0",
-  "status": "NOT_EXECUTED",
-  "classification": "PENDING_DYNAMIC_TEAM_REQUEST",
-  "failed": 1,
-  "failedCheckIds": ["DYNAMIC_TEAM_REQUEST_NOT_EXECUTED"],
-  "executionAuthorized": false,
-  "secretAccessAuthorized": false,
-  "firestoreReadAuthorized": false,
-  "writeAuthorized": false,
-  "authWriteAuthorized": false,
-  "runtimeAuthorized": false,
-  "deployAuthorized": false,
-  "functionsDeployAuthorized": false,
+  "status": "GO_GATE_CONTRACT",
+  "classification": "AUTH_FOUNDATION_DYNAMIC_TEAM_RUNTIME_READY",
+  "total": 40,
+  "passed": 40,
+  "failed": 0,
+  "failedCheckIds": [],
+  "checks": [
+    {
+      "id": "GATE_ID_VERSION",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "LIFECYCLE_AUTHORIZED_ONCE",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "RUNTIME_CAPABILITIES_EXACT",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "PRIOR_RUNTIME_CONSUMED_STOP",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "PRIOR_REQUEST_IMMUTABLE",
+      "ok": true,
+      "detail": "72f5280625d6f760076d529a14eadfc15209d169"
+    },
+    {
+      "id": "REQUEST_ACTIVE",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "REQUEST_BINDING",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "REQUEST_SINGLE_FILE_COMMIT",
+      "ok": true,
+      "detail": ".github/orbit360-requests/auth-foundation-roster-resolution-and-runtime-v20260805.json"
+    },
+    {
+      "id": "REQUEST_DYNAMIC_SCOPE",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "REQUEST_PROHIBITIONS",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "LIFECYCLE_DYNAMIC_COUNT",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "TECHNICAL_BOUND_NOT_BUSINESS_COUNT",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "STORE_AUTHORITY",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "INITIAL_OVERLAY_REMOVED",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "INITIAL_BRIDGES_EXPLICIT_MIGRATION_ONLY",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "FIXED_SEVEN_REMOVED",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "OWNER_AUTHORITY_EXACT",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "OWNER_DYNAMIC_COUNT",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "OWNER_NO_EXACT_COUNT_BRANCH",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "OWNER_ALIASES_DIAGNOSTIC_ONLY",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "OWNER_HASHED_DIAGNOSTICS",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "OWNER_GENERIC_NO_PERSON_HARDCODE",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "OWNER_NO_TEMP_PASSWORD",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "OWNER_ADMIN_SDK_BOOTSTRAP",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "OWNER_READ_ALL_VALIDATE_ALL_WRITE_ALL",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "OWNER_IDEMPOTENT_DIFF",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "OWNER_DYNAMIC_EMAILS_SESSIONS",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "FUNCTIONAL_PROFILES_NONBLOCKING",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "OWNER_ROLLBACK",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "OWNER_CRM_INTEGRITY",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "NORMAL_ONBOARDING_DYNAMIC",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "FUNCTION_ALLOWLIST_EXACT",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "TEAM_FIELD_ALLOWLIST",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "WORKFLOW_REQUEST_PATH",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "WORKFLOW_FULL_HISTORY",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "WORKFLOW_GATE_BEFORE_SECRET",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "WORKFLOW_FUNCTION_ONLY",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "WORKFLOW_NO_HOSTING_RULES",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "WORKFLOW_SINGLE_ATTEMPT_ROLLBACK",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "SOURCE_FIXTURES_PASS",
+      "ok": true,
+      "detail": "{\"schemaVersion\":\"orbit360-auth-foundation-dynamic-team-runtime-source-fixtures-v1\",\"testedActiveCounts\":[1,3,5,7,9,10],\"checks\":{\"variableCountsPass\":true,\"duplicateBlocked\":true,\"incompleteBlocked\":true,\"authoritativeStorePath\":true,\"ownerAuthorityExact\":true,\"ownerDynamicCount\":true,\"noExactSevenOrNineGate\":true,\"technicalBoundOnly\":true,\"aliasesDiagnosticOnly\":true,\"catalogOverlayInactive\":true,\"fixedCatalogCountRemoved\":true,\"noPersonHardcode\":true,\"noTemporaryPassword\":true,\"adminSdkBootstrap\":true,\"readAllBeforeWriteAll\":true,\"noReadAfterWrite\":true,\"diffIdempotency\":true,\"dynamicEmails\":true,\"dynamicSessions\":true,\"profileCoverageNonBlocking\":true,\"rollbackExact\":true,\"crmIntegrity\":true,\"noHostingRulesReimport\":true},\"total\":23,\"passed\":23,\"failed\":0,\"failedCheckIds\":[],\"operationalCapabilitiesUsed\":0,\"containsPII\":false,\"containsSecrets\":false,\"ok\":true}"
+    }
+  ],
+  "executionAuthorized": true,
+  "secretAccessAuthorized": true,
+  "firestoreReadAuthorized": true,
+  "writeAuthorized": true,
+  "authWriteAuthorized": true,
+  "runtimeAuthorized": true,
+  "browserAuthorized": false,
+  "deployAuthorized": true,
+  "functionsDeployAuthorized": true,
+  "allowedFunctions": [
+    "orbit360ProvisionTeamAccess"
+  ],
   "hostingDeployAuthorized": false,
   "rulesDeployAuthorized": false,
   "productionAuthorized": false,
   "authoritativeTeamSource": "tenantId/{tenantId}/asesores",
   "activeCountMode": "DYNAMIC_AT_RUNTIME",
   "exactExpectedUserCount": null,
+  "minimumActiveUsers": 1,
+  "technicalMaximumActiveUsers": 100,
+  "identityCoverageRequired": "N/N_ACTIVE_VALID_USERS",
+  "passwordEmailsRequired": "N_ACTIVE_VALID_USERS",
+  "sessionsRequired": "N_ACTIVE_VALID_USERS",
+  "functionalProfilesAreCoverageNotAccessGate": true,
+  "aliasRoutesDiagnosticOnly": true,
+  "transactionStrategy": "READ_ALL_VALIDATE_ALL_WRITE_ALL",
+  "allowedTeamPatchFields": [
+    "authUid",
+    "accessProvisioned",
+    "accessState",
+    "onboardingState",
+    "invitacionEstado",
+    "membershipStatus",
+    "accessErrorCode",
+    "accessLastAttemptAt",
+    "accessOnboardingVersion"
+  ],
   "dataAccess": false,
   "secretAccess": false,
   "firestoreReads": 0,
@@ -29,7 +256,64 @@
   "runtimeExecuted": false,
   "deployExecuted": false,
   "productionTouched": false,
+  "fixture": {
+    "schemaVersion": "orbit360-auth-foundation-dynamic-team-runtime-source-fixtures-v1",
+    "testedActiveCounts": [
+      1,
+      3,
+      5,
+      7,
+      9,
+      10
+    ],
+    "checks": {
+      "variableCountsPass": true,
+      "duplicateBlocked": true,
+      "incompleteBlocked": true,
+      "authoritativeStorePath": true,
+      "ownerAuthorityExact": true,
+      "ownerDynamicCount": true,
+      "noExactSevenOrNineGate": true,
+      "technicalBoundOnly": true,
+      "aliasesDiagnosticOnly": true,
+      "catalogOverlayInactive": true,
+      "fixedCatalogCountRemoved": true,
+      "noPersonHardcode": true,
+      "noTemporaryPassword": true,
+      "adminSdkBootstrap": true,
+      "readAllBeforeWriteAll": true,
+      "noReadAfterWrite": true,
+      "diffIdempotency": true,
+      "dynamicEmails": true,
+      "dynamicSessions": true,
+      "profileCoverageNonBlocking": true,
+      "rollbackExact": true,
+      "crmIntegrity": true,
+      "noHostingRulesReimport": true
+    },
+    "total": 23,
+    "passed": 23,
+    "failed": 0,
+    "failedCheckIds": [],
+    "operationalCapabilitiesUsed": 0,
+    "containsPII": false,
+    "containsSecrets": false,
+    "ok": true
+  },
   "containsPII": false,
   "containsSecrets": false,
-  "ok": false
+  "ok": true,
+  "canonicalEntrypoint": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
+  "canonicalEngine": "tools/orbit360-validar-gate-contracts-engine-auth-foundation-roster-resolution-and-runtime-v20260805.mjs",
+  "canonicalLifecycleContract": "tools/orbit360-validator-lifecycle-contract-auth-foundation-roster-resolution-and-runtime-v20260805.json",
+  "canonicalLifecycleComposition": "phase-capability-contract-v1",
+  "engineEvidenceSource": "sync-file-evidence-not-stdout-v1",
+  "engineStdoutParsed": false,
+  "sourceTransformed": false,
+  "operationalWrites": 0,
+  "evidenceWrites": 1,
+  "secretsRead": false,
+  "firestoreRead": false,
+  "browserExecuted": false,
+  "rulesApplied": false
 }

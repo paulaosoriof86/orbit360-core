@@ -10,7 +10,8 @@
   var running = null;
   var state = { ready: false, count: 0, error: null, syncedAt: '' };
 
-  if (mode !== 'firestore-lab' || tenant !== 'alianzas-soluciones') return;
+  var migrationMode = new URLSearchParams(window.location.search || '').get('orbitInitialAdvisorMigration') === '1';
+  if (mode !== 'firestore-lab' || tenant !== 'alianzas-soluciones' || !migrationMode) return;
 
   function normalize(value) {
     return String(value == null ? '' : value).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, ' ').replace(/\s+/g, ' ').trim();
@@ -47,7 +48,7 @@
   function validateConfig(config) {
     if (!config || config.schemaVersion !== 'orbit360.tenant-advisors.v1') throw new Error('CATALOGO_ASESORES_SCHEMA');
     if (config.tenantId !== tenant) throw new Error('CATALOGO_ASESORES_TENANT');
-    if (!Array.isArray(config.advisors) || config.advisors.length !== 7) throw new Error('CATALOGO_ASESORES_CONTEO');
+    if (!Array.isArray(config.advisors) || config.advisors.length < 1) throw new Error('CATALOGO_ASESORES_VACIO');
     var ids = {};
     var names = {};
     config.advisors.forEach(function (row) {
