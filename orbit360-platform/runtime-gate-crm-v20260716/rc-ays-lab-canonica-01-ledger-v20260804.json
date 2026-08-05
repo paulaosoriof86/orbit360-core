@@ -2,7 +2,7 @@
   "schemaVersion": "orbit360-rc-ays-canonical-ledger-v1",
   "rcId": "RC-AYS-LAB-CANONICA-01",
   "createdAt": "2026-08-04T21:38:00-06:00",
-  "updatedAt": "2026-08-04T23:54:00-06:00",
+  "updatedAt": "2026-08-05T06:16:00-06:00",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
@@ -15,7 +15,7 @@
   "activeMacroblock": "2",
   "activeMicroblock": "2.5",
   "activeGate": "GO_LAB_CANDIDATE_VISIBLE",
-  "status": "READY_AWAITING_NEW_EXPLICIT_LAB_DEPLOY_AUTHORIZATION",
+  "status": "AUTHORIZED_GO_LAB_CANDIDATE_VISIBLE_ONCE",
   "evidenceIndex": {
     "microblock21Stop": "orbit360-platform/runtime-gate-crm-v20260716/rc-ays-lab-canonica-01-microblock21-stop-retry-v20260805.json",
     "microblock21Closure": "orbit360-platform/docs/CIERRE-STOP-RETRY-MICROBLOQUE-2-1-GO-LAB-CANDIDATE-VISIBLE-20260805.md",
@@ -47,9 +47,12 @@
     "microblock24SourceOnlyConsumed": true,
     "microblock24SourceOnlyReplayAllowed": false,
     "microblock24RuntimeAuthorized": false,
-    "microblock25Authorized": false,
-    "microblock25AllowedExecutions": 0,
-    "newExplicitAuthorizationRequiredForRuntime": true
+    "microblock25Reference": "user_authorized_microblock_2_5_20260805T0616-0600",
+    "microblock25Authorized": true,
+    "microblock25AllowedExecutions": 1,
+    "microblock25Consumed": false,
+    "microblock25ReplayAllowed": false,
+    "newExplicitAuthorizationRequiredForRuntime": false
   },
   "closedFacts": {
     "runtimeFunctionalRunId": 30962756387,
@@ -195,12 +198,12 @@
   "microblock25": {
     "name": "Visual LAB read-only retenida con request runtime v4",
     "gate": "GO_LAB_CANDIDATE_VISIBLE",
-    "status": "READY_AWAITING_NEW_EXPLICIT_LAB_DEPLOY_AUTHORIZATION",
+    "status": "AUTHORIZED_GO_LAB_CANDIDATE_VISIBLE_ONCE",
     "runtimeWorkflow": ".github/workflows/orbit360-block12-visual-layoutfree-reactivation-lab-v20260804.yml",
     "runtimeRequest": ".github/orbit360-requests/block12-go-lab-candidate-visible-v4.json",
     "runtimeRequestExists": false,
-    "runtimeAuthorized": false,
-    "allowedExecutions": 0,
+    "runtimeAuthorized": true,
+    "allowedExecutions": 1,
     "fullHistoryCheckout": true,
     "baselineExistenceGuard": true,
     "consumedV3Immutable": true,
@@ -216,7 +219,7 @@
     {"id": "2.2", "name": "Rediseño source-only de composición canónica", "status": "PASS", "gate": "PASS_CANONICAL_PREFLIGHT_COMPOSITION", "runId": 30977179448},
     {"id": "2.3", "name": "Visual LAB read-only retenida con request v3", "status": "STOP_RETRY_DEFINITIVE_BASELINE_PROVENANCE", "gate": "GO_LAB_CANDIDATE_VISIBLE", "runId": 30977831814},
     {"id": "2.4", "name": "Continuidad request v4 y provenance source-only", "status": "PASS", "gate": "PASS_REQUEST_V4_PROVENANCE_COMPOSITION", "runId": 30979519198},
-    {"id": "2.5", "name": "Visual LAB read-only retenida con request runtime v4", "status": "READY_AWAITING_NEW_EXPLICIT_LAB_DEPLOY_AUTHORIZATION", "gate": "GO_LAB_CANDIDATE_VISIBLE"},
+    {"id": "2.5", "name": "Visual LAB read-only retenida con request runtime v4", "status": "AUTHORIZED_ONCE", "gate": "GO_LAB_CANDIDATE_VISIBLE"},
     {"id": "3.0", "name": "Backend Ops Leads durable", "status": "PENDING_AFTER_NEW_VISUAL_AUTHORIZATION", "gate": "OPS_LEADS_BACKEND_LAB_COMPLETE"},
     {"id": "4.0", "name": "Replay completo read-only de Cobros", "status": "PENDING_AFTER_CONTROL_PLANE_AND_VISUAL", "gate": "PASS_COBROS_FULL_REPLAY"},
     {"id": "4.1", "name": "Materialización durable de Cobros", "status": "PENDING", "gate": "COBROS_REAL_LEDGER_COMPLETE"},
@@ -247,9 +250,9 @@
     "baselineExistenceGuardRequired": true,
     "sourceOnlyRequestMustNotBeMutatedForConsumption": true
   },
-  "currentClassification": "GO_SOURCE_ONLY_CONTROL_PLANE",
+  "currentClassification": "AUTHORIZED_CONTROL_PLANE",
   "currentOwner": "existing runtime workflow with full-history provenance + canonical outer router/inner engine",
-  "exactNextAction": "Await a new explicit authorization for one Microblock 2.5 LAB execution. Only then create .github/orbit360-requests/block12-go-lab-candidate-visible-v4.json bound to the current parent HEAD and execute preflight before secrets, four allowlisted Functions, one retained Hosting preview, eight isolated direct routes and identical before/after snapshots, with zero real writes and no Rules, reimport, production, main, merge or functional replay.",
+  "exactNextAction": "Create only .github/orbit360-requests/block12-go-lab-candidate-visible-v4.json bound to the current parent HEAD and execute one Microblock 2.5 LAB run with canonical preflight before secrets, four allowlisted Functions, one retained Hosting preview, eight isolated direct routes and identical before/after snapshots, with zero real writes and no Rules, reimport, production, main, merge or functional replay.",
   "containsPII": false,
   "containsSecrets": false
 }
