@@ -53,7 +53,8 @@
     "previousRealTenantUnchanged": true,
     "functionalReplayForbidden": true,
     "consumedRequest": ".github/orbit360-requests/block12-go-lab-candidate-visible-v3.json",
-    "futureRuntimeRequestTemplate": ".github/orbit360-requests/block12-go-lab-candidate-visible-v4.json",
+    "futureRuntimeRequestTemplate": ".github/orbit360-requests/block12-go-lab-candidate-visible-v3.json",
+    "futureRuntimeRequestMustUseNewPath": true,
     "consumptionLedger": "orbit360-platform/runtime-gate-crm-v20260716/rc-ays-lab-canonica-01-ledger-v20260804.json",
     "triggerRequestImmutable": true
   },
