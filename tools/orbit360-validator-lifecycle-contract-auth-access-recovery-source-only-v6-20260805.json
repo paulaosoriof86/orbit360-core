@@ -1,0 +1,138 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
+  "gateId": "block-auth-access-recovery-source-only-v6-20260805",
+  "gateContractVersion": "13.5.0",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
+  "status": "AUTH_ACCESS_RECOVERY_SOURCE_ONLY_V6_AUTHORIZED_ONCE",
+  "executionProfile": {
+    "phase": "AUTH_ACCESS_RECOVERY_SOURCE_ONLY_V6",
+    "capabilities": {
+      "secrets": false,
+      "firestoreRead": false,
+      "writes": false,
+      "runtime": false,
+      "browser": false,
+      "deploy": false,
+      "functionsDeploy": false,
+      "rulesDeploy": false,
+      "production": false
+    }
+  },
+  "singleGate": true,
+  "rcId": "RC-AYS-LAB-CANONICA-01",
+  "authorization": {
+    "requiredForExecution": true,
+    "activeRequest": true,
+    "allowedExecutions": 1,
+    "request": ".github/orbit360-requests/auth-access-recovery-source-only-v6-20260805.json",
+    "authorizationRef": "user_authorized_auth_access_source_only_v6_20260805T1133-0600",
+    "authorizedAt": "2026-08-05T11:33:00-06:00",
+    "consumed": false,
+    "replayAllowed": false
+  },
+  "priorRequests": [
+    {
+      "path": ".github/orbit360-requests/auth-access-recovery-lab-v20260805.json",
+      "blobSha": "fffef59bd6065390d1e8b28128754a06d94340b5",
+      "consumed": true,
+      "immutable": true
+    },
+    {
+      "path": ".github/orbit360-requests/auth-access-recovery-lab-v2-20260805.json",
+      "blobSha": "fd5963242de542105dd764371cf501f6814481e6",
+      "consumed": true,
+      "immutable": true
+    },
+    {
+      "path": ".github/orbit360-requests/auth-access-recovery-lab-v3-20260805.json",
+      "blobSha": "f8363197646dc4046fda1933af535110270703ae",
+      "consumed": true,
+      "immutable": true
+    },
+    {
+      "path": ".github/orbit360-requests/auth-access-recovery-source-only-v4-20260805.json",
+      "blobSha": "ad16d2b1fe41c88929eab59a6f92a6bdface08ad",
+      "consumed": true,
+      "immutable": true
+    },
+    {
+      "path": ".github/orbit360-requests/auth-access-recovery-lab-v5-20260805.json",
+      "blobSha": "e4112b831cb6aec65c9232cdcc5c73c88b07c27f",
+      "consumed": true,
+      "immutable": true
+    }
+  ],
+  "v5StopRetryPrerequisite": {
+    "lifecycle": "tools/orbit360-validator-lifecycle-contract-auth-access-recovery-lab-v5-20260805.json",
+    "requiredStatus": "AUTH_ACCESS_RECOVERY_V5_CONSUMED_STOP_RETRY",
+    "primaryClassification": "FUNCTIONAL_DEFECT",
+    "secondaryClassification": "PIPELINE_MECHANISM_FAILURE",
+    "rerunAllowed": false
+  },
+  "sourceValidationBoundary": {
+    "actorParityOwner": "tools/orbit360-auth-access-actor-parity-precheck-v6-20260805.mjs",
+    "callableErrorContract": "tools/orbit360-auth-callable-error-contract-v6-20260805.mjs",
+    "callableErrorPatcher": "tools/orbit360-patch-auth-callable-error-propagation-v6-20260805.mjs",
+    "conditionalEvidenceOwner": "tools/orbit360-auth-access-evidence-safe-persist-v6-20260805.mjs",
+    "testSuite": "tools/orbit360-test-auth-source-only-v6-20260805.mjs",
+    "recoveryOwner": "tools/orbit360-auth-access-recovery-lab-v20260805.mjs",
+    "requiredActorChecks": [
+      "tenantMatch",
+      "statusActive",
+      "activeRoleAssigned",
+      "roleOrPermissionAuthorized",
+      "actorIdentityPresent"
+    ],
+    "requiredCallableEvidenceFields": [
+      "httpStatus",
+      "callableStatus",
+      "errorCode"
+    ],
+    "requiredIntegrityStates": [
+      "VERIFIED_UNCHANGED",
+      "VERIFIED_CHANGED",
+      "NOT_POSTVERIFIED"
+    ],
+    "optionalEvidenceFiles": [
+      "config",
+      "actor",
+      "auth",
+      "scope",
+      "rollback"
+    ],
+    "networkAllowed": false,
+    "operationalWritesAllowed": false
+  },
+  "guards": {
+    "canonicalGateBeforeAnyCapability": true,
+    "requestSingleFileCommit": true,
+    "requestImmutable": true,
+    "priorRequestsImmutableAndConsumed": true,
+    "workflowReusedWithV6Path": true,
+    "workflowZeroCapabilities": true,
+    "actorParityExact": true,
+    "callableStatusPropagationSanitized": true,
+    "conditionalEvidencePersistence": true,
+    "triStateIntegrityRequired": true,
+    "sourceFixturesOnly": true,
+    "stopRetryOnFailure": true
+  },
+  "prohibitions": {
+    "secrets": true,
+    "firebase": true,
+    "firestore": true,
+    "auth": true,
+    "functions": true,
+    "hosting": true,
+    "browser": true,
+    "deploy": true,
+    "rules": true,
+    "reimport": true,
+    "crm": true,
+    "production": true,
+    "main": true,
+    "merge": true
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
