@@ -1,20 +1,15 @@
 {
-  "schemaVersion": "orbit360-block12-rootfix9-resume-materialization-v2",
-  "status": "PENDING_IMP001_RUNTIME_RERUN",
-  "previousRuntimeRunId": 30961956480,
-  "previousFailureCode": "IMP-001",
-  "previousPassed": 10,
-  "previousFailed": 1,
-  "previousRollbackExact": true,
-  "previousRealTenantUnchanged": true,
-  "imp001RootCause": "REUSED_TRUE_OVERWRITTEN_BY_PRIOR_RESULT_FALSE",
-  "imp001SourceFixStatus": "IMP001_IDEMPOTENCY_RESPONSE_SOURCE_PASS",
-  "sourceFixHead": "9a7570169d91b57378f78d0eca0aba52fda488b1",
-  "secretsRead": false,
-  "firebaseCommandsExecuted": false,
+  "schemaVersion": "orbit360-block12-rootfix9-resume-materialization-v1",
+  "status": "ROOTFIX9_RESUME_SOURCE_PASS",
+  "previousGateRunId": 30961489455,
+  "checks": {
+    "orderSafe": true,
+    "functionsSdk": true,
+    "callableReady": true,
+    "engineVersion": true
+  },
+  "secretAccess": false,
   "firestoreRead": false,
-  "firestoreWrites": 0,
-  "authWrites": 0,
   "deployExecuted": false,
-  "ok": false
+  "ok": true
 }
