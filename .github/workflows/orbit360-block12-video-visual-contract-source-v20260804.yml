@@ -156,6 +156,7 @@ jobs:
             .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false
           ' "$ORBIT360_EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
           cp "$ORBIT360_EVIDENCE_DIR/preflight-sanitizado.json" "$ORBIT360_EVIDENCE_DIR/block12-video-visual-contract-preflight-source-v20260804.json"
+          git checkout -- "$ORBIT360_EVIDENCE_DIR/preflight-sanitizado.json"
           rm -f "$ORBIT360_FIXTURE_FILE"
 
       - name: Verificar límites y sellar source
@@ -169,8 +170,7 @@ jobs:
           git diff --check
           test ! -e "$ORBIT360_FIXTURE_FILE"
           test -z "$(git diff --name-only -- firestore.rules data/store.js orbit360-platform/data/store.js orbit360-platform/data/store-firestore-lab.local.js orbit360-platform/core/auth.js orbit360-platform/core/backend-lab-loader.js orbit360-platform/core/backend-lab-init.js functions/ops-leads-domain.js functions/ops-advisor-inbox.js functions/cobros-reconciliation-domain.js functions/recurring-insurance-import.js)"
-          mapfile -t MODIFIED < <(git diff --name-only)
-          printf '%s\n' "${MODIFIED[@]}" | sort -u > "$RUNNER_TEMP/modified.txt"
+          git status --porcelain=v1 | sed -E 's/^.. //' | sort -u > "$RUNNER_TEMP/modified.txt"
           cat > "$RUNNER_TEMP/allowed.txt" <<'EOF'
           orbit360-platform/runtime-gate-crm-v20260716/block12-video-visual-contract-preflight-source-v20260804.json
           orbit360-platform/runtime-gate-crm-v20260716/block12-video-visual-contract-source-v20260804.json
