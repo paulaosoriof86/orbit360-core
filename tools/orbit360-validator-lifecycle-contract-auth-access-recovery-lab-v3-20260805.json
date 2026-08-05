@@ -3,7 +3,7 @@
   "gateId": "block-auth-access-recovery-lab-v3-20260805",
   "gateContractVersion": "13.2.0",
   "validatorLifecycleRevision": "phase-capability-contract-v1",
-  "status": "READY_AWAITING_EXPLICIT_AUTHORIZATION",
+  "status": "AUTH_ACCESS_RECOVERY_V3_AUTHORIZED_ONCE",
   "executionProfile": {
     "phase": "AUTH_ACCESS_RECOVERY_LAB_V3",
     "capabilities": {
@@ -22,10 +22,11 @@
   "rcId": "RC-AYS-LAB-CANONICA-01",
   "authorization": {
     "requiredForExecution": true,
-    "activeRequest": false,
-    "allowedExecutions": 0,
+    "activeRequest": true,
+    "allowedExecutions": 1,
     "request": ".github/orbit360-requests/auth-access-recovery-lab-v3-20260805.json",
-    "authorizationRef": "PENDING_NEW_EXPLICIT_AUTHORIZATION",
+    "authorizationRef": "user_authorized_auth_access_recovery_v3_20260805T0924-0600",
+    "authorizedAt": "2026-08-05T09:24:00-06:00",
     "consumed": false,
     "replayAllowed": false
   },
@@ -58,7 +59,14 @@
   },
   "accessConfigurationBoundary": {
     "maximumAdvisorDocumentsUpdated": 3,
-    "allowedFields": ["email", "roles", "defaultRole", "activeRole", "countries", "dataScopes"],
+    "allowedFields": [
+      "email",
+      "roles",
+      "defaultRole",
+      "activeRole",
+      "countries",
+      "dataScopes"
+    ],
     "rolesAndDefaultFromApprovedRoster": true,
     "identityVerifiedByApprovedDigest": true,
     "countriesFromAdvisorOrTenantMembership": true,
@@ -72,7 +80,9 @@
     "maximumAuthUsersUpdated": 3,
     "maximumMembershipsCreated": 3,
     "maximumMembershipsUpdated": 3,
-    "allowedFunctionDeploys": ["orbit360ProvisionTeamAccess"],
+    "allowedFunctionDeploys": [
+      "orbit360ProvisionTeamAccess"
+    ],
     "passwordResetEmailAllowed": true,
     "passwordReadAllowed": false,
     "temporaryPasswordAllowed": false,
