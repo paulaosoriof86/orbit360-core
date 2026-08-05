@@ -12,7 +12,9 @@ const PRIVILEGED_ROLES = new Set(['superadmin', 'admintenant']);
 const MANAGE_PERMISSIONS = new Set(['equipo_gestionar_acceso','equipo_acceso_administrar','team_access_manage','users_manage']);
 
 const text = (value, max = 500) => String(value == null ? '' : value).replace(/\u0000/g, '').trim().slice(0, max);
-const norm = value => text(value, 160).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '').trim();
+const roleNorm = value => text(value, 160).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '').trim();
+const permissionNorm = value => text(value, 160).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+const statusNorm = value => text(value, 80).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '').trim();
 const sha = value => crypto.createHash('sha256').update(String(value ?? ''), 'utf8').digest('hex');
 const list = value => [...new Set([].concat(value || []).map(item => text(item, 160)).filter(Boolean))];
 const write = value => { fs.mkdirSync(path.dirname(path.resolve(OUT)), { recursive:true }); fs.writeFileSync(OUT, JSON.stringify(value, null, 2) + '\n', 'utf8'); };
@@ -24,12 +26,12 @@ try {
   const member = actor.member || {};
   const roles = list(member.roles || member.rolesAsignados || member.assignedRoles || member.role || member.rol);
   const activeRole = text(actor.activeRole || member.activeRole || member.defaultRole || roles[0], 100);
-  const permissions = list(member.permissions || member.permisosExtra || member.extraPermissions || member.extras).map(norm);
-  const status = norm(member.status || member.estado);
+  const permissions = list(member.permissions || member.permisosExtra || member.extraPermissions || member.extras).map(permissionNorm);
+  const status = statusNorm(member.status || member.estado);
   const tenantMatch = text(member.tenantId, 160) === TENANT;
   const statusActive = ['active','activo'].includes(status);
-  const activeRoleAssigned = roles.some(role => norm(role) === norm(activeRole));
-  const roleAuthorized = PRIVILEGED_ROLES.has(norm(activeRole));
+  const activeRoleAssigned = roles.some(role => roleNorm(role) === roleNorm(activeRole));
+  const roleAuthorized = PRIVILEGED_ROLES.has(roleNorm(activeRole));
   const permissionAuthorized = permissions.some(permission => MANAGE_PERMISSIONS.has(permission));
   const actorIdentityPresent = !!text(actor.uid, 160) && !!text(actor.email, 320);
   const ok = tenantMatch && statusActive && activeRoleAssigned && (roleAuthorized || permissionAuthorized) && actorIdentityPresent;
@@ -48,6 +50,7 @@ try {
     actorUidHash:actor.uid ? sha(actor.uid) : '',
     actorEmailHash:actor.email ? sha(String(actor.email).toLowerCase()) : '',
     activeRole,
+    authorizationPath:roleAuthorized?'privileged_role':(permissionAuthorized?'explicit_permission':'none'),
     checks,
     firestoreReads:0,
     firestoreWrites:0,
