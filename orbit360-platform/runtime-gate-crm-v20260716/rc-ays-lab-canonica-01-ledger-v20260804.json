@@ -2,7 +2,7 @@
   "schemaVersion": "orbit360-rc-ays-canonical-ledger-v1",
   "rcId": "RC-AYS-LAB-CANONICA-01",
   "createdAt": "2026-08-04T21:38:00-06:00",
-  "updatedAt": "2026-08-04T21:58:00-06:00",
+  "updatedAt": "2026-08-04T22:03:00-06:00",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
@@ -19,6 +19,8 @@
   "baselineReconciliationInitialCommit": "c2a71321e2b6e1d63b370adba7a70c1cb6496d19",
   "baselineReconciliationManifestCommit": "c281c858ab9e005f1721e4c19e1b1033bfe1f31e",
   "baselineReconciliationClosureCommit": "68821fe7e8f21b060ec24166f1a699fe9fbea696",
+  "isolatedRouteHarnessRunId": 30971707956,
+  "isolatedRouteHarnessClosureCommit": "674b3ec6646c5cd4f9acf3575521558b6d4af98f",
   "prAnchor": {
     "title": "draft: RC-AYS-LAB-CANONICA-01 · salida acumulativa A&S",
     "updated": true,
@@ -26,9 +28,9 @@
     "planAndLedgerDeclared": true
   },
   "activeMacroblock": "2",
-  "activeMicroblock": "2.0",
-  "activeGate": "PASS_ISOLATED_ROUTE_HARNESS",
-  "status": "ACTIVE_ISOLATED_ROUTE_SYNTHETIC_VALIDATION",
+  "activeMicroblock": "2.1",
+  "activeGate": "GO_LAB_CANDIDATE_VISIBLE",
+  "status": "READY_AWAITING_EXPLICIT_LAB_DEPLOY_AUTHORIZATION",
   "closedFacts": {
     "runtimeFunctionalRunId": 30962756387,
     "runtimeFunctionalPassed": 18,
@@ -39,6 +41,13 @@
     "visualReplacementMechanism": "ONE_ISOLATED_BROWSER_CONTEXT_AND_DIRECT_URL_PER_ROUTE",
     "stopRetryForInPageHashNavigation": true,
     "canonicalBaselineStatus": "PASS",
+    "isolatedRouteHarnessStatus": "PASS",
+    "isolatedRouteHarnessRoutes": 8,
+    "isolatedRouteHarnessElapsedMs": 7302,
+    "isolatedRouteHarnessNetworkAccess": false,
+    "isolatedRouteHarnessFirebase": false,
+    "isolatedRouteHarnessWrites": 0,
+    "isolatedRouteHarnessDeploy": false,
     "canonicalClients": 430,
     "canonicalInsurers": 30,
     "canonicalPolicies": 1375,
@@ -85,14 +94,8 @@
       "gate": "PASS_PLAN_PERSISTED",
       "evidence": [
         "planCommit:79ebbd0c5edeb9bed09f733d54eb8c14393d56ba",
-        "ledgerInitialCommit:f55529562d58ad615fb3b91b88571b8591be15b9",
-        "closureCommit:549350f3deea720849a7c0dd309ecbb36c4e5808",
-        "PR#5 title and body anchored to RC-AYS-LAB-CANONICA-01"
-      ],
-      "writesToRealData": 0,
-      "deployExecuted": false,
-      "secretsUsed": false,
-      "firebaseUsed": false
+        "closureCommit:549350f3deea720849a7c0dd309ecbb36c4e5808"
+      ]
     },
     {
       "id": "1.1",
@@ -103,39 +106,49 @@
         "manifestCommit:c281c858ab9e005f1721e4c19e1b1033bfe1f31e",
         "reportCommit:44c49ed5c2c666cf86a7282a4ec416f6df5484db",
         "closureCommit:68821fe7e8f21b060ec24166f1a699fe9fbea696"
+      ]
+    },
+    {
+      "id": "2.0",
+      "name": "Validador sintetico de rutas aisladas",
+      "status": "PASS",
+      "gate": "PASS_ISOLATED_ROUTE_HARNESS",
+      "evidence": [
+        "run:30971707956",
+        "status:ISOLATED_ROUTES_SYNTHETIC_PASS",
+        "closureCommit:674b3ec6646c5cd4f9acf3575521558b6d4af98f"
       ],
-      "closedFindings": [
-        "Router, Access, Cliente 360 and Aseguradoras canonical owners identified",
-        "support overlays classified without premature retirement",
-        "414/26 to 430/30 delta traced to Gate 7.8 create-only held-parent write",
-        "zero unexplained client or insurer delta",
-        "no reimport required and no data loss observed"
-      ],
+      "routeCount": 8,
+      "requiredMechanism": "ONE_ISOLATED_BROWSER_CONTEXT_AND_DIRECT_URL_PER_ROUTE",
       "writesToRealData": 0,
       "deployExecuted": false,
       "secretsUsed": false,
       "firebaseUsed": false
     },
     {
-      "id": "2.0",
-      "name": "Validador sintetico de rutas aisladas",
-      "status": "IN_PROGRESS",
-      "gate": "PASS_ISOLATED_ROUTE_HARNESS",
-      "requiredMechanism": "ONE_ISOLATED_BROWSER_CONTEXT_AND_DIRECT_URL_PER_ROUTE",
-      "prohibitions": [
-        "in-page cumulative hash navigation",
-        "new visual workflow variant",
-        "Firebase",
-        "secrets",
-        "deploy",
-        "real-data writes"
-      ]
-    },
-    {
       "id": "2.1",
       "name": "Visual LAB read-only retenida",
-      "status": "PENDING",
-      "gate": "GO_LAB_CANDIDATE_VISIBLE"
+      "status": "READY_AWAITING_EXPLICIT_LAB_DEPLOY_AUTHORIZATION",
+      "gate": "GO_LAB_CANDIDATE_VISIBLE",
+      "scope": [
+        "preflight before secrets",
+        "four allowlisted LAB Functions",
+        "one Hosting preview LAB",
+        "before and after data integrity snapshots",
+        "eight isolated direct-route contexts",
+        "retain URL on product plus integrity PASS",
+        "do not repeat 18 functional scenarios"
+      ],
+      "prohibitions": [
+        "Rules",
+        "real-data writes",
+        "reimport",
+        "production",
+        "main",
+        "merge",
+        "new workflow variant",
+        "cumulative in-page hash navigation"
+      ]
     },
     {
       "id": "3.0",
@@ -175,8 +188,8 @@
     }
   ],
   "currentClassification": "PIPELINE_MECHANISM_FAILURE",
-  "currentOwner": "existing isolated-route browser harness",
-  "exactNextAction": "Validate the existing isolated-route synthetic harness against the frozen candidate, using one isolated browser context and direct URL per route, without Firebase, secrets, deploy or real-data writes. Close PASS_ISOLATED_ROUTE_HARNESS or STOP_RETRY on the same failure family.",
+  "currentOwner": "existing visual LAB reactivation workflow using isolated route contexts",
+  "exactNextAction": "After explicit LAB deploy authorization, execute one read-only visual LAB reactivation on the same RC with preflight before secrets, four allowlisted Functions, one retained Hosting preview, eight isolated direct-route contexts and identical before/after snapshots; no Rules, reimport, production, main or merge.",
   "containsPII": false,
   "containsSecrets": false
 }
