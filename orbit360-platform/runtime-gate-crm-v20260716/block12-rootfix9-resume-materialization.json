@@ -1,15 +1,11 @@
 {
   "schemaVersion": "orbit360-block12-rootfix9-resume-materialization-v1",
-  "status": "ROOTFIX9_RESUME_SOURCE_PASS",
-  "previousGateRunId": 30961489455,
-  "checks": {
-    "orderSafe": true,
-    "functionsSdk": true,
-    "callableReady": true,
-    "engineVersion": true
-  },
+  "status": "PENDING_RERUN_AFTER_LIFECYCLE_ALIGNMENT",
+  "previousGateRunIds": [30961489455, 30961823129],
+  "classification": "VALIDATOR_STALE_CORRECTED",
+  "materializerCapabilitiesRestored": true,
   "secretAccess": false,
   "firestoreRead": false,
   "deployExecuted": false,
-  "ok": true
+  "ok": false
 }
