@@ -29,16 +29,17 @@ jobs:
           mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
           test "${#CHANGED[@]}" = 1
           test "${CHANGED[0]}" = "$REQUEST"
-          jq -e '.status=="AUTHORIZED_READ_ONLY" and .targetWorkflow=="orbit360-block12-operational-runtime-lab-rootfix9-resume-v20260804.yml" and .targetHeadSha=="76377a4afd4c211c6d74db012e44e7876d8e88f9" and .firebase==false and .secrets==false and .writes==false and .deploy==false' "$REQUEST" >/dev/null
-      - name: Consultar run objetivo
+          jq -e '.status=="AUTHORIZED_READ_ONLY" and .targetWorkflow=="orbit360-block12-operational-runtime-lab-rootfix9-resume-v20260804.yml" and .expectedSourceFix=="IMP001_IDEMPOTENCY_RESPONSE_SOURCE_PASS" and .firebase==false and .secrets==false and .writes==false and .deploy==false' "$REQUEST" >/dev/null
+      - name: Consultar último run del workflow objetivo
         id: inspect
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          gh api --method GET "repos/${GITHUB_REPOSITORY}/actions/workflows/orbit360-block12-operational-runtime-lab-rootfix9-resume-v20260804.yml/runs" -f branch='ays/backend-tenant-lab-v99-20260703' -f event='push' -f per_page='30' > "$RUNNER_TEMP/runs.json"
-          RUN_ID="$(jq -r '[.workflow_runs[] | select(.head_sha=="76377a4afd4c211c6d74db012e44e7876d8e88f9")][0].id // empty' "$RUNNER_TEMP/runs.json")"
+          gh api --method GET "repos/${GITHUB_REPOSITORY}/actions/workflows/orbit360-block12-operational-runtime-lab-rootfix9-resume-v20260804.yml/runs" -f event='push' -f per_page='30' > "$RUNNER_TEMP/runs.json"
+          RUN_ID="$(jq -r '.workflow_runs[0].id // empty' "$RUNNER_TEMP/runs.json")"
+          HEAD_SHA="$(jq -r '.workflow_runs[0].head_sha // empty' "$RUNNER_TEMP/runs.json")"
           test -n "$RUN_ID"
           gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}" > "$RUNNER_TEMP/run.json"
           gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}/jobs?per_page=100" > "$RUNNER_TEMP/jobs.json"
@@ -47,6 +48,7 @@ jobs:
           ACTIVE="$(jq -r '[.jobs[].steps[]? | select(.status=="in_progress")][0].name // empty' "$RUNNER_TEMP/jobs.json")"
           if [ -z "$ACTIVE" ]; then ACTIVE="$(jq -r '[.jobs[].steps[]? | select(.status=="completed")][-1].name // "sin paso observable"' "$RUNNER_TEMP/jobs.json")"; fi
           echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"
+          echo "head_sha=$HEAD_SHA" >> "$GITHUB_OUTPUT"
           echo "status=$STATUS" >> "$GITHUB_OUTPUT"
           echo "conclusion=$CONCLUSION" >> "$GITHUB_OUTPUT"
           echo "active=$ACTIVE" >> "$GITHUB_OUTPUT"
@@ -55,4 +57,4 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh api "repos/${GITHUB_REPOSITORY}/issues/5/comments" -f body="## Block 12 rootfix 9 · observador read-only\n\n- Run: \`${{ steps.inspect.outputs.run_id }}\`\n- Estado: \`${{ steps.inspect.outputs.status }}\`\n- Conclusión: \`${{ steps.inspect.outputs.conclusion }}\`\n- Paso observable: \`${{ steps.inspect.outputs.active }}\`\n- Firebase/escrituras/deploy del observador: no" >/dev/null
+          gh api "repos/${GITHUB_REPOSITORY}/issues/5/comments" -f body="## Block 12 rootfix 9 · observador read-only\n\n- Run: \`${{ steps.inspect.outputs.run_id }}\`\n- Head: \`${{ steps.inspect.outputs.head_sha }}\`\n- Estado: \`${{ steps.inspect.outputs.status }}\`\n- Conclusión: \`${{ steps.inspect.outputs.conclusion }}\`\n- Paso observable: \`${{ steps.inspect.outputs.active }}\`\n- Firebase/escrituras/deploy del observador: no" >/dev/null
