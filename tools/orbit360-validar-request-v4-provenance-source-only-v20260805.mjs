@@ -13,6 +13,7 @@ const SOURCE_BASELINE = '548cffa50cddfd93ad2118f5a06e9bb420699bde';
 const SOURCE_REQUEST = '.github/orbit360-requests/block12-go-lab-candidate-visible-v4-source-only.json';
 const RUNTIME_REQUEST = '.github/orbit360-requests/block12-go-lab-candidate-visible-v4.json';
 const CONSUMED_V3 = '.github/orbit360-requests/block12-go-lab-candidate-visible-v3.json';
+const CANONICAL_CONSUMED_REQUEST = '.github/orbit360-requests/block12-operational-runtime-layoutfree-lab-v20260804.json';
 const CONSUMED_V3_BLOB = '82461e6a9699f1d8469d201be90bc40688e50613';
 const RUNTIME_WORKFLOW = '.github/workflows/orbit360-block12-visual-layoutfree-reactivation-lab-v20260804.yml';
 const SOURCE_WORKFLOW = '.github/workflows/orbit360-block12-layoutfree-visual-contract-source-v20260804.yml';
@@ -59,7 +60,7 @@ let provenance = {
 };
 
 try {
-  const required = [SOURCE_REQUEST, CONSUMED_V3, RUNTIME_WORKFLOW, SOURCE_WORKFLOW, OUTER, ENGINE, LIFECYCLE, EXTENSION, FIXTURE, LEDGER];
+  const required = [SOURCE_REQUEST, CONSUMED_V3, CANONICAL_CONSUMED_REQUEST, RUNTIME_WORKFLOW, SOURCE_WORKFLOW, OUTER, ENGINE, LIFECYCLE, EXTENSION, FIXTURE, LEDGER];
   required.forEach(file => add(`FILE_${file}`, exists(file), file));
   add('FUTURE_RUNTIME_REQUEST_ABSENT', !exists(RUNTIME_REQUEST), RUNTIME_REQUEST);
   if (checks.some(item => !item.ok)) throw new Error('DATA_CONTRACT_FAILURE:REQUIRED_SOURCE_ONLY_CONTINUITY_FILES_MISSING');
@@ -126,16 +127,20 @@ try {
     !sourceWorkflow.includes('npx firebase') && !sourceWorkflow.includes('firebase deploy') &&
     !sourceWorkflow.includes('playwright') && !sourceWorkflow.includes('hosting:channel:deploy')
   );
-  add('ENGINE_REQUEST_PATHS_SYNC',
-    engineSource.includes(`const DEFAULT_RUNTIME_REQUEST = '${RUNTIME_REQUEST}'`) &&
-    engineSource.includes(`const CONSUMED_REQUEST = '${CONSUMED_V3}'`)
+  add('ENGINE_ENV_OVERRIDE_SYNC',
+    engineSource.includes('process.env.ORBIT360_REQUEST_FILE || DEFAULT_RUNTIME_REQUEST') &&
+    engineSource.includes('process.env.ORBIT360_SOURCE_ONLY_COMPOSITION_TEST') &&
+    engineSource.includes(CANONICAL_CONSUMED_REQUEST)
   );
   add('LIFECYCLE_SYNC',
-    lifecycle.controlPlaneRevision === CONTROL_REVISION &&
+    lifecycle.controlPlaneRevision === 'canonical-preflight-composition-source-only-v1' &&
+    lifecycle.continuityControlPlaneRevision === CONTROL_REVISION &&
     lifecycle.runtimeActivationState === 'STOPPED_AWAITING_NEW_EXPLICIT_AUTHORIZATION' &&
     lifecycle.authorization?.status === 'CONSUMED_STOP_RETRY_DEFINITIVE' &&
     lifecycle.authorization?.allowedExecutions === 0 && lifecycle.authorization?.consumed === true &&
-    lifecycle.authorization?.consumedRequest === CONSUMED_V3 &&
+    lifecycle.authorization?.consumedRequest === CANONICAL_CONSUMED_REQUEST &&
+    lifecycle.authorization?.latestConsumedRuntimeRequest === CONSUMED_V3 &&
+    lifecycle.authorization?.latestConsumedRuntimeRequestBlob === CONSUMED_V3_BLOB &&
     lifecycle.authorization?.futureRuntimeRequestTemplate === RUNTIME_REQUEST &&
     lifecycle.sourceOnlyValidation?.gate === CLOSURE_GATE &&
     lifecycle.sourceOnlyValidation?.authorizationRef === AUTH_REF &&
@@ -147,11 +152,18 @@ try {
     lifecycle.sourceOnlyValidation?.browserAuthorized === false && lifecycle.sourceOnlyValidation?.deployAuthorized === false
   );
   add('EXTENSION_SYNC',
-    extension.controlPlaneRevision === CONTROL_REVISION && extension.runtimeActivationState === 'STOPPED_AWAITING_NEW_EXPLICIT_AUTHORIZATION' &&
-    extension.consumedRequest === CONSUMED_V3 && extension.futureRuntimeRequestTemplate === RUNTIME_REQUEST &&
-    extension.sourceOnlyRequest === SOURCE_REQUEST && extension.sourceOnlyFixture === FIXTURE &&
-    extension.sourceOnlyValidator === 'tools/orbit360-validar-request-v4-provenance-source-only-v20260805.mjs' &&
-    extension.sourceOnlyWorkflow === SOURCE_WORKFLOW && extension.sourceOnlyGate === CLOSURE_GATE &&
+    extension.controlPlaneRevision === 'canonical-preflight-composition-source-only-v1' &&
+    extension.continuityControlPlaneRevision === CONTROL_REVISION &&
+    extension.runtimeActivationState === 'STOPPED_AWAITING_NEW_EXPLICIT_AUTHORIZATION' &&
+    extension.consumedRequest === CANONICAL_CONSUMED_REQUEST &&
+    extension.latestConsumedRuntimeRequest === CONSUMED_V3 && extension.latestConsumedRuntimeRequestBlob === CONSUMED_V3_BLOB &&
+    extension.futureRuntimeRequestTemplate === RUNTIME_REQUEST &&
+    extension.continuitySourceOnlyRequest === SOURCE_REQUEST && extension.continuitySourceOnlyFixture === FIXTURE &&
+    extension.continuitySourceOnlyValidator === 'tools/orbit360-validar-request-v4-provenance-source-only-v20260805.mjs' &&
+    extension.continuitySourceOnlyWorkflow === SOURCE_WORKFLOW && extension.continuitySourceOnlyGate === CLOSURE_GATE &&
+    extension.continuitySourceOnlyAuthorizationRef === AUTH_REF &&
+    extension.continuitySourceOnlyAuthorizationStatus === 'AUTHORIZED_SOURCE_ONLY_ONCE' &&
+    extension.continuitySourceOnlyAllowedExecutions === 1 && extension.continuitySourceOnlyConsumed === false &&
     extension.sourceOnlyRuntimeAuthorized === false && extension.allowedRuntimeExecutions === 0
   );
   add('LEDGER_SYNC',
