@@ -1,22 +1,16 @@
-name: Orbit 360 · Diagnóstico Auth source-only v6
+name: Orbit 360 · Fundación Auth all-team source-only
 
-# AUTH_ACCESS_RECOVERY_SOURCE_ONLY_V6
-# capabilities:
-# secrets: false
-# firestore: false
-# auth: false
-# functions: false
-# hosting: false
-# browser: false
-# deploy: false
-# rules: false
-# production: false
+# AUTH_FOUNDATION_ALL_TEAM_SOURCE_ONLY
+# current identities: 7/7
+# functional profiles: 3/3
+# future users: generic normal onboarding
+# runtime capabilities: 0
 
 on:
   push:
     branches: [ays/backend-tenant-lab-v99-20260703]
     paths:
-      - '.github/orbit360-requests/auth-access-recovery-source-only-v6-20260805.json'
+      - '.github/orbit360-requests/auth-foundation-all-team-source-only-v20260805.json'
 
 permissions:
   contents: write
@@ -24,20 +18,20 @@ permissions:
   pull-requests: write
 
 concurrency:
-  group: orbit360-auth-access-source-only-v6-20260805
+  group: orbit360-auth-foundation-all-team-source-only-20260805
   cancel-in-progress: false
 
 env:
   ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
-  ORBIT360_REQUEST_FILE: .github/orbit360-requests/auth-access-recovery-source-only-v6-20260805.json
-  ORBIT360_GATE_ID: block-auth-access-recovery-source-only-v6-20260805
-  ORBIT360_LIFECYCLE: tools/orbit360-validator-lifecycle-contract-auth-access-recovery-source-only-v6-20260805.json
-  ORBIT360_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/auth-access-source-only-v6-sanitized-v20260805.json
-  ORBIT360_CLOSURE: orbit360-platform/docs/CIERRE-AUTH-ACCESS-SOURCE-ONLY-V6-20260805.md
+  ORBIT360_REQUEST_FILE: .github/orbit360-requests/auth-foundation-all-team-source-only-v20260805.json
+  ORBIT360_GATE_ID: block-auth-foundation-all-team-source-only-v20260805
+  ORBIT360_LIFECYCLE: tools/orbit360-validator-lifecycle-contract-auth-foundation-all-team-source-only-v20260805.json
+  ORBIT360_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/auth-foundation-all-team-source-only-sanitized-v20260805.json
+  ORBIT360_CLOSURE: orbit360-platform/docs/CIERRE-AUTH-FOUNDATION-ALL-TEAM-SOURCE-ONLY-20260805.md
 
 jobs:
-  validate-auth-diagnostic-v6:
-    name: Request → provenance → actor parity → error contract → evidence
+  validate-auth-foundation-all-team:
+    name: Request → 7 users → 3 profiles → future onboarding → gate
     runs-on: ubuntu-24.04
     timeout-minutes: 12
     steps:
@@ -48,7 +42,7 @@ jobs:
           fetch-depth: 0
           persist-credentials: true
 
-      - name: Verificar request source-only v6 único
+      - name: Verificar request único Fundación Auth
         shell: bash
         run: |
           set -euo pipefail
@@ -58,20 +52,24 @@ jobs:
           test "${CHANGED[0]}" = "$ORBIT360_REQUEST_FILE"
           PARENT="$(git rev-parse HEAD^)"
           jq -e --arg parent "$PARENT" '
-            .schemaVersion=="orbit360-auth-access-recovery-source-only-request-v6" and
-            .gateId=="block-auth-access-recovery-source-only-v6-20260805" and
+            .schemaVersion=="orbit360-auth-foundation-all-team-source-only-request-v1" and
+            .gateId=="block-auth-foundation-all-team-source-only-v20260805" and
             .rcId=="RC-AYS-LAB-CANONICA-01" and
             .status=="AUTHORIZED_ONCE" and .approved==true and
             .allowedExecutions==1 and .consumed==false and .replayAllowed==false and
             .branch=="ays/backend-tenant-lab-v99-20260703" and .pullRequest==5 and
             .parentHead==$parent and
-            .scope.validateRequest==true and
-            .scope.validateProvenance==true and
-            .scope.validateCanonicalPreflight==true and
-            .scope.validateActorAuthorizationParity==true and
-            .scope.validateOnboardingErrorCodePropagation==true and
-            .scope.validateConditionalEvidencePersistence==true and
-            .scope.validateTriStateIntegrity==true and
+            .coverage.currentActiveUsers==7 and
+            .coverage.currentIdentityCoverage=="7/7" and
+            .coverage.functionalProfiles==["direccion","operativo","asesor"] and
+            .coverage.futureUsersSupported==true and
+            .scope.validateSevenCurrentUsers==true and
+            .scope.validateThreeFunctionalProfiles==true and
+            .scope.validateFutureUserPath==true and
+            .scope.validateBootstrapSeparation==true and
+            .scope.validateSplitBrainRootCause==true and
+            .scope.validatePasswordRecoveryGap==true and
+            .scope.validateRulesDemoDebt==true and
             .scope.validateSourceFixtures==true and
             .scope.secrets==false and .scope.firebase==false and
             .scope.firestore==false and .scope.auth==false and
@@ -86,130 +84,104 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          node --check tools/orbit360-auth-callable-error-contract-v6-20260805.mjs
-          node --check tools/orbit360-patch-auth-callable-error-propagation-v6-20260805.mjs
-          node --check tools/orbit360-auth-access-actor-parity-precheck-v6-20260805.mjs
-          node --check tools/orbit360-auth-access-evidence-safe-persist-v6-20260805.mjs
-          node --check tools/orbit360-test-auth-source-only-v6-20260805.mjs
-          node --check tools/orbit360-validar-gate-contracts-engine-auth-access-recovery-source-only-v6-20260805.mjs
-          node --check tools/orbit360-register-auth-access-gate-source-only-v6-20260805.mjs
+          node --check tools/orbit360-auth-foundation-all-team-plan-v20260805.mjs
+          node --check tools/orbit360-test-auth-foundation-all-team-source-only-v20260805.mjs
+          node --check tools/orbit360-validar-gate-contracts-engine-auth-foundation-all-team-source-only-v20260805.mjs
+          node --check tools/orbit360-register-auth-foundation-all-team-gate-source-only-v20260805.mjs
           git diff --check HEAD^
 
-      - name: Aplicar root fix de propagación únicamente en working tree
+      - name: Ejecutar fixtures all-team
         shell: bash
         run: |
           set -euo pipefail
-          node tools/orbit360-patch-auth-callable-error-propagation-v6-20260805.mjs
-          node --check tools/orbit360-auth-access-recovery-lab-v20260805.mjs
-
-      - name: Ejecutar fixtures contractuales source-only
-        shell: bash
-        run: |
-          set -euo pipefail
-          node tools/orbit360-test-auth-source-only-v6-20260805.mjs | tee "$RUNNER_TEMP/auth-v6-fixtures.json"
+          node tools/orbit360-test-auth-foundation-all-team-source-only-v20260805.mjs | tee "$RUNNER_TEMP/auth-foundation-fixtures.json"
           jq -e '
-            .ok==true and .actorParityCases==2 and
-            .callableErrorPropagationCases==1 and
-            .evidencePersistenceCases==3 and
-            .integrityStatesVerified==["VERIFIED_UNCHANGED","VERIFIED_CHANGED","NOT_POSTVERIFIED"] and
+            .ok==true and
+            .currentUsersCovered==7 and .expectedCurrentUsers==7 and
+            .functionalProfilesCovered==3 and
+            .futureUserPathSupported==true and
+            .negativeCases==3 and
             .operationalCapabilitiesUsed==0
-          ' "$RUNNER_TEMP/auth-v6-fixtures.json" >/dev/null
+          ' "$RUNNER_TEMP/auth-foundation-fixtures.json" >/dev/null
 
-      - name: Registrar gate v6 únicamente en working tree
+      - name: Registrar gate 13.6.0 únicamente en working tree
         shell: bash
         run: |
           set -euo pipefail
-          node tools/orbit360-register-auth-access-gate-source-only-v6-20260805.mjs
+          node tools/orbit360-register-auth-foundation-all-team-gate-source-only-v20260805.mjs
 
       - name: Ejecutar gate canónico antes de cualquier capacidad
-        id: preflight
         shell: bash
         run: |
           set -euo pipefail
           node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
           jq -e '
-            .status=="GO_GATE_CONTRACT" and .contractVersion=="13.5.0" and
+            .status=="GO_GATE_CONTRACT" and .contractVersion=="13.6.0" and
             .failed==0 and .ok==true and
+            .currentUsersCovered==7 and .expectedCurrentUsers==7 and
+            .functionalProfilesCovered==3 and .futureUserPathSupported==true and
+            .bootstrapSeparatedFromNormalOnboarding==true and
+            .runtimeV7Absent==true and
             .executionAuthorized==false and .secretAccessAuthorized==false and
             .firestoreReadAuthorized==false and .writeAuthorized==false and
             .authWriteAuthorized==false and .runtimeAuthorized==false and
             .browserAuthorized==false and .deployAuthorized==false and
             .functionsDeployAuthorized==false and .hostingDeployAuthorized==false and
             .rulesDeployAuthorized==false and .productionAuthorized==false and
-            .dataAccess==false and .secretAccess==false and
             .firestoreRead==false and .firestoreWrites==0 and
             .authReads==0 and .authWrites==0 and
             .runtimeExecuted==false and .browserExecuted==false and
-            .deployExecuted==false and .productionTouched==false and
-            .priorRequestsVerified==5 and
-            .actorAuthorizationParityValidated==true and
-            .callableErrorPropagationValidated==true and
-            .conditionalEvidencePersistenceValidated==true and
-            .triStateIntegrityValidated==true and
-            .futureRuntimeRequestAbsent==true
+            .deployExecuted==false and .productionTouched==false
           ' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json >/dev/null
 
-      - name: Sellar evidencia y consumir autorización source-only v6
+      - name: Sellar evidencia y consumir autorización source-only
         if: always()
         shell: bash
         run: |
           set -euo pipefail
           node --input-type=module - <<'NODE'
           import fs from 'node:fs';
-          const preflightPath='orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json';
-          const preflight=fs.existsSync(preflightPath)?JSON.parse(fs.readFileSync(preflightPath,'utf8')):null;
+          const p='orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json';
+          const preflight=fs.existsSync(p)?JSON.parse(fs.readFileSync(p,'utf8')):null;
           const ok=preflight?.status==='GO_GATE_CONTRACT'&&preflight?.failed===0&&preflight?.ok===true;
           const evidence={
-            schemaVersion:'orbit360-auth-access-source-only-v6-sanitized-v1',
-            stage:ok?'AUTH_ACCESS_SOURCE_ONLY_V6_PASS':'STOP_RETRY_AUTH_ACCESS_SOURCE_ONLY_V6',
-            decision:ok?'GO_AUTH_DIAGNOSTIC_CONTROL_PLANE':'STOP_RETRY',
-            classification:ok?'AUTH_ACCESS_SOURCE_ONLY_V6_READY':(preflight?.classification||'PIPELINE_MECHANISM_FAILURE'),
-            gateId:'block-auth-access-recovery-source-only-v6-20260805',
+            schemaVersion:'orbit360-auth-foundation-all-team-source-only-sanitized-v1',
+            stage:ok?'AUTH_FOUNDATION_ALL_TEAM_SOURCE_ONLY_PASS':'STOP_RETRY_AUTH_FOUNDATION_ALL_TEAM_SOURCE_ONLY',
+            decision:ok?'GO_AUTH_FOUNDATION_ALL_TEAM_CONTROL_PLANE':'STOP_RETRY',
+            classification:ok?'AUTH_FOUNDATION_ALL_TEAM_SOURCE_ONLY_READY':(preflight?.classification||'PIPELINE_MECHANISM_FAILURE'),
+            gateId:'block-auth-foundation-all-team-source-only-v20260805',
             requestCommit:process.env.GITHUB_SHA,
             checksTotal:preflight?.total??0,
             checksPassed:preflight?.passed??0,
             checksFailed:preflight?.failed??1,
             failedCheckIds:preflight?.failedCheckIds||['PREFLIGHT_NOT_GENERATED'],
-            priorRequestsVerified:preflight?.priorRequestsVerified??0,
-            actorAuthorizationParityValidated:preflight?.actorAuthorizationParityValidated===true,
-            callableErrorPropagationValidated:preflight?.callableErrorPropagationValidated===true,
-            conditionalEvidencePersistenceValidated:preflight?.conditionalEvidencePersistenceValidated===true,
-            triStateIntegrityValidated:preflight?.triStateIntegrityValidated===true,
-            integrityStates:['VERIFIED_UNCHANGED','VERIFIED_CHANGED','NOT_POSTVERIFIED'],
-            requiredCallableEvidenceFields:['httpStatus','callableStatus','errorCode'],
-            secretAccess:false,
-            firebaseCommands:0,
-            firestoreReads:0,
-            firestoreWrites:0,
-            authReads:0,
-            authWrites:0,
-            functionsDeploys:0,
-            hostingDeploys:0,
-            browserRuns:0,
-            rulesDeploys:0,
-            reimports:0,
-            crmWrites:0,
-            productionTouched:false,
-            mainTouched:false,
-            mergeExecuted:false,
-            containsPII:false,
-            containsSecrets:false,
-            ok
+            currentUsersCovered:preflight?.currentUsersCovered??0,
+            expectedCurrentUsers:7,
+            currentIdentityCoverage:preflight?.currentUsersCovered===7?'7/7':'INCOMPLETE',
+            functionalProfilesCovered:preflight?.functionalProfilesCovered??0,
+            functionalProfilesRequired:3,
+            futureUserPathSupported:preflight?.futureUserPathSupported===true,
+            bootstrapSeparatedFromNormalOnboarding:preflight?.bootstrapSeparatedFromNormalOnboarding===true,
+            runtimeV7Executed:false,
+            runtimeV7RequestPresent:false,
+            secretAccess:false,firebaseCommands:0,firestoreReads:0,firestoreWrites:0,authReads:0,authWrites:0,
+            functionsDeploys:0,hostingDeploys:0,browserRuns:0,rulesDeploys:0,reimports:0,crmWrites:0,
+            productionTouched:false,mainTouched:false,mergeExecuted:false,containsPII:false,containsSecrets:false,ok
           };
           fs.mkdirSync('orbit360-platform/runtime-gate-crm-v20260716',{recursive:true});
           fs.writeFileSync(process.env.ORBIT360_EVIDENCE,JSON.stringify(evidence,null,2)+'\n');
           const lifecycle=JSON.parse(fs.readFileSync(process.env.ORBIT360_LIFECYCLE,'utf8'));
-          lifecycle.status=ok?'AUTH_ACCESS_RECOVERY_SOURCE_ONLY_V6_CONSUMED_PASS':'AUTH_ACCESS_RECOVERY_SOURCE_ONLY_V6_CONSUMED_STOP_RETRY';
+          lifecycle.status=ok?'AUTH_FOUNDATION_ALL_TEAM_SOURCE_ONLY_CONSUMED_PASS':'AUTH_FOUNDATION_ALL_TEAM_SOURCE_ONLY_CONSUMED_STOP_RETRY';
           lifecycle.authorization.activeRequest=false;
           lifecycle.authorization.allowedExecutions=0;
           lifecycle.authorization.consumed=true;
           lifecycle.executionResult={stage:evidence.stage,decision:evidence.decision,classification:evidence.classification,ok};
           fs.writeFileSync(process.env.ORBIT360_LIFECYCLE,JSON.stringify(lifecycle,null,2)+'\n');
           fs.mkdirSync('orbit360-platform/docs',{recursive:true});
-          fs.writeFileSync(process.env.ORBIT360_CLOSURE,`# CIERRE AUTH ACCESS SOURCE-ONLY v6\n\n\`\`\`text\n${evidence.stage}\n${evidence.classification}\nchecks: ${evidence.checksPassed}/${evidence.checksTotal}\n\`\`\`\n\n- requests anteriores verificados: ${evidence.priorRequestsVerified}\n- paridad exacta del actor: ${evidence.actorAuthorizationParityValidated}\n- propagación httpStatus/callableStatus/errorCode: ${evidence.callableErrorPropagationValidated}\n- persistencia condicional: ${evidence.conditionalEvidencePersistenceValidated}\n- integridad trivalente: ${evidence.triStateIntegrityValidated}\n- secretos/Firebase/Firestore/Auth/Functions/Hosting/navegador/deploy: 0\n- CRM/producción/main/merge: 0\n\nEl request source-only v6 queda consumido e inmutable.\n`);
+          fs.writeFileSync(process.env.ORBIT360_CLOSURE,`# CIERRE FUNDACIÓN AUTH ALL-TEAM SOURCE-ONLY\n\n\`\`\`text\n${evidence.stage}\n${evidence.classification}\nchecks: ${evidence.checksPassed}/${evidence.checksTotal}\nusuarios actuales: ${evidence.currentIdentityCoverage}\nperfiles funcionales: ${evidence.functionalProfilesCovered}/${evidence.functionalProfilesRequired}\nusuarios futuros: ${evidence.futureUserPathSupported?'SOPORTADOS':'NO'}\n\`\`\`\n\n- Bootstrap inicial separado del onboarding normal: ${evidence.bootstrapSeparatedFromNormalOnboarding}.\n- Runtime v7 anterior: no ejecutado.\n- Secretos/Firebase/Firestore/Auth/Functions/Hosting/navegador/deploy: 0.\n- CRM/producción/main/merge: 0.\n\nEl request source-only queda consumido e inmutable.\n`);
           NODE
 
-      - name: Persistir root fix, registro y evidencia sin tocar request
+      - name: Persistir registro y evidencia sin tocar request
         if: always()
         shell: bash
         run: |
@@ -217,24 +189,23 @@ jobs:
           git config user.name orbit360-gate-bot
           git config user.email orbit360-gate-bot@users.noreply.github.com
           git add tools/orbit360-validar-gate-contracts-v20260717.mjs \
-            tools/orbit360-auth-access-recovery-lab-v20260805.mjs \
-            tools/orbit360-validator-lifecycle-contract-auth-access-recovery-source-only-v6-20260805.json \
+            tools/orbit360-validator-lifecycle-contract-auth-foundation-all-team-source-only-v20260805.json \
             orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json \
             "$ORBIT360_EVIDENCE" "$ORBIT360_CLOSURE"
           if ! git diff --cached --quiet; then
-            git commit -m 'auth: persist source-only v6 diagnostic [skip ci]'
+            git commit -m 'auth: persist all-team foundation source-only [skip ci]'
             git push origin "HEAD:$ORBIT360_BRANCH"
           fi
 
-      - name: Publicar artefacto source-only sanitizado
+      - name: Publicar artefacto sanitizado
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: auth-access-source-only-v6-sanitized
+          name: auth-foundation-all-team-source-only
           path: |
             orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
-            orbit360-platform/runtime-gate-crm-v20260716/auth-access-source-only-v6-sanitized-v20260805.json
-            orbit360-platform/docs/CIERRE-AUTH-ACCESS-SOURCE-ONLY-V6-20260805.md
+            orbit360-platform/runtime-gate-crm-v20260716/auth-foundation-all-team-source-only-sanitized-v20260805.json
+            orbit360-platform/docs/CIERRE-AUTH-FOUNDATION-ALL-TEAM-SOURCE-ONLY-20260805.md
           if-no-files-found: error
           retention-days: 14
 
@@ -246,10 +217,10 @@ jobs:
             const fs=require('fs');
             const p=process.env.ORBIT360_EVIDENCE;
             const e=fs.existsSync(p)?JSON.parse(fs.readFileSync(p,'utf8')):{stage:'STOP_RETRY_EVIDENCE_MISSING',classification:'PIPELINE_MECHANISM_FAILURE',ok:false};
-            const body=`## AUTH Source-only v6 — ${e.ok?'PASS':'STOP_RETRY'}\n\n\`\`\`text\n${e.stage}\n${e.classification}\nchecks: ${e.checksPassed||0}/${e.checksTotal||0}\nactor parity: ${!!e.actorAuthorizationParityValidated}\nerror propagation: ${!!e.callableErrorPropagationValidated}\nconditional evidence: ${!!e.conditionalEvidencePersistenceValidated}\ntri-state integrity: ${!!e.triStateIntegrityValidated}\nruntime capabilities: 0\n\`\`\``;
+            const body=`## Fundación Auth all-team source-only — ${e.ok?'PASS':'STOP_RETRY'}\n\n\`\`\`text\n${e.stage}\n${e.classification}\nchecks: ${e.checksPassed||0}/${e.checksTotal||0}\nusuarios actuales: ${e.currentIdentityCoverage||'INCOMPLETE'}\nperfiles: ${e.functionalProfilesCovered||0}/3\nusuarios futuros: ${!!e.futureUserPathSupported}\nruntime capabilities: 0\n\`\`\``;
             await github.rest.issues.createComment({owner:context.repo.owner,repo:context.repo.repo,issue_number:5,body});
 
-      - name: Exigir PASS source-only v6
+      - name: Exigir PASS Fundación Auth source-only
         if: always()
         shell: bash
-        run: jq -e '.ok==true and .stage=="AUTH_ACCESS_SOURCE_ONLY_V6_PASS" and .checksFailed==0' "$ORBIT360_EVIDENCE" >/dev/null
+        run: jq -e '.ok==true and .stage=="AUTH_FOUNDATION_ALL_TEAM_SOURCE_ONLY_PASS" and .checksFailed==0 and .currentIdentityCoverage=="7/7"' "$ORBIT360_EVIDENCE" >/dev/null
