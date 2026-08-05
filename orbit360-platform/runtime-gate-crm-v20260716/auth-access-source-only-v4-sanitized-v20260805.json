@@ -1,8 +1,17 @@
 {
   "schemaVersion": "orbit360-auth-access-source-only-v4-sanitized-v1",
-  "stage": "NOT_EXECUTED",
-  "decision": "PENDING_SOURCE_ONLY_REQUEST",
-  "classification": "PENDING_SOURCE_ONLY_REQUEST",
+  "stage": "AUTH_ACCESS_SOURCE_ONLY_V4_PASS",
+  "decision": "GO_SOURCE_ONLY_AUTH_V4_COMPOSITION",
+  "classification": "AUTH_ACCESS_SOURCE_ONLY_V4_READY",
+  "gateId": "block-auth-access-recovery-source-only-v4-20260805",
+  "requestCommit": "c676e206babf880eb2db68cf5aa5fa2777d558bd",
+  "checksTotal": 26,
+  "checksPassed": 26,
+  "checksFailed": 0,
+  "failedCheckIds": [],
+  "rootFixStrategy": "READ_ALL_VALIDATE_ALL_WRITE_ALL",
+  "priorRequestsImmutable": true,
+  "futureRuntimeRequestAbsent": true,
   "secretAccess": false,
   "firebaseCommands": 0,
   "firestoreReads": 0,
@@ -20,5 +29,5 @@
   "mergeExecuted": false,
   "containsPII": false,
   "containsSecrets": false,
-  "ok": false
+  "ok": true
 }
