@@ -6,10 +6,12 @@ La continuidad operativa vigente de A&S se rige por:
 
 1. `orbit360-platform/docs/FUENTES-RECTORAS-VIGENTES-ORBIT360-AYS-20260730.md`;
 2. `orbit360-platform/docs/PLAN-UNICO-SALIDA-RC-AYS-LAB-CANONICA-01-20260804.md`;
-3. `orbit360-platform/runtime-gate-crm-v20260716/rc-ays-lab-canonica-01-ledger-v20260804.json`;
-4. `orbit360-platform/docs/CIERRE-BLOQUE-3-OPS-LEADS-DURABLE-PASS-REUTILIZADO-20260805.md`;
-5. `orbit360-platform/docs/ESTADO-ACTIVO-BLOQUE-4-COBROS-FULL-REPLAY-20260805.md`;
-6. estado vivo del PR #5.
+3. `orbit360-platform/docs/ANEXO-PLAN-UNICO-AUTH-SOURCE-ONLY-V4-PASS-20260805.md`;
+4. `orbit360-platform/runtime-gate-crm-v20260716/rc-ays-lab-canonica-01-ledger-v20260804.json`;
+5. `orbit360-platform/runtime-gate-crm-v20260716/auth-access-source-only-v4-ledger-v20260805.json`;
+6. `orbit360-platform/docs/ESTADO-ACTIVO-AUTH-SOURCE-ONLY-V4-BLOQUE4-CONTINUA-20260805.md`;
+7. `orbit360-platform/docs/ESTADO-ACTIVO-BLOQUE-4-COBROS-FULL-REPLAY-20260805.md`;
+8. estado vivo del PR #5.
 
 RC activa:
 
@@ -56,12 +58,33 @@ Estado: PASS_REUSED_FUNCTIONAL_RUNTIME_AND_CURRENT_DEPLOY
 
 La evidencia funcional sigue vigente y ningún owner de Ops/Leads cambió entre el PASS 18/18 y el source HEAD desplegado. No se repite la batería funcional.
 
-Estado activo:
+## Auth source-only v4
+
+```text
+Gate: block-auth-access-recovery-source-only-v4-20260805
+Contract: 13.3.0
+Resultado: AUTH_ACCESS_SOURCE_ONLY_V4_PASS
+Checks: 26/26
+```
+
+Quedaron validados:
+
+- provenance del root fix `38aae846477a35025950869a207bf10be9337cc1`;
+- estrategia `READ_ALL → VALIDATE_ALL → WRITE_ALL`;
+- allowlists exactas;
+- atomicidad e idempotencia;
+- requests Auth v1/v2/v3 inmutables y consumidos;
+- request Auth source-only v4 consumido e inmutable;
+- futuro request Auth runtime v5 ausente.
+
+El source-only v4 ejecutó cero secretos, Firebase, Firestore, Auth, Functions, Hosting, navegador, deploy, Rules, reimportación, CRM, producción, main o merge. Las identidades y memberships reales de Paula, Carlos y Samuel todavía requieren un gate runtime nuevo y autorización explícita.
+
+Estado activo de Cobros:
 
 ```text
 Bloque 4.0
 Gate: PASS_COBROS_FULL_REPLAY
-Estado: ACTIVE_READ_ONLY
+Estado: ACTIVE_READ_ONLY_MONTHLY_INTAKE_PARALLEL
 ```
 
 Universo del replay:
@@ -77,4 +100,4 @@ HOLD de estado: 44
 
 Se recuperaron el workbook canónico privado y el dry-run normalizado de planillas. El replay continúa sin escrituras, reimportación, deploy, Rules, producción, main o merge.
 
-Los requests runtime v3, source-only v4 y runtime v4 están consumidos e inmutables. No usar memoria o estados históricos para sustituir el ledger vivo.
+No reutilizar requests consumidos ni sustituir las fuentes vivas por memoria o estados históricos.
