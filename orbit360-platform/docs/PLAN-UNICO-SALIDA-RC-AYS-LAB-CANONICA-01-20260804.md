@@ -1,7 +1,7 @@
 # PLAN ÚNICO DE SALIDA — RC-AYS-LAB-CANONICA-01
 
 Fecha de adopción: 2026-08-04  
-Última actualización: 2026-08-04 23:23 GT  
+Última actualización: 2026-08-04 23:54 GT  
 Rama obligatoria: `ays/backend-tenant-lab-v99-20260703`  
 PR: #5 draft/open  
 Baseline funcional congelado: `548cffa50cddfd93ad2118f5a06e9bb420699bde`  
@@ -91,6 +91,29 @@ Contrato vigente:
 validatorLifecycleRevision = phase-capability-contract-v1
 visualHarnessRevision = isolated-context-direct-url-v6
 controlPlaneRevision = canonical-preflight-composition-source-only-v1
+continuityControlPlaneRevision = request-v4-provenance-composition-source-only-v1
+```
+
+### Request v4 y provenance
+
+```text
+PASS_REQUEST_V4_PROVENANCE_COMPOSITION
+run: 30979519198
+continuidad/provenance: 33/33
+inner preflight: 32/32
+outer router exit: 0
+inner engine reached: true
+```
+
+Demostrado:
+
+```text
+baseline presente: sí
+baseline ancestro del parent HEAD: sí
+producto idéntico al baseline: sí
+request v3 inmutable: sí
+runtime v4 ausente: sí
+capacidades operativas ejecutadas: no
 ```
 
 ### Cobros reales
@@ -152,35 +175,51 @@ PIPELINE_MECHANISM_FAILURE
 .github/workflows/orbit360-block12-visual-layoutfree-reactivation-lab-v20260804.yml
 ```
 
-El checkout usó `fetch-depth: 80`; el baseline congelado estaba fuera del historial disponible. No se ejecutaron preflight, secretos, Firebase, Functions, Hosting, navegador o snapshots.
+El checkout superficial no contenía el baseline congelado. No se ejecutaron preflight, secretos, Firebase, Functions, Hosting, navegador o snapshots. `0/4 Functions` significó etapa no ejecutada.
 
-`0/4 Functions` significa `no ejecutado`, no fallo de Functions.
-
-## 5. Root fix de provenance
-
-Aplicado source-only en:
+### Microbloque 2.4
 
 ```text
-ed655ef5221cf84c5930ba4ce07da586a6fca64f
+run: 30979519198
+Estado: PASS_REQUEST_V4_PROVENANCE_COMPOSITION
+runtime: no
 ```
 
-Contrato corregido:
+Validó source-only el request de continuidad, provenance, outer router e inner engine con historia completa y cero capacidades.
+
+## 5. Root fix y topología vigente
+
+Root fix de checkout/provenance:
 
 ```text
 fetch-depth: 0
 git cat-file -e "$ORBIT360_SOURCE_BASELINE^{commit}"
-git diff --quiet "$ORBIT360_SOURCE_BASELINE"..HEAD^
+git merge-base --is-ancestor "$ORBIT360_SOURCE_BASELINE" HEAD^
+git diff --quiet "$ORBIT360_SOURCE_BASELINE"..HEAD^ -- <paths de producto>
 ```
 
-La corrección usa el workflow existente, no creó una variante y no disparó otro runtime.
+Topología de requests:
 
-## 6. STOP_RETRY obligatorio
+```text
+request runtime v3 consumido e inmutable:
+.github/orbit360-requests/block12-go-lab-candidate-visible-v3.json
+
+request source-only v4 consumido e inmutable:
+.github/orbit360-requests/block12-go-lab-candidate-visible-v4-source-only.json
+
+request runtime v4 futuro y ausente:
+.github/orbit360-requests/block12-go-lab-candidate-visible-v4.json
+```
+
+El workflow runtime existente escucha únicamente el path runtime v4 ausente. No existe autorización runtime activa.
+
+## 6. STOP_RETRY y anti-deriva
 
 Quedan prohibidos:
 
-- rerun del run `30977831814`;
-- modificación del request v3 consumido;
-- otra ejecución runtime sin autorización explícita nueva;
+- rerun de `30977831814` o `30979519198`;
+- modificación de requests consumidos;
+- creación del request runtime v4 sin autorización explícita nueva;
 - otro workflow visual;
 - tocar producto o datos para resolver provenance;
 - repetir los 18 escenarios funcionales;
@@ -198,6 +237,8 @@ La candidata y los datos permanecen congelados e intactos.
 | 2.1 Visual LAB | `GO_LAB_CANDIDATE_VISIBLE` | STOP_RETRY control plane |
 | 2.2 Composición canónica source-only | `PASS_CANONICAL_PREFLIGHT_COMPOSITION` | PASS |
 | 2.3 Visual LAB request v3 | `GO_LAB_CANDIDATE_VISIBLE` | STOP_RETRY provenance |
+| 2.4 Request v4 + provenance source-only | `PASS_REQUEST_V4_PROVENANCE_COMPOSITION` | PASS |
+| 2.5 Visual LAB request runtime v4 | `GO_LAB_CANDIDATE_VISIBLE` | esperando autorización explícita |
 | 3.0 Ops/Leads durable | `OPS_LEADS_BACKEND_LAB_COMPLETE` | pendiente después de visualización |
 | 4.0 Replay Cobros read-only | `PASS_COBROS_FULL_REPLAY` | pendiente |
 | 4.1 Materialización Cobros | `COBROS_REAL_LEDGER_COMPLETE` | pendiente |
@@ -208,29 +249,32 @@ La candidata y los datos permanecen congelados e intactos.
 ## 8. Siguiente acción exacta
 
 ```text
-NO_RERUN_MICROBLOQUE_2_3
-PREPARAR_NUEVO_REQUEST_SOURCE_ONLY
+MICROBLOQUE_2_5
+AWAIT_NEW_EXPLICIT_LAB_DEPLOY_AUTHORIZATION
 ```
 
-Antes de una nueva autorización:
+Solo después de una autorización nueva se puede crear:
 
-1. conservar el root fix de checkout completo;
-2. preparar un nuevo path de request, sin modificar el v3 consumido;
-3. vincularlo al HEAD vigente;
-4. sincronizar workflow existente, lifecycle, ledger y request;
-5. validar source-only request + provenance + outer router + inner engine;
-6. demostrar cero secretos, Firebase, deploy y navegador;
-7. solicitar una única autorización LAB nueva solo después del PASS source-only.
+```text
+.github/orbit360-requests/block12-go-lab-candidate-visible-v4.json
+```
+
+Debe vincularse al HEAD vigente y ser el único archivo del commit disparador.
 
 La futura ejecución mantendrá:
 
-- preflight antes de secretos;
+- preflight canónico antes de secretos;
+- checkout con historia completa;
+- guard explícito del baseline;
 - cuatro Functions allowlisted;
 - un Hosting preview retenido;
 - ocho rutas aisladas/directas;
 - snapshots before/after idénticos;
 - cero escrituras;
+- retención de URL si producto e integridad pasan y falla solo el capturador;
 - sin repetir los 18 escenarios.
+
+No incluye usuarios o memberships sintéticos, Rules, reimportación, producción, main, merge ni workflow visual nuevo.
 
 ## 9. Continuidad posterior
 
