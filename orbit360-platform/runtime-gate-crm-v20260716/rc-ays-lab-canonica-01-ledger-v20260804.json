@@ -2,7 +2,7 @@
   "schemaVersion": "orbit360-rc-ays-canonical-ledger-v1",
   "rcId": "RC-AYS-LAB-CANONICA-01",
   "createdAt": "2026-08-04T21:38:00-06:00",
-  "updatedAt": "2026-08-04T21:47:00-06:00",
+  "updatedAt": "2026-08-04T21:58:00-06:00",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
@@ -17,16 +17,18 @@
   "microblock10ClosureCommit": "549350f3deea720849a7c0dd309ecbb36c4e5808",
   "microblock11OpenCommit": "8420add0447a2b0d6de044fce46e5c38921a8d33",
   "baselineReconciliationInitialCommit": "c2a71321e2b6e1d63b370adba7a70c1cb6496d19",
+  "baselineReconciliationManifestCommit": "c281c858ab9e005f1721e4c19e1b1033bfe1f31e",
+  "baselineReconciliationClosureCommit": "68821fe7e8f21b060ec24166f1a699fe9fbea696",
   "prAnchor": {
     "title": "draft: RC-AYS-LAB-CANONICA-01 · salida acumulativa A&S",
     "updated": true,
     "sourceBaselineDeclared": true,
     "planAndLedgerDeclared": true
   },
-  "activeMacroblock": "1",
-  "activeMicroblock": "1.1",
-  "activeGate": "PASS_CANONICAL_BASELINE",
-  "status": "ACTIVE_BASELINE_RECONCILIATION",
+  "activeMacroblock": "2",
+  "activeMicroblock": "2.0",
+  "activeGate": "PASS_ISOLATED_ROUTE_HARNESS",
+  "status": "ACTIVE_ISOLATED_ROUTE_SYNTHETIC_VALIDATION",
   "closedFacts": {
     "runtimeFunctionalRunId": 30962756387,
     "runtimeFunctionalPassed": 18,
@@ -36,12 +38,30 @@
     "visualRootCauseCode": "ROUTE_ASEGURADORAS_NAVIGATION_TIMEOUT",
     "visualReplacementMechanism": "ONE_ISOLATED_BROWSER_CONTEXT_AND_DIRECT_URL_PER_ROUTE",
     "stopRetryForInPageHashNavigation": true,
+    "canonicalBaselineStatus": "PASS",
+    "canonicalClients": 430,
+    "canonicalInsurers": 30,
+    "canonicalPolicies": 1375,
+    "canonicalVehicles": 1033,
+    "canonicalExpectedReceipts": 1294,
+    "canonicalPortfolioItems": 673,
+    "canonicalConfirmedCollections": 7,
+    "membershipsObserved": 1,
+    "clientInsurerDeltaReconciled": true,
+    "reimportRequired": false,
+    "dataLossObserved": false,
     "cobrosReported": 365,
     "cobrosConfirmedMaterializedAtSourceOnlyCut": 5,
     "carteraPending": 641,
     "carteraOverdueOrDemandable": 99,
     "carteraFuture": 542,
     "conciliationHolds": 44
+  },
+  "canonicalOwners": {
+    "router": "orbit360-platform/core/router.js",
+    "access": "orbit360-platform/core/access-scope.js",
+    "cliente360": "orbit360-platform/modules/cliente360.js",
+    "aseguradoras": "orbit360-platform/modules/aseguradoras.js"
   },
   "antiDriftControls": {
     "singleRc": true,
@@ -77,43 +97,39 @@
     {
       "id": "1.1",
       "name": "Reconciliacion forense focalizada del baseline",
-      "status": "IN_PROGRESS",
+      "status": "PASS",
       "gate": "PASS_CANONICAL_BASELINE",
       "evidence": [
-        "openCommit:8420add0447a2b0d6de044fce46e5c38921a8d33",
-        "initialReportCommit:c2a71321e2b6e1d63b370adba7a70c1cb6496d19",
-        "index inspected at sourceBaseline"
+        "manifestCommit:c281c858ab9e005f1721e4c19e1b1033bfe1f31e",
+        "reportCommit:44c49ed5c2c666cf86a7282a4ec416f6df5484db",
+        "closureCommit:68821fe7e8f21b060ec24166f1a699fe9fbea696"
       ],
-      "confirmedInitialFindings": [
-        "PR stale runtime statement corrected",
-        "backend loader, adapter, store, auth, access and router scripts identified",
-        "base operational modules identified",
-        "multiple overlays and bridges identified for owner classification"
+      "closedFindings": [
+        "Router, Access, Cliente 360 and Aseguradoras canonical owners identified",
+        "support overlays classified without premature retirement",
+        "414/26 to 430/30 delta traced to Gate 7.8 create-only held-parent write",
+        "zero unexplained client or insurer delta",
+        "no reimport required and no data loss observed"
       ],
-      "scope": [
-        "owners",
-        "scripts loaded by index",
-        "bridges",
-        "module best versions",
-        "counts reconciliation",
-        "PR status correction"
-      ],
-      "prohibitions": [
-        "Firebase",
-        "secrets",
-        "deploy",
-        "real-data writes",
-        "new branch",
-        "new PR",
-        "new candidate",
-        "general audit"
-      ]
+      "writesToRealData": 0,
+      "deployExecuted": false,
+      "secretsUsed": false,
+      "firebaseUsed": false
     },
     {
       "id": "2.0",
       "name": "Validador sintetico de rutas aisladas",
-      "status": "PENDING",
-      "gate": "PASS_ISOLATED_ROUTE_HARNESS"
+      "status": "IN_PROGRESS",
+      "gate": "PASS_ISOLATED_ROUTE_HARNESS",
+      "requiredMechanism": "ONE_ISOLATED_BROWSER_CONTEXT_AND_DIRECT_URL_PER_ROUTE",
+      "prohibitions": [
+        "in-page cumulative hash navigation",
+        "new visual workflow variant",
+        "Firebase",
+        "secrets",
+        "deploy",
+        "real-data writes"
+      ]
     },
     {
       "id": "2.1",
@@ -159,8 +175,8 @@
     }
   ],
   "currentClassification": "PIPELINE_MECHANISM_FAILURE",
-  "currentOwner": "canonical baseline, owners and loaded-source reconciliation",
-  "exactNextAction": "Complete the matrix route -> owner -> base script -> overlay -> consumer -> evidence -> classification -> action, beginning with Router, Access, Cliente 360 and Aseguradoras; then reconcile observed counts and close PASS_CANONICAL_BASELINE without Firebase, secrets, deploy or real-data writes.",
+  "currentOwner": "existing isolated-route browser harness",
+  "exactNextAction": "Validate the existing isolated-route synthetic harness against the frozen candidate, using one isolated browser context and direct URL per route, without Firebase, secrets, deploy or real-data writes. Close PASS_ISOLATED_ROUTE_HARNESS or STOP_RETRY on the same failure family.",
   "containsPII": false,
   "containsSecrets": false
 }
