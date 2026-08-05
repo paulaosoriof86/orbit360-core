@@ -1,0 +1,372 @@
+name: Orbit 360 · Fundación Auth dinámica desde Equipo
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-requests/auth-foundation-roster-resolution-and-runtime-v20260805.json'
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: orbit360-auth-foundation-roster-resolution-and-runtime-v20260805
+  cancel-in-progress: false
+
+env:
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  ORBIT360_REQUEST_FILE: .github/orbit360-requests/auth-foundation-roster-resolution-and-runtime-v20260805.json
+  ORBIT360_GATE_ID: block-auth-foundation-roster-resolution-and-runtime-v20260805
+  ORBIT360_LIFECYCLE: tools/orbit360-validator-lifecycle-contract-auth-foundation-roster-resolution-and-runtime-v20260805.json
+  ORBIT360_PROJECT_ID: ays-orbit-360-lab
+  ORBIT360_TENANT_ID: alianzas-soluciones
+  ORBIT360_MAX_ACTIVE_TEAM_USERS: '100'
+  ORBIT360_EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+  ORBIT360_FINAL_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/auth-dynamic-team-runtime-final-sanitized-v20260805.json
+  ORBIT360_FUNCTION_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/auth-dynamic-team-function-readiness-sanitized-v20260805.json
+  ORBIT360_CLOSURE: orbit360-platform/docs/CIERRE-AUTH-DYNAMIC-TEAM-RUNTIME-20260805.md
+  ORBIT360_PASSWORD_CONTINUE_URL: https://ays-orbit-360-lab.web.app/index.html?orbitBackend=firestore-lab&tenant=alianzas-soluciones#/inicio
+
+jobs:
+  dynamic-team-auth:
+    name: Gate → Equipo N → Auth N/N → cierre
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - name: Checkout request exacto con historia completa
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Verificar request único e inmutable
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
+          test "${#CHANGED[@]}" = '1'
+          test "${CHANGED[0]}" = "$ORBIT360_REQUEST_FILE"
+          PARENT="$(git rev-parse HEAD^)"
+          jq -e --arg parent "$PARENT" '
+            .schemaVersion=="orbit360-auth-foundation-roster-resolution-and-runtime-request-v1" and
+            .gateId=="block-auth-foundation-roster-resolution-and-runtime-v20260805" and
+            .rcId=="RC-AYS-LAB-CANONICA-01" and .status=="AUTHORIZED_ONCE" and
+            .approved==true and .allowedExecutions==1 and .consumed==false and .replayAllowed==false and
+            .branch=="ays/backend-tenant-lab-v99-20260703" and .pullRequest==5 and
+            .projectId=="ays-orbit-360-lab" and .tenantId=="alianzas-soluciones" and .parentHead==$parent and
+            .scope.authoritativeEquipoSource==true and .scope.dynamicActiveUserCount==true and
+            .scope.allActiveValidUsers==true and .scope.aliasRoutesDiagnosticOnly==true and
+            .scope.noExactExpectedCount==true and .scope.adminSdkBootstrap==true and
+            .scope.createOrLinkMissingIdentities==true and .scope.reconcileDynamicMemberships==true and
+            .scope.linkDynamicTeamRecords==true and .scope.sendDynamicPasswordEmails==true and
+            .scope.verifyDynamicSessions==true and .scope.verifyObservedFunctionalProfiles==true and
+            .scope.deployOnlyOnboardingFunctionIfAbsent==true and .scope.verifyFutureOnboardingReadiness==true and
+            .scope.crmSnapshotIntegrity==true and .scope.exactRollback==true and
+            .scope.syntheticUsers==false and .scope.hardcodedPeople==false and
+            .scope.exactBusinessUserCount==false and .scope.temporaryPasswords==false and
+            .scope.otherFunctions==false and .scope.hosting==false and .scope.rules==false and
+            .scope.reimport==false and .scope.crmWrites==false and .scope.production==false and
+            .scope.main==false and .scope.merge==false
+          ' "$ORBIT360_REQUEST_FILE" >/dev/null
+
+      - name: Aplicar root fixes source-only en working tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-apply-dynamic-team-authority-sourcefix-v20260805.mjs
+          node tools/orbit360-apply-dynamic-team-runtime-rootfix-v20260805.mjs
+          node tools/orbit360-fix-auth-dynamic-gate-engine-source-v20260805.mjs
+
+      - name: Validar sintaxis y fixtures dinámicos
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-auth-foundation-dynamic-team-runtime-v20260805.mjs
+          node --check tools/orbit360-test-auth-foundation-dynamic-team-runtime-source-v20260805.mjs
+          node --check tools/orbit360-validar-gate-contracts-engine-auth-foundation-roster-resolution-and-runtime-v20260805.mjs
+          node --check tools/orbit360-register-auth-foundation-roster-resolution-and-runtime-gate-v20260805.mjs
+          node tools/orbit360-test-auth-foundation-dynamic-team-runtime-source-v20260805.mjs | tee "$RUNNER_TEMP/auth-dynamic-source-fixtures.json"
+          jq -e '.ok==true and .testedActiveCounts==[1,3,5,7,9,10] and .operationalCapabilitiesUsed==0' "$RUNNER_TEMP/auth-dynamic-source-fixtures.json" >/dev/null
+          git diff --check
+
+      - name: Registrar gate dinámico únicamente en working tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-register-auth-foundation-roster-resolution-and-runtime-gate-v20260805.mjs
+
+      - name: Gate canónico antes de secretos
+        id: preflight
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
+          jq -e '
+            .status=="GO_GATE_CONTRACT" and .contractVersion=="13.8.0" and .failed==0 and .ok==true and
+            .executionAuthorized==true and .secretAccessAuthorized==true and
+            .firestoreReadAuthorized==true and .writeAuthorized==true and .authWriteAuthorized==true and
+            .runtimeAuthorized==true and .functionsDeployAuthorized==true and
+            .allowedFunctions==["orbit360ProvisionTeamAccess"] and
+            .hostingDeployAuthorized==false and .rulesDeployAuthorized==false and .productionAuthorized==false and
+            .authoritativeTeamSource=="tenantId/{tenantId}/asesores" and
+            .activeCountMode=="DYNAMIC_AT_RUNTIME" and .exactExpectedUserCount==null and
+            .identityCoverageRequired=="N/N_ACTIVE_VALID_USERS" and
+            .passwordEmailsRequired=="N_ACTIVE_VALID_USERS" and .sessionsRequired=="N_ACTIVE_VALID_USERS" and
+            .aliasRoutesDiagnosticOnly==true and .functionalProfilesAreCoverageNotAccessGate==true and
+            .transactionStrategy=="READ_ALL_VALIDATE_ALL_WRITE_ALL" and
+            .dataAccess==false and .secretAccess==false and .firestoreReads==0 and .firestoreWrites==0 and
+            .authReads==0 and .authWrites==0 and .runtimeExecuted==false and .deployExecuted==false
+          ' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json >/dev/null
+
+      - name: Persistir root fix y gate antes de runtime
+        if: steps.preflight.outcome == 'success'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name orbit360-gate-bot
+          git config user.email orbit360-gate-bot@users.noreply.github.com
+          git add \
+            tools/orbit360-validar-gate-contracts-v20260717.mjs \
+            tools/orbit360-auth-foundation-dynamic-team-runtime-v20260805.mjs \
+            tools/orbit360-validar-gate-contracts-engine-auth-foundation-roster-resolution-and-runtime-v20260805.mjs \
+            orbit360-platform/core/backend-lab-init.js \
+            orbit360-platform/core/backend-lab-advisor-write-bridge.js \
+            orbit360-platform/core/backend-lab-advisor-catalog.js \
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'auth: establish dynamic Equipo authority [skip ci]'
+            git push origin "HEAD:$ORBIT360_BRANCH"
+          fi
+
+      - name: Resolver credencial LAB
+        env:
+          SA1: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          SA2: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+          SA3: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          SERVICE_ACCOUNT="${SA1:-${SA2:-${SA3:-}}}"
+          test -n "$SERVICE_ACCOUNT"
+          KEY="$RUNNER_TEMP/orbit360-auth-dynamic-service-account.json"
+          printf '%s' "$SERVICE_ACCOUNT" > "$KEY"
+          chmod 600 "$KEY"
+          test "$(jq -r '.project_id // empty' "$KEY")" = "$ORBIT360_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY" >> "$GITHUB_ENV"
+          echo "ORBIT360_AUTH_DYNAMIC_PRIVATE_STATE=$RUNNER_TEMP/orbit360-auth-dynamic-team-private.json" >> "$GITHUB_ENV"
+
+      - name: Instalar runtime reproducible
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false firebase-admin@13.10.0 firebase-tools@15.25.1 >/dev/null
+          npm --prefix functions ci --include=prod
+          node --check tools/orbit360-auth-foundation-dynamic-team-runtime-v20260805.mjs
+          node --check functions/user-onboarding.js
+
+      - name: Resolver API web sin exponerla
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx firebase apps:list --project "$ORBIT360_PROJECT_ID" --json > "$RUNNER_TEMP/firebase-apps.json"
+          APP_ID="$(node - "$RUNNER_TEMP/firebase-apps.json" <<'NODE'
+          const fs=require('fs');const data=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));const found=[];
+          const walk=v=>{if(!v)return;if(Array.isArray(v))return v.forEach(walk);if(typeof v==='object'){const p=String(v.platform||v.platformId||v.type||'').toUpperCase();const id=String(v.appId||v.app_id||'');if(p==='WEB'&&id)found.push(id);Object.values(v).forEach(walk);}};
+          walk(data);if(!found.length)process.exit(2);process.stdout.write(found[0]);
+          NODE
+          )"
+          npx firebase apps:sdkconfig WEB "$APP_ID" --project "$ORBIT360_PROJECT_ID" > "$RUNNER_TEMP/firebase-web-config.txt"
+          API_KEY="$(node - "$RUNNER_TEMP/firebase-web-config.txt" <<'NODE'
+          const fs=require('fs');const s=fs.readFileSync(process.argv[2],'utf8');let key='';
+          try{const data=JSON.parse(s);const walk=v=>{if(!v||key)return;if(Array.isArray(v))return v.forEach(walk);if(typeof v==='object'){if(typeof v.apiKey==='string')key=v.apiKey;else Object.values(v).forEach(walk);}};walk(data);}catch{}
+          if(!key){const m=s.match(/apiKey\s*[:=]\s*["']([^"']+)["']/);if(m)key=m[1];}if(!key)process.exit(3);process.stdout.write(key);
+          NODE
+          )"
+          echo "::add-mask::$API_KEY"
+          echo "ORBIT360_FIREBASE_WEB_API_KEY=$API_KEY" >> "$GITHUB_ENV"
+
+      - name: Censo dinámico desde la autoridad de Equipo
+        id: census
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-auth-foundation-dynamic-team-runtime-v20260805.mjs census
+          jq -e '
+            .stage=="AUTH_DYNAMIC_TEAM_CENSUS_PASS" and .ok==true and
+            .decision=="USE_AUTHORITATIVE_EQUIPO_DYNAMIC_COUNT" and
+            .activeUsersObserved>=1 and .activeUsersObserved<=100 and
+            .plannedMembershipReconciliations==.activeUsersObserved and
+            .plannedTeamLinks==.activeUsersObserved and .plannedPasswordEmails==.activeUsersObserved and
+            .firestoreWrites==0 and .authWrites==0
+          ' "$ORBIT360_EVIDENCE_DIR/auth-dynamic-team-census-sanitized-v20260805.json" >/dev/null
+
+      - name: Desplegar exclusivamente onboarding si falta
+        id: function
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx firebase functions:list --project "$ORBIT360_PROJECT_ID" --json > "$RUNNER_TEMP/functions-before.json"
+          BEFORE="$(node - "$RUNNER_TEMP/functions-before.json" <<'NODE'
+          const fs=require('fs');const s=fs.readFileSync(process.argv[2],'utf8');process.stdout.write(String((s.match(/orbit360ProvisionTeamAccess/g)||[]).length));
+          NODE
+          )"
+          DEPLOYED=false
+          if [ "$BEFORE" = 0 ]; then
+            npx firebase deploy --project "$ORBIT360_PROJECT_ID" --only "functions:orbit360ProvisionTeamAccess" --non-interactive --force
+            DEPLOYED=true
+          fi
+          npx firebase functions:list --project "$ORBIT360_PROJECT_ID" --json > "$RUNNER_TEMP/functions-after.json"
+          AFTER="$(node - "$RUNNER_TEMP/functions-after.json" <<'NODE'
+          const fs=require('fs');const s=fs.readFileSync(process.argv[2],'utf8');process.stdout.write(String((s.match(/orbit360ProvisionTeamAccess/g)||[]).length));
+          NODE
+          )"
+          test "$AFTER" -ge 1
+          echo "deployed=$DEPLOYED" >> "$GITHUB_OUTPUT"
+          export DEPLOYED
+          node --input-type=module - <<'NODE'
+          import fs from 'node:fs';
+          const payload={schemaVersion:'orbit360-auth-dynamic-function-readiness-v1',stage:'AUTH_DYNAMIC_ONBOARDING_FUNCTION_READY',functionName:'orbit360ProvisionTeamAccess',available:true,deployedThisRun:process.env.DEPLOYED==='true',otherFunctionsDeployed:0,hostingDeploys:0,rulesDeploys:0,containsPII:false,containsSecrets:false,ok:true};
+          fs.writeFileSync(process.env.ORBIT360_FUNCTION_EVIDENCE,JSON.stringify(payload,null,2)+'\n');
+          NODE
+
+      - name: Aplicar Auth memberships y vínculos para N usuarios activos
+        id: apply
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-auth-foundation-dynamic-team-runtime-v20260805.mjs apply
+          jq -e '
+            .stage=="AUTH_DYNAMIC_TEAM_APPLY_PASS" and .ok==true and .activeUsers>=1 and
+            (.authUsersCreated + .authUsersLinked)==.activeUsers and
+            .membershipWrites<=.activeUsers and .teamWrites<=.activeUsers and
+            .atomicTransaction==true and .transactionStrategy=="READ_ALL_VALIDATE_ALL_WRITE_ALL" and
+            .idempotentDiffWrites==true
+          ' "$ORBIT360_EVIDENCE_DIR/auth-dynamic-team-apply-sanitized-v20260805.json" >/dev/null
+
+      - name: Verificar sesiones dinámicas antes del correo
+        id: sessions
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-auth-foundation-dynamic-team-runtime-v20260805.mjs sessions
+          jq -e '.stage=="AUTH_DYNAMIC_TEAM_SESSIONS_PASS" and .ok==true and .sessionsVerified==.activeUsers and .tokensExposed==0' "$ORBIT360_EVIDENCE_DIR/auth-dynamic-team-sessions-sanitized-v20260805.json" >/dev/null
+
+      - name: Enviar correo a cada usuario activo válido
+        id: emails
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-auth-foundation-dynamic-team-runtime-v20260805.mjs emails
+          jq -e '.stage=="AUTH_DYNAMIC_TEAM_EMAILS_PASS" and .ok==true and .emailsSent==.activeUsers and .actionLinksExposed==0' "$ORBIT360_EVIDENCE_DIR/auth-dynamic-team-emails-sanitized-v20260805.json" >/dev/null
+
+      - name: Verificar N sobre N e integridad CRM
+        id: verify
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-auth-foundation-dynamic-team-runtime-v20260805.mjs verify
+          jq -e '
+            .stage=="AUTH_DYNAMIC_TEAM_RUNTIME_PASS" and .ok==true and .activeUsers>=1 and
+            .identitiesVerified==.activeUsers and .membershipsVerified==.activeUsers and
+            .teamLinksVerified==.activeUsers and .passwordEmailsVerified==.activeUsers and
+            .sessionsVerified==.activeUsers and .futureUserPathSupported==true and
+            .crmIntegrity=="VERIFIED_UNCHANGED"
+          ' "$ORBIT360_EVIDENCE_DIR/auth-dynamic-team-verify-sanitized-v20260805.json" >/dev/null
+
+      - name: Rollback exacto ante cualquier fallo reversible
+        if: always() && steps.apply.outcome == 'success' && (steps.sessions.outcome != 'success' || steps.emails.outcome != 'success' || steps.verify.outcome != 'success' || steps.function.outcome != 'success')
+        id: rollback
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-auth-foundation-dynamic-team-runtime-v20260805.mjs rollback
+
+      - name: Sellar evidencia final y consumir autorización
+        if: always()
+        shell: bash
+        env:
+          PREFLIGHT_OUTCOME: ${{ steps.preflight.outcome }}
+          FUNCTION_DEPLOYED: ${{ steps.function.outputs.deployed }}
+          ROLLBACK_OUTCOME: ${{ steps.rollback.outcome }}
+        run: |
+          set -euo pipefail
+          node --input-type=module - <<'NODE'
+          import fs from 'node:fs';
+          const read=p=>fs.existsSync(p)?JSON.parse(fs.readFileSync(p,'utf8')):null;
+          const dir=process.env.ORBIT360_EVIDENCE_DIR;
+          const pre=read(`${dir}/preflight-sanitizado.json`);
+          const census=read(`${dir}/auth-dynamic-team-census-sanitized-v20260805.json`);
+          const apply=read(`${dir}/auth-dynamic-team-apply-sanitized-v20260805.json`);
+          const sessions=read(`${dir}/auth-dynamic-team-sessions-sanitized-v20260805.json`);
+          const emails=read(`${dir}/auth-dynamic-team-emails-sanitized-v20260805.json`);
+          const verify=read(`${dir}/auth-dynamic-team-verify-sanitized-v20260805.json`);
+          const rollback=read(`${dir}/auth-dynamic-team-rollback-sanitized-v20260805.json`);
+          const fn=read(process.env.ORBIT360_FUNCTION_EVIDENCE);
+          const ok=pre?.ok===true&&census?.ok===true&&apply?.ok===true&&sessions?.ok===true&&emails?.ok===true&&verify?.ok===true&&fn?.ok===true;
+          const failed=[pre,census,apply,sessions,emails,verify,rollback].find(x=>x&&x.ok===false);
+          const n=verify?.activeUsers||emails?.activeUsers||sessions?.activeUsers||apply?.activeUsers||census?.activeUsersObserved||0;
+          const integrity=verify?.crmIntegrity||rollback?.crmIntegrity||'NOT_POSTVERIFIED';
+          const final={schemaVersion:'orbit360-auth-dynamic-team-runtime-final-v1',stage:ok?'AUTH_DYNAMIC_TEAM_RUNTIME_PASS':(failed?.stage||'STOP_RETRY_EVIDENCE_INCOMPLETE'),decision:ok?'GO_AUTH_DYNAMIC_TEAM_COMPLETE':'STOP_RETRY',classification:ok?'AUTH_DYNAMIC_TEAM_COMPLETE':(failed?.classification||'PIPELINE_MECHANISM_FAILURE'),errorCode:failed?.errorCode||'',authoritativeTeamSource:'tenantId/{tenantId}/asesores',activeCountMode:'DYNAMIC_AT_RUNTIME',exactExpectedUserCount:null,activeUsers:n,identitiesVerified:verify?.identitiesVerified||0,membershipsVerified:verify?.membershipsVerified||0,teamLinksVerified:verify?.teamLinksVerified||0,passwordEmailsSent:emails?.emailsSent||0,sessionsVerified:sessions?.sessionsVerified||0,functionalProfilesObserved:verify?.functionalProfilesVerified||census?.functionalProfilesCovered||0,futureOnboardingReady:fn?.available===true,onboardingFunctionDeployedThisRun:process.env.FUNCTION_DEPLOYED==='true',otherFunctionsDeployed:0,crmIntegrity:integrity,rollbackAttempted:process.env.ROLLBACK_OUTCOME==='success',rollbackStage:rollback?.stage||'',emailSideEffectsReversible:false,emailsSentBeforeFailure:emails?.emailsSentBeforeFailure||0,temporaryPasswordsCreated:0,passwordsRead:0,actionLinksExposed:0,fullEmailsExposed:0,hostingDeploys:0,rulesDeploys:0,reimports:0,productionTouched:false,mainTouched:false,mergeExecuted:false,containsPII:false,containsSecrets:false,ok};
+          fs.writeFileSync(process.env.ORBIT360_FINAL_EVIDENCE,JSON.stringify(final,null,2)+'\n');
+          const lifecycle=JSON.parse(fs.readFileSync(process.env.ORBIT360_LIFECYCLE,'utf8'));
+          lifecycle.status=ok?'AUTH_FOUNDATION_DYNAMIC_TEAM_RUNTIME_CONSUMED_PASS':'AUTH_FOUNDATION_DYNAMIC_TEAM_RUNTIME_CONSUMED_STOP_RETRY';
+          lifecycle.authorization.activeRequest=false;lifecycle.authorization.allowedExecutions=0;lifecycle.authorization.consumed=true;
+          lifecycle.executionResult={stage:final.stage,decision:final.decision,classification:final.classification,errorCode:final.errorCode,activeUsers:final.activeUsers,crmIntegrity:final.crmIntegrity,ok};
+          fs.writeFileSync(process.env.ORBIT360_LIFECYCLE,JSON.stringify(lifecycle,null,2)+'\n');
+          fs.writeFileSync(process.env.ORBIT360_CLOSURE,`# CIERRE FUNDACIÓN AUTH DINÁMICA\n\n\`\`\`text\n${final.stage}\n${final.classification}\nusuarios activos: ${final.activeUsers}\nidentidades: ${final.identitiesVerified}/${final.activeUsers}\nmemberships: ${final.membershipsVerified}/${final.activeUsers}\nEquipo vinculado: ${final.teamLinksVerified}/${final.activeUsers}\ncorreos: ${final.passwordEmailsSent}/${final.activeUsers}\nsesiones: ${final.sessionsVerified}/${final.activeUsers}\nperfiles observados: ${final.functionalProfilesObserved}\nCRM: ${final.crmIntegrity}\n\`\`\`\n\n- fuente autoritativa: tenantId/{tenantId}/asesores\n- conteo exacto hardcodeado: no\n- onboarding futuro listo: ${final.futureOnboardingReady}\n- Hosting/Rules/reimportación/producción/main/merge: 0\n`);
+          NODE
+
+      - name: Persistir evidencia y lifecycle sin tocar request
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name orbit360-gate-bot
+          git config user.email orbit360-gate-bot@users.noreply.github.com
+          CANDIDATES=(
+            tools/orbit360-validator-lifecycle-contract-auth-foundation-roster-resolution-and-runtime-v20260805.json
+            "$ORBIT360_FINAL_EVIDENCE"
+            "$ORBIT360_CLOSURE"
+            "$ORBIT360_FUNCTION_EVIDENCE"
+          )
+          FILES=()
+          for file in "${CANDIDATES[@]}" "$ORBIT360_EVIDENCE_DIR"/auth-dynamic-team-*-sanitized-v20260805.json; do
+            [ -f "$file" ] && FILES+=("$file")
+          done
+          test "${#FILES[@]}" -ge 3
+          git add "${FILES[@]}"
+          if ! git diff --cached --quiet; then
+            git commit -m 'auth: persist dynamic Equipo foundation result [skip ci]'
+            git push origin "HEAD:$ORBIT360_BRANCH"
+          fi
+
+      - name: Publicar artefacto sanitizado
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: auth-dynamic-team-runtime-sanitized
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/auth-dynamic-team-*-sanitized-v20260805.json
+            orbit360-platform/docs/CIERRE-AUTH-DYNAMIC-TEAM-RUNTIME-20260805.md
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Comentar cierre sanitizado en PR 5
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs=require('fs');const p=process.env.ORBIT360_FINAL_EVIDENCE;
+            const e=fs.existsSync(p)?JSON.parse(fs.readFileSync(p,'utf8')):{stage:'STOP_RETRY_EVIDENCE_MISSING',classification:'PIPELINE_MECHANISM_FAILURE',activeUsers:0,ok:false};
+            const body=`## Fundación Auth dinámica desde Equipo — ${e.ok?'PASS':'STOP_RETRY'}\n\n\`\`\`text\n${e.stage}\n${e.classification}\nusuarios activos: ${e.activeUsers||0}\nidentidades: ${e.identitiesVerified||0}/${e.activeUsers||0}\nmemberships: ${e.membershipsVerified||0}/${e.activeUsers||0}\nEquipo: ${e.teamLinksVerified||0}/${e.activeUsers||0}\ncorreos: ${e.passwordEmailsSent||0}/${e.activeUsers||0}\nsesiones: ${e.sessionsVerified||0}/${e.activeUsers||0}\nCRM: ${e.crmIntegrity||'NOT_POSTVERIFIED'}\n\`\`\``;
+            await github.rest.issues.createComment({owner:context.repo.owner,repo:context.repo.repo,issue_number:5,body});
+
+      - name: Exigir PASS final
+        if: always()
+        shell: bash
+        run: jq -e '.ok==true and .stage=="AUTH_DYNAMIC_TEAM_RUNTIME_PASS" and .activeUsers>=1 and .identitiesVerified==.activeUsers and .membershipsVerified==.activeUsers and .teamLinksVerified==.activeUsers and .passwordEmailsSent==.activeUsers and .sessionsVerified==.activeUsers and .crmIntegrity=="VERIFIED_UNCHANGED"' "$ORBIT360_FINAL_EVIDENCE" >/dev/null
