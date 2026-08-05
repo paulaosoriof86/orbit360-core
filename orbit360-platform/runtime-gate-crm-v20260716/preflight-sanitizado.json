@@ -1,144 +1,14 @@
 {
-  "schemaVersion": "orbit360-auth-access-recovery-source-only-gate-v4",
-  "gateId": "block-auth-access-recovery-source-only-v4-20260805",
-  "contractVersion": "13.3.0",
-  "status": "GO_GATE_CONTRACT",
-  "classification": "AUTH_ACCESS_SOURCE_ONLY_V4_READY",
-  "total": 26,
-  "passed": 26,
-  "failed": 0,
-  "failedCheckIds": [],
-  "checks": [
-    {
-      "id": "GATE_ID_VERSION",
-      "ok": true,
-      "detail": ""
-    },
-    {
-      "id": "LIFECYCLE_AUTHORIZED_ONCE",
-      "ok": true,
-      "detail": ""
-    },
-    {
-      "id": "ZERO_CAPABILITIES",
-      "ok": true,
-      "detail": ""
-    },
-    {
-      "id": "REQUEST_ACTIVE",
-      "ok": true,
-      "detail": ""
-    },
-    {
-      "id": "REQUEST_BINDING",
-      "ok": true,
-      "detail": ""
-    },
-    {
-      "id": "REQUEST_SINGLE_FILE_COMMIT",
-      "ok": true,
-      "detail": ".github/orbit360-requests/auth-access-recovery-source-only-v4-20260805.json"
-    },
-    {
-      "id": "SOURCE_SCOPE_POSITIVE",
-      "ok": true,
-      "detail": ""
-    },
-    {
-      "id": "SOURCE_SCOPE_NEGATIVE",
-      "ok": true,
-      "detail": ""
-    },
-    {
-      "id": "PRIOR_REQUESTS_IMMUTABLE_AND_CONSUMED",
-      "ok": true,
-      "detail": "auth-access-recovery-lab-v20260805.json:fffef59bd6065390d1e8b28128754a06d94340b5:true|auth-access-recovery-lab-v2-20260805.json:fd5963242de542105dd764371cf501f6814481e6:true|auth-access-recovery-lab-v3-20260805.json:f8363197646dc4046fda1933af535110270703ae:true"
-    },
-    {
-      "id": "ROOTFIX_PROVENANCE_ANCESTOR",
-      "ok": true,
-      "detail": ""
-    },
-    {
-      "id": "ROOTFIX_BLOB",
-      "ok": true,
-      "detail": ""
-    },
-    {
-      "id": "FUTURE_RUNTIME_REQUEST_ABSENT",
-      "ok": true,
-      "detail": ""
-    },
-    {
-      "id": "WORKFLOW_REUSED_NEW_PATH",
-      "ok": true,
-      "detail": ""
-    },
-    {
-      "id": "WORKFLOW_NO_RUNTIME_CAPABILITIES",
-      "ok": true,
-      "detail": ""
-    },
-    {
-      "id": "WORKFLOW_FULL_HISTORY",
-      "ok": true,
-      "detail": ""
-    },
-    {
-      "id": "WORKFLOW_SOURCE_ONLY_DECLARATION",
-      "ok": true,
-      "detail": ""
-    },
-    {
-      "id": "ACCESS_FIELD_ALLOWLIST_EXACT",
-      "ok": true,
-      "detail": ""
-    },
-    {
-      "id": "ONBOARDING_FUNCTION_ALLOWLIST_EXACT",
-      "ok": true,
-      "detail": ""
-    },
-    {
-      "id": "TRANSACTION_THREE_PHASE_ORDER",
-      "ok": true,
-      "detail": ""
-    },
-    {
-      "id": "TRANSACTION_NO_READ_AFTER_WRITE",
-      "ok": true,
-      "detail": ""
-    },
-    {
-      "id": "TRANSACTION_ATOMIC_SINGLE_OWNER",
-      "ok": true,
-      "detail": ""
-    },
-    {
-      "id": "TRANSACTION_ALL_READS_BEFORE_ALL_WRITES",
-      "ok": true,
-      "detail": ""
-    },
-    {
-      "id": "IDEMPOTENCY_CHANGED_FIELDS_ONLY",
-      "ok": true,
-      "detail": ""
-    },
-    {
-      "id": "IDEMPOTENCY_STALE_PLAN_GUARD",
-      "ok": true,
-      "detail": ""
-    },
-    {
-      "id": "IDEMPOTENCY_POSTVERIFY",
-      "ok": true,
-      "detail": ""
-    },
-    {
-      "id": "STATIC_SYNTAX_TARGETS_PRESENT",
-      "ok": true,
-      "detail": ""
-    }
+  "schemaVersion": "orbit360-auth-access-recovery-gate-v5",
+  "gateId": "block-auth-access-recovery-lab-v5-20260805",
+  "contractVersion": "13.4.0",
+  "status": "NOT_EXECUTED",
+  "classification": "PENDING_RUNTIME_REQUEST",
+  "total": 0,
+  "passed": 0,
+  "failed": 1,
+  "failedCheckIds": [
+    "RUNTIME_REQUEST_NOT_EXECUTED"
   ],
   "executionAuthorized": false,
   "secretAccessAuthorized": false,
@@ -163,20 +33,9 @@
   "deployExecuted": false,
   "productionTouched": false,
   "rootFixStrategy": "READ_ALL_VALIDATE_ALL_WRITE_ALL",
-  "priorRequestsVerified": 3,
-  "futureRuntimeRequestAbsent": true,
+  "sourceOnlyPrerequisitePass": true,
+  "priorRequestsVerified": 4,
   "containsPII": false,
   "containsSecrets": false,
-  "ok": true,
-  "canonicalEntrypoint": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
-  "canonicalEngine": "tools/orbit360-validar-gate-contracts-engine-auth-access-recovery-source-only-v4-20260805.mjs",
-  "canonicalLifecycleContract": "tools/orbit360-validator-lifecycle-contract-auth-access-recovery-source-only-v4-20260805.json",
-  "canonicalLifecycleComposition": "phase-capability-contract-v1",
-  "engineEvidenceSource": "sync-file-evidence-not-stdout-v1",
-  "engineStdoutParsed": false,
-  "sourceTransformed": false,
-  "operationalWrites": 0,
-  "evidenceWrites": 1,
-  "secretsRead": false,
-  "rulesApplied": false
+  "ok": false
 }
