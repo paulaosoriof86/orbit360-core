@@ -6,10 +6,10 @@ La continuidad operativa vigente de A&S se rige por:
 
 1. `orbit360-platform/docs/FUENTES-RECTORAS-VIGENTES-ORBIT360-AYS-20260730.md`;
 2. `orbit360-platform/docs/PLAN-UNICO-SALIDA-RC-AYS-LAB-CANONICA-01-20260804.md`;
-3. `orbit360-platform/docs/ANEXO-PLAN-UNICO-AUTH-FUNDACION-SOLUCION-DEFINITIVA-20260805.md`;
+3. `orbit360-platform/docs/ANEXO-PLAN-UNICO-AUTH-FOUNDATION-ALL-TEAM-SOURCE-ONLY-PASS-20260805.md`;
 4. `orbit360-platform/docs/AUDITORIA-FORENSE-AUTH-SOLUCION-DEFINITIVA-20260805.md`;
-5. `orbit360-platform/runtime-gate-crm-v20260716/auth-forensic-definitive-solution-v20260805.json`;
-6. `orbit360-platform/docs/ESTADO-ACTIVO-AUTH-V7-SUSPENDIDO-BLOQUE4-CONTINUA-20260805.md`;
+5. `orbit360-platform/runtime-gate-crm-v20260716/auth-foundation-all-team-source-only-sanitized-v20260805.json`;
+6. `orbit360-platform/docs/ESTADO-ACTIVO-AUTH-FOUNDATION-ALL-TEAM-SOURCE-ONLY-PASS-BLOQUE4-CONTINUA-20260805.md`;
 7. `orbit360-platform/docs/ESTADO-ACTIVO-BLOQUE-4-COBROS-FULL-REPLAY-20260805.md`;
 8. estado vivo del PR #5.
 
@@ -35,14 +35,7 @@ URL LAB:
 https://ays-orbit-360-lab--orbit360-operational-block12-w8ibrr6w.web.app
 ```
 
-## Auth — auditoría forense y solución definitiva
-
-```text
-Runtime v7: SUSPENDIDO
-Request v7: AUSENTE
-Runtime ejecutado: no
-Secretos/Firebase/Firestore/Auth/Functions: 0
-```
+## Auth — Fundación all-team
 
 Causa sistémica:
 
@@ -51,22 +44,32 @@ FUNCTIONAL_DEFECT
 AUTH_BOOTSTRAP_CIRCULAR_DEPENDENCY_AND_SPLIT_BRAIN_USER_STATE
 ```
 
-Equipo puede guardar el registro operativo antes de que existan Firebase Auth y membership. El onboarding normal exige un actor ya autenticado con membership administrativa activa, por lo que no puede utilizarse como bootstrap de la primera administración real.
+El bootstrap inicial se separó del onboarding normal. Los tres perfiles Dirección, Operativo y Asesor son pruebas funcionales de permisos; el universo actual de identidad es de siete usuarios.
 
-Solución:
+Cierre source-only:
 
 ```text
-Bootstrap inicial directo por Admin SDK y roster sellado
-→ identidades + memberships + correos
-→ login real verificado
-→ onboarding normal desde Equipo
-→ recuperación visible de contraseña
-→ retiro de demo y cierre de Rules antes de producción
+Gate: block-auth-foundation-all-team-source-only-v20260805
+Contrato: 13.6.0
+Estado: AUTH_FOUNDATION_ALL_TEAM_SOURCE_ONLY_CONSUMED_PASS
+Checks: 29/29
+Usuarios actuales cubiertos: 7/7
+Perfiles funcionales: 3/3
+Usuarios futuros: soportados
 ```
 
-No crear únicamente usuarios en Firebase: sin memberships válidas el login fail-closed los rechazará. No abrir gates separados por persona ni nuevas cadenas de recovery basadas en la callable inicial.
+El owner genérico toma todos los registros activos de Equipo y no hardcodea personas. Bloquea conteos distintos de siete para este cierre, correos duplicados, falta de administrador bootstrap y contratos incompletos de roles, países o scopes.
 
-La siguiente unidad es un único macrobloque `AUTH_FOUNDATION_SINGLE_MACROBLOCK`, primero validado source-only de manera acumulativa y después ejecutado una sola vez bajo autorización explícita.
+Estado real:
+
+```text
+Identidades creadas por el gate source-only: 0
+Memberships creadas: 0
+Correos enviados: 0
+Runtime v7 anterior: no ejecutado
+```
+
+La siguiente frontera es una sola ejecución runtime acumulativa para los siete usuarios actuales, con bootstrap Admin SDK, reconciliación de memberships, correos de establecimiento/recuperación, sesiones verificadas e integridad CRM.
 
 ## Cobros
 
