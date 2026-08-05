@@ -60,7 +60,8 @@ const GATE_CONFIG=Object.freeze({
   "block-auth-access-recovery-lab-v3-20260805":{contractVersion:"13.2.0",lifecycle:"tools/orbit360-validator-lifecycle-contract-auth-access-recovery-lab-v3-20260805.json",engine:"tools/orbit360-validar-gate-contracts-engine-auth-access-recovery-lab-v3-20260805.mjs"},
   "block-auth-access-recovery-source-only-v4-20260805":{contractVersion:"13.3.0",lifecycle:"tools/orbit360-validator-lifecycle-contract-auth-access-recovery-source-only-v4-20260805.json",engine:"tools/orbit360-validar-gate-contracts-engine-auth-access-recovery-source-only-v4-20260805.mjs"},
   "block-auth-access-recovery-lab-v5-20260805":{contractVersion:"13.4.0",lifecycle:"tools/orbit360-validator-lifecycle-contract-auth-access-recovery-lab-v5-20260805.json",engine:"tools/orbit360-validar-gate-contracts-engine-auth-access-recovery-lab-v5-20260805.mjs"},
-  "block-auth-access-recovery-source-only-v6-20260805":{contractVersion:"13.5.0",lifecycle:"tools/orbit360-validator-lifecycle-contract-auth-access-recovery-source-only-v6-20260805.json",engine:"tools/orbit360-validar-gate-contracts-engine-auth-access-recovery-source-only-v6-20260805.mjs"}
+  "block-auth-access-recovery-source-only-v6-20260805":{contractVersion:"13.5.0",lifecycle:"tools/orbit360-validator-lifecycle-contract-auth-access-recovery-source-only-v6-20260805.json",engine:"tools/orbit360-validar-gate-contracts-engine-auth-access-recovery-source-only-v6-20260805.mjs"},
+  "block-auth-foundation-all-team-source-only-v20260805":{contractVersion:"13.6.0",lifecycle:"tools/orbit360-validator-lifecycle-contract-auth-foundation-all-team-source-only-v20260805.json",engine:"tools/orbit360-validar-gate-contracts-engine-auth-foundation-all-team-source-only-v20260805.mjs"}
 });
 const PHASE_PROFILES=Object.freeze({
   "STATIC_PREFLIGHT":ZERO,
@@ -130,7 +131,8 @@ const PHASE_PROFILES=Object.freeze({
   "AUTH_ACCESS_RECOVERY_LAB_V3":{secrets:true,firestoreRead:true,writes:true,runtime:true,browser:false,deploy:true,functionsDeploy:true,rulesDeploy:false,production:false},
   "AUTH_ACCESS_RECOVERY_SOURCE_ONLY_V4":ZERO,
   "AUTH_ACCESS_RECOVERY_LAB_V5":{secrets:true,firestoreRead:true,writes:true,runtime:true,browser:false,deploy:true,functionsDeploy:true,rulesDeploy:false,production:false},
-  "AUTH_ACCESS_RECOVERY_SOURCE_ONLY_V6":ZERO
+  "AUTH_ACCESS_RECOVERY_SOURCE_ONLY_V6":ZERO,
+  "AUTH_FOUNDATION_ALL_TEAM_SOURCE_ONLY":ZERO
 });
 function readJson(rel){return JSON.parse(fs.readFileSync(path.join(ROOT,rel),'utf8'));}
 function exactCapabilities(actual,expected){const a=Object.keys(actual||{}).sort(),e=Object.keys(expected||{}).sort();return JSON.stringify(a)===JSON.stringify(e)&&e.every(key=>actual[key]===expected[key]);}

@@ -1,11 +1,11 @@
 {
-  "schemaVersion": "orbit360-auth-access-recovery-source-only-gate-v6",
-  "gateId": "block-auth-access-recovery-source-only-v6-20260805",
-  "contractVersion": "13.5.0",
+  "schemaVersion": "orbit360-auth-foundation-all-team-source-only-gate-v1",
+  "gateId": "block-auth-foundation-all-team-source-only-v20260805",
+  "contractVersion": "13.6.0",
   "status": "GO_GATE_CONTRACT",
-  "classification": "AUTH_ACCESS_SOURCE_ONLY_V6_READY",
-  "total": 32,
-  "passed": 32,
+  "classification": "AUTH_FOUNDATION_ALL_TEAM_SOURCE_ONLY_READY",
+  "total": 29,
+  "passed": 29,
   "failed": 0,
   "failedCheckIds": [],
   "checks": [
@@ -37,7 +37,7 @@
     {
       "id": "REQUEST_SINGLE_FILE_COMMIT",
       "ok": true,
-      "detail": ".github/orbit360-requests/auth-access-recovery-source-only-v6-20260805.json"
+      "detail": ".github/orbit360-requests/auth-foundation-all-team-source-only-v20260805.json"
     },
     {
       "id": "SOURCE_SCOPE_POSITIVE",
@@ -50,47 +50,77 @@
       "detail": ""
     },
     {
-      "id": "PRIOR_REQUESTS_IMMUTABLE_AND_CONSUMED",
-      "ok": true,
-      "detail": "auth-access-recovery-lab-v20260805.json:fffef59bd6065390d1e8b28128754a06d94340b5:true|auth-access-recovery-lab-v2-20260805.json:fd5963242de542105dd764371cf501f6814481e6:true|auth-access-recovery-lab-v3-20260805.json:f8363197646dc4046fda1933af535110270703ae:true|auth-access-recovery-source-only-v4-20260805.json:ad16d2b1fe41c88929eab59a6f92a6bdface08ad:true|auth-access-recovery-lab-v5-20260805.json:e4112b831cb6aec65c9232cdcc5c73c88b07c27f:true"
-    },
-    {
-      "id": "V5_STOP_RETRY_PREREQUISITE",
+      "id": "V6_CONSUMED_PASS",
       "ok": true,
       "detail": ""
     },
     {
-      "id": "V5_DUAL_ROOTCAUSE_PRESENT",
+      "id": "V6_REQUEST_IMMUTABLE",
       "ok": true,
       "detail": ""
     },
     {
-      "id": "FUTURE_RUNTIME_REQUEST_ABSENT",
+      "id": "V7_ABSENT_AND_SUSPENDED",
       "ok": true,
       "detail": ""
     },
     {
-      "id": "WORKFLOW_REUSED_V6_PATH",
+      "id": "COVERAGE_CONTRACT_7_OF_7",
       "ok": true,
       "detail": ""
     },
     {
-      "id": "WORKFLOW_ZERO_CAPABILITIES",
+      "id": "FUNCTIONAL_PROFILES_3_OF_3",
       "ok": true,
       "detail": ""
     },
     {
-      "id": "WORKFLOW_FULL_HISTORY",
+      "id": "FUTURE_USERS_GENERIC",
       "ok": true,
       "detail": ""
     },
     {
-      "id": "WORKFLOW_CANONICAL_GATE",
+      "id": "PLAN_DYNAMIC_COUNT",
       "ok": true,
       "detail": ""
     },
     {
-      "id": "WORKFLOW_NO_REQUEST_MUTATION",
+      "id": "PLAN_BOOTSTRAP_SEPARATED",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "PLAN_NO_PERSON_HARDCODE",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "EXISTING_ADMIN_SDK_BOOTSTRAP_REUSABLE",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "NORMAL_ONBOARDING_REQUIRES_EXISTING_ADMIN",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "TEAM_SPLIT_BRAIN_CONFIRMED",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "BRIDGE_FAIL_SOFT_CONFIRMED",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "PASSWORD_RECOVERY_GAP_CONFIRMED",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "RULES_DEMO_DEBT_CONFIRMED",
       "ok": true,
       "detail": ""
     },
@@ -100,72 +130,27 @@
       "detail": ""
     },
     {
-      "id": "ACTOR_PARITY_EXACT",
-      "ok": true,
-      "detail": ""
-    },
-    {
-      "id": "ACTOR_PARITY_MATCHES_CALLABLE",
-      "ok": true,
-      "detail": ""
-    },
-    {
-      "id": "CALLABLE_HTTP_STATUS_PROPAGATION",
-      "ok": true,
-      "detail": ""
-    },
-    {
-      "id": "CALLABLE_STATUS_PROPAGATION",
-      "ok": true,
-      "detail": ""
-    },
-    {
-      "id": "CALLABLE_ERROR_CODE_PROPAGATION",
-      "ok": true,
-      "detail": ""
-    },
-    {
-      "id": "CALLABLE_SANITIZATION",
-      "ok": true,
-      "detail": ""
-    },
-    {
-      "id": "CONDITIONAL_EVIDENCE_READS",
-      "ok": true,
-      "detail": ""
-    },
-    {
-      "id": "CONDITIONAL_EVIDENCE_PERSIST_LIST",
-      "ok": true,
-      "detail": ""
-    },
-    {
-      "id": "TRISTATE_INTEGRITY",
-      "ok": true,
-      "detail": ""
-    },
-    {
-      "id": "MISSING_SCOPE_NOT_FALSE_CHANGE",
-      "ok": true,
-      "detail": ""
-    },
-    {
-      "id": "LIFECYCLE_CONSUMPTION_SAFE",
-      "ok": true,
-      "detail": ""
-    },
-    {
       "id": "SOURCE_FIXTURES_PASS",
       "ok": true,
-      "detail": "{\"ok\":true,\"actorParityCases\":2,\"actorRejectionCases\":1,\"callableErrorPropagationCases\":1,\"evidencePersistenceCases\":3,\"integrityStatesVerified\":[\"VERIFIED_UNCHANGED\",\"VERIFIED_CHANGED\",\"NOT_POSTVERIFIED\"],\"operationalCapabilitiesUsed\":0}"
-    },
-    {
-      "id": "TRISTATE_FIXTURES_PASS",
-      "ok": true,
-      "detail": ""
+      "detail": "{\"schemaVersion\":\"orbit360-auth-foundation-all-team-source-only-fixtures-v1\",\"ok\":true,\"checks\":{\"validSeven\":true,\"functionalProfiles\":true,\"actionCoverage\":true,\"dynamicExistingMissingMix\":true,\"noGenericNameHardcode\":true,\"countFailure\":true,\"duplicateFailure\":true,\"bootstrapAdminFailure\":true,\"futurePath\":true},\"currentUsersCovered\":7,\"expectedCurrentUsers\":7,\"functionalProfilesCovered\":3,\"futureUserPathSupported\":true,\"negativeCases\":3,\"operationalCapabilitiesUsed\":0,\"containsPII\":false,\"containsSecrets\":false}"
     },
     {
       "id": "SOURCE_FIXTURES_ZERO_CAPABILITIES",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "WORKFLOW_NEW_PATH",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "WORKFLOW_ZERO_CAPABILITIES",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "WORKFLOW_CANONICAL_GATE",
       "ok": true,
       "detail": ""
     }
@@ -192,31 +177,41 @@
   "browserExecuted": false,
   "deployExecuted": false,
   "productionTouched": false,
-  "priorRequestsVerified": 5,
-  "actorAuthorizationParityValidated": true,
-  "callableErrorPropagationValidated": true,
-  "conditionalEvidencePersistenceValidated": true,
-  "triStateIntegrityValidated": true,
-  "futureRuntimeRequestAbsent": true,
+  "currentUsersCovered": 7,
+  "expectedCurrentUsers": 7,
+  "functionalProfilesCovered": 3,
+  "futureUserPathSupported": true,
+  "bootstrapSeparatedFromNormalOnboarding": true,
+  "runtimeV7Absent": true,
   "sourceFixtures": {
+    "schemaVersion": "orbit360-auth-foundation-all-team-source-only-fixtures-v1",
     "ok": true,
-    "actorParityCases": 2,
-    "actorRejectionCases": 1,
-    "callableErrorPropagationCases": 1,
-    "evidencePersistenceCases": 3,
-    "integrityStatesVerified": [
-      "VERIFIED_UNCHANGED",
-      "VERIFIED_CHANGED",
-      "NOT_POSTVERIFIED"
-    ],
-    "operationalCapabilitiesUsed": 0
+    "checks": {
+      "validSeven": true,
+      "functionalProfiles": true,
+      "actionCoverage": true,
+      "dynamicExistingMissingMix": true,
+      "noGenericNameHardcode": true,
+      "countFailure": true,
+      "duplicateFailure": true,
+      "bootstrapAdminFailure": true,
+      "futurePath": true
+    },
+    "currentUsersCovered": 7,
+    "expectedCurrentUsers": 7,
+    "functionalProfilesCovered": 3,
+    "futureUserPathSupported": true,
+    "negativeCases": 3,
+    "operationalCapabilitiesUsed": 0,
+    "containsPII": false,
+    "containsSecrets": false
   },
   "containsPII": false,
   "containsSecrets": false,
   "ok": true,
   "canonicalEntrypoint": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
-  "canonicalEngine": "tools/orbit360-validar-gate-contracts-engine-auth-access-recovery-source-only-v6-20260805.mjs",
-  "canonicalLifecycleContract": "tools/orbit360-validator-lifecycle-contract-auth-access-recovery-source-only-v6-20260805.json",
+  "canonicalEngine": "tools/orbit360-validar-gate-contracts-engine-auth-foundation-all-team-source-only-v20260805.mjs",
+  "canonicalLifecycleContract": "tools/orbit360-validator-lifecycle-contract-auth-foundation-all-team-source-only-v20260805.json",
   "canonicalLifecycleComposition": "phase-capability-contract-v1",
   "engineEvidenceSource": "sync-file-evidence-not-stdout-v1",
   "engineStdoutParsed": false,
