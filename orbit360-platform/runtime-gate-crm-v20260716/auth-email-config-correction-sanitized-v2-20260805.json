@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "orbit360-auth-email-config-correction-sanitized-v2",
+  "stage": "NOT_EXECUTED",
+  "classification": "PENDING_AUTHORIZED_EXECUTION",
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "membershipWrites": 0,
+  "crmWrites": 0,
+  "containsPII": false,
+  "containsSecrets": false,
+  "ok": false
+}
