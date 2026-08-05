@@ -1,0 +1,57 @@
+{
+  "schemaVersion": "orbit360-block12-visual-cdp-rootcause-v1",
+  "sourceRunId": 30967972527,
+  "sourceHead": "0286c7293f7bcaf489675083bc8a64ea48922a59",
+  "gateId": "block12-operational-runtime-lab-v20260804",
+  "contractVersionObserved": "12.0.9",
+  "preflight": {
+    "status": "GO_GATE_CONTRACT",
+    "passed": 26,
+    "failed": 0
+  },
+  "stages": {
+    "functionsDeploy": "PASS",
+    "hostingPreview": "PASS",
+    "visualStep": "COMPLETED_WITH_FAIL_EVIDENCE",
+    "integrity": "PASS"
+  },
+  "visual": {
+    "status": "CUMULATIVE_VISUAL_LAB_FAIL",
+    "classification": "PIPELINE_MECHANISM_FAILURE",
+    "passedRoutesBeforeFailure": [
+      "cliente360",
+      "aseguradoras"
+    ],
+    "firstFailedRoute": "polizas",
+    "failureCode": "PLAYWRIGHT_PAGE_SCREENSHOT_TIMEOUT",
+    "failureDetail": "page.screenshot exceeded 20000 ms while disabling CSS animations",
+    "pageErrors": 0,
+    "functionalRegressionDemonstrated": false
+  },
+  "integrity": {
+    "status": "VISUAL_READONLY_INTEGRITY_PASS",
+    "unchanged": true,
+    "firestoreWrites": 0,
+    "authWrites": 0
+  },
+  "cleanup": {
+    "functionsKept": false,
+    "hostingPreviewKept": false
+  },
+  "stopRetry": {
+    "activeForPlaywrightPageScreenshot": true,
+    "sameMechanismWillNotBeRetried": true,
+    "replacementMechanism": "CHROMIUM_CDP_PAGE_CAPTURE_SCREENSHOT",
+    "syntheticMechanismTestRequiredBeforeDeploy": true
+  },
+  "rulesDeployed": false,
+  "syntheticTenantCreated": false,
+  "realTenantWrites": 0,
+  "realDataReimported": false,
+  "productionTouched": false,
+  "mainTouched": false,
+  "mergeExecuted": false,
+  "containsPII": false,
+  "containsSecrets": false,
+  "ok": true
+}
