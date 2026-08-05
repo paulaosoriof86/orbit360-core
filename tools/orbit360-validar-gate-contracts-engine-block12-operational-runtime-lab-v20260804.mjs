@@ -33,7 +33,10 @@ const REQUIRED = [
   'tools/orbit360-block12-visual-readonly-integrity-v20260804.mjs',
   'tools/orbit360-materializar-block12-visual-rootfix-v20260804.mjs',
   '.github/workflows/orbit360-block12-visual-reactivation-lab-v20260804.yml',
-  'orbit360-platform/docs/CIERRE-BLOQUE12-RUNTIME-FUNCIONAL-Y-ROOTFIX-VISUAL-20260804.md'
+  'orbit360-platform/docs/CIERRE-BLOQUE12-RUNTIME-FUNCIONAL-Y-ROOTFIX-VISUAL-20260804.md',
+  'tools/orbit360-validar-cdp-screenshot-sintetico-v20260804.mjs',
+  'orbit360-platform/runtime-gate-crm-v20260716/block12-cdp-screenshot-synthetic.json',
+  'orbit360-platform/runtime-gate-crm-v20260716/block12-visual-cdp-rootcause-v20260804.json'
 ];
 const EXPECTED_FUNCTIONS = [
   'orbit360OpsLeadsCommandLabV20260804',
@@ -74,7 +77,8 @@ try {
   add('VISUAL_DEPLOY_PIPELINE', scope.artifactCleanupPolicyAutomatic === true && scope.postDeployFunctionVerificationRequired === true && rootfixWorkflow.includes('firebase deploy') && rootfixWorkflow.includes('--force') && rootfixWorkflow.includes('test \"$VERIFIED\" = 4') && rootfixWorkflow.includes('VISUAL_READONLY_INTEGRITY_PASS') && rootfixWorkflow.includes('functions:delete') && rootfixWorkflow.includes('hosting:channel:delete'));
   const harness = readText('tools/orbit360-block12-operational-runtime-lab-v20260804.mjs');
   const visualHarness = readText('tools/orbit360-block12-cumulative-visual-v20260804.mjs');
-  add('VISUAL_HARNESS_ROOTFIX', scope.visualViewportCaptureRequired === true && scope.visualAnimationsDisabledRequired === true && scope.visualBrowserCloseFinallyRequired === true && visualHarness.includes('fullPage: false') && visualHarness.includes("animations: 'disabled'") && visualHarness.includes("reducedMotion: 'reduce'") && visualHarness.includes('VISUAL_SCREENSHOT_${route}') && visualHarness.includes('if (page) await page.close().catch') && visualHarness.includes('if (browser) await browser.close().catch') && rootfixWorkflow.includes('timeout --signal=TERM --kill-after=15s 240s'));
+  const cdpEvidence = readJson('orbit360-platform/runtime-gate-crm-v20260716/block12-cdp-screenshot-synthetic.json');
+  add('CDP_VISUAL_HARNESS_ROOTFIX', scope.visualViewportCaptureRequired === true && scope.visualAnimationsDisabledRequired === true && scope.visualBrowserCloseFinallyRequired === true && visualHarness.includes('newCDPSession(page)') && visualHarness.includes('Page.captureScreenshot') && visualHarness.includes('captureBeyondViewport: false') && !visualHarness.includes('page.screenshot(') && visualHarness.includes('CDP_SCREENSHOT_${route}_TIMEOUT') && visualHarness.includes('isPng(png)') && visualHarness.includes('if (cdp) await cdp.detach().catch') && visualHarness.includes('if (browser) await browser.close().catch') && cdpEvidence.status === 'CDP_SCREENSHOT_SYNTHETIC_PASS' && cdpEvidence.classification === 'GO_PIPELINE_MECHANISM' && cdpEvidence.captureEngine === 'chromium-cdp' && cdpEvidence.deployExecuted === false && cdpEvidence.ok === true);
   const loader = readText('orbit360-platform/core/backend-lab-loader.js');
   const index = readText('orbit360-platform/index.html');
   add('REAL_TENANT_VISUAL_LOADER_CONTRACT', request.scope.syntheticTenant === false && forbidden.syntheticTenant === true && loader.includes("var allowedTenants = ['alianzas-soluciones']") && loader.includes('isOperationalVerificationPreviewHost') && loader.includes("requestedTenant = params.get('tenant') || 'alianzas-soluciones'") && index.includes('backend-lab-loader.js?v=20260804-operational-rootfix9'));
