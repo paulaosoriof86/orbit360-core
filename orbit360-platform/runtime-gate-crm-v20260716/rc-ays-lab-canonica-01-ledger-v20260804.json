@@ -2,7 +2,7 @@
   "schemaVersion": "orbit360-rc-ays-canonical-ledger-v1",
   "rcId": "RC-AYS-LAB-CANONICA-01",
   "createdAt": "2026-08-04T21:38:00-06:00",
-  "updatedAt": "2026-08-04T21:43:00-06:00",
+  "updatedAt": "2026-08-04T21:47:00-06:00",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
@@ -14,6 +14,9 @@
   "planCommit": "79ebbd0c5edeb9bed09f733d54eb8c14393d56ba",
   "ledgerPath": "orbit360-platform/runtime-gate-crm-v20260716/rc-ays-lab-canonica-01-ledger-v20260804.json",
   "ledgerInitialCommit": "f55529562d58ad615fb3b91b88571b8591be15b9",
+  "microblock10ClosureCommit": "549350f3deea720849a7c0dd309ecbb36c4e5808",
+  "microblock11OpenCommit": "8420add0447a2b0d6de044fce46e5c38921a8d33",
+  "baselineReconciliationInitialCommit": "c2a71321e2b6e1d63b370adba7a70c1cb6496d19",
   "prAnchor": {
     "title": "draft: RC-AYS-LAB-CANONICA-01 · salida acumulativa A&S",
     "updated": true,
@@ -63,6 +66,7 @@
       "evidence": [
         "planCommit:79ebbd0c5edeb9bed09f733d54eb8c14393d56ba",
         "ledgerInitialCommit:f55529562d58ad615fb3b91b88571b8591be15b9",
+        "closureCommit:549350f3deea720849a7c0dd309ecbb36c4e5808",
         "PR#5 title and body anchored to RC-AYS-LAB-CANONICA-01"
       ],
       "writesToRealData": 0,
@@ -75,6 +79,17 @@
       "name": "Reconciliacion forense focalizada del baseline",
       "status": "IN_PROGRESS",
       "gate": "PASS_CANONICAL_BASELINE",
+      "evidence": [
+        "openCommit:8420add0447a2b0d6de044fce46e5c38921a8d33",
+        "initialReportCommit:c2a71321e2b6e1d63b370adba7a70c1cb6496d19",
+        "index inspected at sourceBaseline"
+      ],
+      "confirmedInitialFindings": [
+        "PR stale runtime statement corrected",
+        "backend loader, adapter, store, auth, access and router scripts identified",
+        "base operational modules identified",
+        "multiple overlays and bridges identified for owner classification"
+      ],
       "scope": [
         "owners",
         "scripts loaded by index",
@@ -145,7 +160,7 @@
   ],
   "currentClassification": "PIPELINE_MECHANISM_FAILURE",
   "currentOwner": "canonical baseline, owners and loaded-source reconciliation",
-  "exactNextAction": "Inventory the actual owners, scripts loaded by index, active bridges, accepted module versions and observed data counts on the frozen baseline; produce one sanitized reconciliation report and close PASS_CANONICAL_BASELINE without Firebase, secrets, deploy or real-data writes.",
+  "exactNextAction": "Complete the matrix route -> owner -> base script -> overlay -> consumer -> evidence -> classification -> action, beginning with Router, Access, Cliente 360 and Aseguradoras; then reconcile observed counts and close PASS_CANONICAL_BASELINE without Firebase, secrets, deploy or real-data writes.",
   "containsPII": false,
   "containsSecrets": false
 }
