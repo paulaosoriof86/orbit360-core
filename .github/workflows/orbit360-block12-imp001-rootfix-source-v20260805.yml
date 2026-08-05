@@ -1,0 +1,214 @@
+name: Orbit 360 · Block 12 · IMP-001 rootfix source y continuidad
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-requests/block12-imp001-rootfix-source-v20260805.json'
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: orbit360-block12-imp001-rootfix-source-v20260805
+  cancel-in-progress: false
+
+env:
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  ORBIT360_SOURCE_REQUEST: .github/orbit360-requests/block12-imp001-rootfix-source-v20260805.json
+  ORBIT360_RUNTIME_REQUEST: .github/orbit360-requests/block12-operational-runtime-lab-rootfix9-resume-v20260804.json
+  ORBIT360_MARKER: orbit360-platform/runtime-gate-crm-v20260716/block12-rootfix9-resume-materialization.json
+  ORBIT360_SOURCE_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/block12-imp001-idempotency-rootfix-source.json
+
+jobs:
+  source-rootfix-and-chain:
+    name: Source PASS → marker → runtime request
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout solicitud exacta
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 5
+          persist-credentials: true
+
+      - name: Preparar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verificar autorización source-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
+          test "${#CHANGED[@]}" = '1'
+          test "${CHANGED[0]}" = "$ORBIT360_SOURCE_REQUEST"
+          PARENT="$(git rev-parse HEAD^)"
+          jq -e --arg parent "$PARENT" '
+            .schemaVersion=="orbit360-block12-imp001-rootfix-source-request-v1" and
+            .status=="AUTHORIZED_SOURCE_ONLY" and
+            .approved==true and
+            .allowedExecutions==1 and
+            .consumed==false and
+            .replayAllowed==false and
+            .branch=="ays/backend-tenant-lab-v99-20260703" and
+            .previousRuntimeRunId==30961956480 and
+            .previousFailureCode=="IMP-001" and
+            .previousPassed==10 and
+            .previousFailed==1 and
+            .previousRollbackExact==true and
+            .previousRealTenantUnchanged==true and
+            .parentHead==$parent and
+            .secrets==false and
+            .firebaseCommands==false and
+            .firestoreRead==false and
+            .firestoreWrites==0 and
+            .authWrites==0 and
+            .deploy==false and
+            .production==false and
+            .main==false and
+            .merge==false
+          ' "$ORBIT360_SOURCE_REQUEST" >/dev/null
+
+      - name: Materializar y validar IMP-001 sin Firebase
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-materializar-imp001-idempotency-rootfix-v20260805.mjs
+          node tools/orbit360-materializar-imp001-idempotency-rootfix-v20260805.mjs
+          node --check functions/recurring-insurance-import.js
+          node --check tools/orbit360-validar-gate-contracts-engine-block12-operational-runtime-lab-v20260804.mjs
+          node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
+          node - <<'NODE'
+          const fs = require('fs');
+          const source = fs.readFileSync('functions/recurring-insurance-import.js','utf8');
+          const engine = fs.readFileSync('tools/orbit360-validar-gate-contracts-engine-block12-operational-runtime-lab-v20260804.mjs','utf8');
+          const evidence = JSON.parse(fs.readFileSync(process.env.ORBIT360_SOURCE_EVIDENCE,'utf8'));
+          const wrong = 'Object.assign({ reused: true }, priorReq.data().result || {})';
+          const correct = 'Object.assign({}, priorReq.data().result || {}, { reused: true })';
+          const checks = {
+            wrongPatternAbsent: !source.includes(wrong),
+            correctedPatternPresent: source.includes(correct),
+            gateCheckPresent: engine.includes("add('IMPORT_IDEMPOTENCY_RESPONSE'"),
+            evidencePass: evidence.status === 'IMP001_IDEMPOTENCY_RESPONSE_SOURCE_PASS' && evidence.ok === true
+          };
+          const failed = Object.entries(checks).filter(([,ok]) => !ok).map(([id]) => id);
+          if (failed.length) throw new Error(`FUNCTIONAL_DEFECT:IMP001_SOURCE_CHECK:${failed.join(',')}`);
+          console.log(JSON.stringify({status:'IMP001_SOURCE_STATIC_PASS',checks,secretsRead:false,firebaseCommandsExecuted:false,firestoreRead:false,firestoreWrites:0,authWrites:0,deployExecuted:false,ok:true},null,2));
+          NODE
+          git diff --check
+          test -z "$(git diff --name-only -- firestore.rules data/store.js orbit360-platform/data/store.js orbit360-platform/data/store-firestore-lab.local.js orbit360-platform/core/auth.js)"
+
+      - name: Sellar correctivo source
+        id: source_commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add \
+            functions/recurring-insurance-import.js \
+            tools/orbit360-validar-gate-contracts-engine-block12-operational-runtime-lab-v20260804.mjs \
+            "$ORBIT360_SOURCE_EVIDENCE"
+          git commit -m 'fix(import): preserve reused true in idempotent responses'
+          git push origin HEAD:"$ORBIT360_BRANCH"
+          SOURCE_HEAD="$(git rev-parse HEAD)"
+          echo "source_head=$SOURCE_HEAD" >> "$GITHUB_OUTPUT"
+
+      - name: Crear marcador nuevo de continuidad
+        id: marker_commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs = require('fs');
+          const path = process.env.ORBIT360_MARKER;
+          const value = {
+            schemaVersion: 'orbit360-block12-rootfix9-resume-materialization-v2',
+            status: 'PENDING_IMP001_RUNTIME_RERUN',
+            previousRuntimeRunId: 30961956480,
+            previousFailureCode: 'IMP-001',
+            previousPassed: 10,
+            previousFailed: 1,
+            previousRollbackExact: true,
+            previousRealTenantUnchanged: true,
+            imp001RootCause: 'REUSED_TRUE_OVERWRITTEN_BY_PRIOR_RESULT_FALSE',
+            imp001SourceFixStatus: 'IMP001_IDEMPOTENCY_RESPONSE_SOURCE_PASS',
+            sourceFixHead: process.env.SOURCE_HEAD,
+            secretsRead: false,
+            firebaseCommandsExecuted: false,
+            firestoreRead: false,
+            firestoreWrites: 0,
+            authWrites: 0,
+            deployExecuted: false,
+            ok: false
+          };
+          fs.mkdirSync(require('path').dirname(path), {recursive:true});
+          fs.writeFileSync(path, JSON.stringify(value,null,2)+'\n','utf8');
+          NODE
+          git add "$ORBIT360_MARKER"
+          git commit -m 'gate(block12): stage IMP-001 runtime continuation'
+          git push origin HEAD:"$ORBIT360_BRANCH"
+          MARKER_HEAD="$(git rev-parse HEAD)"
+          echo "marker_head=$MARKER_HEAD" >> "$GITHUB_OUTPUT"
+        env:
+          SOURCE_HEAD: ${{ steps.source_commit.outputs.source_head }}
+
+      - name: Encadenar runtime existente
+        shell: bash
+        env:
+          MARKER_HEAD: ${{ steps.marker_commit.outputs.marker_head }}
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs = require('fs');
+          const path = process.env.ORBIT360_RUNTIME_REQUEST;
+          const request = JSON.parse(fs.readFileSync(path,'utf8'));
+          Object.assign(request, {
+            parentHead: process.env.MARKER_HEAD,
+            latestFunctionalRunId: 30961956480,
+            latestFunctionalFailureCode: 'IMP-001',
+            latestFunctionalPassed: 10,
+            latestFunctionalFailed: 1,
+            latestRollbackExact: true,
+            latestRealTenantUnchanged: true,
+            imp001RootCause: 'REUSED_TRUE_OVERWRITTEN_BY_PRIOR_RESULT_FALSE',
+            imp001SourceFixStatus: 'IMP001_IDEMPOTENCY_RESPONSE_SOURCE_PASS'
+          });
+          fs.writeFileSync(path, JSON.stringify(request,null,2)+'\n','utf8');
+          NODE
+          jq -e --arg parent "$MARKER_HEAD" '
+            .parentHead==$parent and
+            .latestFunctionalRunId==30961956480 and
+            .latestFunctionalFailureCode=="IMP-001" and
+            .latestFunctionalPassed==10 and
+            .latestFunctionalFailed==1 and
+            .latestRollbackExact==true and
+            .latestRealTenantUnchanged==true and
+            .imp001RootCause=="REUSED_TRUE_OVERWRITTEN_BY_PRIOR_RESULT_FALSE" and
+            .imp001SourceFixStatus=="IMP001_IDEMPOTENCY_RESPONSE_SOURCE_PASS"
+          ' "$ORBIT360_RUNTIME_REQUEST" >/dev/null
+          git add "$ORBIT360_RUNTIME_REQUEST"
+          test "$(git diff --cached --name-only | wc -l)" = '1'
+          test "$(git diff --cached --name-only)" = "$ORBIT360_RUNTIME_REQUEST"
+          git commit -m 'authorize(block12): resume runtime after IMP-001 rootfix'
+          git push origin HEAD:"$ORBIT360_BRANCH"
+
+      - name: Publicar cierre source-only en PR 5
+        if: always()
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          STATUS="IMP001_SOURCE_ROOTFIX_FAIL"; CLASSIFICATION="FUNCTIONAL_DEFECT"
+          if [ -f "$ORBIT360_SOURCE_EVIDENCE" ]; then
+            STATUS="$(jq -r '.status // "IMP001_SOURCE_ROOTFIX_FAIL"' "$ORBIT360_SOURCE_EVIDENCE")"
+            CLASSIFICATION="$(jq -r '.classification // "FUNCTIONAL_DEFECT"' "$ORBIT360_SOURCE_EVIDENCE")"
+          fi
+          gh api "repos/${GITHUB_REPOSITORY}/issues/5/comments" -f body="## IMP-001 · rootfix source y continuidad · run ${GITHUB_RUN_ID}\n\n- Estado: \`${STATUS}\`\n- Clasificación: \`${CLASSIFICATION}\`\n- Runtime anterior: \`30961956480\` · PASS 10 / FAIL 1\n- Continuidad runtime: encadenada por request si el source cerró en PASS\n- Firebase/Rules/producción/main/merge en este workflow: no" >/dev/null
