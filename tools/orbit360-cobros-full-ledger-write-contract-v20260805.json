@@ -1,7 +1,7 @@
 {
   "schemaVersion": "orbit360-cobros-full-ledger-write-contract-v1",
   "gateId": "block10.10-cobros-full-ledger-write-lab-v20260805",
-  "contractVersion": "10.10.0",
+  "contractVersion": "10.10.1",
   "rcId": "RC-AYS-LAB-CANONICA-01",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -21,7 +21,7 @@
     "propuestasConciliacion": 132,
     "conciliacionHolds": 233,
     "cobrosLedgerRuns": 1,
-    "activeLedgerPointer": 1,
+    "cobrosLedgerControl": 1,
     "maximumWrites": 1097,
     "newCobros": 0,
     "receiptWrites": 0,
@@ -36,13 +36,19 @@
   "holdBreakdown": {
     "reportedPaymentNoUniqueReceiptLink": 233
   },
+  "pathAuthority": {
+    "class": "canonical-v79-data-items",
+    "membershipPathSeparate": "tenants/{tenantId}/members/{uid}",
+    "legacyOperationalPathProhibited": "tenantId/{tenantId}/{collection}",
+    "thirdPathPatternProhibited": true
+  },
   "collections": {
-    "pagosReportados": "tenants/{tenantId}/pagosReportados/{deterministicId}",
-    "evidenciasCobro": "tenants/{tenantId}/evidenciasCobro/{deterministicId}",
-    "propuestasConciliacion": "tenants/{tenantId}/propuestasConciliacion/{deterministicId}",
-    "conciliacionHolds": "tenants/{tenantId}/conciliacionHolds/{deterministicId}",
-    "runManifest": "tenants/{tenantId}/cobrosLedgerRuns/{runId}",
-    "activePointer": "tenants/{tenantId}/configuracion_catalogo/cobrosLedger"
+    "pagosReportados": "tenants/{tenantId}/data/pagosReportados/items/{deterministicId}",
+    "evidenciasCobro": "tenants/{tenantId}/data/evidenciasCobro/items/{deterministicId}",
+    "propuestasConciliacion": "tenants/{tenantId}/data/propuestasConciliacion/items/{deterministicId}",
+    "conciliacionHolds": "tenants/{tenantId}/data/conciliacionHolds/items/{deterministicId}",
+    "runManifest": "tenants/{tenantId}/data/cobrosLedgerRuns/items/{runId}",
+    "activePointer": "tenants/{tenantId}/data/cobrosLedgerControl/items/active"
   },
   "atomicity": {
     "strategy": "STAGE_CHUNKS_THEN_SINGLE_ACTIVE_POINTER",
@@ -95,7 +101,8 @@
     "existingCobrosFivePreserved": true,
     "calendarHoldsFortyFourPreserved": true,
     "receiptPolicyIntegrityUnchanged": true,
-    "crmIntegrityUnchanged": true
+    "crmIntegrityUnchanged": true,
+    "allPathsCanonicalDataItems": true
   },
   "capabilitiesWhenPrepared": {
     "secrets": false,
@@ -112,6 +119,8 @@
     "do not create cobros from proposals or holds",
     "do not modify receipts, policies or financial movements",
     "do not use bank or financial history as direct collection writes",
+    "do not write ledger collections under tenantId legacy path",
+    "do not create a third tenant path pattern",
     "do not deploy Functions, Hosting or Rules",
     "do not touch production, main or merge",
     "do not store real rows, PII, policy numbers, amounts, secrets or passwords in repository evidence"
