@@ -39,7 +39,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
-          fetch-depth: 80
+          fetch-depth: 0
           persist-credentials: false
 
       - name: Preparar Node 22
@@ -81,6 +81,7 @@ jobs:
             .scope.main==false and .scope.merge==false and (.scope.functionNames|length)==4 and
             (.scope.visualRoutes|length)==8 and .scope.readonlyIntegrityBeforeAfter==true
           ' "$ORBIT360_REQUEST_FILE" >/dev/null
+          git cat-file -e "$ORBIT360_SOURCE_BASELINE^{commit}"
           git diff --quiet "$ORBIT360_SOURCE_BASELINE"..HEAD^ -- \
             orbit360-platform/index.html orbit360-platform/core orbit360-platform/modules \
             orbit360-platform/styles orbit360-platform/data functions firebase.json firestore.rules \
