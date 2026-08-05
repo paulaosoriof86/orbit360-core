@@ -1,0 +1,91 @@
+{
+  "schemaVersion": "orbit360-auth-forensic-definitive-solution-v1",
+  "rcId": "RC-AYS-LAB-CANONICA-01",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "auditDate": "2026-08-05T11:51:00-06:00",
+  "runtimeV7": {
+    "authorizedByUserBeforeForensicStop": true,
+    "suspended": true,
+    "requestCreated": false,
+    "runtimeExecuted": false,
+    "secretAccess": false,
+    "firebaseCommands": 0,
+    "firestoreReads": 0,
+    "firestoreWrites": 0,
+    "authReads": 0,
+    "authWrites": 0,
+    "functionsDeploys": 0
+  },
+  "primaryRootCause": {
+    "classification": "FUNCTIONAL_DEFECT",
+    "code": "AUTH_BOOTSTRAP_CIRCULAR_DEPENDENCY_AND_SPLIT_BRAIN_USER_STATE",
+    "summary": "The first real tenant administrator was being recovered through the normal onboarding callable, but that callable requires an already authenticated active administrative membership. Equipo can persist an operational user record before Auth and membership exist, so the two states diverge."
+  },
+  "contributingRootCauses": [
+    {
+      "classification": "PIPELINE_MECHANISM_FAILURE",
+      "code": "TEAM_RECORD_SAVED_BEFORE_AUTH_MEMBERSHIP_WITH_FAIL_SOFT_ASYNC_BRIDGE"
+    },
+    {
+      "classification": "PIPELINE_MECHANISM_FAILURE",
+      "code": "FRONTEND_CAPABILITY_ADVERTISED_WITHOUT_DEPLOYMENT_READINESS_PARITY"
+    },
+    {
+      "classification": "FUNCTIONAL_DEFECT",
+      "code": "PASSWORD_RECOVERY_NOT_EXPOSED_IN_LOGIN"
+    },
+    {
+      "classification": "SECURITY_FAILURE",
+      "code": "LEGACY_DEMO_IDENTITY_HARDCODED_IN_RULES_AND_OVERBROAD_MEMBER_ACCESS"
+    }
+  ],
+  "manualFirebaseConclusion": {
+    "authUserOnlySufficient": false,
+    "authUserAndMembershipCouldTechnicallyWork": true,
+    "recommended": false,
+    "reason": "Manual creation risks UID, role, scope and advisor binding inconsistencies and lacks idempotency, audit and rollback."
+  },
+  "definitiveArchitecture": {
+    "initialBootstrap": "DIRECT_ADMIN_SDK_APPROVED_ROSTER",
+    "normalOnboardingAfterBootstrap": "orbit360ProvisionTeamAccess",
+    "passwordRecovery": "VISIBLE_FIREBASE_PASSWORD_RESET",
+    "teamStateMachine": [
+      "configured",
+      "provisioning",
+      "invitation_pending",
+      "active",
+      "retryable_error",
+      "blocked"
+    ],
+    "securityBeforeProduction": [
+      "remove_demo_identity_from_rules",
+      "enforce_active_membership_role_scope",
+      "retire_demo_identity_after_real_access_pass",
+      "resolve_production_tenant_from_membership"
+    ]
+  },
+  "singleClosureCriteria": {
+    "realIdentities": 3,
+    "activeMemberships": 3,
+    "passwordEmails": 3,
+    "realLoginPasses": 3,
+    "rolesCountriesScopesVerified": true,
+    "teamAuthMembershipLinked": true,
+    "passwordRecoveryVisible": true,
+    "normalSelfServiceOnboardingPass": true,
+    "protectedCrmIntegrity": "VERIFIED_UNCHANGED"
+  },
+  "nextBoundary": {
+    "name": "AUTH_FOUNDATION_SINGLE_MACROBLOCK",
+    "sourceOnlyPreparationFirst": true,
+    "runtimeRequestAbsentUntilCumulativeStaticPass": true,
+    "mustNotUseCallableForFirstAdminBootstrap": true,
+    "mustNotOpenPerPersonGates": true,
+    "newExplicitAuthorizationRequiredAfterSourceOnlyPass": true
+  },
+  "block4Continues": true,
+  "containsPII": false,
+  "containsSecrets": false,
+  "ok": true
+}
