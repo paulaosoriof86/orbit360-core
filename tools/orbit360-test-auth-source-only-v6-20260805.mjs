@@ -18,32 +18,35 @@ const run = (script, env = {}) => spawnSync(process.execPath, [path.join(ROOT, s
   encoding: 'utf8'
 });
 
+const runActorFixture = (name, actor) => {
+  const privateFile = path.join(tmp, `${name}-private.json`);
+  const evidenceFile = path.join(tmp, `${name}-evidence.json`);
+  write(privateFile, { actor });
+  const result = run('tools/orbit360-auth-access-actor-parity-precheck-v6-20260805.mjs', {
+    ORBIT360_AUTH_PRIVATE_STATE: privateFile,
+    ORBIT360_ACTOR_PARITY_EVIDENCE: evidenceFile
+  });
+  return { result, evidence: read(evidenceFile) };
+};
+
 try {
-  const goodPrivate = path.join(tmp, 'actor-good-private.json');
-  const goodEvidence = path.join(tmp, 'actor-good-evidence.json');
-  write(goodPrivate, {
-    actor: {
-      uid: 'contract-fixture-uid',
-      email: 'contract-fixture@example.invalid',
+  const privileged = runActorFixture('actor-privileged', {
+    uid: 'contract-fixture-uid',
+    email: 'contract-fixture@example.invalid',
+    activeRole: 'SuperAdmin',
+    member: {
+      tenantId: 'alianzas-soluciones',
+      status: 'active',
+      roles: ['SuperAdmin'],
+      defaultRole: 'SuperAdmin',
       activeRole: 'SuperAdmin',
-      member: {
-        tenantId: 'alianzas-soluciones',
-        status: 'active',
-        roles: ['SuperAdmin'],
-        defaultRole: 'SuperAdmin',
-        activeRole: 'SuperAdmin',
-        permissions: []
-      }
+      permissions: []
     }
   });
-  const goodRun = run('tools/orbit360-auth-access-actor-parity-precheck-v6-20260805.mjs', {
-    ORBIT360_AUTH_PRIVATE_STATE: goodPrivate,
-    ORBIT360_ACTOR_PARITY_EVIDENCE: goodEvidence
-  });
-  assert.equal(goodRun.status, 0, goodRun.stderr || goodRun.stdout);
-  const goodActor = read(goodEvidence);
-  assert.equal(goodActor.ok, true);
-  assert.deepEqual(goodActor.checks, {
+  assert.equal(privileged.result.status, 0, privileged.result.stderr || privileged.result.stdout);
+  assert.equal(privileged.evidence.ok, true);
+  assert.equal(privileged.evidence.authorizationPath, 'privileged_role');
+  assert.deepEqual(privileged.evidence.checks, {
     tenantMatch: true,
     statusActive: true,
     activeRoleAssigned: true,
@@ -51,32 +54,40 @@ try {
     actorIdentityPresent: true
   });
 
-  const badPrivate = path.join(tmp, 'actor-bad-private.json');
-  const badEvidence = path.join(tmp, 'actor-bad-evidence.json');
-  write(badPrivate, {
-    actor: {
-      uid: 'contract-fixture-uid',
-      email: 'contract-fixture@example.invalid',
-      activeRole: 'Asesor',
-      member: {
-        tenantId: 'alianzas-soluciones',
-        status: 'active',
-        roles: ['SuperAdmin'],
-        defaultRole: 'SuperAdmin',
-        activeRole: 'Asesor',
-        permissions: []
-      }
+  const permitted = runActorFixture('actor-permission', {
+    uid: 'contract-fixture-uid',
+    email: 'contract-fixture@example.invalid',
+    activeRole: 'Operativo',
+    member: {
+      tenantId: 'alianzas-soluciones',
+      status: 'active',
+      roles: ['Operativo'],
+      defaultRole: 'Operativo',
+      activeRole: 'Operativo',
+      permissions: ['team_access_manage']
     }
   });
-  const badRun = run('tools/orbit360-auth-access-actor-parity-precheck-v6-20260805.mjs', {
-    ORBIT360_AUTH_PRIVATE_STATE: badPrivate,
-    ORBIT360_ACTOR_PARITY_EVIDENCE: badEvidence
+  assert.equal(permitted.result.status, 0, permitted.result.stderr || permitted.result.stdout);
+  assert.equal(permitted.evidence.ok, true);
+  assert.equal(permitted.evidence.authorizationPath, 'explicit_permission');
+
+  const rejected = runActorFixture('actor-rejected', {
+    uid: 'contract-fixture-uid',
+    email: 'contract-fixture@example.invalid',
+    activeRole: 'Asesor',
+    member: {
+      tenantId: 'alianzas-soluciones',
+      status: 'active',
+      roles: ['SuperAdmin'],
+      defaultRole: 'SuperAdmin',
+      activeRole: 'Asesor',
+      permissions: []
+    }
   });
-  assert.equal(badRun.status, 41);
-  const badActor = read(badEvidence);
-  assert.equal(badActor.stage, 'STOP_RETRY_ACTOR_AUTHORIZATION_PARITY');
-  assert.equal(badActor.classification, 'DATA_CONTRACT_FAILURE');
-  assert.equal(badActor.checks.activeRoleAssigned, false);
+  assert.equal(rejected.result.status, 41);
+  assert.equal(rejected.evidence.stage, 'STOP_RETRY_ACTOR_AUTHORIZATION_PARITY');
+  assert.equal(rejected.evidence.classification, 'DATA_CONTRACT_FAILURE');
+  assert.equal(rejected.evidence.checks.activeRoleAssigned, false);
 
   const callableError = buildOnboardingCallFailure(403, { error: { status: 'PERMISSION_DENIED' } });
   const callableEvidence = callableFailureEvidence(callableError);
@@ -178,7 +189,7 @@ try {
 
   console.log(JSON.stringify({
     ok: true,
-    actorParityCases: 2,
+    actorParityCases: 3,
     callableErrorPropagationCases: 1,
     evidencePersistenceCases: 3,
     integrityStatesVerified: ['VERIFIED_UNCHANGED', 'VERIFIED_CHANGED', 'NOT_POSTVERIFIED'],
