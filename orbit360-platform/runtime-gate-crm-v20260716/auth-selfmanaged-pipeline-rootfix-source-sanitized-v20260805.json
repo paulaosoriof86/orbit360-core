@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "orbit360-auth-selfmanaged-pipeline-rootfix-source-test-v1",
+  "status": "PASS_AUTH_PIPELINE_ROOTFIX_SOURCE_ONLY",
+  "classification": "SOURCE_ONLY_ROOTFIX_VERIFIED",
+  "total": 13,
+  "passed": 13,
+  "failed": 0,
+  "failedCheckIds": [],
+  "checks": [
+    {
+      "id": "VALIDATOR_NO_GLOBAL_PRODUCTION_WORD_SCAN",
+      "ok": true
+    },
+    {
+      "id": "VALIDATOR_DEPLOY_DESTINATION_SCAN",
+      "ok": true
+    },
+    {
+      "id": "OWNER_INVALIDATES_STALE_EVIDENCE",
+      "ok": true
+    },
+    {
+      "id": "OWNER_LEDGER_STARTED_PASS_FAIL",
+      "ok": true
+    },
+    {
+      "id": "OWNER_SINGLE_SOURCE_PIPELINE",
+      "ok": true
+    },
+    {
+      "id": "SEALER_CURRENT_RUN_ONLY",
+      "ok": true
+    },
+    {
+      "id": "SEALER_REJECTS_STALE_COUNTS",
+      "ok": true
+    },
+    {
+      "id": "WORKFLOW_DYNAMIC_NEW_REQUEST",
+      "ok": true
+    },
+    {
+      "id": "WORKFLOW_OWNER_BEFORE_SECRET",
+      "ok": true
+    },
+    {
+      "id": "WORKFLOW_ONLY_TWO_LAB_DEPLOYS",
+      "ok": true
+    },
+    {
+      "id": "WORKFLOW_NO_RULES_DEPLOY",
+      "ok": true
+    },
+    {
+      "id": "SOURCE_WORKFLOW_NO_SECRETS",
+      "ok": true
+    },
+    {
+      "id": "SOURCE_WORKFLOW_STATIC_ONLY",
+      "ok": true
+    }
+  ],
+  "secretsRead": false,
+  "firebaseExecuted": false,
+  "firestoreReads": 0,
+  "firestoreWrites": 0,
+  "authReads": 0,
+  "authWrites": 0,
+  "deploys": 0,
+  "productionTouched": false,
+  "containsPII": false,
+  "containsSecrets": false,
+  "containsPasswords": false,
+  "ok": true
+}
