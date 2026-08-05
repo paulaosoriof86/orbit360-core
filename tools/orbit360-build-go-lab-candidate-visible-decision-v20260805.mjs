@@ -18,7 +18,9 @@ const bool = (name, fallback = false) => {
   throw new Error(`PIPELINE_MECHANISM_FAILURE:INVALID_BOOLEAN_${name}`);
 };
 
-const functionsVerified = integer('FUNCTIONS_VERIFIED', 0);
+const functionsVerifiedRaw = String(process.env.FUNCTIONS_VERIFIED ?? '0').trim();
+const functionsVerified = Number.parseInt(functionsVerifiedRaw, 10);
+if (!Number.isInteger(functionsVerified)) throw new Error('PIPELINE_MECHANISM_FAILURE:INVALID_INTEGER_FUNCTIONS_VERIFIED');
 if (functionsVerified < 0 || functionsVerified > 4) throw new Error('PIPELINE_MECHANISM_FAILURE:FUNCTIONS_VERIFIED_OUT_OF_RANGE');
 const functionsExpected = integer('FUNCTIONS_EXPECTED', 4);
 if (functionsExpected !== 4) throw new Error('DATA_CONTRACT_FAILURE:FUNCTIONS_EXPECTED_MUST_BE_FOUR');
