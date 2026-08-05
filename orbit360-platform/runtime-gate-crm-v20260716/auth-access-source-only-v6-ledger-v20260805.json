@@ -1,0 +1,45 @@
+{
+  "schemaVersion": "orbit360-auth-access-source-only-v6-ledger-v1",
+  "rcId": "RC-AYS-LAB-CANONICA-01",
+  "gateId": "block-auth-access-recovery-source-only-v6-20260805",
+  "contractVersion": "13.5.0",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "status": "READY_AWAITING_SINGLE_FILE_REQUEST",
+  "authorization": {
+    "reference": "user_authorized_auth_access_source_only_v6_20260805T1133-0600",
+    "allowedExecutions": 1,
+    "consumed": false,
+    "replayAllowed": false
+  },
+  "priorRequests": {
+    "verifiedCount": 5,
+    "mustRemainImmutable": true
+  },
+  "validation": {
+    "actorParity": "pending",
+    "callableErrorPropagation": "pending",
+    "conditionalEvidencePersistence": "pending",
+    "triStateIntegrity": "pending"
+  },
+  "capabilities": {
+    "secrets": false,
+    "firebase": false,
+    "firestore": false,
+    "auth": false,
+    "functions": false,
+    "hosting": false,
+    "browser": false,
+    "deploy": false,
+    "rules": false,
+    "reimport": false,
+    "crm": false,
+    "production": false,
+    "main": false,
+    "merge": false
+  },
+  "futureRuntimeRequest": ".github/orbit360-requests/auth-access-recovery-lab-v7-20260805.json",
+  "futureRuntimeRequestPresent": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
