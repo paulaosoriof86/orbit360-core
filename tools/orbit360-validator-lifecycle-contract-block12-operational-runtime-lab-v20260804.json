@@ -1,9 +1,12 @@
 {
   "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
-  "validatorLifecycleRevision": "isolated-context-direct-url-v6",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
+  "visualHarnessRevision": "isolated-context-direct-url-v6",
+  "controlPlaneRevision": "canonical-preflight-composition-source-only-v1",
   "gateId": "block12-operational-runtime-lab-v20260804",
   "gateContractVersion": "12.0.11",
   "status": "OPERATIONAL_RUNTIME_LAB_ISOLATED_VISUAL_READY",
+  "runtimeActivationState": "STOPPED_AWAITING_NEW_EXPLICIT_AUTHORIZATION",
   "singleGate": true,
   "macroClosure": true,
   "executionProfile": {
@@ -21,16 +24,14 @@
     }
   },
   "authorization": {
-    "source": "user_authorized_microblock_2_1_20260804T2207-0600",
-    "allowedExecutions": 1,
+    "source": "NO_ACTIVE_RUNTIME_AUTHORIZATION",
+    "status": "CONSUMED_STOP_RETRY_DEFINITIVE",
+    "allowedExecutions": 0,
+    "consumed": true,
     "replayAllowed": false,
-    "correctiveContinuationAllowed": true,
-    "preflightFailureRunId": 30974443335,
-    "preflightFailureClassification": "VALIDATOR_STALE",
-    "preflightFailedChecks": [
-      "REQUEST_ACTIVE",
-      "VIDEO_LAYOUTFREE_HARNESS"
-    ],
+    "newExplicitAuthorizationRequired": true,
+    "authorizedAttemptRunIds": [30974443335, 30974745085],
+    "administrativeRejectedRunId": 30975037529,
     "previousAttemptSecretAccess": false,
     "previousAttemptFirestoreRead": false,
     "previousAttemptDeploy": false,
@@ -47,7 +48,23 @@
     "previousRollbackExact": true,
     "previousRealTenantUnchanged": true,
     "functionalReplayForbidden": true,
-    "request": ".github/orbit360-requests/block12-operational-runtime-layoutfree-lab-v20260804.json"
+    "consumedRequest": ".github/orbit360-requests/block12-operational-runtime-layoutfree-lab-v20260804.json",
+    "futureRuntimeRequestTemplate": ".github/orbit360-requests/block12-go-lab-candidate-visible-v3.json",
+    "consumptionLedger": "orbit360-platform/runtime-gate-crm-v20260716/rc-ays-lab-canonica-01-ledger-v20260804.json",
+    "triggerRequestImmutable": true
+  },
+  "sourceOnlyValidation": {
+    "gate": "PASS_CANONICAL_PREFLIGHT_COMPOSITION",
+    "fixtureAuthorizationRef": "source_only_fixture_microblock22",
+    "fixtureRequest": "tools/fixtures/orbit360-block12-go-lab-candidate-visible-source-only-fixture-v20260805.json",
+    "validator": "tools/orbit360-validar-canonical-preflight-composition-source-only-v20260805.mjs",
+    "outerRouterRequired": true,
+    "innerEngineRequired": true,
+    "runtimeExecutionAuthorized": false,
+    "secretAccessAuthorized": false,
+    "firebaseAuthorized": false,
+    "browserAuthorized": false,
+    "deployAuthorized": false
   },
   "scope": {
     "projectId": "ays-orbit-360-lab",
@@ -105,6 +122,8 @@
     "merge": true,
     "nonAllowlistedFunctions": true,
     "inPageHashNavigation": true,
-    "newVisualWorkflowVariant": true
+    "newVisualWorkflowVariant": true,
+    "runtimeWithoutNewAuthorization": true,
+    "mutatingConsumedTriggerRequest": true
   }
 }
