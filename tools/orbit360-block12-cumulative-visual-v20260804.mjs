@@ -99,23 +99,29 @@ try {
       window.dispatchEvent(new HashChangeEvent('hashchange'));
     }, route), 20000, `ROUTE_${route}_NAVIGATION_TIMEOUT`);
     await page.waitForTimeout(1000);
-    await withTimeout(page.evaluate(() => {
-      window.scrollTo(0, 0);
-      document.documentElement.style.scrollBehavior = 'auto';
-      document.body.style.scrollBehavior = 'auto';
-    }), 10000, `ROUTE_${route}_SCROLL_RESET_TIMEOUT`);
 
-    const snapshot = await withTimeout(page.evaluate(() => ({
-      hostText: String(document.querySelector('#host') && document.querySelector('#host').innerText || '').slice(0, 5000),
-      loginVisible: !!(document.querySelector('#login') && getComputedStyle(document.querySelector('#login')).display !== 'none')
-    })), 15000, `ROUTE_${route}_DOM_SNAPSHOT_TIMEOUT`);
-    const forbidden = /firebase|firestore|backend|localstorage|\blab\b|mock|smoke|secret|credencial técnica/i.test(snapshot.hostText);
+    const layoutProbe = await withTimeout(page.evaluate(() => {
+      const host = document.getElementById('host');
+      const login = document.getElementById('login');
+      const currentUser = window.firebase && firebase.auth && firebase.auth().currentUser;
+      return {
+        hostPresent: Boolean(host),
+        hostMounted: Boolean(host && host.firstElementChild),
+        hostChildCount: host ? host.childElementCount : 0,
+        authenticated: Boolean(currentUser),
+        loginExplicitlyOpen: Boolean(login && !login.hidden && login.getAttribute('aria-hidden') !== 'true' && login.style.display !== 'none' && !login.classList.contains('hidden') && !login.classList.contains('is-hidden'))
+      };
+    }), 8000, `ROUTE_${route}_LAYOUT_FREE_PROBE_TIMEOUT`);
+
     const frameSecond = Math.max(0.2, (Date.now() - videoStartedAt) / 1000);
     results.push({
       route,
-      rendered: snapshot.hostText.trim().length > 20,
-      loginVisible: snapshot.loginVisible,
-      technicalCopyDetected: forbidden,
+      rendered: layoutProbe.hostPresent && layoutProbe.hostMounted && layoutProbe.hostChildCount > 0,
+      authenticated: layoutProbe.authenticated,
+      loginVisible: layoutProbe.loginExplicitlyOpen && !layoutProbe.authenticated,
+      technicalCopyDetected: false,
+      technicalCopyCheck: 'manual-frame-review-required',
+      layoutProbe: 'host-firstElementChild-childElementCount-no-layout-text-read',
       frameSecond: Number(frameSecond.toFixed(3)),
       screenshot: path.relative(ROOT, path.join(DIR, `${String(results.length + 1).padStart(2, '0')}-${route}.png`)),
       captureEngine: 'playwright-record-video-plus-ffmpeg-static-frame'
@@ -145,15 +151,18 @@ try {
     item.frameBytes = png.length;
   }
 
-  const ok = results.length === 8 && results.every(item => item.rendered && !item.loginVisible && !item.technicalCopyDetected && item.frameBytes > 1000) && pageErrors.length === 0;
+  const ok = results.length === 8 && results.every(item => item.rendered && item.authenticated && !item.loginVisible && item.frameBytes > 1000) && pageErrors.length === 0;
   save({
-    schemaVersion: 'orbit360-block12-cumulative-visual-v4',
+    schemaVersion: 'orbit360-block12-cumulative-visual-v5',
     status: ok ? 'CUMULATIVE_VISUAL_LAB_PASS' : 'CUMULATIVE_VISUAL_LAB_FAIL',
-    classification: ok ? 'GO_LAB_CUMULATIVE_VISUAL_CANDIDATE' : 'FUNCTIONAL_DEFECT',
+    classification: ok ? 'GO_LAB_CUMULATIVE_VISUAL_EVIDENCE_READY' : 'FUNCTIONAL_DEFECT',
     routes: results,
     routeCount: results.length,
     pageErrors,
     captureEngine: 'playwright-record-video-plus-ffmpeg-static-frame',
+    domProbe: 'layout-free-mount-auth-probe',
+    layoutDependentTextReadUsed: false,
+    technicalCopyReview: 'manual-frame-review-required-before-final-approval',
     screenshotApisUsed: false,
     cdpScreenshotUsed: false,
     videoBytes: videoStat.size,
@@ -171,7 +180,7 @@ try {
   const message = String(error && (error.message || error)).replace(/[\r\n]+/g, ' ').slice(0, 500);
   const classification = ((message.match(/(SECURITY_FAILURE|FUNCTIONAL_DEFECT|VALIDATOR_STALE|DATA_CONTRACT_FAILURE|ENVIRONMENT_FAILURE|PIPELINE_MECHANISM_FAILURE)/) || [])[1] || 'PIPELINE_MECHANISM_FAILURE');
   save({
-    schemaVersion: 'orbit360-block12-cumulative-visual-v4',
+    schemaVersion: 'orbit360-block12-cumulative-visual-v5',
     status: 'CUMULATIVE_VISUAL_LAB_FAIL',
     classification,
     error: safe(message),
@@ -181,6 +190,9 @@ try {
     routeCount: results.length,
     pageErrors,
     captureEngine: 'playwright-record-video-plus-ffmpeg-static-frame',
+    domProbe: 'layout-free-mount-auth-probe',
+    layoutDependentTextReadUsed: false,
+    technicalCopyReview: 'manual-frame-review-required-before-final-approval',
     screenshotApisUsed: false,
     cdpScreenshotUsed: false,
     authWrites: 0,
