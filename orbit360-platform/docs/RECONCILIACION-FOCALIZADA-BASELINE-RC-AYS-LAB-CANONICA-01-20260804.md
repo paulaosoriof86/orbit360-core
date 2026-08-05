@@ -1,163 +1,163 @@
 # RECONCILIACIÓN FOCALIZADA DEL BASELINE — RC-AYS-LAB-CANONICA-01
 
-Fecha de inicio: 2026-08-04  
-Estado: `IN_PROGRESS`  
+Fecha de cierre: 2026-08-04  
+Estado: `PASS`  
 Gate: `PASS_CANONICAL_BASELINE`  
 Source baseline: `548cffa50cddfd93ad2118f5a06e9bb420699bde`
 
-## 1. Alcance cerrado
-
-Esta no es una auditoría general. Solo resuelve:
-
-1. owners efectivos;
-2. scripts realmente cargados;
-3. bridges/guards/refinements activos;
-4. mejor versión aceptada por módulo;
-5. conteos observados y su trazabilidad;
-6. deltas indispensables antes del gate visual.
-
-Restricciones: sin Firebase, secretos, deploy, navegador, reimportación, producción, main, merge o escrituras reales.
-
-## 2. Hallazgos confirmados iniciales
-
-### 2.1 Estado vivo del PR
-
-El cuerpo anterior del PR estaba desactualizado porque todavía afirmaba que runtime no tenía PASS. Fue reemplazado por el estado vivo de `RC-AYS-LAB-CANONICA-01`, preservando:
-
-- run `30962756387`: 18 PASS / 0 FAIL;
-- causa raíz visual como `PIPELINE_MECHANISM_FAILURE`;
-- censo source-only de Cobros;
-- siguiente acción exacta.
-
-Estado: `CORREGIDO`.
-
-### 2.2 Bootstrap y store cargados por index
-
-El baseline carga explícitamente:
-
-- `core/backend-lab-loader.js`;
-- `core/backend-lab-init.js`;
-- `data/store.js`;
-- `data/store-firestore-lab.local.js`;
-- `core/auth.js`;
-- `core/access-scope.js`;
-- `core/access-role-session-owner-v20260728.js`;
-- `core/router-tenant-config-bootstrap.js`;
-- `core/router.js`.
-
-La secuencia inline inicializa:
+## 1. Decisión
 
 ```text
-Orbit.store.init(Orbit.SEED)
-Orbit.router.init()
-Orbit.auth.init()
+PASS_CANONICAL_BASELINE
 ```
 
-Estado: `EVIDENCIA_CONFIRMADA`; todavía no se modifica el orden.
+La candidata continúa siendo una sola. Esta reconciliación no reconstruye el producto, no crea otra rama y no reemplaza módulos completos. Fija owners, capas de compatibilidad, conteos y acciones posteriores sobre el baseline congelado.
 
-### 2.3 Módulos base cargados
+Restricciones cumplidas: sin Firebase, secretos, deploy, navegador, reimportación, producción, `main`, merge o escrituras reales.
 
-El index carga directamente los módulos base relevantes:
+## 2. Hechos cerrados preservados
 
-- `modules/ops.js`;
-- `modules/leads.js`;
-- `modules/cliente360.js`;
-- `modules/polizas.js`;
-- `modules/cobros.js`;
-- `modules/conciliaciones.js`;
-- `modules/comisiones.js`;
-- `modules/importar.js`;
-- `modules/equipo.js`;
-- `modules/aseguradoras.js`;
-- `modules/portal.js`;
-- `modules/cotizador.js`;
-- `modules/comparativo.js`.
+- PR #5: draft/open y anclado a `RC-AYS-LAB-CANONICA-01`;
+- run funcional `30962756387`: 18 PASS / 0 FAIL;
+- fallo visual vigente: `PIPELINE_MECHANISM_FAILURE`;
+- mecanismo bajo `STOP_RETRY`: navegación por hash acumulativa en una SPA de larga vida;
+- mecanismo reemplazante único: un contexto aislado y URL directa por ruta;
+- árbol acumulativo sellado: 31 rutas, 31 módulos activos trabajados, 30 integrados al store y 0 fallos de módulo;
+- ningún gate funcional cerrado se repite por este diagnóstico.
 
-Estado: `EVIDENCIA_CONFIRMADA`.
+## 3. Matriz canónica de owners fundacionales
 
-### 2.4 Overlays activos que requieren clasificación de owner
+| Dominio/ruta | Owner canónico | Capas de soporte | Clasificación | Acción |
+|---|---|---|---|---|
+| Router | `core/router.js` | `core/router-tenant-config-bootstrap.js` | `OWNER_PLUS_BOOTSTRAP_SUPPORT` | Preservar. El bootstrap carga contratos y tenant antes del Router; no es un segundo Router. |
+| Access | `core/access-scope.js` | `auth.js`, `access-role-session-owner-v20260728.js`, `access-ceilings-v1199.js` | `SINGLE_POLICY_ENGINE_WITH_DISTINCT_SESSION_AND_CEILING_LAYERS` | Preservar. Access decide visibilidad/scope; session owner resuelve rol efectivo y ceilings impone límites duros. |
+| Cliente 360 | `modules/cliente360.js` | `crm-v1198-operational-bridge.js`, `client-insurer-visual-contract-v20260720.js` | `CANONICAL_RENDERER_WITH_SCOPE_OVERLAY_AND_READ_PROJECTION` | Preservar renderer y soporte. No reemplazar el módulo. |
+| Aseguradoras | `modules/aseguradoras.js` | UX bridge, import bridge, visual contract, edit owner y operational-directory owner | `CANONICAL_CRUD_RENDERER_WITH_EXPLICIT_SECTION_OWNERS` | Preservar. CRUD sigue en el módulo; portales/cuentas tienen owner de sección explícito. |
 
-El mismo index carga además, entre otros:
+## 4. Overlays y bridges
 
-- `data/academia-v1197-bridge.js`;
-- `modules/aseguradoras-v1197-ux-bridge.js`;
-- `modules/aseguradoras-v1202-import-bridge.js`;
-- `modules/aseguradoras-v1202-resources-bridge.js`;
-- `modules/portal-v1142-copyfix.js`;
-- `modules/cotizador-v1203-source-gate.js`;
-- `modules/comparativo-v1203-operational-bridge.js`;
-- `modules/crm-v1198-operational-bridge.js`;
-- `modules/policy-receipts-v1199-bridge.js`;
-- `modules/policy-receipts-v1199-detail-guard.js`;
-- `modules/renewals-v1200-operational-bridge.js`;
-- `modules/renewals-v1200-permission-guard.js`;
-- `modules/issuance-endosos-v1201-bridge.js`;
-- `modules/issuance-endosos-v1201-refinements.js`;
-- `modules/ops-workflows-v1201-bridge.js`;
-- `modules/renewals-v1201-issued-filter.js`;
-- `modules/portal-v1198-scope-viewer-bridge.js`.
+### 4.1 Cliente 360
 
-La coexistencia de base + overlay no se clasifica automáticamente como defecto. Cada archivo debe quedar en una de estas categorías:
+`modules/crm-v1198-operational-bridge.js` no sustituye el renderer. Añade scope, guards de deep-link, creación tenant-aware, calidad y separación de acciones críticas. Se clasifica `COMPATIBILITY_REQUIRED`.
+
+`core/client-insurer-visual-contract-v20260720.js` instala la proyección canónica de lectura y mantiene `writesStore:false`.
+
+`core/client-canonical-view-projection-v20260716.js` vuelve a exponer una proyección de compatibilidad y declara `temporaryInPlaceBridge:true`. Se clasifica `TEMPORAL_RETIREMENT`, pero no se retira antes de demostrar en runtime que ningún consumidor depende de sus eventos o aliases.
+
+### 4.2 Aseguradoras
+
+- `aseguradoras-v1197-ux-bridge.js`: `COMPATIBILITY_REQUIRED`; conserva alias, ficha y UX sin sustituir el renderer canónico.
+- `aseguradoras-v1202-import-bridge.js`: `COMPATIBILITY_REQUIRED`; owner de importación/propuestas, no del CRUD general.
+- `client-insurer-edit-owner-v20260722.js`: soporte semántico de edición; delega CRUD al módulo canónico.
+- `client-insurer-operational-directory-owner-v20260722.js`: owner explícito de portales y cuentas en modo operativo; sustituye únicamente esas secciones del contrato visual.
+- `aseguradoras-v1202-resources-bridge.js`: candidato `TEMPORAL_RETIREMENT/INACTIVE_COMPATIBILITY`. Su guard exige `mod.__v1197Bridge`, marcador no demostrado en los productores inspeccionados. No se elimina en este bloque; el próximo runtime debe confirmar que permanece inactivo y que el owner operativo cubre sus consumidores.
+
+No se demostró un `FUNCTIONAL_DEFECT` por coexistencia de capas. La deriva histórica de owners queda contenida mediante esta matriz y los consumidores explícitos.
+
+## 5. Reconciliación exacta de conteos
+
+### 5.1 Baseline histórico M1
 
 ```text
-OWNER
-COMPATIBILITY_REQUIRED
-DUPLICATE
-OBSOLETE
-PROTECTED
-TEMPORAL_RETIREMENT
+clientes: 414
+aseguradoras: 26
+asesores: 7
 ```
 
-No se retira ningún overlay hasta comprobar su consumidor, orden y efecto.
+Esos conteos fueron el inventario aceptado de M1.
 
-## 3. Matriz owner preliminar
+### 5.2 Escritura y revalidación durable M4
 
-| Dominio | Base visible | Overlays visibles | Estado |
-|---|---|---|---|
-| Store/backend | `data/store.js`, loader/init LAB, adapter local | políticas y contratos auxiliares | protegido; verificar sin modificar |
-| Router | `core/router.js` | `router-tenant-config-bootstrap.js` | owner por confirmar |
-| Access | `auth.js`, `access-scope.js` | session owner, ceilings, taxonomy | owner por confirmar |
-| Cliente 360 | `modules/cliente360.js` | CRM operational bridge compartido | consumidor por confirmar |
-| Aseguradoras | `modules/aseguradoras.js` | UX/import/resources bridges | múltiples capas; clasificar |
-| Pólizas/recibos | `modules/polizas.js` | receipts, renewals, issuance overlays | múltiples capas; clasificar |
-| Cobros | `modules/cobros.js` | dominio backend no visible como bridge de módulo | contrato runtime por cruzar |
-| Conciliaciones | `modules/conciliaciones.js` | dominio backend no visible como bridge de módulo | contrato runtime por cruzar |
-| Ops | `modules/ops.js` | ops workflows bridge | owner por confirmar |
-| Leads | `modules/leads.js` | CRM operational bridge | owner por confirmar |
-| Portal | `modules/portal.js` | copyfix y scope-viewer bridge | múltiples capas; clasificar |
-| Cotizador/Comparativo | módulos base | source gate y operational bridge | preservar mejor versión aprobada |
-
-## 4. Riesgo de raíz que se está resolviendo
-
-La rama contiene una acumulación histórica de módulos base y overlays. El riesgo no es solo visual: sin un owner explícito, un validator puede observar una capa mientras el usuario ve otra, y una candidata posterior puede retirar o reemplazar el archivo equivocado.
-
-Clasificación provisional:
+M4 escribió y luego revalidó en read-only:
 
 ```text
-DATA_CONTRACT_FAILURE — no demostrado todavía
-FUNCTIONAL_DEFECT — no demostrado
-VALIDATOR_STALE — posible para consumidores antiguos
-PIPELINE_MECHANISM_FAILURE — confirmado para el gate visual previo
+clientes canónicos: 414
+aseguradoras canónicas: 26
+configuración: 1
+membership: 1
 ```
 
-No se implementa fix hasta cerrar la matriz de consumidores.
+Por tanto, 414/26 no era seed ni una estimación: existía en el destino canónico.
 
-## 5. Trabajo restante del mismo microbloque
+### 5.3 Delta autorizado posterior
 
-1. inspeccionar registro/router y bootstrap;
-2. cruzar cada ruta con módulo y overlays;
-3. identificar archivos protegidos;
-4. localizar evidencia de última aprobación por módulo;
-5. reconciliar conteos históricos y actuales;
-6. emitir deltas concretos, no reemplazo total;
-7. cerrar con `PASS_CANONICAL_BASELINE` o STOP con causa raíz.
-
-## 6. Siguiente acción exacta
-
-Construir la matriz completa:
+El Gate 7.8 de padres HOLD ejecutó `create-only`:
 
 ```text
-ruta → owner → script base → overlay → consumidor → evidencia → clasificación → acción
+clientes: +16  → 430
+aseguradoras: +4 → 30
+updates: 0
+sobrescrituras: 0
+REQUIERE_VALIDACION preservado: 20/20
 ```
 
-Comenzar por Router, Access, Cliente 360 y Aseguradoras porque son dependencias de todas las rutas posteriores.
+Los veinte registros provinieron de la autoridad heredada para resolver integridad referencial; su creación no los convirtió en registros validados.
+
+### 5.4 Snapshot acumulativo observado
+
+```text
+clientes: 430
+aseguradoras: 30
+pólizas: 1,375
+vehículos: 1,033
+recibos esperados: 1,294
+cartera de primas: 673
+cobros: 7
+memberships: 1
+```
+
+El último gate visual read-only observó esos conteos con snapshot before/after idéntico, cero escrituras Firestore y cero escrituras Auth.
+
+Conclusión:
+
+```text
+unexplained client delta: 0
+unexplained insurer delta: 0
+reimport required: false
+data loss observed: false
+```
+
+No se revierten 430/30 a 414/26 y no se reimportan Clientes/Aseguradoras para resolver visualización o acceso.
+
+## 6. Mejor versión acumulativa aceptada
+
+La autoridad acumulativa no es un archivo aislado de Claude ni el módulo base sin overlays. Es la composición sellada del baseline:
+
+```text
+index.html + owner canónico + capas de soporte clasificadas + Orbit.store + Auth/Access + tenant bootstrap
+```
+
+La evidencia acumulativa ya vinculó Cliente 360, Aseguradoras, Pólizas, Vehículos, Recibos, Cartera, Cobros, Ops y Leads al mismo snapshot y árbol de producto. Los módulos restantes se afinan por su gate específico sin abrir otra candidata.
+
+## 7. Clasificación final
+
+```text
+FUNCTIONAL_DEFECT: no demostrado en este microbloque
+DATA_CONTRACT_FAILURE: cerrado para baseline y conteos
+VALIDATOR_STALE: histórico, contenido por owners y ledger
+PIPELINE_MECHANISM_FAILURE: sigue abierto únicamente para evidencia visual
+SECURITY_FAILURE: no demostrado
+```
+
+## 8. Evidencia sellada
+
+- plan rector y ledger vivo de la RC;
+- `rc-ays-lab-canonica-01-baseline-reconciliation-v20260804.json`;
+- cierre durable M4;
+- Gate 7.8 create-only de padres HOLD;
+- manifiesto acumulativo RC1.2;
+- inspección del `index.html` y owners sobre el source baseline.
+
+## 9. Siguiente acción exacta
+
+Abrir Microbloque 2.0 y ejecutar únicamente el validador sintético existente de rutas aisladas:
+
+```text
+ONE_ISOLATED_BROWSER_CONTEXT_AND_DIRECT_URL_PER_ROUTE
+```
+
+Debe probar ocho rutas sin Firebase, secretos, deploy o escrituras reales. No se crea otro workflow ni otro arnés. Gate siguiente:
+
+```text
+PASS_ISOLATED_ROUTE_HARNESS
+```
