@@ -1,14 +1,14 @@
 {
-  "schemaVersion": "orbit360-auth-access-recovery-gate-v5",
-  "gateId": "block-auth-access-recovery-lab-v5-20260805",
-  "contractVersion": "13.4.0",
+  "schemaVersion": "orbit360-auth-access-recovery-source-only-gate-v6",
+  "gateId": "block-auth-access-recovery-source-only-v6-20260805",
+  "contractVersion": "13.5.0",
   "status": "NOT_EXECUTED",
-  "classification": "PENDING_RUNTIME_REQUEST",
+  "classification": "PENDING_SOURCE_ONLY_REQUEST",
   "total": 0,
   "passed": 0,
   "failed": 1,
   "failedCheckIds": [
-    "RUNTIME_REQUEST_NOT_EXECUTED"
+    "SOURCE_ONLY_REQUEST_NOT_EXECUTED"
   ],
   "executionAuthorized": false,
   "secretAccessAuthorized": false,
@@ -32,9 +32,12 @@
   "browserExecuted": false,
   "deployExecuted": false,
   "productionTouched": false,
-  "rootFixStrategy": "READ_ALL_VALIDATE_ALL_WRITE_ALL",
-  "sourceOnlyPrerequisitePass": true,
-  "priorRequestsVerified": 4,
+  "priorRequestsVerified": 0,
+  "actorAuthorizationParityValidated": false,
+  "callableErrorPropagationValidated": false,
+  "conditionalEvidencePersistenceValidated": false,
+  "triStateIntegrityValidated": false,
+  "futureRuntimeRequestAbsent": true,
   "containsPII": false,
   "containsSecrets": false,
   "ok": false
