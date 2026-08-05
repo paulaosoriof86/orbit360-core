@@ -1,32 +1,18 @@
 {
-  "stage": "AUTH_DYNAMIC_TEAM_CENSUS_STOP_RETRY",
-  "classification": "DATA_CONTRACT_FAILURE",
-  "errorCode": "AUTHORITATIVE_TEAM_NOT_READY",
-  "errors": [
-    "TEAM_EMAIL_DUPLICATE",
-    "4f67da491c99:VALID_EMAIL_REQUIRED",
-    "4f67da491c99:COUNTRY_REQUIRED",
-    "eec87c723fd3:VALID_EMAIL_REQUIRED",
-    "eec87c723fd3:COUNTRY_REQUIRED",
-    "0529dc3d09be:VALID_EMAIL_REQUIRED",
-    "0529dc3d09be:COUNTRY_REQUIRED",
-    "eec10877d4e5:VALID_EMAIL_REQUIRED",
-    "eec10877d4e5:COUNTRY_REQUIRED"
-  ],
+  "stage": "AUTH_DYNAMIC_TEAM_CENSUS_PASS",
+  "decision": "USE_AUTHORITATIVE_EQUIPO_DYNAMIC_COUNT",
+  "classification": "GO_AUTH_DYNAMIC_TEAM_RUNTIME",
   "activeUsersObserved": 7,
   "inactiveUsersObserved": 0,
   "authoritativeRecords": [
     {
       "teamIdHash": "4f67da491c99b3f8ab2307b8f41604cc4651553e70df0f2b2bb7d1d05dd486f5",
-      "emailHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "emailHash": "ba4cfa00ba05270d43119f0e8fea2eb7e62ff40a0d24a7fd85b1d66d26bf2862",
       "sourceClass": "AUTHORITATIVE_EQUIPO_STORE",
       "uidHash": "",
       "advisorIdHash": "4f67da491c99b3f8ab2307b8f41604cc4651553e70df0f2b2bb7d1d05dd486f5",
       "activeComputed": true,
-      "contractErrors": [
-        "VALID_EMAIL_REQUIRED",
-        "COUNTRY_REQUIRED"
-      ],
+      "contractErrors": [],
       "aliasGroup": [],
       "identityState": "MISSING_IDENTITY",
       "membershipState": "MISSING_MEMBERSHIP"
@@ -45,45 +31,36 @@
     },
     {
       "teamIdHash": "eec87c723fd3102724022318165b5878a3c82b753c2b402996f5ea0fec0307fc",
-      "emailHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "emailHash": "c6c8bcfe0074b62cc22ac30ba06fff01e134a2e8fda82fdc393244bf428e6894",
       "sourceClass": "AUTHORITATIVE_EQUIPO_STORE",
       "uidHash": "",
       "advisorIdHash": "eec87c723fd3102724022318165b5878a3c82b753c2b402996f5ea0fec0307fc",
       "activeComputed": true,
-      "contractErrors": [
-        "VALID_EMAIL_REQUIRED",
-        "COUNTRY_REQUIRED"
-      ],
+      "contractErrors": [],
       "aliasGroup": [],
       "identityState": "MISSING_IDENTITY",
       "membershipState": "MISSING_MEMBERSHIP"
     },
     {
       "teamIdHash": "0529dc3d09bed76ee1b8113f9a333f90ea044862abd29cb0f881ba20e0c62369",
-      "emailHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "emailHash": "ba8869d37387b9641c4b1e8e1f22e3faacca7757633b4b7369ccde947cf5d3a4",
       "sourceClass": "AUTHORITATIVE_EQUIPO_STORE",
       "uidHash": "",
       "advisorIdHash": "0529dc3d09bed76ee1b8113f9a333f90ea044862abd29cb0f881ba20e0c62369",
       "activeComputed": true,
-      "contractErrors": [
-        "VALID_EMAIL_REQUIRED",
-        "COUNTRY_REQUIRED"
-      ],
+      "contractErrors": [],
       "aliasGroup": [],
       "identityState": "MISSING_IDENTITY",
       "membershipState": "MISSING_MEMBERSHIP"
     },
     {
       "teamIdHash": "eec10877d4e533c261249a87fc9a5bfb980b3f536065d54bf1c720504361b3da",
-      "emailHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "emailHash": "9414b1cb149cc13ba7a97638c1b39f240c65b33fd921382bfb1981a19dd4009b",
       "sourceClass": "AUTHORITATIVE_EQUIPO_STORE",
       "uidHash": "",
       "advisorIdHash": "eec10877d4e533c261249a87fc9a5bfb980b3f536065d54bf1c720504361b3da",
       "activeComputed": true,
-      "contractErrors": [
-        "VALID_EMAIL_REQUIRED",
-        "COUNTRY_REQUIRED"
-      ],
+      "contractErrors": [],
       "aliasGroup": [],
       "identityState": "MISSING_IDENTITY",
       "membershipState": "MISSING_MEMBERSHIP"
@@ -133,11 +110,20 @@
       "resolution": "LEGACY_NON_AUTHORITATIVE_ORPHAN"
     }
   ],
+  "legacyAliasesIgnoredAsUsers": 2,
+  "plannedAuthCreates": 7,
+  "plannedAuthLinks": 0,
+  "plannedMembershipReconciliations": 7,
+  "plannedTeamLinks": 7,
+  "plannedPasswordEmails": 7,
+  "functionalProfilesCovered": 3,
+  "administrativeUsersObserved": 1,
+  "futureUserPathSupported": true,
   "firestoreReads": true,
   "firestoreWrites": 0,
   "authReads": true,
   "authWrites": 0,
-  "ok": false,
+  "ok": true,
   "projectId": "ays-orbit-360-lab",
   "tenantIdHash": "c24dd76ead4c99b61f91a35cc691e7f3408a4888537f2be58b3e20e5748638ba",
   "authorityPathClass": "tenantId/{tenantId}/asesores",
