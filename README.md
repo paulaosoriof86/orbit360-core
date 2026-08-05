@@ -7,9 +7,9 @@ La continuidad operativa vigente de A&S se rige por:
 1. `orbit360-platform/docs/FUENTES-RECTORAS-VIGENTES-ORBIT360-AYS-20260730.md`;
 2. `orbit360-platform/docs/PLAN-UNICO-SALIDA-RC-AYS-LAB-CANONICA-01-20260804.md`;
 3. `orbit360-platform/runtime-gate-crm-v20260716/rc-ays-lab-canonica-01-ledger-v20260804.json`;
-4. `orbit360-platform/docs/ESTADO-ACTIVO-MICROBLOQUE-2-3-RC-AYS-CANONICA-20260805.md`;
-5. `orbit360-platform/docs/CIERRE-STOP-RETRY-MICROBLOQUE-2-3-BASELINE-PROVENANCE-20260805.md`;
-6. `orbit360-platform/runtime-gate-crm-v20260716/rc-ays-lab-canonica-01-microblock23-stop-retry-v20260805.json`;
+4. `orbit360-platform/docs/ESTADO-ACTIVO-MICROBLOQUE-2-5-RC-AYS-CANONICA-20260805.md`;
+5. `orbit360-platform/docs/CIERRE-MICROBLOQUE-2-4-PASS-REQUEST-V4-PROVENANCE-COMPOSITION-20260805.md`;
+6. `orbit360-platform/runtime-gate-crm-v20260716/rc-ays-lab-canonica-01-microblock24-pass-v20260805.json`;
 7. estado vivo del PR #5.
 
 RC activa:
@@ -25,40 +25,59 @@ PASS_PLAN_PERSISTED
 PASS_CANONICAL_BASELINE
 PASS_ISOLATED_ROUTE_HARNESS
 PASS_CANONICAL_PREFLIGHT_COMPOSITION
+PASS_REQUEST_V4_PROVENANCE_COMPOSITION
 ```
 
-Estado vigente:
+Evidencia vigente:
 
 ```text
-Microbloque 2.3: STOP_RETRY_DEFINITIVE_BASELINE_PROVENANCE
-run: 30977831814
-autorización consumida: sí
-URL LAB retenida: no
+runtime funcional: 30962756387 · 18/18 PASS
+rutas aisladas: 30971707956 · 8/8 PASS
+composición canónica: 30977179448 · 31/31 PASS
+inner preflight canónico: 32/32 PASS
+request v4 + provenance: 30979519198 · 33/33 PASS
 ```
 
-La ejecución se detuvo antes del preflight canónico porque el checkout superficial no contenía el baseline congelado. El error fue:
+Estado activo:
 
 ```text
-fatal: Invalid revision range 548cffa50cddfd93ad2118f5a06e9bb420699bde..HEAD^
+Microbloque 2.5
+Gate: GO_LAB_CANDIDATE_VISIBLE
+Estado: READY_AWAITING_NEW_EXPLICIT_LAB_DEPLOY_AUTHORIZATION
 ```
 
-Clasificación:
+Topología vigente:
 
 ```text
-PIPELINE_MECHANISM_FAILURE
-owner: .github/workflows/orbit360-block12-visual-layoutfree-reactivation-lab-v20260804.yml
+workflow runtime existente:
+.github/workflows/orbit360-block12-visual-layoutfree-reactivation-lab-v20260804.yml
+
+request runtime futuro ausente:
+.github/orbit360-requests/block12-go-lab-candidate-visible-v4.json
+
+request runtime v3 consumido e inmutable:
+.github/orbit360-requests/block12-go-lab-candidate-visible-v3.json
+
+request source-only v4 consumido e inmutable:
+.github/orbit360-requests/block12-go-lab-candidate-visible-v4-source-only.json
 ```
 
-No hubo secretos, Firebase, Functions deploy, Hosting deploy, navegador, escrituras, Rules, reimportación, producción, main o merge. `0/4 Functions` significa que la etapa no se ejecutó; no demuestra fallo de Functions.
-
-Root fix source-only aplicado:
+El checkout runtime usa `fetch-depth: 0` y valida expresamente la existencia del baseline congelado antes del preflight:
 
 ```text
-commit: ed655ef5221cf84c5930ba4ce07da586a6fca64f
-fetch-depth: 0
-guard: git cat-file -e "$ORBIT360_SOURCE_BASELINE^{commit}"
+git cat-file -e "$ORBIT360_SOURCE_BASELINE^{commit}"
 ```
 
-El request v3 está consumido e inmutable. No se reejecuta ni se modifica. La siguiente acción es preparar source-only un nuevo path de request sobre el workflow existente y, después de validarlo, solicitar una autorización LAB nueva.
+El Microbloque 2.4 comprobó:
 
-No usar memoria, conversaciones o estados históricos para sustituir el ledger vivo.
+```text
+baseline presente: sí
+baseline ancestro del parent HEAD: sí
+producto sin cambios: sí
+blob del request v3 inmutable: sí
+outer router exit: 0
+inner engine reached: true
+runtime y capacidades operativas: no
+```
+
+No crear el request runtime v4 sin una autorización LAB explícita nueva. No usar memoria, conversaciones o estados históricos para sustituir el ledger vivo.
