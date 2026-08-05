@@ -54,3 +54,5 @@ Entregar una URL Hosting LAB retenida de la misma candidata, con cuatro Function
 ## Siguiente acción exacta
 
 Recibir autorización explícita para este único despliegue LAB read-only y ejecutar el Microbloque 2.1 completo sin microautorizaciones intermedias.
+
+Fuente de continuidad superior: ledger vivo y PR #5.
