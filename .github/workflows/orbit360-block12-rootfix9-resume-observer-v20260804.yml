@@ -29,7 +29,7 @@ jobs:
           mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
           test "${#CHANGED[@]}" = 1
           test "${CHANGED[0]}" = "$REQUEST"
-          jq -e '.status=="AUTHORIZED_READ_ONLY" and .targetWorkflow=="orbit360-block12-operational-runtime-lab-rootfix9-resume-v20260804.yml" and .targetHeadSha=="7f62c76ca55d2a071fa72ea5d345015b1db623a8" and .firebase==false and .secrets==false and .writes==false and .deploy==false' "$REQUEST" >/dev/null
+          jq -e '.status=="AUTHORIZED_READ_ONLY" and .targetWorkflow=="orbit360-block12-operational-runtime-lab-rootfix9-resume-v20260804.yml" and .targetHeadSha=="76377a4afd4c211c6d74db012e44e7876d8e88f9" and .firebase==false and .secrets==false and .writes==false and .deploy==false' "$REQUEST" >/dev/null
       - name: Consultar run objetivo
         id: inspect
         shell: bash
@@ -37,8 +37,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          gh api --method GET "repos/${GITHUB_REPOSITORY}/actions/workflows/orbit360-block12-operational-runtime-lab-rootfix9-resume-v20260804.yml/runs" -f branch='ays/backend-tenant-lab-v99-20260703' -f event='push' -f per_page='20' > "$RUNNER_TEMP/runs.json"
-          RUN_ID="$(jq -r '[.workflow_runs[] | select(.head_sha=="7f62c76ca55d2a071fa72ea5d345015b1db623a8")][0].id // empty' "$RUNNER_TEMP/runs.json")"
+          gh api --method GET "repos/${GITHUB_REPOSITORY}/actions/workflows/orbit360-block12-operational-runtime-lab-rootfix9-resume-v20260804.yml/runs" -f branch='ays/backend-tenant-lab-v99-20260703' -f event='push' -f per_page='30' > "$RUNNER_TEMP/runs.json"
+          RUN_ID="$(jq -r '[.workflow_runs[] | select(.head_sha=="76377a4afd4c211c6d74db012e44e7876d8e88f9")][0].id // empty' "$RUNNER_TEMP/runs.json")"
           test -n "$RUN_ID"
           gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}" > "$RUNNER_TEMP/run.json"
           gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}/jobs?per_page=100" > "$RUNNER_TEMP/jobs.json"
