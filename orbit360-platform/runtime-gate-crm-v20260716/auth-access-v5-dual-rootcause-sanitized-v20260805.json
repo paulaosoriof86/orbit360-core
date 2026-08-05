@@ -1,0 +1,70 @@
+{
+  "schemaVersion": "orbit360-auth-access-v5-dual-rootcause-sanitized-v1",
+  "rcId": "RC-AYS-LAB-CANONICA-01",
+  "gateId": "block-auth-access-recovery-lab-v5-20260805",
+  "requestCommit": "0938e4e696af22b6323d67e9da01a8adb40c0cb7",
+  "gateRegistrationCommit": "d2dcea862a2b85b6dcf02d2f5f48f10c93d6791c",
+  "observedResult": {
+    "stage": "STOP_RETRY_AUTH_ACCESS_RECOVERY",
+    "classification": "FUNCTIONAL_DEFECT",
+    "source": "sanitized_pull_request_comment",
+    "confirmedPasswordEmailsSent": 0,
+    "confirmedAuthUsersCreated": 0,
+    "confirmedMembershipsCreated": 0,
+    "scopePostverifyReached": false,
+    "protectedCrmIntegrityPostverifyReached": false,
+    "protectedCrmChangedObserved": false
+  },
+  "stagesReached": {
+    "canonicalPreflight": true,
+    "approvedAccessConfigPlan": true,
+    "approvedAccessConfigApply": true,
+    "authMembershipCensus": true,
+    "onboardingFunctionAvailability": true,
+    "onboardingCall": true,
+    "scopePostverify": false
+  },
+  "primaryRootCause": {
+    "classification": "FUNCTIONAL_DEFECT",
+    "family": "ONBOARDING_CALL_FAILED_STATUS_UNAVAILABLE",
+    "owner": "tools/orbit360-auth-access-recovery-lab-v20260805.mjs::callOnboarding",
+    "downstreamOwner": "functions/user-onboarding.js::executeProvision",
+    "evidenceBasis": "The recovery owner emits FUNCTIONAL_DEFECT only when the callable response is non-successful or does not return result.ok=true.",
+    "exactRemoteStatusAvailable": false,
+    "reasonExactStatusUnavailable": "The local sanitized recovery evidence was not committed after the scope stage was skipped.",
+    "strongestSourceBasedContractRisk": "The census actor selector does not prove the full tenantId/status/activeRole authorization contract required by the callable before selecting the privileged actor.",
+    "inference": true
+  },
+  "secondaryRootCause": {
+    "classification": "PIPELINE_MECHANISM_FAILURE",
+    "code": "MISSING_OPTIONAL_SCOPE_EVIDENCE_BREAKS_RESULT_PERSISTENCE",
+    "owner": ".github/workflows/orbit360-auth-access-recovery-lab-v3-20260805.yml::Persistir evidencia y cierre sin tocar request",
+    "mechanism": "The workflow unconditionally added ORBIT360_SCOPE_EVIDENCE even though the scope step is skipped when recovery fails. git add aborted and prevented the local failure evidence and lifecycle closure from reaching the branch.",
+    "productFailure": false
+  },
+  "rollbackBoundary": {
+    "rollbackAttemptedByRecoveryCatch": true,
+    "rollbackReadbackPersisted": false,
+    "identityOrMembershipCreationPersistedInRepositoryEvidence": false,
+    "crmModificationObserved": false,
+    "crmIntegrityConclusion": "NOT_POSTVERIFIED"
+  },
+  "sourceOnlySolutions": [
+    "Validate the administrative actor against the same tenantId, active status, assigned activeRole and role/permission contract used by the callable before invocation.",
+    "Persist callable response status and sanitized detail codes in recovery evidence and final evidence.",
+    "Build the git add list conditionally from files that actually exist.",
+    "Treat scope and rollback evidence as optional when their stages were not reached.",
+    "Never render a missing integrity postverify as evidence that CRM changed."
+  ],
+  "authorization": {
+    "consumed": true,
+    "replayAllowed": false,
+    "rerunExecuted": false,
+    "newRequestPathRequired": true,
+    "newExplicitRuntimeAuthorizationRequired": true
+  },
+  "block4Continues": true,
+  "containsPII": false,
+  "containsSecrets": false,
+  "ok": true
+}
