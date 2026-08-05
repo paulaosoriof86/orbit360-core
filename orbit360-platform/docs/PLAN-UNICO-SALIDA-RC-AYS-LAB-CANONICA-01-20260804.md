@@ -1,7 +1,7 @@
 # PLAN ÚNICO DE SALIDA — RC-AYS-LAB-CANONICA-01
 
 Fecha de adopción: 2026-08-04  
-Última actualización: 2026-08-04 22:24 GT  
+Última actualización: 2026-08-04 23:08 GT  
 Rama obligatoria: `ays/backend-tenant-lab-v99-20260703`  
 PR: #5 draft/open  
 Baseline funcional congelado: `548cffa50cddfd93ad2118f5a06e9bb420699bde`  
@@ -9,7 +9,7 @@ Producción, `main` y merge: no autorizados
 
 ## 1. Carácter vinculante
 
-Este documento es el plan rector para cerrar una sola candidata acumulativa A&S. Se aplica junto con el ledger vivo, el estado vigente y la evidencia del gate. Ninguna conversación o workflow sustituye estas fuentes.
+Este documento es el plan rector para cerrar una sola candidata acumulativa A&S. Se aplica junto con el ledger vivo, el estado activo y la evidencia más reciente del gate.
 
 Precedencia:
 
@@ -18,6 +18,8 @@ Precedencia:
 3. `rc-ays-lab-canonica-01-ledger-v20260804.json`;
 4. HEAD de la rama obligatoria;
 5. evidencia del gate activo.
+
+Ninguna conversación, candidata, workflow o documento histórico sustituye estas fuentes.
 
 ## 2. Objetivo final
 
@@ -31,7 +33,7 @@ Debe integrar Cliente 360, Aseguradoras, Pólizas, Vehículos, Recibos, Cartera,
 
 ## 3. Hechos cerrados que no se reabren
 
-### Runtime funcional
+### 3.1 Runtime funcional
 
 ```text
 run: 30962756387
@@ -41,7 +43,7 @@ FAIL: 0
 
 Incluye Ops/Leads, scopes, notificaciones, importación recurrente, Cobros/Conciliación sintético, rollback exacto y snapshot real A&S idéntico. No se repite sin cambio funcional de owner.
 
-### Baseline canónico
+### 3.2 Baseline canónico
 
 ```text
 PASS_CANONICAL_BASELINE
@@ -65,7 +67,7 @@ Cliente 360  → modules/cliente360.js
 Aseguradoras → modules/aseguradoras.js
 ```
 
-### Arnés aislado
+### 3.3 Arnés aislado
 
 ```text
 PASS_ISOLATED_ROUTE_HARNESS
@@ -76,7 +78,28 @@ mecanismo: ONE_ISOLATED_BROWSER_CONTEXT_AND_DIRECT_URL_PER_ROUTE
 
 No se vuelve a navegación hash acumulativa ni se crea otro workflow visual paralelo.
 
-### Cobros reales
+### 3.4 Composición canónica del preflight
+
+```text
+PASS_CANONICAL_PREFLIGHT_COMPOSITION
+run final: 30977179448
+integrated checks: 31/31
+inner preflight: 32/32
+outer router exit: 0
+inner engine reached: true
+```
+
+Contrato corregido:
+
+```text
+validatorLifecycleRevision = phase-capability-contract-v1
+visualHarnessRevision = isolated-context-direct-url-v6
+controlPlaneRevision = canonical-preflight-composition-source-only-v1
+```
+
+El builder de evidencia usa outputs observados. El workflow runtime existente quedó preparado para un futuro request v3 y permanece inerte porque ese request no existe.
+
+### 3.5 Cobros reales
 
 ```text
 pagos reportados: 365
@@ -89,7 +112,7 @@ confirmados materializados en corte source-only: 5
 
 Cinco cobros no representan el universo completo.
 
-## 4. Estado del Microbloque 2.1
+## 4. Historial del Microbloque 2.1
 
 ```text
 Gate: GO_LAB_CANDIDATE_VISIBLE
@@ -98,70 +121,46 @@ Autorización: consumida
 URL LAB: no producida
 ```
 
-### Intento autorizado 1
+Intentos autorizados:
 
 ```text
-run: 30974443335
-VALIDATOR_STALE
-REQUEST_ACTIVE
-VIDEO_LAYOUTFREE_HARNESS
-```
-
-### Intento autorizado 2
-
-```text
-run: 30974745085
-VALIDATOR_STALE
-CANONICAL_PREFLIGHT_ENTRYPOINT
-CANONICAL_LIFECYCLE_REVISION_MISMATCH
+30974443335 → VALIDATOR_STALE · REQUEST_ACTIVE / VIDEO_LAYOUTFREE_HARNESS
+30974745085 → VALIDATOR_STALE · CANONICAL_LIFECYCLE_REVISION_MISMATCH
 ```
 
 Ambos se detuvieron antes de secretos, Firebase, Functions, Hosting y navegador.
 
-### Causa raíz definitiva
+Incidente administrativo:
 
 ```text
-VALIDATOR_STALE
-PIPELINE_MECHANISM_FAILURE
-owner: tools/orbit360-validar-gate-contracts-v20260717.mjs
+30975037529 → request consumido rechazado antes del preflight
 ```
 
-El outer router exige `validatorLifecycleRevision = phase-capability-contract-v1`. La versión del arnés `isolated-context-direct-url-v6` fue colocada en ese campo y sustituyó erróneamente la composición canónica. El inner engine corregido no llegó a ejecutarse.
+El request anterior permanece consumido e inmutable. Su consumo vive en el ledger, no mediante nuevas modificaciones del path disparador.
 
-No se demostró defecto funcional, pérdida de datos o fallo de las cuatro Functions.
+## 5. Solución de raíz aplicada en Microbloque 2.2
 
-### Incidente administrativo de cierre
+Se separaron:
 
-Al actualizar el request para marcarlo consumido se modificó por error el mismo path disparador y se creó el run automático `30975037529`.
+- composición canónica del lifecycle;
+- revisión del arnés visual;
+- request de autorización;
+- ledger de consumo;
+- evidencia observada;
+- política de retención.
+
+Se validaron conjuntamente outer router, lifecycle e inner engine, con todas las capacidades operativas forzadas a cero.
 
 ```text
-request validation: FAIL
-preflight: SKIPPED
-secretos: SKIPPED
-Functions/Hosting/browser: SKIPPED
+runtime: no
+secretos: no
+Firebase: no
+browser: no
+deploy: no
+Rules: no
+reimportación: no
+producción/main/merge: no
 ```
-
-No cuenta como ejecución autorizada ni intento runtime; sí es un `PIPELINE_MECHANISM_FAILURE` del procedimiento de cierre. Desde este punto, el request disparador es inmutable y el consumo se registra solo en paths no disparadores.
-
-### Hallazgo de evidencia
-
-El JSON consolidado escribió un literal `functionsVerified: 4`, aunque los jobs observaron `0/4` y nunca alcanzaron deploy. Ese campo queda invalidado.
-
-## 5. STOP_RETRY obligatorio
-
-Quedan prohibidos:
-
-- otro request autorizado;
-- otro run runtime;
-- otro parche de emergencia a esta familia;
-- otro workflow visual;
-- tocar producto, módulos o datos;
-- acceder a secretos;
-- desplegar Functions o Hosting bajo esta autorización;
-- repetir los 18 escenarios;
-- volver a modificar el request disparador.
-
-La candidata y el baseline quedan congelados e intactos.
 
 ## 6. Secuencia y estado vivo
 
@@ -170,46 +169,89 @@ La candidata y el baseline quedan congelados e intactos.
 | 1.0 Plan y ledger | `PASS_PLAN_PERSISTED` | PASS |
 | 1.1 Baseline/owners/conteos | `PASS_CANONICAL_BASELINE` | PASS |
 | 2.0 Arnés sintético aislado | `PASS_ISOLATED_ROUTE_HARNESS` | PASS |
-| 2.1 Visual LAB retenida | `GO_LAB_CANDIDATE_VISIBLE` | STOP_RETRY definitivo |
-| 2.2 Rediseño source-only del control plane | `PASS_CANONICAL_PREFLIGHT_COMPOSITION` | siguiente, sin runtime |
-| 3.0 Ops/Leads durable | `OPS_LEADS_BACKEND_LAB_COMPLETE` | bloqueado por 2.1 |
-| 4.0 Replay Cobros read-only | `PASS_COBROS_FULL_REPLAY` | pendiente después de control plane |
+| 2.1 Visual LAB retenida | `GO_LAB_CANDIDATE_VISIBLE` | STOP_RETRY histórico; autorización consumida |
+| 2.2 Composición canónica source-only | `PASS_CANONICAL_PREFLIGHT_COMPOSITION` | PASS |
+| 2.3 Visual LAB retenida con request v3 | `GO_LAB_CANDIDATE_VISIBLE` | listo; espera autorización explícita nueva |
+| 3.0 Ops/Leads durable | `OPS_LEADS_BACKEND_LAB_COMPLETE` | pendiente después de 2.3 |
+| 4.0 Replay Cobros read-only | `PASS_COBROS_FULL_REPLAY` | pendiente |
 | 4.1 Materialización Cobros | `COBROS_REAL_LEDGER_COMPLETE` | pendiente |
 | 5.0 Integración acumulativa | `RC_ACCUMULATIVE_MODULES_COMPLETE` | pendiente |
 | 6.0 Revisión visual | `RELEASE_CANDIDATE_ACCEPTED` | pendiente |
-| 7.0 Go-live | `GO_PRODUCTION_A&S` | bloqueado hasta autorización |
+| 7.0 Go-live | `GO_PRODUCTION_A&S` | bloqueado hasta autorización productiva |
 
-## 7. Siguiente acción exacta: Microbloque 2.2 source-only
+## 7. Microbloque activo: 2.3
 
 ```text
-NO_EJECUTAR_RUNTIME
-PASS_CANONICAL_PREFLIGHT_COMPOSITION
+Gate: GO_LAB_CANDIDATE_VISIBLE
+Estado: READY_AWAITING_NEW_EXPLICIT_LAB_DEPLOY_AUTHORIZATION
 ```
 
-Objetivo:
+Workflow existente:
 
-1. conservar `validatorLifecycleRevision = phase-capability-contract-v1`;
-2. declarar `visualHarnessRevision = isolated-context-direct-url-v6` por separado;
-3. sincronizar conceptualmente router, lifecycle, registro, engine, workflow y request;
-4. probar outer router + inner engine como una unidad;
-5. separar request inmutable, ledger de consumo y evidencia final;
-6. comprobar que el JSON de decisión use outputs reales y no literales;
-7. emitir evidencia estática sin secretos, Firebase, navegador o deploy.
+```text
+.github/workflows/orbit360-block12-visual-layoutfree-reactivation-lab-v20260804.yml
+```
 
-Este rediseño no autoriza ejecución LAB. Solo después de un PASS estático integrado podrá solicitarse una autorización explícita nueva.
+Request futuro:
 
-## 8. Continuidad posterior
+```text
+.github/orbit360-requests/block12-go-lab-candidate-visible-v3.json
+```
 
-Después de resolver el control plane y obtener una nueva autorización:
+El request v3 no existe y no se crea sin autorización explícita nueva.
 
-1. entregar una URL LAB retenida;
-2. cerrar Ops/Leads durable;
-3. ejecutar replay completo read-only de Cobros;
+Alcance exacto autorizable:
+
+1. preflight canónico antes de secretos;
+2. cuatro Functions LAB allowlisted;
+3. un único Hosting preview LAB retenido;
+4. snapshot A&S before;
+5. ocho rutas mediante contextos aislados y URLs directas;
+6. snapshot A&S after;
+7. before/after idénticos y cero escrituras;
+8. evidencia desde outputs observados;
+9. retener URL si producto e integridad pasan;
+10. no repetir los 18 escenarios funcionales.
+
+Prohibiciones:
+
+- Rules;
+- reimportación;
+- escrituras reales;
+- producción;
+- `main`;
+- merge;
+- workflow visual nuevo;
+- navegación hash acumulativa;
+- modificación del request consumido anterior.
+
+## 8. Continuidad posterior obligatoria
+
+Después de obtener una URL LAB retenida:
+
+1. cerrar Ops/Leads durable y conectado a UI real;
+2. ejecutar replay completo read-only de los 365 pagos;
+3. sellar diff crear/actualizar/omitir/HOLD/requiere validación;
 4. materializar colecciones correctas con atomicidad e idempotencia;
 5. integrar módulos aprobados sobre la misma RC;
 6. presentar revisión Dirección/Operativo/Asesor;
-7. solicitar autorización productiva macro.
+7. solicitar una autorización productiva macro.
+
+No se abre un bloque periférico entre estas etapas.
 
 ## 9. Regla de actualización
 
-Cada iteración actualiza simultáneamente avance, fuente, evidencia, gate, estado, ledger, plan y PR. No se abre una auditoría general ni un bloque periférico para evitar el siguiente paso exacto.
+Cada iteración actualiza simultáneamente:
+
+- avance visible;
+- fuente/base;
+- implementación o evidencia;
+- gate y estado;
+- ledger;
+- plan;
+- estado activo;
+- PR;
+- Academia;
+- acumulado Claude cuando aplica.
+
+No se abre una auditoría general ni se toca otro módulo para evitar el siguiente paso exacto.
