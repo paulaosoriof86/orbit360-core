@@ -1,0 +1,112 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
+  "gateId": "block-auth-access-recovery-lab-v3-20260805",
+  "gateContractVersion": "13.2.0",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
+  "status": "READY_AWAITING_EXPLICIT_AUTHORIZATION",
+  "executionProfile": {
+    "phase": "AUTH_ACCESS_RECOVERY_LAB_V3",
+    "capabilities": {
+      "secrets": true,
+      "firestoreRead": true,
+      "writes": true,
+      "runtime": true,
+      "browser": false,
+      "deploy": true,
+      "functionsDeploy": true,
+      "rulesDeploy": false,
+      "production": false
+    }
+  },
+  "singleGate": true,
+  "rcId": "RC-AYS-LAB-CANONICA-01",
+  "authorization": {
+    "requiredForExecution": true,
+    "activeRequest": false,
+    "allowedExecutions": 0,
+    "request": ".github/orbit360-requests/auth-access-recovery-lab-v3-20260805.json",
+    "authorizationRef": "PENDING_NEW_EXPLICIT_AUTHORIZATION",
+    "consumed": false,
+    "replayAllowed": false
+  },
+  "priorAttempts": [
+    {
+      "request": ".github/orbit360-requests/auth-access-recovery-lab-v20260805.json",
+      "status": "CONSUMED_STOP_RETRY",
+      "failureCode": "ADVISOR_PAULA_EMAIL_REQUIRED",
+      "immutable": true
+    },
+    {
+      "request": ".github/orbit360-requests/auth-access-recovery-lab-v2-20260805.json",
+      "status": "CONSUMED_STOP_RETRY",
+      "failureCode": "ADVISOR_PAULA_ACCESS_CONFIG_INCOMPLETE",
+      "immutable": true
+    }
+  ],
+  "target": {
+    "projectId": "ays-orbit-360-lab",
+    "tenantId": "alianzas-soluciones",
+    "branch": "ays/backend-tenant-lab-v99-20260703",
+    "pullRequest": 5,
+    "retainedPreviewUrl": "https://ays-orbit-360-lab--orbit360-operational-block12-w8ibrr6w.web.app"
+  },
+  "approvedSources": {
+    "manifest": "orbit360-platform/runtime-gate-crm-v20260716/rc12-cumulative-candidate-unified-manifest.json",
+    "lockedCommit": "34fa84a60ebc38b0035ed664da87ca78aaa73ff7",
+    "lockedPath": "orbit360-platform/runtime-gate-crm-v20260716/rc12-cumulative-candidate-unified-manifest.json",
+    "reconciler": "tools/orbit360-provisionar-roster-aprobado-final-rc12-v20260804.mjs"
+  },
+  "accessConfigurationBoundary": {
+    "maximumAdvisorDocumentsUpdated": 3,
+    "allowedFields": ["email", "roles", "defaultRole", "activeRole", "countries", "dataScopes"],
+    "rolesAndDefaultFromApprovedRoster": true,
+    "identityVerifiedByApprovedDigest": true,
+    "countriesFromAdvisorOrTenantMembership": true,
+    "scopesFromApprovedProfileContract": true,
+    "atomic": true,
+    "idempotent": true,
+    "crmWritesAllowed": false
+  },
+  "onboardingBoundary": {
+    "maximumAuthUsersCreated": 3,
+    "maximumAuthUsersUpdated": 3,
+    "maximumMembershipsCreated": 3,
+    "maximumMembershipsUpdated": 3,
+    "allowedFunctionDeploys": ["orbit360ProvisionTeamAccess"],
+    "passwordResetEmailAllowed": true,
+    "passwordReadAllowed": false,
+    "temporaryPasswordAllowed": false,
+    "syntheticUsersAllowed": false,
+    "syntheticMembershipsAllowed": false,
+    "hardcodedUsersAllowed": false,
+    "hostingDeployAllowed": false,
+    "rulesDeployAllowed": false,
+    "reimportAllowed": false,
+    "otherFunctionsDeployAllowed": false,
+    "productionAllowed": false,
+    "mainAllowed": false,
+    "mergeAllowed": false
+  },
+  "guards": {
+    "canonicalGateBeforeSecrets": true,
+    "requestSingleFileCommit": true,
+    "requestImmutable": true,
+    "priorRequestsImmutable": true,
+    "accessConfigPlanBeforeWrite": true,
+    "accessConfigApplyBeforeAuthCensus": true,
+    "censusBeforeOnboarding": true,
+    "onboardingFunctionDeployOnlyIfAbsent": true,
+    "protectedCrmSnapshotBeforeAfter": true,
+    "rolesCountriesScopesPostverify": true,
+    "rollbackAuthMembershipsOnFailure": true,
+    "noPasswordOrActionLinkInEvidence": true,
+    "stopRetryOnFailure": true
+  },
+  "rootCause": {
+    "classification": "VALIDATOR_STALE",
+    "evidence": "orbit360-platform/runtime-gate-crm-v20260716/auth-access-v2-rootcause-sanitized-v20260805.json",
+    "fixedBy": "tools/orbit360-auth-access-config-repair-lab-v3-20260805.mjs"
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
