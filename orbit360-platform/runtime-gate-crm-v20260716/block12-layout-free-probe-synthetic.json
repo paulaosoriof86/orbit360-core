@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "orbit360-block12-layout-free-probe-synthetic-v1",
+  "status": "LAYOUT_FREE_PROBE_SYNTHETIC_PASS",
+  "classification": "GO_PIPELINE_MECHANISM",
+  "domNodes": 50000,
+  "elapsedMs": 87,
+  "probe": {
+    "hostPresent": true,
+    "hostMounted": true,
+    "hostChildCount": 50000,
+    "authenticated": true,
+    "loginExplicitlyOpen": false
+  },
+  "forbiddenTokens": [
+    ".innerText",
+    "getComputedStyle(",
+    "offsetParent",
+    "getBoundingClientRect(",
+    "Page.captureScreenshot",
+    "page.screenshot(",
+    "newCDPSession("
+  ],
+  "forbiddenPresent": [],
+  "innerTextUsed": false,
+  "layoutApiUsed": false,
+  "screenshotApiUsed": false,
+  "cdpScreenshotUsed": false,
+  "networkAccess": false,
+  "firebaseCommandsExecuted": false,
+  "firestoreRead": false,
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "deployExecuted": false,
+  "productionTouched": false,
+  "ok": true,
+  "containsPII": false,
+  "containsSecrets": false
+}
