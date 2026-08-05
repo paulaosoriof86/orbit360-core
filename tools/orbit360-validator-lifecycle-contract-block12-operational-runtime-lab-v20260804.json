@@ -6,7 +6,7 @@
   "gateId": "block12-operational-runtime-lab-v20260804",
   "gateContractVersion": "12.0.11",
   "status": "OPERATIONAL_RUNTIME_LAB_ISOLATED_VISUAL_READY",
-  "runtimeActivationState": "STOPPED_AWAITING_NEW_EXPLICIT_AUTHORIZATION",
+  "runtimeActivationState": "AUTHORIZED_ONCE",
   "singleGate": true,
   "macroClosure": true,
   "executionProfile": {
@@ -24,12 +24,12 @@
     }
   },
   "authorization": {
-    "source": "NO_ACTIVE_RUNTIME_AUTHORIZATION",
-    "status": "CONSUMED_STOP_RETRY_DEFINITIVE",
-    "allowedExecutions": 0,
-    "consumed": true,
+    "source": "user_authorized_microblock_2_3_20260804T2316-0600",
+    "status": "AUTHORIZED_GO_LAB_CANDIDATE_VISIBLE",
+    "allowedExecutions": 1,
+    "consumed": false,
     "replayAllowed": false,
-    "newExplicitAuthorizationRequired": true,
+    "newExplicitAuthorizationRequired": false,
     "authorizedAttemptRunIds": [30974443335, 30974745085],
     "administrativeRejectedRunId": 30975037529,
     "previousAttemptSecretAccess": false,
