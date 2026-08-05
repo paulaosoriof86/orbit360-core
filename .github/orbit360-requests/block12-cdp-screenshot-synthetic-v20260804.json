@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "orbit360-block12-cdp-screenshot-synthetic-request-v1",
+  "status": "AUTHORIZED_SOURCE_ONLY",
+  "approved": true,
+  "allowedExecutions": 1,
+  "reason": "STOP_RETRY requires replacing repeated Playwright page.screenshot timeouts with a synthetically verified Chromium CDP capture mechanism before another LAB deploy",
+  "previousVisualRunId": 30967972527,
+  "previousVisualFailureCode": "PLAYWRIGHT_PAGE_SCREENSHOT_TIMEOUT_POLIZAS",
+  "firebase": false,
+  "secrets": false,
+  "firestoreRead": false,
+  "writes": false,
+  "deploy": false,
+  "production": false,
+  "main": false,
+  "merge": false
+}
