@@ -7,25 +7,14 @@ La continuidad operativa vigente de A&S se rige por:
 1. `orbit360-platform/docs/FUENTES-RECTORAS-VIGENTES-ORBIT360-AYS-20260730.md`;
 2. `orbit360-platform/docs/PLAN-UNICO-SALIDA-RC-AYS-LAB-CANONICA-01-20260804.md`;
 3. `orbit360-platform/runtime-gate-crm-v20260716/rc-ays-lab-canonica-01-ledger-v20260804.json`;
-4. `orbit360-platform/docs/CIERRE-MICROBLOQUE-2-5-STOP-VISUAL-LEGAL-MODAL-PREVIEW-RETENIDO-20260805.md`;
-5. `orbit360-platform/runtime-gate-crm-v20260716/rc-ays-lab-canonica-01-microblock25-preview-retained-visual-review-stop-v20260805.json`;
-6. `orbit360-platform/docs/ESTADO-ACTIVO-MICROBLOQUE-2-6-CAPTURA-LEGAL-READINESS-20260805.md`;
-7. estado vivo del PR #5.
+4. `orbit360-platform/docs/CIERRE-BLOQUE-3-OPS-LEADS-DURABLE-PASS-REUTILIZADO-20260805.md`;
+5. `orbit360-platform/docs/ESTADO-ACTIVO-BLOQUE-4-COBROS-FULL-REPLAY-20260805.md`;
+6. estado vivo del PR #5.
 
 RC activa:
 
 ```text
 RC-AYS-LAB-CANONICA-01
-```
-
-Gates cerrados:
-
-```text
-PASS_PLAN_PERSISTED
-PASS_CANONICAL_BASELINE
-PASS_ISOLATED_ROUTE_HARNESS
-PASS_CANONICAL_PREFLIGHT_COMPOSITION
-PASS_REQUEST_V4_PROVENANCE_COMPOSITION
 ```
 
 Evidencia preservada:
@@ -46,31 +35,46 @@ preflight: 32/32 PASS
 Functions: 4/4
 Hosting preview: retenido
 integridad: PASS
-snapshot before/after: idénticos
-workflow técnico: GO_LAB_CANDIDATE_VISIBLE
-revisión visual final: STOP_VISUAL_EVIDENCE_PREVIEW_RETAINED
+snapshots before/after: idénticos
+Firestore/Auth writes: 0
 ```
 
-URL LAB retenida:
+URL LAB retenida para revisión manual:
 
 ```text
 https://ays-orbit-360-lab--orbit360-operational-block12-w8ibrr6w.web.app
 ```
 
-Las ocho capturas mostraron `Acuerdos legales` y no el contenido de las rutas. Esto es un fallo del mecanismo de captura, no una regresión funcional demostrada. El root fix de detección de overlays quedó en:
+El modal `Acuerdos legales` debe aceptarse una sola vez en la sesión. Bloqueó las capturas automáticas, pero no bloquea la revisión manual ni la continuidad técnica. No se desactiva globalmente y no se redepliega Functions o Hosting para resolverlo.
+
+Bloque 3.0:
 
 ```text
-6c443d0f40e6874675f8c1980ef0cdb353120031
+Gate: OPS_LEADS_BACKEND_LAB_COMPLETE
+Estado: PASS_REUSED_FUNCTIONAL_RUNTIME_AND_CURRENT_DEPLOY
 ```
+
+La evidencia funcional sigue vigente y ningún owner de Ops/Leads cambió entre el PASS 18/18 y el source HEAD desplegado. No se repite la batería funcional.
 
 Estado activo:
 
 ```text
-Microbloque 2.6
-Gate: PASS_LEGAL_READINESS_CAPTURE_CONTRACT
-Estado: PENDING_SOURCE_ONLY_AUTHORIZATION
+Bloque 4.0
+Gate: PASS_COBROS_FULL_REPLAY
+Estado: ACTIVE_READ_ONLY
 ```
 
-La siguiente acción es exclusivamente source-only. Debe preservar la URL, las cuatro Functions y el Hosting existentes. No se redepliega, no se ejecuta navegador, Firebase, Rules, reimportación, producción, main, merge ni la batería funcional 18/18.
+Universo del replay:
 
-Los requests runtime v3, source-only v4 y runtime v4 están consumidos e inmutables. No usar memoria, conversaciones o estados históricos para sustituir el ledger vivo.
+```text
+pagos reportados: 365
+secuencia cartera: 128
+posteriores al corte: 2
+pendientes de overlay: 235
+cobros existentes preservados: 5
+HOLD de estado: 44
+```
+
+Se recuperaron el workbook canónico privado y el dry-run normalizado de planillas. El replay continúa sin escrituras, reimportación, deploy, Rules, producción, main o merge.
+
+Los requests runtime v3, source-only v4 y runtime v4 están consumidos e inmutables. No usar memoria o estados históricos para sustituir el ledger vivo.
