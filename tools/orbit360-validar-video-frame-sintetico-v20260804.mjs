@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import { execFileSync } from 'node:child_process';
+import ffmpegPath from 'ffmpeg-static';
 
 const ROOT = process.cwd();
 const OUT = path.join(ROOT, 'orbit360-platform/runtime-gate-crm-v20260716/block12-video-frame-synthetic.json');
@@ -17,7 +18,8 @@ let browser;
 let context;
 let page;
 try {
-  execFileSync('ffmpeg', ['-version'], { stdio: 'ignore', timeout: 10000 });
+  if (!ffmpegPath || !fs.existsSync(ffmpegPath)) throw new Error('ENVIRONMENT_FAILURE:FFMPEG_STATIC_NOT_RESOLVED');
+  execFileSync(ffmpegPath, ['-version'], { stdio: 'ignore', timeout: 10000 });
   const { chromium } = await import('playwright');
   browser = await chromium.launch({ headless: true });
   context = await browser.newContext({
@@ -35,19 +37,20 @@ try {
   context = null;
   const videoPath = await video.path();
   const stat = fs.statSync(videoPath);
-  if (stat.size < 1000) throw new Error('VIDEO_SYNTHETIC_EMPTY');
+  if (stat.size < 1000) throw new Error('PIPELINE_MECHANISM_FAILURE:VIDEO_SYNTHETIC_EMPTY');
   const framePath = path.join(TMP, 'frame.png');
-  execFileSync('ffmpeg', ['-hide_banner','-loglevel','error','-ss', frameSecond.toFixed(3), '-i', videoPath, '-frames:v','1','-y', framePath], { stdio: 'pipe', timeout: 15000 });
+  execFileSync(ffmpegPath, ['-hide_banner','-loglevel','error','-ss', frameSecond.toFixed(3), '-i', videoPath, '-frames:v','1','-y', framePath], { stdio: 'pipe', timeout: 15000 });
   const png = fs.readFileSync(framePath);
-  if (!isPng(png)) throw new Error('VIDEO_FRAME_SYNTHETIC_INVALID_PNG');
+  if (!isPng(png)) throw new Error('PIPELINE_MECHANISM_FAILURE:VIDEO_FRAME_SYNTHETIC_INVALID_PNG');
   save({
     schemaVersion: 'orbit360-block12-video-frame-synthetic-v1',
     status: 'VIDEO_FRAME_SYNTHETIC_PASS',
     classification: 'GO_PIPELINE_MECHANISM',
-    captureEngine: 'playwright-record-video-plus-ffmpeg-frame',
+    captureEngine: 'playwright-record-video-plus-ffmpeg-static-frame',
     videoBytes: stat.size,
     frameBytes: png.length,
     frameSecond: Number(frameSecond.toFixed(3)),
+    ffmpegSource: 'npm-ffmpeg-static',
     screenshotApiUsed: false,
     cdpScreenshotUsed: false,
     networkAccess: false,
@@ -60,11 +63,12 @@ try {
     ok: true
   });
 } catch (error) {
+  const message = String(error && (error.message || error)).replace(/[\r\n]+/g, ' ').slice(0, 500);
   save({
     schemaVersion: 'orbit360-block12-video-frame-synthetic-v1',
     status: 'VIDEO_FRAME_SYNTHETIC_FAIL',
-    classification: 'PIPELINE_MECHANISM_FAILURE',
-    error: String(error && (error.message || error)).replace(/[\r\n]+/g, ' ').slice(0, 500),
+    classification: message.startsWith('ENVIRONMENT_FAILURE:') ? 'ENVIRONMENT_FAILURE' : 'PIPELINE_MECHANISM_FAILURE',
+    error: message,
     screenshotApiUsed: false,
     cdpScreenshotUsed: false,
     networkAccess: false,
