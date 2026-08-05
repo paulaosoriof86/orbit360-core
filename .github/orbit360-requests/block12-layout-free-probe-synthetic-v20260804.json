@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "orbit360-block12-layout-free-probe-synthetic-request-v1",
+  "status": "AUTHORIZED_SOURCE_ONLY",
+  "approved": true,
+  "allowedExecutions": 1,
+  "reason": "The real visual run 30970150174 passed gate, Functions, Hosting and integrity but innerText forced layout and timed out on Polizas; validate the exact layout-free mount probe on 50000 DOM nodes before another LAB deploy",
+  "previousVisualRunId": 30970150174,
+  "previousFailureClassification": "PIPELINE_MECHANISM_FAILURE",
+  "previousFailureCode": "ROUTE_POLIZAS_DOM_SNAPSHOT_TIMEOUT",
+  "replacementProbe": "HOST_FIRST_ELEMENT_CHILD_AND_CHILD_ELEMENT_COUNT_NO_LAYOUT_TEXT_READ",
+  "firebase": false,
+  "secrets": false,
+  "firestoreRead": false,
+  "writes": false,
+  "deploy": false,
+  "production": false,
+  "main": false,
+  "merge": false
+}
