@@ -21,11 +21,12 @@ try {
   const lifecycle = read(LIFECYCLE);
   const final = read(FINAL);
   const pkg = lifecycle.privatePackage || {};
-  const paths = Object.values(contract.collections || {});
+  const paths = contract.collections || {};
   const checks = {
     gateAndVersion: contract.gateId === 'block10.10-cobros-full-ledger-write-lab-v20260805'
-      && contract.contractVersion === '10.10.1'
-      && lifecycle.gateContractVersion === '10.10.1',
+      && contract.contractVersion === '10.10.2'
+      && lifecycle.gateContractVersion === '10.10.2'
+      && pkg.contractVersion === '10.10.2',
     scope: contract.rcId === 'RC-AYS-LAB-CANONICA-01'
       && contract.branch === 'ays/backend-tenant-lab-v99-20260703'
       && contract.pullRequest === 5
@@ -42,43 +43,53 @@ try {
       && contract.durablePlan.evidenciasCobro === 365
       && contract.durablePlan.propuestasConciliacion === 132
       && contract.durablePlan.conciliacionHolds === 233
-      && contract.durablePlan.maximumWrites === 1097,
-    proposalBreakdown: contract.proposalBreakdown.sequence === 128
+      && contract.durablePlan.maximumWrites === 1098,
+    proposalAndHoldBreakdown: contract.proposalBreakdown.sequence === 128
       && contract.proposalBreakdown.postCutoff === 2
-      && contract.proposalBreakdown.planillaDetail === 2,
-    holdBreakdown: contract.holdBreakdown.reportedPaymentNoUniqueReceiptLink === 233,
+      && contract.proposalBreakdown.planillaDetail === 2
+      && contract.holdBreakdown.reportedPaymentNoUniqueReceiptLink === 233,
     noBusinessApplications: contract.durablePlan.newCobros === 0
       && contract.durablePlan.receiptWrites === 0
       && contract.durablePlan.policyWrites === 0
       && contract.durablePlan.finmovWrites === 0,
-    canonicalPaths: contract.pathAuthority.class === 'canonical-v79-data-items'
-      && contract.pathAuthority.legacyOperationalPathProhibited === 'tenantId/{tenantId}/{collection}'
-      && paths.length === 6
-      && paths.every(value => /^tenants\/\{tenantId\}\/data\/[A-Za-z0-9]+\/items\//.test(value)),
-    atomicity: contract.atomicity.strategy === 'STAGE_CHUNKS_THEN_SINGLE_ACTIVE_POINTER'
+    runScopedCanonicalPaths: contract.pathAuthority.class === 'canonical-v79-run-scoped-data-items'
+      && /^tenants\/\{tenantId\}\/data\/cobrosLedgerRuns\/items\/\{runId\}$/.test(paths.runManifest)
+      && ['pagosReportados','evidenciasCobro','propuestasConciliacion','conciliacionHolds'].every(name =>
+        paths[name] === `tenants/{tenantId}/data/cobrosLedgerRuns/items/{runId}/${name}/{deterministicId}`)
+      && paths.activePointer === 'tenants/{tenantId}/data/cobrosLedgerControl/items/active',
+    noVisiblePartialWrites: contract.pathAuthority.directTargetCollectionStageWritesProhibited === true
+      && contract.atomicity.stageDocumentsInvisibleToCurrentConsumers === true
+      && contract.atomicity.partialStageIsInvisible === true,
+    activationAtomicity: contract.atomicity.strategy === 'ISOLATED_RUN_SUBCOLLECTIONS_THEN_POINTER_TRANSACTION'
       && contract.atomicity.maximumChunkWrites <= 400
-      && contract.atomicity.partialStageIsInvisible === true
-      && contract.atomicity.activationRequiresExactCountsAndDigest === true,
-    idempotency: contract.idempotency.sameDigest === 'SKIP_AS_IDEMPOTENT'
-      && contract.idempotency.differentDigest === 'STOP_DATA_CONTRACT_FAILURE'
+      && contract.atomicity.activationTransactionWrites === 2
+      && contract.atomicity.activePointerSelectsOnlyCompleteRun === true,
+    idempotency: contract.idempotency.runIdDeterministic === true
+      && contract.idempotency.sameRunAndDigest === 'SKIP_AS_IDEMPOTENT'
+      && contract.idempotency.sameDocumentDifferentDigest === 'STOP_DATA_CONTRACT_FAILURE'
       && contract.idempotency.replayOfConsumedRequest === 'PROHIBITED',
-    rollback: contract.rollback.deleteOnlyDocumentsCreatedByRunId === true
+    rollback: contract.rollback.deleteOnlyRunScopedDocuments === true
       && contract.rollback.restorePreviousActivePointer === true
-      && contract.rollback.restorePreexistingDocumentsIfUpdated === true,
+      && contract.rollback.deleteRunManifestIfCreated === true
+      && contract.rollback.preexistingActiveRunUntouched === true,
     lifecycleReady: lifecycle.status === 'PRIVATE_PACKAGE_READY_STATIC_NOT_AUTHORIZED'
       && lifecycle.currentPhase === 'PRIVATE_PACKAGE_READY'
-      && lifecycle.pathAuthority.class === 'canonical-v79-data-items',
-    packageReadback: pkg.driveFileId === '1fwYktHt3Qj9BQjbjBox4XZBLO03NsZ0p'
-      && pkg.sizeBytes === 856802
-      && pkg.sha256 === 'a104f673b9516cf0874d47ee206c9a0eff458521ce01e182e4c45b38dfe23deb'
-      && pkg.logicalSha256 === '42c2f4ce2cbde21126aa07cfe581e7f64a485f729b9dcf18b8ad9c938dace80b'
-      && pkg.downloadReadbackVerified === true,
+      && lifecycle.pathAuthority.class === 'canonical-v79-run-scoped-data-items'
+      && lifecycle.isolatedRunStageRequired === true
+      && lifecycle.pointerActivationTransactionRequired === true,
+    packageReadback: pkg.driveFileId === '1t4di7P2z6OQVnT8LF5CtEMg_latkW7Cx'
+      && pkg.sizeBytes === 857161
+      && pkg.sha256 === '9769d7a952e9b2a15c27821da9098e5899466b0558ba8b68e021689864ad8cfe'
+      && pkg.logicalSha256 === 'a999977e31c73feebb8aafe3ca380a536e1ca60047d57fcdb6d9a592bd829654'
+      && pkg.downloadReadbackVerified === true
+      && pkg.writeTopology === 'ISOLATED_RUN_SUBCOLLECTIONS_THEN_POINTER_TRANSACTION',
     packageCounts: pkg.counts.pagosReportados === 365
       && pkg.counts.evidenciasCobro === 365
       && pkg.counts.propuestasConciliacion === 132
       && pkg.counts.conciliacionHolds === 233,
-    oldPackageSuperseded: lifecycle.supersededPrivatePackage.status === 'SUPERSEDED_NO_USE'
-      && lifecycle.supersededPrivatePackage.contractVersion === '10.10.0',
+    oldPackagesSuperseded: Array.isArray(lifecycle.supersededPrivatePackages)
+      && lifecycle.supersededPrivatePackages.length === 2
+      && lifecycle.supersededPrivatePackages.every(row => row.status === 'SUPERSEDED_NO_USE'),
     noCapabilities: Object.values(lifecycle.executionProfile.capabilities).every(value => value === false)
       && lifecycle.allowedExecutions === 0
       && lifecycle.executionAuthorized === false
@@ -92,6 +103,8 @@ try {
       && lifecycle.protectedState.receiptWritesAuthorized === 0
       && lifecycle.protectedState.policyWritesAuthorized === 0
       && lifecycle.protectedState.finmovWritesAuthorized === 0,
+    consumerProjectionDeferred: contract.atomicity.block5ConsumerProjectionRequired === true
+      && lifecycle.block5ConsumerProjectionRequired === true,
     noSensitiveRepoEvidence: contract.containsPII === false
       && contract.containsSecrets === false
       && contract.containsPasswords === false
@@ -102,11 +115,11 @@ try {
   };
   const failedCheckIds = Object.entries(checks).filter(([, ok]) => !ok).map(([id]) => id);
   const payload = {
-    schemaVersion: 'orbit360-cobros-full-ledger-write-static-preflight-v2',
+    schemaVersion: 'orbit360-cobros-full-ledger-write-static-preflight-v3',
     gateId: contract.gateId,
     contractVersion: contract.contractVersion,
     status: failedCheckIds.length ? 'FAIL_COBROS_FULL_LEDGER_WRITE_STATIC' : 'PASS_COBROS_FULL_LEDGER_WRITE_STATIC_CONTRACT',
-    classification: failedCheckIds.length ? 'DATA_CONTRACT_FAILURE' : 'STATIC_CONTRACT_AND_PRIVATE_PACKAGE_READY_NO_ACCESS',
+    classification: failedCheckIds.length ? 'DATA_CONTRACT_FAILURE' : 'STATIC_ISOLATED_RUN_CONTRACT_AND_PRIVATE_PACKAGE_READY_NO_ACCESS',
     total: Object.keys(checks).length,
     passed: Object.values(checks).filter(Boolean).length,
     failed: failedCheckIds.length,
@@ -114,7 +127,9 @@ try {
     checks,
     sourceLedgerCount: 365,
     sourceLedgerDigest: contract.source.rowLedgerDigest,
-    plannedWritesMaximum: 1097,
+    plannedWritesMaximum: 1098,
+    stageDocuments: 1095,
+    activationTransactionWrites: 2,
     packageSha256: pkg.sha256 || '',
     packageLogicalSha256: pkg.logicalSha256 || '',
     newCobros: 0,
@@ -144,9 +159,9 @@ try {
   if (!payload.ok) process.exitCode = 41;
 } catch (error) {
   const payload = {
-    schemaVersion: 'orbit360-cobros-full-ledger-write-static-preflight-v2',
+    schemaVersion: 'orbit360-cobros-full-ledger-write-static-preflight-v3',
     gateId: 'block10.10-cobros-full-ledger-write-lab-v20260805',
-    contractVersion: '10.10.1',
+    contractVersion: '10.10.2',
     status: 'FAIL_COBROS_FULL_LEDGER_WRITE_STATIC',
     classification: 'PIPELINE_MECHANISM_FAILURE',
     error: String(error?.message || error).slice(0, 500),
