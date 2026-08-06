@@ -4,16 +4,16 @@
   "gateId": "block2.7-visual-hydration-required-optional-source-v20260805",
   "gateContractVersion": "2.7.4",
   "owner": "orbit360-visual-hydration-required-optional-source-v20260805",
-  "ownerVersion": "20260805.1-source-prepared",
-  "status": "SOURCE_FIX_PREPARED_NOT_EXECUTED",
-  "classification": "DATA_CONTRACT_FAILURE",
+  "ownerVersion": "20260805.3-direct-source-pass",
+  "status": "SOURCE_PASS_RUNTIME_AUTHORIZATION_RESERVED",
+  "classification": "SOURCE_FIX_READY_FOR_RUNTIME",
   "patternClassification": "REPLICABLE_CLAUDE_INMEDIATO",
   "rcId": "RC-AYS-LAB-CANONICA-01",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
-  "currentPhase": "SOURCE_ONLY_PREPARATION",
+  "currentPhase": "SOURCE_PASS",
   "executionProfile": {
-    "mode": "SOURCE_ONLY",
+    "mode": "SOURCE_ONLY_DIRECT_VALIDATION",
     "phase": "VISUAL_HYDRATION_REQUIRED_OPTIONAL_SOURCE",
     "capabilities": {
       "secrets": false,
@@ -28,11 +28,8 @@
     }
   },
   "sourceOwners": [
-    "orbit360-platform/core/visual-runtime-rootfix-v20260805.js",
-    "orbit360-platform/core/backend-lab-loader.js",
-    "orbit360-platform/index.html",
-    "tools/orbit360-apply-visual-hydration-required-optional-sourcefix-v20260805.mjs",
-    "tools/orbit360-test-visual-hydration-required-optional-source-v20260805.mjs"
+    "orbit360-platform/core/visual-runtime-hydration-contract-v20260805.js",
+    "orbit360-platform/core/backend-lab-loader.js"
   ],
   "requiredModules": [
     "inicio",
@@ -45,7 +42,29 @@
     "ops",
     "leads"
   ],
-  "sourceRequest": null,
+  "sourceRequest": {
+    "path": ".github/orbit360-requests/visual-hydration-required-optional-source-v20260805.json",
+    "initialCommit": "f82e15bbd4f3d50a9ad568174e45d60a050611bc",
+    "relayCommit": "d756bc6f61f41990c7f81090ff7167c4eabd68f9",
+    "workflowRunsObserved": 0,
+    "consumed": false,
+    "replayAllowed": false,
+    "classification": "PIPELINE_MECHANISM_FAILURE",
+    "supersededBy": "DIRECT_VERSIONED_SOURCE_VALIDATION"
+  },
+  "directValidation": {
+    "evidence": "orbit360-platform/runtime-gate-crm-v20260716/visual-hydration-direct-source-validation-sanitized-v20260805.json",
+    "status": "PASS_DIRECT_SOURCE_VALIDATION",
+    "checks": 24,
+    "overlayNodeSyntax": true,
+    "deterministicSimulations": true,
+    "repositoryReadback": true,
+    "firestoreWrites": 0,
+    "authWrites": 0,
+    "operationalWrites": 0,
+    "browserExecuted": false,
+    "deployExecuted": false
+  },
   "activeRequest": false,
   "requestConsumed": false,
   "replayAllowed": false,
@@ -71,10 +90,11 @@
     "productionAuthorized": false
   },
   "sourcePassRequiredBeforeRuntime": true,
+  "sourcePassSatisfied": true,
   "runtimeAuthorizationReserved": true,
   "runtimeAuthorizationScope": "ONE_OBSERVABLE_HOSTING_LAB_DEPLOY_WITH_PRECHECK_AND_ROLE_MATRIX",
   "containsPII": false,
   "containsSecrets": false,
   "containsPasswords": false,
-  "nextAction": "EXECUTE_SOURCE_ONLY_PATCH_AND_TEST"
+  "nextAction": "REGISTER_GATE_2_7_5_AND_EXECUTE_RESERVED_RUNTIME_AFTER_GO_GATE_CONTRACT"
 }
