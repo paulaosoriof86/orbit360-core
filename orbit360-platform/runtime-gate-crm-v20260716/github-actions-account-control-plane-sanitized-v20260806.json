@@ -1,28 +1,40 @@
 {
-  "schemaVersion": "orbit360-github-actions-account-control-plane-v1",
-  "status": "FAIL_GITHUB_ACTIONS_DISPATCH_ACROSS_REPOSITORIES",
+  "schemaVersion": "orbit360-github-actions-external-incident-v2",
+  "status": "STOP_RETRY_GITHUB_ACTIONS_MAJOR_OUTAGE_ACTIVE",
   "classification": "ENVIRONMENT_FAILURE",
-  "failureCode": "ACCOUNT_OR_REPOSITORY_ACTIONS_DISABLED_OR_RESTRICTED",
-  "testedRepositories": [
-    {
-      "repository": "paulaosoriof86/orbit360-core",
-      "pullRequest": 25,
-      "runner": "macos-14",
-      "events": ["opened", "reopened", "synchronize", "push"],
-      "runsObserved": 0,
-      "checksObserved": 0,
-      "merged": false
-    },
-    {
-      "repository": "paulaosoriof86/demoCXOrbia",
-      "pullRequests": [17, 18],
-      "runner": "macos-14",
-      "baseWorkflowPreExisting": true,
-      "runsObserved": 0,
-      "checksObserved": 0,
-      "merged": false
-    }
-  ],
+  "failureCode": "GITHUB_ACTIONS_MAJOR_OUTAGE_ACTIVE",
+  "hypothesisRetraction": {
+    "retractedFailureCode": "ACCOUNT_OR_REPOSITORY_ACTIONS_DISABLED_OR_RESTRICTED",
+    "reason": "Repository Settings screenshot confirms 'Allow all actions and reusable workflows' was already selected. The configuration hypothesis is invalid and must not be used as cause root."
+  },
+  "officialIncident": {
+    "provider": "GitHub Status",
+    "incidentId": "qcvjkzcs7j74",
+    "name": "Incident with Actions",
+    "startedAtUtc": "2026-08-06T15:22:49.021Z",
+    "status": "investigating",
+    "impact": "critical",
+    "component": "Actions",
+    "componentStatus": "major_outage",
+    "lastObservedUpdateUtc": "2026-08-06T18:46:37.400Z",
+    "reportedEffects": [
+      "workflow runs failing",
+      "workflow runs delayed in starting",
+      "jobs remaining queued for extended periods",
+      "queued jobs timing out",
+      "GitHub-hosted runner capacity constrained",
+      "webhook deliveries delayed",
+      "some Actions API requests returning errors"
+    ]
+  },
+  "observedProjectSymptoms": {
+    "ubuntuCanaryRun1": "31122714301",
+    "ubuntuCanaryRun2": "31124256674",
+    "ubuntuJobsReceivedSteps": false,
+    "macosControlPlaneRunsObserved": 0,
+    "crossRepositoryRunsObserved": 0,
+    "consistentWithOfficialIncident": true
+  },
   "sourceFix": {
     "crossRunnerStatus": "PASS_VISUAL_MATRIX_CROSS_RUNNER_SOURCE",
     "crossRunnerChecks": 24,
@@ -31,7 +43,6 @@
     "signalSafeChecks": 48,
     "signalSafePassed": 48
   },
-  "inference": "Because no run was created in two repositories, including a control-plane PR whose workflow already existed in its base branch, the remaining blocker is outside Orbit source and before runner assignment. Repository or account Actions permissions/restrictions must be inspected.",
   "secretsRead": false,
   "firebaseAccess": false,
   "firestoreReads": 0,
@@ -48,5 +59,5 @@
   "containsSecrets": false,
   "containsPasswords": false,
   "ok": false,
-  "nextAction": "In GitHub repository Settings > Actions > General, enable Actions and allow GitHub-authored actions such as actions/checkout. If GitHub reports Actions disabled for the account, request GitHub Support review. Once enabled, reopen exactly one source-only control-plane PR and continue with runner v3; do not create parallel canaries."
+  "nextAction": "Do not change repository Actions permissions and do not create more canaries while the official GitHub Actions incident remains investigating/major outage. When GitHub Status reaches monitoring or resolved and new workflow capacity is observable, execute exactly one source-only cross-runner validation, then request one immutable runtime authorization bound to the then-current canonical HEAD."
 }
