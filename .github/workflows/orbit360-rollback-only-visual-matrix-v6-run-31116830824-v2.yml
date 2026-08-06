@@ -1,0 +1,72 @@
+name: Orbit 360 · Rollback only visual matrix v6 · run 31116830824 · v2
+
+on:
+  pull_request:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - .github/workflows/orbit360-rollback-only-visual-matrix-v6-run-31116830824-v2.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: orbit360-rollback-only-visual-matrix-v6-run-31116830824-v2
+  cancel-in-progress: false
+
+jobs:
+  rollback-only:
+    if: github.event.pull_request.head.ref == 'ays/rollback-only-visual-matrix-v6-run-31116830824-v2-20260806'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - name: Checkout transporte rollback exclusivo v2
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Verificar transporte, base y GO sin secretos
+        shell: bash
+        env:
+          ORBIT360_CANONICAL_BRANCH: ays/backend-tenant-lab-v99-20260703
+        run: |
+          set -euo pipefail
+          WORKFLOW='.github/workflows/orbit360-rollback-only-visual-matrix-v6-run-31116830824-v2.yml'
+          BRANCH='ays/backend-tenant-lab-v99-20260703'
+          REQUEST_SHA='0a53acd815e10c3283d899b11bac61c88bcd3bff'
+          GATE='block2.7-visual-matrix-corrected-post-auth-lab-v20260805'
+          PREFLIGHT='orbit360-platform/runtime-gate-crm-v20260716/visual-matrix-corrected-post-auth-preflight-sanitized-v20260805.json'
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          test "$GITHUB_BASE_REF" = "$BRANCH"
+          mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
+          test "${#CHANGED[@]}" = '1'
+          test "${CHANGED[0]}" = "$WORKFLOW"
+          git fetch origin "$BRANCH"
+          test "$(git rev-parse "origin/$BRANCH")" = "$REQUEST_SHA"
+          git checkout --detach "$REQUEST_SHA"
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$GATE"
+          jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="2.7.8" and .failed==0 and .ok==true and .hostingRollbackCloneAuthorizedOnFailure==true and .productionAuthorized==false and .firestoreWritesAuthorized==0 and .authWritesAuthorized==0 and .operationalWritesAuthorized==0 and .secretAccess==false and .firestoreRead==false and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false' "$PREFLIGHT" >/dev/null
+
+      - name: Restaurar Hosting LAB desde backup autorizado
+        shell: bash
+        env:
+          FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          set -euo pipefail
+          PROJECT='ays-orbit-360-lab'
+          BACKUP='visual-matrix-corrected-backup-31116830824'
+          SERVICE_ACCOUNT="${FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB:-${FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB:-${FIREBASE_SERVICE_ACCOUNT:-}}}"
+          test -n "$SERVICE_ACCOUNT"
+          KEY="$RUNNER_TEMP/orbit360-rollback-only-service-account.json"
+          printf '%s' "$SERVICE_ACCOUNT" > "$KEY"
+          chmod 600 "$KEY"
+          test "$(jq -r '.project_id // empty' "$KEY")" = "$PROJECT"
+          export GOOGLE_APPLICATION_CREDENTIALS="$KEY"
+          npm install --no-save --package-lock=false firebase-tools@15.25.1 >/dev/null
+          npx firebase hosting:clone "$PROJECT:$BACKUP" "$PROJECT:live" --project "$PROJECT" --non-interactive
+          curl --fail --silent --show-error --location --max-time 30 'https://ays-orbit-360-lab.web.app/' >/dev/null
+          echo 'ROLLBACK_HOSTING_LAB_PASS run=31116830824 backup=visual-matrix-corrected-backup-31116830824 deploys=0 functions=0 rules=0 production=0'
