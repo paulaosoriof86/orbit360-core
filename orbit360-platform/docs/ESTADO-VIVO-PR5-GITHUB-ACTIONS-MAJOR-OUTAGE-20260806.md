@@ -1,29 +1,26 @@
-# Estado vivo PR #5 — GitHub Actions major outage — 2026-08-06
+# Estado vivo PR #5 — diagnóstico estratificado y ejecutor local — 2026-08-06
 
-## Corrección de diagnóstico
+## Corrección forense
 
-La captura de configuración confirma que `Permitir todas las acciones y flujos de trabajo reutilizables` ya estaba seleccionada. Queda retirada la hipótesis de Actions deshabilitado o restringido por configuración del repositorio.
+La captura de configuración confirma que `Permitir todas las acciones y flujos de trabajo reutilizables` ya estaba seleccionado. La hipótesis de permisos deshabilitados queda retirada.
 
-## Causa raíz externa confirmada
+El incidente de GitHub Actions fue evidencia externa válida para los fallos de cola y `Service Unavailable`, pero no explica el timeout interno original de la matriz y no se usa como dependencia para continuar.
+
+## Causas separadas
 
 ```text
-ENVIRONMENT_FAILURE
-GITHUB_ACTIONS_MAJOR_OUTAGE_ACTIVE
-incidentId: qcvjkzcs7j74
-status: investigating
-impact: critical
-component: Actions
-componentStatus: major_outage
+1. DATA_CONTRACT_FAILURE
+   asesores legacy bloqueaba readiness
+   estado: corregido source-only
+
+2. PIPELINE_MECHANISM_FAILURE
+   matriz sin watchdog/evidencia incremental/traps
+   estado: corregido 48/48 + 24/24
+
+3. ENVIRONMENT_FAILURE
+   cola/Service Unavailable/dispatch degradado de Actions
+   estado: proveedor externo; bypass local seleccionado
 ```
-
-GitHub Status reporta workflows fallando o demorados, jobs en cola durante periodos prolongados, timeouts, capacidad restringida de runners alojados, webhooks retrasados y errores en llamadas a la API de Actions.
-
-La evidencia del proyecto es consistente:
-
-- canario Ubuntu #1: run 31122714301, 0 steps;
-- canario Ubuntu #2: run 31124256674, 0 steps;
-- canarios macOS/control-plane: sin despacho observable;
-- código Orbit ejecutado en estos intentos: no.
 
 ## Producto
 
@@ -39,20 +36,33 @@ snapshot final: NOT_VERIFIED_FINAL
 Cobros 4.1: pausado
 ```
 
-## Acción exacta
+## Ruta inmediata sin Actions
 
-Mientras el incidente permanezca `investigating/major_outage`:
+Se selecciona el ejecutor local Windows autenticado, usando worktree aislado y el mismo runner v3:
 
-- no cambiar permisos;
-- no crear nuevos canarios;
-- no consumir autorizaciones runtime;
-- conservar runner v3 y evidencias.
+```text
+tools/orbit360-launch-local-windows-source-only-v20260806.cmd
+tools/orbit360-preflight-local-windows-source-only-v20260806.mjs
+tools/orbit360-jq-contract-shim-v20260806.mjs
+tools/orbit360-test-jq-contract-shim-v20260806.mjs
+```
 
-Cuando GitHub Status pase a `monitoring` o `resolved` y exista capacidad observable:
+El preflight local es source-only. No lee el valor de la credencial, no abre navegador, no toca Hosting y no despliega. Comprueba herramientas, HEAD remoto, request anterior consumido, shim de contratos, 24/24 cross-runner, 48/48 signal-safe, Firebase CLI y visibilidad del proyecto LAB.
 
-1. ejecutar exactamente un source-only cross-runner;
-2. exigir 24/24 y conservar 48/48;
-3. cerrar sin merge;
-4. emitir autorización runtime nueva ligada al HEAD vigente;
-5. ejecutar recuperación Hosting + matriz completa;
-6. con PASS, continuar hacia producción.
+## Gate de decisión
+
+Solo con `PASS_LOCAL_WINDOWS_SOURCE_ONLY_PREFLIGHT` se crea un nuevo request local-runtime inmutable ligado al HEAD observado.
+
+La ejecución macro posterior incluirá una sola vez:
+
+1. GO_GATE_CONTRACT;
+2. restauración del backup v6;
+3. backup previo;
+4. máximo un deploy Hosting LAB;
+5. precheck;
+6. matriz Dirección/Operativo/Asesor;
+7. snapshot final;
+8. rollback signal-safe ante fallo;
+9. evidencia sanitizada.
+
+No se crean nuevos canarios Actions y no se reutiliza el request v6 consumido.
