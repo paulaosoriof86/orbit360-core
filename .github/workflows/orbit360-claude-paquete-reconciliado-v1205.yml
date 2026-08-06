@@ -1,158 +1,152 @@
-name: Orbit 360 Claude package reconciliado v1205
+name: Orbit 360 · Control-plane registrado · relay runtime
 
 on:
   pull_request:
     types: [synchronize, opened, reopened]
-  workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
+
+concurrency:
+  group: orbit360-registered-runtime-relay
+  cancel-in-progress: false
 
 jobs:
-  build-package:
-    if: github.head_ref == 'ays/backend-tenant-lab-v99-20260703' || github.ref_name == 'ays/backend-tenant-lab-v99-20260703'
-    runs-on: ubuntu-latest
+  registered-runtime-relay:
+    if: github.event_name == 'pull_request' && github.head_ref == 'ays/backend-tenant-lab-v99-20260703'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    env:
+      ORBIT360_CANONICAL_BRANCH: ays/backend-tenant-lab-v99-20260703
+      ORBIT360_TRANSPORT_HEAD_REF: ${{ github.head_ref }}
+      ORBIT360_VISUAL_REQUEST_PATH: .github/orbit360-requests/visual-matrix-corrected-post-auth-lab-v20260805-authorization.json
+      ORBIT360_REQUEST_FILE: .github/orbit360-requests/visual-matrix-corrected-post-auth-lab-v20260805-authorization.json
+      ORBIT360_RESTORE_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/visual-matrix-v8-prior-hosting-restore-sanitized-v20260806.json
+      ORBIT360_FINAL_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/visual-matrix-corrected-post-auth-final-sanitized-v20260805.json
+      ORBIT360_LIFECYCLE: tools/orbit360-validator-lifecycle-contract-visual-matrix-corrected-post-auth-lab-v20260805.json
+
     steps:
-      - name: Checkout rama viva
+      - name: Checkout exact canonical PR head
         uses: actions/checkout@v4
         with:
-          ref: ays/backend-tenant-lab-v99-20260703
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: true
 
-      - name: Construir paquete de referencia
+      - name: Detect exclusive authorized v8 request commit
+        id: detect
         shell: bash
         run: |
           set -euo pipefail
-          ROOT="ORBIT360_CLAUDE_RECONCILIADO_V1205_20260711"
-          CODE="$ROOT/CODIGO_RAMA_VIVA_REFERENCIA_SOLO_LECTURA"
-          DOCS="$ROOT/DOCUMENTACION_RAMA_VIVA"
-          TESTS="$ROOT/PRUEBAS_Y_VALIDADORES_REFERENCIA"
-          mkdir -p "$CODE" "$DOCS" "$TESTS"
+          REQUEST='.github/orbit360-requests/visual-matrix-corrected-post-auth-lab-v20260805-authorization.json'
+          mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
+          if [[ "${#CHANGED[@]}" != '1' || "${CHANGED[0]}" != "$REQUEST" ]]; then
+            echo 'dispatch=false' >> "$GITHUB_OUTPUT"
+            echo 'SKIP_REGISTERED_RELAY_NOT_EXCLUSIVE_REQUEST_COMMIT'
+            exit 0
+          fi
+          if ! jq -e '
+            .schemaVersion=="orbit360-visual-matrix-corrected-post-auth-request-v1" and
+            .requestVersion=="20260806.8-registered-relay-runtime" and
+            .status=="AUTHORIZED_ONCE" and
+            .approved==true and
+            .allowedExecutions==1 and
+            .consumed==false and
+            .replayAllowed==false and
+            .scope.registeredWorkflowRelayRequired==true
+          ' "$REQUEST" >/dev/null; then
+            echo 'dispatch=false' >> "$GITHUB_OUTPUT"
+            echo 'SKIP_REGISTERED_RELAY_REQUEST_NOT_ACTIVE_V8'
+            exit 0
+          fi
+          echo 'dispatch=true' >> "$GITHUB_OUTPUT"
+          echo "request_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
-          cp orbit360-platform/docs/PAQUETE-CLAUDE-RECONCILIADO-CODIGO-REAL-V1205-20260711.md "$ROOT/00_LEER_PRIMERO.md"
-          cp orbit360-platform/docs/PAQUETE-CLAUDE-RECONCILIADO-CODIGO-REAL-V1205-20260711.md "$ROOT/PAQUETE-CLAUDE-RECONCILIADO-CODIGO-REAL-V1205-20260711.md"
-          cp orbit360-platform/docs/MANIFIESTO-ARCHIVOS-FISICOS-CLAUDE-V1205-20260711.md "$ROOT/MANIFIESTO-ARCHIVOS-FISICOS-CLAUDE-V1205-20260711.md"
-          cp orbit360-platform/docs/PROMPT-CLAUDE-RECONCILIADO-V1205-20260711.txt "$ROOT/PROMPT-PARA-PEGAR-EN-CLAUDE.txt"
+      - name: Validate source package before gate
+        if: steps.detect.outputs.dispatch == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          bash -n tools/orbit360-preflight-visual-matrix-runtime-relay-v8-v20260806.sh
+          bash -n tools/orbit360-restore-visual-matrix-v6-backup-before-runtime-v20260806.sh
+          bash -n tools/orbit360-run-visual-matrix-corrected-post-auth-runtime-only-v3-cross-runner-v20260806.sh
+          node --check tools/orbit360-attach-visual-matrix-v7-restore-evidence-v20260806.mjs
+          node tools/orbit360-test-windows-signal-compatibility-synthetic-v20260806.mjs
+          node tools/orbit360-test-visual-matrix-timeout-signal-safe-portable-v20260806.mjs
+          node tools/orbit360-test-visual-matrix-cross-runner-portable-v20260806.mjs
 
-          copy_code() {
-            local src="$1"
-            mkdir -p "$CODE/$(dirname "$src")"
-            cp "$src" "$CODE/$src"
-          }
+      - name: GO_GATE_CONTRACT before secrets
+        if: steps.detect.outputs.dispatch == 'true'
+        id: preflight
+        shell: bash
+        env:
+          ORBIT360_RUNTIME_RELAY_AUTHORIZED: 'true'
+        run: bash tools/orbit360-preflight-visual-matrix-runtime-relay-v8-v20260806.sh
 
-          code_files=(
-            orbit360-platform/core/access-scope.js
-            orbit360-platform/core/access-ceilings-v1199.js
-            orbit360-platform/core/policy-receipts-engine.js
-            orbit360-platform/core/policy-receipts-v1199-refinements.js
-            orbit360-platform/core/issuance-workflow-v1201.js
-            orbit360-platform/core/issuance-workflow-v1201-refinements.js
-            orbit360-platform/core/endorsement-workflow-v1201.js
-            orbit360-platform/core/importa-dryrun-p0.js
-            orbit360-platform/core/insurer-directory-import-v1202.js
-            orbit360-platform/core/insurer-directory-import-v1202-security.js
-            orbit360-platform/core/secure-resource-fields-v1202.js
-            orbit360-platform/core/backend-resource-contracts.js
-            orbit360-platform/core/document-viewer.js
-            orbit360-platform/core/credential-vault.js
-            orbit360-platform/core/quote-comparison-contracts-v1203.js
-            orbit360-platform/core/quote-comparison-contracts-v1203-refinements.js
-            orbit360-platform/modules/crm-v1198-operational-bridge.js
-            orbit360-platform/modules/portal-v1198-scope-viewer-bridge.js
-            orbit360-platform/modules/policy-receipts-v1199-bridge.js
-            orbit360-platform/modules/policy-receipts-v1199-detail-guard.js
-            orbit360-platform/modules/renewals-v1200-operational-bridge.js
-            orbit360-platform/modules/renewals-v1200-permission-guard.js
-            orbit360-platform/modules/issuance-endosos-v1201-bridge.js
-            orbit360-platform/modules/issuance-endosos-v1201-refinements.js
-            orbit360-platform/modules/ops-workflows-v1201-bridge.js
-            orbit360-platform/modules/renewals-v1201-issued-filter.js
-            orbit360-platform/modules/aseguradoras-v1197-ux-bridge.js
-            orbit360-platform/modules/aseguradoras-v1202-import-bridge.js
-            orbit360-platform/modules/aseguradoras-v1202-resources-bridge.js
-            orbit360-platform/modules/cotizador-v1203-source-gate.js
-            orbit360-platform/modules/comparativo-v1203-operational-bridge.js
-            orbit360-platform/data/academia-v1197-bridge.js
-            orbit360-platform/data/academia-v1199-policy-receipts.js
-            orbit360-platform/data/academia-v1200-renewals.js
-            orbit360-platform/data/academia-v1201-emision-endosos.js
-            orbit360-platform/data/academia-v1202-directorios-aseguradoras.js
-            orbit360-platform/data/academia-v1203-cotizador-comparativo.js
-            orbit360-platform/index.html
-            orbit360-platform/modules/aseguradoras.js
-            orbit360-platform/modules/cotizador.js
-            orbit360-platform/modules/comparativo.js
-            orbit360-platform/modules/cliente360.js
-            orbit360-platform/modules/polizas.js
-            orbit360-platform/modules/academia.js
-            orbit360-platform/styles/base.css
-            orbit360-platform/styles/infra.css
-            orbit360-platform/styles/v1197-empalme.css
+      - name: Install Firebase transport after GO
+        if: steps.preflight.outputs.go == 'true'
+        shell: bash
+        run: npm install --no-save --package-lock=false firebase-tools@15.25.1 >/dev/null
+
+      - name: Restore authorized v6 Hosting LAB backup
+        if: steps.preflight.outputs.go == 'true'
+        id: restore
+        shell: bash
+        env:
+          ORBIT360_RUNTIME_EXECUTION_AUTHORIZED: 'true'
+          FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: bash tools/orbit360-restore-visual-matrix-v6-backup-before-runtime-v20260806.sh
+
+      - name: Execute backup, one Hosting LAB deploy and supervised matrix
+        if: steps.restore.outcome == 'success'
+        id: runtime
+        shell: bash
+        env:
+          ORBIT360_RUNTIME_EXECUTION_AUTHORIZED: 'true'
+          FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: bash tools/orbit360-run-visual-matrix-corrected-post-auth-runtime-only-v3-cross-runner-v20260806.sh
+
+      - name: Attach prior restore to closure
+        if: always() && steps.detect.outputs.dispatch == 'true' && steps.preflight.outputs.go == 'true'
+        shell: bash
+        run: node tools/orbit360-attach-visual-matrix-v7-restore-evidence-v20260806.mjs
+
+      - name: Persist sanitized closure
+        if: always() && steps.detect.outputs.dispatch == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name orbit360-gate-bot
+          git config user.email orbit360-gate-bot@users.noreply.github.com
+          FILES=(
+            '.github/orbit360-requests/visual-matrix-corrected-post-auth-lab-v20260805-authorization.json'
+            'orbit360-platform/runtime-gate-crm-v20260716/visual-matrix-corrected-post-auth-preflight-sanitized-v20260805.json'
+            'orbit360-platform/runtime-gate-crm-v20260716/visual-matrix-v8-prior-hosting-restore-sanitized-v20260806.json'
+            'orbit360-platform/runtime-gate-crm-v20260716/visual-matrix-corrected-post-auth-precheck-sanitized-v20260805.json'
+            'orbit360-platform/runtime-gate-crm-v20260716/visual-matrix-corrected-post-auth-matrix-sanitized-v20260805.json'
+            'orbit360-platform/runtime-gate-crm-v20260716/visual-matrix-supervisor-sanitized-v20260806.json'
+            'orbit360-platform/runtime-gate-crm-v20260716/visual-matrix-corrected-post-auth-final-sanitized-v20260805.json'
+            'tools/orbit360-validator-lifecycle-contract-visual-matrix-corrected-post-auth-lab-v20260805.json'
+            'orbit360-platform/docs/CIERRE-MATRIZ-VISUAL-CORREGIDA-POST-AUTH-20260805.md'
           )
-          for file in "${code_files[@]}"; do
-            test -f "$file"
-            copy_code "$file"
+          for file in "${FILES[@]}"; do
+            [[ -e "$file" ]] && git add "$file"
           done
+          if ! git diff --cached --quiet; then
+            git commit -m 'runtime: persist visual matrix v8 closure [skip ci]'
+            git push origin HEAD:ays/backend-tenant-lab-v99-20260703
+          fi
 
-          doc_files=(
-            orbit360-platform/docs/INSTRUCCIONES-MAESTRAS-CONTINUIDAD-ORBIT360-AYS-20260704.md
-            orbit360-platform/docs/ADENDUM-ACADEMIA-PROFUNDA-INTERACTIVA-ORBIT360-AYS-20260704.md
-            orbit360-platform/docs/ADDENDUM-MAESTRO-PATRONES-REUTILIZABLES-CLAUDE-BACKEND-ORBIT360-20260707.md
-            orbit360-platform/docs/ADDENDUM-MAESTRO-CONTINUIDAD-CLIENTES-MULTIROL-IMPORTADORES-20260709.md
-            orbit360-platform/docs/ACTUALIZACION-DELTA-CLAUDE-CRM-V1198-20260711.md
-            orbit360-platform/docs/ACTUALIZACION-DELTA-CLAUDE-POLIZA-RECIBOS-V1199-20260711.md
-            orbit360-platform/docs/ACTUALIZACION-DELTA-CLAUDE-RENOVACIONES-V1200-20260711.md
-            orbit360-platform/docs/ACTUALIZACION-DELTA-CLAUDE-CRM-V1201-20260711.md
-            orbit360-platform/docs/ACTUALIZACION-DELTA-CLAUDE-ASEGURADORAS-V1202-20260711.md
-            orbit360-platform/docs/ACTUALIZACION-DELTA-CLAUDE-COTIZADOR-COMPARATIVO-V1203-20260711.md
-            orbit360-platform/docs/AUDITORIA-CIERRE-CRM-TRANSVERSAL-V1198-20260711.md
-            orbit360-platform/docs/AUDITORIA-CIERRE-POLIZA-RECIBOS-COBROS-V1199-20260711.md
-            orbit360-platform/docs/AUDITORIA-Y-CORRECCION-RENOVACIONES-V1200-20260711.md
-            orbit360-platform/docs/AUDITORIA-CIERRE-RENOVACION-EMISION-ENDOSOS-V1201-20260711.md
-            orbit360-platform/docs/AUDITORIA-OPERATIVA-DIRECTORIOS-ASEGURADORAS-GT-CO-V1202-20260711.md
-            orbit360-platform/docs/AUDITORIA-OPERATIVA-COTIZADOR-COMPARATIVO-V1203-20260711.md
-            orbit360-platform/docs/AUDITORIA-VISUAL-REAPERTURA-ASEGURADORAS-COTIZADOR-COMPARATIVO-V1203-20260711.md
-            orbit360-platform/docs/CONTROL-CONTINUIDAD-OPERATIVA-HASTA-V1203-20260711.md
-            orbit360-platform/docs/DECISION-FRONTERA-V110-ASEGURADORAS-ORBIT-COTIZADOR-COMPARATIVO-20260709.md
-            orbit360-platform/docs/MAPA-INTEGRACION-ASEGURADORAS-ORBIT-COTIZADOR-COMPARATIVO-V110-20260709.md
-            orbit360-platform/docs/MATRIZ-EMPALME-COTIZADOR-COMPARATIVO-ORBIT-V110-20260710.md
-            orbit360-platform/docs/AUDITORIA-FORENSE-PROFUNDA-COTIZADOR-COMPARATIVO-V110-CONTRATO-AYS-20260709.md
-          )
-          for file in "${doc_files[@]}"; do
-            test -f "$file"
-            cp "$file" "$DOCS/$(basename "$file")"
-          done
-
-          test_files=(
-            orbit360-platform/tools/orbit360-test-access-scope-v1198.mjs
-            orbit360-platform/tools/orbit360-validar-cierre-crm-v1198.mjs
-            orbit360-platform/tools/orbit360-test-policy-receipts-v1199b.mjs
-            orbit360-platform/tools/orbit360-validar-policy-receipts-v1199b.mjs
-            orbit360-platform/tools/orbit360-validar-renovaciones-v1200b.mjs
-            orbit360-platform/tools/orbit360-test-issuance-endosos-v1201.mjs
-            orbit360-platform/tools/orbit360-validar-emision-endosos-v1201.mjs
-            orbit360-platform/tools/orbit360-test-directorio-aseguradoras-v1202.mjs
-            orbit360-platform/tools/orbit360-validar-directorio-aseguradoras-v1202.mjs
-            orbit360-platform/tools/orbit360-test-cotizador-comparativo-v1203.mjs
-            orbit360-platform/tools/orbit360-validar-cotizador-comparativo-v1203.mjs
-          )
-          for file in "${test_files[@]}"; do
-            test -f "$file"
-            cp "$file" "$TESTS/$(basename "$file")"
-          done
-
-          cat > "$ROOT/README-CODIGO-REAL.txt" <<'EOF'
-Este paquete contiene físicamente los archivos v1.198–v1.203 que faltaban en el espacio de Claude.
-No es una base para sobrescribir la candidata visual v1.198.
-Lea 00_LEER_PRIMERO.md y el manifiesto antes de modificar cualquier archivo.
-EOF
-
-          find "$ROOT" -type f -print0 | sort -z | xargs -0 sha256sum > "$ROOT/MANIFIESTO-SHA256.txt"
-          zip -qr "${ROOT}.zip" "$ROOT"
-
-      - name: Subir artefacto
+      - name: Publish private sanitized captures
+        if: always() && steps.detect.outputs.dispatch == 'true'
         uses: actions/upload-artifact@v4
         with:
-          name: ORBIT360_CLAUDE_RECONCILIADO_V1205_20260711
-          path: ORBIT360_CLAUDE_RECONCILIADO_V1205_20260711.zip
-          if-no-files-found: error
+          name: orbit360-visual-matrix-runtime-v8-${{ github.run_id }}
+          path: orbit360-visual-matrix-corrected-artifacts/
+          if-no-files-found: ignore
           retention-days: 7
