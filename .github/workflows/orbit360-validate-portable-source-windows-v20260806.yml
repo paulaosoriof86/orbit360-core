@@ -6,9 +6,14 @@ on:
       - ays/backend-tenant-lab-v99-20260703
     paths:
       - tools/orbit360-source-canary-windows-v20260806.txt
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - tools/orbit360-source-canary-windows-v20260806.txt
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: orbit360-portable-source-windows-v20260806
@@ -19,37 +24,112 @@ jobs:
     runs-on: windows-latest
     timeout-minutes: 20
     steps:
-      - name: Checkout exact PR head
+      - name: Checkout exact source
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
           fetch-depth: 1
-          persist-credentials: false
+          persist-credentials: ${{ github.event_name == 'push' }}
 
       - name: Validate portable signal-safe and cross-runner source
+        id: validate
         shell: bash
         env:
           RUNNER_OS: Windows
         run: |
-          set -euo pipefail
+          set +e
+          SIGNAL_OUT='orbit360-platform/runtime-gate-crm-v20260716/visual-matrix-timeout-signal-safe-source-test-sanitized-v20260806.json'
+          CROSS_OUT='orbit360-platform/runtime-gate-crm-v20260716/visual-matrix-cross-runner-source-test-sanitized-v20260806.json'
+          RESULT_OUT='orbit360-platform/runtime-gate-crm-v20260716/portable-windows-source-hosted-sanitized-v20260806.json'
+
           node tools/orbit360-test-visual-matrix-timeout-signal-safe-portable-v20260806.mjs
+          SIGNAL_EXIT=$?
           node tools/orbit360-test-visual-matrix-cross-runner-portable-v20260806.mjs
+          CROSS_EXIT=$?
+
+          export SIGNAL_OUT CROSS_OUT RESULT_OUT SIGNAL_EXIT CROSS_EXIT
           node <<'NODE'
           const fs = require('node:fs');
-          const signal = JSON.parse(fs.readFileSync('orbit360-platform/runtime-gate-crm-v20260716/visual-matrix-timeout-signal-safe-source-test-sanitized-v20260806.json', 'utf8'));
-          const cross = JSON.parse(fs.readFileSync('orbit360-platform/runtime-gate-crm-v20260716/visual-matrix-cross-runner-source-test-sanitized-v20260806.json', 'utf8'));
-          if (!(signal.ok === true && signal.total === 48 && signal.passed === 48 && signal.failed === 0)) process.exit(42);
-          if (!(cross.ok === true && cross.total === 24 && cross.passed === 24 && cross.failed === 0)) process.exit(42);
-          console.log(JSON.stringify({
-            status: 'PASS_PORTABLE_SOURCE_WINDOWS',
-            signalSafe: `${signal.passed}/${signal.total}`,
-            crossRunner: `${cross.passed}/${cross.total}`,
-            compatibilityApplied: signal.compatibilityApplied === true,
+          const path = require('node:path');
+          const read = file => {
+            try { return JSON.parse(fs.readFileSync(file, 'utf8')); }
+            catch { return {}; }
+          };
+          const signal = read(process.env.SIGNAL_OUT);
+          const cross = read(process.env.CROSS_OUT);
+          const ok = Number(process.env.SIGNAL_EXIT) === 0
+            && Number(process.env.CROSS_EXIT) === 0
+            && signal.ok === true && signal.total === 48 && signal.passed === 48 && signal.failed === 0
+            && cross.ok === true && cross.total === 24 && cross.passed === 24 && cross.failed === 0;
+          const result = {
+            schemaVersion: 'orbit360-portable-windows-source-hosted-v1',
+            status: ok ? 'PASS_PORTABLE_SOURCE_WINDOWS' : 'FAIL_PORTABLE_SOURCE_WINDOWS',
+            classification: ok ? 'SOURCE_FIX_VALIDATED_WINDOWS_HOSTED' : 'VALIDATOR_STALE_OR_PIPELINE_MECHANISM_FAILURE',
+            runId: process.env.GITHUB_RUN_ID || '',
+            runAttempt: Number(process.env.GITHUB_RUN_ATTEMPT || 1),
+            eventName: process.env.GITHUB_EVENT_NAME || '',
+            sourceSha: process.env.GITHUB_SHA || '',
+            signalSafe: {
+              exitCode: Number(process.env.SIGNAL_EXIT),
+              total: Number(signal.total || 0),
+              passed: Number(signal.passed || 0),
+              failed: Number(signal.failed || 0),
+              compatibilityApplied: signal.compatibilityApplied === true,
+              compatibilityBasis: signal.compatibilityBasis || ''
+            },
+            crossRunner: {
+              exitCode: Number(process.env.CROSS_EXIT),
+              total: Number(cross.total || 0),
+              passed: Number(cross.passed || 0),
+              failed: Number(cross.failed || 0),
+              priorSignalCompatibilityApplied: cross.priorSignalCompatibilityApplied === true
+            },
             secretsRead: false,
             firebaseAccess: false,
+            firestoreReads: 0,
+            firestoreWrites: 0,
+            authWrites: 0,
+            operationalWrites: 0,
             browserExecuted: false,
+            hostingTouched: false,
             deployExecuted: false,
             productionTouched: false,
-            ok: true
-          }, null, 2));
+            mainTouched: false,
+            mergeExecuted: false,
+            containsPII: false,
+            containsSecrets: false,
+            containsPasswords: false,
+            ok
+          };
+          fs.mkdirSync(path.dirname(process.env.RESULT_OUT), { recursive: true });
+          fs.writeFileSync(process.env.RESULT_OUT, JSON.stringify(result, null, 2) + '\n', 'utf8');
+          console.log(JSON.stringify(result, null, 2));
           NODE
+
+          if [[ "$SIGNAL_EXIT" == '0' && "$CROSS_EXIT" == '0' ]]; then
+            echo 'validation_exit=0' >> "$GITHUB_OUTPUT"
+          else
+            echo 'validation_exit=42' >> "$GITHUB_OUTPUT"
+          fi
+          exit 0
+
+      - name: Persist sanitized result on canonical push
+        if: github.event_name == 'push'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name orbit360-gate-bot
+          git config user.email orbit360-gate-bot@users.noreply.github.com
+          git add \
+            orbit360-platform/runtime-gate-crm-v20260716/visual-matrix-timeout-signal-safe-source-test-sanitized-v20260806.json \
+            orbit360-platform/runtime-gate-crm-v20260716/visual-matrix-cross-runner-source-test-sanitized-v20260806.json \
+            orbit360-platform/runtime-gate-crm-v20260716/portable-windows-source-hosted-sanitized-v20260806.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'test: persist Windows portable source validation [skip ci]'
+            git push origin "HEAD:ays/backend-tenant-lab-v99-20260703"
+          fi
+
+      - name: Enforce source-only PASS
+        shell: bash
+        run: |
+          test '${{ steps.validate.outputs.validation_exit }}' = '0'
