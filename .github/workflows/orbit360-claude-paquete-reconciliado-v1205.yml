@@ -13,7 +13,6 @@ concurrency:
 
 jobs:
   registered-runtime-relay:
-    if: github.event_name == 'pull_request' && github.head_ref == 'ays/backend-tenant-lab-v99-20260703'
     runs-on: ubuntu-24.04
     timeout-minutes: 70
     env:
@@ -26,19 +25,25 @@ jobs:
       ORBIT360_LIFECYCLE: tools/orbit360-validator-lifecycle-contract-visual-matrix-corrected-post-auth-lab-v20260805.json
 
     steps:
-      - name: Checkout exact canonical PR head
+      - name: Checkout exact pull request head
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
           persist-credentials: true
 
-      - name: Detect exclusive authorized v8 request commit
+      - name: Detect canonical exclusive authorized v8 request
         id: detect
         shell: bash
         run: |
           set -euo pipefail
+          BRANCH='ays/backend-tenant-lab-v99-20260703'
           REQUEST='.github/orbit360-requests/visual-matrix-corrected-post-auth-lab-v20260805-authorization.json'
+          if [[ "${GITHUB_EVENT_NAME:-}" != 'pull_request' || "${ORBIT360_TRANSPORT_HEAD_REF:-}" != "$BRANCH" ]]; then
+            echo 'dispatch=false' >> "$GITHUB_OUTPUT"
+            echo 'SKIP_REGISTERED_RELAY_NONCANONICAL_CONTEXT'
+            exit 0
+          fi
           mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
           if [[ "${#CHANGED[@]}" != '1' || "${CHANGED[0]}" != "$REQUEST" ]]; then
             echo 'dispatch=false' >> "$GITHUB_OUTPUT"
