@@ -1,14 +1,14 @@
 # PLAN ÚNICO DE SALIDA — RC-AYS-LAB-CANONICA-01
 
 Fecha de adopción: 2026-08-04  
-Última actualización: 2026-08-05 19:42 GT  
+Última actualización: 2026-08-05 20:34 GT  
 Rama obligatoria: `ays/backend-tenant-lab-v99-20260703`  
 PR: #5 draft/open  
 Producción, `main` y merge: no autorizados
 
 ## 1. Carácter vinculante
 
-Este Plan Único, el estado vivo del PR/HEAD, el lifecycle y la evidencia sanitizada reciente gobiernan una sola candidata acumulativa A&S.
+Este Plan Único, el estado vivo del PR/HEAD, los lifecycle y la evidencia sanitizada reciente gobiernan una sola candidata acumulativa A&S.
 
 Precedencia:
 
@@ -17,7 +17,7 @@ Precedencia:
 3. este Plan Único;
 4. lifecycle, ledger y evidencia reciente.
 
-No se reemplaza la candidata por una composición parcial, no se repiten requests consumidos y no se ejecuta nuevamente una etapa fallida sin cerrar primero su causa raíz.
+No se reemplaza la candidata por una composición parcial, no se repiten requests consumidos y no se reintenta el mismo mecanismo cuando una etapa o familia de fallo ya se repitió.
 
 ## 2. Alcance del primer go-live
 
@@ -36,7 +36,7 @@ Equipo/Auth
 multirol/scopes
 ```
 
-La salida será progresiva. Cotizador, Comparativo y el backend completo de Renovaciones no bloquean la primera salida, siempre que no existan accesos engañosos o funciones que interrumpan el núcleo operativo.
+La salida será progresiva. Cotizador, Comparativo y el backend completo de Renovaciones no bloquean la primera salida, siempre que no existan accesos engañosos ni funciones que interrumpan el núcleo operativo.
 
 Después del go-live, cada módulo o función adicional se incorporará mediante release incremental con prueba técnica, prueba viva, aceptación, backup y rollback.
 
@@ -116,7 +116,7 @@ Una propuesta o un HOLD no es un cobro confirmado.
 
 ## 5. Rootfix visual post-Auth
 
-### 5.1 Rootfix source-only
+### 5.1 Rootfix transversal source-only
 
 ```text
 gate: block2.7-visual-runtime-rootfix-static-v20260805
@@ -145,22 +145,12 @@ Hosting deploy: 1
 resultado: STOP_RETRY
 rollback: PASS
 snapshot: VERIFIED_UNCHANGED
-clasificación inicial: VALIDATOR_STALE
+clasificación: VALIDATOR_STALE
 ```
 
-Ese capturador no identificó el checkpoint exacto. El request está consumido y no se repite.
+El capturador no identificó el checkpoint exacto. Ese request está consumido y no se repite.
 
-### 5.3 Precheck observable y matriz 2.7.3
-
-Registro del gate:
-
-```text
-gate: block2.7-visual-observable-rootfix-lab-v20260805
-contract: 2.7.3
-registro/perfil: 7/7 PASS source-only
-```
-
-Ejecución autorizada:
+### 5.3 Run observable 2.7.3
 
 ```text
 run: 31063000137
@@ -176,72 +166,21 @@ Functions/Rules deploys: 0
 producción/main/merge: 0
 ```
 
-Estado actual:
-
-```text
-PASS_VISUAL_POST_AUTH: NO
-rootfix vivo y aprobado: NO
-Hosting LAB: restaurado a la versión previa
-request: CONSUMED_STOP_RETRY
-replay: prohibido
-```
-
-## 6. Causa raíz cerrada
-
-Clasificación:
+Causa raíz cerrada:
 
 ```text
 DATA_CONTRACT_FAILURE
 ```
 
-Checkpoint:
+Antes del timeout estaban listos Firebase Auth, usuario de producto, membresía activa, tenant, ruta `inicio`, rootfix, 29 snapshots y las siete colecciones canónicas.
 
-```text
-INICIO_READY_TIMEOUT
-```
-
-Antes del timeout estaban listos:
-
-```text
-Firebase Auth
-usuario de producto
-membresía activa
-vínculo con tenant
-ruta inicio
-rootfix cargado
-29 snapshots conectados
-7 colecciones canónicas
-```
-
-Las siete colecciones canónicas disponibles eran:
-
-```text
-clientes
-aseguradoras
-polizas
-vehiculos
-recibosEsperados
-carteraPrimas
-cobros
-```
-
-La colección legacy `asesores` permaneció en `snapshotErrors`.
-
-El rootfix declaró:
-
-```text
-MODULE_DEPS.inicio = clientes + polizas + cobros + asesores + aseguradoras
-```
-
-`hydrationStatus` consideró que la vista no estaba lista y `wrapModule` reemplazó el render original por una pantalla bloqueante. La evidencia visible fue:
+El rootfix declaró la colección legacy `asesores` como dependencia obligatoria de `Inicio`. `asesores` permaneció en `snapshotErrors`; `hydrationStatus` y `wrapModule` mantuvieron una carga bloqueante:
 
 ```text
 4 de 5 fuentes listas · falta asesores
 ```
 
-El módulo original puede operar con `asesores=[]`; por tanto, el bloqueo fue introducido por un contrato de hidratación incompatible con el estado vivo del runtime.
-
-Owner exacto:
+Owner:
 
 ```text
 orbit360-platform/core/visual-runtime-rootfix-v20260805.js
@@ -250,25 +189,119 @@ hydrationStatus
 wrapModule
 ```
 
-No se atribuye a Auth, credenciales, membresía, tenant, Rules ni entorno porque esas etapas ya habían pasado. Tampoco se modifican Rules sin evidencia de que sean la causa.
+No se atribuye a Auth, credenciales, memberships, tenant, Rules ni entorno.
 
-## 7. Correctivo obligatorio antes de otro runtime
+## 6. Correctivo required/optional — SOURCE PASS
 
-Debe prepararse y pasar primero un gate source-only que:
+Se preparó un overlay de lectura que no modifica `data/store.js`, Firestore, Auth ni los datos operativos:
 
-1. separe dependencias canónicas obligatorias y fuentes legacy opcionales;
-2. no bloquee `Inicio` por `asesores`;
-3. proyecte asesores visualmente desde memberships/Equipo, sin escritura y sin hardcode;
-4. muestre un estado degradado honesto para leaderboard y metas si no existe proyección opcional;
-5. revise el contrato required/optional en Cliente 360, Pólizas, Cobros, Ops, Leads, Conciliaciones y Cancelaciones;
-6. conserve cero escrituras y cero datos tenant en código genérico;
-7. actualice owner, validador, workflow, documentación y Academia juntos.
+```text
+orbit360-platform/core/visual-runtime-hydration-contract-v20260805.js
+orbit360-platform/core/backend-lab-loader.js
+```
 
-Solo después de PASS source-only podrá solicitarse una nueva autorización runtime. No se abre otra ejecución visual antes.
+Contrato:
+
+- las fuentes canónicas esenciales gobiernan readiness;
+- las fuentes legacy opcionales no bloquean el render;
+- la información auxiliar ausente produce un estado degradado honesto;
+- los responsables se proyectan visualmente desde la membresía activa y relaciones canónicas;
+- no existen usuarios hardcodeados, identidades demo ni escrituras;
+- Inicio, Aseguradoras, Cliente 360, Pólizas, Cobros, Conciliaciones, Cancelaciones, Ops y Leads comparten el mismo criterio.
+
+Validación:
+
+```text
+gate: block2.7-visual-hydration-required-optional-source-v20260805
+contract: 2.7.4
+status: PASS_DIRECT_SOURCE_VALIDATION
+checks: 24/24 PASS
+browser/secrets/Firestore/deploy: 0
+Firestore/Auth/operational writes: 0
+```
+
+Evidencia:
+
+```text
+orbit360-platform/runtime-gate-crm-v20260716/visual-hydration-direct-source-validation-sanitized-v20260805.json
+```
+
+El `DATA_CONTRACT_FAILURE` del producto queda corregido en fuente, pero el rootfix todavía no está vivo ni visualmente aprobado.
+
+## 7. Gate observable v2 — autorización reservada y pipeline detenido
+
+Gate preparado:
+
+```text
+gate: block2.7-visual-observable-rootfix-v2-lab-v20260805
+contract: 2.7.5
+source prerequisite: PASS 24/24
+```
+
+Alcance autorizado:
+
+```text
+GO_GATE_CONTRACT antes de secretos
+backup Hosting LAB
+máximo un deploy exclusivo de Hosting
+precheck Auth/membresía/ruta/hidratación
+matriz solo con precheck PASS
+Dirección 1440×1000
+Operativo 1024×768
+Asesor 390×844
+cero writes/Functions/Rules/reimport/production/main/merge
+rollback ante fallo
+```
+
+Estado gobernante:
+
+```text
+STOP_RETRY
+classification: PIPELINE_MECHANISM_FAILURE
+checkpoint: ACTIONS_TRIGGER_NOT_CREATED
+workflow runs creados: 0
+gate ejecutado: NO
+GO_GATE_CONTRACT producido: NO
+secretos leídos: NO
+Firestore leído: NO
+backup creado: NO
+Hosting deploys: 0
+navegador ejecutado: NO
+autorización runtime consumida: NO
+```
+
+Se probaron sin éxito los siguientes transportes:
+
+1. workflow source nuevo;
+2. relay source mediante workflow conocido;
+3. request runtime v2 con patrón nuevo;
+4. request runtime v2 con patrón histórico.
+
+Ninguno creó un workflow run ni evidencia de ejecución. La misma familia falló más de dos veces; se prohíben nuevos archivos request o reintentos del mecanismo push-path.
+
+Owner de la causa:
+
+```text
+.github/workflows/orbit360-visual-observable-rootfix-lab-v20260805.yml
+GitHub Actions trigger/dispatch del repositorio
+```
+
+Solución requerida:
+
+- exponer o reparar un mecanismo soportado de dispatch para el runner v2 ya versionado; o
+- ejecutar el runner mediante un workflow registrado fuera de esta rama no fusionada;
+- conservar la autorización actual, sin solicitar otra, porque no fue consumida;
+- no tocar producto, datos, Hosting, Functions o Rules para resolver este bloqueo.
+
+Evidencia:
+
+```text
+orbit360-platform/runtime-gate-crm-v20260716/visual-observable-rootfix-v2-pipeline-stop-sanitized-v20260805.json
+```
 
 ## 8. Política de pruebas directamente desde la plataforma
 
-Cada módulo tendrá dos niveles distintos:
+Cada módulo tendrá dos niveles distintos.
 
 ### 8.1 Prueba viva read-only
 
@@ -284,7 +317,7 @@ Cada módulo tendrá dos niveles distintos:
 
 ### 8.2 Gate CRUD sintético con rollback
 
-Cuando exista autorización separada de escritura:
+Con autorización separada de escritura:
 
 - crear;
 - leer;
@@ -387,45 +420,31 @@ COBROS_REAL_LEDGER_COMPLETE
 correcciones bloqueantes de pólizas cerradas
 ```
 
-Salida:
-
-```text
-RC_ACCUMULATIVE_MODULES_COMPLETE
-```
+Salida: `RC_ACCUMULATIVE_MODULES_COMPLETE`.
 
 ### Bloque 6.0 — aceptación
 
 Incluye visualización final A&S, checklist funcional por rol, conteos, corte de datos, pendientes diferidos, backup, rollback y aceptación explícita.
 
-Salida:
-
-```text
-RELEASE_CANDIDATE_ACCEPTED
-```
+Salida: `RELEASE_CANDIDATE_ACCEPTED`.
 
 ### Bloque 7.0 — go-live
 
 Permanece bloqueado hasta autorización expresa.
 
-Salida:
-
-```text
-GO_PRODUCTION_A&S
-```
+Salida: `GO_PRODUCTION_A&S`.
 
 ## 13. Carriles
 
 ### Carril A — frontend, UX y Academia
 
 ```text
-rootfix source-only: PASS 28/28
-run observable: STOP_RETRY
-causa: DATA_CONTRACT_FAILURE
-checkpoint: INICIO_READY_TIMEOUT
-rollback: PASS
+rootfix transversal source-only: PASS 28/28
+required/optional source-only: PASS 24/24
+rootfix vivo: NO
+PASS_VISUAL_POST_AUTH: NO
+pipeline runtime: STOP_RETRY · ACTIONS_TRIGGER_NOT_CREATED
 ```
-
-Siguiente: contrato required/optional de hidratación source-only.
 
 ### Carril B — backend, seguridad y acceso
 
@@ -434,6 +453,7 @@ Auth: PASS
 memberships: PASS
 Ops/Leads backend: PASS técnico
 Functions/Rules desplegados en este bloque: 0
+secretos leídos en intento v2: 0
 ```
 
 No se reabre Auth ni se cambian Rules por este fallo.
@@ -459,6 +479,8 @@ reimportación causada por rootfix: no
 | 2.7C | run 31061214801 | STOP_RETRY · VALIDATOR_STALE · rollback PASS |
 | 2.7D | registro observable 2.7.3 | PASS 7/7 source-only |
 | 2.7E | run 31063000137 | STOP_RETRY · DATA_CONTRACT_FAILURE · INICIO_READY_TIMEOUT · rollback PASS |
+| 2.7F | hydration source 2.7.4 | PASS 24/24 source-only |
+| 2.7G | runtime observable v2 2.7.5 | STOP_RETRY · PIPELINE_MECHANISM_FAILURE · autorización no consumida |
 | 3.0 | Ops/Leads backend | PASS técnico |
 | 3.1 | Auth autoadministrable | PASS 7/7 |
 | 4.0 | Cobros full replay | PASS 365/365 read-only |
@@ -473,6 +495,8 @@ reimportación causada por rootfix: no
 orbit360-platform/runtime-gate-crm-v20260716/visual-observable-rootfix-final-sanitized-v20260805.json
 orbit360-platform/runtime-gate-crm-v20260716/visual-observable-rootfix-governing-stop-sanitized-v20260805.json
 orbit360-platform/runtime-gate-crm-v20260716/visual-observable-rootcause-closure-sanitized-v20260805.json
+orbit360-platform/runtime-gate-crm-v20260716/visual-hydration-direct-source-validation-sanitized-v20260805.json
+orbit360-platform/runtime-gate-crm-v20260716/visual-observable-rootfix-v2-pipeline-stop-sanitized-v20260805.json
 orbit360-platform/docs/CIERRE-VISUAL-OBSERVABLE-ROOTFIX-LAB-20260805.md
 ```
 
@@ -491,22 +515,24 @@ Debe enseñar:
 - estados degradados honestos;
 - proyección visual desde memberships sin escritura;
 - diferencia entre prueba técnica, prueba viva y CRUD con rollback;
-- diferencia entre defecto funcional, contrato de datos y validador obsoleto;
+- diferencia entre defecto funcional, contrato de datos, validador obsoleto y fallo de pipeline;
+- requests consumidos frente a autorizaciones reservadas no ejecutadas;
 - releases progresivos post-go-live.
 
 ## 17. Siguiente acción exacta
 
 ```text
-1. mantener Hosting LAB restaurado y congelar nuevas ejecuciones visuales
-2. preparar contrato source-only required/optional de hidratación
-3. corregir MODULE_DEPS/hydrationStatus/wrapModule sin hardcode ni datos tenant
-4. proyectar asesores desde memberships/Equipo sin escritura
-5. validar transversalmente Inicio, Cliente 360, Pólizas, Cobros, Ops, Leads, Conciliaciones y Cancelaciones
-6. actualizar owner, gate, workflow, Plan y Academia juntos
-7. solo con PASS source-only solicitar nueva autorización runtime
-8. después de PASS_VISUAL_POST_AUTH preparar CRUD sintético y retomar Cobros 4.1
+1. mantener Hosting LAB en la versión previa restaurada
+2. conservar el source fix required/optional 24/24 PASS
+3. mantener la autorización runtime v2 reservada y no consumida
+4. no crear más request files ni reintentar el push-path
+5. reparar o exponer un mecanismo Actions dispatch soportado
+6. ejecutar el runner v2 ya versionado únicamente después de GO_GATE_CONTRACT
+7. con PASS del precheck, ejecutar la matriz Dirección/Operativo/Asesor
+8. cerrar PASS_VISUAL_POST_AUTH o STOP_RETRY con checkpoint exacto
+9. después preparar CRUD sintético y retomar Cobros 4.1
 ```
 
 ## 18. Regla de actualización
 
-Cada iteración actualiza avance, fuente, implementación, evidencia, gate, estado, Plan, PR, Academia y acumulado Claude. Un fallo del capturador no se atribuye al producto sin checkpoint; una dependencia opcional no debe bloquear un módulo; una inferencia no se convierte en cobro confirmado por presión de cierre; y una póliza nueva posterior al corte no reinicia toda la salida productiva.
+Cada iteración actualiza avance, fuente, implementación, evidencia, gate, estado, Plan, PR, Academia y acumulado Claude. Un fallo del capturador no se atribuye al producto sin checkpoint; una dependencia opcional no bloquea un módulo; un fallo de Actions no consume una autorización que nunca llegó al gate; una inferencia no se convierte en cobro confirmado por presión de cierre; y una póliza nueva posterior al corte no reinicia toda la salida productiva.
