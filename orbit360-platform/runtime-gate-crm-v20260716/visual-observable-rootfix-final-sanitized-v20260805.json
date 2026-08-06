@@ -6,7 +6,7 @@
   "attempt": 1,
   "stage": "STOP_RETRY_VISUAL_OBSERVABLE_ROOTFIX",
   "decision": "STOP_RETRY",
-  "classification": "VALIDATOR_STALE_OR_PRODUCT_WAIT_IDENTIFIED",
+  "classification": "DATA_CONTRACT_FAILURE",
   "checkpoint": "INICIO_READY_TIMEOUT",
   "preflightStatus": "GO_GATE_CONTRACT",
   "preflightChecks": 24,
@@ -27,7 +27,6 @@
   "precheckStage": "FAIL_VISUAL_BROWSER_PRECHECK",
   "precheckCheckpoint": "INICIO_READY_TIMEOUT",
   "precheckObservedState": {
-    "href": "https://ays-orbit-360-lab.web.app/index.html?orbitBackend=firestore-lab&tenant=alianzas-soluciones&runtime=20260717-2",
     "authStage": "inside",
     "preAuth": false,
     "loginVisible": false,
@@ -87,7 +86,7 @@
   "roleResults": [],
   "totalRoleFailures": null,
   "totalWarnings": null,
-  "snapshotIntegrity": "NOT_VERIFIED",
+  "snapshotIntegrity": "PRECHECK_READONLY_NO_OPERATIONAL_WRITES",
   "firestoreReads": 1,
   "firestoreWrites": 0,
   "authWrites": 0,
@@ -98,6 +97,36 @@
   "productionTouched": false,
   "mainTouched": false,
   "mergeExecuted": false,
+  "productStatus": "ROOTFIX_NOT_LIVE_AND_NOT_VISUALLY_APPROVED",
+  "rootCause": {
+    "category": "DATA_CONTRACT_FAILURE",
+    "owner": "orbit360-platform/core/visual-runtime-rootfix-v20260805.js",
+    "functions": [
+      "MODULE_DEPS.inicio",
+      "hydrationStatus",
+      "wrapModule"
+    ],
+    "problem": "The rootfix declared the legacy asesores collection as a mandatory hydration dependency for Inicio. The seven canonical snapshots were ready, but asesores remained in snapshotErrors; wrapModule therefore kept the module in a blocking loading state.",
+    "proof": {
+      "auth": "READY",
+      "membership": "READY_AND_TENANT_BOUND",
+      "route": "inicio",
+      "rootfix": "LOADED",
+      "canonicalCollectionsReady": 7,
+      "snapshotAttachedCount": 29,
+      "missingRequiredDependency": "asesores",
+      "visibleState": "4 de 5 fuentes listas; falta asesores"
+    },
+    "solution": [
+      "Separate required canonical dependencies from optional legacy sources.",
+      "Do not block Inicio on asesores.",
+      "Project advisors client-side from active memberships and Equipo when needed, without Firestore writes or hardcoding.",
+      "Render honest degraded or empty leaderboard and goals when the optional advisor projection is unavailable.",
+      "Apply the same required versus optional contract to Cliente 360, Polizas, Cobros, Ops, Leads, Conciliaciones and Cancelaciones before another runtime authorization."
+    ],
+    "retryProhibited": true,
+    "newRuntimeAuthorizationRequiredAfterSourcePass": true
+  },
   "containsPII": false,
   "containsSecrets": false,
   "containsPasswords": false,
