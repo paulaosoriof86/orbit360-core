@@ -1,0 +1,41 @@
+{
+  "schemaVersion": "orbit360-cobros-full-ledger-static-request-v1",
+  "gateId": "block10.10-cobros-full-ledger-write-lab-v20260805",
+  "contractVersion": "10.10.2",
+  "rcId": "RC-AYS-LAB-CANONICA-01",
+  "status": "AUTHORIZED_SOURCE_ONLY_ONCE",
+  "approved": true,
+  "allowedExecutions": 1,
+  "consumed": false,
+  "replayAllowed": false,
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "projectId": "ays-orbit-360-lab",
+  "tenantId": "alianzas-soluciones",
+  "parentHead": "a6e6b6c3fafdace08c94fe629d8e631c7b8a32e5",
+  "scope": {
+    "syntaxCheck": true,
+    "plannerFixture": true,
+    "staticContractPreflight": true,
+    "lifecycleSeal": true,
+    "realPrivateRows": false,
+    "firestore": false,
+    "auth": false,
+    "deploy": false,
+    "production": false
+  },
+  "capabilities": {
+    "secrets": false,
+    "firestoreRead": false,
+    "writes": false,
+    "runtime": false,
+    "browser": false,
+    "deploy": false,
+    "functionsDeploy": false,
+    "rulesDeploy": false,
+    "production": false
+  },
+  "containsPII": false,
+  "containsSecrets": false,
+  "containsPasswords": false
+}
