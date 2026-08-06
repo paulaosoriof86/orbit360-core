@@ -12,6 +12,7 @@ const LEGACY_ROUTER = 'tools/orbit360-validar-gate-contracts-legacy-v20260717.mj
 const EVIDENCE_REL = 'orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json';
 const EVIDENCE_PATH = path.join(ROOT, EVIDENCE_REL);
 const DEFAULT_REQUEST_REL = '.github/orbit360-requests/visual-matrix-corrected-post-auth-lab-v20260805-authorization.json';
+const STOP_OVERLAY_REL = 'tools/orbit360-validator-lifecycle-overlay-visual-matrix-v8-stop-preflight-v20260806.json';
 const CANONICAL_LIFECYCLE_COMPOSITION = 'phase-capability-contract-v1';
 const NEW_GATE_CONFIG = Object.freeze({
   "block2.7-visual-matrix-corrected-post-auth-lab-v20260805":{contractVersion:"2.7.8",lifecycle:"tools/orbit360-validator-lifecycle-contract-visual-matrix-corrected-post-auth-lab-v20260805.json",engine:"tools/orbit360-validar-gate-contracts-engine-visual-matrix-corrected-post-auth-lab-v20260805.mjs"}
@@ -73,6 +74,14 @@ try {
   if (!config) throw new Error('CANONICAL_GATE_NOT_REGISTERED_IN_ENTRYPOINT');
   if (!fs.existsSync(path.join(ROOT, config.lifecycle))) throw new Error('CANONICAL_LIFECYCLE_CONTRACT_MISSING');
   if (!fs.existsSync(path.join(ROOT, config.engine))) throw new Error('CANONICAL_ENGINE_MISSING');
+
+  if (fs.existsSync(path.join(ROOT, STOP_OVERLAY_REL))) {
+    const overlay = readJson(STOP_OVERLAY_REL);
+    if (overlay.stopRetryActive === true || overlay.freshAuthorizationRequired === true) {
+      throw new Error('STOP_RETRY_ACTIVE_FRESH_AUTHORIZATION_REQUIRED');
+    }
+  }
+
   const lifecycle = readJson(config.lifecycle);
   if (lifecycle.gateId !== GATE_ID) throw new Error('CANONICAL_GATE_MISMATCH');
   if (lifecycle.gateContractVersion !== config.contractVersion) throw new Error('CANONICAL_GATE_VERSION_MISMATCH');
@@ -82,9 +91,17 @@ try {
   if (!expected) throw new Error('CANONICAL_LIFECYCLE_PHASE_MISMATCH');
   if (!exactCapabilities(profile.capabilities || {}, expected)) throw new Error('CANONICAL_LIFECYCLE_CAPABILITY_MISMATCH');
 
+  const expectedRequestVersion = process.env.ORBIT360_EXPECTED_REQUEST_VERSION || 'NONE_PENDING_FRESH_AUTHORIZATION';
+  if (expectedRequestVersion === 'NONE_PENDING_FRESH_AUTHORIZATION') throw new Error('FRESH_AUTHORIZATION_NOT_REGISTERED');
+
   const requestFile = process.env.ORBIT360_REQUEST_FILE || DEFAULT_REQUEST_REL;
   const requestAbs = path.join(ROOT, requestFile);
   if (!fs.existsSync(requestAbs) || !fs.statSync(requestAbs).isFile()) throw new Error('CANONICAL_REQUEST_FILE_UNAVAILABLE');
+  const request = readJson(requestFile);
+  if (request.requestVersion !== expectedRequestVersion) throw new Error('CANONICAL_REQUEST_VERSION_MISMATCH');
+  if (request.status !== 'AUTHORIZED_ONCE' || request.allowedExecutions !== 1 || request.consumed !== false || request.authorizationFrozen !== false || request.replayAllowed !== false) {
+    throw new Error('CANONICAL_REQUEST_NOT_ACTIVE');
+  }
 
   const run = spawnSync(process.execPath, [config.engine, GATE_ID], {
     cwd: ROOT,
@@ -106,7 +123,8 @@ try {
     canonicalEngine: config.engine,
     canonicalLifecycleContract: config.lifecycle,
     canonicalLifecycleComposition: CANONICAL_LIFECYCLE_COMPOSITION,
-    canonicalRouterVersion: 'v3-request-path-propagation-portable',
+    canonicalRouterVersion: 'v4-stop-overlay-fresh-request-portable',
+    canonicalStopOverlay: STOP_OVERLAY_REL,
     legacyDelegate: LEGACY_ROUTER,
     legacyDelegateBlob: '03d1c45db555a3e482afb4be6aaf8d29c74a79dc',
     engineEvidenceSource: 'sync-file-evidence-not-stdout-v1',
@@ -130,7 +148,7 @@ try {
 } catch (error) {
   const config = NEW_GATE_CONFIG[GATE_ID] || {};
   output = {
-    schemaVersion: 'orbit360-gate-contract-preflight-canonical-router-v3',
+    schemaVersion: 'orbit360-gate-contract-preflight-canonical-router-v4',
     gateId: GATE_ID,
     contractVersion: config.contractVersion || '',
     status: 'VALIDATOR_STALE',
@@ -140,7 +158,8 @@ try {
     error: String(error && error.message || error),
     canonicalLifecycleComposition: CANONICAL_LIFECYCLE_COMPOSITION,
     canonicalEngine: config.engine || '',
-    canonicalRouterVersion: 'v3-request-path-propagation-portable',
+    canonicalRouterVersion: 'v4-stop-overlay-fresh-request-portable',
+    canonicalStopOverlay: STOP_OVERLAY_REL,
     legacyDelegate: LEGACY_ROUTER,
     sourceTransformed: false,
     dataAccess: false,
