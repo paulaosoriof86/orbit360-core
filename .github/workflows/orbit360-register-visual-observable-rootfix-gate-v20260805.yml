@@ -1,0 +1,109 @@
+name: Orbit 360 · Registrar gate visual observable
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - '.github/orbit360-requests/register-visual-observable-rootfix-gate-v20260805-*.json'
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: orbit360-register-visual-observable-rootfix-gate-v20260805
+  cancel-in-progress: false
+
+env:
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  ORBIT360_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/visual-observable-rootfix-gate-registration-sanitized-v20260805.json
+
+jobs:
+  register-gate:
+    name: Corregir registro y validar source-only
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - name: Checkout request exacto
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 3
+          persist-credentials: true
+
+      - name: Verificar request único source-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
+          mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
+          test "${#CHANGED[@]}" = '1'
+          REQUEST_FILE="${CHANGED[0]}"
+          case "$REQUEST_FILE" in
+            .github/orbit360-requests/register-visual-observable-rootfix-gate-v20260805-*.json) ;;
+            *) echo 'PIPELINE_MECHANISM_FAILURE:UNEXPECTED_REQUEST_PATH' >&2; exit 41 ;;
+          esac
+          PARENT="$(git rev-parse HEAD^)"
+          jq -e --arg parent "$PARENT" '
+            .schemaVersion=="orbit360-register-visual-observable-rootfix-gate-request-v1" and
+            .gateId=="block2.7-visual-observable-rootfix-lab-v20260805" and
+            .contractVersion=="2.7.3" and
+            .status=="AUTHORIZED_SOURCE_ONLY_ONCE" and .approved==true and
+            .allowedExecutions==1 and .consumed==false and .replayAllowed==false and
+            .branch=="ays/backend-tenant-lab-v99-20260703" and .pullRequest==5 and
+            .parentHead==$parent and
+            .capabilities.secrets==false and .capabilities.firestoreRead==false and
+            .capabilities.writes==false and .capabilities.runtime==false and
+            .capabilities.browser==false and .capabilities.deploy==false and
+            .capabilities.functionsDeploy==false and .capabilities.rulesDeploy==false and
+            .capabilities.production==false
+          ' "$REQUEST_FILE" >/dev/null
+
+      - name: Validar owners antes del registro
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-register-visual-observable-rootfix-gate-v20260805.mjs
+          node --check tools/orbit360-validar-gate-contracts-engine-visual-observable-rootfix-lab-v20260805.mjs
+          node --check tools/orbit360-visual-runtime-rootfix-browser-precheck-v20260805.mjs
+          node --check tools/orbit360-visual-runtime-rootfix-observable-matrix-v20260805.mjs
+          jq -e '.gateId=="block2.7-visual-observable-rootfix-lab-v20260805" and .gateContractVersion=="2.7.3" and .status=="AUTHORIZED_ONCE_PENDING_PREFLIGHT"' tools/orbit360-validator-lifecycle-contract-visual-observable-rootfix-lab-v20260805.json >/dev/null
+          git diff --check
+
+      - name: Registrar gate y perfil
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-register-visual-observable-rootfix-gate-v20260805.mjs
+          jq -e '
+            .status=="PASS_GATE_REGISTRATION" and
+            .classification=="VALIDATOR_STALE_CLOSED" and
+            .total==7 and .passed==7 and .failed==0 and .ok==true and
+            .secretsRead==false and .firestoreRead==false and
+            .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and
+            .browserExecuted==false and .deployExecuted==false and .productionTouched==false
+          ' "$ORBIT360_EVIDENCE" >/dev/null
+          grep -F 'block2.7-visual-observable-rootfix-lab-v20260805' tools/orbit360-validar-gate-contracts-v20260717.mjs >/dev/null
+          grep -F 'VISUAL_OBSERVABLE_ROOTFIX_LAB_EXECUTION' tools/orbit360-validar-gate-contracts-v20260717.mjs >/dev/null
+          git diff --check
+
+      - name: Persistir registro y evidencia
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name orbit360-gate-bot
+          git config user.email orbit360-gate-bot@users.noreply.github.com
+          git add tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_EVIDENCE"
+          git commit -m 'gate: register visual observable rootfix 2.7.3 [skip ci]'
+          git push origin "HEAD:$ORBIT360_BRANCH"
+
+      - name: Comentar cierre source-only en PR 5
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const body = `## Gate visual observable — registro source-only PASS\n\n\`\`\`text\ngate: block2.7-visual-observable-rootfix-lab-v20260805\ncontract: 2.7.3\nregistro/perfil: PASS 7/7\nsecrets/Firestore/browser/deploy: 0\nnext: request runtime inmutable sobre HEAD registrado\n\`\`\``;
+            await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: 5, body });
