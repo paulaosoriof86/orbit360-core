@@ -1,0 +1,24 @@
+{
+  "schemaVersion": "orbit360-visual-validator-stale-source-closure-request-v1",
+  "status": "AUTHORIZED_SOURCE_ONLY_ONCE",
+  "approved": true,
+  "allowedExecutions": 1,
+  "consumed": false,
+  "replayAllowed": false,
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "parentHead": "5e2c161dc8255930ac6b84a17abc094393c3f9cd",
+  "governingRunId": "31061214801",
+  "reason": "Sincronizar Plan Único y validar source-only el precheck observable después del STOP_RETRY VALIDATOR_STALE",
+  "capabilities": {
+    "secrets": false,
+    "firestoreRead": false,
+    "writes": false,
+    "runtime": false,
+    "browser": false,
+    "deploy": false,
+    "functionsDeploy": false,
+    "rulesDeploy": false,
+    "production": false
+  }
+}
