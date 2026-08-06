@@ -1,4 +1,4 @@
-name: Orbit 360 · Runtime branch context · source only
+name: Orbit 360 · Runtime branch context · source only v2
 
 on:
   pull_request:
@@ -11,7 +11,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: orbit360-runtime-branch-context-source-v20260806
+  group: orbit360-runtime-branch-context-source-v20260806-v2
   cancel-in-progress: false
 
 jobs:
@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
-      - name: Checkout transporte source-only
+      - name: Checkout transporte source-only v2
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.sha }}
@@ -40,13 +40,13 @@ jobs:
           git fetch origin "$BRANCH"
           git checkout -B "$BRANCH" "origin/$BRANCH"
 
-      - name: Ejecutar prueba source-only 24 checks
+      - name: Ejecutar validador v2 source-only 24 checks
         shell: bash
         run: |
           set -euo pipefail
           node tools/orbit360-test-runtime-branch-context-v20260806.mjs
           EVIDENCE='orbit360-platform/runtime-gate-crm-v20260716/runtime-branch-context-source-test-sanitized-v20260806.json'
-          jq -e '.status=="PASS_RUNTIME_BRANCH_CONTEXT_SOURCE" and .total==24 and .passed==24 and .failed==0 and .ok==true and .secretsRead==false and .firestoreRead==false and .runtimeExecuted==false and .browserExecuted==false and .backupExecuted==false and .deployExecuted==false' "$EVIDENCE" >/dev/null
+          jq -e '.schemaVersion=="orbit360-runtime-branch-context-source-test-v2" and .validatorRevision=="real-backup-execution-anchor-v2" and .status=="PASS_RUNTIME_BRANCH_CONTEXT_SOURCE" and .total==24 and .passed==24 and .failed==0 and .ok==true and .secretsRead==false and .firestoreRead==false and .runtimeExecuted==false and .browserExecuted==false and .backupExecuted==false and .deployExecuted==false' "$EVIDENCE" >/dev/null
 
       - name: Persistir evidencia sanitizada en rama canónica
         shell: bash
@@ -57,5 +57,5 @@ jobs:
           git config user.name orbit360-source-gate-bot
           git config user.email orbit360-source-gate-bot@users.noreply.github.com
           git add "$EVIDENCE"
-          git commit -m 'test: persist runtime branch context source pass [skip ci]'
+          git commit -m 'test: persist runtime branch context source pass v2 [skip ci]'
           git push origin "HEAD:$BRANCH"
