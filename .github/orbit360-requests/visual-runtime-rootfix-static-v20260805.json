@@ -1,0 +1,39 @@
+{
+  "schemaVersion": "orbit360-visual-runtime-rootfix-static-request-v1",
+  "gateId": "block2.7-visual-runtime-rootfix-static-v20260805",
+  "contractVersion": "2.7.1",
+  "rcId": "RC-AYS-LAB-CANONICA-01",
+  "status": "AUTHORIZED_SOURCE_ONLY_ONCE",
+  "approved": true,
+  "allowedExecutions": 1,
+  "consumed": false,
+  "replayAllowed": false,
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "parentHead": "66544614a1245bf272fc26cbb5afbd2370c37223",
+  "scope": {
+    "syntax": true,
+    "sourceContract": true,
+    "securityBoundary": true,
+    "lifecycleSeal": true,
+    "browser": false,
+    "firestore": false,
+    "auth": false,
+    "deploy": false,
+    "production": false
+  },
+  "capabilities": {
+    "secrets": false,
+    "firestoreRead": false,
+    "writes": false,
+    "runtime": false,
+    "browser": false,
+    "deploy": false,
+    "functionsDeploy": false,
+    "rulesDeploy": false,
+    "production": false
+  },
+  "containsPII": false,
+  "containsSecrets": false,
+  "containsPasswords": false
+}
