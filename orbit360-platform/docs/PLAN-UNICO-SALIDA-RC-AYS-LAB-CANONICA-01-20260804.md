@@ -1,7 +1,7 @@
 # PLAN ÚNICO DE SALIDA — RC-AYS-LAB-CANONICA-01
 
 Fecha de adopción: 2026-08-04  
-Última actualización: 2026-08-05 18:35 GT  
+Última actualización: 2026-08-05 19:08 GT  
 Rama obligatoria: `ays/backend-tenant-lab-v99-20260703`  
 PR: #5 draft/open  
 Producción, `main` y merge: no autorizados
@@ -40,6 +40,24 @@ Importador recurrente
 multirol/scopes
 Academia
 ```
+
+### 2.1 Alcance del primer go-live
+
+El primer go-live operativo prioriza:
+
+```text
+Orbit Ops
+Orbit Leads
+Orbit Aseguradoras
+Cliente 360
+Pólizas
+Recibos
+Cobros y cartera
+Equipo/Auth
+multirol/scopes
+```
+
+La plataforma seguirá por releases incrementales. Cotizador, Comparativo y el backend completo de Renovaciones no bloquean esta primera salida, siempre que sus accesos no prometan funciones inexistentes ni interrumpan el núcleo operativo.
 
 ## 3. Hechos cerrados
 
@@ -173,7 +191,7 @@ Incluye:
 9. estados vacíos honestos de Conciliaciones y Cancelaciones;
 10. botón `Ejecutar prueba en vivo` read-only para Ops/Leads.
 
-Frontera:
+Frontera source-only:
 
 ```text
 browser: 0
@@ -183,7 +201,7 @@ Functions/Hosting/Rules deploy: 0
 producción/main/merge: 0
 ```
 
-El rootfix no está visible todavía en LAB. Requiere una autorización nueva y acotada para un único Hosting LAB deploy y prueba visual.
+El rootfix se desplegó una única vez en el run `31061214801`, pero la prueba viva se detuvo antes del primer resultado de rol por un timeout sin checkpoint observable. Hosting LAB fue restaurado exactamente a la versión previa. La clasificación gobernante es `VALIDATOR_STALE`; el rootfix no está visible ni aprobado en LAB.
 
 ### 4.4 Matriz de revalidación
 
@@ -435,7 +453,7 @@ GO_PRODUCTION_A&S
 
 ### Carril A — frontend, UX y Academia
 
-Rootfix visual source-only 28/28 PASS. Pendiente un único deploy Hosting LAB y prueba viva por rol/viewport.
+Rootfix visual source-only 28/28 PASS. Run vivo `31061214801`: GO_GATE_CONTRACT 20/20, un deploy Hosting, timeout antes del primer rol y rollback PASS. Estado: `STOP_RETRY · VALIDATOR_STALE`.
 
 ### Carril B — backend, seguridad y acceso
 
@@ -454,7 +472,7 @@ Cobros 4.0 cerrado 365/365. Cobros 4.1 preparado estáticamente y pausado. Las c
 | 2.6 | recaptura legal automática | diferido no bloqueante |
 | 2.7A | auditoría visual humana | hallazgos clasificados |
 | 2.7B | `block2.7-visual-runtime-rootfix-static-v20260805` | PASS 28/28 source-only |
-| 2.7C | Hosting LAB + prueba viva | pendiente autorización |
+| 2.7C | Hosting LAB + prueba viva | STOP_RETRY · VALIDATOR_STALE · rollback PASS |
 | 3.0 | `OPS_LEADS_BACKEND_LAB_COMPLETE` | PASS técnico |
 | 3.1 | Auth autoadministrable | PASS 7/7 |
 | 4.0 | `PASS_COBROS_FULL_REPLAY` | PASS 365/365 read-only |
@@ -465,41 +483,37 @@ Cobros 4.0 cerrado 365/365. Cobros 4.1 preparado estáticamente y pausado. Las c
 
 ## 13. Siguiente acción exacta
 
-Solicitar una única autorización para:
-
 ```text
-un Hosting LAB deploy
-cero Functions
-cero Rules
-cero Firestore/Auth writes
-prueba visual Dirección desktop, Operativo tablet y Asesor móvil
-prueba de carga estable Cliente 360/Pólizas/Cobros
-prueba de detalles Vehículo/Recibo/Cobro
-prueba read-only Ops/Leads
-Conciliaciones/Cancelaciones con estados honestos
-STOP_RETRY ante cualquier fallo
+1. precheck observable source-only: preparado y validado estructuralmente 15/15
+2. esperar nueva autorización explícita para un único Hosting LAB deploy
+3. ejecutar primero precheck Auth/membresía/ruta/hidratación
+4. solo con PASS abrir la matriz Dirección/Operativo/Asesor
+5. cerrar PASS_VISUAL_POST_AUTH o STOP_RETRY con checkpoint exacto
+6. preparar gate CRUD sintético con rollback para Cliente 360/Pólizas/Recibos/Cobros/Ops/Leads
+7. retomar Bloque 4.1 y correcciones críticas de pólizas
+8. cerrar RC operativa y solicitar go-live
 ```
-
-Después:
-
-1. cerrar `PASS_VISUAL_POST_AUTH`;
-2. retomar Bloque 4.1;
-3. cerrar correcciones críticas de pólizas;
-4. separar delta post-corte;
-5. cerrar RC acumulativa;
-6. presentar candidata final;
-7. autorizar go-live.
 
 ## 14. Pendientes diferidos no bloqueantes
 
 - recaptura histórica del modal legal;
 - incorporación visual de la lección Academia Auth/Cobros;
-- prueba CRUD sintética Ops/Leads con rollback, si se requiere después del diagnóstico read-only;
+- gate CRUD sintético desde la plataforma con creación, lectura, edición, eliminación/archivo y rollback exacto;
 - autoservicio universal del importador no tabular;
 - liberación progresiva de los 233 HOLD cuando existan reportes detallados;
 - pólizas nuevas posteriores al corte;
+- auditar y reponer la última versión aprobada v110 de Cotizador/Comparativo con todos sus razonamientos;
+- en Renovaciones, Dirección/Admin/Operativo deben elegir entre abrir Cotizador o solicitar gestión de cotización;
+- en Renovaciones, el Asesor debe generar gestión de cotización;
+- `Comparar` solo se habilita después de verificar backend durable, relaciones, idempotencia y scopes;
 - rebranding Gravicentra conforme a nota rectora;
 - mejoras cosméticas sin impacto operativo.
+
+Documento específico:
+
+```text
+orbit360-platform/docs/BACKLOG-POST-GOLIVE-COTIZADOR-COMPARATIVO-RENOVACIONES-Y-PRUEBAS-VIVAS-20260805.md
+```
 
 ## 15. Academia y reutilización
 
@@ -516,7 +530,58 @@ Debe enseñar:
 - estado vacío con alcance temporal;
 - persistencia de sesión sin almacenar contraseña;
 - diferencia entre propuesta, HOLD y cobro confirmado;
-- diferencia entre corrección bloqueante y delta post-corte.
+- diferencia entre corrección bloqueante y delta post-corte;
+- diferencia entre prueba técnica, prueba viva y CRUD sintético con rollback;
+- decisiones de Renovaciones por rol y alcance.
+
+## 15.1 Cierre gobernante del run visual
+
+```text
+run primario: 31061214801
+preflight: GO_GATE_CONTRACT 20/20
+Hosting deploy: 1
+prueba viva: timeout antes del primer resultado de rol
+rollback Hosting: PASS
+snapshot: VERIFIED_UNCHANGED
+Firestore/Auth/operational writes: 0
+clasificación: VALIDATOR_STALE
+```
+
+El owner obsoleto no persistió el checkpoint de Auth, membresía, ruta o hidratación que estaba esperando. No existe evidencia suficiente para asignar un defecto funcional al producto.
+
+Owner de solución preparado:
+
+```text
+tools/orbit360-visual-runtime-rootfix-browser-precheck-v20260805.mjs
+```
+
+El precheck observable registra:
+
+- navegación inicial;
+- carga del rootfix;
+- disponibilidad de Firebase Auth;
+- creación e ingreso con token efímero;
+- entrada a la aplicación;
+- estado de membresía;
+- ruta y estado de hidratación;
+- conteos de snapshots y errores;
+- estado sanitizado y captura en el checkpoint exacto de cualquier timeout.
+
+Validación source-only:
+
+```text
+15/15 controles presentes
+secrets/Firestore/browser/deploy: 0
+```
+
+El request consumido no se repite. Una nueva ejecución requerirá autorización explícita y deberá ejecutar primero el precheck observable; solo con PASS podrá abrir la matriz completa por roles.
+
+Evidencias:
+
+```text
+orbit360-platform/runtime-gate-crm-v20260716/visual-runtime-rootfix-governing-stop-sanitized-v20260805.json
+orbit360-platform/runtime-gate-crm-v20260716/visual-validator-stale-source-closure-sanitized-v20260805.json
+```
 
 ## 16. Regla de actualización
 
