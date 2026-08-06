@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-overlay-v1",
+  "gateId": "block2.7-visual-matrix-corrected-post-auth-lab-v20260805",
+  "requestVersion": "20260806.8-registered-relay-runtime",
+  "status": "STOP_RETRY_PREFLIGHT_V8_CLOSED",
+  "classification": "PIPELINE_MECHANISM_FAILURE",
+  "checkpoint": "PREFLIGHT_V8_GO_GATE_CONTRACT_NOT_OBTAINED",
+  "rootCause": "LOCAL_EXECUTOR_PREFLIGHT_DEPENDENCY_UNAVAILABLE_AND_CANONICAL_ENGINE_EXCEPTION",
+  "stopRetryActive": true,
+  "requestReusable": false,
+  "freshAuthorizationRequired": true,
+  "expectedNextRequestVersion": "20260806.9-portable-preflight-runtime",
+  "runtimeAllowed": false,
+  "browserAllowed": false,
+  "hostingAllowed": false,
+  "productionAllowed": false,
+  "writesAllowed": false,
+  "containsPII": false,
+  "containsSecrets": false,
+  "ok": false
+}
