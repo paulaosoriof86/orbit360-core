@@ -20,6 +20,7 @@ jobs:
       ORBIT360_TRANSPORT_HEAD_REF: ${{ github.head_ref }}
       ORBIT360_VISUAL_REQUEST_PATH: .github/orbit360-requests/visual-matrix-corrected-post-auth-lab-v20260805-authorization.json
       ORBIT360_REQUEST_FILE: .github/orbit360-requests/visual-matrix-corrected-post-auth-lab-v20260805-authorization.json
+      ORBIT360_EXPECTED_REQUEST_VERSION: 20260806.9-portable-preflight-runtime
       ORBIT360_RESTORE_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/visual-matrix-v8-prior-hosting-restore-sanitized-v20260806.json
       ORBIT360_FINAL_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/visual-matrix-corrected-post-auth-final-sanitized-v20260805.json
       ORBIT360_LIFECYCLE: tools/orbit360-validator-lifecycle-contract-visual-matrix-corrected-post-auth-lab-v20260805.json
@@ -32,13 +33,14 @@ jobs:
           fetch-depth: 0
           persist-credentials: true
 
-      - name: Detect canonical exclusive authorized v8 request
+      - name: Detect canonical exclusive fresh authorized request
         id: detect
         shell: bash
         run: |
           set -euo pipefail
           BRANCH='ays/backend-tenant-lab-v99-20260703'
           REQUEST='.github/orbit360-requests/visual-matrix-corrected-post-auth-lab-v20260805-authorization.json'
+          JSON_GUARD='tools/orbit360-json-guard-visual-matrix-runtime-v20260806.mjs'
           if [[ "${GITHUB_EVENT_NAME:-}" != 'pull_request' || "${ORBIT360_TRANSPORT_HEAD_REF:-}" != "$BRANCH" ]]; then
             echo 'dispatch=false' >> "$GITHUB_OUTPUT"
             echo 'SKIP_REGISTERED_RELAY_NONCANONICAL_CONTEXT'
@@ -50,18 +52,9 @@ jobs:
             echo 'SKIP_REGISTERED_RELAY_NOT_EXCLUSIVE_REQUEST_COMMIT'
             exit 0
           fi
-          if ! jq -e '
-            .schemaVersion=="orbit360-visual-matrix-corrected-post-auth-request-v1" and
-            .requestVersion=="20260806.8-registered-relay-runtime" and
-            .status=="AUTHORIZED_ONCE" and
-            .approved==true and
-            .allowedExecutions==1 and
-            .consumed==false and
-            .replayAllowed==false and
-            .scope.registeredWorkflowRelayRequired==true
-          ' "$REQUEST" >/dev/null; then
+          if ! node "$JSON_GUARD" detect-active-request "$REQUEST" "$ORBIT360_EXPECTED_REQUEST_VERSION"; then
             echo 'dispatch=false' >> "$GITHUB_OUTPUT"
-            echo 'SKIP_REGISTERED_RELAY_REQUEST_NOT_ACTIVE_V8'
+            echo 'SKIP_REGISTERED_RELAY_REQUEST_NOT_ACTIVE_FRESH_VERSION'
             exit 0
           fi
           echo 'dispatch=true' >> "$GITHUB_OUTPUT"
@@ -76,10 +69,12 @@ jobs:
           bash -n tools/orbit360-preflight-visual-matrix-runtime-relay-v8-v20260806.sh
           bash -n tools/orbit360-restore-visual-matrix-v6-backup-before-runtime-v20260806.sh
           bash -n tools/orbit360-run-visual-matrix-corrected-post-auth-runtime-only-v3-cross-runner-v20260806.sh
+          node --check tools/orbit360-json-guard-visual-matrix-runtime-v20260806.mjs
           node --check tools/orbit360-attach-visual-matrix-v7-restore-evidence-v20260806.mjs
           node tools/orbit360-test-windows-signal-compatibility-synthetic-v20260806.mjs
           node tools/orbit360-test-visual-matrix-timeout-signal-safe-portable-v20260806.mjs
           node tools/orbit360-test-visual-matrix-cross-runner-portable-v20260806.mjs
+          node tools/orbit360-test-preflight-portable-source-v20260806.mjs
 
       - name: GO_GATE_CONTRACT before secrets
         if: steps.detect.outputs.dispatch == 'true'
@@ -143,7 +138,7 @@ jobs:
             [[ -e "$file" ]] && git add "$file"
           done
           if ! git diff --cached --quiet; then
-            git commit -m 'runtime: persist visual matrix v8 closure [skip ci]'
+            git commit -m 'runtime: persist visual matrix fresh closure [skip ci]'
             git push origin HEAD:ays/backend-tenant-lab-v99-20260703
           fi
 
@@ -151,7 +146,7 @@ jobs:
         if: always() && steps.detect.outputs.dispatch == 'true'
         uses: actions/upload-artifact@v4
         with:
-          name: orbit360-visual-matrix-runtime-v8-${{ github.run_id }}
+          name: orbit360-visual-matrix-runtime-${{ github.run_id }}
           path: orbit360-visual-matrix-corrected-artifacts/
           if-no-files-found: ignore
           retention-days: 7
