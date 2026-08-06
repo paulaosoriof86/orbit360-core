@@ -1,0 +1,51 @@
+{
+  "schemaVersion": "orbit360-visual-matrix-signal-safe-sourcefix-contract-v1",
+  "gateId": "block2.7-visual-matrix-corrected-post-auth-lab-v20260805",
+  "contractVersion": "2.7.8-sourcefix.1",
+  "status": "PASS_SOURCEFIX_PENDING_EXPLICIT_RECOVERY_AUTHORIZATION",
+  "classification": "PIPELINE_MECHANISM_FAILURE_CORRECTED_SOURCE_ONLY",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "ownerFiles": [
+    "tools/orbit360-runtime-signal-safe-lib-v20260806.sh",
+    "tools/orbit360-supervise-visual-matrix-signal-safe-v20260806.mjs",
+    "tools/orbit360-run-visual-matrix-corrected-post-auth-runtime-only-v2-v20260806.sh"
+  ],
+  "validator": "tools/orbit360-test-visual-matrix-timeout-signal-safe-source-v20260806.mjs",
+  "evidence": "orbit360-platform/runtime-gate-crm-v20260716/visual-matrix-timeout-signal-safe-source-test-sanitized-v20260806.json",
+  "workflow": ".github/workflows/orbit360-validate-visual-matrix-signal-safe-source-v20260806.yml",
+  "invariants": {
+    "perRoleWatchdog": true,
+    "idleCheckpointWatchdog": true,
+    "globalMatrixBudget": true,
+    "incrementalDurableSupervisorEvidence": true,
+    "termIntHupExitTraps": true,
+    "rollbackExactlyOnce": true,
+    "persistenceExactlyOnce": true,
+    "rollbackBudgetOutsideMatrix": true,
+    "sourceOnlyExecutionAuthorized": true,
+    "runtimeExecutionAuthorized": false,
+    "secretAccessAuthorized": false,
+    "firestoreReadAuthorized": false,
+    "browserAuthorized": false,
+    "hostingAuthorized": false,
+    "productionAuthorized": false
+  },
+  "syntheticAcceptance": {
+    "status": "PASS_VISUAL_MATRIX_TIMEOUT_SIGNAL_SAFE_SOURCE",
+    "checks": 48,
+    "failed": 0,
+    "roleTimeoutProved": "ROLE_TIMEOUT_DIRECCION",
+    "signalExitCode": 143,
+    "rollbackCalls": 1,
+    "persistCalls": 1
+  },
+  "hostingState": "NOT_RESTORED_LAST_CONFIRMED_V6_DEPLOY_LIVE",
+  "requestConsumed": true,
+  "allowedExecutions": 0,
+  "replayAllowed": false,
+  "containsPII": false,
+  "containsSecrets": false,
+  "containsPasswords": false,
+  "nextAction": "REQUIRE A NEW EXPLICIT CONTROLLED RECOVERY AUTHORIZATION AFTER VERIFYING GITHUB ACTIONS AVAILABILITY; DO NOT REUSE THE CONSUMED REQUEST OR RUN."
+}
