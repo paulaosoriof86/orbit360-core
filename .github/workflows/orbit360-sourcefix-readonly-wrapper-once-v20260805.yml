@@ -1,0 +1,71 @@
+name: Orbit 360 · Sourcefix módulos inmutables · una vez
+
+on:
+  pull_request:
+    types: [opened]
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - '.github/workflows/orbit360-sourcefix-readonly-wrapper-once-v20260805.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: orbit360-sourcefix-readonly-wrapper-once
+  cancel-in-progress: false
+
+jobs:
+  sourcefix:
+    if: >-
+      github.event.pull_request.head.ref == 'ays/sourcefix-readonly-wrapper-pr-20260805' &&
+      github.event.pull_request.base.ref == 'ays/backend-tenant-lab-v99-20260703'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - name: Checkout transporte source-only
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Ejecutar sourcefix y persistir
+        shell: bash
+        run: |
+          set -euo pipefail
+          BRANCH='ays/backend-tenant-lab-v99-20260703'
+          WORKFLOW='.github/workflows/orbit360-sourcefix-readonly-wrapper-once-v20260805.yml'
+          OWNER='tools/orbit360-fix-readonly-module-wrapper-source-v20260805.mjs'
+          EVIDENCE='orbit360-platform/runtime-gate-crm-v20260716/visual-rootfix-readonly-wrapper-sourcefix-sanitized-v20260805.json'
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
+          test "${#CHANGED[@]}" = '1'
+          test "${CHANGED[0]}" = "$WORKFLOW"
+          node --check "$OWNER"
+          node "$OWNER"
+          jq -e '.status=="PASS_READONLY_MODULE_WRAPPER_SOURCEFIX" and .total==15 and .passed==15 and .failed==0 and .classification=="FUNCTIONAL_DEFECT_CLOSED_SOURCE_ONLY" and .causalForRun31067506016==false and .sourceOnly==true and .secretsRead==false and .firestoreRead==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .browserExecuted==false and .deployExecuted==false and .productionTouched==false and .ok==true' "$EVIDENCE" >/dev/null
+          node --check orbit360-platform/core/visual-runtime-rootfix-v20260805.js
+          git diff --check
+          STATE_TAR="$RUNNER_TEMP/orbit360-readonly-wrapper-sourcefix.tar"
+          tar -cf "$STATE_TAR" \
+            orbit360-platform/core/visual-runtime-rootfix-v20260805.js \
+            "$EVIDENCE" \
+            tools/orbit360-validator-lifecycle-contract-visual-observable-rootfix-v2-lab-v20260805.json \
+            orbit360-platform/docs/CIERRE-CAUSA-RAIZ-CAPTURA-VISUAL-V2-20260805.md \
+            orbit360-platform/docs/PLAN-UNICO-SALIDA-RC-AYS-LAB-CANONICA-01-20260804.md
+          git fetch origin "$BRANCH"
+          git reset --hard
+          git checkout --detach "origin/$BRANCH"
+          tar -xf "$STATE_TAR"
+          git diff --check
+          git config user.name orbit360-gate-bot
+          git config user.email orbit360-gate-bot@users.noreply.github.com
+          git add \
+            orbit360-platform/core/visual-runtime-rootfix-v20260805.js \
+            "$EVIDENCE" \
+            tools/orbit360-validator-lifecycle-contract-visual-observable-rootfix-v2-lab-v20260805.json \
+            orbit360-platform/docs/CIERRE-CAUSA-RAIZ-CAPTURA-VISUAL-V2-20260805.md \
+            orbit360-platform/docs/PLAN-UNICO-SALIDA-RC-AYS-LAB-CANONICA-01-20260804.md
+          git commit -m 'source: handle immutable visual module wrappers [skip ci]'
+          git push origin "HEAD:$BRANCH"
