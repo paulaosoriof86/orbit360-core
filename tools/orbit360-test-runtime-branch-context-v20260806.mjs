@@ -22,8 +22,8 @@ try {
   const source = fs.readFileSync(runnerPath, 'utf8');
   const branchGuardIndex = source.indexOf('[[ "$CANONICAL_BRANCH" == "$BRANCH" ]]');
   const serviceAccountIndex = source.indexOf('SERVICE_ACCOUNT=');
-  const backupIndex = source.indexOf('hosting:clone');
-  const deployIndex = source.indexOf('firebase deploy');
+  const backupExecutionIndex = source.indexOf('BACKUP_CHANNEL="visual-matrix-corrected-backup-${GITHUB_RUN_ID}"');
+  const deployExecutionIndex = source.indexOf('firebase deploy --project "$PROJECT" --only hosting');
 
   checks.sourceExists = fs.existsSync(runnerPath);
   checks.orbitOwnedBranchVariable = source.includes('CANONICAL_BRANCH="${ORBIT360_CANONICAL_BRANCH:-}"');
@@ -33,8 +33,8 @@ try {
   checks.canonicalGuardPresent = branchGuardIndex >= 0;
   checks.pullRequestBaseGuardPresent = source.includes('PULL_REQUEST') === false && source.includes('EVENT_BASE_REF') && source.includes('[[ "$EVENT_BASE_REF" == "$BRANCH" ]]');
   checks.branchGuardBeforeSecrets = branchGuardIndex >= 0 && serviceAccountIndex > branchGuardIndex;
-  checks.branchGuardBeforeBackup = branchGuardIndex >= 0 && backupIndex > branchGuardIndex;
-  checks.branchGuardBeforeDeploy = branchGuardIndex >= 0 && deployIndex > branchGuardIndex;
+  checks.branchGuardBeforeBackup = branchGuardIndex >= 0 && backupExecutionIndex > branchGuardIndex;
+  checks.branchGuardBeforeDeploy = branchGuardIndex >= 0 && deployExecutionIndex > branchGuardIndex;
   checks.runAttemptStillRestricted = source.includes('GITHUB_RUN_ATTEMPT');
   checks.requestPrerequisitesStillRequired = source.includes('[[ -f "$REQUEST" && -f "$REGISTRATION" && -f "$PREFLIGHT" ]]');
   checks.goGateEvidenceStillRequired = source.includes('.status=="GO_GATE_CONTRACT"');
@@ -55,7 +55,8 @@ try {
 
 const failedCheckIds = Object.entries(checks).filter(([, ok]) => !ok).map(([id]) => id);
 const evidence = {
-  schemaVersion: 'orbit360-runtime-branch-context-source-test-v1',
+  schemaVersion: 'orbit360-runtime-branch-context-source-test-v2',
+  validatorRevision: 'real-backup-execution-anchor-v2',
   gateId: 'block2.7-visual-matrix-corrected-post-auth-lab-v20260805',
   contractVersion: '2.7.8',
   status: failedCheckIds.length ? 'STOP_RUNTIME_BRANCH_CONTEXT_SOURCE_TEST' : 'PASS_RUNTIME_BRANCH_CONTEXT_SOURCE',
