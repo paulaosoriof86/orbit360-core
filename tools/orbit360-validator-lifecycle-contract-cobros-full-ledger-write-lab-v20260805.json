@@ -2,9 +2,9 @@
   "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
   "validatorLifecycleRevision": "phase-capability-contract-v1",
   "gateId": "block10.10-cobros-full-ledger-write-lab-v20260805",
-  "gateContractVersion": "10.10.1",
+  "gateContractVersion": "10.10.2",
   "owner": "orbit360-cobros-full-ledger-write-lab-v20260805",
-  "ownerVersion": "20260805.3-canonical-path-package-ready",
+  "ownerVersion": "20260805.4-isolated-run-package-ready",
   "status": "PRIVATE_PACKAGE_READY_STATIC_NOT_AUTHORIZED",
   "classification": "STATIC_PACKAGE_READY_NO_ACCESS",
   "patternClassification": "BACKEND_PROTEGIDO_NO_CLAUDE",
@@ -41,10 +41,13 @@
     }
   },
   "pathAuthority": {
-    "class": "canonical-v79-data-items",
-    "pattern": "tenants/{tenantId}/data/{collection}/items/{documentId}",
+    "class": "canonical-v79-run-scoped-data-items",
+    "runManifestPattern": "tenants/{tenantId}/data/cobrosLedgerRuns/items/{runId}",
+    "stageSubcollectionPattern": "tenants/{tenantId}/data/cobrosLedgerRuns/items/{runId}/{collection}/{documentId}",
+    "activePointerPattern": "tenants/{tenantId}/data/cobrosLedgerControl/items/active",
     "legacyTenantIdPathProhibited": true,
-    "thirdPathPatternProhibited": true
+    "directVisibleCollectionStageWritesProhibited": true,
+    "thirdTenantRootPatternProhibited": true
   },
   "sourceLedger": {
     "count": 365,
@@ -58,9 +61,10 @@
     "evidenciasCobro": 365,
     "propuestasConciliacion": 132,
     "conciliacionHolds": 233,
-    "runManifest": 1,
+    "stageManifestCreate": 1,
+    "activationManifestUpdate": 1,
     "activePointer": 1,
-    "maximum": 1097,
+    "maximum": 1098,
     "cobros": 0,
     "receipts": 0,
     "policies": 0,
@@ -86,14 +90,16 @@
   "mergeAuthorized": false,
   "privatePackageRequiredBeforeAuthorization": true,
   "privatePackage": {
-    "driveFileId": "1fwYktHt3Qj9BQjbjBox4XZBLO03NsZ0p",
-    "fileName": "ORBIT360-AYS-COBROS-FULL-LEDGER-WRITE-PRIVATE-V2-20260805.txt",
+    "driveFileId": "1t4di7P2z6OQVnT8LF5CtEMg_latkW7Cx",
+    "fileName": "ORBIT360-AYS-COBROS-FULL-LEDGER-WRITE-PRIVATE-V3-20260805.txt",
     "mimeType": "text/plain",
-    "sizeBytes": 856802,
-    "sha256": "a104f673b9516cf0874d47ee206c9a0eff458521ce01e182e4c45b38dfe23deb",
-    "logicalSha256": "42c2f4ce2cbde21126aa07cfe581e7f64a485f729b9dcf18b8ad9c938dace80b",
+    "sizeBytes": 857161,
+    "sha256": "9769d7a952e9b2a15c27821da9098e5899466b0558ba8b68e021689864ad8cfe",
+    "logicalSha256": "a999977e31c73feebb8aafe3ca380a536e1ca60047d57fcdb6d9a592bd829654",
     "canonicalization": "node-json-stable-sort-v1",
     "downloadReadbackVerified": true,
+    "contractVersion": "10.10.2",
+    "writeTopology": "ISOLATED_RUN_SUBCOLLECTIONS_THEN_POINTER_TRANSACTION",
     "counts": {
       "pagosReportados": 365,
       "evidenciasCobro": 365,
@@ -108,16 +114,25 @@
     "containsPasswords": false,
     "repositoryPersistenceProhibited": true
   },
-  "supersededPrivatePackage": {
-    "driveFileId": "1ZJQmC9liIAJyI6fbsxrfN1HN__HwFVI8",
-    "contractVersion": "10.10.0",
-    "status": "SUPERSEDED_NO_USE"
-  },
+  "supersededPrivatePackages": [
+    {
+      "driveFileId": "1ZJQmC9liIAJyI6fbsxrfN1HN__HwFVI8",
+      "contractVersion": "10.10.0",
+      "status": "SUPERSEDED_NO_USE"
+    },
+    {
+      "driveFileId": "1fwYktHt3Qj9BQjbjBox4XZBLO03NsZ0p",
+      "contractVersion": "10.10.1",
+      "status": "SUPERSEDED_NO_USE"
+    }
+  ],
   "snapshotRequired": true,
   "idempotencyRequired": true,
-  "stageThenActivateRequired": true,
+  "isolatedRunStageRequired": true,
+  "pointerActivationTransactionRequired": true,
   "postVerificationRequired": true,
   "rollbackRequired": true,
+  "block5ConsumerProjectionRequired": true,
   "stopRetryOnRepeatedFailure": true,
   "protectedState": {
     "existingCobros": 5,
@@ -133,5 +148,5 @@
   "containsPII": false,
   "containsSecrets": false,
   "containsPasswords": false,
-  "nextAction": "RUN_STATIC_PACKAGE_PREFLIGHT_AND_PREPARE_ONE_EXPLICIT_LAB_WRITE_AUTHORIZATION"
+  "nextAction": "RUN_STATIC_PACKAGE_PREFLIGHT_BUILD_WRITER_AND_PREPARE_ONE_EXPLICIT_LAB_WRITE_AUTHORIZATION"
 }
