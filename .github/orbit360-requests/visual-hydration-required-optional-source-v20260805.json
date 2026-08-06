@@ -10,7 +10,8 @@
   "replayAllowed": false,
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
-  "parentHead": "c7f18049231df2b982060f246fb35baa07a91727",
+  "parentHead": "a4e48cccec4259a364f12b4ce9d076e6f1c19411",
+  "relay": "recognized-workflow-v1",
   "runtimeAuthorizationReserved": true,
   "purpose": "Close DATA_CONTRACT_FAILURE by separating required canonical hydration dependencies from optional legacy sources before the already authorized observable runtime.",
   "capabilities": {
