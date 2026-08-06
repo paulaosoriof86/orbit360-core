@@ -1,11 +1,10 @@
-# Estado vivo PR #5 — sourcefix signal-safe
+# Estado vivo PR #5 — sourcefix signal-safe y disponibilidad Actions
 
-Fecha: 2026-08-06 11:03 GT
+Fecha de actualización: 2026-08-06 11:33 GT
 
 ## Identidad
 
 - Rama: `ays/backend-tenant-lab-v99-20260703`.
-- HEAD al cierre sourcefix: `dfed1369f65a01155dc6bfa7e4236f6e85d62570`.
 - PR #5: draft/open, sin merge.
 - Producción/main/merge: no autorizados.
 
@@ -42,11 +41,32 @@ Implementado:
 - runner v2 bloqueado por defecto sin autorización;
 - tiempo reservado para recuperación.
 
-## Límites del bloque
+## Canario de disponibilidad GitHub Actions
+
+```txt
+PR: #23 cerrado sin merge
+run: 31122714301
+job: 92686540449
+run: completed / failure
+job: completed / cancelled
+steps: 0
+logs: no disponibles
+cola observada: 930 segundos
+```
+
+Clasificación:
+
+```txt
+ENVIRONMENT_FAILURE
+RUNNER_QUEUE_UNAVAILABLE
+```
+
+El canario no alcanzó checkout ni ejecutó el validador 48/48. Por tanto, no contradice el sourcefix, pero demuestra que el entorno todavía no es apto para abrir recuperación o runtime.
+
+## Límites del bloque sourcefix + canario
 
 - secrets: 0;
-- Firestore reads/writes: 0/0;
-- Auth writes: 0;
+- Firebase/Firestore/Auth: 0;
 - operational writes: 0;
 - browser: 0;
 - Hosting/deploy: 0;
@@ -59,9 +79,10 @@ Implementado:
 - request v6: consumido;
 - allowedExecutions: 0;
 - replayAllowed: false;
-- lifecycle: `STOP_RETRY_SOURCEFIX_PASS_PENDING_EXPLICIT_RECOVERY_AUTHORIZATION`;
-- runtime/browser/deploy/secrets: no autorizados.
+- lifecycle: `STOP_RETRY_SOURCEFIX_PASS_ENVIRONMENT_UNAVAILABLE`;
+- runtime/browser/deploy/secrets: no autorizados;
+- Cobros 4.1: pausado.
 
 ## Siguiente acción exacta
 
-Verificar disponibilidad estable de GitHub Actions. Después, únicamente con autorización explícita nueva e inmutable ligada al HEAD vigente, preparar una recuperación controlada de Hosting y la matriz supervisada usando exclusivamente el runner v2. No reutilizar los runs `31116830824`, `31119868662` ni `31120848942`.
+No ejecutar matriz, rollback ni recuperación en esta iteración. Mantener `STOP_RETRY` hasta que, en una iteración posterior, un canario source-only complete checkout y 48/48. Solo después podrá solicitarse una autorización nueva e inmutable de recuperación controlada ligada al HEAD vigente y usando exclusivamente el runner v2 signal-safe.
