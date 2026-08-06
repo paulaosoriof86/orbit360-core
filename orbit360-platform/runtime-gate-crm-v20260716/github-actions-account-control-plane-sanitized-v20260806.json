@@ -1,0 +1,52 @@
+{
+  "schemaVersion": "orbit360-github-actions-account-control-plane-v1",
+  "status": "FAIL_GITHUB_ACTIONS_DISPATCH_ACROSS_REPOSITORIES",
+  "classification": "ENVIRONMENT_FAILURE",
+  "failureCode": "ACCOUNT_OR_REPOSITORY_ACTIONS_DISABLED_OR_RESTRICTED",
+  "testedRepositories": [
+    {
+      "repository": "paulaosoriof86/orbit360-core",
+      "pullRequest": 25,
+      "runner": "macos-14",
+      "events": ["opened", "reopened", "synchronize", "push"],
+      "runsObserved": 0,
+      "checksObserved": 0,
+      "merged": false
+    },
+    {
+      "repository": "paulaosoriof86/demoCXOrbia",
+      "pullRequests": [17, 18],
+      "runner": "macos-14",
+      "baseWorkflowPreExisting": true,
+      "runsObserved": 0,
+      "checksObserved": 0,
+      "merged": false
+    }
+  ],
+  "sourceFix": {
+    "crossRunnerStatus": "PASS_VISUAL_MATRIX_CROSS_RUNNER_SOURCE",
+    "crossRunnerChecks": 24,
+    "crossRunnerPassed": 24,
+    "signalSafeStatus": "PASS_VISUAL_MATRIX_TIMEOUT_SIGNAL_SAFE_SOURCE",
+    "signalSafeChecks": 48,
+    "signalSafePassed": 48
+  },
+  "inference": "Because no run was created in two repositories, including a control-plane PR whose workflow already existed in its base branch, the remaining blocker is outside Orbit source and before runner assignment. Repository or account Actions permissions/restrictions must be inspected.",
+  "secretsRead": false,
+  "firebaseAccess": false,
+  "firestoreReads": 0,
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "operationalWrites": 0,
+  "browserExecuted": false,
+  "hostingTouched": false,
+  "deployExecuted": false,
+  "productionTouched": false,
+  "mainTouched": false,
+  "mergeExecuted": false,
+  "containsPII": false,
+  "containsSecrets": false,
+  "containsPasswords": false,
+  "ok": false,
+  "nextAction": "In GitHub repository Settings > Actions > General, enable Actions and allow GitHub-authored actions such as actions/checkout. If GitHub reports Actions disabled for the account, request GitHub Support review. Once enabled, reopen exactly one source-only control-plane PR and continue with runner v3; do not create parallel canaries."
+}
