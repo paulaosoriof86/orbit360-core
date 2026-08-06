@@ -1,0 +1,26 @@
+{
+  "schemaVersion": "orbit360-visual-runtime-rootfix-relay-request-v1",
+  "status": "PIPELINE_RELAY_SOURCE_ONLY_ONCE",
+  "approved": true,
+  "allowedExecutions": 1,
+  "consumed": false,
+  "replayAllowed": false,
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "parentHead": "3901924f466bf46f9c7e658a5ec838ae80099927",
+  "authorizationCommit": "5d95b117d4e0b91925af926ba896c1786100181d",
+  "authorizationRequest": ".github/orbit360-requests/visual-runtime-rootfix-lab-v20260805-1841-0600.json",
+  "reason": "Corregir una falla de activación del workflow sin crear ni ampliar autorización runtime",
+  "doesNotGrantAdditionalRuntimeAuthority": true,
+  "capabilities": {
+    "secrets": false,
+    "firestoreRead": false,
+    "writes": false,
+    "runtime": false,
+    "browser": false,
+    "deploy": false,
+    "functionsDeploy": false,
+    "rulesDeploy": false,
+    "production": false
+  }
+}
