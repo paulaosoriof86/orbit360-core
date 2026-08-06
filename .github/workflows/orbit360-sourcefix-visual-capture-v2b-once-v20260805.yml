@@ -1,0 +1,87 @@
+name: Orbit 360 · Sourcefix captura visual v2b · una vez
+
+on:
+  pull_request:
+    types: [opened]
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - '.github/workflows/orbit360-sourcefix-visual-capture-v2b-once-v20260805.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: orbit360-sourcefix-visual-capture-v2b-once
+  cancel-in-progress: false
+
+jobs:
+  sourcefix:
+    if: >-
+      github.event.pull_request.head.ref == 'ays/sourcefix-visual-capture-v2b-pr-20260805' &&
+      github.event.pull_request.base.ref == 'ays/backend-tenant-lab-v99-20260703'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - name: Checkout transporte source-only corregido
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Ejecutar sourcefix corregido y persistir
+        shell: bash
+        run: |
+          set -euo pipefail
+          BRANCH='ays/backend-tenant-lab-v99-20260703'
+          WORKFLOW='.github/workflows/orbit360-sourcefix-visual-capture-v2b-once-v20260805.yml'
+          OWNER='tools/orbit360-close-and-fix-visual-capture-v2-source-v20260805.mjs'
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
+          test "${#CHANGED[@]}" = '1'
+          test "${CHANGED[0]}" = "$WORKFLOW"
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path('tools/orbit360-close-and-fix-visual-capture-v2-source-v20260805.mjs')
+          text = path.read_text(encoding='utf-8')
+          old = "plan = plan.replace(/Última actualización: .*GT  /, 'Última actualización: 2026-08-05 21:35 GT  ');"
+          new = "plan = plan.replace(/Última actualización: .*GT(?:  )?/, 'Última actualización: 2026-08-05 21:35 GT');"
+          if text.count(old) != 1:
+              raise SystemExit('VALIDATOR_STALE_DATE_LITERAL_NOT_UNIQUE')
+          path.write_text(text.replace(old, new), encoding='utf-8')
+          PY
+          node --check "$OWNER"
+          node "$OWNER"
+          jq -e '.status=="PASS_VISUAL_CAPTURE_SOURCEFIX" and .total==20 and .passed==20 and .failed==0 and .sourceOnly==true and .secretsRead==false and .firestoreRead==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .browserExecuted==false and .deployExecuted==false and .productionTouched==false and .ok==true' orbit360-platform/runtime-gate-crm-v20260716/visual-capture-v2-sourcefix-sanitized-v20260805.json >/dev/null
+          jq -e '.runId=="31067506016" and .classification=="PIPELINE_MECHANISM_FAILURE" and .exactFailureCheckpoint=="DIRECCION_SCREENSHOT_FULLPAGE_TIMEOUT" and .runBoundary.rollback=="PASS" and .runBoundary.snapshotIntegrity=="VERIFIED_UNCHANGED" and .authorizationConsumed==true and .replayAllowed==false and .newRuntimeAuthorizationRequired==true' orbit360-platform/runtime-gate-crm-v20260716/visual-observable-rootfix-v2-governing-stop-sanitized-v20260805.json >/dev/null
+          node --check tools/orbit360-visual-runtime-rootfix-observable-matrix-v20260805.mjs
+          git diff --check
+          STATE_TAR="$RUNNER_TEMP/orbit360-sourcefix-visual-v2b.tar"
+          tar -cf "$STATE_TAR" \
+            "$OWNER" \
+            tools/orbit360-visual-runtime-rootfix-observable-matrix-v20260805.mjs \
+            tools/orbit360-run-visual-observable-rootfix-v2-runtime-only-v20260805.sh \
+            tools/orbit360-validator-lifecycle-contract-visual-observable-rootfix-v2-lab-v20260805.json \
+            orbit360-platform/runtime-gate-crm-v20260716/visual-capture-v2-sourcefix-sanitized-v20260805.json \
+            orbit360-platform/runtime-gate-crm-v20260716/visual-observable-rootfix-v2-governing-stop-sanitized-v20260805.json \
+            orbit360-platform/docs/CIERRE-CAUSA-RAIZ-CAPTURA-VISUAL-V2-20260805.md \
+            orbit360-platform/docs/PLAN-UNICO-SALIDA-RC-AYS-LAB-CANONICA-01-20260804.md
+          git fetch origin "$BRANCH"
+          git reset --hard
+          git checkout --detach "origin/$BRANCH"
+          tar -xf "$STATE_TAR"
+          git diff --check
+          git config user.name orbit360-gate-bot
+          git config user.email orbit360-gate-bot@users.noreply.github.com
+          git add \
+            "$OWNER" \
+            tools/orbit360-visual-runtime-rootfix-observable-matrix-v20260805.mjs \
+            tools/orbit360-run-visual-observable-rootfix-v2-runtime-only-v20260805.sh \
+            tools/orbit360-validator-lifecycle-contract-visual-observable-rootfix-v2-lab-v20260805.json \
+            orbit360-platform/runtime-gate-crm-v20260716/visual-capture-v2-sourcefix-sanitized-v20260805.json \
+            orbit360-platform/runtime-gate-crm-v20260716/visual-observable-rootfix-v2-governing-stop-sanitized-v20260805.json \
+            orbit360-platform/docs/CIERRE-CAUSA-RAIZ-CAPTURA-VISUAL-V2-20260805.md \
+            orbit360-platform/docs/PLAN-UNICO-SALIDA-RC-AYS-LAB-CANONICA-01-20260804.md
+          git commit -m 'source: close visual capture timeout and harden matrix [skip ci]'
+          git push origin "HEAD:$BRANCH"
