@@ -1,0 +1,61 @@
+name: Orbit 360 · Runtime branch context · source only
+
+on:
+  pull_request:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - .github/workflows/orbit360-runtime-branch-context-source-v20260806.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: orbit360-runtime-branch-context-source-v20260806
+  cancel-in-progress: false
+
+jobs:
+  source-only:
+    if: github.event.pull_request.head.ref == 'ays/source-runtime-branch-context-278-20260806'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout transporte source-only
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Verificar transporte exclusivo y fijar HEAD canónico
+        shell: bash
+        run: |
+          set -euo pipefail
+          WORKFLOW='.github/workflows/orbit360-runtime-branch-context-source-v20260806.yml'
+          BRANCH='ays/backend-tenant-lab-v99-20260703'
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
+          test "${#CHANGED[@]}" = '1'
+          test "${CHANGED[0]}" = "$WORKFLOW"
+          git fetch origin "$BRANCH"
+          git checkout -B "$BRANCH" "origin/$BRANCH"
+
+      - name: Ejecutar prueba source-only 24 checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-test-runtime-branch-context-v20260806.mjs
+          EVIDENCE='orbit360-platform/runtime-gate-crm-v20260716/runtime-branch-context-source-test-sanitized-v20260806.json'
+          jq -e '.status=="PASS_RUNTIME_BRANCH_CONTEXT_SOURCE" and .total==24 and .passed==24 and .failed==0 and .ok==true and .secretsRead==false and .firestoreRead==false and .runtimeExecuted==false and .browserExecuted==false and .backupExecuted==false and .deployExecuted==false' "$EVIDENCE" >/dev/null
+
+      - name: Persistir evidencia sanitizada en rama canónica
+        shell: bash
+        run: |
+          set -euo pipefail
+          BRANCH='ays/backend-tenant-lab-v99-20260703'
+          EVIDENCE='orbit360-platform/runtime-gate-crm-v20260716/runtime-branch-context-source-test-sanitized-v20260806.json'
+          git config user.name orbit360-source-gate-bot
+          git config user.email orbit360-source-gate-bot@users.noreply.github.com
+          git add "$EVIDENCE"
+          git commit -m 'test: persist runtime branch context source pass [skip ci]'
+          git push origin "HEAD:$BRANCH"
