@@ -1,8 +1,13 @@
 name: Orbit 360 · Validar failover cross-runner macOS · source-only
 # Canary dispatch cross-runner macOS 2026-08-06
-# Synchronize event 1
+# Push transport fallback 1
 
 on:
+  push:
+    branches:
+      - ays/source-canary-cross-runner-macos-20260806
+    paths:
+      - .github/workflows/orbit360-validate-visual-matrix-cross-runner-macos-source-v20260806.yml
   pull_request:
     branches:
       - ays/backend-tenant-lab-v99-20260703
