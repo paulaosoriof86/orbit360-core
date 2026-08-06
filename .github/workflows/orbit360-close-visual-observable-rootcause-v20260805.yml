@@ -1,0 +1,113 @@
+name: Orbit 360 · Cierre causa raíz visual observable
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - '.github/orbit360-requests/close-visual-observable-rootcause-v20260805-*.json'
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: orbit360-close-visual-observable-rootcause-v20260805
+  cancel-in-progress: false
+
+env:
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  ORBIT360_PLAN: orbit360-platform/docs/PLAN-UNICO-SALIDA-RC-AYS-LAB-CANONICA-01-20260804.md
+  ORBIT360_FINAL: orbit360-platform/runtime-gate-crm-v20260716/visual-observable-rootfix-final-sanitized-v20260805.json
+  ORBIT360_GOVERNING: orbit360-platform/runtime-gate-crm-v20260716/visual-observable-rootfix-governing-stop-sanitized-v20260805.json
+  ORBIT360_CLOSURE_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/visual-observable-rootcause-closure-sanitized-v20260805.json
+  ORBIT360_LIFECYCLE: tools/orbit360-validator-lifecycle-contract-visual-observable-rootfix-lab-v20260805.json
+  ORBIT360_CLOSURE_DOC: orbit360-platform/docs/CIERRE-VISUAL-OBSERVABLE-ROOTFIX-LAB-20260805.md
+
+jobs:
+  close-rootcause:
+    name: Clasificar, gobernar y sincronizar Plan
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - name: Checkout request exacto
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 3
+          persist-credentials: true
+
+      - name: Verificar request único source-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
+          mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
+          test "${#CHANGED[@]}" = '1'
+          REQUEST_FILE="${CHANGED[0]}"
+          case "$REQUEST_FILE" in
+            .github/orbit360-requests/close-visual-observable-rootcause-v20260805-*.json) ;;
+            *) echo 'PIPELINE_MECHANISM_FAILURE:UNEXPECTED_REQUEST_PATH' >&2; exit 41 ;;
+          esac
+          PARENT="$(git rev-parse HEAD^)"
+          jq -e --arg parent "$PARENT" '
+            .schemaVersion=="orbit360-close-visual-observable-rootcause-request-v1" and
+            .runId=="31063000137" and .checkpoint=="INICIO_READY_TIMEOUT" and
+            .status=="AUTHORIZED_SOURCE_ONLY_ONCE" and .approved==true and
+            .allowedExecutions==1 and .consumed==false and .replayAllowed==false and
+            .branch=="ays/backend-tenant-lab-v99-20260703" and .pullRequest==5 and
+            .parentHead==$parent and
+            .capabilities.secrets==false and .capabilities.firestoreRead==false and
+            .capabilities.writes==true and .capabilities.runtime==false and
+            .capabilities.browser==false and .capabilities.deploy==false and
+            .capabilities.functionsDeploy==false and .capabilities.rulesDeploy==false and
+            .capabilities.production==false
+          ' "$REQUEST_FILE" >/dev/null
+
+      - name: Validar owner source-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-close-visual-observable-rootcause-v20260805.mjs
+          jq -e '.runId=="31063000137" and .decision=="STOP_RETRY" and .checkpoint=="INICIO_READY_TIMEOUT" and .hostingRollbackRestored==true' "$ORBIT360_FINAL" >/dev/null
+          git diff --check
+
+      - name: Ejecutar cierre forense
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-close-visual-observable-rootcause-v20260805.mjs
+          jq -e '
+            .status=="PASS_ROOT_CAUSE_CLOSURE" and
+            .classification=="DATA_CONTRACT_FAILURE" and
+            .runId=="31063000137" and .checkpoint=="INICIO_READY_TIMEOUT" and
+            .failed==0 and .planUpdated==true and .lifecycleUpdated==true and
+            .finalEvidenceUpdated==true and .governingEvidenceWritten==true and
+            .secretsRead==false and .firestoreRead==false and
+            .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and
+            .browserExecuted==false and .deployExecuted==false and
+            .productionTouched==false and .ok==true
+          ' "$ORBIT360_CLOSURE_EVIDENCE" >/dev/null
+          jq -e '.classification=="DATA_CONTRACT_FAILURE" and .checkpoint=="INICIO_READY_TIMEOUT" and .hostingRollbackRestored==true' "$ORBIT360_GOVERNING" >/dev/null
+          grep -F 'STOP_RETRY · DATA_CONTRACT_FAILURE · INICIO_READY_TIMEOUT · rollback PASS' "$ORBIT360_PLAN" >/dev/null
+          git diff --check
+
+      - name: Persistir cierre sanitizado
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name orbit360-gate-bot
+          git config user.email orbit360-gate-bot@users.noreply.github.com
+          git add "$ORBIT360_PLAN" "$ORBIT360_FINAL" "$ORBIT360_GOVERNING" "$ORBIT360_CLOSURE_EVIDENCE" "$ORBIT360_LIFECYCLE" "$ORBIT360_CLOSURE_DOC"
+          git commit -m 'docs: close observable visual root cause [skip ci]'
+          git push origin "HEAD:$ORBIT360_BRANCH"
+
+      - name: Comentar cierre en PR 5
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const body = `## Cierre forense visual observable — DATA_CONTRACT_FAILURE\n\n\`\`\`text\nrun: 31063000137\ncheckpoint: INICIO_READY_TIMEOUT\ncausa: asesores legacy declarado como dependencia obligatoria de Inicio\nowner: core/visual-runtime-rootfix-v20260805.js\nrollback Hosting: PASS\nwrites/Functions/Rules/production: 0\nnext: contrato required/optional source-only; no retry runtime\n\`\`\``;
+            await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: 5, body });
