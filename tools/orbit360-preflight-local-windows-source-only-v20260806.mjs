@@ -14,9 +14,13 @@ const OUT = path.join(REPO, 'orbit360-platform/runtime-gate-crm-v20260716/local-
 const checks = [];
 const add = (id, ok, detail = '') => checks.push({ id, ok: !!ok, detail: String(detail || '').replace(/[\w.+-]+@[\w.-]+/g, '[email]').slice(0, 600) });
 const envHas = names => names.some(name => typeof process.env[name] === 'string' && process.env[name].trim().length > 0);
+const quoteCmd = value => `"${String(value).replace(/"/g, '""')}"`;
 
 function run(command, args = [], options = {}) {
-  return spawnSync(command, args, {
+  const isBatch = process.platform === 'win32' && /\.(cmd|bat)$/i.test(command);
+  const executable = isBatch ? (process.env.ComSpec || 'C:\\Windows\\System32\\cmd.exe') : command;
+  const finalArgs = isBatch ? ['/d', '/s', '/c', [quoteCmd(command), ...args.map(quoteCmd)].join(' ')] : args;
+  return spawnSync(executable, finalArgs, {
     cwd: options.cwd || REPO,
     env: options.env || process.env,
     encoding: 'utf8',
@@ -26,14 +30,21 @@ function run(command, args = [], options = {}) {
     shell: false
   });
 }
-function existsExecutable(candidate) {
-  if (!candidate) return false;
-  if (path.isAbsolute(candidate)) return fs.existsSync(candidate);
-  const probe = process.platform === 'win32' ? run('where.exe', [candidate], { timeout: 10000 }) : run('which', [candidate], { timeout: 10000 });
-  return probe.status === 0;
+function resolveExecutable(candidate) {
+  if (!candidate) return '';
+  if (path.isAbsolute(candidate)) return fs.existsSync(candidate) ? candidate : '';
+  const probe = process.platform === 'win32'
+    ? spawnSync('where.exe', [candidate], { encoding: 'utf8', timeout: 10000, windowsHide: true })
+    : spawnSync('which', [candidate], { encoding: 'utf8', timeout: 10000 });
+  if (probe.status !== 0) return '';
+  return String(probe.stdout || '').split(/\r?\n/).map(value => value.trim()).find(Boolean) || '';
 }
 function firstExecutable(candidates) {
-  return candidates.find(existsExecutable) || '';
+  for (const candidate of candidates) {
+    const resolved = resolveExecutable(candidate);
+    if (resolved) return resolved;
+  }
+  return '';
 }
 function write(result) {
   fs.mkdirSync(path.dirname(OUT), { recursive: true });
@@ -55,12 +66,6 @@ const firebase = firstExecutable([
   'firebase.cmd',
   'firebase'
 ]);
-const jq = firstExecutable([
-  process.env.JQ_PATH || '',
-  'C:\\Program Files\\Git\\usr\\bin\\jq.exe',
-  'jq.exe',
-  'jq'
-]);
 
 add('repo-exists', fs.existsSync(REPO), REPO);
 add('git-available', !!git, git || 'missing');
@@ -68,7 +73,6 @@ add('node-available', !!process.execPath, process.version);
 add('npm-available', !!npm, npm || 'missing');
 add('git-bash-available', !!bash, bash || 'missing');
 add('firebase-cli-available', !!firebase, firebase || 'missing');
-add('jq-available-for-runtime-v3', !!jq, jq || 'missing');
 add('service-account-env-present', envHas(['FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB', 'FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB', 'FIREBASE_SERVICE_ACCOUNT']), 'value not read');
 
 let localBranch = '';
@@ -76,6 +80,7 @@ let localHead = '';
 let remoteHead = '';
 let worktree = '';
 let sourceResult = {};
+let shimResult = {};
 let firebaseProjectVisible = false;
 
 try {
@@ -109,6 +114,9 @@ try {
     'tools/orbit360-test-visual-matrix-cross-runner-source-v20260806.mjs',
     'tools/orbit360-test-visual-matrix-timeout-signal-safe-source-v20260806.mjs',
     'tools/orbit360-validar-gate-contracts-v20260717.mjs',
+    'tools/orbit360-jq-contract-shim-v20260806.mjs',
+    'tools/orbit360-test-jq-contract-shim-v20260806.mjs',
+    'tools/orbit360-local-bin-v20260806/jq',
     '.github/orbit360-requests/visual-matrix-corrected-post-auth-lab-v20260805-authorization.json'
   ];
   for (const rel of required) add(`required-${rel.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}`, fs.existsSync(path.join(worktree, rel)), rel);
@@ -118,11 +126,23 @@ try {
   add('prior-request-consumed', request.consumed === true && request.allowedExecutions === 0 && request.replayAllowed === false, request.status);
   add('prior-request-not-reusable', request.status === 'CONSUMED_STOP_RETRY_MATRIX_TIMEOUT_ROLLBACK_ENVIRONMENT', request.status);
 
-  const adjustedPath = [path.dirname(bash), path.dirname(git), process.env.PATH || ''].filter(Boolean).join(path.delimiter);
+  const localBin = path.join(worktree, 'tools', 'orbit360-local-bin-v20260806');
+  const adjustedPath = [localBin, path.dirname(bash), path.dirname(git), path.dirname(npm), process.env.PATH || ''].filter(Boolean).join(path.delimiter);
+  const testEnv = { ...process.env, PATH: adjustedPath, RUNNER_OS: 'Windows-local-source-only' };
+
+  const shim = run(process.execPath, ['tools/orbit360-test-jq-contract-shim-v20260806.mjs'], {
+    cwd: worktree,
+    timeout: 30000,
+    env: testEnv
+  });
+  add('jq-shim-source-command-pass', shim.status === 0, shim.stderr || shim.stdout.slice(-600));
+  try { shimResult = JSON.parse(shim.stdout); } catch {}
+  add('jq-shim-source-suite-pass', shimResult.status === 'PASS_JQ_CONTRACT_SHIM_SOURCE' && shimResult.failed === 0 && shimResult.ok === true, JSON.stringify({ total: shimResult.total, passed: shimResult.passed, failed: shimResult.failed }));
+
   const source = run(process.execPath, ['tools/orbit360-test-visual-matrix-cross-runner-source-v20260806.mjs'], {
     cwd: worktree,
     timeout: 90000,
-    env: { ...process.env, PATH: adjustedPath, RUNNER_OS: 'Windows-local-source-only' }
+    env: testEnv
   });
   add('cross-runner-source-command-pass', source.status === 0, source.stderr || source.stdout.slice(-600));
   const evidence = path.join(worktree, 'orbit360-platform/runtime-gate-crm-v20260716/visual-matrix-cross-runner-source-test-sanitized-v20260806.json');
@@ -148,7 +168,7 @@ try {
 
 const failed = checks.filter(item => !item.ok);
 const result = {
-  schemaVersion: 'orbit360-local-windows-source-only-preflight-v1',
+  schemaVersion: 'orbit360-local-windows-source-only-preflight-v2',
   gateId: GATE,
   branch: BRANCH,
   localBranch,
@@ -161,6 +181,8 @@ const result = {
   failed: failed.length,
   failedCheckIds: failed.map(item => item.id),
   checks,
+  jqShimChecks: Number(shimResult.total || 0),
+  jqShimPassed: Number(shimResult.passed || 0),
   crossRunnerChecks: Number(sourceResult.total || 0),
   crossRunnerPassed: Number(sourceResult.passed || 0),
   signalSafeChecks: Number(sourceResult.priorSignalSafeChecks || 0),
