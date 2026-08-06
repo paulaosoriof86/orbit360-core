@@ -4,9 +4,9 @@
   "gateId": "block2.7-visual-runtime-rootfix-lab-v20260805",
   "gateContractVersion": "2.7.2",
   "owner": "orbit360-visual-runtime-rootfix-v20260805",
-  "ownerVersion": "20260805.5-runtime-consumed",
+  "ownerVersion": "20260805.6-governing-stop-validator-stale",
   "status": "CONSUMED_STOP_RETRY",
-  "classification": "ENVIRONMENT_FAILURE",
+  "classification": "VALIDATOR_STALE",
   "patternClassification": "REPLICABLE_CLAUDE_INMEDIATO",
   "rcId": "RC-AYS-LAB-CANONICA-01",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -41,44 +41,19 @@
       "role": "Direccion",
       "width": 1440,
       "height": 1000,
-      "routes": [
-        "inicio",
-        "cliente360",
-        "polizas",
-        "cobros",
-        "ops",
-        "leads",
-        "conciliaciones",
-        "cancelaciones"
-      ]
+      "routes": ["inicio", "cliente360", "polizas", "cobros", "ops", "leads", "conciliaciones", "cancelaciones"]
     },
     {
       "role": "Operativo",
       "width": 1024,
       "height": 768,
-      "routes": [
-        "inicio",
-        "cliente360",
-        "polizas",
-        "cobros",
-        "ops",
-        "leads",
-        "conciliaciones",
-        "cancelaciones"
-      ]
+      "routes": ["inicio", "cliente360", "polizas", "cobros", "ops", "leads", "conciliaciones", "cancelaciones"]
     },
     {
       "role": "Asesor",
       "width": 390,
       "height": 844,
-      "routes": [
-        "inicio",
-        "cliente360",
-        "polizas",
-        "cobros",
-        "ops",
-        "leads"
-      ]
+      "routes": ["inicio", "cliente360", "polizas", "cobros", "ops", "leads"]
     }
   ],
   "sourceStaticGate": {
@@ -130,17 +105,38 @@
   },
   "stopRetryOnRepeatedFailure": true,
   "rollbackRequiredOnHostingFailure": true,
+  "governingEvidence": "orbit360-platform/runtime-gate-crm-v20260716/visual-runtime-rootfix-governing-stop-sanitized-v20260805.json",
+  "runtimeResult": {
+    "runId": "31061214801",
+    "attempt": 1,
+    "result": "STOP_RETRY",
+    "preflight": "GO_GATE_CONTRACT_20_OF_20",
+    "hostingDeploys": 1,
+    "rollbackRestored": true,
+    "snapshotIntegrity": "VERIFIED_UNCHANGED",
+    "totalRoleFailures": null,
+    "persistedCheckpoint": false,
+    "observedError": "page.waitForFunction timeout 35000ms"
+  },
+  "secondaryBlockedRelay": {
+    "runId": "31061447485",
+    "preflight": "STOP_GATE_CONTRACT",
+    "failedCheckId": "lifecycleAuthorizedOnce",
+    "secretsRead": false,
+    "hostingDeploys": 0,
+    "browserExecuted": false,
+    "governing": false
+  },
+  "rootCause": {
+    "category": "VALIDATOR_STALE",
+    "owner": "tools/orbit360-visual-runtime-rootfix-live-v20260805.mjs",
+    "solutionOwner": "tools/orbit360-visual-runtime-rootfix-browser-precheck-v20260805.mjs",
+    "reason": "The consumed browser owner did not persist the active Auth, membership, route or hydration checkpoint on timeout, so it cannot classify a product defect.",
+    "retryProhibited": true,
+    "newExplicitAuthorizationRequired": true
+  },
   "containsPII": false,
   "containsSecrets": false,
   "containsPasswords": false,
-  "nextAction": "CLOSE_ROOT_CAUSE_FROM_CURRENT_RUN_WITHOUT_RETRY",
-  "runtimeResult": {
-    "runId": "31061447485",
-    "attempt": 1,
-    "result": "STOP_RETRY",
-    "hostingDeploys": 0,
-    "rollbackRestored": false,
-    "snapshotIntegrity": "VERIFIED_UNCHANGED",
-    "totalRoleFailures": null
-  }
+  "nextAction": "STATICALLY_VALIDATE_OBSERVABLE_BROWSER_PRECHECK_THEN_WAIT_FOR_NEW_EXPLICIT_AUTHORIZATION"
 }
