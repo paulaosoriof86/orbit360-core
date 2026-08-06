@@ -1,0 +1,60 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-overlay-v1",
+  "parentLifecycle": "tools/orbit360-validator-lifecycle-contract-visual-matrix-corrected-post-auth-lab-v20260805.json",
+  "gateId": "block2.7-visual-matrix-corrected-post-auth-lab-v20260805",
+  "ownerVersion": "20260806.18-cross-runner-source-pass-event-dispatch-unavailable",
+  "status": "STOP_RETRY_CROSS_RUNNER_SOURCE_PASS_EVENT_DISPATCH_UNAVAILABLE",
+  "primaryClassification": "PIPELINE_MECHANISM_FAILURE_CORRECTED_SOURCE_ONLY",
+  "secondaryClassification": "ENVIRONMENT_FAILURE",
+  "failureCode": "EVENT_DISPATCH_UNAVAILABLE",
+  "crossRunnerSource": {
+    "status": "PASS_VISUAL_MATRIX_CROSS_RUNNER_SOURCE",
+    "checks": 24,
+    "passed": 24,
+    "failed": 0,
+    "priorSignalSafeChecks": 48,
+    "priorSignalSafePassed": 48,
+    "portableTimeout": "tools/orbit360-run-with-timeout-cross-platform-v20260806.mjs",
+    "runnerV3": "tools/orbit360-run-visual-matrix-corrected-post-auth-runtime-only-v3-cross-runner-v20260806.sh",
+    "validator": "tools/orbit360-test-visual-matrix-cross-runner-source-v20260806.mjs",
+    "evidence": "orbit360-platform/runtime-gate-crm-v20260716/visual-matrix-cross-runner-source-test-sanitized-v20260806.json"
+  },
+  "eventDispatchCanary": {
+    "pullRequest": 25,
+    "pullRequestClosed": true,
+    "pullRequestMerged": false,
+    "runnerLabel": "macos-14",
+    "eventsAttempted": 4,
+    "workflowRunsObserved": 0,
+    "checksObserved": 0,
+    "evidence": "orbit360-platform/runtime-gate-crm-v20260716/github-actions-cross-runner-event-dispatch-sanitized-v20260806.json"
+  },
+  "capabilities": {
+    "secrets": false,
+    "firestoreRead": false,
+    "writes": false,
+    "runtime": false,
+    "browser": false,
+    "deploy": false,
+    "functionsDeploy": false,
+    "rulesDeploy": false,
+    "production": false,
+    "main": false,
+    "merge": false
+  },
+  "authorization": {
+    "activeRequest": false,
+    "requestConsumed": true,
+    "allowedExecutions": 0,
+    "replayAllowed": false
+  },
+  "productState": {
+    "authMembershipInicioPrecheck": "PASS",
+    "fullVisualMatrix": "NOT_COMPLETED",
+    "passVisualPostAuth": false,
+    "snapshotIntegrity": "NOT_VERIFIED_FINAL",
+    "cobrosObserved": 7,
+    "cobrosBlock41": "PAUSED"
+  },
+  "nextAction": "Restore Actions event dispatch or authorize an independent executor for runner v3. Then execute one source-only cross-runner validation. Only after PASS request a new immutable runtime authorization bound to the then-current HEAD."
+}
