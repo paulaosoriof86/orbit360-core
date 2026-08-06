@@ -1,5 +1,6 @@
 name: Orbit 360 · Validar failover cross-runner macOS · source-only
 # Canary dispatch cross-runner macOS 2026-08-06
+# Synchronize event 1
 
 on:
   pull_request:
