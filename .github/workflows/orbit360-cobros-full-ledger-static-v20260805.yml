@@ -1,0 +1,150 @@
+name: Orbit 360 · Cobros ledger completo · static source-only
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-requests/cobros-full-ledger-static-v20260805.json'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: orbit360-cobros-full-ledger-static-v20260805
+  cancel-in-progress: false
+
+env:
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  ORBIT360_REQUEST: .github/orbit360-requests/cobros-full-ledger-static-v20260805.json
+  ORBIT360_LIFECYCLE: tools/orbit360-validator-lifecycle-contract-cobros-full-ledger-write-lab-v20260805.json
+  ORBIT360_STATIC_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/cobros-full-ledger-write-static-preflight-sanitized-v20260805.json
+  ORBIT360_PLANNER_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/cobros-full-ledger-planner-source-test-sanitized-v20260805.json
+
+jobs:
+  static-source-only:
+    name: Contrato → planner → lifecycle · cero acceso
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout solicitud exacta
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 3
+          persist-credentials: true
+
+      - name: Verificar solicitud inmutable source-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
+          test "${#CHANGED[@]}" = '1'
+          test "${CHANGED[0]}" = "$ORBIT360_REQUEST"
+          PARENT="$(git rev-parse HEAD^)"
+          jq -e --arg parent "$PARENT" '
+            .schemaVersion=="orbit360-cobros-full-ledger-static-request-v1" and
+            .gateId=="block10.10-cobros-full-ledger-write-lab-v20260805" and
+            .contractVersion=="10.10.2" and
+            .rcId=="RC-AYS-LAB-CANONICA-01" and
+            .status=="AUTHORIZED_SOURCE_ONLY_ONCE" and
+            .approved==true and .allowedExecutions==1 and .consumed==false and .replayAllowed==false and
+            .branch=="ays/backend-tenant-lab-v99-20260703" and .pullRequest==5 and
+            .projectId=="ays-orbit-360-lab" and .tenantId=="alianzas-soluciones" and
+            .parentHead==$parent and
+            .capabilities.secrets==false and .capabilities.firestoreRead==false and
+            .capabilities.writes==false and .capabilities.runtime==false and
+            .capabilities.browser==false and .capabilities.deploy==false and
+            .capabilities.functionsDeploy==false and .capabilities.rulesDeploy==false and
+            .capabilities.production==false
+          ' "$ORBIT360_REQUEST" >/dev/null
+
+      - name: Validar sintaxis de owners
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-cobros-full-ledger-planner-v20260805.mjs
+          node --check tools/orbit360-test-cobros-full-ledger-planner-source-v20260805.mjs
+          node --check tools/orbit360-validar-cobros-full-ledger-write-static-v20260805.mjs
+          node --check tools/orbit360-cobros-overlay-hold-finalizer-v20260805.mjs
+          git diff --check
+
+      - name: Ejecutar prueba source-only del planner
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-test-cobros-full-ledger-planner-source-v20260805.mjs | tee "$ORBIT360_PLANNER_EVIDENCE"
+          jq -e '.status=="PASS_COBROS_FULL_LEDGER_PLANNER_SOURCE" and .failed==0 and .ok==true and .fixtureOnly==true and .realPrivateRowsUsed==false and .secretsRead==false and .firestoreRead==false and .firestoreWrites==0 and .deployExecuted==false and .productionTouched==false' "$ORBIT360_PLANNER_EVIDENCE" >/dev/null
+
+      - name: Ejecutar preflight estático 10.10.2
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-cobros-full-ledger-write-static-v20260805.mjs
+          jq -e '.status=="PASS_COBROS_FULL_LEDGER_WRITE_STATIC_CONTRACT" and .contractVersion=="10.10.2" and .passed==20 and .failed==0 and .ok==true and .plannedWritesMaximum==1098 and .stageDocuments==1095 and .activationTransactionWrites==2 and .newCobros==0 and .receiptWrites==0 and .policyWrites==0 and .finmovWrites==0 and .executionAuthorized==false and .firestoreReadAuthorized==false and .writeAuthorized==false and .deployAuthorized==false and .productionAuthorized==false' "$ORBIT360_STATIC_EVIDENCE" >/dev/null
+
+      - name: Sellar lifecycle sin autorización de acceso
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs = require('fs');
+          const path = process.env.ORBIT360_LIFECYCLE;
+          const lifecycle = JSON.parse(fs.readFileSync(path, 'utf8'));
+          lifecycle.ownerVersion = '20260805.5-static-preflight-pass';
+          lifecycle.status = 'STATIC_PREFLIGHT_PASS_NOT_AUTHORIZED';
+          lifecycle.classification = 'STATIC_ISOLATED_RUN_READY_NO_ACCESS';
+          lifecycle.currentPhase = 'STATIC_PREFLIGHT_PASS';
+          if (!lifecycle.phases.includes('STATIC_PREFLIGHT_PASS')) lifecycle.phases.splice(2, 0, 'STATIC_PREFLIGHT_PASS');
+          lifecycle.staticRequest = {
+            path: process.env.ORBIT360_REQUEST,
+            commit: process.env.GITHUB_SHA,
+            runId: process.env.GITHUB_RUN_ID,
+            attempt: Number(process.env.GITHUB_RUN_ATTEMPT || 1),
+            consumed: true,
+            replayAllowed: false,
+            result: 'PASS',
+            plannerSourceChecks: 18,
+            staticContractChecks: 20
+          };
+          lifecycle.executionProfile.mode = 'SOURCE_ONLY';
+          lifecycle.executionProfile.phase = 'STATIC_PREFLIGHT_PASS';
+          lifecycle.activeRequest = false;
+          lifecycle.allowedExecutions = 0;
+          lifecycle.executionAuthorized = false;
+          lifecycle.secretAccessAuthorized = false;
+          lifecycle.firestoreReadAuthorized = false;
+          lifecycle.writeAuthorized = false;
+          lifecycle.labWriteAuthorized = false;
+          lifecycle.runtimeAuthorized = false;
+          lifecycle.browserAuthorized = false;
+          lifecycle.deployAuthorized = false;
+          lifecycle.functionsDeployAuthorized = false;
+          lifecycle.rulesDeployAuthorized = false;
+          lifecycle.productionAuthorized = false;
+          lifecycle.mainAuthorized = false;
+          lifecycle.mergeAuthorized = false;
+          lifecycle.nextAction = 'PREPARE_EXACT_WRITE_REQUEST_AND_WAIT_FOR_ONE_EXPLICIT_LAB_AUTHORIZATION';
+          fs.writeFileSync(path, JSON.stringify(lifecycle, null, 2) + '\n', 'utf8');
+          NODE
+          jq -e '.status=="STATIC_PREFLIGHT_PASS_NOT_AUTHORIZED" and .staticRequest.consumed==true and .staticRequest.result=="PASS" and .executionAuthorized==false and .firestoreReadAuthorized==false and .writeAuthorized==false and .deployAuthorized==false and .productionAuthorized==false' "$ORBIT360_LIFECYCLE" >/dev/null
+
+      - name: Persistir evidencia source-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name orbit360-gate-bot
+          git config user.email orbit360-gate-bot@users.noreply.github.com
+          git add "$ORBIT360_LIFECYCLE" "$ORBIT360_STATIC_EVIDENCE" "$ORBIT360_PLANNER_EVIDENCE"
+          git commit -m 'cobros: persist full ledger static preflight [skip ci]'
+          git push origin "HEAD:$ORBIT360_BRANCH"
+
+      - name: Comentar resultado en PR
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const body = `## Cobros ledger 4.1 — static PASS\n\n\`\`\`text\ncontract: 10.10.2\nplanner source: 18/18 PASS\nstatic contract: 20/20 PASS\nstage documents: 1095\nmaximum writes: 1098\nnew cobros: 0\nFirestore/Auth/deploy/production: 0\nstatus: STATIC_PREFLIGHT_PASS_NOT_AUTHORIZED\n\`\`\``;
+            await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: 5, body });
