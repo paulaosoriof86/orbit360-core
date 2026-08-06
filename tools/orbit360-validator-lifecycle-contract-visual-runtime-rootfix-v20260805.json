@@ -4,14 +4,14 @@
   "gateId": "block2.7-visual-runtime-rootfix-static-v20260805",
   "gateContractVersion": "2.7.1",
   "owner": "orbit360-visual-runtime-rootfix-v20260805",
-  "ownerVersion": "20260805.1-prepared-static",
-  "status": "PREPARED_STATIC_NOT_DEPLOYED",
-  "classification": "FUNCTIONAL_DEFECT_AND_PIPELINE_MECHANISM_FAILURE",
+  "ownerVersion": "20260805.2-static-source-pass",
+  "status": "STATIC_SOURCE_PASS_NOT_DEPLOYED",
+  "classification": "SOURCE_FIX_READY_FOR_LAB_VISUAL_VALIDATION",
   "patternClassification": "REPLICABLE_CLAUDE_INMEDIATO",
   "rcId": "RC-AYS-LAB-CANONICA-01",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
-  "currentPhase": "PREPARED_STATIC",
+  "currentPhase": "STATIC_SOURCE_PASS",
   "phases": [
     "PREPARED_STATIC",
     "STATIC_SOURCE_PASS",
@@ -78,5 +78,15 @@
   "containsPII": false,
   "containsSecrets": false,
   "containsPasswords": false,
-  "nextAction": "RUN_ONE_SOURCE_ONLY_STATIC_GATE_THEN_PREPARE_EXACT_HOSTING_LAB_VISUAL_AUTHORIZATION"
+  "nextAction": "PREPARE_EXACT_ONE_HOSTING_LAB_DEPLOY_AND_LIVE_VISUAL_TEST_AUTHORIZATION",
+  "staticRequest": {
+    "path": ".github/orbit360-requests/visual-runtime-rootfix-static-v20260805.json",
+    "commit": "83e144ae111a365e08662214f393d529011a8809",
+    "runId": "31059563973",
+    "attempt": 1,
+    "consumed": true,
+    "replayAllowed": false,
+    "result": "PASS",
+    "sourceChecks": 28
+  }
 }
