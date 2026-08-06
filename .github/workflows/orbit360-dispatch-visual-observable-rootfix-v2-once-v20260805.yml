@@ -1,0 +1,160 @@
+name: Orbit 360 · Ejecutar rootfix visual observable v2 una vez
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - '.github/workflows/orbit360-dispatch-visual-observable-rootfix-v2-once-v20260805.yml'
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: orbit360-dispatch-visual-observable-rootfix-v2-once-v20260805
+  cancel-in-progress: false
+
+jobs:
+  visual-observable-rootfix-v2-once:
+    name: Gate → backup → Hosting LAB → precheck → matriz
+    runs-on: ubuntu-24.04
+    timeout-minutes: 75
+    steps:
+      - name: Checkout HEAD exacto de la candidata
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Gate canónico antes de secretos
+        id: preflight
+        continue-on-error: true
+        shell: bash
+        run: |
+          chmod +x tools/orbit360-preflight-visual-observable-rootfix-v2-once-v20260805.sh
+          tools/orbit360-preflight-visual-observable-rootfix-v2-once-v20260805.sh
+
+      - name: Ejecutar runtime únicamente con GO_GATE_CONTRACT
+        id: runtime
+        if: steps.preflight.outcome == 'success' && steps.preflight.outputs.go == 'true'
+        continue-on-error: true
+        env:
+          FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        shell: bash
+        run: |
+          chmod +x tools/orbit360-run-visual-observable-rootfix-v2-runtime-only-v20260805.sh
+          tools/orbit360-run-visual-observable-rootfix-v2-runtime-only-v20260805.sh
+
+      - name: Publicar evidencia sanitizada
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-observable-rootfix-v2-lab-sanitized
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/visual-observable-rootfix-v2-gate-registration-sanitized-v20260805.json
+            orbit360-platform/runtime-gate-crm-v20260716/visual-observable-rootfix-v2-precheck-sanitized-v20260805.json
+            orbit360-platform/runtime-gate-crm-v20260716/visual-observable-rootfix-v2-matrix-sanitized-v20260805.json
+            orbit360-platform/runtime-gate-crm-v20260716/visual-observable-rootfix-v2-final-sanitized-v20260805.json
+            orbit360-platform/docs/CIERRE-VISUAL-OBSERVABLE-ROOTFIX-V2-LAB-20260805.md
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Comentar cierre sanitizado en PR 5
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          PREFLIGHT_OUTCOME: ${{ steps.preflight.outcome }}
+          PREFLIGHT_GO: ${{ steps.preflight.outputs.go }}
+          RUNTIME_OUTCOME: ${{ steps.runtime.outcome }}
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const fs = require('fs');
+            const finalPath = 'orbit360-platform/runtime-gate-crm-v20260716/visual-observable-rootfix-v2-final-sanitized-v20260805.json';
+            const preflightPath = 'orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json';
+            const final = fs.existsSync(finalPath)
+              ? JSON.parse(fs.readFileSync(finalPath, 'utf8'))
+              : {
+                  stage: 'STOP_RETRY_EVIDENCE_MISSING',
+                  decision: 'STOP_RETRY',
+                  classification: 'PIPELINE_MECHANISM_FAILURE',
+                  checkpoint: 'FINAL_EVIDENCE_MISSING',
+                  ok: false
+                };
+            const preflight = fs.existsSync(preflightPath)
+              ? JSON.parse(fs.readFileSync(preflightPath, 'utf8'))
+              : { status: 'NOT_PRODUCED', total: 0, failed: null };
+            const lines = [
+              '## Rootfix visual observable v2 post-Auth — ' + (final.ok ? 'PASS' : 'STOP_RETRY'),
+              '',
+              '```text',
+              `run: ${final.runId || context.runId}`,
+              `HEAD: ${context.sha}`,
+              `stage: ${final.stage || '—'}`,
+              `decision: ${final.decision || '—'}`,
+              `classification: ${final.classification || '—'}`,
+              `checkpoint: ${final.checkpoint || '—'}`,
+              `preflight: ${preflight.status || '—'} · ${preflight.total || 0} checks · failed ${preflight.failed == null ? '—' : preflight.failed}`,
+              `preflight step: ${process.env.PREFLIGHT_OUTCOME || '—'} · GO ${process.env.PREFLIGHT_GO || 'false'}`,
+              `runtime step: ${process.env.RUNTIME_OUTCOME || 'skipped'}`,
+              `authorization consumed: ${final.authorizationConsumed === true}`,
+              `Hosting deploy attempted: ${final.hostingDeployAttempted === true}`,
+              `Hosting deploys: ${final.hostingDeploys || 0}`,
+              `rollback required: ${final.hostingRollbackRequired === true}`,
+              `rollback restored: ${final.hostingRollbackRestored === true}`,
+              `precheck: ${final.precheckStage || 'NOT_EXECUTED'} · ${final.precheckCheckpoint || 'NOT_EXECUTED'}`,
+              `matrix: ${final.matrixStage || 'NOT_EXECUTED'} · ${final.matrixCheckpoint || 'NOT_EXECUTED'}`,
+              `snapshot: ${final.snapshotIntegrity || 'NOT_VERIFIED'}`,
+              `role failures: ${final.totalRoleFailures == null ? '—' : final.totalRoleFailures}`,
+              'Firestore/Auth/operational writes: 0',
+              'Functions/Rules/reimport/production/main/merge: 0',
+              '```'
+            ];
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: 5,
+              body: lines.join('\n')
+            });
+
+      - name: Exigir resultado gobernante
+        if: always()
+        env:
+          PREFLIGHT_OUTCOME: ${{ steps.preflight.outcome }}
+          PREFLIGHT_GO: ${{ steps.preflight.outputs.go }}
+          RUNTIME_OUTCOME: ${{ steps.runtime.outcome }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          FINAL='orbit360-platform/runtime-gate-crm-v20260716/visual-observable-rootfix-v2-final-sanitized-v20260805.json'
+          test -f "$FINAL"
+          if [[ "$PREFLIGHT_OUTCOME" != 'success' || "$PREFLIGHT_GO" != 'true' ]]; then
+            jq -e '
+              .ok==false and .decision=="STOP_RETRY" and
+              .authorizationConsumed==false and .secretAccessed==false and
+              .hostingDeploys==0 and .firestoreWrites==0 and .authWrites==0 and
+              .operationalWrites==0 and .productionTouched==false and
+              .mainTouched==false and .mergeExecuted==false
+            ' "$FINAL" >/dev/null
+            exit 41
+          fi
+          test "$RUNTIME_OUTCOME" = 'success'
+          jq -e '
+            .ok==true and .stage=="PASS_VISUAL_OBSERVABLE_ROOTFIX_LIVE" and
+            .decision=="PASS_VISUAL_POST_AUTH" and .classification=="PASS_VISUAL_POST_AUTH" and
+            .checkpoint=="MATRIX_COMPLETE" and .preflightStatus=="GO_GATE_CONTRACT" and
+            .authorizationConsumed==true and .hostingDeployAttempted==true and
+            .hostingDeploys==1 and .hostingRollbackRequired==false and
+            .precheckStage=="PASS_VISUAL_BROWSER_PRECHECK" and
+            .matrixStage=="PASS_VISUAL_OBSERVABLE_ROOTFIX_MATRIX" and
+            .snapshotIntegrity=="VERIFIED_UNCHANGED" and .totalRoleFailures==0 and
+            .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and
+            .functionsDeploys==0 and .rulesDeploys==0 and .reimports==0 and
+            .productionTouched==false and .mainTouched==false and .mergeExecuted==false
+          ' "$FINAL" >/dev/null
