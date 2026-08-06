@@ -5,6 +5,7 @@ on:
     branches:
       - ays/backend-tenant-lab-v99-20260703
     paths:
+      - '.github/orbit360-requests/visual-observable-rootfix-lab-v20260805-*.json'
       - '.github/orbit360-requests/visual-observable-rootfix-v2-lab-v20260805-*.json'
 
 permissions:
@@ -15,21 +16,6 @@ permissions:
 concurrency:
   group: orbit360-visual-observable-rootfix-v2-lab-v20260805
   cancel-in-progress: false
-
-env:
-  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
-  ORBIT360_GATE_ID: block2.7-visual-observable-rootfix-v2-lab-v20260805
-  ORBIT360_LIFECYCLE: tools/orbit360-validator-lifecycle-contract-visual-observable-rootfix-v2-lab-v20260805.json
-  ORBIT360_PROJECT_ID: ays-orbit-360-lab
-  ORBIT360_TENANT_ID: alianzas-soluciones
-  ORBIT360_LAB_URL: https://ays-orbit-360-lab.web.app/index.html?orbitBackend=firestore-lab&tenant=alianzas-soluciones&runtime=20260717-2
-  ORBIT360_EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
-  ORBIT360_REGISTRATION_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/visual-observable-rootfix-v2-gate-registration-sanitized-v20260805.json
-  ORBIT360_PRECHECK_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/visual-observable-rootfix-v2-precheck-sanitized-v20260805.json
-  ORBIT360_MATRIX_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/visual-observable-rootfix-v2-matrix-sanitized-v20260805.json
-  ORBIT360_FINAL_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/visual-observable-rootfix-v2-final-sanitized-v20260805.json
-  ORBIT360_CLOSURE: orbit360-platform/docs/CIERRE-VISUAL-OBSERVABLE-ROOTFIX-V2-LAB-20260805.md
-  ORBIT360_ARTIFACT_DIR: orbit360-visual-observable-v2-artifacts
 
 jobs:
   visual-observable-rootfix-v2:
@@ -44,227 +30,15 @@ jobs:
           fetch-depth: 0
           persist-credentials: true
 
-      - name: Verificar request único e inmutable
-        shell: bash
-        run: |
-          set -euo pipefail
-          test "$GITHUB_RUN_ATTEMPT" = '1'
-          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
-          mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
-          test "${#CHANGED[@]}" = '1'
-          REQUEST_FILE="${CHANGED[0]}"
-          case "$REQUEST_FILE" in
-            .github/orbit360-requests/visual-observable-rootfix-v2-lab-v20260805-*.json) ;;
-            *) echo 'PIPELINE_MECHANISM_FAILURE:UNEXPECTED_REQUEST_PATH' >&2; exit 41 ;;
-          esac
-          echo "ORBIT360_REQUEST_FILE=$REQUEST_FILE" >> "$GITHUB_ENV"
-          PARENT="$(git rev-parse HEAD^)"
-          jq -e --arg parent "$PARENT" '
-            .schemaVersion=="orbit360-visual-observable-rootfix-v2-lab-request-v1" and
-            .gateId=="block2.7-visual-observable-rootfix-v2-lab-v20260805" and
-            .contractVersion=="2.7.5" and .rcId=="RC-AYS-LAB-CANONICA-01" and
-            .status=="AUTHORIZED_ONCE" and .approved==true and
-            .allowedExecutions==1 and .consumed==false and .replayAllowed==false and
-            .branch=="ays/backend-tenant-lab-v99-20260703" and .pullRequest==5 and
-            .projectId=="ays-orbit-360-lab" and .tenantId=="alianzas-soluciones" and
-            .parentHead==$parent and
-            .sourcePass.status=="PASS_DIRECT_SOURCE_VALIDATION" and
-            .sourcePass.checks==24 and .sourcePass.ok==true and
-            .capabilities.secrets==true and .capabilities.firestoreRead==true and
-            .capabilities.writes==false and .capabilities.runtime==true and
-            .capabilities.browser==true and .capabilities.deploy==true and
-            .capabilities.functionsDeploy==false and .capabilities.rulesDeploy==false and
-            .capabilities.production==false and
-            .scope.hostingDeploysMaximum==1 and .scope.hostingOnly==true and
-            .scope.hostingBackupClone==true and .scope.hostingRollbackCloneOnFailure==true and
-            .scope.precheckRequiredBeforeMatrix==true and
-            .scope.functionsDeploy==false and .scope.rulesDeploy==false and
-            .scope.firestoreWrites==false and .scope.authWrites==false and
-            .scope.operationalWrites==false and .scope.reimport==false and
-            .scope.production==false and .scope.main==false and .scope.merge==false and
-            .scope.directionDesktop==true and .scope.operationalTablet==true and
-            .scope.advisorMobile==true
-          ' "$REQUEST_FILE" >/dev/null
-
-      - name: Validar sintaxis antes del registro
-        shell: bash
-        run: |
-          set -euo pipefail
-          node --check tools/orbit360-register-visual-observable-rootfix-v2-gate-v20260805.mjs
-          node --check tools/orbit360-validar-gate-contracts-engine-visual-observable-rootfix-v2-lab-v20260805.mjs
-          node --check tools/orbit360-visual-runtime-rootfix-browser-precheck-v20260805.mjs
-          node --check tools/orbit360-visual-runtime-rootfix-observable-matrix-v20260805.mjs
-          node --check tools/orbit360-seal-visual-observable-rootfix-v2-runtime-v20260805.mjs
-          node --check orbit360-platform/core/visual-runtime-rootfix-v20260805.js
-          node --check orbit360-platform/core/visual-runtime-hydration-contract-v20260805.js
-          node --check orbit360-platform/core/backend-lab-loader.js
-          git diff --check
-
-      - name: Registrar gate v2 source-only
-        id: registration
-        shell: bash
-        run: |
-          set -euo pipefail
-          node tools/orbit360-register-visual-observable-rootfix-v2-gate-v20260805.mjs
-          jq -e '.status=="PASS_GATE_REGISTRATION" and .contractVersion=="2.7.5" and .failed==0 and .ok==true and .secretsRead==false and .firestoreRead==false and .firestoreWrites==0 and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' "$ORBIT360_REGISTRATION_EVIDENCE" >/dev/null
-
-      - name: Gate canónico antes de secretos
-        id: preflight
-        shell: bash
-        run: |
-          set -euo pipefail
-          ORBIT360_REQUEST_FILE="$ORBIT360_REQUEST_FILE" node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
-          jq -e '
-            .status=="GO_GATE_CONTRACT" and .contractVersion=="2.7.5" and
-            .failed==0 and .ok==true and .executionAuthorized==true and
-            .secretAccessAuthorized==true and .firestoreReadAuthorized==true and
-            .writeAuthorized==false and .runtimeAuthorized==true and
-            .browserAuthorized==true and .hostingDeployAuthorized==true and
-            .hostingTarget=="ays-orbit-360-lab" and .hostingDeploysMaximum==1 and
-            .hostingBackupCloneAuthorized==true and .hostingRollbackCloneAuthorizedOnFailure==true and
-            .functionsDeployAuthorized==false and .rulesDeployAuthorized==false and
-            .productionAuthorized==false and .firestoreWritesAuthorized==0 and
-            .authWritesAuthorized==0 and .operationalWritesAuthorized==0 and
-            .dataAccess==false and .secretAccess==false and .firestoreReads==0 and
-            .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and
-            .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false
-          ' "$ORBIT360_EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
-
-      - name: Resolver credencial LAB
-        id: credential
+      - name: Ejecutar runner contractual único
         env:
-          SA1: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
-          SA2: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
-          SA3: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
         shell: bash
         run: |
-          set -euo pipefail
-          SERVICE_ACCOUNT="${SA1:-${SA2:-${SA3:-}}}"
-          test -n "$SERVICE_ACCOUNT"
-          KEY="$RUNNER_TEMP/orbit360-visual-observable-v2-service-account.json"
-          printf '%s' "$SERVICE_ACCOUNT" > "$KEY"
-          chmod 600 "$KEY"
-          test "$(jq -r '.project_id // empty' "$KEY")" = "$ORBIT360_PROJECT_ID"
-          echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY" >> "$GITHUB_ENV"
-
-      - name: Instalar runtime reproducible
-        id: runtime
-        shell: bash
-        run: |
-          set -euo pipefail
-          npm install --no-save --package-lock=false firebase-admin@13.10.0 firebase-tools@15.25.1 playwright@1.55.0 >/dev/null
-          npx playwright install --with-deps chromium >/dev/null
-
-      - name: Respaldar Hosting LAB vigente
-        id: backup
-        shell: bash
-        run: |
-          set -euo pipefail
-          BACKUP_CHANNEL="visual-observable-v2-backup-${GITHUB_RUN_ID}"
-          echo "ORBIT360_BACKUP_CHANNEL=$BACKUP_CHANNEL" >> "$GITHUB_ENV"
-          npx firebase hosting:clone "$ORBIT360_PROJECT_ID:live" "$ORBIT360_PROJECT_ID:$BACKUP_CHANNEL" --project "$ORBIT360_PROJECT_ID" --non-interactive
-          echo "created=true" >> "$GITHUB_OUTPUT"
-
-      - name: Desplegar exclusivamente Hosting LAB
-        id: hosting_deploy
-        shell: bash
-        run: |
-          set -euo pipefail
-          npx firebase deploy --project "$ORBIT360_PROJECT_ID" --only hosting --non-interactive
-          echo "deployed=true" >> "$GITHUB_OUTPUT"
-
-      - name: Ejecutar precheck observable
-        id: browser_precheck
-        continue-on-error: true
-        env:
-          ORBIT360_BROWSER_PRECHECK_EVIDENCE: ${{ env.ORBIT360_PRECHECK_EVIDENCE }}
-          ORBIT360_BROWSER_PRECHECK_SCREENSHOT: ${{ env.ORBIT360_ARTIFACT_DIR }}/precheck-failure.png
-        shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p "$ORBIT360_ARTIFACT_DIR"
-          node tools/orbit360-visual-runtime-rootfix-browser-precheck-v20260805.mjs
-          jq -e '
-            .stage=="PASS_VISUAL_BROWSER_PRECHECK" and
-            .classification=="GO_FULL_VISUAL_MATRIX" and .ok==true and
-            .checkpoint=="INICIO_READY_PASS" and
-            .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and
-            .deployExecuted==false and .productionTouched==false
-          ' "$ORBIT360_PRECHECK_EVIDENCE" >/dev/null
-
-      - name: Ejecutar matriz completa solo con precheck PASS
-        if: steps.browser_precheck.outcome == 'success'
-        id: visual_matrix
-        continue-on-error: true
-        env:
-          ORBIT360_VISUAL_EVIDENCE: ${{ env.ORBIT360_MATRIX_EVIDENCE }}
-          ORBIT360_VISUAL_ARTIFACT_DIR: ${{ env.ORBIT360_ARTIFACT_DIR }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          node tools/orbit360-visual-runtime-rootfix-observable-matrix-v20260805.mjs
-          jq -e '
-            .stage=="PASS_VISUAL_OBSERVABLE_ROOTFIX_MATRIX" and
-            .classification=="PASS_VISUAL_POST_AUTH" and .ok==true and
-            .totalRoleFailures==0 and .snapshotIntegrity=="VERIFIED_UNCHANGED" and
-            (.roles|length)==3 and
-            .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and
-            .functionsDeploys==0 and .rulesDeploys==0 and .productionTouched==false
-          ' "$ORBIT360_MATRIX_EVIDENCE" >/dev/null
-
-      - name: Restaurar Hosting ante cualquier fallo posterior al deploy
-        if: always() && steps.hosting_deploy.outcome == 'success' && (steps.browser_precheck.outcome != 'success' || steps.visual_matrix.outcome != 'success')
-        id: rollback
-        shell: bash
-        run: |
-          set -euo pipefail
-          test -n "${ORBIT360_BACKUP_CHANNEL:-}"
-          npx firebase hosting:clone "$ORBIT360_PROJECT_ID:$ORBIT360_BACKUP_CHANNEL" "$ORBIT360_PROJECT_ID:live" --project "$ORBIT360_PROJECT_ID" --non-interactive
-          echo "restored=true" >> "$GITHUB_OUTPUT"
-
-      - name: Sellar evidencia y consumir autorización
-        if: always()
-        env:
-          REGISTRATION_OUTCOME: ${{ steps.registration.outcome }}
-          PREFLIGHT_OUTCOME: ${{ steps.preflight.outcome }}
-          CREDENTIAL_OUTCOME: ${{ steps.credential.outcome }}
-          RUNTIME_OUTCOME: ${{ steps.runtime.outcome }}
-          BACKUP_OUTCOME: ${{ steps.backup.outcome }}
-          DEPLOY_OUTCOME: ${{ steps.hosting_deploy.outcome }}
-          PRECHECK_OUTCOME: ${{ steps.browser_precheck.outcome }}
-          MATRIX_OUTCOME: ${{ steps.visual_matrix.outcome }}
-          ROLLBACK_OUTCOME: ${{ steps.rollback.outcome }}
-          ORBIT360_PRECHECK_EVIDENCE: ${{ env.ORBIT360_PRECHECK_EVIDENCE }}
-          ORBIT360_MATRIX_EVIDENCE: ${{ env.ORBIT360_MATRIX_EVIDENCE }}
-          ORBIT360_FINAL_EVIDENCE: ${{ env.ORBIT360_FINAL_EVIDENCE }}
-          ORBIT360_LIFECYCLE: ${{ env.ORBIT360_LIFECYCLE }}
-          ORBIT360_CLOSURE: ${{ env.ORBIT360_CLOSURE }}
-        shell: bash
-        run: |
-          node tools/orbit360-seal-visual-observable-rootfix-v2-runtime-v20260805.mjs
-
-      - name: Persistir evidencia sanitizada y lifecycle
-        if: always()
-        shell: bash
-        run: |
-          set -euo pipefail
-          git config user.name orbit360-gate-bot
-          git config user.email orbit360-gate-bot@users.noreply.github.com
-          FILES=(
-            tools/orbit360-validar-gate-contracts-v20260717.mjs
-            "$ORBIT360_REGISTRATION_EVIDENCE"
-            "$ORBIT360_LIFECYCLE"
-            "$ORBIT360_EVIDENCE_DIR/preflight-sanitizado.json"
-            "$ORBIT360_FINAL_EVIDENCE"
-            "$ORBIT360_CLOSURE"
-          )
-          [ -f "$ORBIT360_PRECHECK_EVIDENCE" ] && FILES+=("$ORBIT360_PRECHECK_EVIDENCE")
-          [ -f "$ORBIT360_MATRIX_EVIDENCE" ] && FILES+=("$ORBIT360_MATRIX_EVIDENCE")
-          git add "${FILES[@]}"
-          if ! git diff --cached --quiet; then
-            git commit -m 'runtime: persist observable visual rootfix v2 result [skip ci]'
-            git push origin "HEAD:$ORBIT360_BRANCH"
-          fi
+          chmod +x tools/orbit360-run-visual-observable-rootfix-v2-lab-v20260805.sh
+          tools/orbit360-run-visual-observable-rootfix-v2-lab-v20260805.sh
 
       - name: Publicar evidencia sanitizada
         if: always()
@@ -278,30 +52,3 @@ jobs:
             orbit360-visual-observable-v2-artifacts/*.png
           if-no-files-found: warn
           retention-days: 14
-
-      - name: Comentar cierre en PR 5
-        if: always()
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ github.token }}
-          script: |
-            const fs = require('fs');
-            const p = process.env.ORBIT360_FINAL_EVIDENCE;
-            const e = fs.existsSync(p) ? JSON.parse(fs.readFileSync(p, 'utf8')) : { stage:'STOP_RETRY_EVIDENCE_MISSING', classification:'PIPELINE_MECHANISM_FAILURE', checkpoint:'EVIDENCE_MISSING', ok:false };
-            const body = `## Rootfix visual observable v2 — ${e.ok?'PASS':'STOP_RETRY'}\n\n\`\`\`text\nrun: ${e.runId||'—'}\n${e.stage}\n${e.classification}\ncheckpoint: ${e.checkpoint||'—'}\npreflight: ${e.preflightStatus||'—'}\nprecheck: ${e.precheckStage||'—'}\nmatrix: ${e.matrixStage||'—'}\nroles con fallos: ${e.totalRoleFailures}\nsnapshot: ${e.snapshotIntegrity}\nHosting deploys: ${e.hostingDeploys||0}\nrollback: ${e.hostingRollbackRestored?'restaurado':(e.hostingRollbackRequired?'falló':'no requerido')}\nwrites/Functions/Rules/production: 0\n\`\`\``;
-            await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: 5, body });
-
-      - name: Exigir PASS final
-        shell: bash
-        run: |
-          jq -e '
-            .ok==true and .stage=="PASS_VISUAL_OBSERVABLE_ROOTFIX_LIVE" and
-            .decision=="PASS_VISUAL_POST_AUTH" and .classification=="PASS_VISUAL_POST_AUTH" and
-            .checkpoint=="MATRIX_COMPLETE" and .preflightStatus=="GO_GATE_CONTRACT" and
-            .hostingDeploys==1 and .hostingRollbackRequired==false and
-            .precheckStage=="PASS_VISUAL_BROWSER_PRECHECK" and
-            .matrixStage=="PASS_VISUAL_OBSERVABLE_ROOTFIX_MATRIX" and
-            .snapshotIntegrity=="VERIFIED_UNCHANGED" and .totalRoleFailures==0 and
-            .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and
-            .functionsDeploys==0 and .rulesDeploys==0 and .productionTouched==false
-          ' "$ORBIT360_FINAL_EVIDENCE" >/dev/null
