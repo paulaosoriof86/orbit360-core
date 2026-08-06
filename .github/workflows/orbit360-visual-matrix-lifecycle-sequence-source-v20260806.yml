@@ -1,0 +1,97 @@
+name: Orbit 360 · Secuencia lifecycle visual 2.7.8 · source-only
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - .github/workflows/orbit360-visual-matrix-lifecycle-sequence-source-v20260806.yml
+      - tools/orbit360-visual-matrix-lifecycle-sequence-v20260806.mjs
+      - tools/orbit360-test-visual-matrix-lifecycle-sequence-v20260806.mjs
+      - tools/fixtures/orbit360-visual-matrix-lifecycle-sequence-fixture-v20260806.json
+
+permissions:
+  contents: write
+
+concurrency:
+  group: orbit360-visual-matrix-lifecycle-sequence-source-v20260806
+  cancel-in-progress: false
+
+jobs:
+  lifecycle-sequence-source-only:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout HEAD rector
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Verificar rama, ausencia de request y sintaxis
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = 'ays/backend-tenant-lab-v99-20260703'
+          test ! -f '.github/orbit360-requests/visual-matrix-corrected-post-auth-lab-v20260805-authorization.json'
+          node --check tools/orbit360-visual-matrix-lifecycle-sequence-v20260806.mjs
+          node --check tools/orbit360-test-visual-matrix-lifecycle-sequence-v20260806.mjs
+
+      - name: Ejecutar gate sintético lifecycle → request
+        shell: bash
+        env:
+          ORBIT360_SOURCE_ONLY: 'true'
+        run: |
+          set -euo pipefail
+          node tools/orbit360-test-visual-matrix-lifecycle-sequence-v20260806.mjs
+
+      - name: Validar evidencia sin riesgo
+        shell: bash
+        run: |
+          set -euo pipefail
+          EVIDENCE='orbit360-platform/runtime-gate-crm-v20260716/visual-matrix-lifecycle-sequence-source-test-sanitized-v20260806.json'
+          jq -e '
+            .status=="PASS_LIFECYCLE_SEQUENCE_SYNTHETIC" and
+            .classification=="PIPELINE_MECHANISM_FAILURE_CLOSED_SOURCE_ONLY" and
+            .failed==0 and
+            .ok==true and
+            .sequence.activationParentCommitExplicit==true and
+            .sequence.requestChildCommitExclusive==true and
+            .sequence.exactParentBinding==true and
+            .sequence.prematureRequestBlocked==true and
+            .sequence.canonicalSyntheticGoGate==true and
+            .negativePath.status=="STOP_GATE_CONTRACT" and
+            (.negativePath.failedCheckIds | index("authorizationReserved"))!=null and
+            (.negativePath.failedCheckIds | index("executionBoundaries"))!=null and
+            .positivePath.status=="GO_GATE_CONTRACT" and
+            .runtimeRequestPersisted==false and
+            .currentLifecycleActivated==false and
+            .secretsRead==false and
+            .firestoreRead==false and
+            .firestoreWrites==0 and
+            .authWrites==0 and
+            .operationalWrites==0 and
+            .runtimeExecuted==false and
+            .browserExecuted==false and
+            .deployExecuted==false and
+            .productionTouched==false and
+            .containsPII==false and
+            .containsSecrets==false and
+            .containsPasswords==false
+          ' "$EVIDENCE" >/dev/null
+          test ! -f '.github/orbit360-requests/visual-matrix-corrected-post-auth-lab-v20260805-authorization.json'
+          mapfile -t CHANGED < <(git status --porcelain | sed 's/^...//')
+          test "${#CHANGED[@]}" = '1'
+          test "${CHANGED[0]}" = "$EVIDENCE"
+
+      - name: Persistir evidencia sanitizada
+        shell: bash
+        run: |
+          set -euo pipefail
+          EVIDENCE='orbit360-platform/runtime-gate-crm-v20260716/visual-matrix-lifecycle-sequence-source-test-sanitized-v20260806.json'
+          git config user.name 'orbit360-source-gate'
+          git config user.email 'orbit360-source-gate@users.noreply.github.com'
+          git add "$EVIDENCE"
+          git commit -m 'evidence: pass visual lifecycle sequence source gate [skip ci]'
+          git push origin HEAD:ays/backend-tenant-lab-v99-20260703
