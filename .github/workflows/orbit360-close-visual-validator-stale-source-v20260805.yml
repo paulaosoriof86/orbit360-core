@@ -1,0 +1,105 @@
+name: Orbit 360 · Cierre source-only VALIDATOR_STALE visual
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - .github/orbit360-requests/visual-validator-stale-source-closure-v20260805.json
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: orbit360-close-visual-validator-stale-source-v20260805
+  cancel-in-progress: false
+
+env:
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  ORBIT360_REQUEST: .github/orbit360-requests/visual-validator-stale-source-closure-v20260805.json
+  ORBIT360_PLAN: orbit360-platform/docs/PLAN-UNICO-SALIDA-RC-AYS-LAB-CANONICA-01-20260804.md
+  ORBIT360_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/visual-validator-stale-source-closure-sanitized-v20260805.json
+
+jobs:
+  close-validator-stale:
+    name: Validar precheck observable y sincronizar plan
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout request exacto
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 3
+          persist-credentials: true
+
+      - name: Verificar request inmutable source-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
+          mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
+          test "${#CHANGED[@]}" = '1'
+          test "${CHANGED[0]}" = "$ORBIT360_REQUEST"
+          PARENT="$(git rev-parse HEAD^)"
+          jq -e --arg parent "$PARENT" '
+            .schemaVersion=="orbit360-visual-validator-stale-source-closure-request-v1" and
+            .status=="AUTHORIZED_SOURCE_ONLY_ONCE" and .approved==true and
+            .allowedExecutions==1 and .consumed==false and .replayAllowed==false and
+            .branch=="ays/backend-tenant-lab-v99-20260703" and .pullRequest==5 and
+            .parentHead==$parent and .governingRunId=="31061214801" and
+            .capabilities.secrets==false and .capabilities.firestoreRead==false and
+            .capabilities.writes==false and .capabilities.runtime==false and
+            .capabilities.browser==false and .capabilities.deploy==false and
+            .capabilities.functionsDeploy==false and .capabilities.rulesDeploy==false and
+            .capabilities.production==false
+          ' "$ORBIT360_REQUEST" >/dev/null
+
+      - name: Validar sintaxis source-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-close-visual-validator-stale-source-v20260805.mjs
+          node --check tools/orbit360-visual-runtime-rootfix-browser-precheck-v20260805.mjs
+          git diff --check
+
+      - name: Ejecutar cierre source-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-close-visual-validator-stale-source-v20260805.mjs
+          jq -e '
+            .status=="PASS_VISUAL_VALIDATOR_STALE_SOURCE_CLOSURE" and
+            .classification=="VALIDATOR_STALE_CLOSED_SOURCE_ONLY" and
+            .governingRunId=="31061214801" and
+            .governingEvidenceOk==true and .precheckSyntaxOk==true and
+            .total==15 and .passed==15 and .failed==0 and .planUpdated==true and
+            .secretsRead==false and .firestoreRead==false and
+            .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and
+            .browserExecuted==false and .deployExecuted==false and
+            .productionTouched==false and .ok==true
+          ' "$ORBIT360_EVIDENCE" >/dev/null
+          grep -F 'STOP_RETRY · VALIDATOR_STALE · rollback PASS' "$ORBIT360_PLAN" >/dev/null
+          grep -F 'tools/orbit360-visual-runtime-rootfix-browser-precheck-v20260805.mjs' "$ORBIT360_PLAN" >/dev/null
+          git diff --check
+
+      - name: Persistir Plan y evidencia
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name orbit360-gate-bot
+          git config user.email orbit360-gate-bot@users.noreply.github.com
+          git add "$ORBIT360_PLAN" "$ORBIT360_EVIDENCE"
+          git commit -m 'docs: close visual VALIDATOR_STALE source-only [skip ci]'
+          git push origin "HEAD:$ORBIT360_BRANCH"
+
+      - name: Comentar cierre en PR 5
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const body = `## Cierre source-only del capturador visual\n\n\`\`\`text\nrun gobernante: 31061214801\nclasificación: VALIDATOR_STALE\nprecheck observable: 15/15 PASS source-only\nPlan Único: actualizado\nsecrets/Firestore/browser/deploy: 0\nnext: nueva autorización explícita para precheck antes de matriz completa\n\`\`\``;
+            await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: 5, body });
