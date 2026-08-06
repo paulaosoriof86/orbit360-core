@@ -4,16 +4,16 @@
   "gateId": "block2.7-visual-observable-rootfix-lab-v20260805",
   "gateContractVersion": "2.7.3",
   "owner": "orbit360-visual-observable-rootfix-v20260805",
-  "ownerVersion": "20260805.2-runtime-consumed",
+  "ownerVersion": "20260805.3-root-cause-closed",
   "status": "CONSUMED_STOP_RETRY",
-  "classification": "VALIDATOR_STALE_OR_PRODUCT_WAIT_IDENTIFIED",
+  "classification": "DATA_CONTRACT_FAILURE",
   "patternClassification": "REPLICABLE_CLAUDE_INMEDIATO",
   "rcId": "RC-AYS-LAB-CANONICA-01",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
   "projectId": "ays-orbit-360-lab",
   "tenantId": "alianzas-soluciones",
-  "currentPhase": "CONSUMED_STOP_RETRY",
+  "currentPhase": "CONSUMED_STOP_RETRY_ROOT_CAUSE_CLOSED",
   "executionProfile": {
     "mode": "LAB_HOSTING_OBSERVABLE_READONLY_BROWSER",
     "phase": "VISUAL_OBSERVABLE_ROOTFIX_LAB_EXECUTION",
@@ -123,23 +123,32 @@
     "functionsDeploysAuthorized": 0,
     "rulesDeploysAuthorized": 0,
     "reimportAuthorized": false,
-    "productionAuthorized": false
+    "productionAuthorized": false,
+    "currentLabRestoredToPreviousVersion": true,
+    "rootfixHostingLive": false,
+    "passVisualPostAuth": false
   },
   "stopRetryOnAnyFailure": true,
   "rollbackRequiredOnAnyPostDeployFailure": true,
   "containsPII": false,
   "containsSecrets": false,
   "containsPasswords": false,
-  "nextAction": "CLOSE_EXACT_CHECKPOINT_ROOT_CAUSE_WITHOUT_RETRY",
+  "nextAction": "PREPARE_REQUIRED_OPTIONAL_HYDRATION_CONTRACT_SOURCE_ONLY_BEFORE_ANY_NEW_RUNTIME_AUTHORIZATION",
   "runtimeResult": {
     "runId": "31063000137",
     "attempt": 1,
     "result": "STOP_RETRY",
-    "classification": "VALIDATOR_STALE_OR_PRODUCT_WAIT_IDENTIFIED",
+    "classification": "DATA_CONTRACT_FAILURE",
     "checkpoint": "INICIO_READY_TIMEOUT",
     "hostingDeploys": 1,
     "rollbackRestored": true,
-    "snapshotIntegrity": "NOT_VERIFIED",
-    "totalRoleFailures": null
+    "snapshotIntegrity": "PRECHECK_READONLY_NO_OPERATIONAL_WRITES",
+    "totalRoleFailures": null,
+    "rootCauseOwner": "orbit360-platform/core/visual-runtime-rootfix-v20260805.js",
+    "rootCauseFunctions": [
+      "MODULE_DEPS.inicio",
+      "hydrationStatus",
+      "wrapModule"
+    ]
   }
 }
