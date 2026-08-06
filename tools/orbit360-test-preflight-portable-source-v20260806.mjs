@@ -15,12 +15,24 @@ const files = {
   workflow: rel('.github/workflows/orbit360-claude-paquete-reconciliado-v1205.yml'),
   overlay: rel('tools/orbit360-validator-lifecycle-overlay-visual-matrix-v8-stop-preflight-v20260806.json')
 };
-const read = file => fs.readFileSync(file, 'utf8');
+const read = file => fs.readFileSync(file, 'utf8').replace(/^\uFEFF/, '');
 const router = read(files.router);
 const preflight = read(files.preflight);
 const workflow = read(files.workflow);
 const overlay = JSON.parse(read(files.overlay));
 const checks = {};
+
+const isStopPhase =
+  overlay.stopRetryActive === true &&
+  overlay.freshAuthorizationRequired === true &&
+  overlay.runtimeAllowed === false &&
+  overlay.hostingAllowed === false;
+const isAuthorizedPhase =
+  overlay.stopRetryActive === false &&
+  overlay.freshAuthorizationRequired === false &&
+  overlay.runtimeAllowed === true &&
+  overlay.runtimeAllowedOnlyWithFreshExclusiveRequest === true &&
+  overlay.hostingAllowed === true;
 
 checks.filesExist = Object.values(files).every(fs.existsSync);
 checks.routerPropagatesRequest = router.includes('ORBIT360_REQUEST_FILE: requestFile');
@@ -31,15 +43,21 @@ checks.preflightNoJq = !/\bjq\b/.test(preflight);
 checks.workflowNoJq = !/\bjq\b/.test(workflow);
 checks.preflightUsesGuard = preflight.includes('orbit360-json-guard-visual-matrix-runtime-v20260806.mjs');
 checks.workflowUsesGuard = workflow.includes('detect-active-request');
-checks.workflowRequiresFreshVersion = workflow.includes('20260806.9-portable-preflight-runtime');
-checks.overlayClosesV8 = overlay.stopRetryActive === true && overlay.requestReusable === false;
-checks.overlayNoRuntime = overlay.runtimeAllowed === false && overlay.hostingAllowed === false && overlay.productionAllowed === false;
-checks.overlayFreshAuth = overlay.freshAuthorizationRequired === true && overlay.expectedNextRequestVersion === '20260806.9-portable-preflight-runtime';
+checks.workflowHasFailClosedVersion = workflow.includes('ORBIT360_EXPECTED_REQUEST_VERSION');
+checks.overlayPhaseRecognized = isStopPhase || isAuthorizedPhase;
+checks.overlayNeverReusesPriorRequest = overlay.requestReusable === false;
+checks.overlayRiskBoundariesMatchPhase =
+  overlay.productionAllowed === false &&
+  overlay.writesAllowed === false &&
+  overlay.functionsAllowed === false &&
+  overlay.rulesAllowed === false &&
+  overlay.reimportAllowed === false &&
+  (isStopPhase || isAuthorizedPhase);
 
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'orbit360-preflight-source-'));
 const syntheticRequest = {
   schemaVersion: 'orbit360-visual-matrix-corrected-post-auth-request-v1',
-  requestVersion: '20260806.9-portable-preflight-runtime',
+  requestVersion: '20260806.synthetic-portable-preflight-runtime',
   gateId: 'block2.7-visual-matrix-corrected-post-auth-lab-v20260805',
   contractVersion: '2.7.8',
   status: 'AUTHORIZED_ONCE',
@@ -105,11 +123,13 @@ checks.guardEmitStop = emit.status === 41 && stop.status === 'STOP_PREFLIGHT_REL
 
 const failedCheckIds = Object.entries(checks).filter(([, ok]) => !ok).map(([id]) => id);
 const output = {
-  schemaVersion: 'orbit360-preflight-portable-source-test-v2',
-  generatedAt: '2026-08-06T18:35:00-06:00',
+  schemaVersion: 'orbit360-preflight-portable-source-test-v3-phase-aware',
+  generatedAt: '2026-08-06T17:58:00-06:00',
   gateId: 'block2.7-visual-matrix-corrected-post-auth-lab-v20260805',
-  status: failedCheckIds.length ? 'STOP_SOURCE_TEST' : 'PASS_SOURCE_ONLY_PORTABLE_PREFLIGHT_ROOTFIX',
-  classification: failedCheckIds.length ? 'PIPELINE_MECHANISM_FAILURE' : 'PIPELINE_MECHANISM_FAILURE_CORRECTED_SOURCE_ONLY',
+  status: failedCheckIds.length ? 'STOP_SOURCE_TEST' : 'PASS_SOURCE_ONLY_PHASE_AWARE_PREFLIGHT_VALIDATOR',
+  classification: failedCheckIds.length ? 'VALIDATOR_STALE' : 'VALIDATOR_STALE_CORRECTED_SOURCE_ONLY',
+  observedOverlayStatus: String(overlay.status || ''),
+  observedLifecyclePhase: isStopPhase ? 'STOP_RETRY' : isAuthorizedPhase ? 'AUTHORIZED_FRESH_REQUEST_ONLY' : 'UNRECOGNIZED',
   total: Object.keys(checks).length,
   passed: Object.values(checks).filter(Boolean).length,
   failed: failedCheckIds.length,
