@@ -1,0 +1,95 @@
+name: Orbit 360 · Matriz visual corregida post-Auth · una vez v3
+
+on:
+  pull_request:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - .github/workflows/orbit360-run-visual-matrix-corrected-post-auth-once-v3-20260806.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: orbit360-visual-matrix-corrected-post-auth-278-v3-once
+  cancel-in-progress: false
+
+jobs:
+  visual-matrix-corrected-post-auth:
+    if: github.event.pull_request.head.ref == 'ays/run-visual-matrix-corrected-post-auth-278-v3-20260806'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - name: Checkout transporte exclusivo v3
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Verificar transporte, lifecycle padre y request hijo nuevos
+        shell: bash
+        run: |
+          set -euo pipefail
+          WORKFLOW='.github/workflows/orbit360-run-visual-matrix-corrected-post-auth-once-v3-20260806.yml'
+          BRANCH='ays/backend-tenant-lab-v99-20260703'
+          BASE_HEAD='cc2c2e214b6cb954892dd1d64ac7268a35a645ce'
+          ACTIVATION_SHA='e57d24e6cacbaa5956178d7f79422862bae55768'
+          REQUEST_SHA='63052380791b84917618e9664285dc5fb3f03f77'
+          REQUEST='.github/orbit360-requests/visual-matrix-corrected-post-auth-lab-v20260805-authorization.json'
+          LIFECYCLE='tools/orbit360-validator-lifecycle-contract-visual-matrix-corrected-post-auth-lab-v20260805.json'
+          SOURCE_EVIDENCE='orbit360-platform/runtime-gate-crm-v20260716/visual-matrix-lifecycle-sequence-source-test-sanitized-v20260806.json'
+          RETIRED_REQUEST_1='ba993d061a2d55f1703ebaeb0bad2cd9ab8a98ad'
+          RETIRED_REQUEST_2='75a50b2176aa4e333fb859169e76d81fb03ed542'
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          test "$REQUEST_SHA" != "$RETIRED_REQUEST_1"
+          test "$REQUEST_SHA" != "$RETIRED_REQUEST_2"
+          test "$ACTIVATION_SHA" != "$BASE_HEAD"
+          mapfile -t TRANSPORT_CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
+          test "${#TRANSPORT_CHANGED[@]}" = '1'
+          test "${TRANSPORT_CHANGED[0]}" = "$WORKFLOW"
+          git fetch origin "$BRANCH"
+          test "$(git rev-parse "origin/$BRANCH")" = "$REQUEST_SHA"
+          test "$(git rev-parse "$REQUEST_SHA^")" = "$ACTIVATION_SHA"
+          test "$(git rev-parse "$ACTIVATION_SHA^")" = "$BASE_HEAD"
+          mapfile -t ACTIVATION_CHANGED < <(git diff-tree --no-commit-id --name-only -r "$ACTIVATION_SHA")
+          test "${#ACTIVATION_CHANGED[@]}" = '1'
+          test "${ACTIVATION_CHANGED[0]}" = "$LIFECYCLE"
+          mapfile -t REQUEST_CHANGED < <(git diff-tree --no-commit-id --name-only -r "$REQUEST_SHA")
+          test "${#REQUEST_CHANGED[@]}" = '1'
+          test "${REQUEST_CHANGED[0]}" = "$REQUEST"
+          git checkout --detach "$REQUEST_SHA"
+          test "$(git rev-parse HEAD)" = "$REQUEST_SHA"
+          jq -e '.status=="PASS_LIFECYCLE_SEQUENCE_SYNTHETIC" and .total==39 and .passed==39 and .failed==0 and .ok==true' "$SOURCE_EVIDENCE" >/dev/null
+          jq -e --arg parent "$ACTIVATION_SHA" '.status=="AUTHORIZED_ONCE" and .approved==true and .allowedExecutions==1 and .consumed==false and .replayAllowed==false and .parentHead==$parent' "$REQUEST" >/dev/null
+          jq -e '.status=="AUTHORIZED_ONCE_PENDING_EXCLUSIVE_REQUEST" and .authorizationReserved==true and .allowedExecutions==1 and .requestConsumed==false and .replayAllowed==false and .executionAuthorized==true and .secretAccessAuthorized==true and .firestoreReadAuthorized==true and .writeAuthorized==false and .browserAuthorized==true and .hostingDeployAuthorized==true and .functionsDeployAuthorized==false and .rulesDeployAuthorized==false and .productionAuthorized==false and .mainAuthorized==false and .mergeAuthorized==false' "$LIFECYCLE" >/dev/null
+
+      - name: GO_GATE_CONTRACT sin secretos
+        id: preflight
+        shell: bash
+        env:
+          GITHUB_REF_NAME: ays/backend-tenant-lab-v99-20260703
+        run: |
+          set -euo pipefail
+          bash tools/orbit360-preflight-visual-matrix-corrected-post-auth-once-v20260805.sh
+
+      - name: Ejecutar backup, máximo un Hosting LAB y matriz read-only
+        if: steps.preflight.outputs.go == 'true'
+        shell: bash
+        env:
+          GITHUB_REF_NAME: ays/backend-tenant-lab-v99-20260703
+          FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          set -euo pipefail
+          bash tools/orbit360-run-visual-matrix-corrected-post-auth-runtime-only-v20260805.sh
+
+      - name: Publicar capturas acotadas privadas
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-visual-matrix-corrected-v3-${{ github.run_id }}
+          path: orbit360-visual-matrix-corrected-artifacts/
+          if-no-files-found: ignore
+          retention-days: 7
