@@ -1,0 +1,89 @@
+name: Orbit 360 · Registrar gate visual rootfix
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-requests/visual-rootfix-validator-repair-v20260805.json'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: orbit360-register-visual-rootfix-gate-v20260805
+  cancel-in-progress: false
+
+env:
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  ORBIT360_REQUEST: .github/orbit360-requests/visual-rootfix-validator-repair-v20260805.json
+  ORBIT360_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/visual-rootfix-validator-repair-sanitized-v20260805.json
+
+jobs:
+  repair-validator:
+    name: Corregir registro canónico · source-only
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout request exacto
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 3
+          persist-credentials: true
+
+      - name: Verificar request inmutable
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
+          test "${#CHANGED[@]}" = '1'
+          test "${CHANGED[0]}" = "$ORBIT360_REQUEST"
+          PARENT="$(git rev-parse HEAD^)"
+          jq -e --arg parent "$PARENT" '
+            .schemaVersion=="orbit360-visual-rootfix-validator-repair-request-v1" and
+            .status=="AUTHORIZED_SOURCE_ONLY_ONCE" and .approved==true and
+            .allowedExecutions==1 and .consumed==false and .replayAllowed==false and
+            .branch=="ays/backend-tenant-lab-v99-20260703" and .pullRequest==5 and .parentHead==$parent and
+            .capabilities.secrets==false and .capabilities.firestoreRead==false and
+            .capabilities.writes==false and .capabilities.runtime==false and
+            .capabilities.browser==false and .capabilities.deploy==false and
+            .capabilities.functionsDeploy==false and .capabilities.rulesDeploy==false and
+            .capabilities.production==false
+          ' "$ORBIT360_REQUEST" >/dev/null
+
+      - name: Ejecutar repair owner
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-register-visual-runtime-rootfix-gate-v20260805.mjs
+          jq -e '.status=="PASS_VISUAL_ROOTFIX_VALIDATOR_REPAIR" and .classification=="VALIDATOR_STALE_CLOSED" and .gateOccurrences==1 and .phaseOccurrences==1 and .syntaxOk==true and .secretsRead==false and .firestoreWrites==0 and .deployExecuted==false and .ok==true' "$ORBIT360_EVIDENCE" >/dev/null
+
+      - name: Validar owners relacionados
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-validar-gate-contracts-engine-visual-runtime-rootfix-lab-v20260805.mjs
+          node --check orbit360-platform/core/visual-runtime-rootfix-v20260805.js
+          node --check orbit360-platform/core/backend-lab-loader.js
+          git diff --check
+
+      - name: Persistir corrección
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name orbit360-gate-bot
+          git config user.email orbit360-gate-bot@users.noreply.github.com
+          git add tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_EVIDENCE"
+          git commit -m 'gate: register visual rootfix runtime [skip ci]'
+          git push origin "HEAD:$ORBIT360_BRANCH"
+
+      - name: Comentar PR
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const body = `## Gate visual rootfix — registro corregido\n\n\`\`\`text\nclassification: VALIDATOR_STALE_CLOSED\ngate: block2.7-visual-runtime-rootfix-lab-v20260805\nsecrets/Firestore/browser/deploy: 0\nnext: immutable runtime request\n\`\`\``;
+            await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: 5, body });
