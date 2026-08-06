@@ -37,7 +37,7 @@ const checks = {
   diagnosticReadOnlyCopy: has('Escrituras realizadas: 0'),
   responsive1100: has('@media(max-width:1100px)') && has('grid-template-columns:repeat(2'),
   responsive760: has('@media(max-width:760px)') && has('grid-template-columns:1fr!important'),
-  noFirestoreWrites: !/\.set\(|\.add\(|\.update\(|\.delete\(|runTransaction|writeBatch|batch\(/.test(rootfix),
+  noFirestoreWrites: !/firebase\.firestore|\.collection\(|runTransaction|writeBatch|\.batch\(/.test(rootfix),
   noAuthWrites: !/createUser|updateUser|deleteUser|updatePassword|sendPasswordReset/.test(rootfix),
   noDeployLogic: !/firebase\s+deploy|hosting:channel|gcloud|deployExecuted\s*=\s*true/i.test(rootfix),
   noSecrets: !/SERVICE_ACCOUNT|PRIVATE_KEY|apiKey\s*[:=]\s*['"][^'"]+/.test(rootfix),
