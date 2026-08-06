@@ -1,0 +1,54 @@
+{
+  "schemaVersion": "orbit360-windows-signal-compatibility-synthetic-v1",
+  "status": "PASS_WINDOWS_SIGNAL_COMPATIBILITY_SYNTHETIC",
+  "classification": "VALIDATOR_STALE_CORRECTED_SOURCE_ONLY",
+  "sourceFixCommit": "0ce571cfdcd1024653a59a57d2ed8a877db453d3",
+  "testSource": "tools/orbit360-test-windows-signal-compatibility-synthetic-v20260806.mjs",
+  "total": 7,
+  "passed": 7,
+  "failed": 0,
+  "cases": {
+    "accepted": [
+      "windows-null-signal-with-rollback-and-persist-once",
+      "windows-nonzero-signal-with-rollback-and-persist-once",
+      "runner-os-windows-with-null-signal-and-exact-safety"
+    ],
+    "rejected": [
+      "normal-zero-exit",
+      "rollback-more-than-once",
+      "extra-failed-check",
+      "linux-null-signal-without-windows-context"
+    ]
+  },
+  "v4Observed": {
+    "remoteHead": "8f9230ecfc3e13e5e8a3fb36e6d7f969470fd149",
+    "coreChecksPassed": 20,
+    "coreChecksTotal": 23,
+    "firebaseLabVisible": true,
+    "firebaseCliVersion": "15.19.1",
+    "credentialBindingPending": true,
+    "serviceAccountValueRead": false,
+    "secretsRead": false,
+    "firestoreReads": 0,
+    "firestoreWrites": 0,
+    "authWrites": 0,
+    "operationalWrites": 0,
+    "browserExecuted": false,
+    "hostingTouched": false,
+    "deployExecuted": false,
+    "productionTouched": false
+  },
+  "actionsTransport": {
+    "pullRequest": 26,
+    "pushTriggerCommit": "cd1efe64a5fde23c6bcbdd3aeff9a165b40d6458",
+    "resultPersisted": false,
+    "classification": "ENVIRONMENT_FAILURE_GITHUB_ACTIONS_WEBHOOK_THROTTLED",
+    "officialStatus": "MAJOR_OUTAGE",
+    "providerDetail": "GitHub reports that webhook triggers are throttled and many push and pull request events are not creating workflow runs."
+  },
+  "containsPII": false,
+  "containsSecrets": false,
+  "containsPasswords": false,
+  "ok": true,
+  "nextAction": "Do not request more local commands. Keep the Windows validator fix as PASS synthetic/source-only; prepare the immutable local-runtime/Codex handoff package while GitHub Actions remains externally unavailable."
+}
