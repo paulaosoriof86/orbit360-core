@@ -4,6 +4,8 @@
   "classification": "DATA_CONTRACT_FAILURE",
   "runId": "31063000137",
   "checkpoint": "INICIO_READY_TIMEOUT",
+  "closureMethod": "DIRECT_CONNECTOR_SOURCE_ONLY",
+  "closurePipelineNote": "The optional source-only closure workflow did not produce a commit; no second request or runtime replay was created.",
   "evidenceChecks": {
     "goGateContract24Of24": true,
     "authInside": true,
@@ -40,6 +42,7 @@
     "transverseModuleAuditRequired": true
   },
   "runtimeRequestConsumed": true,
+  "runtimeRequestReplayed": false,
   "retryAllowed": false,
   "newRuntimeAuthorizationAllowedOnlyAfterSourcePass": true,
   "hostingRestored": true,
