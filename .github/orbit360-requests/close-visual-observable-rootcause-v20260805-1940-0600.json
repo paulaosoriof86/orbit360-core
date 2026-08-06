@@ -1,0 +1,28 @@
+{
+  "schemaVersion": "orbit360-close-visual-observable-rootcause-request-v1",
+  "runId": "31063000137",
+  "checkpoint": "INICIO_READY_TIMEOUT",
+  "status": "AUTHORIZED_SOURCE_ONLY_ONCE",
+  "approved": true,
+  "allowedExecutions": 1,
+  "consumed": false,
+  "replayAllowed": false,
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "parentHead": "c000a068562c8146e88a0a9e469c16a9c0d10c13",
+  "purpose": "Classify the consumed observable visual run, persist exact root cause, and synchronize lifecycle, Plan and closure evidence without runtime access.",
+  "capabilities": {
+    "secrets": false,
+    "firestoreRead": false,
+    "writes": true,
+    "runtime": false,
+    "browser": false,
+    "deploy": false,
+    "functionsDeploy": false,
+    "rulesDeploy": false,
+    "production": false
+  },
+  "containsPII": false,
+  "containsSecrets": false,
+  "containsPasswords": false
+}
