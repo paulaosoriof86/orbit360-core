@@ -1,4 +1,4 @@
-name: Orbit 360 · Cierre causa raíz visual observable
+name: Orbit 360 · Cierre visual y relay source hydration
 
 on:
   push:
@@ -6,6 +6,7 @@ on:
       - ays/backend-tenant-lab-v99-20260703
     paths:
       - '.github/orbit360-requests/close-visual-observable-rootcause-v20260805-*.json'
+      - '.github/orbit360-requests/visual-hydration-required-optional-source-v20260805.json'
 
 permissions:
   contents: write
@@ -18,96 +19,140 @@ concurrency:
 
 env:
   ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
-  ORBIT360_PLAN: orbit360-platform/docs/PLAN-UNICO-SALIDA-RC-AYS-LAB-CANONICA-01-20260804.md
-  ORBIT360_FINAL: orbit360-platform/runtime-gate-crm-v20260716/visual-observable-rootfix-final-sanitized-v20260805.json
-  ORBIT360_GOVERNING: orbit360-platform/runtime-gate-crm-v20260716/visual-observable-rootfix-governing-stop-sanitized-v20260805.json
-  ORBIT360_CLOSURE_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/visual-observable-rootcause-closure-sanitized-v20260805.json
-  ORBIT360_LIFECYCLE: tools/orbit360-validator-lifecycle-contract-visual-observable-rootfix-lab-v20260805.json
-  ORBIT360_CLOSURE_DOC: orbit360-platform/docs/CIERRE-VISUAL-OBSERVABLE-ROOTFIX-LAB-20260805.md
+  ORBIT360_REQUEST: .github/orbit360-requests/visual-hydration-required-optional-source-v20260805.json
+  ORBIT360_LIFECYCLE: tools/orbit360-validator-lifecycle-contract-visual-hydration-required-optional-source-v20260805.json
+  ORBIT360_APPLY_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/visual-hydration-required-optional-source-apply-sanitized-v20260805.json
+  ORBIT360_TEST_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/visual-hydration-required-optional-source-test-sanitized-v20260805.json
+  ORBIT360_CLOSURE: orbit360-platform/docs/CIERRE-SOURCE-ONLY-HIDRATACION-REQUIRED-OPTIONAL-20260805.md
+  ORBIT360_ACADEMIA: orbit360-platform/docs/ACADEMIA-HIDRATACION-REQUIRED-OPTIONAL-Y-ESTADO-DEGRADADO-20260805.md
 
 jobs:
-  close-rootcause:
-    name: Clasificar, gobernar y sincronizar Plan
+  source-hydration:
+    name: Required/optional source-only · cero acceso
+    if: github.event.head_commit != null && contains(github.event.head_commit.modified, '.github/orbit360-requests/visual-hydration-required-optional-source-v20260805.json')
     runs-on: ubuntu-24.04
     timeout-minutes: 12
     steps:
-      - name: Checkout request exacto
+      - name: Checkout solicitud exacta
         uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
           fetch-depth: 3
           persist-credentials: true
 
-      - name: Verificar request único source-only
+      - name: Verificar request inmutable
         shell: bash
         run: |
           set -euo pipefail
-          test "$GITHUB_RUN_ATTEMPT" = '1'
           test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
+          test "$GITHUB_RUN_ATTEMPT" = '1'
           mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
           test "${#CHANGED[@]}" = '1'
-          REQUEST_FILE="${CHANGED[0]}"
-          case "$REQUEST_FILE" in
-            .github/orbit360-requests/close-visual-observable-rootcause-v20260805-*.json) ;;
-            *) echo 'PIPELINE_MECHANISM_FAILURE:UNEXPECTED_REQUEST_PATH' >&2; exit 41 ;;
-          esac
+          test "${CHANGED[0]}" = "$ORBIT360_REQUEST"
           PARENT="$(git rev-parse HEAD^)"
           jq -e --arg parent "$PARENT" '
-            .schemaVersion=="orbit360-close-visual-observable-rootcause-request-v1" and
-            .runId=="31063000137" and .checkpoint=="INICIO_READY_TIMEOUT" and
-            .status=="AUTHORIZED_SOURCE_ONLY_ONCE" and .approved==true and
-            .allowedExecutions==1 and .consumed==false and .replayAllowed==false and
+            .schemaVersion=="orbit360-visual-hydration-required-optional-source-request-v1" and
+            .gateId=="block2.7-visual-hydration-required-optional-source-v20260805" and
+            .contractVersion=="2.7.4" and
+            .rcId=="RC-AYS-LAB-CANONICA-01" and
+            .status=="AUTHORIZED_SOURCE_ONLY_ONCE" and
+            .approved==true and .allowedExecutions==1 and .consumed==false and .replayAllowed==false and
             .branch=="ays/backend-tenant-lab-v99-20260703" and .pullRequest==5 and
-            .parentHead==$parent and
+            .parentHead==$parent and .relay=="recognized-workflow-v1" and
+            .runtimeAuthorizationReserved==true and
             .capabilities.secrets==false and .capabilities.firestoreRead==false and
-            .capabilities.writes==true and .capabilities.runtime==false and
+            .capabilities.writes==false and .capabilities.runtime==false and
             .capabilities.browser==false and .capabilities.deploy==false and
             .capabilities.functionsDeploy==false and .capabilities.rulesDeploy==false and
             .capabilities.production==false
-          ' "$REQUEST_FILE" >/dev/null
+          ' "$ORBIT360_REQUEST" >/dev/null
 
-      - name: Validar owner source-only
+      - name: Validar owners source-only
         shell: bash
         run: |
           set -euo pipefail
-          node --check tools/orbit360-close-visual-observable-rootcause-v20260805.mjs
-          jq -e '.runId=="31063000137" and .decision=="STOP_RETRY" and .checkpoint=="INICIO_READY_TIMEOUT" and .hostingRollbackRestored==true' "$ORBIT360_FINAL" >/dev/null
+          node --check tools/orbit360-apply-visual-hydration-required-optional-sourcefix-v20260805.mjs
+          node --check tools/orbit360-test-visual-hydration-required-optional-source-v20260805.mjs
           git diff --check
 
-      - name: Ejecutar cierre forense
+      - name: Aplicar rootfix requerido y opcional
         shell: bash
         run: |
           set -euo pipefail
-          node tools/orbit360-close-visual-observable-rootcause-v20260805.mjs
-          jq -e '
-            .status=="PASS_ROOT_CAUSE_CLOSURE" and
-            .classification=="DATA_CONTRACT_FAILURE" and
-            .runId=="31063000137" and .checkpoint=="INICIO_READY_TIMEOUT" and
-            .failed==0 and .planUpdated==true and .lifecycleUpdated==true and
-            .finalEvidenceUpdated==true and .governingEvidenceWritten==true and
-            .secretsRead==false and .firestoreRead==false and
-            .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and
-            .browserExecuted==false and .deployExecuted==false and
-            .productionTouched==false and .ok==true
-          ' "$ORBIT360_CLOSURE_EVIDENCE" >/dev/null
-          jq -e '.classification=="DATA_CONTRACT_FAILURE" and .checkpoint=="INICIO_READY_TIMEOUT" and .hostingRollbackRestored==true' "$ORBIT360_GOVERNING" >/dev/null
-          grep -F 'STOP_RETRY · DATA_CONTRACT_FAILURE · INICIO_READY_TIMEOUT · rollback PASS' "$ORBIT360_PLAN" >/dev/null
+          node tools/orbit360-apply-visual-hydration-required-optional-sourcefix-v20260805.mjs
+          jq -e '.status=="PASS_SOURCE_APPLY" and .total==10 and .passed==10 and .failed==0 and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .browserExecuted==false and .deployExecuted==false and .productionTouched==false and .ok==true' "$ORBIT360_APPLY_EVIDENCE" >/dev/null
+
+      - name: Ejecutar contrato y simulaciones
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-test-visual-hydration-required-optional-source-v20260805.mjs | tee "$ORBIT360_TEST_EVIDENCE"
+          jq -e '.status=="PASS_VISUAL_HYDRATION_SOURCE" and .total==35 and .passed==35 and .failed==0 and .simulations.optionalFailure.ready==true and .simulations.optionalFailure.degraded==true and .simulations.requiredMissing.ready==false and .simulations.requiredFailure.ready==false and .sourceOnly==true and .browserExecuted==false and .secretsRead==false and .firestoreRead==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .deployExecuted==false and .productionTouched==false and .ok==true' "$ORBIT360_TEST_EVIDENCE" >/dev/null
+          node --check orbit360-platform/core/visual-runtime-rootfix-v20260805.js
+          node --check orbit360-platform/core/backend-lab-loader.js
           git diff --check
 
-      - name: Persistir cierre sanitizado
+      - name: Sellar lifecycle y documentación
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs = require('fs');
+          const lifecyclePath = process.env.ORBIT360_LIFECYCLE;
+          const request = JSON.parse(fs.readFileSync(process.env.ORBIT360_REQUEST, 'utf8'));
+          const lifecycle = JSON.parse(fs.readFileSync(lifecyclePath, 'utf8'));
+          lifecycle.ownerVersion = '20260805.2-source-pass';
+          lifecycle.status = 'SOURCE_PASS_RUNTIME_AUTHORIZATION_RESERVED';
+          lifecycle.classification = 'SOURCE_FIX_READY_FOR_RUNTIME';
+          lifecycle.currentPhase = 'SOURCE_PASS';
+          lifecycle.sourceRequest = {
+            path: process.env.ORBIT360_REQUEST,
+            commit: process.env.GITHUB_SHA,
+            parentHead: request.parentHead,
+            runId: process.env.GITHUB_RUN_ID,
+            attempt: Number(process.env.GITHUB_RUN_ATTEMPT || 1),
+            consumed: true,
+            replayAllowed: false,
+            applyChecks: 10,
+            sourceChecks: 35,
+            result: 'PASS'
+          };
+          lifecycle.activeRequest = false;
+          lifecycle.requestConsumed = true;
+          lifecycle.allowedExecutions = 0;
+          lifecycle.executionAuthorized = false;
+          lifecycle.secretAccessAuthorized = false;
+          lifecycle.firestoreReadAuthorized = false;
+          lifecycle.writeAuthorized = false;
+          lifecycle.browserAuthorized = false;
+          lifecycle.hostingDeployAuthorized = false;
+          lifecycle.functionsDeployAuthorized = false;
+          lifecycle.rulesDeployAuthorized = false;
+          lifecycle.productionAuthorized = false;
+          lifecycle.runtimeAuthorizationReserved = true;
+          lifecycle.nextAction = 'REGISTER_NEW_RUNTIME_GATE_AND_EXECUTE_RESERVED_AUTHORIZATION_AFTER_GO_GATE_CONTRACT';
+          fs.writeFileSync(lifecyclePath, JSON.stringify(lifecycle, null, 2) + '\n', 'utf8');
+
+          fs.writeFileSync(process.env.ORBIT360_CLOSURE, `# CIERRE SOURCE-ONLY — HIDRATACIÓN REQUERIDA Y OPCIONAL\n\nFecha: 2026-08-05\n\n\`\`\`text\ngate: block2.7-visual-hydration-required-optional-source-v20260805\ncontract: 2.7.4\napply: 10/10 PASS\nsource contract: 35/35 PASS\nsecrets/Firestore/browser/deploy: 0\nwrites: 0\nproduction/main/merge: 0\nstatus: SOURCE_PASS_RUNTIME_AUTHORIZATION_RESERVED\n\`\`\`\n\n- Las colecciones canónicas esenciales gobiernan la disponibilidad.\n- Las fuentes legacy opcionales no bloquean el render.\n- Responsables se proyectan en lectura desde membresía activa y relaciones canónicas.\n- El estado degradado es visible y no altera datos.\n- Nueve módulos comparten el mismo contrato.\n`, 'utf8');
+
+          fs.writeFileSync(process.env.ORBIT360_ACADEMIA, `# Academia — hidratación esencial y estado degradado\n\nUna dependencia esencial ausente bloquea la vista para evitar cifras incompletas. Una fuente opcional ausente permite trabajar y muestra alcance degradado honesto.\n\nPatrón: separar required/optional; readiness solo con required; aliases visuales sin escritura; diagnóstico de estado degradado; source PASS antes de navegador; runtime con gate y rollback.\n`, 'utf8');
+          NODE
+          jq -e '.status=="SOURCE_PASS_RUNTIME_AUTHORIZATION_RESERVED" and .sourceRequest.result=="PASS" and .sourceRequest.applyChecks==10 and .sourceRequest.sourceChecks==35 and .runtimeAuthorizationReserved==true and .executionAuthorized==false and .browserAuthorized==false and .hostingDeployAuthorized==false and .productionAuthorized==false' "$ORBIT360_LIFECYCLE" >/dev/null
+
+      - name: Persistir source PASS
         shell: bash
         run: |
           set -euo pipefail
           git config user.name orbit360-gate-bot
           git config user.email orbit360-gate-bot@users.noreply.github.com
-          git add "$ORBIT360_PLAN" "$ORBIT360_FINAL" "$ORBIT360_GOVERNING" "$ORBIT360_CLOSURE_EVIDENCE" "$ORBIT360_LIFECYCLE" "$ORBIT360_CLOSURE_DOC"
-          git commit -m 'docs: close observable visual root cause [skip ci]'
+          git add orbit360-platform/core/visual-runtime-rootfix-v20260805.js orbit360-platform/core/backend-lab-loader.js orbit360-platform/index.html "$ORBIT360_APPLY_EVIDENCE" "$ORBIT360_TEST_EVIDENCE" "$ORBIT360_LIFECYCLE" "$ORBIT360_CLOSURE" "$ORBIT360_ACADEMIA"
+          git commit -m 'rootfix: close required optional hydration source contract [skip ci]'
           git push origin "HEAD:$ORBIT360_BRANCH"
 
-      - name: Comentar cierre en PR 5
+      - name: Comentar PR
         uses: actions/github-script@v7
         with:
           github-token: ${{ github.token }}
           script: |
-            const body = `## Cierre forense visual observable — DATA_CONTRACT_FAILURE\n\n\`\`\`text\nrun: 31063000137\ncheckpoint: INICIO_READY_TIMEOUT\ncausa: asesores legacy declarado como dependencia obligatoria de Inicio\nowner: core/visual-runtime-rootfix-v20260805.js\nrollback Hosting: PASS\nwrites/Functions/Rules/production: 0\nnext: contrato required/optional source-only; no retry runtime\n\`\`\``;
+            const body = `## Hidratación required/optional — source PASS\n\n\`\`\`text\napply: 10/10 PASS\ncontract and simulations: 35/35 PASS\nbrowser/deploy: 0\nwrites: 0\nstatus: SOURCE_PASS_RUNTIME_AUTHORIZATION_RESERVED\n\`\`\``;
             await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: 5, body });
