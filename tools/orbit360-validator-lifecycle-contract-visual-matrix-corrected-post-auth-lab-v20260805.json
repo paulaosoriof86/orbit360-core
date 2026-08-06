@@ -4,9 +4,9 @@
   "gateId": "block2.7-visual-matrix-corrected-post-auth-lab-v20260805",
   "gateContractVersion": "2.7.8",
   "owner": "orbit360-visual-matrix-corrected-post-auth-v20260805",
-  "ownerVersion": "20260805.3-independent-files-source-package",
-  "status": "AUTHORIZED_ONCE_PENDING_EXCLUSIVE_REQUEST",
-  "classification": "PIPELINE_MECHANISM_FAILURE_CLOSED_SOURCE_PACKAGE",
+  "ownerVersion": "20260805.5-request-identity-sourcefix",
+  "status": "SOURCEFIX_PASS_PENDING_NEW_EXCLUSIVE_REQUEST",
+  "classification": "VALIDATOR_STALE_CLOSED_SOURCE_ONLY",
   "patternClassification": "REPLICABLE_CLAUDE_INMEDIATO",
   "rcId": "RC-AYS-LAB-CANONICA-01",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -36,21 +36,9 @@
   "functionsDeploysMaximum": 0,
   "rulesDeploysMaximum": 0,
   "browserMatrix": [
-    {
-      "role": "Direccion",
-      "width": 1440,
-      "height": 1000
-    },
-    {
-      "role": "Operativo",
-      "width": 1024,
-      "height": 768
-    },
-    {
-      "role": "Asesor",
-      "width": 390,
-      "height": 844
-    }
+    { "role": "Direccion", "width": 1440, "height": 1000 },
+    { "role": "Operativo", "width": 1024, "height": 768 },
+    { "role": "Asesor", "width": 390, "height": 844 }
   ],
   "sourcePrerequisites": {
     "rootfixStaticEvidence": "orbit360-platform/runtime-gate-crm-v20260716/visual-runtime-rootfix-source-test-sanitized-v20260805.json",
@@ -61,22 +49,27 @@
     "captureSourceChecks": 20,
     "wrapperSourceEvidence": "orbit360-platform/runtime-gate-crm-v20260716/visual-rootfix-readonly-wrapper-sourcefix-sanitized-v20260805.json",
     "wrapperSourceChecks": 15,
-    "previousRuntimeEvidence": "orbit360-platform/runtime-gate-crm-v20260716/visual-observable-rootfix-v2-governing-stop-sanitized-v20260805.json",
-    "previousStoppedRun": "31067506016",
-    "previousExactCheckpoint": "DIRECCION_SCREENSHOT_FULLPAGE_TIMEOUT",
-    "previousAuthorizationConsumed": true,
-    "previousReplayAllowed": false,
     "packageSourceEvidence": "orbit360-platform/runtime-gate-crm-v20260716/visual-matrix-gate-package-source-test-sanitized-v20260805.json",
-    "authorizationRequest": ".github/orbit360-requests/visual-matrix-corrected-post-auth-lab-v20260805-authorization.json",
-    "failedPreparationRuns": [
-      "31070060298",
-      "31070172625"
-    ],
-    "failedPreparationCheckpoint": "TEMPLATE_TOKEN_COUNT_0",
-    "failedPreparationOwner": "tools/orbit360-fix-prepare-visual-matrix-gate-template-v20260805.mjs",
-    "generatorRetired": true,
     "canonicalSyntheticEvidence": "orbit360-platform/runtime-gate-crm-v20260716/visual-matrix-gate-canonical-synthetic-sanitized-v20260805.json",
-    "canonicalSyntheticStatus": "PASS_CANONICAL_GATE_SYNTHETIC"
+    "canonicalSyntheticStatus": "PASS_CANONICAL_GATE_SYNTHETIC",
+    "previousVisualRun": "31067506016",
+    "previousVisualCheckpoint": "DIRECCION_SCREENSHOT_FULLPAGE_TIMEOUT",
+    "failedPreparationRuns": ["31070060298", "31070172625"],
+    "failedPreparationCheckpoint": "TEMPLATE_TOKEN_COUNT_0",
+    "failedPreflightRun": "31071875782",
+    "failedPreflightStage": "GO_GATE_CONTRACT",
+    "failedPreflightCheckpoint": "REQUEST_HISTORY_COUNT_EQ_1",
+    "failedPreflightClassification": "VALIDATOR_STALE",
+    "failedPreflightRuntimeSkipped": true,
+    "failedPreflightSecretsRead": false,
+    "failedPreflightBrowserExecuted": false,
+    "failedPreflightDeployExecuted": false,
+    "retiredRequestCommit": "ba993d061a2d55f1703ebaeb0bad2cd9ab8a98ad",
+    "retiredRequestReplayAllowed": false,
+    "requestIdentitySourcefixEvidence": "orbit360-platform/runtime-gate-crm-v20260716/visual-matrix-request-identity-sourcefix-sanitized-v20260805.json",
+    "requestIdentitySourcefixStatus": "PASS_REQUEST_IDENTITY_ROOTCAUSE_SYNTHETIC",
+    "authorizationRequest": ".github/orbit360-requests/visual-matrix-corrected-post-auth-lab-v20260805-authorization.json",
+    "generatorRetired": true
   },
   "executionOrder": [
     "VERIFY_EXCLUSIVE_AUTHORIZATION_REQUEST",
@@ -92,16 +85,17 @@
     "CONSUME_REQUEST"
   ],
   "activeRequest": false,
+  "requestRetired": true,
   "requestConsumed": false,
-  "authorizationReserved": true,
+  "authorizationReserved": false,
   "replayAllowed": false,
-  "allowedExecutions": 1,
-  "executionAuthorized": true,
-  "secretAccessAuthorized": true,
-  "firestoreReadAuthorized": true,
+  "allowedExecutions": 0,
+  "executionAuthorized": false,
+  "secretAccessAuthorized": false,
+  "firestoreReadAuthorized": false,
   "writeAuthorized": false,
-  "browserAuthorized": true,
-  "hostingDeployAuthorized": true,
+  "browserAuthorized": false,
+  "hostingDeployAuthorized": false,
   "functionsDeployAuthorized": false,
   "rulesDeployAuthorized": false,
   "productionAuthorized": false,
@@ -124,5 +118,5 @@
   "containsPII": false,
   "containsSecrets": false,
   "containsPasswords": false,
-  "nextAction": "CREATE_EXCLUSIVE_REQUEST_ONLY_AFTER_FINAL_PACKAGE_SOURCE_PASS"
+  "nextAction": "AWAIT_NEW_EXPLICIT_AUTHORIZATION_THEN_ACTIVATE_LIFECYCLE_AND_CREATE_NEW_SOLE_FILE_REQUEST"
 }

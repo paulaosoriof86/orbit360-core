@@ -9,14 +9,16 @@ OUT='orbit360-platform/runtime-gate-crm-v20260716/visual-matrix-corrected-post-a
 [[ "${GITHUB_REF_NAME:-}" == "$BRANCH" ]]
 [[ "${GITHUB_RUN_ATTEMPT:-1}" == '1' ]]
 [[ -f "$REQUEST" ]]
-mapfile -t REQUEST_COMMITS < <(git log --format=%H -- "$REQUEST")
-[[ "${#REQUEST_COMMITS[@]}" == '1' ]]
-REQUEST_COMMIT="${REQUEST_COMMITS[0]}"
+
+# El request vigente debe ser exactamente el HEAD actual y el único archivo de su commit.
+# No se exige unicidad de la ruta en toda la historia: un request retirado puede dejar
+# trazabilidad histórica y una autorización posterior puede recrear la misma ruta.
+REQUEST_COMMIT="$(git rev-parse HEAD)"
 PARENT="$(git rev-parse "$REQUEST_COMMIT^")"
+git cat-file -e "$REQUEST_COMMIT:$REQUEST"
 mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r "$REQUEST_COMMIT")
 [[ "${#CHANGED[@]}" == '1' ]]
 [[ "${CHANGED[0]}" == "$REQUEST" ]]
-[[ "$(git rev-parse HEAD)" == "$REQUEST_COMMIT" ]]
 
 jq -e --arg parent "$PARENT" '
   .schemaVersion=="orbit360-visual-matrix-corrected-post-auth-request-v1" and
