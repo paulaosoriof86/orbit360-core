@@ -4,8 +4,8 @@
   "gateId": "block2.7-visual-matrix-corrected-post-auth-lab-v20260805",
   "gateContractVersion": "2.7.8",
   "owner": "orbit360-visual-matrix-corrected-post-auth-v20260805",
-  "ownerVersion": "20260806.16-sourcefix-pass-actions-runner-unavailable",
-  "status": "STOP_RETRY_SOURCEFIX_PASS_ENVIRONMENT_UNAVAILABLE",
+  "ownerVersion": "20260806.17-sourcefix-pass-actions-runner-unavailable-twice",
+  "status": "STOP_RETRY_SOURCEFIX_PASS_ENVIRONMENT_UNAVAILABLE_REPEATED",
   "classification": "PIPELINE_MECHANISM_FAILURE_CORRECTED_SOURCE_ONLY",
   "secondaryClassification": "ENVIRONMENT_FAILURE",
   "patternClassification": "REPLICABLE_CLAUDE_ACUMULADO",
@@ -20,10 +20,10 @@
   "authorizedAt": "2026-08-06T09:35:00-06:00",
   "consumedAt": "2026-08-06T10:50:31-06:00",
   "authorizationDirective": "EXPLICIT_MACRO_REAUTHORIZATION_RUNTIME_BRANCH_CONTEXT_V6",
-  "currentPhase": "VISUAL_MATRIX_SOURCEFIX_PASS_ACTIONS_ENVIRONMENT_UNAVAILABLE",
+  "currentPhase": "VISUAL_MATRIX_SOURCEFIX_PASS_ACTIONS_ENVIRONMENT_UNAVAILABLE_REPEATED",
   "executionProfile": {
-    "mode": "FROZEN_SOURCEFIX_PASS_ENVIRONMENT_UNAVAILABLE_NO_RUNTIME_AUTHORIZATION",
-    "phase": "VISUAL_MATRIX_SOURCEFIX_PASS_ACTIONS_ENVIRONMENT_UNAVAILABLE",
+    "mode": "FROZEN_SOURCEFIX_PASS_REPEATED_ENVIRONMENT_FAILURE_NO_RUNTIME_AUTHORIZATION",
+    "phase": "VISUAL_MATRIX_SOURCEFIX_PASS_ACTIONS_ENVIRONMENT_UNAVAILABLE_REPEATED",
     "capabilities": {
       "secrets": false,
       "firestoreRead": false,
@@ -90,10 +90,10 @@
     "mergeExecuted": false
   },
   "latestFailure": {
-    "stage": "FULL_VISUAL_MATRIX",
-    "checkpoint": "FULL_MATRIX_PROCESS_TIMEOUT_NO_INCREMENTAL_EVIDENCE",
-    "classification": "PIPELINE_MECHANISM_FAILURE",
-    "cause": "The matrix child process remained active until GitHub cancelled the workflow at 45 minutes. External cancellation bypassed stop(), final evidence sealing, request consumption and rollback because the runner had no per-role watchdog and no signal-safe trap."
+    "stage": "GITHUB_ACTIONS_RUNNER_AVAILABILITY",
+    "checkpoint": "SECOND_SOURCE_ONLY_CANARY_ZERO_STEPS_AFTER_949_SECONDS",
+    "classification": "ENVIRONMENT_FAILURE",
+    "cause": "Two consecutive source-only availability canaries remained queued with zero steps and were closed without merge after the control threshold. GitHub Actions runner capacity was not observable for this repository."
   },
   "rollbackClosure": {
     "required": true,
@@ -157,6 +157,30 @@
     "checkoutExecuted": false,
     "sourceValidationExecuted": false,
     "sourceValidationContradicted": false,
+    "environmentStableForRecovery": false
+  },
+  "availabilityCanaryV2": {
+    "status": "FAIL_GITHUB_ACTIONS_RUNNER_AVAILABILITY_CANARY_V2",
+    "classification": "ENVIRONMENT_FAILURE",
+    "failureCode": "RUNNER_QUEUE_UNAVAILABLE",
+    "evidence": "orbit360-platform/runtime-gate-crm-v20260716/github-actions-availability-canary-v2-sanitized-v20260806.json",
+    "documentation": "orbit360-platform/docs/GITHUB-ACTIONS-AVAILABILITY-CANARY-V2-20260806.md",
+    "pullRequest": 24,
+    "pullRequestClosed": true,
+    "pullRequestMerged": false,
+    "runId": "31124256674",
+    "jobId": "92691463076",
+    "runConclusion": "failure",
+    "jobConclusion": "cancelled",
+    "stepsObserved": 0,
+    "logsAvailable": false,
+    "queueObservedSeconds": 949,
+    "checkoutExecuted": false,
+    "sourceValidationExecuted": false,
+    "sourceValidationContradicted": false,
+    "sameEnvironmentStageFailedTwice": true,
+    "thirdCanaryProhibitedWithoutNewEnvironmentEvidence": true,
+    "environmentStableForRecovery": false,
     "secretsRead": false,
     "firestoreReads": 0,
     "firestoreWrites": 0,
@@ -164,17 +188,17 @@
     "operationalWrites": 0,
     "browserExecuted": false,
     "deployExecuted": false,
-    "productionTouched": false,
-    "environmentStableForRecovery": false
+    "productionTouched": false
   },
   "executionOrder": [
     "SOURCEFIX_WATCHDOG_SIGNAL_SAFE_PASS_48_OF_48",
-    "ACTIONS_AVAILABILITY_CANARY_FAILED_WITH_ZERO_STEPS",
+    "ACTIONS_AVAILABILITY_CANARY_ONE_FAILED_WITH_ZERO_STEPS",
+    "ACTIONS_AVAILABILITY_CANARY_TWO_FAILED_WITH_ZERO_STEPS",
+    "STOP_RETRY_NO_THIRD_CANARY_WITHOUT_NEW_ENVIRONMENT_EVIDENCE",
     "KEEP_CONSUMED_REQUEST_FROZEN",
-    "DO_NOT_REUSE_RUNS_31116830824_31119868662_31120848942_31122714301",
+    "DO_NOT_REUSE_RUNS_31116830824_31119868662_31120848942_31122714301_31124256674",
     "DO_NOT_OPEN_RECOVERY_RISK_WHILE_ENVIRONMENT_UNAVAILABLE",
-    "REQUIRE_A_LATER_SOURCE_ONLY_AVAILABILITY_PASS",
-    "ONLY_AFTER_AVAILABILITY_PASS_REQUIRE_NEW_EXPLICIT_RECOVERY_AUTHORIZATION",
+    "ONLY_AFTER_NEW_EXTERNAL_RECOVERY_EVIDENCE_REQUIRE_NEW_EXPLICIT_AUTHORIZATION",
     "BIND_NEW_REQUEST_TO_THEN_CURRENT_EXACT_HEAD",
     "USE_RUNTIME_RUNNER_V2_ONLY",
     "GO_GATE_CONTRACT_BEFORE_SECRETS",
@@ -217,5 +241,5 @@
   "containsPII": false,
   "containsSecrets": false,
   "containsPasswords": false,
-  "nextAction": "SOURCEFIX IS 48/48 PASS, BUT GITHUB ACTIONS AVAILABILITY CANARY FAILED WITH ZERO STEPS AFTER 930 SECONDS IN QUEUE. KEEP STOP_RETRY ACTIVE. DO NOT EXECUTE OR AUTHORIZE RECOVERY UNTIL A LATER SOURCE-ONLY CANARY COMPLETES CHECKOUT AND 48/48."
+  "nextAction": "SOURCEFIX IS 48/48 PASS, BUT TWO CONSECUTIVE SOURCE-ONLY GITHUB ACTIONS CANARIES FAILED WITH ZERO STEPS. KEEP STOP_RETRY ACTIVE. DO NOT CREATE A THIRD CANARY, RECOVERY OR RUNTIME REQUEST WITHOUT NEW EXTERNAL EVIDENCE THAT RUNNER CAPACITY HAS RECOVERED."
 }
