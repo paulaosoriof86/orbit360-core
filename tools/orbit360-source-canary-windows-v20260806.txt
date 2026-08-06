@@ -1,0 +1,8 @@
+source-only portable validator canonical trigger
+workflow=b722deee833462a639da31f7341230797c28d40c
+validatorFix=0ce571cfdcd1024653a59a57d2ed8a877db453d3
+secrets=false
+firebase=false
+browser=false
+deploy=false
+production=false
