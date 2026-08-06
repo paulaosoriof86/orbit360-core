@@ -1,12 +1,26 @@
 {
-  "schemaVersion": "orbit360-validator-lifecycle-overlay-v1",
+  "schemaVersion": "orbit360-validator-lifecycle-overlay-v2",
   "parentLifecycle": "tools/orbit360-validator-lifecycle-contract-visual-matrix-corrected-post-auth-lab-v20260805.json",
   "gateId": "block2.7-visual-matrix-corrected-post-auth-lab-v20260805",
-  "ownerVersion": "20260806.18-cross-runner-source-pass-event-dispatch-unavailable",
-  "status": "STOP_RETRY_CROSS_RUNNER_SOURCE_PASS_EVENT_DISPATCH_UNAVAILABLE",
+  "ownerVersion": "20260806.19-sourcefix-pass-github-actions-major-outage-active",
+  "status": "STOP_RETRY_SOURCEFIX_PASS_GITHUB_ACTIONS_MAJOR_OUTAGE_ACTIVE",
   "primaryClassification": "PIPELINE_MECHANISM_FAILURE_CORRECTED_SOURCE_ONLY",
   "secondaryClassification": "ENVIRONMENT_FAILURE",
-  "failureCode": "EVENT_DISPATCH_UNAVAILABLE",
+  "failureCode": "GITHUB_ACTIONS_MAJOR_OUTAGE_ACTIVE",
+  "retractedHypothesis": {
+    "failureCode": "ACCOUNT_OR_REPOSITORY_ACTIONS_DISABLED_OR_RESTRICTED",
+    "reason": "Repository settings screenshot confirms all actions and reusable workflows were already allowed."
+  },
+  "officialIncident": {
+    "provider": "GitHub Status",
+    "incidentId": "qcvjkzcs7j74",
+    "status": "investigating",
+    "impact": "critical",
+    "component": "Actions",
+    "componentStatus": "major_outage",
+    "startedAtUtc": "2026-08-06T15:22:49.021Z",
+    "lastObservedUpdateUtc": "2026-08-06T18:46:37.400Z"
+  },
   "crossRunnerSource": {
     "status": "PASS_VISUAL_MATRIX_CROSS_RUNNER_SOURCE",
     "checks": 24,
@@ -19,15 +33,12 @@
     "validator": "tools/orbit360-test-visual-matrix-cross-runner-source-v20260806.mjs",
     "evidence": "orbit360-platform/runtime-gate-crm-v20260716/visual-matrix-cross-runner-source-test-sanitized-v20260806.json"
   },
-  "eventDispatchCanary": {
-    "pullRequest": 25,
-    "pullRequestClosed": true,
-    "pullRequestMerged": false,
-    "runnerLabel": "macos-14",
-    "eventsAttempted": 4,
-    "workflowRunsObserved": 0,
-    "checksObserved": 0,
-    "evidence": "orbit360-platform/runtime-gate-crm-v20260716/github-actions-cross-runner-event-dispatch-sanitized-v20260806.json"
+  "observedSymptoms": {
+    "ubuntuCanaryRuns": ["31122714301", "31124256674"],
+    "ubuntuStepsObserved": 0,
+    "macosControlPlaneRunsObserved": 0,
+    "crossRepositoryRunsObserved": 0,
+    "consistentWithOfficialIncident": true
   },
   "capabilities": {
     "secrets": false,
@@ -56,5 +67,5 @@
     "cobrosObserved": 7,
     "cobrosBlock41": "PAUSED"
   },
-  "nextAction": "Restore Actions event dispatch or authorize an independent executor for runner v3. Then execute one source-only cross-runner validation. Only after PASS request a new immutable runtime authorization bound to the then-current HEAD."
+  "nextAction": "Do not change Actions permissions and do not create more canaries while incident qcvjkzcs7j74 remains investigating/major outage. When GitHub Status reaches monitoring or resolved and capacity is observable, execute exactly one source-only cross-runner validation. Only after PASS request one immutable runtime authorization bound to the then-current canonical HEAD."
 }
