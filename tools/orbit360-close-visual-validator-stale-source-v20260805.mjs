@@ -3,7 +3,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import vm from 'node:vm';
+import { spawnSync } from 'node:child_process';
 
 const PLAN = 'orbit360-platform/docs/PLAN-UNICO-SALIDA-RC-AYS-LAB-CANONICA-01-20260804.md';
 const PRECHECK = 'tools/orbit360-visual-runtime-rootfix-browser-precheck-v20260805.mjs';
@@ -20,7 +20,8 @@ try {
   let plan = fs.readFileSync(PLAN, 'utf8');
   const precheck = fs.readFileSync(PRECHECK, 'utf8');
   const governing = JSON.parse(fs.readFileSync(GOVERNING, 'utf8'));
-  new vm.Script(precheck, { filename: PRECHECK });
+  const syntax = spawnSync(process.execPath, ['--check', PRECHECK], { encoding: 'utf8' });
+  if (syntax.status !== 0) throw new Error('PRECHECK_SYNTAX:' + String(syntax.stderr || syntax.stdout || '').slice(0, 500));
 
   plan = replaceOnce(plan,
     'Última actualización: 2026-08-05 18:35 GT',
@@ -73,7 +74,7 @@ try {
     classification: failedCheckIds.length ? 'VALIDATOR_STALE' : 'VALIDATOR_STALE_CLOSED_SOURCE_ONLY',
     governingRunId: '31061214801',
     governingEvidenceOk: governing.status === 'STOP_RETRY_GOVERNING' && governing.classification === 'VALIDATOR_STALE',
-    precheckSyntaxOk: true,
+    precheckSyntaxOk: syntax.status === 0,
     total: required.length,
     passed: Object.values(checks).filter(Boolean).length,
     failed: failedCheckIds.length,
@@ -91,7 +92,7 @@ try {
     containsPII: false,
     containsSecrets: false,
     containsPasswords: false,
-    ok: failedCheckIds.length === 0
+    ok: failedCheckIds.length === 0 && governing.status === 'STOP_RETRY_GOVERNING' && governing.classification === 'VALIDATOR_STALE'
   };
   fs.mkdirSync(path.dirname(OUT), { recursive: true });
   fs.writeFileSync(OUT, JSON.stringify(output, null, 2) + '\n', 'utf8');
