@@ -1,0 +1,89 @@
+{
+  "schemaVersion": "orbit360-visual-observable-rootfix-v2-pipeline-stop-v1",
+  "gateId": "block2.7-visual-observable-rootfix-v2-lab-v20260805",
+  "contractVersion": "2.7.5",
+  "status": "STOP_RETRY_PIPELINE_TRIGGER_NOT_CREATED",
+  "classification": "PIPELINE_MECHANISM_FAILURE",
+  "checkpoint": "ACTIONS_TRIGGER_NOT_CREATED",
+  "rcId": "RC-AYS-LAB-CANONICA-01",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "sourceFix": {
+    "status": "PASS_DIRECT_SOURCE_VALIDATION",
+    "checks": 24,
+    "evidence": "orbit360-platform/runtime-gate-crm-v20260716/visual-hydration-direct-source-validation-sanitized-v20260805.json",
+    "overlay": "orbit360-platform/core/visual-runtime-hydration-contract-v20260805.js",
+    "loader": "orbit360-platform/core/backend-lab-loader.js",
+    "requiredOptionalContract": true,
+    "advisorProjectionReadOnly": true,
+    "hardcodedUsers": 0,
+    "firestoreWrites": 0,
+    "authWrites": 0,
+    "operationalWrites": 0,
+    "ok": true
+  },
+  "transportAttempts": [
+    {
+      "kind": "new_source_workflow_request",
+      "commit": "f82e15bbd4f3d50a9ad568174e45d60a050611bc",
+      "workflowRunCreated": false
+    },
+    {
+      "kind": "recognized_source_relay",
+      "commit": "d756bc6f61f41990c7f81090ff7167c4eabd68f9",
+      "workflowRunCreated": false
+    },
+    {
+      "kind": "v2_runtime_request_new_pattern",
+      "commit": "c4e21f84c25d2834eccabbd124d22ea802f3652e",
+      "workflowRunCreated": false
+    },
+    {
+      "kind": "v2_runtime_request_historical_pattern",
+      "commit": "b4818484170e6dd6b5911f215c34b3c7a988fea7",
+      "workflowRunCreated": false
+    }
+  ],
+  "runtimeAuthorization": {
+    "reserved": true,
+    "consumed": false,
+    "gateExecuted": false,
+    "goGateContractProduced": false,
+    "secretAccessed": false,
+    "firestoreRead": false,
+    "browserExecuted": false,
+    "hostingBackupCreated": false,
+    "hostingDeploys": 0,
+    "rollbackRequired": false
+  },
+  "protectedState": {
+    "hostingLab": "PREVIOUS_RESTORED_VERSION_UNCHANGED",
+    "rootfixLive": false,
+    "passVisualPostAuth": false,
+    "firestoreWrites": 0,
+    "authWrites": 0,
+    "operationalWrites": 0,
+    "functionsDeploys": 0,
+    "rulesDeploys": 0,
+    "reimports": 0,
+    "productionTouched": false,
+    "mainTouched": false,
+    "mergeExecuted": false
+  },
+  "rootCause": {
+    "category": "PIPELINE_MECHANISM_FAILURE",
+    "owner": ".github/workflows/orbit360-visual-observable-rootfix-lab-v20260805.yml",
+    "problem": "GitHub Actions did not create a workflow run for the new source request, recognized relay, v2 request, or historical-pattern transport request. No runtime stage began.",
+    "notProductFailure": true,
+    "notAuthFailure": true,
+    "notGateFailure": true,
+    "solution": "Repair or expose a supported Actions dispatch mechanism for the already versioned v2 runner, or execute it through a workflow that GitHub has registered outside this unmerged branch. Do not create another request file or replay the same push-path mechanism."
+  },
+  "retryProhibitedOnCurrentMechanism": true,
+  "newAuthorizationRequired": false,
+  "authorizationRemainsReserved": true,
+  "containsPII": false,
+  "containsSecrets": false,
+  "containsPasswords": false,
+  "ok": false
+}
