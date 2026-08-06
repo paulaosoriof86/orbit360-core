@@ -1,47 +1,25 @@
 # PLAN ÚNICO DE SALIDA — RC-AYS-LAB-CANONICA-01
 
 Fecha de adopción: 2026-08-04  
-Última actualización: 2026-08-05 19:08 GT  
+Última actualización: 2026-08-05 19:42 GT  
 Rama obligatoria: `ays/backend-tenant-lab-v99-20260703`  
 PR: #5 draft/open  
 Producción, `main` y merge: no autorizados
 
 ## 1. Carácter vinculante
 
-Este plan, el estado vivo del PR/HEAD, el ledger y la evidencia reciente gobiernan una sola candidata acumulativa A&S.
+Este Plan Único, el estado vivo del PR/HEAD, el lifecycle y la evidencia sanitizada reciente gobiernan una sola candidata acumulativa A&S.
 
 Precedencia:
 
 1. reglas maestras y addenda vigentes;
 2. PR/HEAD vivo;
 3. este Plan Único;
-4. ledger y evidencia reciente.
+4. lifecycle, ledger y evidencia reciente.
 
-No se reemplaza la candidata por una composición parcial, no se reabren auditorías cerradas sin insumo nuevo y no se repiten requests consumidos.
+No se reemplaza la candidata por una composición parcial, no se repiten requests consumidos y no se ejecuta nuevamente una etapa fallida sin cerrar primero su causa raíz.
 
-## 2. Objetivo
-
-Cerrar en una sola RC:
-
-```text
-Cliente 360
-Aseguradoras
-Pólizas
-Vehículos
-Recibos
-Cartera
-Cobros
-Conciliaciones
-Comisiones
-Equipo/Auth
-Ops
-Leads
-Importador recurrente
-multirol/scopes
-Academia
-```
-
-### 2.1 Alcance del primer go-live
+## 2. Alcance del primer go-live
 
 El primer go-live operativo prioriza:
 
@@ -51,57 +29,45 @@ Orbit Leads
 Orbit Aseguradoras
 Cliente 360
 Pólizas
+Vehículos relacionados
 Recibos
 Cobros y cartera
 Equipo/Auth
 multirol/scopes
 ```
 
-La plataforma seguirá por releases incrementales. Cotizador, Comparativo y el backend completo de Renovaciones no bloquean esta primera salida, siempre que sus accesos no prometan funciones inexistentes ni interrumpan el núcleo operativo.
+La salida será progresiva. Cotizador, Comparativo y el backend completo de Renovaciones no bloquean la primera salida, siempre que no existan accesos engañosos o funciones que interrumpan el núcleo operativo.
 
-## 3. Hechos cerrados
+Después del go-live, cada módulo o función adicional se incorporará mediante release incremental con prueba técnica, prueba viva, aceptación, backup y rollback.
 
-### Runtime funcional acumulativo
-
-```text
-run: 30962756387
-PASS: 18
-FAIL: 0
-```
-
-### Composición
-
-```text
-rutas aisladas: 8/8 PASS
-composición canónica: 31/31 PASS
-inner preflight: 32/32 PASS
-request/provenance: 33/33 PASS
-```
-
-### Baseline protegido
+## 3. Baseline protegido
 
 ```text
 clientes: 430
 aseguradoras: 30
 pólizas: 1,375
 vehículos: 1,033
-recibos: 1,294
+recibos esperados: 1,294
 cartera: 673
 cobros confirmados observados: 7
-reimportación requerida: no
+memberships observadas: 8
+reimportación requerida por el rootfix visual: no
 pérdida observada: no
 ```
 
-### Ops/Leads backend
+## 4. Hechos cerrados
+
+### 4.1 Composición funcional acumulativa
 
 ```text
-Gate: OPS_LEADS_BACKEND_LAB_COMPLETE
-Estado: PASS
+runtime funcional: 18/18 PASS
+rutas aisladas: 8/8 PASS
+composición canónica: 31/31 PASS
+inner preflight: 32/32 PASS
+request/provenance: 33/33 PASS
 ```
 
-Este PASS no sustituye una prueba viva desde la interfaz.
-
-### Auth autoadministrable
+### 4.2 Auth autoadministrable
 
 ```text
 run: 31051061883
@@ -111,156 +77,26 @@ logins/cambio obligatorio: 7/7
 CRM: VERIFIED_UNCHANGED
 ```
 
-Auth solo se reabre si la revisión visual demuestra un defecto concreto.
+Auth no es la causa del bloqueo visual actual.
 
-## 4. Bloque 2.7 — revisión visual post-Auth y rootfix transversal
-
-Candidata visible antes del rootfix:
+### 4.3 Ops/Leads backend
 
 ```text
-https://ays-orbit-360-lab.web.app/?orbitBackend=firestore-lab&tenant=alianzas-soluciones#/inicio
+Gate: OPS_LEADS_BACKEND_LAB_COMPLETE
+Estado: PASS técnico
 ```
 
-### 4.1 Evidencia humana real
+Este PASS no sustituye la prueba viva desde la interfaz.
 
-La navegación humana del 5 de agosto de 2026 demostró que las verificaciones técnicas anteriores no cubrían la experiencia completa en navegador.
-
-Hallazgos:
-
-```text
-rememberSessionMissing: FUNCTIONAL_DEFECT
-deadLoginHelp: FUNCTIONAL_DEFECT
-partialHydrationRenders: PIPELINE_MECHANISM_FAILURE
-clientSummaryRepeatedScans: FUNCTIONAL_DEFECT
-vehicleDetailMissing: FUNCTIONAL_DEFECT
-receiptCobroDetailUnclear: FUNCTIONAL_DEFECT
-responsiveTitles: FUNCTIONAL_DEFECT
-opsLeadsNoLiveDiagnostic: FUNCTIONAL_DEFECT
-emptyReconciliationCopy: DATA_CONTRACT_FAILURE
-emptyCancellationCopy: FUNCTIONAL_DEFECT
-```
-
-Evidencia consolidada:
-
-```text
-orbit360-platform/docs/AUDITORIA-VISUAL-POST-AUTH-ROOTFIX-20260805.md
-```
-
-### 4.2 Causa raíz principal
-
-El store abre snapshots independientes y cada fuente inicial emite un evento. El router podía renderizar Cliente 360, Pólizas y Cobros antes de que todas sus dependencias estuvieran listas. La vista mostraba datos parciales, después se recalculaba y reemplazaba la composición.
-
-Cliente 360 además ejecutaba resúmenes repetidos por cliente, recorriendo varias colecciones en cada llamada.
-
-Esto explica:
-
-- bloqueos temporales al cambiar de módulo;
-- KPIs que cambian dos veces;
-- listados que se sustituyen;
-- apertura lenta de clientes, pólizas y recibos;
-- interacción sobre una vista que todavía podía ser reemplazada.
-
-### 4.3 Rootfix source-only
-
-```text
-gate: block2.7-visual-runtime-rootfix-static-v20260805
-contract: 2.7.1
-run: 31059563973
-source checks: 28/28 PASS
-status: STATIC_SOURCE_PASS_NOT_DEPLOYED
-```
-
-Owners:
-
-```text
-orbit360-platform/core/visual-runtime-rootfix-v20260805.js
-orbit360-platform/core/backend-lab-loader.js
-tools/orbit360-test-visual-runtime-rootfix-source-v20260805.mjs
-```
-
-Incluye:
-
-1. `Mantener sesión iniciada en este dispositivo`, sin almacenar contraseña;
-2. eliminación de `¿Problemas al ingresar? → Limpiar sesión`;
-3. render único cuando las dependencias del módulo están completas;
-4. carga estable con progreso y sin KPIs parciales;
-5. índice/cache para Cliente 360;
-6. detalle propio de vehículo;
-7. botones explícitos de detalle en recibos/cobros;
-8. responsive en 1100, 760 y 520 px;
-9. estados vacíos honestos de Conciliaciones y Cancelaciones;
-10. botón `Ejecutar prueba en vivo` read-only para Ops/Leads.
-
-Frontera source-only:
-
-```text
-browser: 0
-Firestore reads: 0
-Firestore/Auth/operational writes: 0
-Functions/Hosting/Rules deploy: 0
-producción/main/merge: 0
-```
-
-El rootfix se desplegó una única vez en el run `31061214801`, pero la prueba viva se detuvo antes del primer resultado de rol por un timeout sin checkpoint observable. Hosting LAB fue restaurado exactamente a la versión previa. La clasificación gobernante es `VALIDATOR_STALE`; el rootfix no está visible ni aprobado en LAB.
-
-### 4.4 Matriz de revalidación
-
-| Perfil | Viewport | Revisión |
-|---|---:|---|
-| Dirección | 1440 × 1000 | administración, Equipo, módulos acumulados |
-| Operativo | 1024 × 768 | operación diaria, Cobros, Ops/Leads |
-| Asesor | 390 × 844 | clientes propios, menú móvil, scopes |
-
-Criterios:
-
-- login real sin credenciales demo;
-- persistencia elegible y sin guardar contraseña;
-- cambio obligatorio de contraseña claro;
-- acuerdo legal una sola vez;
-- Cliente 360/Pólizas/Cobros no muestran cifras parciales;
-- navegación y detalles responden sin bloqueo prolongado;
-- vehículo, recibo y cobro tienen acción explícita;
-- responsive sin títulos cortados;
-- Ops/Leads ejecutan diagnóstico read-only y entregan resultado;
-- Conciliaciones/Cancelaciones explican su estado;
-- cero texto técnico, secretos o passwords;
-- cero acceso indebido por ruta directa.
-
-Salida:
-
-```text
-PASS_VISUAL_POST_AUTH
-```
-
-Ante hallazgo:
-
-```text
-STOP_RETRY
-clasificación
-owner
-captura/viewport
-causa raíz
-corrección focalizada
-una sola revalidación
-```
-
-## 5. Bloque 4.0 — Cobros read-only
+### 4.4 Cobros 4.0 read-only
 
 ```text
 Gate: PASS_COBROS_FULL_REPLAY
-Estado: CLOSED_PASS_READ_ONLY
-```
-
-Resultado:
-
-```text
-pagos canónicos: 365
+pagos canónicos explicados: 365/365
 propuestas por secuencia: 128
 post-corte: 2
 propuestas por planilla detallada: 2
-HOLD sin enlace único a recibo: 233
-requiere validación: 0
-explicados: 365
+HOLD sin enlace único: 233
 sin categoría: 0
 ```
 
@@ -273,46 +109,209 @@ Evidencia:
 ```text
 rowLedgerCount: 365
 rowLedgerDigest: 96d7105912234de14deb5ad0190e537c1b71570519d086616acc9122cb2ca381
-cobros existentes preservados: 5
-HOLD de calendario preservados: 44
 writes/deploy/reimport: 0
 ```
 
-El PASS significa que toda fila terminó vinculada, propuesta, HOLD, omitida o en validación. No significa que los 233 HOLD sean cobros confirmados.
+Una propuesta o un HOLD no es un cobro confirmado.
 
-### Causa raíz corregida
+## 5. Rootfix visual post-Auth
+
+### 5.1 Rootfix source-only
+
+```text
+gate: block2.7-visual-runtime-rootfix-static-v20260805
+contract: 2.7.1
+run: 31059563973
+source checks: 28/28 PASS
+```
+
+Incluye:
+
+- persistencia opcional de sesión sin almacenar contraseña;
+- eliminación de ayuda de login sin función;
+- carga estable antes del render;
+- índice/cache de Cliente 360;
+- detalle de vehículo, recibo y cobro;
+- responsive transversal;
+- estados vacíos honestos;
+- diagnóstico read-only de Ops/Leads.
+
+### 5.2 Primer run visual consumido
+
+```text
+run: 31061214801
+preflight: GO_GATE_CONTRACT 20/20
+Hosting deploy: 1
+resultado: STOP_RETRY
+rollback: PASS
+snapshot: VERIFIED_UNCHANGED
+clasificación inicial: VALIDATOR_STALE
+```
+
+Ese capturador no identificó el checkpoint exacto. El request está consumido y no se repite.
+
+### 5.3 Precheck observable y matriz 2.7.3
+
+Registro del gate:
+
+```text
+gate: block2.7-visual-observable-rootfix-lab-v20260805
+contract: 2.7.3
+registro/perfil: 7/7 PASS source-only
+```
+
+Ejecución autorizada:
+
+```text
+run: 31063000137
+preflight: GO_GATE_CONTRACT 24/24
+backup Hosting: PASS
+Hosting LAB deploy: 1
+precheck: FAIL
+checkpoint: INICIO_READY_TIMEOUT
+matriz Dirección/Operativo/Asesor: no ejecutada
+rollback Hosting: PASS
+Firestore/Auth/operational writes: 0
+Functions/Rules deploys: 0
+producción/main/merge: 0
+```
+
+Estado actual:
+
+```text
+PASS_VISUAL_POST_AUTH: NO
+rootfix vivo y aprobado: NO
+Hosting LAB: restaurado a la versión previa
+request: CONSUMED_STOP_RETRY
+replay: prohibido
+```
+
+## 6. Causa raíz cerrada
+
+Clasificación:
 
 ```text
 DATA_CONTRACT_FAILURE
 ```
 
-Correcciones:
-
-1. una clave repetida póliza/moneda/periodo ya no toma la primera fila; queda en HOLD;
-2. una fila SIGA de pago reportado, sin pendiente y fuera de cartera, pero sin enlace unívoco a recibo, queda en `HOLD_REPORTED_PAYMENT_NO_UNIQUE_RECEIPT_LINK`.
-
-Owners:
+Checkpoint:
 
 ```text
-tools/orbit360-cobros-overlay-readonly-v2-20260805.mjs
-tools/orbit360-cobros-overlay-hold-finalizer-v20260805.mjs
+INICIO_READY_TIMEOUT
 ```
 
-Cierre:
+Antes del timeout estaban listos:
 
 ```text
-orbit360-platform/docs/CIERRE-BLOQUE-4-0-COBROS-FULL-REPLAY-20260805.md
+Firebase Auth
+usuario de producto
+membresía activa
+vínculo con tenant
+ruta inicio
+rootfix cargado
+29 snapshots conectados
+7 colecciones canónicas
 ```
 
-### Estado visible de las inferencias
+Las siete colecciones canónicas disponibles eran:
 
-Los pagos anteriores inferidos no aparecen todavía como cobros porque continúan como propuestas read-only. Esto es coherente con la frontera de seguridad: una inferencia no puede convertirse automáticamente en cobro confirmado.
+```text
+clientes
+aseguradoras
+polizas
+vehiculos
+recibosEsperados
+carteraPrimas
+cobros
+```
 
-## 6. Bloque 4.1 — materialización durable del ledger de Cobros
+La colección legacy `asesores` permaneció en `snapshotErrors`.
+
+El rootfix declaró:
+
+```text
+MODULE_DEPS.inicio = clientes + polizas + cobros + asesores + aseguradoras
+```
+
+`hydrationStatus` consideró que la vista no estaba lista y `wrapModule` reemplazó el render original por una pantalla bloqueante. La evidencia visible fue:
+
+```text
+4 de 5 fuentes listas · falta asesores
+```
+
+El módulo original puede operar con `asesores=[]`; por tanto, el bloqueo fue introducido por un contrato de hidratación incompatible con el estado vivo del runtime.
+
+Owner exacto:
+
+```text
+orbit360-platform/core/visual-runtime-rootfix-v20260805.js
+MODULE_DEPS.inicio
+hydrationStatus
+wrapModule
+```
+
+No se atribuye a Auth, credenciales, membresía, tenant, Rules ni entorno porque esas etapas ya habían pasado. Tampoco se modifican Rules sin evidencia de que sean la causa.
+
+## 7. Correctivo obligatorio antes de otro runtime
+
+Debe prepararse y pasar primero un gate source-only que:
+
+1. separe dependencias canónicas obligatorias y fuentes legacy opcionales;
+2. no bloquee `Inicio` por `asesores`;
+3. proyecte asesores visualmente desde memberships/Equipo, sin escritura y sin hardcode;
+4. muestre un estado degradado honesto para leaderboard y metas si no existe proyección opcional;
+5. revise el contrato required/optional en Cliente 360, Pólizas, Cobros, Ops, Leads, Conciliaciones y Cancelaciones;
+6. conserve cero escrituras y cero datos tenant en código genérico;
+7. actualice owner, validador, workflow, documentación y Academia juntos.
+
+Solo después de PASS source-only podrá solicitarse una nueva autorización runtime. No se abre otra ejecución visual antes.
+
+## 8. Política de pruebas directamente desde la plataforma
+
+Cada módulo tendrá dos niveles distintos:
+
+### 8.1 Prueba viva read-only
+
+- login y sesión;
+- permisos y scopes;
+- navegación real;
+- carga e hidratación;
+- KPIs estables;
+- filtros y detalles;
+- responsive;
+- estados honestos;
+- cero escrituras.
+
+### 8.2 Gate CRUD sintético con rollback
+
+Cuando exista autorización separada de escritura:
+
+- crear;
+- leer;
+- editar;
+- eliminar o archivar según contrato;
+- comprobar relaciones;
+- revertir exactamente;
+- verificar cero registros sintéticos residuales.
+
+Cobertura prevista:
+
+```text
+Cliente 360
+Pólizas
+Recibos
+Cobros
+Ops
+Leads
+```
+
+El gate CRUD no se ejecuta dentro de una autorización read-only.
+
+## 9. Bloque 4.1 — materialización durable de Cobros
 
 ```text
 Gate objetivo: COBROS_REAL_LEDGER_COMPLETE
-Estado: PAUSADO HASTA PASS VISUAL
+Estado: PAUSADO HASTA PASS_VISUAL_POST_AUTH
 ```
 
 Preparación cerrada:
@@ -321,7 +320,6 @@ Preparación cerrada:
 contrato: 10.10.2
 planner source: 18/18 PASS
 static contract: 20/20 PASS
-paquete privado V3: verificado
 writer runtime: no creado
 Firestore writes: 0
 ```
@@ -329,44 +327,21 @@ Firestore writes: 0
 Topología prevista:
 
 ```text
-run aislado
 1,095 documentos de staging
 manifest de run
-transacción de activación del manifest + puntero
-cero escrituras directas en colecciones visibles durante staging
+activación atómica del manifest y puntero
 máximo contractual: 1,098 escrituras
+snapshot, idempotencia, verificación y rollback
 ```
 
-Alcance:
+No se ejecuta sin autorización explícita separada.
 
-- 365 pagos reportados;
-- 365 evidencias;
-- 132 propuestas;
-- 233 HOLD;
-- cero cobros nuevos;
-- cero cambios a recibos, pólizas o finmovs;
-- 5 cobros existentes preservados;
-- snapshot, idempotencia, verificación y rollback.
+## 10. Pólizas y criterio de corte
 
-La preparación se pausó correctamente al recibir evidencia visual. No existe writer parcial persistido.
-
-No se ejecuta antes de:
-
-```text
-PASS_VISUAL_POST_AUTH
-+
-autorización explícita separada de escritura LAB
-```
-
-## 7. Pólizas pendientes y criterio de corte
-
-Las pólizas pendientes se separan en dos grupos.
-
-### Correcciones bloqueantes antes de producción
+### Bloqueantes antes de producción
 
 - cliente o asesor incorrecto;
-- estado incorrecto;
-- vigencias incorrectas;
+- estado o vigencia incorrectos;
 - prima, moneda o país incorrectos;
 - calendario de recibos incorrecto;
 - duplicados;
@@ -374,16 +349,35 @@ Las pólizas pendientes se separan en dos grupos.
 
 ### Delta no bloqueante post-go-live
 
-- pólizas nuevas posteriores al corte verificado;
-- renovaciones recibidas después del corte;
+- pólizas nuevas posteriores al corte;
+- renovaciones posteriores al corte;
 - datos complementarios no críticos;
-- actualizaciones operativas normales posteriores al cierre del dataset.
+- actualizaciones normales de operación.
 
-La producción debe salir con un corte de datos explícito y un importador incremental listo. No se retrasa indefinidamente por cada póliza nueva que continúe llegando.
+La llegada de nuevas pólizas no reinicia toda la salida productiva.
 
-## 8. Bloque 5.0 — RC acumulativa
+## 11. Cotizador, Comparativo y Renovaciones
 
-Se activa cuando existan:
+No bloquean el primer go-live, pero permanecen como release incremental obligatorio.
+
+Decisiones vigentes:
+
+- auditar y reponer la última versión aprobada v110 de Cotizador/Comparativo con todos sus razonamientos;
+- Dirección/Admin/Operativo: elegir entre abrir Cotizador o solicitar gestión de cotización;
+- Asesor: generar gestión de cotización;
+- `Comparar` en Renovaciones solo se habilita después de verificar backend durable, relaciones, idempotencia y scopes.
+
+Documento:
+
+```text
+orbit360-platform/docs/BACKLOG-POST-GOLIVE-COTIZADOR-COMPARATIVO-RENOVACIONES-Y-PRUEBAS-VIVAS-20260805.md
+```
+
+## 12. RC acumulativa, aceptación y go-live
+
+### Bloque 5.0 — RC acumulativa
+
+Requiere:
 
 ```text
 PASS_VISUAL_POST_AUTH
@@ -393,32 +387,15 @@ COBROS_REAL_LEDGER_COMPLETE
 correcciones bloqueantes de pólizas cerradas
 ```
 
-Objetivo:
-
-- una sola candidata con todos los módulos;
-- rutas y dependencias coherentes;
-- Auth, CRM, Cobros, Comisiones, Ops/Leads e importador en la misma RC;
-- multirol/scopes para Dirección, Operativo y Asesor;
-- cero texto técnico o estado engañoso;
-- Academia y documentación actualizadas.
-
 Salida:
 
 ```text
 RC_ACCUMULATIVE_MODULES_COMPLETE
 ```
 
-## 9. Bloque 6.0 — aceptación de release candidate
+### Bloque 6.0 — aceptación
 
-Incluye:
-
-1. visualización final A&S;
-2. checklist funcional y visual por rol;
-3. conteos e integridad;
-4. corte de datos y delta post-corte;
-5. pendientes diferidos no bloqueantes;
-6. backup y rollback preparados;
-7. aceptación explícita de Paula.
+Incluye visualización final A&S, checklist funcional por rol, conteos, corte de datos, pendientes diferidos, backup, rollback y aceptación explícita.
 
 Salida:
 
@@ -426,22 +403,9 @@ Salida:
 RELEASE_CANDIDATE_ACCEPTED
 ```
 
-## 10. Bloque 7.0 — go-live
+### Bloque 7.0 — go-live
 
 Permanece bloqueado hasta autorización expresa.
-
-Macrobloque requerido:
-
-```text
-preflight canónico
-backup
-snapshot
-verificación proyecto/tenant/rama/HEAD
-deploy autorizado
-smoke post-deploy
-rollback listo
-cierre sanitizado
-```
 
 Salida:
 
@@ -449,73 +413,70 @@ Salida:
 GO_PRODUCTION_A&S
 ```
 
-## 11. Carriles
+## 13. Carriles
 
 ### Carril A — frontend, UX y Academia
 
-Rootfix visual source-only 28/28 PASS. Run vivo `31061214801`: GO_GATE_CONTRACT 20/20, un deploy Hosting, timeout antes del primer rol y rollback PASS. Estado: `STOP_RETRY · VALIDATOR_STALE`.
+```text
+rootfix source-only: PASS 28/28
+run observable: STOP_RETRY
+causa: DATA_CONTRACT_FAILURE
+checkpoint: INICIO_READY_TIMEOUT
+rollback: PASS
+```
+
+Siguiente: contrato required/optional de hidratación source-only.
 
 ### Carril B — backend, seguridad y acceso
 
-Auth cerrado. Ops/Leads backend PASS técnico. No se despliegan Functions ni Rules. El diagnóstico visible será read-only.
+```text
+Auth: PASS
+memberships: PASS
+Ops/Leads backend: PASS técnico
+Functions/Rules desplegados en este bloque: 0
+```
+
+No se reabre Auth ni se cambian Rules por este fallo.
 
 ### Carril C — datos reales y migración
 
-Cobros 4.0 cerrado 365/365. Cobros 4.1 preparado estáticamente y pausado. Las correcciones críticas de pólizas se cierran antes de producción; el delta nuevo se carga después del corte.
+```text
+Cobros 4.0: PASS 365/365 read-only
+Cobros 4.1: preparado y pausado
+pólizas: correcciones críticas antes del corte
+reimportación causada por rootfix: no
+```
 
-## 12. Estado vivo
+## 14. Estado vivo
 
 | Bloque | Gate | Estado |
 |---|---|---|
 | 1.0–1.1 | plan/baseline | PASS |
-| 2.0–2.5 | composición/candidata LAB | PASS técnico |
-| 2.6 | recaptura legal automática | diferido no bloqueante |
+| 2.0–2.5 | composición/candidata | PASS técnico |
+| 2.6 | recaptura legal histórica | diferido no bloqueante |
 | 2.7A | auditoría visual humana | hallazgos clasificados |
-| 2.7B | `block2.7-visual-runtime-rootfix-static-v20260805` | PASS 28/28 source-only |
-| 2.7C | Hosting LAB + prueba viva | STOP_RETRY · VALIDATOR_STALE · rollback PASS |
-| 3.0 | `OPS_LEADS_BACKEND_LAB_COMPLETE` | PASS técnico |
+| 2.7B | rootfix static 2.7.1 | PASS 28/28 |
+| 2.7C | run 31061214801 | STOP_RETRY · VALIDATOR_STALE · rollback PASS |
+| 2.7D | registro observable 2.7.3 | PASS 7/7 source-only |
+| 2.7E | run 31063000137 | STOP_RETRY · DATA_CONTRACT_FAILURE · INICIO_READY_TIMEOUT · rollback PASS |
+| 3.0 | Ops/Leads backend | PASS técnico |
 | 3.1 | Auth autoadministrable | PASS 7/7 |
-| 4.0 | `PASS_COBROS_FULL_REPLAY` | PASS 365/365 read-only |
-| 4.1 | `COBROS_REAL_LEDGER_COMPLETE` | preparado estático; pausado |
-| 5.0 | `RC_ACCUMULATIVE_MODULES_COMPLETE` | pendiente |
-| 6.0 | `RELEASE_CANDIDATE_ACCEPTED` | pendiente |
-| 7.0 | `GO_PRODUCTION_A&S` | bloqueado |
+| 4.0 | Cobros full replay | PASS 365/365 read-only |
+| 4.1 | Cobros durable | preparado; pausado |
+| 5.0 | RC acumulativa | pendiente |
+| 6.0 | aceptación | pendiente |
+| 7.0 | producción | bloqueado |
 
-## 13. Siguiente acción exacta
-
-```text
-1. precheck observable source-only: preparado y validado estructuralmente 15/15
-2. esperar nueva autorización explícita para un único Hosting LAB deploy
-3. ejecutar primero precheck Auth/membresía/ruta/hidratación
-4. solo con PASS abrir la matriz Dirección/Operativo/Asesor
-5. cerrar PASS_VISUAL_POST_AUTH o STOP_RETRY con checkpoint exacto
-6. preparar gate CRUD sintético con rollback para Cliente 360/Pólizas/Recibos/Cobros/Ops/Leads
-7. retomar Bloque 4.1 y correcciones críticas de pólizas
-8. cerrar RC operativa y solicitar go-live
-```
-
-## 14. Pendientes diferidos no bloqueantes
-
-- recaptura histórica del modal legal;
-- incorporación visual de la lección Academia Auth/Cobros;
-- gate CRUD sintético desde la plataforma con creación, lectura, edición, eliminación/archivo y rollback exacto;
-- autoservicio universal del importador no tabular;
-- liberación progresiva de los 233 HOLD cuando existan reportes detallados;
-- pólizas nuevas posteriores al corte;
-- auditar y reponer la última versión aprobada v110 de Cotizador/Comparativo con todos sus razonamientos;
-- en Renovaciones, Dirección/Admin/Operativo deben elegir entre abrir Cotizador o solicitar gestión de cotización;
-- en Renovaciones, el Asesor debe generar gestión de cotización;
-- `Comparar` solo se habilita después de verificar backend durable, relaciones, idempotencia y scopes;
-- rebranding Gravicentra conforme a nota rectora;
-- mejoras cosméticas sin impacto operativo.
-
-Documento específico:
+## 15. Evidencias gobernantes
 
 ```text
-orbit360-platform/docs/BACKLOG-POST-GOLIVE-COTIZADOR-COMPARATIVO-RENOVACIONES-Y-PRUEBAS-VIVAS-20260805.md
+orbit360-platform/runtime-gate-crm-v20260716/visual-observable-rootfix-final-sanitized-v20260805.json
+orbit360-platform/runtime-gate-crm-v20260716/visual-observable-rootfix-governing-stop-sanitized-v20260805.json
+orbit360-platform/runtime-gate-crm-v20260716/visual-observable-rootcause-closure-sanitized-v20260805.json
+orbit360-platform/docs/CIERRE-VISUAL-OBSERVABLE-ROOTFIX-LAB-20260805.md
 ```
 
-## 15. Academia y reutilización
+## 16. Academia y reutilización
 
 ```text
 ACADEMIA_ACTUALIZAR
@@ -524,65 +485,28 @@ REPLICABLE_CLAUDE_INMEDIATO
 
 Debe enseñar:
 
-- hidratación estable antes del primer render;
+- required vs optional hydration;
+- no bloquear una vista por una fuente auxiliar;
 - no mostrar KPIs parciales;
-- diagnóstico read-only autoadministrable;
-- estado vacío con alcance temporal;
-- persistencia de sesión sin almacenar contraseña;
-- diferencia entre propuesta, HOLD y cobro confirmado;
-- diferencia entre corrección bloqueante y delta post-corte;
-- diferencia entre prueba técnica, prueba viva y CRUD sintético con rollback;
-- decisiones de Renovaciones por rol y alcance.
+- estados degradados honestos;
+- proyección visual desde memberships sin escritura;
+- diferencia entre prueba técnica, prueba viva y CRUD con rollback;
+- diferencia entre defecto funcional, contrato de datos y validador obsoleto;
+- releases progresivos post-go-live.
 
-## 15.1 Cierre gobernante del run visual
+## 17. Siguiente acción exacta
 
 ```text
-run primario: 31061214801
-preflight: GO_GATE_CONTRACT 20/20
-Hosting deploy: 1
-prueba viva: timeout antes del primer resultado de rol
-rollback Hosting: PASS
-snapshot: VERIFIED_UNCHANGED
-Firestore/Auth/operational writes: 0
-clasificación: VALIDATOR_STALE
+1. mantener Hosting LAB restaurado y congelar nuevas ejecuciones visuales
+2. preparar contrato source-only required/optional de hidratación
+3. corregir MODULE_DEPS/hydrationStatus/wrapModule sin hardcode ni datos tenant
+4. proyectar asesores desde memberships/Equipo sin escritura
+5. validar transversalmente Inicio, Cliente 360, Pólizas, Cobros, Ops, Leads, Conciliaciones y Cancelaciones
+6. actualizar owner, gate, workflow, Plan y Academia juntos
+7. solo con PASS source-only solicitar nueva autorización runtime
+8. después de PASS_VISUAL_POST_AUTH preparar CRUD sintético y retomar Cobros 4.1
 ```
 
-El owner obsoleto no persistió el checkpoint de Auth, membresía, ruta o hidratación que estaba esperando. No existe evidencia suficiente para asignar un defecto funcional al producto.
+## 18. Regla de actualización
 
-Owner de solución preparado:
-
-```text
-tools/orbit360-visual-runtime-rootfix-browser-precheck-v20260805.mjs
-```
-
-El precheck observable registra:
-
-- navegación inicial;
-- carga del rootfix;
-- disponibilidad de Firebase Auth;
-- creación e ingreso con token efímero;
-- entrada a la aplicación;
-- estado de membresía;
-- ruta y estado de hidratación;
-- conteos de snapshots y errores;
-- estado sanitizado y captura en el checkpoint exacto de cualquier timeout.
-
-Validación source-only:
-
-```text
-15/15 controles presentes
-secrets/Firestore/browser/deploy: 0
-```
-
-El request consumido no se repite. Una nueva ejecución requerirá autorización explícita y deberá ejecutar primero el precheck observable; solo con PASS podrá abrir la matriz completa por roles.
-
-Evidencias:
-
-```text
-orbit360-platform/runtime-gate-crm-v20260716/visual-runtime-rootfix-governing-stop-sanitized-v20260805.json
-orbit360-platform/runtime-gate-crm-v20260716/visual-validator-stale-source-closure-sanitized-v20260805.json
-```
-
-## 16. Regla de actualización
-
-Cada iteración actualiza avance, fuente, implementación, evidencia, gate, estado, Plan, PR, Academia y acumulado Claude. Un problema del capturador no bloquea producto, una inferencia no se convierte en cobro por presión de cierre y una póliza nueva posterior al corte no reinicia toda la salida productiva.
+Cada iteración actualiza avance, fuente, implementación, evidencia, gate, estado, Plan, PR, Academia y acumulado Claude. Un fallo del capturador no se atribuye al producto sin checkpoint; una dependencia opcional no debe bloquear un módulo; una inferencia no se convierte en cobro confirmado por presión de cierre; y una póliza nueva posterior al corte no reinicia toda la salida productiva.
