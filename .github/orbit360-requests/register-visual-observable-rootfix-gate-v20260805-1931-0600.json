@@ -1,0 +1,29 @@
+{
+  "schemaVersion": "orbit360-register-visual-observable-rootfix-gate-request-v1",
+  "gateId": "block2.7-visual-observable-rootfix-lab-v20260805",
+  "contractVersion": "2.7.3",
+  "rcId": "RC-AYS-LAB-CANONICA-01",
+  "status": "AUTHORIZED_SOURCE_ONLY_ONCE",
+  "approved": true,
+  "allowedExecutions": 1,
+  "consumed": false,
+  "replayAllowed": false,
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "parentHead": "4350d3106615efd0d67281286d20590f160a1633",
+  "purpose": "Register the new observable visual rootfix gate and exact capability profile before any secret access or runtime execution.",
+  "capabilities": {
+    "secrets": false,
+    "firestoreRead": false,
+    "writes": false,
+    "runtime": false,
+    "browser": false,
+    "deploy": false,
+    "functionsDeploy": false,
+    "rulesDeploy": false,
+    "production": false
+  },
+  "containsPII": false,
+  "containsSecrets": false,
+  "containsPasswords": false
+}
