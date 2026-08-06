@@ -1,5 +1,7 @@
 source-only portable validator canary v5
 base=c1ff4d97ea24e6fb639c0f990805d626fb4c8cb0
+validatorFix=0ce571cfdcd1024653a59a57d2ed8a877db453d3
+synchronize=1
 secrets=false
 firebase=false
 browser=false
