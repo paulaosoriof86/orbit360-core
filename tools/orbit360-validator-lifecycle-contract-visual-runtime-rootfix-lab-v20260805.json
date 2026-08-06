@@ -4,7 +4,7 @@
   "gateId": "block2.7-visual-runtime-rootfix-lab-v20260805",
   "gateContractVersion": "2.7.2",
   "owner": "orbit360-visual-runtime-rootfix-v20260805",
-  "ownerVersion": "20260805.3-authorized-runtime-preflight",
+  "ownerVersion": "20260805.4-runtime-ready-with-rollback",
   "status": "AUTHORIZED_ONCE_PENDING_PREFLIGHT",
   "classification": "AUTHORIZED_HOSTING_LAB_AND_READONLY_BROWSER_ONCE",
   "patternClassification": "REPLICABLE_CLAUDE_INMEDIATO",
@@ -31,6 +31,9 @@
   },
   "hostingTarget": "ays-orbit-360-lab",
   "hostingDeploysMaximum": 1,
+  "hostingBackupCloneAuthorized": true,
+  "hostingRollbackCloneAuthorizedOnFailure": true,
+  "hostingBackupChannelPrefix": "visual-rootfix-backup-",
   "functionsDeploysMaximum": 0,
   "rulesDeploysMaximum": 0,
   "browserMatrix": [
@@ -90,5 +93,5 @@
   "containsPII": false,
   "containsSecrets": false,
   "containsPasswords": false,
-  "nextAction": "REGISTER_GATE_THEN_CREATE_ONE_IMMUTABLE_RUNTIME_REQUEST"
+  "nextAction": "CREATE_ONE_IMMUTABLE_RUNTIME_REQUEST_AND_RUN_CANONICAL_PREFLIGHT"
 }
