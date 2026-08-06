@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "orbit360-visual-rootfix-validator-repair-request-v1",
+  "status": "AUTHORIZED_SOURCE_ONLY_ONCE",
+  "approved": true,
+  "allowedExecutions": 1,
+  "consumed": false,
+  "replayAllowed": false,
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "parentHead": "2c0091eb523599e762e04d9d30a1f63cfe030b43",
+  "reason": "Cerrar VALIDATOR_STALE antes de secretos, Firebase, navegador o deploy",
+  "capabilities": {
+    "secrets": false,
+    "firestoreRead": false,
+    "writes": false,
+    "runtime": false,
+    "browser": false,
+    "deploy": false,
+    "functionsDeploy": false,
+    "rulesDeploy": false,
+    "production": false
+  }
+}
