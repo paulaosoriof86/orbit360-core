@@ -65,6 +65,7 @@ const GATE_CONFIG=Object.freeze({
   "block-auth-foundation-all-team-runtime-v20260805":{contractVersion:"13.7.0",lifecycle:"tools/orbit360-validator-lifecycle-contract-auth-foundation-all-team-runtime-v20260805.json",engine:"tools/orbit360-validar-gate-contracts-engine-auth-foundation-all-team-runtime-v20260805.mjs"},
   "block-auth-foundation-roster-resolution-and-runtime-v20260805":{contractVersion:"13.8.0",lifecycle:"tools/orbit360-validator-lifecycle-contract-auth-foundation-roster-resolution-and-runtime-v20260805.json",engine:"tools/orbit360-validar-gate-contracts-engine-auth-foundation-roster-resolution-and-runtime-v20260805.mjs"},
   "block-auth-selfmanaged-credentials-runtime-v20260805":{contractVersion:"13.9.0",lifecycle:"tools/orbit360-validator-lifecycle-contract-auth-selfmanaged-credentials-runtime-v20260805.json",engine:"tools/orbit360-validar-gate-contracts-engine-auth-selfmanaged-credentials-runtime-v20260805.mjs"},
+  "block2.7-visual-observable-rootfix-v2-lab-v20260805":{contractVersion:"2.7.5",lifecycle:"tools/orbit360-validator-lifecycle-contract-visual-observable-rootfix-v2-lab-v20260805.json",engine:"tools/orbit360-validar-gate-contracts-engine-visual-observable-rootfix-v2-lab-v20260805.mjs"},
   "block2.7-visual-observable-rootfix-lab-v20260805":{contractVersion:"2.7.3",lifecycle:"tools/orbit360-validator-lifecycle-contract-visual-observable-rootfix-lab-v20260805.json",engine:"tools/orbit360-validar-gate-contracts-engine-visual-observable-rootfix-lab-v20260805.mjs"},
   "block2.7-visual-runtime-rootfix-lab-v20260805":{contractVersion:"2.7.2",lifecycle:"tools/orbit360-validator-lifecycle-contract-visual-runtime-rootfix-lab-v20260805.json",engine:"tools/orbit360-validar-gate-contracts-engine-visual-runtime-rootfix-lab-v20260805.mjs"}
 });
@@ -141,6 +142,7 @@ const PHASE_PROFILES=Object.freeze({
   "AUTH_FOUNDATION_ALL_TEAM_RUNTIME":{secrets:true,firestoreRead:true,writes:true,runtime:true,browser:false,deploy:true,functionsDeploy:true,rulesDeploy:false,production:false},
   "AUTH_FOUNDATION_DYNAMIC_TEAM_RUNTIME":{secrets:true,firestoreRead:true,writes:true,runtime:true,browser:false,deploy:true,functionsDeploy:true,rulesDeploy:false,production:false},
   "AUTH_SELFMANAGED_CREDENTIALS_RUNTIME":{secrets:true,firestoreRead:true,writes:true,runtime:true,browser:false,deploy:true,functionsDeploy:true,rulesDeploy:false,production:false},
+  "VISUAL_OBSERVABLE_ROOTFIX_V2_LAB_EXECUTION":{secrets:true,firestoreRead:true,writes:false,runtime:true,browser:true,deploy:true,functionsDeploy:false,rulesDeploy:false,production:false},
   "VISUAL_OBSERVABLE_ROOTFIX_LAB_EXECUTION":{secrets:true,firestoreRead:true,writes:false,runtime:true,browser:true,deploy:true,functionsDeploy:false,rulesDeploy:false,production:false},
   "VISUAL_RUNTIME_ROOTFIX_LAB_EXECUTION":{secrets:true,firestoreRead:true,writes:false,runtime:true,browser:true,deploy:true,functionsDeploy:false,rulesDeploy:false,production:false}
 });

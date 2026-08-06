@@ -1,0 +1,150 @@
+{
+  "schemaVersion": "orbit360-visual-runtime-rootfix-browser-precheck-v1",
+  "gateId": "block2.7-visual-runtime-rootfix-lab-v20260805",
+  "contractVersion": "2.7.2",
+  "stage": "PASS_VISUAL_BROWSER_PRECHECK",
+  "checkpoint": "INICIO_READY_PASS",
+  "checkpoints": [
+    {
+      "checkpoint": "SERVICE_ACCOUNT_VALIDATE",
+      "at": "2026-08-06T03:17:23.547Z"
+    },
+    {
+      "checkpoint": "MEMBERSHIP_READ",
+      "at": "2026-08-06T03:17:23.586Z"
+    },
+    {
+      "checkpoint": "BROWSER_LAUNCH",
+      "at": "2026-08-06T03:17:24.044Z"
+    },
+    {
+      "checkpoint": "PAGE_GOTO",
+      "at": "2026-08-06T03:17:25.580Z"
+    },
+    {
+      "checkpoint": "LOGIN_FORM_PASS",
+      "at": "2026-08-06T03:17:28.223Z"
+    },
+    {
+      "checkpoint": "ROOTFIX_MARKER_WAIT",
+      "at": "2026-08-06T03:17:28.223Z"
+    },
+    {
+      "checkpoint": "ROOTFIX_MARKER_PASS",
+      "at": "2026-08-06T03:17:28.233Z",
+      "elapsedMs": 10
+    },
+    {
+      "checkpoint": "FIREBASE_AUTH_WAIT",
+      "at": "2026-08-06T03:17:28.233Z"
+    },
+    {
+      "checkpoint": "FIREBASE_AUTH_PASS",
+      "at": "2026-08-06T03:17:28.235Z",
+      "elapsedMs": 2
+    },
+    {
+      "checkpoint": "CUSTOM_TOKEN_CREATE",
+      "at": "2026-08-06T03:17:28.235Z"
+    },
+    {
+      "checkpoint": "CUSTOM_TOKEN_SIGNIN",
+      "at": "2026-08-06T03:17:28.303Z"
+    },
+    {
+      "checkpoint": "AUTH_INSIDE_WAIT",
+      "at": "2026-08-06T03:17:28.625Z"
+    },
+    {
+      "checkpoint": "AUTH_INSIDE_PASS",
+      "at": "2026-08-06T03:17:29.067Z",
+      "elapsedMs": 442
+    },
+    {
+      "checkpoint": "REMOVE_EPHEMERAL_OVERLAYS",
+      "at": "2026-08-06T03:17:29.067Z"
+    },
+    {
+      "checkpoint": "INICIO_READY_WAIT",
+      "at": "2026-08-06T03:17:29.070Z"
+    },
+    {
+      "checkpoint": "INICIO_READY_PASS",
+      "at": "2026-08-06T03:17:41.977Z",
+      "elapsedMs": 12907
+    }
+  ],
+  "projectId": "ays-orbit-360-lab",
+  "tenantId": "alianzas-soluciones",
+  "firestoreReads": 1,
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "operationalWrites": 0,
+  "deployExecuted": false,
+  "productionTouched": false,
+  "containsPII": false,
+  "containsSecrets": false,
+  "containsPasswords": false,
+  "ok": true,
+  "membershipHash": "ef23e793fdfeb221",
+  "observedState": {
+    "href": "https://ays-orbit-360-lab.web.app/index.html?orbitBackend=firestore-lab&tenant=alianzas-soluciones&runtime=20260717-2",
+    "authStage": "inside",
+    "preAuth": false,
+    "loginVisible": false,
+    "firebaseUser": true,
+    "productUserReady": true,
+    "membershipStatus": "ready",
+    "membershipReady": true,
+    "membershipTenantBound": true,
+    "route": "inicio",
+    "rootfixLoaded": true,
+    "runtimeDiagnosticInicio": true,
+    "loadingVisible": false,
+    "hostTextLength": 1144,
+    "lab": {
+      "status": "ready",
+      "snapshotAttached": true,
+      "snapshotAttachedCount": 29,
+      "rawCountKeys": [
+        "aseguradoras",
+        "asesores",
+        "cancelaciones",
+        "carteraPrimas",
+        "clientes",
+        "cobros",
+        "comisiones",
+        "gestiones",
+        "metas",
+        "negocios",
+        "polizas",
+        "recibosEsperados",
+        "vehiculos"
+      ],
+      "snapshotErrorKeys": [
+        "__prefs",
+        "acreedores",
+        "actividades",
+        "avisos",
+        "contenidos",
+        "correos",
+        "cursos",
+        "documentos",
+        "facturas",
+        "finmovs",
+        "notifs",
+        "novedades",
+        "plantillas",
+        "presupuesto",
+        "reclamos",
+        "reportes_prog",
+        "tareas"
+      ]
+    }
+  },
+  "consoleErrorCount": 1,
+  "consoleErrors": [
+    "Cannot assign to read only property 'render' of object '#<Object>'"
+  ],
+  "classification": "GO_FULL_VISUAL_MATRIX"
+}

@@ -4,16 +4,16 @@
   "gateId": "block2.7-visual-observable-rootfix-v2-lab-v20260805",
   "gateContractVersion": "2.7.5",
   "owner": "orbit360-visual-observable-rootfix-v2-v20260805",
-  "ownerVersion": "20260805.3-prepared-one-time-self-trigger",
-  "status": "AUTHORIZED_ONCE_PENDING_PREFLIGHT",
-  "classification": "PENDING_GATE_CONTRACT",
+  "ownerVersion": "20260805.5-runtime-consumed-exact-checkpoint",
+  "status": "CONSUMED_STOP_RETRY",
+  "classification": "PIPELINE_MECHANISM_FAILURE",
   "patternClassification": "REPLICABLE_CLAUDE_INMEDIATO",
   "rcId": "RC-AYS-LAB-CANONICA-01",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
   "projectId": "ays-orbit-360-lab",
   "tenantId": "alianzas-soluciones",
-  "currentPhase": "PENDING_PREFLIGHT",
+  "currentPhase": "CONSUMED_STOP_RETRY",
   "executionProfile": {
     "mode": "LAB_HOSTING_OBSERVABLE_READONLY_BROWSER",
     "phase": "VISUAL_OBSERVABLE_ROOTFIX_V2_LAB_EXECUTION",
@@ -41,19 +41,44 @@
       "role": "Direccion",
       "width": 1440,
       "height": 1000,
-      "routes": ["inicio", "cliente360", "polizas", "cobros", "ops", "leads", "conciliaciones", "cancelaciones"]
+      "routes": [
+        "inicio",
+        "cliente360",
+        "polizas",
+        "cobros",
+        "ops",
+        "leads",
+        "conciliaciones",
+        "cancelaciones"
+      ]
     },
     {
       "role": "Operativo",
       "width": 1024,
       "height": 768,
-      "routes": ["inicio", "cliente360", "polizas", "cobros", "ops", "leads", "conciliaciones", "cancelaciones"]
+      "routes": [
+        "inicio",
+        "cliente360",
+        "polizas",
+        "cobros",
+        "ops",
+        "leads",
+        "conciliaciones",
+        "cancelaciones"
+      ]
     },
     {
       "role": "Asesor",
       "width": 390,
       "height": 844,
-      "routes": ["inicio", "cliente360", "polizas", "cobros", "ops", "leads"]
+      "routes": [
+        "inicio",
+        "cliente360",
+        "polizas",
+        "cobros",
+        "ops",
+        "leads"
+      ]
     }
   ],
   "sourcePrerequisites": {
@@ -111,17 +136,17 @@
     "mainTouched": false,
     "mergeRequired": false
   },
-  "activeRequest": true,
-  "requestConsumed": false,
-  "authorizationReserved": true,
+  "activeRequest": false,
+  "requestConsumed": true,
+  "authorizationReserved": false,
   "replayAllowed": false,
-  "allowedExecutions": 1,
-  "executionAuthorized": true,
-  "secretAccessAuthorized": true,
-  "firestoreReadAuthorized": true,
+  "allowedExecutions": 0,
+  "executionAuthorized": false,
+  "secretAccessAuthorized": false,
+  "firestoreReadAuthorized": false,
   "writeAuthorized": false,
-  "browserAuthorized": true,
-  "hostingDeployAuthorized": true,
+  "browserAuthorized": false,
+  "hostingDeployAuthorized": false,
   "functionsDeployAuthorized": false,
   "rulesDeployAuthorized": false,
   "productionAuthorized": false,
@@ -144,5 +169,17 @@
   "containsPII": false,
   "containsSecrets": false,
   "containsPasswords": false,
-  "nextAction": "EXECUTE_CANONICAL_PREFLIGHT_BEFORE_SECRETS"
+  "nextAction": "CLOSE_EXACT_CHECKPOINT_ROOT_CAUSE_WITHOUT_RETRY",
+  "runtimeResult": {
+    "runId": "31067506016",
+    "attempt": 1,
+    "result": "STOP_RETRY",
+    "classification": "PIPELINE_MECHANISM_FAILURE",
+    "checkpoint": "DIRECCION_ROUTE_INICIO_PASS",
+    "hostingDeployAttempted": true,
+    "hostingDeploys": 1,
+    "rollbackRestored": true,
+    "snapshotIntegrity": "VERIFIED_UNCHANGED",
+    "totalRoleFailures": null
+  }
 }

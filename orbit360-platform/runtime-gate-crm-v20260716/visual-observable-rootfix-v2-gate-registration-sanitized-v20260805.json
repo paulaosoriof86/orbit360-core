@@ -1,0 +1,33 @@
+{
+  "schemaVersion": "orbit360-visual-observable-rootfix-v2-gate-registration-v1",
+  "gateId": "block2.7-visual-observable-rootfix-v2-lab-v20260805",
+  "contractVersion": "2.7.5",
+  "status": "PASS_GATE_REGISTRATION",
+  "classification": "VALIDATOR_STALE_CLOSED",
+  "total": 8,
+  "passed": 8,
+  "failed": 0,
+  "failedCheckIds": [],
+  "checks": {
+    "gateRegisteredOnce": true,
+    "phaseRegisteredOnce": true,
+    "contractVersion": true,
+    "lifecycleReference": true,
+    "engineReference": true,
+    "exactCapabilities": true,
+    "validatorSyntax": true,
+    "engineSyntax": true
+  },
+  "secretsRead": false,
+  "firestoreRead": false,
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "operationalWrites": 0,
+  "browserExecuted": false,
+  "deployExecuted": false,
+  "productionTouched": false,
+  "containsPII": false,
+  "containsSecrets": false,
+  "containsPasswords": false,
+  "ok": true
+}
