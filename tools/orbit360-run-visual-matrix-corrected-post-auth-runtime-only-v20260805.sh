@@ -18,6 +18,9 @@ SEALER='tools/orbit360-seal-visual-matrix-corrected-post-auth-runtime-v20260805.
 CLOSURE='orbit360-platform/docs/CIERRE-MATRIZ-VISUAL-CORREGIDA-POST-AUTH-20260805.md'
 ARTIFACT_DIR='orbit360-visual-matrix-corrected-artifacts'
 LAB_URL='https://ays-orbit-360-lab.web.app/index.html?orbitBackend=firestore-lab&tenant=alianzas-soluciones&runtime=20260717-2'
+CANONICAL_BRANCH="${ORBIT360_CANONICAL_BRANCH:-}"
+EVENT_NAME="${GITHUB_EVENT_NAME:-}"
+EVENT_BASE_REF="${GITHUB_BASE_REF:-}"
 
 REGISTRATION_OUTCOME='success'
 PREFLIGHT_OUTCOME='success'
@@ -92,7 +95,10 @@ stop() {
 }
 
 # Preflight canonical already completed in a separate no-secret step.
-[[ "${GITHUB_REF_NAME:-}" == "$BRANCH" ]] || { PREFLIGHT_OUTCOME='failure'; stop; }
+[[ "$CANONICAL_BRANCH" == "$BRANCH" ]] || { PREFLIGHT_OUTCOME='failure'; stop; }
+if [[ "$EVENT_NAME" == 'pull_request' || -n "$EVENT_BASE_REF" ]]; then
+  [[ "$EVENT_BASE_REF" == "$BRANCH" ]] || { PREFLIGHT_OUTCOME='failure'; stop; }
+fi
 [[ "${GITHUB_RUN_ATTEMPT:-1}" == '1' ]] || { PREFLIGHT_OUTCOME='failure'; stop; }
 [[ -f "$REQUEST" && -f "$REGISTRATION" && -f "$PREFLIGHT" ]] || { PREFLIGHT_OUTCOME='failure'; stop; }
 
