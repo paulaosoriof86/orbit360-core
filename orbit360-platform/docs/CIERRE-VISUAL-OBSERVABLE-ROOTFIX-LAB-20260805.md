@@ -45,4 +45,8 @@ wrapModule
 4. Mostrar estado degradado honesto en leaderboard y metas si la proyección opcional no está disponible.
 5. Auditar el mismo contrato en Cliente 360, Pólizas, Cobros, Ops, Leads, Conciliaciones y Cancelaciones.
 
-Salida: `STOP_RETRY`. El request está consumido y no se autoriza otra ejecución runtime hasta obtener PASS source-only del contrato required/optional de hidratación. Hosting LAB permanece restaurado a la versión previa; el rootfix no está vivo ni aprobado visualmente.
+## Frontera del cierre
+
+El workflow source-only opcional de cierre no produjo commit. La causa se cerró directamente mediante el conector, sin nueva solicitud runtime, sin replay y sin acceso adicional a credenciales, Firebase, navegador o Hosting.
+
+Salida: `STOP_RETRY`. El request runtime está consumido y no se autoriza otra ejecución hasta obtener PASS source-only del contrato required/optional de hidratación. Hosting LAB permanece restaurado a la versión previa; el rootfix no está vivo ni aprobado visualmente.
