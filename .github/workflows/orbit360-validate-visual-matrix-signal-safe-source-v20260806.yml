@@ -36,3 +36,5 @@ jobs:
           set -euo pipefail
           node tools/orbit360-test-visual-matrix-timeout-signal-safe-source-v20260806.mjs
           jq -e '.status=="PASS_VISUAL_MATRIX_TIMEOUT_SIGNAL_SAFE_SOURCE" and .total==48 and .passed==48 and .failed==0 and .ok==true and .secretsRead==false and .firestoreReads==0 and .browserExecuted==false and .deployExecuted==false' orbit360-platform/runtime-gate-crm-v20260716/visual-matrix-timeout-signal-safe-source-test-sanitized-v20260806.json >/dev/null
+
+# Availability canary v2: 2026-08-06T11:45:00-06:00
