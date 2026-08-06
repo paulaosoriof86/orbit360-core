@@ -1,6 +1,6 @@
 {
   "schemaVersion": "orbit360-visual-matrix-corrected-post-auth-request-v1",
-  "requestVersion": "20260806.8-registered-relay-runtime",
+  "requestVersion": "20260806.9-portable-preflight-runtime",
   "gateId": "block2.7-visual-matrix-corrected-post-auth-lab-v20260805",
   "contractVersion": "2.7.8",
   "status": "AUTHORIZED_ONCE",
@@ -14,10 +14,10 @@
   "pullRequest": 5,
   "projectId": "ays-orbit-360-lab",
   "tenantId": "alianzas-soluciones",
-  "parentHead": "af404f13e67915de9489faabcc77f3a0c6d23983",
-  "authorizedBaseHead": "af404f13e67915de9489faabcc77f3a0c6d23983",
-  "authorizedAt": "2026-08-06T16:40:00-06:00",
-  "authorizationDirective": "EXPLICIT_MACRO_AUTHORIZATION_RUNTIME_V8_REGISTERED_RELAY_OR_CODEX_FALLBACK",
+  "parentHead": "0a536e2b8a832f8904aec7bfd14eb3c11bf4798e",
+  "authorizedBaseHead": "0a536e2b8a832f8904aec7bfd14eb3c11bf4798e",
+  "authorizedAt": "2026-08-06T17:38:00-06:00",
+  "authorizationDirective": "EXPLICIT_SINGLE_RUNTIME_V9_PORTABLE_PREFLIGHT_RESTORE_BACKUP_HOSTING_LAB_DEPLOY_MATRIX",
   "capabilities": {
     "secrets": true,
     "firestoreRead": true,
@@ -32,6 +32,8 @@
   "scope": {
     "registeredWorkflowRelayRequired": true,
     "registeredWorkflowPath": ".github/workflows/orbit360-claude-paquete-reconciliado-v1205.yml",
+    "portablePreflightRequired": true,
+    "portableJsonGuardRequired": true,
     "hostingOnly": true,
     "hostingDeploysMaximum": 1,
     "hostingBackupClone": true,
@@ -61,6 +63,12 @@
     "captureWarningsNonBlocking": true
   },
   "sourcePrerequisites": {
+    "authorizedSourceHead": "cba0838e89ce07395900e8b12c8c1d0fbf1f5693",
+    "activationHead": "0a536e2b8a832f8904aec7bfd14eb3c11bf4798e",
+    "overlayV8Closed": true,
+    "requestV8Reusable": false,
+    "portablePreflightRootfixStatus": "PASS_SOURCE_ONLY_PORTABLE_PREFLIGHT_ROOTFIX",
+    "portablePreflightRootfixPassed": 17,
     "goGatePreviousStatus": "GO_GATE_CONTRACT",
     "goGatePreviousPassed": 28,
     "authMembershipTenantInicio": "PASS",
@@ -75,11 +83,7 @@
     "firebaseLabVisible": true,
     "requestV6Consumed": true,
     "requestV7FrozenUnconsumed": true,
-    "controlPlaneReferenceRunId": "31128708226",
-    "controlPlaneReferenceResult": "NO_JOBS_WERE_RUN",
-    "controlPlaneRootCause": "CONTROL_PLANE_JOB_CONDITION_EXCLUDED_ALL_JOBS",
-    "registeredRelayRootfixCommit": "5a7135d200414dc768645fe3995246af8c7ead07",
-    "registeredRelayLifecycleCommit": "af404f13e67915de9489faabcc77f3a0c6d23983"
+    "requestV8ClosedStopRetry": true
   },
   "executionResult": null,
   "stopRetryOnAnyFailure": true,
