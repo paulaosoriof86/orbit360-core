@@ -4,19 +4,20 @@
   "gateId": "block10.10-cobros-full-ledger-write-lab-v20260805",
   "gateContractVersion": "10.10.2",
   "owner": "orbit360-cobros-full-ledger-write-lab-v20260805",
-  "ownerVersion": "20260805.4-isolated-run-package-ready",
-  "status": "PRIVATE_PACKAGE_READY_STATIC_NOT_AUTHORIZED",
-  "classification": "STATIC_PACKAGE_READY_NO_ACCESS",
+  "ownerVersion": "20260805.5-static-preflight-pass",
+  "status": "STATIC_PREFLIGHT_PASS_NOT_AUTHORIZED",
+  "classification": "STATIC_ISOLATED_RUN_READY_NO_ACCESS",
   "patternClassification": "BACKEND_PROTEGIDO_NO_CLAUDE",
   "rcId": "RC-AYS-LAB-CANONICA-01",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
   "projectId": "ays-orbit-360-lab",
   "tenantId": "alianzas-soluciones",
-  "currentPhase": "PRIVATE_PACKAGE_READY",
+  "currentPhase": "STATIC_PREFLIGHT_PASS",
   "phases": [
     "PREPARED_STATIC",
     "PRIVATE_PACKAGE_READY",
+    "STATIC_PREFLIGHT_PASS",
     "AUTHORIZED_ONCE",
     "GO_GATE_CONTRACT",
     "SNAPSHOT_VERIFIED",
@@ -27,7 +28,7 @@
   ],
   "executionProfile": {
     "mode": "SOURCE_ONLY",
-    "phase": "PRIVATE_PACKAGE_READY",
+    "phase": "STATIC_PREFLIGHT_PASS",
     "capabilities": {
       "secrets": false,
       "firestoreRead": false,
@@ -148,5 +149,16 @@
   "containsPII": false,
   "containsSecrets": false,
   "containsPasswords": false,
-  "nextAction": "RUN_STATIC_PACKAGE_PREFLIGHT_BUILD_WRITER_AND_PREPARE_ONE_EXPLICIT_LAB_WRITE_AUTHORIZATION"
+  "nextAction": "PREPARE_EXACT_WRITE_REQUEST_AND_WAIT_FOR_ONE_EXPLICIT_LAB_AUTHORIZATION",
+  "staticRequest": {
+    "path": ".github/orbit360-requests/cobros-full-ledger-static-v20260805.json",
+    "commit": "8cdd57f7ff33dc91fe398710a8cd4697f8ad8ba6",
+    "runId": "31058646655",
+    "attempt": 1,
+    "consumed": true,
+    "replayAllowed": false,
+    "result": "PASS",
+    "plannerSourceChecks": 18,
+    "staticContractChecks": 20
+  }
 }
