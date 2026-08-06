@@ -1,0 +1,46 @@
+{
+  "schemaVersion": "orbit360-visual-matrix-lifecycle-sequence-fixture-v1",
+  "gateId": "block2.7-visual-matrix-corrected-post-auth-lab-v20260805",
+  "contractVersion": "2.7.8",
+  "frozenStatus": "STOP_RETRY_PIPELINE_SEQUENCE_FAILURE",
+  "activeStatus": "AUTHORIZED_ONCE_PENDING_EXCLUSIVE_REQUEST",
+  "sourcePass": "PASS_LIFECYCLE_SEQUENCE_SYNTHETIC",
+  "requestPath": ".github/orbit360-requests/visual-matrix-corrected-post-auth-lab-v20260805-authorization.json",
+  "expectedNegativeFailedChecks": [
+    "authorizationReserved",
+    "executionBoundaries"
+  ],
+  "expectedPositiveStatus": "GO_GATE_CONTRACT",
+  "requiredSequence": [
+    "FROZEN_LIFECYCLE",
+    "EXPLICIT_ACTIVATION_PARENT_COMMIT",
+    "SYNTHETIC_ACTIVATION_PASS",
+    "SOLE_FILE_REQUEST_CHILD_COMMIT",
+    "EXACT_PARENT_BINDING",
+    "GO_GATE_CONTRACT"
+  ],
+  "forbiddenDuringSourceTest": {
+    "secretsRead": true,
+    "firestoreRead": true,
+    "firestoreWrites": true,
+    "authWrites": true,
+    "operationalWrites": true,
+    "runtimeExecuted": true,
+    "browserExecuted": true,
+    "deployExecuted": true,
+    "productionTouched": true,
+    "runtimeRequestPersisted": true
+  },
+  "retiredRequestCommits": [
+    "ba993d061a2d55f1703ebaeb0bad2cd9ab8a98ad",
+    "75a50b2176aa4e333fb859169e76d81fb03ed542"
+  ],
+  "retiredRuns": [
+    "31071875782",
+    "31067506016",
+    "31104465513"
+  ],
+  "containsPII": false,
+  "containsSecrets": false,
+  "containsPasswords": false
+}
