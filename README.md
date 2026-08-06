@@ -2,14 +2,12 @@
 
 Repositorio de Orbit 360.
 
-La continuidad operativa vigente de A&S se rige por:
+Fuentes operativas vigentes:
 
 1. `orbit360-platform/docs/FUENTES-RECTORAS-VIGENTES-ORBIT360-AYS-20260730.md`;
 2. `orbit360-platform/docs/PLAN-UNICO-SALIDA-RC-AYS-LAB-CANONICA-01-20260804.md`;
-3. `orbit360-platform/docs/ANEXO-PLAN-UNICO-AUTH-FOUNDATION-ALL-TEAM-SOURCE-ONLY-PASS-20260805.md`;
-4. `orbit360-platform/docs/AUDITORIA-FORENSE-AUTH-SOLUCION-DEFINITIVA-20260805.md`;
-5. `orbit360-platform/docs/AUDITORIA-FORENSE-DIAGNOSTICO-Y-EJECUTOR-LOCAL-20260806.md`;
-6. estado vivo del PR #5.
+3. `orbit360-platform/docs/AUDITORIA-FORENSE-DIAGNOSTICO-Y-EJECUTOR-LOCAL-20260806.md`;
+4. estado vivo del PR #5.
 
 RC activa: `RC-AYS-LAB-CANONICA-01`.
 
