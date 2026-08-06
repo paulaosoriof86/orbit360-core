@@ -135,11 +135,11 @@
   "containsPasswords": false,
   "nextAction": "CLOSE_ROOT_CAUSE_FROM_CURRENT_RUN_WITHOUT_RETRY",
   "runtimeResult": {
-    "runId": "31061214801",
+    "runId": "31061447485",
     "attempt": 1,
     "result": "STOP_RETRY",
-    "hostingDeploys": 1,
-    "rollbackRestored": true,
+    "hostingDeploys": 0,
+    "rollbackRestored": false,
     "snapshotIntegrity": "VERIFIED_UNCHANGED",
     "totalRoleFailures": null
   }
