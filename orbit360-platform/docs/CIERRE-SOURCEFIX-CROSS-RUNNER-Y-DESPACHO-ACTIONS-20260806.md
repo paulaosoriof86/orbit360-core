@@ -1,9 +1,21 @@
-# Cierre sourcefix cross-runner y despacho Actions — 2026-08-06
+# Cierre sourcefix cross-runner y causa externa GitHub Actions — 2026-08-06
 
-## Clasificación
+## Corrección de diagnóstico
 
-- Defecto original: `PIPELINE_MECHANISM_FAILURE`, corregido source-only.
-- Bloqueo actual: `ENVIRONMENT_FAILURE / EVENT_DISPATCH_UNAVAILABLE`.
+La hipótesis de que Actions estaba deshabilitado o restringido en el repositorio queda retirada. La configuración muestra `Permitir todas las acciones y flujos de trabajo reutilizables` ya seleccionada.
+
+## Causa raíz confirmada
+
+```text
+ENVIRONMENT_FAILURE
+GITHUB_ACTIONS_MAJOR_OUTAGE_ACTIVE
+incidentId: qcvjkzcs7j74
+status: investigating
+impact: critical
+componentStatus: major_outage
+```
+
+GitHub Status reporta workflows fallando o demorados, jobs en cola por periodos prolongados, timeouts, capacidad restringida de runners alojados, webhooks retrasados y errores en la API de Actions.
 
 ## Avance visible
 
@@ -11,9 +23,9 @@
 - Runner v3 compatible con Linux/macOS y bloqueado sin autorización.
 - Prueba cross-runner local: `PASS_VISUAL_MATRIX_CROSS_RUNNER_SOURCE`, 24/24.
 - Sourcefix signal-safe conservado: 48/48.
-- Canario macOS PR #25 cerrado sin merge.
-- Eventos intentados: opened, reopened, synchronize y push.
-- Runs/checks creados: 0.
+- Canarios Ubuntu: runs creados, 0 steps, cola prolongada.
+- Canarios macOS/control-plane: sin despacho observable.
+- Síntomas consistentes con el incidente oficial activo.
 
 ## Estado funcional honesto
 
@@ -30,4 +42,4 @@ Cero secretos, Firebase, Firestore/Auth/operational writes, navegador, Hosting, 
 
 ## Siguiente acción exacta
 
-No repetir canarios por PR o push. Restaurar el despacho de GitHub Actions a nivel repositorio/cuenta o autorizar un ejecutor independiente para el runner v3. Después ejecutar una sola validación source-only cross-runner y únicamente con PASS solicitar autorización runtime nueva ligada al HEAD vigente.
+No cambiar permisos ni crear más canarios mientras GitHub Status permanezca `investigating/major_outage`. Cuando el incidente pase a `monitoring` o `resolved` y exista capacidad observable, ejecutar exactamente una validación source-only cross-runner. Solo con PASS solicitar una autorización runtime nueva ligada al HEAD vigente y ejecutar recuperación Hosting + matriz completa con runner v3.
