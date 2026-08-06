@@ -17,7 +17,6 @@ const REQUEST_REL = process.env.ORBIT360_REQUEST_FILE || '';
 
 const read = rel => JSON.parse(fs.readFileSync(path.join(ROOT, rel), 'utf8'));
 const text = rel => fs.readFileSync(path.join(ROOT, rel), 'utf8');
-const exists = rel => !!rel && fs.existsSync(path.join(ROOT, rel));
 const syntaxOk = (source, filename) => {
   try { new vm.Script(source, { filename }); return true; }
   catch { return false; }
@@ -46,6 +45,7 @@ try {
     production: false
   };
   const caps = lifecycle.executionProfile && lifecycle.executionProfile.capabilities || {};
+  const directWritePattern = /runTransaction|writeBatch|firebase-admin|FieldValue|\.doc\([^)]*\)\.(?:set|update|delete)\s*\(|\.collection\([^)]*\)\.add\s*\(/;
   const checks = {
     gateArgument: process.argv[2] === GATE_ID,
     lifecycleGate: lifecycle.gateId === GATE_ID,
@@ -84,6 +84,8 @@ try {
     requestBoundaries: request.scope
       && request.scope.hostingDeploysMaximum === 1
       && request.scope.hostingOnly === true
+      && request.scope.hostingBackupClone === true
+      && request.scope.hostingRollbackCloneOnFailure === true
       && request.scope.functionsDeploy === false
       && request.scope.rulesDeploy === false
       && request.scope.firestoreWrites === false
@@ -106,12 +108,16 @@ try {
     rootfixBoundaries: rootfix.includes("var VERSION = '20260805.1'")
       && rootfix.includes('Mantener sesión iniciada en este dispositivo')
       && rootfix.includes('Ejecutar prueba en vivo')
-      && !/firebase\s+deploy|runTransaction|writeBatch|\.set\(|\.add\(|\.delete\(/.test(rootfix),
+      && !/firebase\s+deploy/.test(rootfix)
+      && !directWritePattern.test(rootfix),
     loaderReferencesRootfix: loader.includes("write('core/visual-runtime-rootfix-v20260805.js?v=20260805-1')"),
     hostingBoundary: lifecycle.hostingTarget === 'ays-orbit-360-lab'
       && lifecycle.hostingDeploysMaximum === 1
       && lifecycle.functionsDeploysMaximum === 0
-      && lifecycle.rulesDeploysMaximum === 0,
+      && lifecycle.rulesDeploysMaximum === 0
+      && lifecycle.hostingBackupCloneAuthorized === true
+      && lifecycle.hostingRollbackCloneAuthorizedOnFailure === true
+      && lifecycle.hostingBackupChannelPrefix === 'visual-rootfix-backup-',
     browserMatrix: Array.isArray(lifecycle.browserMatrix)
       && lifecycle.browserMatrix.length === 3
       && lifecycle.browserMatrix.some(x => x.role === 'Direccion' && x.width === 1440 && x.height === 1000)
@@ -146,6 +152,8 @@ try {
     hostingDeployAuthorized: !failedCheckIds.length,
     hostingTarget: 'ays-orbit-360-lab',
     hostingDeploysMaximum: 1,
+    hostingBackupCloneAuthorized: !failedCheckIds.length,
+    hostingRollbackCloneAuthorizedOnFailure: !failedCheckIds.length,
     functionsDeployAuthorized: false,
     rulesDeployAuthorized: false,
     productionAuthorized: false,
