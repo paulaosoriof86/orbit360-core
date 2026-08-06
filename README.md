@@ -11,7 +11,8 @@ La continuidad operativa vigente de A&S se rige por:
 5. `orbit360-platform/runtime-gate-crm-v20260716/auth-foundation-all-team-source-only-sanitized-v20260805.json`;
 6. `orbit360-platform/docs/ESTADO-ACTIVO-AUTH-FOUNDATION-ALL-TEAM-SOURCE-ONLY-PASS-BLOQUE4-CONTINUA-20260805.md`;
 7. `orbit360-platform/docs/ESTADO-ACTIVO-BLOQUE-4-COBROS-FULL-REPLAY-20260805.md`;
-8. estado vivo del PR #5.
+8. `orbit360-platform/docs/AUDITORIA-FORENSE-DIAGNOSTICO-Y-EJECUTOR-LOCAL-20260806.md`;
+9. estado vivo del PR #5.
 
 RC activa:
 
@@ -70,6 +71,29 @@ Runtime v7 anterior: no ejecutado
 ```
 
 La siguiente frontera es una sola ejecución runtime acumulativa para los siete usuarios actuales, con bootstrap Admin SDK, reconciliación de memberships, correos de establecimiento/recuperación, sesiones verificadas e integridad CRM.
+
+## Rootfix visual post-Auth
+
+```text
+GO_GATE_CONTRACT: 28/28 PASS
+Auth/membership/tenant/Inicio: PASS
+precheck: PASS_VISUAL_BROWSER_PRECHECK / INICIO_READY_PASS
+signal-safe sourcefix: 48/48 PASS
+cross-runner portable: 24/24 PASS
+matriz completa: pendiente
+PASS_VISUAL_POST_AUTH: NO
+```
+
+El request v6 está consumido y no se reutiliza. El timeout interno de la matriz fue un `PIPELINE_MECHANISM_FAILURE` corregido. La indisponibilidad posterior corresponde a un incidente activo de GitHub Actions y no invalida el producto.
+
+Durante el outage, la ruta inmediata deja de depender de Actions y usa el ejecutor local Windows autenticado:
+
+```text
+tools/orbit360-launch-local-windows-source-only-v20260806.cmd
+tools/orbit360-preflight-local-windows-source-only-v20260806.mjs
+```
+
+El preflight es source-only, usa worktree aislado, verifica Firebase LAB, credencial presente sin leerla, shim Node de contratos, 24/24 + 48/48 y no despliega. Solo con PASS corresponde un nuevo request local-runtime inmutable y una única ejecución macro de recuperación Hosting + matriz.
 
 ## Cobros
 
