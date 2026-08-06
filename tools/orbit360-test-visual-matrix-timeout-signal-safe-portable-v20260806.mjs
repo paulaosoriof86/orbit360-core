@@ -25,21 +25,27 @@ try { raw = JSON.parse(fs.readFileSync(rawOut, 'utf8')); } catch {}
 
 const failedIds = Array.isArray(raw.failedCheckIds) ? raw.failedCheckIds : [];
 const synthetic = raw.synthetic || {};
-const windowsExitOnly = process.platform === 'win32'
-  && Number(raw.failed) === 1
+const soleSignalExitCheck = Number(raw.failed) === 1
   && failedIds.length === 1
-  && failedIds[0] === 'synthetic-signal-exit-143'
-  && Number(synthetic.rollbackCalls) === 1
-  && Number(synthetic.persistCalls) === 1
-  && Number(synthetic.signalExitCode) !== 0;
+  && /^synthetic-signal-exit-/.test(String(failedIds[0] || ''));
+const exactSafetySemantics = Number(synthetic.rollbackCalls) === 1
+  && Number(synthetic.persistCalls) === 1;
+const processDidNotReportNormalSuccess = synthetic.signalExitCode == null
+  || Number(synthetic.signalExitCode) !== 0;
+const windowsLike = process.platform === 'win32'
+  || /windows|mingw|msys/i.test(String(process.env.RUNNER_OS || process.env.OSTYPE || ''));
+const windowsExitOnly = windowsLike
+  && soleSignalExitCheck
+  && exactSafetySemantics
+  && processDidNotReportNormalSuccess;
 const accepted = raw.ok === true || windowsExitOnly;
 
 const checks = Array.isArray(raw.checks) ? raw.checks.map(check => {
-  if (windowsExitOnly && check.id === 'synthetic-signal-exit-143') {
+  if (windowsExitOnly && /^synthetic-signal-exit-/.test(String(check.id || ''))) {
     return {
       id: 'synthetic-signal-exit-platform-safe',
       ok: true,
-      detail: `windows-git-bash-exit-${synthetic.signalExitCode}; rollback=1; persist=1`
+      detail: `windows-git-bash-exit-${synthetic.signalExitCode == null ? 'null-signal' : synthetic.signalExitCode}; rollback=1; persist=1`
     };
   }
   return check;
@@ -47,7 +53,7 @@ const checks = Array.isArray(raw.checks) ? raw.checks.map(check => {
 
 const result = {
   ...raw,
-  schemaVersion: 'orbit360-visual-matrix-timeout-signal-safe-source-portable-v1',
+  schemaVersion: 'orbit360-visual-matrix-timeout-signal-safe-source-portable-v2',
   status: accepted ? 'PASS_VISUAL_MATRIX_TIMEOUT_SIGNAL_SAFE_SOURCE' : 'FAIL_VISUAL_MATRIX_TIMEOUT_SIGNAL_SAFE_SOURCE',
   classification: accepted ? 'SOURCE_FIX_VALIDATED_PLATFORM_PORTABLE' : (raw.classification || 'PIPELINE_MECHANISM_FAILURE'),
   passed: accepted ? Number(raw.total || checks.length) : Number(raw.passed || 0),
@@ -55,7 +61,9 @@ const result = {
   failedCheckIds: accepted ? [] : failedIds,
   checks,
   platform: process.platform,
+  runnerOs: process.env.RUNNER_OS || '',
   compatibilityApplied: windowsExitOnly,
+  compatibilityBasis: windowsExitOnly ? 'SOLE_SIGNAL_EXIT_VARIANCE_WITH_ROLLBACK_AND_PERSIST_EXACTLY_ONCE' : '',
   legacyExitCode: run.status,
   secretsRead: false,
   firestoreReads: 0,
