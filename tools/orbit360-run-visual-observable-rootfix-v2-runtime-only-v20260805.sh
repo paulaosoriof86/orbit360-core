@@ -135,6 +135,8 @@ mkdir -p "$ARTIFACT_DIR"
 export ORBIT360_PROJECT_ID="$PROJECT"
 export ORBIT360_TENANT_ID="$TENANT"
 export ORBIT360_LAB_URL="$LAB_URL"
+export ORBIT360_GATE_ID='block2.7-visual-observable-rootfix-v2-lab-v20260805'
+export ORBIT360_CONTRACT_VERSION='2.7.5'
 export ORBIT360_BROWSER_PRECHECK_EVIDENCE="$PRECHECK"
 export ORBIT360_BROWSER_PRECHECK_SCREENSHOT="$ARTIFACT_DIR/precheck-failure.png"
 if node tools/orbit360-visual-runtime-rootfix-browser-precheck-v20260805.mjs \

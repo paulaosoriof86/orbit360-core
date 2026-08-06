@@ -1,7 +1,7 @@
 # PLAN ÚNICO DE SALIDA — RC-AYS-LAB-CANONICA-01
 
 Fecha de adopción: 2026-08-04  
-Última actualización: 2026-08-05 20:34 GT  
+Última actualización: 2026-08-05 21:35 GT
 Rama obligatoria: `ays/backend-tenant-lab-v99-20260703`  
 PR: #5 draft/open  
 Producción, `main` y merge: no autorizados
@@ -536,3 +536,49 @@ Debe enseñar:
 ## 18. Regla de actualización
 
 Cada iteración actualiza avance, fuente, implementación, evidencia, gate, estado, Plan, PR, Academia y acumulado Claude. Un fallo del capturador no se atribuye al producto sin checkpoint; una dependencia opcional no bloquea un módulo; un fallo de Actions no consume una autorización que nunca llegó al gate; una inferencia no se convierte en cobro confirmado por presión de cierre; y una póliza nueva posterior al corte no reinicia toda la salida productiva.
+
+
+## 19. Ejecución visual v2 y causa raíz gobernante
+
+```text
+run: 31067506016
+gate: block2.7-visual-observable-rootfix-v2-lab-v20260805
+contract: 2.7.5
+GO_GATE_CONTRACT: 26/26 PASS
+backup Hosting: PASS
+Hosting LAB deploys: 1
+precheck: PASS · INICIO_READY_PASS
+Dirección / Inicio: PASS
+matriz: STOP_RETRY
+checkpoint exacto: DIRECCION_SCREENSHOT_FULLPAGE_TIMEOUT
+clasificación: PIPELINE_MECHANISM_FAILURE
+rollback: PASS
+snapshot: VERIFIED_UNCHANGED
+writes/Functions/Rules/reimport/production/main/merge: 0
+```
+
+El rootfix required/optional superó el precheck y Dirección/Inicio cargó. La matriz se detuvo exclusivamente porque la captura `fullPage` agotó 30 segundos. La evidencia auxiliar no puede gobernar el resultado funcional.
+
+Correctivo source-only:
+
+```text
+PASS_VISUAL_CAPTURE_SOURCEFIX · 20/20
+captura viewport · 12000 ms · no bloqueante
+runtime/deploy: 0
+```
+
+La autorización fue consumida; no se permite replay. `PASS_VISUAL_POST_AUTH` sigue pendiente.
+
+## 20. Siguiente acción exacta vigente
+
+```text
+1. mantener Hosting LAB restaurado y no repetir el run 31067506016
+2. conservar como evidencia cruda el último checkpoint DIRECCION_ROUTE_INICIO_PASS
+3. gobernar con el checkpoint exacto DIRECCION_SCREENSHOT_FULLPAGE_TIMEOUT
+4. revisar source-only el warning no causal "Cannot assign to read only property render"
+5. validar source-only el capturador acotado y no bloqueante
+6. solicitar autorización nueva únicamente para una futura prueba runtime
+7. no reanudar Cobros 4.1 hasta PASS_VISUAL_POST_AUTH
+```
+
+Este bloque reemplaza cualquier “siguiente acción” anterior incompatible con el run 31067506016.

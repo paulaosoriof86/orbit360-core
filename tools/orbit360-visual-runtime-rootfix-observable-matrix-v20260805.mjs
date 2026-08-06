@@ -12,6 +12,9 @@ const TENANT = process.env.ORBIT360_TENANT_ID || 'alianzas-soluciones';
 const BASE_URL = process.env.ORBIT360_LAB_URL || 'https://ays-orbit-360-lab.web.app/index.html?orbitBackend=firestore-lab&tenant=alianzas-soluciones&runtime=20260717-2';
 const OUT_DIR = process.env.ORBIT360_VISUAL_ARTIFACT_DIR || 'orbit360-visual-observable-artifacts';
 const EVIDENCE = process.env.ORBIT360_VISUAL_EVIDENCE || 'orbit360-platform/runtime-gate-crm-v20260716/visual-observable-rootfix-matrix-sanitized-v20260805.json';
+const GATE_ID = process.env.ORBIT360_GATE_ID || 'block2.7-visual-observable-rootfix-v2-lab-v20260805';
+const CONTRACT_VERSION = process.env.ORBIT360_CONTRACT_VERSION || '2.7.5';
+const CAPTURE_TIMEOUT_MS = 12000;
 const CANONICAL = ['clientes', 'aseguradoras', 'polizas', 'vehiculos', 'recibosEsperados', 'carteraPrimas', 'cobros'];
 const LEGACY = ['asesores', 'comisiones', 'negocios', 'gestiones', 'cancelaciones'];
 const MATRIX = [
@@ -39,8 +42,8 @@ fs.mkdirSync(path.dirname(EVIDENCE), { recursive: true });
 
 const result = {
   schemaVersion: 'orbit360-visual-observable-rootfix-matrix-v1',
-  gateId: 'block2.7-visual-observable-rootfix-lab-v20260805',
-  contractVersion: '2.7.3',
+  gateId: GATE_ID,
+  contractVersion: CONTRACT_VERSION,
   stage: 'STARTED',
   classification: '',
   projectId: PROJECT,
@@ -50,6 +53,7 @@ const result = {
   before: null,
   after: null,
   roles: [],
+  captureWarnings: [],
   firestoreReads: 0,
   firestoreWrites: 0,
   authWrites: 0,
@@ -182,18 +186,32 @@ async function installEvidenceMask(page) {
   });
 }
 async function capture(page, name) {
-  await installEvidenceMask(page);
-  const target = path.join(OUT_DIR, name + '.png');
-  await page.screenshot({ path: target, fullPage: true });
-  return path.basename(target);
+  try {
+    await installEvidenceMask(page);
+    const target = path.join(OUT_DIR, name + '.png');
+    await page.screenshot({
+      path: target,
+      fullPage: false,
+      animations: 'disabled',
+      caret: 'hide',
+      timeout: CAPTURE_TIMEOUT_MS
+    });
+    return path.basename(target);
+  } catch (error) {
+    result.captureWarnings.push({
+      checkpoint: result.currentCheckpoint,
+      name: clean(name),
+      error: clean(error && error.message || error),
+      blocking: false
+    });
+    write();
+    return '';
+  }
 }
 async function failureCapture(page, checkpoint) {
-  try {
-    const file = await capture(page, 'failure-' + norm(checkpoint).replace(/\s+/g, '-'));
-    result.failureScreenshot = file;
-  } catch (error) {
-    result.failureScreenshotError = clean(error && error.message || error);
-  }
+  const file = await capture(page, 'failure-' + norm(checkpoint).replace(/\s+/g, '-'));
+  if (file) result.failureScreenshot = file;
+  else result.failureScreenshotError = 'CAPTURE_UNAVAILABLE_NON_BLOCKING';
 }
 async function removeBlockingOverlays(page) {
   await page.evaluate(() => {
@@ -371,6 +389,8 @@ async function testRole(browser, matrix, member, targets) {
       }
     }
 
+    const roleCaptureWarnings = result.captureWarnings.filter(item => String(item.name || '').startsWith(role.toLowerCase() + '-'));
+    add('screenshots-best-effort', roleCaptureWarnings.length === 0, roleCaptureWarnings.map(item => item.error).slice(0, 3).join(' | '), 'WARN');
     add('console-errors-zero', consoleErrors.length === 0, consoleErrors.slice(0, 5).join(' | '), 'WARN');
     const failed = checks.filter(check => !check.ok && check.level === 'FAIL');
     const warnings = checks.filter(check => !check.ok && check.level === 'WARN');
@@ -385,7 +405,7 @@ async function testRole(browser, matrix, member, targets) {
       failed: failed.length,
       warnings: warnings.length,
       consoleErrorCount: consoleErrors.length,
-      screenshots,
+      screenshots: screenshots.filter(Boolean),
       ok: failed.length === 0
     };
     mark(role.toUpperCase() + '_COMPLETE', { failed: failed.length, warnings: warnings.length });

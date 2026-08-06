@@ -299,7 +299,7 @@ La autorización del run fue consumida. No existe autorización para otro navega
 write(CLOSURE, closure);
 
 let plan = read(PLAN);
-plan = plan.replace(/Última actualización: .*GT  /, 'Última actualización: 2026-08-05 21:35 GT  ');
+plan = plan.replace(/Última actualización: .*GT(?:  )?/, 'Última actualización: 2026-08-05 21:35 GT');
 const planBlock = `
 
 ## 19. Ejecución visual v2 y causa raíz gobernante
