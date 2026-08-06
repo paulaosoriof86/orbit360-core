@@ -7,6 +7,9 @@ GATE='block2.7-visual-matrix-corrected-post-auth-lab-v20260805'
 OUT='orbit360-platform/runtime-gate-crm-v20260716/visual-matrix-corrected-post-auth-preflight-sanitized-v20260805.json'
 CANONICAL='orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json'
 NODE_BIN="${ORBIT360_NODE_BIN:-node}"
+CANONICAL_BRANCH="${ORBIT360_CANONICAL_BRANCH:-}"
+EVENT_NAME="${GITHUB_EVENT_NAME:-}"
+EVENT_BASE_REF="${GITHUB_BASE_REF:-}"
 
 emit_wrapper_failure() {
   local check_id="$1"
@@ -19,7 +22,7 @@ emit_wrapper_failure() {
     --arg detail "$detail" \
     --argjson exitCode "$exit_code" '
     {
-      schemaVersion:"orbit360-visual-matrix-corrected-post-auth-preflight-wrapper-v3",
+      schemaVersion:"orbit360-visual-matrix-corrected-post-auth-preflight-wrapper-v4",
       gateId:$gate,
       contractVersion:"2.7.8",
       status:"STOP_PREFLIGHT_WRAPPER",
@@ -50,7 +53,10 @@ emit_wrapper_failure() {
   exit "$exit_code"
 }
 
-[[ "${GITHUB_REF_NAME:-}" == "$BRANCH" ]] || emit_wrapper_failure 'BRANCH_MISMATCH' 'GITHUB_REF_NAME does not match the canonical branch.'
+[[ "$CANONICAL_BRANCH" == "$BRANCH" ]] || emit_wrapper_failure 'ORBIT360_CANONICAL_BRANCH_MISMATCH' 'ORBIT360_CANONICAL_BRANCH does not match the canonical branch.'
+if [[ "$EVENT_NAME" == 'pull_request' || -n "$EVENT_BASE_REF" ]]; then
+  [[ "$EVENT_BASE_REF" == "$BRANCH" ]] || emit_wrapper_failure 'PULL_REQUEST_BASE_REF_MISMATCH' 'GITHUB_BASE_REF does not match the canonical pull request base branch.'
+fi
 [[ "${GITHUB_RUN_ATTEMPT:-1}" == '1' ]] || emit_wrapper_failure 'RUN_ATTEMPT_NOT_ONE' 'Only the first workflow attempt is authorized.'
 [[ -f "$REQUEST" ]] || emit_wrapper_failure 'REQUEST_FILE_MISSING' 'The exclusive authorization request file is absent.'
 
