@@ -1,0 +1,7 @@
+runtime visual matrix v7 one-shot trigger
+request=5386ca5bbdc5a1918b7077576cadaeea6c937a2a
+branch=ays/backend-tenant-lab-v99-20260703
+secrets=after-go-gate-only
+hosting-deploys-maximum=1
+production=false
+merge=false
