@@ -46,3 +46,17 @@ runtime/deploy/secrets/Firestore: 0
 ```
 
 La autorización del run fue consumida. No existe autorización para otro navegador o deploy. `PASS_VISUAL_POST_AUTH` continúa pendiente.
+
+
+## Warning no causal cerrado
+
+```text
+warning: Cannot assign to read only property 'render'
+clasificación: FUNCTIONAL_DEFECT
+causal del STOP: NO
+owner: orbit360-platform/core/visual-runtime-rootfix-v20260805.js
+sourcefix: PASS_READONLY_MODULE_WRAPPER_SOURCEFIX · 15/15
+runtime/deploy/secrets/Firestore: 0
+```
+
+El wrapper ahora detecta módulos inmutables, usa un proxy en el registro cuando es posible y conserva un observador de render como fallback. No vuelve a escribir directamente sobre un módulo congelado.

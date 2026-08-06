@@ -20,6 +20,8 @@
   var installAttempts = 0;
   var summaryCache = null;
   var summaryCacheBuiltAt = 0;
+  var moduleWrapState = {};
+  var afterRenderObserver = null;
   var SUMMARY_COLLECTIONS = ['clientes', 'polizas', 'cobros', 'comisiones'];
   var MODULE_DEPS = {
     inicio: ['clientes', 'polizas', 'cobros', 'asesores', 'aseguradoras'],
@@ -343,11 +345,49 @@
     if (moduleName === 'conciliaciones' || moduleName === 'cancelaciones') explainEmptyStates(moduleName, host);
   }
 
+  function installAfterRenderObserver() {
+    if (afterRenderObserver) return true;
+    var host = document.getElementById('host');
+    if (!host) return false;
+    var scheduled = false;
+    function apply() {
+      scheduled = false;
+      if (document.body.classList.contains('pre-auth')) return;
+      var route = Orbit.route && Orbit.route.key;
+      if (!route) return;
+      try { afterRender(route, host); }
+      catch (error) {
+        window.OrbitRuntimeDiagnostics = window.OrbitRuntimeDiagnostics || {};
+        OrbitRuntimeDiagnostics[route] = Object.assign({}, OrbitRuntimeDiagnostics[route] || {}, {
+          version: VERSION,
+          afterRenderWarning: text(error && (error.message || error) || error),
+          afterRenderFallback: true
+        });
+      }
+    }
+    function schedule() {
+      if (scheduled) return;
+      scheduled = true;
+      setTimeout(apply, 0);
+    }
+    afterRenderObserver = new MutationObserver(schedule);
+    afterRenderObserver.observe(host, { childList: true, subtree: true });
+    window.addEventListener('hashchange', schedule);
+    schedule();
+    return true;
+  }
+
   function wrapModule(moduleName, deps) {
-    var mod = Orbit.modules && Orbit.modules[moduleName];
-    if (!mod || typeof mod.render !== 'function' || mod.__visualRootfixV20260805) return false;
+    if (moduleWrapState[moduleName]) return true;
+    var registry = Orbit.modules;
+    var mod = registry && registry[moduleName];
+    if (!mod || typeof mod.render !== 'function') return false;
+    if (mod.__visualRootfixV20260805) {
+      moduleWrapState[moduleName] = 'existing';
+      return true;
+    }
     var original = mod.render.bind(mod);
-    mod.render = function (host) {
+    var wrappedRender = function (host) {
       var state = hydrationStatus(deps || []);
       if (!state.ready) {
         host.innerHTML = loadingHtml(moduleName, state);
@@ -363,7 +403,36 @@
       setTimeout(function () { afterRender(moduleName, host); }, 0);
       return output;
     };
-    mod.__visualRootfixV20260805 = { version: VERSION, original: original, deps: deps.slice() };
+    var marker = { version: VERSION, original: original, deps: deps.slice() };
+    try {
+      var renderDescriptor = Object.getOwnPropertyDescriptor(mod, 'render');
+      var moduleMutable = !Object.isFrozen(mod) && (!renderDescriptor || renderDescriptor.writable !== false || typeof renderDescriptor.set === 'function');
+      if (moduleMutable) {
+        mod.render = wrappedRender;
+        try { mod.__visualRootfixV20260805 = marker; } catch (error) {}
+        moduleWrapState[moduleName] = 'direct';
+        return true;
+      }
+      var registryDescriptor = Object.getOwnPropertyDescriptor(registry, moduleName);
+      var registryMutable = !Object.isFrozen(registry) && (!registryDescriptor || registryDescriptor.writable !== false || typeof registryDescriptor.set === 'function' || registryDescriptor.configurable === true);
+      if (registryMutable) {
+        var replacement = Object.create(mod);
+        Object.defineProperty(replacement, 'render', { value: wrappedRender, writable: true, configurable: true, enumerable: true });
+        Object.defineProperty(replacement, '__visualRootfixV20260805', { value: marker, writable: false, configurable: false, enumerable: false });
+        registry[moduleName] = replacement;
+        moduleWrapState[moduleName] = 'registry-proxy';
+        return true;
+      }
+      moduleWrapState[moduleName] = 'observer-fallback';
+    } catch (error) {
+      moduleWrapState[moduleName] = 'observer-fallback';
+      window.OrbitRuntimeDiagnostics = window.OrbitRuntimeDiagnostics || {};
+      OrbitRuntimeDiagnostics[moduleName] = Object.assign({}, OrbitRuntimeDiagnostics[moduleName] || {}, {
+        version: VERSION,
+        wrapWarning: text(error && (error.message || error) || error),
+        wrapperMode: 'observer-fallback'
+      });
+    }
     return true;
   }
 
@@ -371,6 +440,7 @@
     injectStyles(); enhanceLogin(); patchFirebasePersistence();
     if (!Orbit.store || !Orbit.q || !Orbit.modules) return false;
     patchClientSummary();
+    installAfterRenderObserver();
     var wrapped = 0;
     Object.keys(MODULE_DEPS).forEach(function (name) { if (wrapModule(name, MODULE_DEPS[name])) wrapped += 1; });
     if (wrapped && document.body && !document.body.dataset.visualRootfixV20260805) {

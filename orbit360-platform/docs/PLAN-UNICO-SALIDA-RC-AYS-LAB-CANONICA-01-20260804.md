@@ -582,3 +582,23 @@ La autorización fue consumida; no se permite replay. `PASS_VISUAL_POST_AUTH` si
 ```
 
 Este bloque reemplaza cualquier “siguiente acción” anterior incompatible con el run 31067506016.
+
+
+## 21. Warning no causal de módulos inmutables
+
+El precheck del run 31067506016 registró:
+
+```text
+Cannot assign to read only property 'render' of object '#<Object>'
+```
+
+Clasificación:
+
+```text
+FUNCTIONAL_DEFECT no causal
+owner: core/visual-runtime-rootfix-v20260805.js · wrapModule
+sourcefix: PASS_READONLY_MODULE_WRAPPER_SOURCEFIX · 15/15
+runtime/deploy: 0
+```
+
+El rootfix ya no escribe directamente sobre módulos congelados. Usa proxy de registro o fallback observable. Todos los defectos source-only conocidos del run 31067506016 quedan cerrados; una futura matriz requiere autorización nueva.
