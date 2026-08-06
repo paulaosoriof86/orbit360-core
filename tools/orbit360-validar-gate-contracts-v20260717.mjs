@@ -11,6 +11,7 @@ const NEW_GATE_ID = 'block2.7-visual-matrix-corrected-post-auth-lab-v20260805';
 const LEGACY_ROUTER = 'tools/orbit360-validar-gate-contracts-legacy-v20260717.mjs';
 const EVIDENCE_REL = 'orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json';
 const EVIDENCE_PATH = path.join(ROOT, EVIDENCE_REL);
+const DEFAULT_REQUEST_REL = '.github/orbit360-requests/visual-matrix-corrected-post-auth-lab-v20260805-authorization.json';
 const CANONICAL_LIFECYCLE_COMPOSITION = 'phase-capability-contract-v1';
 const NEW_GATE_CONFIG = Object.freeze({
   "block2.7-visual-matrix-corrected-post-auth-lab-v20260805":{contractVersion:"2.7.8",lifecycle:"tools/orbit360-validator-lifecycle-contract-visual-matrix-corrected-post-auth-lab-v20260805.json",engine:"tools/orbit360-validar-gate-contracts-engine-visual-matrix-corrected-post-auth-lab-v20260805.mjs"}
@@ -24,7 +25,7 @@ function writeEvidence(payload) {
   fs.writeFileSync(EVIDENCE_PATH, JSON.stringify(payload, null, 2) + '\n', 'utf8');
 }
 function readJson(rel) {
-  return JSON.parse(fs.readFileSync(path.join(ROOT, rel), 'utf8'));
+  return JSON.parse(fs.readFileSync(path.join(ROOT, rel), 'utf8').replace(/^\uFEFF/, ''));
 }
 function exactCapabilities(actual, expected) {
   const a = Object.keys(actual || {}).sort();
@@ -81,9 +82,17 @@ try {
   if (!expected) throw new Error('CANONICAL_LIFECYCLE_PHASE_MISMATCH');
   if (!exactCapabilities(profile.capabilities || {}, expected)) throw new Error('CANONICAL_LIFECYCLE_CAPABILITY_MISMATCH');
 
+  const requestFile = process.env.ORBIT360_REQUEST_FILE || DEFAULT_REQUEST_REL;
+  const requestAbs = path.join(ROOT, requestFile);
+  if (!fs.existsSync(requestAbs) || !fs.statSync(requestAbs).isFile()) throw new Error('CANONICAL_REQUEST_FILE_UNAVAILABLE');
+
   const run = spawnSync(process.execPath, [config.engine, GATE_ID], {
     cwd: ROOT,
-    env: { ...process.env, ORBIT360_BRANCH: 'ays/backend-tenant-lab-v99-20260703' },
+    env: {
+      ...process.env,
+      ORBIT360_BRANCH: 'ays/backend-tenant-lab-v99-20260703',
+      ORBIT360_REQUEST_FILE: requestFile
+    },
     encoding: 'utf8',
     maxBuffer: 32 * 1024 * 1024
   });
@@ -97,7 +106,7 @@ try {
     canonicalEngine: config.engine,
     canonicalLifecycleContract: config.lifecycle,
     canonicalLifecycleComposition: CANONICAL_LIFECYCLE_COMPOSITION,
-    canonicalRouterVersion: 'v2-independent-gate-extension',
+    canonicalRouterVersion: 'v3-request-path-propagation-portable',
     legacyDelegate: LEGACY_ROUTER,
     legacyDelegateBlob: '03d1c45db555a3e482afb4be6aaf8d29c74a79dc',
     engineEvidenceSource: 'sync-file-evidence-not-stdout-v1',
@@ -121,7 +130,7 @@ try {
 } catch (error) {
   const config = NEW_GATE_CONFIG[GATE_ID] || {};
   output = {
-    schemaVersion: 'orbit360-gate-contract-preflight-canonical-router-v2',
+    schemaVersion: 'orbit360-gate-contract-preflight-canonical-router-v3',
     gateId: GATE_ID,
     contractVersion: config.contractVersion || '',
     status: 'VALIDATOR_STALE',
@@ -131,7 +140,7 @@ try {
     error: String(error && error.message || error),
     canonicalLifecycleComposition: CANONICAL_LIFECYCLE_COMPOSITION,
     canonicalEngine: config.engine || '',
-    canonicalRouterVersion: 'v2-independent-gate-extension',
+    canonicalRouterVersion: 'v3-request-path-propagation-portable',
     legacyDelegate: LEGACY_ROUTER,
     sourceTransformed: false,
     dataAccess: false,
