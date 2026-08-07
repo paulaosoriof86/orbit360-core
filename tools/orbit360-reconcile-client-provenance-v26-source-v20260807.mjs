@@ -81,13 +81,15 @@ function scanCurrent(targets, matches) {
   }
   return filesScanned;
 }
-function git(args,input=null,encoding='utf8') {
-  const run=spawnSync('git',args,{cwd:ROOT,input,encoding,maxBuffer:128*1024*1024});
+function git(args,input=null,encoding='utf8',cwd=ROOT) {
+  const options={cwd,input,maxBuffer:128*1024*1024};
+  if (encoding !== null) options.encoding=encoding;
+  const run=spawnSync('git',args,options);
   if (run.status!==0) throw new Error(`SOURCE_HISTORY_GIT_FAILURE:${args[0]}`);
   return run.stdout;
 }
-function scanHistory(targets,matches) {
-  const raw=git(['rev-list','--objects','--all']);
+export function scanHistory(targets,matches,root=ROOT) {
+  const raw=git(['rev-list','--objects','--all'],null,'utf8',root);
   const objectPath=new Map();
   for (const line of raw.split(/\r?\n/)) {
     const sp=line.indexOf(' '); if (sp<0) continue;
@@ -96,7 +98,7 @@ function scanHistory(targets,matches) {
   }
   const shas=[...objectPath.keys()];
   if (!shas.length) return {objectsConsidered:0,blobsScanned:0,bytesScanned:0};
-  const checks=git(['cat-file','--batch-check=%(objectname) %(objecttype) %(objectsize)'],shas.join('\n')+'\n');
+  const checks=git(['cat-file','--batch-check=%(objectname) %(objecttype) %(objectsize)'],shas.join('\n')+'\n','utf8',root);
   const selected=[]; let total=0;
   for (const line of checks.split(/\r?\n/)) {
     const [sha,type,sizeRaw]=line.trim().split(/\s+/); const size=Number(sizeRaw);
@@ -104,7 +106,8 @@ function scanHistory(targets,matches) {
     selected.push({sha,rel:objectPath.get(sha),size}); total+=size;
   }
   if (!selected.length) return {objectsConsidered:shas.length,blobsScanned:0,bytesScanned:0};
-  const batch=git(['cat-file','--batch'],selected.map(x=>x.sha).join('\n')+'\n','buffer');
+  const batch=git(['cat-file','--batch'],selected.map(x=>x.sha).join('\n')+'\n',null,root);
+  if (!Buffer.isBuffer(batch)) throw new Error('SOURCE_HISTORY_BATCH_NOT_BUFFER');
   let offset=0,scanned=0,bytes=0;
   const bySha=new Map(selected.map(x=>[x.sha,x]));
   while (offset<batch.length) {
