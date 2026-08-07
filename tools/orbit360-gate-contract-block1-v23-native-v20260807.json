@@ -10,7 +10,8 @@
   "rootCauseResolved": "PIPELINE_MECHANISM_FAILURE / CHAINED_TEXTUAL_TRANSFORM_ON_GENERATED_MATRIX_ARTIFACT",
   "validatorStaleResolved": "CANONICAL_BLOCK1_PREFLIGHT_OWNER_VERSION_FREEZE_DRIFT",
   "mechanism": {
-    "nativeRuntimeArtifact": "tools/orbit360-block1-native-matrix-v23-v20260807.mjs",
+    "nativeRuntimeArtifact": "tools/orbit360-block1-native-matrix-v23-canonical-v20260807.mjs",
+    "nativeImplementation": "tools/orbit360-block1-native-matrix-v23-v20260807.mjs",
     "sharedRenderObserver": "tools/orbit360-event-driven-render-observer-v23.mjs",
     "canonicalEngine": "tools/orbit360-validar-gate-contracts-engine-block1-v23-native-v20260807.mjs",
     "generatedFromPriorArtifact": false,
@@ -28,35 +29,13 @@
     "preservedAdvisors": 7
   },
   "blockingRoutes": ["inicio", "cliente360", "aseguradoras"],
-  "nonblockingLedger": [
-    "polizas",
-    "cobros",
-    "ops",
-    "leads",
-    "conciliaciones",
-    "cancelaciones",
-    "vehicle-detail-button",
-    "receipt-detail-button",
-    "cobro-detail-button"
-  ],
+  "nonblockingLedger": ["polizas", "cobros", "ops", "leads", "conciliaciones", "cancelaciones", "vehicle-detail-button", "receipt-detail-button", "cobro-detail-button"],
   "roleMatrix": [
     { "role": "Direccion", "viewport": [1440, 1000] },
     { "role": "Operativo", "viewport": [1024, 768] },
     { "role": "Asesor", "viewport": [390, 844] }
   ],
-  "contracts": [
-    "auth_session_membership",
-    "legal_once_idempotent",
-    "mobile_menu",
-    "multirol_scopes",
-    "cliente360_list_detail_quality_empty_relations",
-    "aseguradoras_directory_detail_knowledge",
-    "zero_technical_copy",
-    "responsive",
-    "event_driven_render_observability",
-    "zero_writes",
-    "snapshot_unchanged"
-  ],
+  "contracts": ["auth_session_membership", "legal_once_idempotent", "mobile_menu", "multirol_scopes", "cliente360_list_detail_quality_empty_relations", "aseguradoras_directory_detail_knowledge", "zero_technical_copy", "responsive", "event_driven_render_observability", "zero_writes", "snapshot_unchanged"],
   "universe": {
     "adjudicator": "tools/orbit360-adjudicate-block1-universe-readonly-v23-v20260807.mjs",
     "expected": { "clientes": 414, "aseguradoras": 26, "asesores": 7 },
@@ -83,28 +62,8 @@
     "backupBeforeDeploy": true,
     "rollbackOnAnyPostDeployFailure": true
   },
-  "frozenPaths": [
-    "orbit360-platform/modules/cliente360.js",
-    "orbit360-platform/modules/polizas.js",
-    "orbit360-platform/modules/cobros.js",
-    "orbit360-platform/core/visual-runtime-rootfix-v20260805.js",
-    "orbit360-platform/data/store.js",
-    "orbit360-platform/data/store-firestore-lab.local.js",
-    "orbit360-platform/core/auth.js",
-    "orbit360-platform/core/importa.js",
-    "orbit360-platform/firestore.rules"
-  ],
-  "successPredicate": {
-    "matrixStage": "PASS_BLOCK1_NATIVE_VISUAL_MATRIX",
-    "classification": "PASS_VISUAL_POST_AUTH",
-    "roles": 3,
-    "totalRoleFailures": 0,
-    "snapshotIntegrity": "VERIFIED_UNCHANGED",
-    "firestoreWrites": 0,
-    "authWrites": 0,
-    "operationalWrites": 0,
-    "productionTouched": false
-  },
+  "frozenPaths": ["orbit360-platform/modules/cliente360.js", "orbit360-platform/modules/polizas.js", "orbit360-platform/modules/cobros.js", "orbit360-platform/core/visual-runtime-rootfix-v20260805.js", "orbit360-platform/data/store.js", "orbit360-platform/data/store-firestore-lab.local.js", "orbit360-platform/core/auth.js", "orbit360-platform/core/importa.js", "orbit360-platform/firestore.rules"],
+  "successPredicate": { "matrixStage": "PASS_BLOCK1_NATIVE_VISUAL_MATRIX", "classification": "PASS_VISUAL_POST_AUTH", "roles": 3, "totalRoleFailures": 0, "snapshotIntegrity": "VERIFIED_UNCHANGED", "firestoreWrites": 0, "authWrites": 0, "operationalWrites": 0, "productionTouched": false },
   "patternClassification": "REPLICABLE_CLAUDE_ACUMULADO",
   "academiaUpdateRequired": true,
   "containsPII": false,
