@@ -398,8 +398,11 @@
       var output = original(host);
       var elapsed = Math.round((performance && performance.now ? performance.now() : Date.now()) - started);
       window.OrbitRuntimeDiagnostics = window.OrbitRuntimeDiagnostics || {};
-      OrbitRuntimeDiagnostics[moduleName] = { version: VERSION, renderMs: elapsed, at: new Date().toISOString(), hydrated: true };
+      OrbitRuntimeDiagnostics[moduleName] = Object.assign({}, OrbitRuntimeDiagnostics[moduleName] || {}, { version: VERSION, renderMs: elapsed, at: new Date().toISOString(), hydrated: true });
+      var afterStarted = performance && performance.now ? performance.now() : Date.now();
       afterRender(moduleName, host);
+      var afterElapsed = Math.round((performance && performance.now ? performance.now() : Date.now()) - afterStarted);
+      OrbitRuntimeDiagnostics[moduleName] = Object.assign({}, OrbitRuntimeDiagnostics[moduleName] || {}, { afterRenderMs: afterElapsed, totalWithAfterRenderMs: elapsed + afterElapsed });
       setTimeout(function () { afterRender(moduleName, host); }, 0);
       return output;
     };

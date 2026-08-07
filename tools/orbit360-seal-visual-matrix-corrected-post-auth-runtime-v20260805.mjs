@@ -139,6 +139,8 @@ const final = {
   precheckCheckpoint: precheck && (precheck.checkpoint || precheck.currentCheckpoint) || 'NOT_EXECUTED',
   matrixStage: outcomes.matrix === 'skipped' ? 'NOT_EXECUTED' : matrix && matrix.stage || 'NOT_EXECUTED',
   matrixCheckpoint: outcomes.matrix === 'skipped' ? 'NOT_EXECUTED' : matrix && (matrix.currentCheckpoint || matrix.checkpoint) || 'NOT_EXECUTED',
+  matrixValidatorFinding: outcomes.matrix === 'skipped' ? '' : matrix && matrix.validatorFinding || '',
+  routeMetrics: outcomes.matrix === 'skipped' ? [] : matrix && Array.isArray(matrix.routeMetrics) ? matrix.routeMetrics : [],
   roleResults: outcomes.matrix === 'skipped' ? [] : roles,
   totalRoleFailures: outcomes.matrix === 'skipped' ? null : matrix && matrix.totalRoleFailures != null ? matrix.totalRoleFailures : null,
   totalWarnings: outcomes.matrix === 'skipped' ? 0 : matrix && matrix.totalWarnings != null ? matrix.totalWarnings : captureWarnings.length,

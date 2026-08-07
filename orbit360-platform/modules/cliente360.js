@@ -14,6 +14,10 @@ Orbit.modules.cliente360 = (function () {
   let filtros = { q: '', pais: '', tipo: '', asesor: '', seg: '' };
   let tab = 'resumen';
   let shownCid = null; // cliente actualmente abierto (para resetear pestaña al cambiar)
+  const LIST_PAGE_SIZE = 40;
+  let listPage = 1;
+  let listRenderSeq = 0;
+  const perfNow = () => (typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now());
   // visibilidad por rol (la comisión de empresa es interna/configurable)
   const ROLE = () => (Orbit.session && Orbit.session.rol && Orbit.session.rol()) || (Orbit.auth && Orbit.auth.user() && Orbit.auth.user().rol) || 'Dirección';
   const verEmpresa = () => ['Dirección', 'Admin', 'Finanzas'].includes(ROLE());
@@ -56,6 +60,10 @@ Orbit.modules.cliente360 = (function () {
     const clientes = S().all('clientes');
     const asesores = S().all('asesores');
     const f = filtros;
+    const renderStartedAt = perfNow();
+    const summaryStartedAt = perfNow();
+    const summaryIndex = q.clientesResumenIndex ? q.clientesResumenIndex() : null;
+    const summaryCacheMs = perfNow() - summaryStartedAt;
     const rows = clientes.filter(c =>
       (!f.q || (c.nombre + ' ' + c.email + ' ' + c.identificacion).toLowerCase().includes(f.q.toLowerCase())) &&
       (!f.pais || c.pais === f.pais) &&
@@ -63,7 +71,37 @@ Orbit.modules.cliente360 = (function () {
       (!f.asesor || c.asesorId === f.asesor) &&
       (!f.seg || c.segmento === f.seg)
     );
-    const totPrima = clientes.reduce((s, c) => { const r = q.clienteResumen(c.id); return s + (r.moneda === 'COP' ? r.primaAnual / 1000 : r.primaAnual); }, 0);
+    const pageCount = Math.max(1, Math.ceil(rows.length / LIST_PAGE_SIZE));
+    if (listPage > pageCount) listPage = pageCount;
+    if (listPage < 1) listPage = 1;
+    const pageStart = (listPage - 1) * LIST_PAGE_SIZE;
+    const visibleRows = rows.slice(pageStart, pageStart + LIST_PAGE_SIZE);
+    const resumenDe = c => (summaryIndex && typeof summaryIndex.get === 'function' && summaryIndex.get(c.id)) || q.clienteResumen(c.id);
+    const summaryAggregateStartedAt = perfNow();
+    const totPrima = clientes.reduce((s, c) => { const r = resumenDe(c); return s + (r.moneda === 'COP' ? r.primaAnual / 1000 : r.primaAnual); }, 0);
+    const summaryAggregateMs = perfNow() - summaryAggregateStartedAt;
+
+    const rowsBuildStartedAt = perfNow();
+    const rowsHtml = visibleRows.map(c => {
+            const r = resumenDe(c);
+            const ase = q.asesor(c.asesorId);
+            const cartera = r.vencido > 0 ? `<span class="badge danger">Vencida ${U.moneyShort(r.vencido, r.moneda)}</span>` : r.pendiente > 0 ? `<span class="badge warn">Al día</span>` : `<span class="badge ok">Al día</span>`;
+            return `<tr class="clickable" onclick="location.hash='#/cliente360?c=${c.id}'">
+              <td><div style="display:flex;align-items:center;gap:11px">
+                ${U.avatar(c.nombre, c.tipo === 'Empresa' ? '#1E2227' : '#C5162E', 'md')}
+                <div><div style="font-weight:700">${U.esc(c.nombre)}</div>
+                <div class="muted" style="font-size:11.5px">${c.tipo} · ${c.ciudad} · ${c.pais}</div></div>
+              </div></td>
+              <td><div style="display:flex;align-items:center;gap:7px"><span class="dot-s" style="background:${ase ? ase.color : '#999'}"></span>${U.esc(ase ? ase.nombre : '—')}</div></td>
+              <td class="num">${r.nVigentes}<span class="muted">/${r.nPolizas}</span></td>
+              <td class="num">${U.money(r.primaAnual, r.moneda)}</td>
+              <td>${cartera}</td>
+              <td><div style="display:flex;align-items:center;gap:8px"><div class="bar" style="width:54px"><i style="width:${r.salud}%;background:${r.salud >= 70 ? 'linear-gradient(90deg,#1f8a4c,#34b96a)' : r.salud >= 45 ? 'linear-gradient(90deg,#c9821b,#e0a23c)' : 'linear-gradient(90deg,#a01828,#C5162E)'}"></i></div><span class="mono" style="font-size:12px">${r.salud}</span></div></td>
+              <td style="text-align:right;color:var(--ink-3)">›</td>
+            </tr>`;
+          }).join('');
+    const rowsBuildMs = perfNow() - rowsBuildStartedAt;
+    const innerHtmlStartedAt = perfNow();
 
     host.innerHTML = `<div class="page">
       ${Orbit.kit.bannerFor('cliente360', `<button class="btn primary" onclick="Orbit.modules.cliente360.nuevoCliente()">+ Nuevo cliente</button>`)}
@@ -90,32 +128,23 @@ Orbit.modules.cliente360 = (function () {
         <table class="tbl">
           <thead><tr><th>Cliente</th><th>Asesor</th><th class="num">Pólizas</th><th class="num">Prima vigente</th><th>Cartera</th><th>Salud</th><th></th></tr></thead>
           <tbody>
-          ${rows.map(c => {
-            const r = q.clienteResumen(c.id);
-            const ase = q.asesor(c.asesorId);
-            const cartera = r.vencido > 0 ? `<span class="badge danger">Vencida ${U.moneyShort(r.vencido, r.moneda)}</span>` : r.pendiente > 0 ? `<span class="badge warn">Al día</span>` : `<span class="badge ok">Al día</span>`;
-            return `<tr class="clickable" onclick="location.hash='#/cliente360?c=${c.id}'">
-              <td><div style="display:flex;align-items:center;gap:11px">
-                ${U.avatar(c.nombre, c.tipo === 'Empresa' ? '#1E2227' : '#C5162E', 'md')}
-                <div><div style="font-weight:700">${U.esc(c.nombre)}</div>
-                <div class="muted" style="font-size:11.5px">${c.tipo} · ${c.ciudad} · ${c.pais}</div></div>
-              </div></td>
-              <td><div style="display:flex;align-items:center;gap:7px"><span class="dot-s" style="background:${ase ? ase.color : '#999'}"></span>${U.esc(ase ? ase.nombre : '—')}</div></td>
-              <td class="num">${r.nVigentes}<span class="muted">/${r.nPolizas}</span></td>
-              <td class="num">${U.money(r.primaAnual, r.moneda)}</td>
-              <td>${cartera}</td>
-              <td><div style="display:flex;align-items:center;gap:8px"><div class="bar" style="width:54px"><i style="width:${r.salud}%;background:${r.salud >= 70 ? 'linear-gradient(90deg,#1f8a4c,#34b96a)' : r.salud >= 45 ? 'linear-gradient(90deg,#c9821b,#e0a23c)' : 'linear-gradient(90deg,#a01828,#C5162E)'}"></i></div><span class="mono" style="font-size:12px">${r.salud}</span></div></td>
-              <td style="text-align:right;color:var(--ink-3)">›</td>
-            </tr>`;
-          }).join('')}
+          ${rowsHtml}
           ${rows.length === 0 ? `<tr><td colspan="7" style="text-align:center;padding:34px" class="muted">Sin resultados para los filtros aplicados.</td></tr>` : ''}
           </tbody>
         </table>
         </div>
+        <div class="c360-pagination" style="display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:12px 14px;border-top:1px solid var(--line);flex-wrap:wrap">
+          <span class="muted" style="font-size:12px;margin-right:auto">Mostrando ${visibleRows.length ? pageStart + 1 : 0}–${Math.min(pageStart + visibleRows.length, rows.length)} de ${rows.length}</span>
+          <button id="c360-prev" class="btn ghost sm" ${listPage <= 1 ? 'disabled' : ''}>‹ Anterior</button>
+          <span class="mono" style="font-size:12px">Página ${listPage} de ${pageCount}</span>
+          <button id="c360-next" class="btn ghost sm" ${listPage >= pageCount ? 'disabled' : ''}>Siguiente ›</button>
+        </div>
       </div>
     </div>`;
 
-    const reb = () => { tab = 'resumen'; lista(); };
+    const innerHtmlMs = perfNow() - innerHtmlStartedAt;
+    const bindingStartedAt = perfNow();
+    const reb = () => { tab = 'resumen'; listPage = 1; lista(); };
     bind('f-q', 'input', v => { filtros.q = v; }, true);
     bind('f-tipo', 'change', v => { filtros.tipo = v; reb(); });
     bind('f-pais', 'change', v => { filtros.pais = v; reb(); });
@@ -124,11 +153,25 @@ Orbit.modules.cliente360 = (function () {
     // búsqueda en vivo sin perder foco
     const qi = document.getElementById('f-q');
     if (qi) qi.addEventListener('input', e => { filtros.q = e.target.value; liveFilter(); });
+    const prev = document.getElementById('c360-prev');
+    const next = document.getElementById('c360-next');
+    if (prev) prev.addEventListener('click', () => { if (listPage > 1) { listPage -= 1; lista(); } });
+    if (next) next.addEventListener('click', () => { if (listPage < pageCount) { listPage += 1; lista(); } });
+    const bindingsMs = perfNow() - bindingStartedAt;
+    const totalMs = perfNow() - renderStartedAt;
+    listRenderSeq += 1;
+    window.OrbitRuntimeDiagnostics = window.OrbitRuntimeDiagnostics || {};
+    OrbitRuntimeDiagnostics.cliente360 = Object.assign({}, OrbitRuntimeDiagnostics.cliente360 || {}, {
+      version: '20260807.19-bounded-list-render',
+      renderMs: totalMs,
+      list: { bounded: true, pageSize: LIST_PAGE_SIZE, page: listPage, pageCount, totalRows: clientes.length, filteredRows: rows.length, renderedRows: visibleRows.length, summaryCacheMs, summaryAggregateMs, rowsBuildMs, innerHtmlMs, bindingsMs, totalMs, renderSeq: listRenderSeq, writes: 0 }
+    });
   }
 
   function liveFilter() {
     // re-render manteniendo el input enfocado
     const active = document.activeElement; const val = active ? active.value : '';
+    listPage = 1;
     lista();
     const qi = document.getElementById('f-q');
     if (qi) { qi.focus(); qi.value = val; qi.setSelectionRange(val.length, val.length); }
