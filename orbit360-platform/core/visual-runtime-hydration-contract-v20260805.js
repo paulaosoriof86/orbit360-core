@@ -6,6 +6,8 @@
      relaciones canónicas, sin escribir ni hardcodear usuarios.
    - Conserva diagnóstico interno del estado degradado real.
    - Revalida el owner Orbit.store para evitar drift de composición.
+   - v17: cachea la proyección read-only de responsables e instala
+     OrbitHydrationContractDiagnostics como autoridad única de readiness.
    ============================================================ */
 (function () {
   'use strict';
@@ -13,8 +15,9 @@
   if (Orbit.__visualHydrationContractV20260805) return;
   Orbit.__visualHydrationContractV20260805 = true;
 
-  var VERSION = '20260807.2';
+  var VERSION = '20260807.3-advisor-cache-unified-readiness';
   var OPTIONAL_LEGACY = ['asesores', 'metas', 'negocios', 'gestiones', 'comisiones', 'cancelaciones'];
+  var ADVISOR_PROJECTION_SOURCES = ['asesores', 'clientes', 'polizas', 'cobros', 'recibosEsperados', 'carteraPrimas'];
   var CONTRACTS = {
     inicio: { required: ['clientes', 'polizas', 'cobros', 'aseguradoras'], optional: ['asesores', 'metas', 'negocios', 'gestiones'] },
     aseguradoras: { required: ['aseguradoras'], optional: ['asesores'] },
@@ -30,10 +33,18 @@
   var installed = false;
   var installedStore = null;
   var listenersBound = false;
+  var projectionListenerBound = false;
   var originalStatus = null;
   var originalStore = null;
   var observer = null;
   var lastActualStatus = null;
+  var advisorProjectionCache = null;
+  var advisorProjectionIndex = null;
+  var advisorProjectionBuilds = 0;
+  var advisorProjectionInvalidations = 0;
+  var advisorProjectionAuthSignature = '';
+  var unifiedModuleWrapState = {};
+  var routeWaiters = {};
 
   function text(value) { return String(value == null ? '' : value).trim(); }
   function clone(value) {
@@ -76,50 +87,84 @@
     };
   }
 
-  function advisorProjectionRows() {
-    if (!originalStore) return [];
-    var durable = originalStore.all('asesores') || [];
-    if (durable.length) return durable;
-    var map = new Map();
-    function add(id, name, extra) {
-      id = text(id);
-      if (!id) return;
-      extra = extra || {};
-      var previous = map.get(id) || {};
-      var label = text(name || previous.nombre) || 'Asesor asignado';
-      map.set(id, Object.assign({}, previous, extra, {
-        id: id,
-        nombre: label,
-        name: label,
-        displayName: label,
-        roles: Array.isArray(extra.roles) && extra.roles.length ? extra.roles.slice() : ['Asesor'],
-        rol: text(extra.rol || extra.activeRole) || 'Asesor',
-        rolDefault: text(extra.rolDefault || extra.activeRole) || 'Asesor',
-        activo: extra.activo !== false,
-        estado: extra.activo === false ? 'inactivo' : 'activo',
-        projectionOnly: true,
-        projectionSource: 'active-membership-and-canonical-relations'
-      }));
-    }
+  function activeAdvisorSignature() {
     try {
       var active = Orbit.auth && typeof Orbit.auth.user === 'function' ? Orbit.auth.user() || {} : {};
-      if (active.advisorId) add(active.advisorId, active.nombre, {
-        email: active.email,
-        roles: active.roles || [],
-        rol: active.rol,
-        activeRole: active.rol,
-        paises: active.countries || [],
+      return JSON.stringify({
+        advisorId: text(active.advisorId),
+        nombre: text(active.nombre),
+        email: text(active.email),
+        rol: text(active.rol),
+        roles: Array.isArray(active.roles) ? active.roles.slice() : [],
+        countries: Array.isArray(active.countries) ? active.countries.slice() : [],
         dataScopes: active.dataScopes || {}
       });
-    } catch (error) {}
-    ['clientes', 'polizas', 'cobros', 'recibosEsperados', 'carteraPrimas'].forEach(function (collection) {
-      (originalStore.all(collection) || []).forEach(function (row) {
-        var id = row && (row.asesorId || row.advisorId || row.vendedorId || row.responsableId);
-        var name = row && (row.asesorNombre || row.advisorName || row.vendedorNombre || row.responsableNombre || (typeof row.asesor === 'string' ? row.asesor : ''));
-        if (id) add(id, name, {});
+    } catch (error) { return ''; }
+  }
+  function invalidateAdvisorProjection() {
+    if (advisorProjectionCache !== null || advisorProjectionIndex !== null) advisorProjectionInvalidations += 1;
+    advisorProjectionCache = null;
+    advisorProjectionIndex = null;
+  }
+  function buildAdvisorProjection(signature) {
+    if (!originalStore) return [];
+    advisorProjectionBuilds += 1;
+    var durable = originalStore.all('asesores') || [];
+    var rows;
+    if (durable.length) {
+      rows = durable;
+    } else {
+      var map = new Map();
+      function add(id, name, extra) {
+        id = text(id);
+        if (!id) return;
+        extra = extra || {};
+        var previous = map.get(id) || {};
+        var label = text(name || previous.nombre) || 'Asesor asignado';
+        map.set(id, Object.assign({}, previous, extra, {
+          id: id,
+          nombre: label,
+          name: label,
+          displayName: label,
+          roles: Array.isArray(extra.roles) && extra.roles.length ? extra.roles.slice() : ['Asesor'],
+          rol: text(extra.rol || extra.activeRole) || 'Asesor',
+          rolDefault: text(extra.rolDefault || extra.activeRole) || 'Asesor',
+          activo: extra.activo !== false,
+          estado: extra.activo === false ? 'inactivo' : 'activo',
+          projectionOnly: true,
+          projectionSource: 'active-membership-and-canonical-relations'
+        }));
+      }
+      try {
+        var active = Orbit.auth && typeof Orbit.auth.user === 'function' ? Orbit.auth.user() || {} : {};
+        if (active.advisorId) add(active.advisorId, active.nombre, {
+          email: active.email,
+          roles: active.roles || [],
+          rol: active.rol,
+          activeRole: active.rol,
+          paises: active.countries || [],
+          dataScopes: active.dataScopes || {}
+        });
+      } catch (error) {}
+      ['clientes', 'polizas', 'cobros', 'recibosEsperados', 'carteraPrimas'].forEach(function (collection) {
+        (originalStore.all(collection) || []).forEach(function (row) {
+          var id = row && (row.asesorId || row.advisorId || row.vendedorId || row.responsableId);
+          var name = row && (row.asesorNombre || row.advisorName || row.vendedorNombre || row.responsableNombre || (typeof row.asesor === 'string' ? row.asesor : ''));
+          if (id) add(id, name, {});
+        });
       });
-    });
-    return Array.from(map.values());
+      rows = Array.from(map.values());
+    }
+    advisorProjectionCache = rows;
+    advisorProjectionIndex = new Map(rows.map(function (row) { return [text(row.id), row]; }));
+    advisorProjectionAuthSignature = signature;
+    return advisorProjectionCache;
+  }
+  function advisorProjectionRows() {
+    if (!originalStore) return [];
+    var signature = activeAdvisorSignature();
+    if (advisorProjectionCache !== null && signature !== advisorProjectionAuthSignature) invalidateAdvisorProjection();
+    return advisorProjectionCache !== null ? advisorProjectionCache : buildAdvisorProjection(signature);
   }
 
   function matches(row, field, op, value) {
@@ -147,7 +192,8 @@
     };
     Orbit.store.get = function (collection, id) {
       if (collection !== 'asesores') return originalStore.get(collection, id);
-      var found = advisorProjectionRows().find(function (row) { return text(row.id) === text(id); });
+      advisorProjectionRows();
+      var found = advisorProjectionIndex && advisorProjectionIndex.get(text(id));
       return found ? clone(found) : null;
     };
     Orbit.store.where = function (collection, fieldOrPredicate, opOrValue, maybeValue) {
@@ -174,11 +220,25 @@
       version: VERSION,
       source: 'active-membership-and-canonical-relations',
       writes: 0,
+      invalidate: invalidateAdvisorProjection,
       status: function () {
         var rows = advisorProjectionRows();
-        return { count: rows.length, durable: rows.some(function (row) { return !row.projectionOnly; }), writes: 0 };
+        return {
+          count: rows.length,
+          durable: rows.some(function (row) { return !row.projectionOnly; }),
+          cacheValid: advisorProjectionCache !== null,
+          builds: advisorProjectionBuilds,
+          invalidations: advisorProjectionInvalidations,
+          writes: 0
+        };
       }
     };
+    if (!projectionListenerBound && Orbit.store && typeof Orbit.store.on === 'function') {
+      projectionListenerBound = true;
+      Orbit.store.on('*', function (collection) {
+        if (collection === '*' || ADVISOR_PROJECTION_SOURCES.indexOf(collection) >= 0) invalidateAdvisorProjection();
+      });
+    }
     if (Orbit.q && typeof Orbit.q.leaderboard === 'function' && !Orbit.q.__leaderboardProjectionV20260805) {
       var originalLeaderboard = Orbit.q.leaderboard.bind(Orbit.q);
       Orbit.q.leaderboard = function () {
@@ -209,12 +269,16 @@
       output.operationalCounts[name] = count;
       delete output.snapshotErrors[name];
     });
+    var activeContract = split(CONTRACTS[routeKey()] || { required: [], optional: [] }, status);
     output.visualHydrationContract = {
       version: VERSION,
-      requiredCanonicalReady: true,
+      requiredCanonicalReady: activeContract.ready,
       optionalLegacyDegraded: degraded.length > 0,
       optionalLegacyUnavailableCount: degraded.length,
       storeBound: installedStore === Orbit.store,
+      readinessAuthority: 'OrbitHydrationContractDiagnostics',
+      advisorProjectionBuilds: advisorProjectionBuilds,
+      advisorProjectionInvalidations: advisorProjectionInvalidations,
       writes: 0
     };
     return output;
@@ -234,6 +298,97 @@
       status: function (moduleName) { return split(CONTRACTS[moduleName] || { required: [], optional: [] }, actualStatus()); }
     };
     return true;
+  }
+
+  function readinessLoadingHtml(moduleName, state) {
+    var required = state.required || { total: 0, seen: [], missing: [], failed: [] };
+    var pct = required.total ? Math.round(required.seen.length / required.total * 100) : 0;
+    var blocked = required.failed.length > 0;
+    return '<div class="page orbit-load-state"><div class="card orbit-load-card"><div class="orbit-load-spin"></div><div class="crumb">' + text(moduleName) + '</div><h2 style="margin:0;font-family:var(--f-display)">' + (blocked ? 'No fue posible completar la carga' : 'Preparando datos del módulo') + '</h2><p class="muted">' + (blocked ? 'Una fuente requerida no respondió.' : 'La vista aparecerá cuando las fuentes requeridas estén listas.') + '</p><div class="orbit-load-progress"><i style="width:' + pct + '%"></i></div><div class="muted" style="font-size:12px">' + required.seen.length + ' de ' + required.total + ' fuentes requeridas listas</div></div></div>';
+  }
+  function requestUnifiedRouteRefresh(moduleName) {
+    if (routeWaiters[moduleName]) return;
+    var started = Date.now();
+    var unsub = Orbit.store && typeof Orbit.store.on === 'function' ? Orbit.store.on('*', function () {
+      if (routeKey() !== moduleName) return;
+      var state = split(CONTRACTS[moduleName] || { required: [], optional: [] }, actualStatus());
+      if (state.ready || state.required.failed.length || Date.now() - started > 20000) {
+        if (typeof unsub === 'function') unsub();
+        delete routeWaiters[moduleName];
+        try { window.dispatchEvent(new HashChangeEvent('hashchange')); }
+        catch (error) { window.dispatchEvent(new Event('hashchange')); }
+      }
+    }) : null;
+    routeWaiters[moduleName] = unsub || true;
+    setTimeout(function () {
+      if (!routeWaiters[moduleName]) return;
+      if (typeof unsub === 'function') unsub();
+      delete routeWaiters[moduleName];
+      try { window.dispatchEvent(new HashChangeEvent('hashchange')); }
+      catch (error) { window.dispatchEvent(new Event('hashchange')); }
+    }, 20500);
+  }
+  function installUnifiedModuleReadiness() {
+    if (!Orbit.modules) return false;
+    var names = Object.keys(CONTRACTS);
+    var wrapped = 0;
+    names.forEach(function (moduleName) {
+      var registry = Orbit.modules;
+      var mod = registry[moduleName];
+      if (!mod || typeof mod.render !== 'function') return;
+      if (mod.__visualHydrationReadinessV17) {
+        unifiedModuleWrapState[moduleName] = 'existing';
+        wrapped += 1;
+        return;
+      }
+      var original = mod.render.bind(mod);
+      var wrappedRender = function (host) {
+        var state = split(CONTRACTS[moduleName] || { required: [], optional: [] }, actualStatus());
+        window.OrbitRuntimeDiagnostics = window.OrbitRuntimeDiagnostics || {};
+        OrbitRuntimeDiagnostics[moduleName] = Object.assign({}, OrbitRuntimeDiagnostics[moduleName] || {}, {
+          hydrationContractVersion: VERSION,
+          readinessAuthority: 'OrbitHydrationContractDiagnostics',
+          requiredReady: state.ready,
+          requiredMissing: state.required.missing.slice(),
+          requiredFailed: state.required.failed.slice(),
+          optionalDegraded: state.degraded,
+          writes: 0
+        });
+        if (!state.ready) {
+          host.innerHTML = readinessLoadingHtml(moduleName, state);
+          requestUnifiedRouteRefresh(moduleName);
+          return;
+        }
+        return original(host);
+      };
+      try {
+        var renderDescriptor = Object.getOwnPropertyDescriptor(mod, 'render');
+        var moduleMutable = !Object.isFrozen(mod) && (!renderDescriptor || renderDescriptor.writable !== false || typeof renderDescriptor.set === 'function');
+        if (moduleMutable) {
+          mod.render = wrappedRender;
+          mod.__visualHydrationReadinessV17 = { version: VERSION, authority: 'OrbitHydrationContractDiagnostics', original: original };
+          unifiedModuleWrapState[moduleName] = 'direct';
+          wrapped += 1;
+          return;
+        }
+        var registryDescriptor = Object.getOwnPropertyDescriptor(registry, moduleName);
+        var registryMutable = !Object.isFrozen(registry) && (!registryDescriptor || registryDescriptor.writable !== false || typeof registryDescriptor.set === 'function' || registryDescriptor.configurable === true);
+        if (registryMutable) {
+          var replacement = Object.create(mod);
+          Object.defineProperty(replacement, 'render', { value: wrappedRender, writable: true, configurable: true, enumerable: true });
+          Object.defineProperty(replacement, '__visualHydrationReadinessV17', { value: { version: VERSION, authority: 'OrbitHydrationContractDiagnostics', original: original }, writable: false, configurable: false, enumerable: false });
+          registry[moduleName] = replacement;
+          unifiedModuleWrapState[moduleName] = 'registry-proxy';
+          wrapped += 1;
+        }
+      } catch (error) {
+        unifiedModuleWrapState[moduleName] = 'failed';
+      }
+    });
+    return names.every(function (name) {
+      var mod = Orbit.modules && Orbit.modules[name];
+      return !!(mod && mod.__visualHydrationReadinessV17);
+    });
   }
 
   function injectStyle() {
@@ -268,6 +423,7 @@
     window.OrbitRuntimeDiagnostics = window.OrbitRuntimeDiagnostics || {};
     OrbitRuntimeDiagnostics[route] = Object.assign({}, OrbitRuntimeDiagnostics[route] || {}, {
       hydrationContractVersion: VERSION,
+      readinessAuthority: 'OrbitHydrationContractDiagnostics',
       optionalDegraded: true,
       optionalMissing: state.optional.missing.length,
       optionalFailed: state.optional.failed.length,
@@ -281,7 +437,17 @@
       contracts: clone(CONTRACTS),
       writes: 0,
       mounted: function () {
-        return !!(installed && installedStore === Orbit.store && Orbit.store && Orbit.store.__visualHydrationContractV20260805);
+        var modulesReady = Object.keys(CONTRACTS).every(function (name) {
+          var mod = Orbit.modules && Orbit.modules[name];
+          return !!(mod && mod.__visualHydrationReadinessV17);
+        });
+        return !!(installed && installedStore === Orbit.store && Orbit.store && Orbit.store.__visualHydrationContractV20260805 && modulesReady);
+      },
+      unifiedReadinessMounted: function () {
+        return Object.keys(CONTRACTS).every(function (name) {
+          var mod = Orbit.modules && Orbit.modules[name];
+          return !!(mod && mod.__visualHydrationReadinessV17);
+        });
       },
       status: function (moduleName) {
         return split(CONTRACTS[moduleName] || { required: [], optional: [] }, actualStatus());
@@ -289,8 +455,9 @@
       advisorProjection: function () {
         return Orbit.store && Orbit.store.__advisorProjectionV20260805
           ? Orbit.store.__advisorProjectionV20260805.status()
-          : { count: 0, durable: false, writes: 0 };
-      }
+          : { count: 0, durable: false, cacheValid: false, builds: 0, invalidations: 0, writes: 0 };
+      },
+      readinessAuthority: 'OrbitHydrationContractDiagnostics'
     };
   }
 
@@ -312,9 +479,14 @@
       originalStatus = null;
       originalStore = null;
       lastActualStatus = null;
+      projectionListenerBound = false;
+      invalidateAdvisorProjection();
+      advisorProjectionAuthSignature = '';
+      unifiedModuleWrapState = {};
     }
     if (!installAdvisorProjection()) return false;
     if (!installStatusContract()) return false;
+    if (!installUnifiedModuleReadiness()) return false;
     injectStyle();
     installed = true;
     installedStore = Orbit.store;
@@ -322,6 +494,7 @@
     bindUiObserversOnce();
     document.body.dataset.visualHydrationContractV20260805 = VERSION;
     document.body.dataset.visualHydrationContractStoreBound = 'true';
+    document.body.dataset.visualReadinessAuthority = 'OrbitHydrationContractDiagnostics';
     setTimeout(paintDegradedState, 0);
     return true;
   }
