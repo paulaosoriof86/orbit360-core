@@ -1,55 +1,13 @@
 {
   "schemaVersion": "orbit360-visual-matrix-signal-safe-supervisor-v1",
   "status": "FAIL_MATRIX_CHILD",
-  "classification": "FUNCTIONAL_DEFECT",
+  "classification": "PIPELINE_MECHANISM_FAILURE",
   "currentCheckpoint": "SUPERVISOR_CHILD_EXIT",
   "observedCheckpoints": [
     {
       "checkpoint": "SUPERVISOR_CHILD_SPAWN",
-      "at": "2026-08-07T16:33:40.124Z",
+      "at": "2026-08-07T17:06:14.535Z",
       "elapsedMs": 1
-    },
-    {
-      "checkpoint": "MATRIX_CHECKPOINT_PROTECTED_SNAPSHOT_BEFORE",
-      "at": "2026-08-07T16:33:41.128Z",
-      "elapsedMs": 1005,
-      "matrixCheckpoint": "PROTECTED_SNAPSHOT_BEFORE",
-      "role": ""
-    },
-    {
-      "checkpoint": "MATRIX_CHECKPOINT_DIRECCION_PAGE_GOTO",
-      "at": "2026-08-07T16:33:45.134Z",
-      "elapsedMs": 5011,
-      "matrixCheckpoint": "DIRECCION_PAGE_GOTO",
-      "role": "DIRECCION"
-    },
-    {
-      "checkpoint": "MATRIX_CHECKPOINT_DIRECCION_ROUTE_INICIO_REQUIRED_HYDRATION_WAIT",
-      "at": "2026-08-07T16:33:47.137Z",
-      "elapsedMs": 7014,
-      "matrixCheckpoint": "DIRECCION_ROUTE_INICIO_REQUIRED_HYDRATION_WAIT",
-      "role": "DIRECCION"
-    },
-    {
-      "checkpoint": "MATRIX_CHECKPOINT_DIRECCION_ROUTE_INICIO_RENDER_READY_WAIT",
-      "at": "2026-08-07T16:33:59.150Z",
-      "elapsedMs": 19027,
-      "matrixCheckpoint": "DIRECCION_ROUTE_INICIO_RENDER_READY_WAIT",
-      "role": "DIRECCION"
-    },
-    {
-      "checkpoint": "MATRIX_CHECKPOINT_DIRECCION_ROUTE_CLIENTE360_REQUIRED_HYDRATION_WAIT",
-      "at": "2026-08-07T16:34:07.158Z",
-      "elapsedMs": 27035,
-      "matrixCheckpoint": "DIRECCION_ROUTE_CLIENTE360_REQUIRED_HYDRATION_WAIT",
-      "role": "DIRECCION"
-    },
-    {
-      "checkpoint": "MATRIX_CHECKPOINT_FAILURE_DIRECCION_ROUTE_CLIENTE360_REQUIRED_HYDRATION_CAPTURE_PASS",
-      "at": "2026-08-07T16:34:55.211Z",
-      "elapsedMs": 75088,
-      "matrixCheckpoint": "FAILURE_DIRECCION_ROUTE_CLIENTE360_REQUIRED_HYDRATION_CAPTURE_PASS",
-      "role": "DIRECCION"
     }
   ],
   "childCommand": "node orbit360-visual-runtime-rootfix-observable-matrix-v20260805.mjs",
@@ -60,16 +18,16 @@
     "globalTimeoutMs": 1200000,
     "terminateGraceMs": 8000
   },
-  "childPid": 3989,
-  "childExitCode": 42,
+  "childPid": 3825,
+  "childExitCode": 1,
   "childSignal": "",
   "terminationReason": "CHILD_NONZERO_EXIT",
   "receivedSignal": "",
-  "matrixEvidencePresent": true,
-  "matrixStage": "FAIL_VISUAL_OBSERVABLE_ROOTFIX_MATRIX",
-  "matrixClassification": "FUNCTIONAL_DEFECT",
+  "matrixEvidencePresent": false,
+  "matrixStage": "",
+  "matrixClassification": "",
   "runtimeExecuted": true,
-  "browserExecuted": true,
+  "browserExecuted": false,
   "deployExecuted": false,
   "firestoreWrites": 0,
   "authWrites": 0,
@@ -79,6 +37,6 @@
   "containsSecrets": false,
   "containsPasswords": false,
   "ok": false,
-  "finishedAt": "2026-08-07T16:34:57.484Z",
-  "elapsedMs": 77361
+  "finishedAt": "2026-08-07T17:06:14.759Z",
+  "elapsedMs": 225
 }
