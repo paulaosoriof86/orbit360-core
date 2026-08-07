@@ -1,0 +1,147 @@
+name: Orbit 360 · Activación v14 dos fases · source-only
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: orbit360-source-v14-two-phase-activation
+  cancel-in-progress: false
+
+jobs:
+  source-v14-two-phase:
+    if: github.head_ref == 'ays/source-activation-v14-two-phase-20260807'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      REQUEST: .github/orbit360-requests/visual-matrix-corrected-post-auth-lab-v20260805-authorization.json
+      LIFECYCLE: tools/orbit360-validator-lifecycle-contract-visual-matrix-corrected-post-auth-lab-v20260805.json
+      OVERLAY: tools/orbit360-validator-lifecycle-overlay-visual-matrix-v8-stop-preflight-v20260806.json
+      EXPECTED_V14: 20260807.14-two-phase-runtime
+    steps:
+      - name: Checkout exact activation head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Detect current lifecycle phase
+        id: phase
+        shell: bash
+        run: |
+          set -euo pipefail
+          PHASE="$(node -e "const j=require('./' + process.env.LIFECYCLE); process.stdout.write(String(j.currentPhase||''))")"
+          if [[ "$PHASE" == 'VISUAL_MATRIX_CORRECTED_POST_AUTH_LAB_EXECUTION' ]]; then
+            echo 'mode=runtime_pending' >> "$GITHUB_OUTPUT"
+          else
+            echo 'mode=source' >> "$GITHUB_OUTPUT"
+          fi
+          echo "observed_phase=$PHASE"
+
+      - name: Validate source-only package before transition
+        if: steps.phase.outputs.mode == 'source'
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-json-guard-visual-matrix-runtime-v20260806.mjs
+          node --check tools/orbit360-transition-visual-matrix-lifecycle-source-to-runtime-v20260807.mjs
+          node --check tools/orbit360-consume-visual-matrix-request-on-stop-v20260807.mjs
+          node --check tools/orbit360-test-preflight-portable-source-v20260806.mjs
+          node --check tools/orbit360-test-request-lifecycle-baseline-contract-v20260806.mjs
+          bash -n tools/orbit360-preflight-visual-matrix-runtime-relay-v8-v20260806.sh
+          bash -n tools/orbit360-restore-visual-matrix-v13-baseline-before-runtime-v20260807.sh
+          bash -n tools/orbit360-run-visual-matrix-corrected-post-auth-runtime-only-v4-transport-base-sha-v20260806.sh
+          node tools/orbit360-test-request-lifecycle-baseline-contract-v20260806.mjs
+          node tools/orbit360-test-preflight-portable-source-v20260806.mjs
+          node tools/orbit360-test-runtime-transport-base-sha-v20260806.mjs
+          node tools/orbit360-test-capture-watchdog-source-v20260806.mjs
+          node tools/orbit360-test-windows-signal-compatibility-synthetic-v20260806.mjs
+          node tools/orbit360-test-visual-matrix-timeout-signal-safe-portable-v20260806.mjs
+          node tools/orbit360-test-visual-matrix-cross-runner-portable-v20260806.mjs
+
+      - name: Assert source-only v14 PASS before transition
+        if: steps.phase.outputs.mode == 'source'
+        shell: bash
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs = require('fs');
+          const request = JSON.parse(fs.readFileSync(process.env.REQUEST,'utf8'));
+          const lifecycle = JSON.parse(fs.readFileSync(process.env.LIFECYCLE,'utf8'));
+          const overlay = JSON.parse(fs.readFileSync(process.env.OVERLAY,'utf8'));
+          const workflow = fs.readFileSync('.github/workflows/orbit360-claude-paquete-reconciliado-v1205.yml','utf8');
+          const expected = process.env.EXPECTED_V14;
+          const caps = lifecycle.executionProfile && lifecycle.executionProfile.capabilities || {};
+          const noRuntimeCaps = caps.secrets===false && caps.firestoreRead===false && caps.writes===false && caps.runtime===false && caps.browser===false && caps.deploy===false && caps.functionsDeploy===false && caps.rulesDeploy===false && caps.production===false;
+          const ok =
+            request.requestVersion === '20260807.13-validator-rootfix-runtime' && request.consumed === true && request.allowedExecutions === 0 && request.authorizationFrozen === true && request.replayAllowed === false &&
+            lifecycle.authorizedBaseHead === 'bb238dc26506aafd64e5bb52d5357fa5052bd9aa' && lifecycle.expectedRequestVersion === expected && lifecycle.stopRetryActive === false && lifecycle.authorizationReserved === true && lifecycle.allowedExecutions === 1 && lifecycle.executionAuthorized === false && lifecycle.secretAccessAuthorized === false && lifecycle.browserAuthorized === false && lifecycle.hostingDeployAuthorized === false && noRuntimeCaps &&
+            overlay.expectedNextRequestVersion === expected && overlay.stopRetryActive === false && overlay.runtimeAllowed === true && overlay.runtimeAllowedOnlyWithFreshExclusiveRequest === true && overlay.productionAllowed === false && overlay.writesAllowed === false &&
+            workflow.includes(`ORBIT360_EXPECTED_REQUEST_VERSION: ${expected}`) && workflow.includes('orbit360-consume-visual-matrix-request-on-stop-v20260807.mjs');
+          if (!ok) process.exit(41);
+          console.log(JSON.stringify({status:'PASS_SOURCE_ONLY_ACTIVATION_V14',authorizedBaseHead:lifecycle.authorizedBaseHead,expectedRequestVersion:expected,priorRequestConsumed:true,runtimeCapabilities:false,secretsRead:false,firebaseAccess:false,browserExecuted:false,hostingTouched:false,deployExecuted:false,writes:0,ok:true},null,2));
+          NODE
+
+      - name: Mark observable source PASS and execute explicit transition
+        if: steps.phase.outputs.mode == 'source'
+        shell: bash
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs = require('fs');
+          const p = process.env.LIFECYCLE;
+          const j = JSON.parse(fs.readFileSync(p,'utf8'));
+          j.classification = 'SOURCE_ONLY_ACTIVATION_VALIDATED';
+          j.currentPhase = 'V14_ACTIVATION_SOURCE_ONLY_PASS_PENDING_EXCLUSIVE_REQUEST';
+          j.executionProfile.phase = j.currentPhase;
+          j.ownerVersion = '20260807.37-v14-two-phase-source-activation-validated';
+          j.sourcePrerequisites = j.sourcePrerequisites || {};
+          j.sourcePrerequisites.activationSourceStatus = 'PASS_V14_ACTIVATION_SOURCE_ONLY';
+          j.sourcePrerequisites.activationSourceRunId = Number(process.env.GITHUB_RUN_ID || 0);
+          j.sourcePrerequisites.activationSourceJob = 'source-v14-two-phase';
+          fs.writeFileSync(p, JSON.stringify(j,null,2)+'\n');
+          console.log('PASS_SOURCE_ONLY_ACTIVATION_V14_OBSERVED_BEFORE_TRANSITION');
+          NODE
+          node tools/orbit360-transition-visual-matrix-lifecycle-source-to-runtime-v20260807.mjs "$LIFECYCLE" "$OVERLAY" "$REQUEST" "$EXPECTED_V14"
+
+      - name: Validate explicit runtime-pending transition
+        shell: bash
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs = require('fs');
+          const l = JSON.parse(fs.readFileSync(process.env.LIFECYCLE,'utf8'));
+          const o = JSON.parse(fs.readFileSync(process.env.OVERLAY,'utf8'));
+          const expected = process.env.EXPECTED_V14;
+          const caps = l.executionProfile && l.executionProfile.capabilities || {};
+          const exactCaps = caps.secrets===true && caps.firestoreRead===true && caps.writes===false && caps.runtime===true && caps.browser===true && caps.deploy===true && caps.functionsDeploy===false && caps.rulesDeploy===false && caps.production===false;
+          const ok = l.status==='AUTHORIZED_ONCE_PENDING_EXCLUSIVE_REQUEST' && l.currentPhase==='VISUAL_MATRIX_CORRECTED_POST_AUTH_LAB_EXECUTION' && l.expectedRequestVersion===expected && l.executionAuthorized===true && l.secretAccessAuthorized===true && l.firestoreReadAuthorized===true && l.writeAuthorized===false && l.browserAuthorized===true && l.hostingDeployAuthorized===true && l.functionsDeployAuthorized===false && l.rulesDeployAuthorized===false && l.productionAuthorized===false && l.mainAuthorized===false && l.mergeAuthorized===false && exactCaps && o.status==='AUTHORIZED_ONCE_PENDING_EXCLUSIVE_REQUEST' && o.expectedNextRequestVersion===expected && o.runtimeAllowed===true && o.hostingAllowed===true && o.productionAllowed===false && o.writesAllowed===false;
+          if (!ok) process.exit(41);
+          console.log(JSON.stringify({status:'PASS_SOURCE_TO_RUNTIME_TRANSITION_V14',lifecycleStatus:l.status,lifecyclePhase:l.currentPhase,expectedRequestVersion:expected,requestCreated:false,secretsRead:false,firebaseAccess:false,browserExecuted:false,hostingTouched:false,deployExecuted:false,writes:0,ok:true},null,2));
+          NODE
+
+      - name: Persist transitioned lifecycle only
+        if: steps.phase.outputs.mode == 'source'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name orbit360-gate-bot
+          git config user.email orbit360-gate-bot@users.noreply.github.com
+          git add "$LIFECYCLE" "$OVERLAY"
+          git commit -m 'source: persist validated v14 runtime-pending transition [skip ci]'
+          git push origin HEAD:ays/source-activation-v14-two-phase-20260807
+
+      - name: Final source-only safety assertion
+        shell: bash
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('fs');
+          const r=JSON.parse(fs.readFileSync(process.env.REQUEST,'utf8'));
+          if (!(r.consumed===true && r.allowedExecutions===0 && r.authorizationFrozen===true && r.replayAllowed===false)) process.exit(41);
+          console.log(JSON.stringify({status:'PASS_V14_SOURCE_ACTIVATION_AND_TRANSITION_NO_RUNTIME',newRequestAbsent:true,priorRequestConsumed:true,secretsRead:false,firebaseAccess:false,firestoreReads:0,firestoreWrites:0,authWrites:0,operationalWrites:0,browserExecuted:false,hostingTouched:false,hostingDeploys:0,productionTouched:false,ok:true},null,2));
+          NODE
