@@ -71,7 +71,7 @@ jobs:
 
           git config user.name orbit360-gate-bot
           git config user.email orbit360-gate-bot@users.noreply.github.com
-          git add "$LIFECYCLE" "$OVERLAY" '.github/workflows/orbit360-claude-paquete-reconciliado-v1205.yml' 'orbit360-platform/runtime-gate-crm-v20260716/v16-source-activation-hydration-sequence-sanitized-v20260807.json'
+          git add "$LIFECYCLE" "$OVERLAY" 'orbit360-platform/runtime-gate-crm-v20260716/v16-source-activation-hydration-sequence-sanitized-v20260807.json'
           if ! git diff --cached --quiet; then
             git commit -m 'source-only: persist v16 runtime-pending hydration sequence [skip ci]'
             git push origin HEAD:ays/source-activation-v16-hydration-sequence-20260807
