@@ -1,0 +1,59 @@
+name: Orbit 360 · Rootfix v15 Inicio hydration + STOP consumer · source-only
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  validate-v15-rootfix:
+    if: github.head_ref == 'ays/sourcefix-v15-inicio-hydration-stop-consumer-20260807'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout exact sourcefix head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Validate syntax and structural rootfix
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check orbit360-platform/core/visual-runtime-hydration-contract-v20260805.js
+          node --check tools/orbit360-visual-runtime-rootfix-browser-precheck-v20260805.mjs
+          node --check tools/orbit360-consume-visual-matrix-request-on-stop-v20260807.mjs
+          node --check tools/orbit360-seal-visual-matrix-corrected-post-auth-runtime-v20260805.mjs
+          node --check tools/orbit360-test-v15-inicio-hydration-stop-consumer-rootfix-source-v20260807.mjs
+          node tools/orbit360-test-v15-inicio-hydration-stop-consumer-rootfix-source-v20260807.mjs
+
+      - name: Re-run governing portable source suites
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-test-request-lifecycle-baseline-contract-v20260806.mjs
+          node tools/orbit360-test-preflight-portable-source-v20260806.mjs
+          node tools/orbit360-test-runtime-transport-base-sha-v20260806.mjs
+          node tools/orbit360-test-capture-watchdog-source-v20260806.mjs
+          node tools/orbit360-test-windows-signal-compatibility-synthetic-v20260806.mjs
+          node tools/orbit360-test-visual-matrix-timeout-signal-safe-portable-v20260806.mjs
+          node tools/orbit360-test-visual-matrix-cross-runner-portable-v20260806.mjs
+
+      - name: Assert live v15 remains consumed frozen and no runtime occurs
+        shell: bash
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('fs');
+          const request=JSON.parse(fs.readFileSync('.github/orbit360-requests/visual-matrix-corrected-post-auth-lab-v20260805-authorization.json','utf8'));
+          const lifecycle=JSON.parse(fs.readFileSync('tools/orbit360-validator-lifecycle-contract-visual-matrix-corrected-post-auth-lab-v20260805.json','utf8'));
+          const overlay=JSON.parse(fs.readFileSync('tools/orbit360-validator-lifecycle-overlay-visual-matrix-v8-stop-preflight-v20260806.json','utf8'));
+          const rootfix=JSON.parse(fs.readFileSync('orbit360-platform/runtime-gate-crm-v20260716/v15-inicio-hydration-stop-consumer-rootfix-source-sanitized-v20260807.json','utf8'));
+          const ok=request.requestVersion==='20260807.15-two-phase-runtime'&&request.consumed===true&&request.allowedExecutions===0&&request.authorizationFrozen===true&&request.replayAllowed===false&&lifecycle.stopRetryActive===true&&lifecycle.allowedExecutions===0&&lifecycle.executionAuthorized===false&&overlay.stopRetryActive===true&&overlay.runtimeAllowed===false&&overlay.hostingAllowed===false&&rootfix.ok===true;
+          if(!ok) process.exit(41);
+          console.log(JSON.stringify({status:'PASS_V15_ROOTFIX_LIVE_FAIL_CLOSED',requestConsumedFrozen:true,lifecycleStop:true,overlayRuntimeAllowed:false,runtimeExecuted:false,secretsRead:false,firebaseAccess:false,hostingTouched:false,browserExecuted:false,deployExecuted:false,writes:0,ok:true},null,2));
+          NODE
