@@ -1,7 +1,7 @@
 {
   "schemaVersion": "orbit360-v17-advisor-cache-route-readiness-rootfix-source-v1",
-  "generatedAt": "2026-08-07T15:44:28.917Z",
-  "runId": "31194105249",
+  "generatedAt": "2026-08-07T15:46:15.961Z",
+  "runId": "31194248569",
   "gateId": "block2.7-visual-matrix-corrected-post-auth-lab-v20260805",
   "sourceAuthorizationBaseHead": "ad6f2e16305c7f519dcd213e26997695637621b8",
   "status": "PASS_V17_ADVISOR_CACHE_ROUTE_READINESS_ROOTFIX_SOURCE_ONLY",
