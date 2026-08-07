@@ -55,7 +55,7 @@ jobs:
           fi
           node - <<'NODE'
           const fs=require('fs'); const r=JSON.parse(fs.readFileSync(process.env.ORBIT360_REQUEST_FILE,'utf8'));
-          const ok=r.requestVersion===process.env.ORBIT360_EXPECTED_REQUEST_VERSION && r.gateId==='block1-client360-insurers-lab-v20260717' && r.contractVersion==='1.0.26' && r.status==='AUTHORIZED_ONCE' && r.approved===true && r.allowedExecutions===1 && r.consumed===false && r.authorizationFrozen===false && r.replayAllowed===false;
+          const ok=r.requestVersion===process.env.ORBIT360_EXPECTED_REQUEST_VERSION && r.gateId==='block1-client360-insurers-lab-v20260717' && r.contractVersion==='1.0.41' && r.status==='AUTHORIZED_ONCE' && r.approved===true && r.allowedExecutions===1 && r.consumed===false && r.authorizationFrozen===false && r.replayAllowed===false;
           if(!ok) process.exit(41);
           NODE
           REQUEST_PARENT="$(git rev-parse HEAD^)"
@@ -71,21 +71,24 @@ jobs:
           echo "request_parent=$REQUEST_PARENT" >> "$GITHUB_OUTPUT"
           echo 'PASS_V23_EXCLUSIVE_REQUEST_TRANSPORT_BASE_BEFORE_SECRETS'
 
-      - name: Validate exact native source package before GO
+      - name: Validate exact canonical native source package before GO
         if: steps.detect.outputs.dispatch == 'true'
         shell: bash
         run: |
           set -euo pipefail
           test "$GITHUB_RUN_ATTEMPT" = '1'
+          node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
+          node --check tools/orbit360-validar-gate-contracts-engine-block1-v23-native-v20260807.mjs
           node --check tools/orbit360-event-driven-render-observer-v23.mjs
           node --check tools/orbit360-block1-native-matrix-v23-v20260807.mjs
+          node --check tools/orbit360-block1-native-matrix-v23-canonical-v20260807.mjs
           node --check tools/orbit360-adjudicate-block1-universe-readonly-v23-v20260807.mjs
           node --check tools/orbit360-test-v23-native-block1-source-v20260807.mjs
           node --check tools/orbit360-preflight-block1-v23-native-v20260807.mjs
           node --check tools/orbit360-block1-v23-browser-precheck-v20260807.mjs
           node --check tools/orbit360-close-block1-v23-runtime-v20260807.mjs
           bash -n tools/orbit360-run-block1-v23-runtime-signal-safe-v20260807.sh
-          ORBIT360_MATRIX_ARTIFACT_VALIDATE_ONLY=1 node tools/orbit360-block1-native-matrix-v23-v20260807.mjs
+          ORBIT360_MATRIX_ARTIFACT_VALIDATE_ONLY=1 node tools/orbit360-block1-native-matrix-v23-canonical-v20260807.mjs
           ORBIT360_PRECHECK_VALIDATE_ONLY=1 node tools/orbit360-block1-v23-browser-precheck-v20260807.mjs
           node tools/orbit360-test-v23-native-block1-source-v20260807.mjs
           node tools/orbit360-test-windows-signal-compatibility-synthetic-v20260806.mjs
@@ -173,16 +176,7 @@ jobs:
           set -euo pipefail
           git config user.name orbit360-gate-bot
           git config user.email orbit360-gate-bot@users.noreply.github.com
-          files=(
-            "$ORBIT360_REQUEST_FILE"
-            "$ORBIT360_V23_LIFECYCLE"
-            "$ORBIT360_V23_PREFLIGHT_EVIDENCE"
-            "$ORBIT360_UNIVERSE_EVIDENCE"
-            "$ORBIT360_BROWSER_PRECHECK_EVIDENCE"
-            "$ORBIT360_MATRIX_EVIDENCE"
-            "$ORBIT360_V23_RUNTIME_STATE"
-            "$ORBIT360_V23_FINAL_EVIDENCE"
-          )
+          files=("$ORBIT360_REQUEST_FILE" "$ORBIT360_V23_LIFECYCLE" "$ORBIT360_V23_PREFLIGHT_EVIDENCE" "$ORBIT360_UNIVERSE_EVIDENCE" "$ORBIT360_BROWSER_PRECHECK_EVIDENCE" "$ORBIT360_MATRIX_EVIDENCE" "$ORBIT360_V23_RUNTIME_STATE" "$ORBIT360_V23_FINAL_EVIDENCE")
           for file in "${files[@]}"; do [[ -e "$file" ]] && git add "$file"; done
           if ! git diff --cached --quiet; then
             git commit -m 'runtime: persist Block1 v23 native closure [skip ci]'
