@@ -1,0 +1,59 @@
+name: Orbit 360 · V16 exclusive relay · source-only
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: write
+
+jobs:
+  validate-v16-exclusive-relay:
+    if: github.head_ref == 'ays/source-activation-v16-hydration-sequence-20260807'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout exact source activation head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Bind exclusive relay metadata and validate runtime-pending source state
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-bind-v16-exclusive-relay-metadata-source-v20260807.mjs
+          node --check tools/orbit360-validate-v16-exclusive-relay-runtime-pending-source-v20260807.mjs
+          node tools/orbit360-bind-v16-exclusive-relay-metadata-source-v20260807.mjs
+          node tools/orbit360-validate-v16-exclusive-relay-runtime-pending-source-v20260807.mjs
+          node tools/orbit360-test-v15-inicio-hydration-stop-consumer-rootfix-source-v20260807.mjs
+          node tools/orbit360-test-request-lifecycle-baseline-contract-v20260806.mjs
+          node tools/orbit360-test-preflight-portable-source-v20260806.mjs
+          node tools/orbit360-test-runtime-transport-base-sha-v20260806.mjs
+          node tools/orbit360-test-capture-watchdog-source-v20260806.mjs
+          node tools/orbit360-test-windows-signal-compatibility-synthetic-v20260806.mjs
+          node tools/orbit360-test-visual-matrix-timeout-signal-safe-portable-v20260806.mjs
+          node tools/orbit360-test-visual-matrix-cross-runner-portable-v20260806.mjs
+
+          git config user.name orbit360-gate-bot
+          git config user.email orbit360-gate-bot@users.noreply.github.com
+          git add tools/orbit360-validator-lifecycle-contract-visual-matrix-corrected-post-auth-lab-v20260805.json tools/orbit360-validator-lifecycle-overlay-visual-matrix-v8-stop-preflight-v20260806.json orbit360-platform/runtime-gate-crm-v20260716/v16-source-activation-hydration-sequence-sanitized-v20260807.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'source-only: bind exclusive v16 relay metadata [skip ci]'
+            git push origin HEAD:ays/source-activation-v16-hydration-sequence-20260807
+          fi
+
+      - name: Assert no runtime side effects and no v16 request
+        shell: bash
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('fs');
+          const e=JSON.parse(fs.readFileSync('orbit360-platform/runtime-gate-crm-v20260716/v16-source-activation-hydration-sequence-sanitized-v20260807.json','utf8'));
+          const r=JSON.parse(fs.readFileSync('.github/orbit360-requests/visual-matrix-corrected-post-auth-lab-v20260805-authorization.json','utf8'));
+          const ok=e.ok===true&&e.status==='PASS_V16_SOURCE_TO_RUNTIME_PENDING_EXCLUSIVE_RELAY'&&e.requestCreated===false&&r.requestVersion==='20260807.15-two-phase-runtime'&&r.consumed===true&&r.authorizationFrozen===true&&e.secretsRead===false&&e.firebaseAccess===false&&e.hostingTouched===false&&e.browserExecuted===false&&e.deployExecuted===false&&e.firestoreWrites===0&&e.authWrites===0&&e.operationalWrites===0;
+          if(!ok) process.exit(41);
+          console.log('PASS_V16_EXCLUSIVE_RELAY_SOURCE_ONLY_ZERO_SIDE_EFFECTS');
+          NODE
