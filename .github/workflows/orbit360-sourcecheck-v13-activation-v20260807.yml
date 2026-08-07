@@ -1,0 +1,85 @@
+name: Orbit 360 · Validar activación v13 · source-only
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  validate-v13-activation-source-only:
+    if: github.head_ref == 'ays/runtime-v13-activation-source-only-20260807'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - name: Checkout exact activation head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Validate source package
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash -n tools/orbit360-preflight-visual-matrix-runtime-relay-v8-v20260806.sh
+          bash -n tools/orbit360-restore-visual-matrix-v13-baseline-before-runtime-v20260807.sh
+          bash -n tools/orbit360-run-visual-matrix-corrected-post-auth-runtime-only-v4-transport-base-sha-v20260806.sh
+          node --check tools/orbit360-json-guard-visual-matrix-runtime-v20260806.mjs
+          node --check tools/orbit360-test-request-lifecycle-baseline-contract-v20260806.mjs
+          node --check tools/orbit360-playwright-capture-watchdog-lib-v20260806.mjs
+          node --check tools/orbit360-visual-runtime-rootfix-observable-matrix-v20260805.mjs
+          node tools/orbit360-test-request-lifecycle-baseline-contract-v20260806.mjs
+          node tools/orbit360-test-preflight-portable-source-v20260806.mjs
+          node tools/orbit360-test-runtime-transport-base-sha-v20260806.mjs
+          node tools/orbit360-test-capture-watchdog-source-v20260806.mjs
+          node tools/orbit360-test-windows-signal-compatibility-synthetic-v20260806.mjs
+          node tools/orbit360-test-visual-matrix-timeout-signal-safe-portable-v20260806.mjs
+          node tools/orbit360-test-visual-matrix-cross-runner-portable-v20260806.mjs
+
+      - name: Assert v13 activation contract and zero risk
+        shell: bash
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs = require('fs');
+          const lifecycle = JSON.parse(fs.readFileSync('tools/orbit360-validator-lifecycle-contract-visual-matrix-corrected-post-auth-lab-v20260805.json','utf8'));
+          const overlay = JSON.parse(fs.readFileSync('tools/orbit360-validator-lifecycle-overlay-visual-matrix-v8-stop-preflight-v20260806.json','utf8'));
+          const request = JSON.parse(fs.readFileSync('.github/orbit360-requests/visual-matrix-corrected-post-auth-lab-v20260805-authorization.json','utf8'));
+          const workflow = fs.readFileSync('.github/workflows/orbit360-claude-paquete-reconciliado-v1205.yml','utf8');
+          const restore = fs.readFileSync('tools/orbit360-restore-visual-matrix-v13-baseline-before-runtime-v20260807.sh','utf8');
+          const baseline = JSON.parse(fs.readFileSync('orbit360-platform/runtime-gate-crm-v20260716/request-lifecycle-baseline-contract-source-test-sanitized-v20260806.json','utf8'));
+          const phase = JSON.parse(fs.readFileSync('orbit360-platform/runtime-gate-crm-v20260716/preflight-portable-source-test-sanitized-v20260806.json','utf8'));
+          const ok =
+            lifecycle.status === 'AUTHORIZED_FRESH_REQUEST_ONLY_V13_PENDING_EXCLUSIVE_REQUEST' &&
+            lifecycle.authorizedBaseHead === '53b31520f7cf97158bb1d7efde4e00a7e8ebf8c3' &&
+            lifecycle.expectedRequestVersion === '20260807.13-validator-rootfix-runtime' &&
+            lifecycle.authorizationReserved === true && lifecycle.allowedExecutions === 1 && lifecycle.executionAuthorized === false && lifecycle.stopRetryActive === false &&
+            lifecycle.priorHostingRestoreChannel === 'visual-matrix-corrected-backup-31135532118' &&
+            lifecycle.priorHostingRestoreScript === 'tools/orbit360-restore-visual-matrix-v13-baseline-before-runtime-v20260807.sh' &&
+            overlay.status === 'AUTHORIZED_FRESH_REQUEST_ONLY_V13_PENDING_EXCLUSIVE_REQUEST' && overlay.runtimeAllowedOnlyWithFreshExclusiveRequest === true && overlay.productionAllowed === false && overlay.writesAllowed === false &&
+            request.requestVersion === '20260806.12-capture-watchdog-runtime' && request.consumed === true && request.allowedExecutions === 0 && request.replayAllowed === false &&
+            workflow.includes('ORBIT360_EXPECTED_REQUEST_VERSION: 20260807.13-validator-rootfix-runtime') &&
+            workflow.includes('orbit360-restore-visual-matrix-v13-baseline-before-runtime-v20260807.sh') &&
+            restore.includes("SOURCE_BACKUP='visual-matrix-corrected-backup-31135532118'") && restore.includes("GO_GATE_CONTRACT_NOT_PASS") &&
+            baseline.status === 'PASS_REQUEST_LIFECYCLE_BASELINE_CONTRACT_SOURCE_ONLY' && baseline.failed === 0 && baseline.ok === true &&
+            phase.status === 'PASS_SOURCE_ONLY_PHASE_AWARE_PREFLIGHT_VALIDATOR' && phase.failed === 0 && phase.ok === true;
+          if (!ok) process.exit(41);
+          console.log(JSON.stringify({
+            status:'PASS_V13_ACTIVATION_SOURCE_ONLY',
+            authorizedBaseHead:lifecycle.authorizedBaseHead,
+            expectedRequestVersion:lifecycle.expectedRequestVersion,
+            baselineChecks:baseline.passed,
+            phaseAwareChecks:phase.passed,
+            runtimeExecuted:false,
+            secretsRead:false,
+            firebaseAccess:false,
+            browserExecuted:false,
+            hostingTouched:false,
+            deployExecuted:false,
+            writes:0,
+            ok:true
+          },null,2));
+          NODE
