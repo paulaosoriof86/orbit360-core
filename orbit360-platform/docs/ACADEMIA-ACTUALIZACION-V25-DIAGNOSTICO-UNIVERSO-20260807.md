@@ -4,28 +4,44 @@ Fecha: 2026-08-07
 
 ## Objetivo pedagógico
 
-Distinguir entre un conteo contractual obsoleto y un dato realmente fuera de contrato sin tocar el producto ni forzar cifras.
+Distinguir entre conteo contractual, dato fuera de contrato y validador obsoleto sin forzar cifras ni tocar datos.
 
 ## Caso v25
 
-El gate Block1 esperaba 414 clientes / 26 aseguradoras / 7 asesores. v24 observó 430 / 30 / 7 raw y 430 / 25 / 7 efectivos. v25 enseña que un delta numérico no autoriza a borrar, fusionar o excluir filas.
+El gate Block1 esperaba 414 clientes / 26 aseguradoras / 7 asesores. La lectura única v25 observó 430 / 30 / 7 raw; 414 clientes y 26 aseguradoras conservan tag del batch baseline. El clasificador genérico bajó Aseguradoras a 25 porque interpretó un código compartido como duplicado.
 
-## Regla
+La fuente rectora de reconciliación demuestra que dos aseguradoras distintas pueden compartir ese código y deben quedar en `REQUIERE_VALIDACION`, no fusionarse. Por ello, el diagnóstico runtime inicial `DATA_CONTRACT_FAILURE` debe ser adjudicado como `VALIDATOR_STALE` para Aseguradoras. El contrato 26 permanece.
+
+En Clientes, los 16 no-baseline carecen de señales objetivas de batch, timestamp, source o auditoría. Aunque están efectivos, no se puede decidir legítimamente si son altas posteriores o contaminación. Resultado: `REQUIERE_VALIDACION`.
+
+## Regla reusable
 
 1. Recuperar el baseline de procedencia.
 2. Probar pertenencia por batch/manifest, no por posición.
 3. Separar miembros baseline de registros posteriores.
-4. Para cada diferencial emitir solo fingerprint y señales no PII.
-5. Si el baseline sigue completo y existen altas posteriores objetivamente trazables, el contrato puede ser `VALIDATOR_STALE`.
-6. Si un miembro baseline contradice su estado canónico sin transición trazable, existe `DATA_CONTRACT_FAILURE`.
-7. Si falta evidencia para decidir, usar `REQUIERE_VALIDACION`; no inventar una exclusión para alcanzar el número esperado.
+4. Una clave de fuente solo es clave fuerte si el contrato de fuente garantiza unicidad.
+5. Una colisión conocida y documentada debe conservarse como `REQUIERE_VALIDACION`, no convertirse automáticamente en duplicado.
+6. Adjudicar el output del validator contra la fuente rectora antes de autorizar correcciones de datos.
+7. Si falta evidencia para decidir, mantener `REQUIERE_VALIDACION`; no excluir hasta alcanzar un número esperado.
+8. Emitir solo fingerprints y señales no PII en artifacts diagnósticos.
+
+## Diferencia de causas
+
+- `FUNCTIONAL_DEFECT`: producto se comporta incorrectamente.
+- `VALIDATOR_STALE`: validator contradice un contrato/fuente rectora vigente.
+- `DATA_CONTRACT_FAILURE`: el dato contradice un contrato demostrado.
+- `REQUIERE_VALIDACION`: evidencia insuficiente para adjudicar legítimamente.
+
+v25 terminó con causa compuesta: `VALIDATOR_STALE_IN_INSURER_DEDUPE_PLUS_UNRESOLVED_CLIENT_PROVENANCE` y decisión global `REQUIERE_VALIDACION`.
 
 ## Seguridad
 
-El diagnóstico v25 admite exactamente tres lecturas de colecciones autorizadas, cero escrituras, cero Auth reads, cero Hosting y cero browser. La autorización se consume al finalizar aunque la conclusión sea `REQUIERE_VALIDACION`.
+La adjudicación LAB se ejecutó una sola vez, exactamente tres lecturas, cero writes, cero Auth reads, cero Hosting/browser. La adjudicación posterior de la causa fue source-only y no volvió a consultar LAB. La autorización quedó consumida/frozen.
 
-## Roles y Academia
+## Roles
 
-Dirección debe comprender que el gate protege la integridad aunque retrase una visualización. Operativo debe distinguir corrección de contrato vs corrección de dato. Asesor no interviene en la reconciliación maestra.
+Dirección: entiende por qué no se toca un dato solo para hacer pasar un KPI.  
+Operativo: distingue corrección de validator, corrección de dato y requerimiento de procedencia.  
+Asesor: no participa en reconciliación maestra ni decide fusiones/exclusiones.
 
 Clasificación: `ACADEMIA_ACTUALIZAR`.
