@@ -1,9 +1,12 @@
 {
-  "schemaVersion": "orbit360-validator-lifecycle-v23-native-v1",
+  "schemaVersion": "orbit360-validator-lifecycle-v23-native-v2",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
   "gateId": "block1-client360-insurers-lab-v20260717",
-  "gateContractVersion": "1.0.26",
+  "gateContractVersion": "1.0.41",
+  "predecessorGateContractVersion": "1.0.40",
+  "predecessorOwnerStatus": "HISTORICAL_RETIRED_OWNER_PRESERVED",
   "owner": "orbit360-block1-native-matrix-v23",
-  "ownerVersion": "20260807.23-native-source",
+  "ownerVersion": "20260807.23-native-source-canonical-owner-1.0.41",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
   "projectId": "ays-orbit-360-lab",
@@ -11,7 +14,7 @@
   "authorizedSourceHead": "ef9e0e1e738ce407025ed159067d8b3cc4d2683b",
   "expectedRequestVersion": "20260807.23-native-block1-runtime",
   "status": "SOURCE_VALIDATION_PENDING",
-  "classification": "PIPELINE_MECHANISM_FAILURE_ROOTFIX_SOURCE_ONLY",
+  "classification": "VALIDATOR_STALE_CANONICAL_OWNER_REALIGNMENT_SOURCE_ONLY",
   "currentPhase": "SOURCE_ONLY_NATIVE_MATRIX_VALIDATION",
   "stopRetryActive": false,
   "authorizationReserved": true,
@@ -40,12 +43,20 @@
   "renderObserver": "tools/orbit360-event-driven-render-observer-v23.mjs",
   "universeAdjudicator": "tools/orbit360-adjudicate-block1-universe-readonly-v23-v20260807.mjs",
   "gateOverlay": "tools/orbit360-gate-contract-block1-v23-native-v20260807.json",
+  "canonicalEngine": "tools/orbit360-validar-gate-contracts-engine-block1-v23-native-v20260807.mjs",
   "mandatoryCanonicalPreflight": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
   "v23Preflight": "tools/orbit360-preflight-block1-v23-native-v20260807.mjs",
   "sourceWorkflow": ".github/workflows/orbit360-sourcecheck-v23-native-block1-v20260807.yml",
   "runtimeWorkflow": ".github/workflows/orbit360-registered-relay-v23-native-block1-v20260807.yml",
   "requestPath": ".github/orbit360-requests/block1-client360-insurers-v23-authorization.json",
   "blockingRoutes": ["inicio", "cliente360", "aseguradoras"],
+  "historicalClosure": {
+    "freeze": "tools/orbit360-incident-freeze-v20260721.json",
+    "m1Closed": true,
+    "m2Closed": true,
+    "priorRuntimeAuthorizationActive": false,
+    "preservedUniverse": { "clientes": 414, "aseguradoras": 26, "asesores": 7 }
+  },
   "hosting": {
     "priorRestoreChannel": "visual-matrix-corrected-backup-31135532118",
     "deploysMaximum": 1,
@@ -78,5 +89,5 @@
   "containsPII": false,
   "containsSecrets": false,
   "containsPasswords": false,
-  "nextAction": "VALIDATE_EXACT_NATIVE_SOURCE_PACKAGE_BEFORE_ANY_RUNTIME_TRANSITION"
+  "nextAction": "VALIDATE_CANONICAL_OWNER_1.0.41_AND_EXACT_NATIVE_SOURCE_PACKAGE_BEFORE_ANY_RUNTIME_TRANSITION"
 }
