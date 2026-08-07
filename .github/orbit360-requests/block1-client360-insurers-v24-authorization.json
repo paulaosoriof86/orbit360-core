@@ -5,11 +5,11 @@
   "authorizationGeneration": "v24-canonical-evidence-handoff",
   "gateId": "block1-client360-insurers-lab-v20260717",
   "contractVersion": "1.0.41",
-  "status": "AUTHORIZED_ONCE",
+  "status": "CONSUMED_STOP_RETRY_UNIVERSE_ADJUDICATION",
   "approved": true,
-  "allowedExecutions": 1,
-  "consumed": false,
-  "authorizationFrozen": false,
+  "allowedExecutions": 0,
+  "consumed": true,
+  "authorizationFrozen": true,
   "replayAllowed": false,
   "parentHead": "5794a29f42cc79993d730d50e29ceed2697b7a3a",
   "authorizedBaseHead": "5794a29f42cc79993d730d50e29ceed2697b7a3a",
@@ -20,10 +20,22 @@
   "canonicalEvidenceAuthority": "orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json",
   "scope": {
     "runtime": "BLOCK1_CLIENT360_INSURERS_NATIVE_MATRIX_V24",
-    "roles": ["Direccion", "Operativo", "Asesor"],
-    "blockingRoutes": ["inicio", "cliente360", "aseguradoras"],
+    "roles": [
+      "Direccion",
+      "Operativo",
+      "Asesor"
+    ],
+    "blockingRoutes": [
+      "inicio",
+      "cliente360",
+      "aseguradoras"
+    ],
     "universeAdjudicationAfterGoBeforeHosting": true,
-    "expectedUniverse": { "clientes": 414, "aseguradoras": 26, "asesores": 7 },
+    "expectedUniverse": {
+      "clientes": 414,
+      "aseguradoras": 26,
+      "asesores": 7
+    },
     "requiresValidationExcluded": false,
     "restoreChannel": "visual-matrix-corrected-backup-31135532118",
     "backupBeforeDeploy": true,
@@ -49,5 +61,29 @@
     "protectedBackend": true
   },
   "containsPII": false,
-  "containsSecrets": false
+  "containsSecrets": false,
+  "consumedByRunId": "31221713418",
+  "consumedByAttempt": 1,
+  "consumedAt": "2026-08-07T21:52:46.199Z",
+  "executionResult": {
+    "decision": "STOP_RETRY",
+    "classification": "DATA_CONTRACT_FAILURE",
+    "checkpoint": "UNIVERSE_ADJUDICATION",
+    "runId": "31221713418",
+    "attempt": 1,
+    "contractVersion": "1.0.41",
+    "goGateContract": "GRANTED",
+    "universeStatus": "STOP_RETRY_BLOCK1_UNIVERSE_ADJUDICATION",
+    "hostingRestoreOutcome": "skipped",
+    "hostingBackupOutcome": "skipped",
+    "hostingDeploys": 0,
+    "browserPrecheck": "",
+    "matrixStage": "",
+    "rollbackOutcome": "skipped",
+    "snapshotIntegrity": "NOT_VERIFIED",
+    "firestoreWrites": 0,
+    "authWrites": 0,
+    "operationalWrites": 0,
+    "productionTouched": false
+  }
 }

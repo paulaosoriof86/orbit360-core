@@ -14,21 +14,31 @@
   "authorizedSourceHead": "ef9e0e1e738ce407025ed159067d8b3cc4d2683b",
   "expectedRequestVersion": "20260807.23-native-block1-runtime",
   "authorizationGeneration": "v24-canonical-evidence-handoff",
-  "status": "AUTHORIZED_ONCE_PENDING_EXCLUSIVE_REQUEST",
-  "classification": "RUNTIME_PENDING_V24_CANONICAL_EVIDENCE_HANDOFF_SOURCE_VALIDATED",
-  "currentPhase": "BLOCK1_NATIVE_MATRIX_RUNTIME_V23",
-  "stopRetryActive": false,
-  "authorizationReserved": true,
-  "authorizationFrozen": false,
-  "allowedExecutions": 1,
+  "status": "STOP_RETRY_UNIVERSE_ADJUDICATION",
+  "classification": "DATA_CONTRACT_FAILURE",
+  "currentPhase": "STOP_RETRY_UNIVERSE_ADJUDICATION",
+  "stopRetryActive": true,
+  "authorizationReserved": false,
+  "authorizationFrozen": true,
+  "allowedExecutions": 0,
   "activeRequest": false,
-  "requestConsumed": false,
+  "requestConsumed": true,
   "replayAllowed": false,
-  "executionAuthorized": true,
+  "executionAuthorized": false,
   "executionProfile": {
-    "mode": "RUNTIME_ONCE_ONLY_WITH_FRESH_EXCLUSIVE_REQUEST_V24",
-    "phase": "BLOCK1_NATIVE_MATRIX_RUNTIME_V23",
-    "capabilities": { "secrets": true, "firestoreRead": true, "writes": false, "runtime": true, "browser": true, "deploy": true, "functionsDeploy": false, "rulesDeploy": false, "production": false }
+    "mode": "STOP_RETRY_NO_RUNTIME",
+    "phase": "STOP_RETRY_UNIVERSE_ADJUDICATION",
+    "capabilities": {
+      "secrets": false,
+      "firestoreRead": false,
+      "writes": false,
+      "runtime": false,
+      "browser": false,
+      "deploy": false,
+      "functionsDeploy": false,
+      "rulesDeploy": false,
+      "production": false
+    }
   },
   "sourceValidation": {
     "status": "PASS_V24_CANONICAL_EVIDENCE_HANDOFF_SOURCE_CLOSED",
@@ -52,20 +62,67 @@
   "sourceWorkflow": ".github/workflows/orbit360-sourcecheck-v24-canonical-evidence-handoff-v20260807.yml",
   "runtimeWorkflow": ".github/workflows/orbit360-registered-relay-v24-canonical-evidence-handoff-v20260807.yml",
   "requestPath": ".github/orbit360-requests/block1-client360-insurers-v24-authorization.json",
-  "blockingRoutes": ["inicio", "cliente360", "aseguradoras"],
+  "blockingRoutes": [
+    "inicio",
+    "cliente360",
+    "aseguradoras"
+  ],
   "historicalClosure": {
     "freeze": "tools/orbit360-incident-freeze-v20260721.json",
     "m1Closed": true,
     "m2Closed": true,
     "priorRuntimeAuthorizationActive": false,
-    "preservedUniverse": { "clientes": 414, "aseguradoras": 26, "asesores": 7 }
+    "preservedUniverse": {
+      "clientes": 414,
+      "aseguradoras": 26,
+      "asesores": 7
+    }
   },
-  "hosting": { "priorRestoreChannel": "visual-matrix-corrected-backup-31135532118", "deploysMaximum": 1, "backupBeforeDeploy": true, "rollbackOnFailure": true },
-  "runtimeCapabilitiesAfterSourcePassOnly": { "secrets": true, "firestoreRead": true, "writes": false, "runtime": true, "browser": true, "deploy": true, "functionsDeploy": false, "rulesDeploy": false, "production": false },
-  "protectedState": { "firestoreWritesAuthorized": 0, "authWritesAuthorized": 0, "operationalWritesAuthorized": 0, "functionsDeploysAuthorized": 0, "rulesDeploysAuthorized": 0, "reimportAuthorized": false, "productionAuthorized": false, "passVisualPostAuth": false, "snapshotIntegrityRequired": "VERIFIED_UNCHANGED" },
+  "hosting": {
+    "priorRestoreChannel": "visual-matrix-corrected-backup-31135532118",
+    "deploysMaximum": 1,
+    "backupBeforeDeploy": true,
+    "rollbackOnFailure": true
+  },
+  "runtimeCapabilitiesAfterSourcePassOnly": {
+    "secrets": true,
+    "firestoreRead": true,
+    "writes": false,
+    "runtime": true,
+    "browser": true,
+    "deploy": true,
+    "functionsDeploy": false,
+    "rulesDeploy": false,
+    "production": false
+  },
+  "protectedState": {
+    "firestoreWritesAuthorized": 0,
+    "authWritesAuthorized": 0,
+    "operationalWritesAuthorized": 0,
+    "functionsDeploysAuthorized": 0,
+    "rulesDeploysAuthorized": 0,
+    "reimportAuthorized": false,
+    "productionAuthorized": false,
+    "passVisualPostAuth": false,
+    "snapshotIntegrityRequired": "VERIFIED_UNCHANGED",
+    "snapshotIntegrity": "NOT_VERIFIED"
+  },
   "patternClassification": "REPLICABLE_CLAUDE_ACUMULADO",
   "containsPII": false,
   "containsSecrets": false,
   "containsPasswords": false,
-  "nextAction": "CREATE_EXACTLY_ONE_NEW_EXCLUSIVE_IMMUTABLE_V24_REQUEST_COMMIT_BOUND_TO_THIS_RUNTIME_PENDING_HEAD"
+  "nextAction": "DIAGNOSE_FIRST_FAILED_V23_CHECK. DO NOT REPLAY THIS REQUEST.",
+  "runtimeResult": {
+    "runId": "31221713418",
+    "attempt": 1,
+    "result": "STOP_RETRY",
+    "classification": "DATA_CONTRACT_FAILURE",
+    "checkpoint": "UNIVERSE_ADJUDICATION",
+    "contractVersion": "1.0.41",
+    "universeStatus": "STOP_RETRY_BLOCK1_UNIVERSE_ADJUDICATION",
+    "hostingDeploys": 0,
+    "rollbackOutcome": "skipped",
+    "snapshotIntegrity": "NOT_VERIFIED",
+    "totalRoleFailures": 0
+  }
 }

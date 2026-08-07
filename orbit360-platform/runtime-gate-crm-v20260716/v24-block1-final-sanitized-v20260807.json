@@ -1,0 +1,43 @@
+{
+  "schemaVersion": "orbit360-block1-v23-final-v2-canonical-1.0.41",
+  "gateId": "block1-client360-insurers-lab-v20260717",
+  "contractVersion": "1.0.41",
+  "decision": "STOP_RETRY",
+  "classification": "DATA_CONTRACT_FAILURE",
+  "checkpoint": "UNIVERSE_ADJUDICATION",
+  "runId": "31221713418",
+  "attempt": 1,
+  "preflightStatus": "GO_GATE_CONTRACT",
+  "universeStatus": "STOP_RETRY_BLOCK1_UNIVERSE_ADJUDICATION",
+  "universeClassification": "DATA_CONTRACT_FAILURE",
+  "observedRaw": {
+    "clientes": 430,
+    "aseguradoras": 30,
+    "asesores": 7
+  },
+  "observedEffective": {
+    "clientes": 430,
+    "aseguradoras": 25,
+    "asesores": 7
+  },
+  "restoreOutcome": "skipped",
+  "backupOutcome": "skipped",
+  "deployAttempted": false,
+  "deploys": 0,
+  "precheckStatus": "",
+  "matrixStage": "",
+  "matrixCanonicalRuntimeArtifact": "",
+  "totalRoleFailures": 0,
+  "snapshotIntegrity": "NOT_VERIFIED",
+  "rollbackOutcome": "skipped",
+  "requestConsumed": true,
+  "authorizationFrozen": true,
+  "replayAllowed": false,
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "operationalWrites": 0,
+  "productionTouched": false,
+  "containsPII": false,
+  "containsSecrets": false,
+  "ok": false
+}
