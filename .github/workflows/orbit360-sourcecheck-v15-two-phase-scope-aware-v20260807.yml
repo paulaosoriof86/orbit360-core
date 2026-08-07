@@ -1,0 +1,169 @@
+name: Orbit 360 · Activación v15 scope-aware · source-only
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: orbit360-source-v15-scope-aware-activation
+  cancel-in-progress: false
+
+jobs:
+  source-v15-scope-aware:
+    if: github.head_ref == 'ays/source-activation-v15-two-phase-20260807'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    env:
+      REQUEST: .github/orbit360-requests/visual-matrix-corrected-post-auth-lab-v20260805-authorization.json
+      LIFECYCLE: tools/orbit360-validator-lifecycle-contract-visual-matrix-corrected-post-auth-lab-v20260805.json
+      OVERLAY: tools/orbit360-validator-lifecycle-overlay-visual-matrix-v8-stop-preflight-v20260806.json
+      EXPECTED_V15: 20260807.15-two-phase-runtime
+      AUTHORIZED_BASE: 325260ac836266d7d2c9b35352ae15d67d7eb619
+
+    steps:
+      - name: Checkout exact activation head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Validate v14 consumed baseline and source-only safety
+        shell: bash
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('fs');
+          const r=JSON.parse(fs.readFileSync(process.env.REQUEST,'utf8'));
+          const l=JSON.parse(fs.readFileSync(process.env.LIFECYCLE,'utf8'));
+          const o=JSON.parse(fs.readFileSync(process.env.OVERLAY,'utf8'));
+          const caps=l.executionProfile?.capabilities||{};
+          const noRuntime=caps.secrets===false&&caps.firestoreRead===false&&caps.writes===false&&caps.runtime===false&&caps.browser===false&&caps.deploy===false&&caps.functionsDeploy===false&&caps.rulesDeploy===false&&caps.production===false;
+          const ok=
+            r.requestVersion==='20260807.14-two-phase-runtime'&&r.consumed===true&&r.allowedExecutions===0&&r.authorizationFrozen===true&&r.replayAllowed===false&&
+            l.authorizedBaseHead===process.env.AUTHORIZED_BASE&&l.expectedRequestVersion===process.env.EXPECTED_V15&&l.status==='AUTHORIZED_FRESH_REQUEST_ONLY_V15_PENDING_EXCLUSIVE_REQUEST'&&l.stopRetryActive===false&&l.authorizationReserved===true&&l.allowedExecutions===1&&l.executionAuthorized===false&&l.secretAccessAuthorized===false&&l.browserAuthorized===false&&l.hostingDeployAuthorized===false&&noRuntime&&
+            o.expectedNextRequestVersion===process.env.EXPECTED_V15&&o.stopRetryActive===false&&o.runtimeAllowed===true&&o.runtimeAllowedOnlyWithFreshExclusiveRequest===true&&o.productionAllowed===false&&o.writesAllowed===false;
+          if(!ok) process.exit(41);
+          console.log(JSON.stringify({status:'PASS_V15_SOURCE_BASELINE_FAIL_CLOSED',priorRequestConsumed:true,authorizedBase:l.authorizedBaseHead,secretsRead:false,firebaseAccess:false,browserExecuted:false,hostingTouched:false,deployExecuted:false,writes:0,ok:true},null,2));
+          NODE
+
+      - name: Validate canonical request scope before any new request
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-json-guard-visual-matrix-runtime-v20260806.mjs
+          node --check tools/orbit360-test-request-lifecycle-baseline-contract-v20260806.mjs
+          node --check tools/orbit360-test-preflight-portable-source-v20260806.mjs
+          node tools/orbit360-test-request-lifecycle-baseline-contract-v20260806.mjs
+          node tools/orbit360-test-preflight-portable-source-v20260806.mjs
+          node - <<'NODE'
+          const fs=require('fs');
+          const guard=fs.readFileSync('tools/orbit360-json-guard-visual-matrix-runtime-v20260806.mjs','utf8');
+          const engine=fs.readFileSync('tools/orbit360-validar-gate-contracts-engine-visual-matrix-corrected-post-auth-lab-v20260805.mjs','utf8');
+          const baseline=JSON.parse(fs.readFileSync('orbit360-platform/runtime-gate-crm-v20260716/request-lifecycle-baseline-contract-source-test-sanitized-v20260806.json','utf8'));
+          const portable=JSON.parse(fs.readFileSync('orbit360-platform/runtime-gate-crm-v20260716/preflight-portable-source-test-sanitized-v20260806.json','utf8'));
+          const fields=['precheckRequiredBeforeMatrix','directionDesktop','operationalTablet','advisorMobile','viewportCaptureOnly'];
+          const aligned=fields.every(f=>guard.includes(`scope.${f} === true`)&&engine.includes(`scope.${f} === true`));
+          const rejected=fields.every(f=>baseline.checks?.[`missing_${f}_rejected`]===true&&portable.checks?.[`guardRejectsMissing_${f}`]===true);
+          const ok=aligned&&rejected&&baseline.status==='PASS_REQUEST_LIFECYCLE_BASELINE_CONTRACT_SOURCE_ONLY'&&baseline.passed===17&&baseline.failed===0&&baseline.ok===true&&portable.status==='PASS_SOURCE_ONLY_TWO_PHASE_LIFECYCLE_PREFLIGHT_VALIDATOR'&&portable.passed===37&&portable.failed===0&&portable.ok===true;
+          if(!ok) process.exit(41);
+          console.log(JSON.stringify({status:'PASS_V15_CANONICAL_REQUEST_SCOPE_BEFORE_REQUEST',requiredScopeFields:fields,guardAndEngineAligned:true,everyMissingFieldRejected:true,requestLifecycleScope:'17/17 PASS',preflightScopeAware:'37/37 PASS',newRequestCreated:false,secretsRead:false,firebaseAccess:false,hostingTouched:false,browserExecuted:false,deployExecuted:false,writes:0,ok:true},null,2));
+          NODE
+
+      - name: Validate reusable transport watchdog and signal-safe package
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash -n tools/orbit360-preflight-visual-matrix-runtime-relay-v8-v20260806.sh
+          bash -n tools/orbit360-restore-visual-matrix-v13-baseline-before-runtime-v20260807.sh
+          bash -n tools/orbit360-run-visual-matrix-corrected-post-auth-runtime-only-v4-transport-base-sha-v20260806.sh
+          node --check tools/orbit360-transition-visual-matrix-lifecycle-source-to-runtime-v20260807.mjs
+          node --check tools/orbit360-consume-visual-matrix-request-on-stop-v20260807.mjs
+          node tools/orbit360-test-runtime-transport-base-sha-v20260806.mjs
+          node tools/orbit360-test-capture-watchdog-source-v20260806.mjs
+          node tools/orbit360-test-windows-signal-compatibility-synthetic-v20260806.mjs
+          node tools/orbit360-test-visual-matrix-timeout-signal-safe-portable-v20260806.mjs
+          node tools/orbit360-test-visual-matrix-cross-runner-portable-v20260806.mjs
+
+      - name: Assert registered relay armed for v15 but noncanonical PR skips
+        shell: bash
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('fs');
+          const w=fs.readFileSync('.github/workflows/orbit360-claude-paquete-reconciliado-v1205.yml','utf8');
+          const expected=process.env.EXPECTED_V15;
+          const detect=w.indexOf('Detect canonical exclusive fresh authorized request and exact transport base');
+          const mismatch=w.indexOf('SKIP_REGISTERED_RELAY_TRANSPORT_BASE_SHA_MISMATCH');
+          const dispatch=w.indexOf("echo 'dispatch=true'");
+          const go=w.indexOf('GO_GATE_CONTRACT before secrets');
+          const restore=w.indexOf('Restore authorized Hosting LAB baseline');
+          const ok=w.includes(`ORBIT360_EXPECTED_REQUEST_VERSION: ${expected}`)&&w.includes('orbit360-consume-visual-matrix-request-on-stop-v20260807.mjs')&&detect>=0&&mismatch>detect&&dispatch>mismatch&&go>dispatch&&restore>go;
+          if(!ok) process.exit(41);
+          console.log(JSON.stringify({status:'PASS_V15_REGISTERED_RELAY_ARMED_FAIL_CLOSED',expectedRequestVersion:expected,baseShaBeforeGo:true,goBeforeSecrets:true,automaticStopConsumer:true,newRequestCreated:false,secretsRead:false,hostingTouched:false,ok:true},null,2));
+          NODE
+
+      - name: Mark source PASS and execute explicit source-to-runtime transition
+        shell: bash
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('fs');
+          const lp=process.env.LIFECYCLE;
+          const op=process.env.OVERLAY;
+          const l=JSON.parse(fs.readFileSync(lp,'utf8'));
+          const o=JSON.parse(fs.readFileSync(op,'utf8'));
+          l.classification='SOURCE_ONLY_ACTIVATION_VALIDATED';
+          l.currentPhase='V15_ACTIVATION_SOURCE_ONLY_PASS_PENDING_EXCLUSIVE_REQUEST';
+          l.executionProfile.phase=l.currentPhase;
+          l.ownerVersion='20260807.41-v15-scope-aware-source-activation-validated';
+          l.sourcePrerequisites.activationSourceStatus='PASS_V15_ACTIVATION_SOURCE_ONLY_SCOPE_AWARE';
+          l.sourcePrerequisites.activationSourceRunId=Number(process.env.GITHUB_RUN_ID||0);
+          l.sourcePrerequisites.activationSourceJob='source-v15-scope-aware';
+          o.classification='SOURCE_ONLY_ACTIVATION_VALIDATED';
+          o.checkpoint='PASS_V15_SCOPE_AWARE_SOURCE_BEFORE_TRANSITION';
+          fs.writeFileSync(lp,JSON.stringify(l,null,2)+'\n');
+          fs.writeFileSync(op,JSON.stringify(o,null,2)+'\n');
+          console.log('PASS_V15_SOURCE_ONLY_OBSERVED_BEFORE_TRANSITION');
+          NODE
+          node tools/orbit360-transition-visual-matrix-lifecycle-source-to-runtime-v20260807.mjs "$LIFECYCLE" "$OVERLAY" "$REQUEST" "$EXPECTED_V15"
+
+      - name: Validate exact runtime-pending transition without executing runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('fs');
+          const l=JSON.parse(fs.readFileSync(process.env.LIFECYCLE,'utf8'));
+          const o=JSON.parse(fs.readFileSync(process.env.OVERLAY,'utf8'));
+          const r=JSON.parse(fs.readFileSync(process.env.REQUEST,'utf8'));
+          const caps=l.executionProfile?.capabilities||{};
+          const exact=caps.secrets===true&&caps.firestoreRead===true&&caps.writes===false&&caps.runtime===true&&caps.browser===true&&caps.deploy===true&&caps.functionsDeploy===false&&caps.rulesDeploy===false&&caps.production===false;
+          const ok=l.status==='AUTHORIZED_ONCE_PENDING_EXCLUSIVE_REQUEST'&&l.currentPhase==='VISUAL_MATRIX_CORRECTED_POST_AUTH_LAB_EXECUTION'&&l.expectedRequestVersion===process.env.EXPECTED_V15&&l.executionAuthorized===true&&l.secretAccessAuthorized===true&&l.firestoreReadAuthorized===true&&l.writeAuthorized===false&&l.browserAuthorized===true&&l.hostingDeployAuthorized===true&&l.functionsDeployAuthorized===false&&l.rulesDeployAuthorized===false&&l.productionAuthorized===false&&l.mainAuthorized===false&&l.mergeAuthorized===false&&exact&&o.status==='AUTHORIZED_ONCE_PENDING_EXCLUSIVE_REQUEST'&&o.expectedNextRequestVersion===process.env.EXPECTED_V15&&o.runtimeAllowed===true&&o.hostingAllowed===true&&o.productionAllowed===false&&o.writesAllowed===false&&r.consumed===true&&r.allowedExecutions===0;
+          if(!ok) process.exit(41);
+          console.log(JSON.stringify({status:'PASS_V15_SOURCE_TO_RUNTIME_TRANSITION',lifecycleStatus:l.status,lifecyclePhase:l.currentPhase,expectedRequestVersion:l.expectedRequestVersion,newRequestCreated:false,priorRequestStillConsumed:true,secretsRead:false,firebaseAccess:false,browserExecuted:false,hostingTouched:false,deployExecuted:false,writes:0,ok:true},null,2));
+          NODE
+
+      - name: Persist transitioned lifecycle and overlay only
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name orbit360-gate-bot
+          git config user.email orbit360-gate-bot@users.noreply.github.com
+          git add "$LIFECYCLE" "$OVERLAY"
+          git commit -m 'source: persist validated v15 runtime-pending transition [skip ci]'
+          git push origin HEAD:ays/source-activation-v15-two-phase-20260807
+
+      - name: Final source-only safety assertion
+        shell: bash
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('fs');
+          const r=JSON.parse(fs.readFileSync(process.env.REQUEST,'utf8'));
+          if(!(r.requestVersion==='20260807.14-two-phase-runtime'&&r.consumed===true&&r.allowedExecutions===0&&r.authorizationFrozen===true&&r.replayAllowed===false)) process.exit(41);
+          console.log(JSON.stringify({status:'PASS_V15_SOURCE_ACTIVATION_TRANSITION_NO_RUNTIME',newRequestAbsent:true,priorRequestConsumed:true,secretsRead:false,firebaseAccess:false,firestoreReads:0,firestoreWrites:0,authWrites:0,operationalWrites:0,browserExecuted:false,hostingTouched:false,hostingDeploys:0,productionTouched:false,ok:true},null,2));
+          NODE
