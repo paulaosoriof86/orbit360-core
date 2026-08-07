@@ -4,10 +4,10 @@
   "gateId": "block2.7-visual-matrix-corrected-post-auth-lab-v20260805",
   "gateContractVersion": "2.7.8",
   "owner": "orbit360-visual-matrix-corrected-post-auth-v20260805",
-  "ownerVersion": "20260807.35-runtime-v13-lifecycle-phase-stop",
+  "ownerVersion": "20260807.36-v13-two-phase-lifecycle-rootfix-validated",
   "status": "STOP_RETRY_V13_LIFECYCLE_PHASE_MISMATCH",
   "classification": "VALIDATOR_STALE",
-  "secondaryClassification": "PIPELINE_MECHANISM_FAILURE_LIFECYCLE_TRANSITION_OMITTED",
+  "secondaryClassification": "ROOT_CAUSE_CORRECTED_SOURCE_ONLY_TWO_PHASE_LIFECYCLE_AND_STOP_CONSUMPTION",
   "patternClassification": "REPLICABLE_CLAUDE_ACUMULADO",
   "rcId": "RC-AYS-LAB-CANONICA-01",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -44,6 +44,8 @@
   "registeredWorkflowPath": ".github/workflows/orbit360-claude-paquete-reconciliado-v1205.yml",
   "portableJsonGuard": "tools/orbit360-json-guard-visual-matrix-runtime-v20260806.mjs",
   "registeredRelayPreflight": "tools/orbit360-preflight-visual-matrix-runtime-relay-v8-v20260806.sh",
+  "sourceToRuntimeTransition": "tools/orbit360-transition-visual-matrix-lifecycle-source-to-runtime-v20260807.mjs",
+  "automaticStopConsumer": "tools/orbit360-consume-visual-matrix-request-on-stop-v20260807.mjs",
   "runtimeV13Stop": {
     "runId": 31180161363,
     "jobId": 92871250697,
@@ -70,11 +72,35 @@
   },
   "rootCause": {
     "summary": "SOURCE_ONLY_TO_RUNTIME_LIFECYCLE_TRANSITION_WAS_NOT_APPLIED_BEFORE_REQUEST_CREATION",
-    "guardState": "REQUEST_LIFECYCLE_BASELINE_CONTRACT_PASS",
+    "secondary": "STOP_DID_NOT_AUTOMATICALLY_CONSUME_ACTIVE_ONE_SHOT_REQUEST",
+    "guardStateBeforeFix": "SOURCE_ONLY_PHASE_ACCEPTED",
     "routerExpectedPhase": "VISUAL_MATRIX_CORRECTED_POST_AUTH_LAB_EXECUTION",
     "engineExpectedPhase": "VISUAL_MATRIX_CORRECTED_POST_AUTH_LAB_EXECUTION",
     "observedLifecyclePhase": "V13_ACTIVATION_SOURCE_ONLY_PASS_PENDING_EXCLUSIVE_REQUEST",
-    "requiredCorrection": "ALIGN_GUARD_ROUTER_ENGINE_AND_EXPLICIT_TWO_PHASE_LIFECYCLE_TRANSITION"
+    "correction": "EXPLICIT_TWO_PHASE_TRANSITION_PLUS_ALIGNED_GUARD_ROUTER_ENGINE_PLUS_AUTOMATIC_STOP_CONSUMPTION"
+  },
+  "rootfixSourceValidation": {
+    "status": "PASS_TWO_PHASE_LIFECYCLE_AND_STOP_CONSUMPTION_SOURCE_ONLY",
+    "runId": 31181042129,
+    "jobId": 92874108672,
+    "relaySafetyRunId": 31181041526,
+    "requestLifecycleRuntimeChecks": "12/12 PASS",
+    "twoPhasePreflightChecks": "31/31 PASS",
+    "transportBaseShaChecks": "12/12 PASS",
+    "captureWatchdogChecks": "17/17 PASS",
+    "signalSafeChecks": "48/48 PASS",
+    "crossRunnerChecks": "24/24 PASS",
+    "windowsChecks": "7/7 PASS",
+    "sourceOnlyLifecycleRejectedForRuntime": true,
+    "runtimePendingLifecycleRequired": true,
+    "automaticStopConsumesRequest": true,
+    "armedWorkflowMustIncludeAutomaticStopConsumer": true,
+    "runtimeExecuted": false,
+    "secretsRead": false,
+    "hostingTouched": false,
+    "browserExecuted": false,
+    "deployExecuted": false,
+    "writes": 0
   },
   "activeRequest": false,
   "requestRetired": true,
@@ -112,5 +138,5 @@
   "containsPII": false,
   "containsSecrets": false,
   "containsPasswords": false,
-  "nextAction": "CORRECT_TWO_PHASE_LIFECYCLE_TRANSITION_SOURCE_ONLY. DO_NOT REEXECUTE V13. FUTURE RUNTIME REQUIRES NEW EXPLICIT AUTHORIZATION."
+  "nextAction": "ROOTFIX_VALIDATED_SOURCE_ONLY. KEEP STOP_RETRY. FUTURE RUNTIME REQUIRES NEW EXPLICIT AUTHORIZATION AND MUST APPLY SOURCE_TO_RUNTIME_TRANSITION BEFORE CREATING THE EXCLUSIVE REQUEST."
 }
