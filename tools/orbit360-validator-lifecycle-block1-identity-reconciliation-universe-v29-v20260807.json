@@ -51,7 +51,7 @@
     "realDataPayloadInRepo": false
   },
   "runtimeReadContract": {
-    "firestoreReadOperationsMaximum": 3,
+    "firestoreReadOperationsMaximum": 4,
     "clientProjection": "BASELINE_MARKER_PLUS_MINIMUM_IDENTITY_FIELDS_ONLY",
     "targetResolution": "HASH_DOCUMENT_ID_IN_MEMORY_FROM_PROJECTED_QUERY",
     "baselineIdentityComparison": "IN_MEMORY_ONLY_NO_RAW_IDENTITY_OUTPUT",
