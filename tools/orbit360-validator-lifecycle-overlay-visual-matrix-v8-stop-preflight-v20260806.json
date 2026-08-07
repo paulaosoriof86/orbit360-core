@@ -7,7 +7,7 @@
   "secondaryClassification": "V15_HYDRATION_ROOTFIX_REUSED_SOURCE_VALIDATED",
   "checkpoint": "DIRECCION_ROUTE_CLIENTE360_TIMEOUT",
   "failureCode": "DIRECCION_ROUTE_CLIENTE360_TIMEOUT",
-  "rootCauseResolved": "V15_HYDRATION_RUNTIME_COMPOSITION_AND_STOP_CONSUMER_STATE_DRIFT_CORRECTED_SOURCE_ONLY",
+  "rootCauseResolved": "V15_HYDRATION_RUNTIME_COMPOSITION_AND_STOP_CONSUMER_STATE_DRIFT_CORRECTED; V16_ADVISOR_PROJECTION_AMPLIFICATION_DIAGNOSED_SOURCE_ONLY",
   "v14StopRunId": 31184472169,
   "v14RequestScopeRootfixRunId": 31184969260,
   "v15StopRunId": 31186425271,
@@ -57,5 +57,15 @@
   "containsSecrets": false,
   "ok": false,
   "registeredRelayPath": ".github/workflows/orbit360-registered-relay-v16-hydration-v20260807.yml",
-  "registeredRelayExclusive": true
+  "registeredRelayExclusive": true,
+  "sourceRootfixRuntimeValidated": false,
+  "historicalRuntimeEvidence": {
+    "runId": "31191340443",
+    "browserExecuted": true,
+    "hostingTouched": true,
+    "hostingDeploys": 1,
+    "rollbackRestored": true,
+    "snapshotIntegrity": "VERIFIED_UNCHANGED",
+    "writes": 0
+  }
 }

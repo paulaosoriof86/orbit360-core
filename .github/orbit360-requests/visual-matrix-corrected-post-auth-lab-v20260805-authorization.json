@@ -82,7 +82,10 @@
     "priorRequestVersion": "20260807.15-two-phase-runtime",
     "priorRequestConsumed": true,
     "priorRequestFrozen": true,
-    "oldRegisteredRelayDisarmed": true
+    "oldRegisteredRelayDisarmed": true,
+    "v16EvidenceCorrectionSourceOnly": "BROWSER_EXECUTED_TRUE_CONFIRMED_BY_MATRIX_AND_WATCHDOG",
+    "v16DeepRootCause": "FUNCTIONAL_DEFECT_READ_ONLY_ADVISOR_PROJECTION_REBUILD_AMPLIFICATION",
+    "v16SecondaryRootCause": "PIPELINE_MECHANISM_FAILURE_GENERIC_ROUTE_READINESS_OBSCURED_RENDER_STALL"
   },
   "freshAuthorizationRequiredForAnyFutureRuntime": true,
   "stopRetryOnAnyFailure": true,
@@ -120,7 +123,7 @@
     "secretAccessed": true,
     "firebaseAccessed": true,
     "hostingTouched": true,
-    "browserExecuted": false,
+    "browserExecuted": true,
     "deployExecuted": true,
     "hostingRollbackRestored": true,
     "snapshotIntegrity": "VERIFIED_UNCHANGED",

@@ -1,0 +1,52 @@
+{
+  "schemaVersion": "orbit360-v17-advisor-cache-route-readiness-rootfix-source-v1",
+  "generatedAt": "2026-08-07T15:42:02.489Z",
+  "runId": "31193903611",
+  "gateId": "block2.7-visual-matrix-corrected-post-auth-lab-v20260805",
+  "sourceAuthorizationBaseHead": "ad6f2e16305c7f519dcd213e26997695637621b8",
+  "status": "PASS_V17_ADVISOR_CACHE_ROUTE_READINESS_ROOTFIX_SOURCE_ONLY",
+  "classification": "FUNCTIONAL_DEFECT_AND_PIPELINE_MECHANISM_FAILURE_CORRECTED_SOURCE_ONLY",
+  "rootCauses": [
+    "FUNCTIONAL_DEFECT_READ_ONLY_ADVISOR_PROJECTION_REBUILD_AMPLIFICATION",
+    "PIPELINE_MECHANISM_FAILURE_GENERIC_ROUTE_READINESS_OBSCURED_RENDER_STALL"
+  ],
+  "fixture": {
+    "advisorLookups": 430,
+    "projectionBuildsBeforeInvalidation": 1,
+    "projectionBuildsAfterOneInvalidation": 2,
+    "membershipInvalidationValidated": true
+  },
+  "readinessAuthority": "OrbitHydrationContractDiagnostics",
+  "routeCheckpointOrder": [
+    "REQUIRED_HYDRATION_PASS",
+    "RENDER_READY_PASS"
+  ],
+  "v16EvidenceCorrected": {
+    "browserExecuted": true,
+    "hostingState": "ROLLBACK_RESTORED_AFTER_V16_STOP"
+  },
+  "governingSuites": {
+    "requestLifecycle": "PASS",
+    "captureWatchdog": "PASS",
+    "windowsSignal": "PASS",
+    "signalSafe": "PASS",
+    "crossRunner": "PASS",
+    "preflightPortable": "PASS",
+    "transportBaseSha": "PASS"
+  },
+  "v16RequestConsumedFrozen": true,
+  "v16RelayDisarmed": true,
+  "runtimeExecuted": false,
+  "secretsRead": false,
+  "firebaseAccess": false,
+  "hostingTouched": false,
+  "browserExecuted": false,
+  "deployExecuted": false,
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "operationalWrites": 0,
+  "productionTouched": false,
+  "containsPII": false,
+  "containsSecrets": false,
+  "ok": true
+}

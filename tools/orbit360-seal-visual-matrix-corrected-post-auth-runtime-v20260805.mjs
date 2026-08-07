@@ -56,6 +56,7 @@ const pass =
   matrixPass;
 const rollbackRequired = deployAttempted && !pass;
 const rollbackRestored = rollbackRequired && outcomes.rollback === 'success';
+const browserExecuted = outcomes.precheck !== 'skipped' || outcomes.matrix !== 'skipped' || Boolean(matrix && matrix.currentCheckpoint && matrix.currentCheckpoint !== 'BOOT');
 
 function falseCapabilities() {
   return {
@@ -127,6 +128,7 @@ const final = {
   authorizationConsumed: true,
   authorizationFrozen: true,
   replayAllowed: false,
+  browserExecuted,
   secretAccessed: outcomes.credential !== 'skipped',
   hostingBackupClone: outcomes.backup === 'success',
   hostingDeployAttempted: deployAttempted,
@@ -213,6 +215,7 @@ lifecycle.protectedState.currentLabRestoredToPreviousVersion = rollbackRestored;
 lifecycle.protectedState.correctedRootfixHostingLive = pass;
 lifecycle.protectedState.passVisualPostAuth = pass;
 lifecycle.protectedState.snapshotIntegrity = snapshotIntegrity;
+lifecycle.protectedState.hostingState = rollbackRestored ? 'ROLLBACK_RESTORED_AFTER_CURRENT_STOP' : (pass ? 'ROOTFIX_HOSTING_LIVE' : lifecycle.protectedState.hostingState);
 lifecycle.nextAction = pass
   ? 'RESUME_COBROS_4_1_AND_PREPARE_PLATFORM_NATIVE_CRUD_GATE'
   : 'CLOSE_EXACT_CHECKPOINT_ROOT_CAUSE_WITHOUT_RETRY';
@@ -236,6 +239,8 @@ if (OVERLAY) {
     rulesAllowed: false,
     reimportAllowed: false,
     hostingDeploys: final.hostingDeploys,
+    browserExecuted: final.browserExecuted,
+    hostingTouched: final.hostingDeployAttempted,
     rollbackRequired: false,
     rollbackRestored,
     snapshotIntegrity,

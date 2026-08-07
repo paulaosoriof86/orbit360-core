@@ -4,7 +4,7 @@
   "gateId": "block2.7-visual-matrix-corrected-post-auth-lab-v20260805",
   "gateContractVersion": "2.7.8",
   "owner": "orbit360-visual-matrix-corrected-post-auth-v20260805",
-  "ownerVersion": "20260807.43-terminal-control-plane-fail-closed",
+  "ownerVersion": "20260807.44-v17-source-rootfix-pending-runtime-validation",
   "status": "STOP_RETRY_DIRECCION_ROUTE_CLIENTE360_TIMEOUT",
   "classification": "PIPELINE_MECHANISM_FAILURE",
   "secondaryClassification": "AUTOMATIC_STOP_CONSUMPTION_APPLIED_IDEMPOTENT",
@@ -126,7 +126,19 @@
     "v16HydrationSequenceSourceCheck": "PASS",
     "v16PriorRequestClosed": true,
     "registeredRelayPath": ".github/workflows/orbit360-registered-relay-v16-hydration-v20260807.yml",
-    "registeredRelayExpectedRequest": "20260807.16-two-phase-runtime"
+    "registeredRelayExpectedRequest": "20260807.16-two-phase-runtime",
+    "v16RuntimeRunId": 31191340443,
+    "v16RuntimeCheckpoint": "DIRECCION_ROUTE_CLIENTE360_TIMEOUT",
+    "v16Precheck": "PASS_INICIO_READY",
+    "v16DeepRootCause": "FUNCTIONAL_DEFECT_READ_ONLY_ADVISOR_PROJECTION_REBUILD_AMPLIFICATION",
+    "v16SecondaryRootCause": "PIPELINE_MECHANISM_FAILURE_GENERIC_ROUTE_READINESS_OBSCURED_RENDER_STALL",
+    "v17AdvisorProjectionCacheRequired": true,
+    "v17UnifiedReadinessAuthority": "OrbitHydrationContractDiagnostics",
+    "v17PerRouteCheckpointsRequired": [
+      "REQUIRED_HYDRATION_PASS",
+      "RENDER_READY_PASS"
+    ],
+    "v17SourceRootfixRuntimeValidated": false
   },
   "activeRequest": false,
   "requestRetired": true,
@@ -154,7 +166,7 @@
     "rulesDeploysAuthorized": 0,
     "reimportAuthorized": false,
     "productionAuthorized": false,
-    "hostingState": "ROLLBACK_RESTORED_AFTER_V15_STOP",
+    "hostingState": "ROLLBACK_RESTORED_AFTER_V16_STOP",
     "passVisualPostAuth": false,
     "snapshotIntegrity": "VERIFIED_UNCHANGED",
     "currentLabRestoredToPreviousVersion": true,
@@ -186,7 +198,8 @@
     "rollbackRestored": true,
     "snapshotIntegrity": "VERIFIED_UNCHANGED",
     "totalRoleFailures": null,
-    "captureWarnings": 1
+    "captureWarnings": 1,
+    "browserExecuted": true
   },
   "priorHostingRestore": {
     "status": "PASS_PRIOR_HOSTING_RESTORE",
