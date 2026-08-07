@@ -68,6 +68,25 @@ Se añadió una envoltura v4 que:
 
 El nombre de la rama base deja de ser la identidad; la procedencia inmutable queda definida por SHA.
 
+## Validación observable
+
+```text
+source-only runId: 31134786817
+jobId: 92731630603
+PASS_RUNTIME_TRANSPORT_BASE_SHA_SOURCE_ONLY
+12/12 PASS
+phase-aware validator: 17/17 PASS
+relay safety runId: 31134786750
+runtime dispatched: false
+secretos/Firebase/Hosting/browser/deploy/writes: 0
+```
+
+Se probaron aceptación del transporte válido y rechazo de base SHA incorrecta, evento incorrecto, rama canónica distinta y request consumido.
+
+## Estado final
+
+El rootfix está integrado únicamente a nivel source/control-plane. V10 permanece consumido y no reutilizable. `PASS_VISUAL_POST_AUTH` continúa pendiente.
+
 ## Siguiente acción exacta
 
-Validar el rootfix exclusivamente source-only. No reutilizar v10 ni ejecutar runtime sin autorización explícita nueva ligada al HEAD entonces vigente.
+Mantener `STOP_RETRY`. No reutilizar v10 ni ejecutar runtime sin autorización explícita nueva ligada al HEAD canónico entonces vigente.
