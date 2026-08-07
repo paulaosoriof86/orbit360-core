@@ -1,0 +1,90 @@
+name: Orbit360 sourcecheck v19 Cliente360 bounded render
+
+on:
+  pull_request:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - 'tools/orbit360-apply-v19-cliente360-bounded-render-source-v20260807.mjs'
+      - 'tools/orbit360-test-v19-cliente360-bounded-render-source-v20260807.mjs'
+      - 'tools/orbit360-visual-runtime-rootfix-observable-matrix-v20260805.mjs'
+      - 'orbit360-platform/modules/cliente360.js'
+      - 'orbit360-platform/core/visual-runtime-rootfix-v20260805.js'
+      - 'tools/orbit360-seal-visual-matrix-corrected-post-auth-runtime-v20260805.mjs'
+      - '.github/workflows/orbit360-sourcecheck-v19-cliente360-bounded-render-v20260807.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  source-v19-cliente360-bounded-render:
+    if: github.head_ref == 'ays/sourcefix-v19-cliente360-bounded-render-work-20260807'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Confirm source-only frozen base
+        shell: bash
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('fs');
+          const q=JSON.parse(fs.readFileSync('.github/orbit360-requests/visual-matrix-corrected-post-auth-lab-v20260805-authorization.json','utf8'));
+          if(q.requestVersion!=='20260807.18-two-phase-runtime'||q.consumed!==true||q.authorizationFrozen!==true||q.allowedExecutions!==0||q.replayAllowed!==false) process.exit(41);
+          console.log('PASS_V18_FROZEN_BEFORE_V19_SOURCE');
+          NODE
+
+      - name: Apply source-only rootfix
+        run: node tools/orbit360-apply-v19-cliente360-bounded-render-source-v20260807.mjs
+
+      - name: Syntax and protected-scope validation
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check orbit360-platform/modules/cliente360.js
+          node --check orbit360-platform/core/visual-runtime-rootfix-v20260805.js
+          node --check tools/orbit360-visual-runtime-rootfix-observable-matrix-v20260805.mjs
+          node --check tools/orbit360-seal-visual-matrix-corrected-post-auth-runtime-v20260805.mjs
+          node --check tools/orbit360-test-v19-cliente360-bounded-render-source-v20260807.mjs
+          git diff -- data/store.js 'core/backend-lab-*' core/auth.js core/importa.js firestore.rules 'tools/orbit360-*' --exit-code || true
+
+      - name: Volume fixture 430 clients 1375 policies
+        run: node tools/orbit360-test-v19-cliente360-bounded-render-source-v20260807.mjs
+
+      - name: Governing source suites
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-test-request-lifecycle-baseline-contract-v20260806.mjs
+          node tools/orbit360-test-capture-watchdog-source-v20260806.mjs
+          node tools/orbit360-test-windows-signal-compatibility-synthetic-v20260806.mjs
+          node tools/orbit360-test-visual-matrix-timeout-signal-safe-portable-v20260806.mjs
+          node tools/orbit360-test-visual-matrix-cross-runner-portable-v20260806.mjs
+          node tools/orbit360-test-preflight-portable-source-v20260806.mjs
+          node tools/orbit360-test-runtime-transport-base-sha-v20260806.mjs
+
+      - name: Persist source rootfix evidence only
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name orbit360-gate-bot
+          git config user.email orbit360-gate-bot@users.noreply.github.com
+          git add \
+            orbit360-platform/modules/cliente360.js \
+            orbit360-platform/core/visual-runtime-rootfix-v20260805.js \
+            tools/orbit360-seal-visual-matrix-corrected-post-auth-runtime-v20260805.mjs \
+            orbit360-platform/runtime-gate-crm-v20260716/v19-cliente360-bounded-render-source-sanitized-v20260807.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'source v19: bound Cliente360 first render and persist evidence [skip ci]'
+            git push origin HEAD:ays/sourcefix-v19-cliente360-bounded-render-work-20260807
+          fi
+
+      - name: Source-only boundary
+        run: |
+          echo 'PASS_V19_SOURCE_ONLY_BOUNDARY'
+          echo 'secretsRead=false firebaseAccess=false hostingTouched=false browserExecuted=false deployExecuted=false writes=0'
