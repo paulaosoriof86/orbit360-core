@@ -4,9 +4,9 @@
   "gateId": "block2.7-visual-matrix-corrected-post-auth-lab-v20260805",
   "gateContractVersion": "2.7.8",
   "owner": "orbit360-visual-matrix-corrected-post-auth-v20260805",
-  "ownerVersion": "20260807.33-runtime-v13-source-activation",
+  "ownerVersion": "20260807.34-runtime-v13-source-activation-validated",
   "status": "AUTHORIZED_FRESH_REQUEST_ONLY_V13_PENDING_EXCLUSIVE_REQUEST",
-  "classification": "SOURCE_ONLY_ACTIVATION_PENDING_VALIDATION",
+  "classification": "SOURCE_ONLY_ACTIVATION_VALIDATED",
   "secondaryClassification": "VALIDATOR_STALE_ROOTFIX_CARRIED_FORWARD",
   "patternClassification": "REPLICABLE_CLAUDE_ACUMULADO",
   "rcId": "RC-AYS-LAB-CANONICA-01",
@@ -18,10 +18,10 @@
   "authorizedBaseHead": "53b31520f7cf97158bb1d7efde4e00a7e8ebf8c3",
   "expectedRequestVersion": "20260807.13-validator-rootfix-runtime",
   "authorizationDirective": "EXPLICIT_SINGLE_SOURCE_ONLY_ACTIVATION_AND_RUNTIME_V13_LIFECYCLE_BASELINE_ROOTFIX_HOSTING_LAB_READONLY_MATRIX",
-  "currentPhase": "V13_ACTIVATION_SOURCE_ONLY_PENDING_VALIDATION",
+  "currentPhase": "V13_ACTIVATION_SOURCE_ONLY_PASS_PENDING_EXCLUSIVE_REQUEST",
   "executionProfile": {
-    "mode": "SOURCE_ONLY_ACTIVATION_THEN_RUNTIME_ONCE_WITH_FRESH_EXCLUSIVE_REQUEST",
-    "phase": "V13_ACTIVATION_SOURCE_ONLY_PENDING_VALIDATION",
+    "mode": "SOURCE_ONLY_ACTIVATION_PASS_THEN_RUNTIME_ONCE_WITH_FRESH_EXCLUSIVE_REQUEST",
+    "phase": "V13_ACTIVATION_SOURCE_ONLY_PASS_PENDING_EXCLUSIVE_REQUEST",
     "capabilities": {
       "secrets": false,
       "firestoreRead": false,
@@ -68,6 +68,10 @@
     "validatorRootfixStatus": "PASS_V12_VALIDATOR_BASELINE_CONTRACT_SOURCE_ONLY",
     "validatorRootfixRunId": 31142188182,
     "validatorRootfixJobId": 92754217111,
+    "activationSourceStatus": "PASS_V13_ACTIVATION_SOURCE_ONLY",
+    "activationSourceRunId": 31179739353,
+    "activationSourceJobId": 92869888763,
+    "relaySafetyRunId": 31179739324,
     "requestLifecycleBaselineChecks": "8/8 PASS",
     "phaseAwareChecks": "18/18 PASS",
     "transportBaseShaChecks": "12/12 PASS",
@@ -117,5 +121,5 @@
   "containsPII": false,
   "containsSecrets": false,
   "containsPasswords": false,
-  "nextAction": "VALIDATE_V13_SOURCE_ONLY_ACTIVATION. ONLY AFTER PASS FAST_FORWARD CANONICAL AND CREATE ONE EXCLUSIVE IMMUTABLE V13 REQUEST COMMIT."
+  "nextAction": "FAST_FORWARD_CANONICAL_TO_THIS_VALIDATED_ACTIVATION, THEN CREATE EXACTLY ONE EXCLUSIVE IMMUTABLE V13 REQUEST COMMIT."
 }
