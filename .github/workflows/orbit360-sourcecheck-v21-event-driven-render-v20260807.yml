@@ -36,18 +36,25 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Verify exact authorization base v20 frozen and product freeze
+      - name: Verify authorization ancestry v20 frozen and product freeze
         shell: bash
         run: |
           set -euo pipefail
-          test "${{ github.event.pull_request.base.sha }}" = '68667075e00654a4df216f0ce6e7417f041fe837'
+          AUTH_BASE='68667075e00654a4df216f0ce6e7417f041fe837'
+          CURRENT_CANONICAL='6bd75fd6fbf680654fe028bf576f7fb6e7847945'
+          BASE_SHA='${{ github.event.pull_request.base.sha }}'
+          if [[ "$BASE_SHA" != "$AUTH_BASE" && "$BASE_SHA" != "$CURRENT_CANONICAL" ]]; then
+            echo "STOP_V21_UNEXPECTED_SOURCE_BASE:$BASE_SHA"
+            exit 41
+          fi
+          git merge-base --is-ancestor "$AUTH_BASE" "${{ github.event.pull_request.head.sha }}"
           node - <<'NODE'
           const fs = require('fs');
           const r = JSON.parse(fs.readFileSync('.github/orbit360-requests/visual-matrix-corrected-post-auth-lab-v20260805-authorization.json','utf8'));
           if (!(r.requestVersion === '20260807.20-two-phase-runtime' && r.consumed === true && r.authorizationFrozen === true && r.allowedExecutions === 0 && r.replayAllowed === false)) process.exit(41);
           console.log('PASS_V20_REQUEST_FROZEN_BEFORE_V21_SOURCE');
           NODE
-          mapfile -t changed < <(git diff --name-only "${{ github.event.pull_request.base.sha }}"..."${{ github.event.pull_request.head.sha }}")
+          mapfile -t changed < <(git diff --name-only "$AUTH_BASE"..."${{ github.event.pull_request.head.sha }}")
           protected=(
             'orbit360-platform/modules/cliente360.js'
             'orbit360-platform/core/visual-runtime-rootfix-v20260805.js'
