@@ -4,10 +4,10 @@
   "gateId": "block2.7-visual-matrix-corrected-post-auth-lab-v20260805",
   "gateContractVersion": "2.7.8",
   "owner": "orbit360-visual-matrix-corrected-post-auth-v20260805",
-  "ownerVersion": "20260806.31-runtime-v12-validator-stale-stop",
+  "ownerVersion": "20260806.32-runtime-v12-validator-stale-rootfix-validated",
   "status": "STOP_RETRY_V12_VALIDATOR_STALE_BASELINE_CONTRACT",
   "classification": "VALIDATOR_STALE",
-  "secondaryClassification": "REQUEST_GUARD_STALE_HARDCODED_V6_BASELINE",
+  "secondaryClassification": "VALIDATOR_STALE_CORRECTED_SOURCE_ONLY",
   "patternClassification": "REPLICABLE_CLAUDE_ACUMULADO",
   "rcId": "RC-AYS-LAB-CANONICA-01",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -17,10 +17,10 @@
   "requestVersion": "20260806.12-capture-watchdog-runtime",
   "requestCommit": "f604bcf5609529b1115d16bb2a8b4f2e7388a4b4",
   "authorizedBaseHead": "a0bd5533dc7c3c0efd87019e7b1c9001ce23d26e",
-  "currentPhase": "STOP_RETRY_V12_VALIDATOR_STALE_BASELINE_CONTRACT",
+  "currentPhase": "STOP_RETRY_V12_VALIDATOR_STALE_ROOTFIX_VALIDATED_SOURCE_ONLY",
   "executionProfile": {
     "mode": "STOP_RETRY_NO_RUNTIME",
-    "phase": "STOP_RETRY_V12_VALIDATOR_STALE_BASELINE_CONTRACT",
+    "phase": "STOP_RETRY_V12_VALIDATOR_STALE_ROOTFIX_VALIDATED_SOURCE_ONLY",
     "capabilities": {
       "secrets": false,
       "firestoreRead": false,
@@ -59,16 +59,26 @@
     "operationalWrites": 0,
     "rollbackRequired": false
   },
-  "sourcePrerequisites": {
-    "activationSourceStatus": "PASS_V12_ACTIVATION_SOURCE_ONLY",
-    "activationSourceRunId": 31141402229,
-    "activationSourceJobId": 92751886813,
-    "phaseAwareValidatorPassed": 17,
-    "transportBaseShaPassed": 12,
-    "captureWatchdogPassed": 17,
-    "signalSafePassed": 48,
-    "crossRunnerPassed": 24,
-    "windowsCompatibilityPassed": 7
+  "sourcefixResult": {
+    "status": "PASS_V12_VALIDATOR_BASELINE_CONTRACT_SOURCE_ONLY",
+    "classification": "VALIDATOR_STALE_CORRECTED_SOURCE_ONLY",
+    "runId": 31142188182,
+    "jobId": 92754217111,
+    "relaySafetyRunId": 31142188174,
+    "requestLifecycleBaselineChecks": "8/8 PASS",
+    "phaseAwareChecks": "18/18 PASS",
+    "transportBaseShaChecks": "12/12 PASS",
+    "captureWatchdogChecks": "17/17 PASS",
+    "signalSafeChecks": "48/48 PASS",
+    "crossRunnerChecks": "24/24 PASS",
+    "windowsChecks": "7/7 PASS",
+    "runtimeExecuted": false,
+    "secretsRead": false,
+    "firebaseAccess": false,
+    "browserExecuted": false,
+    "hostingTouched": false,
+    "deployExecuted": false,
+    "writes": 0
   },
   "activeRequest": false,
   "requestRetired": true,
@@ -106,5 +116,5 @@
   "containsPII": false,
   "containsSecrets": false,
   "containsPasswords": false,
-  "nextAction": "CORRECT_STALE_REQUEST_GUARD_SOURCE_ONLY_AND_VALIDATE. DO_NOT REEXECUTE V12. FUTURE RUNTIME REQUIRES NEW EXPLICIT AUTHORIZATION."
+  "nextAction": "KEEP RUNTIME CLOSED. ANY FUTURE MATRIX EXECUTION REQUIRES NEW EXPLICIT AUTHORIZATION, NEW ACTIVATION BOUND TO THE THEN-CANONICAL HEAD, AND A NEW IMMUTABLE REQUEST."
 }
