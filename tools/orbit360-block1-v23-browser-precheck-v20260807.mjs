@@ -14,7 +14,7 @@ const clean = v => String(v == null ? '' : v).replace(/[\w.+-]+@[\w.-]+/g,'[emai
 function write(value){ fs.mkdirSync(path.dirname(path.resolve(EVIDENCE)),{recursive:true}); fs.writeFileSync(path.resolve(EVIDENCE),JSON.stringify(value,null,2)+'\n','utf8'); }
 
 async function main(){
-  const output = { schemaVersion:'orbit360-block1-v23-browser-precheck-v1', gateId:'block1-client360-insurers-lab-v20260717', contractVersion:'1.0.26', stage:'STARTED', classification:'', checkpoint:'BOOT', firestoreReads:0, firestoreWrites:0, authWrites:0, operationalWrites:0, deployExecuted:false, productionTouched:false, containsPII:false, containsSecrets:false, ok:false };
+  const output = { schemaVersion:'orbit360-block1-v23-browser-precheck-v2-canonical-1.0.41', gateId:'block1-client360-insurers-lab-v20260717', contractVersion:'1.0.41', stage:'STARTED', classification:'', checkpoint:'BOOT', firestoreReads:0, firestoreWrites:0, authWrites:0, operationalWrites:0, deployExecuted:false, productionTouched:false, containsPII:false, containsSecrets:false, ok:false };
   let browser;
   try {
     output.checkpoint='SERVICE_ACCOUNT_VALIDATE'; write(output);
@@ -45,5 +45,5 @@ async function main(){
   finally{ if(browser) await browser.close(); write(output); console.log(JSON.stringify(output,null,2)); }
   return output;
 }
-if(process.env.ORBIT360_PRECHECK_VALIDATE_ONLY==='1'){ console.log(JSON.stringify({status:'PASS_V23_BROWSER_PRECHECK_IMPORT',externalRuntimeDependenciesLoaded:false,ok:true})); }
+if(process.env.ORBIT360_PRECHECK_VALIDATE_ONLY==='1'){ console.log(JSON.stringify({status:'PASS_V23_BROWSER_PRECHECK_IMPORT',contractVersion:'1.0.41',externalRuntimeDependenciesLoaded:false,ok:true})); }
 else { const out=await main(); process.exitCode=out.ok?0:42; }
