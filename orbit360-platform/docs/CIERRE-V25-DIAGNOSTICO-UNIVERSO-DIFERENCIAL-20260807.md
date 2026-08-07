@@ -1,4 +1,4 @@
-# Orbit 360 A&S — v25 diagnóstico diferencial de universo
+# Orbit 360 A&S — cierre v25 diagnóstico diferencial de universo
 
 Fecha: 2026-08-07  
 Bloque: 1 — Cliente 360 + Aseguradoras  
@@ -6,37 +6,70 @@ Gate: `block1-client360-insurers-lab-v20260717`
 Owner de producto preservado: `1.0.41`  
 Base autorizada: `4d8c3f77588853a0abed512c0f19e7efb266d56a`
 
-## Necesidad
+## Resultado ejecutivo
 
-v24 cerró `DATA_CONTRACT_FAILURE / UNIVERSE_ADJUDICATION` antes de Hosting con 430/30/7 raw y 430/25/7 efectivos frente al contrato 414/26/7. El producto, el owner, la matriz, el observer y el handoff v24 no son el objeto de v25.
+v25 cerró sin modificar producto ni datos. Source run `31222721451` pasó 20/20 fixtures y `PASS_V25_SOURCE_PREFLIGHT`. Diagnostic run `31222886355` obtuvo `GO_V25_DIAGNOSTIC_READONLY` antes de secretos, ejecutó exactamente tres lecturas Firestore y cero writes/Auth reads/Hosting/browser.
 
-## Fuente/base
+La lectura LAB observó:
+- raw: 430 clientes / 30 aseguradoras / 7 asesores;
+- baselineTagged: 414 clientes / 26 aseguradoras;
+- nonBaseline: 16 clientes / 4 aseguradoras;
+- clasificador runtime genérico: 430 clientes / 25 aseguradoras efectivos;
+- exclusiones runtime: 0 clientes / 5 aseguradoras; una de las cinco era baseline.
 
-El manifiesto controlado del 14-jul registra batch template `ays_clients_insurers_20260714`: 440 filas fuente de clientes, 414 candidatos de escritura, 26 en requiere-validación; 26 aseguradoras, 13 GT + 13 CO, 3 omitidas. El freeze vigente preservó después 414 clientes, 26 aseguradoras activas y 7 asesores.
+## Adjudicación final por dominio
 
-## Implementación v25
+### Clientes — `REQUIERE_VALIDACION`
 
-- diagnóstico diferencial por fingerprint estable, sin nombres/correos/documentos;
-- pertenencia a baseline probada por batch template, no por posición ni corte numérico;
-- Clientes: solo si aparecen exactamente 414 miembros baseline y 16 no-baseline con procedencia objetiva posterior se permite clasificar `VALIDATOR_STALE`;
-- Aseguradoras: se distinguen baseline, extras y exclusiones; una exclusión de un miembro baseline exige evidencia objetiva de transición para declarar stale; sin ella se conserva `DATA_CONTRACT_FAILURE` o `REQUIERE_VALIDACION`;
-- Asesores: solo control 7/7;
-- máximo 3 lecturas Firestore; cero Auth reads/writes, cero Firestore writes, cero Hosting/browser/reimport.
+Los 414 miembros del batch controlado `ays_clients_insurers_20260714` sí están demostrados. Los 16 registros adicionales son no-baseline y actualmente efectivos, pero no contienen batch alterno, batchId, source marker, timestamp útil ni audit actor/reason que permita demostrar que sean altas legítimas posteriores o contaminación previa. No se borran, excluyen ni se usa un corte numérico para volver a 414.
 
-## Gates
+Tratamiento: obtener procedencia objetiva de esos 16 mediante evidencia ya existente o una autorización futura específicamente diseñada; sin data write y sin actualizar todavía el contrato de clientes.
 
-Source primero, request ausente. Solo con source PASS se habilita un único request diagnóstico v25. El preflight diagnóstico debe devolver `GO_V25_DIAGNOSTIC_READONLY` antes de secretos y demostrar `firestoreReadsMaximum=3`, writes=0, Auth reads=0, Hosting/browser=false.
+### Aseguradoras — `VALIDATOR_STALE`
 
-## Salida permitida
+El clasificador runtime v25 marcó una de las 26 aseguradoras baseline como `duplicate_strong_key` porque trata `codigo` como una clave universalmente única. La reconciliación controlada del 13-jul ya documentaba explícitamente que dos aseguradoras distintas comparten un mismo código fuente y ambas debían conservarse como `REQUIERE_VALIDACION`, no fusionarse. Por tanto, esa exclusión es un falso positivo del validador, no una instrucción de borrar/fusionar datos.
 
-`VALIDATOR_STALE`, `DATA_CONTRACT_FAILURE`, `REQUIERE_VALIDACION` o `PASS_DATA_CONTRACT`, siempre con matriz sanitizada únicamente de diferenciales. v25 no actualiza contrato ni datos.
+La fuente controlada mantiene 13 GT + 13 CO = 26 aseguradoras canónicas. Las cuatro entidades no-baseline observadas están fuera del conjunto baseline y el runtime las excluyó por su estado; al retirar únicamente el falso positivo de deduplicación, el conteo efectivo contractual de Aseguradoras vuelve a 26.
+
+Tratamiento: conservar contrato 26 y corregir en una autorización futura la regla de deduplicación para que `codigo` compartido no implique duplicado automático; exigir identidad compuesta/procedencia y mantener `REQUIERE_VALIDACION` ante colisión conocida.
+
+### Asesores — `PASS_DATA_CONTRACT`
+
+7/7, solo control de invariancia. Sin acción.
+
+## Clasificación terminal v25
+
+El diagnóstico runtime emitió inicialmente `DATA_CONTRACT_FAILURE` porque no disponía de la excepción de fuente para el código compartido. La adjudicación source-only posterior, sin nueva lectura LAB, corrige la causa de Aseguradoras a `VALIDATOR_STALE` y deja Clientes en `REQUIERE_VALIDACION`.
+
+Decisión final global: `REQUIERE_VALIDACION`.
+
+Causa raíz compuesta:
+`VALIDATOR_STALE_IN_INSURER_DEDUPE_PLUS_UNRESOLVED_CLIENT_PROVENANCE`.
+
+## Seguridad y límites respetados
+
+- lecturas LAB: exactamente 3, en una sola adjudicación;
+- lecturas LAB adicionales postdiagnóstico: 0;
+- Firestore writes: 0;
+- Auth reads/writes: 0;
+- operational writes: 0;
+- Hosting/browser: 0;
+- Functions/Rules deploy: 0;
+- reimportación: 0;
+- producción/main/merge: 0;
+- request v25 consumido/frozen; replay=false.
 
 ## Carriles
 
-A UX/frontend: congelado.  
-B control-plane: preflight diagnóstico y one-shot closure.  
-C datos/migración: diagnóstico diferencial de procedencia sin writes.
+A — UX/frontend: congelado; no hay nuevo defecto funcional demostrado.  
+B — control-plane: se identificó una regla stale de deduplicación de Aseguradoras; owner 1.0.41, matriz, observer y handoff v24 permanecen congelados.  
+C — datos/migración: 414 baseline de Clientes están demostrados; 16 no-baseline quedan pendientes de procedencia. Aseguradoras conserva baseline 26; no se autoriza reparación de datos.
 
-## Siguiente acción
+## Claude / Academia
 
-La evidencia runtime decidirá si corresponde actualizar únicamente el contrato, preparar reparación focal de datos o conseguir evidencia adicional de procedencia.
+`REPLICABLE_CLAUDE_ACUMULADO`: una clave de fuente no es automáticamente un identificador único; deduplicación debe respetar excepciones de procedencia y fail-closed.  
+`ACADEMIA_ACTUALIZAR`: un diagnóstico puede producir una clasificación inicial que luego debe adjudicarse contra la fuente rectora antes de tocar datos.
+
+## Siguiente acción exacta
+
+Requiere autorización fresca. No repetir la lectura v25. Preparar source-only dos deltas coordinados: (1) corregir el validador de deduplicación de Aseguradoras para respetar la colisión conocida de código sin hardcodear entidades A&S, mediante identidad compuesta/procedencia; (2) construir un resolver de procedencia para los 16 fingerprints de Clientes usando exclusivamente evidencia existente y, solo si sigue faltando señal, diseñar una lectura focal futura. No modificar datos ni contrato 414/26 todavía. Solo después de cerrar ambos puntos se autoriza un nuevo universe gate y luego la matriz visual.
