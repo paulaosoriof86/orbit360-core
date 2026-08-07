@@ -1,0 +1,97 @@
+name: Orbit360 sourcecheck v29 identity reconciliation universe
+
+on:
+  pull_request:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+
+permissions:
+  contents: read
+
+jobs:
+  source-v29-identity-reconciliation:
+    runs-on: ubuntu-24.04
+    if: github.event.pull_request.head.ref == 'ays/source-v29-identity-reconciliation-universe-20260807'
+    env:
+      ORBIT360_GATE_PROFILE: v29-identity-reconciliation-universe
+      ORBIT360_REQUEST_FILE: .github/orbit360-requests/block1-client360-insurers-v29-identity-reconciliation-universe-authorization.json
+      ORBIT360_EXPECTED_REQUEST_VERSION: NONE_PENDING_FRESH_AUTHORIZATION
+    steps:
+      - name: Checkout exact v29 source candidate
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Canonical gate-contract first before any secrets or data
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs block1-client360-insurers-lab-v20260717
+          jq -e '.status=="PASS_GATE_CONTRACT_SOURCE_V29" and .ok==true and .secretAccessAuthorized==false and .firestoreReadAuthorized==false and .browserAuthorized==false and .hostingAuthorized==false and .writesAuthorized==0' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json >/dev/null
+          echo PASS_V29_CANONICAL_GATE_SOURCE_BEFORE_SECRETS
+
+      - name: Verify exact base and frozen product owner backend
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE='b7f35f1a76d43e2485e0631a618a4ef6ec297336'
+          HEAD_SHA='${{ github.event.pull_request.head.sha }}'
+          test '${{ github.event.pull_request.base.sha }}' = "$BASE"
+          git merge-base --is-ancestor "$BASE" "$HEAD_SHA"
+          frozen=(
+            'tools/orbit360-gate-contract-block1-v23-native-v20260807.json'
+            'tools/orbit360-block1-native-matrix-v23-v20260807.mjs'
+            'tools/orbit360-block1-native-matrix-v23-canonical-v20260807.mjs'
+            'tools/orbit360-event-driven-render-observer-v23.mjs'
+            'orbit360-platform/modules/cliente360.js'
+            'orbit360-platform/modules/aseguradoras.js'
+            'orbit360-platform/modules/polizas.js'
+            'orbit360-platform/modules/cobros.js'
+            'orbit360-platform/sw.js'
+            'orbit360-platform/core/pwa.js'
+            'orbit360-platform/data/store.js'
+            'orbit360-platform/core/auth.js'
+            'orbit360-platform/core/importa.js'
+            'orbit360-platform/firestore.rules'
+          )
+          for p in "${frozen[@]}"; do git diff --quiet "$BASE"..."$HEAD_SHA" -- "$p" || { echo "STOP_V29_FROZEN_CHANGED:$p"; exit 41; }; done
+          echo PASS_V29_PRODUCT_OWNER_MATRIX_OBSERVER_BACKEND_FROZEN
+
+      - name: Validate identity path and fixtures source-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
+          node --check tools/orbit360-validar-gate-contracts-engine-block1-identity-reconciliation-universe-v29-v20260807.mjs
+          node --check tools/orbit360-identity-reconcile-universe-v29-v20260807.mjs
+          node --check tools/orbit360-test-identity-reconciliation-universe-v29-source-v20260807.mjs
+          node --check tools/orbit360-preflight-block1-identity-reconciliation-universe-v29-v20260807.mjs
+          node --check tools/orbit360-close-block1-identity-reconciliation-universe-v29-v20260807.mjs
+          node tools/orbit360-test-identity-reconciliation-universe-v29-source-v20260807.mjs
+          node tools/orbit360-test-v26-dedupe-and-client-provenance-source-v20260807.mjs
+          node tools/orbit360-preflight-block1-identity-reconciliation-universe-v29-v20260807.mjs source
+
+      - name: Assert privacy preserving and fail-closed runtime boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          test ! -e "$ORBIT360_REQUEST_FILE"
+          f=tools/orbit360-identity-reconcile-universe-v29-v20260807.mjs
+          ! grep -Eq '\.(set|update|delete|create)\(' "$f"
+          ! grep -Eq 'runTransaction|bulkWriter|firebase deploy|playwright|hosting:' "$f"
+          grep -Fq "projectedRows(canonicalRef(db,'clientes'),CLIENT_IDENTITY_FIELDS)" "$f"
+          grep -Fq "rawIdentityOutput:false" "$f"
+          grep -Fq "repeatV28ProvenanceFields" tools/orbit360-validar-gate-contracts-engine-block1-identity-reconciliation-universe-v29-v20260807.mjs
+          echo PASS_V29_SOURCE_PRIVACY_ZERO_WRITE_NO_BROWSER_NO_HOSTING
+
+      - name: Verify only authorized v29 source control docs changed
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE='b7f35f1a76d43e2485e0631a618a4ef6ec297336'
+          HEAD_SHA='${{ github.event.pull_request.head.sha }}'
+          allowed='^(tools/orbit360-validar-gate-contracts-v20260717\.mjs|tools/orbit360-validar-gate-contracts-engine-block1-identity-reconciliation-universe-v29-v20260807\.mjs|tools/orbit360-validator-lifecycle-block1-identity-reconciliation-universe-v29-v20260807\.json|tools/orbit360-preflight-block1-identity-reconciliation-universe-v29-v20260807\.mjs|tools/orbit360-identity-reconcile-universe-v29-v20260807\.mjs|tools/orbit360-test-identity-reconciliation-universe-v29-source-v20260807\.mjs|tools/orbit360-close-block1-identity-reconciliation-universe-v29-v20260807\.mjs|\.github/workflows/orbit360-sourcecheck-v29-identity-reconciliation-universe-v20260807\.yml|\.github/workflows/orbit360-registered-relay-v29-identity-reconciliation-universe-v20260807\.yml|orbit360-platform/docs/CIERRE-V29-IDENTITY-RECONCILIATION-UNIVERSE-20260807\.md|orbit360-platform/docs/ACADEMIA-ACTUALIZACION-V29-IDENTITY-RECONCILIATION-20260807\.md|orbit360-platform/docs/CLAUDE-ACUMULADO-V29-IDENTITY-RECONCILIATION-20260807\.md)$'
+          while IFS= read -r p; do [[ "$p" =~ $allowed ]] || { echo "STOP_V29_UNAUTHORIZED_SOURCE_CHANGE:$p"; exit 41; }; done < <(git diff --name-only "$BASE"..."$HEAD_SHA")
+          echo PASS_V29_SOURCE_SCOPE_EXACT
