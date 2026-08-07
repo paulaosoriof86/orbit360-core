@@ -5,11 +5,11 @@
   "authorizationGeneration": "v25-differential-universe-diagnosis",
   "gateId": "block1-client360-insurers-lab-v20260717",
   "contractVersion": "1.0.41",
-  "status": "AUTHORIZED_ONCE",
+  "status": "CONSUMED_DATA_CONTRACT_FAILURE",
   "approved": true,
-  "allowedExecutions": 1,
-  "consumed": false,
-  "authorizationFrozen": false,
+  "allowedExecutions": 0,
+  "consumed": true,
+  "authorizationFrozen": true,
   "replayAllowed": false,
   "parentHead": "796a1bb06cf12fe4bff2a57f3c363000821525ec",
   "authorizedBaseHead": "796a1bb06cf12fe4bff2a57f3c363000821525ec",
@@ -20,7 +20,11 @@
   "scope": {
     "purpose": "DIAGNOSE_BLOCK1_UNIVERSE_DIFFERENTIAL_ONLY",
     "firestoreReadsMaximum": 3,
-    "collections": ["clientes", "aseguradoras", "asesores-control"],
+    "collections": [
+      "clientes",
+      "aseguradoras",
+      "asesores-control"
+    ],
     "firestoreWrites": false,
     "authReads": false,
     "authWrites": false,
@@ -33,9 +37,21 @@
     "production": false,
     "main": false,
     "merge": false,
-    "expectedPriorObservedRaw": { "clientes": 430, "aseguradoras": 30, "asesores": 7 },
-    "expectedPriorObservedEffective": { "clientes": 430, "aseguradoras": 25, "asesores": 7 },
-    "baselineExpected": { "clientes": 414, "aseguradoras": 26, "asesores": 7 },
+    "expectedPriorObservedRaw": {
+      "clientes": 430,
+      "aseguradoras": 30,
+      "asesores": 7
+    },
+    "expectedPriorObservedEffective": {
+      "clientes": 430,
+      "aseguradoras": 25,
+      "asesores": 7
+    },
+    "baselineExpected": {
+      "clientes": 414,
+      "aseguradoras": 26,
+      "asesores": 7
+    },
     "requiresValidationExcludedToMatchCount": false,
     "output": "SANITIZED_DIFFERENTIAL_FINGERPRINTS_ONLY"
   },
@@ -53,5 +69,23 @@
     "protectedBackend": true
   },
   "containsPII": false,
-  "containsSecrets": false
+  "containsSecrets": false,
+  "consumedByRunId": "31222886355",
+  "consumedByAttempt": 1,
+  "consumedAt": "2026-08-07T22:11:17.028Z",
+  "executionResult": {
+    "decision": "DATA_CONTRACT_FAILURE",
+    "classification": "DATA_CONTRACT_FAILURE",
+    "checkpoint": "UNIVERSE_DIAGNOSTIC_COMPLETE",
+    "runId": "31222886355",
+    "attempt": 1,
+    "firestoreReads": 3,
+    "firestoreWrites": 0,
+    "authReads": 0,
+    "authWrites": 0,
+    "operationalWrites": 0,
+    "hostingTouched": false,
+    "browserExecuted": false,
+    "productionTouched": false
+  }
 }

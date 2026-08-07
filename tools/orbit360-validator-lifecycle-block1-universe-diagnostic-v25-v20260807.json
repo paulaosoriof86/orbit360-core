@@ -11,23 +11,23 @@
   "tenantId": "alianzas-soluciones",
   "authorizedBaseHead": "4d8c3f77588853a0abed512c0f19e7efb266d56a",
   "expectedRequestVersion": "20260807.25-differential-universe-diagnosis",
-  "status": "AUTHORIZED_ONCE_PENDING_EXCLUSIVE_REQUEST",
-  "classification": "DATA_CONTRACT_FAILURE_ROOT_CAUSE_DIAGNOSTIC_READONLY_PENDING_REQUEST",
-  "currentPhase": "BLOCK1_UNIVERSE_DIAGNOSTIC_V25",
+  "status": "CLOSED_DATA_CONTRACT_FAILURE",
+  "classification": "DATA_CONTRACT_FAILURE",
+  "currentPhase": "CLOSED_UNIVERSE_DIAGNOSTIC_V25",
   "stopRetryActive": false,
-  "authorizationReserved": true,
-  "authorizationFrozen": false,
-  "allowedExecutions": 1,
+  "authorizationReserved": false,
+  "authorizationFrozen": true,
+  "allowedExecutions": 0,
   "activeRequest": false,
-  "requestConsumed": false,
+  "requestConsumed": true,
   "replayAllowed": false,
-  "executionAuthorized": true,
+  "executionAuthorized": false,
   "executionProfile": {
-    "mode": "DIAGNOSTIC_READONLY_ONE_SHOT",
-    "phase": "BLOCK1_UNIVERSE_DIAGNOSTIC_V25",
+    "mode": "CLOSED_NO_RUNTIME",
+    "phase": "CLOSED_UNIVERSE_DIAGNOSTIC_V25",
     "capabilities": {
-      "secrets": true,
-      "firestoreRead": true,
+      "secrets": false,
+      "firestoreRead": false,
       "firestoreWrite": false,
       "authRead": false,
       "authWrite": false,
@@ -55,8 +55,16 @@
   "preflight": "tools/orbit360-preflight-block1-universe-diagnostic-v25-v20260807.mjs",
   "requestPath": ".github/orbit360-requests/block1-client360-insurers-v25-diagnostic-authorization.json",
   "expectedObservedFromV24": {
-    "raw": { "clientes": 430, "aseguradoras": 30, "asesores": 7 },
-    "effective": { "clientes": 430, "aseguradoras": 25, "asesores": 7 }
+    "raw": {
+      "clientes": 430,
+      "aseguradoras": 30,
+      "asesores": 7
+    },
+    "effective": {
+      "clientes": 430,
+      "aseguradoras": 25,
+      "asesores": 7
+    }
   },
   "baselineSourceContract": {
     "manifestDate": "2026-07-14",
@@ -95,5 +103,60 @@
   },
   "containsPII": false,
   "containsSecrets": false,
-  "nextAction": "CREATE_ONE_EXCLUSIVE_PARENT_BOUND_V25_DIAGNOSTIC_REQUEST"
+  "nextAction": "AUTHORIZE_TARGETED_DATA_CONTRACT_REPAIR_PLAN_NO_WRITE",
+  "diagnosticResult": {
+    "runId": "31222886355",
+    "attempt": 1,
+    "decision": "DATA_CONTRACT_FAILURE",
+    "classification": "DATA_CONTRACT_FAILURE",
+    "checkpoint": "UNIVERSE_DIAGNOSTIC_COMPLETE",
+    "observed": {
+      "raw": {
+        "clientes": 430,
+        "aseguradoras": 30,
+        "asesores": 7
+      },
+      "effective": {
+        "clientes": 430,
+        "aseguradoras": 25,
+        "asesores": 7
+      },
+      "baselineTagged": {
+        "clientes": 414,
+        "aseguradoras": 26
+      },
+      "nonBaseline": {
+        "clientes": 16,
+        "aseguradoras": 4
+      },
+      "excluded": {
+        "clientes": 0,
+        "aseguradoras": 5
+      },
+      "baselineInsurersExcluded": 1
+    },
+    "domainDecision": {
+      "clientes": {
+        "classification": "REQUIERE_VALIDACION",
+        "basis": "BASELINE_MEMBERSHIP_NOT_PROVEN",
+        "demonstratedObjectiveCount": null
+      },
+      "aseguradoras": {
+        "classification": "DATA_CONTRACT_FAILURE",
+        "basis": "BASELINE_ACTIVE_INSURER_NOW_EXCLUDED_WITHOUT_POST_CLOSURE_TRANSITION_EVIDENCE",
+        "demonstratedObjectiveCount": null
+      },
+      "asesores": {
+        "classification": "PASS_DATA_CONTRACT",
+        "basis": "INVARIANCE_COUNT_ONLY_NO_REPROCESS"
+      }
+    },
+    "differentialCounts": {
+      "clientes": 16,
+      "aseguradoras": 5
+    },
+    "nextTreatment": "AUTHORIZE_TARGETED_DATA_CONTRACT_REPAIR_PLAN_NO_WRITE",
+    "firestoreReads": 3,
+    "writes": 0
+  }
 }
