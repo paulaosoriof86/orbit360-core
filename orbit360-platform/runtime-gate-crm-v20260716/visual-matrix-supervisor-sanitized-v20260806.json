@@ -6,47 +6,54 @@
   "observedCheckpoints": [
     {
       "checkpoint": "SUPERVISOR_CHILD_SPAWN",
-      "at": "2026-08-07T00:48:04.185Z",
-      "elapsedMs": 1
+      "at": "2026-08-07T15:13:20.967Z",
+      "elapsedMs": 0
     },
     {
       "checkpoint": "MATRIX_CHECKPOINT_PROTECTED_SNAPSHOT_BEFORE",
-      "at": "2026-08-07T00:48:05.188Z",
+      "at": "2026-08-07T15:13:21.971Z",
       "elapsedMs": 1004,
       "matrixCheckpoint": "PROTECTED_SNAPSHOT_BEFORE",
       "role": ""
     },
     {
       "checkpoint": "MATRIX_CHECKPOINT_DIRECCION_PAGE_GOTO",
-      "at": "2026-08-07T00:48:09.192Z",
-      "elapsedMs": 5008,
+      "at": "2026-08-07T15:13:27.977Z",
+      "elapsedMs": 7010,
       "matrixCheckpoint": "DIRECCION_PAGE_GOTO",
       "role": "DIRECCION"
     },
     {
       "checkpoint": "MATRIX_CHECKPOINT_DIRECCION_ROUTE_INICIO_WAIT",
-      "at": "2026-08-07T00:48:18.202Z",
-      "elapsedMs": 14018,
+      "at": "2026-08-07T15:13:32.983Z",
+      "elapsedMs": 12016,
       "matrixCheckpoint": "DIRECCION_ROUTE_INICIO_WAIT",
       "role": "DIRECCION"
     },
     {
       "checkpoint": "MATRIX_CHECKPOINT_DIRECCION_ROUTE_INICIO_PASS",
-      "at": "2026-08-07T00:48:30.216Z",
-      "elapsedMs": 26032,
+      "at": "2026-08-07T15:13:56.009Z",
+      "elapsedMs": 35042,
       "matrixCheckpoint": "DIRECCION_ROUTE_INICIO_PASS",
       "role": "DIRECCION"
     },
     {
-      "checkpoint": "CHECKPOINT_IDLE_TIMEOUT",
-      "at": "2026-08-07T00:50:00.308Z",
-      "elapsedMs": 116124
+      "checkpoint": "MATRIX_CHECKPOINT_DIRECCION_ROUTE_CLIENTE360_WAIT",
+      "at": "2026-08-07T15:14:06.018Z",
+      "elapsedMs": 45051,
+      "matrixCheckpoint": "DIRECCION_ROUTE_CLIENTE360_WAIT",
+      "role": "DIRECCION"
     },
     {
-      "checkpoint": "MATRIX_CHECKPOINT_DIRECCION_NAVIGATE_CLIENTE360",
-      "at": "2026-08-07T00:50:01.309Z",
-      "elapsedMs": 117125,
-      "matrixCheckpoint": "DIRECCION_NAVIGATE_CLIENTE360",
+      "checkpoint": "CHECKPOINT_IDLE_TIMEOUT",
+      "at": "2026-08-07T15:15:36.112Z",
+      "elapsedMs": 135145
+    },
+    {
+      "checkpoint": "MATRIX_CHECKPOINT_DIRECCION_ROUTE_CLIENTE360_TIMEOUT",
+      "at": "2026-08-07T15:15:37.114Z",
+      "elapsedMs": 136147,
+      "matrixCheckpoint": "DIRECCION_ROUTE_CLIENTE360_TIMEOUT",
       "role": "DIRECCION"
     }
   ],
@@ -58,7 +65,7 @@
     "globalTimeoutMs": 1200000,
     "terminateGraceMs": 8000
   },
-  "childPid": 3853,
+  "childPid": 3889,
   "childExitCode": 42,
   "childSignal": "",
   "terminationReason": "CHECKPOINT_IDLE_TIMEOUT",
@@ -77,6 +84,6 @@
   "containsSecrets": false,
   "containsPasswords": false,
   "ok": false,
-  "finishedAt": "2026-08-07T00:50:03.373Z",
-  "elapsedMs": 119189
+  "finishedAt": "2026-08-07T15:15:40.271Z",
+  "elapsedMs": 139304
 }

@@ -6,66 +6,75 @@
   "classification": "PIPELINE_MECHANISM_FAILURE",
   "projectId": "ays-orbit-360-lab",
   "tenantId": "alianzas-soluciones",
-  "currentCheckpoint": "DIRECCION_NAVIGATE_CLIENTE360",
+  "currentCheckpoint": "DIRECCION_ROUTE_CLIENTE360_TIMEOUT",
   "checkpoints": [
     {
       "checkpoint": "SERVICE_ACCOUNT_VALIDATE",
-      "at": "2026-08-07T00:48:04.488Z"
+      "at": "2026-08-07T15:13:21.196Z"
     },
     {
       "checkpoint": "PROTECTED_SNAPSHOT_BEFORE",
-      "at": "2026-08-07T00:48:04.527Z"
+      "at": "2026-08-07T15:13:21.218Z"
     },
     {
       "checkpoint": "BROWSER_LAUNCH",
-      "at": "2026-08-07T00:48:08.510Z"
+      "at": "2026-08-07T15:13:27.520Z"
     },
     {
       "checkpoint": "DIRECCION_CONTEXT_CREATE",
-      "at": "2026-08-07T00:48:08.578Z"
+      "at": "2026-08-07T15:13:27.573Z"
     },
     {
       "checkpoint": "DIRECCION_PAGE_GOTO",
-      "at": "2026-08-07T00:48:08.622Z"
+      "at": "2026-08-07T15:13:27.616Z"
     },
     {
       "checkpoint": "DIRECCION_FIREBASE_AUTH_WAIT",
-      "at": "2026-08-07T00:48:17.388Z"
+      "at": "2026-08-07T15:13:32.027Z"
     },
     {
       "checkpoint": "DIRECCION_FIREBASE_AUTH_PASS",
-      "at": "2026-08-07T00:48:17.390Z",
+      "at": "2026-08-07T15:13:32.030Z",
       "elapsedMs": 2
     },
     {
       "checkpoint": "DIRECCION_CUSTOM_TOKEN_CREATE",
-      "at": "2026-08-07T00:48:17.390Z"
+      "at": "2026-08-07T15:13:32.030Z"
     },
     {
       "checkpoint": "DIRECCION_CUSTOM_TOKEN_SIGNIN",
-      "at": "2026-08-07T00:48:17.451Z"
+      "at": "2026-08-07T15:13:32.068Z"
     },
     {
       "checkpoint": "DIRECCION_AUTH_INSIDE_WAIT",
-      "at": "2026-08-07T00:48:17.688Z"
+      "at": "2026-08-07T15:13:32.378Z"
     },
     {
       "checkpoint": "DIRECCION_AUTH_INSIDE_PASS",
-      "at": "2026-08-07T00:48:18.100Z",
-      "elapsedMs": 412
+      "at": "2026-08-07T15:13:32.611Z",
+      "elapsedMs": 233
     },
     {
       "checkpoint": "DIRECCION_ROUTE_INICIO_WAIT",
-      "at": "2026-08-07T00:48:18.124Z"
+      "at": "2026-08-07T15:13:32.614Z"
     },
     {
       "checkpoint": "DIRECCION_ROUTE_INICIO_PASS",
-      "at": "2026-08-07T00:48:29.280Z",
-      "elapsedMs": 11156
+      "at": "2026-08-07T15:13:55.790Z",
+      "elapsedMs": 23175
     },
     {
       "checkpoint": "DIRECCION_NAVIGATE_CLIENTE360",
-      "at": "2026-08-07T00:50:00.317Z"
+      "at": "2026-08-07T15:14:05.798Z"
+    },
+    {
+      "checkpoint": "DIRECCION_ROUTE_CLIENTE360_WAIT",
+      "at": "2026-08-07T15:14:05.800Z"
+    },
+    {
+      "checkpoint": "DIRECCION_ROUTE_CLIENTE360_TIMEOUT",
+      "at": "2026-08-07T15:15:36.116Z",
+      "elapsedMs": 90316
     }
   ],
   "before": {
@@ -179,8 +188,8 @@
   "roles": [],
   "captureWarnings": [
     {
-      "checkpoint": "DIRECCION_ROUTE_INICIO_PASS",
-      "name": "direccion-inicio",
+      "checkpoint": "DIRECCION_ROUTE_CLIENTE360_TIMEOUT",
+      "name": "failure-direccion-route-cliente360",
       "error": "page.evaluate: Target page, context or browser has been closed",
       "blocking": false
     }
@@ -196,6 +205,10 @@
   "containsSecrets": false,
   "containsPasswords": false,
   "ok": false,
-  "error": "page.evaluate: Target page, context or browser has been closed",
+  "observedState": {
+    "stateError": "page.evaluate: Target page, context or browser has been closed"
+  },
+  "failureScreenshotError": "CAPTURE_UNAVAILABLE_NON_BLOCKING",
+  "error": "browserContext.close: Target page, context or browser has been closed",
   "snapshotIntegrity": "VERIFIED_UNCHANGED"
 }

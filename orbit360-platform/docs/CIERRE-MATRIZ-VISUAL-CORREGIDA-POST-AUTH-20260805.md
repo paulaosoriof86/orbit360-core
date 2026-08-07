@@ -1,19 +1,20 @@
 # CIERRE MATRIZ VISUAL CORREGIDA POST-AUTH — 2026-08-05
 
 ~~~text
-run: 31186425271
+run: 31191340443
 stage: STOP_RETRY_VISUAL_MATRIX_CORRECTED_POST_AUTH
-classification: VALIDATOR_STALE_OR_PRODUCT_WAIT_IDENTIFIED
-checkpoint: INICIO_READY_TIMEOUT
+classification: PIPELINE_MECHANISM_FAILURE
+checkpoint: DIRECCION_ROUTE_CLIENTE360_TIMEOUT
 preflight: GO_GATE_CONTRACT · 28
 Hosting deploys: 1
 rollback required: true
 rollback restored: true
-precheck: FAIL_VISUAL_BROWSER_PRECHECK · INICIO_READY_TIMEOUT
-matrix: FAIL_VISUAL_OBSERVABLE_ROOTFIX_MATRIX · DIRECCION_NAVIGATE_CLIENTE360
+precheck: PASS_VISUAL_BROWSER_PRECHECK · INICIO_READY_PASS
+matrix: FAIL_VISUAL_OBSERVABLE_ROOTFIX_MATRIX · DIRECCION_ROUTE_CLIENTE360_TIMEOUT
 snapshot: VERIFIED_UNCHANGED
 role failures: null
 capture warnings: 1
+request/lifecycle/overlay terminal fail-closed: true
 Firestore/Auth/operational writes: 0
 Functions/Rules/reimport/production/main/merge: 0
 ~~~
