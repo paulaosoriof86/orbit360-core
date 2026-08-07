@@ -3,10 +3,10 @@
   "requestVersion": "20260806.11-transport-base-sha-runtime",
   "gateId": "block2.7-visual-matrix-corrected-post-auth-lab-v20260805",
   "contractVersion": "2.7.8",
-  "status": "AUTHORIZED_ONCE",
+  "status": "CONSUMED",
   "approved": true,
-  "allowedExecutions": 1,
-  "consumed": false,
+  "allowedExecutions": 0,
+  "consumed": true,
   "authorizationFrozen": false,
   "replayAllowed": false,
   "rcId": "RC-AYS-LAB-CANONICA-01",
@@ -93,5 +93,7 @@
   "rollbackRequiredOnAnyPostDeployFailure": true,
   "containsPII": false,
   "containsSecrets": false,
-  "containsPasswords": false
+  "containsPasswords": false,
+  "consumedByRunId": "31135532118",
+  "consumedByAttempt": 1
 }

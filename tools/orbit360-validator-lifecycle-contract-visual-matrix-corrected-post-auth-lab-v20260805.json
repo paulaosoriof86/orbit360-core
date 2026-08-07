@@ -4,9 +4,9 @@
   "gateId": "block2.7-visual-matrix-corrected-post-auth-lab-v20260805",
   "gateContractVersion": "2.7.8",
   "owner": "orbit360-visual-matrix-corrected-post-auth-v20260805",
-  "ownerVersion": "20260806.26-runtime-v11-activation-source-only",
-  "status": "AUTHORIZED_ONCE_PENDING_EXCLUSIVE_REQUEST",
-  "classification": "PIPELINE_MECHANISM_FAILURE_CORRECTED_SOURCE_ONLY",
+  "ownerVersion": "20260805.4-runtime-consumed",
+  "status": "CONSUMED_STOP_RETRY",
+  "classification": "PIPELINE_MECHANISM_FAILURE",
   "secondaryClassification": "PASS_RUNTIME_TRANSPORT_BASE_SHA_SOURCE_ONLY_12_OF_12",
   "patternClassification": "REPLICABLE_CLAUDE_ACUMULADO",
   "rcId": "RC-AYS-LAB-CANONICA-01",
@@ -18,7 +18,7 @@
   "authorizedBaseHead": "423bcc0e57ea43ddbc9c6d6af6c92777385242bb",
   "requestVersion": "20260806.11-transport-base-sha-runtime",
   "authorizationDirective": "EXPLICIT_CONTINUE_NEXT_ACTION_SINGLE_RUNTIME_V11_TRANSPORT_BASE_SHA_RESTORE_BACKUP_HOSTING_LAB_DEPLOY_MATRIX",
-  "currentPhase": "VISUAL_MATRIX_CORRECTED_POST_AUTH_LAB_EXECUTION",
+  "currentPhase": "CONSUMED_STOP_RETRY",
   "executionProfile": {
     "mode": "RUNTIME_ONCE_PHASE_AWARE_TRANSPORT_BASE_SHA_RESTORE_BACKUP_DEPLOY_PRECHECK_MATRIX",
     "phase": "VISUAL_MATRIX_CORRECTED_POST_AUTH_LAB_EXECUTION",
@@ -50,9 +50,21 @@
   "functionsDeploysMaximum": 0,
   "rulesDeploysMaximum": 0,
   "browserMatrix": [
-    { "role": "Direccion", "width": 1440, "height": 1000 },
-    { "role": "Operativo", "width": 1024, "height": 768 },
-    { "role": "Asesor", "width": 390, "height": 844 }
+    {
+      "role": "Direccion",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "role": "Operativo",
+      "width": 1024,
+      "height": 768
+    },
+    {
+      "role": "Asesor",
+      "width": 390,
+      "height": 844
+    }
   ],
   "sourcePrerequisites": {
     "authorizedSourceHead": "423bcc0e57ea43ddbc9c6d6af6c92777385242bb",
@@ -79,17 +91,17 @@
   },
   "activeRequest": false,
   "requestRetired": false,
-  "requestConsumed": false,
-  "authorizationReserved": true,
+  "requestConsumed": true,
+  "authorizationReserved": false,
   "authorizationFrozen": false,
   "replayAllowed": false,
-  "allowedExecutions": 1,
-  "executionAuthorized": true,
-  "secretAccessAuthorized": true,
-  "firestoreReadAuthorized": true,
+  "allowedExecutions": 0,
+  "executionAuthorized": false,
+  "secretAccessAuthorized": false,
+  "firestoreReadAuthorized": false,
   "writeAuthorized": false,
-  "browserAuthorized": true,
-  "hostingDeployAuthorized": true,
+  "browserAuthorized": false,
+  "hostingDeployAuthorized": false,
   "functionsDeployAuthorized": false,
   "rulesDeployAuthorized": false,
   "productionAuthorized": false,
@@ -116,5 +128,17 @@
   "containsPII": false,
   "containsSecrets": false,
   "containsPasswords": false,
-  "nextAction": "VALIDATE_V11_ACTIVATION_SOURCE_ONLY_THEN_CREATE_ONE_EXCLUSIVE_IMMUTABLE_REQUEST"
+  "nextAction": "CLOSE_EXACT_CHECKPOINT_ROOT_CAUSE_WITHOUT_RETRY",
+  "runtimeResult": {
+    "runId": "31135532118",
+    "attempt": 1,
+    "result": "STOP_RETRY",
+    "classification": "PIPELINE_MECHANISM_FAILURE",
+    "checkpoint": "DIRECCION_NAVIGATE_CLIENTE360",
+    "hostingDeploys": 1,
+    "rollbackRestored": true,
+    "snapshotIntegrity": "VERIFIED_UNCHANGED",
+    "totalRoleFailures": null,
+    "captureWarnings": 1
+  }
 }
