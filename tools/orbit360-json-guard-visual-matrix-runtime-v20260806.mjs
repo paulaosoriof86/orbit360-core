@@ -88,8 +88,26 @@ if (mode === 'validate-request') {
   const file = process.argv[3];
   const parent = process.argv[4];
   const expectedVersion = process.argv[5];
+  const lifecycleFile = process.argv[6];
   const request = readJson(file);
+  const lifecycle = readJson(lifecycleFile);
   const scope = request.scope || {};
+  const capabilities = request.capabilities || {};
+  const lifecycleCapabilities = lifecycle.executionProfile && lifecycle.executionProfile.capabilities || {};
+  const lifecycleStatus = String(lifecycle.status || '');
+  const baselineChannel = String(lifecycle.priorHostingRestoreChannel || '');
+  const baselineScript = String(lifecycle.priorHostingRestoreScript || '');
+  const lifecycleAuthorizedPhase =
+    /^AUTHORIZED_FRESH_REQUEST_ONLY_/.test(lifecycleStatus) &&
+    /PENDING_EXCLUSIVE_REQUEST$/.test(lifecycleStatus) &&
+    lifecycle.stopRetryActive === false &&
+    lifecycle.authorizationReserved === true &&
+    lifecycle.authorizationFrozen === false &&
+    lifecycle.allowedExecutions === 1 &&
+    lifecycle.executionAuthorized === false &&
+    lifecycle.secretAccessAuthorized === false &&
+    lifecycle.browserAuthorized === false &&
+    lifecycle.hostingDeployAuthorized === false;
   const ok =
     exact(request.schemaVersion, 'orbit360-visual-matrix-corrected-post-auth-request-v1') &&
     exact(request.requestVersion, expectedVersion) &&
@@ -102,10 +120,26 @@ if (mode === 'validate-request') {
     request.authorizationFrozen === false &&
     request.replayAllowed === false &&
     exact(request.parentHead, parent) &&
+    exact(request.authorizedBaseHead, parent) &&
+    capabilities.secrets === true &&
+    capabilities.firestoreRead === true &&
+    capabilities.writes === false &&
+    capabilities.runtime === true &&
+    capabilities.browser === true &&
+    capabilities.deploy === true &&
+    capabilities.functionsDeploy === false &&
+    capabilities.rulesDeploy === false &&
+    capabilities.production === false &&
     scope.registeredWorkflowRelayRequired === true &&
-    scope.restorePriorV6BackupBeforeRuntime === true &&
-    exact(scope.restorePriorV6BackupChannel, 'visual-matrix-corrected-backup-31116830824') &&
+    scope.restorePriorBaselineBeforeRuntime === true &&
+    baselineChannel.length > 0 &&
+    baselineScript.length > 0 &&
+    exact(scope.restorePriorBaselineChannel, baselineChannel) &&
+    exact(scope.restorePriorBaselineScript, baselineScript) &&
+    scope.hostingOnly === true &&
     scope.hostingDeploysMaximum === 1 &&
+    scope.hostingBackupClone === true &&
+    scope.hostingRollbackCloneOnFailure === true &&
     scope.functionsDeploy === false &&
     scope.rulesDeploy === false &&
     scope.firestoreWrites === false &&
@@ -114,7 +148,22 @@ if (mode === 'validate-request') {
     scope.reimport === false &&
     scope.production === false &&
     scope.main === false &&
-    scope.merge === false;
+    scope.merge === false &&
+    exact(lifecycle.schemaVersion, 'orbit360-validator-lifecycle-contract-v1') &&
+    exact(lifecycle.gateId, request.gateId) &&
+    exact(lifecycle.gateContractVersion, request.contractVersion) &&
+    exact(lifecycle.expectedRequestVersion, expectedVersion) &&
+    exact(lifecycle.branch, request.branch) &&
+    exact(lifecycle.projectId, request.projectId) &&
+    exact(lifecycle.tenantId, request.tenantId) &&
+    lifecycle.hostingDeploysMaximum === 1 &&
+    lifecycle.hostingBackupCloneAuthorized === true &&
+    lifecycle.hostingRollbackCloneAuthorizedOnFailure === true &&
+    lifecycleAuthorizedPhase &&
+    lifecycleCapabilities.writes === false &&
+    lifecycleCapabilities.functionsDeploy === false &&
+    lifecycleCapabilities.rulesDeploy === false &&
+    lifecycleCapabilities.production === false;
   process.exit(ok ? 0 : 41);
 }
 
