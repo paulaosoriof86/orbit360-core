@@ -13,9 +13,10 @@
   "tenantId": "alianzas-soluciones",
   "authorizedSourceHead": "ef9e0e1e738ce407025ed159067d8b3cc4d2683b",
   "expectedRequestVersion": "20260807.23-native-block1-runtime",
-  "status": "SOURCE_VALIDATION_PENDING",
-  "classification": "VALIDATOR_STALE_CANONICAL_OWNER_REALIGNMENT_SOURCE_ONLY",
-  "currentPhase": "SOURCE_ONLY_NATIVE_MATRIX_VALIDATION",
+  "authorizationGeneration": "v24-canonical-evidence-handoff",
+  "status": "AUTHORIZED_ONCE_PENDING_EXCLUSIVE_REQUEST",
+  "classification": "RUNTIME_PENDING_V24_CANONICAL_EVIDENCE_HANDOFF_SOURCE_VALIDATED",
+  "currentPhase": "BLOCK1_NATIVE_MATRIX_RUNTIME_V23",
   "stopRetryActive": false,
   "authorizationReserved": true,
   "authorizationFrozen": false,
@@ -23,11 +24,22 @@
   "activeRequest": false,
   "requestConsumed": false,
   "replayAllowed": false,
-  "executionAuthorized": false,
+  "executionAuthorized": true,
   "executionProfile": {
-    "mode": "SOURCE_ONLY",
-    "phase": "SOURCE_ONLY_NATIVE_MATRIX_VALIDATION",
-    "capabilities": { "secrets": false, "firestoreRead": false, "writes": false, "runtime": false, "browser": false, "deploy": false, "functionsDeploy": false, "rulesDeploy": false, "production": false }
+    "mode": "RUNTIME_ONCE_ONLY_WITH_FRESH_EXCLUSIVE_REQUEST_V24",
+    "phase": "BLOCK1_NATIVE_MATRIX_RUNTIME_V23",
+    "capabilities": { "secrets": true, "firestoreRead": true, "writes": false, "runtime": true, "browser": true, "deploy": true, "functionsDeploy": false, "rulesDeploy": false, "production": false }
+  },
+  "sourceValidation": {
+    "status": "PASS_V24_CANONICAL_EVIDENCE_HANDOFF_SOURCE_CLOSED",
+    "runId": 31221486703,
+    "head": "ad2af17c959223f91b3808a8a17abcd8aa587671",
+    "authorizationGeneration": "v24-canonical-evidence-handoff",
+    "canonicalPreflightStatus": "PASS_GATE_CONTRACT_SOURCE_V23",
+    "canonicalEvidenceAuthority": "orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json",
+    "wrapperStatus": "PASS_V24_SOURCE_PREFLIGHT",
+    "handoffFixtures": "15/15 PASS",
+    "frozenBaselineInvariant": true
   },
   "nativeMatrix": "tools/orbit360-block1-native-matrix-v23-canonical-v20260807.mjs",
   "nativeImplementation": "tools/orbit360-block1-native-matrix-v23-v20260807.mjs",
@@ -37,9 +49,9 @@
   "canonicalEngine": "tools/orbit360-validar-gate-contracts-engine-block1-v23-native-v20260807.mjs",
   "mandatoryCanonicalPreflight": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
   "v23Preflight": "tools/orbit360-preflight-block1-v23-native-v20260807.mjs",
-  "sourceWorkflow": ".github/workflows/orbit360-sourcecheck-v23-native-block1-v20260807.yml",
-  "runtimeWorkflow": ".github/workflows/orbit360-registered-relay-v23-native-block1-v20260807.yml",
-  "requestPath": ".github/orbit360-requests/block1-client360-insurers-v23-authorization.json",
+  "sourceWorkflow": ".github/workflows/orbit360-sourcecheck-v24-canonical-evidence-handoff-v20260807.yml",
+  "runtimeWorkflow": ".github/workflows/orbit360-registered-relay-v24-canonical-evidence-handoff-v20260807.yml",
+  "requestPath": ".github/orbit360-requests/block1-client360-insurers-v24-authorization.json",
   "blockingRoutes": ["inicio", "cliente360", "aseguradoras"],
   "historicalClosure": {
     "freeze": "tools/orbit360-incident-freeze-v20260721.json",
@@ -55,5 +67,5 @@
   "containsPII": false,
   "containsSecrets": false,
   "containsPasswords": false,
-  "nextAction": "VALIDATE_CANONICAL_OWNER_1.0.41_AND_EXACT_NATIVE_SOURCE_PACKAGE_BEFORE_ANY_RUNTIME_TRANSITION"
+  "nextAction": "CREATE_EXACTLY_ONE_NEW_EXCLUSIVE_IMMUTABLE_V24_REQUEST_COMMIT_BOUND_TO_THIS_RUNTIME_PENDING_HEAD"
 }
