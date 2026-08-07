@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "orbit360-v20-source-transition-marker-v1",
+  "requestVersion": "20260807.20-two-phase-runtime",
+  "authorizedSourceHead": "a3e833b8f162f0313dda19f9bd2cf1730ad9871c",
+  "sourceEvidenceRunId": 31207941202,
+  "oneShot": true,
+  "secretsAllowed": false,
+  "firebaseAllowed": false,
+  "hostingAllowed": false,
+  "browserAllowed": false,
+  "writesAllowed": false,
+  "productionAllowed": false
+}
