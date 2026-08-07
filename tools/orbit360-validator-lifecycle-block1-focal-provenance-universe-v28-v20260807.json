@@ -15,25 +15,25 @@
   "sourceRunId": 31227817112,
   "sourceJobId": 93025533196,
   "expectedRequestVersion": "20260807.28-focal-provenance-universe-readonly",
-  "status": "AUTHORIZED_ONCE_PENDING_EXCLUSIVE_REQUEST",
-  "classification": "GO_FOCAL_PROVENANCE_UNIVERSE_READONLY_PENDING_REQUEST",
-  "currentPhase": "BLOCK1_FOCAL_PROVENANCE_UNIVERSE_READONLY_V28",
-  "stopRetryActive": false,
-  "authorizationReserved": true,
-  "authorizationFrozen": false,
-  "allowedExecutions": 1,
+  "status": "STOP_RETRY",
+  "classification": "DATA_CONTRACT_FAILURE",
+  "currentPhase": "STOP_RETRY_FOCAL_PROVENANCE_UNIVERSE_V28",
+  "stopRetryActive": true,
+  "authorizationReserved": false,
+  "authorizationFrozen": true,
+  "allowedExecutions": 0,
   "activeRequest": false,
-  "requestConsumed": false,
+  "requestConsumed": true,
   "replayAllowed": false,
-  "executionAuthorized": true,
+  "executionAuthorized": false,
   "executionProfile": {
-    "mode": "READ_ONLY_RUNTIME",
-    "phase": "BLOCK1_FOCAL_PROVENANCE_UNIVERSE_READONLY_V28",
+    "mode": "CLOSED_NO_RUNTIME",
+    "phase": "STOP_RETRY_FOCAL_PROVENANCE_UNIVERSE_V28",
     "capabilities": {
-      "secrets": true,
-      "firestoreRead": true,
+      "secrets": false,
+      "firestoreRead": false,
       "writes": false,
-      "runtime": true,
+      "runtime": false,
       "browser": false,
       "deploy": false,
       "functionsDeploy": false,
@@ -42,7 +42,11 @@
     }
   },
   "targetFingerprintCount": 16,
-  "baselineContract": { "clientes": 414, "aseguradoras": 26, "asesores": 7 },
+  "baselineContract": {
+    "clientes": 414,
+    "aseguradoras": 26,
+    "asesores": 7
+  },
   "runtimeReadContract": {
     "firestoreReadOperationsMaximum": 5,
     "clientLocatorPass": "LIST_DOCUMENT_REFERENCES_ID_ONLY_HASH_IN_MEMORY",
@@ -73,5 +77,25 @@
   },
   "containsPII": false,
   "containsSecrets": false,
-  "nextAction": "CREATE_ONE_EXCLUSIVE_PARENT_BOUND_REQUEST_THEN_EXECUTE_ONCE"
+  "nextAction": "STOP_RETRY_ROOT_CAUSE_REQUIRED_NO_SECOND_ATTEMPT",
+  "runtimeResult": {
+    "runId": "31227937411",
+    "attempt": 1,
+    "decision": "STOP_RETRY",
+    "classification": "DATA_CONTRACT_FAILURE",
+    "checkpoint": "CLIENT_PROVENANCE_FOCAL_ADJUDICATION",
+    "rootCause": "CLIENT_PROVENANCE_NOT_DEMONSTRABLE_AFTER_AUTHORIZED_FOCAL_READ",
+    "targetProvenance": {
+      "count": 16,
+      "unresolved": 16,
+      "contradictions": 0,
+      "classificationCounts": {
+        "ORIGEN_NO_DEMOSTRABLE": 16
+      }
+    },
+    "universe": null,
+    "firestoreReadOperations": 2,
+    "writes": 0,
+    "visualAuthorizationEligible": false
+  }
 }
