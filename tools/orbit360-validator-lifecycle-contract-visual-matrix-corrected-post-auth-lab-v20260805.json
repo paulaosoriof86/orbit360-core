@@ -4,10 +4,10 @@
   "gateId": "block2.7-visual-matrix-corrected-post-auth-lab-v20260805",
   "gateContractVersion": "2.7.8",
   "owner": "orbit360-visual-matrix-corrected-post-auth-v20260805",
-  "ownerVersion": "20260807.40-v15-source-activation-pending-validation",
-  "status": "AUTHORIZED_FRESH_REQUEST_ONLY_V15_PENDING_EXCLUSIVE_REQUEST",
-  "classification": "SOURCE_ONLY_ACTIVATION_PENDING_VALIDATION",
-  "secondaryClassification": "V14_REQUEST_SCOPE_ROOTFIX_VALIDATED_SOURCE_ONLY",
+  "ownerVersion": "20260807.41-v15-scope-aware-source-activation-validated-runtime-pending",
+  "status": "AUTHORIZED_ONCE_PENDING_EXCLUSIVE_REQUEST",
+  "classification": "RUNTIME_PENDING_EXCLUSIVE_REQUEST_SOURCE_VALIDATED",
+  "secondaryClassification": "TWO_PHASE_LIFECYCLE_TRANSITION_APPLIED",
   "patternClassification": "REPLICABLE_CLAUDE_ACUMULADO",
   "rcId": "RC-AYS-LAB-CANONICA-01",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -18,17 +18,17 @@
   "authorizedBaseHead": "325260ac836266d7d2c9b35352ae15d67d7eb619",
   "expectedRequestVersion": "20260807.15-two-phase-runtime",
   "authorizationDirective": "EXPLICIT_SINGLE_SOURCE_ONLY_ACTIVATION_AND_RUNTIME_V15_SCOPE_AWARE_TWO_PHASE_HOSTING_LAB_READONLY_MATRIX",
-  "currentPhase": "V15_ACTIVATION_SOURCE_ONLY_PENDING_VALIDATION",
+  "currentPhase": "VISUAL_MATRIX_CORRECTED_POST_AUTH_LAB_EXECUTION",
   "executionProfile": {
-    "mode": "SOURCE_ONLY_ACTIVATION_PASS_THEN_RUNTIME_ONCE_WITH_FRESH_EXCLUSIVE_REQUEST",
-    "phase": "V15_ACTIVATION_SOURCE_ONLY_PENDING_VALIDATION",
+    "mode": "RUNTIME_ONCE_ONLY_WITH_FRESH_EXCLUSIVE_REQUEST",
+    "phase": "VISUAL_MATRIX_CORRECTED_POST_AUTH_LAB_EXECUTION",
     "capabilities": {
-      "secrets": false,
-      "firestoreRead": false,
+      "secrets": true,
+      "firestoreRead": true,
       "writes": false,
-      "runtime": false,
-      "browser": false,
-      "deploy": false,
+      "runtime": true,
+      "browser": true,
+      "deploy": true,
       "functionsDeploy": false,
       "rulesDeploy": false,
       "production": false
@@ -58,9 +58,21 @@
   "functionsDeploysMaximum": 0,
   "rulesDeploysMaximum": 0,
   "browserMatrix": [
-    { "role": "Direccion", "width": 1440, "height": 1000 },
-    { "role": "Operativo", "width": 1024, "height": 768 },
-    { "role": "Asesor", "width": 390, "height": 844 }
+    {
+      "role": "Direccion",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "role": "Operativo",
+      "width": 1024,
+      "height": 768
+    },
+    {
+      "role": "Asesor",
+      "width": 390,
+      "height": 844
+    }
   ],
   "sourcePrerequisites": {
     "authorizedSourceHead": "325260ac836266d7d2c9b35352ae15d67d7eb619",
@@ -86,11 +98,13 @@
       "advisorMobile",
       "viewportCaptureOnly"
     ],
-    "activationSourceStatus": "PENDING_V15_SOURCE_VALIDATION",
+    "activationSourceStatus": "PASS_V15_ACTIVATION_SOURCE_ONLY_SCOPE_AWARE",
     "authMembershipTenantInicio": "PASS_PREVIOUS",
     "browserPrecheckPrevious": "PASS_VISUAL_BROWSER_PRECHECK",
     "snapshotMostRecent": "VERIFIED_UNCHANGED_V11",
-    "hostingBaselineConfirmed": "visual-matrix-corrected-backup-31135532118"
+    "hostingBaselineConfirmed": "visual-matrix-corrected-backup-31135532118",
+    "activationSourceRunId": 31186214573,
+    "activationSourceJob": "source-v15-scope-aware"
   },
   "activeRequest": false,
   "requestRetired": false,
@@ -99,12 +113,12 @@
   "authorizationFrozen": false,
   "replayAllowed": false,
   "allowedExecutions": 1,
-  "executionAuthorized": false,
-  "secretAccessAuthorized": false,
-  "firestoreReadAuthorized": false,
+  "executionAuthorized": true,
+  "secretAccessAuthorized": true,
+  "firestoreReadAuthorized": true,
   "writeAuthorized": false,
-  "browserAuthorized": false,
-  "hostingDeployAuthorized": false,
+  "browserAuthorized": true,
+  "hostingDeployAuthorized": true,
   "functionsDeployAuthorized": false,
   "rulesDeployAuthorized": false,
   "productionAuthorized": false,
@@ -128,5 +142,5 @@
   "containsPII": false,
   "containsSecrets": false,
   "containsPasswords": false,
-  "nextAction": "VALIDATE V15 SOURCE-ONLY INCLUDING CANONICAL REQUEST SCOPE; ONLY WITH PASS TRANSITION TO RUNTIME-PENDING BEFORE CREATING A FRESH REQUEST."
+  "nextAction": "CREATE_EXACTLY_ONE_EXCLUSIVE_IMMUTABLE_REQUEST_COMMIT_BOUND_TO_THIS_RUNTIME_PENDING_LIFECYCLE."
 }
