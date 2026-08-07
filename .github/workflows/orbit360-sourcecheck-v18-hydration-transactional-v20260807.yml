@@ -46,14 +46,14 @@ jobs:
           if grep -q "20260807.4-transactional-owner-reentrant-readiness" orbit360-platform/core/visual-runtime-hydration-contract-v20260805.js; then
             echo 'PASS_V18_ROOTFIX_ALREADY_APPLIED'
           else
-            node tools/orbit360-apply-v18-hydration-transactional-rootfix-v20260807.mjs
+            node tools/orbit360-run-v18-source-patcher-fixed-v20260807.mjs
           fi
 
       - name: Syntax and protected scope
         shell: bash
         run: |
           set -euo pipefail
-          node --check tools/orbit360-apply-v18-hydration-transactional-rootfix-v20260807.mjs
+          node --check tools/orbit360-run-v18-source-patcher-fixed-v20260807.mjs
           node --check tools/orbit360-test-v18-hydration-transactional-run-evidence-source-v20260807.mjs
           node --check tools/orbit360-visual-runtime-rootfix-browser-precheck-v20260805.mjs
           node --check tools/orbit360-seal-visual-matrix-corrected-post-auth-runtime-v20260805.mjs
