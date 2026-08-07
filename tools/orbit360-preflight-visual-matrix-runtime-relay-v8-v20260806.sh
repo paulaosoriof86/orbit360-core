@@ -7,6 +7,8 @@ GATE='block2.7-visual-matrix-corrected-post-auth-lab-v20260805'
 OUT='orbit360-platform/runtime-gate-crm-v20260716/visual-matrix-corrected-post-auth-preflight-sanitized-v20260805.json'
 CANONICAL='orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json'
 JSON_GUARD='tools/orbit360-json-guard-visual-matrix-runtime-v20260806.mjs'
+DEFAULT_LIFECYCLE='tools/orbit360-validator-lifecycle-contract-visual-matrix-corrected-post-auth-lab-v20260805.json'
+LIFECYCLE="${ORBIT360_LIFECYCLE:-$DEFAULT_LIFECYCLE}"
 NODE_BIN="${ORBIT360_NODE_BIN:-node}"
 TRANSPORT_HEAD_REF="${ORBIT360_TRANSPORT_HEAD_REF:-}"
 EXPECTED_REQUEST_VERSION="${ORBIT360_EXPECTED_REQUEST_VERSION:-NONE_PENDING_FRESH_AUTHORIZATION}"
@@ -36,6 +38,7 @@ command -v "$NODE_BIN" >/dev/null 2>&1 || {
 [[ "${GITHUB_RUN_ATTEMPT:-1}" == '1' ]] || emit_failure 'RUN_ATTEMPT_NOT_ONE' 'Only the first workflow attempt is authorized.'
 [[ "$EXPECTED_REQUEST_VERSION" != 'NONE_PENDING_FRESH_AUTHORIZATION' ]] || emit_failure 'FRESH_AUTHORIZATION_NOT_REGISTERED' 'No fresh immutable runtime request is registered.'
 [[ -f "$REQUEST" ]] || emit_failure 'REQUEST_FILE_MISSING' 'The immutable authorization request is absent.'
+[[ -f "$LIFECYCLE" ]] || emit_failure 'LIFECYCLE_FILE_MISSING' 'The runtime lifecycle contract is absent.'
 
 REQUEST_COMMIT="$(git rev-parse HEAD 2>/dev/null)" || emit_failure 'REQUEST_COMMIT_UNRESOLVED' 'Unable to resolve request HEAD.'
 PARENT="$(git rev-parse "$REQUEST_COMMIT^" 2>/dev/null)" || emit_failure 'REQUEST_PARENT_UNRESOLVED' 'Unable to resolve request parent.'
@@ -43,8 +46,8 @@ mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r "$REQUEST_COM
 [[ "${#CHANGED[@]}" == '1' ]] || emit_failure 'REQUEST_COMMIT_NOT_SINGLE_FILE' "The request commit changed ${#CHANGED[@]} files."
 [[ "${CHANGED[0]}" == "$REQUEST" ]] || emit_failure 'REQUEST_COMMIT_WRONG_FILE' "The sole path is ${CHANGED[0]}."
 
-"$NODE_BIN" "$JSON_GUARD" validate-request "$REQUEST" "$PARENT" "$EXPECTED_REQUEST_VERSION" ||
-  emit_failure 'REQUEST_CONTRACT_INVALID' 'The request is not an admissible fresh registered-relay authorization.'
+"$NODE_BIN" "$JSON_GUARD" validate-request "$REQUEST" "$PARENT" "$EXPECTED_REQUEST_VERSION" "$LIFECYCLE" ||
+  emit_failure 'REQUEST_CONTRACT_INVALID' 'The request does not match the registered lifecycle baseline contract.'
 
 export ORBIT360_REQUEST_FILE="$REQUEST"
 "$NODE_BIN" tools/orbit360-validar-gate-contracts-v20260717.mjs "$GATE"
