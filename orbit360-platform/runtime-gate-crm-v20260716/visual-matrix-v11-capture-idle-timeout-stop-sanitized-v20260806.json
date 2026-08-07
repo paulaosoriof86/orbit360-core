@@ -1,6 +1,6 @@
 {
   "schemaVersion": "orbit360-visual-matrix-v11-capture-idle-timeout-stop-v1",
-  "generatedAt": "2026-08-06T18:55:00-06:00",
+  "generatedAt": "2026-08-06T19:09:00-06:00",
   "gateId": "block2.7-visual-matrix-corrected-post-auth-lab-v20260805",
   "contractVersion": "2.7.8",
   "requestVersion": "20260806.11-transport-base-sha-runtime",
@@ -64,11 +64,21 @@
   "sourcefix": {
     "strategy": "PRESERVE_AUDITED_MATRIX_V1_AND_WRAP_PLAYWRIGHT_SCREENSHOT_WITH_BOUNDED_CDP_CAPTURE_UNIQUE_HEARTBEATS_AND_SESSION_ONLY_DETACH",
     "runtimeReexecuted": false,
-    "status": "PENDING_SOURCE_ONLY_VALIDATION"
+    "status": "PASS_CAPTURE_WATCHDOG_SOURCE_ONLY",
+    "runId": 31137027863,
+    "jobId": 92738551215,
+    "passed": 17,
+    "failed": 0,
+    "playwright155Patchability": "PASS",
+    "timeoutElapsedMs": 350,
+    "contextCloseCalls": 0,
+    "browserCloseCalls": 0,
+    "pageStillUsable": true
   },
   "passVisualPostAuth": false,
   "containsPII": false,
   "containsSecrets": false,
   "containsPasswords": false,
-  "ok": false
+  "ok": false,
+  "nextAction": "Maintain STOP_RETRY. A future runtime requires a new explicit authorization tied to the then-current canonical HEAD."
 }
