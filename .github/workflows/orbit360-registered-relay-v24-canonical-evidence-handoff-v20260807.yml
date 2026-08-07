@@ -1,0 +1,189 @@
+name: Orbit360 registered relay v24 canonical evidence handoff runtime one-shot
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: orbit360-registered-runtime-relay-v24
+  cancel-in-progress: false
+
+jobs:
+  registered-runtime-relay-v24:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 80
+    env:
+      ORBIT360_CANONICAL_BRANCH: ays/backend-tenant-lab-v99-20260703
+      ORBIT360_TRANSPORT_HEAD_REF: ${{ github.head_ref }}
+      ORBIT360_REQUEST_FILE: .github/orbit360-requests/block1-client360-insurers-v24-authorization.json
+      ORBIT360_EXPECTED_REQUEST_VERSION: 20260807.23-native-block1-runtime
+      ORBIT360_AUTHORIZATION_GENERATION: v24-canonical-evidence-handoff
+      ORBIT360_V23_LIFECYCLE: tools/orbit360-validator-lifecycle-block1-v23-native-v20260807.json
+      ORBIT360_V23_PREFLIGHT_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/v23-block1-preflight-sanitized-v20260807.json
+      ORBIT360_UNIVERSE_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/v23-block1-universe-adjudication-sanitized-v20260807.json
+      ORBIT360_BROWSER_PRECHECK_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/v23-block1-browser-precheck-sanitized-v20260807.json
+      ORBIT360_MATRIX_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/v23-block1-native-matrix-sanitized-v20260807.json
+      ORBIT360_V23_RUNTIME_STATE: orbit360-platform/runtime-gate-crm-v20260716/v23-block1-runtime-state-sanitized-v20260807.json
+      ORBIT360_V23_FINAL_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/v24-block1-final-sanitized-v20260807.json
+
+    steps:
+      - name: Checkout exact pull request head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Detect exclusive immutable v24 request before secrets
+        id: detect
+        shell: bash
+        run: |
+          set -euo pipefail
+          REQUEST="$ORBIT360_REQUEST_FILE"
+          if [[ "${GITHUB_EVENT_NAME:-}" != 'pull_request' || "${ORBIT360_TRANSPORT_HEAD_REF:-}" != "$ORBIT360_CANONICAL_BRANCH" ]]; then
+            echo 'dispatch=false' >> "$GITHUB_OUTPUT"
+            echo 'SKIP_V24_NONCANONICAL_CONTEXT'
+            exit 0
+          fi
+          mapfile -t changed < <(git diff-tree --no-commit-id --name-only -r HEAD)
+          if [[ "${#changed[@]}" != '1' || "${changed[0]}" != "$REQUEST" ]]; then
+            echo 'dispatch=false' >> "$GITHUB_OUTPUT"
+            echo 'SKIP_V24_NOT_EXCLUSIVE_REQUEST_COMMIT'
+            exit 0
+          fi
+          REQUEST_PARENT="$(git rev-parse HEAD^)"
+          node - "$REQUEST_PARENT" <<'NODE'
+          const fs=require('fs'); const parent=process.argv[2];
+          const r=JSON.parse(fs.readFileSync(process.env.ORBIT360_REQUEST_FILE,'utf8'));
+          const ok=r.requestVersion===process.env.ORBIT360_EXPECTED_REQUEST_VERSION && r.authorizationGeneration===process.env.ORBIT360_AUTHORIZATION_GENERATION && r.gateId==='block1-client360-insurers-lab-v20260717' && r.contractVersion==='1.0.41' && r.status==='AUTHORIZED_ONCE' && r.approved===true && r.allowedExecutions===1 && r.consumed===false && r.authorizationFrozen===false && r.replayAllowed===false && r.parentHead===parent && r.authorizedBaseHead===parent;
+          if(!ok) process.exit(41);
+          const l=JSON.parse(fs.readFileSync('tools/orbit360-validator-lifecycle-block1-v23-native-v20260807.json','utf8'));
+          const ls=l.status==='AUTHORIZED_ONCE_PENDING_EXCLUSIVE_REQUEST' && l.currentPhase==='BLOCK1_NATIVE_MATRIX_RUNTIME_V23' && l.executionAuthorized===true && l.allowedExecutions===1 && l.authorizationFrozen===false && l.replayAllowed===false && l.sourceValidation && l.sourceValidation.authorizationGeneration===process.env.ORBIT360_AUTHORIZATION_GENERATION;
+          if(!ls) process.exit(41);
+          NODE
+          git merge-base --is-ancestor ef9e0e1e738ce407025ed159067d8b3cc4d2683b "$REQUEST_PARENT"
+          echo 'dispatch=true' >> "$GITHUB_OUTPUT"
+          echo "request_parent=$REQUEST_PARENT" >> "$GITHUB_OUTPUT"
+          echo 'PASS_V24_EXCLUSIVE_REQUEST_PARENT_BOUND_BEFORE_SECRETS'
+
+      - name: Validate v24 handoff source without reopening native package
+        if: steps.detect.outputs.dispatch == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          node --check tools/orbit360-canonical-preflight-evidence-handoff-v24.mjs
+          node --check tools/orbit360-preflight-block1-v23-native-v20260807.mjs
+          node tools/orbit360-test-canonical-preflight-evidence-handoff-v24-source-v20260807.mjs
+          ! grep -Fq 'canonical.stdout' tools/orbit360-preflight-block1-v23-native-v20260807.mjs
+          ! grep -Fq '.split(/\\r?\\n/)' tools/orbit360-preflight-block1-v23-native-v20260807.mjs
+
+      - name: GO_GATE_CONTRACT through structured evidence before secrets
+        if: steps.detect.outputs.dispatch == 'true'
+        id: preflight
+        shell: bash
+        run: node tools/orbit360-preflight-block1-v23-native-v20260807.mjs runtime
+
+      - name: Install read-only adjudication dependency after GO
+        if: steps.preflight.outcome == 'success'
+        id: admin_transport
+        shell: bash
+        run: npm install --no-save --package-lock=false firebase-admin@13.10.0 >/dev/null
+
+      - name: Materialize LAB credential after GO
+        if: steps.admin_transport.outcome == 'success'
+        id: credential
+        shell: bash
+        env:
+          FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          set -euo pipefail
+          SERVICE_ACCOUNT="${FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB:-${FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB:-${FIREBASE_SERVICE_ACCOUNT:-}}}"
+          [[ -n "$SERVICE_ACCOUNT" ]] || { echo 'STOP_V24_SERVICE_ACCOUNT_MISSING'; exit 41; }
+          KEY="$RUNNER_TEMP/orbit360-v24-service-account.json"
+          printf '%s' "$SERVICE_ACCOUNT" > "$KEY"
+          chmod 600 "$KEY"
+          [[ "$(jq -r '.project_id // empty' "$KEY")" == 'ays-orbit-360-lab' ]] || { echo 'STOP_V24_SERVICE_ACCOUNT_PROJECT_MISMATCH'; exit 41; }
+          echo "key=$KEY" >> "$GITHUB_OUTPUT"
+
+      - name: Adjudicate 414 26 7 read-only before Hosting
+        if: steps.credential.outcome == 'success'
+        id: universe
+        shell: bash
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.credential.outputs.key }}
+          ORBIT360_PROJECT_ID: ays-orbit-360-lab
+          ORBIT360_TENANT_ID: alianzas-soluciones
+        run: node tools/orbit360-adjudicate-block1-universe-readonly-v23-v20260807.mjs
+
+      - name: Install Hosting and browser dependencies only after universe PASS
+        if: steps.universe.outcome == 'success'
+        id: runtime_deps
+        shell: bash
+        run: |
+          set -euo pipefail
+          jq -e '.status=="PASS_BLOCK1_UNIVERSE_ADJUDICATION" and .classification=="PASS_DATA_CONTRACT" and .goForHosting==true and .ok==true and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0' "$ORBIT360_UNIVERSE_EVIDENCE" >/dev/null
+          npm install --no-save --package-lock=false firebase-tools@15.25.1 playwright@1.55.0 >/dev/null
+          npx playwright install --with-deps chromium >/dev/null
+
+      - name: Execute one signal-safe Hosting LAB runtime with frozen v23 runner
+        if: steps.runtime_deps.outcome == 'success'
+        id: runtime
+        shell: bash
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.credential.outputs.key }}
+          ORBIT360_RUNTIME_EXECUTION_AUTHORIZED: 'true'
+          ORBIT360_CANONICAL_BRANCH: ays/backend-tenant-lab-v99-20260703
+        run: bash tools/orbit360-run-block1-v23-runtime-signal-safe-v20260807.sh
+
+      - name: Consume freeze and close v24 request
+        if: always() && steps.detect.outputs.dispatch == 'true' && steps.preflight.outcome != 'skipped'
+        id: closure
+        shell: bash
+        env:
+          ORBIT360_REQUEST_FILE: ${{ env.ORBIT360_REQUEST_FILE }}
+          ORBIT360_V23_LIFECYCLE: ${{ env.ORBIT360_V23_LIFECYCLE }}
+          ORBIT360_V23_PREFLIGHT_EVIDENCE: ${{ env.ORBIT360_V23_PREFLIGHT_EVIDENCE }}
+          ORBIT360_UNIVERSE_EVIDENCE: ${{ env.ORBIT360_UNIVERSE_EVIDENCE }}
+          ORBIT360_BROWSER_PRECHECK_EVIDENCE: ${{ env.ORBIT360_BROWSER_PRECHECK_EVIDENCE }}
+          ORBIT360_MATRIX_EVIDENCE: ${{ env.ORBIT360_MATRIX_EVIDENCE }}
+          ORBIT360_V23_RUNTIME_STATE: ${{ env.ORBIT360_V23_RUNTIME_STATE }}
+          ORBIT360_V23_FINAL_EVIDENCE: ${{ env.ORBIT360_V23_FINAL_EVIDENCE }}
+        run: node tools/orbit360-close-block1-v23-runtime-v20260807.mjs || true
+
+      - name: Persist sanitized terminal closure to canonical
+        if: always() && steps.detect.outputs.dispatch == 'true' && steps.preflight.outcome != 'skipped'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name orbit360-gate-bot
+          git config user.email orbit360-gate-bot@users.noreply.github.com
+          files=(
+            "$ORBIT360_REQUEST_FILE"
+            "$ORBIT360_V23_LIFECYCLE"
+            "$ORBIT360_V23_PREFLIGHT_EVIDENCE"
+            "$ORBIT360_UNIVERSE_EVIDENCE"
+            "$ORBIT360_BROWSER_PRECHECK_EVIDENCE"
+            "$ORBIT360_MATRIX_EVIDENCE"
+            "$ORBIT360_V23_RUNTIME_STATE"
+            "$ORBIT360_V23_FINAL_EVIDENCE"
+          )
+          for file in "${files[@]}"; do [[ -e "$file" ]] && git add "$file"; done
+          if ! git diff --cached --quiet; then
+            git commit -m 'runtime: persist Block1 v24 terminal closure [skip ci]'
+            git push origin HEAD:ays/backend-tenant-lab-v99-20260703
+          fi
+
+      - name: Publish sanitized visual evidence
+        if: always() && steps.detect.outputs.dispatch == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-block1-v24-runtime-${{ github.run_id }}
+          path: orbit360-block1-v23-artifacts/
+          if-no-files-found: ignore
+          retention-days: 7
