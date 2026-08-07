@@ -1,0 +1,72 @@
+name: Orbit360 sourcecheck v20 exact matrix artifact gate
+
+on:
+  pull_request:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - 'tools/orbit360-build-v20-route-aware-matrix-artifact-v20260807.mjs'
+      - 'tools/orbit360-visual-runtime-rootfix-observable-matrix-v20260805.mjs'
+      - 'tools/orbit360-seal-visual-matrix-corrected-post-auth-runtime-v20260805.mjs'
+      - 'tools/orbit360-test-v20-native-matrix-artifact-source-v20260807.mjs'
+      - '.github/workflows/orbit360-sourcecheck-v20-native-matrix-artifact-v20260807.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: orbit360-sourcecheck-v20-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  source-v20-exact-matrix-artifact:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout exact source candidate
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Verify authorized source base and v19 frozen
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "${{ github.event.pull_request.base.sha }}" = 'a3e833b8f162f0313dda19f9bd2cf1730ad9871c'
+          node - <<'NODE'
+          const fs = require('fs');
+          const r = JSON.parse(fs.readFileSync('.github/orbit360-requests/visual-matrix-corrected-post-auth-lab-v20260805-authorization.json','utf8'));
+          if (!(r.requestVersion === '20260807.19-two-phase-runtime' && r.consumed === true && r.authorizationFrozen === true && r.allowedExecutions === 0 && r.replayAllowed === false)) process.exit(41);
+          console.log('PASS_V19_REQUEST_FROZEN_BEFORE_V20_SOURCE');
+          NODE
+
+      - name: Syntax and exact artifact compile import gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-build-v20-route-aware-matrix-artifact-v20260807.mjs
+          node --check tools/orbit360-visual-runtime-rootfix-observable-matrix-v20260805.mjs
+          node --check tools/orbit360-seal-visual-matrix-corrected-post-auth-runtime-v20260805.mjs
+          node --check tools/orbit360-test-v20-native-matrix-artifact-source-v20260807.mjs
+          node --experimental-vm-modules tools/orbit360-test-v20-native-matrix-artifact-source-v20260807.mjs
+
+      - name: Governing source suites
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-test-request-lifecycle-baseline-contract-v20260806.mjs
+          node tools/orbit360-test-capture-watchdog-source-v20260806.mjs
+          node tools/orbit360-test-windows-signal-compatibility-synthetic-v20260806.mjs
+          node tools/orbit360-test-visual-matrix-timeout-signal-safe-portable-v20260806.mjs
+          node tools/orbit360-test-visual-matrix-cross-runner-portable-v20260806.mjs
+          node tools/orbit360-test-preflight-portable-source-v20260806.mjs
+          node tools/orbit360-test-runtime-transport-base-sha-v20260806.mjs
+
+      - name: Assert source-only boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          test ! -e "$HOME/.config/configstore/firebase-tools.json" || true
+          echo 'PASS_V20_SOURCE_ONLY_NO_SECRETS_FIREBASE_HOSTING_BROWSER_WRITES'
