@@ -42,7 +42,7 @@
   "priorHostingRestoreChannel": "visual-matrix-corrected-backup-31135532118",
   "priorHostingRestoreScript": "tools/orbit360-restore-visual-matrix-v13-baseline-before-runtime-v20260807.sh",
   "registeredWorkflowRelayRequired": true,
-  "registeredWorkflowPath": ".github/workflows/orbit360-claude-paquete-reconciliado-v1205.yml",
+  "registeredWorkflowPath": ".github/workflows/orbit360-registered-relay-v16-hydration-v20260807.yml",
   "registeredRelayPreflight": "tools/orbit360-preflight-visual-matrix-runtime-relay-v8-v20260806.sh",
   "portableJsonGuard": "tools/orbit360-json-guard-visual-matrix-runtime-v20260806.mjs",
   "phaseAwareSourceValidator": "tools/orbit360-test-preflight-portable-source-v20260806.mjs",
@@ -114,7 +114,7 @@
     "v15StopConsumerPartialConsumedStateSupported": true,
     "v15StopConsumerIdempotent": true,
     "v15SealerTerminalFailClosed": true,
-    "registeredRelayStatus": "NONE_PENDING_FRESH_AUTHORIZATION",
+    "registeredRelayStatus": "RESERVED_EXCLUSIVE_V16_BEFORE_REQUEST",
     "authMembershipTenantInicio": "PASS_IN_V15_BEFORE_INICIO_READY_TIMEOUT",
     "snapshotMostRecent": "VERIFIED_UNCHANGED_V15_ROLLBACK",
     "hostingBaselineConfirmed": "visual-matrix-corrected-backup-31135532118",
@@ -124,7 +124,9 @@
       "INICIO_READY"
     ],
     "v16HydrationSequenceSourceCheck": "PASS",
-    "v16PriorRequestClosed": true
+    "v16PriorRequestClosed": true,
+    "registeredRelayPath": ".github/workflows/orbit360-registered-relay-v16-hydration-v20260807.yml",
+    "registeredRelayExpectedRequest": "20260807.16-two-phase-runtime"
   },
   "activeRequest": false,
   "requestRetired": false,
