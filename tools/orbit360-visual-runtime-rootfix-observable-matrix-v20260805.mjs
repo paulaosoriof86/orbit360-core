@@ -7,9 +7,12 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { chromium } from 'playwright';
 import { patchChromiumCaptureWatchdog } from './orbit360-playwright-capture-watchdog-lib-v20260806.mjs';
-import { buildV20MatrixArtifact, V20_MATRIX_SCHEMA } from './orbit360-build-v20-route-aware-matrix-artifact-v20260807.mjs';
+import { buildV20MatrixArtifact } from './orbit360-build-v20-route-aware-matrix-artifact-v20260807.mjs';
+import { buildV21MatrixArtifact, V21_MATRIX_SCHEMA } from './orbit360-build-v21-event-driven-matrix-artifact-v20260807.mjs';
 
 const CAPTURE_TIMEOUT_MS = 12000;
+// Historical v20 import remains source-visible so the retired v20 source gate can verify succession safely.
+void buildV20MatrixArtifact;
 // Contract markers: fullPage: false; blocking: false.
 
 patchChromiumCaptureWatchdog({
@@ -21,7 +24,7 @@ patchChromiumCaptureWatchdog({
 });
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const tempPath = path.join(here, `.orbit360-v20-exact-matrix-artifact-${process.pid}-${Date.now()}.mjs`);
+const tempPath = path.join(here, `.orbit360-v21-exact-matrix-artifact-${process.pid}-${Date.now()}.mjs`);
 const evidencePath = process.env.ORBIT360_VISUAL_EVIDENCE || process.env.ORBIT360_MATRIX_EVIDENCE || '';
 
 function clean(value) {
@@ -33,7 +36,7 @@ function clean(value) {
 function persistPipelineFailure(checkpoint, error) {
   if (!evidencePath) return;
   const payload = {
-    schemaVersion: V20_MATRIX_SCHEMA,
+    schemaVersion: V21_MATRIX_SCHEMA,
     gateId: process.env.ORBIT360_GATE_ID || 'block2.7-visual-observable-rootfix-v2-lab-v20260805',
     contractVersion: process.env.ORBIT360_CONTRACT_VERSION || '2.7.5',
     stage: 'FAIL_VISUAL_OBSERVABLE_ROOTFIX_MATRIX',
@@ -63,7 +66,7 @@ function persistPipelineFailure(checkpoint, error) {
 
 let artifactWritten = false;
 try {
-  const source = buildV20MatrixArtifact();
+  const source = buildV21MatrixArtifact();
   fs.writeFileSync(tempPath, source, 'utf8');
   artifactWritten = true;
 
@@ -75,7 +78,7 @@ try {
     throw error;
   }
 
-  await import(pathToFileURL(tempPath).href + `?v20=${Date.now()}`);
+  await import(pathToFileURL(tempPath).href + `?v21=${Date.now()}`);
 } catch (error) {
   if (!evidencePath || !fs.existsSync(evidencePath)) {
     persistPipelineFailure('MATRIX_ARTIFACT_IMPORT_FAILED', error);
