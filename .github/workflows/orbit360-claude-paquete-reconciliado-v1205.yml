@@ -20,7 +20,7 @@ jobs:
       ORBIT360_TRANSPORT_HEAD_REF: ${{ github.head_ref }}
       ORBIT360_VISUAL_REQUEST_PATH: .github/orbit360-requests/visual-matrix-corrected-post-auth-lab-v20260805-authorization.json
       ORBIT360_REQUEST_FILE: .github/orbit360-requests/visual-matrix-corrected-post-auth-lab-v20260805-authorization.json
-      ORBIT360_EXPECTED_REQUEST_VERSION: NONE_PENDING_FRESH_AUTHORIZATION
+      ORBIT360_EXPECTED_REQUEST_VERSION: 20260806.10-phase-aware-runtime
       ORBIT360_RESTORE_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/visual-matrix-v8-prior-hosting-restore-sanitized-v20260806.json
       ORBIT360_FINAL_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/visual-matrix-corrected-post-auth-final-sanitized-v20260805.json
       ORBIT360_LIFECYCLE: tools/orbit360-validator-lifecycle-contract-visual-matrix-corrected-post-auth-lab-v20260805.json
