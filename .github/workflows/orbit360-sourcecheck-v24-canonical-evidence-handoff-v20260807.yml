@@ -1,0 +1,136 @@
+name: Orbit360 sourcecheck v24 canonical evidence handoff
+
+on:
+  pull_request:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - 'tools/orbit360-preflight-block1-v23-native-v20260807.mjs'
+      - 'tools/orbit360-canonical-preflight-evidence-handoff-v24.mjs'
+      - 'tools/orbit360-test-canonical-preflight-evidence-handoff-v24-source-v20260807.mjs'
+      - 'tools/orbit360-transition-block1-v24-source-to-runtime-v20260807.mjs'
+      - '.github/workflows/orbit360-sourcecheck-v24-canonical-evidence-handoff-v20260807.yml'
+      - '.github/workflows/orbit360-registered-relay-v24-canonical-evidence-handoff-v20260807.yml'
+      - 'orbit360-platform/docs/CIERRE-SOURCEFIX-V24-CANONICAL-EVIDENCE-HANDOFF-20260807.md'
+      - 'orbit360-platform/docs/ACADEMIA-ACTUALIZACION-V24-CANONICAL-EVIDENCE-HANDOFF-20260807.md'
+      - 'orbit360-platform/docs/CLAUDE-ACUMULADO-V24-CANONICAL-EVIDENCE-HANDOFF-20260807.md'
+      - 'orbit360-platform/runtime-gate-crm-v20260716/v24-canonical-evidence-handoff-source-sanitized-v20260807.json'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: orbit360-sourcecheck-v24-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  source-v24-canonical-evidence-handoff:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      ORBIT360_REQUEST_FILE: .github/orbit360-requests/block1-client360-insurers-v24-authorization.json
+      ORBIT360_EXPECTED_REQUEST_VERSION: NONE_PENDING_FRESH_AUTHORIZATION
+      ORBIT360_V23_PREFLIGHT_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/v24-block1-preflight-sanitized-v20260807.json
+    steps:
+      - name: Checkout exact v24 source candidate
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Verify canonical base, v23 reference ancestry and invariant package
+        shell: bash
+        run: |
+          set -euo pipefail
+          CANONICAL='ef9e0e1e738ce407025ed159067d8b3cc4d2683b'
+          V23_BASE='93ae0289bd6c415941a17b214f24cdb6fa05ca06'
+          HEAD_SHA='${{ github.event.pull_request.head.sha }}'
+          [[ '${{ github.event.pull_request.base.sha }}' == "$CANONICAL" ]] || { echo 'STOP_V24_CANONICAL_BASE_MISMATCH'; exit 41; }
+          git merge-base --is-ancestor "$CANONICAL" "$V23_BASE"
+          git merge-base --is-ancestor "$V23_BASE" "$HEAD_SHA"
+          [[ ! -e "$ORBIT360_REQUEST_FILE" ]] || { echo 'STOP_V24_REQUEST_EXISTS_DURING_SOURCE'; exit 41; }
+
+          frozen=(
+            'tools/orbit360-validar-gate-contracts-v20260717.mjs'
+            'tools/orbit360-validar-gate-contracts-engine-block1-v23-native-v20260807.mjs'
+            'tools/orbit360-gate-contract-block1-v23-native-v20260807.json'
+            'tools/orbit360-validator-lifecycle-block1-v23-native-v20260807.json'
+            'tools/orbit360-event-driven-render-observer-v23.mjs'
+            'tools/orbit360-block1-native-matrix-v23-v20260807.mjs'
+            'tools/orbit360-block1-native-matrix-v23-canonical-v20260807.mjs'
+            'tools/orbit360-adjudicate-block1-universe-readonly-v23-v20260807.mjs'
+            'tools/orbit360-test-v23-native-block1-source-v20260807.mjs'
+            'tools/orbit360-block1-v23-browser-precheck-v20260807.mjs'
+            'tools/orbit360-run-block1-v23-runtime-signal-safe-v20260807.sh'
+            'tools/orbit360-close-block1-v23-runtime-v20260807.mjs'
+            '.github/workflows/orbit360-sourcecheck-v23-native-block1-v20260807.yml'
+            '.github/workflows/orbit360-registered-relay-v23-native-block1-v20260807.yml'
+            'orbit360-platform/modules/cliente360.js'
+            'orbit360-platform/modules/aseguradoras.js'
+            'orbit360-platform/modules/polizas.js'
+            'orbit360-platform/modules/cobros.js'
+            'orbit360-platform/sw.js'
+            'orbit360-platform/manifest.webmanifest'
+            'orbit360-platform/manifest.json'
+            'orbit360-platform/core/pwa.js'
+            'orbit360-platform/data/store.js'
+            'orbit360-platform/data/store-firestore-lab.local.js'
+            'orbit360-platform/core/auth.js'
+            'orbit360-platform/core/importa.js'
+            'orbit360-platform/firestore.rules'
+          )
+          for p in "${frozen[@]}"; do
+            git diff --quiet "$V23_BASE"..."$HEAD_SHA" -- "$p" || { echo "STOP_V24_FROZEN_V23_BASELINE_CHANGED:$p"; exit 41; }
+          done
+
+          allowed='^(tools/orbit360-preflight-block1-v23-native-v20260807\.mjs|tools/orbit360-canonical-preflight-evidence-handoff-v24\.mjs|tools/orbit360-test-canonical-preflight-evidence-handoff-v24-source-v20260807\.mjs|tools/orbit360-transition-block1-v24-source-to-runtime-v20260807\.mjs|\.github/workflows/orbit360-sourcecheck-v24-canonical-evidence-handoff-v20260807\.yml|\.github/workflows/orbit360-registered-relay-v24-canonical-evidence-handoff-v20260807\.yml|orbit360-platform/docs/CIERRE-SOURCEFIX-V24-CANONICAL-EVIDENCE-HANDOFF-20260807\.md|orbit360-platform/docs/ACADEMIA-ACTUALIZACION-V24-CANONICAL-EVIDENCE-HANDOFF-20260807\.md|orbit360-platform/docs/CLAUDE-ACUMULADO-V24-CANONICAL-EVIDENCE-HANDOFF-20260807\.md|orbit360-platform/runtime-gate-crm-v20260716/v24-canonical-evidence-handoff-source-sanitized-v20260807\.json)$'
+          mapfile -t changed < <(git diff --name-only "$V23_BASE"..."$HEAD_SHA")
+          for p in "${changed[@]}"; do
+            [[ "$p" =~ $allowed ]] || { echo "STOP_V24_UNAUTHORIZED_SOURCE_CHANGE:$p"; exit 41; }
+          done
+          echo 'PASS_V24_V23_PACKAGE_OWNER_PRODUCT_PWA_BACKEND_INVARIANT'
+
+      - name: Validate handoff source and fail-closed fixtures
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-canonical-preflight-evidence-handoff-v24.mjs
+          node --check tools/orbit360-preflight-block1-v23-native-v20260807.mjs
+          node --check tools/orbit360-test-canonical-preflight-evidence-handoff-v24-source-v20260807.mjs
+          node --check tools/orbit360-transition-block1-v24-source-to-runtime-v20260807.mjs
+          node tools/orbit360-test-canonical-preflight-evidence-handoff-v24-source-v20260807.mjs
+
+      - name: Mandatory canonical preflight then structured wrapper
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs block1-client360-insurers-lab-v20260717
+          node - <<'NODE'
+          const fs=require('fs'); const p='orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json';
+          const e=JSON.parse(fs.readFileSync(p,'utf8'));
+          const ok=e.gateId==='block1-client360-insurers-lab-v20260717' && e.contractVersion==='1.0.41' && e.executionPhase==='SOURCE_ONLY_NATIVE_MATRIX_VALIDATION' && e.status==='PASS_GATE_CONTRACT_SOURCE_V23' && e.ok===true && e.canonicalOwnerScope==='v23_native_overlay_replace_historical_css_owner' && e.nativeRuntimeArtifact==='tools/orbit360-block1-native-matrix-v23-canonical-v20260807.mjs' && e.engineEvidenceSource==='sync-file-evidence-not-stdout-v1' && e.executionAuthorized===false && e.secretAccessAuthorized===false && e.firestoreReadAuthorized===false && e.writeAuthorized===false && e.runtimeAuthorized===false && e.browserAuthorized===false && e.hostingDeployAuthorized===false;
+          if(!ok) process.exit(41); console.log('PASS_V24_CANONICAL_EVIDENCE_AUTHORITY_SOURCE');
+          NODE
+          node tools/orbit360-preflight-block1-v23-native-v20260807.mjs source
+          node - <<'NODE'
+          const fs=require('fs'); const p=process.env.ORBIT360_V23_PREFLIGHT_EVIDENCE; const e=JSON.parse(fs.readFileSync(p,'utf8'));
+          const ok=e.status==='PASS_V24_SOURCE_PREFLIGHT' && e.contractVersion==='1.0.41' && e.canonicalPreflightStatus==='PASS_GATE_CONTRACT_SOURCE_V23' && e.canonicalEvidenceAuthority==='orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json' && e.canonicalEvidenceFresh===true && e.stdoutUsedForDecision===false && e.ok===true;
+          if(!ok) process.exit(41); console.log('PASS_V24_STRUCTURED_HANDOFF_SOURCE');
+          NODE
+
+      - name: Governing signal and transport suites
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-test-windows-signal-compatibility-synthetic-v20260806.mjs
+          node tools/orbit360-test-visual-matrix-timeout-signal-safe-portable-v20260806.mjs
+          node tools/orbit360-test-runtime-transport-base-sha-v20260806.mjs
+
+      - name: Assert source-only boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ ! -e "$ORBIT360_REQUEST_FILE" ]]
+          echo 'PASS_V24_SOURCE_ONLY_NO_SECRETS_FIREBASE_LAB_HOSTING_BROWSER_WRITES'
