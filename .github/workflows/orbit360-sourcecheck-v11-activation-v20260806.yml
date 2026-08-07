@@ -1,0 +1,67 @@
+name: Orbit 360 · Validar activación v11 transport-base-sha · source-only
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  validate-v11-activation-source-only:
+    if: github.head_ref == 'ays/runtime-v11-activation-source-only-20260806'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout exact activation head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Validate source package and activation phase
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-test-preflight-portable-source-v20260806.mjs
+          node --check tools/orbit360-test-runtime-transport-base-sha-v20260806.mjs
+          node --check tools/orbit360-validate-runtime-transport-context-v20260806.mjs
+          bash -n tools/orbit360-preflight-visual-matrix-runtime-relay-v8-v20260806.sh
+          bash -n tools/orbit360-run-visual-matrix-corrected-post-auth-runtime-only-v4-transport-base-sha-v20260806.sh
+          node tools/orbit360-test-windows-signal-compatibility-synthetic-v20260806.mjs
+          node tools/orbit360-test-visual-matrix-timeout-signal-safe-portable-v20260806.mjs
+          node tools/orbit360-test-visual-matrix-cross-runner-portable-v20260806.mjs
+          node tools/orbit360-test-runtime-transport-base-sha-v20260806.mjs
+          node tools/orbit360-test-preflight-portable-source-v20260806.mjs
+
+      - name: Assert v11 activation and zero risk
+        shell: bash
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs = require('fs');
+          const overlay = JSON.parse(fs.readFileSync('tools/orbit360-validator-lifecycle-overlay-visual-matrix-v8-stop-preflight-v20260806.json','utf8'));
+          const lifecycle = JSON.parse(fs.readFileSync('tools/orbit360-validator-lifecycle-contract-visual-matrix-corrected-post-auth-lab-v20260805.json','utf8'));
+          const phase = JSON.parse(fs.readFileSync('orbit360-platform/runtime-gate-crm-v20260716/preflight-portable-source-test-sanitized-v20260806.json','utf8'));
+          const transport = JSON.parse(fs.readFileSync('orbit360-platform/runtime-gate-crm-v20260716/runtime-transport-base-sha-source-test-sanitized-v20260806.json','utf8'));
+          const workflow = fs.readFileSync('.github/workflows/orbit360-claude-paquete-reconciliado-v1205.yml','utf8');
+          const ok =
+            overlay.requestVersion === '20260806.11-transport-base-sha-runtime' &&
+            overlay.status === 'AUTHORIZED_FRESH_REQUEST_ONLY_V11_PENDING_EXCLUSIVE_REQUEST' &&
+            overlay.stopRetryActive === false && overlay.runtimeAllowed === true && overlay.hostingAllowed === true &&
+            overlay.runtimeAllowedOnlyWithFreshExclusiveRequest === true && overlay.requestReusable === false &&
+            overlay.productionAllowed === false && overlay.writesAllowed === false &&
+            lifecycle.status === 'AUTHORIZED_ONCE_PENDING_EXCLUSIVE_REQUEST' &&
+            lifecycle.currentPhase === 'VISUAL_MATRIX_CORRECTED_POST_AUTH_LAB_EXECUTION' &&
+            lifecycle.authorizationReserved === true && lifecycle.allowedExecutions === 1 && lifecycle.requestConsumed === false && lifecycle.replayAllowed === false &&
+            lifecycle.hostingDeploysMaximum === 1 && lifecycle.writeAuthorized === false && lifecycle.productionAuthorized === false &&
+            workflow.includes('ORBIT360_EXPECTED_REQUEST_VERSION: 20260806.11-transport-base-sha-runtime') &&
+            workflow.includes('orbit360-run-visual-matrix-corrected-post-auth-runtime-only-v4-transport-base-sha-v20260806.sh') &&
+            phase.status === 'PASS_SOURCE_ONLY_PHASE_AWARE_PREFLIGHT_VALIDATOR' && phase.failed === 0 && phase.ok === true &&
+            transport.status === 'PASS_RUNTIME_TRANSPORT_BASE_SHA_SOURCE_ONLY' && transport.failed === 0 && transport.ok === true &&
+            phase.secretsRead === false && phase.firebaseAccess === false && phase.browserExecuted === false && phase.deployExecuted === false &&
+            transport.secretAccess === false && transport.firebaseAccess === false && transport.browserExecuted === false && transport.deployExecuted === false && transport.writes === 0;
+          if (!ok) process.exit(41);
+          console.log(JSON.stringify({status:'PASS_V11_TRANSPORT_BASE_SHA_ACTIVATION_SOURCE_ONLY',phaseAwarePassed:phase.passed,transportPassed:transport.passed,runtimeExecuted:false,secretsRead:false,deployExecuted:false,ok:true},null,2));
+          NODE
