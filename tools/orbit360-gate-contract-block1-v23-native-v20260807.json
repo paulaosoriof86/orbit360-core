@@ -1,19 +1,31 @@
 {
-  "schemaVersion": "orbit360-gate-contract-overlay-v23-native-v1",
+  "schemaVersion": "orbit360-gate-contract-overlay-v23-native-v2",
   "gateId": "block1-client360-insurers-lab-v20260717",
-  "contractVersion": "1.0.26",
-  "baseRegistry": "tools/orbit360-gate-contract-registry-v20260717.json",
-  "baseContractVersion": "1.0.25",
+  "contractVersion": "1.0.41",
+  "predecessorContractVersion": "1.0.40",
+  "predecessorOverlay": "tools/orbit360-gate-contract-overlay-v20260718.json",
+  "predecessorStatus": "HISTORICAL_RETIRED_OWNER_PRESERVED",
   "block": 1,
   "status": "SOURCE_VALIDATION_PENDING",
   "rootCauseResolved": "PIPELINE_MECHANISM_FAILURE / CHAINED_TEXTUAL_TRANSFORM_ON_GENERATED_MATRIX_ARTIFACT",
+  "validatorStaleResolved": "CANONICAL_BLOCK1_PREFLIGHT_OWNER_VERSION_FREEZE_DRIFT",
   "mechanism": {
     "nativeRuntimeArtifact": "tools/orbit360-block1-native-matrix-v23-v20260807.mjs",
     "sharedRenderObserver": "tools/orbit360-event-driven-render-observer-v23.mjs",
+    "canonicalEngine": "tools/orbit360-validar-gate-contracts-engine-block1-v23-native-v20260807.mjs",
     "generatedFromPriorArtifact": false,
     "textualTransform": false,
     "sourceSurgery": false,
     "exactRuntimeFileValidatedBeforeTransition": true
+  },
+  "historicalClosureRequirements": {
+    "freeze": "tools/orbit360-incident-freeze-v20260721.json",
+    "m1Closed": true,
+    "m2Closed": true,
+    "priorRuntimeAuthorizationActive": false,
+    "preservedClients": 414,
+    "preservedInsurers": 26,
+    "preservedAdvisors": 7
   },
   "blockingRoutes": ["inicio", "cliente360", "aseguradoras"],
   "nonblockingLedger": [
@@ -55,8 +67,10 @@
   },
   "preflight": {
     "mandatoryCanonicalEntrypoint": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
+    "canonicalEngine": "tools/orbit360-validar-gate-contracts-engine-block1-v23-native-v20260807.mjs",
     "v23Preflight": "tools/orbit360-preflight-block1-v23-native-v20260807.mjs",
-    "goStatus": "GO_GATE_CONTRACT"
+    "sourceStatus": "PASS_GATE_CONTRACT_SOURCE_V23",
+    "runtimeGoStatus": "GO_GATE_CONTRACT"
   },
   "workflow": ".github/workflows/orbit360-registered-relay-v23-native-block1-v20260807.yml",
   "sourceWorkflow": ".github/workflows/orbit360-sourcecheck-v23-native-block1-v20260807.yml",
@@ -73,6 +87,7 @@
     "orbit360-platform/modules/cliente360.js",
     "orbit360-platform/modules/polizas.js",
     "orbit360-platform/modules/cobros.js",
+    "orbit360-platform/core/visual-runtime-rootfix-v20260805.js",
     "orbit360-platform/data/store.js",
     "orbit360-platform/data/store-firestore-lab.local.js",
     "orbit360-platform/core/auth.js",
