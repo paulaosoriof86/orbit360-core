@@ -16,7 +16,7 @@ const REQUEST = process.env.ORBIT360_REQUEST_FILE || '.github/orbit360-requests/
 const EVIDENCE = process.env.ORBIT360_V23_PREFLIGHT_EVIDENCE || 'orbit360-platform/runtime-gate-crm-v20260716/v23-block1-preflight-sanitized-v20260807.json';
 const CANONICAL_PREFLIGHT = 'tools/orbit360-validar-gate-contracts-v20260717.mjs';
 const CANONICAL_ENGINE = 'tools/orbit360-validar-gate-contracts-engine-block1-v23-native-v20260807.mjs';
-const MATRIX = 'tools/orbit360-block1-native-matrix-v23-v20260807.mjs';
+const MATRIX = 'tools/orbit360-block1-native-matrix-v23-canonical-v20260807.mjs';
 const OBSERVER = 'tools/orbit360-event-driven-render-observer-v23.mjs';
 const ADJUDICATOR = 'tools/orbit360-adjudicate-block1-universe-readonly-v23-v20260807.mjs';
 const SOURCE_TEST = 'tools/orbit360-test-v23-native-block1-source-v20260807.mjs';
@@ -58,7 +58,7 @@ if (overlay.gateId !== GATE_ID || overlay.contractVersion !== CONTRACT_VERSION |
 if (!overlay.mechanism || overlay.mechanism.nativeRuntimeArtifact !== MATRIX || overlay.mechanism.canonicalEngine !== CANONICAL_ENGINE || overlay.mechanism.generatedFromPriorArtifact !== false || overlay.mechanism.textualTransform !== false || overlay.mechanism.sourceSurgery !== false) fail('V23_NATIVE_MECHANISM_CONTRACT_INVALID', '', 'PASS');
 if (!exactArray(overlay.blockingRoutes, ['inicio','cliente360','aseguradoras'])) fail('V23_BLOCKING_SCOPE_INVALID', JSON.stringify(overlay.blockingRoutes), 'PASS');
 if (!overlay.universe || overlay.universe.executeAfterGoBeforeHosting !== true || overlay.universe.expected.clientes !== 414 || overlay.universe.expected.aseguradoras !== 26 || overlay.universe.expected.asesores !== 7 || overlay.universe.requiresValidationExcluded !== false) fail('V23_UNIVERSE_CONTRACT_INVALID', '', 'PASS');
-if (lifecycle.gateId !== GATE_ID || lifecycle.gateContractVersion !== CONTRACT_VERSION || lifecycle.expectedRequestVersion !== REQUEST_VERSION) fail('V23_LIFECYCLE_IDENTITY_MISMATCH', '', 'PASS');
+if (lifecycle.gateId !== GATE_ID || lifecycle.gateContractVersion !== CONTRACT_VERSION || lifecycle.expectedRequestVersion !== REQUEST_VERSION || lifecycle.nativeMatrix !== MATRIX) fail('V23_LIFECYCLE_IDENTITY_MISMATCH', '', 'PASS');
 
 if (MODE === 'source') {
   if (canonicalPayload.status !== 'PASS_GATE_CONTRACT_SOURCE_V23' || canonicalPayload.contractVersion !== CONTRACT_VERSION || canonicalPayload.ok !== true) fail('V23_CANONICAL_SOURCE_OWNER_NOT_PASS', canonicalPayload.status || '', 'PASS');
