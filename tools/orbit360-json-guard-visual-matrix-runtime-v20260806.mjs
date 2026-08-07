@@ -46,6 +46,30 @@ function writeJson(file, payload) {
   fs.mkdirSync(path.dirname(path.resolve(file)), { recursive: true });
   fs.writeFileSync(path.resolve(file), JSON.stringify(payload, null, 2) + '\n', 'utf8');
 }
+function hasCanonicalRuntimeScope(scope) {
+  return Boolean(scope) &&
+    scope.registeredWorkflowRelayRequired === true &&
+    scope.restorePriorBaselineBeforeRuntime === true &&
+    scope.hostingOnly === true &&
+    scope.hostingDeploysMaximum === 1 &&
+    scope.hostingBackupClone === true &&
+    scope.hostingRollbackCloneOnFailure === true &&
+    scope.precheckRequiredBeforeMatrix === true &&
+    scope.functionsDeploy === false &&
+    scope.rulesDeploy === false &&
+    scope.firestoreWrites === false &&
+    scope.authWrites === false &&
+    scope.operationalWrites === false &&
+    scope.reimport === false &&
+    scope.production === false &&
+    scope.main === false &&
+    scope.merge === false &&
+    scope.directionDesktop === true &&
+    scope.operationalTablet === true &&
+    scope.advisorMobile === true &&
+    scope.viewportCaptureOnly === true &&
+    scope.captureWarningsNonBlocking === true;
+}
 
 if (mode === 'emit-failure') {
   const [, , , out, gate, checkpoint, detail, exitCodeRaw] = process.argv;
@@ -97,8 +121,7 @@ if (mode === 'detect-active-request') {
     request.consumed === false &&
     request.authorizationFrozen === false &&
     request.replayAllowed === false &&
-    request.scope &&
-    request.scope.registeredWorkflowRelayRequired === true;
+    hasCanonicalRuntimeScope(request.scope);
   process.exit(ok ? 0 : 1);
 }
 
@@ -151,25 +174,11 @@ if (mode === 'validate-request') {
     exact(request.parentHead, parent) &&
     exact(request.authorizedBaseHead, parent) &&
     exactObject(capabilities, RUNTIME_CAPABILITIES) &&
-    scope.registeredWorkflowRelayRequired === true &&
-    scope.restorePriorBaselineBeforeRuntime === true &&
+    hasCanonicalRuntimeScope(scope) &&
     baselineChannel.length > 0 &&
     baselineScript.length > 0 &&
     exact(scope.restorePriorBaselineChannel, baselineChannel) &&
     exact(scope.restorePriorBaselineScript, baselineScript) &&
-    scope.hostingOnly === true &&
-    scope.hostingDeploysMaximum === 1 &&
-    scope.hostingBackupClone === true &&
-    scope.hostingRollbackCloneOnFailure === true &&
-    scope.functionsDeploy === false &&
-    scope.rulesDeploy === false &&
-    scope.firestoreWrites === false &&
-    scope.authWrites === false &&
-    scope.operationalWrites === false &&
-    scope.reimport === false &&
-    scope.production === false &&
-    scope.main === false &&
-    scope.merge === false &&
     exact(lifecycle.schemaVersion, 'orbit360-validator-lifecycle-contract-v1') &&
     exact(lifecycle.gateId, request.gateId) &&
     exact(lifecycle.gateContractVersion, request.contractVersion) &&
