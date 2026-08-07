@@ -16,7 +16,7 @@ const sha = value => crypto.createHash('sha256').update(String(value), 'utf8').d
 const norm = value => String(value == null ? '' : value).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 const clean = value => String(value == null ? '' : value).replace(/[\w.+-]+@[\w.-]+/g, '[email]').replace(/\b\d{6,}\b/g, '[id]').slice(0, 900);
 const result = {
-  schemaVersion: 'orbit360-visual-runtime-rootfix-browser-precheck-v2-hydration-contract-aware',
+  schemaVersion: 'orbit360-visual-runtime-rootfix-browser-precheck-v3-transactional-owner-aware',
   gateId: 'block2.7-visual-runtime-rootfix-lab-v20260805',
   contractVersion: '2.7.2',
   stage: 'STARTED',
@@ -24,6 +24,8 @@ const result = {
   checkpoints: [],
   projectId: PROJECT,
   tenantId: TENANT,
+  runId: process.env.GITHUB_RUN_ID || '',
+  attempt: Number(process.env.GITHUB_RUN_ATTEMPT || 1),
   firestoreReads: 0,
   firestoreWrites: 0,
   authWrites: 0,
@@ -80,6 +82,8 @@ async function browserState(page) {
             loaded: !!(window.Orbit && Orbit.__visualHydrationContractV20260805),
             storeMarker: !!(window.Orbit && Orbit.store && Orbit.store.__visualHydrationContractV20260805),
             mounted: !!(diagnostics && typeof diagnostics.mounted === 'function' && diagnostics.mounted()),
+            ownerValid: !!(diagnostics && typeof diagnostics.ownerValid === 'function' && diagnostics.ownerValid()),
+            storeOwner: diagnostics && typeof diagnostics.storeOwner === 'function' ? diagnostics.storeOwner() : null,
             ready: !!(state && state.ready === true),
             degraded: !!(state && state.degraded === true),
             requiredMissing: state && state.required ? state.required.missing.slice() : [],
@@ -103,6 +107,7 @@ async function browserState(page) {
         rootfixLoaded: !!(window.Orbit && Orbit.__visualRuntimeRootfixV20260805),
         hydrationContractLoaded: hydration.loaded === true,
         hydrationContractMounted: hydration.mounted === true,
+        hydrationOwnerValid: hydration.ownerValid === true,
         hydrationInicioReady: hydration.ready === true,
         hydrationInicioDegraded: hydration.degraded === true,
         hydration,
@@ -177,6 +182,11 @@ try {
     typeof OrbitHydrationContractDiagnostics.mounted === 'function' &&
     OrbitHydrationContractDiagnostics.mounted()
   ), 'HYDRATION_CONTRACT_MOUNTED', 30000);
+  await waitObservable(page, () => !!(
+    window.OrbitHydrationContractDiagnostics &&
+    typeof OrbitHydrationContractDiagnostics.ownerValid === 'function' &&
+    OrbitHydrationContractDiagnostics.ownerValid()
+  ), 'HYDRATION_OWNER_VALID', 10000);
   await waitObservable(page, () => !!(window.firebase && typeof firebase.auth === 'function'), 'FIREBASE_AUTH', 30000);
 
   mark('CUSTOM_TOKEN_CREATE');
@@ -219,8 +229,16 @@ try {
 } catch (error) {
   result.stage = 'FAIL_VISUAL_BROWSER_PRECHECK';
   const message = String(error && error.message || error);
-  if (result.checkpoint.startsWith('HYDRATION_CONTRACT_MOUNTED')) result.classification = 'PIPELINE_MECHANISM_FAILURE';
-  else if (result.checkpoint.startsWith('INICIO_REQUIRED_HYDRATION')) result.classification = 'DATA_CONTRACT_FAILURE';
+  const observed = result.observedState || {};
+  const hydrationOwnerLost = observed.membershipReady === true && observed.membershipTenantBound === true && observed.hydrationContractLoaded === true && (
+    observed.hydrationOwnerValid === false ||
+    observed.hydration?.ownerValid === false ||
+    (observed.hydrationContractMounted === true && observed.lab?.status === '' && observed.lab?.snapshotAttached === false && Number(observed.lab?.snapshotAttachedCount || 0) === 0)
+  );
+  if (result.checkpoint.startsWith('HYDRATION_CONTRACT_MOUNTED') || result.checkpoint.startsWith('HYDRATION_OWNER_VALID') || hydrationOwnerLost) {
+    result.classification = 'PIPELINE_MECHANISM_FAILURE';
+    result.rootCauseHint = 'HYDRATION_PARTIAL_INSTALL_REENTRANCY_STATE_LOSS';
+  } else if (result.checkpoint.startsWith('INICIO_REQUIRED_HYDRATION')) result.classification = 'DATA_CONTRACT_FAILURE';
   else result.classification = result.checkpoint.includes('TIMEOUT') ? 'VALIDATOR_STALE_OR_PRODUCT_WAIT_IDENTIFIED' : (/DATA_CONTRACT/.test(message) ? 'DATA_CONTRACT_FAILURE' : 'PIPELINE_MECHANISM_FAILURE');
   result.error = clean(message);
   try {

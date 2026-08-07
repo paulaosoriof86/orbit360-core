@@ -15,7 +15,7 @@
   if (Orbit.__visualHydrationContractV20260805) return;
   Orbit.__visualHydrationContractV20260805 = true;
 
-  var VERSION = '20260807.3-advisor-cache-unified-readiness';
+  var VERSION = '20260807.4-transactional-owner-reentrant-readiness';
   var OPTIONAL_LEGACY = ['asesores', 'metas', 'negocios', 'gestiones', 'comisiones', 'cancelaciones'];
   var ADVISOR_PROJECTION_SOURCES = ['asesores', 'clientes', 'polizas', 'cobros', 'recibosEsperados', 'carteraPrimas'];
   var CONTRACTS = {
@@ -32,6 +32,8 @@
 
   var installed = false;
   var installedStore = null;
+  var boundStore = null;
+  var storeOwnerGeneration = 0;
   var listenersBound = false;
   var projectionListenerBound = false;
   var originalStatus = null;
@@ -178,15 +180,46 @@
     return row[field] === value;
   }
 
-  function installAdvisorProjection() {
-    if (!Orbit.store) return false;
-    if (Orbit.store.__advisorProjectionV20260805) return true;
+  function originalStoreReady() {
+    return !!(originalStore && ['all', 'get', 'where', 'find'].every(function (name) { return typeof originalStore[name] === 'function'; }));
+  }
+  function originalStatusReady() { return typeof originalStatus === 'function'; }
+  function ownerValid() {
+    return !!(boundStore && boundStore === Orbit.store && originalStoreReady() && originalStatusReady());
+  }
+  function resetBoundOwnerForStoreChange() {
+    installed = false;
+    installedStore = null;
+    originalStatus = null;
+    originalStore = null;
+    lastActualStatus = null;
+    projectionListenerBound = false;
+    invalidateAdvisorProjection();
+    advisorProjectionAuthSignature = '';
+    unifiedModuleWrapState = {};
+    routeWaiters = {};
+  }
+  function bindStoreOwner() {
+    if (!Orbit.store || typeof Orbit.store.all !== 'function' || typeof Orbit.store.get !== 'function' || typeof Orbit.store.where !== 'function' || typeof Orbit.store.find !== 'function' || typeof Orbit.store._labStatus !== 'function') return false;
+    if (boundStore === Orbit.store && originalStoreReady() && originalStatusReady()) return true;
+    if (boundStore && boundStore !== Orbit.store) resetBoundOwnerForStoreChange();
+    if (boundStore === Orbit.store && (!originalStoreReady() || !originalStatusReady())) return false;
+    if (Orbit.store.__advisorProjectionV20260805 || Orbit.store.__visualHydrationContractV20260805) return false;
+    boundStore = Orbit.store;
     originalStore = {
       all: Orbit.store.all.bind(Orbit.store),
       get: Orbit.store.get.bind(Orbit.store),
       where: Orbit.store.where.bind(Orbit.store),
       find: Orbit.store.find.bind(Orbit.store)
     };
+    originalStatus = Orbit.store._labStatus.bind(Orbit.store);
+    storeOwnerGeneration += 1;
+    return ownerValid();
+  }
+
+  function installAdvisorProjection() {
+    if (!Orbit.store || !ownerValid()) return false;
+    if (Orbit.store.__advisorProjectionV20260805) return originalStoreReady();
     Orbit.store.all = function (collection) {
       return collection === 'asesores' ? advisorProjectionRows().map(clone) : originalStore.all(collection);
     };
@@ -275,7 +308,9 @@
       requiredCanonicalReady: activeContract.ready,
       optionalLegacyDegraded: degraded.length > 0,
       optionalLegacyUnavailableCount: degraded.length,
-      storeBound: installedStore === Orbit.store,
+      storeBound: boundStore === Orbit.store && ownerValid(),
+      ownerValid: ownerValid(),
+      storeOwnerGeneration: storeOwnerGeneration,
       readinessAuthority: 'OrbitHydrationContractDiagnostics',
       advisorProjectionBuilds: advisorProjectionBuilds,
       advisorProjectionInvalidations: advisorProjectionInvalidations,
@@ -285,9 +320,8 @@
   }
 
   function installStatusContract() {
-    if (!Orbit.store || typeof Orbit.store._labStatus !== 'function') return false;
-    if (Orbit.store.__visualHydrationContractV20260805) return true;
-    originalStatus = Orbit.store._labStatus.bind(Orbit.store);
+    if (!Orbit.store || !ownerValid()) return false;
+    if (Orbit.store.__visualHydrationContractV20260805) return originalStatusReady();
     Orbit.store._labStatus = maskedStatus;
     Orbit.store.__visualHydrationContractV20260805 = {
       version: VERSION,
@@ -441,7 +475,11 @@
           var mod = Orbit.modules && Orbit.modules[name];
           return !!(mod && mod.__visualHydrationReadinessV17);
         });
-        return !!(installed && installedStore === Orbit.store && Orbit.store && Orbit.store.__visualHydrationContractV20260805 && modulesReady);
+        return !!(installed && installedStore === Orbit.store && boundStore === Orbit.store && ownerValid() && Orbit.store && Orbit.store.__visualHydrationContractV20260805 && Orbit.store.__advisorProjectionV20260805 && modulesReady);
+      },
+      ownerValid: function () { return ownerValid(); },
+      storeOwner: function () {
+        return { valid: ownerValid(), generation: storeOwnerGeneration, bound: boundStore === Orbit.store, originalStoreReady: originalStoreReady(), originalStatusReady: originalStatusReady(), writes: 0 };
       },
       unifiedReadinessMounted: function () {
         return Object.keys(CONTRACTS).every(function (name) {
@@ -472,20 +510,13 @@
   }
 
   function install() {
-    if (!window.Orbit || !Orbit.store || !Orbit.q || !Orbit.modules) return false;
-    if (installedStore !== Orbit.store) {
-      installed = false;
-      installedStore = null;
-      originalStatus = null;
-      originalStore = null;
-      lastActualStatus = null;
-      projectionListenerBound = false;
-      invalidateAdvisorProjection();
-      advisorProjectionAuthSignature = '';
-      unifiedModuleWrapState = {};
-    }
+    if (!window.Orbit || !Orbit.store) return false;
+    if (!bindStoreOwner()) return false;
+    exposeDiagnostics();
+    if (!Orbit.q || !Orbit.modules) return false;
     if (!installAdvisorProjection()) return false;
     if (!installStatusContract()) return false;
+    exposeDiagnostics();
     if (!installUnifiedModuleReadiness()) return false;
     injectStyle();
     installed = true;
@@ -494,6 +525,7 @@
     bindUiObserversOnce();
     document.body.dataset.visualHydrationContractV20260805 = VERSION;
     document.body.dataset.visualHydrationContractStoreBound = 'true';
+    document.body.dataset.visualHydrationOwnerValid = ownerValid() ? 'true' : 'false';
     document.body.dataset.visualReadinessAuthority = 'OrbitHydrationContractDiagnostics';
     setTimeout(paintDegradedState, 0);
     return true;

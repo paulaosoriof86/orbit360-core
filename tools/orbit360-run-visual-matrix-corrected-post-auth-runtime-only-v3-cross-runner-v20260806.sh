@@ -49,6 +49,13 @@ PERSISTED=0
 
 source "$SIGNAL_LIB"
 
+reset_run_evidence() {
+  rm -f "$PRECHECK" "$MATRIX" "$SUPERVISOR" "$FINAL"
+  rm -rf "$ARTIFACT_DIR"
+  mkdir -p "$ARTIFACT_DIR"
+  echo "PASS_RUNTIME_EVIDENCE_RESET run=${GITHUB_RUN_ID:-local}"
+}
+
 write_runtime_state() {
   export STATE_FILE REGISTRATION_OUTCOME PREFLIGHT_OUTCOME CREDENTIAL_OUTCOME RUNTIME_OUTCOME
   export BACKUP_OUTCOME DEPLOY_OUTCOME PRECHECK_OUTCOME MATRIX_OUTCOME ROLLBACK_OUTCOME
@@ -201,6 +208,9 @@ jq -e --arg contract "$CONTRACT" '
   .secretAccess==false and .runtimeExecuted==false and
   .browserExecuted==false and .deployExecuted==false
 ' "$PREFLIGHT" >/dev/null || { PREFLIGHT_OUTCOME='failure'; stop; }
+
+reset_run_evidence
+write_runtime_state
 
 SERVICE_ACCOUNT="${FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB:-${FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB:-${FIREBASE_SERVICE_ACCOUNT:-}}}"
 if [[ -z "$SERVICE_ACCOUNT" ]]; then CREDENTIAL_OUTCOME='failure'; stop; fi
