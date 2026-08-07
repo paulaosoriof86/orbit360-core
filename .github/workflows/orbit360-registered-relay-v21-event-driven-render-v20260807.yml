@@ -1,0 +1,213 @@
+name: Orbit 360 · Relay registrado v21 event-driven render · runtime one-shot
+
+on:
+  pull_request:
+    types: [synchronize, opened, reopened]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: orbit360-registered-runtime-relay-v21
+  cancel-in-progress: false
+
+jobs:
+  registered-runtime-relay-v21:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    env:
+      ORBIT360_CANONICAL_BRANCH: ays/backend-tenant-lab-v99-20260703
+      ORBIT360_TRANSPORT_HEAD_REF: ${{ github.head_ref }}
+      ORBIT360_VISUAL_REQUEST_PATH: .github/orbit360-requests/visual-matrix-corrected-post-auth-lab-v20260805-authorization.json
+      ORBIT360_REQUEST_FILE: .github/orbit360-requests/visual-matrix-corrected-post-auth-lab-v20260805-authorization.json
+      ORBIT360_EXPECTED_REQUEST_VERSION: 20260807.21-two-phase-runtime
+      ORBIT360_RESTORE_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/visual-matrix-v21-prior-hosting-restore-sanitized-v20260807.json
+      ORBIT360_FINAL_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/visual-matrix-corrected-post-auth-final-sanitized-v20260805.json
+      ORBIT360_LIFECYCLE: tools/orbit360-validator-lifecycle-contract-visual-matrix-corrected-post-auth-lab-v20260805.json
+      ORBIT360_OVERLAY: tools/orbit360-validator-lifecycle-overlay-visual-matrix-v8-stop-preflight-v20260806.json
+
+    steps:
+      - name: Checkout exact pull request head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Detect canonical exclusive fresh authorized request and exact transport base
+        id: detect
+        shell: bash
+        run: |
+          set -euo pipefail
+          BRANCH="$ORBIT360_CANONICAL_BRANCH"
+          REQUEST="$ORBIT360_VISUAL_REQUEST_PATH"
+          JSON_GUARD='tools/orbit360-json-guard-visual-matrix-runtime-v20260806.mjs'
+          if [[ "${GITHUB_EVENT_NAME:-}" != 'pull_request' || "${ORBIT360_TRANSPORT_HEAD_REF:-}" != "$BRANCH" ]]; then
+            echo 'dispatch=false' >> "$GITHUB_OUTPUT"
+            echo 'SKIP_V21_REGISTERED_RELAY_NONCANONICAL_CONTEXT'
+            exit 0
+          fi
+          mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
+          if [[ "${#CHANGED[@]}" != '1' || "${CHANGED[0]}" != "$REQUEST" ]]; then
+            echo 'dispatch=false' >> "$GITHUB_OUTPUT"
+            echo 'SKIP_V21_REGISTERED_RELAY_NOT_EXCLUSIVE_REQUEST_COMMIT'
+            exit 0
+          fi
+          if ! node "$JSON_GUARD" detect-active-request "$REQUEST" "$ORBIT360_EXPECTED_REQUEST_VERSION"; then
+            echo 'dispatch=false' >> "$GITHUB_OUTPUT"
+            echo 'SKIP_V21_REGISTERED_RELAY_REQUEST_NOT_ACTIVE_FRESH_VERSION'
+            exit 0
+          fi
+          REQUEST_COMMIT="$(git rev-parse HEAD)"
+          REQUEST_PARENT="$(git rev-parse HEAD^)"
+          BASE_REF="${GITHUB_BASE_REF:-}"
+          if [[ -z "$BASE_REF" ]]; then
+            echo 'dispatch=false' >> "$GITHUB_OUTPUT"
+            echo 'SKIP_V21_REGISTERED_RELAY_TRANSPORT_BASE_REF_MISSING'
+            exit 0
+          fi
+          BASE_SHA="$(git rev-parse "origin/${BASE_REF}^{commit}" 2>/dev/null || true)"
+          if [[ -z "$BASE_SHA" || "$BASE_SHA" != "$REQUEST_PARENT" ]]; then
+            echo 'dispatch=false' >> "$GITHUB_OUTPUT"
+            echo "SKIP_V21_REGISTERED_RELAY_TRANSPORT_BASE_SHA_MISMATCH base=${BASE_SHA:-UNRESOLVED} parent=$REQUEST_PARENT"
+            exit 0
+          fi
+          echo 'dispatch=true' >> "$GITHUB_OUTPUT"
+          echo "request_sha=$REQUEST_COMMIT" >> "$GITHUB_OUTPUT"
+          echo "request_parent=$REQUEST_PARENT" >> "$GITHUB_OUTPUT"
+          echo "transport_base_sha=$BASE_SHA" >> "$GITHUB_OUTPUT"
+          echo 'PASS_V21_REGISTERED_RELAY_TRANSPORT_BASE_SHA_BEFORE_SECRETS'
+
+      - name: Validate exact source package before gate
+        if: steps.detect.outputs.dispatch == 'true'
+        id: source_package
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          bash -n tools/orbit360-preflight-visual-matrix-runtime-relay-v8-v20260806.sh
+          bash -n tools/orbit360-restore-visual-matrix-v13-baseline-before-runtime-v20260807.sh
+          bash -n tools/orbit360-run-visual-matrix-corrected-post-auth-runtime-only-v3-cross-runner-v20260806.sh
+          bash -n tools/orbit360-run-visual-matrix-corrected-post-auth-runtime-only-v4-transport-base-sha-v20260806.sh
+          node --check tools/orbit360-build-v21-event-driven-matrix-artifact-v20260807.mjs
+          node --check tools/orbit360-visual-runtime-rootfix-observable-matrix-v20260805.mjs
+          node --check tools/orbit360-seal-visual-matrix-corrected-post-auth-runtime-v20260805.mjs
+          node --check tools/orbit360-json-guard-visual-matrix-runtime-v20260806.mjs
+          node --check tools/orbit360-transition-visual-matrix-lifecycle-source-to-runtime-v20260807.mjs
+          node --check tools/orbit360-consume-visual-matrix-request-on-stop-v20260807.mjs
+          node --check tools/orbit360-visual-runtime-rootfix-browser-precheck-v20260805.mjs
+          node --check orbit360-platform/core/visual-runtime-hydration-contract-v20260805.js
+          node --check orbit360-platform/modules/cliente360.js
+          node --experimental-vm-modules tools/orbit360-test-v21-runtime-package-source-v20260807.mjs
+          node tools/orbit360-test-request-lifecycle-baseline-contract-v20260806.mjs
+          node tools/orbit360-test-capture-watchdog-source-v20260806.mjs
+          node tools/orbit360-test-windows-signal-compatibility-synthetic-v20260806.mjs
+          node tools/orbit360-test-visual-matrix-timeout-signal-safe-portable-v20260806.mjs
+          node tools/orbit360-test-visual-matrix-cross-runner-portable-v20260806.mjs
+          node tools/orbit360-test-preflight-portable-source-v20260806.mjs
+          node tools/orbit360-test-runtime-transport-base-sha-v20260806.mjs
+
+      - name: GO_GATE_CONTRACT before secrets
+        if: steps.detect.outputs.dispatch == 'true'
+        id: preflight
+        shell: bash
+        env:
+          ORBIT360_RUNTIME_RELAY_AUTHORIZED: 'true'
+        run: bash tools/orbit360-preflight-visual-matrix-runtime-relay-v8-v20260806.sh
+
+      - name: Install Firebase transport after GO
+        if: steps.preflight.outputs.go == 'true'
+        id: firebase_transport
+        shell: bash
+        run: npm install --no-save --package-lock=false firebase-tools@15.25.1 >/dev/null
+
+      - name: Restore authorized Hosting LAB baseline
+        if: steps.preflight.outputs.go == 'true'
+        id: restore
+        shell: bash
+        env:
+          ORBIT360_RUNTIME_EXECUTION_AUTHORIZED: 'true'
+          FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: bash tools/orbit360-restore-visual-matrix-v13-baseline-before-runtime-v20260807.sh
+
+      - name: Execute backup one Hosting LAB deploy precheck and supervised matrix
+        if: steps.restore.outcome == 'success'
+        id: runtime
+        shell: bash
+        env:
+          ORBIT360_RUNTIME_EXECUTION_AUTHORIZED: 'true'
+          FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: bash tools/orbit360-run-visual-matrix-corrected-post-auth-runtime-only-v4-transport-base-sha-v20260806.sh
+
+      - name: Attach prior restore to closure
+        if: always() && steps.detect.outputs.dispatch == 'true' && steps.preflight.outputs.go == 'true'
+        shell: bash
+        run: node tools/orbit360-attach-visual-matrix-v7-restore-evidence-v20260806.mjs
+
+      - name: Automatically consume and freeze request on any STOP
+        if: always() && steps.detect.outputs.dispatch == 'true' && failure()
+        id: stop_consume
+        shell: bash
+        env:
+          PREFLIGHT_OUTCOME: ${{ steps.preflight.outcome }}
+          FIREBASE_OUTCOME: ${{ steps.firebase_transport.outcome }}
+          RESTORE_OUTCOME: ${{ steps.restore.outcome }}
+          RUNTIME_OUTCOME: ${{ steps.runtime.outcome }}
+        run: |
+          set -euo pipefail
+          REQUEST="$ORBIT360_REQUEST_FILE"
+          LIFECYCLE="$ORBIT360_LIFECYCLE"
+          OVERLAY="$ORBIT360_OVERLAY"
+          EVIDENCE='orbit360-platform/runtime-gate-crm-v20260716/visual-matrix-corrected-post-auth-preflight-sanitized-v20260805.json'
+          FINAL='orbit360-platform/runtime-gate-crm-v20260716/visual-matrix-corrected-post-auth-final-sanitized-v20260805.json'
+          RESTORE_EVIDENCE="$ORBIT360_RESTORE_EVIDENCE"
+          if [[ "$RUNTIME_OUTCOME" == 'failure' && -f "$FINAL" ]]; then
+            EVIDENCE="$FINAL"
+          elif [[ "$RESTORE_OUTCOME" == 'failure' && -f "$RESTORE_EVIDENCE" ]]; then
+            EVIDENCE="$RESTORE_EVIDENCE"
+          elif [[ "$PREFLIGHT_OUTCOME" != 'failure' && "$FIREBASE_OUTCOME" == 'failure' ]]; then
+            EVIDENCE="$(mktemp)"
+            printf '%s\n' '{"status":"PIPELINE_MECHANISM_FAILURE","classification":"PIPELINE_MECHANISM_FAILURE","error":"FIREBASE_TRANSPORT_INSTALL_FAILURE","hostingTouched":false,"browserExecuted":false,"deployExecuted":false,"firestoreWrites":0,"authWrites":0,"operationalWrites":0,"productionTouched":false}' > "$EVIDENCE"
+          elif [[ ! -f "$EVIDENCE" ]]; then
+            EVIDENCE="$(mktemp)"
+            printf '%s\n' '{"status":"PIPELINE_MECHANISM_FAILURE","classification":"PIPELINE_MECHANISM_FAILURE","error":"SOURCE_OR_TRANSPORT_FAILURE_BEFORE_RUNTIME","hostingTouched":false,"browserExecuted":false,"deployExecuted":false,"firestoreWrites":0,"authWrites":0,"operationalWrites":0,"productionTouched":false}' > "$EVIDENCE"
+          fi
+          node tools/orbit360-consume-visual-matrix-request-on-stop-v20260807.mjs "$REQUEST" "$LIFECYCLE" "$OVERLAY" "$EVIDENCE"
+
+      - name: Persist sanitized closure
+        if: always() && steps.detect.outputs.dispatch == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name orbit360-gate-bot
+          git config user.email orbit360-gate-bot@users.noreply.github.com
+          FILES=(
+            '.github/orbit360-requests/visual-matrix-corrected-post-auth-lab-v20260805-authorization.json'
+            'orbit360-platform/runtime-gate-crm-v20260716/visual-matrix-corrected-post-auth-preflight-sanitized-v20260805.json'
+            'orbit360-platform/runtime-gate-crm-v20260716/visual-matrix-v21-prior-hosting-restore-sanitized-v20260807.json'
+            'orbit360-platform/runtime-gate-crm-v20260716/visual-matrix-corrected-post-auth-precheck-sanitized-v20260805.json'
+            'orbit360-platform/runtime-gate-crm-v20260716/visual-matrix-corrected-post-auth-matrix-sanitized-v20260805.json'
+            'orbit360-platform/runtime-gate-crm-v20260716/visual-matrix-supervisor-sanitized-v20260806.json'
+            'orbit360-platform/runtime-gate-crm-v20260716/visual-matrix-corrected-post-auth-final-sanitized-v20260805.json'
+            'tools/orbit360-validator-lifecycle-contract-visual-matrix-corrected-post-auth-lab-v20260805.json'
+            'tools/orbit360-validator-lifecycle-overlay-visual-matrix-v8-stop-preflight-v20260806.json'
+            'orbit360-platform/docs/CIERRE-MATRIZ-VISUAL-CORREGIDA-POST-AUTH-20260805.md'
+          )
+          for file in "${FILES[@]}"; do [[ -e "$file" ]] && git add "$file"; done
+          if ! git diff --cached --quiet; then
+            git commit -m 'runtime: persist visual matrix v21 closure [skip ci]'
+            git push origin HEAD:ays/backend-tenant-lab-v99-20260703
+          fi
+
+      - name: Publish private sanitized captures
+        if: always() && steps.detect.outputs.dispatch == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-visual-matrix-runtime-${{ github.run_id }}
+          path: orbit360-visual-matrix-corrected-artifacts/
+          if-no-files-found: ignore
+          retention-days: 7
