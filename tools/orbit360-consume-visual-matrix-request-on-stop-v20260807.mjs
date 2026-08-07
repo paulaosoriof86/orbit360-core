@@ -27,36 +27,8 @@ function safeCode(value) {
     .replace(/^_+|_+$/g, '')
     .slice(0, 96) || 'RUNTIME_STOP';
 }
-
-const request = readJson(requestPath);
-const lifecycle = readJson(lifecyclePath);
-const overlay = readJson(overlayPath);
-const evidence = readJson(evidencePath, false);
-
-if (request.consumed === true && request.allowedExecutions === 0 && request.authorizationFrozen === true) {
-  console.log(JSON.stringify({ status: 'PASS_STOP_REQUEST_ALREADY_CONSUMED', requestVersion: request.requestVersion, ok: true }, null, 2));
-  process.exit(0);
-}
-if (request.status !== 'AUTHORIZED_ONCE' || request.allowedExecutions !== 1 || request.consumed !== false || request.replayAllowed !== false) {
-  console.error(JSON.stringify({ status: 'STOP_REQUEST_CONSUMPTION_INVALID_ACTIVE_STATE', requestVersion: request.requestVersion, ok: false }, null, 2));
-  process.exit(41);
-}
-
-const evidenceCode = evidence.error || evidence.relayCheckpoint || (Array.isArray(evidence.failedCheckIds) && evidence.failedCheckIds[0]) || 'RUNTIME_STOP';
-const failureCode = safeCode(evidenceCode);
-const classification = evidence.status === 'VALIDATOR_STALE' ? 'VALIDATOR_STALE' : String(evidence.classification || 'PIPELINE_MECHANISM_FAILURE');
-const runId = String(process.env.GITHUB_RUN_ID || '');
-const attempt = Number(process.env.GITHUB_RUN_ATTEMPT || 1);
-const consumedAt = new Date().toISOString();
-
-const stoppedRequest = {
-  ...request,
-  status: `CONSUMED_STOP_RETRY_${failureCode}`,
-  allowedExecutions: 0,
-  consumed: true,
-  authorizationFrozen: true,
-  replayAllowed: false,
-  capabilities: {
+function falseCapabilities() {
+  return {
     secrets: false,
     firestoreRead: false,
     writes: false,
@@ -66,7 +38,64 @@ const stoppedRequest = {
     functionsDeploy: false,
     rulesDeploy: false,
     production: false
-  },
+  };
+}
+
+const request = readJson(requestPath);
+const lifecycle = readJson(lifecyclePath);
+const overlay = readJson(overlayPath);
+const evidence = readJson(evidencePath, false);
+
+const activeState =
+  request.status === 'AUTHORIZED_ONCE' &&
+  request.allowedExecutions === 1 &&
+  request.consumed === false &&
+  request.replayAllowed === false;
+const partiallyOrFullyConsumedState =
+  request.consumed === true &&
+  request.allowedExecutions === 0 &&
+  request.replayAllowed === false;
+if (!activeState && !partiallyOrFullyConsumedState) {
+  console.error(JSON.stringify({
+    status: 'STOP_REQUEST_CONSUMPTION_INVALID_STATE',
+    requestVersion: request.requestVersion,
+    consumed: request.consumed,
+    allowedExecutions: request.allowedExecutions,
+    authorizationFrozen: request.authorizationFrozen,
+    replayAllowed: request.replayAllowed,
+    ok: false
+  }, null, 2));
+  process.exit(41);
+}
+
+const evidenceCode = evidence.checkpoint || evidence.error || evidence.relayCheckpoint ||
+  (Array.isArray(evidence.failedCheckIds) && evidence.failedCheckIds[0]) ||
+  (request.executionResult && request.executionResult.checkpoint) || 'RUNTIME_STOP';
+const failureCode = safeCode(evidenceCode);
+const classification = String(evidence.classification || request.executionResult?.classification || 'PIPELINE_MECHANISM_FAILURE');
+const runId = String(process.env.GITHUB_RUN_ID || request.consumedByRunId || evidence.runId || '');
+const attempt = Number(process.env.GITHUB_RUN_ATTEMPT || request.consumedByAttempt || evidence.attempt || 1);
+const consumedAt = request.consumedAt || new Date().toISOString();
+const checkpoint = String(evidence.checkpoint || evidence.relayCheckpoint || evidence.failedCheckIds?.[0] || request.executionResult?.checkpoint || 'CANONICAL_PREFLIGHT_ENTRYPOINT');
+const secretAccessed = Boolean(evidence.secretAccessed ?? evidence.secretAccess ?? request.executionResult?.secretAccessed);
+const firebaseAccessed = Boolean(evidence.firebaseAccessed ?? request.executionResult?.firebaseAccessed ?? secretAccessed);
+const hostingTouched = Boolean(
+  evidence.hostingTouched ?? evidence.hostingDeployAttempted ??
+  request.executionResult?.hostingTouched ?? request.executionResult?.hostingDeploys
+);
+const browserExecuted = Boolean(evidence.browserExecuted ?? request.executionResult?.browserExecuted);
+const deployExecuted = Boolean(evidence.deployExecuted ?? evidence.hostingDeployAttempted ?? request.executionResult?.deployExecuted ?? request.executionResult?.hostingDeploys);
+const rollbackRestored = Boolean(evidence.hostingRollbackRestored ?? evidence.rollbackRestored ?? request.executionResult?.hostingRollbackRestored);
+const snapshotIntegrity = String(evidence.snapshotIntegrity || request.executionResult?.snapshotIntegrity || 'NOT_VERIFIED');
+
+const stoppedRequest = {
+  ...request,
+  status: `CONSUMED_STOP_RETRY_${failureCode}`,
+  allowedExecutions: 0,
+  consumed: true,
+  authorizationFrozen: true,
+  replayAllowed: false,
+  capabilities: falseCapabilities(),
   scope: {
     ...(request.scope || {}),
     restorePriorBaselineBeforeRuntime: false,
@@ -84,22 +113,25 @@ const stoppedRequest = {
     merge: false
   },
   executionResult: {
+    ...(request.executionResult || {}),
     decision: 'STOP_RETRY',
     classification,
     failureCode,
-    checkpoint: String(evidence.relayCheckpoint || evidence.failedCheckIds?.[0] || 'CANONICAL_PREFLIGHT_ENTRYPOINT'),
+    checkpoint,
     runId,
     attempt,
-    goGateContract: evidence.status === 'GO_GATE_CONTRACT' ? 'GRANTED' : 'NOT_GRANTED',
-    secretAccessed: Boolean(evidence.secretAccess),
-    firebaseAccessed: false,
-    hostingTouched: Boolean(evidence.hostingTouched),
-    browserExecuted: Boolean(evidence.browserExecuted),
-    deployExecuted: Boolean(evidence.deployExecuted),
-    firestoreWrites: Number(evidence.firestoreWrites || 0),
-    authWrites: Number(evidence.authWrites || 0),
-    operationalWrites: Number(evidence.operationalWrites || 0),
-    productionTouched: Boolean(evidence.productionTouched)
+    goGateContract: evidence.preflightStatus === 'GO_GATE_CONTRACT' || evidence.status === 'GO_GATE_CONTRACT' || request.executionResult?.goGateContract === 'GRANTED' ? 'GRANTED' : 'NOT_GRANTED',
+    secretAccessed,
+    firebaseAccessed,
+    hostingTouched,
+    browserExecuted,
+    deployExecuted,
+    hostingRollbackRestored: rollbackRestored,
+    snapshotIntegrity,
+    firestoreWrites: Number(evidence.firestoreWrites ?? request.executionResult?.firestoreWrites ?? 0),
+    authWrites: Number(evidence.authWrites ?? request.executionResult?.authWrites ?? 0),
+    operationalWrites: Number(evidence.operationalWrites ?? request.executionResult?.operationalWrites ?? 0),
+    productionTouched: Boolean(evidence.productionTouched ?? request.executionResult?.productionTouched)
   },
   freshAuthorizationRequiredForAnyFutureRuntime: true,
   consumedAt,
@@ -111,22 +143,12 @@ const stoppedLifecycle = {
   ...lifecycle,
   status: `STOP_RETRY_${failureCode}`,
   classification,
-  secondaryClassification: 'AUTOMATIC_STOP_CONSUMPTION_APPLIED',
+  secondaryClassification: 'AUTOMATIC_STOP_CONSUMPTION_APPLIED_IDEMPOTENT',
   currentPhase: `STOP_RETRY_${failureCode}`,
   executionProfile: {
     mode: 'STOP_RETRY_NO_RUNTIME',
     phase: `STOP_RETRY_${failureCode}`,
-    capabilities: {
-      secrets: false,
-      firestoreRead: false,
-      writes: false,
-      runtime: false,
-      browser: false,
-      deploy: false,
-      functionsDeploy: false,
-      rulesDeploy: false,
-      production: false
-    }
+    capabilities: falseCapabilities()
   },
   activeRequest: false,
   requestRetired: true,
@@ -151,15 +173,21 @@ const stoppedLifecycle = {
   hostingBackupCloneAuthorized: false,
   hostingRollbackCloneAuthorizedOnFailure: false,
   priorHostingRestoreAuthorized: false,
-  lastAutomaticStop: { runId, attempt, failureCode, classification, consumedAt },
-  nextAction: 'DIAGNOSE_AND_VALIDATE_SOURCE_ONLY. DO_NOT REPLAY THIS REQUEST.'
+  protectedState: {
+    ...(lifecycle.protectedState || {}),
+    passVisualPostAuth: false,
+    snapshotIntegrity,
+    currentLabRestoredToPreviousVersion: rollbackRestored || lifecycle.protectedState?.currentLabRestoredToPreviousVersion === true
+  },
+  lastAutomaticStop: { runId, attempt, failureCode, classification, consumedAt, checkpoint },
+  nextAction: 'DIAGNOSE_AND_VALIDATE_SOURCE_ONLY. DO NOT REPLAY THIS REQUEST.'
 };
 
 const stoppedOverlay = {
   ...overlay,
   status: `STOP_RETRY_${failureCode}`,
   classification,
-  checkpoint: String(evidence.relayCheckpoint || evidence.failedCheckIds?.[0] || 'CANONICAL_PREFLIGHT_ENTRYPOINT'),
+  checkpoint,
   failureCode,
   stopRetryActive: true,
   requestReusable: false,
@@ -173,7 +201,14 @@ const stoppedOverlay = {
   functionsAllowed: false,
   rulesAllowed: false,
   reimportAllowed: false,
-  hostingDeploys: 0,
+  hostingDeploys: Number(evidence.hostingDeploys || request.executionResult?.hostingDeploys || 0),
+  rollbackRequired: false,
+  rollbackRestored,
+  snapshotIntegrity,
+  firestoreWrites: Number(evidence.firestoreWrites ?? request.executionResult?.firestoreWrites ?? 0),
+  authWrites: Number(evidence.authWrites ?? request.executionResult?.authWrites ?? 0),
+  operationalWrites: Number(evidence.operationalWrites ?? request.executionResult?.operationalWrites ?? 0),
+  passVisualPostAuth: false,
   ok: false
 };
 
@@ -181,20 +216,21 @@ writeJson(requestPath, stoppedRequest);
 writeJson(lifecyclePath, stoppedLifecycle);
 writeJson(overlayPath, stoppedOverlay);
 console.log(JSON.stringify({
-  status: 'PASS_AUTOMATIC_STOP_REQUEST_CONSUMPTION',
+  status: partiallyOrFullyConsumedState ? 'PASS_AUTOMATIC_STOP_COMPLETED_FROM_CONSUMED_STATE' : 'PASS_AUTOMATIC_STOP_REQUEST_CONSUMPTION',
   requestVersion: request.requestVersion,
   failureCode,
   classification,
+  checkpoint,
   runId,
   allowedExecutions: 0,
   consumed: true,
   authorizationFrozen: true,
   replayAllowed: false,
   runtimeAllowed: false,
-  secretAccess: false,
-  hostingTouchedByConsumer: false,
-  browserExecutedByConsumer: false,
-  deployExecutedByConsumer: false,
+  lifecycleStopRetryActive: true,
+  overlayStopRetryActive: true,
+  rollbackRestored,
+  snapshotIntegrity,
   writesByConsumer: 0,
   ok: true
 }, null, 2));
