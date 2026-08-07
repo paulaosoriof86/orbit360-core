@@ -9,10 +9,9 @@ import { chromium } from 'playwright';
 import { patchChromiumCaptureWatchdog } from './orbit360-playwright-capture-watchdog-lib-v20260806.mjs';
 import { buildV20MatrixArtifact } from './orbit360-build-v20-route-aware-matrix-artifact-v20260807.mjs';
 import { buildV21MatrixArtifact } from './orbit360-build-v21-event-driven-matrix-artifact-v20260807.mjs';
-import { buildV22MatrixArtifact, V22_MATRIX_SCHEMA } from './orbit360-build-v22-block1-matrix-artifact-v20260807.mjs';
+import { buildV22MatrixArtifact, V22_MATRIX_SCHEMA } from './orbit360-build-v22-block1-matrix-artifact-v2-v20260807.mjs';
 
 const CAPTURE_TIMEOUT_MS = 12000;
-// Historical owners remain source-visible so retired gates can verify succession without owning runtime.
 void buildV20MatrixArtifact;
 void buildV21MatrixArtifact;
 // Contract markers: fullPage: false; blocking: false.
@@ -72,7 +71,6 @@ try {
   const source = buildV22MatrixArtifact();
   fs.writeFileSync(tempPath, source, 'utf8');
   artifactWritten = true;
-
   const compile = spawnSync(process.execPath, ['--check', tempPath], { encoding: 'utf8' });
   if (compile.status !== 0) {
     const detail = `${compile.stderr || ''}\n${compile.stdout || ''}`.trim();
@@ -80,12 +78,9 @@ try {
     persistPipelineFailure('MATRIX_ARTIFACT_COMPILE_FAILED', error);
     throw error;
   }
-
   await import(pathToFileURL(tempPath).href + `?v22=${Date.now()}`);
 } catch (error) {
-  if (!evidencePath || !fs.existsSync(evidencePath)) {
-    persistPipelineFailure('MATRIX_ARTIFACT_IMPORT_FAILED', error);
-  }
+  if (!evidencePath || !fs.existsSync(evidencePath)) persistPipelineFailure('MATRIX_ARTIFACT_IMPORT_FAILED', error);
   throw error;
 } finally {
   if (artifactWritten) {
