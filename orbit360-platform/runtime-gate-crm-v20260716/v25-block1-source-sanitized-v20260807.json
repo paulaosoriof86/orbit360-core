@@ -4,9 +4,14 @@
   "contractVersion": "1.0.41",
   "authorizationGeneration": "v25-differential-universe-diagnosis",
   "authorizedBaseHead": "4d8c3f77588853a0abed512c0f19e7efb266d56a",
-  "status": "SOURCE_CANDIDATE_PENDING_GITHUB_VALIDATION",
+  "sourceValidatedHead": "56cef0a31343b043722355069b21e93bd23e8034",
+  "sourceRunId": 31222721451,
+  "status": "PASS_V25_SOURCE_CLOSED",
   "classification": "DATA_CONTRACT_FAILURE_ROOT_CAUSE_DIAGNOSTIC_SOURCE_ONLY",
-  "priorRun": 31221713418,
+  "sourceFixtures": "20/20 PASS",
+  "preflight": "PASS_V25_SOURCE_PREFLIGHT",
+  "readOnlyScope": "clientes+aseguradoras+asesores-control",
+  "firestoreReadsMaximumAfterGo": 3,
   "priorObservedRaw": { "clientes": 430, "aseguradoras": 30, "asesores": 7 },
   "priorObservedEffective": { "clientes": 430, "aseguradoras": 25, "asesores": 7 },
   "baselineManifest": { "date": "2026-07-14", "clientes": 414, "aseguradoras": 26, "asesores": 7, "batchTemplateHashOnly": true },
@@ -23,5 +28,5 @@
   "productionTouched": false,
   "containsPII": false,
   "containsSecrets": false,
-  "ok": false
+  "ok": true
 }
