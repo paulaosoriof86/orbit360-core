@@ -1,0 +1,62 @@
+name: Orbit 360 · Validar validator baseline contract v12 · source-only
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  validate-validator-baseline-contract-source-only:
+    if: github.head_ref == 'ays/sourcefix-v12-validator-stale-baseline-contract-20260806'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - name: Checkout exact sourcefix head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Validate stale validator rootfix
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash -n tools/orbit360-preflight-visual-matrix-runtime-relay-v8-v20260806.sh
+          node --check tools/orbit360-json-guard-visual-matrix-runtime-v20260806.mjs
+          node --check tools/orbit360-test-request-lifecycle-baseline-contract-v20260806.mjs
+          node --check tools/orbit360-test-preflight-portable-source-v20260806.mjs
+          node tools/orbit360-test-request-lifecycle-baseline-contract-v20260806.mjs
+          node tools/orbit360-test-preflight-portable-source-v20260806.mjs
+          node tools/orbit360-test-runtime-transport-base-sha-v20260806.mjs
+          node tools/orbit360-test-capture-watchdog-source-v20260806.mjs
+          node tools/orbit360-test-windows-signal-compatibility-synthetic-v20260806.mjs
+          node tools/orbit360-test-visual-matrix-timeout-signal-safe-portable-v20260806.mjs
+          node tools/orbit360-test-visual-matrix-cross-runner-portable-v20260806.mjs
+
+      - name: Assert STOP, lifecycle binding and zero risk
+        shell: bash
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs = require('fs');
+          const request = JSON.parse(fs.readFileSync('.github/orbit360-requests/visual-matrix-corrected-post-auth-lab-v20260805-authorization.json','utf8'));
+          const lifecycle = JSON.parse(fs.readFileSync('tools/orbit360-validator-lifecycle-contract-visual-matrix-corrected-post-auth-lab-v20260805.json','utf8'));
+          const overlay = JSON.parse(fs.readFileSync('tools/orbit360-validator-lifecycle-overlay-visual-matrix-v8-stop-preflight-v20260806.json','utf8'));
+          const workflow = fs.readFileSync('.github/workflows/orbit360-claude-paquete-reconciliado-v1205.yml','utf8');
+          const guard = fs.readFileSync('tools/orbit360-json-guard-visual-matrix-runtime-v20260806.mjs','utf8');
+          const baseline = JSON.parse(fs.readFileSync('orbit360-platform/runtime-gate-crm-v20260716/request-lifecycle-baseline-contract-source-test-sanitized-v20260806.json','utf8'));
+          const phase = JSON.parse(fs.readFileSync('orbit360-platform/runtime-gate-crm-v20260716/preflight-portable-source-test-sanitized-v20260806.json','utf8'));
+          const ok =
+            request.status === 'CONSUMED_STOP_RETRY_VALIDATOR_STALE_BASELINE_CONTRACT' && request.allowedExecutions === 0 && request.consumed === true && request.authorizationFrozen === true && request.replayAllowed === false &&
+            lifecycle.status === 'STOP_RETRY_V12_VALIDATOR_STALE_BASELINE_CONTRACT' && lifecycle.classification === 'VALIDATOR_STALE' && lifecycle.allowedExecutions === 0 && lifecycle.stopRetryActive === true &&
+            overlay.status === 'STOP_RETRY_V12_VALIDATOR_STALE_BASELINE_CONTRACT' && overlay.runtimeAllowed === false && overlay.hostingAllowed === false && overlay.expectedNextRequestVersion === 'NONE_PENDING_FRESH_AUTHORIZATION' &&
+            workflow.includes('ORBIT360_EXPECTED_REQUEST_VERSION: NONE_PENDING_FRESH_AUTHORIZATION') &&
+            guard.includes('priorHostingRestoreChannel') && guard.includes('priorHostingRestoreScript') && !guard.includes('restorePriorV6BackupBeforeRuntime') &&
+            baseline.status === 'PASS_REQUEST_LIFECYCLE_BASELINE_CONTRACT_SOURCE_ONLY' && baseline.failed === 0 && baseline.ok === true &&
+            phase.status === 'PASS_SOURCE_ONLY_PHASE_AWARE_PREFLIGHT_VALIDATOR' && phase.failed === 0 && phase.ok === true;
+          if (!ok) process.exit(41);
+          console.log(JSON.stringify({status:'PASS_V12_VALIDATOR_BASELINE_CONTRACT_SOURCE_ONLY',baselineChecks:baseline.passed,phaseAwareChecks:phase.passed,runtimeExecuted:false,secretsRead:false,firebaseAccess:false,browserExecuted:false,hostingTouched:false,deployExecuted:false,writes:0,ok:true},null,2));
+          NODE
