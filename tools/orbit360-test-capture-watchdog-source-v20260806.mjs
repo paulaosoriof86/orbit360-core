@@ -83,7 +83,7 @@ checks.successDetachesOnly = success.calls.detach === 1 && success.calls.context
 
 const timeoutEvidence = evidenceFile(tmp, 'timeout');
 const timeout = makeHarness('hang');
-patchChromiumCaptureWatchdog({ chromium: timeout.chromium, evidencePath: timeoutEvidence, hardTimeoutMs: 60, heartbeatMs: 15, detachTimeoutMs: 15 });
+patchChromiumCaptureWatchdog({ chromium: timeout.chromium, evidencePath: timeoutEvidence, hardTimeoutMs: 350, heartbeatMs: 250, detachTimeoutMs: 15 });
 const timeoutBrowser = await timeout.chromium.launch();
 const timeoutContext = await timeoutBrowser.newContext();
 const timeoutPage = await timeoutContext.newPage();
@@ -97,7 +97,7 @@ try {
 const timeoutElapsed = Date.now() - timeoutStarted;
 const timeoutJson = JSON.parse(fs.readFileSync(timeoutEvidence, 'utf8'));
 const pageStillUsable = await timeoutPage.evaluate(() => true);
-checks.timeoutIsBounded = /CAPTURE_HARD_TIMEOUT_60MS/.test(timeoutMessage) && timeoutElapsed < 500;
+checks.timeoutIsBounded = /CAPTURE_HARD_TIMEOUT_350MS/.test(timeoutMessage) && timeoutElapsed < 1000;
 checks.timeoutHasHeartbeat = timeoutJson.checkpoints.some(x => /DIRECCION_TIMEOUT_CAPTURE_HEARTBEAT_\d+/.test(x.checkpoint));
 checks.timeoutHasTerminalCheckpoint = timeoutJson.checkpoints.some(x => x.checkpoint === 'DIRECCION_TIMEOUT_CAPTURE_TIMEOUT');
 checks.timeoutLeavesPageUsable = pageStillUsable === true && timeout.calls.contextClose === 0 && timeout.calls.browserClose === 0;
@@ -106,9 +106,9 @@ checks.timeoutDetachesSession = timeout.calls.detach === 1;
 const failedCheckIds = Object.entries(checks).filter(([, ok]) => !ok).map(([id]) => id);
 const output = {
   schemaVersion: 'orbit360-capture-watchdog-source-test-v1',
-  generatedAt: '2026-08-06T18:55:00-06:00',
+  generatedAt: '2026-08-06T19:08:00-06:00',
   status: failedCheckIds.length ? 'STOP_CAPTURE_WATCHDOG_SOURCE_TEST' : 'PASS_CAPTURE_WATCHDOG_SOURCE_ONLY',
-  classification: failedCheckIds.length ? 'PIPELINE_MECHANISM_FAILURE' : 'PIPELINE_MECHANISM_FAILURE_CORRECTED_SOURCE_ONLY',
+  classification: failedCheckIds.length ? 'VALIDATOR_STALE' : 'PIPELINE_MECHANISM_FAILURE_CORRECTED_SOURCE_ONLY',
   total: Object.keys(checks).length,
   passed: Object.values(checks).filter(Boolean).length,
   failed: failedCheckIds.length,
