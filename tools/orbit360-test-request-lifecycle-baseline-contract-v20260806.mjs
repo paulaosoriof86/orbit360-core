@@ -48,6 +48,7 @@ function baseRequest() {
       hostingDeploysMaximum: 1,
       hostingBackupClone: true,
       hostingRollbackCloneOnFailure: true,
+      precheckRequiredBeforeMatrix: true,
       functionsDeploy: false,
       rulesDeploy: false,
       firestoreWrites: false,
@@ -56,7 +57,12 @@ function baseRequest() {
       reimport: false,
       production: false,
       main: false,
-      merge: false
+      merge: false,
+      directionDesktop: true,
+      operationalTablet: true,
+      advisorMobile: true,
+      viewportCaptureOnly: true,
+      captureWarningsNonBlocking: true
     }
   };
 }
@@ -135,6 +141,12 @@ const scriptMismatch = baseRequest();
 scriptMismatch.scope.restorePriorBaselineScript = 'tools/obsolete-restore.sh';
 checks.scriptMismatchRejected = run(scriptMismatch, runtimeLifecycle()) !== 0;
 
+for (const field of ['precheckRequiredBeforeMatrix','directionDesktop','operationalTablet','advisorMobile','viewportCaptureOnly']) {
+  const missing = baseRequest();
+  delete missing.scope[field];
+  checks[`missing_${field}_rejected`] = run(missing, runtimeLifecycle()) !== 0;
+}
+
 const versionLifecycleMismatch = runtimeLifecycle();
 versionLifecycleMismatch.expectedRequestVersion = '20260807.wrong-version';
 checks.lifecycleVersionMismatchRejected = run(baseRequest(), versionLifecycleMismatch) !== 0;
@@ -171,19 +183,21 @@ checks.authorizedBaseHeadMismatchRejected = run(differentParent, runtimeLifecycl
 
 const failedCheckIds = Object.entries(checks).filter(([, ok]) => !ok).map(([id]) => id);
 const output = {
-  schemaVersion: 'orbit360-request-lifecycle-baseline-contract-source-test-v2-runtime-phase-aware',
-  generatedAt: '2026-08-07T07:02:00-06:00',
+  schemaVersion: 'orbit360-request-lifecycle-baseline-contract-source-test-v3-runtime-phase-and-scope-aware',
+  generatedAt: '2026-08-07T07:55:00-06:00',
   status: failedCheckIds.length ? 'STOP_REQUEST_LIFECYCLE_BASELINE_CONTRACT_SOURCE_TEST' : 'PASS_REQUEST_LIFECYCLE_BASELINE_CONTRACT_SOURCE_ONLY',
-  classification: failedCheckIds.length ? 'VALIDATOR_STALE' : 'VALIDATOR_STALE_CORRECTED_SOURCE_ONLY',
+  classification: failedCheckIds.length ? 'PIPELINE_MECHANISM_FAILURE' : 'PIPELINE_MECHANISM_FAILURE_CORRECTED_SOURCE_ONLY',
   total: Object.keys(checks).length,
   passed: Object.values(checks).filter(Boolean).length,
   failed: failedCheckIds.length,
   failedCheckIds,
   checks,
+  requiredScopeFields: ['precheckRequiredBeforeMatrix','directionDesktop','operationalTablet','advisorMobile','viewportCaptureOnly'],
   hardcodedLegacyBaselineAccepted: false,
   sourceOnlyLifecycleAcceptedForRuntime: false,
   runtimePendingLifecycleRequired: true,
   lifecycleBindingRequired: true,
+  canonicalRequestScopeRequiredBeforeRuntime: true,
   secretsRead: false,
   firebaseAccess: false,
   firestoreReads: 0,
