@@ -5,17 +5,20 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const read = file => file && fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, 'utf8')) : null;
+const write = (file, value) => fs.writeFileSync(file, JSON.stringify(value, null, 2) + '\n', 'utf8');
 const PREFLIGHT = process.env.ORBIT360_PREFLIGHT_EVIDENCE;
 const PRECHECK = process.env.ORBIT360_PRECHECK_EVIDENCE;
 const MATRIX = process.env.ORBIT360_MATRIX_EVIDENCE;
 const FINAL = process.env.ORBIT360_FINAL_EVIDENCE;
 const LIFECYCLE = process.env.ORBIT360_LIFECYCLE;
+const OVERLAY = process.env.ORBIT360_OVERLAY;
 const CLOSURE = process.env.ORBIT360_CLOSURE;
 
 const preflight = read(PREFLIGHT);
 const precheck = read(PRECHECK);
 const matrix = read(MATRIX);
 const lifecycle = read(LIFECYCLE);
+const overlay = read(OVERLAY);
 const outcomes = {
   registration: process.env.REGISTRATION_OUTCOME || 'skipped',
   preflight: process.env.PREFLIGHT_OUTCOME || 'skipped',
@@ -54,6 +57,19 @@ const pass =
 const rollbackRequired = deployAttempted && !pass;
 const rollbackRestored = rollbackRequired && outcomes.rollback === 'success';
 
+function falseCapabilities() {
+  return {
+    secrets: false,
+    firestoreRead: false,
+    writes: false,
+    runtime: false,
+    browser: false,
+    deploy: false,
+    functionsDeploy: false,
+    rulesDeploy: false,
+    production: false
+  };
+}
 function failure() {
   if (pass) return { checkpoint: 'MATRIX_COMPLETE', classification: 'PASS_VISUAL_POST_AUTH' };
   if (outcomes.registration !== 'success') return { checkpoint: 'GATE_REGISTRATION_NOT_PASS', classification: 'VALIDATOR_STALE' };
@@ -94,6 +110,7 @@ function failure() {
 const failed = failure();
 const roles = matrix && Array.isArray(matrix.roles) ? matrix.roles : [];
 const captureWarnings = matrix && Array.isArray(matrix.captureWarnings) ? matrix.captureWarnings : [];
+const snapshotIntegrity = matrix && matrix.snapshotIntegrity || precheck && precheck.snapshotIntegrity || 'NOT_VERIFIED';
 const final = {
   schemaVersion: 'orbit360-visual-matrix-corrected-post-auth-final-v2',
   gateId: 'block2.7-visual-matrix-corrected-post-auth-lab-v20260805',
@@ -108,6 +125,8 @@ const final = {
   preflightChecks: preflight && preflight.total || 0,
   outcomes,
   authorizationConsumed: true,
+  authorizationFrozen: true,
+  replayAllowed: false,
   secretAccessed: outcomes.credential !== 'skipped',
   hostingBackupClone: outcomes.backup === 'success',
   hostingDeployAttempted: deployAttempted,
@@ -122,7 +141,7 @@ const final = {
   totalRoleFailures: matrix && matrix.totalRoleFailures != null ? matrix.totalRoleFailures : null,
   totalWarnings: matrix && matrix.totalWarnings != null ? matrix.totalWarnings : captureWarnings.length,
   captureWarnings,
-  snapshotIntegrity: matrix && matrix.snapshotIntegrity || precheck && precheck.snapshotIntegrity || 'NOT_VERIFIED',
+  snapshotIntegrity,
   firestoreReads: Number(precheck && precheck.firestoreReads || 0) + Number(matrix && matrix.firestoreReads || 0),
   firestoreWrites: 0,
   authWrites: 0,
@@ -141,16 +160,25 @@ const final = {
 
 if (!FINAL) throw new Error('FINAL_EVIDENCE_PATH_MISSING');
 fs.mkdirSync(path.dirname(FINAL), { recursive: true });
-fs.writeFileSync(FINAL, JSON.stringify(final, null, 2) + '\n', 'utf8');
+write(FINAL, final);
 
 if (!lifecycle || !LIFECYCLE) throw new Error('PIPELINE_MECHANISM_FAILURE_LIFECYCLE_MISSING');
-lifecycle.ownerVersion = '20260805.4-runtime-consumed';
-lifecycle.status = pass ? 'CONSUMED_PASS' : 'CONSUMED_STOP_RETRY';
+const terminalStatus = pass ? 'CONSUMED_PASS' : `STOP_RETRY_${failed.checkpoint}`;
+lifecycle.ownerVersion = '20260807.43-terminal-control-plane-fail-closed';
+lifecycle.status = terminalStatus;
 lifecycle.classification = final.classification;
-lifecycle.currentPhase = pass ? 'LIVE_VISUAL_VERIFIED' : 'CONSUMED_STOP_RETRY';
+lifecycle.currentPhase = pass ? 'LIVE_VISUAL_VERIFIED' : terminalStatus;
+lifecycle.executionProfile = {
+  mode: pass ? 'CONSUMED_PASS_NO_RUNTIME' : 'STOP_RETRY_NO_RUNTIME',
+  phase: pass ? 'LIVE_VISUAL_VERIFIED' : terminalStatus,
+  capabilities: falseCapabilities()
+};
 lifecycle.activeRequest = false;
+lifecycle.requestRetired = true;
 lifecycle.requestConsumed = true;
 lifecycle.authorizationReserved = false;
+lifecycle.authorizationFrozen = true;
+lifecycle.replayAllowed = false;
 lifecycle.allowedExecutions = 0;
 lifecycle.executionAuthorized = false;
 lifecycle.secretAccessAuthorized = false;
@@ -161,6 +189,13 @@ lifecycle.hostingDeployAuthorized = false;
 lifecycle.functionsDeployAuthorized = false;
 lifecycle.rulesDeployAuthorized = false;
 lifecycle.productionAuthorized = false;
+lifecycle.mainAuthorized = false;
+lifecycle.mergeAuthorized = false;
+lifecycle.stopRetryActive = !pass;
+lifecycle.hostingDeploysMaximum = 0;
+lifecycle.hostingBackupCloneAuthorized = false;
+lifecycle.hostingRollbackCloneAuthorizedOnFailure = false;
+lifecycle.priorHostingRestoreAuthorized = false;
 lifecycle.runtimeResult = {
   runId: final.runId,
   attempt: final.attempt,
@@ -173,13 +208,46 @@ lifecycle.runtimeResult = {
   totalRoleFailures: final.totalRoleFailures,
   captureWarnings: captureWarnings.length
 };
+lifecycle.protectedState = lifecycle.protectedState || {};
 lifecycle.protectedState.currentLabRestoredToPreviousVersion = rollbackRestored;
 lifecycle.protectedState.correctedRootfixHostingLive = pass;
 lifecycle.protectedState.passVisualPostAuth = pass;
+lifecycle.protectedState.snapshotIntegrity = snapshotIntegrity;
 lifecycle.nextAction = pass
   ? 'RESUME_COBROS_4_1_AND_PREPARE_PLATFORM_NATIVE_CRUD_GATE'
   : 'CLOSE_EXACT_CHECKPOINT_ROOT_CAUSE_WITHOUT_RETRY';
-fs.writeFileSync(LIFECYCLE, JSON.stringify(lifecycle, null, 2) + '\n', 'utf8');
+write(LIFECYCLE, lifecycle);
+
+if (OVERLAY) {
+  const nextOverlay = Object.assign({}, overlay || {}, {
+    status: terminalStatus,
+    classification: final.classification,
+    checkpoint: final.checkpoint,
+    stopRetryActive: !pass,
+    requestReusable: false,
+    freshAuthorizationRequired: !pass,
+    expectedNextRequestVersion: 'NONE_PENDING_FRESH_AUTHORIZATION',
+    runtimeAllowed: false,
+    browserAllowed: false,
+    hostingAllowed: false,
+    productionAllowed: false,
+    writesAllowed: false,
+    functionsAllowed: false,
+    rulesAllowed: false,
+    reimportAllowed: false,
+    hostingDeploys: final.hostingDeploys,
+    rollbackRequired: false,
+    rollbackRestored,
+    snapshotIntegrity,
+    firestoreReads: final.firestoreReads,
+    firestoreWrites: 0,
+    authWrites: 0,
+    operationalWrites: 0,
+    passVisualPostAuth: pass,
+    ok: pass
+  });
+  write(OVERLAY, nextOverlay);
+}
 
 if (!CLOSURE) throw new Error('CLOSURE_PATH_MISSING');
 const lines = [
@@ -199,6 +267,7 @@ const lines = [
   'snapshot: ' + final.snapshotIntegrity,
   'role failures: ' + String(final.totalRoleFailures),
   'capture warnings: ' + String(captureWarnings.length),
+  'request/lifecycle/overlay terminal fail-closed: true',
   'Firestore/Auth/operational writes: 0',
   'Functions/Rules/reimport/production/main/merge: 0',
   '~~~',
