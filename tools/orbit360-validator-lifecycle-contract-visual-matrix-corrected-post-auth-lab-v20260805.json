@@ -4,9 +4,9 @@
   "gateId": "block2.7-visual-matrix-corrected-post-auth-lab-v20260805",
   "gateContractVersion": "2.7.8",
   "owner": "orbit360-visual-matrix-corrected-post-auth-v20260805",
-  "ownerVersion": "20260806.24-runtime-v10-phase-aware-authorized",
-  "status": "AUTHORIZED_ONCE_PENDING_EXCLUSIVE_REQUEST",
-  "classification": "RUNTIME_AUTHORIZATION_RESERVED_AFTER_VALIDATOR_STALE_ROOTFIX",
+  "ownerVersion": "20260805.4-runtime-consumed",
+  "status": "CONSUMED_STOP_RETRY",
+  "classification": "GO_VISUAL_MATRIX_CORRECTED_POST_AUTH",
   "secondaryClassification": "PHASE_AWARE_PREFLIGHT_VALIDATOR_17_OF_17_PASS",
   "patternClassification": "REPLICABLE_CLAUDE_ACUMULADO",
   "rcId": "RC-AYS-LAB-CANONICA-01",
@@ -18,7 +18,7 @@
   "authorizedBaseHead": "b2862d8a738711e744d66821d58a4f638e35aa82",
   "requestVersion": "20260806.10-phase-aware-runtime",
   "authorizationDirective": "EXPLICIT_SINGLE_RUNTIME_V10_PHASE_AWARE_RESTORE_BACKUP_HOSTING_LAB_DEPLOY_MATRIX",
-  "currentPhase": "VISUAL_MATRIX_CORRECTED_POST_AUTH_LAB_EXECUTION",
+  "currentPhase": "CONSUMED_STOP_RETRY",
   "executionProfile": {
     "mode": "RUNTIME_ONCE_PHASE_AWARE_RESTORE_BACKUP_DEPLOY_PRECHECK_MATRIX",
     "phase": "VISUAL_MATRIX_CORRECTED_POST_AUTH_LAB_EXECUTION",
@@ -48,9 +48,21 @@
   "functionsDeploysMaximum": 0,
   "rulesDeploysMaximum": 0,
   "browserMatrix": [
-    { "role": "Direccion", "width": 1440, "height": 1000 },
-    { "role": "Operativo", "width": 1024, "height": 768 },
-    { "role": "Asesor", "width": 390, "height": 844 }
+    {
+      "role": "Direccion",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "role": "Operativo",
+      "width": 1024,
+      "height": 768
+    },
+    {
+      "role": "Asesor",
+      "width": 390,
+      "height": 844
+    }
   ],
   "sourcePrerequisites": {
     "authorizedSourceHead": "b2862d8a738711e744d66821d58a4f638e35aa82",
@@ -76,17 +88,17 @@
   },
   "activeRequest": false,
   "requestRetired": false,
-  "requestConsumed": false,
-  "authorizationReserved": true,
+  "requestConsumed": true,
+  "authorizationReserved": false,
   "authorizationFrozen": false,
   "replayAllowed": false,
-  "allowedExecutions": 1,
-  "executionAuthorized": true,
-  "secretAccessAuthorized": true,
-  "firestoreReadAuthorized": true,
+  "allowedExecutions": 0,
+  "executionAuthorized": false,
+  "secretAccessAuthorized": false,
+  "firestoreReadAuthorized": false,
   "writeAuthorized": false,
-  "browserAuthorized": true,
-  "hostingDeployAuthorized": true,
+  "browserAuthorized": false,
+  "hostingDeployAuthorized": false,
   "functionsDeployAuthorized": false,
   "rulesDeployAuthorized": false,
   "productionAuthorized": false,
@@ -102,7 +114,7 @@
     "productionAuthorized": false,
     "currentLabRestoredToPreviousVersion": false,
     "priorV6BackupRestoredBeforeRuntime": false,
-    "correctedRootfixHostingLive": true,
+    "correctedRootfixHostingLive": false,
     "hostingState": "NOT_RESTORED_LAST_CONFIRMED_V6_DEPLOY_LIVE",
     "passVisualPostAuth": false,
     "snapshotIntegrity": "NOT_VERIFIED_FINAL"
@@ -113,5 +125,17 @@
   "containsPII": false,
   "containsSecrets": false,
   "containsPasswords": false,
-  "nextAction": "CREATE_ONE_EXCLUSIVE_IMMUTABLE_V10_REQUEST COMMIT BOUND TO THE ACTIVATION HEAD. PRODUCE GO_GATE_CONTRACT BEFORE SECRETS."
+  "nextAction": "CLOSE_EXACT_CHECKPOINT_ROOT_CAUSE_WITHOUT_RETRY",
+  "runtimeResult": {
+    "runId": "31134090771",
+    "attempt": 1,
+    "result": "STOP_RETRY",
+    "classification": "GO_VISUAL_MATRIX_CORRECTED_POST_AUTH",
+    "checkpoint": "GO_GATE_CONTRACT",
+    "hostingDeploys": 0,
+    "rollbackRestored": false,
+    "snapshotIntegrity": "NOT_VERIFIED",
+    "totalRoleFailures": null,
+    "captureWarnings": 0
+  }
 }
