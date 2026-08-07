@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "orbit360-v23-native-block1-package-manifest-v1",
+  "gateId": "block1-client360-insurers-lab-v20260717",
+  "contractVersion": "1.0.26",
+  "exactRuntimeArtifact": "tools/orbit360-block1-native-matrix-v23-v20260807.mjs",
+  "sharedObserver": "tools/orbit360-event-driven-render-observer-v23.mjs",
+  "universeAdjudicator": "tools/orbit360-adjudicate-block1-universe-readonly-v23-v20260807.mjs",
+  "sourceTest": "tools/orbit360-test-v23-native-block1-source-v20260807.mjs",
+  "preflight": "tools/orbit360-preflight-block1-v23-native-v20260807.mjs",
+  "browserPrecheck": "tools/orbit360-block1-v23-browser-precheck-v20260807.mjs",
+  "runtimeRunner": "tools/orbit360-run-block1-v23-runtime-signal-safe-v20260807.sh",
+  "closure": "tools/orbit360-close-block1-v23-runtime-v20260807.mjs",
+  "sourceWorkflow": ".github/workflows/orbit360-sourcecheck-v23-native-block1-v20260807.yml",
+  "runtimeWorkflow": ".github/workflows/orbit360-registered-relay-v23-native-block1-v20260807.yml",
+  "nativeSource": true,
+  "generatedFromPriorArtifact": false,
+  "textualTransform": false,
+  "requestExists": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
