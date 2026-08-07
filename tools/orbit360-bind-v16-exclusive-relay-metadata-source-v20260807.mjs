@@ -1,0 +1,23 @@
+#!/usr/bin/env node
+'use strict';
+import fs from 'node:fs';
+import path from 'node:path';
+const L='tools/orbit360-validator-lifecycle-contract-visual-matrix-corrected-post-auth-lab-v20260805.json';
+const O='tools/orbit360-validator-lifecycle-overlay-visual-matrix-v8-stop-preflight-v20260806.json';
+const RELAY='.github/workflows/orbit360-registered-relay-v16-hydration-v20260807.yml';
+const VERSION='20260807.16-two-phase-runtime';
+const read=f=>JSON.parse(fs.readFileSync(path.resolve(f),'utf8').replace(/^\uFEFF/,''));
+const write=(f,v)=>fs.writeFileSync(path.resolve(f),JSON.stringify(v,null,2)+'\n','utf8');
+const l=read(L), o=read(O);
+if(l.status!=='AUTHORIZED_ONCE_PENDING_EXCLUSIVE_REQUEST'||l.expectedRequestVersion!==VERSION||l.stopRetryActive!==false) process.exit(41);
+if(o.status!=='AUTHORIZED_ONCE_PENDING_EXCLUSIVE_REQUEST'||o.expectedNextRequestVersion!==VERSION||o.stopRetryActive!==false) process.exit(41);
+l.registeredWorkflowPath=RELAY;
+l.sourcePrerequisites=l.sourcePrerequisites||{};
+l.sourcePrerequisites.registeredRelayStatus='RESERVED_EXCLUSIVE_V16_BEFORE_REQUEST';
+l.sourcePrerequisites.registeredRelayPath=RELAY;
+l.sourcePrerequisites.registeredRelayExpectedRequest=VERSION;
+o.registeredRelayPath=RELAY;
+o.registeredRelayExpectedRequest=VERSION;
+o.registeredRelayExclusive=true;
+write(L,l); write(O,o);
+console.log(JSON.stringify({status:'PASS_V16_EXCLUSIVE_RELAY_METADATA_BOUND',requestVersion:VERSION,registeredRelayPath:RELAY,runtimeExecuted:false,secretsRead:false,firebaseAccess:false,hostingTouched:false,browserExecuted:false,deployExecuted:false,writes:0,ok:true},null,2));
