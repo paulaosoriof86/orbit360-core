@@ -69,12 +69,16 @@ jobs:
           bash -n tools/orbit360-preflight-visual-matrix-runtime-relay-v8-v20260806.sh
           bash -n tools/orbit360-restore-visual-matrix-v6-backup-before-runtime-v20260806.sh
           bash -n tools/orbit360-run-visual-matrix-corrected-post-auth-runtime-only-v3-cross-runner-v20260806.sh
+          bash -n tools/orbit360-run-visual-matrix-corrected-post-auth-runtime-only-v4-transport-base-sha-v20260806.sh
           node --check tools/orbit360-json-guard-visual-matrix-runtime-v20260806.mjs
           node --check tools/orbit360-attach-visual-matrix-v7-restore-evidence-v20260806.mjs
+          node --check tools/orbit360-validate-runtime-transport-context-v20260806.mjs
+          node --check tools/orbit360-test-runtime-transport-base-sha-v20260806.mjs
           node tools/orbit360-test-windows-signal-compatibility-synthetic-v20260806.mjs
           node tools/orbit360-test-visual-matrix-timeout-signal-safe-portable-v20260806.mjs
           node tools/orbit360-test-visual-matrix-cross-runner-portable-v20260806.mjs
           node tools/orbit360-test-preflight-portable-source-v20260806.mjs
+          node tools/orbit360-test-runtime-transport-base-sha-v20260806.mjs
 
       - name: GO_GATE_CONTRACT before secrets
         if: steps.detect.outputs.dispatch == 'true'
@@ -109,7 +113,7 @@ jobs:
           FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
           FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-        run: bash tools/orbit360-run-visual-matrix-corrected-post-auth-runtime-only-v3-cross-runner-v20260806.sh
+        run: bash tools/orbit360-run-visual-matrix-corrected-post-auth-runtime-only-v4-transport-base-sha-v20260806.sh
 
       - name: Attach prior restore to closure
         if: always() && steps.detect.outputs.dispatch == 'true' && steps.preflight.outputs.go == 'true'
