@@ -34,7 +34,7 @@ jobs:
           fetch-depth: 0
           persist-credentials: true
 
-      - name: Detect canonical exclusive fresh authorized request
+      - name: Detect canonical exclusive fresh authorized request and exact transport base
         id: detect
         shell: bash
         run: |
@@ -58,8 +58,25 @@ jobs:
             echo 'SKIP_REGISTERED_RELAY_REQUEST_NOT_ACTIVE_FRESH_VERSION'
             exit 0
           fi
+          REQUEST_COMMIT="$(git rev-parse HEAD)"
+          REQUEST_PARENT="$(git rev-parse HEAD^)"
+          BASE_REF="${GITHUB_BASE_REF:-}"
+          if [[ -z "$BASE_REF" ]]; then
+            echo 'dispatch=false' >> "$GITHUB_OUTPUT"
+            echo 'SKIP_REGISTERED_RELAY_TRANSPORT_BASE_REF_MISSING'
+            exit 0
+          fi
+          BASE_SHA="$(git rev-parse "origin/${BASE_REF}^{commit}" 2>/dev/null || true)"
+          if [[ -z "$BASE_SHA" || "$BASE_SHA" != "$REQUEST_PARENT" ]]; then
+            echo 'dispatch=false' >> "$GITHUB_OUTPUT"
+            echo "SKIP_REGISTERED_RELAY_TRANSPORT_BASE_SHA_MISMATCH base=${BASE_SHA:-UNRESOLVED} parent=$REQUEST_PARENT"
+            exit 0
+          fi
           echo 'dispatch=true' >> "$GITHUB_OUTPUT"
-          echo "request_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          echo "request_sha=$REQUEST_COMMIT" >> "$GITHUB_OUTPUT"
+          echo "request_parent=$REQUEST_PARENT" >> "$GITHUB_OUTPUT"
+          echo "transport_base_sha=$BASE_SHA" >> "$GITHUB_OUTPUT"
+          echo 'PASS_REGISTERED_RELAY_TRANSPORT_BASE_SHA_BEFORE_SECRETS'
 
       - name: Validate source package before gate
         if: steps.detect.outputs.dispatch == 'true'
