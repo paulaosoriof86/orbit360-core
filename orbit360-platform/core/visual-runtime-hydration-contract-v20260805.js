@@ -5,6 +5,7 @@
    - Proyecta responsables en lectura desde membresía activa y
      relaciones canónicas, sin escribir ni hardcodear usuarios.
    - Conserva diagnóstico interno del estado degradado real.
+   - Revalida el owner Orbit.store para evitar drift de composición.
    ============================================================ */
 (function () {
   'use strict';
@@ -12,7 +13,7 @@
   if (Orbit.__visualHydrationContractV20260805) return;
   Orbit.__visualHydrationContractV20260805 = true;
 
-  var VERSION = '20260805.1';
+  var VERSION = '20260807.2';
   var OPTIONAL_LEGACY = ['asesores', 'metas', 'negocios', 'gestiones', 'comisiones', 'cancelaciones'];
   var CONTRACTS = {
     inicio: { required: ['clientes', 'polizas', 'cobros', 'aseguradoras'], optional: ['asesores', 'metas', 'negocios', 'gestiones'] },
@@ -27,6 +28,8 @@
   };
 
   var installed = false;
+  var installedStore = null;
+  var listenersBound = false;
   var originalStatus = null;
   var originalStore = null;
   var observer = null;
@@ -40,8 +43,7 @@
   }
   function routeKey() {
     try { return text(Orbit.route && Orbit.route.key); }
-    catch (error) { return '';
-    }
+    catch (error) { return ''; }
   }
   function actualStatus() {
     try {
@@ -132,7 +134,8 @@
   }
 
   function installAdvisorProjection() {
-    if (!Orbit.store || Orbit.store.__advisorProjectionV20260805) return true;
+    if (!Orbit.store) return false;
+    if (Orbit.store.__advisorProjectionV20260805) return true;
     originalStore = {
       all: Orbit.store.all.bind(Orbit.store),
       get: Orbit.store.get.bind(Orbit.store),
@@ -211,6 +214,7 @@
       requiredCanonicalReady: true,
       optionalLegacyDegraded: degraded.length > 0,
       optionalLegacyUnavailableCount: degraded.length,
+      storeBound: installedStore === Orbit.store,
       writes: 0
     };
     return output;
@@ -241,7 +245,7 @@
   }
 
   function paintDegradedState() {
-    if (!installed || document.body.classList.contains('pre-auth')) return;
+    if (!installed || installedStore !== Orbit.store || document.body.classList.contains('pre-auth')) return;
     var route = routeKey();
     var contract = CONTRACTS[route];
     var host = document.getElementById('host');
@@ -276,6 +280,9 @@
       version: VERSION,
       contracts: clone(CONTRACTS),
       writes: 0,
+      mounted: function () {
+        return !!(installed && installedStore === Orbit.store && Orbit.store && Orbit.store.__visualHydrationContractV20260805);
+      },
       status: function (moduleName) {
         return split(CONTRACTS[moduleName] || { required: [], optional: [] }, actualStatus());
       },
@@ -287,27 +294,41 @@
     };
   }
 
-  function install() {
-    if (installed) return true;
-    if (!window.Orbit || !Orbit.store || !Orbit.q || !Orbit.modules) return false;
-    if (!installAdvisorProjection()) return false;
-    if (!installStatusContract()) return false;
-    injectStyle();
-    exposeDiagnostics();
-    installed = true;
-    document.body.dataset.visualHydrationContractV20260805 = VERSION;
+  function bindUiObserversOnce() {
+    if (listenersBound) return;
+    listenersBound = true;
     observer = new MutationObserver(function () { setTimeout(paintDegradedState, 0); });
     var host = document.getElementById('host');
     if (host) observer.observe(host, { childList: true, subtree: true });
     window.addEventListener('hashchange', function () { setTimeout(paintDegradedState, 0); });
     window.addEventListener('orbit:store:emit', function () { setTimeout(paintDegradedState, 0); });
+  }
+
+  function install() {
+    if (!window.Orbit || !Orbit.store || !Orbit.q || !Orbit.modules) return false;
+    if (installedStore !== Orbit.store) {
+      installed = false;
+      installedStore = null;
+      originalStatus = null;
+      originalStore = null;
+      lastActualStatus = null;
+    }
+    if (!installAdvisorProjection()) return false;
+    if (!installStatusContract()) return false;
+    injectStyle();
+    installed = true;
+    installedStore = Orbit.store;
+    exposeDiagnostics();
+    bindUiObserversOnce();
+    document.body.dataset.visualHydrationContractV20260805 = VERSION;
+    document.body.dataset.visualHydrationContractStoreBound = 'true';
     setTimeout(paintDegradedState, 0);
     return true;
   }
 
   (function boot(attempt) {
-    if (install()) return;
+    install();
     if (attempt >= 500) return;
-    setTimeout(function () { boot(attempt + 1); }, 20);
+    setTimeout(function () { boot(attempt + 1); }, installed ? 100 : 20);
   })(0);
 })();
