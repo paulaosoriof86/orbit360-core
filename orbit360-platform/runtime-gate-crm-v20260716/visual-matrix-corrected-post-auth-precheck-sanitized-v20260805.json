@@ -2,94 +2,85 @@
   "schemaVersion": "orbit360-visual-runtime-rootfix-browser-precheck-v2-hydration-contract-aware",
   "gateId": "block2.7-visual-runtime-rootfix-lab-v20260805",
   "contractVersion": "2.7.2",
-  "stage": "PASS_VISUAL_BROWSER_PRECHECK",
-  "checkpoint": "INICIO_READY_PASS",
+  "stage": "FAIL_VISUAL_BROWSER_PRECHECK",
+  "checkpoint": "INICIO_REQUIRED_HYDRATION_TIMEOUT",
   "checkpoints": [
     {
       "checkpoint": "SERVICE_ACCOUNT_VALIDATE",
-      "at": "2026-08-07T15:12:42.069Z"
+      "at": "2026-08-07T15:53:33.297Z"
     },
     {
       "checkpoint": "MEMBERSHIP_READ",
-      "at": "2026-08-07T15:12:42.096Z"
+      "at": "2026-08-07T15:53:33.337Z"
     },
     {
       "checkpoint": "BROWSER_LAUNCH",
-      "at": "2026-08-07T15:12:42.498Z"
+      "at": "2026-08-07T15:53:33.789Z"
     },
     {
       "checkpoint": "PAGE_GOTO",
-      "at": "2026-08-07T15:12:43.457Z"
+      "at": "2026-08-07T15:53:34.031Z"
     },
     {
       "checkpoint": "LOGIN_FORM_PASS",
-      "at": "2026-08-07T15:12:47.294Z"
+      "at": "2026-08-07T15:53:37.391Z"
     },
     {
       "checkpoint": "ROOTFIX_MARKER_WAIT",
-      "at": "2026-08-07T15:12:47.295Z"
+      "at": "2026-08-07T15:53:37.391Z"
     },
     {
       "checkpoint": "ROOTFIX_MARKER_PASS",
-      "at": "2026-08-07T15:12:47.302Z",
-      "elapsedMs": 7
+      "at": "2026-08-07T15:53:37.401Z",
+      "elapsedMs": 10
     },
     {
       "checkpoint": "HYDRATION_CONTRACT_MOUNTED_WAIT",
-      "at": "2026-08-07T15:12:47.302Z"
+      "at": "2026-08-07T15:53:37.401Z"
     },
     {
       "checkpoint": "HYDRATION_CONTRACT_MOUNTED_PASS",
-      "at": "2026-08-07T15:12:47.304Z",
+      "at": "2026-08-07T15:53:37.403Z",
       "elapsedMs": 2
     },
     {
       "checkpoint": "FIREBASE_AUTH_WAIT",
-      "at": "2026-08-07T15:12:47.304Z"
+      "at": "2026-08-07T15:53:37.403Z"
     },
     {
       "checkpoint": "FIREBASE_AUTH_PASS",
-      "at": "2026-08-07T15:12:47.306Z",
-      "elapsedMs": 2
+      "at": "2026-08-07T15:53:37.406Z",
+      "elapsedMs": 3
     },
     {
       "checkpoint": "CUSTOM_TOKEN_CREATE",
-      "at": "2026-08-07T15:12:47.306Z"
+      "at": "2026-08-07T15:53:37.406Z"
     },
     {
       "checkpoint": "CUSTOM_TOKEN_SIGNIN",
-      "at": "2026-08-07T15:12:47.345Z"
+      "at": "2026-08-07T15:53:37.474Z"
     },
     {
       "checkpoint": "AUTH_INSIDE_WAIT",
-      "at": "2026-08-07T15:12:47.668Z"
+      "at": "2026-08-07T15:53:37.668Z"
     },
     {
       "checkpoint": "AUTH_INSIDE_PASS",
-      "at": "2026-08-07T15:12:47.927Z",
-      "elapsedMs": 259
+      "at": "2026-08-07T15:53:37.978Z",
+      "elapsedMs": 310
     },
     {
       "checkpoint": "REMOVE_EPHEMERAL_OVERLAYS",
-      "at": "2026-08-07T15:12:47.927Z"
+      "at": "2026-08-07T15:53:37.978Z"
     },
     {
       "checkpoint": "INICIO_REQUIRED_HYDRATION_WAIT",
-      "at": "2026-08-07T15:12:47.938Z"
+      "at": "2026-08-07T15:53:37.980Z"
     },
     {
-      "checkpoint": "INICIO_REQUIRED_HYDRATION_PASS",
-      "at": "2026-08-07T15:12:49.357Z",
-      "elapsedMs": 1419
-    },
-    {
-      "checkpoint": "INICIO_READY_WAIT",
-      "at": "2026-08-07T15:12:49.357Z"
-    },
-    {
-      "checkpoint": "INICIO_READY_PASS",
-      "at": "2026-08-07T15:13:11.046Z",
-      "elapsedMs": 21689
+      "checkpoint": "INICIO_REQUIRED_HYDRATION_TIMEOUT",
+      "at": "2026-08-07T15:54:12.986Z",
+      "elapsedMs": 35006
     }
   ],
   "projectId": "ays-orbit-360-lab",
@@ -103,7 +94,7 @@
   "containsPII": false,
   "containsSecrets": false,
   "containsPasswords": false,
-  "ok": true,
+  "ok": false,
   "membershipHash": "ef23e793fdfeb221",
   "observedState": {
     "href": "https://ays-orbit-360-lab.web.app/index.html?orbitBackend=firestore-lab&tenant=alianzas-soluciones&runtime=20260717-2",
@@ -115,80 +106,63 @@
     "membershipStatus": "ready",
     "membershipReady": true,
     "membershipTenantBound": true,
-    "route": "inicio",
+    "route": "",
     "rootfixLoaded": true,
     "hydrationContractLoaded": true,
     "hydrationContractMounted": true,
-    "hydrationInicioReady": true,
+    "hydrationInicioReady": false,
     "hydrationInicioDegraded": true,
     "hydration": {
       "loaded": true,
       "storeMarker": true,
       "mounted": true,
-      "ready": true,
+      "ready": false,
       "degraded": true,
-      "requiredMissing": [],
+      "requiredMissing": [
+        "clientes",
+        "polizas",
+        "cobros",
+        "aseguradoras"
+      ],
       "requiredFailed": [],
-      "optionalMissing": [],
-      "optionalFailed": [
+      "optionalMissing": [
         "asesores",
         "metas",
         "negocios",
         "gestiones"
-      ]
+      ],
+      "optionalFailed": []
     },
-    "runtimeDiagnosticInicio": true,
+    "runtimeDiagnosticInicio": false,
     "loadingVisible": false,
-    "hostTextLength": 1143,
+    "hostTextLength": 0,
     "lab": {
-      "status": "ready",
-      "snapshotAttached": true,
-      "snapshotAttachedCount": 29,
+      "status": "",
+      "snapshotAttached": false,
+      "snapshotAttachedCount": 0,
       "rawCountKeys": [
-        "aseguradoras",
         "asesores",
         "cancelaciones",
-        "carteraPrimas",
-        "clientes",
-        "cobros",
         "comisiones",
         "gestiones",
         "metas",
-        "negocios",
-        "polizas",
-        "recibosEsperados",
-        "vehiculos"
+        "negocios"
       ],
-      "snapshotErrorKeys": [
-        "__prefs",
-        "acreedores",
-        "actividades",
-        "avisos",
-        "contenidos",
-        "correos",
-        "cursos",
-        "documentos",
-        "facturas",
-        "finmovs",
-        "notifs",
-        "novedades",
-        "plantillas",
-        "presupuesto",
-        "reclamos",
-        "reportes_prog",
-        "tareas"
-      ],
+      "snapshotErrorKeys": [],
       "visualHydrationContract": {
-        "version": "20260807.2",
+        "version": "20260807.3-advisor-cache-unified-readiness",
         "requiredCanonicalReady": true,
         "optionalLegacyDegraded": true,
         "optionalLegacyUnavailableCount": 6,
         "storeBound": true,
+        "readinessAuthority": "OrbitHydrationContractDiagnostics",
+        "advisorProjectionBuilds": 0,
+        "advisorProjectionInvalidations": 0,
         "writes": 0
       }
     }
   },
-  "consoleErrorCount": 0,
-  "consoleErrors": [],
-  "classification": "GO_FULL_VISUAL_MATRIX"
+  "classification": "DATA_CONTRACT_FAILURE",
+  "error": "page.waitForFunction: Timeout 35000ms exceeded.",
+  "failureScreenshot": "precheck-failure.png"
 }
