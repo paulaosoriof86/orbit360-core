@@ -19,17 +19,16 @@ for (const file of [matrixPath, observerPath, adjudicatorPath]) {
   const run = spawnSync(process.execPath, ['--check', file], { encoding: 'utf8' });
   checks['syntax:' + path.basename(file)] = run.status === 0;
 }
-const validate = spawnSync(process.execPath, [matrixPath], {
-  encoding: 'utf8',
-  env: { ...process.env, ORBIT360_MATRIX_ARTIFACT_VALIDATE_ONLY: '1' }
-});
+const validate = spawnSync(process.execPath, [matrixPath], { encoding: 'utf8', env: { ...process.env, ORBIT360_MATRIX_ARTIFACT_VALIDATE_ONLY: '1' } });
 let validation = {};
 try { validation = JSON.parse((validate.stdout || '').trim().split(/\r?\n/).filter(Boolean).pop() || '{}'); } catch {}
 checks.exactNativeImport = validate.status === 0 && validation.status === 'PASS_V23_NATIVE_MATRIX_IMPORT' && validation.ok === true;
 checks.exactSameRuntimeFile = validation.sourceContract && validation.sourceContract.schemaVersion === 'orbit360-block1-client360-insurers-native-matrix-v23';
 checks.nativeNotGenerated = validation.sourceContract && validation.sourceContract.nativeSource === true && validation.sourceContract.generatedFromPriorArtifact === false && validation.sourceContract.textualTransform === false;
+checks.roleScopedTargetContract = validation.sourceContract && validation.sourceContract.roleScopedTargets === true && matrix.includes('async function roleScopedTargets(page)') && matrix.includes('cliente360-role-scoped-target-exists') && matrix.includes('aseguradoras-role-scoped-target-exists');
+checks.noGlobalEntityTargetSelector = !matrix.includes('async function selectTargets(db)') && !matrix.includes('async function entityTargets(db)');
 checks.noV21Builder = !matrix.includes('buildV21MatrixArtifact') && !matrix.includes('buildV22MatrixArtifact');
-checks.noTextualSurgery = !matrix.includes('source.replace(') && !matrix.includes('source.match(') && !matrix.includes('source.slice(') && !matrix.includes('testRolePattern') && !matrix.includes('mainBlockPattern') && !matrix.includes('buildV21MatrixArtifact') && !matrix.includes('buildV22MatrixArtifact');
+checks.noTextualSurgery = !matrix.includes('source.replace(') && !matrix.includes('source.match(') && !matrix.includes('source.slice(') && !matrix.includes('testRolePattern') && !matrix.includes('mainBlockPattern');
 checks.blockingRoutesExact = matrix.includes("Object.freeze(['inicio', 'cliente360', 'aseguradoras'])");
 checks.legacyRoutesNonblocking = ['polizas','cobros','ops','leads','conciliaciones','cancelaciones'].every(x => matrix.includes(`'${x}'`)) && matrix.includes('V23_NONBLOCKING_LEDGER');
 checks.detailTargetsNonblocking = ['vehicle-detail-button','receipt-detail-button','cobro-detail-button'].every(x => matrix.includes(x));
@@ -46,16 +45,7 @@ checks.clientAndInsurerContracts = ['cliente360-list','cliente360-detail','clien
 checks.technicalCopyGate = matrix.includes('cliente360-no-technical-copy') && matrix.includes('aseguradoras-no-technical-copy');
 checks.snapshotRequired = matrix.includes("snapshotIntegrity = snapshotsEqual(result.before, result.after) ? 'VERIFIED_UNCHANGED' : 'CHANGED'");
 
-const makeRows = (count, kind, mutate = () => ({})) => Array.from({ length: count }, (_, i) => ({
-  id: `${kind}-${i}`,
-  data: {
-    pais: 'GT', moneda: 'GTQ', estado: 'Activo',
-    identificacion: kind === 'clientes' ? `C${i}` : undefined,
-    nit: kind === 'aseguradoras' ? `N${i}` : undefined,
-    codigo: kind === 'asesores' ? `A${i}` : undefined,
-    ...mutate(i)
-  }
-}));
+const makeRows = (count, kind, mutate = () => ({})) => Array.from({ length: count }, (_, i) => ({ id: `${kind}-${i}`, data: { pais: 'GT', moneda: 'GTQ', estado: 'Activo', identificacion: kind === 'clientes' ? `C${i}` : undefined, nit: kind === 'aseguradoras' ? `N${i}` : undefined, codigo: kind === 'asesores' ? `A${i}` : undefined, ...mutate(i) } }));
 const clients = makeRows(430, 'clientes', i => i >= 414 ? { estado: 'Historico' } : {});
 const insurers = makeRows(30, 'aseguradoras', i => i >= 26 ? { vinculada: false } : {});
 const advisors = makeRows(7, 'asesores');
@@ -71,7 +61,7 @@ checks.adjudicatorNoWrites = adjudicator.includes('firestoreWrites: 0') && adjud
 
 const failedCheckIds = Object.entries(checks).filter(([, ok]) => ok !== true).map(([id]) => id);
 const output = {
-  schemaVersion: 'orbit360-v23-native-block1-source-test-v1',
+  schemaVersion: 'orbit360-v23-native-block1-source-test-v2-role-scoped-targets',
   status: failedCheckIds.length ? 'STOP_V23_NATIVE_BLOCK1_SOURCE' : 'PASS_V23_NATIVE_BLOCK1_SOURCE_ONLY',
   classification: failedCheckIds.length ? 'PIPELINE_MECHANISM_FAILURE' : 'PIPELINE_MECHANISM_FAILURE_CORRECTED_SOURCE_ONLY',
   total: Object.keys(checks).length,
