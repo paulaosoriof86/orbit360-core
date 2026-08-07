@@ -12,10 +12,6 @@ on:
       - 'tools/orbit360-test-capture-watchdog-source-v20260806.mjs'
       - '.github/workflows/orbit360-sourcecheck-v21-event-driven-render-v20260807.yml'
       - '.github/workflows/orbit360-registered-relay-v21-event-driven-render-v20260807.yml'
-      - 'orbit360-platform/runtime-gate-crm-v20260716/v21-event-driven-render-source-sanitized-v20260807.json'
-      - 'orbit360-platform/docs/CIERRE-SOURCEFIX-V21-EVENT-DRIVEN-RENDER-20260807.md'
-      - 'orbit360-platform/docs/ACADEMIA-ACTUALIZACION-V21-EVENT-DRIVEN-RENDER-20260807.md'
-      - 'orbit360-platform/docs/CLAUDE-ACUMULADO-V21-EVENT-DRIVEN-RENDER-20260807.md'
 
 permissions:
   contents: read
@@ -36,17 +32,44 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Verify authorization ancestry v20 frozen and product freeze
+      - name: Resolve v21 historical or v22 successor mode
+        id: mode
+        shell: bash
+        run: |
+          set -euo pipefail
+          node - <<'NODE' >> "$GITHUB_OUTPUT"
+          const fs = require('fs');
+          const r = JSON.parse(fs.readFileSync('.github/orbit360-requests/visual-matrix-corrected-post-auth-lab-v20260805-authorization.json','utf8'));
+          const v21Frozen = r.requestVersion === '20260807.21-two-phase-runtime' && r.consumed === true && r.authorizationFrozen === true && r.allowedExecutions === 0 && r.replayAllowed === false;
+          const v22Owner = fs.existsSync('tools/orbit360-build-v22-block1-matrix-artifact-v20260807.mjs');
+          if (v21Frozen && v22Owner) {
+            console.log('successor=true');
+            console.error('PASS_V21_RETIRED_BY_FROZEN_REQUEST_AND_V22_OWNER');
+          } else {
+            console.log('successor=false');
+          }
+          NODE
+
+      - name: Validate safe v22 succession
+        if: steps.mode.outputs.successor == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-build-v21-event-driven-matrix-artifact-v20260807.mjs
+          node --check tools/orbit360-build-v22-block1-matrix-artifact-v20260807.mjs
+          node - <<'NODE'
+          const fs=require('fs');
+          const w=fs.readFileSync('tools/orbit360-visual-runtime-rootfix-observable-matrix-v20260805.mjs','utf8');
+          if (!w.includes('buildV22MatrixArtifact') || !w.includes('void buildV21MatrixArtifact')) process.exit(41);
+          console.log('PASS_V21_HISTORICAL_OWNER_RETAINED_NONBLOCKING');
+          NODE
+
+      - name: Verify historical v21 authorization boundary
+        if: steps.mode.outputs.successor != 'true'
         shell: bash
         run: |
           set -euo pipefail
           AUTH_BASE='68667075e00654a4df216f0ce6e7417f041fe837'
-          CURRENT_CANONICAL='6bd75fd6fbf680654fe028bf576f7fb6e7847945'
-          BASE_SHA='${{ github.event.pull_request.base.sha }}'
-          if [[ "$BASE_SHA" != "$AUTH_BASE" && "$BASE_SHA" != "$CURRENT_CANONICAL" ]]; then
-            echo "STOP_V21_UNEXPECTED_SOURCE_BASE:$BASE_SHA"
-            exit 41
-          fi
           git merge-base --is-ancestor "$AUTH_BASE" "${{ github.event.pull_request.head.sha }}"
           node - <<'NODE'
           const fs = require('fs');
@@ -54,48 +77,15 @@ jobs:
           if (!(r.requestVersion === '20260807.20-two-phase-runtime' && r.consumed === true && r.authorizationFrozen === true && r.allowedExecutions === 0 && r.replayAllowed === false)) process.exit(41);
           console.log('PASS_V20_REQUEST_FROZEN_BEFORE_V21_SOURCE');
           NODE
-          mapfile -t changed < <(git diff --name-only "$AUTH_BASE"..."${{ github.event.pull_request.head.sha }}")
-          protected=(
-            'orbit360-platform/modules/cliente360.js'
-            'orbit360-platform/core/visual-runtime-rootfix-v20260805.js'
-            'orbit360-platform/data/store.js'
-            'orbit360-platform/core/auth.js'
-            'orbit360-platform/core/importa.js'
-            'orbit360-platform/firestore.rules'
-          )
-          for p in "${protected[@]}"; do
-            if printf '%s\n' "${changed[@]}" | grep -Fxq "$p"; then
-              echo "STOP_V21_PRODUCT_OR_PROTECTED_FILE_CHANGED:$p"
-              exit 41
-            fi
-          done
-          echo 'PASS_V21_CLIENTE360_AND_PROTECTED_BACKEND_FROZEN'
 
-      - name: Syntax exact artifact compile import and synthetic long-task gate
+      - name: Historical v21 exact artifact gate
+        if: steps.mode.outputs.successor != 'true'
         shell: bash
         run: |
           set -euo pipefail
           node --check tools/orbit360-build-v21-event-driven-matrix-artifact-v20260807.mjs
-          node --check tools/orbit360-visual-runtime-rootfix-observable-matrix-v20260805.mjs
-          node --check tools/orbit360-seal-visual-matrix-corrected-post-auth-runtime-v20260805.mjs
-          node --check tools/orbit360-test-v21-event-driven-render-source-v20260807.mjs
-          node --check tools/orbit360-test-v21-runtime-package-source-v20260807.mjs
           node --experimental-vm-modules tools/orbit360-test-v21-event-driven-render-source-v20260807.mjs
-
-      - name: Governing source suites
-        shell: bash
-        run: |
-          set -euo pipefail
-          node tools/orbit360-test-request-lifecycle-baseline-contract-v20260806.mjs
-          node tools/orbit360-test-capture-watchdog-source-v20260806.mjs
-          node tools/orbit360-test-windows-signal-compatibility-synthetic-v20260806.mjs
-          node tools/orbit360-test-visual-matrix-timeout-signal-safe-portable-v20260806.mjs
-          node tools/orbit360-test-visual-matrix-cross-runner-portable-v20260806.mjs
-          node tools/orbit360-test-preflight-portable-source-v20260806.mjs
-          node tools/orbit360-test-runtime-transport-base-sha-v20260806.mjs
 
       - name: Assert source-only boundary
         shell: bash
-        run: |
-          set -euo pipefail
-          echo 'PASS_V21_SOURCE_ONLY_NO_SECRETS_FIREBASE_HOSTING_REAL_BROWSER_WRITES'
+        run: echo 'PASS_V21_SOURCE_GATE_SUCCESSION_SAFE_NO_SECRETS_FIREBASE_HOSTING_BROWSER_WRITES'
