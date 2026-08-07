@@ -57,6 +57,15 @@ const pass =
 const rollbackRequired = deployAttempted && !pass;
 const rollbackRestored = rollbackRequired && outcomes.rollback === 'success';
 const browserExecuted = outcomes.precheck !== 'skipped' || outcomes.matrix !== 'skipped' || Boolean(matrix && matrix.currentCheckpoint && matrix.currentCheckpoint !== 'BOOT');
+const matrixCheckpoint = matrix && (matrix.currentCheckpoint || matrix.checkpoint) || '';
+const matrixError = String(matrix && matrix.error || '');
+const matrixArtifactPipelineFailure =
+  outcomes.matrix === 'failure' && (
+    !matrix ||
+    matrix.classification === 'PIPELINE_MECHANISM_FAILURE' ||
+    /MATRIX_ARTIFACT_(COMPILE|IMPORT)/.test(matrixError) ||
+    /MATRIX_ARTIFACT_(COMPILE|IMPORT)_FAILED/.test(matrixCheckpoint)
+  );
 
 function falseCapabilities() {
   return {
@@ -97,12 +106,20 @@ function failure() {
       classification: precheck && precheck.classification || 'ENVIRONMENT_FAILURE'
     };
   }
+  if (!matrixPass && matrixArtifactPipelineFailure) {
+    return {
+      checkpoint: rollbackRequired && !rollbackRestored
+        ? 'MATRIX_ARTIFACT_FAILED_ROLLBACK_FAILED'
+        : matrixCheckpoint || 'MATRIX_ARTIFACT_IMPORT_FAILED',
+      classification: 'PIPELINE_MECHANISM_FAILURE'
+    };
+  }
   if (!matrixPass) {
     return {
       checkpoint: rollbackRequired && !rollbackRestored
         ? 'MATRIX_FAILED_ROLLBACK_FAILED'
-        : matrix && (matrix.currentCheckpoint || matrix.checkpoint) || 'VISUAL_MATRIX_FAILED',
-      classification: matrix && matrix.classification || 'FUNCTIONAL_DEFECT'
+        : matrixCheckpoint || 'VISUAL_MATRIX_FAILED',
+      classification: matrix && matrix.classification || 'PIPELINE_MECHANISM_FAILURE'
     };
   }
   return { checkpoint: 'PIPELINE_UNKNOWN', classification: 'PIPELINE_MECHANISM_FAILURE' };
@@ -138,7 +155,7 @@ const final = {
   precheckStage: precheck && precheck.stage || 'NOT_EXECUTED',
   precheckCheckpoint: precheck && (precheck.checkpoint || precheck.currentCheckpoint) || 'NOT_EXECUTED',
   matrixStage: outcomes.matrix === 'skipped' ? 'NOT_EXECUTED' : matrix && matrix.stage || 'NOT_EXECUTED',
-  matrixCheckpoint: outcomes.matrix === 'skipped' ? 'NOT_EXECUTED' : matrix && (matrix.currentCheckpoint || matrix.checkpoint) || 'NOT_EXECUTED',
+  matrixCheckpoint: outcomes.matrix === 'skipped' ? 'NOT_EXECUTED' : matrixCheckpoint || 'NOT_EXECUTED',
   matrixValidatorFinding: outcomes.matrix === 'skipped' ? '' : matrix && matrix.validatorFinding || '',
   routeMetrics: outcomes.matrix === 'skipped' ? [] : matrix && Array.isArray(matrix.routeMetrics) ? matrix.routeMetrics : [],
   roleResults: outcomes.matrix === 'skipped' ? [] : roles,
@@ -168,7 +185,7 @@ write(FINAL, final);
 
 if (!lifecycle || !LIFECYCLE) throw new Error('PIPELINE_MECHANISM_FAILURE_LIFECYCLE_MISSING');
 const terminalStatus = pass ? 'CONSUMED_PASS' : `STOP_RETRY_${failed.checkpoint}`;
-lifecycle.ownerVersion = '20260807.43-terminal-control-plane-fail-closed';
+lifecycle.ownerVersion = '20260807.50-v20-exact-artifact-gate-terminal';
 lifecycle.status = terminalStatus;
 lifecycle.classification = final.classification;
 lifecycle.currentPhase = pass ? 'LIVE_VISUAL_VERIFIED' : terminalStatus;
