@@ -1,6 +1,6 @@
 {
   "schemaVersion": "orbit360-visual-matrix-v10-transport-base-ref-stop-v1",
-  "generatedAt": "2026-08-06T18:21:00-06:00",
+  "generatedAt": "2026-08-06T18:29:00-06:00",
   "gateId": "block2.7-visual-matrix-corrected-post-auth-lab-v20260805",
   "contractVersion": "2.7.8",
   "requestVersion": "20260806.10-phase-aware-runtime",
@@ -66,12 +66,23 @@
   "snapshotIntegrity": "NOT_VERIFIED_FINAL",
   "sourcefix": {
     "strategy": "VALIDATE_ACTUAL_PULL_REQUEST_BASE_SHA_AGAINST_REQUEST_PARENT_HEAD_BEFORE_DELEGATING_TO_AUDITED_V3_RUNNER",
+    "status": "PASS_RUNTIME_TRANSPORT_BASE_SHA_SOURCE_ONLY",
+    "runId": 31134786817,
+    "jobId": 92731630603,
+    "relaySafetyRunId": 31134786750,
+    "checksPassed": 12,
+    "checksFailed": 0,
+    "phaseAwareChecksPassed": 17,
     "runtimeReexecuted": false,
-    "status": "PENDING_SOURCE_ONLY_VALIDATION"
+    "secretAccess": false,
+    "firebaseAccess": false,
+    "hostingTouched": false,
+    "deployExecuted": false,
+    "writes": 0
   },
   "containsPII": false,
   "containsSecrets": false,
   "containsPasswords": false,
   "ok": false,
-  "nextAction": "Validate the immutable base-SHA transport wrapper source-only. Do not reuse v10 or execute runtime without a new explicit authorization."
+  "nextAction": "Keep STOP_RETRY. Do not reuse v10. Any future runtime requires a new explicit authorization bound to the then-current canonical HEAD."
 }
