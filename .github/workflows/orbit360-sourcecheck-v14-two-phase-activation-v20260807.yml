@@ -42,6 +42,28 @@ jobs:
           fi
           echo "observed_phase=$PHASE"
 
+      - name: Validate transport base fail-closed before secrets source-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-test-runtime-transport-base-sha-v20260806.mjs
+          node tools/orbit360-test-preflight-portable-source-v20260806.mjs
+          node - <<'NODE'
+          const fs=require('fs');
+          const p='.github/workflows/orbit360-claude-paquete-reconciliado-v1205.yml';
+          const w=fs.readFileSync(p,'utf8');
+          const detect=w.indexOf('Detect canonical exclusive fresh authorized request and exact transport base');
+          const parent=w.indexOf('REQUEST_PARENT="$(git rev-parse HEAD^)"');
+          const baseRef=w.indexOf('BASE_REF="${GITHUB_BASE_REF:-}"');
+          const mismatch=w.indexOf('SKIP_REGISTERED_RELAY_TRANSPORT_BASE_SHA_MISMATCH');
+          const dispatch=w.indexOf("echo 'dispatch=true'");
+          const go=w.indexOf('GO_GATE_CONTRACT before secrets');
+          const restore=w.indexOf('Restore authorized Hosting LAB baseline');
+          const ok=detect>=0 && parent>detect && baseRef>parent && mismatch>baseRef && dispatch>mismatch && go>dispatch && restore>go && w.includes('orbit360-consume-visual-matrix-request-on-stop-v20260807.mjs');
+          if(!ok) process.exit(41);
+          console.log(JSON.stringify({status:'PASS_V14_TRANSPORT_BASE_FAIL_CLOSED_BEFORE_SECRETS',pr5WrongBaseWillSkip:true,exactTransportBaseRequired:true,secretsRead:false,firebaseAccess:false,hostingTouched:false,browserExecuted:false,deployExecuted:false,writes:0,ok:true},null,2));
+          NODE
+
       - name: Validate source-only package before transition
         if: steps.phase.outputs.mode == 'source'
         shell: bash
@@ -77,11 +99,7 @@ jobs:
           const expected = process.env.EXPECTED_V14;
           const caps = lifecycle.executionProfile && lifecycle.executionProfile.capabilities || {};
           const noRuntimeCaps = caps.secrets===false && caps.firestoreRead===false && caps.writes===false && caps.runtime===false && caps.browser===false && caps.deploy===false && caps.functionsDeploy===false && caps.rulesDeploy===false && caps.production===false;
-          const ok =
-            request.requestVersion === '20260807.13-validator-rootfix-runtime' && request.consumed === true && request.allowedExecutions === 0 && request.authorizationFrozen === true && request.replayAllowed === false &&
-            lifecycle.authorizedBaseHead === 'bb238dc26506aafd64e5bb52d5357fa5052bd9aa' && lifecycle.expectedRequestVersion === expected && lifecycle.stopRetryActive === false && lifecycle.authorizationReserved === true && lifecycle.allowedExecutions === 1 && lifecycle.executionAuthorized === false && lifecycle.secretAccessAuthorized === false && lifecycle.browserAuthorized === false && lifecycle.hostingDeployAuthorized === false && noRuntimeCaps &&
-            overlay.expectedNextRequestVersion === expected && overlay.stopRetryActive === false && overlay.runtimeAllowed === true && overlay.runtimeAllowedOnlyWithFreshExclusiveRequest === true && overlay.productionAllowed === false && overlay.writesAllowed === false &&
-            workflow.includes(`ORBIT360_EXPECTED_REQUEST_VERSION: ${expected}`) && workflow.includes('orbit360-consume-visual-matrix-request-on-stop-v20260807.mjs');
+          const ok = request.requestVersion === '20260807.13-validator-rootfix-runtime' && request.consumed === true && request.allowedExecutions === 0 && request.authorizationFrozen === true && request.replayAllowed === false && lifecycle.authorizedBaseHead === 'bb238dc26506aafd64e5bb52d5357fa5052bd9aa' && lifecycle.expectedRequestVersion === expected && lifecycle.stopRetryActive === false && lifecycle.authorizationReserved === true && lifecycle.allowedExecutions === 1 && lifecycle.executionAuthorized === false && lifecycle.secretAccessAuthorized === false && lifecycle.browserAuthorized === false && lifecycle.hostingDeployAuthorized === false && noRuntimeCaps && overlay.expectedNextRequestVersion === expected && overlay.stopRetryActive === false && overlay.runtimeAllowed === true && overlay.runtimeAllowedOnlyWithFreshExclusiveRequest === true && overlay.productionAllowed === false && overlay.writesAllowed === false && workflow.includes(`ORBIT360_EXPECTED_REQUEST_VERSION: ${expected}`) && workflow.includes('orbit360-consume-visual-matrix-request-on-stop-v20260807.mjs');
           if (!ok) process.exit(41);
           console.log(JSON.stringify({status:'PASS_SOURCE_ONLY_ACTIVATION_V14',authorizedBaseHead:lifecycle.authorizedBaseHead,expectedRequestVersion:expected,priorRequestConsumed:true,runtimeCapabilities:false,secretsRead:false,firebaseAccess:false,browserExecuted:false,hostingTouched:false,deployExecuted:false,writes:0,ok:true},null,2));
           NODE
