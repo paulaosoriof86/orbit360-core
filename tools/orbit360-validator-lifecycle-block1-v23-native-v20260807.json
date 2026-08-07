@@ -27,19 +27,10 @@
   "executionProfile": {
     "mode": "SOURCE_ONLY",
     "phase": "SOURCE_ONLY_NATIVE_MATRIX_VALIDATION",
-    "capabilities": {
-      "secrets": false,
-      "firestoreRead": false,
-      "writes": false,
-      "runtime": false,
-      "browser": false,
-      "deploy": false,
-      "functionsDeploy": false,
-      "rulesDeploy": false,
-      "production": false
-    }
+    "capabilities": { "secrets": false, "firestoreRead": false, "writes": false, "runtime": false, "browser": false, "deploy": false, "functionsDeploy": false, "rulesDeploy": false, "production": false }
   },
-  "nativeMatrix": "tools/orbit360-block1-native-matrix-v23-v20260807.mjs",
+  "nativeMatrix": "tools/orbit360-block1-native-matrix-v23-canonical-v20260807.mjs",
+  "nativeImplementation": "tools/orbit360-block1-native-matrix-v23-v20260807.mjs",
   "renderObserver": "tools/orbit360-event-driven-render-observer-v23.mjs",
   "universeAdjudicator": "tools/orbit360-adjudicate-block1-universe-readonly-v23-v20260807.mjs",
   "gateOverlay": "tools/orbit360-gate-contract-block1-v23-native-v20260807.json",
@@ -57,34 +48,9 @@
     "priorRuntimeAuthorizationActive": false,
     "preservedUniverse": { "clientes": 414, "aseguradoras": 26, "asesores": 7 }
   },
-  "hosting": {
-    "priorRestoreChannel": "visual-matrix-corrected-backup-31135532118",
-    "deploysMaximum": 1,
-    "backupBeforeDeploy": true,
-    "rollbackOnFailure": true
-  },
-  "runtimeCapabilitiesAfterSourcePassOnly": {
-    "secrets": true,
-    "firestoreRead": true,
-    "writes": false,
-    "runtime": true,
-    "browser": true,
-    "deploy": true,
-    "functionsDeploy": false,
-    "rulesDeploy": false,
-    "production": false
-  },
-  "protectedState": {
-    "firestoreWritesAuthorized": 0,
-    "authWritesAuthorized": 0,
-    "operationalWritesAuthorized": 0,
-    "functionsDeploysAuthorized": 0,
-    "rulesDeploysAuthorized": 0,
-    "reimportAuthorized": false,
-    "productionAuthorized": false,
-    "passVisualPostAuth": false,
-    "snapshotIntegrityRequired": "VERIFIED_UNCHANGED"
-  },
+  "hosting": { "priorRestoreChannel": "visual-matrix-corrected-backup-31135532118", "deploysMaximum": 1, "backupBeforeDeploy": true, "rollbackOnFailure": true },
+  "runtimeCapabilitiesAfterSourcePassOnly": { "secrets": true, "firestoreRead": true, "writes": false, "runtime": true, "browser": true, "deploy": true, "functionsDeploy": false, "rulesDeploy": false, "production": false },
+  "protectedState": { "firestoreWritesAuthorized": 0, "authWritesAuthorized": 0, "operationalWritesAuthorized": 0, "functionsDeploysAuthorized": 0, "rulesDeploysAuthorized": 0, "reimportAuthorized": false, "productionAuthorized": false, "passVisualPostAuth": false, "snapshotIntegrityRequired": "VERIFIED_UNCHANGED" },
   "patternClassification": "REPLICABLE_CLAUDE_ACUMULADO",
   "containsPII": false,
   "containsSecrets": false,
