@@ -5,6 +5,19 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const mode = process.argv[2] || '';
+const RUNTIME_PHASE = 'VISUAL_MATRIX_CORRECTED_POST_AUTH_LAB_EXECUTION';
+const RUNTIME_STATUS = 'AUTHORIZED_ONCE_PENDING_EXCLUSIVE_REQUEST';
+const RUNTIME_CAPABILITIES = Object.freeze({
+  secrets: true,
+  firestoreRead: true,
+  writes: false,
+  runtime: true,
+  browser: true,
+  deploy: true,
+  functionsDeploy: false,
+  rulesDeploy: false,
+  production: false
+});
 
 function fail(message, code = 41) {
   if (message) console.error(message);
@@ -23,6 +36,11 @@ function readJson(file) {
 }
 function exact(actual, expected) {
   return actual === expected;
+}
+function exactObject(actual, expected) {
+  const a = Object.keys(actual || {}).sort();
+  const e = Object.keys(expected || {}).sort();
+  return JSON.stringify(a) === JSON.stringify(e) && e.every(key => actual[key] === expected[key]);
 }
 function writeJson(file, payload) {
   fs.mkdirSync(path.dirname(path.resolve(file)), { recursive: true });
@@ -93,21 +111,32 @@ if (mode === 'validate-request') {
   const lifecycle = readJson(lifecycleFile);
   const scope = request.scope || {};
   const capabilities = request.capabilities || {};
-  const lifecycleCapabilities = lifecycle.executionProfile && lifecycle.executionProfile.capabilities || {};
-  const lifecycleStatus = String(lifecycle.status || '');
+  const profile = lifecycle.executionProfile || {};
+  const lifecycleCapabilities = profile.capabilities || {};
   const baselineChannel = String(lifecycle.priorHostingRestoreChannel || '');
   const baselineScript = String(lifecycle.priorHostingRestoreScript || '');
-  const lifecycleAuthorizedPhase =
-    /^AUTHORIZED_FRESH_REQUEST_ONLY_/.test(lifecycleStatus) &&
-    /PENDING_EXCLUSIVE_REQUEST$/.test(lifecycleStatus) &&
+  const lifecycleRuntimePending =
+    lifecycle.status === RUNTIME_STATUS &&
+    lifecycle.currentPhase === RUNTIME_PHASE &&
+    profile.phase === RUNTIME_PHASE &&
+    exactObject(lifecycleCapabilities, RUNTIME_CAPABILITIES) &&
     lifecycle.stopRetryActive === false &&
     lifecycle.authorizationReserved === true &&
     lifecycle.authorizationFrozen === false &&
     lifecycle.allowedExecutions === 1 &&
-    lifecycle.executionAuthorized === false &&
-    lifecycle.secretAccessAuthorized === false &&
-    lifecycle.browserAuthorized === false &&
-    lifecycle.hostingDeployAuthorized === false;
+    lifecycle.requestConsumed === false &&
+    lifecycle.replayAllowed === false &&
+    lifecycle.executionAuthorized === true &&
+    lifecycle.secretAccessAuthorized === true &&
+    lifecycle.firestoreReadAuthorized === true &&
+    lifecycle.writeAuthorized === false &&
+    lifecycle.browserAuthorized === true &&
+    lifecycle.hostingDeployAuthorized === true &&
+    lifecycle.functionsDeployAuthorized === false &&
+    lifecycle.rulesDeployAuthorized === false &&
+    lifecycle.productionAuthorized === false &&
+    lifecycle.mainAuthorized === false &&
+    lifecycle.mergeAuthorized === false;
   const ok =
     exact(request.schemaVersion, 'orbit360-visual-matrix-corrected-post-auth-request-v1') &&
     exact(request.requestVersion, expectedVersion) &&
@@ -121,15 +150,7 @@ if (mode === 'validate-request') {
     request.replayAllowed === false &&
     exact(request.parentHead, parent) &&
     exact(request.authorizedBaseHead, parent) &&
-    capabilities.secrets === true &&
-    capabilities.firestoreRead === true &&
-    capabilities.writes === false &&
-    capabilities.runtime === true &&
-    capabilities.browser === true &&
-    capabilities.deploy === true &&
-    capabilities.functionsDeploy === false &&
-    capabilities.rulesDeploy === false &&
-    capabilities.production === false &&
+    exactObject(capabilities, RUNTIME_CAPABILITIES) &&
     scope.registeredWorkflowRelayRequired === true &&
     scope.restorePriorBaselineBeforeRuntime === true &&
     baselineChannel.length > 0 &&
@@ -159,11 +180,7 @@ if (mode === 'validate-request') {
     lifecycle.hostingDeploysMaximum === 1 &&
     lifecycle.hostingBackupCloneAuthorized === true &&
     lifecycle.hostingRollbackCloneAuthorizedOnFailure === true &&
-    lifecycleAuthorizedPhase &&
-    lifecycleCapabilities.writes === false &&
-    lifecycleCapabilities.functionsDeploy === false &&
-    lifecycleCapabilities.rulesDeploy === false &&
-    lifecycleCapabilities.production === false;
+    lifecycleRuntimePending;
   process.exit(ok ? 0 : 41);
 }
 
