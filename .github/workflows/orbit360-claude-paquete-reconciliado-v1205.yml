@@ -20,8 +20,8 @@ jobs:
       ORBIT360_TRANSPORT_HEAD_REF: ${{ github.head_ref }}
       ORBIT360_VISUAL_REQUEST_PATH: .github/orbit360-requests/visual-matrix-corrected-post-auth-lab-v20260805-authorization.json
       ORBIT360_REQUEST_FILE: .github/orbit360-requests/visual-matrix-corrected-post-auth-lab-v20260805-authorization.json
-      ORBIT360_EXPECTED_REQUEST_VERSION: 20260807.14-two-phase-runtime
-      ORBIT360_RESTORE_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/visual-matrix-v14-prior-hosting-restore-sanitized-v20260807.json
+      ORBIT360_EXPECTED_REQUEST_VERSION: 20260807.15-two-phase-runtime
+      ORBIT360_RESTORE_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/visual-matrix-v15-prior-hosting-restore-sanitized-v20260807.json
       ORBIT360_FINAL_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/visual-matrix-corrected-post-auth-final-sanitized-v20260805.json
       ORBIT360_LIFECYCLE: tools/orbit360-validator-lifecycle-contract-visual-matrix-corrected-post-auth-lab-v20260805.json
       ORBIT360_OVERLAY: tools/orbit360-validator-lifecycle-overlay-visual-matrix-v8-stop-preflight-v20260806.json
@@ -189,7 +189,7 @@ jobs:
           FILES=(
             '.github/orbit360-requests/visual-matrix-corrected-post-auth-lab-v20260805-authorization.json'
             'orbit360-platform/runtime-gate-crm-v20260716/visual-matrix-corrected-post-auth-preflight-sanitized-v20260805.json'
-            'orbit360-platform/runtime-gate-crm-v20260716/visual-matrix-v14-prior-hosting-restore-sanitized-v20260807.json'
+            'orbit360-platform/runtime-gate-crm-v20260716/visual-matrix-v15-prior-hosting-restore-sanitized-v20260807.json'
             'orbit360-platform/runtime-gate-crm-v20260716/visual-matrix-corrected-post-auth-precheck-sanitized-v20260805.json'
             'orbit360-platform/runtime-gate-crm-v20260716/visual-matrix-corrected-post-auth-matrix-sanitized-v20260805.json'
             'orbit360-platform/runtime-gate-crm-v20260716/visual-matrix-supervisor-sanitized-v20260806.json'
@@ -202,7 +202,7 @@ jobs:
             [[ -e "$file" ]] && git add "$file"
           done
           if ! git diff --cached --quiet; then
-            git commit -m 'runtime: persist visual matrix v14 closure [skip ci]'
+            git commit -m 'runtime: persist visual matrix v15 closure [skip ci]'
             git push origin HEAD:ays/backend-tenant-lab-v99-20260703
           fi
 
