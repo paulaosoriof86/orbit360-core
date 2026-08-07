@@ -7,103 +7,103 @@
   "checkpoints": [
     {
       "checkpoint": "SERVICE_ACCOUNT_VALIDATE",
-      "at": "2026-08-07T17:05:53.342Z"
+      "at": "2026-08-07T18:45:45.339Z"
     },
     {
       "checkpoint": "MEMBERSHIP_READ",
-      "at": "2026-08-07T17:05:53.370Z"
+      "at": "2026-08-07T18:45:45.379Z"
     },
     {
       "checkpoint": "BROWSER_LAUNCH",
-      "at": "2026-08-07T17:05:53.981Z"
+      "at": "2026-08-07T18:45:45.806Z"
     },
     {
       "checkpoint": "PAGE_GOTO",
-      "at": "2026-08-07T17:05:54.183Z"
+      "at": "2026-08-07T18:45:46.660Z"
     },
     {
       "checkpoint": "LOGIN_FORM_PASS",
-      "at": "2026-08-07T17:05:58.640Z"
+      "at": "2026-08-07T18:45:50.292Z"
     },
     {
       "checkpoint": "ROOTFIX_MARKER_WAIT",
-      "at": "2026-08-07T17:05:58.640Z"
+      "at": "2026-08-07T18:45:50.292Z"
     },
     {
       "checkpoint": "ROOTFIX_MARKER_PASS",
-      "at": "2026-08-07T17:05:58.648Z",
-      "elapsedMs": 8
+      "at": "2026-08-07T18:45:50.301Z",
+      "elapsedMs": 9
     },
     {
       "checkpoint": "HYDRATION_CONTRACT_MOUNTED_WAIT",
-      "at": "2026-08-07T17:05:58.648Z"
+      "at": "2026-08-07T18:45:50.301Z"
     },
     {
       "checkpoint": "HYDRATION_CONTRACT_MOUNTED_PASS",
-      "at": "2026-08-07T17:05:58.650Z",
+      "at": "2026-08-07T18:45:50.303Z",
       "elapsedMs": 2
     },
     {
       "checkpoint": "HYDRATION_OWNER_VALID_WAIT",
-      "at": "2026-08-07T17:05:58.650Z"
+      "at": "2026-08-07T18:45:50.303Z"
     },
     {
       "checkpoint": "HYDRATION_OWNER_VALID_PASS",
-      "at": "2026-08-07T17:05:58.652Z",
-      "elapsedMs": 2
+      "at": "2026-08-07T18:45:50.306Z",
+      "elapsedMs": 3
     },
     {
       "checkpoint": "FIREBASE_AUTH_WAIT",
-      "at": "2026-08-07T17:05:58.652Z"
+      "at": "2026-08-07T18:45:50.306Z"
     },
     {
       "checkpoint": "FIREBASE_AUTH_PASS",
-      "at": "2026-08-07T17:05:58.654Z",
-      "elapsedMs": 2
+      "at": "2026-08-07T18:45:50.307Z",
+      "elapsedMs": 1
     },
     {
       "checkpoint": "CUSTOM_TOKEN_CREATE",
-      "at": "2026-08-07T17:05:58.654Z"
+      "at": "2026-08-07T18:45:50.307Z"
     },
     {
       "checkpoint": "CUSTOM_TOKEN_SIGNIN",
-      "at": "2026-08-07T17:05:58.698Z"
+      "at": "2026-08-07T18:45:50.370Z"
     },
     {
       "checkpoint": "AUTH_INSIDE_WAIT",
-      "at": "2026-08-07T17:05:59.069Z"
+      "at": "2026-08-07T18:45:50.669Z"
     },
     {
       "checkpoint": "AUTH_INSIDE_PASS",
-      "at": "2026-08-07T17:05:59.332Z",
-      "elapsedMs": 263
+      "at": "2026-08-07T18:45:50.940Z",
+      "elapsedMs": 271
     },
     {
       "checkpoint": "REMOVE_EPHEMERAL_OVERLAYS",
-      "at": "2026-08-07T17:05:59.332Z"
+      "at": "2026-08-07T18:45:50.940Z"
     },
     {
       "checkpoint": "INICIO_REQUIRED_HYDRATION_WAIT",
-      "at": "2026-08-07T17:05:59.337Z"
+      "at": "2026-08-07T18:45:50.945Z"
     },
     {
       "checkpoint": "INICIO_REQUIRED_HYDRATION_PASS",
-      "at": "2026-08-07T17:06:07.745Z",
-      "elapsedMs": 8408
+      "at": "2026-08-07T18:46:00.075Z",
+      "elapsedMs": 9130
     },
     {
       "checkpoint": "INICIO_READY_WAIT",
-      "at": "2026-08-07T17:06:07.745Z"
+      "at": "2026-08-07T18:46:00.075Z"
     },
     {
       "checkpoint": "INICIO_READY_PASS",
-      "at": "2026-08-07T17:06:14.413Z",
-      "elapsedMs": 6668
+      "at": "2026-08-07T18:46:07.763Z",
+      "elapsedMs": 7688
     }
   ],
   "projectId": "ays-orbit-360-lab",
   "tenantId": "alianzas-soluciones",
-  "runId": "31200613941",
+  "runId": "31208347862",
   "attempt": 1,
   "firestoreReads": 1,
   "firestoreWrites": 0,

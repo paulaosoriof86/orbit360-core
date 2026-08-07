@@ -1,90 +1,132 @@
 {
-  "schemaVersion": "orbit360-visual-observable-rootfix-matrix-v17-route-aware",
+  "schemaVersion": "orbit360-visual-observable-rootfix-matrix-v20-native-artifact-gated",
   "gateId": "block2.7-visual-matrix-corrected-post-auth-lab-v20260805",
   "contractVersion": "2.7.8",
   "stage": "FAIL_VISUAL_OBSERVABLE_ROOTFIX_MATRIX",
   "classification": "FUNCTIONAL_DEFECT",
   "readinessAuthority": "OrbitHydrationContractDiagnostics",
+  "validatorFinding": "VALIDATOR_STALE_RENDER_PROBE_BLOCKED",
+  "routeMetrics": [
+    {
+      "role": "Direccion",
+      "route": "inicio",
+      "requiredHydrationWaitMs": 9181,
+      "renderReadyWaitMs": 7427,
+      "renderMs": 7356,
+      "afterRenderMs": 0,
+      "totalWithAfterRenderMs": 7356,
+      "list": {
+        "bounded": false,
+        "pageSize": 0,
+        "page": 0,
+        "pageCount": 0,
+        "totalRows": 0,
+        "filteredRows": 0,
+        "renderedRows": 0,
+        "summaryCacheMs": 0,
+        "summaryAggregateMs": 0,
+        "rowsBuildMs": 0,
+        "innerHtmlMs": 0,
+        "bindingsMs": 0,
+        "totalMs": 0,
+        "writes": 0
+      }
+    }
+  ],
   "projectId": "ays-orbit-360-lab",
   "tenantId": "alianzas-soluciones",
-  "currentCheckpoint": "DIRECCION_ROUTE_CLIENTE360_REQUIRED_HYDRATION_TIMEOUT",
+  "currentCheckpoint": "DIRECCION_ROUTE_CLIENTE360_RENDER_PROBE_BLOCKED",
   "checkpoints": [
     {
       "checkpoint": "SERVICE_ACCOUNT_VALIDATE",
-      "at": "2026-08-07T16:33:40.434Z"
+      "at": "2026-08-07T18:46:08.280Z"
     },
     {
       "checkpoint": "PROTECTED_SNAPSHOT_BEFORE",
-      "at": "2026-08-07T16:33:40.476Z"
+      "at": "2026-08-07T18:46:08.324Z"
     },
     {
       "checkpoint": "BROWSER_LAUNCH",
-      "at": "2026-08-07T16:33:44.307Z"
+      "at": "2026-08-07T18:46:15.080Z"
     },
     {
       "checkpoint": "DIRECCION_CONTEXT_CREATE",
-      "at": "2026-08-07T16:33:44.380Z"
+      "at": "2026-08-07T18:46:15.156Z"
     },
     {
       "checkpoint": "DIRECCION_PAGE_GOTO",
-      "at": "2026-08-07T16:33:44.476Z"
+      "at": "2026-08-07T18:46:15.202Z"
     },
     {
       "checkpoint": "DIRECCION_FIREBASE_AUTH_WAIT",
-      "at": "2026-08-07T16:33:46.322Z"
+      "at": "2026-08-07T18:46:17.429Z"
     },
     {
       "checkpoint": "DIRECCION_FIREBASE_AUTH_PASS",
-      "at": "2026-08-07T16:33:46.326Z",
-      "elapsedMs": 3
+      "at": "2026-08-07T18:46:17.435Z",
+      "elapsedMs": 6
     },
     {
       "checkpoint": "DIRECCION_CUSTOM_TOKEN_CREATE",
-      "at": "2026-08-07T16:33:46.326Z"
+      "at": "2026-08-07T18:46:17.436Z"
     },
     {
       "checkpoint": "DIRECCION_CUSTOM_TOKEN_SIGNIN",
-      "at": "2026-08-07T16:33:46.389Z"
+      "at": "2026-08-07T18:46:17.505Z"
     },
     {
       "checkpoint": "DIRECCION_AUTH_INSIDE_WAIT",
-      "at": "2026-08-07T16:33:46.591Z"
+      "at": "2026-08-07T18:46:17.815Z"
     },
     {
       "checkpoint": "DIRECCION_AUTH_INSIDE_PASS",
-      "at": "2026-08-07T16:33:46.807Z",
-      "elapsedMs": 216
+      "at": "2026-08-07T18:46:18.085Z",
+      "elapsedMs": 269
     },
     {
       "checkpoint": "DIRECCION_ROUTE_INICIO_REQUIRED_HYDRATION_WAIT",
-      "at": "2026-08-07T16:33:46.813Z"
+      "at": "2026-08-07T18:46:18.092Z"
     },
     {
       "checkpoint": "DIRECCION_ROUTE_INICIO_REQUIRED_HYDRATION_PASS",
-      "at": "2026-08-07T16:33:58.246Z",
-      "elapsedMs": 11433
+      "at": "2026-08-07T18:46:27.272Z",
+      "elapsedMs": 9180
     },
     {
       "checkpoint": "DIRECCION_ROUTE_INICIO_RENDER_READY_WAIT",
-      "at": "2026-08-07T16:33:58.246Z"
+      "at": "2026-08-07T18:46:27.273Z"
     },
     {
       "checkpoint": "DIRECCION_ROUTE_INICIO_RENDER_READY_PASS",
-      "at": "2026-08-07T16:34:06.224Z",
-      "elapsedMs": 7978
-    },
-    {
-      "checkpoint": "DIRECCION_NAVIGATE_CLIENTE360",
-      "at": "2026-08-07T16:34:06.354Z"
+      "at": "2026-08-07T18:46:34.700Z",
+      "elapsedMs": 7427
     },
     {
       "checkpoint": "DIRECCION_ROUTE_CLIENTE360_REQUIRED_HYDRATION_WAIT",
-      "at": "2026-08-07T16:34:06.357Z"
+      "at": "2026-08-07T18:46:34.827Z"
     },
     {
-      "checkpoint": "DIRECCION_ROUTE_CLIENTE360_REQUIRED_HYDRATION_TIMEOUT",
-      "at": "2026-08-07T16:34:54.302Z",
-      "elapsedMs": 47944
+      "checkpoint": "DIRECCION_ROUTE_CLIENTE360_REQUIRED_HYDRATION_PASS",
+      "at": "2026-08-07T18:46:34.829Z",
+      "elapsedMs": 2
+    },
+    {
+      "checkpoint": "DIRECCION_NAVIGATE_CLIENTE360",
+      "at": "2026-08-07T18:46:34.829Z"
+    },
+    {
+      "checkpoint": "DIRECCION_ROUTE_CLIENTE360_RENDER_READY_WAIT",
+      "at": "2026-08-07T18:46:34.831Z"
+    },
+    {
+      "checkpoint": "DIRECCION_ROUTE_CLIENTE360_RENDER_READY_TIMEOUT",
+      "at": "2026-08-07T18:47:12.008Z",
+      "elapsedMs": 37176
+    },
+    {
+      "checkpoint": "DIRECCION_ROUTE_CLIENTE360_RENDER_PROBE_BLOCKED",
+      "at": "2026-08-07T18:47:12.149Z",
+      "hostTextLength": 4732
     }
   ],
   "before": {
@@ -220,7 +262,7 @@
     "route": "cliente360",
     "rootfixLoaded": true,
     "loadingVisible": false,
-    "hostTextLength": 45567,
+    "hostTextLength": 4732,
     "diagnosticKeys": [
       "cliente360",
       "inicio"
@@ -265,7 +307,7 @@
       ]
     }
   },
-  "failureScreenshot": "failure-direccion-route-cliente360-required-hydration.png",
-  "error": "DIRECCION_ROUTE_CLIENTE360_REQUIRED_HYDRATION_TIMEOUT:page.waitForFunction: Timeout 35000ms exceeded.",
+  "failureScreenshot": "failure-direccion-route-cliente360-render-ready.png",
+  "error": "VALIDATOR_STALE_RENDER_PROBE_BLOCKED:DIRECCION_ROUTE_CLIENTE360_RENDER_READY_TIMEOUT:page.waitForFunction: Timeout 35000ms exceeded.",
   "snapshotIntegrity": "VERIFIED_UNCHANGED"
 }
