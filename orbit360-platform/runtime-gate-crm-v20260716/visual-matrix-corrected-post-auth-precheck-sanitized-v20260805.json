@@ -7,103 +7,103 @@
   "checkpoints": [
     {
       "checkpoint": "SERVICE_ACCOUNT_VALIDATE",
-      "at": "2026-08-07T18:45:45.339Z"
+      "at": "2026-08-07T19:23:27.867Z"
     },
     {
       "checkpoint": "MEMBERSHIP_READ",
-      "at": "2026-08-07T18:45:45.379Z"
+      "at": "2026-08-07T19:23:27.902Z"
     },
     {
       "checkpoint": "BROWSER_LAUNCH",
-      "at": "2026-08-07T18:45:45.806Z"
+      "at": "2026-08-07T19:23:28.360Z"
     },
     {
       "checkpoint": "PAGE_GOTO",
-      "at": "2026-08-07T18:45:46.660Z"
+      "at": "2026-08-07T19:23:29.455Z"
     },
     {
       "checkpoint": "LOGIN_FORM_PASS",
-      "at": "2026-08-07T18:45:50.292Z"
+      "at": "2026-08-07T19:23:33.708Z"
     },
     {
       "checkpoint": "ROOTFIX_MARKER_WAIT",
-      "at": "2026-08-07T18:45:50.292Z"
+      "at": "2026-08-07T19:23:33.708Z"
     },
     {
       "checkpoint": "ROOTFIX_MARKER_PASS",
-      "at": "2026-08-07T18:45:50.301Z",
-      "elapsedMs": 9
+      "at": "2026-08-07T19:23:33.722Z",
+      "elapsedMs": 14
     },
     {
       "checkpoint": "HYDRATION_CONTRACT_MOUNTED_WAIT",
-      "at": "2026-08-07T18:45:50.301Z"
+      "at": "2026-08-07T19:23:33.722Z"
     },
     {
       "checkpoint": "HYDRATION_CONTRACT_MOUNTED_PASS",
-      "at": "2026-08-07T18:45:50.303Z",
-      "elapsedMs": 2
-    },
-    {
-      "checkpoint": "HYDRATION_OWNER_VALID_WAIT",
-      "at": "2026-08-07T18:45:50.303Z"
-    },
-    {
-      "checkpoint": "HYDRATION_OWNER_VALID_PASS",
-      "at": "2026-08-07T18:45:50.306Z",
+      "at": "2026-08-07T19:23:33.725Z",
       "elapsedMs": 3
     },
     {
+      "checkpoint": "HYDRATION_OWNER_VALID_WAIT",
+      "at": "2026-08-07T19:23:33.725Z"
+    },
+    {
+      "checkpoint": "HYDRATION_OWNER_VALID_PASS",
+      "at": "2026-08-07T19:23:33.727Z",
+      "elapsedMs": 2
+    },
+    {
       "checkpoint": "FIREBASE_AUTH_WAIT",
-      "at": "2026-08-07T18:45:50.306Z"
+      "at": "2026-08-07T19:23:33.727Z"
     },
     {
       "checkpoint": "FIREBASE_AUTH_PASS",
-      "at": "2026-08-07T18:45:50.307Z",
-      "elapsedMs": 1
+      "at": "2026-08-07T19:23:33.730Z",
+      "elapsedMs": 2
     },
     {
       "checkpoint": "CUSTOM_TOKEN_CREATE",
-      "at": "2026-08-07T18:45:50.307Z"
+      "at": "2026-08-07T19:23:33.730Z"
     },
     {
       "checkpoint": "CUSTOM_TOKEN_SIGNIN",
-      "at": "2026-08-07T18:45:50.370Z"
+      "at": "2026-08-07T19:23:33.794Z"
     },
     {
       "checkpoint": "AUTH_INSIDE_WAIT",
-      "at": "2026-08-07T18:45:50.669Z"
+      "at": "2026-08-07T19:23:35.686Z"
     },
     {
       "checkpoint": "AUTH_INSIDE_PASS",
-      "at": "2026-08-07T18:45:50.940Z",
-      "elapsedMs": 271
+      "at": "2026-08-07T19:23:36.152Z",
+      "elapsedMs": 466
     },
     {
       "checkpoint": "REMOVE_EPHEMERAL_OVERLAYS",
-      "at": "2026-08-07T18:45:50.940Z"
+      "at": "2026-08-07T19:23:36.152Z"
     },
     {
       "checkpoint": "INICIO_REQUIRED_HYDRATION_WAIT",
-      "at": "2026-08-07T18:45:50.945Z"
+      "at": "2026-08-07T19:23:36.181Z"
     },
     {
       "checkpoint": "INICIO_REQUIRED_HYDRATION_PASS",
-      "at": "2026-08-07T18:46:00.075Z",
-      "elapsedMs": 9130
+      "at": "2026-08-07T19:23:48.542Z",
+      "elapsedMs": 12361
     },
     {
       "checkpoint": "INICIO_READY_WAIT",
-      "at": "2026-08-07T18:46:00.075Z"
+      "at": "2026-08-07T19:23:48.542Z"
     },
     {
       "checkpoint": "INICIO_READY_PASS",
-      "at": "2026-08-07T18:46:07.763Z",
-      "elapsedMs": 7688
+      "at": "2026-08-07T19:23:56.064Z",
+      "elapsedMs": 7522
     }
   ],
   "projectId": "ays-orbit-360-lab",
   "tenantId": "alianzas-soluciones",
-  "runId": "31208347862",
+  "runId": "31211158696",
   "attempt": 1,
   "firestoreReads": 1,
   "firestoreWrites": 0,
@@ -208,8 +208,8 @@
         "ownerValid": true,
         "storeOwnerGeneration": 1,
         "readinessAuthority": "OrbitHydrationContractDiagnostics",
-        "advisorProjectionBuilds": 5,
-        "advisorProjectionInvalidations": 4,
+        "advisorProjectionBuilds": 6,
+        "advisorProjectionInvalidations": 5,
         "writes": 0
       }
     }

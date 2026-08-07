@@ -2,12 +2,12 @@
   "schemaVersion": "orbit360-visual-matrix-corrected-post-auth-final-v2",
   "gateId": "block2.7-visual-matrix-corrected-post-auth-lab-v20260805",
   "contractVersion": "2.7.8",
-  "runId": "31208347862",
+  "runId": "31211158696",
   "attempt": 1,
   "stage": "STOP_RETRY_VISUAL_MATRIX_CORRECTED_POST_AUTH",
   "decision": "STOP_RETRY",
   "classification": "FUNCTIONAL_DEFECT",
-  "checkpoint": "DIRECCION_ROUTE_CLIENTE360_RENDER_PROBE_BLOCKED",
+  "checkpoint": "PROTECTED_SNAPSHOT_AFTER",
   "preflightStatus": "GO_GATE_CONTRACT",
   "preflightChecks": 28,
   "outcomes": {
@@ -34,17 +34,24 @@
   "precheckStage": "PASS_VISUAL_BROWSER_PRECHECK",
   "precheckCheckpoint": "INICIO_READY_PASS",
   "matrixStage": "FAIL_VISUAL_OBSERVABLE_ROOTFIX_MATRIX",
-  "matrixCheckpoint": "DIRECCION_ROUTE_CLIENTE360_RENDER_PROBE_BLOCKED",
-  "matrixValidatorFinding": "VALIDATOR_STALE_RENDER_PROBE_BLOCKED",
+  "matrixCheckpoint": "PROTECTED_SNAPSHOT_AFTER",
+  "matrixValidatorFinding": "",
   "routeMetrics": [
     {
       "role": "Direccion",
       "route": "inicio",
-      "requiredHydrationWaitMs": 9181,
-      "renderReadyWaitMs": 7427,
-      "renderMs": 7356,
+      "requiredHydrationWaitMs": 12053,
+      "renderReadyWaitMs": 3040,
+      "renderObserverWaitMs": 3040,
+      "renderOutcome": "PASS_RENDER_EVENT",
+      "renderSignalVersion": "20260807.21-event-driven-render-observer",
+      "routeObserved": "inicio",
+      "hydrationReadyObserved": true,
+      "loadingVisibleObserved": false,
+      "hostTextLength": 1143,
+      "renderMs": 6866,
       "afterRenderMs": 0,
-      "totalWithAfterRenderMs": 7356,
+      "totalWithAfterRenderMs": 6866,
       "list": {
         "bounded": false,
         "pageSize": 0,
@@ -60,15 +67,1521 @@
         "bindingsMs": 0,
         "totalMs": 0,
         "writes": 0
-      }
+      },
+      "detail": "already-ready"
+    },
+    {
+      "role": "Direccion",
+      "route": "cliente360",
+      "requiredHydrationWaitMs": 3,
+      "renderReadyWaitMs": 27846,
+      "renderObserverWaitMs": 27846,
+      "renderOutcome": "PASS_RENDER_EVENT",
+      "renderSignalVersion": "20260807.21-event-driven-render-observer",
+      "routeObserved": "cliente360",
+      "hydrationReadyObserved": true,
+      "loadingVisibleObserved": false,
+      "hostTextLength": 4689,
+      "renderMs": 14208,
+      "afterRenderMs": 0,
+      "totalWithAfterRenderMs": 14208,
+      "list": {
+        "bounded": true,
+        "pageSize": 40,
+        "page": 1,
+        "pageCount": 11,
+        "totalRows": 430,
+        "filteredRows": 430,
+        "renderedRows": 40,
+        "summaryCacheMs": 6885.5,
+        "summaryAggregateMs": 0.20000000001164153,
+        "rowsBuildMs": 5.699999999982538,
+        "innerHtmlMs": 390.70000000001164,
+        "bindingsMs": 0.10000000000582077,
+        "totalMs": 7282.3000000000175,
+        "writes": 0
+      },
+      "detail": "mutation"
+    },
+    {
+      "role": "Direccion",
+      "route": "polizas",
+      "requiredHydrationWaitMs": 2,
+      "renderReadyWaitMs": 14276,
+      "renderObserverWaitMs": 14276,
+      "renderOutcome": "PASS_RENDER_EVENT",
+      "renderSignalVersion": "20260807.21-event-driven-render-observer",
+      "routeObserved": "polizas",
+      "hydrationReadyObserved": true,
+      "loadingVisibleObserved": false,
+      "hostTextLength": 18403,
+      "renderMs": 13990,
+      "afterRenderMs": 0,
+      "totalWithAfterRenderMs": 13990,
+      "list": {
+        "bounded": false,
+        "pageSize": 0,
+        "page": 0,
+        "pageCount": 0,
+        "totalRows": 0,
+        "filteredRows": 0,
+        "renderedRows": 0,
+        "summaryCacheMs": 0,
+        "summaryAggregateMs": 0,
+        "rowsBuildMs": 0,
+        "innerHtmlMs": 0,
+        "bindingsMs": 0,
+        "totalMs": 0,
+        "writes": 0
+      },
+      "detail": "mutation"
+    },
+    {
+      "role": "Direccion",
+      "route": "cobros",
+      "requiredHydrationWaitMs": 2,
+      "renderReadyWaitMs": 725,
+      "renderObserverWaitMs": 725,
+      "renderOutcome": "PASS_RENDER_EVENT",
+      "renderSignalVersion": "20260807.21-event-driven-render-observer",
+      "routeObserved": "cobros",
+      "hydrationReadyObserved": true,
+      "loadingVisibleObserved": false,
+      "hostTextLength": 1343,
+      "renderMs": 481,
+      "afterRenderMs": 0,
+      "totalWithAfterRenderMs": 481,
+      "list": {
+        "bounded": false,
+        "pageSize": 0,
+        "page": 0,
+        "pageCount": 0,
+        "totalRows": 0,
+        "filteredRows": 0,
+        "renderedRows": 0,
+        "summaryCacheMs": 0,
+        "summaryAggregateMs": 0,
+        "rowsBuildMs": 0,
+        "innerHtmlMs": 0,
+        "bindingsMs": 0,
+        "totalMs": 0,
+        "writes": 0
+      },
+      "detail": "mutation"
+    },
+    {
+      "role": "Direccion",
+      "route": "ops",
+      "requiredHydrationWaitMs": 2,
+      "renderReadyWaitMs": 199,
+      "renderObserverWaitMs": 199,
+      "renderOutcome": "PASS_RENDER_EVENT",
+      "renderSignalVersion": "20260807.21-event-driven-render-observer",
+      "routeObserved": "ops",
+      "hydrationReadyObserved": true,
+      "loadingVisibleObserved": false,
+      "hostTextLength": 1281,
+      "renderMs": 4,
+      "afterRenderMs": 0,
+      "totalWithAfterRenderMs": 4,
+      "list": {
+        "bounded": false,
+        "pageSize": 0,
+        "page": 0,
+        "pageCount": 0,
+        "totalRows": 0,
+        "filteredRows": 0,
+        "renderedRows": 0,
+        "summaryCacheMs": 0,
+        "summaryAggregateMs": 0,
+        "rowsBuildMs": 0,
+        "innerHtmlMs": 0,
+        "bindingsMs": 0,
+        "totalMs": 0,
+        "writes": 0
+      },
+      "detail": "mutation"
+    },
+    {
+      "role": "Direccion",
+      "route": "leads",
+      "requiredHydrationWaitMs": 2,
+      "renderReadyWaitMs": 191,
+      "renderObserverWaitMs": 191,
+      "renderOutcome": "PASS_RENDER_EVENT",
+      "renderSignalVersion": "20260807.21-event-driven-render-observer",
+      "routeObserved": "leads",
+      "hydrationReadyObserved": true,
+      "loadingVisibleObserved": false,
+      "hostTextLength": 851,
+      "renderMs": 1,
+      "afterRenderMs": 0,
+      "totalWithAfterRenderMs": 1,
+      "list": {
+        "bounded": false,
+        "pageSize": 0,
+        "page": 0,
+        "pageCount": 0,
+        "totalRows": 0,
+        "filteredRows": 0,
+        "renderedRows": 0,
+        "summaryCacheMs": 0,
+        "summaryAggregateMs": 0,
+        "rowsBuildMs": 0,
+        "innerHtmlMs": 0,
+        "bindingsMs": 0,
+        "totalMs": 0,
+        "writes": 0
+      },
+      "detail": "mutation"
+    },
+    {
+      "role": "Direccion",
+      "route": "conciliaciones",
+      "requiredHydrationWaitMs": 3,
+      "renderReadyWaitMs": 237,
+      "renderObserverWaitMs": 237,
+      "renderOutcome": "PASS_RENDER_EVENT",
+      "renderSignalVersion": "20260807.21-event-driven-render-observer",
+      "routeObserved": "conciliaciones",
+      "hydrationReadyObserved": true,
+      "loadingVisibleObserved": false,
+      "hostTextLength": 455,
+      "renderMs": 1,
+      "afterRenderMs": 0,
+      "totalWithAfterRenderMs": 1,
+      "list": {
+        "bounded": false,
+        "pageSize": 0,
+        "page": 0,
+        "pageCount": 0,
+        "totalRows": 0,
+        "filteredRows": 0,
+        "renderedRows": 0,
+        "summaryCacheMs": 0,
+        "summaryAggregateMs": 0,
+        "rowsBuildMs": 0,
+        "innerHtmlMs": 0,
+        "bindingsMs": 0,
+        "totalMs": 0,
+        "writes": 0
+      },
+      "detail": "mutation"
+    },
+    {
+      "role": "Direccion",
+      "route": "cancelaciones",
+      "requiredHydrationWaitMs": 2,
+      "renderReadyWaitMs": 376,
+      "renderObserverWaitMs": 376,
+      "renderOutcome": "PASS_RENDER_EVENT",
+      "renderSignalVersion": "20260807.21-event-driven-render-observer",
+      "routeObserved": "cancelaciones",
+      "hydrationReadyObserved": true,
+      "loadingVisibleObserved": false,
+      "hostTextLength": 722,
+      "renderMs": 144,
+      "afterRenderMs": 0,
+      "totalWithAfterRenderMs": 144,
+      "list": {
+        "bounded": false,
+        "pageSize": 0,
+        "page": 0,
+        "pageCount": 0,
+        "totalRows": 0,
+        "filteredRows": 0,
+        "renderedRows": 0,
+        "summaryCacheMs": 0,
+        "summaryAggregateMs": 0,
+        "rowsBuildMs": 0,
+        "innerHtmlMs": 0,
+        "bindingsMs": 0,
+        "totalMs": 0,
+        "writes": 0
+      },
+      "detail": "mutation"
+    },
+    {
+      "role": "Direccion",
+      "route": "cliente360",
+      "requiredHydrationWaitMs": 2,
+      "renderReadyWaitMs": 7483,
+      "renderObserverWaitMs": 7483,
+      "renderOutcome": "PASS_RENDER_EVENT",
+      "renderSignalVersion": "20260807.21-event-driven-render-observer",
+      "routeObserved": "cliente360",
+      "hydrationReadyObserved": true,
+      "loadingVisibleObserved": false,
+      "hostTextLength": 1658,
+      "renderMs": 467,
+      "afterRenderMs": 1,
+      "totalWithAfterRenderMs": 468,
+      "list": {
+        "bounded": true,
+        "pageSize": 40,
+        "page": 1,
+        "pageCount": 11,
+        "totalRows": 430,
+        "filteredRows": 430,
+        "renderedRows": 40,
+        "summaryCacheMs": 6885.5,
+        "summaryAggregateMs": 0.20000000001164153,
+        "rowsBuildMs": 5.699999999982538,
+        "innerHtmlMs": 390.70000000001164,
+        "bindingsMs": 0.10000000000582077,
+        "totalMs": 7282.3000000000175,
+        "writes": 0
+      },
+      "detail": "mutation"
+    },
+    {
+      "role": "Direccion",
+      "route": "cliente360",
+      "requiredHydrationWaitMs": 6,
+      "renderReadyWaitMs": 8629,
+      "renderObserverWaitMs": 8629,
+      "renderOutcome": "PASS_RENDER_EVENT",
+      "renderSignalVersion": "20260807.21-event-driven-render-observer",
+      "routeObserved": "cliente360",
+      "hydrationReadyObserved": true,
+      "loadingVisibleObserved": false,
+      "hostTextLength": 1593,
+      "renderMs": 1598,
+      "afterRenderMs": 1,
+      "totalWithAfterRenderMs": 1599,
+      "list": {
+        "bounded": true,
+        "pageSize": 40,
+        "page": 1,
+        "pageCount": 11,
+        "totalRows": 430,
+        "filteredRows": 430,
+        "renderedRows": 40,
+        "summaryCacheMs": 6885.5,
+        "summaryAggregateMs": 0.20000000001164153,
+        "rowsBuildMs": 5.699999999982538,
+        "innerHtmlMs": 390.70000000001164,
+        "bindingsMs": 0.10000000000582077,
+        "totalMs": 7282.3000000000175,
+        "writes": 0
+      },
+      "detail": "already-ready"
+    },
+    {
+      "role": "Direccion",
+      "route": "cliente360",
+      "requiredHydrationWaitMs": 89,
+      "renderReadyWaitMs": 7392,
+      "renderObserverWaitMs": 7392,
+      "renderOutcome": "PASS_RENDER_EVENT",
+      "renderSignalVersion": "20260807.21-event-driven-render-observer",
+      "routeObserved": "cliente360",
+      "hydrationReadyObserved": true,
+      "loadingVisibleObserved": false,
+      "hostTextLength": 1138,
+      "renderMs": 441,
+      "afterRenderMs": 1,
+      "totalWithAfterRenderMs": 442,
+      "list": {
+        "bounded": true,
+        "pageSize": 40,
+        "page": 1,
+        "pageCount": 11,
+        "totalRows": 430,
+        "filteredRows": 430,
+        "renderedRows": 40,
+        "summaryCacheMs": 6885.5,
+        "summaryAggregateMs": 0.20000000001164153,
+        "rowsBuildMs": 5.699999999982538,
+        "innerHtmlMs": 390.70000000001164,
+        "bindingsMs": 0.10000000000582077,
+        "totalMs": 7282.3000000000175,
+        "writes": 0
+      },
+      "detail": "already-ready"
+    },
+    {
+      "role": "Operativo",
+      "route": "inicio",
+      "requiredHydrationWaitMs": 8928,
+      "renderReadyWaitMs": 2954,
+      "renderObserverWaitMs": 2954,
+      "renderOutcome": "PASS_RENDER_EVENT",
+      "renderSignalVersion": "20260807.21-event-driven-render-observer",
+      "routeObserved": "inicio",
+      "hydrationReadyObserved": true,
+      "loadingVisibleObserved": false,
+      "hostTextLength": 1143,
+      "renderMs": 6985,
+      "afterRenderMs": 0,
+      "totalWithAfterRenderMs": 6985,
+      "list": {
+        "bounded": false,
+        "pageSize": 0,
+        "page": 0,
+        "pageCount": 0,
+        "totalRows": 0,
+        "filteredRows": 0,
+        "renderedRows": 0,
+        "summaryCacheMs": 0,
+        "summaryAggregateMs": 0,
+        "rowsBuildMs": 0,
+        "innerHtmlMs": 0,
+        "bindingsMs": 0,
+        "totalMs": 0,
+        "writes": 0
+      },
+      "detail": "already-ready"
+    },
+    {
+      "role": "Operativo",
+      "route": "cliente360",
+      "requiredHydrationWaitMs": 3,
+      "renderReadyWaitMs": 27760,
+      "renderObserverWaitMs": 27760,
+      "renderOutcome": "PASS_RENDER_EVENT",
+      "renderSignalVersion": "20260807.21-event-driven-render-observer",
+      "routeObserved": "cliente360",
+      "hydrationReadyObserved": true,
+      "loadingVisibleObserved": false,
+      "hostTextLength": 1589,
+      "renderMs": 14190,
+      "afterRenderMs": 0,
+      "totalWithAfterRenderMs": 14190,
+      "list": {
+        "bounded": true,
+        "pageSize": 40,
+        "page": 1,
+        "pageCount": 1,
+        "totalRows": 8,
+        "filteredRows": 8,
+        "renderedRows": 8,
+        "summaryCacheMs": 6901.399999999965,
+        "summaryAggregateMs": 0.1000000000349246,
+        "rowsBuildMs": 4.599999999976717,
+        "innerHtmlMs": 511,
+        "bindingsMs": 0.09999999997671694,
+        "totalMs": 7417.199999999953,
+        "writes": 0
+      },
+      "detail": "mutation"
+    },
+    {
+      "role": "Operativo",
+      "route": "polizas",
+      "requiredHydrationWaitMs": 2,
+      "renderReadyWaitMs": 8689,
+      "renderObserverWaitMs": 8689,
+      "renderOutcome": "PASS_RENDER_EVENT",
+      "renderSignalVersion": "20260807.21-event-driven-render-observer",
+      "routeObserved": "polizas",
+      "hydrationReadyObserved": true,
+      "loadingVisibleObserved": false,
+      "hostTextLength": 4063,
+      "renderMs": 8449,
+      "afterRenderMs": 0,
+      "totalWithAfterRenderMs": 8449,
+      "list": {
+        "bounded": false,
+        "pageSize": 0,
+        "page": 0,
+        "pageCount": 0,
+        "totalRows": 0,
+        "filteredRows": 0,
+        "renderedRows": 0,
+        "summaryCacheMs": 0,
+        "summaryAggregateMs": 0,
+        "rowsBuildMs": 0,
+        "innerHtmlMs": 0,
+        "bindingsMs": 0,
+        "totalMs": 0,
+        "writes": 0
+      },
+      "detail": "mutation"
+    },
+    {
+      "role": "Operativo",
+      "route": "cobros",
+      "requiredHydrationWaitMs": 2,
+      "renderReadyWaitMs": 246,
+      "renderObserverWaitMs": 246,
+      "renderOutcome": "PASS_RENDER_EVENT",
+      "renderSignalVersion": "20260807.21-event-driven-render-observer",
+      "routeObserved": "cobros",
+      "hydrationReadyObserved": true,
+      "loadingVisibleObserved": false,
+      "hostTextLength": 755,
+      "renderMs": 4,
+      "afterRenderMs": 0,
+      "totalWithAfterRenderMs": 4,
+      "list": {
+        "bounded": false,
+        "pageSize": 0,
+        "page": 0,
+        "pageCount": 0,
+        "totalRows": 0,
+        "filteredRows": 0,
+        "renderedRows": 0,
+        "summaryCacheMs": 0,
+        "summaryAggregateMs": 0,
+        "rowsBuildMs": 0,
+        "innerHtmlMs": 0,
+        "bindingsMs": 0,
+        "totalMs": 0,
+        "writes": 0
+      },
+      "detail": "mutation"
+    },
+    {
+      "role": "Operativo",
+      "route": "ops",
+      "requiredHydrationWaitMs": 2,
+      "renderReadyWaitMs": 193,
+      "renderObserverWaitMs": 193,
+      "renderOutcome": "PASS_RENDER_EVENT",
+      "renderSignalVersion": "20260807.21-event-driven-render-observer",
+      "routeObserved": "ops",
+      "hydrationReadyObserved": true,
+      "loadingVisibleObserved": false,
+      "hostTextLength": 1281,
+      "renderMs": 4,
+      "afterRenderMs": 0,
+      "totalWithAfterRenderMs": 4,
+      "list": {
+        "bounded": false,
+        "pageSize": 0,
+        "page": 0,
+        "pageCount": 0,
+        "totalRows": 0,
+        "filteredRows": 0,
+        "renderedRows": 0,
+        "summaryCacheMs": 0,
+        "summaryAggregateMs": 0,
+        "rowsBuildMs": 0,
+        "innerHtmlMs": 0,
+        "bindingsMs": 0,
+        "totalMs": 0,
+        "writes": 0
+      },
+      "detail": "mutation"
+    },
+    {
+      "role": "Operativo",
+      "route": "leads",
+      "requiredHydrationWaitMs": 2,
+      "renderReadyWaitMs": 247,
+      "renderObserverWaitMs": 247,
+      "renderOutcome": "PASS_RENDER_EVENT",
+      "renderSignalVersion": "20260807.21-event-driven-render-observer",
+      "routeObserved": "leads",
+      "hydrationReadyObserved": true,
+      "loadingVisibleObserved": false,
+      "hostTextLength": 851,
+      "renderMs": 1,
+      "afterRenderMs": 0,
+      "totalWithAfterRenderMs": 1,
+      "list": {
+        "bounded": false,
+        "pageSize": 0,
+        "page": 0,
+        "pageCount": 0,
+        "totalRows": 0,
+        "filteredRows": 0,
+        "renderedRows": 0,
+        "summaryCacheMs": 0,
+        "summaryAggregateMs": 0,
+        "rowsBuildMs": 0,
+        "innerHtmlMs": 0,
+        "bindingsMs": 0,
+        "totalMs": 0,
+        "writes": 0
+      },
+      "detail": "mutation"
+    },
+    {
+      "role": "Operativo",
+      "route": "conciliaciones",
+      "requiredHydrationWaitMs": 2,
+      "renderReadyWaitMs": 239,
+      "renderObserverWaitMs": 239,
+      "renderOutcome": "PASS_RENDER_EVENT",
+      "renderSignalVersion": "20260807.21-event-driven-render-observer",
+      "routeObserved": "conciliaciones",
+      "hydrationReadyObserved": true,
+      "loadingVisibleObserved": false,
+      "hostTextLength": 415,
+      "renderMs": 0,
+      "afterRenderMs": 0,
+      "totalWithAfterRenderMs": 0,
+      "list": {
+        "bounded": false,
+        "pageSize": 0,
+        "page": 0,
+        "pageCount": 0,
+        "totalRows": 0,
+        "filteredRows": 0,
+        "renderedRows": 0,
+        "summaryCacheMs": 0,
+        "summaryAggregateMs": 0,
+        "rowsBuildMs": 0,
+        "innerHtmlMs": 0,
+        "bindingsMs": 0,
+        "totalMs": 0,
+        "writes": 0
+      },
+      "detail": "mutation"
+    },
+    {
+      "role": "Operativo",
+      "route": "cancelaciones",
+      "requiredHydrationWaitMs": 1,
+      "renderReadyWaitMs": 181,
+      "renderObserverWaitMs": 181,
+      "renderOutcome": "PASS_RENDER_EVENT",
+      "renderSignalVersion": "20260807.21-event-driven-render-observer",
+      "routeObserved": "cancelaciones",
+      "hydrationReadyObserved": true,
+      "loadingVisibleObserved": false,
+      "hostTextLength": 537,
+      "renderMs": 0,
+      "afterRenderMs": 0,
+      "totalWithAfterRenderMs": 0,
+      "list": {
+        "bounded": false,
+        "pageSize": 0,
+        "page": 0,
+        "pageCount": 0,
+        "totalRows": 0,
+        "filteredRows": 0,
+        "renderedRows": 0,
+        "summaryCacheMs": 0,
+        "summaryAggregateMs": 0,
+        "rowsBuildMs": 0,
+        "innerHtmlMs": 0,
+        "bindingsMs": 0,
+        "totalMs": 0,
+        "writes": 0
+      },
+      "detail": "mutation"
+    },
+    {
+      "role": "Asesor",
+      "route": "inicio",
+      "requiredHydrationWaitMs": 11618,
+      "renderReadyWaitMs": 2912,
+      "renderObserverWaitMs": 2912,
+      "renderOutcome": "PASS_RENDER_EVENT",
+      "renderSignalVersion": "20260807.21-event-driven-render-observer",
+      "routeObserved": "inicio",
+      "hydrationReadyObserved": true,
+      "loadingVisibleObserved": false,
+      "hostTextLength": 1099,
+      "renderMs": 6815,
+      "afterRenderMs": 0,
+      "totalWithAfterRenderMs": 6815,
+      "list": {
+        "bounded": false,
+        "pageSize": 0,
+        "page": 0,
+        "pageCount": 0,
+        "totalRows": 0,
+        "filteredRows": 0,
+        "renderedRows": 0,
+        "summaryCacheMs": 0,
+        "summaryAggregateMs": 0,
+        "rowsBuildMs": 0,
+        "innerHtmlMs": 0,
+        "bindingsMs": 0,
+        "totalMs": 0,
+        "writes": 0
+      },
+      "detail": "already-ready"
+    },
+    {
+      "role": "Asesor",
+      "route": "cliente360",
+      "requiredHydrationWaitMs": 5,
+      "renderReadyWaitMs": 27759,
+      "renderObserverWaitMs": 27759,
+      "renderOutcome": "PASS_RENDER_EVENT",
+      "renderSignalVersion": "20260807.21-event-driven-render-observer",
+      "routeObserved": "cliente360",
+      "hydrationReadyObserved": true,
+      "loadingVisibleObserved": false,
+      "hostTextLength": 865,
+      "renderMs": 14238,
+      "afterRenderMs": 0,
+      "totalWithAfterRenderMs": 14238,
+      "list": {
+        "bounded": true,
+        "pageSize": 40,
+        "page": 1,
+        "pageCount": 1,
+        "totalRows": 1,
+        "filteredRows": 1,
+        "renderedRows": 1,
+        "summaryCacheMs": 7052.799999999988,
+        "summaryAggregateMs": 0,
+        "rowsBuildMs": 4.7000000000116415,
+        "innerHtmlMs": 374.20000000001164,
+        "bindingsMs": 0.09999999997671694,
+        "totalMs": 7431.799999999988,
+        "writes": 0
+      },
+      "detail": "mutation"
+    },
+    {
+      "role": "Asesor",
+      "route": "polizas",
+      "requiredHydrationWaitMs": 2,
+      "renderReadyWaitMs": 8256,
+      "renderObserverWaitMs": 8256,
+      "renderOutcome": "PASS_RENDER_EVENT",
+      "renderSignalVersion": "20260807.21-event-driven-render-observer",
+      "routeObserved": "polizas",
+      "hydrationReadyObserved": true,
+      "loadingVisibleObserved": false,
+      "hostTextLength": 2553,
+      "renderMs": 8058,
+      "afterRenderMs": 0,
+      "totalWithAfterRenderMs": 8058,
+      "list": {
+        "bounded": false,
+        "pageSize": 0,
+        "page": 0,
+        "pageCount": 0,
+        "totalRows": 0,
+        "filteredRows": 0,
+        "renderedRows": 0,
+        "summaryCacheMs": 0,
+        "summaryAggregateMs": 0,
+        "rowsBuildMs": 0,
+        "innerHtmlMs": 0,
+        "bindingsMs": 0,
+        "totalMs": 0,
+        "writes": 0
+      },
+      "detail": "mutation"
+    },
+    {
+      "role": "Asesor",
+      "route": "cobros",
+      "requiredHydrationWaitMs": 2,
+      "renderReadyWaitMs": 243,
+      "renderObserverWaitMs": 243,
+      "renderOutcome": "PASS_RENDER_EVENT",
+      "renderSignalVersion": "20260807.21-event-driven-render-observer",
+      "routeObserved": "cobros",
+      "hydrationReadyObserved": true,
+      "loadingVisibleObserved": false,
+      "hostTextLength": 716,
+      "renderMs": 4,
+      "afterRenderMs": 0,
+      "totalWithAfterRenderMs": 4,
+      "list": {
+        "bounded": false,
+        "pageSize": 0,
+        "page": 0,
+        "pageCount": 0,
+        "totalRows": 0,
+        "filteredRows": 0,
+        "renderedRows": 0,
+        "summaryCacheMs": 0,
+        "summaryAggregateMs": 0,
+        "rowsBuildMs": 0,
+        "innerHtmlMs": 0,
+        "bindingsMs": 0,
+        "totalMs": 0,
+        "writes": 0
+      },
+      "detail": "mutation"
+    },
+    {
+      "role": "Asesor",
+      "route": "ops",
+      "requiredHydrationWaitMs": 2,
+      "renderReadyWaitMs": 188,
+      "renderObserverWaitMs": 188,
+      "renderOutcome": "PASS_RENDER_EVENT",
+      "renderSignalVersion": "20260807.21-event-driven-render-observer",
+      "routeObserved": "ops",
+      "hydrationReadyObserved": true,
+      "loadingVisibleObserved": false,
+      "hostTextLength": 844,
+      "renderMs": 1,
+      "afterRenderMs": 0,
+      "totalWithAfterRenderMs": 1,
+      "list": {
+        "bounded": false,
+        "pageSize": 0,
+        "page": 0,
+        "pageCount": 0,
+        "totalRows": 0,
+        "filteredRows": 0,
+        "renderedRows": 0,
+        "summaryCacheMs": 0,
+        "summaryAggregateMs": 0,
+        "rowsBuildMs": 0,
+        "innerHtmlMs": 0,
+        "bindingsMs": 0,
+        "totalMs": 0,
+        "writes": 0
+      },
+      "detail": "mutation"
+    },
+    {
+      "role": "Asesor",
+      "route": "leads",
+      "requiredHydrationWaitMs": 3,
+      "renderReadyWaitMs": 191,
+      "renderObserverWaitMs": 191,
+      "renderOutcome": "PASS_RENDER_EVENT",
+      "renderSignalVersion": "20260807.21-event-driven-render-observer",
+      "routeObserved": "leads",
+      "hydrationReadyObserved": true,
+      "loadingVisibleObserved": false,
+      "hostTextLength": 808,
+      "renderMs": 1,
+      "afterRenderMs": 0,
+      "totalWithAfterRenderMs": 1,
+      "list": {
+        "bounded": false,
+        "pageSize": 0,
+        "page": 0,
+        "pageCount": 0,
+        "totalRows": 0,
+        "filteredRows": 0,
+        "renderedRows": 0,
+        "summaryCacheMs": 0,
+        "summaryAggregateMs": 0,
+        "rowsBuildMs": 0,
+        "innerHtmlMs": 0,
+        "bindingsMs": 0,
+        "totalMs": 0,
+        "writes": 0
+      },
+      "detail": "mutation"
     }
   ],
-  "roleResults": [],
-  "totalRoleFailures": null,
-  "totalWarnings": 0,
+  "roleResults": [
+    {
+      "role": "Direccion",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "membershipHash": "ef23e793fdfeb221",
+      "loginMs": 25070,
+      "initialReadyMs": 15093,
+      "routeTimings": {
+        "cliente360": 27846,
+        "polizas": 14276,
+        "cobros": 725,
+        "ops": 199,
+        "leads": 191,
+        "conciliaciones": 237,
+        "cancelaciones": 376,
+        "vehicleDetail": 7483,
+        "receiptDetail": 8629,
+        "cobroDetail": 7392
+      },
+      "checks": [
+        {
+          "id": "remember-session-visible",
+          "ok": true,
+          "detail": "checkbox",
+          "level": "PASS"
+        },
+        {
+          "id": "dead-login-help-absent",
+          "ok": true,
+          "detail": "lg-reset absent",
+          "level": "PASS"
+        },
+        {
+          "id": "rootfix-loaded",
+          "ok": true,
+          "detail": "runtime marker",
+          "level": "PASS"
+        },
+        {
+          "id": "initial-ready-under-30s",
+          "ok": true,
+          "detail": "15093ms",
+          "level": "PASS"
+        },
+        {
+          "id": "cliente360-ready-under-30s",
+          "ok": true,
+          "detail": "27846ms",
+          "level": "PASS"
+        },
+        {
+          "id": "cliente360-kpis-stable",
+          "ok": true,
+          "detail": "stable",
+          "level": "PASS"
+        },
+        {
+          "id": "cliente360-titles-responsive",
+          "ok": true,
+          "detail": "overflow=0",
+          "level": "PASS"
+        },
+        {
+          "id": "polizas-ready-under-30s",
+          "ok": true,
+          "detail": "14276ms",
+          "level": "PASS"
+        },
+        {
+          "id": "polizas-kpis-stable",
+          "ok": false,
+          "detail": "changed after ready",
+          "level": "FAIL"
+        },
+        {
+          "id": "polizas-titles-responsive",
+          "ok": true,
+          "detail": "overflow=0",
+          "level": "PASS"
+        },
+        {
+          "id": "cobros-ready-under-30s",
+          "ok": true,
+          "detail": "725ms",
+          "level": "PASS"
+        },
+        {
+          "id": "cobros-kpis-stable",
+          "ok": true,
+          "detail": "stable",
+          "level": "PASS"
+        },
+        {
+          "id": "cobros-titles-responsive",
+          "ok": true,
+          "detail": "overflow=0",
+          "level": "PASS"
+        },
+        {
+          "id": "ops-ready-under-30s",
+          "ok": true,
+          "detail": "199ms",
+          "level": "PASS"
+        },
+        {
+          "id": "ops-kpis-stable",
+          "ok": true,
+          "detail": "stable",
+          "level": "PASS"
+        },
+        {
+          "id": "ops-titles-responsive",
+          "ok": true,
+          "detail": "overflow=0",
+          "level": "PASS"
+        },
+        {
+          "id": "ops-diagnostic-button",
+          "ok": true,
+          "detail": "button visible",
+          "level": "PASS"
+        },
+        {
+          "id": "ops-diagnostic-readonly",
+          "ok": true,
+          "detail": "writes=0",
+          "level": "PASS"
+        },
+        {
+          "id": "ops-diagnostic-no-failure",
+          "ok": true,
+          "detail": "visible diagnostic",
+          "level": "PASS"
+        },
+        {
+          "id": "leads-ready-under-30s",
+          "ok": true,
+          "detail": "191ms",
+          "level": "PASS"
+        },
+        {
+          "id": "leads-kpis-stable",
+          "ok": true,
+          "detail": "stable",
+          "level": "PASS"
+        },
+        {
+          "id": "leads-titles-responsive",
+          "ok": true,
+          "detail": "overflow=0",
+          "level": "PASS"
+        },
+        {
+          "id": "leads-diagnostic-button",
+          "ok": true,
+          "detail": "button visible",
+          "level": "PASS"
+        },
+        {
+          "id": "leads-diagnostic-readonly",
+          "ok": true,
+          "detail": "writes=0",
+          "level": "PASS"
+        },
+        {
+          "id": "leads-diagnostic-no-failure",
+          "ok": true,
+          "detail": "visible diagnostic",
+          "level": "PASS"
+        },
+        {
+          "id": "conciliaciones-ready-under-30s",
+          "ok": true,
+          "detail": "237ms",
+          "level": "PASS"
+        },
+        {
+          "id": "conciliaciones-kpis-stable",
+          "ok": true,
+          "detail": "stable",
+          "level": "PASS"
+        },
+        {
+          "id": "conciliaciones-titles-responsive",
+          "ok": true,
+          "detail": "overflow=0",
+          "level": "PASS"
+        },
+        {
+          "id": "cancelaciones-ready-under-30s",
+          "ok": true,
+          "detail": "376ms",
+          "level": "PASS"
+        },
+        {
+          "id": "cancelaciones-kpis-stable",
+          "ok": true,
+          "detail": "stable",
+          "level": "PASS"
+        },
+        {
+          "id": "cancelaciones-titles-responsive",
+          "ok": true,
+          "detail": "overflow=0",
+          "level": "PASS"
+        },
+        {
+          "id": "cancelaciones-empty-honest",
+          "ok": true,
+          "detail": "honest empty state",
+          "level": "PASS"
+        },
+        {
+          "id": "vehicle-target-exists",
+          "ok": true,
+          "detail": "vehicle target",
+          "level": "PASS"
+        },
+        {
+          "id": "receipt-target-exists",
+          "ok": true,
+          "detail": "receipt target",
+          "level": "PASS"
+        },
+        {
+          "id": "cobro-target-exists",
+          "ok": true,
+          "detail": "cobro target",
+          "level": "PASS"
+        },
+        {
+          "id": "vehicle-detail-button",
+          "ok": false,
+          "detail": "button visible",
+          "level": "FAIL"
+        },
+        {
+          "id": "receipt-detail-button",
+          "ok": false,
+          "detail": "button visible",
+          "level": "FAIL"
+        },
+        {
+          "id": "cobro-detail-button",
+          "ok": false,
+          "detail": "button visible",
+          "level": "FAIL"
+        },
+        {
+          "id": "screenshots-best-effort",
+          "ok": true,
+          "detail": "",
+          "level": "PASS"
+        },
+        {
+          "id": "console-errors-zero",
+          "ok": false,
+          "detail": "TypeError: Cannot read properties of null (reading 'lecciones')",
+          "level": "WARN"
+        }
+      ],
+      "failed": 4,
+      "warnings": 1,
+      "consoleErrorCount": 1,
+      "screenshots": [
+        "direccion-inicio.png",
+        "direccion-cliente360.png",
+        "direccion-polizas.png",
+        "direccion-cobros.png",
+        "direccion-ops.png",
+        "direccion-leads.png"
+      ],
+      "ok": false
+    },
+    {
+      "role": "Operativo",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "membershipHash": "d5384adb0f2e3a06",
+      "loginMs": 19073,
+      "initialReadyMs": 11882,
+      "routeTimings": {
+        "cliente360": 27760,
+        "polizas": 8689,
+        "cobros": 246,
+        "ops": 193,
+        "leads": 247,
+        "conciliaciones": 239,
+        "cancelaciones": 181
+      },
+      "checks": [
+        {
+          "id": "remember-session-visible",
+          "ok": true,
+          "detail": "checkbox",
+          "level": "PASS"
+        },
+        {
+          "id": "dead-login-help-absent",
+          "ok": true,
+          "detail": "lg-reset absent",
+          "level": "PASS"
+        },
+        {
+          "id": "rootfix-loaded",
+          "ok": true,
+          "detail": "runtime marker",
+          "level": "PASS"
+        },
+        {
+          "id": "initial-ready-under-30s",
+          "ok": true,
+          "detail": "11882ms",
+          "level": "PASS"
+        },
+        {
+          "id": "cliente360-ready-under-30s",
+          "ok": true,
+          "detail": "27760ms",
+          "level": "PASS"
+        },
+        {
+          "id": "cliente360-kpis-stable",
+          "ok": true,
+          "detail": "stable",
+          "level": "PASS"
+        },
+        {
+          "id": "cliente360-titles-responsive",
+          "ok": true,
+          "detail": "overflow=0",
+          "level": "PASS"
+        },
+        {
+          "id": "polizas-ready-under-30s",
+          "ok": true,
+          "detail": "8689ms",
+          "level": "PASS"
+        },
+        {
+          "id": "polizas-kpis-stable",
+          "ok": false,
+          "detail": "changed after ready",
+          "level": "FAIL"
+        },
+        {
+          "id": "polizas-titles-responsive",
+          "ok": true,
+          "detail": "overflow=0",
+          "level": "PASS"
+        },
+        {
+          "id": "cobros-ready-under-30s",
+          "ok": true,
+          "detail": "246ms",
+          "level": "PASS"
+        },
+        {
+          "id": "cobros-kpis-stable",
+          "ok": true,
+          "detail": "stable",
+          "level": "PASS"
+        },
+        {
+          "id": "cobros-titles-responsive",
+          "ok": true,
+          "detail": "overflow=0",
+          "level": "PASS"
+        },
+        {
+          "id": "ops-ready-under-30s",
+          "ok": true,
+          "detail": "193ms",
+          "level": "PASS"
+        },
+        {
+          "id": "ops-kpis-stable",
+          "ok": true,
+          "detail": "stable",
+          "level": "PASS"
+        },
+        {
+          "id": "ops-titles-responsive",
+          "ok": true,
+          "detail": "overflow=0",
+          "level": "PASS"
+        },
+        {
+          "id": "ops-diagnostic-button",
+          "ok": true,
+          "detail": "button visible",
+          "level": "PASS"
+        },
+        {
+          "id": "ops-diagnostic-readonly",
+          "ok": true,
+          "detail": "writes=0",
+          "level": "PASS"
+        },
+        {
+          "id": "ops-diagnostic-no-failure",
+          "ok": true,
+          "detail": "visible diagnostic",
+          "level": "PASS"
+        },
+        {
+          "id": "leads-ready-under-30s",
+          "ok": true,
+          "detail": "247ms",
+          "level": "PASS"
+        },
+        {
+          "id": "leads-kpis-stable",
+          "ok": true,
+          "detail": "stable",
+          "level": "PASS"
+        },
+        {
+          "id": "leads-titles-responsive",
+          "ok": true,
+          "detail": "overflow=0",
+          "level": "PASS"
+        },
+        {
+          "id": "leads-diagnostic-button",
+          "ok": true,
+          "detail": "button visible",
+          "level": "PASS"
+        },
+        {
+          "id": "leads-diagnostic-readonly",
+          "ok": true,
+          "detail": "writes=0",
+          "level": "PASS"
+        },
+        {
+          "id": "leads-diagnostic-no-failure",
+          "ok": true,
+          "detail": "visible diagnostic",
+          "level": "PASS"
+        },
+        {
+          "id": "conciliaciones-ready-under-30s",
+          "ok": true,
+          "detail": "239ms",
+          "level": "PASS"
+        },
+        {
+          "id": "conciliaciones-kpis-stable",
+          "ok": true,
+          "detail": "stable",
+          "level": "PASS"
+        },
+        {
+          "id": "conciliaciones-titles-responsive",
+          "ok": true,
+          "detail": "overflow=0",
+          "level": "PASS"
+        },
+        {
+          "id": "conciliaciones-empty-honest",
+          "ok": true,
+          "detail": "honest empty state",
+          "level": "PASS"
+        },
+        {
+          "id": "cancelaciones-ready-under-30s",
+          "ok": true,
+          "detail": "181ms",
+          "level": "PASS"
+        },
+        {
+          "id": "cancelaciones-kpis-stable",
+          "ok": true,
+          "detail": "stable",
+          "level": "PASS"
+        },
+        {
+          "id": "cancelaciones-titles-responsive",
+          "ok": true,
+          "detail": "overflow=0",
+          "level": "PASS"
+        },
+        {
+          "id": "cancelaciones-empty-honest",
+          "ok": true,
+          "detail": "honest empty state",
+          "level": "PASS"
+        },
+        {
+          "id": "screenshots-best-effort",
+          "ok": true,
+          "detail": "",
+          "level": "PASS"
+        },
+        {
+          "id": "console-errors-zero",
+          "ok": true,
+          "detail": "",
+          "level": "PASS"
+        }
+      ],
+      "failed": 1,
+      "warnings": 0,
+      "consoleErrorCount": 0,
+      "screenshots": [
+        "operativo-inicio.png",
+        "operativo-cliente360.png",
+        "operativo-polizas.png",
+        "operativo-cobros.png",
+        "operativo-ops.png",
+        "operativo-leads.png"
+      ],
+      "ok": false
+    },
+    {
+      "role": "Asesor",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "membershipHash": "32a8b9ab5285e298",
+      "loginMs": 21753,
+      "initialReadyMs": 14530,
+      "routeTimings": {
+        "cliente360": 27759,
+        "polizas": 8256,
+        "cobros": 243,
+        "ops": 188,
+        "leads": 191
+      },
+      "checks": [
+        {
+          "id": "remember-session-visible",
+          "ok": true,
+          "detail": "checkbox",
+          "level": "PASS"
+        },
+        {
+          "id": "dead-login-help-absent",
+          "ok": true,
+          "detail": "lg-reset absent",
+          "level": "PASS"
+        },
+        {
+          "id": "rootfix-loaded",
+          "ok": true,
+          "detail": "runtime marker",
+          "level": "PASS"
+        },
+        {
+          "id": "initial-ready-under-30s",
+          "ok": true,
+          "detail": "14530ms",
+          "level": "PASS"
+        },
+        {
+          "id": "cliente360-ready-under-30s",
+          "ok": true,
+          "detail": "27759ms",
+          "level": "PASS"
+        },
+        {
+          "id": "cliente360-kpis-stable",
+          "ok": true,
+          "detail": "stable",
+          "level": "PASS"
+        },
+        {
+          "id": "cliente360-titles-responsive",
+          "ok": true,
+          "detail": "overflow=0",
+          "level": "PASS"
+        },
+        {
+          "id": "polizas-ready-under-30s",
+          "ok": true,
+          "detail": "8256ms",
+          "level": "PASS"
+        },
+        {
+          "id": "polizas-kpis-stable",
+          "ok": false,
+          "detail": "changed after ready",
+          "level": "FAIL"
+        },
+        {
+          "id": "polizas-titles-responsive",
+          "ok": true,
+          "detail": "overflow=0",
+          "level": "PASS"
+        },
+        {
+          "id": "cobros-ready-under-30s",
+          "ok": true,
+          "detail": "243ms",
+          "level": "PASS"
+        },
+        {
+          "id": "cobros-kpis-stable",
+          "ok": true,
+          "detail": "stable",
+          "level": "PASS"
+        },
+        {
+          "id": "cobros-titles-responsive",
+          "ok": true,
+          "detail": "overflow=0",
+          "level": "PASS"
+        },
+        {
+          "id": "ops-ready-under-30s",
+          "ok": true,
+          "detail": "188ms",
+          "level": "PASS"
+        },
+        {
+          "id": "ops-kpis-stable",
+          "ok": true,
+          "detail": "stable",
+          "level": "PASS"
+        },
+        {
+          "id": "ops-titles-responsive",
+          "ok": true,
+          "detail": "overflow=0",
+          "level": "PASS"
+        },
+        {
+          "id": "ops-diagnostic-button",
+          "ok": true,
+          "detail": "button visible",
+          "level": "PASS"
+        },
+        {
+          "id": "ops-diagnostic-readonly",
+          "ok": true,
+          "detail": "writes=0",
+          "level": "PASS"
+        },
+        {
+          "id": "ops-diagnostic-no-failure",
+          "ok": true,
+          "detail": "visible diagnostic",
+          "level": "PASS"
+        },
+        {
+          "id": "leads-ready-under-30s",
+          "ok": true,
+          "detail": "191ms",
+          "level": "PASS"
+        },
+        {
+          "id": "leads-kpis-stable",
+          "ok": true,
+          "detail": "stable",
+          "level": "PASS"
+        },
+        {
+          "id": "leads-titles-responsive",
+          "ok": true,
+          "detail": "overflow=0",
+          "level": "PASS"
+        },
+        {
+          "id": "leads-diagnostic-button",
+          "ok": true,
+          "detail": "button visible",
+          "level": "PASS"
+        },
+        {
+          "id": "leads-diagnostic-readonly",
+          "ok": true,
+          "detail": "writes=0",
+          "level": "PASS"
+        },
+        {
+          "id": "leads-diagnostic-no-failure",
+          "ok": true,
+          "detail": "visible diagnostic",
+          "level": "PASS"
+        },
+        {
+          "id": "screenshots-best-effort",
+          "ok": true,
+          "detail": "",
+          "level": "PASS"
+        },
+        {
+          "id": "console-errors-zero",
+          "ok": true,
+          "detail": "",
+          "level": "PASS"
+        }
+      ],
+      "failed": 1,
+      "warnings": 0,
+      "consoleErrorCount": 0,
+      "screenshots": [
+        "asesor-inicio.png",
+        "asesor-cliente360.png",
+        "asesor-polizas.png",
+        "asesor-cobros.png",
+        "asesor-ops.png",
+        "asesor-leads.png"
+      ],
+      "ok": false
+    }
+  ],
+  "totalRoleFailures": 6,
+  "totalWarnings": 1,
   "captureWarnings": [],
   "snapshotIntegrity": "VERIFIED_UNCHANGED",
-  "firestoreReads": 20,
+  "firestoreReads": 33,
   "firestoreWrites": 0,
   "authWrites": 0,
   "operationalWrites": 0,
@@ -90,7 +1603,7 @@
     "targetChannel": "live",
     "restoreExecuted": true,
     "restoreOutcome": "success",
-    "runId": "31208347862",
+    "runId": "31211158696",
     "attempt": 1,
     "firestoreWrites": 0,
     "authWrites": 0,
