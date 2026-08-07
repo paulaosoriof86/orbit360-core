@@ -9,11 +9,13 @@ const ROOT = process.cwd();
 const GATE_ID = process.argv[2] || 'block1-client360-insurers-lab-v20260717';
 const BLOCK1_V23_GATE_ID = 'block1-client360-insurers-lab-v20260717';
 const VISUAL_LEGACY_GATE_ID = 'block2.7-visual-matrix-corrected-post-auth-lab-v20260805';
+const V28_PROFILE = 'v28-focal-provenance-universe';
 const LEGACY_ROUTER = 'tools/orbit360-validar-gate-contracts-legacy-v20260717.mjs';
 const EVIDENCE_REL = 'orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json';
 const EVIDENCE_PATH = path.join(ROOT, EVIDENCE_REL);
 const DEFAULT_VISUAL_REQUEST_REL = '.github/orbit360-requests/visual-matrix-corrected-post-auth-lab-v20260805-authorization.json';
 const DEFAULT_BLOCK1_V23_REQUEST_REL = '.github/orbit360-requests/block1-client360-insurers-v23-authorization.json';
+const DEFAULT_BLOCK1_V28_REQUEST_REL = '.github/orbit360-requests/block1-client360-insurers-v28-focal-provenance-universe-authorization.json';
 const STOP_OVERLAY_REL = 'tools/orbit360-validator-lifecycle-overlay-visual-matrix-v8-stop-preflight-v20260806.json';
 const CANONICAL_LIFECYCLE_COMPOSITION = 'phase-capability-contract-v1';
 const GATE_CONFIG = Object.freeze({
@@ -32,9 +34,18 @@ const GATE_CONFIG = Object.freeze({
     sourcePhase: ''
   }
 });
+const BLOCK1_V28_CONFIG = Object.freeze({
+  contractVersion: '1.0.41',
+  lifecycle: 'tools/orbit360-validator-lifecycle-block1-focal-provenance-universe-v28-v20260807.json',
+  engine: 'tools/orbit360-validar-gate-contracts-engine-block1-focal-provenance-universe-v28-v20260807.mjs',
+  defaultRequest: DEFAULT_BLOCK1_V28_REQUEST_REL,
+  sourcePhase: 'SOURCE_ONLY_FOCAL_PROVENANCE_UNIVERSE_V28'
+});
 const PHASE_PROFILES = Object.freeze({
   SOURCE_ONLY_NATIVE_MATRIX_VALIDATION: {secrets:false,firestoreRead:false,writes:false,runtime:false,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false},
   BLOCK1_NATIVE_MATRIX_RUNTIME_V23: {secrets:true,firestoreRead:true,writes:false,runtime:true,browser:true,deploy:true,functionsDeploy:false,rulesDeploy:false,production:false},
+  SOURCE_ONLY_FOCAL_PROVENANCE_UNIVERSE_V28: {secrets:false,firestoreRead:false,writes:false,runtime:false,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false},
+  BLOCK1_FOCAL_PROVENANCE_UNIVERSE_READONLY_V28: {secrets:true,firestoreRead:true,writes:false,runtime:true,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false},
   VISUAL_MATRIX_CORRECTED_POST_AUTH_LAB_EXECUTION: {secrets:true,firestoreRead:true,writes:false,runtime:true,browser:true,deploy:true,functionsDeploy:false,rulesDeploy:false,production:false}
 });
 
@@ -52,7 +63,7 @@ function exactCapabilities(actual, expected) {
 }
 function failOutput(config, error) {
   return {
-    schemaVersion: 'orbit360-gate-contract-preflight-canonical-router-v5-phase-aware-v23',
+    schemaVersion: 'orbit360-gate-contract-preflight-canonical-router-v6-profile-aware',
     gateId: GATE_ID,
     contractVersion: config && config.contractVersion || '',
     status: 'VALIDATOR_STALE',
@@ -62,8 +73,9 @@ function failOutput(config, error) {
     error: String(error && error.message || error),
     canonicalLifecycleComposition: CANONICAL_LIFECYCLE_COMPOSITION,
     canonicalEngine: config && config.engine || '',
-    canonicalRouterVersion: 'v5-phase-aware-native-block1-v23',
+    canonicalRouterVersion: 'v6-profile-aware-block1-v28',
     canonicalStopOverlay: GATE_ID === VISUAL_LEGACY_GATE_ID ? STOP_OVERLAY_REL : '',
+    gateProfile: process.env.ORBIT360_GATE_PROFILE || 'default',
     legacyDelegate: LEGACY_ROUTER,
     sourceTransformed: false,
     dataAccess: false,
@@ -83,12 +95,13 @@ function failOutput(config, error) {
   };
 }
 
-const config = GATE_CONFIG[GATE_ID];
+const gateProfile = process.env.ORBIT360_GATE_PROFILE || '';
+const config = GATE_ID === BLOCK1_V23_GATE_ID && gateProfile === V28_PROFILE ? BLOCK1_V28_CONFIG : GATE_CONFIG[GATE_ID];
 if (!config) {
   const legacyPath = path.join(ROOT, LEGACY_ROUTER);
   if (!fs.existsSync(legacyPath)) {
     const missing = {
-      schemaVersion: 'orbit360-gate-contract-preflight-canonical-router-v5-phase-aware-v23',
+      schemaVersion: 'orbit360-gate-contract-preflight-canonical-router-v6-profile-aware',
       gateId: GATE_ID,
       status: 'VALIDATOR_STALE',
       classification: 'PIPELINE_MECHANISM_FAILURE',
@@ -123,9 +136,7 @@ try {
 
   if (GATE_ID === VISUAL_LEGACY_GATE_ID && fs.existsSync(path.join(ROOT, STOP_OVERLAY_REL))) {
     const overlay = readJson(STOP_OVERLAY_REL);
-    if (overlay.stopRetryActive === true || overlay.freshAuthorizationRequired === true) {
-      throw new Error('STOP_RETRY_ACTIVE_FRESH_AUTHORIZATION_REQUIRED');
-    }
+    if (overlay.stopRetryActive === true || overlay.freshAuthorizationRequired === true) throw new Error('STOP_RETRY_ACTIVE_FRESH_AUTHORIZATION_REQUIRED');
   }
 
   const lifecycle = readJson(config.lifecycle);
@@ -144,8 +155,7 @@ try {
   const requestFile = process.env.ORBIT360_REQUEST_FILE || config.defaultRequest;
   if (isSourcePhase) {
     if (expectedRequestVersion !== 'NONE_PENDING_FRESH_AUTHORIZATION') throw new Error('SOURCE_PHASE_UNEXPECTED_REQUEST_VERSION');
-    const requestAbs = path.join(ROOT, requestFile);
-    if (fs.existsSync(requestAbs)) throw new Error('SOURCE_PHASE_REQUEST_MUST_BE_ABSENT');
+    if (fs.existsSync(path.join(ROOT, requestFile))) throw new Error('SOURCE_PHASE_REQUEST_MUST_BE_ABSENT');
   } else {
     if (expectedRequestVersion === 'NONE_PENDING_FRESH_AUTHORIZATION') throw new Error('FRESH_AUTHORIZATION_NOT_REGISTERED');
     const requestAbs = path.join(ROOT, requestFile);
@@ -176,8 +186,9 @@ try {
     canonicalEngine: config.engine,
     canonicalLifecycleContract: config.lifecycle,
     canonicalLifecycleComposition: CANONICAL_LIFECYCLE_COMPOSITION,
-    canonicalRouterVersion: 'v5-phase-aware-native-block1-v23',
+    canonicalRouterVersion: 'v6-profile-aware-block1-v28',
     canonicalStopOverlay: GATE_ID === VISUAL_LEGACY_GATE_ID ? STOP_OVERLAY_REL : '',
+    gateProfile: gateProfile || 'default',
     legacyDelegate: LEGACY_ROUTER,
     engineEvidenceSource: 'sync-file-evidence-not-stdout-v1',
     engineStdoutParsed: false,
