@@ -1,0 +1,99 @@
+name: Orbit 360 · Sourcecheck v18 hydration transactional
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: orbit360-sourcecheck-v18-hydration-transactional
+  cancel-in-progress: false
+
+jobs:
+  source-v18-hydration-transactional:
+    if: github.head_ref == 'ays/sourcefix-v18-hydration-transactional-run-evidence-20260807'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout exact sourcefix head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Assert authorized base and frozen v17
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git merge-base HEAD b4a80c5ab7ca4e719e4e1050eedfb4669ffefdf8)" = 'b4a80c5ab7ca4e719e4e1050eedfb4669ffefdf8'
+          node - <<'NODE'
+          const fs = require('fs');
+          const req = JSON.parse(fs.readFileSync('.github/orbit360-requests/visual-matrix-corrected-post-auth-lab-v20260805-authorization.json','utf8'));
+          const lifecycle = JSON.parse(fs.readFileSync('tools/orbit360-validator-lifecycle-contract-visual-matrix-corrected-post-auth-lab-v20260805.json','utf8'));
+          const overlay = JSON.parse(fs.readFileSync('tools/orbit360-validator-lifecycle-overlay-visual-matrix-v8-stop-preflight-v20260806.json','utf8'));
+          if (req.requestVersion !== '20260807.17-two-phase-runtime' || !req.consumed || !req.authorizationFrozen || req.allowedExecutions !== 0 || req.replayAllowed !== false) process.exit(41);
+          if (!lifecycle.stopRetryActive || lifecycle.executionAuthorized || overlay.runtimeAllowed || overlay.hostingAllowed) process.exit(42);
+          console.log('PASS_V17_FROZEN_BEFORE_V18_SOURCEFIX');
+          NODE
+
+      - name: Apply v18 source-only rootfix
+        shell: bash
+        run: |
+          set -euo pipefail
+          if grep -q "20260807.4-transactional-owner-reentrant-readiness" orbit360-platform/core/visual-runtime-hydration-contract-v20260805.js; then
+            echo 'PASS_V18_ROOTFIX_ALREADY_APPLIED'
+          else
+            node tools/orbit360-apply-v18-hydration-transactional-rootfix-v20260807.mjs
+          fi
+
+      - name: Syntax and protected scope
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-apply-v18-hydration-transactional-rootfix-v20260807.mjs
+          node --check tools/orbit360-test-v18-hydration-transactional-run-evidence-source-v20260807.mjs
+          node --check tools/orbit360-visual-runtime-rootfix-browser-precheck-v20260805.mjs
+          node --check tools/orbit360-seal-visual-matrix-corrected-post-auth-runtime-v20260805.mjs
+          node --check orbit360-platform/core/visual-runtime-hydration-contract-v20260805.js
+          bash -n tools/orbit360-run-visual-matrix-corrected-post-auth-runtime-only-v3-cross-runner-v20260806.sh
+          git diff --name-only b4a80c5ab7ca4e719e4e1050eedfb4669ffefdf8...HEAD | tee /tmp/v18-source-files.txt
+          if grep -E '(^|/)(data/store\.js|data/store-firestore-lab\.local\.js|core/backend-lab-|core/auth\.js|core/importa\.js|firestore\.rules)$' /tmp/v18-source-files.txt; then
+            echo 'STOP_PROTECTED_FILE_TOUCHED'; exit 43;
+          fi
+
+      - name: Progressive installation fixture
+        shell: bash
+        run: node tools/orbit360-test-v18-hydration-transactional-run-evidence-source-v20260807.mjs
+
+      - name: Governing portable suites
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-test-request-lifecycle-baseline-contract-v20260806.mjs
+          node tools/orbit360-test-capture-watchdog-source-v20260806.mjs
+          node tools/orbit360-test-windows-signal-compatibility-synthetic-v20260806.mjs
+          node tools/orbit360-test-visual-matrix-timeout-signal-safe-portable-v20260806.mjs
+          node tools/orbit360-test-visual-matrix-cross-runner-portable-v20260806.mjs
+          node tools/orbit360-test-preflight-portable-source-v20260806.mjs
+          node tools/orbit360-test-runtime-transport-base-sha-v20260806.mjs
+
+      - name: Persist sanitized source-only rootfix
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name orbit360-source-gate-bot
+          git config user.email orbit360-source-gate-bot@users.noreply.github.com
+          git add \
+            orbit360-platform/core/visual-runtime-hydration-contract-v20260805.js \
+            tools/orbit360-visual-runtime-rootfix-browser-precheck-v20260805.mjs \
+            tools/orbit360-run-visual-matrix-corrected-post-auth-runtime-only-v3-cross-runner-v20260806.sh \
+            tools/orbit360-seal-visual-matrix-corrected-post-auth-runtime-v20260805.mjs \
+            orbit360-platform/runtime-gate-crm-v20260716/v18-hydration-transactional-run-evidence-source-sanitized-v20260807.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'sourcefix: persist v18 transactional hydration rootfix [skip ci]'
+            git push origin HEAD:ays/sourcefix-v18-hydration-transactional-run-evidence-20260807
+          fi
+          echo 'PASS_V18_SOURCE_ONLY_NO_SECRETS_NO_FIREBASE_NO_HOSTING_NO_BROWSER_NO_WRITES'
