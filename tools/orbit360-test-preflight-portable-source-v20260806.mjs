@@ -42,6 +42,7 @@ checks.routerHonorsStopOverlay = router.includes('STOP_RETRY_ACTIVE_FRESH_AUTHOR
 checks.preflightNoJq = !/\bjq\b/.test(preflight);
 checks.workflowNoJq = !/\bjq\b/.test(workflow);
 checks.preflightUsesGuard = preflight.includes('orbit360-json-guard-visual-matrix-runtime-v20260806.mjs');
+checks.preflightBindsLifecycle = preflight.includes('validate-request "$REQUEST" "$PARENT" "$EXPECTED_REQUEST_VERSION" "$LIFECYCLE"');
 checks.workflowUsesGuard = workflow.includes('detect-active-request');
 checks.workflowHasFailClosedVersion = workflow.includes('ORBIT360_EXPECTED_REQUEST_VERSION');
 checks.overlayPhaseRecognized = isStopPhase || isAuthorizedPhase;
@@ -55,9 +56,12 @@ checks.overlayRiskBoundariesMatchPhase =
   (isStopPhase || isAuthorizedPhase);
 
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'orbit360-preflight-source-'));
+const version = '20260806.synthetic-portable-preflight-runtime';
+const baselineChannel = 'visual-matrix-corrected-backup-synthetic-current';
+const baselineScript = 'tools/orbit360-restore-visual-matrix-synthetic-current.sh';
 const syntheticRequest = {
   schemaVersion: 'orbit360-visual-matrix-corrected-post-auth-request-v1',
-  requestVersion: '20260806.synthetic-portable-preflight-runtime',
+  requestVersion: version,
   gateId: 'block2.7-visual-matrix-corrected-post-auth-lab-v20260805',
   contractVersion: '2.7.8',
   status: 'AUTHORIZED_ONCE',
@@ -66,12 +70,31 @@ const syntheticRequest = {
   consumed: false,
   authorizationFrozen: false,
   replayAllowed: false,
+  branch: 'ays/backend-tenant-lab-v99-20260703',
+  projectId: 'ays-orbit-360-lab',
+  tenantId: 'alianzas-soluciones',
   parentHead: 'a'.repeat(40),
+  authorizedBaseHead: 'a'.repeat(40),
+  capabilities: {
+    secrets: true,
+    firestoreRead: true,
+    writes: false,
+    runtime: true,
+    browser: true,
+    deploy: true,
+    functionsDeploy: false,
+    rulesDeploy: false,
+    production: false
+  },
   scope: {
     registeredWorkflowRelayRequired: true,
-    restorePriorV6BackupBeforeRuntime: true,
-    restorePriorV6BackupChannel: 'visual-matrix-corrected-backup-31116830824',
+    restorePriorBaselineBeforeRuntime: true,
+    restorePriorBaselineChannel: baselineChannel,
+    restorePriorBaselineScript: baselineScript,
+    hostingOnly: true,
     hostingDeploysMaximum: 1,
+    hostingBackupClone: true,
+    hostingRollbackCloneOnFailure: true,
     functionsDeploy: false,
     rulesDeploy: false,
     firestoreWrites: false,
@@ -83,10 +106,36 @@ const syntheticRequest = {
     merge: false
   }
 };
+const syntheticLifecycle = {
+  schemaVersion: 'orbit360-validator-lifecycle-contract-v1',
+  gateId: syntheticRequest.gateId,
+  gateContractVersion: syntheticRequest.contractVersion,
+  status: 'AUTHORIZED_FRESH_REQUEST_ONLY_SYNTHETIC_PENDING_EXCLUSIVE_REQUEST',
+  expectedRequestVersion: version,
+  branch: syntheticRequest.branch,
+  projectId: syntheticRequest.projectId,
+  tenantId: syntheticRequest.tenantId,
+  priorHostingRestoreChannel: baselineChannel,
+  priorHostingRestoreScript: baselineScript,
+  hostingDeploysMaximum: 1,
+  hostingBackupCloneAuthorized: true,
+  hostingRollbackCloneAuthorizedOnFailure: true,
+  stopRetryActive: false,
+  authorizationReserved: true,
+  authorizationFrozen: false,
+  allowedExecutions: 1,
+  executionAuthorized: false,
+  secretAccessAuthorized: false,
+  browserAuthorized: false,
+  hostingDeployAuthorized: false,
+  executionProfile: { capabilities: { writes: false, functionsDeploy: false, rulesDeploy: false, production: false } }
+};
 const requestPath = path.join(tmp, 'request.json');
+const lifecyclePath = path.join(tmp, 'lifecycle.json');
 fs.writeFileSync(requestPath, JSON.stringify(syntheticRequest), 'utf8');
-checks.guardDetectPass = spawnSync(process.execPath, [files.guard, 'detect-active-request', requestPath, syntheticRequest.requestVersion]).status === 0;
-checks.guardValidateRequestPass = spawnSync(process.execPath, [files.guard, 'validate-request', requestPath, syntheticRequest.parentHead, syntheticRequest.requestVersion]).status === 0;
+fs.writeFileSync(lifecyclePath, JSON.stringify(syntheticLifecycle), 'utf8');
+checks.guardDetectPass = spawnSync(process.execPath, [files.guard, 'detect-active-request', requestPath, version]).status === 0;
+checks.guardValidateRequestPass = spawnSync(process.execPath, [files.guard, 'validate-request', requestPath, syntheticRequest.parentHead, version, lifecyclePath]).status === 0;
 
 const go = {
   status: 'GO_GATE_CONTRACT',
@@ -123,8 +172,8 @@ checks.guardEmitStop = emit.status === 41 && stop.status === 'STOP_PREFLIGHT_REL
 
 const failedCheckIds = Object.entries(checks).filter(([, ok]) => !ok).map(([id]) => id);
 const output = {
-  schemaVersion: 'orbit360-preflight-portable-source-test-v3-phase-aware',
-  generatedAt: '2026-08-06T17:58:00-06:00',
+  schemaVersion: 'orbit360-preflight-portable-source-test-v4-lifecycle-baseline-aware',
+  generatedAt: '2026-08-06T20:40:00-06:00',
   gateId: 'block2.7-visual-matrix-corrected-post-auth-lab-v20260805',
   status: failedCheckIds.length ? 'STOP_SOURCE_TEST' : 'PASS_SOURCE_ONLY_PHASE_AWARE_PREFLIGHT_VALIDATOR',
   classification: failedCheckIds.length ? 'VALIDATOR_STALE' : 'VALIDATOR_STALE_CORRECTED_SOURCE_ONLY',
