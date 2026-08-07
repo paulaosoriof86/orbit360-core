@@ -1,80 +1,90 @@
 {
-  "schemaVersion": "orbit360-visual-observable-rootfix-matrix-v1",
+  "schemaVersion": "orbit360-visual-observable-rootfix-matrix-v17-route-aware",
   "gateId": "block2.7-visual-matrix-corrected-post-auth-lab-v20260805",
   "contractVersion": "2.7.8",
   "stage": "FAIL_VISUAL_OBSERVABLE_ROOTFIX_MATRIX",
-  "classification": "PIPELINE_MECHANISM_FAILURE",
+  "classification": "FUNCTIONAL_DEFECT",
+  "readinessAuthority": "OrbitHydrationContractDiagnostics",
   "projectId": "ays-orbit-360-lab",
   "tenantId": "alianzas-soluciones",
-  "currentCheckpoint": "DIRECCION_ROUTE_CLIENTE360_TIMEOUT",
+  "currentCheckpoint": "DIRECCION_ROUTE_CLIENTE360_REQUIRED_HYDRATION_TIMEOUT",
   "checkpoints": [
     {
       "checkpoint": "SERVICE_ACCOUNT_VALIDATE",
-      "at": "2026-08-07T15:13:21.196Z"
+      "at": "2026-08-07T16:33:40.434Z"
     },
     {
       "checkpoint": "PROTECTED_SNAPSHOT_BEFORE",
-      "at": "2026-08-07T15:13:21.218Z"
+      "at": "2026-08-07T16:33:40.476Z"
     },
     {
       "checkpoint": "BROWSER_LAUNCH",
-      "at": "2026-08-07T15:13:27.520Z"
+      "at": "2026-08-07T16:33:44.307Z"
     },
     {
       "checkpoint": "DIRECCION_CONTEXT_CREATE",
-      "at": "2026-08-07T15:13:27.573Z"
+      "at": "2026-08-07T16:33:44.380Z"
     },
     {
       "checkpoint": "DIRECCION_PAGE_GOTO",
-      "at": "2026-08-07T15:13:27.616Z"
+      "at": "2026-08-07T16:33:44.476Z"
     },
     {
       "checkpoint": "DIRECCION_FIREBASE_AUTH_WAIT",
-      "at": "2026-08-07T15:13:32.027Z"
+      "at": "2026-08-07T16:33:46.322Z"
     },
     {
       "checkpoint": "DIRECCION_FIREBASE_AUTH_PASS",
-      "at": "2026-08-07T15:13:32.030Z",
-      "elapsedMs": 2
+      "at": "2026-08-07T16:33:46.326Z",
+      "elapsedMs": 3
     },
     {
       "checkpoint": "DIRECCION_CUSTOM_TOKEN_CREATE",
-      "at": "2026-08-07T15:13:32.030Z"
+      "at": "2026-08-07T16:33:46.326Z"
     },
     {
       "checkpoint": "DIRECCION_CUSTOM_TOKEN_SIGNIN",
-      "at": "2026-08-07T15:13:32.068Z"
+      "at": "2026-08-07T16:33:46.389Z"
     },
     {
       "checkpoint": "DIRECCION_AUTH_INSIDE_WAIT",
-      "at": "2026-08-07T15:13:32.378Z"
+      "at": "2026-08-07T16:33:46.591Z"
     },
     {
       "checkpoint": "DIRECCION_AUTH_INSIDE_PASS",
-      "at": "2026-08-07T15:13:32.611Z",
-      "elapsedMs": 233
+      "at": "2026-08-07T16:33:46.807Z",
+      "elapsedMs": 216
     },
     {
-      "checkpoint": "DIRECCION_ROUTE_INICIO_WAIT",
-      "at": "2026-08-07T15:13:32.614Z"
+      "checkpoint": "DIRECCION_ROUTE_INICIO_REQUIRED_HYDRATION_WAIT",
+      "at": "2026-08-07T16:33:46.813Z"
     },
     {
-      "checkpoint": "DIRECCION_ROUTE_INICIO_PASS",
-      "at": "2026-08-07T15:13:55.790Z",
-      "elapsedMs": 23175
+      "checkpoint": "DIRECCION_ROUTE_INICIO_REQUIRED_HYDRATION_PASS",
+      "at": "2026-08-07T16:33:58.246Z",
+      "elapsedMs": 11433
+    },
+    {
+      "checkpoint": "DIRECCION_ROUTE_INICIO_RENDER_READY_WAIT",
+      "at": "2026-08-07T16:33:58.246Z"
+    },
+    {
+      "checkpoint": "DIRECCION_ROUTE_INICIO_RENDER_READY_PASS",
+      "at": "2026-08-07T16:34:06.224Z",
+      "elapsedMs": 7978
     },
     {
       "checkpoint": "DIRECCION_NAVIGATE_CLIENTE360",
-      "at": "2026-08-07T15:14:05.798Z"
+      "at": "2026-08-07T16:34:06.354Z"
     },
     {
-      "checkpoint": "DIRECCION_ROUTE_CLIENTE360_WAIT",
-      "at": "2026-08-07T15:14:05.800Z"
+      "checkpoint": "DIRECCION_ROUTE_CLIENTE360_REQUIRED_HYDRATION_WAIT",
+      "at": "2026-08-07T16:34:06.357Z"
     },
     {
-      "checkpoint": "DIRECCION_ROUTE_CLIENTE360_TIMEOUT",
-      "at": "2026-08-07T15:15:36.116Z",
-      "elapsedMs": 90316
+      "checkpoint": "DIRECCION_ROUTE_CLIENTE360_REQUIRED_HYDRATION_TIMEOUT",
+      "at": "2026-08-07T16:34:54.302Z",
+      "elapsedMs": 47944
     }
   ],
   "before": {
@@ -186,14 +196,7 @@
     }
   },
   "roles": [],
-  "captureWarnings": [
-    {
-      "checkpoint": "DIRECCION_ROUTE_CLIENTE360_TIMEOUT",
-      "name": "failure-direccion-route-cliente360",
-      "error": "page.evaluate: Target page, context or browser has been closed",
-      "blocking": false
-    }
-  ],
+  "captureWarnings": [],
   "firestoreReads": 19,
   "firestoreWrites": 0,
   "authWrites": 0,
@@ -206,9 +209,63 @@
   "containsPasswords": false,
   "ok": false,
   "observedState": {
-    "stateError": "page.evaluate: Target page, context or browser has been closed"
+    "authStage": "inside",
+    "preAuth": false,
+    "loginVisible": false,
+    "firebaseUser": true,
+    "productUserReady": true,
+    "membershipStatus": "ready",
+    "membershipReady": true,
+    "membershipTenantBound": true,
+    "route": "cliente360",
+    "rootfixLoaded": true,
+    "loadingVisible": false,
+    "hostTextLength": 45567,
+    "diagnosticKeys": [
+      "cliente360",
+      "inicio"
+    ],
+    "lab": {
+      "status": "ready",
+      "snapshotAttached": true,
+      "snapshotAttachedCount": 29,
+      "rawCountKeys": [
+        "aseguradoras",
+        "asesores",
+        "cancelaciones",
+        "carteraPrimas",
+        "clientes",
+        "cobros",
+        "comisiones",
+        "gestiones",
+        "metas",
+        "negocios",
+        "polizas",
+        "recibosEsperados",
+        "vehiculos"
+      ],
+      "snapshotErrorKeys": [
+        "__prefs",
+        "acreedores",
+        "actividades",
+        "avisos",
+        "contenidos",
+        "correos",
+        "cursos",
+        "documentos",
+        "facturas",
+        "finmovs",
+        "notifs",
+        "novedades",
+        "plantillas",
+        "presupuesto",
+        "reclamos",
+        "reportes_prog",
+        "tareas"
+      ]
+    }
   },
-  "failureScreenshotError": "CAPTURE_UNAVAILABLE_NON_BLOCKING",
-  "error": "browserContext.close: Target page, context or browser has been closed",
+  "failureScreenshot": "failure-direccion-route-cliente360-required-hydration.png",
+  "error": "DIRECCION_ROUTE_CLIENTE360_REQUIRED_HYDRATION_TIMEOUT:page.waitForFunction: Timeout 35000ms exceeded.",
   "snapshotIntegrity": "VERIFIED_UNCHANGED"
 }

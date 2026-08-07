@@ -1,59 +1,54 @@
 {
   "schemaVersion": "orbit360-visual-matrix-signal-safe-supervisor-v1",
-  "status": "FAIL_MATRIX_WATCHDOG",
-  "classification": "PIPELINE_MECHANISM_FAILURE",
+  "status": "FAIL_MATRIX_CHILD",
+  "classification": "FUNCTIONAL_DEFECT",
   "currentCheckpoint": "SUPERVISOR_CHILD_EXIT",
   "observedCheckpoints": [
     {
       "checkpoint": "SUPERVISOR_CHILD_SPAWN",
-      "at": "2026-08-07T15:13:20.967Z",
-      "elapsedMs": 0
+      "at": "2026-08-07T16:33:40.124Z",
+      "elapsedMs": 1
     },
     {
       "checkpoint": "MATRIX_CHECKPOINT_PROTECTED_SNAPSHOT_BEFORE",
-      "at": "2026-08-07T15:13:21.971Z",
-      "elapsedMs": 1004,
+      "at": "2026-08-07T16:33:41.128Z",
+      "elapsedMs": 1005,
       "matrixCheckpoint": "PROTECTED_SNAPSHOT_BEFORE",
       "role": ""
     },
     {
       "checkpoint": "MATRIX_CHECKPOINT_DIRECCION_PAGE_GOTO",
-      "at": "2026-08-07T15:13:27.977Z",
-      "elapsedMs": 7010,
+      "at": "2026-08-07T16:33:45.134Z",
+      "elapsedMs": 5011,
       "matrixCheckpoint": "DIRECCION_PAGE_GOTO",
       "role": "DIRECCION"
     },
     {
-      "checkpoint": "MATRIX_CHECKPOINT_DIRECCION_ROUTE_INICIO_WAIT",
-      "at": "2026-08-07T15:13:32.983Z",
-      "elapsedMs": 12016,
-      "matrixCheckpoint": "DIRECCION_ROUTE_INICIO_WAIT",
+      "checkpoint": "MATRIX_CHECKPOINT_DIRECCION_ROUTE_INICIO_REQUIRED_HYDRATION_WAIT",
+      "at": "2026-08-07T16:33:47.137Z",
+      "elapsedMs": 7014,
+      "matrixCheckpoint": "DIRECCION_ROUTE_INICIO_REQUIRED_HYDRATION_WAIT",
       "role": "DIRECCION"
     },
     {
-      "checkpoint": "MATRIX_CHECKPOINT_DIRECCION_ROUTE_INICIO_PASS",
-      "at": "2026-08-07T15:13:56.009Z",
-      "elapsedMs": 35042,
-      "matrixCheckpoint": "DIRECCION_ROUTE_INICIO_PASS",
+      "checkpoint": "MATRIX_CHECKPOINT_DIRECCION_ROUTE_INICIO_RENDER_READY_WAIT",
+      "at": "2026-08-07T16:33:59.150Z",
+      "elapsedMs": 19027,
+      "matrixCheckpoint": "DIRECCION_ROUTE_INICIO_RENDER_READY_WAIT",
       "role": "DIRECCION"
     },
     {
-      "checkpoint": "MATRIX_CHECKPOINT_DIRECCION_ROUTE_CLIENTE360_WAIT",
-      "at": "2026-08-07T15:14:06.018Z",
-      "elapsedMs": 45051,
-      "matrixCheckpoint": "DIRECCION_ROUTE_CLIENTE360_WAIT",
+      "checkpoint": "MATRIX_CHECKPOINT_DIRECCION_ROUTE_CLIENTE360_REQUIRED_HYDRATION_WAIT",
+      "at": "2026-08-07T16:34:07.158Z",
+      "elapsedMs": 27035,
+      "matrixCheckpoint": "DIRECCION_ROUTE_CLIENTE360_REQUIRED_HYDRATION_WAIT",
       "role": "DIRECCION"
     },
     {
-      "checkpoint": "CHECKPOINT_IDLE_TIMEOUT",
-      "at": "2026-08-07T15:15:36.112Z",
-      "elapsedMs": 135145
-    },
-    {
-      "checkpoint": "MATRIX_CHECKPOINT_DIRECCION_ROUTE_CLIENTE360_TIMEOUT",
-      "at": "2026-08-07T15:15:37.114Z",
-      "elapsedMs": 136147,
-      "matrixCheckpoint": "DIRECCION_ROUTE_CLIENTE360_TIMEOUT",
+      "checkpoint": "MATRIX_CHECKPOINT_FAILURE_DIRECCION_ROUTE_CLIENTE360_REQUIRED_HYDRATION_CAPTURE_PASS",
+      "at": "2026-08-07T16:34:55.211Z",
+      "elapsedMs": 75088,
+      "matrixCheckpoint": "FAILURE_DIRECCION_ROUTE_CLIENTE360_REQUIRED_HYDRATION_CAPTURE_PASS",
       "role": "DIRECCION"
     }
   ],
@@ -65,14 +60,14 @@
     "globalTimeoutMs": 1200000,
     "terminateGraceMs": 8000
   },
-  "childPid": 3889,
+  "childPid": 3989,
   "childExitCode": 42,
   "childSignal": "",
-  "terminationReason": "CHECKPOINT_IDLE_TIMEOUT",
+  "terminationReason": "CHILD_NONZERO_EXIT",
   "receivedSignal": "",
   "matrixEvidencePresent": true,
   "matrixStage": "FAIL_VISUAL_OBSERVABLE_ROOTFIX_MATRIX",
-  "matrixClassification": "PIPELINE_MECHANISM_FAILURE",
+  "matrixClassification": "FUNCTIONAL_DEFECT",
   "runtimeExecuted": true,
   "browserExecuted": true,
   "deployExecuted": false,
@@ -84,6 +79,6 @@
   "containsSecrets": false,
   "containsPasswords": false,
   "ok": false,
-  "finishedAt": "2026-08-07T15:15:40.271Z",
-  "elapsedMs": 139304
+  "finishedAt": "2026-08-07T16:34:57.484Z",
+  "elapsedMs": 77361
 }

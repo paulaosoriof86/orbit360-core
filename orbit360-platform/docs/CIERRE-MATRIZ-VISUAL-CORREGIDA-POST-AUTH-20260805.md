@@ -1,19 +1,19 @@
 # CIERRE MATRIZ VISUAL CORREGIDA POST-AUTH — 2026-08-05
 
 ~~~text
-run: 31194773091
+run: 31198040758
 stage: STOP_RETRY_VISUAL_MATRIX_CORRECTED_POST_AUTH
-classification: DATA_CONTRACT_FAILURE
-checkpoint: INICIO_REQUIRED_HYDRATION_TIMEOUT
+classification: FUNCTIONAL_DEFECT
+checkpoint: DIRECCION_ROUTE_CLIENTE360_REQUIRED_HYDRATION_TIMEOUT
 preflight: GO_GATE_CONTRACT · 28
 Hosting deploys: 1
 rollback required: true
 rollback restored: true
-precheck: FAIL_VISUAL_BROWSER_PRECHECK · INICIO_REQUIRED_HYDRATION_TIMEOUT
-matrix: FAIL_VISUAL_OBSERVABLE_ROOTFIX_MATRIX · DIRECCION_ROUTE_CLIENTE360_TIMEOUT
+precheck: PASS_VISUAL_BROWSER_PRECHECK · INICIO_READY_PASS
+matrix: FAIL_VISUAL_OBSERVABLE_ROOTFIX_MATRIX · DIRECCION_ROUTE_CLIENTE360_REQUIRED_HYDRATION_TIMEOUT
 snapshot: VERIFIED_UNCHANGED
 role failures: null
-capture warnings: 1
+capture warnings: 0
 request/lifecycle/overlay terminal fail-closed: true
 Firestore/Auth/operational writes: 0
 Functions/Rules/reimport/production/main/merge: 0
