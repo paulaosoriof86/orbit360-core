@@ -11,8 +11,8 @@
   "tenantId": "alianzas-soluciones",
   "authorizedBaseHead": "4d8c3f77588853a0abed512c0f19e7efb266d56a",
   "expectedRequestVersion": "20260807.25-differential-universe-diagnosis",
-  "status": "CLOSED_DATA_CONTRACT_FAILURE",
-  "classification": "DATA_CONTRACT_FAILURE",
+  "status": "CLOSED_REQUIERE_VALIDACION_POST_SOURCE_ADJUDICATION",
+  "classification": "REQUIERE_VALIDACION",
   "currentPhase": "CLOSED_UNIVERSE_DIAGNOSTIC_V25",
   "stopRetryActive": false,
   "authorizationReserved": false,
@@ -54,17 +54,10 @@
   "sourceTest": "tools/orbit360-test-block1-universe-differential-v25-source-v20260807.mjs",
   "preflight": "tools/orbit360-preflight-block1-universe-diagnostic-v25-v20260807.mjs",
   "requestPath": ".github/orbit360-requests/block1-client360-insurers-v25-diagnostic-authorization.json",
+  "postDiagnosticAdjudicationEvidence": "orbit360-platform/runtime-gate-crm-v20260716/v25-block1-postdiagnostic-source-adjudication-sanitized-v20260807.json",
   "expectedObservedFromV24": {
-    "raw": {
-      "clientes": 430,
-      "aseguradoras": 30,
-      "asesores": 7
-    },
-    "effective": {
-      "clientes": 430,
-      "aseguradoras": 25,
-      "asesores": 7
-    }
+    "raw": { "clientes": 430, "aseguradoras": 30, "asesores": 7 },
+    "effective": { "clientes": 430, "aseguradoras": 25, "asesores": 7 }
   },
   "baselineSourceContract": {
     "manifestDate": "2026-07-14",
@@ -73,19 +66,6 @@
     "clientes": 414,
     "aseguradoras": 26,
     "asesores": 7
-  },
-  "runtimeCapabilitiesAfterSourcePassOnly": {
-    "secrets": true,
-    "firestoreRead": true,
-    "firestoreWrite": false,
-    "authRead": false,
-    "authWrite": false,
-    "browser": false,
-    "hosting": false,
-    "functionsDeploy": false,
-    "rulesDeploy": false,
-    "reimport": false,
-    "production": false
   },
   "protectedState": {
     "productFrozen": true,
@@ -101,62 +81,48 @@
     "browserAuthorized": false,
     "writesAuthorized": 0
   },
-  "containsPII": false,
-  "containsSecrets": false,
-  "nextAction": "AUTHORIZE_TARGETED_DATA_CONTRACT_REPAIR_PLAN_NO_WRITE",
   "diagnosticResult": {
     "runId": "31222886355",
     "attempt": 1,
-    "decision": "DATA_CONTRACT_FAILURE",
-    "classification": "DATA_CONTRACT_FAILURE",
+    "initialDecision": "DATA_CONTRACT_FAILURE",
+    "initialClassification": "DATA_CONTRACT_FAILURE",
     "checkpoint": "UNIVERSE_DIAGNOSTIC_COMPLETE",
     "observed": {
-      "raw": {
-        "clientes": 430,
-        "aseguradoras": 30,
-        "asesores": 7
-      },
-      "effective": {
-        "clientes": 430,
-        "aseguradoras": 25,
-        "asesores": 7
-      },
-      "baselineTagged": {
-        "clientes": 414,
-        "aseguradoras": 26
-      },
-      "nonBaseline": {
-        "clientes": 16,
-        "aseguradoras": 4
-      },
-      "excluded": {
-        "clientes": 0,
-        "aseguradoras": 5
-      },
-      "baselineInsurersExcluded": 1
+      "raw": { "clientes": 430, "aseguradoras": 30, "asesores": 7 },
+      "effectiveByGenericRuntimeClassifier": { "clientes": 430, "aseguradoras": 25, "asesores": 7 },
+      "baselineTagged": { "clientes": 414, "aseguradoras": 26 },
+      "nonBaseline": { "clientes": 16, "aseguradoras": 4 },
+      "runtimeExcluded": { "clientes": 0, "aseguradoras": 5 },
+      "runtimeBaselineInsurersExcluded": 1
     },
-    "domainDecision": {
-      "clientes": {
-        "classification": "REQUIERE_VALIDACION",
-        "basis": "BASELINE_MEMBERSHIP_NOT_PROVEN",
-        "demonstratedObjectiveCount": null
-      },
-      "aseguradoras": {
-        "classification": "DATA_CONTRACT_FAILURE",
-        "basis": "BASELINE_ACTIVE_INSURER_NOW_EXCLUDED_WITHOUT_POST_CLOSURE_TRANSITION_EVIDENCE",
-        "demonstratedObjectiveCount": null
-      },
-      "asesores": {
-        "classification": "PASS_DATA_CONTRACT",
-        "basis": "INVARIANCE_COUNT_ONLY_NO_REPROCESS"
-      }
+    "initialDomainDecision": {
+      "clientes": { "classification": "REQUIERE_VALIDACION", "basis": "16_NONBASELINE_ROWS_LACK_OBJECTIVE_PROVENANCE" },
+      "aseguradoras": { "classification": "DATA_CONTRACT_FAILURE", "basis": "GENERIC_RUNTIME_CLASSIFIER_EXCLUDED_ONE_BASELINE_AS_DUPLICATE_STRONG_KEY" },
+      "asesores": { "classification": "PASS_DATA_CONTRACT", "basis": "7_OF_7_INVARIANT" }
     },
-    "differentialCounts": {
-      "clientes": 16,
-      "aseguradoras": 5
-    },
-    "nextTreatment": "AUTHORIZE_TARGETED_DATA_CONTRACT_REPAIR_PLAN_NO_WRITE",
     "firestoreReads": 3,
     "writes": 0
-  }
+  },
+  "postDiagnosticSourceAdjudication": {
+    "mode": "SOURCE_ONLY_NO_ADDITIONAL_LAB_READ",
+    "finalDecision": "REQUIERE_VALIDACION",
+    "clientes": {
+      "classification": "REQUIERE_VALIDACION",
+      "basis": "414_BASELINE_TAGGED_PLUS_16_NONBASELINE_EFFECTIVE_WITHOUT_BATCH_TIMESTAMP_SOURCE_OR_AUDIT_PROVENANCE"
+    },
+    "aseguradoras": {
+      "classification": "VALIDATOR_STALE",
+      "basis": "CONTROLLED_SOURCE_RECONCILIATION_EXPLICITLY_PRESERVES_TWO_DISTINCT_BASELINE_INSURERS_SHARING_ONE_SOURCE_CODE_AS_REQUIERE_VALIDACION; GENERIC_DEDUPE_MUST_NOT_TREAT_SOURCE_CODE_AS_UNIVERSALLY_UNIQUE",
+      "correctedEffectiveCount": 26,
+      "contractCountRemains": 26,
+      "dataRepairAuthorized": false,
+      "contractUpdateAuthorized": false
+    },
+    "asesores": { "classification": "PASS_DATA_CONTRACT", "count": 7 },
+    "additionalLabReads": 0,
+    "writes": 0
+  },
+  "containsPII": false,
+  "containsSecrets": false,
+  "nextAction": "FRESH_AUTHORIZATION_REQUIRED: SOURCE_ONLY_FIX_INSURER_DEDUPE_VALIDATOR_AND_PROVENANCE_RESOLUTION_PLAN_FOR_16_CLIENTS; NO_DATA_WRITE_NO_CONTRACT_UPDATE_YET"
 }
