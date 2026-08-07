@@ -9,8 +9,10 @@ import { patchChromiumCaptureWatchdog } from './orbit360-playwright-capture-watc
 const ROOT = process.cwd();
 const wrapperPath = path.join(ROOT, 'tools/orbit360-visual-runtime-rootfix-observable-matrix-v20260805.mjs');
 const auditedPath = path.join(ROOT, 'tools/orbit360-visual-runtime-rootfix-observable-matrix-v1-audited-20260805.mjs');
+const builderPath = path.join(ROOT, 'tools/orbit360-build-v20-route-aware-matrix-artifact-v20260807.mjs');
 const helperPath = path.join(ROOT, 'tools/orbit360-playwright-capture-watchdog-lib-v20260806.mjs');
 const wrapper = fs.readFileSync(wrapperPath, 'utf8');
+const builder = fs.readFileSync(builderPath, 'utf8');
 const helper = fs.readFileSync(helperPath, 'utf8');
 
 function makeHarness(mode) {
@@ -58,10 +60,12 @@ function evidenceFile(dir, name) {
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'orbit360-capture-watchdog-'));
 const checks = {};
 
-checks.filesExist = [wrapperPath, auditedPath, helperPath].every(fs.existsSync);
+checks.filesExist = [wrapperPath, auditedPath, builderPath, helperPath].every(fs.existsSync);
 checks.wrapperImportsHelper = wrapper.includes('patchChromiumCaptureWatchdog');
-checks.wrapperDelegatesAuditedV1 = wrapper.includes("orbit360-visual-runtime-rootfix-observable-matrix-v1-audited-20260805.mjs");
+checks.wrapperDelegatesAuditedV1 = wrapper.includes('buildV20MatrixArtifact') && builder.includes('orbit360-visual-runtime-rootfix-observable-matrix-v1-audited-20260805.mjs');
+checks.wrapperExactArtifactGate = wrapper.includes("spawnSync(process.execPath, ['--check', tempPath]") && wrapper.includes('MATRIX_ARTIFACT_COMPILE_FAILED') && wrapper.includes('PIPELINE_MECHANISM_FAILURE');
 checks.wrapperNoProductLogic = !wrapper.includes('canonicalRef(') && !wrapper.includes('testRole(') && !wrapper.includes('protectedSnapshot(');
+checks.builderNoProductDataLogic = !builder.includes('canonicalRef(') && !builder.includes('protectedSnapshot(') && builder.includes('buildV20MatrixArtifact');
 checks.helperUsesCDP = helper.includes("Page.captureScreenshot") && helper.includes("Runtime.evaluate");
 checks.helperHasHardTimeout = helper.includes('CAPTURE_HARD_TIMEOUT_') && helper.includes('Promise.race');
 checks.helperHasUniqueHeartbeats = helper.includes("_HEARTBEAT_") && helper.includes('heartbeatSequence += 1');
@@ -105,8 +109,8 @@ checks.timeoutDetachesSession = timeout.calls.detach === 1;
 
 const failedCheckIds = Object.entries(checks).filter(([, ok]) => !ok).map(([id]) => id);
 const output = {
-  schemaVersion: 'orbit360-capture-watchdog-source-test-v1',
-  generatedAt: '2026-08-06T19:08:00-06:00',
+  schemaVersion: 'orbit360-capture-watchdog-source-test-v2-exact-artifact-aware',
+  generatedAt: new Date().toISOString(),
   status: failedCheckIds.length ? 'STOP_CAPTURE_WATCHDOG_SOURCE_TEST' : 'PASS_CAPTURE_WATCHDOG_SOURCE_ONLY',
   classification: failedCheckIds.length ? 'VALIDATOR_STALE' : 'PIPELINE_MECHANISM_FAILURE_CORRECTED_SOURCE_ONLY',
   total: Object.keys(checks).length,
@@ -122,6 +126,8 @@ const output = {
     timeoutBrowserCloseCalls: timeout.calls.browserClose,
     pageStillUsable
   },
+  exactArtifactOwner: 'tools/orbit360-build-v20-route-aware-matrix-artifact-v20260807.mjs',
+  auditedMatrixSource: 'tools/orbit360-visual-runtime-rootfix-observable-matrix-v1-audited-20260805.mjs',
   secretAccess: false,
   firebaseAccess: false,
   firestoreReads: 0,
@@ -140,4 +146,5 @@ const out = path.join(ROOT, 'orbit360-platform/runtime-gate-crm-v20260716/captur
 fs.mkdirSync(path.dirname(out), { recursive: true });
 fs.writeFileSync(out, JSON.stringify(output, null, 2) + '\n');
 console.log(JSON.stringify(output, null, 2));
+try { fs.rmSync(tmp, { recursive: true, force: true }); } catch {}
 process.exit(output.ok ? 0 : 41);
