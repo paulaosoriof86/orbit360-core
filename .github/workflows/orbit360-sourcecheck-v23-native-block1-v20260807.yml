@@ -15,6 +15,7 @@ on:
       - 'tools/orbit360-gate-contract-block1-v23-native-v20260807.json'
       - 'tools/orbit360-validator-lifecycle-block1-v23-native-v20260807.json'
       - 'tools/orbit360-preflight-block1-v23-native-v20260807.mjs'
+      - 'tools/orbit360-transition-block1-v23-source-to-runtime-v20260807.mjs'
       - 'tools/orbit360-block1-v23-browser-precheck-v20260807.mjs'
       - 'tools/orbit360-close-block1-v23-runtime-v20260807.mjs'
       - 'tools/orbit360-run-block1-v23-runtime-signal-safe-v20260807.sh'
@@ -24,6 +25,7 @@ on:
       - 'orbit360-platform/docs/ACADEMIA-ACTUALIZACION-V23-NATIVE-BLOCK1-20260807.md'
       - 'orbit360-platform/docs/CLAUDE-ACUMULADO-V23-NATIVE-BLOCK1-20260807.md'
       - 'orbit360-platform/runtime-gate-crm-v20260716/v23-native-block1-source-sanitized-v20260807.json'
+      - 'orbit360-platform/runtime-gate-crm-v20260716/v23-native-block1-package-manifest-sanitized-v20260807.json'
 
 permissions:
   contents: read
@@ -79,7 +81,7 @@ jobs:
           done
           echo 'PASS_V23_PRODUCT_AND_PROTECTED_BACKEND_FROZEN'
 
-      - name: Validate exact native runtime files
+      - name: Validate exact canonical native runtime files
         shell: bash
         run: |
           set -euo pipefail
@@ -91,6 +93,7 @@ jobs:
           node --check tools/orbit360-adjudicate-block1-universe-readonly-v23-v20260807.mjs
           node --check tools/orbit360-test-v23-native-block1-source-v20260807.mjs
           node --check tools/orbit360-preflight-block1-v23-native-v20260807.mjs
+          node --check tools/orbit360-transition-block1-v23-source-to-runtime-v20260807.mjs
           node --check tools/orbit360-block1-v23-browser-precheck-v20260807.mjs
           node --check tools/orbit360-close-block1-v23-runtime-v20260807.mjs
           bash -n tools/orbit360-run-block1-v23-runtime-signal-safe-v20260807.sh
