@@ -16,7 +16,7 @@ const sha = value => crypto.createHash('sha256').update(String(value), 'utf8').d
 const norm = value => String(value == null ? '' : value).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 const clean = value => String(value == null ? '' : value).replace(/[\w.+-]+@[\w.-]+/g, '[email]').replace(/\b\d{6,}\b/g, '[id]').slice(0, 900);
 const result = {
-  schemaVersion: 'orbit360-visual-runtime-rootfix-browser-precheck-v1',
+  schemaVersion: 'orbit360-visual-runtime-rootfix-browser-precheck-v2-hydration-contract-aware',
   gateId: 'block2.7-visual-runtime-rootfix-lab-v20260805',
   contractVersion: '2.7.2',
   stage: 'STARTED',
@@ -63,13 +63,31 @@ async function browserState(page) {
             snapshotAttached: status.snapshotAttached === true,
             snapshotAttachedCount: Number(status.snapshotAttachedCount || 0),
             rawCountKeys: Object.keys(status.rawCounts || {}).sort(),
-            snapshotErrorKeys: Object.keys(status.snapshotErrors || {}).sort()
+            snapshotErrorKeys: Object.keys(status.snapshotErrors || {}).sort(),
+            visualHydrationContract: status.visualHydrationContract || null
           };
         } catch { return {}; }
       })();
       const membership = (() => {
         try { return Orbit.session && typeof Orbit.session.membershipProjectionStatus === 'function' ? Orbit.session.membershipProjectionStatus() || {} : {}; }
         catch { return {}; }
+      })();
+      const hydration = (() => {
+        try {
+          const diagnostics = window.OrbitHydrationContractDiagnostics;
+          const state = diagnostics && typeof diagnostics.status === 'function' ? diagnostics.status('inicio') : null;
+          return {
+            loaded: !!(window.Orbit && Orbit.__visualHydrationContractV20260805),
+            storeMarker: !!(window.Orbit && Orbit.store && Orbit.store.__visualHydrationContractV20260805),
+            mounted: !!(diagnostics && typeof diagnostics.mounted === 'function' && diagnostics.mounted()),
+            ready: !!(state && state.ready === true),
+            degraded: !!(state && state.degraded === true),
+            requiredMissing: state && state.required ? state.required.missing.slice() : [],
+            requiredFailed: state && state.required ? state.required.failed.slice() : [],
+            optionalMissing: state && state.optional ? state.optional.missing.slice() : [],
+            optionalFailed: state && state.optional ? state.optional.failed.slice() : []
+          };
+        } catch { return {}; }
       })();
       return {
         href: location.origin + location.pathname + location.search + location.hash,
@@ -83,6 +101,11 @@ async function browserState(page) {
         membershipTenantBound: membership.tenantBound === true,
         route: window.Orbit && Orbit.route && Orbit.route.key || '',
         rootfixLoaded: !!(window.Orbit && Orbit.__visualRuntimeRootfixV20260805),
+        hydrationContractLoaded: hydration.loaded === true,
+        hydrationContractMounted: hydration.mounted === true,
+        hydrationInicioReady: hydration.ready === true,
+        hydrationInicioDegraded: hydration.degraded === true,
+        hydration,
         runtimeDiagnosticInicio: !!(window.OrbitRuntimeDiagnostics && OrbitRuntimeDiagnostics.inicio && OrbitRuntimeDiagnostics.inicio.hydrated === true),
         loadingVisible: !!document.querySelector('.orbit-load-state'),
         hostTextLength: (document.getElementById('host') && document.getElementById('host').innerText || '').trim().length,
@@ -147,6 +170,13 @@ try {
   await page.waitForSelector('#login-form', { timeout: 30000 });
   mark('LOGIN_FORM_PASS');
   await waitObservable(page, () => !!(window.Orbit && Orbit.__visualRuntimeRootfixV20260805), 'ROOTFIX_MARKER', 20000);
+  await waitObservable(page, () => !!(
+    window.Orbit && Orbit.__visualHydrationContractV20260805 &&
+    Orbit.store && Orbit.store.__visualHydrationContractV20260805 &&
+    window.OrbitHydrationContractDiagnostics &&
+    typeof OrbitHydrationContractDiagnostics.mounted === 'function' &&
+    OrbitHydrationContractDiagnostics.mounted()
+  ), 'HYDRATION_CONTRACT_MOUNTED', 30000);
   await waitObservable(page, () => !!(window.firebase && typeof firebase.auth === 'function'), 'FIREBASE_AUTH', 30000);
 
   mark('CUSTOM_TOKEN_CREATE');
@@ -165,6 +195,13 @@ try {
     document.body.style.overflow = '';
   });
   await waitObservable(page, () => {
+    try {
+      const diagnostics = window.OrbitHydrationContractDiagnostics;
+      const state = diagnostics && typeof diagnostics.status === 'function' ? diagnostics.status('inicio') : null;
+      return !!(diagnostics && diagnostics.mounted && diagnostics.mounted() && state && state.ready === true);
+    } catch { return false; }
+  }, 'INICIO_REQUIRED_HYDRATION', 35000);
+  await waitObservable(page, () => {
     const route = window.Orbit && Orbit.route && Orbit.route.key;
     const diag = window.OrbitRuntimeDiagnostics && OrbitRuntimeDiagnostics.inicio;
     const host = document.getElementById('host');
@@ -181,8 +218,11 @@ try {
   await context.close();
 } catch (error) {
   result.stage = 'FAIL_VISUAL_BROWSER_PRECHECK';
-  result.classification = result.checkpoint.includes('TIMEOUT') ? 'VALIDATOR_STALE_OR_PRODUCT_WAIT_IDENTIFIED' : (/DATA_CONTRACT/.test(String(error && error.message || error)) ? 'DATA_CONTRACT_FAILURE' : 'PIPELINE_MECHANISM_FAILURE');
-  result.error = clean(error && error.message || error);
+  const message = String(error && error.message || error);
+  if (result.checkpoint.startsWith('HYDRATION_CONTRACT_MOUNTED')) result.classification = 'PIPELINE_MECHANISM_FAILURE';
+  else if (result.checkpoint.startsWith('INICIO_REQUIRED_HYDRATION')) result.classification = 'DATA_CONTRACT_FAILURE';
+  else result.classification = result.checkpoint.includes('TIMEOUT') ? 'VALIDATOR_STALE_OR_PRODUCT_WAIT_IDENTIFIED' : (/DATA_CONTRACT/.test(message) ? 'DATA_CONTRACT_FAILURE' : 'PIPELINE_MECHANISM_FAILURE');
+  result.error = clean(message);
   try {
     if (browser && browser.contexts && browser.contexts()[0]) await maskAndCapture(browser.contexts()[0].pages()[0]);
   } catch {}
