@@ -2,9 +2,9 @@
   "schemaVersion": "orbit360-validator-lifecycle-overlay-v1",
   "gateId": "block2.7-visual-matrix-corrected-post-auth-lab-v20260805",
   "requestVersion": "20260807.14-two-phase-runtime",
-  "status": "AUTHORIZED_FRESH_REQUEST_ONLY_V14_PENDING_EXCLUSIVE_REQUEST",
-  "classification": "SOURCE_ONLY_ACTIVATION_PENDING_VALIDATION",
-  "checkpoint": "V14_ACTIVATION_SOURCE_ONLY_PENDING_VALIDATION",
+  "status": "AUTHORIZED_ONCE_PENDING_EXCLUSIVE_REQUEST",
+  "classification": "RUNTIME_PENDING_EXCLUSIVE_REQUEST_SOURCE_VALIDATED",
+  "checkpoint": "SOURCE_TO_RUNTIME_LIFECYCLE_TRANSITION_PASS",
   "rootCauseResolved": "TWO_PHASE_LIFECYCLE_TRANSITION_AND_AUTOMATIC_STOP_CONSUMPTION_VALIDATED_IN_V13_ROOTFIX",
   "v13RootfixRunId": 31181042129,
   "v13RootfixJobId": 92874108672,
@@ -43,5 +43,5 @@
   "passVisualPostAuth": false,
   "containsPII": false,
   "containsSecrets": false,
-  "ok": false
+  "ok": true
 }

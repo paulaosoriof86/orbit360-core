@@ -4,10 +4,10 @@
   "gateId": "block2.7-visual-matrix-corrected-post-auth-lab-v20260805",
   "gateContractVersion": "2.7.8",
   "owner": "orbit360-visual-matrix-corrected-post-auth-v20260805",
-  "ownerVersion": "20260807.37-v14-two-phase-source-activation",
-  "status": "AUTHORIZED_FRESH_REQUEST_ONLY_V14_PENDING_EXCLUSIVE_REQUEST",
-  "classification": "SOURCE_ONLY_ACTIVATION_PENDING_VALIDATION",
-  "secondaryClassification": "V13_TWO_PHASE_ROOTFIX_CARRIED_FORWARD",
+  "ownerVersion": "20260807.37-v14-two-phase-source-activation-validated-runtime-pending",
+  "status": "AUTHORIZED_ONCE_PENDING_EXCLUSIVE_REQUEST",
+  "classification": "RUNTIME_PENDING_EXCLUSIVE_REQUEST_SOURCE_VALIDATED",
+  "secondaryClassification": "TWO_PHASE_LIFECYCLE_TRANSITION_APPLIED",
   "patternClassification": "REPLICABLE_CLAUDE_ACUMULADO",
   "rcId": "RC-AYS-LAB-CANONICA-01",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -18,17 +18,17 @@
   "authorizedBaseHead": "bb238dc26506aafd64e5bb52d5357fa5052bd9aa",
   "expectedRequestVersion": "20260807.14-two-phase-runtime",
   "authorizationDirective": "EXPLICIT_SINGLE_SOURCE_ONLY_ACTIVATION_AND_RUNTIME_V14_TWO_PHASE_LIFECYCLE_HOSTING_LAB_READONLY_MATRIX",
-  "currentPhase": "V14_ACTIVATION_SOURCE_ONLY_PENDING_VALIDATION",
+  "currentPhase": "VISUAL_MATRIX_CORRECTED_POST_AUTH_LAB_EXECUTION",
   "executionProfile": {
-    "mode": "SOURCE_ONLY_ACTIVATION_PASS_THEN_RUNTIME_ONCE_WITH_FRESH_EXCLUSIVE_REQUEST",
-    "phase": "V14_ACTIVATION_SOURCE_ONLY_PENDING_VALIDATION",
+    "mode": "RUNTIME_ONCE_ONLY_WITH_FRESH_EXCLUSIVE_REQUEST",
+    "phase": "VISUAL_MATRIX_CORRECTED_POST_AUTH_LAB_EXECUTION",
     "capabilities": {
-      "secrets": false,
-      "firestoreRead": false,
+      "secrets": true,
+      "firestoreRead": true,
       "writes": false,
-      "runtime": false,
-      "browser": false,
-      "deploy": false,
+      "runtime": true,
+      "browser": true,
+      "deploy": true,
       "functionsDeploy": false,
       "rulesDeploy": false,
       "production": false
@@ -58,9 +58,21 @@
   "functionsDeploysMaximum": 0,
   "rulesDeploysMaximum": 0,
   "browserMatrix": [
-    { "role": "Direccion", "width": 1440, "height": 1000 },
-    { "role": "Operativo", "width": 1024, "height": 768 },
-    { "role": "Asesor", "width": 390, "height": 844 }
+    {
+      "role": "Direccion",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "role": "Operativo",
+      "width": 1024,
+      "height": 768
+    },
+    {
+      "role": "Asesor",
+      "width": 390,
+      "height": 844
+    }
   ],
   "sourcePrerequisites": {
     "authorizedSourceHead": "bb238dc26506aafd64e5bb52d5357fa5052bd9aa",
@@ -70,7 +82,7 @@
     "v13RootfixStatus": "PASS_TWO_PHASE_LIFECYCLE_AND_STOP_CONSUMPTION_SOURCE_ONLY",
     "v13RootfixRunId": 31181042129,
     "v13RootfixJobId": 92874108672,
-    "activationSourceStatus": "PENDING_V14_ACTIVATION_SOURCE_ONLY",
+    "activationSourceStatus": "PASS_V14_ACTIVATION_SOURCE_ONLY",
     "requestLifecycleBaselineChecks": "12/12 PASS_PREVIOUS",
     "phaseAwareChecks": "31/31 PASS_PREVIOUS",
     "transportBaseShaChecks": "12/12 PASS_PREVIOUS",
@@ -81,7 +93,9 @@
     "authMembershipTenantInicio": "PASS_PREVIOUS",
     "browserPrecheckPrevious": "PASS_VISUAL_BROWSER_PRECHECK",
     "snapshotMostRecent": "VERIFIED_UNCHANGED_V11",
-    "hostingBaselineConfirmed": "visual-matrix-corrected-backup-31135532118"
+    "hostingBaselineConfirmed": "visual-matrix-corrected-backup-31135532118",
+    "activationSourceRunId": 31184067096,
+    "activationSourceJob": "source-v14-two-phase"
   },
   "activeRequest": false,
   "requestRetired": false,
@@ -90,12 +104,12 @@
   "authorizationFrozen": false,
   "replayAllowed": false,
   "allowedExecutions": 1,
-  "executionAuthorized": false,
-  "secretAccessAuthorized": false,
-  "firestoreReadAuthorized": false,
+  "executionAuthorized": true,
+  "secretAccessAuthorized": true,
+  "firestoreReadAuthorized": true,
   "writeAuthorized": false,
-  "browserAuthorized": false,
-  "hostingDeployAuthorized": false,
+  "browserAuthorized": true,
+  "hostingDeployAuthorized": true,
   "functionsDeployAuthorized": false,
   "rulesDeployAuthorized": false,
   "productionAuthorized": false,
@@ -119,5 +133,5 @@
   "containsPII": false,
   "containsSecrets": false,
   "containsPasswords": false,
-  "nextAction": "VALIDATE_SOURCE_ONLY_V14; ONLY ON OBSERVABLE PASS APPLY EXPLICIT SOURCE_TO_RUNTIME_TRANSITION; THEN CREATE EXACTLY ONE EXCLUSIVE IMMUTABLE REQUEST."
+  "nextAction": "CREATE_EXACTLY_ONE_EXCLUSIVE_IMMUTABLE_REQUEST_COMMIT_BOUND_TO_THIS_RUNTIME_PENDING_LIFECYCLE."
 }
