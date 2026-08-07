@@ -2,30 +2,41 @@
 
 Fecha: 2026-08-07  
 Bloque: 1 — Cliente 360 + Aseguradoras  
-Gate: `block1-client360-insurers-lab-v20260717`  
-Contrato delta: `1.0.26` sobre registry `1.0.25`  
+Gate único: `block1-client360-insurers-lab-v20260717`  
+Owner canónico candidato: `1.0.41`  
+Owner histórico reemplazado: `1.0.40` CSS delivery, preservado como evidencia  
 Base autorizada: `ef9e0e1e738ce407025ed159067d8b3cc4d2683b`  
 Rama source: `ays/source-v23-native-block1-matrix-20260807`
 
-## Necesidad
+## Causas raíz
 
-v22 se detuvo source-only después de dos fallos en la misma etapa exact-artifact. La causa raíz demostrada fue:
+v22 se detuvo source-only después de dos fallos en la misma etapa exact-artifact:
 
 `PIPELINE_MECHANISM_FAILURE / CHAINED_TEXTUAL_TRANSFORM_ON_GENERATED_MATRIX_ARTIFACT`
 
-La corrección v23 no modifica producto. Sustituye el mecanismo: la matriz que runtime ejecutará existe como archivo fuente nativo/versionado y el source gate compila/importa exactamente ese mismo archivo. No se genera desde v21/v22, no usa regex/slices para reescribir matrices ni aplica source surgery.
+v23 eliminó ese mecanismo. Su primer source run `31217970336` demostró **29/29 PASS** del package nativo, pero el preflight canónico obligatorio quedó en STOP porque todavía exigía el owner histórico de CSS delivery `1.0.40`, tokens de Service Worker de julio y `FREEZE_M1_OPEN`, aunque el freeze vivo ya registra M1 y M2 cerrados. Ese segundo diagnóstico es:
+
+`VALIDATOR_STALE / CANONICAL_BLOCK1_PREFLIGHT_OWNER_VERSION_FREEZE_DRIFT`
+
+La corrección no toca `sw.js`, PWA, Cliente 360, Aseguradoras, Pólizas, Cobros ni backend protegido para satisfacer el validador viejo. El mismo `gateId` Block1 cambia de owner activo a `1.0.41`; el owner CSS `1.0.40` queda histórico.
 
 ## Arquitectura v23
 
-- matriz runtime nativa: `tools/orbit360-block1-native-matrix-v23-v20260807.mjs`;
+- entrypoint canónico exacto de runtime: `tools/orbit360-block1-native-matrix-v23-canonical-v20260807.mjs`;
+- implementación nativa: `tools/orbit360-block1-native-matrix-v23-v20260807.mjs`;
 - observabilidad event-driven compartida por API: `tools/orbit360-event-driven-render-observer-v23.mjs`;
+- engine canónico Block1: `tools/orbit360-validar-gate-contracts-engine-block1-v23-native-v20260807.mjs`;
+- entrypoint obligatorio de gates: `tools/orbit360-validar-gate-contracts-v20260717.mjs`;
 - adjudicador read-only: `tools/orbit360-adjudicate-block1-universe-readonly-v23-v20260807.mjs`;
-- contrato overlay del único gate Block1: `tools/orbit360-gate-contract-block1-v23-native-v20260807.json`;
+- overlay del único gate Block1: `tools/orbit360-gate-contract-block1-v23-native-v20260807.json`;
 - lifecycle v23: `tools/orbit360-validator-lifecycle-block1-v23-native-v20260807.json`;
 - preflight v23: `tools/orbit360-preflight-block1-v23-native-v20260807.mjs`;
-- browser precheck nativo: `tools/orbit360-block1-v23-browser-precheck-v20260807.mjs`;
+- transición source→runtime: `tools/orbit360-transition-block1-v23-source-to-runtime-v20260807.mjs`;
+- browser precheck: `tools/orbit360-block1-v23-browser-precheck-v20260807.mjs`;
 - runner signal-safe: `tools/orbit360-run-block1-v23-runtime-signal-safe-v20260807.sh`;
 - cierre/consume/freeze: `tools/orbit360-close-block1-v23-runtime-v20260807.mjs`.
+
+El entrypoint runtime `1.0.41` importa la implementación nativa y fija la identidad contractual final; no genera código, no transforma strings, no aplica regex/slices/replaces y no hace source surgery. El source gate compila e importa exactamente ese entrypoint.
 
 ## Scope bloqueante exacto
 
@@ -34,7 +45,7 @@ La corrección v23 no modifica producto. Sustituye el mecanismo: la matriz que r
 1. Inicio/Auth/sesión/membership.
 2. Legal real una vez e idempotencia del mismo scope.
 3. Multirol/scopes y menú móvil.
-4. Cliente 360: lista acotada, ficha, calidad, relaciones vacías honestas cuando exista caso visible.
+4. Cliente 360: lista acotada, ficha, calidad, relaciones vacías honestas cuando exista caso visible en el scope efectivo.
 5. Aseguradoras: directorio, ficha, conocimiento y solo lectura del Asesor.
 6. Cero copy técnico visible.
 7. Responsive.
@@ -68,18 +79,28 @@ Source-only mantiene:
 - Functions/Rules 0;
 - producción/main/merge 0.
 
-Solo source PASS permite transición explícita a runtime-pending y la creación de un único request v23 inmutable. Runtime debe obtener `GO_GATE_CONTRACT` antes de secretos. La adjudicación 414/26/7 ocurre después de GO y antes de instalar/usar Hosting o Playwright. Solo con PASS se restaura `visual-matrix-corrected-backup-31135532118`, se crea backup, se permite máximo un deploy Hosting LAB, precheck y matriz.
+Solo source PASS permite cambiar lifecycle a `SOURCE_VALIDATED_READY_FOR_RUNTIME_TRANSITION`, registrar evidencia terminal source y ejecutar la transición explícita. La transición falla si el request ya existe; después habilita runtime-pending y solo entonces puede crearse un único request v23 nuevo e inmutable.
+
+Runtime debe obtener `GO_GATE_CONTRACT` antes de secretos. La adjudicación 414/26/7 ocurre después de GO y antes de instalar/usar Hosting o Playwright. Solo con PASS se restaura `visual-matrix-corrected-backup-31135532118`, se crea backup, se permite máximo un deploy Hosting LAB, precheck y matriz.
 
 ## Estado de evidencia
 
-La evidencia source definitiva se registra en:
+Primer source run `31217970336`:
+- exact native package: 29/29 PASS;
+- producto/backend protegido congelado: PASS;
+- request ausente: PASS;
+- runtime: no ejecutado;
+- fallo: preflight canónico histórico `1.0.40`.
+
+La evidencia source vigente se registra en:
 `orbit360-platform/runtime-gate-crm-v20260716/v23-native-block1-source-sanitized-v20260807.json`.
 
-Este documento no declara PASS antes de que GitHub Actions valide el HEAD source exacto.
+Este documento no declara PASS terminal antes de que GitHub Actions valide el HEAD source final con owner canónico `1.0.41`.
 
 ## Clasificación
 
-- causa corregida: `PIPELINE_MECHANISM_FAILURE`;
+- mecanismo v22: `PIPELINE_MECHANISM_FAILURE`;
+- preflight histórico: `VALIDATOR_STALE`;
 - patrón reusable: `REPLICABLE_CLAUDE_ACUMULADO`;
 - backend/control-plane: `BACKEND_PROTEGIDO_NO_CLAUDE`;
 - adjudicación real A&S: `TENANT_AYS_ONLY`;
@@ -87,10 +108,10 @@ Este documento no declara PASS antes de que GitHub Actions valide el HEAD source
 
 ## Carriles
 
-A — frontend/UX: producto congelado; solo se define qué conducta ya existente será observada.  
-B — backend/control/seguridad: mecanismo del gate sustituido por artefacto nativo + API event-driven + lifecycle fail-closed.  
+A — frontend/UX: producto congelado; solo se observa conducta ya existente.  
+B — backend/control/seguridad: artefacto nativo + API event-driven + owner canónico 1.0.41 + lifecycle fail-closed.  
 C — datos/migración: adjudicador 414/26/7 preparado read-only, sin payload real en repo.
 
 ## Siguiente acción
 
-Ejecutar el sourcecheck v23 sobre PR source. Solo si todo el package obtiene PASS se habilita la transición runtime-pending y un request nuevo; nunca reutilizar PR #62 ni sus runs.
+Ejecutar una sola validación source final del package 1.0.41. Si vuelve a fallar la misma familia `CANONICAL_BLOCK1_PREFLIGHT_OWNER_VERSION_FREEZE_DRIFT`, aplicar STOP_RETRY sin tercer ajuste. Si obtiene PASS, cerrar evidencia source, fast-forward canónico sin merge a main, transición runtime-pending y request v23 exclusivo.
