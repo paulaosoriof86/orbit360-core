@@ -1,0 +1,123 @@
+name: Orbit 360 · Activación v18 source → runtime-pending
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: orbit360-source-activate-v18-runtime-pending
+  cancel-in-progress: false
+
+jobs:
+  activate-v18-runtime-pending:
+    if: github.head_ref == 'ays/sourcefix-v18-hydration-transactional-run-evidence-20260807'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout exact sourcefix head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Detect whether activation is still pending
+        id: detect
+        shell: bash
+        run: |
+          set -euo pipefail
+          node - <<'NODE' >> "$GITHUB_OUTPUT"
+          const fs = require('fs');
+          const lifecycle = JSON.parse(fs.readFileSync('tools/orbit360-validator-lifecycle-contract-visual-matrix-corrected-post-auth-lab-v20260805.json','utf8'));
+          const overlay = JSON.parse(fs.readFileSync('tools/orbit360-validator-lifecycle-overlay-visual-matrix-v8-stop-preflight-v20260806.json','utf8'));
+          if (lifecycle.status === 'AUTHORIZED_ONCE_PENDING_EXCLUSIVE_REQUEST' && lifecycle.expectedRequestVersion === '20260807.18-two-phase-runtime' && overlay.expectedNextRequestVersion === '20260807.18-two-phase-runtime') {
+            console.log('run=false');
+            console.error('SKIP_V18_SOURCE_ACTIVATION_ALREADY_RUNTIME_PENDING');
+          } else {
+            console.log('run=true');
+            console.error('PASS_V18_SOURCE_ACTIVATION_REQUIRED');
+          }
+          NODE
+
+      - name: Validate source rootfix package before transition
+        if: steps.detect.outputs.run == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          test ! -e .github/workflows/orbit360-sourcecheck-v18-hydration-transactional-v20260807.yml
+          test ! -e .github/workflows/orbit360-registered-relay-v17-route-readiness-v20260807.yml
+          test -e .github/workflows/orbit360-registered-relay-v18-transactional-hydration-v20260807.yml
+          node --check tools/orbit360-activate-v18-source-stage-v20260807.mjs
+          node --check tools/orbit360-transition-visual-matrix-lifecycle-source-to-runtime-v20260807.mjs
+          node --check tools/orbit360-test-v18-hydration-transactional-run-evidence-source-v20260807.mjs
+          node - <<'NODE'
+          const fs=require('fs');
+          const ev=JSON.parse(fs.readFileSync('orbit360-platform/runtime-gate-crm-v20260716/v18-hydration-transactional-run-evidence-source-sanitized-v20260807.json','utf8'));
+          const req=JSON.parse(fs.readFileSync('.github/orbit360-requests/visual-matrix-corrected-post-auth-lab-v20260805-authorization.json','utf8'));
+          if (!ev.ok || ev.status!=='PASS_V18_TRANSACTIONAL_HYDRATION_RUN_EVIDENCE_SOURCE_ONLY' || ev.fixture?.ownerGeneration!==1 || ev.fixture?.canonicalSnapshotAttached!==true || ev.fixture?.writes!==0) process.exit(41);
+          if (req.requestVersion!=='20260807.17-two-phase-runtime' || !req.consumed || !req.authorizationFrozen || req.allowedExecutions!==0 || req.replayAllowed!==false) process.exit(42);
+          console.log('PASS_V18_SOURCE_PACKAGE_BEFORE_TRANSITION');
+          NODE
+
+      - name: Reserve v18 source activation
+        if: steps.detect.outputs.run == 'true'
+        shell: bash
+        run: node tools/orbit360-activate-v18-source-stage-v20260807.mjs
+
+      - name: Transition source to runtime-pending
+        if: steps.detect.outputs.run == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-transition-visual-matrix-lifecycle-source-to-runtime-v20260807.mjs \
+            tools/orbit360-validator-lifecycle-contract-visual-matrix-corrected-post-auth-lab-v20260805.json \
+            tools/orbit360-validator-lifecycle-overlay-visual-matrix-v8-stop-preflight-v20260806.json \
+            .github/orbit360-requests/visual-matrix-corrected-post-auth-lab-v20260805-authorization.json \
+            20260807.18-two-phase-runtime
+
+      - name: Validate runtime-pending without runtime effects
+        if: steps.detect.outputs.run == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('fs');
+          const req=JSON.parse(fs.readFileSync('.github/orbit360-requests/visual-matrix-corrected-post-auth-lab-v20260805-authorization.json','utf8'));
+          const lifecycle=JSON.parse(fs.readFileSync('tools/orbit360-validator-lifecycle-contract-visual-matrix-corrected-post-auth-lab-v20260805.json','utf8'));
+          const overlay=JSON.parse(fs.readFileSync('tools/orbit360-validator-lifecycle-overlay-visual-matrix-v8-stop-preflight-v20260806.json','utf8'));
+          if (req.requestVersion!=='20260807.17-two-phase-runtime' || !req.consumed || !req.authorizationFrozen || req.allowedExecutions!==0) process.exit(41);
+          if (lifecycle.status!=='AUTHORIZED_ONCE_PENDING_EXCLUSIVE_REQUEST' || lifecycle.expectedRequestVersion!=='20260807.18-two-phase-runtime') process.exit(42);
+          if (!lifecycle.executionAuthorized || !lifecycle.secretAccessAuthorized || !lifecycle.firestoreReadAuthorized || !lifecycle.browserAuthorized || !lifecycle.hostingDeployAuthorized) process.exit(43);
+          if (lifecycle.writeAuthorized || lifecycle.functionsDeployAuthorized || lifecycle.rulesDeployAuthorized || lifecycle.productionAuthorized || lifecycle.mainAuthorized || lifecycle.mergeAuthorized) process.exit(44);
+          if (!overlay.runtimeAllowed || !overlay.browserAllowed || !overlay.hostingAllowed || overlay.writesAllowed || overlay.productionAllowed) process.exit(45);
+          console.log('PASS_V18_RUNTIME_PENDING_SOURCE_TRANSITION_NO_RUNTIME_EXECUTED');
+          NODE
+
+      - name: Write sanitized transition evidence
+        if: steps.detect.outputs.run == 'true'
+        shell: bash
+        run: |
+          mkdir -p orbit360-platform/runtime-gate-crm-v20260716
+          node - <<'NODE'
+          const fs=require('fs');
+          const out={schemaVersion:'orbit360-v18-source-to-runtime-pending-transition-v1',generatedAt:new Date().toISOString(),runId:process.env.GITHUB_RUN_ID||'',requestVersion:'20260807.18-two-phase-runtime',status:'PASS_V18_SOURCE_TO_RUNTIME_PENDING',priorV17RequestStillConsumedFrozen:true,v18RequestCreated:false,goGateContractExecuted:false,secretsRead:false,firebaseAccess:false,hostingTouched:false,browserExecuted:false,deployExecuted:false,firestoreWrites:0,authWrites:0,operationalWrites:0,productionTouched:false,mainTouched:false,mergeExecuted:false,ok:true};
+          fs.writeFileSync('orbit360-platform/runtime-gate-crm-v20260716/v18-source-to-runtime-pending-transition-sanitized-v20260807.json',JSON.stringify(out,null,2)+'\n');
+          NODE
+
+      - name: Persist runtime-pending source transition
+        if: steps.detect.outputs.run == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name orbit360-source-gate-bot
+          git config user.email orbit360-source-gate-bot@users.noreply.github.com
+          git add \
+            tools/orbit360-validator-lifecycle-contract-visual-matrix-corrected-post-auth-lab-v20260805.json \
+            tools/orbit360-validator-lifecycle-overlay-visual-matrix-v8-stop-preflight-v20260806.json \
+            orbit360-platform/runtime-gate-crm-v20260716/v18-source-to-runtime-pending-transition-sanitized-v20260807.json
+          git commit -m 'source: persist v18 runtime-pending transition [skip ci]'
+          git push origin HEAD:ays/sourcefix-v18-hydration-transactional-run-evidence-20260807
+          echo 'PASS_V18_SOURCE_TO_RUNTIME_PENDING_PERSISTED'
