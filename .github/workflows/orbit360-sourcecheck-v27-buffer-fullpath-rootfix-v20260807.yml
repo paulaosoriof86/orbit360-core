@@ -1,0 +1,134 @@
+name: Orbit360 sourcecheck v27 Buffer full-path rootfix
+
+on:
+  pull_request:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+
+permissions:
+  contents: read
+
+jobs:
+  source-v27-buffer-fullpath-rootfix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    if: github.event.pull_request.head.ref == 'ays/source-v27-buffer-fullpath-rootfix-20260807'
+    env:
+      ORBIT360_V26_CLIENT_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/v26-client-provenance-source-sanitized-v20260807.json
+      ORBIT360_V26_PREFLIGHT_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/v26-block1-source-preflight-sanitized-v20260807.json
+    steps:
+      - name: Checkout exact v27 source candidate
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Mandatory current gate-contract diagnostic first
+        shell: bash
+        run: |
+          set -euo pipefail
+          set +e
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs block1-client360-insurers-lab-v20260717 >/tmp/v27-gate-first.log 2>&1
+          rc=$?
+          set -e
+          test "$rc" = '41'
+          node - <<'NODE'
+          const fs=require('fs');
+          const e=JSON.parse(fs.readFileSync('orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json','utf8'));
+          const ok=e.status==='VALIDATOR_STALE' && e.classification==='PIPELINE_MECHANISM_FAILURE' && String(e.error||'').includes('CANONICAL_LIFECYCLE_PHASE_MISMATCH') && e.secretAccess===false && e.dataAccess===false && e.firestoreRead===false;
+          if(!ok) process.exit(41);
+          console.log('PASS_V27_GATE_FIRST_EXPECTED_FROZEN_STOP_STATE_NO_RUNTIME');
+          NODE
+
+      - name: Verify authorized canonical base and frozen product
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE='7f4c76db09b164e0f05d5a53d7ba284932be8fa2'
+          HEAD_SHA='${{ github.event.pull_request.head.sha }}'
+          test '${{ github.event.pull_request.base.sha }}' = "$BASE"
+          git merge-base --is-ancestor "$BASE" "$HEAD_SHA"
+          frozen=(
+            'tools/orbit360-validar-gate-contracts-v20260717.mjs'
+            'tools/orbit360-validar-gate-contracts-engine-block1-v23-native-v20260807.mjs'
+            'tools/orbit360-gate-contract-block1-v23-native-v20260807.json'
+            'tools/orbit360-validator-lifecycle-block1-v23-native-v20260807.json'
+            'tools/orbit360-preflight-block1-v23-native-v20260807.mjs'
+            'tools/orbit360-canonical-preflight-evidence-handoff-v24.mjs'
+            'tools/orbit360-block1-native-matrix-v23-v20260807.mjs'
+            'tools/orbit360-block1-native-matrix-v23-canonical-v20260807.mjs'
+            'tools/orbit360-event-driven-render-observer-v23.mjs'
+            'tools/orbit360-adjudicate-block1-universe-readonly-v23-v20260807.mjs'
+            'tools/orbit360-diagnose-block1-universe-differential-v25-v20260807.mjs'
+            'orbit360-platform/modules/cliente360.js'
+            'orbit360-platform/modules/aseguradoras.js'
+            'orbit360-platform/modules/polizas.js'
+            'orbit360-platform/modules/cobros.js'
+            'orbit360-platform/sw.js'
+            'orbit360-platform/core/pwa.js'
+            'orbit360-platform/data/store.js'
+            'orbit360-platform/core/auth.js'
+            'orbit360-platform/core/importa.js'
+            'orbit360-platform/firestore.rules'
+          )
+          for p in "${frozen[@]}"; do git diff --quiet "$BASE"..."$HEAD_SHA" -- "$p" || { echo "STOP_V27_FROZEN_CHANGED:$p"; exit 41; }; done
+          echo PASS_V27_PRODUCT_OWNER_MATRIX_OBSERVER_BACKEND_FROZEN
+
+      - name: Execute full historical Buffer path before real reconciliation
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-reconcile-client-provenance-v26-source-v20260807.mjs
+          node --check tools/orbit360-test-v27-full-history-buffer-path-source-v20260807.mjs
+          ! grep -Fq "encoding='buffer'" tools/orbit360-reconcile-client-provenance-v26-source-v20260807.mjs
+          ! grep -Fq "'buffer',root" tools/orbit360-reconcile-client-provenance-v26-source-v20260807.mjs
+          node tools/orbit360-test-v27-full-history-buffer-path-source-v20260807.mjs
+
+      - name: Revalidate reused v26 dedupe package without redesign
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-insurer-identity-dedupe-v26-v20260807.mjs
+          node --check tools/orbit360-adjudicate-block1-universe-readonly-v26-v20260807.mjs
+          node --check tools/orbit360-test-v26-dedupe-and-client-provenance-source-v20260807.mjs
+          node --check tools/orbit360-preflight-block1-v26-source-v20260807.mjs
+          node tools/orbit360-test-v26-dedupe-and-client-provenance-source-v20260807.mjs
+
+      - name: Reconcile sixteen client fingerprints from existing source evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-reconcile-client-provenance-v26-source-v20260807.mjs
+          node - <<'NODE'
+          const fs=require('fs'); const e=JSON.parse(fs.readFileSync(process.env.ORBIT360_V26_CLIENT_EVIDENCE,'utf8'));
+          const ok=e.ok===true && e.inputV25FingerprintCount===16 && e.firestoreReads===0 && e.firestoreWrites===0 && e.authReads===0 && e.authWrites===0 && e.hostingTouched===false && e.browserExecuted===false && e.reimport===false && e.productionTouched===false && e.containsPII===false;
+          if(!ok) process.exit(41);
+          console.log(JSON.stringify({status:'PASS_V27_CLIENT_SOURCE_EVIDENCE',classification:e.summary.classification,resolvedSeed:e.summary.resolvedSeed,directReferences:e.summary.directReferences,unresolved:e.summary.unresolved,currentSeedMatchCount:e.sourceEvidence.currentSeedMatchCount,historicalSeedMatchCount:e.sourceEvidence.historicalSeedMatchCount,directReferenceCount:e.sourceEvidence.directReferenceCount,deterministicSimpleIdPatternMatchCount:e.sourceEvidence.deterministicSimpleIdPatternMatchCount}));
+          NODE
+
+      - name: Validate source preflight after complete reconciliation
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-preflight-block1-v26-source-v20260807.mjs
+
+      - name: Assert zero runtime capabilities and writes
+        shell: bash
+        run: |
+          set -euo pipefail
+          files=(tools/orbit360-insurer-identity-dedupe-v26-v20260807.mjs tools/orbit360-adjudicate-block1-universe-readonly-v26-v20260807.mjs tools/orbit360-reconcile-client-provenance-v26-source-v20260807.mjs tools/orbit360-test-v26-dedupe-and-client-provenance-source-v20260807.mjs tools/orbit360-test-v27-full-history-buffer-path-source-v20260807.mjs tools/orbit360-preflight-block1-v26-source-v20260807.mjs)
+          ! grep -Eq 'firebase-admin|GOOGLE_APPLICATION_CREDENTIALS|\.set\(|\.update\(|\.delete\(|runTransaction|bulkWriter|playwright|firebase deploy|hosting:' "${files[@]}"
+          test ! -e .github/orbit360-requests/block1-client360-insurers-v26-authorization.json
+          test ! -e .github/orbit360-requests/block1-client360-insurers-v27-authorization.json
+          echo PASS_V27_SOURCE_BOUNDARY_ZERO_RUNTIME_CAPABILITIES
+
+      - name: Verify source scope exact
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE='7f4c76db09b164e0f05d5a53d7ba284932be8fa2'
+          HEAD_SHA='${{ github.event.pull_request.head.sha }}'
+          allowed='^(tools/orbit360-insurer-identity-dedupe-v26-v20260807\.mjs|tools/orbit360-adjudicate-block1-universe-readonly-v26-v20260807\.mjs|tools/orbit360-reconcile-client-provenance-v26-source-v20260807\.mjs|tools/orbit360-test-v26-dedupe-and-client-provenance-source-v20260807\.mjs|tools/orbit360-test-v27-full-history-buffer-path-source-v20260807\.mjs|tools/orbit360-preflight-block1-v26-source-v20260807\.mjs|\.github/workflows/orbit360-sourcecheck-v26-rootcause-close-v20260807\.yml|\.github/workflows/orbit360-sourcecheck-v27-buffer-fullpath-rootfix-v20260807\.yml|orbit360-platform/docs/CIERRE-V26-ROOTCAUSE-VALIDATOR-PROVENANCE-20260807\.md|orbit360-platform/docs/ACADEMIA-ACTUALIZACION-V26-ROOTCAUSE-20260807\.md|orbit360-platform/docs/CLAUDE-ACUMULADO-V26-ROOTCAUSE-20260807\.md|orbit360-platform/docs/AUDITORIA-ANTI-BUCLE-V26-20260807\.md|orbit360-platform/docs/CIERRE-V27-ROOTFIX-BUFFER-FULLPATH-20260807\.md|orbit360-platform/docs/ACADEMIA-ACTUALIZACION-V27-PIPELINE-FULLPATH-20260807\.md|orbit360-platform/docs/CLAUDE-ACUMULADO-V27-PIPELINE-FULLPATH-20260807\.md)$'
+          while IFS= read -r p; do [[ "$p" =~ $allowed ]] || { echo "STOP_V27_UNAUTHORIZED_SOURCE_CHANGE:$p"; exit 41; }; done < <(git diff --name-only "$BASE"..."$HEAD_SHA")
+          echo PASS_V27_SOURCE_SCOPE_EXACT
