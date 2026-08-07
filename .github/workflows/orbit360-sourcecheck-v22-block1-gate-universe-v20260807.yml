@@ -1,0 +1,103 @@
+name: Orbit360 sourcecheck v22 Block1 Cliente360 Aseguradoras universe
+
+on:
+  pull_request:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - 'tools/orbit360-build-v22-block1-matrix-artifact-v20260807.mjs'
+      - 'tools/orbit360-adjudicate-block1-universe-readonly-v20260807.mjs'
+      - 'tools/orbit360-test-v22-universe-adjudicator-source-v20260807.mjs'
+      - 'tools/orbit360-test-v22-block1-gate-source-v20260807.mjs'
+      - 'tools/orbit360-test-capture-watchdog-v22-source-v20260807.mjs'
+      - 'tools/orbit360-visual-runtime-rootfix-observable-matrix-v20260805.mjs'
+      - '.github/workflows/orbit360-sourcecheck-v22-block1-gate-universe-v20260807.yml'
+      - '.github/workflows/orbit360-registered-relay-v22-block1-gate-universe-v20260807.yml'
+      - 'tools/orbit360-validator-lifecycle-contract-visual-matrix-corrected-post-auth-lab-v20260805.json'
+      - 'tools/orbit360-validator-lifecycle-overlay-visual-matrix-v8-stop-preflight-v20260806.json'
+      - 'orbit360-platform/docs/CIERRE-SOURCEFIX-V22-BLOCK1-GATE-UNIVERSE-20260807.md'
+      - 'orbit360-platform/docs/ACADEMIA-ACTUALIZACION-V22-BLOCK1-GATE-UNIVERSE-20260807.md'
+      - 'orbit360-platform/docs/CLAUDE-ACUMULADO-V22-BLOCK1-GATE-UNIVERSE-20260807.md'
+      - 'orbit360-platform/runtime-gate-crm-v20260716/v22-block1-gate-source-sanitized-v20260807.json'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: orbit360-sourcecheck-v22-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  source-v22-block1-gate-universe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - name: Checkout exact v22 candidate
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Verify exact authorization base v21 frozen and product freeze
+        shell: bash
+        run: |
+          set -euo pipefail
+          AUTH_BASE='ef9e0e1e738ce407025ed159067d8b3cc4d2683b'
+          BASE_SHA='${{ github.event.pull_request.base.sha }}'
+          [[ "$BASE_SHA" == "$AUTH_BASE" ]] || { echo "STOP_V22_UNEXPECTED_SOURCE_BASE:$BASE_SHA"; exit 41; }
+          git merge-base --is-ancestor "$AUTH_BASE" "${{ github.event.pull_request.head.sha }}"
+          node - <<'NODE'
+          const fs=require('fs');
+          const r=JSON.parse(fs.readFileSync('.github/orbit360-requests/visual-matrix-corrected-post-auth-lab-v20260805-authorization.json','utf8'));
+          if (!(r.requestVersion==='20260807.21-two-phase-runtime' && r.consumed===true && r.authorizationFrozen===true && r.allowedExecutions===0 && r.replayAllowed===false)) process.exit(41);
+          console.log('PASS_V21_REQUEST_FROZEN_BEFORE_V22_SOURCE');
+          NODE
+          mapfile -t changed < <(git diff --name-only "$AUTH_BASE"..."${{ github.event.pull_request.head.sha }}")
+          protected=(
+            'orbit360-platform/modules/cliente360.js'
+            'orbit360-platform/modules/polizas.js'
+            'orbit360-platform/modules/cobros.js'
+            'orbit360-platform/core/visual-runtime-rootfix-v20260805.js'
+            'orbit360-platform/data/store.js'
+            'orbit360-platform/data/store-firestore-lab.local.js'
+            'orbit360-platform/core/auth.js'
+            'orbit360-platform/core/importa.js'
+            'orbit360-platform/firestore.rules'
+          )
+          for p in "${protected[@]}"; do
+            if printf '%s\n' "${changed[@]}" | grep -Fxq "$p"; then
+              echo "STOP_V22_FROZEN_OR_PROTECTED_FILE_CHANGED:$p"
+              exit 41
+            fi
+          done
+          echo 'PASS_V22_PRODUCT_AND_PROTECTED_BACKEND_FROZEN'
+
+      - name: Exact Block1 artifact and universe synthetic gates
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-build-v22-block1-matrix-artifact-v20260807.mjs
+          node --check tools/orbit360-adjudicate-block1-universe-readonly-v20260807.mjs
+          node --check tools/orbit360-test-v22-universe-adjudicator-source-v20260807.mjs
+          node --check tools/orbit360-test-v22-block1-gate-source-v20260807.mjs
+          node --check tools/orbit360-test-capture-watchdog-v22-source-v20260807.mjs
+          node --check tools/orbit360-visual-runtime-rootfix-observable-matrix-v20260805.mjs
+          node tools/orbit360-test-v22-universe-adjudicator-source-v20260807.mjs
+          node --experimental-vm-modules tools/orbit360-test-v22-block1-gate-source-v20260807.mjs
+          node tools/orbit360-test-capture-watchdog-v22-source-v20260807.mjs
+
+      - name: Governing control-plane suites
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-test-request-lifecycle-baseline-contract-v20260806.mjs
+          node tools/orbit360-test-windows-signal-compatibility-synthetic-v20260806.mjs
+          node tools/orbit360-test-visual-matrix-timeout-signal-safe-portable-v20260806.mjs
+          node tools/orbit360-test-visual-matrix-cross-runner-portable-v20260806.mjs
+          node tools/orbit360-test-preflight-portable-source-v20260806.mjs
+          node tools/orbit360-test-runtime-transport-base-sha-v20260806.mjs
+
+      - name: Assert source-only boundary
+        shell: bash
+        run: echo 'PASS_V22_SOURCE_ONLY_NO_SECRETS_FIREBASE_HOSTING_REAL_BROWSER_WRITES'
