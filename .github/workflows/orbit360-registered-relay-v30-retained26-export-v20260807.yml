@@ -1,0 +1,86 @@
+name: Orbit360 registered relay v30 retained26 encrypted export
+on:
+  pull_request:
+    branches: [ays/runtime-v30-retained26-export-base-20260807]
+permissions: {contents: write}
+jobs:
+  registered-export-v30:
+    if: github.head_ref == 'ays/backend-tenant-lab-v99-20260703'
+    runs-on: ubuntu-24.04
+    env:
+      ORBIT360_GATE_PROFILE: v30-retained26-psi-universe
+      ORBIT360_V30_MODE: export
+      ORBIT360_REQUEST_FILE: .github/orbit360-requests/block1-client360-insurers-v30-retained26-encrypted-export-authorization.json
+      ORBIT360_EXPECTED_REQUEST_VERSION: 20260807.30-retained26-encrypted-export-readonly
+      ORBIT360_V30_PREFLIGHT_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/v30-block1-preflight-sanitized-v20260807.json
+      ORBIT360_V30_EXPORT_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/v30-retained26-encrypted-export-sanitized-v20260807.json
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+      - name: Exclusive immutable request before secrets
+        run: |
+          set -euo pipefail
+          test "$GITHUB_RUN_ATTEMPT" = 1
+          mapfile -t changed < <(git diff-tree --no-commit-id --name-only -r HEAD)
+          [[ "${#changed[@]}" = 1 && "${changed[0]}" = "$ORBIT360_REQUEST_FILE" ]] || { echo STOP_V30_NOT_EXCLUSIVE_REQUEST; exit 41; }
+          PARENT="$(git rev-parse HEAD^)"; BASE_SHA="$(git rev-parse "origin/${GITHUB_BASE_REF}^{commit}")"; test "$PARENT" = "$BASE_SHA"
+          node - "$PARENT" <<'NODE'
+          const fs=require('fs');const p=process.argv[2];const r=JSON.parse(fs.readFileSync(process.env.ORBIT360_REQUEST_FILE,'utf8'));
+          const ok=r.requestVersion===process.env.ORBIT360_EXPECTED_REQUEST_VERSION&&r.status==='AUTHORIZED_ONCE'&&r.allowedExecutions===1&&r.consumed===false&&r.authorizationFrozen===false&&r.replayAllowed===false&&r.parentHead===p&&r.authorizedBaseHead===p;
+          if(!ok)process.exit(41);
+          NODE
+      - name: GO gate and preflight before secrets
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs block1-client360-insurers-lab-v20260717
+          jq -e '.status=="GO_GATE_CONTRACT" and .classification=="GO_BLOCK1_RETAINED26_ENCRYPTED_EXPORT_READONLY_V30" and .ok==true and .firestoreReadAuthorized==true and .writesAuthorized==0' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json >/dev/null
+          node tools/orbit360-preflight-block1-retained26-psi-v30-v20260807.mjs export
+      - run: npm install --no-save --package-lock=false firebase-admin@13.10.0 >/dev/null
+      - name: Materialize LAB credential after GO
+        id: cred
+        env:
+          FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+        run: |
+          set -euo pipefail
+          test -n "$FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB"
+          KEY="$RUNNER_TEMP/orbit360-v30-service-account.json"; printf '%s' "$FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB" > "$KEY"; chmod 600 "$KEY"
+          test "$(jq -r '.project_id' "$KEY")" = ays-orbit-360-lab
+          echo "key=$KEY" >> "$GITHUB_OUTPUT"
+      - name: Encrypted target identity export
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.cred.outputs.key }}
+          ORBIT360_PROJECT_ID: ays-orbit-360-lab
+          ORBIT360_TENANT_ID: alianzas-soluciones
+          ORBIT360_V30_ENCRYPTED_OUT: ${{ runner.temp }}/orbit360-v30-target-identities.encrypted.json
+        run: |
+          set -euo pipefail
+          node tools/orbit360-export-target-identity-encrypted-v30-v20260807.mjs
+          jq -e '.status=="PASS_V30_ENCRYPTED_TARGET_EXPORT" and .targetCount==16 and .firestoreReadOperations==2 and .rawPIIInEvidence==false and .rawPIIPersistedInRepo==false and .ok==true' "$ORBIT360_V30_EXPORT_EVIDENCE" >/dev/null
+      - uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-v30-encrypted-target-identities
+          path: ${{ runner.temp }}/orbit360-v30-target-identities.encrypted.json
+          retention-days: 1
+          if-no-files-found: error
+      - name: Consume and freeze export request
+        if: always()
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');const rp=process.env.ORBIT360_REQUEST_FILE;const lp='tools/orbit360-validator-lifecycle-block1-retained26-psi-v30-v20260807.json';
+          const r=JSON.parse(fs.readFileSync(rp,'utf8'));r.status='CONSUMED';r.allowedExecutions=0;r.consumed=true;r.authorizationFrozen=true;r.replayAllowed=false;r.consumedByRunId=process.env.GITHUB_RUN_ID;r.consumedByAttempt=Number(process.env.GITHUB_RUN_ATTEMPT);fs.writeFileSync(rp,JSON.stringify(r,null,2)+'\n');
+          const l=JSON.parse(fs.readFileSync(lp,'utf8'));l.status='EXPORT_CONSUMED_AWAITING_LOCAL_ADJUDICATION';l.stopRetryActive=true;l.authorizationFrozen=true;l.activeRequest=false;l.requestConsumed=true;l.executionAuthorized=false;fs.writeFileSync(lp,JSON.stringify(l,null,2)+'\n');
+          NODE
+      - name: Persist sanitized closure only
+        if: always()
+        run: |
+          set -euo pipefail
+          git config user.name orbit360-gate-bot
+          git config user.email orbit360-gate-bot@users.noreply.github.com
+          git add "$ORBIT360_REQUEST_FILE" tools/orbit360-validator-lifecycle-block1-retained26-psi-v30-v20260807.json orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json "$ORBIT360_V30_PREFLIGHT_EVIDENCE" "$ORBIT360_V30_EXPORT_EVIDENCE"
+          git commit -m 'runtime: persist Block1 v30 encrypted export closure [skip ci]' || true
+          git push origin HEAD:ays/backend-tenant-lab-v99-20260703
+      - name: Zero write boundary
+        if: always()
+        run: echo PASS_V30_EXPORT_NO_HOSTING_BROWSER_AUTH_OR_OPERATIONAL_WRITES
