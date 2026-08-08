@@ -1,0 +1,58 @@
+{
+  "schemaVersion": "orbit360-block1-v29-identity-reconciliation-universe-request-v1",
+  "requestVersion": "20260807.29-identity-reconciliation-universe-readonly",
+  "authorizationGeneration": "v29-identity-reconciliation-universe-readonly",
+  "gateId": "block1-client360-insurers-lab-v20260717",
+  "contractVersion": "1.0.41",
+  "status": "AUTHORIZED_ONCE",
+  "approved": true,
+  "allowedExecutions": 1,
+  "consumed": false,
+  "authorizationFrozen": false,
+  "replayAllowed": false,
+  "parentHead": "729f227dee2474485cec27db1a7525fbdc0c74d6",
+  "authorizedBaseHead": "729f227dee2474485cec27db1a7525fbdc0c74d6",
+  "scope": {
+    "identityProjectionOnly": true,
+    "repeatV28ProvenanceFields": false,
+    "baselineIdentityInMemory": true,
+    "demoSourceInMemory": true,
+    "externalAuditOnlyIfRegistered": true,
+    "universeAfterFullAdjudicationOnly": true,
+    "expectedUniverse": {
+      "clientes": 414,
+      "aseguradoras": 26,
+      "asesores": 7
+    },
+    "firestoreReadOperationsMaximum": 4,
+    "firestoreWrites": false,
+    "authReads": false,
+    "authWrites": false,
+    "operationalWrites": false,
+    "hosting": false,
+    "browser": false,
+    "reimport": false,
+    "functionsDeploy": false,
+    "rulesDeploy": false,
+    "production": false,
+    "main": false,
+    "merge": false
+  },
+  "classificationPolicy": {
+    "strongDocumentExact": "DUPLICADO",
+    "normalizedIdentityExactUnderSourceContract": "DUPLICADO",
+    "demoPrototypeExact": "RESIDUAL_PROTOTIPO",
+    "sameNameDifferentStrongDocument": "CONTRADICCION_IDENTIDAD",
+    "createTimeAloneLegitimate": false,
+    "legitimatePostBaselineMayChangeContract": true,
+    "contractMutationAuthorized": false
+  },
+  "prohibitedSources": [
+    "polizas",
+    "cobros",
+    "financiero_historico"
+  ],
+  "authorizedByUser": true,
+  "containsPII": false,
+  "containsSecrets": false
+}
