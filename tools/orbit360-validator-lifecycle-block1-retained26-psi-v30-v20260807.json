@@ -1,9 +1,9 @@
 {
-  "schemaVersion": "orbit360-validator-lifecycle-block1-retained26-psi-v30-v1",
+  "schemaVersion": "orbit360-validator-lifecycle-block1-retained26-psi-v30-v2",
   "validatorLifecycleRevision": "phase-capability-contract-v1",
   "gateId": "block1-client360-insurers-lab-v20260717",
   "gateContractVersion": "1.0.41",
-  "authorizationGeneration": "v30-retained26-psi-universe-readonly",
+  "authorizationGeneration": "v32-semantic-mutation-rootfix-retained26",
   "ownerReference": "orbit360-block1-native-matrix-v23",
   "ownerReferenceVersion": "20260807.23-native-source-canonical-owner-1.0.41",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -11,7 +11,7 @@
   "projectId": "ays-orbit-360-lab",
   "tenantId": "alianzas-soluciones",
   "authorizedBaseHead": "127d1bab8aca09ccdc47c368bd402d8bd2d638a1",
-  "expectedRequestVersion": "20260807.30-retained26-encrypted-export-readonly",
+  "expectedRequestVersion": "20260807.32-retained26-encrypted-export-readonly",
   "status": "SOURCE_VALIDATION_PENDING",
   "classification": "RETAINED26_PRIVACY_PRESERVING_RECONCILIATION_SOURCE_ONLY",
   "currentPhase": "SOURCE_ONLY_RETAINED26_PSI_V30",
@@ -47,15 +47,26 @@
     "runtimeRawIdentityOutput": false,
     "encryptedArtifactOnly": true,
     "encryption": "AES-256-GCM + RSA-OAEP-SHA256 envelope",
-    "publicKeySha256": "edd84dffa0dd5703ee6edbabdd509c2bdbb95b7165567a619ce669690b64e273",
+    "publicKeySha256": "9fffaf25a4a65233bbb039222c87349855ca8d9f2603f64c2050eab9fd89bf54",
     "privateKeyInRepo": false,
     "privateKeyInActions": false,
     "artifactRetentionDays": 1,
     "plaintextSource26InRepo": false
   },
+  "mutationValidator": {
+    "generation": "v32-semantic-firestore-provenance",
+    "detector": "tools/orbit360-detect-firestore-mutations-v32-v20260807.mjs",
+    "fixtures": "tools/orbit360-test-firestore-mutation-detector-v32-v20260807.mjs",
+    "genericMethodNameGrepForbidden": true,
+    "cryptoCipherUpdateAllowed": true,
+    "firestoreReferenceWritesBlocked": true,
+    "writeBatchWritesBlocked": true,
+    "transactionWritesBlocked": true,
+    "bulkWriterWritesBlocked": true
+  },
   "runtimeReadContract": {"exportFirestoreReadOperationsMaximum": 2, "universeFirestoreReadOperationsMaximum": 3, "exportTargetsOnly": 16, "universeAfterAdjudicationOnly": true},
   "protectedState": {"productFrozen": true, "cliente360Frozen": true, "insurersFunctionalFrozen": true, "polizasFrozen": true, "cobrosFrozen": true, "pwaServiceWorkerFrozen": true, "owner1041Frozen": true, "matrixFrozen": true, "observerFrozen": true, "authFrozen": true, "storeFrozen": true, "importersFrozen": true, "rulesFrozen": true, "backendProtectedFrozen": true, "hostingAuthorized": false, "browserAuthorized": false, "writesAuthorized": 0},
   "containsPII": false,
   "containsSecrets": false,
-  "nextAction": "SOURCE_GATE_THEN_ENCRYPTED_TARGET_EXPORT"
+  "nextAction": "SOURCE_GATE_V32_THEN_ENCRYPTED_TARGET_EXPORT"
 }
