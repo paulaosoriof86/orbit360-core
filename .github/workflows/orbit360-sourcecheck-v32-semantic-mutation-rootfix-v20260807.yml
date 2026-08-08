@@ -1,0 +1,66 @@
+name: Orbit360 sourcecheck v32 semantic mutation rootfix
+on:
+  pull_request:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+permissions: {contents: read}
+jobs:
+  source-v32-semantic-mutation-rootfix:
+    if: github.head_ref == 'ays/source-v32-semantic-mutation-rootfix-20260807'
+    runs-on: ubuntu-24.04
+    env:
+      ORBIT360_GATE_PROFILE: v30-retained26-psi-universe
+      ORBIT360_V30_MODE: export
+      ORBIT360_REQUEST_FILE: .github/orbit360-requests/block1-client360-insurers-v30-retained26-encrypted-export-authorization.json
+      ORBIT360_EXPECTED_REQUEST_VERSION: NONE_PENDING_FRESH_AUTHORIZATION
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: First and only v32 source attempt
+        run: test "$GITHUB_RUN_ATTEMPT" = 1
+      - name: Canonical gate first
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs block1-client360-insurers-lab-v20260717
+          jq -e '.status=="PASS_GATE_CONTRACT_SOURCE_V30" and .authorizationGeneration=="v32-semantic-mutation-rootfix-retained26" and .ok==true and .secretAccessAuthorized==false and .firestoreReadAuthorized==false and .writesAuthorized==0' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json >/dev/null
+      - name: Frozen product owner backend
+        run: |
+          set -euo pipefail
+          BASE=127d1bab8aca09ccdc47c368bd402d8bd2d638a1
+          for p in orbit360-platform/modules/cliente360.js orbit360-platform/modules/aseguradoras.js orbit360-platform/modules/polizas.js orbit360-platform/modules/cobros.js orbit360-platform/sw.js orbit360-platform/core/pwa.js orbit360-platform/data/store.js orbit360-platform/core/auth.js orbit360-platform/core/importa.js orbit360-platform/firestore.rules; do
+            git diff --quiet "$BASE"...HEAD -- "$p" || { echo "STOP_V32_FROZEN_CHANGED:$p"; exit 41; }
+          done
+      - name: Semantic mutation full-path fixtures
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-detect-firestore-mutations-v32-v20260807.mjs
+          node --check tools/orbit360-test-firestore-mutation-detector-v32-v20260807.mjs
+          node --check tools/orbit360-export-target-identity-encrypted-v30-v20260807.mjs
+          node tools/orbit360-test-firestore-mutation-detector-v32-v20260807.mjs
+          node tools/orbit360-detect-firestore-mutations-v32-v20260807.mjs tools/orbit360-export-target-identity-encrypted-v30-v20260807.mjs > "$RUNNER_TEMP/v32-mutation-analysis.json"
+          jq -e '.ok==true and (.findings|length)==0' "$RUNNER_TEMP/v32-mutation-analysis.json" >/dev/null
+          node tools/orbit360-test-retained26-psi-v30-source-v20260807.mjs
+          node tools/orbit360-test-v26-dedupe-and-client-provenance-source-v20260807.mjs
+          node tools/orbit360-preflight-block1-retained26-psi-v30-v20260807.mjs source
+      - name: Structural key and credential boundary
+        run: |
+          set -euo pipefail
+          BASE=127d1bab8aca09ccdc47c368bd402d8bd2d638a1
+          PUB=tools/orbit360-v30-ephemeral-public.pem
+          test "$(sha256sum "$PUB" | awk '{print $1}')" = "9fffaf25a4a65233bbb039222c87349855ca8d9f2603f64c2050eab9fd89bf54"
+          openssl pkey -pubin -in "$PUB" -noout >/dev/null
+          mapfile -t changed < <(git diff --name-only "$BASE"...HEAD)
+          ((${#changed[@]}>0)) || { echo STOP_V32_EMPTY_SCOPE; exit 41; }
+          for f in "${changed[@]}"; do
+            n="$(basename "$f" | tr '[:upper:]' '[:lower:]')"
+            case "$n" in
+              *.key|*private*.pem|*service-account*.json|*service_account*.json|*credential*.json|*credentials*.json) echo "STOP_V32_PRIVATE_OR_CREDENTIAL_FILENAME:$f"; exit 41 ;;
+              *.pem) test "$f" = "$PUB" || { echo "STOP_V32_UNEXPECTED_PEM:$f"; exit 41; } ;;
+            esac
+          done
+          grep -Fq "'telefono'" tools/orbit360-export-target-identity-encrypted-v30-v20260807.mjs
+          grep -Fq "'fechaNacimiento'" tools/orbit360-export-target-identity-encrypted-v30-v20260807.mjs
+          ! grep -Eq 'playwright|firebase deploy|hosting:' tools/orbit360-export-target-identity-encrypted-v30-v20260807.mjs
+          echo PASS_V32_SEMANTIC_PRIVACY_BOUNDARY
