@@ -7,14 +7,23 @@ jobs:
   source-v33-two-client-cloud-audit:
     if: github.head_ref == 'ays/source-v33-two-client-cloud-audit-20260807'
     runs-on: ubuntu-24.04
+    env:
+      ORBIT360_GATE_PROFILE: v33-two-client-cloud-audit
+      ORBIT360_REQUEST_FILE: .github/orbit360-requests/block1-client360-insurers-v33-two-client-cloud-audit-authorization.json
+      ORBIT360_EXPECTED_REQUEST_VERSION: NONE_PENDING_FRESH_AUTHORIZATION
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
           persist-credentials: false
-      - name: First and only source preflight attempt
+      - name: First canonical v33 source-gate attempt
         run: test "$GITHUB_RUN_ATTEMPT" = 1
+      - name: Canonical gate first
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs block1-client360-insurers-lab-v20260717
+          jq -e '.status=="PASS_GATE_CONTRACT_SOURCE_V33" and .authorizationGeneration=="v33-two-client-cloud-audit-readonly" and .ok==true and .secretAccessAuthorized==false and .firestoreReadAuthorized==false and .loggingReadAuthorized==false and .writesAuthorized==0' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json >/dev/null
       - name: Frozen product and protected backend
         run: |
           set -euo pipefail
@@ -25,15 +34,17 @@ jobs:
       - name: Source-safe external audit fixtures
         run: |
           set -euo pipefail
+          node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
           node --check tools/orbit360-probe-two-client-cloud-audit-v33-v20260807.mjs
           node --check tools/orbit360-test-two-client-cloud-audit-v33-source-v20260807.mjs
           node --check tools/orbit360-validar-gate-contracts-engine-block1-two-client-cloud-audit-v33-v20260807.mjs
           node tools/orbit360-test-two-client-cloud-audit-v33-source-v20260807.mjs
-          test ! -e .github/orbit360-requests/block1-client360-insurers-v33-two-client-cloud-audit-authorization.json
-      - name: Static privacy and zero-write boundary
+          test ! -e "$ORBIT360_REQUEST_FILE"
+      - name: Semantic privacy and zero-write boundary
         run: |
           set -euo pipefail
-          ! grep -Eq '\.(set|update|delete|create)\(' tools/orbit360-probe-two-client-cloud-audit-v33-v20260807.mjs
+          node tools/orbit360-detect-firestore-mutations-v32-v20260807.mjs tools/orbit360-probe-two-client-cloud-audit-v33-v20260807.mjs > "$RUNNER_TEMP/v33-mutation-analysis.json"
+          jq -e '.ok==true and (.findings|length)==0' "$RUNNER_TEMP/v33-mutation-analysis.json" >/dev/null
           ! grep -Eq 'firebase deploy|playwright|hosting:' tools/orbit360-probe-two-client-cloud-audit-v33-v20260807.mjs
           grep -Fq 'rawLogEntriesPersisted' tools/orbit360-validator-lifecycle-block1-two-client-cloud-audit-v33-v20260807.json
-          echo PASS_V33_SOURCE_PREFLIGHT_NO_SECRETS_NO_RUNTIME_NO_WRITES
+          echo PASS_V33_CANONICAL_SOURCE_GATE_NO_SECRETS_NO_RUNTIME_NO_WRITES
