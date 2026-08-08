@@ -7,11 +7,12 @@ import { spawnSync } from 'node:child_process';
 
 const ROOT = process.cwd();
 const GATE_ID = process.argv[2] || 'block1-client360-insurers-lab-v20260717';
-const BLOCK1_V23_GATE_ID = 'block1-client360-insurers-lab-v20260717';
+const BLOCK1_GATE_ID = 'block1-client360-insurers-lab-v20260717';
 const VISUAL_LEGACY_GATE_ID = 'block2.7-visual-matrix-corrected-post-auth-lab-v20260805';
 const V28_PROFILE = 'v28-focal-provenance-universe';
 const V29_PROFILE = 'v29-identity-reconciliation-universe';
 const V30_PROFILE = 'v30-retained26-psi-universe';
+const V33_PROFILE = 'v33-two-client-cloud-audit';
 const LEGACY_ROUTER = 'tools/orbit360-validar-gate-contracts-legacy-v20260717.mjs';
 const EVIDENCE_REL = 'orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json';
 const EVIDENCE_PATH = path.join(ROOT, EVIDENCE_REL);
@@ -20,10 +21,13 @@ const DEFAULT_BLOCK1_V23_REQUEST_REL = '.github/orbit360-requests/block1-client3
 const DEFAULT_BLOCK1_V28_REQUEST_REL = '.github/orbit360-requests/block1-client360-insurers-v28-focal-provenance-universe-authorization.json';
 const DEFAULT_BLOCK1_V29_REQUEST_REL = '.github/orbit360-requests/block1-client360-insurers-v29-identity-reconciliation-universe-authorization.json';
 const DEFAULT_BLOCK1_V30_REQUEST_REL = '.github/orbit360-requests/block1-client360-insurers-v30-retained26-encrypted-export-authorization.json';
+const DEFAULT_BLOCK1_V33_REQUEST_REL = '.github/orbit360-requests/block1-client360-insurers-v33-two-client-cloud-audit-authorization.json';
 const STOP_OVERLAY_REL = 'tools/orbit360-validator-lifecycle-overlay-visual-matrix-v8-stop-preflight-v20260806.json';
 const CANONICAL_LIFECYCLE_COMPOSITION = 'phase-capability-contract-v1';
+const ROUTER_VERSION = 'v9-profile-aware-block1-v33';
+
 const GATE_CONFIG = Object.freeze({
-  [BLOCK1_V23_GATE_ID]: {
+  [BLOCK1_GATE_ID]: {
     contractVersion: '1.0.41',
     lifecycle: 'tools/orbit360-validator-lifecycle-block1-v23-native-v20260807.json',
     engine: 'tools/orbit360-validar-gate-contracts-engine-block1-v23-native-v20260807.mjs',
@@ -38,6 +42,7 @@ const GATE_CONFIG = Object.freeze({
     sourcePhase: ''
   }
 });
+
 const BLOCK1_V28_CONFIG = Object.freeze({
   contractVersion: '1.0.41',
   lifecycle: 'tools/orbit360-validator-lifecycle-block1-focal-provenance-universe-v28-v20260807.json',
@@ -59,6 +64,14 @@ const BLOCK1_V30_CONFIG = Object.freeze({
   defaultRequest: DEFAULT_BLOCK1_V30_REQUEST_REL,
   sourcePhase: 'SOURCE_ONLY_RETAINED26_PSI_V30'
 });
+const BLOCK1_V33_CONFIG = Object.freeze({
+  contractVersion: '1.0.41',
+  lifecycle: 'tools/orbit360-validator-lifecycle-block1-two-client-cloud-audit-v33-v20260807.json',
+  engine: 'tools/orbit360-validar-gate-contracts-engine-block1-two-client-cloud-audit-v33-v20260807.mjs',
+  defaultRequest: DEFAULT_BLOCK1_V33_REQUEST_REL,
+  sourcePhase: 'SOURCE_ONLY_TWO_CLIENT_CLOUD_AUDIT_V33'
+});
+
 const PHASE_PROFILES = Object.freeze({
   SOURCE_ONLY_NATIVE_MATRIX_VALIDATION: {secrets:false,firestoreRead:false,writes:false,runtime:false,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false},
   BLOCK1_NATIVE_MATRIX_RUNTIME_V23: {secrets:true,firestoreRead:true,writes:false,runtime:true,browser:true,deploy:true,functionsDeploy:false,rulesDeploy:false,production:false},
@@ -68,6 +81,8 @@ const PHASE_PROFILES = Object.freeze({
   BLOCK1_IDENTITY_RECONCILIATION_UNIVERSE_READONLY_V29: {secrets:true,firestoreRead:true,writes:false,runtime:true,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false},
   SOURCE_ONLY_RETAINED26_PSI_V30: {secrets:false,firestoreRead:false,writes:false,runtime:false,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false},
   BLOCK1_RETAINED26_ENCRYPTED_EXPORT_READONLY_V30: {secrets:true,firestoreRead:true,writes:false,runtime:true,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false},
+  SOURCE_ONLY_TWO_CLIENT_CLOUD_AUDIT_V33: {secrets:false,firestoreRead:false,writes:false,runtime:false,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false},
+  BLOCK1_TWO_CLIENT_CLOUD_AUDIT_READONLY_V33: {secrets:true,firestoreRead:true,writes:false,runtime:true,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false},
   VISUAL_MATRIX_CORRECTED_POST_AUTH_LAB_EXECUTION: {secrets:true,firestoreRead:true,writes:false,runtime:true,browser:true,deploy:true,functionsDeploy:false,rulesDeploy:false,production:false}
 });
 
@@ -85,7 +100,7 @@ function exactCapabilities(actual, expected) {
 }
 function failOutput(config, error) {
   return {
-    schemaVersion: 'orbit360-gate-contract-preflight-canonical-router-v8-profile-aware',
+    schemaVersion: 'orbit360-gate-contract-preflight-canonical-router-v9-profile-aware',
     gateId: GATE_ID,
     contractVersion: config && config.contractVersion || '',
     status: 'VALIDATOR_STALE',
@@ -95,7 +110,7 @@ function failOutput(config, error) {
     error: String(error && error.message || error),
     canonicalLifecycleComposition: CANONICAL_LIFECYCLE_COMPOSITION,
     canonicalEngine: config && config.engine || '',
-    canonicalRouterVersion: 'v8-profile-aware-block1-v30',
+    canonicalRouterVersion: ROUTER_VERSION,
     canonicalStopOverlay: GATE_ID === VISUAL_LEGACY_GATE_ID ? STOP_OVERLAY_REL : '',
     gateProfile: process.env.ORBIT360_GATE_PROFILE || 'default',
     legacyDelegate: LEGACY_ROUTER,
@@ -118,12 +133,17 @@ function failOutput(config, error) {
 }
 
 const gateProfile = process.env.ORBIT360_GATE_PROFILE || '';
-const config = GATE_ID === BLOCK1_V23_GATE_ID && gateProfile === V30_PROFILE ? BLOCK1_V30_CONFIG : GATE_ID === BLOCK1_V23_GATE_ID && gateProfile === V29_PROFILE ? BLOCK1_V29_CONFIG : GATE_ID === BLOCK1_V23_GATE_ID && gateProfile === V28_PROFILE ? BLOCK1_V28_CONFIG : GATE_CONFIG[GATE_ID];
+const config = GATE_ID === BLOCK1_GATE_ID && gateProfile === V33_PROFILE ? BLOCK1_V33_CONFIG
+  : GATE_ID === BLOCK1_GATE_ID && gateProfile === V30_PROFILE ? BLOCK1_V30_CONFIG
+  : GATE_ID === BLOCK1_GATE_ID && gateProfile === V29_PROFILE ? BLOCK1_V29_CONFIG
+  : GATE_ID === BLOCK1_GATE_ID && gateProfile === V28_PROFILE ? BLOCK1_V28_CONFIG
+  : GATE_CONFIG[GATE_ID];
+
 if (!config) {
   const legacyPath = path.join(ROOT, LEGACY_ROUTER);
   if (!fs.existsSync(legacyPath)) {
     const missing = {
-      schemaVersion: 'orbit360-gate-contract-preflight-canonical-router-v8-profile-aware',
+      schemaVersion: 'orbit360-gate-contract-preflight-canonical-router-v9-profile-aware',
       gateId: GATE_ID,
       status: 'VALIDATOR_STALE',
       classification: 'PIPELINE_MECHANISM_FAILURE',
@@ -208,7 +228,7 @@ try {
     canonicalEngine: config.engine,
     canonicalLifecycleContract: config.lifecycle,
     canonicalLifecycleComposition: CANONICAL_LIFECYCLE_COMPOSITION,
-    canonicalRouterVersion: 'v8-profile-aware-block1-v30',
+    canonicalRouterVersion: ROUTER_VERSION,
     canonicalStopOverlay: GATE_ID === VISUAL_LEGACY_GATE_ID ? STOP_OVERLAY_REL : '',
     gateProfile: gateProfile || 'default',
     legacyDelegate: LEGACY_ROUTER,
