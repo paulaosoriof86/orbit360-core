@@ -11,7 +11,7 @@
   "projectId": "ays-orbit-360-lab",
   "tenantId": "alianzas-soluciones",
   "authorizedBaseHead": "127d1bab8aca09ccdc47c368bd402d8bd2d638a1",
-  "expectedRequestVersion": "20260807.32-retained26-encrypted-export-readonly",
+  "expectedRequestVersion": "20260807.30-retained26-encrypted-export-readonly",
   "status": "SOURCE_PASS_AWAITING_EXCLUSIVE_RUNTIME_REQUEST",
   "classification": "RETAINED26_PRIVACY_PRESERVING_RECONCILIATION_RUNTIME_READY",
   "currentPhase": "BLOCK1_RETAINED26_ENCRYPTED_EXPORT_READONLY_V30",
