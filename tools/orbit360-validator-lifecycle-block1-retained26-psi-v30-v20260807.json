@@ -12,21 +12,21 @@
   "tenantId": "alianzas-soluciones",
   "authorizedBaseHead": "127d1bab8aca09ccdc47c368bd402d8bd2d638a1",
   "expectedRequestVersion": "20260807.32-retained26-encrypted-export-readonly",
-  "status": "SOURCE_VALIDATION_PENDING",
-  "classification": "RETAINED26_PRIVACY_PRESERVING_RECONCILIATION_SOURCE_ONLY",
-  "currentPhase": "SOURCE_ONLY_RETAINED26_PSI_V30",
+  "status": "SOURCE_PASS_AWAITING_EXCLUSIVE_RUNTIME_REQUEST",
+  "classification": "RETAINED26_PRIVACY_PRESERVING_RECONCILIATION_RUNTIME_READY",
+  "currentPhase": "BLOCK1_RETAINED26_ENCRYPTED_EXPORT_READONLY_V30",
   "stopRetryActive": false,
   "authorizationReserved": true,
   "authorizationFrozen": false,
-  "allowedExecutions": 2,
+  "allowedExecutions": 1,
   "activeRequest": false,
   "requestConsumed": false,
   "replayAllowed": false,
   "executionAuthorized": false,
   "executionProfile": {
-    "mode": "SOURCE_ONLY",
-    "phase": "SOURCE_ONLY_RETAINED26_PSI_V30",
-    "capabilities": {"secrets": false, "firestoreRead": false, "writes": false, "runtime": false, "browser": false, "deploy": false, "functionsDeploy": false, "rulesDeploy": false, "production": false}
+    "mode": "RUNTIME_READ_ONLY",
+    "phase": "BLOCK1_RETAINED26_ENCRYPTED_EXPORT_READONLY_V30",
+    "capabilities": {"secrets": true, "firestoreRead": true, "writes": false, "runtime": true, "browser": false, "deploy": false, "functionsDeploy": false, "rulesDeploy": false, "production": false}
   },
   "targetFingerprintCount": 16,
   "retainedSourceContract": {
@@ -62,11 +62,14 @@
     "firestoreReferenceWritesBlocked": true,
     "writeBatchWritesBlocked": true,
     "transactionWritesBlocked": true,
-    "bulkWriterWritesBlocked": true
+    "bulkWriterWritesBlocked": true,
+    "sourceRunId": "31236134430",
+    "sourceJobId": "93048871935",
+    "sourcePass": true
   },
   "runtimeReadContract": {"exportFirestoreReadOperationsMaximum": 2, "universeFirestoreReadOperationsMaximum": 3, "exportTargetsOnly": 16, "universeAfterAdjudicationOnly": true},
   "protectedState": {"productFrozen": true, "cliente360Frozen": true, "insurersFunctionalFrozen": true, "polizasFrozen": true, "cobrosFrozen": true, "pwaServiceWorkerFrozen": true, "owner1041Frozen": true, "matrixFrozen": true, "observerFrozen": true, "authFrozen": true, "storeFrozen": true, "importersFrozen": true, "rulesFrozen": true, "backendProtectedFrozen": true, "hostingAuthorized": false, "browserAuthorized": false, "writesAuthorized": 0},
   "containsPII": false,
   "containsSecrets": false,
-  "nextAction": "SOURCE_GATE_V32_THEN_ENCRYPTED_TARGET_EXPORT"
+  "nextAction": "EXCLUSIVE_ENCRYPTED_TARGET_EXPORT_REQUEST"
 }
