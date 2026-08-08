@@ -1,0 +1,39 @@
+name: Orbit360 sourcecheck v33 two-client cloud audit
+on:
+  pull_request:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+permissions: {contents: read}
+jobs:
+  source-v33-two-client-cloud-audit:
+    if: github.head_ref == 'ays/source-v33-two-client-cloud-audit-20260807'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: First and only source preflight attempt
+        run: test "$GITHUB_RUN_ATTEMPT" = 1
+      - name: Frozen product and protected backend
+        run: |
+          set -euo pipefail
+          BASE=84d6daf66c99bba8fe6b4df5c9e327c05ec469dc
+          for p in orbit360-platform/modules/cliente360.js orbit360-platform/modules/aseguradoras.js orbit360-platform/modules/polizas.js orbit360-platform/modules/cobros.js orbit360-platform/sw.js orbit360-platform/core/pwa.js orbit360-platform/data/store.js orbit360-platform/core/auth.js orbit360-platform/core/importa.js orbit360-platform/firestore.rules; do
+            git diff --quiet "$BASE"...HEAD -- "$p" || { echo "STOP_V33_FROZEN_CHANGED:$p"; exit 41; }
+          done
+      - name: Source-safe external audit fixtures
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-probe-two-client-cloud-audit-v33-v20260807.mjs
+          node --check tools/orbit360-test-two-client-cloud-audit-v33-source-v20260807.mjs
+          node --check tools/orbit360-validar-gate-contracts-engine-block1-two-client-cloud-audit-v33-v20260807.mjs
+          node tools/orbit360-test-two-client-cloud-audit-v33-source-v20260807.mjs
+          test ! -e .github/orbit360-requests/block1-client360-insurers-v33-two-client-cloud-audit-authorization.json
+      - name: Static privacy and zero-write boundary
+        run: |
+          set -euo pipefail
+          ! grep -Eq '\.(set|update|delete|create)\(' tools/orbit360-probe-two-client-cloud-audit-v33-v20260807.mjs
+          ! grep -Eq 'firebase deploy|playwright|hosting:' tools/orbit360-probe-two-client-cloud-audit-v33-v20260807.mjs
+          grep -Fq 'rawLogEntriesPersisted' tools/orbit360-validator-lifecycle-block1-two-client-cloud-audit-v33-v20260807.json
+          echo PASS_V33_SOURCE_PREFLIGHT_NO_SECRETS_NO_RUNTIME_NO_WRITES
