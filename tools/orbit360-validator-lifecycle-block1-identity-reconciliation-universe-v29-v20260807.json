@@ -12,25 +12,25 @@
   "tenantId": "alianzas-soluciones",
   "authorizedBaseHead": "b7f35f1a76d43e2485e0631a618a4ef6ec297336",
   "expectedRequestVersion": "20260807.29-identity-reconciliation-universe-readonly",
-  "status": "AUTHORIZED_ONCE_PENDING_EXCLUSIVE_REQUEST",
-  "classification": "IDENTITY_RECONCILIATION_UNIVERSE_READONLY_AUTHORIZED",
-  "currentPhase": "BLOCK1_IDENTITY_RECONCILIATION_UNIVERSE_READONLY_V29",
-  "stopRetryActive": false,
+  "status": "CLOSED_STOP_RETRY",
+  "classification": "DATA_CONTRACT_FAILURE",
+  "currentPhase": "CLOSED_IDENTITY_RECONCILIATION_UNIVERSE_V29",
+  "stopRetryActive": true,
   "authorizationReserved": false,
-  "authorizationFrozen": false,
-  "allowedExecutions": 1,
-  "activeRequest": true,
-  "requestConsumed": false,
+  "authorizationFrozen": true,
+  "allowedExecutions": 0,
+  "activeRequest": false,
+  "requestConsumed": true,
   "replayAllowed": false,
-  "executionAuthorized": true,
+  "executionAuthorized": false,
   "executionProfile": {
-    "mode": "RUNTIME_READONLY",
-    "phase": "BLOCK1_IDENTITY_RECONCILIATION_UNIVERSE_READONLY_V29",
+    "mode": "CLOSED_NO_RUNTIME",
+    "phase": "CLOSED_IDENTITY_RECONCILIATION_UNIVERSE_V29",
     "capabilities": {
-      "secrets": true,
-      "firestoreRead": true,
+      "secrets": false,
+      "firestoreRead": false,
       "writes": false,
-      "runtime": true,
+      "runtime": false,
       "browser": false,
       "deploy": false,
       "functionsDeploy": false,
@@ -39,7 +39,11 @@
     }
   },
   "targetFingerprintCount": 16,
-  "baselineContract": { "clientes": 414, "aseguradoras": 26, "asesores": 7 },
+  "baselineContract": {
+    "clientes": 414,
+    "aseguradoras": 26,
+    "asesores": 7
+  },
   "sourceIdentityContract": {
     "sourceRows": 440,
     "writeCandidates": 414,
@@ -91,5 +95,129 @@
   },
   "containsPII": false,
   "containsSecrets": false,
-  "nextAction": "CREATE_ONE_EXCLUSIVE_PARENT_BOUND_REQUEST_AND_EXECUTE_ONCE"
+  "nextAction": "STOP_RETRY_NO_SECOND_ATTEMPT_RESOLVE_REPORTED_ROOT_CAUSE",
+  "runtimeResult": {
+    "runId": "31229104045",
+    "attempt": 1,
+    "decision": "STOP_RETRY",
+    "classification": "DATA_CONTRACT_FAILURE",
+    "checkpoint": "CLIENT_IDENTITY_RECONCILIATION",
+    "rootCause": "CLIENT_IDENTITY_UNRESOLVED_AND_EXTERNAL_AUDIT_UNAVAILABLE_OR_INSUFFICIENT",
+    "targetIdentity": {
+      "count": 16,
+      "unresolved": 16,
+      "contradictions": 0,
+      "fullyAdjudicated": false,
+      "classificationCounts": {
+        "ORIGEN_NO_DEMOSTRABLE": 16
+      },
+      "items": [
+        {
+          "fingerprint": "df57dd2ebdd0e1f1d0d2",
+          "classification": "ORIGEN_NO_DEMOSTRABLE",
+          "basis": "NO_BASELINE_OR_DEMO_MATCH",
+          "contradiction": false
+        },
+        {
+          "fingerprint": "f437b20fa510cb0ee985",
+          "classification": "ORIGEN_NO_DEMOSTRABLE",
+          "basis": "NO_BASELINE_OR_DEMO_MATCH",
+          "contradiction": false
+        },
+        {
+          "fingerprint": "20db2bee38e4f861d2b0",
+          "classification": "ORIGEN_NO_DEMOSTRABLE",
+          "basis": "NO_BASELINE_OR_DEMO_MATCH",
+          "contradiction": false
+        },
+        {
+          "fingerprint": "b921e15f04d3cda917b1",
+          "classification": "ORIGEN_NO_DEMOSTRABLE",
+          "basis": "NO_BASELINE_OR_DEMO_MATCH",
+          "contradiction": false
+        },
+        {
+          "fingerprint": "cdb3ad7d6ba92eaae5b9",
+          "classification": "ORIGEN_NO_DEMOSTRABLE",
+          "basis": "NO_BASELINE_OR_DEMO_MATCH",
+          "contradiction": false
+        },
+        {
+          "fingerprint": "154df45b9a24c1dd72ef",
+          "classification": "ORIGEN_NO_DEMOSTRABLE",
+          "basis": "NO_BASELINE_OR_DEMO_MATCH",
+          "contradiction": false
+        },
+        {
+          "fingerprint": "8a1aebb2b6520d868de8",
+          "classification": "ORIGEN_NO_DEMOSTRABLE",
+          "basis": "NO_BASELINE_OR_DEMO_MATCH",
+          "contradiction": false
+        },
+        {
+          "fingerprint": "16ef4d44878b3f5938ec",
+          "classification": "ORIGEN_NO_DEMOSTRABLE",
+          "basis": "NO_BASELINE_OR_DEMO_MATCH",
+          "contradiction": false
+        },
+        {
+          "fingerprint": "ce9492a1492e69100242",
+          "classification": "ORIGEN_NO_DEMOSTRABLE",
+          "basis": "NO_BASELINE_OR_DEMO_MATCH",
+          "contradiction": false
+        },
+        {
+          "fingerprint": "803ee931b563a64fda36",
+          "classification": "ORIGEN_NO_DEMOSTRABLE",
+          "basis": "NO_BASELINE_OR_DEMO_MATCH",
+          "contradiction": false
+        },
+        {
+          "fingerprint": "72666413c94701ee7fc2",
+          "classification": "ORIGEN_NO_DEMOSTRABLE",
+          "basis": "NO_BASELINE_OR_DEMO_MATCH",
+          "contradiction": false
+        },
+        {
+          "fingerprint": "4ca6a88d28ac98715abc",
+          "classification": "ORIGEN_NO_DEMOSTRABLE",
+          "basis": "NO_BASELINE_OR_DEMO_MATCH",
+          "contradiction": false
+        },
+        {
+          "fingerprint": "021cac2a1b856a0c5d1c",
+          "classification": "ORIGEN_NO_DEMOSTRABLE",
+          "basis": "NO_BASELINE_OR_DEMO_MATCH",
+          "contradiction": false
+        },
+        {
+          "fingerprint": "43a8841d19f7fec03ad6",
+          "classification": "ORIGEN_NO_DEMOSTRABLE",
+          "basis": "NO_BASELINE_OR_DEMO_MATCH",
+          "contradiction": false
+        },
+        {
+          "fingerprint": "a96956c63fdf22d44cfe",
+          "classification": "ORIGEN_NO_DEMOSTRABLE",
+          "basis": "NO_BASELINE_OR_DEMO_MATCH",
+          "contradiction": false
+        },
+        {
+          "fingerprint": "f3d653f7c968d5f399cd",
+          "classification": "ORIGEN_NO_DEMOSTRABLE",
+          "basis": "NO_BASELINE_OR_DEMO_MATCH",
+          "contradiction": false
+        }
+      ]
+    },
+    "externalAudit": {
+      "status": "NOT_REGISTERED_IN_CANONICAL_SOURCE_CONTRACT",
+      "queried": false,
+      "readOperations": 0
+    },
+    "universe": null,
+    "firestoreReadOperations": 1,
+    "writes": 0,
+    "visualAuthorizationEligible": false
+  }
 }
