@@ -24,13 +24,20 @@ No se encontró en la evidencia versionada de repo/PR/Actions un run o mecanismo
 
 El defecto ya no es de visualización, importador o validador: el sistema histórico permitió documentos de cliente sin trazabilidad durable suficiente para reconstruir su actor/mecanismo de origen desde el propio dato o el ledger versionado.
 
-## Frontera material nueva
-Se prepara v33 source-only para consultar exclusivamente Google Cloud Audit Logs/Logging API de Firestore para los 2 documentos, con IDs resueltos solo en memoria y ventana 2026-07-24..2026-08-08. Máximo: 1 lectura locator Firestore + 2 consultas Logging. Salida permitida: fingerprint, existencia de evento de escritura, categoría de actor, categoría de mecanismo y timestamps; prohibido persistir document ID, resourceName, principalEmail, IP o log crudo.
+## Contrato externo verificado
+La documentación vigente de Google Cloud clasifica `BatchWrite`, `Commit`, `CreateDocument`, `DeleteDocument`, `UpdateDocument` y `Write` de Firestore como Data Access; se cubren tanto `google.firestore.v1.Firestore.*` como `google.firestore.v1beta1.Firestore.*`. Firestore audit logs usan `protoPayload.serviceName="firestore.googleapis.com"`; la configuración de Data Access se gestiona bajo `datastore.googleapis.com`.
 
-`AUDIT_NO_MATCHING_WRITE_ENTRY` no equivale a demostrar que no hubo escritura. Si Logging Data Access no está disponible, está deshabilitado o el service account carece de permiso, cerrar como pérdida estructural de trazabilidad y pasar a decisión humana controlada; no crear otra auditoría general.
+La consulta futura usa `log_id("cloudaudit.googleapis.com/data_access")`, serviceName Firestore, ventana 2026-07-24T00:00:00Z..2026-08-08T05:00:00Z, allowlist de 12 métodos y `SEARCH` del path completo exacto de cada uno de los dos documentos. No se asume que `protoPayload.resourceName` de `Commit` sea el documento.
+
+Se usa una sola consulta combinada para los dos targets. `entries.list` puede devolver `nextPageToken`, incluso con `entries` vacío: se admiten máximo dos páginas. Si después de la segunda página aún existe token, `STOP_RETRY` por consulta incompleta; nunca se interpreta el subconjunto como exhaustivo.
+
+`AUDIT_NO_MATCHING_WRITE_ENTRY` no equivale a demostrar que no hubo escritura. Los logs de acceso a datos pueden estar deshabilitados/no retenidos, y su lectura requiere acceso a logs privados. Un evento encontrado tampoco demuestra por sí solo legitimidad: actor/mecanismo/tiempo deben correlacionarse con una operación conocida y autorizada.
+
+## Privacidad y alcance futuro
+IDs de documento resueltos solo en memoria. Máximo futuro: 1 lectura locator Firestore + 1 query Logging con hasta 2 páginas. Salida permitida: fingerprint, existencia de evento write, clase de actor, clase de mecanismo y timestamps. Prohibido persistir document ID, resourceName, principalEmail, IP o log crudo.
 
 ## Estado
-- Source probe preparado; no ejecutado contra LAB/Logging.
+- Source package preparado y router canónico v33 registrado en la rama source; no ejecutado contra LAB/Logging.
 - Sin secrets, Firestore runtime, Logging runtime, writes, reimportación, Hosting, browser, producción, main o merge.
 - Universe 414/26/7 sigue bloqueado hasta adjudicar los 2.
 - Visual sigue no elegible.
