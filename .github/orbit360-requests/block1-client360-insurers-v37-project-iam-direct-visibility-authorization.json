@@ -4,11 +4,11 @@
   "gateId": "block1-client360-insurers-lab-v20260717",
   "contractVersion": "1.0.41",
   "requestVersion": "20260810.37-project-iam-direct-visibility-readonly",
-  "status": "AUTHORIZED_ONCE",
+  "status": "CONSUMED_PASS",
   "approved": true,
-  "allowedExecutions": 1,
-  "consumed": false,
-  "authorizationFrozen": false,
+  "allowedExecutions": 0,
+  "consumed": true,
+  "authorizationFrozen": true,
   "replayAllowed": false,
   "parentHead": "ca2bf15df232eb4fef1769555871f0c2e3091080",
   "authorizedBaseHead": "ca2bf15df232eb4fef1769555871f0c2e3091080",
@@ -45,5 +45,10 @@
   "mergeAuthorized": false,
   "authorizedByUser": true,
   "containsPII": false,
-  "containsSecrets": false
+  "containsSecrets": false,
+  "consumedByRunId": "31442798546",
+  "consumedByAttempt": 1,
+  "runtimeDecision": "DIRECT_IAM_EXECUTOR_CANDIDATE_IDENTIFIED",
+  "runtimeArtifactId": "9083448667",
+  "runtimeArtifactDigest": "sha256:1fda9a644c8c2029494a4d3af10458a5bcc7e12938acd94e2da63f2ff85300db"
 }
