@@ -68,7 +68,20 @@ jobs:
           grep -Fq '.firestoreReads==0' "$R"
           grep -Fq '.authReads==0' "$R"
           test "$(grep -o 'await setPolicy(tok' tools/orbit360-execute-logging-view-grant-audit-revoke-v35-v20260810.mjs | wc -l)" -eq 2
-          ! grep -Fq 'firebase-admin' tools/orbit360-execute-logging-view-grant-audit-revoke-v35-v20260810.mjs
+          node <<'NODE'
+          const fs=require('fs');
+          const src=fs.readFileSync('tools/orbit360-execute-logging-view-grant-audit-revoke-v35-v20260810.mjs','utf8');
+          const forbidden=[
+            "from 'firebase-admin'",
+            'from "firebase-admin"',
+            "import('firebase-admin')",
+            'import("firebase-admin")',
+            "require('firebase-admin')",
+            'require("firebase-admin")'
+          ];
+          const found=forbidden.filter(x=>src.includes(x));
+          if(found.length) throw new Error('V35_RUNTIME_FIREBASE_ADMIN_DEPENDENCY_FOUND');
+          NODE
       - name: Seal preparation evidence
         shell: bash
         run: |
