@@ -84,7 +84,7 @@ jobs:
           if(!/projects\/\$\{PROJECT\}:testIamPermissions/.test(src))throw new Error('V37_TEST_PERMISSION_CALL_MISSING');
           if(!/projects\/\$\{PROJECT\}:getIamPolicy/.test(src))throw new Error('V37_GET_POLICY_CALL_MISSING');
           if(!/requestedPolicyVersion:3/.test(src))throw new Error('V37_POLICY_VERSION_3_MISSING');
-          const runtime=fs.readFileSync(R,'utf8');
+          const runtime=fs.readFileSync('.github/workflows/orbit360-v37-project-iam-direct-visibility-runtime-v20260810.yml','utf8');
           if(/add-iam-policy-binding|set-iam-policy|firebase deploy|gcloud .* deploy/i.test(runtime))throw new Error('V37_RUNTIME_WRITE_OR_DEPLOY_TOKEN_FOUND');
           NODE
       - name: Seal sanitized source evidence
