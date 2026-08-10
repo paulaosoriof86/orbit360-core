@@ -1,89 +1,23 @@
-name: Orbit 360 · Vehicles private sources readcheck
+name: Orbit 360 · Vehicles private sources readcheck · historical
 on:
-  push:
-    branches: [ays/backend-tenant-lab-v99-20260703]
-    paths:
-      - '.github/workflows/orbit360-vehicles-private-source-readcheck-v20260730.yml'
-      - 'tools/orbit360-vehicles-source-freeze-v20260730.json'
-      - 'tools/orbit360-vehicles-canonicalize-v20260730.mjs'
-      - 'tools/orbit360-validator-lifecycle-contract-vehicles-static-v20260730.json'
-      - 'tools/orbit360-validar-gate-contracts-engine-vehicles-static-v20260730.mjs'
-      - 'tools/orbit360-validar-gate-contracts-v20260717.mjs'
-      - 'orbit360-platform/docs/DRYRUN-VEHICULOS-AYS-20260730.md'
+  workflow_dispatch:
 permissions:
   contents: read
-  statuses: write
-concurrency:
-  group: orbit360-vehicles-private-source-readcheck-v20260730
-  cancel-in-progress: false
-env:
-  ORBIT360_GATE_ID: block8-vehicles-static-v20260730
-  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
-  HIST_ID: 1lHKV1BBQy3KeMAc-khTW_wL2sD1hyQVW
-  HIST_SHA: 68904f19705cfa742bba11219725ce1f10de7912d82b88dc085f4119cc3204af
-  DELTA_ID: 1wlCUk68rWVnKEgQSmaxmxsIw7WNo5WLI
-  DELTA_SHA: dbd31e3436946ef65bb737068394e6ee5eed44dc4a2dd96fcf975d5b3995f1d2
-  POL_ID: 1NXHACZ11815882AhoyGrQQCb9Amgbi95
-  POL_SHA: b63c5d10be40fcd4039be1b7844cafb0bf45c2a9904dd47ad65443b5fb43a89f
 jobs:
-  readcheck:
-    name: Vehicles · exact private sources read-only check
+  historical_guard:
+    name: Vehicles · historical source-read closure guard
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
-          fetch-depth: 2
           persist-credentials: false
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-      - name: Gate canónico antes de secrets/Drive
+      - name: Confirmar cierre histórico sin secrets ni fuentes privadas
         shell: bash
         run: |
           set -euo pipefail
-          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
-          jq -e '.status=="GO_GATE_CONTRACT" and .failed==0 and .operationalWrites==0 and .productionTouched==false and .vehiclePolicyRelationsCreate==1032 and .excluded==4' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
-      - name: Preparar parser XLSX aislado
-        shell: bash
-        run: |
-          set -euo pipefail
-          npm init -y >/dev/null 2>&1
-          npm install --no-save xlsx@0.18.5 >/dev/null 2>&1
-      - name: Leer tres fuentes privadas exactas y verificar hashes
-        env:
-          SA_ORBIT360_LAB: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}'
-          SA_ORBIT_360_LAB: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}'
-          SA_DEFAULT: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
-        shell: bash
-        run: |
-          set -euo pipefail
-          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-${SA_ORBIT_360_LAB:-${SA_DEFAULT:-}}}"; test -n "$SERVICE_ACCOUNT"; export SERVICE_ACCOUNT
-          node <<'NODE'
-          const fs=require('fs'),crypto=require('crypto'),XLSX=require('xlsx');
-          const outPath=process.env.EVIDENCE_DIR+'/vehicles-private-source-readcheck.json';
-          const sha=b=>crypto.createHash('sha256').update(b).digest('hex');
-          const b64=o=>Buffer.from(JSON.stringify(o)).toString('base64url');
-          async function token(sa){const now=Math.floor(Date.now()/1000);const unsigned=b64({alg:'RS256',typ:'JWT'})+'.'+b64({iss:sa.client_email,scope:'https://www.googleapis.com/auth/drive.readonly',aud:'https://oauth2.googleapis.com/token',iat:now,exp:now+900});const sig=crypto.sign('RSA-SHA256',Buffer.from(unsigned),sa.private_key).toString('base64url');const body=new URLSearchParams({grant_type:'urn:ietf:params:oauth:grant-type:jwt-bearer',assertion:unsigned+'.'+sig});const r=await fetch('https://oauth2.googleapis.com/token',{method:'POST',headers:{'content-type':'application/x-www-form-urlencoded'},body});const j=await r.json();if(!r.ok||!j.access_token)throw new Error('ENVIRONMENT_FAILURE:OAUTH_'+r.status);return j.access_token;}
-          async function get(t,id,expected,label){const r=await fetch(`https://www.googleapis.com/drive/v3/files/${encodeURIComponent(id)}?alt=media&supportsAllDrives=true`,{headers:{authorization:`Bearer ${t}`}});if(!r.ok)throw new Error(`ENVIRONMENT_FAILURE:DRIVE_${label}_${r.status}`);const b=Buffer.from(await r.arrayBuffer());const got=sha(b);if(got!==expected)throw new Error(`DATA_CONTRACT_FAILURE:${label}_HASH`);return b;}
-          (async()=>{const sa=JSON.parse(process.env.SERVICE_ACCOUNT);if(sa.project_id!=='ays-orbit-360-lab')throw new Error('ENVIRONMENT_FAILURE:PROJECT_ID_MISMATCH');const t=await token(sa);const hist=await get(t,process.env.HIST_ID,process.env.HIST_SHA,'HIST');const delta=await get(t,process.env.DELTA_ID,process.env.DELTA_SHA,'DELTA');const pol=await get(t,process.env.POL_ID,process.env.POL_SHA,'POLICIES');const wh=XLSX.read(hist,{type:'buffer'}),wd=XLSX.read(delta,{type:'buffer'}),wp=XLSX.read(pol,{type:'buffer'});const ah=XLSX.utils.sheet_to_json(wh.Sheets[wh.SheetNames[0]],{header:1,defval:null});const ad=XLSX.utils.sheet_to_json(wd.Sheets[wd.SheetNames[0]],{header:1,defval:null});const ap=XLSX.utils.sheet_to_json(wp.Sheets['PoliciesToCreate'],{header:1,defval:null});if(ah.length!==1042||ad.length!==29||ap.length!==1374)throw new Error('DATA_CONTRACT_FAILURE:ROW_COUNTS');if(String(ah[0]?.[5]||'')!=='Póliza'||String(ad[9]?.[5]||'')!=='Póliza'||String(ap[0]?.[1]||'')!=='numero')throw new Error('DATA_CONTRACT_FAILURE:HEADERS');const out={schemaVersion:'orbit360-vehicles-private-source-readcheck-v1',status:'SOURCE_READ_PASS',ok:true,hashesVerified:true,rows:{historical:1041,delta:19,rawTotal:1060,canonicalPolicies:1373},headersVerified:true,privateDriveRead:true,serviceAccountProjectVerified:true,firestoreRead:false,firestoreWrites:0,operationalWrites:0,productionTouched:false,containsPII:false,containsSecrets:false};fs.mkdirSync(process.env.EVIDENCE_DIR,{recursive:true});fs.writeFileSync(outPath,JSON.stringify(out,null,2)+'\n');})().catch(e=>{fs.mkdirSync(process.env.EVIDENCE_DIR,{recursive:true});fs.writeFileSync(outPath,JSON.stringify({schemaVersion:'orbit360-vehicles-private-source-readcheck-v1',status:'BLOCKED',ok:false,classification:String(e.message||e).split(':')[0],error:String(e.message||e).slice(0,250),firestoreRead:false,firestoreWrites:0,operationalWrites:0,productionTouched:false,containsPII:false,containsSecrets:false},null,2)+'\n');console.error(String(e.message||e));process.exit(41);});
-          NODE
-          jq -e '.status=="SOURCE_READ_PASS" and .ok==true and .rows.historical==1041 and .rows.delta==19 and .rows.rawTotal==1060 and .rows.canonicalPolicies==1373 and .firestoreWrites==0 and .operationalWrites==0' "$EVIDENCE_DIR/vehicles-private-source-readcheck.json" >/dev/null
-      - name: Subir evidencia sanitizada
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: orbit360-vehicles-private-source-readcheck-${{ github.run_id }}
-          path: orbit360-platform/runtime-gate-crm-v20260716/vehicles-private-source-readcheck.json
-          if-no-files-found: warn
-          retention-days: 7
-      - name: Publicar estado observable
-        if: always()
-        uses: actions/github-script@v7
-        env:
-          EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/vehicles-private-source-readcheck.json
-        with:
-          script: |
-            const fs=require('fs');let state='failure',description='Vehicles private source readcheck blocked';
-            try{const p=JSON.parse(fs.readFileSync(process.env.EVIDENCE,'utf8'));if(p.status==='SOURCE_READ_PASS'&&p.ok===true&&p.operationalWrites===0){state='success';description='Vehicles sources exact hashes/rows verified read-only';}else if(p.classification){description=`Vehicles readcheck blocked: ${p.classification}`;}}catch(e){}
-            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/vehicles-private-source-readcheck',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
+          test -f orbit360-platform/docs/CIERRE-WRITE-VEHICULOS-AYS-20260730.md
+          grep -Fq 'Estado: `WRITE_PASS`' orbit360-platform/docs/CIERRE-WRITE-VEHICULOS-AYS-20260730.md
+          grep -Fq 'vehiculos: 1032' orbit360-platform/docs/CIERRE-WRITE-VEHICULOS-AYS-20260730.md
+          grep -Fq 'La autorización fue consumida una sola vez' orbit360-platform/docs/CIERRE-WRITE-VEHICULOS-AYS-20260730.md
+          echo 'HISTORICAL_SOURCE_READCHECK_RETIRED_AFTER_WRITE_PASS'
