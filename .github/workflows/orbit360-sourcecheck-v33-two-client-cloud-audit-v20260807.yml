@@ -17,13 +17,11 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
           persist-credentials: false
-      - name: First canonical v33 source-gate attempt
-        run: test "$GITHUB_RUN_ATTEMPT" = 1
-      - name: Canonical gate first
+      - name: Canonical v33 source gate
         run: |
           set -euo pipefail
           node tools/orbit360-validar-gate-contracts-v20260717.mjs block1-client360-insurers-lab-v20260717
-          jq -e '.status=="PASS_GATE_CONTRACT_SOURCE_V33" and .authorizationGeneration=="v33-two-client-cloud-audit-readonly" and .ok==true and .secretAccessAuthorized==false and .firestoreReadAuthorized==false and .loggingReadAuthorized==false and .writesAuthorized==0' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json >/dev/null
+          jq -e '.status=="PASS_GATE_CONTRACT_SOURCE_V33" and .authorizationGeneration=="v33-two-client-cloud-audit-readonly" and .ok==true and .secretAccessAuthorized==false and .firestoreReadAuthorized==false and .loggingReadAuthorized==false and .writesAuthorized==0 and (.requestState=="ABSENT_PENDING_FRESH_AUTHORIZATION" or .requestState=="FROZEN_HISTORICAL_CONSUMED")' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json >/dev/null
       - name: Frozen product and protected backend
         run: |
           set -euo pipefail
@@ -31,7 +29,7 @@ jobs:
           for p in orbit360-platform/modules/cliente360.js orbit360-platform/modules/aseguradoras.js orbit360-platform/modules/polizas.js orbit360-platform/modules/cobros.js orbit360-platform/sw.js orbit360-platform/core/pwa.js orbit360-platform/data/store.js orbit360-platform/core/auth.js orbit360-platform/core/importa.js orbit360-platform/firestore.rules; do
             git diff --quiet "$BASE"...HEAD -- "$p" || { echo "STOP_V33_FROZEN_CHANGED:$p"; exit 41; }
           done
-      - name: Source-safe external audit fixtures
+      - name: Source-safe external audit fixtures and request state
         run: |
           set -euo pipefail
           node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
@@ -39,7 +37,13 @@ jobs:
           node --check tools/orbit360-test-two-client-cloud-audit-v33-source-v20260807.mjs
           node --check tools/orbit360-validar-gate-contracts-engine-block1-two-client-cloud-audit-v33-v20260807.mjs
           node tools/orbit360-test-two-client-cloud-audit-v33-source-v20260807.mjs
-          test ! -e "$ORBIT360_REQUEST_FILE"
+          node <<'NODE'
+          const fs=require('fs');const p=process.env.ORBIT360_REQUEST_FILE;
+          if(!fs.existsSync(p))process.exit(0);
+          const r=JSON.parse(fs.readFileSync(p,'utf8'));
+          const ok=['CONSUMED','CONSUMED_STOP_RETRY'].includes(String(r.status||''))&&r.allowedExecutions===0&&r.consumed===true&&r.authorizationFrozen===true&&r.replayAllowed===false;
+          if(!ok){console.error('STOP_V33_REQUEST_NOT_FROZEN_HISTORICAL');process.exit(41);}
+          NODE
       - name: Semantic privacy and zero-write boundary
         run: |
           set -euo pipefail
