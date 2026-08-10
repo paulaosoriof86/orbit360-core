@@ -59,7 +59,15 @@ jobs:
           grep -Fq 'networkOperationsMaximum==1' .github/workflows/orbit360-v34-logging-iam-capability-runtime-v20260810.yml
           grep -Fq 'auditLogReadsAuthorized==0' .github/workflows/orbit360-v34-logging-iam-capability-runtime-v20260810.yml
           grep -Fq 'iamWritesAuthorized==0' .github/workflows/orbit360-v34-logging-iam-capability-runtime-v20260810.yml
-          ! grep -Eq 'setIamPolicy|add-iam-policy-binding|firebase deploy|playwright' .github/workflows/orbit360-v34-logging-iam-capability-runtime-v20260810.yml
+          node <<'NODE'
+          const fs=require('fs');
+          const p='.github/workflows/orbit360-v34-logging-iam-capability-runtime-v20260810.yml';
+          const lines=fs.readFileSync(p,'utf8').split(/\r?\n/).filter(line=>!line.includes('grep -Eq'));
+          const effective=lines.join('\n');
+          const forbidden=['setIamPolicy','add-iam-policy-binding','firebase deploy','playwright'];
+          const found=forbidden.filter(token=>effective.includes(token));
+          if(found.length) throw new Error(`V34_RUNTIME_FORBIDDEN_EFFECTIVE_COMMAND:${found.join(',')}`);
+          NODE
       - name: Source-only probe remains offline
         shell: bash
         run: |
