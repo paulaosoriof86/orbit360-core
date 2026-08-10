@@ -1,0 +1,104 @@
+name: Orbit360 v36 IAM executor diagnostic source-only
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/workflows/orbit360-v36-iam-executor-diagnostic-source-v20260810.yml'
+      - '.github/workflows/orbit360-v36-iam-executor-diagnostic-runtime-v20260810.yml'
+      - 'tools/orbit360-validator-lifecycle-block1-iam-executor-diagnostic-runtime-v36-v20260810.json'
+      - 'tools/orbit360-gate-contract-registry-extension-block1-v36-iam-executor-diagnostic-v20260810.json'
+      - 'tools/orbit360-validar-gate-contracts-engine-block1-iam-executor-diagnostic-runtime-v36-v20260810.mjs'
+      - 'tools/orbit360-diagnose-iam-executor-v36-v20260810.mjs'
+      - 'tools/fixtures/orbit360-v36-iam-executor-diagnostic-request-fixture-v20260810.json'
+permissions:
+  contents: read
+  statuses: write
+concurrency:
+  group: orbit360-v36-iam-executor-diagnostic-source-v20260810
+  cancel-in-progress: false
+env:
+  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+  SOURCE_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/v36-iam-executor-diagnostic-source-sanitized-v20260810.json
+jobs:
+  source:
+    name: v36 · IAM executor diagnostic · source-only
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Canonical Block1 source gate remains frozen
+        shell: bash
+        run: |
+          set -euo pipefail
+          ORBIT360_GATE_PROFILE=v33-two-client-cloud-audit ORBIT360_EXPECTED_REQUEST_VERSION=NONE_PENDING_FRESH_AUTHORIZATION node tools/orbit360-validar-gate-contracts-v20260717.mjs block1-client360-insurers-lab-v20260717
+          jq -e '.status=="PASS_GATE_CONTRACT_SOURCE_V33" and .failed==0 and .executionAuthorized==false and .secretAccessAuthorized==false and .writesAuthorized==0 and .secretAccess==false and .runtimeExecuted==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+      - name: Require closed v35 executor-capability stop
+        shell: bash
+        run: |
+          set -euo pipefail
+          jq -e '.runtimeCompleted==true and .runtimeRootCause=="IAM_EXECUTOR_CANNOT_MODIFY_TARGET_LOG_VIEW" and .iamWritesObserved==0 and .requestConsumed==true and .requestAuthorizationFrozen==true and .replayAllowed==false and .sourceExecutorReviewCompleted==true and .sourceExecutorReviewDecision=="NO_SEPARATE_AUTHORIZED_IAM_EXECUTOR_EVIDENCED_IN_VERSIONED_SOURCE"' tools/orbit360-gate-contract-registry-extension-block1-v35-logging-view-grant-v20260810.json >/dev/null
+      - name: Validate v36 lifecycle registry engine and fixture
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-validar-gate-contracts-engine-block1-iam-executor-diagnostic-runtime-v36-v20260810.mjs
+          node --check tools/orbit360-diagnose-iam-executor-v36-v20260810.mjs
+          node -e "JSON.parse(require('fs').readFileSync('tools/orbit360-validator-lifecycle-block1-iam-executor-diagnostic-runtime-v36-v20260810.json','utf8'));JSON.parse(require('fs').readFileSync('tools/orbit360-gate-contract-registry-extension-block1-v36-iam-executor-diagnostic-v20260810.json','utf8'));JSON.parse(require('fs').readFileSync('tools/fixtures/orbit360-v36-iam-executor-diagnostic-request-fixture-v20260810.json','utf8'))"
+          ORBIT360_REQUEST_FILE=tools/fixtures/orbit360-v36-iam-executor-diagnostic-request-fixture-v20260810.json \
+          ORBIT360_EXPECTED_REQUEST_VERSION=FIXTURE_V36_IAM_EXECUTOR_DIAGNOSTIC_READONLY \
+          ORBIT360_EXPECTED_PARENT_HEAD=fixture-parent-head-v36 \
+            node tools/orbit360-validar-gate-contracts-engine-block1-iam-executor-diagnostic-runtime-v36-v20260810.mjs
+          jq -e '.status=="GO_GATE_CONTRACT_RUNTIME_V36" and .failed==0 and .iamReadAuthorized==true and .iamWriteAuthorized==false and .iamWritesAuthorized==0 and .firestoreReadAuthorized==false and .authReadAuthorized==false and .loggingEntryReadAuthorized==false and .operationalWritesAuthorized==0 and .secretAccess==false and .runtimeExecuted==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+      - name: Execute worker offline fixture
+        shell: bash
+        run: |
+          set -euo pipefail
+          ORBIT360_SOURCE_ONLY=1 ORBIT360_V36_EVIDENCE="$EVIDENCE_DIR/v36-worker-source.json" node tools/orbit360-diagnose-iam-executor-v36-v20260810.mjs
+          jq -e '.decision=="SOURCE_ONLY_RUNTIME_READY" and .fixtureCandidateParsing==true and .networkAccess==false and .secretAccess==false and .iamPolicyWrites==0 and .iamWrites==0 and .firestoreReads==0 and .authReads==0 and .loggingEntryReads==0 and .operationalWrites==0 and .ok==true' "$EVIDENCE_DIR/v36-worker-source.json" >/dev/null
+      - name: Validate read-only runtime boundaries semantically
+        shell: bash
+        run: |
+          set -euo pipefail
+          R=.github/workflows/orbit360-v36-iam-executor-diagnostic-runtime-v20260810.yml
+          grep -Fq 'Canonical Block1 source gate before secrets' "$R"
+          grep -Fq 'v36 GO gate before secret materialization' "$R"
+          grep -Fq '.iamWritesAuthorized==0' "$R"
+          grep -Fq '.loggingEntryReads==0' "$R"
+          node <<'NODE'
+          const fs=require('fs');
+          const src=fs.readFileSync('tools/orbit360-diagnose-iam-executor-v36-v20260810.mjs','utf8');
+          const forbidden=[/gcloud\s+projects\s+add-iam-policy-binding/i,/firebase-admin/i,/\bcreateServiceAccount\b/i,/\bcreateKey\b/i,/method\s*:\s*['\"](?:PUT|PATCH|DELETE)['\"]/i];
+          const hits=forbidden.filter(r=>r.test(src));
+          if(hits.length)throw new Error('V36_READ_ONLY_BOUNDARY_FAILED');
+          const runtime=fs.readFileSync('.github/workflows/orbit360-v36-iam-executor-diagnostic-runtime-v20260810.yml','utf8');
+          if(/add-iam-policy-binding|set-iam-policy|firebase deploy|gcloud .* deploy/i.test(runtime))throw new Error('V36_RUNTIME_WRITE_OR_DEPLOY_TOKEN_FOUND');
+          NODE
+      - name: Seal sanitized source evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          jq -n --arg sha "$GITHUB_SHA" '{schemaVersion:"orbit360-v36-iam-executor-diagnostic-source-v1",status:"PASS_V36_SOURCE",ok:true,head:$sha,runtimeRequestPresent:false,runtimeAuthorized:false,secretsRead:false,networkAccess:false,iamReads:0,iamWrites:0,firestoreReads:0,authReads:0,loggingEntryReads:0,operationalWrites:0,runtimeExecuted:false,browserExecuted:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false}' > "$SOURCE_EVIDENCE"
+      - name: Publish source status
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          EVIDENCE_FILE: orbit360-platform/runtime-gate-crm-v20260716/v36-iam-executor-diagnostic-source-sanitized-v20260810.json
+        with:
+          script: |
+            const fs=require('fs');let state='failure',description='v36 IAM executor diagnostic source blocked';
+            try{const p=JSON.parse(fs.readFileSync(process.env.EVIDENCE_FILE,'utf8'));if(p.ok===true&&p.status==='PASS_V36_SOURCE'&&p.iamWrites===0&&p.networkAccess===false){state='success';description='v36 IAM executor diagnostic SOURCE PASS; zero capabilities';}}catch(e){}
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/v36-iam-executor-diagnostic-source',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
+      - name: Upload sanitized source evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-v36-iam-executor-diagnostic-source-${{ github.run_id }}
+          path: orbit360-platform/runtime-gate-crm-v20260716/v36-iam-executor-diagnostic-source-sanitized-v20260810.json
+          if-no-files-found: warn
+          retention-days: 30
