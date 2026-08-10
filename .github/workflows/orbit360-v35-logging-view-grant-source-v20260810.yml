@@ -41,7 +41,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          jq -e '.runtimeDiagnosticCompleted==true and .runtimeDecision=="IAM_LOGGING_CAPABILITY_GAP" and .runtimeRootCause=="REQUIRED_LOGGING_PERMISSION_NOT_EFFECTIVE" and .loggingLogEntriesListEffective==false and .loggingPrivateLogEntriesListEffective==false and .runtimeAuthorized==false and .iamGrantAuthorized==false' tools/orbit360-gate-contract-registry-extension-block1-v34-logging-iam-v20260810.json >/dev/null
+          jq -e '.runtimeDiagnosticCompleted==true and .runtimeDecision=="IAM_LOGGING_CAPABILITY_GAP" and .runtimeRootCause=="REQUIRED_LOGGING_PERMISSION_NOT_EFFECTIVE" and .loggingLogEntriesListEffective==false and .loggingPrivateLogEntriesListEffective==false and .runtimeDiagnosticAuthorized==false and .iamGrantAuthorized==false' tools/orbit360-gate-contract-registry-extension-block1-v34-logging-iam-v20260810.json >/dev/null
       - name: Validate v35 lifecycle and registry
         shell: bash
         run: |
