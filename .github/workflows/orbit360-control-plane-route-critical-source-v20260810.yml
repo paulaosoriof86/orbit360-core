@@ -56,7 +56,7 @@ jobs:
           ORBIT360_GATE_PROFILE=v33-two-client-cloud-audit ORBIT360_EXPECTED_REQUEST_VERSION=NONE_PENDING_FRESH_AUTHORIZATION \
             node tools/orbit360-validar-gate-contracts-v20260717.mjs block1-client360-insurers-lab-v20260717
           cp "$EVIDENCE_DIR/preflight-sanitizado.json" /tmp/block1-v33.json
-          jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="1.0.41" and .failed==0 and .secretAccess==false and .firestoreRead==false and .operationalWrites==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' /tmp/block1-v33.json >/dev/null
+          jq -e '.status=="PASS_GATE_CONTRACT_SOURCE_V33" and .classification=="DATA_CONTRACT_EXTERNAL_AUDIT_SOURCE_VALID" and .contractVersion=="1.0.41" and .failed==0 and .secretAccess==false and .firestoreRead==false and .operationalWrites==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' /tmp/block1-v33.json >/dev/null
       - name: Policies 7.0.1 · closed reusable
         shell: bash
         run: |
