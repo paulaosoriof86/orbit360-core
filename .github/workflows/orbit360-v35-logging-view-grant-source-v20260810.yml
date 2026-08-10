@@ -1,0 +1,98 @@
+name: Orbit360 v35 logging view temporary grant source-only
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/workflows/orbit360-v35-logging-view-grant-source-v20260810.yml'
+      - 'tools/orbit360-validator-lifecycle-block1-logging-view-temporary-grant-v35-v20260810.json'
+      - 'tools/orbit360-gate-contract-registry-extension-block1-v35-logging-view-grant-v20260810.json'
+      - 'tools/orbit360-plan-logging-view-temporary-grant-v35-v20260810.mjs'
+permissions:
+  contents: read
+  statuses: write
+concurrency:
+  group: orbit360-v35-logging-view-grant-source-v20260810
+  cancel-in-progress: false
+env:
+  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+  V35_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/v35-logging-view-grant-source-sanitized-v20260810.json
+jobs:
+  source:
+    name: v35 · least privilege Log View grant · source-only
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Canonical Block1 gate before remediation preparation
+        shell: bash
+        run: |
+          set -euo pipefail
+          ORBIT360_GATE_PROFILE=v33-two-client-cloud-audit \
+          ORBIT360_EXPECTED_REQUEST_VERSION=NONE_PENDING_FRESH_AUTHORIZATION \
+            node tools/orbit360-validar-gate-contracts-v20260717.mjs block1-client360-insurers-lab-v20260717
+          jq -e '.status=="PASS_GATE_CONTRACT_SOURCE_V33" and .failed==0 and .requestState=="FROZEN_HISTORICAL_CONSUMED" and .executionAuthorized==false and .secretAccessAuthorized==false and .writesAuthorized==0 and .secretAccess==false and .runtimeExecuted==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+      - name: Require closed v34 permission-gap evidence contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          jq -e '.runtimeDiagnosticCompleted==true and .runtimeDecision=="IAM_LOGGING_CAPABILITY_GAP" and .runtimeRootCause=="REQUIRED_LOGGING_PERMISSION_NOT_EFFECTIVE" and .loggingLogEntriesListEffective==false and .loggingPrivateLogEntriesListEffective==false and .runtimeAuthorized==false and .iamGrantAuthorized==false' tools/orbit360-gate-contract-registry-extension-block1-v34-logging-iam-v20260810.json >/dev/null
+      - name: Validate v35 lifecycle and registry
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-plan-logging-view-temporary-grant-v35-v20260810.mjs
+          node <<'NODE'
+          const fs=require('fs');
+          const lifecycle=JSON.parse(fs.readFileSync('tools/orbit360-validator-lifecycle-block1-logging-view-temporary-grant-v35-v20260810.json','utf8'));
+          const registry=JSON.parse(fs.readFileSync('tools/orbit360-gate-contract-registry-extension-block1-v35-logging-view-grant-v20260810.json','utf8'));
+          const target='projects/ays-orbit-360-lab/locations/global/buckets/_Default/views/_AllLogs';
+          if(lifecycle.gateId!=='block1-client360-insurers-lab-v20260717'||lifecycle.gateContractVersion!=='1.0.41')throw new Error('V35_GATE_CONTRACT_MISMATCH');
+          if(lifecycle.currentPhase!=='SOURCE_ONLY_LOGGING_VIEW_TEMPORARY_GRANT_V35'||lifecycle.executionAuthorized!==false)throw new Error('V35_SOURCE_PHASE_INVALID');
+          if(lifecycle.remediationContract?.targetResource!==target||registry.targetResource!==target)throw new Error('V35_TARGET_SCOPE_INVALID');
+          if(lifecycle.remediationContract?.role!=='roles/logging.privateLogViewer'||registry.role!=='roles/logging.privateLogViewer')throw new Error('V35_ROLE_INVALID');
+          if(lifecycle.remediationContract?.scopeLevel!=='LOG_VIEW'||registry.scopeLevel!=='LOG_VIEW'||registry.projectLevelGrant!==false)throw new Error('V35_NOT_LEAST_SCOPE');
+          if(lifecycle.remediationContract?.futureIamWritesMaximum!==2||registry.futureRuntimeContract?.iamWritesMaximum!==2)throw new Error('V35_WRITE_BUDGET_INVALID');
+          if(lifecycle.remediationContract?.futureRevokeMandatoryOnPassOrStop!==true||registry.futureRuntimeContract?.revokeMandatoryOnPassOrStop!==true)throw new Error('V35_REVOKE_NOT_MANDATORY');
+          if(registry.runtimeAuthorized!==false||registry.runtimeRequestPresent!==false||registry.iamGrantAuthorized!==false)throw new Error('V35_RUNTIME_MUST_REMAIN_UNAUTHORIZED');
+          NODE
+      - name: Execute offline policy transformation fixtures
+        shell: bash
+        run: |
+          set -euo pipefail
+          ORBIT360_V35_EVIDENCE="$V35_EVIDENCE" node tools/orbit360-plan-logging-view-temporary-grant-v35-v20260810.mjs
+          jq -e '.status=="PASS_V35_SOURCE_PLAN" and .ok==true and .scopeLevel=="LOG_VIEW" and .projectLevelGrant==false and .customRoleCreation==false and .futureIamWritesMaximum==2 and .futureGrantWritesMaximum==1 and .futureRevokeWritesMaximum==1 and .futureEtagRequired==true and .futureConcurrentPolicyDriftFailClosed==true and .futureRevokeMandatoryOnPassOrStop==true and .fixtureExistingBindingPreserved==true and .fixtureSyntheticBindingAddedExactlyOnce==true and .fixtureBaselineBindingsRestoredExactly==true and .networkAccess==false and .secretAccess==false and .iamPolicyRead==false and .iamWrites==0 and .loggingReads==0 and .firestoreReads==0 and .authReads==0 and .operationalWrites==0 and .runtimeExecuted==false and .iamGrantAuthorized==false' "$V35_EVIDENCE" >/dev/null
+      - name: Static zero-capability boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs=require('fs');
+          const src=fs.readFileSync('tools/orbit360-plan-logging-view-temporary-grant-v35-v20260810.mjs','utf8');
+          const forbidden=['google-auth-library','GoogleAuth','fetch(','https://','setIamPolicy','getIamPolicy','child_process','firebase-admin'];
+          const found=forbidden.filter(x=>src.includes(x));
+          if(found.length)throw new Error(`V35_SOURCE_CAPABILITY_LEAK:${found.join(',')}`);
+          NODE
+      - name: Publish status
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/v35-logging-view-grant-source-sanitized-v20260810.json
+        with:
+          script: |
+            const fs=require('fs');let state='failure',description='v35 least-privilege IAM source preparation blocked';
+            try{const p=JSON.parse(fs.readFileSync(process.env.EVIDENCE,'utf8'));if(p.ok===true&&p.status==='PASS_V35_SOURCE_PLAN'&&p.iamWrites===0&&p.networkAccess===false){state='success';description='v35 Log View grant SOURCE PASS; zero capabilities';}}catch(e){}
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/v35-logging-view-grant-source',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
+      - name: Upload sanitized source evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-v35-logging-view-grant-source-${{ github.run_id }}
+          path: orbit360-platform/runtime-gate-crm-v20260716/v35-logging-view-grant-source-sanitized-v20260810.json
+          if-no-files-found: warn
+          retention-days: 30
