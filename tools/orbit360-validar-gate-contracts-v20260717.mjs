@@ -25,7 +25,7 @@ const DEFAULT_BLOCK1_V30_REQUEST_REL = '.github/orbit360-requests/block1-client3
 const DEFAULT_BLOCK1_V33_REQUEST_REL = '.github/orbit360-requests/block1-client360-insurers-v33-two-client-cloud-audit-authorization.json';
 const STOP_OVERLAY_REL = 'tools/orbit360-validator-lifecycle-overlay-visual-matrix-v8-stop-preflight-v20260806.json';
 const CANONICAL_LIFECYCLE_COMPOSITION = 'phase-capability-contract-v1';
-const ROUTER_VERSION = 'v10-profile-aware-block1-v33-runtime';
+const ROUTER_VERSION = 'v10.1-profile-aware-v33-historical-request';
 
 const GATE_CONFIG = Object.freeze({
   [BLOCK1_GATE_ID]: {
@@ -70,7 +70,8 @@ const BLOCK1_V33_CONFIG = Object.freeze({
   lifecycle: 'tools/orbit360-validator-lifecycle-block1-two-client-cloud-audit-v33-v20260807.json',
   engine: 'tools/orbit360-validar-gate-contracts-engine-block1-two-client-cloud-audit-v33-v20260807.mjs',
   defaultRequest: DEFAULT_BLOCK1_V33_REQUEST_REL,
-  sourcePhase: 'SOURCE_ONLY_TWO_CLIENT_CLOUD_AUDIT_V33'
+  sourcePhase: 'SOURCE_ONLY_TWO_CLIENT_CLOUD_AUDIT_V33',
+  allowHistoricalConsumedRequest: true
 });
 const BLOCK1_V33_RUNTIME_CONFIG = Object.freeze({
   contractVersion: '1.0.41',
@@ -106,9 +107,17 @@ function exactCapabilities(actual, expected) {
   const e = Object.keys(expected || {}).sort();
   return JSON.stringify(a) === JSON.stringify(e) && e.every(key => actual[key] === expected[key]);
 }
+function isFrozenHistoricalRequest(request) {
+  return request &&
+    ['CONSUMED', 'CONSUMED_STOP_RETRY'].includes(String(request.status || '')) &&
+    request.allowedExecutions === 0 &&
+    request.consumed === true &&
+    request.authorizationFrozen === true &&
+    request.replayAllowed === false;
+}
 function failOutput(config, error) {
   return {
-    schemaVersion: 'orbit360-gate-contract-preflight-canonical-router-v9-profile-aware',
+    schemaVersion: 'orbit360-gate-contract-preflight-canonical-router-v10.1-profile-aware',
     gateId: GATE_ID,
     contractVersion: config && config.contractVersion || '',
     status: 'VALIDATOR_STALE',
@@ -152,7 +161,7 @@ if (!config) {
   const legacyPath = path.join(ROOT, LEGACY_ROUTER);
   if (!fs.existsSync(legacyPath)) {
     const missing = {
-      schemaVersion: 'orbit360-gate-contract-preflight-canonical-router-v9-profile-aware',
+      schemaVersion: 'orbit360-gate-contract-preflight-canonical-router-v10.1-profile-aware',
       gateId: GATE_ID,
       status: 'VALIDATOR_STALE',
       classification: 'PIPELINE_MECHANISM_FAILURE',
@@ -206,7 +215,12 @@ try {
   const requestFile = process.env.ORBIT360_REQUEST_FILE || config.defaultRequest;
   if (isSourcePhase) {
     if (expectedRequestVersion !== 'NONE_PENDING_FRESH_AUTHORIZATION') throw new Error('SOURCE_PHASE_UNEXPECTED_REQUEST_VERSION');
-    if (fs.existsSync(path.join(ROOT, requestFile))) throw new Error('SOURCE_PHASE_REQUEST_MUST_BE_ABSENT');
+    const requestAbs = path.join(ROOT, requestFile);
+    if (fs.existsSync(requestAbs)) {
+      if (config.allowHistoricalConsumedRequest !== true) throw new Error('SOURCE_PHASE_REQUEST_MUST_BE_ABSENT');
+      const request = readJson(requestFile);
+      if (!isFrozenHistoricalRequest(request)) throw new Error('SOURCE_PHASE_REQUEST_NOT_FROZEN_HISTORICAL');
+    }
   } else {
     if (expectedRequestVersion === 'NONE_PENDING_FRESH_AUTHORIZATION') throw new Error('FRESH_AUTHORIZATION_NOT_REGISTERED');
     const requestAbs = path.join(ROOT, requestFile);
