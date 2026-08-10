@@ -107,8 +107,15 @@
   "replayAllowed": false,
   "iamGrantPrepared": true,
   "iamGrantAuthorized": false,
+  "sourceExecutorReviewCompleted": true,
+  "sourceExecutorReviewDecision": "NO_SEPARATE_AUTHORIZED_IAM_EXECUTOR_EVIDENCED_IN_VERSIONED_SOURCE",
+  "historicalDispatcherCommit": "d1e2b48dd440b1ec2f6132a99380c81ff9093272",
+  "historicalDispatcherPresentInHead": false,
+  "historicalDispatcherUsedSameLabCredential": true,
+  "workloadIdentityCommitEvidenceFound": false,
+  "oidcCommitEvidenceFound": false,
   "freshExplicitAuthorizationRequired": true,
-  "nextAction": "SOURCE_ONLY_IDENTIFY_EXISTING_AUTHORIZED_IAM_EXECUTOR_FOR_TARGET_LOG_VIEW_WITHOUT_SECRETS_OR_WRITES",
+  "nextAction": "FRESH_EXPLICIT_AUTHORIZATION_REQUIRED_BEFORE_DIAGNOSING_OR_PROVISIONING_ANY_SEPARATE_IAM_EXECUTOR",
   "containsPII": false,
   "containsSecrets": false
 }
