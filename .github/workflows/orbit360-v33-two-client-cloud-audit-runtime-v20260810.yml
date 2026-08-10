@@ -1,0 +1,124 @@
+name: Orbit360 v33 two-client external audit read-only runtime
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-requests/block1-client360-insurers-v33-two-client-cloud-audit-authorization.json'
+permissions:
+  contents: read
+  statuses: write
+concurrency:
+  group: orbit360-v33-two-client-cloud-audit-runtime-v20260810
+  cancel-in-progress: false
+env:
+  REQUEST_FILE: .github/orbit360-requests/block1-client360-insurers-v33-two-client-cloud-audit-authorization.json
+  REQUEST_VERSION: 20260810.33-two-client-cloud-audit-readonly
+  EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/v33-two-client-cloud-audit-sanitized-v20260810.json
+jobs:
+  runtime:
+    if: github.event.head_commit.message == 'v33 runtime: authorize one external audit read'
+    name: v33 · exact two-client audit · read-only once
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Immutable request and parent binding before capabilities
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_RUN_ATTEMPT" = 1
+          PARENT="$(git rev-parse HEAD^)"
+          test "$(git diff --name-only HEAD^ HEAD | wc -l)" -eq 1
+          test "$(git diff --name-only HEAD^ HEAD)" = "$REQUEST_FILE"
+          jq -e --arg p "$PARENT" --arg v "$REQUEST_VERSION" '.schemaVersion=="orbit360-runtime-request-v1" and .authorizationGeneration=="v33-two-client-cloud-audit-readonly-runtime" and .gateId=="block1-client360-insurers-lab-v20260717" and .contractVersion=="1.0.41" and .requestVersion==$v and .status=="AUTHORIZED_ONCE" and .approved==true and .allowedExecutions==1 and .consumed==false and .authorizationFrozen==false and .replayAllowed==false and .parentHead==$p and .authorizedBaseHead==$p and .operation=="TWO_CLIENT_CLOUD_AUDIT_READONLY" and .targetFingerprintCount==2 and .firestoreLocatorReadOperationsMaximum==1 and .loggingQueriesMaximum==1 and .loggingReadOperationsMaximum==2 and .loggingPaginationMaximumPages==2 and .firestoreWritesAuthorized==0 and .authReadsAuthorized==0 and .authWritesAuthorized==0 and .operationalWritesAuthorized==0 and .reimportAuthorized==false and .hostingAuthorized==false and .browserAuthorized==false and .productionAuthorized==false and .mainAuthorized==false and .mergeAuthorized==false and .authorizedByUser==true and .containsPII==false and .containsSecrets==false' "$REQUEST_FILE" >/dev/null
+          echo "ORBIT360_EXPECTED_PARENT_HEAD=$PARENT" >> "$GITHUB_ENV"
+      - name: Canonical GO gate before secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          ORBIT360_GATE_PROFILE=v33-two-client-cloud-audit-runtime \
+          ORBIT360_REQUEST_FILE="$REQUEST_FILE" \
+          ORBIT360_EXPECTED_REQUEST_VERSION="$REQUEST_VERSION" \
+          ORBIT360_EXPECTED_PARENT_HEAD="$ORBIT360_EXPECTED_PARENT_HEAD" \
+            node tools/orbit360-validar-gate-contracts-v20260717.mjs block1-client360-insurers-lab-v20260717
+          jq -e '.status=="GO_GATE_CONTRACT_RUNTIME_V33" and .classification=="DATA_CONTRACT_EXTERNAL_AUDIT_RUNTIME_AUTHORIZED_READONLY" and .failed==0 and .executionAuthorized==true and .secretAccessAuthorized==true and .firestoreReadAuthorized==true and .loggingReadAuthorized==true and .firestoreLocatorReadOperationsMaximum==1 and .loggingQueriesMaximum==1 and .loggingReadOperationsMaximum==2 and .writesAuthorized==0 and .secretAccess==false and .firestoreRead==false and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json >/dev/null
+      - name: Zero-write semantic boundary before secret materialization
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-probe-two-client-cloud-audit-v33-v20260807.mjs
+          node tools/orbit360-test-two-client-cloud-audit-v33-source-v20260807.mjs
+          node tools/orbit360-detect-firestore-mutations-v32-v20260807.mjs tools/orbit360-probe-two-client-cloud-audit-v33-v20260807.mjs > "$RUNNER_TEMP/v33-runtime-mutation-analysis.json"
+          jq -e '.ok==true and (.findings|length)==0' "$RUNNER_TEMP/v33-runtime-mutation-analysis.json" >/dev/null
+      - name: Prepare isolated read-only dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --ignore-scripts firebase-admin@13.0.0 google-auth-library@9.15.1 >/dev/null 2>&1
+      - name: Execute one bounded external audit read
+        id: probe
+        env:
+          SA_ORBIT360_LAB: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}'
+          SA_ORBIT_360_LAB: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}'
+          SA_DEFAULT: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
+        shell: bash
+        run: |
+          set -uo pipefail
+          mkdir -p "$(dirname "$EVIDENCE")"
+          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-${SA_ORBIT_360_LAB:-${SA_DEFAULT:-}}}"
+          CODE=0
+          if [ -z "$SERVICE_ACCOUNT" ]; then
+            jq -n '{schemaVersion:"orbit360-block1-two-client-cloud-audit-v33-v2",gateId:"block1-client360-insurers-lab-v20260717",contractVersion:"1.0.41",targetCount:2,firestoreLocatorReadOperations:0,loggingReadOperations:0,items:[],writeEventTargets:0,auditUnavailableTargets:2,fullyAdjudicated:false,decision:"STOP_RETRY",classification:"ENVIRONMENT_FAILURE",rootCause:"SERVICE_ACCOUNT_SECRET_UNAVAILABLE",rawLogsPersisted:false,resourceNamesPersisted:false,documentIdsPersisted:false,principalEmailsPersisted:false,callerIpsPersisted:false,firestoreWrites:0,authReads:0,authWrites:0,operationalWrites:0,reimport:false,hostingTouched:false,browserExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false,ok:false}' > "$EVIDENCE"
+            CODE=42
+          else
+            SA_FILE="$RUNNER_TEMP/v33-sa.json"
+            printf '%s' "$SERVICE_ACCOUNT" > "$SA_FILE"
+            chmod 600 "$SA_FILE"
+            GOOGLE_APPLICATION_CREDENTIALS="$SA_FILE" ORBIT360_V33_EVIDENCE="$EVIDENCE" ORBIT360_PROJECT_ID=ays-orbit-360-lab ORBIT360_TENANT_ID=alianzas-soluciones node tools/orbit360-probe-two-client-cloud-audit-v33-v20260807.mjs
+            CODE=$?
+            rm -f "$SA_FILE"
+          fi
+          if [ ! -s "$EVIDENCE" ]; then
+            jq -n --arg rc "$CODE" '{schemaVersion:"orbit360-block1-two-client-cloud-audit-v33-v2",gateId:"block1-client360-insurers-lab-v20260717",contractVersion:"1.0.41",targetCount:2,firestoreLocatorReadOperations:0,loggingReadOperations:0,items:[],writeEventTargets:0,auditUnavailableTargets:2,fullyAdjudicated:false,decision:"STOP_RETRY",classification:"PIPELINE_MECHANISM_FAILURE",rootCause:("PROBE_EXIT_WITHOUT_SANITIZED_EVIDENCE_"+$rc),rawLogsPersisted:false,resourceNamesPersisted:false,documentIdsPersisted:false,principalEmailsPersisted:false,callerIpsPersisted:false,firestoreWrites:0,authReads:0,authWrites:0,operationalWrites:0,reimport:false,hostingTouched:false,browserExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false,ok:false}' > "$EVIDENCE"
+          fi
+          echo "exit_code=$CODE" >> "$GITHUB_OUTPUT"
+          exit 0
+      - name: Verify sanitized boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          jq -e '.targetCount==2 and .firestoreLocatorReadOperations<=1 and .loggingReadOperations<=2 and .firestoreWrites==0 and .authReads==0 and .authWrites==0 and .operationalWrites==0 and .reimport==false and .hostingTouched==false and .browserExecuted==false and .productionTouched==false and .rawLogsPersisted==false and .resourceNamesPersisted==false and .documentIdsPersisted==false and .principalEmailsPersisted==false and .callerIpsPersisted==false and .containsPII==false and .containsSecrets==false' "$EVIDENCE" >/dev/null
+      - name: Publish observable status
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          EVIDENCE_FILE: orbit360-platform/runtime-gate-crm-v20260716/v33-two-client-cloud-audit-sanitized-v20260810.json
+        with:
+          script: |
+            const fs=require('fs');let state='failure',description='v33 external audit stopped safely';
+            try{const p=JSON.parse(fs.readFileSync(process.env.EVIDENCE_FILE,'utf8'));if(p.decision==='AUDIT_EVIDENCE_AVAILABLE'&&p.writeEventTargets===2&&p.operationalWrites===0){state='success';description='v33 external audit: authoritative write evidence found for 2/2';}else if(p.classification){description=`v33 external audit: ${p.classification} / ${p.rootCause||p.decision}`.slice(0,140);}}catch(e){}
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/v33-two-client-cloud-audit-runtime',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
+      - name: Upload sanitized evidence only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-v33-two-client-cloud-audit-runtime-${{ github.run_id }}
+          path: orbit360-platform/runtime-gate-crm-v20260716/v33-two-client-cloud-audit-sanitized-v20260810.json
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Enforce single-run decision
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s "$EVIDENCE"
+          if jq -e '.decision=="AUDIT_EVIDENCE_AVAILABLE" and .writeEventTargets==2 and .operationalWrites==0' "$EVIDENCE" >/dev/null; then
+            exit 0
+          fi
+          exit 42
