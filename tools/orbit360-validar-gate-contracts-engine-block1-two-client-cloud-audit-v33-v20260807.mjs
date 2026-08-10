@@ -10,6 +10,11 @@ const l=read(L);const source=l.currentPhase==='SOURCE_ONLY_TWO_CLIENT_CLOUD_AUDI
 const req=process.env.ORBIT360_REQUEST_FILE||'.github/orbit360-requests/block1-client360-insurers-v33-two-client-cloud-audit-authorization.json';
 const expected=process.env.ORBIT360_EXPECTED_REQUEST_VERSION||'NONE_PENDING_FRESH_AUTHORIZATION';
 const methods=l.auditContract?.writeMethodAllowlist||[];
+function requestSafe(){
+ const abs=path.join(ROOT,req);if(!fs.existsSync(abs))return expected==='NONE_PENDING_FRESH_AUTHORIZATION';
+ if(expected!=='NONE_PENDING_FRESH_AUTHORIZATION')return false;
+ try{const r=read(req);return ['CONSUMED','CONSUMED_STOP_RETRY'].includes(String(r.status||''))&&r.allowedExecutions===0&&r.consumed===true&&r.authorizationFrozen===true&&r.replayAllowed===false;}catch{return false;}
+}
 const checks={
  gate:l.gateId==='block1-client360-insurers-lab-v20260717',
  version:l.gateContractVersion==='1.0.41',
@@ -28,8 +33,9 @@ const checks={
  permission:Array.isArray(l.auditContract?.requiredLoggingPermissions)&&l.auditContract.requiredLoggingPermissions.includes('logging.privateLogEntries.list'),
  privacy:l.auditContract?.rawLogEntriesPersisted===false&&l.auditContract?.resourceNamesPersisted===false&&l.auditContract?.principalEmailsPersisted===false&&l.auditContract?.callerIpsPersisted===false,
  writes:l.runtimeReadContract?.writesAuthorized===0&&l.protectedState?.writesAuthorized===0,
- requestAbsent:!fs.existsSync(path.join(ROOT,req))&&expected==='NONE_PENDING_FRESH_AUTHORIZATION'
+ requestInactiveOrAbsent:requestSafe()
 };
 const failed=Object.entries(checks).filter(([,v])=>!v).map(([k])=>k);const ok=failed.length===0;
-const out={schemaVersion:'orbit360-gate-contract-preflight-block1-v33-v2',gateId:l.gateId,contractVersion:l.gateContractVersion,authorizationGeneration:l.authorizationGeneration,executionPhase:l.currentPhase,status:ok?'PASS_GATE_CONTRACT_SOURCE_V33':'VALIDATOR_STALE',classification:ok?'DATA_CONTRACT_EXTERNAL_AUDIT_SOURCE_VALID':'PIPELINE_MECHANISM_FAILURE',total:Object.keys(checks).length,passed:Object.keys(checks).length-failed.length,failed:failed.length,failedCheckIds:failed,targetFingerprintCount:2,auditLogType:'DATA_ACCESS',writeMethodCount:methods.length,executionAuthorized:false,secretAccessAuthorized:false,firestoreReadAuthorized:false,loggingReadAuthorized:false,firestoreWriteAuthorized:false,authReadAuthorized:false,authWriteAuthorized:false,browserAuthorized:false,hostingAuthorized:false,functionsDeployAuthorized:false,rulesDeployAuthorized:false,productionAuthorized:false,writesAuthorized:0,dataAccess:false,secretAccess:false,secretsRead:false,firestoreRead:false,runtimeExecuted:false,browserExecuted:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false,ok};
+const requestState=fs.existsSync(path.join(ROOT,req))?'FROZEN_HISTORICAL_CONSUMED':'ABSENT_PENDING_FRESH_AUTHORIZATION';
+const out={schemaVersion:'orbit360-gate-contract-preflight-block1-v33-v3',gateId:l.gateId,contractVersion:l.gateContractVersion,authorizationGeneration:l.authorizationGeneration,executionPhase:l.currentPhase,status:ok?'PASS_GATE_CONTRACT_SOURCE_V33':'VALIDATOR_STALE',classification:ok?'DATA_CONTRACT_EXTERNAL_AUDIT_SOURCE_VALID':'PIPELINE_MECHANISM_FAILURE',total:Object.keys(checks).length,passed:Object.keys(checks).length-failed.length,failed:failed.length,failedCheckIds:failed,targetFingerprintCount:2,auditLogType:'DATA_ACCESS',writeMethodCount:methods.length,requestState,executionAuthorized:false,secretAccessAuthorized:false,firestoreReadAuthorized:false,loggingReadAuthorized:false,firestoreWriteAuthorized:false,authReadAuthorized:false,authWriteAuthorized:false,browserAuthorized:false,hostingAuthorized:false,functionsDeployAuthorized:false,rulesDeployAuthorized:false,productionAuthorized:false,writesAuthorized:0,dataAccess:false,secretAccess:false,secretsRead:false,firestoreRead:false,runtimeExecuted:false,browserExecuted:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false,ok};
 fs.mkdirSync(path.dirname(E),{recursive:true});fs.writeFileSync(E,JSON.stringify(out,null,2)+'\n','utf8');console.log(JSON.stringify(out,null,2));process.exit(ok?0:41);
