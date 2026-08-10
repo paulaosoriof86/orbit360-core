@@ -1,0 +1,126 @@
+name: Orbit360 v35 temporary Log View access audit revoke runtime
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-requests/block1-client360-insurers-v35-logging-view-grant-audit-revoke-authorization.json'
+permissions:
+  contents: read
+  statuses: write
+concurrency:
+  group: orbit360-v35-logging-view-grant-audit-revoke-runtime-v20260810
+  cancel-in-progress: false
+env:
+  REQUEST_FILE: .github/orbit360-requests/block1-client360-insurers-v35-logging-view-grant-audit-revoke-authorization.json
+  REQUEST_VERSION: 20260810.35-logging-view-grant-audit-revoke
+  EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/v35-logging-view-grant-audit-revoke-sanitized-v20260810.json
+jobs:
+  runtime:
+    if: "${{ github.event.head_commit.message == 'v35 runtime: authorize one temporary log view grant audit revoke' }}"
+    name: v35 · temporary Log View access · grant audit revoke once
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Immutable request and parent binding before capabilities
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_RUN_ATTEMPT" = 1
+          test "$(git diff --name-only HEAD^ HEAD | wc -l)" -eq 1
+          test "$(git diff --name-only HEAD^ HEAD)" = "$REQUEST_FILE"
+          PARENT="$(git rev-parse HEAD^)"
+          jq -e --arg p "$PARENT" --arg v "$REQUEST_VERSION" '.schemaVersion=="orbit360-runtime-request-v1" and .authorizationGeneration=="v35-logging-view-grant-audit-revoke-runtime" and .gateId=="block1-client360-insurers-lab-v20260717" and .contractVersion=="1.0.41" and .requestVersion==$v and .status=="AUTHORIZED_ONCE" and .approved==true and .allowedExecutions==1 and .consumed==false and .authorizationFrozen==false and .replayAllowed==false and .parentHead==$p and .authorizedBaseHead==$p and .operation=="TEMPORARY_LOG_VIEW_PRIVATE_LOG_VIEWER_AUDIT_REVOKE" and .targetResource=="projects/ays-orbit-360-lab/locations/global/buckets/_Default/views/_AllLogs" and .role=="roles/logging.privateLogViewer" and .targetFingerprintCount==2 and .iamPolicyReadsMaximum==4 and .iamWritesMaximum==2 and .grantWritesMaximum==1 and .revokeWritesMaximum==1 and .loggingReadPagesMaximum==10 and .loggingEntriesPageSize==100 and .firestoreReadsAuthorized==0 and .authReadsAuthorized==0 and .operationalWritesAuthorized==0 and .revokeMandatory==true and .hostingAuthorized==false and .browserAuthorized==false and .deployAuthorized==false and .productionAuthorized==false and .mainAuthorized==false and .mergeAuthorized==false and .authorizedByUser==true and .containsPII==false and .containsSecrets==false' "$REQUEST_FILE" >/dev/null
+          echo "ORBIT360_EXPECTED_PARENT_HEAD=$PARENT" >> "$GITHUB_ENV"
+      - name: Canonical Block1 source gate before secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          ORBIT360_GATE_PROFILE=v33-two-client-cloud-audit ORBIT360_EXPECTED_REQUEST_VERSION=NONE_PENDING_FRESH_AUTHORIZATION node tools/orbit360-validar-gate-contracts-v20260717.mjs block1-client360-insurers-lab-v20260717
+          jq -e '.status=="PASS_GATE_CONTRACT_SOURCE_V33" and .failed==0 and .executionAuthorized==false and .secretAccessAuthorized==false and .writesAuthorized==0 and .secretAccess==false and .runtimeExecuted==false' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json >/dev/null
+      - name: v35 GO gate before secret materialization
+        shell: bash
+        run: |
+          set -euo pipefail
+          ORBIT360_REQUEST_FILE="$REQUEST_FILE" ORBIT360_EXPECTED_REQUEST_VERSION="$REQUEST_VERSION" ORBIT360_EXPECTED_PARENT_HEAD="$ORBIT360_EXPECTED_PARENT_HEAD" node tools/orbit360-validar-gate-contracts-engine-block1-logging-view-grant-audit-revoke-runtime-v35-v20260810.mjs
+          jq -e '.status=="GO_GATE_CONTRACT_RUNTIME_V35" and .failed==0 and .executionAuthorized==true and .secretAccessAuthorized==true and .iamPolicyReadsMaximum==4 and .iamWritesMaximum==2 and .grantWritesMaximum==1 and .revokeWritesMaximum==1 and .loggingReadPagesMaximum==10 and .firestoreReadAuthorized==false and .authReadAuthorized==false and .operationalWritesAuthorized==0 and .secretAccess==false and .iamWrite==false and .runtimeExecuted==false' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json >/dev/null
+      - name: Source-safe worker contract before secret
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-execute-logging-view-grant-audit-revoke-v35-v20260810.mjs
+          ORBIT360_SOURCE_ONLY=1 ORBIT360_V35_RUNTIME_EVIDENCE="$RUNNER_TEMP/v35-worker-source.json" node tools/orbit360-execute-logging-view-grant-audit-revoke-v35-v20260810.mjs
+          jq -e '.decision=="SOURCE_ONLY_RUNTIME_READY" and .networkAccess==false and .secretAccess==false and .iamPolicyReads==0 and .iamWrites==0 and .loggingReadPages==0 and .fixtureGrantAdded==true and .fixtureBaselineRestored==true and .ok==true' "$RUNNER_TEMP/v35-worker-source.json" >/dev/null
+      - name: Prepare isolated dependency
+        shell: bash
+        run: npm install --no-save --ignore-scripts google-auth-library@9.15.1 >/dev/null 2>&1
+      - name: Execute one authorized grant audit revoke lifecycle
+        id: lifecycle
+        env:
+          SA_ORBIT360_LAB: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}'
+          SA_ORBIT_360_LAB: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}'
+          SA_DEFAULT: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
+        shell: bash
+        run: |
+          set -uo pipefail
+          mkdir -p "$(dirname "$EVIDENCE")"
+          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-${SA_ORBIT_360_LAB:-${SA_DEFAULT:-}}}"
+          CODE=0
+          if [ -z "$SERVICE_ACCOUNT" ]; then
+            jq -n '{schemaVersion:"orbit360-v35-log-view-grant-audit-revoke-v1",gateId:"block1-client360-insurers-lab-v20260717",contractVersion:"1.0.41",targetCount:2,targetViewClass:"LAB_DEFAULT_BUCKET_ALLLOGS_VIEW",role:"roles/logging.privateLogViewer",iamPolicyReads:0,iamWrites:0,grantWrites:0,revokeWrites:0,loggingReadPages:0,firestoreReads:0,authReads:0,operationalWrites:0,decision:"STOP_RETRY",classification:"ENVIRONMENT_FAILURE",rootCause:"SERVICE_ACCOUNT_SECRET_UNAVAILABLE",rawLogsPersisted:false,resourceNamesPersisted:false,documentIdsPersisted:false,principalEmailsPersisted:false,credentialsPersisted:false,containsPII:false,containsSecrets:false,ok:false}' > "$EVIDENCE"
+            CODE=42
+          else
+            SA_FILE="$RUNNER_TEMP/v35-sa.json"
+            printf '%s' "$SERVICE_ACCOUNT" > "$SA_FILE"
+            chmod 600 "$SA_FILE"
+            PROJECT_ID="$(jq -r '.project_id // empty' "$SA_FILE")"
+            if [ "$PROJECT_ID" != "ays-orbit-360-lab" ]; then
+              jq -n '{schemaVersion:"orbit360-v35-log-view-grant-audit-revoke-v1",gateId:"block1-client360-insurers-lab-v20260717",contractVersion:"1.0.41",targetCount:2,targetViewClass:"LAB_DEFAULT_BUCKET_ALLLOGS_VIEW",role:"roles/logging.privateLogViewer",iamPolicyReads:0,iamWrites:0,grantWrites:0,revokeWrites:0,loggingReadPages:0,firestoreReads:0,authReads:0,operationalWrites:0,decision:"STOP_RETRY",classification:"SECURITY_FAILURE",rootCause:"PROJECT_ID_MISMATCH",rawLogsPersisted:false,resourceNamesPersisted:false,documentIdsPersisted:false,principalEmailsPersisted:false,credentialsPersisted:false,containsPII:false,containsSecrets:false,ok:false}' > "$EVIDENCE"
+              CODE=42
+            else
+              GOOGLE_APPLICATION_CREDENTIALS="$SA_FILE" ORBIT360_V35_RUNTIME_EVIDENCE="$EVIDENCE" node tools/orbit360-execute-logging-view-grant-audit-revoke-v35-v20260810.mjs
+              CODE=$?
+            fi
+            rm -f "$SA_FILE"
+          fi
+          echo "exit_code=$CODE" >> "$GITHUB_OUTPUT"
+          exit 0
+      - name: Verify sanitized evidence and hard budgets
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s "$EVIDENCE"
+          jq -e '.targetCount==2 and .iamPolicyReads<=4 and .iamWrites<=2 and .grantWrites<=1 and .revokeWrites<=1 and .loggingReadPages<=10 and .firestoreReads==0 and .authReads==0 and .operationalWrites==0 and .rawLogsPersisted==false and .resourceNamesPersisted==false and .documentIdsPersisted==false and .principalEmailsPersisted==false and .credentialsPersisted==false and .containsPII==false and .containsSecrets==false' "$EVIDENCE" >/dev/null
+          if jq -e '.grantWrites==1' "$EVIDENCE" >/dev/null; then jq -e '.revokeWrites==1 and .finalTemporaryBindingPresent==false' "$EVIDENCE" >/dev/null; fi
+      - name: Publish observable lifecycle status
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          EVIDENCE_FILE: orbit360-platform/runtime-gate-crm-v20260716/v35-logging-view-grant-audit-revoke-sanitized-v20260810.json
+        with:
+          script: |
+            const fs=require('fs');let state='failure',description='v35 temporary IAM lifecycle stopped safely';
+            try{const p=JSON.parse(fs.readFileSync(process.env.EVIDENCE_FILE,'utf8'));if(p.ok===true&&p.decision==='AUDIT_EVIDENCE_AVAILABLE'&&p.iamWrites===2&&p.revokeWrites===1&&p.finalTemporaryBindingPresent===false){state='success';description='v35: audit evidence available; temporary IAM grant revoked';}else if(p.rootCause){description=`v35: ${p.classification} / ${p.rootCause}`.slice(0,140);}}catch(e){}
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/v35-logging-view-grant-audit-revoke-runtime',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
+      - name: Upload sanitized evidence only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-v35-logging-view-grant-audit-revoke-runtime-${{ github.run_id }}
+          path: orbit360-platform/runtime-gate-crm-v20260716/v35-logging-view-grant-audit-revoke-sanitized-v20260810.json
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Enforce lifecycle closure without retry
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s "$EVIDENCE"
+          if jq -e '.grantWrites==1' "$EVIDENCE" >/dev/null; then jq -e '.revokeWrites==1 and .finalTemporaryBindingPresent==false' "$EVIDENCE" >/dev/null; fi
+          jq -e '.ok==true and .decision=="AUDIT_EVIDENCE_AVAILABLE"' "$EVIDENCE" >/dev/null
