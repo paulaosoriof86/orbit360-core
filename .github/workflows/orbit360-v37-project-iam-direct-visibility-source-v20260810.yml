@@ -1,0 +1,112 @@
+name: Orbit360 v37 project IAM direct visibility source-only
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/workflows/orbit360-v37-project-iam-direct-visibility-source-v20260810.yml'
+      - '.github/workflows/orbit360-v37-project-iam-direct-visibility-runtime-v20260810.yml'
+      - 'tools/orbit360-validator-lifecycle-block1-project-iam-direct-visibility-runtime-v37-v20260810.json'
+      - 'tools/orbit360-gate-contract-registry-extension-block1-v37-project-iam-direct-visibility-v20260810.json'
+      - 'tools/orbit360-validar-gate-contracts-engine-block1-project-iam-direct-visibility-runtime-v37-v20260810.mjs'
+      - 'tools/orbit360-read-project-iam-direct-visibility-v37-v20260810.mjs'
+      - 'tools/fixtures/orbit360-v37-project-iam-direct-visibility-request-fixture-v20260810.json'
+permissions:
+  contents: read
+  statuses: write
+concurrency:
+  group: orbit360-v37-project-iam-direct-visibility-source-v20260810
+  cancel-in-progress: false
+env:
+  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+  SOURCE_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/v37-project-iam-direct-visibility-source-sanitized-v20260810.json
+jobs:
+  source:
+    name: v37 · project IAM direct visibility · source-only
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Canonical Block1 source gate remains frozen
+        shell: bash
+        run: |
+          set -euo pipefail
+          ORBIT360_GATE_PROFILE=v33-two-client-cloud-audit ORBIT360_EXPECTED_REQUEST_VERSION=NONE_PENDING_FRESH_AUTHORIZATION node tools/orbit360-validar-gate-contracts-v20260717.mjs block1-client360-insurers-lab-v20260717
+          jq -e '.status=="PASS_GATE_CONTRACT_SOURCE_V33" and .failed==0 and .executionAuthorized==false and .secretAccessAuthorized==false and .writesAuthorized==0 and .secretAccess==false and .runtimeExecuted==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+      - name: Require closed v36 Policy Analyzer visibility stop
+        shell: bash
+        run: |
+          set -euo pipefail
+          jq -e '.runtimeCompleted==true and .runtimeRootCause=="IAM_POLICY_ANALYZER_READ_FORBIDDEN" and .ancestryReadsObserved==1 and .policyAnalyzerQueriesObserved==0 and .iamWritesObserved==0 and .requestConsumed==true and .requestAuthorizationFrozen==true and .replayAllowed==false and .doesNotProveNoAdminExecutorExists==true' tools/orbit360-gate-contract-registry-extension-block1-v36-iam-executor-diagnostic-v20260810.json >/dev/null
+      - name: Validate v37 lifecycle registry engine fixture and documentation
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-validar-gate-contracts-engine-block1-project-iam-direct-visibility-runtime-v37-v20260810.mjs
+          node --check tools/orbit360-read-project-iam-direct-visibility-v37-v20260810.mjs
+          node -e "JSON.parse(require('fs').readFileSync('tools/orbit360-validator-lifecycle-block1-project-iam-direct-visibility-runtime-v37-v20260810.json','utf8'));JSON.parse(require('fs').readFileSync('tools/orbit360-gate-contract-registry-extension-block1-v37-project-iam-direct-visibility-v20260810.json','utf8'));JSON.parse(require('fs').readFileSync('tools/fixtures/orbit360-v37-project-iam-direct-visibility-request-fixture-v20260810.json','utf8'))"
+          test -f orbit360-platform/docs/PREPARACION-V37-VISIBILIDAD-IAM-DIRECTA-PROYECTO-READONLY-20260810.md
+          test -f orbit360-platform/docs/CLAUDE-ACUMULADO-V37-VISIBILIDAD-IAM-DIRECTA-READONLY-20260810.md
+          test -f orbit360-platform/docs/ACADEMIA-ACTUALIZACION-V37-VISIBILIDAD-IAM-DIRECTA-READONLY-20260810.md
+          jq -e '.sourceVerifiedCandidateRoles==["roles/owner","roles/iam.securityAdmin","roles/logging.admin","roles/iam.devOps","roles/iam.infrastructureAdmin","roles/iam.networkAdmin"] and .sourceRoleEvidence.serviceAgentRolesExcluded==true and .sourceRoleEvidence.customRolesNotAssumed==true and .runtimeContract.testIamPermissionsCallsMaximum==1 and .runtimeContract.projectIamPolicyReadsMaximum==1 and .runtimeContract.requestedPolicyVersion==3 and .runtimeContract.iamWritesMaximum==0 and .runtimeContract.policyAnalyzerQueriesMaximum==0 and .runtimeContract.policyTroubleshooterQueriesMaximum==0' tools/orbit360-gate-contract-registry-extension-block1-v37-project-iam-direct-visibility-v20260810.json >/dev/null
+          ORBIT360_REQUEST_FILE=tools/fixtures/orbit360-v37-project-iam-direct-visibility-request-fixture-v20260810.json \
+          ORBIT360_EXPECTED_REQUEST_VERSION=FIXTURE_V37_PROJECT_IAM_DIRECT_VISIBILITY_READONLY \
+          ORBIT360_EXPECTED_PARENT_HEAD=fixture-parent-head-v37 \
+            node tools/orbit360-validar-gate-contracts-engine-block1-project-iam-direct-visibility-runtime-v37-v20260810.mjs
+          jq -e '.status=="GO_GATE_CONTRACT_RUNTIME_V37" and .failed==0 and .iamReadAuthorized==true and .iamWriteAuthorized==false and .testIamPermissionsCallsMaximum==1 and .projectIamPolicyReadsMaximum==1 and .requestedPolicyVersion==3 and .iamWritesAuthorized==0 and .policyAnalyzerQueriesAuthorized==0 and .policyTroubleshooterQueriesAuthorized==0 and .firestoreReadAuthorized==false and .authReadAuthorized==false and .loggingEntryReadAuthorized==false and .operationalWritesAuthorized==0 and .secretAccess==false and .runtimeExecuted==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+      - name: Execute worker offline fixtures
+        shell: bash
+        run: |
+          set -euo pipefail
+          ORBIT360_SOURCE_ONLY=1 ORBIT360_V37_EVIDENCE="$EVIDENCE_DIR/v37-worker-source.json" node tools/orbit360-read-project-iam-direct-visibility-v37-v20260810.mjs
+          jq -e '.decision=="SOURCE_ONLY_RUNTIME_READY" and .fixtureCandidateParsing==true and .networkAccess==false and .secretAccess==false and .testIamPermissionsCalls==0 and .projectIamPolicyReads==0 and .iamPolicyWrites==0 and .iamWrites==0 and .policyAnalyzerQueries==0 and .policyTroubleshooterQueries==0 and .firestoreReads==0 and .authReads==0 and .loggingEntryReads==0 and .operationalWrites==0 and .ok==true' "$EVIDENCE_DIR/v37-worker-source.json" >/dev/null
+      - name: Validate read-only runtime boundaries semantically
+        shell: bash
+        run: |
+          set -euo pipefail
+          R=.github/workflows/orbit360-v37-project-iam-direct-visibility-runtime-v20260810.yml
+          grep -Fq 'Canonical Block1 source gate before secrets' "$R"
+          grep -Fq 'v37 GO gate before secret materialization' "$R"
+          grep -Fq '.iamWritesAuthorized==0' "$R"
+          grep -Fq '.policyAnalyzerQueries==0' "$R"
+          grep -Fq '.policyTroubleshooterQueries==0' "$R"
+          node <<'NODE'
+          const fs=require('fs');
+          const src=fs.readFileSync('tools/orbit360-read-project-iam-direct-visibility-v37-v20260810.mjs','utf8');
+          const forbidden=[/gcloud\s+projects\s+add-iam-policy-binding/i,/firebase-admin/i,/policytroubleshooter\.googleapis\.com/i,/cloudasset\.googleapis\.com/i,/:setIamPolicy\b/i,/\bcreateServiceAccount\b/i,/\bcreateKey\b/i,/method\s*:\s*['\"](?:PUT|PATCH|DELETE)['\"]/i];
+          const hits=forbidden.filter(r=>r.test(src));
+          if(hits.length)throw new Error('V37_READ_ONLY_BOUNDARY_FAILED');
+          if(!/projects\/\$\{PROJECT\}:testIamPermissions/.test(src))throw new Error('V37_TEST_PERMISSION_CALL_MISSING');
+          if(!/projects\/\$\{PROJECT\}:getIamPolicy/.test(src))throw new Error('V37_GET_POLICY_CALL_MISSING');
+          if(!/requestedPolicyVersion:3/.test(src))throw new Error('V37_POLICY_VERSION_3_MISSING');
+          const runtime=fs.readFileSync(R,'utf8');
+          if(/add-iam-policy-binding|set-iam-policy|firebase deploy|gcloud .* deploy/i.test(runtime))throw new Error('V37_RUNTIME_WRITE_OR_DEPLOY_TOKEN_FOUND');
+          NODE
+      - name: Seal sanitized source evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          jq -n --arg sha "$GITHUB_SHA" '{schemaVersion:"orbit360-v37-project-iam-direct-visibility-source-v1",status:"PASS_V37_SOURCE",ok:true,head:$sha,runtimeRequestPresent:false,runtimeAuthorized:false,secretsRead:false,networkAccess:false,testIamPermissionsCalls:0,projectIamPolicyReads:0,iamWrites:0,policyAnalyzerQueries:0,policyTroubleshooterQueries:0,firestoreReads:0,authReads:0,loggingEntryReads:0,operationalWrites:0,runtimeExecuted:false,browserExecuted:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false}' > "$SOURCE_EVIDENCE"
+      - name: Publish source status
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          EVIDENCE_FILE: orbit360-platform/runtime-gate-crm-v20260716/v37-project-iam-direct-visibility-source-sanitized-v20260810.json
+        with:
+          script: |
+            const fs=require('fs');let state='failure',description='v37 direct project IAM visibility source blocked';
+            try{const p=JSON.parse(fs.readFileSync(process.env.EVIDENCE_FILE,'utf8'));if(p.ok===true&&p.status==='PASS_V37_SOURCE'&&p.iamWrites===0&&p.networkAccess===false){state='success';description='v37 direct project IAM visibility SOURCE PASS; zero capabilities';}}catch(e){}
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/v37-project-iam-direct-visibility-source',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
+      - name: Upload sanitized source evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-v37-project-iam-direct-visibility-source-${{ github.run_id }}
+          path: orbit360-platform/runtime-gate-crm-v20260716/v37-project-iam-direct-visibility-source-sanitized-v20260810.json
+          if-no-files-found: warn
+          retention-days: 30
