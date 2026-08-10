@@ -1,0 +1,91 @@
+name: Orbit360 v34 logging IAM runtime preparation source-only
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/workflows/orbit360-v34-logging-iam-runtime-prep-source-v20260810.yml'
+      - '.github/workflows/orbit360-v34-logging-iam-capability-runtime-v20260810.yml'
+      - 'tools/orbit360-validator-lifecycle-block1-logging-iam-capability-runtime-v34-v20260810.json'
+      - 'tools/orbit360-validar-gate-contracts-engine-block1-logging-iam-capability-runtime-v34-v20260810.mjs'
+      - 'tools/fixtures/orbit360-v34-logging-iam-runtime-request-fixture-v20260810.json'
+      - 'tools/orbit360-diagnose-logging-iam-capability-v34-v20260810.mjs'
+permissions:
+  contents: read
+  statuses: write
+concurrency:
+  group: orbit360-v34-logging-iam-runtime-prep-source-v20260810
+  cancel-in-progress: false
+env:
+  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+jobs:
+  source:
+    name: v34 runtime contract · source-only · zero capabilities
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Canonical Block1 source gate remains frozen
+        shell: bash
+        run: |
+          set -euo pipefail
+          ORBIT360_GATE_PROFILE=v33-two-client-cloud-audit \
+          ORBIT360_EXPECTED_REQUEST_VERSION=NONE_PENDING_FRESH_AUTHORIZATION \
+            node tools/orbit360-validar-gate-contracts-v20260717.mjs block1-client360-insurers-lab-v20260717
+          jq -e '.status=="PASS_GATE_CONTRACT_SOURCE_V33" and .failed==0 and .executionAuthorized==false and .secretAccessAuthorized==false and .writesAuthorized==0 and .secretAccess==false and .runtimeExecuted==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+      - name: Validate v34 runtime contract using inert fixture
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-validar-gate-contracts-engine-block1-logging-iam-capability-runtime-v34-v20260810.mjs
+          node --check tools/orbit360-diagnose-logging-iam-capability-v34-v20260810.mjs
+          node -e "JSON.parse(require('fs').readFileSync('tools/orbit360-validator-lifecycle-block1-logging-iam-capability-runtime-v34-v20260810.json','utf8'));JSON.parse(require('fs').readFileSync('tools/fixtures/orbit360-v34-logging-iam-runtime-request-fixture-v20260810.json','utf8'))"
+          ORBIT360_REQUEST_FILE=tools/fixtures/orbit360-v34-logging-iam-runtime-request-fixture-v20260810.json \
+          ORBIT360_EXPECTED_REQUEST_VERSION=FIXTURE_V34_LOGGING_IAM_RUNTIME \
+          ORBIT360_EXPECTED_PARENT_HEAD=fixture-parent-head-v34 \
+            node tools/orbit360-validar-gate-contracts-engine-block1-logging-iam-capability-runtime-v34-v20260810.mjs
+          jq -e '.status=="GO_GATE_CONTRACT_RUNTIME_V34" and .failed==0 and .executionAuthorized==true and .secretAccessAuthorized==true and .networkOperationsMaximum==1 and .firestoreReadAuthorized==false and .authReadAuthorized==false and .auditLogReadAuthorized==false and .iamPolicyBindingReadAuthorized==false and .iamWriteAuthorized==false and .writesAuthorized==0 and .secretAccess==false and .runtimeExecuted==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+      - name: Static runtime workflow scope boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -Fq 'Canonical Block1 gate before any secret' .github/workflows/orbit360-v34-logging-iam-capability-runtime-v20260810.yml
+          grep -Fq 'v34 GO gate before secret materialization' .github/workflows/orbit360-v34-logging-iam-capability-runtime-v20260810.yml
+          grep -Fq 'networkOperationsMaximum==1' .github/workflows/orbit360-v34-logging-iam-capability-runtime-v20260810.yml
+          grep -Fq 'auditLogReadsAuthorized==0' .github/workflows/orbit360-v34-logging-iam-capability-runtime-v20260810.yml
+          grep -Fq 'iamWritesAuthorized==0' .github/workflows/orbit360-v34-logging-iam-capability-runtime-v20260810.yml
+          ! grep -Eq 'setIamPolicy|add-iam-policy-binding|firebase deploy|playwright' .github/workflows/orbit360-v34-logging-iam-capability-runtime-v20260810.yml
+      - name: Source-only probe remains offline
+        shell: bash
+        run: |
+          set -euo pipefail
+          ORBIT360_SOURCE_ONLY=1 ORBIT360_V34_EVIDENCE="$EVIDENCE_DIR/v34-runtime-prep-probe-source.json" node tools/orbit360-diagnose-logging-iam-capability-v34-v20260810.mjs
+          jq -e '.decision=="SOURCE_ONLY_READY" and .networkAccess==false and .secretAccess==false and .iamWrites==0 and .firestoreReads==0 and .auditLogEntriesRead==false and .targetClientDataRead==false' "$EVIDENCE_DIR/v34-runtime-prep-probe-source.json" >/dev/null
+      - name: Seal preparation evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          jq -n --arg sha "$GITHUB_SHA" '{schemaVersion:"orbit360-v34-runtime-prep-source-v1",status:"PASS_V34_RUNTIME_PREP_SOURCE",ok:true,head:$sha,requestFixtureOnly:true,secretsRead:false,networkAccess:false,firestoreRead:false,auditLogRead:false,iamPolicyBindingRead:false,iamWrites:0,operationalWrites:0,runtimeExecuted:false,browserExecuted:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false}' > "$EVIDENCE_DIR/v34-runtime-prep-source-sanitized-v20260810.json"
+      - name: Publish status
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/v34-runtime-prep-source-sanitized-v20260810.json
+        with:
+          script: |
+            const fs=require('fs');let state='failure',description='v34 IAM Logging runtime prep blocked';
+            try{const p=JSON.parse(fs.readFileSync(process.env.EVIDENCE,'utf8'));if(p.ok===true&&p.status==='PASS_V34_RUNTIME_PREP_SOURCE'&&p.iamWrites===0){state='success';description='v34 runtime prep SOURCE PASS; zero capabilities';}}catch(e){}
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/v34-runtime-prep-source',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
+      - name: Upload sanitized preparation evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-v34-runtime-prep-source-${{ github.run_id }}
+          path: orbit360-platform/runtime-gate-crm-v20260716/v34-runtime-prep-source-sanitized-v20260810.json
+          if-no-files-found: warn
+          retention-days: 30
