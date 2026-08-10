@@ -4,6 +4,7 @@ on:
     branches: [ays/backend-tenant-lab-v99-20260703]
     paths:
       - '.github/orbit360-requests/block1-client360-insurers-v33-two-client-cloud-audit-authorization.json'
+      - '.github/workflows/orbit360-v33-two-client-cloud-audit-runtime-v20260810.yml'
 permissions:
   contents: read
   statuses: write
@@ -16,14 +17,14 @@ env:
   EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/v33-two-client-cloud-audit-sanitized-v20260810.json
 jobs:
   runtime:
-    if: github.event.head_commit.message == 'v33 runtime: authorize one external audit read'
+    if: "${{ github.event.head_commit.message == 'v33 runtime repair pre-execution trigger' }}"
     name: v33 · exact two-client audit · read-only once
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
-          fetch-depth: 2
+          fetch-depth: 3
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
@@ -33,9 +34,17 @@ jobs:
         run: |
           set -euo pipefail
           test "$GITHUB_RUN_ATTEMPT" = 1
-          PARENT="$(git rev-parse HEAD^)"
+          test "$(git show -s --format=%s HEAD)" = "v33 runtime repair pre-execution trigger"
           test "$(git diff --name-only HEAD^ HEAD | wc -l)" -eq 1
-          test "$(git diff --name-only HEAD^ HEAD)" = "$REQUEST_FILE"
+          test "$(git diff --name-only HEAD^ HEAD)" = ".github/workflows/orbit360-v33-two-client-cloud-audit-runtime-v20260810.yml"
+          AUTH_COMMIT="$(git rev-parse HEAD^)"
+          test "$AUTH_COMMIT" = "333b88acb415a7e335e387f4c6a1bc11995ca811"
+          test "$(git show -s --format=%s "$AUTH_COMMIT")" = "v33 runtime: authorize one external audit read"
+          test "$(git diff --name-only "$AUTH_COMMIT^" "$AUTH_COMMIT" | wc -l)" -eq 1
+          test "$(git diff --name-only "$AUTH_COMMIT^" "$AUTH_COMMIT")" = "$REQUEST_FILE"
+          PARENT="$(git rev-parse "$AUTH_COMMIT^")"
+          test "$PARENT" = "b9a4083d5564deb76258e5cf7059f38400bc2241"
+          git diff --quiet "$AUTH_COMMIT" HEAD -- "$REQUEST_FILE"
           jq -e --arg p "$PARENT" --arg v "$REQUEST_VERSION" '.schemaVersion=="orbit360-runtime-request-v1" and .authorizationGeneration=="v33-two-client-cloud-audit-readonly-runtime" and .gateId=="block1-client360-insurers-lab-v20260717" and .contractVersion=="1.0.41" and .requestVersion==$v and .status=="AUTHORIZED_ONCE" and .approved==true and .allowedExecutions==1 and .consumed==false and .authorizationFrozen==false and .replayAllowed==false and .parentHead==$p and .authorizedBaseHead==$p and .operation=="TWO_CLIENT_CLOUD_AUDIT_READONLY" and .targetFingerprintCount==2 and .firestoreLocatorReadOperationsMaximum==1 and .loggingQueriesMaximum==1 and .loggingReadOperationsMaximum==2 and .loggingPaginationMaximumPages==2 and .firestoreWritesAuthorized==0 and .authReadsAuthorized==0 and .authWritesAuthorized==0 and .operationalWritesAuthorized==0 and .reimportAuthorized==false and .hostingAuthorized==false and .browserAuthorized==false and .productionAuthorized==false and .mainAuthorized==false and .mergeAuthorized==false and .authorizedByUser==true and .containsPII==false and .containsSecrets==false' "$REQUEST_FILE" >/dev/null
           echo "ORBIT360_EXPECTED_PARENT_HEAD=$PARENT" >> "$GITHUB_ENV"
       - name: Canonical GO gate before secrets
