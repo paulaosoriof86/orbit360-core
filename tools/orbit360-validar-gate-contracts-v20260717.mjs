@@ -13,6 +13,7 @@ const V28_PROFILE = 'v28-focal-provenance-universe';
 const V29_PROFILE = 'v29-identity-reconciliation-universe';
 const V30_PROFILE = 'v30-retained26-psi-universe';
 const V33_PROFILE = 'v33-two-client-cloud-audit';
+const V33_RUNTIME_PROFILE = 'v33-two-client-cloud-audit-runtime';
 const LEGACY_ROUTER = 'tools/orbit360-validar-gate-contracts-legacy-v20260717.mjs';
 const EVIDENCE_REL = 'orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json';
 const EVIDENCE_PATH = path.join(ROOT, EVIDENCE_REL);
@@ -24,7 +25,7 @@ const DEFAULT_BLOCK1_V30_REQUEST_REL = '.github/orbit360-requests/block1-client3
 const DEFAULT_BLOCK1_V33_REQUEST_REL = '.github/orbit360-requests/block1-client360-insurers-v33-two-client-cloud-audit-authorization.json';
 const STOP_OVERLAY_REL = 'tools/orbit360-validator-lifecycle-overlay-visual-matrix-v8-stop-preflight-v20260806.json';
 const CANONICAL_LIFECYCLE_COMPOSITION = 'phase-capability-contract-v1';
-const ROUTER_VERSION = 'v9-profile-aware-block1-v33';
+const ROUTER_VERSION = 'v10-profile-aware-block1-v33-runtime';
 
 const GATE_CONFIG = Object.freeze({
   [BLOCK1_GATE_ID]: {
@@ -70,6 +71,13 @@ const BLOCK1_V33_CONFIG = Object.freeze({
   engine: 'tools/orbit360-validar-gate-contracts-engine-block1-two-client-cloud-audit-v33-v20260807.mjs',
   defaultRequest: DEFAULT_BLOCK1_V33_REQUEST_REL,
   sourcePhase: 'SOURCE_ONLY_TWO_CLIENT_CLOUD_AUDIT_V33'
+});
+const BLOCK1_V33_RUNTIME_CONFIG = Object.freeze({
+  contractVersion: '1.0.41',
+  lifecycle: 'tools/orbit360-validator-lifecycle-block1-two-client-cloud-audit-runtime-v33-v20260810.json',
+  engine: 'tools/orbit360-validar-gate-contracts-engine-block1-two-client-cloud-audit-runtime-v33-v20260810.mjs',
+  defaultRequest: DEFAULT_BLOCK1_V33_REQUEST_REL,
+  sourcePhase: ''
 });
 
 const PHASE_PROFILES = Object.freeze({
@@ -133,7 +141,8 @@ function failOutput(config, error) {
 }
 
 const gateProfile = process.env.ORBIT360_GATE_PROFILE || '';
-const config = GATE_ID === BLOCK1_GATE_ID && gateProfile === V33_PROFILE ? BLOCK1_V33_CONFIG
+const config = GATE_ID === BLOCK1_GATE_ID && gateProfile === V33_RUNTIME_PROFILE ? BLOCK1_V33_RUNTIME_CONFIG
+  : GATE_ID === BLOCK1_GATE_ID && gateProfile === V33_PROFILE ? BLOCK1_V33_CONFIG
   : GATE_ID === BLOCK1_GATE_ID && gateProfile === V30_PROFILE ? BLOCK1_V30_CONFIG
   : GATE_ID === BLOCK1_GATE_ID && gateProfile === V29_PROFILE ? BLOCK1_V29_CONFIG
   : GATE_ID === BLOCK1_GATE_ID && gateProfile === V28_PROFILE ? BLOCK1_V28_CONFIG
