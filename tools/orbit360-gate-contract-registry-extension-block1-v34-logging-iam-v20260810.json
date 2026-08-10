@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "orbit360-gate-contract-registry-extension-v1",
+  "gateId": "block1-client360-insurers-lab-v20260717",
+  "contractVersion": "1.0.41",
+  "profile": "v34-logging-iam-capability-diagnostic",
+  "classification": "ENVIRONMENT_FAILURE_IAM_CAPABILITY_DIAGNOSTIC",
+  "owner": "DATA_MIGRATION_TRACEABILITY_CLIENT_CREATION_PROVENANCE",
+  "lifecycle": "tools/orbit360-validator-lifecycle-block1-logging-iam-capability-v34-v20260810.json",
+  "probe": "tools/orbit360-diagnose-logging-iam-capability-v34-v20260810.mjs",
+  "sourceWorkflow": ".github/workflows/orbit360-v34-logging-iam-capability-source-v20260810.yml",
+  "canonicalPreflight": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
+  "canonicalPreflightProfile": "v33-two-client-cloud-audit",
+  "requiredPermissions": [
+    "logging.logEntries.list",
+    "logging.privateLogEntries.list"
+  ],
+  "sourceCapabilities": {
+    "secrets": false,
+    "firestoreRead": false,
+    "loggingRead": false,
+    "iamWrites": false,
+    "operationalWrites": false,
+    "runtime": false,
+    "browser": false,
+    "deploy": false,
+    "production": false
+  },
+  "runtimeDiagnosticPrepared": true,
+  "runtimeDiagnosticAuthorized": false,
+  "runtimeRequestPresent": false,
+  "iamGrantPrepared": false,
+  "iamGrantAuthorized": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
