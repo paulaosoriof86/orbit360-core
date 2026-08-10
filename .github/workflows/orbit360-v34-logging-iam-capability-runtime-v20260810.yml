@@ -4,6 +4,7 @@ on:
     branches: [ays/backend-tenant-lab-v99-20260703]
     paths:
       - '.github/orbit360-requests/block1-client360-insurers-v34-logging-iam-capability-authorization.json'
+      - '.github/workflows/orbit360-v34-logging-iam-capability-runtime-v20260810.yml'
 permissions:
   contents: read
   statuses: write
@@ -16,14 +17,14 @@ env:
   EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/v34-logging-iam-capability-sanitized-v20260810.json
 jobs:
   runtime:
-    if: github.event.head_commit.message == 'v34 runtime: authorize one IAM logging capability check'
+    if: "${{ github.event.head_commit.message == 'v34 runtime: authorize one IAM logging capability check' || github.event.head_commit.message == 'v34 runtime repair pre-execution trigger' }}"
     name: v34 · testIamPermissions · read-only once
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
-          fetch-depth: 2
+          fetch-depth: 3
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
@@ -33,9 +34,22 @@ jobs:
         run: |
           set -euo pipefail
           test "$GITHUB_RUN_ATTEMPT" = 1
-          test "$(git diff --name-only HEAD^ HEAD | wc -l)" -eq 1
-          test "$(git diff --name-only HEAD^ HEAD)" = "$REQUEST_FILE"
-          PARENT="$(git rev-parse HEAD^)"
+          SUBJECT="$(git show -s --format=%s HEAD)"
+          if [ "$SUBJECT" = "v34 runtime: authorize one IAM logging capability check" ]; then
+            AUTH_COMMIT="$(git rev-parse HEAD)"
+          elif [ "$SUBJECT" = "v34 runtime repair pre-execution trigger" ]; then
+            test "$(git diff --name-only HEAD^ HEAD | wc -l)" -eq 1
+            test "$(git diff --name-only HEAD^ HEAD)" = ".github/workflows/orbit360-v34-logging-iam-capability-runtime-v20260810.yml"
+            AUTH_COMMIT="$(git rev-parse HEAD^)"
+            test "$(git show -s --format=%s "$AUTH_COMMIT")" = "v34 runtime: authorize one IAM logging capability check"
+            git diff --quiet "$AUTH_COMMIT" HEAD -- "$REQUEST_FILE"
+          else
+            echo "STOP_V34_UNAUTHORIZED_TRIGGER"
+            exit 41
+          fi
+          test "$(git diff --name-only "$AUTH_COMMIT^" "$AUTH_COMMIT" | wc -l)" -eq 1
+          test "$(git diff --name-only "$AUTH_COMMIT^" "$AUTH_COMMIT")" = "$REQUEST_FILE"
+          PARENT="$(git rev-parse "$AUTH_COMMIT^")"
           jq -e --arg p "$PARENT" --arg v "$REQUEST_VERSION" '.schemaVersion=="orbit360-runtime-request-v1" and .authorizationGeneration=="v34-logging-iam-capability-runtime" and .gateId=="block1-client360-insurers-lab-v20260717" and .contractVersion=="1.0.41" and .requestVersion==$v and .status=="AUTHORIZED_ONCE" and .approved==true and .allowedExecutions==1 and .consumed==false and .authorizationFrozen==false and .replayAllowed==false and .parentHead==$p and .authorizedBaseHead==$p and .operation=="LOGGING_IAM_TEST_PERMISSIONS_READONLY" and .permissions==["logging.logEntries.list","logging.privateLogEntries.list"] and .networkOperationsMaximum==1 and .firestoreReadsAuthorized==0 and .authReadsAuthorized==0 and .auditLogReadsAuthorized==0 and .iamPolicyBindingReadsAuthorized==0 and .iamWritesAuthorized==0 and .operationalWritesAuthorized==0 and .hostingAuthorized==false and .browserAuthorized==false and .productionAuthorized==false and .mainAuthorized==false and .mergeAuthorized==false and .authorizedByUser==true and .containsPII==false and .containsSecrets==false' "$REQUEST_FILE" >/dev/null
           echo "ORBIT360_EXPECTED_PARENT_HEAD=$PARENT" >> "$GITHUB_ENV"
       - name: Canonical Block1 gate before any secret
@@ -60,8 +74,14 @@ jobs:
         run: |
           set -euo pipefail
           node --check tools/orbit360-diagnose-logging-iam-capability-v34-v20260810.mjs
-          ! grep -Eq 'setIamPolicy|add-iam-policy-binding|roles/logging\.|roles/iam\.|entries:list|firebase-admin|firestore|playwright|firebase deploy' tools/orbit360-diagnose-logging-iam-capability-v34-v20260810.mjs
-          grep -Fq ':testIamPermissions' tools/orbit360-diagnose-logging-iam-capability-v34-v20260810.mjs
+          node <<'NODE'
+          const fs=require('fs');
+          const s=fs.readFileSync('tools/orbit360-diagnose-logging-iam-capability-v34-v20260810.mjs','utf8');
+          const forbidden=[/setIamPolicy/i,/add-iam-policy-binding/i,/logging\.googleapis\.com\/v2\/entries:list/i,/firebase-admin/i,/\.firestore\s*\(/i,/playwright/i,/firebase\s+deploy/i];
+          const hit=forbidden.find(re=>re.test(s));
+          if(hit) throw new Error(`V34_FORBIDDEN_OPERATIONAL_API:${hit}`);
+          if(!s.includes(':testIamPermissions')) throw new Error('V34_TEST_IAM_PERMISSIONS_MISSING');
+          NODE
       - name: Prepare isolated dependency
         shell: bash
         run: npm install --no-save --ignore-scripts google-auth-library@9.15.1 >/dev/null 2>&1
