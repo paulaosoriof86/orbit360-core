@@ -9,15 +9,15 @@
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
   "projectId": "ays-orbit-360-lab",
-  "status": "RUNTIME_PREP_SOURCE_ONLY",
-  "classification": "ENVIRONMENT_IAM_EXECUTOR_DIAGNOSTIC_SOURCE_ONLY",
-  "currentPhase": "SOURCE_ONLY_IAM_EXECUTOR_DIAGNOSTIC_V36",
-  "stopRetryActive": false,
+  "status": "RUNTIME_CONSUMED_STOP_RETRY",
+  "classification": "ENVIRONMENT_FAILURE_IAM_POLICY_ANALYZER_READ_FORBIDDEN",
+  "currentPhase": "BLOCK1_IAM_EXECUTOR_DIAGNOSTIC_READONLY_V36_CLOSED",
+  "stopRetryActive": true,
   "authorizationReserved": false,
-  "authorizationFrozen": false,
+  "authorizationFrozen": true,
   "allowedExecutions": 0,
   "activeRequest": false,
-  "requestConsumed": false,
+  "requestConsumed": true,
   "replayAllowed": false,
   "executionAuthorized": false,
   "runtimeReadContract": {
@@ -42,8 +42,26 @@
     "rawPrincipalsPersisted": false,
     "principalFingerprintsOnly": true,
     "credentialsPersisted": false,
-    "freshExplicitAuthorizationRequired": true,
     "runtimeAuthorized": false
+  },
+  "runtimeClosure": {
+    "runId": "31441839536",
+    "attempt": 1,
+    "decision": "STOP_RETRY",
+    "rootCause": "IAM_POLICY_ANALYZER_READ_FORBIDDEN",
+    "ancestryReadsObserved": 1,
+    "analysisScopeClass": "PROJECT",
+    "policyAnalyzerQueriesObserved": 0,
+    "policyTroubleshooterQueriesObserved": 0,
+    "candidateCountObserved": 0,
+    "effectiveCandidateCountObserved": 0,
+    "iamWritesObserved": 0,
+    "firestoreReadsObserved": 0,
+    "authReadsObserved": 0,
+    "loggingEntryReadsObserved": 0,
+    "operationalWritesObserved": 0,
+    "artifactId": "9083117566",
+    "artifactDigest": "sha256:d64adeb2a982957545fd60d835fc0298bde88d1931f071eed1640a71d3b3a162"
   },
   "protectedState": {
     "productFrozen": true,
@@ -66,5 +84,5 @@
   },
   "containsPII": false,
   "containsSecrets": false,
-  "nextAction": "VALIDATE_V36_SOURCE_THEN_EXECUTE_SINGLE_AUTHORIZED_READONLY_REQUEST"
+  "nextAction": "FRESH_EXPLICIT_AUTHORIZATION_REQUIRED_FOR_ANY_ALTERNATE_IAM_VISIBILITY_MECHANISM_OR_ADMIN_EXECUTOR"
 }
