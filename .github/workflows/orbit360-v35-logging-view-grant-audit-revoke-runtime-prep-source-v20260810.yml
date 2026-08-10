@@ -1,0 +1,94 @@
+name: Orbit360 v35 temporary Log View runtime preparation source-only
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/workflows/orbit360-v35-logging-view-grant-audit-revoke-runtime-prep-source-v20260810.yml'
+      - '.github/workflows/orbit360-v35-logging-view-grant-audit-revoke-runtime-v20260810.yml'
+      - 'tools/orbit360-validator-lifecycle-block1-logging-view-grant-audit-revoke-runtime-v35-v20260810.json'
+      - 'tools/orbit360-validar-gate-contracts-engine-block1-logging-view-grant-audit-revoke-runtime-v35-v20260810.mjs'
+      - 'tools/fixtures/orbit360-v35-logging-view-grant-audit-revoke-request-fixture-v20260810.json'
+      - 'tools/orbit360-execute-logging-view-grant-audit-revoke-v35-v20260810.mjs'
+permissions:
+  contents: read
+  statuses: write
+concurrency:
+  group: orbit360-v35-log-view-runtime-prep-source-v20260810
+  cancel-in-progress: false
+env:
+  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+  PREP_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/v35-runtime-prep-source-sanitized-v20260810.json
+jobs:
+  source:
+    name: v35 · grant audit revoke runtime · source-only
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Canonical Block1 source gate remains frozen
+        shell: bash
+        run: |
+          set -euo pipefail
+          ORBIT360_GATE_PROFILE=v33-two-client-cloud-audit ORBIT360_EXPECTED_REQUEST_VERSION=NONE_PENDING_FRESH_AUTHORIZATION node tools/orbit360-validar-gate-contracts-v20260717.mjs block1-client360-insurers-lab-v20260717
+          jq -e '.status=="PASS_GATE_CONTRACT_SOURCE_V33" and .failed==0 and .requestState=="FROZEN_HISTORICAL_CONSUMED" and .executionAuthorized==false and .secretAccessAuthorized==false and .writesAuthorized==0 and .secretAccess==false and .runtimeExecuted==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+      - name: Validate runtime lifecycle and inert GO fixture
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-validar-gate-contracts-engine-block1-logging-view-grant-audit-revoke-runtime-v35-v20260810.mjs
+          node --check tools/orbit360-execute-logging-view-grant-audit-revoke-v35-v20260810.mjs
+          node -e "JSON.parse(require('fs').readFileSync('tools/orbit360-validator-lifecycle-block1-logging-view-grant-audit-revoke-runtime-v35-v20260810.json','utf8'));JSON.parse(require('fs').readFileSync('tools/fixtures/orbit360-v35-logging-view-grant-audit-revoke-request-fixture-v20260810.json','utf8'))"
+          ORBIT360_REQUEST_FILE=tools/fixtures/orbit360-v35-logging-view-grant-audit-revoke-request-fixture-v20260810.json \
+          ORBIT360_EXPECTED_REQUEST_VERSION=FIXTURE_V35_LOGGING_VIEW_GRANT_AUDIT_REVOKE \
+          ORBIT360_EXPECTED_PARENT_HEAD=fixture-parent-head-v35 \
+            node tools/orbit360-validar-gate-contracts-engine-block1-logging-view-grant-audit-revoke-runtime-v35-v20260810.mjs
+          jq -e '.status=="GO_GATE_CONTRACT_RUNTIME_V35" and .failed==0 and .executionAuthorized==true and .secretAccessAuthorized==true and .iamPolicyReadsMaximum==4 and .iamWritesMaximum==2 and .grantWritesMaximum==1 and .revokeWritesMaximum==1 and .loggingReadPagesMaximum==10 and .firestoreReadAuthorized==false and .authReadAuthorized==false and .operationalWritesAuthorized==0 and .secretAccess==false and .iamPolicyRead==false and .iamWrite==false and .loggingRead==false and .runtimeExecuted==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+      - name: Execute worker source-only fixtures
+        shell: bash
+        run: |
+          set -euo pipefail
+          ORBIT360_SOURCE_ONLY=1 ORBIT360_V35_RUNTIME_EVIDENCE="$EVIDENCE_DIR/v35-runtime-worker-source.json" node tools/orbit360-execute-logging-view-grant-audit-revoke-v35-v20260810.mjs
+          jq -e '.decision=="SOURCE_ONLY_RUNTIME_READY" and .fixtureGrantAdded==true and .fixtureBaselineRestored==true and .networkAccess==false and .secretAccess==false and .iamPolicyReads==0 and .iamWrites==0 and .loggingReadPages==0 and .firestoreReads==0 and .authReads==0 and .operationalWrites==0 and .ok==true' "$EVIDENCE_DIR/v35-runtime-worker-source.json" >/dev/null
+      - name: Validate runtime workflow hard boundaries
+        shell: bash
+        run: |
+          set -euo pipefail
+          R=.github/workflows/orbit360-v35-logging-view-grant-audit-revoke-runtime-v20260810.yml
+          grep -Fq 'Canonical Block1 source gate before secrets' "$R"
+          grep -Fq 'v35 GO gate before secret materialization' "$R"
+          grep -Fq '.iamWritesMaximum==2' "$R"
+          grep -Fq '.grantWritesMaximum==1' "$R"
+          grep -Fq '.revokeWritesMaximum==1' "$R"
+          grep -Fq '.firestoreReads==0' "$R"
+          grep -Fq '.authReads==0' "$R"
+          test "$(grep -o 'await setPolicy(tok' tools/orbit360-execute-logging-view-grant-audit-revoke-v35-v20260810.mjs | wc -l)" -eq 2
+          ! grep -Fq 'firebase-admin' tools/orbit360-execute-logging-view-grant-audit-revoke-v35-v20260810.mjs
+      - name: Seal preparation evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          jq -n --arg sha "$GITHUB_SHA" '{schemaVersion:"orbit360-v35-runtime-prep-source-v1",status:"PASS_V35_RUNTIME_PREP_SOURCE",ok:true,head:$sha,requestFixtureOnly:true,runtimeRequestPresent:false,runtimeAuthorized:false,secretsRead:false,networkAccess:false,iamPolicyRead:false,iamWrites:0,loggingRead:false,firestoreRead:false,authRead:false,operationalWrites:0,runtimeExecuted:false,browserExecuted:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false}' > "$PREP_EVIDENCE"
+      - name: Publish status
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/v35-runtime-prep-source-sanitized-v20260810.json
+        with:
+          script: |
+            const fs=require('fs');let state='failure',description='v35 grant-audit-revoke runtime prep blocked';
+            try{const p=JSON.parse(fs.readFileSync(process.env.EVIDENCE,'utf8'));if(p.ok===true&&p.status==='PASS_V35_RUNTIME_PREP_SOURCE'&&p.iamWrites===0&&p.networkAccess===false){state='success';description='v35 grant-audit-revoke runtime SOURCE PASS; zero capabilities';}}catch(e){}
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/v35-runtime-prep-source',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
+      - name: Upload sanitized preparation evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-v35-runtime-prep-source-${{ github.run_id }}
+          path: orbit360-platform/runtime-gate-crm-v20260716/v35-runtime-prep-source-sanitized-v20260810.json
+          if-no-files-found: warn
+          retention-days: 30
