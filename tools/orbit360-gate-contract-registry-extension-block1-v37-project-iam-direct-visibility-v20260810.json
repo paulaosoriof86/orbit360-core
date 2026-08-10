@@ -3,7 +3,7 @@
   "gateId": "block1-client360-insurers-lab-v20260717",
   "contractVersion": "1.0.41",
   "profile": "v37-project-iam-direct-visibility-readonly",
-  "classification": "ENVIRONMENT_PROJECT_IAM_DIRECT_VISIBILITY_SOURCE_READY",
+  "classification": "ENVIRONMENT_PROJECT_IAM_DIRECT_VISIBILITY_RUNTIME_PREPARED",
   "owner": "DATA_MIGRATION_TRACEABILITY_CLIENT_CREATION_PROVENANCE",
   "predecessorRegistry": "tools/orbit360-gate-contract-registry-extension-block1-v36-iam-executor-diagnostic-v20260810.json",
   "predecessorRuntimeRootCauseRequired": "IAM_POLICY_ANALYZER_READ_FORBIDDEN",
@@ -61,12 +61,20 @@
     "deploy": false,
     "production": false
   },
-  "runtimePrepared": false,
+  "sourceInitialRunId": "31442662309",
+  "sourceInitialDecision": "STOP_SOURCE_VALIDATOR",
+  "sourceInitialClassification": "VALIDATOR_STALE_PIPELINE_MECHANISM_FAILURE",
+  "sourceInitialRootCause": "NODE_HEREDOC_REFERENCED_UNEXPORTED_BASH_RUNTIME_PATH_VARIABLE",
+  "sourceRootfixCommit": "8909bf63488cc059cdf650a3c172bafda9f9a3e8",
+  "sourceRunId": "31442724397",
+  "sourceArtifactId": "9083422794",
+  "sourceArtifactDigest": "sha256:6958f351896657e70418a28a27461ba5ac319b0deee0ded19e7a4f51cbfe6fb7",
+  "runtimePrepared": true,
   "runtimeAuthorized": false,
   "runtimeRequestPresent": false,
   "runtimeCompleted": false,
   "freshExplicitAuthorizationPresentInConversation": true,
   "containsPII": false,
   "containsSecrets": false,
-  "nextAction": "SOURCE_VALIDATE_THEN_SINGLE_V37_READONLY_RUNTIME"
+  "nextAction": "REVALIDATE_SOURCE_THEN_CREATE_ONE_PARENT_BOUND_V37_REQUEST_AND_EXECUTE_ONCE"
 }
