@@ -1,9 +1,13 @@
-name: Orbit 360 · Receipts/portfolio static gate 9.1.0
+name: Orbit 360 · Receipts/portfolio static closure 9.1.0
 on:
   push:
     branches: [ays/backend-tenant-lab-v99-20260703]
     paths:
       - '.github/workflows/orbit360-receipts-portfolio-static-gate-v910-20260730.yml'
+      - 'tools/orbit360-validar-gate-contracts-engine-receipts-portfolio-static-v910-20260730.mjs'
+      - 'tools/orbit360-test-receipts-portfolio-controlled-write-static-v910-20260730.mjs'
+      - 'tools/orbit360-validator-lifecycle-contract-receipts-portfolio-static-v910-20260730.json'
+      - 'orbit360-platform/docs/CIERRE-WRITE-RECIBOS-CARTERA-AYS-V910-20260730.md'
 permissions:
   contents: read
   statuses: write
@@ -12,7 +16,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   static:
-    name: Receipts/portfolio 9.1.0 · canonical static gate
+    name: Receipts/portfolio 9.1.0 · closed reusable gate
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
@@ -22,20 +26,30 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Gate canónico 9.1.0
+      - name: Gate canónico 9.1.0 sin capacidades
         shell: bash
         run: |
           set -euo pipefail
+          node --check tools/orbit360-validar-gate-contracts-engine-receipts-portfolio-static-v910-20260730.mjs
           node tools/orbit360-validar-gate-contracts-v20260717.mjs block9-receipts-portfolio-static-v20260730
-          jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="9.1.0" and .failed==0 and .receiptsExpected==1293 and .portfolioPending==673 and .historicalExigible==32 and .historicalAmountGTQ==13443.48 and .operationalWrites==0 and .productionTouched==false' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json >/dev/null
-      - name: Static write contract
+          jq -e '.status=="GO_GATE_CONTRACT" and .classification=="RECEIPTS_PORTFOLIO_WRITE_CLOSED_REUSABLE" and .contractVersion=="9.1.0" and .writeClosed==true and .requestState=="HISTORICAL_CONSUMED_EVIDENCE" and .receiptsExpected==1293 and .portfolioPending==673 and .historicalExigible==32 and .operationalWrites==0 and .secretAccess==false and .firestoreRead==false and .runtimeExecuted==false and .deployExecuted==false and .productionTouched==false' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json >/dev/null
+      - name: Test de cierre estático
         shell: bash
         run: |
           set -euo pipefail
-          node --check tools/orbit360-receipts-portfolio-canonical-apply-v910-20260730.mjs
           node --check tools/orbit360-test-receipts-portfolio-controlled-write-static-v910-20260730.mjs
           node tools/orbit360-test-receipts-portfolio-controlled-write-static-v910-20260730.mjs > /tmp/receipts-v910-static.json
-          jq -e '.status=="STATIC_WRITE_READY" and .contractVersion=="9.1.0" and .failed==0 and .operationalWrites==0 and .productionTouched==false' /tmp/receipts-v910-static.json >/dev/null
+          jq -e '.status=="STATIC_WRITE_CLOSED" and .contractVersion=="9.1.0" and .failed==0 and .requestState=="HISTORICAL_CONSUMED_EVIDENCE" and .operationalWrites==0 and .productionTouched==false' /tmp/receipts-v910-static.json >/dev/null
+      - name: Publicar estado
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+        with:
+          script: |
+            const fs=require('fs');let state='failure',description='Receipts/portfolio 9.1.0 closure blocked';
+            try{const p=JSON.parse(fs.readFileSync(process.env.EVIDENCE,'utf8'));if(p.status==='GO_GATE_CONTRACT'&&p.classification==='RECEIPTS_PORTFOLIO_WRITE_CLOSED_REUSABLE'&&p.failed===0){state='success';description='Receipts/portfolio 9.1.0 WRITE_PASS closed: 1293 + 673';}}catch(e){}
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/receipts-portfolio-static-v910',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
       - name: Subir evidencia sanitizada
         if: always()
         uses: actions/upload-artifact@v4
@@ -44,13 +58,3 @@ jobs:
           path: orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
           if-no-files-found: warn
           retention-days: 30
-      - name: Publicar estado
-        if: always()
-        uses: actions/github-script@v7
-        env:
-          EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
-        with:
-          script: |
-            const fs=require('fs');let state='failure',description='Receipts/portfolio static 9.1.0 failed';
-            try{const p=JSON.parse(fs.readFileSync(process.env.EVIDENCE,'utf8'));if(p.status==='GO_GATE_CONTRACT'&&p.contractVersion==='9.1.0'&&p.failed===0&&p.receiptsExpected===1293&&p.portfolioPending===673&&p.historicalExigible===32&&p.operationalWrites===0){state='success';description='Receipts/portfolio STATIC 9.1.0: 1293 + 673; zero writes';}else if(p.classification){description=`Receipts/portfolio blocked: ${p.classification}`;}}catch(e){}
-            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/receipts-portfolio-static-v910',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
