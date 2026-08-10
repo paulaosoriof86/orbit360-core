@@ -1,76 +1,23 @@
-name: Orbit 360 · Policies static qualification 7.0.1
+name: Orbit 360 · Policies static qualification 7.0.1 · historical
 on:
-  push:
-    branches: [ays/backend-tenant-lab-v99-20260703]
-    paths:
-      - '.github/workflows/orbit360-policies-static-qualification-v20260730.yml'
-      - 'tools/orbit360-validator-lifecycle-contract-policies-static-v20260730.json'
-      - 'tools/orbit360-validar-gate-contracts-engine-policies-static-v20260730.mjs'
-      - 'tools/orbit360-validar-gate-contracts-v20260717.mjs'
-      - 'orbit360-platform/core/importa-polizas-p0.js'
-      - 'orbit360-platform/core/importa-polizas-p0-wire.js'
-      - 'orbit360-platform/core/importa-write-p0.js'
-      - 'orbit360-platform/core/policy-receipts-engine.js'
-      - 'orbit360-platform/core/policy-receipts-v1199-refinements.js'
-      - 'orbit360-platform/core/access-ceilings-v1199.js'
-      - 'orbit360-platform/modules/polizas.js'
-      - 'orbit360-platform/modules/importar.js'
-      - 'orbit360-platform/docs/DRYRUN-POLIZAS-FUENTES-COMPLEMENTARIAS-AYS-20260730.md'
-      - 'orbit360-platform/tools/orbit360-test-policy-receipts-v1199.mjs'
-      - 'orbit360-platform/tools/orbit360-test-policy-receipts-v1199b.mjs'
-      - 'tools/orbit360-test-importa-polizas-p0.mjs'
-      - 'tools/orbit360-test-importa-polizas-p0-wire.mjs'
-      - 'tools/orbit360-test-importa-polizas-legacy-defaults-guard-v20260730.mjs'
-      - 'tools/orbit360-test-importa-polizas-vigencia-authority-v20260730.mjs'
-      - 'tools/orbit360-test-importa-write-p0.mjs'
+  workflow_dispatch:
 permissions:
   contents: read
-  statuses: write
-concurrency:
-  group: orbit360-policies-static-v20260730
-  cancel-in-progress: false
-env:
-  ORBIT360_GATE_ID: block7-policies-static-v20260730
-  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
 jobs:
-  policies_static:
-    name: Policies · canonical static qualification 7.0.1
+  historical_guard:
+    name: Policies · historical WRITE_PASS closure guard
     runs-on: ubuntu-24.04
     steps:
-      - name: Checkout SHA exacto
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
-          fetch-depth: 2
           persist-credentials: false
-      - name: Preparar Node 22
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-      - name: Ejecutar gate canónico antes de cualquier capacidad
-        id: gate
+      - name: Confirmar cierre histórico sin reabrir prewrite
         shell: bash
         run: |
           set -euo pipefail
-          node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
-          node --check tools/orbit360-validar-gate-contracts-engine-policies-static-v20260730.mjs
-          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
-          jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="7.0.1" and .executionPhase=="POLICIES_STATIC_QUALIFICATION" and .failed==0 and .m6Closed==true and .reuseM6Infrastructure==true and .rebuildTransverseInfrastructure==false and .sourceDomain=="polizas" and .sourceReprofilingRequired==false and .sourceDryRunComplete==true and .sourcePayloadRead==false and .legacyImporterAuthoritativeForPolicyDefaults==false and .vigenciaAuthoritativeForVencida==true and .sourcePaymentLikeStatusPreserved==true and .pendingClientQualityPreserved==true and .countryCurrencyFailClosed==true and .premiumComponentsSeparated==true and .advisorPolicyMutationRestricted==true and .financialHistoryCreatesPolicies==false and .firestoreDataWrites==0 and .operationalWrites==0 and .secretAccess==false and .firestoreRead==false and .runtimeExecuted==false and .browserExecuted==false and .rulesApplied==false and .deployExecuted==false and .productionTouched==false and .nextPhase=="POLICIES_WRITE_PACKAGE_STATIC_PREPARATION" and .nextWriteRequestPrepared==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
-      - name: Publicar estado
-        if: always()
-        uses: actions/github-script@v7
-        env:
-          PREFLIGHT: orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
-        with:
-          script: |
-            const fs=require('fs');let state='failure',description='Policies 7.0.1 static qualification failed';
-            try{const p=JSON.parse(fs.readFileSync(process.env.PREFLIGHT,'utf8'));if(p.status==='GO_GATE_CONTRACT'&&p.failed===0){state='success';description=`Policies ${p.contractVersion} static PASS; ready for write-package preparation`;}}catch(e){}
-            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/policies-static',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
-      - name: Subir evidencia sanitizada
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: orbit360-policies-static-${{ github.run_id }}
-          path: orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
-          if-no-files-found: error
-          retention-days: 30
+          test -f orbit360-platform/docs/CIERRE-WRITE-POLIZAS-AYS-20260730.md
+          grep -Fq 'Estado: `WRITE_PASS`' orbit360-platform/docs/CIERRE-WRITE-POLIZAS-AYS-20260730.md
+          grep -Fq 'polizas: 1373' orbit360-platform/docs/CIERRE-WRITE-POLIZAS-AYS-20260730.md
+          grep -Fq 'La autorización macro' orbit360-platform/docs/CIERRE-WRITE-POLIZAS-AYS-20260730.md
+          echo 'HISTORICAL_POLICIES_STATIC_RETIRED_AFTER_WRITE_PASS'
