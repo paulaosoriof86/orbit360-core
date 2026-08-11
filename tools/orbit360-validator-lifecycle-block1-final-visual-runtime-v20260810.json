@@ -4,7 +4,7 @@
   "gateId": "block1-client360-insurers-lab-v20260717",
   "gateContractVersion": "1.0.41",
   "currentPhase": "BLOCK1_FINAL_VISUAL_MATRIX_AFTER_RELEASE_UNIVERSE",
-  "status": "SOURCE_CANDIDATE_REQUIRES_FAIL_CLOSED_PASS",
+  "status": "SOURCE_PASS_AWAITING_FRESH_EXCLUSIVE_REQUEST",
   "executionProfile": {
     "phase": "BLOCK1_FINAL_VISUAL_MATRIX_AFTER_RELEASE_UNIVERSE",
     "capabilities": {
@@ -88,7 +88,13 @@
     "replayAllowed": false
   },
   "sourceRootfix": {
-    "status": "SOURCE_CANDIDATE_REQUIRES_FAIL_CLOSED_PASS",
+    "status": "PASS_BLOCK1_FINAL_NATIVE_VISUAL_SOURCE_V7",
+    "sourceRunId": 31533626053,
+    "sourceJobId": 93919360458,
+    "sourceHead": "77cc8b51887130d0483af56d5d76fab49145f793",
+    "sourceArtifactId": 9117858627,
+    "sourceArtifactDigestSha256": "6a72da6adeaf691537b5375b3c222ff75db622b87608d61b35585043501255b0",
+    "sourceStatusFailClosed": true,
     "firebaseSdkWithoutDefaultAppMustBlock": true,
     "firebaseDefaultAppAuthMustPass": true,
     "routerLateReadyMustRecover": true,
