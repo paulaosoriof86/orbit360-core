@@ -1,0 +1,49 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-v1",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
+  "gateId": "block1-client360-insurers-lab-v20260717",
+  "gateContractVersion": "1.0.41",
+  "currentPhase": "BLOCK1_CONTROLLED_PROVENANCE_EXCEPTION_IMPACT_READONLY",
+  "status": "AUTHORIZED_ONCE_PENDING_EXCLUSIVE_REQUEST",
+  "executionProfile": {
+    "phase": "BLOCK1_CONTROLLED_PROVENANCE_EXCEPTION_IMPACT_READONLY",
+    "capabilities": {
+      "secrets": true,
+      "firestoreRead": true,
+      "writes": false,
+      "runtime": true,
+      "browser": false,
+      "deploy": false,
+      "functionsDeploy": false,
+      "rulesDeploy": false,
+      "production": false
+    }
+  },
+  "operation": "CONTROLLED_PROVENANCE_EXCEPTION_IMPACT_READONLY",
+  "policyFile": "tools/orbit360-block1-controlled-provenance-exception-policy-v20260810.json",
+  "targetCount": 2,
+  "maximumLogicalFirestoreOperations": 6,
+  "allowedCollections": [
+    "clientes",
+    "polizas",
+    "vehiculos",
+    "recibosEsperados",
+    "carteraPrimas",
+    "cobros"
+  ],
+  "writesAuthorized": 0,
+  "authReadsAuthorized": 0,
+  "loggingReadsAuthorized": 0,
+  "iamReadsAuthorized": 0,
+  "hostingAuthorized": false,
+  "browserAuthorized": false,
+  "deployAuthorized": false,
+  "productionAuthorized": false,
+  "reimportAuthorized": false,
+  "mainAuthorized": false,
+  "mergeAuthorized": false,
+  "freshRequestRequired": true,
+  "replayAllowed": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
