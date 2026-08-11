@@ -11,23 +11,14 @@ Estado porcentual congelado: `72%` · no se gana avance hasta `PASS_VISUAL_POST_
 ## Bloque y carriles
 
 - A · frontend/UX: producto congelado; no se corrigió UI ni módulos funcionales.
-- B · control-plane/harness: activo; rootfix source-only de readiness Firebase.
+- B · control-plane/harness: rootfix source-only de readiness Firebase cerrado PASS.
 - C · datos/migración: intacto; cero reimportación y cero escrituras operacionales.
 
 ## Evidencia del runtime detenido
 
-El run `31512995513` pasó antes de secretos/request runtime:
+El run `31512995513` pasó request fresco/parent-bound, gate canónico, source PASS fail-closed previo, `GO_GATE_CONTRACT`, safety backup, restore del baseline `visual-matrix-corrected-backup-31135532118`, exactamente un deploy de Hosting LAB y precheck `INICIO_READY_PASS`.
 
-1. request fresco, exclusivo, parent-bound e inmutable;
-2. gate canónico source;
-3. source PASS fail-closed previo;
-4. `GO_GATE_CONTRACT`;
-5. safety backup;
-6. restore del baseline `visual-matrix-corrected-backup-31135532118`;
-7. exactamente un deploy de Hosting LAB;
-8. precheck `INICIO_READY_PASS`.
-
-La matriz se detuvo durante Dirección antes de ejecutar pruebas funcionales de rol. La secuencia observable alcanzó `DIRECCION_BOOTSTRAP_FIREBASE_SDK_PASS` y posteriormente el intento de `firebase.auth().signInWithCustomToken(...)` falló porque aún no existía la app Firebase `[DEFAULT]`.
+La matriz se detuvo durante Dirección antes de ejecutar pruebas funcionales de rol. La secuencia observable alcanzó `DIRECCION_BOOTSTRAP_FIREBASE_SDK_PASS` y posteriormente `firebase.auth().signInWithCustomToken(...)` falló porque aún no existía la app Firebase `[DEFAULT]`.
 
 Cierre seguro del run:
 
@@ -42,11 +33,11 @@ Cierre seguro del run:
 
 ## Causa raíz
 
-El checkpoint anterior trataba dos estados diferentes como si fueran equivalentes:
+El checkpoint anterior trataba dos estados distintos como equivalentes:
 
 `firebase.auth` disponible → Firebase lista para autenticación.
 
-Eso es falso. El SDK compat puede estar cargado y exponer `firebase.auth` mientras `firebase.apps.length === 0` y la app `[DEFAULT]` aún no está inicializada.
+Eso es falso. El SDK compat puede exponer `firebase.auth` mientras `firebase.apps.length === 0` y la app `[DEFAULT]` todavía no está inicializada.
 
 Causa raíz canónica:
 
@@ -57,9 +48,13 @@ Familias asociadas:
 - `AUTH_SIGNIN_CALLED_BEFORE_FIREBASE_DEFAULT_APP_INITIALIZATION`;
 - `BOOTSTRAP_OWNER_MISSING_DEFAULT_APP_AND_AUTH_INSTANCE_STATE`.
 
-No existe evidencia de defecto funcional de Dirección, Operativo, Asesor, Cliente 360 o Aseguradoras en este run: la matriz no llegó a esas pruebas.
+No existe evidencia de defecto funcional de Dirección, Operativo, Asesor, Cliente 360 o Aseguradoras en ese run: la matriz no alcanzó esas pruebas.
 
-## Rootfix source-only
+## Rootfix source-only aplicado
+
+Commit atómico:
+
+`dc01efd2351849fedf54c7be31732da8a5067273`
 
 Owner de bootstrap actualizado:
 
@@ -81,21 +76,55 @@ Secuencia requerida antes del custom-token sign-in:
 6. `firebase.auth().app.name === '[DEFAULT]'`;
 7. solo entonces custom-token sign-in.
 
-La espera de app `[DEFAULT]` tiene checkpoint independiente y diagnóstico sanitizado de recursos fallidos. El contexto Playwright conserva cierre fail-safe si cualquier etapa falla.
+La espera de app `[DEFAULT]` tiene checkpoint independiente y diagnóstico sanitizado. El contexto Playwright conserva cierre fail-safe si cualquier etapa falla.
 
 ## Fixture anti-bucle
 
-El fixture debe demostrar simultáneamente:
+El fixture demuestra simultáneamente:
 
 - `sdkLoaded=true`, `appsCount=0` → readiness `false` y login bloqueado;
 - `sdkLoaded=true`, `appsCount=1`, `defaultAppName='[DEFAULT]'`, `authAppName='[DEFAULT]'` → readiness `true`;
-- el rootfix de `DOMContentLoaded`, rendimiento, detalle Cliente 360 y menú móvil continúa preservado.
+- los rootfix previos de `DOMContentLoaded`, rendimiento, detalle Cliente 360 y menú móvil continúan preservados.
 
-Ninguna prueba source-only usa secretos, Firebase LAB, browser runtime, Hosting o writes.
+## Source gate fail-closed · PASS
+
+Ejecución única del paquete atómico:
+
+- run: `31517185967`;
+- job: `93865157095`;
+- head: `dc01efd2351849fedf54c7be31732da8a5067273`;
+- artifact: `9111534320`;
+- artifact digest: `sha256:d8f9a05627ecb6f2dd1defb80b18ba9a09ca6b594dcda7b4f9631bf1fc6544b5`;
+- resultado: `PASS_BLOCK1_FINAL_NATIVE_VISUAL_SOURCE`;
+- todos los pasos 1–12: `success`, incluidos validación semántica, preflight offline, boundaries del runtime futuro, `Seal` y publicador fail-closed.
+
+Contrato v6 demostrado:
+
+- `bootstrapSyntheticPass:true`;
+- `firebaseSdkWithoutDefaultAppBlocked:true`;
+- `firebaseDefaultAppAuthReady:true`;
+- `canonicalBootstrapSyntheticHandoff:true`;
+- `sourceStatusFailClosed:true`;
+- `runtimeAuthorized:false`;
+- `secretsRead:false`;
+- `firestoreReads:0`;
+- `firestoreWrites:0`;
+- `authWrites:0`;
+- `operationalWrites:0`;
+- `browserExecuted:false`;
+- `hostingTouched:false`;
+- `deployExecuted:false`;
+- `productionTouched:false`.
+
+La evidencia v6 fue persistida posteriormente en repo sin disparar otro source gate.
+
+## Estado anti-bucle
+
+La autorización del run `31512995513` quedó consumida. No hubo segundo request, rerun ni segundo deploy. El rootfix source-only cerró PASS en su primer source run; no hubo iteración adicional de esta etapa.
 
 ## Contrato futuro runtime
 
-No existe request nuevo en este cierre. El próximo request, únicamente después de source PASS fail-closed, será:
+No existe request nuevo todavía. El próximo request, solo tras autorización humana fresca, será:
 
 `.github/orbit360-requests/block1-final-visual-firebase-default-app-ready-v20260811-authorization.json`
 
@@ -107,22 +136,19 @@ Mensaje exacto futuro:
 
 `runtime: authorize Block1 firebase-default-app-ready visual matrix`
 
-El workflow futuro debe exigir antes de secretos:
+El workflow futuro exige antes de secretos:
 
+- source PASS v6 fail-closed;
 - `bootstrapSyntheticPass:true`;
 - `firebaseSdkWithoutDefaultAppBlocked:true`;
 - `firebaseDefaultAppAuthReady:true`;
-- owners Firebase anteriores;
+- owners SDK/app/Auth anteriores;
+- request fresco, exclusivo, parent-bound e inmutable;
 - `GO_GATE_CONTRACT`;
-- request fresco y one-shot.
+- máximo un deploy Hosting LAB;
+- cero escrituras y snapshot final idéntico.
 
 No se reutiliza el request del run `31512995513`.
-
-## Anti-bucle
-
-La autorización del run `31512995513` quedó consumida. Ante su STOP no se generó segundo request, rerun ni segundo deploy. El trabajo posterior es un rootfix source-only basado en causa raíz demostrada, no un reintento del runtime.
-
-Si el source gate de este rootfix falla dos veces en la misma etapa/código, se aplica `STOP_RETRY` y no se abre un tercer parche.
 
 ## Claude / reutilización
 
@@ -147,4 +173,6 @@ No enviar datos reales, secretos, credenciales, IDs de usuarios ni backend prote
 
 ## Siguiente acción exacta
 
-Ejecutar un único source gate fail-closed del paquete atómico. Solo si obtiene PASS se persiste la evidencia v6 y se solicita autorización humana fresca para un único runtime. Hasta entonces `PASS_VISUAL_POST_AUTH=NO` y el avance global permanece en `72%`.
+Estado: `SOURCE_PASS_AWAITING_FRESH_EXCLUSIVE_REQUEST`.
+
+Solicitar autorización humana fresca para crear exactamente un request nuevo y ejecutar una sola matriz runtime Firebase default-app-ready. Hasta `PASS_VISUAL_POST_AUTH`, el avance global permanece en `72%`; únicamente ese PASS puede moverlo a `80%`.
