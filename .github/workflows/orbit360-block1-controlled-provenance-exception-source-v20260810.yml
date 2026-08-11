@@ -10,11 +10,22 @@ on:
       - 'tools/orbit360-block1-controlled-provenance-exception-impact-readonly-v20260810.mjs'
       - 'tools/fixtures/orbit360-block1-controlled-provenance-exception-request-fixture-v20260810.json'
       - 'orbit360-platform/docs/DECISION-RELEASE-EXCEPCION-CONTROLADA-2-CLIENTES-20260810.md'
+  pull_request:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/workflows/orbit360-block1-controlled-provenance-exception-source-v20260810.yml'
+      - 'tools/orbit360-block1-controlled-provenance-exception-policy-v20260810.json'
+      - 'tools/orbit360-validator-lifecycle-block1-controlled-provenance-exception-runtime-v20260810.json'
+      - 'tools/orbit360-validar-gate-contracts-engine-block1-controlled-provenance-exception-v20260810.mjs'
+      - 'tools/orbit360-block1-controlled-provenance-exception-impact-readonly-v20260810.mjs'
+      - 'tools/fixtures/orbit360-block1-controlled-provenance-exception-request-fixture-v20260810.json'
+      - 'orbit360-platform/docs/DECISION-RELEASE-EXCEPCION-CONTROLADA-2-CLIENTES-20260810.md'
+      - 'orbit360-platform/docs/TRANSPORTE-SOURCE-EXCEPCION-CONTROLADA-20260810.md'
 permissions:
   contents: read
   statuses: write
 concurrency:
-  group: orbit360-block1-controlled-provenance-exception-source-v20260810
+  group: orbit360-block1-controlled-provenance-exception-source-v20260810-${{ github.event.pull_request.number || github.sha }}
   cancel-in-progress: false
 env:
   EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
