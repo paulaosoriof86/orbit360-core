@@ -3,24 +3,23 @@
   "gateId": "block1-client360-insurers-lab-v20260717",
   "contractVersion": "1.0.41",
   "operation": "BLOCK1_FINAL_VISUAL_MATRIX_AFTER_RELEASE_UNIVERSE",
-  "runId": 31447187977,
-  "jobId": 93643821604,
-  "artifactId": 9085126135,
-  "artifactDigestSha256": "13869b3b56294aed3e9af9142cfcc7595ef98ef80c3e864ce2df65a083cf8e71",
-  "decision": "STOP_RETRY",
-  "classification": "PIPELINE_MECHANISM_FAILURE",
-  "checkpoint": "ROLLBACK_HOSTING_LAB",
-  "rootCause": "NATIVE_MATRIX_EPHEMERAL_PASSWORD_CHANGE_OVERLAY_AND_STALE_SCOPE_TIMING_DETAIL_CHECKS",
+  "runId": "31544331170",
+  "attempt": 1,
+  "decision": "PASS_VISUAL_POST_AUTH",
+  "classification": "PASS_VISUAL_POST_AUTH",
+  "checkpoint": "MATRIX_COMPLETE",
+  "rootCause": "",
   "blockingRoutes": ["inicio", "cliente360", "aseguradoras"],
   "releaseUniverseDecision": "RELEASE_UNIVERSE_ACCEPTED_WITH_2_CLIENT_PROVENANCE_EXCEPTIONS",
   "hosting": {
+    "safetyBackupChannelClass": "ephemeral_run_scoped",
     "baselineChannel": "visual-matrix-corrected-backup-31135532118",
     "safetyBackupOutcome": "success",
     "baselineRestoreOutcome": "success",
     "deployOutcome": "success",
     "deploys": 1,
     "hostingTouched": true,
-    "rollbackOutcome": "success"
+    "rollbackOutcome": "not_required"
   },
   "precheck": {
     "outcome": "success",
@@ -33,36 +32,21 @@
     "operationalWrites": 0
   },
   "matrix": {
-    "outcome": "failure",
-    "stage": "FAIL_BLOCK1_NATIVE_VISUAL_MATRIX",
-    "classification": "PIPELINE_MECHANISM_FAILURE",
+    "outcome": "success",
+    "stage": "PASS_BLOCK1_NATIVE_VISUAL_MATRIX",
+    "classification": "PASS_VISUAL_POST_AUTH",
     "snapshotIntegrity": "VERIFIED_UNCHANGED",
-    "firestoreReads": 14,
+    "totalRoleFailures": 0,
+    "totalWarnings": 0,
+    "firestoreReads": 27,
     "firestoreWrites": 0,
     "authWrites": 0,
     "operationalWrites": 0,
-    "observedValidatorFindings": [
-      "PASSWORD_CHANGE_OVERLAY_INTERCEPTS_TEST_INTERACTIONS",
-      "SESSION_CANSEE_USED_INSTEAD_OF_ROUTER_ACCESS_OWNER",
-      "SAME_ROUTE_QUERY_OBSERVER_CAN_COMPLETE_ALREADY_READY",
-      "READY_UNDER_30S_SUMMED_PRE_NAV_REQUIRED_HYDRATION_WITH_RENDER_WAIT"
-    ],
-    "direction": {
-      "client360MeasuredCompositeMs": 34952,
-      "client360RenderObserverWaitMs": 27360,
-      "client360RenderEngineMsApprox": 13943,
-      "client360FunctionalChecksOtherwisePass": true
-    },
-    "operativo": {
-      "activeRole": "Operativo",
-      "client360MeasuredCompositeMs": 27687,
-      "insurerSessionBaseCanSee": false,
-      "insurerDirectRouteRenderedInObservedRun": true,
-      "passwordOverlayInterferenceObserved": true
-    },
-    "asesor": {
-      "incompleteBecausePasswordOverlayInterceptedBurger": true
-    }
+    "roles": [
+      {"role":"Direccion","failed":0,"warnings":0,"viewport":{"width":1440,"height":1000},"routeTimings":{"cliente360":{"requiredHydrationMs":2,"renderWaitMs":28618,"observerElapsedMs":21510.399999999994},"aseguradoras":{"requiredHydrationMs":80,"renderWaitMs":357,"observerElapsedMs":114.79999999998836}},"ok":true},
+      {"role":"Operativo","failed":0,"warnings":0,"viewport":{"width":1024,"height":768},"routeTimings":{"cliente360":{"requiredHydrationMs":2,"renderWaitMs":28719,"observerElapsedMs":21467.399999999965}},"ok":true},
+      {"role":"Asesor","failed":0,"warnings":0,"viewport":{"width":390,"height":844},"routeTimings":{"cliente360":{"requiredHydrationMs":2,"renderWaitMs":27543,"observerElapsedMs":20671.5},"aseguradoras":{"requiredHydrationMs":78,"renderWaitMs":343,"observerElapsedMs":103.90000000002328}},"ok":true}
+    ]
   },
   "firestoreWrites": 0,
   "authWrites": 0,
@@ -75,6 +59,13 @@
   "mergeExecuted": false,
   "containsPII": false,
   "containsSecrets": false,
-  "block1CloseEligible": false,
-  "ok": false
+  "block1CloseEligible": true,
+  "ok": true,
+  "jobId": 93953469389,
+  "executionHead": "f500f76fd9a1879f4e53178a6ff1dd7c314dc10e",
+  "artifactId": 9122190111,
+  "artifactDigestSha256": "8f4dd332a1f6381e7f96f7f4c87f80641992870922bfdc8c4eb5894e0140e70b",
+  "requestPath": ".github/orbit360-requests/block1-final-visual-late-ready-recovery-v20260811-authorization.json",
+  "requestConsumed": true,
+  "replayAllowed": false
 }
