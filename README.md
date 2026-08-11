@@ -8,7 +8,7 @@ Fuentes operativas vigentes:
 2. `orbit360-platform/docs/PLAN-UNICO-SALIDA-RC-AYS-LAB-CANONICA-01-20260804.md`;
 3. `orbit360-platform/docs/DECISION-RELEASE-EXCEPCION-CONTROLADA-2-CLIENTES-20260810.md`;
 4. `orbit360-platform/docs/CIERRE-BLOCK1-UNIVERSE-EXCEPCION-CONTROLADA-PASS-20260810.md`;
-5. `orbit360-platform/docs/CIERRE-SOURCEFIX-MATRIZ-VISUAL-BLOCK1-POST-UNIVERSE-20260810.md`;
+5. `orbit360-platform/docs/CIERRE-ANTIBUCLE-MATRIZ-VISUAL-BLOCK1-RUN31502845695-20260811.md`;
 6. estado vivo del PR #5 + HEAD de `ays/backend-tenant-lab-v99-20260703`;
 7. lifecycle/evidencia sanitizada más reciente del gate activo.
 
@@ -22,8 +22,9 @@ Gate único: block1-client360-insurers-lab-v20260717
 Contrato vivo: 1.0.41
 Universe release: PASS con 2 excepciones controladas de procedencia
 PASS_VISUAL_POST_AUTH: NO
-Matriz visual anterior: STOP_RETRY + rollback PASS + snapshot VERIFIED_UNCHANGED
-Matriz visual corregida source-only: PASS
+Último runtime visual: run 31502845695 · STOP_RETRY seguro
+Clasificación corregida: VALIDATOR_STALE / PIPELINE_MECHANISM_FAILURE
+Rootfix anti-bucle source-only: PASS
 Lifecycle: SOURCE_PASS_AWAITING_FRESH_EXCLUSIVE_REQUEST
 Producción/main/merge: NO autorizados
 ```
@@ -46,20 +47,12 @@ Decisión gobernante:
 
 Los dos clientes no se borran, ocultan, fusionan, reimportan ni modifican. Conservan sus relaciones. La procedencia pendiente es deuda post-go-live y no bloquea por sí sola la ruta productiva.
 
-Impacto read-only demostrado para ambos: 3 pólizas, 1 vehículo, 12 recibos esperados, 10 registros de cartera y 0 cobros. Writes 0.
-
-## IAM / auditoría externa
-
-v34–v37 permanecen cerrados e históricos. No continuar IAM/Logging para resolver los dos clientes y no autoelevar la cuenta LAB.
-
-## Matriz visual Block 1
-
-Primera ejecución final post-universe:
+## Último runtime visual · 2026-08-11
 
 ```text
-run: 31447187977
+run: 31502845695
+job: 93816961022
 resultado: STOP_RETRY
-clasificación corregida: VALIDATOR_STALE / PIPELINE_MECHANISM_FAILURE
 safety backup: PASS
 baseline restore: PASS
 Hosting LAB deploys: 1
@@ -67,43 +60,68 @@ precheck: PASS · INICIO_READY_PASS
 rollback: PASS
 snapshot: VERIFIED_UNCHANGED
 Firestore/Auth/operational writes: 0
+Functions/Rules: 0
 producción/main/merge: 0
 ```
 
-Causas del harness cerradas source-only:
+El runner reportó inicialmente `FUNCTIONAL_DEFECT`, pero la investigación de causa raíz demostró tres familias del instrumento:
 
-- modal obligatorio de primera contraseña interceptaba clicks del test;
-- matriz usaba `Orbit.session.canSee` en vez del owner real del router `Orbit.access.can`;
-- deep-links del mismo módulo podían completar `already-ready` antes del query string;
-- target de detalle se tomaba del store raw en vez de la proyección/filtrado efectivo;
-- el umbral de 30 s sumaba hidratación pre-navegación al tiempo de render.
+1. el umbral de 30 s usaba latencia del canal Node/Playwright en vez del intervalo del observer dentro del navegador;
+2. el burger móvil se probaba antes de readiness del Router/Inicio;
+3. Cliente 360 detalle se ejercía escribiendo hash directamente y sin diagnóstico del owner Router/params/DOM.
 
-Correctivo vivo:
+No se modificó producto ni datos para resolver esos hallazgos.
+
+## Rootfix anti-bucle source-only
+
+Owner de implementación:
+
+`tools/orbit360-block1-final-native-matrix-v20260811.mjs`
+
+Binding canónico:
+
+`tools/orbit360-block1-native-matrix-v23-canonical-v20260807.mjs`
+
+Fixture sintético:
+
+`tools/fixtures/orbit360-block1-visual-antibucle-fixture-v20260811.mjs`
+
+Owners vigentes:
 
 ```text
-implementation: tools/orbit360-block1-final-native-matrix-v20260810.mjs
-canonical binding: tools/orbit360-block1-native-matrix-v23-canonical-v20260807.mjs
-source run: 31448149299 · PASS
-workflow armado para request fresco: 31448254999 · PASS source
+acceso: Orbit.access.can
+scope clientes: Orbit.access.filter/withScope
+rendimiento: browserObserverElapsedMs
+detalle Cliente 360: rendered-row-user-flow-plus-route-param-dom
+menú móvil: router-ready-before-burger
+overlay primera contraseña: test-harness-remove-only
 ```
 
-Owner de acceso: `Orbit.access.can`.
-Owner de scope de clientes: `Orbit.access.filter/withScope`.
-Deep-links: hash exacto + DOM objetivo.
-Rendimiento: `renderObserverWaitMs`; hidratación previa es checkpoint separado.
-Overlay de contraseña: normalización exclusiva del harness, sin desactivar seguridad del producto.
+Evidencia source:
+
+```text
+run 31505449540: PASS owner + fixture + gate source
+run 31505520202: PASS con runtime contract futuro alineado
+runtime/secrets/Firebase/Hosting/browser/writes: 0
+```
 
 ## Siguiente acción exacta
 
-La ejecución `31447187977` está consumida y no puede reproducirse.
+El request del run `31502845695` está consumido y no se reutiliza.
 
-Se requiere una autorización humana fresca para crear un request nuevo, exclusivo, parent-bound e inmutable:
+La siguiente ejecución runtime requiere autorización humana fresca y un único request nuevo, todavía inexistente:
 
-`.github/orbit360-requests/block1-final-visual-corrected-after-sourcefix-authorization.json`
+`.github/orbit360-requests/block1-final-visual-antibucle-v20260811-authorization.json`
 
-Ese request habilitará una sola matriz corregida de Dirección desktop, Operativo tablet y Asesor móvil sobre `inicio`, `cliente360` y `aseguradoras`, con safety backup, baseline `visual-matrix-corrected-backup-31135532118`, máximo un deploy Hosting LAB, snapshot final idéntico, cero escrituras y rollback ante cualquier STOP.
+Versión:
 
-Solo con `PASS_VISUAL_POST_AUTH` se cierra Block 1 y se continúa a RC acumulativa/aceptación. Producción sigue requiriendo autorización explícita posterior.
+`20260811.block1-final-visual-antibucle`
+
+Será parent-bound, inmutable y one-shot; `GO_GATE_CONTRACT` antes de secretos; baseline `visual-matrix-corrected-backup-31135532118`; máximo un deploy Hosting LAB; Dirección desktop, Operativo tablet y Asesor móvil; snapshot final idéntico; cero escrituras; rollback ante cualquier STOP.
+
+Si reaparece la misma familia, `STOP_RETRY` inmediato: no se crea otro request ni otro parche.
+
+Solo con `PASS_VISUAL_POST_AUTH` se cierra Block 1 y se pasa al barrido focal de blockers Cobros/Pólizas.
 
 ## Cierres que no se reabren
 
