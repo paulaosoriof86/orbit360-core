@@ -40,6 +40,9 @@ export const SOURCE_CONTRACT=Object.freeze({
   bootstrapNavigationOwner:IMPLEMENTATION_SOURCE_CONTRACT.bootstrapNavigationOwner,
   bootstrapInitialWaitUntil:IMPLEMENTATION_SOURCE_CONTRACT.bootstrapInitialWaitUntil,
   bootstrapContextCloseOnFailure:IMPLEMENTATION_SOURCE_CONTRACT.bootstrapContextCloseOnFailure,
+  firebaseSdkOwner:IMPLEMENTATION_SOURCE_CONTRACT.firebaseSdkOwner,
+  firebaseDefaultAppOwner:IMPLEMENTATION_SOURCE_CONTRACT.firebaseDefaultAppOwner,
+  firebaseAuthOwner:IMPLEMENTATION_SOURCE_CONTRACT.firebaseAuthOwner,
   ephemeralSecurityOverlayTreatment:'test-harness-remove-only',
   implementationSourceContract:IMPLEMENTATION_SOURCE_CONTRACT
 });
@@ -54,6 +57,8 @@ if(process.env.ORBIT360_MATRIX_ARTIFACT_VALIDATE_ONLY==='1'){
     classification:'SOURCE_ARTIFACT_VALIDATED',
     sourceContract:SOURCE_CONTRACT,
     bootstrapSyntheticPass:bootstrapSynthetic.ok===true,
+    firebaseSdkWithoutDefaultAppBlocked:bootstrapSynthetic.sdkWithoutDefaultAppBlocked===true,
+    firebaseDefaultAppAuthReady:bootstrapSynthetic.defaultAppAuthReady===true,
     bootstrapSynthetic,
     externalRuntimeDependenciesLoaded:false,
     firebaseAccess:false,

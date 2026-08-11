@@ -23,7 +23,7 @@ env:
   SOURCE_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/block1-final-visual-source-sanitized-v20260810.json
 jobs:
   source:
-    name: Block1 · segmented bootstrap · source-only anti-loop
+    name: Block1 · Firebase default-app readiness · source-only anti-loop
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
@@ -45,7 +45,7 @@ jobs:
         run: |
           set -euo pipefail
           jq -e '.decision=="RELEASE_UNIVERSE_ACCEPTED_WITH_2_CLIENT_PROVENANCE_EXCEPTIONS" and .classification=="PASS_BLOCK1_RELEASE_UNIVERSE_WITH_CONTROLLED_EXCEPTIONS" and .observed.clientes.raw==430 and .observed.clientes.baselineContract==414 and .observed.clientes.retained26Deferred==14 and .observed.clientes.controlledProvenanceExceptions==2 and .observed.aseguradoras.effective==26 and .observed.asesores.count==7 and .releaseEligible==true and .visualEligible==true and .firestoreWrites==0 and .ok==true' orbit360-platform/runtime-gate-crm-v20260716/block1-release-universe-exception-sanitized-v20260810.json >/dev/null
-      - name: Validate exact segmented-bootstrap visual package
+      - name: Validate exact Firebase default-app readiness package
         shell: bash
         run: |
           set -euo pipefail
@@ -57,12 +57,12 @@ jobs:
           node --check tools/orbit360-visual-runtime-rootfix-browser-precheck-v20260805.mjs
           node --check tools/fixtures/orbit360-block1-visual-antibucle-fixture-v20260811.mjs
           node tools/fixtures/orbit360-block1-visual-antibucle-fixture-v20260811.mjs > "$RUNNER_TEMP/antibucle.json"
-          jq -e '.status=="PASS_BLOCK1_VISUAL_ANTIBUCLE_SYNTHETIC_V20260811" and .ok==true and .runtime==false and .firebase==false and .hosting==false and .writes==0' "$RUNNER_TEMP/antibucle.json" >/dev/null
+          jq -e '.status=="PASS_BLOCK1_VISUAL_ANTIBUCLE_SYNTHETIC_V20260811" and .firebaseSdkWithoutDefaultAppBlocked==true and .firebaseDefaultAppAuthReady==true and .ok==true and .runtime==false and .firebase==false and .hosting==false and .writes==0' "$RUNNER_TEMP/antibucle.json" >/dev/null
           ORBIT360_MATRIX_ARTIFACT_VALIDATE_ONLY=1 node tools/orbit360-block1-final-native-matrix-v20260811.mjs > "$RUNNER_TEMP/implementation-import.json"
-          jq -e '.status=="PASS_BLOCK1_FINAL_NATIVE_MATRIX_IMPORT" and .classification=="SOURCE_ARTIFACT_VALIDATED" and .bootstrapSyntheticPass==true and .sourceContract.bootstrapNavigationOwner=="document-commit-login-form-firebase-readiness-segmented" and .sourceContract.bootstrapInitialWaitUntil=="commit" and .sourceContract.bootstrapContextCloseOnFailure==true and .externalRuntimeDependenciesLoaded==false and .firebaseAccess==false and .browserExecuted==false and .hostingTouched==false and .writes==0 and .ok==true' "$RUNNER_TEMP/implementation-import.json" >/dev/null
+          jq -e '.status=="PASS_BLOCK1_FINAL_NATIVE_MATRIX_IMPORT" and .classification=="SOURCE_ARTIFACT_VALIDATED" and .bootstrapSyntheticPass==true and .firebaseSdkWithoutDefaultAppBlocked==true and .firebaseDefaultAppAuthReady==true and .sourceContract.bootstrapNavigationOwner=="document-commit-login-form-firebase-sdk-default-app-auth-readiness-segmented" and .sourceContract.bootstrapInitialWaitUntil=="commit" and .sourceContract.bootstrapContextCloseOnFailure==true and .sourceContract.firebaseSdkOwner=="firebase-compat-sdk-present" and .sourceContract.firebaseDefaultAppOwner=="firebase-default-app-initialized" and .sourceContract.firebaseAuthOwner=="firebase-default-app-auth-instance-ready" and .externalRuntimeDependenciesLoaded==false and .firebaseAccess==false and .browserExecuted==false and .hostingTouched==false and .writes==0 and .ok==true' "$RUNNER_TEMP/implementation-import.json" >/dev/null
           ORBIT360_MATRIX_ARTIFACT_VALIDATE_ONLY=1 node tools/orbit360-block1-native-matrix-v23-canonical-v20260807.mjs > "$RUNNER_TEMP/matrix-import.json"
-          jq -e '.status=="PASS_V23_NATIVE_MATRIX_IMPORT" and .classification=="SOURCE_ARTIFACT_VALIDATED" and .bootstrapSyntheticPass==true and .sourceContract.bootstrapNavigationOwner=="document-commit-login-form-firebase-readiness-segmented" and .sourceContract.bootstrapInitialWaitUntil=="commit" and .sourceContract.bootstrapContextCloseOnFailure==true and .sourceContract.gateId=="block1-client360-insurers-lab-v20260717" and .sourceContract.contractVersion=="1.0.41" and .sourceContract.blockingRoutes==["inicio","cliente360","aseguradoras"] and .sourceContract.sharedImplementationImport=="tools/orbit360-block1-final-native-matrix-v20260811.mjs" and .sourceContract.accessOwner=="Orbit.access.can" and .sourceContract.clientScopeOwner=="Orbit.access.filter/withScope" and .sourceContract.sameRouteDetailOwner=="rendered-row-user-flow-plus-route-param-dom" and .sourceContract.routePerformanceOwner=="browserObserverElapsedMs" and .sourceContract.mobileMenuOwner=="router-ready-before-burger" and .firebaseAccess==false and .browserExecuted==false and .hostingTouched==false and .writes==0 and .ok==true' "$RUNNER_TEMP/matrix-import.json" >/dev/null
-      - name: Validate segmented bootstrap semantics
+          jq -e '.status=="PASS_V23_NATIVE_MATRIX_IMPORT" and .classification=="SOURCE_ARTIFACT_VALIDATED" and .bootstrapSyntheticPass==true and .firebaseSdkWithoutDefaultAppBlocked==true and .firebaseDefaultAppAuthReady==true and .sourceContract.bootstrapNavigationOwner=="document-commit-login-form-firebase-sdk-default-app-auth-readiness-segmented" and .sourceContract.bootstrapInitialWaitUntil=="commit" and .sourceContract.bootstrapContextCloseOnFailure==true and .sourceContract.firebaseSdkOwner=="firebase-compat-sdk-present" and .sourceContract.firebaseDefaultAppOwner=="firebase-default-app-initialized" and .sourceContract.firebaseAuthOwner=="firebase-default-app-auth-instance-ready" and .sourceContract.gateId=="block1-client360-insurers-lab-v20260717" and .sourceContract.contractVersion=="1.0.41" and .sourceContract.blockingRoutes==["inicio","cliente360","aseguradoras"] and .sourceContract.sharedImplementationImport=="tools/orbit360-block1-final-native-matrix-v20260811.mjs" and .sourceContract.accessOwner=="Orbit.access.can" and .sourceContract.clientScopeOwner=="Orbit.access.filter/withScope" and .sourceContract.sameRouteDetailOwner=="rendered-row-user-flow-plus-route-param-dom" and .sourceContract.routePerformanceOwner=="browserObserverElapsedMs" and .sourceContract.mobileMenuOwner=="router-ready-before-burger" and .firebaseAccess==false and .browserExecuted==false and .hostingTouched==false and .writes==0 and .ok==true' "$RUNNER_TEMP/matrix-import.json" >/dev/null
+      - name: Validate Firebase default-app readiness semantics
         shell: bash
         run: |
           set -euo pipefail
@@ -71,15 +71,23 @@ jobs:
           const src=fs.readFileSync('tools/orbit360-block1-final-native-matrix-v20260811.mjs','utf8');
           const canonical=fs.readFileSync('tools/orbit360-block1-native-matrix-v23-canonical-v20260807.mjs','utf8');
           const required=[
-            "bootstrapNavigationOwner:'document-commit-login-form-firebase-readiness-segmented'",
+            "bootstrapNavigationOwner:'document-commit-login-form-firebase-sdk-default-app-auth-readiness-segmented'",
             "bootstrapInitialWaitUntil:'commit'",
             'bootstrapContextCloseOnFailure:true',
+            "firebaseSdkOwner:'firebase-compat-sdk-present'",
+            "firebaseDefaultAppOwner:'firebase-default-app-initialized'",
+            "firebaseAuthOwner:'firebase-default-app-auth-instance-ready'",
+            'firebaseDefaultAppAuthReadyState(state)',
             'syntheticBootstrapNavigationContract()',
             "waitUntil:'commit'",
             "page.on('requestfailed'",
             '_BOOTSTRAP_DOCUMENT_COMMIT_WAIT',
             '_BOOTSTRAP_LOGIN_FORM_WAIT',
             '_BOOTSTRAP_FIREBASE_SDK_WAIT',
+            '_BOOTSTRAP_FIREBASE_DEFAULT_APP_WAIT',
+            '_BOOTSTRAP_FIREBASE_DEFAULT_APP_PASS',
+            "app.name==='[DEFAULT]'",
+            "auth.app.name==='[DEFAULT]'",
             'try{await context.close();}catch{}',
             "Orbit.access&&Orbit.access.can&&Orbit.access.can(route,'view')",
             'c360.observerElapsedMs>0&&c360.observerElapsedMs<=30000',
@@ -88,12 +96,13 @@ jobs:
             'await row.click({timeout:12000})'
           ];
           const missing=required.filter(x=>!src.includes(x));
-          if(missing.length)throw new Error('FINAL_VISUAL_SEGMENTED_BOOTSTRAP_CONTRACT_MISSING:'+missing.join('|'));
+          if(missing.length)throw new Error('FINAL_VISUAL_FIREBASE_READINESS_CONTRACT_MISSING:'+missing.join('|'));
           if(src.includes("waitUntil:'domcontentloaded',timeout:45000"))throw new Error('STALE_DOMCONTENTLOADED_MONOLITHIC_BOOTSTRAP_REMAINS');
+          if(/BOOTSTRAP_FIREBASE_SDK_PASS[\s\S]{0,500}signInWithCustomToken/.test(src))throw new Error('FIREBASE_SDK_PASS_STILL_DIRECTLY_ENABLES_SIGNIN');
           if(src.includes('c360.renderWaitMs<=30000'))throw new Error('STALE_CLIENT_CHANNEL_WAIT_THRESHOLD_REMAINS');
           if(src.includes('insurers.renderWaitMs<=30000'))throw new Error('STALE_INSURER_CHANNEL_WAIT_THRESHOLD_REMAINS');
-          if(!canonical.includes('syntheticBootstrapNavigationContract'))throw new Error('CANONICAL_BOOTSTRAP_SYNTHETIC_HANDOFF_MISSING');
-          if(!canonical.includes('bootstrapSyntheticPass:bootstrapSynthetic.ok===true'))throw new Error('CANONICAL_BOOTSTRAP_SYNTHETIC_RESULT_NOT_PROPAGATED');
+          if(!canonical.includes('firebaseSdkWithoutDefaultAppBlocked:bootstrapSynthetic.sdkWithoutDefaultAppBlocked===true'))throw new Error('CANONICAL_FIREBASE_SDK_ONLY_BLOCK_NOT_PROPAGATED');
+          if(!canonical.includes('firebaseDefaultAppAuthReady:bootstrapSynthetic.defaultAppAuthReady===true'))throw new Error('CANONICAL_FIREBASE_DEFAULT_APP_READY_NOT_PROPAGATED');
           NODE
       - name: Validate final visual preflight with offline request fixture
         shell: bash
@@ -117,21 +126,22 @@ jobs:
           if((runner.match(/firebase deploy/g)||[]).length!==1)throw new Error('FINAL_VISUAL_DEPLOY_COUNT_SOURCE_INVALID');
           if(!runner.includes('firebase hosting:clone "$PROJECT:live" "$PROJECT:$SAFETY_CHANNEL"')||!runner.includes('firebase hosting:clone "$PROJECT:$BASELINE" "$PROJECT:live"')||!runner.includes('firebase hosting:clone "$PROJECT:$SAFETY_CHANNEL" "$PROJECT:live"'))throw new Error('FINAL_VISUAL_BACKUP_RESTORE_ROLLBACK_MISSING');
           if(!canonical.includes("sharedImplementationImport:'tools/orbit360-block1-final-native-matrix-v20260811.mjs'"))throw new Error('FINAL_VISUAL_IMPLEMENTATION_NOT_BOUND');
-          if(!flow.includes('.github/orbit360-requests/block1-final-visual-bootstrap-segmented-v20260811-authorization.json'))throw new Error('FUTURE_REQUEST_PATH_NOT_NEW');
-          if(!flow.includes('20260811.block1-final-visual-bootstrap-segmented'))throw new Error('FUTURE_REQUEST_VERSION_NOT_NEW');
-          if(!flow.includes('.bootstrapSyntheticPass==true'))throw new Error('FUTURE_RUNTIME_DOES_NOT_REQUIRE_BOOTSTRAP_SOURCE_PASS');
-          if(!flow.includes(".sourceContract.bootstrapInitialWaitUntil==\"commit\""))throw new Error('FUTURE_RUNTIME_DOES_NOT_REQUIRE_SEGMENTED_BOOTSTRAP');
+          if(!flow.includes('.github/orbit360-requests/block1-final-visual-firebase-default-app-ready-v20260811-authorization.json'))throw new Error('FUTURE_REQUEST_PATH_NOT_FRESH');
+          if(!flow.includes('20260811.block1-final-visual-firebase-default-app-ready'))throw new Error('FUTURE_REQUEST_VERSION_NOT_FRESH');
+          if(!flow.includes('.firebaseSdkWithoutDefaultAppBlocked==true'))throw new Error('FUTURE_RUNTIME_DOES_NOT_REQUIRE_SDK_ONLY_BLOCK');
+          if(!flow.includes('.firebaseDefaultAppAuthReady==true'))throw new Error('FUTURE_RUNTIME_DOES_NOT_REQUIRE_DEFAULT_APP_AUTH_READY');
+          if(!flow.includes('.sourceContract.firebaseDefaultAppOwner==\"firebase-default-app-initialized\"'))throw new Error('FUTURE_RUNTIME_DOES_NOT_REQUIRE_DEFAULT_APP_OWNER');
           if(/--only\s+(functions|firestore|rules)|firebase\s+deploy[^\n]*(functions|firestore|rules)|gcloud\s+.*deploy/i.test(runner+flow))throw new Error('FINAL_VISUAL_FORBIDDEN_DEPLOY_SCOPE');
           const forbiddenTrue=/(?:mainAuthorized|productionAuthorized|mergeAuthorized)\s*==\s*true/.test(flow)||/"(?:mainAuthorized|productionAuthorized|mergeAuthorized)"\s*:\s*true/.test(flow);
           if(forbiddenTrue)throw new Error('FINAL_VISUAL_PRODUCTION_CAPABILITY_FOUND');
           NODE
-      - name: Seal sanitized segmented-bootstrap source evidence
+      - name: Seal sanitized Firebase default-app readiness source evidence
         id: seal
         shell: bash
         run: |
           set -euo pipefail
-          jq -n --arg sha "$GITHUB_SHA" --arg run "$GITHUB_RUN_ID" '{schemaVersion:"orbit360-block1-final-native-visual-source-v5",status:"PASS_BLOCK1_FINAL_NATIVE_VISUAL_SOURCE",ok:true,head:$sha,sourceRunId:($run|tonumber),gateId:"block1-client360-insurers-lab-v20260717",contractVersion:"1.0.41",blockingRoutes:["inicio","cliente360","aseguradoras"],releaseUniversePass:true,correctedValidatorSemantics:true,antiLoopSyntheticPass:true,bootstrapSyntheticPass:true,canonicalBootstrapSyntheticHandoff:true,sourceStatusFailClosed:true,bootstrapNavigationOwner:"document-commit-login-form-firebase-readiness-segmented",bootstrapInitialWaitUntil:"commit",bootstrapContextCloseOnFailure:true,accessOwner:"Orbit.access.can",clientScopeOwner:"Orbit.access.filter/withScope",sameRouteDetailOwner:"rendered-row-user-flow-plus-route-param-dom",routePerformanceOwner:"browserObserverElapsedMs",mobileMenuOwner:"router-ready-before-burger",ephemeralSecurityOverlayTreatment:"test-harness-remove-only",priorRuntimeRun:31507467271,priorRuntimeClassification:"PIPELINE_MECHANISM_FAILURE",priorRuntimeCheckpoint:"ASESOR_PAGE_GOTO",priorSourcePreparationRun:31511643685,priorSourcePreparationClassification:"VALIDATOR_STALE_PIPELINE_MECHANISM_FAILURE",runtimeRequestPresent:false,runtimeAuthorized:false,secretsRead:false,networkAccess:false,firestoreReads:0,firestoreWrites:0,authWrites:0,operationalWrites:0,browserExecuted:false,hostingTouched:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false}' > "$SOURCE_EVIDENCE"
-          jq -e --arg sha "$GITHUB_SHA" '.head==$sha and .bootstrapSyntheticPass==true and .canonicalBootstrapSyntheticHandoff==true and .sourceStatusFailClosed==true and .runtimeAuthorized==false and .firestoreWrites==0 and .ok==true' "$SOURCE_EVIDENCE" >/dev/null
+          jq -n --arg sha "$GITHUB_SHA" --arg run "$GITHUB_RUN_ID" '{schemaVersion:"orbit360-block1-final-native-visual-source-v6",status:"PASS_BLOCK1_FINAL_NATIVE_VISUAL_SOURCE",ok:true,head:$sha,sourceRunId:($run|tonumber),gateId:"block1-client360-insurers-lab-v20260717",contractVersion:"1.0.41",blockingRoutes:["inicio","cliente360","aseguradoras"],releaseUniversePass:true,correctedValidatorSemantics:true,antiLoopSyntheticPass:true,bootstrapSyntheticPass:true,firebaseSdkWithoutDefaultAppBlocked:true,firebaseDefaultAppAuthReady:true,canonicalBootstrapSyntheticHandoff:true,sourceStatusFailClosed:true,bootstrapNavigationOwner:"document-commit-login-form-firebase-sdk-default-app-auth-readiness-segmented",bootstrapInitialWaitUntil:"commit",bootstrapContextCloseOnFailure:true,firebaseSdkOwner:"firebase-compat-sdk-present",firebaseDefaultAppOwner:"firebase-default-app-initialized",firebaseAuthOwner:"firebase-default-app-auth-instance-ready",accessOwner:"Orbit.access.can",clientScopeOwner:"Orbit.access.filter/withScope",sameRouteDetailOwner:"rendered-row-user-flow-plus-route-param-dom",routePerformanceOwner:"browserObserverElapsedMs",mobileMenuOwner:"router-ready-before-burger",ephemeralSecurityOverlayTreatment:"test-harness-remove-only",priorRuntimeRun:31512995513,priorRuntimeClassification:"PIPELINE_MECHANISM_FAILURE",priorRuntimeCheckpoint:"DIRECCION_BOOTSTRAP_FIREBASE_SDK_PASS",runtimeRequestPresent:false,runtimeAuthorized:false,secretsRead:false,networkAccess:false,firestoreReads:0,firestoreWrites:0,authWrites:0,operationalWrites:0,browserExecuted:false,hostingTouched:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false}' > "$SOURCE_EVIDENCE"
+          jq -e --arg sha "$GITHUB_SHA" '.head==$sha and .bootstrapSyntheticPass==true and .firebaseSdkWithoutDefaultAppBlocked==true and .firebaseDefaultAppAuthReady==true and .canonicalBootstrapSyntheticHandoff==true and .sourceStatusFailClosed==true and .runtimeAuthorized==false and .firestoreWrites==0 and .ok==true' "$SOURCE_EVIDENCE" >/dev/null
       - name: Publish fail-closed source status
         if: always()
         uses: actions/github-script@v7
@@ -142,11 +152,11 @@ jobs:
         with:
           script: |
             const fs=require('fs');
-            let state='failure',description='Block1 segmented-bootstrap source blocked fail-closed';
+            let state='failure',description='Block1 Firebase default-app readiness source blocked fail-closed';
             try{
               if(process.env.SEAL_OUTCOME==='success' && process.env.PRIOR_JOB_STATUS==='success'){
                 const p=JSON.parse(fs.readFileSync(process.env.EVIDENCE_FILE,'utf8'));
-                if(p.ok===true&&p.status==='PASS_BLOCK1_FINAL_NATIVE_VISUAL_SOURCE'&&p.head===context.sha&&p.bootstrapSyntheticPass===true&&p.canonicalBootstrapSyntheticHandoff===true&&p.sourceStatusFailClosed===true&&p.firestoreWrites===0){state='success';description='Block1 segmented-bootstrap SOURCE PASS fail-closed';}
+                if(p.ok===true&&p.status==='PASS_BLOCK1_FINAL_NATIVE_VISUAL_SOURCE'&&p.head===context.sha&&p.bootstrapSyntheticPass===true&&p.firebaseSdkWithoutDefaultAppBlocked===true&&p.firebaseDefaultAppAuthReady===true&&p.sourceStatusFailClosed===true&&p.firestoreWrites===0){state='success';description='Block1 Firebase default-app readiness SOURCE PASS fail-closed';}
               }
             }catch(e){}
             await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/block1-final-native-visual-source',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
