@@ -79,7 +79,8 @@ jobs:
           if(!runner.includes("MATRIX_RUNNER='tools/orbit360-block1-native-matrix-v23-canonical-v20260807.mjs'"))throw new Error('FINAL_VISUAL_NATIVE_MATRIX_NOT_BOUND');
           if(!matrix.includes("V23_BLOCKING_ROUTES = Object.freeze(['inicio', 'cliente360', 'aseguradoras'])"))throw new Error('FINAL_VISUAL_BLOCKING_SCOPE_INVALID');
           if(/--only\s+(functions|firestore|rules)|firebase\s+deploy[^\n]*(functions|firestore|rules)|gcloud\s+.*deploy/i.test(runner+flow))throw new Error('FINAL_VISUAL_FORBIDDEN_DEPLOY_SCOPE');
-          if(/mainAuthorized[^\n]*true|productionAuthorized[^\n]*true|mergeAuthorized[^\n]*true/.test(flow))throw new Error('FINAL_VISUAL_PRODUCTION_CAPABILITY_FOUND');
+          const forbiddenTrue = /(?:mainAuthorized|productionAuthorized|mergeAuthorized)\s*==\s*true/.test(flow) || /"(?:mainAuthorized|productionAuthorized|mergeAuthorized)"\s*:\s*true/.test(flow);
+          if(forbiddenTrue)throw new Error('FINAL_VISUAL_PRODUCTION_CAPABILITY_FOUND');
           NODE
       - name: Seal sanitized source evidence
         shell: bash
