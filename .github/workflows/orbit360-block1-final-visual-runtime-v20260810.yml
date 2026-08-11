@@ -1,0 +1,108 @@
+name: Orbit360 Block1 final native visual matrix after release universe
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-requests/block1-final-visual-after-release-universe-authorization.json'
+permissions:
+  contents: read
+  statuses: write
+concurrency:
+  group: orbit360-block1-final-native-visual-after-release-universe
+  cancel-in-progress: false
+env:
+  REQUEST_FILE: .github/orbit360-requests/block1-final-visual-after-release-universe-authorization.json
+  REQUEST_VERSION: 20260810.block1-final-visual-after-release-universe
+  FINAL_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/block1-final-visual-closure-sanitized-v20260810.json
+jobs:
+  runtime:
+    if: "${{ github.event.head_commit.message == 'runtime: authorize Block1 final native visual matrix after release universe' }}"
+    name: Block1 · final native visual matrix · one-shot
+    runs-on: ubuntu-24.04
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Immutable request and parent binding before capabilities
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_RUN_ATTEMPT" = 1
+          test "$(git diff --name-only HEAD^ HEAD | wc -l)" -eq 1
+          test "$(git diff --name-only HEAD^ HEAD)" = "$REQUEST_FILE"
+          PARENT="$(git rev-parse HEAD^)"
+          jq -e --arg p "$PARENT" --arg v "$REQUEST_VERSION" '.schemaVersion=="orbit360-runtime-request-v1" and .authorizationGeneration=="block1-final-visual-after-release-universe" and .gateId=="block1-client360-insurers-lab-v20260717" and .contractVersion=="1.0.41" and .requestVersion==$v and .status=="AUTHORIZED_ONCE" and .approved==true and .authorizedByUser==true and .allowedExecutions==1 and .consumed==false and .authorizationFrozen==false and .replayAllowed==false and .parentHead==$p and .authorizedBaseHead==$p and .operation=="BLOCK1_FINAL_VISUAL_MATRIX_AFTER_RELEASE_UNIVERSE" and .blockingRoutes==["inicio","cliente360","aseguradoras"] and .baselineHostingChannel=="visual-matrix-corrected-backup-31135532118" and .hostingSafetyBackupAuthorized==true and .hostingBaselineRestoreAuthorized==true and .hostingDeployAuthorized==true and .hostingDeploysMaximum==1 and .hostingRollbackAuthorizedOnFailure==true and .maximumAdminFirestoreReadOperations==30 and .firestoreReadAuthorized==true and .firestoreWritesAuthorized==0 and .authTokenMintAuthorized==true and .authWritesAuthorized==0 and .operationalWritesAuthorized==0 and .browserAuthorized==true and .functionsDeployAuthorized==false and .rulesDeployAuthorized==false and .reimportAuthorized==false and .productionAuthorized==false and .mainAuthorized==false and .mergeAuthorized==false and .screenshotsSanitizedPrivateArtifactOnly==true and .persistPII==false and .persistSecrets==false and .containsPII==false and .containsSecrets==false' "$REQUEST_FILE" >/dev/null
+          echo "ORBIT360_EXPECTED_PARENT_HEAD=$PARENT" >> "$GITHUB_ENV"
+      - name: Canonical Block1 source gate before secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          ORBIT360_GATE_PROFILE=v33-two-client-cloud-audit ORBIT360_EXPECTED_REQUEST_VERSION=NONE_PENDING_FRESH_AUTHORIZATION node tools/orbit360-validar-gate-contracts-v20260717.mjs block1-client360-insurers-lab-v20260717
+          jq -e '.status=="PASS_GATE_CONTRACT_SOURCE_V33" and .failed==0 and .executionAuthorized==false and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json >/dev/null
+      - name: Final visual GO gate before secret materialization
+        shell: bash
+        run: |
+          set -euo pipefail
+          ORBIT360_REQUEST_FILE="$REQUEST_FILE" ORBIT360_EXPECTED_REQUEST_VERSION="$REQUEST_VERSION" ORBIT360_EXPECTED_PARENT_HEAD="$ORBIT360_EXPECTED_PARENT_HEAD" node tools/orbit360-validar-gate-contracts-engine-block1-final-visual-v20260810.mjs
+          jq -e '.status=="GO_GATE_CONTRACT_BLOCK1_FINAL_VISUAL" and .failed==0 and .executionAuthorized==true and .secretAccessAuthorized==true and .firestoreReadAuthorized==true and .browserAuthorized==true and .hostingSafetyBackupAuthorized==true and .hostingBaselineRestoreAuthorized==true and .hostingDeployAuthorized==true and .hostingDeploysMaximum==1 and .hostingRollbackAuthorizedOnFailure==true and .firestoreWritesAuthorized==0 and .authWritesAuthorized==0 and .operationalWritesAuthorized==0 and .functionsDeployAuthorized==false and .rulesDeployAuthorized==false and .reimportAuthorized==false and .productionAuthorized==false and .runtimeExecuted==false and .secretAccess==false and .browserExecuted==false and .deployExecuted==false and .ok==true' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json >/dev/null
+      - name: Source-safe exact matrix artifact before secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash -n tools/orbit360-run-block1-final-visual-after-universe-v20260810.sh
+          node --check tools/orbit360-block1-native-matrix-v23-canonical-v20260807.mjs
+          node --check tools/orbit360-block1-native-matrix-v23-v20260807.mjs
+          node --check tools/orbit360-event-driven-render-observer-v23.mjs
+          node --check tools/orbit360-visual-runtime-rootfix-browser-precheck-v20260805.mjs
+          ORBIT360_MATRIX_ARTIFACT_VALIDATE_ONLY=1 node tools/orbit360-block1-native-matrix-v23-canonical-v20260807.mjs > "$RUNNER_TEMP/matrix-import.json"
+          jq -e '.status=="PASS_V23_NATIVE_MATRIX_IMPORT" and .classification=="SOURCE_ARTIFACT_VALIDATED" and .sourceContract.gateId=="block1-client360-insurers-lab-v20260717" and .sourceContract.contractVersion=="1.0.41" and .sourceContract.blockingRoutes==["inicio","cliente360","aseguradoras"] and .sourceContract.generatedFromPriorArtifact==false and .sourceContract.textualTransform==false and .firebaseAccess==false and .browserExecuted==false and .hostingTouched==false and .writes==0 and .ok==true' "$RUNNER_TEMP/matrix-import.json" >/dev/null
+      - name: Execute one authorized final native visual matrix
+        id: visual
+        env:
+          ORBIT360_RUNTIME_EXECUTION_AUTHORIZED: 'true'
+          FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}'
+          FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}'
+          FIREBASE_SERVICE_ACCOUNT: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
+        shell: bash
+        run: bash tools/orbit360-run-block1-final-visual-after-universe-v20260810.sh
+      - name: Verify sanitized final visual closure
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s "$FINAL_EVIDENCE"
+          jq -e '.firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .functionsDeploys==0 and .rulesDeploys==0 and .reimport==false and .productionTouched==false and .containsPII==false and .containsSecrets==false' "$FINAL_EVIDENCE" >/dev/null
+      - name: Publish observable final visual status
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          EVIDENCE_FILE: orbit360-platform/runtime-gate-crm-v20260716/block1-final-visual-closure-sanitized-v20260810.json
+        with:
+          script: |
+            const fs=require('fs');let state='failure',description='Block1 final native visual matrix stopped safely';
+            try{const p=JSON.parse(fs.readFileSync(process.env.EVIDENCE_FILE,'utf8'));if(p.ok===true&&p.decision==='PASS_VISUAL_POST_AUTH'&&p.block1CloseEligible===true&&p.hosting.deploys===1&&p.matrix.snapshotIntegrity==='VERIFIED_UNCHANGED'&&p.matrix.totalRoleFailures===0){state='success';description='Block1 final native visual matrix PASS; Block1 close eligible';}else if(p.rootCause){description=`${p.classification} / ${p.rootCause}`.slice(0,140);}}catch(e){}
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/block1-final-native-visual-runtime',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
+      - name: Upload sanitized evidence and private captures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-block1-final-native-visual-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/block1-final-visual-precheck-sanitized-v20260810.json
+            orbit360-platform/runtime-gate-crm-v20260716/block1-final-visual-matrix-sanitized-v20260810.json
+            orbit360-platform/runtime-gate-crm-v20260716/block1-final-visual-closure-sanitized-v20260810.json
+            orbit360-block1-final-visual-artifacts/
+          if-no-files-found: warn
+          retention-days: 7
+      - name: Enforce one-shot PASS without replay
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          jq -e '.ok==true and .decision=="PASS_VISUAL_POST_AUTH" and .classification=="PASS_VISUAL_POST_AUTH" and .block1CloseEligible==true and .hosting.safetyBackupOutcome=="success" and .hosting.baselineRestoreOutcome=="success" and .hosting.deployOutcome=="success" and .hosting.deploys==1 and .hosting.rollbackOutcome=="not_required" and .precheck.outcome=="success" and .matrix.outcome=="success" and .matrix.snapshotIntegrity=="VERIFIED_UNCHANGED" and .matrix.totalRoleFailures==0 and (.matrix.roles|length)==3 and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .productionTouched==false' "$FINAL_EVIDENCE" >/dev/null
