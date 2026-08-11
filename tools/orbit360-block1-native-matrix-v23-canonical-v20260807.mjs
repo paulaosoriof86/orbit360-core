@@ -11,7 +11,7 @@ import {
   BLOCKING_ROUTES,
   NONBLOCKING_LEDGER,
   SOURCE_CONTRACT as IMPLEMENTATION_SOURCE_CONTRACT
-} from './orbit360-block1-final-native-matrix-v20260810.mjs';
+} from './orbit360-block1-final-native-matrix-v20260811.mjs';
 import { V23_RENDER_SIGNAL_VERSION } from './orbit360-event-driven-render-observer-v23.mjs';
 
 export const V23_CANONICAL_CONTRACT_VERSION='1.0.41';
@@ -25,7 +25,7 @@ export const SOURCE_CONTRACT=Object.freeze({
   generatedFromPriorArtifact:false,
   textualTransform:false,
   sourceSurgery:false,
-  sharedImplementationImport:'tools/orbit360-block1-final-native-matrix-v20260810.mjs',
+  sharedImplementationImport:'tools/orbit360-block1-final-native-matrix-v20260811.mjs',
   sharedRenderObserver:'tools/orbit360-event-driven-render-observer-v23.mjs',
   renderSignalVersion:V23_RENDER_SIGNAL_VERSION,
   blockingRoutes:[...BLOCKING_ROUTES],
@@ -33,8 +33,9 @@ export const SOURCE_CONTRACT=Object.freeze({
   roleScopedTargets:true,
   accessOwner:'Orbit.access.can',
   clientScopeOwner:'Orbit.access.filter/withScope',
-  sameRouteDetailOwner:'exact-hash-and-dom',
-  routePerformanceOwner:'renderObserverWaitMs',
+  sameRouteDetailOwner:'rendered-row-user-flow-plus-route-param-dom',
+  routePerformanceOwner:'browserObserverElapsedMs',
+  mobileMenuOwner:'router-ready-before-burger',
   ephemeralSecurityOverlayTreatment:'test-harness-remove-only',
   implementationSourceContract:IMPLEMENTATION_SOURCE_CONTRACT
 });
@@ -52,7 +53,7 @@ if(process.env.ORBIT360_MATRIX_ARTIFACT_VALIDATE_ONLY==='1'){
   output.implementationSchemaVersion=MATRIX_SCHEMA;
   output.contractVersion=V23_CANONICAL_CONTRACT_VERSION;
   output.canonicalRuntimeArtifact='tools/orbit360-block1-native-matrix-v23-canonical-v20260807.mjs';
-  output.sharedImplementationImport='tools/orbit360-block1-final-native-matrix-v20260810.mjs';
+  output.sharedImplementationImport='tools/orbit360-block1-final-native-matrix-v20260811.mjs';
   output.nativeSource=true;
   output.generatedFromPriorArtifact=false;
   output.textualTransform=false;
