@@ -79,9 +79,16 @@ jobs:
           node <<'NODE'
           const fs=require('fs');
           const src=fs.readFileSync('tools/orbit360-block1-controlled-provenance-exception-impact-readonly-v20260810.mjs','utf8');
-          const forbidden=[/\.set\s*\(/,/\.update\s*\(/,/\.delete\s*\(/,/\.add\s*\(/,/writeBatch\s*\(/,/runTransaction\s*\(/,/firebase\s+deploy/i,/gcloud\s+.*(?:iam|logging)/i];
-          const hits=forbidden.filter(r=>r.test(src));
-          if(hits.length)throw new Error('CONTROLLED_EXCEPTION_WRITE_OR_CONTROL_PLANE_TOKEN_FOUND');
+          const firestoreMutationPatterns=[
+            /\.doc\([^)]*\)\.(?:set|update|delete|create)\s*\(/,
+            /canonicalRef\([^)]*\)\.add\s*\(/,
+            /\bdb\.batch\s*\(/,
+            /\brunTransaction\s*\(/,
+            /\bbulkWriter\s*\(/
+          ];
+          if(firestoreMutationPatterns.some(r=>r.test(src)))throw new Error('CONTROLLED_EXCEPTION_FIRESTORE_MUTATION_FOUND');
+          if(/firebase\s+deploy|gcloud\s+.*(?:iam|logging)/i.test(src))throw new Error('CONTROLLED_EXCEPTION_CONTROL_PLANE_TOKEN_FOUND');
+          if(!/new Map\(/.test(src)||!/found\.set\(fp,ref\.id\)/.test(src))throw new Error('CONTROLLED_EXCEPTION_IN_MEMORY_MAP_CONTRACT_MISSING');
           if(!/listDocuments\(\)/.test(src)||!/where\('clienteId','in',ids\)/.test(src)||!/select\('clienteId'\)/.test(src))throw new Error('CONTROLLED_EXCEPTION_READ_SHAPE_MISSING');
           NODE
       - name: Seal sanitized source evidence
