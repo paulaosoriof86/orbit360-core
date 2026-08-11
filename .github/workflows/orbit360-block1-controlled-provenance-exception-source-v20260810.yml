@@ -1,0 +1,98 @@
+name: Orbit360 Block1 controlled provenance exception source-only
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/workflows/orbit360-block1-controlled-provenance-exception-source-v20260810.yml'
+      - 'tools/orbit360-block1-controlled-provenance-exception-policy-v20260810.json'
+      - 'tools/orbit360-validator-lifecycle-block1-controlled-provenance-exception-runtime-v20260810.json'
+      - 'tools/orbit360-validar-gate-contracts-engine-block1-controlled-provenance-exception-v20260810.mjs'
+      - 'tools/orbit360-block1-controlled-provenance-exception-impact-readonly-v20260810.mjs'
+      - 'tools/fixtures/orbit360-block1-controlled-provenance-exception-request-fixture-v20260810.json'
+      - 'orbit360-platform/docs/DECISION-RELEASE-EXCEPCION-CONTROLADA-2-CLIENTES-20260810.md'
+permissions:
+  contents: read
+  statuses: write
+concurrency:
+  group: orbit360-block1-controlled-provenance-exception-source-v20260810
+  cancel-in-progress: false
+env:
+  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+  SOURCE_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/block1-controlled-provenance-exception-source-sanitized-v20260810.json
+jobs:
+  source:
+    name: Block1 · controlled provenance exception · source-only
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Canonical Block1 gate before package validation
+        shell: bash
+        run: |
+          set -euo pipefail
+          ORBIT360_GATE_PROFILE=v33-two-client-cloud-audit ORBIT360_EXPECTED_REQUEST_VERSION=NONE_PENDING_FRESH_AUTHORIZATION node tools/orbit360-validar-gate-contracts-v20260717.mjs block1-client360-insurers-lab-v20260717
+          jq -e '.status=="PASS_GATE_CONTRACT_SOURCE_V33" and .failed==0 and .executionAuthorized==false and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+      - name: Validate controlled exception policy and source package
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-validar-gate-contracts-engine-block1-controlled-provenance-exception-v20260810.mjs
+          node --check tools/orbit360-block1-controlled-provenance-exception-impact-readonly-v20260810.mjs
+          node -e "JSON.parse(require('fs').readFileSync('tools/orbit360-block1-controlled-provenance-exception-policy-v20260810.json','utf8'));JSON.parse(require('fs').readFileSync('tools/orbit360-validator-lifecycle-block1-controlled-provenance-exception-runtime-v20260810.json','utf8'));JSON.parse(require('fs').readFileSync('tools/fixtures/orbit360-block1-controlled-provenance-exception-request-fixture-v20260810.json','utf8'))"
+          jq -e '.decision=="GO_PRODUCTION_PATH_WITH_2_CONTROLLED_CLIENT_PROVENANCE_EXCEPTIONS" and .authorizedByUser==true and .baselineContract=={"clientes":414,"aseguradoras":26,"asesores":7,"changedByException":false} and .sourceEvidence.unresolvedCount==2 and .sourceEvidence.unresolvedFingerprints==["43a8841d19f7fec03ad6","a96956c63fdf22d44cfe"] and .releaseTreatment.deleteClients==false and .releaseTreatment.hideClients==false and .releaseTreatment.mergeClients==false and .releaseTreatment.reimportClients==false and .releaseTreatment.mutateClients==false and .releaseTreatment.changeContractCountsToForcePass==false and .releaseTreatment.blockReleaseSolelyForPendingProvenance==false' tools/orbit360-block1-controlled-provenance-exception-policy-v20260810.json >/dev/null
+      - name: Validate runtime preflight with offline fixture
+        shell: bash
+        run: |
+          set -euo pipefail
+          ORBIT360_REQUEST_FILE=tools/fixtures/orbit360-block1-controlled-provenance-exception-request-fixture-v20260810.json \
+          ORBIT360_EXPECTED_REQUEST_VERSION=FIXTURE_CONTROLLED_PROVENANCE_EXCEPTION_IMPACT_READONLY \
+          ORBIT360_EXPECTED_PARENT_HEAD=fixture-parent-head-controlled-exception \
+            node tools/orbit360-validar-gate-contracts-engine-block1-controlled-provenance-exception-v20260810.mjs
+          jq -e '.status=="GO_GATE_CONTRACT_CONTROLLED_PROVENANCE_EXCEPTION" and .executionAuthorized==true and .secretAccessAuthorized==true and .firestoreReadAuthorized==true and .maximumLogicalFirestoreOperations==6 and .targetCount==2 and .firestoreWritesAuthorized==0 and .authReadsAuthorized==0 and .loggingReadsAuthorized==0 and .iamReadsAuthorized==0 and .operationalWritesAuthorized==0 and .hostingAuthorized==false and .browserAuthorized==false and .deployAuthorized==false and .productionAuthorized==false and .runtimeExecuted==false and .secretAccess==false and .firestoreRead==false and .ok==true' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+      - name: Execute impact checker offline fixture
+        shell: bash
+        run: |
+          set -euo pipefail
+          ORBIT360_SOURCE_ONLY=1 ORBIT360_EXCEPTION_EVIDENCE="$RUNNER_TEMP/controlled-exception-worker-source.json" node tools/orbit360-block1-controlled-provenance-exception-impact-readonly-v20260810.mjs
+          jq -e '.decision=="SOURCE_ONLY_RUNTIME_READY" and .classification=="PASS_SOURCE_FIXTURE" and .networkAccess==false and .secretAccess==false and .firestoreReadOperations==0 and .firestoreWrites==0 and .authReads==0 and .loggingReads==0 and .iamReads==0 and .operationalWrites==0 and .ok==true' "$RUNNER_TEMP/controlled-exception-worker-source.json" >/dev/null
+      - name: Enforce semantic read-only boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs=require('fs');
+          const src=fs.readFileSync('tools/orbit360-block1-controlled-provenance-exception-impact-readonly-v20260810.mjs','utf8');
+          const forbidden=[/\.set\s*\(/,/\.update\s*\(/,/\.delete\s*\(/,/\.add\s*\(/,/writeBatch\s*\(/,/runTransaction\s*\(/,/firebase\s+deploy/i,/gcloud\s+.*(?:iam|logging)/i];
+          const hits=forbidden.filter(r=>r.test(src));
+          if(hits.length)throw new Error('CONTROLLED_EXCEPTION_WRITE_OR_CONTROL_PLANE_TOKEN_FOUND');
+          if(!/listDocuments\(\)/.test(src)||!/where\('clienteId','in',ids\)/.test(src)||!/select\('clienteId'\)/.test(src))throw new Error('CONTROLLED_EXCEPTION_READ_SHAPE_MISSING');
+          NODE
+      - name: Seal sanitized source evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          jq -n --arg sha "$GITHUB_SHA" '{schemaVersion:"orbit360-block1-controlled-provenance-exception-source-v1",status:"PASS_CONTROLLED_PROVENANCE_EXCEPTION_SOURCE",ok:true,head:$sha,gateId:"block1-client360-insurers-lab-v20260717",contractVersion:"1.0.41",baselineContractChanged:false,targetCount:2,runtimeRequestPresent:false,runtimeAuthorized:false,secretsRead:false,networkAccess:false,firestoreReads:0,firestoreWrites:0,authReads:0,loggingReads:0,iamReads:0,operationalWrites:0,runtimeExecuted:false,browserExecuted:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false}' > "$SOURCE_EVIDENCE"
+      - name: Publish source status
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          EVIDENCE_FILE: orbit360-platform/runtime-gate-crm-v20260716/block1-controlled-provenance-exception-source-sanitized-v20260810.json
+        with:
+          script: |
+            const fs=require('fs');let state='failure',description='Block1 controlled provenance exception source blocked';
+            try{const p=JSON.parse(fs.readFileSync(process.env.EVIDENCE_FILE,'utf8'));if(p.ok===true&&p.status==='PASS_CONTROLLED_PROVENANCE_EXCEPTION_SOURCE'&&p.firestoreWrites===0){state='success';description='Block1 controlled provenance exception SOURCE PASS';}}catch(e){}
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/block1-controlled-provenance-exception-source',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
+      - name: Upload sanitized source evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-block1-controlled-provenance-exception-source-${{ github.run_id }}
+          path: orbit360-platform/runtime-gate-crm-v20260716/block1-controlled-provenance-exception-source-sanitized-v20260810.json
+          if-no-files-found: warn
+          retention-days: 30
