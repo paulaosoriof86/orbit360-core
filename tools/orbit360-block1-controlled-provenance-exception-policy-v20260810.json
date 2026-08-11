@@ -1,0 +1,69 @@
+{
+  "schemaVersion": "orbit360-block1-controlled-provenance-exception-policy-v1",
+  "issuedAt": "2026-08-10T18:25:00-06:00",
+  "gateId": "block1-client360-insurers-lab-v20260717",
+  "contractVersion": "1.0.41",
+  "tenantId": "alianzas-soluciones",
+  "decision": "GO_PRODUCTION_PATH_WITH_2_CONTROLLED_CLIENT_PROVENANCE_EXCEPTIONS",
+  "authorizedByUser": true,
+  "authorizationBasis": "User explicitly prioritized production and authorized proceeding while deferring the unresolved provenance of exactly two clients.",
+  "classification": "VALIDATOR_STALE_PROVENANCE_NOT_FULLY_OBSERVED_WITH_CONTROLLED_DATA_EXCEPTION",
+  "baselineContract": {
+    "clientes": 414,
+    "aseguradoras": 26,
+    "asesores": 7,
+    "changedByException": false
+  },
+  "sourceEvidence": {
+    "reconciliationFile": "orbit360-platform/runtime-gate-crm-v20260716/v32-retained26-local-adjudication-sanitized-v20260807.json",
+    "targetCount": 16,
+    "matchedRetained26": 14,
+    "unresolvedCount": 2,
+    "unresolvedFingerprints": [
+      "43a8841d19f7fec03ad6",
+      "a96956c63fdf22d44cfe"
+    ],
+    "v28ValidatorCoverageFinding": "The v28 provenance field mask did not include the historical Orbit.store actor fields ownerUid, ownerEmail, updatedByUid, updatedByEmail; therefore absence of actor/provenance was not fully demonstrated.",
+    "provenanceDefectProven": false,
+    "provenanceStillPending": true
+  },
+  "releaseTreatment": {
+    "deleteClients": false,
+    "hideClients": false,
+    "mergeClients": false,
+    "reimportClients": false,
+    "mutateClients": false,
+    "inferLegitimacy": false,
+    "changeContractCountsToForcePass": false,
+    "blockReleaseSolelyForPendingProvenance": false,
+    "preserveAllExistingRelationships": true,
+    "deferProvenanceResolutionPostGoLive": true
+  },
+  "preReleaseCondition": {
+    "required": true,
+    "operation": "CONTROLLED_PROVENANCE_EXCEPTION_IMPACT_READONLY",
+    "purpose": "Confirm that both client documents exist and quantify relationships in polizas, vehiculos, recibosEsperados, carteraPrimas and cobros without changing or re-adjudicating provenance.",
+    "maximumLogicalFirestoreOperations": 6,
+    "writesAuthorized": 0,
+    "authReadsAuthorized": 0,
+    "loggingReadsAuthorized": 0,
+    "iamReadsAuthorized": 0,
+    "hostingAuthorized": false,
+    "browserAuthorized": false,
+    "deployAuthorized": false
+  },
+  "releaseAcceptance": {
+    "safeIfBothTargetsExist": true,
+    "relationshipsMayExist": true,
+    "relationshipsArePreserved": true,
+    "stopOnlyIfTargetMissingOrRelationshipReadCannotBeCompletedSafely": true,
+    "releaseDecisionOnPass": "RELEASE_UNIVERSE_ACCEPTED_WITH_2_CLIENT_PROVENANCE_EXCEPTIONS"
+  },
+  "postGoLiveDebt": {
+    "owner": "DATA_MIGRATION_TRACEABILITY_CLIENT_CREATION_PROVENANCE",
+    "priority": "NON_BLOCKING_POST_GOLIVE_DATA_QUALITY",
+    "requiredResolution": "Re-adjudicate exact provenance using the real Orbit.store actor schema and/or authoritative source evidence without reimport or inference."
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
