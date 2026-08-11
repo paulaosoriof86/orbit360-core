@@ -1,18 +1,26 @@
 {
-  "schemaVersion": "orbit360-block1-final-native-visual-source-v2",
+  "schemaVersion": "orbit360-block1-final-native-visual-source-v3",
   "status": "PASS_BLOCK1_FINAL_NATIVE_VISUAL_SOURCE",
   "ok": true,
-  "head": "8570ec3097a7d599a944d51e3f8fdc4afb0182eb",
+  "head": "71529a6a62f0a1c19dc7cbf30c5aaa9ca47d3385",
   "gateId": "block1-client360-insurers-lab-v20260717",
   "contractVersion": "1.0.41",
-  "blockingRoutes": ["inicio", "cliente360", "aseguradoras"],
+  "blockingRoutes": [
+    "inicio",
+    "cliente360",
+    "aseguradoras"
+  ],
   "releaseUniversePass": true,
   "correctedValidatorSemantics": true,
+  "antiLoopSyntheticPass": true,
   "accessOwner": "Orbit.access.can",
   "clientScopeOwner": "Orbit.access.filter/withScope",
-  "sameRouteDetailOwner": "exact-hash-and-dom",
-  "routePerformanceOwner": "renderObserverWaitMs",
+  "sameRouteDetailOwner": "rendered-row-user-flow-plus-route-param-dom",
+  "routePerformanceOwner": "browserObserverElapsedMs",
+  "mobileMenuOwner": "router-ready-before-burger",
   "ephemeralSecurityOverlayTreatment": "test-harness-remove-only",
+  "priorRuntimeRun": 31502845695,
+  "priorRuntimeClassification": "VALIDATOR_STALE_PIPELINE_MECHANISM_FAILURE",
   "runtimeRequestPresent": false,
   "runtimeAuthorized": false,
   "secretsRead": false,
@@ -26,8 +34,5 @@
   "deployExecuted": false,
   "productionTouched": false,
   "containsPII": false,
-  "containsSecrets": false,
-  "sourceRunId": 31448149299,
-  "artifactId": 9085313679,
-  "artifactDigestSha256": "158c1f67ff4ccf4c0d0d2a05e85729552c2ff1c660540b696000c0a870a34c5f"
+  "containsSecrets": false
 }
