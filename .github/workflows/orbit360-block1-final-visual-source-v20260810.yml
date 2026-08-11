@@ -58,6 +58,8 @@ jobs:
           node --check tools/fixtures/orbit360-block1-visual-antibucle-fixture-v20260811.mjs
           node tools/fixtures/orbit360-block1-visual-antibucle-fixture-v20260811.mjs > "$RUNNER_TEMP/antibucle.json"
           jq -e '.status=="PASS_BLOCK1_VISUAL_ANTIBUCLE_SYNTHETIC_V20260811" and .ok==true and .runtime==false and .firebase==false and .hosting==false and .writes==0' "$RUNNER_TEMP/antibucle.json" >/dev/null
+          ORBIT360_MATRIX_ARTIFACT_VALIDATE_ONLY=1 node tools/orbit360-block1-final-native-matrix-v20260811.mjs > "$RUNNER_TEMP/implementation-import.json"
+          jq -e '.status=="PASS_BLOCK1_FINAL_NATIVE_MATRIX_IMPORT" and .classification=="SOURCE_ARTIFACT_VALIDATED" and .bootstrapSyntheticPass==true and .sourceContract.bootstrapNavigationOwner=="document-commit-login-form-firebase-readiness-segmented" and .sourceContract.bootstrapInitialWaitUntil=="commit" and .sourceContract.bootstrapContextCloseOnFailure==true and .externalRuntimeDependenciesLoaded==false and .firebaseAccess==false and .browserExecuted==false and .hostingTouched==false and .writes==0 and .ok==true' "$RUNNER_TEMP/implementation-import.json" >/dev/null
           ORBIT360_MATRIX_ARTIFACT_VALIDATE_ONLY=1 node tools/orbit360-block1-native-matrix-v23-canonical-v20260807.mjs > "$RUNNER_TEMP/matrix-import.json"
           jq -e '.status=="PASS_V23_NATIVE_MATRIX_IMPORT" and .classification=="SOURCE_ARTIFACT_VALIDATED" and .bootstrapSyntheticPass==true and .sourceContract.bootstrapNavigationOwner=="document-commit-login-form-firebase-readiness-segmented" and .sourceContract.bootstrapInitialWaitUntil=="commit" and .sourceContract.bootstrapContextCloseOnFailure==true and .sourceContract.gateId=="block1-client360-insurers-lab-v20260717" and .sourceContract.contractVersion=="1.0.41" and .sourceContract.blockingRoutes==["inicio","cliente360","aseguradoras"] and .sourceContract.sharedImplementationImport=="tools/orbit360-block1-final-native-matrix-v20260811.mjs" and .sourceContract.accessOwner=="Orbit.access.can" and .sourceContract.clientScopeOwner=="Orbit.access.filter/withScope" and .sourceContract.sameRouteDetailOwner=="rendered-row-user-flow-plus-route-param-dom" and .sourceContract.routePerformanceOwner=="browserObserverElapsedMs" and .sourceContract.mobileMenuOwner=="router-ready-before-burger" and .firebaseAccess==false and .browserExecuted==false and .hostingTouched==false and .writes==0 and .ok==true' "$RUNNER_TEMP/matrix-import.json" >/dev/null
       - name: Validate segmented bootstrap semantics
@@ -67,6 +69,7 @@ jobs:
           node <<'NODE'
           const fs=require('fs');
           const src=fs.readFileSync('tools/orbit360-block1-final-native-matrix-v20260811.mjs','utf8');
+          const canonical=fs.readFileSync('tools/orbit360-block1-native-matrix-v23-canonical-v20260807.mjs','utf8');
           const required=[
             "bootstrapNavigationOwner:'document-commit-login-form-firebase-readiness-segmented'",
             "bootstrapInitialWaitUntil:'commit'",
@@ -89,6 +92,8 @@ jobs:
           if(src.includes("waitUntil:'domcontentloaded',timeout:45000"))throw new Error('STALE_DOMCONTENTLOADED_MONOLITHIC_BOOTSTRAP_REMAINS');
           if(src.includes('c360.renderWaitMs<=30000'))throw new Error('STALE_CLIENT_CHANNEL_WAIT_THRESHOLD_REMAINS');
           if(src.includes('insurers.renderWaitMs<=30000'))throw new Error('STALE_INSURER_CHANNEL_WAIT_THRESHOLD_REMAINS');
+          if(!canonical.includes('syntheticBootstrapNavigationContract'))throw new Error('CANONICAL_BOOTSTRAP_SYNTHETIC_HANDOFF_MISSING');
+          if(!canonical.includes('bootstrapSyntheticPass:bootstrapSynthetic.ok===true'))throw new Error('CANONICAL_BOOTSTRAP_SYNTHETIC_RESULT_NOT_PROPAGATED');
           NODE
       - name: Validate final visual preflight with offline request fixture
         shell: bash
@@ -121,25 +126,35 @@ jobs:
           if(forbiddenTrue)throw new Error('FINAL_VISUAL_PRODUCTION_CAPABILITY_FOUND');
           NODE
       - name: Seal sanitized segmented-bootstrap source evidence
+        id: seal
         shell: bash
         run: |
           set -euo pipefail
-          jq -n --arg sha "$GITHUB_SHA" '{schemaVersion:"orbit360-block1-final-native-visual-source-v4",status:"PASS_BLOCK1_FINAL_NATIVE_VISUAL_SOURCE",ok:true,head:$sha,gateId:"block1-client360-insurers-lab-v20260717",contractVersion:"1.0.41",blockingRoutes:["inicio","cliente360","aseguradoras"],releaseUniversePass:true,correctedValidatorSemantics:true,antiLoopSyntheticPass:true,bootstrapSyntheticPass:true,bootstrapNavigationOwner:"document-commit-login-form-firebase-readiness-segmented",bootstrapInitialWaitUntil:"commit",bootstrapContextCloseOnFailure:true,accessOwner:"Orbit.access.can",clientScopeOwner:"Orbit.access.filter/withScope",sameRouteDetailOwner:"rendered-row-user-flow-plus-route-param-dom",routePerformanceOwner:"browserObserverElapsedMs",mobileMenuOwner:"router-ready-before-burger",ephemeralSecurityOverlayTreatment:"test-harness-remove-only",priorRuntimeRun:31507467271,priorRuntimeClassification:"PIPELINE_MECHANISM_FAILURE",priorRuntimeCheckpoint:"ASESOR_PAGE_GOTO",runtimeRequestPresent:false,runtimeAuthorized:false,secretsRead:false,networkAccess:false,firestoreReads:0,firestoreWrites:0,authWrites:0,operationalWrites:0,browserExecuted:false,hostingTouched:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false}' > "$SOURCE_EVIDENCE"
-      - name: Publish source status
+          jq -n --arg sha "$GITHUB_SHA" --arg run "$GITHUB_RUN_ID" '{schemaVersion:"orbit360-block1-final-native-visual-source-v5",status:"PASS_BLOCK1_FINAL_NATIVE_VISUAL_SOURCE",ok:true,head:$sha,sourceRunId:($run|tonumber),gateId:"block1-client360-insurers-lab-v20260717",contractVersion:"1.0.41",blockingRoutes:["inicio","cliente360","aseguradoras"],releaseUniversePass:true,correctedValidatorSemantics:true,antiLoopSyntheticPass:true,bootstrapSyntheticPass:true,canonicalBootstrapSyntheticHandoff:true,sourceStatusFailClosed:true,bootstrapNavigationOwner:"document-commit-login-form-firebase-readiness-segmented",bootstrapInitialWaitUntil:"commit",bootstrapContextCloseOnFailure:true,accessOwner:"Orbit.access.can",clientScopeOwner:"Orbit.access.filter/withScope",sameRouteDetailOwner:"rendered-row-user-flow-plus-route-param-dom",routePerformanceOwner:"browserObserverElapsedMs",mobileMenuOwner:"router-ready-before-burger",ephemeralSecurityOverlayTreatment:"test-harness-remove-only",priorRuntimeRun:31507467271,priorRuntimeClassification:"PIPELINE_MECHANISM_FAILURE",priorRuntimeCheckpoint:"ASESOR_PAGE_GOTO",priorSourcePreparationRun:31511643685,priorSourcePreparationClassification:"VALIDATOR_STALE_PIPELINE_MECHANISM_FAILURE",runtimeRequestPresent:false,runtimeAuthorized:false,secretsRead:false,networkAccess:false,firestoreReads:0,firestoreWrites:0,authWrites:0,operationalWrites:0,browserExecuted:false,hostingTouched:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false}' > "$SOURCE_EVIDENCE"
+          jq -e --arg sha "$GITHUB_SHA" '.head==$sha and .bootstrapSyntheticPass==true and .canonicalBootstrapSyntheticHandoff==true and .sourceStatusFailClosed==true and .runtimeAuthorized==false and .firestoreWrites==0 and .ok==true' "$SOURCE_EVIDENCE" >/dev/null
+      - name: Publish fail-closed source status
         if: always()
         uses: actions/github-script@v7
         env:
           EVIDENCE_FILE: orbit360-platform/runtime-gate-crm-v20260716/block1-final-visual-source-sanitized-v20260810.json
+          SEAL_OUTCOME: '${{ steps.seal.outcome }}'
+          PRIOR_JOB_STATUS: '${{ job.status }}'
         with:
           script: |
-            const fs=require('fs');let state='failure',description='Block1 segmented-bootstrap source blocked';
-            try{const p=JSON.parse(fs.readFileSync(process.env.EVIDENCE_FILE,'utf8'));if(p.ok===true&&p.status==='PASS_BLOCK1_FINAL_NATIVE_VISUAL_SOURCE'&&p.bootstrapSyntheticPass===true&&p.firestoreWrites===0){state='success';description='Block1 segmented-bootstrap SOURCE PASS';}}catch(e){}
+            const fs=require('fs');
+            let state='failure',description='Block1 segmented-bootstrap source blocked fail-closed';
+            try{
+              if(process.env.SEAL_OUTCOME==='success' && process.env.PRIOR_JOB_STATUS==='success'){
+                const p=JSON.parse(fs.readFileSync(process.env.EVIDENCE_FILE,'utf8'));
+                if(p.ok===true&&p.status==='PASS_BLOCK1_FINAL_NATIVE_VISUAL_SOURCE'&&p.head===context.sha&&p.bootstrapSyntheticPass===true&&p.canonicalBootstrapSyntheticHandoff===true&&p.sourceStatusFailClosed===true&&p.firestoreWrites===0){state='success';description='Block1 segmented-bootstrap SOURCE PASS fail-closed';}
+              }
+            }catch(e){}
             await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/block1-final-native-visual-source',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
-      - name: Upload sanitized source evidence
-        if: always()
+      - name: Upload current-run sanitized source evidence
+        if: ${{ always() && steps.seal.outcome == 'success' }}
         uses: actions/upload-artifact@v4
         with:
           name: orbit360-block1-final-native-visual-source-${{ github.run_id }}
           path: orbit360-platform/runtime-gate-crm-v20260716/block1-final-visual-source-sanitized-v20260810.json
-          if-no-files-found: warn
+          if-no-files-found: error
           retention-days: 30

@@ -6,6 +6,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   runFinalNativeMatrix,
+  syntheticBootstrapNavigationContract,
   MATRIX_SCHEMA,
   GATE_ID,
   BLOCKING_ROUTES,
@@ -36,6 +37,9 @@ export const SOURCE_CONTRACT=Object.freeze({
   sameRouteDetailOwner:'rendered-row-user-flow-plus-route-param-dom',
   routePerformanceOwner:'browserObserverElapsedMs',
   mobileMenuOwner:'router-ready-before-burger',
+  bootstrapNavigationOwner:IMPLEMENTATION_SOURCE_CONTRACT.bootstrapNavigationOwner,
+  bootstrapInitialWaitUntil:IMPLEMENTATION_SOURCE_CONTRACT.bootstrapInitialWaitUntil,
+  bootstrapContextCloseOnFailure:IMPLEMENTATION_SOURCE_CONTRACT.bootstrapContextCloseOnFailure,
   ephemeralSecurityOverlayTreatment:'test-harness-remove-only',
   implementationSourceContract:IMPLEMENTATION_SOURCE_CONTRACT
 });
@@ -44,7 +48,20 @@ const EVIDENCE=process.env.ORBIT360_VISUAL_EVIDENCE||process.env.ORBIT360_MATRIX
 function persist(value){fs.mkdirSync(path.dirname(path.resolve(EVIDENCE)),{recursive:true});fs.writeFileSync(path.resolve(EVIDENCE),JSON.stringify(value,null,2)+'\n','utf8');}
 
 if(process.env.ORBIT360_MATRIX_ARTIFACT_VALIDATE_ONLY==='1'){
-  console.log(JSON.stringify({status:'PASS_V23_NATIVE_MATRIX_IMPORT',classification:'SOURCE_ARTIFACT_VALIDATED',sourceContract:SOURCE_CONTRACT,externalRuntimeDependenciesLoaded:false,firebaseAccess:false,browserExecuted:false,hostingTouched:false,writes:0,ok:true}));
+  const bootstrapSynthetic=syntheticBootstrapNavigationContract();
+  console.log(JSON.stringify({
+    status:'PASS_V23_NATIVE_MATRIX_IMPORT',
+    classification:'SOURCE_ARTIFACT_VALIDATED',
+    sourceContract:SOURCE_CONTRACT,
+    bootstrapSyntheticPass:bootstrapSynthetic.ok===true,
+    bootstrapSynthetic,
+    externalRuntimeDependenciesLoaded:false,
+    firebaseAccess:false,
+    browserExecuted:false,
+    hostingTouched:false,
+    writes:0,
+    ok:bootstrapSynthetic.ok===true
+  }));
 }else if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url)){
   const output=await runFinalNativeMatrix();
   output.implementationStage=output.stage;
