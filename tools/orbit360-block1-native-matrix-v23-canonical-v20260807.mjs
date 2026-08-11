@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 import {
   runFinalNativeMatrix,
   syntheticBootstrapNavigationContract,
+  syntheticLateReadyRecoveryContract,
   MATRIX_SCHEMA,
   GATE_ID,
   BLOCKING_ROUTES,
@@ -43,6 +44,9 @@ export const SOURCE_CONTRACT=Object.freeze({
   firebaseSdkOwner:IMPLEMENTATION_SOURCE_CONTRACT.firebaseSdkOwner,
   firebaseDefaultAppOwner:IMPLEMENTATION_SOURCE_CONTRACT.firebaseDefaultAppOwner,
   firebaseAuthOwner:IMPLEMENTATION_SOURCE_CONTRACT.firebaseAuthOwner,
+  routerReadinessOwner:IMPLEMENTATION_SOURCE_CONTRACT.routerReadinessOwner,
+  clientLateReadyOwner:IMPLEMENTATION_SOURCE_CONTRACT.clientLateReadyOwner,
+  validatorFailClosedOwner:IMPLEMENTATION_SOURCE_CONTRACT.validatorFailClosedOwner,
   ephemeralSecurityOverlayTreatment:'test-harness-remove-only',
   implementationSourceContract:IMPLEMENTATION_SOURCE_CONTRACT
 });
@@ -52,6 +56,7 @@ function persist(value){fs.mkdirSync(path.dirname(path.resolve(EVIDENCE)),{recur
 
 if(process.env.ORBIT360_MATRIX_ARTIFACT_VALIDATE_ONLY==='1'){
   const bootstrapSynthetic=syntheticBootstrapNavigationContract();
+  const lateReadySynthetic=syntheticLateReadyRecoveryContract();
   console.log(JSON.stringify({
     status:'PASS_V23_NATIVE_MATRIX_IMPORT',
     classification:'SOURCE_ARTIFACT_VALIDATED',
@@ -59,13 +64,20 @@ if(process.env.ORBIT360_MATRIX_ARTIFACT_VALIDATE_ONLY==='1'){
     bootstrapSyntheticPass:bootstrapSynthetic.ok===true,
     firebaseSdkWithoutDefaultAppBlocked:bootstrapSynthetic.sdkWithoutDefaultAppBlocked===true,
     firebaseDefaultAppAuthReady:bootstrapSynthetic.defaultAppAuthReady===true,
+    lateReadySyntheticPass:lateReadySynthetic.ok===true,
+    routerLateReadyRecovered:lateReadySynthetic.routerLateReadyRecovered===true,
+    routerUnreadyBlocked:lateReadySynthetic.routerUnreadyBlocked===true,
+    clientDetailLateReadyRecovered:lateReadySynthetic.clientDetailLateReadyRecovered===true,
+    clientRouteLateReadyRecovered:lateReadySynthetic.clientRouteLateReadyRecovered===true,
+    clientRouteWrongParamBlocked:lateReadySynthetic.clientRouteWrongParamBlocked===true,
     bootstrapSynthetic,
+    lateReadySynthetic,
     externalRuntimeDependenciesLoaded:false,
     firebaseAccess:false,
     browserExecuted:false,
     hostingTouched:false,
     writes:0,
-    ok:bootstrapSynthetic.ok===true
+    ok:bootstrapSynthetic.ok===true&&lateReadySynthetic.ok===true
   }));
 }else if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url)){
   const output=await runFinalNativeMatrix();
