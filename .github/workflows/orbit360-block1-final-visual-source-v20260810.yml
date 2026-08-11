@@ -9,7 +9,8 @@ on:
       - 'tools/orbit360-validar-gate-contracts-engine-block1-final-visual-v20260810.mjs'
       - 'tools/orbit360-run-block1-final-visual-after-universe-v20260810.sh'
       - 'tools/orbit360-block1-native-matrix-v23-canonical-v20260807.mjs'
-      - 'tools/orbit360-block1-final-native-matrix-v20260810.mjs'
+      - 'tools/orbit360-block1-final-native-matrix-v20260811.mjs'
+      - 'tools/fixtures/orbit360-block1-visual-antibucle-fixture-v20260811.mjs'
       - 'tools/fixtures/orbit360-block1-final-visual-request-fixture-v20260810.json'
 permissions:
   contents: read
@@ -22,7 +23,7 @@ env:
   SOURCE_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/block1-final-visual-source-sanitized-v20260810.json
 jobs:
   source:
-    name: Block1 · final native visual · source-only
+    name: Block1 · final native visual · source-only anti-loop
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
@@ -51,34 +52,40 @@ jobs:
           bash -n tools/orbit360-run-block1-final-visual-after-universe-v20260810.sh
           node --check tools/orbit360-validar-gate-contracts-engine-block1-final-visual-v20260810.mjs
           node --check tools/orbit360-block1-native-matrix-v23-canonical-v20260807.mjs
-          node --check tools/orbit360-block1-final-native-matrix-v20260810.mjs
+          node --check tools/orbit360-block1-final-native-matrix-v20260811.mjs
           node --check tools/orbit360-event-driven-render-observer-v23.mjs
           node --check tools/orbit360-visual-runtime-rootfix-browser-precheck-v20260805.mjs
+          node --check tools/fixtures/orbit360-block1-visual-antibucle-fixture-v20260811.mjs
           node -e "JSON.parse(require('fs').readFileSync('tools/orbit360-validator-lifecycle-block1-final-visual-runtime-v20260810.json','utf8'));JSON.parse(require('fs').readFileSync('tools/fixtures/orbit360-block1-final-visual-request-fixture-v20260810.json','utf8'))"
+          node tools/fixtures/orbit360-block1-visual-antibucle-fixture-v20260811.mjs > "$RUNNER_TEMP/antibucle.json"
+          jq -e '.status=="PASS_BLOCK1_VISUAL_ANTIBUCLE_SYNTHETIC_V20260811" and .ok==true and .runtime==false and .firebase==false and .hosting==false and .writes==0' "$RUNNER_TEMP/antibucle.json" >/dev/null
           ORBIT360_MATRIX_ARTIFACT_VALIDATE_ONLY=1 node tools/orbit360-block1-native-matrix-v23-canonical-v20260807.mjs > "$RUNNER_TEMP/matrix-import.json"
-          jq -e '.status=="PASS_V23_NATIVE_MATRIX_IMPORT" and .classification=="SOURCE_ARTIFACT_VALIDATED" and .sourceContract.gateId=="block1-client360-insurers-lab-v20260717" and .sourceContract.contractVersion=="1.0.41" and .sourceContract.blockingRoutes==["inicio","cliente360","aseguradoras"] and .sourceContract.generatedFromPriorArtifact==false and .sourceContract.textualTransform==false and .sourceContract.sharedImplementationImport=="tools/orbit360-block1-final-native-matrix-v20260810.mjs" and .sourceContract.accessOwner=="Orbit.access.can" and .sourceContract.clientScopeOwner=="Orbit.access.filter/withScope" and .sourceContract.sameRouteDetailOwner=="exact-hash-and-dom" and .sourceContract.routePerformanceOwner=="renderObserverWaitMs" and .sourceContract.ephemeralSecurityOverlayTreatment=="test-harness-remove-only" and .firebaseAccess==false and .browserExecuted==false and .hostingTouched==false and .writes==0 and .ok==true' "$RUNNER_TEMP/matrix-import.json" >/dev/null
+          jq -e '.status=="PASS_V23_NATIVE_MATRIX_IMPORT" and .classification=="SOURCE_ARTIFACT_VALIDATED" and .sourceContract.gateId=="block1-client360-insurers-lab-v20260717" and .sourceContract.contractVersion=="1.0.41" and .sourceContract.blockingRoutes==["inicio","cliente360","aseguradoras"] and .sourceContract.generatedFromPriorArtifact==false and .sourceContract.textualTransform==false and .sourceContract.sharedImplementationImport=="tools/orbit360-block1-final-native-matrix-v20260811.mjs" and .sourceContract.accessOwner=="Orbit.access.can" and .sourceContract.clientScopeOwner=="Orbit.access.filter/withScope" and .sourceContract.sameRouteDetailOwner=="rendered-row-user-flow-plus-route-param-dom" and .sourceContract.routePerformanceOwner=="browserObserverElapsedMs" and .sourceContract.mobileMenuOwner=="router-ready-before-burger" and .sourceContract.ephemeralSecurityOverlayTreatment=="test-harness-remove-only" and .firebaseAccess==false and .browserExecuted==false and .hostingTouched==false and .writes==0 and .ok==true' "$RUNNER_TEMP/matrix-import.json" >/dev/null
       - name: Validate corrected validator semantics
         shell: bash
         run: |
           set -euo pipefail
           node <<'NODE'
           const fs=require('fs');
-          const src=fs.readFileSync('tools/orbit360-block1-final-native-matrix-v20260810.mjs','utf8');
+          const src=fs.readFileSync('tools/orbit360-block1-final-native-matrix-v20260811.mjs','utf8');
           const required=[
             "Orbit.access&&Orbit.access.can&&Orbit.access.can(route,'view')",
             'normalizeEphemeralSecurityOverlay(page)',
             'Crea tu contraseña personal',
-            'renderWaitMs<=30000',
+            "routePerformanceOwner:'browserObserverElapsedMs'",
+            'c360.observerElapsedMs>0&&c360.observerElapsedMs<=30000',
             'requiredHydrationPreNav=',
-            "kind==='client-detail'",
-            "kind==='insurer-detail'",
-            "kind==='denied'",
-            "Orbit.access.filter('clientes'",
-            "document.querySelector('.tbl tbody tr.clickable')"
+            'await waitRouterReady(page,role)',
+            "page.locator('.tbl tbody tr.clickable').first()",
+            'await row.click({timeout:12000})',
+            "sameRouteDetailOwner:'rendered-row-user-flow-plus-route-param-dom'",
+            "mobileMenuOwner:'router-ready-before-burger'",
+            "Orbit.access.filter('clientes'"
           ];
           const missing=required.filter(x=>!src.includes(x));
-          if(missing.length)throw new Error('FINAL_VISUAL_CORRECTED_CONTRACT_MISSING:'+missing.join('|'));
-          if(src.includes('routeTimings.cliente360 <= 30000'))throw new Error('STALE_COMPOSITE_READY_THRESHOLD_REMAINS');
+          if(missing.length)throw new Error('FINAL_VISUAL_ANTIBUCLE_CONTRACT_MISSING:'+missing.join('|'));
+          if(src.includes('c360.renderWaitMs<=30000'))throw new Error('STALE_CLIENT_CHANNEL_WAIT_THRESHOLD_REMAINS');
+          if(src.includes('insurers.renderWaitMs<=30000'))throw new Error('STALE_INSURER_CHANNEL_WAIT_THRESHOLD_REMAINS');
           if(/const\s+authFacts[\s\S]{0,800}Orbit\.session[^\n]*canSee\('aseguradoras'\)[\s\S]{0,200}add\('scope-insurer-visible'/.test(src))throw new Error('STALE_SESSION_CANSEE_BLOCKER_REMAINS');
           NODE
       - name: Validate final visual preflight with offline request fixture
@@ -103,7 +110,7 @@ jobs:
           if((runner.match(/firebase deploy/g)||[]).length!==1)throw new Error('FINAL_VISUAL_DEPLOY_COUNT_SOURCE_INVALID');
           if(!runner.includes('firebase hosting:clone "$PROJECT:live" "$PROJECT:$SAFETY_CHANNEL"')||!runner.includes('firebase hosting:clone "$PROJECT:$BASELINE" "$PROJECT:live"')||!runner.includes('firebase hosting:clone "$PROJECT:$SAFETY_CHANNEL" "$PROJECT:live"'))throw new Error('FINAL_VISUAL_BACKUP_RESTORE_ROLLBACK_MISSING');
           if(!runner.includes("MATRIX_RUNNER='tools/orbit360-block1-native-matrix-v23-canonical-v20260807.mjs'"))throw new Error('FINAL_VISUAL_NATIVE_MATRIX_NOT_BOUND');
-          if(!canonical.includes("sharedImplementationImport:'tools/orbit360-block1-final-native-matrix-v20260810.mjs'"))throw new Error('FINAL_VISUAL_CORRECTED_IMPLEMENTATION_NOT_BOUND');
+          if(!canonical.includes("sharedImplementationImport:'tools/orbit360-block1-final-native-matrix-v20260811.mjs'"))throw new Error('FINAL_VISUAL_ANTIBUCLE_IMPLEMENTATION_NOT_BOUND');
           if(/--only\s+(functions|firestore|rules)|firebase\s+deploy[^\n]*(functions|firestore|rules)|gcloud\s+.*deploy/i.test(runner+flow))throw new Error('FINAL_VISUAL_FORBIDDEN_DEPLOY_SCOPE');
           const forbiddenTrue=/(?:mainAuthorized|productionAuthorized|mergeAuthorized)\s*==\s*true/.test(flow)||/"(?:mainAuthorized|productionAuthorized|mergeAuthorized)"\s*:\s*true/.test(flow);
           if(forbiddenTrue)throw new Error('FINAL_VISUAL_PRODUCTION_CAPABILITY_FOUND');
@@ -112,7 +119,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          jq -n --arg sha "$GITHUB_SHA" '{schemaVersion:"orbit360-block1-final-native-visual-source-v2",status:"PASS_BLOCK1_FINAL_NATIVE_VISUAL_SOURCE",ok:true,head:$sha,gateId:"block1-client360-insurers-lab-v20260717",contractVersion:"1.0.41",blockingRoutes:["inicio","cliente360","aseguradoras"],releaseUniversePass:true,correctedValidatorSemantics:true,accessOwner:"Orbit.access.can",clientScopeOwner:"Orbit.access.filter/withScope",sameRouteDetailOwner:"exact-hash-and-dom",routePerformanceOwner:"renderObserverWaitMs",ephemeralSecurityOverlayTreatment:"test-harness-remove-only",runtimeRequestPresent:false,runtimeAuthorized:false,secretsRead:false,networkAccess:false,firestoreReads:0,firestoreWrites:0,authWrites:0,operationalWrites:0,browserExecuted:false,hostingTouched:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false}' > "$SOURCE_EVIDENCE"
+          jq -n --arg sha "$GITHUB_SHA" '{schemaVersion:"orbit360-block1-final-native-visual-source-v3",status:"PASS_BLOCK1_FINAL_NATIVE_VISUAL_SOURCE",ok:true,head:$sha,gateId:"block1-client360-insurers-lab-v20260717",contractVersion:"1.0.41",blockingRoutes:["inicio","cliente360","aseguradoras"],releaseUniversePass:true,correctedValidatorSemantics:true,antiLoopSyntheticPass:true,accessOwner:"Orbit.access.can",clientScopeOwner:"Orbit.access.filter/withScope",sameRouteDetailOwner:"rendered-row-user-flow-plus-route-param-dom",routePerformanceOwner:"browserObserverElapsedMs",mobileMenuOwner:"router-ready-before-burger",ephemeralSecurityOverlayTreatment:"test-harness-remove-only",priorRuntimeRun:31502845695,priorRuntimeClassification:"VALIDATOR_STALE_PIPELINE_MECHANISM_FAILURE",runtimeRequestPresent:false,runtimeAuthorized:false,secretsRead:false,networkAccess:false,firestoreReads:0,firestoreWrites:0,authWrites:0,operationalWrites:0,browserExecuted:false,hostingTouched:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false}' > "$SOURCE_EVIDENCE"
       - name: Publish source status
         if: always()
         uses: actions/github-script@v7
@@ -121,7 +128,7 @@ jobs:
         with:
           script: |
             const fs=require('fs');let state='failure',description='Block1 final native visual source blocked';
-            try{const p=JSON.parse(fs.readFileSync(process.env.EVIDENCE_FILE,'utf8'));if(p.ok===true&&p.status==='PASS_BLOCK1_FINAL_NATIVE_VISUAL_SOURCE'&&p.firestoreWrites===0){state='success';description='Block1 corrected final native visual SOURCE PASS';}}catch(e){}
+            try{const p=JSON.parse(fs.readFileSync(process.env.EVIDENCE_FILE,'utf8'));if(p.ok===true&&p.status==='PASS_BLOCK1_FINAL_NATIVE_VISUAL_SOURCE'&&p.antiLoopSyntheticPass===true&&p.firestoreWrites===0){state='success';description='Block1 visual anti-loop rootfix SOURCE PASS';}}catch(e){}
             await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/block1-final-native-visual-source',description,target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
       - name: Upload sanitized source evidence
         if: always()
