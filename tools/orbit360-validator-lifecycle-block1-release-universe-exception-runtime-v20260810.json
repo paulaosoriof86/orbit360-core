@@ -1,0 +1,41 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-v1",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
+  "gateId": "block1-client360-insurers-lab-v20260717",
+  "gateContractVersion": "1.0.41",
+  "currentPhase": "BLOCK1_RELEASE_UNIVERSE_WITH_CONTROLLED_EXCEPTIONS_READONLY",
+  "status": "AUTHORIZED_ONCE_PENDING_EXCLUSIVE_REQUEST",
+  "executionProfile": {
+    "phase": "BLOCK1_RELEASE_UNIVERSE_WITH_CONTROLLED_EXCEPTIONS_READONLY",
+    "capabilities": {
+      "secrets": true,
+      "firestoreRead": true,
+      "writes": false,
+      "runtime": true,
+      "browser": false,
+      "deploy": false,
+      "functionsDeploy": false,
+      "rulesDeploy": false,
+      "production": false
+    }
+  },
+  "operation": "BLOCK1_RELEASE_UNIVERSE_WITH_CONTROLLED_EXCEPTIONS_READONLY",
+  "exceptionPolicyFile": "tools/orbit360-block1-controlled-provenance-exception-policy-v20260810.json",
+  "impactEvidenceFile": "orbit360-platform/runtime-gate-crm-v20260716/block1-controlled-provenance-exception-impact-sanitized-v20260810.json",
+  "maximumLogicalFirestoreOperations": 3,
+  "writesAuthorized": 0,
+  "authReadsAuthorized": 0,
+  "loggingReadsAuthorized": 0,
+  "iamReadsAuthorized": 0,
+  "hostingAuthorized": false,
+  "browserAuthorized": false,
+  "deployAuthorized": false,
+  "productionAuthorized": false,
+  "reimportAuthorized": false,
+  "mainAuthorized": false,
+  "mergeAuthorized": false,
+  "freshRequestRequired": true,
+  "replayAllowed": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
