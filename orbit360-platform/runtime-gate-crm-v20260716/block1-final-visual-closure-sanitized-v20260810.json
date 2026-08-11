@@ -1,0 +1,80 @@
+{
+  "schemaVersion": "orbit360-block1-final-visual-closure-v1",
+  "gateId": "block1-client360-insurers-lab-v20260717",
+  "contractVersion": "1.0.41",
+  "operation": "BLOCK1_FINAL_VISUAL_MATRIX_AFTER_RELEASE_UNIVERSE",
+  "runId": 31447187977,
+  "jobId": 93643821604,
+  "artifactId": 9085126135,
+  "artifactDigestSha256": "13869b3b56294aed3e9af9142cfcc7595ef98ef80c3e864ce2df65a083cf8e71",
+  "decision": "STOP_RETRY",
+  "classification": "PIPELINE_MECHANISM_FAILURE",
+  "checkpoint": "ROLLBACK_HOSTING_LAB",
+  "rootCause": "NATIVE_MATRIX_EPHEMERAL_PASSWORD_CHANGE_OVERLAY_AND_STALE_SCOPE_TIMING_DETAIL_CHECKS",
+  "blockingRoutes": ["inicio", "cliente360", "aseguradoras"],
+  "releaseUniverseDecision": "RELEASE_UNIVERSE_ACCEPTED_WITH_2_CLIENT_PROVENANCE_EXCEPTIONS",
+  "hosting": {
+    "baselineChannel": "visual-matrix-corrected-backup-31135532118",
+    "safetyBackupOutcome": "success",
+    "baselineRestoreOutcome": "success",
+    "deployOutcome": "success",
+    "deploys": 1,
+    "hostingTouched": true,
+    "rollbackOutcome": "success"
+  },
+  "precheck": {
+    "outcome": "success",
+    "stage": "PASS_VISUAL_BROWSER_PRECHECK",
+    "classification": "GO_FULL_VISUAL_MATRIX",
+    "checkpoint": "INICIO_READY_PASS",
+    "firestoreReads": 1,
+    "firestoreWrites": 0,
+    "authWrites": 0,
+    "operationalWrites": 0
+  },
+  "matrix": {
+    "outcome": "failure",
+    "stage": "FAIL_BLOCK1_NATIVE_VISUAL_MATRIX",
+    "classification": "PIPELINE_MECHANISM_FAILURE",
+    "snapshotIntegrity": "VERIFIED_UNCHANGED",
+    "firestoreReads": 14,
+    "firestoreWrites": 0,
+    "authWrites": 0,
+    "operationalWrites": 0,
+    "observedValidatorFindings": [
+      "PASSWORD_CHANGE_OVERLAY_INTERCEPTS_TEST_INTERACTIONS",
+      "SESSION_CANSEE_USED_INSTEAD_OF_ROUTER_ACCESS_OWNER",
+      "SAME_ROUTE_QUERY_OBSERVER_CAN_COMPLETE_ALREADY_READY",
+      "READY_UNDER_30S_SUMMED_PRE_NAV_REQUIRED_HYDRATION_WITH_RENDER_WAIT"
+    ],
+    "direction": {
+      "client360MeasuredCompositeMs": 34952,
+      "client360RenderObserverWaitMs": 27360,
+      "client360RenderEngineMsApprox": 13943,
+      "client360FunctionalChecksOtherwisePass": true
+    },
+    "operativo": {
+      "activeRole": "Operativo",
+      "client360MeasuredCompositeMs": 27687,
+      "insurerSessionBaseCanSee": false,
+      "insurerDirectRouteRenderedInObservedRun": true,
+      "passwordOverlayInterferenceObserved": true
+    },
+    "asesor": {
+      "incompleteBecausePasswordOverlayInterceptedBurger": true
+    }
+  },
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "operationalWrites": 0,
+  "functionsDeploys": 0,
+  "rulesDeploys": 0,
+  "reimport": false,
+  "productionTouched": false,
+  "mainTouched": false,
+  "mergeExecuted": false,
+  "containsPII": false,
+  "containsSecrets": false,
+  "block1CloseEligible": false,
+  "ok": false
+}
