@@ -10,11 +10,17 @@ on:
       - 'tools/orbit360-validar-fase-a-ops-leads-crm-rootfix-source-v20260812.mjs'
       - 'tools/orbit360-validar-fase-a-ops-leads-crm-composed-source-v20260812.mjs'
       - 'orbit360-platform/runtime-gate-crm-v20260716/fase-a-ops-leads-crm-pipeline-stage-stop-v20260812.json'
+      - 'orbit360-platform/runtime-gate-crm-v20260716/fase-a-ops-leads-crm-composed-source-closure-v20260812.json'
       - 'tools/orbit360-validator-lifecycle-fase-a-ops-leads-crm-release-v20260812.json'
       - 'tools/orbit360-validar-gate-contracts-engine-fase-a-ops-leads-crm-release-v20260812.mjs'
       - 'tools/orbit360-gate-contract-registry-extension-fase-a-ops-leads-crm-v20260812.json'
       - 'tools/orbit360-validar-gate-contracts-v20260717.mjs'
       - 'tools/orbit360-validar-fase-a-ops-leads-crm-release-source-v20260812.mjs'
+      - 'tools/orbit360-validator-lifecycle-fase-a-ops-leads-crm-composed-runtime-v20260812.json'
+      - 'tools/orbit360-gate-contract-registry-extension-fase-a-ops-leads-crm-composed-runtime-v20260812.json'
+      - 'tools/orbit360-validar-gate-contracts-engine-fase-a-ops-leads-crm-composed-runtime-v20260812.mjs'
+      - 'tools/orbit360-validar-fase-a-ops-leads-crm-composed-runtime-source-v20260812.mjs'
+      - '.github/workflows/orbit360-fase-a-ops-leads-crm-composed-runtime-v20260812.yml'
       - '.github/workflows/orbit360-fase-a-ops-leads-crm-release-source-v20260812.yml'
 permissions:
   contents: read
@@ -23,7 +29,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   source-only:
-    name: Fase A Ops Leads CRM canonical source + composed pipeline rootfix
+    name: Fase A Ops Leads CRM canonical source + composed runtime package
     runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:
@@ -41,12 +47,14 @@ jobs:
           set -euo pipefail
           node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
           node --check tools/orbit360-validar-gate-contracts-engine-fase-a-ops-leads-crm-release-v20260812.mjs
+          node --check tools/orbit360-validar-gate-contracts-engine-fase-a-ops-leads-crm-composed-runtime-v20260812.mjs
           node --check tools/orbit360-fase-a-ops-leads-crm-auth-matrix-v20260812.mjs
           node --check tools/orbit360-fase-a-ops-leads-crm-auth-matrix-segmented-v20260812.mjs
           node --check tools/orbit360-fase-a-ops-leads-crm-auth-matrix-composed-v20260812.mjs
           node --check tools/orbit360-validar-fase-a-ops-leads-crm-release-source-v20260812.mjs
           node --check tools/orbit360-validar-fase-a-ops-leads-crm-rootfix-source-v20260812.mjs
           node --check tools/orbit360-validar-fase-a-ops-leads-crm-composed-source-v20260812.mjs
+          node --check tools/orbit360-validar-fase-a-ops-leads-crm-composed-runtime-source-v20260812.mjs
           node --check orbit360-platform/modules/ops.js
           node --check orbit360-platform/modules/leads.js
           node --check orbit360-platform/core/ciclo.js
@@ -55,33 +63,34 @@ jobs:
         run: |
           set -euo pipefail
           ORBIT360_EXPECTED_REQUEST_VERSION=NONE_PENDING_FRESH_AUTHORIZATION node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
-          jq -e '.status=="PASS_GATE_CONTRACT_SOURCE_FASE_A_OPS_LEADS_CRM" and .failed==0 and .executionAuthorized==false and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false and .canonicalEngine=="tools/orbit360-validar-gate-contracts-engine-fase-a-ops-leads-crm-release-v20260812.mjs" and .canonicalLifecycleContract=="tools/orbit360-validator-lifecycle-fase-a-ops-leads-crm-release-v20260812.json" and .ok==true' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json >/dev/null
+          jq -e '.status=="PASS_GATE_CONTRACT_SOURCE_FASE_A_OPS_LEADS_CRM" and .failed==0 and .executionAuthorized==false and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false and .ok==true' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json >/dev/null
       - name: Validate cumulative Fase A source-only package
         shell: bash
         run: |
           set -euo pipefail
           node tools/orbit360-validar-fase-a-ops-leads-crm-release-source-v20260812.mjs
           jq -e '.status=="GO_FASE_A_OPS_LEADS_CRM_CANONICAL_SOURCE" and .checksFailed==0 and .secretAccess==false and .firestoreRead==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .browserExecuted==false and .deployExecuted==false and .productionTouched==false and .runtimeAuthorizationPresent==false and .canonicalRegistrationPending==false and .ok==true' orbit360-platform/runtime-gate-crm-v20260716/fase-a-ops-leads-crm-release-source-sanitized-v20260812.json >/dev/null
-      - name: Validate segmented auth rootfix against proven Block1 semantics
-        shell: bash
-        run: |
-          set -euo pipefail
-          node tools/orbit360-validar-fase-a-ops-leads-crm-rootfix-source-v20260812.mjs
-          jq -e '.status=="PASS_FASE_A_SEGMENTED_AUTH_ROOTFIX_SOURCE" and .checksFailed==0 and .rootfixOwner=="AUTHENTICATED_RELEASE_TEST_HARNESS" and .secretAccess==false and .firestoreRead==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .browserExecuted==false and .deployExecuted==false and .productionTouched==false and .runtimeAuthorized==false and .ok==true' orbit360-platform/runtime-gate-crm-v20260716/fase-a-ops-leads-crm-rootfix-source-sanitized-v20260812.json >/dev/null
       - name: Validate composed transport plus auth readiness rootfix
         shell: bash
         run: |
           set -euo pipefail
           node tools/orbit360-validar-fase-a-ops-leads-crm-composed-source-v20260812.mjs
-          jq -e '.status=="PASS_FASE_A_COMPOSED_HARNESS_SOURCE" and .classification=="PIPELINE_ROOT_CAUSE_CORRECTED_SOURCE" and .rootCause=="HARNESS_CONTRACT_COMPOSITION_FAILURE" and .transportOwner=="BLOCK12_EXISTING_LAB_TRANSPORT" and .authReadinessOwner=="BLOCK1_SEGMENTED_AUTH_MEMBERSHIP_ROUTER" and .checksFailed==0 and .secretAccess==false and .firestoreRead==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .browserExecuted==false and .deployExecuted==false and .productionTouched==false and .runtimeAuthorized==false and .containsPII==false and .containsSecrets==false and .ok==true' orbit360-platform/runtime-gate-crm-v20260716/fase-a-ops-leads-crm-composed-source-sanitized-v20260812.json >/dev/null
+          jq -e '.status=="PASS_FASE_A_COMPOSED_HARNESS_SOURCE" and .classification=="PIPELINE_ROOT_CAUSE_CORRECTED_SOURCE" and .rootCause=="HARNESS_CONTRACT_COMPOSITION_FAILURE" and .transportOwner=="BLOCK12_EXISTING_LAB_TRANSPORT" and .authReadinessOwner=="BLOCK1_SEGMENTED_AUTH_MEMBERSHIP_ROUTER" and .checksFailed==0 and .secretAccess==false and .firestoreRead==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .browserExecuted==false and .deployExecuted==false and .productionTouched==false and .runtimeAuthorized==false and .ok==true' orbit360-platform/runtime-gate-crm-v20260716/fase-a-ops-leads-crm-composed-source-sanitized-v20260812.json >/dev/null
+      - name: Validate composed runtime package with request absent
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-fase-a-ops-leads-crm-composed-runtime-source-v20260812.mjs
+          jq -e '.status=="PASS_FASE_A_COMPOSED_RUNTIME_PACKAGE_SOURCE" and .classification=="RUNTIME_PACKAGE_READY_REQUEST_ABSENT" and .checksFailed==0 and .requestPresent==false and .secretAccess==false and .firestoreRead==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .browserExecuted==false and .deployExecuted==false and .productionTouched==false and .ok==true' orbit360-platform/runtime-gate-crm-v20260716/fase-a-ops-leads-crm-composed-runtime-source-sanitized-v20260812.json >/dev/null
       - name: Upload sanitized source-only evidence
         uses: actions/upload-artifact@v4
         with:
-          name: orbit360-fase-a-ops-leads-crm-composed-source-${{ github.run_id }}
+          name: orbit360-fase-a-ops-leads-crm-composed-runtime-package-${{ github.run_id }}
           path: |
             orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
             orbit360-platform/runtime-gate-crm-v20260716/fase-a-ops-leads-crm-release-source-sanitized-v20260812.json
-            orbit360-platform/runtime-gate-crm-v20260716/fase-a-ops-leads-crm-rootfix-source-sanitized-v20260812.json
             orbit360-platform/runtime-gate-crm-v20260716/fase-a-ops-leads-crm-composed-source-sanitized-v20260812.json
+            orbit360-platform/runtime-gate-crm-v20260716/fase-a-ops-leads-crm-composed-runtime-source-sanitized-v20260812.json
             orbit360-platform/runtime-gate-crm-v20260716/fase-a-ops-leads-crm-pipeline-stage-stop-v20260812.json
+            orbit360-platform/runtime-gate-crm-v20260716/fase-a-ops-leads-crm-composed-source-closure-v20260812.json
           retention-days: 14
