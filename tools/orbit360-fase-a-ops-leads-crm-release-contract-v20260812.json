@@ -1,0 +1,70 @@
+{
+  "schemaVersion": "orbit360-fase-a-ops-leads-crm-release-contract-v1",
+  "issuedAt": "2026-08-12",
+  "gateId": "fase-a-ops-leads-crm-release-lab-v20260812",
+  "contractVersion": "1.0.0",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "tenantId": "alianzas-soluciones",
+  "preparedFromHead": "31f20e944bfeff0aea8f706b18a6ffdff2b6ead7",
+  "classification": "PIPELINE_MECHANISM_FAILURE / RELEASE_EVIDENCE_GAP",
+  "objective": "Close Fase A release evidence for authenticated Ops + Leads + integrated CRM without reopening closed modules.",
+  "closedDependencies": {
+    "block1VisualPostAuth": {"status":"PASS_VISUAL_POST_AUTH","runId":31544331170,"replayAllowed":false},
+    "polizas": "CLOSED_REUSE_ONLY",
+    "vehiculos": "CLOSED_REUSE_ONLY",
+    "recibosCartera": "CLOSED_REUSE_ONLY",
+    "cobrosConciliacion": "CLOSED_REUSE_ONLY",
+    "comisiones": "CLOSED_REUSE_ONLY"
+  },
+  "runtime": {
+    "labUrl": "https://ays-orbit-360-lab.web.app/index.html?orbitBackend=firestore-lab&tenant=alianzas-soluciones&runtime=20260717-2",
+    "deployAuthorized": false,
+    "deployRequired": false,
+    "browserRequired": true,
+    "firestoreReadRequired": true,
+    "firestoreWritesAuthorized": 0,
+    "authWritesAuthorized": 0,
+    "operationalWritesAuthorized": 0,
+    "productionAuthorized": false,
+    "mainAuthorized": false,
+    "mergeAuthorized": false
+  },
+  "matrix": [
+    {"role":"Direccion","viewport":{"width":1440,"height":1000},"roleAliases":["superadmin","direccion","admintenant"]},
+    {"role":"Operativo","viewport":{"width":1024,"height":768},"roleAliases":["operativo"]},
+    {"role":"Asesor","viewport":{"width":390,"height":844},"roleAliases":["asesor"]}
+  ],
+  "routes": ["ops","leads","cliente360"],
+  "routePolicy": "Orbit.access.can(route,'view') is authoritative: allowed routes must render; denied routes must remain honestly restricted and must not expose unrelated data.",
+  "assertions": [
+    "authenticated membership is tenant-bound",
+    "active role and scope are coherent",
+    "Ops and Leads route behavior matches Orbit.access.can",
+    "Cliente360 remains available according to scope as integrated CRM dependency",
+    "no visible technical copy",
+    "no uncaught page or console errors",
+    "mobile navigation is usable for Asesor",
+    "before/after protected snapshot is identical",
+    "firestoreWrites=0",
+    "authWrites=0",
+    "operationalWrites=0"
+  ],
+  "sourceOnly": {
+    "secrets": false,
+    "firestoreRead": false,
+    "writes": false,
+    "browser": false,
+    "deploy": false,
+    "production": false,
+    "runtimeRequestRequired": false,
+    "runtimeAuthorizationPresent": false
+  },
+  "runtimeRequest": {
+    "status": "ABSENT_UNTIL_SOURCE_PASS_AND_EXPLICIT_AUTHORIZATION",
+    "allowedExecutions": 0,
+    "replayAllowed": false
+  },
+  "finance": {"financieroHistoricoStatus":"FROZEN_POST_PRODUCTION_82_PERCENT","touched":false}
+}

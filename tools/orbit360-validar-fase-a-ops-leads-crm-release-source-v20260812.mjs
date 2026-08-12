@@ -1,0 +1,35 @@
+#!/usr/bin/env node
+'use strict';
+import fs from 'node:fs';
+import crypto from 'node:crypto';
+const read=p=>fs.readFileSync(p,'utf8');
+const json=p=>JSON.parse(read(p));
+const digest=p=>crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex');
+const CONTRACT='tools/orbit360-fase-a-ops-leads-crm-release-contract-v20260812.json';
+const MATRIX='tools/orbit360-fase-a-ops-leads-crm-auth-matrix-v20260812.mjs';
+const BLOCK1='tools/orbit360-block1-final-native-matrix-v20260811.mjs';
+const BLOCK12='tools/orbit360-validator-lifecycle-contract-block12-operational-runtime-lab-v20260804.json';
+const OUT='orbit360-platform/runtime-gate-crm-v20260716/fase-a-ops-leads-crm-release-source-sanitized-v20260812.json';
+const checks=[];const add=(id,ok,detail='')=>checks.push({id,ok:Boolean(ok),detail:String(detail).slice(0,500)});
+let result;
+try{
+  const c=json(CONTRACT),m=read(MATRIX),b1=read(BLOCK1),b12=json(BLOCK12),ops=read('orbit360-platform/modules/ops.js'),leads=read('orbit360-platform/modules/leads.js'),ciclo=read('orbit360-platform/core/ciclo.js');
+  add('CONTRACT_ID_VERSION',c.gateId==='fase-a-ops-leads-crm-release-lab-v20260812'&&c.contractVersion==='1.0.0');
+  add('BRANCH_TENANT',c.branch==='ays/backend-tenant-lab-v99-20260703'&&c.tenantId==='alianzas-soluciones');
+  add('FINANCE_FROZEN',c.finance?.financieroHistoricoStatus==='FROZEN_POST_PRODUCTION_82_PERCENT'&&c.finance?.touched===false);
+  add('NO_RUNTIME_AUTHORIZATION',c.sourceOnly?.runtimeAuthorizationPresent===false&&c.runtimeRequest?.allowedExecutions===0&&c.runtimeRequest?.status==='ABSENT_UNTIL_SOURCE_PASS_AND_EXPLICIT_AUTHORIZATION');
+  add('NO_DEPLOY_NO_WRITES',c.runtime?.deployAuthorized===false&&c.runtime?.deployRequired===false&&c.runtime?.firestoreWritesAuthorized===0&&c.runtime?.authWritesAuthorized===0&&c.runtime?.operationalWritesAuthorized===0&&c.runtime?.productionAuthorized===false);
+  add('THREE_ROLE_MATRIX',JSON.stringify(c.matrix.map(x=>x.role))===JSON.stringify(['Direccion','Operativo','Asesor']));
+  add('RELEASE_ROUTES',JSON.stringify(c.routes)===JSON.stringify(['ops','leads','cliente360']));
+  add('BLOCK1_PROVEN_HARNESS',b1.includes("{role:'Direccion',width:1440,height:1000")&&b1.includes("{role:'Operativo',width:1024,height:768")&&b1.includes("{role:'Asesor',width:390,height:844")&&b1.includes("snapshotIntegrity")&&b1.includes("technicalCopy"));
+  add('BLOCK12_OPS_LEADS_ROUTE_PRECEDENT',Array.isArray(b12.scope?.visualRoutes)&&b12.scope.visualRoutes.includes('ops')&&b12.scope.visualRoutes.includes('leads')&&b12.authorization?.consumed===true&&b12.authorization?.replayAllowed===false);
+  add('OPS_MODULE_PRESENT',ops.includes('Orbit.modules')&&/ops/i.test(ops)&&ops.includes('render'));
+  add('LEADS_MODULE_PRESENT',leads.includes('Orbit.modules')&&/leads/i.test(leads)&&leads.includes('render'));
+  add('CRM_CYCLE_PRESENT',ciclo.includes('Orbit')&&(/lead/i.test(ciclo)||/negocio/i.test(ciclo))&&(/gestion/i.test(ciclo)||/ops/i.test(ciclo)));
+  add('MATRIX_FAIL_CLOSED',m.includes("AUTHORIZATION_REQUIRED:RUNTIME_NOT_AUTHORIZED")&&m.includes("ROUTES=Object.freeze(['ops','leads','cliente360'])")&&m.includes("snapshotIntegrity")&&m.includes("VERIFIED_UNCHANGED")&&m.includes("technicalCopy")&&m.includes("firestoreWrites:0")&&m.includes("authWrites:0")&&m.includes("operationalWrites:0"));
+  add('MATRIX_NO_DEPLOY',!m.includes('firebase deploy')&&!m.includes('hosting:channel:deploy')&&!m.includes('functions:deploy'));
+  add('MATRIX_SOURCE_SYNTAX_TARGET',m.includes("SCHEMA='orbit360-fase-a-ops-leads-crm-auth-matrix-v1'"));
+  const failed=checks.filter(x=>!x.ok);
+  result={schemaVersion:'orbit360-fase-a-ops-leads-crm-release-source-evidence-v1',gateId:c.gateId,contractVersion:c.contractVersion,status:failed.length?'STOP_SOURCE_ONLY':'GO_FASE_A_OPS_LEADS_CRM_SOURCE_ONLY_PREP',classification:failed.length?'PIPELINE_MECHANISM_FAILURE':'RELEASE_EVIDENCE_GAP_SOURCE_READY',checksPassed:checks.length-failed.length,checksFailed:failed.length,failedCheckIds:failed.map(x=>x.id),checks,files:{contractSha256:digest(CONTRACT),matrixSha256:digest(MATRIX)},secretAccess:false,firestoreRead:false,firestoreWrites:0,authWrites:0,operationalWrites:0,browserExecuted:false,deployExecuted:false,productionTouched:false,runtimeAuthorizationPresent:false,canonicalRegistrationPending:true,ok:failed.length===0};
+}catch(e){result={schemaVersion:'orbit360-fase-a-ops-leads-crm-release-source-evidence-v1',status:'STOP_SOURCE_ONLY',classification:'PIPELINE_MECHANISM_FAILURE',error:String(e&&e.message||e).slice(0,600),secretAccess:false,firestoreRead:false,firestoreWrites:0,browserExecuted:false,deployExecuted:false,productionTouched:false,ok:false};}
+fs.mkdirSync('orbit360-platform/runtime-gate-crm-v20260716',{recursive:true});fs.writeFileSync(OUT,JSON.stringify(result,null,2)+'\n');console.log(JSON.stringify(result,null,2));if(!result.ok)process.exit(41);
