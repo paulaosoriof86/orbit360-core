@@ -5,15 +5,15 @@
   "gateContractVersion": "10.10.2",
   "owner": "orbit360-cobros-full-ledger-write-lab-v20260805",
   "ownerVersion": "20260811.2-canonical-router-registered",
-  "status": "STATIC_PREFLIGHT_PASS_NOT_AUTHORIZED",
-  "classification": "STATIC_ISOLATED_RUN_READY_NO_ACCESS",
+  "status": "STOP_RETRY",
+  "classification": "AUTHORIZED_LAB_RUN_SCOPED_LEDGER_WRITE_READY",
   "patternClassification": "BACKEND_PROTEGIDO_NO_CLAUDE",
   "rcId": "RC-AYS-LAB-CANONICA-01",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
   "projectId": "ays-orbit-360-lab",
   "tenantId": "alianzas-soluciones",
-  "currentPhase": "STATIC_PREFLIGHT_PASS",
+  "currentPhase": "CONSUMED_PASS_OR_STOP_RETRY",
   "phases": [
     "PREPARED_STATIC",
     "PRIVATE_PACKAGE_READY",
@@ -27,8 +27,8 @@
     "CONSUMED_PASS_OR_STOP_RETRY"
   ],
   "executionProfile": {
-    "mode": "SOURCE_ONLY",
-    "phase": "STATIC_PREFLIGHT_PASS",
+    "mode": "CLOSED",
+    "phase": "CONSUMED_PASS_OR_STOP_RETRY",
     "capabilities": {
       "secrets": false,
       "firestoreRead": false,
@@ -73,7 +73,7 @@
   },
   "requestPathPattern": ".github/orbit360-requests/cobros-full-ledger-write-lab-*.json",
   "activeRequest": false,
-  "requestConsumed": false,
+  "requestConsumed": true,
   "replayAllowed": false,
   "allowedExecutions": 0,
   "executionAuthorized": false,
@@ -149,7 +149,7 @@
   "containsPII": false,
   "containsSecrets": false,
   "containsPasswords": false,
-  "nextAction": "CREATE_ONE_FRESH_EXCLUSIVE_PARENT_BOUND_RUNTIME_REQUEST_FOR_COBROS_10102",
+  "nextAction": "STOP_RETRY_DIAGNOSE_ROOT_CAUSE_BEFORE_ANY_NEW_REQUEST",
   "staticRequest": {
     "path": ".github/orbit360-requests/cobros-full-ledger-static-v20260805.json",
     "commit": "8cdd57f7ff33dc91fe398710a8cd4697f8ad8ba6",
@@ -170,5 +170,15 @@
     "secretsRead": false,
     "firestoreRead": false,
     "writes": 0
+  },
+  "runtimeClosure": {
+    "runId": 31553043940,
+    "requestCommit": "4dcab95ae0803d4e772ed88e2fa6b34cd4e304e2",
+    "status": "STOP_RETRY",
+    "classification": "AUTHORIZED_LAB_RUN_SCOPED_LEDGER_WRITE_READY",
+    "checkpoint": "PRE_WRITE_GATE_OR_ENVIRONMENT",
+    "forwardWrites": 0,
+    "rollbackAttempted": false,
+    "rollbackRestored": false
   }
 }
