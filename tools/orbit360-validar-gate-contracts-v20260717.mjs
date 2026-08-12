@@ -10,6 +10,7 @@ const GATE_ID = process.argv[2] || 'block1-client360-insurers-lab-v20260717';
 const BLOCK1_GATE_ID = 'block1-client360-insurers-lab-v20260717';
 const VISUAL_LEGACY_GATE_ID = 'block2.7-visual-matrix-corrected-post-auth-lab-v20260805';
 const COBROS_10102_GATE_ID = 'block10.10-cobros-full-ledger-write-lab-v20260805';
+const FASE_A_OPS_LEADS_CRM_GATE_ID = 'fase-a-ops-leads-crm-release-lab-v20260812';
 const COBROS_10102_RUNTIME_PROFILE = 'cobros-10102-runtime';
 const V28_PROFILE = 'v28-focal-provenance-universe';
 const V29_PROFILE = 'v29-identity-reconciliation-universe';
@@ -27,7 +28,7 @@ const DEFAULT_BLOCK1_V30_REQUEST_REL = '.github/orbit360-requests/block1-client3
 const DEFAULT_BLOCK1_V33_REQUEST_REL = '.github/orbit360-requests/block1-client360-insurers-v33-two-client-cloud-audit-authorization.json';
 const STOP_OVERLAY_REL = 'tools/orbit360-validator-lifecycle-overlay-visual-matrix-v8-stop-preflight-v20260806.json';
 const CANONICAL_LIFECYCLE_COMPOSITION = 'phase-capability-contract-v1';
-const ROUTER_VERSION = 'v10.1-profile-aware-v33-historical-request';
+const ROUTER_VERSION = 'v10.2-fase-a-release-evidence';
 
 const GATE_CONFIG = Object.freeze({
   [BLOCK1_GATE_ID]: {
@@ -43,6 +44,13 @@ const GATE_CONFIG = Object.freeze({
     engine: 'tools/orbit360-validar-gate-contracts-engine-cobros-full-ledger-write-v20260811.mjs',
     defaultRequest: '.github/orbit360-requests/cobros-full-ledger-write-lab-v20260811.json',
     sourcePhase: 'STATIC_PREFLIGHT_PASS'
+  },
+  [FASE_A_OPS_LEADS_CRM_GATE_ID]: {
+    contractVersion: '1.0.0',
+    lifecycle: 'tools/orbit360-validator-lifecycle-fase-a-ops-leads-crm-release-v20260812.json',
+    engine: 'tools/orbit360-validar-gate-contracts-engine-fase-a-ops-leads-crm-release-v20260812.mjs',
+    defaultRequest: '.github/orbit360-requests/fase-a-ops-leads-crm-release-v20260812-authorization.json',
+    sourcePhase: 'SOURCE_ONLY_FASE_A_OPS_LEADS_CRM_RELEASE'
   },
   [VISUAL_LEGACY_GATE_ID]: {
     contractVersion: '2.7.8',
@@ -111,6 +119,7 @@ const PHASE_PROFILES = Object.freeze({
   BLOCK1_RETAINED26_ENCRYPTED_EXPORT_READONLY_V30: {secrets:true,firestoreRead:true,writes:false,runtime:true,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false},
   SOURCE_ONLY_TWO_CLIENT_CLOUD_AUDIT_V33: {secrets:false,firestoreRead:false,writes:false,runtime:false,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false},
   BLOCK1_TWO_CLIENT_CLOUD_AUDIT_READONLY_V33: {secrets:true,firestoreRead:true,writes:false,runtime:true,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false},
+  SOURCE_ONLY_FASE_A_OPS_LEADS_CRM_RELEASE: {secrets:false,firestoreRead:false,writes:false,runtime:false,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false},
   VISUAL_MATRIX_CORRECTED_POST_AUTH_LAB_EXECUTION: {secrets:true,firestoreRead:true,writes:false,runtime:true,browser:true,deploy:true,functionsDeploy:false,rulesDeploy:false,production:false}
 });
 
