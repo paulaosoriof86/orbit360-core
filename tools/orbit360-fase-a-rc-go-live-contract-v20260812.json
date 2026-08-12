@@ -1,0 +1,94 @@
+{
+  "schemaVersion": "orbit360-fase-a-rc-go-live-contract-v1",
+  "issuedAt": "2026-08-12T17:19:00-06:00",
+  "releaseId": "RC-AYS-LAB-CANONICA-01-20260812",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "sourceHead": "0bf2b98210fea72ee888efee7c6e6348b6efc72e",
+  "pr": 5,
+  "tenant": "alianzas-soluciones",
+  "classification": "RELEASE_CANDIDATE_GO_LIVE_PREPARATION",
+  "faseA": {
+    "functionalReadinessPercent": 100,
+    "status": "CLOSED",
+    "releaseEvidenceRun": 31649580547,
+    "releaseEvidenceArtifact": 9162045175,
+    "opsLeadsCrmRouteChecks": 9,
+    "opsLeadsCrmRouteChecksPassed": 9,
+    "snapshotIntegrity": "VERIFIED_UNCHANGED",
+    "firestoreWrites": 0,
+    "authWrites": 0,
+    "operationalWrites": 0,
+    "mobileFindingClassification": "VALIDATOR_STALE"
+  },
+  "production": {
+    "status": "NOT_TOUCHED",
+    "authorizationRequired": true,
+    "requestPath": ".github/orbit360-requests/fase-a-go-live-production-20260812-authorization.json",
+    "requestMustBeAbsentDuringSourcePreparation": true,
+    "deployAllowedDuringSourcePreparation": false,
+    "secretsAllowedDuringSourcePreparation": false,
+    "firebaseAllowedDuringSourcePreparation": false,
+    "browserAllowedDuringSourcePreparation": false,
+    "writesAllowedDuringSourcePreparation": false
+  },
+  "goLiveMacro": {
+    "singleAuthorization": true,
+    "singleImmutableRequest": true,
+    "stages": [
+      "canonical_gate_preflight_before_secrets",
+      "production_readiness_readonly",
+      "cutover_delta_dry_run_since_last_watermark",
+      "target_backup_and_rollback_checkpoint",
+      "controlled_cutover_delta_write_if_required",
+      "hosting_release_checkpoint",
+      "authorized_deploy_or_activation",
+      "production_smoke_three_views",
+      "integrity_and_write_scope_verification",
+      "confirm_url_and_go_live"
+    ],
+    "failClosed": true,
+    "sameStageSecondFailurePolicy": "STOP_RETRY_ROOT_CAUSE_NO_THIRD_REQUEST"
+  },
+  "backupRollback": {
+    "requiredBeforeAnyProductionMutation": true,
+    "targetDataSnapshotRequiredBeforeCutoverWrites": true,
+    "hostingReleaseCheckpointRequiredBeforeDeploy": true,
+    "rollbackMustBeExecutableNotNarrative": true,
+    "rollbackMustNotDeleteValidProductionData": true,
+    "blockDeployIfUnproven": true
+  },
+  "dataContinuity": {
+    "productionBecomesSystemOfRecordAfterGoLive": true,
+    "fullReloadAfterGoLive": false,
+    "newExternalSourcesDuringSameDeploy": false,
+    "preGoLiveOperationalDeltaRequired": true,
+    "postGoLiveImportsAreIncremental": true,
+    "idempotentBatchKeysRequired": true,
+    "dryRunDiffAuditRollbackRequired": true,
+    "productionUserEditsCannotBeSilentlyOverwritten": true
+  },
+  "newSourcePolicy": {
+    "planilla_comisiones": "SEPARATE_INCREMENTAL_BATCH_AFTER_GO_LIVE_OR_SEPARATE_AUTHORIZED_DATA_BLOCK",
+    "estado_cuenta_bancario": "STAGING_AND_RECONCILIATION_ONLY_NEVER_DIRECT_COBROS_WRITE",
+    "otherSources": "ONE_SOURCE_ONE_BATCH_ONE_TRACEABLE_GATE"
+  },
+  "moduleEvolution": {
+    "preserveProductionData": true,
+    "noDatabaseReseedOnCodeDeploy": true,
+    "additiveBackwardCompatibleSchema": true,
+    "tenantFeatureEnablementAfterSmoke": true,
+    "oneModuleGatePerClosure": true,
+    "pattern": "LAB_GATE -> DRY_RUN_MIGRATION_IF_NEEDED -> BACKUP_ROLLBACK -> COMPATIBLE_DEPLOY -> PROD_READONLY_SMOKE -> TENANT_ENABLE -> POST_ENABLE_SMOKE"
+  },
+  "sourceOnlyAcceptance": {
+    "requestAbsent": true,
+    "productionTouched": false,
+    "secretsAccessed": false,
+    "firebaseAccessed": false,
+    "browserExecuted": false,
+    "deploys": 0,
+    "writes": 0,
+    "evidencePath": "orbit360-platform/runtime-gate-crm-v20260716/fase-a-rc-go-live-source-sanitized-v20260812.json"
+  }
+}

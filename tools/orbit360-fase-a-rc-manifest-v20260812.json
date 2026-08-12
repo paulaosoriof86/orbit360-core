@@ -1,0 +1,71 @@
+{
+  "schemaVersion": "orbit360-fase-a-rc-manifest-v1",
+  "releaseId": "RC-AYS-LAB-CANONICA-01-20260812",
+  "preparedFromHead": "0bf2b98210fea72ee888efee7c6e6348b6efc72e",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pr": 5,
+  "faseA": {
+    "status": "CLOSED",
+    "functionalReadinessPercent": 100,
+    "closedAndFrozen": [
+      "auth_membership_multirol_scopes",
+      "inicio_navigation",
+      "cliente360",
+      "aseguradoras",
+      "polizas",
+      "vehiculos",
+      "recibos_cartera",
+      "cobros_conciliacion",
+      "comisiones_planillas",
+      "ops",
+      "leads",
+      "crm_integrated_release_evidence"
+    ],
+    "doNotReopenWithoutNewEvidence": true
+  },
+  "authenticatedLabEvidence": {
+    "roles": [
+      "Direccion_desktop_1440x1000",
+      "Operativo_tablet_1024x768",
+      "Asesor_mobile_390x844"
+    ],
+    "routes": ["ops", "leads", "cliente360"],
+    "routeChecksTotal": 9,
+    "routeChecksPassed": 9,
+    "routeChecksFailed": 0,
+    "consoleErrors": 0,
+    "technicalCopyFindings": 0,
+    "snapshotIntegrity": "VERIFIED_UNCHANGED",
+    "firestoreWrites": 0,
+    "authWrites": 0,
+    "operationalWrites": 0,
+    "runtimeRun": 31649067843,
+    "reconciliationRun": 31649580547,
+    "reconciliationArtifact": 9162045175,
+    "mobileAssertionRootCause": "VALIDATOR_STALE_MOBILE_MENU_SELECTOR",
+    "mobileOwnerUnchangedFromPriorPass": true
+  },
+  "nonBlockingPostProduction": {
+    "financiero_historico": "82_PERCENT_OWN_BLOCK_FROZEN",
+    "cotizador_comparativo_renovaciones": "POST_GO_LIVE_NON_BLOCKING",
+    "marketing_portal_rest": "POST_GO_LIVE",
+    "rebranding_gravicentra": "DEFERRED_NON_BLOCKING"
+  },
+  "goLiveRemaining": [
+    "source_only_package_pass",
+    "explicit_single_production_authorization",
+    "canonical_preflight_before_secrets",
+    "production_readiness_readonly",
+    "crm_cutover_delta_dry_run",
+    "backup_and_executable_rollback",
+    "cutover_delta_write_if_required",
+    "authorized_deploy_or_activation",
+    "production_smoke",
+    "confirm_url"
+  ],
+  "externalFilesReceivedAfterCutoff": {
+    "includedInDeployment": false,
+    "treatment": "DEFER_TO_SEPARATE_INCREMENTAL_SOURCE_BATCHES_WITH_DRY_RUN_DIFF_AUDIT_ROLLBACK"
+  },
+  "productionTouchedByThisManifest": false
+}

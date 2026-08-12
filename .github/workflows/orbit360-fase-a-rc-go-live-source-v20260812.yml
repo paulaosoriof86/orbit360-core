@@ -1,0 +1,47 @@
+name: Orbit360 Fase A RC Go Live Source Only
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - 'tools/orbit360-fase-a-rc-go-live-contract-v20260812.json'
+      - 'tools/orbit360-fase-a-rc-manifest-v20260812.json'
+      - 'tools/orbit360-validar-fase-a-rc-go-live-source-v20260812.mjs'
+      - 'orbit360-platform/docs/ORBIT360-GO-LIVE-DATA-CONTINUITY-20260812.md'
+      - '.github/workflows/orbit360-fase-a-rc-go-live-source-v20260812.yml'
+permissions:
+  contents: read
+concurrency:
+  group: orbit360-fase-a-rc-go-live-source-v20260812
+  cancel-in-progress: false
+jobs:
+  validate-source-only:
+    name: Validate RC and inert go-live package without production access
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate source syntax
+        run: node --check tools/orbit360-validar-fase-a-rc-go-live-source-v20260812.mjs
+      - name: Validate inert RC go-live package
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-fase-a-rc-go-live-source-v20260812.mjs
+          jq -e '.status=="PASS_FASE_A_RC_GO_LIVE_SOURCE_PACKAGE_READY" and .faseAFunctionalReadinessPercent==100 and .authenticatedRouteChecksPassed==9 and .snapshotIntegrity=="VERIFIED_UNCHANGED" and .requestAbsent==true and .productionTouched==false and .secretsAccessed==false and .firebaseAccessed==false and .browserExecuted==false and .deploys==0 and .writes==0 and .newExternalSourcesIncludedInDeploy==false and .productionBecomesSystemOfRecordAfterGoLive==true and .checksFailed==0 and .ok==true' orbit360-platform/runtime-gate-crm-v20260716/fase-a-rc-go-live-source-sanitized-v20260812.json >/dev/null
+      - name: Upload sanitized RC source-only package evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-fase-a-rc-go-live-source-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/fase-a-rc-go-live-source-sanitized-v20260812.json
+            tools/orbit360-fase-a-rc-go-live-contract-v20260812.json
+            tools/orbit360-fase-a-rc-manifest-v20260812.json
+            orbit360-platform/docs/ORBIT360-GO-LIVE-DATA-CONTINUITY-20260812.md
+          retention-days: 14
