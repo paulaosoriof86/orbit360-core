@@ -9,6 +9,8 @@ const ROOT = process.cwd();
 const GATE_ID = process.argv[2] || 'block1-client360-insurers-lab-v20260717';
 const BLOCK1_GATE_ID = 'block1-client360-insurers-lab-v20260717';
 const VISUAL_LEGACY_GATE_ID = 'block2.7-visual-matrix-corrected-post-auth-lab-v20260805';
+const COBROS_10102_GATE_ID = 'block10.10-cobros-full-ledger-write-lab-v20260805';
+const COBROS_10102_RUNTIME_PROFILE = 'cobros-10102-runtime';
 const V28_PROFILE = 'v28-focal-provenance-universe';
 const V29_PROFILE = 'v29-identity-reconciliation-universe';
 const V30_PROFILE = 'v30-retained26-psi-universe';
@@ -34,6 +36,13 @@ const GATE_CONFIG = Object.freeze({
     engine: 'tools/orbit360-validar-gate-contracts-engine-block1-v23-native-v20260807.mjs',
     defaultRequest: DEFAULT_BLOCK1_V23_REQUEST_REL,
     sourcePhase: 'SOURCE_ONLY_NATIVE_MATRIX_VALIDATION'
+  },
+  [COBROS_10102_GATE_ID]: {
+    contractVersion: '10.10.2',
+    lifecycle: 'tools/orbit360-validator-lifecycle-contract-cobros-full-ledger-write-lab-v20260805.json',
+    engine: 'tools/orbit360-validar-gate-contracts-engine-cobros-full-ledger-write-v20260811.mjs',
+    defaultRequest: '.github/orbit360-requests/cobros-full-ledger-write-lab-v20260811.json',
+    sourcePhase: 'STATIC_PREFLIGHT_PASS'
   },
   [VISUAL_LEGACY_GATE_ID]: {
     contractVersion: '2.7.8',
@@ -81,7 +90,17 @@ const BLOCK1_V33_RUNTIME_CONFIG = Object.freeze({
   sourcePhase: ''
 });
 
+const COBROS_10102_RUNTIME_CONFIG = Object.freeze({
+  contractVersion: '10.10.2',
+  lifecycle: 'tools/orbit360-validator-lifecycle-contract-cobros-full-ledger-write-runtime-v20260811.json',
+  engine: 'tools/orbit360-validar-gate-contracts-engine-cobros-full-ledger-write-v20260811.mjs',
+  defaultRequest: '.github/orbit360-requests/cobros-full-ledger-write-lab-v20260811.json',
+  sourcePhase: ''
+});
+
 const PHASE_PROFILES = Object.freeze({
+  STATIC_PREFLIGHT_PASS: {secrets:false,firestoreRead:false,writes:false,runtime:false,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false},
+  COBROS_FULL_LEDGER_WRITE_RUNTIME: {secrets:true,firestoreRead:true,writes:true,runtime:true,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false},
   SOURCE_ONLY_NATIVE_MATRIX_VALIDATION: {secrets:false,firestoreRead:false,writes:false,runtime:false,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false},
   BLOCK1_NATIVE_MATRIX_RUNTIME_V23: {secrets:true,firestoreRead:true,writes:false,runtime:true,browser:true,deploy:true,functionsDeploy:false,rulesDeploy:false,production:false},
   SOURCE_ONLY_FOCAL_PROVENANCE_UNIVERSE_V28: {secrets:false,firestoreRead:false,writes:false,runtime:false,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false},
@@ -150,7 +169,8 @@ function failOutput(config, error) {
 }
 
 const gateProfile = process.env.ORBIT360_GATE_PROFILE || '';
-const config = GATE_ID === BLOCK1_GATE_ID && gateProfile === V33_RUNTIME_PROFILE ? BLOCK1_V33_RUNTIME_CONFIG
+const config = GATE_ID === COBROS_10102_GATE_ID && gateProfile === COBROS_10102_RUNTIME_PROFILE ? COBROS_10102_RUNTIME_CONFIG
+  : GATE_ID === BLOCK1_GATE_ID && gateProfile === V33_RUNTIME_PROFILE ? BLOCK1_V33_RUNTIME_CONFIG
   : GATE_ID === BLOCK1_GATE_ID && gateProfile === V33_PROFILE ? BLOCK1_V33_CONFIG
   : GATE_ID === BLOCK1_GATE_ID && gateProfile === V30_PROFILE ? BLOCK1_V30_CONFIG
   : GATE_ID === BLOCK1_GATE_ID && gateProfile === V29_PROFILE ? BLOCK1_V29_CONFIG

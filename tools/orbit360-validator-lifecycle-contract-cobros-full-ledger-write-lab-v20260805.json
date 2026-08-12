@@ -4,7 +4,7 @@
   "gateId": "block10.10-cobros-full-ledger-write-lab-v20260805",
   "gateContractVersion": "10.10.2",
   "owner": "orbit360-cobros-full-ledger-write-lab-v20260805",
-  "ownerVersion": "20260805.5-static-preflight-pass",
+  "ownerVersion": "20260811.2-canonical-router-registered",
   "status": "STATIC_PREFLIGHT_PASS_NOT_AUTHORIZED",
   "classification": "STATIC_ISOLATED_RUN_READY_NO_ACCESS",
   "patternClassification": "BACKEND_PROTEGIDO_NO_CLAUDE",
@@ -149,7 +149,7 @@
   "containsPII": false,
   "containsSecrets": false,
   "containsPasswords": false,
-  "nextAction": "PREPARE_EXACT_WRITE_REQUEST_AND_WAIT_FOR_ONE_EXPLICIT_LAB_AUTHORIZATION",
+  "nextAction": "CREATE_ONE_FRESH_EXCLUSIVE_PARENT_BOUND_RUNTIME_REQUEST_FOR_COBROS_10102",
   "staticRequest": {
     "path": ".github/orbit360-requests/cobros-full-ledger-static-v20260805.json",
     "commit": "8cdd57f7ff33dc91fe398710a8cd4697f8ad8ba6",
@@ -160,5 +160,15 @@
     "result": "PASS",
     "plannerSourceChecks": 18,
     "staticContractChecks": 20
+  },
+  "controlPlaneRootfix": {
+    "runId": 31552977362,
+    "triggerCommit": "6d6c199017969dbbc1de6c02d9df6519328d920d",
+    "status": "PASS_COBROS_10102_CANONICAL_ROUTER_SOURCE",
+    "classification": "VALIDATOR_STALE_CLOSED",
+    "rootCause": "CANONICAL_GATE_NOT_REGISTERED_IN_ENTRYPOINT",
+    "secretsRead": false,
+    "firestoreRead": false,
+    "writes": 0
   }
 }
