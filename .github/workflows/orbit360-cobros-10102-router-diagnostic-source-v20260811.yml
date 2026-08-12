@@ -1,0 +1,58 @@
+name: Orbit 360 · Cobros 10.10.2 · canonical router diagnostic source-only
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-source-only/cobros-10102-router-diagnostic-v20260811.json'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: orbit360-cobros-10102-router-diagnostic-source-v20260811
+  cancel-in-progress: false
+
+env:
+  GATE_ID: block10.10-cobros-full-ledger-write-lab-v20260805
+  TRIGGER: .github/orbit360-source-only/cobros-10102-router-diagnostic-v20260811.json
+  EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+
+jobs:
+  diagnose:
+    name: Existing canonical router · zero access
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify source-only trigger
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = 'ays/backend-tenant-lab-v99-20260703'
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          jq -e '.schemaVersion=="orbit360-cobros-10102-router-diagnostic-source-v1" and .gateId==env.GATE_ID and .approved==true and .capabilities.secrets==false and .capabilities.firestoreRead==false and .capabilities.writes==false and .capabilities.runtime==false and .capabilities.browser==false and .capabilities.deploy==false and .capabilities.production==false' "$TRIGGER" >/dev/null
+      - name: Execute existing canonical gate before any correction
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
+          set +e
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$GATE_ID"
+          rc=$?
+          set -e
+          test "$rc" -ne 0
+          jq -e '.gateId==env.GATE_ID and .status=="VALIDATOR_STALE" and .classification=="PIPELINE_MECHANISM_FAILURE" and .dataAccess==false and .secretAccess==false and .secretsRead==false and .firestoreRead==false and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false and .ok==false' "$EVIDENCE" >/dev/null
+      - name: Upload sanitized diagnostic
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-cobros-10102-router-diagnostic-${{ github.run_id }}
+          path: ${{ env.EVIDENCE }}
+          retention-days: 30
