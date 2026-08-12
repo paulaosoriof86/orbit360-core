@@ -3,13 +3,16 @@
   "gateId": "fase-a-ops-leads-crm-release-lab-v20260812",
   "gateProfile": "fase-a-ops-leads-crm-runtime",
   "contractVersion": "1.0.0",
-  "status": "RUNTIME_PROFILE_READY_AWAITING_REQUEST",
+  "status": "ROOTFIX_V2_RUNTIME_PROFILE_READY_AWAITING_REQUEST",
   "lifecycle": "tools/orbit360-validator-lifecycle-fase-a-ops-leads-crm-runtime-v20260812.json",
   "engine": "tools/orbit360-validar-gate-contracts-engine-fase-a-ops-leads-crm-runtime-v20260812.mjs",
   "entrypoint": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
   "workflow": ".github/workflows/orbit360-fase-a-ops-leads-crm-runtime-v20260812.yml",
-  "requestPath": ".github/orbit360-requests/fase-a-ops-leads-crm-runtime-v20260812-authorization.json",
-  "sourceClosure": "orbit360-platform/runtime-gate-crm-v20260716/fase-a-ops-leads-crm-canonical-source-closure-v20260812.json",
+  "requestPath": ".github/orbit360-requests/fase-a-ops-leads-crm-rootfix-v2-20260812-authorization.json",
+  "canonicalSourceClosure": "orbit360-platform/runtime-gate-crm-v20260716/fase-a-ops-leads-crm-canonical-source-closure-v20260812.json",
+  "rootfixSourceClosure": "orbit360-platform/runtime-gate-crm-v20260716/fase-a-ops-leads-crm-rootfix-source-closure-v20260812.json",
+  "previousFailureClosure": "orbit360-platform/runtime-gate-crm-v20260716/fase-a-ops-leads-crm-runtime-failure-31644988994-sanitized-v20260812.json",
+  "rootfixMatrix": "tools/orbit360-fase-a-ops-leads-crm-auth-matrix-segmented-v20260812.mjs",
   "routes": ["ops", "leads", "cliente360"],
   "roles": ["Direccion", "Operativo", "Asesor"],
   "firestoreReadAuthorized": true,
@@ -17,5 +20,6 @@
   "deployAuthorized": false,
   "writesAuthorized": 0,
   "productionAuthorized": false,
-  "replayAllowed": false
+  "replayAllowed": false,
+  "maximumRootfixRuntimeExecutions": 1
 }
