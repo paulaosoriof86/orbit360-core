@@ -1,0 +1,45 @@
+name: Orbit360 Fase A Ops Leads CRM Validator Reconciliation
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - 'orbit360-platform/runtime-gate-crm-v20260716/fase-a-ops-leads-crm-runtime-v3-failure-sanitized-v20260812.json'
+      - '.github/orbit360-requests/fase-a-ops-leads-crm-composed-runtime-20260812-authorization.json'
+      - 'tools/orbit360-validar-fase-a-ops-leads-crm-validator-reconciliation-v20260812.mjs'
+      - '.github/workflows/orbit360-fase-a-ops-leads-crm-validator-reconciliation-v20260812.yml'
+permissions:
+  contents: read
+concurrency:
+  group: orbit360-fase-a-ops-leads-crm-validator-reconciliation-v20260812
+  cancel-in-progress: false
+jobs:
+  reconcile:
+    name: Reconcile stale mobile-menu assertion with unchanged owner evidence
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate syntax
+        run: node --check tools/orbit360-validar-fase-a-ops-leads-crm-validator-reconciliation-v20260812.mjs
+      - name: Reconcile release evidence source-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-fase-a-ops-leads-crm-validator-reconciliation-v20260812.mjs
+          jq -e '.status=="PASS_FASE_A_OPS_LEADS_CRM_RELEASE_EVIDENCE_RECONCILED" and .classification=="VALIDATOR_STALE_CORRECTED_BY_EVIDENCE_REUSE" and .rootCause=="VALIDATOR_STALE_MOBILE_MENU_SELECTOR" and .opsLeadsCrmRouteChecksPassed==9 and .mobileMenuEvidenceReusedFromRun==31544331170 and .routerOwnerUnchanged==true and .indexOwnerUnchanged==true and .snapshotIntegrity=="VERIFIED_UNCHANGED" and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .deploys==0 and .productionTouched==false and .browserReexecuted==false and .secretAccess==false and .firestoreRead==false and .requestReplay==false and .checksFailed==0 and .ok==true' orbit360-platform/runtime-gate-crm-v20260716/fase-a-ops-leads-crm-release-reconciled-sanitized-v20260812.json >/dev/null
+      - name: Upload reconciled sanitized release evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-fase-a-ops-leads-crm-release-reconciled-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/fase-a-ops-leads-crm-release-reconciled-sanitized-v20260812.json
+            orbit360-platform/runtime-gate-crm-v20260716/fase-a-ops-leads-crm-runtime-v3-failure-sanitized-v20260812.json
+            .github/orbit360-requests/fase-a-ops-leads-crm-composed-runtime-20260812-authorization.json
+          retention-days: 14
