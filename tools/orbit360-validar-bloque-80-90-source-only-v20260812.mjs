@@ -20,9 +20,9 @@ try{
   const lifecycle=parse('tools/orbit360-validator-lifecycle-contract-planillas-comisiones-linkage-readonly-v20260801.json');
   if(lifecycle.status!=='PLANILLAS_COMMISSION_CONTROLLED_WRITE_CLOSED'||lifecycle.controlledWrite?.status!=='WRITE_PASS'||lifecycle.authorization?.consumed!==true||lifecycle.financeActivated!==false||Number(lifecycle.operationalWritesAllowed)!==0)fail('DATA_CONTRACT_FAILURE','COMMISSION_CLOSURE_NOT_REUSABLE_AS_EVIDENCE');
   result.checks.commissionLifecycleClosed=true;
-  const legacy=read('.github/workflows/orbit360-planillas-comisiones-linkage-readonly-v20260801.yml');
-  result.checks.historicalCommissionWorkflowStale=legacy.includes('PLANILLAS_COMMISSION_DRYRUN_ACTIVE');
-  if(!result.checks.historicalCommissionWorkflowStale)fail('VALIDATOR_STALE','HISTORICAL_STALE_SIGNATURE_NOT_DETECTED');
+  const historical=read('.github/workflows/orbit360-planillas-comisiones-linkage-readonly-v20260801.yml');
+  if(!historical.includes('HISTORICAL_CLOSED_DO_NOT_REUSE')||historical.includes('FIREBASE_SERVICE_ACCOUNT')||historical.includes('PLANILLAS_COMMISSION_DRYRUN_ACTIVE'))fail('VALIDATOR_STALE','HISTORICAL_WORKFLOW_NOT_SAFELY_CLOSED');
+  result.checks.historicalCommissionWorkflow={status:'HISTORICAL_CLOSED_DO_NOT_REUSE',secrets:false,firestore:false,writes:false};
   const cobros=parse('orbit360-platform/runtime-gate-crm-v20260716/cobros-full-ledger-write-runtime-post-rootcause-r2-sanitized-v20260811.json');
   const b=cobros.snapshotAfter?.business||{};
   if(cobros.status!=='COBROS_REAL_LEDGER_COMPLETE'||cobros.ok!==true||Number(cobros.newCobros)!==0||Number(cobros.receiptWrites)!==0||Number(cobros.policyWrites)!==0||Number(cobros.finmovWrites)!==0)fail('DATA_CONTRACT_FAILURE','COBROS_10102_CLOSURE');
