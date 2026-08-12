@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "orbit360-gate-contract-registry-extension-v1",
+  "gateId": "fase-a-ops-leads-crm-release-lab-v20260812",
+  "contractVersion": "1.0.0",
+  "status": "SOURCE_ONLY_BINDING_READY",
+  "lifecycle": "tools/orbit360-validator-lifecycle-fase-a-ops-leads-crm-release-v20260812.json",
+  "engine": "tools/orbit360-validar-gate-contracts-engine-fase-a-ops-leads-crm-release-v20260812.mjs",
+  "entrypoint": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
+  "sourceValidator": "tools/orbit360-validar-fase-a-ops-leads-crm-release-source-v20260812.mjs",
+  "sourceWorkflow": ".github/workflows/orbit360-fase-a-ops-leads-crm-release-source-v20260812.yml",
+  "runtimeMatrix": "tools/orbit360-fase-a-ops-leads-crm-auth-matrix-v20260812.mjs",
+  "runtimeRequest": ".github/orbit360-requests/fase-a-ops-leads-crm-release-v20260812-authorization.json",
+  "runtimeRequestStatus": "ABSENT_UNTIL_SOURCE_PASS_AND_EXPLICIT_AUTHORIZATION",
+  "routes": ["ops", "leads", "cliente360"],
+  "roles": ["Direccion", "Operativo", "Asesor"],
+  "deployRequired": false,
+  "writesAuthorized": 0,
+  "productionAuthorized": false,
+  "replayAllowed": false
+}
