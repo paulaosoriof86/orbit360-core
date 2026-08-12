@@ -1,0 +1,81 @@
+name: Orbit360 Fase A Ops Leads CRM Authenticated Release Runtime
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-requests/fase-a-ops-leads-crm-release-v20260812-authorization.json'
+permissions:
+  contents: read
+concurrency:
+  group: orbit360-fase-a-ops-leads-crm-runtime-v20260812
+  cancel-in-progress: false
+env:
+  REQUEST_FILE: .github/orbit360-requests/fase-a-ops-leads-crm-release-v20260812-authorization.json
+  REQUEST_VERSION: 20260812.fase-a-ops-leads-crm-runtime.v1
+  EVIDENCE_FILE: orbit360-platform/runtime-gate-crm-v20260716/fase-a-ops-leads-crm-release-sanitized-v20260812.json
+jobs:
+  runtime:
+    if: "${{ github.event.head_commit.message == 'runtime: authorize Fase A Ops Leads CRM release matrix' }}"
+    name: Fase A · Ops Leads CRM · authenticated read-only
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Immutable one-shot request and parent binding
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_RUN_ATTEMPT" = 1
+          test "$(git diff --name-only HEAD^ HEAD | wc -l)" -eq 1
+          test "$(git diff --name-only HEAD^ HEAD)" = "$REQUEST_FILE"
+          PARENT="$(git rev-parse HEAD^)"
+          jq -e --arg p "$PARENT" --arg v "$REQUEST_VERSION" '.schemaVersion=="orbit360-runtime-request-v1" and .authorizationGeneration=="fase-a-ops-leads-crm-release-v20260812" and .gateId=="fase-a-ops-leads-crm-release-lab-v20260812" and .contractVersion=="1.0.0" and .requestVersion==$v and .status=="AUTHORIZED_ONCE" and .approved==true and .authorizedByUser==true and .allowedExecutions==1 and .consumed==false and .authorizationFrozen==false and .replayAllowed==false and .parentHead==$p and .authorizedBaseHead==$p and .operation=="FASE_A_OPS_LEADS_CRM_AUTHENTICATED_RELEASE_MATRIX" and .routes==["ops","leads","cliente360"] and .roles==["Direccion","Operativo","Asesor"] and .sourceRunId==31644543049 and .sourceArtifactId==9160188093 and .firestoreReadAuthorized==true and .browserAuthorized==true and .authTokenMintAuthorized==true and .firestoreWritesAuthorized==0 and .authWritesAuthorized==0 and .operationalWritesAuthorized==0 and .hostingDeployAuthorized==false and .functionsDeployAuthorized==false and .rulesDeployAuthorized==false and .reimportAuthorized==false and .productionAuthorized==false and .mainAuthorized==false and .mergeAuthorized==false' "$REQUEST_FILE" >/dev/null
+      - name: Canonical GO gate before secrets, Firebase or browser
+        shell: bash
+        run: |
+          set -euo pipefail
+          ORBIT360_GATE_PROFILE=fase-a-ops-leads-crm-runtime ORBIT360_REQUEST_FILE="$REQUEST_FILE" ORBIT360_EXPECTED_REQUEST_VERSION="$REQUEST_VERSION" node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+          jq -e '.status=="GO_GATE_CONTRACT_FASE_A_OPS_LEADS_CRM_RUNTIME" and .failed==0 and .executionAuthorized==true and .secretAccessAuthorized==true and .firestoreReadAuthorized==true and .browserAuthorized==true and .authTokenMintAuthorized==true and .firestoreWritesAuthorized==0 and .authWritesAuthorized==0 and .operationalWritesAuthorized==0 and .hostingDeployAuthorized==false and .functionsDeployAuthorized==false and .rulesDeployAuthorized==false and .reimportAuthorized==false and .productionAuthorized==false and .mainAuthorized==false and .mergeAuthorized==false and .runtimeExecuted==false and .secretAccess==false and .browserExecuted==false and .deployExecuted==false and .ok==true' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json >/dev/null
+      - name: Install runtime-only test dependencies after GO
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false firebase-admin@13.10.0 playwright@1.55.0 >/dev/null 2>&1
+          npx playwright install --with-deps chromium >/dev/null 2>&1
+      - name: Execute authenticated read-only matrix on existing LAB
+        env:
+          ORBIT360_RUNTIME_EXECUTION_AUTHORIZED: 'true'
+          ORBIT360_PROJECT_ID: 'ays-orbit-360-lab'
+          ORBIT360_TENANT_ID: 'alianzas-soluciones'
+          ORBIT360_LAB_URL: 'https://ays-orbit-360-lab.web.app/index.html?orbitBackend=firestore-lab&tenant=alianzas-soluciones&runtime=20260717-2'
+          FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}'
+          FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}'
+          FIREBASE_SERVICE_ACCOUNT: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-fase-a-ops-leads-crm-auth-matrix-v20260812.mjs
+      - name: Enforce PASS, three roles, zero writes and unchanged snapshot
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s "$EVIDENCE_FILE"
+          jq -e '.status=="PASS_FASE_A_OPS_LEADS_CRM_AUTH_MATRIX" and .classification=="PASS_RELEASE_EVIDENCE" and (.roles|length)==3 and (.roles|all(.ok==true)) and .snapshotIntegrity=="VERIFIED_UNCHANGED" and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .deploys==0 and .productionTouched==false and .containsPII==false and .containsSecrets==false and .ok==true' "$EVIDENCE_FILE" >/dev/null
+      - name: Upload sanitized runtime evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-fase-a-ops-leads-crm-runtime-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/fase-a-ops-leads-crm-release-sanitized-v20260812.json
+          if-no-files-found: warn
+          retention-days: 14
