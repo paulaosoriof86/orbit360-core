@@ -8,7 +8,7 @@
   "engine": "tools/orbit360-validar-gate-contracts-engine-fase-a-ops-leads-crm-runtime-v20260812.mjs",
   "entrypoint": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
   "workflow": ".github/workflows/orbit360-fase-a-ops-leads-crm-runtime-v20260812.yml",
-  "requestPath": ".github/orbit360-requests/fase-a-ops-leads-crm-release-v20260812-authorization.json",
+  "requestPath": ".github/orbit360-requests/fase-a-ops-leads-crm-runtime-v20260812-authorization.json",
   "sourceClosure": "orbit360-platform/runtime-gate-crm-v20260716/fase-a-ops-leads-crm-canonical-source-closure-v20260812.json",
   "routes": ["ops", "leads", "cliente360"],
   "roles": ["Direccion", "Operativo", "Asesor"],
