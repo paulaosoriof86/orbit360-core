@@ -4,7 +4,7 @@ on:
   push:
     branches: [ays/backend-tenant-lab-v99-20260703]
     paths:
-      - '.github/orbit360-requests/cobros-full-ledger-write-lab-v20260811.json'
+      - '.github/orbit360-requests/cobros-full-ledger-write-lab-v20260811-r2.json'
 
 permissions:
   contents: write
@@ -12,23 +12,23 @@ permissions:
   statuses: write
 
 concurrency:
-  group: orbit360-cobros-full-ledger-write-runtime-v20260811
+  group: orbit360-cobros-full-ledger-write-runtime-v20260811-r2
   cancel-in-progress: false
 
 env:
   GATE_ID: block10.10-cobros-full-ledger-write-lab-v20260805
   GATE_PROFILE: cobros-10102-runtime
-  REQUEST_PATH: .github/orbit360-requests/cobros-full-ledger-write-lab-v20260811.json
-  REQUEST_VERSION: cobros-full-ledger-write-lab-v20260811-r1
+  REQUEST_PATH: .github/orbit360-requests/cobros-full-ledger-write-lab-v20260811-r2.json
+  REQUEST_VERSION: cobros-full-ledger-write-lab-v20260811-r2
   PACKAGE_PATH: /tmp/orbit360-cobros-full-ledger-v3.json
-  EVIDENCE_PATH: orbit360-platform/runtime-gate-crm-v20260716/cobros-full-ledger-write-runtime-sanitized-v20260811.json
+  EVIDENCE_PATH: orbit360-platform/runtime-gate-crm-v20260716/cobros-full-ledger-write-runtime-post-rootcause-r2-sanitized-v20260811.json
   STATIC_LIFECYCLE: tools/orbit360-validator-lifecycle-contract-cobros-full-ledger-write-lab-v20260805.json
   RUNTIME_LIFECYCLE: tools/orbit360-validator-lifecycle-contract-cobros-full-ledger-write-runtime-v20260811.json
-  CONSUMED_MARKER: .github/orbit360-consumed/cobros-full-ledger-write-lab-v20260811.json
+  CONSUMED_MARKER: .github/orbit360-consumed/cobros-full-ledger-write-lab-v20260811-r2.json
 
 jobs:
   durable_write:
-    name: Gate → snapshot → stage → activate → verify/rollback
+    name: Gate → package identity/reader → snapshot → stage → activate → verify/rollback
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     steps:
@@ -51,7 +51,7 @@ jobs:
           test "${#CHANGED[@]}" = '1'
           test "${CHANGED[0]}" = "$REQUEST_PATH"
           PARENT="$(git rev-parse HEAD^)"
-          jq -e --arg p "$PARENT" '.schemaVersion=="orbit360-cobros-full-ledger-write-runtime-request-v1" and .gateId==env.GATE_ID and .contractVersion=="10.10.2" and .requestVersion==env.REQUEST_VERSION and .parentHead==$p and .approved==true and .status=="AUTHORIZED_ONCE" and .allowedExecutions==1 and .consumed==false and .authorizationFrozen==false and .replayAllowed==false and .scope.sourceLedgerCount==365 and .scope.pagosReportados==365 and .scope.evidenciasCobro==365 and .scope.propuestasConciliacion==132 and .scope.conciliacionHolds==233 and .scope.stageDocuments==1095 and .scope.maximumForwardWrites==1098 and .scope.newCobros==0 and .scope.receiptWrites==0 and .scope.policyWrites==0 and .scope.finmovWrites==0 and .capabilities.secrets==true and .capabilities.firestoreRead==true and .capabilities.writes==true and .capabilities.runtime==true and .capabilities.browser==false and .capabilities.deploy==false and .capabilities.functionsDeploy==false and .capabilities.rulesDeploy==false and .capabilities.production==false' "$REQUEST_PATH" >/dev/null
+          jq -e --arg p "$PARENT" '.schemaVersion=="orbit360-cobros-full-ledger-write-runtime-request-v1" and .gateId==env.GATE_ID and .contractVersion=="10.10.2" and .requestVersion==env.REQUEST_VERSION and .parentHead==$p and .approved==true and .status=="AUTHORIZED_ONCE" and .allowedExecutions==1 and .consumed==false and .authorizationFrozen==false and .replayAllowed==false and .scope.sourceLedgerCount==365 and .scope.pagosReportados==365 and .scope.evidenciasCobro==365 and .scope.propuestasConciliacion==132 and .scope.conciliacionHolds==233 and .scope.stageDocuments==1095 and .scope.maximumForwardWrites==1098 and .scope.newCobros==0 and .scope.receiptWrites==0 and .scope.policyWrites==0 and .scope.finmovWrites==0 and .privatePackage.driveFileId=="1t4di7P2z6OQVnT8LF5CtEMg_latkW7Cx" and .privatePackage.sizeBytes==857161 and .privatePackage.expectedReader=="firebase-adminsdk-fbsvc@ays-orbit-360-lab.iam.gserviceaccount.com" and .privatePackage.expectedReaderRole=="reader" and .capabilities.secrets==true and .capabilities.firestoreRead==true and .capabilities.writes==true and .capabilities.runtime==true and .capabilities.browser==false and .capabilities.deploy==false and .capabilities.functionsDeploy==false and .capabilities.rulesDeploy==false and .capabilities.production==false' "$REQUEST_PATH" >/dev/null
           test ! -e "$CONSUMED_MARKER"
       - name: Canonical gate before secrets or Firestore
         shell: bash
@@ -60,7 +60,7 @@ jobs:
           node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
           node --check tools/orbit360-validar-gate-contracts-engine-cobros-full-ledger-write-v20260811.mjs
           ORBIT360_GATE_PROFILE="$GATE_PROFILE" ORBIT360_REQUEST_FILE="$REQUEST_PATH" ORBIT360_EXPECTED_REQUEST_VERSION="$REQUEST_VERSION" node tools/orbit360-validar-gate-contracts-v20260717.mjs "$GATE_ID"
-          jq -e '.status=="GO_GATE_CONTRACT" and .gateId==env.GATE_ID and .contractVersion=="10.10.2" and .canonicalPhase=="COBROS_FULL_LEDGER_WRITE_RUNTIME" and .requestExists==true and .requestState=="EXACT_FRESH_PARENT_BOUND_IMMUTABLE" and .executionAuthorized==true and .secretAccessAuthorized==true and .firestoreReadAuthorized==true and .labWriteAuthorized==true and .writeAuthorized==true and .maximumForwardWrites==1098 and .stageDocuments==1095 and .newCobros==0 and .receiptWrites==0 and .policyWrites==0 and .finmovWrites==0 and .passVisualPostAuth==true and .dataAccess==false and .secretAccess==false and .operationalWrites==0 and .secretsRead==false and .firestoreRead==false and .deployExecuted==false and .productionTouched==false and .ok==true' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json >/dev/null
+          jq -e '.status=="GO_GATE_CONTRACT" and .gateId==env.GATE_ID and .contractVersion=="10.10.2" and .canonicalPhase=="COBROS_FULL_LEDGER_WRITE_RUNTIME" and .requestExists==true and .requestState=="EXACT_FRESH_PARENT_BOUND_IMMUTABLE" and .executionAuthorized==true and .secretAccessAuthorized==true and .firestoreReadAuthorized==true and .labWriteAuthorized==true and .writeAuthorized==true and .maximumForwardWrites==1098 and .stageDocuments==1095 and .newCobros==0 and .receiptWrites==0 and .policyWrites==0 and .finmovWrites==0 and .packageFileId=="1t4di7P2z6OQVnT8LF5CtEMg_latkW7Cx" and .packageSizeBytes==857161 and .expectedReader=="firebase-adminsdk-fbsvc@ays-orbit-360-lab.iam.gserviceaccount.com" and .passVisualPostAuth==true and .dataAccess==false and .secretAccess==false and .operationalWrites==0 and .secretsRead==false and .firestoreRead==false and .deployExecuted==false and .productionTouched==false and .ok==true' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json >/dev/null
       - name: Prepare isolated runtime dependency
         shell: bash
         run: |
@@ -68,7 +68,7 @@ jobs:
           npm init -y >/dev/null 2>&1
           npm install --no-save firebase-admin@13.4.0 >/dev/null 2>&1
           node --check tools/orbit360-cobros-full-ledger-write-lab-v20260811.mjs
-      - name: Download exact private V3 package after GO
+      - name: Validate and download exact private V3 package after GO
         env:
           SA_ORBIT360_LAB: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}'
           SA_ORBIT_360_LAB: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}'
@@ -77,10 +77,42 @@ jobs:
         run: |
           set -euo pipefail
           SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-${SA_ORBIT_360_LAB:-${SA_DEFAULT:-}}}"; test -n "$SERVICE_ACCOUNT"; export SERVICE_ACCOUNT
-          PACKAGE_ID="$(jq -r '.privatePackage.driveFileId' "$REQUEST_PATH")"; PACKAGE_SHA="$(jq -r '.privatePackage.sha256' "$REQUEST_PATH")"; export PACKAGE_ID PACKAGE_SHA
+          PACKAGE_ID="$(jq -r '.privatePackage.driveFileId' "$REQUEST_PATH")"
+          PACKAGE_SIZE="$(jq -r '.privatePackage.sizeBytes' "$REQUEST_PATH")"
+          PACKAGE_SHA="$(jq -r '.privatePackage.sha256' "$REQUEST_PATH")"
+          EXPECTED_READER="$(jq -r '.privatePackage.expectedReader' "$REQUEST_PATH")"
+          export PACKAGE_ID PACKAGE_SIZE PACKAGE_SHA EXPECTED_READER
           node <<'NODE'
-          const fs=require('fs'),crypto=require('crypto');const b64=o=>Buffer.from(JSON.stringify(o)).toString('base64url');
-          (async()=>{const sa=JSON.parse(process.env.SERVICE_ACCOUNT),now=Math.floor(Date.now()/1000);if(sa.project_id!=='ays-orbit-360-lab')throw new Error('ENVIRONMENT_FAILURE:PROJECT_ID_MISMATCH');const unsigned=b64({alg:'RS256',typ:'JWT'})+'.'+b64({iss:sa.client_email,scope:'https://www.googleapis.com/auth/drive.readonly',aud:'https://oauth2.googleapis.com/token',iat:now,exp:now+900});const sig=crypto.sign('RSA-SHA256',Buffer.from(unsigned),sa.private_key).toString('base64url');const tr=await fetch('https://oauth2.googleapis.com/token',{method:'POST',headers:{'content-type':'application/x-www-form-urlencoded'},body:new URLSearchParams({grant_type:'urn:ietf:params:oauth-type:jwt-bearer'.replace('oauth-type','oauth-type'),assertion:unsigned+'.'+sig})});let token=await tr.json();if(!tr.ok||!token.access_token){const tr2=await fetch('https://oauth2.googleapis.com/token',{method:'POST',headers:{'content-type':'application/x-www-form-urlencoded'},body:new URLSearchParams({grant_type:'urn:ietf:params:oauth:grant-type:jwt-bearer',assertion:unsigned+'.'+sig})});token=await tr2.json();if(!tr2.ok||!token.access_token)throw new Error('ENVIRONMENT_FAILURE:OAUTH_'+tr2.status);}const r=await fetch(`https://www.googleapis.com/drive/v3/files/${process.env.PACKAGE_ID}?alt=media&supportsAllDrives=true`,{headers:{authorization:`Bearer ${token.access_token}`}});if(!r.ok)throw new Error('ENVIRONMENT_FAILURE:DRIVE_'+r.status);const bytes=Buffer.from(await r.arrayBuffer()),sha=crypto.createHash('sha256').update(bytes).digest('hex');if(sha!==process.env.PACKAGE_SHA)throw new Error('DATA_CONTRACT_FAILURE:PRIVATE_PACKAGE_SHA');fs.writeFileSync(process.env.PACKAGE_PATH,bytes);})().catch(e=>{console.error(String(e.message||e));process.exit(41);});
+          const fs=require('fs'),crypto=require('crypto');
+          const b64=o=>Buffer.from(JSON.stringify(o)).toString('base64url');
+          const evidence=(classification,error)=>({schemaVersion:'orbit360-cobros-full-ledger-write-runtime-evidence-v1',gateId:process.env.GATE_ID,contractVersion:'10.10.2',status:'STOP_RETRY',classification,checkpoint:'PRIVATE_PACKAGE_ID_SIZE_READER_HASH_AFTER_GO_GATE_CONTRACT',error:String(error||'').replace(/[\w.+-]+@[\w.-]+/g,'[email]').slice(0,500),forwardWrites:0,rollbackAttempted:false,rollbackRestored:false,newCobros:0,receiptWrites:0,policyWrites:0,finmovWrites:0,secretsRead:true,firestoreRead:false,authWrites:0,operationalBusinessWrites:0,browserExecuted:false,hostingDeploys:0,functionsDeploys:0,rulesDeploys:0,reimport:false,productionTouched:false,mainTouched:false,mergeExecuted:false,containsPII:false,containsSecrets:false,ok:false});
+          (async()=>{
+            const sa=JSON.parse(process.env.SERVICE_ACCOUNT),now=Math.floor(Date.now()/1000);
+            if(sa.project_id!=='ays-orbit-360-lab')throw new Error('ENVIRONMENT_FAILURE:PROJECT_ID_MISMATCH');
+            if(sa.client_email!==process.env.EXPECTED_READER)throw new Error('ENVIRONMENT_FAILURE:LAB_READER_IDENTITY_MISMATCH');
+            const unsigned=b64({alg:'RS256',typ:'JWT'})+'.'+b64({iss:sa.client_email,scope:'https://www.googleapis.com/auth/drive.readonly',aud:'https://oauth2.googleapis.com/token',iat:now,exp:now+900});
+            const sig=crypto.sign('RSA-SHA256',Buffer.from(unsigned),sa.private_key).toString('base64url');
+            const tr=await fetch('https://oauth2.googleapis.com/token',{method:'POST',headers:{'content-type':'application/x-www-form-urlencoded'},body:new URLSearchParams({grant_type:'urn:ietf:params:oauth:grant-type:jwt-bearer',assertion:unsigned+'.'+sig})});
+            const token=await tr.json();if(!tr.ok||!token.access_token)throw new Error('ENVIRONMENT_FAILURE:OAUTH_'+tr.status);
+            const headers={authorization:`Bearer ${token.access_token}`};
+            const metaR=await fetch(`https://www.googleapis.com/drive/v3/files/${process.env.PACKAGE_ID}?supportsAllDrives=true&fields=id,name,size,capabilities(canDownload,canEdit,canShare)`,{headers});
+            if(!metaR.ok)throw new Error('ENVIRONMENT_FAILURE:DRIVE_META_'+metaR.status);
+            const meta=await metaR.json();
+            if(meta.id!==process.env.PACKAGE_ID)throw new Error('DATA_CONTRACT_FAILURE:PRIVATE_PACKAGE_FILE_ID');
+            if(Number(meta.size)!==Number(process.env.PACKAGE_SIZE))throw new Error('DATA_CONTRACT_FAILURE:PRIVATE_PACKAGE_SIZE');
+            if(meta.capabilities?.canDownload!==true||meta.capabilities?.canEdit===true||meta.capabilities?.canShare===true)throw new Error('ENVIRONMENT_FAILURE:LAB_READER_CAPABILITY_NOT_READ_ONLY');
+            const r=await fetch(`https://www.googleapis.com/drive/v3/files/${process.env.PACKAGE_ID}?alt=media&supportsAllDrives=true`,{headers});
+            if(!r.ok)throw new Error('ENVIRONMENT_FAILURE:DRIVE_'+r.status);
+            const bytes=Buffer.from(await r.arrayBuffer());
+            if(bytes.length!==Number(process.env.PACKAGE_SIZE))throw new Error('DATA_CONTRACT_FAILURE:PRIVATE_PACKAGE_SIZE_DOWNLOAD');
+            const sha=crypto.createHash('sha256').update(bytes).digest('hex');
+            if(sha!==process.env.PACKAGE_SHA)throw new Error('DATA_CONTRACT_FAILURE:PRIVATE_PACKAGE_SHA');
+            fs.writeFileSync(process.env.PACKAGE_PATH,bytes);
+          })().catch(e=>{
+            const msg=String(e.message||e);const classification=msg.startsWith('ENVIRONMENT_FAILURE')?'ENVIRONMENT_FAILURE':'DATA_CONTRACT_FAILURE';
+            fs.mkdirSync(require('path').dirname(process.env.EVIDENCE_PATH),{recursive:true});fs.writeFileSync(process.env.EVIDENCE_PATH,JSON.stringify(evidence(classification,msg),null,2)+'\n');
+            console.error(msg);process.exit(41);
+          });
           NODE
       - name: Execute one durable ledger materialization
         env:
@@ -91,7 +123,7 @@ jobs:
         run: |
           set -euo pipefail
           SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-${SA_ORBIT_360_LAB:-${SA_DEFAULT:-}}}"; test -n "$SERVICE_ACCOUNT"; export SERVICE_ACCOUNT
-          export ORBIT360_COBROS_FULL_REQUEST="$REQUEST_PATH" ORBIT360_COBROS_FULL_PACKAGE="$PACKAGE_PATH" ORBIT360_COBROS_FULL_EVIDENCE="$EVIDENCE_PATH"
+          export ORBIT360_COBROS_FULL_REQUEST="$REQUEST_PATH" ORBIT360_COBROS_FULL_REQUEST_VERSION="$REQUEST_VERSION" ORBIT360_COBROS_FULL_PACKAGE="$PACKAGE_PATH" ORBIT360_COBROS_FULL_EVIDENCE="$EVIDENCE_PATH"
           node tools/orbit360-cobros-full-ledger-write-lab-v20260811.mjs
           jq -e '.status=="COBROS_REAL_LEDGER_COMPLETE" and .ok==true and .gateId==env.GATE_ID and .contractVersion=="10.10.2" and .checkpoint=="POST_VERIFIED" and .requestVerified==true and .packageVerified==true and .stageDocumentsWritten==1095 and .forwardWrites==1098 and .maximumForwardWrites==1098 and .manifestWrites==1 and .activationWrites==2 and .activationCommitted==true and .newCobros==0 and .receiptWrites==0 and .policyWrites==0 and .finmovWrites==0 and .operationalBusinessWrites==0 and .rollbackAttempted==false and .browserExecuted==false and .hostingDeploys==0 and .functionsDeploys==0 and .rulesDeploys==0 and .reimport==false and .productionTouched==false and .mainTouched==false and .mergeExecuted==false and .containsPII==false and .containsPolicyNumbers==false and .containsAmounts==false and .containsSecrets==false' "$EVIDENCE_PATH" >/dev/null
       - name: Remove private package
@@ -109,24 +141,24 @@ jobs:
           try{ev=read(process.env.EVIDENCE_PATH);}catch(e){let pre={};try{pre=read('orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json')}catch{}ev={schemaVersion:'orbit360-cobros-full-ledger-write-runtime-evidence-v1',gateId:process.env.GATE_ID,contractVersion:'10.10.2',status:'STOP_RETRY',classification:pre.classification||'PIPELINE_MECHANISM_FAILURE',checkpoint:'PRE_WRITE_GATE_OR_ENVIRONMENT',forwardWrites:0,rollbackAttempted:false,rollbackRestored:false,newCobros:0,receiptWrites:0,policyWrites:0,finmovWrites:0,secretsRead:false,firestoreRead:false,authWrites:0,operationalBusinessWrites:0,browserExecuted:false,hostingDeploys:0,functionsDeploys:0,rulesDeploys:0,reimport:false,productionTouched:false,mainTouched:false,mergeExecuted:false,containsPII:false,containsSecrets:false,ok:false};fs.mkdirSync(path.dirname(process.env.EVIDENCE_PATH),{recursive:true});fs.writeFileSync(process.env.EVIDENCE_PATH,JSON.stringify(ev,null,2)+'\n');}
           const pass=ev.status==='COBROS_REAL_LEDGER_COMPLETE'&&ev.ok===true;const marker={schemaVersion:'orbit360-request-consumption-v1',gateId:process.env.GATE_ID,contractVersion:'10.10.2',requestPath:process.env.REQUEST_PATH,requestVersion:process.env.REQUEST_VERSION,requestCommit:process.env.JOB_SHA,runId:Number(process.env.RUN_ID),status:pass?'CONSUMED_PASS':'CONSUMED_STOP_RETRY',allowedExecutions:0,consumed:true,authorizationFrozen:true,replayAllowed:false,result:ev.status,classification:ev.classification||'',checkpoint:ev.checkpoint||'',forwardWrites:Number(ev.forwardWrites||0),rollbackAttempted:ev.rollbackAttempted===true,rollbackRestored:ev.rollbackRestored===true,productionTouched:false,mainTouched:false,mergeExecuted:false,containsPII:false,containsSecrets:false};fs.mkdirSync(path.dirname(process.env.CONSUMED_MARKER),{recursive:true});fs.writeFileSync(process.env.CONSUMED_MARKER,JSON.stringify(marker,null,2)+'\n');
           for(const p of [process.env.STATIC_LIFECYCLE,process.env.RUNTIME_LIFECYCLE]){const l=read(p);l.status=pass?'COBROS_REAL_LEDGER_COMPLETE':'STOP_RETRY';l.classification=pass?'GO_LAB_COBROS_FULL_LEDGER_DURABLE_COMPLETE':(ev.classification||'PIPELINE_MECHANISM_FAILURE');l.currentPhase='CONSUMED_PASS_OR_STOP_RETRY';l.executionProfile={mode:'CLOSED',phase:'CONSUMED_PASS_OR_STOP_RETRY',capabilities:{secrets:false,firestoreRead:false,writes:false,runtime:false,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false}};l.activeRequest=false;l.requestConsumed=true;l.allowedExecutions=0;l.executionAuthorized=false;l.secretAccessAuthorized=false;l.firestoreReadAuthorized=false;l.writeAuthorized=false;l.labWriteAuthorized=false;l.runtimeAuthorized=false;l.replayAllowed=false;l.runtimeClosure={runId:Number(process.env.RUN_ID),requestCommit:process.env.JOB_SHA,status:ev.status,classification:ev.classification||'',checkpoint:ev.checkpoint||'',forwardWrites:Number(ev.forwardWrites||0),rollbackAttempted:ev.rollbackAttempted===true,rollbackRestored:ev.rollbackRestored===true};l.nextAction=pass?'RUN_FINAL_RELEASE_BLOCKER_SWEEP':'STOP_RETRY_DIAGNOSE_ROOT_CAUSE_BEFORE_ANY_NEW_REQUEST';fs.writeFileSync(p,JSON.stringify(l,null,2)+'\n');}
-          const doc=`# Cierre Cobros 10.10.2 — ${pass?'COBROS_REAL_LEDGER_COMPLETE':'STOP_RETRY'} — 2026-08-11\n\n- Gate: \`${process.env.GATE_ID}\`\n- Run: \`${process.env.RUN_ID}\`\n- Request commit: \`${process.env.JOB_SHA}\`\n- Resultado: \`${ev.status}\`\n- Clasificación: \`${ev.classification||''}\`\n- Checkpoint: \`${ev.checkpoint||''}\`\n- Forward writes: \`${Number(ev.forwardWrites||0)} / 1098\`\n- Nuevos cobros: 0\n- Writes Pólizas/Recibos/finmovs: 0\n- Auth/Hosting/Functions/Rules/reimport/producción/main/merge: 0\n- Request: consumido y congelado por ledger separado; replay no permitido.\n\n${pass?'Siguiente: barrido final de release blockers y confirmar si el tramo 80→90 queda completamente cerrado.':'STOP_RETRY: no crear segundo request ni reintentar hasta diagnosticar la causa raíz del checkpoint.'}\n`;
-          fs.writeFileSync('orbit360-platform/docs/CIERRE-COBROS-10102-RUNTIME-20260811.md',doc);
-          fs.writeFileSync('orbit360-platform/docs/ACADEMIA-ACTUALIZACION-COBROS-10102-RUNTIME-20260811.md',`# Academia — Cobros 10.10.2 runtime\n\nPatrón: request inmutable + consumo separado; GO_GATE_CONTRACT antes de secretos; staging run-scoped invisible; activación atómica por puntero; HOLD/propuestas no equivalen a cobros; rollback fail-closed; STOP_RETRY sin segundo intento.\n\nResultado vigente: ${ev.status}.\n`);
-          fs.writeFileSync('orbit360-platform/docs/CLAUDE-ACUMULADO-COBROS-10102-RUNSCOPED-20260811.md',`# Claude acumulado — patrón reusable Cobros 10.10.2\n\nREPLICABLE_CLAUDE_ACUMULADO: staging aislado por run, IDs determinísticos, manifest + puntero atómico, request inmutable con ledger de consumo separado, verificación de no-mutación de colecciones de negocio. No compartir datos, hashes privados, credenciales ni implementación backend protegida.\n`);
+          const doc=`# Cierre Cobros 10.10.2 post-rootcause r2 — ${pass?'COBROS_REAL_LEDGER_COMPLETE':'STOP_RETRY'} — 2026-08-11\n\n- Gate: \`${process.env.GATE_ID}\`\n- Run: \`${process.env.RUN_ID}\`\n- Request commit: \`${process.env.JOB_SHA}\`\n- Resultado: \`${ev.status}\`\n- Clasificación: \`${ev.classification||''}\`\n- Checkpoint: \`${ev.checkpoint||''}\`\n- Forward writes: \`${Number(ev.forwardWrites||0)} / 1098\`\n- Nuevos cobros: 0\n- Writes Pólizas/Recibos/finmovs: 0\n- Auth/Hosting/Functions/Rules/reimport/producción/main/merge: 0\n- Request r2: consumido y congelado; replay no permitido.\n\n${pass?'Siguiente: barrido final de release blockers y confirmar si el tramo 80→90 queda completamente cerrado.':'STOP_RETRY: mismo run/request no se repite; diagnosticar causa raíz antes de cualquier nueva autorización.'}\n`;
+          fs.writeFileSync('orbit360-platform/docs/CIERRE-COBROS-10102-POST-ROOTCAUSE-R2-20260811.md',doc);
+          fs.writeFileSync('orbit360-platform/docs/ACADEMIA-ACTUALIZACION-COBROS-10102-POST-ROOTCAUSE-R2-20260811.md',`# Academia — Cobros 10.10.2 post-rootcause r2\n\nPatrón: request fresco parent-bound; GO_GATE_CONTRACT antes de secretos; validación de file ID/tamaño/lector/hash antes de Firestore; staging aislado por run; activación atómica; HOLD/propuestas no equivalen a cobros; rollback fail-closed; STOP_RETRY sin reutilizar request.\n\nResultado vigente: ${ev.status}.\n`);
+          fs.writeFileSync('orbit360-platform/docs/CLAUDE-ACUMULADO-COBROS-10102-POST-ROOTCAUSE-R2-20260811.md',`# Claude acumulado — Cobros 10.10.2 post-rootcause r2\n\nREPLICABLE_CLAUDE_ACUMULADO: recursos privados deben tener owner + lector técnico esperado; validar identidad/tamaño/hash antes del consumo; request inmutable y ledger separado; staging run-scoped y puntero atómico. No compartir IDs privados, hashes, credenciales ni backend protegido.\n`);
           NODE
           git config user.name orbit360-gate-bot
           git config user.email orbit360-gate-bot@users.noreply.github.com
-          git add "$EVIDENCE_PATH" "$CONSUMED_MARKER" "$STATIC_LIFECYCLE" "$RUNTIME_LIFECYCLE" orbit360-platform/docs/CIERRE-COBROS-10102-RUNTIME-20260811.md orbit360-platform/docs/ACADEMIA-ACTUALIZACION-COBROS-10102-RUNTIME-20260811.md orbit360-platform/docs/CLAUDE-ACUMULADO-COBROS-10102-RUNSCOPED-20260811.md
-          git commit -m "cobros: consume 10.10.2 runtime authorization [skip ci]"
+          git add "$EVIDENCE_PATH" "$CONSUMED_MARKER" "$STATIC_LIFECYCLE" "$RUNTIME_LIFECYCLE" orbit360-platform/docs/CIERRE-COBROS-10102-POST-ROOTCAUSE-R2-20260811.md orbit360-platform/docs/ACADEMIA-ACTUALIZACION-COBROS-10102-POST-ROOTCAUSE-R2-20260811.md orbit360-platform/docs/CLAUDE-ACUMULADO-COBROS-10102-POST-ROOTCAUSE-R2-20260811.md
+          git commit -m "cobros: consume 10.10.2 post-rootcause r2 authorization [skip ci]"
           git push origin "HEAD:ays/backend-tenant-lab-v99-20260703"
       - name: Upload sanitized evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: orbit360-cobros-full-ledger-write-${{ github.run_id }}
+          name: orbit360-cobros-full-ledger-write-r2-${{ github.run_id }}
           path: |
             orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
-            orbit360-platform/runtime-gate-crm-v20260716/cobros-full-ledger-write-runtime-sanitized-v20260811.json
-            .github/orbit360-consumed/cobros-full-ledger-write-lab-v20260811.json
+            orbit360-platform/runtime-gate-crm-v20260716/cobros-full-ledger-write-runtime-post-rootcause-r2-sanitized-v20260811.json
+            .github/orbit360-consumed/cobros-full-ledger-write-lab-v20260811-r2.json
           if-no-files-found: warn
           retention-days: 30
