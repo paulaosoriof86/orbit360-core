@@ -4,24 +4,24 @@
   "gateId": "block10.10-cobros-full-ledger-write-lab-v20260805",
   "gateContractVersion": "10.10.2",
   "owner": "orbit360-cobros-full-ledger-write-lab-v20260805",
-  "ownerVersion": "20260811.2-drive-reader-permission-rootcause-closed",
-  "status": "STOP_RETRY_ROOT_CAUSE_CLOSED_AWAIT_FRESH_AUTHORIZATION",
-  "classification": "ENVIRONMENT_FAILURE_CLOSED",
+  "ownerVersion": "20260811.3-post-rootcause-r2-request-gated",
+  "status": "RUNTIME_REQUEST_REQUIRED",
+  "classification": "POST_ROOTCAUSE_FRESH_AUTHORIZATION_READY",
   "patternClassification": "BACKEND_PROTEGIDO_NO_CLAUDE",
   "rcId": "RC-AYS-LAB-CANONICA-01",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
   "projectId": "ays-orbit-360-lab",
   "tenantId": "alianzas-soluciones",
-  "currentPhase": "ROOT_CAUSE_CLOSED_REQUEST_REMAINS_CONSUMED",
+  "currentPhase": "COBROS_FULL_LEDGER_WRITE_RUNTIME",
   "executionProfile": {
-    "mode": "CLOSED",
-    "phase": "ROOT_CAUSE_CLOSED_REQUEST_REMAINS_CONSUMED",
+    "mode": "REQUEST_GATED_RUNTIME",
+    "phase": "COBROS_FULL_LEDGER_WRITE_RUNTIME",
     "capabilities": {
-      "secrets": false,
-      "firestoreRead": false,
-      "writes": false,
-      "runtime": false,
+      "secrets": true,
+      "firestoreRead": true,
+      "writes": true,
+      "runtime": true,
       "browser": false,
       "deploy": false,
       "functionsDeploy": false,
@@ -29,8 +29,8 @@
       "production": false
     }
   },
-  "requestPath": ".github/orbit360-requests/cobros-full-ledger-write-lab-v20260811.json",
-  "requestVersion": "cobros-full-ledger-write-lab-v20260811-r1",
+  "requestPath": ".github/orbit360-requests/cobros-full-ledger-write-lab-v20260811-r2.json",
+  "requestVersion": "cobros-full-ledger-write-lab-v20260811-r2",
   "freshRequestRequired": true,
   "requestPresenceDoesNotImplyAuthorization": true,
   "executionAuthorized": false,
@@ -65,24 +65,17 @@
   "containsSecrets": false,
   "containsPasswords": false,
   "activeRequest": false,
-  "requestConsumed": true,
+  "requestConsumed": false,
   "allowedExecutions": 0,
-  "runtimeClosure": {
+  "priorConsumedRequest": {
     "runId": 31553043940,
     "requestCommit": "4dcab95ae0803d4e772ed88e2fa6b34cd4e304e2",
-    "status": "STOP_RETRY",
-    "classification": "ENVIRONMENT_FAILURE",
+    "requestVersion": "cobros-full-ledger-write-lab-v20260811-r1",
+    "status": "CONSUMED_STOP_RETRY",
+    "replayAllowed": false,
     "rootCauseCode": "PRIVATE_PACKAGE_LAB_READER_PERMISSION",
     "terminalError": "DRIVE_404",
-    "checkpoint": "PRIVATE_PACKAGE_DRIVE_DOWNLOAD_AFTER_GO_GATE_CONTRACT",
-    "goGateContract": true,
-    "privatePackageDownloaded": false,
-    "writerExecuted": false,
-    "secretsRead": true,
-    "firestoreRead": false,
-    "forwardWrites": 0,
-    "rollbackAttempted": false,
-    "rollbackRestored": false
+    "forwardWrites": 0
   },
   "rootCauseClosure": {
     "diagnosedAt": "2026-08-11T19:20:40-06:00",
@@ -101,5 +94,5 @@
     "runtimeReplayExecuted": false,
     "status": "ROOT_CAUSE_CLOSED"
   },
-  "nextAction": "AWAIT_ONE_NEW_EXPLICIT_AUTHORIZATION_FOR_POST_ROOTCAUSE_RUNTIME_WITH_NEW_PARENT_BOUND_REQUEST; DO_NOT_REPLAY_CONSUMED_REQUEST"
+  "nextAction": "CREATE_ONE_NEW_EXCLUSIVE_PARENT_BOUND_R2_REQUEST_AND_EXECUTE_ONCE"
 }
