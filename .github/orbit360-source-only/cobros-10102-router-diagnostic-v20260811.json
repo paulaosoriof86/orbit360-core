@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "orbit360-cobros-10102-router-diagnostic-source-v1",
+  "gateId": "block10.10-cobros-full-ledger-write-lab-v20260805",
+  "contractVersion": "10.10.2",
+  "approved": true,
+  "parentHead": "cd69ed0442cae682e8ddb5e6db89bbcdc5f9ba60",
+  "purpose": "EXECUTE_CANONICAL_GATE_BEFORE_VALIDATOR_CORRECTION",
+  "capabilities": {
+    "secrets": false,
+    "firestoreRead": false,
+    "writes": false,
+    "runtime": false,
+    "browser": false,
+    "deploy": false,
+    "functionsDeploy": false,
+    "rulesDeploy": false,
+    "production": false
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
