@@ -80,5 +80,13 @@
     "includeSourceRows": false,
     "includeSecrets": false,
     "includeOnlyCountsBooleansDecisionsAndDigests": true
+  },
+  "revalidation": {
+    "requestedAt": "2026-08-12T12:25:00-06:00",
+    "reason": "Revalidate the closed five-relation commission dry-run against the post-Cobros-10.10.2 live universe without changing the historical expected baseline or authorizing writes.",
+    "referenceHead": "78a71453dce7e6d1e626f5b9c46a57be6216d774",
+    "referenceCobrosClosure": "COBROS_REAL_LEDGER_COMPLETE",
+    "readOnly": true,
+    "writesAuthorized": false
   }
 }
