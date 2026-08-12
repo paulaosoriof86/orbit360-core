@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "orbit360-cobros-10102-router-rootfix-source-v1",
+  "gateId": "block10.10-cobros-full-ledger-write-lab-v20260805",
+  "contractVersion": "10.10.2",
+  "approved": true,
+  "classification": "VALIDATOR_STALE",
+  "rootCause": "CANONICAL_GATE_NOT_REGISTERED_IN_ENTRYPOINT",
+  "parentHead": "6d9dccfd657b6d0a22cba0ac6e0a11c28824c70b",
+  "runtimeAuthorizationConsumed": false,
+  "capabilities": {
+    "secrets": false,
+    "firestoreRead": false,
+    "writes": false,
+    "runtime": false,
+    "browser": false,
+    "deploy": false,
+    "functionsDeploy": false,
+    "rulesDeploy": false,
+    "production": false
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
