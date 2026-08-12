@@ -3,7 +3,7 @@
   "validatorLifecycleRevision": "phase-capability-contract-v1",
   "gateId": "fase-a-ops-leads-crm-release-lab-v20260812",
   "gateContractVersion": "1.0.0",
-  "status": "RUNTIME_READY_AWAITING_REQUEST",
+  "status": "ROOTFIX_V2_RUNTIME_READY_AWAITING_REQUEST",
   "currentPhase": "FASE_A_OPS_LEADS_CRM_RELEASE_READONLY_RUNTIME",
   "singleGate": true,
   "macroClosure": true,
@@ -23,19 +23,24 @@
   },
   "authorization": {
     "requestRequired": true,
-    "requestPath": ".github/orbit360-requests/fase-a-ops-leads-crm-runtime-v20260812-authorization.json",
-    "status": "AWAITING_FRESH_EXPLICIT_REQUEST",
+    "requestPath": ".github/orbit360-requests/fase-a-ops-leads-crm-rootfix-v2-20260812-authorization.json",
+    "status": "AWAITING_FRESH_EXPLICIT_REQUEST_AFTER_ROOTFIX_SOURCE_PASS",
     "allowedExecutions": 0,
     "replayAllowed": false,
-    "sourceRunId": 31644543049,
-    "sourceArtifactId": 9160188093,
-    "sourceArtifactDigest": "sha256:b6938949f1af51724b47856bdc1af4fca7d2c05dc054fbcd2f7df9a4f36fc055"
+    "previousRuntimeRunId": 31644988994,
+    "previousRuntimeStatus": "CONSUMED_STOP_RETRY",
+    "previousFailureClassification": "PIPELINE_MECHANISM_FAILURE",
+    "previousFailureCheckpoint": "OPERATIVO_AUTH_MEMBERSHIP_READY_WAIT",
+    "rootfixSourceRunId": 31645997070,
+    "rootfixSourceArtifactId": 9160721901,
+    "rootfixSourceArtifactDigest": "sha256:a5222470ad2fcd86ef911e16226af8c8e658a5de5e21bfa44b49d6af800249aa"
   },
   "scope": {
     "branch": "ays/backend-tenant-lab-v99-20260703",
     "pullRequest": 5,
     "tenantId": "alianzas-soluciones",
     "labUrl": "https://ays-orbit-360-lab.web.app/index.html?orbitBackend=firestore-lab&tenant=alianzas-soluciones&runtime=20260717-2",
+    "rootfixMatrix": "tools/orbit360-fase-a-ops-leads-crm-auth-matrix-segmented-v20260812.mjs",
     "roles": ["Direccion", "Operativo", "Asesor"],
     "routes": ["ops", "leads", "cliente360"],
     "hostingDeployAuthorized": false,
@@ -48,5 +53,10 @@
     "productionAuthorized": false,
     "mainAuthorized": false,
     "mergeAuthorized": false
+  },
+  "antiLoop": {
+    "maximumRootfixRuntimeExecutions": 1,
+    "sameCheckpointFailureRequiresStopRetry": true,
+    "thirdRuntimeForbiddenWithoutNewRootCause": true
   }
 }
