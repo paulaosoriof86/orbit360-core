@@ -3,14 +3,14 @@ on:
   push:
     branches: [ays/backend-tenant-lab-v99-20260703]
     paths:
-      - '.github/orbit360-requests/fase-a-ops-leads-crm-release-v20260812-authorization.json'
+      - '.github/orbit360-requests/fase-a-ops-leads-crm-runtime-v20260812-authorization.json'
 permissions:
   contents: read
 concurrency:
   group: orbit360-fase-a-ops-leads-crm-runtime-v20260812
   cancel-in-progress: false
 env:
-  REQUEST_FILE: .github/orbit360-requests/fase-a-ops-leads-crm-release-v20260812-authorization.json
+  REQUEST_FILE: .github/orbit360-requests/fase-a-ops-leads-crm-runtime-v20260812-authorization.json
   REQUEST_VERSION: 20260812.fase-a-ops-leads-crm-runtime.v1
   EVIDENCE_FILE: orbit360-platform/runtime-gate-crm-v20260716/fase-a-ops-leads-crm-release-sanitized-v20260812.json
 jobs:
@@ -37,11 +37,17 @@ jobs:
           test "$(git diff --name-only HEAD^ HEAD)" = "$REQUEST_FILE"
           PARENT="$(git rev-parse HEAD^)"
           jq -e --arg p "$PARENT" --arg v "$REQUEST_VERSION" '.schemaVersion=="orbit360-runtime-request-v1" and .authorizationGeneration=="fase-a-ops-leads-crm-release-v20260812" and .gateId=="fase-a-ops-leads-crm-release-lab-v20260812" and .contractVersion=="1.0.0" and .requestVersion==$v and .status=="AUTHORIZED_ONCE" and .approved==true and .authorizedByUser==true and .allowedExecutions==1 and .consumed==false and .authorizationFrozen==false and .replayAllowed==false and .parentHead==$p and .authorizedBaseHead==$p and .operation=="FASE_A_OPS_LEADS_CRM_AUTHENTICATED_RELEASE_MATRIX" and .routes==["ops","leads","cliente360"] and .roles==["Direccion","Operativo","Asesor"] and .sourceRunId==31644543049 and .sourceArtifactId==9160188093 and .firestoreReadAuthorized==true and .browserAuthorized==true and .authTokenMintAuthorized==true and .firestoreWritesAuthorized==0 and .authWritesAuthorized==0 and .operationalWritesAuthorized==0 and .hostingDeployAuthorized==false and .functionsDeployAuthorized==false and .rulesDeployAuthorized==false and .reimportAuthorized==false and .productionAuthorized==false and .mainAuthorized==false and .mergeAuthorized==false' "$REQUEST_FILE" >/dev/null
-      - name: Canonical GO gate before secrets, Firebase or browser
+      - name: Canonical source gate first, before secrets Firebase or browser
         shell: bash
         run: |
           set -euo pipefail
-          ORBIT360_GATE_PROFILE=fase-a-ops-leads-crm-runtime ORBIT360_REQUEST_FILE="$REQUEST_FILE" ORBIT360_EXPECTED_REQUEST_VERSION="$REQUEST_VERSION" node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+          ORBIT360_EXPECTED_REQUEST_VERSION=NONE_PENDING_FRESH_AUTHORIZATION node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+          jq -e '.status=="PASS_GATE_CONTRACT_SOURCE_FASE_A_OPS_LEADS_CRM" and .failed==0 and .executionAuthorized==false and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false and .ok==true' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json >/dev/null
+      - name: Runtime GO gate after canonical source PASS and before secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          ORBIT360_REQUEST_FILE="$REQUEST_FILE" ORBIT360_EXPECTED_REQUEST_VERSION="$REQUEST_VERSION" node tools/orbit360-validar-gate-contracts-engine-fase-a-ops-leads-crm-runtime-v20260812.mjs fase-a-ops-leads-crm-release-lab-v20260812
           jq -e '.status=="GO_GATE_CONTRACT_FASE_A_OPS_LEADS_CRM_RUNTIME" and .failed==0 and .executionAuthorized==true and .secretAccessAuthorized==true and .firestoreReadAuthorized==true and .browserAuthorized==true and .authTokenMintAuthorized==true and .firestoreWritesAuthorized==0 and .authWritesAuthorized==0 and .operationalWritesAuthorized==0 and .hostingDeployAuthorized==false and .functionsDeployAuthorized==false and .rulesDeployAuthorized==false and .reimportAuthorized==false and .productionAuthorized==false and .mainAuthorized==false and .mergeAuthorized==false and .runtimeExecuted==false and .secretAccess==false and .browserExecuted==false and .deployExecuted==false and .ok==true' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json >/dev/null
       - name: Install runtime-only test dependencies after GO
         shell: bash
