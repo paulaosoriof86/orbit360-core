@@ -1,0 +1,45 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
+  "gateId": "fase-a-ops-leads-crm-release-lab-v20260812",
+  "gateContractVersion": "1.0.0",
+  "status": "COMPOSED_RUNTIME_READY_AWAITING_REQUEST",
+  "currentPhase": "FASE_A_OPS_LEADS_CRM_COMPOSED_READONLY_RUNTIME",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "tenantId": "alianzas-soluciones",
+  "sourceClosure": "orbit360-platform/runtime-gate-crm-v20260716/fase-a-ops-leads-crm-composed-source-closure-v20260812.json",
+  "matrix": "tools/orbit360-fase-a-ops-leads-crm-auth-matrix-composed-v20260812.mjs",
+  "executionProfile": {
+    "capabilities": {
+      "secrets": true,
+      "firestoreRead": true,
+      "writes": false,
+      "runtime": true,
+      "browser": true,
+      "deploy": false,
+      "production": false
+    }
+  },
+  "antiLoop": {
+    "priorPipelineFailures": 2,
+    "priorMechanismFrozen": true,
+    "newMechanism": "BLOCK12_TRANSPORT_PLUS_BLOCK1_AUTH_READINESS",
+    "maximumComposedRuntimeExecutions": 1,
+    "sameCheckpointFailureRequiresStopRetry": true,
+    "noFurtherRuntimeWithoutNewRootCause": true
+  },
+  "integrity": {
+    "snapshotBeforeAfterRequired": true,
+    "snapshotMustRemainIdentical": true,
+    "firestoreWritesAuthorized": 0,
+    "authWritesAuthorized": 0,
+    "operationalWritesAuthorized": 0,
+    "deploysAuthorized": 0
+  },
+  "request": {
+    "status": "ABSENT_UNTIL_EXPLICIT_AUTHORIZATION",
+    "path": ".github/orbit360-requests/fase-a-ops-leads-crm-composed-runtime-20260812-authorization.json",
+    "allowedExecutions": 0,
+    "replayAllowed": false
+  }
+}
