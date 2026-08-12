@@ -5,23 +5,23 @@
   "gateContractVersion": "10.10.2",
   "owner": "orbit360-cobros-full-ledger-write-lab-v20260805",
   "ownerVersion": "20260811.3-post-rootcause-r2-request-gated",
-  "status": "RUNTIME_REQUEST_REQUIRED",
-  "classification": "POST_ROOTCAUSE_FRESH_AUTHORIZATION_READY",
+  "status": "COBROS_REAL_LEDGER_COMPLETE",
+  "classification": "GO_LAB_COBROS_FULL_LEDGER_DURABLE_COMPLETE",
   "patternClassification": "BACKEND_PROTEGIDO_NO_CLAUDE",
   "rcId": "RC-AYS-LAB-CANONICA-01",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
   "projectId": "ays-orbit-360-lab",
   "tenantId": "alianzas-soluciones",
-  "currentPhase": "COBROS_FULL_LEDGER_WRITE_RUNTIME",
+  "currentPhase": "CONSUMED_PASS_OR_STOP_RETRY",
   "executionProfile": {
-    "mode": "REQUEST_GATED_RUNTIME",
-    "phase": "COBROS_FULL_LEDGER_WRITE_RUNTIME",
+    "mode": "CLOSED",
+    "phase": "CONSUMED_PASS_OR_STOP_RETRY",
     "capabilities": {
-      "secrets": true,
-      "firestoreRead": true,
-      "writes": true,
-      "runtime": true,
+      "secrets": false,
+      "firestoreRead": false,
+      "writes": false,
+      "runtime": false,
       "browser": false,
       "deploy": false,
       "functionsDeploy": false,
@@ -65,7 +65,7 @@
   "containsSecrets": false,
   "containsPasswords": false,
   "activeRequest": false,
-  "requestConsumed": false,
+  "requestConsumed": true,
   "allowedExecutions": 0,
   "priorConsumedRequest": {
     "runId": 31553043940,
@@ -94,5 +94,15 @@
     "runtimeReplayExecuted": false,
     "status": "ROOT_CAUSE_CLOSED"
   },
-  "nextAction": "CREATE_ONE_NEW_EXCLUSIVE_PARENT_BOUND_R2_REQUEST_AND_EXECUTE_ONCE"
+  "nextAction": "RUN_FINAL_RELEASE_BLOCKER_SWEEP",
+  "runtimeClosure": {
+    "runId": 31554583971,
+    "requestCommit": "e5243806e6faa5267992c511c6080f7c8238189d",
+    "status": "COBROS_REAL_LEDGER_COMPLETE",
+    "classification": "GO_LAB_COBROS_FULL_LEDGER_DURABLE_COMPLETE",
+    "checkpoint": "POST_VERIFIED",
+    "forwardWrites": 1098,
+    "rollbackAttempted": false,
+    "rollbackRestored": false
+  }
 }
