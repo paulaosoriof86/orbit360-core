@@ -1,0 +1,84 @@
+name: Orbit 360 · Cobros 10.10.2 · canonical router rootfix source-only
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-source-only/cobros-10102-router-rootfix-v20260811.json'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: orbit360-cobros-10102-router-rootfix-source-v20260811
+  cancel-in-progress: false
+
+env:
+  GATE_ID: block10.10-cobros-full-ledger-write-lab-v20260805
+  TRIGGER: .github/orbit360-source-only/cobros-10102-router-rootfix-v20260811.json
+  EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/cobros-10102-router-rootfix-source-sanitized-v20260811.json
+  LIFECYCLE: tools/orbit360-validator-lifecycle-contract-cobros-full-ledger-write-lab-v20260805.json
+
+jobs:
+  rootfix:
+    name: Register owner → validate canonical gate · zero access
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 2
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify exclusive source-only rootfix trigger
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = 'ays/backend-tenant-lab-v99-20260703'
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
+          test "${#CHANGED[@]}" = '1'
+          test "${CHANGED[0]}" = "$TRIGGER"
+          jq -e '.schemaVersion=="orbit360-cobros-10102-router-rootfix-source-v1" and .gateId==env.GATE_ID and .approved==true and .classification=="VALIDATOR_STALE" and .rootCause=="CANONICAL_GATE_NOT_REGISTERED_IN_ENTRYPOINT" and .capabilities.secrets==false and .capabilities.firestoreRead==false and .capabilities.writes==false and .capabilities.runtime==false and .capabilities.browser==false and .capabilities.deploy==false and .capabilities.production==false' "$TRIGGER" >/dev/null
+      - name: Apply owner/registry rootfix only
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-rootfix-register-cobros-10102-canonical-router-v20260811.mjs
+          node tools/orbit360-rootfix-register-cobros-10102-canonical-router-v20260811.mjs
+          node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
+          node --check tools/orbit360-validar-gate-contracts-engine-cobros-full-ledger-write-v20260811.mjs
+          node --check tools/orbit360-cobros-full-ledger-write-lab-v20260811.mjs
+      - name: Execute corrected canonical gate source-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          test ! -e .github/orbit360-requests/cobros-full-ledger-write-lab-v20260811.json
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$GATE_ID"
+          jq -e '.status=="GO_GATE_CONTRACT" and .gateId==env.GATE_ID and .contractVersion=="10.10.2" and .canonicalPhase=="STATIC_PREFLIGHT_PASS" and .phase=="STATIC_PREFLIGHT_PASS" and .requestExists==false and .requestState=="FRESH_RUNTIME_REQUEST_REQUIRED" and .executionAuthorized==false and .secretAccessAuthorized==false and .firestoreReadAuthorized==false and .labWriteAuthorized==false and .writeAuthorized==false and .maximumForwardWrites==1098 and .stageDocuments==1095 and .newCobros==0 and .receiptWrites==0 and .policyWrites==0 and .finmovWrites==0 and .passVisualPostAuth==true and .dataAccess==false and .secretAccess==false and .operationalWrites==0 and .secretsRead==false and .firestoreRead==false and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false and .ok==true' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json >/dev/null
+      - name: Persist source-only closure
+        shell: bash
+        run: |
+          set -euo pipefail
+          export RUN_ID="$GITHUB_RUN_ID" HEAD_SHA="$GITHUB_SHA"
+          node <<'NODE'
+          const fs=require('fs'),path=require('path');const p=process.env.LIFECYCLE;const l=JSON.parse(fs.readFileSync(p,'utf8'));l.ownerVersion='20260811.2-canonical-router-registered';l.controlPlaneRootfix={runId:Number(process.env.RUN_ID),triggerCommit:process.env.HEAD_SHA,status:'PASS_COBROS_10102_CANONICAL_ROUTER_SOURCE',classification:'VALIDATOR_STALE_CLOSED',rootCause:'CANONICAL_GATE_NOT_REGISTERED_IN_ENTRYPOINT',secretsRead:false,firestoreRead:false,writes:0};l.nextAction='CREATE_ONE_FRESH_EXCLUSIVE_PARENT_BOUND_RUNTIME_REQUEST_FOR_COBROS_10102';fs.writeFileSync(p,JSON.stringify(l,null,2)+'\n');
+          const ev={schemaVersion:'orbit360-cobros-10102-router-rootfix-source-evidence-v1',gateId:process.env.GATE_ID,contractVersion:'10.10.2',runId:Number(process.env.RUN_ID),triggerCommit:process.env.HEAD_SHA,status:'PASS_COBROS_10102_CANONICAL_ROUTER_SOURCE',classification:'VALIDATOR_STALE_CLOSED',rootCause:'CANONICAL_GATE_NOT_REGISTERED_IN_ENTRYPOINT',canonicalEntrypoint:'tools/orbit360-validar-gate-contracts-v20260717.mjs',canonicalEngine:'tools/orbit360-validar-gate-contracts-engine-cobros-full-ledger-write-v20260811.mjs',writer:'tools/orbit360-cobros-full-ledger-write-lab-v20260811.mjs',runtimeWorkflow:'.github/workflows/orbit360-cobros-full-ledger-write-runtime-v20260811.yml',sourceGate:'GO_GATE_CONTRACT',maximumForwardWrites:1098,stageDocuments:1095,secretsRead:false,firestoreRead:false,firestoreWrites:0,operationalWrites:0,browser:false,deploy:false,production:false,main:false,merge:false,containsPII:false,containsSecrets:false,ok:true};fs.mkdirSync(path.dirname(process.env.EVIDENCE),{recursive:true});fs.writeFileSync(process.env.EVIDENCE,JSON.stringify(ev,null,2)+'\n');
+          fs.writeFileSync('orbit360-platform/docs/CIERRE-ROOTFIX-CONTROL-PLANE-COBROS-10102-20260811.md',`# Cierre rootfix control-plane Cobros 10.10.2 — 2026-08-11\n\nCausa raíz: \`VALIDATOR_STALE / PIPELINE_MECHANISM_FAILURE\` porque el gate 10.10.2 no estaba registrado en el entrypoint canónico.\n\nResultado: \`PASS_COBROS_10102_CANONICAL_ROUTER_SOURCE\`. El entrypoint canónico ya resuelve lifecycle + engine 10.10.2 y devuelve \`GO_GATE_CONTRACT\` en source-only con cero capacidades de acceso.\n\nNo hubo secretos, Firestore, writes, browser, deploy, producción, main ni merge. La autorización runtime permanece sin consumir.\n`);
+          fs.writeFileSync('orbit360-platform/docs/ACADEMIA-ACTUALIZACION-COBROS-10102-CONTROL-PLANE-20260811.md',`# Academia — gate no registrado vs defecto funcional\n\nUn contrato estático PASS no habilita runtime si el gate no existe en el entrypoint canónico. Esto es VALIDATOR_STALE/PIPELINE_MECHANISM_FAILURE, no defecto de datos ni de Cobros. Producto y datos se congelan; se corrigen registry, lifecycle, engine y workflow juntos antes de secretos.\n`);
+          NODE
+          git config user.name orbit360-gate-bot
+          git config user.email orbit360-gate-bot@users.noreply.github.com
+          git add tools/orbit360-validar-gate-contracts-v20260717.mjs "$LIFECYCLE" "$EVIDENCE" orbit360-platform/docs/CIERRE-ROOTFIX-CONTROL-PLANE-COBROS-10102-20260811.md orbit360-platform/docs/ACADEMIA-ACTUALIZACION-COBROS-10102-CONTROL-PLANE-20260811.md
+          git commit -m "control-plane: register Cobros 10.10.2 canonical gate [skip ci]"
+          git push origin "HEAD:ays/backend-tenant-lab-v99-20260703"
+      - name: Upload sanitized rootfix evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-cobros-10102-router-rootfix-${{ github.run_id }}
+          path: ${{ env.EVIDENCE }}
+          retention-days: 30
