@@ -23,7 +23,7 @@
   },
   "authorization": {
     "requestRequired": true,
-    "requestPath": ".github/orbit360-requests/fase-a-ops-leads-crm-release-v20260812-authorization.json",
+    "requestPath": ".github/orbit360-requests/fase-a-ops-leads-crm-runtime-v20260812-authorization.json",
     "status": "AWAITING_FRESH_EXPLICIT_REQUEST",
     "allowedExecutions": 0,
     "replayAllowed": false,
