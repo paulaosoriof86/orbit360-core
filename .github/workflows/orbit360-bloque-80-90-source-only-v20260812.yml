@@ -1,0 +1,40 @@
+name: Orbit360 Block 80-90 Source Only
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - 'tools/orbit360-financiero-historico-canonical-apply-v20260812.mjs'
+      - 'tools/orbit360-validar-financiero-historico-canonical-writer-v20260812.mjs'
+      - 'tools/orbit360-validar-bloque-80-90-source-only-v20260812.mjs'
+      - '.github/workflows/orbit360-bloque-80-90-source-only-v20260812.yml'
+      - 'orbit360-platform/docs/CORRECCION-BLOQUE-80-90-20260812.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source-only-preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Validate syntax
+        run: |
+          node --check tools/orbit360-financiero-historico-canonical-apply-v20260812.mjs
+          node --check tools/orbit360-validar-financiero-historico-canonical-writer-v20260812.mjs
+          node --check tools/orbit360-validar-bloque-80-90-source-only-v20260812.mjs
+      - name: Source-only cumulative preflight 80 to 90
+        run: node tools/orbit360-validar-bloque-80-90-source-only-v20260812.mjs
+      - name: Upload sanitized evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-block-80-90-source-only-v20260812
+          path: orbit360-platform/runtime-gate-crm-v20260716/block-80-90-source-only-v20260812.json
+          if-no-files-found: error
