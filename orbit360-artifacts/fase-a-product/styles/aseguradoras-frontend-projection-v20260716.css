@@ -1,0 +1,25 @@
+/* Orbit 360 · Aseguradoras · proyección frontend 2026-07-16 */
+.asg-order-v20260716{display:grid;gap:4px;min-width:180px;font-size:11px;font-weight:700;color:var(--ink-2)}
+.asg-order-v20260716 .o-sel{width:100%}
+.asg-k-projection{margin:0 0 16px;padding:16px;border:1px solid var(--line);border-left:4px solid var(--red);border-radius:12px;background:var(--card)}
+.asg-k-projection>header{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap}
+.asg-k-projection>header>div{flex:1;min-width:240px}
+.asg-k-projection header small{font-family:var(--f-mono);text-transform:uppercase;letter-spacing:.09em;color:var(--ink-3)}
+.asg-k-projection h3{margin:3px 0 4px;font-family:var(--f-display)}
+.asg-k-projection header p{margin:0;color:var(--ink-3);font-size:12px}
+.asg-k-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin:14px 0}
+.asg-km{padding:10px;border:1px solid var(--line);border-radius:9px;background:var(--surface)}
+.asg-km small{display:block;color:var(--ink-3);font-size:10px;text-transform:uppercase;letter-spacing:.05em}
+.asg-km b{display:block;margin-top:3px;font-size:19px}
+.asg-k-warning{margin:0 0 12px}
+.asg-k-projection details{border-top:1px solid var(--line);padding:10px 0}
+.asg-k-projection summary{cursor:pointer;font-weight:800;font-size:12px;color:var(--ink-2)}
+.asg-k-list{display:grid;gap:7px;margin-top:8px}
+.asg-k-row{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:10px;border:1px solid var(--line);border-radius:9px;background:var(--surface)}
+.asg-k-row>div{min-width:0}
+.asg-k-row b{display:block;font-size:12.5px}
+.asg-k-row small{display:block;color:var(--ink-3);font-size:10.8px;margin-top:3px}
+.asg-k-row p{margin:5px 0 0;color:var(--ink-2);font-size:11.5px}
+.asg-k-empty{padding:12px 0;color:var(--ink-3);font-size:11.5px}
+#asg-ficha[data-mode="read"] .asg-sec input:disabled,#asg-ficha[data-mode="read"] .asg-sec select:disabled,#asg-ficha[data-mode="read"] .asg-sec textarea:disabled,#asg-ficha[data-mode="read"] .asg-row .o-sel:disabled{border-color:transparent!important;background:transparent!important;padding-left:0!important;color:var(--ink)!important;opacity:1!important;-webkit-text-fill-color:var(--ink)!important;box-shadow:none!important;cursor:default!important}
+@media(max-width:760px){.asg-k-row{flex-direction:column}.asg-order-v20260716{width:100%;min-width:0}.asg-k-metrics{grid-template-columns:1fr 1fr}}

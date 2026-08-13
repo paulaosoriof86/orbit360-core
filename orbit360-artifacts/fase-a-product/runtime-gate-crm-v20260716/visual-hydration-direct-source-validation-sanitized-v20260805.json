@@ -1,0 +1,79 @@
+{
+  "schemaVersion": "orbit360-visual-hydration-direct-source-validation-v1",
+  "gateId": "block2.7-visual-hydration-required-optional-source-v20260805",
+  "contractVersion": "2.7.4",
+  "status": "PASS_DIRECT_SOURCE_VALIDATION",
+  "classification": "SOURCE_FIX_READY_FOR_RUNTIME",
+  "total": 24,
+  "passed": 24,
+  "failed": 0,
+  "failedCheckIds": [],
+  "checks": {
+    "overlayNodeSyntax": true,
+    "loaderSourcePresent": true,
+    "loaderVersionAdvanced": true,
+    "loaderReferencesOverlay": true,
+    "nineModules": true,
+    "optionalFailureReady": true,
+    "optionalFailureDegraded": true,
+    "requiredMissingBlocks": true,
+    "requiredFailureBlocks": true,
+    "noLegacyRequired": true,
+    "advisorProjection": true,
+    "activeMembershipProjection": true,
+    "canonicalRelationProjection": true,
+    "noStoreWriteOverrides": true,
+    "noFirestoreWriteCalls": true,
+    "noDemoIdentity": true,
+    "noNamedUsers": true,
+    "honestDegradedCopy": true,
+    "diagnosticsExposed": true,
+    "actualErrorsPreserved": true,
+    "maskedOnlyOptional": true,
+    "writesZeroMarkers": true,
+    "containsNoSecrets": true,
+    "sourceOnly": true
+  },
+  "simulations": {
+    "optionalFailure": {
+      "ready": true,
+      "degraded": true
+    },
+    "requiredMissing": {
+      "ready": false,
+      "degraded": true
+    },
+    "requiredFailure": {
+      "ready": false,
+      "degraded": true
+    }
+  },
+  "owners": [
+    "orbit360-platform/core/visual-runtime-hydration-contract-v20260805.js",
+    "orbit360-platform/core/backend-lab-loader.js"
+  ],
+  "overlaySha256": "e1f1871b8d2a413ca95fdfb361a61080a8bfb4ff66241cf865e22e3707cd19eb",
+  "overlayBlobSha": "64207ba1ebbb5a1e8c624280a13133fd6380147a",
+  "loaderBlobSha": "d4e6ac34cdd183cd32d419a3d02a7f3495a682f2",
+  "validationMode": "node-syntax-plus-deterministic-contract-simulation-and-repository-readback",
+  "pipelineNote": {
+    "newWorkflowTriggerExecuted": false,
+    "recognizedRelayExecuted": false,
+    "classification": "PIPELINE_MECHANISM_FAILURE",
+    "sourceRequestConsumed": false,
+    "runtimeAuthorizationConsumed": false,
+    "resolution": "direct versioned source validation without credentials or external access"
+  },
+  "browserExecuted": false,
+  "secretsRead": false,
+  "firestoreRead": false,
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "operationalWrites": 0,
+  "deployExecuted": false,
+  "productionTouched": false,
+  "containsPII": false,
+  "containsSecrets": false,
+  "containsPasswords": false,
+  "ok": true
+}

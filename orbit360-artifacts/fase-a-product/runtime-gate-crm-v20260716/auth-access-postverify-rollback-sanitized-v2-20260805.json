@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "orbit360-auth-access-postverify-rollback-sanitized-v2",
+  "stage": "NOT_REQUIRED_NOT_EXECUTED",
+  "classification": "PENDING_AUTHORIZED_EXECUTION",
+  "crmWrites": 0,
+  "containsPII": false,
+  "containsSecrets": false,
+  "ok": false
+}

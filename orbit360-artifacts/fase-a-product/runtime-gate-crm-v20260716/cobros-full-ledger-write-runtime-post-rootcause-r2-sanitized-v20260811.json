@@ -1,0 +1,98 @@
+{
+  "schemaVersion": "orbit360-cobros-full-ledger-write-runtime-evidence-v1",
+  "gateId": "block10.10-cobros-full-ledger-write-lab-v20260805",
+  "contractVersion": "10.10.2",
+  "projectId": "ays-orbit-360-lab",
+  "tenantId": "alianzas-soluciones",
+  "status": "COBROS_REAL_LEDGER_COMPLETE",
+  "classification": "GO_LAB_COBROS_FULL_LEDGER_DURABLE_COMPLETE",
+  "checkpoint": "POST_VERIFIED",
+  "runId": "cobledger_ed27a5d87d3c9a10d8919bc85c00",
+  "requestVerified": true,
+  "packageVerified": true,
+  "snapshotBefore": {
+    "activePointerExists": false,
+    "activeRunId": "",
+    "runManifestExists": false,
+    "business": {
+      "cobros": {
+        "count": 7,
+        "digest": "9c9b826e33e96c5a02f099b2b632e050ba783dfbbe35fb0bf16d524f152a7ff4"
+      },
+      "receipts": {
+        "count": 1294,
+        "digest": "937adc500513eeb8a1f726ad2881b3f96f2b5f18620f96d5b8ec8f845ad5be9f"
+      },
+      "policies": {
+        "count": 1375,
+        "digest": "8260a7850ea0dac67bae1ff66c977b96591a734202fcf2e768511c04db8bfd8e"
+      },
+      "finmovsCount": 1
+    }
+  },
+  "snapshotAfter": {
+    "activePointerExists": true,
+    "activeRunId": "cobledger_ed27a5d87d3c9a10d8919bc85c00",
+    "runManifestExists": true,
+    "business": {
+      "cobros": {
+        "count": 7,
+        "digest": "9c9b826e33e96c5a02f099b2b632e050ba783dfbbe35fb0bf16d524f152a7ff4"
+      },
+      "receipts": {
+        "count": 1294,
+        "digest": "937adc500513eeb8a1f726ad2881b3f96f2b5f18620f96d5b8ec8f845ad5be9f"
+      },
+      "policies": {
+        "count": 1375,
+        "digest": "8260a7850ea0dac67bae1ff66c977b96591a734202fcf2e768511c04db8bfd8e"
+      },
+      "finmovsCount": 1
+    }
+  },
+  "stage": {
+    "counts": {
+      "pagosReportados": 365,
+      "evidenciasCobro": 365,
+      "propuestasConciliacion": 132,
+      "conciliacionHolds": 233
+    },
+    "digests": {
+      "pagosReportados": "034f84b4fdcdce84bd95f5aa3bec614760b7ef616c32338ebda24d934d16e638",
+      "evidenciasCobro": "db4314d6a44515466d01d8c00fadbcfcea5db7f64a99fd831b70ceb66cd001c4",
+      "propuestasConciliacion": "cb52effa38ce5ca3895605978c5f78ec93205b541e179f6cc53a052fafd27ece",
+      "conciliacionHolds": "dfd1f734d3dc3e828328e2b5f47efd884bcb76c9e655d1c63a146cae2687176e"
+    },
+    "aggregateDigest": "a27364d7de6627a1a3b21769ec30598992113436eed5915eb05b8060ed423f22"
+  },
+  "forwardWrites": 1098,
+  "maximumForwardWrites": 1098,
+  "stageDocumentsWritten": 1095,
+  "manifestWrites": 1,
+  "activationWrites": 2,
+  "activationCommitted": true,
+  "rollbackAttempted": false,
+  "rollbackWrites": 0,
+  "rollbackRestored": false,
+  "newCobros": 0,
+  "receiptWrites": 0,
+  "policyWrites": 0,
+  "finmovWrites": 0,
+  "secretsRead": true,
+  "firestoreRead": true,
+  "authWrites": 0,
+  "operationalBusinessWrites": 0,
+  "browserExecuted": false,
+  "hostingDeploys": 0,
+  "functionsDeploys": 0,
+  "rulesDeploys": 0,
+  "reimport": false,
+  "productionTouched": false,
+  "mainTouched": false,
+  "mergeExecuted": false,
+  "containsPII": false,
+  "containsPolicyNumbers": false,
+  "containsAmounts": false,
+  "containsSecrets": false,
+  "ok": true
+}

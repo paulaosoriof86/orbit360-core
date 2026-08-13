@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "orbit360-documentos-parches-roles-v1330",
+  "title": "Orbit 360 Documentos/Parches/Roles v1330",
+  "type": "object",
+  "required": ["version", "documento", "parchePendiente", "roles", "accionesSensibles", "forbiddenFields"],
+  "additionalProperties": false,
+  "properties": {
+    "version": { "const": "v1330" },
+    "documento": {
+      "type": "object",
+      "required": ["required", "estados", "tipos", "storageEstados"],
+      "properties": {
+        "required": {
+          "type": "array",
+          "items": { "type": "string" },
+          "contains": { "const": "metaOnly" }
+        },
+        "estados": {
+          "type": "array",
+          "items": { "enum": ["en_revision", "requiere_aclaracion", "validado", "rechazado", "aplicado", "bloqueado"] },
+          "minItems": 6,
+          "uniqueItems": true
+        },
+        "tipos": {
+          "type": "array",
+          "items": { "enum": ["soporte_pago", "dpi", "rtu", "rut", "poliza_emitida", "tarjeta_circulacion", "factura_aseguradora", "otro"] },
+          "uniqueItems": true
+        },
+        "storageEstados": {
+          "type": "array",
+          "items": { "enum": ["pendiente_storage", "storage_conectado", "no_aplica"] },
+          "uniqueItems": true
+        }
+      }
+    },
+    "parchePendiente": {
+      "type": "object",
+      "required": ["required", "estados", "entidadTipos"],
+      "properties": {
+        "required": { "type": "array", "items": { "type": "string" } },
+        "estados": {
+          "type": "array",
+          "items": { "enum": ["pendiente_revision", "aprobado", "rechazado", "aplicado", "bloqueado"] },
+          "minItems": 5,
+          "uniqueItems": true
+        },
+        "entidadTipos": {
+          "type": "array",
+          "items": { "enum": ["cliente", "poliza", "cobro", "vehiculo", "aseguradora"] },
+          "uniqueItems": true
+        }
+      }
+    },
+    "roles": {
+      "type": "array",
+      "items": { "enum": ["Direccion", "AdminTenant", "ITSeguridad", "Finanzas", "Cobros", "Operativo", "Asesor", "Marketing", "AcademiaAdmin", "ClientePortal", "AuditorSoloLectura"] },
+      "minItems": 11,
+      "uniqueItems": true
+    },
+    "accionesSensibles": {
+      "type": "array",
+      "items": { "enum": ["solicitar_aclaracion", "aprobar_parche", "rechazar_parche", "aplicar_parche", "cambiar_visibilidad_cliente", "anular_documento", "bloquear_documento"] },
+      "minItems": 7,
+      "uniqueItems": true
+    },
+    "confirmaciones": {
+      "type": "object",
+      "additionalProperties": { "type": "string" },
+      "properties": {
+        "aplicar_parche": { "const": "APLICAR" },
+        "anular_documento": { "const": "ANULAR" },
+        "mostrar_cliente_documento_sensible": { "const": "MOSTRAR CLIENTE" }
+      }
+    },
+    "forbiddenFields": {
+      "type": "array",
+      "items": { "enum": ["base64", "bytes", "fileBytes", "dataUrl", "downloadUrl", "publicUrl", "token", "secret", "apiKey", "password", "credential"] },
+      "minItems": 10,
+      "uniqueItems": true
+    },
+    "currencyRules": {
+      "type": "object",
+      "properties": {
+        "GT": { "const": "GTQ" },
+        "CO": { "const": "COP" }
+      },
+      "required": ["GT", "CO"]
+    }
+  }
+}

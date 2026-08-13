@@ -1,0 +1,182 @@
+{
+  "schemaVersion": "orbit360-conciliacion-multievidencia-source-registry-v1",
+  "tenantId": "alianzas-soluciones",
+  "registeredAt": "2026-08-01",
+  "status": "MULTI_EVIDENCE_SOURCES_REGISTERED_READONLY",
+  "classification": "DATA_CONTRACT_FAILURE_CORRECTED",
+  "userRules": {
+    "requestFreshPlanillasOnlyWhenNeeded": true,
+    "requestFreshBankStatementsOnlyWhenNeeded": true,
+    "requestFreshFinancialFilesOnlyWhenNeeded": true,
+    "doNotUsePreviouslyProvidedStaleVersions": true,
+    "paymentAfterPortfolioSnapshotCutoffIsValid": true,
+    "doNotReRequestSameHash": true,
+    "documentEveryReceivedSource": true
+  },
+  "evidenceModel": {
+    "directPaymentReports": "CRM and insurer paid/revenue reports are direct payment evidence but still require one-to-one reconciliation.",
+    "portfolioSnapshots": "Presence proves pending as of cutoff. Disappearance from a later comparable complete snapshot is temporal clearing evidence, not an automatic cobro by itself.",
+    "commissionStatements": "A recognized or paid commission corroborates insurer recognition of collection; timing may lag and differences remain visible.",
+    "bankStatements": "Corroboration requested only for specific unresolved cases; never creates cobros alone.",
+    "financialHistory": "Separate domain; never substitutes for payment or bank evidence.",
+    "postCutoffRule": "A payment dated after a portfolio snapshot cutoff remains valid and may explain a previously pending obligation. It must not be rejected as a contradiction."
+  },
+  "sources": [
+    {
+      "logicalName": "Cartera Pendiente La Ceiba.pdf",
+      "sha256": "389a0be4afb0f483946bc7ee98715f93cd85757a1973e7bb11f54fd057c50008",
+      "sourceType": "estado_cartera_aseguradora",
+      "insurer": "La Ceiba",
+      "cutoff": "2026-07-31",
+      "emissionDate": "2026-07-27",
+      "format": "PDF",
+      "policies": 5,
+      "receiptRows": 9,
+      "aggregateOutstandingGTQ": 3243.84,
+      "historicalExpiredTermOutstandingDetected": true,
+      "status": "REGISTERED_AND_PROFILED"
+    },
+    {
+      "logicalName": "Reporte de Primas pendientes Aseguradora General.xls",
+      "sha256": "1c7c5b01dfb1ce4af4d4f88ee4a0c4b1c7a19e7aecedb1716a1106f5b25b46ab",
+      "sourceType": "estado_cartera_aseguradora",
+      "insurer": "Aseguradora General",
+      "cutoff": "2026-07-20",
+      "format": "XLS_BIFF",
+      "receiptRows": 1,
+      "status": "REGISTERED_AND_TEMPORALLY_MATCHED",
+      "sanitizedTransition": "One exact endorsement was pending at 2026-07-20 and appears paid on 2026-07-22 in the insurer paid report.",
+      "postCutoffPaymentPreserved": true
+    },
+    {
+      "logicalName": "Estado de Cartera GyT.xlsx",
+      "sha256": "d6348e3d63c8a1dd96af5b07940f9d1fd66aba0cb0d1768d20bbdb901aabce79",
+      "sourceType": "estado_cartera_aseguradora",
+      "insurer": "REQUIERE_VALIDACION",
+      "cutoff": "REQUIERE_VALIDACION",
+      "format": "XLSX",
+      "receiptRows": 2,
+      "aggregateOutstandingGTQ": 7165.19,
+      "latestDueDate": "2026-07-27",
+      "status": "REGISTERED_PROFILED_REQUIRES_SOURCE_IDENTITY"
+    },
+    {
+      "logicalName": "Cartera pendiente Aseguradora Guatemalteca.pdf",
+      "sha256": "aba093aa526f956a151ae8e73b39024250b85b4bc73847bf5135e8a6b188ee45",
+      "sourceType": "estado_cartera_aseguradora",
+      "insurer": "Aseguradora Guatemalteca",
+      "cutoff": "2026-07-28",
+      "format": "PDF",
+      "policies": 16,
+      "receiptRows": 92,
+      "aggregateOutstandingGTQ": 32098.45,
+      "status": "REGISTERED_AND_PROFILED"
+    },
+    {
+      "logicalName": "Balance El Roble.xls",
+      "sha256": "bcf6ccf35728d262e7efd1bd06142ea50028c804995a6a92cea77282a326b3a3",
+      "sourceType": "estado_cartera_aseguradora",
+      "insurer": "El Roble",
+      "cutoff": "2026-07-27",
+      "cutoffBasis": "INFERRED_FROM_AGING_BOUNDARY",
+      "format": "DIF_XLS",
+      "policies": 37,
+      "receiptRows": 269,
+      "aggregateOutstandingGTQ": 105420.47,
+      "status": "REGISTERED_PROFILED_CUTOFF_INFERRED"
+    },
+    {
+      "logicalName": "Balance de cuentas Universales.pdf",
+      "sha256": "92379f984781c3312fc5c7d3a88a6c09becac7b71c3cd0c534f53d5b1005196b",
+      "sourceType": "estado_cartera_aseguradora",
+      "insurer": "Universales",
+      "cutoff": "2026-07-27",
+      "format": "PDF",
+      "policyGroups": 5,
+      "receiptRows": 34,
+      "aggregateOutstandingGTQ": 32927.01,
+      "status": "REGISTERED_AND_PROFILED"
+    },
+    {
+      "logicalName": "Proyectado Mapfre para agosto.xls",
+      "sha256": "45071b686e47d3b245336a1bc16f7dfffc949f4c14d0a50b7c97c5048650499c",
+      "sourceType": "estado_cartera_aseguradora",
+      "insurer": "Mapfre",
+      "cutoff": "2026-08-31",
+      "cutoffType": "PROJECTED",
+      "format": "HTML_XLS",
+      "receiptRows": 13,
+      "aggregateOutstandingGTQ": 11369.56,
+      "status": "REGISTERED_AND_PROFILED",
+      "temporalUse": "Separates already-paid July requirements from next pending requirements and prevents cross-vigencia matching."
+    },
+    {
+      "logicalName": "Cobros Mapfre julio.xls",
+      "sha256": "990844110efd815f73535d962870d6381a59268233a9b3e86a5ffc0e76df1992",
+      "sourceType": "planilla_aseguradora",
+      "insurer": "Mapfre",
+      "periodStart": "2026-07-01",
+      "periodEnd": "2026-07-31",
+      "format": "HTML_XLS",
+      "paidRows": 4,
+      "aggregatePaidGTQ": 3217.41,
+      "supersedesSha256": "d19559b7d5ad80930ad10f88d30ae7e0015b1647a5c0840867cf76e32c617ad8",
+      "samePaidRowsAsSupersededSource": true,
+      "status": "REGISTERED_PROFILED_SUPERSEDES_PRIOR_CUTOFF"
+    },
+    {
+      "logicalName": "Estado de cuenta Ficohsa a Junio.xlsx",
+      "sha256": "0c465e96564f623f3c8873dd7ff188cbad4f50e772a86b281dfc9b78ba625ae3",
+      "sourceType": "planilla_comisiones",
+      "insurer": "Ficohsa",
+      "period": "2026-06",
+      "format": "XLSX",
+      "commissionRows": 1,
+      "commissionGTQ": 21.25,
+      "invoiceTotalGTQ": 23.80,
+      "status": "REGISTERED_PROFILED_HOLD_DATA_CONTRACT",
+      "holdReasons": [
+        "CRM policy prefix differs from insurer statement.",
+        "CRM currency is COP while insurer statement currency is Q/GTQ."
+      ],
+      "reconciliationUse": "Corroborates insurer recognition of the June collection but cannot auto-apply until data-contract conflicts are resolved."
+    },
+    {
+      "logicalName": "Estado de cuenta Bantrab a Julio 03.xlsx",
+      "sha256": "a991eaa9170fbfbfd13fcbba1db95e5bf488ac3839622dd7bf7b504427bef18a",
+      "sourceType": "estado_cartera_aseguradora",
+      "insurer": "Bantrab",
+      "cutoff": "2026-07-03",
+      "format": "XLSX",
+      "policies": 2,
+      "receiptRows": 18,
+      "aggregateOutstandingGTQ": 5398.92,
+      "status": "REGISTERED_PROFILED_OLD_BUT_USABLE",
+      "postCutoffEvidence": "A later CRM payment dated 2026-07-14 is valid after this snapshot cutoff.",
+      "holdReasons": [
+        "One policy has frequency and amount differences between snapshot and CRM.",
+        "Old snapshot is evidence of prior pending status, not current balance authority."
+      ]
+    }
+  ],
+  "currentUploadCoverage": {
+    "filesReceived": 10,
+    "filesRegistered": 10,
+    "columnaFileIdentified": false,
+    "columnaRule": "Do not infer another file as Columna. Request an updated Columna source only when the unresolved reconciliation requires it."
+  },
+  "writes": {
+    "cobros": 0,
+    "finmovs": 0,
+    "firestore": 0,
+    "operational": 0,
+    "productionTouched": false,
+    "deployExecuted": false
+  },
+  "security": {
+    "realRowsStoredInRepo": false,
+    "containsPII": false,
+    "containsPolicyNumbers": false,
+    "containsSecrets": false
+  }
+}

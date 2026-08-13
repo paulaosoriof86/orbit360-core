@@ -1,0 +1,40 @@
+{
+  "schemaVersion": "orbit360-block12-functional-pass-before-visual-rootfix-v1",
+  "sourceRunId": 30962756387,
+  "sourceHead": "76377a4a95d9a834ac114e0654660a03c5f5046c",
+  "gateId": "block12-operational-runtime-lab-v20260804",
+  "contractVersionObserved": "12.0.8",
+  "runtime": {
+    "status": "OPERATIONAL_RUNTIME_BROWSER_PASS",
+    "classification": "GO_LAB_IN_PLATFORM_RUNTIME",
+    "passed": 18,
+    "failed": 0,
+    "opsLeads": true,
+    "advisorOwnScope": true,
+    "notifications": true,
+    "recurringImport": true,
+    "cobrosReconciliation": true
+  },
+  "cleanup": {
+    "rollbackExact": true,
+    "realTenantUnchanged": true,
+    "realTenantWrites": 0,
+    "syntheticAuthUsersRemaining": 0,
+    "syntheticTenantCollectionsRemaining": 0
+  },
+  "visual": {
+    "status": "CUMULATIVE_VISUAL_LAB_FAIL",
+    "classification": "PIPELINE_MECHANISM_FAILURE",
+    "failureCode": "VISUAL_SCREENSHOT_FULLPAGE_TIMEOUT",
+    "functionalRegressionDemonstrated": false
+  },
+  "decision": "REUSE_FUNCTIONAL_PASS_AND_RETRY_VISUAL_ONLY",
+  "rulesDeployed": false,
+  "productionTouched": false,
+  "realDataReimported": false,
+  "mainTouched": false,
+  "mergeExecuted": false,
+  "containsPII": false,
+  "containsSecrets": false,
+  "ok": true
+}

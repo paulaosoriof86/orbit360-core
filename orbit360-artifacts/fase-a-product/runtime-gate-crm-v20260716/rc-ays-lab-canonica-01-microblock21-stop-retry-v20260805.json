@@ -1,0 +1,108 @@
+{
+  "schemaVersion": "orbit360-rc-ays-microblock21-stop-retry-v1",
+  "generatedAt": "2026-08-05T04:18:30Z",
+  "rcId": "RC-AYS-LAB-CANONICA-01",
+  "gateId": "GO_LAB_CANDIDATE_VISIBLE",
+  "contractGateId": "block12-operational-runtime-lab-v20260804",
+  "contractVersion": "12.0.11",
+  "sourceBaseline": "548cffa50cddfd93ad2118f5a06e9bb420699bde",
+  "authorizationRef": "user_authorized_microblock_2_1_20260804T2207-0600",
+  "authorizationConsumed": true,
+  "decision": "STOP_RETRY_DEFINITIVE_CONTROL_PLANE",
+  "primaryClassification": "VALIDATOR_STALE",
+  "secondaryClassification": "PIPELINE_MECHANISM_FAILURE",
+  "repeatedStage": "CANONICAL_PREFLIGHT_ENTRYPOINT_BEFORE_SECRETS",
+  "attempts": [
+    {
+      "runId": 30974443335,
+      "requestCommit": "ee2f4890883ac9b8c1d8829ae7a40757d747d2ce",
+      "status": "VALIDATOR_STALE",
+      "passed": 26,
+      "failed": 2,
+      "failedCheckIds": [
+        "REQUEST_ACTIVE",
+        "VIDEO_LAYOUTFREE_HARNESS"
+      ],
+      "secretAccess": false,
+      "firestoreRead": false,
+      "deployExecuted": false,
+      "browserExecuted": false
+    },
+    {
+      "runId": 30974745085,
+      "requestCommit": "5236b7f91a85ba20d2f5baed625f503b32db7dfe",
+      "status": "VALIDATOR_STALE",
+      "failed": 1,
+      "failedCheckIds": [
+        "CANONICAL_PREFLIGHT_ENTRYPOINT"
+      ],
+      "error": "CANONICAL_LIFECYCLE_REVISION_MISMATCH",
+      "canonicalLifecycleCompositionExpected": "phase-capability-contract-v1",
+      "lifecycleRevisionObserved": "isolated-context-direct-url-v6",
+      "secretAccess": false,
+      "firestoreRead": false,
+      "deployExecuted": false,
+      "browserExecuted": false
+    }
+  ],
+  "rootCause": {
+    "owner": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
+    "predicate": "lifecycle.validatorLifecycleRevision must equal CANONICAL_LIFECYCLE_COMPOSITION",
+    "canonicalLifecycleComposition": "phase-capability-contract-v1",
+    "incorrectChange": "The isolated visual harness revision was written into validatorLifecycleRevision, replacing the canonical composition identifier instead of being declared in a separate harness revision field.",
+    "engineReached": false,
+    "productDefectDemonstrated": false,
+    "dataContractFailureDemonstrated": false
+  },
+  "evidenceQualityFinding": {
+    "classification": "PIPELINE_MECHANISM_FAILURE",
+    "field": "functionsVerified",
+    "decisionJsonValue": 4,
+    "authoritativeJobValue": 0,
+    "reason": "The decision generator used a fixed literal instead of the step output.",
+    "impact": "No operational impact; no Functions deployment occurred. The field must not be used as evidence."
+  },
+  "preservedEvidence": {
+    "functionalRunId": 30962756387,
+    "functionalPassed": 18,
+    "functionalFailed": 0,
+    "functionalReplayExecuted": false,
+    "isolatedSyntheticRunId": 30971707956,
+    "isolatedSyntheticRoutesPassed": 8,
+    "canonicalClients": 430,
+    "canonicalInsurers": 30
+  },
+  "executionOutcome": {
+    "previewUrlProduced": false,
+    "functionsVerified": 0,
+    "functionsDeployed": false,
+    "hostingPreviewDeployed": false,
+    "snapshotBeforeExecuted": false,
+    "snapshotAfterExecuted": false,
+    "visualRoutesExecuted": 0,
+    "secretsRead": false,
+    "firestoreRead": false,
+    "firestoreWrites": 0,
+    "authWrites": 0,
+    "rulesDeployed": false,
+    "realDataReimported": false,
+    "productionTouched": false,
+    "mainTouched": false,
+    "mergeExecuted": false
+  },
+  "stopRetry": {
+    "active": true,
+    "thirdRequestForbidden": true,
+    "thirdRuntimeAttemptForbidden": true,
+    "additionalPatchInThisFailureFamilyForbidden": true,
+    "productAndDataFrozen": true
+  },
+  "requiredFutureResolution": {
+    "type": "SOURCE_ONLY_CONTROL_PLANE_REDESIGN",
+    "description": "Preserve validatorLifecycleRevision as the canonical composition identifier and declare the isolated harness generation separately; add a static composition proof that exercises the outer router and inner engine together before any new runtime authorization.",
+    "newExplicitAuthorizationRequiredAfterStaticPass": true
+  },
+  "containsPII": false,
+  "containsSecrets": false,
+  "ok": false
+}

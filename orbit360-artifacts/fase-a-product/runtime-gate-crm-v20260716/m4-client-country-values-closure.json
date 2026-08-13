@@ -1,0 +1,69 @@
+{
+  "schemaVersion": "orbit360-m4-client-country-values-closure-v1",
+  "issuedAt": "2026-07-25",
+  "gateId": "block4-client-country-values-readonly-v20260725",
+  "contractVersion": "4.2.3",
+  "status": "M4_CLIENT_COUNTRY_VALUES_AUDIT_COMPLETED_DATA_CONTRACT_FAILURE_CONFIRMED",
+  "packageCommit": "27171f4fd5490c5f56f42bdf7c5ff4d1a775a8ff",
+  "requestCommit": "79457224b095b9c54a0900ac9791c560fde9320d",
+  "runId": 30162227645,
+  "jobId": 89689301112,
+  "artifactId": 8620551534,
+  "artifactDigest": "sha256:47bd6be2b68c5ace2dba7656305452aa7a6dc0c85dd2d4fca026e0f512493b6e",
+  "canonicalPreflight": "GO_GATE_CONTRACT_30_OF_30",
+  "runtimeContract": "PASS_14_OF_14",
+  "sourceCounts": {
+    "clientes": 414,
+    "missingCurrency": 61
+  },
+  "distribution": {
+    "GT": 0,
+    "CO": 0,
+    "empty": 0,
+    "nonCanonical": 61,
+    "conflict": 0,
+    "total": 61
+  },
+  "currencyProposal": {
+    "GT": "GTQ",
+    "CO": "COP",
+    "resolved": 0,
+    "unresolved": 61,
+    "writeAuthorized": false
+  },
+  "classification": "DATA_CONTRACT_FAILURE",
+  "partialMigrationAllowedByCurrentContract": false,
+  "partialMigrationReason": "durable writer requires 414 clients and approvalReady only when requiresValidation equals zero",
+  "authorization": {
+    "valueAuditConsumed": true,
+    "allowedExecutions": 0,
+    "writeAuthorized": false,
+    "allowedWriteExecutions": 0
+  },
+  "security": {
+    "collectionsRead": 1,
+    "insurersRead": false,
+    "targetRead": false,
+    "rawValuesExported": false,
+    "individualRecordsExported": false,
+    "configurationWrites": 0,
+    "membershipWrites": 0,
+    "clientWrites": 0,
+    "insurerWrites": 0,
+    "auditWrites": 0,
+    "rulesChanged": false,
+    "hostingDeploy": false,
+    "functionsDeploy": false,
+    "imports": false,
+    "production": false,
+    "mergeMain": false
+  },
+  "nextAction": "OBTAIN_AUTHORITATIVE_COUNTRY_CORRECTION_SOURCE_OR_EXPLICIT_CONTROLLED_BUSINESS_VALIDATION_FOR_61_CLIENTS",
+  "claudeClassification": "BACKEND_PROTEGIDO_NO_CLAUDE",
+  "academyClassification": [
+    "REPLICABLE_CLAUDE_ACUMULADO",
+    "ACADEMIA_ACTUALIZAR"
+  ],
+  "containsPII": false,
+  "containsSecrets": false
+}

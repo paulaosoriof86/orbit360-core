@@ -1,0 +1,47 @@
+{
+  "schemaVersion": "orbit360-auth-access-v2-rootcause-sanitized-v1",
+  "rcId": "RC-AYS-LAB-CANONICA-01",
+  "observedStage": "STOP_RETRY_CENSUS",
+  "observedClassification": "DATA_CONTRACT_FAILURE",
+  "observedErrorCode": "ADVISOR_PAULA_ACCESS_CONFIG_INCOMPLETE",
+  "rootClassification": "VALIDATOR_STALE",
+  "rootCause": "The v2 resolver required email, roles, defaultRole and countries to coexist in the legacy advisor document. The approved roster contract stores roles/defaultRole in the sealed roster manifest and the approved reconciler resolves countries from advisor configuration with fallback to the active technical tenant membership.",
+  "owner": {
+    "file": "tools/orbit360-auth-access-recovery-lab-v20260805.mjs",
+    "functions": ["resolveTargets", "rolesFrom", "countriesFrom", "defaultRoleFrom", "scopesFrom"]
+  },
+  "authoritativeSources": {
+    "approvedRosterManifest": "orbit360-platform/runtime-gate-crm-v20260716/rc12-cumulative-candidate-unified-manifest.json",
+    "approvedRosterLockedCommit": "34fa84a60ebc38b0035ed664da87ca78aaa73ff7",
+    "approvedReconciler": "tools/orbit360-provisionar-roster-aprobado-final-rc12-v20260804.mjs",
+    "tenantMembershipFallback": "tenants/{tenantId}/members"
+  },
+  "confirmedEffects": {
+    "paulaOfficialEmailConfigured": true,
+    "emailConfigurationWrites": 1,
+    "onboardingFunctionDeployed": false,
+    "authWrites": 0,
+    "membershipWrites": 0,
+    "passwordEmailsSent": 0,
+    "crmWrites": 0,
+    "hostingDeploys": 0,
+    "rulesDeploys": 0,
+    "reimports": 0,
+    "productionTouched": false,
+    "mainTouched": false,
+    "mergeExecuted": false
+  },
+  "requiredRootFix": {
+    "composeAccessFromApprovedSources": true,
+    "doNotRequireDuplicateLegacyFields": true,
+    "emailFromAdvisorVerifiedByRosterDigest": true,
+    "rolesAndDefaultRoleFromApprovedRoster": true,
+    "countriesFromAdvisorOrTenantMembershipFallback": true,
+    "dataScopesFromApprovedProfileContract": true,
+    "noHardcodedUsersOrPasswords": true,
+    "newGateAndRequestRequiredBeforeRuntime": true
+  },
+  "containsPII": false,
+  "containsSecrets": false,
+  "ok": true
+}

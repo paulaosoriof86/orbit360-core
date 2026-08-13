@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "orbit360-auth-access-recovery-sanitized-v5",
+  "stage": "NOT_EXECUTED",
+  "decision": "PENDING_RUNTIME_REQUEST",
+  "classification": "PENDING_RUNTIME_REQUEST",
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "emailsSent": 0,
+  "containsPII": false,
+  "containsSecrets": false,
+  "ok": false
+}

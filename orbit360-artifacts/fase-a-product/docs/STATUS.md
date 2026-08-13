@@ -1,0 +1,11 @@
+# Orbit 360 A&S — estado actual
+
+Ver:
+
+```text
+orbit360-platform/docs/PLAN-UNICO-SALIDA-RC-AYS-LAB-CANONICA-01-20260804.md
+orbit360-platform/docs/ESTADO-ACTIVO-VISUAL-OBSERVABLE-V2-20260805.md
+orbit360-platform/docs/TABLERO-RESUMIDO-RC-AYS-20260805.md
+```
+
+Estado vigente: `STOP_RETRY · PIPELINE_MECHANISM_FAILURE · ACTIONS_TRIGGER_NOT_CREATED`.

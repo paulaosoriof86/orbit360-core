@@ -1,0 +1,114 @@
+{
+  "schemaVersion": "orbit360-m4-target-only-retirement-dryrun-closure-v1",
+  "issuedAt": "2026-07-26",
+  "gateId": "block4-target-only-retirement-dryrun-v20260725",
+  "contractVersion": "4.2.8",
+  "validatorRevision": "4.2.8-r1",
+  "status": "M4_TARGET_ONLY_RETIREMENT_DRYRUN_CLOSED_SUCCESS",
+  "packageCommit": "866e0c49f4333a400dec32746e5cd930b62e7e0c",
+  "repairCommit": "8def3f94ee3ec5900f4fc952a0086ac411e1e231",
+  "requestCommit": "fe182aee838ac383da0ccde95e916de4a290f635",
+  "runId": 30204564753,
+  "jobId": 89800280468,
+  "artifactId": 8632667827,
+  "artifactDigest": "sha256:2f34f88e2c713e08df94c3cba46c22a676e4e54454d7979fdd6a9e3f3eb571e9",
+  "canonicalPreflight": {
+    "status": "GO_GATE_CONTRACT",
+    "passed": 24,
+    "total": 24,
+    "failed": 0,
+    "activationMode": "immutable_request_present"
+  },
+  "fixtureContract": {
+    "status": "PASS",
+    "passed": 38,
+    "total": 38,
+    "failed": 0,
+    "positiveFixtures": 8,
+    "negativeFixtures": 30,
+    "validationMode": "executed_contract_fixtures",
+    "literalSourceInspection": false
+  },
+  "sourceCounts": {
+    "clientes": 414,
+    "aseguradoras": 26
+  },
+  "targetOverlay": {
+    "semantic": "target_only_overlay",
+    "clientesBefore": 2,
+    "aseguradorasBefore": 2,
+    "clientesAfterHypotheticalRetirement": 0,
+    "aseguradorasAfterHypotheticalRetirement": 0,
+    "targetOnlyRemaining": 0
+  },
+  "selection": {
+    "clientSelected": 2,
+    "insurerSelected": 2,
+    "totalSelected": 4,
+    "classification": "obsolete",
+    "deterministicSelection": true,
+    "deterministicOrder": "collection_then_document_id_asc",
+    "allTargetOnly": true,
+    "allTechnicalMarker": true,
+    "allNoSourceIdMatch": true,
+    "allNoFingerprintMatch": true,
+    "recordIdsExported": false,
+    "rawValuesExported": false,
+    "pseudonymousTokensExported": false
+  },
+  "diff": {
+    "retireCandidates": 4,
+    "wouldDeleteClients": 2,
+    "wouldDeleteInsurers": 2,
+    "actualDeletes": 0,
+    "actualUpdates": 0,
+    "actualCreates": 0,
+    "actualMerges": 0
+  },
+  "rollback": {
+    "mode": "exact_restore_from_four_before_snapshots",
+    "planned": true,
+    "executed": false,
+    "snapshotCountPlanned": 4,
+    "restorePathCountPlanned": 4,
+    "restoreOrder": "reverse_deterministic_selection",
+    "snapshotValuesExported": false
+  },
+  "auditPlan": {
+    "mode": "append_only",
+    "planned": true,
+    "executed": false,
+    "plannedEvents": 4
+  },
+  "authorization": {
+    "dryRunExecutionConsumed": true,
+    "allowedExecutions": 0,
+    "retirementWriteAuthorized": false,
+    "clientCorrectionWriteAuthorized": false,
+    "m4WriteAuthorized": false
+  },
+  "security": {
+    "secretAccess": true,
+    "firestoreRead": true,
+    "collectionsRead": 4,
+    "clientWrites": 0,
+    "insurerWrites": 0,
+    "auditWrites": 0,
+    "deletes": 0,
+    "merges": 0,
+    "rulesApplied": false,
+    "deployExecuted": false,
+    "productionTouched": false,
+    "containsPII": false,
+    "containsSecrets": false
+  },
+  "approvalReadyForTargetOnlyRetirementWrite": true,
+  "approvalReadyForClientCorrectionWrite": false,
+  "approvalReadyForM4Write": false,
+  "classification": "DATA_CONTRACT_TARGET_ONLY_RETIREMENT_DRYRUN_COMPLETED",
+  "nextAction": "REQUEST_SEPARATE_AUTHORIZATION_FOR_ATOMIC_RETIREMENT_WRITE_OF_EXACTLY_4_OBSOLETE_TARGET_ONLY_RECORDS",
+  "claudeClassification": "BACKEND_PROTEGIDO_NO_CLAUDE",
+  "academyClassification": "ACADEMIA_ACTUALIZAR",
+  "containsPII": false,
+  "containsSecrets": false
+}

@@ -1,0 +1,49 @@
+{
+  "schemaVersion": "orbit360-fase-a-ops-leads-crm-pipeline-stage-stop-v1",
+  "gateId": "fase-a-ops-leads-crm-release-lab-v20260812",
+  "contractVersion": "1.0.0",
+  "decision": "STOP_PIPELINE_STAGE_AFTER_TWO_RUNTIME_FAILURES",
+  "classification": "PIPELINE_MECHANISM_FAILURE",
+  "runtimeFailures": [
+    {
+      "runId": 31644988994,
+      "jobId": 94276363349,
+      "artifactId": 9160447489,
+      "checkpoint": "OPERATIVO_AUTH_MEMBERSHIP_READY_WAIT",
+      "finding": "Simplified combined auth/membership wait diverged from proven segmented Block1 readiness semantics.",
+      "positiveEvidence": "Direccion passed ops/leads/cliente360 with zero console errors and zero technical copy."
+    },
+    {
+      "runId": 31646214850,
+      "jobId": 94280260138,
+      "artifactId": 9160822190,
+      "artifactDigest": "sha256:1715b24368a82e9fd7767fa0352ebd12183b8df41607b65f50e6e619ae0ea0dd",
+      "checkpoint": "DIRECCION_BOOTSTRAP_DOCUMENT_COMMIT_WAIT",
+      "finding": "Block1 segmented auth readiness was copied together with a 15-second initial document transport budget that was not validated for the existing no-deploy LAB path."
+    }
+  ],
+  "rootCause": "HARNESS_CONTRACT_COMPOSITION_FAILURE",
+  "rootCauseDetail": "The release harness treated transport readiness and authenticated product readiness as one reusable contract. Block1 is authoritative for segmented Auth/membership/router readiness, while the current no-deploy LAB transport requires the proven wider direct-navigation envelope used by Block12 and by runtime 31644988994. Copying either harness wholesale causes contract drift.",
+  "correctionContract": {
+    "transportOwner": "BLOCK12_EXISTING_LAB_TRANSPORT",
+    "transportBudgetMs": 90000,
+    "authReadinessOwner": "BLOCK1_SEGMENTED_AUTH_MEMBERSHIP_ROUTER",
+    "loginFormBudgetMs": 15000,
+    "firebaseBudgetMs": 30000,
+    "authMembershipBudgetMs": 35000,
+    "routes": ["ops", "leads", "cliente360"],
+    "roles": ["Direccion", "Operativo", "Asesor"],
+    "deployAuthorized": false,
+    "writesAuthorized": 0
+  },
+  "samePipelineMechanismRetryForbidden": true,
+  "newComposedMechanismRequiresSourceOnlyPass": true,
+  "firestoreWritesObservedAcrossFailures": 0,
+  "authWritesObservedAcrossFailures": 0,
+  "operationalWritesObservedAcrossFailures": 0,
+  "deploysObservedAcrossFailures": 0,
+  "productionTouched": false,
+  "containsPII": false,
+  "containsSecrets": false,
+  "ok": true
+}

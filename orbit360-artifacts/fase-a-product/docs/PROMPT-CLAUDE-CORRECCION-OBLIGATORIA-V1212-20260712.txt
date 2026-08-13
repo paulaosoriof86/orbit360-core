@@ -1,0 +1,103 @@
+CORRECCIÓN OBLIGATORIA ORBIT 360 — CANDIDATA v1.212
+
+Trabaja directamente sobre:
+Prototype Development Request - 2026-07-11T224600.224.zip
+SHA256: e9f517217af687afe20f53bb63037a6062cd1abe143b4c07986bcb7f91f3dca0
+
+Lee como única fuente de corrección:
+docs/AUDITORIA-Y-CORRECCION-UNICA-CANDIDATA-CLAUDE-V1212-20260712.md
+
+No vuelvas a revisar 13 documentos ni respondas que “ya está implementado” sin evidencia física.
+
+HECHO FORENSE:
+v1.212 solo modificó CHANGELOG.md, data/seed.js e index.html.
+No corrigió módulos operativos.
+El curso cur10 duplica el curso existente cur_p_aseg_cotiz.
+
+DEBES CORREGIR SOBRE v1.212, SIN RECONSTRUIR:
+
+1. ACADEMIA
+- Elimina cur10.
+- Profundiza/integra el contenido en cur_p_aseg_cotiz.
+- No dejes cursos duplicados.
+- No enseñes funciones que el runtime todavía no cumple.
+
+2. COTIZADOR
+- Elimina el fallback operativo TASAS_DEF.
+- Sin fuente/configuración validada y habilitada, automático debe quedar bloqueado.
+- No inventes otra tasa genérica.
+- Manual/PDF quedan pendientes de revisión.
+- Muestra fuente, versión, validación, prima neta, gastos, impuestos y total.
+
+3. COTIZADOR → COMPARATIVO
+- Orbit._cots no puede ser la entidad final.
+- Persiste cotizaciones normalizadas en Orbit.store.
+- Transfiere IDs y recupéralos en Comparativo.
+- Bloquea inconsistencias y muestra errores.
+
+4. COMPARATIVO
+- Excluye borrador/requiere_revision/rechazada/vencida del ranking, impresión, preparación y aceptación.
+- PDF/manual debe pasar archivo/fuente → extracción → diff → corrección → motivo → actor/fecha → confirmación → validada.
+- Solo una propuesta validada puede originar solicitud de emisión.
+- Aceptación crea Ops/issuance_request; nunca póliza ni recibos.
+
+5. COMUNICACIÓN
+- Abrir WhatsApp/correo no equivale a enviado.
+- Usa Preparado, WhatsApp Web abierto, Correo preparado, Pendiente de confirmación.
+- Enviado confirmado requiere callback o confirmación verificable.
+- No registres “Comparativo enviado” por abrir el canal.
+
+6. COPY TÉCNICO
+Limpia UI cliente de:
+backend, LAB, Firebase/Firestore, localStorage/store, mock/demo/smoke,
+API key, token, secret, webhook/hook URL, scopes, OAuth, Client ID,
+provider, snapshot, credentialRef y códigos internos.
+Revisa como mínimo:
+modules/configuracion.js
+modules/automatizaciones.js
+modules/ia.js
+modules/aseguradoras.js
+modules/cotizador.js
+modules/comparativo.js
+
+Separa UI cliente, UI administrativa y configuración técnica interna.
+No captures credenciales en el prototipo.
+
+7. PENDIENTES TRANSVERSALES
+- Visor documental común en módulos relevantes.
+- Equipo: rol activo, rol default y scope propios/equipo/todos/ninguno.
+- Calidad: vista por asesor y gestión de corrección.
+- Póliza: ficha-página o evidencia de una vista equivalente completa.
+- Responsive comprobado en escritorio/tablet/móvil.
+
+8. ARCHIVOS PROTEGIDOS
+No sobrescribas:
+data/store.js
+core/auth.js
+core/importa.js
+backend protegido
+reglas Firestore
+
+ENTREGA OBLIGATORIA:
+- ZIP completo corregido.
+- SHA256.
+- manifiesto único.
+- inventario y delta exacto contra v1.212.
+- matriz requisito → archivo → función → prueba → resultado.
+- pruebas de sintaxis.
+- evidencia funcional de los siete escenarios del documento.
+- evidencia responsive 1440/1366, 1024/768 y 390 px.
+- pendientes honestos.
+
+RECHAZO AUTOMÁTICO:
+- TASAS_DEF o fallback equivalente.
+- Orbit._cots como entidad final.
+- requiere_revision en ranking/aceptación.
+- “enviado” sin confirmación.
+- cur10 duplicado.
+- archivos obligatorios sin cambios.
+- afirmaciones sin ruta/función/prueba.
+- copy técnico visible.
+- protected files alterados.
+
+No pidas más documentos. No regreses una auditoría verbal. Entrega código corregido y evidencia física.

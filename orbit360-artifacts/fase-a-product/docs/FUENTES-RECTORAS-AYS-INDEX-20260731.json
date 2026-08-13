@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "orbit360-source-registry-index-v1",
+  "tenantId": "alianzas-soluciones",
+  "registryDate": "2026-07-31",
+  "status": "OPEN_PENDING_MORE_FILES",
+  "manifests": [
+    "FUENTES-RECTORAS-AYS-MANIFIESTO-20260731-01.json",
+    "FUENTES-RECTORAS-AYS-RECEPCION-20260731-02.json"
+  ],
+  "uniqueSources": 23,
+  "receivedFileEvents": 26,
+  "exactDuplicateReceipts": 3,
+  "rules": {
+    "allowOnlyHashesInRegistry": true,
+    "writePrecheckRequiresClosedReady": true,
+    "oldDriveFallback": false,
+    "payloadsStoredInRepo": false,
+    "duplicateHashMeansNoReprocess": true,
+    "historicalReferenceIsNotDirectWriteSource": true,
+    "uiReferenceIsNotDataSource": true
+  },
+  "blockedUntilClose": [
+    "policy_enrichment_write",
+    "vehicle_enrichment_write",
+    "receipts_rematerialization",
+    "cartera_rematerialization",
+    "cobros_write"
+  ],
+  "safeWhileOpen": [
+    "hash_registration",
+    "read_only_diff",
+    "sanitized_aggregate_analysis",
+    "frontend_static_fix",
+    "synthetic_tests",
+    "documentation",
+    "claude_ledger_accumulation"
+  ]
+}

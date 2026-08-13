@@ -1,0 +1,103 @@
+{
+  "schemaVersion": "orbit360-sanitized-audit-held-parents-controlled-write-v1",
+  "date": "2026-08-01",
+  "gate": {
+    "id": "block7-policies-held-parents-controlled-write-lab-v20260801",
+    "contractVersion": "7.8.0",
+    "run": 30730683228,
+    "job": 91450453030,
+    "artifact": 8827868101,
+    "artifactDigest": "sha256:933d4f2d54173460b3d34ec92c49262c97d07ff6e424353a230d15f166a47bf6",
+    "head": "6cd5e9f9dfcaf7f156b5d733236b3db4eea6368e",
+    "preflight": {"passed": 17, "failed": 0},
+    "status": "POLICIES_HELD_PARENTS_CONTROLLED_WRITE_PASS",
+    "classification": "GO_LAB_HELD_PARENTS_CONTROLLED_WRITE_CLOSED"
+  },
+  "digests": {
+    "sourceSnapshot": "88b8e16b0d4531b2f5c0ce2b1a21068837853080943f7584f6f3fab0cc2ff18d",
+    "targetSnapshotBefore": "724e1efbbc29f60791350ea180ef54230ecf888f9914b98fc70fda62ca6ac305",
+    "dryRunPlan": "de72758f0f2097471bb9183879b8039154b0c063d79e7678393575a5a97f97c8",
+    "targetSnapshotAfter": "19e1927d39f6b713ee12504f8762bc42ead9de6e365bb0f12162d2a0c8f8469b"
+  },
+  "write": {
+    "clientsCreated": 16,
+    "insurersCreated": 4,
+    "documentsCreated": 20,
+    "documentsUpdated": 0,
+    "documentsOverwritten": 0,
+    "atomicBatchesPlanned": 1,
+    "atomicBatchesCommitted": 1,
+    "createOnly": true,
+    "overwriteAttempts": 0,
+    "unresolvedBatchReferencesWritten": 0
+  },
+  "counts": {
+    "before": {
+      "clientes": 414,
+      "aseguradoras": 26,
+      "polizas": 1375,
+      "vehiculos": 1033,
+      "recibosEsperados": 1294,
+      "carteraPrimas": 673,
+      "cobros": 7,
+      "total": 4822
+    },
+    "after": {
+      "clientes": 430,
+      "aseguradoras": 30,
+      "polizas": 1375,
+      "vehiculos": 1033,
+      "recibosEsperados": 1294,
+      "carteraPrimas": 673,
+      "cobros": 7,
+      "total": 4842
+    }
+  },
+  "postVerification": {
+    "countsMatch": true,
+    "contentMatch": true,
+    "sourceUnchanged": true,
+    "createdPayloadsMatch": true,
+    "requiresValidationPreserved": true,
+    "restrictedParentsVerified": 20,
+    "affectedPoliciesVerified": 75,
+    "affectedDescendantsVerified": 162,
+    "allPolicyRelationsResolved": true
+  },
+  "snapshotAndRollback": {
+    "privateSnapshotCreated": true,
+    "snapshotEntries": 4822,
+    "snapshotStoredInArtifact": false,
+    "singleAtomicBatch": true,
+    "rollbackAvailable": true,
+    "rollbackExecuted": false
+  },
+  "cumulativeVisualGuard": {
+    "trackedFileCount": 308,
+    "pathDigest": "0c3dbf222646ea46b57e838359ac56fff3994268a97e0d682508bd747a29f3c4",
+    "contentDigest": "5b32b90815929acc341cfd4ae7c1e5f76d819e1a6a1b4091d13800508ab9b647",
+    "indexDigest": "54df4a1977573ccc6a0702bd0012f2835fcef4cb529e327d16918c4b420382a4",
+    "manifestMatches": true
+  },
+  "security": {
+    "firestoreRead": true,
+    "firestoreWrites": 20,
+    "operationalWrites": 20,
+    "reimport": false,
+    "frontendAdapted": false,
+    "browser": false,
+    "preview": false,
+    "deploy": false,
+    "rules": false,
+    "functions": false,
+    "production": false,
+    "main": false,
+    "merge": false
+  },
+  "containsPII": false,
+  "containsDocumentIds": false,
+  "containsPolicyNumbers": false,
+  "containsAmounts": false,
+  "containsValues": false,
+  "containsSecrets": false
+}

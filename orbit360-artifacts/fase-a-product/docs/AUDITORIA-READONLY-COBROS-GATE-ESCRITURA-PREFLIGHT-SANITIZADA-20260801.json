@@ -1,0 +1,104 @@
+{
+  "schemaVersion": "orbit360-cobros-controlled-write-gate-lifecycle-sanitized-v2",
+  "tenantId": "alianzas-soluciones",
+  "cutoff": "2026-08-01",
+  "status": "STOP_RETRY_DATA_CONTRACT_FAILURE",
+  "gate": {
+    "gateId": "block10.9-cobros-controlled-write-lab-v20260801",
+    "contractVersion": "10.9.0",
+    "phase": "VERIFIED_OR_ROLLED_BACK",
+    "outcome": "ROLLED_BACK_BASELINE_RESTORED",
+    "singleWriteGate": true,
+    "thirdExecutionProhibited": true
+  },
+  "sourceGate": {
+    "gateId": "block10.8-cobros-private-real-materialization-static-v20260801",
+    "run": 30709607082,
+    "artifact": 8821429532,
+    "digest": "sha256:7ed3cf4a446a954bdd9378026a70e3e3eb00820c5780ddb12bc80421ec29ba5c",
+    "checks": "64/64 PASS"
+  },
+  "preflight": {
+    "run": 30710608492,
+    "artifact": 8821741047,
+    "digest": "sha256:6da1eb4d5fd39ce350ac31b4f9dd2a1ecb34b713346f14cc9d35f23a6e50ed00",
+    "status": "PASS"
+  },
+  "authorization": {
+    "recorded": true,
+    "directApproved": 4,
+    "historicalApprovedSeparately": 1,
+    "approvedTotal": 5,
+    "executionAuthorized": true,
+    "labWriteAuthorized": true,
+    "productionAuthorized": false,
+    "deployAuthorized": false
+  },
+  "plan": {
+    "atomicGroups": 5,
+    "directGroups": 4,
+    "historicalGroups": 1,
+    "snapshots": 11,
+    "plannedOperations": 10,
+    "rollbackSteps": 11,
+    "duplicateAuthorizationRefs": 0,
+    "duplicateIdempotencyKeys": 0
+  },
+  "attempts": [
+    {
+      "sequence": 1,
+      "run": 30711389436,
+      "artifact": 8821984014,
+      "classification": "DATA_CONTRACT_FAILURE_CANONICALIZATION",
+      "failedCheck": "PRIVATE_PACKAGE_LOGICAL_SHA",
+      "firestoreRead": false,
+      "operationalWrites": 0,
+      "rollbackExecuted": false
+    },
+    {
+      "sequence": 2,
+      "run": 30711578397,
+      "artifact": 8822041409,
+      "digest": "sha256:f9bd2cde8107481243b2937df11c434a2cff91eeccbbf99569b0f47c9b5f2b00",
+      "classification": "DATA_CONTRACT_FAILURE",
+      "failedCheck": "RECEIPT_SNAPSHOT_MISMATCH",
+      "failedCaseOrdinal": 3,
+      "completedGroupsBeforeFailure": 2,
+      "temporaryCobrosWrites": 2,
+      "temporaryReceiptUpdates": 2,
+      "temporaryPolicyWrites": 0,
+      "temporaryFinmovWrites": 0,
+      "rollbackExecuted": true,
+      "rollbackRestored": true,
+      "rollbackGroups": 2
+    }
+  ],
+  "finalState": {
+    "polizas": 1373,
+    "recibosEsperados": 1293,
+    "cobros": 0,
+    "finmovs": 0,
+    "remainingOperationalWrites": 0,
+    "browserExecuted": false,
+    "deployExecuted": false,
+    "productionTouched": false
+  },
+  "controls": {
+    "snapshotBeforeWriteRequired": true,
+    "idempotencyRequired": true,
+    "atomicPerCaseRequired": true,
+    "rollbackAllOnAnyFailure": true,
+    "historicalCaseSeparated": true,
+    "reactivatePolicy": false,
+    "createFinmov": false,
+    "genericWriterRemainsBlockedForCobros": true
+  },
+  "security": {
+    "realRowsStoredInRepo": 0,
+    "containsPII": false,
+    "containsPolicyNumbers": false,
+    "containsAmounts": false,
+    "containsSecrets": false
+  },
+  "nextAction": "READ_ONLY_ROOT_CAUSE_DIAGNOSTIC_CASE_3_RECEIPT_SNAPSHOT"
+}

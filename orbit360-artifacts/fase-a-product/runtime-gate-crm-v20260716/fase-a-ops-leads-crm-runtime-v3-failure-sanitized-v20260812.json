@@ -1,0 +1,43 @@
+{
+  "schemaVersion": "orbit360-fase-a-ops-leads-crm-runtime-v3-failure-sanitized-v1",
+  "gateId": "fase-a-ops-leads-crm-release-lab-v20260812",
+  "contractVersion": "1.0.0",
+  "runId": 31649067843,
+  "jobId": 94289186453,
+  "artifactId": 9161948517,
+  "artifactDigest": "sha256:336a5d3908cd28a82b92b902b7d8cf19b07e8938106349bcb5cc58d70fb0fbcd",
+  "head": "4b728dc07f6d7d4673e878e38c6bd2546635f249",
+  "reportedStatus": "FAIL_FASE_A_OPS_LEADS_CRM_AUTH_MATRIX",
+  "reportedClassification": "FUNCTIONAL_DEFECT",
+  "reclassifiedAs": "VALIDATOR_STALE",
+  "staleAssertion": "mobileMenuOk queried #mobile-menu-btn",
+  "canonicalSelector": "#burger",
+  "routes": ["ops", "leads", "cliente360"],
+  "roleResults": {
+    "Direccion": {"routeChecksPassed": 3, "routeChecksFailed": 0, "consoleErrors": 0, "technicalCopy": false, "ok": true},
+    "Operativo": {"routeChecksPassed": 3, "routeChecksFailed": 0, "consoleErrors": 0, "technicalCopy": false, "ok": true},
+    "Asesor": {"routeChecksPassed": 3, "routeChecksFailed": 0, "consoleErrors": 0, "technicalCopy": false, "mobileMenuOkReported": false, "okReported": false}
+  },
+  "routeChecksTotal": 9,
+  "routeChecksPassed": 9,
+  "routeChecksFailed": 0,
+  "snapshotIntegrity": "VERIFIED_UNCHANGED",
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "operationalWrites": 0,
+  "deploys": 0,
+  "productionTouched": false,
+  "mobileOwnerEvidence": {
+    "priorPassRunId": 31544331170,
+    "priorPassHead": "f500f76fd9a1879f4e53178a6ff1dd7c314dc10e",
+    "routerBlobShaPrior": "844bb7181a3dea5d960e91dd7200d9ca475cbd97",
+    "routerBlobShaCurrent": "844bb7181a3dea5d960e91dd7200d9ca475cbd97",
+    "indexBlobShaPrior": "dec0aaba252eeb2e3530d6a56ddebf68f397dafd",
+    "indexBlobShaCurrent": "dec0aaba252eeb2e3530d6a56ddebf68f397dafd",
+    "priorHarnessSelector": "#burger",
+    "priorHarnessAssertions": ["sidebar.open", ".sb-overlay.show", "menu closes"]
+  },
+  "containsPII": false,
+  "containsSecrets": false,
+  "ok": true
+}

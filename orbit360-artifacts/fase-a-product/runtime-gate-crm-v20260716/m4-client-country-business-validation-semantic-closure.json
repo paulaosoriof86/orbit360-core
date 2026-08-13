@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "orbit360-m4-client-country-business-validation-semantic-closure-v1",
+  "issuedAt": "2026-07-25",
+  "gateId": "block4-client-country-business-validation-semantic-repair-static-v20260725",
+  "contractVersion": "4.2.5",
+  "status": "M4_CLIENT_COUNTRY_BUSINESS_VALIDATION_SEMANTIC_REPAIR_STATIC_CLOSED",
+  "packageCommit": "010faf81ac399d375afa3428cb9616dca3a8324f",
+  "requestCommit": "4b1797ce1c3034c4b85c1a4e6b11b1822cda6f0e",
+  "runId": 30163968404,
+  "jobId": 89693747592,
+  "artifactId": 8621014966,
+  "artifactDigest": "sha256:603f3e22a026a7af2bf0350d3871aa8e66db7ff6d85b17ca6729f9ceea43884a",
+  "canonicalPreflight": {
+    "status": "GO_GATE_CONTRACT",
+    "passed": 26,
+    "total": 26,
+    "failed": 0
+  },
+  "fixtureContract": {
+    "status": "PASS",
+    "passed": 19,
+    "total": 19,
+    "failed": 0,
+    "positiveFixtures": 5,
+    "negativeFixtures": 14,
+    "validationMode": "executed_contract_fixtures",
+    "literalSourceInspection": false
+  },
+  "composedBaseline": {
+    "clients": 414,
+    "insurers": 26,
+    "missingCurrency": 61,
+    "nonCanonical": 61,
+    "clientTargetOnly": 2,
+    "insurerTargetOnly": 2,
+    "targetOnlyDeferred": 4
+  },
+  "proposal": {
+    "records": 61,
+    "countryFieldChanges": 61,
+    "currencyFieldChanges": 61,
+    "country": "GT",
+    "currency": "GTQ",
+    "creates": 0,
+    "deletes": 0,
+    "targetOnlyDeferred": 4,
+    "writeAuthorized": false
+  },
+  "approvalReadyForCorrectionDryRun": true,
+  "approvalReadyForM4Write": false,
+  "authorization": {
+    "staticExecutionConsumed": true,
+    "allowedExecutions": 0,
+    "correctionDryRunAuthorized": false,
+    "writeAuthorized": false
+  },
+  "security": {
+    "secretAccess": false,
+    "firestoreRead": false,
+    "runtimeExecuted": false,
+    "browserExecuted": false,
+    "clientWrites": 0,
+    "insurerWrites": 0,
+    "rulesApplied": false,
+    "deployExecuted": false,
+    "productionTouched": false,
+    "containsPII": false,
+    "containsSecrets": false
+  },
+  "rootCauseResolved": "literal_source_token_validation_replaced_by_executed_contract_fixtures",
+  "nextAction": "REQUEST_NEW_AUTHORIZATION_FOR_ONE_READONLY_CORRECTION_DRYRUN_61_GT_GTQ",
+  "claudeClassification": "REPLICABLE_CLAUDE_ACUMULADO",
+  "academyClassification": "ACADEMIA_ACTUALIZAR",
+  "containsPII": false,
+  "containsSecrets": false
+}

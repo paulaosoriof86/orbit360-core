@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "orbit360-auth-access-v3-transaction-rootcause-sanitized-v1",
+  "rcId": "RC-AYS-LAB-CANONICA-01",
+  "gateId": "block-auth-access-recovery-lab-v3-20260805",
+  "requestCommit": "9c6da924faf2bbf2c7fc563eb610013f10cc0c2d",
+  "gateRegistrationCommit": "6aaa80f2bb4974e3935e9b01d76d58941f7bb3be",
+  "resultCommit": "6da491fbe6d3b023eaab3cd3d05ce795b9dd809e",
+  "observedStage": "STOP_RETRY_ACCESS_CONFIG_APPLY",
+  "observedClassification": "PIPELINE_MECHANISM_FAILURE",
+  "observedErrorCode": "ACCESS_CONFIG_REPAIR_FAILED",
+  "rootCauseCode": "FIRESTORE_TRANSACTION_READ_AFTER_WRITE",
+  "rootCauseMethod": "SOURCE_INSPECTION_OF_FAILED_OWNER",
+  "owner": {
+    "file": "tools/orbit360-auth-access-config-repair-lab-v3-20260805.mjs",
+    "mode": "apply",
+    "function": "db.runTransaction callback"
+  },
+  "rootCause": "The apply transaction interleaved tx.get and tx.update inside the same profile loop. After the first profile queued an update, the next profile attempted another transaction read. The transaction aborted atomically before commit.",
+  "fix": {
+    "commit": "38aae846477a35025950869a207bf10be9337cc1",
+    "strategy": "THREE_PHASE_TRANSACTION",
+    "phases": [
+      "read all advisor snapshots",
+      "validate all snapshots and build allowlisted patches",
+      "queue all writes after every read has completed"
+    ],
+    "errorEvidenceImproved": true
+  },
+  "executionBoundary": {
+    "accessConfigWritesCommitted": 0,
+    "authWrites": 0,
+    "membershipWrites": 0,
+    "functionDeployed": false,
+    "passwordEmailsSent": 0,
+    "hostingDeploys": 0,
+    "rulesDeploys": 0,
+    "reimports": 0,
+    "crmWrites": 0,
+    "productionTouched": false,
+    "mainTouched": false,
+    "mergeExecuted": false
+  },
+  "authorization": {
+    "consumed": true,
+    "replayAllowed": false,
+    "rerunExecuted": false,
+    "newRequestPathRequired": true,
+    "newExplicitAuthorizationRequired": true
+  },
+  "containsPII": false,
+  "containsSecrets": false,
+  "ok": true
+}

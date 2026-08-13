@@ -1,0 +1,40 @@
+{
+  "stage": "AUTH_SELFMANAGED_IDENTITY_PLAN_PASS",
+  "classification": "GO_IDENTITY_COMPLETION",
+  "overridesPlanned": 4,
+  "activeUsersObserved": 7,
+  "effectiveUniqueEmails": 7,
+  "countriesResolved": 4,
+  "firestoreReads": true,
+  "firestoreWrites": 0,
+  "authReads": 0,
+  "authWrites": 0,
+  "overrideNameHashes": [
+    "0529dc3d09bed76ee1b8113f9a333f90ea044862abd29cb0f881ba20e0c62369",
+    "4f67da491c99b3f8ab2307b8f41604cc4651553e70df0f2b2bb7d1d05dd486f5",
+    "eec10877d4e533c261249a87fc9a5bfb980b3f536065d54bf1c720504361b3da",
+    "eec87c723fd3102724022318165b5878a3c82b753c2b402996f5ea0fec0307fc"
+  ],
+  "overrideEmailHashes": [
+    "9414b1cb149cc13ba7a97638c1b39f240c65b33fd921382bfb1981a19dd4009b",
+    "ba4cfa00ba05270d43119f0e8fea2eb7e62ff40a0d24a7fd85b1d66d26bf2862",
+    "ba8869d37387b9641c4b1e8e1f22e3faacca7757633b4b7369ccde947cf5d3a4",
+    "c6c8bcfe0074b62cc22ac30ba06fff01e134a2e8fda82fdc393244bf428e6894"
+  ],
+  "crmSnapshotTaken": true,
+  "ok": true,
+  "projectId": "ays-orbit-360-lab",
+  "tenantIdHash": "c24dd76ead4c99b61f91a35cc691e7f3408a4888537f2be58b3e20e5748638ba",
+  "authorityPathClass": "tenantId/{tenantId}/asesores",
+  "containsPII": false,
+  "containsSecrets": false,
+  "containsPassword": false,
+  "containsTemporaryPassword": false,
+  "containsActionLink": false,
+  "productionTouched": false,
+  "mainTouched": false,
+  "mergeExecuted": false,
+  "hostingDeploys": 0,
+  "rulesDeploys": 0,
+  "reimports": 0
+}

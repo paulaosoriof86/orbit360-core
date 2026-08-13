@@ -1,0 +1,220 @@
+{
+  "schemaVersion": "orbit360-visual-runtime-rootfix-browser-precheck-v3-transactional-owner-aware",
+  "gateId": "block2.7-visual-runtime-rootfix-lab-v20260805",
+  "contractVersion": "2.7.2",
+  "stage": "PASS_VISUAL_BROWSER_PRECHECK",
+  "checkpoint": "INICIO_READY_PASS",
+  "checkpoints": [
+    {
+      "checkpoint": "SERVICE_ACCOUNT_VALIDATE",
+      "at": "2026-08-07T19:23:27.867Z"
+    },
+    {
+      "checkpoint": "MEMBERSHIP_READ",
+      "at": "2026-08-07T19:23:27.902Z"
+    },
+    {
+      "checkpoint": "BROWSER_LAUNCH",
+      "at": "2026-08-07T19:23:28.360Z"
+    },
+    {
+      "checkpoint": "PAGE_GOTO",
+      "at": "2026-08-07T19:23:29.455Z"
+    },
+    {
+      "checkpoint": "LOGIN_FORM_PASS",
+      "at": "2026-08-07T19:23:33.708Z"
+    },
+    {
+      "checkpoint": "ROOTFIX_MARKER_WAIT",
+      "at": "2026-08-07T19:23:33.708Z"
+    },
+    {
+      "checkpoint": "ROOTFIX_MARKER_PASS",
+      "at": "2026-08-07T19:23:33.722Z",
+      "elapsedMs": 14
+    },
+    {
+      "checkpoint": "HYDRATION_CONTRACT_MOUNTED_WAIT",
+      "at": "2026-08-07T19:23:33.722Z"
+    },
+    {
+      "checkpoint": "HYDRATION_CONTRACT_MOUNTED_PASS",
+      "at": "2026-08-07T19:23:33.725Z",
+      "elapsedMs": 3
+    },
+    {
+      "checkpoint": "HYDRATION_OWNER_VALID_WAIT",
+      "at": "2026-08-07T19:23:33.725Z"
+    },
+    {
+      "checkpoint": "HYDRATION_OWNER_VALID_PASS",
+      "at": "2026-08-07T19:23:33.727Z",
+      "elapsedMs": 2
+    },
+    {
+      "checkpoint": "FIREBASE_AUTH_WAIT",
+      "at": "2026-08-07T19:23:33.727Z"
+    },
+    {
+      "checkpoint": "FIREBASE_AUTH_PASS",
+      "at": "2026-08-07T19:23:33.730Z",
+      "elapsedMs": 2
+    },
+    {
+      "checkpoint": "CUSTOM_TOKEN_CREATE",
+      "at": "2026-08-07T19:23:33.730Z"
+    },
+    {
+      "checkpoint": "CUSTOM_TOKEN_SIGNIN",
+      "at": "2026-08-07T19:23:33.794Z"
+    },
+    {
+      "checkpoint": "AUTH_INSIDE_WAIT",
+      "at": "2026-08-07T19:23:35.686Z"
+    },
+    {
+      "checkpoint": "AUTH_INSIDE_PASS",
+      "at": "2026-08-07T19:23:36.152Z",
+      "elapsedMs": 466
+    },
+    {
+      "checkpoint": "REMOVE_EPHEMERAL_OVERLAYS",
+      "at": "2026-08-07T19:23:36.152Z"
+    },
+    {
+      "checkpoint": "INICIO_REQUIRED_HYDRATION_WAIT",
+      "at": "2026-08-07T19:23:36.181Z"
+    },
+    {
+      "checkpoint": "INICIO_REQUIRED_HYDRATION_PASS",
+      "at": "2026-08-07T19:23:48.542Z",
+      "elapsedMs": 12361
+    },
+    {
+      "checkpoint": "INICIO_READY_WAIT",
+      "at": "2026-08-07T19:23:48.542Z"
+    },
+    {
+      "checkpoint": "INICIO_READY_PASS",
+      "at": "2026-08-07T19:23:56.064Z",
+      "elapsedMs": 7522
+    }
+  ],
+  "projectId": "ays-orbit-360-lab",
+  "tenantId": "alianzas-soluciones",
+  "runId": "31211158696",
+  "attempt": 1,
+  "firestoreReads": 1,
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "operationalWrites": 0,
+  "deployExecuted": false,
+  "productionTouched": false,
+  "containsPII": false,
+  "containsSecrets": false,
+  "containsPasswords": false,
+  "ok": true,
+  "membershipHash": "ef23e793fdfeb221",
+  "observedState": {
+    "href": "https://ays-orbit-360-lab.web.app/index.html?orbitBackend=firestore-lab&tenant=alianzas-soluciones&runtime=20260717-2",
+    "authStage": "inside",
+    "preAuth": false,
+    "loginVisible": false,
+    "firebaseUser": true,
+    "productUserReady": true,
+    "membershipStatus": "ready",
+    "membershipReady": true,
+    "membershipTenantBound": true,
+    "route": "inicio",
+    "rootfixLoaded": true,
+    "hydrationContractLoaded": true,
+    "hydrationContractMounted": true,
+    "hydrationOwnerValid": true,
+    "hydrationInicioReady": true,
+    "hydrationInicioDegraded": true,
+    "hydration": {
+      "loaded": true,
+      "storeMarker": true,
+      "mounted": true,
+      "ownerValid": true,
+      "storeOwner": {
+        "valid": true,
+        "generation": 1,
+        "bound": true,
+        "originalStoreReady": true,
+        "originalStatusReady": true,
+        "writes": 0
+      },
+      "ready": true,
+      "degraded": true,
+      "requiredMissing": [],
+      "requiredFailed": [],
+      "optionalMissing": [],
+      "optionalFailed": [
+        "asesores",
+        "metas",
+        "negocios",
+        "gestiones"
+      ]
+    },
+    "runtimeDiagnosticInicio": true,
+    "loadingVisible": false,
+    "hostTextLength": 1143,
+    "lab": {
+      "status": "ready",
+      "snapshotAttached": true,
+      "snapshotAttachedCount": 29,
+      "rawCountKeys": [
+        "aseguradoras",
+        "asesores",
+        "cancelaciones",
+        "carteraPrimas",
+        "clientes",
+        "cobros",
+        "comisiones",
+        "gestiones",
+        "metas",
+        "negocios",
+        "polizas",
+        "recibosEsperados",
+        "vehiculos"
+      ],
+      "snapshotErrorKeys": [
+        "__prefs",
+        "acreedores",
+        "actividades",
+        "avisos",
+        "contenidos",
+        "correos",
+        "cursos",
+        "documentos",
+        "facturas",
+        "finmovs",
+        "notifs",
+        "novedades",
+        "plantillas",
+        "presupuesto",
+        "reclamos",
+        "reportes_prog",
+        "tareas"
+      ],
+      "visualHydrationContract": {
+        "version": "20260807.4-transactional-owner-reentrant-readiness",
+        "requiredCanonicalReady": true,
+        "optionalLegacyDegraded": true,
+        "optionalLegacyUnavailableCount": 6,
+        "storeBound": true,
+        "ownerValid": true,
+        "storeOwnerGeneration": 1,
+        "readinessAuthority": "OrbitHydrationContractDiagnostics",
+        "advisorProjectionBuilds": 6,
+        "advisorProjectionInvalidations": 5,
+        "writes": 0
+      }
+    }
+  },
+  "consoleErrorCount": 0,
+  "consoleErrors": [],
+  "classification": "GO_FULL_VISUAL_MATRIX"
+}

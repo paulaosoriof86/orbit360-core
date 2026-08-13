@@ -1,0 +1,1 @@
+window.Orbit=window.Orbit||{};Orbit.academiaM4TargetOnlyReconciliation=Object.freeze({classification:'ACADEMIA_ACTUALIZAR',lesson:'Los registros solo-destino se clasifican con evidencia como esperados, duplicados, obsoletos o requiere validación. El análisis read-only no autoriza borrar, fusionar ni inferir.',roles:['Direccion','Operativo'],writesAuthorized:false});

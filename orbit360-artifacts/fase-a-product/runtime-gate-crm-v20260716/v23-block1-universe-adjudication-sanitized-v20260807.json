@@ -1,0 +1,2431 @@
+{
+  "schemaVersion": "orbit360-block1-universe-adjudication-v23-readonly-v1",
+  "gateScope": "BLOCK1_CLIENT360_INSURERS",
+  "projectIdHash": "60e88ed5a174cd9d0af5",
+  "tenantIdHash": "c24dd76ead4c99b61f91",
+  "expected": {
+    "clientes": 414,
+    "aseguradoras": 26,
+    "asesores": 7
+  },
+  "observedRaw": {
+    "clientes": 430,
+    "aseguradoras": 30,
+    "asesores": 7
+  },
+  "observedEffective": {
+    "clientes": 430,
+    "aseguradoras": 25,
+    "asesores": 7
+  },
+  "domains": [
+    {
+      "kind": "clientes",
+      "expected": 414,
+      "raw": 430,
+      "effective": 430,
+      "deltaRaw": 16,
+      "deltaEffective": 16,
+      "categories": {
+        "duplicate": 0,
+        "historicalInactive": 0,
+        "outOfEffectiveUniverse": 0,
+        "requiresValidation": 0,
+        "contractDrift": 16
+      },
+      "status": "STOP_CONTRACT_COUNT_STALE",
+      "classification": "VALIDATOR_STALE",
+      "items": [
+        {
+          "fingerprint": "df57dd2ebdd0e1f1d0d2",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "f437b20fa510cb0ee985",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "20db2bee38e4f861d2b0",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "b921e15f04d3cda917b1",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "cdb3ad7d6ba92eaae5b9",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "154df45b9a24c1dd72ef",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "8a1aebb2b6520d868de8",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "16ef4d44878b3f5938ec",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "ce9492a1492e69100242",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "803ee931b563a64fda36",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "72666413c94701ee7fc2",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "4ca6a88d28ac98715abc",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "021cac2a1b856a0c5d1c",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "43a8841d19f7fec03ad6",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "a96956c63fdf22d44cfe",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "f3d653f7c968d5f399cd",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "3fef952b9a968614a06a",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "3848e4ce57b4705a96f4",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "9534c49c7f620c2bf006",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "4e8ee7c1cb3193726e4c",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "ea22e3bad9738ab35bba",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "aa1e8d287a0a41adb827",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "4a4e2a8173edc06df04b",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "daee070c4aad2171e86b",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "65a84bfdefd24a7524d0",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "13d273fc68f7da1e5940",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "645034a445563d61e3c7",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "1b6db64160e8d58bb999",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "2fba46027d2c88576334",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "859c96a73cb5807bbd1d",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "4ec988a4638a82094c39",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "c5bb4398e4bbe85bbef8",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "1787d799ac08c88507fc",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "7e57d036338f63ae7a34",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "cfd5db048c9683d9b611",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "df980a7b180ffaf84e57",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "136e966cf06f1fb99b99",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "6eabd124e74ad8583e43",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "4994827dab6edc1f8f97",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "070ab0cc6c65e79eb24d",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "ec95076d911e6e9c4cf7",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "ec9b2899be0af38c4ec9",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "76a8ee2ab1130b9d36c2",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "123e1e0317fb229c73b9",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "66197700d9ec3fdace90",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "941673ea7d5bb348a1dc",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "835c51b445b11f9a81c6",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "ce3b9b78342aed802bb4",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "f3fa74993b96b9fe603c",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "445cec9fe01c142f906c",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "e922feb90307477b55b6",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "46dc559b2bc6ddebbb78",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "231a742338a3906dc3c5",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "6bb05b9a9f8dbec7a419",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "b5863abffe34ea13e22f",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "3a953ac03827035f0c92",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "9f31fd5312b0e8901376",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "6da3579957af0f28f1c5",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "3453567f0ad13c9ca685",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "15740dfd9f0404b7446b",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "1effca072f0dfe879fd7",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "e195ac1321b0d78d6957",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "2fdf8a9e03acef4d5124",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "57bc5af7bf1818cbdbbf",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "fa6771b61d9e7dcc6b2b",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "b829c48fe7fc61d708e9",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "a14dd71659b96ef96b2a",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "c6e1fc9812761378d18c",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "dc48df672f8885f06979",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "6d842f041d4342e10691",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "0cfa9214e433dc3ac990",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "f625cb64b1a2e3facdda",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "546dc5b98f226296c379",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "6003589bd91785ad4751",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "73cf62091d4a0e6e4a1e",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "f48f99c0ee875068c46f",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "c02c44b3cbc96bbee730",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "a93352a74481bfbbffa1",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "5157e768a557331909b4",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "1e654eb524cc5eea049f",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "e62a8351a5067570b101",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "544240b12e8559d945d6",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "1d09cf16c3fcf9cabfcf",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "afcb7a57415b11ea5e13",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "e576e2031846361ea2a9",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "2c80e91c980edcf47e05",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "73f46fb22d4c743f896c",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "a18382c127b3dd50ef60",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "84ebee0cf2aebf9ce685",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "413fc1909ce9b413570b",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "959b0c785db9e4539307",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "d141f6602b6dd0b404d1",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "5b3b92d574235f9fcf06",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "3acf2de0bca5ad47e3bc",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "10d64528f9cff108da2c",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "6e78301eb432921bbeb7",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "48c23f6c6cd63d064666",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "360ff3c6b5a6b5624f3e",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "376a14f344ffbe80829f",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "9d3349c0d521db8ae753",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "39d6b4266539442ffc18",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "672f283c33bd2e94b757",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "c5481c3c377de963c773",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "55268738fd013fd50276",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "c120c44beee2ea84c435",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "406b05db6bdcba8075da",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "fda3a387713ade58904e",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "2f2b1eba0511637692ed",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "5d29b9ce0639f9ae96ae",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "947b9696052b803ec503",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "85c7ecc203c3d6956dce",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "05314558047c330796a7",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "587ad736b691d240fc25",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "ce4f5c94f024356f42fb",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "bda77448a94cb2624bc9",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "016d0cb1124c3375c6cb",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "00c48e548a5598963fa4",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "b0cea86c5df7d6eed066",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "f34168620bddf0bc2690",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "84a88e76d50064a2397a",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "f93adcc617611fec8136",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "94939978c2c06afa66b3",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "92fc24a0b1196fd25f31",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "fab0634a012ecfce28c2",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "f64dacb86e76d125278b",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "13489f013e836bf56b78",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "5826e39773db00cc6eef",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "baff17971004d8022db0",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "68fcb1f8dcae1ee6c026",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "b88a9f5ead6e5d027c60",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "46049dda77632359acb7",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "a5a1967565f8087bed1b",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "971645c0a60e14498827",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "953b27350dacbaf3b3f9",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "e80de3bcd1ffa5ddf343",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "feb8c11c3bbd9d932c2f",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "aba7123a648ceca4c477",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "938be9dc43acf5c2084a",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "eec2921fe1c996a11c0b",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "5f5b542a753b28589422",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "32a823a9d925f80ee6fd",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "1d137b5af5a2bac408b2",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "737c770ef4479f78b854",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "c7da3150b750e5569823",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "13274edc8fb1a1d7596e",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "5063eff31d6315faa009",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "688d4463b7bc751254e3",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "5ed56c3157f4789e9ac3",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "142ab091541d9b64912d",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "6a2d788101b8786849be",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "8ead907b94768ca821d3",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "6e389352b4de99ed2540",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "caf799af1c43539d8c5a",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "7ed16959b53ee9996da7",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "a668334f874ac0f33453",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "c9e53891f3d19f75d062",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "a5a337dadf8a12d0db86",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "66aaf17c9680f6ed0fc8",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "3d21c6638f2771362bc9",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "e7096310f1055b8cb443",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "1cf46a4ecf5f522e0259",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "86a47bac355f98276459",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "746b1d932c60dc742ae5",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "af1e9fb05b3e51b18318",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "64d230a623e453fa2cf2",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "1b24eb3ce5caf1add802",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "aca3a0c6040692ab5ec3",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "7b5cefa4bd98824f3f3f",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "c56cea8828a812a0774a",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "54206f98831a2953dc70",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "2f8a5b8f4808f749c55e",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "2207d9c32efbc0045365",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "50a1c173d647a01eb0ff",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "9796ec5890acddb6611a",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "59d7de0722f8b4e5938c",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "bd5e0491cbcaee2b8702",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "6776aafef7176701f0cd",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "5f473924517cced82337",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "20718ed17d19da57c61e",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "6eb101216ce08596efc8",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "190d519cf52b6c5bed6d",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "d93ea7c121e9d21e7b0b",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "936ebc83357a392ed84b",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "7158b0e431064c13f61c",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "90fa7760eb749c49fb3e",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "c77420bb36eff7106ee9",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "4b301a963570826fb97e",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "637461729d786a001402",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "e8358db9ca80edd27a1d",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "0499a2d8b2f1bd115715",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "01b0bf6088912208da23",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "1b0414d2284f1427bfd8",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "a4c2118d008695399af7",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "115dc4f7e5d2d88280b7",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "09da73c0c5c057ba0007",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "7556c1d0e3e7a936655e",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "dd60c142c785c78a6ba8",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "087cbcfb7ab0b9eba7a9",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "918c11d7a7cd06549d9f",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "f1944db170b0b5e5e096",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "bafda6f5607d577c032a",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "7cb045b9bc8e186ba1e5",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "8398d7ead0d4a844acad",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "f4a9ab1140ca13ec740f",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "b98679a9660f94e060cb",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "575dbad7c8e3046481ea",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "5d21f824baa0cbd85b29",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "8731964180eea592ceac",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "6a6f4b890bb916494f1a",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "d9669284f8a19b7ff321",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "f79bd49861e7aec072bf",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "e4fffb6e8b02fab5dd80",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "372b9f103e5de1235b36",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "8b4c3dd7c34a2fe99a01",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "d4c38545fc9d761fd4c6",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "1c4e3d64e89ceb6d6758",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "fe8d643f6073f7eeaec8",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "d026806a1118ad2c55ed",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "a27cfcd494eee1aa2f13",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "c94e01fa8dd92728b70e",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "5e2ad07611cf7bd73cf1",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "f4b2cdec1846a350e247",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "c642192f7fc45912a277",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "90abb6117fbde54a125b",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "428948044b70ea07ea7f",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "d2f0864691cf1838f1a1",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "895d09bd0d62cf7ad152",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "93ee26bd88086687c50b",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "ce86cc654613c51376b1",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "8ed31887f7e57cfd3882",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "da60b070f33564bbde2a",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "751a9bbe8150cc1b883e",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "d6d1a8a6694c34dd7c83",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "25f6955d6d767f3815e2",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "d5f35e93d4dfad1124ad",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "f9c34bd4696033e23f80",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "637d3be75591678ec47f",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "81e4aa71902f769ac845",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "b0d7b67dbd98923faaec",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "1bcf93c221d60105be54",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "e6c54901c61f0118f38d",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "4e3ea959333853b2df89",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "843f89c84553c335f24f",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "fb4f1a04ecc12b69f149",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "e901e22bd9e2b908e51c",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "a21029ce5d46717c5878",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "0a097237e8a856718a63",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "05900838cfba90a6169b",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "6a0c149ce3a9e09c66a0",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "4b55416d0eaf0a2db98f",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "d68765ab099e9030adde",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "b6cb55da9712162438dd",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "eae1e76973cad8cc49db",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "ca1f4efe50cd2c708d95",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "7d874aeb871d493c409b",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "8fa25ac53976d8c01343",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "16ceea3f4123b7c7a00e",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "cf47450e2965eb9c8d3a",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "dabe4f63aa877eb2229c",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "3ab4fec478ac0a8a1888",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "4772b00400c775105737",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "87c717e3c8df0ae29fe0",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "c50a6924f86a270f758e",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "6087b98c15c9df47771b",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "c310d79c434282e767dd",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "99b9e08eb473b6f6aa29",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "8735312a7f648137e0a9",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "0b9a2b9f2eabd3701af2",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "65b0c768d25b82663be6",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "3797f103db10f19812c4",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "3275a516570d483aa5e3",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "1c6abb39a49ef8596809",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "6fba0d8278010263417a",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "8e7667a61553b4999f8c",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "0300a5e72808acd78739",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "1b0104cb706ef8ae0f4f",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "5caf9115240b73c92bd5",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "729db5577208c8a04ae7",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "787e4292c9b148602e07",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "2adbb7853019c78444bb",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "b2adafdacd520976a2d1",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "0abafa3038f3aa2e0e64",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "072060a0c5a94cf2e599",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "49990d8381b7acf7aed4",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "e2111677379ee486a9d9",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "45942c5039c0016173ea",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "d009526fb973f49b4482",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "38ecf84087b24aa171f1",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "09a98e2c1069bd88bc6d",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "ea02729755a6137a22a2",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "fa2456bdb9225f95f1e4",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "07391e868636e3a2ac76",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "1b8cf86153e031f6c379",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "a4d3915c52fb672db67e",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "dbc3380bd86f8953c2df",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "44c6ff286969758282ab",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "7740b88e91ccfb883f3e",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "f06ed2d08552284b7f62",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "f6b38c354753efcb1bc3",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "04c13b19eea168a71b87",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "7c15f805d40e7263cd59",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "0134254dc87494998565",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "9c5b039f5329c749e482",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "bb2e812ea47a493e5d02",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "a49f0c3ba3e3ad77c677",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "2f13ffef69758300926c",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "b1ea485135d064b8c0ce",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "5e7ab4494d5ad994a445",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "ed7c2b9fbf6f5d153ef4",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "a2a23afe6d8afbd0beb8",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "42e4afd9abeffbc0a5b8",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "8266fb1f8be2209121f0",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "82f85b941e29e5c343a9",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "eba8d707d5c472419669",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "39777d909eb1b2f2ca3c",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "f198e6aa9fdc948c8c59",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "0a54fb2ec49addaaa605",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "74e0d1d8249cd588099c",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "44b4e0d539602edcae60",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "b67ce7d8c2d4e10eb366",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "c2512496d389b917bfed",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "b5c181f3dc3bc3d0fdcb",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "5f5c256b11365e92d0de",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "1ed0b149303031610e16",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "29445b40ceb7416213ae",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "83111c2e8d130022efab",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "5e68c3ad75d407b7641a",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "4571399ccad2803b1341",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "2a192f0b5175537c5fa2",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "21155d4dffb65e8d3fec",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "74595502cf25f8befe03",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "870f60c7dbe6711cc952",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "9ca5d12d0b08b953736e",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "d08eb40f4f9df92bde83",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "268c4b53bae406d61925",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "5fc3f81b1adaad27aefb",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "6bff75d27dbc59fb3b8e",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "a7d9875467d072e60aef",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "1e1712eaeca53e56047a",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "078a7026c6b3c02b6c8a",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "e519e1ea2a52f292b08b",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "a8b3d3fbc915c94b6ec3",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "0a8dfc9322e5fda186e6",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "13ef93d254aff5149133",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "84ae5c31c537652c4169",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "6dfc10025ee344638183",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "3eeca0633b6dcba04c19",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "86e78b095590444c9311",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "0bea0fb40e4a2bc8454e",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "323d938a7b245ee9c84c",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "0d951f2ac55c5f33e6b3",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "d09d088bfb791d6dbb84",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "299634a5a8ba7373eec3",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "8749f9cc9d858ff3d758",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "8dc97194087d356ff205",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "7dccead51a0890f5d761",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "e6b0afb17d01bc34b4ff",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "55d5f4fa224e88807405",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "d3b03b000867c7beaeb1",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "f2ea72753b8fe0af3527",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "3fe410acdcda9d82eefa",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "63ab6229bd4b79488629",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "63198b7d64e959f26b59",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "afa4001e9eb3266fe380",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "1523f51471b716410f13",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "1727f1c838aa98d17032",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "92b622568515a86f5838",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "cf074fd74f5c18316c2b",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "b4cccb644c0092adebd6",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "db147d89fb62dc6767b3",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "d7f9bad24546a6a56f59",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "61948ad54a0c9f2dd0c6",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "2fa94454812bc408cc7d",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "b5c3761d76a4d7e8faf0",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "e76968116650c25a3cf7",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "010ac4d306f49f14925d",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "92677a8274b149f8d083",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "b26fc3f6b0af86d82295",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "ce71a689e6d0c3eacdbd",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "c4bd27c04fa8f8b308cd",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "d85db5a955cdc8e98897",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "8bf3d5666e1a313c9506",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "f5bc814519e597d0bc12",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "768053ac0564d2294d0a",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "a597d6354fd36cc3d76a",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "8e347ef054f5a5cf3a1c",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "1e30f204f8a22c563c00",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "b07d38666a63f363dbd4",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "3c92ab84e9e59fa61416",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "124a3d9f9b9e9e510433",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "990b626a55c77c803d64",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "3fdd9b390173cd18d431",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "c2a231ae6772dd924378",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "afb1556117132cc81481",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "aaed72c49205a3c50106",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "92b969ad4c6fac9b3438",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "515a9c1add870367520a",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "c0975ac72c9c2c6b4bc8",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "a532234e6e4e1e251b56",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "87df67035213b8151f60",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "efed5bbf176de2475cb7",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "8eeacd126c2c399dd636",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "5fc09c090c32538c26b3",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "8fccb03d988e683052e7",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "f2559046d7858d25633a",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "8ef5dd784a6d33d668dd",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "31d2c55358db4adf1af0",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "0e4f04ab5d74ee96b3ea",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "2d5316e64097291d0a1c",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "08f1069a0f3931073ccd",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "390cd30167895803304d",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "5b5f787253974466d39c",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "b17000a5ba83e12c0f05",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "63c9adfb470b53ad46d4",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "b331d27339f9c7234fdb",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "9f3560747aae1dd15110",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "ab1da075ef35b650f9f1",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "5de1cfabe468f91a212e",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "0d406e039e619a0e9c39",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "8e63791bfd1aed1c8bd6",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "228009d9b2845ca12681",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "cc967ae77f9cf2b077d6",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "abc049a319ddbb5b2863",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "0a5f45b4c3d6eec1f068",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "db038e2522d3858816b1",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "5d66a464efe2003e6f84",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "dfa913e0619e4aea5bab",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "e0d466c25a3890fc7959",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "6ed0e6a9a8b1cb3345e4",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "87e71990feaf2c9402cc",
+          "category": "effective",
+          "excludedFromEffective": false
+        }
+      ]
+    },
+    {
+      "kind": "aseguradoras",
+      "expected": 26,
+      "raw": 30,
+      "effective": 25,
+      "deltaRaw": 4,
+      "deltaEffective": -1,
+      "categories": {
+        "duplicate": 1,
+        "historicalInactive": 4,
+        "outOfEffectiveUniverse": 0,
+        "requiresValidation": 2,
+        "contractDrift": -1
+      },
+      "status": "STOP_UNIVERSE_NOT_RECONCILED",
+      "classification": "DATA_CONTRACT_FAILURE",
+      "items": [
+        {
+          "fingerprint": "738b3b275c4ae8ed052a",
+          "category": "requires_validation",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "676a2c3554c5245979bf",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "54dc2b76c57c9846f7eb",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "9e15fefb2fe313545507",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "3c596e5b2cc2831c3ed3",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "cd04f82f20304965fe2e",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "5044a0d1e61610c243a3",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "af0edc788d23098c83ce",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "77ad4b5ccda3318b3faf",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "a5357739db79a44e929e",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "c362008429765365be55",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "78e4f8268441ce053a1b",
+          "category": "requires_validation",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "1c205d440861210ffb0d",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "2327f10da14950a78803",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "fecefa120225e17ebfb4",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "9802527a119250bdd405",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "bcc1a13b02356e1710bd",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "ab25557c7f149a499711",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "e67471716fd7f955b724",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "381a58717a4fcf0dba5f",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "11413e9fadefe72c8ccb",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "38a077ad04e0e08defde",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "4f31b0a2da55b8fff5e6",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "0b91dd7f35dfdf04b090",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "12a8731ac111abd6640e",
+          "category": "duplicate",
+          "excludedFromEffective": true
+        },
+        {
+          "fingerprint": "36aad2180a4d75fc50ae",
+          "category": "effective",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "2bc3605f13979c8a8f00",
+          "category": "historical_inactive",
+          "excludedFromEffective": true
+        },
+        {
+          "fingerprint": "954f79acebbec5026e49",
+          "category": "historical_inactive",
+          "excludedFromEffective": true
+        },
+        {
+          "fingerprint": "f19112adf18f8bd2f7db",
+          "category": "historical_inactive",
+          "excludedFromEffective": true
+        },
+        {
+          "fingerprint": "4b7ed665d14f1f2f00bd",
+          "category": "historical_inactive",
+          "excludedFromEffective": true
+        }
+      ]
+    },
+    {
+      "kind": "asesores",
+      "expected": 7,
+      "raw": 7,
+      "effective": 7,
+      "deltaRaw": 0,
+      "deltaEffective": 0,
+      "categories": {
+        "duplicate": 0,
+        "historicalInactive": 0,
+        "outOfEffectiveUniverse": 0,
+        "requiresValidation": 7,
+        "contractDrift": 0
+      },
+      "status": "PASS_RECONCILED",
+      "classification": "PASS_DATA_CONTRACT",
+      "items": [
+        {
+          "fingerprint": "34e6ae01c7f737cbff1b",
+          "category": "requires_validation",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "7a211c9fea35e0dd1258",
+          "category": "requires_validation",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "8da5c68380bab8b069f7",
+          "category": "requires_validation",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "0ee49a261b052d963b04",
+          "category": "requires_validation",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "57c26076e2f87d1bb9db",
+          "category": "requires_validation",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "1a912c7d74fba8b46c53",
+          "category": "requires_validation",
+          "excludedFromEffective": false
+        },
+        {
+          "fingerprint": "4ba8c50055591b09a40b",
+          "category": "requires_validation",
+          "excludedFromEffective": false
+        }
+      ]
+    }
+  ],
+  "status": "STOP_RETRY_BLOCK1_UNIVERSE_ADJUDICATION",
+  "classification": "DATA_CONTRACT_FAILURE",
+  "goForHosting": false,
+  "firestoreReads": 3,
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "operationalWrites": 0,
+  "reimport": false,
+  "hostingTouched": false,
+  "deployExecuted": false,
+  "productionTouched": false,
+  "containsPII": false,
+  "containsNames": false,
+  "containsEmails": false,
+  "containsSecrets": false,
+  "ok": false
+}

@@ -1,0 +1,148 @@
+{
+  "schemaVersion": "orbit360-m1-dynamic-directory-contract-v3",
+  "contractVersion": "1.0.40",
+  "status": "DYNAMIC_DIRECTORY_CONTRACT_V3_PASS",
+  "ok": true,
+  "total": 23,
+  "passed": 23,
+  "failed": 0,
+  "failedCheckIds": [],
+  "checks": [
+    {
+      "id": "VALIDATOR_ROOT_PLATFORM",
+      "ok": true,
+      "detail": "/home/runner/work/orbit360-core/orbit360-core/orbit360-platform"
+    },
+    {
+      "id": "CANONICAL_MODULE_OWNS_CRUD",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "READ_OWNER_SKIPS_EDIT_MODE",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "BANK_ADD_BLANK_DYNAMIC",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "NO_RANDOM_MASKED_ACCOUNT",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "BANK_SNAPSHOT_SAFE",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "PORTAL_NATIVE_USERNAME",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "PASSWORD_NATIVE_EPHEMERAL",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "SECURE_PROVIDER_MUTATION",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "SECURE_SOURCE_HASH_SHA256",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "PASSWORD_NOT_IN_STORE_CONTRACT",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "CURRENT_TAB_FORCED_BEFORE_SAVE",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "TAB_SWITCH_SNAPSHOTS",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "BACKEND_WRITE_ACK",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "EDIT_REMAINS_OPEN_ON_FAILURE",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "AUTHORIZED_ROLES",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "ADVISOR_NOT_IN_EDIT_ROLES",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "STABLE_NEW_RESOURCE_IDS",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "NEW_INSURER_DEFAULT_ACTIVE",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "ACADEMY_1232",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "BOOTSTRAP_VERSIONS",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "BOOTSTRAP_COMMENT_CLOSED",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "NO_OPERATIONAL_VALUES_ADDED_TO_OWNER",
+      "ok": true,
+      "detail": ""
+    }
+  ],
+  "rootCauseCorrection": {
+    "unterminatedBootstrapCommentFixed": true,
+    "validatorRootPlatformFixed": true,
+    "previousFailedPatchRunId": 30009334105,
+    "previousDiagnosticRunId": 30009737855,
+    "previousValidatorRootFailureRunId": 30010358983
+  },
+  "capabilities": {
+    "secrets": false,
+    "firestoreRead": false,
+    "writes": false,
+    "runtime": false,
+    "browser": false,
+    "deploy": false,
+    "repositoryWrite": false,
+    "functionsDeploy": false,
+    "rulesDeploy": false,
+    "production": false
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}

@@ -1,0 +1,81 @@
+{
+  "schemaVersion": "orbit360-m4-data-reconciliation-static-source-audit-v1",
+  "issuedAt": "2026-07-25",
+  "status": "M4_SOURCE_SCHEMA_AUDITED_COUNTRY_NOT_EXPLICIT",
+  "classification": "DATA_CONTRACT_FAILURE",
+  "source": {
+    "file": "Contratantes Datos de Contacto 2026-07-08.xlsx",
+    "sha256": "0023d52c2623be7a8c5b81a4e295043097f38644c80ed783160b518c0cb9eef2",
+    "sheet": "Worksheet",
+    "range": "A1:AD441",
+    "rawRecords": 440,
+    "preliminaryCreateAfterDeduplication": 414
+  },
+  "dryRunReport": {
+    "file": "DRY-RUN-CLIENTES-SIGA-CRM-REPORTE-SANITIZADO-20260709.xlsx",
+    "sha256": "cef11a4d29082d7428b19c63e8f0403274b4e414efddb2d149056cae7f4ba6d6"
+  },
+  "schema": {
+    "explicitCountryColumnPresent": false,
+    "candidateFields": [
+      {
+        "name": "Cod. Región",
+        "present": 380,
+        "blank": 60,
+        "distribution": {
+          "502": 360,
+          "57": 16,
+          "521": 3,
+          "1": 1
+        },
+        "authoritativeForCountry": false
+      },
+      {
+        "name": "Provincia",
+        "present": 269,
+        "blank": 171,
+        "countrySignals": {
+          "guatemalaCatalogCandidates": 253,
+          "colombiaCatalogCandidates": 15,
+          "ambiguous": 1
+        },
+        "authoritativeForCountry": false
+      },
+      {
+        "name": "Canton",
+        "present": 251,
+        "blank": 189,
+        "authoritativeForCountry": false
+      }
+    ]
+  },
+  "contractFindings": [
+    "Cod. Región is mapped to codigoPaisTelefono and must not infer portfolio country",
+    "A confirmed País → Departamento/Provincia → Ciudad/Municipio catalog is still required",
+    "Missing canonical country or currency remains REQUIERE_VALIDACION"
+  ],
+  "runtimeBaseline": {
+    "clientsMissingCurrency": 61,
+    "canonicalCountryResolvedGT": 0,
+    "canonicalCountryResolvedCO": 0,
+    "unresolved": 61
+  },
+  "targetOnly": {
+    "clients": 2,
+    "insurers": 2,
+    "recommendation": "retirar_candidato",
+    "writeExecuted": false
+  },
+  "proposal": {
+    "automaticCurrencyAssignmentAuthorized": false,
+    "nextEvidenceNeeded": "canonical country field or approved geographic catalog joined to the 61 records",
+    "forbiddenSources": [
+      "polizas",
+      "finmovs",
+      "estado_cuenta_bancario"
+    ],
+    "newRuntimeExecutionAuthorized": false
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}

@@ -1,0 +1,105 @@
+{
+  "schemaVersion": "orbit360-block12-isolated-routes-synthetic-v1",
+  "status": "ISOLATED_ROUTES_SYNTHETIC_PASS",
+  "classification": "GO_PIPELINE_MECHANISM",
+  "routeCount": 8,
+  "routes": [
+    {
+      "route": "cliente360",
+      "isolatedContext": true,
+      "directRouteUrlConfirmed": true,
+      "videoBytes": 37657,
+      "frameBytes": 82779,
+      "validPng": true
+    },
+    {
+      "route": "aseguradoras",
+      "isolatedContext": true,
+      "directRouteUrlConfirmed": true,
+      "videoBytes": 31908,
+      "frameBytes": 73363,
+      "validPng": true
+    },
+    {
+      "route": "polizas",
+      "isolatedContext": true,
+      "directRouteUrlConfirmed": true,
+      "videoBytes": 28826,
+      "frameBytes": 74971,
+      "validPng": true
+    },
+    {
+      "route": "cobros",
+      "isolatedContext": true,
+      "directRouteUrlConfirmed": true,
+      "videoBytes": 28917,
+      "frameBytes": 79458,
+      "validPng": true
+    },
+    {
+      "route": "conciliaciones",
+      "isolatedContext": true,
+      "directRouteUrlConfirmed": true,
+      "videoBytes": 30364,
+      "frameBytes": 81410,
+      "validPng": true
+    },
+    {
+      "route": "ops",
+      "isolatedContext": true,
+      "directRouteUrlConfirmed": true,
+      "videoBytes": 28962,
+      "frameBytes": 73704,
+      "validPng": true
+    },
+    {
+      "route": "leads",
+      "isolatedContext": true,
+      "directRouteUrlConfirmed": true,
+      "videoBytes": 28726,
+      "frameBytes": 74357,
+      "validPng": true
+    },
+    {
+      "route": "importar",
+      "isolatedContext": true,
+      "directRouteUrlConfirmed": true,
+      "videoBytes": 28863,
+      "frameBytes": 74042,
+      "validPng": true
+    }
+  ],
+  "elapsedMs": 7302,
+  "sourceContract": {
+    "isolatedContextToken": true,
+    "directUrlToken": true,
+    "perRouteContextToken": true,
+    "immediateFrameToken": true,
+    "schemaV6": true,
+    "noForbiddenTokens": true
+  },
+  "forbiddenTokens": [
+    "location.hash =",
+    "HashChangeEvent(",
+    ".innerText",
+    "getComputedStyle(",
+    "Page.captureScreenshot",
+    "page.screenshot(",
+    "newCDPSession("
+  ],
+  "forbiddenPresent": [],
+  "navigationMechanism": "one-isolated-browser-context-and-direct-url-per-route",
+  "inPageHashNavigationUsed": false,
+  "screenshotApiUsed": false,
+  "cdpScreenshotUsed": false,
+  "networkAccess": false,
+  "firebaseCommandsExecuted": false,
+  "firestoreRead": false,
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "deployExecuted": false,
+  "productionTouched": false,
+  "ok": true,
+  "containsPII": false,
+  "containsSecrets": false
+}

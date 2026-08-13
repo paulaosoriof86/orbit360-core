@@ -1,0 +1,425 @@
+﻿# Auditoria contaminacion Orbit / Orbia / CXOrbia
+
+- Fecha local: 2026-07-01 04:14:57
+- Rama: feat/ays-auth-lab-correction-20260630
+- HEAD: c9f7b10 chore(proto): integrar Claude v98 y actualizar pendientes
+- Resultado preliminar: CONTAMINACION_CRITICA_EN_APP_O_MODULOS
+- Restricciones: solo auditoria/documentacion; sin borrar, sin push, sin deploy.
+
+## Resumen cuantitativo
+
+- Coincidencias totales repo local: 12410
+- Criticas en app activa: 2316
+- Altas en tools: 0
+- Medias en documentacion: 1284
+- Bajas en backups/tmp: 8308
+- Archivos de app con nombres sospechosos: 11
+- Archivos posibles conflicto/copia OneDrive: 9
+- Coincidencias en ZIP auditado: 4053
+
+## Interpretacion
+
+No se debe afirmar que el prototipo entregado por Claude esta contaminado sin distinguir ubicacion. La contaminacion critica existe solo si aparece en app activa, rutas, modulos o configuracion renderizable. Referencias en docs, changelog, backups o comentarios deben limpiarse, pero se tratan como nivel medio/bajo segun impacto.
+
+## Hallazgos criticos en app activa
+
+- orbit360-platform\index.html linea 6 [Orbia]: <title>CXOrbia · Plataforma Operativa de Campo</title>
+- orbit360-platform\index.html linea 6 [CXOrbia]: <title>CXOrbia · Plataforma Operativa de Campo</title>
+- orbit360-platform\index.html linea 56 [shopper]: <script src="core/shoppers-store.js"></script>
+- orbit360-platform\index.html linea 56 [shoppers]: <script src="core/shoppers-store.js"></script>
+- orbit360-platform\index.html linea 79 [visita]: <script src="modules/visitas.js"></script>
+- orbit360-platform\index.html linea 79 [visitas]: <script src="modules/visitas.js"></script>
+- orbit360-platform\index.html linea 80 [visita]: <script src="modules/visita-detalle.js"></script>
+- orbit360-platform\index.html linea 81 [shopper]: <script src="modules/cuestionario-shopper.js"></script>
+- orbit360-platform\index.html linea 81 [cuestionario]: <script src="modules/cuestionario-shopper.js"></script>
+- orbit360-platform\index.html linea 82 [postulaciones]: <script src="modules/postulaciones.js"></script>
+- orbit360-platform\index.html linea 83 [shopper]: <script src="modules/shoppers.js"></script>
+- orbit360-platform\index.html linea 83 [shoppers]: <script src="modules/shoppers.js"></script>
+- orbit360-platform\index.html linea 84 [visita]: <script src="modules/misvisitas.js"></script>
+- orbit360-platform\index.html linea 84 [visitas]: <script src="modules/misvisitas.js"></script>
+- orbit360-platform\index.html linea 85 [beneficios]: <script src="modules/beneficios.js"></script>
+- orbit360-platform\index.html linea 103 [rutas]: <script src="modules/rutas.js"></script>
+- orbit360-platform\manifest.webmanifest linea 2 [Orbia]: "name": "CXOrbia · Plataforma Operativa de Campo",
+- orbit360-platform\manifest.webmanifest linea 2 [CXOrbia]: "name": "CXOrbia · Plataforma Operativa de Campo",
+- orbit360-platform\manifest.webmanifest linea 3 [Orbia]: "short_name": "CXOrbia",
+- orbit360-platform\manifest.webmanifest linea 3 [CXOrbia]: "short_name": "CXOrbia",
+- orbit360-platform\manifest.webmanifest linea 4 [mystery]: "description": "Mystery shopping, CX y auditoría de campo",
+- orbit360-platform\manifest.webmanifest linea 4 [mystery shopping]: "description": "Mystery shopping, CX y auditoría de campo",
+- orbit360-platform\sw.js linea 1 [Orbia]: /* CXOrbia · Service Worker mínimo — habilita instalación PWA y caché básico offline */
+- orbit360-platform\sw.js linea 1 [CXOrbia]: /* CXOrbia · Service Worker mínimo — habilita instalación PWA y caché básico offline */
+- orbit360-platform\sw.js linea 2 [Orbia]: const CX_CACHE = 'cxorbia-v1';
+- orbit360-platform\sw.js linea 2 [CXOrbia]: const CX_CACHE = 'cxorbia-v1';
+- orbit360-platform\core\automations.js linea 2 [Orbia]: CXOrbia · Automatizaciones (Make) + alertas de pendientes
+- orbit360-platform\core\automations.js linea 2 [CXOrbia]: CXOrbia · Automatizaciones (Make) + alertas de pendientes
+- orbit360-platform\core\automations.js linea 5 [shopper]: - Notifica al equipo TODOS los movimientos del shopper.
+- orbit360-platform\core\automations.js linea 6 [visita]: - Detecta visitas atrasadas / pendientes / desactualizadas y
+- orbit360-platform\core\automations.js linea 6 [visitas]: - Detecta visitas atrasadas / pendientes / desactualizadas y
+- orbit360-platform\core\automations.js linea 19 [shopper]: {id:'a_postulacion', evento:'postulacion', activa:true, canal:'whatsapp', to:'admin', titulo:'Nueva postulación', plantilla:'{shopper} se postuló a {sucursal}'},
+- orbit360-platform\core\automations.js linea 20 [shopper]: {id:'a_agenda', evento:'agenda', activa:true, canal:'push', to:'admin', titulo:'Visita agendada', plantilla:'{shopper} agendó {sucursal} para {fecha}'},
+- orbit360-platform\core\automations.js linea 20 [visita]: {id:'a_agenda', evento:'agenda', activa:true, canal:'push', to:'admin', titulo:'Visita agendada', plantilla:'{shopper} agendó {sucursal} para {fecha}'},
+- orbit360-platform\core\automations.js linea 21 [shopper]: {id:'a_realizada', evento:'realizada', activa:true, canal:'push', to:'admin', titulo:'Visita realizada', plantilla:'{shopper} realizó {sucursal} · validar cuestionario'},
+- orbit360-platform\core\automations.js linea 21 [visita]: {id:'a_realizada', evento:'realizada', activa:true, canal:'push', to:'admin', titulo:'Visita realizada', plantilla:'{shopper} realizó {sucursal} · validar cuestionario'},
+- orbit360-platform\core\automations.js linea 21 [cuestionario]: {id:'a_realizada', evento:'realizada', activa:true, canal:'push', to:'admin', titulo:'Visita realizada', plantilla:'{shopper} realizó {sucursal} · validar cuestionario'},
+- orbit360-platform\core\automations.js linea 22 [shopper]: {id:'a_cuestionario',evento:'cuestionario',activa:true, canal:'push', to:'admin', titulo:'Cuestionario enviado', plantilla:'{shopper} envió el cuestionario de {sucursal} (score {score})'},
+- orbit360-platform\core\automations.js linea 22 [cuestionario]: {id:'a_cuestionario',evento:'cuestionario',activa:true, canal:'push', to:'admin', titulo:'Cuestionario enviado', plantilla:'{shopper} envió el cuestionario de {sucursal} (score {score})'},
+- orbit360-platform\core\automations.js linea 23 [shopper]: {id:'a_reprog', evento:'reprog', activa:true, canal:'whatsapp', to:'admin', titulo:'Reprogramación solicitada', plantilla:'{shopper} pide reprogramar {sucursal}'},
+- orbit360-platform\core\automations.js linea 24 [shopper]: {id:'a_pago', evento:'pago', activa:true, canal:'whatsapp', to:'shopper', titulo:'Pago realizado', plantilla:'Tu liquidación de {sucursal} pasó a pagada'},
+- orbit360-platform\core\automations.js linea 25 [visita]: {id:'a_atraso', evento:'atraso', activa:true, canal:'whatsapp', to:'admin', titulo:'Visita atrasada', plantilla:'{sucursal} sin avance · vence {fecha}'},
+- orbit360-platform\core\automations.js linea 26 [shopper]: {id:'a_aprobacion', evento:'aprobacion', activa:true, canal:'whatsapp', to:'shopper', titulo:'Postulación aprobada', plantilla:'Tu visita a {sucursal} fue aprobada'},
+- orbit360-platform\core\automations.js linea 26 [visita]: {id:'a_aprobacion', evento:'aprobacion', activa:true, canal:'whatsapp', to:'shopper', titulo:'Postulación aprobada', plantilla:'Tu visita a {sucursal} fue aprobada'},
+- orbit360-platform\core\automations.js linea 27 [shopper]: {id:'a_hr_writeback',evento:'hr_writeback', activa:true, canal:'sheet', to:'admin', titulo:'HR actualizada', plantilla:'{sucursal}: {shopper} · {fecha} · {estado} (sincronizado a la HR)'},
+- orbit360-platform\core\automations.js linea 28 [shopper]: {id:'a_shopper_edit',evento:'shopper_edit', activa:true, canal:'push', to:'admin', titulo:'Datos de shopper actualizados', plantilla:'{shopper} actualizó: {campos}'},
+- orbit360-platform\core\automations.js linea 127 [shopper]: EVENTOS:{postulacion:'Postulación creada', agenda:'Visita agendada', realizada:'Visita realizada', cuestionario:'Cuestionario enviado', reprog:'Reprogramación', pago:'Pago/liquidación', atraso:'Visita atrasada/pendiente', aprobacion:'Postulación aprobada', hr_writeback:'Escritura de vuelta a HR', shopper_edit:'Cambio de datos del shopper'},
+- orbit360-platform\core\automations.js linea 127 [visita]: EVENTOS:{postulacion:'Postulación creada', agenda:'Visita agendada', realizada:'Visita realizada', cuestionario:'Cuestionario enviado', reprog:'Reprogramación', pago:'Pago/liquidación', atraso:'Visita atrasada/pendiente', aprobacion:'Postulación aprobada', hr_writeback:'Escritura de vuelta a HR', shopper_edit:'Cambio de datos del shopper'},
+- orbit360-platform\core\automations.js linea 127 [cuestionario]: EVENTOS:{postulacion:'Postulación creada', agenda:'Visita agendada', realizada:'Visita realizada', cuestionario:'Cuestionario enviado', reprog:'Reprogramación', pago:'Pago/liquidación', atraso:'Visita atrasada/pendiente', aprobacion:'Postulación aprobada', hr_writeback:'Escritura de vuelta a HR', shopper_edit:'Cambio de datos del shopper'},
+- orbit360-platform\core\automations.js linea 135 [TyA]: /* tenant activo (cada consultora guarda SUS propios webhooks; p.ej. TyA usa los suyos) */
+- orbit360-platform\core\automations.js linea 159 [shopper]: _icon(e){ return {postulacion:'📩',agenda:'📅',realizada:'✅',cuestionario:'📝',reprog:'🔄',pago:'💰',atraso:'⏰',aprobacion:'✅',hr_writeback:'🔃',shopper_edit:'✏️'}[e]||'🔔'; },
+- orbit360-platform\core\automations.js linea 159 [cuestionario]: _icon(e){ return {postulacion:'📩',agenda:'📅',realizada:'✅',cuestionario:'📝',reprog:'🔄',pago:'💰',atraso:'⏰',aprobacion:'✅',hr_writeback:'🔃',shopper_edit:'✏️'}[e]||'🔔'; },
+- orbit360-platform\core\automations.js linea 160 [shopper]: _tone(e){ return {postulacion:'b',agenda:'g',realizada:'b',cuestionario:'b',reprog:'a',pago:'g',atraso:'r',aprobacion:'g',hr_writeback:'b',shopper_edit:'b'}[e]||'b'; },
+- orbit360-platform\core\automations.js linea 160 [cuestionario]: _tone(e){ return {postulacion:'b',agenda:'g',realizada:'b',cuestionario:'b',reprog:'a',pago:'g',atraso:'r',aprobacion:'g',hr_writeback:'b',shopper_edit:'b'}[e]||'b'; },
+- orbit360-platform\core\automations.js linea 161 [shopper]: _nav(to,e){ if(to==='shopper') return e==='pago'?'beneficios':'misvisitas'; return e==='atraso'?'visitas':'postulaciones'; },
+- orbit360-platform\core\automations.js linea 161 [visita]: _nav(to,e){ if(to==='shopper') return e==='pago'?'beneficios':'misvisitas'; return e==='atraso'?'visitas':'postulaciones'; },
+- orbit360-platform\core\automations.js linea 161 [visitas]: _nav(to,e){ if(to==='shopper') return e==='pago'?'beneficios':'misvisitas'; return e==='atraso'?'visitas':'postulaciones'; },
+- orbit360-platform\core\automations.js linea 161 [postulaciones]: _nav(to,e){ if(to==='shopper') return e==='pago'?'beneficios':'misvisitas'; return e==='atraso'?'visitas':'postulaciones'; },
+- orbit360-platform\core\automations.js linea 161 [beneficios]: _nav(to,e){ if(to==='shopper') return e==='pago'?'beneficios':'misvisitas'; return e==='atraso'?'visitas':'postulaciones'; },
+- orbit360-platform\core\automations.js linea 163 [visita]: /* escanea visitas y detecta atrasadas / pendientes / desactualizadas */
+- orbit360-platform\core\automations.js linea 163 [visitas]: /* escanea visitas y detecta atrasadas / pendientes / desactualizadas */
+- orbit360-platform\core\automations.js linea 166 [visita]: (CX.data._visitas||[]).filter(v=>v.projectId===CX.data.currentProjectId).forEach(v=>{
+- orbit360-platform\core\automations.js linea 166 [visitas]: (CX.data._visitas||[]).filter(v=>v.projectId===CX.data.currentProjectId).forEach(v=>{
+- orbit360-platform\core\automations.js linea 169 [cuestionario]: else if(v.estado==='realizada') out.pendientes.push(v); // pend. cuestionario
+- orbit360-platform\core\automations.js linea 177 [shopper]: s.atrasadas.forEach(v=>{ this.fire('atraso',{sucursal:v.sucursal, fecha:v.agendada||v.disponibleDesde||'—', shopper:v.shopper||'sin asignar'}); n++; });
+- orbit360-platform\core\cliente-data.js linea 2 [Orbia]: CXOrbia · Motor del Portal Estratégico del Cliente
+- orbit360-platform\core\cliente-data.js linea 2 [CXOrbia]: CXOrbia · Motor del Portal Estratégico del Cliente
+- orbit360-platform\core\cliente-data.js linea 53 [visita]: Se derivan de las VISITAS REALES del proyecto (sincronía operación→cliente).
+- orbit360-platform\core\cliente-data.js linea 53 [visitas]: Se derivan de las VISITAS REALES del proyecto (sincronía operación→cliente).
+- orbit360-platform\core\cliente-data.js linea 54 [cuestionario]: El score usa cuestionarios efectivamente enviados (evaluada); si una sucursal
+- orbit360-platform\core\cliente-data.js linea 60 [visita]: const vis=(CX.data._visitas||[]).filter(v=>v.projectId===p.id);
+- orbit360-platform\core\cliente-data.js linea 60 [visitas]: const vis=(CX.data._visitas||[]).filter(v=>v.projectId===p.id);
+- orbit360-platform\core\cliente-data.js linea 61 [visita]: const list = vis.length ? this._fromVisitas(p, prog, vis) : this._synthetic(p, prog);
+- orbit360-platform\core\cliente-data.js linea 61 [visitas]: const list = vis.length ? this._fromVisitas(p, prog, vis) : this._synthetic(p, prog);
+- orbit360-platform\core\cliente-data.js linea 67 [visita]: /* agrupa visitas por sucursal y arma el scorecard con datos reales */
+- orbit360-platform\core\cliente-data.js linea 67 [visitas]: /* agrupa visitas por sucursal y arma el scorecard con datos reales */
+- orbit360-platform\core\cliente-data.js linea 68 [visita]: _fromVisitas(p, prog, vis){
+- orbit360-platform\core\cliente-data.js linea 68 [visitas]: _fromVisitas(p, prog, vis){
+- orbit360-platform\core\cliente-data.js linea 75 [cuestionario]: // score: real si hay cuestionarios enviados; si no, determinístico estable
+- orbit360-platform\core\cliente-data.js linea 91 [visita]: responsable:pick(r,NAMES), visitas:vs.length, evaluadas:evals.length,
+- orbit360-platform\core\cliente-data.js linea 91 [visitas]: responsable:pick(r,NAMES), visitas:vs.length, evaluadas:evals.length,
+- orbit360-platform\core\cliente-data.js linea 100 [visita]: /* fallback puramente determinístico (proyectos sin visitas cargadas) */
+- orbit360-platform\core\cliente-data.js linea 100 [visitas]: /* fallback puramente determinístico (proyectos sin visitas cargadas) */
+- orbit360-platform\core\cliente-data.js linea 110 [visita]: responsable:pick(r,NAMES), visitas:2+Math.floor(r()*8), evaluadas:0,
+- orbit360-platform\core\cliente-data.js linea 110 [visitas]: responsable:pick(r,NAMES), visitas:2+Math.floor(r()*8), evaluadas:0,
+- orbit360-platform\core\cliente-data.js linea 130 [visita]: const totVis=list.reduce((a,s)=>a+s.visitas,0);
+- orbit360-platform\core\cliente-data.js linea 130 [visitas]: const totVis=list.reduce((a,s)=>a+s.visitas,0);
+- orbit360-platform\core\cliente-data.js linea 131 [visita]: const wScore=Math.round(list.reduce((a,s)=>a+s.score*s.visitas,0)/(totVis||1));
+- orbit360-platform\core\cliente-data.js linea 131 [visitas]: const wScore=Math.round(list.reduce((a,s)=>a+s.score*s.visitas,0)/(totVis||1));
+- orbit360-platform\core\cliente-data.js linea 136 [visita]: n:list.length, visitas:totVis,
+- orbit360-platform\core\cliente-data.js linea 136 [visitas]: n:list.length, visitas:totVis,
+- orbit360-platform\core\cliente-data.js linea 179 [mystery]: {cat:'Benchmark', icon:'📊', name:'Mystery shopping competitivo', desc:'Mide a tu competencia con la misma vara y compara por sector.', tag:'Pro'},
+- orbit360-platform\core\cliente-data.js linea 179 [mystery shopping]: {cat:'Benchmark', icon:'📊', name:'Mystery shopping competitivo', desc:'Mide a tu competencia con la misma vara y compara por sector.', tag:'Pro'},
+- orbit360-platform\core\cliente-data.js linea 189 [cuestionario]: /* RESULTADOS REALES de operación: scores de cuestionarios efectivamente
+- orbit360-platform\core\cliente-data.js linea 190 [shopper]: enviados por shoppers en este proyecto (sincronía operación → cliente). */
+- orbit360-platform\core\cliente-data.js linea 190 [shoppers]: enviados por shoppers en este proyecto (sincronía operación → cliente). */
+- orbit360-platform\core\cliente-data.js linea 193 [visita]: const vis=CX.data._visitas.filter(v=>v.projectId===p.id && typeof v.score==='number' && v.evaluada);
+- orbit360-platform\core\cliente-data.js linea 193 [visitas]: const vis=CX.data._visitas.filter(v=>v.projectId===p.id && typeof v.score==='number' && v.evaluada);
+- orbit360-platform\core\cliente-data.js linea 200 [visita]: return {count:vis.length, avg, bySection, ko, visitas:vis};
+- orbit360-platform\core\cliente-data.js linea 200 [visitas]: return {count:vis.length, avg, bySection, ko, visitas:vis};
+- orbit360-platform\core\config.js linea 2 [Orbia]: CXOrbia · Core configuration (white-label + navigation)
+- orbit360-platform\core\config.js linea 2 [CXOrbia]: CXOrbia · Core configuration (white-label + navigation)
+- orbit360-platform\core\config.js linea 10 [Orbia]: name: 'CXOrbia',
+- orbit360-platform\core\config.js linea 10 [CXOrbia]: name: 'CXOrbia',
+- orbit360-platform\core\config.js linea 16 [Orbia]: theme: 'cxorbia', // id de CX.THEMES
+- orbit360-platform\core\config.js linea 16 [CXOrbia]: theme: 'cxorbia', // id de CX.THEMES
+- orbit360-platform\core\config.js linea 24 [T&A]: Cada cliente puede partir de una plantilla y ajustarla. La de T&A
+- orbit360-platform\core\config.js linea 27 [Orbia]: cxorbia: {
+- orbit360-platform\core\config.js linea 27 [CXOrbia]: cxorbia: {
+- orbit360-platform\core\config.js linea 28 [Orbia]: label: 'CXOrbia (oscuro)', font: "'Manrope', system-ui, sans-serif", railStyle:'dark',
+- orbit360-platform\core\config.js linea 28 [CXOrbia]: label: 'CXOrbia (oscuro)', font: "'Manrope', system-ui, sans-serif", railStyle:'dark',
+- orbit360-platform\core\config.js linea 32 [TyA]: tya: {
+- orbit360-platform\core\config.js linea 43 [retail]: label: 'Violeta (retail/food)', font: "'Manrope', system-ui, sans-serif", railStyle:'dark',
+- orbit360-platform\core\config.js linea 71 [Orbia]: const t = CX.THEMES[id] || CX.THEMES.cxorbia;
+- orbit360-platform\core\config.js linea 71 [CXOrbia]: const t = CX.THEMES[id] || CX.THEMES.cxorbia;
+- orbit360-platform\core\config.js linea 108 [cuestionario]: const adminAlways=['cuestionarios','usuarios','config','automatizaciones','integraciones','correo','marca',
+- orbit360-platform\core\config.js linea 110 [shopper]: 'informes','soporte','tablon','documentos','aprendizaje','cert','rutas','postulaciones','shoppers',
+- orbit360-platform\core\config.js linea 110 [shoppers]: 'informes','soporte','tablon','documentos','aprendizaje','cert','rutas','postulaciones','shoppers',
+- orbit360-platform\core\config.js linea 110 [postulaciones]: 'informes','soporte','tablon','documentos','aprendizaje','cert','rutas','postulaciones','shoppers',
+- orbit360-platform\core\config.js linea 110 [rutas]: 'informes','soporte','tablon','documentos','aprendizaje','cert','rutas','postulaciones','shoppers',
+
+## Archivos sospechosos por nombre en app
+
+- orbit360-platform\core\shoppers-store.js [shopper]
+- orbit360-platform\modules\aprendizaje.js [aprendizaje]
+- orbit360-platform\modules\beneficios.js [beneficios]
+- orbit360-platform\modules\cert.js [cert]
+- orbit360-platform\modules\cuestionario-shopper.js [shopper]
+- orbit360-platform\modules\misvisitas.js [visita]
+- orbit360-platform\modules\postulaciones.js [postulaciones]
+- orbit360-platform\modules\rutas.js [rutas]
+- orbit360-platform\modules\shoppers.js [shopper]
+- orbit360-platform\modules\visita-detalle.js [visita]
+- orbit360-platform\modules\visitas.js [visita]
+
+## Conflictos/copias OneDrive
+
+- orbit360-platform\core\auth-lab-preview-router.local-Paula.js
+- orbit360-platform\core\lab-smoke-firestore.local-Paula.js
+- tools\orbit360-static-server-Paula.cjs
+- _orbit360_backups\pre-claude-v98-20260701_034853\orbit360-platform\core\auth-lab-preview-router.local-Paula.js
+- _orbit360_backups\pre-claude-v98-20260701_034853\orbit360-platform\core\lab-smoke-firestore.local-Paula.js
+- _orbit360_backups\pre-claude-v98-20260701_034853\tools\orbit360-static-server-Paula.cjs
+- _orbit360_backups\pre-claude-v98-v2-20260701_035258\orbit360-platform\core\auth-lab-preview-router.local-Paula.js
+- _orbit360_backups\pre-claude-v98-v2-20260701_035258\orbit360-platform\core\lab-smoke-firestore.local-Paula.js
+- _orbit360_backups\pre-claude-v98-v2-20260701_035258\tools\orbit360-static-server-Paula.cjs
+
+## Referencias en documentacion
+
+- orbit360-platform\CHANGELOG.md linea 339 [Orbia]: - 🎨 Paletas: Suave/Orbia (púrpura) + Coral cálido; selector de tipografía
+- orbit360-platform\README.md linea 1 [Orbia]: # CXOrbia — Plataforma Operativa de Campo
+- orbit360-platform\README.md linea 1 [CXOrbia]: # CXOrbia — Plataforma Operativa de Campo
+- orbit360-platform\README.md linea 3 [Orbia]: > Versión **comercial / white-label** de CXOrbia: mystery shopping, experiencia al cliente y auditoría de campo en una sola plataforma.
+- orbit360-platform\README.md linea 3 [CXOrbia]: > Versión **comercial / white-label** de CXOrbia: mystery shopping, experiencia al cliente y auditoría de campo en una sola plataforma.
+- orbit360-platform\README.md linea 3 [mystery]: > Versión **comercial / white-label** de CXOrbia: mystery shopping, experiencia al cliente y auditoría de campo en una sola plataforma.
+- orbit360-platform\README.md linea 3 [mystery shopping]: > Versión **comercial / white-label** de CXOrbia: mystery shopping, experiencia al cliente y auditoría de campo en una sola plataforma.
+- orbit360-platform\README.md linea 4 [T&A]: > Esta base es el punto de partida arquitectónico para comercializar el producto, separada de la operación real de T&A Consultores (sin datos reales, marca neutral, multi-proyecto).
+- orbit360-platform\README.md linea 12 [shopper]: Una **aplicación web modular** que reproduce el flujo operativo completo del negocio —configurar proyecto → publicar visitas → captar/asignar shoppers → instruir → certificar → agendar → ejecutar → liquidar → reportar— con **dos perfiles**:
+- orbit360-platform\README.md linea 12 [shoppers]: Una **aplicación web modular** que reproduce el flujo operativo completo del negocio —configurar proyecto → publicar visitas → captar/asignar shoppers → instruir → certificar → agendar → ejecutar → liquidar → reportar— con **dos perfiles**:
+- orbit360-platform\README.md linea 12 [visita]: Una **aplicación web modular** que reproduce el flujo operativo completo del negocio —configurar proyecto → publicar visitas → captar/asignar shoppers → instruir → certificar → agendar → ejecutar → liquidar → reportar— con **dos perfiles**:
+- orbit360-platform\README.md linea 12 [visitas]: Una **aplicación web modular** que reproduce el flujo operativo completo del negocio —configurar proyecto → publicar visitas → captar/asignar shoppers → instruir → certificar → agendar → ejecutar → liquidar → reportar— con **dos perfiles**:
+- orbit360-platform\README.md linea 15 [shopper]: - 📱 **Portal Shopper / Evaluador** — visitas, certificación, ejecución y pagos.
+- orbit360-platform\README.md linea 15 [visita]: - 📱 **Portal Shopper / Evaluador** — visitas, certificación, ejecución y pagos.
+- orbit360-platform\README.md linea 15 [visitas]: - 📱 **Portal Shopper / Evaluador** — visitas, certificación, ejecución y pagos.
+- orbit360-platform\README.md linea 17 [cuestionario]: Es **multi-proyecto e IA-adaptable**: al cambiar de proyecto, todo el dashboard, los KPIs, las reglas y los cuestionarios se reconfiguran para ese cliente sin tocar código.
+- orbit360-platform\README.md linea 19 [T&A]: > ⚠️ **Demo comercial con datos ficticios.** No contiene datos ni marca reales de T&A. Pensada para presentar, pilotear y entregar a desarrollo.
+- orbit360-platform\README.md linea 58 [visita]: │ ├── dashboard.js proyectos.js visitas.js postulaciones.js …
+- orbit360-platform\README.md linea 58 [visitas]: │ ├── dashboard.js proyectos.js visitas.js postulaciones.js …
+- orbit360-platform\README.md linea 58 [postulaciones]: │ ├── dashboard.js proyectos.js visitas.js postulaciones.js …
+- orbit360-platform\README.md linea 73 [Orbia]: name: 'CXOrbia',
+- orbit360-platform\README.md linea 73 [CXOrbia]: name: 'CXOrbia',
+- orbit360-platform\README.md linea 85 [shopper]: Operación, Portal Shopper, Finanzas y Configuración. Detalle de cada uno (problema, función, capa IA, valor) en **[docs/MODULES.md](docs/MODULES.md)**.
+- orbit360-platform\README.md linea 87 [shopper]: | Operación (Admin) | Portal Shopper | Finanzas (Admin) | Configuración |
+- orbit360-platform\README.md linea 89 [shopper]: | Mi Día · Dashboard · Proyectos · Visitas · Postulaciones · Shoppers · Hojas de Ruta · Documentos · Aprendizaje · Certificación · Tablón · Soporte IA · Reportes | Mi Día · Mi Perfil · Visitas · Mis Visitas · Documentos · Aprendizaje · Certificación · Novedades · Soporte IA · Mis Beneficios | Dashboard Financiero · Movimientos · Liquidaciones · Lotes | Cuestionarios · Usuarios & Permisos · Configuración |
+- orbit360-platform\README.md linea 89 [shoppers]: | Mi Día · Dashboard · Proyectos · Visitas · Postulaciones · Shoppers · Hojas de Ruta · Documentos · Aprendizaje · Certificación · Tablón · Soporte IA · Reportes | Mi Día · Mi Perfil · Visitas · Mis Visitas · Documentos · Aprendizaje · Certificación · Novedades · Soporte IA · Mis Beneficios | Dashboard Financiero · Movimientos · Liquidaciones · Lotes | Cuestionarios · Usuarios & Permisos · Configuración |
+- orbit360-platform\README.md linea 89 [visita]: | Mi Día · Dashboard · Proyectos · Visitas · Postulaciones · Shoppers · Hojas de Ruta · Documentos · Aprendizaje · Certificación · Tablón · Soporte IA · Reportes | Mi Día · Mi Perfil · Visitas · Mis Visitas · Documentos · Aprendizaje · Certificación · Novedades · Soporte IA · Mis Beneficios | Dashboard Financiero · Movimientos · Liquidaciones · Lotes | Cuestionarios · Usuarios & Permisos · Configuración |
+- orbit360-platform\README.md linea 89 [visitas]: | Mi Día · Dashboard · Proyectos · Visitas · Postulaciones · Shoppers · Hojas de Ruta · Documentos · Aprendizaje · Certificación · Tablón · Soporte IA · Reportes | Mi Día · Mi Perfil · Visitas · Mis Visitas · Documentos · Aprendizaje · Certificación · Novedades · Soporte IA · Mis Beneficios | Dashboard Financiero · Movimientos · Liquidaciones · Lotes | Cuestionarios · Usuarios & Permisos · Configuración |
+- orbit360-platform\README.md linea 89 [cuestionario]: | Mi Día · Dashboard · Proyectos · Visitas · Postulaciones · Shoppers · Hojas de Ruta · Documentos · Aprendizaje · Certificación · Tablón · Soporte IA · Reportes | Mi Día · Mi Perfil · Visitas · Mis Visitas · Documentos · Aprendizaje · Certificación · Novedades · Soporte IA · Mis Beneficios | Dashboard Financiero · Movimientos · Liquidaciones · Lotes | Cuestionarios · Usuarios & Permisos · Configuración |
+- orbit360-platform\README.md linea 89 [postulaciones]: | Mi Día · Dashboard · Proyectos · Visitas · Postulaciones · Shoppers · Hojas de Ruta · Documentos · Aprendizaje · Certificación · Tablón · Soporte IA · Reportes | Mi Día · Mi Perfil · Visitas · Mis Visitas · Documentos · Aprendizaje · Certificación · Novedades · Soporte IA · Mis Beneficios | Dashboard Financiero · Movimientos · Liquidaciones · Lotes | Cuestionarios · Usuarios & Permisos · Configuración |
+- orbit360-platform\README.md linea 89 [beneficios]: | Mi Día · Dashboard · Proyectos · Visitas · Postulaciones · Shoppers · Hojas de Ruta · Documentos · Aprendizaje · Certificación · Tablón · Soporte IA · Reportes | Mi Día · Mi Perfil · Visitas · Mis Visitas · Documentos · Aprendizaje · Certificación · Novedades · Soporte IA · Mis Beneficios | Dashboard Financiero · Movimientos · Liquidaciones · Lotes | Cuestionarios · Usuarios & Permisos · Configuración |
+- orbit360-platform\README.md linea 97 [T&A]: ## Relación con la plataforma de T&A
+- orbit360-platform\README.md linea 99 [T&A]: Esta base es **independiente** del HTML operativo actual de T&A. Recomendación: T&A sigue operando en su instancia; cuando este core esté sólido, T&A se migra como **"proyecto / tenant #1"** sobre esta arquitectura modular. Ver [ARCHITECTURE.md](docs/ARCHITECTURE.md).
+- orbit360-platform\core\manuales-data.js linea 1 [Orbia]: /* CXOrbia · Manuales — biblioteca de manuales completos por rol, legibles in-app.
+- orbit360-platform\core\manuales-data.js linea 1 [CXOrbia]: /* CXOrbia · Manuales — biblioteca de manuales completos por rol, legibles in-app.
+- orbit360-platform\core\manuales-data.js linea 2 [shopper]: superadmin = manual maestro (TODO) · admin · ops · coordinador · shopper · cliente.
+- orbit360-platform\core\manuales-data.js linea 16 [Orbia]: id:'m_master', rol:'superadmin', ic:'👑', titulo:'Manual Maestro CXOrbia (todo el sistema)',
+- orbit360-platform\core\manuales-data.js linea 16 [CXOrbia]: id:'m_master', rol:'superadmin', ic:'👑', titulo:'Manual Maestro CXOrbia (todo el sistema)',
+- orbit360-platform\core\manuales-data.js linea 19 [Orbia]: {t:'1 · Qué es CXOrbia y arquitectura', html:`
+- orbit360-platform\core\manuales-data.js linea 19 [CXOrbia]: {t:'1 · Qué es CXOrbia y arquitectura', html:`
+- orbit360-platform\core\manuales-data.js linea 21 [Orbia]: <p>CXOrbia es una plataforma SaaS <b>multi-tenant</b> para consultoras de mystery shopping, auditoría, experiencia del cliente e investigación de mercados. Tiene <b>tres caras</b> que comparten la misma base de datos:</p>
+- orbit360-platform\core\manuales-data.js linea 21 [CXOrbia]: <p>CXOrbia es una plataforma SaaS <b>multi-tenant</b> para consultoras de mystery shopping, auditoría, experiencia del cliente e investigación de mercados. Tiene <b>tres caras</b> que comparten la misma base de datos:</p>
+- orbit360-platform\core\manuales-data.js linea 21 [mystery]: <p>CXOrbia es una plataforma SaaS <b>multi-tenant</b> para consultoras de mystery shopping, auditoría, experiencia del cliente e investigación de mercados. Tiene <b>tres caras</b> que comparten la misma base de datos:</p>
+- orbit360-platform\core\manuales-data.js linea 21 [mystery shopping]: <p>CXOrbia es una plataforma SaaS <b>multi-tenant</b> para consultoras de mystery shopping, auditoría, experiencia del cliente e investigación de mercados. Tiene <b>tres caras</b> que comparten la misma base de datos:</p>
+- orbit360-platform\core\manuales-data.js linea 23 [shopper]: <li><b>Operativa/Administrativa</b> (la consultora): opera proyectos, shoppers, finanzas, comercial.</li>
+- orbit360-platform\core\manuales-data.js linea 23 [shoppers]: <li><b>Operativa/Administrativa</b> (la consultora): opera proyectos, shoppers, finanzas, comercial.</li>
+- orbit360-platform\core\manuales-data.js linea 24 [shopper]: <li><b>Shopper</b> (el evaluador): portal móvil con sus visitas, certificación, beneficios.</li>
+- orbit360-platform\core\manuales-data.js linea 24 [visita]: <li><b>Shopper</b> (el evaluador): portal móvil con sus visitas, certificación, beneficios.</li>
+- orbit360-platform\core\manuales-data.js linea 24 [visitas]: <li><b>Shopper</b> (el evaluador): portal móvil con sus visitas, certificación, beneficios.</li>
+- orbit360-platform\core\manuales-data.js linea 24 [beneficios]: <li><b>Shopper</b> (el evaluador): portal móvil con sus visitas, certificación, beneficios.</li>
+- orbit360-platform\core\manuales-data.js linea 29 [TyA]: <div class="acad-step"><span>1</span><b>Tenant / Consultora</b><p>Ej. TyA. Tiene su marca, plan y usuarios.</p></div>
+- orbit360-platform\core\manuales-data.js linea 32 [visita]: <div class="acad-step"><span>4</span><b>Visitas / Sucursales</b><p>Las unidades operativas del periodo.</p></div>
+- orbit360-platform\core\manuales-data.js linea 32 [visitas]: <div class="acad-step"><span>4</span><b>Visitas / Sucursales</b><p>Las unidades operativas del periodo.</p></div>
+- orbit360-platform\core\manuales-data.js linea 41 [shopper]: <li><b>Shopper</b>: portal móvil.</li>
+- orbit360-platform\core\manuales-data.js linea 47 [Orbia]: <p>Configuración → 🎨 Marca. Sube el logo (se aplica a login, topbar, propuestas y documentos). Elige la paleta (CXOrbia, Corporativa/TyA, Esmeralda, Violeta) o personaliza colores. El logo se usa también como favicon e ícono de la app instalada.</p>
+- orbit360-platform\core\manuales-data.js linea 47 [CXOrbia]: <p>Configuración → 🎨 Marca. Sube el logo (se aplica a login, topbar, propuestas y documentos). Elige la paleta (CXOrbia, Corporativa/TyA, Esmeralda, Violeta) o personaliza colores. El logo se usa también como favicon e ícono de la app instalada.</p>
+- orbit360-platform\core\manuales-data.js linea 47 [TyA]: <p>Configuración → 🎨 Marca. Sube el logo (se aplica a login, topbar, propuestas y documentos). Elige la paleta (CXOrbia, Corporativa/TyA, Esmeralda, Violeta) o personaliza colores. El logo se usa también como favicon e ícono de la app instalada.</p>
+- orbit360-platform\core\manuales-data.js linea 58 [Orbia]: <p>CXOrbia es <b>agnóstica</b> de proveedor. Configuración → Automatizaciones → Asistente de IA. Elige entre Gemini, ChatGPT, Claude o un endpoint propio según costo/beneficio (hay un comparativo integrado). Pega tu API key y actívala.</p>
+- orbit360-platform\core\manuales-data.js linea 58 [CXOrbia]: <p>CXOrbia es <b>agnóstica</b> de proveedor. Configuración → Automatizaciones → Asistente de IA. Elige entre Gemini, ChatGPT, Claude o un endpoint propio según costo/beneficio (hay un comparativo integrado). Pega tu API key y actívala.</p>
+- orbit360-platform\core\manuales-data.js linea 62 [cuestionario]: <li><b>Set-up de proyecto</b>: extrae escenarios, secciones y cuestionario de un instructivo.</li>
+- orbit360-platform\core\manuales-data.js linea 72 [visita]: <div class="acad-step"><span>1</span><b>Publicar</b><p>Carga HR o publica visitas. Nacen "disponible".</p></div>
+- orbit360-platform\core\manuales-data.js linea 72 [visitas]: <div class="acad-step"><span>1</span><b>Publicar</b><p>Carga HR o publica visitas. Nacen "disponible".</p></div>
+- orbit360-platform\core\manuales-data.js linea 73 [shopper]: <div class="acad-step"><span>2</span><b>Reservar/Postular</b><p>El shopper reserva o se postula.</p></div>
+- orbit360-platform\core\manuales-data.js linea 74 [shopper]: <div class="acad-step"><span>3</span><b>Asignar</b><p>Aprobar postulación o asignar manual → WhatsApp al shopper.</p></div>
+- orbit360-platform\core\manuales-data.js linea 75 [shopper]: <div class="acad-step"><span>4</span><b>Agendar</b><p>El shopper elige fecha/franja.</p></div>
+- orbit360-platform\core\manuales-data.js linea 76 [cuestionario]: <div class="acad-step"><span>5</span><b>Realizar</b><p>Marca realizada → habilita cuestionario.</p></div>
+- orbit360-platform\core\manuales-data.js linea 77 [cuestionario]: <div class="acad-step"><span>6</span><b>Cuestionario</b><p>Llena, adjunta evidencias, envía.</p></div>
+- orbit360-platform\core\manuales-data.js linea 82 [visita]: <li><b>Mi Día</b>: cronograma tipo calendario con visitas y tareas pendientes.</li>
+- orbit360-platform\core\manuales-data.js linea 82 [visitas]: <li><b>Mi Día</b>: cronograma tipo calendario con visitas y tareas pendientes.</li>
+- orbit360-platform\core\manuales-data.js linea 83 [shopper]: <li><b>Dashboard operativo</b>: KPIs clickeables, avance real vs ideal por país, ranking de shoppers, comparativo trimestral, estado operativo de visitas.</li>
+- orbit360-platform\core\manuales-data.js linea 83 [shoppers]: <li><b>Dashboard operativo</b>: KPIs clickeables, avance real vs ideal por país, ranking de shoppers, comparativo trimestral, estado operativo de visitas.</li>
+- orbit360-platform\core\manuales-data.js linea 83 [visita]: <li><b>Dashboard operativo</b>: KPIs clickeables, avance real vs ideal por país, ranking de shoppers, comparativo trimestral, estado operativo de visitas.</li>
+- orbit360-platform\core\manuales-data.js linea 83 [visitas]: <li><b>Dashboard operativo</b>: KPIs clickeables, avance real vs ideal por país, ranking de shoppers, comparativo trimestral, estado operativo de visitas.</li>
+- orbit360-platform\core\manuales-data.js linea 84 [shopper]: <li><b>Visitas</b>: tabla operativa (admin) / marketplace (shopper).</li>
+- orbit360-platform\core\manuales-data.js linea 84 [visita]: <li><b>Visitas</b>: tabla operativa (admin) / marketplace (shopper).</li>
+- orbit360-platform\core\manuales-data.js linea 84 [visitas]: <li><b>Visitas</b>: tabla operativa (admin) / marketplace (shopper).</li>
+- orbit360-platform\core\manuales-data.js linea 85 [postulaciones]: <li><b>Postulaciones</b>: aprobar/rechazar/standby/reprogramar/reasignar/cancelar, con trazabilidad de quién gestionó.</li>
+- orbit360-platform\core\manuales-data.js linea 95 [visita]: <li><b>Liquidaciones</b>: se generan automáticamente de las visitas; elige cuáles van al lote; las no pagadas pasan a CxP el mes siguiente.</li>
+- orbit360-platform\core\manuales-data.js linea 95 [visitas]: <li><b>Liquidaciones</b>: se generan automáticamente de las visitas; elige cuáles van al lote; las no pagadas pasan a CxP el mes siguiente.</li>
+- orbit360-platform\core\manuales-data.js linea 96 [shopper]: <li><b>Lotes de pago</b>: al pagar, se reflejan como egresos por shopper.</li>
+- orbit360-platform\core\manuales-data.js linea 110 [shopper]: <li><b>Certificación</b>: el shopper debe certificarse por proyecto antes de postularse. Genera banco de preguntas con IA desde el instructivo; recertificación con notificación.</li>
+- orbit360-platform\core\manuales-data.js linea 118 [cuestionario]: <li><b>Make.com</b>: la integración más importante. Cada evento (postulación, agenda, realizada, cuestionario, reprogramación, pago, atraso) puede disparar un escenario que ramifica a WhatsApp/correo/Sheets. Webhook por tenant (cada consultora usa los suyos).</li>
+- orbit360-platform\core\manuales-data.js linea 119 [shopper]: <li><b>WhatsApp Business</b>: notificaciones al shopper.</li>
+- orbit360-platform\core\manuales-data.js linea 135 [visita]: {t:'1 · Tu rol y acceso', html:`<h2>Equipo administrativo</h2><p>Ves toda la operación, finanzas y comercial. No tienes acceso a la configuración técnica avanzada del Super Admin. Tu día se centra en gestionar proyectos, visitas, postulaciones y el seguimiento financiero.</p>`},
+- orbit360-platform\core\manuales-data.js linea 135 [visitas]: {t:'1 · Tu rol y acceso', html:`<h2>Equipo administrativo</h2><p>Ves toda la operación, finanzas y comercial. No tienes acceso a la configuración técnica avanzada del Super Admin. Tu día se centra en gestionar proyectos, visitas, postulaciones y el seguimiento financiero.</p>`},
+- orbit360-platform\core\manuales-data.js linea 135 [postulaciones]: {t:'1 · Tu rol y acceso', html:`<h2>Equipo administrativo</h2><p>Ves toda la operación, finanzas y comercial. No tienes acceso a la configuración técnica avanzada del Super Admin. Tu día se centra en gestionar proyectos, visitas, postulaciones y el seguimiento financiero.</p>`},
+- orbit360-platform\core\manuales-data.js linea 136 [cuestionario]: {t:'2 · Crear y configurar un proyecto', html:`<h2>Set-up de un programa</h2><ol><li>Admin del Proyecto → Proyectos → Crear.</li><li>Define países, monedas, honorarios por país, reembolsos, modelo (directo/delegado), periodicidad de rondas y periodo de cumplimiento.</li><li>Carga el instructivo → la IA propone escenarios y cuestionario.</li><li>Configura la certificación.</li><li>Carga la HR (importador) o conéctala en vivo (Google Sheets).</li></ol>`},
+- orbit360-platform\core\manuales-data.js linea 137 [visita]: {t:'3 · Gestión operativa diaria', html:`<h2>Tu rutina</h2><ul><li><b>Mi Día</b>: revisa visitas y tareas del día.</li><li><b>Dashboard</b>: vigila avance vs meta, atrasos, ranking.</li><li><b>Postulaciones</b>: aprueba/rechaza, reasigna, reprograma. Todo queda con tu nombre como gestor.</li><li><b>Estado operativo de visitas</b>: gestiona masiva o individualmente; notifica por WhatsApp/correo.</li></ul>`},
+- orbit360-platform\core\manuales-data.js linea 137 [visitas]: {t:'3 · Gestión operativa diaria', html:`<h2>Tu rutina</h2><ul><li><b>Mi Día</b>: revisa visitas y tareas del día.</li><li><b>Dashboard</b>: vigila avance vs meta, atrasos, ranking.</li><li><b>Postulaciones</b>: aprueba/rechaza, reasigna, reprograma. Todo queda con tu nombre como gestor.</li><li><b>Estado operativo de visitas</b>: gestiona masiva o individualmente; notifica por WhatsApp/correo.</li></ul>`},
+- orbit360-platform\core\manuales-data.js linea 137 [postulaciones]: {t:'3 · Gestión operativa diaria', html:`<h2>Tu rutina</h2><ul><li><b>Mi Día</b>: revisa visitas y tareas del día.</li><li><b>Dashboard</b>: vigila avance vs meta, atrasos, ranking.</li><li><b>Postulaciones</b>: aprueba/rechaza, reasigna, reprograma. Todo queda con tu nombre como gestor.</li><li><b>Estado operativo de visitas</b>: gestiona masiva o individualmente; notifica por WhatsApp/correo.</li></ul>`},
+- orbit360-platform\core\manuales-data.js linea 144 [visita]: desc:'Operación de visitas, postulaciones y seguimiento — sin acceso a finanzas.',
+- orbit360-platform\core\manuales-data.js linea 144 [visitas]: desc:'Operación de visitas, postulaciones y seguimiento — sin acceso a finanzas.',
+- orbit360-platform\core\manuales-data.js linea 144 [postulaciones]: desc:'Operación de visitas, postulaciones y seguimiento — sin acceso a finanzas.',
+- orbit360-platform\core\manuales-data.js linea 146 [visita]: {t:'1 · Tu rol', html:`<h2>Equipo operativo</h2><p>Te enfocas en la operación: visitas, postulaciones, certificación y capacitación. No ves finanzas.</p>`},
+- orbit360-platform\core\manuales-data.js linea 146 [visitas]: {t:'1 · Tu rol', html:`<h2>Equipo operativo</h2><p>Te enfocas en la operación: visitas, postulaciones, certificación y capacitación. No ves finanzas.</p>`},
+- orbit360-platform\core\manuales-data.js linea 146 [postulaciones]: {t:'1 · Tu rol', html:`<h2>Equipo operativo</h2><p>Te enfocas en la operación: visitas, postulaciones, certificación y capacitación. No ves finanzas.</p>`},
+- orbit360-platform\core\manuales-data.js linea 147 [shopper]: {t:'2 · Gestionar visitas y postulaciones', html:`<h2>El día a día operativo</h2><ul><li>Publica visitas o carga la HR.</li><li>Aprueba postulaciones y asigna shoppers (manual o por postulación).</li><li>Da seguimiento al estado de cada visita hasta el cuestionario enviado.</li><li>Notifica a los shoppers atrasados.</li></ul>`},
+- orbit360-platform\core\manuales-data.js linea 147 [shoppers]: {t:'2 · Gestionar visitas y postulaciones', html:`<h2>El día a día operativo</h2><ul><li>Publica visitas o carga la HR.</li><li>Aprueba postulaciones y asigna shoppers (manual o por postulación).</li><li>Da seguimiento al estado de cada visita hasta el cuestionario enviado.</li><li>Notifica a los shoppers atrasados.</li></ul>`},
+- orbit360-platform\core\manuales-data.js linea 147 [visita]: {t:'2 · Gestionar visitas y postulaciones', html:`<h2>El día a día operativo</h2><ul><li>Publica visitas o carga la HR.</li><li>Aprueba postulaciones y asigna shoppers (manual o por postulación).</li><li>Da seguimiento al estado de cada visita hasta el cuestionario enviado.</li><li>Notifica a los shoppers atrasados.</li></ul>`},
+- orbit360-platform\core\manuales-data.js linea 147 [visitas]: {t:'2 · Gestionar visitas y postulaciones', html:`<h2>El día a día operativo</h2><ul><li>Publica visitas o carga la HR.</li><li>Aprueba postulaciones y asigna shoppers (manual o por postulación).</li><li>Da seguimiento al estado de cada visita hasta el cuestionario enviado.</li><li>Notifica a los shoppers atrasados.</li></ul>`},
+- orbit360-platform\core\manuales-data.js linea 147 [cuestionario]: {t:'2 · Gestionar visitas y postulaciones', html:`<h2>El día a día operativo</h2><ul><li>Publica visitas o carga la HR.</li><li>Aprueba postulaciones y asigna shoppers (manual o por postulación).</li><li>Da seguimiento al estado de cada visita hasta el cuestionario enviado.</li><li>Notifica a los shoppers atrasados.</li></ul>`},
+- orbit360-platform\core\manuales-data.js linea 147 [postulaciones]: {t:'2 · Gestionar visitas y postulaciones', html:`<h2>El día a día operativo</h2><ul><li>Publica visitas o carga la HR.</li><li>Aprueba postulaciones y asigna shoppers (manual o por postulación).</li><li>Da seguimiento al estado de cada visita hasta el cuestionario enviado.</li><li>Notifica a los shoppers atrasados.</li></ul>`},
+- orbit360-platform\core\manuales-data.js linea 148 [visita]: {t:'3 · Sin duplicar', html:`<h2>Cuidado con la HR en vivo</h2><p>Si gestionas desde la plataforma y desde la HR, el sistema no duplica. Siempre verifica que la visita aparezca con el gestor correcto.</p>`},
+- orbit360-platform\core\manuales-data.js linea 156 [shopper]: {t:'2 · Tu alcance', html:`<h2>Qué puedes ver y hacer</h2><ul><li>Ver y gestionar solo las visitas/HR de tu país asignado.</li><li>Asignar shoppers de tu país.</li><li>Dar seguimiento operativo local.</li><li>Toda tu gestión queda auditada con tu nombre.</li></ul>`},
+- orbit360-platform\core\manuales-data.js linea 156 [shoppers]: {t:'2 · Tu alcance', html:`<h2>Qué puedes ver y hacer</h2><ul><li>Ver y gestionar solo las visitas/HR de tu país asignado.</li><li>Asignar shoppers de tu país.</li><li>Dar seguimiento operativo local.</li><li>Toda tu gestión queda auditada con tu nombre.</li></ul>`},
+- orbit360-platform\core\manuales-data.js linea 156 [visita]: {t:'2 · Tu alcance', html:`<h2>Qué puedes ver y hacer</h2><ul><li>Ver y gestionar solo las visitas/HR de tu país asignado.</li><li>Asignar shoppers de tu país.</li><li>Dar seguimiento operativo local.</li><li>Toda tu gestión queda auditada con tu nombre.</li></ul>`},
+- orbit360-platform\core\manuales-data.js linea 156 [visitas]: {t:'2 · Tu alcance', html:`<h2>Qué puedes ver y hacer</h2><ul><li>Ver y gestionar solo las visitas/HR de tu país asignado.</li><li>Asignar shoppers de tu país.</li><li>Dar seguimiento operativo local.</li><li>Toda tu gestión queda auditada con tu nombre.</li></ul>`},
+- orbit360-platform\core\manuales-data.js linea 157 [shopper]: {t:'3 · Liquidaciones y honorarios', html:`<h2>Control local</h2><p>Según el modelo, puedes ver la liquidación de honorarios de tus shoppers y el cruce de cuentas cuando facturas localmente.</p>`},
+- orbit360-platform\core\manuales-data.js linea 157 [shoppers]: {t:'3 · Liquidaciones y honorarios', html:`<h2>Control local</h2><p>Según el modelo, puedes ver la liquidación de honorarios de tus shoppers y el cruce de cuentas cuando facturas localmente.</p>`},
+- orbit360-platform\core\manuales-data.js linea 161 [shopper]: id:'m_shopper', rol:'shopper', ic:'📱', titulo:'Manual del Shopper / Evaluador',
+- orbit360-platform\core\manuales-data.js linea 162 [visita]: desc:'Todo lo que el evaluador necesita: certificarse, postularse, ejecutar visitas, cobrar.',
+- orbit360-platform\core\manuales-data.js linea 162 [visitas]: desc:'Todo lo que el evaluador necesita: certificarse, postularse, ejecutar visitas, cobrar.',
+- orbit360-platform\core\manuales-data.js linea 164 [visita]: {t:'1 · Tu portal', html:`<h2>Bienvenido, evaluador</h2><p>Tu portal móvil tiene todo lo que necesitas: visitas disponibles, mis visitas, certificación, beneficios y soporte.</p>`},
+- orbit360-platform\core\manuales-data.js linea 164 [visitas]: {t:'1 · Tu portal', html:`<h2>Bienvenido, evaluador</h2><p>Tu portal móvil tiene todo lo que necesitas: visitas disponibles, mis visitas, certificación, beneficios y soporte.</p>`},
+- orbit360-platform\core\manuales-data.js linea 164 [beneficios]: {t:'1 · Tu portal', html:`<h2>Bienvenido, evaluador</h2><p>Tu portal móvil tiene todo lo que necesitas: visitas disponibles, mis visitas, certificación, beneficios y soporte.</p>`},
+- orbit360-platform\core\manuales-data.js linea 165 [visita]: {t:'2 · Certificarte', html:`<h2>Antes de tu primera visita</h2><p>Debes aprobar la certificación del proyecto. Estudia el instructivo y los recursos en Capacitación, luego presenta el examen. Recibirás feedback detallado de cada respuesta.</p>`},
+- orbit360-platform\core\manuales-data.js linea 166 [visita]: {t:'3 · Postularte y agendar', html:`<h2>Conseguir visitas</h2><ol><li>En Visitas Disponibles ves la oferta de todos los proyectos (filtra por país/proyecto).</li><li>Reserva o postúlate a las sucursales que quieras.</li><li>Cuando te aprueban, agenda fecha y franja.</li></ol>`},
+- orbit360-platform\core\manuales-data.js linea 166 [visitas]: {t:'3 · Postularte y agendar', html:`<h2>Conseguir visitas</h2><ol><li>En Visitas Disponibles ves la oferta de todos los proyectos (filtra por país/proyecto).</li><li>Reserva o postúlate a las sucursales que quieras.</li><li>Cuando te aprueban, agenda fecha y franja.</li></ol>`},
+- orbit360-platform\core\manuales-data.js linea 167 [visita]: {t:'4 · Ejecutar la visita', html:`<h2>El día de la visita</h2><ol><li>Marca la visita como realizada.</li><li>Se habilita el cuestionario: llénalo y adjunta las evidencias requeridas (foto, foto geolocalizada, audio o video según el escenario).</li><li>Envía el cuestionario.</li></ol>`},
+- orbit360-platform\core\manuales-data.js linea 167 [cuestionario]: {t:'4 · Ejecutar la visita', html:`<h2>El día de la visita</h2><ol><li>Marca la visita como realizada.</li><li>Se habilita el cuestionario: llénalo y adjunta las evidencias requeridas (foto, foto geolocalizada, audio o video según el escenario).</li><li>Envía el cuestionario.</li></ol>`},
+
+## Referencias en ZIP auditado
+
+- ZIP app.js linea 2 [Orbia]: CXOrbia · Boot + login / role selection
+- ZIP app.js linea 2 [CXOrbia]: CXOrbia · Boot + login / role selection
+- ZIP app.js linea 82 [Orbia]: /* logo pequeño de CXOrbia como "desarrollado por" (siempre visible en el pie del login) */
+- ZIP app.js linea 82 [CXOrbia]: /* logo pequeño de CXOrbia como "desarrollado por" (siempre visible en el pie del login) */
+- ZIP app.js linea 84 [Orbia]: const devForFooter = `<div class="login-poweredby">${cxLogo} <span>Desarrollado por <b>CXOrbia</b></span></div>`;
+- ZIP app.js linea 84 [CXOrbia]: const devForFooter = `<div class="login-poweredby">${cxLogo} <span>Desarrollado por <b>CXOrbia</b></span></div>`;
+- ZIP app.js linea 104 [shopper]: <button class="role-btn role-shopper" data-role="shopper">
+- ZIP app.js linea 106 [shopper]: <div><div class="r-t">Shopper / Evaluador</div>
+- ZIP app.js linea 107 [visita]: <div class="r-d">Portal móvil: visitas, certificación y pagos</div></div>
+- ZIP app.js linea 107 [visitas]: <div class="r-d">Portal móvil: visitas, certificación y pagos</div></div>
+- ZIP app.js linea 124 [visita]: <p style="font-size:13px;color:var(--t2);margin-bottom:14px">Crea tu cuenta. El equipo revisará tu perfil y te habilitará las visitas de tu país. Los campos marcados con <b style="color:var(--accent)">*</b> son obligatorios.</p>
+- ZIP app.js linea 124 [visitas]: <p style="font-size:13px;color:var(--t2);margin-bottom:14px">Crea tu cuenta. El equipo revisará tu perfil y te habilitará las visitas de tu país. Los campos marcados con <b style="color:var(--accent)">*</b> son obligatorios.</p>
+- ZIP app.js linea 136 [visita]: (<b>${CX.CREDS.userExample()}</b> · <b>${CX.CREDS.passExample()}</b>). Edad y sexo se usan para automatizar la asignación de visitas.</div>
+- ZIP app.js linea 136 [visitas]: (<b>${CX.CREDS.userExample()}</b> · <b>${CX.CREDS.passExample()}</b>). Edad y sexo se usan para automatizar la asignación de visitas.</div>
+- ZIP app.js linea 143 [visita]: if(f&&l) ov.querySelector('#rgCreds').innerHTML=`Tu cuenta será — usuario: <b>${CX.CREDS.user(f,l)}</b> · contraseña: <b>${CX.CREDS.pass(f,l)}</b>. Edad y sexo se usan para automatizar la asignación de visitas.`;
+- ZIP app.js linea 143 [visitas]: if(f&&l) ov.querySelector('#rgCreds').innerHTML=`Tu cuenta será — usuario: <b>${CX.CREDS.user(f,l)}</b> · contraseña: <b>${CX.CREDS.pass(f,l)}</b>. Edad y sexo se usan para automatizar la asignación de visitas.`;
+- ZIP app.js linea 153 [shopper]: const s=CX.data.addShopper({
+- ZIP app.js linea 167 [shopper]: /* confirmación de registro + acceso directo al portal del nuevo shopper */
+- ZIP app.js linea 179 [visita]: <p style="font-size:12.5px;color:var(--t2);line-height:1.6">Al ingresar podrás <b>completar tu perfil</b> (documento, ciudad, cuenta de pago) y empezar a postularte a visitas de tu país.</p>
+- ZIP app.js linea 179 [visitas]: <p style="font-size:12.5px;color:var(--t2);line-height:1.6">Al ingresar podrás <b>completar tu perfil</b> (documento, ciudad, cuenta de pago) y empezar a postularte a visitas de tu país.</p>
+- ZIP app.js linea 183 [shopper]: ov.querySelector('#rgEnter').addEventListener('click',()=>{ close(); this.selectRole('shopper', s.id); });
+- ZIP app.js linea 187 [shopper]: selectRole(role, shopperId){
+- ZIP app.js linea 194 [shopper]: const sid=shopperId||'sh1';
+- ZIP app.js linea 195 [shopper]: const s=CX.data.getShopper ? CX.data.getShopper(sid) : null;
+- ZIP app.js linea 196 [shopper]: CX.session.user={name:(s&&s.nombre)||'Evaluador 01', role:'shopper', shopperId:sid, code:(s&&s.code)||'EVL-01'};
+- ZIP index.html linea 6 [Orbia]: <title>CXOrbia · Plataforma Operativa de Campo</title>
+- ZIP index.html linea 6 [CXOrbia]: <title>CXOrbia · Plataforma Operativa de Campo</title>
+- ZIP index.html linea 56 [shopper]: <script src="core/shoppers-store.js"></script>
+- ZIP index.html linea 56 [shoppers]: <script src="core/shoppers-store.js"></script>
+- ZIP index.html linea 79 [visita]: <script src="modules/visitas.js"></script>
+- ZIP index.html linea 79 [visitas]: <script src="modules/visitas.js"></script>
+- ZIP index.html linea 80 [visita]: <script src="modules/visita-detalle.js"></script>
+- ZIP index.html linea 81 [shopper]: <script src="modules/cuestionario-shopper.js"></script>
+- ZIP index.html linea 81 [cuestionario]: <script src="modules/cuestionario-shopper.js"></script>
+- ZIP index.html linea 82 [postulaciones]: <script src="modules/postulaciones.js"></script>
+- ZIP index.html linea 83 [shopper]: <script src="modules/shoppers.js"></script>
+- ZIP index.html linea 83 [shoppers]: <script src="modules/shoppers.js"></script>
+- ZIP index.html linea 84 [visita]: <script src="modules/misvisitas.js"></script>
+- ZIP index.html linea 84 [visitas]: <script src="modules/misvisitas.js"></script>
+- ZIP index.html linea 85 [beneficios]: <script src="modules/beneficios.js"></script>
+- ZIP index.html linea 103 [rutas]: <script src="modules/rutas.js"></script>
+- ZIP manifest.webmanifest linea 2 [Orbia]: "name": "CXOrbia · Plataforma Operativa de Campo",
+- ZIP manifest.webmanifest linea 2 [CXOrbia]: "name": "CXOrbia · Plataforma Operativa de Campo",
+- ZIP manifest.webmanifest linea 3 [Orbia]: "short_name": "CXOrbia",
+- ZIP manifest.webmanifest linea 3 [CXOrbia]: "short_name": "CXOrbia",
+- ZIP manifest.webmanifest linea 4 [mystery]: "description": "Mystery shopping, CX y auditoría de campo",
+- ZIP manifest.webmanifest linea 4 [mystery shopping]: "description": "Mystery shopping, CX y auditoría de campo",
+- ZIP README.md linea 1 [Orbia]: # CXOrbia — Plataforma Operativa de Campo
+- ZIP README.md linea 1 [CXOrbia]: # CXOrbia — Plataforma Operativa de Campo
+- ZIP README.md linea 3 [Orbia]: > Versión **comercial / white-label** de CXOrbia: mystery shopping, experiencia al cliente y auditoría de campo en una sola plataforma.
+- ZIP README.md linea 3 [CXOrbia]: > Versión **comercial / white-label** de CXOrbia: mystery shopping, experiencia al cliente y auditoría de campo en una sola plataforma.
+- ZIP README.md linea 3 [mystery]: > Versión **comercial / white-label** de CXOrbia: mystery shopping, experiencia al cliente y auditoría de campo en una sola plataforma.
+- ZIP README.md linea 3 [mystery shopping]: > Versión **comercial / white-label** de CXOrbia: mystery shopping, experiencia al cliente y auditoría de campo en una sola plataforma.
+- ZIP README.md linea 4 [T&A]: > Esta base es el punto de partida arquitectónico para comercializar el producto, separada de la operación real de T&A Consultores (sin datos reales, marca neutral, multi-proyecto).
+- ZIP README.md linea 12 [shopper]: Una **aplicación web modular** que reproduce el flujo operativo completo del negocio —configurar proyecto → publicar visitas → captar/asignar shoppers → instruir → certificar → agendar → ejecutar → liquidar → reportar— con **dos perfiles**:
+- ZIP README.md linea 12 [shoppers]: Una **aplicación web modular** que reproduce el flujo operativo completo del negocio —configurar proyecto → publicar visitas → captar/asignar shoppers → instruir → certificar → agendar → ejecutar → liquidar → reportar— con **dos perfiles**:
+- ZIP README.md linea 12 [visita]: Una **aplicación web modular** que reproduce el flujo operativo completo del negocio —configurar proyecto → publicar visitas → captar/asignar shoppers → instruir → certificar → agendar → ejecutar → liquidar → reportar— con **dos perfiles**:
+- ZIP README.md linea 12 [visitas]: Una **aplicación web modular** que reproduce el flujo operativo completo del negocio —configurar proyecto → publicar visitas → captar/asignar shoppers → instruir → certificar → agendar → ejecutar → liquidar → reportar— con **dos perfiles**:
+- ZIP README.md linea 15 [shopper]: - 📱 **Portal Shopper / Evaluador** — visitas, certificación, ejecución y pagos.
+- ZIP README.md linea 15 [visita]: - 📱 **Portal Shopper / Evaluador** — visitas, certificación, ejecución y pagos.
+- ZIP README.md linea 15 [visitas]: - 📱 **Portal Shopper / Evaluador** — visitas, certificación, ejecución y pagos.
+- ZIP README.md linea 17 [cuestionario]: Es **multi-proyecto e IA-adaptable**: al cambiar de proyecto, todo el dashboard, los KPIs, las reglas y los cuestionarios se reconfiguran para ese cliente sin tocar código.
+- ZIP README.md linea 19 [T&A]: > ⚠️ **Demo comercial con datos ficticios.** No contiene datos ni marca reales de T&A. Pensada para presentar, pilotear y entregar a desarrollo.
+- ZIP README.md linea 58 [visita]: │ ├── dashboard.js proyectos.js visitas.js postulaciones.js …
+- ZIP README.md linea 58 [visitas]: │ ├── dashboard.js proyectos.js visitas.js postulaciones.js …
+- ZIP README.md linea 58 [postulaciones]: │ ├── dashboard.js proyectos.js visitas.js postulaciones.js …
+- ZIP README.md linea 73 [Orbia]: name: 'CXOrbia',
+- ZIP README.md linea 73 [CXOrbia]: name: 'CXOrbia',
+- ZIP README.md linea 85 [shopper]: Operación, Portal Shopper, Finanzas y Configuración. Detalle de cada uno (problema, función, capa IA, valor) en **[docs/MODULES.md](docs/MODULES.md)**.
+- ZIP README.md linea 87 [shopper]: | Operación (Admin) | Portal Shopper | Finanzas (Admin) | Configuración |
+- ZIP README.md linea 89 [shopper]: | Mi Día · Dashboard · Proyectos · Visitas · Postulaciones · Shoppers · Hojas de Ruta · Documentos · Aprendizaje · Certificación · Tablón · Soporte IA · Reportes | Mi Día · Mi Perfil · Visitas · Mis Visitas · Documentos · Aprendizaje · Certificación · Novedades · Soporte IA · Mis Beneficios | Dashboard Financiero · Movimientos · Liquidaciones · Lotes | Cuestionarios · Usuarios & Permisos · Configuración |
+- ZIP README.md linea 89 [shoppers]: | Mi Día · Dashboard · Proyectos · Visitas · Postulaciones · Shoppers · Hojas de Ruta · Documentos · Aprendizaje · Certificación · Tablón · Soporte IA · Reportes | Mi Día · Mi Perfil · Visitas · Mis Visitas · Documentos · Aprendizaje · Certificación · Novedades · Soporte IA · Mis Beneficios | Dashboard Financiero · Movimientos · Liquidaciones · Lotes | Cuestionarios · Usuarios & Permisos · Configuración |
+- ZIP README.md linea 89 [visita]: | Mi Día · Dashboard · Proyectos · Visitas · Postulaciones · Shoppers · Hojas de Ruta · Documentos · Aprendizaje · Certificación · Tablón · Soporte IA · Reportes | Mi Día · Mi Perfil · Visitas · Mis Visitas · Documentos · Aprendizaje · Certificación · Novedades · Soporte IA · Mis Beneficios | Dashboard Financiero · Movimientos · Liquidaciones · Lotes | Cuestionarios · Usuarios & Permisos · Configuración |
+- ZIP README.md linea 89 [visitas]: | Mi Día · Dashboard · Proyectos · Visitas · Postulaciones · Shoppers · Hojas de Ruta · Documentos · Aprendizaje · Certificación · Tablón · Soporte IA · Reportes | Mi Día · Mi Perfil · Visitas · Mis Visitas · Documentos · Aprendizaje · Certificación · Novedades · Soporte IA · Mis Beneficios | Dashboard Financiero · Movimientos · Liquidaciones · Lotes | Cuestionarios · Usuarios & Permisos · Configuración |
+- ZIP README.md linea 89 [cuestionario]: | Mi Día · Dashboard · Proyectos · Visitas · Postulaciones · Shoppers · Hojas de Ruta · Documentos · Aprendizaje · Certificación · Tablón · Soporte IA · Reportes | Mi Día · Mi Perfil · Visitas · Mis Visitas · Documentos · Aprendizaje · Certificación · Novedades · Soporte IA · Mis Beneficios | Dashboard Financiero · Movimientos · Liquidaciones · Lotes | Cuestionarios · Usuarios & Permisos · Configuración |
+- ZIP README.md linea 89 [postulaciones]: | Mi Día · Dashboard · Proyectos · Visitas · Postulaciones · Shoppers · Hojas de Ruta · Documentos · Aprendizaje · Certificación · Tablón · Soporte IA · Reportes | Mi Día · Mi Perfil · Visitas · Mis Visitas · Documentos · Aprendizaje · Certificación · Novedades · Soporte IA · Mis Beneficios | Dashboard Financiero · Movimientos · Liquidaciones · Lotes | Cuestionarios · Usuarios & Permisos · Configuración |
+- ZIP README.md linea 89 [beneficios]: | Mi Día · Dashboard · Proyectos · Visitas · Postulaciones · Shoppers · Hojas de Ruta · Documentos · Aprendizaje · Certificación · Tablón · Soporte IA · Reportes | Mi Día · Mi Perfil · Visitas · Mis Visitas · Documentos · Aprendizaje · Certificación · Novedades · Soporte IA · Mis Beneficios | Dashboard Financiero · Movimientos · Liquidaciones · Lotes | Cuestionarios · Usuarios & Permisos · Configuración |
+- ZIP README.md linea 97 [T&A]: ## Relación con la plataforma de T&A
+- ZIP README.md linea 99 [T&A]: Esta base es **independiente** del HTML operativo actual de T&A. Recomendación: T&A sigue operando en su instancia; cuando este core esté sólido, T&A se migra como **"proyecto / tenant #1"** sobre esta arquitectura modular. Ver [ARCHITECTURE.md](docs/ARCHITECTURE.md).
+- ZIP sw.js linea 1 [Orbia]: /* CXOrbia · Service Worker mínimo — habilita instalación PWA y caché básico offline */
+- ZIP sw.js linea 1 [CXOrbia]: /* CXOrbia · Service Worker mínimo — habilita instalación PWA y caché básico offline */
+- ZIP sw.js linea 2 [Orbia]: const CX_CACHE = 'cxorbia-v1';
+- ZIP sw.js linea 2 [CXOrbia]: const CX_CACHE = 'cxorbia-v1';
+- ZIP automations.js linea 2 [Orbia]: CXOrbia · Automatizaciones (Make) + alertas de pendientes
+- ZIP automations.js linea 2 [CXOrbia]: CXOrbia · Automatizaciones (Make) + alertas de pendientes
+- ZIP automations.js linea 5 [shopper]: - Notifica al equipo TODOS los movimientos del shopper.
+- ZIP automations.js linea 6 [visita]: - Detecta visitas atrasadas / pendientes / desactualizadas y
+- ZIP automations.js linea 6 [visitas]: - Detecta visitas atrasadas / pendientes / desactualizadas y
+- ZIP automations.js linea 19 [shopper]: {id:'a_postulacion', evento:'postulacion', activa:true, canal:'whatsapp', to:'admin', titulo:'Nueva postulación', plantilla:'{shopper} se postuló a {sucursal}'},
+- ZIP automations.js linea 20 [shopper]: {id:'a_agenda', evento:'agenda', activa:true, canal:'push', to:'admin', titulo:'Visita agendada', plantilla:'{shopper} agendó {sucursal} para {fecha}'},
+- ZIP automations.js linea 20 [visita]: {id:'a_agenda', evento:'agenda', activa:true, canal:'push', to:'admin', titulo:'Visita agendada', plantilla:'{shopper} agendó {sucursal} para {fecha}'},
+- ZIP automations.js linea 21 [shopper]: {id:'a_realizada', evento:'realizada', activa:true, canal:'push', to:'admin', titulo:'Visita realizada', plantilla:'{shopper} realizó {sucursal} · validar cuestionario'},
+- ZIP automations.js linea 21 [visita]: {id:'a_realizada', evento:'realizada', activa:true, canal:'push', to:'admin', titulo:'Visita realizada', plantilla:'{shopper} realizó {sucursal} · validar cuestionario'},
+- ZIP automations.js linea 21 [cuestionario]: {id:'a_realizada', evento:'realizada', activa:true, canal:'push', to:'admin', titulo:'Visita realizada', plantilla:'{shopper} realizó {sucursal} · validar cuestionario'},
+- ZIP automations.js linea 22 [shopper]: {id:'a_cuestionario',evento:'cuestionario',activa:true, canal:'push', to:'admin', titulo:'Cuestionario enviado', plantilla:'{shopper} envió el cuestionario de {sucursal} (score {score})'},
+- ZIP automations.js linea 22 [cuestionario]: {id:'a_cuestionario',evento:'cuestionario',activa:true, canal:'push', to:'admin', titulo:'Cuestionario enviado', plantilla:'{shopper} envió el cuestionario de {sucursal} (score {score})'},
+- ZIP automations.js linea 23 [shopper]: {id:'a_reprog', evento:'reprog', activa:true, canal:'whatsapp', to:'admin', titulo:'Reprogramación solicitada', plantilla:'{shopper} pide reprogramar {sucursal}'},
+- ZIP automations.js linea 24 [shopper]: {id:'a_pago', evento:'pago', activa:true, canal:'whatsapp', to:'shopper', titulo:'Pago realizado', plantilla:'Tu liquidación de {sucursal} pasó a pagada'},
+- ZIP automations.js linea 25 [visita]: {id:'a_atraso', evento:'atraso', activa:true, canal:'whatsapp', to:'admin', titulo:'Visita atrasada', plantilla:'{sucursal} sin avance · vence {fecha}'},
+- ZIP automations.js linea 26 [shopper]: {id:'a_aprobacion', evento:'aprobacion', activa:true, canal:'whatsapp', to:'shopper', titulo:'Postulación aprobada', plantilla:'Tu visita a {sucursal} fue aprobada'},
+- ZIP automations.js linea 26 [visita]: {id:'a_aprobacion', evento:'aprobacion', activa:true, canal:'whatsapp', to:'shopper', titulo:'Postulación aprobada', plantilla:'Tu visita a {sucursal} fue aprobada'},
+- ZIP automations.js linea 27 [shopper]: {id:'a_hr_writeback',evento:'hr_writeback', activa:true, canal:'sheet', to:'admin', titulo:'HR actualizada', plantilla:'{sucursal}: {shopper} · {fecha} · {estado} (sincronizado a la HR)'},
+- ZIP automations.js linea 28 [shopper]: {id:'a_shopper_edit',evento:'shopper_edit', activa:true, canal:'push', to:'admin', titulo:'Datos de shopper actualizados', plantilla:'{shopper} actualizó: {campos}'},
+- ZIP automations.js linea 127 [shopper]: EVENTOS:{postulacion:'Postulación creada', agenda:'Visita agendada', realizada:'Visita realizada', cuestionario:'Cuestionario enviado', reprog:'Reprogramación', pago:'Pago/liquidación', atraso:'Visita atrasada/pendiente', aprobacion:'Postulación aprobada', hr_writeback:'Escritura de vuelta a HR', shopper_edit:'Cambio de datos del shopper'},
+- ZIP automations.js linea 127 [visita]: EVENTOS:{postulacion:'Postulación creada', agenda:'Visita agendada', realizada:'Visita realizada', cuestionario:'Cuestionario enviado', reprog:'Reprogramación', pago:'Pago/liquidación', atraso:'Visita atrasada/pendiente', aprobacion:'Postulación aprobada', hr_writeback:'Escritura de vuelta a HR', shopper_edit:'Cambio de datos del shopper'},
+- ZIP automations.js linea 127 [cuestionario]: EVENTOS:{postulacion:'Postulación creada', agenda:'Visita agendada', realizada:'Visita realizada', cuestionario:'Cuestionario enviado', reprog:'Reprogramación', pago:'Pago/liquidación', atraso:'Visita atrasada/pendiente', aprobacion:'Postulación aprobada', hr_writeback:'Escritura de vuelta a HR', shopper_edit:'Cambio de datos del shopper'},
+- ZIP automations.js linea 135 [TyA]: /* tenant activo (cada consultora guarda SUS propios webhooks; p.ej. TyA usa los suyos) */
+- ZIP automations.js linea 159 [shopper]: _icon(e){ return {postulacion:'📩',agenda:'📅',realizada:'✅',cuestionario:'📝',reprog:'🔄',pago:'💰',atraso:'⏰',aprobacion:'✅',hr_writeback:'🔃',shopper_edit:'✏️'}[e]||'🔔'; },
+- ZIP automations.js linea 159 [cuestionario]: _icon(e){ return {postulacion:'📩',agenda:'📅',realizada:'✅',cuestionario:'📝',reprog:'🔄',pago:'💰',atraso:'⏰',aprobacion:'✅',hr_writeback:'🔃',shopper_edit:'✏️'}[e]||'🔔'; },
+- ZIP automations.js linea 160 [shopper]: _tone(e){ return {postulacion:'b',agenda:'g',realizada:'b',cuestionario:'b',reprog:'a',pago:'g',atraso:'r',aprobacion:'g',hr_writeback:'b',shopper_edit:'b'}[e]||'b'; },
+- ZIP automations.js linea 160 [cuestionario]: _tone(e){ return {postulacion:'b',agenda:'g',realizada:'b',cuestionario:'b',reprog:'a',pago:'g',atraso:'r',aprobacion:'g',hr_writeback:'b',shopper_edit:'b'}[e]||'b'; },
+- ZIP automations.js linea 161 [shopper]: _nav(to,e){ if(to==='shopper') return e==='pago'?'beneficios':'misvisitas'; return e==='atraso'?'visitas':'postulaciones'; },
+- ZIP automations.js linea 161 [visita]: _nav(to,e){ if(to==='shopper') return e==='pago'?'beneficios':'misvisitas'; return e==='atraso'?'visitas':'postulaciones'; },
+- ZIP automations.js linea 161 [visitas]: _nav(to,e){ if(to==='shopper') return e==='pago'?'beneficios':'misvisitas'; return e==='atraso'?'visitas':'postulaciones'; },
+- ZIP automations.js linea 161 [postulaciones]: _nav(to,e){ if(to==='shopper') return e==='pago'?'beneficios':'misvisitas'; return e==='atraso'?'visitas':'postulaciones'; },
+- ZIP automations.js linea 161 [beneficios]: _nav(to,e){ if(to==='shopper') return e==='pago'?'beneficios':'misvisitas'; return e==='atraso'?'visitas':'postulaciones'; },
+- ZIP automations.js linea 163 [visita]: /* escanea visitas y detecta atrasadas / pendientes / desactualizadas */
+- ZIP automations.js linea 163 [visitas]: /* escanea visitas y detecta atrasadas / pendientes / desactualizadas */
+- ZIP automations.js linea 166 [visita]: (CX.data._visitas||[]).filter(v=>v.projectId===CX.data.currentProjectId).forEach(v=>{
+- ZIP automations.js linea 166 [visitas]: (CX.data._visitas||[]).filter(v=>v.projectId===CX.data.currentProjectId).forEach(v=>{
+
+## Procesos y puertos
+
+Ver reporte TXT para comandos completos de Node y puertos 5177/5178.
+
+## Decision y siguiente paso
+
+Hay evidencia suficiente para abrir limpieza tecnica antes de continuar integrando prototipos. No borrar manualmente. Preparar rollback o limpieza controlada sobre los archivos listados, con backup y commit.

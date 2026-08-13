@@ -1,0 +1,90 @@
+{
+  "schemaVersion": "orbit360-m4-post-retirement-revalidation-closure-v1",
+  "issuedAt": "2026-07-28",
+  "gateId": "block4-post-retirement-revalidation-readonly-v20260728",
+  "contractVersion": "4.2.10",
+  "status": "M4_POST_RETIREMENT_REVALIDATION_READONLY_CLOSED_SUCCESS",
+  "requestCommit": "6f478987a66f34aefcfc0526d58d3089162a4ee7",
+  "runId": 30395639383,
+  "jobId": 90397715932,
+  "artifactId": 8702669519,
+  "artifactDigest": "sha256:dc3181a0256ccd1e26bf98fb1c9062f0aed01deef96ccd118858b2a028dcdb29",
+  "priorFailedExecution": {
+    "runId": 30395156011,
+    "jobId": 90396118824,
+    "artifactId": 8702484870,
+    "classification": "PIPELINE_MECHANISM_FAILURE",
+    "cause": "collectionGroup_two_filter_query_required_unneeded_index",
+    "operationalWrites": 0,
+    "resolution": "tenant_auditEvents_then_exact_snapshotRef_reads"
+  },
+  "canonicalPreflight": {
+    "status": "GO_GATE_CONTRACT",
+    "passed": 28,
+    "total": 28,
+    "failed": 0,
+    "validatorRevision": "4.2.10-r1",
+    "activationMode": "immutable_request_present",
+    "mechanismNoCollectionGroup": true,
+    "mechanismAuditToSnapshotRef": true
+  },
+  "fixtureContract": {
+    "status": "PASS",
+    "passed": 17,
+    "total": 17,
+    "failed": 0,
+    "validationMode": "executed_contract_fixtures",
+    "literalSourceInspection": false
+  },
+  "result": {
+    "remoteReadConfirmed": true,
+    "priorWriteClosureValidated": true,
+    "sourceClients": 414,
+    "sourceInsurers": 26,
+    "targetClients": 0,
+    "targetInsurers": 0,
+    "targetTotal": 0,
+    "snapshotsReadable": 4,
+    "auditEventsReadable": 4,
+    "snapshotsMissing": 0,
+    "auditEventsMissing": 0,
+    "snapshotGateBindingValid": true,
+    "auditGateBindingValid": true,
+    "auditAppendOnlyValid": true
+  },
+  "writes": {
+    "operationalWrites": 0,
+    "configurationWrites": 0,
+    "membershipWrites": 0,
+    "clientWrites": 0,
+    "insurerWrites": 0,
+    "auditWrites": 0,
+    "snapshotWrites": 0,
+    "deletes": 0,
+    "merges": 0
+  },
+  "delivery": {
+    "indexCreated": false,
+    "rulesChanged": false,
+    "hostingDeploy": false,
+    "functionsDeploy": false,
+    "productionTouched": false,
+    "mergeMain": false
+  },
+  "authorization": {
+    "readOnlyExecutionConsumed": true,
+    "allowedExecutions": 0,
+    "clientCorrectionWriteAuthorized": false,
+    "m4WriteAuthorized": false
+  },
+  "approvalReadyForClientCorrectionWrite": true,
+  "clientCorrectionWriteAuthorized": false,
+  "approvalReadyForM4Write": false,
+  "nextAction": "REQUEST_SEPARATE_AUTHORIZATION_FOR_61_GT_GTQ_CLIENT_CORRECTION_WRITE",
+  "policiesBlocked": true,
+  "policiesSourceRule": "request_current_specific_policy_list_from_user_when_policy_block_starts; production_sheet_is_not_valid_policy_source",
+  "claudeClassification": "BACKEND_PROTEGIDO_NO_CLAUDE",
+  "academyClassification": "ACADEMIA_ACTUALIZAR",
+  "containsPII": false,
+  "containsSecrets": false
+}

@@ -1,0 +1,57 @@
+{
+  "schemaVersion": "orbit360-block12-route-navigation-rootcause-v1",
+  "sourceRunId": 30971226259,
+  "sourceHead": "104726bfef69776e3499a78ae07ad098b64ce159",
+  "gateId": "block12-operational-runtime-lab-v20260804",
+  "contractVersionObserved": "12.0.11",
+  "preflight": {
+    "status": "GO_GATE_CONTRACT",
+    "passed": 28,
+    "failed": 0
+  },
+  "stages": {
+    "functionsDeploy": "PASS",
+    "hostingPreview": "PASS",
+    "layoutFreeVisualStep": "COMPLETED_WITH_FAIL_EVIDENCE",
+    "integrity": "PASS"
+  },
+  "visual": {
+    "status": "CUMULATIVE_VISUAL_LAB_FAIL",
+    "classification": "PIPELINE_MECHANISM_FAILURE",
+    "passedRoutesBeforeFailure": ["cliente360"],
+    "firstFailedRoute": "aseguradoras",
+    "failureCode": "ROUTE_ASEGURADORAS_NAVIGATION_TIMEOUT",
+    "failureOwner": "in-page hash navigation on a long-lived SPA page",
+    "layoutProbeFailure": false,
+    "videoCaptureFailure": false,
+    "screenshotApiUsed": false,
+    "pageErrors": 0,
+    "functionalRegressionDemonstrated": false
+  },
+  "integrity": {
+    "status": "VISUAL_READONLY_INTEGRITY_PASS",
+    "unchanged": true,
+    "firestoreWrites": 0,
+    "authWrites": 0
+  },
+  "cleanup": {
+    "functionsKept": false,
+    "hostingPreviewKept": false
+  },
+  "stopRetry": {
+    "activeForInPageHashNavigation": true,
+    "sameMechanismWillNotBeRetried": true,
+    "replacementMechanism": "ONE_ISOLATED_BROWSER_CONTEXT_AND_DIRECT_URL_PER_ROUTE",
+    "syntheticEightRouteIsolationTestRequiredBeforeDeploy": true
+  },
+  "rulesDeployed": false,
+  "syntheticTenantCreated": false,
+  "realTenantWrites": 0,
+  "realDataReimported": false,
+  "productionTouched": false,
+  "mainTouched": false,
+  "mergeExecuted": false,
+  "containsPII": false,
+  "containsSecrets": false,
+  "ok": true
+}

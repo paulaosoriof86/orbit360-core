@@ -1,0 +1,106 @@
+{
+  "schemaVersion": "orbit360-policies-dual-path-root-cause-audit-v1",
+  "date": "2026-08-01",
+  "gateId": "block7-policies-static-v20260730",
+  "contractVersion": "7.0.1",
+  "status": "POLICIES_VISUAL_FROZEN_DUAL_PATH_DATA_CONTRACT_FAILURE",
+  "classification": "DATA_CONTRACT_FAILURE",
+  "secondaryClassification": "PIPELINE_MECHANISM_FAILURE",
+  "rootCause": {
+    "productCanonicalPath": "tenants/{tenantId}/data/{collection}/items",
+    "legacyOperationalPath": "tenantId/{tenantId}/{collection}",
+    "productRuntimeUsesCanonicalPath": true,
+    "baselineAndControlledWritersUsedLegacyPath": true,
+    "visualGateComparedDifferentPhysicalUniverses": true,
+    "authoritativePathDeclared": false
+  },
+  "visualRun": {
+    "run": 30723733270,
+    "job": 91431611947,
+    "artifact": 8825662341,
+    "digest": "sha256:5146e89ec68a23ac7be5ba5e957d57e2e31de530efde0631f20c64a9ea667fbf",
+    "preflightPassed": 19,
+    "preflightFailed": 0,
+    "projection": {
+      "clientes": 414,
+      "aseguradoras": 26,
+      "polizas": 2,
+      "vehiculos": 1,
+      "recibosEsperados": 0,
+      "carteraPrimas": 0,
+      "cobros": 2
+    },
+    "previewRolledBack": true,
+    "humanApprovalRecorded": false
+  },
+  "diagnostics": [
+    {
+      "run": 30723931071,
+      "job": 91432109841,
+      "artifact": 8825711437,
+      "digest": "sha256:bb6b14b289df020d041c34314d126b605ca1118683a1187230c836e331e321ed",
+      "classification": "VALIDATOR_STALE",
+      "preflightPassed": 17,
+      "preflightFailed": 0
+    },
+    {
+      "run": 30724084271,
+      "job": 91432515980,
+      "artifact": 8825758202,
+      "digest": "sha256:38ef5d0f26f344d8237d6d4dbaed9443832894c810d6c14c3e8e95da6c4f3cd4",
+      "validatorRevision": "top-level-country-v2",
+      "classification": "DATA_CONTRACT_FAILURE",
+      "preflightPassed": 22,
+      "preflightFailed": 0
+    }
+  ],
+  "legacyPathEvidence": {
+    "counts": {
+      "clientes": 430,
+      "aseguradoras": 30,
+      "polizas": 1373,
+      "vehiculos": 1032,
+      "recibosEsperados": 1294,
+      "carteraPrimas": 673,
+      "cobros": 5
+    },
+    "missingTopLevelCountry": {
+      "recibosEsperados": 1294,
+      "carteraPrimas": 673,
+      "cobros": 5,
+      "total": 1972
+    },
+    "exactRelationshipCandidates": 1972,
+    "unresolvedRelationships": 0,
+    "requiresValidationBeforeWrite": true
+  },
+  "humanApproval": {
+    "clientes": true,
+    "polizas": false,
+    "vehiculos": false,
+    "recibos": false,
+    "cartera": false,
+    "restoCrm": false
+  },
+  "controls": {
+    "firestoreWrites": 0,
+    "operationalWrites": 0,
+    "networkWriteCandidates": 0,
+    "rulesDeploy": false,
+    "functionsDeploy": false,
+    "defaultHostingDeploy": false,
+    "activePreview": false,
+    "productionTouched": false,
+    "mainTouched": false,
+    "mergeExecuted": false,
+    "reimportExecuted": false
+  },
+  "nextAction": "CANONICAL_VS_LEGACY_PATH_RECONCILIATION_READONLY",
+  "requiresNewAuthorization": true,
+  "containsPII": false,
+  "containsPolicyNumbers": false,
+  "containsAmounts": false,
+  "containsIds": false,
+  "containsSourceRows": false,
+  "containsSecrets": false
+}

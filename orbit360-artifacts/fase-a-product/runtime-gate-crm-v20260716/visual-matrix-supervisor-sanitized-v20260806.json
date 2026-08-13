@@ -1,0 +1,441 @@
+{
+  "schemaVersion": "orbit360-visual-matrix-signal-safe-supervisor-v1",
+  "status": "FAIL_MATRIX_CHILD",
+  "classification": "FUNCTIONAL_DEFECT",
+  "currentCheckpoint": "SUPERVISOR_CHILD_EXIT",
+  "observedCheckpoints": [
+    {
+      "checkpoint": "SUPERVISOR_CHILD_SPAWN",
+      "at": "2026-08-07T19:23:56.211Z",
+      "elapsedMs": 0
+    },
+    {
+      "checkpoint": "MATRIX_CHECKPOINT_PROTECTED_SNAPSHOT_BEFORE",
+      "at": "2026-08-07T19:23:57.216Z",
+      "elapsedMs": 1005,
+      "matrixCheckpoint": "PROTECTED_SNAPSHOT_BEFORE",
+      "role": ""
+    },
+    {
+      "checkpoint": "MATRIX_CHECKPOINT_DIRECCION_PAGE_GOTO",
+      "at": "2026-08-07T19:24:04.223Z",
+      "elapsedMs": 8012,
+      "matrixCheckpoint": "DIRECCION_PAGE_GOTO",
+      "role": "DIRECCION"
+    },
+    {
+      "checkpoint": "MATRIX_CHECKPOINT_DIRECCION_CUSTOM_TOKEN_SIGNIN",
+      "at": "2026-08-07T19:24:09.229Z",
+      "elapsedMs": 13018,
+      "matrixCheckpoint": "DIRECCION_CUSTOM_TOKEN_SIGNIN",
+      "role": "DIRECCION"
+    },
+    {
+      "checkpoint": "MATRIX_CHECKPOINT_DIRECCION_ROUTE_INICIO_REQUIRED_HYDRATION_WAIT",
+      "at": "2026-08-07T19:24:10.230Z",
+      "elapsedMs": 14019,
+      "matrixCheckpoint": "DIRECCION_ROUTE_INICIO_REQUIRED_HYDRATION_WAIT",
+      "role": "DIRECCION"
+    },
+    {
+      "checkpoint": "MATRIX_CHECKPOINT_DIRECCION_ROUTE_INICIO_RENDER_OBSERVER_ARM_WAIT",
+      "at": "2026-08-07T19:24:22.243Z",
+      "elapsedMs": 26032,
+      "matrixCheckpoint": "DIRECCION_ROUTE_INICIO_RENDER_OBSERVER_ARM_WAIT",
+      "role": "DIRECCION"
+    },
+    {
+      "checkpoint": "MATRIX_CHECKPOINT_DIRECCION_ROUTE_INICIO_RENDER_EVENT_WAIT",
+      "at": "2026-08-07T19:24:26.248Z",
+      "elapsedMs": 30037,
+      "matrixCheckpoint": "DIRECCION_ROUTE_INICIO_RENDER_EVENT_WAIT",
+      "role": "DIRECCION"
+    },
+    {
+      "checkpoint": "MATRIX_CHECKPOINT_DIRECCION_INICIO_CAPTURE_START",
+      "at": "2026-08-07T19:24:29.252Z",
+      "elapsedMs": 33041,
+      "matrixCheckpoint": "DIRECCION_INICIO_CAPTURE_START",
+      "role": "DIRECCION"
+    },
+    {
+      "checkpoint": "MATRIX_CHECKPOINT_DIRECCION_ROUTE_CLIENTE360_RENDER_EVENT_WAIT",
+      "at": "2026-08-07T19:24:30.253Z",
+      "elapsedMs": 34042,
+      "matrixCheckpoint": "DIRECCION_ROUTE_CLIENTE360_RENDER_EVENT_WAIT",
+      "role": "DIRECCION"
+    },
+    {
+      "checkpoint": "MATRIX_CHECKPOINT_DIRECCION_ROUTE_CLIENTE360_RENDER_READY_PASS",
+      "at": "2026-08-07T19:24:57.280Z",
+      "elapsedMs": 61069,
+      "matrixCheckpoint": "DIRECCION_ROUTE_CLIENTE360_RENDER_READY_PASS",
+      "role": "DIRECCION"
+    },
+    {
+      "checkpoint": "MATRIX_CHECKPOINT_DIRECCION_ROUTE_POLIZAS_RENDER_EVENT_WAIT",
+      "at": "2026-08-07T19:25:07.291Z",
+      "elapsedMs": 71080,
+      "matrixCheckpoint": "DIRECCION_ROUTE_POLIZAS_RENDER_EVENT_WAIT",
+      "role": "DIRECCION"
+    },
+    {
+      "checkpoint": "MATRIX_CHECKPOINT_DIRECCION_ROUTE_POLIZAS_RENDER_READY_PASS",
+      "at": "2026-08-07T19:25:21.305Z",
+      "elapsedMs": 85094,
+      "matrixCheckpoint": "DIRECCION_ROUTE_POLIZAS_RENDER_READY_PASS",
+      "role": "DIRECCION"
+    },
+    {
+      "checkpoint": "MATRIX_CHECKPOINT_DIRECCION_ROUTE_COBROS_RENDER_EVENT_WAIT",
+      "at": "2026-08-07T19:25:51.339Z",
+      "elapsedMs": 115128,
+      "matrixCheckpoint": "DIRECCION_ROUTE_COBROS_RENDER_EVENT_WAIT",
+      "role": "DIRECCION"
+    },
+    {
+      "checkpoint": "MATRIX_CHECKPOINT_DIRECCION_ROUTE_COBROS_RENDER_READY_PASS",
+      "at": "2026-08-07T19:25:52.339Z",
+      "elapsedMs": 116128,
+      "matrixCheckpoint": "DIRECCION_ROUTE_COBROS_RENDER_READY_PASS",
+      "role": "DIRECCION"
+    },
+    {
+      "checkpoint": "MATRIX_CHECKPOINT_DIRECCION_ROUTE_OPS_RENDER_READY_PASS",
+      "at": "2026-08-07T19:25:54.341Z",
+      "elapsedMs": 118130,
+      "matrixCheckpoint": "DIRECCION_ROUTE_OPS_RENDER_READY_PASS",
+      "role": "DIRECCION"
+    },
+    {
+      "checkpoint": "MATRIX_CHECKPOINT_DIRECCION_OPS_CAPTURE_PASS",
+      "at": "2026-08-07T19:25:57.345Z",
+      "elapsedMs": 121134,
+      "matrixCheckpoint": "DIRECCION_OPS_CAPTURE_PASS",
+      "role": "DIRECCION"
+    },
+    {
+      "checkpoint": "MATRIX_CHECKPOINT_DIRECCION_ROUTE_LEADS_RENDER_EVENT_WAIT",
+      "at": "2026-08-07T19:26:03.352Z",
+      "elapsedMs": 127141,
+      "matrixCheckpoint": "DIRECCION_ROUTE_LEADS_RENDER_EVENT_WAIT",
+      "role": "DIRECCION"
+    },
+    {
+      "checkpoint": "MATRIX_CHECKPOINT_DIRECCION_ROUTE_LEADS_RENDER_READY_PASS",
+      "at": "2026-08-07T19:26:04.352Z",
+      "elapsedMs": 128141,
+      "matrixCheckpoint": "DIRECCION_ROUTE_LEADS_RENDER_READY_PASS",
+      "role": "DIRECCION"
+    },
+    {
+      "checkpoint": "MATRIX_CHECKPOINT_DIRECCION_LEADS_CAPTURE_PASS",
+      "at": "2026-08-07T19:26:06.354Z",
+      "elapsedMs": 130143,
+      "matrixCheckpoint": "DIRECCION_LEADS_CAPTURE_PASS",
+      "role": "DIRECCION"
+    },
+    {
+      "checkpoint": "MATRIX_CHECKPOINT_DIRECCION_ROUTE_CONCILIACIONES_RENDER_READY_PASS",
+      "at": "2026-08-07T19:26:13.362Z",
+      "elapsedMs": 137151,
+      "matrixCheckpoint": "DIRECCION_ROUTE_CONCILIACIONES_RENDER_READY_PASS",
+      "role": "DIRECCION"
+    },
+    {
+      "checkpoint": "MATRIX_CHECKPOINT_DIRECCION_ROUTE_CANCELACIONES_RENDER_EVENT_WAIT",
+      "at": "2026-08-07T19:26:15.365Z",
+      "elapsedMs": 139154,
+      "matrixCheckpoint": "DIRECCION_ROUTE_CANCELACIONES_RENDER_EVENT_WAIT",
+      "role": "DIRECCION"
+    },
+    {
+      "checkpoint": "MATRIX_CHECKPOINT_DIRECCION_ROUTE_CANCELACIONES_RENDER_READY_PASS",
+      "at": "2026-08-07T19:26:16.367Z",
+      "elapsedMs": 140156,
+      "matrixCheckpoint": "DIRECCION_ROUTE_CANCELACIONES_RENDER_READY_PASS",
+      "role": "DIRECCION"
+    },
+    {
+      "checkpoint": "MATRIX_CHECKPOINT_DIRECCION_ROUTE_CLIENTE360_RENDER_EVENT_WAIT",
+      "at": "2026-08-07T19:26:18.370Z",
+      "elapsedMs": 142159,
+      "matrixCheckpoint": "DIRECCION_ROUTE_CLIENTE360_RENDER_EVENT_WAIT",
+      "role": "DIRECCION"
+    },
+    {
+      "checkpoint": "MATRIX_CHECKPOINT_DIRECCION_ROUTE_CLIENTE360_RENDER_READY_PASS",
+      "at": "2026-08-07T19:26:35.389Z",
+      "elapsedMs": 159178,
+      "matrixCheckpoint": "DIRECCION_ROUTE_CLIENTE360_RENDER_READY_PASS",
+      "role": "DIRECCION"
+    },
+    {
+      "checkpoint": "MATRIX_CHECKPOINT_DIRECCION_ROUTE_CLIENTE360_RENDER_EVENT_WAIT",
+      "at": "2026-08-07T19:26:57.412Z",
+      "elapsedMs": 181201,
+      "matrixCheckpoint": "DIRECCION_ROUTE_CLIENTE360_RENDER_EVENT_WAIT",
+      "role": "DIRECCION"
+    },
+    {
+      "checkpoint": "MATRIX_CHECKPOINT_DIRECCION_ROUTE_CLIENTE360_RENDER_READY_PASS",
+      "at": "2026-08-07T19:27:05.420Z",
+      "elapsedMs": 189209,
+      "matrixCheckpoint": "DIRECCION_ROUTE_CLIENTE360_RENDER_READY_PASS",
+      "role": "DIRECCION"
+    },
+    {
+      "checkpoint": "MATRIX_CHECKPOINT_OPERATIVO_PAGE_GOTO",
+      "at": "2026-08-07T19:27:26.441Z",
+      "elapsedMs": 210230,
+      "matrixCheckpoint": "OPERATIVO_PAGE_GOTO",
+      "role": "OPERATIVO"
+    },
+    {
+      "checkpoint": "MATRIX_CHECKPOINT_OPERATIVO_AUTH_INSIDE_WAIT",
+      "at": "2026-08-07T19:27:28.444Z",
+      "elapsedMs": 212233,
+      "matrixCheckpoint": "OPERATIVO_AUTH_INSIDE_WAIT",
+      "role": "OPERATIVO"
+    },
+    {
+      "checkpoint": "MATRIX_CHECKPOINT_OPERATIVO_ROUTE_INICIO_REQUIRED_HYDRATION_WAIT",
+      "at": "2026-08-07T19:27:29.446Z",
+      "elapsedMs": 213235,
+      "matrixCheckpoint": "OPERATIVO_ROUTE_INICIO_REQUIRED_HYDRATION_WAIT",
+      "role": "OPERATIVO"
+    },
+    {
+      "checkpoint": "MATRIX_CHECKPOINT_OPERATIVO_ROUTE_INICIO_RENDER_OBSERVER_ARM_WAIT",
+      "at": "2026-08-07T19:27:38.456Z",
+      "elapsedMs": 222245,
+      "matrixCheckpoint": "OPERATIVO_ROUTE_INICIO_RENDER_OBSERVER_ARM_WAIT",
+      "role": "OPERATIVO"
+    },
+    {
+      "checkpoint": "MATRIX_CHECKPOINT_OPERATIVO_ROUTE_INICIO_RENDER_EVENT_WAIT",
+      "at": "2026-08-07T19:27:42.460Z",
+      "elapsedMs": 226249,
+      "matrixCheckpoint": "OPERATIVO_ROUTE_INICIO_RENDER_EVENT_WAIT",
+      "role": "OPERATIVO"
+    },
+    {
+      "checkpoint": "MATRIX_CHECKPOINT_OPERATIVO_ROUTE_CLIENTE360_RENDER_EVENT_WAIT",
+      "at": "2026-08-07T19:27:45.462Z",
+      "elapsedMs": 229251,
+      "matrixCheckpoint": "OPERATIVO_ROUTE_CLIENTE360_RENDER_EVENT_WAIT",
+      "role": "OPERATIVO"
+    },
+    {
+      "checkpoint": "MATRIX_CHECKPOINT_OPERATIVO_ROUTE_CLIENTE360_RENDER_READY_PASS",
+      "at": "2026-08-07T19:28:13.492Z",
+      "elapsedMs": 257281,
+      "matrixCheckpoint": "OPERATIVO_ROUTE_CLIENTE360_RENDER_READY_PASS",
+      "role": "OPERATIVO"
+    },
+    {
+      "checkpoint": "MATRIX_CHECKPOINT_OPERATIVO_ROUTE_POLIZAS_RENDER_EVENT_WAIT",
+      "at": "2026-08-07T19:28:22.502Z",
+      "elapsedMs": 266291,
+      "matrixCheckpoint": "OPERATIVO_ROUTE_POLIZAS_RENDER_EVENT_WAIT",
+      "role": "OPERATIVO"
+    },
+    {
+      "checkpoint": "MATRIX_CHECKPOINT_OPERATIVO_ROUTE_POLIZAS_RENDER_READY_PASS",
+      "at": "2026-08-07T19:28:31.512Z",
+      "elapsedMs": 275301,
+      "matrixCheckpoint": "OPERATIVO_ROUTE_POLIZAS_RENDER_READY_PASS",
+      "role": "OPERATIVO"
+    },
+    {
+      "checkpoint": "MATRIX_CHECKPOINT_OPERATIVO_ROUTE_COBROS_RENDER_READY_PASS",
+      "at": "2026-08-07T19:28:55.538Z",
+      "elapsedMs": 299327,
+      "matrixCheckpoint": "OPERATIVO_ROUTE_COBROS_RENDER_READY_PASS",
+      "role": "OPERATIVO"
+    },
+    {
+      "checkpoint": "MATRIX_CHECKPOINT_OPERATIVO_COBROS_CAPTURE_START",
+      "at": "2026-08-07T19:28:57.541Z",
+      "elapsedMs": 301330,
+      "matrixCheckpoint": "OPERATIVO_COBROS_CAPTURE_START",
+      "role": "OPERATIVO"
+    },
+    {
+      "checkpoint": "MATRIX_CHECKPOINT_OPERATIVO_ROUTE_OPS_RENDER_READY_PASS",
+      "at": "2026-08-07T19:28:58.542Z",
+      "elapsedMs": 302331,
+      "matrixCheckpoint": "OPERATIVO_ROUTE_OPS_RENDER_READY_PASS",
+      "role": "OPERATIVO"
+    },
+    {
+      "checkpoint": "MATRIX_CHECKPOINT_OPERATIVO_OPS_CAPTURE_PASS",
+      "at": "2026-08-07T19:29:00.545Z",
+      "elapsedMs": 304334,
+      "matrixCheckpoint": "OPERATIVO_OPS_CAPTURE_PASS",
+      "role": "OPERATIVO"
+    },
+    {
+      "checkpoint": "MATRIX_CHECKPOINT_OPERATIVO_ROUTE_LEADS_RENDER_READY_PASS",
+      "at": "2026-08-07T19:29:07.553Z",
+      "elapsedMs": 311342,
+      "matrixCheckpoint": "OPERATIVO_ROUTE_LEADS_RENDER_READY_PASS",
+      "role": "OPERATIVO"
+    },
+    {
+      "checkpoint": "MATRIX_CHECKPOINT_OPERATIVO_LEADS_CAPTURE_PASS",
+      "at": "2026-08-07T19:29:09.556Z",
+      "elapsedMs": 313345,
+      "matrixCheckpoint": "OPERATIVO_LEADS_CAPTURE_PASS",
+      "role": "OPERATIVO"
+    },
+    {
+      "checkpoint": "MATRIX_CHECKPOINT_OPERATIVO_ROUTE_CONCILIACIONES_RENDER_READY_PASS",
+      "at": "2026-08-07T19:29:16.563Z",
+      "elapsedMs": 320352,
+      "matrixCheckpoint": "OPERATIVO_ROUTE_CONCILIACIONES_RENDER_READY_PASS",
+      "role": "OPERATIVO"
+    },
+    {
+      "checkpoint": "MATRIX_CHECKPOINT_OPERATIVO_ROUTE_CANCELACIONES_RENDER_READY_PASS",
+      "at": "2026-08-07T19:29:19.567Z",
+      "elapsedMs": 323356,
+      "matrixCheckpoint": "OPERATIVO_ROUTE_CANCELACIONES_RENDER_READY_PASS",
+      "role": "OPERATIVO"
+    },
+    {
+      "checkpoint": "MATRIX_CHECKPOINT_ASESOR_PAGE_GOTO",
+      "at": "2026-08-07T19:29:21.569Z",
+      "elapsedMs": 325358,
+      "matrixCheckpoint": "ASESOR_PAGE_GOTO",
+      "role": "ASESOR"
+    },
+    {
+      "checkpoint": "MATRIX_CHECKPOINT_ASESOR_CUSTOM_TOKEN_SIGNIN",
+      "at": "2026-08-07T19:29:23.572Z",
+      "elapsedMs": 327361,
+      "matrixCheckpoint": "ASESOR_CUSTOM_TOKEN_SIGNIN",
+      "role": "ASESOR"
+    },
+    {
+      "checkpoint": "MATRIX_CHECKPOINT_ASESOR_ROUTE_INICIO_REQUIRED_HYDRATION_WAIT",
+      "at": "2026-08-07T19:29:24.573Z",
+      "elapsedMs": 328362,
+      "matrixCheckpoint": "ASESOR_ROUTE_INICIO_REQUIRED_HYDRATION_WAIT",
+      "role": "ASESOR"
+    },
+    {
+      "checkpoint": "MATRIX_CHECKPOINT_ASESOR_ROUTE_INICIO_RENDER_OBSERVER_ARM_WAIT",
+      "at": "2026-08-07T19:29:36.586Z",
+      "elapsedMs": 340375,
+      "matrixCheckpoint": "ASESOR_ROUTE_INICIO_RENDER_OBSERVER_ARM_WAIT",
+      "role": "ASESOR"
+    },
+    {
+      "checkpoint": "MATRIX_CHECKPOINT_ASESOR_ROUTE_INICIO_RENDER_EVENT_WAIT",
+      "at": "2026-08-07T19:29:40.590Z",
+      "elapsedMs": 344379,
+      "matrixCheckpoint": "ASESOR_ROUTE_INICIO_RENDER_EVENT_WAIT",
+      "role": "ASESOR"
+    },
+    {
+      "checkpoint": "MATRIX_CHECKPOINT_ASESOR_ROUTE_CLIENTE360_RENDER_EVENT_WAIT",
+      "at": "2026-08-07T19:29:43.593Z",
+      "elapsedMs": 347382,
+      "matrixCheckpoint": "ASESOR_ROUTE_CLIENTE360_RENDER_EVENT_WAIT",
+      "role": "ASESOR"
+    },
+    {
+      "checkpoint": "MATRIX_CHECKPOINT_ASESOR_ROUTE_CLIENTE360_RENDER_READY_PASS",
+      "at": "2026-08-07T19:30:11.626Z",
+      "elapsedMs": 375415,
+      "matrixCheckpoint": "ASESOR_ROUTE_CLIENTE360_RENDER_READY_PASS",
+      "role": "ASESOR"
+    },
+    {
+      "checkpoint": "MATRIX_CHECKPOINT_ASESOR_ROUTE_POLIZAS_RENDER_EVENT_WAIT",
+      "at": "2026-08-07T19:30:20.635Z",
+      "elapsedMs": 384424,
+      "matrixCheckpoint": "ASESOR_ROUTE_POLIZAS_RENDER_EVENT_WAIT",
+      "role": "ASESOR"
+    },
+    {
+      "checkpoint": "MATRIX_CHECKPOINT_ASESOR_ROUTE_POLIZAS_RENDER_READY_PASS",
+      "at": "2026-08-07T19:30:28.644Z",
+      "elapsedMs": 392433,
+      "matrixCheckpoint": "ASESOR_ROUTE_POLIZAS_RENDER_READY_PASS",
+      "role": "ASESOR"
+    },
+    {
+      "checkpoint": "MATRIX_CHECKPOINT_ASESOR_ROUTE_COBROS_RENDER_READY_PASS",
+      "at": "2026-08-07T19:30:52.672Z",
+      "elapsedMs": 416461,
+      "matrixCheckpoint": "ASESOR_ROUTE_COBROS_RENDER_READY_PASS",
+      "role": "ASESOR"
+    },
+    {
+      "checkpoint": "MATRIX_CHECKPOINT_ASESOR_ROUTE_OPS_RENDER_READY_PASS",
+      "at": "2026-08-07T19:30:55.677Z",
+      "elapsedMs": 419466,
+      "matrixCheckpoint": "ASESOR_ROUTE_OPS_RENDER_READY_PASS",
+      "role": "ASESOR"
+    },
+    {
+      "checkpoint": "MATRIX_CHECKPOINT_ASESOR_OPS_CAPTURE_PASS",
+      "at": "2026-08-07T19:30:57.681Z",
+      "elapsedMs": 421470,
+      "matrixCheckpoint": "ASESOR_OPS_CAPTURE_PASS",
+      "role": "ASESOR"
+    },
+    {
+      "checkpoint": "MATRIX_CHECKPOINT_ASESOR_ROUTE_LEADS_RENDER_READY_PASS",
+      "at": "2026-08-07T19:31:04.687Z",
+      "elapsedMs": 428476,
+      "matrixCheckpoint": "ASESOR_ROUTE_LEADS_RENDER_READY_PASS",
+      "role": "ASESOR"
+    },
+    {
+      "checkpoint": "MATRIX_CHECKPOINT_ASESOR_LEADS_CAPTURE_PASS",
+      "at": "2026-08-07T19:31:06.689Z",
+      "elapsedMs": 430478,
+      "matrixCheckpoint": "ASESOR_LEADS_CAPTURE_PASS",
+      "role": "ASESOR"
+    },
+    {
+      "checkpoint": "MATRIX_CHECKPOINT_PROTECTED_SNAPSHOT_AFTER",
+      "at": "2026-08-07T19:31:13.697Z",
+      "elapsedMs": 437486,
+      "matrixCheckpoint": "PROTECTED_SNAPSHOT_AFTER",
+      "role": "ASESOR"
+    }
+  ],
+  "childCommand": "node orbit360-visual-runtime-rootfix-observable-matrix-v20260805.mjs",
+  "budgets": {
+    "pollMs": 1000,
+    "idleTimeoutMs": 90000,
+    "roleTimeoutMs": 420000,
+    "globalTimeoutMs": 1200000,
+    "terminateGraceMs": 8000
+  },
+  "childPid": 4054,
+  "childExitCode": 42,
+  "childSignal": "",
+  "terminationReason": "CHILD_NONZERO_EXIT",
+  "receivedSignal": "",
+  "matrixEvidencePresent": true,
+  "matrixStage": "FAIL_VISUAL_OBSERVABLE_ROOTFIX_MATRIX",
+  "matrixClassification": "FUNCTIONAL_DEFECT",
+  "runtimeExecuted": true,
+  "browserExecuted": true,
+  "deployExecuted": false,
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "operationalWrites": 0,
+  "productionTouched": false,
+  "containsPII": false,
+  "containsSecrets": false,
+  "containsPasswords": false,
+  "ok": false,
+  "finishedAt": "2026-08-07T19:31:17.219Z",
+  "elapsedMs": 441008
+}

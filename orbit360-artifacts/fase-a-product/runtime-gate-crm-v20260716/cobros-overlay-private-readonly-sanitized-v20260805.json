@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "orbit360-cobros-overlay-readonly-v2",
+  "stage": "COBROS_OVERLAY_PROGRESS",
+  "classification": "READ_ONLY_PROGRESS_REQUIRES_MORE_EVIDENCE",
+  "canonicalPayments": 365,
+  "sequenceApplied": 128,
+  "postCutoffApplied": 2,
+  "exactPlanillaProposals": 2,
+  "explainedPayments": 132,
+  "unresolvedPayments": 233,
+  "outcomeCounts": {
+    "UNRESOLVED_NEEDS_ADDITIONAL_EVIDENCE": 233,
+    "PROPOSE_SEQUENCE_RECONCILIATION_NO_WRITE": 128,
+    "VALID_POST_CUTOFF_PENDING_EXTERNAL_CONFIRMATION": 2,
+    "PROPOSE_PLANILLA_DETAIL_RECONCILIATION_NO_WRITE": 2
+  },
+  "planillaCounts": {
+    "PLANILLA_ZERO_OMIT": 2,
+    "PLANILLA_PERIOD_ONLY": 29,
+    "PLANILLA_REVERSAL_HOLD": 2,
+    "PLANILLA_DETAIL_AMBIGUOUS_HOLD": 10,
+    "PLANILLA_DETAIL_CANDIDATE": 24
+  },
+  "planillaMatchOutcomes": {
+    "proposed": 2,
+    "sourceKeyAmbiguousHold": 10,
+    "targetKeyAmbiguousHold": 0,
+    "noUnresolvedTarget": 22
+  },
+  "planillaSourceControl": {
+    "titleSha256": "3137eec329d2f50a210348b76c3327e6aba6c0e1e9fa6c6a55d70f336a25c514",
+    "inputMode": "FILE_LIBRARY_PARSED_ROWS_RECONSTRUCTED",
+    "reportedRows": 67,
+    "eligibleCrm": 65,
+    "sourcePackages": 10,
+    "incompletePackages": 1,
+    "invoiceMissingPackages": 1
+  },
+  "rowLedgerCount": 365,
+  "rowLedgerDigest": "3f129242c34934b3f87009a1d0cb4bded6861b376f3719349831d770b7825f5f",
+  "existingMaterializedCobrosPreserved": 5,
+  "calendarHoldsPreserved": 44,
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "operationalWrites": 0,
+  "reimportExecuted": false,
+  "deployExecuted": false,
+  "productionTouched": false,
+  "containsPII": false,
+  "containsSecrets": false,
+  "containsPasswords": false,
+  "ok": false
+}

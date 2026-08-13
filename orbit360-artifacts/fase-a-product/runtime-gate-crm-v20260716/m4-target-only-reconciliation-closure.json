@@ -1,0 +1,113 @@
+{
+  "schemaVersion": "orbit360-m4-target-only-reconciliation-closure-v1",
+  "issuedAt": "2026-07-25",
+  "gateId": "block4-target-only-reconciliation-readonly-v20260725",
+  "contractVersion": "4.2.7",
+  "status": "M4_TARGET_ONLY_RECONCILIATION_READONLY_CLOSED_SUCCESS",
+  "packageCommit": "8659bbf03d462db13880f157c00a39dcc61d5993",
+  "requestCommit": "18e3b817afe03a77477276434f6cc1b895b454f8",
+  "runId": 30175133698,
+  "jobId": 89722572474,
+  "artifactId": 8623987508,
+  "artifactDigest": "sha256:3e17321cedb51045c90161a909db966c984c3f191b6d6339873f25b0d4d2fb2b",
+  "canonicalPreflight": {
+    "status": "GO_GATE_CONTRACT",
+    "passed": 26,
+    "total": 26,
+    "failed": 0,
+    "activationMode": "immutable_request_present"
+  },
+  "fixtureContract": {
+    "status": "PASS",
+    "passed": 30,
+    "total": 30,
+    "failed": 0,
+    "positiveFixtures": 7,
+    "negativeFixtures": 23,
+    "validationMode": "executed_contract_fixtures",
+    "literalSourceInspection": false
+  },
+  "sourceCounts": {
+    "clientes": 414,
+    "aseguradoras": 26
+  },
+  "targetCounts": {
+    "clientes": 2,
+    "aseguradoras": 2
+  },
+  "reconciliation": {
+    "clientTargetOnly": 2,
+    "insurerTargetOnly": 2,
+    "total": 4,
+    "classifications": {
+      "clientes": {
+        "expected": 0,
+        "duplicate": 0,
+        "obsolete": 2,
+        "requiresValidation": 0
+      },
+      "aseguradoras": {
+        "expected": 0,
+        "duplicate": 0,
+        "obsolete": 2,
+        "requiresValidation": 0
+      },
+      "aggregate": {
+        "expected": 0,
+        "duplicate": 0,
+        "obsolete": 4,
+        "requiresValidation": 0
+      }
+    },
+    "rawValuesExported": false,
+    "recordIdsExported": false,
+    "pseudonymousTokensExported": false
+  },
+  "diff": {
+    "keepExpected": 0,
+    "rekeyReview": 0,
+    "retireCandidate": 4,
+    "requiresValidation": 0,
+    "creates": 0,
+    "updates": 0,
+    "deletes": 0,
+    "merges": 0
+  },
+  "rollback": {
+    "planned": true,
+    "executed": false,
+    "snapshotCountPlanned": 4,
+    "snapshotValuesExported": false
+  },
+  "authorization": {
+    "readOnlyExecutionConsumed": true,
+    "allowedExecutions": 0,
+    "retirementWriteAuthorized": false,
+    "clientCorrectionWriteAuthorized": false,
+    "m4WriteAuthorized": false
+  },
+  "security": {
+    "secretAccess": true,
+    "firestoreRead": true,
+    "collectionsRead": 4,
+    "clientWrites": 0,
+    "insurerWrites": 0,
+    "auditWrites": 0,
+    "deletes": 0,
+    "merges": 0,
+    "rulesApplied": false,
+    "deployExecuted": false,
+    "productionTouched": false,
+    "containsPII": false,
+    "containsSecrets": false
+  },
+  "approvalReadyForTargetOnlyResolutionPlanning": true,
+  "approvalReadyForClientCorrectionWrite": false,
+  "approvalReadyForM4Write": false,
+  "classification": "DATA_CONTRACT_RECONCILIATION_COMPLETED_ALL_4_TARGET_ONLY_OBSOLETE",
+  "nextAction": "REQUEST_SEPARATE_AUTHORIZATION_FOR_ATOMIC_RETIREMENT_DRYRUN_OF_EXACTLY_4_OBSOLETE_TARGET_RECORDS",
+  "claudeClassification": "BACKEND_PROTEGIDO_NO_CLAUDE",
+  "academyClassification": "ACADEMIA_ACTUALIZAR",
+  "containsPII": false,
+  "containsSecrets": false
+}

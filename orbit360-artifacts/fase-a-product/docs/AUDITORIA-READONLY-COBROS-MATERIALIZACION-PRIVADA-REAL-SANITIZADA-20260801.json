@@ -1,0 +1,155 @@
+{
+  "schemaVersion": "orbit360-cobros-private-real-materialization-attestation-v2-closed",
+  "tenantId": "alianzas-soluciones",
+  "cutoff": "2026-07-31",
+  "status": "PRIVATE_AUTHORIZATION_MATERIALIZATION_REAL_ATTESTED",
+  "sourceGate": {
+    "gateId": "block10.7-cobros-private-materialization-static-v20260801",
+    "run": 30706859578,
+    "artifact": 8820592721,
+    "digest": "sha256:f90c8f2da85be677cc0caf821e868a88490c241f8294f19072678738b7f10536",
+    "checks": "46/46 PASS"
+  },
+  "closureGate": {
+    "gateId": "block10.8-cobros-private-real-materialization-static-v20260801",
+    "run": 30709607082,
+    "artifact": 8821429532,
+    "digest": "sha256:7ed3cf4a446a954bdd9378026a70e3e3eb00820c5780ddb12bc80421ec29ba5c",
+    "checks": "64/64 PASS",
+    "head": "b83a28800e1bbd5e9c0cada96616ec21577f0fb9",
+    "sameGateRecovered": true,
+    "directPreflight": "64/64 PASS"
+  },
+  "ephemeralSession": {
+    "sessionRef": "ephemeral-session-0329d125bf41bf57adb7d904384b98e0",
+    "realMaterializationPerformed": true,
+    "privateInputAvailable": true,
+    "persistAllowed": false,
+    "privateCardsEnumerable": false,
+    "serializedAuditContainsPrivateValues": false,
+    "ownerPrivateCardsDisposed": true,
+    "callerPrivateInputDisposed": true,
+    "remainingPrivateCardsAfterDisposal": 0,
+    "remainingPrivateInputsAfterDisposal": 0
+  },
+  "materialization": {
+    "cards": [
+      {
+        "authorizationRef": "cob-auth-a0d4f00d5169af22d571f20b",
+        "category": "EXISTING_CANONICAL_RECEIPT",
+        "validationOk": true,
+        "sourceProofCount": 3,
+        "explicitAuthorizationRequired": true,
+        "reinforcedAuthorizationRequired": false,
+        "atomicOperationRequired": false,
+        "authorizationGranted": false,
+        "writeEligible": false,
+        "createFinmov": false,
+        "reactivatePolicy": false
+      },
+      {
+        "authorizationRef": "cob-auth-ade753baa6872ddfbbea704f",
+        "category": "EXISTING_CANONICAL_RECEIPT",
+        "validationOk": true,
+        "sourceProofCount": 3,
+        "explicitAuthorizationRequired": true,
+        "reinforcedAuthorizationRequired": false,
+        "atomicOperationRequired": false,
+        "authorizationGranted": false,
+        "writeEligible": false,
+        "createFinmov": false,
+        "reactivatePolicy": false
+      },
+      {
+        "authorizationRef": "cob-auth-d9ed3d5aa03f198a469439cc",
+        "category": "EXISTING_CANONICAL_RECEIPT",
+        "validationOk": true,
+        "sourceProofCount": 3,
+        "explicitAuthorizationRequired": true,
+        "reinforcedAuthorizationRequired": false,
+        "atomicOperationRequired": false,
+        "authorizationGranted": false,
+        "writeEligible": false,
+        "createFinmov": false,
+        "reactivatePolicy": false
+      },
+      {
+        "authorizationRef": "cob-auth-1ee62483415c6124bf64981c",
+        "category": "EXISTING_CANONICAL_RECEIPT",
+        "validationOk": true,
+        "sourceProofCount": 3,
+        "explicitAuthorizationRequired": true,
+        "reinforcedAuthorizationRequired": false,
+        "atomicOperationRequired": false,
+        "authorizationGranted": false,
+        "writeEligible": false,
+        "createFinmov": false,
+        "reactivatePolicy": false
+      },
+      {
+        "authorizationRef": "cob-auth-5ae6c8bf9ebe9680ca848b2e",
+        "category": "HISTORICAL_RECEIPT_REINFORCED",
+        "validationOk": true,
+        "sourceProofCount": 3,
+        "explicitAuthorizationRequired": true,
+        "reinforcedAuthorizationRequired": true,
+        "atomicOperationRequired": true,
+        "authorizationGranted": false,
+        "writeEligible": false,
+        "createFinmov": false,
+        "reactivatePolicy": false
+      }
+    ],
+    "direct": 4,
+    "historical": 1,
+    "authorizationGranted": 0,
+    "writeEligible": 0,
+    "allSourceProofsSufficient": true,
+    "minimumSourceProofsPerCard": 2,
+    "duplicateAuthorizationRefs": 0,
+    "duplicateIdempotencyKeys": 0,
+    "historicalCardLast": true,
+    "integrityDigest": "sha256:b405d108f38082a5e2b64c0fbd3350a7283194444fc7c666aafde877d66fadc6",
+    "cardCount": 5
+  },
+  "sourceVerification": {
+    "registeredHashesVerified": 3,
+    "crmExactHash": true,
+    "generalExactHash": true,
+    "mapfreExactHash": true,
+    "canonicalPoliciesAvailable": true,
+    "canonicalReceiptsAvailable": true,
+    "newFilesRequested": 0,
+    "staleFinancialFilesUsed": false,
+    "bankUsedAsPaymentAuthority": false,
+    "commissionSheetUsedAsPaymentAuthority": false
+  },
+  "controls": {
+    "exactReceiptPrecedesFifo": true,
+    "historicalReceiptRequiresReinforcedAuthorization": true,
+    "historicalReceiptAtomicOperationRequired": true,
+    "reactivatesPolicy": false,
+    "createsFinmov": false,
+    "autoApply": false,
+    "preWriteSnapshotRequired": true,
+    "rollbackRequired": true,
+    "packageGrantsAuthorization": false
+  },
+  "writes": {
+    "cobros": 0,
+    "finmovs": 0,
+    "firestore": 0,
+    "operational": 0,
+    "browserExecuted": false,
+    "deployExecuted": false,
+    "productionTouched": false
+  },
+  "security": {
+    "realRowsStoredInRepo": 0,
+    "privateValuesPersisted": false,
+    "containsPII": false,
+    "containsPolicyNumbers": false,
+    "containsRealAmounts": false,
+    "containsSecrets": false
+  }
+}

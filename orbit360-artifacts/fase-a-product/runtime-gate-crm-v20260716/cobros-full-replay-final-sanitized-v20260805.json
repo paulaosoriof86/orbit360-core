@@ -1,0 +1,44 @@
+{
+  "schemaVersion": "orbit360-cobros-full-replay-final-v1",
+  "stage": "PASS_COBROS_FULL_REPLAY",
+  "decision": "GO_COBROS_LEDGER_COMPLETE_NO_WRITES",
+  "classification": "READ_ONLY_FULL_SOURCE_LEDGER_COMPLETE",
+  "canonicalPayments": 365,
+  "sequenceProposals": 128,
+  "postCutoffPendingConfirmation": 2,
+  "planillaDetailProposals": 2,
+  "reportedPaymentHoldsNoUniqueReceiptLink": 233,
+  "requiresValidation": 0,
+  "explainedPayments": 365,
+  "unresolvedPayments": 0,
+  "invariant": "128 + 2 + 2 + 233 = 365",
+  "rowLedgerCount": 365,
+  "rowLedgerDigest": "96d7105912234de14deb5ad0190e537c1b71570519d086616acc9122cb2ca381",
+  "sourceControl": {
+    "canonicalWorkbookBytes": 443105,
+    "canonicalWorkbookSheets": 8,
+    "planillaRows": 67,
+    "planillaCrmEligibleRows": 65,
+    "planillaPackages": 10,
+    "duplicateSourceKeyProtection": true
+  },
+  "preserved": {
+    "existingMaterializedCobros": 5,
+    "calendarHolds": 44
+  },
+  "writes": {
+    "firestore": 0,
+    "auth": 0,
+    "operational": 0
+  },
+  "deployExecuted": false,
+  "reimportExecuted": false,
+  "rulesChanged": false,
+  "productionTouched": false,
+  "mainTouched": false,
+  "mergeExecuted": false,
+  "containsPII": false,
+  "containsSecrets": false,
+  "containsPasswords": false,
+  "ok": true
+}

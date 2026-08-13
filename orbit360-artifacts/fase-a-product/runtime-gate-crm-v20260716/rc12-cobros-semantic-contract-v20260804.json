@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "orbit360-cobros-semantic-contract-v1",
+  "generatedAt": "2026-08-04T13:01:00Z",
+  "decision": "COBROS_COUNT_SCOPE_CORRECTED",
+  "classification": "DATA_CONTRACT_GAP",
+  "definitions": {
+    "cobroMaterializado": "documento de cobro ya creado en la colección operativa y enlazado conforme al contrato vigente",
+    "pagoReportadoNoConciliado": "evidencia de pago procedente de cartera, aseguradora, banco, SIGA o planilla que todavía no puede declararse cobro conciliado",
+    "pagoInferidoPorSecuencia": "hipótesis operativa porque una cuota posterior figura pagada o una anterior dejó de aparecer; requiere conciliación y trazabilidad",
+    "sinSaldoSegunAseguradora": "evidencia de que la aseguradora no reporta saldo pendiente; no equivale por sí sola a un cobro materializado",
+    "evidenciaComision": "fila de planilla de comisión que puede respaldar recaudo y comisión, pero no crea automáticamente cobro ni movimiento financiero",
+    "movimientoFinanciero": "registro financiero derivado únicamente después de conciliación, clasificación contable y reglas de negocio; cobros y recaudos no son finmovs"
+  },
+  "acceptedSnapshot": {
+    "materializedOperationalCobros": 5,
+    "canonicalCobroDocuments": 7,
+    "materializedCountIsCompleteUniverse": false
+  },
+  "unmaterializedEvidence": {
+    "paymentsReportedNotReconciled": 365,
+    "noOutstandingBalanceAccordingInsurer": 211,
+    "receiptStatusHold": 44,
+    "sigaExcluded": 20
+  },
+  "commissionPlanillas": {
+    "detailRows": 67,
+    "crmEligibleRows": 65,
+    "exactReconciliationPairs": 8,
+    "financeActivated": false
+  },
+  "mandatoryPipelineForNewSources": [
+    "register source file, insurer, country, currency, period and digest",
+    "parse without overwriting prior accepted sources",
+    "propose mappings and normalize identifiers",
+    "classify direct evidence, inferred evidence and unresolved evidence separately",
+    "run dry-run with create, update, omit and requires-validation counts",
+    "reconcile against receipts, portfolio, policies, bank evidence and prior planillas",
+    "materialize cobro only with sufficient traceability and approved reconciliation",
+    "derive commission and financial effects in separate controlled records",
+    "preserve audit, idempotency and rollback"
+  ],
+  "prohibitions": {
+    "treatFiveAsTotalCollectedUniverse": true,
+    "writeCobrosFromBankWithoutReconciliation": true,
+    "writeFinmovsDirectlyFromCommissionPlanilla": true,
+    "reimportAllCobrosToAddNewMonthlyPlanillas": true,
+    "inferPaidStatusWithoutEvidenceAndTraceability": true
+  },
+  "nextUpdateMode": "incremental_by_source_period_and_digest",
+  "containsPII": false,
+  "containsSecrets": false,
+  "ok": true
+}

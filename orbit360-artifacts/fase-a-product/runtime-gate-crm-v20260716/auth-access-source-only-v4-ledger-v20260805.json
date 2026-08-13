@@ -1,0 +1,57 @@
+{
+  "schemaVersion": "orbit360-auth-access-source-only-v4-ledger-v1",
+  "rcId": "RC-AYS-LAB-CANONICA-01",
+  "gateId": "block-auth-access-recovery-source-only-v4-20260805",
+  "contractVersion": "13.3.0",
+  "status": "PASS_CLOSED",
+  "requestCommit": "c676e206babf880eb2db68cf5aa5fa2777d558bd",
+  "resultCommit": "1dc1ebdde70029ef4136500061df8164f3269da5",
+  "checks": {
+    "total": 26,
+    "passed": 26,
+    "failed": 0
+  },
+  "rootFix": {
+    "strategy": "READ_ALL_VALIDATE_ALL_WRITE_ALL",
+    "commit": "38aae846477a35025950869a207bf10be9337cc1",
+    "blobSha": "dda248ff0df08f69d95ac117d8a7262c055b1af6",
+    "provenanceVerified": true,
+    "atomicityVerified": true,
+    "idempotencyVerified": true
+  },
+  "requests": {
+    "v1ImmutableConsumed": true,
+    "v2ImmutableConsumed": true,
+    "v3ImmutableConsumed": true,
+    "v4SourceOnlyConsumed": true,
+    "v4ReplayAllowed": false,
+    "v5RuntimeAbsent": true
+  },
+  "executionBoundary": {
+    "secretAccess": false,
+    "firebaseCommands": 0,
+    "firestoreReads": 0,
+    "firestoreWrites": 0,
+    "authReads": 0,
+    "authWrites": 0,
+    "functionsDeploys": 0,
+    "hostingDeploys": 0,
+    "browserRuns": 0,
+    "rulesDeploys": 0,
+    "reimports": 0,
+    "crmWrites": 0,
+    "productionTouched": false,
+    "mainTouched": false,
+    "mergeExecuted": false
+  },
+  "nextBoundary": {
+    "gate": "AUTH_ACCESS_RECOVERY_RUNTIME_V5",
+    "newRequestPathRequired": true,
+    "newExplicitAuthorizationRequired": true,
+    "sourceOnlyV4MustNotRepeat": true
+  },
+  "block4Continues": true,
+  "containsPII": false,
+  "containsSecrets": false,
+  "ok": true
+}

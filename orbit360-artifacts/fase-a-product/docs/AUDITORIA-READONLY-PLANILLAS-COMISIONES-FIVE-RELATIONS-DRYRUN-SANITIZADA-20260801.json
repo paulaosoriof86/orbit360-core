@@ -1,0 +1,112 @@
+{
+  "schemaVersion": "orbit360-planillas-comisiones-five-relations-dryrun-sanitized-audit-v1",
+  "date": "2026-08-01",
+  "gateId": "block11-planillas-comisiones-linkage-readonly-v20260801",
+  "contractVersion": "11.0.0",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "status": "PLANILLAS_COMMISSION_DRYRUN_CLOSED",
+  "sourceCut": {
+    "period": "2026-06",
+    "files": 19,
+    "rowsObserved": 67,
+    "crmCandidates": 65,
+    "exactPolicyReceiptRelations": 5
+  },
+  "baseline": {
+    "polizas": 1373,
+    "recibosEsperados": 1294,
+    "cobros": 5,
+    "finmovs": 0
+  },
+  "targetSnapshot": {
+    "before": {
+      "planillasComisiones": 0,
+      "comisionesDevengadas": 0,
+      "conciliacionesComisiones": 0
+    },
+    "after": {
+      "planillasComisiones": 0,
+      "comisionesDevengadas": 0,
+      "conciliacionesComisiones": 0
+    },
+    "digest": "12b3763f976433e1e7e809f461dc835bca3a4c39b1d6dd1655e42a202e6cbf3f"
+  },
+  "dryRun": {
+    "total": 5,
+    "commissionCandidates": 5,
+    "holdsOrOmits": 0,
+    "proposedDocuments": 15,
+    "proposedPlanillasComisiones": 5,
+    "proposedComisionesDevengadas": 5,
+    "proposedConciliacionesComisiones": 5,
+    "idempotentOmits": 0,
+    "partialDestinationHolds": 0,
+    "contractHolds": 0,
+    "sellerReadyOrNotApplicable": 2,
+    "sellerHolds": 3,
+    "decisions": {
+      "CREATE_AS_COMMISSION_HOLD_SELLER": 3,
+      "CREATE_AS_COMMISSION_DRYRUN": 2
+    },
+    "sellerDecisions": {
+      "HOLD_SELLER_ALIAS_NOT_CONFIGURED": 3,
+      "SELLER_NOT_APPLICABLE": 2
+    },
+    "bySourceBundle": {
+      "el_roble_gtq_2026_06": 3,
+      "universales_gtq_2026_06": 1,
+      "bantrab_gtq_2026_06": 1
+    },
+    "candidateSetDigest": "04c7da071ddadfe689e0137e730448ada36abe7aff6c228cd5abb0206c26c680"
+  },
+  "evidence": {
+    "plannerStatic": {
+      "run": 30719949803,
+      "job": 91421949720,
+      "artifact": 8824535956,
+      "digest": "sha256:3926cf3ed356d40872b3d00cda2025567a7eb936549e56eb8a30357873682914",
+      "checks": 32
+    },
+    "liveDryRun": {
+      "run": 30720089823,
+      "job": 91422311027,
+      "artifact": 8824579757,
+      "digest": "sha256:97439efee94ddf7b0ff438da4f89e9fae5463c68d8a4ec19ec768d13bf9c201e",
+      "head": "e76f2cfb179468edbd8fe22b970d2010b64b8984"
+    }
+  },
+  "futureWriteContract": {
+    "documents": 15,
+    "atomicBatchRequired": true,
+    "idempotencyRequired": true,
+    "candidateSetDigestRequired": true,
+    "targetSnapshotDigestRequired": true,
+    "postVerificationRequired": true,
+    "rollbackExactDocuments": 15,
+    "sellerLiquidationBlocked": true,
+    "genericComisionesUntouched": true,
+    "financeInactive": true,
+    "separateAuthorizationRequired": true
+  },
+  "controls": {
+    "genericComisionesDestination": false,
+    "invoiceWrites": false,
+    "cxcWrites": false,
+    "cxpWrites": false,
+    "advisorLiquidationWrites": false,
+    "rateInferred": false,
+    "commissionPaymentDateSelectsPolicyOrReceipt": false,
+    "firestoreRead": true,
+    "firestoreWrites": 0,
+    "operationalWrites": 0,
+    "browserExecuted": false,
+    "deployExecuted": false,
+    "productionTouched": false,
+    "containsPII": false,
+    "containsPolicyNumbers": false,
+    "containsAmounts": false,
+    "containsIds": false,
+    "containsSourceRows": false,
+    "containsSecrets": false
+  }
+}

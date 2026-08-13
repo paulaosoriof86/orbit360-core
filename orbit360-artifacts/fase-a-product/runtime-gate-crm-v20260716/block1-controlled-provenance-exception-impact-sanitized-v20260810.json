@@ -1,0 +1,74 @@
+{
+  "schemaVersion": "orbit360-block1-controlled-provenance-exception-impact-v1",
+  "gateId": "block1-client360-insurers-lab-v20260717",
+  "contractVersion": "1.0.41",
+  "operation": "CONTROLLED_PROVENANCE_EXCEPTION_IMPACT_READONLY",
+  "targetCount": 2,
+  "targetFingerprints": [
+    "43a8841d19f7fec03ad6",
+    "a96956c63fdf22d44cfe"
+  ],
+  "collectionsChecked": [
+    "polizas",
+    "vehiculos",
+    "recibosEsperados",
+    "carteraPrimas",
+    "cobros"
+  ],
+  "provenanceReAdjudicated": false,
+  "clientDocumentsMutated": false,
+  "relationshipsMutated": false,
+  "baselineContractChanged": false,
+  "reimport": false,
+  "firestoreWrites": 0,
+  "authReads": 0,
+  "authWrites": 0,
+  "loggingReads": 0,
+  "iamReads": 0,
+  "operationalWrites": 0,
+  "hostingTouched": false,
+  "browserExecuted": false,
+  "deployExecuted": false,
+  "productionTouched": false,
+  "documentIdsPersisted": false,
+  "containsPII": false,
+  "containsSecrets": false,
+  "decision": "CONTROLLED_EXCEPTION_IMPACT_PASS",
+  "classification": "PASS_CONTROLLED_RELEASE_EXCEPTION_IMPACT",
+  "firestoreReadOperations": 6,
+  "targetsLocated": 2,
+  "impact": {
+    "counts": {
+      "43a8841d19f7fec03ad6": {
+        "polizas": 1,
+        "vehiculos": 0,
+        "recibosEsperados": 10,
+        "carteraPrimas": 10,
+        "cobros": 0
+      },
+      "a96956c63fdf22d44cfe": {
+        "polizas": 2,
+        "vehiculos": 1,
+        "recibosEsperados": 2,
+        "carteraPrimas": 0,
+        "cobros": 0
+      }
+    },
+    "totals": {
+      "polizas": 3,
+      "vehiculos": 1,
+      "recibosEsperados": 12,
+      "carteraPrimas": 10,
+      "cobros": 0
+    },
+    "totalRelationships": 26
+  },
+  "relationshipPresenceDoesNotBlockBecauseClientsAndRelationshipsRemainPreserved": true,
+  "releaseEligible": true,
+  "nextDecision": "RELEASE_UNIVERSE_ACCEPTED_WITH_2_CLIENT_PROVENANCE_EXCEPTIONS",
+  "runtimeRunId": 31446481543,
+  "runtimeJobId": 93641729652,
+  "artifactId": 9084712322,
+  "artifactDigestSha256": "da2d469ad50e14e50c93fed6f42344410a419df9f93441df49c2df8cfcaf590f",
+  "ok": true
+}

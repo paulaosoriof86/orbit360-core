@@ -1,0 +1,107 @@
+{
+  "schemaVersion": "orbit360-planillas-comisiones-policy-identity-receipt-link-sanitized-audit-v1",
+  "date": "2026-08-01",
+  "gateId": "block11-planillas-comisiones-linkage-readonly-v20260801",
+  "contractVersion": "11.0.0",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "sourceCut": {
+    "period": "2026-06",
+    "files": 19,
+    "bundles": 10,
+    "rowsObserved": 67,
+    "crmCandidates": 65,
+    "omittedZeroCommission": 2
+  },
+  "baseline": {
+    "polizas": 1373,
+    "recibosEsperados": 1294,
+    "cobros": 5,
+    "finmovs": 0
+  },
+  "policyIdentity": {
+    "previousUnique": 10,
+    "previousHolds": 55,
+    "resolved": 49,
+    "holds": 16,
+    "previousHoldsResolved": 39,
+    "previousUniqueReclassified": 1,
+    "decisions": {
+      "RESOLVE_EXACT_UNIQUE": 9,
+      "RESOLVE_ALIAS_UNIQUE": 16,
+      "RESOLVE_RENEWAL_BY_RECEIPT_AMOUNT": 22,
+      "RESOLVE_BY_INSURED_BRANCH_RECEIPT_AMOUNT": 2,
+      "HOLD_RENEWAL_AMBIGUITY_NO_RECEIPT_MATCH": 9,
+      "HOLD_INSURED_CONFLICT": 2,
+      "HOLD_POLICY_NUMBER_UNMAPPED": 2,
+      "HOLD_CANONICAL_POLICY_NUMBER_TYPO": 1,
+      "HOLD_GROUPED_POLICY_DETAIL_REQUIRED": 2
+    }
+  },
+  "receiptLink": {
+    "processed": 49,
+    "resolved": 5,
+    "holds": 44,
+    "excludedPolicyHolds": 16,
+    "existingCobroLinked": 0,
+    "decisions": {
+      "RESOLVE_RECEIPT_BY_NET_PREMIUM": 5,
+      "HOLD_RECEIPT_AMOUNT_AMBIGUOUS": 30,
+      "HOLD_RECEIPT_NOT_FOUND": 14
+    }
+  },
+  "evidence": {
+    "policyResolverStatic": {
+      "run": 30719074310,
+      "job": 91419680404,
+      "artifact": 8824265883,
+      "digest": "sha256:9c3dbc8ee18b2c09fcd3518d4877c5fe651461131ffb3d113d98df12f5b5a0f1",
+      "checks": 19
+    },
+    "policyIdentityReadOnly": {
+      "run": 30719208561,
+      "job": 91420032333,
+      "artifact": 8824310023,
+      "digest": "sha256:28518aead736f2d3709e02492d0e7f8eb99b0ba9a4d87a44bf9a5934d05e4567"
+    },
+    "receiptResolverStatic": {
+      "run": 30719316572,
+      "job": 91420315804,
+      "artifact": 8824340344,
+      "digest": "sha256:37b923832fc189733ea7f196672b9f1d73ee2031968c56a6e4dccf4698c0600a",
+      "checks": 14
+    },
+    "receiptLinkReadOnly": {
+      "run": 30719464732,
+      "job": 91420695963,
+      "artifact": 8824388638,
+      "digest": "sha256:fd81c22fd70ad62511d2ec8a8a53f0f5d2aa3e058d0d31dcfd8a3f9cedffa054",
+      "head": "18ae924d6f2e97478be5ba44a51e245bc363d5de"
+    }
+  },
+  "rootCause": {
+    "classification": "VALIDATOR_STALE",
+    "exactNumberFirstWasInsufficient": true,
+    "insurerAliasesRequired": true,
+    "receiptCalendarRequiredForRenewal": true,
+    "commissionPaymentDateMaySelectPolicyOrReceipt": false,
+    "strongReferenceMatches": 0,
+    "netPremiumUniqueFallbacks": 5
+  },
+  "controls": {
+    "sourceRowsChanged": false,
+    "financeActivated": false,
+    "writeAuthorized": false,
+    "firestoreRead": true,
+    "firestoreWrites": 0,
+    "operationalWrites": 0,
+    "browserExecuted": false,
+    "deployExecuted": false,
+    "productionTouched": false,
+    "containsPII": false,
+    "containsPolicyNumbers": false,
+    "containsAmounts": false,
+    "containsIds": false,
+    "containsSecrets": false
+  },
+  "status": "READONLY_POLICY_IDENTITY_AND_RECEIPT_LINK_CLOSED"
+}

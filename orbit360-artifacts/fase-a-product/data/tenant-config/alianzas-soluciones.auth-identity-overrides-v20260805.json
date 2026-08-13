@@ -1,0 +1,40 @@
+{
+  "schemaVersion": "orbit360-tenant-auth-identity-overrides-v1",
+  "tenantId": "alianzas-soluciones",
+  "classification": "TENANT_AYS_ONLY",
+  "authorityCollection": "tenantId/{tenantId}/asesores",
+  "temporaryPasswordPolicy": {
+    "strategy": "FIRST_NAME_123_STAR",
+    "forceChangeOnFirstLogin": true,
+    "storePlaintext": false,
+    "exposeInEvidence": false
+  },
+  "identityOverrides": [
+    {
+      "matchName": "Fernando Arias",
+      "email": "fernando.arias@aysseguros.com",
+      "countries": ["GT"],
+      "defaultCountry": "GT"
+    },
+    {
+      "matchName": "Nicole Castro",
+      "email": "nicole.castro@aysseguros.com",
+      "countries": ["CO"],
+      "defaultCountry": "CO"
+    },
+    {
+      "matchName": "Braulio Hernández",
+      "email": "braulio.hernandez@aysseguros.com",
+      "countries": ["GT"],
+      "defaultCountry": "GT"
+    },
+    {
+      "matchName": "Johanna Salgado",
+      "email": "johanna.salgado@aysseguros.com",
+      "countries": ["GT"],
+      "defaultCountry": "GT"
+    }
+  ],
+  "containsPasswords": false,
+  "containsSecrets": false
+}

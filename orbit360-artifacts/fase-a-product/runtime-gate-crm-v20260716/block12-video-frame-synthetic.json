@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "orbit360-block12-video-frame-synthetic-v1",
+  "status": "VIDEO_FRAME_SYNTHETIC_PASS",
+  "classification": "GO_PIPELINE_MECHANISM",
+  "captureEngine": "playwright-record-video-plus-ffmpeg-static-frame",
+  "videoBytes": 42835,
+  "frameBytes": 60330,
+  "frameSecond": 0.991,
+  "ffmpegSource": "npm-ffmpeg-static",
+  "screenshotApiUsed": false,
+  "cdpScreenshotUsed": false,
+  "networkAccess": false,
+  "firebaseCommandsExecuted": false,
+  "firestoreRead": false,
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "deployExecuted": false,
+  "productionTouched": false,
+  "ok": true,
+  "containsPII": false,
+  "containsSecrets": false
+}

@@ -1,0 +1,32 @@
+{
+  "schemaVersion": "orbit360.product-readonly-route-rule-matrix.summary.v1",
+  "date": "2026-07-14",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "mode": "proposal_only_no_firestore_execution",
+  "writeAuthorized": false,
+  "deployAuthorized": false,
+  "roles": [
+    "Dirección",
+    "Operativo",
+    "Asesor"
+  ],
+  "routes": [
+    "config",
+    "member",
+    "dataCollection",
+    "dataDocument",
+    "auditEvent",
+    "importBatch",
+    "credentialRef",
+    "academyProgress"
+  ],
+  "scopes": [
+    "own",
+    "team",
+    "all",
+    "none"
+  ],
+  "bankAccountsOperationalForModuleUsers": true,
+  "credentialRefsProviderOnly": true,
+  "nextStep": "emulator_rules_proposal_requires_explicit_authorization"
+}

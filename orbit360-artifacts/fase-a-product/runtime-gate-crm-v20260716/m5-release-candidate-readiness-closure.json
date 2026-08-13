@@ -1,0 +1,64 @@
+{
+  "schemaVersion": "orbit360-m5-release-candidate-readiness-closure-v2",
+  "issuedAt": "2026-07-28",
+  "updatedAt": "2026-07-28",
+  "gateId": "block5-release-candidate-visualization-v20260728",
+  "contractVersion": "5.0.0",
+  "status": "M5_READINESS_INVALIDATED_VALIDATOR_STALE_M4_REOPENED",
+  "classification": ["VALIDATOR_STALE", "DATA_CONTRACT_FAILURE"],
+  "requestCommit": "28550c6bd42016111553a46d6342e50df84d4809",
+  "runId": 30400072369,
+  "jobId": 90412449826,
+  "artifactId": 8704338707,
+  "artifactDigest": "sha256:764599abfaa207ebd494dd4addd2bfd0a407354d2568b43453c7e7b14c329713",
+  "priorResult": {
+    "status": "M5_RC_READY_FOR_RUNTIME_SMOKE",
+    "technicallyValidChecks": true,
+    "sufficientForProductReadiness": false,
+    "invalidationReason": "validator_omitted_canonical_target_clients_and_insurers"
+  },
+  "preservedEvidence": {
+    "canonicalPreflightPassed": "31/31",
+    "fixtureContractPassed": "24/24",
+    "releaseCandidateHash": "a891dbd159bd667125291460b9f2202fe5177f78df460791d685255940df1c13",
+    "criticalAssets": 40,
+    "labVisualAssetsMatched": 22,
+    "labVisualAssetsExpected": 22,
+    "labRemoteParity": true,
+    "hostingDeployRequired": false,
+    "hostingDeployExecuted": false,
+    "mobileTitleResponsiveContract": true
+  },
+  "missingRequiredPredicate": {
+    "canonicalTargetClientsRequired": 414,
+    "canonicalTargetInsurersRequired": 26,
+    "latestDurableTargetClients": 0,
+    "latestDurableTargetInsurers": 0,
+    "evidence": "orbit360-platform/runtime-gate-crm-v20260716/m4-post-retirement-revalidation-closure.json"
+  },
+  "capabilitiesUsed": {
+    "secrets": false,
+    "firestoreRead": false,
+    "browser": false,
+    "operationalWrites": 0,
+    "hostingDeploy": false,
+    "rulesDeploy": false,
+    "functionsDeploy": false,
+    "production": false,
+    "policies": false,
+    "mergeMain": false
+  },
+  "authorization": {
+    "readinessExecutionConsumed": true,
+    "allowedExecutions": 0,
+    "runtimeSmokeAuthorized": false,
+    "visualReviewAuthorized": false
+  },
+  "approvalReadyForRuntimeSmoke": false,
+  "block5Closed": false,
+  "m5Frozen": true,
+  "nextAction": "RETURN_TO_M4_AND_COMPLETE_CANONICAL_TARGET_MIGRATION_BEFORE_NEW_M5_READINESS",
+  "policiesBlocked": true,
+  "containsPII": false,
+  "containsSecrets": false
+}

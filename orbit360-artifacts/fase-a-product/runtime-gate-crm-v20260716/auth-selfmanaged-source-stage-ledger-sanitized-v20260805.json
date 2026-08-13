@@ -1,0 +1,72 @@
+{
+  "schemaVersion": "orbit360-auth-selfmanaged-source-stage-ledger-v1",
+  "gateId": "block-auth-selfmanaged-credentials-runtime-v20260805",
+  "runId": "31051061883",
+  "runAttempt": "1",
+  "requestFile": ".github/orbit360-requests/auth-selfmanaged-credentials-runtime-20260805T1559-0600.json",
+  "status": "pass",
+  "classification": "SOURCE_ONLY_ROOTFIX_PASS",
+  "errorCode": "",
+  "failedStepId": "",
+  "staleEvidenceInvalidated": true,
+  "secretsRead": false,
+  "firebaseExecuted": false,
+  "firestoreReads": 0,
+  "firestoreWrites": 0,
+  "authReads": 0,
+  "authWrites": 0,
+  "deploys": 0,
+  "productionTouched": false,
+  "containsPII": false,
+  "containsSecrets": false,
+  "containsPasswords": false,
+  "startedAt": "2026-08-05T22:01:02.947Z",
+  "finishedAt": "2026-08-05T22:01:03.381Z",
+  "steps": [
+    {
+      "id": "apply_sourcefix",
+      "owner": "tools/orbit360-apply-selfmanaged-credentials-sourcefix-v20260805.mjs",
+      "status": "pass",
+      "errorCode": "",
+      "detail": "{   \"schemaVersion\": \"orbit360-selfmanaged-credentials-sourcefix-v1\",   \"results\": [     {       \"file\": \"functions/user-onboarding.js\",       \"changed\": true     },     {       \"file\": \"orbit360-platform/core/access-role-session-owner-v20260728.js\",       \"changed\": true     },     {       \"file\": \"orbit360-platform/index.html\",       \"changed\": true     }   ],   \"operations\": [     \"sync_email_name\",     \"set_temporary_password\",     \"complete_password_change\"   ],   \"currentPasswordReadable\": false,   \"forceChangeSupported\": true,   \"ok\": true } ",
+      "startedAt": "2026-08-05T22:01:02.951Z",
+      "finishedAt": "2026-08-05T22:01:02.988Z"
+    },
+    {
+      "id": "syntax",
+      "owner": "node --check",
+      "status": "pass",
+      "errorCode": "",
+      "detail": "checked=7",
+      "startedAt": "2026-08-05T22:01:02.988Z",
+      "finishedAt": "2026-08-05T22:01:03.173Z"
+    },
+    {
+      "id": "fixtures",
+      "owner": "tools/orbit360-test-auth-selfmanaged-credentials-source-v20260805.mjs",
+      "status": "pass",
+      "errorCode": "",
+      "detail": "{\"ok\":true,\"identityOverrides\":4,\"usersInPatternFixture\":7}",
+      "startedAt": "2026-08-05T22:01:03.173Z",
+      "finishedAt": "2026-08-05T22:01:03.210Z"
+    },
+    {
+      "id": "register_gate",
+      "owner": "tools/orbit360-register-auth-selfmanaged-credentials-runtime-gate-v20260805.mjs",
+      "status": "pass",
+      "errorCode": "",
+      "detail": "{\"ok\":true,\"gateId\":\"block-auth-selfmanaged-credentials-runtime-v20260805\",\"phase\":\"AUTH_SELFMANAGED_CREDENTIALS_RUNTIME\",\"contractVersion\":\"13.9.0\"} ",
+      "startedAt": "2026-08-05T22:01:03.210Z",
+      "finishedAt": "2026-08-05T22:01:03.245Z"
+    },
+    {
+      "id": "canonical_gate",
+      "owner": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
+      "status": "pass",
+      "errorCode": "",
+      "detail": "{\"status\":\"GO_GATE_CONTRACT\",\"passed\":43,\"failed\":0}",
+      "startedAt": "2026-08-05T22:01:03.245Z",
+      "finishedAt": "2026-08-05T22:01:03.380Z"
+    }
+  ]
+}

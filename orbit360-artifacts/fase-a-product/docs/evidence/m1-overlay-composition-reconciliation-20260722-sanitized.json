@@ -1,0 +1,57 @@
+{
+  "schemaVersion": "orbit360-m1-overlay-composition-reconciliation-proof-v1",
+  "issuedAt": "2026-07-22",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "gateId": "block1-client360-insurers-lab-v20260717",
+  "gateContractVersion": "1.0.37",
+  "validatorLifecycleRevision": "phase-aware-static-authorization-v2",
+  "classification": "VALIDATOR_STALE",
+  "status": "READY_FOR_BINDING_EXECUTION",
+  "mechanism": {
+    "wrapper": "tools/orbit360-validar-gate-contracts-composed-v20260722.mjs",
+    "officialPreflight": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
+    "baseOverlay": "tools/orbit360-gate-contract-overlay-v20260718.json",
+    "lifecycleOverlay": "tools/orbit360-gate-contract-overlay-validator-lifecycle-v20260722.json",
+    "temporaryMirror": true,
+    "repositoryWrites": 0,
+    "sourceSyntaxValidatedLocally": true,
+    "overlayJsonValidatedLocally": true
+  },
+  "replacementScope": {
+    "academyContentVersion": "1.228",
+    "academyMarker": 1228,
+    "validatorChecks": [
+      "FREEZE_M1_OPEN",
+      "FREEZE_NO_RUNTIME_BROWSER_DEPLOY",
+      "AUTHORIZATION_STATIC_LIFECYCLE"
+    ],
+    "retiredChecks": [
+      "FREEZE_STOP_THE_LINE",
+      "FREEZE_NO_RUNTIME",
+      "AUTHORIZATION_CONSUMED"
+    ]
+  },
+  "productOwnerChanged": false,
+  "historicalOverlayModified": false,
+  "bindingPreflightExecuted": false,
+  "execution": {
+    "operationalWrites": 0,
+    "firestoreReads": 0,
+    "firestoreWrites": 0,
+    "secretsRead": false,
+    "vaultRead": false,
+    "runtimeExecuted": false,
+    "browserExecuted": false,
+    "deployExecuted": false,
+    "functionsDeployed": false,
+    "rulesDeployed": false,
+    "productionTouched": false,
+    "mainTouched": false,
+    "mergeExecuted": false
+  },
+  "nextAction": "Create one separate static-only authorization and execute the composed wrapper when an observable execution mechanism is available.",
+  "containsPII": false,
+  "containsSecrets": false
+}

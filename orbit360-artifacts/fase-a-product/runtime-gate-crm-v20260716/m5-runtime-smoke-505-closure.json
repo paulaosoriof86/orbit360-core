@@ -1,0 +1,72 @@
+{
+  "schemaVersion": "orbit360-m5-runtime-smoke-closure-v1",
+  "issuedAt": "2026-07-29",
+  "gateId": "block5-release-candidate-visualization-v20260728",
+  "contractVersion": "5.0.5",
+  "status": "M5_RUNTIME_SMOKE_LAB_FAILED_STOP_LINE",
+  "requestCommit": "610229dcead42162f1e22b34894b4a3f8230684f",
+  "authorizedBaseCommit": "c98675c5c2b562b1c531543371607153fb56e3d9",
+  "runId": 30413481948,
+  "jobId": 90454714725,
+  "artifactId": 8709301142,
+  "artifactDigest": "sha256:082be4c8ac6e2e12d12534598736e27cc8083d1d206eb35c5ca2e37180d8e503",
+  "canonicalPreflight": {"status": "GO_GATE_CONTRACT", "passed": 17, "total": 17, "failed": 0},
+  "staticContract": {"status": "M5_RUNTIME_SMOKE_CONTRACT_PASS", "passed": 29, "total": 29, "failed": 0},
+  "browser": {
+    "executed": true,
+    "status": "FAIL",
+    "failureStage": "canonical_backend_runtime_ready",
+    "checksPassedBeforeStop": ["previewRedirectReady", "canonical_url_ready", "canonicalDocumentParsed"],
+    "pageError": "M5_RUNTIME_WRITE_BLOCKED:insert",
+    "blockedSource": "data/academia-v1230-operational-directory-v20260722.js",
+    "blockedCollection": "lecciones",
+    "failedScripts": 0,
+    "networkWriteCandidates": 0
+  },
+  "snapshots": {
+    "before": {"status": "PASS", "checks": "11/11"},
+    "after": {"status": "PASS", "checks": "11/11"},
+    "countsStable": true,
+    "digestsStable": true,
+    "sourceClients": 414,
+    "sourceInsurers": 26,
+    "advisors": 7,
+    "canonicalClients": 414,
+    "canonicalInsurers": 26,
+    "memberships": 1,
+    "config": 1
+  },
+  "writes": {
+    "firestoreReads": true,
+    "firestoreWrites": 0,
+    "operationalWrites": 0,
+    "storeWriteCallsCompleted": 0,
+    "networkWriteCandidates": 0
+  },
+  "rootCauses": [
+    {
+      "classification": ["FUNCTIONAL_DEFECT", "DATA_CONTRACT_FAILURE"],
+      "owner": "Academia/Orbit.store LAB",
+      "cause": "static_academia_content_uses_durable_store_insert_update_during_bootstrap",
+      "evidence": [
+        "academia_v1230_auto_apply_calls_store_insert_update",
+        "lab_store_insert_update_call_firestore_set"
+      ]
+    },
+    {
+      "classification": ["VALIDATOR_STALE", "PIPELINE_MECHANISM_FAILURE"],
+      "owner": "PWA/Router/runtime smoke",
+      "cause": "smoke_expected_visual_delivery_revision_20260723_10_as_backend_runtime_while_backend_loader_owner_is_20260717_2"
+    }
+  ],
+  "authorizationConsumed": true,
+  "runtimeSmokeAuthorized": false,
+  "allowedRuntimeSmokeExecutions": 0,
+  "hostingDeployAuthorized": false,
+  "visualReviewAuthorized": false,
+  "approvalReadyForVisualReview": false,
+  "block5Closed": false,
+  "nextAction": "STATIC_REMEDIATION_AND_NEW_RC_READINESS_WITHOUT_DEPLOY_OR_BROWSER",
+  "containsPII": false,
+  "containsSecrets": false
+}

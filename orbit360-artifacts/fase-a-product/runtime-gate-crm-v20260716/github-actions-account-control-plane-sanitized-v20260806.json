@@ -1,0 +1,63 @@
+{
+  "schemaVersion": "orbit360-github-actions-external-incident-v2",
+  "status": "STOP_RETRY_GITHUB_ACTIONS_MAJOR_OUTAGE_ACTIVE",
+  "classification": "ENVIRONMENT_FAILURE",
+  "failureCode": "GITHUB_ACTIONS_MAJOR_OUTAGE_ACTIVE",
+  "hypothesisRetraction": {
+    "retractedFailureCode": "ACCOUNT_OR_REPOSITORY_ACTIONS_DISABLED_OR_RESTRICTED",
+    "reason": "Repository Settings screenshot confirms 'Allow all actions and reusable workflows' was already selected. The configuration hypothesis is invalid and must not be used as cause root."
+  },
+  "officialIncident": {
+    "provider": "GitHub Status",
+    "incidentId": "qcvjkzcs7j74",
+    "name": "Incident with Actions",
+    "startedAtUtc": "2026-08-06T15:22:49.021Z",
+    "status": "investigating",
+    "impact": "critical",
+    "component": "Actions",
+    "componentStatus": "major_outage",
+    "lastObservedUpdateUtc": "2026-08-06T18:46:37.400Z",
+    "reportedEffects": [
+      "workflow runs failing",
+      "workflow runs delayed in starting",
+      "jobs remaining queued for extended periods",
+      "queued jobs timing out",
+      "GitHub-hosted runner capacity constrained",
+      "webhook deliveries delayed",
+      "some Actions API requests returning errors"
+    ]
+  },
+  "observedProjectSymptoms": {
+    "ubuntuCanaryRun1": "31122714301",
+    "ubuntuCanaryRun2": "31124256674",
+    "ubuntuJobsReceivedSteps": false,
+    "macosControlPlaneRunsObserved": 0,
+    "crossRepositoryRunsObserved": 0,
+    "consistentWithOfficialIncident": true
+  },
+  "sourceFix": {
+    "crossRunnerStatus": "PASS_VISUAL_MATRIX_CROSS_RUNNER_SOURCE",
+    "crossRunnerChecks": 24,
+    "crossRunnerPassed": 24,
+    "signalSafeStatus": "PASS_VISUAL_MATRIX_TIMEOUT_SIGNAL_SAFE_SOURCE",
+    "signalSafeChecks": 48,
+    "signalSafePassed": 48
+  },
+  "secretsRead": false,
+  "firebaseAccess": false,
+  "firestoreReads": 0,
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "operationalWrites": 0,
+  "browserExecuted": false,
+  "hostingTouched": false,
+  "deployExecuted": false,
+  "productionTouched": false,
+  "mainTouched": false,
+  "mergeExecuted": false,
+  "containsPII": false,
+  "containsSecrets": false,
+  "containsPasswords": false,
+  "ok": false,
+  "nextAction": "Do not change repository Actions permissions and do not create more canaries while the official GitHub Actions incident remains investigating/major outage. When GitHub Status reaches monitoring or resolved and new workflow capacity is observable, execute exactly one source-only cross-runner validation, then request one immutable runtime authorization bound to the then-current canonical HEAD."
+}

@@ -1,0 +1,36 @@
+/* Orbit 360 · Academia 1.232 · Directorio operativo, edición y responsive */
+(function(){
+'use strict';
+window.Orbit=window.Orbit||{};var O=window.Orbit,V='1.232',F='20260802.1',appliedStore=null,applying=false,attempts=0;
+(function(){var p=new URLSearchParams(location.search||''),lab=p.get('orbitBackend')==='firestore-lab'&&(p.get('tenant')||'alianzas-soluciones')==='alianzas-soluciones',c=O.academiaStaticContentWritePolicy;if(!lab||(c&&c.version==='20260730.1'&&c.installed===true))return;if(document.readyState==='loading'&&typeof document.write==='function')document.write('<script src="core/academia-static-content-write-policy-v20260729.js?v=20260730-1"><\/script>');}());
+if(O.academiaOperationalDirectoryV20260722&&O.academiaOperationalDirectoryV20260722.version===V&&O.academiaOperationalDirectoryV20260722.rootFix===F)return;
+function rows(){return[
+{id:'m1_operational_directory_direccion_1232',titulo:'Directorio operativo y edición · Dirección',rol:'Dirección',obligatoria:true,_m1operationalv:1232,secciones:[
+{icon:'👤',title:'Usuario visible',body:'El usuario del portal es operativo y permanece visible. La contrase\u00f1a es el único secreto y se revela temporalmente.'},
+{icon:'🏦',title:'Cuenta visible',body:'El número bancario se muestra completo y se copia directamente. accountRef se conserva como respaldo, nunca como condición de lectura.'},
+{icon:'✏️',title:'CRUD dinámico',body:'Cuentas, contactos y plataformas se agregan, editan y eliminan desde Orbit.store. No se generan números ficticios ni se conservan valores operativos en código.'},
+{icon:'💾',title:'Persistencia confirmada',body:'Guardar captura la pestaña actual y espera confirmación del backend. Ante un rechazo, mantiene la edición abierta y muestra un error honesto.'},
+{icon:'✅',title:'Aseguradoras A&S activas',body:'Para el tenant A&S, las 26 aseguradoras son operadas y permanecen activas. Una inactivación futura solo puede hacerse manualmente, con motivo y auditoría.'},
+{icon:'🧪',title:'Defecto y validador',body:'Pantalla en blanco o títulos desbordados son FUNCTIONAL_DEFECT. Un validador que los aprueba es VALIDATOR_STALE y debe corregirse antes de cerrar M1.'}]},
+{id:'m1_operational_directory_operativo_1232',titulo:'Directorio operativo y contactos · Operativo',rol:'Operativo',obligatoria:true,_m1operationalv:1232,secciones:[
+{icon:'📋',title:'Lectura operativa',body:'Consultar usuario, cuenta y contactos no concede permisos para borrar o desactivar aseguradoras.'},
+{icon:'📞',title:'Acciones derivadas',body:'Correo aparece cuando existe email; Llamar cuando existe teléfono; WhatsApp cuando hay al menos ocho dígitos. Tras guardar, las acciones se actualizan automáticamente.'},
+{icon:'↩️',title:'Edición segura',body:'Operativo, Dirección, Admin y Superadmin pueden actualizar usuario y contrase\u00f1a. El usuario se guarda en el directorio; la contrase\u00f1a viaja al proveedor seguro y nunca entra a Orbit.store.'}]},
+{id:'m1_operational_directory_asesor_1232',titulo:'Directorio operativo responsive · Asesor',rol:'Asesor',obligatoria:true,_m1operationalv:1232,secciones:[
+{icon:'📱',title:'Títulos y acciones móviles',body:'Títulos, pestañas, campos y botones deben adaptarse a 320, 360, 390 y 430 píxeles sin ocultar información ni generar desplazamiento lateral.'},
+{icon:'⚠️',title:'Pendientes honestos',body:'Sin usuario registrado o Pendiente de registrar solo se muestran cuando realmente falta el dato.'},
+{icon:'🔒',title:'Permisos separados',body:'Ver datos operativos no autoriza editar. La contrase\u00f1a continúa sujeta a rol, sesión y revelado temporal.'}]}];}
+function quiz(){return{id:'eval_m1_operational_directory_1232',titulo:'Caso aplicado · Edición del directorio',_m1operationalv:1232,preguntas:[
+{p:'¿Qué debe preservar el editor al guardar un portal?',ops:['Solo lo visible','credentialRef y usuario operativo','La contrase\u00f1a en texto'],ok:1},
+{p:'¿Qué debe ocurrir con las aseguradoras de A&S?',ops:['Todas activas hasta inactivación manual','Inactivas sin credencial','Activas según documentos'],ok:0},
+{p:'¿Cuándo aparece WhatsApp?',ops:['Siempre','Cuando existe teléfono con al menos ocho dígitos','Solo con correo'],ok:1},
+{p:'¿Qué hacer si Editar deja la ficha en blanco?',ops:['Aceptar el PASS estático','Clasificar defecto y corregir la barrera edit-aware','Reimportar datos'],ok:1}]};}
+function stable(v){if(Array.isArray(v))return v.map(stable);if(!v||typeof v!=='object')return v;return Object.keys(v).sort().reduce(function(o,k){o[k]=stable(v[k]);return o;},{});}
+function same(current,expected){if(!current||!expected||current.id!==expected.id||current._m1operationalv!==1232)return false;var a={},b={};Object.keys(expected).forEach(function(k){a[k]=current[k];b[k]=expected[k];});try{return JSON.stringify(stable(a))===JSON.stringify(stable(b));}catch(e){return false;}}
+function upsert(S,col,row){var cur=S.get(col,row.id);if(same(cur,row))return'unchanged';if(cur){S.update(col,row.id,row);return'updated';}S.insert(col,row);return'inserted';}
+function ready(S){if(!S||!S.get)return false;var q=quiz(),c=S.get('config','academia')||{};return rows().every(function(r){return same(S.get('lecciones',r.id),r);})&&same(S.get('evaluaciones',q.id),q)&&c.contenidoDirectorioOperativo===V;}
+function apply(){var S=O.store;if(!S||!S.all||!S.get||!S.insert||!S.update)return{ok:false,code:'STORE_REQUIRED',writes:0};if(applying)return{ok:false,code:'APPLY_IN_PROGRESS',writes:0};if(appliedStore===S&&ready(S))return{ok:true,code:'ALREADY_CURRENT',contentVersion:V,writes:0};applying=true;try{var P=O.academiaStaticContentWritePolicy;if(S.__firestoreLabExplicit===true&&(!P||P.installed!==true||P.version!=='20260730.1')){if(P&&typeof P.install==='function')P.install();P=O.academiaStaticContentWritePolicy;if(!P||P.installed!==true)return{ok:false,code:'STATIC_CONTENT_WRITE_POLICY_REQUIRED',writes:0};}var acts=[];rows().forEach(function(r){acts.push(upsert(S,'lecciones',r));});acts.push(upsert(S,'evaluaciones',quiz()));var c=S.get('config','academia')||{};if(c.contenidoDirectorioOperativo!==V){S.update('config','academia',Object.assign({},c,{contenidoDirectorioOperativo:V,actualizadoAt:new Date().toISOString()}));acts.push('updated');}else acts.push('unchanged');appliedStore=S;var w=acts.filter(function(x){return x==='inserted'||x==='updated';}).length;return{ok:true,code:w?'STATIC_CONTENT_APPLIED':'ALREADY_CURRENT',contentVersion:V,writes:w,actions:acts};}finally{applying=false;}}
+function boot(){var r=apply();if(!r.ok&&(r.code==='STORE_REQUIRED'||r.code==='STATIC_CONTENT_WRITE_POLICY_REQUIRED')&&attempts++<400)setTimeout(boot,10);return r;}
+O.academiaOperationalDirectoryV20260722={version:V,rootFix:F,contentVersion:V,operationalDirectorySemantics:true,editModeAware:true,allAysInsurersActive:true,manualDeactivationOnly:true,contactActionsDerived:true,responsiveSemanticTitles:true,usernameOperational:true,bankNumberOperational:true,passwordOnlySecret:true,dynamicCrud:true,backendWriteAcknowledgement:true,secureCredentialMutation:true,operationalValuesInCode:false,staticContentPersistence:'transient_session_only_in_lab',sessionChangeWrites:false,targetOnlyIdempotentUpsert:true,apply:apply,contentReady:ready};
+setTimeout(boot,0);document.addEventListener('orbit:store',boot);
+}());

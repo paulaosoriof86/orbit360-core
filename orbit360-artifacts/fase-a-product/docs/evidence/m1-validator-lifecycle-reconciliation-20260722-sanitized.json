@@ -1,0 +1,56 @@
+{
+  "schemaVersion": "orbit360-m1-validator-lifecycle-reconciliation-proof-v1",
+  "issuedAt": "2026-07-22",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "gateId": "block1-client360-insurers-lab-v20260717",
+  "gateContractVersion": "1.0.37",
+  "validatorLifecycleRevision": "phase-aware-static-authorization-v2",
+  "classification": [
+    "VALIDATOR_STALE",
+    "ENVIRONMENT_FAILURE"
+  ],
+  "status": "RECONCILED_PENDING_BINDING_EXECUTION",
+  "retiredChecks": [
+    "FREEZE_STOP_THE_LINE",
+    "FREEZE_NO_RUNTIME",
+    "AUTHORIZATION_CONSUMED"
+  ],
+  "replacementChecks": [
+    "FREEZE_M1_OPEN",
+    "FREEZE_NO_RUNTIME_BROWSER_DEPLOY",
+    "AUTHORIZATION_STATIC_LIFECYCLE"
+  ],
+  "preservedContractTokens": {
+    "gateContractVersion": "1.0.37",
+    "overlayClassification": "FUNCTIONAL_DEFECT",
+    "manifestContractVersion": "1.0.37"
+  },
+  "productOwnerChanged": false,
+  "academyContentVersion": "1.228",
+  "environment": {
+    "workflowRunObserved": false,
+    "commitStatusObserved": false,
+    "replacementMechanism": "atomic_git_data_commit"
+  },
+  "execution": {
+    "bindingPreflightExecuted": false,
+    "operationalWrites": 0,
+    "firestoreReads": 0,
+    "firestoreWrites": 0,
+    "secretsRead": false,
+    "vaultRead": false,
+    "runtimeExecuted": false,
+    "browserExecuted": false,
+    "deployExecuted": false,
+    "functionsDeployed": false,
+    "rulesDeployed": false,
+    "productionTouched": false,
+    "mainTouched": false,
+    "mergeExecuted": false
+  },
+  "nextAction": "Run one binding static preflight under a new single-use static-only authorization when the execution mechanism is available.",
+  "containsPII": false,
+  "containsSecrets": false
+}

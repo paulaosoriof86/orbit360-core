@@ -1,0 +1,98 @@
+{
+  "schemaVersion": "orbit360-sanitized-audit-canonical-store-cumulative-v1",
+  "date": "2026-08-01",
+  "gate": {
+    "id": "block7-canonical-store-cumulative-adapter-static-v20260801",
+    "contractVersion": "7.10.0",
+    "status": "CANONICAL_STORE_CUMULATIVE_ADAPTER_STATIC_CLOSED",
+    "classification": "GO_STATIC_CANONICAL_STORE_ADAPTER",
+    "acceptedPass": {
+      "run": 30732429713,
+      "job": 91455058689,
+      "artifact": 8828406898,
+      "artifactDigest": "sha256:69b839474c08c3e01c4c65b8899a331d788921e25be3acda935f0c94a76c9a4e",
+      "head": "0203a2adb2dd0173c23c4a7d275ae340bd3bc0f6",
+      "preflight": {"passed": 17, "failed": 0},
+      "staticChecks": {"passed": 48, "failed": 0}
+    },
+    "latestAuditedEquivalentPass": {
+      "run": 30732451326,
+      "job": 91455115850,
+      "artifact": 8828413796,
+      "artifactDigest": "sha256:6abbd30d2abeab57abe6cd5f7d1e34fa449646709b5dca6b21ef1f387797bf72",
+      "head": "5f3ec91e827b7b3ecb8a4fb4d8c493268632f9a4",
+      "preflight": {"passed": 17, "failed": 0},
+      "staticChecks": {"passed": 48, "failed": 0},
+      "classification": "PIPELINE_MECHANISM_DUPLICATE_STATIC_REPLAY",
+      "productOrDataImpact": false
+    }
+  },
+  "rootCause": {
+    "primary": "MULTIPLE_FRONTEND_READ_OWNERS_AND_LEGACY_PATH_LABELED_CANONICAL",
+    "details": [
+      "The LAB store resolved sealed collections through the legacy tenant path.",
+      "The receipts/portfolio bridge opened Firestore listeners and maintained a parallel cache outside Orbit.store.",
+      "The static scanner initially inspected comments and dormant unloaded modules instead of the active runtime graph."
+    ]
+  },
+  "solution": {
+    "singleReadOwner": "Orbit.store",
+    "canonicalSnapshotDigest": "19e1927d39f6b713ee12504f8762bc42ead9de6e365bb0f12162d2a0c8f8469b",
+    "canonicalCollections": 7,
+    "canonicalPath": "tenants/{tenantId}/data/{collection}/items",
+    "legacyUnmigratedPath": "tenantId/{tenantId}/{collection}",
+    "runtimeDeltaFiles": 5,
+    "publicApiMissing": [],
+    "operationalSeedExclusion": true,
+    "requiresValidationPreserved": true,
+    "directFirestoreListenersInVisualBridge": 0,
+    "parallelVisualCache": false,
+    "oldParallelProjectionLoaded": false,
+    "modulesPreserved": 62,
+    "activeModulesValidated": 52,
+    "activeModuleDirectFirestoreViolations": 0,
+    "dormantModules": 10,
+    "dormantInitialImporterRuntimeReferences": 0
+  },
+  "cumulativeManifest": {
+    "trackedFileCount": 309,
+    "rootCounts": {
+      "index": 1,
+      "modules": 62,
+      "core": 183,
+      "styles": 10,
+      "data": 53
+    },
+    "pathDigest": "517056dee1200503b2e7295a333cb804bc71271bbaa87847fa762da025f276f1",
+    "contentDigest": "83cc01dacf180b8ca9693df7117030228479992d6db4c59fab53def2e94acafd",
+    "indexDigest": "b57b6581ee02d2dde42a8a2c1272d57f19b7ad6809d13a1d25111f3d71a96074"
+  },
+  "methodology": {
+    "firstAttemptClassification": "VALIDATOR_STALE",
+    "firstAttemptProductDefectConfirmed": false,
+    "validatorCorrectedBeforeSecondAttempt": true,
+    "secondAttemptPassed": true,
+    "duplicateReplayClassification": "PIPELINE_MECHANISM_DUPLICATE_STATIC_REPLAY",
+    "pushReplayDisabled": true,
+    "requestConsumed": true,
+    "additionalExecutionsAllowed": false
+  },
+  "security": {
+    "secretAccess": false,
+    "firestoreRead": false,
+    "firestoreWrites": 0,
+    "operationalWrites": 0,
+    "reimport": false,
+    "runtime": false,
+    "browser": false,
+    "preview": false,
+    "deploy": false,
+    "production": false,
+    "main": false,
+    "merge": false
+  },
+  "containsPII": false,
+  "containsDocumentIds": false,
+  "containsValues": false,
+  "containsSecrets": false
+}

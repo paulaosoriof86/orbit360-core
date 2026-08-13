@@ -1,0 +1,32 @@
+{
+  "schemaVersion": "orbit360-block1-retained26-encrypted-export-v30-v1",
+  "gateId": "block1-client360-insurers-lab-v20260717",
+  "contractVersion": "1.0.41",
+  "status": "PASS_V30_ENCRYPTED_TARGET_EXPORT",
+  "decision": "PASS_ENCRYPTED_EXPORT",
+  "classification": "PRIVACY_PRESERVING_TARGET_IDENTITY_EXPORT",
+  "targetCount": 16,
+  "referencesObserved": 430,
+  "projectedFields": 33,
+  "probableMatchSupport": {
+    "phoneFieldsEncryptedOnly": true,
+    "birthDateFieldsEncryptedOnly": true
+  },
+  "firestoreReadOperations": 2,
+  "encryptedArtifact": true,
+  "encryptedArtifactSha256": "17b892a961b65d1d2b8e025531e8afedd5fad763b214141ed673d4b9fbf33b64",
+  "rawPIIInEvidence": false,
+  "rawPIIPersistedInRepo": false,
+  "privateKeyInActions": false,
+  "firestoreWrites": 0,
+  "authReads": 0,
+  "authWrites": 0,
+  "operationalWrites": 0,
+  "reimport": false,
+  "hostingTouched": false,
+  "browserExecuted": false,
+  "productionTouched": false,
+  "containsPII": false,
+  "containsSecrets": false,
+  "ok": true
+}

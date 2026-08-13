@@ -1,0 +1,101 @@
+{
+  "schemaVersion": "orbit360-rc-ays-microblock22-pass-v1",
+  "generatedAt": "2026-08-05T05:08:03.885Z",
+  "localTime": "2026-08-04T23:08:03-06:00",
+  "rcId": "RC-AYS-LAB-CANONICA-01",
+  "microblock": "2.2",
+  "gate": "PASS_CANONICAL_PREFLIGHT_COMPOSITION",
+  "status": "PASS_CANONICAL_PREFLIGHT_COMPOSITION",
+  "classification": "GO_SOURCE_ONLY_CONTROL_PLANE",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "sourceBaseline": "548cffa50cddfd93ad2118f5a06e9bb420699bde",
+  "finalSourceOnlyRunId": 30977179448,
+  "finalSourceOnlyJobId": 92213524382,
+  "finalRequestCommit": "ac5b4e6acdeb9423f0ecff056c9e3f0026df3c55",
+  "artifact": {
+    "id": 8918683791,
+    "name": "orbit360-microblock22-source-only-30977179448",
+    "digest": "sha256:1c9a1e3f76e331604a046562337e03bfdbe5e2a7be7094746e14804b017692ec",
+    "expiresAt": "2026-08-19T05:08:04Z"
+  },
+  "integratedGate": {
+    "total": 31,
+    "passed": 31,
+    "failed": 0,
+    "outerRouterExitCode": 0,
+    "innerEngineReached": true,
+    "innerPreflightStatus": "PASS_CANONICAL_PREFLIGHT_COMPOSITION"
+  },
+  "innerPreflight": {
+    "total": 32,
+    "passed": 32,
+    "failed": 0,
+    "validatorLifecycleRevision": "phase-capability-contract-v1",
+    "visualHarnessRevision": "isolated-context-direct-url-v6",
+    "controlPlaneRevision": "canonical-preflight-composition-source-only-v1"
+  },
+  "observedEvidenceProbe": {
+    "functionsExpected": 4,
+    "functionsVerified": 0,
+    "observedCountersOnly": true
+  },
+  "resolvedRootCauses": [
+    {
+      "classification": "VALIDATOR_STALE",
+      "finding": "Canonical lifecycle composition and visual harness revision were stored in the same field.",
+      "resolution": "Preserve phase-capability-contract-v1 and declare isolated-context-direct-url-v6 separately."
+    },
+    {
+      "classification": "VALIDATOR_STALE",
+      "finding": "Evidence validators expected a direct environment token although the builder used an observed helper.",
+      "resolution": "Make the observed FUNCTIONS_VERIFIED source explicit while preserving validation behavior."
+    },
+    {
+      "classification": "VALIDATOR_STALE",
+      "finding": "Retention validation searched legacy inline decision tokens after moving decisions to the observed-output builder.",
+      "resolution": "Expose explicit retention contract markers without changing runtime behavior."
+    }
+  ],
+  "runtimePackaging": {
+    "workflow": ".github/workflows/orbit360-block12-visual-layoutfree-reactivation-lab-v20260804.yml",
+    "workflowCommit": "957b62aa2416d71e1ae1cada9bad61d2395bc46e",
+    "futureRequest": ".github/orbit360-requests/block12-go-lab-candidate-visible-v3.json",
+    "futureRequestExists": false,
+    "oldConsumedRequest": ".github/orbit360-requests/block12-operational-runtime-layoutfree-lab-v20260804.json",
+    "oldConsumedRequestImmutable": true,
+    "newWorkflowVariantCreatedForRuntime": false,
+    "runtimeActivationState": "INERT_AWAITING_NEW_EXPLICIT_AUTHORIZATION"
+  },
+  "executionBoundary": {
+    "runtimeAuthorized": false,
+    "secretAccess": false,
+    "firebaseCommandsExecuted": false,
+    "firestoreRead": false,
+    "firestoreWrites": 0,
+    "authWrites": 0,
+    "browserExecuted": false,
+    "deployExecuted": false,
+    "rulesDeployed": false,
+    "realDataReimported": false,
+    "functionalReplayExecuted": false,
+    "productionTouched": false,
+    "mainTouched": false,
+    "mergeExecuted": false
+  },
+  "priorFactsPreserved": {
+    "functionalRunId": 30962756387,
+    "functionalPassed": 18,
+    "functionalFailed": 0,
+    "isolatedRouteRunId": 30971707956,
+    "isolatedRoutesPassed": 8,
+    "candidateDataUnchanged": true
+  },
+  "nextMicroblock": "2.3",
+  "nextGate": "GO_LAB_CANDIDATE_VISIBLE",
+  "nextRuntimeAuthorizationRequired": true,
+  "containsPII": false,
+  "containsSecrets": false,
+  "ok": true
+}

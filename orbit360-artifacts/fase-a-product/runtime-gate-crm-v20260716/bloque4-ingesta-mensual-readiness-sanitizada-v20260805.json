@@ -1,0 +1,103 @@
+{
+  "schemaVersion": "orbit360-bloque4-monthly-intake-readiness-v1",
+  "generatedAt": "2026-08-05T07:04:00-06:00",
+  "rcId": "RC-AYS-LAB-CANONICA-01",
+  "gate": "PASS_COBROS_FULL_REPLAY",
+  "status": "ACTIVE_READ_ONLY_MONTHLY_INTAKE_PARALLEL",
+  "classification": [
+    "DATA_CONTRACT_FAILURE",
+    "FUNCTIONAL_DEFECT"
+  ],
+  "manualVisualReview": {
+    "blockingTechnicalProgress": false,
+    "retainedPreview": true,
+    "legalAcceptanceOncePerSession": true
+  },
+  "platformCapabilitiesObserved": {
+    "formatsAccepted": ["xlsx", "xls", "csv", "tsv", "txt", "pdf", "doc", "docx", "png", "jpg", "jpeg", "webp", "bmp", "tif", "tiff"],
+    "sourceTypes": [
+      "receipt_schedule",
+      "reported_payments",
+      "insurer_payment_report",
+      "portfolio_statement",
+      "commission_statement",
+      "bank_statement",
+      "supporting_document"
+    ],
+    "fileHashIdempotency": true,
+    "dryRun": true,
+    "humanConfirmation": true,
+    "rollbackBeforeConsumption": true,
+    "bankCreatesCobroDirectly": false,
+    "financeMovementCreatedAutomatically": false,
+    "recurringImportFunctionDeployedLab": true,
+    "recurringImportFeatureFlagActiveLab": true
+  },
+  "newSourcesObserved": {
+    "gtCommissionStatement": {
+      "period": "2026-07",
+      "detailRows": 8,
+      "exactCalendarMatches": 8,
+      "alreadyOutsidePortfolio": 7,
+      "newReconciliationProposal": 1,
+      "proposalKey": "AUTO-519815|10/10|GTQ|600.31",
+      "currentCalendarState": "futuro_pendiente",
+      "decision": "PROPOSE_COMMISSION_RECOGNITION_NO_WRITE"
+    },
+    "aseguradoraGeneralSummary": {
+      "period": "2026-07",
+      "detailLevel": "aggregate",
+      "decision": "SUPPORTING_DOCUMENT_HOLD_NO_INDIVIDUAL_COBRO"
+    },
+    "elRobleCommissionInvoice": {
+      "period": "2026-07",
+      "detailLevel": "aggregate_invoice",
+      "decision": "COMMISSION_BILLING_SUPPORT_NO_INDIVIDUAL_COBRO"
+    }
+  },
+  "rootCauseFindings": [
+    {
+      "classification": "DATA_CONTRACT_FAILURE",
+      "owner": "functions/recurring-insurance-import.js",
+      "finding": "The generic required-evidence rule requires policyId for every source type. This conflicts with commission rows that arrive with policyNumber, bank rows that require a counterpart rather than policyId, and aggregate supporting documents."
+    },
+    {
+      "classification": "FUNCTIONAL_DEFECT",
+      "owner": "orbit360-platform/modules/importar-recurring-bridge-v20260804.js",
+      "finding": "Editable mapping correction and persisted reusable profiles are not demonstrated in the recurring monthly UI."
+    },
+    {
+      "classification": "FUNCTIONAL_DEFECT",
+      "owner": "orbit360-platform/core/recurring-insurance-document-extractor.js",
+      "finding": "Non-tabular documents can be marked as requiring backend extraction, but an end-to-end backend extraction operation is not demonstrated."
+    }
+  ],
+  "decision": "GO_ASSISTED_MONTHLY_INTAKE_NOT_YET_GO_UNIVERSAL_SELF_SERVICE",
+  "intakeOperatingRule": {
+    "filesMayArriveOneByOne": true,
+    "batchSubmissionAllowed": true,
+    "waitForAllSourcesRequired": false,
+    "deduplicateByFileHash": true,
+    "preserveFileSheetRowBlockCountryCurrencyPeriod": true,
+    "aggregateEvidenceNeverCreatesIndividualCobros": true,
+    "bankStatementAloneNeverCreatesCobro": true
+  },
+  "nextActions": [
+    "Continue classifying the 365 reported payments without writes.",
+    "Add the G&T 8-row statement to the sanitized proposal ledger and preserve the seven already explained rows.",
+    "Keep Aseguradora General and El Roble aggregate documents as support/HOLD.",
+    "Prepare a source-only root fix for evidence identity requirements by source type, reusable profiles and mapping correction.",
+    "Do not deploy or write tenant data until a separate gate and authorization."
+  ],
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "cobrosApplied": 0,
+  "receiptsModified": 0,
+  "deployExecuted": false,
+  "productionTouched": false,
+  "mainTouched": false,
+  "mergeExecuted": false,
+  "containsPII": false,
+  "containsSecrets": false,
+  "ok": true
+}

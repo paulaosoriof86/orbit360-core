@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Capacitación: CRM · Orbit 360</title>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{--red:#C5162E;--graph:#1E2227;--ink:#1E2227;--ink-2:#3d4350;--ink-3:#7a818e;--surface:#f4f3ee;--card:#fff;--line:#e4e2db;--r:14px}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Manrope',system-ui,sans-serif;background:var(--surface);color:var(--ink);line-height:1.6}
+    .nav{position:sticky;top:0;z-index:50;background:var(--graph);color:#fff;display:flex;align-items:center;gap:14px;padding:14px 24px;box-shadow:0 2px 12px rgba(0,0,0,.25)}
+    .nav-logo{font-size:20px;font-weight:800;letter-spacing:-.02em}.nav-logo span{color:var(--red)}
+    .nav-sub{font-size:11px;color:rgba(255,255,255,.55);margin-top:2px}
+    .nav-prog{margin-left:auto;display:flex;align-items:center;gap:10px}
+    .prog-bar{width:110px;height:5px;background:rgba(255,255,255,.18);border-radius:99px;overflow:hidden}
+    .prog-bar i{display:block;height:100%;background:var(--red);border-radius:99px;transition:.4s;width:0}
+    .prog-lbl{font-size:11px;color:rgba(255,255,255,.6)}
+
+    .layout{display:grid;grid-template-columns:240px 1fr;max-width:1060px;margin:0 auto;padding:24px 16px;gap:20px}
+    .toc{position:sticky;top:66px;align-self:start;background:var(--card);border-radius:var(--r);padding:18px;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+    .toc-t{font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin-bottom:12px}
+    .toc-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;font-size:12.5px;font-weight:600;color:var(--ink-2);cursor:pointer;transition:.12s;margin-bottom:2px}
+    .toc-item:hover{background:var(--surface)}
+    .toc-item.done{color:var(--red)}.toc-item.done .toc-check{background:var(--red);color:#fff;border-color:var(--red)}
+    .toc-item.active{background:var(--red);color:#fff}.toc-item.active .toc-check{background:rgba(255,255,255,.2);color:#fff;border-color:rgba(255,255,255,.3)}
+    .toc-check{width:20px;height:20px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-size:10px;font-weight:800;flex-shrink:0}
+
+    .content{display:grid;gap:24px}
+    .slide{background:var(--card);border-radius:var(--r);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.07);scroll-margin-top:80px}
+    .slide-hero{background:linear-gradient(120deg,var(--graph),#111820);padding:36px 40px;color:#fff}
+    .slide-hero .eyebrow{font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.6);margin-bottom:10px}
+    .slide-hero h1{font-size:28px;font-weight:800;letter-spacing:-.02em;line-height:1.2;margin-bottom:10px}
+    .slide-hero h1 span{color:var(--red)}
+    .slide-hero p{font-size:15px;color:rgba(255,255,255,.8);max-width:520px}
+    .slide-body{padding:32px 40px}
+    .slide h2{font-size:19px;font-weight:800;margin-bottom:16px;display:flex;align-items:center;gap:9px}
+    .num{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--red);color:#fff;font-size:13px;font-weight:800;flex-shrink:0}
+    .slide p{font-size:14px;color:var(--ink-2);margin-bottom:12px}
+    .slide ul{list-style:none;display:grid;gap:9px;margin-bottom:16px}
+    .slide ul li{display:flex;gap:11px;align-items:flex-start;font-size:14px;color:var(--ink-2);padding:10px 14px;background:var(--surface);border-radius:8px}
+    .slide ul li .li-em{font-size:18px;flex-shrink:0;margin-top:1px}
+    .tip{background:#fff7ed;border-left:4px solid #c9821b;border-radius:0 10px 10px 0;padding:14px 18px;margin-top:18px}
+    .tip b{display:block;font-size:13px;color:#c9821b;margin-bottom:5px}
+    .tip p{font-size:13px;color:var(--ink-2);margin:0}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+    .info-card{border:1px solid var(--line);border-radius:10px;padding:16px 18px}
+    .info-card .ic{font-size:22px;margin-bottom:7px}
+    .info-card b{display:block;font-size:14px;font-weight:700;margin-bottom:4px}
+    .info-card p{font-size:12.5px;color:var(--ink-3);margin:0}
+    .video-ph{background:linear-gradient(135deg,#1a1f28,#0f1318);border-radius:10px;padding:48px 20px;text-align:center;color:#fff;margin:8px 0}
+    .video-ph .play{width:64px;height:64px;border-radius:50%;background:var(--red);display:grid;place-items:center;font-size:24px;margin:0 auto 14px;cursor:pointer}
+    .video-ph h3{font-family:'Manrope',sans-serif;font-size:17px;font-weight:700;margin-bottom:6px}
+    .video-ph p{font-size:13px;color:rgba(255,255,255,.65);margin:0}
+    .step-list{display:grid;gap:10px;margin:14px 0}
+    .step-item{display:flex;gap:13px;align-items:flex-start;padding:13px 16px;border:1px solid var(--line);border-radius:10px}
+    .step-n{flex-shrink:0;width:28px;height:28px;border-radius:50%;background:var(--graph);color:#fff;font-weight:800;font-size:13px;display:grid;place-items:center}
+    .step-t{font-size:14px;font-weight:700;margin-bottom:3px}
+    .step-d{font-size:13px;color:var(--ink-2)}
+    .badge-ok{background:#dcfce7;color:#15803d;font-size:11px;font-weight:700;border-radius:6px;padding:3px 9px}
+    .badge-warn{background:#fef3c7;color:#b45309;font-size:11px;font-weight:700;border-radius:6px;padding:3px 9px}
+    .quiz-block{background:var(--surface);border-radius:10px;padding:20px 22px;margin-top:16px}
+    .quiz-block h3{font-size:14.5px;font-weight:700;margin-bottom:12px}
+    .quiz-block label{display:flex;align-items:center;gap:10px;font-size:13.5px;padding:9px 12px;border:1px solid var(--line);border-radius:8px;cursor:pointer;margin-bottom:7px;background:var(--card)}
+    .quiz-block label:hover{border-color:var(--red)}
+    .quiz-block input{accent-color:var(--red)}
+    .quiz-block .qbtn{display:inline-flex;align-items:center;gap:7px;background:var(--red);color:#fff;border:none;border-radius:8px;padding:9px 20px;font-weight:700;font-size:13.5px;cursor:pointer;margin-top:8px}
+    .quiz-block .result{display:none;margin-top:10px;font-weight:700;font-size:13.5px}
+    .footer-nav{display:flex;justify-content:space-between;align-items:center;padding:16px 40px;border-top:1px solid var(--line)}
+    .btn-nav{display:inline-flex;align-items:center;gap:7px;background:var(--red);color:#fff;border:none;border-radius:8px;padding:10px 20px;font-weight:700;font-size:13.5px;cursor:pointer}
+    .btn-ghost{background:none;color:var(--ink-2);border:1px solid var(--line)}
+    @media(max-width:780px){.layout{grid-template-columns:1fr}.toc{position:static}.grid2{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+
+<div class="nav">
+  <div><div class="nav-logo">Orbit <span>360</span></div><div class="nav-sub">📚 Capacitación · CRM Completo</div></div>
+  <div class="nav-prog">
+    <div class="prog-bar"><i id="progbar"></i></div>
+    <span class="prog-lbl" id="proglbl">0/6</span>
+  </div>
+</div>
+
+<div class="layout">
+  <aside class="toc">
+    <div class="toc-t">Módulos</div>
+    <div class="toc-item" id="toc-s1" onclick="goTo('s1')"><span class="toc-check" id="chk-s1">1</span>🌅 Bienvenida</div>
+    <div class="toc-item" id="toc-s2" onclick="goTo('s2')"><span class="toc-check" id="chk-s2">2</span>🧑‍💼 Clientes 360</div>
+    <div class="toc-item" id="toc-s3" onclick="goTo('s3')"><span class="toc-check" id="chk-s3">3</span>📑 Pólizas</div>
+    <div class="toc-item" id="toc-s4" onclick="goTo('s4')"><span class="toc-check" id="chk-s4">4</span>💳 Cobros</div>
+    <div class="toc-item" id="toc-s5" onclick="goTo('s5')"><span class="toc-check" id="chk-s5">5</span>🔄 Ops/Leads</div>
+    <div class="toc-item" id="toc-s6" onclick="goTo('s6')"><span class="toc-check" id="chk-s6">6</span>✅ Evaluación</div>
+  </aside>
+
+  <div class="content">
+
+    <!-- S1 HERO -->
+    <div class="slide" id="s1">
+      <div class="slide-hero">
+        <div class="eyebrow">📚 Módulo 1 de 6 · CRM</div>
+        <h1>Bienvenida a<br><span>Orbit 360 CRM</span></h1>
+        <p>El sistema 360 inteligente e integral para intermediarios de seguros. En este módulo aprenderás a dominar el corazón de la plataforma. ¡Vamos! 🚀</p>
+      </div>
+      <div class="slide-body">
+        <h2><span class="num">🎯</span>¿Qué vas a aprender?</h2>
+        <div class="grid2">
+          <div class="info-card"><div class="ic">🧑‍💼</div><b>Clientes 360</b><p>El expediente completo: datos, pólizas, cobros, siniestros, correos e historial en un solo lugar.</p></div>
+          <div class="info-card"><div class="ic">📑</div><b>Pólizas y recibos</b><p>Desglose real de prima (neta, gastos, IVA) y generación automática de recibos.</p></div>
+          <div class="info-card"><div class="ic">💳</div><b>Cobros y cartera</b><p>Aplicar pagos, conciliar con factura, gestionar vencidos y notificar por lote.</p></div>
+          <div class="info-card"><div class="ic">🔄</div><b>Ciclo Ops ↔ Leads</b><p>El pipeline comercial sincronizado en vivo entre el equipo y los asesores.</p></div>
+        </div>
+        <div class="video-ph" onclick="alert('🎬 Carga el video de bienvenida en esta lección.\n\nPega la URL de YouTube en el campo URL de la lección (Orbit Academia → editar curso → lección 1).')">
+          <div class="play">▶</div>
+          <h3>🎬 Video de bienvenida</h3>
+          <p>Aquí va el video que generes con HeyGen o graben como equipo.<br>Haz clic para configurar la URL.</p>
+        </div>
+        <div class="tip"><b>💡 Tip inicial</b><p>La primera acción siempre es completar el teléfono y el correo de cada cliente — esto habilita WhatsApp y el correo interno de la plataforma.</p></div>
+      </div>
+      <div class="footer-nav">
+        <span></span>
+        <button class="btn-nav" onclick="done('s1')">Siguiente: Clientes 360 →</button>
+      </div>
+    </div>
+
+    <!-- S2 CLIENTES -->
+    <div class="slide" id="s2">
+      <div class="slide-body">
+        <h2><span class="num">2</span>🧑‍💼 Clientes 360 — el expediente completo</h2>
+        <p>Cada cliente tiene un <strong>expediente unificado</strong> con 10 pestañas. Todo en un solo lugar, sin saltar entre sistemas.</p>
+
+        <div class="step-list">
+          <div class="step-item"><div class="step-n">📋</div><div><div class="step-t">Resumen</div><div class="step-d">KPIs del cliente (pólizas activas, prima anual, cobros) — todos clicables para ver el detalle. Actividad reciente y próximas acciones.</div></div></div>
+          <div class="step-item"><div class="step-n">📑</div><div><div class="step-t">Pólizas</div><div class="step-d">Todas sus pólizas vigentes, vencidas y canceladas. Cada fila abre el desglose completo con recibos y endosos.</div></div></div>
+          <div class="step-item"><div class="step-n">🚗</div><div><div class="step-t">Vehículos</div><div class="step-d">Vehículos asegurados con marca, modelo, año, placa, chasis y motor. Vinculados a sus pólizas de auto.</div></div></div>
+          <div class="step-item"><div class="step-n">💳</div><div><div class="step-t">Recibos y pagos</div><div class="step-d">Usa el <b>filtro por póliza</b> para no mezclar cuotas de diferentes contratos. Aplicar pago con fecha y cargar factura.</div></div></div>
+          <div class="step-item"><div class="step-n">✉</div><div><div class="step-t">Correos</div><div class="step-d">Hilos de correo vinculados al cliente. Redactar desde aquí queda asociado al expediente automáticamente.</div></div></div>
+          <div class="step-item"><div class="step-n">🚨</div><div><div class="step-t">Siniestros / Reclamos</div><div class="step-d">Reclamos del cliente con estado, aseguradora, monto, bitácora y correos de respuesta. Se crean manual, desde el portal del cliente, o importando la bitácora de la aseguradora (multi-cliente).</div></div></div>
+          <div class="step-item"><div class="step-n">📂</div><div><div class="step-t">Documentos</div><div class="step-d">Expediente documental: DPI, pólizas, facturas, soportes. Vista previa y descarga; el cliente también los ve en su portal.</div></div></div>
+        </div>
+
+        <h2 style="margin-top:24px"><span class="num">🛠</span>Solicitar una gestión</h2>
+        <p>Desde la ficha del cliente (y desde el portal del cliente) puedes <strong>solicitar una gestión</strong> que aparece automáticamente en <strong>Orbit Ops</strong>, asociada al cliente y la póliza, con tipo seleccionable, nota y adjuntos de soporte. El equipo recibe notificación por WhatsApp y correo; al resolverse, notifica al asesor. Queda toda la trazabilidad en el historial del cliente.</p>
+
+        <h2 style="margin-top:24px"><span class="num">🆕</span>Crear un cliente nuevo</h2>
+        <ul>
+          <li><span class="li-em">1️⃣</span><div><b>Manualmente:</b> menú Clientes 360 → "+ Nuevo cliente" → completar todos los campos con ✅ los obligatorios (nombre, tipo, país, teléfono, correo, asesor).</div></li>
+          <li><span class="li-em">2️⃣</span><div><b>Por importación inteligente:</b> sube DPI, RTU o póliza en PDF — el motor detecta y completa nombre, identificación, dirección y datos automáticamente.</div></li>
+          <li><span class="li-em">3️⃣</span><div><b>Desde el ciclo comercial:</b> al emitir una póliza en Leads/Ops, se crea el cliente automáticamente heredando todos los datos del negocio.</div></li>
+        </ul>
+
+        <div class="tip"><b>🔗 Importar al expediente</b><p>Desde cualquier ficha de cliente → botón "Importar a este expediente" → elige el tipo (Pólizas, Vehículos, Estados de cuenta, Facturas, Documentos). El motor extrae los datos y complementa sin duplicar.</p></div>
+      </div>
+      <div class="footer-nav">
+        <button class="btn-nav btn-ghost" onclick="goTo('s1')">← Anterior</button>
+        <button class="btn-nav" onclick="done('s2')">Siguiente: Pólizas →</button>
+      </div>
+    </div>
+
+    <!-- S3 PÓLIZAS -->
+    <div class="slide" id="s3">
+      <div class="slide-body">
+        <h2><span class="num">3</span>📑 Pólizas — desglose real de prima</h2>
+        <p>Las pólizas en Orbit 360 no son solo un número — incluyen el <strong>desglose financiero real</strong> que coincide con lo que pide cada aseguradora.</p>
+
+        <h2 style="margin-top:20px;font-size:16px;color:var(--red)">🧾 Fórmula del desglose</h2>
+        <div class="step-list">
+          <div class="step-item"><div class="step-n" style="background:#1f8a4c">+</div><div><div class="step-t">Prima Neta</div><div class="step-d">El valor base del riesgo, calculado por las tasas de la aseguradora.</div></div></div>
+          <div class="step-item"><div class="step-n" style="background:#1f8a4c">+</div><div><div class="step-t">Gastos de Expedición (GT: 5% automático)</div><div class="step-d">Se calcula automáticamente al ingresar la prima neta en Guatemala. Modificable si la aseguradora difiere.</div></div></div>
+          <div class="step-item"><div class="step-n" style="background:#c9821b">+</div><div><div class="step-t">Gastos Financieros (recargo por fraccionamiento)</div><div class="step-d">Solo aplica si el pago es fraccionado. Se calcula sobre la prima neta.</div></div></div>
+          <div class="step-item"><div class="step-n" style="background:#6b4ea0">+</div><div><div class="step-t">Otros / Asistencias</div><div class="step-d">Cargos adicionales (asistencia vial, médica, etc.) incluidos en la póliza.</div></div></div>
+          <div class="step-item"><div class="step-n" style="background:var(--red)">%</div><div><div class="step-t">IVA (GT: 12% · CO: 19%)</div><div class="step-d">Se aplica sobre la base gravable (suma de todos los componentes anteriores). Configurable por país.</div></div></div>
+        </div>
+
+        <div class="info-card" style="margin-top:16px;border-color:var(--red)"><div class="ic">💡</div><b>Recibos automáticos</b><p>Tarjeta/contado = <b>1 recibo</b>. Fraccionado = <b>N recibos</b> prorrateados con recargo financiero. Al cambiar la forma de pago, los recibos pendientes se <b>regeneran automáticamente</b>.</p></div>
+
+        <h2 style="margin-top:24px"><span class="num">📜</span>Endosos y modificaciones</h2>
+        <ul>
+          <li><span class="li-em">🔄</span><div><b>Sustitución de vehículo:</b> registrar en Endosos → queda en el historial de la póliza y en el del cliente.</div></li>
+          <li><span class="li-em">👤</span><div><b>Cambio de propietario:</b> igual por Endosos. Se actualiza el vínculo con el cliente.</div></li>
+          <li><span class="li-em">👥</span><div><b>Inclusión de beneficiario:</b> en pólizas de Vida, agregar o modificar beneficiarios por Endosos.</div></li>
+          <li><span class="li-em">🔁</span><div><b>Renovación:</b> botón "Renovar" en la ficha de la póliza → captura nueva prima, forma de pago → regenera recibos. Se incrementa el contador de renovaciones.</div></li>
+        </ul>
+      </div>
+      <div class="footer-nav">
+        <button class="btn-nav btn-ghost" onclick="goTo('s2')">← Anterior</button>
+        <button class="btn-nav" onclick="done('s3')">Siguiente: Cobros →</button>
+      </div>
+    </div>
+
+    <!-- S4 COBROS -->
+    <div class="slide" id="s4">
+      <div class="slide-body">
+        <h2><span class="num">4</span>💳 Cobros y cartera</h2>
+        <p>El módulo de cobros te muestra <strong>el estado en tiempo real de toda la cartera</strong>: quién pagó, quién debe, cuánto vence esta semana.</p>
+
+        <div class="grid2">
+          <div class="info-card"><div class="ic">⏳</div><b>Pendiente</b><p>Recibo emitido, aún no pagado. Dentro del plazo.</p></div>
+          <div class="info-card"><div class="ic">⚠️</div><b>Vencido</b><p>Pasó la fecha límite sin pago. Requiere acción inmediata.</p></div>
+          <div class="info-card"><div class="ic">✅</div><b>Pagado</b><p>Cobro aplicado. Puede estar "Por conciliar" si no se cargó la factura.</p></div>
+          <div class="info-card"><div class="ic">🔗</div><b>Conciliado</b><p>Pagado + factura de la aseguradora cargada. Estado final completo.</p></div>
+        </div>
+
+        <h2 style="margin-top:22px"><span class="num">💰</span>Cómo aplicar un pago</h2>
+        <div class="step-list">
+          <div class="step-item"><div class="step-n">1</div><div><div class="step-t">🔍 Buscar el recibo</div><div class="step-d">En Cobros globales o en la ficha del cliente → pestaña Recibos y Pagos → filtrar por póliza.</div></div></div>
+          <div class="step-item"><div class="step-n">2</div><div><div class="step-t">📅 Seleccionar fecha</div><div class="step-d">Fecha de envío a gestión (default: hoy). Modificarla si el cliente pagó en otra fecha.</div></div></div>
+          <div class="step-item"><div class="step-n">3</div><div><div class="step-t">📄 Cargar factura (opcional)</div><div class="step-d">Si cargas la factura de la aseguradora, el recibo pasa a "Conciliado" y se registra la fecha real de pago.</div></div></div>
+          <div class="step-item"><div class="step-n">4</div><div><div class="step-t">📤 Notificación automática</div><div class="step-d">El sistema notifica al cliente (WhatsApp/correo) que su pago fue recibido y registrado.</div></div></div>
+        </div>
+
+        <h2 style="margin-top:22px"><span class="num">📢</span>Notificación de cobro por lote</h2>
+        <p>En <strong>Cobros</strong> → botón "📤 Notificar por lote": selecciona los recibos pendientes/vencidos, elige el canal (WA + correo) y envía recordatorios masivos con mensaje generado por IA. Queda en el historial de cada cliente.</p>
+
+        <div class="tip"><b>🔄 Conciliación y aplicación de pagos</b><p><b>Estado de cuenta de la aseguradora</b> (módulo Importar → "Conciliación con aseguradoras" → Estados de cuenta): trae el reporte de cartera; crea los recibos faltantes y <b>aplica los pagos reportados como cobrados sin duplicar</b>; los no reportados quedan en cartera. La <b>planilla de comisiones</b> es aparte: solo actualiza tarifas % por producto, no aplica pagos. El <b>estado bancario</b> (Finanzas) cruza depósitos y avisa desviaciones.</p></div>ibos pagados y los marca como conciliados automáticamente.</p></div>
+      </div>
+      <div class="footer-nav">
+        <button class="btn-nav btn-ghost" onclick="goTo('s3')">← Anterior</button>
+        <button class="btn-nav" onclick="done('s4')">Siguiente: Ciclo Ops/Leads →</button>
+      </div>
+    </div>
+
+    <!-- S5 OPS/LEADS -->
+    <div class="slide" id="s5">
+      <div class="slide-body">
+        <h2><span class="num">5</span>🔄 Ciclo Ops ↔ Leads — el pipeline comercial</h2>
+        <p>Un mismo <strong>negocio (prospecto)</strong> se proyecta en tiempo real en dos tableros sincronizados. Cambiar la etapa en uno se refleja inmediatamente en el otro. 🔁</p>
+
+        <div class="grid2">
+          <div class="info-card" style="border-top:3px solid #1f3a5f"><div class="ic">🗂</div><b>Orbit Ops — equipo interno</b><p>Cotizaciones · Inspecciones · Emisiones. Solo lo ve el equipo. Aquí se ejecuta lo operativo.</p></div>
+          <div class="info-card" style="border-top:3px solid var(--red)"><div class="ic">🎯</div><b>Orbit Leads — asesor</b><p>Nuevo → Contactado → Cotizando → Propuesta → Negociación → Cierre. Con cadencias automáticas de seguimiento.</p></div>
+        </div>
+
+        <h2 style="margin-top:22px"><span class="num">🗺</span>Etapas del ciclo</h2>
+        <div class="step-list">
+          <div class="step-item"><div class="step-n" style="background:#6b7280">🌱</div><div><div class="step-t">Nuevo ingreso</div><div class="step-d">Puede entrar directo a Leads (interés) o a Ops (pide cotización). Se registra el canal de origen.</div></div></div>
+          <div class="step-item"><div class="step-n" style="background:#c9821b">🧮</div><div><div class="step-t">Cotización</div><div class="step-d">El equipo cotiza desde Ops. El asesor da seguimiento desde Leads. Aparece el N.º de cotización automáticamente.</div></div></div>
+          <div class="step-item"><div class="step-n" style="background:#6b4ea0">📨</div><div><div class="step-t">Propuesta enviada</div><div class="step-d">Al pasar a Propuesta se activa automáticamente la <b>cadencia de seguimiento</b> (WA primero, correo en ausencia).</div></div></div>
+          <div class="step-item"><div class="step-n" style="background:#0f766e">🔍</div><div><div class="step-t">Inspección / Emisión</div><div class="step-d">Decisión de cierre. El negocio <b>reaparece en Ops</b> para gestión técnica sin salir de Leads.</div></div></div>
+          <div class="step-item"><div class="step-n" style="background:#15803d">🏆</div><div><div class="step-t">Emitido (ganado)</div><div class="step-d">Se <b>crea el cliente automáticamente</b> heredando todos los datos y se activa la cadencia de encuestas de satisfacción.</div></div></div>
+        </div>
+
+        <div class="tip"><b>🤖 Cadencias automáticas</b><p>Al enviar la propuesta, Orbit activa la cadencia: Día 1 → WA de bienvenida, Día 3 → WA de seguimiento, Día 7 → correo con propuesta, Día 14 → llamada de cierre. Sin intervención manual. Configurable en Automatizaciones.</p></div>
+      </div>
+      <div class="footer-nav">
+        <button class="btn-nav btn-ghost" onclick="goTo('s4')">← Anterior</button>
+        <button class="btn-nav" onclick="done('s5')">Siguiente: Evaluación →</button>
+      </div>
+    </div>
+
+    <!-- S6 QUIZ -->
+    <div class="slide" id="s6">
+      <div class="slide-body">
+        <h2><span class="num">✅</span>Evaluación del módulo CRM</h2>
+        <p>Responde correctamente al menos 3 de 4 preguntas para obtener tu <strong>🏅 certificado del módulo</strong>.</p>
+
+        <div class="quiz-block" id="q1">
+          <h3>❓ 1. ¿Qué pasa automáticamente al emitir una póliza (etapa "Emitido")?</h3>
+          <label><input type="radio" name="q1" value="a">❌ Se archiva el negocio y el asesor lo gestiona aparte</label>
+          <label><input type="radio" name="q1" value="b">✅ Se crea el cliente automáticamente y se activa la cadencia de encuestas</label>
+          <label><input type="radio" name="q1" value="c">❌ Se envía una cotización pero no se crea expediente</label>
+          <button class="qbtn" onclick="chk('q1','b',this)">Verificar ✓</button>
+          <div class="result" id="r1"></div>
+        </div>
+
+        <div class="quiz-block" id="q2" style="margin-top:12px">
+          <h3>❓ 2. En Guatemala, los gastos de expedición son:</h3>
+          <label><input type="radio" name="q2" value="a">❌ El 12% de la prima neta (es el IVA)</label>
+          <label><input type="radio" name="q2" value="b">✅ El 5% de la prima neta, calculado automáticamente</label>
+          <label><input type="radio" name="q2" value="c">❌ No aplican en Guatemala</label>
+          <button class="qbtn" onclick="chk('q2','b',this)">Verificar ✓</button>
+          <div class="result" id="r2"></div>
+        </div>
+
+        <div class="quiz-block" id="q3" style="margin-top:12px">
+          <h3>❓ 3. En la pestaña "Recibos y pagos" de un cliente con varias pólizas, ¿qué se debe usar?</h3>
+          <label><input type="radio" name="q3" value="a">❌ Ver todos los recibos juntos sin filtrar</label>
+          <label><input type="radio" name="q3" value="b">❌ Filtrar solo por fecha</label>
+          <label><input type="radio" name="q3" value="c">✅ Filtrar por póliza (N.º + aseguradora + bien)</label>
+          <button class="qbtn" onclick="chk('q3','c',this)">Verificar ✓</button>
+          <div class="result" id="r3"></div>
+        </div>
+
+        <div class="quiz-block" id="q4" style="margin-top:12px">
+          <h3>❓ 4. ¿Qué es la "Conciliación" de un recibo?</h3>
+          <label><input type="radio" name="q4" value="a">❌ Cuando el cliente paga en efectivo</label>
+          <label><input type="radio" name="q4" value="b">✅ Cuando el pago se cruza con la factura/estado de cuenta de la aseguradora</label>
+          <label><input type="radio" name="q4" value="c">❌ Cuando se anula el recibo por cancelación</label>
+          <button class="qbtn" onclick="chk('q4','b',this)">Verificar ✓</button>
+          <div class="result" id="r4"></div>
+        </div>
+
+        <div id="cert-btn" style="display:none;margin-top:20px">
+          <button class="btn-nav" style="font-size:16px;padding:14px 28px" onclick="finish()">🏅 Obtener mi certificado →</button>
+        </div>
+      </div>
+      <div class="footer-nav">
+        <button class="btn-nav btn-ghost" onclick="goTo('s5')">← Anterior</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const done_set = new Set();
+  let correct = 0;
+
+  function goTo(id) {
+    const el = document.getElementById(id); if (!el) return;
+    el.scrollIntoView({ behavior:'smooth', block:'start' });
+    updateToc(id);
+  }
+
+  function done(sid) {
+    done_set.add(sid);
+    updateProgress();
+    const nxt = { s1:'s2', s2:'s3', s3:'s4', s4:'s5', s5:'s6' };
+    if (nxt[sid]) goTo(nxt[sid]);
+    else goTo(sid);
+  }
+
+  function updateProgress() {
+    const pct = Math.round(done_set.size / 6 * 100);
+    document.getElementById('progbar').style.width = pct + '%';
+    document.getElementById('proglbl').textContent = done_set.size + '/6';
+  }
+
+  function updateToc(active) {
+    ['s1','s2','s3','s4','s5','s6'].forEach(id => {
+      const item = document.getElementById('toc-' + id);
+      const chk = document.getElementById('chk-' + id);
+      if (!item) return;
+      if (done_set.has(id)) {
+        item.className = 'toc-item done';
+        chk.textContent = '✓';
+      } else if (id === active) {
+        item.className = 'toc-item active';
+      } else {
+        item.className = 'toc-item';
+      }
+    });
+  }
+
+  function chk(qid, ans, btn) {
+    const sel = document.querySelector('input[name="' + qid + '"]:checked');
+    const res = document.getElementById('r' + qid.slice(1));
+    res.style.display = 'block';
+    if (!sel) { res.textContent = '⚠️ Selecciona una opción.'; res.style.color = '#c9821b'; return; }
+    btn.disabled = true;
+    if (sel.value === ans) {
+      res.textContent = '✅ ¡Correcto! Muy bien.'; res.style.color = '#15803d'; correct++;
+    } else {
+      res.textContent = '❌ No es correcto. Repasa la sección correspondiente.'; res.style.color = '#C5162E';
+    }
+    if (correct >= 3) document.getElementById('cert-btn').style.display = 'block';
+  }
+
+  function finish() {
+    done_set.add('s6'); updateProgress(); updateToc('s6');
+    alert('🏅 ¡Módulo CRM completado!\n\n' + correct + '/4 respuestas correctas.\n\nTu certificado queda registrado en Orbit Academia.');
+    if (window.parent !== window) {
+      window.parent.postMessage({ orbit: 'leccion_completada' }, '*');
+    }
+  }
+
+  // Intersection Observer para actualizar TOC al scroll
+  document.querySelectorAll('.slide').forEach(s => {
+    new IntersectionObserver(([e]) => { if (e.isIntersecting) updateToc(s.id); }, { threshold: 0.3 }).observe(s);
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,539 @@
+{
+  "schemaVersion": "orbit360-block1-universe-diagnostic-v25-final-v1",
+  "gateId": "block1-client360-insurers-lab-v20260717",
+  "contractVersion": "1.0.41",
+  "authorizationGeneration": "v25-differential-universe-diagnosis",
+  "decision": "DATA_CONTRACT_FAILURE",
+  "classification": "DATA_CONTRACT_FAILURE",
+  "checkpoint": "UNIVERSE_DIAGNOSTIC_COMPLETE",
+  "runId": "31222886355",
+  "attempt": 1,
+  "observed": {
+    "raw": {
+      "clientes": 430,
+      "aseguradoras": 30,
+      "asesores": 7
+    },
+    "effective": {
+      "clientes": 430,
+      "aseguradoras": 25,
+      "asesores": 7
+    },
+    "baselineTagged": {
+      "clientes": 414,
+      "aseguradoras": 26
+    },
+    "nonBaseline": {
+      "clientes": 16,
+      "aseguradoras": 4
+    },
+    "excluded": {
+      "clientes": 0,
+      "aseguradoras": 5
+    },
+    "baselineInsurersExcluded": 1
+  },
+  "domainDecision": {
+    "clientes": {
+      "classification": "REQUIERE_VALIDACION",
+      "basis": "BASELINE_MEMBERSHIP_NOT_PROVEN",
+      "demonstratedObjectiveCount": null
+    },
+    "aseguradoras": {
+      "classification": "DATA_CONTRACT_FAILURE",
+      "basis": "BASELINE_ACTIVE_INSURER_NOW_EXCLUDED_WITHOUT_POST_CLOSURE_TRANSITION_EVIDENCE",
+      "demonstratedObjectiveCount": null
+    },
+    "asesores": {
+      "classification": "PASS_DATA_CONTRACT",
+      "basis": "INVARIANCE_COUNT_ONLY_NO_REPROCESS"
+    }
+  },
+  "differential": {
+    "clientes": [
+      {
+        "fingerprint": "df57dd2ebdd0e1f1d0d2",
+        "role": "post_baseline_candidate",
+        "baselineMember": false,
+        "excludedFromEffective": false,
+        "exclusionReason": null,
+        "requiresValidation": false,
+        "provenance": {
+          "baselineBatch": false,
+          "distinctBatch": false,
+          "hasBatchId": false,
+          "hasSourceMarker": false,
+          "createdAfterManifest": false,
+          "updatedAfterClosure": false,
+          "hasAuditReason": false,
+          "hasAuditActor": false,
+          "provenanceHash": "565d240f5343e625ae57",
+          "timestampBasisHash": "cbe5cfdf7c2118a9c3d7",
+          "objectivePostBaseline": false
+        },
+        "recommendedTreatment": "REVIEW_POST_BASELINE_PROVENANCE_NO_WRITE"
+      },
+      {
+        "fingerprint": "f437b20fa510cb0ee985",
+        "role": "post_baseline_candidate",
+        "baselineMember": false,
+        "excludedFromEffective": false,
+        "exclusionReason": null,
+        "requiresValidation": false,
+        "provenance": {
+          "baselineBatch": false,
+          "distinctBatch": false,
+          "hasBatchId": false,
+          "hasSourceMarker": false,
+          "createdAfterManifest": false,
+          "updatedAfterClosure": false,
+          "hasAuditReason": false,
+          "hasAuditActor": false,
+          "provenanceHash": "565d240f5343e625ae57",
+          "timestampBasisHash": "cbe5cfdf7c2118a9c3d7",
+          "objectivePostBaseline": false
+        },
+        "recommendedTreatment": "REVIEW_POST_BASELINE_PROVENANCE_NO_WRITE"
+      },
+      {
+        "fingerprint": "20db2bee38e4f861d2b0",
+        "role": "post_baseline_candidate",
+        "baselineMember": false,
+        "excludedFromEffective": false,
+        "exclusionReason": null,
+        "requiresValidation": false,
+        "provenance": {
+          "baselineBatch": false,
+          "distinctBatch": false,
+          "hasBatchId": false,
+          "hasSourceMarker": false,
+          "createdAfterManifest": false,
+          "updatedAfterClosure": false,
+          "hasAuditReason": false,
+          "hasAuditActor": false,
+          "provenanceHash": "565d240f5343e625ae57",
+          "timestampBasisHash": "cbe5cfdf7c2118a9c3d7",
+          "objectivePostBaseline": false
+        },
+        "recommendedTreatment": "REVIEW_POST_BASELINE_PROVENANCE_NO_WRITE"
+      },
+      {
+        "fingerprint": "b921e15f04d3cda917b1",
+        "role": "post_baseline_candidate",
+        "baselineMember": false,
+        "excludedFromEffective": false,
+        "exclusionReason": null,
+        "requiresValidation": false,
+        "provenance": {
+          "baselineBatch": false,
+          "distinctBatch": false,
+          "hasBatchId": false,
+          "hasSourceMarker": false,
+          "createdAfterManifest": false,
+          "updatedAfterClosure": false,
+          "hasAuditReason": false,
+          "hasAuditActor": false,
+          "provenanceHash": "565d240f5343e625ae57",
+          "timestampBasisHash": "cbe5cfdf7c2118a9c3d7",
+          "objectivePostBaseline": false
+        },
+        "recommendedTreatment": "REVIEW_POST_BASELINE_PROVENANCE_NO_WRITE"
+      },
+      {
+        "fingerprint": "cdb3ad7d6ba92eaae5b9",
+        "role": "post_baseline_candidate",
+        "baselineMember": false,
+        "excludedFromEffective": false,
+        "exclusionReason": null,
+        "requiresValidation": false,
+        "provenance": {
+          "baselineBatch": false,
+          "distinctBatch": false,
+          "hasBatchId": false,
+          "hasSourceMarker": false,
+          "createdAfterManifest": false,
+          "updatedAfterClosure": false,
+          "hasAuditReason": false,
+          "hasAuditActor": false,
+          "provenanceHash": "565d240f5343e625ae57",
+          "timestampBasisHash": "cbe5cfdf7c2118a9c3d7",
+          "objectivePostBaseline": false
+        },
+        "recommendedTreatment": "REVIEW_POST_BASELINE_PROVENANCE_NO_WRITE"
+      },
+      {
+        "fingerprint": "154df45b9a24c1dd72ef",
+        "role": "post_baseline_candidate",
+        "baselineMember": false,
+        "excludedFromEffective": false,
+        "exclusionReason": null,
+        "requiresValidation": false,
+        "provenance": {
+          "baselineBatch": false,
+          "distinctBatch": false,
+          "hasBatchId": false,
+          "hasSourceMarker": false,
+          "createdAfterManifest": false,
+          "updatedAfterClosure": false,
+          "hasAuditReason": false,
+          "hasAuditActor": false,
+          "provenanceHash": "565d240f5343e625ae57",
+          "timestampBasisHash": "cbe5cfdf7c2118a9c3d7",
+          "objectivePostBaseline": false
+        },
+        "recommendedTreatment": "REVIEW_POST_BASELINE_PROVENANCE_NO_WRITE"
+      },
+      {
+        "fingerprint": "8a1aebb2b6520d868de8",
+        "role": "post_baseline_candidate",
+        "baselineMember": false,
+        "excludedFromEffective": false,
+        "exclusionReason": null,
+        "requiresValidation": false,
+        "provenance": {
+          "baselineBatch": false,
+          "distinctBatch": false,
+          "hasBatchId": false,
+          "hasSourceMarker": false,
+          "createdAfterManifest": false,
+          "updatedAfterClosure": false,
+          "hasAuditReason": false,
+          "hasAuditActor": false,
+          "provenanceHash": "565d240f5343e625ae57",
+          "timestampBasisHash": "cbe5cfdf7c2118a9c3d7",
+          "objectivePostBaseline": false
+        },
+        "recommendedTreatment": "REVIEW_POST_BASELINE_PROVENANCE_NO_WRITE"
+      },
+      {
+        "fingerprint": "16ef4d44878b3f5938ec",
+        "role": "post_baseline_candidate",
+        "baselineMember": false,
+        "excludedFromEffective": false,
+        "exclusionReason": null,
+        "requiresValidation": false,
+        "provenance": {
+          "baselineBatch": false,
+          "distinctBatch": false,
+          "hasBatchId": false,
+          "hasSourceMarker": false,
+          "createdAfterManifest": false,
+          "updatedAfterClosure": false,
+          "hasAuditReason": false,
+          "hasAuditActor": false,
+          "provenanceHash": "565d240f5343e625ae57",
+          "timestampBasisHash": "cbe5cfdf7c2118a9c3d7",
+          "objectivePostBaseline": false
+        },
+        "recommendedTreatment": "REVIEW_POST_BASELINE_PROVENANCE_NO_WRITE"
+      },
+      {
+        "fingerprint": "ce9492a1492e69100242",
+        "role": "post_baseline_candidate",
+        "baselineMember": false,
+        "excludedFromEffective": false,
+        "exclusionReason": null,
+        "requiresValidation": false,
+        "provenance": {
+          "baselineBatch": false,
+          "distinctBatch": false,
+          "hasBatchId": false,
+          "hasSourceMarker": false,
+          "createdAfterManifest": false,
+          "updatedAfterClosure": false,
+          "hasAuditReason": false,
+          "hasAuditActor": false,
+          "provenanceHash": "565d240f5343e625ae57",
+          "timestampBasisHash": "cbe5cfdf7c2118a9c3d7",
+          "objectivePostBaseline": false
+        },
+        "recommendedTreatment": "REVIEW_POST_BASELINE_PROVENANCE_NO_WRITE"
+      },
+      {
+        "fingerprint": "803ee931b563a64fda36",
+        "role": "post_baseline_candidate",
+        "baselineMember": false,
+        "excludedFromEffective": false,
+        "exclusionReason": null,
+        "requiresValidation": false,
+        "provenance": {
+          "baselineBatch": false,
+          "distinctBatch": false,
+          "hasBatchId": false,
+          "hasSourceMarker": false,
+          "createdAfterManifest": false,
+          "updatedAfterClosure": false,
+          "hasAuditReason": false,
+          "hasAuditActor": false,
+          "provenanceHash": "565d240f5343e625ae57",
+          "timestampBasisHash": "cbe5cfdf7c2118a9c3d7",
+          "objectivePostBaseline": false
+        },
+        "recommendedTreatment": "REVIEW_POST_BASELINE_PROVENANCE_NO_WRITE"
+      },
+      {
+        "fingerprint": "72666413c94701ee7fc2",
+        "role": "post_baseline_candidate",
+        "baselineMember": false,
+        "excludedFromEffective": false,
+        "exclusionReason": null,
+        "requiresValidation": false,
+        "provenance": {
+          "baselineBatch": false,
+          "distinctBatch": false,
+          "hasBatchId": false,
+          "hasSourceMarker": false,
+          "createdAfterManifest": false,
+          "updatedAfterClosure": false,
+          "hasAuditReason": false,
+          "hasAuditActor": false,
+          "provenanceHash": "565d240f5343e625ae57",
+          "timestampBasisHash": "cbe5cfdf7c2118a9c3d7",
+          "objectivePostBaseline": false
+        },
+        "recommendedTreatment": "REVIEW_POST_BASELINE_PROVENANCE_NO_WRITE"
+      },
+      {
+        "fingerprint": "4ca6a88d28ac98715abc",
+        "role": "post_baseline_candidate",
+        "baselineMember": false,
+        "excludedFromEffective": false,
+        "exclusionReason": null,
+        "requiresValidation": false,
+        "provenance": {
+          "baselineBatch": false,
+          "distinctBatch": false,
+          "hasBatchId": false,
+          "hasSourceMarker": false,
+          "createdAfterManifest": false,
+          "updatedAfterClosure": false,
+          "hasAuditReason": false,
+          "hasAuditActor": false,
+          "provenanceHash": "565d240f5343e625ae57",
+          "timestampBasisHash": "cbe5cfdf7c2118a9c3d7",
+          "objectivePostBaseline": false
+        },
+        "recommendedTreatment": "REVIEW_POST_BASELINE_PROVENANCE_NO_WRITE"
+      },
+      {
+        "fingerprint": "021cac2a1b856a0c5d1c",
+        "role": "post_baseline_candidate",
+        "baselineMember": false,
+        "excludedFromEffective": false,
+        "exclusionReason": null,
+        "requiresValidation": false,
+        "provenance": {
+          "baselineBatch": false,
+          "distinctBatch": false,
+          "hasBatchId": false,
+          "hasSourceMarker": false,
+          "createdAfterManifest": false,
+          "updatedAfterClosure": false,
+          "hasAuditReason": false,
+          "hasAuditActor": false,
+          "provenanceHash": "565d240f5343e625ae57",
+          "timestampBasisHash": "cbe5cfdf7c2118a9c3d7",
+          "objectivePostBaseline": false
+        },
+        "recommendedTreatment": "REVIEW_POST_BASELINE_PROVENANCE_NO_WRITE"
+      },
+      {
+        "fingerprint": "43a8841d19f7fec03ad6",
+        "role": "post_baseline_candidate",
+        "baselineMember": false,
+        "excludedFromEffective": false,
+        "exclusionReason": null,
+        "requiresValidation": false,
+        "provenance": {
+          "baselineBatch": false,
+          "distinctBatch": false,
+          "hasBatchId": false,
+          "hasSourceMarker": false,
+          "createdAfterManifest": false,
+          "updatedAfterClosure": false,
+          "hasAuditReason": false,
+          "hasAuditActor": false,
+          "provenanceHash": "565d240f5343e625ae57",
+          "timestampBasisHash": "cbe5cfdf7c2118a9c3d7",
+          "objectivePostBaseline": false
+        },
+        "recommendedTreatment": "REVIEW_POST_BASELINE_PROVENANCE_NO_WRITE"
+      },
+      {
+        "fingerprint": "a96956c63fdf22d44cfe",
+        "role": "post_baseline_candidate",
+        "baselineMember": false,
+        "excludedFromEffective": false,
+        "exclusionReason": null,
+        "requiresValidation": false,
+        "provenance": {
+          "baselineBatch": false,
+          "distinctBatch": false,
+          "hasBatchId": false,
+          "hasSourceMarker": false,
+          "createdAfterManifest": false,
+          "updatedAfterClosure": false,
+          "hasAuditReason": false,
+          "hasAuditActor": false,
+          "provenanceHash": "565d240f5343e625ae57",
+          "timestampBasisHash": "cbe5cfdf7c2118a9c3d7",
+          "objectivePostBaseline": false
+        },
+        "recommendedTreatment": "REVIEW_POST_BASELINE_PROVENANCE_NO_WRITE"
+      },
+      {
+        "fingerprint": "f3d653f7c968d5f399cd",
+        "role": "post_baseline_candidate",
+        "baselineMember": false,
+        "excludedFromEffective": false,
+        "exclusionReason": null,
+        "requiresValidation": false,
+        "provenance": {
+          "baselineBatch": false,
+          "distinctBatch": false,
+          "hasBatchId": false,
+          "hasSourceMarker": false,
+          "createdAfterManifest": false,
+          "updatedAfterClosure": false,
+          "hasAuditReason": false,
+          "hasAuditActor": false,
+          "provenanceHash": "565d240f5343e625ae57",
+          "timestampBasisHash": "cbe5cfdf7c2118a9c3d7",
+          "objectivePostBaseline": false
+        },
+        "recommendedTreatment": "REVIEW_POST_BASELINE_PROVENANCE_NO_WRITE"
+      }
+    ],
+    "aseguradoras": [
+      {
+        "fingerprint": "2bc3605f13979c8a8f00",
+        "role": "nonbaseline_excluded",
+        "baselineMember": false,
+        "excludedFromEffective": true,
+        "exclusionReason": "historical_inactive_vinculada_false",
+        "requiresValidation": true,
+        "provenance": {
+          "baselineBatch": false,
+          "distinctBatch": false,
+          "hasBatchId": false,
+          "hasSourceMarker": false,
+          "createdAfterManifest": false,
+          "updatedAfterClosure": false,
+          "hasAuditReason": false,
+          "hasAuditActor": false,
+          "provenanceHash": "565d240f5343e625ae57",
+          "timestampBasisHash": "cbe5cfdf7c2118a9c3d7",
+          "objectivePostBaseline": false
+        },
+        "recommendedTreatment": "REVIEW_EXCLUSION_PROVENANCE_NO_WRITE"
+      },
+      {
+        "fingerprint": "954f79acebbec5026e49",
+        "role": "nonbaseline_excluded",
+        "baselineMember": false,
+        "excludedFromEffective": true,
+        "exclusionReason": "historical_inactive_vinculada_false",
+        "requiresValidation": true,
+        "provenance": {
+          "baselineBatch": false,
+          "distinctBatch": false,
+          "hasBatchId": false,
+          "hasSourceMarker": false,
+          "createdAfterManifest": false,
+          "updatedAfterClosure": false,
+          "hasAuditReason": false,
+          "hasAuditActor": false,
+          "provenanceHash": "565d240f5343e625ae57",
+          "timestampBasisHash": "cbe5cfdf7c2118a9c3d7",
+          "objectivePostBaseline": false
+        },
+        "recommendedTreatment": "REVIEW_EXCLUSION_PROVENANCE_NO_WRITE"
+      },
+      {
+        "fingerprint": "f19112adf18f8bd2f7db",
+        "role": "nonbaseline_excluded",
+        "baselineMember": false,
+        "excludedFromEffective": true,
+        "exclusionReason": "historical_inactive_vinculada_false",
+        "requiresValidation": true,
+        "provenance": {
+          "baselineBatch": false,
+          "distinctBatch": false,
+          "hasBatchId": false,
+          "hasSourceMarker": false,
+          "createdAfterManifest": false,
+          "updatedAfterClosure": false,
+          "hasAuditReason": false,
+          "hasAuditActor": false,
+          "provenanceHash": "565d240f5343e625ae57",
+          "timestampBasisHash": "cbe5cfdf7c2118a9c3d7",
+          "objectivePostBaseline": false
+        },
+        "recommendedTreatment": "REVIEW_EXCLUSION_PROVENANCE_NO_WRITE"
+      },
+      {
+        "fingerprint": "4b7ed665d14f1f2f00bd",
+        "role": "nonbaseline_excluded",
+        "baselineMember": false,
+        "excludedFromEffective": true,
+        "exclusionReason": "historical_inactive_vinculada_false",
+        "requiresValidation": true,
+        "provenance": {
+          "baselineBatch": false,
+          "distinctBatch": false,
+          "hasBatchId": false,
+          "hasSourceMarker": false,
+          "createdAfterManifest": false,
+          "updatedAfterClosure": false,
+          "hasAuditReason": false,
+          "hasAuditActor": false,
+          "provenanceHash": "565d240f5343e625ae57",
+          "timestampBasisHash": "cbe5cfdf7c2118a9c3d7",
+          "objectivePostBaseline": false
+        },
+        "recommendedTreatment": "REVIEW_EXCLUSION_PROVENANCE_NO_WRITE"
+      },
+      {
+        "fingerprint": "12a8731ac111abd6640e",
+        "role": "baseline_now_excluded",
+        "baselineMember": true,
+        "excludedFromEffective": true,
+        "exclusionReason": "duplicate_strong_key",
+        "requiresValidation": false,
+        "provenance": {
+          "baselineBatch": true,
+          "distinctBatch": false,
+          "hasBatchId": true,
+          "hasSourceMarker": true,
+          "createdAfterManifest": true,
+          "updatedAfterClosure": false,
+          "hasAuditReason": false,
+          "hasAuditActor": false,
+          "provenanceHash": "eb7606a76335a363c1eb",
+          "timestampBasisHash": "a437cc3da6ba0edeb6c8",
+          "objectivePostBaseline": true
+        },
+        "recommendedTreatment": "REVIEW_EXCLUSION_PROVENANCE_NO_WRITE"
+      }
+    ]
+  },
+  "nextTreatment": "AUTHORIZE_TARGETED_DATA_CONTRACT_REPAIR_PLAN_NO_WRITE",
+  "requestConsumed": true,
+  "authorizationFrozen": true,
+  "replayAllowed": false,
+  "firestoreReads": 3,
+  "firestoreWrites": 0,
+  "authReads": 0,
+  "authWrites": 0,
+  "operationalWrites": 0,
+  "reimport": false,
+  "hostingTouched": false,
+  "browserExecuted": false,
+  "productionTouched": false,
+  "containsPII": false,
+  "containsNames": false,
+  "containsEmails": false,
+  "containsDocuments": false,
+  "containsSecrets": false,
+  "ok": true
+}

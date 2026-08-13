@@ -1,0 +1,26 @@
+#!/usr/bin/env node
+'use strict';
+const fs=require('fs');const vm=require('vm');
+const read=p=>fs.readFileSync(p,'utf8');const checks=[];const check=(id,ok)=>checks.push({id,ok:!!ok});
+const runtime=read('tools/orbit360-m2-existing-identity-runtime-v20260724.mjs');
+const workflow=read('.github/workflows/orbit360-m2-existing-identity-runtime-gate-v20260724.yml');
+const provider=read('orbit360-platform/core/product-runtime-provider-contracts-p0.js');
+const entry=read('orbit360-platform/product-readonly.html');
+check('RUNTIME_EXISTING_PROJECT',runtime.includes("PROJECT_ID='ays-orbit-360-lab'"));
+check('RUNTIME_WEB_CONFIG_READONLY',runtime.includes('firebase.googleapis.com/v1beta1/projects/${PROJECT_ID}/webApps')&&runtime.includes('/config'));
+check('RUNTIME_EXISTING_MEMBERSHIP',runtime.includes("collection('members').get()")&&runtime.includes('eligibleExistingIdentityCount:1'));
+check('RUNTIME_CANONICAL_BOOTSTRAP',runtime.includes('backendProductReadOnlyBootstrapP0.start'));
+check('RUNTIME_LOCAL_WRITE_BLOCK',runtime.includes("store.insert('clientes'")&&runtime.includes('WRITE_BLOCKED_PRODUCT_READ_ONLY_P0'));
+['createUser(','updateUser(','deleteUser(','memberRef.set(','memberRef.delete(','FieldValue','firebase-tools deploy','firestore:rules','storage:rules'].forEach(token=>check('FORBIDDEN_RUNTIME:'+token,!runtime.includes(token)));
+check('WORKFLOW_NO_ENVIRONMENT',!/^\s*environment:/m.test(workflow));
+check('WORKFLOW_EXISTING_ALIASES',workflow.includes('FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB')&&workflow.includes('FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB')&&workflow.includes('FIREBASE_SERVICE_ACCOUNT'));
+check('WORKFLOW_NO_RULES_DEPLOY',!workflow.includes('firebase-tools deploy')&&!workflow.includes('firestore:rules')&&!workflow.includes('storage.rules'));
+check('WORKFLOW_NO_WRITES',workflow.includes('No Rules · No Writes')&&!workflow.includes('bootstrap')&&!workflow.includes('rollback'));
+check('PROVIDER_EXISTING_IDENTITY',provider.includes('existingIdentityOnly:true')&&provider.includes('rulesChangeAuthorized:false'));
+check('ENTRY_WRITE_GUARD',entry.includes('owner.WRITE_AUTHORIZED===false'));
+const context={window:{Orbit:{}}};vm.createContext(context);vm.runInContext(provider,context);
+const p=context.window.Orbit.productRuntimeProviderContractsP0;const fn=()=>{};
+const readiness=p.authorizationReadiness({explicitAuthorization:true,readOnly:true,writeAuthorized:false,operationalWrites:false,existingProjectReconciled:true,existingAuthUserRequired:true,existingMembershipRequired:true,createProject:false,createAuthUser:false,createMembership:false,rulesChangeAuthorized:false,noWriteExecutionPlanApproved:true,publicConfigDescriptor:{projectIdPresent:true,authDomainPresent:true,appIdPresent:true,apiKeyPresent:true,environmentRefPresent:true,containsValues:false,containsSecrets:false},providers:{environmentProvider:{describePublicConfig:fn},firebaseAdapter:{initializeFromEnvironment:fn,storeDependencies:fn},authProvider:{waitForAuthenticatedUser:fn},membershipProvider:{getByUid:fn}}});
+check('PROVIDER_FIXTURE_PASS',readiness.ok===true&&readiness.readyForAuthorizedRuntime===true&&readiness.writeAuthorized===false);
+const failed=checks.filter(x=>!x.ok);const out={schemaVersion:'orbit360-m2-existing-identity-runtime-static-contract-v1',ok:failed.length===0,status:failed.length?'M2_EXISTING_IDENTITY_RUNTIME_STATIC_FAILED':'M2_EXISTING_IDENTITY_RUNTIME_STATIC_PASS',contractVersion:'2.2.0',passed:checks.length-failed.length,total:checks.length,failed:failed.length,failedCheckIds:failed.map(x=>x.id),checks,secretAccess:false,firestoreRead:false,runtimeExecuted:false,rulesChanged:false,configurationWrites:0,operationalWrites:0,containsPII:false,containsSecrets:false};
+fs.mkdirSync('orbit360-platform/runtime-gate-crm-v20260716',{recursive:true});fs.writeFileSync('orbit360-platform/runtime-gate-crm-v20260716/m2-existing-identity-runtime-static-contract.json',JSON.stringify(out,null,2)+'\n');console.log(JSON.stringify(out,null,2));process.exit(failed.length?41:0);

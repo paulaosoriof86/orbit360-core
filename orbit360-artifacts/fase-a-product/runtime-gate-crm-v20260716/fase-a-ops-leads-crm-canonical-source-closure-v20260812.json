@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "orbit360-fase-a-ops-leads-crm-canonical-source-closure-v1",
+  "gateId": "fase-a-ops-leads-crm-release-lab-v20260812",
+  "contractVersion": "1.0.0",
+  "decision": "PASS_CANONICAL_SOURCE_BINDING",
+  "runId": 31644543049,
+  "jobId": 94274912421,
+  "head": "cd22406451f8dee96950d3945fac8cc5f52b2d2c",
+  "artifactId": 9160188093,
+  "artifactDigest": "sha256:b6938949f1af51724b47856bdc1af4fca7d2c05dc054fbcd2f7df9a4f36fc055",
+  "sourceOnly": true,
+  "secretAccess": false,
+  "firestoreRead": false,
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "operationalWrites": 0,
+  "browserExecuted": false,
+  "deployExecuted": false,
+  "productionTouched": false,
+  "runtimeAuthorizationPresent": false,
+  "canonicalRegistrationPending": false,
+  "ok": true
+}

@@ -1,0 +1,3 @@
+# Governing state
+
+See `PLAN-UNICO-SALIDA-RC-AYS-LAB-CANONICA-01-20260804.md`.

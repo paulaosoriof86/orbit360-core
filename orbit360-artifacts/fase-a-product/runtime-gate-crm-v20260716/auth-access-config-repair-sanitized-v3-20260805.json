@@ -1,0 +1,14 @@
+{
+  "schemaVersion": "orbit360-auth-access-config-repair-sanitized-v3",
+  "stage": "STOP_RETRY_ACCESS_CONFIG_APPLY",
+  "decision": "STOP_RETRY",
+  "classification": "PIPELINE_MECHANISM_FAILURE",
+  "errorCode": "ACCESS_CONFIG_REPAIR_FAILED",
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "membershipWrites": 0,
+  "crmWrites": 0,
+  "containsPII": false,
+  "containsSecrets": false,
+  "ok": false
+}

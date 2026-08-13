@@ -1,0 +1,122 @@
+{
+  "schemaVersion": "orbit360-rc-ays-canonical-baseline-reconciliation-v1",
+  "generatedAt": "2026-08-04T21:55:00-06:00",
+  "rcId": "RC-AYS-LAB-CANONICA-01",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "sourceBaseline": "548cffa50cddfd93ad2118f5a06e9bb420699bde",
+  "gate": "PASS_CANONICAL_BASELINE",
+  "decision": "PASS_CANONICAL_BASELINE",
+  "classification": {
+    "functionalDefectDemonstrated": false,
+    "dataContractFailureOpen": false,
+    "validatorStaleHistorical": true,
+    "pipelineMechanismFailureVisualOpen": true,
+    "securityFailureDemonstrated": false
+  },
+  "owners": {
+    "router": {
+      "owner": "orbit360-platform/core/router.js",
+      "support": ["orbit360-platform/core/router-tenant-config-bootstrap.js"],
+      "classification": "OWNER_PLUS_BOOTSTRAP_SUPPORT",
+      "action": "PRESERVE"
+    },
+    "access": {
+      "owner": "orbit360-platform/core/access-scope.js",
+      "support": [
+        "orbit360-platform/core/access-role-session-owner-v20260728.js",
+        "orbit360-platform/core/access-ceilings-v1199.js",
+        "orbit360-platform/core/auth.js"
+      ],
+      "classification": "SINGLE_POLICY_ENGINE_WITH_DISTINCT_SESSION_AND_CEILING_LAYERS",
+      "action": "PRESERVE"
+    },
+    "cliente360": {
+      "owner": "orbit360-platform/modules/cliente360.js",
+      "support": [
+        "orbit360-platform/modules/crm-v1198-operational-bridge.js",
+        "orbit360-platform/core/client-insurer-visual-contract-v20260720.js"
+      ],
+      "temporaryRetirementCandidate": "orbit360-platform/core/client-canonical-view-projection-v20260716.js",
+      "classification": "CANONICAL_RENDERER_WITH_SCOPE_OVERLAY_AND_READ_PROJECTION",
+      "action": "PRESERVE_OWNER_AND_SUPPORT; DO_NOT_RETIRE_COMPATIBILITY_BEFORE_RUNTIME_DEPENDENCY_PROOF"
+    },
+    "aseguradoras": {
+      "owner": "orbit360-platform/modules/aseguradoras.js",
+      "support": [
+        "orbit360-platform/modules/aseguradoras-v1197-ux-bridge.js",
+        "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js",
+        "orbit360-platform/core/client-insurer-visual-contract-v20260720.js",
+        "orbit360-platform/core/client-insurer-edit-owner-v20260722.js",
+        "orbit360-platform/core/client-insurer-operational-directory-owner-v20260722.js"
+      ],
+      "inactiveCompatibilityCandidate": "orbit360-platform/modules/aseguradoras-v1202-resources-bridge.js",
+      "classification": "CANONICAL_CRUD_RENDERER_WITH_EXPLICIT_SECTION_OWNERS",
+      "action": "PRESERVE; MARK INACTIVE BRIDGE FOR LATER RETIREMENT ONLY AFTER RUNTIME PROOF"
+    }
+  },
+  "countReconciliation": {
+    "m1Historical": {
+      "clientes": 414,
+      "aseguradoras": 26,
+      "asesores": 7,
+      "status": "HISTORICAL_ACCEPTED"
+    },
+    "m4CanonicalDurable": {
+      "clientes": 414,
+      "aseguradoras": 26,
+      "membership": 1,
+      "status": "WRITTEN_AND_READONLY_REVALIDATED"
+    },
+    "heldParentsControlledWrite": {
+      "clientesCreated": 16,
+      "aseguradorasCreated": 4,
+      "mode": "CREATE_ONLY",
+      "validationState": "REQUIERE_VALIDACION_PRESERVED",
+      "status": "AUTHORIZED_GATE_CLOSED"
+    },
+    "acceptedCumulativeSnapshot": {
+      "clientes": 430,
+      "aseguradoras": 30,
+      "polizas": 1375,
+      "vehiculos": 1033,
+      "recibosEsperados": 1294,
+      "carteraPrimas": 673,
+      "cobros": 7,
+      "memberships": 1,
+      "status": "OBSERVED_READONLY_WITH_IDENTICAL_BEFORE_AFTER_DIGESTS"
+    },
+    "reimportRequired": false,
+    "dataLossObserved": false,
+    "unexplainedClientOrInsurerDelta": 0
+  },
+  "moduleTreeEvidence": {
+    "routes": 31,
+    "workedActiveModules": 31,
+    "sharedStoreIntegrated": 30,
+    "moduleFailures": 0,
+    "moduleTreeParity": true,
+    "source": "sealed cumulative candidate manifest plus frozen baseline inspection"
+  },
+  "antiLoop": {
+    "newCandidateCreated": false,
+    "newBranchCreated": false,
+    "newPullRequestCreated": false,
+    "workflowVariantCreated": false,
+    "functionalReplayRepeated": false,
+    "dataReimported": false,
+    "firebaseUsed": false,
+    "secretsUsed": false,
+    "deployExecuted": false,
+    "realDataWrites": 0,
+    "productionTouched": false,
+    "mainTouched": false,
+    "mergeExecuted": false
+  },
+  "nextGate": "PASS_ISOLATED_ROUTE_HARNESS",
+  "exactNextAction": "Validate the existing isolated-route synthetic harness against the frozen candidate, using one isolated browser context and direct URL per route, without Firebase, secrets, deploy or real-data writes.",
+  "containsPII": false,
+  "containsSecrets": false,
+  "ok": true
+}

@@ -1,0 +1,111 @@
+{
+  "schemaVersion": "orbit360-m4-client-country-business-validation-correction-closure-v1",
+  "issuedAt": "2026-07-25",
+  "gateId": "block4-client-country-business-validation-correction-dryrun-v20260725",
+  "contractVersion": "4.2.6",
+  "validatorRevision": "4.2.6-r1",
+  "status": "M4_CLIENT_COUNTRY_BUSINESS_VALIDATION_CORRECTION_DRYRUN_CLOSED_SUCCESS",
+  "packageCommit": "7d00508aaa3de71cb31a4e1c2b66fb1f0b61f2da",
+  "repairCommit": "b188af0e435d673d0537b0a0838b5694b8bd1bc9",
+  "requestCommit": "c80e6b2c39df7009d724c3c797501428578a95ad",
+  "runId": 30171997232,
+  "jobId": 89714583880,
+  "artifactId": 8623169736,
+  "artifactDigest": "sha256:261d4508e7c13aa189a37525dd3a88fe0f38f49984659914dbf0a4ff38314e9a",
+  "canonicalPreflight": {
+    "status": "GO_GATE_CONTRACT",
+    "passed": 24,
+    "total": 24,
+    "failed": 0,
+    "activationMode": "immutable_request_present"
+  },
+  "fixtureContract": {
+    "status": "PASS",
+    "passed": 26,
+    "total": 26,
+    "failed": 0,
+    "positiveFixtures": 7,
+    "negativeFixtures": 19,
+    "validationMode": "executed_contract_fixtures",
+    "literalSourceInspection": false
+  },
+  "source": {
+    "collection": "tenantId/{tenant}/clientes",
+    "collectionsRead": 1,
+    "clients": 414,
+    "missingCurrency": 61,
+    "nonCanonicalCountry": 61,
+    "insurersRead": false,
+    "targetRead": false
+  },
+  "proposal": {
+    "records": 61,
+    "countryFieldChanges": 61,
+    "currencyFieldChanges": 61,
+    "country": "GT",
+    "currency": "GTQ",
+    "creates": 0,
+    "deletes": 0,
+    "targetOnlyDeferred": 4,
+    "writeAuthorized": false
+  },
+  "afterProjection": {
+    "sourceClientsReadyAfterProposal": 414,
+    "currencyValidationRemaining": 0,
+    "clientTargetOnlyDeferred": 2,
+    "insurerTargetOnlyDeferred": 2,
+    "targetOnlyDeferred": 4,
+    "approvalReadyForM4Write": false
+  },
+  "traceability": {
+    "sourceType": "business_validation_batch",
+    "sourceReference": "user_authorization_2026-07-25",
+    "actorRole": "Direccion_AyS",
+    "reasonCode": "VALIDACION_EMPRESARIAL_LOTE_61_GT",
+    "beforeAfterPlanned": true,
+    "recordIdsExported": false
+  },
+  "rollback": {
+    "mode": "per_record_before_snapshot",
+    "planned": true,
+    "executed": false,
+    "snapshotCountPlanned": 61,
+    "snapshotValuesExported": false
+  },
+  "auditPlan": {
+    "mode": "append_only",
+    "planned": true,
+    "executed": false,
+    "plannedEvents": 61
+  },
+  "authorization": {
+    "dryRunConsumed": true,
+    "allowedDryRunExecutions": 0,
+    "clientCorrectionWriteAuthorized": false,
+    "m4WriteAuthorized": false
+  },
+  "security": {
+    "secretAccess": true,
+    "firestoreRead": true,
+    "runtimeExecuted": true,
+    "browserExecuted": false,
+    "configurationWrites": 0,
+    "membershipWrites": 0,
+    "clientWrites": 0,
+    "insurerWrites": 0,
+    "auditWrites": 0,
+    "rulesApplied": false,
+    "deployExecuted": false,
+    "productionTouched": false,
+    "containsPII": false,
+    "containsSecrets": false
+  },
+  "approvalReadyForClientCorrection": true,
+  "approvalReadyForM4Write": false,
+  "classification": "DATA_CONTRACT_FAILURE_REMAINING_TARGET_ONLY_RECONCILIATION",
+  "nextAction": "READONLY_RECONCILE_EXACTLY_2_CLIENT_AND_2_INSURER_TARGET_ONLY_RECORDS",
+  "claudeClassification": "BACKEND_PROTEGIDO_NO_CLAUDE",
+  "academyClassification": "ACADEMIA_ACTUALIZAR",
+  "containsPII": false,
+  "containsSecrets": false
+}

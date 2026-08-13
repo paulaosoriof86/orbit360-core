@@ -1,0 +1,52 @@
+{
+  "schemaVersion": "orbit360-visual-observable-rootfix-governing-stop-v1",
+  "gateId": "block2.7-visual-observable-rootfix-lab-v20260805",
+  "contractVersion": "2.7.3",
+  "status": "STOP_RETRY_GOVERNING",
+  "classification": "DATA_CONTRACT_FAILURE",
+  "runId": "31063000137",
+  "checkpoint": "INICIO_READY_TIMEOUT",
+  "preflight": "GO_GATE_CONTRACT_24_OF_24",
+  "hostingBackupClone": true,
+  "hostingDeploys": 1,
+  "precheck": "FAIL_AT_INICIO_READY",
+  "matrixExecuted": false,
+  "hostingRollbackRestored": true,
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "operationalWrites": 0,
+  "functionsDeploys": 0,
+  "rulesDeploys": 0,
+  "productionTouched": false,
+  "rootCause": {
+    "category": "DATA_CONTRACT_FAILURE",
+    "owner": "orbit360-platform/core/visual-runtime-rootfix-v20260805.js",
+    "functions": [
+      "MODULE_DEPS.inicio",
+      "hydrationStatus",
+      "wrapModule"
+    ],
+    "problem": "Inicio required the legacy asesores collection as a mandatory hydration dependency. The seven canonical snapshots were ready, but asesores remained in snapshotErrors, leaving the module permanently blocked at four of five sources.",
+    "whyNotAuth": "Firebase user, product user, membership projection and tenant binding were ready before the timeout.",
+    "whyNotEnvironment": "The rootfix loaded, route inicio was active and all seven canonical collections were attached.",
+    "solution": [
+      "Separate mandatory canonical dependencies from optional legacy sources.",
+      "Remove asesores as a blocking dependency of Inicio.",
+      "Project advisors client-side from memberships and Equipo without writes or hardcoding.",
+      "Use an honest degraded state for advisor leaderboard and goals when optional projection is unavailable.",
+      "Audit the same dependency contract in Cliente 360, Polizas, Cobros, Ops, Leads, Conciliaciones and Cancelaciones."
+    ],
+    "retryProhibited": true,
+    "newRuntimeAuthorizationRequiredAfterSourcePass": true
+  },
+  "protectedState": {
+    "currentLabRestoredToPreviousVersion": true,
+    "rootfixHostingLive": false,
+    "passVisualPostAuth": false,
+    "cobros41RemainsPaused": true
+  },
+  "containsPII": false,
+  "containsSecrets": false,
+  "containsPasswords": false,
+  "ok": false
+}

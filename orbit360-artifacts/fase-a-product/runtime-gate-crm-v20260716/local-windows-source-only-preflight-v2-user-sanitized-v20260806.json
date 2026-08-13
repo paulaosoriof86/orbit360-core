@@ -1,0 +1,64 @@
+{
+  "schemaVersion": "orbit360-local-windows-source-only-preflight-user-result-v1",
+  "gateId": "block2.7-visual-matrix-corrected-post-auth-lab-v20260805",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "localHead": "75f28c50aac0db8cec90c6244ec799c700c0840d",
+  "remoteHead": "a87fc18cf0688cd2534bc0974c81247da4e191e9",
+  "status": "HOLD_LOCAL_WINDOWS_SOURCE_ONLY_PREFLIGHT",
+  "total": 34,
+  "passed": 28,
+  "failed": 6,
+  "failedCheckIds": [
+    "service-account-env-present",
+    "cross-runner-source-command-pass",
+    "cross-runner-24-of-24",
+    "signal-safe-48-of-48",
+    "firebase-cli-version-pass",
+    "firebase-lab-project-visible"
+  ],
+  "rootCauseClassification": {
+    "serviceAccount": "SECRET_BINDING_PREMATURELY_REQUIRED_BEFORE_GO_GATE",
+    "signalSafe": "VALIDATOR_STALE_WINDOWS_POSIX_EXIT_CODE_ASSUMPTION",
+    "firebaseCli": "PIPELINE_MECHANISM_FAILURE_WINDOWS_CMD_DOUBLE_QUOTING"
+  },
+  "confirmedPasses": {
+    "repoAndBranch": true,
+    "remoteFetch": true,
+    "isolatedWorktreeCreateRemove": true,
+    "priorRequestConsumedAndNotReusable": true,
+    "jqShim": "10/10",
+    "coreChecks": "28/34"
+  },
+  "signalSemantics": {
+    "legacyTotal": 48,
+    "legacyPassed": 47,
+    "legacyFailed": 1,
+    "rollbackExactlyOnce": true,
+    "persistExactlyOnce": true,
+    "productOrRuntimeDefect": false
+  },
+  "riskOperations": {
+    "secretsRead": false,
+    "firestoreReads": 0,
+    "firestoreWrites": 0,
+    "authWrites": 0,
+    "operationalWrites": 0,
+    "browserExecuted": false,
+    "hostingTouched": false,
+    "deployExecuted": false,
+    "productionTouched": false,
+    "mainTouched": false,
+    "mergeExecuted": false
+  },
+  "correctiveVersion": "local-windows-source-only-preflight-v3",
+  "correctiveFiles": [
+    "tools/orbit360-test-visual-matrix-timeout-signal-safe-portable-v20260806.mjs",
+    "tools/orbit360-test-visual-matrix-cross-runner-portable-v20260806.mjs",
+    "tools/orbit360-preflight-local-windows-source-only-v3-v20260806.mjs"
+  ],
+  "containsPII": false,
+  "containsSecrets": false,
+  "containsPasswords": false,
+  "ok": false,
+  "nextAction": "Execute the corrected v3 source-only preflight once. Do not reuse v2 and do not open runtime until v3 PASS."
+}

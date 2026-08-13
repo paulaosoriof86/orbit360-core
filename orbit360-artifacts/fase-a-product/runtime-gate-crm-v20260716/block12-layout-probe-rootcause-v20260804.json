@@ -1,0 +1,59 @@
+{
+  "schemaVersion": "orbit360-block12-layout-probe-rootcause-v1",
+  "sourceRunId": 30970150174,
+  "sourceHead": "aa2747736bb766dc6a16381c2fa9562849a5cbe2",
+  "gateId": "block12-operational-runtime-lab-v20260804",
+  "contractVersionObserved": "12.0.10",
+  "preflight": {
+    "status": "GO_GATE_CONTRACT",
+    "passed": 26,
+    "failed": 0
+  },
+  "stages": {
+    "functionsDeploy": "PASS",
+    "hostingPreview": "PASS",
+    "videoVisualStep": "COMPLETED_WITH_FAIL_EVIDENCE",
+    "integrity": "PASS"
+  },
+  "visual": {
+    "status": "CUMULATIVE_VISUAL_LAB_FAIL",
+    "classification": "PIPELINE_MECHANISM_FAILURE",
+    "passedRoutesBeforeFailure": [
+      "cliente360",
+      "aseguradoras"
+    ],
+    "firstFailedRoute": "polizas",
+    "failureCode": "ROUTE_POLIZAS_DOM_SNAPSHOT_TIMEOUT",
+    "failureOwner": "layout-dependent host innerText probe",
+    "videoCaptureFailure": false,
+    "screenshotApiUsed": false,
+    "pageErrors": 0,
+    "functionalRegressionDemonstrated": false
+  },
+  "integrity": {
+    "status": "VISUAL_READONLY_INTEGRITY_PASS",
+    "unchanged": true,
+    "firestoreWrites": 0,
+    "authWrites": 0
+  },
+  "cleanup": {
+    "functionsKept": false,
+    "hostingPreviewKept": false
+  },
+  "rootFix": {
+    "removeInnerTextProbe": true,
+    "replacement": "layout-free mount probe using host existence, firstElementChild and childElementCount",
+    "syntheticLargeDomTestRequiredBeforeDeploy": true,
+    "productFrozen": true
+  },
+  "rulesDeployed": false,
+  "syntheticTenantCreated": false,
+  "realTenantWrites": 0,
+  "realDataReimported": false,
+  "productionTouched": false,
+  "mainTouched": false,
+  "mergeExecuted": false,
+  "containsPII": false,
+  "containsSecrets": false,
+  "ok": true
+}

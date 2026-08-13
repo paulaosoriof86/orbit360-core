@@ -1,0 +1,50 @@
+{
+  "schemaVersion": "orbit360-m1-binding-static-preflight-1-0-37-proof-v1",
+  "issuedAt": "2026-07-22T18:24:40.318Z",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "gateId": "block1-client360-insurers-lab-v20260717",
+  "contractVersion": "1.0.37",
+  "status": "FAIL",
+  "gateContract": {
+    "status": "GO_GATE_CONTRACT",
+    "contractVersion": "1.0.37",
+    "total": 1314,
+    "passed": 1314,
+    "failed": 0,
+    "classification": null,
+    "overlayRevision": "1.0.37-visual-review-semantic-responsive-remediation-v1",
+    "evidencePath": "orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json"
+  },
+  "architecture": {
+    "status": "NO_GO",
+    "total": 35,
+    "passed": 33,
+    "failed": 2
+  },
+  "visualRemediation": {
+    "status": "FAIL",
+    "total": 29,
+    "passed": 26,
+    "failed": 3,
+    "revision": "20260722.1"
+  },
+  "execution": {
+    "operationalWrites": 0,
+    "firestoreReads": 0,
+    "firestoreWrites": 0,
+    "secretsRead": false,
+    "vaultRead": false,
+    "runtimeExecuted": false,
+    "browserExecuted": false,
+    "deployExecuted": false,
+    "functionsDeployed": false,
+    "rulesDeployed": false,
+    "productionTouched": false,
+    "mainTouched": false,
+    "mergeExecuted": false
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}

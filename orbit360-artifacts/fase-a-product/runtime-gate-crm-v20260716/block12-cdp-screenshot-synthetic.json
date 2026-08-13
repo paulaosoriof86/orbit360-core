@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "orbit360-block12-cdp-screenshot-synthetic-v1",
+  "status": "CDP_SCREENSHOT_SYNTHETIC_PASS",
+  "classification": "GO_PIPELINE_MECHANISM",
+  "captureEngine": "chromium-cdp",
+  "captureBeyondViewport": false,
+  "bytes": 22518,
+  "networkAccess": false,
+  "firebaseCommandsExecuted": false,
+  "firestoreRead": false,
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "deployExecuted": false,
+  "productionTouched": false,
+  "ok": true,
+  "containsPII": false,
+  "containsSecrets": false
+}

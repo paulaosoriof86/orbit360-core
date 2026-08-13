@@ -1,0 +1,132 @@
+{
+  "schemaVersion": "orbit360-visual-runtime-rootfix-live-v1",
+  "gateId": "block2.7-visual-runtime-rootfix-lab-v20260805",
+  "contractVersion": "2.7.2",
+  "stage": "FAIL_VISUAL_RUNTIME_ROOTFIX_LIVE",
+  "classification": "ENVIRONMENT_FAILURE",
+  "projectId": "ays-orbit-360-lab",
+  "tenantId": "alianzas-soluciones",
+  "before": {
+    "canonical:clientes": {
+      "count": 430,
+      "digest": "a5ffcb32899023d8494944c0e3be278e8db8916c13f6c590ed36bcf25fa7061d"
+    },
+    "canonical:aseguradoras": {
+      "count": 30,
+      "digest": "e7567fd3d3acba6008d17616faf1367bdfabcba1ba2cfa8763c1c2da63d06535"
+    },
+    "canonical:polizas": {
+      "count": 1375,
+      "digest": "7c2ecf37cbbcee7ff202af0343c2b870163bf892c85f82e405de1c4341688dfe"
+    },
+    "canonical:vehiculos": {
+      "count": 1033,
+      "digest": "12cbf7a6fdea6a182481db493d8a315fec0a5c57d028ebafe3f3fa658b0eb612"
+    },
+    "canonical:recibosEsperados": {
+      "count": 1294,
+      "digest": "246a67fb377ed3837cee6ff441f011b3fa5ce56942e84503ef0c1943828043da"
+    },
+    "canonical:carteraPrimas": {
+      "count": 673,
+      "digest": "0a0031d2c27132934a5b0d67921f72b9496c2e4fa0165cc5c41f074143566894"
+    },
+    "canonical:cobros": {
+      "count": 7,
+      "digest": "a24d28e2981e5919e4f0fd89ddd410bc83e147eec2a78b9bf66418d6aa35a553"
+    },
+    "legacy:asesores": {
+      "count": 7,
+      "digest": "9814b1a181465a3e39fab53543762a24f88f13adc886aa6ed22b77f9432d1cdf"
+    },
+    "legacy:comisiones": {
+      "count": 0,
+      "digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "legacy:negocios": {
+      "count": 0,
+      "digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "legacy:gestiones": {
+      "count": 0,
+      "digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "legacy:cancelaciones": {
+      "count": 0,
+      "digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "memberships": {
+      "count": 8,
+      "digest": "d28891cd5fb4244397b3bb35b50137f6792bcb2038639d90566e3cb7c4c8a1b2"
+    }
+  },
+  "after": {
+    "canonical:clientes": {
+      "count": 430,
+      "digest": "a5ffcb32899023d8494944c0e3be278e8db8916c13f6c590ed36bcf25fa7061d"
+    },
+    "canonical:aseguradoras": {
+      "count": 30,
+      "digest": "e7567fd3d3acba6008d17616faf1367bdfabcba1ba2cfa8763c1c2da63d06535"
+    },
+    "canonical:polizas": {
+      "count": 1375,
+      "digest": "7c2ecf37cbbcee7ff202af0343c2b870163bf892c85f82e405de1c4341688dfe"
+    },
+    "canonical:vehiculos": {
+      "count": 1033,
+      "digest": "12cbf7a6fdea6a182481db493d8a315fec0a5c57d028ebafe3f3fa658b0eb612"
+    },
+    "canonical:recibosEsperados": {
+      "count": 1294,
+      "digest": "246a67fb377ed3837cee6ff441f011b3fa5ce56942e84503ef0c1943828043da"
+    },
+    "canonical:carteraPrimas": {
+      "count": 673,
+      "digest": "0a0031d2c27132934a5b0d67921f72b9496c2e4fa0165cc5c41f074143566894"
+    },
+    "canonical:cobros": {
+      "count": 7,
+      "digest": "a24d28e2981e5919e4f0fd89ddd410bc83e147eec2a78b9bf66418d6aa35a553"
+    },
+    "legacy:asesores": {
+      "count": 7,
+      "digest": "9814b1a181465a3e39fab53543762a24f88f13adc886aa6ed22b77f9432d1cdf"
+    },
+    "legacy:comisiones": {
+      "count": 0,
+      "digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "legacy:negocios": {
+      "count": 0,
+      "digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "legacy:gestiones": {
+      "count": 0,
+      "digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "legacy:cancelaciones": {
+      "count": 0,
+      "digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "memberships": {
+      "count": 8,
+      "digest": "d28891cd5fb4244397b3bb35b50137f6792bcb2038639d90566e3cb7c4c8a1b2"
+    }
+  },
+  "roles": [],
+  "hostingDeploysObservedByTool": 0,
+  "firestoreReads": 13,
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "operationalWrites": 0,
+  "functionsDeploys": 0,
+  "rulesDeploys": 0,
+  "productionTouched": false,
+  "containsPII": false,
+  "containsSecrets": false,
+  "containsPasswords": false,
+  "ok": false,
+  "error": "page.waitForFunction: Timeout 35000ms exceeded.",
+  "snapshotIntegrity": "VERIFIED_UNCHANGED"
+}

@@ -1,0 +1,114 @@
+{
+  "schemaVersion": "orbit360-cumulative-candidate-unified-manifest-v2-source-only",
+  "generatedAt": "2026-08-04T08:23:00-06:00",
+  "repository": "paulaosoriof86/orbit360-core",
+  "requiredBranch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "pullRequestState": "draft_open",
+  "headAtStart": "7317ecdfd570ecd6b34b2bca1525fdefcd900d0e",
+  "productBaseline": "b699ba329960cd830121b57452ce558399aa84fb",
+  "gate711Candidate": "267f7231b46d65b80c167f54567a67503b6a6793",
+  "decision": "CANDIDATE_CANONICAL_DATA_PRESERVED_ACCESS_ROOTFIX_SOURCE_ONLY",
+  "classification": [
+    "FUNCTIONAL_DEFECT",
+    "DATA_CONTRACT_FAILURE",
+    "VALIDATOR_STALE",
+    "PIPELINE_MECHANISM_FAILURE"
+  ],
+  "product": {
+    "routes": 31,
+    "workedActiveModules": 31,
+    "sharedStoreIntegrated": 30,
+    "moduleTreeParity": true,
+    "backendExplicitlyComplete": 0,
+    "modulesWithMaturityGaps": 22,
+    "staticAuditOnly": true,
+    "runtimeValidatedRoutes": [
+      "cliente360",
+      "aseguradoras",
+      "polizas",
+      "ops",
+      "leads"
+    ],
+    "humanVisualApprovalPending": [
+      "cliente360-current-candidate",
+      "polizas",
+      "vehiculos",
+      "recibos",
+      "cartera",
+      "cobros",
+      "ops",
+      "leads"
+    ]
+  },
+  "data": {
+    "authority": "Gate 7.11 immutable canonical snapshot plus controlled writes closed afterward",
+    "operationalCounts": {
+      "clientes": 430,
+      "aseguradoras": 30,
+      "polizas": 1373,
+      "vehiculos": 1032,
+      "recibosEsperados": 1294,
+      "carteraPrimas": 673,
+      "cobrosConciliados": 5,
+      "asesores": 7,
+      "planillasComisiones": 5,
+      "comisionesDevengadas": 5,
+      "conciliacionesComisiones": 5
+    },
+    "crmCobranzaRows": 2157,
+    "julyReportedPayments": 68,
+    "meaning": {
+      "crmReportedPayment": "not automatically a reconciled collection",
+      "insurerPortfolio": "evidence of pending balance at cut date",
+      "commissionStatement": "corroborating evidence, not sole collection authority",
+      "bankStatement": "support for specific holds, not sole collection authority"
+    },
+    "reimportRequired": false,
+    "dataLossObserved": false
+  },
+  "access": {
+    "rootCause": "Equipo persists advisor records but does not execute protected Auth plus tenant membership onboarding",
+    "advisorRecords": 7,
+    "authUsersObserved": 2,
+    "membershipsObserved": 1,
+    "nominalRosterSolution": "RETIRED",
+    "genericContract": "tools/orbit360-user-onboarding-contract-v20260804.mjs",
+    "legacyDryRun": "tools/orbit360-reconciliar-user-onboarding-legacy-dryrun-v20260804.mjs",
+    "protectedExecutor": "PENDING_FUNCTIONS_FREEZE_LIFT_SOURCE_ONLY_NO_DEPLOY",
+    "status": "SOURCE_CONTRACT_READY_RUNTIME_ACCESS_STILL_BLOCKED"
+  },
+  "validator": {
+    "owner": "tools/orbit360-gravicentra-rc12-browser-membership-smoke-v20260803.mjs",
+    "rootFix": "use observed.store outside browser context",
+    "errorEvidence": [
+      "stage",
+      "classification",
+      "secondaryClassification",
+      "sanitizedStack"
+    ],
+    "runtimeReexecutionAuthorized": false
+  },
+  "opsLeads": {
+    "sharedStoreBackend": true,
+    "gate711RuntimePass": true,
+    "multiRoleReadOnlyVerified": true,
+    "emptyRelationsAllowed": true,
+    "domainBackendComplete": false,
+    "reasonIncludedInVisualReview": "runtime route and permission behavior were verifiable even without complete domain writes"
+  },
+  "integrity": {
+    "firestoreWrites": 0,
+    "authWrites": 0,
+    "reimportExecuted": false,
+    "hostingDeployExecuted": false,
+    "rulesChanged": false,
+    "functionsChanged": false,
+    "productionTouched": false,
+    "mainTouched": false,
+    "mergeExecuted": false
+  },
+  "nextBoundary": "complete protected generic executor and Team integration only after the explicit Functions source freeze is lifted; then run one generic end-to-end user gate before a single visual/deploy decision",
+  "containsPII": false,
+  "containsSecrets": false
+}

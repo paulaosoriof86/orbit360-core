@@ -1,0 +1,48 @@
+{
+  "schemaVersion": "orbit360-actions-no-jobs-control-plane-rootcause-v1",
+  "observedAt": "2026-08-06T16:35:00-06:00",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "workflowPath": ".github/workflows/orbit360-claude-paquete-reconciliado-v1205.yml",
+  "referenceRunId": "31128708226",
+  "referenceCommit": "9352968273fab431bea6ea6f16f0fb79af749ee2",
+  "emailResult": "No jobs were run",
+  "githubJobsObserved": 0,
+  "eventDispatchObserved": true,
+  "workflowDiscoveryObserved": true,
+  "runnerAllocated": false,
+  "stepsObserved": 0,
+  "previousGeneralDiagnosisRetired": "GITHUB_ACTIONS_EVENT_DISPATCH_UNAVAILABLE",
+  "classification": "PIPELINE_MECHANISM_FAILURE",
+  "failureCode": "CONTROL_PLANE_JOB_CONDITION_EXCLUDED_ALL_JOBS",
+  "rootCause": "The historical workflow was triggered, but its job-level condition excluded every job. Failure notifications were incorrectly interpreted as evidence of unavailable event dispatch or runner capacity.",
+  "contributingFactors": [
+    "Historical workflow used broad pull_request triggers.",
+    "The workflow filename and notification text obscured that no job entered a runner.",
+    "The repository contains extensive historical workflow accumulation, increasing control-plane noise."
+  ],
+  "correctiveAction": {
+    "registeredWorkflowPath": ".github/workflows/orbit360-claude-paquete-reconciliado-v1205.yml",
+    "relayPreflightPath": "tools/orbit360-preflight-visual-matrix-runtime-relay-v8-v20260806.sh",
+    "relayCommit": "db9b4da99f49f69999a45429aaa2fe590b38fae9",
+    "behavior": "The already registered workflow now creates one relay job for the canonical branch, explicitly skips non-exclusive commits, and opens runtime only for an authorized exclusive v8 request commit."
+  },
+  "riskExecuted": {
+    "secretsRead": false,
+    "firebaseAccess": false,
+    "firestoreReads": 0,
+    "firestoreWrites": 0,
+    "authWrites": 0,
+    "operationalWrites": 0,
+    "browserExecuted": false,
+    "hostingTouched": false,
+    "deployExecuted": false,
+    "productionTouched": false,
+    "mainTouched": false,
+    "mergeExecuted": false
+  },
+  "containsPII": false,
+  "containsSecrets": false,
+  "containsPasswords": false,
+  "ok": true
+}

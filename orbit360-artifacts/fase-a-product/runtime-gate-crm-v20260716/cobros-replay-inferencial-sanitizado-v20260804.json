@@ -1,0 +1,116 @@
+{
+  "schemaVersion": "orbit360-cobros-replay-inferencial-sanitizado-v2",
+  "generatedAt": "2026-08-04T12:20:00-06:00",
+  "sourceWorkbook": {
+    "title": "ORBIT360-AYS-RECIBOS-CARTERA-CANONICAL-PRIVATE-20260730",
+    "driveFileId": "1cttFAW4atpv8y9GAl5xrx26ojTDxQhYV",
+    "sizeBytes": 443105,
+    "containsPrivateRows": true,
+    "privateRowsCommitted": false
+  },
+  "classification": "GO_REPLAY_INFERENCIAL_PARCIAL_CARTERA_SOURCE_ONLY",
+  "rootCause": [
+    "DATA_CONTRACT_FAILURE",
+    "PIPELINE_MECHANISM_FAILURE",
+    "VALIDATOR_STALE"
+  ],
+  "canonicalCounts": {
+    "receiptsCalendar": 1261,
+    "reportedPaymentsOriginalTemporaryLabel": 365,
+    "portfolioPending": 641,
+    "noPendingAccordingToInsurerOutsideReportedPayments": 211,
+    "receiptStateHolds": 44,
+    "qualityAlerts": 73,
+    "currentlyMaterializedCobros": 5
+  },
+  "reportedPaymentReclassification": {
+    "portfolioSequenceCandidates": 128,
+    "validReportedAfterSnapshotCutoff": 2,
+    "pendingAdditionalCrossBeforeCommissionAndDirectReports": 235,
+    "invariant": "128 + 2 + 235 = 365",
+    "distinctPoliciesInSequenceCandidates": 38
+  },
+  "sequenceCandidatesByAuthority": {
+    "AseGuate": {
+      "cutoff": "2026-07-28",
+      "candidatePayments": 17,
+      "distinctPolicies": 8,
+      "postCutoffValid": 1,
+      "confidence": "ALTA",
+      "basis": "Balance completo pendiente; corte explícito"
+    },
+    "ElRoble": {
+      "cutoff": "2026-07-27",
+      "candidatePayments": 91,
+      "distinctPolicies": 22,
+      "postCutoffValid": 0,
+      "confidence": "ALTA_CON_CORTE_INFERIDO",
+      "basis": "Balance completo; corte inferido por frontera de aging"
+    },
+    "Universales": {
+      "cutoff": "2026-07-27",
+      "candidatePayments": 7,
+      "distinctPolicies": 3,
+      "postCutoffValid": 1,
+      "confidence": "ALTA",
+      "basis": "Balance completo pendiente; corte explícito"
+    },
+    "LaCeiba": {
+      "cutoff": "2026-07-31",
+      "candidatePayments": 12,
+      "distinctPolicies": 4,
+      "postCutoffValid": 0,
+      "confidence": "ALTA",
+      "basis": "Estado de cartera pendiente emitido"
+    },
+    "Mapfre": {
+      "cutoff": "2026-08-31",
+      "candidatePayments": 1,
+      "distinctPolicies": 1,
+      "postCutoffValid": 0,
+      "confidence": "ALTA_PROYECTADO",
+      "basis": "Proyectado separa pagados de requerimientos pendientes"
+    }
+  },
+  "method": {
+    "groupKey": [
+      "polizaId",
+      "vigenciaInicio",
+      "vigenciaFin",
+      "moneda"
+    ],
+    "candidateRule": "pago reportado con fecha límite anterior a la primera obligación pendiente de una fuente de cartera completa, fecha reportada no posterior al corte, y sin requiereValidacion",
+    "postCutoffRule": "pago reportado después del corte se conserva como válido, pero no se concilia usando ese snapshot",
+    "excludedSources": [
+      "GyT (identidad/corte requiere validación)"
+    ],
+    "excludedConditions": [
+      "requiereValidacion",
+      "conflicto de vigencia",
+      "conflicto de moneda",
+      "reverso",
+      "duplicado ambiguo"
+    ]
+  },
+  "ledger": {
+    "rows": 130,
+    "digestSha256": "3706fc5e02bcfeb8eef6d511849ba40a357449251998f548f58d02fff15d42bf",
+    "containsPII": false,
+    "containsPolicyNumbers": false,
+    "containsAmountsPerRow": false
+  },
+  "nextOverlay": {
+    "commissionStatements": "pending current private normalized rows",
+    "directInsurerPaymentReports": "must be matched without duplicating five already materialized cobros",
+    "remaining235IsNotFinalUnreconciledCount": true
+  },
+  "writes": {
+    "firestore": 0,
+    "auth": 0,
+    "cobros": 0,
+    "recibos": 0,
+    "deploy": 0,
+    "productionTouched": false
+  },
+  "ok": true
+}

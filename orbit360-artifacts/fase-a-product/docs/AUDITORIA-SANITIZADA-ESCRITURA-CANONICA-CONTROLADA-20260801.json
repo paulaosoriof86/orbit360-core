@@ -1,0 +1,93 @@
+{
+  "schemaVersion": "orbit360-sanitized-audit-v1",
+  "date": "2026-08-01",
+  "gateId": "block7-policies-canonical-controlled-write-lab-v20260801",
+  "contractVersion": "7.5.0",
+  "status": "POLICIES_CANONICAL_CONTROLLED_WRITE_CLOSED",
+  "classification": "GO_LAB_CANONICAL_CONTROLLED_WRITE_CLOSED",
+  "execution": {
+    "run": 30726870258,
+    "job": 91440059984,
+    "artifact": 8826656778,
+    "artifactDigest": "sha256:170f450128cd228e3a8ce53c072fcd91cfb38ff4ad6a0dc5ae73116b84e8b945",
+    "head": "67b76a23419dea01c273f1524feda7b8f1578395",
+    "preflight": {"passed": 17, "failed": 0},
+    "batches": {"planned": 11, "committed": 11}
+  },
+  "authority": {
+    "operationalSource": "tenantId/{tenantId}/{collection}",
+    "canonicalDestination": "tenants/{tenantId}/data/{collection}/items",
+    "frontendAdapted": false
+  },
+  "plan": {
+    "create": 4377,
+    "update": 0,
+    "omit": 440,
+    "hold": 25,
+    "collections": {
+      "clientes": {"before": 414, "created": 0, "after": 414, "omit": 414, "hold": 16},
+      "aseguradoras": {"before": 26, "created": 0, "after": 26, "omit": 26, "hold": 4},
+      "polizas": {"before": 2, "created": 1373, "after": 1375, "hold": 2},
+      "vehiculos": {"before": 1, "created": 1032, "after": 1033, "hold": 1},
+      "recibosEsperados": {"before": 0, "created": 1294, "after": 1294, "hold": 0},
+      "carteraPrimas": {"before": 0, "created": 673, "after": 673, "hold": 0},
+      "cobros": {"before": 2, "created": 5, "after": 7, "hold": 2}
+    }
+  },
+  "controls": {
+    "createOnly": true,
+    "overwriteAttempts": 0,
+    "privateSnapshotCreated": true,
+    "snapshotEntries": 445,
+    "idempotencyMode": "CREATE_PRECONDITION_PLUS_SNAPSHOT_DIGEST",
+    "postVerification": {
+      "countsMatch": true,
+      "contentMatch": true,
+      "sourceUnchanged": true,
+      "createdPayloadsMatch": true
+    },
+    "rollbackAvailable": true,
+    "rollbackExecuted": false,
+    "unresolvedImportBatchReferencesWritten": 0,
+    "holdDocumentsWritten": 0,
+    "seedDeletionExecuted": false
+  },
+  "digests": {
+    "sourceSnapshot": "88b8e16b0d4531b2f5c0ce2b1a21068837853080943f7584f6f3fab0cc2ff18d",
+    "targetSnapshotBefore": "9ec5e02509d6fa3cfc1450de8db42e0fd71c0d52e612bd6d9c0119186fc5f3d8",
+    "planSet": "bd1852e73c21c61d98baed4bda129b027cd1a3ec2a265b6749dbc7c0eb25df47",
+    "targetSnapshotAfter": "724e1efbbc29f60791350ea180ef54230ecf888f9914b98fc70fda62ca6ac305"
+  },
+  "cumulativeVisualGuard": {
+    "trackedFiles": 308,
+    "pathDigest": "0c3dbf222646ea46b57e838359ac56fff3994268a97e0d682508bd747a29f3c4",
+    "contentDigest": "5b32b90815929acc341cfd4ae7c1e5f76d819e1a6a1b4091d13800508ab9b647",
+    "indexDigest": "54df4a1977573ccc6a0702bd0012f2835fcef4cb529e327d16918c4b420382a4",
+    "manifestMatches": true,
+    "visualizationAuthorized": false
+  },
+  "security": {
+    "firestoreReads": true,
+    "firestoreWrites": 4377,
+    "operationalWrites": 4377,
+    "reimportExecuted": false,
+    "browserExecuted": false,
+    "previewExecuted": false,
+    "deployExecuted": false,
+    "rulesApplied": false,
+    "functionsDeployed": false,
+    "productionTouched": false,
+    "mainTouched": false,
+    "mergeExecuted": false
+  },
+  "humanApproval": {
+    "clientes": true,
+    "polizas": false,
+    "vehiculos": false,
+    "recibos": false,
+    "cartera": false,
+    "restoCrm": false
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}

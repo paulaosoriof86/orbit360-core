@@ -1,0 +1,95 @@
+{
+  "schemaVersion": "orbit360-planillas-comisiones-linkage-readonly-audit-sanitized-v1",
+  "date": "2026-08-01",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pr": 5,
+  "gate": {
+    "gateId": "block11-planillas-comisiones-linkage-readonly-v20260801",
+    "contractVersion": "11.0.0",
+    "status": "PLANILLAS_COMISIONES_LINKAGE_READONLY_PASS",
+    "classification": "GO_LAB_PLANILLAS_COMISIONES_LINKAGE_READONLY",
+    "run": 30718081323,
+    "job": 91417072747,
+    "artifact": 8823967179,
+    "artifactDigest": "sha256:52ff1ed73e16bf012ce438f0f3c3f50aeaaadb1da4a0d575891424a1683a73f6",
+    "auditedHead": "55b6f969611139a54334c8ee455a96c23137fb8b"
+  },
+  "sourceCut": {
+    "filesReceived": 19,
+    "sourceBundles": 10,
+    "rowsObserved": 67,
+    "crmCandidates": 65,
+    "omittedZeroCommission": 2,
+    "exactDateCandidates": 34,
+    "periodOnlyCandidates": 29,
+    "reversalCandidates": 2,
+    "period": "2026-06"
+  },
+  "baseline": {
+    "polizas": 1373,
+    "recibosEsperados": 1294,
+    "cobros": 5,
+    "finmovs": 0
+  },
+  "linkage": {
+    "processed": 65,
+    "policyUnique": 10,
+    "policyMissing": 29,
+    "policyAmbiguous": 26,
+    "receiptUniqueByReference": 0,
+    "receiptUniqueByNetPremium": 2,
+    "receiptRelatedButUnresolved": 7,
+    "receiptNoRelation": 1,
+    "cobroLinked": 0,
+    "cobroNotLinked": 2,
+    "decisions": {
+      "HOLD_POLICY_NOT_FOUND": 29,
+      "HOLD_POLICY_AMBIGUOUS": 26,
+      "HOLD_RECEIPT_AMBIGUOUS": 4,
+      "LINK_POLICY_RECEIPT_READONLY": 2,
+      "LINK_POLICY_ONLY_RECEIPT_UNRESOLVED": 3,
+      "LINK_POLICY_ONLY_NO_RECEIPT_RELATION": 1
+    }
+  },
+  "firstRunIncident": {
+    "run": 30717963030,
+    "job": 91416756957,
+    "artifact": 8823933228,
+    "classification": "DATA_CONTRACT_FAILURE",
+    "failure": "PACKAGE_LOGICAL_SHA",
+    "cause": "PRIVATE_PACKAGE_LOGICAL_HASH_USED_PYTHON_SERIALIZATION_INSTEAD_OF_NODE_STABLE_SORT",
+    "firestoreRead": false,
+    "writes": 0,
+    "correction": "ONLY_PRIVATE_PACKAGE_CANONICAL_HASH_AND_CONTRACT_METADATA_UPDATED"
+  },
+  "openHolds": {
+    "policyIdentityLayer": 55,
+    "receiptResolutionWithinUniquePolicies": 8,
+    "mapfreSourcePackageIncomplete": true,
+    "ficohsaFinanceInvoiceMissing": true,
+    "financeActivation": false
+  },
+  "capabilities": {
+    "secretsRead": true,
+    "firestoreRead": true,
+    "firestoreWrites": 0,
+    "operationalWrites": 0,
+    "runtimeExecuted": false,
+    "browserExecuted": false,
+    "deployExecuted": false,
+    "productionTouched": false,
+    "mainTouched": false,
+    "mergeExecuted": false
+  },
+  "sanitization": {
+    "containsPII": false,
+    "containsPolicyNumbers": false,
+    "containsAmounts": false,
+    "containsIds": false,
+    "containsSecrets": false,
+    "realSourceRowsStoredInRepository": false
+  },
+  "nextAction": "READ_ONLY_POLICY_IDENTITY_ROOT_CAUSE_FOR_55_HOLDS",
+  "ok": true
+}

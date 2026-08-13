@@ -1,0 +1,99 @@
+{
+  "schemaVersion": "orbit360-cobros-source-intake-v2-multi-evidence",
+  "tenantId": "alianzas-soluciones",
+  "cutoff": "2026-07-31",
+  "status": "MULTI_EVIDENCE_MODEL_ACTIVE",
+  "supersedes": "orbit360-cobros-source-intake-v1",
+  "canonicalRegistry": "REGISTRO-FUENTES-CONCILIACION-MULTIEVIDENCIA-20260801.json",
+  "sourceRegistry": {
+    "status": "OPEN_ONLY_FOR_SPECIFIC_UNRESOLVED_EVIDENCE",
+    "payloadsStoredInRepo": false,
+    "cobrosWriteBlocked": true,
+    "registeredCurrentUploadHashes": 10,
+    "doNotReRequestSameHash": true,
+    "documentEveryReceivedSource": true
+  },
+  "freshnessRules": {
+    "planillas": "Request the current version only when a specific reconciliation requires it. Do not use an older previously supplied version after the user reports that it has changed.",
+    "bankStatements": "Request a current statement only for a specific unresolved HOLD. Do not use prior statements as current balance authority.",
+    "financialFiles": "Request the current file only in its own financial-history block. Never use it as payment or bank evidence.",
+    "portfolioSnapshots": "Older snapshots remain valid historical evidence for their own cutoff but are not current-balance authority.",
+    "postCutoffPayments": "A payment after the portfolio snapshot cutoff is valid and can explain an obligation that was pending at the earlier cutoff."
+  },
+  "sources": [
+    {
+      "sourceType": "cobros_realizados",
+      "authority": "DIRECT_PAYMENT_REPORTED_CRM",
+      "canonicalDestinations": ["pagosReportadosFuente", "conciliaciones"],
+      "forbiddenDestinations": ["cobros", "finmovs", "carteraPrimas"],
+      "rule": "Requires corroboration and authorization; never auto-applies."
+    },
+    {
+      "sourceType": "planilla_aseguradora",
+      "authority": "DIRECT_INSURER_PAYMENT_OR_REVENUE_EVIDENCE",
+      "canonicalDestinations": ["reportesPagoAseguradora", "conciliaciones"],
+      "forbiddenDestinations": ["cobros", "finmovs", "carteraPrimas"],
+      "rule": "Direct insurer evidence, still matched one-to-one and never auto-applied."
+    },
+    {
+      "sourceType": "estado_cartera_aseguradora",
+      "authority": "TEMPORAL_PENDING_AND_CLEARING_EVIDENCE",
+      "canonicalDestinations": ["evidenciasCarteraTemporal", "conciliaciones"],
+      "forbiddenDestinations": ["cobros", "finmovs"],
+      "rule": "Presence proves pending at cutoff. Disappearance from a later comparable complete snapshot is clearing evidence but does not create a cobro alone."
+    },
+    {
+      "sourceType": "planilla_comisiones",
+      "authority": "CORROBORATIVE_INSURER_COLLECTION_RECOGNITION",
+      "canonicalDestinations": ["evidenciasComisionRecaudo", "conciliaciones"],
+      "forbiddenDestinations": ["cobros", "finmovs", "carteraPrimas"],
+      "rule": "A recognized or paid commission corroborates collection; timing differences and data-contract conflicts remain visible. Commission alone does not create a cobro."
+    },
+    {
+      "sourceType": "estado_cuenta_bancario",
+      "authority": "SUPPORT_FOR_SPECIFIC_HOLD_ONLY",
+      "canonicalDestinations": ["movimientosBanco", "conciliaciones"],
+      "forbiddenDestinations": ["cobros", "finmovs", "carteraPrimas"],
+      "rule": "Request only when a specific HOLD needs corroboration. Bank alone does not create a cobro."
+    },
+    {
+      "sourceType": "documentos_soporte",
+      "authority": "SUPPORT_FOR_SPECIFIC_HOLD_ONLY",
+      "canonicalDestinations": ["documentosSoportePago", "conciliaciones"],
+      "forbiddenDestinations": ["cobros", "finmovs", "carteraPrimas", "clientes", "polizas"]
+    },
+    {
+      "sourceType": "financiero_historico",
+      "authority": "SEPARATE_FINANCIAL_DOMAIN",
+      "forbiddenDestinations": ["cobros", "carteraPrimas", "conciliacionesPago"],
+      "rule": "Never substitutes for a payment report, portfolio statement, commission plan, or bank statement."
+    }
+  ],
+  "reconciliationRules": {
+    "oneTemporalLineagePerCase": true,
+    "oneToOnePaymentMatch": true,
+    "fifoSimulationRequired": true,
+    "exactReceiptPrecedesGenericFifo": true,
+    "historicalExigibleIncluded": true,
+    "absenceAloneCreatesCobro": false,
+    "commissionAloneCreatesCobro": false,
+    "bankAloneCreatesCobro": false,
+    "paymentAfterSnapshotCutoffAllowed": true,
+    "rollbackPlanRequiredBeforeWrite": true
+  },
+  "currentState": {
+    "conversationPayloadsProfiled": true,
+    "realRowsStoredInRepo": false,
+    "cobrosWrites": 0,
+    "finmovsWrites": 0,
+    "firestoreWrites": 0,
+    "productionTouched": false
+  },
+  "nextUserInputWhenRequested": [
+    "Ask only for the current version of a planilla, bank statement, or financial file when a specific unresolved reconciliation requires it.",
+    "Do not ask again for a source already registered with the same hash.",
+    "Do not infer an insurer identity from an ambiguous filename or workbook."
+  ],
+  "containsPII": false,
+  "containsSecrets": false
+}
