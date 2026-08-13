@@ -1,0 +1,60 @@
+{
+  "schemaVersion": "orbit360-hostdime-production-target-v1",
+  "issuedAt": "2026-08-12T21:55:00-06:00",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "parentHead": "b713ab842f9b8de4848e837a79ca61bbdfbf5250",
+  "classification": "PIPELINE_MECHANISM_FAILURE_RESOLUTION",
+  "provider": "HostDime",
+  "publicUrl": "https://app.aysseguros.com",
+  "domain": "aysseguros.com",
+  "recommendedDocumentRootTemplate": "/home/<cpanel-user>/public_html/app/",
+  "recommendedPrivateDeployRootTemplate": "/home/<cpanel-user>/orbit360-deploy/",
+  "transport": {
+    "preferred": "SFTP_OVER_SSH",
+    "fallback": "FTPS_ONLY_IF_SFTP_UNAVAILABLE",
+    "plainFtpAllowed": false,
+    "authenticationPreferred": "SSH_KEY",
+    "credentialsInRepositoryAllowed": false
+  },
+  "githubActionsInputs": {
+    "repositorySecretsRequiredOnce": [
+      "HOSTDIME_HOST",
+      "HOSTDIME_USER",
+      "HOSTDIME_SSH_PRIVATE_KEY"
+    ],
+    "repositoryVariablesRequiredOnce": [
+      "HOSTDIME_PORT",
+      "HOSTDIME_DOCUMENT_ROOT",
+      "ORBIT360_PRODUCTION_URL"
+    ],
+    "recommendedValues": {
+      "HOSTDIME_PORT": "VERIFY_WITH_HOSTDIME_ACCOUNT",
+      "HOSTDIME_DOCUMENT_ROOT": "/home/<cpanel-user>/public_html/app/",
+      "ORBIT360_PRODUCTION_URL": "https://app.aysseguros.com"
+    }
+  },
+  "releasePolicy": {
+    "sourceArtifactPinnedBySha": true,
+    "canonicalGateBeforeSecrets": true,
+    "backupBeforePublicMutation": true,
+    "singleDeployPerAuthorizedRequest": true,
+    "remoteSmokeAfterDeploy": true,
+    "integrityHashVerification": true,
+    "rollbackExecutable": true,
+    "requestRequiredBeforeProductionAccess": true,
+    "productionDeployAllowedByThisContract": false
+  },
+  "hostingSeparation": {
+    "firebaseBackendMayRemain": true,
+    "firebaseHostingIsFinalProductionTarget": false,
+    "hostdimeIsFinalProductionHostingTarget": true,
+    "corporateRootDomainMustNotBeOverwritten": true,
+    "applicationUsesSubdomain": true
+  },
+  "status": "SOURCE_ONLY_TARGET_CONTRACT_PREPARED",
+  "productionTouched": false,
+  "secretsAccessed": false,
+  "deploys": 0,
+  "writes": 0
+}
