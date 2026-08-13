@@ -1,0 +1,50 @@
+name: Orbit360 HostDime Production Target Source Only
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - 'tools/orbit360-hostdime-production-target-v20260812.json'
+      - '.github/workflows/orbit360-hostdime-target-source-only-v20260812.yml'
+permissions:
+  contents: read
+concurrency:
+  group: orbit360-hostdime-target-source-only-v20260812
+  cancel-in-progress: false
+jobs:
+  validate-hostdime-target:
+    name: Validate HostDime target contract without secrets or production access
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Validate target contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          FILE='tools/orbit360-hostdime-production-target-v20260812.json'
+          jq -e '
+            .schemaVersion=="orbit360-hostdime-production-target-v1" and
+            .provider=="HostDime" and
+            .publicUrl=="https://app.aysseguros.com" and
+            .transport.preferred=="SFTP_OVER_SSH" and
+            .transport.plainFtpAllowed==false and
+            .transport.credentialsInRepositoryAllowed==false and
+            .releasePolicy.canonicalGateBeforeSecrets==true and
+            .releasePolicy.backupBeforePublicMutation==true and
+            .releasePolicy.singleDeployPerAuthorizedRequest==true and
+            .releasePolicy.remoteSmokeAfterDeploy==true and
+            .releasePolicy.integrityHashVerification==true and
+            .releasePolicy.rollbackExecutable==true and
+            .releasePolicy.requestRequiredBeforeProductionAccess==true and
+            .releasePolicy.productionDeployAllowedByThisContract==false and
+            .hostingSeparation.firebaseHostingIsFinalProductionTarget==false and
+            .hostingSeparation.hostdimeIsFinalProductionHostingTarget==true and
+            .productionTouched==false and
+            .secretsAccessed==false and
+            .deploys==0 and
+            .writes==0
+          ' "$FILE" >/dev/null
+          echo 'PASS_HOSTDIME_TARGET_SOURCE_ONLY'
