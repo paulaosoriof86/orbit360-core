@@ -3,7 +3,7 @@
     "rules": "firestore.product-readonly.rules"
   },
   "hosting": {
-    "public": "orbit360-platform",
+    "public": "orbit360-artifacts/fase-a-product",
     "ignore": [
       "firebase.json",
       "**/.*",
