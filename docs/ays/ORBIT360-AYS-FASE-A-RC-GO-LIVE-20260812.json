@@ -1,0 +1,17 @@
+{
+  "schema": "orbit360-ays-fase-a-rc-go-live-v2",
+  "date": "2026-08-13",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "sourceShaStrategy": "workflow-github-sha",
+  "gateId": "block1-client360-insurers-lab-v20260717",
+  "tenantId": "alianzas-soluciones",
+  "stagingDir": "orbit360-artifacts/fase-a-product",
+  "mode": "firestore-product-readonly",
+  "transformOnlyStaging": true,
+  "runtimeConfigAfterGate": true,
+  "writesEnabled": false,
+  "requestMustBeAbsentDuringSourceOnly": true,
+  "maxHostingDeploys": 1,
+  "rollbackRequiredWhenHostingTouched": true,
+  "stopOnAnyFailure": true
+}
