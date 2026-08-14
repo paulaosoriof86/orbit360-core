@@ -10,108 +10,103 @@ Antes de diagnosticar, modificar, ejecutar runtime/browser/deploy o continuar un
 2. HEAD real de `ays/backend-tenant-lab-v99-20260703` y PR #5;
 3. último workflow/evidencia indicado por `lastEvidence` en el live-state;
 4. `orbit360-platform/docs/ADDENDUM-MAESTRO-CONTINUIDAD-SINCRONIZACION-ANTIBUCLE-GOLIVE-POSTPROD-20260814.md`;
-5. `orbit360-platform/docs/CIERRE-R1-OBSERVABILIDAD-ROOTCAUSE-PRODUCT-RUNTIME-COLLECTIONS-20260814.md`;
-6. `orbit360-platform/CHANGELOG-R1-GOLIVE-20260814.md`;
+5. `orbit360-platform/docs/CIERRE-R2-REQUIRED-OPTIONAL-PASS-DYNAMIC-ASSET-GAP-20260814.md`;
+6. `orbit360-platform/CHANGELOG-R2-GOLIVE-20260814.md`;
 7. fuentes históricas solo para reglas no sustituidas por evidencia posterior.
 
 No usar este README, CHANGELOG histórico, PENDIENTES o memoria de otra conversación como sustituto del live-state.
 
-## Estado vivo · R1 cerrado · 2026-08-14
+## Estado vivo · R2 cerrado · 2026-08-14
 
 ```text
-stateVersion: 20260814.r1-rootcause.1
-fase: PRE_GOLIVE_R2_ROOTFIX
+stateVersion: 20260814.r2-required-optional-pass-dynamic-asset-gap.1
+previousStateVersion: 20260814.r1-rootcause.1
+fase: PRE_GOLIVE_R3_DURABLE_PACKAGE
 RC: RC-AYS-LAB-CANONICA-01
 candidata funcional canónica preservada: 4ede3e785cb2cc889a7c11c2d9e2030c7af20b64
+HEAD R2 ejecutado: 8816f1e1119150f993a79fd56de33c104c29ecec
 PR #5: draft/open
 main/merge: no
 HostDime blocker actual: no
 paquete durable definitivo: todavía no
-producción tocada por R1: no
+producción tocada por R2: no
 ```
 
-Última evidencia relevante:
+## R2 · resultado certificado
+
+Workflow: `Orbit360 Fase A Product Local Synthetic 20260814`  
+Run: `31822262972`  
+Job: `94838064587`
+
+La causa de R1 quedó corregida:
 
 ```text
-workflow: Orbit360 Fase A Product Local Synthetic 20260814
-run: 31820056535
-job: 94830881175
-resultado: FAIL seguro fuera de producción, causa diagnosticada
-bootstrap: environment -> authentication -> membership -> planning -> attaching -> blocked
-error interno: snapshots_no_adjuntos
-clasificación: DATA_CONTRACT_FAILURE / PRODUCT_RUNTIME_COLLECTION_POLICY_MISMATCH
+bootstrap: environment -> authentication -> membership -> planning -> attaching -> waiting-snapshots -> installing -> ready-read-only
+productApp.started: true
+routerStarted: true
+required collections: 7/7
+requiredMissing: 0
+requiredFailed: 0
+clientes: 430
+aseguradoras: 30
 writes: 0
 deploy: 0
+productionTouched: false
 ```
 
-## Causa raíz R1
-
-El materializador productivo solicita actualmente:
-
-`clientes, aseguradoras, gestiones, notificaciones`
-
-pero el contrato required/optional ya aprobado para las rutas críticas exige como unión required:
+Required canónicas:
 
 `clientes, polizas, cobros, aseguradoras, vehiculos, recibosEsperados, carteraPrimas`
 
-Legacy/opcionales no bloqueantes:
+Optional/legacy no bloqueantes:
 
 `asesores, metas, negocios, gestiones, comisiones, cancelaciones`
 
-`notificaciones` no tiene política de colección productiva y provoca un hard-error de attach. Además el store P0 no distingue required/optional y hoy puede considerar ready una hidratación parcial.
+CERRADO:
 
-## Siguiente acción exacta — R2
+`DATA_CONTRACT_FAILURE / PRODUCT_RUNTIME_COLLECTION_POLICY_MISMATCH`
 
-Corregir únicamente la capa productiva de catálogo/hidratación read-only para reutilizar el contrato required/optional existente:
+## Nuevo blocker vigente
 
-- quitar `notificaciones` como hard dependency;
-- incluir todas las required canónicas;
-- optional/legacy no bloquea readiness;
-- `asesores` continúa optional/proyectable;
-- readiness requiere todas las required adjuntas y sin error;
-- conservar tenant scope, read-only, fail-closed y cero fallback;
-- validar source-only;
-- ejecutar UNA sola vez el mismo synthetic local.
+El workflow global terminó FAIL **después** de que Product App y el store estaban listos. El harness venció esperando `#host` visible mientras `core/router.js` todavía resolvía contratos runtime mediante `import()` dinámico. La evidencia registró un 404 local de un JS bajo `/core/`.
 
-No HostDime, deploy, producción, reimportación, Auth/membership, Rules/Functions ni nuevo workflow/request en R2.
+Clasificación vigente:
+
+`PIPELINE_MECHANISM_FAILURE / PRODUCT_DYNAMIC_RUNTIME_ASSET_GAP`
+
+El builder debe incorporar de forma reproducible los assets dinámicos que el router necesita y el gate source-only debe detectar cualquier omisión antes de secrets/browser.
+
+## Siguiente acción exacta · R3
+
+R3 conserva su propósito de paquete durable e incorpora este cierre de ensamblaje:
+
+- derivar assets dinámicos desde `core/router.js` y `data/tenant-runtime-config-index.js`;
+- copiarlos source→artifact sin hardcodear secretos/datos;
+- ampliar validación source-only para que un dynamic asset faltante bloquee antes del navegador;
+- ejecutar una sola prueba local esperando una señal real de router/render;
+- con PASS, materializar ZIP durable + manifest + hashes en la misma frontera;
+- HostDime y `app.aysseguros.com` siguen después, en R4.
 
 ## Porcentajes vigentes
 
 ```text
 readiness funcional de candidata: 100%
-avance por iteraciones hacia producción: 25% (R1 1/4)
+avance por iteraciones hacia producción: 50% (R1+R2, 2/4)
 gates finales cerrados: 0% (0/3)
-R2 PASS -> 50% iteraciones / 33% gates
 R3 PASS -> 75% iteraciones / 67% gates
 R4 PASS -> 100% / 100%
 ```
 
-Los porcentajes de gates solo suben al cerrar resultados, no por actividad o diagnóstico.
-
-## Ruta de salida vigente
-
-```text
-R1 observabilidad + synthetic: CERRADO
-→ R2 único rootfix required/optional: SIGUIENTE
-→ R3 paquete durable + manifest + hashes
-→ R4 HostDime + app.aysseguros.com + smoke E2E productivo
-→ R5 habilitación operativa + delta controlado
-→ R6 módulos postproducción incrementales
-→ R7 gate de reutilización para siguiente tenant
-```
-
-## Integridad documental de R1
-
-Durante la transacción documental hubo una escritura intermedia que dejó temporalmente vacío el live-state en `af220f61101881bb43e4d2cdd07afda65f844f87`. Fue detectada y restaurada en la misma iteración; producto, datos, runtime y producción no fueron tocados. R1 solo se considera cerrado cuando `Orbit360 Continuidad Documental Source 20260814` vuelva a PASS sobre el estado restaurado.
+R2 cuenta como iteración cerrada porque su rootfix objetivo quedó demostrado. Los gates no suben todavía porque el artifact no está certificado como paquete durable/renderizable.
 
 ## Reglas anti-bucle
 
 - una sola frontera larga por iteración;
 - checkpoint durable antes de runtime/browser/deploy;
 - al terminar la frontera: detener, leer, clasificar y sincronizar;
-- si una familia falla dos veces: `STOP_RETRY`;
-- no buscar paquetes antiguos: el durable se construye desde el source certificado;
+- si la misma familia falla dos veces: `STOP_RETRY`;
+- no buscar paquetes antiguos: el durable se construye desde source certificado;
 - HostDime no vuelve a ser diagnóstico antes de R4;
 - no reabrir módulos cerrados sin evidencia nueva reproducible;
 - producción no se usa para depurar validators;
-- cada cambio de estado sincroniza `live-state` + PR #5 + README + checkpoint y, cuando corresponda, bitácora/Plan/E2E.
+- cada cambio de estado sincroniza `live-state` + PR #5 + README + checkpoint y bitácora correspondiente.
