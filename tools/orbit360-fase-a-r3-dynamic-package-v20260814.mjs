@@ -15,7 +15,11 @@ const MANIFEST=path.join(ART,'orbit360-package-manifest.json');
 const mode=String(process.argv[2]||'sync').trim();
 const TEXT_EXT=new Set(['.js','.css','.json','.html','.webmanifest','.svg']);
 const ASSET_EXT_RE=/\.(?:js|css|json|html|webmanifest|svg|png|webp|jpg|jpeg|gif|ico)(?:[?#][^'"\s]*)?$/i;
-const FORBIDDEN_EXACT=new Set(['data/store.js','data/seed.js','core/auth.js','core/router-tenant-config-bootstrap.js','core/user-credential-selfservice-v20260805.js','core/auth-password-change-v20260805.js']);
+const PRODUCT_INCOMPATIBLE_EXACT=[
+  'core/academia-static-content-write-policy-v20260729.js',
+  'data/academia-v1230-operational-directory-v20260722.js'
+];
+const FORBIDDEN_EXACT=new Set(['data/store.js','data/seed.js','core/auth.js','core/router-tenant-config-bootstrap.js','core/user-credential-selfservice-v20260805.js','core/auth-password-change-v20260805.js'].concat(PRODUCT_INCOMPATIBLE_EXACT));
 
 function cleanRel(v){return String(v||'').split('?')[0].split('#')[0].replace(/\\/g,'/').replace(/^\/+/, '');}
 function hasLabToken(rel){return cleanRel(rel).split('/').some(seg=>/(^|[-_.])lab([-_.]|$)/i.test(seg));}
@@ -80,7 +84,9 @@ function sync(){
   const tenantRefsMissing=tenantRefs.filter(rel=>!fs.existsSync(path.join(ART,rel)));
   const artifactRels=walk(ART).map(file=>path.relative(ART,file).replace(/\\/g,'/'));
   const forbiddenIncluded=artifactRels.filter(forbiddenPath).sort();
-  const report={schemaVersion:'orbit360-fase-a-r3-dynamic-assets-v1',ok:missing.length===0&&parity.length===0&&dynamicMissing.length===0&&knownMissing.length===0&&tenantRefsMissing.length===0&&forbiddenIncluded.length===0,status:'',mode:'sync',sourceHead:gitHead(),staticRootCount:roots.length,dependencyClosureCount:discovered.size,dynamicDependencyCount:dynamic.length,copiedCount:copied.length,dynamicDependencies:dynamic,missing,parityFailures:parity,dynamicMissing,knownMissing,tenantRefs,tenantRefsMissing,forbiddenIncluded,noLabRuntime:forbiddenIncluded.length===0,secretAccess:false,browserExecuted:false,deployExecuted:false,productionTouched:false,writeAuthorized:false};
+  const semanticForbiddenIncluded=artifactRels.filter(rel=>PRODUCT_INCOMPATIBLE_EXACT.includes(rel)).sort();
+  const discoveredSemanticForbidden=[...discovered].filter(rel=>PRODUCT_INCOMPATIBLE_EXACT.includes(rel)).sort();
+  const report={schemaVersion:'orbit360-fase-a-r3-dynamic-assets-v1',ok:missing.length===0&&parity.length===0&&dynamicMissing.length===0&&knownMissing.length===0&&tenantRefsMissing.length===0&&forbiddenIncluded.length===0&&semanticForbiddenIncluded.length===0&&discoveredSemanticForbidden.length===0,status:'',mode:'sync',sourceHead:gitHead(),staticRootCount:roots.length,dependencyClosureCount:discovered.size,dynamicDependencyCount:dynamic.length,copiedCount:copied.length,dynamicDependencies:dynamic,missing,parityFailures:parity,dynamicMissing,knownMissing,tenantRefs,tenantRefsMissing,productIncompatibleExact:PRODUCT_INCOMPATIBLE_EXACT,forbiddenIncluded,semanticForbiddenIncluded,discoveredSemanticForbidden,noLabRuntime:forbiddenIncluded.length===0&&semanticForbiddenIncluded.length===0&&discoveredSemanticForbidden.length===0,secretAccess:false,browserExecuted:false,deployExecuted:false,productionTouched:false,writeAuthorized:false};
   report.status=report.ok?'FASE_A_PRODUCT_R3_DYNAMIC_ASSETS_PASS':'FASE_A_PRODUCT_R3_DYNAMIC_ASSETS_FAIL';save(report);if(!report.ok)process.exitCode=41;
 }
 function manifest(){
@@ -92,7 +98,7 @@ function manifest(){
   const activeTenant=renderEvidence?.runtime?.routerState?.['data-orbit-tenant-insurer-config-active-v20260717']||{};
   const store=renderEvidence?.runtime?.store||{};
   const tenantContext=renderEvidence?.runtime?.tenantContext||{};
-  const dynamicCertified=dynamicEvidence.ok===true&&dynamicEvidence.status==='FASE_A_PRODUCT_R3_DYNAMIC_ASSETS_PASS'&&[].concat(dynamicEvidence.dynamicMissing||[]).length===0&&[].concat(dynamicEvidence.knownMissing||[]).length===0&&[].concat(dynamicEvidence.tenantRefsMissing||[]).length===0&&[].concat(dynamicEvidence.parityFailures||[]).length===0&&dynamicEvidence.noLabRuntime===true;
+  const dynamicCertified=dynamicEvidence.ok===true&&dynamicEvidence.status==='FASE_A_PRODUCT_R3_DYNAMIC_ASSETS_PASS'&&[].concat(dynamicEvidence.dynamicMissing||[]).length===0&&[].concat(dynamicEvidence.knownMissing||[]).length===0&&[].concat(dynamicEvidence.tenantRefsMissing||[]).length===0&&[].concat(dynamicEvidence.parityFailures||[]).length===0&&[].concat(dynamicEvidence.semanticForbiddenIncluded||[]).length===0&&[].concat(dynamicEvidence.discoveredSemanticForbidden||[]).length===0&&dynamicEvidence.noLabRuntime===true;
   const hydrationCertified=renderEvidence.ok===true&&renderEvidence.status==='FASE_A_PRODUCT_RENDER_PROOF_R3_PASS'&&store.ready===true&&store.status==='ready-read-only'&&store.writeEnabled===false&&[].concat(store.requiredMissing||[]).length===0&&[].concat(store.requiredFailed||[]).length===0;
   const tenantContextCertified=tenantContext.ready===true&&tenantContext.writeAuthorized===false&&String(tenantContext.tenantId||'')===String(renderEvidence?.runtime?.user?.tenantId||'')&&activeTenant.ready===true&&activeTenant.status==='ready';
   const routerRenderCertified=renderEvidence?.runtime?.productApp?.started===true&&renderEvidence?.runtime?.productApp?.routerStarted===true&&Number(renderEvidence?.runtime?.hostChildCount||0)>0&&String(renderEvidence?.runtime?.routeKey||'').length>0&&[].concat(renderEvidence.pageErrors||[]).length===0&&[].concat(renderEvidence.httpFailures||[]).filter(x=>x&&x.scope==='local-artifact').length===0;
@@ -107,7 +113,7 @@ function manifest(){
   for(const file of files){
     const ext=path.extname(file).toLowerCase();if(!TEXT_EXT.has(ext))continue;
     const text=fs.readFileSync(file,'utf8');
-    if(/-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----/.test(text)||/["']type["']\s*:\s*["'qservice_account["']/.test(text)||/["']private_key["']\s*:/.test(text))secretMaterial.push(path.relative(ART,file).replace(/\\/g,'/'));
+    if(/-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----/.test(text)||/["']type["']\s*:\s*["']service_account["']/.test(text)||/["']private_key["']\s*:/.test(text))secretMaterial.push(path.relative(ART,file).replace(/\\/g,'/'));
   }
   const entries=files.map(file=>({path:path.relative(ART,file).replace(/\\/g,'/'),bytes:fs.statSync(file).size,sha256:sha(file)}));
   const result={schemaVersion:'orbit360-fase-a-product-package-manifest-v1',status:'FASE_A_PRODUCT_R3_DURABLE_PACKAGE_CERTIFIED',sourceHead:process.env.GITHUB_SHA||gitHead(),generatedAt:new Date().toISOString(),artifactRoot:'orbit360-artifacts/fase-a-product',fileCount:entries.length,files:entries,requiredHydrationCertified:hydrationCertified,dynamicRuntimeClosureCertified:dynamicCertified,productTenantContextCertified:tenantContextCertified,routerRenderCertified:routerRenderCertified,noLabRuntime:forbidden.length===0,noPrivateSecretMaterial:secretMaterial.length===0,forbiddenFiles:forbidden,secretMaterialFiles:secretMaterial,writeAuthorized:false,productionTouched:false,deployExecuted:false,containsPrivateSecrets:false};
