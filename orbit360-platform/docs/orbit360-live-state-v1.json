@@ -8,7 +8,7 @@
   "pr": 5,
   "prState": "draft-open",
   "productSourceHead": "4ede3e785cb2cc889a7c11c2d9e2030c7af20b64",
-  "controlPlaneParentHead": "af220f61101881bb43e4d2cdd07afda65f844f87",
+  "controlPlaneParentHead": "cef81107c09672c02dcbd6ad43a391c1bf106083",
   "releaseCandidate": "RC-AYS-LAB-CANONICA-01",
   "canonicalCandidatePreserved": true,
   "documentationRecovery": {
