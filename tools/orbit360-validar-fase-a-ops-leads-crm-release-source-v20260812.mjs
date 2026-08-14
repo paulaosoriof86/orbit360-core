@@ -2,6 +2,7 @@
 'use strict';
 import fs from 'node:fs';
 import crypto from 'node:crypto';
+import path from 'node:path';
 const read=p=>fs.readFileSync(p,'utf8');
 const json=p=>JSON.parse(read(p).replace(/^\uFEFF/,''));
 const digest=p=>crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex');
@@ -14,8 +15,15 @@ const ROUTER='tools/orbit360-validar-gate-contracts-v20260717.mjs';
 const WORKFLOW='.github/workflows/orbit360-fase-a-ops-leads-crm-release-source-v20260812.yml';
 const BLOCK1='tools/orbit360-block1-final-native-matrix-v20260811.mjs';
 const BLOCK12='tools/orbit360-validator-lifecycle-contract-block12-operational-runtime-lab-v20260804.json';
+const PRODUCT_HOSTING='firebase.product-go-live.json';
+const PRODUCT_ARTIFACT='orbit360-artifacts/fase-a-product';
+const PRODUCT_INDEX=PRODUCT_ARTIFACT+'/index.html';
+const PRODUCT_STORE=PRODUCT_ARTIFACT+'/data/store-firestore-product-readonly-p0.js';
+const PRODUCT_BOOTSTRAP=PRODUCT_ARTIFACT+'/core/backend-product-readonly-bootstrap-p0.js';
+const PRODUCT_MEMBERSHIP=PRODUCT_ARTIFACT+'/core/membership-multirol-effective-p0.js';
 const OUT='orbit360-platform/runtime-gate-crm-v20260716/fase-a-ops-leads-crm-release-source-sanitized-v20260812.json';
 const checks=[];const add=(id,ok,detail='')=>checks.push({id,ok:Boolean(ok),detail:String(detail).slice(0,500)});
+const walkText=(dir)=>{const out=[];for(const ent of fs.readdirSync(dir,{withFileTypes:true})){const p=path.join(dir,ent.name);if(ent.isDirectory())out.push(...walkText(p));else if(/\.(?:html?|js|mjs|cjs|json|css|txt|md|yml|yaml)$/i.test(ent.name))out.push(p);}return out;};
 let result;
 try{
   const c=json(CONTRACT),m=read(MATRIX),l=json(LIFECYCLE),e=read(ENGINE),x=json(EXTENSION),r=read(ROUTER),w=read(WORKFLOW),b1=read(BLOCK1),b12=json(BLOCK12),ops=read('orbit360-platform/modules/ops.js'),leads=read('orbit360-platform/modules/leads.js'),ciclo=read('orbit360-platform/core/ciclo.js');
@@ -38,7 +46,26 @@ try{
   add('CRM_CYCLE_PRESENT',ciclo.includes('Orbit')&&(/lead/i.test(ciclo)||/negocio/i.test(ciclo))&&(/gestion/i.test(ciclo)||/ops/i.test(ciclo)));
   add('MATRIX_FAIL_CLOSED',m.includes("AUTHORIZATION_REQUIRED:RUNTIME_NOT_AUTHORIZED")&&m.includes("ROUTES=Object.freeze(['ops','leads','cliente360'])")&&m.includes("snapshotIntegrity")&&m.includes("VERIFIED_UNCHANGED")&&m.includes("technicalCopy")&&m.includes("firestoreWrites:0")&&m.includes("authWrites:0")&&m.includes("operationalWrites:0"));
   add('MATRIX_NO_DEPLOY',!m.includes('firebase deploy')&&!m.includes('hosting:channel:deploy')&&!m.includes('functions:deploy'));
+
+  const hosting=json(PRODUCT_HOSTING);
+  const productRequired=[PRODUCT_INDEX,PRODUCT_STORE,PRODUCT_BOOTSTRAP,PRODUCT_MEMBERSHIP,'firestore.product-readonly.rules'];
+  add('PRODUCT_ARTIFACT_REQUIRED_FILES',productRequired.every(fs.existsSync),productRequired.filter(p=>!fs.existsSync(p)).join(','));
+  add('PRODUCT_HOSTING_POINTS_STAGING',hosting?.hosting?.public===PRODUCT_ARTIFACT,hosting?.hosting?.public||'');
+  add('PRODUCT_RULES_READONLY_BOUND',hosting?.firestore?.rules==='firestore.product-readonly.rules',hosting?.firestore?.rules||'');
+  if(productRequired.slice(0,4).every(fs.existsSync)){
+    const pIndex=read(PRODUCT_INDEX),pStore=read(PRODUCT_STORE),pBootstrap=read(PRODUCT_BOOTSTRAP),pMembership=read(PRODUCT_MEMBERSHIP);
+    add('PRODUCT_ENTRYPOINT_FAIL_CLOSED',pIndex.includes('data-orbit-entrypoint="product-readonly"')&&pIndex.includes('blocked-until-authorized-runtime')&&pIndex.includes('membership_only')&&pIndex.includes('queryStringTenantAllowed:false')&&pIndex.includes('writeAuthorized:false')&&pIndex.includes('autoStart:false'));
+    add('PRODUCT_STORE_EXPLICIT',pIndex.includes('data/store-firestore-product-readonly-p0.js')&&/read.?only/i.test(pStore));
+    add('PRODUCT_BOOTSTRAP_EXPLICIT',pIndex.includes('core/backend-product-readonly-bootstrap-p0.js')&&pBootstrap.includes('WRITE_AUTHORIZED')&&pBootstrap.includes('false'));
+    add('PRODUCT_MEMBERSHIP_EXPLICIT',pIndex.includes('core/membership-multirol-effective-p0.js')&&pMembership.length>100);
+  }
+  const productFiles=fs.existsSync(PRODUCT_ARTIFACT)?walkText(PRODUCT_ARTIFACT):[];
+  const forbidden=[];
+  for(const file of productFiles){const text=read(file);for(const token of ['backend-lab-','__ORBIT_LAB_SAFE_MODE__','store-firestore-lab','orbitBackend=firestore-lab'])if(text.includes(token))forbidden.push(path.relative(PRODUCT_ARTIFACT,file)+':'+token);}
+  add('PRODUCT_ARTIFACT_ZERO_LAB_RUNTIME',forbidden.length===0,forbidden.slice(0,12).join(','));
+  add('PRODUCT_ARTIFACT_NONEMPTY',productFiles.length>=10,String(productFiles.length));
+
   const failed=checks.filter(x=>!x.ok);
-  result={schemaVersion:'orbit360-fase-a-ops-leads-crm-release-source-evidence-v2',gateId:c.gateId,contractVersion:c.contractVersion,status:failed.length?'STOP_SOURCE_ONLY':'GO_FASE_A_OPS_LEADS_CRM_CANONICAL_SOURCE',classification:failed.length?'PIPELINE_MECHANISM_FAILURE':'RELEASE_EVIDENCE_GAP_CANONICAL_SOURCE_READY',checksPassed:checks.length-failed.length,checksFailed:failed.length,failedCheckIds:failed.map(x=>x.id),checks,files:{contractSha256:digest(CONTRACT),matrixSha256:digest(MATRIX),lifecycleSha256:digest(LIFECYCLE),engineSha256:digest(ENGINE),extensionSha256:digest(EXTENSION),routerSha256:digest(ROUTER)},secretAccess:false,firestoreRead:false,firestoreWrites:0,authWrites:0,operationalWrites:0,browserExecuted:false,deployExecuted:false,productionTouched:false,runtimeAuthorizationPresent:false,canonicalRegistrationPending:false,ok:failed.length===0};
-}catch(e){result={schemaVersion:'orbit360-fase-a-ops-leads-crm-release-source-evidence-v2',status:'STOP_SOURCE_ONLY',classification:'PIPELINE_MECHANISM_FAILURE',error:String(e&&e.message||e).slice(0,600),secretAccess:false,firestoreRead:false,firestoreWrites:0,browserExecuted:false,deployExecuted:false,productionTouched:false,ok:false};}
+  result={schemaVersion:'orbit360-fase-a-ops-leads-crm-release-source-evidence-v3-product-staging',gateId:c.gateId,contractVersion:c.contractVersion,status:failed.length?'STOP_SOURCE_ONLY':'GO_FASE_A_OPS_LEADS_CRM_CANONICAL_SOURCE',classification:failed.length?'VALIDATOR_OR_PRODUCT_STAGING_CONTRACT_FAILURE':'RELEASE_EVIDENCE_GAP_CANONICAL_SOURCE_READY',checksPassed:checks.length-failed.length,checksFailed:failed.length,failedCheckIds:failed.map(x=>x.id),checks,productArtifact:{path:PRODUCT_ARTIFACT,hostingConfig:PRODUCT_HOSTING,filesScanned:productFiles.length,forbiddenRuntimeRefs:forbidden.length},files:{contractSha256:digest(CONTRACT),matrixSha256:digest(MATRIX),lifecycleSha256:digest(LIFECYCLE),engineSha256:digest(ENGINE),extensionSha256:digest(EXTENSION),routerSha256:digest(ROUTER),productIndexSha256:fs.existsSync(PRODUCT_INDEX)?digest(PRODUCT_INDEX):'',productHostingSha256:fs.existsSync(PRODUCT_HOSTING)?digest(PRODUCT_HOSTING):''},secretAccess:false,firestoreRead:false,firestoreWrites:0,authWrites:0,operationalWrites:0,browserExecuted:false,deployExecuted:false,productionTouched:false,runtimeAuthorizationPresent:false,canonicalRegistrationPending:false,ok:failed.length===0};
+}catch(e){result={schemaVersion:'orbit360-fase-a-ops-leads-crm-release-source-evidence-v3-product-staging',status:'STOP_SOURCE_ONLY',classification:'PIPELINE_MECHANISM_FAILURE',error:String(e&&e.message||e).slice(0,600),secretAccess:false,firestoreRead:false,firestoreWrites:0,browserExecuted:false,deployExecuted:false,productionTouched:false,ok:false};}
 fs.mkdirSync('orbit360-platform/runtime-gate-crm-v20260716',{recursive:true});fs.writeFileSync(OUT,JSON.stringify(result,null,2)+'\n');console.log(JSON.stringify(result,null,2));if(!result.ok)process.exit(41);
