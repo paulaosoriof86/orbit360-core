@@ -11,7 +11,7 @@
 ## Run 31830646641
 
 - source/gate PASS;
-- no LAB runtime PASS;
+- no LAB runtime PASS según gate vigente;
 - dynamic closure PASS;
 - identidad/config PASS;
 - Product App PASS;
@@ -27,16 +27,57 @@
 - producción intacta;
 - FAIL final por `pageError: lecciones`.
 
-### Cierre
+### Cierre tenant-context
 
 `FUNCTIONAL_DEFECT / PRODUCT_TENANT_RUNTIME_CONTEXT_BRIDGE_MISSING` → CLOSED.
 
-### Nueva causa
+### Nueva familia aislada
 
-`PIPELINE_MECHANISM_FAILURE / PRODUCT_BOOTSTRAP_INCLUDES_LAB_ONLY_ACADEMIA_STATIC_CONTENT`
+`PIPELINE_MECHANISM_FAILURE / PRODUCT_BOOTSTRAP_INCLUDES_LAB_ONLY_ACADEMIA_STATIC_CONTENT`.
 
-El bootstrap productivo está cargando `data/academia-v1230-operational-directory-v20260722.js`, un inyector de contenido estático cuyo propio contrato declara `transient_session_only_in_lab`; al llamar `insert/update` contra el store productivo read-only, el store bloquea correctamente y genera el pageerror.
+El owner `data/academia-v1230-operational-directory-v20260722.js` declara `transient_session_only_in_lab` y ejecuta `insert/update`; product read-only bloquea correctamente y genera el pageerror.
+
+## Run 31834590862
+
+HEAD runtime: `dc5822d2b6561460edbd36c29e58951666a1000a`.
+
+- se retiró `operationalAcademy` del bootstrap productivo;
+- source-gate PASS antes de secrets;
+- identidad/config PASS;
+- tenant-context continuó PASS;
+- required 7/7 continuó PASS;
+- clientes=430;
+- aseguradoras=30;
+- route `inicio` continuó renderizando;
+- local HTTP failures=0;
+- writes=0;
+- deploy=0;
+- producción intacta;
+- FAIL final nuevamente por `pageError: lecciones`;
+- package durable correctamente `skipped`.
+
+### STOP_RETRY
+
+Este es el segundo fallo de la misma familia. No hay tercer navegador automático.
+
+### Causa raíz exacta
+
+La exclusión directa del bootstrap sí funcionó, pero la clausura dinámica todavía incluyó `data/academia-v1230-operational-directory-v20260722.js`.
+
+El padre transitivo identificado es `core/academia-static-content-write-policy-v20260729.js`:
+
+- encabezado explícito `LAB only`;
+- define `OPERATIONAL_OWNER_SRC='data/academia-v1230-operational-directory-v20260722.js?...'`;
+- llama `ensureOperationalDirectoryOwner()` globalmente;
+- sigue entrando al artefacto productivo porque el gate vigente detecta LAB principalmente por token en ruta/nombre y esta policy no contiene `lab` en el filename.
+
+Por tanto, el source-gate anterior fue insuficiente para semántica LAB-only aunque sus checks sintácticos pasaran.
+
+Clasificación vigente:
+
+- `VALIDATOR_STALE / PRODUCT_LAB_ONLY_STATIC_POLICY_NOT_REGISTERED`;
+- causa raíz pipeline: `PIPELINE_MECHANISM_FAILURE / PRODUCT_TRANSITIVE_LAB_ONLY_STATIC_POLICY_INCLUDED`.
 
 ### Acción siguiente
 
-Excluir ese inyector LAB-only de la composición productiva read-only, source-gate, ejecutar una prueba de esta nueva familia y, solo con PASS limpio, materializar ZIP durable + manifest + hash.
+Solo source-only. Congelar runtime y corregir composición + registro/validador para prohibir tanto la policy LAB-only como su owner transitivo. Exigir ausencia de ambos en artefacto y clausura dinámica manteniendo Fase A crítica. Detener después de esa evidencia y sincronizar. Cualquier navegador posterior requiere una nueva frontera explícitamente autorizada post-causa-raíz; no tercer retry automático.
