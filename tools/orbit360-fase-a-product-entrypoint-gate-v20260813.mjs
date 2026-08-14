@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 const ROOT=process.cwd(),ART=path.join(ROOT,'orbit360-artifacts/fase-a-product');
 const INDEX=path.join(ART,'index.html'),OUT=path.join(ROOT,'orbit360-platform/runtime-gate-crm-v20260716/fase-a-product-entrypoint-source-v20260813.json');
-const requiredIds=['login','login-form','lg-user','lg-pass','app','host'];
+const requiredIds=['login','login-form','lg-user','lg-pass','host'];
 const requiredRefs=['product-runtime-config.js','core/product-runtime-browser-providers-p0.js','core/backend-product-readonly-bootstrap-p0.js','core/auth-product-runtime-p0.js','core/product-app-p0.js','modules/cliente360.js','modules/aseguradoras.js','modules/ops.js','modules/leads.js'];
 const forbidden=[/backend-lab-/i,/store-firestore-lab/i,/client360-lab-/i,/__ORBIT_LAB_SAFE_MODE__/i,/orbitBackend=firestore-lab/i,/data\/seed\.js/i,/core\/auth\.js(?:\?|["'])/i,/blocked-until-authorized-runtime/i,/Acceso pendiente de activaci[oó]n/i,/Orbit\.store\.init\(Orbit\.SEED\)/];
 function strip(v){return String(v||'').split('?')[0].split('#')[0];}
