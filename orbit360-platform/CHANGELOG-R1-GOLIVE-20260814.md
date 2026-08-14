@@ -23,6 +23,11 @@ Estado: cierre durable de la iteración R1. El estado operativo vigente continú
 - `notificaciones` no tiene política productiva y no corresponde al almacenamiento usado por el módulo de mensajería.
 - El store productivo P0 no distingue required/optional y puede declarar readiness parcial.
 
+### Documentation recovery
+- Durante la transacción documental, `orbit360-live-state-v1.json` quedó temporalmente como `{}` en commit `af220f61101881bb43e4d2cdd07afda65f844f87`.
+- Se detectó y restauró en la misma iteración; producto, datos, runtime, deploy y producción: 0 impacto.
+- Cierre condicionado a PASS del validador `Orbit360 Continuidad Documental Source 20260814` sobre el estado restaurado.
+
 ### Decision
 - R2 será un solo rootfix de la capa catálogo/hidratación productiva reutilizando el contrato required/optional existente.
 - No tercer intento de la misma familia si R2 repite el fallo.
