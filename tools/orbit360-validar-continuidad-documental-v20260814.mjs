@@ -34,6 +34,7 @@ function check(id, ok, detail = '') {
 }
 
 let live = null;
+let effectiveProductSourceHead = '';
 let error = '';
 try {
   [LIVE, README, ADDENDUM, SOURCES, E2E].forEach((file) => check('FILE:' + path.relative(ROOT, file), exists(file)));
@@ -43,10 +44,17 @@ try {
   const sources = read(SOURCES);
   const e2e = read(E2E);
 
+  effectiveProductSourceHead = String(live.productSourceHead || live.canonicalFunctionalBaselineHead || '').trim();
+
   check('LIVE_SCHEMA', live.schemaVersion === 'orbit360-live-state-v1', live.schemaVersion);
   check('STATE_VERSION', typeof live.stateVersion === 'string' && live.stateVersion.length >= 10, live.stateVersion);
   check('PHASE', typeof live.phase === 'string' && live.phase.length > 0, live.phase);
-  check('PRODUCT_SOURCE_HEAD_FORMAT', /^[0-9a-f]{40}$/i.test(String(live.productSourceHead || '')), live.productSourceHead);
+  check('PRODUCT_SOURCE_HEAD_FORMAT', /^[0-9a-f]{40}$/i.test(effectiveProductSourceHead), effectiveProductSourceHead);
+  check(
+    'PRODUCT_SOURCE_HEAD_SCHEMA_COMPAT',
+    !!String(live.productSourceHead || '').trim() || !!String(live.canonicalFunctionalBaselineHead || '').trim(),
+    live.productSourceHead ? 'productSourceHead' : live.canonicalFunctionalBaselineHead ? 'canonicalFunctionalBaselineHead' : ''
+  );
   check('LAST_EVIDENCE_RUN', Number(live?.lastEvidence?.runId) > 0, live?.lastEvidence?.runId);
   check('NEXT_ACTION_EXACT', typeof live?.nextActionExact?.action === 'string' && live.nextActionExact.action.length >= 20);
 
@@ -69,9 +77,9 @@ try {
   check('E2E_CURRENT_ROUTE', e2e.includes('R1 observabilidad') && e2e.includes('R7 pruebas de aislamiento/reutilización'));
 
   try {
-    git('cat-file', '-e', `${live.productSourceHead}^{commit}`);
+    git('cat-file', '-e', `${effectiveProductSourceHead}^{commit}`);
     check('PRODUCT_SOURCE_HEAD_EXISTS', true);
-    execFileSync('git', ['merge-base', '--is-ancestor', live.productSourceHead, 'HEAD'], { cwd: ROOT, stdio: 'ignore' });
+    execFileSync('git', ['merge-base', '--is-ancestor', effectiveProductSourceHead, 'HEAD'], { cwd: ROOT, stdio: 'ignore' });
     check('PRODUCT_SOURCE_HEAD_IS_ANCESTOR', true);
   } catch (gitError) {
     check('PRODUCT_SOURCE_HEAD_EXISTS_OR_ANCESTOR', false, String(gitError?.message || gitError));
@@ -90,7 +98,8 @@ const report = {
   status: !error && failed.length === 0 ? 'PASS_CONTINUIDAD_DOCUMENTAL' : 'FAIL_CONTINUIDAD_DOCUMENTAL',
   stateVersion: live?.stateVersion || '',
   phase: live?.phase || '',
-  productSourceHead: live?.productSourceHead || '',
+  productSourceHead: effectiveProductSourceHead,
+  productSourceHeadField: live?.productSourceHead ? 'productSourceHead' : live?.canonicalFunctionalBaselineHead ? 'canonicalFunctionalBaselineHead' : '',
   nextActionOwner: live?.nextActionExact?.owner || '',
   failed: failed.length,
   failedCheckIds: failed.map((c) => c.id),
