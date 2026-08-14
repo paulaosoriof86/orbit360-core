@@ -1,63 +1,89 @@
 {
   "schemaVersion": "orbit360-live-state-v1",
-  "stateVersion": "20260814.forensic-continuity.1",
-  "updatedAt": "2026-08-14T09:57:12-06:00",
-  "phase": "PRE_GOLIVE_RECOVERY",
+  "stateVersion": "20260814.r1-rootcause.1",
+  "updatedAt": "2026-08-14T10:34:00-06:00",
+  "phase": "PRE_GOLIVE_R2_ROOTFIX",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pr": 5,
   "prState": "draft-open",
   "productSourceHead": "4ede3e785cb2cc889a7c11c2d9e2030c7af20b64",
-  "controlPlaneParentHead": "20d7283f5f74e67845ce83e828cc9eb8f333a72b",
+  "controlPlaneParentHead": "1f39bc2e45c40e493b5006ceac83ce20f9026645",
   "releaseCandidate": "RC-AYS-LAB-CANONICA-01",
+  "canonicalCandidatePreserved": true,
   "governanceSynchronization": {
     "status": "PASS_CONTINUIDAD_DOCUMENTAL",
     "workflow": "Orbit360 Continuidad Documental Source 20260814",
-    "runId": 31816984227,
-    "sourceHead": "20d7283f5f74e67845ce83e828cc9eb8f333a72b",
+    "lastPassedRunId": 31817050287,
     "validator": "tools/orbit360-validar-continuidad-documental-v20260814.mjs",
     "runtimeExecuted": false,
     "browserExecuted": false,
     "deployExecuted": false,
-    "secretAccess": false,
-    "dataAccess": false,
     "productionTouched": false
   },
   "lastEvidence": {
     "workflow": "Orbit360 Fase A Product Local Synthetic 20260814",
-    "runId": 31773511066,
-    "sourceHead": "4ede3e785cb2cc889a7c11c2d9e2030c7af20b64",
-    "result": "FAIL_SAFE_OUTSIDE_PRODUCTION",
+    "runId": 31820056535,
+    "jobId": 94830881175,
+    "sourceHead": "e102735ea5592b84b2ea920933ce483af01a43ad",
+    "result": "FAIL_SAFE_OUTSIDE_PRODUCTION_DIAGNOSED",
     "failureStage": "login",
-    "firstVisibleError": "PRODUCT_APP_NOT_STARTED:PRODUCT_READONLY_BOOTSTRAP_NOT_READY"
+    "bootstrapTransitions": ["environment", "authentication", "membership", "planning", "attaching", "blocked"],
+    "bootstrapError": "snapshots_no_adjuntos",
+    "firestoreWrites": 0,
+    "authWrites": 0,
+    "operationalWrites": 0,
+    "deployExecuted": false,
+    "productionTouched": false
   },
-  "classification": "PIPELINE_MECHANISM_FAILURE/OBSERVABILITY_GAP",
-  "blocker": "The product read-only bootstrap returns not-ready after authenticated login, but the synthetic harness currently collapses the internal sanitized bootstrap phase/errors into a generic Product App error.",
+  "classification": "DATA_CONTRACT_FAILURE/PRODUCT_RUNTIME_COLLECTION_POLICY_MISMATCH",
+  "blocker": "The product runtime collection catalog diverges from the already-approved required/optional hydration contract: it hard-requires uncontracted notificaciones, omits required canonical collections, and the P0 product store has no required/optional readiness semantics.",
+  "hydrationContract": {
+    "existingOwner": "orbit360-platform/core/visual-runtime-hydration-contract-v20260805.js",
+    "requiredFirstGoLiveUnion": ["clientes", "polizas", "cobros", "aseguradoras", "vehiculos", "recibosEsperados", "carteraPrimas"],
+    "optionalLegacy": ["asesores", "metas", "negocios", "gestiones", "comisiones", "cancelaciones"],
+    "currentRuntimeCatalog": ["clientes", "aseguradoras", "gestiones", "notificaciones"],
+    "hardInvalidCurrentCollection": "notificaciones",
+    "advisorLegacyMustNotBlock": true
+  },
   "closedNonBlockers": [
-    "HostDime is not a package-construction blocker",
+    "Auth and authenticated membership reached PASS before the attach failure",
+    "HostDime is not a blocker before R4",
     "Do not search for an older production package",
-    "Do not reimport Clientes/Aseguradoras for bootstrap/login/routing/cache/gate defects",
-    "Do not reopen Block 1 or previously closed modules without new reproducible evidence",
-    "Do not use production to debug validators"
+    "Do not reimport Clientes/Aseguradoras for this failure",
+    "Do not reopen closed functional modules without new reproducible evidence",
+    "Do not use production to debug validators or this data contract"
   ],
   "artifactState": {
-    "versionedDirectoryExists": true,
-    "versionedEntrypointIsHistoricalFailClosed": true,
     "functionalRunnerArtifactIsEphemeral": true,
     "durableProductionZipReady": false,
-    "decision": "BUILD_DURABLE_PACKAGE_FROM_CERTIFIED_SOURCE_AFTER_SYNTHETIC_PASS"
+    "decision": "BUILD_DURABLE_PACKAGE_FROM_CERTIFIED_SOURCE_AFTER_R2_SYNTHETIC_PASS"
+  },
+  "progress": {
+    "functionalReadinessPercent": 100,
+    "technicalIterationsCompleted": 1,
+    "technicalIterationsPlanned": 4,
+    "technicalIterationProgressPercent": 25,
+    "goLiveGatesClosed": 0,
+    "goLiveGatesTotal": 3,
+    "goLiveGateProgressPercent": 0,
+    "nextPercentAfterR2Pass": {"technical": 50, "gates": 33},
+    "nextPercentAfterR3Pass": {"technical": 75, "gates": 67},
+    "finalAfterR4Pass": {"technical": 100, "gates": 100}
   },
   "nextActionExact": {
-    "owner": "tools/orbit360-fase-a-product-local-synthetic-smoke-v20260814.mjs",
-    "action": "Modify only the synthetic harness to capture the last sanitized orbit:product-readonly-bootstrap event including phase/ready/errors and sanitized failed-request or 404 paths, then execute the same local synthetic workflow exactly once.",
-    "productChangesAuthorized": false,
+    "stage": "R2_SINGLE_ROOTFIX",
+    "action": "Align the product read-only runtime collection catalog and store/bootstrap readiness with the existing canonical required/optional hydration contract; remove notificaciones as a hard dependency, include all required first-go-live collections, keep legacy optional collections nonblocking, and require all required snapshots to attach without error. Validate source-only and then execute the same local synthetic workflow exactly once.",
+    "sameWorkflowOnly": "Orbit360 Fase A Product Local Synthetic 20260814",
+    "productLayerChangeAuthorizedByPlan": true,
     "dataChangesAuthorized": false,
     "hostdimeWorkAuthorized": false,
-    "deployAuthorized": false
+    "deployAuthorized": false,
+    "reimportAuthorized": false
   },
   "goLiveRoute": [
-    "R1_OBSERVABILITY_ONE_SYNTHETIC",
-    "R2_SINGLE_ROOTFIX_ONLY_IF_DEMONSTRATED",
+    "R1_OBSERVABILITY_ONE_SYNTHETIC_CLOSED",
+    "R2_SINGLE_ROOTFIX_REQUIRED_OPTIONAL",
     "R3_DURABLE_PACKAGE_MANIFEST_HASHES",
     "R4_HOSTDIME_PUBLISH_AND_POST_GOLIVE_E2E",
     "R5_OPERATIONAL_ENABLEMENT_AND_CONTROLLED_DELTA",
@@ -65,23 +91,23 @@
     "R7_SECOND_TENANT_REUSABILITY_GATE"
   ],
   "iterationBudget": {
-    "r0GovernanceCompletedByAdoption": true,
-    "bestCaseTechnicalIterationsToValidatedGoLive": 3,
-    "maxPlannedTechnicalIterationsWithOneDemonstratedRootfix": 4,
-    "fifthSameFamilyIterationAllowed": false,
-    "sameFamilyFailureLimit": 2
+    "r0GovernanceCompleted": true,
+    "r1Completed": true,
+    "technicalIterationsToValidatedGoLive": 4,
+    "sameFamilyFailureLimit": 2,
+    "thirdSameFamilyAttemptAllowed": false
   },
   "hostdimeBlocking": false,
   "productionTouchedByLastEvidence": false,
-  "writeAuthorization": "NONE_FOR_CURRENT_RECOVERY",
+  "writeAuthorization": "NONE_FOR_R2_RECOVERY",
   "resumeProtocol": [
     "Read this file first",
     "Confirm real branch HEAD and PR #5",
-    "Read exactly lastEvidence.runId",
-    "Confirm nextActionExact remains valid",
-    "Execute only that frontier; do not rediagnose closed issues",
-    "After the frontier, stop and synchronize live-state, PR, README and checkpoint before another long execution"
+    "Read run 31820056535 only if R2 has not produced newer evidence",
+    "Execute nextActionExact without redoing R1",
+    "One long frontier only",
+    "After R2, synchronize live-state, PR, README, checkpoint and CHANGELOG before R3"
   ],
   "governanceDocument": "orbit360-platform/docs/ADDENDUM-MAESTRO-CONTINUIDAD-SINCRONIZACION-ANTIBUCLE-GOLIVE-POSTPROD-20260814.md",
-  "forensicCheckpoint": "orbit360-platform/docs/CORTE-FORENSE-ANTIBUCLE-GO-LIVE-20260814.md"
+  "currentCheckpoint": "orbit360-platform/docs/CIERRE-R1-OBSERVABILIDAD-ROOTCAUSE-PRODUCT-RUNTIME-COLLECTIONS-20260814.md"
 }
