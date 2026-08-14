@@ -10,110 +10,83 @@ Antes de diagnosticar, modificar, ejecutar runtime/browser/deploy o continuar un
 2. HEAD real de `ays/backend-tenant-lab-v99-20260703` y PR #5;
 3. último workflow/evidencia indicado por `lastEvidence`;
 4. `orbit360-platform/docs/ADDENDUM-MAESTRO-CONTINUIDAD-SINCRONIZACION-ANTIBUCLE-GOLIVE-POSTPROD-20260814.md`;
-5. `orbit360-platform/docs/CIERRE-R3-DURABLE-PACKAGE-PASS-20260814.md`;
-6. `orbit360-platform/CHANGELOG-R3C-GOLIVE-20260814.md`.
+5. `orbit360-platform/docs/CIERRE-PARCIAL-R4-HOSTDIME-DEPLOYMENT-CHANNEL-BLOCKER-20260814.md`;
+6. `orbit360-platform/CHANGELOG-R4-GOLIVE-20260814.md`.
 
-No usar memoria, README histórico, PENDIENTES o una conversación anterior como sustituto del live-state.
+No usar memoria, README histórico ni paquetes antiguos como sustituto del live-state.
 
-## Estado vivo · R3 CERRADO · 2026-08-14
+## Estado vivo · R4 PREPUBLISH BLOQUEADO POR ENTORNO · 2026-08-14
 
 ```text
-stateVersion: 20260814.r3-durable-package-pass.1
-fase: PRE_GOLIVE_R4_AWAIT_EXPLICIT_PUBLISH_AUTHORIZATION
-RC: RC-AYS-LAB-CANONICA-01
-baseline funcional histórico: 4ede3e785cb2cc889a7c11c2d9e2030c7af20b64
-source HEAD del paquete certificado: 4f70f0dd6e870e8c7443a7638a9dc6e954eace1b
-control HEAD con browser re-congelado: 0cd626bf5021580832041dec02f1398c99a429ed
-run R3 PASS: 31836094541
+stateVersion: 20260814.r4-environment-blocked-hostdime-deployment-channel.1
+fase: R4_ENVIRONMENT_BLOCKED_HOSTDIME_DEPLOYMENT_CHANNEL
+R1/R2/R3: CERRADOS
 ZIP: orbit360-fase-a-product-r3-4f70f0dd6e87.zip
 SHA256: 4fd52a748fa130fd069b2d2684e1944369164aeb0646fe728067dd7b4ce29e69
-PR #5: draft/open
-main/merge: no
-HostDime/deploy/producción: no tocados
+app.aysseguros.com: creado en cPanel
+document root: /home/ayssegur/public_html/app.aysseguros.com
+deploy: 0
+producción tocada: no
 ```
 
-## R3 certificado
+## R4 preflight
 
-La única frontera de aceptación post-causa-raíz autorizada fue el run `31836094541` sobre `4f70f0dd6e870e8c7443a7638a9dc6e954eace1b`.
+La autorización R4 está vigente y el hash del paquete se verificó nuevamente con coincidencia exacta. No se reconstruyó ni sustituyó el ZIP.
 
-Resultado:
+Las capturas HostDime recuperadas establecen:
 
-- gate contractual source PASS antes de secretos;
-- build/entrypoint/dynamic closure PASS;
-- policy y owner Academia LAB-only ausentes;
-- identidad existente y config read-only PASS;
-- Product App `started=true`;
-- router `started=true`;
-- tenant-context `ready=true`, fuente `authenticated-product-membership`;
-- backend `product-readonly`, writes no autorizados;
-- store `ready-read-only`;
-- required 7/7, `requiredMissing=[]`, `requiredFailed=[]`;
-- clientes=430;
-- aseguradoras=30;
-- ruta `inicio`, `hostChildCount=1`;
-- `pageErrors=[]`;
-- `consoleErrors=[]`;
-- `httpFailures=[]`;
-- Firestore/Auth/operational writes = 0;
-- deploy=0;
-- producción intacta.
+- usuario cPanel `ayssegur`;
+- servidor `mjo.aysseguros.com`;
+- IP compartida `107.161.178.166`;
+- `app.aysseguros.com` creado;
+- document root `/home/ayssegur/public_html/app.aysseguros.com`;
+- AutoSSL válido de Let's Encrypt;
+- clave pública SSH `orbit360_hostdime_prod_20260812` autorizada.
 
-## Paquete durable
+El bloqueo actual no es hostname ni producto. La ejecución no dispone de la clave privada correspondiente, de un conector cPanel/SFTP/SSH autenticado ni de un workflow/tool de despliegue HostDime en el repositorio. El inventario de Actions secrets tampoco es accesible por la integración GitHub actual.
 
-```text
-status: FASE_A_PRODUCT_R3_DURABLE_PACKAGE_PASS
-manifest: FASE_A_PRODUCT_R3_DURABLE_PACKAGE_CERTIFIED
-fileCount: 194
-requiredHydrationCertified: true
-dynamicRuntimeClosureCertified: true
-productTenantContextCertified: true
-routerRenderCertified: true
-noLabRuntime: true
-noPrivateSecretMaterial: true
-writeAuthorized: false
-deployExecuted: false
-productionTouched: false
-```
+Clasificación:
 
-El SHA256 fue verificado nuevamente sobre el ZIP descargado de GitHub Actions y coincide exactamente con la evidencia:
+`ENVIRONMENT_FAILURE / HOSTDIME_DEPLOYMENT_CHANNEL_UNAVAILABLE`
 
-`4fd52a748fa130fd069b2d2684e1944369164aeb0646fe728067dd7b4ce29e69`.
+## Regla aplicada
 
-El artifact durable de GitHub Actions es `orbit360-fase-a-product-r3-durable-31836094541`.
+No se publica sin backup remoto verificable y rollback previo. Por tanto:
 
-## Guardia post-R3
+- backup remoto: no ejecutado;
+- publicación: no ejecutada;
+- E2E productivo: no ejecutado;
+- producción: intacta;
+- R1/R2/R3: no reabiertos;
+- paquete: intacto.
 
-Después del PASS se restauró `ORBIT360_R3_SOURCE_ONLY_ROOTFIX=true` en `0cd626bf5021580832041dec02f1398c99a429ed` para impedir una segunda ejecución browser accidental. El control source-only run `31836358548` terminó SUCCESS y dejó instalación/secrets/identity/browser/ZIP en `skipped`.
-
-## Porcentajes vigentes
+## Avance
 
 ```text
 readiness funcional: 100%
-avance técnico global: 75% (R1+R2+R3 cerrados)
+avance técnico: 75%
 gates finales: 67% (2/3)
-R3: PASS + ZIP durable certificado
-R4 PASS -> 100% técnico / 100% gates
+R4: bloqueado antes de backup/publicación
 ```
 
 ## Siguiente acción exacta
 
-R4 está pendiente de autorización explícita. No iniciar HostDime, deploy ni producción por continuidad automática.
+Habilitar únicamente el transporte autenticado HostDime para esta ejecución, preferentemente la credencial privada correspondiente a la clave pública SSH ya autorizada o un conector cPanel/SFTP autenticado. No pegar secretos en el chat.
 
-Con autorización R4:
+Con el canal disponible:
 
-1. tomar exclusivamente el ZIP certificado anterior y verificar SHA256 antes de publicar;
-2. resolver/publicar `app.aysseguros.com` sin reabrir hostname como diagnóstico de producto;
-3. no reconstruir ni sustituir el paquete durante publicación;
-4. ejecutar E2E productivo final después de publicar, incluyendo autenticación, roles/scopes y rutas críticas acordadas;
-5. exigir cero fallos bloqueantes y cero escrituras no autorizadas;
-6. documentar rollback/backup y evidencia sanitizada;
-7. sin main ni merge salvo autorización separada.
+1. volver a verificar el SHA256 exacto;
+2. ejecutar el gate canónico antes de operaciones remotas;
+3. crear backup timestamped de `/home/ayssegur/public_html/app.aysseguros.com` y ruta de rollback;
+4. publicar exclusivamente el contenido del ZIP certificado;
+5. ejecutar inmediatamente el E2E productivo final;
+6. mantener main/merge, reimportaciones y reconstrucción fuera de alcance.
 
 ## Reglas anti-bucle
 
-- R1/R2/R3 están cerrados; no se reabren sin drift reproducible;
-- paquete R3 se identifica por nombre + SHA256, no por “último ZIP”;
-- HostDime no puede provocar reconstrucción del producto;
-- cualquier fallo R4 se clasifica antes de corregir;
-- una sola frontera larga por iteración;
+- R1/R2/R3 permanecen cerrados;
+- HostDime no provoca cambios de producto;
+- no se inventan credenciales, puertos o rutas;
+- no se publica sin backup/rollback;
+- dos fallos del mismo transporte implican `STOP_RETRY`;
 - cada cambio de estado sincroniza live-state + PR #5 + README + checkpoint + bitácora.
