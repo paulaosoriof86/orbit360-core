@@ -11,9 +11,10 @@ Antes de diagnosticar, modificar, ejecutar runtime/browser/deploy o continuar un
 3. último workflow/evidencia indicado por `lastEvidence` en el live-state;
 4. `orbit360-platform/docs/ADDENDUM-MAESTRO-CONTINUIDAD-SINCRONIZACION-ANTIBUCLE-GOLIVE-POSTPROD-20260814.md`;
 5. `orbit360-platform/docs/CIERRE-R1-OBSERVABILIDAD-ROOTCAUSE-PRODUCT-RUNTIME-COLLECTIONS-20260814.md`;
-6. fuentes históricas solo para reglas no sustituidas por evidencia posterior.
+6. `orbit360-platform/CHANGELOG-R1-GOLIVE-20260814.md`;
+7. fuentes históricas solo para reglas no sustituidas por evidencia posterior.
 
-No usar este README, CHANGELOG, PENDIENTES o memoria de otra conversación como sustituto del live-state.
+No usar este README, CHANGELOG histórico, PENDIENTES o memoria de otra conversación como sustituto del live-state.
 
 ## Estado vivo · R1 cerrado · 2026-08-14
 
