@@ -6,6 +6,7 @@ on:
     paths:
       - '.github/workflows/orbit360-fase-a-production-go-live-v20260813.yml'
       - '.github/orbit360-requests/fase-a-go-live-production-20260812-authorization.json'
+      - '.github/orbit360-resume/fase-a-go-live-production-20260813-validator-stale.json'
 
 permissions:
   contents: read
@@ -19,6 +20,7 @@ env:
   ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
   ORBIT360_SOURCE_HEAD: 3a61564d102e45a871b249ae96f93c3836906f1d
   ORBIT360_REQUEST_FILE: .github/orbit360-requests/fase-a-go-live-production-20260812-authorization.json
+  ORBIT360_RESUME_FILE: .github/orbit360-resume/fase-a-go-live-production-20260813-validator-stale.json
   ORBIT360_PRODUCT_PROJECT_ID: ays-orbit-360-lab
   ORBIT360_PRODUCT_TENANT_ID: alianzas-soluciones
   ORBIT360_PRODUCT_URL: https://ays-orbit-360-lab.web.app
@@ -54,7 +56,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          ORBIT360_EXPECTED_REQUEST_VERSION=NONE_PENDING_FRESH_AUTHORIZATION node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+          env -u ORBIT360_REQUEST_FILE ORBIT360_EXPECTED_REQUEST_VERSION=NONE_PENDING_FRESH_AUTHORIZATION node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
           jq -e '.status=="PASS_GATE_CONTRACT_SOURCE_FASE_A_OPS_LEADS_CRM" and .failed==0 and .executionAuthorized==false and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false and .ok==true' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
       - name: Validate deployable product artifact without secrets
         shell: bash
@@ -66,9 +68,8 @@ jobs:
           node - <<'NODE'
           const fs=require('fs'),crypto=require('crypto'),p='orbit360-artifacts/fase-a-product/index.html';
           const h=crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex');
-          const out={ok:true,status:'FASE_A_PRODUCTION_EXECUTOR_SOURCE_READY',sourceHead:process.env.ORBIT360_SOURCE_HEAD,executorHead:process.env.GITHUB_SHA,artifact:'orbit360-artifacts/fase-a-product',indexSha256:h,requestPresent:fs.existsSync(process.env.ORBIT360_REQUEST_FILE),secretAccess:false,browserExecuted:false,deployExecuted:false,productionTouched:false};
+          const out={ok:true,status:'FASE_A_PRODUCTION_EXECUTOR_SOURCE_READY',sourceHead:process.env.ORBIT360_SOURCE_HEAD,executorHead:process.env.GITHUB_SHA,artifact:'orbit360-artifacts/fase-a-product',indexSha256:h,secretAccess:false,browserExecuted:false,deployExecuted:false,productionTouched:false};
           fs.mkdirSync('orbit360-platform/runtime-gate-crm-v20260716',{recursive:true});fs.writeFileSync('orbit360-platform/runtime-gate-crm-v20260716/fase-a-production-executor-source-v20260813.json',JSON.stringify(out,null,2)+'\n');
-          if(out.requestPresent)process.exit(41);
           NODE
       - name: Upload sanitized executor evidence
         uses: actions/upload-artifact@v4
@@ -80,7 +81,7 @@ jobs:
           retention-days: 14
 
   production_go_live:
-    if: contains(github.event.head_commit.message, 'authorize Fase A go-live 20260813')
+    if: contains(github.event.head_commit.message, 'authorize Fase A go-live 20260813') || contains(github.event.head_commit.message, 'resume Fase A go-live 20260813 after validator stale')
     name: Backup · single Hosting deploy · live browser · integrity · rollback
     runs-on: ubuntu-24.04
     timeout-minutes: 45
@@ -94,7 +95,7 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Verify immutable one-shot request before secrets
+      - name: Verify immutable authorization or one-time resume before secrets
         shell: bash
         run: |
           set -euo pipefail
@@ -103,27 +104,40 @@ jobs:
           test -f "$ORBIT360_REQUEST_FILE"
           mapfile -t CHANGED < <(git diff --name-only HEAD^ HEAD)
           test "${#CHANGED[@]}" = '1'
-          test "${CHANGED[0]}" = "$ORBIT360_REQUEST_FILE"
-          node - <<'NODE'
-          const fs=require('fs'),cp=require('child_process');
-          const r=JSON.parse(fs.readFileSync(process.env.ORBIT360_REQUEST_FILE,'utf8'));
-          const parent=cp.execFileSync('git',['rev-parse','HEAD^'],{encoding:'utf8'}).trim();
-          const source=process.env.ORBIT360_SOURCE_HEAD,bad=[];
-          if(r.schemaVersion!=='orbit360-fase-a-production-go-live-request-v1')bad.push('schema');
-          if(r.branch!==process.env.ORBIT360_BRANCH||r.sourceHead!==source||r.controlPlaneHead!==parent)bad.push('binding');
-          if(r.approved!==true||r.authorizedByUser!==true||r.allowedExecutions!==1||r.consumed!==false||r.authorizationFrozen!==false||r.replayAllowed!==false)bad.push('authorization');
-          if(r.hostingDeployAuthorized!==true||r.browserAuthorized!==true||r.rollbackAuthorized!==true||r.productionAuthorized!==true)bad.push('capabilities');
-          if(r.firestoreWritesAuthorized!==0||r.authWritesAuthorized!==0||r.operationalWritesAuthorized!==0||r.reimportAuthorized!==false||r.functionsDeployAuthorized!==false||r.rulesDeployAuthorized!==false||r.mainAuthorized!==false||r.mergeAuthorized!==false||r.hostdimeRequired!==false)bad.push('scope');
-          if(r.target?.projectId!==process.env.ORBIT360_PRODUCT_PROJECT_ID||r.target?.tenantId!==process.env.ORBIT360_PRODUCT_TENANT_ID||r.target?.liveUrl!==process.env.ORBIT360_PRODUCT_URL||r.target?.artifact!==process.env.ORBIT360_PRODUCT_ARTIFACT)bad.push('target');
-          if(bad.length)throw new Error('PRODUCTION_REQUEST_INVALID:'+bad.join(','));
-          NODE
-          git merge-base --is-ancestor "$ORBIT360_SOURCE_HEAD" HEAD^
+          CHANGED_FILE="${CHANGED[0]}"
+          if [ "$CHANGED_FILE" = "$ORBIT360_REQUEST_FILE" ]; then
+            node - <<'NODE'
+            const fs=require('fs'),cp=require('child_process');
+            const r=JSON.parse(fs.readFileSync(process.env.ORBIT360_REQUEST_FILE,'utf8')),parent=cp.execFileSync('git',['rev-parse','HEAD^'],{encoding:'utf8'}).trim(),bad=[];
+            if(r.schemaVersion!=='orbit360-fase-a-production-go-live-request-v1')bad.push('schema');
+            if(r.branch!==process.env.ORBIT360_BRANCH||r.sourceHead!==process.env.ORBIT360_SOURCE_HEAD||r.controlPlaneHead!==parent)bad.push('binding');
+            if(r.approved!==true||r.authorizedByUser!==true||r.allowedExecutions!==1||r.consumed!==false||r.authorizationFrozen!==false||r.replayAllowed!==false)bad.push('authorization');
+            if(r.hostingDeployAuthorized!==true||r.browserAuthorized!==true||r.rollbackAuthorized!==true||r.productionAuthorized!==true)bad.push('capabilities');
+            if(r.firestoreWritesAuthorized!==0||r.authWritesAuthorized!==0||r.operationalWritesAuthorized!==0||r.reimportAuthorized!==false||r.functionsDeployAuthorized!==false||r.rulesDeployAuthorized!==false||r.mainAuthorized!==false||r.mergeAuthorized!==false||r.hostdimeRequired!==false)bad.push('scope');
+            if(r.target?.projectId!==process.env.ORBIT360_PRODUCT_PROJECT_ID||r.target?.tenantId!==process.env.ORBIT360_PRODUCT_TENANT_ID||r.target?.liveUrl!==process.env.ORBIT360_PRODUCT_URL||r.target?.artifact!==process.env.ORBIT360_PRODUCT_ARTIFACT)bad.push('target');
+            if(bad.length)throw new Error('PRODUCTION_REQUEST_INVALID:'+bad.join(','));
+            NODE
+          elif [ "$CHANGED_FILE" = "$ORBIT360_RESUME_FILE" ]; then
+            node - <<'NODE'
+            const fs=require('fs'),cp=require('child_process');
+            const r=JSON.parse(fs.readFileSync(process.env.ORBIT360_REQUEST_FILE,'utf8')),m=JSON.parse(fs.readFileSync(process.env.ORBIT360_RESUME_FILE,'utf8')),bad=[];
+            if(r.schemaVersion!=='orbit360-fase-a-production-go-live-request-v1'||r.sourceHead!==process.env.ORBIT360_SOURCE_HEAD||r.approved!==true||r.authorizedByUser!==true||r.allowedExecutions!==1||r.replayAllowed!==false)bad.push('request');
+            if(m.schemaVersion!=='orbit360-fase-a-production-resume-v1'||m.requestCommit!=='d3749ec9abd14f24fb3972c0a33c600d86f18105'||m.failedRunId!==31762808073||m.previousDeployCount!==0||m.classification!=='VALIDATOR_STALE'||m.failedCheck!=='CANONICAL_PREFLIGHT_ENTRYPOINT'||m.rootCause!=='SOURCE_PHASE_REQUEST_CONTEXT_LEAK'||m.resumeAllowed!==true||m.secondForwardDeployAllowed!==false)bad.push('resume');
+            try{cp.execFileSync('git',['merge-base','--is-ancestor',r.controlPlaneHead,'HEAD'],{stdio:'ignore'});}catch{bad.push('controlPlaneAncestor');}
+            try{cp.execFileSync('git',['merge-base','--is-ancestor',m.requestCommit,'HEAD'],{stdio:'ignore'});}catch{bad.push('requestAncestor');}
+            if(bad.length)throw new Error('PRODUCTION_RESUME_INVALID:'+bad.join(','));
+            NODE
+          else
+            echo "UNEXPECTED_TRIGGER_FILE=$CHANGED_FILE" >&2
+            exit 41
+          fi
+          git merge-base --is-ancestor "$ORBIT360_SOURCE_HEAD" HEAD
 
-      - name: Canonical Fase A gate before secrets and deploy
+      - name: Canonical Fase A source closure gate in isolated source context
         shell: bash
         run: |
           set -euo pipefail
-          ORBIT360_EXPECTED_REQUEST_VERSION=NONE_PENDING_FRESH_AUTHORIZATION node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+          env -u ORBIT360_REQUEST_FILE ORBIT360_EXPECTED_REQUEST_VERSION=NONE_PENDING_FRESH_AUTHORIZATION node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
           jq -e '.status=="PASS_GATE_CONTRACT_SOURCE_FASE_A_OPS_LEADS_CRM" and .failed==0 and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false and .ok==true' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
           test "$(jq -r '.hosting.public' firebase.product-go-live.json)" = "$ORBIT360_PRODUCT_ARTIFACT"
           ! grep -Eqi 'backend-lab-|store-firestore-lab|__ORBIT_LAB_SAFE_MODE__|orbitBackend=firestore-lab' "$ORBIT360_PRODUCT_ARTIFACT/index.html"
@@ -265,7 +279,7 @@ jobs:
           const rolledBack=!forwardOk&&env.ROLLBACK_CODE==='0';
           const decision=forwardOk?'GO_LIVE_PASS':(rolledBack?'ROLLED_BACK_SAFE':(attempted?'GO_LIVE_STOP_RETRY':'PIPELINE_STOP_BEFORE_DEPLOY'));
           const classification=forwardOk?'PRODUCTION_E2E_PASS':(rolledBack?'STOP_RETRY_ROLLBACK_SAFE':(attempted?'ENVIRONMENT_OR_RUNTIME_FAILURE':'PIPELINE_MECHANISM_FAILURE'));
-          const out={schemaVersion:'orbit360-fase-a-production-go-live-final-v1',generatedAt:new Date().toISOString(),decision,classification,sourceHead:env.ORBIT360_SOURCE_HEAD,requestCommit:env.GITHUB_SHA,liveUrl:env.ORBIT360_PRODUCT_URL,deployAttempted:attempted,deployCount:attempted?1:0,productionMaintained:forwardOk,rollbackExecuted:rolledBack,firestoreWrites:0,authWrites:0,operationalWrites:0,reimportExecuted:false,functionsDeployed:false,rulesDeployed:false,hostdimeTouched:false,mainTouched:false,mergeExecuted:false,ok:forwardOk};
+          const out={schemaVersion:'orbit360-fase-a-production-go-live-final-v1',generatedAt:new Date().toISOString(),decision,classification,sourceHead:env.ORBIT360_SOURCE_HEAD,triggerCommit:env.GITHUB_SHA,liveUrl:env.ORBIT360_PRODUCT_URL,deployAttempted:attempted,deployCount:attempted?1:0,productionMaintained:forwardOk,rollbackExecuted:rolledBack,firestoreWrites:0,authWrites:0,operationalWrites:0,reimportExecuted:false,functionsDeployed:false,rulesDeployed:false,hostdimeTouched:false,mainTouched:false,mergeExecuted:false,ok:forwardOk};
           fs.writeFileSync(p+'fase-a-production-go-live-final-v20260813.json',JSON.stringify(out,null,2)+'\n');console.log(JSON.stringify(out,null,2));
           NODE
 
