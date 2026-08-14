@@ -1,10 +1,11 @@
 # ORBIT 360 / A&S — Pruebas funcionales automatizadas E2E pre/post go-live
 
-Fecha: 2026-08-12
-Repositorio: `paulaosoriof86/orbit360-core`
-Rama obligatoria: `ays/backend-tenant-lab-v99-20260703`
-PR rector: #5 draft/open
-Estado al registrar: Fase A funcional cerrada; target productivo final HostDime `https://app.aysseguros.com`; producción no tocada.
+Fecha original: 2026-08-12  
+Actualización de secuencia: 2026-08-14  
+Repositorio: `paulaosoriof86/orbit360-core`  
+Rama obligatoria: `ays/backend-tenant-lab-v99-20260703`  
+PR rector: #5 draft/open  
+Estado operativo: consultar primero `orbit360-platform/docs/orbit360-live-state-v1.json`.
 
 ## 1. Decisión de producto y operación
 
@@ -41,6 +42,9 @@ Este requisito NO reabre Fase A ni sustituye la ruta crítica actual de salida a
 - Solo se agregan escenarios que prueben flujos integrados no cubiertos o que funcionen como aceptación final.
 - Producción no se usa para depurar validators ni para descubrir defectos del harness.
 - Si la misma etapa/familia falla dos veces: `STOP_RETRY`, clasificación de causa raíz y reproducción fuera de producción.
+- Una sola frontera larga de runtime/browser/deploy por iteración.
+- Antes de una frontera larga debe existir checkpoint durable.
+- Después de la frontera se detiene, lee, clasifica y sincroniza documentación antes de otra ejecución.
 
 ## 3. Dos capas de prueba
 
@@ -64,9 +68,9 @@ Cada corrida debe:
 10. verificar snapshot/digest post-cleanup equivalente al baseline permitido;
 11. conservar evidencia sanitizada.
 
-### Capa B — smoke productivo post-deploy
+### Capa B — smoke productivo post-publicación
 
-Objetivo: demostrar que el artefacto desplegado, dominio, Auth, tenant, navegación, backend y lecturas reales operan en `https://app.aysseguros.com`.
+Objetivo: demostrar que el artefacto publicado, dominio, Auth, tenant, navegación, backend y lecturas reales operan en `https://app.aysseguros.com`.
 
 Por defecto es read-only y debe incluir:
 
@@ -186,24 +190,70 @@ Requiere:
 - integridad read-only PASS;
 - cero escrituras inesperadas.
 
-## 7. Relación con el go-live actual
+## 7. Relación vigente con el go-live — sustituye el orden HostDime-first anterior
 
-La ruta crítica no se altera:
+La ruta crítica vigente está gobernada por el Addendum Maestro de Continuidad 20260814 y el live-state:
 
-1. cerrar target/transport HostDime y control plane productivo;
-2. preparar request productivo único e inmutable solo cuando el paquete esté completo;
-3. ejecutar gate canónico antes de secrets;
-4. delta CRM dry-run, backup/rollback y activación controlada;
-5. deploy a HostDime / `app.aysseguros.com`;
-6. ejecutar smoke productivo Capa B;
-7. habilitar trabajo del equipo;
-8. continuar bloques post-producción;
-9. ejecutar regresión E2E acumulativa al incorporar módulos posteriores, reutilizando el mismo harness transversal.
+```text
+R1 observabilidad + un synthetic local
+→ R2 rootfix único solo si R1 demuestra owner
+→ R3 paquete durable + manifest + hashes
+→ R4 HostDime/app.aysseguros.com + smoke productivo Capa B
+→ R5 habilitación del equipo + delta incremental controlado
+→ R6 regresión E2E acumulativa con releases postproducción
+→ R7 pruebas de aislamiento/reutilización para siguiente tenant
+```
 
-## 8. Clasificación
+Reglas:
+
+1. HostDime NO bloquea R1–R3.
+2. No se prepara ni publica un paquete manual basado en un artefacto efímero no certificado.
+3. R4 sube exactamente el paquete durable construido en R3.
+4. El equipo se habilita solo después de `POST_GO_LIVE_SMOKE_PASS`.
+5. El delta de información es incremental desde el watermark/corte documentado; no full reload.
+6. Nuevos módulos postproducción no reabren Fase A: entran como releases incrementales con su regresión acumulativa.
+
+## 8. Continuidad documental obligatoria
+
+Cada corrida que cambie estado debe cerrar sincronizando:
+
+1. `orbit360-platform/docs/orbit360-live-state-v1.json`;
+2. PR #5;
+3. `README.md`;
+4. checkpoint/cierre de la corrida;
+5. CHANGELOG/bitácora cuando cambie producto/pipeline/datos/contrato;
+6. este documento solo cuando cambie política E2E o secuencia de go-live.
+
+Ante corte de conversación, no se repite una corrida por ausencia de respuesta del chat. Primero se recupera el resultado desde GitHub usando `lastEvidence` del live-state.
+
+## 9. Postproducción y siguiente tenant
+
+La batería E2E debe crecer, no reiniciarse.
+
+Cada release posterior debe reutilizar:
+
+- Auth/membership/scopes;
+- Orbit.store y contratos de acceso;
+- harness/gates/fixtures existentes;
+- snapshots e integridad;
+- `testRunId` y cleanup para writers sintéticos;
+- smoke read-only de producción;
+- evidencia sanitizada;
+- STOP_RETRY.
+
+Antes del siguiente tenant debe agregarse una matriz cross-tenant que demuestre:
+
+- aislamiento de datos;
+- tenant derivado de membership/configuración;
+- cero hardcode A&S en módulos genéricos;
+- configuración por tenant;
+- denegación fail-closed ante tenant/scope inválido;
+- bootstrap reproducible del tenant nuevo sin fork.
+
+## 10. Clasificación
 
 - patrón de QA/harness: `REPLICABLE_CLAUDE_ACUMULADO` cuando afecte UX/recorridos reutilizables;
 - harness, seguridad, secretos, integridad y pipeline: `BACKEND_PROTEGIDO_NO_CLAUDE`;
 - escenarios y configuración A&S: `TENANT_AYS_ONLY`;
 - datos/credenciales reales: `SECRETO_DATO_REAL`;
-- Academia: `ACADEMIA_ACTUALIZAR` para enseñar pruebas por rol, diferencia entre defecto funcional y validator stale, y lectura de evidencia E2E.
+- Academia: `ACADEMIA_ACTUALIZAR` para enseñar pruebas por rol, continuidad documental, diferencia entre defecto funcional y validator stale, artefacto efímero vs durable y lectura de evidencia E2E.
