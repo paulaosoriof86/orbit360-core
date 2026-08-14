@@ -10,17 +10,21 @@ const SRCROOT=path.join(ROOT,'orbit360-platform');
 const ART=path.join(ROOT,'orbit360-artifacts/fase-a-product');
 const INDEX=path.join(ART,'index.html');
 const EVIDENCE=path.join(ROOT,'orbit360-platform/runtime-gate-crm-v20260716/fase-a-product-r3-dynamic-assets-v20260814.json');
+const RENDER_EVIDENCE=path.join(ROOT,'orbit360-platform/runtime-gate-crm-v20260716/fase-a-product-render-proof-r3-v20260814.json');
 const MANIFEST=path.join(ART,'orbit360-package-manifest.json');
 const mode=String(process.argv[2]||'sync').trim();
 const TEXT_EXT=new Set(['.js','.css','.json','.html','.webmanifest','.svg']);
 const ASSET_EXT_RE=/\.(?:js|css|json|html|webmanifest|svg|png|webp|jpg|jpeg|gif|ico)(?:[?#][^'"\s]*)?$/i;
-const FORBIDDEN_PATH=/(?:^|\/)(?:backend-lab-[^/]*|store-firestore-lab[^/]*|client360-lab-[^/]*)|(?:^|\/)data\/store\.js$|(?:^|\/)data\/seed\.js$|(?:^|\/)core\/auth\.js$/i;
+const FORBIDDEN_EXACT=new Set(['data/store.js','data/seed.js','core/auth.js','core/router-tenant-config-bootstrap.js','core/user-credential-selfservice-v20260805.js','core/auth-password-change-v20260805.js']);
 
 function cleanRel(v){return String(v||'').split('?')[0].split('#')[0].replace(/\\/g,'/').replace(/^\/+/, '');}
+function hasLabToken(rel){return cleanRel(rel).split('/').some(seg=>/(^|[-_.])lab([-_.]|$)/i.test(seg));}
+function forbiddenPath(rel){rel=cleanRel(rel);return !rel||FORBIDDEN_EXACT.has(rel)||hasLabToken(rel);}
 function inside(root,file){const r=path.resolve(root),f=path.resolve(file);return f===r||f.startsWith(r+path.sep);}
 function sha(file){return crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');}
 function save(report){fs.mkdirSync(path.dirname(EVIDENCE),{recursive:true});fs.writeFileSync(EVIDENCE,JSON.stringify(report,null,2)+'\n','utf8');console.log(JSON.stringify(report,null,2));}
 function gitHead(){try{return execFileSync('git',['rev-parse','HEAD'],{cwd:ROOT,encoding:'utf8'}).trim();}catch{return '';}}
+function readJson(file){return JSON.parse(fs.readFileSync(file,'utf8'));}
 function sourceCandidate(ownerRel,raw){
   let value=String(raw||'').trim();
   if(!value||/^(?:https?:|data:|mailto:|#)/i.test(value)||value.includes('${')||value.includes('<'))return '';
@@ -28,7 +32,7 @@ function sourceCandidate(ownerRel,raw){
   let rel;
   if(/^\.\.?\//.test(value))rel=path.posix.normalize(path.posix.join(path.posix.dirname(ownerRel),value));
   else rel=path.posix.normalize(value);
-  if(!rel||rel.startsWith('../')||FORBIDDEN_PATH.test(rel))return '';
+  if(!rel||rel.startsWith('../')||forbiddenPath(rel))return '';
   const src=path.join(SRCROOT,rel);
   return inside(SRCROOT,src)&&fs.existsSync(src)&&fs.statSync(src).isFile()?rel:'';
 }
@@ -43,6 +47,7 @@ function staticRefs(){
   html.replace(/<(?:script|link)\b[^>]*(?:src|href)=(['"])([^'"]+)\1/gi,(_m,_q,ref)=>{const rel=sourceCandidate('index.html',ref);if(rel&&!out.includes(rel))out.push(rel);return _m;});
   return out;
 }
+function walk(dir){let out=[];if(!fs.existsSync(dir))return out;for(const ent of fs.readdirSync(dir,{withFileTypes:true})){const full=path.join(dir,ent.name);if(ent.isDirectory())out=out.concat(walk(full));else out.push(full);}return out;}
 function sync(){
   if(!fs.existsSync(INDEX))throw new Error('R3_PRODUCT_INDEX_MISSING');
   const roots=staticRefs();
@@ -64,6 +69,8 @@ function sync(){
   const requiredKnown=[
     'core/session-multirol-visibility-v20260716.js',
     'core/client-canonical-view-projection-v20260716.js',
+    'core/product-tenant-runtime-context-bridge-p0.js',
+    'core/router-tenant-config-product-bootstrap-p0.js',
     'data/tenant-runtime-config-index.js'
   ];
   const knownMissing=requiredKnown.filter(rel=>!fs.existsSync(path.join(ART,rel)));
@@ -71,25 +78,39 @@ function sync(){
   const tenantIndexText=fs.existsSync(tenantIndex)?fs.readFileSync(tenantIndex,'utf8'):'';
   const tenantRefs=stringAssetRefs(tenantIndexText,'data/tenant-runtime-config-index.js');
   const tenantRefsMissing=tenantRefs.filter(rel=>!fs.existsSync(path.join(ART,rel)));
-  const forbiddenIncluded=[...discovered].filter(rel=>FORBIDDEN_PATH.test(rel));
-  const report={schemaVersion:'orbit360-fase-a-r3-dynamic-assets-v1',ok:missing.length===0&&parity.length===0&&dynamicMissing.length===0&&knownMissing.length===0&&tenantRefsMissing.length===0&&forbiddenIncluded.length===0,status:'',mode:'sync',sourceHead:gitHead(),staticRootCount:roots.length,dependencyClosureCount:discovered.size,dynamicDependencyCount:dynamic.length,copiedCount:copied.length,dynamicDependencies:dynamic,missing,parityFailures:parity,dynamicMissing,knownMissing,tenantRefs,tenantRefsMissing,forbiddenIncluded,secretAccess:false,browserExecuted:false,deployExecuted:false,productionTouched:false,writeAuthorized:false};
+  const artifactRels=walk(ART).map(file=>path.relative(ART,file).replace(/\\/g,'/'));
+  const forbiddenIncluded=artifactRels.filter(forbiddenPath).sort();
+  const report={schemaVersion:'orbit360-fase-a-r3-dynamic-assets-v1',ok:missing.length===0&&parity.length===0&&dynamicMissing.length===0&&knownMissing.length===0&&tenantRefsMissing.length===0&&forbiddenIncluded.length===0,status:'',mode:'sync',sourceHead:gitHead(),staticRootCount:roots.length,dependencyClosureCount:discovered.size,dynamicDependencyCount:dynamic.length,copiedCount:copied.length,dynamicDependencies:dynamic,missing,parityFailures:parity,dynamicMissing,knownMissing,tenantRefs,tenantRefsMissing,forbiddenIncluded,noLabRuntime:forbiddenIncluded.length===0,secretAccess:false,browserExecuted:false,deployExecuted:false,productionTouched:false,writeAuthorized:false};
   report.status=report.ok?'FASE_A_PRODUCT_R3_DYNAMIC_ASSETS_PASS':'FASE_A_PRODUCT_R3_DYNAMIC_ASSETS_FAIL';save(report);if(!report.ok)process.exitCode=41;
 }
-function walk(dir){let out=[];for(const ent of fs.readdirSync(dir,{withFileTypes:true})){const full=path.join(dir,ent.name);if(ent.isDirectory())out=out.concat(walk(full));else out.push(full);}return out;}
 function manifest(){
   if(!fs.existsSync(INDEX))throw new Error('R3_PRODUCT_INDEX_MISSING');
   const runtimeConfig=path.join(ART,'product-runtime-config.js');if(!fs.existsSync(runtimeConfig))throw new Error('R3_PUBLIC_RUNTIME_CONFIG_MISSING');
+  if(!fs.existsSync(EVIDENCE))throw new Error('R3_DYNAMIC_EVIDENCE_MISSING');
+  if(!fs.existsSync(RENDER_EVIDENCE))throw new Error('R3_RENDER_EVIDENCE_MISSING');
+  const dynamicEvidence=readJson(EVIDENCE),renderEvidence=readJson(RENDER_EVIDENCE);
+  const activeTenant=renderEvidence?.runtime?.routerState?.['data-orbit-tenant-insurer-config-active-v20260717']||{};
+  const store=renderEvidence?.runtime?.store||{};
+  const tenantContext=renderEvidence?.runtime?.tenantContext||{};
+  const dynamicCertified=dynamicEvidence.ok===true&&dynamicEvidence.status==='FASE_A_PRODUCT_R3_DYNAMIC_ASSETS_PASS'&&[].concat(dynamicEvidence.dynamicMissing||[]).length===0&&[].concat(dynamicEvidence.knownMissing||[]).length===0&&[].concat(dynamicEvidence.tenantRefsMissing||[]).length===0&&[].concat(dynamicEvidence.parityFailures||[]).length===0&&dynamicEvidence.noLabRuntime===true;
+  const hydrationCertified=renderEvidence.ok===true&&renderEvidence.status==='FASE_A_PRODUCT_RENDER_PROOF_R3_PASS'&&store.ready===true&&store.status==='ready-read-only'&&store.writeEnabled===false&&[].concat(store.requiredMissing||[]).length===0&&[].concat(store.requiredFailed||[]).length===0;
+  const tenantContextCertified=tenantContext.ready===true&&tenantContext.writeAuthorized===false&&String(tenantContext.tenantId||'')===String(renderEvidence?.runtime?.user?.tenantId||'')&&activeTenant.ready===true&&activeTenant.status==='ready';
+  const routerRenderCertified=renderEvidence?.runtime?.productApp?.started===true&&renderEvidence?.runtime?.productApp?.routerStarted===true&&Number(renderEvidence?.runtime?.hostChildCount||0)>0&&String(renderEvidence?.runtime?.routeKey||'').length>0&&[].concat(renderEvidence.pageErrors||[]).length===0&&[].concat(renderEvidence.httpFailures||[]).filter(x=>x&&x.scope==='local-artifact').length===0;
+  if(!dynamicCertified)throw new Error('R3_DYNAMIC_EVIDENCE_NOT_CERTIFIED');
+  if(!hydrationCertified)throw new Error('R3_HYDRATION_EVIDENCE_NOT_CERTIFIED');
+  if(!tenantContextCertified)throw new Error('R3_TENANT_CONTEXT_EVIDENCE_NOT_CERTIFIED');
+  if(!routerRenderCertified)throw new Error('R3_ROUTER_RENDER_EVIDENCE_NOT_CERTIFIED');
   const files=walk(ART).filter(f=>f!==MANIFEST).sort();
   const rels=files.map(f=>path.relative(ART,f).replace(/\\/g,'/'));
-  const forbidden=rels.filter(rel=>FORBIDDEN_PATH.test(rel));
-  let secretMaterial=[];
+  const forbidden=rels.filter(forbiddenPath);
+  const secretMaterial=[];
   for(const file of files){
     const ext=path.extname(file).toLowerCase();if(!TEXT_EXT.has(ext))continue;
     const text=fs.readFileSync(file,'utf8');
-    if(/-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----/.test(text)||/["']type["']\s*:\s*["']service_account["']/.test(text)||/["']private_key["']\s*:/.test(text))secretMaterial.push(path.relative(ART,file).replace(/\\/g,'/'));
+    if(/-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----/.test(text)||/["']type["']\s*:\s*["'qservice_account["']/.test(text)||/["']private_key["']\s*:/.test(text))secretMaterial.push(path.relative(ART,file).replace(/\\/g,'/'));
   }
   const entries=files.map(file=>({path:path.relative(ART,file).replace(/\\/g,'/'),bytes:fs.statSync(file).size,sha256:sha(file)}));
-  const result={schemaVersion:'orbit360-fase-a-product-package-manifest-v1',status:'FASE_A_PRODUCT_R3_DURABLE_PACKAGE_CERTIFIED',sourceHead:process.env.GITHUB_SHA||gitHead(),generatedAt:new Date().toISOString(),artifactRoot:'orbit360-artifacts/fase-a-product',fileCount:entries.length,files:entries,requiredHydrationCertified:true,dynamicRuntimeClosureCertified:true,noLabRuntime:forbidden.length===0,noPrivateSecretMaterial:secretMaterial.length===0,forbiddenFiles:forbidden,secretMaterialFiles:secretMaterial,writeAuthorized:false,productionTouched:false,deployExecuted:false,containsPrivateSecrets:false};
+  const result={schemaVersion:'orbit360-fase-a-product-package-manifest-v1',status:'FASE_A_PRODUCT_R3_DURABLE_PACKAGE_CERTIFIED',sourceHead:process.env.GITHUB_SHA||gitHead(),generatedAt:new Date().toISOString(),artifactRoot:'orbit360-artifacts/fase-a-product',fileCount:entries.length,files:entries,requiredHydrationCertified:hydrationCertified,dynamicRuntimeClosureCertified:dynamicCertified,productTenantContextCertified:tenantContextCertified,routerRenderCertified:routerRenderCertified,noLabRuntime:forbidden.length===0,noPrivateSecretMaterial:secretMaterial.length===0,forbiddenFiles:forbidden,secretMaterialFiles:secretMaterial,writeAuthorized:false,productionTouched:false,deployExecuted:false,containsPrivateSecrets:false};
   if(forbidden.length||secretMaterial.length)throw new Error('R3_PACKAGE_SAFETY_FAIL:'+forbidden.concat(secretMaterial).join(','));
   fs.writeFileSync(MANIFEST,JSON.stringify(result,null,2)+'\n','utf8');console.log(JSON.stringify({ok:true,status:result.status,fileCount:result.fileCount,manifest:path.relative(ROOT,MANIFEST).replace(/\\/g,'/'),sourceHead:result.sourceHead,writeAuthorized:false,productionTouched:false},null,2));
 }

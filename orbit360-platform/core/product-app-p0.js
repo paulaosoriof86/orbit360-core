@@ -1,11 +1,11 @@
-/* Orbit 360 · Product application activation owner P0 · 2026-08-13 */
+/* Orbit 360 · Product application activation owner P0 · 2026-08-14 */
 (function(){
   'use strict';
   window.Orbit=window.Orbit||{};
-  var state={initialized:false,activating:false,started:false,routerStarted:false,lastError:''};
+  var state={initialized:false,activating:false,started:false,routerStarted:false,tenantContextReady:false,lastError:''};
   var activationPromise=null;
   function clean(v){return String(v==null?'':v).trim();}
-  function status(){return{initialized:state.initialized,activating:state.activating,started:state.started,routerStarted:state.routerStarted,lastError:state.lastError,mode:'product-readonly',writeAuthorized:false};}
+  function status(){return{initialized:state.initialized,activating:state.activating,started:state.started,routerStarted:state.routerStarted,tenantContextReady:state.tenantContextReady,lastError:state.lastError,mode:'product-readonly',writeAuthorized:false};}
   function fail(message){state.lastError=clean(message)||'PRODUCT_APP_ACTIVATION_FAILED';state.activating=false;try{document.dispatchEvent(new CustomEvent('orbit:product-app',{detail:status()}));}catch(e){}var err=new Error(state.lastError);err.code=state.lastError;throw err;}
   function init(){
     if(state.initialized)return status();
@@ -20,7 +20,7 @@
   function activate(){
     if(state.started)return Promise.resolve(status());
     if(activationPromise)return activationPromise;
-    state.activating=true;state.lastError='';
+    state.activating=true;state.lastError='';state.tenantContextReady=false;
     activationPromise=Promise.resolve().then(function(){
       var cfg=window.__ORBIT360_PRODUCT_PUBLIC_CONFIG__||{};
       var providers=Orbit.productRuntimeBrowserProvidersP0;
@@ -33,6 +33,11 @@
       if(!result||result.ok!==true||result.ready!==true||result.writeAuthorized!==false)throw new Error('PRODUCT_READONLY_BOOTSTRAP_NOT_READY');
       var ps=Orbit.store&&typeof Orbit.store._productStatus==='function'?Orbit.store._productStatus():{};
       if(ps.ready!==true||ps.status!=='ready-read-only'||ps.noFallback!==true||ps.writeEnabled!==false)throw new Error('PRODUCT_STORE_NOT_READY');
+      var tenantBridge=Orbit.productTenantRuntimeContextP0;
+      if(!tenantBridge||typeof tenantBridge.install!=='function')throw new Error('PRODUCT_TENANT_CONTEXT_BRIDGE_MISSING');
+      var tenantStatus=tenantBridge.install();
+      if(!tenantStatus||tenantStatus.ready!==true||!clean(tenantStatus.tenantId)||tenantStatus.writeAuthorized!==false)throw new Error('PRODUCT_TENANT_CONTEXT_NOT_READY');
+      state.tenantContextReady=true;
       if(!state.routerStarted){if(!Orbit.router||typeof Orbit.router.init!=='function')throw new Error('PRODUCT_ROUTER_MISSING');Orbit.router.init();state.routerStarted=true;}
       state.started=true;state.activating=false;state.lastError='';
       if(Orbit.auth&&typeof Orbit.auth.showApp==='function')Orbit.auth.showApp();
@@ -41,8 +46,8 @@
       if(!location.hash)location.hash='#/inicio';
       try{window.dispatchEvent(new HashChangeEvent('hashchange'));}catch(e){window.dispatchEvent(new Event('hashchange'));}
       return status();
-    }).catch(function(error){activationPromise=null;return fail(error&&error.message?error.message:error);});
+    }).catch(function(error){activationPromise=null;state.tenantContextReady=false;return fail(error&&error.message?error.message:error);});
     return activationPromise;
   }
-  window.Orbit.productAppP0=Object.freeze({VERSION:'fase-a-product-p0-20260813',init:init,activate:activate,isStarted:function(){return state.started===true;},status:status,writeAuthorized:false,noFallback:true});
+  window.Orbit.productAppP0=Object.freeze({VERSION:'fase-a-product-p0-20260814',init:init,activate:activate,isStarted:function(){return state.started===true;},status:status,writeAuthorized:false,noFallback:true});
 })();

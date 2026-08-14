@@ -11,13 +11,20 @@ const OUT=path.join(ROOT,'orbit360-platform/runtime-gate-crm-v20260716/fase-a-pr
 const email=String(process.env.ORBIT360_PRODUCT_SMOKE_EMAIL||'').trim();
 const password=String(process.env.ORBIT360_PRODUCT_SMOKE_PASSWORD||'');
 const port=4173,url=`http://127.0.0.1:${port}/`,localOrigin=new URL(url).origin;
-const clean=v=>String(v??'').replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi,'[email]').replace(/\s+/g,' ').trim().slice(0,700);
-const safeLocalPath=raw=>{try{const u=new URL(String(raw||''));return u.origin===localOrigin?decodeURIComponent(u.pathname).replace(/[^A-Za-z0-9._/\-]/g,'').slice(0,300):u.pathname.replace(/[^A-Za-z0-9._/\-]/g,'').slice(0,300);}catch{return 'unknown';}};
-const report={schemaVersion:'orbit360-fase-a-product-render-proof-r3-v1',ok:false,status:'FASE_A_PRODUCT_RENDER_PROOF_R3_FAIL',stage:'init',pageErrors:[],consoleErrors:[],httpFailures:[],bootstrapTransitions:[],firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
+const clean=v=>String(v??'').replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi,'[email]').replace(/[A-Za-z0-9_-]{40,}/g,'[redacted]').replace(/\s+/g,' ').trim().slice(0,700);
+const safeLocalPath=raw=>{try{const u=new URL(String(raw||''));return decodeURIComponent(u.pathname).replace(/[^A-Za-z0-9._/\-]/g,'').slice(0,300);}catch{return 'unknown';}};
+const report={schemaVersion:'orbit360-fase-a-product-render-proof-r3-v2',ok:false,status:'FASE_A_PRODUCT_RENDER_PROOF_R3_FAIL',stage:'init',pageErrors:[],consoleErrors:[],httpFailures:[],bootstrapTransitions:[],firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
 function save(){fs.mkdirSync(path.dirname(OUT),{recursive:true});fs.writeFileSync(OUT,JSON.stringify(report,null,2)+'\n','utf8');console.log(JSON.stringify(report,null,2));}
 function mime(file){return file.endsWith('.js')?'text/javascript':file.endsWith('.css')?'text/css':file.endsWith('.json')?'application/json':file.endsWith('.svg')?'image/svg+xml':file.endsWith('.png')?'image/png':file.endsWith('.webmanifest')?'application/manifest+json':file.endsWith('.html')?'text/html':'application/octet-stream';}
-function requestLocation(raw){try{const u=new URL(String(raw||''));return {scope:u.origin===localOrigin?'local-artifact':'external-runtime',host:u.origin===localOrigin?'local':clean(u.hostname),path:u.origin===localOrigin?safeLocalPath(raw):safeLocalPath(raw)};}catch{return {scope:'unknown',host:'unknown',path:'unknown'};}}
+function requestLocation(raw){try{const u=new URL(String(raw||''));return {scope:u.origin===localOrigin?'local-artifact':'external-runtime',host:u.origin===localOrigin?'local':clean(u.hostname),path:safeLocalPath(raw)};}catch{return {scope:'unknown',host:'unknown',path:'unknown'};}}
 function addHttpFailure(entry){if(report.httpFailures.length<30)report.httpFailures.push(entry);}
+function pageErrorEvidence(error){
+  const message=clean(error?.message||error),name=clean(error?.name||'Error'),stack=String(error?.stack||'');
+  const frames=[];const re=/(https?:\/\/[^\s)]+):(\d+):(\d+)/g;let m;
+  while((m=re.exec(stack))&&frames.length<8){const loc=requestLocation(m[1]);frames.push({scope:loc.scope,host:loc.host,path:loc.path,line:Number(m[2])||0,column:Number(m[3])||0});}
+  return {message,name,frames};
+}
+function pageErrorMessages(){return report.pageErrors.map(item=>clean(item&&item.message||item)).filter(Boolean);}
 const server=http.createServer((req,res)=>{try{let rel=decodeURIComponent(String(req.url||'/').split('?')[0]);if(rel==='/'||rel==='')rel='/index.html';rel=rel.replace(/^\/+/, '');const file=path.resolve(ART,rel);if(!file.startsWith(path.resolve(ART)+path.sep)&&file!==path.join(path.resolve(ART),'index.html')){res.writeHead(403);return res.end();}if(!fs.existsSync(file)||fs.statSync(file).isDirectory()){res.writeHead(404);return res.end('not found');}res.writeHead(200,{'content-type':mime(file),'cache-control':'no-store'});fs.createReadStream(file).pipe(res);}catch{res.writeHead(500);res.end();}});
 let browser,page;
 try{
@@ -33,7 +40,7 @@ try{
       if(window.__orbitProductBootstrapTransitions.length>24)window.__orbitProductBootstrapTransitions.shift();
     });
   });
-  page.on('pageerror',e=>{if(report.pageErrors.length<30)report.pageErrors.push(clean(e?.message||e));});
+  page.on('pageerror',e=>{if(report.pageErrors.length<30)report.pageErrors.push(pageErrorEvidence(e));});
   page.on('console',m=>{if(m.type()==='error'&&report.consoleErrors.length<30)report.consoleErrors.push(clean(m.text()));});
   page.on('response',response=>{const status=response.status();if(status>=400)addHttpFailure({kind:'response',status,...requestLocation(response.url())});});
   page.on('requestfailed',request=>addHttpFailure({kind:'requestfailed',failure:clean(request.failure()?.errorText||'unknown'),...requestLocation(request.url())}));
@@ -42,9 +49,9 @@ try{
   await page.goto(url,{waitUntil:'domcontentloaded',timeout:30000});
   await page.locator('#login-form').waitFor({state:'visible',timeout:15000});
   await page.waitForTimeout(1200);
-  report.preauth=await page.evaluate(()=>({storeStatus:Orbit.store?._productStatus?Orbit.store._productStatus():null,preauth:Boolean(Orbit.store?.__productPreAuthP0),productApp:Orbit.productAppP0?.status?Orbit.productAppP0.status():null}));
+  report.preauth=await page.evaluate(()=>({storeStatus:Orbit.store?._productStatus?Orbit.store._productStatus():null,preauth:Boolean(Orbit.store?.__productPreAuthP0),productApp:Orbit.productAppP0?.status?Orbit.productAppP0.status():null,productRouterBootstrap:Orbit.productRouterTenantConfigBootstrapP0?.status?Orbit.productRouterTenantConfigBootstrapP0.status():null}));
   if(!report.preauth?.preauth)throw new Error('PREAUTH_STORE_NOT_ACTIVE');
-  if(report.pageErrors.length)throw new Error('PREAUTH_PAGE_ERRORS:'+report.pageErrors.join('|'));
+  if(report.pageErrors.length)throw new Error('PREAUTH_PAGE_ERRORS:'+pageErrorMessages().join('|'));
 
   report.stage='login';
   await page.fill('#lg-user',email);await page.fill('#lg-pass',password);await page.click('#login-form button[type="submit"]');
@@ -70,8 +77,12 @@ try{
     const transitions=Array.isArray(window.__orbitProductBootstrapTransitions)?window.__orbitProductBootstrapTransitions.slice(-24):[];
     const routerState=Orbit.router&&Orbit.router.runtimeContractState?JSON.parse(JSON.stringify(Orbit.router.runtimeContractState)):{};
     const host=document.getElementById('host');
+    const backend=window.OrbitBackend||{};
     return {
       productApp:Orbit.productAppP0?.status?Orbit.productAppP0.status():null,
+      tenantContext:Orbit.productTenantRuntimeContextP0?.status?Orbit.productTenantRuntimeContextP0.status():null,
+      productRouterBootstrap:Orbit.productRouterTenantConfigBootstrapP0?.status?Orbit.productRouterTenantConfigBootstrapP0.status():null,
+      backendContext:{tenantId:String(backend.tenantId||backend.tenant||''),mode:String(backend.mode||''),productReadOnly:backend.productReadOnly===true,writeAuthorized:backend.writeAuthorized===true},
       store:Orbit.store?._productStatus?Orbit.store._productStatus():null,
       user:Orbit.auth?.productUser?{tenantId:Orbit.auth.productUser.tenantId||'',activeRole:Orbit.auth.productUser.activeRole||'',roleCount:Array.isArray(Orbit.auth.productUser.roles)?Orbit.auth.productUser.roles.length:0}:null,
       loginError:Boolean(String(document.getElementById('login-error')?.textContent||'').trim()),
@@ -87,7 +98,12 @@ try{
   });
   report.bootstrapTransitions=Array.isArray(report.runtime?.bootstrapTransitions)?report.runtime.bootstrapTransitions.map(item=>({phase:clean(item?.phase),ready:item?.ready===true,errors:Array.isArray(item?.errors)?item.errors.map(clean).slice(0,10):[]})):[];
   if(report.runtime){report.runtime.bootstrapTransitions=report.bootstrapTransitions;report.runtime.bootstrapLast=report.bootstrapTransitions.length?report.bootstrapTransitions[report.bootstrapTransitions.length-1]:null;}
-  if(report.runtime?.productApp?.started!==true||report.runtime?.productApp?.routerStarted!==true)throw new Error('PRODUCT_APP_OR_ROUTER_NOT_STARTED');
+  if(report.runtime?.productApp?.started!==true||report.runtime?.productApp?.routerStarted!==true||report.runtime?.productApp?.tenantContextReady!==true)throw new Error('PRODUCT_APP_ROUTER_OR_TENANT_CONTEXT_NOT_STARTED');
+  if(report.runtime?.tenantContext?.ready!==true||report.runtime?.tenantContext?.writeAuthorized!==false||!report.runtime?.tenantContext?.tenantId)throw new Error('PRODUCT_TENANT_CONTEXT_NOT_READY');
+  if(report.runtime.tenantContext.tenantId!==report.runtime?.user?.tenantId||report.runtime?.backendContext?.tenantId!==report.runtime?.user?.tenantId||report.runtime?.backendContext?.mode!=='product-readonly'||report.runtime?.backendContext?.writeAuthorized!==false)throw new Error('PRODUCT_TENANT_CONTEXT_PARITY_FAIL');
+  const activeTenant=report.runtime?.routerState?.['data-orbit-tenant-insurer-config-active-v20260717'];
+  if(!activeTenant||activeTenant.ready!==true||activeTenant.status!=='ready'||!activeTenant.src)throw new Error('PRODUCT_ACTIVE_TENANT_CONFIG_NOT_READY');
+  if(Array.isArray(report.runtime?.productRouterBootstrap?.errors)&&report.runtime.productRouterBootstrap.errors.length)throw new Error('PRODUCT_ROUTER_SUPPORT_BOOTSTRAP_ERROR:'+report.runtime.productRouterBootstrap.errors.join(','));
   if(report.runtime?.store?.ready!==true||report.runtime?.store?.status!=='ready-read-only'||report.runtime?.store?.writeEnabled!==false)throw new Error('PRODUCT_STORE_NOT_READY');
   if(Array.isArray(report.runtime?.store?.requiredMissing)&&report.runtime.store.requiredMissing.length)throw new Error('REQUIRED_COLLECTIONS_MISSING:'+report.runtime.store.requiredMissing.join(','));
   if(Array.isArray(report.runtime?.store?.requiredFailed)&&report.runtime.store.requiredFailed.length)throw new Error('REQUIRED_COLLECTIONS_FAILED:'+report.runtime.store.requiredFailed.join(','));
@@ -95,8 +111,8 @@ try{
   if(!report.runtime.routeKey||report.runtime.hostChildCount<1||report.runtime.hostTextLength<1)throw new Error('ROUTER_RENDER_NOT_OBSERVED');
   const localFailures=report.httpFailures.filter(x=>x.scope==='local-artifact');
   if(localFailures.length)throw new Error('LOCAL_ARTIFACT_HTTP_FAILURE:'+localFailures.map(x=>`${x.status||x.failure}:${x.path}`).join('|'));
-  if(report.pageErrors.length)throw new Error('PAGE_ERRORS:'+report.pageErrors.join('|'));
+  if(report.pageErrors.length)throw new Error('PAGE_ERRORS:'+pageErrorMessages().join('|'));
   if(report.consoleErrors.length)throw new Error('CONSOLE_ERRORS:'+report.consoleErrors.join('|'));
 
   report.stage='final';report.ok=true;report.status='FASE_A_PRODUCT_RENDER_PROOF_R3_PASS';
-}catch(e){report.error=clean(e?.message||e);report.failureStage=report.stage;try{if(page){report.failureRuntime=await page.evaluate(()=>({routeKey:window.Orbit&&Orbit.route&&Orbit.route.key||'',routerState:window.Orbit&&Orbit.router&&Orbit.router.runtimeContractState?JSON.parse(JSON.stringify(Orbit.router.runtimeContractState)):{},store:window.Orbit&&Orbit.store&&Orbit.store._productStatus?Orbit.store._productStatus():null,productApp:window.Orbit&&Orbit.productAppP0&&Orbit.productAppP0.status?Orbit.productAppP0.status():null})).catch(()=>null);}}catch{}process.exitCode=41;}finally{if(browser)await browser.close().catch(()=>{});await new Promise(r=>server.close(()=>r())).catch(()=>{});save();}
+}catch(e){report.error=clean(e?.message||e);report.failureStage=report.stage;try{if(page){report.failureRuntime=await page.evaluate(()=>{const backend=window.OrbitBackend||{};return{routeKey:window.Orbit&&Orbit.route&&Orbit.route.key||'',routerState:window.Orbit&&Orbit.router&&Orbit.router.runtimeContractState?JSON.parse(JSON.stringify(Orbit.router.runtimeContractState)):{},tenantContext:window.Orbit&&Orbit.productTenantRuntimeContextP0&&Orbit.productTenantRuntimeContextP0.status?Orbit.productTenantRuntimeContextP0.status():null,productRouterBootstrap:window.Orbit&&Orbit.productRouterTenantConfigBootstrapP0&&Orbit.productRouterTenantConfigBootstrapP0.status?Orbit.productRouterTenantConfigBootstrapP0.status():null,backendContext:{tenantId:String(backend.tenantId||backend.tenant||''),mode:String(backend.mode||''),productReadOnly:backend.productReadOnly===true,writeAuthorized:backend.writeAuthorized===true},store:window.Orbit&&Orbit.store&&Orbit.store._productStatus?Orbit.store._productStatus():null,productApp:window.Orbit&&Orbit.productAppP0&&Orbit.productAppP0.status?Orbit.productAppP0.status():null};}).catch(()=>null);}}catch{}process.exitCode=41;}finally{if(browser)await browser.close().catch(()=>{});await new Promise(r=>server.close(()=>r())).catch(()=>{});save();}

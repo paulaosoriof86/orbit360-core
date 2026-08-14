@@ -12,6 +12,8 @@ on:
       - 'tools/orbit360-fase-a-product-entrypoint-gate-v20260813.mjs'
       - 'orbit360-platform/data/store-product-preauth-p0.js'
       - 'orbit360-platform/core/product-app-p0.js'
+      - 'orbit360-platform/core/product-tenant-runtime-context-bridge-p0.js'
+      - 'orbit360-platform/core/router-tenant-config-product-bootstrap-p0.js'
 
 permissions:
   contents: read
@@ -39,7 +41,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Gate, assemble and close dynamic graph before secrets
+      - name: Gate, assemble and close R3 source before secrets
         shell: bash
         run: |
           set -euo pipefail
@@ -50,11 +52,14 @@ jobs:
           node --check tools/orbit360-fase-a-r3-dynamic-package-v20260814.mjs
           node --check tools/orbit360-fase-a-product-render-proof-r3-v20260814.mjs
           node --check orbit360-platform/data/store-product-preauth-p0.js
+          node --check orbit360-platform/core/product-app-p0.js
+          node --check orbit360-platform/core/product-tenant-runtime-context-bridge-p0.js
+          node --check orbit360-platform/core/router-tenant-config-product-bootstrap-p0.js
           node tools/orbit360-fase-a-build-product-artifact-v20260813.mjs
           node tools/orbit360-fase-a-r3-dynamic-package-v20260814.mjs sync
-          jq -e '.ok==true and .status=="FASE_A_PRODUCT_R3_DYNAMIC_ASSETS_PASS" and (.dynamicMissing|length)==0 and (.knownMissing|length)==0 and (.tenantRefsMissing|length)==0 and (.parityFailures|length)==0 and .secretAccess==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/fase-a-product-r3-dynamic-assets-v20260814.json" >/dev/null
+          jq -e '.ok==true and .status=="FASE_A_PRODUCT_R3_DYNAMIC_ASSETS_PASS" and (.dynamicMissing|length)==0 and (.knownMissing|length)==0 and (.tenantRefsMissing|length)==0 and (.parityFailures|length)==0 and (.forbiddenIncluded|length)==0 and .noLabRuntime==true and .secretAccess==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/fase-a-product-r3-dynamic-assets-v20260814.json" >/dev/null
           node tools/orbit360-fase-a-product-entrypoint-gate-v20260813.mjs
-          jq -e '.ok==true and .checks.preAuthStoreFailClosed==true and .checks.noForbiddenRuntime==true and .productionTouched==false' "$EVIDENCE_DIR/fase-a-product-entrypoint-source-v20260813.json" >/dev/null
+          jq -e '.ok==true and .checks.preAuthStoreFailClosed==true and .checks.noForbiddenRuntime==true and .checks.noLabEntrypointRefs==true and .checks.productTenantBridge==true and .checks.productRouterBootstrap==true and .productionTouched==false' "$EVIDENCE_DIR/fase-a-product-entrypoint-source-v20260813.json" >/dev/null
       - name: Install read-only synthetic runtime tools
         shell: bash
         run: |
@@ -87,12 +92,12 @@ jobs:
           node tools/orbit360-fase-a-materialize-product-runtime-config-v20260813.mjs
           node tools/orbit360-m6-resolve-smoke-identity-readonly-v20260730.mjs
           jq -e '.ok==true and .eligibleSmokeIdentityCount==1 and .firestoreWrites==0 and .operationalWrites==0' "$EVIDENCE_DIR/m6-product-smoke-identity-summary.json" >/dev/null
-      - name: R3 local router render proof
+      - name: R3 second local tenant-context and router render proof
         shell: bash
         run: |
           set -euo pipefail
           node tools/orbit360-fase-a-product-render-proof-r3-v20260814.mjs
-          jq -e '.ok==true and .status=="FASE_A_PRODUCT_RENDER_PROOF_R3_PASS" and .runtime.productApp.started==true and .runtime.productApp.routerStarted==true and .runtime.store.ready==true and .runtime.store.status=="ready-read-only" and (.runtime.store.requiredMissing|length)==0 and (.runtime.store.requiredFailed|length)==0 and .runtime.clientes==430 and .runtime.aseguradoras==30 and .runtime.hostChildCount>0 and .deployExecuted==false and .productionTouched==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0' "$EVIDENCE_DIR/fase-a-product-render-proof-r3-v20260814.json" >/dev/null
+          jq -e '.ok==true and .status=="FASE_A_PRODUCT_RENDER_PROOF_R3_PASS" and .runtime.productApp.started==true and .runtime.productApp.routerStarted==true and .runtime.productApp.tenantContextReady==true and .runtime.tenantContext.ready==true and .runtime.tenantContext.writeAuthorized==false and .runtime.backendContext.mode=="product-readonly" and .runtime.backendContext.writeAuthorized==false and .runtime.routerState["data-orbit-tenant-insurer-config-active-v20260717"].ready==true and .runtime.routerState["data-orbit-tenant-insurer-config-active-v20260717"].status=="ready" and .runtime.store.ready==true and .runtime.store.status=="ready-read-only" and (.runtime.store.requiredMissing|length)==0 and (.runtime.store.requiredFailed|length)==0 and .runtime.clientes==430 and .runtime.aseguradoras==30 and .runtime.hostChildCount>0 and (.pageErrors|length)==0 and .deployExecuted==false and .productionTouched==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0' "$EVIDENCE_DIR/fase-a-product-render-proof-r3-v20260814.json" >/dev/null
       - name: Certify and package durable R3 artifact
         shell: bash
         run: |
@@ -101,13 +106,15 @@ jobs:
           ZIP_NAME="orbit360-fase-a-product-r3-${GITHUB_SHA:0:12}.zip"
           (cd "$ORBIT360_PRODUCT_ARTIFACT" && zip -qr "$GITHUB_WORKSPACE/$ZIP_NAME" .)
           ZIP_SHA="$(sha256sum "$ZIP_NAME" | awk '{print $1}')"
+          export ZIP_NAME ZIP_SHA
+          test "${#ZIP_SHA}" -eq 64
           printf '%s  %s\n' "$ZIP_SHA" "$ZIP_NAME" > "$EVIDENCE_DIR/fase-a-product-r3-durable-package-sha256-v20260814.txt"
-          node -e 'const fs=require("fs");const p=process.env.EVIDENCE_DIR+"/fase-a-product-r3-durable-package-v20260814.json";const zip=process.env.ZIP_NAME;const sha=process.env.ZIP_SHA;const manifest=JSON.parse(fs.readFileSync(process.env.ORBIT360_PRODUCT_ARTIFACT+"/orbit360-package-manifest.json","utf8"));fs.writeFileSync(p,JSON.stringify({schemaVersion:"orbit360-fase-a-product-r3-durable-package-v1",ok:true,status:"FASE_A_PRODUCT_R3_DURABLE_PACKAGE_PASS",zipName:zip,zipSha256:sha,sourceHead:process.env.GITHUB_SHA,fileCount:manifest.fileCount,manifestStatus:manifest.status,requiredHydrationCertified:manifest.requiredHydrationCertified,dynamicRuntimeClosureCertified:manifest.dynamicRuntimeClosureCertified,noLabRuntime:manifest.noLabRuntime,noPrivateSecretMaterial:manifest.noPrivateSecretMaterial,writeAuthorized:false,deployExecuted:false,productionTouched:false},null,2)+"\n")'
-          jq -e '.ok==true and .status=="FASE_A_PRODUCT_R3_DURABLE_PACKAGE_PASS" and .requiredHydrationCertified==true and .dynamicRuntimeClosureCertified==true and .noLabRuntime==true and .noPrivateSecretMaterial==true and .writeAuthorized==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/fase-a-product-r3-durable-package-v20260814.json" >/dev/null
+          node -e 'const fs=require("fs");const p=process.env.EVIDENCE_DIR+"/fase-a-product-r3-durable-package-v20260814.json";const zip=process.env.ZIP_NAME;const sha=process.env.ZIP_SHA;const manifest=JSON.parse(fs.readFileSync(process.env.ORBIT360_PRODUCT_ARTIFACT+"/orbit360-package-manifest.json","utf8"));fs.writeFileSync(p,JSON.stringify({schemaVersion:"orbit360-fase-a-product-r3-durable-package-v1",ok:true,status:"FASE_A_PRODUCT_R3_DURABLE_PACKAGE_PASS",zipName:zip,zipSha256:sha,sourceHead:process.env.GITHUB_SHA,fileCount:manifest.fileCount,manifestStatus:manifest.status,requiredHydrationCertified:manifest.requiredHydrationCertified,dynamicRuntimeClosureCertified:manifest.dynamicRuntimeClosureCertified,productTenantContextCertified:manifest.productTenantContextCertified,routerRenderCertified:manifest.routerRenderCertified,noLabRuntime:manifest.noLabRuntime,noPrivateSecretMaterial:manifest.noPrivateSecretMaterial,writeAuthorized:false,deployExecuted:false,productionTouched:false},null,2)+"\n")'
+          jq -e '.ok==true and .status=="FASE_A_PRODUCT_R3_DURABLE_PACKAGE_PASS" and (.zipSha256|length)==64 and .requiredHydrationCertified==true and .dynamicRuntimeClosureCertified==true and .productTenantContextCertified==true and .routerRenderCertified==true and .noLabRuntime==true and .noPrivateSecretMaterial==true and .writeAuthorized==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/fase-a-product-r3-durable-package-v20260814.json" >/dev/null
+          test "$(jq -r '.zipName' "$EVIDENCE_DIR/fase-a-product-r3-durable-package-v20260814.json")" = "$ZIP_NAME"
+          test "$(jq -r '.zipSha256' "$EVIDENCE_DIR/fase-a-product-r3-durable-package-v20260814.json")" = "$ZIP_SHA"
+          test "$(sha256sum "$ZIP_NAME" | awk '{print $1}')" = "$ZIP_SHA"
           echo "ORBIT360_R3_ZIP=$ZIP_NAME" >> "$GITHUB_ENV"
-        env:
-          ZIP_NAME: orbit360-fase-a-product-r3-${{ github.sha }}.zip
-          ZIP_SHA: placeholder
       - name: Cleanup
         if: always()
         shell: bash
