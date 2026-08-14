@@ -100,6 +100,10 @@ R1 observabilidad + synthetic: CERRADO
 → R7 gate de reutilización para siguiente tenant
 ```
 
+## Integridad documental de R1
+
+Durante la transacción documental hubo una escritura intermedia que dejó temporalmente vacío el live-state en `af220f61101881bb43e4d2cdd07afda65f844f87`. Fue detectada y restaurada en la misma iteración; producto, datos, runtime y producción no fueron tocados. R1 solo se considera cerrado cuando `Orbit360 Continuidad Documental Source 20260814` vuelva a PASS sobre el estado restaurado.
+
 ## Reglas anti-bucle
 
 - una sola frontera larga por iteración;
