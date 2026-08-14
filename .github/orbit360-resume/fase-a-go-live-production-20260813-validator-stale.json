@@ -1,6 +1,6 @@
 {
   "schemaVersion": "orbit360-fase-a-production-resume-v2",
-  "updatedAt": "2026-08-13T20:18:00-06:00",
+  "updatedAt": "2026-08-13T20:26:00-06:00",
   "requestCommit": "d3749ec9abd14f24fb3972c0a33c600d86f18105",
   "requestReused": true,
   "newRequestCreated": false,
@@ -26,11 +26,28 @@
       "failedStage": "REQUEST_RESUME_GUARD",
       "rootCause": "BASH_HEREDOC_GUARD_SYNTAX",
       "correction": "MOVE_REQUEST_RESUME_GUARD_TO_DEDICATED_NODE_SCRIPT"
+    },
+    {
+      "runId": 31763154708,
+      "jobId": 94653537000,
+      "deployCount": 0,
+      "classification": "VALIDATOR_STALE",
+      "failedStage": "PRODUCTION_READINESS_READONLY",
+      "rootCause": "M6_HISTORICAL_BASELINE_414_26_1",
+      "observedCurrentBaseline": {
+        "clientes": 430,
+        "aseguradoras": 30,
+        "asesores": 7,
+        "memberships": 8,
+        "config": 1
+      },
+      "correction": "CURRENT_FASE_A_BASELINE_430_30_7_MEMBERSHIPS_GTE7_AND_CURRENT_BROWSER"
     }
   ],
   "latestCorrection": "DEDICATED_NODE_REQUEST_RESUME_GUARD",
-  "sourcePreflightRunId": 31763119206,
-  "sourcePreflightJobId": 94653435197,
+  "latestValidatorCorrection": "CURRENT_FASE_A_DATA_AND_BROWSER_BASELINE",
+  "sourcePreflightRunId": 31763618325,
+  "sourcePreflightJobId": 94654901318,
   "sourcePreflightStatus": "SUCCESS",
   "forwardDeployBudget": 1,
   "hostdimeTouched": false,
