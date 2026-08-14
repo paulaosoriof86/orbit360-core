@@ -1,0 +1,104 @@
+name: Orbit360 Fase A Product Local Synthetic 20260814
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/workflows/orbit360-fase-a-product-local-synthetic-v20260814.yml'
+      - 'tools/orbit360-fase-a-product-local-synthetic-smoke-v20260814.mjs'
+      - 'tools/orbit360-fase-a-build-product-artifact-v20260813.mjs'
+      - 'tools/orbit360-fase-a-product-entrypoint-gate-v20260813.mjs'
+      - 'orbit360-platform/data/store-product-preauth-p0.js'
+      - 'orbit360-platform/core/product-app-p0.js'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: orbit360-fase-a-product-local-synthetic-v20260814
+  cancel-in-progress: false
+
+env:
+  ORBIT360_PRODUCT_PROJECT_ID: ays-orbit-360-lab
+  ORBIT360_PRODUCT_TENANT_ID: alianzas-soluciones
+  ORBIT360_PRODUCT_ARTIFACT: orbit360-artifacts/fase-a-product
+  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+
+jobs:
+  synthetic:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Gate and assemble before secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+          jq -e '.ok==true and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+          node --check tools/orbit360-fase-a-build-product-artifact-v20260813.mjs
+          node --check tools/orbit360-fase-a-product-entrypoint-gate-v20260813.mjs
+          node --check tools/orbit360-fase-a-product-local-synthetic-smoke-v20260814.mjs
+          node --check orbit360-platform/data/store-product-preauth-p0.js
+          node tools/orbit360-fase-a-build-product-artifact-v20260813.mjs
+          node tools/orbit360-fase-a-product-entrypoint-gate-v20260813.mjs
+          jq -e '.ok==true and .checks.preAuthStoreFailClosed==true and .checks.noForbiddenRuntime==true and .productionTouched==false' "$EVIDENCE_DIR/fase-a-product-entrypoint-source-v20260813.json" >/dev/null
+      - name: Install read-only synthetic runtime tools
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false --ignore-scripts firebase-admin@13 google-auth-library@9 playwright@1.52.0
+          npx playwright install --with-deps chromium
+      - name: Bind existing identity after gate
+        env:
+          SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+          SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          ORBIT360_EXISTING_LOGIN_PASSWORD: ${{ secrets.ORBIT360_LAB_LOGIN_PASSWORD }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-${SA_ORBIT_360_LAB:-${SA_DEFAULT:-}}}"
+          test -n "$SERVICE_ACCOUNT"
+          test ${#ORBIT360_EXISTING_LOGIN_PASSWORD} -ge 12
+          KEY_FILE="${RUNNER_TEMP}/orbit360-fase-a-synthetic.json"
+          printf '%s' "$SERVICE_ACCOUNT" > "$KEY_FILE"
+          chmod 600 "$KEY_FILE"
+          test "$(jq -r '.project_id // empty' "$KEY_FILE")" = "$ORBIT360_PRODUCT_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
+          echo "ORBIT360_TEMP_KEY_FILE=$KEY_FILE" >> "$GITHUB_ENV"
+          echo "ORBIT360_PRODUCT_SMOKE_PASSWORD=$ORBIT360_EXISTING_LOGIN_PASSWORD" >> "$GITHUB_ENV"
+      - name: Materialize public config and resolve read-only smoke identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-fase-a-materialize-product-runtime-config-v20260813.mjs
+          node tools/orbit360-m6-resolve-smoke-identity-readonly-v20260730.mjs
+          jq -e '.ok==true and .eligibleSmokeIdentityCount==1 and .firestoreWrites==0 and .operationalWrites==0' "$EVIDENCE_DIR/m6-product-smoke-identity-summary.json" >/dev/null
+      - name: Local synthetic browser login and hydration
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-fase-a-product-local-synthetic-smoke-v20260814.mjs
+          jq -e '.ok==true and .status=="FASE_A_PRODUCT_LOCAL_SYNTHETIC_PASS" and .deployExecuted==false and .productionTouched==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0' "$EVIDENCE_DIR/fase-a-product-local-synthetic-v20260814.json" >/dev/null
+      - name: Cleanup
+        if: always()
+        shell: bash
+        run: |
+          if [ -n "${ORBIT360_TEMP_KEY_FILE:-}" ] && [ -f "$ORBIT360_TEMP_KEY_FILE" ]; then shred -u "$ORBIT360_TEMP_KEY_FILE" || rm -f "$ORBIT360_TEMP_KEY_FILE"; fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: orbit360-fase-a-product-local-synthetic-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/fase-a-product-entrypoint-source-v20260813.json
+            orbit360-platform/runtime-gate-crm-v20260716/fase-a-product-local-synthetic-v20260814.json
+          retention-days: 14
