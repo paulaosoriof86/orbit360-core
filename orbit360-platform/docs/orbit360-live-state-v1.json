@@ -55,14 +55,24 @@
     "reason": "The target subdomain/document root and an authorized public SSH key are evidenced, but this execution has no private key, authenticated cPanel/SFTP/SSH connector, repository deployment workflow/tool, or accessible Actions-secret inventory. Publishing without authenticated remote backup/rollback would violate R4."
   },
   "lastEvidence": {
-    "stage": "R4_PREPUBLISH_ENVIRONMENT_PREFLIGHT",
-    "result": "BLOCKED_ENVIRONMENT_BEFORE_BACKUP_PUBLISH",
-    "sourceHead": "f180e4fa936acafd3d16bf56c2518e5f2ce428cd",
-    "packageShaVerified": true,
-    "backupExecuted": false,
-    "deployExecuted": false,
+    "workflow": "Orbit360 Continuidad Documental Source 20260814",
+    "runId": 31838423735,
+    "jobId": 94889832106,
+    "stage": "R4_DOCUMENTATION_SYNC",
+    "result": "FAIL_ONLY_LAST_EVIDENCE_RUN_FIELD_MISSING",
+    "sourceHead": "5abb825650fbb7437f90df667867b4258b179592",
+    "classification": "DATA_CONTRACT_FAILURE/R4_LIVE_STATE_LAST_EVIDENCE_RUN_MISSING",
+    "secretAccess": false,
+    "dataAccess": false,
+    "runtimeExecuted": false,
     "browserExecuted": false,
+    "deployExecuted": false,
     "productionTouched": false
+  },
+  "documentationCorrection": {
+    "classification": "DATA_CONTRACT_FAILURE/R4_LIVE_STATE_LAST_EVIDENCE_RUN_MISSING",
+    "status": "CORRECTED_NO_PRODUCT_IMPACT",
+    "validatorChanged": false
   },
   "classification": "ENVIRONMENT_FAILURE/HOSTDIME_DEPLOYMENT_CHANNEL_UNAVAILABLE",
   "closedNonBlockers": [
