@@ -27,6 +27,7 @@ env:
   ORBIT360_PRODUCT_TENANT_ID: alianzas-soluciones
   ORBIT360_PRODUCT_ARTIFACT: orbit360-artifacts/fase-a-product
   EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+  ORBIT360_R3_SOURCE_ONLY_ROOTFIX: 'true'
 
 jobs:
   synthetic:
