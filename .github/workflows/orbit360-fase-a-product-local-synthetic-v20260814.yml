@@ -27,6 +27,7 @@ env:
   ORBIT360_PRODUCT_TENANT_ID: alianzas-soluciones
   ORBIT360_PRODUCT_ARTIFACT: orbit360-artifacts/fase-a-product
   EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+  ORBIT360_R3_SOURCE_ONLY_ROOTFIX: 'true'
 
 jobs:
   synthetic:
@@ -58,15 +59,19 @@ jobs:
           node tools/orbit360-fase-a-build-product-artifact-v20260813.mjs
           node tools/orbit360-fase-a-r3-dynamic-package-v20260814.mjs sync
           jq -e '.ok==true and .status=="FASE_A_PRODUCT_R3_DYNAMIC_ASSETS_PASS" and (.dynamicMissing|length)==0 and (.knownMissing|length)==0 and (.tenantRefsMissing|length)==0 and (.parityFailures|length)==0 and (.forbiddenIncluded|length)==0 and .noLabRuntime==true and .secretAccess==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/fase-a-product-r3-dynamic-assets-v20260814.json" >/dev/null
+          test ! -e "$ORBIT360_PRODUCT_ARTIFACT/core/academia-static-content-write-policy-v20260729.js"
+          test ! -e "$ORBIT360_PRODUCT_ARTIFACT/data/academia-v1230-operational-directory-v20260722.js"
           node tools/orbit360-fase-a-product-entrypoint-gate-v20260813.mjs
           jq -e '.ok==true and .checks.preAuthStoreFailClosed==true and .checks.noForbiddenRuntime==true and .checks.noLabEntrypointRefs==true and .checks.productTenantBridge==true and .checks.productRouterBootstrap==true and .productionTouched==false' "$EVIDENCE_DIR/fase-a-product-entrypoint-source-v20260813.json" >/dev/null
       - name: Install read-only synthetic runtime tools
+        if: env.ORBIT360_R3_SOURCE_ONLY_ROOTFIX != 'true'
         shell: bash
         run: |
           set -euo pipefail
           npm install --no-save --package-lock=false --ignore-scripts firebase-admin@13 google-auth-library@9 playwright@1.52.0
           npx playwright install --with-deps chromium
       - name: Bind existing identity after gate
+        if: env.ORBIT360_R3_SOURCE_ONLY_ROOTFIX != 'true'
         env:
           SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
           SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
@@ -86,6 +91,7 @@ jobs:
           echo "ORBIT360_TEMP_KEY_FILE=$KEY_FILE" >> "$GITHUB_ENV"
           echo "ORBIT360_PRODUCT_SMOKE_PASSWORD=$ORBIT360_EXISTING_LOGIN_PASSWORD" >> "$GITHUB_ENV"
       - name: Materialize public config and resolve read-only smoke identity
+        if: env.ORBIT360_R3_SOURCE_ONLY_ROOTFIX != 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -93,12 +99,14 @@ jobs:
           node tools/orbit360-m6-resolve-smoke-identity-readonly-v20260730.mjs
           jq -e '.ok==true and .eligibleSmokeIdentityCount==1 and .firestoreWrites==0 and .operationalWrites==0' "$EVIDENCE_DIR/m6-product-smoke-identity-summary.json" >/dev/null
       - name: R3 second local tenant-context and router render proof
+        if: env.ORBIT360_R3_SOURCE_ONLY_ROOTFIX != 'true'
         shell: bash
         run: |
           set -euo pipefail
           node tools/orbit360-fase-a-product-render-proof-r3-v20260814.mjs
           jq -e '.ok==true and .status=="FASE_A_PRODUCT_RENDER_PROOF_R3_PASS" and .runtime.productApp.started==true and .runtime.productApp.routerStarted==true and .runtime.productApp.tenantContextReady==true and .runtime.tenantContext.ready==true and .runtime.tenantContext.writeAuthorized==false and .runtime.backendContext.mode=="product-readonly" and .runtime.backendContext.writeAuthorized==false and .runtime.routerState["data-orbit-tenant-insurer-config-active-v20260717"].ready==true and .runtime.routerState["data-orbit-tenant-insurer-config-active-v20260717"].status=="ready" and .runtime.store.ready==true and .runtime.store.status=="ready-read-only" and (.runtime.store.requiredMissing|length)==0 and (.runtime.store.requiredFailed|length)==0 and .runtime.clientes==430 and .runtime.aseguradoras==30 and .runtime.hostChildCount>0 and (.pageErrors|length)==0 and .deployExecuted==false and .productionTouched==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0' "$EVIDENCE_DIR/fase-a-product-render-proof-r3-v20260814.json" >/dev/null
       - name: Certify and package durable R3 artifact
+        if: env.ORBIT360_R3_SOURCE_ONLY_ROOTFIX != 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -134,7 +142,7 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
       - uses: actions/upload-artifact@v4
-        if: success()
+        if: success() && env.ORBIT360_R3_SOURCE_ONLY_ROOTFIX != 'true'
         with:
           name: orbit360-fase-a-product-r3-durable-${{ github.run_id }}
           path: |
