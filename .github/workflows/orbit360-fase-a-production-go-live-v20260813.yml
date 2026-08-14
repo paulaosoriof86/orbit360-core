@@ -27,7 +27,7 @@ env:
 
 jobs:
   source_preflight:
-    if: github.event.head_commit.message == 'fix: connect Fase A production go-live executor'
+    if: contains(github.event.head_commit.message, 'production executor workflow parseable')
     name: Source-only validation of the production executor
     runs-on: ubuntu-latest
     timeout-minutes: 8
@@ -80,7 +80,7 @@ jobs:
           retention-days: 14
 
   production_go_live:
-    if: github.event.head_commit.message == 'production: authorize Fase A go-live 20260813'
+    if: contains(github.event.head_commit.message, 'authorize Fase A go-live 20260813')
     name: Backup · single Hosting deploy · live browser · integrity · rollback
     runs-on: ubuntu-24.04
     timeout-minutes: 45
