@@ -1,6 +1,6 @@
 /* Orbit 360 · Product tenant runtime context bridge P0 · 2026-08-14
    Projects the authenticated membership tenant into the router's existing
-   runtime hook. No URL tenant, no tenantHint authority, no writes, no fallback. */
+   runtime hook. No URL-derived tenant authority, no writes, no fallback. */
 (function(){
   'use strict';
   window.Orbit=window.Orbit||{};
@@ -44,5 +44,5 @@
       var out=new Error(state.lastError);out.code=state.lastError;throw out;
     }
   }
-  window.Orbit.productTenantRuntimeContextP0=Object.freeze({VERSION:VERSION,install:install,status:status,resolveTenant:resolveTenant,writeAuthorized:false,noFallback:true,queryTenantAllowed:false,tenantHintAuthority:false});
+  window.Orbit.productTenantRuntimeContextP0=Object.freeze({VERSION:VERSION,install:install,status:status,resolveTenant:resolveTenant,writeAuthorized:false,noFallback:true,queryTenantAllowed:false});
 })();
