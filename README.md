@@ -15,15 +15,17 @@ Antes de diagnosticar, modificar, ejecutar runtime/browser/deploy o continuar un
 
 No usar memoria, README histórico, PENDIENTES o una conversación anterior como sustituto del live-state.
 
-## Estado vivo · R3 STOP_RETRY · 2026-08-14
+## Estado vivo · R3 post-causa-raíz source-only · 2026-08-14
 
 ```text
-stateVersion: 20260814.r3-stop-retry-transitive-lab-policy-root-cause.1
-fase: PRE_GOLIVE_R3_STOP_RETRY_SOURCE_ONLY_ROOT_CAUSE
+stateVersion objetivo: 20260814.r3-source-only-transitive-composition-pass.1
+previousStateVersion: 20260814.r3-stop-retry-transitive-lab-policy-root-cause.1
+fase: PRE_GOLIVE_R3_POST_ROOT_CAUSE_VALIDATION_AUTHORIZATION
 RC: RC-AYS-LAB-CANONICA-01
 baseline funcional preservado: 4ede3e785cb2cc889a7c11c2d9e2030c7af20b64
 último runtime HEAD: dc5822d2b6561460edbd36c29e58951666a1000a
-último run: 31834590862
+último source-only HEAD: fc281a6865f5b5ae75d01f9deb01b4da04baa305
+último source-only run: 31835646012
 PR #5: draft/open
 main/merge: no
 HostDime: no bloquea todavía
@@ -37,44 +39,73 @@ producción tocada: no
 - R2 required/optional: store `ready-read-only`, 7/7 required, 430 clientes, 30 aseguradoras.
 - Tenant-context productivo: PASS y cerrado.
 - Auth/membership: no son el bloqueo.
-- Router: renderiza `inicio` antes del pageerror.
+- Router: renderiza `inicio` antes del antiguo pageerror.
+- Causa raíz transitiva de Academia LAB-only: **CERRADA SOURCE-ONLY**.
 
-## STOP_RETRY vigente
+## Cierre source-only de causa raíz
 
-El run `31834590862` fue el **segundo fallo de la misma familia**:
+Run: `31835646012`  
+HEAD: `fc281a6865f5b5ae75d01f9deb01b4da04baa305`
 
-`PIPELINE_MECHANISM_FAILURE / PRODUCT_BOOTSTRAP_INCLUDES_LAB_ONLY_ACADEMIA_STATIC_CONTENT`
+El workflow estuvo congelado explícitamente en `ORBIT360_R3_SOURCE_ONLY_ROOTFIX=true`.
 
-No existe autorización para un tercer navegador de esa familia.
+Resultado:
 
-El intento directo de retirar `data/academia-v1230-operational-directory-v20260722.js` del bootstrap productivo sí funcionó: el bootstrap ya no lo solicita. Sin embargo, la clausura dinámica volvió a incluirlo.
+```text
+Gate/assemble/dynamic closure: PASS
+Install runtime tools: SKIPPED
+Secrets/identity: SKIPPED
+Browser/render: SKIPPED
+ZIP: SKIPPED
+secretAccess: false
+browserExecuted: false
+deployExecuted: false
+productionTouched: false
+```
 
-### Causa raíz exacta
+La clausura productiva quedó:
 
-`core/academia-static-content-write-policy-v20260729.js`:
+```text
+staticRootCount: 115
+dependencyClosureCount: 193
+dynamicDependencyCount: 78
+missing: 0
+dynamicMissing: 0
+knownMissing: 0
+tenantRefsMissing: 0
+parityFailures: 0
+forbiddenIncluded: 0
+semanticForbiddenIncluded: 0
+discoveredSemanticForbidden: 0
+noLabRuntime: true
+```
 
-- se declara explícitamente `LAB only`;
-- define `OPERATIONAL_OWNER_SRC='data/academia-v1230-operational-directory-v20260722.js?...'`;
-- llama globalmente `ensureOperationalDirectoryOwner()`;
-- permanece como root del artefacto productivo porque el gate actual identifica LAB principalmente por nombre/token y ese archivo no contiene `lab` en su ruta.
+Registro semántico incompatible con product-readonly:
 
-Resultado: el source-gate reportó PASS, pero la política LAB-only reinyectó el owner estático y volvió a producir `pageError: lecciones` contra el store productivo read-only. El store bloqueó correctamente la escritura; no debe modificarse para permitirla.
+- `core/academia-static-content-write-policy-v20260729.js`;
+- `data/academia-v1230-operational-directory-v20260722.js`.
 
-Clasificaciones vigentes:
+Ambos quedaron ausentes del artefacto y de la dependency closure. El entrypoint crítico continuó PASS, con DOM funcional, assets resueltos, product tenant bridge, product router bootstrap y store pre-auth fail-closed.
 
-- `VALIDATOR_STALE / PRODUCT_LAB_ONLY_STATIC_POLICY_NOT_REGISTERED`;
-- causa raíz de pipeline: `PIPELINE_MECHANISM_FAILURE / PRODUCT_TRANSITIVE_LAB_ONLY_STATIC_POLICY_INCLUDED`.
+Clasificaciones cerradas source-only:
 
-## Siguiente acción exacta · SOURCE-ONLY
+- `VALIDATOR_STALE / PRODUCT_LAB_ONLY_STATIC_POLICY_NOT_REGISTERED` → CLOSED;
+- `PIPELINE_MECHANISM_FAILURE / PRODUCT_TRANSITIVE_LAB_ONLY_STATIC_POLICY_INCLUDED` → CLOSED_SOURCE_ONLY.
 
-No ejecutar navegador, secrets, deploy, HostDime ni producción.
+## STOP_RETRY y siguiente frontera
 
-1. congelar runtime/producto;
-2. corregir únicamente composición del paquete + registro/validador source para que `core/academia-static-content-write-policy-v20260729.js` y `data/academia-v1230-operational-directory-v20260722.js` sean incompatibles con el artefacto productivo;
-3. ejecutar solo source-gate y clausura dinámica;
-4. exigir que ambos archivos estén ausentes del artefacto y de la clausura, manteniendo las referencias críticas de Fase A;
-5. detener después de esa evidencia source-only y volver a sincronizar documentación;
-6. cualquier navegador posterior requiere una nueva frontera explícitamente autorizada después del cierre de causa raíz; no se considera un tercer retry automático.
+El `STOP_RETRY` del antiguo browser family permanece registrado: no se autoriza un tercer retry automático de `PRODUCT_BOOTSTRAP_INCLUDES_LAB_ONLY_ACADEMIA_STATIC_CONTENT`.
+
+La causa raíz ya quedó corregida y validada source-only. Cualquier nuevo navegador debe ser una **frontera explícita de aceptación post-causa-raíz**, no una repetición automática del intento anterior.
+
+Siguiente acción exacta, solo después de autorización explícita:
+
+1. mantener congelados R1/R2/Auth/tenant-context/store/router;
+2. retirar únicamente el freeze `ORBIT360_R3_SOURCE_ONLY_ROOTFIX` del workflow existente;
+3. ejecutar una sola validación post-causa-raíz sobre la composición ya certificada;
+4. exigir tenant-context PASS, 7/7 required, 430/30, `inicio` renderizado, cero `pageErrors`, cero local HTTP failures y cero writes;
+5. solo con ese PASS, crear manifest + SHA256 + ZIP durable en el mismo run;
+6. cualquier nuevo fallo se clasifica por su familia real antes de otra acción; no reabrir la familia ya cerrada sin evidencia nueva.
 
 ## Porcentajes vigentes
 
@@ -82,12 +113,12 @@ No ejecutar navegador, secrets, deploy, HostDime ni producción.
 readiness funcional: 100%
 avance técnico global: 50%
 gates finales: 0/3
-R3: required PASS / tenant-context PASS / router inicio PASS / product-safe closure FAIL / ZIP pendiente
+R3 interno: required PASS / tenant-context PASS / router inicio PASS histórico / product-safe closure PASS SOURCE-ONLY / clean render pendiente / ZIP pendiente
 R3 PASS -> 75% técnico / 67% gates
 R4 PASS -> 100% / 100%
 ```
 
-Los porcentajes no suben por actividad parcial.
+Los porcentajes globales no suben por actividad parcial.
 
 ## Reglas anti-bucle
 
