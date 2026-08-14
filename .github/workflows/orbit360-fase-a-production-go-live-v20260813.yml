@@ -28,8 +28,8 @@ env:
 
 jobs:
   source_preflight:
-    if: contains(github.event.head_commit.message, 'harden go-live macro source-only')
-    name: Source-only validation of hardened production macro
+    if: contains(github.event.head_commit.message, 'bind current Fase A production baseline')
+    name: Source-only validation of current Fase A production macro
     runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:
@@ -41,7 +41,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Validate all production control-plane scripts
+      - name: Validate complete production control-plane source
         shell: bash
         run: |
           set -euo pipefail
@@ -49,37 +49,42 @@ jobs:
           git merge-base --is-ancestor "$ORBIT360_SOURCE_HEAD" HEAD
           node --check tools/orbit360-fase-a-production-request-resume-guard-v20260813.mjs
           node --check tools/orbit360-fase-a-hosting-release-helper-v20260813.mjs
+          node --check tools/orbit360-fase-a-product-data-snapshot-readonly-v20260813.mjs
+          node --check tools/orbit360-m6-resolve-smoke-identity-readonly-v20260730.mjs
+          node --check tools/orbit360-fase-a-product-browser-smoke-v20260813.mjs
           node --check tools/orbit360-fase-a-product-integrity-v20260813.mjs
           node --check tools/orbit360-fase-a-production-finalize-v20260813.mjs
-          node --check tools/orbit360-m6-product-data-snapshot-readonly-v20260730.mjs
-          node --check tools/orbit360-m6-resolve-smoke-identity-readonly-v20260730.mjs
-          node --check tools/orbit360-m6-product-browser-smoke-v20260730.mjs
       - name: Canonical source gate in isolated source context
         shell: bash
         run: |
           set -euo pipefail
           env -u ORBIT360_REQUEST_FILE ORBIT360_EXPECTED_REQUEST_VERSION=NONE_PENDING_FRESH_AUTHORIZATION node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
           jq -e '.status=="PASS_GATE_CONTRACT_SOURCE_FASE_A_OPS_LEADS_CRM" and .failed==0 and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false and .ok==true' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
-      - name: Validate exact deployable product artifact
+      - name: Validate exact current deployable artifact and stale-baseline removal
         shell: bash
         run: |
           set -euo pipefail
           test "$(jq -r '.hosting.public' firebase.product-go-live.json)" = "$ORBIT360_PRODUCT_ARTIFACT"
           for f in index.html product-runtime-config.js core/auth-product-runtime-p0.js core/backend-product-readonly-bootstrap-p0.js data/store-firestore-product-readonly-p0.js modules/cliente360.js modules/aseguradoras.js modules/ops.js modules/leads.js; do test -f "$ORBIT360_PRODUCT_ARTIFACT/$f"; done
           ! grep -Eqi 'backend-lab-|store-firestore-lab|__ORBIT_LAB_SAFE_MODE__|orbitBackend=firestore-lab' "$ORBIT360_PRODUCT_ARTIFACT/index.html"
+          grep -q 'clientes:430' tools/orbit360-fase-a-product-data-snapshot-readonly-v20260813.mjs
+          grep -q 'aseguradoras:30' tools/orbit360-fase-a-product-data-snapshot-readonly-v20260813.mjs
+          grep -q 'minimumMemberships:7' tools/orbit360-fase-a-product-data-snapshot-readonly-v20260813.mjs
+          grep -q 'clientes:430' tools/orbit360-fase-a-product-browser-smoke-v20260813.mjs
+          grep -q 'aseguradoras:30' tools/orbit360-fase-a-product-browser-smoke-v20260813.mjs
           mkdir -p "$EVIDENCE_DIR"
-          jq -n --arg source "$ORBIT360_SOURCE_HEAD" --arg head "$GITHUB_SHA" '{ok:true,status:"FASE_A_HARDENED_PRODUCTION_MACRO_SOURCE_PASS",sourceHead:$source,controlPlaneHead:$head,secretAccess:false,browserExecuted:false,deployExecuted:false,productionTouched:false}' > "$EVIDENCE_DIR/fase-a-production-macro-source-v20260813.json"
+          jq -n --arg source "$ORBIT360_SOURCE_HEAD" --arg head "$GITHUB_SHA" '{ok:true,status:"FASE_A_CURRENT_PRODUCTION_BASELINE_SOURCE_PASS",sourceHead:$source,controlPlaneHead:$head,currentOperationalBaseline:{clientes:430,aseguradoras:30,asesores:7,minimumMemberships:7},secretAccess:false,browserExecuted:false,deployExecuted:false,productionTouched:false}' > "$EVIDENCE_DIR/fase-a-production-macro-source-v20260813.json"
       - uses: actions/upload-artifact@v4
         with:
-          name: orbit360-fase-a-production-macro-source-${{ github.run_id }}
+          name: orbit360-fase-a-production-current-baseline-source-${{ github.run_id }}
           path: |
             orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
             orbit360-platform/runtime-gate-crm-v20260716/fase-a-production-macro-source-v20260813.json
           retention-days: 14
 
   production_go_live:
-    if: contains(github.event.head_commit.message, 'resume Fase A go-live after hardened guard')
-    name: Backup · single Hosting deploy · live browser · integrity · rollback
+    if: contains(github.event.head_commit.message, 'resume Fase A go-live after current baseline closure')
+    name: Backup · single Hosting deploy · current live browser · integrity · rollback
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     steps:
@@ -132,12 +137,16 @@ jobs:
           echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
           echo "ORBIT360_TEMP_KEY_FILE=$KEY_FILE" >> "$GITHUB_ENV"
           echo "ORBIT360_PRODUCT_SMOKE_PASSWORD=$ORBIT360_EXISTING_LOGIN_PASSWORD" >> "$GITHUB_ENV"
-      - name: Production readiness read-only
+      - name: Current production baseline snapshot read-only
         shell: bash
         run: |
           set -euo pipefail
-          node tools/orbit360-m6-product-data-snapshot-readonly-v20260730.mjs before
-          jq -e '.ok==true and .counts.clientes==414 and .counts.aseguradoras==26 and .counts.asesoresFuente==7 and .counts.memberships==1 and .counts.config==1 and .firestoreWrites==0 and .operationalWrites==0' "$EVIDENCE_DIR/m6-product-data-before.json" >/dev/null
+          node tools/orbit360-fase-a-product-data-snapshot-readonly-v20260813.mjs before
+          jq -e '.ok==true and .counts.clientes==430 and .counts.aseguradoras==30 and .counts.asesoresFuente==7 and .counts.memberships>=7 and .counts.config==1 and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0' "$EVIDENCE_DIR/fase-a-product-data-before-v20260813.json" >/dev/null
+      - name: Resolve one eligible existing smoke identity read-only
+        shell: bash
+        run: |
+          set -euo pipefail
           node tools/orbit360-m6-resolve-smoke-identity-readonly-v20260730.mjs
           jq -e '.ok==true and .eligibleSmokeIdentityCount==1 and .requiredRolesPresent==true and .firestoreWrites==0 and .operationalWrites==0' "$EVIDENCE_DIR/m6-product-smoke-identity-summary.json" >/dev/null
       - name: Backup current Hosting release
@@ -165,23 +174,23 @@ jobs:
           CODE=$?
           echo "exit_code=$CODE" >> "$GITHUB_OUTPUT"
           exit 0
-      - name: Execute real browser smoke in three role views
+      - name: Execute current real browser smoke in three role views
         id: browser
         if: steps.deploy.outputs.exit_code == '0' && steps.hosting_smoke.outputs.exit_code == '0'
         shell: bash
         run: |
           set +e
-          node tools/orbit360-m6-product-browser-smoke-v20260730.mjs
+          node tools/orbit360-fase-a-product-browser-smoke-v20260813.mjs
           CODE=$?
           echo "exit_code=$CODE" >> "$GITHUB_OUTPUT"
           exit 0
-      - name: Snapshot data after deploy
+      - name: Snapshot current data after deploy
         id: snapshot_after
         if: steps.deploy.outcome != 'skipped'
         shell: bash
         run: |
           set +e
-          node tools/orbit360-m6-product-data-snapshot-readonly-v20260730.mjs after
+          node tools/orbit360-fase-a-product-data-snapshot-readonly-v20260813.mjs after
           CODE=$?
           echo "exit_code=$CODE" >> "$GITHUB_OUTPUT"
           exit 0
@@ -223,12 +232,12 @@ jobs:
           name: orbit360-fase-a-production-go-live-${{ github.run_id }}
           path: |
             orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
-            orbit360-platform/runtime-gate-crm-v20260716/m6-product-data-before.json
+            orbit360-platform/runtime-gate-crm-v20260716/fase-a-product-data-before-v20260813.json
             orbit360-platform/runtime-gate-crm-v20260716/m6-product-smoke-identity-summary.json
             orbit360-platform/runtime-gate-crm-v20260716/fase-a-product-hosting-before-v20260813.json
             orbit360-platform/runtime-gate-crm-v20260716/fase-a-product-hosting-smoke-v20260813.json
-            orbit360-platform/runtime-gate-crm-v20260716/m6-product-browser-smoke-summary.json
-            orbit360-platform/runtime-gate-crm-v20260716/m6-product-data-after.json
+            orbit360-platform/runtime-gate-crm-v20260716/fase-a-product-browser-smoke-v20260813.json
+            orbit360-platform/runtime-gate-crm-v20260716/fase-a-product-data-after-v20260813.json
             orbit360-platform/runtime-gate-crm-v20260716/fase-a-product-integrity-v20260813.json
             orbit360-platform/runtime-gate-crm-v20260716/fase-a-product-hosting-rollback-v20260813.json
             orbit360-platform/runtime-gate-crm-v20260716/fase-a-production-go-live-final-v20260813.json
