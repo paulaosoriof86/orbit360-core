@@ -2,135 +2,96 @@
 
 Repositorio de Orbit 360.
 
-Fuentes operativas vigentes:
+## REANUDACIÓN OBLIGATORIA
 
-1. `orbit360-platform/docs/FUENTES-RECTORAS-VIGENTES-ORBIT360-AYS-20260730.md`;
-2. `orbit360-platform/docs/PLAN-UNICO-SALIDA-RC-AYS-LAB-CANONICA-01-20260804.md`;
-3. `orbit360-platform/docs/DECISION-RELEASE-EXCEPCION-CONTROLADA-2-CLIENTES-20260810.md`;
-4. `orbit360-platform/docs/CIERRE-BLOCK1-UNIVERSE-EXCEPCION-CONTROLADA-PASS-20260810.md`;
-5. `orbit360-platform/docs/CIERRE-ANTIBUCLE-MATRIZ-VISUAL-BLOCK1-RUN31502845695-20260811.md`;
-6. estado vivo del PR #5 + HEAD de `ays/backend-tenant-lab-v99-20260703`;
-7. lifecycle/evidencia sanitizada más reciente del gate activo.
+Antes de diagnosticar, modificar, ejecutar runtime/browser/deploy o continuar una conversación interrumpida, leer en este orden:
 
-RC activa: `RC-AYS-LAB-CANONICA-01`.
+1. `orbit360-platform/docs/orbit360-live-state-v1.json`;
+2. HEAD real de `ays/backend-tenant-lab-v99-20260703` y PR #5;
+3. último workflow/evidencia indicado por `lastEvidence` en el live-state;
+4. `orbit360-platform/docs/ADDENDUM-MAESTRO-CONTINUIDAD-SINCRONIZACION-ANTIBUCLE-GOLIVE-POSTPROD-20260814.md`;
+5. `orbit360-platform/docs/CORTE-FORENSE-ANTIBUCLE-GO-LIVE-20260814.md`;
+6. fuentes maestras/addenda históricos solo para reglas no sustituidas por evidencia posterior.
 
-## Estado rector actual
+No usar este README, CHANGELOG, PENDIENTES o memoria de otra conversación como sustituto del live-state.
+
+## Estado vivo · 2026-08-14
 
 ```text
-Bloque activo: Block 1 — Cliente 360 + Aseguradoras
-Gate único: block1-client360-insurers-lab-v20260717
-Contrato vivo: 1.0.41
-Universe release: PASS con 2 excepciones controladas de procedencia
-PASS_VISUAL_POST_AUTH: NO
-Último runtime visual: run 31502845695 · STOP_RETRY seguro
-Clasificación corregida: VALIDATOR_STALE / PIPELINE_MECHANISM_FAILURE
-Rootfix anti-bucle source-only: PASS
-Lifecycle: SOURCE_PASS_AWAITING_FRESH_EXCLUSIVE_REQUEST
-Producción/main/merge: NO autorizados
+stateVersion: 20260814.forensic-continuity.1
+fase: PRE_GOLIVE_RECOVERY
+RC: RC-AYS-LAB-CANONICA-01
+producto fuente certificado/auditado: 4ede3e785cb2cc889a7c11c2d9e2030c7af20b64
+PR #5: draft/open
+main/merge: no
+HostDime blocker actual: no
+paquete durable definitivo: todavía no
+producción tocada por último synthetic: no
 ```
 
-## Universe y datos
+Última evidencia relevante:
 
 ```text
-clientes raw: 430
-clientes baseline contractual: 414
-retained26 diferidos: 14
-excepciones controladas de procedencia: 2
-aseguradoras raw: 30
-aseguradoras efectivas: 26
-asesores: 7
-```
-
-Decisión gobernante:
-
-`RELEASE_UNIVERSE_ACCEPTED_WITH_2_CLIENT_PROVENANCE_EXCEPTIONS`
-
-Los dos clientes no se borran, ocultan, fusionan, reimportan ni modifican. Conservan sus relaciones. La procedencia pendiente es deuda post-go-live y no bloquea por sí sola la ruta productiva.
-
-## Último runtime visual · 2026-08-11
-
-```text
-run: 31502845695
-job: 93816961022
-resultado: STOP_RETRY
-safety backup: PASS
-baseline restore: PASS
-Hosting LAB deploys: 1
-precheck: PASS · INICIO_READY_PASS
-rollback: PASS
-snapshot: VERIFIED_UNCHANGED
-Firestore/Auth/operational writes: 0
-Functions/Rules: 0
-producción/main/merge: 0
-```
-
-El runner reportó inicialmente `FUNCTIONAL_DEFECT`, pero la investigación de causa raíz demostró tres familias del instrumento:
-
-1. el umbral de 30 s usaba latencia del canal Node/Playwright en vez del intervalo del observer dentro del navegador;
-2. el burger móvil se probaba antes de readiness del Router/Inicio;
-3. Cliente 360 detalle se ejercía escribiendo hash directamente y sin diagnóstico del owner Router/params/DOM.
-
-No se modificó producto ni datos para resolver esos hallazgos.
-
-## Rootfix anti-bucle source-only
-
-Owner de implementación:
-
-`tools/orbit360-block1-final-native-matrix-v20260811.mjs`
-
-Binding canónico:
-
-`tools/orbit360-block1-native-matrix-v23-canonical-v20260807.mjs`
-
-Fixture sintético:
-
-`tools/fixtures/orbit360-block1-visual-antibucle-fixture-v20260811.mjs`
-
-Owners vigentes:
-
-```text
-acceso: Orbit.access.can
-scope clientes: Orbit.access.filter/withScope
-rendimiento: browserObserverElapsedMs
-detalle Cliente 360: rendered-row-user-flow-plus-route-param-dom
-menú móvil: router-ready-before-burger
-overlay primera contraseña: test-harness-remove-only
-```
-
-Evidencia source:
-
-```text
-run 31505449540: PASS owner + fixture + gate source
-run 31505520202: PASS con runtime contract futuro alineado
-runtime/secrets/Firebase/Hosting/browser/writes: 0
+workflow: Orbit360 Fase A Product Local Synthetic 20260814
+run: 31773511066
+resultado: FAIL seguro fuera de producción
+etapa: login
+error visible: PRODUCT_APP_NOT_STARTED:PRODUCT_READONLY_BOOTSTRAP_NOT_READY
+clasificación inmediata: PIPELINE_MECHANISM_FAILURE / OBSERVABILITY_GAP
+writes: 0
+deploy: 0
 ```
 
 ## Siguiente acción exacta
 
-El request del run `31502845695` está consumido y no se reutiliza.
+Modificar únicamente:
 
-La siguiente ejecución runtime requiere autorización humana fresca y un único request nuevo, todavía inexistente:
+`tools/orbit360-fase-a-product-local-synthetic-smoke-v20260814.mjs`
 
-`.github/orbit360-requests/block1-final-visual-antibucle-v20260811-authorization.json`
+para conservar el último evento sanitizado `orbit:product-readonly-bootstrap` con `phase/ready/errors` y rutas fallidas/404 sanitizadas. Después ejecutar UNA sola vez el mismo synthetic local.
 
-Versión:
+No tocar en esta frontera:
 
-`20260811.block1-final-visual-antibucle`
+- producto funcional;
+- datos;
+- Auth/membership/store;
+- Rules/Functions;
+- HostDime;
+- producción;
+- main/merge.
 
-Será parent-bound, inmutable y one-shot; `GO_GATE_CONTRACT` antes de secretos; baseline `visual-matrix-corrected-backup-31135532118`; máximo un deploy Hosting LAB; Dirección desktop, Operativo tablet y Asesor móvil; snapshot final idéntico; cero escrituras; rollback ante cualquier STOP.
+## Ruta de salida vigente
 
-Si reaparece la misma familia, `STOP_RETRY` inmediato: no se crea otro request ni otro parche.
+```text
+R1 observabilidad + un synthetic
+→ R2 un único rootfix solo si R1 demuestra owner
+→ R3 paquete durable + manifest + hashes
+→ R4 HostDime + app.aysseguros.com + smoke E2E productivo
+→ R5 habilitación operativa + delta controlado
+→ R6 módulos postproducción incrementales
+→ R7 gate de reutilización para siguiente tenant
+```
 
-Solo con `PASS_VISUAL_POST_AUTH` se cierra Block 1 y se pasa al barrido focal de blockers Cobros/Pólizas.
+Presupuesto:
 
-## Cierres que no se reabren
+```text
+mejor caso: 3 iteraciones técnicas hasta go-live validado
+caso con un rootfix demostrado: 4 iteraciones técnicas
+quinta iteración de la misma familia: prohibida
+```
 
-- Auth/membership/multirol salvo regresión demostrada;
-- Pólizas write PASS histórico;
-- Vehículos write PASS histórico;
-- Recibos/cartera write PASS histórico;
-- reconciliación retained26;
-- universe con excepción controlada;
-- IAM diagnostics v34–v37.
+## Reglas anti-bucle
 
-No ejecutar producción, main, merge, Functions, Rules o reimportación sin autorización explícita y gate correspondiente.
+- una sola frontera larga por iteración;
+- checkpoint durable antes de runtime/browser/deploy;
+- al terminar la frontera: detener, leer, clasificar y sincronizar;
+- si una familia falla dos veces: `STOP_RETRY`;
+- no buscar paquetes antiguos: el durable se construye desde el source certificado;
+- HostDime no vuelve a ser diagnóstico previo a R3;
+- no reabrir módulos cerrados sin evidencia nueva reproducible;
+- producción no se usa para depurar validators;
+- cada cambio de estado sincroniza `live-state` + PR #5 + README + checkpoint y, cuando corresponda, CHANGELOG/bitácora/Plan/E2E.
+
+## Fuentes rectoras de negocio/arquitectura
+
+Continúan vigentes, en su orden de precedencia histórica, el Documento Maestro Consolidado, los addenda de Academia, patrones reutilizables, continuidad/importadores, Plan Maestro Productivo, control de causa raíz/gates y aceleración productiva. Para el estado operativo actual prevalecen live-state + PR/HEAD + evidencia reciente conforme al addendum del 14 de agosto de 2026.
