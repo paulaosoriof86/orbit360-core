@@ -16,6 +16,10 @@ const LEGACY_ROUTER_TENANT_BOOTSTRAP='core/router-tenant-config-bootstrap.js';
 const PRODUCT_ROUTER_TENANT_BOOTSTRAP='core/router-tenant-config-product-bootstrap-p0.js';
 const HYDRATION_SOURCE='orbit360-platform/core/visual-runtime-hydration-contract-v20260805.js';
 const MATERIALIZER_SOURCE='tools/orbit360-fase-a-materialize-product-runtime-config-v20260813.mjs';
+const PRODUCT_INCOMPATIBLE_EXACT=[
+ 'core/academia-static-content-write-policy-v20260729.js',
+ 'data/academia-v1230-operational-directory-v20260722.js'
+];
 const REQUIRED_RUNTIME=[
  'product-runtime-config.js',
  'core/membership-multirol-contract-p0.js',
@@ -35,7 +39,7 @@ const REQUIRED_RUNTIME=[
  TENANT_CONTEXT_BRIDGE
 ];
 const BLOCKED_CONTENT_RE=/(__ORBIT_LAB_SAFE_MODE__|orbitBackend=firestore-lab)/i;
-const BLOCKED_EXACT=new Set(['data/store.js','data/seed.js','core/auth.js','core/user-credential-selfservice-v20260805.js','core/auth-password-change-v20260805.js',LEGACY_ROUTER_TENANT_BOOTSTRAP]);
+const BLOCKED_EXACT=new Set(['data/store.js','data/seed.js','core/auth.js','core/user-credential-selfservice-v20260805.js','core/auth-password-change-v20260805.js',LEGACY_ROUTER_TENANT_BOOTSTRAP].concat(PRODUCT_INCOMPATIBLE_EXACT));
 function stripQuery(v){return String(v||'').split('?')[0].split('#')[0].replace(/^\/+/, '');}
 function isExternal(v){return /^(?:https?:)?\/\//i.test(v)||/^(?:data:|mailto:|#)/i.test(v);}
 function hasLabToken(rel){return stripQuery(rel).split('/').some(seg=>/(^|[-_.])lab([-_.]|$)/i.test(seg));}
@@ -103,6 +107,7 @@ const initRe=/<script>\s*Orbit\.store\.init\(Orbit\.SEED\);\s*Orbit\.router\.ini
 if(!initRe.test(html))throw new Error('CANONICAL_INIT_SEQUENCE_NOT_FOUND');
 html=html.replace(initRe,'<script src="core/product-app-p0.js?v=20260814-product-entrypoint-r3"></script>\n  <script>\n    Orbit.productAppP0.init();');
 if(BLOCKED_CONTENT_RE.test(html)||/data\/store\.js(?:\?|["'])|data\/seed\.js|core\/auth\.js(?:\?|["'])/i.test(html))throw new Error('PRODUCT_INDEX_BLOCKED_RUNTIME_REMAINED');
+if(PRODUCT_INCOMPATIBLE_EXACT.some(function(rel){return html.includes(rel);}))throw new Error('PRODUCT_INDEX_SEMANTIC_LAB_ONLY_RUNTIME_REMAINED');
 if(html.includes(LEGACY_ROUTER_TENANT_BOOTSTRAP)||!html.includes(PRODUCT_ROUTER_TENANT_BOOTSTRAP))throw new Error('PRODUCT_ROUTER_TENANT_BOOTSTRAP_REPLACEMENT_FAILED');
 if(!html.includes(PREAUTH_STORE))throw new Error('PRODUCT_PREAUTH_STORE_NOT_BOUND');
 if(!html.includes(HYDRATION_OWNER))throw new Error('PRODUCT_HYDRATION_OWNER_NOT_BOUND');
@@ -117,8 +122,9 @@ const refs=[];html.replace(/<(?:script|link)\b[^>]*(?:src|href)=(['"])([^'"]+)\1
 const labRefs=refs.map(stripQuery).filter(hasLabToken);if(labRefs.length)throw new Error('PRODUCT_ENTRYPOINT_LAB_REF:'+labRefs.join(','));
 for(const ref of refs)copyMissing(ref);
 removeBlockedFiles(ARTIFACT);
+for(const rel of PRODUCT_INCOMPATIBLE_EXACT){if(fs.existsSync(path.join(ARTIFACT,rel)))throw new Error('PRODUCT_ARTIFACT_SEMANTIC_LAB_ONLY_RUNTIME_REMAINED:'+rel);}
 ensureDir(OUT);fs.writeFileSync(OUT,html,'utf8');
 const productBootstrapOut=path.join(ARTIFACT,PRODUCT_ROUTER_TENANT_BOOTSTRAP);if(!fs.existsSync(productBootstrapOut))throw new Error('PRODUCT_ROUTER_TENANT_BOOTSTRAP_NOT_COPIED');
 if(!fs.readFileSync(path.join(ROOT,'orbit360-platform',PRODUCT_ROUTER_TENANT_BOOTSTRAP)).equals(fs.readFileSync(productBootstrapOut)))throw new Error('PRODUCT_ROUTER_TENANT_BOOTSTRAP_PARITY_FAIL');
-const result={ok:true,status:'FASE_A_PRODUCT_ARTIFACT_ASSEMBLED',source:'orbit360-platform/index.html',output:'orbit360-artifacts/fase-a-product/index.html',functionalEntrypoint:true,loginForm:true,productRuntimeBound:true,preAuthStoreBound:true,canonicalHydrationContractBound:true,productHydrationOwnerBound:true,productTenantContextBridgeBound:true,productRouterTenantBootstrapBound:true,legacyRouterTenantBootstrapRemoved:true,deterministicCleanBuild:true,runtimeSourceSynced:true,runtimeSourceParity:true,localStorageFallbackRemoved:true,labRuntimeRemoved:true,seedRemoved:true,genericAuthRemoved:true,writeAuthorized:false,productionTouched:false};
+const result={ok:true,status:'FASE_A_PRODUCT_ARTIFACT_ASSEMBLED',source:'orbit360-platform/index.html',output:'orbit360-artifacts/fase-a-product/index.html',functionalEntrypoint:true,loginForm:true,productRuntimeBound:true,preAuthStoreBound:true,canonicalHydrationContractBound:true,productHydrationOwnerBound:true,productTenantContextBridgeBound:true,productRouterTenantBootstrapBound:true,legacyRouterTenantBootstrapRemoved:true,semanticLabOnlyRuntimeRemoved:true,productIncompatibleExact:PRODUCT_INCOMPATIBLE_EXACT,deterministicCleanBuild:true,runtimeSourceSynced:true,runtimeSourceParity:true,localStorageFallbackRemoved:true,labRuntimeRemoved:true,seedRemoved:true,genericAuthRemoved:true,writeAuthorized:false,productionTouched:false};
 console.log(JSON.stringify(result,null,2));
