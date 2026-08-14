@@ -73,11 +73,64 @@ El padre transitivo identificado es `core/academia-static-content-write-policy-v
 
 Por tanto, el source-gate anterior fue insuficiente para semántica LAB-only aunque sus checks sintácticos pasaran.
 
-Clasificación vigente:
+Clasificación vigente en ese punto:
 
 - `VALIDATOR_STALE / PRODUCT_LAB_ONLY_STATIC_POLICY_NOT_REGISTERED`;
 - causa raíz pipeline: `PIPELINE_MECHANISM_FAILURE / PRODUCT_TRANSITIVE_LAB_ONLY_STATIC_POLICY_INCLUDED`.
 
-### Acción siguiente
+## Run 31835518503 · control negativo source-only
 
-Solo source-only. Congelar runtime y corregir composición + registro/validador para prohibir tanto la policy LAB-only como su owner transitivo. Exigir ausencia de ambos en artefacto y clausura dinámica manteniendo Fase A crítica. Detener después de esa evidencia y sincronizar. Cualquier navegador posterior requiere una nueva frontera explícitamente autorizada post-causa-raíz; no tercer retry automático.
+HEAD: `8c061f999263983145326f8d55c323b06160d9e9`.
+
+Se congeló el workflow existente con `ORBIT360_R3_SOURCE_ONLY_ROOTFIX=true` y se agregaron assertions exactas para ambos archivos incompatibles.
+
+Resultado:
+
+- source gate: FAIL esperado;
+- runtime tools: skipped;
+- secrets/identity: skipped;
+- browser: skipped;
+- ZIP: skipped.
+
+Este FAIL confirmó que el validador corregido ya no aceptaba el artefacto contaminado.
+
+## Run 31835646012 · cierre source-only
+
+HEAD: `fc281a6865f5b5ae75d01f9deb01b4da04baa305`.
+
+Cambios de causa raíz:
+
+- builder: registro `PRODUCT_INCOMPATIBLE_EXACT` para la policy LAB-only y su owner;
+- composición: ambos archivos se eliminan/bloquean por nombre exacto además de la detección por token;
+- dynamic closure: ambos archivos se registran como semánticamente prohibidos y el gate falla si aparecen en artefacto o dependency closure;
+- workflow: permanece source-only, sin acceso a secretos ni navegador.
+
+Evidencia:
+
+- gate contractual source PASS;
+- build PASS;
+- entrypoint source PASS;
+- dynamic closure PASS;
+- staticRootCount=115;
+- dependencyClosureCount=193;
+- dynamicDependencyCount=78;
+- missing=0;
+- dynamicMissing=0;
+- knownMissing=0;
+- tenantRefsMissing=0;
+- parityFailures=0;
+- forbiddenIncluded=0;
+- semanticForbiddenIncluded=0;
+- discoveredSemanticForbidden=0;
+- noLabRuntime=true;
+- secretAccess=false;
+- browserExecuted=false;
+- deployExecuted=false;
+- productionTouched=false.
+
+### Cierre source-only
+
+- `VALIDATOR_STALE / PRODUCT_LAB_ONLY_STATIC_POLICY_NOT_REGISTERED` → CLOSED.
+- `PIPELINE_MECHANISM_FAILURE / PRODUCT_TRANSITIVE_LAB_ONLY_STATIC_POLICY_INCLUDED` → CLOSED_SOURCE_ONLY.
+
+La próxima ejecución de navegador, si se autoriza, será una frontera nueva de aceptación post-causa-raíz y no un tercer retry automático. Solo con clean render PASS se podrá generar manifest + SHA256 + ZIP durable.
