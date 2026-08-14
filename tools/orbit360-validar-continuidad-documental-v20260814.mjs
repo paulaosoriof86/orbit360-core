@@ -49,8 +49,17 @@ try {
   check('PRODUCT_SOURCE_HEAD_FORMAT', /^[0-9a-f]{40}$/i.test(String(live.productSourceHead || '')), live.productSourceHead);
   check('LAST_EVIDENCE_RUN', Number(live?.lastEvidence?.runId) > 0, live?.lastEvidence?.runId);
   check('NEXT_ACTION_EXACT', typeof live?.nextActionExact?.action === 'string' && live.nextActionExact.action.length >= 20);
-  check('ITERATION_LIMIT', live?.iterationBudget?.fifthSameFamilyIterationAllowed === false);
-  check('STOP_RETRY_LIMIT', Number(live?.iterationBudget?.sameFamilyFailureLimit) === 2);
+
+  const sameFamilyFailureLimit = Number(live?.iterationBudget?.sameFamilyFailureLimit);
+  const explicitNoThirdAttempt = live?.iterationBudget?.thirdSameFamilyAttemptAllowed === false;
+  const legacyNoFifthIteration = live?.iterationBudget?.fifthSameFamilyIterationAllowed === false;
+  check(
+    'ITERATION_LIMIT',
+    sameFamilyFailureLimit === 2 && (explicitNoThirdAttempt || legacyNoFifthIteration),
+    explicitNoThirdAttempt ? 'thirdSameFamilyAttemptAllowed=false' : legacyNoFifthIteration ? 'legacy fifthSameFamilyIterationAllowed=false' : ''
+  );
+  check('STOP_RETRY_LIMIT', sameFamilyFailureLimit === 2, sameFamilyFailureLimit);
+
   check('README_POINTS_LIVE', readme.includes('orbit360-live-state-v1.json'));
   check('README_STATE_VERSION', readme.includes(String(live.stateVersion || '')));
   check('ADDENDUM_POINTS_LIVE', addendum.includes('orbit360-live-state-v1.json'));
