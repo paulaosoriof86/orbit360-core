@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "orbit360-fase-a-production-resume-v1",
+  "createdAt": "2026-08-13T20:15:00-06:00",
+  "requestCommit": "d3749ec9abd14f24fb3972c0a33c600d86f18105",
+  "failedRunId": 31762808073,
+  "failedJobId": 94652520953,
+  "previousDeployCount": 0,
+  "productionTouched": false,
+  "classification": "VALIDATOR_STALE",
+  "failedCheck": "CANONICAL_PREFLIGHT_ENTRYPOINT",
+  "error": "SOURCE_PHASE_REQUEST_MUST_BE_ABSENT",
+  "rootCause": "SOURCE_PHASE_REQUEST_CONTEXT_LEAK",
+  "fix": "UNSET_ORBIT360_REQUEST_FILE_ONLY_WHILE_RUNNING_SOURCE_PHASE_GATE",
+  "requestReused": true,
+  "newRequestCreated": false,
+  "resumeAllowed": true,
+  "secondForwardDeployAllowed": false,
+  "hostdimeTouched": false,
+  "mainTouched": false,
+  "mergeExecuted": false
+}
