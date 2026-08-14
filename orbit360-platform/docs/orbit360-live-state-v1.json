@@ -1,0 +1,74 @@
+{
+  "schemaVersion": "orbit360-live-state-v1",
+  "stateVersion": "20260814.forensic-continuity.1",
+  "updatedAt": "2026-08-14T09:50:00-06:00",
+  "phase": "PRE_GOLIVE_RECOVERY",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pr": 5,
+  "prState": "draft-open",
+  "productSourceHead": "4ede3e785cb2cc889a7c11c2d9e2030c7af20b64",
+  "controlPlaneParentHead": "135b1c51f29b8d341d27d448679ca7f571fc1d93",
+  "releaseCandidate": "RC-AYS-LAB-CANONICA-01",
+  "lastEvidence": {
+    "workflow": "Orbit360 Fase A Product Local Synthetic 20260814",
+    "runId": 31773511066,
+    "sourceHead": "4ede3e785cb2cc889a7c11c2d9e2030c7af20b64",
+    "result": "FAIL_SAFE_OUTSIDE_PRODUCTION",
+    "failureStage": "login",
+    "firstVisibleError": "PRODUCT_APP_NOT_STARTED:PRODUCT_READONLY_BOOTSTRAP_NOT_READY"
+  },
+  "classification": "PIPELINE_MECHANISM_FAILURE/OBSERVABILITY_GAP",
+  "blocker": "The product read-only bootstrap returns not-ready after authenticated login, but the synthetic harness currently collapses the internal sanitized bootstrap phase/errors into a generic Product App error.",
+  "closedNonBlockers": [
+    "HostDime is not a package-construction blocker",
+    "Do not search for an older production package",
+    "Do not reimport Clientes/Aseguradoras for bootstrap/login/routing/cache/gate defects",
+    "Do not reopen Block 1 or previously closed modules without new reproducible evidence",
+    "Do not use production to debug validators"
+  ],
+  "artifactState": {
+    "versionedDirectoryExists": true,
+    "versionedEntrypointIsHistoricalFailClosed": true,
+    "functionalRunnerArtifactIsEphemeral": true,
+    "durableProductionZipReady": false,
+    "decision": "BUILD_DURABLE_PACKAGE_FROM_CERTIFIED_SOURCE_AFTER_SYNTHETIC_PASS"
+  },
+  "nextActionExact": {
+    "owner": "tools/orbit360-fase-a-product-local-synthetic-smoke-v20260814.mjs",
+    "action": "Modify only the synthetic harness to capture the last sanitized orbit:product-readonly-bootstrap event including phase/ready/errors and sanitized failed-request or 404 paths, then execute the same local synthetic workflow exactly once.",
+    "productChangesAuthorized": false,
+    "dataChangesAuthorized": false,
+    "hostdimeWorkAuthorized": false,
+    "deployAuthorized": false
+  },
+  "goLiveRoute": [
+    "R1_OBSERVABILITY_ONE_SYNTHETIC",
+    "R2_SINGLE_ROOTFIX_ONLY_IF_DEMONSTRATED",
+    "R3_DURABLE_PACKAGE_MANIFEST_HASHES",
+    "R4_HOSTDIME_PUBLISH_AND_POST_GOLIVE_E2E",
+    "R5_OPERATIONAL_ENABLEMENT_AND_CONTROLLED_DELTA",
+    "R6_INCREMENTAL_POSTPRODUCTION_MODULES",
+    "R7_SECOND_TENANT_REUSABILITY_GATE"
+  ],
+  "iterationBudget": {
+    "r0GovernanceCompletedByAdoption": true,
+    "bestCaseTechnicalIterationsToValidatedGoLive": 3,
+    "maxPlannedTechnicalIterationsWithOneDemonstratedRootfix": 4,
+    "fifthSameFamilyIterationAllowed": false,
+    "sameFamilyFailureLimit": 2
+  },
+  "hostdimeBlocking": false,
+  "productionTouchedByLastEvidence": false,
+  "writeAuthorization": "NONE_FOR_CURRENT_RECOVERY",
+  "resumeProtocol": [
+    "Read this file first",
+    "Confirm real branch HEAD and PR #5",
+    "Read exactly lastEvidence.runId",
+    "Confirm nextActionExact remains valid",
+    "Execute only that frontier; do not rediagnose closed issues",
+    "After the frontier, stop and synchronize live-state, PR, README and checkpoint before another long execution"
+  ],
+  "governanceDocument": "orbit360-platform/docs/ADDENDUM-MAESTRO-CONTINUIDAD-SINCRONIZACION-ANTIBUCLE-GOLIVE-POSTPROD-20260814.md",
+  "forensicCheckpoint": "orbit360-platform/docs/CORTE-FORENSE-ANTIBUCLE-GO-LIVE-20260814.md"
+}
