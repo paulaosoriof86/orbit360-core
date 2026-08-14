@@ -1,5 +1,7 @@
 # CHANGELOG R1 — GO-LIVE 2026-08-14
 
+Estado: cierre durable de la iteración R1. El estado operativo vigente continúa en `orbit360-platform/docs/orbit360-live-state-v1.json`.
+
 ## R1 · Observabilidad productiva y clasificación de causa raíz
 
 ### Changed
