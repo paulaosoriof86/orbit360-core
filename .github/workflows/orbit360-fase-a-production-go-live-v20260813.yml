@@ -1,0 +1,310 @@
+name: Orbit360 Fase A Production Go Live 20260813
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/workflows/orbit360-fase-a-production-go-live-v20260813.yml'
+      - '.github/orbit360-requests/fase-a-go-live-production-20260812-authorization.json'
+
+permissions:
+  contents: read
+  statuses: write
+
+concurrency:
+  group: orbit360-fase-a-production-go-live-v20260813
+  cancel-in-progress: false
+
+env:
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  ORBIT360_SOURCE_HEAD: 3a61564d102e45a871b249ae96f93c3836906f1d
+  ORBIT360_REQUEST_FILE: .github/orbit360-requests/fase-a-go-live-production-20260812-authorization.json
+  ORBIT360_PRODUCT_PROJECT_ID: ays-orbit-360-lab
+  ORBIT360_PRODUCT_TENANT_ID: alianzas-soluciones
+  ORBIT360_PRODUCT_URL: https://ays-orbit-360-lab.web.app
+  ORBIT360_PRODUCT_ARTIFACT: orbit360-artifacts/fase-a-product
+  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+
+jobs:
+  source_preflight:
+    if: github.event.head_commit.message == 'fix: connect Fase A production go-live executor'
+    name: Source-only validation of the production executor
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate control-plane syntax and source ancestry
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
+          git merge-base --is-ancestor "$ORBIT360_SOURCE_HEAD" HEAD
+          node --check tools/orbit360-fase-a-hosting-release-helper-v20260813.mjs
+          node --check tools/orbit360-m6-product-data-snapshot-readonly-v20260730.mjs
+          node --check tools/orbit360-m6-resolve-smoke-identity-readonly-v20260730.mjs
+          node --check tools/orbit360-m6-product-browser-smoke-v20260730.mjs
+      - name: Canonical Fase A gate before runtime capabilities
+        shell: bash
+        run: |
+          set -euo pipefail
+          ORBIT360_EXPECTED_REQUEST_VERSION=NONE_PENDING_FRESH_AUTHORIZATION node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+          jq -e '.status=="PASS_GATE_CONTRACT_SOURCE_FASE_A_OPS_LEADS_CRM" and .failed==0 and .executionAuthorized==false and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false and .ok==true' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+      - name: Validate deployable product artifact without secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(jq -r '.hosting.public' firebase.product-go-live.json)" = "$ORBIT360_PRODUCT_ARTIFACT"
+          for f in index.html product-runtime-config.js core/auth-product-runtime-p0.js core/backend-product-readonly-bootstrap-p0.js data/store-firestore-product-readonly-p0.js modules/cliente360.js modules/aseguradoras.js modules/ops.js modules/leads.js; do test -f "$ORBIT360_PRODUCT_ARTIFACT/$f"; done
+          ! grep -Eqi 'backend-lab-|store-firestore-lab|__ORBIT_LAB_SAFE_MODE__|orbitBackend=firestore-lab' "$ORBIT360_PRODUCT_ARTIFACT/index.html"
+          node - <<'NODE'
+          const fs=require('fs'),crypto=require('crypto'),p='orbit360-artifacts/fase-a-product/index.html';
+          const h=crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex');
+          const out={ok:true,status:'FASE_A_PRODUCTION_EXECUTOR_SOURCE_READY',sourceHead:process.env.ORBIT360_SOURCE_HEAD,executorHead:process.env.GITHUB_SHA,artifact:'orbit360-artifacts/fase-a-product',indexSha256:h,requestPresent:fs.existsSync(process.env.ORBIT360_REQUEST_FILE),secretAccess:false,browserExecuted:false,deployExecuted:false,productionTouched:false};
+          fs.mkdirSync('orbit360-platform/runtime-gate-crm-v20260716',{recursive:true});fs.writeFileSync('orbit360-platform/runtime-gate-crm-v20260716/fase-a-production-executor-source-v20260813.json',JSON.stringify(out,null,2)+'\n');
+          if(out.requestPresent)process.exit(41);
+          NODE
+      - name: Upload sanitized executor evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-fase-a-production-executor-source-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/fase-a-production-executor-source-v20260813.json
+          retention-days: 14
+
+  production_go_live:
+    if: github.event.head_commit.message == 'production: authorize Fase A go-live 20260813'
+    name: Backup · single Hosting deploy · live browser · integrity · rollback
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify immutable one-shot request before secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          test -f "$ORBIT360_REQUEST_FILE"
+          mapfile -t CHANGED < <(git diff --name-only HEAD^ HEAD)
+          test "${#CHANGED[@]}" = '1'
+          test "${CHANGED[0]}" = "$ORBIT360_REQUEST_FILE"
+          node - <<'NODE'
+          const fs=require('fs'),cp=require('child_process');
+          const r=JSON.parse(fs.readFileSync(process.env.ORBIT360_REQUEST_FILE,'utf8'));
+          const parent=cp.execFileSync('git',['rev-parse','HEAD^'],{encoding:'utf8'}).trim();
+          const source=process.env.ORBIT360_SOURCE_HEAD,bad=[];
+          if(r.schemaVersion!=='orbit360-fase-a-production-go-live-request-v1')bad.push('schema');
+          if(r.branch!==process.env.ORBIT360_BRANCH||r.sourceHead!==source||r.controlPlaneHead!==parent)bad.push('binding');
+          if(r.approved!==true||r.authorizedByUser!==true||r.allowedExecutions!==1||r.consumed!==false||r.authorizationFrozen!==false||r.replayAllowed!==false)bad.push('authorization');
+          if(r.hostingDeployAuthorized!==true||r.browserAuthorized!==true||r.rollbackAuthorized!==true||r.productionAuthorized!==true)bad.push('capabilities');
+          if(r.firestoreWritesAuthorized!==0||r.authWritesAuthorized!==0||r.operationalWritesAuthorized!==0||r.reimportAuthorized!==false||r.functionsDeployAuthorized!==false||r.rulesDeployAuthorized!==false||r.mainAuthorized!==false||r.mergeAuthorized!==false||r.hostdimeRequired!==false)bad.push('scope');
+          if(r.target?.projectId!==process.env.ORBIT360_PRODUCT_PROJECT_ID||r.target?.tenantId!==process.env.ORBIT360_PRODUCT_TENANT_ID||r.target?.liveUrl!==process.env.ORBIT360_PRODUCT_URL||r.target?.artifact!==process.env.ORBIT360_PRODUCT_ARTIFACT)bad.push('target');
+          if(bad.length)throw new Error('PRODUCTION_REQUEST_INVALID:'+bad.join(','));
+          NODE
+          git merge-base --is-ancestor "$ORBIT360_SOURCE_HEAD" HEAD^
+
+      - name: Canonical Fase A gate before secrets and deploy
+        shell: bash
+        run: |
+          set -euo pipefail
+          ORBIT360_EXPECTED_REQUEST_VERSION=NONE_PENDING_FRESH_AUTHORIZATION node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+          jq -e '.status=="PASS_GATE_CONTRACT_SOURCE_FASE_A_OPS_LEADS_CRM" and .failed==0 and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false and .ok==true' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+          test "$(jq -r '.hosting.public' firebase.product-go-live.json)" = "$ORBIT360_PRODUCT_ARTIFACT"
+          ! grep -Eqi 'backend-lab-|store-firestore-lab|__ORBIT_LAB_SAFE_MODE__|orbitBackend=firestore-lab' "$ORBIT360_PRODUCT_ARTIFACT/index.html"
+
+      - name: Install runtime tools after canonical preflight
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --global firebase-tools@latest
+          npm install --no-save --package-lock=false --ignore-scripts firebase-admin@13 google-auth-library@9 playwright@1.52.0
+          npx playwright install --with-deps chromium
+
+      - name: Resolve existing production identity and smoke secret
+        env:
+          SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+          SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          ORBIT360_EXISTING_LOGIN_PASSWORD: ${{ secrets.ORBIT360_LAB_LOGIN_PASSWORD }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-${SA_ORBIT_360_LAB:-${SA_DEFAULT:-}}}"
+          test -n "$SERVICE_ACCOUNT"
+          test ${#ORBIT360_EXISTING_LOGIN_PASSWORD} -ge 12
+          KEY_FILE="${RUNNER_TEMP}/orbit360-fase-a-product.json"
+          printf '%s' "$SERVICE_ACCOUNT" > "$KEY_FILE"
+          chmod 600 "$KEY_FILE"
+          test "$(jq -r '.project_id // empty' "$KEY_FILE")" = "$ORBIT360_PRODUCT_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
+          echo "ORBIT360_TEMP_KEY_FILE=$KEY_FILE" >> "$GITHUB_ENV"
+          echo "ORBIT360_PRODUCT_SMOKE_PASSWORD=$ORBIT360_EXISTING_LOGIN_PASSWORD" >> "$GITHUB_ENV"
+
+      - name: Production readiness read-only and smoke identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-m6-product-data-snapshot-readonly-v20260730.mjs before
+          jq -e '.ok==true and .counts.clientes==414 and .counts.aseguradoras==26 and .counts.asesoresFuente==7 and .counts.memberships==1 and .counts.config==1 and .firestoreWrites==0 and .operationalWrites==0' "$EVIDENCE_DIR/m6-product-data-before.json" >/dev/null
+          node tools/orbit360-m6-resolve-smoke-identity-readonly-v20260730.mjs
+          jq -e '.ok==true and .eligibleSmokeIdentityCount==1 and .requiredRolesPresent==true and .firestoreWrites==0 and .operationalWrites==0' "$EVIDENCE_DIR/m6-product-smoke-identity-summary.json" >/dev/null
+
+      - name: Backup current Hosting release and rollback anchor
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-fase-a-hosting-release-helper-v20260813.mjs before
+          jq -e '.ok==true and .checks.hostingReadable==true and .checks.currentReleaseAvailable==true and .checks.rollbackAnchorAvailable==true and .checks.publicReachable==true and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/fase-a-product-hosting-before-v20260813.json" >/dev/null
+
+      - name: Execute the single authorized Hosting deploy
+        id: deploy
+        shell: bash
+        run: |
+          set +e
+          firebase deploy --only hosting --project "$ORBIT360_PRODUCT_PROJECT_ID" --config firebase.product-go-live.json --non-interactive --json > "$EVIDENCE_DIR/fase-a-product-deploy-raw-v20260813.json" 2>&1
+          CODE=$?
+          echo "exit_code=$CODE" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Verify exact deployed artifact
+        id: hosting_smoke
+        if: steps.deploy.outputs.exit_code == '0'
+        shell: bash
+        run: |
+          set +e
+          node tools/orbit360-fase-a-hosting-release-helper-v20260813.mjs smoke
+          CODE=$?
+          echo "exit_code=$CODE" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Execute real browser production smoke in three role views
+        id: browser
+        if: steps.deploy.outputs.exit_code == '0' && steps.hosting_smoke.outputs.exit_code == '0'
+        shell: bash
+        run: |
+          set +e
+          node tools/orbit360-m6-product-browser-smoke-v20260730.mjs
+          CODE=$?
+          echo "exit_code=$CODE" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Snapshot production data after deploy
+        id: snapshot_after
+        if: steps.deploy.outcome != 'skipped'
+        shell: bash
+        run: |
+          set +e
+          node tools/orbit360-m6-product-data-snapshot-readonly-v20260730.mjs after
+          CODE=$?
+          echo "exit_code=$CODE" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Verify before-after integrity and zero operational writes
+        id: integrity
+        if: steps.deploy.outcome != 'skipped'
+        shell: bash
+        run: |
+          set +e
+          node - <<'NODE'
+          const fs=require('fs'),p='orbit360-platform/runtime-gate-crm-v20260716/';
+          const read=n=>{try{return JSON.parse(fs.readFileSync(p+n,'utf8'))}catch{return null}};
+          const a=read('m6-product-data-before.json'),b=read('m6-product-data-after.json');
+          const keys=['clientes','aseguradoras','asesoresFuente','memberships','config'];
+          const countsStable=keys.every(k=>a?.counts?.[k]===b?.counts?.[k]);
+          const digestsStable=keys.every(k=>a?.digests?.[k]===b?.digests?.[k]);
+          const ok=Boolean(a?.ok&&b?.ok&&countsStable&&digestsStable);
+          const out={ok,status:ok?'FASE_A_PRODUCT_INTEGRITY_PASS':'FASE_A_PRODUCT_INTEGRITY_FAIL',countsStable,digestsStable,firestoreWrites:0,authWrites:0,operationalWrites:0,containsPII:false,containsSecrets:false};
+          fs.writeFileSync(p+'fase-a-product-integrity-v20260813.json',JSON.stringify(out,null,2)+'\n');process.exit(ok?0:41);
+          NODE
+          CODE=$?
+          echo "exit_code=$CODE" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Exact rollback on any post-attempt failure
+        id: rollback
+        if: always() && steps.deploy.outcome != 'skipped' && (steps.deploy.outputs.exit_code != '0' || steps.hosting_smoke.outputs.exit_code != '0' || steps.browser.outputs.exit_code != '0' || steps.snapshot_after.outputs.exit_code != '0' || steps.integrity.outputs.exit_code != '0')
+        shell: bash
+        run: |
+          set +e
+          node tools/orbit360-fase-a-hosting-release-helper-v20260813.mjs rollback
+          CODE=$?
+          echo "exit_code=$CODE" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Close one-shot production decision
+        if: always()
+        env:
+          DEPLOY_CODE: ${{ steps.deploy.outputs.exit_code }}
+          HOSTING_CODE: ${{ steps.hosting_smoke.outputs.exit_code }}
+          BROWSER_CODE: ${{ steps.browser.outputs.exit_code }}
+          SNAPSHOT_CODE: ${{ steps.snapshot_after.outputs.exit_code }}
+          INTEGRITY_CODE: ${{ steps.integrity.outputs.exit_code }}
+          ROLLBACK_CODE: ${{ steps.rollback.outputs.exit_code }}
+        shell: bash
+        run: |
+          node - <<'NODE'
+          const fs=require('fs'),p='orbit360-platform/runtime-gate-crm-v20260716/';
+          const env=process.env,attempted=env.DEPLOY_CODE!==undefined&&env.DEPLOY_CODE!=='';
+          const forwardOk=['DEPLOY_CODE','HOSTING_CODE','BROWSER_CODE','SNAPSHOT_CODE','INTEGRITY_CODE'].every(k=>env[k]==='0');
+          const rolledBack=!forwardOk&&env.ROLLBACK_CODE==='0';
+          const decision=forwardOk?'GO_LIVE_PASS':(rolledBack?'ROLLED_BACK_SAFE':(attempted?'GO_LIVE_STOP_RETRY':'PIPELINE_STOP_BEFORE_DEPLOY'));
+          const classification=forwardOk?'PRODUCTION_E2E_PASS':(rolledBack?'STOP_RETRY_ROLLBACK_SAFE':(attempted?'ENVIRONMENT_OR_RUNTIME_FAILURE':'PIPELINE_MECHANISM_FAILURE'));
+          const out={schemaVersion:'orbit360-fase-a-production-go-live-final-v1',generatedAt:new Date().toISOString(),decision,classification,sourceHead:env.ORBIT360_SOURCE_HEAD,requestCommit:env.GITHUB_SHA,liveUrl:env.ORBIT360_PRODUCT_URL,deployAttempted:attempted,deployCount:attempted?1:0,productionMaintained:forwardOk,rollbackExecuted:rolledBack,firestoreWrites:0,authWrites:0,operationalWrites:0,reimportExecuted:false,functionsDeployed:false,rulesDeployed:false,hostdimeTouched:false,mainTouched:false,mergeExecuted:false,ok:forwardOk};
+          fs.writeFileSync(p+'fase-a-production-go-live-final-v20260813.json',JSON.stringify(out,null,2)+'\n');console.log(JSON.stringify(out,null,2));
+          NODE
+
+      - name: Upload sanitized production evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-fase-a-production-go-live-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/m6-product-data-before.json
+            orbit360-platform/runtime-gate-crm-v20260716/m6-product-smoke-identity-summary.json
+            orbit360-platform/runtime-gate-crm-v20260716/fase-a-product-hosting-before-v20260813.json
+            orbit360-platform/runtime-gate-crm-v20260716/fase-a-product-hosting-smoke-v20260813.json
+            orbit360-platform/runtime-gate-crm-v20260716/m6-product-browser-smoke-summary.json
+            orbit360-platform/runtime-gate-crm-v20260716/m6-product-data-after.json
+            orbit360-platform/runtime-gate-crm-v20260716/fase-a-product-integrity-v20260813.json
+            orbit360-platform/runtime-gate-crm-v20260716/fase-a-product-hosting-rollback-v20260813.json
+            orbit360-platform/runtime-gate-crm-v20260716/fase-a-production-go-live-final-v20260813.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Publish observable commit status
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs=require('fs');let state='failure',description='Fase A production go-live without final evidence';
+            try{const f=JSON.parse(fs.readFileSync('orbit360-platform/runtime-gate-crm-v20260716/fase-a-production-go-live-final-v20260813.json','utf8'));if(f.decision==='GO_LIVE_PASS'){state='success';description='Orbit360 Fase A production live · browser and integrity PASS';}else description=`Orbit360 Fase A: ${f.decision}`;}catch(e){}
+            await github.rest.repos.createCommitStatus({owner:context.repo.owner,repo:context.repo.repo,sha:context.sha,state,context:'orbit360/fase-a-production-go-live-20260813',description:description.slice(0,140),target_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`});
+
+      - name: Cleanup temporary credential file
+        if: always()
+        shell: bash
+        run: |
+          if [ -n "${ORBIT360_TEMP_KEY_FILE:-}" ] && [ -f "$ORBIT360_TEMP_KEY_FILE" ]; then shred -u "$ORBIT360_TEMP_KEY_FILE" || rm -f "$ORBIT360_TEMP_KEY_FILE"; fi
+
+      - name: Require production PASS
+        if: always()
+        shell: bash
+        run: |
+          jq -e '.decision=="GO_LIVE_PASS" and .productionMaintained==true and .rollbackExecuted==false and .deployCount==1 and .ok==true' "$EVIDENCE_DIR/fase-a-production-go-live-final-v20260813.json" >/dev/null
