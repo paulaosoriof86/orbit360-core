@@ -3,7 +3,7 @@
 import fs from 'node:fs';
 import {execFileSync} from 'node:child_process';
 
-const REQUEST=String(process.env.ORBIT360_REQUEST_FILE||'').trim();
+const REQUEST_ENV=String(process.env.ORBIT360_REQUEST_FILE||'').trim();
 const RESUME=String(process.env.ORBIT360_RESUME_FILE||'').trim();
 const SOURCE=String(process.env.ORBIT360_SOURCE_HEAD||'').trim();
 const BRANCH=String(process.env.ORBIT360_BRANCH||'').trim();
@@ -15,12 +15,34 @@ const fail=(code,detail='')=>{throw new Error(`${code}${detail?`:${detail}`:''}`
 const json=p=>JSON.parse(fs.readFileSync(p,'utf8').replace(/^\uFEFF/,''));
 const git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
 const ancestor=(a,b='HEAD')=>{try{execFileSync('git',['merge-base','--is-ancestor',a,b],{stdio:'ignore'});return true;}catch{return false;}};
+const changedAt=sha=>git('diff-tree','--no-commit-id','--name-only','-r',sha).split(/\r?\n/).filter(Boolean);
 const changed=git('diff','--name-only','HEAD^','HEAD').split(/\r?\n/).filter(Boolean);
 if(changed.length!==1)fail('PRODUCTION_TRIGGER_FILE_COUNT_INVALID',String(changed.length));
 const trigger=changed[0];
-if(!REQUEST||!RESUME||!SOURCE||!BRANCH||!PROJECT||!TENANT||!URL||!ARTIFACT)fail('PRODUCTION_GUARD_CONTEXT_INCOMPLETE');
-if(!fs.existsSync(REQUEST))fail('PRODUCTION_REQUEST_MISSING');
-const r=json(REQUEST),bad=[];
+if(!RESUME||!SOURCE||!BRANCH||!PROJECT||!TENANT||!URL||!ARTIFACT)fail('PRODUCTION_GUARD_CONTEXT_INCOMPLETE');
+let requestPath=REQUEST_ENV,requestCommit='',requestReused=false,newRequestCreated=false,previousDeployCount=0;
+if(trigger===RESUME){
+ if(!fs.existsSync(RESUME))fail('PRODUCTION_RESUME_MISSING');
+ const m=json(RESUME),bad=[];
+ if(m.schemaVersion!=='orbit360-fase-a-production-resume-v3')bad.push('resumeSchema');
+ if(m.resumeAllowed!==true||m.newRequestCreated!==true||m.requestReused!==false||m.secondForwardDeployAllowed!==false)bad.push('resumeSafety');
+ if(m.previousDeployCount!==0||m.forwardDeployBudget!==1)bad.push('resumeBudget');
+ if(m.priorFailedProductionRunId!==31763649841||m.priorRollbackSafe!==true)bad.push('priorRollbackEvidence');
+ if(m.rootCauseClosed!=='PRODUCT_ARTIFACT_ENTRYPOINT_GAP')bad.push('rootCauseClosure');
+ if(m.sourcePreflightRunId!==31772635572||m.sourcePreflightStatus!=='SUCCESS')bad.push('sourceClosureEvidence');
+ if(typeof m.requestFile!=='string'||!m.requestFile.startsWith('.github/orbit360-requests/'))bad.push('requestFile');
+ if(typeof m.requestCommit!=='string'||m.requestCommit.length<12)bad.push('requestCommit');
+ if(bad.length)fail('PRODUCTION_RESUME_V3_FAIL',bad.join(','));
+ requestPath=m.requestFile;requestCommit=m.requestCommit;requestReused=false;newRequestCreated=true;previousDeployCount=0;
+ if(!fs.existsSync(requestPath))fail('PRODUCTION_REQUEST_MISSING',requestPath);
+ if(!ancestor(requestCommit,'HEAD'))fail('PRODUCTION_REQUEST_COMMIT_NOT_ANCESTOR');
+ const requestChanged=changedAt(requestCommit);
+ if(requestChanged.length!==1||requestChanged[0]!==requestPath)fail('PRODUCTION_REQUEST_COMMIT_NOT_IMMUTABLE');
+}else if(trigger===REQUEST_ENV){
+ requestPath=REQUEST_ENV;requestCommit='HEAD';requestReused=false;newRequestCreated=true;previousDeployCount=0;
+}else fail('PRODUCTION_TRIGGER_UNSUPPORTED',trigger);
+if(!requestPath||!fs.existsSync(requestPath))fail('PRODUCTION_REQUEST_MISSING');
+const r=json(requestPath),bad=[];
 if(r.schemaVersion!=='orbit360-fase-a-production-go-live-request-v1')bad.push('schema');
 if(r.branch!==BRANCH||r.sourceHead!==SOURCE)bad.push('sourceBinding');
 if(r.approved!==true||r.authorizedByUser!==true||r.allowedExecutions!==1||r.consumed!==false||r.authorizationFrozen!==false||r.replayAllowed!==false)bad.push('authorization');
@@ -29,23 +51,11 @@ if(r.firestoreWritesAuthorized!==0||r.authWritesAuthorized!==0||r.operationalWri
 if(r.target?.projectId!==PROJECT||r.target?.tenantId!==TENANT||r.target?.liveUrl!==URL||r.target?.artifact!==ARTIFACT)bad.push('target');
 if(!ancestor(SOURCE,'HEAD'))bad.push('sourceAncestor');
 if(!ancestor(r.controlPlaneHead,'HEAD'))bad.push('controlPlaneAncestor');
-if(trigger===REQUEST){
- const parent=git('rev-parse','HEAD^');
+if(trigger===RESUME){
+ const parent=git('rev-parse',`${requestCommit}^`);
  if(r.controlPlaneHead!==parent)bad.push('requestParentBinding');
-}else if(trigger===RESUME){
- if(!fs.existsSync(RESUME))bad.push('resumeMissing');
- else{
-  const m=json(RESUME);
-  if(m.schemaVersion!=='orbit360-fase-a-production-resume-v2')bad.push('resumeSchema');
-  if(m.requestCommit!=='d3749ec9abd14f24fb3972c0a33c600d86f18105')bad.push('resumeRequestCommit');
-  if(m.previousDeployCount!==0||m.productionTouched!==false||m.resumeAllowed!==true||m.newRequestCreated!==false||m.requestReused!==true||m.secondForwardDeployAllowed!==false)bad.push('resumeSafety');
-  if(!Array.isArray(m.closedPreDeployFailures)||m.closedPreDeployFailures.length<2)bad.push('resumeEvidence');
-  if(!m.closedPreDeployFailures.some(x=>x.runId===31762808073&&x.deployCount===0&&x.rootCause==='SOURCE_PHASE_REQUEST_CONTEXT_LEAK'))bad.push('phaseLeakEvidence');
-  if(!m.closedPreDeployFailures.some(x=>x.runId===31762940469&&x.deployCount===0&&x.rootCause==='BASH_HEREDOC_GUARD_SYNTAX'))bad.push('shellGuardEvidence');
-  if(m.latestCorrection!=='DEDICATED_NODE_REQUEST_RESUME_GUARD')bad.push('resumeCorrection');
-  if(!ancestor(m.requestCommit,'HEAD'))bad.push('requestAncestor');
- }
-}else bad.push(`trigger:${trigger}`);
-if(bad.length)fail('PRODUCTION_REQUEST_RESUME_GUARD_FAIL',bad.join(','));
-const out={ok:true,status:'PRODUCTION_REQUEST_RESUME_GUARD_PASS',trigger,sourceHead:SOURCE,requestId:r.requestId,requestReused:trigger===RESUME,newRequestCreated:false,previousDeployCount:0,forwardDeployBudget:1,secondForwardDeployAllowed:false,secretAccess:false,productionTouched:false};
+ if(r.sourcePreflightRunId!==31772635572||r.sourcePreflightStatus!=='SUCCESS')bad.push('sourcePreflightBinding');
+}
+if(bad.length)fail('PRODUCTION_REQUEST_GUARD_FAIL',bad.join(','));
+const out={ok:true,status:'PRODUCTION_REQUEST_RESUME_GUARD_PASS',trigger,sourceHead:SOURCE,requestId:r.requestId,requestFile:requestPath,requestReused,newRequestCreated,previousDeployCount,forwardDeployBudget:1,secondForwardDeployAllowed:false,secretAccess:false,productionTouched:false};
 console.log(JSON.stringify(out,null,2));
