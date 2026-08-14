@@ -8,11 +8,11 @@
   "pr": 5,
   "prState": "draft-open",
   "productSourceHead": "4ede3e785cb2cc889a7c11c2d9e2030c7af20b64",
-  "controlPlaneParentHead": "1f39bc2e45c40e493b5006ceac83ce20f9026645",
+  "controlPlaneParentHead": "bf9055ee6d2e0d8bafd7e979183f4d3289c74c59",
   "releaseCandidate": "RC-AYS-LAB-CANONICA-01",
   "canonicalCandidatePreserved": true,
   "governanceSynchronization": {
-    "status": "PASS_CONTINUIDAD_DOCUMENTAL",
+    "status": "PENDING_POST_R1_VALIDATOR",
     "workflow": "Orbit360 Continuidad Documental Source 20260814",
     "lastPassedRunId": 31817050287,
     "validator": "tools/orbit360-validar-continuidad-documental-v20260814.mjs",
@@ -106,8 +106,9 @@
     "Read run 31820056535 only if R2 has not produced newer evidence",
     "Execute nextActionExact without redoing R1",
     "One long frontier only",
-    "After R2, synchronize live-state, PR, README, checkpoint and CHANGELOG before R3"
+    "After R2, synchronize live-state, PR, README, checkpoint and changelog before R3"
   ],
   "governanceDocument": "orbit360-platform/docs/ADDENDUM-MAESTRO-CONTINUIDAD-SINCRONIZACION-ANTIBUCLE-GOLIVE-POSTPROD-20260814.md",
-  "currentCheckpoint": "orbit360-platform/docs/CIERRE-R1-OBSERVABILIDAD-ROOTCAUSE-PRODUCT-RUNTIME-COLLECTIONS-20260814.md"
+  "currentCheckpoint": "orbit360-platform/docs/CIERRE-R1-OBSERVABILIDAD-ROOTCAUSE-PRODUCT-RUNTIME-COLLECTIONS-20260814.md",
+  "currentChangelog": "orbit360-platform/CHANGELOG-R1-GOLIVE-20260814.md"
 }
