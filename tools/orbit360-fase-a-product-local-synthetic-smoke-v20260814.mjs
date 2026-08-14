@@ -6,19 +6,32 @@ import http from 'node:http';
 import {chromium} from 'playwright';
 const ROOT=process.cwd(),ART=path.join(ROOT,'orbit360-artifacts/fase-a-product'),OUT=path.join(ROOT,'orbit360-platform/runtime-gate-crm-v20260716/fase-a-product-local-synthetic-v20260814.json');
 const email=String(process.env.ORBIT360_PRODUCT_SMOKE_EMAIL||'').trim(),password=String(process.env.ORBIT360_PRODUCT_SMOKE_PASSWORD||'');
-const port=4173,url=`http://127.0.0.1:${port}/`;
+const port=4173,url=`http://127.0.0.1:${port}/`,localOrigin=new URL(url).origin;
 const clean=v=>String(v??'').replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi,'[email]').replace(/[A-Za-z0-9_-]{40,}/g,'[redacted]').replace(/\s+/g,' ').trim().slice(0,500);
-const report={schemaVersion:'orbit360-fase-a-product-local-synthetic-v1',ok:false,status:'FASE_A_PRODUCT_LOCAL_SYNTHETIC_FAIL',stage:'init',pageErrors:[],consoleErrors:[],firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
+const report={schemaVersion:'orbit360-fase-a-product-local-synthetic-v1',ok:false,status:'FASE_A_PRODUCT_LOCAL_SYNTHETIC_FAIL',stage:'init',pageErrors:[],consoleErrors:[],httpFailures:[],bootstrapTransitions:[],firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
 function save(){fs.mkdirSync(path.dirname(OUT),{recursive:true});fs.writeFileSync(OUT,JSON.stringify(report,null,2)+'\n','utf8');console.log(JSON.stringify(report,null,2));}
 function mime(file){return file.endsWith('.js')?'text/javascript':file.endsWith('.css')?'text/css':file.endsWith('.json')?'application/json':file.endsWith('.svg')?'image/svg+xml':file.endsWith('.png')?'image/png':file.endsWith('.html')?'text/html':'application/octet-stream';}
+function safeRequestLocation(raw){try{const u=new URL(String(raw||''));return {scope:u.origin===localOrigin?'local-artifact':'external-runtime',host:u.origin===localOrigin?'local':clean(u.hostname),path:clean(u.pathname||'/')};}catch{return {scope:'unknown',host:'unknown',path:'unknown'};}}
+function addHttpFailure(entry){if(report.httpFailures.length<20)report.httpFailures.push(entry);}
 const server=http.createServer((req,res)=>{try{let rel=decodeURIComponent(String(req.url||'/').split('?')[0]);if(rel==='/'||rel==='')rel='/index.html';rel=rel.replace(/^\/+/, '');const file=path.resolve(ART,rel);if(!file.startsWith(path.resolve(ART)+path.sep)&&file!==path.join(path.resolve(ART),'index.html')){res.writeHead(403);return res.end();}if(!fs.existsSync(file)||fs.statSync(file).isDirectory()){res.writeHead(404);return res.end('not found');}res.writeHead(200,{'content-type':mime(file),'cache-control':'no-store'});fs.createReadStream(file).pipe(res);}catch{res.writeHead(500);res.end();}});
 let browser,page;
 try{
  if(!email.includes('@')||password.length<12)throw new Error('SYNTHETIC_IDENTITY_CONTEXT_MISSING');
  await new Promise((resolve,reject)=>server.listen(port,'127.0.0.1',e=>e?reject(e):resolve()));
  browser=await chromium.launch({headless:true});page=await browser.newPage({viewport:{width:1440,height:1000}});
+ await page.addInitScript(()=>{
+   window.__orbitProductBootstrapTransitions=[];
+   window.addEventListener('orbit:product-readonly-bootstrap',event=>{
+     const detail=event&&event.detail&&typeof event.detail==='object'?event.detail:{};
+     const item={phase:String(detail.phase||''),ready:detail.ready===true,errors:Array.isArray(detail.errors)?detail.errors.map(v=>String(v)).slice(0,10):[]};
+     window.__orbitProductBootstrapTransitions.push(item);
+     if(window.__orbitProductBootstrapTransitions.length>20)window.__orbitProductBootstrapTransitions.shift();
+   });
+ });
  page.on('pageerror',e=>{if(report.pageErrors.length<20)report.pageErrors.push(clean(e?.message||e));});
  page.on('console',m=>{if(m.type()==='error'&&report.consoleErrors.length<20)report.consoleErrors.push(clean(m.text()));});
+ page.on('response',response=>{const status=response.status();if(status>=400){const loc=safeRequestLocation(response.url());addHttpFailure({kind:'response',status,...loc});}});
+ page.on('requestfailed',request=>{const loc=safeRequestLocation(request.url());addHttpFailure({kind:'requestfailed',failure:clean(request.failure()?.errorText||'unknown'),...loc});});
  report.stage='preauth';await page.goto(url,{waitUntil:'domcontentloaded',timeout:30000});await page.locator('#login-form').waitFor({state:'visible',timeout:15000});await page.waitForTimeout(1500);
  report.preauth=await page.evaluate(()=>({storeStatus:Orbit.store?._productStatus?Orbit.store._productStatus():null,preauth:Boolean(Orbit.store?.__productPreAuthP0),productApp:Orbit.productAppP0?.status?Orbit.productAppP0.status():null}));
  if(!report.preauth?.preauth)throw new Error('PREAUTH_STORE_NOT_ACTIVE');
@@ -28,7 +41,9 @@ try{
    page.waitForFunction(()=>window.Orbit&&Orbit.productAppP0?.isStarted&&Orbit.productAppP0.isStarted()===true,undefined,{timeout:45000,polling:100}).then(()=>({started:true})).catch(()=>({started:false})),
    page.waitForFunction(()=>{const e=document.getElementById('login-error');return e&&String(e.textContent||'').trim().length>0;},undefined,{timeout:45000,polling:100}).then(()=>({loginError:true})).catch(()=>({loginError:false}))
  ]);
- report.runtime=await page.evaluate(()=>({productApp:Orbit.productAppP0?.status?Orbit.productAppP0.status():null,store:Orbit.store?._productStatus?Orbit.store._productStatus():null,user:Orbit.auth?.productUser?{tenantId:Orbit.auth.productUser.tenantId||'',activeRole:Orbit.auth.productUser.activeRole||'',roleCount:Array.isArray(Orbit.auth.productUser.roles)?Orbit.auth.productUser.roles.length:0}:null,loginError:Boolean(String(document.getElementById('login-error')?.textContent||'').trim()),clientes:(Orbit.store?.all?Orbit.store.all('clientes'):[]).length,aseguradoras:(Orbit.store?.all?Orbit.store.all('aseguradoras'):[]).length}));
+ report.runtime=await page.evaluate(()=>{const transitions=Array.isArray(window.__orbitProductBootstrapTransitions)?window.__orbitProductBootstrapTransitions.slice(-20):[];return {productApp:Orbit.productAppP0?.status?Orbit.productAppP0.status():null,store:Orbit.store?._productStatus?Orbit.store._productStatus():null,user:Orbit.auth?.productUser?{tenantId:Orbit.auth.productUser.tenantId||'',activeRole:Orbit.auth.productUser.activeRole||'',roleCount:Array.isArray(Orbit.auth.productUser.roles)?Orbit.auth.productUser.roles.length:0}:null,loginError:Boolean(String(document.getElementById('login-error')?.textContent||'').trim()),clientes:(Orbit.store?.all?Orbit.store.all('clientes'):[]).length,aseguradoras:(Orbit.store?.all?Orbit.store.all('aseguradoras'):[]).length,bootstrapTransitions:transitions,bootstrapLast:transitions.length?transitions[transitions.length-1]:null};});
+ report.bootstrapTransitions=Array.isArray(report.runtime?.bootstrapTransitions)?report.runtime.bootstrapTransitions.map(item=>({phase:clean(item?.phase),ready:item?.ready===true,errors:Array.isArray(item?.errors)?item.errors.map(clean).slice(0,10):[]})):[];
+ if(report.runtime){report.runtime.bootstrapTransitions=report.bootstrapTransitions;report.runtime.bootstrapLast=report.bootstrapTransitions.length?report.bootstrapTransitions[report.bootstrapTransitions.length-1]:null;}
  if(!outcome.started||report.runtime?.productApp?.started!==true)throw new Error('PRODUCT_APP_NOT_STARTED:'+clean(report.runtime?.productApp?.lastError||'unknown'));
  if(report.runtime?.store?.ready!==true||report.runtime?.store?.status!=='ready-read-only'||report.runtime?.store?.writeEnabled!==false)throw new Error('PRODUCT_STORE_NOT_READY');
  if(report.runtime.clientes!==430||report.runtime.aseguradoras!==30)throw new Error(`BASELINE_COUNT_INVALID:${report.runtime.clientes}/${report.runtime.aseguradoras}`);
