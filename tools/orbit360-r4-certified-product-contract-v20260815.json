@@ -1,0 +1,33 @@
+{
+  "schemaVersion": "orbit360-r4-certified-product-contract-v1",
+  "status": "R4_CERTIFIED_PRODUCT_CONTRACT_BOUND",
+  "classification": "VALIDATOR_STALE_ROOTFIX_CONTRACT",
+  "sourceHead": "4f70f0dd6e870e8c7443a7638a9dc6e954eace1b",
+  "r3RunId": 31836094541,
+  "r3DurableArtifactId": 9232555925,
+  "zipName": "orbit360-fase-a-product-r3-4f70f0dd6e87.zip",
+  "zipSha256": "4fd52a748fa130fd069b2d2684e1944369164aeb0646fe728067dd7b4ce29e69",
+  "fileCount": 194,
+  "manifestStatus": "FASE_A_PRODUCT_R3_DURABLE_PACKAGE_CERTIFIED",
+  "entrypoint": {
+    "path": "index.html",
+    "bytes": 16893,
+    "sha256": "125b24a3fc215a368a7183a107cd55eb5a6332fc8a7f8354ed94e3169340ec4e"
+  },
+  "authAsset": {
+    "path": "/core/auth-product-runtime-p0.js",
+    "sourcePath": "orbit360-platform/core/auth-product-runtime-p0.js",
+    "bytes": 4211,
+    "sha256": "d0bb399fe0e1dd102a03950673044eda5bc8d181e4e98cf477d22d141aa7b3a8"
+  },
+  "legacyAssetsExcludedFromProduct": [
+    "/core/auth.js",
+    "/core/auth-password-change-v20260805.js",
+    "/core/user-credential-selfservice-v20260805.js"
+  ],
+  "noLabRuntime": true,
+  "noPrivateSecretMaterial": true,
+  "writeAuthorized": false,
+  "packageRebuildAuthorized": false,
+  "productionMutationAuthorized": false
+}
