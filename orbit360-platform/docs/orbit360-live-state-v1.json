@@ -1,8 +1,8 @@
 {
   "schemaVersion": "orbit360-live-state-v1",
-  "stateVersion": "20260815.r4-published-auth-e2e-prebrowser.1",
-  "updatedAt": "2026-08-15T13:10:00-06:00",
-  "phase": "R4_POST_PUBLISH_AUTH_E2E_PREBROWSER",
+  "stateVersion": "20260815.r4-first-smoke-harness-timeout-source-recovery.1",
+  "updatedAt": "2026-08-15T13:48:00-06:00",
+  "phase": "R4_POST_PUBLISH_SMOKE_HARNESS_SOURCE_RECOVERY",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pr": 5,
@@ -11,7 +11,6 @@
   "canonicalFunctionalBaselineHead": "4ede3e785cb2cc889a7c11c2d9e2030c7af20b64",
   "productSourceHead": "4f70f0dd6e870e8c7443a7638a9dc6e954eace1b",
   "certifiedPackageSourceHead": "4f70f0dd6e870e8c7443a7638a9dc6e954eace1b",
-  "browserRefreezeControlHead": "0cd626bf5021580832041dec02f1398c99a429ed",
   "canonicalCandidatePreserved": true,
   "r4Authorization": {
     "authorized": true,
@@ -27,55 +26,78 @@
     "zipSha256": "4fd52a748fa130fd069b2d2684e1944369164aeb0646fe728067dd7b4ce29e69",
     "sourceHead": "4f70f0dd6e870e8c7443a7638a9dc6e954eace1b",
     "fileCount": 194,
-    "shaReverifiedAtR4Preflight": true,
     "rebuildExecuted": false
-  },
-  "hostdimeEvidence": {
-    "subdomain": "app.aysseguros.com",
-    "subdomainCreatedInCpanel": true,
-    "documentRoot": "/home/ayssegur/public_html/app.aysseguros.com",
-    "cpanelUser": "ayssegur",
-    "server": "mjo.aysseguros.com",
-    "sharedIp": "107.161.178.166",
-    "ssl": "AutoSSL Domain Validated / Lets Encrypt",
-    "httpsRedirectObservedInLaterDomainsCapture": true,
-    "manualPackageUploadCompletedByUser": true,
-    "manualExtractionRootStructureConfirmedByScreenshot": true,
-    "publicLoginPageObservedByUser": true,
-    "hostdimeTransportNoLongerBlocksE2E": true
   },
   "r4Publish": {
     "status": "MANUAL_PUBLISH_COMPLETED_PUBLIC_LOGIN_REACHABLE",
-    "publishMethod": "cpanel-file-manager-manual-exact-certified-package",
     "publicUrl": "https://app.aysseguros.com",
-    "manifestVerificationPendingInAutomatedBrowser": true,
-    "remoteBackupIndependentVerification": false,
+    "documentRoot": "/home/ayssegur/public_html/app.aysseguros.com",
+    "manualPackageUploadCompletedByUser": true,
+    "manualExtractionRootStructureConfirmedByScreenshot": true,
+    "publicLoginPageObservedByUser": true,
+    "hostdimeBlocking": false,
     "productionTouched": true
   },
   "r4AuthObservation": {
-    "status": "USER_LOGIN_GENERIC_FAILURE_UNCLASSIFIED",
+    "status": "USER_LOGIN_GENERIC_FAILURE_STILL_UNCLASSIFIED",
     "personalPasswordRetestRequested": false,
-    "passwordResetOwnerPresentInPublishedLogin": false,
-    "genericUiErrorCanRepresentMultipleStages": true,
-    "classification": "UNCLASSIFIED_PENDING_AUTOMATED_DIAGNOSTIC"
+    "classification": "UNCLASSIFIED_PENDING_VALID_AUTOMATED_DIAGNOSTIC",
+    "note": "First automated browser frontier timed out inside the harness before stage evidence was persisted; therefore it does not classify the human login failure."
   },
-  "r4SmokeActor": {
-    "source": "existing-r3-nonhuman-readonly-smoke-identity",
-    "resolver": "tools/orbit360-m6-resolve-smoke-identity-readonly-v20260730.mjs",
-    "secretValuesExposed": false,
-    "requiresExactlyOneEligibleIdentity": true,
-    "requiresEmailVerified": true,
-    "requiresActiveMembership": true,
-    "requiresRoles": ["Dirección", "Operativo", "Asesor"],
-    "writesAuthorized": false
+  "r4SmokeFrontier1": {
+    "workflow": "Orbit360 R4 Production Readonly Smoke 20260815",
+    "runId": 31903805595,
+    "jobId": 95058471779,
+    "sourceHead": "5c12be143b6241a0af335d78f227c0ad14b05008",
+    "result": "CANCELLED_AT_JOB_TIMEOUT",
+    "browserStepStarted": "2026-08-15T19:24:57Z",
+    "browserStepCancelled": "2026-08-15T19:44:28Z",
+    "canonicalGatePass": true,
+    "protectedIdentityBindPass": true,
+    "identityResolverPass": true,
+    "eligibleSmokeIdentityCount": 1,
+    "authUserCount": 9,
+    "membershipCount": 8,
+    "requiredRolesPresent": true,
+    "resolverFirestoreWrites": 0,
+    "resolverOperationalWrites": 0,
+    "browserFinalEvidencePresent": false,
+    "artifactId": 9252029652,
+    "artifactContains": ["preflight-sanitizado.json", "m6-product-smoke-identity-summary.json"],
+    "classification": "PIPELINE_MECHANISM_FAILURE/R4_HARNESS_UNBOUNDED_BROWSER_AWAIT_AND_FINAL_ONLY_EVIDENCE",
+    "productDefectProven": false,
+    "authDefectProven": false,
+    "unexpectedWritesCertified": false
+  },
+  "r4HarnessRootCause": {
+    "status": "PROVEN_SOURCE_MECHANISM_GAP",
+    "classification": "PIPELINE_MECHANISM_FAILURE/R4_HARNESS_UNBOUNDED_BROWSER_AWAIT_AND_FINAL_ONLY_EVIDENCE",
+    "facts": [
+      "Node and Chromium remained alive until GitHub job timeout.",
+      "The harness emitted no browser-stage log marker after launch.",
+      "The harness writes its diagnostic JSON only at final completion.",
+      "Browser-side asynchronous operations include awaits without a harness-level watchdog/stage persistence.",
+      "The run therefore cannot distinguish manifest/Auth/membership/router as the hang location."
+    ]
+  },
+  "r4BrowserFreeze": {
+    "active": true,
+    "sourceHead": "73a9cfc6d0ae6d430919aa32fcc0be7871b94740",
+    "controlRunId": 31904861893,
+    "controlJobId": 95060983322,
+    "controlResult": "SUCCESS_SOURCE_ONLY",
+    "installSkipped": true,
+    "secretsSkipped": true,
+    "identitySkipped": true,
+    "browserSkipped": true
   },
   "lastEvidence": {
-    "workflow": "Orbit360 Continuidad Documental Source 20260814",
-    "runId": 31838545222,
-    "jobId": 94890207984,
-    "stage": "R4_PREVIOUS_DOCUMENTATION_SYNC_PASS",
+    "workflow": "Orbit360 R4 Production Readonly Smoke 20260815",
+    "runId": 31904861893,
+    "jobId": 95060983322,
+    "stage": "R4_BROWSER_REFREEZE_SOURCE_ONLY_CONTROL",
     "result": "SUCCESS",
-    "sourceHead": "616b68ea9752fb5e37c77ea9a71704eedd094f26",
+    "sourceHead": "73a9cfc6d0ae6d430919aa32fcc0be7871b94740",
     "secretAccess": false,
     "dataAccess": false,
     "runtimeExecuted": false,
@@ -83,20 +105,7 @@
     "deployExecuted": false,
     "productionTouched": false
   },
-  "classification": "UNCLASSIFIED_PENDING_AUTOMATED_DIAGNOSTIC",
-  "closedNonBlockers": [
-    "R1 closed",
-    "R2 closed",
-    "R3 durable package closed",
-    "certified package integrity reverified",
-    "app.aysseguros.com created",
-    "document root confirmed",
-    "package manually uploaded and extracted",
-    "public Orbit 360 login page reachable by user",
-    "HostDime transport no longer blocks post-publish smoke",
-    "do not rebuild package",
-    "do not reimport data"
-  ],
+  "classification": "PIPELINE_MECHANISM_FAILURE/R4_HARNESS_UNBOUNDED_BROWSER_AWAIT_AND_FINAL_ONLY_EVIDENCE",
   "progress": {
     "functionalReadinessPercent": 100,
     "technicalIterationsCompleted": 3,
@@ -105,36 +114,38 @@
     "goLiveGatesClosed": 2,
     "goLiveGatesTotal": 3,
     "goLiveGateProgressPercent": 67,
-    "r4": "PUBLISHED_POST_GO_LIVE_SMOKE_PENDING"
+    "r4": "PUBLISHED_HARNESS_SOURCE_RECOVERY_BEFORE_SECOND_FRONTIER"
   },
-  "nextActionExact": {
-    "owner": "R4 production read-only Auth/E2E harness",
-    "stage": "R4_POST_PUBLISH_AUTH_E2E_SINGLE_BROWSER_FRONTIER",
-    "action": "Keep R1/R2/R3 frozen. Run the canonical source-only gate fase-a-ops-leads-crm-release-lab-v20260812 before secrets. Only with PASS, resolve the existing non-human smoke identity read-only using protected secrets, verify the public manifest at https://app.aysseguros.com, perform real Firebase Auth, classify Auth/emailVerified/membership/tenant separately if login fails, and if login succeeds continue the same single browser frontier through tenant/store/read-only counts and Dirección desktop, Operativo tablet and Asesor mobile critical-route smoke. Produce sanitized evidence with zero secret values and zero unexpected writes. Do not rebuild/reimport/merge.",
-    "productChangesAuthorized": false,
-    "packageRebuildAuthorized": false,
-    "reimportAuthorized": false,
-    "mainMergeAuthorized": false
-  },
-  "goLiveRoute": [
-    "R1_OBSERVABILITY_CLOSED",
-    "R2_REQUIRED_OPTIONAL_ROOTFIX_CLOSED",
-    "R3_DURABLE_PACKAGE_CLOSED",
-    "R4_MANUAL_PUBLISH_COMPLETED",
-    "R4_POST_GO_LIVE_AUTH_E2E_ACTIVE",
-    "R5_OPERATIONAL_ENABLEMENT_AND_CONTROLLED_DELTA",
-    "R6_INCREMENTAL_POSTPRODUCTION_MODULES",
-    "R7_SECOND_TENANT_REUSABILITY_GATE"
-  ],
   "iterationBudget": {
     "r0GovernanceCompleted": true,
     "r1Completed": true,
     "r2Completed": true,
     "r3Completed": true,
-    "r4BrowserFrontiersExecutedAfterPublish": 0,
+    "r4BrowserFrontiersExecutedAfterPublish": 1,
+    "r4HarnessFailureCount": 1,
     "sameFamilyFailureLimit": 2,
     "thirdSameFamilyAttemptAllowed": false
   },
+  "nextActionExact": {
+    "owner": "R4 production read-only smoke harness",
+    "stage": "R4_HARNESS_SOURCE_ONLY_BOUNDED_OBSERVABILITY_ROOTFIX",
+    "action": "Keep the R4 workflow frozen source-only. Modify only the R4 harness/workflow mechanism, not product. Add a deterministic global deadline, bounded browser-side async stages, incremental sanitized stage evidence written before and after manifest, login response, auth projection, membership, runtime activation and each role-route group, plus signal-safe finalization. Validate node syntax and source assertions only while the freeze is active. Do not execute a second production browser frontier until the source-only recovery evidence is PASS and the durable checkpoint is synchronized.",
+    "productChangesAuthorized": false,
+    "packageRebuildAuthorized": false,
+    "reimportAuthorized": false,
+    "mainMergeAuthorized": false
+  },
+  "closedNonBlockers": [
+    "R1 closed",
+    "R2 closed",
+    "R3 durable package closed",
+    "exact package published manually",
+    "public login reachable",
+    "HostDime/hostname not blocking",
+    "canonical R4 preflight gate passes",
+    "exactly one protected smoke identity resolves read-only",
+    "browser workflow refrozen source-only"
+  ],
   "hostdimeBlocking": false,
   "productionTouchedByManualPublish": true,
   "writeAuthorization": "R4_PRODUCTIVE_SMOKE_READ_ONLY_ONLY",
@@ -143,12 +154,12 @@
     "Confirm HEAD and PR #5",
     "Keep R1/R2/R3 closed",
     "Do not rebuild the certified package",
-    "Do not ask Paula to retry personal passwords before automated classification",
-    "Run canonical gate before secrets/browser",
-    "Use only the existing protected smoke identity",
-    "Stop and classify after the single R4 browser frontier"
+    "Do not ask Paula to retry personal passwords",
+    "Do not run another production browser while R4 source-only freeze is active",
+    "Fix harness observability/timeouts source-only",
+    "After source-only PASS, synchronize checkpoint before any second browser frontier"
   ],
   "governanceDocument": "orbit360-platform/docs/ADDENDUM-MAESTRO-CONTINUIDAD-SINCRONIZACION-ANTIBUCLE-GOLIVE-POSTPROD-20260814.md",
-  "currentCheckpoint": "orbit360-platform/docs/CHECKPOINT-R4-POST-PUBLISH-AUTH-E2E-BEFORE-BROWSER-20260815.md",
+  "currentCheckpoint": "orbit360-platform/docs/CIERRE-R4-FIRST-PRODUCTION-SMOKE-HARNESS-TIMEOUT-20260815.md",
   "currentChangelog": "orbit360-platform/CHANGELOG-R4-GOLIVE-20260814.md"
 }

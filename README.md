@@ -10,60 +10,78 @@ Antes de diagnosticar, modificar, ejecutar runtime/browser/deploy o continuar un
 2. HEAD real de `ays/backend-tenant-lab-v99-20260703` y PR #5;
 3. último workflow/evidencia indicado por `lastEvidence`;
 4. `orbit360-platform/docs/ADDENDUM-MAESTRO-CONTINUIDAD-SINCRONIZACION-ANTIBUCLE-GOLIVE-POSTPROD-20260814.md`;
-5. `orbit360-platform/docs/CHECKPOINT-R4-POST-PUBLISH-AUTH-E2E-BEFORE-BROWSER-20260815.md`;
+5. `orbit360-platform/docs/CIERRE-R4-FIRST-PRODUCTION-SMOKE-HARNESS-TIMEOUT-20260815.md`;
 6. `orbit360-platform/CHANGELOG-R4-GOLIVE-20260814.md`.
 
 No usar memoria ni documentación histórica como sustituto del live-state.
 
-## Estado vivo · R4 PUBLICADO / AUTH + E2E PRODUCTIVO ACTIVO · 2026-08-15
+## Estado vivo · R4 PUBLICADO / RECUPERACIÓN SOURCE-ONLY DEL HARNESS · 2026-08-15
 
 ```text
-stateVersion: 20260815.r4-published-auth-e2e-prebrowser.1
-fase: R4_POST_PUBLISH_AUTH_E2E_PREBROWSER
 R1/R2/R3: CERRADOS
-ZIP: orbit360-fase-a-product-r3-4f70f0dd6e87.zip
-SHA256: 4fd52a748fa130fd069b2d2684e1944369164aeb0646fe728067dd7b4ce29e69
-source head R3: 4f70f0dd6e870e8c7443a7638a9dc6e954eace1b
-app.aysseguros.com: paquete cargado y extraído manualmente
-login público: visible
-HostDime transport: ya no bloquea el smoke
-POST_GO_LIVE_SMOKE_PASS: pendiente
+app.aysseguros.com: PUBLICADO, login visible
+paquete: exacto R3 certificado, sin rebuild
+R4 browser frontier #1: CANCELLED por timeout del harness
+producto/Auth defect: NO CLASIFICADOS por esa corrida
+workflow R4 browser: REFROZEN SOURCE-ONLY
+avance: 100% funcional / 75% técnico / 67% gates
 ```
 
-## Publicación confirmada por captura
+## Primera frontera productiva
 
-Paula cargó y extrajo el paquete certificado directamente en `/home/ayssegur/public_html/app.aysseguros.com`. La estructura visible contiene `index.html`, `core/`, `data/`, `docs/`, `modules/`, `styles/`, `product-runtime-config.js`, `sw.js` y `orbit360-package-manifest.json`, conservando los archivos propios del hosting.
+Run `31903805595`, job `95058471779`, HEAD `5c12be143b6241a0af335d78f227c0ad14b05008`.
 
-`https://app.aysseguros.com` muestra el login productivo de Orbit 360.
+Pasaron antes del navegador:
 
-## Auth actual
+- gate canónico source-only;
+- instalación;
+- binding de secretos protegidos;
+- resolver read-only de identidad;
+- exactamente 1 actor elegible;
+- roles requeridos presentes;
+- resolver con cero escrituras.
 
-Un intento humano con la cuenta administrativa mostró el error genérico de login. Ese texto no permite distinguir contraseña, `emailVerified`, membership, tenant o bootstrap y **no se usará para diagnosticar por intuición**.
+El paso browser inició a `19:24:57Z` y fue cancelado por el timeout del job a `19:44:28Z`. Node y Chromium permanecieron activos hasta la cancelación.
 
-No se pedirán más pruebas manuales de contraseña antes de la clasificación automática.
+El artifact `9252029652` solo contiene:
 
-El paquete productivo no expone una función de recuperación de contraseña en esa pantalla; `Limpiar sesión` solo limpia estado local.
+- `preflight-sanitizado.json` PASS;
+- `m6-product-smoke-identity-summary.json` PASS.
 
-## Siguiente frontera
+No existe `r4-production-readonly-smoke-v20260815.json`. Por ello la corrida no demuestra si el punto de espera fue manifest, Auth, membership, tenant, activación o rutas.
 
-Se reutiliza el actor de smoke no humano ya existente y los secrets protegidos usados por R3. El resolver read-only exige exactamente una identidad elegible, verificada, activa y con roles `Dirección + Operativo + Asesor`, sin crear ni modificar usuarios.
+Clasificación:
 
-Antes de cualquier secreto/browser:
+`PIPELINE_MECHANISM_FAILURE / R4_HARNESS_UNBOUNDED_BROWSER_AWAIT_AND_FINAL_ONLY_EVIDENCE`
 
-```text
-node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
-```
+No clasificar esta corrida como contraseña incorrecta ni defecto funcional.
 
-Solo con PASS se ejecutará una única frontera Playwright contra el dominio público para:
+## Freeze anti-bucle
 
-- verificar el manifest exacto publicado;
-- distinguir Auth HTTP / emailVerified / membership / tenant;
-- validar tenant `alianzas-soluciones`;
-- store `ready-read-only` y required 7/7;
-- 430 clientes / 30 aseguradoras en la vista privilegiada;
-- Dirección desktop, Operativo tablet y Asesor móvil;
-- Inicio + rutas críticas según permisos;
-- cero errores relevantes, copy técnico y escrituras inesperadas.
+El workflow R4 se refreezeó en HEAD `73a9cfc6d0ae6d430919aa32fcc0be7871b94740`.
+
+Control source-only:
+
+- run `31904861893` SUCCESS;
+- gate PASS;
+- instalación `skipped`;
+- secretos `skipped`;
+- identity `skipped`;
+- browser `skipped`.
+
+Mientras el freeze esté activo, editar el harness no puede disparar otro browser productivo.
+
+## Siguiente acción exacta
+
+Corregir **solo** `tools/orbit360-r4-production-readonly-smoke-v20260815.mjs` y, si es necesario, assertions del workflow:
+
+- deadline global menor al timeout del job;
+- timeouts explícitos para cada async browser-side;
+- checkpoints sanitizados antes/después de manifest, login HTTP, Auth, membership, activación y rol/rutas;
+- persistir evidencia parcial aunque una etapa expire;
+- finalización signal-safe.
+
+Validar source-only con gate + `node --check` + assertions de watchdog/checkpoints. No ejecutar segundo navegador antes de cerrar esta recuperación y sincronizar documentación.
 
 ## Avance
 
@@ -71,7 +89,7 @@ Solo con PASS se ejecutará una única frontera Playwright contra el dominio pú
 readiness funcional: 100%
 avance técnico: 75%
 gates finales: 67% (2/3)
-R4: publicación completada; smoke productivo pendiente
+R4: publicación completa; primer smoke no válido por fallo del harness
 ```
 
-R4 solo cierra con `POST_GO_LIVE_SMOKE_PASS`. Sin reconstrucción, reimportación, main ni merge.
+Sin reconstrucción, reimportación, main ni merge. No pedir nuevas pruebas manuales de contraseña a Paula mientras Auth siga sin clasificación automática válida.
