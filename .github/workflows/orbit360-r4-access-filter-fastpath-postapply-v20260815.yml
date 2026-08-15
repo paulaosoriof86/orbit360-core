@@ -1,0 +1,50 @@
+name: Orbit360 R4 Access Filter Fastpath Postapply 20260815
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/workflows/orbit360-r4-access-filter-fastpath-postapply-v20260815.yml'
+      - 'tools/orbit360-access-filter-fastpath-postapply-v20260815.mjs'
+
+permissions:
+  contents: read
+
+env:
+  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Canonical gate before postapply verification
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+          jq -e '.ok==true and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+      - name: Verify materialized source against certified baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-access-filter-fastpath-postapply-v20260815.mjs
+          node tools/orbit360-access-filter-fastpath-postapply-v20260815.mjs
+          jq -e '.ok==true and .status=="ACCESS_FILTER_FASTPATH_APPLIED_PASS" and .classification=="FUNCTIONAL_DEFECT_ROOTFIX_APPLIED_SOURCE_PASS" and .appliedSourceEqualsExpectedCandidate==true and .direction.baselineGetCalls==1720 and .direction.appliedGetCalls==4 and .direction.appliedCount==430 and .advisorOwnCount==144 and .operativeTeamCount==287 and .browserExecuted==false and .secretAccess==false and .dataAccess==false and .productionTouched==false and .deployExecuted==false and .packageRebuilt==false' "$EVIDENCE_DIR/r4-access-filter-fastpath-postapply-v20260815.json" >/dev/null
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: orbit360-r4-access-filter-fastpath-postapply-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/r4-access-filter-fastpath-postapply-v20260815.json
+          if-no-files-found: warn
+          retention-days: 14
