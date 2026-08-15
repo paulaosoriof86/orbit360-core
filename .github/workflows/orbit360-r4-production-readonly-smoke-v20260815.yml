@@ -45,6 +45,35 @@ jobs:
           node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
           jq -e '.ok==true and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
           node --check tools/orbit360-r4-production-readonly-smoke-v20260815.mjs
+          AUTH_SHA="$(git show "$ORBIT360_R4_PACKAGE_SOURCE_HEAD:orbit360-platform/core/auth.js" | sha256sum | awk '{print $1}')"
+          test ${#AUTH_SHA} -eq 64
+          echo "ORBIT360_R4_EXPECTED_AUTH_SHA256=$AUTH_SHA" >> "$GITHUB_ENV"
+
+      - name: Validate bounded R4 harness source-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$ORBIT360_R4_SOURCE_ONLY_RECOVERY" = 'true'
+          HARNESS="tools/orbit360-r4-production-readonly-smoke-v20260815.mjs"
+          grep -q "GLOBAL_TIMEOUT_MS" "$HARNESS"
+          grep -q "R4_PRODUCTION_READONLY_SMOKE_IN_PROGRESS" "$HARNESS"
+          grep -q "R4_STAGE|" "$HARNESS"
+          grep -q "auth-asset-validated" "$HARNESS"
+          grep -q "login-http-response" "$HARNESS"
+          grep -q "membership-read" "$HARNESS"
+          grep -q "runtime-activation" "$HARNESS"
+          grep -q "role-.*-group" "$HARNESS"
+          grep -q "SIGTERM" "$HARNESS"
+          if grep -Eq "^import .*from ['\"]playwright['\"]" "$HARNESS"; then
+            echo 'Static Playwright import would break source-only watchdog validation.' >&2
+            exit 41
+          fi
+          SYNTHETIC_OUT="$EVIDENCE_DIR/r4-harness-source-only-watchdog-v20260815.json"
+          ORBIT360_R4_SYNTHETIC_MODE=watchdog \
+          ORBIT360_R4_SYNTHETIC_TIMEOUT_MS=120 \
+          ORBIT360_R4_OUT="$SYNTHETIC_OUT" \
+          node "$HARNESS"
+          jq -e '.ok==true and .status=="R4_HARNESS_SOURCE_ONLY_WATCHDOG_PASS" and .classification=="PASS" and .synthetic==true and .stageTimeoutObserved==true and .evidencePersistedBeforeTimeout==true and .productionTouched==false and .containsPII==false and .containsSecrets==false and .secretValuesLogged==false and .deployExecuted==false and .packageRebuilt==false' "$SYNTHETIC_OUT" >/dev/null
 
       - name: Install read-only production smoke tools
         if: env.ORBIT360_R4_SOURCE_ONLY_RECOVERY != 'true'
@@ -89,7 +118,7 @@ jobs:
         run: |
           set -euo pipefail
           node tools/orbit360-r4-production-readonly-smoke-v20260815.mjs
-          jq -e '.ok==true and .status=="POST_GO_LIVE_SMOKE_PASS" and .targetHttps==true and .manifest.pass==true and .auth.signedIn==true and .auth.emailVerified==true and .auth.membershipAvailable==true and .auth.membershipActive==true and .auth.tenantMatches==true and .auth.requiredRolesPresent==true and .runtime.started==true and .runtime.routerStarted==true and .runtime.tenantContextReady==true and .runtime.storeReady==true and .runtime.storeStatus=="ready-read-only" and .runtime.storeWriteEnabled==false and .runtime.requiredMissingCount==0 and .runtime.requiredFailedCount==0 and .privileged.clientes==430 and .privileged.aseguradoras==30 and (.roles|length)==3 and ([.roles[].pass]|all) and (.pageErrors|length)==0 and (.consoleErrors|length)==0 and (.httpFailures|length)==0 and (.writeSignals|length)==0 and (.technicalCopy|length)==0 and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .containsPII==false and .containsSecrets==false and .secretValuesLogged==false and .deployExecuted==false and .packageRebuilt==false' "$EVIDENCE_DIR/r4-production-readonly-smoke-v20260815.json" >/dev/null
+          jq -e '.ok==true and .status=="POST_GO_LIVE_SMOKE_PASS" and .targetHttps==true and .manifest.pass==true and .authAsset.pass==true and .authAsset.sha256Matches==true and .auth.signedIn==true and .auth.emailVerified==true and .auth.membershipAvailable==true and .auth.membershipActive==true and .auth.tenantMatches==true and .auth.requiredRolesPresent==true and .runtime.started==true and .runtime.routerStarted==true and .runtime.tenantContextReady==true and .runtime.storeReady==true and .runtime.storeStatus=="ready-read-only" and .runtime.storeWriteEnabled==false and .runtime.requiredMissingCount==0 and .runtime.requiredFailedCount==0 and .privileged.clientes==430 and .privileged.aseguradoras==30 and (.roles|length)==3 and ([.roles[].pass]|all) and (.pageErrors|length)==0 and (.consoleErrors|length)==0 and (.httpFailures|length)==0 and (.writeSignals|length)==0 and (.technicalCopy|length)==0 and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .containsPII==false and .containsSecrets==false and .secretValuesLogged==false and .deployExecuted==false and .packageRebuilt==false' "$EVIDENCE_DIR/r4-production-readonly-smoke-v20260815.json" >/dev/null
 
       - name: Cleanup protected key material
         if: always()
@@ -105,5 +134,6 @@ jobs:
             orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
             orbit360-platform/runtime-gate-crm-v20260716/m6-product-smoke-identity-summary.json
             orbit360-platform/runtime-gate-crm-v20260716/r4-production-readonly-smoke-v20260815.json
+            orbit360-platform/runtime-gate-crm-v20260716/r4-harness-source-only-watchdog-v20260815.json
           if-no-files-found: warn
           retention-days: 14
