@@ -4,7 +4,78 @@ Sistema 360 para intermediarios de seguros, comercializable, white-label y multi
 
 > Nota de marca vigente: existe una decisión estratégica provisional para cambiar la marca visible futura a **GRAVICENTRA**, pero es NO bloqueante. Hasta el bloque formal de rebranding se conserva `Orbit 360` como nombre técnico/operativo y no se cambian backend, contratos, colecciones, tenant IDs, Firebase, rutas, repositorio ni identificadores técnicos.
 
-## Fuentes rectoras — corte 2026-07-30
+## Corte go-live vigente · 2026-08-15
+
+```txt
+Repositorio: paulaosoriof86/orbit360-core
+Rama obligatoria: ays/backend-tenant-lab-v99-20260703
+PR: #5 draft/open
+main / merge: NO autorizados
+Reimportación / cambios Auth / cambios de datos: NO autorizados
+```
+
+### Producción publicada actualmente
+
+R3 permanece publicado e inmutable hasta que exista evidencia posterior al reemplazo:
+
+- `orbit360-fase-a-product-r3-4f70f0dd6e87.zip`
+- SHA256 `4fd52a748fa130fd069b2d2684e1944369164aeb0646fe728067dd7b4ce29e69`
+- source `4f70f0dd6e870e8c7443a7638a9dc6e954eace1b`
+- 194 archivos de producto.
+
+Auth/runtime productivo de R3 ya está certificado PASS: login HTTP 200, signedIn, emailVerified, membership active, tenant correcto, roles requeridos, runtime/router/tenant-context activos, store read-only y cero writes. Datos privilegiados productivos también PASS: **430 clientes + 30 aseguradoras**, cero writes.
+
+### Sucesora mínima R4S1 · CERTIFICADA
+
+El defecto funcional de rendimiento de `Orbit.access.filter()` fue corregido en source por `df4c217c34722c03215f88b62f6865ab41c2a9f3`, modificando únicamente `core/access-scope.js`. La regresión preservó semántica y redujo `store.get()` para Dirección/430 de 1720 a 4.
+
+La sucesora mínima ya fue generada y certificada; **no se reconstruye nuevamente**:
+
+- ZIP `orbit360-fase-a-product-r4s1-df4c217c3472.zip`
+- SHA256 `49f5a5eee451665fcc420fc9acee88347b95aa832a8f6f524053cc4ccaa0d60d`
+- fileCount `194`
+- `193` archivos de producto byte-idénticos a R3
+- `1` único delta: `core/access-scope.js`
+- SHA256 del delta `8976ab8032f210a0f93d79f4ace037ec3b3e8fe8c1ac9e1f5a0eadd8d134fb3f`
+- run `31915191809`
+- job `95085878427`
+- durable artifact `9254713380`
+- evidence artifact `9254713130`
+- gate canónico: PASS 13/13, failed 0, writes autorizados 0.
+
+Estado: `R4S1_MINIMAL_SUCCESSOR_DURABLE_CERTIFIED`.
+
+### Publicación R4S1 · AUTORIZADA / PENDIENTE
+
+La autorización macro vigente cubre backup/rollback, publicación exclusiva de R4S1 en `app.aysseguros.com` y **una única matriz productiva final read-only** después de verificar la identidad publicada.
+
+La publicación todavía no se ha ejecutado. El ejecutor actual no dispone de un canal autenticado seguro de mutación del filesystem de HostDime: no hay workflow/script versionado para el dominio, `scp`, `rsync` o FTP; no hay clave privada SSH utilizable y la integración GitHub no permite listar Actions secrets/variables. Esto se registra como una limitación del entorno del ejecutor, no como defecto de HostDime ni del producto.
+
+Clasificación del límite de transporte:
+
+`ENVIRONMENT_FAILURE / R4S1_AUTHENTICATED_HOSTDIME_TRANSPORT_UNAVAILABLE_IN_CURRENT_TOOLING`
+
+El browser final permanece congelado hasta que R4S1 esté publicado y verificado estáticamente.
+
+### Secuencia exacta pendiente
+
+1. backup rollback-capable del contenido vivo de `app.aysseguros.com`;
+2. publicar **solo** el ZIP R4S1 certificado, sin parchear R3 in-place;
+3. verificar manifest sucesor y SHA de `core/access-scope.js`;
+4. ejecutar el gate canónico obligatorio;
+5. habilitar exactamente una matriz final productiva read-only;
+6. validar Auth/runtime + 430 clientes + 30 aseguradoras + Dirección/Operativo/Asesor + scopes + rendimiento fast-path + cero Firestore/Auth/operational writes;
+7. refreezar y sincronizar evidencia.
+
+Ante cualquier fallo: STOP, clasificar causa raíz y no reintentar por intuición.
+
+Avance permanece **100% funcional / 75% técnico / 67% gates (2/3)** hasta `POST_GO_LIVE_SMOKE_PASS`.
+
+Checkpoint vigente: `docs/CIERRE-R4S1-SUCESORA-MINIMA-CERTIFICADA-PUBLICACION-PENDIENTE-20260815.md`.
+
+Estado canónico: `docs/orbit360-live-state-v1.json`.
+
+## Fuentes rectoras
 
 Leer antes de actuar:
 
@@ -16,71 +87,25 @@ Leer antes de actuar:
 6. Addendum Control de Causa Raíz, Validadores y Gates 20260717.
 7. `docs/ADDENDUM-MAESTRO-ACELERACION-PRODUCTIVA-REUSO-TRANSVERSAL-Y-CONTROL-AUTORIZACIONES-20260730.md`.
 8. `docs/NOTA-RECTORA-REBRANDING-GRAVICENTRA-NO-BLOQUEANTE-20260730.md`.
-9. `docs/ARQUITECTURA-REUTILIZABLE-INGESTA-MODULOS-POST-M6-20260730.md`.
-10. `docs/CIERRE-M6-FINAL-630-PASS-20260730.md`.
-11. `docs/REGLA-FUENTES-OPERATIVAS-VIGENTES-BAJO-DEMANDA-20260730.md`.
-12. PR #5 + HEAD vivo + evidencia reciente del módulo.
+9. `docs/ADDENDUM-MAESTRO-CONTINUIDAD-SINCRONIZACION-ANTIBUCLE-GOLIVE-POSTPROD-20260814.md`.
+10. `docs/orbit360-live-state-v1.json` + checkpoint vigente + PR #5 + HEAD vivo.
 
-Precedencia: reglas maestras/addenda → PR/HEAD vivo → Plan Maestro → evidencia modular reciente. No reabrir trabajo cerrado por documentación anterior desactualizada.
+Precedencia: reglas maestras/addenda → PR/HEAD/estado vivo → Plan Maestro → evidencia modular reciente. No reabrir trabajo cerrado por documentación anterior desactualizada.
 
-## Estado vivo
-
-```txt
-Repositorio: paulaosoriof86/orbit360-core
-Rama activa: ays/backend-tenant-lab-v99-20260703
-PR: #5 draft/open
-main / merge / Functions: no autorizados
-
-M1–M4: CERRADOS
-M5 5.0.44: CERRADO + revisión visual aprobada
-M6 6.3.0: CERRADO · M6_FINAL_CLOSURE_PASS
-Pólizas: PREPARACIÓN ESTÁTICA/READ-ONLY ACTIVA
-
-Substrate productivo M6 read-only: LIVE
-Firestore data writes del cierre M6: 0
-Operational writes del cierre M6: 0
-Storage: inexistente / diferido fail-closed
-Pólizas reales: NO MIGRADAS / NO ACTIVADAS PRODUCTIVAMENTE
-Fuente real vigente de pólizas: PENDIENTE DE PAULA CUANDO EL DRY-RUN LA REQUIERA
-```
-
-Evidencia M6 final:
-
-```txt
-Run: 30562624279
-Artifact: 8767559350
-Digest: sha256:9a555a3b47d2605397d11d9e81996720afdd655cd7408b55994f5f531a17ba2f
-productionLive: true (substrate productivo read-only M6)
-rollbackExecuted: false
-414 clientes
-26 aseguradoras
-7 asesores fuente
-Dirección desktop: PASS
-Operativo tablet: PASS
-Asesor móvil: PASS
-countsStable: true
-digestsStable: true
-networkWriteCandidates: 0
-Firestore data writes: 0
-operational writes: 0
-```
-
-## Directiva de aceleración
-
-Ruta crítica:
-
-`Pólizas → Vehículos → Recibos/cartera → Cobros/conciliación → Comisiones/planillas → financiero histórico → Siniestros/Documentos → resto del plan`.
-
-Reglas:
+## Reglas de ejecución permanentes
 
 - autorización por bloque macro de riesgo, no micro-pasos;
 - diagnóstico, documentación y validación estática/sintética continúan sin autorización adicional;
+- ejecutar primero el gate canónico antes de secretos/browser/deploy;
 - un fallo productivo no genera automáticamente otro recovery;
 - repetición de etapa/familia de fallo activa `STOP_RETRY`;
 - producción no se usa para desarrollar validators;
 - no se prepara otro recovery hasta tener causa raíz demostrada + fix reusable + prueba estática/sintética;
 - un request productivo es inmutable y de una sola ejecución;
-- 0% manual salvo imposibilidad técnica real.
+- 0% manual salvo imposibilidad técnica real;
+- no modificar Auth/usuarios/memberships/datos por intuición;
+- no reimportar Clientes/Aseguradoras para resolver visualización, acceso, cache, proyección o gates;
+- no avanzar a otro módulo mientras el gate final de go-live siga abierto.
 
 ## Infraestructura transversal que NO se reconstruye por módulo
 
@@ -91,9 +116,7 @@ Se reutiliza en Pólizas, Vehículos, Cobros, Siniestros y módulos posteriores:
 - `Orbit.store` + write guard;
 - manifiesto canónico de colecciones;
 - aliases lógico → físico;
-- readiness de todas las colecciones activas;
-- blocking-gate readiness diferido;
-- Hosting readiness acotado;
+- readiness de colecciones activas;
 - smoke multirol/multivista;
 - diagnóstico sanitizado;
 - integridad before/after + digests;
@@ -101,38 +124,6 @@ Se reutiliza en Pólizas, Vehículos, Cobros, Siniestros y módulos posteriores:
 - rollback fail-closed;
 - clasificación de causa raíz + `STOP_RETRY`;
 - request inmutable y gate único.
-
-Los módulos posteriores solo añaden contrato de fuente, esquema/aliases, normalización y reglas de negocio específicas.
-
-## Bloque activo — Pólizas
-
-Owner operativo existente: `core/policy-receipts-engine.js`, cargado por `index.html` junto con los refinamientos/bridges ya existentes.
-
-La preparación estática puede continuar sin datos reales con:
-
-1. contrato canónico de póliza;
-2. identidad canónica tenant/país/aseguradora/número/cliente;
-3. permisos y scopes;
-4. prima separada en neta, gastos, IVA/impuestos y total;
-5. generación determinística de recibos únicamente para `Vigente` / `Por renovar`;
-6. histórico sin cartera para otros estados;
-7. deduplicación/idempotencia;
-8. reglas de actualización/endoso cuando existen pagos;
-9. pruebas sintéticas/ficticias;
-10. diseño del dry-run/diff reutilizando el harness M6.
-
-### Regla bloqueante de vigencia de fuente
-
-Los archivos antiguos de producción/movimientos y cualquier análisis derivado son referencia histórica/de diseño, no fuente oficial vigente para migrar pólizas.
-
-Antes del primer dry-run con filas reales se debe pedir a Paula el **corte actualizado de pólizas**. La misma regla se aplica, cuando llegue cada etapa, a vehículos, cobros, planillas, financiero histórico, siniestros y documentos operativos pendientes.
-
-No se permite:
-
-- inferir pólizas oficiales desde `finmovs` o desde producción antigua;
-- crear cartera/cobros reales con fuentes viejas;
-- asumir que un archivo disponible sigue vigente;
-- reimportar Clientes/Aseguradoras para resolver Pólizas.
 
 ## Reglas de negocio permanentes
 
@@ -150,9 +141,7 @@ No se permite:
 
 Estado: registrado / diferido / no bloqueante.
 
-El cambio visible se ejecutará únicamente en el último punto técnicamente seguro antes del lanzamiento público definitivo, sin mezclarlo con gates de datos/backend/migración abiertos. En ese punto se anunciará:
-
-`PUNTO SEGURO DE REBRANDING GRAVICENTRA ALCANZADO`.
+El cambio visible se ejecutará únicamente en el último punto técnicamente seguro antes del lanzamiento público definitivo, sin mezclarlo con gates de datos/backend/migración abiertos.
 
 ## Arquitectura
 
