@@ -1,0 +1,67 @@
+'use strict';
+const fs = require('fs');
+const path = require('path');
+const { chromium } = require('playwright');
+
+const target = process.env.ORBIT360_R4_URL;
+const tenant = process.env.ORBIT360_PRODUCT_TENANT_ID;
+const email = process.env.ORBIT360_PRODUCT_SMOKE_EMAIL;
+const password = process.env.ORBIT360_PRODUCT_SMOKE_PASSWORD;
+const out = path.join(process.cwd(), process.env.EVIDENCE_DIR, 'r4-role-session-timing-probe-v20260815.json');
+const red = v => String(v == null ? '' : v).replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/ig,'[email-redacted]').slice(0,300);
+let browser;
+const evidence={schemaVersion:'orbit360-r4-role-session-timing-probe-v1',ok:false,status:'IN_PROGRESS',classification:'PENDING',loginHttpStatus:0,runtimeReady:false,storeReady:false,roleSetResult:false,timing:{},scope:{},pageErrors:[],consoleErrors:[],httpFailures:[],writeSignals:[],browserExecuted:true,loginSubmitted:false,secretAccess:true,dataAccess:true,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,packageRebuilt:false,containsPII:false,containsSecrets:false};
+function write(){fs.mkdirSync(path.dirname(out),{recursive:true});fs.writeFileSync(out,JSON.stringify(evidence,null,2)+'\n');}
+
+async function main(){
+  try{
+    browser=await chromium.launch({headless:true});
+    const context=await browser.newContext({viewport:{width:1440,height:900},serviceWorkers:'block'});
+    const page=await context.newPage();
+    page.setDefaultTimeout(15000); page.setDefaultNavigationTimeout(45000);
+    page.on('pageerror',e=>evidence.pageErrors.push(red(e.message||e)));
+    page.on('console',m=>{if(m.type()==='error')evidence.consoleErrors.push(red(m.text()));});
+    page.on('requestfailed',r=>{try{const u=new URL(r.url());if(u.host===new URL(target).host)evidence.httpFailures.push(`${r.method()} ${u.pathname}`);}catch(_){}});
+    page.on('request',r=>{const u=r.url();if(/firestore\.googleapis\.com\/.+(documents:commit|documents:batchWrite|Firestore\/Write\/channel)/i.test(u)||/identitytoolkit\.googleapis\.com\/.+accounts:(signUp|update|delete)/i.test(u))evidence.writeSignals.push(r.method());});
+    await page.goto(target,{waitUntil:'domcontentloaded'});
+    await page.locator('#login-form').waitFor({state:'visible'});
+    const authResponse=page.waitForResponse(r=>/identitytoolkit\.googleapis\.com\/.+accounts:signInWithPassword/i.test(r.url()),{timeout:30000});
+    await page.locator('#lg-user').fill(email);
+    await page.locator('#lg-pass').fill(password);
+    evidence.loginSubmitted=true;
+    await page.locator('#login-form').evaluate(form=>form.requestSubmit());
+    const ar=await authResponse; evidence.loginHttpStatus=ar.status();
+    await page.waitForFunction(expected=>{
+      try{const a=Orbit.productAppP0.status(),t=Orbit.productTenantRuntimeContextP0.status(),s=Orbit.store._productStatus();return a.started===true&&a.routerStarted===true&&t.ready===true&&String(t.tenantId||'')===expected&&s.ready===true&&s.status==='ready-read-only'&&s.writeEnabled===false;}catch(e){return false;}
+    },tenant,{timeout:120000});
+    const ready=await page.evaluate(()=>{const a=Orbit.productAppP0.status(),t=Orbit.productTenantRuntimeContextP0.status(),s=Orbit.store._productStatus();return{runtimeReady:a.started===true&&a.routerStarted===true&&t.ready===true,storeReady:s.ready===true&&s.status==='ready-read-only'&&s.writeEnabled===false,route:String(Orbit.route&&Orbit.route.key||''),clients:Orbit.store.all('clientes').length,insurers:Orbit.store.all('aseguradoras').length};});
+    evidence.runtimeReady=ready.runtimeReady;evidence.storeReady=ready.storeReady;evidence.startRoute=ready.route;evidence.clients=ready.clients;evidence.insurers=ready.insurers;
+
+    const timing=await page.evaluate(()=>{
+      const log={sessionDispatchMs:[],hashDispatchMs:[],inicioRenderMs:[]};
+      const od=document.dispatchEvent.bind(document), ow=window.dispatchEvent.bind(window);
+      const inicio=Orbit.modules.inicio, originalInicio=inicio&&inicio.render;
+      document.dispatchEvent=function(ev){const t=performance.now();try{return od(ev);}finally{if(ev&&ev.type==='orbit:session')log.sessionDispatchMs.push(performance.now()-t);}};
+      window.dispatchEvent=function(ev){const t=performance.now();try{return ow(ev);}finally{if(ev&&ev.type==='hashchange')log.hashDispatchMs.push(performance.now()-t);}};
+      if(inicio&&typeof originalInicio==='function')inicio.render=function(...args){const t=performance.now();try{return originalInicio.apply(this,args);}finally{log.inicioRenderMs.push(performance.now()-t);}};
+      const t0=performance.now();let result=false,error='';
+      try{result=!!Orbit.session.set('Dirección');}catch(e){error=String(e&&e.message||e);}
+      const sessionSetMs=performance.now()-t0;
+      document.dispatchEvent=od;window.dispatchEvent=ow;if(inicio&&originalInicio)inicio.render=originalInicio;
+      return{result,error,sessionSetMs,log,activeRole:String(Orbit.session.rol&&Orbit.session.rol()||'')};
+    });
+    evidence.roleSetResult=timing.result;evidence.timing=timing;
+    await page.waitForTimeout(500);
+    evidence.scope=await page.evaluate(()=>{const raw=Orbit.store.all('clientes');const t=performance.now();const scoped=Orbit.access.filter('clientes',raw,'cliente360');return{raw:raw.length,scoped:scoped.length,filterMs:performance.now()-t,scope:String(Orbit.access.scopeCanon('cliente360')||''),activeRole:String(Orbit.session.rol&&Orbit.session.rol()||'')};});
+    const sessionMs=Number(timing.sessionSetMs||0), hashMax=Math.max(0,...(timing.log.hashDispatchMs||[])), inicioMax=Math.max(0,...(timing.log.inicioRenderMs||[])), filterMs=Number(evidence.scope.filterMs||0);
+    if(sessionMs>5000 && hashMax>5000 && inicioMax>5000 && Math.abs(hashMax-inicioMax)<5000) evidence.classification='FUNCTIONAL_DEFECT/R4_ROLE_SESSION_SYNCHRONOUS_RERENDER_BLOCK';
+    else if(sessionMs>5000 && filterMs<2000) evidence.classification='FUNCTIONAL_DEFECT/R4_ROLE_SESSION_SYNCHRONOUS_LISTENER_BLOCK';
+    else if(filterMs>5000) evidence.classification='FUNCTIONAL_DEFECT/R4_ACCESS_SCOPE_FILTER_PERFORMANCE_BLOCK';
+    else if(sessionMs<5000 && filterMs<5000) evidence.classification='VALIDATOR_STALE/R4_ROLE_GROUP_BUDGET_NOT_COMPONENTIZED';
+    else evidence.classification='PIPELINE_MECHANISM_FAILURE/R4_ROLE_TIMING_UNRESOLVED';
+    evidence.ok=true;evidence.status='ROLE_SESSION_TIMING_COMPLETE';
+  }catch(e){evidence.classification='PIPELINE_MECHANISM_FAILURE/R4_ROLE_TIMING_PROBE_FAILED';evidence.error=red(e&&e.message||e);evidence.status='ROLE_SESSION_TIMING_PROBE_FAIL';process.exitCode=41;}
+  finally{try{if(browser)await browser.close();}catch(e){};write();}
+  console.log(JSON.stringify({status:evidence.status,classification:evidence.classification,runtimeReady:evidence.runtimeReady,storeReady:evidence.storeReady,clients:evidence.clients,insurers:evidence.insurers,roleSetResult:evidence.roleSetResult,timing:evidence.timing,scope:evidence.scope,writeSignals:evidence.writeSignals.length},null,2));
+}
+main();
