@@ -1,0 +1,126 @@
+name: Orbit360 R4 HTTP Sensitive Name Matrix 20260815
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/workflows/orbit360-r4-http-sensitive-name-matrix-v20260815.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: orbit360-r4-http-sensitive-name-matrix-v20260815
+  cancel-in-progress: false
+
+env:
+  ORBIT360_R4_URL: https://app.aysseguros.com
+  ORBIT360_R4_PACKAGE_SOURCE_HEAD: 4f70f0dd6e870e8c7443a7638a9dc6e954eace1b
+  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Canonical source gate before HTTP diagnosis
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+          jq -e '.ok==true and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+
+      - name: Final HTTP-only sensitive-name matrix
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const https = require('https');
+          const fs = require('fs');
+          const crypto = require('crypto');
+          const { execFileSync } = require('child_process');
+
+          const base = new URL(process.env.ORBIT360_R4_URL);
+          const sourceHead = process.env.ORBIT360_R4_PACKAGE_SOURCE_HEAD;
+          const sourceBase = 'orbit360-platform/';
+          const out = process.env.EVIDENCE_DIR + '/r4-http-sensitive-name-matrix-v20260815.json';
+          const runId = process.env.GITHUB_RUN_ID || 'unknown';
+          const assets = [
+            {id:'config', path:'/core/config.js?v1328', source:'core/config.js', group:'neutral'},
+            {id:'theme', path:'/core/theme.js?v1304', source:'core/theme.js', group:'neutral'},
+            {id:'document-viewer', path:'/core/document-viewer.js?v=20260711', source:'core/document-viewer.js', group:'neutral'},
+            {id:'backend-resource-contracts', path:'/core/backend-resource-contracts.js?v=20260711', source:'core/backend-resource-contracts.js', group:'backend-name'},
+            {id:'auth', path:'/core/auth.js?v1295-labfix-20260703', source:'core/auth.js', group:'auth'},
+            {id:'auth-password-change', path:'/core/auth-password-change-v20260805.js?v=20260805-1', source:'core/auth-password-change-v20260805.js', group:'auth'},
+            {id:'user-credential-selfservice', path:'/core/user-credential-selfservice-v20260805.js?v=20260805-1', source:'core/user-credential-selfservice-v20260805.js', group:'credential'},
+            {id:'credential-vault', path:'/core/credential-vault.js?v=20260711', source:'core/credential-vault.js', group:'credential'},
+            {id:'secure-resource-fields', path:'/core/secure-resource-fields-v1202.js?v=20260711', source:'core/secure-resource-fields-v1202.js', group:'secure'},
+            {id:'insurer-security', path:'/core/insurer-directory-import-v1202-security.js?v=20260711', source:'core/insurer-directory-import-v1202-security.js', group:'security'}
+          ];
+
+          function sha256(buf){ return crypto.createHash('sha256').update(buf).digest('hex'); }
+          function expected(source){
+            const buf = execFileSync('git',['show',`${sourceHead}:${sourceBase}${source}`],{encoding:null,maxBuffer:4*1024*1024});
+            return {sha256:sha256(buf),bytes:buf.length};
+          }
+          function headers(h){
+            const allow=['server','content-type','content-length','cache-control','etag','last-modified'];
+            const out={}; for(const k of allow) if(h[k]!==undefined) out[k]=String(h[k]).slice(0,240); return out;
+          }
+          function request(method,path){
+            return new Promise((resolve,reject)=>{
+              const u=new URL(path,base); u.searchParams.set('orbit360diag2',runId);
+              const req=https.request(u,{method,headers:{'Cache-Control':'no-cache, no-store, max-age=0','Pragma':'no-cache','Accept':'*/*','User-Agent':'Orbit360-R4-HTTP-Diagnostic/2.0'},timeout:12000},res=>{
+                const chunks=[]; res.on('data',c=>{if(method!=='HEAD')chunks.push(c)}); res.on('end',()=>{
+                  const body=method==='HEAD'?Buffer.alloc(0):Buffer.concat(chunks);
+                  resolve({status:res.statusCode||0,headers:headers(res.headers),bytes:body.length,bodySha256:method==='HEAD'?null:sha256(body)});
+                });
+              });
+              req.on('timeout',()=>req.destroy(new Error('HTTP_TIMEOUT'))); req.on('error',reject); req.end();
+            });
+          }
+
+          (async()=>{
+            const results=[];
+            for(const asset of assets){
+              const exp=expected(asset.source);
+              let head,get;
+              try{head=await request('HEAD',asset.path)}catch(e){head={status:0,error:String(e.message||e)}}
+              try{get=await request('GET',asset.path)}catch(e){get={status:0,error:String(e.message||e)}}
+              results.push({...asset,expectedSha256:exp.sha256,expectedBytes:exp.bytes,head,get,getShaMatchesSource:get.status===200&&get.bodySha256===exp.sha256});
+            }
+            const neutral=results.filter(r=>r.group==='neutral');
+            const sensitive=results.filter(r=>['auth','credential','secure','security'].includes(r.group));
+            const blocked=sensitive.filter(r=>r.get.status===500);
+            const served=sensitive.filter(r=>r.get.status===200&&r.getShaMatchesSource);
+            const allNeutralExact=neutral.every(r=>r.get.status===200&&r.getShaMatchesSource);
+            const same500=blocked.length>1&&blocked.every(r=>r.get.bodySha256===blocked[0].get.bodySha256);
+            let classification='ENVIRONMENT_FAILURE/R4_STATIC_SECURITY_FILTER_PATTERN_UNRESOLVED';
+            if(allNeutralExact&&blocked.length>=3&&same500){classification='ENVIRONMENT_FAILURE/R4_APACHE_SENSITIVE_ASSET_FILTER_PATTERN';}
+            if(allNeutralExact&&blocked.length===0&&sensitive.every(r=>r.get.status===200&&r.getShaMatchesSource)){classification='PASS/R4_SENSITIVE_ASSET_HTTP_LAYER';}
+            const evidence={schemaVersion:'orbit360-r4-http-sensitive-name-matrix-v1',ok:true,status:'HTTP_SENSITIVE_NAME_MATRIX_COMPLETE',classification,sourceHead,publicOrigin:base.origin,cacheBypass:true,allNeutralExact,blockedIds:blocked.map(r=>r.id),servedSensitiveIds:served.map(r=>r.id),same500BodySignature:!!same500,results,browserExecuted:false,secretAccess:false,dataAccess:false,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,packageRebuilt:false,containsPII:false,containsSecrets:false,responseBodiesPersisted:false};
+            fs.mkdirSync(process.env.EVIDENCE_DIR,{recursive:true}); fs.writeFileSync(out,JSON.stringify(evidence,null,2)+'\n');
+            console.log(JSON.stringify({status:evidence.status,classification,allNeutralExact,blockedIds:evidence.blockedIds,servedSensitiveIds:evidence.servedSensitiveIds,same500BodySignature:evidence.same500BodySignature},null,2));
+          })().catch(err=>{fs.mkdirSync(process.env.EVIDENCE_DIR,{recursive:true});fs.writeFileSync(out,JSON.stringify({ok:false,status:'HTTP_MATRIX_MECHANISM_FAILURE',classification:'PIPELINE_MECHANISM_FAILURE/R4_HTTP_MATRIX_FAILED',error:String(err.message||err),browserExecuted:false,secretAccess:false,dataAccess:false,firestoreWrites:0,authWrites:0,operationalWrites:0,containsPII:false,containsSecrets:false},null,2)+'\n');process.exit(42)});
+          NODE
+          jq -e '.ok==true and .status=="HTTP_SENSITIVE_NAME_MATRIX_COMPLETE" and .browserExecuted==false and .secretAccess==false and .dataAccess==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .deployExecuted==false and .packageRebuilt==false and .containsPII==false and .containsSecrets==false and .responseBodiesPersisted==false' "$EVIDENCE_DIR/r4-http-sensitive-name-matrix-v20260815.json" >/dev/null
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: orbit360-r4-http-sensitive-name-matrix-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/r4-http-sensitive-name-matrix-v20260815.json
+          if-no-files-found: warn
+          retention-days: 14
