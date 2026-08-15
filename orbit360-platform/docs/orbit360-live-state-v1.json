@@ -1,8 +1,8 @@
 {
   "schemaVersion": "orbit360-live-state-v1",
-  "stateVersion": "20260814.r4-environment-blocked-hostdime-deployment-channel.1",
-  "updatedAt": "2026-08-14T14:21:00-06:00",
-  "phase": "R4_ENVIRONMENT_BLOCKED_HOSTDIME_DEPLOYMENT_CHANNEL",
+  "stateVersion": "20260815.r4-published-auth-e2e-prebrowser.1",
+  "updatedAt": "2026-08-15T13:10:00-06:00",
+  "phase": "R4_POST_PUBLISH_AUTH_E2E_PREBROWSER",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pr": 5,
@@ -15,7 +15,8 @@
   "canonicalCandidatePreserved": true,
   "r4Authorization": {
     "authorized": true,
-    "scope": "exact certified package -> backup/rollback -> app.aysseguros.com publish -> production E2E",
+    "scope": "exact certified package -> app.aysseguros.com -> production read-only E2E",
+    "productionE2EAuthorized": true,
     "packageRebuildAuthorized": false,
     "reimportAuthorized": false,
     "mainMergeAuthorized": false
@@ -24,6 +25,7 @@
     "ready": true,
     "zipName": "orbit360-fase-a-product-r3-4f70f0dd6e87.zip",
     "zipSha256": "4fd52a748fa130fd069b2d2684e1944369164aeb0646fe728067dd7b4ce29e69",
+    "sourceHead": "4f70f0dd6e870e8c7443a7638a9dc6e954eace1b",
     "fileCount": 194,
     "shaReverifiedAtR4Preflight": true,
     "rebuildExecuted": false
@@ -37,31 +39,43 @@
     "sharedIp": "107.161.178.166",
     "ssl": "AutoSSL Domain Validated / Lets Encrypt",
     "httpsRedirectObservedInLaterDomainsCapture": true,
-    "authorizedPublicSshKeyName": "orbit360_hostdime_prod_20260812",
-    "privateKeyAvailableToCurrentExecution": false,
-    "authenticatedCpanelOrSftpConnectorAvailable": false,
-    "repositoryDeployWorkflowAvailable": false,
-    "repositoryDeployToolAvailable": false
+    "manualPackageUploadCompletedByUser": true,
+    "manualExtractionRootStructureConfirmedByScreenshot": true,
+    "publicLoginPageObservedByUser": true,
+    "hostdimeTransportNoLongerBlocksE2E": true
   },
-  "r4Preflight": {
-    "status": "BLOCKED_BEFORE_REMOTE_BACKUP_OR_PUBLISH",
-    "classification": "ENVIRONMENT_FAILURE/HOSTDIME_DEPLOYMENT_CHANNEL_UNAVAILABLE",
-    "packageIntegrityPass": true,
-    "remoteBackupExecuted": false,
-    "rollbackArtifactCreated": false,
-    "publishExecuted": false,
-    "productionE2EExecuted": false,
-    "productionTouched": false,
-    "reason": "The target subdomain/document root and an authorized public SSH key are evidenced, but this execution has no private key, authenticated cPanel/SFTP/SSH connector, repository deployment workflow/tool, or accessible Actions-secret inventory. Publishing without authenticated remote backup/rollback would violate R4."
+  "r4Publish": {
+    "status": "MANUAL_PUBLISH_COMPLETED_PUBLIC_LOGIN_REACHABLE",
+    "publishMethod": "cpanel-file-manager-manual-exact-certified-package",
+    "publicUrl": "https://app.aysseguros.com",
+    "manifestVerificationPendingInAutomatedBrowser": true,
+    "remoteBackupIndependentVerification": false,
+    "productionTouched": true
+  },
+  "r4AuthObservation": {
+    "status": "USER_LOGIN_GENERIC_FAILURE_UNCLASSIFIED",
+    "personalPasswordRetestRequested": false,
+    "passwordResetOwnerPresentInPublishedLogin": false,
+    "genericUiErrorCanRepresentMultipleStages": true,
+    "classification": "UNCLASSIFIED_PENDING_AUTOMATED_DIAGNOSTIC"
+  },
+  "r4SmokeActor": {
+    "source": "existing-r3-nonhuman-readonly-smoke-identity",
+    "resolver": "tools/orbit360-m6-resolve-smoke-identity-readonly-v20260730.mjs",
+    "secretValuesExposed": false,
+    "requiresExactlyOneEligibleIdentity": true,
+    "requiresEmailVerified": true,
+    "requiresActiveMembership": true,
+    "requiresRoles": ["Dirección", "Operativo", "Asesor"],
+    "writesAuthorized": false
   },
   "lastEvidence": {
     "workflow": "Orbit360 Continuidad Documental Source 20260814",
-    "runId": 31838423735,
-    "jobId": 94889832106,
-    "stage": "R4_DOCUMENTATION_SYNC",
-    "result": "FAIL_ONLY_LAST_EVIDENCE_RUN_FIELD_MISSING",
-    "sourceHead": "5abb825650fbb7437f90df667867b4258b179592",
-    "classification": "DATA_CONTRACT_FAILURE/R4_LIVE_STATE_LAST_EVIDENCE_RUN_MISSING",
+    "runId": 31838545222,
+    "jobId": 94890207984,
+    "stage": "R4_PREVIOUS_DOCUMENTATION_SYNC_PASS",
+    "result": "SUCCESS",
+    "sourceHead": "616b68ea9752fb5e37c77ea9a71704eedd094f26",
     "secretAccess": false,
     "dataAccess": false,
     "runtimeExecuted": false,
@@ -69,20 +83,17 @@
     "deployExecuted": false,
     "productionTouched": false
   },
-  "documentationCorrection": {
-    "classification": "DATA_CONTRACT_FAILURE/R4_LIVE_STATE_LAST_EVIDENCE_RUN_MISSING",
-    "status": "CORRECTED_NO_PRODUCT_IMPACT",
-    "validatorChanged": false
-  },
-  "classification": "ENVIRONMENT_FAILURE/HOSTDIME_DEPLOYMENT_CHANNEL_UNAVAILABLE",
+  "classification": "UNCLASSIFIED_PENDING_AUTOMATED_DIAGNOSTIC",
   "closedNonBlockers": [
     "R1 closed",
     "R2 closed",
-    "R3 closed",
+    "R3 durable package closed",
     "certified package integrity reverified",
-    "app.aysseguros.com exists in cPanel",
-    "document root recovered",
-    "AutoSSL validated",
+    "app.aysseguros.com created",
+    "document root confirmed",
+    "package manually uploaded and extracted",
+    "public Orbit 360 login page reachable by user",
+    "HostDime transport no longer blocks post-publish smoke",
     "do not rebuild package",
     "do not reimport data"
   ],
@@ -94,12 +105,12 @@
     "goLiveGatesClosed": 2,
     "goLiveGatesTotal": 3,
     "goLiveGateProgressPercent": 67,
-    "r4": "BLOCKED_BEFORE_REMOTE_BACKUP_PUBLISH"
+    "r4": "PUBLISHED_POST_GO_LIVE_SMOKE_PENDING"
   },
   "nextActionExact": {
-    "owner": "HostDime authenticated deployment transport",
-    "stage": "R4_DEPLOYMENT_CHANNEL_ENABLEMENT_ONLY",
-    "action": "Do not change product or rebuild the certified ZIP. Make the existing HostDime deployment channel available to the execution environment using the private credential corresponding to the already-authorized public SSH key orbit360_hostdime_prod_20260812, or an authenticated cPanel/SFTP connector. Do not paste secrets into chat. Once the authenticated channel is available, verify the exact ZIP SHA256 again, run the canonical gate before remote operations, create a timestamped backup of /home/ayssegur/public_html/app.aysseguros.com with a rollback path, publish only the certified ZIP contents, then execute the production E2E. If the transport itself fails twice, STOP_RETRY and classify before any other change.",
+    "owner": "R4 production read-only Auth/E2E harness",
+    "stage": "R4_POST_PUBLISH_AUTH_E2E_SINGLE_BROWSER_FRONTIER",
+    "action": "Keep R1/R2/R3 frozen. Run the canonical source-only gate fase-a-ops-leads-crm-release-lab-v20260812 before secrets. Only with PASS, resolve the existing non-human smoke identity read-only using protected secrets, verify the public manifest at https://app.aysseguros.com, perform real Firebase Auth, classify Auth/emailVerified/membership/tenant separately if login fails, and if login succeeds continue the same single browser frontier through tenant/store/read-only counts and Dirección desktop, Operativo tablet and Asesor mobile critical-route smoke. Produce sanitized evidence with zero secret values and zero unexpected writes. Do not rebuild/reimport/merge.",
     "productChangesAuthorized": false,
     "packageRebuildAuthorized": false,
     "reimportAuthorized": false,
@@ -109,8 +120,8 @@
     "R1_OBSERVABILITY_CLOSED",
     "R2_REQUIRED_OPTIONAL_ROOTFIX_CLOSED",
     "R3_DURABLE_PACKAGE_CLOSED",
-    "R4_ENVIRONMENT_BLOCKED_DEPLOYMENT_CHANNEL",
-    "R4_BACKUP_PUBLISH_POST_GOLIVE_E2E_PENDING",
+    "R4_MANUAL_PUBLISH_COMPLETED",
+    "R4_POST_GO_LIVE_AUTH_E2E_ACTIVE",
     "R5_OPERATIONAL_ENABLEMENT_AND_CONTROLLED_DELTA",
     "R6_INCREMENTAL_POSTPRODUCTION_MODULES",
     "R7_SECOND_TENANT_REUSABILITY_GATE"
@@ -120,22 +131,24 @@
     "r1Completed": true,
     "r2Completed": true,
     "r3Completed": true,
+    "r4BrowserFrontiersExecutedAfterPublish": 0,
     "sameFamilyFailureLimit": 2,
     "thirdSameFamilyAttemptAllowed": false
   },
-  "hostdimeBlocking": true,
-  "productionTouchedByLastEvidence": false,
-  "writeAuthorization": "R4_AUTHORIZED_BUT_NOT_EXECUTABLE_WITHOUT_AUTHENTICATED_REMOTE_CHANNEL",
+  "hostdimeBlocking": false,
+  "productionTouchedByManualPublish": true,
+  "writeAuthorization": "R4_PRODUCTIVE_SMOKE_READ_ONLY_ONLY",
   "resumeProtocol": [
     "Read this file first",
     "Confirm HEAD and PR #5",
     "Keep R1/R2/R3 closed",
-    "Use only the certified ZIP name and SHA256",
-    "Do not rebuild product to solve HostDime",
-    "Do not publish without remote backup/rollback",
-    "Resume only from authenticated HostDime deployment transport enablement"
+    "Do not rebuild the certified package",
+    "Do not ask Paula to retry personal passwords before automated classification",
+    "Run canonical gate before secrets/browser",
+    "Use only the existing protected smoke identity",
+    "Stop and classify after the single R4 browser frontier"
   ],
   "governanceDocument": "orbit360-platform/docs/ADDENDUM-MAESTRO-CONTINUIDAD-SINCRONIZACION-ANTIBUCLE-GOLIVE-POSTPROD-20260814.md",
-  "currentCheckpoint": "orbit360-platform/docs/CIERRE-PARCIAL-R4-HOSTDIME-DEPLOYMENT-CHANNEL-BLOCKER-20260814.md",
+  "currentCheckpoint": "orbit360-platform/docs/CHECKPOINT-R4-POST-PUBLISH-AUTH-E2E-BEFORE-BROWSER-20260815.md",
   "currentChangelog": "orbit360-platform/CHANGELOG-R4-GOLIVE-20260814.md"
 }
