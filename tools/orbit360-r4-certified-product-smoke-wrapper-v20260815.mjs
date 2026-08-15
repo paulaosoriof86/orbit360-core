@@ -34,19 +34,45 @@ function buildPatchedHarness(contract) {
   const stalePath = '/core/auth.js';
   if (count(original, stalePath) !== 1) fail(`STALE_PATH_COUNT_INVALID:${count(original, stalePath)}`);
   if (original.includes(contract.authAsset.path)) fail('BASE_HARNESS_ALREADY_PRODUCT_BOUND_UNEXPECTED');
-  const patched = original.replace(stalePath, contract.authAsset.path);
+  let patched = original.replace(stalePath, contract.authAsset.path);
   if (patched.includes(stalePath)) fail('STALE_PATH_REMAINS_AFTER_PATCH');
   if (count(patched, contract.authAsset.path) !== 1) fail('PRODUCT_AUTH_PATH_NOT_BOUND_EXACTLY_ONCE');
+
+  const staleLegalBlock = `  const legal = page.locator('[data-legal-gate]');
+  if (await withTimeout('legal-count', 5000, () => legal.count()) && await withTimeout('legal-check-count', 5000, () => page.locator('#lg-chk').count()) && await withTimeout('legal-ok-count', 5000, () => page.locator('#lg-ok').count())) {
+    await runStage('legal-gate-local', 10000, async () => { await page.locator('#lg-chk').check(); await page.locator('#lg-ok').click(); d.legalGateHandledLocally = true; await page.waitForTimeout(200); });
+  }`;
+  const readonlyLegalBlock = `  const legalState = await runStage('legal-gate-observe', 7000, () => page.evaluate(() => {
+    const gate = document.querySelector('[data-legal-gate]');
+    return { present: !!gate, checkboxPresent: !!(gate && gate.querySelector('#lg-chk')), okPresent: !!(gate && gate.querySelector('#lg-ok')) };
+  }), v => ({ present: v && v.present === true, checkboxPresent: v && v.checkboxPresent === true, okPresent: v && v.okPresent === true }));
+  d.legalGateObserved = legalState.present === true;
+  d.legalGateHandledLocally = false;
+  if (legalState.present && (!legalState.checkboxPresent || !legalState.okPresent)) throw new ClassifiedError('FUNCTIONAL_DEFECT', 'R4_LEGAL_GATE_MARKUP_INCOMPLETE');`;
+  if (count(patched, staleLegalBlock) !== 1) fail(`STALE_LEGAL_BLOCK_COUNT_INVALID:${count(patched, staleLegalBlock)}`);
+  patched = patched.replace(staleLegalBlock, readonlyLegalBlock);
+  if (patched.includes("legal-check-count") || patched.includes("page.locator('#lg-chk').check()") || patched.includes("page.locator('#lg-ok').click()")) fail('STALE_LEGAL_INTERACTION_REMAINS');
+  if (count(patched, "legal-gate-observe") !== 1) fail('READONLY_LEGAL_OBSERVER_NOT_BOUND_EXACTLY_ONCE');
   return { original, patched };
 }
 function sourceAuthSha(contract) {
   const bytes = execFileSync('git', ['show', `${contract.sourceHead}:${contract.authAsset.sourcePath}`], { encoding: null, maxBuffer: 4 * 1024 * 1024 });
   return { sha256: sha256(bytes), bytes: bytes.length };
 }
+function syntaxCheckPatchedHarness(patched) {
+  const temp = path.join(ROOT, 'tools', `.orbit360-r4-certified-syntax-${process.pid}-${Date.now()}.mjs`);
+  fs.writeFileSync(temp, patched, 'utf8');
+  try { execFileSync(process.execPath, ['--check', temp], { cwd: ROOT, stdio: 'pipe' }); return true; }
+  finally { try { fs.unlinkSync(temp); } catch {} }
+}
 function selfTest(contract, harness) {
   const sourceAuth = sourceAuthSha(contract);
-  const ok = sourceAuth.sha256 === contract.authAsset.sha256 && sourceAuth.bytes === contract.authAsset.bytes && !harness.patched.includes('/core/auth.js') && harness.patched.includes(contract.authAsset.path);
-  const payload = { schemaVersion: 'orbit360-r4-certified-validator-rootfix-source-v1', ok, status: ok ? 'R4_CERTIFIED_VALIDATOR_ROOTFIX_SOURCE_PASS' : 'R4_CERTIFIED_VALIDATOR_ROOTFIX_SOURCE_FAIL', classification: ok ? 'VALIDATOR_STALE_ROOTFIX_PASS' : 'VALIDATOR_STALE_ROOTFIX_FAIL', sourceHead: contract.sourceHead, durableArtifact: { r3RunId: contract.r3RunId, artifactId: contract.r3DurableArtifactId, zipName: contract.zipName, zipSha256: contract.zipSha256, fileCount: contract.fileCount }, entrypoint: contract.entrypoint, authAsset: { ...contract.authAsset, sourceSha256Matches: sourceAuth.sha256 === contract.authAsset.sha256, sourceBytesMatch: sourceAuth.bytes === contract.authAsset.bytes }, staleLegacyAuthPathRemovedFromExecutableHarness: !harness.patched.includes('/core/auth.js'), productAuthPathBoundExactlyOnce: count(harness.patched, contract.authAsset.path) === 1, runtimeHarnessLocation: 'workspace/tools', browserExecuted: false, secretAccess: false, dataAccess: false, firestoreWrites: 0, authWrites: 0, operationalWrites: 0, deployExecuted: false, packageRebuilt: false, productionTouched: false, containsPII: false, containsSecrets: false };
+  let patchedHarnessSyntaxPass = false;
+  try { patchedHarnessSyntaxPass = syntaxCheckPatchedHarness(harness.patched); } catch {}
+  const staleLegalInteractionRemoved = !harness.patched.includes('legal-check-count') && !harness.patched.includes("page.locator('#lg-chk').check()") && !harness.patched.includes("page.locator('#lg-ok').click()");
+  const readonlyLegalObserverBound = count(harness.patched, 'legal-gate-observe') === 1;
+  const ok = sourceAuth.sha256 === contract.authAsset.sha256 && sourceAuth.bytes === contract.authAsset.bytes && !harness.patched.includes('/core/auth.js') && harness.patched.includes(contract.authAsset.path) && staleLegalInteractionRemoved && readonlyLegalObserverBound && patchedHarnessSyntaxPass;
+  const payload = { schemaVersion: 'orbit360-r4-certified-validator-rootfix-source-v1', ok, status: ok ? 'R4_CERTIFIED_VALIDATOR_ROOTFIX_SOURCE_PASS' : 'R4_CERTIFIED_VALIDATOR_ROOTFIX_SOURCE_FAIL', classification: ok ? 'VALIDATOR_STALE_ROOTFIX_PASS' : 'VALIDATOR_STALE_ROOTFIX_FAIL', sourceHead: contract.sourceHead, durableArtifact: { r3RunId: contract.r3RunId, artifactId: contract.r3DurableArtifactId, zipName: contract.zipName, zipSha256: contract.zipSha256, fileCount: contract.fileCount }, entrypoint: contract.entrypoint, authAsset: { ...contract.authAsset, sourceSha256Matches: sourceAuth.sha256 === contract.authAsset.sha256, sourceBytesMatch: sourceAuth.bytes === contract.authAsset.bytes }, staleLegacyAuthPathRemovedFromExecutableHarness: !harness.patched.includes('/core/auth.js'), productAuthPathBoundExactlyOnce: count(harness.patched, contract.authAsset.path) === 1, staleLegalInteractionRemoved, readonlyLegalObserverBound, patchedHarnessSyntaxPass, runtimeHarnessLocation: 'workspace/tools', browserExecuted: false, secretAccess: false, dataAccess: false, firestoreWrites: 0, authWrites: 0, operationalWrites: 0, deployExecuted: false, packageRebuilt: false, productionTouched: false, containsPII: false, containsSecrets: false };
   writeJson(SELF_EVIDENCE, payload); console.log(JSON.stringify(payload, null, 2)); if (!ok) process.exitCode = 41;
 }
 
