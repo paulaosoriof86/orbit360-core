@@ -21,6 +21,7 @@ env:
   ORBIT360_R4_PACKAGE_SOURCE_HEAD: 4f70f0dd6e870e8c7443a7638a9dc6e954eace1b
   ORBIT360_R4_PACKAGE_FILE_COUNT: '194'
   EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+  ORBIT360_R4_SOURCE_ONLY_RECOVERY: 'true'
 
 jobs:
   smoke:
@@ -46,6 +47,7 @@ jobs:
           node --check tools/orbit360-r4-production-readonly-smoke-v20260815.mjs
 
       - name: Install read-only production smoke tools
+        if: env.ORBIT360_R4_SOURCE_ONLY_RECOVERY != 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -53,6 +55,7 @@ jobs:
           npx playwright install --with-deps chromium
 
       - name: Bind existing protected smoke identity after gate
+        if: env.ORBIT360_R4_SOURCE_ONLY_RECOVERY != 'true'
         env:
           SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
           SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
@@ -73,6 +76,7 @@ jobs:
           echo "ORBIT360_PRODUCT_SMOKE_PASSWORD=$ORBIT360_EXISTING_LOGIN_PASSWORD" >> "$GITHUB_ENV"
 
       - name: Resolve existing smoke identity read-only
+        if: env.ORBIT360_R4_SOURCE_ONLY_RECOVERY != 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -80,6 +84,7 @@ jobs:
           jq -e '.ok==true and .eligibleSmokeIdentityCount==1 and .requiredRolesPresent==true and .firestoreWrites==0 and .operationalWrites==0 and .containsPII==false and .containsSecrets==false' "$EVIDENCE_DIR/m6-product-smoke-identity-summary.json" >/dev/null
 
       - name: Execute single production read-only browser frontier
+        if: env.ORBIT360_R4_SOURCE_ONLY_RECOVERY != 'true'
         shell: bash
         run: |
           set -euo pipefail
