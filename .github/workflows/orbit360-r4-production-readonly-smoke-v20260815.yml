@@ -21,7 +21,7 @@ env:
   ORBIT360_R4_PACKAGE_SOURCE_HEAD: 4f70f0dd6e870e8c7443a7638a9dc6e954eace1b
   ORBIT360_R4_PACKAGE_FILE_COUNT: '194'
   EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
-  ORBIT360_R4_SOURCE_ONLY_RECOVERY: 'true'
+  ORBIT360_R4_SOURCE_ONLY_RECOVERY: 'false'
 
 jobs:
   smoke:
@@ -50,6 +50,7 @@ jobs:
           echo "ORBIT360_R4_EXPECTED_AUTH_SHA256=$AUTH_SHA" >> "$GITHUB_ENV"
 
       - name: Validate bounded R4 harness source-only
+        if: env.ORBIT360_R4_SOURCE_ONLY_RECOVERY == 'true'
         shell: bash
         run: |
           set -euo pipefail
