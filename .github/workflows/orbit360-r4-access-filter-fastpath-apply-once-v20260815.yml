@@ -1,0 +1,68 @@
+name: Orbit360 R4 Access Filter Fastpath Apply Once 20260815
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/workflows/orbit360-r4-access-filter-fastpath-apply-once-v20260815.yml'
+
+permissions:
+  contents: write
+
+env:
+  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+  TARGET_PATH: orbit360-platform/core/access-scope.js
+
+jobs:
+  apply:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Gate and regenerate certified candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+          jq -e '.ok==true and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+          node tools/orbit360-access-filter-fastpath-rootfix-v20260815.mjs
+          jq -e '.ok==true and .status=="ACCESS_FILTER_FASTPATH_SOURCE_PASS" and .semanticEquivalence==true and .directionOptimization.baseGetCalls==1720 and .directionOptimization.fastGetCalls==4' "$EVIDENCE_DIR/r4-access-filter-fastpath-rootfix-v20260815.json" >/dev/null
+          node --check "$EVIDENCE_DIR/access-scope.fastpath.candidate.js"
+      - name: Apply exact candidate through GitHub Contents API CAS
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          BRANCH: ${{ github.ref_name }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          CURRENT_SHA="$(curl -fsSL -H "Authorization: Bearer $GH_TOKEN" -H 'Accept: application/vnd.github+json' "https://api.github.com/repos/$REPO/contents/$TARGET_PATH?ref=$BRANCH" | jq -r '.sha')"
+          test -n "$CURRENT_SHA" && test "$CURRENT_SHA" != 'null'
+          EXPECTED_SHA="$(git rev-parse "HEAD:$TARGET_PATH")"
+          test "$CURRENT_SHA" = "$EXPECTED_SHA"
+          CONTENT="$(base64 -w0 "$EVIDENCE_DIR/access-scope.fastpath.candidate.js")"
+          BODY="$(jq -n --arg message 'fix: bound access filter invariant context once' --arg content "$CONTENT" --arg sha "$CURRENT_SHA" --arg branch "$BRANCH" '{message:$message,content:$content,sha:$sha,branch:$branch}')"
+          RESPONSE="$(curl -fsSL -X PUT -H "Authorization: Bearer $GH_TOKEN" -H 'Accept: application/vnd.github+json' -H 'Content-Type: application/json' "https://api.github.com/repos/$REPO/contents/$TARGET_PATH" --data "$BODY")"
+          NEW_SHA="$(printf '%s' "$RESPONSE" | jq -r '.commit.sha')"
+          BLOB_SHA="$(printf '%s' "$RESPONSE" | jq -r '.content.sha')"
+          test -n "$NEW_SHA" && test "$NEW_SHA" != 'null'
+          test -n "$BLOB_SHA" && test "$BLOB_SHA" != 'null'
+          jq -n --arg commit "$NEW_SHA" --arg blob "$BLOB_SHA" --arg previous "$CURRENT_SHA" '{ok:true,status:"ACCESS_FILTER_FASTPATH_APPLIED",classification:"FUNCTIONAL_DEFECT_ROOTFIX_APPLIED",commit:$commit,blob:$blob,previousBlob:$previous,target:"orbit360-platform/core/access-scope.js",productionTouched:false,deployExecuted:false,packageRebuilt:false,secretAccess:false,dataAccess:false}' > "$EVIDENCE_DIR/r4-access-filter-fastpath-apply-v20260815.json"
+          cat "$EVIDENCE_DIR/r4-access-filter-fastpath-apply-v20260815.json"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: orbit360-r4-access-filter-fastpath-apply-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/r4-access-filter-fastpath-rootfix-v20260815.json
+            orbit360-platform/runtime-gate-crm-v20260716/r4-access-filter-fastpath-apply-v20260815.json
+          if-no-files-found: warn
+          retention-days: 14
