@@ -10,86 +10,53 @@ Antes de diagnosticar, modificar, ejecutar runtime/browser/deploy o continuar un
 2. HEAD real de `ays/backend-tenant-lab-v99-20260703` y PR #5;
 3. último workflow/evidencia indicado por `lastEvidence`;
 4. `orbit360-platform/docs/ADDENDUM-MAESTRO-CONTINUIDAD-SINCRONIZACION-ANTIBUCLE-GOLIVE-POSTPROD-20260814.md`;
-5. `orbit360-platform/docs/CIERRE-R4-FIRST-PRODUCTION-SMOKE-HARNESS-TIMEOUT-20260815.md`;
+5. `orbit360-platform/docs/CIERRE-R4-HARNESS-SOURCE-ONLY-ROOTFIX-PASS-20260815.md`;
 6. `orbit360-platform/CHANGELOG-R4-GOLIVE-20260814.md`.
 
 No usar memoria ni documentación histórica como sustituto del live-state.
 
-## Estado vivo · R4 PUBLICADO / RECUPERACIÓN SOURCE-ONLY DEL HARNESS · 2026-08-15
+## Estado vivo · R4 PUBLICADO / HARNESS RECUPERADO SOURCE-ONLY · 2026-08-15
 
 ```text
 R1/R2/R3: CERRADOS
 app.aysseguros.com: PUBLICADO, login visible
 paquete: exacto R3 certificado, sin rebuild
-R4 browser frontier #1: CANCELLED por timeout del harness
-producto/Auth defect: NO CLASIFICADOS por esa corrida
-workflow R4 browser: REFROZEN SOURCE-ONLY
+R4 browser frontier #1: no válida por timeout del harness
+rootfix harness source-only: PASS
+Auth/product defect: todavía NO CLASIFICADOS
+workflow R4 browser: continúa congelado source-only
 avance: 100% funcional / 75% técnico / 67% gates
 ```
 
-## Primera frontera productiva
+## Recuperación del harness cerrada
 
-Run `31903805595`, job `95058471779`, HEAD `5c12be143b6241a0af335d78f227c0ad14b05008`.
+Rootfix control-plane: `442ca5fc5a6ca6f70e7607daaa108ee0b84d8956`.
 
-Pasaron antes del navegador:
+Run source-only `31907519696`, job `95067552998`: **SUCCESS**.
 
-- gate canónico source-only;
-- instalación;
-- binding de secretos protegidos;
-- resolver read-only de identidad;
-- exactamente 1 actor elegible;
-- roles requeridos presentes;
-- resolver con cero escrituras.
+- gate canónico PASS;
+- `node --check` PASS;
+- watchdog sintético forced-hang PASS;
+- timeout sintético observado a 120 ms;
+- evidencia incremental existía antes del timeout;
+- deadline global del harness: 480000 ms, inferior al timeout del job;
+- comparación SHA-256 de `core/auth.js` publicada contra source R3 incorporada antes de diagnóstico de credencial;
+- instalación skipped;
+- secretos skipped;
+- identity resolver skipped;
+- browser skipped;
+- datos/Firestore: no acceso;
+- writes: 0;
+- producción: no tocada por esta recuperación.
 
-El paso browser inició a `19:24:57Z` y fue cancelado por el timeout del job a `19:44:28Z`. Node y Chromium permanecieron activos hasta la cancelación.
+Artifact: `9252752191`.
 
-El artifact `9252029652` solo contiene:
-
-- `preflight-sanitizado.json` PASS;
-- `m6-product-smoke-identity-summary.json` PASS.
-
-No existe `r4-production-readonly-smoke-v20260815.json`. Por ello la corrida no demuestra si el punto de espera fue manifest, Auth, membership, tenant, activación o rutas.
-
-Clasificación:
-
-`PIPELINE_MECHANISM_FAILURE / R4_HARNESS_UNBOUNDED_BROWSER_AWAIT_AND_FINAL_ONLY_EVIDENCE`
-
-No clasificar esta corrida como contraseña incorrecta ni defecto funcional.
-
-## Freeze anti-bucle
-
-El workflow R4 se refreezeó en HEAD `73a9cfc6d0ae6d430919aa32fcc0be7871b94740`.
-
-Control source-only:
-
-- run `31904861893` SUCCESS;
-- gate PASS;
-- instalación `skipped`;
-- secretos `skipped`;
-- identity `skipped`;
-- browser `skipped`.
-
-Mientras el freeze esté activo, editar el harness no puede disparar otro browser productivo.
+La causa de la primera corrida queda corregida a nivel mecanismo. Esto **no** convierte el fallo humano de login en contraseña incorrecta ni en PASS de Auth: todavía falta una frontera automatizada válida que lo clasifique.
 
 ## Siguiente acción exacta
 
-Corregir **solo** `tools/orbit360-r4-production-readonly-smoke-v20260815.mjs` y, si es necesario, assertions del workflow:
+En la **siguiente iteración**, mantener el harness recuperado sin cambios y activar exactamente **una** segunda frontera productiva read-only R4. Debe verificar primero manifest + hash de `core/auth.js`, y después aislar login HTTP → Auth → `emailVerified` → membership → tenant → runtime → roles/scopes/rutas.
 
-- deadline global menor al timeout del job;
-- timeouts explícitos para cada async browser-side;
-- checkpoints sanitizados antes/después de manifest, login HTTP, Auth, membership, activación y rol/rutas;
-- persistir evidencia parcial aunque una etapa expire;
-- finalización signal-safe.
+Ante el primer fallo clasificado se detiene. No modificar Auth, usuarios, memberships, producto, paquete ni datos por intuición.
 
-Validar source-only con gate + `node --check` + assertions de watchdog/checkpoints. No ejecutar segundo navegador antes de cerrar esta recuperación y sincronizar documentación.
-
-## Avance
-
-```text
-readiness funcional: 100%
-avance técnico: 75%
-gates finales: 67% (2/3)
-R4: publicación completa; primer smoke no válido por fallo del harness
-```
-
-Sin reconstrucción, reimportación, main ni merge. No pedir nuevas pruebas manuales de contraseña a Paula mientras Auth siga sin clasificación automática válida.
+No reconstrucción, no reimportación, no main, no merge.

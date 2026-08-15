@@ -1,8 +1,8 @@
 {
   "schemaVersion": "orbit360-live-state-v1",
-  "stateVersion": "20260815.r4-first-smoke-harness-timeout-source-recovery.1",
-  "updatedAt": "2026-08-15T13:48:00-06:00",
-  "phase": "R4_POST_PUBLISH_SMOKE_HARNESS_SOURCE_RECOVERY",
+  "stateVersion": "20260815.r4-harness-source-recovery-pass.1",
+  "updatedAt": "2026-08-15T14:45:00-06:00",
+  "phase": "R4_POST_PUBLISH_SMOKE_HARNESS_SOURCE_RECOVERY_PASS",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pr": 5,
@@ -11,6 +11,7 @@
   "canonicalFunctionalBaselineHead": "4ede3e785cb2cc889a7c11c2d9e2030c7af20b64",
   "productSourceHead": "4f70f0dd6e870e8c7443a7638a9dc6e954eace1b",
   "certifiedPackageSourceHead": "4f70f0dd6e870e8c7443a7638a9dc6e954eace1b",
+  "controlPlaneHead": "442ca5fc5a6ca6f70e7607daaa108ee0b84d8956",
   "canonicalCandidatePreserved": true,
   "r4Authorization": {
     "authorized": true,
@@ -42,7 +43,7 @@
     "status": "USER_LOGIN_GENERIC_FAILURE_STILL_UNCLASSIFIED",
     "personalPasswordRetestRequested": false,
     "classification": "UNCLASSIFIED_PENDING_VALID_AUTOMATED_DIAGNOSTIC",
-    "note": "First automated browser frontier timed out inside the harness before stage evidence was persisted; therefore it does not classify the human login failure."
+    "note": "The harness mechanism is now source-only recovered, but no second production browser frontier has executed yet; therefore the human login failure remains unclassified."
   },
   "r4SmokeFrontier1": {
     "workflow": "Orbit360 R4 Production Readonly Smoke 20260815",
@@ -50,54 +51,76 @@
     "jobId": 95058471779,
     "sourceHead": "5c12be143b6241a0af335d78f227c0ad14b05008",
     "result": "CANCELLED_AT_JOB_TIMEOUT",
-    "browserStepStarted": "2026-08-15T19:24:57Z",
-    "browserStepCancelled": "2026-08-15T19:44:28Z",
-    "canonicalGatePass": true,
-    "protectedIdentityBindPass": true,
-    "identityResolverPass": true,
-    "eligibleSmokeIdentityCount": 1,
-    "authUserCount": 9,
-    "membershipCount": 8,
-    "requiredRolesPresent": true,
-    "resolverFirestoreWrites": 0,
-    "resolverOperationalWrites": 0,
-    "browserFinalEvidencePresent": false,
-    "artifactId": 9252029652,
-    "artifactContains": ["preflight-sanitizado.json", "m6-product-smoke-identity-summary.json"],
     "classification": "PIPELINE_MECHANISM_FAILURE/R4_HARNESS_UNBOUNDED_BROWSER_AWAIT_AND_FINAL_ONLY_EVIDENCE",
     "productDefectProven": false,
-    "authDefectProven": false,
-    "unexpectedWritesCertified": false
+    "authDefectProven": false
   },
   "r4HarnessRootCause": {
-    "status": "PROVEN_SOURCE_MECHANISM_GAP",
-    "classification": "PIPELINE_MECHANISM_FAILURE/R4_HARNESS_UNBOUNDED_BROWSER_AWAIT_AND_FINAL_ONLY_EVIDENCE",
-    "facts": [
-      "Node and Chromium remained alive until GitHub job timeout.",
-      "The harness emitted no browser-stage log marker after launch.",
-      "The harness writes its diagnostic JSON only at final completion.",
-      "Browser-side asynchronous operations include awaits without a harness-level watchdog/stage persistence.",
-      "The run therefore cannot distinguish manifest/Auth/membership/router as the hang location."
+    "status": "ROOTFIX_SOURCE_ONLY_PASS",
+    "originalClassification": "PIPELINE_MECHANISM_FAILURE/R4_HARNESS_UNBOUNDED_BROWSER_AWAIT_AND_FINAL_ONLY_EVIDENCE",
+    "rootfixHead": "442ca5fc5a6ca6f70e7607daaa108ee0b84d8956",
+    "mechanismChanges": [
+      "deterministic global deadline below the GitHub job timeout",
+      "bounded stage wrappers for browser-side asynchronous operations",
+      "incremental sanitized currentStage/checkpoint evidence",
+      "terminal evidence on stage timeout and SIGTERM/SIGINT",
+      "bounded browser close in finalization",
+      "source-only synthetic forced-hang watchdog",
+      "published core/auth.js SHA-256 comparison against the certified R3 source before credential diagnosis"
     ]
+  },
+  "r4HarnessSourceRecovery": {
+    "status": "PASS",
+    "workflow": "Orbit360 R4 Production Readonly Smoke 20260815",
+    "runId": 31907519696,
+    "jobId": 95067552998,
+    "sourceHead": "442ca5fc5a6ca6f70e7607daaa108ee0b84d8956",
+    "artifactId": 9252752191,
+    "artifactDigest": "sha256:ffcf24398a445fdc13cc80b9ac2d91fa151b5fd7731d5b6510fadf1087a65421",
+    "canonicalGatePass": true,
+    "watchdogPass": true,
+    "syntheticStageTimeoutMs": 120,
+    "stageTimeoutObserved": true,
+    "evidencePersistedBeforeTimeout": true,
+    "globalDeadlineMs": 480000,
+    "installSkipped": true,
+    "secretBindSkipped": true,
+    "identityResolverSkipped": true,
+    "browserSkipped": true,
+    "dataAccess": false,
+    "secretAccess": false,
+    "firestoreRead": false,
+    "runtimeExecuted": false,
+    "browserExecuted": false,
+    "deployExecuted": false,
+    "productionTouched": false,
+    "firestoreWrites": 0,
+    "authWrites": 0,
+    "operationalWrites": 0,
+    "containsPII": false,
+    "containsSecrets": false
   },
   "r4BrowserFreeze": {
     "active": true,
-    "sourceHead": "73a9cfc6d0ae6d430919aa32fcc0be7871b94740",
-    "controlRunId": 31904861893,
-    "controlJobId": 95060983322,
-    "controlResult": "SUCCESS_SOURCE_ONLY",
+    "sourceHead": "442ca5fc5a6ca6f70e7607daaa108ee0b84d8956",
+    "controlRunId": 31907519696,
+    "controlJobId": 95067552998,
+    "controlResult": "SUCCESS_SOURCE_ONLY_ROOTFIX",
     "installSkipped": true,
     "secretsSkipped": true,
     "identitySkipped": true,
-    "browserSkipped": true
+    "browserSkipped": true,
+    "previousFreezeHead": "73a9cfc6d0ae6d430919aa32fcc0be7871b94740",
+    "previousControlRunId": 31904861893
   },
   "lastEvidence": {
     "workflow": "Orbit360 R4 Production Readonly Smoke 20260815",
-    "runId": 31904861893,
-    "jobId": 95060983322,
-    "stage": "R4_BROWSER_REFREEZE_SOURCE_ONLY_CONTROL",
+    "runId": 31907519696,
+    "jobId": 95067552998,
+    "artifactId": 9252752191,
+    "stage": "R4_HARNESS_SOURCE_ONLY_BOUNDED_OBSERVABILITY_ROOTFIX",
     "result": "SUCCESS",
-    "sourceHead": "73a9cfc6d0ae6d430919aa32fcc0be7871b94740",
+    "sourceHead": "442ca5fc5a6ca6f70e7607daaa108ee0b84d8956",
     "secretAccess": false,
     "dataAccess": false,
     "runtimeExecuted": false,
@@ -105,7 +128,7 @@
     "deployExecuted": false,
     "productionTouched": false
   },
-  "classification": "PIPELINE_MECHANISM_FAILURE/R4_HARNESS_UNBOUNDED_BROWSER_AWAIT_AND_FINAL_ONLY_EVIDENCE",
+  "classification": "R4_HARNESS_SOURCE_ONLY_RECOVERY_PASS_AUTH_STILL_UNCLASSIFIED",
   "progress": {
     "functionalReadinessPercent": 100,
     "technicalIterationsCompleted": 3,
@@ -114,7 +137,7 @@
     "goLiveGatesClosed": 2,
     "goLiveGatesTotal": 3,
     "goLiveGateProgressPercent": 67,
-    "r4": "PUBLISHED_HARNESS_SOURCE_RECOVERY_BEFORE_SECOND_FRONTIER"
+    "r4": "PUBLISHED_HARNESS_RECOVERED_SOURCE_ONLY_SECOND_BROWSER_FRONTIER_NOT_EXECUTED"
   },
   "iterationBudget": {
     "r0GovernanceCompleted": true,
@@ -123,13 +146,14 @@
     "r3Completed": true,
     "r4BrowserFrontiersExecutedAfterPublish": 1,
     "r4HarnessFailureCount": 1,
+    "r4HarnessSourceRecoveryPassCount": 1,
     "sameFamilyFailureLimit": 2,
     "thirdSameFamilyAttemptAllowed": false
   },
   "nextActionExact": {
-    "owner": "R4 production read-only smoke harness",
-    "stage": "R4_HARNESS_SOURCE_ONLY_BOUNDED_OBSERVABILITY_ROOTFIX",
-    "action": "Keep the R4 workflow frozen source-only. Modify only the R4 harness/workflow mechanism, not product. Add a deterministic global deadline, bounded browser-side async stages, incremental sanitized stage evidence written before and after manifest, login response, auth projection, membership, runtime activation and each role-route group, plus signal-safe finalization. Validate node syntax and source assertions only while the freeze is active. Do not execute a second production browser frontier until the source-only recovery evidence is PASS and the durable checkpoint is synchronized.",
+    "owner": "R4 production read-only smoke frontier",
+    "stage": "R4_SECOND_SINGLE_PRODUCTION_BROWSER_FRONTIER",
+    "action": "Keep the recovered harness unchanged. In the next iteration only, preserve the canonical source gate, then activate exactly one second production read-only browser frontier using the already-authorized protected smoke identity. The browser must first verify the published package manifest and core/auth.js SHA-256 against the certified R3 source, then classify login HTTP, Auth projection, emailVerified, membership, tenant, runtime activation, Dirección/Operativo/Asesor scopes and critical routes with incremental stage evidence. Stop immediately on the first classified failure. Do not modify Auth, users, memberships, product, package or data before that evidence. Do not execute this frontier in the same iteration that closes source-only recovery.",
     "productChangesAuthorized": false,
     "packageRebuildAuthorized": false,
     "reimportAuthorized": false,
@@ -143,8 +167,9 @@
     "public login reachable",
     "HostDime/hostname not blocking",
     "canonical R4 preflight gate passes",
-    "exactly one protected smoke identity resolves read-only",
-    "browser workflow refrozen source-only"
+    "exactly one protected smoke identity previously resolved read-only",
+    "first R4 browser failure classified as pipeline mechanism failure",
+    "R4 harness bounded-observability rootfix source-only PASS"
   ],
   "hostdimeBlocking": false,
   "productionTouchedByManualPublish": true,
@@ -155,11 +180,12 @@
     "Keep R1/R2/R3 closed",
     "Do not rebuild the certified package",
     "Do not ask Paula to retry personal passwords",
-    "Do not run another production browser while R4 source-only freeze is active",
-    "Fix harness observability/timeouts source-only",
-    "After source-only PASS, synchronize checkpoint before any second browser frontier"
+    "Do not modify Auth/users/memberships before a valid second browser classification",
+    "Keep the recovered harness unchanged unless new mechanism evidence proves drift",
+    "Execute at most one second production browser frontier in the next iteration",
+    "After that frontier, stop, classify and synchronize before any further action"
   ],
   "governanceDocument": "orbit360-platform/docs/ADDENDUM-MAESTRO-CONTINUIDAD-SINCRONIZACION-ANTIBUCLE-GOLIVE-POSTPROD-20260814.md",
-  "currentCheckpoint": "orbit360-platform/docs/CIERRE-R4-FIRST-PRODUCTION-SMOKE-HARNESS-TIMEOUT-20260815.md",
+  "currentCheckpoint": "orbit360-platform/docs/CIERRE-R4-HARNESS-SOURCE-ONLY-ROOTFIX-PASS-20260815.md",
   "currentChangelog": "orbit360-platform/CHANGELOG-R4-GOLIVE-20260814.md"
 }
