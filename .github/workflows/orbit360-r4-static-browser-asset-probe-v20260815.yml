@@ -1,0 +1,180 @@
+name: Orbit360 R4 Static Browser Asset Probe 20260815
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/workflows/orbit360-r4-static-browser-asset-probe-v20260815.yml'
+
+permissions:
+  contents: read
+
+env:
+  ORBIT360_R4_URL: https://app.aysseguros.com
+  ORBIT360_R4_PACKAGE_SOURCE_HEAD: 4f70f0dd6e870e8c7443a7638a9dc6e954eace1b
+  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Canonical source gate before public browser
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+          jq -e '.ok==true and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+
+      - name: Install isolated Chromium probe
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false --ignore-scripts playwright@1.52.0
+          npx playwright install --with-deps chromium
+
+      - name: Observe real browser static asset delivery only
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs = require('fs');
+          const crypto = require('crypto');
+          const { execFileSync } = require('child_process');
+          const { chromium } = require('playwright');
+
+          const origin = new URL(process.env.ORBIT360_R4_URL).origin;
+          const sourceHead = process.env.ORBIT360_R4_PACKAGE_SOURCE_HEAD;
+          const out = process.env.EVIDENCE_DIR + '/r4-static-browser-asset-probe-v20260815.json';
+          const targets = [
+            {id:'config', path:'/core/config.js', source:'core/config.js'},
+            {id:'legal', path:'/core/legal.js', source:'core/legal.js'},
+            {id:'auth', path:'/core/auth.js', source:'core/auth.js'},
+            {id:'auth-password-change', path:'/core/auth-password-change-v20260805.js', source:'core/auth-password-change-v20260805.js'},
+            {id:'user-credential-selfservice', path:'/core/user-credential-selfservice-v20260805.js', source:'core/user-credential-selfservice-v20260805.js'},
+            {id:'access-scope', path:'/core/access-scope.js', source:'core/access-scope.js'}
+          ];
+          const expected = Object.fromEntries(targets.map(t => {
+            const b = execFileSync('git',['show',`${sourceHead}:orbit360-platform/${t.source}`],{encoding:null,maxBuffer:4*1024*1024});
+            return [t.id,{sha256:crypto.createHash('sha256').update(b).digest('hex'),bytes:b.length}];
+          }));
+          const observed = new Map();
+          const blockedExternal = [];
+          const blockedNonGet = [];
+          const pageErrors = [];
+          const consoleErrors = [];
+          let mainDocument = null;
+          let loginVisible = false;
+          let browser = null;
+
+          function sha256(b){return crypto.createHash('sha256').update(b).digest('hex');}
+          function safeHeaders(h){
+            const keys=['content-type','content-length','cache-control','server','etag','last-modified'];
+            const o={}; for(const k of keys) if(h[k]!==undefined)o[k]=String(h[k]).slice(0,240); return o;
+          }
+
+          (async()=>{
+            browser = await chromium.launch({headless:true});
+            const context = await browser.newContext({ignoreHTTPSErrors:false});
+            await context.route('**/*', async route => {
+              const req = route.request();
+              const u = new URL(req.url());
+              if (req.method() !== 'GET') {
+                blockedNonGet.push({method:req.method(),origin:u.origin,path:u.pathname});
+                return route.abort();
+              }
+              if (u.origin !== origin) {
+                blockedExternal.push({origin:u.origin,path:u.pathname});
+                return route.abort();
+              }
+              return route.continue();
+            });
+            const page = await context.newPage();
+            page.on('pageerror', e => pageErrors.push(String(e.message||e).slice(0,300)));
+            page.on('console', m => { if (m.type()==='error') consoleErrors.push(m.text().slice(0,300)); });
+            page.on('response', async response => {
+              try {
+                const u = new URL(response.url());
+                if (u.origin !== origin) return;
+                if (response.request().resourceType()==='document' && u.pathname === '/') {
+                  mainDocument = {status:response.status(),headers:safeHeaders(await response.allHeaders())};
+                }
+                const t = targets.find(x => u.pathname === x.path);
+                if (!t || observed.has(t.id)) return;
+                let body = null, bodyError = null;
+                try { body = await response.body(); } catch(e) { bodyError = String(e.message||e).slice(0,300); }
+                const headers = safeHeaders(await response.allHeaders());
+                observed.set(t.id,{
+                  id:t.id,path:u.pathname,status:response.status(),headers,
+                  bytes:body?body.length:null,sha256:body?sha256(body):null,
+                  shaMatches:body?sha256(body)===expected[t.id].sha256:false,
+                  expectedBytes:expected[t.id].bytes,bodyError
+                });
+              } catch(_) {}
+            });
+
+            let gotoError = null;
+            try {
+              await page.goto(process.env.ORBIT360_R4_URL,{waitUntil:'domcontentloaded',timeout:45000});
+            } catch(e) { gotoError=String(e.message||e).slice(0,400); }
+            try {
+              await page.locator('#login-form').waitFor({state:'visible',timeout:30000});
+              loginVisible = true;
+            } catch(_) {}
+            await page.waitForTimeout(3000);
+
+            const results = targets.map(t => observed.get(t.id) || ({id:t.id,path:t.path,status:null,missing:true,expectedBytes:expected[t.id].bytes}));
+            const allObserved = results.every(r => !r.missing);
+            const all200 = allObserved && results.every(r => r.status===200);
+            const allMimeJs = allObserved && results.every(r => /javascript|ecmascript/i.test(String(r.headers?.['content-type']||'')));
+            const allHashExact = allObserved && results.every(r => r.shaMatches===true);
+            const auth = results.find(r=>r.id==='auth');
+            let classification='ENVIRONMENT_FAILURE/R4_REAL_BROWSER_STATIC_ASSET_UNRESOLVED';
+            if (loginVisible && all200 && allMimeJs && allHashExact) classification='PASS/R4_REAL_BROWSER_STATIC_ASSET_DELIVERY';
+            else if (loginVisible && auth && auth.status===500) classification='ENVIRONMENT_FAILURE/R4_REAL_BROWSER_AUTH_ASSET_HTTP500';
+            else if (!loginVisible && mainDocument && /text\/html/i.test(String(mainDocument.headers?.['content-type']||''))) classification='ENVIRONMENT_FAILURE/R4_WEBSHIELD_BROWSER_CHALLENGE_NOT_CLEARED';
+            else if (allObserved && results.some(r=>r.status===200 && !r.shaMatches)) classification='DATA_CONTRACT_FAILURE/R4_BROWSER_SERVED_BYTES_DIFFER_FROM_R3';
+
+            const evidence={
+              schemaVersion:'orbit360-r4-static-browser-asset-probe-v1',ok:true,status:'STATIC_BROWSER_ASSET_PROBE_COMPLETE',classification,
+              sourceHead,origin,mainDocument,loginVisible,gotoError,results,
+              allObserved,all200,allMimeJs,allHashExact,
+              externalRequestsBlocked:blockedExternal.length,nonGetRequestsBlocked:blockedNonGet.length,
+              blockedExternalOrigins:[...new Set(blockedExternal.map(x=>x.origin))],
+              pageErrorCount:pageErrors.length,consoleErrorCount:consoleErrors.length,
+              browserExecuted:true,loginSubmitted:false,secretAccess:false,dataAccess:false,externalDataRequestsAllowed:false,
+              firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,packageRebuilt:false,
+              containsPII:false,containsSecrets:false,responseBodiesPersisted:false
+            };
+            fs.mkdirSync(process.env.EVIDENCE_DIR,{recursive:true});
+            fs.writeFileSync(out,JSON.stringify(evidence,null,2)+'\n');
+            console.log(JSON.stringify({classification,loginVisible,allObserved,all200,allMimeJs,allHashExact,results:results.map(r=>({id:r.id,status:r.status,contentType:r.headers?.['content-type']||null,shaMatches:r.shaMatches||false,missing:!!r.missing})),externalRequestsBlocked:evidence.externalRequestsBlocked,nonGetRequestsBlocked:evidence.nonGetRequestsBlocked},null,2));
+            await browser.close(); browser=null;
+          })().catch(async err=>{
+            try{if(browser)await browser.close();}catch(_){}
+            fs.mkdirSync(process.env.EVIDENCE_DIR,{recursive:true});
+            fs.writeFileSync(out,JSON.stringify({schemaVersion:'orbit360-r4-static-browser-asset-probe-v1',ok:false,status:'STATIC_BROWSER_PROBE_MECHANISM_FAILURE',classification:'PIPELINE_MECHANISM_FAILURE/R4_STATIC_BROWSER_PROBE_FAILED',error:String(err.message||err),browserExecuted:true,loginSubmitted:false,secretAccess:false,dataAccess:false,firestoreWrites:0,authWrites:0,operationalWrites:0,containsPII:false,containsSecrets:false},null,2)+'\n');
+            process.exit(42);
+          });
+          NODE
+          jq -e '.ok==true and .status=="STATIC_BROWSER_ASSET_PROBE_COMPLETE" and .browserExecuted==true and .loginSubmitted==false and .secretAccess==false and .dataAccess==false and .externalDataRequestsAllowed==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .deployExecuted==false and .packageRebuilt==false and .containsPII==false and .containsSecrets==false and .responseBodiesPersisted==false' "$EVIDENCE_DIR/r4-static-browser-asset-probe-v20260815.json" >/dev/null
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: orbit360-r4-static-browser-asset-probe-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/r4-static-browser-asset-probe-v20260815.json
+          if-no-files-found: warn
+          retention-days: 14
