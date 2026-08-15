@@ -10,73 +10,68 @@ Antes de diagnosticar, modificar, ejecutar runtime/browser/deploy o continuar un
 2. HEAD real de `ays/backend-tenant-lab-v99-20260703` y PR #5;
 3. último workflow/evidencia indicado por `lastEvidence`;
 4. `orbit360-platform/docs/ADDENDUM-MAESTRO-CONTINUIDAD-SINCRONIZACION-ANTIBUCLE-GOLIVE-POSTPROD-20260814.md`;
-5. `orbit360-platform/docs/CIERRE-R4-SECOND-BROWSER-AUTH-ASSET-HTTP500-20260815.md`;
+5. `orbit360-platform/docs/CIERRE-R4-HTTP-ONLY-SENSITIVE-ASSET-PATTERN-20260815.md`;
 6. `orbit360-platform/CHANGELOG-R4-GOLIVE-20260814.md`.
 
 No usar memoria ni documentación histórica como sustituto del live-state.
 
-## Estado vivo · R4 PUBLICADO / AUTH BLOQUEADO ANTES DE CREDENCIALES · 2026-08-15
+## Estado vivo · R4 PUBLICADO / BLOQUEO EN CAPA APACHE-SEGURIDAD · 2026-08-15
 
 ```text
 R1/R2/R3: CERRADOS
-app.aysseguros.com: publicado, login visible
+app.aysseguros.com: PUBLICADO, login visible
 paquete: exacto R3 certificado, sin rebuild
-harness R4 bounded observability: PASS
-segunda frontera browser: FAIL CLASIFICADO
-manifest: PASS / HTTP 200 / source R3 exacto
-/core/auth.js: HTTP 500
-Auth/password/emailVerified/membership browser: NO EVALUADOS
-clasificación: ENVIRONMENT_FAILURE / R4_PUBLISHED_AUTH_ASSET_MISMATCH
-workflow browser: REFROZEN source-only
+R4 browser frontier #1: no válida por timeout del harness
+rootfix harness source-only: PASS
+R4 browser frontier #2: FAIL clasificado antes de login
+HTTP-only diagnosis: PASS como mecanismo
+browser R4: REFROZEN SOURCE-ONLY
+Auth/contraseña: NO EVALUADOS
+bloqueo: Apache/hosting devuelve 500 a assets de auth/credenciales
 avance: 100% funcional / 75% técnico / 67% gates
 ```
 
-## Segunda frontera R4
+## Evidencia HTTP-only
 
-Run `31907938110`, job `95068560384`, HEAD `9150d249e6eeeb1962d0831a541e18737e35b7e3`.
+Run `31908342723`, job `95069516527`, HEAD `474e022382920382f6e0f408038d4734908521ec`.
 
-PASS antes del punto de fallo:
+PASS:
 
 - gate canónico;
-- instalación;
-- binding de secretos protegidos;
-- resolver read-only;
-- exactamente 1 actor elegible;
-- roles requeridos presentes;
-- target HTTPS 200;
-- login visible;
-- manifest R3 HTTP 200 y exacto;
-- cero writes.
+- watchdog source-only;
+- requests HTTP no-store;
+- cero secretos;
+- cero datos;
+- cero browser;
+- cero writes;
+- cero deploy/rebuild.
 
-Primer fallo válido:
+Assets neutros servidos correctamente y con SHA-256 exacto del source R3:
 
-`/core/auth.js` respondió HTTP `500`.
+- `core/config.js` → HTTP 200;
+- `core/legal.js` → HTTP 200;
+- `core/access-scope.js` → HTTP 200.
 
-El harness se detuvo en `auth-asset-validated` con:
+Assets ligados a autenticación/credenciales:
 
-`ENVIRONMENT_FAILURE / R4_PUBLISHED_AUTH_ASSET_MISMATCH`
+- `core/auth.js` → HEAD 500 / GET 500;
+- `core/auth-password-change-v20260805.js` → HEAD 500 / GET 500;
+- `core/user-credential-selfservice-v20260805.js` → HEAD 500 / GET 500.
 
-No hubo request de login a Identity Toolkit; por tanto no existe evidencia de contraseña incorrecta, email no verificado, membership defectuosa ni fallo del runtime.
+Los tres 500 son servidos por Apache como HTML de 712 bytes y comparten la misma firma SHA-256. El paquete R3 no contiene `orbit360-platform/.htaccess`.
 
-Artifact `9252867826`, digest `sha256:854906ce4618e24f1c1c7c004ecf608b5919849637fdac1c1a8104a4299951e5`.
+Clasificación vigente:
 
-## Refreeze anti-bucle
+`ENVIRONMENT_FAILURE / R4_CORE_STATIC_DELIVERY_BROADER_FAILURE`
 
-HEAD `6c15b7ccaee4a56be50912148470949e9a28317b` reactivó source-only.
-
-Control run `31908033440`, job `95068778079`: **SUCCESS**.
-
-- gate PASS;
-- watchdog PASS;
-- install skipped;
-- secrets skipped;
-- identity skipped;
-- browser skipped.
+Interpretación operativa: el owner está en la capa Apache/seguridad/handler del hosting para assets sensibles. La evidencia todavía no identifica el ID exacto de una regla ModSecurity ni autoriza desactivar seguridad.
 
 ## Siguiente acción exacta
 
-Diagnosticar **fuera de Auth** el HTTP 500 de `/core/auth.js` con requests HTTP directos no-store, comparación contra assets hermanos de `/core` y contra el source/paquete R3 certificado. Determinar primero si el owner es regla/handler/seguridad/permisos del hosting o integridad/entrega del archivo.
+Mantener el browser congelado. Obtener evidencia del servidor para los 500 reproducibles de los tres assets sensibles: regla ModSecurity/Apache exacta, directiva, handler o metadata/permisos. Preferir whitelist de la regla falsa positiva únicamente para `app.aysseguros.com`; no desactivar ModSecurity globalmente.
 
-No tocar contraseña, usuarios, memberships, `core/auth.js`, paquete productivo, datos ni HostDime por intuición. Corregir únicamente el owner demostrado y exigir evidencia estática/HTTP antes de otro browser.
+Si cPanel expone `Security > ModSecurity`, revisar el estado del dominio sin modificarlo todavía. Si no expone el rule/audit log, escalar el caso reproducible a HostDime para que identifique la regla exacta.
 
-No reconstrucción, no reimportación, no main, no merge.
+Después del rootfix del hosting se exige HTTP 200 + SHA-256 R3 exacto para todos los assets afectados antes de cualquier nuevo browser/Auth.
+
+Sin cambio de contraseña, usuarios, memberships, `core/auth.js`, paquete, datos, main ni merge.
