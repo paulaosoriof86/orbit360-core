@@ -13,63 +13,29 @@ Autorización recibida para backup/rollback, publicación en `app.aysseguros.com
 
 ## Publicación manual · 2026-08-15
 
-Paula cargó y extrajo el paquete exacto en `/home/ayssegur/public_html/app.aysseguros.com`.
-
-`https://app.aysseguros.com` mostró el login productivo Orbit 360. El manifest publicado coincide con R3 y fileCount 194.
+Paula cargó y extrajo el paquete exacto en `/home/ayssegur/public_html/app.aysseguros.com`. `https://app.aysseguros.com` mostró el login y el manifest publicado coincidió con R3, fileCount 194.
 
 ## R4 browser frontier #1
 
-Run `31903805595`, job `95058471779`.
-
-Pre-browser PASS; browser cancelado por timeout del harness.
-
-Clasificación:
+Run `31903805595`, job `95058471779`: pre-browser PASS; browser cancelado por timeout.
 
 `PIPELINE_MECHANISM_FAILURE / R4_HARNESS_UNBOUNDED_BROWSER_AWAIT_AND_FINAL_ONLY_EVIDENCE`
 
-## Rootfix bounded observability · source-only PASS
+## Rootfix bounded observability
 
 Rootfix `442ca5fc5a6ca6f70e7607daaa108ee0b84d8956`.
 
-Run `31907519696`, job `95067552998`: SUCCESS.
+Run `31907519696`, job `95067552998`: SUCCESS source-only; gate/watchdog/evidencia incremental PASS, global deadline 480000 ms, secrets/browser/data skipped, writes 0.
 
-- gate PASS;
-- forced-hang watchdog PASS;
-- evidencia incremental PASS;
-- global deadline 480000 ms;
-- auth asset SHA check incorporado antes de credenciales;
-- secrets/browser/data skipped;
-- writes 0.
-
-## R4 browser frontier #2 · FAIL clasificado
-
-Activación `9150d249e6eeeb1962d0831a541e18737e35b7e3`.
+## R4 browser frontier #2
 
 Run `31907938110`, job `95068560384`.
 
-PASS antes del fallo:
+PASS antes del fallo: gate, identidad protegida, resolver read-only, 1 actor elegible, roles requeridos, target 200, login visible, manifest R3 exacto, writes 0.
 
-- gate;
-- protected identity bind;
-- identity resolver read-only;
-- 1 actor elegible;
-- roles requeridos presentes;
-- target HTTPS 200;
-- login visible;
-- manifest 200 + source R3 exacto;
-- resolver writes 0.
-
-Primer fallo:
-
-`/core/auth.js` → HTTP 500 en stage `auth-asset-validated`.
-
-Login no fue enviado. Auth, `emailVerified`, browser membership y runtime no fueron evaluados.
-
-Clasificación inicial:
+Primer fallo: `/core/auth.js` → HTTP 500 en `auth-asset-validated`. Login no fue enviado; contraseña, `emailVerified`, browser membership y runtime no fueron evaluados.
 
 `ENVIRONMENT_FAILURE / R4_PUBLISHED_AUTH_ASSET_MISMATCH`
-
-Artifact `9252867826`.
 
 ## Refreeze anti-bucle
 
@@ -77,57 +43,57 @@ Commit `6c15b7ccaee4a56be50912148470949e9a28317b`.
 
 Control run `31908033440`, job `95068778079`: SUCCESS source-only; install/secrets/identity/browser skipped.
 
-## Diagnóstico HTTP-only del patrón de assets · 2026-08-15
+## HTTP-only diagnosis #1
 
 Commit `474e022382920382f6e0f408038d4734908521ec`.
 
-Run `31908342723`, job `95069516527`: SUCCESS como mecanismo source-only.
+Run `31908342723`, job `95069516527`; artifact `9252961845`.
 
-Artifact `9252961845`, digest `sha256:0ac94926266abff0cf6c219b565fe334b10f013deb51d889e0f8cef4d4909932`.
-
-Controles:
-
-- canonical gate PASS;
-- watchdog PASS;
-- cache bypass/no-store;
-- browser false;
-- secrets false;
-- data access false;
-- Firestore/Auth/operational writes 0;
-- deploy false;
-- package rebuild false.
-
-### Assets neutros — PASS exacto R3
-
-- `core/config.js`: HEAD 200 / GET 200 / SHA exacto R3;
-- `core/legal.js`: HEAD 200 / GET 200 / SHA exacto R3;
-- `core/access-scope.js`: HEAD 200 / GET 200 / SHA exacto R3.
-
-### Assets ligados a autenticación/credenciales — FAIL Apache idéntico
-
-- `core/auth.js`: HEAD 500 / GET 500;
-- `core/auth-password-change-v20260805.js`: HEAD 500 / GET 500;
-- `core/user-credential-selfservice-v20260805.js`: HEAD 500 / GET 500.
-
-Los tres GET 500 retornan `text/html; charset=iso-8859-1`, 712 bytes, `server: Apache` y la misma firma de cuerpo `07e2c9e80962ab9ff4072c4d192e5b5e51d993d7e100c5af563c2eeff21cc002`.
-
-El source R3 no contiene `orbit360-platform/.htaccess`.
-
-Clasificación machine-readable:
+- `core/config.js`, `core/legal.js`, `core/access-scope.js`: GET 200 + SHA exacto R3;
+- `core/auth.js`, `core/auth-password-change-v20260805.js`, `core/user-credential-selfservice-v20260805.js`: HEAD 500 / GET 500;
+- los tres 500: Apache, HTML 712 bytes, misma firma;
+- paquete R3 sin `orbit360-platform/.htaccess`.
 
 `ENVIRONMENT_FAILURE / R4_CORE_STATIC_DELIVERY_BROADER_FAILURE`
 
-Interpretación: no hay evidencia de corrupción general del paquete. La entrega Apache/hosting discrimina múltiples assets de autenticación/credenciales. La familia de owner es regla/handler/security policy/metadata del hosting. El ID exacto de una regla ModSecurity no está probado aún y requiere log/audit server-side.
+## Evidencia cPanel
 
-## Siguiente gate
+Capturas del 15-ago-2026 confirmaron:
 
-Mantener browser R4 congelado source-only. Obtener evidencia server-side para los tres HTTP 500 reproducibles e identificar regla/directiva exacta. No desactivar seguridad globalmente; preferir whitelist puntual para `app.aysseguros.com` si se demuestra un falso positivo.
+- interfaz ModSecurity no expuesta en cPanel;
+- Imunify360 expone solo Escáner de malware y Defensa proactiva, sin WAF/Incidents;
+- Defensa proactiva indica que el modo lo establece el administrador del servidor;
+- interfaz `Errores` sí disponible;
+- mensajes visibles `AH01630: client denied by server configuration` apuntan a `/home/ayssegur/public_html/app.aysseguros.com/php.ini` y no a `auth.js`.
 
-Antes de reabrir browser/Auth deben pasar:
+Por tanto, esos mensajes de `php.ini` no se usan para atribuir el fallo Orbit a una regla concreta.
 
-- los tres assets afectados HTTP 200;
-- SHA-256 exacto contra R3;
-- cero cambio en producto/paquete/datos;
-- evidencia sanitizada del rootfix del hosting.
+## HTTP-only diagnosis #2 · FINAL
+
+Workflow `Orbit360 R4 HTTP Sensitive Name Matrix 20260815`.
+
+Commit `2862d283f5d29ba40646a56d0ad29fe4eee36af8`.
+
+Run `31912332328`, job `95079202582`: SUCCESS como mecanismo. Artifact `9254004177`, digest `sha256:7e42593c463a85f9402609ce39ca62f74918765fd4d7e2fac2585045960de364`.
+
+Gate canónico PASS. Sin secretos, browser, datos, deploy, rebuild ni writes.
+
+Resultado ambiental:
+
+- todos los assets probados, incluidos neutros, respondieron HEAD 200 con `server: Apache`, `content-type: text/html; charset=utf-8` y tamaño aproximado 11.9–12.1 KB;
+- todos los GET terminaron `socket hang up`;
+- por tanto la segunda matriz no permite distinguir nombres sensibles: una capa Apache/seguridad/edge está interceptando genéricamente las sondas automatizadas.
+
+Clasificación:
+
+`ENVIRONMENT_FAILURE / R4_HOSTING_SECURITY_EDGE_INTERCEPTION_GENERIC`
+
+## STOP_RETRY y siguiente acción
+
+Se consumieron dos diagnósticos HTTP de la misma familia. No ejecutar un tercero y no reabrir browser/Auth.
+
+Siguiente owner: administración server-side de HostDime. Abrir un único caso técnico para `app.aysseguros.com`, aportar la cronología reproducible y pedir identificación del rule ID/directiva/handler/control exacto en Apache/ModSecurity/Imunify/audit logs. Corregir únicamente el falso positivo u owner demostrado; no desactivar seguridad globalmente.
+
+Después del fix de hosting: una sola verificación HTTP-only exigiendo 200 + MIME JavaScript + SHA-256 exacto R3 para todos los assets afectados. Solo con PASS se reabre browser/Auth.
 
 Avance permanece 100% funcional / 75% técnico / 67% gates hasta `POST_GO_LIVE_SMOKE_PASS`.
