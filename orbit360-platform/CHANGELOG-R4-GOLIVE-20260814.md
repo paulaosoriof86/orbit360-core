@@ -14,7 +14,7 @@ Autorización recibida para backup/rollback, publicación en `app.aysseguros.com
 
 Paula cargó y extrajo el paquete exacto en `/home/ayssegur/public_html/app.aysseguros.com`.
 
-Capturas confirmaron estructura raíz correcta y `https://app.aysseguros.com` mostró el login productivo Orbit 360. HostDime/hostname dejó de ser bloqueo para el smoke.
+Capturas confirmaron estructura raíz correcta y `https://app.aysseguros.com` mostró el login productivo Orbit 360. HostDime/hostname dejó de ser bloqueo para el smoke general de publicación.
 
 ## Auth humano observado
 
@@ -69,6 +69,69 @@ Run `31907519696`, job `95067552998`: **SUCCESS**.
 
 Artifact `9252752191`, digest `sha256:ffcf24398a445fdc13cc80b9ac2d91fa151b5fd7731d5b6510fadf1087a65421`.
 
-La recuperación del mecanismo queda cerrada. Auth humano continúa sin clasificar hasta una segunda frontera productiva válida. No se ejecuta esa frontera en la misma iteración.
+## R4 smoke productivo · frontera 2 · fallo clasificado
+
+Activación HEAD `9150d249e6eeeb1962d0831a541e18737e35b7e3`.
+
+Run `31907938110`, job `95068560384`: **FAIL clasificado**.
+
+PASS previos:
+
+- canonical gate PASS;
+- install PASS;
+- protected identity bind PASS;
+- identity resolver PASS;
+- `eligibleSmokeIdentityCount=1`;
+- `authUserCount=9`;
+- `membershipCount=8`;
+- roles requeridos presentes;
+- resolver Firestore writes `0`;
+- resolver operational writes `0`;
+- navegación HTTPS PASS, HTTP 200;
+- login form visible;
+- manifest HTTP 200;
+- manifest status `FASE_A_PRODUCT_R3_DURABLE_PACKAGE_CERTIFIED`;
+- source head exacto;
+- fileCount `194`.
+
+Primer fallo terminal válido:
+
+- stage: `auth-asset-validated`;
+- `/core/auth.js`: HTTP `500`;
+- SHA-256 publicado: no comparable/mismatch por respuesta 500;
+- `authHttp.seen=false`;
+- login no fue enviado;
+- runtime no fue evaluado.
+
+Clasificación:
+
+`ENVIRONMENT_FAILURE / R4_PUBLISHED_AUTH_ASSET_MISMATCH`
+
+No demuestra contraseña incorrecta, email no verificado, membership defectuosa ni defecto funcional del runtime.
+
+Artifact `9252867826`, digest `sha256:854906ce4618e24f1c1c7c004ecf608b5919849637fdac1c1a8104a4299951e5`.
+
+## Refreeze posterior al fallo
+
+HEAD `6c15b7ccaee4a56be50912148470949e9a28317b` reactiva `ORBIT360_R4_SOURCE_ONLY_RECOVERY=true`.
+
+Control run `31908033440`, job `95068778079`: **SUCCESS source-only**.
+
+- gate PASS;
+- watchdog PASS;
+- install skipped;
+- secrets skipped;
+- identity skipped;
+- browser skipped;
+- deploy 0;
+- productionTouched=false.
+
+## Siguiente owner
+
+No es Auth todavía. El siguiente diagnóstico pertenece a la capa de entrega HTTP de assets productivos.
+
+Aislar `/core/auth.js` con requests directos no-store y compararlo contra assets hermanos de `/core` y contra el source/paquete R3. Determinar si el 500 proviene de regla/handler/seguridad/permisos del hosting o de integridad/entrega del archivo.
+
+No modificar contraseña, usuarios, memberships, `core/auth.js`, paquete, datos, main ni merge antes de demostrar el owner.
 
 Avance permanece 100% funcional / 75% técnico / 67% gates hasta `POST_GO_LIVE_SMOKE_PASS`.
