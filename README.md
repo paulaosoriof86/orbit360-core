@@ -10,55 +10,60 @@ Antes de diagnosticar, modificar, ejecutar runtime/browser/deploy o continuar un
 2. HEAD real de `ays/backend-tenant-lab-v99-20260703` y PR #5;
 3. último workflow/evidencia indicado por `lastEvidence`;
 4. `orbit360-platform/docs/ADDENDUM-MAESTRO-CONTINUIDAD-SINCRONIZACION-ANTIBUCLE-GOLIVE-POSTPROD-20260814.md`;
-5. `orbit360-platform/docs/CIERRE-PARCIAL-R4-HOSTDIME-DEPLOYMENT-CHANNEL-BLOCKER-20260814.md`;
+5. `orbit360-platform/docs/CHECKPOINT-R4-POST-PUBLISH-AUTH-E2E-BEFORE-BROWSER-20260815.md`;
 6. `orbit360-platform/CHANGELOG-R4-GOLIVE-20260814.md`.
 
-No usar memoria, README histórico ni paquetes antiguos como sustituto del live-state.
+No usar memoria ni documentación histórica como sustituto del live-state.
 
-## Estado vivo · R4 PREPUBLISH BLOQUEADO POR ENTORNO · 2026-08-14
+## Estado vivo · R4 PUBLICADO / AUTH + E2E PRODUCTIVO ACTIVO · 2026-08-15
 
 ```text
-stateVersion: 20260814.r4-environment-blocked-hostdime-deployment-channel.1
-fase: R4_ENVIRONMENT_BLOCKED_HOSTDIME_DEPLOYMENT_CHANNEL
+stateVersion: 20260815.r4-published-auth-e2e-prebrowser.1
+fase: R4_POST_PUBLISH_AUTH_E2E_PREBROWSER
 R1/R2/R3: CERRADOS
 ZIP: orbit360-fase-a-product-r3-4f70f0dd6e87.zip
 SHA256: 4fd52a748fa130fd069b2d2684e1944369164aeb0646fe728067dd7b4ce29e69
-app.aysseguros.com: creado en cPanel
-document root: /home/ayssegur/public_html/app.aysseguros.com
-deploy: 0
-producción tocada: no
+source head R3: 4f70f0dd6e870e8c7443a7638a9dc6e954eace1b
+app.aysseguros.com: paquete cargado y extraído manualmente
+login público: visible
+HostDime transport: ya no bloquea el smoke
+POST_GO_LIVE_SMOKE_PASS: pendiente
 ```
 
-## R4 preflight
+## Publicación confirmada por captura
 
-La autorización R4 está vigente y el hash del paquete se verificó nuevamente con coincidencia exacta. No se reconstruyó ni sustituyó el ZIP.
+Paula cargó y extrajo el paquete certificado directamente en `/home/ayssegur/public_html/app.aysseguros.com`. La estructura visible contiene `index.html`, `core/`, `data/`, `docs/`, `modules/`, `styles/`, `product-runtime-config.js`, `sw.js` y `orbit360-package-manifest.json`, conservando los archivos propios del hosting.
 
-Las capturas HostDime recuperadas establecen:
+`https://app.aysseguros.com` muestra el login productivo de Orbit 360.
 
-- usuario cPanel `ayssegur`;
-- servidor `mjo.aysseguros.com`;
-- IP compartida `107.161.178.166`;
-- `app.aysseguros.com` creado;
-- document root `/home/ayssegur/public_html/app.aysseguros.com`;
-- AutoSSL válido de Let's Encrypt;
-- clave pública SSH `orbit360_hostdime_prod_20260812` autorizada.
+## Auth actual
 
-El bloqueo actual no es hostname ni producto. La ejecución no dispone de la clave privada correspondiente, de un conector cPanel/SFTP/SSH autenticado ni de un workflow/tool de despliegue HostDime en el repositorio. El inventario de Actions secrets tampoco es accesible por la integración GitHub actual.
+Un intento humano con la cuenta administrativa mostró el error genérico de login. Ese texto no permite distinguir contraseña, `emailVerified`, membership, tenant o bootstrap y **no se usará para diagnosticar por intuición**.
 
-Clasificación:
+No se pedirán más pruebas manuales de contraseña antes de la clasificación automática.
 
-`ENVIRONMENT_FAILURE / HOSTDIME_DEPLOYMENT_CHANNEL_UNAVAILABLE`
+El paquete productivo no expone una función de recuperación de contraseña en esa pantalla; `Limpiar sesión` solo limpia estado local.
 
-## Regla aplicada
+## Siguiente frontera
 
-No se publica sin backup remoto verificable y rollback previo. Por tanto:
+Se reutiliza el actor de smoke no humano ya existente y los secrets protegidos usados por R3. El resolver read-only exige exactamente una identidad elegible, verificada, activa y con roles `Dirección + Operativo + Asesor`, sin crear ni modificar usuarios.
 
-- backup remoto: no ejecutado;
-- publicación: no ejecutada;
-- E2E productivo: no ejecutado;
-- producción: intacta;
-- R1/R2/R3: no reabiertos;
-- paquete: intacto.
+Antes de cualquier secreto/browser:
+
+```text
+node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+```
+
+Solo con PASS se ejecutará una única frontera Playwright contra el dominio público para:
+
+- verificar el manifest exacto publicado;
+- distinguir Auth HTTP / emailVerified / membership / tenant;
+- validar tenant `alianzas-soluciones`;
+- store `ready-read-only` y required 7/7;
+- 430 clientes / 30 aseguradoras en la vista privilegiada;
+- Dirección desktop, Operativo tablet y Asesor móvil;
+- Inicio + rutas críticas según permisos;
+- cero errores relevantes, copy técnico y escrituras inesperadas.
 
 ## Avance
 
@@ -66,27 +71,7 @@ No se publica sin backup remoto verificable y rollback previo. Por tanto:
 readiness funcional: 100%
 avance técnico: 75%
 gates finales: 67% (2/3)
-R4: bloqueado antes de backup/publicación
+R4: publicación completada; smoke productivo pendiente
 ```
 
-## Siguiente acción exacta
-
-Habilitar únicamente el transporte autenticado HostDime para esta ejecución, preferentemente la credencial privada correspondiente a la clave pública SSH ya autorizada o un conector cPanel/SFTP autenticado. No pegar secretos en el chat.
-
-Con el canal disponible:
-
-1. volver a verificar el SHA256 exacto;
-2. ejecutar el gate canónico antes de operaciones remotas;
-3. crear backup timestamped de `/home/ayssegur/public_html/app.aysseguros.com` y ruta de rollback;
-4. publicar exclusivamente el contenido del ZIP certificado;
-5. ejecutar inmediatamente el E2E productivo final;
-6. mantener main/merge, reimportaciones y reconstrucción fuera de alcance.
-
-## Reglas anti-bucle
-
-- R1/R2/R3 permanecen cerrados;
-- HostDime no provoca cambios de producto;
-- no se inventan credenciales, puertos o rutas;
-- no se publica sin backup/rollback;
-- dos fallos del mismo transporte implican `STOP_RETRY`;
-- cada cambio de estado sincroniza live-state + PR #5 + README + checkpoint + bitácora.
+R4 solo cierra con `POST_GO_LIVE_SMOKE_PASS`. Sin reconstrucción, reimportación, main ni merge.
