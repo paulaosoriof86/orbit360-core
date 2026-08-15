@@ -288,7 +288,36 @@ Orbit.access = (function () {
     return canAccessRecord(rec, moduleKey || OP_COLLS[collection] || collection, { collection: collection });
   }
   function filter(collection, rows, moduleKey) {
-    return (rows || []).filter(function (r) { return canView(collection, r, moduleKey); });
+    var list = Array.isArray(rows) ? rows : [];
+    if (!list.length) return [];
+    try {
+      // v20260815: resolve invariant access context once per filter call.
+      var role = activeRole();
+      if (SENSITIVE.indexOf(collection) >= 0 && ALL_ROLES.indexOf(role) < 0) return [];
+      var effectiveModule = moduleKey || OP_COLLS[collection] || collection;
+      if (!puedeVerModulo(effectiveModule)) return [];
+      var allowedCountries = permittedCountries();
+      var scope = dataScope(effectiveModule);
+      if (scope === 'none') return [];
+      function countryOk(rec) {
+        var pais = clean(rec && rec.pais);
+        return !allowedCountries.length || !pais || allowedCountries.indexOf(pais) >= 0;
+      }
+      if (scope === 'all') {
+        if (!allowedCountries.length) return list.slice();
+        return list.filter(countryOk);
+      }
+      var ownAdvisorId = actorAdvisorId();
+      var teamIds = scope === 'team' ? teamAdvisorIds() : [];
+      return list.filter(function (rec) {
+        if (!rec || !countryOk(rec)) return false;
+        var advisorId = clean(recordAdvisorId(collection, rec));
+        if (!advisorId) return false;
+        if (scope === 'own') return advisorId === ownAdvisorId;
+        if (scope === 'team') return teamIds.indexOf(advisorId) >= 0;
+        return false;
+      });
+    } catch (e) { return []; }
   }
   function filtrarPorAsesor(items, getAdvisorId, moduleKey) {
     return (items || []).filter(function (it) {
