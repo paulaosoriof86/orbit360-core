@@ -76,6 +76,171 @@ jobs:
           node "$HARNESS"
           jq -e '.ok==true and .status=="R4_HARNESS_SOURCE_ONLY_WATCHDOG_PASS" and .classification=="PASS" and .synthetic==true and .stageTimeoutObserved==true and .evidencePersistedBeforeTimeout==true and .productionTouched==false and .containsPII==false and .containsSecrets==false and .secretValuesLogged==false and .deployExecuted==false and .packageRebuilt==false' "$SYNTHETIC_OUT" >/dev/null
 
+      - name: Diagnose published auth asset HTTP-only
+        if: env.ORBIT360_R4_SOURCE_ONLY_RECOVERY == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="$EVIDENCE_DIR/r4-auth-asset-http-diagnosis-v20260815.json"
+          node <<'NODE'
+          const https = require('https');
+          const fs = require('fs');
+          const crypto = require('crypto');
+          const { execFileSync } = require('child_process');
+
+          const base = new URL(process.env.ORBIT360_R4_URL);
+          const sourceHead = process.env.ORBIT360_R4_PACKAGE_SOURCE_HEAD;
+          const out = process.env.EVIDENCE_DIR + '/r4-auth-asset-http-diagnosis-v20260815.json';
+          const runId = process.env.GITHUB_RUN_ID || 'unknown';
+          const sourceBase = 'orbit360-platform/';
+          const assets = [
+            { id: 'config', path: '/core/config.js?v1328', source: 'core/config.js', sibling: true },
+            { id: 'legal', path: '/core/legal.js?v1291', source: 'core/legal.js', sibling: true },
+            { id: 'auth-versioned', path: '/core/auth.js?v1295-labfix-20260703', source: 'core/auth.js', auth: true },
+            { id: 'auth-plain', path: '/core/auth.js', source: 'core/auth.js', auth: true },
+            { id: 'auth-password-change', path: '/core/auth-password-change-v20260805.js?v=20260805-1', source: 'core/auth-password-change-v20260805.js', sibling: true },
+            { id: 'user-credential-selfservice', path: '/core/user-credential-selfservice-v20260805.js?v=20260805-1', source: 'core/user-credential-selfservice-v20260805.js', sibling: true },
+            { id: 'access-scope', path: '/core/access-scope.js?v=20260711', source: 'core/access-scope.js', sibling: true }
+          ];
+
+          function sha256(buf) { return crypto.createHash('sha256').update(buf).digest('hex'); }
+          function expected(source) {
+            const buf = execFileSync('git', ['show', `${sourceHead}:${sourceBase}${source}`], { encoding: null, maxBuffer: 4 * 1024 * 1024 });
+            return { sha256: sha256(buf), bytes: buf.length };
+          }
+          function sanitizeHeaders(h) {
+            const allow = ['server','content-type','content-length','cache-control','etag','last-modified','vary','accept-ranges'];
+            const out = {};
+            for (const k of allow) if (h[k] !== undefined) out[k] = String(h[k]).slice(0, 240);
+            return out;
+          }
+          function request(method, path, redirects = 0) {
+            return new Promise((resolve, reject) => {
+              const u = new URL(path, base);
+              u.searchParams.set('orbit360diag', runId);
+              const req = https.request(u, {
+                method,
+                headers: {
+                  'Cache-Control': 'no-cache, no-store, max-age=0',
+                  'Pragma': 'no-cache',
+                  'Accept': '*/*',
+                  'User-Agent': 'Orbit360-R4-HTTP-Diagnostic/1.0'
+                },
+                timeout: 12000
+              }, (res) => {
+                if ([301,302,303,307,308].includes(res.statusCode) && res.headers.location && redirects < 3) {
+                  res.resume();
+                  return resolve(request(method, new URL(res.headers.location, u).toString(), redirects + 1));
+                }
+                const chunks = [];
+                res.on('data', c => { if (method !== 'HEAD') chunks.push(c); });
+                res.on('end', () => {
+                  const body = method === 'HEAD' ? Buffer.alloc(0) : Buffer.concat(chunks);
+                  resolve({
+                    method,
+                    status: res.statusCode || 0,
+                    headers: sanitizeHeaders(res.headers),
+                    bytes: body.length,
+                    bodySha256: method === 'HEAD' ? null : sha256(body)
+                  });
+                });
+              });
+              req.on('timeout', () => req.destroy(new Error('HTTP_TIMEOUT')));
+              req.on('error', reject);
+              req.end();
+            });
+          }
+
+          (async () => {
+            const results = [];
+            for (const asset of assets) {
+              const exp = expected(asset.source);
+              let head, get, error = null;
+              try { head = await request('HEAD', asset.path); } catch (e) { head = { method:'HEAD', status:0, error:String(e.message||e) }; }
+              try { get = await request('GET', asset.path); } catch (e) { get = { method:'GET', status:0, error:String(e.message||e) }; error = String(e.message||e); }
+              results.push({
+                id: asset.id,
+                path: asset.path,
+                auth: !!asset.auth,
+                sibling: !!asset.sibling,
+                expectedSha256: exp.sha256,
+                expectedBytes: exp.bytes,
+                head,
+                get,
+                getShaMatchesSource: get.status === 200 && get.bodySha256 === exp.sha256,
+                error
+              });
+            }
+
+            const byId = Object.fromEntries(results.map(r => [r.id, r]));
+            const auths = [byId['auth-versioned'], byId['auth-plain']];
+            const siblings = results.filter(r => r.sibling);
+            const authGet500 = auths.every(r => r.get.status === 500);
+            const authHead500 = auths.every(r => r.head.status === 500);
+            const siblingsGet200 = siblings.every(r => r.get.status === 200);
+            const siblingsMatch = siblings.every(r => r.getShaMatchesSource === true);
+            const authPasswordSibling200 = byId['auth-password-change'].get.status === 200 && byId['auth-password-change'].getShaMatchesSource === true;
+            const same500Body = auths[0].get.bodySha256 && auths[0].get.bodySha256 === auths[1].get.bodySha256;
+
+            let classification = 'ENVIRONMENT_FAILURE/R4_STATIC_ASSET_DELIVERY_UNRESOLVED';
+            let ownerHypothesis = 'UNRESOLVED';
+            if (authGet500 && authHead500 && siblingsGet200 && siblingsMatch && authPasswordSibling200) {
+              classification = 'ENVIRONMENT_FAILURE/R4_AUTH_JS_EXACT_PATH_SERVER_FAILURE';
+              ownerHypothesis = 'HOSTING_RULE_HANDLER_SECURITY_POLICY_OR_FILE_METADATA_FOR_EXACT_AUTH_JS';
+            } else if (authGet500 && siblingsGet200 && siblingsMatch) {
+              classification = 'ENVIRONMENT_FAILURE/R4_AUTH_JS_ISOLATED_GET_SERVER_FAILURE';
+              ownerHypothesis = 'HOSTING_FILE_DELIVERY_OR_CONTENT_INSPECTION_FOR_AUTH_JS';
+            } else if (auths.every(r => r.get.status === 200) && auths.every(r => !r.getShaMatchesSource) && siblingsMatch) {
+              classification = 'DATA_CONTRACT_FAILURE/R4_AUTH_JS_PUBLISHED_BYTES_DIFFER_FROM_CERTIFIED_R3';
+              ownerHypothesis = 'PUBLISHED_FILE_INTEGRITY';
+            } else if (auths.every(r => r.get.status === 200 && r.getShaMatchesSource) && siblingsMatch) {
+              classification = 'PASS/R4_STATIC_ASSET_HTTP_LAYER';
+              ownerHypothesis = 'NO_CURRENT_STATIC_ASSET_FAILURE';
+            } else if (siblings.some(r => r.get.status >= 500)) {
+              classification = 'ENVIRONMENT_FAILURE/R4_CORE_STATIC_DELIVERY_BROADER_FAILURE';
+              ownerHypothesis = 'HOSTING_CORE_PATH_OR_SERVER_LAYER';
+            }
+
+            const evidence = {
+              schemaVersion: 'orbit360-r4-auth-asset-http-diagnosis-v1',
+              ok: true,
+              status: 'HTTP_ONLY_DIAGNOSIS_COMPLETE',
+              classification,
+              ownerHypothesis,
+              sourceHead,
+              publicOrigin: base.origin,
+              cacheBypass: true,
+              browserExecuted: false,
+              secretAccess: false,
+              dataAccess: false,
+              firestoreRead: false,
+              firestoreWrites: 0,
+              authWrites: 0,
+              operationalWrites: 0,
+              deployExecuted: false,
+              packageRebuilt: false,
+              authGet500,
+              authHead500,
+              siblingsGet200,
+              siblingsMatchCertifiedSource: siblingsMatch,
+              authPasswordSibling200AndMatches: authPasswordSibling200,
+              auth500BodiesSameSignature: !!same500Body,
+              results,
+              containsPII: false,
+              containsSecrets: false,
+              responseBodiesPersisted: false
+            };
+            fs.mkdirSync(process.env.EVIDENCE_DIR, { recursive: true });
+            fs.writeFileSync(out, JSON.stringify(evidence, null, 2) + '\n');
+            console.log(JSON.stringify({status:evidence.status,classification:evidence.classification,ownerHypothesis:evidence.ownerHypothesis,authGet500,authHead500,siblingsGet200,siblingsMatch,authPasswordSibling200,same500Body}, null, 2));
+          })().catch((err) => {
+            fs.mkdirSync(process.env.EVIDENCE_DIR, { recursive: true });
+            fs.writeFileSync(out, JSON.stringify({schemaVersion:'orbit360-r4-auth-asset-http-diagnosis-v1',ok:false,status:'HTTP_ONLY_DIAGNOSIS_MECHANISM_FAILURE',classification:'PIPELINE_MECHANISM_FAILURE/R4_HTTP_DIAGNOSTIC_FAILED',error:String(err.message||err),browserExecuted:false,secretAccess:false,dataAccess:false,firestoreWrites:0,authWrites:0,operationalWrites:0,containsPII:false,containsSecrets:false}, null, 2) + '\n');
+            process.exit(42);
+          });
+          NODE
+          jq -e '.ok==true and .status=="HTTP_ONLY_DIAGNOSIS_COMPLETE" and .browserExecuted==false and .secretAccess==false and .dataAccess==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .deployExecuted==false and .packageRebuilt==false and .containsPII==false and .containsSecrets==false and .responseBodiesPersisted==false' "$OUT" >/dev/null
+
       - name: Install read-only production smoke tools
         if: env.ORBIT360_R4_SOURCE_ONLY_RECOVERY != 'true'
         shell: bash
@@ -136,5 +301,6 @@ jobs:
             orbit360-platform/runtime-gate-crm-v20260716/m6-product-smoke-identity-summary.json
             orbit360-platform/runtime-gate-crm-v20260716/r4-production-readonly-smoke-v20260815.json
             orbit360-platform/runtime-gate-crm-v20260716/r4-harness-source-only-watchdog-v20260815.json
+            orbit360-platform/runtime-gate-crm-v20260716/r4-auth-asset-http-diagnosis-v20260815.json
           if-no-files-found: warn
           retention-days: 14
