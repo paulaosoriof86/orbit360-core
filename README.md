@@ -10,42 +10,68 @@ Antes de diagnosticar, modificar, ejecutar runtime/browser/deploy o continuar un
 2. HEAD real de `ays/backend-tenant-lab-v99-20260703` y PR #5;
 3. último workflow/evidencia indicado por `lastEvidence`;
 4. `orbit360-platform/docs/ADDENDUM-MAESTRO-CONTINUIDAD-SINCRONIZACION-ANTIBUCLE-GOLIVE-POSTPROD-20260814.md`;
-5. `orbit360-platform/docs/CIERRE-R4-HOSTDIME-SERVER-SIDE-ESCALATION-20260815.md`;
+5. `orbit360-platform/docs/CIERRE-R4-VALIDATOR-STALE-AUTH-PASS-ACCESS-FILTER-ROOTFIX-20260815.md`;
 6. `orbit360-platform/CHANGELOG-R4-GOLIVE-20260814.md`.
 
 No usar memoria ni documentación histórica como sustituto del live-state.
 
-## Estado vivo · R4 PUBLICADO / HOSTDIME SERVER-SIDE EVIDENCE REQUIRED · 2026-08-15
+## Estado vivo · R4 PUBLICADO / AUTH PASS / ACCESS FILTER ROOTFIX SOURCE PASS · 2026-08-15
 
 ```text
-R1/R2/R3: CERRADOS
-app.aysseguros.com: PUBLICADO, login visible
-paquete: exacto R3 certificado, sin rebuild
-R4 browser #1: inválido por timeout del harness
-rootfix harness source-only: PASS
-R4 browser #2: FAIL antes de login; auth.js HTTP 500
-HTTP-only #1: assets neutros 200+SHA R3; tres assets auth/credenciales 500 Apache idéntico
-HTTP-only #2: capa Apache/seguridad interceptó incluso neutros; HEAD 200 HTML ~12 KB / GET socket hang up
-cPanel: ModSecurity no expuesto; Imunify sin WAF/Incidents; Errores solo muestra AH01630 sobre php.ini, no auth.js
-browser R4: REFROZEN SOURCE-ONLY
-Auth/contraseña: NO EVALUADOS
+R1/R2/R3 histórico: CERRADOS
+app.aysseguros.com: PUBLICADO con el ZIP R3 certificado exacto
+ZIP R3 publicado: INMUTABLE / sin rebuild / sin parche in-place
+HostDime: NO es blocker demostrado
+smoke antiguo /core/auth.js: VALIDATOR_STALE
+Auth productivo real: PASS
+emailVerified: PASS
+membership/tenant/roles requeridos: PASS
+runtime/router/tenant-context/store read-only: PASS
+clientes: 430 PASS
+aseguradoras: 30 PASS
+legal gate: observado read-only, sin persistir aceptación
+causa raíz vigente: rendimiento de Orbit.access.filter()
+medición producción: filter(430, scope=all) = 38.27 s
+rootfix source: df4c217c34722c03215f88b62f6865ab41c2a9f3
+postapply source: PASS
+store.get Direction 430: 1720 -> 4, mismo resultado 430/430
+browser R4: CONGELADO SOURCE-ONLY
 avance: 100% funcional / 75% técnico / 67% gates
 ```
 
-## Cierre anti-bucle
+## Diagnóstico corregido
 
-Se alcanzaron dos diagnósticos HTTP de la misma familia. No se ejecuta un tercero y no se reabre browser/Auth.
+El paquete durable R3 original demostró que el entrypoint productivo certificado usa `core/auth-product-runtime-p0.js`; `core/auth.js`, `core/auth-password-change-v20260805.js` y `core/user-credential-selfservice-v20260805.js` no forman parte del ZIP productivo. Por tanto, las conclusiones que trataban el HTTP 500 de esos assets excluidos como bloqueo de Auth/HostDime quedan **superadas**.
 
-Clasificación vigente:
+La frontera corregida contra el contrato productivo real demostró login HTTP 200, usuario autenticado, `emailVerified`, membership activa, tenant correcto, roles requeridos, runtime iniciado, router iniciado y store `ready-read-only`, con cero escrituras.
 
-`ENVIRONMENT_FAILURE / R4_HOSTING_SECURITY_EDGE_INTERCEPTION_GENERIC`
+## Causa raíz real y fix
 
-La evidencia de cPanel visible no identifica la regla/directiva que produce el fallo de `auth.js`; los mensajes `AH01630` observados corresponden a accesos denegados a `php.ini` y no se reutilizan como prueba del defecto Orbit.
+La medición aislada del rol Dirección mostró:
+
+- `Orbit.session.set('Dirección')`: ~5.9 s;
+- `hashchange`: ~0.1 ms;
+- `Inicio.render`: no fue la causa;
+- `Orbit.access.filter('clientes', 430, 'cliente360')`: ~38.27 s.
+
+La causa fue recomputar contexto invariante de acceso por cada registro. `actorAdvisor()` volvía a resolver asesor y el store productivo implementa `get()` sobre `all()`, que clona la colección antes de buscar.
+
+El commit funcional `df4c217c34722c03215f88b62f6865ab41c2a9f3` modifica únicamente `orbit360-platform/core/access-scope.js`: resuelve rol/módulo/país/scope una vez por filtro y usa fast-path para `scope=all`; `canView()`, `canAccessRecord()` y la API pública permanecen intactos.
+
+Regresión y post-aplicación:
+
+- Dirección 430: 430 registros antes y después;
+- `store.get()` 1720 -> 4;
+- Asesor own: 144;
+- Operativo team: 287;
+- país restringido, módulo denegado y colección sensible: equivalencia PASS;
+- sintaxis PASS;
+- cero browser/secrets/data/deploy/rebuild en la validación source-only.
 
 ## Siguiente acción exacta
 
-Escalar una sola incidencia técnica a HostDime para `app.aysseguros.com` y solicitar inspección server-side de Apache/ModSecurity/Imunify/audit logs. Deben identificar el rule ID, directiva, handler o control exacto que produce el HTTP 500/intercepción sobre los assets JavaScript publicados y aplicar únicamente una corrección puntual del falso positivo o owner demostrado.
+El ZIP R3 publicado **no contiene todavía este rootfix** y no debe modificarse en sitio. La siguiente acción requiere autorización explícita para generar una sucesora mínima e inmutable del R3 cuyo único delta de producto sea `core/access-scope.js` desde `df4c217c34722c03215f88b62f6865ab41c2a9f3`.
 
-No desactivar ModSecurity/Imunify globalmente. No cambiar contraseña, usuarios, memberships, `core/auth.js`, nombres de archivos, paquete, datos, main ni merge.
+La sucesora debe demostrar byte-identidad de todos los demás archivos frente a R3, regenerar manifest/hashes y pasar gates source/static antes de cualquier publicación. Publicación y browser final continúan sin autorización en este momento.
 
-Después del fix de hosting se exige una sola verificación HTTP-only: HTTP 200, MIME JavaScript y SHA-256 exacto del R3 en todos los assets afectados. Solo con ese PASS se puede volver a abrir el browser/Auth.
+No cambiar contraseña, usuarios, memberships, Auth, datos, main ni merge. No abrir caso HostDime por el diagnóstico anterior.
