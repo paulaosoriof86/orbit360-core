@@ -10,53 +10,73 @@ Antes de diagnosticar, modificar, ejecutar runtime/browser/deploy o continuar un
 2. HEAD real de `ays/backend-tenant-lab-v99-20260703` y PR #5;
 3. último workflow/evidencia indicado por `lastEvidence`;
 4. `orbit360-platform/docs/ADDENDUM-MAESTRO-CONTINUIDAD-SINCRONIZACION-ANTIBUCLE-GOLIVE-POSTPROD-20260814.md`;
-5. `orbit360-platform/docs/CIERRE-R4-HARNESS-SOURCE-ONLY-ROOTFIX-PASS-20260815.md`;
+5. `orbit360-platform/docs/CIERRE-R4-SECOND-BROWSER-AUTH-ASSET-HTTP500-20260815.md`;
 6. `orbit360-platform/CHANGELOG-R4-GOLIVE-20260814.md`.
 
 No usar memoria ni documentación histórica como sustituto del live-state.
 
-## Estado vivo · R4 PUBLICADO / HARNESS RECUPERADO SOURCE-ONLY · 2026-08-15
+## Estado vivo · R4 PUBLICADO / AUTH BLOQUEADO ANTES DE CREDENCIALES · 2026-08-15
 
 ```text
 R1/R2/R3: CERRADOS
-app.aysseguros.com: PUBLICADO, login visible
+app.aysseguros.com: publicado, login visible
 paquete: exacto R3 certificado, sin rebuild
-R4 browser frontier #1: no válida por timeout del harness
-rootfix harness source-only: PASS
-Auth/product defect: todavía NO CLASIFICADOS
-workflow R4 browser: continúa congelado source-only
+harness R4 bounded observability: PASS
+segunda frontera browser: FAIL CLASIFICADO
+manifest: PASS / HTTP 200 / source R3 exacto
+/core/auth.js: HTTP 500
+Auth/password/emailVerified/membership browser: NO EVALUADOS
+clasificación: ENVIRONMENT_FAILURE / R4_PUBLISHED_AUTH_ASSET_MISMATCH
+workflow browser: REFROZEN source-only
 avance: 100% funcional / 75% técnico / 67% gates
 ```
 
-## Recuperación del harness cerrada
+## Segunda frontera R4
 
-Rootfix control-plane: `442ca5fc5a6ca6f70e7607daaa108ee0b84d8956`.
+Run `31907938110`, job `95068560384`, HEAD `9150d249e6eeeb1962d0831a541e18737e35b7e3`.
 
-Run source-only `31907519696`, job `95067552998`: **SUCCESS**.
+PASS antes del punto de fallo:
 
-- gate canónico PASS;
-- `node --check` PASS;
-- watchdog sintético forced-hang PASS;
-- timeout sintético observado a 120 ms;
-- evidencia incremental existía antes del timeout;
-- deadline global del harness: 480000 ms, inferior al timeout del job;
-- comparación SHA-256 de `core/auth.js` publicada contra source R3 incorporada antes de diagnóstico de credencial;
-- instalación skipped;
-- secretos skipped;
-- identity resolver skipped;
-- browser skipped;
-- datos/Firestore: no acceso;
-- writes: 0;
-- producción: no tocada por esta recuperación.
+- gate canónico;
+- instalación;
+- binding de secretos protegidos;
+- resolver read-only;
+- exactamente 1 actor elegible;
+- roles requeridos presentes;
+- target HTTPS 200;
+- login visible;
+- manifest R3 HTTP 200 y exacto;
+- cero writes.
 
-Artifact: `9252752191`.
+Primer fallo válido:
 
-La causa de la primera corrida queda corregida a nivel mecanismo. Esto **no** convierte el fallo humano de login en contraseña incorrecta ni en PASS de Auth: todavía falta una frontera automatizada válida que lo clasifique.
+`/core/auth.js` respondió HTTP `500`.
+
+El harness se detuvo en `auth-asset-validated` con:
+
+`ENVIRONMENT_FAILURE / R4_PUBLISHED_AUTH_ASSET_MISMATCH`
+
+No hubo request de login a Identity Toolkit; por tanto no existe evidencia de contraseña incorrecta, email no verificado, membership defectuosa ni fallo del runtime.
+
+Artifact `9252867826`, digest `sha256:854906ce4618e24f1c1c7c004ecf608b5919849637fdac1c1a8104a4299951e5`.
+
+## Refreeze anti-bucle
+
+HEAD `6c15b7ccaee4a56be50912148470949e9a28317b` reactivó source-only.
+
+Control run `31908033440`, job `95068778079`: **SUCCESS**.
+
+- gate PASS;
+- watchdog PASS;
+- install skipped;
+- secrets skipped;
+- identity skipped;
+- browser skipped.
 
 ## Siguiente acción exacta
 
-En la **siguiente iteración**, mantener el harness recuperado sin cambios y activar exactamente **una** segunda frontera productiva read-only R4. Debe verificar primero manifest + hash de `core/auth.js`, y después aislar login HTTP → Auth → `emailVerified` → membership → tenant → runtime → roles/scopes/rutas.
+Diagnosticar **fuera de Auth** el HTTP 500 de `/core/auth.js` con requests HTTP directos no-store, comparación contra assets hermanos de `/core` y contra el source/paquete R3 certificado. Determinar primero si el owner es regla/handler/seguridad/permisos del hosting o integridad/entrega del archivo.
 
-Ante el primer fallo clasificado se detiene. No modificar Auth, usuarios, memberships, producto, paquete ni datos por intuición.
+No tocar contraseña, usuarios, memberships, `core/auth.js`, paquete productivo, datos ni HostDime por intuición. Corregir únicamente el owner demostrado y exigir evidencia estática/HTTP antes de otro browser.
 
 No reconstrucción, no reimportación, no main, no merge.
