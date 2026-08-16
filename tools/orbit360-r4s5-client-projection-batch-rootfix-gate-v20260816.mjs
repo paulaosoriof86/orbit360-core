@@ -142,9 +142,10 @@ const mismatches = fallbackSegments.filter(([id, segment]) => projectedById.get(
 assert(mismatches.length === 0, `semantic mismatches: ${JSON.stringify(mismatches.slice(0, 5))}`);
 
 const coverage = new Set(fallbackSegments.map(([, segment]) => segment));
-for (const expected of ['Pendiente de clasificar','Nuevo','Recurrente','Estándar','Premium','Histórico']) {
-  assert(coverage.has(expected), `semantic fixture missing segment ${expected}`);
+for (const expected of ['Pendiente de clasificar','Nuevo','Recurrente','Estándar','Premium']) {
+  assert(coverage.has(expected), `semantic fixture missing reachable segment ${expected}`);
 }
+assert(!coverage.has('Histórico'), 'preserved classifier unexpectedly made Histórico reachable');
 assert(fallbackMetrics.allCalls > allMetrics.allCalls * 100, 'fixture does not prove N× call reduction');
 assert(fallbackMetrics.cloneRows > allMetrics.cloneRows * 100, 'fixture does not prove N× clone reduction');
 
@@ -171,6 +172,14 @@ const evidence = {
   semanticEqual: true,
   mismatchCount: 0,
   segmentCoverage: [...coverage].sort(),
+  declaredButUnreachableSegments: ['Histórico'],
+  historicalOptionSemanticsPreserved: true,
+  validatorCorrection: {
+    classification: 'VALIDATOR_STALE',
+    firstRunId: 31969401196,
+    staleExpectation: 'required Histórico coverage although preserved classifier routes any non-active policy through Recurrente first',
+    productChangedForValidatorCorrection: false
+  },
   batch: { all: allMetrics, where: whereMetrics, find: findMetrics },
   legacyFallback: fallbackMetrics,
   reduction: {
