@@ -1,0 +1,111 @@
+name: Orbit360 R4S6 Public Identity Static 20260816
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - 'tools/orbit360-r4s6-public-identity-trigger-v20260816.txt'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: orbit360-r4s6-public-identity-static-v20260816
+  cancel-in-progress: false
+
+env:
+  TARGET: https://app.aysseguros.com
+  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+  EXPECTED_INDEX_SHA: 125b24a3fc215a368a7183a107cd55eb5a6332fc8a7f8354ed94e3169340ec4e
+  EXPECTED_MANIFEST_SHA: bbc3085df74a3ad80026425fde390078e28de740930141ca81906b923ebf8a8d
+  EXPECTED_ACCESS_SHA: 624f7538809dbea59294a2c94a4acce58f326b0812625754891fb7b0fa4d3e1f
+  EXPECTED_AUTH_SHA: d0bb399fe0e1dd102a03950673044eda5bc8d181e4e98cf477d22d141aa7b3a8
+  EXPECTED_QUERIES_SHA: b906c1d3382a9fad310695b0ce2c8e7f49a2bf99fe9b9ed674a8df7e0fcbbb7b
+  EXPECTED_CLIENT_VISUAL_SHA: 5493a18acba2d2055c301bf576c46050959ddb6b2f74e7ca4293ee77f815604f
+  EXPECTED_CLIENT360_SHA: 5ac3f042add37ea45582cc88c670c5bcff139937dac406d9561e25f1b9962f9e
+  EXPECTED_POLICY_OWNER_SHA: 3323f09b812d6e3accc8cd151fe28ec3fab2fffa6c41ad622a2f8a147046887b
+  EXPECTED_SOURCE_HEAD: 395f15d9c2e1fac2949763947834b88a9b521207
+  EXPECTED_BASE_SOURCE_HEAD: 5474a1a9af64c018e6dcc71b4ad0cdfe57ce0484
+  EXPECTED_BASE_PACKAGE_SHA256: 2d7a2ae75c5e6ef04c4759ff3438d41b8589d542fc20f14a603aaffb2053a1ac
+
+jobs:
+  static-identity:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Canonical gate before any production observation
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+          jq -e '.ok==true and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+      - name: Verify exact public R4S6 bytes
+        shell: bash
+        run: |
+          set -euo pipefail
+          WORK="$RUNNER_TEMP/r4s6-public"
+          mkdir -p "$WORK" "$EVIDENCE_DIR"
+          UA='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/142.0.0.0 Safari/537.36'
+          fetch_exact() {
+            local rel="$1" out="$2"
+            curl --http1.1 -L --fail --silent --show-error --connect-timeout 15 --max-time 45 \
+              -A "$UA" -H 'Cache-Control: no-cache, no-store, max-age=0' -H 'Pragma: no-cache' \
+              "$TARGET/$rel?orbit360_r4s6_verify=${GITHUB_RUN_ID}" -o "$out"
+          }
+          fetch_exact 'index.html' "$WORK/index.html"
+          fetch_exact 'orbit360-package-manifest.json' "$WORK/manifest.json"
+          fetch_exact 'core/access-scope.js' "$WORK/access-scope.js"
+          fetch_exact 'core/auth-product-runtime-p0.js' "$WORK/auth-product-runtime-p0.js"
+          fetch_exact 'core/queries.js' "$WORK/queries.js"
+          fetch_exact 'core/client-insurer-visual-contract-v20260720.js' "$WORK/client-visual.js"
+          fetch_exact 'modules/cliente360.js' "$WORK/cliente360.js"
+          fetch_exact 'modules/policy-receipts-v1199-detail-guard.js' "$WORK/policy-owner.js"
+
+          INDEX_SHA=$(sha256sum "$WORK/index.html" | awk '{print $1}')
+          MANIFEST_SHA=$(sha256sum "$WORK/manifest.json" | awk '{print $1}')
+          ACCESS_SHA=$(sha256sum "$WORK/access-scope.js" | awk '{print $1}')
+          AUTH_SHA=$(sha256sum "$WORK/auth-product-runtime-p0.js" | awk '{print $1}')
+          QUERIES_SHA=$(sha256sum "$WORK/queries.js" | awk '{print $1}')
+          CLIENT_VISUAL_SHA=$(sha256sum "$WORK/client-visual.js" | awk '{print $1}')
+          CLIENT360_SHA=$(sha256sum "$WORK/cliente360.js" | awk '{print $1}')
+          POLICY_OWNER_SHA=$(sha256sum "$WORK/policy-owner.js" | awk '{print $1}')
+
+          test "$INDEX_SHA" = "$EXPECTED_INDEX_SHA"
+          test "$MANIFEST_SHA" = "$EXPECTED_MANIFEST_SHA"
+          test "$ACCESS_SHA" = "$EXPECTED_ACCESS_SHA"
+          test "$AUTH_SHA" = "$EXPECTED_AUTH_SHA"
+          test "$QUERIES_SHA" = "$EXPECTED_QUERIES_SHA"
+          test "$CLIENT_VISUAL_SHA" = "$EXPECTED_CLIENT_VISUAL_SHA"
+          test "$CLIENT360_SHA" = "$EXPECTED_CLIENT360_SHA"
+          test "$POLICY_OWNER_SHA" = "$EXPECTED_POLICY_OWNER_SHA"
+
+          jq -e '.schemaVersion=="orbit360-fase-a-product-package-manifest-v1" and .status=="FASE_A_PRODUCT_R4S6_MINIMAL_SUCCESSOR_CERTIFIED" and .sourceHead==env.EXPECTED_SOURCE_HEAD and .deltaSourceHead==env.EXPECTED_SOURCE_HEAD and .fileCount==194 and .unchangedFileCount==192 and .deltaFiles==["core/client-insurer-visual-contract-v20260720.js","modules/cliente360.js"] and .basePackageSha256==env.EXPECTED_BASE_PACKAGE_SHA256 and .baseSourceHead==env.EXPECTED_BASE_SOURCE_HEAD and .successorOrdinal==6' "$WORK/manifest.json" >/dev/null
+
+          jq -n \
+            --arg indexSha "$INDEX_SHA" --arg manifestSha "$MANIFEST_SHA" --arg accessSha "$ACCESS_SHA" \
+            --arg authSha "$AUTH_SHA" --arg queriesSha "$QUERIES_SHA" --arg clientVisualSha "$CLIENT_VISUAL_SHA" \
+            --arg client360Sha "$CLIENT360_SHA" --arg policyOwnerSha "$POLICY_OWNER_SHA" \
+            '{ok:true,status:"R4S6_PUBLIC_IDENTITY_STATIC_PASS",classification:"PASS",target:"https://app.aysseguros.com",manifestStatus:"FASE_A_PRODUCT_R4S6_MINIMAL_SUCCESSOR_CERTIFIED",manifestSourceHead:env.EXPECTED_SOURCE_HEAD,fileCount:194,indexSha256:$indexSha,manifestSha256:$manifestSha,accessScopeSha256:$accessSha,authProductSha256:$authSha,queriesSha256:$queriesSha,clientVisualSha256:$clientVisualSha,cliente360Sha256:$client360Sha,policyReceiptsOwnerSha256:$policyOwnerSha,secretAccess:false,dataAccess:false,runtimeExecuted:false,browserExecuted:false,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,packageRebuilt:false,productionMutation:false,containsPII:false,containsSecrets:false}' > "$EVIDENCE_DIR/r4s6-public-identity-static-v20260816.json"
+      - name: Canonical gate after exact public identity PASS
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+          jq -e '.ok==true and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: orbit360-r4s6-public-identity-static-evidence-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/r4s6-public-identity-static-v20260816.json
+          if-no-files-found: warn
+          retention-days: 14
