@@ -1,0 +1,127 @@
+name: Orbit360 R4S2 Minimal Successor Certify 20260815
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/workflows/orbit360-r4s2-minimal-successor-certify-v20260815.yml'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: orbit360-r4s2-minimal-successor-certify-v20260815
+  cancel-in-progress: false
+
+env:
+  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+  BASE_ARTIFACT_ID: '9254713380'
+  BASE_ZIP_NAME: orbit360-fase-a-product-r4s1-df4c217c3472.zip
+  BASE_ZIP_SHA256: 49f5a5eee451665fcc420fc9acee88347b95aa832a8f6f524053cc4ccaa0d60d
+  BASE_SOURCE_HEAD: df4c217c34722c03215f88b62f6865ab41c2a9f3
+  DELTA_SOURCE_HEAD: 47249fd4d6032a2f4c09f6fbd3460d3804c199da
+  QUERIES_PATH: orbit360-platform/core/queries.js
+  OWNER_PATH: orbit360-platform/modules/policy-receipts-v1199-detail-guard.js
+  QUERIES_SHA256: 1a37503507cd87be00314076e2ccf1b61d29cfbed9d3961486ade96fbab40051
+  OWNER_SHA256: 3323f09b812d6e3accc8cd151fe28ec3fab2fffa6c41ad622a2f8a147046887b
+  SUCCESSOR_ZIP_NAME: orbit360-fase-a-product-r4s2-47249fd4d603.zip
+
+jobs:
+  certify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Canonical gate before R4S2 construction
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+          jq -e '.ok==true and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+          node --check tools/orbit360-r4s2-minimal-successor-package-v20260815.mjs
+          git cat-file -e "${BASE_SOURCE_HEAD}^{commit}"
+          git cat-file -e "${DELTA_SOURCE_HEAD}^{commit}"
+          test "$(git show "${DELTA_SOURCE_HEAD}:${QUERIES_PATH}" | sha256sum | awk '{print $1}')" = "$QUERIES_SHA256"
+          test "$(git show "${DELTA_SOURCE_HEAD}:${OWNER_PATH}" | sha256sum | awk '{print $1}')" = "$OWNER_SHA256"
+
+      - name: Recover exact durable R4S1 and construct two-delta R4S2
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          WORK="$RUNNER_TEMP/orbit360-r4s2"
+          BASE="$WORK/base"
+          SUCCESSOR="$WORK/successor"
+          VERIFY="$WORK/verify"
+          OUTER="$WORK/r4s1-artifact.zip"
+          INNER="$WORK/$BASE_ZIP_NAME"
+          QUERIES_REPLACEMENT="$WORK/queries.rootfix.js"
+          OWNER_REPLACEMENT="$WORK/policy-receipts.rootfix.js"
+          CERT="$EVIDENCE_DIR/r4s2-minimal-successor-certification-v20260815.json"
+          mkdir -p "$WORK" "$BASE" "$VERIFY" "$EVIDENCE_DIR"
+
+          curl --fail --silent --show-error --location \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/${BASE_ARTIFACT_ID}/zip" \
+            -o "$OUTER"
+          unzip -q "$OUTER" -d "$WORK/outer"
+          test -f "$WORK/outer/$BASE_ZIP_NAME"
+          cp "$WORK/outer/$BASE_ZIP_NAME" "$INNER"
+          test "$(sha256sum "$INNER" | awk '{print $1}')" = "$BASE_ZIP_SHA256"
+          unzip -q "$INNER" -d "$BASE"
+
+          git show "${DELTA_SOURCE_HEAD}:${QUERIES_PATH}" > "$QUERIES_REPLACEMENT"
+          git show "${DELTA_SOURCE_HEAD}:${OWNER_PATH}" > "$OWNER_REPLACEMENT"
+          node --check "$QUERIES_REPLACEMENT"
+          node --check "$OWNER_REPLACEMENT"
+          test "$(sha256sum "$QUERIES_REPLACEMENT" | awk '{print $1}')" = "$QUERIES_SHA256"
+          test "$(sha256sum "$OWNER_REPLACEMENT" | awk '{print $1}')" = "$OWNER_SHA256"
+
+          node tools/orbit360-r4s2-minimal-successor-package-v20260815.mjs prepare "$BASE" "$SUCCESSOR" "$QUERIES_REPLACEMENT" "$OWNER_REPLACEMENT" "$CERT"
+          jq -e '.ok==false and .status=="R4S2_SUCCESSOR_STAGED_AWAITING_ZIP_VERIFY" and .baseZipSha256==env.BASE_ZIP_SHA256 and .baseSourceHead==env.BASE_SOURCE_HEAD and .deltaSourceHead==env.DELTA_SOURCE_HEAD and .changedProductFileCount==2 and .unchangedFileCount==192 and .fileCount==194 and (.deltaFiles|length)==2 and .writeAuthorized==false and .browserExecuted==false and .secretAccess==false and .dataAccess==false and .deployExecuted==false and .productionTouched==false' "$CERT" >/dev/null
+
+          (cd "$SUCCESSOR" && find . -type f -printf '%P\n' | LC_ALL=C sort | zip -X -q "$GITHUB_WORKSPACE/$SUCCESSOR_ZIP_NAME" -@)
+          SUCCESSOR_ZIP_SHA256="$(sha256sum "$SUCCESSOR_ZIP_NAME" | awk '{print $1}')"
+          test "${#SUCCESSOR_ZIP_SHA256}" -eq 64
+          unzip -q "$SUCCESSOR_ZIP_NAME" -d "$VERIFY"
+          export SUCCESSOR_ZIP_SHA256 SUCCESSOR_ZIP_NAME
+          node tools/orbit360-r4s2-minimal-successor-package-v20260815.mjs verify "$BASE" "$VERIFY" - - "$CERT"
+          jq -e '.ok==true and .status=="R4S2_MINIMAL_SUCCESSOR_DURABLE_CERTIFIED" and .classification=="FUNCTIONAL_DEFECT_ROOTFIX_SUCCESSOR_CERTIFIED" and .baseZipSha256==env.BASE_ZIP_SHA256 and .baseSourceHead==env.BASE_SOURCE_HEAD and .deltaSourceHead==env.DELTA_SOURCE_HEAD and .changedProductFileCount==2 and .unchangedFileCount==192 and .fileCount==194 and (.deltaFiles|length)==2 and .targetInfo["core/queries.js"].sha256==env.QUERIES_SHA256 and .targetInfo["modules/policy-receipts-v1199-detail-guard.js"].sha256==env.OWNER_SHA256 and (.zipSha256|length)==64 and .writeAuthorized==false and .browserExecuted==false and .secretAccess==false and .dataAccess==false and .deployExecuted==false and .productionTouched==false and .containsPII==false and .containsSecrets==false' "$CERT" >/dev/null
+          test "$(jq -r '.zipSha256' "$CERT")" = "$SUCCESSOR_ZIP_SHA256"
+          test "$(sha256sum "$SUCCESSOR_ZIP_NAME" | awk '{print $1}')" = "$SUCCESSOR_ZIP_SHA256"
+          cp "$VERIFY/orbit360-package-manifest.json" "$EVIDENCE_DIR/r4s2-orbit360-package-manifest-v20260815.json"
+          printf '%s  %s\n' "$SUCCESSOR_ZIP_SHA256" "$SUCCESSOR_ZIP_NAME" > "$EVIDENCE_DIR/r4s2-minimal-successor-sha256-v20260815.txt"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: orbit360-r4s2-minimal-successor-evidence-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/r4s2-minimal-successor-certification-v20260815.json
+            orbit360-platform/runtime-gate-crm-v20260716/r4s2-orbit360-package-manifest-v20260815.json
+            orbit360-platform/runtime-gate-crm-v20260716/r4s2-minimal-successor-sha256-v20260815.txt
+          if-no-files-found: warn
+          retention-days: 14
+
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: orbit360-r4s2-minimal-successor-durable-${{ github.run_id }}
+          path: |
+            orbit360-fase-a-product-r4s2-47249fd4d603.zip
+          if-no-files-found: error
+          retention-days: 14
