@@ -46,7 +46,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          test "$(git branch --show-current)" = "$BRANCH"
+          test "$GITHUB_REF_NAME" = "$BRANCH"
           grep -F "ORBIT360_R4_CERTIFIED_SOURCE_ONLY: 'true'" .github/workflows/orbit360-r4-certified-product-readonly-smoke-v20260815.yml >/dev/null
           test "$(git hash-object "$CORE")" = "573f210b81a8e219e056fe82d3f79ad6622d83f8"
           test "$(git hash-object "$CLIENT360")" = "4834b696cf5335b2bce478248aed60d5b59a2de8"
