@@ -1,0 +1,90 @@
+name: Orbit360 R4S1 Inicio Query Index Source Regression 20260815
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/workflows/orbit360-r4s1-inicio-query-index-source-regression-v20260815.yml'
+
+permissions:
+  contents: read
+
+env:
+  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+
+jobs:
+  regression:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Canonical source gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+          jq -e '.ok==true and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+      - name: Compare current global queries against indexed candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/r4s1-inicio" "$EVIDENCE_DIR"
+          node <<'NODE'
+          const fs=require('fs'),vm=require('vm');
+          const sourcePath='orbit360-platform/core/queries.js';
+          const current=fs.readFileSync(sourcePath,'utf8');
+          function count(h,n){return h.split(n).length-1;}
+          if(count(current,"S().get('clientes', c.clienteId)")!==1) throw new Error('COB_PAIS_GET_ANCHOR_DRIFT');
+          if(count(current,"S().get('clientes', p2.clienteId)")!==1) throw new Error('POL_PAIS_GET_ANCHOR_DRIFT');
+          let candidate=current;
+          const pairOld=`  function cobPais(c) { const cli = S().get('clientes', c.clienteId); const p = paisActivo(); return !p || (cli && cli.pais === p); }\n  function polPais(p2) { const cli = S().get('clientes', p2.clienteId); const p = paisActivo(); return !p || (cli && cli.pais === p); }`;
+          const pairNew=`  function clientIndex() { return new Map((S().all('clientes') || []).filter(c => c && c.id).map(c => [c.id, c])); }\n  function cobPais(c, clients) { const cli = clients instanceof Map ? clients.get(c.clienteId) : S().get('clientes', c.clienteId); const p = paisActivo(); return !p || (cli && cli.pais === p); }\n  function polPais(p2, clients) { const cli = clients instanceof Map ? clients.get(p2.clienteId) : S().get('clientes', p2.clienteId); const p = paisActivo(); return !p || (cli && cli.pais === p); }`;
+          if(count(candidate,pairOld)!==1) throw new Error('QUERY_CLIENT_INDEX_PAIR_ANCHOR_INVALID'); candidate=candidate.replace(pairOld,pairNew);
+          const cartOld=`  function carteraGlobal() {\n    const cob = S().all('cobros').filter(cobPais);`;
+          const cartNew=`  function carteraGlobal() {\n    const clients = clientIndex();\n    const cob = S().all('cobros').filter(c => cobPais(c, clients));`;
+          if(count(candidate,cartOld)!==1) throw new Error('CARTERA_ANCHOR_INVALID'); candidate=candidate.replace(cartOld,cartNew);
+          const primaOld=`  function primaVigenteGlobal() {\n    return S().where('polizas', p => (p.estado === 'Vigente' || p.estado === 'Por renovar') && polPais(p))`;
+          const primaNew=`  function primaVigenteGlobal() {\n    const clients = clientIndex();\n    return S().where('polizas', p => (p.estado === 'Vigente' || p.estado === 'Por renovar') && polPais(p, clients))`;
+          if(count(candidate,primaOld)!==1) throw new Error('PRIMA_ANCHOR_INVALID'); candidate=candidate.replace(primaOld,primaNew);
+          const leadOld=`  function leaderboard() {\n    return S().all('asesores').map(a => {\n      const pol = S().where('polizas', p => p.asesorId === a.id && (p.estado === 'Vigente' || p.estado === 'Por renovar') && polPais(p));\n      const prima = pol.reduce((s, p) => s + norm(p.prima, p.moneda), 0);\n      const com = S().where('comisiones', c => c.asesorId === a.id).reduce((s, c) => s + norm(c.monto, c.moneda), 0);`;
+          const leadNew=`  function leaderboard() {\n    const clients = clientIndex();\n    const policies = S().all('polizas') || [];\n    const commissions = S().all('comisiones') || [];\n    return S().all('asesores').map(a => {\n      const pol = policies.filter(p => p.asesorId === a.id && (p.estado === 'Vigente' || p.estado === 'Por renovar') && polPais(p, clients));\n      const prima = pol.reduce((s, p) => s + norm(p.prima, p.moneda), 0);\n      const com = commissions.filter(c => c.asesorId === a.id).reduce((s, c) => s + norm(c.monto, c.moneda), 0);`;
+          if(count(candidate,leadOld)!==1) throw new Error('LEADERBOARD_ANCHOR_INVALID'); candidate=candidate.replace(leadOld,leadNew);
+          new vm.Script(candidate,{filename:'queries.candidate.js'});
+          fs.writeFileSync(process.env.RUNNER_TEMP+'/r4s1-inicio/queries.candidate.js',candidate);
+
+          const CLIENTS=430,POLICIES=1375,COBROS=860;
+          const seed={clientes:[],asesores:[],polizas:[],cobros:[],comisiones:[]};
+          for(let i=0;i<CLIENTS;i++)seed.clientes.push({id:`cli_${i}`,pais:i%7===0?'CO':'GT',moneda:i%7===0?'COP':'GTQ'});
+          for(let i=0;i<7;i++)seed.asesores.push({id:`ase_${i}`,nombre:`Asesor ${i}`,metaPrima:100000});
+          for(let i=0;i<POLICIES;i++){const ci=i%CLIENTS;seed.polizas.push({id:`pol_${i}`,clienteId:`cli_${ci}`,asesorId:`ase_${i%7}`,estado:i%9===0?'Cancelada':i%6===0?'Por renovar':'Vigente',prima:1000+(i%100),moneda:ci%7===0?'COP':'GTQ'});}
+          for(let i=0;i<COBROS;i++){const ci=i%CLIENTS;seed.cobros.push({id:`cob_${i}`,clienteId:`cli_${ci}`,estado:i%11===0?'Vencido':i%3===0?'Pagado':'Pendiente',monto:100+(i%50),moneda:ci%7===0?'COP':'GTQ'});}
+          for(let i=0;i<CLIENTS;i++)seed.comisiones.push({id:`com_${i}`,asesorId:`ase_${i%7}`,monto:25+(i%7),moneda:i%7===0?'COP':'GTQ'});
+          function makeStore(){const metrics={allCalls:{},getCalls:{},whereCalls:{},cloneRows:{},writes:0};const clone=x=>JSON.parse(JSON.stringify(x));const s={all(c){metrics.allCalls[c]=(metrics.allCalls[c]||0)+1;const a=seed[c]||[];metrics.cloneRows[c]=(metrics.cloneRows[c]||0)+a.length;return a.map(clone)},get(c,id){metrics.getCalls[c]=(metrics.getCalls[c]||0)+1;return s.all(c).find(r=>r.id===id)||null},where(c,p){metrics.whereCalls[c]=(metrics.whereCalls[c]||0)+1;return s.all(c).filter(p)},insert(){metrics.writes++;throw new Error('WRITE_FORBIDDEN')},update(){metrics.writes++;throw new Error('WRITE_FORBIDDEN')},remove(){metrics.writes++;throw new Error('WRITE_FORBIDDEN')}};return{s,metrics};}
+          function run(src){const {s,metrics}=makeStore();const ctx={console,window:null,Orbit:{store:s,ui:{},pais:'GT'},Map,Set,Date,Math,JSON,Object,Array,String,Number,Boolean,RegExp};ctx.window=ctx;vm.createContext(ctx);new vm.Script(src).runInContext(ctx);const q=ctx.Orbit.q;const cart=q.carteraGlobal();const prima=q.primaVigenteGlobal();const board=q.leaderboard();return{metrics,out:{cart,prima,board:board.map(x=>({id:x.asesor.id,prima:x.prima,comision:x.comision,pct:x.pct}))}};}
+          const base=run(current),applied=run(candidate);
+          const semanticEqual=JSON.stringify(base.out)===JSON.stringify(applied.out);
+          const bg=base.metrics.getCalls.clientes||0,ag=applied.metrics.getCalls.clientes||0;
+          const bc=base.metrics.cloneRows.clientes||0,ac=applied.metrics.cloneRows.clientes||0;
+          const checks={candidateSyntax:true,semanticEqual,baselineClientGetsHigh:bg>=3000,appliedClientGetsZero:ag===0,clientCloneRowsReduced:(bc-ac)>=1000000,policyAllCallsReduced:(base.metrics.allCalls.polizas||0)>(applied.metrics.allCalls.polizas||0),commissionAllCallsReduced:(base.metrics.allCalls.comisiones||0)>(applied.metrics.allCalls.comisiones||0),writesZero:base.metrics.writes===0&&applied.metrics.writes===0};
+          const failed=Object.entries(checks).filter(([,v])=>!v).map(([k])=>k);
+          const ev={schemaVersion:'orbit360-r4s1-inicio-query-index-source-regression-v1',generatedAt:new Date().toISOString(),status:failed.length?'FAIL':'PASS_R4S1_INICIO_QUERY_INDEX_SOURCE_REGRESSION',classification:failed.length?'PIPELINE_MECHANISM_FAILURE':'FUNCTIONAL_DEFECT_ROOTFIX_CANDIDATE_SOURCE_PASS',rootCause:'INICIO_GLOBAL_QUERIES_PER_ROW_CLIENT_GET_CAUSES_NX_PRODUCT_STORE_COLLECTION_CLONE',fixture:{clients:CLIENTS,policies:POLICIES,cobros:COBROS,advisors:7,country:'GT'},baseline:{clientGetCalls:bg,clientCloneRows:bc,allCalls:base.metrics.allCalls,cloneRows:base.metrics.cloneRows},candidate:{clientGetCalls:ag,clientCloneRows:ac,allCalls:applied.metrics.allCalls,cloneRows:applied.metrics.cloneRows},reduction:{clientCloneRows:bc-ac,ratio:ac?bc/ac:null},semanticEqual,checks,failedCheckIds:failed,sourceFilesChanged:0,candidateArtifactOnly:true,browserExecuted:false,secretAccess:false,dataAccess:false,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false,ok:failed.length===0};
+          fs.writeFileSync(process.env.EVIDENCE_DIR+'/r4s1-inicio-query-index-source-regression-v20260815.json',JSON.stringify(ev,null,2)+'\n');console.log(JSON.stringify(ev,null,2));if(failed.length)process.exit(1);
+          NODE
+          jq -e '.ok==true and .semanticEqual==true and .baseline.clientGetCalls>=3000 and .candidate.clientGetCalls==0 and .reduction.clientCloneRows>=1000000 and .browserExecuted==false and .secretAccess==false and .dataAccess==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .productionTouched==false' "$EVIDENCE_DIR/r4s1-inicio-query-index-source-regression-v20260815.json" >/dev/null
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: orbit360-r4s1-inicio-query-index-source-regression-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/r4s1-inicio-query-index-source-regression-v20260815.json
+            ${{ runner.temp }}/r4s1-inicio/queries.candidate.js
+          if-no-files-found: warn
+          retention-days: 14
