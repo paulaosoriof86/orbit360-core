@@ -1,0 +1,72 @@
+name: Orbit360 R4S5 Postpublish Refreeze Source Only 20260816
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/workflows/orbit360-r4s5-postpublish-refreeze-source-only-v20260816.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: orbit360-r4s5-postpublish-refreeze-source-only-v20260816
+  cancel-in-progress: false
+
+env:
+  TARGET: https://app.aysseguros.com
+  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+  EXPECTED_SOURCE_HEAD: 5474a1a9af64c018e6dcc71b4ad0cdfe57ce0484
+  EXPECTED_CLIENT_VISUAL_SHA: ad6fa96614d4eefe29880fac26a1c349ae24940adc2d8ff75ad04d991595b067
+
+jobs:
+  refreeze:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Canonical gate before refreeze proof
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+          jq -e '.ok==true and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+      - name: Prove public R4S5 and browser freeze remain exact
+        shell: bash
+        run: |
+          set -euo pipefail
+          SMOKE='.github/workflows/orbit360-r4-certified-product-readonly-smoke-v20260815.yml'
+          grep -F "ORBIT360_R4_CERTIFIED_SOURCE_ONLY: 'true'" "$SMOKE" >/dev/null
+          grep -F "if: env.ORBIT360_R4_CERTIFIED_SOURCE_ONLY != 'true'" "$SMOKE" >/dev/null
+          WORK="$RUNNER_TEMP/r4s5-refreeze"
+          mkdir -p "$WORK" "$EVIDENCE_DIR"
+          UA='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/142.0.0.0 Safari/537.36'
+          curl --http1.1 -L --fail --silent --show-error --connect-timeout 15 --max-time 45 -A "$UA" -H 'Cache-Control: no-cache, no-store, max-age=0' -H 'Pragma: no-cache' "$TARGET/orbit360-package-manifest.json?orbit360_r4s5_refreeze=${GITHUB_RUN_ID}" -o "$WORK/manifest.json"
+          curl --http1.1 -L --fail --silent --show-error --connect-timeout 15 --max-time 45 -A "$UA" -H 'Cache-Control: no-cache, no-store, max-age=0' -H 'Pragma: no-cache' "$TARGET/core/client-insurer-visual-contract-v20260720.js?orbit360_r4s5_refreeze=${GITHUB_RUN_ID}" -o "$WORK/client-visual.js"
+          test "$(jq -r '.status' "$WORK/manifest.json")" = 'FASE_A_PRODUCT_R4S5_MINIMAL_SUCCESSOR_CERTIFIED'
+          test "$(jq -r '.sourceHead' "$WORK/manifest.json")" = "$EXPECTED_SOURCE_HEAD"
+          test "$(jq -r '.fileCount' "$WORK/manifest.json")" = '194'
+          test "$(sha256sum "$WORK/client-visual.js" | awk '{print $1}')" = "$EXPECTED_CLIENT_VISUAL_SHA"
+          jq -n '{ok:true,status:"R4S5_POSTPUBLISH_REFREEZE_SOURCE_ONLY_PASS",classification:"PASS",publicVersion:"R4S5",publicSourceHead:env.EXPECTED_SOURCE_HEAD,publicFileCount:194,clientVisualSha256:env.EXPECTED_CLIENT_VISUAL_SHA,browserFreezeActive:true,sourceOnly:true,runtimeBindingActivationPerformed:false,secretAccess:false,dataAccess:false,runtimeExecuted:false,browserExecuted:false,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,packageRebuilt:false,productModified:false,containsPII:false,containsSecrets:false}' > "$EVIDENCE_DIR/r4s5-postpublish-refreeze-source-only-v20260816.json"
+      - name: Canonical gate after refreeze proof
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+          jq -e '.ok==true and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: orbit360-r4s5-postpublish-refreeze-source-only-evidence-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/r4s5-postpublish-refreeze-source-only-v20260816.json
+          if-no-files-found: warn
+          retention-days: 14
