@@ -1,7 +1,7 @@
 {
   "schemaVersion": "orbit360-live-state-v1",
   "stateVersion": "20260816.r4s5-readonly-matrix-stop-deep-clone-composition.current",
-  "updatedAt": "2026-08-16T15:40:00-06:00",
+  "updatedAt": "2026-08-16T15:41:00-06:00",
   "phase": "R4S5_PUBLIC_REFROZEN_STOP_READONLY_MATRIX_CLIENTE360_DEEP_CLONE_COMPOSITION",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -138,13 +138,6 @@
     "previousNxRootfixInvalidated": false,
     "productChangeAuthorizedNow": false
   },
-  "semanticDebt": {
-    "clientSegmentHistorical": {
-      "status": "DOCUMENTED_NOT_AUTHORIZED_FOR_CHANGE",
-      "classification": "FUNCTIONAL_SEMANTIC_DEBT",
-      "changedInCurrentBlock": false
-    }
-  },
   "browserFreeze": {
     "active": true,
     "sourceOnly": true,
@@ -160,6 +153,32 @@
     "browserStepSkipped": true,
     "browserRerunAllowedNow": false,
     "freshRuntimeAuthorizationRequired": true
+  },
+  "scopeControl": {
+    "baseBeforeAuthorization": "458cfbe4e6e7cf3968e1492d23cb16b703e3f57d",
+    "headAfterDiagnosisDocs": "586d644146a68b6f1f67e8331e730c95814058f7",
+    "changedFileCount": 5,
+    "changedProductFileCount": 0,
+    "files": [
+      ".github/workflows/orbit360-r4-certified-product-readonly-smoke-v20260815.yml",
+      "tools/orbit360-r4-certified-product-contract-v20260815.json",
+      "tools/orbit360-r4-certified-product-smoke-wrapper-v20260815.mjs",
+      "orbit360-platform/docs/STOP-R4S5-READONLY-MATRIX-CLIENTE360-DEEP-CLONE-COMPOSITION-20260816.md",
+      "orbit360-platform/docs/orbit360-live-state-v1.json"
+    ],
+    "productModified": false,
+    "authModified": false,
+    "dataModified": false,
+    "rulesModified": false,
+    "storeModified": false,
+    "mainMerged": false
+  },
+  "semanticDebt": {
+    "clientSegmentHistorical": {
+      "status": "DOCUMENTED_NOT_AUTHORIZED_FOR_CHANGE",
+      "classification": "FUNCTIONAL_SEMANTIC_DEBT",
+      "changedInCurrentBlock": false
+    }
   },
   "progress": {
     "functionalReadinessPercent": 100,
