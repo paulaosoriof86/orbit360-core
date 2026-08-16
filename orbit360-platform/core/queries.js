@@ -56,18 +56,21 @@ Orbit.q = (function () {
   function paisActivo() { const p = Orbit.pais; return (p && p !== 'TODOS') ? p : null; }
   function monedaPais() { const p = paisActivo(); return p === 'CO' ? 'COP' : 'GTQ'; }
   const norm = (m, cur) => { if (paisActivo()) return m; return cur === 'COP' ? m / TC_COP_GTQ : m; };
-  function cobPais(c) { const cli = S().get('clientes', c.clienteId); const p = paisActivo(); return !p || (cli && cli.pais === p); }
-  function polPais(p2) { const cli = S().get('clientes', p2.clienteId); const p = paisActivo(); return !p || (cli && cli.pais === p); }
+  function clientIndex() { return new Map((S().all('clientes') || []).filter(c => c && c.id).map(c => [c.id, c])); }
+  function cobPais(c, clients) { const cli = clients instanceof Map ? clients.get(c.clienteId) : S().get('clientes', c.clienteId); const p = paisActivo(); return !p || (cli && cli.pais === p); }
+  function polPais(p2, clients) { const cli = clients instanceof Map ? clients.get(p2.clienteId) : S().get('clientes', p2.clienteId); const p = paisActivo(); return !p || (cli && cli.pais === p); }
 
   function carteraGlobal() {
-    const cob = S().all('cobros').filter(cobPais);
+    const clients = clientIndex();
+    const cob = S().all('cobros').filter(c => cobPais(c, clients));
     const alDia = cob.filter(c => c.estado === 'Pagado').reduce((s, c) => s + norm(c.monto, c.moneda), 0);
     const pend = cob.filter(c => c.estado === 'Pendiente').reduce((s, c) => s + norm(c.monto, c.moneda), 0);
     const venc = cob.filter(c => c.estado === 'Vencido').reduce((s, c) => s + norm(c.monto, c.moneda), 0);
     return { alDia, pend, venc, moneda: monedaPais() };
   }
   function primaVigenteGlobal() {
-    return S().where('polizas', p => (p.estado === 'Vigente' || p.estado === 'Por renovar') && polPais(p))
+    const clients = clientIndex();
+    return S().where('polizas', p => (p.estado === 'Vigente' || p.estado === 'Por renovar') && polPais(p, clients))
       .reduce((s, p) => s + norm(p.prima, p.moneda), 0);
   }
   function renovacionesProximas(dias) {
@@ -82,10 +85,13 @@ Orbit.q = (function () {
   }
   /** Avance por asesor (prima vigente vs meta). */
   function leaderboard() {
+    const clients = clientIndex();
+    const policies = S().all('polizas') || [];
+    const commissions = S().all('comisiones') || [];
     return S().all('asesores').map(a => {
-      const pol = S().where('polizas', p => p.asesorId === a.id && (p.estado === 'Vigente' || p.estado === 'Por renovar') && polPais(p));
+      const pol = policies.filter(p => p.asesorId === a.id && (p.estado === 'Vigente' || p.estado === 'Por renovar') && polPais(p, clients));
       const prima = pol.reduce((s, p) => s + norm(p.prima, p.moneda), 0);
-      const com = S().where('comisiones', c => c.asesorId === a.id).reduce((s, c) => s + norm(c.monto, c.moneda), 0);
+      const com = commissions.filter(c => c.asesorId === a.id).reduce((s, c) => s + norm(c.monto, c.moneda), 0);
       return { asesor: a, prima, comision: com, pct: Math.min(140, Math.round(prima / a.metaPrima * 100)) };
     }).sort((x, y) => y.prima - x.prima);
   }

@@ -94,9 +94,11 @@ Orbit.modules = Orbit.modules || {};
   }
   function rebuildIndexes() {
     if (!S() || typeof S().all !== 'function') return null;
+    const clients = S().all('clientes') || [];
     const policies = (S().all('polizas') || []).map(policyVisual);
     const vehicles = (S().all('vehiculos') || []).map(vehicleVisual);
     indexes = {
+      clients, clientsById: new Map(clients.filter(row => row && row.id).map(row => [row.id, row])),
       policies, vehicles,
       policiesByClient: group(policies, 'clienteId'),
       vehiclesByClient: group(vehicles, 'clienteId'),
@@ -131,7 +133,7 @@ Orbit.modules = Orbit.modules || {};
     q.clienteResumen = function (clientId) {
       if (summaries.has(clientId)) return summaries.get(clientId);
       const I = idx();
-      const rawCli = S().get('clientes', clientId);
+      const rawCli = (I.clientsById && I.clientsById.get(clientId)) || S().get('clientes', clientId);
       const cli = rawCli && Orbit.clientProjection && typeof Orbit.clientProjection.project === 'function' ? Orbit.clientProjection.project(rawCli) : rawCli;
       const pol = (I.policiesByClient && I.policiesByClient.get(clientId)) || [];
       const cob = (I.cobrosByClient && I.cobrosByClient.get(clientId)) || [];
@@ -148,7 +150,16 @@ Orbit.modules = Orbit.modules || {};
       summaries.set(clientId, out);
       return out;
     };
-    q.__clientSummaryV1199c = { original: originalClientSummary, indexed: true };
+    q.clientesResumenIndex = function () {
+      const I = idx();
+      const clients = (I && I.clients) || [];
+      clients.forEach(rawCli => {
+        const clientId = rawCli && rawCli.id;
+        if (clientId && !summaries.has(clientId)) q.clienteResumen(clientId);
+      });
+      return new Map(summaries);
+    };
+    q.__clientSummaryV1199c = { original: originalClientSummary, indexed: true, indexedAll: true };
   }
 
   function section(title, body, cls) {
