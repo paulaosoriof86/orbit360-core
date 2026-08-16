@@ -7,6 +7,7 @@ on:
       - '.github/workflows/orbit360-r4-certified-product-readonly-smoke-v20260815.yml'
       - 'tools/orbit360-r4-certified-product-contract-v20260815.json'
       - 'tools/orbit360-r4-certified-product-smoke-wrapper-v20260815.mjs'
+      - 'tools/orbit360-r4-team-scope-relational-index-regression-v20260816.mjs'
 
 permissions:
   contents: read
@@ -45,8 +46,17 @@ jobs:
           jq -e '.ok==true and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
           node --check tools/orbit360-r4-production-readonly-smoke-v20260815.mjs
           node --check tools/orbit360-r4-certified-product-smoke-wrapper-v20260815.mjs
+          node --check tools/orbit360-r4-team-scope-relational-index-regression-v20260816.mjs
           node tools/orbit360-r4-certified-product-smoke-wrapper-v20260815.mjs --self-test
           jq -e '.ok==true and .status=="R4_CERTIFIED_VALIDATOR_ROOTFIX_SOURCE_PASS" and .classification=="VALIDATOR_STALE_ROOTFIX_PASS" and .authAsset.sourceSha256Matches==true and .authAsset.sourceBytesMatch==true and .staleLegacyAuthPathRemovedFromExecutableHarness==true and .productAuthPathBoundExactlyOnce==true and .browserExecuted==false and .secretAccess==false and .dataAccess==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .deployExecuted==false and .packageRebuilt==false and .productionTouched==false' "$EVIDENCE_DIR/r4-certified-validator-rootfix-source-v20260815.json" >/dev/null
+      - name: Validate team-own scoped relational access regression source-only
+        if: env.ORBIT360_R4_CERTIFIED_SOURCE_ONLY == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="$EVIDENCE_DIR/r4-team-scope-relational-index-regression-v20260816.json"
+          ORBIT360_R4_TEAM_SCOPE_REGRESSION_OUT="$OUT" node tools/orbit360-r4-team-scope-relational-index-regression-v20260816.mjs
+          jq -e '.ok==true and .status=="R4_TEAM_SCOPE_RELATIONAL_INDEX_REGRESSION_PASS" and .classification=="FUNCTIONAL_DEFECT_ROOTFIX_SOURCE_PROVEN" and .roles.Dirección.publicEqual==true and .roles.Dirección.facadeEqual==true and .roles.Operativo.publicEqual==true and .roles.Operativo.facadeEqual==true and .roles.Asesor.publicEqual==true and .roles.Asesor.facadeEqual==true and .reduction.operativoFacadeCloneRatio>=50 and .reduction.asesorFacadeCloneRatio>=50 and .roles.Operativo.candidate.facadeMetrics.getCalls<100 and .roles.Asesor.candidate.facadeMetrics.getCalls<100 and .browserExecuted==false and .secretAccess==false and .dataAccess==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .productionTouched==false' "$OUT" >/dev/null
       - name: Validate bounded recovered harness source-only
         if: env.ORBIT360_R4_CERTIFIED_SOURCE_ONLY == 'true'
         shell: bash
@@ -108,6 +118,7 @@ jobs:
           path: |
             orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
             orbit360-platform/runtime-gate-crm-v20260716/r4-certified-validator-rootfix-source-v20260815.json
+            orbit360-platform/runtime-gate-crm-v20260716/r4-team-scope-relational-index-regression-v20260816.json
             orbit360-platform/runtime-gate-crm-v20260716/r4-certified-harness-source-only-watchdog-v20260815.json
             orbit360-platform/runtime-gate-crm-v20260716/m6-product-smoke-identity-summary.json
             orbit360-platform/runtime-gate-crm-v20260716/r4-production-readonly-smoke-v20260815.json
