@@ -1,7 +1,7 @@
 {
   "schemaVersion": "orbit360-live-state-v1",
-  "stateVersion": "20260816.r4s2-final-frontier-team-own-rootcause-source-pass.1",
-  "updatedAt": "2026-08-16T10:25:00-06:00",
+  "stateVersion": "20260816.r4s2-final-frontier-team-own-rootcause-source-pass.2",
+  "updatedAt": "2026-08-16T10:29:00-06:00",
   "phase": "R4S2_FINAL_FRONTIER_CONSUMED_TEAM_OWN_ROOTCAUSE_SOURCE_PASS",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -16,12 +16,6 @@
     "staticVerificationRunId": 31957103570,
     "staticVerificationJobId": 95189286663,
     "manifestStatus": "FASE_A_PRODUCT_R4S2_MINIMAL_SUCCESSOR_CERTIFIED",
-    "indexSha256": "125b24a3fc215a368a7183a107cd55eb5a6332fc8a7f8354ed94e3169340ec4e",
-    "manifestSha256": "444d6eaa85c782cf4b3c34961159bebad0b3cf67ea6b76de163ec68fbe0b5a6a",
-    "accessScopeSha256": "8976ab8032f210a0f93d79f4ace037ec3b3e8fe8c1ac9e1f5a0eadd8d134fb3f",
-    "authProductSha256": "d0bb399fe0e1dd102a03950673044eda5bc8d181e4e98cf477d22d141aa7b3a8",
-    "queriesSha256": "1a37503507cd87be00314076e2ccf1b61d29cfbed9d3961486ade96fbab40051",
-    "policyReceiptsOwnerSha256": "3323f09b812d6e3accc8cd151fe28ec3fab2fffa6c41ad622a2f8a147046887b",
     "rollbackPackagePreserved": true,
     "hostdimeProductBlocker": false
   },
@@ -39,8 +33,6 @@
     "storeWriteEnabled": false,
     "clientes": 430,
     "aseguradoras": 30,
-    "requiredMissingCount": 0,
-    "requiredFailedCount": 0,
     "firestoreWrites": 0,
     "authWrites": 0,
     "operationalWrites": 0
@@ -55,23 +47,10 @@
     "classification": "FUNCTIONAL_DEFECT/R4_ROLE_ROUTE_STAGE_TIMEOUT",
     "firstFailedStage": "role-Operativo-group",
     "error": "R4_STAGE_TIMEOUT:role-Operativo-group:90000",
-    "direction": {
-      "groupPass": true,
-      "inicioPass": true,
-      "cliente360Pass": true,
-      "aseguradorasPass": true,
-      "opsPass": true,
-      "leadsPass": true,
-      "cliente360Scope": "all",
-      "clientesRaw": 430,
-      "clientesScoped": 430
-    },
-    "operativo": {
-      "inicioPass": true,
-      "cliente360Started": true,
-      "cliente360Returned": false,
-      "cliente360ElapsedBeforeTimeoutMsApprox": 82874
-    },
+    "directionFiveRoutesPass": true,
+    "operativoInicioPass": true,
+    "operativoCliente360Started": true,
+    "operativoCliente360Returned": false,
     "asesorReached": false,
     "pageErrors": 0,
     "consoleErrors": 0,
@@ -96,7 +75,6 @@
   "teamOwnScopeRootCause": {
     "classification": "FUNCTIONAL_DEFECT/ACCESS_SCOPED_RELATIONAL_NX_CLONE_TEAM_OWN",
     "owner": "orbit360-platform/core/access-scope.js",
-    "cause": "For scope team/own, filter() still resolved related advisor IDs row-by-row through store.get(clientes/polizas); the product store get() delegates to clone-on-read all(), multiplying full-collection clones inside scopedStore during Cliente360 render.",
     "historicalValidationGap": "VALIDATOR_STALE/ACCESS_FASTPATH_REGRESSION_DID_NOT_EXERCISE_SCOPED_RELATIONAL_TEAM_OWN_PATH",
     "productModified": false,
     "candidateStatus": "SOURCE_ONLY_PROVEN_NOT_APPLIED"
@@ -109,13 +87,9 @@
     "artifactId": 9266561371,
     "artifactDigest": "sha256:7db701960ed6f08bc78594fbdca6eab57556bf9ddb1a02a23ce9e1c6bc937f34",
     "sourcePath": "orbit360-platform/core/access-scope.js",
-    "sourceSha256": "8976ab8032f210a0f93d79f4ace037ec3b3e8fe8c1ac9e1f5a0eadd8d134fb3f",
-    "fixture": { "clientes": 430, "polizas": 1375, "vehiculos": 700, "cobros": 1900, "comisiones": 900 },
     "directionSemanticEqual": true,
     "operativoSemanticEqual": true,
     "asesorSemanticEqual": true,
-    "operativoCounts": { "clientes": 216, "polizas": 686, "vehiculos": 365, "cobros": 954, "comisiones": 454 },
-    "asesorCounts": { "clientes": 108, "polizas": 344, "vehiculos": 191, "cobros": 479, "comisiones": 281 },
     "operativoFacadeCurrent": { "getCalls": 45631, "cloneRows": 6112246 },
     "operativoFacadeCandidate": { "getCalls": 25, "cloneRows": 12705 },
     "asesorFacadeCurrent": { "getCalls": 36245, "cloneRows": 5790400 },
@@ -131,12 +105,6 @@
     "firestoreWrites": 0,
     "authWrites": 0,
     "operationalWrites": 0
-  },
-  "pipelineNote": {
-    "firstRegressionRunId": 31958278365,
-    "classification": "PIPELINE_MECHANISM_FAILURE/JQ_UNICODE_KEY_SELECTOR",
-    "meaning": "Regression JSON itself was PASS; only jq selector .roles.Dirección failed to compile. Corrected once to .roles[\"Dirección\"] and the second/last source-only run passed.",
-    "productImpacted": false
   },
   "progress": {
     "functionalReadinessPercent": 100,
