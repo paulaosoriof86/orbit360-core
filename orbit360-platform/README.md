@@ -1,8 +1,8 @@
 # Orbit 360 · Plataforma
 
-Estado rector: `docs/orbit360-live-state-v1.json`. Checkpoint vigente: `docs/CIERRE-R4S3-ROOTCAUSE-CLIENTE360-BATCH-SUMMARY-NX-CLONE-20260816.md`. Changelog: `CHANGELOG-R4S3-GOLIVE-20260816.md`.
+Estado rector: `docs/orbit360-live-state-v1.json`. Checkpoint vigente: `docs/CIERRE-R4S3-CLIENTE360-BATCH-SUMMARY-ROOTFIX-SOURCE-PASS-20260816.md`. Changelog: `CHANGELOG-R4S3-GOLIVE-20260816.md`.
 
-R4S3 está **certificada, publicada y verificada byte a byte** en `app.aysseguros.com`:
+R4S3 sigue **certificada, publicada y verificada byte a byte** en `app.aysseguros.com`:
 
 - ZIP `orbit360-fase-a-product-r4s3-294ed22bdb56.zip`
 - SHA256 `1ab5f3ea7f59cd0c2eb2bb1f5c0596a4bf3ca241f42016f74bf095ccbaf0f78e`
@@ -10,25 +10,56 @@ R4S3 está **certificada, publicada y verificada byte a byte** en `app.aysseguro
 - 194 archivos
 - identidad pública run `31960492114` PASS.
 
-La matriz productiva final read-only autorizada fue consumida en run `31961220051`. Antes del STOP pasaron publicación, Auth, login, membership, tenant, roles, runtime/router/store read-only, 430 clientes, 30 aseguradoras, Dirección Inicio y Dirección Cliente 360, con cero errores de browser y cero writes.
+## Auth
 
-El STOP `FUNCTIONAL_DEFECT / R4_ROLE_ROUTE_STAGE_TIMEOUT` quedó ahora **diagnosticado a causa raíz sin repetir browser**.
+La última matriz productiva real, run `31961220051`, confirmó antes del timeout de rendimiento:
 
-Diagnóstico source-only/static: run `31962262791`, job `95201876769`, artifact `9267541412` → SUCCESS. Gate canónico fue la primera etapa ejecutable y pasó.
+- login HTTP 200;
+- usuario autenticado y email verificado;
+- membership disponible y activa;
+- tenant correcto;
+- roles requeridos presentes;
+- runtime/router/store read-only ready;
+- 430 clientes y 30 aseguradoras;
+- cero errores de página/consola/HTTP y cero writes.
 
-Owner único probado:
+**Auth no es el bloqueo vigente y no requiere un cambio nuevo.**
+
+## Cliente 360 · causa raíz y rootfix
+
+El timeout del grupo Dirección fue aislado source-only a:
 
 `FUNCTIONAL_DEFECT / CLIENTE360_BATCH_SUMMARY_CONTRACT_MISSING_NX_CLONE`  
-`orbit360-platform/core/queries.js`
+Owner: `orbit360-platform/core/queries.js`.
 
-Cliente 360 ya intenta usar `q.clientesResumenIndex()`, pero `core/queries.js` no lo implementa/exporta. La lista cae en `q.clienteResumen(c.id)` al menos 470 veces en la carga inicial. Cada resumen provoca clones de colecciones completas a través del store read-only. Sobre el fixture versionado 430/1,375/1,900/900, el lower bound es **2,164,350 filas clonadas**, frente a ~4,605 para una pasada batched: amplificación estructural **470×**.
+Se autorizó y aplicó exclusivamente ese rootfix en commit `54f671e64b32c7b39100d79e770572a579e79ac7`, implementando/exportando `Orbit.q.clientesResumenIndex()` sin modificar Cliente 360, store, Access, Auth ni datos.
 
-El timeout acumulativo de 90 s quedó reclasificado como `VALIDATOR_STALE_SECONDARY / CUMULATIVE_ROLE_GROUP_BUDGET_AND_ROUTE_ATTRIBUTION`: explica la truncación de Aseguradoras, pero no es el root owner. Aseguradoras no produjo PASS/FAIL propio y no es el owner terminal probado.
+Preflight run `31963457394` PASS.
 
-Gate correctivo versionado: `tools/orbit360-r4-cliente360-summary-boundedness-gate-v20260816.mjs`. R4S3 actual produce el FAIL esperado `CLIENTE360_BATCH_SUMMARY_CONTRACT_MISSING`. Para cerrar debe existir/exportarse `Orbit.q.clientesResumenIndex` como Map batched preservando semántica y cumplir `allCalls<=8`, `getCalls<=10`, `cloneRows<=20000` en el fixture versionado.
+Validación source-only run `31963555214`, job `95205101103`, artifact `9267857434`, digest `sha256:f04472548212f53ea6d9a9e78acc77729c346b8570bd5f012098a9fe1ca7e43a` → SUCCESS.
 
-**No se aplicó el rootfix de producto.** Browser permanece congelado `SOURCE_ONLY=true`; no hay nueva matriz, deploy, reimportación, Auth/data changes, main ni merge autorizados.
+Gate boundedness PASS sobre fixture 430/1,375/1,900/900:
 
-La siguiente frontera requiere autorización explícita para modificar únicamente `core/queries.js`, ejecutar gate canónico + gate de boundedness + regresión semántica. Empaquetado/publicación/browser quedan fuera de esa autorización hasta un gate posterior.
+- `allCalls=4`
+- `getCalls=0`
+- `whereCalls=0`
+- `cloneRows=4605`
+- SHA256 `core/queries.js`: `b906c1d3382a9fad310695b0ce2c8e7f49a2bf99fe9b9ed674a8df7e0fcbbb7b`.
 
-Avance: **100% funcional / 75% técnico / 67% gates (2/3)** hasta `POST_GO_LIVE_SMOKE_PASS`.
+Regresión semántica PASS: 430/430 resúmenes equivalentes, cero mismatch y API `clienteResumen` preservada.
+
+## Frontera vigente
+
+El rootfix está probado **solo en source**. La R4S3 publicada todavía no contiene el nuevo `core/queries.js`.
+
+También permanece abierto un issue secundario del validador:
+
+`VALIDATOR_STALE_SECONDARY / CUMULATIVE_ROLE_GROUP_BUDGET_AND_ROUTE_ATTRIBUTION`.
+
+No es la causa del trabajo pesado de Cliente 360, pero debe corregirse antes de interpretar otra matriz final.
+
+Browser sigue congelado `SOURCE_ONLY=true`; no hay nuevo paquete, publicación ni matriz autorizados.
+
+Siguiente secuencia: corregir el harness source-only → certificar sucesora mínima con único delta `core/queries.js` → publicar con backup/rollback → ejecutar una única matriz productiva read-only corregida → con `POST_GO_LIVE_SMOKE_PASS`, visualización humana y batería E2E/live.
+
+Sin reimportación, cambios Auth/datos, main ni merge. Avance rector: **100% funcional / 75% técnico / 67% gates (2/3)** hasta el smoke final.
