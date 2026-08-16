@@ -1,7 +1,7 @@
 {
   "schemaVersion": "orbit360-live-state-v1",
-  "stateVersion": "20260815.r4s1-final-frontier-nx-clone-root-cause.1",
-  "updatedAt": "2026-08-15T18:33:00-06:00",
+  "stateVersion": "20260815.r4s1-final-frontier-nx-clone-root-cause.2",
+  "updatedAt": "2026-08-15T18:36:00-06:00",
   "phase": "R4S1_FINAL_FRONTIER_FAILED_ROOT_CAUSE_PROVEN_SOURCE_CANDIDATES_NOT_APPLIED",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -19,14 +19,6 @@
     "accessScopeSha256": "8976ab8032f210a0f93d79f4ace037ec3b3e8fe8c1ac9e1f5a0eadd8d134fb3f",
     "authProductSha256": "d0bb399fe0e1dd102a03950673044eda5bc8d181e4e98cf477d22d141aa7b3a8",
     "hostdimeProductBlocker": false
-  },
-  "certifiedBaselineHistory": {
-    "r3Sha256": "4fd52a748fa130fd069b2d2684e1944369164aeb0646fe728067dd7b4ce29e69",
-    "r4s1CertificationRunId": 31915191809,
-    "r4s1DurableArtifactId": 9254713380,
-    "r4s1EvidenceArtifactId": 9254713130,
-    "r4s1OnlyDeltaFromR3": "core/access-scope.js",
-    "r4s1DeltaSourceCommit": "df4c217c34722c03215f88b62f6865ab41c2a9f3"
   },
   "authRuntimeDataEvidence": {
     "status": "PASS_RECONFIRMED_R4S1_FINAL_FRONTIER",
@@ -64,12 +56,8 @@
     "runtimeClassification": "FUNCTIONAL_DEFECT",
     "runtimeFailureFamily": "R4_ROLE_ROUTE_STAGE_TIMEOUT",
     "role": "Dirección",
-    "groupStartMs": 14728,
-    "inicioStartMs": 45462,
     "preFirstRouteMs": 30734,
-    "inicioPassMs": 45915,
-    "cliente360StartMs": 45915,
-    "groupFailMs": 104729,
+    "inicioPassed": true,
     "cliente360UntilGroupTimeoutMs": 58814,
     "cliente360PassObserved": false,
     "secondBrowserRunAuthorized": false
@@ -88,17 +76,10 @@
     "sourceRegressionRunId": 31917185515,
     "artifactId": 9255246859,
     "artifactDigest": "sha256:c309f91f18b0e697d4b59fe51d75bc2a7ecd55d113338c567cb1af720e6c819f",
-    "fixtureClients": 430,
-    "fixturePolicies": 1375,
-    "baselineSummaryIndexCalls": 0,
-    "baselineFallbackSummaryCalls": 470,
     "baselineClientGetCalls": 430,
     "baselineClientCloneRows": 185330,
-    "candidateSummaryIndexCalls": 1,
-    "candidateFallbackSummaryCalls": 0,
     "candidateClientGetCalls": 0,
     "candidateClientCloneRows": 860,
-    "cloneRowsReduced": 184470,
     "reductionRatio": 215.5,
     "semanticEqual": true,
     "candidateAppliedToSource": false,
@@ -109,14 +90,10 @@
     "sourceRegressionRunId": 31917288758,
     "artifactId": 9255279034,
     "artifactDigest": "sha256:c07892977d30953556d8031d78c087bdfc09acd32a44221d33da2e083518ef8a",
-    "fixtureClients": 430,
-    "fixturePolicies": 1375,
-    "fixtureCobros": 860,
     "baselineClientGetCalls": 3304,
     "baselineClientCloneRows": 1420720,
     "candidateClientGetCalls": 0,
     "candidateClientCloneRows": 1290,
-    "cloneRowsReduced": 1419430,
     "reductionRatio": 1101.3333333333333,
     "semanticEqual": true,
     "candidateAppliedToSource": false,
@@ -128,8 +105,7 @@
     "historicalClaimSummaryIndexCalls": 1,
     "historicalClaimFallbackSummaryCalls": 0,
     "actualIndexDefinitionCountInR4S1": 0,
-    "supersededForPerformanceClaims": true,
-    "replacementEvidenceRunId": 31917185515
+    "supersededForPerformanceClaims": true
   },
   "rootCauseStatus": "R4S1_PUBLISHED_AND_AUTH_DATA_PASS; FINAL_FRONTIER_BLOCKED_BY_TWO_PROVEN_NX_CLONE_RENDER_DEFECTS; SOURCE_CANDIDATES_PASS_NOT_APPLIED",
   "classification": "FUNCTIONAL_DEFECT_ROOT_CAUSE_PROVEN_AWAITING_NEW_PRODUCT_MUTATION_AUTHORIZATION",
@@ -159,8 +135,7 @@
     "owner": "R4S2 minimal successor / Inicio + Cliente360 indexed read-model",
     "stage": "AUTHORIZE_TWO_PROVEN_SOURCE_ROOTFIXES_THEN_COMBINED_SOURCE_GATE",
     "action": "Do not rerun browser. If explicitly authorized, apply only the two proven source-only candidates: core/queries.js indexed client lookup for Inicio global queries and modules/policy-receipts-v1199-detail-guard.js real clientesResumenIndex/read-model lookup. Run combined semantic/performance source regression and canonical gate. Only after PASS generate an immutable R4S2 from published R4S1 with exactly these two new product deltas and 192 other product files byte-identical to R4S1; certify before publication. Publication and any new final browser matrix require explicit authorization because the prior macro authorization has been consumed.",
-    "doNotRollbackR4S1Automatically": true,
-    "reason": "R4S1 package identity, Auth, tenant, 430/30 data integrity and zero-write safety remain PASS; current blocker is bounded render performance, not corruption/security."
+    "doNotRollbackR4S1Automatically": true
   },
   "resumeProtocol": [
     "Read this file first",
@@ -168,11 +143,9 @@
     "Treat R4S1 as currently published and statically verified",
     "Do not re-open HostDime/Auth/password/membership/tenant/data diagnosis",
     "Keep browser frozen; the single authorized final frontier was consumed",
-    "Treat access-scope R4S1 fix as published PASS",
     "Treat Inicio and Cliente360 N-x-clone root causes as proven with source-only semantic equivalence",
     "Do not apply the two new product rootfixes without explicit authorization",
-    "Do not advance to Polizas",
-    "On new authorization: apply exactly two source files, combined gate/regression, then immutable R4S2 only after PASS"
+    "Do not advance to Polizas"
   ],
   "currentCheckpoint": "orbit360-platform/docs/CIERRE-R4S1-FRONTERA-FINAL-NX-CLONE-INICIO-CLIENTE360-20260815.md",
   "currentChangelog": "orbit360-platform/CHANGELOG-R4S1-GOLIVE-20260815.md",
@@ -181,7 +154,6 @@
     "runId": 31917288758,
     "artifactId": 9255279034,
     "result": "PASS_R4S1_INICIO_QUERY_INDEX_SOURCE_REGRESSION",
-    "sourceHead": "97b8d0ee0c13b6c1cdb49800c341fc8d8f9aa834",
     "browserExecuted": false,
     "secretAccess": false,
     "dataAccess": false,
