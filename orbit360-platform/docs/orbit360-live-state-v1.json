@@ -1,12 +1,9 @@
 {
   "schemaVersion":"orbit360-live-state-v1",
-  "stateVersion":"20260815.r4s1-final-frontier-nx-clone-root-cause.final",
-  "updatedAt":"2026-08-15T18:43:00-06:00",
+  "stateVersion":"20260815.r4s1-final-frontier-nx-clone-root-cause.final2",
+  "updatedAt":"2026-08-15T18:44:00-06:00",
   "phase":"R4S1_FINAL_FRONTIER_FAILED_ROOT_CAUSE_PROVEN_SOURCE_CANDIDATES_NOT_APPLIED",
-  "repository":"paulaosoriof86/orbit360-core",
-  "branch":"ays/backend-tenant-lab-v99-20260703",
-  "pr":5,
-  "prState":"draft-open",
+  "repository":"paulaosoriof86/orbit360-core","branch":"ays/backend-tenant-lab-v99-20260703","pr":5,"prState":"draft-open",
   "currentPublishedPackage":{"name":"orbit360-fase-a-product-r4s1-df4c217c3472.zip","sha256":"49f5a5eee451665fcc420fc9acee88347b95aa832a8f6f524053cc4ccaa0d60d","fileCount":194,"status":"R4S1_PUBLISHED_STATIC_IDENTITY_PASS","staticVerificationRunId":31916602904,"staticEvidenceArtifactId":9255064967,"hostdimeProductBlocker":false},
   "authRuntimeDataEvidence":{"status":"PASS_RECONFIRMED_R4S1_FINAL_FRONTIER","loginHttp200":true,"signedIn":true,"emailVerified":true,"membershipActive":true,"tenantMatches":true,"requiredRolesPresent":true,"runtimeStarted":true,"storeStatus":"ready-read-only","clientes":430,"aseguradoras":30,"firestoreWrites":0,"authWrites":0,"operationalWrites":0},
   "singleFinalFrontier":{"authorizationConsumed":true,"runId":31916778155,"jobId":95089796794,"artifactId":9255149181,"runtimeClassification":"FUNCTIONAL_DEFECT","runtimeFailureFamily":"R4_ROLE_ROUTE_STAGE_TIMEOUT","preFirstRouteMs":30734,"inicioPassed":true,"cliente360UntilGroupTimeoutMs":58814,"secondBrowserRunAuthorized":false},
@@ -18,9 +15,7 @@
   "rootCauseStatus":"R4S1_PUBLISHED_AND_AUTH_DATA_PASS; FINAL_FRONTIER_BLOCKED_BY_TWO_PROVEN_NX_CLONE_RENDER_DEFECTS; SOURCE_CANDIDATES_PASS_NOT_APPLIED",
   "progress":{"functionalReadinessPercent":100,"technicalIterationProgressPercent":75,"goLiveGatesClosed":2,"goLiveGatesTotal":3,"goLiveGateProgressPercent":67,"postGoLiveSmokePass":false},
   "authorization":{"r4s1GenerationAuthorizedAndConsumed":true,"r4s1PublicationAuthorizedAndConsumed":true,"r4s1SingleFinalMatrixAuthorizedAndConsumed":true,"newQueriesRootfixAuthorized":false,"newCliente360SummaryIndexRootfixAuthorized":false,"r4s2GenerationAuthorized":false,"r4s2PublicationAuthorized":false,"additionalBrowserMatrixAuthorized":false,"reimportAuthorized":false,"authChangesAuthorized":false,"dataChangesAuthorized":false,"mainMergeAuthorized":false},
-  "nextActionExact":{"owner":"R4S2 minimal successor / Inicio + Cliente360 indexed read-model","stage":"AUTHORIZE_TWO_PROVEN_SOURCE_ROOTFIXES_THEN_COMBINED_SOURCE_GATE","action":"Do not rerun browser. With explicit authorization, apply only core/queries.js and modules/policy-receipts-v1199-detail-guard.js proven candidates, then canonical gate plus combined semantic/performance regression. Only with PASS build immutable R4S2 from R4S1 with exactly these two new deltas and 192 other product files byte-identical. Certification, publication and a new browser matrix must be included explicitly in the new macro authorization.","doNotRollbackR4S1Automatically":true},
-  "currentCheckpoint":"orbit360-platform/docs/CIERRE-R4S1-FRONTERA-FINAL-NX-CLONE-INICIO-CLIENTE360-20260815.md",
-  "currentChangelog":"orbit360-platform/CHANGELOG-R4S1-GOLIVE-20260815.md",
-  "readme":"orbit360-platform/README.md",
+  "nextActionExact":{"owner":"R4S2 minimal successor / Inicio + Cliente360 indexed read-model","stage":"AUTHORIZE_TWO_PROVEN_SOURCE_ROOTFIXES_THEN_COMBINED_SOURCE_GATE","action":"Do not rerun browser. With explicit authorization, apply only core/queries.js and modules/policy-receipts-v1199-detail-guard.js proven candidates, run canonical gate plus combined semantic/performance regression, then only with PASS build immutable R4S2 from R4S1 with exactly these two new deltas and 192 other product files byte-identical. Certification, publication and a new browser matrix must be explicitly included in the new macro authorization.","doNotRollbackR4S1Automatically":true},
+  "currentCheckpoint":"orbit360-platform/docs/CIERRE-R4S1-FRONTERA-FINAL-NX-CLONE-INICIO-CLIENTE360-20260815.md","currentChangelog":"orbit360-platform/CHANGELOG-R4S1-GOLIVE-20260815.md","readme":"orbit360-platform/README.md",
   "lastEvidence":{"runId":31917288758,"artifactId":9255279034,"result":"PASS_R4S1_INICIO_QUERY_INDEX_SOURCE_REGRESSION","browserExecuted":false,"productionTouched":false,"firestoreWrites":0,"authWrites":0,"operationalWrites":0}
 }
