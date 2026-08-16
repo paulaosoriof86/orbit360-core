@@ -1,0 +1,84 @@
+name: Orbit360 R4S3 Access Scope Rootfix Apply 20260816
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/workflows/orbit360-r4s3-access-scope-rootfix-apply-v20260816.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: orbit360-r4s3-access-scope-rootfix-apply-v20260816
+  cancel-in-progress: false
+
+env:
+  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+  PRODUCT_PATH: orbit360-platform/core/access-scope.js
+  EXPECTED_R4S2_SOURCE_SHA256: 8976ab8032f210a0f93d79f4ace037ec3b3e8fe8c1ac9e1f5a0eadd8d134fb3f
+
+jobs:
+  apply-source-only:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Canonical gate before rootfix
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = 'ays/backend-tenant-lab-v99-20260703'
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+          jq -e '.ok==true and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+          test "$(sha256sum "$PRODUCT_PATH" | awk '{print $1}')" = "$EXPECTED_R4S2_SOURCE_SHA256"
+      - name: Prove exact candidate with versioned regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="$EVIDENCE_DIR/r4-team-scope-relational-index-regression-v20260816.json"
+          ORBIT360_R4_TEAM_SCOPE_REGRESSION_OUT="$OUT" node tools/orbit360-r4-team-scope-relational-index-regression-v20260816.mjs
+          jq -e '.ok==true and .status=="R4_TEAM_SCOPE_RELATIONAL_INDEX_REGRESSION_PASS" and .classification=="FUNCTIONAL_DEFECT_ROOTFIX_SOURCE_PROVEN" and .roles["Dirección"].publicEqual==true and .roles["Dirección"].facadeEqual==true and .roles.Operativo.publicEqual==true and .roles.Operativo.facadeEqual==true and .roles.Asesor.publicEqual==true and .roles.Asesor.facadeEqual==true and .reduction.operativoFacadeCloneRatio>=50 and .reduction.asesorFacadeCloneRatio>=50 and .roles.Operativo.candidate.facadeMetrics.getCalls<100 and .roles.Asesor.candidate.facadeMetrics.getCalls<100 and .browserExecuted==false and .secretAccess==false and .dataAccess==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .productionTouched==false' "$OUT" >/dev/null
+      - name: Apply only proven filter rootfix
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="$EVIDENCE_DIR/r4s3-access-scope-rootfix-apply-v20260816.json"
+          ORBIT360_R4S3_APPLY_AUTHORIZED=1 ORBIT360_R4S3_APPLY_OUT="$OUT" node tools/orbit360-r4s3-apply-access-scope-rootfix-v20260816.mjs
+          jq -e '.ok==true and .status=="R4S3_ACCESS_SCOPE_ROOTFIX_APPLIED_EXACT" and .classification=="FUNCTIONAL_DEFECT_ROOTFIX_SOURCE_EXACT" and .mutationBoundary=="filter-only" and .candidateMarkerCount==1 and .oldMarkerCount==0 and .applied==true and .browserExecuted==false and .secretAccess==false and .dataAccess==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .productionTouched==false' "$OUT" >/dev/null
+          node --check "$PRODUCT_PATH"
+      - name: Canonical gate after rootfix and diff contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+          jq -e '.ok==true and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+          test "$(git diff --name-only -- "$PRODUCT_PATH")" = "$PRODUCT_PATH"
+          test "$(git diff --numstat -- "$PRODUCT_PATH" | wc -l | tr -d ' ')" = '1'
+      - name: Commit only product rootfix
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'orbit360-ci'
+          git config user.email 'orbit360-ci@users.noreply.github.com'
+          git add -- "$PRODUCT_PATH"
+          test "$(git diff --cached --name-only)" = "$PRODUCT_PATH"
+          git commit -m 'fix: index team-own relational access for R4S3'
+          git push origin HEAD:ays/backend-tenant-lab-v99-20260703
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: orbit360-r4s3-access-scope-rootfix-apply-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/r4-team-scope-relational-index-regression-v20260816.json
+            orbit360-platform/runtime-gate-crm-v20260716/r4s3-access-scope-rootfix-apply-v20260816.json
+          if-no-files-found: warn
+          retention-days: 14
