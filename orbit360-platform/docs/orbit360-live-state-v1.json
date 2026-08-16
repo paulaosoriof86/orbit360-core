@@ -1,8 +1,8 @@
 {
   "schemaVersion": "orbit360-live-state-v1",
-  "stateVersion": "20260816.r4s5-client-projection-batch-source-pass.current",
-  "updatedAt": "2026-08-16T14:04:14-06:00",
-  "phase": "R4S5_CLIENT_PROJECTION_BATCH_SOURCE_ROOTFIX_PASS_NOT_PACKAGED",
+  "stateVersion": "20260816.r4s5-minimal-successor-durable-certified.current",
+  "updatedAt": "2026-08-16T15:11:16-06:00",
+  "phase": "R4S5_MINIMAL_SUCCESSOR_DURABLE_CERTIFIED_NOT_PUBLISHED",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pr": 5,
@@ -68,9 +68,9 @@
     "currentStopAttributedToValidator": false
   },
   "currentRootCause": {
-    "classification": "FUNCTIONAL_DEFECT_ROOTFIX_SOURCE_PROVEN",
+    "classification": "FUNCTIONAL_DEFECT_ROOTFIX_SUCCESSOR_CERTIFIED",
     "failureFamily": "CLIENT_VISUAL_PROJECTION_SEGMENTATION_NX_CLONE_COMPOSED_READONLY_STORE",
-    "status": "ROOTFIX_SOURCE_PASS_NOT_PACKAGED_NOT_PUBLISHED",
+    "status": "ROOTFIX_SOURCE_AND_DURABLE_PACKAGE_CERTIFIED_NOT_PUBLISHED",
     "owner": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js",
     "ownerType": "PRODUCT",
     "sourceRootfixCommit": "5474a1a9af64c018e6dcc71b4ad0cdfe57ce0484",
@@ -86,8 +86,8 @@
     "hostdimeModified": false
   },
   "clientProjectionBatchRootfix": {
-    "status": "SOURCE_ROOTFIX_PASS_NOT_PACKAGED_NOT_PUBLISHED",
-    "classification": "FUNCTIONAL_DEFECT_ROOTFIX_SOURCE_PROVEN",
+    "status": "SOURCE_AND_DURABLE_SUCCESSOR_CERTIFIED_NOT_PUBLISHED",
+    "classification": "FUNCTIONAL_DEFECT_ROOTFIX_SUCCESSOR_CERTIFIED",
     "owner": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js",
     "productCommit": "5474a1a9af64c018e6dcc71b4ad0cdfe57ce0484",
     "targetSha256": "ad6fa96614d4eefe29880fac26a1c349ae24940adc2d8ff75ad04d991595b067",
@@ -147,7 +147,7 @@
     "realDataAccess": false,
     "deployExecuted": false,
     "productionTouched": false,
-    "packageRebuilt": false
+    "packageRebuilt": true
   },
   "semanticDebt": {
     "clientSegmentHistorical": {
@@ -173,11 +173,50 @@
     "deltaFiles": ["core/queries.js"],
     "immutable": true
   },
+  "certifiedSuccessorR4S5": {
+    "status": "R4S5_MINIMAL_SUCCESSOR_DURABLE_CERTIFIED_NOT_PUBLISHED",
+    "certificationRunId": 31972737482,
+    "certificationJobId": 95227578912,
+    "zipName": "orbit360-fase-a-product-r4s5-5474a1a9af64.zip",
+    "zipSha256": "2d7a2ae75c5e6ef04c4759ff3438d41b8589d542fc20f14a603aaffb2053a1ac",
+    "manifestStatus": "FASE_A_PRODUCT_R4S5_MINIMAL_SUCCESSOR_CERTIFIED",
+    "baseZipName": "orbit360-fase-a-product-r4s4-54f671e64b32.zip",
+    "baseZipSha256": "f266815e26da04a8c9e86b0db9414ca6c06bedb3cd9371f85e96c8d08e420d4c",
+    "baseSourceHead": "54f671e64b32c7b39100d79e770572a579e79ac7",
+    "deltaSourceHead": "5474a1a9af64c018e6dcc71b4ad0cdfe57ce0484",
+    "fileCount": 194,
+    "changedProductFileCount": 1,
+    "unchangedProductFileCount": 193,
+    "deltaFiles": ["core/client-insurer-visual-contract-v20260720.js"],
+    "targetSha256": "ad6fa96614d4eefe29880fac26a1c349ae24940adc2d8ff75ad04d991595b067",
+    "baseTargetSha256": "fd597c7dae108070cfb96e169a87aabaf75a57ffcb347532863f2d88631bace0",
+    "durableArtifactId": 9270227820,
+    "durableArtifactDigest": "9adc9d53c1e1a1d2a2eb15223d63feadb849ac3f2abed0638dcf57b83a1852f4",
+    "evidenceArtifactId": 9270227636,
+    "evidenceArtifactDigest": "5aa4edb9606b01eaa0fc40ff3ec117a715be10876d876ebb5e23eae38c2ed763",
+    "staticCertification": {
+      "baseManifestExact": true,
+      "basePhysicalTreeExact": true,
+      "successorManifestExact": true,
+      "successorPhysicalTreeExact": true,
+      "allManifestHashesVerified": true,
+      "unchangedFilesHashExact": true,
+      "targetHashExact": true,
+      "noLabRuntime": true,
+      "noPrivateSecretMaterial": true,
+      "browserExecuted": false,
+      "runtimeExecuted": false,
+      "deployExecuted": false,
+      "productionTouched": false
+    },
+    "published": false,
+    "immutableCandidate": true
+  },
   "publication": {
     "target": "https://app.aysseguros.com",
     "documentRoot": "/home/ayssegur/public_html/app.aysseguros.com",
     "publishedPackage": "orbit360-fase-a-product-r4s4-54f671e64b32.zip",
-    "status": "R4S4_PUBLIC_STATIC_IDENTITY_VERIFIED_UNCHANGED",
+    "status": "R4S4_PUBLIC_STATIC_IDENTITY_VERIFIED_UNCHANGED_R4S5_NOT_PUBLISHED",
     "staticVerificationRunId": 31965583608,
     "rollbackBase": "Exact R4S3 package/durable artifact preserved.",
     "hostdimeActionRequiredNow": false
@@ -223,7 +262,7 @@
   },
   "progress": {
     "functionalReadinessPercent": 100,
-    "technicalIterationProgressPercent": 75,
+    "technicalIterationProgressPercent": 85,
     "goLiveGatesClosed": 2,
     "goLiveGatesTotal": 3,
     "goLiveGateProgressPercent": 67,
@@ -233,7 +272,7 @@
     "correctedFinalReadonlyMatrixAuthorizedAndConsumed": true,
     "clientProjectionSourceRootfixAuthorizedAndConsumed": true,
     "clientProjectionSourceGateAuthorizedAndConsumed": true,
-    "successorPackageAuthorized": false,
+    "successorPackageAuthorizedAndConsumed": true,
     "productionPublishNewPackageAuthorized": false,
     "newRuntimeAuthorizationRequired": true,
     "browserAuthorized": false,
@@ -255,23 +294,28 @@
     "scope": "Teach batch/index versus N-times clone-on-read, semantic-preserving performance fixes, VALIDATOR_STALE when a gate demands an unreachable state, and Histórico as a separately governed semantic debt."
   },
   "nextActionExact": {
-    "stage": "R4S5_MINIMAL_SUCCESSOR_PACKAGE_REQUIRES_FRESH_AUTHORIZATION",
-    "action": "Keep public R4S4 exact and browser frozen. The source rootfix is proven but not packaged. With fresh explicit authorization only, construct a minimal successor from exact R4S4 replacing solely core/client-insurer-visual-contract-v20260720.js with SHA256 ad6fa96614d4eefe29880fac26a1c349ae24940adc2d8ff75ad04d991595b067; certify package identity and source/static contracts only. Do not publish to HostDime, deploy, access secrets/data, or run browser/runtime without separate authorization."
+    "stage": "R4S5_CERTIFIED_PUBLICATION_REQUIRES_FRESH_AUTHORIZATION",
+    "action": "Keep public R4S4 exact and browser frozen. R4S5 is durable certified with ZIP SHA256 2d7a2ae75c5e6ef04c4759ff3438d41b8589d542fc20f14a603aaffb2053a1ac and artifact 9270227820. With fresh explicit authorization only, publish exactly this immutable R4S5 artifact without rebuilding it; perform static public identity verification and immediate refreeze. Any browser/runtime matrix requires separate explicit authorization after publication identity PASS."
   },
-  "currentCheckpoint": "orbit360-platform/docs/R4S5-SOURCE-ROOTFIX-CLIENT-PROJECTION-BATCH-PASS-20260816.md",
+  "currentCheckpoint": "orbit360-platform/docs/R4S5-MINIMAL-SUCCESSOR-DURABLE-CERTIFIED-20260816.md",
   "currentChangelog": "orbit360-platform/CHANGELOG-R4S3-GOLIVE-20260816.md",
   "readme": "orbit360-platform/README.md",
   "lastEvidence": {
-    "runId": 31969452166,
-    "jobId": 95219466783,
-    "result": "R4S5_CLIENT_PROJECTION_BATCH_ROOTFIX_SOURCE_PASS",
-    "artifactId": 9269368462,
-    "artifactSha256": "e074e25c8213da08b4fa1cc8ae16e3f206f322b13dbd168e2ca878d621d8180d",
+    "runId": 31972737482,
+    "jobId": 95227578912,
+    "result": "R4S5_MINIMAL_SUCCESSOR_DURABLE_CERTIFIED",
+    "durableArtifactId": 9270227820,
+    "durableArtifactDigest": "9adc9d53c1e1a1d2a2eb15223d63feadb849ac3f2abed0638dcf57b83a1852f4",
+    "evidenceArtifactId": 9270227636,
+    "evidenceArtifactDigest": "5aa4edb9606b01eaa0fc40ff3ec117a715be10876d876ebb5e23eae38c2ed763",
+    "zipSha256": "2d7a2ae75c5e6ef04c4759ff3438d41b8589d542fc20f14a603aaffb2053a1ac",
     "semanticEqual": true,
     "mismatchCount": 0,
     "browserExecuted": false,
+    "runtimeExecuted": false,
     "secretAccess": false,
     "dataAccess": false,
-    "operationalWrites": 0
+    "operationalWrites": 0,
+    "productionTouched": false
   }
 }
