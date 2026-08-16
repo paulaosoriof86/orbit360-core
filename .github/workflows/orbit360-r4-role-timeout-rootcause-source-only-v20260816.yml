@@ -1,0 +1,85 @@
+name: Orbit360 R4 Role Timeout Root Cause Source Only 20260816
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/workflows/orbit360-r4-role-timeout-rootcause-source-only-v20260816.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: orbit360-r4-role-timeout-rootcause-source-only-v20260816
+  cancel-in-progress: false
+
+env:
+  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Canonical gate first — source only
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+          jq -e '.ok==true and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false and .secretAccess==false and .dataAccess==false and .operationalWrites==0' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+
+      - name: Prove R4S3 browser remains frozen
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -F "ORBIT360_R4_CERTIFIED_SOURCE_ONLY: 'true'" .github/workflows/orbit360-r4-certified-product-readonly-smoke-v20260815.yml >/dev/null
+          jq -e '.sourceHead=="294ed22bdb564585b71fc59cefa1d04cdfa6b120" and .zipSha256=="1ab5f3ea7f59cd0c2eb2bb1f5c0596a4bf3ca241f42016f74bf095ccbaf0f78e" and .fileCount==194 and .manifestStatus=="FASE_A_PRODUCT_R4S3_MINIMAL_SUCCESSOR_CERTIFIED" and .writeAuthorized==false and .packageRebuildAuthorized==false and .productionMutationAuthorized==false' tools/orbit360-r4-certified-product-contract-v20260815.json >/dev/null
+          node --check tools/orbit360-r4-role-timeout-rootcause-diagnosis-v20260816.mjs
+          node --check tools/orbit360-r4-cliente360-summary-boundedness-gate-v20260816.mjs
+
+      - name: Isolate root cause statically
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="$EVIDENCE_DIR/r4-role-timeout-rootcause-source-only-v20260816.json"
+          ORBIT360_R4_ROLE_TIMEOUT_DIAG_OUT="$OUT" node tools/orbit360-r4-role-timeout-rootcause-diagnosis-v20260816.mjs
+          jq -e '.ok==true and .status=="R4_ROLE_TIMEOUT_ROOT_CAUSE_SOURCE_ONLY_PASS" and .classification=="FUNCTIONAL_DEFECT" and .failureFamily=="CLIENTE360_BATCH_SUMMARY_CONTRACT_MISSING_NX_CLONE" and .ownerType=="PRODUCT" and .owner=="orbit360-platform/core/queries.js" and .uniqueOwnerDecision.secondaryValidatorIssueIsRootOwner==false and .uniqueOwnerDecision.aseguradorasIsRootOwner==false and .isolation.cliente360.productDefectProven==true and .isolation.aseguradoras.defectProvenByMatrix==false and .isolation.harnessBudget90s.rootOwner==false and .browserExecuted==false and .secretAccess==false and .dataAccess==false and .productModified==false and .productionTouched==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0' "$OUT" >/dev/null
+
+      - name: Execute corrective gate in expected-fail diagnostic mode
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="$EVIDENCE_DIR/r4-cliente360-summary-boundedness-gate-v20260816.json"
+          set +e
+          ORBIT360_R4_C360_BOUNDEDNESS_OUT="$OUT" node tools/orbit360-r4-cliente360-summary-boundedness-gate-v20260816.mjs
+          rc=$?
+          set -e
+          test "$rc" -eq 42
+          jq -e '.ok==false and .status=="CLIENTE360_SUMMARY_BOUNDEDNESS_GATE_FAIL" and .classification=="FUNCTIONAL_DEFECT" and .failureFamily=="CLIENTE360_BATCH_SUMMARY_CONTRACT_MISSING" and .owner=="orbit360-platform/core/queries.js" and .browserExecuted==false and .secretAccess==false and .dataAccess==false and .productionTouched==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0' "$OUT" >/dev/null
+
+      - name: Assert no product mutation
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -z "$(git status --porcelain -- orbit360-platform/core orbit360-platform/modules orbit360-platform/data)"
+          grep -F "ORBIT360_R4_CERTIFIED_SOURCE_ONLY: 'true'" .github/workflows/orbit360-r4-certified-product-readonly-smoke-v20260815.yml >/dev/null
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: orbit360-r4-role-timeout-rootcause-source-only-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/r4-role-timeout-rootcause-source-only-v20260816.json
+            orbit360-platform/runtime-gate-crm-v20260716/r4-cliente360-summary-boundedness-gate-v20260816.json
+          if-no-files-found: warn
+          retention-days: 30
