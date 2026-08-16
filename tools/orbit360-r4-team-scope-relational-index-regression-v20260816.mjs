@@ -5,10 +5,15 @@ import fs from 'node:fs';
 import path from 'node:path';
 import vm from 'node:vm';
 import crypto from 'node:crypto';
+import { execFileSync } from 'node:child_process';
 
 const ROOT = process.cwd();
-const ACCESS_PATH = path.join(ROOT, 'orbit360-platform/core/access-scope.js');
+const ACCESS_REPO_PATH = 'orbit360-platform/core/access-scope.js';
+const ACCESS_PATH = path.join(ROOT, ACCESS_REPO_PATH);
 const OUT = process.env.ORBIT360_R4_TEAM_SCOPE_REGRESSION_OUT || path.join(ROOT, 'orbit360-platform/runtime-gate-crm-v20260716/r4-team-scope-relational-index-regression-v20260816.json');
+const BASE_R4S2_SOURCE_HEAD = '47249fd4d6032a2f4c09f6fbd3460d3804c199da';
+const BASE_R4S2_SHA256 = '8976ab8032f210a0f93d79f4ace037ec3b3e8fe8c1ac9e1f5a0eadd8d134fb3f';
+const R4S3_ROOTFIX_SHA256 = '624f7538809dbea59294a2c94a4acce58f326b0812625754891fb7b0fa4d3e1f';
 const sha256 = value => crypto.createHash('sha256').update(value).digest('hex');
 const clone = value => JSON.parse(JSON.stringify(value));
 
@@ -53,6 +58,13 @@ function patchSource(source) {
   const patched = source.slice(0, start) + candidate + source.slice(end);
   if (patched === source) throw new Error('FILTER_PATCH_FAILED');
   return patched;
+}
+
+function loadBaselineR4S2() {
+  const bytes = execFileSync('git', ['show', `${BASE_R4S2_SOURCE_HEAD}:${ACCESS_REPO_PATH}`], { cwd: ROOT, encoding: null, maxBuffer: 4 * 1024 * 1024 });
+  const source = bytes.toString('utf8');
+  if (sha256(source) !== BASE_R4S2_SHA256) throw new Error('BASE_R4S2_SOURCE_HASH_MISMATCH');
+  return source;
 }
 
 function makeContext(source, role, candidate) {
@@ -102,10 +114,22 @@ function exercise(source, role, candidate) {
 }
 
 const source = fs.readFileSync(ACCESS_PATH, 'utf8');
+const sourceHash = sha256(source);
+const rootfixAlreadyApplied = sourceHash === R4S3_ROOTFIX_SHA256;
+const baselineSource = rootfixAlreadyApplied ? loadBaselineR4S2() : source;
+const candidateSource = rootfixAlreadyApplied ? source : patchSource(source);
+if (rootfixAlreadyApplied && sha256(candidateSource) !== R4S3_ROOTFIX_SHA256) throw new Error('R4S3_ROOTFIX_SOURCE_HASH_MISMATCH');
+
 const result = {
   schemaVersion: 'orbit360-r4-team-scope-relational-index-regression-v1',
-  sourcePath: 'orbit360-platform/core/access-scope.js',
-  sourceSha256: sha256(source),
+  sourcePath: ACCESS_REPO_PATH,
+  sourceSha256: sourceHash,
+  currentStateAware: true,
+  rootfixAlreadyApplied,
+  baselineSourceHead: rootfixAlreadyApplied ? BASE_R4S2_SOURCE_HEAD : null,
+  baselineSha256: sha256(baselineSource),
+  candidateSha256: sha256(candidateSource),
+  expectedR4S3RootfixSha256: R4S3_ROOTFIX_SHA256,
   fixture: { clientes: 430, polizas: 1375, vehiculos: 700, cobros: 1900, comisiones: 900 },
   roles: {},
   browserExecuted: false, secretAccess: false, dataAccess: false,
@@ -114,8 +138,8 @@ const result = {
 };
 let ok = true;
 for (const role of ['Dirección', 'Operativo', 'Asesor']) {
-  const current = exercise(source, role, false);
-  const candidate = exercise(source, role, true);
+  const current = exercise(baselineSource, role, false);
+  const candidate = exercise(candidateSource, role, false);
   const publicEqual = Object.keys(current.publicOut).every(k => same(current.publicOut[k], candidate.publicOut[k]));
   const facadeEqual = Object.keys(current.facadeOut).every(k => same(current.facadeOut[k], candidate.facadeOut[k]));
   const counts = {};
@@ -129,7 +153,8 @@ const advCloneRatio = adv.current.facadeMetrics.cloneRows / Math.max(1, adv.cand
 const opGetRatio = op.current.facadeMetrics.getCalls / Math.max(1, op.candidate.facadeMetrics.getCalls);
 const advGetRatio = adv.current.facadeMetrics.getCalls / Math.max(1, adv.candidate.facadeMetrics.getCalls);
 result.reduction = { operativoFacadeCloneRatio: opCloneRatio, asesorFacadeCloneRatio: advCloneRatio, operativoFacadeGetRatio: opGetRatio, asesorFacadeGetRatio: advGetRatio };
-const guard = dir.publicEqual && dir.facadeEqual && op.publicEqual && op.facadeEqual && adv.publicEqual && adv.facadeEqual && opCloneRatio >= 50 && advCloneRatio >= 50 && opGetRatio >= 20 && advGetRatio >= 20 && op.candidate.facadeMetrics.getCalls < 100 && adv.candidate.facadeMetrics.getCalls < 100;
+const stateGuard = !rootfixAlreadyApplied || (result.baselineSha256 === BASE_R4S2_SHA256 && result.candidateSha256 === R4S3_ROOTFIX_SHA256);
+const guard = stateGuard && dir.publicEqual && dir.facadeEqual && op.publicEqual && op.facadeEqual && adv.publicEqual && adv.facadeEqual && opCloneRatio >= 50 && advCloneRatio >= 50 && opGetRatio >= 20 && advGetRatio >= 20 && op.candidate.facadeMetrics.getCalls < 100 && adv.candidate.facadeMetrics.getCalls < 100;
 ok = ok && guard;
 result.ok = ok;
 result.status = ok ? 'R4_TEAM_SCOPE_RELATIONAL_INDEX_REGRESSION_PASS' : 'R4_TEAM_SCOPE_RELATIONAL_INDEX_REGRESSION_FAIL';
