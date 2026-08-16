@@ -14,132 +14,117 @@ main / merge: NO autorizados
 Reimportación / cambios Auth / cambios de datos: NO autorizados
 ```
 
-### Producción actual · R4S1 PUBLICADO Y VERIFICADO
+### R4S1 publicado · identidad PASS
 
-Paquete vivo:
-
-- `orbit360-fase-a-product-r4s1-df4c217c3472.zip`
+- ZIP `orbit360-fase-a-product-r4s1-df4c217c3472.zip`
 - SHA256 `49f5a5eee451665fcc420fc9acee88347b95aa832a8f6f524053cc4ccaa0d60d`
-- fileCount `194`
-- R3→R4S1: `193` archivos byte-idénticos + `1` único delta `core/access-scope.js`
-- SHA256 `core/access-scope.js`: `8976ab8032f210a0f93d79f4ace037ec3b3e8fe8c1ac9e1f5a0eadd8d134fb3f`.
+- 194 archivos
+- único delta desde R3: `core/access-scope.js`
+- verificación pública run `31916602904` · SUCCESS
+- artifact `9255064967`.
 
-Verificación pública estática:
+Los hashes públicos de `index.html`, manifest, `core/access-scope.js` y `core/auth-product-runtime-p0.js` coinciden con la sucesora certificada. HostDime y la identidad del paquete no son blockers vigentes.
 
-- run `31916602904` · SUCCESS
-- artifact `9255064967`
-- `index.html`, manifest, `core/access-scope.js` y `core/auth-product-runtime-p0.js` coinciden exactamente con R4S1 certificado.
+### Auth/runtime/datos · PASS
 
-HostDime y la identidad del paquete **no son blockers vigentes**.
-
-### Auth/runtime/datos productivos · PASS
-
-La única frontera R4S1 volvió a certificar antes del bloqueo de rendimiento:
+La frontera productiva confirmó:
 
 - login HTTP 200;
 - signedIn + emailVerified;
-- membership available/active;
+- membership active;
 - tenant correcto;
-- 5 roles y roles requeridos;
-- runtime/router/tenant-context activos;
-- store `ready-read-only`, write disabled;
-- required missing/failed `0`;
-- legal observado sin persistir aceptación;
-- **430 clientes**;
-- **30 aseguradoras**;
-- Dirección `inicio` PASS;
-- page/console/HTTP/write errors `0`;
-- Firestore/Auth/operational writes `0`.
+- roles requeridos;
+- runtime/router/tenant-context;
+- store `ready-read-only`;
+- required missing/failed 0;
+- 430 clientes;
+- 30 aseguradoras;
+- cero page/console/http/write errors antes del bloqueo;
+- cero Firestore/Auth/operational writes.
 
-No reabrir contraseñas, Auth, membership, tenant, datos o HostDime.
+No reabrir Auth, password, membership, tenant, datos ni HostDime.
 
-### Única matriz final R4S1 · CONSUMIDA / REFROZEN
+### Única matriz R4S1 · CONSUMIDA / REFROZEN
 
-- source-only previo: run `31916736116` · SUCCESS
-- única frontera browser: run `31916778155`, job `95089796794`
+- run `31916778155`
+- job `95089796794`
 - artifact `9255149181`
-- digest `sha256:3011cd5ba7b90d38c962de00d63ec90cb84ed69688b0c667e4816095b500e6b7`
-- runtime classification: `FUNCTIONAL_DEFECT / R4_ROLE_ROUTE_STAGE_TIMEOUT`
+- clasificación `FUNCTIONAL_DEFECT / R4_ROLE_ROUTE_STAGE_TIMEOUT`
+- Dirección Inicio PASS
+- Cliente 360 no completó antes del timeout
 - refreeze commit `6e41dca4973e8c47c7592ef914badebdff870c36`
-- refreeze control run `31916926740` · SUCCESS.
+- refreeze run `31916926740` · SUCCESS.
 
-La autorización de una sola matriz quedó consumida. Browser permanece congelado.
+No existe autorización vigente para un segundo browser.
 
-### Causa raíz vigente A · Cliente 360
+### Causa raíz 1 · Cliente 360
 
-`modules/cliente360.js` espera opcionalmente `q.clientesResumenIndex()`, pero el owner real no implementa ese índice. El fallback construye resúmenes por cliente y termina haciendo `store.get('clientes', id)` repetidamente; el store productivo resuelve `get()` mediante `all()`, y `all()` clona toda la colección.
+El módulo espera `q.clientesResumenIndex()`, pero el owner real no implementa esa función; el fallback hace `store.get('clientes')` repetidamente y el store clone-on-read multiplica el trabajo.
 
-Regresión source-only run `31917185515`, artifact `9255246859`:
+Regresión source-only run `31917185515`:
 
-- baseline: clientGetCalls `430`, clientCloneRows `185330`, fallbackSummaryCalls `470`;
-- candidato: clientGetCalls `0`, clientCloneRows `860`, summaryIndexCalls `1`, fallback `0`;
-- reducción `215.5×`;
-- semanticEqual `true`;
+- clientGetCalls `430 → 0`
+- clientCloneRows `185330 → 860`
+- fallbackSummaryCalls `470 → 0`
+- summaryIndexCalls `0 → 1`
+- reducción `215.5×`
+- semanticEqual `true`
 - writes `0`.
-
-Clasificación:
 
 `FUNCTIONAL_DEFECT / R4S1_CLIENTE360_MISSING_SUMMARY_INDEX_NX_CLONE`
 
-### VALIDATOR_STALE histórico
+### VALIDATOR_STALE v19
 
-La evidencia v19 del 7 de agosto afirmaba `summaryIndexCalls:1` y `fallbackSummaryCalls:0`, pero el source actual tiene `0` definiciones reales de `q.clientesResumenIndex`.
-
-Clasificación:
+La evidencia histórica v19 afirmó que el índice ya existía, pero el producto real tiene `0` definiciones de `q.clientesResumenIndex`.
 
 `VALIDATOR_STALE / V19_CLIENTE360_SUMMARY_INDEX_ASSUMED_NOT_IMPLEMENTED`
 
-No reutilizar aquella fixture como prueba de rendimiento real.
+### Causa raíz 2 · Inicio
 
-### Causa raíz vigente B · Inicio
+Las queries globales hacen lookup de cliente dentro de filtros de cobros/pólizas y leaderboard repite recorridos por asesor.
 
-Las queries globales de Inicio hacen lookup de cliente dentro de filtros por cobro/póliza y `leaderboard()` repite esos recorridos por asesor. Al cambiar rol y reconstruirse Inicio, ese patrón vuelve a multiplicar `store.get()`/clonados.
+Regresión source-only run `31917288758`:
 
-Regresión source-only run `31917288758`, artifact `9255279034`:
-
-- baseline: clientGetCalls `3304`, clientCloneRows `1420720`, policy all `8`, commission all `7`;
-- candidato: clientGetCalls `0`, clientCloneRows `1290`, policy all `2`, commission all `1`;
-- reducción `1101.33×`;
-- semanticEqual `true`;
+- clientGetCalls `3304 → 0`
+- clientCloneRows `1420720 → 1290`
+- policy all calls `8 → 2`
+- commission all calls `7 → 1`
+- reducción `1101.33×`
+- semanticEqual `true`
 - writes `0`.
-
-Clasificación:
 
 `FUNCTIONAL_DEFECT / R4S1_INICIO_GLOBAL_QUERY_NX_CLIENT_CLONE`
 
-### Rootfixes nuevos · PROBADOS / NO APLICADOS
+### Rootfixes candidatos · PROBADOS / NO APLICADOS
 
-La autorización R4S1 ya fue consumida y solo permitía el delta `core/access-scope.js`. Por tanto, estos dos candidatos no se aplican sin nueva autorización:
+La autorización R4S1 ya fue consumida y solo cubría `core/access-scope.js`. Los siguientes cambios requieren nueva autorización:
 
-1. `orbit360-platform/core/queries.js`: lookup local indexado de clientes por query global y arrays precomputados para leaderboard.
-2. `orbit360-platform/modules/policy-receipts-v1199-detail-guard.js`: `clientsById` en read-model + `q.clientesResumenIndex()` real, preservando invalidación y resultados.
+1. `core/queries.js`: índices locales y precarga para queries globales.
+2. `modules/policy-receipts-v1199-detail-guard.js`: `clientsById` + `q.clientesResumenIndex()` real.
 
-Aseguradoras, Ops y Leads fueron revisados para el mismo antipatrón en su render base; no se amplía el alcance.
+Aseguradoras/Ops/Leads no presentan este mismo antipatrón en su render base; no se expande alcance.
 
 ### Siguiente acción exacta
 
-Si se autoriza un nuevo bloque:
+Con nueva autorización:
 
-1. aplicar **exclusivamente** los dos rootfixes source-only ya probados;
-2. gate canónico + regresión combinada source-only;
-3. solo con PASS generar R4S2 mínima desde R4S1 con exactamente esos dos nuevos deltas y los otros `192` archivos byte-idénticos;
+1. aplicar exclusivamente esos dos rootfixes probados;
+2. gate + regresión combinada source-only;
+3. generar R4S2 mínima desde R4S1 con esos 2 deltas y 192 archivos restantes byte-idénticos;
 4. certificar manifest/SHA;
-5. backup/rollback y publicación exclusiva R4S2;
+5. backup/publicar R4S2;
 6. verificar identidad pública;
-7. ejecutar una única nueva matriz productiva read-only solo con autorización explícita;
-8. cerrar únicamente con `POST_GO_LIVE_SMOKE_PASS` y cero writes.
+7. una única nueva matriz final read-only solo si se autoriza expresamente.
 
-No rollback automático de R4S1: paquete, Auth, tenant, datos y cero escrituras permanecen PASS. No avanzar a Pólizas.
+No rollback automático de R4S1. No reimportación. No Auth/datos. No main/merge. No avanzar a Pólizas.
 
-Avance permanece **100% funcional / 75% técnico / 67% gates (2/3)**.
+Avance: **100% funcional / 75% técnico / 67% gates (2/3)**.
 
-Checkpoint vigente: `docs/CIERRE-R4S1-FRONTERA-FINAL-NX-CLONE-INICIO-CLIENTE360-20260815.md`.
-
-Estado canónico: `docs/orbit360-live-state-v1.json`.
+Checkpoint: `docs/CIERRE-R4S1-FRONTERA-FINAL-NX-CLONE-INICIO-CLIENTE360-20260815.md`  
+Estado: `docs/orbit360-live-state-v1.json`  
+Changelog: `CHANGELOG-R4S1-GOLIVE-20260815.md`
 
 ## Fuentes rectoras
-
-Leer antes de actuar:
 
 1. Documento Maestro Consolidado 20260704.
 2. Addendum Academia Profunda 20260704.
@@ -147,54 +132,22 @@ Leer antes de actuar:
 4. Addendum Continuidad Clientes/Multirol/Importadores 20260709.
 5. Plan Maestro de Ejecución Productiva 20260716.
 6. Addendum Control de Causa Raíz, Validadores y Gates 20260717.
-7. `docs/ADDENDUM-MAESTRO-ACELERACION-PRODUCTIVA-REUSO-TRANSVERSAL-Y-CONTROL-AUTORIZACIONES-20260730.md`.
-8. `docs/NOTA-RECTORA-REBRANDING-GRAVICENTRA-NO-BLOQUEANTE-20260730.md`.
-9. `docs/ADDENDUM-MAESTRO-CONTINUIDAD-SINCRONIZACION-ANTIBUCLE-GOLIVE-POSTPROD-20260814.md`.
-10. `docs/orbit360-live-state-v1.json` + checkpoint vigente + PR #5 + HEAD vivo.
+7. Addendum Aceleración Productiva 20260730.
+8. Nota Rectora Rebranding GRAVICENTRA 20260730.
+9. Addendum Continuidad/Sincronización/Antibucle Go-live 20260814.
+10. Live-state + checkpoint + PR #5 + HEAD vivo.
 
-Precedencia: reglas maestras/addenda → PR/HEAD/estado vivo → Plan Maestro → evidencia modular reciente. No reabrir trabajo cerrado por documentación anterior desactualizada.
+Precedencia: reglas maestras/addenda → PR/HEAD/estado vivo → Plan Maestro → evidencia reciente.
 
-## Reglas de ejecución permanentes
+## Reglas permanentes
 
-- autorización por bloque macro de riesgo, no micro-pasos;
-- diagnóstico, documentación y validación estática/sintética continúan sin autorización adicional;
-- ejecutar primero el gate canónico antes de secretos/browser/deploy;
-- repetición de etapa/familia de fallo activa `STOP_RETRY`;
+- gate canónico antes de secrets/browser/deploy;
+- misma etapa/familia dos veces → `STOP_RETRY`;
 - producción no se usa para desarrollar validators;
 - no modificar Auth/usuarios/memberships/datos por intuición;
 - 0% manual salvo imposibilidad técnica real;
-- no reimportar Clientes/Aseguradoras para resolver visualización, acceso, cache, proyección o gates;
-- no avanzar a otro módulo mientras el gate final de go-live siga abierto.
-
-## Infraestructura transversal que NO se reconstruye por módulo
-
-Se reutiliza en módulos posteriores:
-
-- Auth/membership/scopes;
-- multirol y rol activo;
-- `Orbit.store` + write guard;
-- manifiesto canónico de colecciones;
-- aliases lógico → físico;
-- readiness de colecciones activas;
-- smoke multirol/multivista;
-- diagnóstico sanitizado;
-- integridad before/after + digests;
-- cero escrituras en bloques read-only;
-- rollback fail-closed;
-- causa raíz + `STOP_RETRY`;
-- request inmutable y gate único.
-
-## Reglas de negocio permanentes
-
-- GT → GTQ; CO → COP.
-- Falta país/moneda confiable → `REQUIERE_VALIDACION`.
-- Solo `Vigente` / `Por renovar` genera recibos/cartera.
-- Cancelada/Vencida/Anulada/Rechazada permanece histórico.
-- Prima = neta + gastos + IVA/impuestos + total.
-- Producción, metas y comisiones sobre prima neta recaudada.
-- Cobros/recaudos no son `finmovs`.
-- Estados bancarios solo concilian; no crean cobros por inferencia.
-- Documentos soporte proponen con diff/confirmación; no escriben silenciosamente.
+- no reimportar Clientes/Aseguradoras para resolver acceso/visualización/cache/proyección/gates;
+- no avanzar a otro módulo mientras el gate final siga abierto.
 
 ## Arquitectura
 
