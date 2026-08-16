@@ -1,0 +1,175 @@
+name: Orbit360 R4S1 Final Readonly Smoke 20260815
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/workflows/orbit360-r4s1-final-readonly-smoke-v20260815.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: orbit360-r4s1-final-readonly-smoke-v20260815
+  cancel-in-progress: false
+
+env:
+  ORBIT360_PRODUCT_PROJECT_ID: ays-orbit-360-lab
+  ORBIT360_PRODUCT_TENANT_ID: alianzas-soluciones
+  ORBIT360_R4_URL: https://app.aysseguros.com
+  ORBIT360_R4_PACKAGE_SOURCE_HEAD: df4c217c34722c03215f88b62f6865ab41c2a9f3
+  ORBIT360_R4_PACKAGE_FILE_COUNT: '194'
+  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+  ORBIT360_R4S1_SOURCE_ONLY: 'true'
+
+jobs:
+  final-smoke:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Canonical gate before secrets and browser
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+          jq -e '.ok==true and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+      - name: Prepare isolated R4S1 contract wrapper
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs = require('fs');
+          const contractPath = 'tools/.orbit360-r4s1-final-contract-v20260815.json';
+          const wrapperPath = 'tools/.orbit360-r4s1-final-wrapper-v20260815.mjs';
+          const contract = {
+            schemaVersion: 'orbit360-r4-certified-product-contract-v1',
+            status: 'R4_CERTIFIED_PRODUCT_CONTRACT_BOUND',
+            classification: 'R4S1_FINAL_PRODUCT_CONTRACT',
+            sourceHead: 'df4c217c34722c03215f88b62f6865ab41c2a9f3',
+            r3RunId: 31915191809,
+            r3DurableArtifactId: 9254713380,
+            zipName: 'orbit360-fase-a-product-r4s1-df4c217c3472.zip',
+            zipSha256: '49f5a5eee451665fcc420fc9acee88347b95aa832a8f6f524053cc4ccaa0d60d',
+            fileCount: 194,
+            manifestStatus: 'FASE_A_PRODUCT_R4S1_MINIMAL_SUCCESSOR_CERTIFIED',
+            entrypoint: { path: 'index.html', bytes: 16893, sha256: '125b24a3fc215a368a7183a107cd55eb5a6332fc8a7f8354ed94e3169340ec4e' },
+            authAsset: { path: '/core/auth-product-runtime-p0.js', sourcePath: 'orbit360-platform/core/auth-product-runtime-p0.js', bytes: 4211, sha256: 'd0bb399fe0e1dd102a03950673044eda5bc8d181e4e98cf477d22d141aa7b3a8' },
+            legacyAssetsExcludedFromProduct: ['/core/auth.js','/core/auth-password-change-v20260805.js','/core/user-credential-selfservice-v20260805.js'],
+            noLabRuntime: true,
+            noPrivateSecretMaterial: true,
+            writeAuthorized: false,
+            packageRebuildAuthorized: false,
+            productionMutationAuthorized: false
+          };
+          fs.writeFileSync(contractPath, JSON.stringify(contract, null, 2) + '\n');
+          let w = fs.readFileSync('tools/orbit360-r4-certified-product-smoke-wrapper-v20260815.mjs','utf8');
+          w = w.replace('orbit360-r4-certified-product-contract-v20260815.json', '.orbit360-r4s1-final-contract-v20260815.json');
+          w = w.replaceAll('FASE_A_PRODUCT_R3_DURABLE_PACKAGE_CERTIFIED', 'FASE_A_PRODUCT_R4S1_MINIMAL_SUCCESSOR_CERTIFIED');
+          const oldLine = 'let patched = original.replace(stalePath, contract.authAsset.path);';
+          const newLine = "let patched = original.replace(stalePath, contract.authAsset.path).replace('FASE_A_PRODUCT_R3_DURABLE_PACKAGE_CERTIFIED', contract.manifestStatus);";
+          if ((w.match(new RegExp(oldLine.replace(/[.*+?^${}()|[\\]\\]/g,'\\$&'),'g'))||[]).length !== 1) throw new Error('R4S1_WRAPPER_MANIFEST_PATCH_ANCHOR_INVALID');
+          w = w.replace(oldLine, newLine);
+          fs.writeFileSync(wrapperPath, w);
+          const base = fs.readFileSync('tools/orbit360-r4-production-readonly-smoke-v20260815.mjs','utf8');
+          if ((base.match(/FASE_A_PRODUCT_R3_DURABLE_PACKAGE_CERTIFIED/g)||[]).length !== 1) throw new Error('R4S1_BASE_MANIFEST_STATUS_COUNT_INVALID');
+          if ((base.match(/\/core\/auth\.js/g)||[]).length !== 1) throw new Error('R4S1_BASE_AUTH_PATH_COUNT_INVALID');
+          console.log('R4S1_FINAL_WRAPPER_PREPARED');
+          NODE
+          node --check tools/.orbit360-r4s1-final-wrapper-v20260815.mjs
+          node tools/.orbit360-r4s1-final-wrapper-v20260815.mjs --self-test
+          jq -e '.ok==true and .authAsset.sourceSha256Matches==true and .authAsset.sourceBytesMatch==true and .staleLegacyAuthPathRemovedFromExecutableHarness==true and .productAuthPathBoundExactlyOnce==true and .staleLegalInteractionRemoved==true and .readonlyLegalObserverBound==true and .patchedHarnessSyntaxPass==true and .browserExecuted==false and .secretAccess==false and .dataAccess==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .deployExecuted==false and .packageRebuilt==false and .productionTouched==false' "$EVIDENCE_DIR/r4-certified-validator-rootfix-source-v20260815.json" >/dev/null
+      - name: Validate R4S1 harness source-only watchdog
+        if: env.ORBIT360_R4S1_SOURCE_ONLY == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="$EVIDENCE_DIR/r4s1-final-harness-source-only-watchdog-v20260815.json"
+          ORBIT360_R4_SYNTHETIC_MODE=watchdog ORBIT360_R4_SYNTHETIC_TIMEOUT_MS=120 ORBIT360_R4_OUT="$OUT" node tools/.orbit360-r4s1-final-wrapper-v20260815.mjs
+          jq -e '.ok==true and .status=="R4_HARNESS_SOURCE_ONLY_WATCHDOG_PASS" and .classification=="PASS" and .synthetic==true and .stageTimeoutObserved==true and .evidencePersistedBeforeTimeout==true and .productionTouched==false and .containsPII==false and .containsSecrets==false and .deployExecuted==false and .packageRebuilt==false' "$OUT" >/dev/null
+      - name: Install read-only production smoke tools
+        if: env.ORBIT360_R4S1_SOURCE_ONLY != 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false --ignore-scripts firebase-admin@13 google-auth-library@9 playwright@1.52.0
+          npx playwright install --with-deps chromium
+      - name: Bind existing protected smoke identity after gate
+        if: env.ORBIT360_R4S1_SOURCE_ONLY != 'true'
+        env:
+          SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+          SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          ORBIT360_EXISTING_LOGIN_PASSWORD: ${{ secrets.ORBIT360_LAB_LOGIN_PASSWORD }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-${SA_ORBIT_360_LAB:-${SA_DEFAULT:-}}}"
+          test -n "$SERVICE_ACCOUNT"
+          test ${#ORBIT360_EXISTING_LOGIN_PASSWORD} -ge 12
+          KEY_FILE="${RUNNER_TEMP}/orbit360-r4s1-final-smoke.json"
+          printf '%s' "$SERVICE_ACCOUNT" > "$KEY_FILE"
+          chmod 600 "$KEY_FILE"
+          test "$(jq -r '.project_id // empty' "$KEY_FILE")" = "$ORBIT360_PRODUCT_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
+          echo "ORBIT360_TEMP_KEY_FILE=$KEY_FILE" >> "$GITHUB_ENV"
+          echo "ORBIT360_PRODUCT_SMOKE_PASSWORD=$ORBIT360_EXISTING_LOGIN_PASSWORD" >> "$GITHUB_ENV"
+      - name: Resolve existing smoke identity read-only
+        if: env.ORBIT360_R4S1_SOURCE_ONLY != 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-m6-resolve-smoke-identity-readonly-v20260730.mjs
+          jq -e '.ok==true and .eligibleSmokeIdentityCount==1 and .requiredRolesPresent==true and .firestoreWrites==0 and .operationalWrites==0 and .containsPII==false and .containsSecrets==false' "$EVIDENCE_DIR/m6-product-smoke-identity-summary.json" >/dev/null
+      - name: Execute one final R4S1 production read-only browser matrix
+        if: env.ORBIT360_R4S1_SOURCE_ONLY != 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/.orbit360-r4s1-final-wrapper-v20260815.mjs
+          OUT="$EVIDENCE_DIR/r4-production-readonly-smoke-v20260815.json"
+          jq -e '.ok==true and .status=="POST_GO_LIVE_SMOKE_PASS" and .manifest.pass==true and .authAsset.pass==true and .authAsset.sha256Matches==true and .auth.signedIn==true and .auth.emailVerified==true and .auth.membershipAvailable==true and .auth.membershipActive==true and .auth.tenantMatches==true and .auth.requiredRolesPresent==true and .runtime.started==true and .runtime.routerStarted==true and .runtime.tenantContextReady==true and .runtime.storeReady==true and .runtime.storeStatus=="ready-read-only" and .runtime.storeWriteEnabled==false and .runtime.requiredMissingCount==0 and .runtime.requiredFailedCount==0 and .privileged.clientes==430 and .privileged.aseguradoras==30 and (.roles|length)==3 and ([.roles[].pass]|all) and (.pageErrors|length)==0 and (.consoleErrors|length)==0 and (.httpFailures|length)==0 and (.writeSignals|length)==0 and (.technicalCopy|length)==0 and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .containsPII==false and .containsSecrets==false and .deployExecuted==false and .packageRebuilt==false' "$OUT" >/dev/null
+          node <<'NODE'
+          const fs = require('fs');
+          const p = 'orbit360-platform/runtime-gate-crm-v20260716/r4-production-readonly-smoke-v20260815.json';
+          const o = JSON.parse(fs.readFileSync(p,'utf8'));
+          const roles = ['Dirección','Operativo','Asesor'];
+          const metrics = {};
+          for (const role of roles) {
+            const a = o.checkpoints.find(x => x.stage === `role-${role}-group` && x.state === 'START');
+            const b = o.checkpoints.find(x => x.stage === `role-${role}-route-inicio` && x.state === 'START');
+            if (!a || !b) throw new Error(`R4S1_PERF_CHECKPOINT_MISSING:${role}`);
+            const ms = Number(b.atMs) - Number(a.atMs);
+            metrics[role] = ms;
+            if (!(ms >= 0 && ms <= 10000)) throw new Error(`R4S1_ACCESS_FILTER_NOT_BOUNDED:${role}:${ms}`);
+          }
+          const e = {ok:true,status:'R4S1_FINAL_ACCESS_PERFORMANCE_PASS',classification:'PASS',maxPreRouteMs:10000,rolePreRouteMs:metrics,firestoreWrites:0,authWrites:0,operationalWrites:0,containsPII:false,containsSecrets:false};
+          fs.writeFileSync('orbit360-platform/runtime-gate-crm-v20260716/r4s1-final-access-performance-v20260815.json',JSON.stringify(e,null,2)+'\n');
+          console.log(JSON.stringify(e));
+          NODE
+      - name: Cleanup protected and temporary material
+        if: always()
+        shell: bash
+        run: |
+          if [ -n "${ORBIT360_TEMP_KEY_FILE:-}" ] && [ -f "$ORBIT360_TEMP_KEY_FILE" ]; then shred -u "$ORBIT360_TEMP_KEY_FILE" || rm -f "$ORBIT360_TEMP_KEY_FILE"; fi
+          rm -f tools/.orbit360-r4s1-final-contract-v20260815.json tools/.orbit360-r4s1-final-wrapper-v20260815.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: orbit360-r4s1-final-readonly-smoke-evidence-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/r4-certified-validator-rootfix-source-v20260815.json
+            orbit360-platform/runtime-gate-crm-v20260716/r4s1-final-harness-source-only-watchdog-v20260815.json
+            orbit360-platform/runtime-gate-crm-v20260716/m6-product-smoke-identity-summary.json
+            orbit360-platform/runtime-gate-crm-v20260716/r4-production-readonly-smoke-v20260815.json
+            orbit360-platform/runtime-gate-crm-v20260716/r4s1-final-access-performance-v20260815.json
+          if-no-files-found: warn
+          retention-days: 14
