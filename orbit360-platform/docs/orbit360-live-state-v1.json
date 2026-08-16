@@ -1,7 +1,7 @@
 {
   "schemaVersion": "orbit360-live-state-v1",
-  "stateVersion": "20260815.r4s1-final-frontier-nx-clone-root-cause.2",
-  "updatedAt": "2026-08-15T18:36:00-06:00",
+  "stateVersion": "20260815.r4s1-final-frontier-nx-clone-root-cause.3",
+  "updatedAt": "2026-08-15T18:38:00-06:00",
   "phase": "R4S1_FINAL_FRONTIER_FAILED_ROOT_CAUSE_PROVEN_SOURCE_CANDIDATES_NOT_APPLIED",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -14,10 +14,6 @@
     "status": "R4S1_PUBLISHED_STATIC_IDENTITY_PASS",
     "staticVerificationRunId": 31916602904,
     "staticEvidenceArtifactId": 9255064967,
-    "indexSha256": "125b24a3fc215a368a7183a107cd55eb5a6332fc8a7f8354ed94e3169340ec4e",
-    "manifestSha256": "7d145264c8defaac0aa2928e4412e62a51826b8d0abac7cc44ff3195cb60dbbe",
-    "accessScopeSha256": "8976ab8032f210a0f93d79f4ace037ec3b3e8fe8c1ac9e1f5a0eadd8d134fb3f",
-    "authProductSha256": "d0bb399fe0e1dd102a03950673044eda5bc8d181e4e98cf477d22d141aa7b3a8",
     "hostdimeProductBlocker": false
   },
   "authRuntimeDataEvidence": {
@@ -25,24 +21,13 @@
     "loginHttp200": true,
     "signedIn": true,
     "emailVerified": true,
-    "membershipAvailable": true,
     "membershipActive": true,
     "tenantMatches": true,
-    "assignedRoleCount": 5,
     "requiredRolesPresent": true,
     "runtimeStarted": true,
-    "routerStarted": true,
-    "tenantContextReady": true,
     "storeStatus": "ready-read-only",
-    "storeWriteEnabled": false,
-    "requiredMissingCount": 0,
-    "requiredFailedCount": 0,
     "clientes": 430,
     "aseguradoras": 30,
-    "pageErrors": 0,
-    "consoleErrors": 0,
-    "httpFailures": 0,
-    "writeSignals": 0,
     "firestoreWrites": 0,
     "authWrites": 0,
     "operationalWrites": 0
@@ -52,19 +37,15 @@
     "runId": 31916778155,
     "jobId": 95089796794,
     "artifactId": 9255149181,
-    "artifactDigest": "sha256:3011cd5ba7b90d38c962de00d63ec90cb84ed69688b0c667e4816095b500e6b7",
     "runtimeClassification": "FUNCTIONAL_DEFECT",
     "runtimeFailureFamily": "R4_ROLE_ROUTE_STAGE_TIMEOUT",
-    "role": "Dirección",
     "preFirstRouteMs": 30734,
     "inicioPassed": true,
     "cliente360UntilGroupTimeoutMs": 58814,
-    "cliente360PassObserved": false,
     "secondBrowserRunAuthorized": false
   },
   "browserFreeze": {
     "active": true,
-    "workflow": ".github/workflows/orbit360-r4s1-final-readonly-smoke-v20260815.yml",
     "sourceOnly": true,
     "refreezeCommit": "6e41dca4973e8c47c7592ef914badebdff870c36",
     "refreezeControlRunId": 31916926740,
@@ -75,7 +56,6 @@
     "classification": "FUNCTIONAL_DEFECT/R4S1_CLIENTE360_MISSING_SUMMARY_INDEX_NX_CLONE",
     "sourceRegressionRunId": 31917185515,
     "artifactId": 9255246859,
-    "artifactDigest": "sha256:c309f91f18b0e697d4b59fe51d75bc2a7ecd55d113338c567cb1af720e6c819f",
     "baselineClientGetCalls": 430,
     "baselineClientCloneRows": 185330,
     "candidateClientGetCalls": 0,
@@ -89,7 +69,6 @@
     "classification": "FUNCTIONAL_DEFECT/R4S1_INICIO_GLOBAL_QUERY_NX_CLIENT_CLONE",
     "sourceRegressionRunId": 31917288758,
     "artifactId": 9255279034,
-    "artifactDigest": "sha256:c07892977d30953556d8031d78c087bdfc09acd32a44221d33da2e083518ef8a",
     "baselineClientGetCalls": 3304,
     "baselineClientCloneRows": 1420720,
     "candidateClientGetCalls": 0,
@@ -102,13 +81,10 @@
   "staleValidator": {
     "classification": "VALIDATOR_STALE/V19_CLIENTE360_SUMMARY_INDEX_ASSUMED_NOT_IMPLEMENTED",
     "historicalEvidence": "orbit360-platform/runtime-gate-crm-v20260716/v19-cliente360-bounded-render-source-sanitized-v20260807.json",
-    "historicalClaimSummaryIndexCalls": 1,
-    "historicalClaimFallbackSummaryCalls": 0,
-    "actualIndexDefinitionCountInR4S1": 0,
     "supersededForPerformanceClaims": true
   },
-  "rootCauseStatus": "R4S1_PUBLISHED_AND_AUTH_DATA_PASS; FINAL_FRONTIER_BLOCKED_BY_TWO_PROVEN_NX_CLONE_RENDER_DEFECTS; SOURCE_CANDIDATES_PASS_NOT_APPLIED",
   "classification": "FUNCTIONAL_DEFECT_ROOT_CAUSE_PROVEN_AWAITING_NEW_PRODUCT_MUTATION_AUTHORIZATION",
+  "rootCauseStatus": "R4S1_PUBLISHED_AND_AUTH_DATA_PASS; FINAL_FRONTIER_BLOCKED_BY_TWO_PROVEN_NX_CLONE_RENDER_DEFECTS; SOURCE_CANDIDATES_PASS_NOT_APPLIED",
   "progress": {
     "functionalReadinessPercent": 100,
     "technicalIterationProgressPercent": 75,
@@ -143,7 +119,6 @@
     "Treat R4S1 as currently published and statically verified",
     "Do not re-open HostDime/Auth/password/membership/tenant/data diagnosis",
     "Keep browser frozen; the single authorized final frontier was consumed",
-    "Treat Inicio and Cliente360 N-x-clone root causes as proven with source-only semantic equivalence",
     "Do not apply the two new product rootfixes without explicit authorization",
     "Do not advance to Polizas"
   ],
@@ -155,11 +130,9 @@
     "artifactId": 9255279034,
     "result": "PASS_R4S1_INICIO_QUERY_INDEX_SOURCE_REGRESSION",
     "browserExecuted": false,
-    "secretAccess": false,
-    "dataAccess": false,
+    "productionTouched": false,
     "firestoreWrites": 0,
     "authWrites": 0,
-    "operationalWrites": 0,
-    "productionTouched": false
+    "operationalWrites": 0
   }
 }
