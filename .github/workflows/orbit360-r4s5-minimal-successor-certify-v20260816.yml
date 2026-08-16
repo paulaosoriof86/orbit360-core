@@ -1,0 +1,140 @@
+name: Orbit360 R4S5 Minimal Successor Certify 20260816
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/workflows/orbit360-r4s5-minimal-successor-certify-v20260816.yml'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: orbit360-r4s5-minimal-successor-certify-v20260816
+  cancel-in-progress: false
+
+env:
+  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+  BASE_ARTIFACT_ID: '9268128540'
+  BASE_ZIP_NAME: orbit360-fase-a-product-r4s4-54f671e64b32.zip
+  BASE_ZIP_SHA256: f266815e26da04a8c9e86b0db9414ca6c06bedb3cd9371f85e96c8d08e420d4c
+  BASE_SOURCE_HEAD: 54f671e64b32c7b39100d79e770572a579e79ac7
+  DELTA_SOURCE_HEAD: 5474a1a9af64c018e6dcc71b4ad0cdfe57ce0484
+  TARGET_PATH: orbit360-platform/core/client-insurer-visual-contract-v20260720.js
+  TARGET_PACKAGE_PATH: core/client-insurer-visual-contract-v20260720.js
+  TARGET_SHA256: ad6fa96614d4eefe29880fac26a1c349ae24940adc2d8ff75ad04d991595b067
+  QUERIES_PATH: orbit360-platform/core/queries.js
+  QUERIES_SHA256: b906c1d3382a9fad310695b0ce2c8e7f49a2bf99fe9b9ed674a8df7e0fcbbb7b
+  SUCCESSOR_ZIP_NAME: orbit360-fase-a-product-r4s5-5474a1a9af64.zip
+
+jobs:
+  certify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Canonical gate and exact R4S5 source contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+          jq -e '.ok==true and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+          node --check tools/orbit360-r4s5-minimal-successor-package-v20260816.mjs
+          node --check tools/orbit360-r4s5-client-projection-batch-rootfix-gate-v20260816.mjs
+          ROOTFIX_PROOF="$EVIDENCE_DIR/r4s5-source-reproof-before-package-v20260816.json"
+          ORBIT360_CLIENT_PROJECTION_GATE_OUT="$ROOTFIX_PROOF" node tools/orbit360-r4s5-client-projection-batch-rootfix-gate-v20260816.mjs
+          jq -e '.ok==true and .status=="R4S5_CLIENT_PROJECTION_BATCH_ROOTFIX_SOURCE_PASS" and .semanticEqual==true and .mismatchCount==0 and .fixture.clientes==430 and .fixture.polizas==1375 and .fixture.cobros==1900 and .queriesSha256MatchesCertifiedR4S4==true and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .browserExecuted==false and .secretAccess==false and .dataAccess==false and .deployExecuted==false and .productionTouched==false and .packageRebuilt==false' "$ROOTFIX_PROOF" >/dev/null
+          git cat-file -e "${BASE_SOURCE_HEAD}^{commit}"
+          git cat-file -e "${DELTA_SOURCE_HEAD}^{commit}"
+          test "$(git show "${DELTA_SOURCE_HEAD}:${TARGET_PATH}" | sha256sum | awk '{print $1}')" = "$TARGET_SHA256"
+          test "$(git show "${GITHUB_SHA}:${TARGET_PATH}" | sha256sum | awk '{print $1}')" = "$TARGET_SHA256"
+          test "$(git show "${GITHUB_SHA}:${QUERIES_PATH}" | sha256sum | awk '{print $1}')" = "$QUERIES_SHA256"
+          mapfile -t PRODUCT_DELTA < <(git diff-tree --no-commit-id --name-only -r "$DELTA_SOURCE_HEAD" | grep '^orbit360-platform/' || true)
+          test "${#PRODUCT_DELTA[@]}" -eq 1
+          test "${PRODUCT_DELTA[0]}" = "$TARGET_PATH"
+          grep -F "ORBIT360_R4_CERTIFIED_SOURCE_ONLY: 'true'" .github/workflows/orbit360-r4-certified-product-readonly-smoke-v20260815.yml >/dev/null
+
+      - name: Recover exact durable R4S4 and construct one-delta R4S5
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          WORK="$RUNNER_TEMP/orbit360-r4s5"
+          BASE="$WORK/base"
+          SUCCESSOR="$WORK/successor"
+          VERIFY="$WORK/verify"
+          OUTER="$WORK/r4s4-artifact.zip"
+          INNER="$WORK/$BASE_ZIP_NAME"
+          REPLACEMENT="$WORK/client-insurer-visual-contract.rootfix.js"
+          CERT="$EVIDENCE_DIR/r4s5-minimal-successor-certification-v20260816.json"
+          mkdir -p "$WORK" "$BASE" "$VERIFY" "$EVIDENCE_DIR"
+
+          curl --fail --silent --show-error --location \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/${BASE_ARTIFACT_ID}/zip" \
+            -o "$OUTER"
+          unzip -q "$OUTER" -d "$WORK/outer"
+          test -f "$WORK/outer/$BASE_ZIP_NAME"
+          cp "$WORK/outer/$BASE_ZIP_NAME" "$INNER"
+          test "$(sha256sum "$INNER" | awk '{print $1}')" = "$BASE_ZIP_SHA256"
+          unzip -q "$INNER" -d "$BASE"
+
+          git show "${DELTA_SOURCE_HEAD}:${TARGET_PATH}" > "$REPLACEMENT"
+          node --check "$REPLACEMENT"
+          test "$(sha256sum "$REPLACEMENT" | awk '{print $1}')" = "$TARGET_SHA256"
+
+          node tools/orbit360-r4s5-minimal-successor-package-v20260816.mjs prepare "$BASE" "$SUCCESSOR" "$REPLACEMENT" "$CERT"
+          jq -e '.ok==false and .status=="R4S5_SUCCESSOR_STAGED_AWAITING_ZIP_VERIFY" and .baseZipSha256==env.BASE_ZIP_SHA256 and .baseSourceHead==env.BASE_SOURCE_HEAD and .deltaSourceHead==env.DELTA_SOURCE_HEAD and .changedProductFileCount==1 and .unchangedFileCount==193 and .fileCount==194 and (.deltaFiles|length)==1 and .deltaFiles[0]==env.TARGET_PACKAGE_PATH and .targetInfo[env.TARGET_PACKAGE_PATH].sha256==env.TARGET_SHA256 and .staticCertification.baseManifestExact==true and .staticCertification.basePhysicalTreeExact==true and .staticCertification.successorManifestExact==true and .staticCertification.successorPhysicalTreeExact==true and .staticCertification.noLabRuntime==true and .staticCertification.noPrivateSecretMaterial==true and .writeAuthorized==false and .browserExecuted==false and .secretAccess==false and .dataAccess==false and .deployExecuted==false and .productionTouched==false' "$CERT" >/dev/null
+
+          (cd "$SUCCESSOR" && find . -type f -printf '%P\n' | LC_ALL=C sort | zip -X -q "$GITHUB_WORKSPACE/$SUCCESSOR_ZIP_NAME" -@)
+          SUCCESSOR_ZIP_SHA256="$(sha256sum "$SUCCESSOR_ZIP_NAME" | awk '{print $1}')"
+          test "${#SUCCESSOR_ZIP_SHA256}" -eq 64
+          unzip -q "$SUCCESSOR_ZIP_NAME" -d "$VERIFY"
+          export SUCCESSOR_ZIP_SHA256 SUCCESSOR_ZIP_NAME
+          node tools/orbit360-r4s5-minimal-successor-package-v20260816.mjs verify "$BASE" "$VERIFY" - "$CERT"
+          jq -e '.ok==true and .status=="R4S5_MINIMAL_SUCCESSOR_DURABLE_CERTIFIED" and .classification=="FUNCTIONAL_DEFECT_ROOTFIX_SUCCESSOR_CERTIFIED" and .baseZipSha256==env.BASE_ZIP_SHA256 and .baseSourceHead==env.BASE_SOURCE_HEAD and .deltaSourceHead==env.DELTA_SOURCE_HEAD and .changedProductFileCount==1 and .unchangedFileCount==193 and .fileCount==194 and (.deltaFiles|length)==1 and .deltaFiles[0]==env.TARGET_PACKAGE_PATH and .targetInfo[env.TARGET_PACKAGE_PATH].sha256==env.TARGET_SHA256 and .staticCertification.allManifestHashesVerified==true and .staticCertification.unchangedFilesHashExact==true and .staticCertification.targetHashExact==true and .staticCertification.noLabRuntime==true and .staticCertification.noPrivateSecretMaterial==true and .staticCertification.browserExecuted==false and .staticCertification.runtimeExecuted==false and .staticCertification.deployExecuted==false and .staticCertification.productionTouched==false and (.zipSha256|length)==64 and .writeAuthorized==false and .browserExecuted==false and .runtimeExecuted==false and .secretAccess==false and .dataAccess==false and .deployExecuted==false and .productionTouched==false and .containsPII==false and .containsSecrets==false' "$CERT" >/dev/null
+          test "$(jq -r '.zipSha256' "$CERT")" = "$SUCCESSOR_ZIP_SHA256"
+          test "$(sha256sum "$SUCCESSOR_ZIP_NAME" | awk '{print $1}')" = "$SUCCESSOR_ZIP_SHA256"
+          cp "$VERIFY/orbit360-package-manifest.json" "$EVIDENCE_DIR/r4s5-orbit360-package-manifest-v20260816.json"
+          printf '%s  %s\n' "$SUCCESSOR_ZIP_SHA256" "$SUCCESSOR_ZIP_NAME" > "$EVIDENCE_DIR/r4s5-minimal-successor-sha256-v20260816.txt"
+
+      - name: Canonical gate after R4S5 certification
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+          jq -e '.ok==true and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: orbit360-r4s5-minimal-successor-evidence-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/r4s5-source-reproof-before-package-v20260816.json
+            orbit360-platform/runtime-gate-crm-v20260716/r4s5-minimal-successor-certification-v20260816.json
+            orbit360-platform/runtime-gate-crm-v20260716/r4s5-orbit360-package-manifest-v20260816.json
+            orbit360-platform/runtime-gate-crm-v20260716/r4s5-minimal-successor-sha256-v20260816.txt
+          if-no-files-found: warn
+          retention-days: 14
+
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: orbit360-r4s5-minimal-successor-durable-${{ github.run_id }}
+          path: |
+            orbit360-fase-a-product-r4s5-5474a1a9af64.zip
+          if-no-files-found: error
+          retention-days: 14
