@@ -42,6 +42,7 @@ const checks = {
   independentStageBudgetsBound: e.independentStageBudgetsBound === true,
   swallowedRouteWaitRemoved: e.swallowedRouteWaitRemoved === true,
   routeReadinessFailurePropagates: e.routeReadinessFailurePropagates === true,
+  routeReadinessBudgetAligned: e.routeReadinessBudgetAligned === true,
   roleTimeoutAttributionSplit: e.roleTimeoutAttributionSplit === true,
   partialRoleEvidenceBound: e.partialRoleEvidenceBound === true,
   syntaxPass: e.patchedHarnessSyntaxPass === true,
