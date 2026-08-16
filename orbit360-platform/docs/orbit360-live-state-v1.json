@@ -1,7 +1,7 @@
 {
   "schemaVersion": "orbit360-live-state-v1",
-  "stateVersion": "20260815.r4s1-final-frontier-nx-clone-root-cause.3",
-  "updatedAt": "2026-08-15T18:38:00-06:00",
+  "stateVersion": "20260815.r4s1-final-frontier-nx-clone-root-cause.4",
+  "updatedAt": "2026-08-15T18:40:00-06:00",
   "phase": "R4S1_FINAL_FRONTIER_FAILED_ROOT_CAUSE_PROVEN_SOURCE_CANDIDATES_NOT_APPLIED",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -80,7 +80,6 @@
   },
   "staleValidator": {
     "classification": "VALIDATOR_STALE/V19_CLIENTE360_SUMMARY_INDEX_ASSUMED_NOT_IMPLEMENTED",
-    "historicalEvidence": "orbit360-platform/runtime-gate-crm-v20260716/v19-cliente360-bounded-render-source-sanitized-v20260807.json",
     "supersededForPerformanceClaims": true
   },
   "classification": "FUNCTIONAL_DEFECT_ROOT_CAUSE_PROVEN_AWAITING_NEW_PRODUCT_MUTATION_AUTHORIZATION",
@@ -110,22 +109,13 @@
   "nextActionExact": {
     "owner": "R4S2 minimal successor / Inicio + Cliente360 indexed read-model",
     "stage": "AUTHORIZE_TWO_PROVEN_SOURCE_ROOTFIXES_THEN_COMBINED_SOURCE_GATE",
-    "action": "Do not rerun browser. If explicitly authorized, apply only the two proven source-only candidates: core/queries.js indexed client lookup for Inicio global queries and modules/policy-receipts-v1199-detail-guard.js real clientesResumenIndex/read-model lookup. Run combined semantic/performance source regression and canonical gate. Only after PASS generate an immutable R4S2 from published R4S1 with exactly these two new product deltas and 192 other product files byte-identical to R4S1; certify before publication. Publication and any new final browser matrix require explicit authorization because the prior macro authorization has been consumed.",
+    "action": "Do not rerun browser. With explicit authorization, apply only core/queries.js indexed client lookup and modules/policy-receipts-v1199-detail-guard.js real clientesResumenIndex/read-model lookup. Run canonical gate plus combined semantic/performance regression. Only with PASS build immutable R4S2 from R4S1 with exactly these two new deltas and 192 other product files byte-identical. Certification, publication and any new browser matrix remain separately controlled by the new macro authorization.",
     "doNotRollbackR4S1Automatically": true
   },
-  "resumeProtocol": [
-    "Read this file first",
-    "Confirm mandatory branch and PR #5 draft/open/no merge",
-    "Treat R4S1 as currently published and statically verified",
-    "Do not re-open HostDime/Auth/password/membership/tenant/data diagnosis",
-    "Keep browser frozen; the single authorized final frontier was consumed",
-    "Do not apply the two new product rootfixes without explicit authorization",
-    "Do not advance to Polizas"
-  ],
   "currentCheckpoint": "orbit360-platform/docs/CIERRE-R4S1-FRONTERA-FINAL-NX-CLONE-INICIO-CLIENTE360-20260815.md",
   "currentChangelog": "orbit360-platform/CHANGELOG-R4S1-GOLIVE-20260815.md",
+  "readme": "orbit360-platform/README.md",
   "lastEvidence": {
-    "workflow": "Orbit360 R4S1 Inicio Query Index Source Regression 20260815",
     "runId": 31917288758,
     "artifactId": 9255279034,
     "result": "PASS_R4S1_INICIO_QUERY_INDEX_SOURCE_REGRESSION",
