@@ -1,14 +1,16 @@
 {
   "schemaVersion": "orbit360-r4-certified-product-contract-v1",
   "status": "R4_CERTIFIED_PRODUCT_CONTRACT_BOUND",
-  "classification": "VALIDATOR_STALE_ROOTFIX_CONTRACT",
-  "sourceHead": "294ed22bdb564585b71fc59cefa1d04cdfa6b120",
-  "r3RunId": 31959607956,
-  "r3DurableArtifactId": 9266877667,
-  "zipName": "orbit360-fase-a-product-r4s3-294ed22bdb56.zip",
-  "zipSha256": "1ab5f3ea7f59cd0c2eb2bb1f5c0596a4bf3ca241f42016f74bf095ccbaf0f78e",
+  "classification": "FUNCTIONAL_DEFECT_ROOTFIX_SUCCESSOR_CONTRACT",
+  "sourceHead": "54f671e64b32c7b39100d79e770572a579e79ac7",
+  "r3RunId": 31964568216,
+  "r3DurableArtifactId": 9268128540,
+  "zipName": "orbit360-fase-a-product-r4s4-54f671e64b32.zip",
+  "zipSha256": "f266815e26da04a8c9e86b0db9414ca6c06bedb3cd9371f85e96c8d08e420d4c",
   "fileCount": 194,
-  "manifestStatus": "FASE_A_PRODUCT_R4S3_MINIMAL_SUCCESSOR_CERTIFIED",
+  "manifestStatus": "FASE_A_PRODUCT_R4S4_MINIMAL_SUCCESSOR_CERTIFIED",
+  "manifestSha256": "11df01ef919b30b04a75fb9332210866850e1720406997735dc4573ceeaf9fba",
+  "publicIdentityRunId": 31965583608,
   "entrypoint": {
     "path": "index.html",
     "bytes": 16893,
@@ -19,6 +21,12 @@
     "sourcePath": "orbit360-platform/core/auth-product-runtime-p0.js",
     "bytes": 4211,
     "sha256": "d0bb399fe0e1dd102a03950673044eda5bc8d181e4e98cf477d22d141aa7b3a8"
+  },
+  "queriesAsset": {
+    "path": "/core/queries.js",
+    "sourcePath": "orbit360-platform/core/queries.js",
+    "bytes": 9949,
+    "sha256": "b906c1d3382a9fad310695b0ce2c8e7f49a2bf99fe9b9ed674a8df7e0fcbbb7b"
   },
   "legacyAssetsExcludedFromProduct": [
     "/core/auth.js",
