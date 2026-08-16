@@ -1,7 +1,7 @@
 {
   "schemaVersion": "orbit360-live-state-v1",
-  "stateVersion": "20260816.r4s2-final-frontier-team-own-rootcause-source-pass.2",
-  "updatedAt": "2026-08-16T10:29:00-06:00",
+  "stateVersion": "20260816.r4s2-final-frontier-team-own-rootcause-source-pass.3",
+  "updatedAt": "2026-08-16T10:30:00-06:00",
   "phase": "R4S2_FINAL_FRONTIER_CONSUMED_TEAM_OWN_ROOTCAUSE_SOURCE_PASS",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -15,7 +15,6 @@
     "sourceHead": "47249fd4d6032a2f4c09f6fbd3460d3804c199da",
     "staticVerificationRunId": 31957103570,
     "staticVerificationJobId": 95189286663,
-    "manifestStatus": "FASE_A_PRODUCT_R4S2_MINIMAL_SUCCESSOR_CERTIFIED",
     "rollbackPackagePreserved": true,
     "hostdimeProductBlocker": false
   },
@@ -28,7 +27,6 @@
     "tenantMatches": true,
     "requiredRolesPresent": true,
     "runtimeStarted": true,
-    "routerStarted": true,
     "storeStatus": "ready-read-only",
     "storeWriteEnabled": false,
     "clientes": 430,
@@ -46,22 +44,14 @@
     "status": "R4_PRODUCTION_READONLY_SMOKE_FAIL",
     "classification": "FUNCTIONAL_DEFECT/R4_ROLE_ROUTE_STAGE_TIMEOUT",
     "firstFailedStage": "role-Operativo-group",
-    "error": "R4_STAGE_TIMEOUT:role-Operativo-group:90000",
     "directionFiveRoutesPass": true,
     "operativoInicioPass": true,
     "operativoCliente360Started": true,
     "operativoCliente360Returned": false,
     "asesorReached": false,
-    "pageErrors": 0,
-    "consoleErrors": 0,
-    "httpFailures": 0,
-    "writeSignals": 0,
-    "technicalCopy": 0,
     "firestoreWrites": 0,
     "authWrites": 0,
     "operationalWrites": 0,
-    "containsPII": false,
-    "containsSecrets": false,
     "browserClosed": true
   },
   "refreeze": {
@@ -81,12 +71,10 @@
   },
   "teamOwnScopeRegression": {
     "status": "R4_TEAM_SCOPE_RELATIONAL_INDEX_REGRESSION_PASS",
-    "classification": "FUNCTIONAL_DEFECT_ROOTFIX_SOURCE_PROVEN",
     "runId": 31958357674,
     "jobId": 95192417987,
     "artifactId": 9266561371,
     "artifactDigest": "sha256:7db701960ed6f08bc78594fbdca6eab57556bf9ddb1a02a23ce9e1c6bc937f34",
-    "sourcePath": "orbit360-platform/core/access-scope.js",
     "directionSemanticEqual": true,
     "operativoSemanticEqual": true,
     "asesorSemanticEqual": true,
@@ -94,13 +82,7 @@
     "operativoFacadeCandidate": { "getCalls": 25, "cloneRows": 12705 },
     "asesorFacadeCurrent": { "getCalls": 36245, "cloneRows": 5790400 },
     "asesorFacadeCandidate": { "getCalls": 20, "cloneRows": 12645 },
-    "operativoCloneReductionRatio": 481.08980716253444,
-    "asesorCloneReductionRatio": 457.92012653222616,
-    "operativoGetReductionRatio": 1825.24,
-    "asesorGetReductionRatio": 1812.25,
     "browserExecuted": false,
-    "secretAccess": false,
-    "dataAccess": false,
     "productionTouched": false,
     "firestoreWrites": 0,
     "authWrites": 0,
@@ -115,7 +97,6 @@
     "postGoLiveSmokePass": false
   },
   "authorization": {
-    "r4s2Published": true,
     "r4s2FinalMatrixAuthorizationConsumed": true,
     "teamOwnRootfixApplyAuthorized": false,
     "r4s3GenerationAuthorized": false,
@@ -134,15 +115,11 @@
   "currentCheckpoint": "orbit360-platform/docs/CIERRE-R4S2-FRONTERA-FINAL-OPERATIVO-CLIENTE360-TEAM-OWN-NX-CLONE-20260816.md",
   "currentChangelog": "orbit360-platform/CHANGELOG-R4S2-GOLIVE-20260816.md",
   "readme": "orbit360-platform/README.md",
+  "lastDocumentationHeadBeforeThisCommit": "d86e98c7fb47b095f68608ae1bcc322d72eb8b74",
   "lastEvidence": {
     "runId": 31958357674,
     "jobId": 95192417987,
     "artifactId": 9266561371,
-    "result": "R4_TEAM_SCOPE_RELATIONAL_INDEX_REGRESSION_PASS",
-    "browserExecuted": false,
-    "productionTouched": false,
-    "firestoreWrites": 0,
-    "authWrites": 0,
-    "operationalWrites": 0
+    "result": "R4_TEAM_SCOPE_RELATIONAL_INDEX_REGRESSION_PASS"
   }
 }
