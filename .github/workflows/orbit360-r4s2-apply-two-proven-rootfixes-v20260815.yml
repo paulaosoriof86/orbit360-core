@@ -1,0 +1,139 @@
+name: Orbit360 R4S2 Apply Two Proven Rootfixes 20260815
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/workflows/orbit360-r4s2-apply-two-proven-rootfixes-v20260815.yml'
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: orbit360-r4s2-apply-two-proven-rootfixes-v20260815
+  cancel-in-progress: false
+
+env:
+  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+  QUERIES_PATH: orbit360-platform/core/queries.js
+  OWNER_PATH: orbit360-platform/modules/policy-receipts-v1199-detail-guard.js
+  EXPECTED_QUERIES_BLOB: 02d944cbbce8e85d10bc009ae54b3fa0c8560163
+  EXPECTED_OWNER_BLOB: 2dd34645d08b0836ebeaa369376364ac760a2f74
+  EXPECTED_QUERIES_SHA256: 1a37503507cd87be00314076e2ccf1b61d29cfbed9d3961486ade96fbab40051
+  EXPECTED_OWNER_SHA256: 3323f09b812d6e3accc8cd151fe28ec3fab2fffa6c41ad622a2f8a147046887b
+  QUERIES_ARTIFACT_ID: '9255279034'
+  OWNER_ARTIFACT_ID: '9255246859'
+
+jobs:
+  apply-source-only:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Canonical gate and immutable baseline preconditions
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "ays/backend-tenant-lab-v99-20260703"
+          test "$(git rev-parse "HEAD:$QUERIES_PATH")" = "$EXPECTED_QUERIES_BLOB"
+          test "$(git rev-parse "HEAD:$OWNER_PATH")" = "$EXPECTED_OWNER_BLOB"
+          node --check tools/orbit360-r4s2-two-rootfix-apply-source-v20260815.mjs
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+          jq -e '.ok==true and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+
+      - name: Recover exact candidates from prior PASS artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          WORK="$RUNNER_TEMP/r4s2-proven-candidates"
+          mkdir -p "$WORK/queries" "$WORK/owner"
+          for spec in "queries:$QUERIES_ARTIFACT_ID" "owner:$OWNER_ARTIFACT_ID"; do
+            name="${spec%%:*}"; id="${spec##*:}"
+            curl --fail --silent --show-error --location \
+              -H "Authorization: Bearer $GH_TOKEN" \
+              -H "Accept: application/vnd.github+json" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/${id}/zip" \
+              -o "$WORK/${name}.zip"
+            unzip -q "$WORK/${name}.zip" -d "$WORK/${name}"
+          done
+          QUERIES_CANDIDATE="$(find "$WORK/queries" -type f -name 'queries.candidate.js' -print -quit)"
+          OWNER_CANDIDATE="$(find "$WORK/owner" -type f -name 'policy-receipts-v1199-detail-guard.candidate.js' -print -quit)"
+          QUERIES_PRIOR_EVIDENCE="$(find "$WORK/queries" -type f -name 'r4s1-inicio-query-index-source-regression-v20260815.json' -print -quit)"
+          OWNER_PRIOR_EVIDENCE="$(find "$WORK/owner" -type f -name 'r4s1-cliente360-summary-index-source-regression-v20260815.json' -print -quit)"
+          test -n "$QUERIES_CANDIDATE"; test -n "$OWNER_CANDIDATE"
+          test -n "$QUERIES_PRIOR_EVIDENCE"; test -n "$OWNER_PRIOR_EVIDENCE"
+          test "$(sha256sum "$QUERIES_CANDIDATE" | awk '{print $1}')" = "$EXPECTED_QUERIES_SHA256"
+          test "$(sha256sum "$OWNER_CANDIDATE" | awk '{print $1}')" = "$EXPECTED_OWNER_SHA256"
+          jq -e '.ok==true and .semanticEqual==true and .candidate.clientGetCalls==0 and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .productionTouched==false' "$QUERIES_PRIOR_EVIDENCE" >/dev/null
+          jq -e '.ok==true and .semanticEqual==true and .candidate.clientGetCalls==0 and .candidate.summaryIndexCalls==1 and .candidate.fallbackSummaryCalls==0 and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .productionTouched==false' "$OWNER_PRIOR_EVIDENCE" >/dev/null
+          echo "R4S2_QUERIES_CANDIDATE=$QUERIES_CANDIDATE" >> "$GITHUB_ENV"
+          echo "R4S2_OWNER_CANDIDATE=$OWNER_CANDIDATE" >> "$GITHUB_ENV"
+
+      - name: Combined semantic and performance regression then stage both rootfixes
+        shell: bash
+        run: |
+          set -euo pipefail
+          EVIDENCE="$RUNNER_TEMP/r4s2-two-rootfix-combined-source-regression-v20260815.json"
+          node tools/orbit360-r4s2-two-rootfix-apply-source-v20260815.mjs "$R4S2_QUERIES_CANDIDATE" "$R4S2_OWNER_CANDIDATE" "$EVIDENCE"
+          jq -e '.ok==true and .status=="R4S2_TWO_ROOTFIX_COMBINED_SOURCE_REGRESSION_PASS" and .summary.semanticEqual==true and .inicio.semanticEqual==true and .summary.candidate.clientGetCalls==0 and .summary.candidate.summaryIndexCalls==1 and .summary.candidate.fallbackSummaryCalls==0 and .summary.candidate.indexSize==430 and .summary.reduction.clientCloneRows>=180000 and .inicio.candidate.clientGetCalls==0 and .inicio.reduction.clientCloneRows>=1000000 and .browserExecuted==false and .secretAccess==false and .dataAccess==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .deployExecuted==false and .productionTouched==false' "$EVIDENCE" >/dev/null
+          node --check "$QUERIES_PATH"
+          node --check "$OWNER_PATH"
+          test "$(sha256sum "$QUERIES_PATH" | awk '{print $1}')" = "$EXPECTED_QUERIES_SHA256"
+          test "$(sha256sum "$OWNER_PATH" | awk '{print $1}')" = "$EXPECTED_OWNER_SHA256"
+
+      - name: Canonical gate after both source rootfixes
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+          jq -e '.ok==true and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+          cp "$EVIDENCE_DIR/preflight-sanitizado.json" "$RUNNER_TEMP/r4s2-two-rootfix-post-gate-v20260815.json"
+          git restore -- "$EVIDENCE_DIR/preflight-sanitizado.json" || true
+
+      - name: Commit exactly the two authorized product files
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t CHANGED < <(git diff --name-only | LC_ALL=C sort)
+          test "${#CHANGED[@]}" -eq 2
+          test "${CHANGED[0]}" = "$QUERIES_PATH"
+          test "${CHANGED[1]}" = "$OWNER_PATH"
+          test -z "$(git ls-files --others --exclude-standard)"
+          REMOTE_HEAD="$(git ls-remote origin "refs/heads/$GITHUB_REF_NAME" | awk '{print $1}')"
+          test "$REMOTE_HEAD" = "$GITHUB_SHA"
+          git config user.name orbit360-gate-bot
+          git config user.email orbit360-gate-bot@users.noreply.github.com
+          git add -- "$QUERIES_PATH" "$OWNER_PATH"
+          mapfile -t STAGED < <(git diff --cached --name-only | LC_ALL=C sort)
+          test "${#STAGED[@]}" -eq 2
+          test "${STAGED[0]}" = "$QUERIES_PATH"
+          test "${STAGED[1]}" = "$OWNER_PATH"
+          git commit -m "fix(r4s2): apply proven Inicio and Cliente360 indexed read-model rootfixes"
+          ROOTFIX_COMMIT="$(git rev-parse HEAD)"
+          cat > "$RUNNER_TEMP/r4s2-two-rootfix-commit-v20260815.json" <<JSON
+          {"ok":true,"status":"R4S2_TWO_PROVEN_ROOTFIXES_COMMITTED","rootfixCommit":"$ROOTFIX_COMMIT","files":["$QUERIES_PATH","$OWNER_PATH"],"queriesSha256":"$EXPECTED_QUERIES_SHA256","ownerSha256":"$EXPECTED_OWNER_SHA256","firestoreWrites":0,"authWrites":0,"operationalWrites":0,"browserExecuted":false,"deployExecuted":false,"productionTouched":false,"containsPII":false,"containsSecrets":false}
+          JSON
+          git push origin "HEAD:$GITHUB_REF_NAME"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: orbit360-r4s2-two-rootfix-source-evidence-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/r4s2-two-rootfix-combined-source-regression-v20260815.json
+            ${{ runner.temp }}/r4s2-two-rootfix-post-gate-v20260815.json
+            ${{ runner.temp }}/r4s2-two-rootfix-commit-v20260815.json
+          if-no-files-found: warn
+          retention-days: 14
