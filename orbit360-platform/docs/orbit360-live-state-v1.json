@@ -1,8 +1,8 @@
 {
   "schemaVersion": "orbit360-live-state-v1",
-  "stateVersion": "20260816.r4s4-final-matrix-validator-stale-refrozen.current",
-  "updatedAt": "2026-08-16T13:06:00-06:00",
-  "phase": "R4S4_FINAL_MATRIX_STOP_RETRY_VALIDATOR_STALE_REFROZEN",
+  "stateVersion": "20260816.r4s4-corrected-matrix-cliente360-nx-clone-stop.current",
+  "updatedAt": "2026-08-16T13:46:00-06:00",
+  "phase": "R4S4_CORRECTED_MATRIX_STOP_RETRY_CLIENT_PROJECTION_NX_CLONE",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pr": 5,
@@ -21,7 +21,7 @@
   },
   "authStatus": {
     "status": "PASS_NOT_CURRENT_BLOCKER",
-    "lastProductionEvidenceRunId": 31965708561,
+    "lastProductionEvidenceRunId": 31968334075,
     "loginHttpStatus": 200,
     "signedIn": true,
     "emailVerified": true,
@@ -35,14 +35,11 @@
     "authChangesRequiredNow": false
   },
   "cliente360BatchSummaryRootfix": {
-    "status": "SOURCE_ROOTFIX_PASS_AND_PUBLISHED_IN_R4S4",
+    "status": "SOURCE_ROOTFIX_PASS_AND_PUBLISHED_IN_R4S4_BUT_COMPOSED_PROJECTION_OWNER_REMAINS",
     "productCommit": "54f671e64b32c7b39100d79e770572a579e79ac7",
     "productFile": "orbit360-platform/core/queries.js",
     "querySha256": "b906c1d3382a9fad310695b0ce2c8e7f49a2bf99fe9b9ed674a8df7e0fcbbb7b",
     "validationRunId": 31963555214,
-    "validationJobId": 95205101103,
-    "artifactId": 9267857434,
-    "artifactDigest": "sha256:f04472548212f53ea6d9a9e78acc77729c346b8570bd5f012098a9fe1ca7e43a",
     "boundedness": {
       "allCalls": 4,
       "getCalls": 0,
@@ -53,87 +50,97 @@
       "mismatchCount": 0
     },
     "singleProductDeltaVerified": true,
-    "reopenProductFixAuthorized": false
+    "reopenProductFixAuthorized": false,
+    "ownerOfCurrentStop": false
   },
   "validatorRoleRouteAttribution": {
-    "classification": "VALIDATOR_STALE",
-    "failureFamily": "ROUTE_READINESS_8S_MASKS_30S_STAGE",
-    "status": "SOURCE_ROOTFIX_PASS_AFTER_R4S4_FINAL_MATRIX",
+    "classification": "VALIDATOR_STALE_ROOTFIX_PASS",
+    "failureFamily": "ROUTE_READINESS_8S_MASKS_30S_STAGE_CLOSED",
+    "status": "CORRECTED_30S_STAGE_25S_READINESS_SOURCE_PROVEN_AND_RUNTIME_USED",
     "wrapper": "tools/orbit360-r4-role-route-attribution-wrapper-v20260816.mjs",
     "gate": "tools/orbit360-r4-role-route-attribution-gate-v20260816.mjs",
-    "runtimeFailureRunId": 31965708561,
-    "runtimeFailureJobId": 95210452139,
-    "runtimeFailureStage": "role-Dirección-route-cliente360",
-    "runtimeInitialClassification": "FUNCTIONAL_DEFECT",
-    "runtimeInitialFailureFamily": "R4_ROLE_ROUTE_STAGE_FAILED",
-    "routeStageBudgetMs": 30000,
-    "staleRouteReadinessBudgetMs": 8000,
-    "correctedRouteReadinessBudgetMs": 25000,
     "correctedWrapperCommit": "ea04bac7ae28279370c9b63a53562413b9638c9b",
     "correctedGateCommit": "81c5b196b101e14984d8488d1c50d4808e415b3c",
     "sourceValidationRuns": [31966399464, 31966410400],
-    "cumulativeRoleGroupRemoved": true,
-    "roleActivationStagesBound": true,
-    "perRouteStagesBound": true,
-    "independentStageBudgetsBound": true,
-    "swallowedRouteWaitRemoved": true,
-    "routeReadinessFailurePropagates": true,
+    "routeStageBudgetMs": 30000,
+    "correctedRouteReadinessBudgetMs": 25000,
     "routeReadinessBudgetAligned": true,
-    "roleTimeoutAttributionSplit": true,
-    "partialRoleEvidenceBound": true,
-    "teamOwnRegressionPass": true,
-    "watchdogPass": true,
-    "browserExecutedInCorrectiveValidation": false,
-    "secretAccessInCorrectiveValidation": false,
-    "dataAccessInCorrectiveValidation": false,
-    "operationalWritesInCorrectiveValidation": 0
+    "currentStopAttributedToValidator": false
+  },
+  "currentRootCause": {
+    "classification": "FUNCTIONAL_DEFECT",
+    "failureFamily": "CLIENT_VISUAL_PROJECTION_SEGMENTATION_NX_CLONE_COMPOSED_READONLY_STORE",
+    "status": "ROOT_CAUSE_SOURCE_ISOLATED_PRODUCT_FROZEN",
+    "owner": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js",
+    "ownerType": "PRODUCT",
+    "chain": [
+      "installClientReadProjection overrides Orbit.store.all",
+      "projectedAll(clientes) maps projectClient for every client",
+      "projectClient always invokes segmentFor",
+      "segmentFor calls rawRows(polizas) per client",
+      "rawRows uses nativeAll clone-on-read from product readonly store",
+      "R4S4 clientesResumenIndex receives the wrapped all(clientes), so the visual projection recreates N-times cloning before the batched summary can help"
+    ],
+    "fixture": {
+      "clientes": 430,
+      "polizas": 1375,
+      "cobros": 1900
+    },
+    "cloneLowerBounds": {
+      "oneProjectedClientesAllWithoutPremiumCobros": 591680,
+      "oneProjectedClientesAllWithPremiumCobros": 1408680,
+      "twoProjectedClientesAllWithoutPremiumCobros": 1183360,
+      "twoProjectedClientesAllWithPremiumCobros": 2817360,
+      "threeProjectedClientesAllWithoutPremiumCobros": 1775040,
+      "threeProjectedClientesAllWithPremiumCobros": 4226040
+    },
+    "productModifiedDuringDiagnosis": false,
+    "authModified": false,
+    "dataModified": false,
+    "storeModified": false
   },
   "certifiedSuccessorR4S4": {
     "status": "R4S4_MINIMAL_SUCCESSOR_DURABLE_CERTIFIED_AND_PUBLISHED",
     "certificationRunId": 31964568216,
-    "certificationJobId": 95207631956,
     "zipName": "orbit360-fase-a-product-r4s4-54f671e64b32.zip",
     "zipSha256": "f266815e26da04a8c9e86b0db9414ca6c06bedb3cd9371f85e96c8d08e420d4c",
     "baseZipName": "orbit360-fase-a-product-r4s3-294ed22bdb56.zip",
-    "baseZipSha256": "1ab5f3ea7f59cd0c2eb2bb1f5c0596a4bf3ca241f42016f74bf095ccbaf0f78e",
+    "baseZipSha256": "1ab5f3ea7f59cd0c2eb2bb1f5c0596a4bf095ccbaf0f78e",
     "baseSourceHead": "294ed22bdb564585b71fc59cefa1d04cdfa6b120",
     "deltaSourceHead": "54f671e64b32c7b39100d79e770572a579e79ac7",
     "fileCount": 194,
     "changedProductFileCount": 1,
     "unchangedProductFileCount": 193,
     "deltaFiles": ["core/queries.js"],
-    "targetSha256": "b906c1d3382a9fad310695b0ce2c8e7f49a2bf99fe9b9ed674a8df7e0fcbbb7b",
-    "targetBytes": 9949,
-    "durableArtifactId": 9268128540,
-    "durableArtifactDigest": "sha256:f285598bc09d567f5e63483db02ce91d4c382c58b606efe45c061e34508eb02d",
-    "evidenceArtifactId": 9268128341,
-    "evidenceArtifactDigest": "sha256:b0c82bb4ab904994b88544fb9252229dba58283c9c22dc48b2fd545c2132c22d",
-    "manifestStatus": "FASE_A_PRODUCT_R4S4_MINIMAL_SUCCESSOR_CERTIFIED",
     "immutable": true
   },
   "publication": {
     "target": "https://app.aysseguros.com",
     "documentRoot": "/home/ayssegur/public_html/app.aysseguros.com",
     "publishedPackage": "orbit360-fase-a-product-r4s4-54f671e64b32.zip",
-    "publishedPackageSha256": "f266815e26da04a8c9e86b0db9414ca6c06bedb3cd9371f85e96c8d08e420d4c",
     "status": "R4S4_PUBLIC_STATIC_IDENTITY_VERIFIED",
     "staticVerificationRunId": 31965583608,
     "rollbackBase": "Exact R4S3 package/durable artifact preserved.",
-    "hostdimeManualExtractionCompleted": true,
     "hostdimeActionRequiredNow": false
   },
   "runtimeFinalMatrix": {
-    "status": "CONSUMED_STOP_RETRY_VALIDATOR_STALE",
-    "runId": 31965708561,
-    "jobId": 95210452139,
+    "status": "CONSUMED_STOP_RETRY_FUNCTIONAL_DEFECT",
+    "runId": 31968334075,
+    "jobId": 95216801889,
+    "artifactId": 9269114049,
+    "artifactSha256": "706b4f98de572ec7da572d9397d76c5650dd24819c9bee97c41823ffea251b98",
     "authorizedExecutionsConsumed": 1,
     "postGoLiveSmokePass": false,
     "firstFailedStage": "role-Dirección-route-cliente360",
+    "failureFamily": "R4_ROLE_ROUTE_STAGE_FAILED",
+    "routeReadinessTimeoutObservedMs": 25000,
     "authPass": true,
     "membershipPass": true,
     "tenantPass": true,
     "storeReadOnlyPass": true,
     "directionScopeAllPass": true,
+    "directionRawClientCount": 430,
+    "directionScopedClientCount": 430,
     "inicioPass": true,
     "clientes": 430,
     "aseguradoras": 30,
@@ -149,11 +156,14 @@
     "active": true,
     "sourceOnly": true,
     "workflow": ".github/workflows/orbit360-r4-certified-product-readonly-smoke-v20260815.yml",
-    "refreezeCommit": "576c3d051387bcfc540bb44924f991b968cf66fd",
-    "refreezeRunId": 31965848572,
-    "previousFinalMatrixAuthorizationConsumed": true,
+    "refreezeCommit": "9813618620714913a016fd2f89a3a9ea077a9f2b",
+    "refreezeRunId": 31968457286,
+    "refreezeRunConclusion": "SUCCESS",
+    "runtimeStepsSkippedOnRefreeze": true,
+    "correctedFinalMatrixAuthorizationConsumed": true,
     "browserRerunAllowedNow": false,
-    "freshExplicitAuthorizationRequired": true
+    "freshRuntimeAuthorizationRequired": true,
+    "rootfixRequiredBeforeAnyFutureRuntime": true
   },
   "progress": {
     "functionalReadinessPercent": 100,
@@ -164,38 +174,36 @@
     "postGoLiveSmokePass": false
   },
   "authorization": {
-    "validatorSecondaryFixAuthorizedAndConsumed": true,
-    "successorPackageAuthorizedAndExecuted": true,
-    "productionPublishAuthorizedForR4S4": true,
-    "previousFinalReadonlyMatrixAuthorizationConsumed": true,
-    "newFinalReadonlyMatrixAuthorized": false,
+    "correctedFinalReadonlyMatrixAuthorizedAndConsumed": true,
+    "currentProductRootfixAuthorized": false,
     "newRuntimeAuthorizationRequired": true,
     "reimportAuthorized": false,
     "authChangesAuthorized": false,
     "dataChangesAuthorized": false,
+    "storeChangesAuthorized": false,
     "mainMergeAuthorized": false
   },
   "claudeImpact": {
     "classification": "REPLICABLE_CLAUDE_ACUMULADO",
-    "scope": "Validator methodology only; no new frontend/product delta. Align nested readiness budgets with declared stage budgets and preserve STOP_RETRY semantics."
+    "scope": "Avoid read projections that perform per-row full-collection scans over clone-on-read stores. Segment/projection enrichment must use prebuilt relational indexes or bounded batched passes without mutating canonical data."
   },
   "academiaImpact": {
     "classification": "ACADEMIA_ACTUALIZAR",
-    "scope": "Differentiate FUNCTIONAL_DEFECT from VALIDATOR_STALE; teach nested timeout versus stage budget consistency and why product/data must remain frozen when the validator is stale."
+    "scope": "Teach composed-performance defects: a local batched query can be correct while an upstream visual projection wrapper reintroduces N-times cloning. Distinguish validator stale from functional composition defect using repeated-stage evidence."
   },
   "nextActionExact": {
-    "stage": "R4S4_CORRECTED_FINAL_MATRIX_REQUIRES_FRESH_AUTHORIZATION",
-    "action": "Keep R4S4 exact and SOURCE_ONLY=true. Do not modify product, Auth or data. With fresh explicit authorization only, execute canonical/source-only gates and exactly one corrected read-only Dirección/Operativo/Asesor matrix using 30s route stages with 25s readiness, require zero writes and POST_GO_LIVE_SMOKE_PASS, then refreeze immediately. If the same stage/family fails again, STOP_RETRY without extending timeouts or creating another patch."
+    "stage": "CLIENT_VISUAL_PROJECTION_NX_CLONE_ROOTFIX_REQUIRES_EXPLICIT_AUTHORIZATION",
+    "action": "Keep R4S4 exact and SOURCE_ONLY=true. No more browser attempts. With new explicit authorization only, modify exclusively core/client-insurer-visual-contract-v20260720.js to replace per-client full collection scans in segmentFor/projectedAll with bounded preindexed read-only projection while preserving segmentation semantics; do not touch queries.js, Auth, product store, data or Rules. Validate composition source-only against 430/1375/1900 with clone-on-read store and canonical gate. Only after PASS decide a minimal certified successor and any future runtime under a separate authorization."
   },
-  "currentCheckpoint": "orbit360-platform/docs/STOP-R4S4-FINAL-MATRIX-VALIDATOR-READINESS-BUDGET-20260816.md",
+  "currentCheckpoint": "orbit360-platform/docs/STOP-R4S4-CORRECTED-MATRIX-CLIENT-PROJECTION-NX-CLONE-20260816.md",
   "currentChangelog": "orbit360-platform/CHANGELOG-R4S3-GOLIVE-20260816.md",
   "readme": "orbit360-platform/README.md",
   "lastEvidence": {
-    "runId": 31966410400,
-    "result": "R4S4_VALIDATOR_READINESS_BUDGET_SOURCE_ONLY_PASS",
-    "browserExecuted": false,
-    "secretAccess": false,
-    "dataAccess": false,
+    "runtimeRunId": 31968334075,
+    "runtimeResult": "R4_PRODUCTION_READONLY_SMOKE_FAIL",
+    "refreezeRunId": 31968457286,
+    "refreezeResult": "SUCCESS_SOURCE_ONLY",
+    "postGoLiveSmokePass": false,
     "operationalWrites": 0
   }
 }
