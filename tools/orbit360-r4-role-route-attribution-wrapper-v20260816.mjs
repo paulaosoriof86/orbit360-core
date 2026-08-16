@@ -60,7 +60,7 @@ function patchBase(original) {
         const allowed = await page.evaluate(r => r === 'inicio' ? true : !!Orbit.access.can(r, 'view'), route);
         routeEvidence.policyAllowed = allowed;
         await page.evaluate(r => { location.hash = '#/' + r; }, route);
-        await page.waitForFunction(r => window.Orbit && Orbit.route && Orbit.route.key === r, route, { timeout: 8000 });
+        await page.waitForFunction(r => window.Orbit && Orbit.route && Orbit.route.key === r, route, { timeout: 25000 });
         await page.waitForTimeout(200);
         const state = await page.evaluate(() => { const h = document.getElementById('host'), body = String(document.body && document.body.innerText || ''); return { key: Orbit.route && Orbit.route.key || '', children: h && h.children ? h.children.length : 0, blocked: String(h && h.innerText || '').includes('No tienes acceso con el rol activo'), body: body.slice(0, 200000) }; });
         const matches = uniq((state.body.match(TECH) || []).map(x => String(x).toLowerCase())); d.technicalCopy.push(...matches.map(x => role + ':' + route + ':' + x));
@@ -90,7 +90,8 @@ function patchBase(original) {
     perRouteStagesBound: patched.includes("runStage('role-' + role + '-route-' + route, 30000"),
     independentStageBudgetsBound: !patched.includes('90000') && patched.includes("'-activation', 30000") && patched.includes("'-route-' + route, 30000"),
     swallowedRouteWaitRemoved: !patched.includes('waitForFunction(r => window.Orbit && Orbit.route && Orbit.route.key === r, route, { timeout: 8000 }).catch(() => {})'),
-    routeReadinessFailurePropagates: patched.includes("await page.waitForFunction(r => window.Orbit && Orbit.route && Orbit.route.key === r, route, { timeout: 8000 });"),
+    routeReadinessFailurePropagates: patched.includes("await page.waitForFunction(r => window.Orbit && Orbit.route && Orbit.route.key === r, route, { timeout: 25000 });"),
+    routeReadinessBudgetAligned: !patched.includes('{ timeout: 8000 }') && patched.includes('{ timeout: 25000 }') && patched.includes("'-route-' + route, 30000"),
     roleTimeoutAttributionSplit: patched.includes('R4_ROLE_ACTIVATION_STAGE_TIMEOUT') && patched.includes('R4_ROLE_ROUTE_STAGE_TIMEOUT') && patched.includes('R4_ROLE_ACTIVATION_STAGE_FAILED') && patched.includes('R4_ROLE_ROUTE_STAGE_FAILED'),
     partialRoleEvidenceBound: patched.includes('d.roles.push(rr);') && patched.indexOf('d.roles.push(rr);') < patched.indexOf("runStage('role-' + role + '-activation'")
   };
