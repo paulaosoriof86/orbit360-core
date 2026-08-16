@@ -1,26 +1,27 @@
 {
   "schemaVersion": "orbit360-live-state-v1",
-  "stateVersion": "20260816.r4s4-certified-publication-pending.current",
-  "updatedAt": "2026-08-16T12:27:00-06:00",
-  "phase": "R4S4_CERTIFIED_PUBLICATION_PENDING",
+  "stateVersion": "20260816.r4s4-final-matrix-validator-stale-refrozen.current",
+  "updatedAt": "2026-08-16T13:06:00-06:00",
+  "phase": "R4S4_FINAL_MATRIX_STOP_RETRY_VALIDATOR_STALE_REFROZEN",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pr": 5,
   "prState": "draft-open",
   "currentPublishedPackage": {
-    "name": "orbit360-fase-a-product-r4s3-294ed22bdb56.zip",
-    "sha256": "1ab5f3ea7f59cd0c2eb2bb1f5c0596a4bf3ca241f42016f74bf095ccbaf0f78e",
+    "name": "orbit360-fase-a-product-r4s4-54f671e64b32.zip",
+    "sha256": "f266815e26da04a8c9e86b0db9414ca6c06bedb3cd9371f85e96c8d08e420d4c",
     "fileCount": 194,
-    "status": "R4S3_PUBLISHED_STATIC_IDENTITY_PASS",
-    "sourceHead": "294ed22bdb564585b71fc59cefa1d04cdfa6b120",
-    "staticVerificationRunId": 31960492114,
-    "staticVerificationJobId": 95197609260,
-    "staticVerificationArtifactId": 9267096364,
+    "status": "R4S4_PUBLISHED_STATIC_IDENTITY_PASS",
+    "sourceHead": "54f671e64b32c7b39100d79e770572a579e79ac7",
+    "manifestStatus": "FASE_A_PRODUCT_R4S4_MINIMAL_SUCCESSOR_CERTIFIED",
+    "staticVerificationRunId": 31965583608,
+    "rollbackPackage": "orbit360-fase-a-product-r4s3-294ed22bdb56.zip",
+    "rollbackPackageSha256": "1ab5f3ea7f59cd0c2eb2bb1f5c0596a4bf3ca241f42016f74bf095ccbaf0f78e",
     "rollbackPackagePreserved": true
   },
   "authStatus": {
     "status": "PASS_NOT_CURRENT_BLOCKER",
-    "lastProductionEvidenceRunId": 31961220051,
+    "lastProductionEvidenceRunId": 31965708561,
     "loginHttpStatus": 200,
     "signedIn": true,
     "emailVerified": true,
@@ -34,7 +35,7 @@
     "authChangesRequiredNow": false
   },
   "cliente360BatchSummaryRootfix": {
-    "status": "SOURCE_ROOTFIX_PASS_AND_PACKAGED_IN_R4S4",
+    "status": "SOURCE_ROOTFIX_PASS_AND_PUBLISHED_IN_R4S4",
     "productCommit": "54f671e64b32c7b39100d79e770572a579e79ac7",
     "productFile": "orbit360-platform/core/queries.js",
     "querySha256": "b906c1d3382a9fad310695b0ce2c8e7f49a2bf99fe9b9ed674a8df7e0fcbbb7b",
@@ -51,35 +52,44 @@
       "semanticEqual": true,
       "mismatchCount": 0
     },
-    "singleProductDeltaVerified": true
+    "singleProductDeltaVerified": true,
+    "reopenProductFixAuthorized": false
   },
   "validatorRoleRouteAttribution": {
-    "classification": "VALIDATOR_STALE_SECONDARY",
-    "failureFamily": "CUMULATIVE_ROLE_GROUP_BUDGET_AND_ROUTE_ATTRIBUTION",
-    "status": "SOURCE_ROOTFIX_PASS",
+    "classification": "VALIDATOR_STALE",
+    "failureFamily": "ROUTE_READINESS_8S_MASKS_30S_STAGE",
+    "status": "SOURCE_ROOTFIX_PASS_AFTER_R4S4_FINAL_MATRIX",
     "wrapper": "tools/orbit360-r4-role-route-attribution-wrapper-v20260816.mjs",
     "gate": "tools/orbit360-r4-role-route-attribution-gate-v20260816.mjs",
-    "validationRunId": 31964177636,
-    "validationJobId": 95206611728,
-    "artifactId": 9268029944,
-    "artifactDigest": "sha256:f4f9db37db1e1688e858a63e03f2f3f089d339813bda61dff9686c9b8be01213",
+    "runtimeFailureRunId": 31965708561,
+    "runtimeFailureJobId": 95210452139,
+    "runtimeFailureStage": "role-Dirección-route-cliente360",
+    "runtimeInitialClassification": "FUNCTIONAL_DEFECT",
+    "runtimeInitialFailureFamily": "R4_ROLE_ROUTE_STAGE_FAILED",
+    "routeStageBudgetMs": 30000,
+    "staleRouteReadinessBudgetMs": 8000,
+    "correctedRouteReadinessBudgetMs": 25000,
+    "correctedWrapperCommit": "ea04bac7ae28279370c9b63a53562413b9638c9b",
+    "correctedGateCommit": "81c5b196b101e14984d8488d1c50d4808e415b3c",
+    "sourceValidationRuns": [31966399464, 31966410400],
     "cumulativeRoleGroupRemoved": true,
     "roleActivationStagesBound": true,
     "perRouteStagesBound": true,
     "independentStageBudgetsBound": true,
     "swallowedRouteWaitRemoved": true,
     "routeReadinessFailurePropagates": true,
+    "routeReadinessBudgetAligned": true,
     "roleTimeoutAttributionSplit": true,
     "partialRoleEvidenceBound": true,
     "teamOwnRegressionPass": true,
     "watchdogPass": true,
-    "browserExecuted": false,
-    "secretAccess": false,
-    "dataAccess": false,
-    "operationalWrites": 0
+    "browserExecutedInCorrectiveValidation": false,
+    "secretAccessInCorrectiveValidation": false,
+    "dataAccessInCorrectiveValidation": false,
+    "operationalWritesInCorrectiveValidation": 0
   },
   "certifiedSuccessorR4S4": {
-    "status": "R4S4_MINIMAL_SUCCESSOR_DURABLE_CERTIFIED",
+    "status": "R4S4_MINIMAL_SUCCESSOR_DURABLE_CERTIFIED_AND_PUBLISHED",
     "certificationRunId": 31964568216,
     "certificationJobId": 95207631956,
     "zipName": "orbit360-fase-a-product-r4s4-54f671e64b32.zip",
@@ -99,30 +109,51 @@
     "evidenceArtifactId": 9268128341,
     "evidenceArtifactDigest": "sha256:b0c82bb4ab904994b88544fb9252229dba58283c9c22dc48b2fd545c2132c22d",
     "manifestStatus": "FASE_A_PRODUCT_R4S4_MINIMAL_SUCCESSOR_CERTIFIED",
-    "immutable": true,
-    "browserExecuted": false,
-    "secretAccess": false,
-    "dataAccess": false,
-    "deployExecuted": false,
-    "productionTouched": false
+    "immutable": true
   },
   "publication": {
     "target": "https://app.aysseguros.com",
     "documentRoot": "/home/ayssegur/public_html/app.aysseguros.com",
-    "authorizedPackage": "orbit360-fase-a-product-r4s4-54f671e64b32.zip",
-    "authorizedPackageSha256": "f266815e26da04a8c9e86b0db9414ca6c06bedb3cd9371f85e96c8d08e420d4c",
-    "status": "AUTHORIZED_PENDING_EXTERNAL_HOSTDIME_EXTRACTION",
-    "r4s3StillPublishedUntilStaticProof": true,
+    "publishedPackage": "orbit360-fase-a-product-r4s4-54f671e64b32.zip",
+    "publishedPackageSha256": "f266815e26da04a8c9e86b0db9414ca6c06bedb3cd9371f85e96c8d08e420d4c",
+    "status": "R4S4_PUBLIC_STATIC_IDENTITY_VERIFIED",
+    "staticVerificationRunId": 31965583608,
     "rollbackBase": "Exact R4S3 package/durable artifact preserved.",
-    "authenticatedHostdimeTransportAvailableToExecutor": false
+    "hostdimeManualExtractionCompleted": true,
+    "hostdimeActionRequiredNow": false
+  },
+  "runtimeFinalMatrix": {
+    "status": "CONSUMED_STOP_RETRY_VALIDATOR_STALE",
+    "runId": 31965708561,
+    "jobId": 95210452139,
+    "authorizedExecutionsConsumed": 1,
+    "postGoLiveSmokePass": false,
+    "firstFailedStage": "role-Dirección-route-cliente360",
+    "authPass": true,
+    "membershipPass": true,
+    "tenantPass": true,
+    "storeReadOnlyPass": true,
+    "directionScopeAllPass": true,
+    "inicioPass": true,
+    "clientes": 430,
+    "aseguradoras": 30,
+    "pageErrors": 0,
+    "consoleErrors": 0,
+    "httpFailures": 0,
+    "writeSignals": 0,
+    "firestoreWrites": 0,
+    "authWrites": 0,
+    "operationalWrites": 0
   },
   "browserFreeze": {
     "active": true,
     "sourceOnly": true,
     "workflow": ".github/workflows/orbit360-r4-certified-product-readonly-smoke-v20260815.yml",
-    "finalMatrixAuthorizedAfterR4S4StaticPass": true,
-    "maxFinalMatricesAuthorized": 1,
-    "browserRerunAllowedNow": false
+    "refreezeCommit": "576c3d051387bcfc540bb44924f991b968cf66fd",
+    "refreezeRunId": 31965848572,
+    "previousFinalMatrixAuthorizationConsumed": true,
+    "browserRerunAllowedNow": false,
+    "freshExplicitAuthorizationRequired": true
   },
   "progress": {
     "functionalReadinessPercent": 100,
@@ -136,24 +167,35 @@
     "validatorSecondaryFixAuthorizedAndConsumed": true,
     "successorPackageAuthorizedAndExecuted": true,
     "productionPublishAuthorizedForR4S4": true,
-    "finalReadonlyMatrixAuthorized": true,
+    "previousFinalReadonlyMatrixAuthorizationConsumed": true,
+    "newFinalReadonlyMatrixAuthorized": false,
+    "newRuntimeAuthorizationRequired": true,
     "reimportAuthorized": false,
     "authChangesAuthorized": false,
     "dataChangesAuthorized": false,
     "mainMergeAuthorized": false
   },
-  "nextActionExact": {
-    "stage": "R4S4_EXTERNAL_PUBLISH_THEN_STATIC_VERIFY_THEN_SINGLE_FINAL_MATRIX",
-    "action": "Preserve R4S3 rollback, extract only certified R4S4 into the existing app.aysseguros.com document root. Then statically verify exact R4S4 manifest and core/queries.js SHA. Only with PASS execute canonical gate, bind exact R4S4 smoke contract source-only, then execute exactly one corrected production read-only matrix for Dirección/Operativo/Asesor. Refreeze immediately."
+  "claudeImpact": {
+    "classification": "REPLICABLE_CLAUDE_ACUMULADO",
+    "scope": "Validator methodology only; no new frontend/product delta. Align nested readiness budgets with declared stage budgets and preserve STOP_RETRY semantics."
   },
-  "currentCheckpoint": "orbit360-platform/docs/CIERRE-R4S4-CERTIFICADA-PUBLICACION-PENDIENTE-20260816.md",
+  "academiaImpact": {
+    "classification": "ACADEMIA_ACTUALIZAR",
+    "scope": "Differentiate FUNCTIONAL_DEFECT from VALIDATOR_STALE; teach nested timeout versus stage budget consistency and why product/data must remain frozen when the validator is stale."
+  },
+  "nextActionExact": {
+    "stage": "R4S4_CORRECTED_FINAL_MATRIX_REQUIRES_FRESH_AUTHORIZATION",
+    "action": "Keep R4S4 exact and SOURCE_ONLY=true. Do not modify product, Auth or data. With fresh explicit authorization only, execute canonical/source-only gates and exactly one corrected read-only Dirección/Operativo/Asesor matrix using 30s route stages with 25s readiness, require zero writes and POST_GO_LIVE_SMOKE_PASS, then refreeze immediately. If the same stage/family fails again, STOP_RETRY without extending timeouts or creating another patch."
+  },
+  "currentCheckpoint": "orbit360-platform/docs/STOP-R4S4-FINAL-MATRIX-VALIDATOR-READINESS-BUDGET-20260816.md",
   "currentChangelog": "orbit360-platform/CHANGELOG-R4S3-GOLIVE-20260816.md",
   "readme": "orbit360-platform/README.md",
   "lastEvidence": {
-    "runId": 31964568216,
-    "jobId": 95207631956,
-    "durableArtifactId": 9268128540,
-    "evidenceArtifactId": 9268128341,
-    "result": "R4S4_MINIMAL_SUCCESSOR_DURABLE_CERTIFIED"
+    "runId": 31966410400,
+    "result": "R4S4_VALIDATOR_READINESS_BUDGET_SOURCE_ONLY_PASS",
+    "browserExecuted": false,
+    "secretAccess": false,
+    "dataAccess": false,
+    "operationalWrites": 0
   }
 }
