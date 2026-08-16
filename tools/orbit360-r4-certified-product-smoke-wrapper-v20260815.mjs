@@ -26,7 +26,8 @@ function validateContract(contract) {
   const allowedManifestStatuses = new Set([
     'FASE_A_PRODUCT_R3_DURABLE_PACKAGE_CERTIFIED',
     'FASE_A_PRODUCT_R4S1_MINIMAL_SUCCESSOR_CERTIFIED',
-    'FASE_A_PRODUCT_R4S2_MINIMAL_SUCCESSOR_CERTIFIED'
+    'FASE_A_PRODUCT_R4S2_MINIMAL_SUCCESSOR_CERTIFIED',
+    'FASE_A_PRODUCT_R4S3_MINIMAL_SUCCESSOR_CERTIFIED'
   ]);
   if (!allowedManifestStatuses.has(String(contract.manifestStatus || ''))) fail('CONTRACT_MANIFEST_STATUS_INVALID');
   if (contract.entrypoint?.path !== 'index.html' || Number(contract.entrypoint?.bytes) !== 16893 || !/^[a-f0-9]{64}$/.test(String(contract.entrypoint?.sha256 || ''))) fail('CONTRACT_ENTRYPOINT_INVALID');
