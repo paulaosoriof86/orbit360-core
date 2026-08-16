@@ -1,8 +1,8 @@
 {
   "schemaVersion": "orbit360-live-state-v1",
-  "stateVersion": "20260816.r4s5-minimal-successor-durable-certified.current",
-  "updatedAt": "2026-08-16T15:11:16-06:00",
-  "phase": "R4S5_MINIMAL_SUCCESSOR_DURABLE_CERTIFIED_NOT_PUBLISHED",
+  "stateVersion": "20260816.r4s5-publication-authorized-prepublish-pass-transport-boundary.current",
+  "updatedAt": "2026-08-16T15:19:25-06:00",
+  "phase": "R4S5_PUBLICATION_AUTHORIZED_PREPUBLISH_PASS_AWAITING_EXTERNAL_HOSTDIME_TRANSPORT",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pr": 5,
@@ -174,7 +174,7 @@
     "immutable": true
   },
   "certifiedSuccessorR4S5": {
-    "status": "R4S5_MINIMAL_SUCCESSOR_DURABLE_CERTIFIED_NOT_PUBLISHED",
+    "status": "R4S5_MINIMAL_SUCCESSOR_DURABLE_CERTIFIED_PREPUBLISH_PASS_AWAITING_HOSTDIME_TRANSPORT",
     "certificationRunId": 31972737482,
     "certificationJobId": 95227578912,
     "zipName": "orbit360-fase-a-product-r4s5-5474a1a9af64.zip",
@@ -194,6 +194,11 @@
     "durableArtifactDigest": "9adc9d53c1e1a1d2a2eb15223d63feadb849ac3f2abed0638dcf57b83a1852f4",
     "evidenceArtifactId": 9270227636,
     "evidenceArtifactDigest": "5aa4edb9606b01eaa0fc40ff3ec117a715be10876d876ebb5e23eae38c2ed763",
+    "prepublishRunId": 31973133583,
+    "prepublishJobId": 95228556232,
+    "prepublishEvidenceArtifactId": 9270333406,
+    "prepublishEvidenceDigest": "756b558b656c8f9aff0a69c3c605b33893aa554896ddb733ba6629302fa7996f",
+    "prepublishStatus": "R4S5_EXACT_ARTIFACT_PREPUBLISH_READY",
     "staticCertification": {
       "baseManifestExact": true,
       "basePhysicalTreeExact": true,
@@ -216,10 +221,16 @@
     "target": "https://app.aysseguros.com",
     "documentRoot": "/home/ayssegur/public_html/app.aysseguros.com",
     "publishedPackage": "orbit360-fase-a-product-r4s4-54f671e64b32.zip",
-    "status": "R4S4_PUBLIC_STATIC_IDENTITY_VERIFIED_UNCHANGED_R4S5_NOT_PUBLISHED",
+    "status": "R4S4_PUBLIC_STATIC_IDENTITY_VERIFIED_UNCHANGED_R4S5_AUTHORIZED_PREPUBLISH_PASS_AWAITING_EXTERNAL_TRANSPORT",
+    "classification": "ENVIRONMENT_FAILURE_HOSTDIME_AUTHENTICATED_TRANSPORT_UNAVAILABLE_TO_EXECUTOR",
     "staticVerificationRunId": 31965583608,
-    "rollbackBase": "Exact R4S3 package/durable artifact preserved.",
-    "hostdimeActionRequiredNow": false
+    "r4s5PrepublishRunId": 31973133583,
+    "r4s5PublicVerifierArmed": true,
+    "r4s5PublicVerifierWorkflow": ".github/workflows/orbit360-r4s5-public-identity-static-v20260816.yml",
+    "rollbackBase": "Exact R4S4 public package remains intact; exact R4S4 durable identity is the immediate publication rollback.",
+    "hostdimeActionRequiredNow": true,
+    "executorHasAuthenticatedHostdimeTransport": false,
+    "publicationPerformed": false
   },
   "runtimeFinalMatrix": {
     "status": "CONSUMED_STOP_RETRY_FUNCTIONAL_DEFECT",
@@ -273,7 +284,11 @@
     "clientProjectionSourceRootfixAuthorizedAndConsumed": true,
     "clientProjectionSourceGateAuthorizedAndConsumed": true,
     "successorPackageAuthorizedAndConsumed": true,
-    "productionPublishNewPackageAuthorized": false,
+    "productionPublishExactR4S5Authorized": true,
+    "productionPublishExactR4S5AuthorizationConsumed": false,
+    "publicStaticVerificationAuthorized": true,
+    "immediateSourceOnlyRefreezeAuthorized": true,
+    "hostdimeExactPublicationAuthorized": true,
     "newRuntimeAuthorizationRequired": true,
     "browserAuthorized": false,
     "deployAuthorized": false,
@@ -282,7 +297,6 @@
     "dataChangesAuthorized": false,
     "storeChangesAuthorized": false,
     "rulesChangesAuthorized": false,
-    "hostdimeChangesAuthorized": false,
     "mainMergeAuthorized": false
   },
   "claudeImpact": {
@@ -291,26 +305,25 @@
   },
   "academiaImpact": {
     "classification": "ACADEMIA_ACTUALIZAR",
-    "scope": "Teach batch/index versus N-times clone-on-read, semantic-preserving performance fixes, VALIDATOR_STALE when a gate demands an unreachable state, and Histórico as a separately governed semantic debt."
+    "scope": "Teach batch/index versus N-times clone-on-read, semantic-preserving performance fixes, VALIDATOR_STALE when a gate demands an unreachable state, Histórico as separately governed semantic debt, and distinguish product/package readiness from an external authenticated publication transport boundary."
   },
   "nextActionExact": {
-    "stage": "R4S5_CERTIFIED_PUBLICATION_REQUIRES_FRESH_AUTHORIZATION",
-    "action": "Keep public R4S4 exact and browser frozen. R4S5 is durable certified with ZIP SHA256 2d7a2ae75c5e6ef04c4759ff3438d41b8589d542fc20f14a603aaffb2053a1ac and artifact 9270227820. With fresh explicit authorization only, publish exactly this immutable R4S5 artifact without rebuilding it; perform static public identity verification and immediate refreeze. Any browser/runtime matrix requires separate explicit authorization after publication identity PASS."
+    "stage": "R4S5_PUBLICATION_AWAITING_EXTERNAL_HOSTDIME_TRANSPORT",
+    "action": "Public R4S4 remains exact. R4S5 artifact 9270227820 passed prepublish run 31973133583 and is ready without rebuild. The executor has no authenticated HostDime/cPanel/SFTP/FTP transport. Perform the single external handoff by uploading orbit360-fase-a-product-r4s5-5474a1a9af64.zip SHA256 2d7a2ae75c5e6ef04c4759ff3438d41b8589d542fc20f14a603aaffb2053a1ac to /home/ayssegur/public_html/app.aysseguros.com and extracting it there over the current R4S4 files. Then, under the already-active authorization, trigger the armed R4S5 public static identity verifier and only on PASS refreeze source-only. Do not run browser/runtime/matrix without separate authorization."
   },
-  "currentCheckpoint": "orbit360-platform/docs/R4S5-MINIMAL-SUCCESSOR-DURABLE-CERTIFIED-20260816.md",
+  "currentCheckpoint": "orbit360-platform/docs/STOP-R4S5-PUBLICATION-HOSTDIME-TRANSPORT-UNAVAILABLE-20260816.md",
   "currentChangelog": "orbit360-platform/CHANGELOG-R4S3-GOLIVE-20260816.md",
   "readme": "orbit360-platform/README.md",
   "lastEvidence": {
-    "runId": 31972737482,
-    "jobId": 95227578912,
-    "result": "R4S5_MINIMAL_SUCCESSOR_DURABLE_CERTIFIED",
+    "runId": 31973133583,
+    "jobId": 95228556232,
+    "result": "R4S5_EXACT_ARTIFACT_PREPUBLISH_READY",
+    "prepublishEvidenceArtifactId": 9270333406,
+    "prepublishEvidenceDigest": "756b558b656c8f9aff0a69c3c605b33893aa554896ddb733ba6629302fa7996f",
     "durableArtifactId": 9270227820,
     "durableArtifactDigest": "9adc9d53c1e1a1d2a2eb15223d63feadb849ac3f2abed0638dcf57b83a1852f4",
-    "evidenceArtifactId": 9270227636,
-    "evidenceArtifactDigest": "5aa4edb9606b01eaa0fc40ff3ec117a715be10876d876ebb5e23eae38c2ed763",
     "zipSha256": "2d7a2ae75c5e6ef04c4759ff3438d41b8589d542fc20f14a603aaffb2053a1ac",
-    "semanticEqual": true,
-    "mismatchCount": 0,
+    "currentPublicVersion": "R4S4",
     "browserExecuted": false,
     "runtimeExecuted": false,
     "secretAccess": false,
