@@ -1,5 +1,6 @@
 name: Orbit360 R4S2 Public Identity Static 20260815
 
+# reverify after user-confirmed HostDime extraction 2026-08-16
 on:
   push:
     branches: [ays/backend-tenant-lab-v99-20260703]
