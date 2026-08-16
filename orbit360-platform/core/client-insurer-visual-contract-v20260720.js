@@ -83,14 +83,34 @@
       return +(Orbit.tenant && Orbit.tenant.segmentacion && Orbit.tenant.segmentacion.premiumPrimaNetaRecaudada) || +(Orbit.config && Orbit.config.segmentacion && Orbit.config.segmentacion.premiumPrimaNetaRecaudada) || 0;
     } catch (e) { return 0; }
   }
-  function segmentFor(row) {
-    var policies = rawRows('polizas').filter(function (p) { return p && p.clienteId === row.id; });
+  function buildSegmentationContext(readAll) {
+    var threshold = premiumThreshold(), policies = [], collections = [], policiesByClient = new Map(), collectedByClient = new Map();
+    try { policies = typeof readAll === 'function' ? (readAll('polizas') || []) : rawRows('polizas'); } catch (e) { policies = []; }
+    policies.forEach(function (p) {
+      if (!p || p.clienteId == null) return;
+      var rows = policiesByClient.get(p.clienteId);
+      if (!rows) { rows = []; policiesByClient.set(p.clienteId, rows); }
+      rows.push(p);
+    });
+    if (threshold > 0) {
+      try { collections = typeof readAll === 'function' ? (readAll('cobros') || []) : rawRows('cobros'); } catch (e2) { collections = []; }
+      collections.forEach(function (c) {
+        if (!c || c.clienteId == null || c.estado !== 'Pagado' || c.conciliado !== true) return;
+        collectedByClient.set(c.clienteId, (collectedByClient.get(c.clienteId) || 0) + (+c.neta || 0));
+      });
+    }
+    return { batched: true, threshold: threshold, policiesByClient: policiesByClient, collectedByClient: collectedByClient, policyRowCount: policies.length, collectionRowCount: collections.length };
+  }
+  function segmentFor(row, context) {
+    var indexedPolicies = context && context.policiesByClient && typeof context.policiesByClient.get === 'function';
+    var policies = indexedPolicies ? (context.policiesByClient.get(row.id) || []) : rawRows('polizas').filter(function (p) { return p && p.clienteId === row.id; });
     if (!policies.length) return 'Pendiente de clasificar';
     var active = policies.filter(function (p) { return p.estado === 'Vigente' || p.estado === 'Por renovar'; });
     var historical = policies.filter(function (p) { return active.indexOf(p) < 0; });
-    var threshold = premiumThreshold();
+    var threshold = context && context.batched === true ? context.threshold : premiumThreshold();
     if (threshold > 0) {
-      var collected = rawRows('cobros').filter(function (c) { return c && c.clienteId === row.id && c.estado === 'Pagado' && c.conciliado === true; }).reduce(function (sum,c) { return sum + (+c.neta || 0); },0);
+      var indexedCollections = context && context.collectedByClient && typeof context.collectedByClient.get === 'function';
+      var collected = indexedCollections ? (+context.collectedByClient.get(row.id) || 0) : rawRows('cobros').filter(function (c) { return c && c.clienteId === row.id && c.estado === 'Pagado' && c.conciliado === true; }).reduce(function (sum,c) { return sum + (+c.neta || 0); },0);
       if (collected >= threshold) return 'Premium';
     }
     if (active.length >= 2 || historical.length > 0 || active.some(function (p) { return p.esRenovacion === true || p.renovadaDe || p.renovacionOrigenId; })) return 'Recurrente';
@@ -108,12 +128,12 @@
     telefono:['telefono','whatsapp','telefonoAlterno','contactoPrincipalTelefono'], ciudad:['ciudad','ciudadMunicipio','canton'], departamento:['departamento','departamentoProvincia','provincia'],
     pais:['pais','paisCodigo','codigoPais','country','nacionalidad'], fechaAlta:['fechaAlta','fechaAltaOrigen','fechaCreacion','creadoEn','createdAt'], fechaNac:['fechaNac','fechaNacimiento'], driveLink:['driveLink','drive','expedienteUrl']
   };
-  function projectClient(row) {
+  function projectClient(row, segmentationContext) {
     if (!row || typeof row !== 'object') return row;
     var out = clone(row);
     Object.keys(CLIENT_ALIAS).forEach(function (key) { var value = pick(row,CLIENT_ALIAS[key]); if (value !== '' || out[key] === undefined) out[key] = value || out[key] || ''; });
     out.tipo = normalizeType(out.tipo || out.tipoPersona,out); out.pais = normalizeCountry(out.pais); out.fechaAlta = normalizeDate(out.fechaAlta); out.fechaNac = normalizeDate(out.fechaNac);
-    out.moneda = clean(out.moneda || (out.pais === 'CO' ? 'COP' : out.pais === 'GT' ? 'GTQ' : '')); out.segmentoOrigen = clean(out.segmento || ''); out.segmento = segmentFor(out);
+    out.moneda = clean(out.moneda || (out.pais === 'CO' ? 'COP' : out.pais === 'GT' ? 'GTQ' : '')); out.segmentoOrigen = clean(out.segmento || ''); out.segmento = segmentFor(out, segmentationContext);
     out.canal = clean(out.canal || out.canalOrigen || 'Migración'); out.etiquetas = Array.isArray(out.etiquetas) ? out.etiquetas.slice() : []; out.__canonicalVisualProjection = '20260720.2'; return out;
   }
 
@@ -124,7 +144,12 @@
     var nativeAll = previous && previous.nativeAll || store.all.bind(store);
     var nativeWhere = previous && previous.nativeWhere || store.where && store.where.bind(store);
     var nativeFind = previous && previous.nativeFind || store.find && store.find.bind(store);
-    function projectedAll(collection) { var rows = nativeAll(collection) || []; return collection === 'clientes' ? rows.map(projectClient) : rows; }
+    function projectedAll(collection) {
+      var rows = nativeAll(collection) || [];
+      if (collection !== 'clientes') return rows;
+      var segmentationContext = buildSegmentationContext(nativeAll);
+      return rows.map(function (row) { return projectClient(row, segmentationContext); });
+    }
     function evaluate(rows,args) {
       var f=args[1], ov=args[2], mv=args[3];
       if (typeof f === 'function') return rows.filter(function(r){ try{return !!f(r);}catch(e){return false;} });
@@ -135,7 +160,7 @@
     store.all=function(collection){return projectedAll(collection);};
     if(nativeWhere) store.where=function(){return arguments[0]==='clientes'?evaluate(projectedAll('clientes'),arguments):nativeWhere.apply(store,arguments);};
     if(nativeFind) store.find=function(collection,predicate){if(collection!=='clientes')return nativeFind.apply(store,arguments);if(typeof predicate==='function')return projectedAll('clientes').find(predicate)||null;if(predicate&&typeof predicate==='object')return evaluate(projectedAll('clientes'),[collection,predicate])[0]||null;return null;};
-    store.__clientCanonicalReadProjectionV20260720={version:'20260720.2',writesStore:false,reimportsData:false,nativeAll:nativeAll,nativeWhere:nativeWhere,nativeFind:nativeFind};
+    store.__clientCanonicalReadProjectionV20260720={version:'20260720.2',writesStore:false,reimportsData:false,nativeAll:nativeAll,nativeWhere:nativeWhere,nativeFind:nativeFind,segmentationBatchRevision:'20260816.1'};
   }
   installClientReadProjection();
   Orbit.clientCountryEvidence={version:'20260720.2',evaluate:countryEvidence,writesStore:false,silentAutoClassification:false};
@@ -234,6 +259,6 @@
   });
   observerHost=document.getElementById('host');if(observerHost&&window.MutationObserver){canonicalObserver=new MutationObserver(handleCanonicalMutations);observeCanonicalOwner();}window.addEventListener('hashchange',schedule);document.addEventListener('orbit:session',schedule);window.addEventListener('orbit:store:emit',schedule);
   document.documentElement.classList.add('orbit-m1-stable-ui');
-  Orbit.clientInsurerVisualContractV20260720={version:'20260720.2',idempotenceRevision:'20260721.4',visualRemediationRevision:'20260722.1',clientProjection:true,countryEvidenceProposalOnly:true,segmentationReadOnly:true,insurerSemanticView:true,secureCredentialActions:true,credentialUserAlwaysSeparate:true,credentialSecretSeparateReveal:true,completeBankCopy:true,bankCopyExcludesUse:true,bankHolderFallbackInsurer:true,visualStability:true,synchronousMutationOwner:true,mutationMode:'same-microtask-disconnect-own-writes',observerOwnMutations:false,idempotentDomWrites:true,client360StructuralTrigger:true,writesStore:false,reimportsData:false,exposesSecrets:false,enhance:runEnhance};
+  Orbit.clientInsurerVisualContractV20260720={version:'20260720.2',idempotenceRevision:'20260721.4',visualRemediationRevision:'20260722.1',clientProjection:true,countryEvidenceProposalOnly:true,segmentationReadOnly:true,insurerSemanticView:true,secureCredentialActions:true,credentialUserAlwaysSeparate:true,credentialSecretSeparateReveal:true,completeBankCopy:true,bankCopyExcludesUse:true,bankHolderFallbackInsurer:true,visualStability:true,synchronousMutationOwner:true,mutationMode:'same-microtask-disconnect-own-writes',observerOwnMutations:false,idempotentDomWrites:true,client360StructuralTrigger:true,clientProjectionBatchRevision:'20260816.1',writesStore:false,reimportsData:false,exposesSecrets:false,enhance:runEnhance};
   schedule();
 })();
