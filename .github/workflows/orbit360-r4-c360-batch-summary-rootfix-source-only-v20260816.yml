@@ -1,0 +1,64 @@
+name: Orbit360 R4 Cliente360 Batch Summary Rootfix Source Only 20260816
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/workflows/orbit360-r4-c360-batch-summary-rootfix-source-only-v20260816.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Canonical gate first — source only
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+          jq -e '.ok==true and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false and .secretAccess==false and .dataAccess==false and .operationalWrites==0' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+      - name: Cliente360 boundedness gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="$EVIDENCE_DIR/r4-cliente360-summary-boundedness-gate-postfix-v20260816.json"
+          ORBIT360_R4_C360_BOUNDEDNESS_OUT="$OUT" node tools/orbit360-r4-cliente360-summary-boundedness-gate-v20260816.mjs
+          jq -e '.ok==true and .status=="CLIENTE360_SUMMARY_BOUNDEDNESS_GATE_PASS" and .classification=="PASS" and .boundedMetrics.allCalls<=8 and .boundedMetrics.getCalls<=10 and .boundedMetrics.cloneRows<=20000 and .browserExecuted==false and .secretAccess==false and .dataAccess==false and .productionTouched==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0' "$OUT" >/dev/null
+      - name: Cliente360 semantic regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="$EVIDENCE_DIR/r4-cliente360-summary-semantic-regression-v20260816.json"
+          ORBIT360_R4_C360_SEMANTIC_OUT="$OUT" node tools/orbit360-r4-cliente360-summary-semantic-regression-v20260816.mjs
+          jq -e '.ok==true and .status=="CLIENTE360_SUMMARY_SEMANTIC_REGRESSION_PASS" and .semanticEqual==true and .mapShape==true and .apiPreserved==true and .batchMetrics.allCalls==4 and .batchMetrics.getCalls==0 and .batchMetrics.whereCalls==0 and .browserExecuted==false and .secretAccess==false and .dataAccess==false and .productionTouched==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0' "$OUT" >/dev/null
+      - name: Assert single product delta and browser freeze
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE=8323dd604f438bb285ab93ee47f66b4cd5d45eef
+          mapfile -t PRODUCT_FILES < <(git diff --name-only "$BASE"..HEAD -- orbit360-platform/core orbit360-platform/modules orbit360-platform/data)
+          test "${#PRODUCT_FILES[@]}" -eq 1
+          test "${PRODUCT_FILES[0]}" = "orbit360-platform/core/queries.js"
+          grep -F "ORBIT360_R4_CERTIFIED_SOURCE_ONLY: 'true'" .github/workflows/orbit360-r4-certified-product-readonly-smoke-v20260815.yml >/dev/null
+          test -z "$(git status --porcelain -- orbit360-platform/core orbit360-platform/modules orbit360-platform/data)"
+      - name: Upload sanitized evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-r4-c360-batch-summary-rootfix-source-only-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/r4-cliente360-summary-boundedness-gate-postfix-v20260816.json
+            orbit360-platform/runtime-gate-crm-v20260716/r4-cliente360-summary-semantic-regression-v20260816.json
+          retention-days: 30
