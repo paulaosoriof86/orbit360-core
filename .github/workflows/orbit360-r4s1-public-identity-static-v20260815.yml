@@ -1,0 +1,90 @@
+name: Orbit360 R4S1 Public Identity Static 20260815
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/workflows/orbit360-r4s1-public-identity-static-v20260815.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: orbit360-r4s1-public-identity-static-v20260815
+  cancel-in-progress: false
+
+env:
+  TARGET: https://app.aysseguros.com
+  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+  EXPECTED_INDEX_SHA: 125b24a3fc215a368a7183a107cd55eb5a6332fc8a7f8354ed94e3169340ec4e
+  EXPECTED_MANIFEST_SHA: 7d145264c8defaac0aa2928e4412e62a51826b8d0abac7cc44ff3195cb60dbbe
+  EXPECTED_ACCESS_SHA: 8976ab8032f210a0f93d79f4ace037ec3b3e8fe8c1ac9e1f5a0eadd8d134fb3f
+  EXPECTED_AUTH_SHA: d0bb399fe0e1dd102a03950673044eda5bc8d181e4e98cf477d22d141aa7b3a8
+
+jobs:
+  static-identity:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Canonical gate before any production observation
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+          jq -e '.ok==true and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+      - name: Verify exact public R4S1 bytes
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/r4s1-public" "$EVIDENCE_DIR"
+          UA='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/142.0.0.0 Safari/537.36'
+          fetch_exact() {
+            local rel="$1" out="$2"
+            curl --http1.1 -L --fail --silent --show-error --connect-timeout 15 --max-time 45 \
+              -A "$UA" -H 'Cache-Control: no-cache, no-store, max-age=0' -H 'Pragma: no-cache' \
+              "$TARGET/$rel?orbit360_r4s1_verify=${GITHUB_RUN_ID}" -o "$out"
+          }
+          fetch_exact 'index.html' "$RUNNER_TEMP/r4s1-public/index.html"
+          fetch_exact 'orbit360-package-manifest.json' "$RUNNER_TEMP/r4s1-public/manifest.json"
+          fetch_exact 'core/access-scope.js' "$RUNNER_TEMP/r4s1-public/access-scope.js"
+          fetch_exact 'core/auth-product-runtime-p0.js' "$RUNNER_TEMP/r4s1-public/auth-product-runtime-p0.js"
+
+          INDEX_SHA=$(sha256sum "$RUNNER_TEMP/r4s1-public/index.html" | awk '{print $1}')
+          MANIFEST_SHA=$(sha256sum "$RUNNER_TEMP/r4s1-public/manifest.json" | awk '{print $1}')
+          ACCESS_SHA=$(sha256sum "$RUNNER_TEMP/r4s1-public/access-scope.js" | awk '{print $1}')
+          AUTH_SHA=$(sha256sum "$RUNNER_TEMP/r4s1-public/auth-product-runtime-p0.js" | awk '{print $1}')
+
+          test "$INDEX_SHA" = "$EXPECTED_INDEX_SHA"
+          test "$MANIFEST_SHA" = "$EXPECTED_MANIFEST_SHA"
+          test "$ACCESS_SHA" = "$EXPECTED_ACCESS_SHA"
+          test "$AUTH_SHA" = "$EXPECTED_AUTH_SHA"
+
+          jq -e '.schemaVersion=="orbit360-fase-a-product-package-manifest-v1" and .status=="FASE_A_PRODUCT_R4S1_MINIMAL_SUCCESSOR_CERTIFIED" and .sourceHead=="df4c217c34722c03215f88b62f6865ab41c2a9f3" and .fileCount==194 and ([.files[]|select(.path=="core/access-scope.js" and .bytes==23908 and .sha256=="8976ab8032f210a0f93d79f4ace037ec3b3e8fe8c1ac9e1f5a0eadd8d134fb3f")]|length)==1' "$RUNNER_TEMP/r4s1-public/manifest.json" >/dev/null
+
+          jq -n \
+            --arg status 'R4S1_PUBLIC_IDENTITY_STATIC_PASS' \
+            --arg classification 'PASS' \
+            --arg indexSha "$INDEX_SHA" \
+            --arg manifestSha "$MANIFEST_SHA" \
+            --arg accessSha "$ACCESS_SHA" \
+            --arg authSha "$AUTH_SHA" \
+            '{ok:true,status:$status,classification:$classification,target:"https://app.aysseguros.com",manifestStatus:"FASE_A_PRODUCT_R4S1_MINIMAL_SUCCESSOR_CERTIFIED",fileCount:194,indexSha256:$indexSha,manifestSha256:$manifestSha,accessScopeSha256:$accessSha,authProductSha256:$authSha,secretAccess:false,dataAccess:false,runtimeExecuted:false,browserExecuted:false,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,packageRebuilt:false,productionMutation:false,containsPII:false,containsSecrets:false}' \
+            > "$EVIDENCE_DIR/r4s1-public-identity-static-v20260815.json"
+          jq -e '.ok==true and .status=="R4S1_PUBLIC_IDENTITY_STATIC_PASS" and .browserExecuted==false and .secretAccess==false and .dataAccess==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .productionMutation==false' "$EVIDENCE_DIR/r4s1-public-identity-static-v20260815.json" >/dev/null
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: orbit360-r4s1-public-identity-static-evidence-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/r4s1-public-identity-static-v20260815.json
+          if-no-files-found: warn
+          retention-days: 14
