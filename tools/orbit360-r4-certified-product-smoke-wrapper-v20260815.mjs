@@ -96,5 +96,5 @@ if (process.argv.includes('--self-test')) {
   try {
     const child = spawnSync(process.execPath, [temp], { cwd: ROOT, stdio: 'inherit', env: { ...process.env, ORBIT360_R4_EXPECTED_AUTH_SHA256: contract.authAsset.sha256, ORBIT360_R4_CERTIFIED_AUTH_ASSET_PATH: contract.authAsset.path, ORBIT360_R4_CERTIFIED_ENTRYPOINT_SHA256: contract.entrypoint.sha256, ORBIT360_R4_CERTIFIED_PACKAGE_SHA256: contract.zipSha256 } });
     if (child.error) throw child.error; process.exitCode = Number.isInteger(child.status) ? child.status : 41;
-  } finally { try { fs.unlinkSync(temp); } catch {}
+  } finally { try { fs.unlinkSync(temp); } catch {} }
 }
