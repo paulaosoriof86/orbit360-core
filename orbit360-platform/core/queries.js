@@ -49,6 +49,57 @@ Orbit.q = (function () {
     };
   }
 
+  /**
+   * Índice batched para la lista de Cliente 360.
+   * Preserva exactamente la semántica de clienteResumen para clientes existentes,
+   * pero resuelve las cuatro colecciones una sola vez y evita N×clone en el store
+   * productivo read-only.
+   */
+  function clientesResumenIndex() {
+    const clientes = S().all('clientes') || [];
+    const polizas = S().all('polizas') || [];
+    const cobros = S().all('cobros') || [];
+    const comisiones = S().all('comisiones') || [];
+    const polByClient = new Map();
+    const cobByClient = new Map();
+    const comByClient = new Map();
+    const add = (map, id, row) => {
+      if (!map.has(id)) map.set(id, []);
+      map.get(id).push(row);
+    };
+    polizas.forEach(p => add(polByClient, p.clienteId, p));
+    cobros.forEach(c => add(cobByClient, c.clienteId, c));
+    comisiones.forEach(c => add(comByClient, c.clienteId, c));
+
+    const index = new Map();
+    clientes.forEach(cli => {
+      if (!cli || cli.id == null) return;
+      const pol = polByClient.get(cli.id) || [];
+      const cob = cobByClient.get(cli.id) || [];
+      const com = comByClient.get(cli.id) || [];
+      const vigentes = pol.filter(p => p.estado === 'Vigente' || p.estado === 'Por renovar');
+      const primaAnual = vigentes.reduce((s, p) => s + p.prima, 0);
+      const cobrado = cob.filter(c => c.estado === 'Pagado').reduce((s, c) => s + c.monto, 0);
+      const pendiente = cob.filter(c => c.estado === 'Pendiente').reduce((s, c) => s + c.monto, 0);
+      const vencido = cob.filter(c => c.estado === 'Vencido').reduce((s, c) => s + c.monto, 0);
+      const comisionGen = com.reduce((s, c) => s + c.monto, 0);
+      const porRenovar = pol.filter(p => p.estado === 'Por renovar').length;
+      let salud = 70;
+      salud += Math.min(20, vigentes.length * 6);
+      salud -= vencido > 0 ? 25 : 0;
+      salud += cli.segmento === 'Premium' ? 8 : 0;
+      salud = Math.max(8, Math.min(100, salud));
+      index.set(cli.id, {
+        cli, pol, cob, com,
+        moneda: cli.moneda,
+        nPolizas: pol.length, nVigentes: vigentes.length,
+        primaAnual, cobrado, pendiente, vencido, comisionGen, porRenovar,
+        salud
+      });
+    });
+    return index;
+  }
+
   // ---- globales ----
   // Moneda por país: cuando hay un país activo, NO se convierte (montos nativos).
   // Solo en la vista global mixta ('TODOS') se normaliza con una tasa DECLARADA (COP↔GTQ ≈ /1000).
@@ -134,7 +185,7 @@ Orbit.q = (function () {
 
   return {
     asesor, aseguradora, polizasDe, cobrosDe, comisionesDe, actividadesDe, cancelacionesDe,
-    clienteResumen, carteraGlobal, primaVigenteGlobal, renovacionesProximas, cobrosVencidos, leaderboard,
+    clienteResumen, clientesResumenIndex, carteraGlobal, primaVigenteGlobal, renovacionesProximas, cobrosVencidos, leaderboard,
     agingVencido, comisionesPor, clienteNombre, norm, monedaPais, vehiculosDe, vehiculoDePoliza, postRecaudo
   };
 })();
