@@ -1,0 +1,57 @@
+name: Orbit360 R4S5 Client Projection Batch Source Gate 20260816
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - 'orbit360-platform/core/client-insurer-visual-contract-v20260720.js'
+      - 'tools/orbit360-r4s5-client-projection-batch-rootfix-gate-v20260816.mjs'
+      - '.github/workflows/orbit360-r4s5-client-projection-batch-source-gate-v20260816.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: orbit360-r4s5-client-projection-batch-source-gate-v20260816
+  cancel-in-progress: false
+
+env:
+  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+
+jobs:
+  source-gate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Canonical gate before source-only rootfix validation
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+          jq -e '.ok==true and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+      - name: Validate client projection batch rootfix source-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check orbit360-platform/core/client-insurer-visual-contract-v20260720.js
+          node --check tools/orbit360-r4s5-client-projection-batch-rootfix-gate-v20260816.mjs
+          OUT="$EVIDENCE_DIR/r4s5-client-projection-batch-rootfix-source-v20260816.json"
+          ORBIT360_CLIENT_PROJECTION_GATE_OUT="$OUT" node tools/orbit360-r4s5-client-projection-batch-rootfix-gate-v20260816.mjs
+          jq -e '.ok==true and .status=="R4S5_CLIENT_PROJECTION_BATCH_ROOTFIX_SOURCE_PASS" and .classification=="FUNCTIONAL_DEFECT_ROOTFIX_SOURCE_PROVEN" and .fixture.clientes==430 and .fixture.polizas==1375 and .fixture.cobros==1900 and .semanticEqual==true and .mismatchCount==0 and .batch.all.allCalls==3 and .batch.all.cloneRows==3705 and .batch.where.allCalls==3 and .batch.find.allCalls==3 and .reduction.allCallRatio>100 and .reduction.cloneRowRatio>100 and .queriesSha256MatchesCertifiedR4S4==true and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .browserExecuted==false and .secretAccess==false and .dataAccess==false and .deployExecuted==false and .productionTouched==false and .packageRebuilt==false and .containsPII==false and .containsSecrets==false' "$OUT" >/dev/null
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: orbit360-r4s5-client-projection-batch-source-evidence-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/r4s5-client-projection-batch-rootfix-source-v20260816.json
+          if-no-files-found: warn
+          retention-days: 14
