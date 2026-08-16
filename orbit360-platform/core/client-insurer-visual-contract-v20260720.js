@@ -11,7 +11,7 @@
   'use strict';
   window.Orbit = window.Orbit || {};
   var Orbit = window.Orbit;
-  if (Orbit.clientInsurerVisualContractV20260720 && Orbit.clientInsurerVisualContractV20260720.version === '20260720.2' && Orbit.clientInsurerVisualContractV20260720.visualRemediationRevision === '20260722.1') return;
+  if (Orbit.clientInsurerVisualContractV20260720 && Orbit.clientInsurerVisualContractV20260720.version === '20260720.2' && Orbit.clientInsurerVisualContractV20260720.visualRemediationRevision === '20260722.1' && Orbit.clientInsurerVisualContractV20260720.clientProjectionReadCacheRevision === '20260816.2') return;
 
   function clean(value) { return String(value == null ? '' : value).trim(); }
   function normalized(value) { return clean(value).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, ' ').trim(); }
@@ -83,9 +83,16 @@
       return +(Orbit.tenant && Orbit.tenant.segmentacion && Orbit.tenant.segmentacion.premiumPrimaNetaRecaudada) || +(Orbit.config && Orbit.config.segmentacion && Orbit.config.segmentacion.premiumPrimaNetaRecaudada) || 0;
     } catch (e) { return 0; }
   }
-  function buildSegmentationContext(readAll) {
-    var threshold = premiumThreshold(), policies = [], collections = [], policiesByClient = new Map(), collectedByClient = new Map();
-    try { policies = typeof readAll === 'function' ? (readAll('polizas') || []) : rawRows('polizas'); } catch (e) { policies = []; }
+  var segmentationContextCache = { epoch: 0, threshold: null, context: null, builds: 0, hits: 0, invalidations: 0, batchReads: 0 };
+  function invalidateSegmentationContext() {
+    segmentationContextCache.epoch += 1;
+    segmentationContextCache.threshold = null;
+    segmentationContextCache.context = null;
+    segmentationContextCache.invalidations += 1;
+  }
+  function buildSegmentationContext(readAll, preloaded) {
+    var threshold = premiumThreshold(), policies = [], collections = [], policiesByClient = new Map(), collectedByClient = new Map(), collectionsComplete = false;
+    try { policies = preloaded && Array.isArray(preloaded.polizas) ? preloaded.polizas : (typeof readAll === 'function' ? (readAll('polizas') || []) : rawRows('polizas')); } catch (e) { policies = []; }
     policies.forEach(function (p) {
       if (!p || p.clienteId == null) return;
       var rows = policiesByClient.get(p.clienteId);
@@ -93,13 +100,14 @@
       rows.push(p);
     });
     if (threshold > 0) {
-      try { collections = typeof readAll === 'function' ? (readAll('cobros') || []) : rawRows('cobros'); } catch (e2) { collections = []; }
+      try { collections = preloaded && Array.isArray(preloaded.cobros) ? preloaded.cobros : (typeof readAll === 'function' ? (readAll('cobros') || []) : rawRows('cobros')); } catch (e2) { collections = []; }
+      collectionsComplete = true;
       collections.forEach(function (c) {
         if (!c || c.clienteId == null || c.estado !== 'Pagado' || c.conciliado !== true) return;
         collectedByClient.set(c.clienteId, (collectedByClient.get(c.clienteId) || 0) + (+c.neta || 0));
       });
     }
-    return { batched: true, threshold: threshold, policiesByClient: policiesByClient, collectedByClient: collectedByClient, policyRowCount: policies.length, collectionRowCount: collections.length };
+    return { batched: true, threshold: threshold, policiesByClient: policiesByClient, collectedByClient: collectedByClient, policyRowCount: policies.length, collectionRowCount: collections.length, policies: policies, collections: collections, collectionsComplete: collectionsComplete };
   }
   function segmentFor(row, context) {
     var indexedPolicies = context && context.policiesByClient && typeof context.policiesByClient.get === 'function';
@@ -140,14 +148,29 @@
   function installClientReadProjection() {
     var store = Orbit.store; if (!store) return;
     var previous = store.__clientCanonicalReadProjectionV20260720;
-    if (previous && previous.version === '20260720.2') return;
+    if (previous && previous.version === '20260720.2' && previous.segmentationBatchRevision === '20260816.2') return;
     var nativeAll = previous && previous.nativeAll || store.all.bind(store);
     var nativeWhere = previous && previous.nativeWhere || store.where && store.where.bind(store);
     var nativeFind = previous && previous.nativeFind || store.find && store.find.bind(store);
+    var activeReadBatch = null;
+    function cachedSegmentationContext() {
+      var threshold = premiumThreshold();
+      if (segmentationContextCache.context && segmentationContextCache.threshold === threshold) {
+        segmentationContextCache.hits += 1;
+        return segmentationContextCache.context;
+      }
+      if (segmentationContextCache.context && segmentationContextCache.threshold !== threshold) invalidateSegmentationContext();
+      var context = buildSegmentationContext(nativeAll);
+      segmentationContextCache.threshold = threshold;
+      segmentationContextCache.context = context;
+      segmentationContextCache.builds += 1;
+      return context;
+    }
     function projectedAll(collection) {
+      if (activeReadBatch && Object.prototype.hasOwnProperty.call(activeReadBatch.rows, collection)) return activeReadBatch.rows[collection].slice();
       var rows = nativeAll(collection) || [];
       if (collection !== 'clientes') return rows;
-      var segmentationContext = buildSegmentationContext(nativeAll);
+      var segmentationContext = cachedSegmentationContext();
       return rows.map(function (row) { return projectClient(row, segmentationContext); });
     }
     function evaluate(rows,args) {
@@ -157,15 +180,45 @@
       var op=args.length>=4?ov:'==', value=args.length>=4?mv:ov;
       return rows.filter(function(r){if(!r)return false;if(op==='=='||op==='=')return r[f]===value;if(op==='!=')return r[f]!==value;if(op==='>')return r[f]>value;if(op==='>=')return r[f]>=value;if(op==='<')return r[f]<value;if(op==='<=')return r[f]<=value;if(op==='array-contains')return Array.isArray(r[f])&&r[f].indexOf(value)>=0;return r[f]===value;});
     }
+    function withReadBatch(collections, callback) {
+      if (typeof callback !== 'function') throw new Error('CLIENT_PROJECTION_READ_BATCH_CALLBACK_REQUIRED');
+      if (activeReadBatch) return callback(activeReadBatch.rows);
+      var requested = Array.from(new Set((Array.isArray(collections) ? collections : []).concat(['clientes'])));
+      var context = cachedSegmentationContext(), rows = {};
+      requested.forEach(function (collection) {
+        if (collection === 'clientes') {
+          rows.clientes = (nativeAll('clientes') || []).map(function (row) { return projectClient(row, context); });
+        } else if (collection === 'polizas') {
+          rows.polizas = context.policies;
+        } else if (collection === 'cobros' && context.collectionsComplete) {
+          rows.cobros = context.collections;
+        } else {
+          rows[collection] = nativeAll(collection) || [];
+        }
+      });
+      activeReadBatch = { rows: rows };
+      segmentationContextCache.batchReads += 1;
+      try {
+        var result = callback(rows);
+        if (result && typeof result.then === 'function') throw new Error('CLIENT_PROJECTION_READ_BATCH_MUST_BE_SYNC');
+        return result;
+      } finally { activeReadBatch = null; }
+    }
+    function performanceState() {
+      return { revision:'20260816.2', epoch:segmentationContextCache.epoch, builds:segmentationContextCache.builds, hits:segmentationContextCache.hits, invalidations:segmentationContextCache.invalidations, batchReads:segmentationContextCache.batchReads, threshold:segmentationContextCache.threshold };
+    }
     store.all=function(collection){return projectedAll(collection);};
     if(nativeWhere) store.where=function(){return arguments[0]==='clientes'?evaluate(projectedAll('clientes'),arguments):nativeWhere.apply(store,arguments);};
     if(nativeFind) store.find=function(collection,predicate){if(collection!=='clientes')return nativeFind.apply(store,arguments);if(typeof predicate==='function')return projectedAll('clientes').find(predicate)||null;if(predicate&&typeof predicate==='object')return evaluate(projectedAll('clientes'),[collection,predicate])[0]||null;return null;};
-    store.__clientCanonicalReadProjectionV20260720={version:'20260720.2',writesStore:false,reimportsData:false,nativeAll:nativeAll,nativeWhere:nativeWhere,nativeFind:nativeFind,segmentationBatchRevision:'20260816.1'};
+    if (typeof store.on === 'function') {
+      try { store.on(function (collection) { if (collection === '*' || collection === 'polizas' || collection === 'cobros') invalidateSegmentationContext(); }); } catch (e) {}
+    }
+    store.__clientCanonicalReadProjectionV20260720={version:'20260720.2',writesStore:false,reimportsData:false,nativeAll:nativeAll,nativeWhere:nativeWhere,nativeFind:nativeFind,segmentationBatchRevision:'20260816.2',withReadBatch:withReadBatch,performanceState:performanceState};
   }
   installClientReadProjection();
   Orbit.clientCountryEvidence={version:'20260720.2',evaluate:countryEvidence,writesStore:false,silentAutoClassification:false};
   Orbit.clientSegmentation={version:'20260720.2',options:SEGMENTS.slice(),classify:segmentFor,criteria:{pending:'Sin pólizas validadas',nuevo:'Primera póliza activa con inicio menor o igual a 90 días',recurrente:'Dos pólizas activas, renovación o historial',estandar:'Póliza activa sin otro criterio',premium:'Solo con umbral configurado sobre prima neta recaudada',historico:'Sin pólizas activas'},writesStore:false};
-  Orbit.clientProjection={version:'20260720.2',project:projectClient,get:function(id){return projectClient(Orbit.store&&Orbit.store.get?Orbit.store.get('clientes',id):null);},normalizeType:normalizeType,normalizeCountry:normalizeCountry,normalizeDate:normalizeDate,writesStore:false,reimportsData:false,createsRelations:false};
+  Orbit.clientProjection={version:'20260720.2',project:projectClient,get:function(id){return projectClient(Orbit.store&&Orbit.store.get?Orbit.store.get('clientes',id):null);},normalizeType:normalizeType,normalizeCountry:normalizeCountry,normalizeDate:normalizeDate,withReadBatch:function(collections,callback){var meta=Orbit.store&&Orbit.store.__clientCanonicalReadProjectionV20260720;return meta&&typeof meta.withReadBatch==='function'?meta.withReadBatch(collections,callback):callback({});},readPerformanceState:function(){var meta=Orbit.store&&Orbit.store.__clientCanonicalReadProjectionV20260720;return meta&&typeof meta.performanceState==='function'?meta.performanceState():{revision:'unavailable'};},writesStore:false,reimportsData:false,createsRelations:false};
   Orbit.clientCanonicalViewProjectionV20260716={version:'20260720.2',projectCopy:projectClient,temporaryInPlaceBridge:false,writesStore:false,reimportsData:false,replacesRenderer:false};
 
   if (Orbit.q && typeof Orbit.q.clienteResumen === 'function' && !Orbit.q.__clientCanonicalResumenV20260720V2) {
@@ -259,6 +312,6 @@
   });
   observerHost=document.getElementById('host');if(observerHost&&window.MutationObserver){canonicalObserver=new MutationObserver(handleCanonicalMutations);observeCanonicalOwner();}window.addEventListener('hashchange',schedule);document.addEventListener('orbit:session',schedule);window.addEventListener('orbit:store:emit',schedule);
   document.documentElement.classList.add('orbit-m1-stable-ui');
-  Orbit.clientInsurerVisualContractV20260720={version:'20260720.2',idempotenceRevision:'20260721.4',visualRemediationRevision:'20260722.1',clientProjection:true,countryEvidenceProposalOnly:true,segmentationReadOnly:true,insurerSemanticView:true,secureCredentialActions:true,credentialUserAlwaysSeparate:true,credentialSecretSeparateReveal:true,completeBankCopy:true,bankCopyExcludesUse:true,bankHolderFallbackInsurer:true,visualStability:true,synchronousMutationOwner:true,mutationMode:'same-microtask-disconnect-own-writes',observerOwnMutations:false,idempotentDomWrites:true,client360StructuralTrigger:true,clientProjectionBatchRevision:'20260816.1',writesStore:false,reimportsData:false,exposesSecrets:false,enhance:runEnhance};
+  Orbit.clientInsurerVisualContractV20260720={version:'20260720.2',idempotenceRevision:'20260721.4',visualRemediationRevision:'20260722.1',clientProjection:true,countryEvidenceProposalOnly:true,segmentationReadOnly:true,insurerSemanticView:true,secureCredentialActions:true,credentialUserAlwaysSeparate:true,credentialSecretSeparateReveal:true,completeBankCopy:true,bankCopyExcludesUse:true,bankHolderFallbackInsurer:true,visualStability:true,synchronousMutationOwner:true,mutationMode:'same-microtask-disconnect-own-writes',observerOwnMutations:false,idempotentDomWrites:true,client360StructuralTrigger:true,clientProjectionBatchRevision:'20260816.2',clientProjectionReadCacheRevision:'20260816.2',writesStore:false,reimportsData:false,exposesSecrets:false,enhance:runEnhance};
   schedule();
 })();

@@ -57,12 +57,15 @@ Orbit.modules.cliente360 = (function () {
      LISTA (cartera de clientes)
      ========================================================= */
   function lista() {
-    const clientes = S().all('clientes');
-    const asesores = S().all('asesores');
     const f = filtros;
     const renderStartedAt = perfNow();
     const summaryStartedAt = perfNow();
-    const summaryIndex = q.clientesResumenIndex ? q.clientesResumenIndex() : null;
+    const batchRunner = Orbit.clientProjection && typeof Orbit.clientProjection.withReadBatch === 'function' ? Orbit.clientProjection.withReadBatch : null;
+    const summaryBatch = q.clientesResumenIndex && batchRunner ? batchRunner(['clientes', 'polizas', 'cobros', 'comisiones'], source => ({ summaryIndex: q.clientesResumenIndex(), clientes: source.clientes || [], polizas: source.polizas || [] })) : null;
+    const summaryIndex = summaryBatch ? summaryBatch.summaryIndex : (q.clientesResumenIndex ? q.clientesResumenIndex() : null);
+    const clientes = summaryBatch ? summaryBatch.clientes : S().all('clientes');
+    const policiesForList = summaryBatch ? summaryBatch.polizas : null;
+    const asesores = S().all('asesores');
     const summaryCacheMs = perfNow() - summaryStartedAt;
     const rows = clientes.filter(c =>
       (!f.q || (c.nombre + ' ' + c.email + ' ' + c.identificacion).toLowerCase().includes(f.q.toLowerCase())) &&
@@ -79,6 +82,9 @@ Orbit.modules.cliente360 = (function () {
     const resumenDe = c => (summaryIndex && typeof summaryIndex.get === 'function' && summaryIndex.get(c.id)) || q.clienteResumen(c.id);
     const summaryAggregateStartedAt = perfNow();
     const totPrima = clientes.reduce((s, c) => { const r = resumenDe(c); return s + (r.moneda === 'COP' ? r.primaAnual / 1000 : r.primaAnual); }, 0);
+    const activePolicyCount = policiesForList ? policiesForList.filter(esRenovable).length : S().where('polizas', p => p.estado === 'Vigente' || p.estado === 'Por renovar').length;
+    const totalPolicyCount = policiesForList ? policiesForList.length : S().all('polizas').length;
+    const renewals45Count = policiesForList ? policiesForList.filter(p => { const d = U.daysFromNow(p.vigenciaFin); return esRenovable(p) && d != null && d >= 0 && d <= 45; }).length : q.renovacionesProximas(45).length;
     const summaryAggregateMs = perfNow() - summaryAggregateStartedAt;
 
     const rowsBuildStartedAt = perfNow();
@@ -108,9 +114,9 @@ Orbit.modules.cliente360 = (function () {
 
       <div class="kpi-row" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px">
         <button class="kpi kpi-click" onclick="Orbit.modules.cliente360.render(document.getElementById('mod-host'))" title="Ver todos"><div class="k-accent"></div><div class="k-label">Clientes</div><div class="k-val">${clientes.length}</div><div class="k-foot muted">${clientes.filter(c => c.tipo === 'Empresa').length} empresas · ${clientes.filter(c => c.tipo === 'Persona').length} personas</div></button>
-        <button class="kpi kpi-click" onclick="Orbit.kpi('polizas-vigentes')" title="Ver pólizas"><div class="k-accent" style="background:var(--info)"></div><div class="k-label">Pólizas activas</div><div class="k-val">${S().where('polizas', p => p.estado === 'Vigente' || p.estado === 'Por renovar').length}</div><div class="k-foot muted">de ${S().all('polizas').length} históricas</div></button>
+        <button class="kpi kpi-click" onclick="Orbit.kpi('polizas-vigentes')" title="Ver pólizas"><div class="k-accent" style="background:var(--info)"></div><div class="k-label">Pólizas activas</div><div class="k-val">${activePolicyCount}</div><div class="k-foot muted">de ${totalPolicyCount} históricas</div></button>
         <div class="kpi"><div class="k-accent" style="background:var(--ok)"></div><div class="k-label">Prima vigente</div><div class="k-val">${U.moneyShort(totPrima, Orbit.q.monedaPais())}</div><div class="k-foot muted">cartera total estimada</div></div>
-        <div class="kpi"><div class="k-accent" style="background:var(--warn)"></div><div class="k-label">Por renovar ≤45 d</div><div class="k-val">${q.renovacionesProximas(45).length}</div><div class="k-foot muted">requieren gestión</div></div>
+        <div class="kpi"><div class="k-accent" style="background:var(--warn)"></div><div class="k-label">Por renovar ≤45 d</div><div class="k-val">${renewals45Count}</div><div class="k-foot muted">requieren gestión</div></div>
       </div>
 
       <div class="card" style="overflow:hidden">
@@ -162,9 +168,9 @@ Orbit.modules.cliente360 = (function () {
     listRenderSeq += 1;
     window.OrbitRuntimeDiagnostics = window.OrbitRuntimeDiagnostics || {};
     OrbitRuntimeDiagnostics.cliente360 = Object.assign({}, OrbitRuntimeDiagnostics.cliente360 || {}, {
-      version: '20260807.19-bounded-list-render',
+      version: '20260816.20-bounded-list-batch-read',
       renderMs: totalMs,
-      list: { bounded: true, pageSize: LIST_PAGE_SIZE, page: listPage, pageCount, totalRows: clientes.length, filteredRows: rows.length, renderedRows: visibleRows.length, summaryCacheMs, summaryAggregateMs, rowsBuildMs, innerHtmlMs, bindingsMs, totalMs, renderSeq: listRenderSeq, writes: 0 }
+      list: { bounded: true, batchRead: !!summaryBatch, pageSize: LIST_PAGE_SIZE, page: listPage, pageCount, totalRows: clientes.length, filteredRows: rows.length, renderedRows: visibleRows.length, summaryCacheMs, summaryAggregateMs, rowsBuildMs, innerHtmlMs, bindingsMs, totalMs, renderSeq: listRenderSeq, writes: 0 }
     });
   }
 
