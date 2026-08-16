@@ -26,6 +26,7 @@ env:
   QUERIES_SHA256: b906c1d3382a9fad310695b0ce2c8e7f49a2bf99fe9b9ed674a8df7e0fcbbb7b
   PUBLIC_TARGET: https://app.aysseguros.com
   CURRENT_PUBLIC_SOURCE_HEAD: 5474a1a9af64c018e6dcc71b4ad0cdfe57ce0484
+  CURRENT_PUBLIC_MANIFEST_SHA256: c527d400d4c55e1469140a21dd7d31fb310e5de48ac0f3f465b5d50a19822b63
   CURRENT_PUBLIC_CORE_SHA256: ad6fa96614d4eefe29880fac26a1c349ae24940adc2d8ff75ad04d991595b067
   CURRENT_PUBLIC_CLIENT360_SHA256: 665f3499a4eb6a1eafa723543a73bdd7057de344b2daf61776b6701ff3e3fbd9
 
@@ -82,17 +83,37 @@ jobs:
           test "$(sha256sum "$TREE/core/queries.js" | awk '{print $1}')" = "$QUERIES_SHA256"
 
           UA='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/142.0.0.0 Safari/537.36'
-          curl --http1.1 -L --fail --silent --show-error --connect-timeout 15 --max-time 45 -A "$UA" -H 'Cache-Control: no-cache, no-store, max-age=0' -H 'Pragma: no-cache' "$PUBLIC_TARGET/orbit360-package-manifest.json?orbit360_r4s6_prepublish=${GITHUB_RUN_ID}" -o "$WORK/public-manifest.json"
-          curl --http1.1 -L --fail --silent --show-error --connect-timeout 15 --max-time 45 -A "$UA" -H 'Cache-Control: no-cache, no-store, max-age=0' -H 'Pragma: no-cache' "$PUBLIC_TARGET/core/client-insurer-visual-contract-v20260720.js?orbit360_r4s6_prepublish=${GITHUB_RUN_ID}" -o "$WORK/public-core.js"
-          curl --http1.1 -L --fail --silent --show-error --connect-timeout 15 --max-time 45 -A "$UA" -H 'Cache-Control: no-cache, no-store, max-age=0' -H 'Pragma: no-cache' "$PUBLIC_TARGET/modules/cliente360.js?orbit360_r4s6_prepublish=${GITHUB_RUN_ID}" -o "$WORK/public-cliente360.js"
+          fetch_public_exact() {
+            local rel="$1" out="$2" expected="$3" sha='' meta='' attempt=''
+            for attempt in 1 2 3 4; do
+              meta=$(curl --http1.1 -L --fail --silent --show-error --connect-timeout 15 --max-time 45 \
+                -A "$UA" -H 'Cache-Control: no-cache, no-store, max-age=0' -H 'Pragma: no-cache' \
+                -w '%{http_code}|%{content_type}' \
+                "$PUBLIC_TARGET/$rel?orbit360_r4s6_prepublish=${GITHUB_RUN_ID}_${attempt}" -o "$out" || true)
+              sha=$(sha256sum "$out" 2>/dev/null | awk '{print $1}' || true)
+              if [ "$sha" = "$expected" ]; then
+                printf '%s|%s|%s|%s\n' "$rel" "$attempt" "$meta" "$sha" >> "$WORK/public-fetch-pass.txt"
+                return 0
+              fi
+              printf '%s|%s|%s|%s\n' "$rel" "$attempt" "$meta" "$sha" >> "$WORK/public-fetch-attempts.txt"
+              sleep 1
+            done
+            jq -n --arg rel "$rel" --arg expected "$expected" --arg observed "$sha" --arg meta "$meta" \
+              '{ok:false,status:"R4S6_PREPUBLISH_PUBLIC_BASELINE_FETCH_STOP",classification:"ENVIRONMENT_FAILURE",failureFamily:"PUBLIC_STATIC_RESPONSE_NOT_EXACT_BASELINE_BYTES",relativePath:$rel,expectedSha256:$expected,observedSha256:$observed,lastHttpMeta:$meta,publicationPerformed:false,packageRebuilt:false,productModified:false,secretAccess:false,dataAccess:false,runtimeExecuted:false,browserExecuted:false,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,productionMutation:false,containsPII:false,containsSecrets:false}' \
+              > "$EVIDENCE_DIR/r4s6-prepublish-exact-artifact-gate-v20260816.json"
+            return 42
+          }
+
+          fetch_public_exact 'orbit360-package-manifest.json' "$WORK/public-manifest.json" "$CURRENT_PUBLIC_MANIFEST_SHA256"
+          fetch_public_exact 'core/client-insurer-visual-contract-v20260720.js' "$WORK/public-core.js" "$CURRENT_PUBLIC_CORE_SHA256"
+          fetch_public_exact 'modules/cliente360.js' "$WORK/public-cliente360.js" "$CURRENT_PUBLIC_CLIENT360_SHA256"
+
           PUBLIC_SOURCE=$(jq -r '.sourceHead // "UNKNOWN"' "$WORK/public-manifest.json")
           PUBLIC_STATUS=$(jq -r '.status // "UNKNOWN"' "$WORK/public-manifest.json")
           PUBLIC_CORE_SHA=$(sha256sum "$WORK/public-core.js" | awk '{print $1}')
           PUBLIC_CLIENT_SHA=$(sha256sum "$WORK/public-cliente360.js" | awk '{print $1}')
           test "$PUBLIC_SOURCE" = "$CURRENT_PUBLIC_SOURCE_HEAD"
           test "$PUBLIC_STATUS" = 'FASE_A_PRODUCT_R4S5_MINIMAL_SUCCESSOR_CERTIFIED'
-          test "$PUBLIC_CORE_SHA" = "$CURRENT_PUBLIC_CORE_SHA256"
-          test "$PUBLIC_CLIENT_SHA" = "$CURRENT_PUBLIC_CLIENT360_SHA256"
 
           jq -n \
             --arg artifactId "$ARTIFACT_ID" \
@@ -106,7 +127,7 @@ jobs:
             --arg currentPublicManifestStatus "$PUBLIC_STATUS" \
             --arg currentPublicCoreSha256 "$PUBLIC_CORE_SHA" \
             --arg currentPublicClient360Sha256 "$PUBLIC_CLIENT_SHA" \
-            '{ok:true,status:"R4S6_EXACT_ARTIFACT_PREPUBLISH_READY",classification:"ENVIRONMENT_HANDOFF_READY",artifactId:($artifactId|tonumber),artifactWrapperSha256:$artifactWrapperSha256,zipName:$zipName,zipSha256:$zipSha256,sourceHead:$sourceHead,deltaFiles:["core/client-insurer-visual-contract-v20260720.js","modules/cliente360.js"],deltaSha256:{"core/client-insurer-visual-contract-v20260720.js":$coreSha256,"modules/cliente360.js":$client360Sha256},fileCount:194,unchangedProductFiles:192,changedProductFiles:2,currentPublic:{version:"R4S5",sourceHead:$currentPublicSourceHead,manifestStatus:$currentPublicManifestStatus,coreSha256:$currentPublicCoreSha256,cliente360Sha256:$currentPublicClient360Sha256},publicationPerformed:false,packageRebuilt:false,productModified:false,secretAccess:false,dataAccess:false,runtimeExecuted:false,browserExecuted:false,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,productionMutation:false,containsPII:false,containsSecrets:false}' > "$EVIDENCE_DIR/r4s6-prepublish-exact-artifact-gate-v20260816.json"
+            '{ok:true,status:"R4S6_EXACT_ARTIFACT_PREPUBLISH_READY",classification:"ENVIRONMENT_HANDOFF_READY",validatorCorrection:{classification:"PIPELINE_MECHANISM_FAILURE",priorRunId:31976863923,failureFamily:"PUBLIC_MANIFEST_RESPONSE_UNGUARDED_JSON_PARSE",productChangedForCorrection:false},artifactId:($artifactId|tonumber),artifactWrapperSha256:$artifactWrapperSha256,zipName:$zipName,zipSha256:$zipSha256,sourceHead:$sourceHead,deltaFiles:["core/client-insurer-visual-contract-v20260720.js","modules/cliente360.js"],deltaSha256:{"core/client-insurer-visual-contract-v20260720.js":$coreSha256,"modules/cliente360.js":$client360Sha256},fileCount:194,unchangedProductFiles:192,changedProductFiles:2,currentPublic:{version:"R4S5",sourceHead:$currentPublicSourceHead,manifestStatus:$currentPublicManifestStatus,coreSha256:$currentPublicCoreSha256,cliente360Sha256:$currentPublicClient360Sha256},publicationPerformed:false,packageRebuilt:false,productModified:false,secretAccess:false,dataAccess:false,runtimeExecuted:false,browserExecuted:false,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,productionMutation:false,containsPII:false,containsSecrets:false}' > "$EVIDENCE_DIR/r4s6-prepublish-exact-artifact-gate-v20260816.json"
 
       - name: Canonical gate after prepublication handoff
         shell: bash
