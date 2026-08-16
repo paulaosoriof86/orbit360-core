@@ -1,0 +1,126 @@
+name: Orbit360 R4S6 Prepublish Exact Artifact Gate 20260816
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/workflows/orbit360-r4s6-prepublish-exact-artifact-gate-v20260816.yml'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: orbit360-r4s6-prepublish-exact-artifact-gate-v20260816
+  cancel-in-progress: false
+
+env:
+  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+  ARTIFACT_ID: '9271052165'
+  ARTIFACT_WRAPPER_SHA256: ef1df64d11024c36f759ea445c7583c97f59ab36781205a78e199ce31899b86e
+  ZIP_NAME: orbit360-fase-a-product-r4s6-395f15d9c2e1.zip
+  ZIP_SHA256: 00b283a69511735dbcd8d662b5d95ab0d02895a38fbf90770590754f253f3d2c
+  SOURCE_HEAD: 395f15d9c2e1fac2949763947834b88a9b521207
+  CORE_SHA256: 5493a18acba2d2055c301bf576c46050959ddb6b2f74e7ca4293ee77f815604f
+  CLIENT360_SHA256: 5ac3f042add37ea45582cc88c670c5bcff139937dac406d9561e25f1b9962f9e
+  QUERIES_SHA256: b906c1d3382a9fad310695b0ce2c8e7f49a2bf99fe9b9ed674a8df7e0fcbbb7b
+  PUBLIC_TARGET: https://app.aysseguros.com
+  CURRENT_PUBLIC_SOURCE_HEAD: 5474a1a9af64c018e6dcc71b4ad0cdfe57ce0484
+  CURRENT_PUBLIC_CORE_SHA256: ad6fa96614d4eefe29880fac26a1c349ae24940adc2d8ff75ad04d991595b067
+  CURRENT_PUBLIC_CLIENT360_SHA256: 665f3499a4eb6a1eafa723543a73bdd7057de344b2daf61776b6701ff3e3fbd9
+
+jobs:
+  prepublish:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Canonical gate before publication handoff
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+          jq -e '.ok==true and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+
+      - name: Verify exact durable R4S6 artifact and current public R4S5 baseline
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          WORK="$RUNNER_TEMP/orbit360-r4s6-prepublish"
+          OUTER="$WORK/artifact-wrapper.zip"
+          INNER="$WORK/$ZIP_NAME"
+          TREE="$WORK/tree"
+          mkdir -p "$WORK/outer" "$TREE" "$EVIDENCE_DIR"
+
+          curl --fail --silent --show-error --location \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/${ARTIFACT_ID}/zip" \
+            -o "$OUTER"
+          test "$(sha256sum "$OUTER" | awk '{print $1}')" = "$ARTIFACT_WRAPPER_SHA256"
+          unzip -q "$OUTER" -d "$WORK/outer"
+          test "$(find "$WORK/outer" -maxdepth 1 -type f | wc -l | tr -d ' ')" = '1'
+          test -f "$WORK/outer/$ZIP_NAME"
+          cp "$WORK/outer/$ZIP_NAME" "$INNER"
+          test "$(sha256sum "$INNER" | awk '{print $1}')" = "$ZIP_SHA256"
+          unzip -q "$INNER" -d "$TREE"
+
+          jq -e '.schemaVersion=="orbit360-fase-a-product-package-manifest-v1" and .status=="FASE_A_PRODUCT_R4S6_MINIMAL_SUCCESSOR_CERTIFIED" and .sourceHead==env.SOURCE_HEAD and .deltaSourceHead==env.SOURCE_HEAD and .fileCount==194 and .unchangedFileCount==192 and .deltaFiles==["core/client-insurer-visual-contract-v20260720.js","modules/cliente360.js"] and .noLabRuntime==true and .noPrivateSecretMaterial==true and .writeAuthorized==false and .deployExecuted==false and .productionTouched==false' "$TREE/orbit360-package-manifest.json" >/dev/null
+          test "$(sha256sum "$TREE/core/client-insurer-visual-contract-v20260720.js" | awk '{print $1}')" = "$CORE_SHA256"
+          test "$(sha256sum "$TREE/modules/cliente360.js" | awk '{print $1}')" = "$CLIENT360_SHA256"
+          test "$(sha256sum "$TREE/core/queries.js" | awk '{print $1}')" = "$QUERIES_SHA256"
+
+          UA='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/142.0.0.0 Safari/537.36'
+          curl --http1.1 -L --fail --silent --show-error --connect-timeout 15 --max-time 45 -A "$UA" -H 'Cache-Control: no-cache, no-store, max-age=0' -H 'Pragma: no-cache' "$PUBLIC_TARGET/orbit360-package-manifest.json?orbit360_r4s6_prepublish=${GITHUB_RUN_ID}" -o "$WORK/public-manifest.json"
+          curl --http1.1 -L --fail --silent --show-error --connect-timeout 15 --max-time 45 -A "$UA" -H 'Cache-Control: no-cache, no-store, max-age=0' -H 'Pragma: no-cache' "$PUBLIC_TARGET/core/client-insurer-visual-contract-v20260720.js?orbit360_r4s6_prepublish=${GITHUB_RUN_ID}" -o "$WORK/public-core.js"
+          curl --http1.1 -L --fail --silent --show-error --connect-timeout 15 --max-time 45 -A "$UA" -H 'Cache-Control: no-cache, no-store, max-age=0' -H 'Pragma: no-cache' "$PUBLIC_TARGET/modules/cliente360.js?orbit360_r4s6_prepublish=${GITHUB_RUN_ID}" -o "$WORK/public-cliente360.js"
+          PUBLIC_SOURCE=$(jq -r '.sourceHead // "UNKNOWN"' "$WORK/public-manifest.json")
+          PUBLIC_STATUS=$(jq -r '.status // "UNKNOWN"' "$WORK/public-manifest.json")
+          PUBLIC_CORE_SHA=$(sha256sum "$WORK/public-core.js" | awk '{print $1}')
+          PUBLIC_CLIENT_SHA=$(sha256sum "$WORK/public-cliente360.js" | awk '{print $1}')
+          test "$PUBLIC_SOURCE" = "$CURRENT_PUBLIC_SOURCE_HEAD"
+          test "$PUBLIC_STATUS" = 'FASE_A_PRODUCT_R4S5_MINIMAL_SUCCESSOR_CERTIFIED'
+          test "$PUBLIC_CORE_SHA" = "$CURRENT_PUBLIC_CORE_SHA256"
+          test "$PUBLIC_CLIENT_SHA" = "$CURRENT_PUBLIC_CLIENT360_SHA256"
+
+          jq -n \
+            --arg artifactId "$ARTIFACT_ID" \
+            --arg artifactWrapperSha256 "$ARTIFACT_WRAPPER_SHA256" \
+            --arg zipName "$ZIP_NAME" \
+            --arg zipSha256 "$ZIP_SHA256" \
+            --arg sourceHead "$SOURCE_HEAD" \
+            --arg coreSha256 "$CORE_SHA256" \
+            --arg client360Sha256 "$CLIENT360_SHA256" \
+            --arg currentPublicSourceHead "$PUBLIC_SOURCE" \
+            --arg currentPublicManifestStatus "$PUBLIC_STATUS" \
+            --arg currentPublicCoreSha256 "$PUBLIC_CORE_SHA" \
+            --arg currentPublicClient360Sha256 "$PUBLIC_CLIENT_SHA" \
+            '{ok:true,status:"R4S6_EXACT_ARTIFACT_PREPUBLISH_READY",classification:"ENVIRONMENT_HANDOFF_READY",artifactId:($artifactId|tonumber),artifactWrapperSha256:$artifactWrapperSha256,zipName:$zipName,zipSha256:$zipSha256,sourceHead:$sourceHead,deltaFiles:["core/client-insurer-visual-contract-v20260720.js","modules/cliente360.js"],deltaSha256:{"core/client-insurer-visual-contract-v20260720.js":$coreSha256,"modules/cliente360.js":$client360Sha256},fileCount:194,unchangedProductFiles:192,changedProductFiles:2,currentPublic:{version:"R4S5",sourceHead:$currentPublicSourceHead,manifestStatus:$currentPublicManifestStatus,coreSha256:$currentPublicCoreSha256,cliente360Sha256:$currentPublicClient360Sha256},publicationPerformed:false,packageRebuilt:false,productModified:false,secretAccess:false,dataAccess:false,runtimeExecuted:false,browserExecuted:false,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,productionMutation:false,containsPII:false,containsSecrets:false}' > "$EVIDENCE_DIR/r4s6-prepublish-exact-artifact-gate-v20260816.json"
+
+      - name: Canonical gate after prepublication handoff
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+          jq -e '.ok==true and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: orbit360-r4s6-prepublish-exact-artifact-evidence-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/r4s6-prepublish-exact-artifact-gate-v20260816.json
+          if-no-files-found: warn
+          retention-days: 14
