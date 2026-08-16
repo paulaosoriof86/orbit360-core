@@ -137,6 +137,7 @@ El workflow de smoke continúa congelado con `ORBIT360_R4_CERTIFIED_SOURCE_ONLY=
 - Rootfix: **SOURCE_ONLY PASS, todavía NO empaquetado ni publicado**.
 - Gate 3 `POST_GO_LIVE_SMOKE_PASS`: abierto.
 - Nueva matriz/browser: no autorizada.
+- Estado rector: `orbit360-platform/docs/orbit360-live-state-v1.json`, actualizado a `20260816.r4s5-client360-deep-clone-source-rootfix-pass.current`.
 
 Carriles:
 - A frontend/UX: avance visible source-only en Cliente 360.
