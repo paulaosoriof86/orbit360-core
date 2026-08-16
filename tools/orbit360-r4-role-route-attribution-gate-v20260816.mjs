@@ -6,7 +6,7 @@ import path from 'node:path';
 
 const ROOT = process.cwd();
 const EVIDENCE_DIR = path.join(ROOT, 'orbit360-platform/runtime-gate-crm-v20260716');
-const SELF = path.join(EVIDENCE_DIR, 'r4-certified-validator-rootfix-source-v20260815.json');
+const SELF = path.join(EVIDENCE_DIR, 'r4-role-route-attribution-selftest-v20260816.json');
 const OUT = path.resolve(process.env.ORBIT360_R4_ROLE_ROUTE_GATE_OUT || path.join(EVIDENCE_DIR, 'r4-role-route-attribution-gate-v20260816.json'));
 
 function write(payload) {
@@ -35,7 +35,7 @@ if (!fs.existsSync(SELF)) {
 
 const e = JSON.parse(fs.readFileSync(SELF, 'utf8'));
 const checks = {
-  baseSelfTestPass: e.ok === true && e.status === 'R4_CERTIFIED_VALIDATOR_ROOTFIX_SOURCE_PASS',
+  baseSelfTestPass: e.ok === true && e.status === 'R4_ROLE_ROUTE_ATTRIBUTION_SELFTEST_PASS',
   cumulativeRoleGroupRemoved: e.cumulativeRoleGroupRemoved === true,
   roleActivationStagesBound: e.roleActivationStagesBound === true,
   perRouteStagesBound: e.perRouteStagesBound === true,
@@ -55,7 +55,7 @@ write({
   status: ok ? 'R4_ROLE_ROUTE_ATTRIBUTION_GATE_PASS' : 'R4_ROLE_ROUTE_ATTRIBUTION_GATE_FAIL',
   classification: ok ? 'VALIDATOR_STALE_ROOTFIX_PASS' : 'VALIDATOR_STALE',
   failureFamily: ok ? '' : 'CUMULATIVE_ROLE_GROUP_BUDGET_AND_ROUTE_ATTRIBUTION_NOT_CLOSED',
-  owner: 'tools/orbit360-r4-certified-product-smoke-wrapper-v20260815.mjs',
+  owner: 'tools/orbit360-r4-role-route-attribution-wrapper-v20260816.mjs',
   checks,
   failedCheckIds: failed
 });
