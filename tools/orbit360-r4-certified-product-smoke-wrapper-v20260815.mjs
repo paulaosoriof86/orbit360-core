@@ -23,7 +23,12 @@ function validateContract(contract) {
   if (!/^[a-f0-9]{40}$/.test(String(contract.sourceHead || ''))) fail('CONTRACT_SOURCE_INVALID');
   if (!/^[a-f0-9]{64}$/.test(String(contract.zipSha256 || ''))) fail('CONTRACT_ZIP_SHA_INVALID');
   if (Number(contract.fileCount) !== 194) fail('CONTRACT_FILE_COUNT_INVALID');
-  if (contract.manifestStatus !== 'FASE_A_PRODUCT_R3_DURABLE_PACKAGE_CERTIFIED') fail('CONTRACT_MANIFEST_STATUS_INVALID');
+  const allowedManifestStatuses = new Set([
+    'FASE_A_PRODUCT_R3_DURABLE_PACKAGE_CERTIFIED',
+    'FASE_A_PRODUCT_R4S1_MINIMAL_SUCCESSOR_CERTIFIED',
+    'FASE_A_PRODUCT_R4S2_MINIMAL_SUCCESSOR_CERTIFIED'
+  ]);
+  if (!allowedManifestStatuses.has(String(contract.manifestStatus || ''))) fail('CONTRACT_MANIFEST_STATUS_INVALID');
   if (contract.entrypoint?.path !== 'index.html' || Number(contract.entrypoint?.bytes) !== 16893 || !/^[a-f0-9]{64}$/.test(String(contract.entrypoint?.sha256 || ''))) fail('CONTRACT_ENTRYPOINT_INVALID');
   if (contract.authAsset?.path !== '/core/auth-product-runtime-p0.js' || contract.authAsset?.sourcePath !== 'orbit360-platform/core/auth-product-runtime-p0.js' || Number(contract.authAsset?.bytes) !== 4211 || !/^[a-f0-9]{64}$/.test(String(contract.authAsset?.sha256 || ''))) fail('CONTRACT_AUTH_ASSET_INVALID');
   if (!Array.isArray(contract.legacyAssetsExcludedFromProduct) || !contract.legacyAssetsExcludedFromProduct.includes('/core/auth.js')) fail('CONTRACT_LEGACY_EXCLUSION_INVALID');
@@ -37,6 +42,11 @@ function buildPatchedHarness(contract) {
   let patched = original.replace(stalePath, contract.authAsset.path);
   if (patched.includes(stalePath)) fail('STALE_PATH_REMAINS_AFTER_PATCH');
   if (count(patched, contract.authAsset.path) !== 1) fail('PRODUCT_AUTH_PATH_NOT_BOUND_EXACTLY_ONCE');
+
+  const baseManifestStatus = 'FASE_A_PRODUCT_R3_DURABLE_PACKAGE_CERTIFIED';
+  if (count(patched, baseManifestStatus) !== 1) fail(`BASE_MANIFEST_STATUS_COUNT_INVALID:${count(patched, baseManifestStatus)}`);
+  patched = patched.replace(baseManifestStatus, contract.manifestStatus);
+  if (count(patched, contract.manifestStatus) !== 1) fail('CERTIFIED_MANIFEST_STATUS_NOT_BOUND_EXACTLY_ONCE');
 
   const staleLegalBlock = `  const legal = page.locator('[data-legal-gate]');
   if (await withTimeout('legal-count', 5000, () => legal.count()) && await withTimeout('legal-check-count', 5000, () => page.locator('#lg-chk').count()) && await withTimeout('legal-ok-count', 5000, () => page.locator('#lg-ok').count())) {
@@ -71,8 +81,9 @@ function selfTest(contract, harness) {
   try { patchedHarnessSyntaxPass = syntaxCheckPatchedHarness(harness.patched); } catch {}
   const staleLegalInteractionRemoved = !harness.patched.includes('legal-check-count') && !harness.patched.includes("page.locator('#lg-chk').check()") && !harness.patched.includes("page.locator('#lg-ok').click()");
   const readonlyLegalObserverBound = count(harness.patched, 'legal-gate-observe') === 1;
-  const ok = sourceAuth.sha256 === contract.authAsset.sha256 && sourceAuth.bytes === contract.authAsset.bytes && !harness.patched.includes('/core/auth.js') && harness.patched.includes(contract.authAsset.path) && staleLegalInteractionRemoved && readonlyLegalObserverBound && patchedHarnessSyntaxPass;
-  const payload = { schemaVersion: 'orbit360-r4-certified-validator-rootfix-source-v1', ok, status: ok ? 'R4_CERTIFIED_VALIDATOR_ROOTFIX_SOURCE_PASS' : 'R4_CERTIFIED_VALIDATOR_ROOTFIX_SOURCE_FAIL', classification: ok ? 'VALIDATOR_STALE_ROOTFIX_PASS' : 'VALIDATOR_STALE_ROOTFIX_FAIL', sourceHead: contract.sourceHead, durableArtifact: { r3RunId: contract.r3RunId, artifactId: contract.r3DurableArtifactId, zipName: contract.zipName, zipSha256: contract.zipSha256, fileCount: contract.fileCount }, entrypoint: contract.entrypoint, authAsset: { ...contract.authAsset, sourceSha256Matches: sourceAuth.sha256 === contract.authAsset.sha256, sourceBytesMatch: sourceAuth.bytes === contract.authAsset.bytes }, staleLegacyAuthPathRemovedFromExecutableHarness: !harness.patched.includes('/core/auth.js'), productAuthPathBoundExactlyOnce: count(harness.patched, contract.authAsset.path) === 1, staleLegalInteractionRemoved, readonlyLegalObserverBound, patchedHarnessSyntaxPass, runtimeHarnessLocation: 'workspace/tools', browserExecuted: false, secretAccess: false, dataAccess: false, firestoreWrites: 0, authWrites: 0, operationalWrites: 0, deployExecuted: false, packageRebuilt: false, productionTouched: false, containsPII: false, containsSecrets: false };
+  const manifestStatusBoundExactlyOnce = count(harness.patched, contract.manifestStatus) === 1;
+  const ok = sourceAuth.sha256 === contract.authAsset.sha256 && sourceAuth.bytes === contract.authAsset.bytes && !harness.patched.includes('/core/auth.js') && harness.patched.includes(contract.authAsset.path) && manifestStatusBoundExactlyOnce && staleLegalInteractionRemoved && readonlyLegalObserverBound && patchedHarnessSyntaxPass;
+  const payload = { schemaVersion: 'orbit360-r4-certified-validator-rootfix-source-v1', ok, status: ok ? 'R4_CERTIFIED_VALIDATOR_ROOTFIX_SOURCE_PASS' : 'R4_CERTIFIED_VALIDATOR_ROOTFIX_SOURCE_FAIL', classification: ok ? 'VALIDATOR_STALE_ROOTFIX_PASS' : 'VALIDATOR_STALE_ROOTFIX_FAIL', sourceHead: contract.sourceHead, durableArtifact: { r3RunId: contract.r3RunId, artifactId: contract.r3DurableArtifactId, zipName: contract.zipName, zipSha256: contract.zipSha256, fileCount: contract.fileCount }, entrypoint: contract.entrypoint, manifestStatus: contract.manifestStatus, manifestStatusBoundExactlyOnce, authAsset: { ...contract.authAsset, sourceSha256Matches: sourceAuth.sha256 === contract.authAsset.sha256, sourceBytesMatch: sourceAuth.bytes === contract.authAsset.bytes }, staleLegacyAuthPathRemovedFromExecutableHarness: !harness.patched.includes('/core/auth.js'), productAuthPathBoundExactlyOnce: count(harness.patched, contract.authAsset.path) === 1, staleLegalInteractionRemoved, readonlyLegalObserverBound, patchedHarnessSyntaxPass, runtimeHarnessLocation: 'workspace/tools', browserExecuted: false, secretAccess: false, dataAccess: false, firestoreWrites: 0, authWrites: 0, operationalWrites: 0, deployExecuted: false, packageRebuilt: false, productionTouched: false, containsPII: false, containsSecrets: false };
   writeJson(SELF_EVIDENCE, payload); console.log(JSON.stringify(payload, null, 2)); if (!ok) process.exitCode = 41;
 }
 
@@ -85,5 +96,5 @@ if (process.argv.includes('--self-test')) {
   try {
     const child = spawnSync(process.execPath, [temp], { cwd: ROOT, stdio: 'inherit', env: { ...process.env, ORBIT360_R4_EXPECTED_AUTH_SHA256: contract.authAsset.sha256, ORBIT360_R4_CERTIFIED_AUTH_ASSET_PATH: contract.authAsset.path, ORBIT360_R4_CERTIFIED_ENTRYPOINT_SHA256: contract.entrypoint.sha256, ORBIT360_R4_CERTIFIED_PACKAGE_SHA256: contract.zipSha256 } });
     if (child.error) throw child.error; process.exitCode = Number.isInteger(child.status) ? child.status : 41;
-  } finally { try { fs.unlinkSync(temp); } catch {} }
+  } finally { try { fs.unlinkSync(temp); } catch {}
 }
