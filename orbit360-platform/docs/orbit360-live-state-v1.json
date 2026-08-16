@@ -1,7 +1,7 @@
 {
   "schemaVersion": "orbit360-live-state-v1",
   "stateVersion": "20260816.r4s5-readonly-matrix-stop-deep-clone-composition.current",
-  "updatedAt": "2026-08-16T15:42:00-06:00",
+  "updatedAt": "2026-08-16T15:42:30-06:00",
   "phase": "R4S5_PUBLIC_REFROZEN_STOP_READONLY_MATRIX_CLIENTE360_DEEP_CLONE_COMPOSITION",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -25,8 +25,6 @@
   "publicationRollback": {
     "immediatePackage": "orbit360-fase-a-product-r4s4-54f671e64b32.zip",
     "immediatePackageSha256": "f266815e26da04a8c9e86b0db9414ca6c06bedb3cd9371f85e96c8d08e420d4c",
-    "previousPackage": "orbit360-fase-a-product-r4s3-294ed22bdb56.zip",
-    "previousPackageSha256": "1ab5f3ea7f59cd0c2eb2bb1f5c0596a4bf3ca241f42016f74bf095ccbaf0f78e",
     "preserved": true,
     "rollbackRequiredNow": false
   },
@@ -55,9 +53,7 @@
     "finalSourceOnlyRunId": 31973809307,
     "finalSourceOnlyJobId": 95230172774,
     "finalSourceOnlyConclusion": "SUCCESS",
-    "canonicalGatePass": true,
-    "browserExecuted": false,
-    "secretAccess": false
+    "canonicalGatePass": true
   },
   "runtimeFinalMatrix": {
     "status": "CONSUMED_STOP_RETRY_FUNCTIONAL_DEFECT",
@@ -68,16 +64,13 @@
     "authorizedExecutionsConsumed": 1,
     "postGoLiveSmokePass": false,
     "classification": "FUNCTIONAL_DEFECT",
-    "failureFamilyHarness": "R4_ROLE_ROUTE_STAGE_FAILED",
     "firstFailedStage": "role-Dirección-route-cliente360",
     "error": "page.waitForFunction: Timeout 25000ms exceeded.",
-    "elapsedMs": 61372,
     "manifestPass": true,
     "authPass": true,
     "membershipPass": true,
     "tenantPass": true,
     "storeReadOnlyPass": true,
-    "directionRolePassBeforeRouteStop": true,
     "directionScope": "all",
     "directionRawClientCount": 430,
     "directionScopedClientCount": 430,
@@ -93,11 +86,7 @@
     "technicalCopy": 0,
     "firestoreWrites": 0,
     "authWrites": 0,
-    "operationalWrites": 0,
-    "containsPII": false,
-    "containsSecrets": false,
-    "deployExecuted": false,
-    "packageRebuilt": false
+    "operationalWrites": 0
   },
   "runtimeTiming": {
     "directionActivationDurationMs": 24189,
@@ -129,13 +118,11 @@
     "refreezeEvidenceDigest": "e42e4eca2910d313c06e70249c494a3afa6e9c241f1d3d5cae87952831ab8e28",
     "secretStepsSkipped": true,
     "browserStepSkipped": true,
-    "browserRerunAllowedNow": false,
-    "freshRuntimeAuthorizationRequired": true
+    "browserRerunAllowedNow": false
   },
   "scopeControl": {
     "baseBeforeAuthorization": "458cfbe4e6e7cf3968e1492d23cb16b703e3f57d",
-    "lastComparedHead": "586d644146a68b6f1f67e8331e730c95814058f7",
-    "changedFileCount": 5,
+    "changedFileCountAtControl": 5,
     "changedProductFileCount": 0,
     "productModified": false,
     "authModified": false,
@@ -170,11 +157,11 @@
   },
   "claudeImpact": {
     "classification": "REPLICABLE_CLAUDE_ACUMULADO",
-    "scope": "In clone-on-read stores, batching N related reads is necessary but insufficient if the full batch is rebuilt on every consumer read. Reuse bounded read projection context and collapse duplicate global reads without weakening immutable/read-only boundaries."
+    "scope": "Batching N related reads is insufficient when clone-on-read batches are rebuilt for each consecutive consumer read; reuse bounded projection context and collapse duplicate global reads."
   },
   "academiaImpact": {
     "classification": "ACADEMIA_ACTUALIZAR",
-    "scope": "Teach repeated whole-batch deep clones versus N-times scans, fixture limits versus real-object serialization cost, and STOP/refreeze discipline."
+    "scope": "Repeated whole-batch deep clones versus N-times scans; fixture limits versus real-object serialization cost; STOP/refreeze discipline."
   },
   "nextActionExact": {
     "stage": "R4S5_STOP_AWAITING_SOURCE_ONLY_DEEP_CLONE_COMPOSITION_ROOTFIX_AUTHORIZATION",
@@ -183,9 +170,7 @@
   "currentCheckpoint": "orbit360-platform/docs/STOP-R4S5-READONLY-MATRIX-CLIENTE360-DEEP-CLONE-COMPOSITION-20260816.md",
   "lastEvidence": {
     "runtimeRunId": 31973847177,
-    "runtimeJobId": 95230265194,
     "runtimeEvidenceArtifactId": 9270532591,
-    "runtimeEvidenceDigest": "b13eb1b018a222320ee56dbe7a714fb395bc1db306038756a7526e2b9d5f692e",
     "refreezeRunId": 31973877256,
     "refreezeEvidenceArtifactId": 9270537919,
     "currentPublicVersion": "R4S5",
