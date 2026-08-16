@@ -2,15 +2,15 @@
   "schemaVersion": "orbit360-r4-certified-product-contract-v1",
   "status": "R4_CERTIFIED_PRODUCT_CONTRACT_BOUND",
   "classification": "FUNCTIONAL_DEFECT_ROOTFIX_SUCCESSOR_CONTRACT",
-  "sourceHead": "54f671e64b32c7b39100d79e770572a579e79ac7",
-  "r3RunId": 31964568216,
-  "r3DurableArtifactId": 9268128540,
-  "zipName": "orbit360-fase-a-product-r4s4-54f671e64b32.zip",
-  "zipSha256": "f266815e26da04a8c9e86b0db9414ca6c06bedb3cd9371f85e96c8d08e420d4c",
+  "sourceHead": "5474a1a9af64c018e6dcc71b4ad0cdfe57ce0484",
+  "r3RunId": 31972737482,
+  "r3DurableArtifactId": 9270227820,
+  "zipName": "orbit360-fase-a-product-r4s5-5474a1a9af64.zip",
+  "zipSha256": "2d7a2ae75c5e6ef04c4759ff3438d41b8589d542fc20f14a603aaffb2053a1ac",
   "fileCount": 194,
-  "manifestStatus": "FASE_A_PRODUCT_R4S4_MINIMAL_SUCCESSOR_CERTIFIED",
-  "manifestSha256": "11df01ef919b30b04a75fb9332210866850e1720406997735dc4573ceeaf9fba",
-  "publicIdentityRunId": 31965583608,
+  "manifestStatus": "FASE_A_PRODUCT_R4S5_MINIMAL_SUCCESSOR_CERTIFIED",
+  "manifestSha256": "c527d400d4c55e1469140a21dd7d31fb310e5de48ac0f3f465b5d50a19822b63",
+  "publicIdentityRunId": 31973486406,
   "entrypoint": {
     "path": "index.html",
     "bytes": 16893,
@@ -27,6 +27,11 @@
     "sourcePath": "orbit360-platform/core/queries.js",
     "bytes": 9949,
     "sha256": "b906c1d3382a9fad310695b0ce2c8e7f49a2bf99fe9b9ed674a8df7e0fcbbb7b"
+  },
+  "clientVisualAsset": {
+    "path": "/core/client-insurer-visual-contract-v20260720.js",
+    "sourcePath": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js",
+    "sha256": "ad6fa96614d4eefe29880fac26a1c349ae24940adc2d8ff75ad04d991595b067"
   },
   "legacyAssetsExcludedFromProduct": [
     "/core/auth.js",
