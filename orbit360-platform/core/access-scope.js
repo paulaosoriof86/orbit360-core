@@ -291,7 +291,7 @@ Orbit.access = (function () {
     var list = Array.isArray(rows) ? rows : [];
     if (!list.length) return [];
     try {
-      // v20260815: resolve invariant access context once per filter call.
+      // v20260816 candidate: resolve invariant role/scope plus relational advisor indexes once per filter call.
       var role = activeRole();
       if (SENSITIVE.indexOf(collection) >= 0 && ALL_ROLES.indexOf(role) < 0) return [];
       var effectiveModule = moduleKey || OP_COLLS[collection] || collection;
@@ -308,13 +308,49 @@ Orbit.access = (function () {
         return list.filter(countryOk);
       }
       var ownAdvisorId = actorAdvisorId();
-      var teamIds = scope === 'team' ? teamAdvisorIds() : [];
+      var teamSet = new Set(scope === 'team' ? teamAdvisorIds() : []);
+      var currentStore = S();
+      var rawStore = currentStore && Object.prototype.hasOwnProperty.call(currentStore, '_scopedFor') ? Object.getPrototypeOf(currentStore) : currentStore;
+      var clientRows = collection === 'clientes' ? list : ((rawStore && rawStore.all && rawStore.all('clientes')) || []);
+      var clientExists = new Set();
+      var clientAdvisor = new Map();
+      clientRows.forEach(function (c) {
+        if (!c || c.id == null) return;
+        var id = clean(c.id);
+        clientExists.add(id);
+        clientAdvisor.set(id, clean(c.asesorId));
+      });
+      var policyRows = collection === 'polizas' ? list : ((rawStore && rawStore.all && rawStore.all('polizas')) || []);
+      var policyAdvisor = new Map();
+      policyRows.forEach(function (p) {
+        if (!p || p.id == null) return;
+        var advisor = clean(p.asesorId);
+        if (!advisor && p.clienteId != null) {
+          var cid = clean(p.clienteId);
+          advisor = clientExists.has(cid) ? clean(clientAdvisor.get(cid)) : '';
+        }
+        policyAdvisor.set(clean(p.id), advisor);
+      });
+      function indexedAdvisorId(rec) {
+        if (!rec) return '';
+        if (rec.asesorId) return clean(rec.asesorId);
+        if (rec.clienteId != null) {
+          var cid = clean(rec.clienteId);
+          if (clientExists.has(cid)) return clean(clientAdvisor.get(cid));
+        }
+        if (rec.polizaId != null) {
+          var pid = clean(rec.polizaId);
+          if (policyAdvisor.has(pid)) return clean(policyAdvisor.get(pid));
+        }
+        if (collection === 'clientes') return clean(rec.asesorId);
+        return '';
+      }
       return list.filter(function (rec) {
         if (!rec || !countryOk(rec)) return false;
-        var advisorId = clean(recordAdvisorId(collection, rec));
+        var advisorId = indexedAdvisorId(rec);
         if (!advisorId) return false;
         if (scope === 'own') return advisorId === ownAdvisorId;
-        if (scope === 'team') return teamIds.indexOf(advisorId) >= 0;
+        if (scope === 'team') return teamSet.has(advisorId);
         return false;
       });
     } catch (e) { return []; }
