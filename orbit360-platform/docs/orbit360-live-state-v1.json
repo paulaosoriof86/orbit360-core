@@ -1,8 +1,8 @@
 {
   "schemaVersion": "orbit360-live-state-v1",
-  "stateVersion": "20260816.r4s4-corrected-matrix-cliente360-nx-clone-stop.current",
-  "updatedAt": "2026-08-16T13:46:00-06:00",
-  "phase": "R4S4_CORRECTED_MATRIX_STOP_RETRY_CLIENT_PROJECTION_NX_CLONE",
+  "stateVersion": "20260816.r4s5-client-projection-batch-source-pass.current",
+  "updatedAt": "2026-08-16T14:04:14-06:00",
+  "phase": "R4S5_CLIENT_PROJECTION_BATCH_SOURCE_ROOTFIX_PASS_NOT_PACKAGED",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pr": 5,
@@ -11,7 +11,7 @@
     "name": "orbit360-fase-a-product-r4s4-54f671e64b32.zip",
     "sha256": "f266815e26da04a8c9e86b0db9414ca6c06bedb3cd9371f85e96c8d08e420d4c",
     "fileCount": 194,
-    "status": "R4S4_PUBLISHED_STATIC_IDENTITY_PASS",
+    "status": "R4S4_PUBLISHED_STATIC_IDENTITY_PASS_UNCHANGED",
     "sourceHead": "54f671e64b32c7b39100d79e770572a579e79ac7",
     "manifestStatus": "FASE_A_PRODUCT_R4S4_MINIMAL_SUCCESSOR_CERTIFIED",
     "staticVerificationRunId": 31965583608,
@@ -35,7 +35,7 @@
     "authChangesRequiredNow": false
   },
   "cliente360BatchSummaryRootfix": {
-    "status": "SOURCE_ROOTFIX_PASS_AND_PUBLISHED_IN_R4S4_BUT_COMPOSED_PROJECTION_OWNER_REMAINS",
+    "status": "SOURCE_ROOTFIX_PASS_AND_PUBLISHED_IN_R4S4_NOT_OWNER_OF_CURRENT_SOURCE_FRONTIER",
     "productCommit": "54f671e64b32c7b39100d79e770572a579e79ac7",
     "productFile": "orbit360-platform/core/queries.js",
     "querySha256": "b906c1d3382a9fad310695b0ce2c8e7f49a2bf99fe9b9ed674a8df7e0fcbbb7b",
@@ -68,36 +68,95 @@
     "currentStopAttributedToValidator": false
   },
   "currentRootCause": {
-    "classification": "FUNCTIONAL_DEFECT",
+    "classification": "FUNCTIONAL_DEFECT_ROOTFIX_SOURCE_PROVEN",
     "failureFamily": "CLIENT_VISUAL_PROJECTION_SEGMENTATION_NX_CLONE_COMPOSED_READONLY_STORE",
-    "status": "ROOT_CAUSE_SOURCE_ISOLATED_PRODUCT_FROZEN",
+    "status": "ROOTFIX_SOURCE_PASS_NOT_PACKAGED_NOT_PUBLISHED",
     "owner": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js",
     "ownerType": "PRODUCT",
-    "chain": [
-      "installClientReadProjection overrides Orbit.store.all",
-      "projectedAll(clientes) maps projectClient for every client",
-      "projectClient always invokes segmentFor",
-      "segmentFor calls rawRows(polizas) per client",
-      "rawRows uses nativeAll clone-on-read from product readonly store",
-      "R4S4 clientesResumenIndex receives the wrapped all(clientes), so the visual projection recreates N-times cloning before the batched summary can help"
-    ],
+    "sourceRootfixCommit": "5474a1a9af64c018e6dcc71b4ad0cdfe57ce0484",
+    "sourceRootfixSha256": "ad6fa96614d4eefe29880fac26a1c349ae24940adc2d8ff75ad04d991595b067",
+    "previousHead": "7ddc46dc1fe39d1cfd46aa02e910facf1b021c87",
+    "productDiffFileCount": 1,
+    "productDeltaFiles": ["orbit360-platform/core/client-insurer-visual-contract-v20260720.js"],
+    "queriesReopened": false,
+    "authModified": false,
+    "dataModified": false,
+    "storeModified": false,
+    "rulesModified": false,
+    "hostdimeModified": false
+  },
+  "clientProjectionBatchRootfix": {
+    "status": "SOURCE_ROOTFIX_PASS_NOT_PACKAGED_NOT_PUBLISHED",
+    "classification": "FUNCTIONAL_DEFECT_ROOTFIX_SOURCE_PROVEN",
+    "owner": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js",
+    "productCommit": "5474a1a9af64c018e6dcc71b4ad0cdfe57ce0484",
+    "targetSha256": "ad6fa96614d4eefe29880fac26a1c349ae24940adc2d8ff75ad04d991595b067",
+    "batchRevision": "20260816.1",
+    "implementation": {
+      "singlePolicyReadPerProjectedOperation": true,
+      "singleCollectionReadWhenPremiumThresholdActive": true,
+      "policiesIndexedByClientId": true,
+      "collectedNetIndexedByClientId": true,
+      "singleRowFallbackSemanticsPreserved": true,
+      "storePublicApiChanged": false,
+      "writesStore": false
+    },
     "fixture": {
       "clientes": 430,
       "polizas": 1375,
-      "cobros": 1900
+      "cobros": 1900,
+      "premiumThreshold": 1000
     },
-    "cloneLowerBounds": {
-      "oneProjectedClientesAllWithoutPremiumCobros": 591680,
-      "oneProjectedClientesAllWithPremiumCobros": 1408680,
-      "twoProjectedClientesAllWithoutPremiumCobros": 1183360,
-      "twoProjectedClientesAllWithPremiumCobros": 2817360,
-      "threeProjectedClientesAllWithoutPremiumCobros": 1775040,
-      "threeProjectedClientesAllWithPremiumCobros": 4226040
+    "semanticValidation": {
+      "semanticEqual": true,
+      "mismatchCount": 0,
+      "reachableSegments": ["Pendiente de clasificar", "Nuevo", "Recurrente", "Estándar", "Premium"],
+      "declaredButUnreachableSegments": ["Histórico"],
+      "historicalSemanticsChanged": false
     },
-    "productModifiedDuringDiagnosis": false,
-    "authModified": false,
-    "dataModified": false,
-    "storeModified": false
+    "batchMetrics": {
+      "allClientes": {"allCalls": 3, "cloneRows": 3705},
+      "whereClientes": {"allCalls": 3, "cloneRows": 3705},
+      "findClientes": {"allCalls": 3, "cloneRows": 3705},
+      "legacyFallback": {"allCalls": 810, "cloneRows": 1313250},
+      "allCallReductionRatio": 270,
+      "cloneRowReductionRatio": 354.45
+    },
+    "validatorFirstRun": {
+      "runId": 31969401196,
+      "jobId": 95219337280,
+      "result": "FAIL_VALIDATOR_STALE_HISTORICO_COVERAGE",
+      "classification": "VALIDATOR_STALE",
+      "productChangedAfterFailure": false
+    },
+    "validatorCorrectionCommit": "29860193f51459ce7ab0ab55312ae9d3feb30d6f",
+    "sourcePass": {
+      "runId": 31969452166,
+      "jobId": 95219466783,
+      "result": "R4S5_CLIENT_PROJECTION_BATCH_ROOTFIX_SOURCE_PASS",
+      "artifactId": 9269368462,
+      "artifactSha256": "e074e25c8213da08b4fa1cc8ae16e3f206f322b13dbd168e2ca878d621d8180d"
+    },
+    "queriesSha256": "b906c1d3382a9fad310695b0ce2c8e7f49a2bf99fe9b9ed674a8df7e0fcbbb7b",
+    "queriesSha256MatchesCertifiedR4S4": true,
+    "firestoreWrites": 0,
+    "authWrites": 0,
+    "operationalWrites": 0,
+    "browserExecuted": false,
+    "secretAccess": false,
+    "realDataAccess": false,
+    "deployExecuted": false,
+    "productionTouched": false,
+    "packageRebuilt": false
+  },
+  "semanticDebt": {
+    "clientSegmentHistorical": {
+      "status": "DOCUMENTED_NOT_AUTHORIZED_FOR_CHANGE",
+      "classification": "FUNCTIONAL_SEMANTIC_DEBT",
+      "detail": "Histórico is declared in SEGMENTS but is unreachable because any existing non-active policy makes historical.length > 0 and returns Recurrente before the final Histórico branch.",
+      "discoveredByValidatorRunId": 31969401196,
+      "changedInCurrentBlock": false
+    }
   },
   "certifiedSuccessorR4S4": {
     "status": "R4S4_MINIMAL_SUCCESSOR_DURABLE_CERTIFIED_AND_PUBLISHED",
@@ -118,7 +177,7 @@
     "target": "https://app.aysseguros.com",
     "documentRoot": "/home/ayssegur/public_html/app.aysseguros.com",
     "publishedPackage": "orbit360-fase-a-product-r4s4-54f671e64b32.zip",
-    "status": "R4S4_PUBLIC_STATIC_IDENTITY_VERIFIED",
+    "status": "R4S4_PUBLIC_STATIC_IDENTITY_VERIFIED_UNCHANGED",
     "staticVerificationRunId": 31965583608,
     "rollbackBase": "Exact R4S3 package/durable artifact preserved.",
     "hostdimeActionRequiredNow": false
@@ -132,7 +191,6 @@
     "authorizedExecutionsConsumed": 1,
     "postGoLiveSmokePass": false,
     "firstFailedStage": "role-Dirección-route-cliente360",
-    "failureFamily": "R4_ROLE_ROUTE_STAGE_FAILED",
     "routeReadinessTimeoutObservedMs": 25000,
     "authPass": true,
     "membershipPass": true,
@@ -160,10 +218,8 @@
     "refreezeRunId": 31968457286,
     "refreezeRunConclusion": "SUCCESS",
     "runtimeStepsSkippedOnRefreeze": true,
-    "correctedFinalMatrixAuthorizationConsumed": true,
     "browserRerunAllowedNow": false,
-    "freshRuntimeAuthorizationRequired": true,
-    "rootfixRequiredBeforeAnyFutureRuntime": true
+    "freshRuntimeAuthorizationRequired": true
   },
   "progress": {
     "functionalReadinessPercent": 100,
@@ -175,35 +231,47 @@
   },
   "authorization": {
     "correctedFinalReadonlyMatrixAuthorizedAndConsumed": true,
-    "currentProductRootfixAuthorized": false,
+    "clientProjectionSourceRootfixAuthorizedAndConsumed": true,
+    "clientProjectionSourceGateAuthorizedAndConsumed": true,
+    "successorPackageAuthorized": false,
+    "productionPublishNewPackageAuthorized": false,
     "newRuntimeAuthorizationRequired": true,
+    "browserAuthorized": false,
+    "deployAuthorized": false,
     "reimportAuthorized": false,
     "authChangesAuthorized": false,
     "dataChangesAuthorized": false,
     "storeChangesAuthorized": false,
+    "rulesChangesAuthorized": false,
+    "hostdimeChangesAuthorized": false,
     "mainMergeAuthorized": false
   },
   "claudeImpact": {
     "classification": "REPLICABLE_CLAUDE_ACUMULADO",
-    "scope": "Avoid read projections that perform per-row full-collection scans over clone-on-read stores. Segment/projection enrichment must use prebuilt relational indexes or bounded batched passes without mutating canonical data."
+    "scope": "Read-only visual projections that enrich N entities from related collections must batch each related collection once per operation and index by relation key; never perform full clone-on-read collection scans per projected row."
   },
   "academiaImpact": {
     "classification": "ACADEMIA_ACTUALIZAR",
-    "scope": "Teach composed-performance defects: a local batched query can be correct while an upstream visual projection wrapper reintroduces N-times cloning. Distinguish validator stale from functional composition defect using repeated-stage evidence."
+    "scope": "Teach batch/index versus N-times clone-on-read, semantic-preserving performance fixes, VALIDATOR_STALE when a gate demands an unreachable state, and Histórico as a separately governed semantic debt."
   },
   "nextActionExact": {
-    "stage": "CLIENT_VISUAL_PROJECTION_NX_CLONE_ROOTFIX_REQUIRES_EXPLICIT_AUTHORIZATION",
-    "action": "Keep R4S4 exact and SOURCE_ONLY=true. No more browser attempts. With new explicit authorization only, modify exclusively core/client-insurer-visual-contract-v20260720.js to replace per-client full collection scans in segmentFor/projectedAll with bounded preindexed read-only projection while preserving segmentation semantics; do not touch queries.js, Auth, product store, data or Rules. Validate composition source-only against 430/1375/1900 with clone-on-read store and canonical gate. Only after PASS decide a minimal certified successor and any future runtime under a separate authorization."
+    "stage": "R4S5_MINIMAL_SUCCESSOR_PACKAGE_REQUIRES_FRESH_AUTHORIZATION",
+    "action": "Keep public R4S4 exact and browser frozen. The source rootfix is proven but not packaged. With fresh explicit authorization only, construct a minimal successor from exact R4S4 replacing solely core/client-insurer-visual-contract-v20260720.js with SHA256 ad6fa96614d4eefe29880fac26a1c349ae24940adc2d8ff75ad04d991595b067; certify package identity and source/static contracts only. Do not publish to HostDime, deploy, access secrets/data, or run browser/runtime without separate authorization."
   },
-  "currentCheckpoint": "orbit360-platform/docs/STOP-R4S4-CORRECTED-MATRIX-CLIENT-PROJECTION-NX-CLONE-20260816.md",
+  "currentCheckpoint": "orbit360-platform/docs/R4S5-SOURCE-ROOTFIX-CLIENT-PROJECTION-BATCH-PASS-20260816.md",
   "currentChangelog": "orbit360-platform/CHANGELOG-R4S3-GOLIVE-20260816.md",
   "readme": "orbit360-platform/README.md",
   "lastEvidence": {
-    "runtimeRunId": 31968334075,
-    "runtimeResult": "R4_PRODUCTION_READONLY_SMOKE_FAIL",
-    "refreezeRunId": 31968457286,
-    "refreezeResult": "SUCCESS_SOURCE_ONLY",
-    "postGoLiveSmokePass": false,
+    "runId": 31969452166,
+    "jobId": 95219466783,
+    "result": "R4S5_CLIENT_PROJECTION_BATCH_ROOTFIX_SOURCE_PASS",
+    "artifactId": 9269368462,
+    "artifactSha256": "e074e25c8213da08b4fa1cc8ae16e3f206f322b13dbd168e2ca878d621d8180d",
+    "semanticEqual": true,
+    "mismatchCount": 0,
+    "browserExecuted": false,
+    "secretAccess": false,
+    "dataAccess": false,
     "operationalWrites": 0
   }
 }
