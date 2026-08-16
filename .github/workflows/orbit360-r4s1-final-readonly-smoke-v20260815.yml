@@ -50,37 +50,28 @@ jobs:
           const contractPath = 'tools/.orbit360-r4s1-final-contract-v20260815.json';
           const wrapperPath = 'tools/.orbit360-r4s1-final-wrapper-v20260815.mjs';
           const contract = {
-            schemaVersion: 'orbit360-r4-certified-product-contract-v1',
-            status: 'R4_CERTIFIED_PRODUCT_CONTRACT_BOUND',
-            classification: 'R4S1_FINAL_PRODUCT_CONTRACT',
-            sourceHead: 'df4c217c34722c03215f88b62f6865ab41c2a9f3',
-            r3RunId: 31915191809,
-            r3DurableArtifactId: 9254713380,
-            zipName: 'orbit360-fase-a-product-r4s1-df4c217c3472.zip',
-            zipSha256: '49f5a5eee451665fcc420fc9acee88347b95aa832a8f6f524053cc4ccaa0d60d',
-            fileCount: 194,
-            manifestStatus: 'FASE_A_PRODUCT_R4S1_MINIMAL_SUCCESSOR_CERTIFIED',
-            entrypoint: { path: 'index.html', bytes: 16893, sha256: '125b24a3fc215a368a7183a107cd55eb5a6332fc8a7f8354ed94e3169340ec4e' },
-            authAsset: { path: '/core/auth-product-runtime-p0.js', sourcePath: 'orbit360-platform/core/auth-product-runtime-p0.js', bytes: 4211, sha256: 'd0bb399fe0e1dd102a03950673044eda5bc8d181e4e98cf477d22d141aa7b3a8' },
-            legacyAssetsExcludedFromProduct: ['/core/auth.js','/core/auth-password-change-v20260805.js','/core/user-credential-selfservice-v20260805.js'],
-            noLabRuntime: true,
-            noPrivateSecretMaterial: true,
-            writeAuthorized: false,
-            packageRebuildAuthorized: false,
-            productionMutationAuthorized: false
+            schemaVersion:'orbit360-r4-certified-product-contract-v1', status:'R4_CERTIFIED_PRODUCT_CONTRACT_BOUND', classification:'R4S1_FINAL_PRODUCT_CONTRACT',
+            sourceHead:'df4c217c34722c03215f88b62f6865ab41c2a9f3', r3RunId:31915191809, r3DurableArtifactId:9254713380,
+            zipName:'orbit360-fase-a-product-r4s1-df4c217c3472.zip', zipSha256:'49f5a5eee451665fcc420fc9acee88347b95aa832a8f6f524053cc4ccaa0d60d', fileCount:194,
+            manifestStatus:'FASE_A_PRODUCT_R4S1_MINIMAL_SUCCESSOR_CERTIFIED',
+            entrypoint:{path:'index.html',bytes:16893,sha256:'125b24a3fc215a368a7183a107cd55eb5a6332fc8a7f8354ed94e3169340ec4e'},
+            authAsset:{path:'/core/auth-product-runtime-p0.js',sourcePath:'orbit360-platform/core/auth-product-runtime-p0.js',bytes:4211,sha256:'d0bb399fe0e1dd102a03950673044eda5bc8d181e4e98cf477d22d141aa7b3a8'},
+            legacyAssetsExcludedFromProduct:['/core/auth.js','/core/auth-password-change-v20260805.js','/core/user-credential-selfservice-v20260805.js'],
+            noLabRuntime:true,noPrivateSecretMaterial:true,writeAuthorized:false,packageRebuildAuthorized:false,productionMutationAuthorized:false
           };
-          fs.writeFileSync(contractPath, JSON.stringify(contract, null, 2) + '\n');
+          fs.writeFileSync(contractPath, JSON.stringify(contract,null,2)+'\n');
           let w = fs.readFileSync('tools/orbit360-r4-certified-product-smoke-wrapper-v20260815.mjs','utf8');
-          w = w.replace('orbit360-r4-certified-product-contract-v20260815.json', '.orbit360-r4s1-final-contract-v20260815.json');
-          w = w.replaceAll('FASE_A_PRODUCT_R3_DURABLE_PACKAGE_CERTIFIED', 'FASE_A_PRODUCT_R4S1_MINIMAL_SUCCESSOR_CERTIFIED');
-          const oldLine = 'let patched = original.replace(stalePath, contract.authAsset.path);';
-          const newLine = "let patched = original.replace(stalePath, contract.authAsset.path).replace('FASE_A_PRODUCT_R3_DURABLE_PACKAGE_CERTIFIED', contract.manifestStatus);";
-          if ((w.match(new RegExp(oldLine.replace(/[.*+?^${}()|[\\]\\]/g,'\\$&'),'g'))||[]).length !== 1) throw new Error('R4S1_WRAPPER_MANIFEST_PATCH_ANCHOR_INVALID');
-          w = w.replace(oldLine, newLine);
-          fs.writeFileSync(wrapperPath, w);
-          const base = fs.readFileSync('tools/orbit360-r4-production-readonly-smoke-v20260815.mjs','utf8');
-          if ((base.match(/FASE_A_PRODUCT_R3_DURABLE_PACKAGE_CERTIFIED/g)||[]).length !== 1) throw new Error('R4S1_BASE_MANIFEST_STATUS_COUNT_INVALID');
-          if ((base.match(/\/core\/auth\.js/g)||[]).length !== 1) throw new Error('R4S1_BASE_AUTH_PATH_COUNT_INVALID');
+          w = w.replace('orbit360-r4-certified-product-contract-v20260815.json','.orbit360-r4s1-final-contract-v20260815.json');
+          w = w.replaceAll('FASE_A_PRODUCT_R3_DURABLE_PACKAGE_CERTIFIED','FASE_A_PRODUCT_R4S1_MINIMAL_SUCCESSOR_CERTIFIED');
+          const oldLine='let patched = original.replace(stalePath, contract.authAsset.path);';
+          const newLine="let patched = original.replace(stalePath, contract.authAsset.path).replace('FASE_A_PRODUCT_R3_DURABLE_PACKAGE_CERTIFIED', contract.manifestStatus);";
+          const n=w.split(oldLine).length-1;
+          if(n!==1) throw new Error(`R4S1_WRAPPER_MANIFEST_PATCH_ANCHOR_INVALID:${n}`);
+          w=w.replace(oldLine,newLine);
+          fs.writeFileSync(wrapperPath,w);
+          const base=fs.readFileSync('tools/orbit360-r4-production-readonly-smoke-v20260815.mjs','utf8');
+          if((base.match(/FASE_A_PRODUCT_R3_DURABLE_PACKAGE_CERTIFIED/g)||[]).length!==1) throw new Error('R4S1_BASE_MANIFEST_STATUS_COUNT_INVALID');
+          if((base.match(/\/core\/auth\.js/g)||[]).length!==1) throw new Error('R4S1_BASE_AUTH_PATH_COUNT_INVALID');
           console.log('R4S1_FINAL_WRAPPER_PREPARED');
           NODE
           node --check tools/.orbit360-r4s1-final-wrapper-v20260815.mjs
@@ -137,20 +128,18 @@ jobs:
           OUT="$EVIDENCE_DIR/r4-production-readonly-smoke-v20260815.json"
           jq -e '.ok==true and .status=="POST_GO_LIVE_SMOKE_PASS" and .manifest.pass==true and .authAsset.pass==true and .authAsset.sha256Matches==true and .auth.signedIn==true and .auth.emailVerified==true and .auth.membershipAvailable==true and .auth.membershipActive==true and .auth.tenantMatches==true and .auth.requiredRolesPresent==true and .runtime.started==true and .runtime.routerStarted==true and .runtime.tenantContextReady==true and .runtime.storeReady==true and .runtime.storeStatus=="ready-read-only" and .runtime.storeWriteEnabled==false and .runtime.requiredMissingCount==0 and .runtime.requiredFailedCount==0 and .privileged.clientes==430 and .privileged.aseguradoras==30 and (.roles|length)==3 and ([.roles[].pass]|all) and (.pageErrors|length)==0 and (.consoleErrors|length)==0 and (.httpFailures|length)==0 and (.writeSignals|length)==0 and (.technicalCopy|length)==0 and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .containsPII==false and .containsSecrets==false and .deployExecuted==false and .packageRebuilt==false' "$OUT" >/dev/null
           node <<'NODE'
-          const fs = require('fs');
-          const p = 'orbit360-platform/runtime-gate-crm-v20260716/r4-production-readonly-smoke-v20260815.json';
-          const o = JSON.parse(fs.readFileSync(p,'utf8'));
-          const roles = ['Dirección','Operativo','Asesor'];
-          const metrics = {};
-          for (const role of roles) {
-            const a = o.checkpoints.find(x => x.stage === `role-${role}-group` && x.state === 'START');
-            const b = o.checkpoints.find(x => x.stage === `role-${role}-route-inicio` && x.state === 'START');
-            if (!a || !b) throw new Error(`R4S1_PERF_CHECKPOINT_MISSING:${role}`);
-            const ms = Number(b.atMs) - Number(a.atMs);
-            metrics[role] = ms;
-            if (!(ms >= 0 && ms <= 10000)) throw new Error(`R4S1_ACCESS_FILTER_NOT_BOUNDED:${role}:${ms}`);
+          const fs=require('fs');
+          const p='orbit360-platform/runtime-gate-crm-v20260716/r4-production-readonly-smoke-v20260815.json';
+          const o=JSON.parse(fs.readFileSync(p,'utf8'));
+          const roles=['Dirección','Operativo','Asesor'], metrics={};
+          for(const role of roles){
+            const a=o.checkpoints.find(x=>x.stage===`role-${role}-group`&&x.state==='START');
+            const b=o.checkpoints.find(x=>x.stage===`role-${role}-route-inicio`&&x.state==='START');
+            if(!a||!b) throw new Error(`R4S1_PERF_CHECKPOINT_MISSING:${role}`);
+            const ms=Number(b.atMs)-Number(a.atMs); metrics[role]=ms;
+            if(!(ms>=0&&ms<=10000)) throw new Error(`R4S1_ACCESS_FILTER_NOT_BOUNDED:${role}:${ms}`);
           }
-          const e = {ok:true,status:'R4S1_FINAL_ACCESS_PERFORMANCE_PASS',classification:'PASS',maxPreRouteMs:10000,rolePreRouteMs:metrics,firestoreWrites:0,authWrites:0,operationalWrites:0,containsPII:false,containsSecrets:false};
+          const e={ok:true,status:'R4S1_FINAL_ACCESS_PERFORMANCE_PASS',classification:'PASS',maxPreRouteMs:10000,rolePreRouteMs:metrics,firestoreWrites:0,authWrites:0,operationalWrites:0,containsPII:false,containsSecrets:false};
           fs.writeFileSync('orbit360-platform/runtime-gate-crm-v20260716/r4s1-final-access-performance-v20260815.json',JSON.stringify(e,null,2)+'\n');
           console.log(JSON.stringify(e));
           NODE
