@@ -1,7 +1,7 @@
 {
   "schemaVersion": "orbit360-live-state-v1",
   "stateVersion": "20260816.r4s5-readonly-matrix-stop-deep-clone-composition.current",
-  "updatedAt": "2026-08-16T15:41:00-06:00",
+  "updatedAt": "2026-08-16T15:42:00-06:00",
   "phase": "R4S5_PUBLIC_REFROZEN_STOP_READONLY_MATRIX_CLIENTE360_DEEP_CLONE_COMPOSITION",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -28,8 +28,7 @@
     "previousPackage": "orbit360-fase-a-product-r4s3-294ed22bdb56.zip",
     "previousPackageSha256": "1ab5f3ea7f59cd0c2eb2bb1f5c0596a4bf3ca241f42016f74bf095ccbaf0f78e",
     "preserved": true,
-    "rollbackRequiredNow": false,
-    "reason": "Runtime STOP was read-only performance/render composition; zero writes, zero security failure, exact public identity preserved."
+    "rollbackRequiredNow": false
   },
   "authStatus": {
     "status": "PASS_NOT_CURRENT_BLOCKER",
@@ -50,7 +49,6 @@
   "r4s5SmokeBinding": {
     "status": "SOURCE_ONLY_BINDING_PASS_RUNTIME_ONCE_CONSUMED",
     "validatorStaleEncountered": true,
-    "validatorStaleDetail": "Certified smoke manifest allowlist lagged behind R4S5. Product remained frozen; only contract/wrapper/workflow were corrected.",
     "contractCommit": "d8942377754607f6a0d5310a765ac5c3f6f21fa1",
     "wrapperCommit": "9f1cb33ef460744e86dbcfb3bde8307549e60a55",
     "sourceBindingCommit": "283c603dd193efb4376d9c012a9d397933f530ba",
@@ -102,16 +100,8 @@
     "packageRebuilt": false
   },
   "runtimeTiming": {
-    "runtimeActivationPassAtMs": 10119,
-    "privilegedSnapshotPassAtMs": 11547,
-    "directionActivationStartAtMs": 11548,
-    "directionActivationPassAtMs": 35737,
     "directionActivationDurationMs": 24189,
-    "inicioStartAtMs": 35737,
-    "inicioPassAtMs": 36166,
     "inicioDurationMs": 429,
-    "cliente360StartAtMs": 36166,
-    "cliente360FailAtMs": 61371,
     "cliente360ObservedDurationMs": 25205
   },
   "currentRootCause": {
@@ -122,20 +112,8 @@
     "secondaryConsumer": "orbit360-platform/modules/cliente360.js",
     "protectedStore": "orbit360-platform/data/store-firestore-product-readonly-p0.js",
     "protectedStoreIsDefect": false,
-    "details": {
-      "productStoreAllDeepClonesEachRow": true,
-      "productStoreGetWhereFindDelegateThroughAll": true,
-      "clientProjectionRebuildsSegmentationContextOnEachAllClientes": true,
-      "segmentationContextReadsPoliciesEachTime": true,
-      "segmentationContextReadsCobrosWhenPremiumThresholdActive": true,
-      "cliente360CallsAllClientesBeforeSummaryIndex": true,
-      "summaryIndexCallsAllClientesAgain": true,
-      "summaryIndexAlsoReadsPoliciesCobrosComisiones": true,
-      "cliente360AdditionalPolicyGlobalReads": true,
-      "minimumKnownDeepClonedRowsBeforeInitialListRenderExcludingComisiones": 14810
-    },
+    "minimumKnownDeepClonedRowsBeforeInitialListRenderExcludingComisiones": 14810,
     "previousNxRootfixStillValid": true,
-    "previousNxRootfixInvalidated": false,
     "productChangeAuthorizedNow": false
   },
   "browserFreeze": {
@@ -156,29 +134,15 @@
   },
   "scopeControl": {
     "baseBeforeAuthorization": "458cfbe4e6e7cf3968e1492d23cb16b703e3f57d",
-    "headAfterDiagnosisDocs": "586d644146a68b6f1f67e8331e730c95814058f7",
+    "lastComparedHead": "586d644146a68b6f1f67e8331e730c95814058f7",
     "changedFileCount": 5,
     "changedProductFileCount": 0,
-    "files": [
-      ".github/workflows/orbit360-r4-certified-product-readonly-smoke-v20260815.yml",
-      "tools/orbit360-r4-certified-product-contract-v20260815.json",
-      "tools/orbit360-r4-certified-product-smoke-wrapper-v20260815.mjs",
-      "orbit360-platform/docs/STOP-R4S5-READONLY-MATRIX-CLIENTE360-DEEP-CLONE-COMPOSITION-20260816.md",
-      "orbit360-platform/docs/orbit360-live-state-v1.json"
-    ],
     "productModified": false,
     "authModified": false,
     "dataModified": false,
     "rulesModified": false,
     "storeModified": false,
     "mainMerged": false
-  },
-  "semanticDebt": {
-    "clientSegmentHistorical": {
-      "status": "DOCUMENTED_NOT_AUTHORIZED_FOR_CHANGE",
-      "classification": "FUNCTIONAL_SEMANTIC_DEBT",
-      "changedInCurrentBlock": false
-    }
   },
   "progress": {
     "functionalReadinessPercent": 100,
@@ -210,14 +174,13 @@
   },
   "academiaImpact": {
     "classification": "ACADEMIA_ACTUALIZAR",
-    "scope": "Teach the distinction between N-times scans and repeated whole-batch deep clones, how a fixture can prove semantic equivalence yet miss real-object serialization cost, and why runtime STOP must freeze rather than trigger repeated browser retries."
+    "scope": "Teach repeated whole-batch deep clones versus N-times scans, fixture limits versus real-object serialization cost, and STOP/refreeze discipline."
   },
   "nextActionExact": {
     "stage": "R4S5_STOP_AWAITING_SOURCE_ONLY_DEEP_CLONE_COMPOSITION_ROOTFIX_AUTHORIZATION",
-    "action": "Keep exact public R4S5 and browser source-only frozen. With fresh explicit source-only authorization only, design and prove a semantic-preserving rootfix in the client visual projection plus Cliente360 consumer that avoids rebuilding the deep-cloned segmentation context on every consecutive clientes read and collapses duplicate global reads. Do not modify the protected product store. No browser/runtime/publication until a new minimal successor is independently authorized, certified and published."
+    "action": "Keep exact public R4S5 and browser source-only frozen. With fresh explicit source-only authorization only, design and prove a semantic-preserving rootfix in the client visual projection plus Cliente360 consumer that avoids rebuilding the deep-cloned segmentation context on every consecutive clientes read and collapses duplicate global reads. Do not modify the protected product store. No browser/runtime/publication until separately authorized."
   },
   "currentCheckpoint": "orbit360-platform/docs/STOP-R4S5-READONLY-MATRIX-CLIENTE360-DEEP-CLONE-COMPOSITION-20260816.md",
-  "previousCheckpoint": "orbit360-platform/docs/R4S5-PUBLISHED-STATIC-IDENTITY-PASS-REFROZEN-20260816.md",
   "lastEvidence": {
     "runtimeRunId": 31973847177,
     "runtimeJobId": 95230265194,
@@ -226,7 +189,6 @@
     "refreezeRunId": 31973877256,
     "refreezeEvidenceArtifactId": 9270537919,
     "currentPublicVersion": "R4S5",
-    "browserExecutedInAuthorizedRun": true,
     "secondBrowserExecution": false,
     "firestoreWrites": 0,
     "authWrites": 0,
