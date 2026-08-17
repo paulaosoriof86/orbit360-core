@@ -1,0 +1,94 @@
+name: Orbit360 R4S9 minimal successor build certify v2 20260817
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/workflows/orbit360-r4s9-minimal-successor-build-certify-v2-20260817.yml'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: orbit360-r4s9-minimal-successor-build-certify-v2-20260817
+  cancel-in-progress: false
+
+env:
+  BASE_ARTIFACT_ID: '9296206724'
+  BASE_ZIP_SHA256: '265fcac34f436ddf28bba58dc63a9146301e49ded7e26faeac50adf86d5790da'
+  BASE_SOURCE_HEAD: '2427d94758c6143f3dbedf70512cbda87a24459c'
+  BASE_STATUS: 'FASE_A_PRODUCT_R4S8_MINIMAL_SUCCESSOR_CERTIFIED'
+  PRODUCT_SOURCE_HEAD: '861326906558f03d9c8c2e7f34adfb4979a17d73'
+  PRODUCT_DELTA_PATH: 'modules/cliente360.js'
+  SUCCESSOR_STATUS: 'FASE_A_PRODUCT_R4S9_MINIMAL_SUCCESSOR_CERTIFIED'
+  SUCCESSOR_ZIP: 'orbit360-fase-a-product-r4s9-861326906558.zip'
+  BASE_ARTIFACT_ZIP: '/tmp/r4s8-artifact.zip'
+  EVIDENCE_DIR: 'orbit360-platform/runtime-gate-crm-v20260716'
+
+jobs:
+  build-certify-source-package-static:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Canonical gate before package work
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+          jq -e '.ok==true and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+
+      - name: Download exact durable R4S8 artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -L --fail --retry 3 \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/${BASE_ARTIFACT_ID}/zip" \
+            -o "$BASE_ARTIFACT_ZIP"
+
+      - name: Build and fully certify R4S9 from committed product blob
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-r4s9-minimal-successor-builder-v20260817.mjs
+          node tools/orbit360-r4s9-minimal-successor-builder-v20260817.mjs
+          jq -e '.ok==true and .status=="R4S9_MINIMAL_SUCCESSOR_CERTIFIED" and .manifestStatus==env.SUCCESSOR_STATUS and .sourceHead==env.PRODUCT_SOURCE_HEAD and .fileCount==194 and .deltaCount==1 and .unchangedProductFiles==193 and .productDelta.path==env.PRODUCT_DELTA_PATH and .baseArtifactId==9296206724 and .baseFullyRehashed==true and .packageReopened==true and .allProductFilesRehashed==true and .committedBlobSyntaxPass==true and .protectedSurfacesUnchanged==true and .worktreeShaBindingDeprecated==true and .priorPackagingStopClassification=="VALIDATOR_STALE_WORKTREE_SHA_NORMALIZATION" and .browserExecuted==false and .runtimeExecuted==false and .secretAccess==false and .dataAccess==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/r4s9-minimal-successor-certification-v20260817.json" >/dev/null
+
+      - name: Canonical gate after package proof
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+          jq -e '.ok==true and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-fase-a-product-r4s9-durable-${{ github.run_id }}
+          path: ${{ env.SUCCESSOR_ZIP }}
+          if-no-files-found: error
+          retention-days: 30
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: orbit360-r4s9-certification-evidence-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/r4s9-minimal-successor-certification-v20260817.json
+            orbit360-platform/runtime-gate-crm-v20260716/r4s9-successor-zip-sha256-v20260817.txt
+          if-no-files-found: warn
+          retention-days: 30
