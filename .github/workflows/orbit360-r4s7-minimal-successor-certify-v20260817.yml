@@ -1,0 +1,166 @@
+name: Orbit360 R4S7 Minimal Successor Certify 20260817
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/workflows/orbit360-r4s7-minimal-successor-certify-v20260817.yml'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: orbit360-r4s7-minimal-successor-certify-v20260817
+  cancel-in-progress: false
+
+env:
+  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+  BASE_ARTIFACT_ID: '9271052165'
+  BASE_ZIP_NAME: orbit360-fase-a-product-r4s6-395f15d9c2e1.zip
+  BASE_ZIP_SHA256: 00b283a69511735dbcd8d662b5d95ab0d02895a38fbf90770590754f253f3d2c
+  BASE_SOURCE_HEAD: 395f15d9c2e1fac2949763947834b88a9b521207
+  DELTA_SOURCE_HEAD: ce9792e3e4e37b298d2eda6f65983c683d66a3a3
+  CORE_PATH: orbit360-platform/core/client-insurer-visual-contract-v20260720.js
+  CORE_PACKAGE_PATH: core/client-insurer-visual-contract-v20260720.js
+  CORE_BASE_SHA256: 5493a18acba2d2055c301bf576c46050959ddb6b2f74e7ca4293ee77f815604f
+  CORE_SHA256: 573a45da2f7dae3803e8dff86ff651ba58f5be507cf85b04a80863ac15bb4390
+  CLIENT360_PATH: orbit360-platform/modules/cliente360.js
+  CLIENT360_PACKAGE_PATH: modules/cliente360.js
+  CLIENT360_SHA256: 5ac3f042add37ea45582cc88c670c5bcff139937dac406d9561e25f1b9962f9e
+  QUERIES_PATH: orbit360-platform/core/queries.js
+  QUERIES_PACKAGE_PATH: core/queries.js
+  QUERIES_SHA256: b906c1d3382a9fad310695b0ce2c8e7f49a2bf99fe9b9ed674a8df7e0fcbbb7b
+  SUCCESSOR_ZIP_NAME: orbit360-fase-a-product-r4s7-ce9792e3e4e3.zip
+
+jobs:
+  certify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Canonical gate and exact R4S7 source contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+          jq -e '.ok==true and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+          node --check tools/orbit360-r4s7-minimal-successor-package-v20260817.mjs
+          node --check tools/orbit360-r4s6-client-projection-consecutive-read-rootfix-gate-v20260817.mjs
+
+          ROOTFIX_PROOF="$EVIDENCE_DIR/r4s7-source-reproof-before-package-v20260817.json"
+          node tools/orbit360-r4s6-client-projection-consecutive-read-rootfix-gate-v20260817.mjs --verify
+          cp "$EVIDENCE_DIR/r4s6-client-projection-consecutive-read-rootfix-source-v20260817.json" "$ROOTFIX_PROOF"
+          jq -e '.ok==true and .status=="R4S6_CLIENT_PROJECTION_CONSECUTIVE_READ_ROOTFIX_SOURCE_PASS" and .classification=="FUNCTIONAL_DEFECT_ROOTFIX_SOURCE_PROVEN" and .semanticEqual==true and .countsEqual==true and .topLevelIsolation==true and .reduction.callReductionPct>=60 and .reduction.rowReductionPct>=60 and .reduction.byteReductionPct>=60 and .candidate.projection.clientProjection.builds==1 and .candidate.projection.clientProjection.hits>=4 and .invalidation.pass==true and .candidateSha256==env.CORE_SHA256 and .protectedStoreModified==false and .moduleModified==false and .browserExecuted==false and .runtimeExecuted==false and .secretAccess==false and .dataAccess==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .productionTouched==false' "$ROOTFIX_PROOF" >/dev/null
+
+          git cat-file -e "${BASE_SOURCE_HEAD}^{commit}"
+          git cat-file -e "${DELTA_SOURCE_HEAD}^{commit}"
+          test "$(git show "${BASE_SOURCE_HEAD}:${CORE_PATH}" | sha256sum | awk '{print $1}')" = "$CORE_BASE_SHA256"
+          test "$(git show "${DELTA_SOURCE_HEAD}:${CORE_PATH}" | sha256sum | awk '{print $1}')" = "$CORE_SHA256"
+          test "$(git show "${DELTA_SOURCE_HEAD}:${CLIENT360_PATH}" | sha256sum | awk '{print $1}')" = "$CLIENT360_SHA256"
+          test "$(git show "${GITHUB_SHA}:${CORE_PATH}" | sha256sum | awk '{print $1}')" = "$CORE_SHA256"
+          test "$(git show "${GITHUB_SHA}:${CLIENT360_PATH}" | sha256sum | awk '{print $1}')" = "$CLIENT360_SHA256"
+          test "$(git show "${GITHUB_SHA}:${QUERIES_PATH}" | sha256sum | awk '{print $1}')" = "$QUERIES_SHA256"
+          mapfile -t PRODUCT_DELTA < <(git diff-tree --no-commit-id --name-only -r "$DELTA_SOURCE_HEAD" | grep '^orbit360-platform/' | sort)
+          test "${#PRODUCT_DELTA[@]}" -eq 1
+          test "${PRODUCT_DELTA[0]}" = "$CORE_PATH"
+          grep -F "ORBIT360_R4_CERTIFIED_SOURCE_ONLY: 'true'" .github/workflows/orbit360-r4-certified-product-readonly-smoke-v20260815.yml >/dev/null
+
+      - name: Recover exact durable R4S6 and construct one-delta R4S7
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          WORK="$RUNNER_TEMP/orbit360-r4s7"
+          BASE="$WORK/base"
+          SUCCESSOR="$WORK/successor"
+          VERIFY="$WORK/verify"
+          OUTER="$WORK/r4s6-artifact.zip"
+          INNER="$WORK/$BASE_ZIP_NAME"
+          CORE_REPLACEMENT="$WORK/client-insurer-visual-contract.rootfix.js"
+          CERT="$EVIDENCE_DIR/r4s7-minimal-successor-certification-v20260817.json"
+          mkdir -p "$WORK" "$BASE" "$VERIFY" "$EVIDENCE_DIR"
+
+          curl --fail --silent --show-error --location \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/${BASE_ARTIFACT_ID}/zip" \
+            -o "$OUTER"
+          unzip -q "$OUTER" -d "$WORK/outer"
+          test -f "$WORK/outer/$BASE_ZIP_NAME"
+          test "$(find "$WORK/outer" -maxdepth 1 -type f | wc -l)" -eq 1
+          cp "$WORK/outer/$BASE_ZIP_NAME" "$INNER"
+          test "$(sha256sum "$INNER" | awk '{print $1}')" = "$BASE_ZIP_SHA256"
+          unzip -q "$INNER" -d "$BASE"
+
+          git show "${DELTA_SOURCE_HEAD}:${CORE_PATH}" > "$CORE_REPLACEMENT"
+          node --check "$CORE_REPLACEMENT"
+          test "$(sha256sum "$CORE_REPLACEMENT" | awk '{print $1}')" = "$CORE_SHA256"
+
+          node tools/orbit360-r4s7-minimal-successor-package-v20260817.mjs prepare "$BASE" "$SUCCESSOR" "$CORE_REPLACEMENT" "$CERT"
+          jq -e '.ok==false and .status=="R4S7_SUCCESSOR_STAGED_AWAITING_ZIP_VERIFY" and .baseZipSha256==env.BASE_ZIP_SHA256 and .baseSourceHead==env.BASE_SOURCE_HEAD and .deltaSourceHead==env.DELTA_SOURCE_HEAD and .changedProductFileCount==1 and .unchangedFileCount==193 and .fileCount==194 and (.deltaFiles|length)==1 and .deltaFiles[0]==env.CORE_PACKAGE_PATH and .targetInfo.sha256==env.CORE_SHA256 and .staticCertification.baseManifestExact==true and .staticCertification.basePhysicalTreeExact==true and .staticCertification.successorManifestExact==true and .staticCertification.successorPhysicalTreeExact==true and .staticCertification.unchangedFilesHashExact==true and .staticCertification.targetHashExact==true and .staticCertification.noLabRuntime==true and .staticCertification.noPrivateSecretMaterial==true and .writeAuthorized==false and .browserExecuted==false and .runtimeExecuted==false and .secretAccess==false and .dataAccess==false and .deployExecuted==false and .productionTouched==false' "$CERT" >/dev/null
+
+          (cd "$SUCCESSOR" && find . -type f -printf '%P\n' | LC_ALL=C sort | zip -X -q "$GITHUB_WORKSPACE/$SUCCESSOR_ZIP_NAME" -@)
+          SUCCESSOR_ZIP_SHA256="$(sha256sum "$SUCCESSOR_ZIP_NAME" | awk '{print $1}')"
+          test "${#SUCCESSOR_ZIP_SHA256}" -eq 64
+          unzip -q "$SUCCESSOR_ZIP_NAME" -d "$VERIFY"
+          export SUCCESSOR_ZIP_SHA256 SUCCESSOR_ZIP_NAME
+          node tools/orbit360-r4s7-minimal-successor-package-v20260817.mjs verify "$BASE" "$VERIFY" - "$CERT"
+          jq -e '.ok==true and .status=="R4S7_MINIMAL_SUCCESSOR_DURABLE_CERTIFIED" and .classification=="FUNCTIONAL_DEFECT_ROOTFIX_SUCCESSOR_CERTIFIED" and .baseZipSha256==env.BASE_ZIP_SHA256 and .baseSourceHead==env.BASE_SOURCE_HEAD and .deltaSourceHead==env.DELTA_SOURCE_HEAD and .changedProductFileCount==1 and .unchangedFileCount==193 and .fileCount==194 and (.deltaFiles|length)==1 and .deltaFiles[0]==env.CORE_PACKAGE_PATH and .targetInfo.sha256==env.CORE_SHA256 and .staticCertification.allManifestHashesVerified==true and .staticCertification.unchangedFilesHashExact==true and .staticCertification.targetHashExact==true and .staticCertification.noLabRuntime==true and .staticCertification.noPrivateSecretMaterial==true and .staticCertification.browserExecuted==false and .staticCertification.runtimeExecuted==false and .staticCertification.deployExecuted==false and .staticCertification.productionTouched==false and (.zipSha256|length)==64 and .writeAuthorized==false and .browserExecuted==false and .runtimeExecuted==false and .secretAccess==false and .dataAccess==false and .deployExecuted==false and .productionTouched==false and .containsPII==false and .containsSecrets==false' "$CERT" >/dev/null
+          test "$(jq -r '.zipSha256' "$CERT")" = "$SUCCESSOR_ZIP_SHA256"
+          test "$(sha256sum "$SUCCESSOR_ZIP_NAME" | awk '{print $1}')" = "$SUCCESSOR_ZIP_SHA256"
+          test "$(sha256sum "$VERIFY/$CLIENT360_PACKAGE_PATH" | awk '{print $1}')" = "$CLIENT360_SHA256"
+          test "$(sha256sum "$VERIFY/$QUERIES_PACKAGE_PATH" | awk '{print $1}')" = "$QUERIES_SHA256"
+
+          cp "$VERIFY/orbit360-package-manifest.json" "$EVIDENCE_DIR/r4s7-orbit360-package-manifest-v20260817.json"
+          printf '%s  %s\n' "$SUCCESSOR_ZIP_SHA256" "$SUCCESSOR_ZIP_NAME" > "$EVIDENCE_DIR/r4s7-minimal-successor-sha256-v20260817.txt"
+          jq -n \
+            --arg base "$BASE_SOURCE_HEAD" \
+            --arg successor "$DELTA_SOURCE_HEAD" \
+            --arg core "$CORE_PACKAGE_PATH" \
+            --arg coreSha "$CORE_SHA256" \
+            --arg clientSha "$CLIENT360_SHA256" \
+            --arg queriesSha "$QUERIES_SHA256" \
+            '{ok:true,status:"R4S6_TO_R4S7_STATIC_COMPARE_PASS",baseSource:$base,successorSource:$successor,fileCount:194,changedProductFileCount:1,unchangedProductFileCount:193,deltaFiles:[$core],deltaSha256:{($core):$coreSha},unchangedAnchors:{"modules/cliente360.js":$clientSha,"core/queries.js":$queriesSha},unexpectedProductDeltas:0,browserExecuted:false,runtimeExecuted:false,deployExecuted:false,productionTouched:false}' \
+            > "$EVIDENCE_DIR/r4s6-to-r4s7-static-compare-v20260817.json"
+
+      - name: Canonical gate after R4S7 certification
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+          jq -e '.ok==true and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: orbit360-r4s7-minimal-successor-evidence-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/r4s7-source-reproof-before-package-v20260817.json
+            orbit360-platform/runtime-gate-crm-v20260716/r4s7-minimal-successor-certification-v20260817.json
+            orbit360-platform/runtime-gate-crm-v20260716/r4s7-orbit360-package-manifest-v20260817.json
+            orbit360-platform/runtime-gate-crm-v20260716/r4s7-minimal-successor-sha256-v20260817.txt
+            orbit360-platform/runtime-gate-crm-v20260716/r4s6-to-r4s7-static-compare-v20260817.json
+          if-no-files-found: warn
+          retention-days: 14
+
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: orbit360-r4s7-minimal-successor-durable-${{ github.run_id }}
+          path: |
+            orbit360-fase-a-product-r4s7-ce9792e3e4e3.zip
+          if-no-files-found: error
+          retention-days: 14
