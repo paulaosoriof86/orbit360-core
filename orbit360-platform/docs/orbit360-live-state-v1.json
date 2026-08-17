@@ -17,5 +17,6 @@
   "progress":{"functionalImplementationPercent":100,"technicalIterationProgressPercent":99,"goLiveGatesClosed":2,"goLiveGatesTotal":3,"goLiveGateProgressPercent":67,"postGoLiveSmokePass":false},
   "authorization":{"latestRuntimeAuthorizationConsumed":true,"secondRuntimeAuthorizedNow":false,"rootfixAuthorizedNow":false,"browserAuthorizedNow":false,"runtimeAuthorizedNow":false,"publicationAuthorizedNow":false,"authChangesAuthorized":false,"dataChangesAuthorized":false,"rulesChangesAuthorized":false,"storeChangesAuthorized":false,"mainMergeAuthorized":false},
   "nextActionExact":{"stage":"SOURCE_ONLY_ROOTFIX_CLIENT360_RESIDUAL_POLICY_WHERE","action":"Fresh authorization: modify initially only core/client-insurer-visual-contract-v20260720.js to replace per-row Orbit.store.where('polizas') with one reusable policy snapshot/index per enhance using existing batch/context. Require source-only DOM/semantic equality and where/all/rows/bytes/enhance metrics plus polizas/clientes/*/route invalidation. No browser/runtime until PASS."},
-  "currentCheckpoint":"orbit360-platform/docs/R4S7-RUNTIME-STOP-RESIDUAL-CLIENT360-ROOTCAUSE-PROVEN-20260817.md"
+  "currentCheckpoint":"orbit360-platform/docs/R4S7-RUNTIME-STOP-RESIDUAL-CLIENT360-ROOTCAUSE-PROVEN-20260817.md",
+  "checkpointCommit":"3af61ede83cfe297c8b3ac96cc356f2d0b8a43bc"
 }
