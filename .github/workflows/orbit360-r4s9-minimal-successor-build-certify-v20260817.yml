@@ -1,0 +1,246 @@
+name: Orbit360 R4S9 minimal successor build certify 20260817
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/workflows/orbit360-r4s9-minimal-successor-build-certify-v20260817.yml'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: orbit360-r4s9-minimal-successor-build-certify-v20260817
+  cancel-in-progress: false
+
+env:
+  BASE_ARTIFACT_ID: '9296206724'
+  BASE_ZIP_SHA256: '265fcac34f436ddf28bba58dc63a9146301e49ded7e26faeac50adf86d5790da'
+  BASE_SOURCE_HEAD: '2427d94758c6143f3dbedf70512cbda87a24459c'
+  BASE_STATUS: 'FASE_A_PRODUCT_R4S8_MINIMAL_SUCCESSOR_CERTIFIED'
+  PRODUCT_SOURCE_HEAD: '861326906558f03d9c8c2e7f34adfb4979a17d73'
+  PRODUCT_DELTA_PATH: 'modules/cliente360.js'
+  PRODUCT_DELTA_SHA256: '642aca24460cbbb8306aca139969dae1754384e964299d1526c05731a567bf3c'
+  SUCCESSOR_STATUS: 'FASE_A_PRODUCT_R4S9_MINIMAL_SUCCESSOR_CERTIFIED'
+  SUCCESSOR_ZIP: 'orbit360-fase-a-product-r4s9-861326906558.zip'
+  EVIDENCE_DIR: 'orbit360-platform/runtime-gate-crm-v20260716'
+
+jobs:
+  build-certify-source-package-static:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Canonical gate before package work
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+          jq -e '.ok==true and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+
+      - name: Verify source rootfix exact owner and protected surfaces
+        shell: bash
+        run: |
+          set -euo pipefail
+          git cat-file -e "$PRODUCT_SOURCE_HEAD^{commit}"
+          git show "$PRODUCT_SOURCE_HEAD:orbit360-platform/$PRODUCT_DELTA_PATH" > /tmp/cliente360-rootfix.js
+          printf '%s  %s\n' "$PRODUCT_DELTA_SHA256" /tmp/cliente360-rootfix.js | sha256sum -c -
+          node --check /tmp/cliente360-rootfix.js
+          test "$(git diff --name-only "$BASE_SOURCE_HEAD" "$PRODUCT_SOURCE_HEAD" -- orbit360-platform/data/store-firestore-product-readonly-p0.js orbit360-platform/core/queries.js orbit360-platform/core/auth.js orbit360-platform/firestore.rules | wc -l)" -eq 0
+
+      - name: Download and verify exact durable R4S8 base
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/r4s8-artifact /tmp/r4s8-package /tmp/r4s9-package /tmp/r4s9-reopen
+          mkdir -p /tmp/r4s8-artifact /tmp/r4s8-package /tmp/r4s9-package /tmp/r4s9-reopen
+          curl -L --fail --retry 3 \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/${BASE_ARTIFACT_ID}/zip" \
+            -o /tmp/r4s8-artifact.zip
+          unzip -q /tmp/r4s8-artifact.zip -d /tmp/r4s8-artifact
+          BASE_INNER="/tmp/r4s8-artifact/orbit360-fase-a-product-r4s8-2427d94758c6.zip"
+          test -f "$BASE_INNER"
+          printf '%s  %s\n' "$BASE_ZIP_SHA256" "$BASE_INNER" | sha256sum -c -
+          unzip -q "$BASE_INNER" -d /tmp/r4s8-package
+          jq -e --arg status "$BASE_STATUS" --arg source "$BASE_SOURCE_HEAD" '.schemaVersion=="orbit360-fase-a-product-package-manifest-v1" and .status==$status and .sourceHead==$source and .fileCount==194 and (.files|length)==194' /tmp/r4s8-package/orbit360-package-manifest.json >/dev/null
+
+      - name: Rehash all 194 R4S8 product files before successor build
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib, json, pathlib, sys
+          root = pathlib.Path('/tmp/r4s8-package')
+          manifest = json.loads((root/'orbit360-package-manifest.json').read_text())
+          errors=[]
+          for item in manifest['files']:
+              p=root/item['path']
+              if not p.is_file(): errors.append(f"missing:{item['path']}"); continue
+              b=p.read_bytes(); h=hashlib.sha256(b).hexdigest()
+              if len(b)!=item['bytes']: errors.append(f"bytes:{item['path']}:{len(b)}:{item['bytes']}")
+              if h!=item['sha256']: errors.append(f"sha:{item['path']}:{h}:{item['sha256']}")
+          actual={str(p.relative_to(root)).replace('\\','/') for p in root.rglob('*') if p.is_file() and p.name!='orbit360-package-manifest.json'}
+          declared={x['path'] for x in manifest['files']}
+          if actual!=declared: errors.append(f"file-set-mismatch extra={sorted(actual-declared)} missing={sorted(declared-actual)}")
+          if errors:
+              print('\n'.join(errors)); sys.exit(41)
+          print(json.dumps({'ok':True,'status':'R4S8_DURABLE_REOPEN_FULL_REHASH_PASS','fileCount':len(declared)},indent=2))
+          PY
+
+      - name: Construct deterministic one-delta R4S9 successor
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp -a /tmp/r4s8-package/. /tmp/r4s9-package/
+          git show "$PRODUCT_SOURCE_HEAD:orbit360-platform/$PRODUCT_DELTA_PATH" > "/tmp/r4s9-package/$PRODUCT_DELTA_PATH"
+          python - <<'PY'
+          import datetime, hashlib, json, os, pathlib, subprocess, sys
+          base=pathlib.Path('/tmp/r4s8-package')
+          out=pathlib.Path('/tmp/r4s9-package')
+          m=json.loads((base/'orbit360-package-manifest.json').read_text())
+          delta=os.environ['PRODUCT_DELTA_PATH']
+          expected=os.environ['PRODUCT_DELTA_SHA256']
+          changed=[]
+          files=[]
+          for item in m['files']:
+              p=out/item['path']; b=p.read_bytes(); h=hashlib.sha256(b).hexdigest()
+              files.append({'path':item['path'],'bytes':len(b),'sha256':h})
+              if h!=item['sha256'] or len(b)!=item['bytes']:
+                  changed.append({'path':item['path'],'beforeSha256':item['sha256'],'afterSha256':h,'beforeBytes':item['bytes'],'afterBytes':len(b)})
+          if [x['path'] for x in changed] != [delta]:
+              print(json.dumps({'changed':changed},indent=2)); sys.exit(41)
+          if changed[0]['afterSha256']!=expected: sys.exit('DELTA_SHA_MISMATCH')
+          unchanged=sum(1 for old,new in zip(m['files'],files) if old['sha256']==new['sha256'] and old['bytes']==new['bytes'])
+          if unchanged!=193: sys.exit(f'UNCHANGED_COUNT_INVALID:{unchanged}')
+          epoch=int(subprocess.check_output(['git','show','-s','--format=%ct',os.environ['PRODUCT_SOURCE_HEAD']],text=True).strip())
+          generated=datetime.datetime.fromtimestamp(epoch,datetime.timezone.utc).isoformat().replace('+00:00','Z')
+          successor={
+            'schemaVersion':'orbit360-fase-a-product-package-manifest-v1',
+            'status':os.environ['SUCCESSOR_STATUS'],
+            'sourceHead':os.environ['PRODUCT_SOURCE_HEAD'],
+            'generatedAt':generated,
+            'artifactRoot':m.get('artifactRoot','orbit360-artifacts/fase-a-product'),
+            'fileCount':194,
+            'files':files,
+            'lineage':{
+              'baseStatus':os.environ['BASE_STATUS'],
+              'baseSourceHead':os.environ['BASE_SOURCE_HEAD'],
+              'baseArtifactId':int(os.environ['BASE_ARTIFACT_ID']),
+              'baseZipSha256':os.environ['BASE_ZIP_SHA256'],
+              'deltaCount':1,
+              'unchangedProductFiles':193,
+              'productDelta':changed[0]
+            }
+          }
+          (out/'orbit360-package-manifest.json').write_text(json.dumps(successor,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          evidence={
+            'schemaVersion':'orbit360-r4s9-minimal-successor-build-v1','ok':True,
+            'status':'R4S9_MINIMAL_SUCCESSOR_CONSTRUCTED','classification':'PASS',
+            'sourceHead':os.environ['PRODUCT_SOURCE_HEAD'],'baseArtifactId':int(os.environ['BASE_ARTIFACT_ID']),
+            'baseZipSha256':os.environ['BASE_ZIP_SHA256'],'fileCount':194,'deltaCount':1,'unchangedProductFiles':193,
+            'productDelta':changed[0], 'browserExecuted':False,'runtimeExecuted':False,'secretAccess':False,'dataAccess':False,
+            'firestoreWrites':0,'authWrites':0,'operationalWrites':0,'deployExecuted':False,'productionTouched':False
+          }
+          ev=pathlib.Path(os.environ['EVIDENCE_DIR']); ev.mkdir(parents=True,exist_ok=True)
+          (ev/'r4s9-minimal-successor-build-v20260817.json').write_text(json.dumps(evidence,indent=2)+'\n')
+          print(json.dumps(evidence,indent=2))
+          PY
+          jq -e '.ok==true and .status=="R4S9_MINIMAL_SUCCESSOR_CONSTRUCTED" and .fileCount==194 and .deltaCount==1 and .unchangedProductFiles==193 and .productDelta.path=="modules/cliente360.js" and .productDelta.afterSha256==env.PRODUCT_DELTA_SHA256 and .browserExecuted==false and .runtimeExecuted==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .productionTouched==false' "$EVIDENCE_DIR/r4s9-minimal-successor-build-v20260817.json" >/dev/null
+
+      - name: Build deterministic successor ZIP
+        shell: bash
+        run: |
+          set -euo pipefail
+          EPOCH="$(git show -s --format=%ct "$PRODUCT_SOURCE_HEAD")"
+          find /tmp/r4s9-package -exec touch -d "@$EPOCH" {} +
+          rm -f "$SUCCESSOR_ZIP"
+          (cd /tmp/r4s9-package && find . -type f -printf '%P\n' | LC_ALL=C sort | zip -X -q "$GITHUB_WORKSPACE/$SUCCESSOR_ZIP" -@)
+          sha256sum "$SUCCESSOR_ZIP" | tee "$EVIDENCE_DIR/r4s9-successor-zip-sha256-v20260817.txt"
+
+      - name: Reopen successor ZIP and fully certify package/static identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          unzip -q "$SUCCESSOR_ZIP" -d /tmp/r4s9-reopen
+          python - <<'PY'
+          import hashlib, json, os, pathlib, sys
+          root=pathlib.Path('/tmp/r4s9-reopen')
+          manifest=json.loads((root/'orbit360-package-manifest.json').read_text())
+          errors=[]
+          if manifest.get('status')!=os.environ['SUCCESSOR_STATUS']: errors.append('status')
+          if manifest.get('sourceHead')!=os.environ['PRODUCT_SOURCE_HEAD']: errors.append('source')
+          if manifest.get('fileCount')!=194 or len(manifest.get('files',[]))!=194: errors.append('count')
+          for item in manifest.get('files',[]):
+              p=root/item['path']
+              if not p.is_file(): errors.append('missing:'+item['path']); continue
+              b=p.read_bytes(); h=hashlib.sha256(b).hexdigest()
+              if len(b)!=item['bytes'] or h!=item['sha256']: errors.append('hash:'+item['path'])
+          actual={str(p.relative_to(root)).replace('\\','/') for p in root.rglob('*') if p.is_file() and p.name!='orbit360-package-manifest.json'}
+          declared={x['path'] for x in manifest.get('files',[])}
+          if actual!=declared: errors.append('fileset')
+          delta=manifest.get('lineage',{}).get('productDelta',{})
+          if delta.get('path')!=os.environ['PRODUCT_DELTA_PATH'] or delta.get('afterSha256')!=os.environ['PRODUCT_DELTA_SHA256']: errors.append('delta')
+          if manifest.get('lineage',{}).get('unchangedProductFiles')!=193: errors.append('unchanged')
+          module=(root/os.environ['PRODUCT_DELTA_PATH']).read_bytes()
+          if hashlib.sha256(module).hexdigest()!=os.environ['PRODUCT_DELTA_SHA256']: errors.append('module-source')
+          if errors:
+              print(errors); sys.exit(41)
+          zip_path=pathlib.Path(os.environ['SUCCESSOR_ZIP'])
+          zip_sha=hashlib.sha256(zip_path.read_bytes()).hexdigest()
+          manifest_sha=hashlib.sha256((root/'orbit360-package-manifest.json').read_bytes()).hexdigest()
+          evidence={
+            'schemaVersion':'orbit360-r4s9-minimal-successor-certification-v1','ok':True,
+            'status':'R4S9_MINIMAL_SUCCESSOR_CERTIFIED','manifestStatus':os.environ['SUCCESSOR_STATUS'],'classification':'PASS',
+            'sourceHead':os.environ['PRODUCT_SOURCE_HEAD'],'zipName':os.environ['SUCCESSOR_ZIP'],'zipSha256':zip_sha,'manifestSha256':manifest_sha,
+            'fileCount':194,'deltaCount':1,'unchangedProductFiles':193,'productDelta':delta,
+            'packageReopened':True,'allProductFilesRehashed':True,'nodeSyntaxChangedModulePass':True,
+            'browserExecuted':False,'runtimeExecuted':False,'secretAccess':False,'dataAccess':False,
+            'firestoreWrites':0,'authWrites':0,'operationalWrites':0,'deployExecuted':False,'productionTouched':False
+          }
+          ev=pathlib.Path(os.environ['EVIDENCE_DIR'])
+          (ev/'r4s9-minimal-successor-certification-v20260817.json').write_text(json.dumps(evidence,indent=2)+'\n')
+          print(json.dumps(evidence,indent=2))
+          PY
+          node --check "/tmp/r4s9-reopen/$PRODUCT_DELTA_PATH"
+          jq -e '.ok==true and .status=="R4S9_MINIMAL_SUCCESSOR_CERTIFIED" and .manifestStatus==env.SUCCESSOR_STATUS and .sourceHead==env.PRODUCT_SOURCE_HEAD and .fileCount==194 and .deltaCount==1 and .unchangedProductFiles==193 and .productDelta.path==env.PRODUCT_DELTA_PATH and .productDelta.afterSha256==env.PRODUCT_DELTA_SHA256 and .packageReopened==true and .allProductFilesRehashed==true and .browserExecuted==false and .runtimeExecuted==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .productionTouched==false' "$EVIDENCE_DIR/r4s9-minimal-successor-certification-v20260817.json" >/dev/null
+
+      - name: Canonical gate after package proof
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+          jq -e '.ok==true and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-fase-a-product-r4s9-durable-${{ github.run_id }}
+          path: ${{ env.SUCCESSOR_ZIP }}
+          if-no-files-found: error
+          retention-days: 30
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: orbit360-r4s9-certification-evidence-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/r4s9-minimal-successor-build-v20260817.json
+            orbit360-platform/runtime-gate-crm-v20260716/r4s9-minimal-successor-certification-v20260817.json
+            orbit360-platform/runtime-gate-crm-v20260716/r4s9-successor-zip-sha256-v20260817.txt
+          if-no-files-found: warn
+          retention-days: 30
