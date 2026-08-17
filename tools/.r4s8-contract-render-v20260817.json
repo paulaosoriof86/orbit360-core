@@ -1,0 +1,46 @@
+{
+  "schemaVersion": "orbit360-r4-certified-product-contract-v1",
+  "status": "R4_CERTIFIED_PRODUCT_CONTRACT_BOUND",
+  "classification": "FUNCTIONAL_DEFECT_ROOTFIX_SUCCESSOR_CONTRACT",
+  "sourceHead": "2427d94758c6143f3dbedf70512cbda87a24459c",
+  "r3RunId": 32055426996,
+  "r3DurableArtifactId": 9296206724,
+  "zipName": "orbit360-fase-a-product-r4s8-2427d94758c6.zip",
+  "zipSha256": "265fcac34f436ddf28bba58dc63a9146301e49ded7e26faeac50adf86d5790da",
+  "fileCount": 194,
+  "manifestStatus": "FASE_A_PRODUCT_R4S8_MINIMAL_SUCCESSOR_CERTIFIED",
+  "manifestSha256": "422f961cd1bbbc75b8540e9419fdd5bfe64e4798c91358253d4ac128bad42343",
+  "publicIdentityRunId": 32057975932,
+  "entrypoint": {
+    "path": "index.html",
+    "bytes": 16893,
+    "sha256": "125b24a3fc215a368a7183a107cd55eb5a6332fc8a7f8354ed94e3169340ec4e"
+  },
+  "authAsset": {
+    "path": "/core/auth-product-runtime-p0.js",
+    "sourcePath": "orbit360-platform/core/auth-product-runtime-p0.js",
+    "bytes": 4211,
+    "sha256": "d0bb399fe0e1dd102a03950673044eda5bc8d181e4e98cf477d22d141aa7b3a8"
+  },
+  "queriesAsset": {
+    "path": "/core/queries.js",
+    "sourcePath": "orbit360-platform/core/queries.js",
+    "bytes": 9949,
+    "sha256": "b906c1d3382a9fad310695b0ce2c8e7f49a2bf99fe9b9ed674a8df7e0fcbbb7b"
+  },
+  "clientVisualAsset": {
+    "path": "/core/client-insurer-visual-contract-v20260720.js",
+    "sourcePath": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js",
+    "sha256": "a7c61af94bd578849d8e6a946c01e97159cd7bac4f0385f6ac5cd920cc93299d"
+  },
+  "legacyAssetsExcludedFromProduct": [
+    "/core/auth.js",
+    "/core/auth-password-change-v20260805.js",
+    "/core/user-credential-selfservice-v20260805.js"
+  ],
+  "noLabRuntime": true,
+  "noPrivateSecretMaterial": true,
+  "writeAuthorized": false,
+  "packageRebuildAuthorized": false,
+  "productionMutationAuthorized": false
+}
