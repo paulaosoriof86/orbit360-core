@@ -33,7 +33,8 @@ function validateContract(contract) {
     'FASE_A_PRODUCT_R4S6_MINIMAL_SUCCESSOR_CERTIFIED',
     'FASE_A_PRODUCT_R4S7_MINIMAL_SUCCESSOR_CERTIFIED',
     'FASE_A_PRODUCT_R4S8_MINIMAL_SUCCESSOR_CERTIFIED',
-    'FASE_A_PRODUCT_R4S9_MINIMAL_SUCCESSOR_CERTIFIED'
+    'FASE_A_PRODUCT_R4S9_MINIMAL_SUCCESSOR_CERTIFIED',
+    'FASE_A_PRODUCT_R4S9C_CONTRACT_RECOVERY_CERTIFIED'
   ]);
   if (!allowedManifestStatuses.has(String(contract.manifestStatus || ''))) fail('CONTRACT_MANIFEST_STATUS_INVALID');
   if (contract.entrypoint?.path !== 'index.html' || Number(contract.entrypoint?.bytes) !== 16893 || !/^[a-f0-9]{64}$/.test(String(contract.entrypoint?.sha256 || ''))) fail('CONTRACT_ENTRYPOINT_INVALID');
