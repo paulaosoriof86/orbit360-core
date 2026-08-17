@@ -69,11 +69,7 @@
       "direccionScopedClientes": 430,
       "direccionInicioPass": true
     },
-    "notRuntimeValidated": [
-      "Dirección:Aseguradoras",
-      "Operativo:matrix",
-      "Asesor:matrix"
-    ],
+    "notRuntimeValidated": ["Dirección:Aseguradoras", "Operativo:matrix", "Asesor:matrix"],
     "pageErrors": 0,
     "consoleErrors": 0,
     "httpFailures": 0,
