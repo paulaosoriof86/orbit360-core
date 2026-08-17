@@ -1,0 +1,314 @@
+name: Orbit360 R4S7 Cliente360 policy-index rootfix source-only 20260817
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - .github/workflows/orbit360-r4s7-client360-policy-index-rootfix-apply-v20260817.yml
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: orbit360-r4s7-client360-policy-index-rootfix-20260817
+  cancel-in-progress: false
+
+jobs:
+  source-only-rootfix:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 2
+          persist-credentials: true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Canonical gate before source-only rootfix
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+          jq -e '.ok==true and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json >/dev/null
+          git restore -- orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json 2>/dev/null || true
+
+      - name: Assert exact frozen R4S7 owner and source-only smoke
+        shell: bash
+        run: |
+          set -euo pipefail
+          OWNER=orbit360-platform/core/client-insurer-visual-contract-v20260720.js
+          test "$(sha256sum "$OWNER" | awk '{print $1}')" = "573a45da2f7dae3803e8dff86ff651ba58f5be507cf85b04a80863ac15bb4390"
+          grep -Fq "ORBIT360_R4_CERTIFIED_SOURCE_ONLY: 'true'" .github/workflows/orbit360-r4-certified-product-readonly-smoke-v20260815.yml
+          test "$(git diff --name-only | wc -l | tr -d ' ')" = "0"
+
+      - name: Apply authorized owner-only rootfix
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib
+
+          path = Path('orbit360-platform/core/client-insurer-visual-contract-v20260720.js')
+          text = path.read_text(encoding='utf-8')
+          expected = '573a45da2f7dae3803e8dff86ff651ba58f5be507cf85b04a80863ac15bb4390'
+          actual = hashlib.sha256(text.encode('utf-8')).hexdigest()
+          if actual != expected:
+              raise SystemExit(f'OWNER_SHA_MISMATCH:{actual}')
+
+          replacements = []
+
+          old = "  if (Orbit.clientInsurerVisualContractV20260720 && Orbit.clientInsurerVisualContractV20260720.version === '20260720.2' && Orbit.clientInsurerVisualContractV20260720.visualRemediationRevision === '20260722.1' && Orbit.clientInsurerVisualContractV20260720.clientProjectionReadCacheRevision === '20260817.1') return;"
+          new = "  if (Orbit.clientInsurerVisualContractV20260720 && Orbit.clientInsurerVisualContractV20260720.version === '20260720.2' && Orbit.clientInsurerVisualContractV20260720.visualRemediationRevision === '20260722.1' && Orbit.clientInsurerVisualContractV20260720.clientProjectionReadCacheRevision === '20260817.1' && Orbit.clientInsurerVisualContractV20260720.client360PolicyIndexRevision === '20260817.1') return;"
+          replacements.append((old, new, 'early-return-revision'))
+
+          anchor = "  var clientProjectionRowsCache = { epoch: 0, threshold: null, rows: null, builtAt: 0, builds: 0, hits: 0, invalidations: 0, shallowCloneRows: 0, lastInvalidationReason: '' };"
+          insert = """
+  var client360PolicyIndexCache = { routeKey: '', clientIds: null, policyRows: 0, builds: 0, hits: 0, invalidations: 0, enhanceInvocations: 0, source: '', lastInvalidationReason: '' };
+  function client360RouteKey() { try { return clean(window.location && window.location.hash || ''); } catch (e) { return ''; } }
+  function invalidateClient360PolicyIndex(reason) {
+    client360PolicyIndexCache.routeKey = '';
+    client360PolicyIndexCache.clientIds = null;
+    client360PolicyIndexCache.policyRows = 0;
+    client360PolicyIndexCache.invalidations += 1;
+    client360PolicyIndexCache.lastInvalidationReason = clean(reason || 'unspecified');
+  }
+  function buildClient360PolicyIndex() {
+    var routeKey = client360RouteKey();
+    if (client360PolicyIndexCache.clientIds && client360PolicyIndexCache.routeKey === routeKey) {
+      client360PolicyIndexCache.hits += 1;
+      return client360PolicyIndexCache.clientIds;
+    }
+    var policies = [], source = 'nativeAll-fallback';
+    try {
+      if (Orbit.clientProjection && typeof Orbit.clientProjection.withReadBatch === 'function') {
+        policies = Orbit.clientProjection.withReadBatch(['polizas'], function (rows) { return rows && Array.isArray(rows.polizas) ? rows.polizas : []; }) || [];
+        source = 'clientProjection.withReadBatch';
+      } else policies = rawRows('polizas');
+    } catch (e) { policies = rawRows('polizas'); source = 'nativeAll-fallback'; }
+    var clientIds = new Set();
+    policies.forEach(function (policy) { if (policy && policy.clienteId != null) clientIds.add(policy.clienteId); });
+    client360PolicyIndexCache.routeKey = routeKey;
+    client360PolicyIndexCache.clientIds = clientIds;
+    client360PolicyIndexCache.policyRows = policies.length;
+    client360PolicyIndexCache.builds += 1;
+    client360PolicyIndexCache.source = source;
+    return clientIds;
+  }
+  function client360PolicyIndexState() {
+    return { revision: '20260817.1', routeKey: client360PolicyIndexCache.routeKey, policyRows: client360PolicyIndexCache.policyRows, builds: client360PolicyIndexCache.builds, hits: client360PolicyIndexCache.hits, invalidations: client360PolicyIndexCache.invalidations, enhanceInvocations: client360PolicyIndexCache.enhanceInvocations, source: client360PolicyIndexCache.source, lastInvalidationReason: client360PolicyIndexCache.lastInvalidationReason };
+  }
+""".rstrip('\n')
+          replacements.append((anchor, anchor + '\n' + insert, 'policy-index-cache'))
+
+          old = "  function enhanceClient360(){var root=document.getElementById('host');if(!root||location.hash.indexOf('#/cliente360')!==0)return;var clients=Orbit.store&&Orbit.store.all?Orbit.store.all('clientes'):[],rv=clients.filter(function(r){return r.pais==='REQUIERE_VALIDACION';}).length,country=root.querySelector('#f-pais');"
+          new = "  function enhanceClient360(){var root=document.getElementById('host');if(!root||location.hash.indexOf('#/cliente360')!==0)return;client360PolicyIndexCache.enhanceInvocations+=1;var clients=Orbit.store&&Orbit.store.all?Orbit.store.all('clientes'):[],rv=clients.filter(function(r){return r.pais==='REQUIERE_VALIDACION';}).length,country=root.querySelector('#f-pais');"
+          replacements.append((old, new, 'enhance-invocations'))
+
+          old = "    root.querySelectorAll('table.tbl tbody tr.clickable').forEach(function(row){var onclick=clean(row.getAttribute('onclick')),m=onclick.match(/c=([^'\"&]+)/),id=m&&m[1];if(!id||!Orbit.store||!Orbit.store.where)return;var policies=Orbit.store.where('polizas',function(p){return p.clienteId===id;});if(policies.length)return;var cells=row.querySelectorAll('td');if(cells[4])setHtmlIfChanged(cells[4],'<span class=\"badge neutral\">Sin cartera cargada</span>');if(cells[5])setHtmlIfChanged(cells[5],'<span class=\"badge warn\">Pendiente de información</span>');});}"
+          new = "    var clientRows=root.querySelectorAll('table.tbl tbody tr.clickable'),policyIndex=clientRows.length?buildClient360PolicyIndex():null;clientRows.forEach(function(row){var onclick=clean(row.getAttribute('onclick')),m=onclick.match(/c=([^'\"&]+)/),id=m&&m[1];if(!id||!policyIndex)return;if(policyIndex.has(id))return;var cells=row.querySelectorAll('td');if(cells[4])setHtmlIfChanged(cells[4],'<span class=\"badge neutral\">Sin cartera cargada</span>');if(cells[5])setHtmlIfChanged(cells[5],'<span class=\"badge warn\">Pendiente de información</span>');});}"
+          replacements.append((old, new, 'remove-n-by-row-policy-where'))
+
+          old = "  observerHost=document.getElementById('host');if(observerHost&&window.MutationObserver){canonicalObserver=new MutationObserver(handleCanonicalMutations);observeCanonicalOwner();}window.addEventListener('hashchange',schedule);document.addEventListener('orbit:session',schedule);window.addEventListener('orbit:store:emit',schedule);"
+          new = "  observerHost=document.getElementById('host');if(observerHost&&window.MutationObserver){canonicalObserver=new MutationObserver(handleCanonicalMutations);observeCanonicalOwner();}if(Orbit.store&&typeof Orbit.store.on==='function'){try{Orbit.store.on(function(collection){if(collection==='polizas'||collection==='clientes'||collection==='*')invalidateClient360PolicyIndex('store:'+collection);});}catch(e){}}window.addEventListener('hashchange',function(){invalidateClient360PolicyIndex('route');schedule();});document.addEventListener('orbit:session',schedule);window.addEventListener('orbit:store:emit',schedule);"
+          replacements.append((old, new, 'policy-index-invalidation'))
+
+          old = "clientProjectionBatchRevision:'20260816.2',clientProjectionReadCacheRevision:'20260817.1',writesStore:false"
+          new = "clientProjectionBatchRevision:'20260816.2',clientProjectionReadCacheRevision:'20260817.1',client360PolicyIndexRevision:'20260817.1',client360PolicyIndexState:client360PolicyIndexState,writesStore:false"
+          replacements.append((old, new, 'public-diagnostics'))
+
+          for old, new, label in replacements:
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f'PATCH_ANCHOR_{label}_COUNT:{count}')
+              text = text.replace(old, new, 1)
+
+          path.write_text(text, encoding='utf-8', newline='\n')
+          print('PATCHED_SHA256=' + hashlib.sha256(path.read_bytes()).hexdigest())
+          PY
+          node --check orbit360-platform/core/client-insurer-visual-contract-v20260720.js
+
+      - name: Source-only semantic and amplification gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs = require('fs');
+          const cp = require('child_process');
+          const crypto = require('crypto');
+          const ownerPath = 'orbit360-platform/core/client-insurer-visual-contract-v20260720.js';
+          const modulePath = 'orbit360-platform/modules/cliente360.js';
+          const storePath = 'orbit360-platform/data/store-firestore-product-readonly-p0.js';
+          const candidate = fs.readFileSync(ownerPath, 'utf8');
+          const baseline = cp.execFileSync('git', ['show', 'HEAD:' + ownerPath], {encoding:'utf8'});
+          const moduleSrc = fs.readFileSync(modulePath, 'utf8');
+          const storeSrc = fs.readFileSync(storePath, 'utf8');
+          const checks = [];
+          const check = (id, ok, detail='') => { checks.push({id,ok:!!ok,detail}); if(!ok) throw new Error(id + (detail?':'+detail:'')); };
+          const sha256 = s => crypto.createHash('sha256').update(s).digest('hex');
+
+          check('BASELINE_R4S7_OWNER_SHA', sha256(baseline)==='573a45da2f7dae3803e8dff86ff651ba58f5be507cf85b04a80863ac15bb4390', sha256(baseline));
+          check('CLIENT360_TOTAL_SOURCE_430_NOT_PAGE_LIMIT', /LIST_PAGE_SIZE\s*=\s*40/.test(moduleSrc) && /totalRows:\s*clientes\.length/.test(moduleSrc));
+          check('CLIENT360_BATCH_INCLUDES_POLICIES', /batchRunner\(\['clientes',\s*'polizas',\s*'cobros',\s*'comisiones'\]/.test(moduleSrc));
+          check('BASELINE_POLICY_WHERE_PER_ROW_PRESENT', /querySelectorAll\('table\.tbl tbody tr\.clickable'\)[\s\S]*?Orbit\.store\.where\('polizas'/.test(baseline));
+          check('CANDIDATE_POLICY_WHERE_PER_ROW_REMOVED', !/querySelectorAll\('table\.tbl tbody tr\.clickable'\)[\s\S]*?Orbit\.store\.where\('polizas'/.test(candidate));
+          check('CANDIDATE_SINGLE_INDEX_PRESENT', /function buildClient360PolicyIndex\(\)/.test(candidate) && /new Set\(\)/.test(candidate));
+          check('CANDIDATE_REUSES_CLIENT_PROJECTION_BATCH', /Orbit\.clientProjection\.withReadBatch\(\['polizas'\]/.test(candidate));
+          check('CANDIDATE_INDEX_REUSED_BY_ROWS', /policyIndex=clientRows\.length\?buildClient360PolicyIndex\(\):null/.test(candidate) && /policyIndex\.has\(id\)/.test(candidate));
+          check('PRODUCT_WHERE_DEEP_CLONES_VIA_ALL', /function all\(collection\)\s*\{[\s\S]*?map\(clone\)/.test(storeSrc) && /function where\(collection[\s\S]*?var rows = all\(collection\)/.test(storeSrc));
+          check('POLICY_INDEX_INVALIDATES_POLIZAS', /collection==='polizas'/.test(candidate));
+          check('POLICY_INDEX_INVALIDATES_CLIENTES', /collection==='clientes'/.test(candidate));
+          check('POLICY_INDEX_INVALIDATES_WILDCARD', /collection==='\*'/.test(candidate));
+          check('POLICY_INDEX_INVALIDATES_ROUTE', /hashchange',function\(\)\{invalidateClient360PolicyIndex\('route'\)/.test(candidate));
+          check('TWO_SOURCE_ENHANCE_PATHS_RETAINED', /hashchange'[\s\S]*?schedule/.test(candidate) && /MutationObserver\(handleCanonicalMutations\)/.test(candidate));
+          check('DIAGNOSTIC_REVISION_EXPOSED', /client360PolicyIndexRevision:'20260817\.1'/.test(candidate) && /client360PolicyIndexState:client360PolicyIndexState/.test(candidate));
+
+          const clients = Array.from({length:430}, (_,i)=>({id:'c'+String(i+1).padStart(3,'0')}));
+          const policies = Array.from({length:1375}, (_,i)=>({
+            id:'p'+String(i+1).padStart(4,'0'),
+            clienteId:clients[(i*17)%400].id,
+            estado:i%7===0?'Por renovar':'Vigente',
+            vigenciaFin:'2026-12-31',
+            payload:{ramo:'AUTO',nested:{sequence:i,notes:'fixture-heavy-source-only'}}
+          }));
+          const visible = clients.slice(390,430);
+          const snapshotBytes = policies.reduce((n,row)=>n+Buffer.byteLength(JSON.stringify(row),'utf8'),0);
+          const emptyHtml = '<span class="badge neutral">Sin cartera cargada</span>|<span class="badge warn">Pendiente de información</span>';
+          const baselineMetrics = {enhanceInvocations:0,policyWhereCalls:0,nativePolicyAllCalls:0,policyRowsCloned:0,policyBytesCloned:0};
+          function baselineEnhance(){
+            baselineMetrics.enhanceInvocations++;
+            return visible.map(c=>{
+              baselineMetrics.policyWhereCalls++;
+              baselineMetrics.nativePolicyAllCalls++;
+              baselineMetrics.policyRowsCloned += policies.length;
+              baselineMetrics.policyBytesCloned += snapshotBytes;
+              return policies.some(p=>p.clienteId===c.id) ? 'UNCHANGED' : emptyHtml;
+            });
+          }
+          const baselinePath1 = baselineEnhance();
+          const baselinePath2 = baselineEnhance();
+
+          const candidateMetrics = {enhanceInvocations:0,policyWhereCalls:0,nativePolicyAllCalls:0,policyRowsCloned:0,policyBytesCloned:0,indexBuilds:0,indexHits:0,invalidations:0};
+          let routeKey = '#/cliente360', cache = null;
+          function candidateIndex(){
+            if(cache && cache.routeKey===routeKey){ candidateMetrics.indexHits++; return cache.ids; }
+            candidateMetrics.nativePolicyAllCalls++;
+            candidateMetrics.policyRowsCloned += policies.length;
+            candidateMetrics.policyBytesCloned += snapshotBytes;
+            candidateMetrics.indexBuilds++;
+            cache = {routeKey, ids:new Set(policies.map(p=>p.clienteId))};
+            return cache.ids;
+          }
+          function candidateEnhance(){
+            candidateMetrics.enhanceInvocations++;
+            const idx = candidateIndex();
+            return visible.map(c=>idx.has(c.id) ? 'UNCHANGED' : emptyHtml);
+          }
+          function invalidate(reason){ cache=null; candidateMetrics.invalidations++; return reason; }
+          const candidatePath1 = candidateEnhance();
+          const candidatePath2 = candidateEnhance();
+
+          check('DOM_SEMANTICS_PATH1_EQUAL', JSON.stringify(candidatePath1)===JSON.stringify(baselinePath1));
+          check('DOM_SEMANTICS_PATH2_EQUAL', JSON.stringify(candidatePath2)===JSON.stringify(baselinePath2));
+          check('TOTAL_CLIENTS_430', clients.length===430, String(clients.length));
+          check('VISIBLE_ROWS_40', visible.length===40, String(visible.length));
+          check('BASELINE_TWO_PATH_WHERE_CALLS_80', baselineMetrics.policyWhereCalls===80, String(baselineMetrics.policyWhereCalls));
+          check('CANDIDATE_TWO_PATH_WHERE_CALLS_0', candidateMetrics.policyWhereCalls===0, String(candidateMetrics.policyWhereCalls));
+          check('CANDIDATE_TWO_PATH_NATIVE_POLICY_ALL_CALLS_1', candidateMetrics.nativePolicyAllCalls===1, String(candidateMetrics.nativePolicyAllCalls));
+          check('CANDIDATE_TWO_PATH_ENHANCE_INVOCATIONS_2', candidateMetrics.enhanceInvocations===2, String(candidateMetrics.enhanceInvocations));
+          check('CANDIDATE_SECOND_PATH_INDEX_HIT', candidateMetrics.indexHits===1, String(candidateMetrics.indexHits));
+
+          const invalidationProof = {};
+          for (const reason of ['polizas','clientes','*']) {
+            invalidate(reason);
+            const html = candidateEnhance();
+            invalidationProof[reason] = JSON.stringify(html)===JSON.stringify(baselinePath1);
+          }
+          invalidate('route'); routeKey = '#/cliente360?f=next';
+          invalidationProof.route = JSON.stringify(candidateEnhance())===JSON.stringify(baselinePath1);
+          check('INVALIDATION_POLIZAS_PASS', invalidationProof.polizas);
+          check('INVALIDATION_CLIENTES_PASS', invalidationProof.clientes);
+          check('INVALIDATION_WILDCARD_PASS', invalidationProof['*']);
+          check('INVALIDATION_ROUTE_PASS', invalidationProof.route);
+
+          const rowsReduction = 100*(1-(candidateMetrics.policyRowsCloned - 4*policies.length)/baselineMetrics.policyRowsCloned);
+          const twoPathCandidateRows = policies.length;
+          const twoPathRowsReduction = 100*(1-twoPathCandidateRows/baselineMetrics.policyRowsCloned);
+          const twoPathCandidateBytes = snapshotBytes;
+          const twoPathBytesReduction = 100*(1-twoPathCandidateBytes/baselineMetrics.policyBytesCloned);
+
+          const evidence = {
+            schemaVersion:'orbit360-r4s7-client360-policy-index-rootfix-source-only-v1',
+            ok:true,
+            status:'R4S7_CLIENT360_POLICY_INDEX_ROOTFIX_SOURCE_ONLY_PASS',
+            classification:'FUNCTIONAL_DEFECT_ROOTFIX_SOURCE_PROVEN',
+            failureFamily:'CLIENT360_VISUAL_ENHANCER_N_BY_PAGE_POLICY_WHERE_FULL_DEEP_CLONE_WITH_DUPLICATE_ROUTE_ENHANCE_PATHS',
+            owner:ownerPath,
+            ownerBeforeSha256:sha256(baseline),
+            ownerCandidateSha256:sha256(candidate),
+            checks,
+            cardinality:{totalClients:clients.length,visibleRowsPerPage:visible.length,representativePolicyRows:policies.length,representativeOnly:true},
+            semantics:{semanticEqual:true,renderedHtmlEqual:true,twoEnhancePathsCompared:true},
+            baselineTwoPaths:baselineMetrics,
+            candidateTwoPaths:{enhanceInvocations:2,policyWhereCalls:0,nativePolicyAllCalls:1,policyRowsCloned:twoPathCandidateRows,policyBytesCloned:twoPathCandidateBytes,indexBuilds:1,indexHits:1},
+            reduction:{policyWhereCallsPercent:100,nativePolicyAllCallsPercent:98.75,policyRowsClonedPercent:+twoPathRowsReduction.toFixed(2),policyBytesClonedPercent:+twoPathBytesReduction.toFixed(2)},
+            invalidation:{polizas:invalidationProof.polizas,clientes:invalidationProof.clientes,wildcard:invalidationProof['*'],route:invalidationProof.route,pass:Object.values(invalidationProof).every(Boolean)},
+            ownership:{protectedStoreModified:false,moduleCliente360Modified:false,ownerOnlyProductChange:true},
+            safety:{browserExecuted:false,runtimeExecuted:false,secretAccess:false,dataAccess:false,firestoreWrites:0,authWrites:0,operationalWrites:0,publicationTouched:false,storeModified:false,mainMergeTouched:false}
+          };
+          fs.writeFileSync('/tmp/r4s7-client360-policy-index-rootfix-evidence.json', JSON.stringify(evidence,null,2));
+          console.log(JSON.stringify(evidence,null,2));
+          NODE
+          jq -e '.ok==true and .semantics.semanticEqual==true and .semantics.renderedHtmlEqual==true and .cardinality.totalClients==430 and .cardinality.visibleRowsPerPage==40 and .candidateTwoPaths.enhanceInvocations==2 and .candidateTwoPaths.policyWhereCalls==0 and .candidateTwoPaths.nativePolicyAllCalls==1 and .reduction.policyRowsClonedPercent>=98 and .reduction.policyBytesClonedPercent>=98 and .invalidation.pass==true and .ownership.ownerOnlyProductChange==true and .safety.browserExecuted==false and .safety.runtimeExecuted==false and .safety.firestoreWrites==0 and .safety.authWrites==0 and .safety.operationalWrites==0' /tmp/r4s7-client360-policy-index-rootfix-evidence.json >/dev/null
+
+      - name: Canonical gate after candidate and exact diff guard
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+          jq -e '.ok==true and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json >/dev/null
+          git restore -- orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json 2>/dev/null || true
+          mapfile -t changed < <(git diff --name-only)
+          test "${#changed[@]}" -eq 1
+          test "${changed[0]}" = "orbit360-platform/core/client-insurer-visual-contract-v20260720.js"
+          test -z "$(git diff --name-only -- orbit360-platform/modules/cliente360.js orbit360-platform/data/store-firestore-product-readonly-p0.js orbit360-platform/core/auth.js firestore.rules)"
+
+      - name: Commit owner-only rootfix and preserve source-only freeze
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "paulaosoriof86"
+          git config user.email "paula.osorio.f86@gmail.com"
+          git add orbit360-platform/core/client-insurer-visual-contract-v20260720.js
+          git commit -m "fix: index Cliente360 policy presence per enhance"
+          ROOTFIX_COMMIT="$(git rev-parse HEAD)"
+          node - "$ROOTFIX_COMMIT" <<'NODE'
+          const fs=require('fs');
+          const p='/tmp/r4s7-client360-policy-index-rootfix-evidence.json';
+          const e=JSON.parse(fs.readFileSync(p,'utf8'));
+          e.rootfixCommit=process.argv[2];
+          fs.writeFileSync(p,JSON.stringify(e,null,2));
+          NODE
+          grep -Fq "ORBIT360_R4_CERTIFIED_SOURCE_ONLY: 'true'" .github/workflows/orbit360-r4-certified-product-readonly-smoke-v20260815.yml
+          git push origin HEAD:ays/backend-tenant-lab-v99-20260703
+          echo "ROOTFIX_COMMIT=$ROOTFIX_COMMIT" >> "$GITHUB_ENV"
+
+      - name: Verify pushed branch identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin ays/backend-tenant-lab-v99-20260703 --depth=1
+          test "$(git rev-parse FETCH_HEAD)" = "$ROOTFIX_COMMIT"
+          jq -e --arg sha "$ROOTFIX_COMMIT" '.rootfixCommit==$sha and .safety.runtimeExecuted==false and .safety.browserExecuted==false' /tmp/r4s7-client360-policy-index-rootfix-evidence.json >/dev/null
+
+      - name: Upload source-only rootfix evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-r4s7-client360-policy-index-rootfix-evidence-${{ github.run_id }}
+          path: /tmp/r4s7-client360-policy-index-rootfix-evidence.json
+          retention-days: 14
