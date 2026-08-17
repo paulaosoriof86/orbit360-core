@@ -72,11 +72,19 @@ jobs:
           set -euo pipefail
           node "$GATE_TOOL" --apply
           node --check "$OWNER"
-          mapfile -t changed < <(git diff --name-only | sort)
-          test "${#changed[@]}" -eq 2
-          test "${changed[0]}" = "$OWNER"
-          test "${changed[1]}" = "$GATE_TOOL"
+          echo 'TRACKED_DIFF_AFTER_APPLY'
+          git diff --name-only
+          mapfile -t source_changed < <(git diff --name-only -- "$OWNER" "$GATE_TOOL" "$MODULE" "$PROTECTED_STORE" | sort)
+          test "${#source_changed[@]}" -eq 2
+          test "${source_changed[0]}" = "$OWNER"
+          test "${source_changed[1]}" = "$GATE_TOOL"
           git diff --exit-code -- "$MODULE" "$PROTECTED_STORE"
+          while IFS= read -r f; do
+            case "$f" in
+              "$OWNER"|"$GATE_TOOL"|"$EVIDENCE_DIR/preflight-sanitizado.json") ;;
+              *) echo "UNEXPECTED_TRACKED_DELTA:$f"; exit 41 ;;
+            esac
+          done < <(git diff --name-only)
 
       - name: Verify representative consecutive-read rootfix source-only
         shell: bash
