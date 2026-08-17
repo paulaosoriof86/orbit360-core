@@ -1,0 +1,256 @@
+name: Orbit 360 · Enlace verificado credencial Paula LAB
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-requests/auth-paula-reset-link-handoff-lab-v20260817.json'
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: orbit360-auth-paula-reset-link-handoff-lab-v20260817
+  cancel-in-progress: false
+
+env:
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  ORBIT360_REQUEST_FILE: .github/orbit360-requests/auth-paula-reset-link-handoff-lab-v20260817.json
+  ORBIT360_EXPECTED_REQUEST_VERSION: AUTH_PAULA_RESET_LINK_HANDOFF_V1
+  ORBIT360_GATE_ID: block-auth-paula-reset-link-handoff-lab-v20260817
+  ORBIT360_PROJECT_ID: ays-orbit-360-lab
+  ORBIT360_TENANT_ID: alianzas-soluciones
+  ORBIT360_LIFECYCLE: tools/orbit360-validator-lifecycle-contract-auth-paula-reset-link-handoff-lab-v20260817.json
+  ORBIT360_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/auth-paula-reset-link-sanitized-v20260817.json
+  ORBIT360_PRIVATE_RESET_LINK_FILE: orbit360-private-artifacts/paula-reset-link.txt
+  ORBIT360_CLOSURE: orbit360-platform/docs/CIERRE-AUTH-PAULA-RESET-LINK-HANDOFF-LAB-20260817.md
+
+jobs:
+  verified-reset-link:
+    name: Gate → identidad existente → generar código → verificar → handoff privado
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout autorización exacta
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Verificar request único e inmutable
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
+          test "$GITHUB_RUN_ATTEMPT" = "1"
+          mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
+          test "${#CHANGED[@]}" = "1"
+          test "${CHANGED[0]}" = "$ORBIT360_REQUEST_FILE"
+          PARENT="$(git rev-parse HEAD^)"
+          jq -e --arg parent "$PARENT" '
+            .schemaVersion=="orbit360-auth-paula-reset-link-handoff-request-v1" and
+            .requestVersion=="AUTH_PAULA_RESET_LINK_HANDOFF_V1" and
+            .gateId=="block-auth-paula-reset-link-handoff-lab-v20260817" and
+            .rcId=="RC-AYS-LAB-CANONICA-01" and
+            .status=="AUTHORIZED_ONCE" and .approved==true and
+            .allowedExecutions==1 and .consumed==false and
+            .authorizationFrozen==false and .replayAllowed==false and
+            .branch=="ays/backend-tenant-lab-v99-20260703" and .pullRequest==5 and
+            .projectId=="ays-orbit-360-lab" and .tenantId=="alianzas-soluciones" and
+            .parentHead==$parent and
+            .target.advisorId=="ase-paula-osorio" and
+            .target.emailHash=="9b663847979724e9491e1c655da32a7cb17a5f6ed26dba352de1eb811254b23f"
+          ' "$ORBIT360_REQUEST_FILE" >/dev/null
+
+      - name: Registrar gate estrecho sin secretos
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-register-auth-paula-reset-link-handoff-gate-v20260817.mjs
+          node --check tools/orbit360-validar-gate-contracts-engine-auth-paula-reset-link-handoff-lab-v20260817.mjs
+          node --check tools/orbit360-auth-paula-generate-verified-reset-link-v20260817.mjs
+          node tools/orbit360-register-auth-paula-reset-link-handoff-gate-v20260817.mjs
+          git diff --check
+
+      - name: Gate contractual obligatorio antes de secretos
+        id: preflight
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
+          jq -e '
+            .status=="GO_GATE_CONTRACT" and .contractVersion=="14.1.0" and
+            .failed==0 and .ok==true and .executionAuthorized==true and
+            .secretAccessAuthorized==true and .firestoreReadAuthorized==true and
+            .writeAuthorized==false and .passwordResetLinkAuthorized==true and
+            .resetCodeVerificationAuthorized==true and .runtimeAuthorized==true and
+            .browserAuthorized==false and .deployAuthorized==false and
+            .productionAuthorized==false and .targetCount==1 and .maxResetLinks==1
+          ' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json >/dev/null
+
+      - name: Resolver credencial LAB después del GO
+        if: steps.preflight.outcome == 'success'
+        shell: bash
+        env:
+          SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+          SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          set -euo pipefail
+          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-${SA_ORBIT_360_LAB:-${SA_DEFAULT:-}}}"
+          test -n "$SERVICE_ACCOUNT"
+          KEY_FILE="$RUNNER_TEMP/orbit360-paula-reset-link-service-account.json"
+          printf '%s' "$SERVICE_ACCOUNT" > "$KEY_FILE"
+          chmod 600 "$KEY_FILE"
+          test "$(jq -r '.project_id // empty' "$KEY_FILE")" = "$ORBIT360_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
+
+      - name: Instalar runtime reproducible
+        if: steps.preflight.outcome == 'success'
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false firebase-admin@13.10.0 >/dev/null
+
+      - name: Generar y verificar enlace sin cambiar contraseña
+        id: generate
+        if: steps.preflight.outcome == 'success'
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-auth-paula-generate-verified-reset-link-v20260817.mjs
+          jq -e '
+            .ok==true and
+            .stage=="AUTH_PAULA_RESET_LINK_VERIFIED_READY_FOR_HANDOFF" and
+            .existingAuthIdentityVerified==true and .existingMembershipVerified==true and
+            .privilegedMembershipVerified==true and .resetLinksGenerated==1 and
+            .resetCodeVerified==true and .passwordChanged==false and
+            .uidUnchanged==true and .membershipUnchanged==true and
+            .rolesScopesUnchanged==true and .privateArtifactPrepared==true and
+            .firestoreWrites==0 and .authUsersCreated==0 and .authUsersDeleted==0 and
+            .directPasswordSets==0 and .containsActionLink==false and .containsOobCode==false
+          ' "$ORBIT360_EVIDENCE" >/dev/null
+          test -s "$ORBIT360_PRIVATE_RESET_LINK_FILE"
+          test "$(wc -l < "$ORBIT360_PRIVATE_RESET_LINK_FILE")" = "1"
+
+      - name: Handoff privado del enlace verificado
+        id: artifact
+        if: steps.generate.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-paula-reset-link-private-${{ github.run_id }}
+          path: ${{ env.ORBIT360_PRIVATE_RESET_LINK_FILE }}
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Eliminar enlace del workspace antes de persistir evidencia
+        if: always()
+        shell: bash
+        run: |
+          rm -rf orbit360-private-artifacts
+
+      - name: Sellar lifecycle y cierre sanitizado
+        if: always() && steps.preflight.outcome == 'success'
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module - <<'NODE'
+          import fs from 'node:fs';
+          const epath=process.env.ORBIT360_EVIDENCE;
+          const lpath=process.env.ORBIT360_LIFECYCLE;
+          const cpath=process.env.ORBIT360_CLOSURE;
+          const e=fs.existsSync(epath)?JSON.parse(fs.readFileSync(epath,'utf8')):{stage:'STOP_RETRY_AUTH_PAULA_RESET_LINK_HANDOFF',classification:'PIPELINE_MECHANISM_FAILURE',resetLinksGenerated:0,resetCodeVerified:false,ok:false};
+          const lifecycle=JSON.parse(fs.readFileSync(lpath,'utf8'));
+          lifecycle.status=e.ok?'AUTH_PAULA_RESET_LINK_HANDOFF_CONSUMED_PASS':'AUTH_PAULA_RESET_LINK_HANDOFF_CONSUMED_STOP_RETRY';
+          lifecycle.authorization.activeRequest=false;
+          lifecycle.authorization.allowedExecutions=0;
+          lifecycle.authorization.consumed=true;
+          lifecycle.authorization.replayAllowed=false;
+          lifecycle.executionResult={stage:e.stage||'',classification:e.classification||'',ok:e.ok===true,resetLinksGenerated:e.resetLinksGenerated||0,resetCodeVerified:e.resetCodeVerified===true};
+          fs.writeFileSync(lpath,JSON.stringify(lifecycle,null,2)+'\n','utf8');
+          fs.mkdirSync('orbit360-platform/docs',{recursive:true});
+          fs.writeFileSync(cpath,[
+            '# CIERRE — HANDOFF PRIVADO DE ENLACE RESET PAULA LAB','',
+            'Fecha: 2026-08-17',
+            'Gate: `block-auth-paula-reset-link-handoff-lab-v20260817`','',
+            '```text',
+            String(e.stage||'UNKNOWN'),
+            `resetLinksGenerated: ${e.resetLinksGenerated||0}`,
+            `resetCodeVerified: ${e.resetCodeVerified===true}`,
+            `passwordChanged: ${e.passwordChanged===true}`,
+            `uidUnchanged: ${e.uidUnchanged===true}`,
+            `membershipUnchanged: ${e.membershipUnchanged===true}`,
+            `rolesScopesUnchanged: ${e.rolesScopesUnchanged===true}`,
+            '```','',
+            '- Enlace/OOB code en repo, evidencia o comentario: 0.',
+            '- Identidades creadas/eliminadas: 0/0.',
+            '- Contraseña cambiada/asignada directamente: 0.',
+            '- Firestore/CRM writes: 0.',
+            '- Functions/Hosting/Rules/deploy/browser/producción/main/merge: 0.',
+            '- El request queda consumido y sin replay.',''
+          ].join('\n'),'utf8');
+          NODE
+
+      - name: Persistir solo evidencia sanitizada y consumo
+        if: always() && steps.preflight.outcome == 'success'
+        shell: bash
+        run: |
+          set -euo pipefail
+          test ! -e orbit360-private-artifacts
+          git config user.name orbit360-auth-reset-link-bot
+          git config user.email orbit360-auth-reset-link-bot@users.noreply.github.com
+          git add tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_LIFECYCLE" orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json "$ORBIT360_EVIDENCE" "$ORBIT360_CLOSURE"
+          if ! git diff --cached --quiet; then
+            git commit -m 'auth: persist verified reset-link handoff evidence [skip ci]'
+            git push origin "HEAD:$ORBIT360_BRANCH"
+          fi
+
+      - name: Publicar evidencia sanitizada
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-auth-paula-reset-link-sanitized-v20260817
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            ${{ env.ORBIT360_EVIDENCE }}
+            ${{ env.ORBIT360_CLOSURE }}
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Comentar cierre y run id sin secretos en PR 5
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs=require('fs');
+            const p=process.env.ORBIT360_EVIDENCE;
+            const e=fs.existsSync(p)?JSON.parse(fs.readFileSync(p,'utf8')):{stage:'STOP_RETRY_EVIDENCE_MISSING',ok:false};
+            const body=[
+              `## Enlace de reset verificado — ${e.ok?'PASS':'STOP_RETRY'}`,'',
+              '```text',
+              `runId: ${context.runId}`,
+              `stage: ${e.stage||''}`,
+              `resetLinksGenerated: ${e.resetLinksGenerated||0}`,
+              `resetCodeVerified: ${e.resetCodeVerified===true}`,
+              `privateArtifactName: orbit360-paula-reset-link-private-${context.runId}`,
+              `uidUnchanged: ${e.uidUnchanged===true}`,
+              `membershipUnchanged: ${e.membershipUnchanged===true}`,
+              'link/oobCode exposed: false',
+              'password changed: false',
+              'Firestore/CRM writes: 0',
+              'Functions/Hosting/Rules/producción/main/merge: 0',
+              '```'
+            ].join('\n');
+            await github.rest.issues.createComment({owner:context.repo.owner,repo:context.repo.repo,issue_number:5,body});
+
+      - name: Exigir PASS sin segundo intento
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f "$ORBIT360_EVIDENCE"
+          jq -e '.ok==true and .stage=="AUTH_PAULA_RESET_LINK_VERIFIED_READY_FOR_HANDOFF" and .resetLinksGenerated==1 and .resetCodeVerified==true' "$ORBIT360_EVIDENCE" >/dev/null
