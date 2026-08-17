@@ -1,0 +1,109 @@
+name: Orbit360 R4S7 Atomic Source-Only Rebind Apply 20260817
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/workflows/orbit360-r4s7-source-only-rebind-apply-v20260817.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: orbit360-r4s7-source-only-rebind-apply-v20260817
+  cancel-in-progress: false
+
+jobs:
+  rebind:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Canonical gate before atomic source-only rebind
+        shell: bash
+        run: |
+          set -euo pipefail
+          EVIDENCE_DIR=orbit360-platform/runtime-gate-crm-v20260716
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+          jq -e '.ok==true and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+      - name: Rebind R4S6 smoke identity to exact public R4S7 in one working tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          contract = Path('tools/orbit360-r4-certified-product-contract-v20260815.json')
+          wrapper = Path('tools/orbit360-r4-certified-product-smoke-wrapper-v20260815.mjs')
+          workflow = Path('.github/workflows/orbit360-r4-certified-product-readonly-smoke-v20260815.yml')
+
+          def replace_once(text, old, new, label):
+              n = text.count(old)
+              if n != 1:
+                  raise SystemExit(f'{label}_COUNT_{n}')
+              return text.replace(old, new, 1)
+
+          c = contract.read_text()
+          replacements = [
+              ('"sourceHead": "395f15d9c2e1fac2949763947834b88a9b521207"', '"sourceHead": "ce9792e3e4e37b298d2eda6f65983c683d66a3a3"', 'CONTRACT_SOURCE'),
+              ('"r3RunId": 31975982349', '"r3RunId": 32026657493', 'CONTRACT_RUN'),
+              ('"r3DurableArtifactId": 9271052165', '"r3DurableArtifactId": 9287314053', 'CONTRACT_ARTIFACT'),
+              ('"zipName": "orbit360-fase-a-product-r4s6-395f15d9c2e1.zip"', '"zipName": "orbit360-fase-a-product-r4s7-ce9792e3e4e3.zip"', 'CONTRACT_ZIP'),
+              ('"zipSha256": "00b283a69511735dbcd8d662b5d95ab0d02895a38fbf90770590754f253f3d2c"', '"zipSha256": "4c249faa4ccf05d0bb0bc8fa4b8bb5dca07de17838cd9fb4816c5eb15b66944a"', 'CONTRACT_ZIP_SHA'),
+              ('"manifestStatus": "FASE_A_PRODUCT_R4S6_MINIMAL_SUCCESSOR_CERTIFIED"', '"manifestStatus": "FASE_A_PRODUCT_R4S7_MINIMAL_SUCCESSOR_CERTIFIED"', 'CONTRACT_MANIFEST_STATUS'),
+              ('"manifestSha256": "bbc3085df74a3ad80026425fde390078e28de740930141ca81906b923ebf8a8d"', '"manifestSha256": "8f74f310ae8b56aa005ac7388c38db717960f0fe70c5ae4e0ef3347c72c03de4"', 'CONTRACT_MANIFEST_SHA'),
+              ('"publicIdentityRunId": 31977091920', '"publicIdentityRunId": 32046719733', 'CONTRACT_PUBLIC_RUN'),
+              ('"sha256": "5493a18acba2d2055c301bf576c46050959ddb6b2f74e7ca4293ee77f815604f"', '"sha256": "573a45da2f7dae3803e8dff86ff651ba58f5be507cf85b04a80863ac15bb4390"', 'CONTRACT_CLIENT_VISUAL_SHA'),
+          ]
+          for old, new, label in replacements:
+              c = replace_once(c, old, new, label)
+          contract.write_text(c)
+
+          w = wrapper.read_text()
+          old = "    'FASE_A_PRODUCT_R4S6_MINIMAL_SUCCESSOR_CERTIFIED'\n"
+          new = "    'FASE_A_PRODUCT_R4S6_MINIMAL_SUCCESSOR_CERTIFIED',\n    'FASE_A_PRODUCT_R4S7_MINIMAL_SUCCESSOR_CERTIFIED'\n"
+          w = replace_once(w, old, new, 'WRAPPER_ALLOWLIST')
+          wrapper.write_text(w)
+
+          y = workflow.read_text()
+          yrepl = [
+              ('ORBIT360_R4_PACKAGE_SOURCE_HEAD: 395f15d9c2e1fac2949763947834b88a9b521207', 'ORBIT360_R4_PACKAGE_SOURCE_HEAD: ce9792e3e4e37b298d2eda6f65983c683d66a3a3', 'WORKFLOW_SOURCE'),
+              ('.manifestStatus=="FASE_A_PRODUCT_R4S6_MINIMAL_SUCCESSOR_CERTIFIED"', '.manifestStatus=="FASE_A_PRODUCT_R4S7_MINIMAL_SUCCESSOR_CERTIFIED"', 'WORKFLOW_MANIFEST'),
+              ('.durableArtifact.artifactId==9271052165', '.durableArtifact.artifactId==9287314053', 'WORKFLOW_ARTIFACT'),
+              ('.durableArtifact.zipSha256=="00b283a69511735dbcd8d662b5d95ab0d02895a38fbf90770590754f253f3d2c"', '.durableArtifact.zipSha256=="4c249faa4ccf05d0bb0bc8fa4b8bb5dca07de17838cd9fb4816c5eb15b66944a"', 'WORKFLOW_ZIP_SHA'),
+          ]
+          for old, new, label in yrepl:
+              y = replace_once(y, old, new, label)
+          if "ORBIT360_R4_CERTIFIED_SOURCE_ONLY: 'true'" not in y:
+              raise SystemExit('SOURCE_ONLY_NOT_TRUE')
+          workflow.write_text(y)
+          PY
+
+          node --check tools/orbit360-r4-certified-product-smoke-wrapper-v20260815.mjs
+          jq -e '.sourceHead=="ce9792e3e4e37b298d2eda6f65983c683d66a3a3" and .r3DurableArtifactId==9287314053 and .zipSha256=="4c249faa4ccf05d0bb0bc8fa4b8bb5dca07de17838cd9fb4816c5eb15b66944a" and .manifestStatus=="FASE_A_PRODUCT_R4S7_MINIMAL_SUCCESSOR_CERTIFIED" and .manifestSha256=="8f74f310ae8b56aa005ac7388c38db717960f0fe70c5ae4e0ef3347c72c03de4" and .publicIdentityRunId==32046719733 and .clientVisualAsset.sha256=="573a45da2f7dae3803e8dff86ff651ba58f5be507cf85b04a80863ac15bb4390"' tools/orbit360-r4-certified-product-contract-v20260815.json >/dev/null
+          grep -F "'FASE_A_PRODUCT_R4S7_MINIMAL_SUCCESSOR_CERTIFIED'" tools/orbit360-r4-certified-product-smoke-wrapper-v20260815.mjs >/dev/null
+          grep -F "ORBIT360_R4_PACKAGE_SOURCE_HEAD: ce9792e3e4e37b298d2eda6f65983c683d66a3a3" .github/workflows/orbit360-r4-certified-product-readonly-smoke-v20260815.yml >/dev/null
+          grep -F "ORBIT360_R4_CERTIFIED_SOURCE_ONLY: 'true'" .github/workflows/orbit360-r4-certified-product-readonly-smoke-v20260815.yml >/dev/null
+
+          mapfile -t CHANGED < <(git diff --name-only | sort)
+          test "${#CHANGED[@]}" -eq 3
+          test "${CHANGED[0]}" = '.github/workflows/orbit360-r4-certified-product-readonly-smoke-v20260815.yml'
+          test "${CHANGED[1]}" = 'tools/orbit360-r4-certified-product-contract-v20260815.json'
+          test "${CHANGED[2]}" = 'tools/orbit360-r4-certified-product-smoke-wrapper-v20260815.mjs'
+      - name: Commit and push atomic three-file source-only rebind
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name paulaosoriof86
+          git config user.email paula.osorio.f86@gmail.com
+          git add .github/workflows/orbit360-r4-certified-product-readonly-smoke-v20260815.yml tools/orbit360-r4-certified-product-contract-v20260815.json tools/orbit360-r4-certified-product-smoke-wrapper-v20260815.mjs
+          test "$(git diff --cached --name-only | wc -l | tr -d ' ')" = '3'
+          git commit -m 'ci: atomically rebind certified smoke source-only to R4S7'
+          git push origin HEAD:ays/backend-tenant-lab-v99-20260703
