@@ -1,0 +1,9 @@
+R4S9C public verification trigger 2026-08-17
+artifactId=9300368902
+zip=orbit360-fase-a-product-r4s9c-contract-recovery-861326906558.zip
+zipSha256=917f5424deea06d224d45a1b039c0b3699d71a7bef430b2a40d059703b2acc3a
+manifestSha256=fc9b9d23d8749b6c70a24381271cee6e3227d7db286d13b740995514b8d735b5
+sourceHead=861326906558f03d9c8c2e7f34adfb4979a17d73
+PUBLIC_STATIC_ONLY=true
+NO_BROWSER=true
+NO_RUNTIME=true
