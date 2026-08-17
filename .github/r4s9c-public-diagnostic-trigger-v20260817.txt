@@ -1,0 +1,4 @@
+R4S9C public diagnostic trigger 2026-08-17
+staticOnly=true
+noBrowser=true
+noRuntime=true
