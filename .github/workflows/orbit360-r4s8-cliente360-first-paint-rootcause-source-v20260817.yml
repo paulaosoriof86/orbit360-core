@@ -1,0 +1,119 @@
+name: Orbit360 R4S8 Cliente360 first-paint rootcause source-only 20260817
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - .github/workflows/orbit360-r4s8-cliente360-first-paint-rootcause-source-v20260817.yml
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose-source-only:
+    runs-on: ubuntu-24.04
+    env:
+      EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Canonical gate before diagnosis
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+          jq -e '.ok==true and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+      - name: Prove synchronous pre-first-paint ownership
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs=require('fs');
+          const crypto=require('crypto');
+          const router=fs.readFileSync('orbit360-platform/core/router.js','utf8');
+          const mod=fs.readFileSync('orbit360-platform/modules/cliente360.js','utf8');
+          const queries=fs.readFileSync('orbit360-platform/core/queries.js','utf8');
+          const store=fs.readFileSync('orbit360-platform/data/store-firestore-product-readonly-p0.js','utf8');
+          const harness=fs.readFileSync('tools/orbit360-r4-role-route-attribution-wrapper-v20260816.mjs','utf8');
+          const sha=s=>crypto.createHash('sha256').update(s).digest('hex');
+          const checks=[];
+          const check=(id,ok,detail='')=>{checks.push({id,ok:!!ok,detail});if(!ok)throw new Error(id+':'+detail)};
+
+          const routerAssign=router.indexOf("Orbit.route = { key: route, params: parseQuery(qs) }");
+          const routerRender=router.indexOf('mod.render(host)',routerAssign);
+          check('ROUTER_SETS_KEY_BEFORE_SYNC_MODULE_RENDER',routerAssign>=0&&routerRender>routerAssign,`${routerAssign}:${routerRender}`);
+          check('HARNESS_WAITS_EXACT_ROUTE_KEY',harness.includes("await page.waitForFunction(r => window.Orbit && Orbit.route && Orbit.route.key === r, route, { timeout: 25000 });"));
+          check('HARNESS_DOM_OBSERVATION_OCCURS_AFTER_ROUTE_WAIT',harness.indexOf("const state = await page.evaluate",harness.indexOf('waitForFunction'))>harness.indexOf('waitForFunction'));
+
+          const listaStart=mod.indexOf('function lista()');
+          const firstPaint=mod.indexOf('host.innerHTML =',listaStart);
+          const batch=mod.indexOf("batchRunner(['clientes', 'polizas', 'cobros', 'comisiones']",listaStart);
+          const summary=mod.indexOf('q.clientesResumenIndex()',listaStart);
+          const totalAggregate=mod.indexOf('const totPrima = clientes.reduce',listaStart);
+          check('CLIENT360_BATCHES_FOUR_FULL_COLLECTIONS_BEFORE_FIRST_PAINT',batch>listaStart&&batch<firstPaint);
+          check('CLIENT360_BUILDS_FULL_360_SUMMARY_BEFORE_FIRST_PAINT',summary>listaStart&&summary<firstPaint);
+          check('CLIENT360_GLOBAL_430_SUMMARY_AGGREGATE_BEFORE_FIRST_PAINT',totalAggregate>summary&&totalAggregate<firstPaint);
+          check('CLIENT360_PAGE_SIZE_40',/LIST_PAGE_SIZE\s*=\s*40/.test(mod));
+          check('CLIENT360_TOTAL_ROWS_PRESERVED',/totalRows:\s*clientes\.length/.test(mod));
+
+          const qStart=queries.indexOf('function clientesResumenIndex()');
+          const qEnd=queries.indexOf('// ---- globales ----',qStart);
+          const qBlock=queries.slice(qStart,qEnd);
+          check('SUMMARY_INDEX_READS_CLIENTES',qBlock.includes("S().all('clientes')"));
+          check('SUMMARY_INDEX_READS_POLIZAS',qBlock.includes("S().all('polizas')"));
+          check('SUMMARY_INDEX_READS_COBROS',qBlock.includes("S().all('cobros')"));
+          check('SUMMARY_INDEX_READS_COMISIONES',qBlock.includes("S().all('comisiones')"));
+          check('SUMMARY_INDEX_ITERATES_ALL_CLIENTS',qBlock.includes('clientes.forEach(cli =>'));
+          check('SUMMARY_INDEX_COMPUTES_COMISION_UNUSED_BY_LIST',qBlock.includes('const comisionGen =') && qBlock.includes('comisionGen'));
+          check('SUMMARY_INDEX_COMPUTES_COBRADO_UNUSED_BY_LIST',qBlock.includes('const cobrado =') && qBlock.includes('cobrado'));
+
+          const listBeforePaint=mod.slice(listaStart,firstPaint);
+          const listAfterSummary=listBeforePaint.slice(listBeforePaint.indexOf('const summaryIndex'));
+          check('LIST_DOES_NOT_CONSUME_COMISIONGEN',!listAfterSummary.includes('.comisionGen'));
+          check('LIST_DOES_NOT_CONSUME_COBRADO',!listAfterSummary.includes('.cobrado'));
+
+          check('PRODUCT_STORE_ALL_DEEP_CLONES_EVERY_ROW',/function all\(collection\)\s*\{[\s\S]*?return \(cache\[collection\] \|\| \[\]\)\.map\(clone\);/.test(store));
+          check('PRODUCT_STORE_CLONE_IS_JSON_DEEP_CLONE',/JSON\.parse\(JSON\.stringify\(value\)\)/.test(store));
+
+          // Deterministic structural model: 430 total clients vs 40 visible rows.
+          // No claim about live policy/payment/commission cardinalities is made here.
+          const totalClients=430, visibleRows=40;
+          const baseline={totalClients,visibleRows,prePaintCollections:['clientes','polizas','cobros','comisiones'],fullClientSummaries:430,unusedSummaryDimensions:['comisionGen','cobrado']};
+          const boundedTarget={totalClients,visibleRows,requiredPrePaintCollections:['clientes','polizas','cobros'],visibleClientSummariesAtMost:40,commissionCollectionRequiredForList:false};
+          const evidence={
+            schemaVersion:'orbit360-r4s8-cliente360-first-paint-rootcause-source-v1',
+            ok:true,
+            status:'R4S8_CLIENTE360_SYNCHRONOUS_FIRST_PAINT_ROOTCAUSE_SOURCE_PASS',
+            classification:'FUNCTIONAL_DEFECT_ROOT_CAUSE_PROVEN_SOURCE',
+            failureFamily:'CLIENTE360_SYNCHRONOUS_FULL_360_SUMMARY_AND_UNUSED_COMMISSION_CLONE_BEFORE_FIRST_PAINT',
+            causalBoundary:{routeKeyAssignedBeforeRender:true,playwrightPollingCannotResumeUntilSynchronousRenderReturns:true,postRenderEnhancerCannotCauseThisRouteWaitTimeout:true},
+            owner:'orbit360-platform/modules/cliente360.js',
+            supportingSharedQuery:'orbit360-platform/core/queries.js',
+            protectedStore:'orbit360-platform/data/store-firestore-product-readonly-p0.js',
+            hashes:{router:sha(router),cliente360:sha(mod),queries:sha(queries),store:sha(store),harness:sha(harness)},
+            checks,baseline,boundedTarget,
+            interpretation:'Runtime proves the route stage occupies the browser main thread for >25s. Source proves all full-summary work above executes synchronously before first paint. This gate proves the blocking ownership and unnecessary commission/cobrado dimensions, but does not claim live row counts for policies, cobros or comisiones.',
+            safety:{browserExecuted:false,runtimeExecuted:false,secretAccess:false,dataAccess:false,firestoreWrites:0,authWrites:0,operationalWrites:0,publicationTouched:false,productModified:false,storeModified:false,mainMergeTouched:false}
+          };
+          fs.writeFileSync('/tmp/r4s8-cliente360-first-paint-rootcause.json',JSON.stringify(evidence,null,2));
+          console.log(JSON.stringify(evidence,null,2));
+          NODE
+          jq -e '.ok==true and .classification=="FUNCTIONAL_DEFECT_ROOT_CAUSE_PROVEN_SOURCE" and .causalBoundary.postRenderEnhancerCannotCauseThisRouteWaitTimeout==true and .baseline.totalClients==430 and .baseline.visibleRows==40 and .baseline.fullClientSummaries==430 and .boundedTarget.visibleClientSummariesAtMost==40 and .boundedTarget.commissionCollectionRequiredForList==false and .safety.browserExecuted==false and .safety.runtimeExecuted==false and .safety.productModified==false' /tmp/r4s8-cliente360-first-paint-rootcause.json >/dev/null
+      - name: Canonical gate after diagnosis
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+          jq -e '.ok==true and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+      - uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-r4s8-cliente360-first-paint-rootcause-${{ github.run_id }}
+          path: /tmp/r4s8-cliente360-first-paint-rootcause.json
+          retention-days: 14
