@@ -1,7 +1,7 @@
 {
   "schemaVersion": "orbit360-live-state-v1",
   "stateVersion": "20260817.r4s6-runtime-stop-client360-repeated-refrozen.current",
-  "updatedAt": "2026-08-17T05:14:00-06:00",
+  "updatedAt": "2026-08-17T05:15:00-06:00",
   "phase": "R4S6_PUBLIC_EXACT_RUNTIME_STOP_CLIENT360_REPEATED_SOURCE_ONLY_REFROZEN",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -158,6 +158,7 @@
   "lastEvidence": {
     "runtimeRunId": 32023286778,
     "runtimeEvidenceArtifactId": 9286187130,
+    "runtimeEvidenceDigest": "cb17b9fbe7edb0792d5ddabd898ba94224e678f01e3f977d5b255ccc0e84ebb2",
     "refreezeRunId": 32023487824,
     "checkpointCommit": "666927b1906cbbb5f06fc45a029fc146ed4b1d25",
     "currentPublicVersion": "R4S6",
