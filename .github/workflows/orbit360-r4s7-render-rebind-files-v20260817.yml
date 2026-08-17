@@ -1,0 +1,77 @@
+name: Orbit360 R4S7 Render Rebind Files 20260817
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/workflows/orbit360-r4s7-render-rebind-files-v20260817.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  render:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Canonical gate and render exact three-file R4S7 rebind
+        shell: bash
+        run: |
+          set -euo pipefail
+          EVIDENCE_DIR=orbit360-platform/runtime-gate-crm-v20260716
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+          jq -e '.ok==true and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+          python - <<'PY'
+          from pathlib import Path
+          contract=Path('tools/orbit360-r4-certified-product-contract-v20260815.json')
+          wrapper=Path('tools/orbit360-r4-certified-product-smoke-wrapper-v20260815.mjs')
+          workflow=Path('.github/workflows/orbit360-r4-certified-product-readonly-smoke-v20260815.yml')
+          def ro(t,o,n,l):
+              c=t.count(o)
+              if c!=1: raise SystemExit(f'{l}_COUNT_{c}')
+              return t.replace(o,n,1)
+          c=contract.read_text()
+          for o,n,l in [
+            ('"sourceHead": "395f15d9c2e1fac2949763947834b88a9b521207"','"sourceHead": "ce9792e3e4e37b298d2eda6f65983c683d66a3a3"','C_SOURCE'),
+            ('"r3RunId": 31975982349','"r3RunId": 32026657493','C_RUN'),
+            ('"r3DurableArtifactId": 9271052165','"r3DurableArtifactId": 9287314053','C_ART'),
+            ('"zipName": "orbit360-fase-a-product-r4s6-395f15d9c2e1.zip"','"zipName": "orbit360-fase-a-product-r4s7-ce9792e3e4e3.zip"','C_ZIP'),
+            ('"zipSha256": "00b283a69511735dbcd8d662b5d95ab0d02895a38fbf90770590754f253f3d2c"','"zipSha256": "4c249faa4ccf05d0bb0bc8fa4b8bb5dca07de17838cd9fb4816c5eb15b66944a"','C_ZSHA'),
+            ('"manifestStatus": "FASE_A_PRODUCT_R4S6_MINIMAL_SUCCESSOR_CERTIFIED"','"manifestStatus": "FASE_A_PRODUCT_R4S7_MINIMAL_SUCCESSOR_CERTIFIED"','C_MS'),
+            ('"manifestSha256": "bbc3085df74a3ad80026425fde390078e28de740930141ca81906b923ebf8a8d"','"manifestSha256": "8f74f310ae8b56aa005ac7388c38db717960f0fe70c5ae4e0ef3347c72c03de4"','C_MSHA'),
+            ('"publicIdentityRunId": 31977091920','"publicIdentityRunId": 32046719733','C_PRUN'),
+            ('"sha256": "5493a18acba2d2055c301bf576c46050959ddb6b2f74e7ca4293ee77f815604f"','"sha256": "573a45da2f7dae3803e8dff86ff651ba58f5be507cf85b04a80863ac15bb4390"','C_VIS')]: c=ro(c,o,n,l)
+          contract.write_text(c)
+          w=wrapper.read_text()
+          w=ro(w,"    'FASE_A_PRODUCT_R4S6_MINIMAL_SUCCESSOR_CERTIFIED'\n","    'FASE_A_PRODUCT_R4S6_MINIMAL_SUCCESSOR_CERTIFIED',\n    'FASE_A_PRODUCT_R4S7_MINIMAL_SUCCESSOR_CERTIFIED'\n",'W_ALLOW')
+          wrapper.write_text(w)
+          y=workflow.read_text()
+          for o,n,l in [
+            ('ORBIT360_R4_PACKAGE_SOURCE_HEAD: 395f15d9c2e1fac2949763947834b88a9b521207','ORBIT360_R4_PACKAGE_SOURCE_HEAD: ce9792e3e4e37b298d2eda6f65983c683d66a3a3','Y_SOURCE'),
+            ('.manifestStatus=="FASE_A_PRODUCT_R4S6_MINIMAL_SUCCESSOR_CERTIFIED"','.manifestStatus=="FASE_A_PRODUCT_R4S7_MINIMAL_SUCCESSOR_CERTIFIED"','Y_MS'),
+            ('.durableArtifact.artifactId==9271052165','.durableArtifact.artifactId==9287314053','Y_ART'),
+            ('.durableArtifact.zipSha256=="00b283a69511735dbcd8d662b5d95ab0d02895a38fbf90770590754f253f3d2c"','.durableArtifact.zipSha256=="4c249faa4ccf05d0bb0bc8fa4b8bb5dca07de17838cd9fb4816c5eb15b66944a"','Y_ZSHA')]: y=ro(y,o,n,l)
+          if "ORBIT360_R4_CERTIFIED_SOURCE_ONLY: 'true'" not in y: raise SystemExit('SOURCE_ONLY_NOT_TRUE')
+          workflow.write_text(y)
+          PY
+          node --check tools/orbit360-r4-certified-product-smoke-wrapper-v20260815.mjs
+          jq -e '.sourceHead=="ce9792e3e4e37b298d2eda6f65983c683d66a3a3" and .r3DurableArtifactId==9287314053 and .manifestStatus=="FASE_A_PRODUCT_R4S7_MINIMAL_SUCCESSOR_CERTIFIED" and .clientVisualAsset.sha256=="573a45da2f7dae3803e8dff86ff651ba58f5be507cf85b04a80863ac15bb4390"' tools/orbit360-r4-certified-product-contract-v20260815.json >/dev/null
+          grep -F "ORBIT360_R4_CERTIFIED_SOURCE_ONLY: 'true'" .github/workflows/orbit360-r4-certified-product-readonly-smoke-v20260815.yml >/dev/null
+          mkdir -p rendered/tools rendered/.github/workflows
+          cp tools/orbit360-r4-certified-product-contract-v20260815.json rendered/tools/
+          cp tools/orbit360-r4-certified-product-smoke-wrapper-v20260815.mjs rendered/tools/
+          cp .github/workflows/orbit360-r4-certified-product-readonly-smoke-v20260815.yml rendered/.github/workflows/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-r4s7-rendered-rebind-files-${{ github.run_id }}
+          path: rendered/
+          if-no-files-found: error
+          retention-days: 2
