@@ -1,0 +1,5 @@
+R4S8 public exact verification trigger
+source=2427d94758c6143f3dbedf70512cbda87a24459c
+artifact=9296206724
+zipSha256=265fcac34f436ddf28bba58dc63a9146301e49ded7e26faeac50adf86d5790da
+triggeredAfterAuthorizedHostDimeExtraction=true
