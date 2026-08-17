@@ -1,0 +1,103 @@
+name: Orbit360 R4S8 Cliente360 first-paint rootfix source-only 20260817
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/workflows/orbit360-r4s8-cliente360-first-paint-rootfix-source-v20260817.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: orbit360-r4s8-cliente360-first-paint-rootfix-source-v20260817
+  cancel-in-progress: false
+
+env:
+  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+
+jobs:
+  rootfix-source-only:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Canonical gate before correction
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+          jq -e '.ok==true and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+
+      - name: Confirm baseline first-paint defect with actual module
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-r4s8-cliente360-first-paint-rootfix-gate-v20260817.mjs
+          node --check tools/orbit360-r4s8-cliente360-first-paint-rootfix-apply-v20260817.mjs
+          node tools/orbit360-r4s8-cliente360-first-paint-rootfix-gate-v20260817.mjs --before
+          jq -e '.ok==true and .status=="R4S8_CLIENTE360_FIRST_PAINT_BEFORE_CONFIRMED" and .classification=="FUNCTIONAL_DEFECT_CONFIRMED" and .checks.totalClients430==true and .checks.visibleRows40==true and .checks.fullSummaryRows430==true and .checks.commissionNativeReadPresent==true and .checks.writesZero==true' "$EVIDENCE_DIR/r4s8-cliente360-first-paint-before-v20260817.json" >/dev/null
+
+      - name: Apply bounded first-paint rootfix ephemerally
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-r4s8-cliente360-first-paint-rootfix-apply-v20260817.mjs
+          jq -e '.ok==true and .status=="R4S8_CLIENTE360_FIRST_PAINT_ROOTFIX_APPLIED_EPHEMERAL" and .owner=="orbit360-platform/modules/cliente360.js" and .supportingQueryTouched==false and .protectedStoreTouched==false and .pageSize==40 and .browserExecuted==false and .runtimeExecuted==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .productionTouched==false' "$EVIDENCE_DIR/r4s8-cliente360-first-paint-rootfix-apply-v20260817.json" >/dev/null
+          node --check orbit360-platform/modules/cliente360.js
+
+      - name: Prove source semantics and first-paint reduction
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-r4s8-cliente360-first-paint-rootfix-gate-v20260817.mjs --after
+          jq -e '.ok==true and .status=="R4S8_CLIENTE360_FIRST_PAINT_ROOTFIX_SOURCE_PASS" and .classification=="FUNCTIONAL_DEFECT_ROOTFIX_SOURCE_PROVEN" and .sourceChecks.ownerChanged==true and .sourceChecks.filterLogicByteIdentical==true and .sourceChecks.paginationLogicByteIdentical==true and .sourceChecks.pageSize40Preserved==true and .sourceChecks.fullSummaryPathRemovedFromLista==true and .sourceChecks.commissionBatchRemoved==true and .sourceChecks.boundedBatchPresent==true and .sourceChecks.coreQueriesUntouched==true and .sourceChecks.protectedStoreUntouched==true and .semanticChecks.htmlByteEqual==true and .semanticChecks.kpisEqual==true and .semanticChecks.totalClients430==true and .semanticChecks.visibleRows40==true and .semanticChecks.writesZero==true and .performanceChecks.baselineFullSummaryRows430==true and .performanceChecks.candidateFullSummaryRows0==true and .performanceChecks.candidateFirstPaintSummaryRows40==true and .performanceChecks.candidateCommissionRows0==true and .performanceChecks.candidateCommissionNativeCalls0==true and .performanceChecks.candidateAdvisorNativeCallsReduced==true and .performanceChecks.candidateNativeRowsReduced==true and .performanceChecks.candidateNativeBytesReduced==true and .browserExecuted==false and .runtimeExecuted==false and .secretAccess==false and .dataAccess==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .productionTouched==false' "$EVIDENCE_DIR/r4s8-cliente360-first-paint-rootfix-source-v20260817.json" >/dev/null
+
+      - name: Guard exact product ownership
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -z "$(git diff --name-only HEAD -- orbit360-platform/core orbit360-platform/data | tr -d '\n')"
+          CHANGED="$(git diff --name-only HEAD -- orbit360-platform/modules)"
+          test "$CHANGED" = "orbit360-platform/modules/cliente360.js"
+          git diff --exit-code HEAD -- orbit360-platform/core/queries.js
+          git diff --exit-code HEAD -- orbit360-platform/data/store-firestore-product-readonly-p0.js
+
+      - name: Canonical gate after proof
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+          jq -e '.ok==true and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+
+      - name: Persist only proven Cliente360 owner
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'paulaosoriof86'
+          git config user.email 'paula.osorio.f86@gmail.com'
+          git add orbit360-platform/modules/cliente360.js
+          git diff --cached --name-only | grep -qx 'orbit360-platform/modules/cliente360.js'
+          git commit -m 'fix: bound Cliente360 synchronous first paint'
+          git push origin HEAD:${GITHUB_REF_NAME}
+          git rev-parse HEAD > "$EVIDENCE_DIR/r4s8-cliente360-first-paint-rootfix-commit.txt"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: orbit360-r4s8-cliente360-first-paint-rootfix-source-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/r4s8-cliente360-first-paint-before-v20260817.json
+            orbit360-platform/runtime-gate-crm-v20260716/r4s8-cliente360-first-paint-rootfix-apply-v20260817.json
+            orbit360-platform/runtime-gate-crm-v20260716/r4s8-cliente360-first-paint-rootfix-source-v20260817.json
+            orbit360-platform/runtime-gate-crm-v20260716/r4s8-cliente360-first-paint-rootfix-commit.txt
+          if-no-files-found: warn
+          retention-days: 14
