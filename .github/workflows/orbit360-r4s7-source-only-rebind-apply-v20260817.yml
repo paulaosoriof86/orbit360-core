@@ -92,6 +92,7 @@ jobs:
           grep -F "ORBIT360_R4_PACKAGE_SOURCE_HEAD: ce9792e3e4e37b298d2eda6f65983c683d66a3a3" .github/workflows/orbit360-r4-certified-product-readonly-smoke-v20260815.yml >/dev/null
           grep -F "ORBIT360_R4_CERTIFIED_SOURCE_ONLY: 'true'" .github/workflows/orbit360-r4-certified-product-readonly-smoke-v20260815.yml >/dev/null
 
+          git checkout -- orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
           mapfile -t CHANGED < <(git diff --name-only | sort)
           test "${#CHANGED[@]}" -eq 3
           test "${CHANGED[0]}" = '.github/workflows/orbit360-r4-certified-product-readonly-smoke-v20260815.yml'
@@ -102,7 +103,7 @@ jobs:
         run: |
           set -euo pipefail
           git config user.name paulaosoriof86
-          git config user.email paula.osorio.f86@gmail.com
+          git config user.email paula.osoriof86@gmail.com
           git add .github/workflows/orbit360-r4-certified-product-readonly-smoke-v20260815.yml tools/orbit360-r4-certified-product-contract-v20260815.json tools/orbit360-r4-certified-product-smoke-wrapper-v20260815.mjs
           test "$(git diff --cached --name-only | wc -l | tr -d ' ')" = '3'
           git commit -m 'ci: atomically rebind certified smoke source-only to R4S7'
