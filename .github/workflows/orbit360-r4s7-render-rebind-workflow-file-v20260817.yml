@@ -1,0 +1,51 @@
+name: Orbit360 R4S7 Render Rebind Workflow File 20260817
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/workflows/orbit360-r4s7-render-rebind-workflow-file-v20260817.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  render-workflow:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Render exact R4S7 source-only smoke workflow copy
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p rendered
+          cp .github/workflows/orbit360-r4-certified-product-readonly-smoke-v20260815.yml rendered/orbit360-r4-certified-product-readonly-smoke-v20260815.yml
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('rendered/orbit360-r4-certified-product-readonly-smoke-v20260815.yml')
+          y=p.read_text()
+          def ro(t,o,n,l):
+              c=t.count(o)
+              if c!=1: raise SystemExit(f'{l}_COUNT_{c}')
+              return t.replace(o,n,1)
+          for o,n,l in [
+            ('ORBIT360_R4_PACKAGE_SOURCE_HEAD: 395f15d9c2e1fac2949763947834b88a9b521207','ORBIT360_R4_PACKAGE_SOURCE_HEAD: ce9792e3e4e37b298d2eda6f65983c683d66a3a3','Y_SOURCE'),
+            ('.manifestStatus=="FASE_A_PRODUCT_R4S6_MINIMAL_SUCCESSOR_CERTIFIED"','.manifestStatus=="FASE_A_PRODUCT_R4S7_MINIMAL_SUCCESSOR_CERTIFIED"','Y_MS'),
+            ('.durableArtifact.artifactId==9271052165','.durableArtifact.artifactId==9287314053','Y_ART'),
+            ('.durableArtifact.zipSha256=="00b283a69511735dbcd8d662b5d95ab0d02895a38fbf90770590754f253f3d2c"','.durableArtifact.zipSha256=="4c249faa4ccf05d0bb0bc8fa4b8bb5dca07de17838cd9fb4816c5eb15b66944a"','Y_ZSHA')]: y=ro(y,o,n,l)
+          if "ORBIT360_R4_CERTIFIED_SOURCE_ONLY: 'true'" not in y: raise SystemExit('SOURCE_ONLY_NOT_TRUE')
+          p.write_text(y)
+          PY
+          grep -F "ORBIT360_R4_PACKAGE_SOURCE_HEAD: ce9792e3e4e37b298d2eda6f65983c683d66a3a3" rendered/orbit360-r4-certified-product-readonly-smoke-v20260815.yml >/dev/null
+          grep -F "ORBIT360_R4_CERTIFIED_SOURCE_ONLY: 'true'" rendered/orbit360-r4-certified-product-readonly-smoke-v20260815.yml >/dev/null
+      - uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-r4s7-rendered-smoke-workflow-${{ github.run_id }}
+          path: rendered/orbit360-r4-certified-product-readonly-smoke-v20260815.yml
+          if-no-files-found: error
+          retention-days: 2
