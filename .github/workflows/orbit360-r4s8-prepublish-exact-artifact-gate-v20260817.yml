@@ -1,0 +1,108 @@
+name: Orbit360 R4S8 prepublish exact artifact gate 20260817
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - .github/workflows/orbit360-r4s8-prepublish-exact-artifact-gate-v20260817.yml
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  prepublish:
+    runs-on: ubuntu-24.04
+    env:
+      CANDIDATE_ARTIFACT_ID: '9296206724'
+      CANDIDATE_ZIP_NAME: orbit360-fase-a-product-r4s8-2427d94758c6.zip
+      CANDIDATE_ZIP_SHA256: 265fcac34f436ddf28bba58dc63a9146301e49ded7e26faeac50adf86d5790da
+      CANDIDATE_MANIFEST_SHA256: 422f961cd1bbbc75b8540e9419fdd5bfe64e4798c91358253d4ac128bad42343
+      CANDIDATE_SOURCE_HEAD: 2427d94758c6143f3dbedf70512cbda87a24459c
+      CANDIDATE_OWNER_SHA256: a7c61af94bd578849d8e6a946c01e97159cd7bac4f0385f6ac5cd920cc93299d
+      PUBLIC_BASE: https://app.aysseguros.com
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Canonical gate before prepublish
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+          jq -e '.ok==true and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json >/dev/null
+
+      - name: Verify exact durable R4S8 candidate
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/r4s8-pre/wrap /tmp/r4s8-pre/pkg
+          curl -L --fail --retry 3 --retry-delay 2 -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/${CANDIDATE_ARTIFACT_ID}/zip" -o /tmp/r4s8-pre/wrapper.zip
+          unzip -q /tmp/r4s8-pre/wrapper.zip -d /tmp/r4s8-pre/wrap
+          test -f "/tmp/r4s8-pre/wrap/$CANDIDATE_ZIP_NAME"
+          test "$(sha256sum "/tmp/r4s8-pre/wrap/$CANDIDATE_ZIP_NAME" | awk '{print $1}')" = "$CANDIDATE_ZIP_SHA256"
+          unzip -q "/tmp/r4s8-pre/wrap/$CANDIDATE_ZIP_NAME" -d /tmp/r4s8-pre/pkg
+          test "$(sha256sum /tmp/r4s8-pre/pkg/orbit360-package-manifest.json | awk '{print $1}')" = "$CANDIDATE_MANIFEST_SHA256"
+          jq -e --arg src "$CANDIDATE_SOURCE_HEAD" '.status=="FASE_A_PRODUCT_R4S8_MINIMAL_SUCCESSOR_CERTIFIED" and .sourceHead==$src and .fileCount==194 and .unchangedFileCount==193 and .successorOrdinal==8 and .deltaFiles==["core/client-insurer-visual-contract-v20260720.js"]' /tmp/r4s8-pre/pkg/orbit360-package-manifest.json >/dev/null
+          test "$(sha256sum /tmp/r4s8-pre/pkg/core/client-insurer-visual-contract-v20260720.js | awk '{print $1}')" = "$CANDIDATE_OWNER_SHA256"
+
+      - name: Verify current public rollback point is still exact R4S7
+        shell: bash
+        run: |
+          set -euo pipefail
+          nonce="$(date +%s%N)"
+          curl -fsSL --retry 3 -H 'Cache-Control: no-cache' "$PUBLIC_BASE/orbit360-package-manifest.json?prepublish=$nonce" -o /tmp/r4s8-pre/public-manifest.json
+          jq -e '.status=="FASE_A_PRODUCT_R4S7_MINIMAL_SUCCESSOR_CERTIFIED" and .sourceHead=="ce9792e3e4e37b298d2eda6f65983c683d66a3a3" and .fileCount==194 and .successorOrdinal==7' /tmp/r4s8-pre/public-manifest.json >/dev/null
+          curl -fsSL --retry 3 -H 'Cache-Control: no-cache' "$PUBLIC_BASE/core/client-insurer-visual-contract-v20260720.js?prepublish=$nonce" -o /tmp/r4s8-pre/public-owner.js
+          test "$(sha256sum /tmp/r4s8-pre/public-owner.js | awk '{print $1}')" = "573a45da2f7dae3803e8dff86ff651ba58f5be507cf85b04a80863ac15bb4390"
+
+      - name: Emit sanitized prepublish evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > /tmp/r4s8-pre/evidence.json <<EOF
+          {
+            "schemaVersion":"orbit360-r4s8-prepublish-v1",
+            "ok":true,
+            "status":"R4S8_PREPUBLISH_EXACT_ARTIFACT_PASS",
+            "candidateArtifactId":9296206724,
+            "candidateZipName":"orbit360-fase-a-product-r4s8-2427d94758c6.zip",
+            "candidateZipSha256":"265fcac34f436ddf28bba58dc63a9146301e49ded7e26faeac50adf86d5790da",
+            "candidateManifestSha256":"422f961cd1bbbc75b8540e9419fdd5bfe64e4798c91358253d4ac128bad42343",
+            "candidateSourceHead":"2427d94758c6143f3dbedf70512cbda87a24459c",
+            "publicRollbackStatus":"FASE_A_PRODUCT_R4S7_MINIMAL_SUCCESSOR_CERTIFIED",
+            "publicRollbackSource":"ce9792e3e4e37b298d2eda6f65983c683d66a3a3",
+            "browserExecuted":false,
+            "runtimeExecuted":false,
+            "secretAccess":false,
+            "firestoreWrites":0,
+            "authWrites":0,
+            "operationalWrites":0,
+            "publicationExecuted":false
+          }
+          EOF
+
+      - name: Canonical gate after prepublish
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+          jq -e '.ok==true and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json >/dev/null
+          jq -e '.ok==true and .publicationExecuted==false and .browserExecuted==false and .runtimeExecuted==false' /tmp/r4s8-pre/evidence.json >/dev/null
+
+      - name: Upload prepublish evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-r4s8-prepublish-evidence-${{ github.run_id }}
+          path: /tmp/r4s8-pre/evidence.json
+          retention-days: 14
