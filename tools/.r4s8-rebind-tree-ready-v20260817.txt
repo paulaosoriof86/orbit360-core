@@ -1,5 +1,0 @@
-baseHead=2aa202765e8c0655eba34189cc19d3da28211f45
-baseTree=3642ce3b7187e3c5bdd1ee73e3e027f1f7bb3a53
-contractBlob=618e9fd8eb1720ad00e2b6a8e1d106065edefa42
-workflowBlob=4d324ad003eb3a4c2d00db0daf52cd59ca94b0e0
-sourceOnly=true
