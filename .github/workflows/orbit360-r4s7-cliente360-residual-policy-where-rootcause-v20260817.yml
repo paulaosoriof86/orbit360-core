@@ -1,0 +1,52 @@
+name: Orbit360 R4S7 Cliente360 Residual Rootcause 20260817
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/workflows/orbit360-r4s7-cliente360-residual-policy-where-rootcause-v20260817.yml'
+      - 'tools/orbit360-r4s7-cliente360-residual-policy-where-rootcause-v20260817.mjs'
+
+permissions:
+  contents: read
+
+jobs:
+  source-only-rootcause:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Canonical gate before source-only diagnosis
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+          jq -e '.ok==true and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json >/dev/null
+      - name: Prove residual Cliente360 policy-where amplification source-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-r4s7-cliente360-residual-policy-where-rootcause-v20260817.mjs
+          OUT=orbit360-platform/runtime-gate-crm-v20260716/r4s7-cliente360-residual-policy-where-rootcause-v20260817.json
+          jq -e '.ok==true and .status=="R4S7_CLIENT360_RESIDUAL_POLICY_WHERE_ROOTCAUSE_PASS" and .classification=="FUNCTIONAL_DEFECT" and .deterministicAmplification.visibleRows==40 and .deterministicAmplification.productWhereCallsPerEnhance==40 and .deterministicAmplification.eachWhereDeepClonesFullPolicyCollection==true and .deterministicAmplification.policyRowCloneEquivalentsPerEnhance==55000 and .deterministicAmplification.policyRowCloneEquivalentsAcrossTwoPaths==110000 and .deterministicAmplification.deterministicRowCloneReductionPercent==97.5 and .ownership.protectedStoreMustNotBeModified==true and .ownership.cliente360ModuleBatchAlreadyPresent==true and .safety.browserExecuted==false and .safety.runtimeExecuted==false and .safety.firestoreWrites==0 and .safety.authWrites==0 and .safety.operationalWrites==0 and .safety.productModified==false and .safety.storeModified==false and .safety.productionTouched==false' "$OUT" >/dev/null
+      - name: Canonical gate after source-only diagnosis
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: orbit360-r4s7-cliente360-residual-rootcause-evidence-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/r4s7-cliente360-residual-policy-where-rootcause-v20260817.json
+          if-no-files-found: warn
+          retention-days: 14
