@@ -1,0 +1,8 @@
+R4S7_PUBLIC_IDENTITY_STATIC_VERIFY_ONCE_20260817
+artifact=9287314053
+zip=orbit360-fase-a-product-r4s7-ce9792e3e4e3.zip
+sha256=4c249faa4ccf05d0bb0bc8fa4b8bb5dca07de17838cd9fb4816c5eb15b66944a
+source=ce9792e3e4e37b298d2eda6f65983c683d66a3a3
+publication_confirmed=HOSTDIME_EXTRACTION_USER_CONFIRMED
+browser=false
+runtime=false
