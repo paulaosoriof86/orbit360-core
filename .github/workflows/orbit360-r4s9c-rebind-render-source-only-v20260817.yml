@@ -1,0 +1,95 @@
+name: Orbit360 R4S9C rebind render source-only 20260817
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/workflows/orbit360-r4s9c-rebind-render-source-only-v20260817.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  render-rebind:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Canonical gate before render
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+          jq -e '.ok==true and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json >/dev/null
+      - name: Render exact three-file R4S9C binding
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/r4s9c-rebind
+          python - <<'PY'
+          from pathlib import Path
+          import json
+
+          contract_path=Path('tools/orbit360-r4-certified-product-contract-v20260815.json')
+          wrapper_path=Path('tools/orbit360-r4-certified-product-smoke-wrapper-v20260815.mjs')
+          workflow_path=Path('.github/workflows/orbit360-r4-certified-product-readonly-smoke-v20260815.yml')
+
+          c=json.loads(contract_path.read_text())
+          assert c['sourceHead']=='861326906558f03d9c8c2e7f34adfb4979a17d73'
+          assert c['r3DurableArtifactId']==9299097141
+          assert c['zipSha256']=='9e8566fdc33f4f45b350fd3609c9ee02b22c49edd1d377bff334fc00df902180'
+          assert c['manifestStatus']=='FASE_A_PRODUCT_R4S9_MINIMAL_SUCCESSOR_CERTIFIED'
+          c.update({
+            'classification':'DATA_CONTRACT_FAILURE_ROOTFIX_SUCCESSOR_CONTRACT',
+            'r3RunId':32067274583,
+            'r3DurableArtifactId':9300368902,
+            'zipName':'orbit360-fase-a-product-r4s9c-contract-recovery-861326906558.zip',
+            'zipSha256':'917f5424deea06d224d45a1b039c0b3699d71a7bef430b2a40d059703b2acc3a',
+            'manifestStatus':'FASE_A_PRODUCT_R4S9C_CONTRACT_RECOVERY_CERTIFIED',
+            'manifestSha256':'fc9b9d23d8749b6c70a24381271cee6e3227d7db286d13b740995514b8d735b5',
+            'publicIdentityRunId':32068688007
+          })
+          Path('/tmp/r4s9c-rebind/contract.json').write_text(json.dumps(c,indent=2)+'\n')
+
+          w=wrapper_path.read_text()
+          old="    'FASE_A_PRODUCT_R4S9_MINIMAL_SUCCESSOR_CERTIFIED'\n  ]);"
+          new="    'FASE_A_PRODUCT_R4S9_MINIMAL_SUCCESSOR_CERTIFIED',\n    'FASE_A_PRODUCT_R4S9C_CONTRACT_RECOVERY_CERTIFIED'\n  ]);"
+          assert w.count(old)==1
+          w=w.replace(old,new,1)
+          Path('/tmp/r4s9c-rebind/wrapper.mjs').write_text(w)
+
+          y=workflow_path.read_text()
+          assert "ORBIT360_R4_CERTIFIED_SOURCE_ONLY: 'true'" in y
+          reps={
+            '.manifestStatus=="FASE_A_PRODUCT_R4S9_MINIMAL_SUCCESSOR_CERTIFIED"':'.manifestStatus=="FASE_A_PRODUCT_R4S9C_CONTRACT_RECOVERY_CERTIFIED"',
+            '.durableArtifact.artifactId==9299097141':'.durableArtifact.artifactId==9300368902',
+            '.durableArtifact.zipSha256=="9e8566fdc33f4f45b350fd3609c9ee02b22c49edd1d377bff334fc00df902180"':'.durableArtifact.zipSha256=="917f5424deea06d224d45a1b039c0b3699d71a7bef430b2a40d059703b2acc3a"'
+          }
+          for old,new in reps.items():
+            assert y.count(old)==1, (old,y.count(old))
+            y=y.replace(old,new,1)
+          Path('/tmp/r4s9c-rebind/workflow.yml').write_text(y)
+          PY
+          node --check /tmp/r4s9c-rebind/wrapper.mjs
+          jq -e '.sourceHead=="861326906558f03d9c8c2e7f34adfb4979a17d73" and .r3DurableArtifactId==9300368902 and .zipSha256=="917f5424deea06d224d45a1b039c0b3699d71a7bef430b2a40d059703b2acc3a" and .manifestStatus=="FASE_A_PRODUCT_R4S9C_CONTRACT_RECOVERY_CERTIFIED" and .manifestSha256=="fc9b9d23d8749b6c70a24381271cee6e3227d7db286d13b740995514b8d735b5" and .publicIdentityRunId==32068688007 and .noLabRuntime==true and .noPrivateSecretMaterial==true and .writeAuthorized==false' /tmp/r4s9c-rebind/contract.json >/dev/null
+          grep -Fq "'FASE_A_PRODUCT_R4S9C_CONTRACT_RECOVERY_CERTIFIED'" /tmp/r4s9c-rebind/wrapper.mjs
+          grep -Fq "ORBIT360_R4_CERTIFIED_SOURCE_ONLY: 'true'" /tmp/r4s9c-rebind/workflow.yml
+          grep -Fq '.manifestStatus=="FASE_A_PRODUCT_R4S9C_CONTRACT_RECOVERY_CERTIFIED"' /tmp/r4s9c-rebind/workflow.yml
+          grep -Fq '.durableArtifact.artifactId==9300368902' /tmp/r4s9c-rebind/workflow.yml
+      - name: Canonical gate after render
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+          jq -e '.ok==true and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json >/dev/null
+      - uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-r4s9c-rebind-render-${{ github.run_id }}
+          path: /tmp/r4s9c-rebind
+          retention-days: 14
