@@ -1,0 +1,87 @@
+name: Orbit360 R4S8 public exact verify 20260817
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - .github/r4s8-public-verify-trigger-v20260817.txt
+
+permissions:
+  contents: read
+
+jobs:
+  verify-public-r4s8:
+    runs-on: ubuntu-24.04
+    env:
+      PUBLIC_BASE: https://app.aysseguros.com
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Canonical gate before public static observation
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+          jq -e '.ok==true and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json >/dev/null
+      - name: Verify exact public R4S8 identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/r4s8-public
+          nonce="$(date +%s%N)"
+          curl -fsSL --retry 3 -H 'Cache-Control: no-cache' "$PUBLIC_BASE/orbit360-package-manifest.json?verify=$nonce" -o /tmp/r4s8-public/manifest.json
+          test "$(sha256sum /tmp/r4s8-public/manifest.json | awk '{print $1}')" = "422f961cd1bbbc75b8540e9419fdd5bfe64e4798c91358253d4ac128bad42343"
+          jq -e '.status=="FASE_A_PRODUCT_R4S8_MINIMAL_SUCCESSOR_CERTIFIED" and .sourceHead=="2427d94758c6143f3dbedf70512cbda87a24459c" and .fileCount==194 and .successorOrdinal==8 and .unchangedFileCount==193 and .basePackageSha256=="4c249faa4ccf05d0bb0bc8fa4b8bb5dca07de17838cd9fb4816c5eb15b66944a" and .baseSourceHead=="ce9792e3e4e37b298d2eda6f65983c683d66a3a3" and .deltaFiles==["core/client-insurer-visual-contract-v20260720.js"]' /tmp/r4s8-public/manifest.json >/dev/null
+          fetch_sha(){ url="$1" expected="$2" file="$3"; curl -fsSL --retry 3 -H 'Cache-Control: no-cache' "$PUBLIC_BASE$url?verify=$nonce" -o "/tmp/r4s8-public/$file"; test "$(sha256sum "/tmp/r4s8-public/$file" | awk '{print $1}')" = "$expected"; }
+          fetch_sha /index.html 125b24a3fc215a368a7183a107cd55eb5a6332fc8a7f8354ed94e3169340ec4e index.html
+          fetch_sha /core/auth-product-runtime-p0.js d0bb399fe0e1dd102a03950673044eda5bc8d181e4e98cf477d22d141aa7b3a8 auth.js
+          fetch_sha /core/queries.js b906c1d3382a9fad310695b0ce2c8e7f49a2bf99fe9b9ed674a8df7e0fcbbb7b queries.js
+          fetch_sha /core/client-insurer-visual-contract-v20260720.js a7c61af94bd578849d8e6a946c01e97159cd7bac4f0385f6ac5cd920cc93299d client-visual.js
+          fetch_sha /modules/cliente360.js 5ac3f042add37ea45582cc88c670c5bcff139937dac406d9561e25f1b9962f9e cliente360.js
+          fetch_sha /core/insurer-secure-target-bridge-v20260720.js 3323f09b812d6e3accc8cd151fe28ec3fab2fffa6c41ad622a2f8a147046887b insurer-policy-owner.js
+      - name: Emit sanitized public evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > /tmp/r4s8-public/evidence.json <<'EOF'
+          {
+            "schemaVersion":"orbit360-r4s8-public-exact-verify-v1",
+            "ok":true,
+            "status":"R4S8_PUBLIC_EXACT_STATIC_PASS",
+            "sourceHead":"2427d94758c6143f3dbedf70512cbda87a24459c",
+            "artifactId":9296206724,
+            "zipName":"orbit360-fase-a-product-r4s8-2427d94758c6.zip",
+            "zipSha256":"265fcac34f436ddf28bba58dc63a9146301e49ded7e26faeac50adf86d5790da",
+            "manifestSha256":"422f961cd1bbbc75b8540e9419fdd5bfe64e4798c91358253d4ac128bad42343",
+            "fileCount":194,
+            "unchangedFileCount":193,
+            "changedProductFileCount":1,
+            "browserExecuted":false,
+            "runtimeExecuted":false,
+            "secretAccess":false,
+            "firestoreWrites":0,
+            "authWrites":0,
+            "operationalWrites":0,
+            "containsPII":false,
+            "containsSecrets":false
+          }
+          EOF
+      - name: Canonical gate after public static observation
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+          jq -e '.ok==true and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json >/dev/null
+          jq -e '.ok==true and .status=="R4S8_PUBLIC_EXACT_STATIC_PASS" and .browserExecuted==false and .runtimeExecuted==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0' /tmp/r4s8-public/evidence.json >/dev/null
+      - uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-r4s8-public-exact-evidence-${{ github.run_id }}
+          path: /tmp/r4s8-public/evidence.json
+          retention-days: 14
