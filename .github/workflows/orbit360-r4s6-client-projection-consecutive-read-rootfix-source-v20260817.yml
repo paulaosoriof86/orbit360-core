@@ -18,6 +18,7 @@ env:
   OWNER: orbit360-platform/core/client-insurer-visual-contract-v20260720.js
   MODULE: orbit360-platform/modules/cliente360.js
   PROTECTED_STORE: orbit360-platform/data/store-firestore-product-readonly-p0.js
+  GATE_TOOL: tools/orbit360-r4s6-client-projection-consecutive-read-rootfix-gate-v20260817.mjs
   BRANCH: ays/backend-tenant-lab-v99-20260703
 
 jobs:
@@ -41,28 +42,47 @@ jobs:
           node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
           jq -e '.ok==true and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
 
+      - name: Correct stale source-gate predicate only
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('tools/orbit360-r4s6-client-projection-consecutive-read-rootfix-gate-v20260817.mjs')
+          s = p.read_text(encoding='utf-8')
+          old = '''    cliente360UsesReadBatch: moduleSource.includes("withReadBatch(['clientes', 'polizas', 'cobros', 'comisiones']"),'''
+          new = '''    cliente360UsesReadBatch: moduleSource.includes("typeof Orbit.clientProjection.withReadBatch === 'function'") && moduleSource.includes("batchRunner(['clientes', 'polizas', 'cobros', 'comisiones']"),'''
+          if s.count(old) != 1:
+              raise SystemExit(f'VALIDATOR_STALE_PREDICATE_COUNT_{s.count(old)}')
+          p.write_text(s.replace(old, new), encoding='utf-8')
+          PY
+          node --check "$GATE_TOOL"
+          echo 'VALIDATOR_STALE_ROOTFIX_SOURCE_ONLY_PASS'
+
       - name: Confirm complete root cause before changing product
         shell: bash
         run: |
           set -euo pipefail
-          node tools/orbit360-r4s6-client-projection-consecutive-read-rootfix-gate-v20260817.mjs --diagnose
+          node "$GATE_TOOL" --diagnose
           jq -e '.ok==true and .status=="R4S6_CLIENT_PROJECTION_ROOT_CAUSE_DIAGNOSIS_SOURCE_PASS" and .diagnosis.roleScopeReadsClients==true and .diagnosis.cliente360UsesReadBatch==true and .diagnosis.batchDirectlyNativeReadsClients==true and .diagnosis.projectedAllNativeReadsBeforeClientBranch==true and .diagnosis.enhancerReadsClientsAgain==true and .tripleReadReproduced==true and .browserExecuted==false and .runtimeExecuted==false and .secretAccess==false and .dataAccess==false' "$EVIDENCE_DIR/r4s6-client-projection-consecutive-read-rootfix-source-v20260817.json" >/dev/null
 
       - name: Apply rootfix only to projection owner
         shell: bash
         run: |
           set -euo pipefail
-          node tools/orbit360-r4s6-client-projection-consecutive-read-rootfix-gate-v20260817.mjs --apply
+          node "$GATE_TOOL" --apply
           node --check "$OWNER"
-          test "$(git diff --name-only | sed '/^$/d' | wc -l)" -eq 1
-          test "$(git diff --name-only)" = "$OWNER"
+          mapfile -t changed < <(git diff --name-only | sort)
+          test "${#changed[@]}" -eq 2
+          test "${changed[0]}" = "$OWNER"
+          test "${changed[1]}" = "$GATE_TOOL"
           git diff --exit-code -- "$MODULE" "$PROTECTED_STORE"
 
       - name: Verify representative consecutive-read rootfix source-only
         shell: bash
         run: |
           set -euo pipefail
-          node tools/orbit360-r4s6-client-projection-consecutive-read-rootfix-gate-v20260817.mjs --verify
+          node "$GATE_TOOL" --verify
           jq -e '.ok==true and .status=="R4S6_CLIENT_PROJECTION_CONSECUTIVE_READ_ROOTFIX_SOURCE_PASS" and .semanticEqual==true and .countsEqual==true and .topLevelIsolation==true and .reduction.callReductionPct>=60 and .reduction.rowReductionPct>=60 and .reduction.byteReductionPct>=60 and .candidate.projection.clientProjection.builds==1 and .candidate.projection.clientProjection.hits>=4 and .invalidation.pass==true and .protectedStoreModified==false and .moduleModified==false and .browserExecuted==false and .runtimeExecuted==false and .secretAccess==false and .dataAccess==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .productionTouched==false' "$EVIDENCE_DIR/r4s6-client-projection-consecutive-read-rootfix-source-v20260817.json" >/dev/null
 
       - name: Re-run canonical gate after source proof
@@ -72,15 +92,17 @@ jobs:
           node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
           jq -e '.ok==true and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
 
-      - name: Commit exact proven owner delta to mandatory branch
+      - name: Commit exact proven owner and validator delta
         shell: bash
         run: |
           set -euo pipefail
           git config user.name "orbit360-source-gate"
           git config user.email "actions@users.noreply.github.com"
-          git add "$OWNER"
-          test "$(git diff --cached --name-only | sed '/^$/d' | wc -l)" -eq 1
-          test "$(git diff --cached --name-only)" = "$OWNER"
+          git add "$OWNER" "$GATE_TOOL"
+          mapfile -t staged < <(git diff --cached --name-only | sort)
+          test "${#staged[@]}" -eq 2
+          test "${staged[0]}" = "$OWNER"
+          test "${staged[1]}" = "$GATE_TOOL"
           git commit -m "fix: cache consecutive projected client reads source-only"
           git push origin "HEAD:$BRANCH"
 
