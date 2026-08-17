@@ -31,14 +31,24 @@ jobs:
           set -euo pipefail
           node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
           jq -e '.ok==true and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
-      - name: Observe exact public manifest and critical hashes
+      - name: Observe public response without assuming JSON
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p /tmp/r4s9c-diag
           nonce="$(date +%s%N)"
-          curl -fsSL --retry 3 -H 'Cache-Control: no-cache' "$PUBLIC_BASE/orbit360-package-manifest.json?diag=$nonce" -o /tmp/r4s9c-diag/manifest.json
-          MANIFEST_SHA="$(sha256sum /tmp/r4s9c-diag/manifest.json | awk '{print $1}')"
+          curl -sS -L --retry 3 -D /tmp/r4s9c-diag/manifest.headers -H 'Cache-Control: no-cache' "$PUBLIC_BASE/orbit360-package-manifest.json?diag=$nonce" -o /tmp/r4s9c-diag/manifest.body
+          STATUS="$(awk 'toupper($1) ~ /^HTTP\// {code=$2} END{print code}' /tmp/r4s9c-diag/manifest.headers)"
+          CONTENT_TYPE="$(awk 'BEGIN{IGNORECASE=1} /^content-type:/ {sub(/\r$/,"",$0); sub(/^[^:]+:[[:space:]]*/,"",$0); ct=$0} END{print ct}' /tmp/r4s9c-diag/manifest.headers)"
+          MANIFEST_SHA="$(sha256sum /tmp/r4s9c-diag/manifest.body | awk '{print $1}')"
+          PREFIX_B64="$(head -c 160 /tmp/r4s9c-diag/manifest.body | base64 -w0)"
+          if jq -e . /tmp/r4s9c-diag/manifest.body >/dev/null 2>&1; then
+            MANIFEST_VALID=true
+            cp /tmp/r4s9c-diag/manifest.body /tmp/r4s9c-diag/manifest.json
+          else
+            MANIFEST_VALID=false
+            printf 'null\n' > /tmp/r4s9c-diag/manifest.json
+          fi
           fetch_sha(){ url="$1" file="$2"; curl -fsSL --retry 3 -H 'Cache-Control: no-cache' "$PUBLIC_BASE$url?diag=$nonce" -o "/tmp/r4s9c-diag/$file"; sha256sum "/tmp/r4s9c-diag/$file" | awk '{print $1}'; }
           INDEX_SHA="$(fetch_sha /index.html index.html)"
           AUTH_SHA="$(fetch_sha /core/auth-product-runtime-p0.js auth.js)"
@@ -47,7 +57,11 @@ jobs:
           CLIENTE_SHA="$(fetch_sha /modules/cliente360.js cliente360.js)"
           OWNER_SHA="$(fetch_sha /core/insurer-secure-target-bridge-v20260720.js owner.js)"
           jq -n \
+            --arg status "$STATUS" \
+            --arg contentType "$CONTENT_TYPE" \
             --arg manifestSha "$MANIFEST_SHA" \
+            --arg prefixBase64 "$PREFIX_B64" \
+            --argjson manifestValid "$MANIFEST_VALID" \
             --arg indexSha "$INDEX_SHA" \
             --arg authSha "$AUTH_SHA" \
             --arg queriesSha "$QUERIES_SHA" \
@@ -55,8 +69,8 @@ jobs:
             --arg clienteSha "$CLIENTE_SHA" \
             --arg ownerSha "$OWNER_SHA" \
             --slurpfile m /tmp/r4s9c-diag/manifest.json \
-            '{schemaVersion:"orbit360-r4s9c-public-diagnostic-v1",manifestSha256:$manifestSha,manifest:$m[0],criticalHashes:{index:$indexSha,auth:$authSha,queries:$queriesSha,visual:$visualSha,cliente360:$clienteSha,owner:$ownerSha},browserExecuted:false,runtimeExecuted:false,secretAccess:false,firestoreWrites:0,authWrites:0,operationalWrites:0}' > /tmp/r4s9c-diag/evidence.json
-          jq '{manifestSha256, manifest:{status:.manifest.status,sourceHead:.manifest.sourceHead,fileCount:.manifest.fileCount,basePackageSha256:.manifest.basePackageSha256,baseSourceHead:.manifest.baseSourceHead,containsPrivateSecrets:.manifest.containsPrivateSecrets,deltaFiles:.manifest.deltaFiles,deltaSourceHead:.manifest.deltaSourceHead,deployExecuted:.manifest.deployExecuted,dynamicRuntimeClosureCertified:.manifest.dynamicRuntimeClosureCertified,forbiddenFiles:.manifest.forbiddenFiles,noLabRuntime:.manifest.noLabRuntime,noPrivateSecretMaterial:.manifest.noPrivateSecretMaterial,packageLineage:.manifest.packageLineage,productTenantContextCertified:.manifest.productTenantContextCertified,productionTouched:.manifest.productionTouched,requiredHydrationCertified:.manifest.requiredHydrationCertified,routerRenderCertified:.manifest.routerRenderCertified,secretMaterialFiles:.manifest.secretMaterialFiles,successorOrdinal:.manifest.successorOrdinal,unchangedFileCount:.manifest.unchangedFileCount,writeAuthorized:.manifest.writeAuthorized,contractRecovery:.manifest.lineage.contractRecovery},criticalHashes}' /tmp/r4s9c-diag/evidence.json
+            '{schemaVersion:"orbit360-r4s9c-public-diagnostic-v2",httpStatus:$status,contentType:$contentType,manifestSha256:$manifestSha,manifestValidJson:$manifestValid,prefixBase64:$prefixBase64,manifest:$m[0],criticalHashes:{index:$indexSha,auth:$authSha,queries:$queriesSha,visual:$visualSha,cliente360:$clienteSha,owner:$ownerSha},browserExecuted:false,runtimeExecuted:false,secretAccess:false,firestoreWrites:0,authWrites:0,operationalWrites:0}' > /tmp/r4s9c-diag/evidence.json
+          jq '{httpStatus,contentType,manifestSha256,manifestValidJson,prefixBase64,manifest:{status:.manifest.status,sourceHead:.manifest.sourceHead,fileCount:.manifest.fileCount,basePackageSha256:.manifest.basePackageSha256,baseSourceHead:.manifest.baseSourceHead,containsPrivateSecrets:.manifest.containsPrivateSecrets,deltaFiles:.manifest.deltaFiles,deltaSourceHead:.manifest.deltaSourceHead,deployExecuted:.manifest.deployExecuted,dynamicRuntimeClosureCertified:.manifest.dynamicRuntimeClosureCertified,forbiddenFiles:.manifest.forbiddenFiles,noLabRuntime:.manifest.noLabRuntime,noPrivateSecretMaterial:.manifest.noPrivateSecretMaterial,packageLineage:.manifest.packageLineage,productTenantContextCertified:.manifest.productTenantContextCertified,productionTouched:.manifest.productionTouched,requiredHydrationCertified:.manifest.requiredHydrationCertified,routerRenderCertified:.manifest.routerRenderCertified,secretMaterialFiles:.manifest.secretMaterialFiles,successorOrdinal:.manifest.successorOrdinal,unchangedFileCount:.manifest.unchangedFileCount,writeAuthorized:.manifest.writeAuthorized,contractRecovery:.manifest.lineage.contractRecovery},criticalHashes}' /tmp/r4s9c-diag/evidence.json
       - name: Canonical gate after diagnostic
         shell: bash
         run: |
