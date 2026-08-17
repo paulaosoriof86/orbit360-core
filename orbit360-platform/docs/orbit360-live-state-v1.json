@@ -1,7 +1,7 @@
 {
   "schemaVersion": "orbit360-live-state-v1",
   "stateVersion": "20260817.r4s6-runtime-stop-client360-repeated-refrozen.current",
-  "updatedAt": "2026-08-17T05:15:00-06:00",
+  "updatedAt": "2026-08-17T05:16:00-06:00",
   "phase": "R4S6_PUBLIC_EXACT_RUNTIME_STOP_CLIENT360_REPEATED_SOURCE_ONLY_REFROZEN",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -92,7 +92,8 @@
     "previousStage": "role-Dirección-route-cliente360",
     "sameErrorClass": "page.waitForFunction timeout 25000ms",
     "retryProhibited": true,
-    "runtimeRerunAllowedNow": false
+    "runtimeRerunAllowedNow": false,
+    "productFrozenUntilSourceRootfixPass": true
   },
   "rootCause": {
     "classification": "FUNCTIONAL_DEFECT",
