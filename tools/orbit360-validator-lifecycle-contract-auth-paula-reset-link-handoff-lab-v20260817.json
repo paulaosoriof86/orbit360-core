@@ -1,0 +1,72 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
+  "gateId": "block-auth-paula-reset-link-handoff-lab-v20260817",
+  "gateContractVersion": "14.1.0",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
+  "status": "AWAITING_SINGLE_VERIFIED_RESET_LINK_AUTHORIZATION",
+  "currentPhase": "AUTH_PAULA_RESET_LINK_HANDOFF_LAB",
+  "executionProfile": {
+    "phase": "AUTH_PAULA_RESET_LINK_HANDOFF_LAB",
+    "capabilities": {
+      "secrets": true,
+      "firestoreRead": true,
+      "writes": false,
+      "runtime": true,
+      "browser": false,
+      "deploy": false,
+      "functionsDeploy": false,
+      "rulesDeploy": false,
+      "production": false
+    }
+  },
+  "singleGate": true,
+  "macroClosure": false,
+  "rcId": "RC-AYS-LAB-CANONICA-01",
+  "authorization": {
+    "requiredForExecution": true,
+    "activeRequest": false,
+    "allowedExecutions": 0,
+    "request": ".github/orbit360-requests/auth-paula-reset-link-handoff-lab-v20260817.json",
+    "consumed": false,
+    "replayAllowed": false,
+    "newExplicitAuthorizationRequiredAfterExecution": true
+  },
+  "target": {
+    "projectId": "ays-orbit-360-lab",
+    "tenantId": "alianzas-soluciones",
+    "branch": "ays/backend-tenant-lab-v99-20260703",
+    "pullRequest": 5,
+    "advisorId": "ase-paula-osorio",
+    "emailHash": "9b663847979724e9491e1c655da32a7cb17a5f6ed26dba352de1eb811254b23f"
+  },
+  "accessBoundary": {
+    "maximumTargets": 1,
+    "maximumResetLinks": 1,
+    "verifyResetCodeAllowed": true,
+    "passwordChangeAllowed": false,
+    "authUserCreateAllowed": false,
+    "authUserDeleteAllowed": false,
+    "directPasswordSetAllowed": false,
+    "firestoreWritesAllowed": false,
+    "hostingDeployAllowed": false,
+    "functionsDeployAllowed": false,
+    "rulesDeployAllowed": false,
+    "browserAllowed": false,
+    "productionAllowed": false,
+    "mainAllowed": false,
+    "mergeAllowed": false
+  },
+  "guards": {
+    "gateBeforeSecrets": true,
+    "exactExistingAuthIdentityRequired": true,
+    "existingMembershipRequired": true,
+    "privilegedMembershipRequired": true,
+    "resetCodeMustVerifyBeforeHandoff": true,
+    "resetLinkMustNeverEnterRepoEvidenceOrLogs": true,
+    "uidMustRemainUnchanged": true,
+    "membershipMustRemainUnchanged": true,
+    "stopRetryOnFailure": true
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
