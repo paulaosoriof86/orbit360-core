@@ -1,0 +1,227 @@
+name: Orbit360 R4S8 minimal successor build 20260817
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - .github/workflows/orbit360-r4s8-minimal-successor-build-v20260817.yml
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: orbit360-r4s8-minimal-successor-build-20260817
+  cancel-in-progress: false
+
+jobs:
+  build-r4s8:
+    runs-on: ubuntu-24.04
+    env:
+      BASE_ARTIFACT_ID: '9287314053'
+      BASE_ZIP_NAME: orbit360-fase-a-product-r4s7-ce9792e3e4e3.zip
+      BASE_ZIP_SHA256: 4c249faa4ccf05d0bb0bc8fa4b8bb5dca07de17838cd9fb4816c5eb15b66944a
+      BASE_SOURCE_HEAD: ce9792e3e4e37b298d2eda6f65983c683d66a3a3
+      ROOTFIX_SOURCE_HEAD: 2427d94758c6143f3dbedf70512cbda87a24459c
+      OWNER_PATH: orbit360-platform/core/client-insurer-visual-contract-v20260720.js
+      OWNER_SHA256: a7c61af94bd578849d8e6a946c01e97159cd7bac4f0385f6ac5cd920cc93299d
+      PACKAGE_NAME: orbit360-fase-a-product-r4s8-2427d94758c6.zip
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 2
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Canonical gate before package construction
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+          jq -e '.ok==true and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json >/dev/null
+          git restore -- orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json 2>/dev/null || true
+
+      - name: Assert exact rootfix source and source-only freeze
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD~1)" = "$ROOTFIX_SOURCE_HEAD"
+          test "$(sha256sum "$OWNER_PATH" | awk '{print $1}')" = "$OWNER_SHA256"
+          grep -Fq "ORBIT360_R4_CERTIFIED_SOURCE_ONLY: 'true'" .github/workflows/orbit360-r4-certified-product-readonly-smoke-v20260815.yml
+          node --check "$OWNER_PATH"
+
+      - name: Download exact durable R4S7 base artifact
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/r4s8/base-wrapper /tmp/r4s8/base /tmp/r4s8/candidate /tmp/r4s8/reopen
+          curl -L --fail --retry 3 --retry-delay 2 \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/${BASE_ARTIFACT_ID}/zip" \
+            -o /tmp/r4s8/base-wrapper.zip
+          unzip -q /tmp/r4s8/base-wrapper.zip -d /tmp/r4s8/base-wrapper
+          test -f "/tmp/r4s8/base-wrapper/$BASE_ZIP_NAME"
+          test "$(sha256sum "/tmp/r4s8/base-wrapper/$BASE_ZIP_NAME" | awk '{print $1}')" = "$BASE_ZIP_SHA256"
+          unzip -q "/tmp/r4s8/base-wrapper/$BASE_ZIP_NAME" -d /tmp/r4s8/base
+
+      - name: Verify exact R4S7 base package and construct R4S8
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          import json, hashlib, shutil, datetime
+
+          root = Path('/tmp/r4s8')
+          base = root/'base'
+          cand = root/'candidate'
+          manifest_path = base/'orbit360-package-manifest.json'
+          m = json.loads(manifest_path.read_text(encoding='utf-8'))
+          assert m['status'] == 'FASE_A_PRODUCT_R4S7_MINIMAL_SUCCESSOR_CERTIFIED'
+          assert m['sourceHead'] == 'ce9792e3e4e37b298d2eda6f65983c683d66a3a3'
+          assert m['fileCount'] == 194 and len(m['files']) == 194
+          assert m['successorOrdinal'] == 7
+          assert m['deltaFiles'] == ['core/client-insurer-visual-contract-v20260720.js']
+          def sha(p):
+              return hashlib.sha256(p.read_bytes()).hexdigest()
+          for rec in m['files']:
+              p=base/rec['path']
+              assert p.is_file(), rec['path']
+              assert p.stat().st_size == rec['bytes'], rec['path']
+              assert sha(p) == rec['sha256'], rec['path']
+          assert sha(base/'core/client-insurer-visual-contract-v20260720.js') == '573a45da2f7dae3803e8dff86ff651ba58f5be507cf85b04a80863ac15bb4390'
+
+          shutil.copytree(base, cand, dirs_exist_ok=True)
+          source_owner = Path('orbit360-platform/core/client-insurer-visual-contract-v20260720.js')
+          assert sha(source_owner) == 'a7c61af94bd578849d8e6a946c01e97159cd7bac4f0385f6ac5cd920cc93299d'
+          shutil.copy2(source_owner, cand/'core/client-insurer-visual-contract-v20260720.js')
+
+          files=[]
+          changed=[]
+          base_by={r['path']:r for r in m['files']}
+          for path in sorted(base_by):
+              p=cand/path
+              digest=sha(p)
+              rec={'path':path,'bytes':p.stat().st_size,'sha256':digest}
+              files.append(rec)
+              if digest != base_by[path]['sha256'] or rec['bytes'] != base_by[path]['bytes']:
+                  changed.append(path)
+          assert changed == ['core/client-insurer-visual-contract-v20260720.js'], changed
+
+          out=dict(m)
+          out.update({
+              'status':'FASE_A_PRODUCT_R4S8_MINIMAL_SUCCESSOR_CERTIFIED',
+              'sourceHead':'2427d94758c6143f3dbedf70512cbda87a24459c',
+              'generatedAt':datetime.datetime.now(datetime.timezone.utc).isoformat().replace('+00:00','Z'),
+              'files':files,
+              'fileCount':194,
+              'basePackageSha256':'4c249faa4ccf05d0bb0bc8fa4b8bb5dca07de17838cd9fb4816c5eb15b66944a',
+              'baseSourceHead':'ce9792e3e4e37b298d2eda6f65983c683d66a3a3',
+              'deltaSourceHead':'2427d94758c6143f3dbedf70512cbda87a24459c',
+              'deltaFiles':['core/client-insurer-visual-contract-v20260720.js'],
+              'unchangedFileCount':193,
+              'successorOrdinal':8,
+              'packageLineage':'R4S7 + Cliente360 visual enhancer single policy snapshot/index rootfix'
+          })
+          (cand/'orbit360-package-manifest.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          evidence={
+              'schemaVersion':'orbit360-r4s8-minimal-successor-build-v1',
+              'ok':True,
+              'status':'R4S8_MINIMAL_SUCCESSOR_SOURCE_PACKAGE_PASS',
+              'baseArtifactId':9287314053,
+              'baseZipSha256':'4c249faa4ccf05d0bb0bc8fa4b8bb5dca07de17838cd9fb4816c5eb15b66944a',
+              'sourceHead':'2427d94758c6143f3dbedf70512cbda87a24459c',
+              'changedProductFiles':changed,
+              'changedProductFileCount':len(changed),
+              'unchangedFileCount':193,
+              'fileCount':194,
+              'ownerSha256':sha(cand/'core/client-insurer-visual-contract-v20260720.js'),
+              'protectedStoreModified':False,
+              'moduleCliente360Modified':False,
+              'browserExecuted':False,
+              'runtimeExecuted':False,
+              'secretAccess':False,
+              'dataAccess':False,
+              'firestoreWrites':0,
+              'authWrites':0,
+              'operationalWrites':0,
+              'publicationTouched':False
+          }
+          (root/'build-evidence.json').write_text(json.dumps(evidence,indent=2)+'\n',encoding='utf-8')
+          PY
+
+      - name: Create package ZIP and reopen physical bytes
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          import zipfile
+          src=Path('/tmp/r4s8/candidate')
+          out=Path('/tmp/r4s8')/'orbit360-fase-a-product-r4s8-2427d94758c6.zip'
+          with zipfile.ZipFile(out,'w',compression=zipfile.ZIP_DEFLATED,compresslevel=9) as z:
+              for p in sorted(src.rglob('*')):
+                  if p.is_file():
+                      arc=p.relative_to(src).as_posix()
+                      info=zipfile.ZipInfo(arc,date_time=(2026,8,17,12,0,0))
+                      info.compress_type=zipfile.ZIP_DEFLATED
+                      info.external_attr=(0o100644 & 0xFFFF)<<16
+                      z.writestr(info,p.read_bytes(),compress_type=zipfile.ZIP_DEFLATED,compresslevel=9)
+          PY
+          unzip -q "/tmp/r4s8/$PACKAGE_NAME" -d /tmp/r4s8/reopen
+          python - <<'PY'
+          from pathlib import Path
+          import json, hashlib
+          root=Path('/tmp/r4s8')
+          reopened=root/'reopen'
+          m=json.loads((reopened/'orbit360-package-manifest.json').read_text(encoding='utf-8'))
+          assert m['status']=='FASE_A_PRODUCT_R4S8_MINIMAL_SUCCESSOR_CERTIFIED'
+          assert m['sourceHead']=='2427d94758c6143f3dbedf70512cbda87a24459c'
+          assert m['fileCount']==194 and len(m['files'])==194
+          assert m['unchangedFileCount']==193
+          assert m['deltaFiles']==['core/client-insurer-visual-contract-v20260720.js']
+          def sha(p): return hashlib.sha256(p.read_bytes()).hexdigest()
+          for rec in m['files']:
+              p=reopened/rec['path']
+              assert p.is_file() and p.stat().st_size==rec['bytes'] and sha(p)==rec['sha256'], rec['path']
+          assert sha(reopened/'core/client-insurer-visual-contract-v20260720.js')=='a7c61af94bd578849d8e6a946c01e97159cd7bac4f0385f6ac5cd920cc93299d'
+          package=root/'orbit360-fase-a-product-r4s8-2427d94758c6.zip'
+          e=json.loads((root/'build-evidence.json').read_text())
+          e['packageName']=package.name
+          e['packageSha256']=sha(package)
+          e['manifestSha256']=sha(reopened/'orbit360-package-manifest.json')
+          e['physicalFileCount']=sum(1 for p in reopened.rglob('*') if p.is_file())
+          assert e['physicalFileCount']==195
+          (root/'build-evidence.json').write_text(json.dumps(e,indent=2)+'\n')
+          print(json.dumps(e,indent=2))
+          PY
+
+      - name: Canonical gate after reopened package
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+          jq -e '.ok==true and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json >/dev/null
+          jq -e '.ok==true and .changedProductFileCount==1 and .unchangedFileCount==193 and .fileCount==194 and .physicalFileCount==195 and .ownerSha256=="a7c61af94bd578849d8e6a946c01e97159cd7bac4f0385f6ac5cd920cc93299d" and .browserExecuted==false and .runtimeExecuted==false and .publicationTouched==false' /tmp/r4s8/build-evidence.json >/dev/null
+
+      - name: Upload durable R4S8 package
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-r4s8-minimal-successor-durable-${{ github.run_id }}
+          path: /tmp/r4s8/orbit360-fase-a-product-r4s8-2427d94758c6.zip
+          retention-days: 30
+
+      - name: Upload R4S8 certification evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-r4s8-minimal-successor-evidence-${{ github.run_id }}
+          path: /tmp/r4s8/build-evidence.json
+          retention-days: 30
