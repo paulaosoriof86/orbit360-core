@@ -68,42 +68,42 @@ jobs:
           replacements.append((old, new, 'early-return-revision'))
 
           anchor = "  var clientProjectionRowsCache = { epoch: 0, threshold: null, rows: null, builtAt: 0, builds: 0, hits: 0, invalidations: 0, shallowCloneRows: 0, lastInvalidationReason: '' };"
-          insert = """
-  var client360PolicyIndexCache = { routeKey: '', clientIds: null, policyRows: 0, builds: 0, hits: 0, invalidations: 0, enhanceInvocations: 0, source: '', lastInvalidationReason: '' };
-  function client360RouteKey() { try { return clean(window.location && window.location.hash || ''); } catch (e) { return ''; } }
-  function invalidateClient360PolicyIndex(reason) {
-    client360PolicyIndexCache.routeKey = '';
-    client360PolicyIndexCache.clientIds = null;
-    client360PolicyIndexCache.policyRows = 0;
-    client360PolicyIndexCache.invalidations += 1;
-    client360PolicyIndexCache.lastInvalidationReason = clean(reason || 'unspecified');
-  }
-  function buildClient360PolicyIndex() {
-    var routeKey = client360RouteKey();
-    if (client360PolicyIndexCache.clientIds && client360PolicyIndexCache.routeKey === routeKey) {
-      client360PolicyIndexCache.hits += 1;
-      return client360PolicyIndexCache.clientIds;
-    }
-    var policies = [], source = 'nativeAll-fallback';
-    try {
-      if (Orbit.clientProjection && typeof Orbit.clientProjection.withReadBatch === 'function') {
-        policies = Orbit.clientProjection.withReadBatch(['polizas'], function (rows) { return rows && Array.isArray(rows.polizas) ? rows.polizas : []; }) || [];
-        source = 'clientProjection.withReadBatch';
-      } else policies = rawRows('polizas');
-    } catch (e) { policies = rawRows('polizas'); source = 'nativeAll-fallback'; }
-    var clientIds = new Set();
-    policies.forEach(function (policy) { if (policy && policy.clienteId != null) clientIds.add(policy.clienteId); });
-    client360PolicyIndexCache.routeKey = routeKey;
-    client360PolicyIndexCache.clientIds = clientIds;
-    client360PolicyIndexCache.policyRows = policies.length;
-    client360PolicyIndexCache.builds += 1;
-    client360PolicyIndexCache.source = source;
-    return clientIds;
-  }
-  function client360PolicyIndexState() {
-    return { revision: '20260817.1', routeKey: client360PolicyIndexCache.routeKey, policyRows: client360PolicyIndexCache.policyRows, builds: client360PolicyIndexCache.builds, hits: client360PolicyIndexCache.hits, invalidations: client360PolicyIndexCache.invalidations, enhanceInvocations: client360PolicyIndexCache.enhanceInvocations, source: client360PolicyIndexCache.source, lastInvalidationReason: client360PolicyIndexCache.lastInvalidationReason };
-  }
-""".rstrip('\n')
+          insert = "\n".join([
+              "  var client360PolicyIndexCache = { routeKey: '', clientIds: null, policyRows: 0, builds: 0, hits: 0, invalidations: 0, enhanceInvocations: 0, source: '', lastInvalidationReason: '' };",
+              "  function client360RouteKey() { try { return clean(window.location && window.location.hash || ''); } catch (e) { return ''; } }",
+              "  function invalidateClient360PolicyIndex(reason) {",
+              "    client360PolicyIndexCache.routeKey = '';",
+              "    client360PolicyIndexCache.clientIds = null;",
+              "    client360PolicyIndexCache.policyRows = 0;",
+              "    client360PolicyIndexCache.invalidations += 1;",
+              "    client360PolicyIndexCache.lastInvalidationReason = clean(reason || 'unspecified');",
+              "  }",
+              "  function buildClient360PolicyIndex() {",
+              "    var routeKey = client360RouteKey();",
+              "    if (client360PolicyIndexCache.clientIds && client360PolicyIndexCache.routeKey === routeKey) {",
+              "      client360PolicyIndexCache.hits += 1;",
+              "      return client360PolicyIndexCache.clientIds;",
+              "    }",
+              "    var policies = [], source = 'nativeAll-fallback';",
+              "    try {",
+              "      if (Orbit.clientProjection && typeof Orbit.clientProjection.withReadBatch === 'function') {",
+              "        policies = Orbit.clientProjection.withReadBatch(['polizas'], function (rows) { return rows && Array.isArray(rows.polizas) ? rows.polizas : []; }) || [];",
+              "        source = 'clientProjection.withReadBatch';",
+              "      } else policies = rawRows('polizas');",
+              "    } catch (e) { policies = rawRows('polizas'); source = 'nativeAll-fallback'; }",
+              "    var clientIds = new Set();",
+              "    policies.forEach(function (policy) { if (policy && policy.clienteId != null) clientIds.add(policy.clienteId); });",
+              "    client360PolicyIndexCache.routeKey = routeKey;",
+              "    client360PolicyIndexCache.clientIds = clientIds;",
+              "    client360PolicyIndexCache.policyRows = policies.length;",
+              "    client360PolicyIndexCache.builds += 1;",
+              "    client360PolicyIndexCache.source = source;",
+              "    return clientIds;",
+              "  }",
+              "  function client360PolicyIndexState() {",
+              "    return { revision: '20260817.1', routeKey: client360PolicyIndexCache.routeKey, policyRows: client360PolicyIndexCache.policyRows, builds: client360PolicyIndexCache.builds, hits: client360PolicyIndexCache.hits, invalidations: client360PolicyIndexCache.invalidations, enhanceInvocations: client360PolicyIndexCache.enhanceInvocations, source: client360PolicyIndexCache.source, lastInvalidationReason: client360PolicyIndexCache.lastInvalidationReason };",
+              "  }"
+          ])
           replacements.append((anchor, anchor + '\n' + insert, 'policy-index-cache'))
 
           old = "  function enhanceClient360(){var root=document.getElementById('host');if(!root||location.hash.indexOf('#/cliente360')!==0)return;var clients=Orbit.store&&Orbit.store.all?Orbit.store.all('clientes'):[],rv=clients.filter(function(r){return r.pais==='REQUIERE_VALIDACION';}).length,country=root.querySelector('#f-pais');"
@@ -169,47 +169,20 @@ jobs:
           check('DIAGNOSTIC_REVISION_EXPOSED', /client360PolicyIndexRevision:'20260817\.1'/.test(candidate) && /client360PolicyIndexState:client360PolicyIndexState/.test(candidate));
 
           const clients = Array.from({length:430}, (_,i)=>({id:'c'+String(i+1).padStart(3,'0')}));
-          const policies = Array.from({length:1375}, (_,i)=>({
-            id:'p'+String(i+1).padStart(4,'0'),
-            clienteId:clients[(i*17)%400].id,
-            estado:i%7===0?'Por renovar':'Vigente',
-            vigenciaFin:'2026-12-31',
-            payload:{ramo:'AUTO',nested:{sequence:i,notes:'fixture-heavy-source-only'}}
-          }));
+          const policies = Array.from({length:1375}, (_,i)=>({id:'p'+String(i+1).padStart(4,'0'),clienteId:clients[(i*17)%400].id,estado:i%7===0?'Por renovar':'Vigente',vigenciaFin:'2026-12-31',payload:{ramo:'AUTO',nested:{sequence:i,notes:'fixture-heavy-source-only'}}}));
           const visible = clients.slice(390,430);
           const snapshotBytes = policies.reduce((n,row)=>n+Buffer.byteLength(JSON.stringify(row),'utf8'),0);
           const emptyHtml = '<span class="badge neutral">Sin cartera cargada</span>|<span class="badge warn">Pendiente de información</span>';
           const baselineMetrics = {enhanceInvocations:0,policyWhereCalls:0,nativePolicyAllCalls:0,policyRowsCloned:0,policyBytesCloned:0};
-          function baselineEnhance(){
-            baselineMetrics.enhanceInvocations++;
-            return visible.map(c=>{
-              baselineMetrics.policyWhereCalls++;
-              baselineMetrics.nativePolicyAllCalls++;
-              baselineMetrics.policyRowsCloned += policies.length;
-              baselineMetrics.policyBytesCloned += snapshotBytes;
-              return policies.some(p=>p.clienteId===c.id) ? 'UNCHANGED' : emptyHtml;
-            });
-          }
+          function baselineEnhance(){baselineMetrics.enhanceInvocations++;return visible.map(c=>{baselineMetrics.policyWhereCalls++;baselineMetrics.nativePolicyAllCalls++;baselineMetrics.policyRowsCloned+=policies.length;baselineMetrics.policyBytesCloned+=snapshotBytes;return policies.some(p=>p.clienteId===c.id)?'UNCHANGED':emptyHtml;});}
           const baselinePath1 = baselineEnhance();
           const baselinePath2 = baselineEnhance();
 
           const candidateMetrics = {enhanceInvocations:0,policyWhereCalls:0,nativePolicyAllCalls:0,policyRowsCloned:0,policyBytesCloned:0,indexBuilds:0,indexHits:0,invalidations:0};
           let routeKey = '#/cliente360', cache = null;
-          function candidateIndex(){
-            if(cache && cache.routeKey===routeKey){ candidateMetrics.indexHits++; return cache.ids; }
-            candidateMetrics.nativePolicyAllCalls++;
-            candidateMetrics.policyRowsCloned += policies.length;
-            candidateMetrics.policyBytesCloned += snapshotBytes;
-            candidateMetrics.indexBuilds++;
-            cache = {routeKey, ids:new Set(policies.map(p=>p.clienteId))};
-            return cache.ids;
-          }
-          function candidateEnhance(){
-            candidateMetrics.enhanceInvocations++;
-            const idx = candidateIndex();
-            return visible.map(c=>idx.has(c.id) ? 'UNCHANGED' : emptyHtml);
-          }
-          function invalidate(reason){ cache=null; candidateMetrics.invalidations++; return reason; }
+          function candidateIndex(){if(cache&&cache.routeKey===routeKey){candidateMetrics.indexHits++;return cache.ids;}candidateMetrics.nativePolicyAllCalls++;candidateMetrics.policyRowsCloned+=policies.length;candidateMetrics.policyBytesCloned+=snapshotBytes;candidateMetrics.indexBuilds++;cache={routeKey,ids:new Set(policies.map(p=>p.clienteId))};return cache.ids;}
+          function candidateEnhance(){candidateMetrics.enhanceInvocations++;const idx=candidateIndex();return visible.map(c=>idx.has(c.id)?'UNCHANGED':emptyHtml);}
+          function invalidate(){cache=null;candidateMetrics.invalidations++;}
           const candidatePath1 = candidateEnhance();
           const candidatePath2 = candidateEnhance();
 
@@ -224,43 +197,18 @@ jobs:
           check('CANDIDATE_SECOND_PATH_INDEX_HIT', candidateMetrics.indexHits===1, String(candidateMetrics.indexHits));
 
           const invalidationProof = {};
-          for (const reason of ['polizas','clientes','*']) {
-            invalidate(reason);
-            const html = candidateEnhance();
-            invalidationProof[reason] = JSON.stringify(html)===JSON.stringify(baselinePath1);
-          }
-          invalidate('route'); routeKey = '#/cliente360?f=next';
-          invalidationProof.route = JSON.stringify(candidateEnhance())===JSON.stringify(baselinePath1);
+          for (const reason of ['polizas','clientes','*']) {invalidate();const html=candidateEnhance();invalidationProof[reason]=JSON.stringify(html)===JSON.stringify(baselinePath1);}
+          invalidate();routeKey='#/cliente360?f=next';invalidationProof.route=JSON.stringify(candidateEnhance())===JSON.stringify(baselinePath1);
           check('INVALIDATION_POLIZAS_PASS', invalidationProof.polizas);
           check('INVALIDATION_CLIENTES_PASS', invalidationProof.clientes);
           check('INVALIDATION_WILDCARD_PASS', invalidationProof['*']);
           check('INVALIDATION_ROUTE_PASS', invalidationProof.route);
 
-          const rowsReduction = 100*(1-(candidateMetrics.policyRowsCloned - 4*policies.length)/baselineMetrics.policyRowsCloned);
           const twoPathCandidateRows = policies.length;
           const twoPathRowsReduction = 100*(1-twoPathCandidateRows/baselineMetrics.policyRowsCloned);
           const twoPathCandidateBytes = snapshotBytes;
           const twoPathBytesReduction = 100*(1-twoPathCandidateBytes/baselineMetrics.policyBytesCloned);
-
-          const evidence = {
-            schemaVersion:'orbit360-r4s7-client360-policy-index-rootfix-source-only-v1',
-            ok:true,
-            status:'R4S7_CLIENT360_POLICY_INDEX_ROOTFIX_SOURCE_ONLY_PASS',
-            classification:'FUNCTIONAL_DEFECT_ROOTFIX_SOURCE_PROVEN',
-            failureFamily:'CLIENT360_VISUAL_ENHANCER_N_BY_PAGE_POLICY_WHERE_FULL_DEEP_CLONE_WITH_DUPLICATE_ROUTE_ENHANCE_PATHS',
-            owner:ownerPath,
-            ownerBeforeSha256:sha256(baseline),
-            ownerCandidateSha256:sha256(candidate),
-            checks,
-            cardinality:{totalClients:clients.length,visibleRowsPerPage:visible.length,representativePolicyRows:policies.length,representativeOnly:true},
-            semantics:{semanticEqual:true,renderedHtmlEqual:true,twoEnhancePathsCompared:true},
-            baselineTwoPaths:baselineMetrics,
-            candidateTwoPaths:{enhanceInvocations:2,policyWhereCalls:0,nativePolicyAllCalls:1,policyRowsCloned:twoPathCandidateRows,policyBytesCloned:twoPathCandidateBytes,indexBuilds:1,indexHits:1},
-            reduction:{policyWhereCallsPercent:100,nativePolicyAllCallsPercent:98.75,policyRowsClonedPercent:+twoPathRowsReduction.toFixed(2),policyBytesClonedPercent:+twoPathBytesReduction.toFixed(2)},
-            invalidation:{polizas:invalidationProof.polizas,clientes:invalidationProof.clientes,wildcard:invalidationProof['*'],route:invalidationProof.route,pass:Object.values(invalidationProof).every(Boolean)},
-            ownership:{protectedStoreModified:false,moduleCliente360Modified:false,ownerOnlyProductChange:true},
-            safety:{browserExecuted:false,runtimeExecuted:false,secretAccess:false,dataAccess:false,firestoreWrites:0,authWrites:0,operationalWrites:0,publicationTouched:false,storeModified:false,mainMergeTouched:false}
-          };
+          const evidence = {schemaVersion:'orbit360-r4s7-client360-policy-index-rootfix-source-only-v1',ok:true,status:'R4S7_CLIENT360_POLICY_INDEX_ROOTFIX_SOURCE_ONLY_PASS',classification:'FUNCTIONAL_DEFECT_ROOTFIX_SOURCE_PROVEN',failureFamily:'CLIENT360_VISUAL_ENHANCER_N_BY_PAGE_POLICY_WHERE_FULL_DEEP_CLONE_WITH_DUPLICATE_ROUTE_ENHANCE_PATHS',owner:ownerPath,ownerBeforeSha256:sha256(baseline),ownerCandidateSha256:sha256(candidate),checks,cardinality:{totalClients:clients.length,visibleRowsPerPage:visible.length,representativePolicyRows:policies.length,representativeOnly:true},semantics:{semanticEqual:true,renderedHtmlEqual:true,twoEnhancePathsCompared:true},baselineTwoPaths:baselineMetrics,candidateTwoPaths:{enhanceInvocations:2,policyWhereCalls:0,nativePolicyAllCalls:1,policyRowsCloned:twoPathCandidateRows,policyBytesCloned:twoPathCandidateBytes,indexBuilds:1,indexHits:1},reduction:{policyWhereCallsPercent:100,nativePolicyAllCallsPercent:98.75,policyRowsClonedPercent:+twoPathRowsReduction.toFixed(2),policyBytesClonedPercent:+twoPathBytesReduction.toFixed(2)},invalidation:{polizas:invalidationProof.polizas,clientes:invalidationProof.clientes,wildcard:invalidationProof['*'],route:invalidationProof.route,pass:Object.values(invalidationProof).every(Boolean)},ownership:{protectedStoreModified:false,moduleCliente360Modified:false,ownerOnlyProductChange:true},safety:{browserExecuted:false,runtimeExecuted:false,secretAccess:false,dataAccess:false,firestoreWrites:0,authWrites:0,operationalWrites:0,publicationTouched:false,storeModified:false,mainMergeTouched:false}};
           fs.writeFileSync('/tmp/r4s7-client360-policy-index-rootfix-evidence.json', JSON.stringify(evidence,null,2));
           console.log(JSON.stringify(evidence,null,2));
           NODE
