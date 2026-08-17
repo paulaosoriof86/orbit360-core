@@ -3,7 +3,7 @@
   "gateId": "block-auth-paula-reset-link-handoff-lab-v20260817",
   "gateContractVersion": "14.1.0",
   "validatorLifecycleRevision": "phase-capability-contract-v1",
-  "status": "AWAITING_SINGLE_VERIFIED_RESET_LINK_AUTHORIZATION",
+  "status": "AUTH_PAULA_RESET_LINK_HANDOFF_CONSUMED_PASS",
   "currentPhase": "AUTH_PAULA_RESET_LINK_HANDOFF_LAB",
   "executionProfile": {
     "phase": "AUTH_PAULA_RESET_LINK_HANDOFF_LAB",
@@ -27,7 +27,7 @@
     "activeRequest": false,
     "allowedExecutions": 0,
     "request": ".github/orbit360-requests/auth-paula-reset-link-handoff-lab-v20260817.json",
-    "consumed": false,
+    "consumed": true,
     "replayAllowed": false,
     "newExplicitAuthorizationRequiredAfterExecution": true
   },
@@ -68,5 +68,12 @@
     "stopRetryOnFailure": true
   },
   "containsPII": false,
-  "containsSecrets": false
+  "containsSecrets": false,
+  "executionResult": {
+    "stage": "AUTH_PAULA_RESET_LINK_VERIFIED_READY_FOR_HANDOFF",
+    "classification": "RESET_EMAIL_OOB_CODE_INVALID_ROOTFIX_CHANNEL_HANDOFF",
+    "ok": true,
+    "resetLinksGenerated": 1,
+    "resetCodeVerified": true
+  }
 }
