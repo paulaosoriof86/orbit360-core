@@ -1,0 +1,122 @@
+name: Orbit360 R4S9C public exact contract verify 20260817
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - '.github/r4s9c-public-verify-trigger-v20260817.txt'
+
+permissions:
+  contents: read
+
+jobs:
+  verify-public-r4s9c:
+    runs-on: ubuntu-24.04
+    env:
+      PUBLIC_BASE: https://app.aysseguros.com
+      EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Canonical gate before public static observation
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+          jq -e '.ok==true and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+
+      - name: Verify exact public R4S9C identity and full manifest contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/r4s9c-public
+          nonce="$(date +%s%N)"
+          curl -fsSL --retry 3 -H 'Cache-Control: no-cache' "$PUBLIC_BASE/orbit360-package-manifest.json?verify=$nonce" -o /tmp/r4s9c-public/manifest.json
+          test "$(sha256sum /tmp/r4s9c-public/manifest.json | awk '{print $1}')" = "fc9b9d23d8749b6c70a24381271cee6e3227d7db286d13b740995514b8d735b5"
+          jq -e '
+            .status=="FASE_A_PRODUCT_R4S9C_CONTRACT_RECOVERY_CERTIFIED" and
+            .sourceHead=="861326906558f03d9c8c2e7f34adfb4979a17d73" and
+            .fileCount==194 and
+            .basePackageSha256=="9e8566fdc33f4f45b350fd3609c9ee02b22c49edd1d377bff334fc00df902180" and
+            .baseSourceHead=="861326906558f03d9c8c2e7f34adfb4979a17d73" and
+            .containsPrivateSecrets==false and
+            .deltaFiles==[] and
+            .deltaSourceHead=="861326906558f03d9c8c2e7f34adfb4979a17d73" and
+            .deployExecuted==false and
+            .dynamicRuntimeClosureCertified==true and
+            .forbiddenFiles==[] and
+            .noLabRuntime==true and
+            .noPrivateSecretMaterial==true and
+            (.packageLineage|contains("R4S9")) and
+            .productTenantContextCertified==true and
+            .productionTouched==false and
+            .requiredHydrationCertified==true and
+            .routerRenderCertified==true and
+            .secretMaterialFiles==[] and
+            .successorOrdinal==9 and
+            .unchangedFileCount==194 and
+            .writeAuthorized==false and
+            .lineage.contractRecovery.productBaseArtifactId==9299097141 and
+            .lineage.contractRecovery.zeroProductDelta==true and
+            (.lineage.contractRecovery.restoredContractFields|length)==19
+          ' /tmp/r4s9c-public/manifest.json >/dev/null
+          fetch_sha(){ url="$1" expected="$2" file="$3"; curl -fsSL --retry 3 -H 'Cache-Control: no-cache' "$PUBLIC_BASE$url?verify=$nonce" -o "/tmp/r4s9c-public/$file"; test "$(sha256sum "/tmp/r4s9c-public/$file" | awk '{print $1}')" = "$expected"; }
+          fetch_sha /index.html 125b24a3fc215a368a7183a107cd55eb5a6332fc8a7f8354ed94e3169340ec4e index.html
+          fetch_sha /core/auth-product-runtime-p0.js d0bb399fe0e1dd102a03950673044eda5bc8d181e4e98cf477d22d141aa7b3a8 auth.js
+          fetch_sha /core/queries.js b906c1d3382a9fad310695b0ce2c8e7f49a2bf99fe9b9ed674a8df7e0fcbbb7b queries.js
+          fetch_sha /core/client-insurer-visual-contract-v20260720.js a7c61af94bd578849d8e6a946c01e97159cd7bac4f0385f6ac5cd920cc93299d client-visual.js
+          fetch_sha /modules/cliente360.js 05a42009ef13a67ecca76c116cbecee9cef0caeef4cf0e78730438ec59888d34 cliente360.js
+          fetch_sha /core/insurer-secure-target-bridge-v20260720.js f656daaf1d1927e330a090304dd1b7deb4463bf23d92fafe8b912d9348dfd462 insurer-policy-owner.js
+
+      - name: Emit sanitized public evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > /tmp/r4s9c-public/evidence.json <<'EOF'
+          {
+            "schemaVersion":"orbit360-r4s9c-public-exact-contract-verify-v1",
+            "ok":true,
+            "status":"R4S9C_PUBLIC_EXACT_CONTRACT_PASS",
+            "classification":"DATA_CONTRACT_FAILURE_ROOTFIX_PUBLIC_PROVEN",
+            "sourceHead":"861326906558f03d9c8c2e7f34adfb4979a17d73",
+            "artifactId":9300368902,
+            "zipName":"orbit360-fase-a-product-r4s9c-contract-recovery-861326906558.zip",
+            "zipSha256":"917f5424deea06d224d45a1b039c0b3699d71a7bef430b2a40d059703b2acc3a",
+            "manifestSha256":"fc9b9d23d8749b6c70a24381271cee6e3227d7db286d13b740995514b8d735b5",
+            "fileCount":194,
+            "productFilesByteIdenticalToR4S9":194,
+            "productDeltaCount":0,
+            "restoredContractFieldCount":19,
+            "runtimeClosurePass":true,
+            "browserExecuted":false,
+            "runtimeExecuted":false,
+            "secretAccess":false,
+            "firestoreWrites":0,
+            "authWrites":0,
+            "operationalWrites":0,
+            "containsPII":false,
+            "containsSecrets":false
+          }
+          EOF
+
+      - name: Canonical gate after public static observation
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+          jq -e '.ok==true and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+          jq -e '.ok==true and .status=="R4S9C_PUBLIC_EXACT_CONTRACT_PASS" and .restoredContractFieldCount==19 and .runtimeClosurePass==true and .browserExecuted==false and .runtimeExecuted==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0' /tmp/r4s9c-public/evidence.json >/dev/null
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-r4s9c-public-exact-contract-evidence-${{ github.run_id }}
+          path: /tmp/r4s9c-public/evidence.json
+          retention-days: 30
