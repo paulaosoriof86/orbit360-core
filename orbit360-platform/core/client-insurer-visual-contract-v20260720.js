@@ -11,7 +11,7 @@
   'use strict';
   window.Orbit = window.Orbit || {};
   var Orbit = window.Orbit;
-  if (Orbit.clientInsurerVisualContractV20260720 && Orbit.clientInsurerVisualContractV20260720.version === '20260720.2' && Orbit.clientInsurerVisualContractV20260720.visualRemediationRevision === '20260722.1' && Orbit.clientInsurerVisualContractV20260720.clientProjectionReadCacheRevision === '20260816.2') return;
+  if (Orbit.clientInsurerVisualContractV20260720 && Orbit.clientInsurerVisualContractV20260720.version === '20260720.2' && Orbit.clientInsurerVisualContractV20260720.visualRemediationRevision === '20260722.1' && Orbit.clientInsurerVisualContractV20260720.clientProjectionReadCacheRevision === '20260817.1') return;
 
   function clean(value) { return String(value == null ? '' : value).trim(); }
   function normalized(value) { return clean(value).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, ' ').trim(); }
@@ -84,11 +84,22 @@
     } catch (e) { return 0; }
   }
   var segmentationContextCache = { epoch: 0, threshold: null, context: null, builds: 0, hits: 0, invalidations: 0, batchReads: 0 };
-  function invalidateSegmentationContext() {
+  var CLIENT_PROJECTION_CACHE_TTL_MS = 5000;
+  var clientProjectionRowsCache = { epoch: 0, threshold: null, rows: null, builtAt: 0, builds: 0, hits: 0, invalidations: 0, shallowCloneRows: 0, lastInvalidationReason: '' };
+  function invalidateClientProjectionRows(reason) {
+    clientProjectionRowsCache.epoch += 1;
+    clientProjectionRowsCache.threshold = null;
+    clientProjectionRowsCache.rows = null;
+    clientProjectionRowsCache.builtAt = 0;
+    clientProjectionRowsCache.invalidations += 1;
+    clientProjectionRowsCache.lastInvalidationReason = clean(reason || 'unspecified');
+  }
+  function invalidateSegmentationContext(reason) {
     segmentationContextCache.epoch += 1;
     segmentationContextCache.threshold = null;
     segmentationContextCache.context = null;
     segmentationContextCache.invalidations += 1;
+    invalidateClientProjectionRows(reason || 'segmentation');
   }
   function buildSegmentationContext(readAll, preloaded) {
     var threshold = premiumThreshold(), policies = [], collections = [], policiesByClient = new Map(), collectedByClient = new Map(), collectionsComplete = false;
@@ -159,19 +170,43 @@
         segmentationContextCache.hits += 1;
         return segmentationContextCache.context;
       }
-      if (segmentationContextCache.context && segmentationContextCache.threshold !== threshold) invalidateSegmentationContext();
+      if (segmentationContextCache.context && segmentationContextCache.threshold !== threshold) invalidateSegmentationContext('threshold');
       var context = buildSegmentationContext(nativeAll);
       segmentationContextCache.threshold = threshold;
       segmentationContextCache.context = context;
       segmentationContextCache.builds += 1;
       return context;
     }
+    function cloneProjectedClients(rows) {
+      var source = Array.isArray(rows) ? rows : [];
+      clientProjectionRowsCache.shallowCloneRows += source.length;
+      return source.map(function (row) {
+        var out = clone(row);
+        if (out && Array.isArray(row && row.etiquetas)) out.etiquetas = row.etiquetas.slice();
+        return out;
+      });
+    }
+    function projectedClients(segmentationContext) {
+      var threshold = premiumThreshold();
+      var now = Date.now();
+      if (clientProjectionRowsCache.rows && clientProjectionRowsCache.threshold !== threshold) invalidateSegmentationContext('threshold');
+      if (clientProjectionRowsCache.rows && (now - clientProjectionRowsCache.builtAt) <= CLIENT_PROJECTION_CACHE_TTL_MS) {
+        clientProjectionRowsCache.hits += 1;
+        return cloneProjectedClients(clientProjectionRowsCache.rows);
+      }
+      if (clientProjectionRowsCache.rows) invalidateClientProjectionRows('ttl');
+      var context = segmentationContext || cachedSegmentationContext();
+      var projected = (nativeAll('clientes') || []).map(function (row) { return projectClient(row, context); });
+      clientProjectionRowsCache.rows = projected;
+      clientProjectionRowsCache.threshold = threshold;
+      clientProjectionRowsCache.builtAt = Date.now();
+      clientProjectionRowsCache.builds += 1;
+      return cloneProjectedClients(projected);
+    }
     function projectedAll(collection) {
       if (activeReadBatch && Object.prototype.hasOwnProperty.call(activeReadBatch.rows, collection)) return activeReadBatch.rows[collection].slice();
-      var rows = nativeAll(collection) || [];
-      if (collection !== 'clientes') return rows;
-      var segmentationContext = cachedSegmentationContext();
-      return rows.map(function (row) { return projectClient(row, segmentationContext); });
+      if (collection === 'clientes') return projectedClients();
+      return nativeAll(collection) || [];
     }
     function evaluate(rows,args) {
       var f=args[1], ov=args[2], mv=args[3];
@@ -187,7 +222,7 @@
       var context = cachedSegmentationContext(), rows = {};
       requested.forEach(function (collection) {
         if (collection === 'clientes') {
-          rows.clientes = (nativeAll('clientes') || []).map(function (row) { return projectClient(row, context); });
+          rows.clientes = projectedClients(context);
         } else if (collection === 'polizas') {
           rows.polizas = context.policies;
         } else if (collection === 'cobros' && context.collectionsComplete) {
@@ -205,15 +240,15 @@
       } finally { activeReadBatch = null; }
     }
     function performanceState() {
-      return { revision:'20260816.2', epoch:segmentationContextCache.epoch, builds:segmentationContextCache.builds, hits:segmentationContextCache.hits, invalidations:segmentationContextCache.invalidations, batchReads:segmentationContextCache.batchReads, threshold:segmentationContextCache.threshold };
+      return { revision:'20260817.1', epoch:segmentationContextCache.epoch, builds:segmentationContextCache.builds, hits:segmentationContextCache.hits, invalidations:segmentationContextCache.invalidations, batchReads:segmentationContextCache.batchReads, threshold:segmentationContextCache.threshold, clientProjection:{ epoch:clientProjectionRowsCache.epoch, builds:clientProjectionRowsCache.builds, hits:clientProjectionRowsCache.hits, invalidations:clientProjectionRowsCache.invalidations, shallowCloneRows:clientProjectionRowsCache.shallowCloneRows, ttlMs:CLIENT_PROJECTION_CACHE_TTL_MS, cachedRows:clientProjectionRowsCache.rows ? clientProjectionRowsCache.rows.length : 0, ageMs:clientProjectionRowsCache.builtAt ? Math.max(0,Date.now()-clientProjectionRowsCache.builtAt) : null, lastInvalidationReason:clientProjectionRowsCache.lastInvalidationReason } };
     }
     store.all=function(collection){return projectedAll(collection);};
     if(nativeWhere) store.where=function(){return arguments[0]==='clientes'?evaluate(projectedAll('clientes'),arguments):nativeWhere.apply(store,arguments);};
     if(nativeFind) store.find=function(collection,predicate){if(collection!=='clientes')return nativeFind.apply(store,arguments);if(typeof predicate==='function')return projectedAll('clientes').find(predicate)||null;if(predicate&&typeof predicate==='object')return evaluate(projectedAll('clientes'),[collection,predicate])[0]||null;return null;};
     if (typeof store.on === 'function') {
-      try { store.on(function (collection) { if (collection === '*' || collection === 'polizas' || collection === 'cobros') invalidateSegmentationContext(); }); } catch (e) {}
+      try { store.on(function (collection) { if (collection === 'clientes') invalidateClientProjectionRows('store:clientes'); else if (collection === '*' || collection === 'polizas' || collection === 'cobros') invalidateSegmentationContext('store:' + collection); }); } catch (e) {}
     }
-    store.__clientCanonicalReadProjectionV20260720={version:'20260720.2',writesStore:false,reimportsData:false,nativeAll:nativeAll,nativeWhere:nativeWhere,nativeFind:nativeFind,segmentationBatchRevision:'20260816.2',withReadBatch:withReadBatch,performanceState:performanceState};
+    store.__clientCanonicalReadProjectionV20260720={version:'20260720.2',writesStore:false,reimportsData:false,nativeAll:nativeAll,nativeWhere:nativeWhere,nativeFind:nativeFind,segmentationBatchRevision:'20260816.2',clientProjectionReadCacheRevision:'20260817.1',withReadBatch:withReadBatch,performanceState:performanceState};
   }
   installClientReadProjection();
   Orbit.clientCountryEvidence={version:'20260720.2',evaluate:countryEvidence,writesStore:false,silentAutoClassification:false};
@@ -312,6 +347,6 @@
   });
   observerHost=document.getElementById('host');if(observerHost&&window.MutationObserver){canonicalObserver=new MutationObserver(handleCanonicalMutations);observeCanonicalOwner();}window.addEventListener('hashchange',schedule);document.addEventListener('orbit:session',schedule);window.addEventListener('orbit:store:emit',schedule);
   document.documentElement.classList.add('orbit-m1-stable-ui');
-  Orbit.clientInsurerVisualContractV20260720={version:'20260720.2',idempotenceRevision:'20260721.4',visualRemediationRevision:'20260722.1',clientProjection:true,countryEvidenceProposalOnly:true,segmentationReadOnly:true,insurerSemanticView:true,secureCredentialActions:true,credentialUserAlwaysSeparate:true,credentialSecretSeparateReveal:true,completeBankCopy:true,bankCopyExcludesUse:true,bankHolderFallbackInsurer:true,visualStability:true,synchronousMutationOwner:true,mutationMode:'same-microtask-disconnect-own-writes',observerOwnMutations:false,idempotentDomWrites:true,client360StructuralTrigger:true,clientProjectionBatchRevision:'20260816.2',clientProjectionReadCacheRevision:'20260816.2',writesStore:false,reimportsData:false,exposesSecrets:false,enhance:runEnhance};
+  Orbit.clientInsurerVisualContractV20260720={version:'20260720.2',idempotenceRevision:'20260721.4',visualRemediationRevision:'20260722.1',clientProjection:true,countryEvidenceProposalOnly:true,segmentationReadOnly:true,insurerSemanticView:true,secureCredentialActions:true,credentialUserAlwaysSeparate:true,credentialSecretSeparateReveal:true,completeBankCopy:true,bankCopyExcludesUse:true,bankHolderFallbackInsurer:true,visualStability:true,synchronousMutationOwner:true,mutationMode:'same-microtask-disconnect-own-writes',observerOwnMutations:false,idempotentDomWrites:true,client360StructuralTrigger:true,clientProjectionBatchRevision:'20260816.2',clientProjectionReadCacheRevision:'20260817.1',writesStore:false,reimportsData:false,exposesSecrets:false,enhance:runEnhance};
   schedule();
 })();

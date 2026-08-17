@@ -216,7 +216,7 @@ function snapshot(result) {
 function staticDiagnosis(source, moduleSource, harnessSource) {
   return {
     roleScopeReadsClients: harnessSource.includes("const raw = Orbit.store.all('clientes'), scoped = Orbit.access.filter('clientes', raw, 'cliente360')"),
-    cliente360UsesReadBatch: moduleSource.includes("withReadBatch(['clientes', 'polizas', 'cobros', 'comisiones']"),
+    cliente360UsesReadBatch: moduleSource.includes("typeof Orbit.clientProjection.withReadBatch === 'function'") && moduleSource.includes("batchRunner(['clientes', 'polizas', 'cobros', 'comisiones']"),
     batchDirectlyNativeReadsClients: source.includes("rows.clientes = (nativeAll('clientes') || []).map(function (row) { return projectClient(row, context); });"),
     projectedAllNativeReadsBeforeClientBranch: source.includes("var rows = nativeAll(collection) || [];\n      if (collection !== 'clientes') return rows;"),
     enhancerReadsClientsAgain: source.includes("var clients=Orbit.store&&Orbit.store.all?Orbit.store.all('clientes'):[]"),
