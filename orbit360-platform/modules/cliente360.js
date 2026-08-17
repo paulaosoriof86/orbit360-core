@@ -61,11 +61,26 @@ Orbit.modules.cliente360 = (function () {
     const renderStartedAt = perfNow();
     const summaryStartedAt = perfNow();
     const batchRunner = Orbit.clientProjection && typeof Orbit.clientProjection.withReadBatch === 'function' ? Orbit.clientProjection.withReadBatch : null;
-    const summaryBatch = q.clientesResumenIndex && batchRunner ? batchRunner(['clientes', 'polizas', 'cobros', 'comisiones'], source => ({ summaryIndex: q.clientesResumenIndex(), clientes: source.clientes || [], polizas: source.polizas || [] })) : null;
-    const summaryIndex = summaryBatch ? summaryBatch.summaryIndex : (q.clientesResumenIndex ? q.clientesResumenIndex() : null);
-    const clientes = summaryBatch ? summaryBatch.clientes : S().all('clientes');
-    const policiesForList = summaryBatch ? summaryBatch.polizas : null;
+    const listBatch = batchRunner ? batchRunner(['clientes', 'polizas', 'cobros'], source => ({
+      clientes: source.clientes || [],
+      polizas: source.polizas || [],
+      cobros: source.cobros || []
+    })) : null;
+    const clientes = listBatch ? listBatch.clientes : S().all('clientes');
+    const policiesForList = listBatch ? listBatch.polizas : S().all('polizas');
+    const collectionsForList = listBatch ? listBatch.cobros : S().all('cobros');
     const asesores = S().all('asesores');
+    const advisorById = new Map(asesores.filter(a => a && a.id != null).map(a => [a.id, a]));
+    const policyByClient = new Map();
+    const collectionByClient = new Map();
+    const addRelated = (map, clientId, row) => {
+      if (clientId == null) return;
+      let bucket = map.get(clientId);
+      if (!bucket) { bucket = []; map.set(clientId, bucket); }
+      bucket.push(row);
+    };
+    policiesForList.forEach(p => { if (p) addRelated(policyByClient, p.clienteId, p); });
+    collectionsForList.forEach(c => { if (c) addRelated(collectionByClient, c.clienteId, c); });
     const summaryCacheMs = perfNow() - summaryStartedAt;
     const rows = clientes.filter(c =>
       (!f.q || (c.nombre + ' ' + c.email + ' ' + c.identificacion).toLowerCase().includes(f.q.toLowerCase())) &&
@@ -79,18 +94,37 @@ Orbit.modules.cliente360 = (function () {
     if (listPage < 1) listPage = 1;
     const pageStart = (listPage - 1) * LIST_PAGE_SIZE;
     const visibleRows = rows.slice(pageStart, pageStart + LIST_PAGE_SIZE);
-    const resumenDe = c => (summaryIndex && typeof summaryIndex.get === 'function' && summaryIndex.get(c.id)) || q.clienteResumen(c.id);
+    const resumenDe = c => {
+      const pol = policyByClient.get(c.id) || [];
+      const cob = collectionByClient.get(c.id) || [];
+      const vigentes = pol.filter(esRenovable);
+      const primaAnual = vigentes.reduce((s, p) => s + p.prima, 0);
+      const pendiente = cob.filter(x => x.estado === 'Pendiente').reduce((s, x) => s + x.monto, 0);
+      const vencido = cob.filter(x => x.estado === 'Vencido').reduce((s, x) => s + x.monto, 0);
+      let salud = 70;
+      salud += Math.min(20, vigentes.length * 6);
+      salud -= vencido > 0 ? 25 : 0;
+      salud += c && c.segmento === 'Premium' ? 8 : 0;
+      salud = Math.max(8, Math.min(100, salud));
+      return { moneda: c ? c.moneda : 'GTQ', nPolizas: pol.length, nVigentes: vigentes.length, primaAnual, pendiente, vencido, salud };
+    };
     const summaryAggregateStartedAt = perfNow();
-    const totPrima = clientes.reduce((s, c) => { const r = resumenDe(c); return s + (r.moneda === 'COP' ? r.primaAnual / 1000 : r.primaAnual); }, 0);
-    const activePolicyCount = policiesForList ? policiesForList.filter(esRenovable).length : S().where('polizas', p => p.estado === 'Vigente' || p.estado === 'Por renovar').length;
-    const totalPolicyCount = policiesForList ? policiesForList.length : S().all('polizas').length;
-    const renewals45Count = policiesForList ? policiesForList.filter(p => { const d = U.daysFromNow(p.vigenciaFin); return esRenovable(p) && d != null && d >= 0 && d <= 45; }).length : q.renovacionesProximas(45).length;
+    const clientById = new Map(clientes.filter(c => c && c.id != null).map(c => [c.id, c]));
+    const totPrima = policiesForList.reduce((s, p) => {
+      if (!esRenovable(p)) return s;
+      const cli = clientById.get(p.clienteId);
+      if (!cli) return s;
+      return s + (cli.moneda === 'COP' ? p.prima / 1000 : p.prima);
+    }, 0);
+    const activePolicyCount = policiesForList.filter(esRenovable).length;
+    const totalPolicyCount = policiesForList.length;
+    const renewals45Count = policiesForList.filter(p => { const d = U.daysFromNow(p.vigenciaFin); return esRenovable(p) && d != null && d >= 0 && d <= 45; }).length;
     const summaryAggregateMs = perfNow() - summaryAggregateStartedAt;
 
     const rowsBuildStartedAt = perfNow();
     const rowsHtml = visibleRows.map(c => {
             const r = resumenDe(c);
-            const ase = q.asesor(c.asesorId);
+            const ase = advisorById.get(c.asesorId) || null;
             const cartera = r.vencido > 0 ? `<span class="badge danger">Vencida ${U.moneyShort(r.vencido, r.moneda)}</span>` : r.pendiente > 0 ? `<span class="badge warn">Al día</span>` : `<span class="badge ok">Al día</span>`;
             return `<tr class="clickable" onclick="location.hash='#/cliente360?c=${c.id}'">
               <td><div style="display:flex;align-items:center;gap:11px">
@@ -168,9 +202,9 @@ Orbit.modules.cliente360 = (function () {
     listRenderSeq += 1;
     window.OrbitRuntimeDiagnostics = window.OrbitRuntimeDiagnostics || {};
     OrbitRuntimeDiagnostics.cliente360 = Object.assign({}, OrbitRuntimeDiagnostics.cliente360 || {}, {
-      version: '20260816.20-bounded-list-batch-read',
+      version: '20260817.2-bounded-first-paint',
       renderMs: totalMs,
-      list: { bounded: true, batchRead: !!summaryBatch, pageSize: LIST_PAGE_SIZE, page: listPage, pageCount, totalRows: clientes.length, filteredRows: rows.length, renderedRows: visibleRows.length, summaryCacheMs, summaryAggregateMs, rowsBuildMs, innerHtmlMs, bindingsMs, totalMs, renderSeq: listRenderSeq, writes: 0 }
+      list: { bounded: true, batchRead: !!listBatch, firstPaintSummaryRows: visibleRows.length, firstPaintCommissionRows: 0, firstPaintPolicyRows: policiesForList.length, firstPaintCollectionRows: collectionsForList.length, pageSize: LIST_PAGE_SIZE, page: listPage, pageCount, totalRows: clientes.length, filteredRows: rows.length, renderedRows: visibleRows.length, summaryCacheMs, summaryAggregateMs, rowsBuildMs, innerHtmlMs, bindingsMs, totalMs, renderSeq: listRenderSeq, writes: 0 }
     });
   }
 
