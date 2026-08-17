@@ -45,7 +45,7 @@ jobs:
           fetch_sha /core/queries.js b906c1d3382a9fad310695b0ce2c8e7f49a2bf99fe9b9ed674a8df7e0fcbbb7b queries.js
           fetch_sha /core/client-insurer-visual-contract-v20260720.js a7c61af94bd578849d8e6a946c01e97159cd7bac4f0385f6ac5cd920cc93299d client-visual.js
           fetch_sha /modules/cliente360.js 5ac3f042add37ea45582cc88c670c5bcff139937dac406d9561e25f1b9962f9e cliente360.js
-          fetch_sha /core/insurer-secure-target-bridge-v20260720.js 3323f09b812d6e3accc8cd151fe28ec3fab2fffa6c41ad622a2f8a147046887b insurer-policy-owner.js
+          fetch_sha /core/insurer-secure-target-bridge-v20260720.js f656daaf1d1927e330a090304dd1b7deb4463bf23d92fafe8b912d9348dfd462 insurer-policy-owner.js
       - name: Emit sanitized public evidence
         shell: bash
         run: |
@@ -55,6 +55,7 @@ jobs:
             "schemaVersion":"orbit360-r4s8-public-exact-verify-v1",
             "ok":true,
             "status":"R4S8_PUBLIC_EXACT_STATIC_PASS",
+            "classification":"VALIDATOR_STALE_ROOTFIX_PASS",
             "sourceHead":"2427d94758c6143f3dbedf70512cbda87a24459c",
             "artifactId":9296206724,
             "zipName":"orbit360-fase-a-product-r4s8-2427d94758c6.zip",
@@ -79,7 +80,7 @@ jobs:
           set -euo pipefail
           node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
           jq -e '.ok==true and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json >/dev/null
-          jq -e '.ok==true and .status=="R4S8_PUBLIC_EXACT_STATIC_PASS" and .browserExecuted==false and .runtimeExecuted==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0' /tmp/r4s8-public/evidence.json >/dev/null
+          jq -e '.ok==true and .status=="R4S8_PUBLIC_EXACT_STATIC_PASS" and .classification=="VALIDATOR_STALE_ROOTFIX_PASS" and .browserExecuted==false and .runtimeExecuted==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0' /tmp/r4s8-public/evidence.json >/dev/null
       - uses: actions/upload-artifact@v4
         with:
           name: orbit360-r4s8-public-exact-evidence-${{ github.run_id }}
