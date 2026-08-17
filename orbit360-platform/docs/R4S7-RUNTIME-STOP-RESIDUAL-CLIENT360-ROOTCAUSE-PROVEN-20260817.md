@@ -20,3 +20,5 @@ Run `32051672373`, job `95452260461` SUCCESS; artifact `9294910801`, digest `e11
 
 ## Siguiente acción
 Rootfix source-only fresco, inicialmente solo en el owner visual: reemplazar el `where('polizas')` por fila por una snapshot/index reutilizable desde el contexto/batch existente. Gate antes de aceptar: `Cliente360 batch → 40 filas → dos caminos de enhance`, igualdad DOM/semántica, `policyWhereCalls`, `nativePolicyAllCalls`, filas/bytes clonados, `enhanceInvocations` e invalidación `polizas/clientes/*/ruta`. No browser/runtime hasta PASS.
+
+Este checkpoint queda vinculado desde `orbit360-live-state-v1.json`; commit documental previo `3af61ede83cfe297c8b3ac96cc356f2d0b8a43bc`.
