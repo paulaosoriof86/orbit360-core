@@ -1,4 +1,5 @@
 R4S9C public diagnostic trigger 2026-08-17
+attempt=2-content-aware
 staticOnly=true
 noBrowser=true
 noRuntime=true
