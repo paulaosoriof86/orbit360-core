@@ -1,0 +1,77 @@
+name: Orbit360 R4S8 public static diagnostic 20260817
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - .github/workflows/orbit360-r4s8-public-static-diagnostic-v20260817.yml
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-24.04
+    env:
+      PUBLIC_BASE: https://app.aysseguros.com
+      EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Canonical gate before public static diagnostic
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+          jq -e '.ok==true and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+      - name: Capture exact public hashes without asserting
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/r4s8-diag
+          nonce="$(date +%s%N)"
+          declare -a ITEMS=(
+            "manifest|/orbit360-package-manifest.json|422f961cd1bbbc75b8540e9419fdd5bfe64e4798c91358253d4ac128bad42343"
+            "index|/index.html|125b24a3fc215a368a7183a107cd55eb5a6332fc8a7f8354ed94e3169340ec4e"
+            "auth|/core/auth-product-runtime-p0.js|d0bb399fe0e1dd102a03950673044eda5bc8d181e4e98cf477d22d141aa7b3a8"
+            "queries|/core/queries.js|b906c1d3382a9fad310695b0ce2c8e7f49a2bf99fe9b9ed674a8df7e0fcbbb7b"
+            "clientVisual|/core/client-insurer-visual-contract-v20260720.js|a7c61af94bd578849d8e6a946c01e97159cd7bac4f0385f6ac5cd920cc93299d"
+            "cliente360|/modules/cliente360.js|5ac3f042add37ea45582cc88c670c5bcff139937dac406d9561e25f1b9962f9e"
+            "policyOwner|/core/insurer-secure-target-bridge-v20260720.js|3323f09b812d6e3accc8cd151fe28ec3fab2fffa6c41ad622a2f8a147046887b"
+          )
+          printf '{"schemaVersion":"orbit360-r4s8-public-static-diagnostic-v1","browserExecuted":false,"runtimeExecuted":false,"secretAccess":false,"items":[' > /tmp/r4s8-diag/evidence.json
+          first=1
+          all=1
+          for item in "${ITEMS[@]}"; do
+            IFS='|' read -r name url expected <<< "$item"
+            out="/tmp/r4s8-diag/$name.bin"
+            code="$(curl -sS -L --retry 3 -H 'Cache-Control: no-cache' -w '%{http_code}' -o "$out" "$PUBLIC_BASE$url?diag=$nonce")"
+            actual="$(sha256sum "$out" | awk '{print $1}')"
+            bytes="$(wc -c < "$out" | tr -d ' ')"
+            match=false; [ "$actual" = "$expected" ] && match=true || all=0
+            [ $first -eq 1 ] || printf ',' >> /tmp/r4s8-diag/evidence.json
+            first=0
+            printf '{"name":"%s","path":"%s","http":%s,"bytes":%s,"expected":"%s","actual":"%s","match":%s}' "$name" "$url" "$code" "$bytes" "$expected" "$actual" "$match" >> /tmp/r4s8-diag/evidence.json
+          done
+          printf '],"allExpected":%s}' "$([ $all -eq 1 ] && echo true || echo false)" >> /tmp/r4s8-diag/evidence.json
+          jq . /tmp/r4s8-diag/evidence.json
+          echo '--- PUBLIC MANIFEST ---'
+          cat /tmp/r4s8-diag/manifest.bin || true
+      - name: Canonical gate after public static diagnostic
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs fase-a-ops-leads-crm-release-lab-v20260812
+          jq -e '.ok==true and .secretAccessAuthorized==false and .writesAuthorized==0 and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .productionTouched==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+      - uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-r4s8-public-static-diagnostic-${{ github.run_id }}
+          path: /tmp/r4s8-diag/evidence.json
+          retention-days: 14
