@@ -1,0 +1,65 @@
+{
+  "schemaVersion": "orbit360-f1-4c-successor-artifact-certification-v1",
+  "ok": true,
+  "status": "F1_4C_SUCCESSOR_ARTIFACT_CERTIFIED_UNPUBLISHED",
+  "classification": "PASS",
+  "manifestStatus": "FASE_A_PRODUCT_F1_4C_SUCCESSOR_CERTIFIED",
+  "sourceHead": "29caae94a3db1f1626bdde2ea6ee9a21799f9df6",
+  "baseArtifactId": 9300368902,
+  "baseSourceHead": "861326906558f03d9c8c2e7f34adfb4979a17d73",
+  "baseZipSha256": "917f5424deea06d224d45a1b039c0b3699d71a7bef430b2a40d059703b2acc3a",
+  "zipName": "orbit360-fase-a-product-f1-4c-successor-29caae94a3db.zip",
+  "zipSha256": "493009c83390901aa772842a2ba9ddd5ce5293f6969d86c5c3395ebd670a44ac",
+  "manifestSha256": "29dafe5e63b425ea6cf641937fe1b9d4b9e63f72479a51ae76f9148a55771761",
+  "fileCount": 194,
+  "deltaCount": 2,
+  "unchangedProductFiles": 192,
+  "productDeltaPaths": [
+    "core/backend-product-readonly-bootstrap-p0.js",
+    "core/membership-multirol-contract-p0.js"
+  ],
+  "productDelta": [
+    {
+      "path": "core/backend-product-readonly-bootstrap-p0.js",
+      "beforeSha256": "ead861dfb4b3fa45a55e0e1ded7dcf973759054b864ebc3a2850deb0d083bfa3",
+      "afterSha256": "a6bf74ad903590777caff25bd0dcb8719531d61735fcb0c04b99db1a7cdc73e0",
+      "beforeBytes": 13892,
+      "afterBytes": 14126
+    },
+    {
+      "path": "core/membership-multirol-contract-p0.js",
+      "beforeSha256": "138e901430d8110db3d37a402c8ffc756efccfa2628c14b224eced11cd3a1c4f",
+      "afterSha256": "b65358b821cabf44d2b29e7fb8d40454da833adfd00ee6eb6abbcbb530eafaff",
+      "beforeBytes": 15568,
+      "afterBytes": 15705
+    }
+  ],
+  "rootfixCommits": [
+    "a808e13d69dcb687f488be7e17411796eaec3509",
+    "b050d5a1a9861f898d2bb50d1bcc5c26beb72e9b"
+  ],
+  "f1_4bEvidenceCommit": "3c56d0baffce8fc8399050e520ee4cb54cebf4db",
+  "rootfixAncestors": true,
+  "f1_4bAncestor": true,
+  "f1_3MembershipSemanticsPresent": true,
+  "f1_3BootstrapAuthOwnershipPresent": true,
+  "baseFullyRehashed": true,
+  "successorFullyRehashed": true,
+  "packageReopened": true,
+  "allProductFilesRehashed": true,
+  "noLabRuntime": true,
+  "noPrivateSecretMaterial": true,
+  "published": false,
+  "packageRebuilt": true,
+  "browserExecuted": false,
+  "runtimeExecuted": false,
+  "secretAccess": false,
+  "dataAccess": false,
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "operationalWrites": 0,
+  "deployExecuted": false,
+  "productionTouched": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
