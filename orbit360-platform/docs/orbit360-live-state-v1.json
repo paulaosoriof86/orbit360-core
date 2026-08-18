@@ -15,7 +15,7 @@
   "currentPublishedPackage": {
     "version": "R4S9C",
     "sha256": "917f5424deea06d224d45a1b039c0b3699d71a7bef430b2a40d059703b2acc3a",
-    "sourceHead": "861326906558f03c805503a42b46bd5a755c3ef9",
+    "sourceHead": "861326906558f03d9c8c2e7f34adfb4979a17d73",
     "manifestStatus": "FASE_A_PRODUCT_R4S9C_CONTRACT_RECOVERY_CERTIFIED",
     "manifestSha256": "fc9b9d23d8749b6c70a24381271cee6e3227d7db286d13b740995514b8d735b5",
     "durableArtifactId": 9300368902,
