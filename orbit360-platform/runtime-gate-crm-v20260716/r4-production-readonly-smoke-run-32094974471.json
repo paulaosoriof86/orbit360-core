@@ -1,0 +1,82 @@
+{
+  "schemaVersion": "orbit360-r4-production-readonly-smoke-v2-bounded-observability",
+  "ok": false,
+  "status": "R4_PRODUCTION_READONLY_SMOKE_FAIL",
+  "classification": "ENVIRONMENT_FAILURE",
+  "failureFamily": "R4_BROWSER_LAUNCH_FAILED",
+  "currentStage": "browser-launch",
+  "elapsedMs": 232,
+  "globalDeadlineMs": 480000,
+  "manifest": {
+    "pass": false
+  },
+  "authAsset": {
+    "pass": false,
+    "httpStatus": 0,
+    "sha256Matches": false
+  },
+  "authHttp": {
+    "seen": false,
+    "status": 0,
+    "errorCode": ""
+  },
+  "auth": {
+    "signedIn": false,
+    "emailVerified": false,
+    "membershipAvailable": false,
+    "membershipActive": false,
+    "tenantMatches": false,
+    "roleCount": 0,
+    "requiredRolesPresent": false
+  },
+  "runtime": {
+    "started": false
+  },
+  "roles": [],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "httpFailures": [],
+  "writeSignals": [],
+  "technicalCopy": [],
+  "checkpoints": [
+    {
+      "stage": "playwright-import",
+      "state": "START",
+      "atMs": 1
+    },
+    {
+      "stage": "playwright-import",
+      "state": "PASS",
+      "atMs": 154
+    },
+    {
+      "stage": "browser-launch",
+      "state": "START",
+      "atMs": 155
+    },
+    {
+      "stage": "browser-launch",
+      "state": "FAIL",
+      "atMs": 211,
+      "error": "browserType.launch: Executable doesn't exist at /home/runner/.cache/ms-playwright/chromium_headless_shell-1169/chrome-linux/headless_shell\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                             "
+    }
+  ],
+  "legalGateHandledLocally": false,
+  "cleanup": {
+    "browserCloseAttempted": false,
+    "browserClosed": false,
+    "browserCloseTimedOut": false
+  },
+  "error": "browserType.launch: Executable doesn't exist at /home/runner/.cache/ms-playwright/chromium_headless_shell-1169/chrome-linux/headless_shell\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                             ",
+  "targetHttps": true,
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "operationalWrites": 0,
+  "containsPII": false,
+  "containsSecrets": false,
+  "secretValuesLogged": false,
+  "writesAuthorized": false,
+  "deployExecuted": false,
+  "packageRebuilt": false,
+  "productionTouched": true
+}
