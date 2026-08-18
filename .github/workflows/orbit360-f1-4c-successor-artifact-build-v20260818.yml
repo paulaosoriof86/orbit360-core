@@ -1,0 +1,123 @@
+name: Orbit360 F1.4C Successor Artifact Build 20260818
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-requests/f1-4c-successor-artifact-build-runbound-*.json'
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: orbit360-f1-4c-successor-build-20260818
+  cancel-in-progress: false
+env:
+  ORBIT360_GATE_ID: f1-4c-successor-artifact-build-lab-v20260818
+  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+  BASE_ARTIFACT_ID: '9300368902'
+  BASE_ARTIFACT_ZIP: /tmp/r4s9c-artifact.zip
+jobs:
+  f1_4c_single_successor_build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify immutable request and source tooling
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
+          test "${#CHANGED[@]}" = '1'
+          REQUEST_FILE="${CHANGED[0]}"
+          case "$REQUEST_FILE" in
+            .github/orbit360-requests/f1-4c-successor-artifact-build-runbound-*.json) ;;
+            *) echo 'PIPELINE_MECHANISM_FAILURE:F1_4C_REQUEST_PATH_INVALID' >&2; exit 41 ;;
+          esac
+          test "$(jq -r '.requestVersion' "$REQUEST_FILE")" = 'F1_4C_SUCCESSOR_ARTIFACT_BUILD_V1'
+          SOURCE_HEAD="$(git rev-parse HEAD^)"
+          test "$(jq -r '.parentHead' "$REQUEST_FILE")" = "$SOURCE_HEAD"
+          SHORT="${SOURCE_HEAD:0:12}"
+          OUT_ZIP="orbit360-fase-a-product-f1-4c-successor-${SHORT}.zip"
+          node --check tools/orbit360-validar-gate-contracts-engine-f1-4c-successor-artifact-build-v20260818.mjs
+          node --check tools/orbit360-f1-4c-successor-builder-v20260818.mjs
+          echo "ORBIT360_REQUEST_FILE=$REQUEST_FILE" >> "$GITHUB_ENV"
+          echo "ORBIT360_EXPECTED_REQUEST_VERSION=F1_4C_SUCCESSOR_ARTIFACT_BUILD_V1" >> "$GITHUB_ENV"
+          echo "F1_4C_SOURCE_HEAD=$SOURCE_HEAD" >> "$GITHUB_ENV"
+          echo "F1_4C_SUCCESSOR_ZIP=$OUT_ZIP" >> "$GITHUB_ENV"
+      - name: Mandatory canonical gate before package build
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
+          jq -e --arg source "$F1_4C_SOURCE_HEAD" '
+            .ok==true and .status=="GO_GATE_CONTRACT" and
+            .classification=="GO_F1_4C_SINGLE_SUCCESSOR_BUILD" and
+            .sourceHead==$source and .packageRebuildAuthorized==true and
+            .allowedCandidateBuilds==1 and .artifactUploadAuthorized==true and
+            .secretAccessAuthorized==false and .writesAuthorized==0 and
+            .runtimeAuthorized==false and .browserAuthorized==false and
+            .deployAuthorized==false and .productionAuthorized==false and
+            .dataAccess==false and .secretAccess==false and
+            .operationalWrites==0 and .firestoreWrites==0 and .authWrites==0
+          ' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+      - name: Download exact certified R4S9C durable base after GO
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -L --fail --retry 3 \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/${BASE_ARTIFACT_ID}/zip" \
+            -o "$BASE_ARTIFACT_ZIP"
+          test -s "$BASE_ARTIFACT_ZIP"
+      - name: Build exactly one unpublished successor
+        shell: bash
+        run: |
+          set -euo pipefail
+          F1_4C_BASE_ARTIFACT_ZIP="$BASE_ARTIFACT_ZIP" \
+          F1_4C_BASE_ARTIFACT_ID="$BASE_ARTIFACT_ID" \
+          F1_4C_SOURCE_HEAD="$F1_4C_SOURCE_HEAD" \
+          F1_4C_SUCCESSOR_ZIP="$F1_4C_SUCCESSOR_ZIP" \
+          EVIDENCE_DIR="$EVIDENCE_DIR" \
+          node tools/orbit360-f1-4c-successor-builder-v20260818.mjs
+          jq -e --arg source "$F1_4C_SOURCE_HEAD" --arg zip "$F1_4C_SUCCESSOR_ZIP" '
+            .ok==true and .status=="F1_4C_SUCCESSOR_ARTIFACT_CERTIFIED_UNPUBLISHED" and
+            .sourceHead==$source and .zipName==$zip and .fileCount==194 and
+            .deltaCount==2 and .unchangedProductFiles==192 and
+            .rootfixAncestors==true and .f1_4bAncestor==true and
+            .f1_3MembershipSemanticsPresent==true and .f1_3BootstrapAuthOwnershipPresent==true and
+            .baseFullyRehashed==true and .successorFullyRehashed==true and
+            .packageReopened==true and .allProductFilesRehashed==true and
+            .published==false and .packageRebuilt==true and
+            .browserExecuted==false and .runtimeExecuted==false and
+            .secretAccess==false and .dataAccess==false and
+            .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and
+            .deployExecuted==false and .productionTouched==false
+          ' "$EVIDENCE_DIR/f1-4c-successor-artifact-certification-v20260818.json" >/dev/null
+      - name: Upload unpublished candidate artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-f1-4c-successor-unpublished-${{ github.run_id }}
+          path: ${{ env.F1_4C_SUCCESSOR_ZIP }}
+          if-no-files-found: error
+          retention-days: 30
+      - name: Upload sanitized build evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-f1-4c-successor-evidence-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/f1-4c-successor-artifact-certification-v20260818.json
+            orbit360-platform/runtime-gate-crm-v20260716/f1-4c-successor-artifact-sha256-v20260818.txt
+          if-no-files-found: error
+          retention-days: 30
