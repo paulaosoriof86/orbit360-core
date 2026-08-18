@@ -12,6 +12,7 @@ const CERTIFIED_WRAPPER = path.join(ROOT, 'tools/orbit360-r4-certified-product-s
 const EVIDENCE_DIR = path.join(ROOT, 'orbit360-platform/runtime-gate-crm-v20260716');
 const SELF_OUT = path.join(EVIDENCE_DIR, 'r4-role-route-attribution-selftest-v20260816.json');
 const TARGET_BOUND = String(process.env.ORBIT360_EXPECTED_RESULT_REVISION || '') === 'paula-postauth-custom-token-readonly-v1';
+const SELF_TEST_ONLY = process.argv.includes('--self-test-only');
 const sha256 = v => crypto.createHash('sha256').update(v).digest('hex');
 const count = (h, n) => h.split(n).length - 1;
 const fail = m => { throw new Error(m); };
@@ -166,6 +167,44 @@ function patchCertifiedWrapper(source, tempBase) {
     if (count(patched, r4s3) !== 1) fail(`R4S3_MANIFEST_ALLOWLIST_COUNT_INVALID:${count(patched, r4s3)}`);
     patched = patched.replace(r4s3, `${r4s3},\n${r4s4}`);
   }
+  if (TARGET_BOUND) {
+    const oldActivation = "await runStage('runtime-activation-trigger', 45000, () => page.evaluate(async () => { if (!window.Orbit || !Orbit.productAppP0 || typeof Orbit.productAppP0.activate !== 'function') throw new Error('PRODUCT_APP_ACTIVATION_OWNER_MISSING'); return Orbit.productAppP0.activate(); }));";
+    const newActivation = `const activationProbe = await runStage('runtime-activation-trigger', 45000, () => page.evaluate(async () => {
+    if (!window.Orbit || !Orbit.productAppP0 || typeof Orbit.productAppP0.activate !== 'function') throw new Error('PRODUCT_APP_ACTIVATION_OWNER_MISSING');
+    const originalOwner = Orbit.backendProductReadOnlyBootstrapP0;
+    if (!originalOwner || typeof originalOwner.start !== 'function') throw new Error('PRODUCT_READONLY_BOOTSTRAP_MISSING');
+    const cleanCode = value => String(value == null ? '' : value).replace(/[^A-Za-z0-9_.:|/ -]/g, '_').slice(0, 180);
+    let bootstrapObservation = null;
+    Orbit.backendProductReadOnlyBootstrapP0 = Object.freeze(Object.assign({}, originalOwner, {
+      start: async function(...args) {
+        const result = await originalOwner.start.apply(originalOwner, args);
+        const s = result && result.status && typeof result.status === 'object' ? result.status : {};
+        bootstrapObservation = {
+          phase: cleanCode(s.phase).slice(0, 80),
+          errors: Array.isArray(s.errors) ? s.errors.map(cleanCode).slice(0, 12) : [],
+          assignedRoleCount: Number.isFinite(Number(s.assignedRoleCount)) ? Number(s.assignedRoleCount) : 0,
+          countryCount: Number.isFinite(Number(s.countryCount)) ? Number(s.countryCount) : 0,
+          collectionCount: Number.isFinite(Number(s.collectionCount)) ? Number(s.collectionCount) : 0,
+          ready: s.ready === true,
+          writeAuthorized: s.writeAuthorized === true
+        };
+        return result;
+      }
+    }));
+    try {
+      await Orbit.productAppP0.activate();
+      return { activationOk: true, bootstrapObservation };
+    } catch (error) {
+      return { activationOk: false, bootstrapObservation, appError: cleanCode(error && error.message || error).slice(0, 120) };
+    } finally {
+      Orbit.backendProductReadOnlyBootstrapP0 = originalOwner;
+    }
+  }), v => ({ activationOk: !!(v && v.activationOk), bootstrapPhase: String(v && v.bootstrapObservation && v.bootstrapObservation.phase || '').slice(0, 80), bootstrapErrorCount: Array.isArray(v && v.bootstrapObservation && v.bootstrapObservation.errors) ? v.bootstrapObservation.errors.length : 0 }));
+  d.bootstrapObservation = activationProbe && activationProbe.bootstrapObservation ? activationProbe.bootstrapObservation : null;
+  if (!activationProbe || activationProbe.activationOk !== true) throw new ClassifiedError('FUNCTIONAL_DEFECT', 'R4_PRODUCT_BOOTSTRAP_OBSERVED_FAILURE');`;
+    if (count(patched, oldActivation) !== 1) fail(`CERTIFIED_RUNTIME_ACTIVATION_NEEDLE_COUNT_INVALID:${count(patched, oldActivation)}`);
+    patched = patched.replace(oldActivation, newActivation);
+  }
   return patched;
 }
 
@@ -173,20 +212,33 @@ const originalBase = fs.readFileSync(BASE, 'utf8');
 const originalWrapper = fs.readFileSync(CERTIFIED_WRAPPER, 'utf8');
 const roleFix = patchBase(originalBase);
 const patchedHarnessSyntaxPass = syntaxCheck(roleFix.patched, 'r4-role-route-base-syntax');
+const certifiedProbe = patchCertifiedWrapper(originalWrapper, path.join(ROOT, 'tools', '.orbit360-r4-role-route-selftest-base.mjs'));
+const certifiedProbeSyntaxPass = syntaxCheck(certifiedProbe, 'r4-role-route-certified-probe-syntax');
+const bootstrapObserverChecks = {
+  bootstrapObserverBound: !TARGET_BOUND || (count(certifiedProbe, 'bootstrapObservation = {') === 1 && count(certifiedProbe, 'd.bootstrapObservation =') === 1),
+  bootstrapSingleInvocationPreserved: !TARGET_BOUND || (count(certifiedProbe, 'originalOwner.start.apply(originalOwner, args)') === 1 && !certifiedProbe.includes('originalOwner.start.apply(originalOwner, args); originalOwner.start')),
+  noStandaloneSecondBootstrapStart: !TARGET_BOUND || count(certifiedProbe, 'Orbit.backendProductReadOnlyBootstrapP0.start(') === 0,
+  bootstrapObserverAllowlistOnly: !TARGET_BOUND || (certifiedProbe.includes('phase: cleanCode(s.phase)') && certifiedProbe.includes('errors: Array.isArray(s.errors)') && certifiedProbe.includes('assignedRoleCount:') && certifiedProbe.includes('countryCount:') && certifiedProbe.includes('collectionCount:') && certifiedProbe.includes('ready: s.ready === true') && certifiedProbe.includes('writeAuthorized: s.writeAuthorized === true') && !certifiedProbe.includes('tenantId: cleanCode(s.tenantId)') && !certifiedProbe.includes('email:') && !certifiedProbe.includes('uid:')),
+  bootstrapObserverRestoresOwner: !TARGET_BOUND || certifiedProbe.includes('Orbit.backendProductReadOnlyBootstrapP0 = originalOwner;'),
+  activationFailureObservedWithoutSecondRun: !TARGET_BOUND || certifiedProbe.includes("R4_PRODUCT_BOOTSTRAP_OBSERVED_FAILURE")
+};
 const allRoleChecksPass = Object.values(roleFix.checks).every(Boolean);
+const allBootstrapObserverChecksPass = Object.values(bootstrapObserverChecks).every(Boolean);
 const selfPayload = {
-  schemaVersion: 'orbit360-r4-role-route-attribution-selftest-v1',
-  ok: patchedHarnessSyntaxPass && allRoleChecksPass,
-  status: patchedHarnessSyntaxPass && allRoleChecksPass ? 'R4_ROLE_ROUTE_ATTRIBUTION_SELFTEST_PASS' : 'R4_ROLE_ROUTE_ATTRIBUTION_SELFTEST_FAIL',
-  classification: patchedHarnessSyntaxPass && allRoleChecksPass ? 'VALIDATOR_STALE_ROOTFIX_PASS' : 'VALIDATOR_STALE',
-  failureFamily: patchedHarnessSyntaxPass && allRoleChecksPass ? '' : 'CUMULATIVE_ROLE_GROUP_BUDGET_AND_ROUTE_ATTRIBUTION_NOT_CLOSED',
+  schemaVersion: 'orbit360-r4-role-route-attribution-selftest-v2',
+  ok: patchedHarnessSyntaxPass && certifiedProbeSyntaxPass && allRoleChecksPass && allBootstrapObserverChecksPass,
+  status: patchedHarnessSyntaxPass && certifiedProbeSyntaxPass && allRoleChecksPass && allBootstrapObserverChecksPass ? 'R4_ROLE_ROUTE_ATTRIBUTION_SELFTEST_PASS' : 'R4_ROLE_ROUTE_ATTRIBUTION_SELFTEST_FAIL',
+  classification: patchedHarnessSyntaxPass && certifiedProbeSyntaxPass && allRoleChecksPass && allBootstrapObserverChecksPass ? 'VALIDATOR_STALE_ROOTFIX_PASS' : 'VALIDATOR_STALE',
+  failureFamily: patchedHarnessSyntaxPass && certifiedProbeSyntaxPass && allRoleChecksPass && allBootstrapObserverChecksPass ? '' : 'TARGET_ROLE_OR_BOOTSTRAP_OBSERVABILITY_CONTRACT_NOT_CLOSED',
   owner: 'tools/orbit360-r4-role-route-attribution-wrapper-v20260816.mjs',
   targetBound: TARGET_BOUND,
-  targetSemantics: TARGET_BOUND ? 'assigned-roles-only-canonical-scope' : 'historical-generic-three-role-matrix',
+  targetSemantics: TARGET_BOUND ? 'assigned-roles-only-canonical-scope-with-single-bootstrap-observer' : 'historical-generic-three-role-matrix',
   baseHarnessSha256: roleFix.staleSha256,
   correctedHarnessSha256: roleFix.patchedSha256,
   ...roleFix.checks,
+  ...bootstrapObserverChecks,
   patchedHarnessSyntaxPass,
+  certifiedProbeSyntaxPass,
   browserExecuted: false,
   secretAccess: false,
   dataAccess: false,
@@ -201,6 +253,7 @@ const selfPayload = {
 };
 writeJson(SELF_OUT, selfPayload);
 if (!selfPayload.ok) { console.log(JSON.stringify(selfPayload, null, 2)); process.exit(41); }
+if (SELF_TEST_ONLY) { console.log(JSON.stringify(selfPayload, null, 2)); process.exit(0); }
 
 const tempBase = path.join(ROOT, 'tools', `.orbit360-r4-role-route-base-${process.pid}-${Date.now()}.mjs`);
 const tempWrapper = path.join(ROOT, 'tools', `.orbit360-r4-role-route-certified-wrapper-${process.pid}-${Date.now()}.mjs`);
@@ -209,7 +262,8 @@ const certified = patchCertifiedWrapper(originalWrapper, tempBase);
 fs.writeFileSync(tempWrapper, certified, 'utf8');
 try {
   execFileSync(process.execPath, ['--check', tempWrapper], { cwd: ROOT, stdio: 'pipe' });
-  const child = spawnSync(process.execPath, [tempWrapper, ...process.argv.slice(2)], { cwd: ROOT, stdio: 'inherit', env: process.env });
+  const childArgs = process.argv.slice(2).filter(arg => arg !== '--self-test-only');
+  const child = spawnSync(process.execPath, [tempWrapper, ...childArgs], { cwd: ROOT, stdio: 'inherit', env: process.env });
   if (child.error) throw child.error;
   process.exitCode = Number.isInteger(child.status) ? child.status : 41;
 } finally {
