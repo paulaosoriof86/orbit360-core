@@ -133,7 +133,10 @@
     var check = owner && owner.validate ? owner.validate(membership) : { ok: false, errors: ['contrato_membresia_faltante'] };
     var normalized = check.membership || normalizeMembership(membership);
     var errors = (check.errors || []).slice();
+    var membershipEmail = text(normalized.email).toLowerCase();
+    var authEmail = text(authUser && authUser.email).toLowerCase();
     if (text(normalized.uid) !== text(authUser && authUser.uid)) errors.push('membership_uid_no_coincide');
+    if (membershipEmail && membershipEmail !== authEmail) errors.push('membership_email_no_coincide');
     if (text(normalized.status).toLowerCase() !== 'active') errors.push('membership_inactiva');
     if (!normalized.activeRole || normalized.roles.indexOf(normalized.activeRole) < 0) errors.push('membership_rol_activo_invalido');
     return { ok: errors.length === 0, membership: normalized, errors: unique(errors) };
