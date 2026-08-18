@@ -1,23 +1,148 @@
 {
-  "schemaVersion":"orbit360-live-state-v1",
-  "stateVersion":"20260817.r4s9c-gate3-pass-source-only-refrozen.current",
-  "updatedAt":"2026-08-17T15:55:00-06:00",
-  "phase":"R4S9C_PUBLIC_EXACT_GATE3_RUNTIME_PASS_SOURCE_ONLY_REFROZEN_GO_LIVE_TECHNICAL_CLOSURE",
-  "repository":"paulaosoriof86/orbit360-core",
-  "branch":"ays/backend-tenant-lab-v99-20260703",
-  "pr":5,
-  "prState":"draft-open",
-  "currentPublishedPackage":{"version":"R4S9C","sha256":"917f5424deea06d224d45a1b039c0b3699d71a7bef430b2a40d059703b2acc3a","sourceHead":"861326906558f03d9c8c2e7f34adfb4979a17d73","manifestStatus":"FASE_A_PRODUCT_R4S9C_CONTRACT_RECOVERY_CERTIFIED","manifestSha256":"fc9b9d23d8749b6c70a24381271cee6e3227d7db286d13b740995514b8d735b5","durableArtifactId":9300368902,"productFileCount":194,"publicIdentityExact":true,"zeroProductDeltaVsR4S9":true},
-  "publicVerification":{"runId":32068688007,"jobId":95506643905,"evidenceArtifactId":9300877121,"evidenceDigest":"sha256:2e2fc3eeaeaba9b0c8d19ca7bc3764d5d122ea1d1e36682790a81732a68beff2","httpStatus":200,"manifestValidJson":true,"requiredContractFieldsPresent":19,"criticalHashesMatch":true},
-  "sourceOnlyRebind":{"commit":"085d6bb8faf19fdbc987e9d4ea2000551a6648a2","runId":32069469238,"jobId":95509127670,"status":"SUCCESS","browserSkipped":true,"secretBindingSkipped":true,"identitySkipped":true,"runtimeSkipped":true},
-  "gate3Runtime":{"status":"PASS_CONSUMED_SINGLE_ATTEMPT","activationCommit":"d0981c69e94de198ca61fa0fa593c84d1cfb1d81","runId":32069742485,"jobId":95510009418,"evidenceArtifactId":9301327700,"evidenceDigest":"sha256:280beee46acfe5a578c4349bf3cd1748f1435e6a25ec40ffd5ae83aef20eb477","classification":"PASS","smokeStatus":"POST_GO_LIVE_SMOKE_PASS","elapsedMs":88576,"manifestPass":true,"authPass":true,"membershipPass":true,"tenantPass":true,"storeReadyReadOnly":true,"clientes":430,"aseguradoras":30,"roles":[{"role":"Dirección","viewport":"1440x900","scopeCliente360":"all","rawClientCount":430,"scopedClientCount":430,"routesPass":["inicio","cliente360","aseguradoras","ops","leads"]},{"role":"Operativo","viewport":"1024x768","scopeCliente360":"team","rawClientCount":430,"scopedClientCount":390,"routesPass":["inicio","cliente360","aseguradoras:block-expected","ops","leads"]},{"role":"Asesor","viewport":"390x844","scopeCliente360":"own","rawClientCount":430,"scopedClientCount":390,"routesPass":["inicio","cliente360","aseguradoras","ops","leads"]}],"timingsMs":{"direccionCliente360":1668,"operativoCliente360":1696,"asesorCliente360":1392},"pageErrors":0,"consoleErrors":0,"httpFailures":0,"technicalCopy":0,"firestoreWrites":0,"authWrites":0,"operationalWrites":0,"writesAuthorized":false,"secondAttemptExecuted":false},
-  "postGate3Refreeze":{"commit":"6270f7fa86e44b3e8fe558129b1710408e64a2bd","runId":32070106637,"status":"SUCCESS","sourceOnly":true,"browserSkipped":true,"secretBindingSkipped":true,"identitySkipped":true,"runtimeSkipped":true},
-  "rootCauseClosure":{"cliente360FirstPaintFunctionalDefect":"CLOSED_BY_R4S9_PRODUCT_ROOTFIX","r4s9ManifestDataContractFailure":"CLOSED_BY_R4S9C_CONTRACT_RECOVERY","authIsCurrentBlocker":false,"hostDimeIsCurrentBlocker":false,"storeIsCurrentBlocker":false},
-  "writes":{"firestore":0,"auth":0,"operational":0},
-  "progress":{"functionalImplementationPercent":100,"technicalIterationProgressPercent":100,"goLiveGatesClosed":3,"goLiveGatesTotal":3,"goLiveGateProgressPercent":100,"postGoLiveSmokePass":true},
-  "authorization":{"latestRuntimeAuthorizationConsumed":true,"secondRuntimeAuthorizedNow":false,"browserAuthorizedNow":false,"runtimeAuthorizedNow":false,"publicationAuthorizedNow":false,"authChangesAuthorized":false,"dataChangesAuthorized":false,"rulesChangesAuthorized":false,"storeChangesAuthorized":false,"mainMergeAuthorized":false},
-  "goLive":{"technicalGateClosed":true,"publicUrl":"https://app.aysseguros.com","sensitiveWritesRemainRestricted":true,"quickPaulaVisualReviewPending":true,"mainMergeRequiredForGoLive":false},
-  "nextActionExact":{"stage":"GO_LIVE_VISUAL_CONFIRMATION_AND_POST_GO_LIVE_CONTINUITY","action":"Do not create another candidate. Preserve R4S9C public exact and source-only refreeze. Paula may perform the Plan Maestro quick visual review at https://app.aysseguros.com. After visual confirmation, declare initial go-live and continue with the next source/domain block using the existing transversal harness; do not reopen Auth, membership, scopes, Hosting, store, rollback or Cliente360 without demonstrated regression."},
-  "currentCheckpoint":"orbit360-platform/docs/R4S9C-GATE3-PASS-GO-LIVE-TECHNICAL-CLOSURE-20260817.md",
-  "checkpointCommit":"90b88dd0e97a71f4284a0a4dbc2f9539268a68b9"
+  "schemaVersion": "orbit360-live-state-v1",
+  "stateVersion": "20260818.f0-reconciled-f1-source-only.current",
+  "updatedAt": "2026-08-18T12:17:00-06:00",
+  "phase": "F1_RUNTIME_BOOTSTRAP_ROOT_CAUSE_SOURCE_ONLY",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pr": 5,
+  "prState": "draft-open",
+  "controlPlaneParentHead": "41a91ad635896fd78d033e18010f80d3ab2c13b0",
+  "observerSourceHead": "6d68495ec92f103c805503a42b46bd5a755c3ef9",
+  "currentPublishedPackage": {
+    "version": "R4S9C",
+    "sha256": "917f5424deea06d224d45a1b039c0b3699d71a7bef430b2a40d059703b2acc3a",
+    "sourceHead": "861326906558f03d9c8c2e7f34adfb4979a17d73",
+    "manifestStatus": "FASE_A_PRODUCT_R4S9C_CONTRACT_RECOVERY_CERTIFIED",
+    "manifestSha256": "fc9b9d23d8749b6c70a24381271cee6e3227d7db286d13b740995514b8d735b5",
+    "durableArtifactId": 9300368902,
+    "productFileCount": 194,
+    "publicIdentityExactAtLastVerification": true,
+    "preserveImmutableDuringDiagnosis": true
+  },
+  "historicalGate3": {
+    "status": "PASS_HISTORICAL_NOT_SUFFICIENT_FOR_CURRENT_GO_LIVE",
+    "runId": 32069742485,
+    "jobId": 95510009418,
+    "evidenceArtifactId": 9301327700,
+    "authPass": true,
+    "membershipPass": true,
+    "tenantPass": true,
+    "storeReadyReadOnly": true,
+    "supersededForCurrentAcceptanceByRunId": 32155605314
+  },
+  "lastRuntimeEvidence": {
+    "path": "orbit360-platform/runtime-gate-crm-v20260716/auth-paula-gate14-3-smoke-run-32155605314.json",
+    "runId": 32155605314,
+    "status": "AUTH_PAULA_REAL_BROWSER_READONLY_SMOKE_FAIL",
+    "classification": "FUNCTIONAL_DEFECT",
+    "failedCheck": "R4_RUNTIME_ACTIVATION_TRIGGER_FAILED",
+    "authSignedIn": true,
+    "emailVerified": true,
+    "membershipAvailable": true,
+    "membershipActive": true,
+    "tenantMatches": true,
+    "runtimeStarted": false,
+    "routerStarted": false,
+    "tenantContextReady": false,
+    "storeReady": false,
+    "serviceWorkerParityEnabled": true,
+    "firestoreWrites": 0,
+    "authWrites": 0,
+    "operationalWrites": 0,
+    "deployExecuted": false,
+    "packageRebuilt": false
+  },
+  "lastLifecycleEvidence": {
+    "path": "orbit360-platform/runtime-gate-crm-v20260716/auth-paula-gate14-3-pipeline-run-32155605314.json",
+    "runId": 32155605314,
+    "status": "SEALED_STOP_RETRY",
+    "classification": "FUNCTIONAL_DEFECT",
+    "failedCheck": "R4_RUNTIME_ACTIVATION_TRIGGER_FAILED"
+  },
+  "rootCauseState": {
+    "methodology": {
+      "classification": "PIPELINE_MECHANISM_FAILURE",
+      "code": "DOCUMENTATION_STATE_DRIFT",
+      "status": "CLOSED_BY_F0_RECONCILIATION_20260818"
+    },
+    "technicalBlocker": {
+      "classification": "FUNCTIONAL_DEFECT",
+      "code": "R4_RUNTIME_ACTIVATION_TRIGGER_FAILED",
+      "status": "OPEN_STOP_RETRY_SOURCE_ONLY_DIAGNOSIS"
+    },
+    "authIsCurrentBlocker": false,
+    "passwordIsCurrentBlocker": false,
+    "membershipTenantIsCurrentBlocker": false,
+    "hostDimeIsCurrentBlocker": false,
+    "dataReimportIsCurrentBlocker": false
+  },
+  "documentationControl": {
+    "index": "orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json",
+    "currentAddendum": "orbit360-platform/docs/ADDENDUM-MAESTRO-CIERRE-FORENSE-SINCRONIZACION-Y-PLAN-CONGELADO-20260818.md",
+    "f0Checkpoint": "orbit360-platform/docs/CHECKPOINT-F0-RECONCILIACION-FORENSE-20260818.md",
+    "readmeSynchronized": true,
+    "prSynchronized": true,
+    "historicalPolicy": "HISTORICAL_NOT_CURRENT_STATE",
+    "documentationSynchronized": true
+  },
+  "frozenPlan": {
+    "source": "orbit360-platform/docs/ADDENDUM-MAESTRO-CIERRE-FORENSE-SINCRONIZACION-Y-PLAN-CONGELADO-20260818.md",
+    "currentPhase": "F1",
+    "goLiveRoute": {
+      "percentClosed": 20,
+      "closedPhases": ["F0"],
+      "remainingPhases": ["F1", "F2", "F3"]
+    },
+    "integratedProgram": {
+      "percentClosed": 10,
+      "closedPhases": ["F0"],
+      "remainingPhases": ["F1", "F2", "F3", "F4", "F5", "F6", "F7"]
+    },
+    "currentPhaseInternalPercent": 0
+  },
+  "writes": {
+    "firestore": 0,
+    "auth": 0,
+    "operational": 0
+  },
+  "authorization": {
+    "latestRuntimeAuthorizationConsumed": true,
+    "browserAuthorizedNow": false,
+    "runtimeAuthorizedNow": false,
+    "publicationAuthorizedNow": false,
+    "authChangesAuthorized": false,
+    "dataChangesAuthorized": false,
+    "rulesChangesAuthorized": false,
+    "storeChangesAuthorized": false,
+    "mainMergeAuthorized": false,
+    "sourceOnlyDiagnosisAllowed": true
+  },
+  "goLive": {
+    "status": "PAUSED_FOR_RUNTIME_ACTIVATION_ROOT_CAUSE",
+    "publicUrl": "https://app.aysseguros.com",
+    "publishedPackagePreserved": true,
+    "productionOperationalDeclared": false,
+    "sensitiveWritesRemainRestricted": true,
+    "mainMergeRequiredForGoLive": false
+  },
+  "stopRetry": {
+    "active": true,
+    "family": "R4_RUNTIME_ACTIVATION_TRIGGER_FAILED",
+    "thirdEquivalentAttemptAllowed": false,
+    "newCandidateAllowedForDiagnosis": false,
+    "deployAllowedForDiagnosis": false
+  },
+  "nextActionExact": {
+    "stage": "F1_SOURCE_ONLY_BOOTSTRAP_OBSERVER_VALIDATION",
+    "action": "Validate source-only the observer introduced by 6d68495ec92f103c805503a42b46bd5a755c3ef9. Confirm it observes exactly one backendProductReadOnlyBootstrapP0.start() invocation, captures only sanitized phase/errors/assignedRoleCount/countryCount/collectionCount/ready/writeAuthorized, restores the original owner, introduces no second bootstrap/retry and performs no browser/secret/data/deploy/write operation. Then identify the owner path that can produce R4_RUNTIME_ACTIVATION_TRIGGER_FAILED. Do not execute another runtime/browser/deploy until this source-only attribution is closed and documented."
+  },
+  "resumeProtocol": [
+    "Read ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json",
+    "Read this live-state",
+    "Confirm actual HEAD and PR #5",
+    "Read lastRuntimeEvidence and lastLifecycleEvidence",
+    "Validate nextActionExact",
+    "Execute only nextActionExact"
+  ]
 }
