@@ -1,0 +1,62 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
+  "gateId": "block-auth-paula-membership-readonly-reconcile-v2-lab-v20260817",
+  "gateContractVersion": "14.3.0",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
+  "status": "F1_4D_SOURCE_READY_RUNTIME_AUTHORIZED_BY_FRESH_REQUEST_ONLY",
+  "currentPhase": "AUTH_PAULA_REAL_BROWSER_READONLY_SMOKE_LAB",
+  "executionProfile": {
+    "phase": "AUTH_PAULA_REAL_BROWSER_READONLY_SMOKE_LAB",
+    "capabilities": {
+      "secrets": true,
+      "firestoreRead": true,
+      "writes": false,
+      "runtime": true,
+      "browser": true,
+      "deploy": false,
+      "functionsDeploy": false,
+      "rulesDeploy": false,
+      "production": false
+    }
+  },
+  "singleGate": true,
+  "macroClosure": false,
+  "authorization": {
+    "requiredForExecution": true,
+    "activeRequest": false,
+    "allowedExecutions": 0,
+    "consumed": false,
+    "replayAllowed": false
+  },
+  "guards": {
+    "candidateArtifactId": 9345207863,
+    "candidateZipSha256": "493009c83390901aa772842a2ba9ddd5ce5293f6969d86c5c3395ebd670a44ac",
+    "candidateManifestSha256": "29dafe5e63b425ea6cf641937fe1b9d4b9e63f72479a51ae76f9148a55771761",
+    "candidateSourceHead": "29caae94a3db1f1626bdde2ea6ee9a21799f9df6",
+    "candidateManifestStatus": "FASE_A_PRODUCT_F1_4C_SUCCESSOR_CERTIFIED",
+    "candidateFileCount": 194,
+    "rootfixCommitsRequired": [
+      "a808e13d69dcb687f488be7e17411796eaec3509",
+      "b050d5a1a9861f898d2bb50d1bcc5c26beb72e9b"
+    ],
+    "f1_4bEvidenceCommitRequired": "3c56d0baffce8fc8399050e520ee4cb54cebf4db",
+    "exactCandidateRequired": true,
+    "gateBeforeArtifactDownload": true,
+    "gateBeforeSecretAccess": true,
+    "gateBeforeBrowser": true,
+    "customTokenEphemeralOnly": true,
+    "passwordResetAllowed": false,
+    "authChangesAllowed": false,
+    "membershipChangesAllowed": false,
+    "dataChangesAllowed": false,
+    "firestoreWritesAllowed": false,
+    "operationalWritesAllowed": false,
+    "packageRebuildAllowed": false,
+    "deployAllowed": false,
+    "publicationAllowed": false,
+    "productionMutationAllowed": false,
+    "stopRetryOnSameFamily": true
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
