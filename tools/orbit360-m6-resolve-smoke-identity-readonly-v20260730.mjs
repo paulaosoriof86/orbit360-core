@@ -12,20 +12,41 @@ const RUN_ID=String(process.env.ORBIT360_SMOKE_RUN_ID||'').trim();
 const TARGET_HASH=String(process.env.ORBIT360_SMOKE_TARGET_EMAIL_HASH||'').trim();
 const TARGET_ADVISOR=String(process.env.ORBIT360_SMOKE_TARGET_ADVISOR_ID||'').trim();
 const PRIV=new Set(['Dirección','SuperAdmin','AdminTenant']);
+const VALID_ROLES=new Set(['Dirección','SuperAdmin','AdminTenant','Operativo','Finanzas','Marketing','Asesor','Comercial','Asistente']);
 const text=v=>String(v==null?'':v).trim();const unique=v=>[...new Set([].concat(v||[]).map(text).filter(Boolean))];
 const sha=v=>crypto.createHash('sha256').update(String(v==null?'':v),'utf8').digest('hex');
 const emailHash=v=>sha(text(v).toLowerCase().replace(/\s+/g,''));
 function write(p){fs.mkdirSync(path.dirname(OUT),{recursive:true});fs.writeFileSync(OUT,JSON.stringify({...p,runId:RUN_ID||undefined,containsPII:false,containsSecrets:false},null,2)+'\n');}
+function roleState(row){const roles=unique([].concat(row.roles||[],row.role||row.rol||[]));const active=text(row.activeRole||row.rolActivo||row.defaultRole||row.rolDefault||roles[0]);return{roles,active,status:text(row.status||row.estado).toLowerCase(),advisor:text(row.advisorId||row.asesorId||row.teamId)};}
 let app;
 try{
  if(!PROJECT||!TENANT||!process.env.GOOGLE_APPLICATION_CREDENTIALS||!process.env.GITHUB_ENV)throw new Error('PIPELINE_MECHANISM_FAILURE:IDENTITY_CONTEXT_NOT_BOUND');
  app=getApps()[0]||initializeApp({credential:applicationDefault(),projectId:PROJECT});const auth=getAuth(app),db=getFirestore(app);
  const users=[];let token;do{const page=await auth.listUsers(1000,token);users.push(...page.users);token=page.pageToken;}while(token&&users.length<10000);const byUid=new Map(users.map(u=>[text(u.uid),u]));
- const snap=await db.collection(`tenants/${TENANT}/members`).get();const candidates=snap.docs.map(d=>({id:d.id,...(d.data()||{})})).map(row=>{const uid=text(row.uid||row.userId||row.id),roles=unique([].concat(row.roles||[],row.role||row.rol||[])),active=text(row.activeRole||row.rolActivo||row.defaultRole||row.rolDefault||roles[0]),status=text(row.status||row.estado).toLowerCase(),advisor=text(row.advisorId||row.asesorId||row.teamId),user=byUid.get(uid);return{uid,roles,active,status,advisor,user,eligible:status==='active'&&!!user&&!user.disabled&&user.emailVerified===true&&!!text(user.email)&&roles.includes(active)&&roles.includes('Dirección')&&roles.includes('Operativo')&&roles.includes('Asesor')&&roles.some(r=>PRIV.has(r))};}).filter(x=>x.eligible);
- if(candidates.length!==1)throw new Error(`DATA_CONTRACT_FAILURE:M6_SMOKE_IDENTITY_COUNT_${candidates.length}`);
- const selected=candidates[0],email=text(selected.user.email);fs.appendFileSync(process.env.GITHUB_ENV,`ORBIT360_PRODUCT_SMOKE_EMAIL=${email}\n`,'utf8');
- const targetEmailHashMatches=TARGET_HASH?emailHash(email)===TARGET_HASH:false;
- const targetAdvisorMatches=TARGET_ADVISOR?selected.advisor===TARGET_ADVISOR:false;
- const targetIdentityMatches=!!TARGET_HASH&&!!TARGET_ADVISOR&&targetEmailHashMatches&&targetAdvisorMatches;
- write({ok:true,status:'M6_PRODUCT_SMOKE_IDENTITY_RESOLVED',projectIdentityMatches:true,authUserCount:users.length,membershipCount:snap.size,eligibleSmokeIdentityCount:1,assignedRoleCount:selected.roles.length,requiredRolesPresent:true,emailExportedToRunnerEnv:true,targetBindingRequested:!!TARGET_HASH&&!!TARGET_ADVISOR,targetEmailHashMatches,targetAdvisorMatches,targetIdentityMatches,selectedActiveRole:selected.active,firestoreRead:true,authRead:true,firestoreWrites:0,authWrites:0,operationalWrites:0});
-}catch(error){write({ok:false,status:text(error&&error.message).startsWith('PIPELINE_MECHANISM_FAILURE')?'PIPELINE_MECHANISM_FAILURE':'DATA_CONTRACT_FAILURE',classification:text(error&&error.message).split(':')[0]||'DATA_CONTRACT_FAILURE',error:text(error&&error.message||error).replace(/[A-Za-z0-9_-]{30,}/g,'[redacted]').slice(0,300),eligibleSmokeIdentityCount:0,emailExportedToRunnerEnv:false,targetBindingRequested:!!TARGET_HASH&&!!TARGET_ADVISOR,targetEmailHashMatches:false,targetAdvisorMatches:false,targetIdentityMatches:false,firestoreRead:false,authRead:false,firestoreWrites:0,authWrites:0,operationalWrites:0});process.exitCode=41;}finally{if(app)await deleteApp(app).catch(()=>{});}
+ const snap=await db.collection(`tenants/${TENANT}/members`).get();
+ const rows=snap.docs.map(d=>({id:d.id,...(d.data()||{})}));
+ const targetBound=!!TARGET_HASH&&!!TARGET_ADVISOR;
+ if(targetBound){
+   const targetUsers=users.filter(u=>!!text(u.email)&&emailHash(u.email)===TARGET_HASH);
+   if(targetUsers.length!==1)throw new Error(`DATA_CONTRACT_FAILURE:TARGET_AUTH_IDENTITY_MATCH_${targetUsers.length}`);
+   const user=targetUsers[0];
+   if(user.disabled)throw new Error('DATA_CONTRACT_FAILURE:TARGET_AUTH_IDENTITY_DISABLED');
+   if(user.emailVerified!==true)throw new Error('DATA_CONTRACT_FAILURE:TARGET_AUTH_EMAIL_NOT_VERIFIED');
+   const memberRows=rows.filter(row=>text(row.uid||row.userId||row.id)===text(user.uid));
+   if(memberRows.length!==1)throw new Error(`DATA_CONTRACT_FAILURE:TARGET_MEMBERSHIP_MATCH_${memberRows.length}`);
+   const member=memberRows[0],state=roleState(member);
+   if(state.status!=='active')throw new Error('DATA_CONTRACT_FAILURE:TARGET_MEMBERSHIP_NOT_ACTIVE');
+   if(!state.roles.length||state.roles.some(r=>!VALID_ROLES.has(r)))throw new Error('DATA_CONTRACT_FAILURE:TARGET_MEMBERSHIP_ROLES_INVALID');
+   if(!state.roles.includes(state.active))throw new Error('DATA_CONTRACT_FAILURE:TARGET_MEMBERSHIP_ACTIVE_ROLE_NOT_ASSIGNED');
+   if(!state.roles.some(r=>PRIV.has(r)))throw new Error('DATA_CONTRACT_FAILURE:TARGET_MEMBERSHIP_PRIVILEGED_ROLE_MISSING');
+   if(state.roles.includes('Asesor')&&state.advisor!==TARGET_ADVISOR)throw new Error('DATA_CONTRACT_FAILURE:TARGET_MEMBERSHIP_ADVISOR_MISMATCH');
+   if(state.advisor!==TARGET_ADVISOR)throw new Error('DATA_CONTRACT_FAILURE:TARGET_ADVISOR_BINDING_MISMATCH');
+   const email=text(user.email);fs.appendFileSync(process.env.GITHUB_ENV,`ORBIT360_PRODUCT_SMOKE_EMAIL=${email}\n`,'utf8');
+   write({ok:true,status:'M6_PRODUCT_SMOKE_IDENTITY_RESOLVED',selectionMode:'target-first',projectIdentityMatches:true,authUserCount:users.length,membershipCount:snap.size,eligibleSmokeIdentityCount:1,exactTargetAuthCount:1,exactTargetMembershipCount:1,assignedRoleCount:state.roles.length,rolesCanonical:true,privilegedRolePresent:true,activeRoleAssigned:true,emailExportedToRunnerEnv:true,targetBindingRequested:true,targetEmailHashMatches:true,targetAdvisorMatches:true,targetIdentityMatches:true,selectedActiveRole:state.active,firestoreRead:true,authRead:true,firestoreWrites:0,authWrites:0,operationalWrites:0});
+ } else {
+   const candidates=rows.map(row=>{const uid=text(row.uid||row.userId||row.id),state=roleState(row),user=byUid.get(uid);return{uid,...state,user,eligible:state.status==='active'&&!!user&&!user.disabled&&user.emailVerified===true&&!!text(user.email)&&state.roles.includes(state.active)&&state.roles.includes('Dirección')&&state.roles.includes('Operativo')&&state.roles.includes('Asesor')&&state.roles.some(r=>PRIV.has(r))};}).filter(x=>x.eligible);
+   if(candidates.length!==1)throw new Error(`DATA_CONTRACT_FAILURE:M6_SMOKE_IDENTITY_COUNT_${candidates.length}`);
+   const selected=candidates[0],email=text(selected.user.email);fs.appendFileSync(process.env.GITHUB_ENV,`ORBIT360_PRODUCT_SMOKE_EMAIL=${email}\n`,'utf8');
+   write({ok:true,status:'M6_PRODUCT_SMOKE_IDENTITY_RESOLVED',selectionMode:'generic-fallback',projectIdentityMatches:true,authUserCount:users.length,membershipCount:snap.size,eligibleSmokeIdentityCount:1,assignedRoleCount:selected.roles.length,requiredRolesPresent:true,emailExportedToRunnerEnv:true,targetBindingRequested:false,targetEmailHashMatches:false,targetAdvisorMatches:false,targetIdentityMatches:false,selectedActiveRole:selected.active,firestoreRead:true,authRead:true,firestoreWrites:0,authWrites:0,operationalWrites:0});
+ }
+}catch(error){write({ok:false,status:text(error&&error.message).startsWith('PIPELINE_MECHANISM_FAILURE')?'PIPELINE_MECHANISM_FAILURE':'DATA_CONTRACT_FAILURE',classification:text(error&&error.message).split(':')[0]||'DATA_CONTRACT_FAILURE',error:text(error&&error.message||error).replace(/[A-Za-z0-9_-]{30,}/g,'[redacted]').slice(0,300),selectionMode:TARGET_HASH&&TARGET_ADVISOR?'target-first':'generic-fallback',eligibleSmokeIdentityCount:0,emailExportedToRunnerEnv:false,targetBindingRequested:!!TARGET_HASH&&!!TARGET_ADVISOR,targetEmailHashMatches:false,targetAdvisorMatches:false,targetIdentityMatches:false,firestoreRead:false,authRead:false,firestoreWrites:0,authWrites:0,operationalWrites:0});process.exitCode=41;}finally{if(app)await deleteApp(app).catch(()=>{});}
