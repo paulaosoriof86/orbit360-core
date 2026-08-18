@@ -1,0 +1,246 @@
+{
+  "schemaVersion": "orbit360-r4-production-readonly-smoke-v2-bounded-observability",
+  "ok": false,
+  "status": "R4_PRODUCTION_READONLY_SMOKE_FAIL",
+  "classification": "FUNCTIONAL_DEFECT",
+  "failureFamily": "R4_PRODUCT_BOOTSTRAP_OBSERVED_FAILURE",
+  "currentStage": "runtime-activation-trigger",
+  "elapsedMs": 12285,
+  "globalDeadlineMs": 480000,
+  "manifest": {
+    "pass": true,
+    "status": "FASE_A_PRODUCT_R4S9C_CONTRACT_RECOVERY_CERTIFIED",
+    "sourceHeadMatches": true,
+    "fileCount": 194,
+    "noLabRuntime": true,
+    "noPrivateSecretMaterial": true
+  },
+  "authAsset": {
+    "pass": true,
+    "httpStatus": 200,
+    "sha256Matches": true
+  },
+  "authHttp": {
+    "seen": true,
+    "status": 200,
+    "errorCode": ""
+  },
+  "auth": {
+    "signedIn": true,
+    "emailVerified": true,
+    "membershipAvailable": true,
+    "membershipActive": true,
+    "tenantMatches": true,
+    "roleCount": 4,
+    "requiredRolesPresent": true
+  },
+  "runtime": {
+    "started": false
+  },
+  "roles": [],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "httpFailures": [],
+  "writeSignals": [],
+  "technicalCopy": [],
+  "checkpoints": [
+    {
+      "stage": "playwright-import",
+      "state": "START",
+      "atMs": 2
+    },
+    {
+      "stage": "playwright-import",
+      "state": "PASS",
+      "atMs": 242
+    },
+    {
+      "stage": "browser-launch",
+      "state": "START",
+      "atMs": 242
+    },
+    {
+      "stage": "browser-launch",
+      "state": "PASS",
+      "atMs": 7466
+    },
+    {
+      "stage": "browser-context",
+      "state": "START",
+      "atMs": 7467
+    },
+    {
+      "stage": "browser-context",
+      "state": "PASS",
+      "atMs": 7638
+    },
+    {
+      "stage": "page-create",
+      "state": "START",
+      "atMs": 7638
+    },
+    {
+      "stage": "page-create",
+      "state": "PASS",
+      "atMs": 9201
+    },
+    {
+      "stage": "target-navigation",
+      "state": "START",
+      "atMs": 9204
+    },
+    {
+      "stage": "target-navigation",
+      "state": "PASS",
+      "atMs": 10588,
+      "httpStatus": 200
+    },
+    {
+      "stage": "login-form-visible",
+      "state": "START",
+      "atMs": 10588
+    },
+    {
+      "stage": "login-form-visible",
+      "state": "PASS",
+      "atMs": 10865
+    },
+    {
+      "stage": "manifest-fetch",
+      "state": "START",
+      "atMs": 10865
+    },
+    {
+      "stage": "manifest-fetch",
+      "state": "PASS",
+      "atMs": 11400,
+      "httpStatus": 200
+    },
+    {
+      "stage": "manifest-validated",
+      "state": "PASS",
+      "atMs": 11402,
+      "sourceHeadMatches": true,
+      "fileCount": 194
+    },
+    {
+      "stage": "auth-asset-fetch",
+      "state": "START",
+      "atMs": 11402
+    },
+    {
+      "stage": "auth-asset-fetch",
+      "state": "PASS",
+      "atMs": 11487,
+      "httpStatus": 200
+    },
+    {
+      "stage": "auth-asset-validated",
+      "state": "PASS",
+      "atMs": 11488,
+      "httpStatus": 200,
+      "sha256Matches": true
+    },
+    {
+      "stage": "custom-token-submit",
+      "state": "START",
+      "atMs": 11490
+    },
+    {
+      "stage": "custom-token-submit",
+      "state": "PASS",
+      "atMs": 11882
+    },
+    {
+      "stage": "custom-token-http-response",
+      "state": "START",
+      "atMs": 11883
+    },
+    {
+      "stage": "custom-token-http-response",
+      "state": "PASS",
+      "atMs": 11883,
+      "httpStatus": 200
+    },
+    {
+      "stage": "custom-token-http-classified",
+      "state": "PASS",
+      "atMs": 11883,
+      "httpStatus": 200
+    },
+    {
+      "stage": "auth-projection",
+      "state": "START",
+      "atMs": 11883
+    },
+    {
+      "stage": "auth-projection",
+      "state": "PASS",
+      "atMs": 11887,
+      "signedIn": true,
+      "emailVerified": true
+    },
+    {
+      "stage": "membership-read",
+      "state": "START",
+      "atMs": 11887
+    },
+    {
+      "stage": "membership-read",
+      "state": "PASS",
+      "atMs": 12170,
+      "membershipAvailable": true,
+      "membershipActive": true,
+      "tenantMatches": true,
+      "roleCount": 4,
+      "requiredRolesPresent": true
+    },
+    {
+      "stage": "runtime-activation-trigger",
+      "state": "START",
+      "atMs": 12170
+    },
+    {
+      "stage": "runtime-activation-trigger",
+      "state": "PASS",
+      "atMs": 12284,
+      "activationOk": false,
+      "bootstrapPhase": "blocked",
+      "bootstrapErrorCount": 1
+    }
+  ],
+  "legalGateHandledLocally": false,
+  "cleanup": {
+    "browserCloseAttempted": true,
+    "browserClosed": true,
+    "browserCloseTimedOut": false
+  },
+  "bootstrapObservation": {
+    "phase": "blocked",
+    "errors": [
+      "membership_invalid:email_invalido"
+    ],
+    "assignedRoleCount": 0,
+    "countryCount": 0,
+    "collectionCount": 13,
+    "ready": false,
+    "writeAuthorized": false
+  },
+  "error": "R4_PRODUCT_BOOTSTRAP_OBSERVED_FAILURE",
+  "targetHttps": true,
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "operationalWrites": 0,
+  "containsPII": false,
+  "containsSecrets": false,
+  "secretValuesLogged": false,
+  "writesAuthorized": false,
+  "deployExecuted": false,
+  "packageRebuilt": false,
+  "productionTouched": true,
+  "authMechanism": "custom-token-ephemeral",
+  "passwordSecretUsed": false,
+  "customTokenPersisted": false,
+  "customTokenMintedForExactTarget": true,
+  "canonicalTargetRoleContract": true
+}
