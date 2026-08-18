@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "orbit360-auth-paula-membership-pipeline-journal-v1",
+  "runId": "32091815030",
+  "request": ".github/orbit360-requests/auth-paula-membership-readonly-reconcile-v2-runbound-20260817-01.json",
+  "headSha": "317d08ffd5d920490417a2b6848840b51a743b2c",
+  "status": "SEALED_STOP_RETRY",
+  "currentStage": "SEALED",
+  "classification": "DATA_CONTRACT_FAILURE",
+  "containsPII": false,
+  "containsSecrets": false,
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "operationalWrites": 0,
+  "failedCheck": "TARGET_MEMBERSHIP_DEFAULT_SCOPE_INVALID"
+}
