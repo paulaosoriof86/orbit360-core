@@ -49,5 +49,7 @@
   "browserExecuted": false,
   "rulesApplied": false,
   "deployExecuted": false,
-  "productionTouched": false
+  "productionTouched": false,
+  "runId": "32092745286",
+  "evidenceFreshness": "current-run-only"
 }
