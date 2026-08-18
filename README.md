@@ -16,22 +16,24 @@ Antes de diagnosticar, modificar, ejecutar runtime/browser/deploy o continuar un
 
 **Regla:** README no es una copia autónoma del estado operativo. El estado actual vive en índice + live-state + HEAD/PR + última evidencia. Cualquier cierre, changelog, checkpoint o “siguiente acción” anterior que contradiga esas superficies es `HISTORICAL_NOT_CURRENT_STATE`.
 
-## Estado resumido · 2026-08-18
+## Estado resumido · 2026-08-18 · F1.3 cerrado
 
 - Rama obligatoria: `ays/backend-tenant-lab-v99-20260703`.
 - PR #5: draft/open; sin main/merge.
 - URL pública conservada: `https://app.aysseguros.com`.
-- Paquete público R4S9C: conservar inmutable mientras se diagnostica; no rebuild/deploy por descarte.
-- Auth real, contraseña, membership/tenant y HostDime: no son blockers demostrados en la evidencia más reciente.
-- F0 `DOCUMENTATION_STATE_DRIFT`: **CERRADO 100%**.
-- F1 activo: `FUNCTIONAL_DEFECT / R4_RUNTIME_ACTIVATION_TRIGGER_FAILED`.
-- Observer source: `6d68495ec92f103c805503a42b46bd5a755c3ef9`.
-- Ejecución previa `32155605314`: Auth/membership PASS y `PRODUCT_READONLY_BOOTSTRAP_NOT_READY`; no contiene el error interno porque ocurrió antes del observer.
-- Self-test canónico source-only del observer: **PASS** `R4_ROLE_ROUTE_ATTRIBUTION_SELFTEST_PASS`.
-- Evidencia: `orbit360-platform/runtime-gate-crm-v20260716/r4-role-route-attribution-selftest-v20260818.json`.
-- Single invocation, no segundo bootstrap, allowlist sanitizada, restore del owner y sintaxis: PASS.
-- Browser/runtime nuevos: 0; secretos: 0; data access productivo nuevo: 0; Firestore/Auth/operational writes: 0; deploy/rebuild: 0.
-- La causa interna concreta del bootstrap continúa `UNKNOWN_PENDING_SANITIZED_OBSERVATION`; no inferirla.
+- Paquete público R4S9C: conservar inmutable; F1.3 no hizo deploy ni rebuild.
+- F0 `DOCUMENTATION_STATE_DRIFT`: **CERRADO**.
+- F1.1 owner/observer source: **CERRADO**.
+- F1.2A observer self-test: **CERRADO**.
+- F1.2B observación runtime sanitizada: **CERRADO/CONSUMIDO** run `32175674293`.
+- Error interno observado: `membership_invalid:email_invalido` en bootstrap `phase=blocked`.
+- Causa raíz final F1.3: `VALIDATOR_STALE / MEMBERSHIP_EMAIL_REQUIRED_STALE_AUTH_IDENTITY_OWNERSHIP`.
+- Rootfix: membership email pasa a ser opcional; Auth es owner de correo; si membership trae correo debe tener formato válido y coincidir con Auth.
+- Evidencia source-only: `orbit360-platform/runtime-gate-crm-v20260716/f1-3-membership-email-ownership-source-only-v20260818.json`.
+- Resultado: `F1_3_MEMBERSHIP_EMAIL_OWNERSHIP_SOURCE_ONLY_PASS`, `failed=[]`, `staticViolations=[]`.
+- F1.3 browser/runtime/secrets/data reads/deploy/rebuild: 0.
+- Firestore/Auth/operational writes: 0.
+- Contraseña/reset/usuarios/membership/datos: 0 cambios.
 
 ## Plan congelado
 
@@ -40,7 +42,7 @@ Fuente vinculante:
 
 Ruta inmediata a producción:
 - F0 Reconciliación/documentación = 20% — **CERRADO**;
-- F1 Causa raíz runtime/bootstrap = 30% — **37.5% interno**;
+- F1 Causa raíz runtime/bootstrap = 30% — **80% interno por hitos (4/5 subfases cerradas)**;
 - F2 Aceptación productiva E2E real = 30%;
 - F3 Go-live operativo = 20%.
 
@@ -48,7 +50,7 @@ Ruta inmediata a producción:
 
 Programa integral producción + postproducción:
 - F0 10% — **CERRADO**;
-- F1 15% — **37.5% interno**;
+- F1 15% — **80% interno**;
 - F2 15%;
 - F3 10%;
 - F4 actualización incremental de información 15%;
@@ -60,12 +62,12 @@ Programa integral producción + postproducción:
 
 ## Checkpoint activo
 
-`orbit360-platform/docs/CHECKPOINT-F1-SOURCE-ONLY-BOOTSTRAP-ATTRIBUTION-20260818.md`
+`orbit360-platform/docs/CHECKPOINT-F1-3-MEMBERSHIP-EMAIL-ROOTFIX-SOURCE-ONLY-20260818.md`
 
 ## Siguiente acción exacta
 
-`F1_2B_SINGLE_RUNTIME_BOOTSTRAP_OBSERVATION`.
+`F1_4_SINGLE_RUNTIME_ROOTFIX_CONFIRMATION`.
 
-**Requiere autorización explícita de runtime/browser antes de ejecutarse.** Una vez autorizada: ejecutar primero el gate-contract validator, crear un request nuevo único/inmutable/single-use ligado al observer ya certificado y ejecutar una sola frontera read-only para capturar únicamente `bootstrapObservation.phase`, `errors`, `assignedRoleCount`, `countryCount`, `collectionCount`, `ready`, `writeAuthorized` y el error exterior sanitizado. Detener inmediatamente y sincronizar documentación.
+Requiere autorización explícita de runtime/browser. Con una sola autorización macro: gate-contract validator primero → request nuevo único/inmutable/single-use → una sola frontera productiva read-only sobre la misma ruta → comprobar que desapareció `membership_invalid:email_invalido` y capturar siguiente fase/error o PASS → detener y sincronizar.
 
-No reusar ni reejecutar `32155605314`; no deploy, rebuild, nueva candidata, reset/cambio de contraseña, alta/baja de usuarios, cambios de membership/datos ni rootfix antes de obtener esa evidencia.
+No reutilizar `32175674293`; no deploy/rebuild/candidata, no reset/cambio de contraseña, no usuarios nuevos, no cambios de membership/datos, cero writes y sin main/merge.
