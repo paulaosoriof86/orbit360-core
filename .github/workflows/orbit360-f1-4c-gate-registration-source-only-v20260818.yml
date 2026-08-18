@@ -1,0 +1,76 @@
+name: Orbit360 F1.4C Gate Registration Source Only 20260818
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/workflows/orbit360-f1-4c-gate-registration-source-only-v20260818.yml'
+permissions:
+  contents: write
+concurrency:
+  group: orbit360-f1-4c-gate-registration-source-only-20260818
+  cancel-in-progress: false
+jobs:
+  register_source_only:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate source-only owners and workflow boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-register-f1-4c-successor-artifact-build-gate-v20260818.mjs
+          node --check tools/orbit360-validar-gate-contracts-engine-f1-4c-successor-artifact-build-v20260818.mjs
+          node --check tools/orbit360-f1-4c-successor-builder-v20260818.mjs
+          grep -F 'Mandatory canonical gate before package build' .github/workflows/orbit360-f1-4c-successor-artifact-build-v20260818.yml >/dev/null
+          grep -F 'Build exactly one unpublished successor' .github/workflows/orbit360-f1-4c-successor-artifact-build-v20260818.yml >/dev/null
+          if grep -Eiq 'playwright|firebase[[:space:]._/-]*deploy|gcloud[[:space:]]+deploy' .github/workflows/orbit360-f1-4c-successor-artifact-build-v20260818.yml; then
+            echo 'PIPELINE_MECHANISM_FAILURE:F1_4C_FORBIDDEN_RUNTIME_OR_DEPLOY_MECHANISM' >&2; exit 41
+          fi
+      - name: Register canonical F1.4C gate source-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-register-f1-4c-successor-artifact-build-gate-v20260818.mjs
+          node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
+          git diff --check
+      - name: Persist source-only registration evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p orbit360-platform/runtime-gate-crm-v20260716
+          cat > orbit360-platform/runtime-gate-crm-v20260716/f1-4c-gate-registration-source-only-v20260818.json <<'JSON'
+          {
+            "schemaVersion": "orbit360-f1-4c-gate-registration-source-only-v1",
+            "ok": true,
+            "status": "F1_4C_GATE_REGISTRATION_SOURCE_ONLY_PASS",
+            "classification": "PASS",
+            "gateId": "f1-4c-successor-artifact-build-lab-v20260818",
+            "gateBeforeBuild": true,
+            "singleCandidateMaximum": 1,
+            "packageRebuildAuthorizedOnlyByFreshRequest": true,
+            "browserExecuted": false,
+            "runtimeExecuted": false,
+            "secretAccess": false,
+            "dataAccess": false,
+            "firestoreWrites": 0,
+            "authWrites": 0,
+            "operationalWrites": 0,
+            "deployExecuted": false,
+            "productionTouched": false,
+            "containsPII": false,
+            "containsSecrets": false
+          }
+          JSON
+          git config user.name orbit360-f1-4c-source-only-bot
+          git config user.email orbit360-f1-4c-source-only-bot@users.noreply.github.com
+          git add tools/orbit360-validar-gate-contracts-v20260717.mjs orbit360-platform/runtime-gate-crm-v20260716/f1-4c-gate-registration-source-only-v20260818.json
+          git commit -m 'gate(f1.4c): persist canonical source-only registration PASS [skip ci]'
+          git push origin "HEAD:ays/backend-tenant-lab-v99-20260703"
