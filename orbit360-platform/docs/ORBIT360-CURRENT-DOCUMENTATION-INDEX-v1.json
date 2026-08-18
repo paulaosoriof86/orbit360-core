@@ -1,0 +1,81 @@
+{
+  "schemaVersion": "orbit360-current-documentation-index-v1",
+  "updatedAt": "2026-08-18T12:13:00-06:00",
+  "status": "CURRENT_BINDING_INDEX",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "readOrder": [
+    "bindingRules",
+    "orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json",
+    "orbit360-platform/docs/orbit360-live-state-v1.json",
+    "HEAD_AND_PR5_LIVE",
+    "LIVE_STATE_LAST_EVIDENCE",
+    "orbit360-platform/docs/ADDENDUM-MAESTRO-CIERRE-FORENSE-SINCRONIZACION-Y-PLAN-CONGELADO-20260818.md"
+  ],
+  "bindingRules": [
+    "orbit360-platform/docs/DOCUMENTO-MAESTRO-CONSOLIDADO-ORBIT360-AYS-20260704.md",
+    "orbit360-platform/docs/ADENDUM-ACADEMIA-PROFUNDA-INTERACTIVA-ORBIT360-AYS-20260704.md",
+    "orbit360-platform/docs/ADDENDUM-MAESTRO-PATRONES-REUTILIZABLES-CLAUDE-BACKEND-ORBIT360-20260707.md",
+    "orbit360-platform/docs/ADDENDUM-MAESTRO-CONTINUIDAD-CLIENTES-MULTIROL-IMPORTADORES-20260709.md",
+    "orbit360-platform/docs/PLAN-MAESTRO-EJECUCION-PRODUCTIVA-ANTI-DESVIACION-SINCRONIZACION-CLAUDE-ORBIT360-AYS-20260716.md",
+    "orbit360-platform/docs/ADENDUM-MAESTRO-CONTROL-CAUSA-RAIZ-VALIDADORES-GATES-ORBIT360-AYS-20260717.md",
+    "orbit360-platform/docs/ADDENDUM-MAESTRO-ACELERACION-PRODUCTIVA-REUSO-TRANSVERSAL-Y-CONTROL-AUTORIZACIONES-20260730.md",
+    "orbit360-platform/docs/ADDENDUM-MAESTRO-CONTINUIDAD-SINCRONIZACION-ANTIBUCLE-GOLIVE-POSTPROD-20260814.md",
+    "orbit360-platform/docs/ADDENDUM-MAESTRO-CIERRE-FORENSE-SINCRONIZACION-Y-PLAN-CONGELADO-20260818.md"
+  ],
+  "operationalCurrent": {
+    "liveState": "orbit360-platform/docs/orbit360-live-state-v1.json",
+    "resumePointer": "README.md",
+    "pullRequest": 5,
+    "latestRuntimeEvidence": "orbit360-platform/runtime-gate-crm-v20260716/auth-paula-gate14-3-smoke-run-32155605314.json",
+    "latestLifecycleEvidence": "orbit360-platform/runtime-gate-crm-v20260716/auth-paula-gate14-3-pipeline-run-32155605314.json",
+    "currentObserverCommit": "6d68495ec92f103c805503a42b46bd5a755c3ef9",
+    "currentBlocker": "FUNCTIONAL_DEFECT / R4_RUNTIME_ACTIVATION_TRIGGER_FAILED",
+    "currentMethodologyDrift": "PIPELINE_MECHANISM_FAILURE / DOCUMENTATION_STATE_DRIFT",
+    "currentPlan": "orbit360-platform/docs/ADDENDUM-MAESTRO-CIERRE-FORENSE-SINCRONIZACION-Y-PLAN-CONGELADO-20260818.md"
+  },
+  "historicalPolicy": {
+    "defaultClassification": "HISTORICAL_NOT_CURRENT_STATE",
+    "rule": "Any dated closure, checkpoint, README section, changelog next-action, prior gate summary, prior PR wording or conversation that conflicts with live-state/HEAD/latest evidence is historical only and MUST NOT drive execution.",
+    "deletionRequired": false,
+    "whyPreserved": "Audit trail and evidence chronology",
+    "mayOverrideCurrentState": false
+  },
+  "requiredResumeProtocol": [
+    "Read this index",
+    "Read orbit360-live-state-v1.json",
+    "Confirm actual HEAD and PR #5",
+    "Read exact last evidence named by live-state",
+    "Validate nextActionExact",
+    "If drift exists, classify once and synchronize before execution",
+    "Execute only nextActionExact"
+  ],
+  "frozenPlanPhases": [
+    {"id":"F0","name":"Reconciliacion forense y documentacion","goLiveWeight":20,"integratedWeight":10},
+    {"id":"F1","name":"Causa raiz runtime/bootstrap","goLiveWeight":30,"integratedWeight":15},
+    {"id":"F2","name":"Gate de aceptacion productiva real","goLiveWeight":30,"integratedWeight":15},
+    {"id":"F3","name":"Go-live operativo A&S","goLiveWeight":20,"integratedWeight":10},
+    {"id":"F4","name":"Actualizacion incremental de informacion","goLiveWeight":0,"integratedWeight":15},
+    {"id":"F5","name":"Control Plane no-code","goLiveWeight":0,"integratedWeight":15},
+    {"id":"F6","name":"Postproduccion funcional acumulativa","goLiveWeight":0,"integratedWeight":15},
+    {"id":"F7","name":"SaaS reusable / siguiente tenant","goLiveWeight":0,"integratedWeight":5}
+  ],
+  "reportingRequired": [
+    "phase",
+    "visibleProgress",
+    "phaseInternalPercent",
+    "goLiveRoutePercent",
+    "integratedProgramPercent",
+    "sourceHead",
+    "classification",
+    "implementation",
+    "evidence",
+    "writesDeployStatus",
+    "documentationSynchronized",
+    "claudeReusableImpact",
+    "academiaImpact",
+    "pending",
+    "nextActionExact"
+  ]
+}
