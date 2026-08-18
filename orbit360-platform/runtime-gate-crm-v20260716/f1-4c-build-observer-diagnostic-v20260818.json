@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "orbit360-f1-4c-build-observer-diagnostic-v1",
+  "ok": true,
+  "status": "F1_4C_BUILD_OBSERVER_DIAGNOSTIC_CAPTURED",
+  "classification": "OBSERVATION_ONLY",
+  "requestCommit": "cc5aeeca1c42506218c59830dd302c284ddc5554",
+  "matchingRunCount": 1,
+  "runId": "32193519205",
+  "runStatus": "completed",
+  "runConclusion": "failure",
+  "artifactCount": 0,
+  "rerunExecuted": false,
+  "buildExecutedByObserver": false,
+  "browserExecuted": false,
+  "runtimeExecuted": false,
+  "secretAccess": false,
+  "dataAccess": false,
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "operationalWrites": 0,
+  "deployExecuted": false,
+  "productionTouched": false
+}
