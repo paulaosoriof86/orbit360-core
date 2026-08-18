@@ -1,0 +1,51 @@
+name: Orbit360 F1.4C Build Observer Diagnostic Source Only 20260818
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/workflows/orbit360-f1-4c-build-observer-diagnostic-source-only-v20260818.yml'
+permissions:
+  contents: write
+  actions: read
+jobs:
+  observe_diagnostic_only:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    env:
+      REQUEST_COMMIT: cc5aeeca1c42506218c59830dd302c284ddc5554
+      BUILD_WORKFLOW_NAME: Orbit360 F1.4C Successor Artifact Build 20260818
+      EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: true
+      - name: Observe exact build run without execution or rerun
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -sS --fail -H "Authorization: Bearer $GH_TOKEN" -H 'Accept: application/vnd.github+json' -H 'X-GitHub-Api-Version: 2022-11-28' \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/runs?head_sha=${REQUEST_COMMIT}&event=push&per_page=20" > /tmp/runs.json
+          RUN_COUNT="$(jq -r --arg n "$BUILD_WORKFLOW_NAME" '[.workflow_runs[]|select(.name==$n)]|length' /tmp/runs.json)"
+          RUN_ID="$(jq -r --arg n "$BUILD_WORKFLOW_NAME" '[.workflow_runs[]|select(.name==$n)]|if length>=1 then .[0].id else "" end' /tmp/runs.json)"
+          STATUS="$(jq -r --arg n "$BUILD_WORKFLOW_NAME" '[.workflow_runs[]|select(.name==$n)]|if length>=1 then .[0].status else "missing" end' /tmp/runs.json)"
+          CONCLUSION="$(jq -r --arg n "$BUILD_WORKFLOW_NAME" '[.workflow_runs[]|select(.name==$n)]|if length>=1 then (. [0].conclusion // "") else "" end' /tmp/runs.json)"
+          ART_COUNT=0
+          if [ -n "$RUN_ID" ]; then
+            curl -sS --fail -H "Authorization: Bearer $GH_TOKEN" -H 'Accept: application/vnd.github+json' -H 'X-GitHub-Api-Version: 2022-11-28' \
+              "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}/artifacts" > /tmp/artifacts.json
+            ART_COUNT="$(jq -r '.total_count' /tmp/artifacts.json)"
+          fi
+          mkdir -p "$EVIDENCE_DIR"
+          jq -n --arg count "$RUN_COUNT" --arg run "$RUN_ID" --arg status "$STATUS" --arg conclusion "$CONCLUSION" --arg artifacts "$ART_COUNT" '{schemaVersion:"orbit360-f1-4c-build-observer-diagnostic-v1",ok:true,status:"F1_4C_BUILD_OBSERVER_DIAGNOSTIC_CAPTURED",classification:"OBSERVATION_ONLY",requestCommit:"cc5aeeca1c42506218c59830dd302c284ddc5554",matchingRunCount:($count|tonumber),runId:$run,runStatus:$status,runConclusion:$conclusion,artifactCount:($artifacts|tonumber),rerunExecuted:false,buildExecutedByObserver:false,browserExecuted:false,runtimeExecuted:false,secretAccess:false,dataAccess:false,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,productionTouched:false}' > "$EVIDENCE_DIR/f1-4c-build-observer-diagnostic-v20260818.json"
+      - name: Persist diagnostic observation only
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name orbit360-f1-4c-observer-diagnostic-bot
+          git config user.email orbit360-f1-4c-observer-diagnostic-bot@users.noreply.github.com
+          git add "$EVIDENCE_DIR/f1-4c-build-observer-diagnostic-v20260818.json"
+          git commit -m 'build(f1.4c): persist exact run diagnostic observation [skip ci]'
+          git push origin "HEAD:ays/backend-tenant-lab-v99-20260703"
