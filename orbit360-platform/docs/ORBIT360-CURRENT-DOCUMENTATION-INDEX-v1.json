@@ -14,15 +14,15 @@
     "orbit360-platform/docs/ADDENDUM-MAESTRO-CIERRE-FORENSE-SINCRONIZACION-Y-PLAN-CONGELADO-20260818.md"
   ],
   "bindingRules": [
-    "orbit360-platform/docs/DOCUMENTO-MAESTRO-CONSOLIDADO-ORBIT360-AYS-20260704.md",
-    "orbit360-platform/docs/ADENDUM-ACADEMIA-PROFUNDA-INTERACTIVA-ORBIT360-AYS-20260704.md",
-    "orbit360-platform/docs/ADDENDUM-MAESTRO-PATRONES-REUTILIZABLES-CLAUDE-BACKEND-ORBIT360-20260707.md",
-    "orbit360-platform/docs/ADDENDUM-MAESTRO-CONTINUIDAD-CLIENTES-MULTIROL-IMPORTADORES-20260709.md",
-    "orbit360-platform/docs/PLAN-MAESTRO-EJECUCION-PRODUCTIVA-ANTI-DESVIACION-SINCRONIZACION-CLAUDE-ORBIT360-AYS-20260716.md",
-    "orbit360-platform/docs/ADENDUM-MAESTRO-CONTROL-CAUSA-RAIZ-VALIDADORES-GATES-ORBIT360-AYS-20260717.md",
-    "orbit360-platform/docs/ADDENDUM-MAESTRO-ACELERACION-PRODUCTIVA-REUSO-TRANSVERSAL-Y-CONTROL-AUTORIZACIONES-20260730.md",
-    "orbit360-platform/docs/ADDENDUM-MAESTRO-CONTINUIDAD-SINCRONIZACION-ANTIBUCLE-GOLIVE-POSTPROD-20260814.md",
-    "orbit360-platform/docs/ADDENDUM-MAESTRO-CIERRE-FORENSE-SINCRONIZACION-Y-PLAN-CONGELADO-20260818.md"
+    {"id":"master-20260704","title":"Documento Maestro Consolidado 20260704","sourceType":"project_attachment","sourceName":"DOCUMENTO-MAESTRO-CONSOLIDADO-ORBIT360-AYS-20260704.md","repoPath":null},
+    {"id":"academia-20260704","title":"Addendum Academia Profunda 20260704","sourceType":"project_attachment","sourceName":"ADENDUM-ACADEMIA-PROFUNDA-INTERACTIVA-ORBIT360-AYS-20260704.md","repoPath":null},
+    {"id":"claude-backend-20260707","title":"Addendum Patrones Reutilizables Claude/Backend 20260707","sourceType":"project_attachment","sourceName":"ADDENDUM-MAESTRO-PATRONES-REUTILIZABLES-CLAUDE-BACKEND-ORBIT360-20260707.md","repoPath":null},
+    {"id":"continuidad-multirol-importadores-20260709","title":"Addendum Continuidad Clientes/Multirol/Importadores 20260709","sourceType":"project_attachment","sourceName":"addendum_continuidad_clientes_multirol_importadores_20260709.zip","repoPath":null},
+    {"id":"plan-maestro-20260716","title":"Plan Maestro de Ejecucion Productiva 20260716","sourceType":"project_attachment","sourceName":"PLAN-MAESTRO-EJECUCION-PRODUCTIVA-ANTI-DESVIACION-SINCRONIZACION-CLAUDE-ORBIT360-AYS-20260716(1).md","repoPath":null},
+    {"id":"causa-raiz-gates-20260717","title":"Addendum Control de Causa Raiz, Validadores y Gates 20260717","sourceType":"project_attachment","sourceName":"ADENDUM-MAESTRO-CONTROL-CAUSA-RAIZ-VALIDADORES-GATES-ORBIT360-AYS-20260717(1).docx","repoPath":null},
+    {"id":"aceleracion-20260730","title":"Addendum Aceleracion Productiva, Reuso Transversal y Control Autorizaciones 20260730","sourceType":"project_attachment","sourceName":"ADDENDUM-MAESTRO-ACELERACION-PRODUCTIVA-REUSO-TRANSVERSAL-Y-CONTROL-AUTORIZACIONES-20260730(1).md","repoPath":null},
+    {"id":"continuidad-antibucle-20260814","title":"Addendum Continuidad, Sincronizacion, Antibucle, Go-live y Postproduccion 20260814","sourceType":"repository","sourceName":"ADDENDUM-MAESTRO-CONTINUIDAD-SINCRONIZACION-ANTIBUCLE-GOLIVE-POSTPROD-20260814.md","repoPath":"orbit360-platform/docs/ADDENDUM-MAESTRO-CONTINUIDAD-SINCRONIZACION-ANTIBUCLE-GOLIVE-POSTPROD-20260814.md"},
+    {"id":"forense-plan-congelado-20260818","title":"Addendum Cierre Forense, Sincronizacion y Plan Congelado 20260818","sourceType":"repository","sourceName":"ADDENDUM-MAESTRO-CIERRE-FORENSE-SINCRONIZACION-Y-PLAN-CONGELADO-20260818.md","repoPath":"orbit360-platform/docs/ADDENDUM-MAESTRO-CIERRE-FORENSE-SINCRONIZACION-Y-PLAN-CONGELADO-20260818.md"}
   ],
   "operationalCurrent": {
     "liveState": "orbit360-platform/docs/orbit360-live-state-v1.json",
