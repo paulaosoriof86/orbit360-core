@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "orbit360-f1-4d-run-observer-v1",
+  "ok": true,
+  "status": "F1_4D_RUN_DISCOVERED",
+  "classification": "OBSERVATION_ONLY",
+  "requestCommit": "45c85e6ed6e992b490262f5abf12cce94d7a13c4",
+  "runId": "32195516901",
+  "runStatus": "in_progress",
+  "runConclusion": "",
+  "runAttempt": 1,
+  "rerunExecuted": false,
+  "observerRuntimeExecuted": false,
+  "observerBrowserExecuted": false,
+  "observerSecretAccess": false,
+  "observerDataAccess": false,
+  "observerFirestoreWrites": 0,
+  "observerAuthWrites": 0,
+  "observerOperationalWrites": 0,
+  "observerDeployExecuted": false,
+  "observerProductionTouched": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
