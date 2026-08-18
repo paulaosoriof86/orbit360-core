@@ -1,0 +1,86 @@
+name: Orbit360 F1.4C Validator Stale Rootfix Source Only 20260818
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/workflows/orbit360-f1-4c-validator-stale-rootfix-source-only-v20260818.yml'
+permissions:
+  contents: write
+jobs:
+  validate_source_only:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate corrected evidence contract source-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          ENGINE=tools/orbit360-validar-gate-contracts-engine-f1-4c-successor-artifact-build-v20260818.mjs
+          EVID=orbit360-platform/runtime-gate-crm-v20260716/f1-3-membership-email-ownership-source-only-v20260818.json
+          node --check "$ENGINE"
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const f=JSON.parse(fs.readFileSync('orbit360-platform/runtime-gate-crm-v20260716/f1-3-membership-email-ownership-source-only-v20260818.json','utf8'));
+          const a=f.assertions||{}, s=f.sample||{};
+          const ok=f.ok===true && f.status==='F1_3_MEMBERSHIP_EMAIL_OWNERSHIP_SOURCE_ONLY_PASS' &&
+            Array.isArray(f.failed)&&f.failed.length===0 && Array.isArray(f.staticViolations)&&f.staticViolations.length===0 &&
+            a.optionalMembershipEmail===true && a.malformedEmailStillBlocked===true &&
+            a.authOwnsEmailWhenMembershipOmitsIt===true && a.matchingMembershipEmailAllowed===true &&
+            a.mismatchedMembershipEmailBlocked===true && s.emailOptional===true && s.emailIdentityOwner==='auth' &&
+            s.writeAuthorized===false && s.writeExecuted===false;
+          if(!ok) throw new Error('F1_3_CANONICAL_EVIDENCE_SCHEMA_NOT_PASS');
+          NODE
+          grep -F "const s=f13&&f13.sample||{};" "$ENGINE" >/dev/null
+          grep -F "a.optionalMembershipEmail===true" "$ENGINE" >/dev/null
+          grep -F "s.emailOptional===true" "$ENGINE" >/dev/null
+          grep -F "s.emailIdentityOwner==='auth'" "$ENGINE" >/dev/null
+          grep -F "f13.failed.length===0" "$ENGINE" >/dev/null
+          grep -F "f13.staticViolations.length===0" "$ENGINE" >/dev/null
+          test -f orbit360-platform/runtime-gate-crm-v20260716/f1-4c-build-observer-diagnostic-v20260818.json
+          jq -e '.matchingRunCount==1 and .runId=="32193519205" and .runConclusion=="failure" and .artifactCount==0 and .rerunExecuted==false' orbit360-platform/runtime-gate-crm-v20260716/f1-4c-build-observer-diagnostic-v20260818.json >/dev/null
+      - name: Persist source-only rootfix evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p orbit360-platform/runtime-gate-crm-v20260716
+          cat > orbit360-platform/runtime-gate-crm-v20260716/f1-4c-validator-stale-rootfix-source-only-v20260818.json <<'JSON'
+          {
+            "schemaVersion": "orbit360-f1-4c-validator-stale-rootfix-source-only-v1",
+            "ok": true,
+            "status": "F1_4C_VALIDATOR_STALE_ROOTFIX_SOURCE_ONLY_PASS",
+            "classification": "VALIDATOR_STALE_ROOTFIX_PASS",
+            "failedRunId": "32193519205",
+            "failedRequestCommit": "cc5aeeca1c42506218c59830dd302c284ddc5554",
+            "failedReason": "F1_3_EVIDENCE_NOT_PASS",
+            "rootCause": "F1_4C_ENGINE_READ_F1_3_EMAIL_OWNERSHIP_FIELDS_AT_JSON_ROOT_INSTEAD_OF_CANONICAL_SAMPLE_AND_ASSERTIONS_PATHS",
+            "canonicalF1_3EvidencePass": true,
+            "canonicalSchemaPathsValidated": true,
+            "request01Reusable": false,
+            "candidateBuildsExecuted": 0,
+            "candidateArtifactsProduced": 0,
+            "browserExecuted": false,
+            "runtimeExecuted": false,
+            "secretAccess": false,
+            "dataAccess": false,
+            "firestoreWrites": 0,
+            "authWrites": 0,
+            "operationalWrites": 0,
+            "deployExecuted": false,
+            "productionTouched": false,
+            "containsPII": false,
+            "containsSecrets": false
+          }
+          JSON
+          git config user.name orbit360-f1-4c-validator-rootfix-bot
+          git config user.email orbit360-f1-4c-validator-rootfix-bot@users.noreply.github.com
+          git add orbit360-platform/runtime-gate-crm-v20260716/f1-4c-validator-stale-rootfix-source-only-v20260818.json
+          git commit -m 'gate(f1.4c): persist validator-stale rootfix source-only PASS [skip ci]'
+          git push origin "HEAD:ays/backend-tenant-lab-v99-20260703"
