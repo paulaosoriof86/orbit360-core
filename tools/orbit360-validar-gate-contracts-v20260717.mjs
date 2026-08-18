@@ -73,6 +73,13 @@ const GATE_CONFIG = Object.freeze({
     defaultRequest: '.github/orbit360-requests/auth-paula-membership-readonly-reconcile-lab-v20260817.json',
     sourcePhase: ''
   },
+  ['block-auth-paula-membership-readonly-reconcile-v2-lab-v20260817']: {
+    contractVersion: '14.3.0',
+    lifecycle: 'tools/orbit360-validator-lifecycle-contract-auth-paula-membership-readonly-reconcile-v2-lab-v20260817.json',
+    engine: 'tools/orbit360-validar-gate-contracts-engine-auth-paula-membership-readonly-reconcile-v2-lab-v20260817.mjs',
+    defaultRequest: '.github/orbit360-requests/auth-paula-membership-readonly-reconcile-v2-lab-v20260817.json',
+    sourcePhase: ''
+  },
   [VISUAL_LEGACY_GATE_ID]: {
     contractVersion: '2.7.8',
     lifecycle: 'tools/orbit360-validator-lifecycle-contract-visual-matrix-corrected-post-auth-lab-v20260805.json',
@@ -144,6 +151,7 @@ const PHASE_PROFILES = Object.freeze({
   AUTH_PAULA_PASSWORD_RESET_LAB: {secrets:true,firestoreRead:true,writes:false,runtime:true,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false},
   AUTH_PAULA_RESET_LINK_HANDOFF_LAB: {secrets:true,firestoreRead:true,writes:false,runtime:true,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false},
   AUTH_PAULA_MEMBERSHIP_READONLY_RECONCILIATION_LAB: {secrets:true,firestoreRead:true,writes:false,runtime:true,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false},
+  AUTH_PAULA_MEMBERSHIP_READONLY_RECONCILIATION_V2_LAB: {secrets:true,firestoreRead:true,writes:false,runtime:true,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false},
   VISUAL_MATRIX_CORRECTED_POST_AUTH_LAB_EXECUTION: {secrets:true,firestoreRead:true,writes:false,runtime:true,browser:true,deploy:true,functionsDeploy:false,rulesDeploy:false,production:false}
 });
 
