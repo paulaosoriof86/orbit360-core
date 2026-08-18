@@ -2,6 +2,26 @@
 
 Formato basado en *Keep a Changelog*. Construcción greenfield; el estado operativo vigente se mantiene en la rama obligatoria y PR #5 draft/open, sin merge ni producción salvo autorización explícita.
 
+## [F1.3] — 2026-08-18 GT · Membership email ownership rootfix source-only PASS
+### Root cause
+- La observación read-only consumida `32175674293` aisló `membership_invalid:email_invalido` dentro del bootstrap productivo, después de Auth/membership/tenant PASS y antes de runtime/store/router.
+- Clasificación final: `VALIDATOR_STALE / MEMBERSHIP_EMAIL_REQUIRED_STALE_AUTH_IDENTITY_OWNERSHIP`.
+- El contrato base de membership exigía correo obligatorio, aunque la identidad de correo canónica pertenece a Auth y el reconciliador vigente solo compara `email/correo` de membership cuando el campo existe.
+### Fixed
+- `core/membership-multirol-contract-p0.js`: email de membership pasa a opcional; si existe conserva validación de formato; Auth queda declarado owner de identidad email.
+- `core/backend-product-readonly-bootstrap-p0.js`: si membership trae email debe coincidir con Auth; si lo omite no se inventa ni se escribe.
+- `tools/orbit360-validar-membership-multirol-p0.mjs`: fixture source-only cubre email ausente, formato inválido, match y mismatch con Auth.
+- Workflow existente de membership amplía su alcance a contrato efectivo + bootstrap y persiste evidencia sanitizada; no se creó gate paralelo.
+### Verified
+- Evidencia `runtime-gate-crm-v20260716/f1-3-membership-email-ownership-source-only-v20260818.json`.
+- `F1_3_MEMBERSHIP_EMAIL_OWNERSHIP_SOURCE_ONLY_PASS`; `failed=[]`; `staticViolations=[]`.
+- Email ausente PASS; formato inválido BLOCK; email presente igual a Auth PASS; email distinto de Auth BLOCK.
+- F1.3: browser/runtime/secrets/Firebase/data access = 0; Firestore/Auth/operational writes = 0; deploy/rebuild/reset/usuarios/membership/data changes = 0.
+### State
+- F1.1 CLOSED; F1.2A CLOSED; F1.2B CLOSED/CONSUMED; F1.3 CLOSED/PASS; F1.4 pendiente de autorización runtime/browser.
+- F1 = 80% interno por 4/5 hitos; ruta inmediata cerrada permanece 20% y programa integral 10% hasta cerrar F1.
+- Siguiente frontera: `F1_4_SINGLE_RUNTIME_ROOTFIX_CONFIRMATION`, una sola ejecución read-only después de `GO_GATE_CONTRACT`, sin deploy ni writes.
+
 ## [M5-5.0.12] — 2026-07-29 UTC · Access/membership projection + RC ae6bb2a3
 ### Fixed
 - `core/access-role-session-owner-v20260728.js` v`20260729.3` proyecta membership LAB desde `tenants/{tenantId}/members/{authenticatedUid}` usando tenant del runtime y UID Firebase autenticado.
