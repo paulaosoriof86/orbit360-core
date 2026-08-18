@@ -1,111 +1,122 @@
 {
   "schemaVersion": "orbit360-live-state-v1",
-  "stateVersion": "20260818.f1-4b-rootfix-artifact-parity-source-pass.successor-artifact-authorization-pending.current",
-  "updatedAt": "2026-08-18T16:26:00-06:00",
-  "phase": "F1_ROOTFIX_ARTIFACT_PARITY_GATE_SOURCE_ONLY_PASS_SUCCESSOR_ARTIFACT_PENDING",
+  "stateVersion": "20260818.f1-4c-successor-artifact-certified-unpublished.runtime-confirmation-pending.current",
+  "updatedAt": "2026-08-18T16:44:00-06:00",
+  "phase": "F1_SUCCESSOR_ARTIFACT_CERTIFIED_UNPUBLISHED_RUNTIME_CONFIRMATION_PENDING",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pr": 5,
   "prState": "draft-open",
-  "runtimeEvidencePersistenceHead": "5ddbedd22748a207b140d61799def49333d14838",
-  "f1_4RequestCommit": "0058e4f928414da182c9e29b2e0c506ebd3258d7",
-  "f1_4RunId": 32191671405,
-  "f1_4BSourceOnlyEvidenceCommit": "3c56d0baffce8fc8399050e520ee4cb54cebf4db",
-  "rootfixCommits": [
+  "f1_3RootfixCommits": [
     "a808e13d69dcb687f488be7e17411796eaec3509",
-    "b050d5a1a9861f898d2bb50d1bcc5c26beb72e9b",
-    "01fbfc9372e6a6987e70c8a0522322d18109b333",
-    "24a36d216f7f7baa407bae03f8c8a965c05fe4af"
+    "b050d5a1a9861f898d2bb50d1bcc5c26beb72e9b"
   ],
-  "currentPublishedPackage": {
+  "f1_4BSourceOnlyEvidenceCommit": "3c56d0baffce8fc8399050e520ee4cb54cebf4db",
+  "publishedPackage": {
     "version": "R4S9C",
-    "sha256": "917f5424deea06d224d45a1b039c0b3699d71a7bef430b2a40d059703b2acc3a",
     "sourceHead": "861326906558f03d9c8c2e7f34adfb4979a17d73",
+    "zipSha256": "917f5424deea06d224d45a1b039c0b3699d71a7bef430b2a40d059703b2acc3a",
     "containsF1_3Rootfix": false,
     "eligibleForF1_3RuntimeConfirmation": false,
     "preserveImmutable": true
   },
-  "lastRuntimeEvidence": {
-    "path": "orbit360-platform/runtime-gate-crm-v20260716/r4-production-readonly-smoke-run-32191671405.json",
-    "runId": 32191671405,
-    "status": "R4_PRODUCTION_READONLY_SMOKE_FAIL",
-    "classificationEmittedByRuntime": "FUNCTIONAL_DEFECT",
-    "classificationAfterForensicAttribution": "PIPELINE_MECHANISM_FAILURE",
-    "failedCheck": "R4_PRODUCT_BOOTSTRAP_OBSERVED_FAILURE",
-    "bootstrapErrors": ["membership_invalid:email_invalido"],
-    "authSignedIn": true,
-    "emailVerified": true,
-    "membershipAvailable": true,
-    "membershipActive": true,
-    "tenantMatches": true,
-    "browserExecuted": true,
-    "runtimeStarted": false,
-    "firestoreWrites": 0,
-    "authWrites": 0,
-    "operationalWrites": 0,
-    "deployExecuted": false,
-    "packageRebuilt": false,
-    "rootfixActuallyUnderTest": false,
-    "disposition": "CONSUMED_SEALED_STOP_RETRY_DO_NOT_RERUN"
-  },
-  "lastLifecycleEvidence": {
-    "path": "orbit360-platform/runtime-gate-crm-v20260716/auth-paula-gate14-3-pipeline-run-32191671405.json",
-    "runId": 32191671405,
+  "f1_4HistoricalRuntime": {
+    "runId": "32191671405",
+    "requestCommit": "0058e4f928414da182c9e29b2e0c506ebd3258d7",
     "status": "SEALED_STOP_RETRY",
-    "browserExecuted": true,
-    "firestoreWrites": 0,
-    "authWrites": 0,
-    "operationalWrites": 0
+    "observedError": "membership_invalid:email_invalido",
+    "rootfixActuallyUnderTest": false,
+    "disposition": "DO_NOT_RERUN_OR_USE_AS_F1_3_CONFIRMATION"
   },
-  "f1_3SourceOnlyEvidence": {
-    "path": "orbit360-platform/runtime-gate-crm-v20260716/f1-3-membership-email-ownership-source-only-v20260818.json",
-    "commit": "7e2123f91d1cbf518a92197b6e24fed9ae29c65c",
-    "status": "F1_3_MEMBERSHIP_EMAIL_OWNERSHIP_SOURCE_ONLY_PASS",
-    "emailOptional": true,
-    "emailIdentityOwner": "auth",
-    "runtimeConfirmationStatus": "NOT_YET_VALIDLY_CONFIRMED_ON_ARTIFACT_CONTAINING_ROOTFIX"
-  },
-  "lastSourceOnlyEvidence": {
-    "path": "orbit360-platform/runtime-gate-crm-v20260716/f1-4b-rootfix-artifact-parity-source-only-v20260818.json",
-    "commit": "3c56d0baffce8fc8399050e520ee4cb54cebf4db",
-    "status": "F1_4B_ROOTFIX_ARTIFACT_PARITY_SOURCE_ONLY_PASS",
-    "classification": "PIPELINE_MECHANISM_FAILURE_ROOTFIX_PASS",
-    "validatorRevision": "rootfix-artifact-parity-v2-20260818",
+  "f1_4BParityGate": {
+    "status": "CLOSED_SOURCE_ONLY_PASS",
+    "evidence": "orbit360-platform/runtime-gate-crm-v20260716/f1-4b-rootfix-artifact-parity-source-only-v20260818.json",
     "oldPackageBlocked": true,
-    "currentHeadContainsRootfix": true,
-    "rootfixEvidencePass": true,
-    "workflowGateBeforeProvider": true,
-    "registryPointsParityOwner": true,
-    "browserExecuted": false,
-    "runtimeExecuted": false,
-    "secretAccess": false,
-    "dataAccess": false,
-    "firestoreWrites": 0,
-    "authWrites": 0,
-    "operationalWrites": 0,
-    "deployExecuted": false,
-    "packageRebuilt": false,
-    "productionTouched": false
+    "rootfixArtifactParityRequired": true
+  },
+  "f1_4C": {
+    "status": "CLOSED_PASS_CONSUMED",
+    "gateId": "f1-4c-successor-artifact-build-lab-v20260818",
+    "lifecycle": "tools/orbit360-validator-lifecycle-contract-f1-4c-successor-artifact-build-v20260818.json",
+    "request01": {
+      "commit": "cc5aeeca1c42506218c59830dd302c284ddc5554",
+      "runId": "32193519205",
+      "status": "PREBUILD_STOP_VALIDATOR_STALE",
+      "error": "F1_3_EVIDENCE_NOT_PASS",
+      "candidateBuildsExecuted": 0,
+      "artifactsProduced": 0,
+      "reusable": false
+    },
+    "validatorStaleRootfix": {
+      "classification": "VALIDATOR_STALE",
+      "rootfixCommit": "d8a611cf93aef77cd860efe8a0144860d58f310b",
+      "sourceOnlyRunId": "32193896132",
+      "status": "F1_4C_VALIDATOR_STALE_ROOTFIX_SOURCE_ONLY_PASS",
+      "evidence": "orbit360-platform/runtime-gate-crm-v20260716/f1-4c-validator-stale-rootfix-source-only-v20260818.json"
+    },
+    "request02": {
+      "commit": "0080eafac6a48aebb46debddcae405783b29a97b",
+      "sourceHead": "29caae94a3db1f1626bdde2ea6ee9a21799f9df6",
+      "runId": "32194002530",
+      "status": "PASS",
+      "rerunExecuted": false
+    },
+    "candidate": {
+      "status": "F1_4C_SUCCESSOR_ARTIFACT_CERTIFIED_UNPUBLISHED",
+      "manifestStatus": "FASE_A_PRODUCT_F1_4C_SUCCESSOR_CERTIFIED",
+      "artifactId": "9345207863",
+      "evidenceArtifactId": "9345208103",
+      "zipName": "orbit360-fase-a-product-f1-4c-successor-29caae94a3db.zip",
+      "zipSha256": "493009c83390901aa772842a2ba9ddd5ce5293f6969d86c5c3395ebd670a44ac",
+      "manifestSha256": "29dafe5e63b425ea6cf641937fe1b9d4b9e63f72479a51ae76f9148a55771761",
+      "sourceHead": "29caae94a3db1f1626bdde2ea6ee9a21799f9df6",
+      "fileCount": 194,
+      "deltaCount": 2,
+      "unchangedProductFiles": 192,
+      "productDeltaPaths": [
+        "core/backend-product-readonly-bootstrap-p0.js",
+        "core/membership-multirol-contract-p0.js"
+      ],
+      "rootfixAncestors": true,
+      "f1_4bAncestor": true,
+      "f1_3MembershipSemanticsPresent": true,
+      "f1_3BootstrapAuthOwnershipPresent": true,
+      "baseFullyRehashed": true,
+      "successorFullyRehashed": true,
+      "packageReopened": true,
+      "allProductFilesRehashed": true,
+      "observerRehashPass": true,
+      "published": false,
+      "noLabRuntime": true,
+      "noPrivateSecretMaterial": true
+    },
+    "evidence": {
+      "certification": "orbit360-platform/runtime-gate-crm-v20260716/f1-4c-successor-artifact-certification-v20260818.json",
+      "runSummary": "orbit360-platform/runtime-gate-crm-v20260716/f1-4c-request02-run-summary-v20260818.json",
+      "checkpoint": "orbit360-platform/docs/CHECKPOINT-F1-4C-SUCCESSOR-ARTIFACT-CERTIFIED-UNPUBLISHED-20260818.md"
+    }
   },
   "rootCauseState": {
     "membershipValidator": {
       "classification": "VALIDATOR_STALE",
       "code": "MEMBERSHIP_EMAIL_REQUIRED_STALE_AUTH_IDENTITY_OWNERSHIP",
-      "status": "ROOTFIX_SOURCE_ONLY_PASS_AWAITING_VALID_RUNTIME_CONFIRMATION"
+      "status": "ROOTFIX_SOURCE_ONLY_PASS_VALID_RUNTIME_CONFIRMATION_PENDING"
     },
     "artifactParityPipeline": {
       "classification": "PIPELINE_MECHANISM_FAILURE",
       "code": "ROOTFIX_ARTIFACT_PARITY_MISSING",
-      "secondaryClassification": "VALIDATOR_STALE",
-      "secondaryCode": "MISSING_ROOTFIX_TO_ARTIFACT_PARITY_CHECK",
-      "status": "CLOSED_SOURCE_ONLY_PASS_F1_4B"
+      "status": "CLOSED_BY_F1_4B"
+    },
+    "f1_4CPrebuild": {
+      "classification": "VALIDATOR_STALE",
+      "code": "F1_3_EVIDENCE_SCHEMA_PATH_MISMATCH",
+      "status": "CLOSED_SOURCE_ONLY_ROOTFIX_PASS"
     },
     "currentBlockingFact": {
-      "code": "ROOTFIX_NOT_PRESENT_IN_CURRENT_PUBLISHED_ARTIFACT",
-      "status": "SUCCESSOR_ARTIFACT_REQUIRED",
-      "publishedArtifactSourceHead": "861326906558f03d9c8c2e7f34adfb4979a17d73",
-      "currentPublishedArtifactContainsRootfix": false,
-      "oldArtifactWillBeBlockedByCorrectedGate": true
+      "code": "SUCCESSOR_RUNTIME_CONFIRMATION_NOT_YET_EXECUTED",
+      "status": "RUNTIME_BROWSER_AUTHORIZATION_REQUIRED",
+      "artifactId": "9345207863",
+      "zipSha256": "493009c83390901aa772842a2ba9ddd5ce5293f6969d86c5c3395ebd670a44ac"
     },
     "authIsCurrentBlocker": false,
     "passwordIsCurrentBlocker": false,
@@ -114,30 +125,14 @@
     "hostDimeIsCurrentBlocker": false,
     "dataReimportIsCurrentBlocker": false
   },
-  "gateControl": {
-    "canonicalRouter": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
-    "currentOwner": "tools/orbit360-validar-gate-contracts-engine-auth-paula-membership-readonly-reconcile-v2-lab-v20260818.mjs",
-    "lifecycle": "tools/orbit360-validator-lifecycle-contract-auth-paula-membership-readonly-reconcile-v2-lab-v20260817.json",
-    "validatorRevision": "rootfix-artifact-parity-v2-20260818",
-    "rootfixArtifactParityRequired": true,
-    "artifactBeforeRootfixMustStop": true,
-    "artifactContainingRootfixMayProceedToRemainingChecks": true,
-    "gateBeforeProviderBrowser": true
-  },
   "documentationControl": {
     "index": "orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json",
     "currentAddendum": "orbit360-platform/docs/ADDENDUM-MAESTRO-CIERRE-FORENSE-SINCRONIZACION-Y-PLAN-CONGELADO-20260818.md",
-    "currentCheckpoint": "orbit360-platform/docs/CHECKPOINT-F1-4B-ROOTFIX-ARTIFACT-PARITY-GATE-SOURCE-ONLY-PASS-20260818.md",
+    "currentCheckpoint": "orbit360-platform/docs/CHECKPOINT-F1-4C-SUCCESSOR-ARTIFACT-CERTIFIED-UNPUBLISHED-20260818.md",
     "historicalPolicy": "HISTORICAL_NOT_CURRENT_STATE",
-    "prSynchronized": true,
-    "indexSynchronized": true,
-    "checkpointSynchronized": true,
-    "liveStateSynchronized": true,
-    "documentationSynchronizedForCurrentDecision": true,
-    "transactionStatus": "CLOSED_AFTER_F1_4B_SOURCE_ONLY_PASS"
+    "transactionStatus": "CLOSED_AFTER_F1_4C_CERTIFIED_UNPUBLISHED_SUCCESSOR"
   },
   "frozenPlan": {
-    "source": "orbit360-platform/docs/ADDENDUM-MAESTRO-CIERRE-FORENSE-SINCRONIZACION-Y-PLAN-CONGELADO-20260818.md",
     "currentPhase": "F1",
     "goLiveRoute": {
       "percentClosed": 20,
@@ -156,13 +151,14 @@
       "F1_2A_observer_selftest": "CLOSED",
       "F1_2B_sanitized_inner_phase_error_runtime_observation": "CLOSED_CONSUMED_RUN_32175674293",
       "F1_3_owner_rootfix_source_static_synthetic": "CLOSED_PASS",
-      "F1_4_runtime_rootfix_confirmation": "BLOCKED_PENDING_SUCCESSOR_ARTIFACT_THAT_CONTAINS_ROOTFIX",
-      "F1_4B_pipeline_parity_remediation": "CLOSED_SOURCE_ONLY_PASS"
+      "F1_4_valid_runtime_rootfix_confirmation": "PENDING_ON_EXACT_F1_4C_SUCCESSOR",
+      "F1_4B_pipeline_parity_remediation": "CLOSED_SOURCE_ONLY_PASS",
+      "F1_4C_successor_artifact_build": "CLOSED_PASS_CONSUMED"
     }
   },
   "lanes": {
     "A_frontend_UX": "FROZEN_NO_CHANGES",
-    "B_backend_security_gates": "F1_4B_CLOSED_PASS_AWAITING_SUCCESSOR_ARTIFACT_BOUNDARY",
+    "B_backend_security_gates": "F1_4C_CLOSED_PASS_AWAITING_F1_4D_RUNTIME_CONFIRMATION",
     "C_real_data_migration": "UNTOUCHED_ZERO_CHANGES"
   },
   "writes": {
@@ -171,50 +167,50 @@
     "operational": 0
   },
   "authorization": {
-    "f1_4RuntimeAuthorizationConsumed": true,
-    "f1_4RequestReplayAllowed": false,
+    "f1_4CRuntimeBuildAuthorizationConsumed": true,
+    "f1_4CCandidateBuildsExecuted": 1,
+    "f1_4CRequestReplayAllowed": false,
+    "candidateRebuildAuthorizedNow": false,
     "browserAuthorizedNow": false,
     "runtimeAuthorizedNow": false,
     "publicationAuthorizedNow": false,
-    "packageRebuildAuthorizedNow": false,
-    "successorCandidateBuildAuthorizedNow": false,
+    "deployAuthorizedNow": false,
     "authChangesAuthorized": false,
+    "membershipChangesAuthorized": false,
     "dataChangesAuthorized": false,
-    "rulesChangesAuthorized": false,
-    "storeChangesAuthorized": false,
     "mainMergeAuthorized": false,
-    "f1_4CRequiresExplicitPackageRebuildCandidateAuthorization": true
+    "f1_4DRequiresExplicitRuntimeBrowserAuthorization": true
   },
   "goLive": {
-    "status": "F1_SUCCESSOR_ARTIFACT_REQUIRED_BEFORE_VALID_ROOTFIX_RUNTIME_CONFIRMATION",
+    "status": "F1_EXACT_SUCCESSOR_READY_FOR_SINGLE_RUNTIME_CONFIRMATION",
     "publicUrl": "https://app.aysseguros.com",
     "publishedPackagePreserved": true,
+    "successorPublished": false,
     "productionOperationalDeclared": false,
     "sensitiveWritesRemainRestricted": true,
     "mainMergeRequiredForGoLive": false
   },
   "stopRetry": {
-    "activeForOldArtifactEquivalentRuntime": true,
-    "family": "R4_PRODUCT_BOOTSTRAP_OBSERVED_FAILURE_ON_PRE_ROOTFIX_ARTIFACT",
-    "consumedRuns": [32175674293, 32191671405],
-    "f1_4ConsumedRunMayBeRerun": false,
-    "thirdEquivalentAttemptAllowed": false,
-    "oldPublishedArtifactEligibleForRootfixConfirmation": false,
-    "releaseCondition": "BUILD_ONE_NONPUBLISHED_SUCCESSOR_ARTIFACT_CONTAINING_F1_3_AND_F1_4B_THEN_SEPARATE_RUNTIME_AUTHORIZATION"
+    "oldArtifactEquivalentRuntimeActive": true,
+    "f1_4HistoricalRunMayBeRerun": false,
+    "f1_4CBuildMayBeRerun": false,
+    "successorRebuildAllowed": false,
+    "nextRuntimeMustBindExactArtifactIdentity": true,
+    "releaseCondition": "ONE_EXPLICITLY_AUTHORIZED_READONLY_RUNTIME_BROWSER_CONFIRMATION_BOUND_TO_ARTIFACT_9345207863_SHA_493009C8"
   },
   "nextActionExact": {
-    "stage": "F1_4C_SUCCESSOR_ARTIFACT_BUILD_FRONTIER",
-    "authorizationRequired": "EXPLICIT_PACKAGE_REBUILD_CANDIDATE_AUTHORIZATION",
-    "action": "After explicit authorization only: execute the applicable gate first; build exactly one nonpublished immutable successor candidate from a sourceHead containing F1.3 and F1.4B; generate manifest, SHA256, file count and rootfix-to-artifact parity evidence; zero Hosting deploy/publication, zero production mutation, zero Auth/Firestore/data/operational writes; stop and synchronize. Do not execute runtime/browser confirmation in this frontier; that requires separate later authorization."
+    "stage": "F1_4D_SINGLE_SUCCESSOR_ARTIFACT_RUNTIME_BROWSER_READONLY_CONFIRMATION",
+    "authorizationRequired": "EXPLICIT_RUNTIME_BROWSER_AUTHORIZATION",
+    "action": "After explicit authorization only: canonical gate-contract validator first; create one new immutable single-use request bound to candidate artifact 9345207863, evidence artifact 9345208103, ZIP SHA256 493009c83390901aa772842a2ba9ddd5ce5293f6969d86c5c3395ebd670a44ac, manifest SHA256 29dafe5e63b425ea6cf641937fe1b9d4b9e63f72479a51ae76f9148a55771761 and sourceHead 29caae94a3db1f1626bdde2ea6ee9a21799f9df6. Execute exactly one read-only runtime/browser confirmation using this exact successor, not R4S9C. Zero rebuild/deploy/publication/Auth/membership/data/Firestore/operational writes. Verify membership_invalid:email_invalido is absent and capture the next sanitized phase/errors or PASS. STOP_RETRY if the same failure family reappears."
   },
   "resumeProtocol": [
     "Read ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json",
     "Read this live-state",
     "Confirm actual HEAD and PR #5",
-    "Read run 32191671405 evidence and F1.4B source-only evidence",
-    "Read CHECKPOINT-F1-4B-ROOTFIX-ARTIFACT-PARITY-GATE-SOURCE-ONLY-PASS-20260818.md",
-    "Do not repeat F1.4 or F1.4B",
-    "Do not rebuild or publish without F1.4C authorization",
-    "Execute only F1_4C_SUCCESSOR_ARTIFACT_BUILD_FRONTIER after explicit authorization"
+    "Read F1.4C certification and request02 run summary",
+    "Read CHECKPOINT-F1-4C-SUCCESSOR-ARTIFACT-CERTIFIED-UNPUBLISHED-20260818.md",
+    "Do not repeat F1.4, F1.4B or F1.4C build",
+    "Do not test R4S9C as rootfix artifact",
+    "Execute only F1_4D after explicit runtime/browser authorization"
   ]
 }
