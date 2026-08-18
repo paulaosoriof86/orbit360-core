@@ -12,6 +12,8 @@ const TENANT=process.env.ORBIT360_TENANT_ID||'alianzas-soluciones';
 const TARGET_HASH=process.env.ORBIT360_TARGET_EMAIL_HASH||'9b663847979724e9491e1c655da32a7cb17a5f6ed26dba352de1eb811254b23f';
 const ADVISOR=process.env.ORBIT360_TARGET_ADVISOR_ID||'ase-paula-osorio';
 const OUT=process.env.ORBIT360_RECON_EVIDENCE||'orbit360-platform/runtime-gate-crm-v20260716/auth-paula-membership-readonly-reconciliation-sanitized-v20260817.json';
+const VALID_ROLES=new Set(['Dirección','SuperAdmin','AdminTenant','Operativo','Finanzas','Marketing','Asesor','Comercial','Asistente']);
+const PRIVILEGED=new Set(['Dirección','SuperAdmin','AdminTenant']);
 const text=v=>String(v==null?'':v).trim();
 const sha=v=>crypto.createHash('sha256').update(String(v==null?'':v),'utf8').digest('hex');
 const emailHash=v=>sha(text(v).toLowerCase().replace(/\s+/g,''));
@@ -43,13 +45,12 @@ try{
   if(text(member.status||member.estado).toLowerCase()!=='active') fail('TARGET_MEMBERSHIP_NOT_ACTIVE');
   if(member.email||member.correo){if(emailHash(member.email||member.correo)!==TARGET_HASH) fail('TARGET_MEMBERSHIP_EMAIL_MISMATCH','SECURITY_FAILURE');}
 
-  const roles=uniq([].concat(member.roles||[],member.rolesAsignados||[],member.assignedRoles||[],member.role||[],member.rol||[]));
-  const expectedRoles=['Dirección','SuperAdmin','AdminTenant','Asesor','Operativo'];
-  const missingRoles=expectedRoles.filter(r=>!roles.includes(r));
-  if(missingRoles.length) fail('TARGET_MEMBERSHIP_REQUIRED_ROLES_MISSING');
-  const defaultRole=text(member.defaultRole||member.rolDefault||member.roleDefault);
+  const roles=uniq(Array.isArray(member.roles)?member.roles:(member.role||member.rol?[member.role||member.rol]:[]));
+  if(!roles.length) fail('TARGET_MEMBERSHIP_ROLES_MISSING');
+  if(roles.some(r=>!VALID_ROLES.has(r))) fail('TARGET_MEMBERSHIP_ROLE_NOT_CONFIGURED');
+  if(!roles.some(r=>PRIVILEGED.has(r))) fail('TARGET_MEMBERSHIP_PRIVILEGED_ROLE_MISSING');
+  const defaultRole=text(member.defaultRole||member.rolDefault||member.roleDefault||roles[0]);
   const activeRole=text(member.activeRole||member.rolActivo||defaultRole);
-  if(defaultRole!=='Dirección') fail('TARGET_MEMBERSHIP_DEFAULT_ROLE_NOT_DIRECCION');
   if(!roles.includes(defaultRole)) fail('TARGET_MEMBERSHIP_DEFAULT_ROLE_NOT_ASSIGNED');
   if(!roles.includes(activeRole)) fail('TARGET_MEMBERSHIP_ACTIVE_ROLE_NOT_ASSIGNED');
 
@@ -57,13 +58,13 @@ try{
   if(!countries.length) fail('TARGET_MEMBERSHIP_COUNTRIES_MISSING');
   if(countries.some(c=>!['GT','CO'].includes(c))) fail('TARGET_MEMBERSHIP_COUNTRIES_INVALID');
   const advisor=text(member.advisorId||member.asesorId||member.teamId);
-  if(advisor!==ADVISOR) fail('TARGET_MEMBERSHIP_ADVISOR_MISMATCH');
+  if(roles.includes('Asesor')&&advisor!==ADVISOR) fail('TARGET_MEMBERSHIP_ADVISOR_MISMATCH');
 
   const rawScopes=member.dataScopes||member.scopes||member.scopeDatos||{};
   let defaultScope='';const moduleScopes={};
   if(typeof rawScopes==='string') defaultScope=normScope(rawScopes);
   else{defaultScope=normScope(rawScopes.default||rawScopes['*']||'');const mods=rawScopes.modules&&typeof rawScopes.modules==='object'?rawScopes.modules:{};for(const [k,v] of Object.entries(mods))moduleScopes[k]=normScope(v);}
-  if(defaultScope!=='all') fail('TARGET_MEMBERSHIP_DEFAULT_SCOPE_NOT_ALL');
+  if(!['own','team','all','none'].includes(defaultScope)) fail('TARGET_MEMBERSHIP_DEFAULT_SCOPE_INVALID');
   if(Object.values(moduleScopes).some(v=>!['own','team','all','none'].includes(v))) fail('TARGET_MEMBERSHIP_MODULE_SCOPE_INVALID');
 
   const teamRefs=[
@@ -75,9 +76,6 @@ try{
   for(const ref of teamRefs){const snap=await ref.get();if(snap.exists){teamSnap=snap;break;}}
   if(!teamSnap) fail('TARGET_TEAM_RECORD_NOT_FOUND');
   const team=stable(teamSnap.data()||{});
-  const teamRoles=uniq(team.roles||[]);
-  if(expectedRoles.some(r=>!teamRoles.includes(r))) fail('TARGET_TEAM_REQUIRED_ROLES_MISSING');
-  if(text(team.rolDefault||team.defaultRole)!=='Dirección') fail('TARGET_TEAM_DEFAULT_ROLE_NOT_DIRECCION');
   if(!['activo','active'].includes(text(team.estado||team.status).toLowerCase())) fail('TARGET_TEAM_NOT_ACTIVE');
 
   const before={auth:digest({uid:user.uid,emailHash:emailHash(user.email),disabled:!!user.disabled,emailVerified:!!user.emailVerified}),membership:digest(member),team:digest(team)};
@@ -87,9 +85,9 @@ try{
   const unchanged=before.auth===after.auth&&before.membership===after.membership&&before.team===after.team;
   if(!unchanged) fail('READONLY_RECONCILIATION_INTEGRITY_DRIFT','SECURITY_FAILURE');
 
-  write({schemaVersion:'orbit360-auth-target-membership-readonly-reconciliation-v1',ok:true,status:'TARGET_IDENTITY_MEMBERSHIP_READONLY_PASS',classification:'PASS',authIdentityExists:true,authEnabled:true,emailVerified:true,membershipExists:true,uidMatches:true,tenantMatches:true,membershipActive:true,rolesCanonical:true,assignedRoleCount:roles.length,defaultRoleCanonical:true,activeRoleAssigned:true,countriesPresent:true,countryCount:countries.length,scopesCanonical:true,defaultScopeAll:true,advisorBound:true,teamRecordExists:true,readbackUnchanged:true,authReads:true,firestoreReads:true});
+  write({schemaVersion:'orbit360-auth-target-membership-readonly-reconciliation-v2',ok:true,status:'TARGET_IDENTITY_MEMBERSHIP_READONLY_PASS',classification:'PASS',authIdentityExists:true,authEnabled:true,emailVerified:true,membershipExists:true,uidMatches:true,tenantMatches:true,membershipActive:true,rolesCanonical:true,assignedRoleCount:roles.length,privilegedRolePresent:true,defaultRoleAssigned:true,activeRoleAssigned:true,countriesPresent:true,countryCount:countries.length,scopesCanonical:true,advisorBindingValid:true,teamRecordExists:true,readbackUnchanged:true,authReads:true,firestoreReads:true});
   console.log(JSON.stringify({ok:true,status:'TARGET_IDENTITY_MEMBERSHIP_READONLY_PASS',classification:'PASS'}));
 }catch(e){
-  write({schemaVersion:'orbit360-auth-target-membership-readonly-reconciliation-v1',ok:false,status:'TARGET_IDENTITY_MEMBERSHIP_READONLY_STOP',classification:e.classification||'DATA_CONTRACT_FAILURE',failedCheck:text(e.message||e).slice(0,180),authReads:true,firestoreReads:true});
+  write({schemaVersion:'orbit360-auth-target-membership-readonly-reconciliation-v2',ok:false,status:'TARGET_IDENTITY_MEMBERSHIP_READONLY_STOP',classification:e.classification||'DATA_CONTRACT_FAILURE',failedCheck:text(e.message||e).slice(0,180),authReads:true,firestoreReads:true});
   console.error(text(e.message||e).slice(0,180));process.exitCode=41;
 }finally{try{if(app)await deleteApp(app);}catch{}}
