@@ -54,6 +54,7 @@ jobs:
             AUTH_PAULA_MEMBERSHIP_READONLY_RECONCILE_V2) MODE=readonly; REVISION=canonical-multirol-v2-fresh-evidence-bound ;;
             AUTH_PAULA_MEMBERSHIP_SCOPE_CANONICAL_REPAIR_V1) MODE=repair; REVISION=canonical-scope-repair-v1-semantic-noexpansion ;;
             AUTH_PAULA_REAL_BROWSER_READONLY_SMOKE_V1) MODE=smoke; REVISION=paula-real-browser-sw-parity-v1 ;;
+            AUTH_PAULA_REAL_BROWSER_POSTAUTH_CUSTOM_TOKEN_READONLY_V1) MODE=smoke; REVISION=paula-postauth-custom-token-readonly-v1 ;;
             *) echo 'PIPELINE_MECHANISM_FAILURE:REQUEST_VERSION_NOT_ALLOWED' >&2; exit 41 ;;
           esac
           mkdir -p "$EVIDENCE_DIR"
@@ -97,12 +98,13 @@ jobs:
           grep -F 'node tools/orbit360-auth-paula-real-browser-smoke-summarize-v20260817.mjs' "$GITHUB_WORKSPACE/.github/workflows/orbit360-auth-paula-membership-readonly-reconcile-v4-20260817.yml" >/dev/null
           STALE_NEEDLE='npx playwright install --with-deps ''chromium'
           if grep -F "$STALE_NEEDLE" "$GITHUB_WORKSPACE/.github/workflows/orbit360-auth-paula-membership-readonly-reconcile-v4-20260817.yml" >/dev/null; then echo 'PIPELINE_MECHANISM_FAILURE:STALE_PLAYWRIGHT_BROWSER_INSTALL_REMAINS' >&2; exit 41; fi
+          if grep -F 'ORBIT360_LAB_LOGIN_PASSWORD' "$GITHUB_WORKSPACE/.github/workflows/orbit360-auth-paula-membership-readonly-reconcile-v4-20260817.yml" >/dev/null; then echo 'PIPELINE_MECHANISM_FAILURE:STALE_PASSWORD_SECRET_BINDING_REMAINS' >&2; exit 41; fi
           test ! -e "$ORBIT360_RECON_EVIDENCE"
           test ! -e "$ORBIT360_PREFLIGHT_EVIDENCE"
           if [ "$ORBIT360_PIPELINE_MODE" = smoke ]; then
             rm -f "$EVIDENCE_DIR/r4-certified-validator-rootfix-source-v20260815.json"
             node tools/orbit360-r4-certified-product-smoke-wrapper-v20260815.mjs --self-test
-            jq -e '.ok==true and .status=="R4_CERTIFIED_VALIDATOR_ROOTFIX_SOURCE_PASS" and .serviceWorkerParityEnabled==true and .serviceWorkersBlockedInExecutableHarness==false and .staleLegacyAuthPathRemovedFromExecutableHarness==true and .productAuthPathBoundExactlyOnce==true and .browserExecuted==false and .secretAccess==false and .dataAccess==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .deployExecuted==false and .packageRebuilt==false' "$EVIDENCE_DIR/r4-certified-validator-rootfix-source-v20260815.json" >/dev/null
+            jq -e '.ok==true and .status=="R4_CERTIFIED_VALIDATOR_ROOTFIX_SOURCE_PASS" and .serviceWorkerParityEnabled==true and .serviceWorkersBlockedInExecutableHarness==false and .staleLegacyAuthPathRemovedFromExecutableHarness==true and .productAuthPathBoundExactlyOnce==true and .runnerBrowserExecutableBound==true and .customTokenPathBound==true and .passwordSubmitPathRemoved==true and .postAuthActivationBound==true and .tokenNeverPersistedByHarness==true and .authMechanism=="custom-token-ephemeral" and .passwordSecretUsed==false and .browserExecuted==false and .secretAccess==false and .dataAccess==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .deployExecuted==false and .packageRebuilt==false' "$EVIDENCE_DIR/r4-certified-validator-rootfix-source-v20260815.json" >/dev/null
           fi
       - name: Register current gate phases in working tree
         shell: bash
@@ -138,7 +140,11 @@ jobs:
             repair)
               jq -e --arg run "$GITHUB_RUN_ID" '.status=="GO_GATE_CONTRACT" and .classification=="GO_TARGET_MEMBERSHIP_SCOPE_CANONICAL_REPAIR" and .contractVersion=="14.3.0" and .ok==true and .runId==$run and .executionAuthorized==true and .secretAccessAuthorized==true and .firestoreReadAuthorized==true and .writeAuthorized==true and .authWriteAuthorized==false and .firestoreWriteBudget==1 and .semanticAccessExpansionAllowed==false and .browserAuthorized==false and .deployAuthorized==false and .productionAuthorized==false' "$ORBIT360_PREFLIGHT_EVIDENCE" >/dev/null ;;
             smoke)
-              jq -e --arg run "$GITHUB_RUN_ID" '.status=="GO_GATE_CONTRACT" and .classification=="GO_PAULA_REAL_BROWSER_READONLY_SMOKE" and .contractVersion=="14.3.0" and .ok==true and .runId==$run and .executionAuthorized==true and .secretAccessAuthorized==true and .firestoreReadAuthorized==true and .writeAuthorized==false and .authWriteAuthorized==false and .runtimeAuthorized==true and .browserAuthorized==true and .deployAuthorized==false and .productionAuthorized==false and .serviceWorkerParityRequired==true and .targetIdentityMatchRequired==true and .repairBasisRunId=="32092348630" and .targetCount==1' "$ORBIT360_PREFLIGHT_EVIDENCE" >/dev/null ;;
+              if [ "$ORBIT360_EXPECTED_REQUEST_VERSION" = AUTH_PAULA_REAL_BROWSER_POSTAUTH_CUSTOM_TOKEN_READONLY_V1 ]; then
+                jq -e --arg run "$GITHUB_RUN_ID" '.status=="GO_GATE_CONTRACT" and .classification=="GO_PAULA_POSTAUTH_CUSTOM_TOKEN_READONLY_SMOKE" and .contractVersion=="14.3.0" and .ok==true and .runId==$run and .executionAuthorized==true and .secretAccessAuthorized==true and .firestoreReadAuthorized==true and .customTokenMintAuthorized==true and .passwordSecretReadAuthorized==false and .writeAuthorized==false and .authWriteAuthorized==false and .runtimeAuthorized==true and .browserAuthorized==true and .deployAuthorized==false and .productionAuthorized==false and .serviceWorkerParityRequired==true and .targetIdentityMatchRequired==true and .customTokenExactTargetRequired==true and .customTokenPersistenceAllowed==false and .repairBasisRunId=="32092348630" and .priorCredentialRunId=="32095105528" and .targetCount==1' "$ORBIT360_PREFLIGHT_EVIDENCE" >/dev/null
+              else
+                jq -e --arg run "$GITHUB_RUN_ID" '.status=="GO_GATE_CONTRACT" and .classification=="GO_PAULA_REAL_BROWSER_READONLY_SMOKE" and .contractVersion=="14.3.0" and .ok==true and .runId==$run and .executionAuthorized==true and .secretAccessAuthorized==true and .firestoreReadAuthorized==true and .writeAuthorized==false and .authWriteAuthorized==false and .runtimeAuthorized==true and .browserAuthorized==true and .deployAuthorized==false and .productionAuthorized==false and .serviceWorkerParityRequired==true and .targetIdentityMatchRequired==true and .repairBasisRunId=="32092348630" and .targetCount==1' "$ORBIT360_PREFLIGHT_EVIDENCE" >/dev/null
+              fi ;;
           esac
           jq '.currentStage="CANONICAL_PREFLIGHT_PASS"' "$ORBIT360_STAGE_JOURNAL" > "$ORBIT360_STAGE_JOURNAL.tmp" && mv "$ORBIT360_STAGE_JOURNAL.tmp" "$ORBIT360_STAGE_JOURNAL"
       - name: Install authorized runtime dependencies after GO
@@ -161,13 +167,12 @@ jobs:
           else
             npm install --no-save --package-lock=false --ignore-scripts firebase-admin@13.10.0 >/dev/null
           fi
-      - name: Bind provider and existing smoke secret after GO
+      - name: Bind provider after GO
         if: steps.preflight.outcome == 'success'
         env:
           SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
           SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
           SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-          EXISTING_LOGIN_PASSWORD: ${{ secrets.ORBIT360_LAB_LOGIN_PASSWORD }}
         shell: bash
         run: |
           set -euo pipefail
@@ -180,10 +185,6 @@ jobs:
           test "$(jq -r '.project_id // empty' "$KEY_FILE")" = "$ORBIT360_PROJECT_ID"
           echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
           echo "ORBIT360_TEMP_KEY_FILE=$KEY_FILE" >> "$GITHUB_ENV"
-          if [ "$ORBIT360_PIPELINE_MODE" = smoke ]; then
-            test ${#EXISTING_LOGIN_PASSWORD} -ge 12
-            echo "ORBIT360_PRODUCT_SMOKE_PASSWORD=$EXISTING_LOGIN_PASSWORD" >> "$GITHUB_ENV"
-          fi
       - name: Bind eligible smoke identity to Paula before browser
         if: steps.preflight.outcome == 'success' && env.ORBIT360_PIPELINE_MODE == 'smoke'
         shell: bash
@@ -250,5 +251,5 @@ jobs:
           case "$ORBIT360_PIPELINE_MODE" in
             repair) jq -e --arg run "$GITHUB_RUN_ID" '.ok==true and (.status=="TARGET_MEMBERSHIP_SCOPE_CANONICAL_REPAIR_PASS" or .status=="TARGET_MEMBERSHIP_SCOPE_ALREADY_CANONICAL") and .classification=="PASS" and .runId==$run and .validatorRevision=="canonical-scope-repair-v1-semantic-noexpansion" and .authWrites==0 and (.firestoreWrites==0 or .firestoreWrites==1) and .semanticAccessExpansion==false and .beforeEffectiveDefaultScope=="all" and .afterEffectiveDefaultScope=="all" and .readbackUnchangedExceptTarget==true' "$ORBIT360_RECON_EVIDENCE" >/dev/null ;;
             readonly) jq -e --arg run "$GITHUB_RUN_ID" '.ok==true and .status=="TARGET_IDENTITY_MEMBERSHIP_READONLY_PASS" and .classification=="PASS" and .runId==$run and .validatorRevision=="canonical-multirol-v2-fresh-evidence-bound" and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .readbackUnchanged==true' "$ORBIT360_RECON_EVIDENCE" >/dev/null ;;
-            smoke) jq -e --arg run "$GITHUB_RUN_ID" '.ok==true and .status=="AUTH_PAULA_REAL_BROWSER_READONLY_SMOKE_PASS" and .classification=="PASS" and .runId==$run and .validatorRevision=="paula-real-browser-sw-parity-v1" and .targetIdentityMatches==true and .serviceWorkerParityEnabled==true and .browserExecuted==true and .authSignedIn==true and .emailVerified==true and .membershipAvailable==true and .membershipActive==true and .tenantMatches==true and .runtimeStarted==true and .storeWriteEnabled==false and .pageErrorCount==0 and .consoleErrorCount==0 and .httpFailureCount==0 and .writeSignalCount==0 and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .deployExecuted==false and .packageRebuilt==false and .productionMutationExecuted==false' "$ORBIT360_RECON_EVIDENCE" >/dev/null ;;
+            smoke) jq -e --arg run "$GITHUB_RUN_ID" --arg rev "$ORBIT360_EXPECTED_RESULT_REVISION" '.ok==true and .status=="AUTH_PAULA_REAL_BROWSER_READONLY_SMOKE_PASS" and .classification=="PASS" and .runId==$run and .validatorRevision==$rev and .targetIdentityMatches==true and .serviceWorkerParityEnabled==true and .browserExecuted==true and .authSignedIn==true and .emailVerified==true and .membershipAvailable==true and .membershipActive==true and .tenantMatches==true and .runtimeStarted==true and .storeWriteEnabled==false and .pageErrorCount==0 and .consoleErrorCount==0 and .httpFailureCount==0 and .writeSignalCount==0 and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .deployExecuted==false and .packageRebuilt==false and .productionMutationExecuted==false and (if $rev=="paula-postauth-custom-token-readonly-v1" then .authMechanism=="custom-token-ephemeral" and .passwordSecretUsed==false and .customTokenPersisted==false and .customTokenMintedForExactTarget==true and .sourceMechanismPass==true else true end)' "$ORBIT360_RECON_EVIDENCE" >/dev/null ;;
           esac
