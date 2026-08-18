@@ -16,16 +16,21 @@ const RUN_ID=String(process.env.ORBIT360_RECON_RUN_ID||'').trim();
 const VALIDATOR_REVISION='canonical-multirol-v2-fresh-evidence-bound';
 const VALID_ROLES=new Set(['Dirección','SuperAdmin','AdminTenant','Operativo','Finanzas','Marketing','Asesor','Comercial','Asistente']);
 const PRIVILEGED=new Set(['Dirección','SuperAdmin','AdminTenant']);
+const VALID_SCOPES=new Set(['own','team','all','none']);
+const ROLE_FALLBACK=Object.freeze({'Dirección':'all','SuperAdmin':'all','AdminTenant':'all','Operativo':'team','Finanzas':'all','Marketing':'team','Asesor':'own','Comercial':'own','Asistente':'team'});
 const text=v=>String(v==null?'':v).trim();
 const sha=v=>crypto.createHash('sha256').update(String(v==null?'':v),'utf8').digest('hex');
 const emailHash=v=>sha(text(v).toLowerCase().replace(/\s+/g,''));
 const uniq=a=>[...new Set([].concat(a||[]).map(text).filter(Boolean))];
-const normScope=v=>({propios:'own',propio:'own',own:'own',equipo:'team',team:'team',todos:'all',all:'all',ninguno:'none',none:'none'}[text(v).toLowerCase()]||text(v).toLowerCase());
+const normScope=v=>({propios:'own',propio:'own',own:'own',mios:'own',equipo:'team',team:'team',todos:'all',all:'all',global:'all',ninguno:'none',none:'none',sin_acceso:'none',sinacceso:'none'}[text(v).toLowerCase()]||text(v).toLowerCase());
 const stable=v=>{if(v==null)return v;if(Array.isArray(v))return v.map(stable);if(typeof v?.toDate==='function')return v.toDate().toISOString();if(typeof v==='object')return Object.fromEntries(Object.keys(v).sort().map(k=>[k,stable(v[k])]));return v;};
 const digest=v=>sha(JSON.stringify(stable(v)));
+const scopeKind=v=>v==null?'absent':Array.isArray(v)?'array':typeof v;
+const safeScope=v=>VALID_SCOPES.has(normScope(v))?normScope(v):'';
 function write(p){fs.mkdirSync(path.dirname(OUT),{recursive:true});fs.writeFileSync(OUT,JSON.stringify({...p,runId:RUN_ID,validatorRevision:VALIDATOR_REVISION,projectId:PROJECT,tenantIdHash:sha(TENANT),targetAdvisorId:ADVISOR,targetEmailHash:TARGET_HASH,containsPII:false,containsSecrets:false,containsPassword:false,containsActionLink:false,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,productionTouched:false,mainTouched:false,mergeExecuted:false},null,2)+'\n','utf8');}
 function fail(code,classification='DATA_CONTRACT_FAILURE'){const e=new Error(code);e.classification=classification;throw e;}
 let app;
+let diagnostic={};
 try{
   if(!RUN_ID) fail('FRESH_EVIDENCE_RUN_ID_NOT_BOUND','PIPELINE_MECHANISM_FAILURE');
   if(!process.env.ORBIT360_RECON_EVIDENCE) fail('FRESH_EVIDENCE_PATH_NOT_BOUND','PIPELINE_MECHANISM_FAILURE');
@@ -64,12 +69,37 @@ try{
   const advisor=text(member.advisorId||member.asesorId||member.teamId);
   if(roles.includes('Asesor')&&advisor!==ADVISOR) fail('TARGET_MEMBERSHIP_ADVISOR_MISMATCH');
 
+  const hasDataScopes=Object.prototype.hasOwnProperty.call(member,'dataScopes');
+  const hasScopes=Object.prototype.hasOwnProperty.call(member,'scopes');
+  const hasScopeDatos=Object.prototype.hasOwnProperty.call(member,'scopeDatos');
+  const selectedSource=member.dataScopes?'dataScopes':member.scopes?'scopes':member.scopeDatos?'scopeDatos':'none';
   const rawScopes=member.dataScopes||member.scopes||member.scopeDatos||{};
   let defaultScope='';const moduleScopes={};
   if(typeof rawScopes==='string') defaultScope=normScope(rawScopes);
   else{defaultScope=normScope(rawScopes.default||rawScopes['*']||'');const mods=rawScopes.modules&&typeof rawScopes.modules==='object'?rawScopes.modules:{};for(const [k,v] of Object.entries(mods))moduleScopes[k]=normScope(v);}
-  if(!['own','team','all','none'].includes(defaultScope)) fail('TARGET_MEMBERSHIP_DEFAULT_SCOPE_INVALID');
-  if(Object.values(moduleScopes).some(v=>!['own','team','all','none'].includes(v))) fail('TARGET_MEMBERSHIP_MODULE_SCOPE_INVALID');
+  diagnostic={
+    scopeDiagnosticVersion:'sanitized-v1',
+    defaultRole,
+    activeRole,
+    activeRoleFallbackScope:ROLE_FALLBACK[activeRole]||'none',
+    hasDataScopes,
+    dataScopesKind:scopeKind(member.dataScopes),
+    dataScopesHasDefault:!!(member.dataScopes&&typeof member.dataScopes==='object'&&(member.dataScopes.default||member.dataScopes['*'])),
+    dataScopesDefaultNormalized:member.dataScopes&&typeof member.dataScopes==='object'?safeScope(member.dataScopes.default||member.dataScopes['*']):'',
+    hasScopes,
+    scopesKind:scopeKind(member.scopes),
+    scopesHasDefault:!!(member.scopes&&typeof member.scopes==='object'&&(member.scopes.default||member.scopes['*'])),
+    scopesDefaultNormalized:member.scopes&&typeof member.scopes==='object'?safeScope(member.scopes.default||member.scopes['*']):'',
+    hasLegacyScopeDatos:hasScopeDatos,
+    legacyScopeDatosKind:scopeKind(member.scopeDatos),
+    legacyScopeDatosNormalized:typeof member.scopeDatos==='string'?safeScope(member.scopeDatos):'',
+    selectedScopeSource:selectedSource,
+    selectedScopeKind:scopeKind(rawScopes),
+    selectedDefaultScopeNormalized:VALID_SCOPES.has(defaultScope)?defaultScope:'',
+    storedScopeValid:VALID_SCOPES.has(defaultScope)
+  };
+  if(!VALID_SCOPES.has(defaultScope)) fail('TARGET_MEMBERSHIP_DEFAULT_SCOPE_INVALID');
+  if(Object.values(moduleScopes).some(v=>!VALID_SCOPES.has(v))) fail('TARGET_MEMBERSHIP_MODULE_SCOPE_INVALID');
 
   const teamRefs=[
     db.collection('tenantId').doc(TENANT).collection('asesores').doc(ADVISOR),
@@ -89,9 +119,9 @@ try{
   const unchanged=before.auth===after.auth&&before.membership===after.membership&&before.team===after.team;
   if(!unchanged) fail('READONLY_RECONCILIATION_INTEGRITY_DRIFT','SECURITY_FAILURE');
 
-  write({schemaVersion:'orbit360-auth-target-membership-readonly-reconciliation-v2',ok:true,status:'TARGET_IDENTITY_MEMBERSHIP_READONLY_PASS',classification:'PASS',authIdentityExists:true,authEnabled:true,emailVerified:true,membershipExists:true,uidMatches:true,tenantMatches:true,membershipActive:true,rolesCanonical:true,assignedRoleCount:roles.length,privilegedRolePresent:true,defaultRoleAssigned:true,activeRoleAssigned:true,countriesPresent:true,countryCount:countries.length,scopesCanonical:true,advisorBindingValid:true,teamRecordExists:true,readbackUnchanged:true,authReads:true,firestoreReads:true});
+  write({schemaVersion:'orbit360-auth-target-membership-readonly-reconciliation-v2',ok:true,status:'TARGET_IDENTITY_MEMBERSHIP_READONLY_PASS',classification:'PASS',...diagnostic,authIdentityExists:true,authEnabled:true,emailVerified:true,membershipExists:true,uidMatches:true,tenantMatches:true,membershipActive:true,rolesCanonical:true,assignedRoleCount:roles.length,privilegedRolePresent:true,defaultRoleAssigned:true,activeRoleAssigned:true,countriesPresent:true,countryCount:countries.length,scopesCanonical:true,advisorBindingValid:true,teamRecordExists:true,readbackUnchanged:true,authReads:true,firestoreReads:true});
   console.log(JSON.stringify({ok:true,status:'TARGET_IDENTITY_MEMBERSHIP_READONLY_PASS',classification:'PASS',runId:RUN_ID}));
 }catch(e){
-  write({schemaVersion:'orbit360-auth-target-membership-readonly-reconciliation-v2',ok:false,status:'TARGET_IDENTITY_MEMBERSHIP_READONLY_STOP',classification:e.classification||'DATA_CONTRACT_FAILURE',failedCheck:text(e.message||e).slice(0,180),authReads:true,firestoreReads:true});
+  write({schemaVersion:'orbit360-auth-target-membership-readonly-reconciliation-v2',ok:false,status:'TARGET_IDENTITY_MEMBERSHIP_READONLY_STOP',classification:e.classification||'DATA_CONTRACT_FAILURE',failedCheck:text(e.message||e).slice(0,180),...diagnostic,authReads:true,firestoreReads:true});
   console.error(text(e.message||e).slice(0,180));process.exitCode=41;
 }finally{try{if(app)await deleteApp(app);}catch{}}
