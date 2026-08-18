@@ -1,14 +1,16 @@
 {
   "schemaVersion": "orbit360-live-state-v1",
-  "stateVersion": "20260818.f0-closed-f1-source-attribution-25.current",
-  "updatedAt": "2026-08-18T12:27:00-06:00",
-  "phase": "F1_RUNTIME_BOOTSTRAP_ROOT_CAUSE_SOURCE_ONLY",
+  "stateVersion": "20260818.f1-observer-selftest-pass-37_5.runtime-observation-auth-pending.current",
+  "updatedAt": "2026-08-18T12:49:35-06:00",
+  "phase": "F1_RUNTIME_BOOTSTRAP_OBSERVATION_AUTH_PENDING",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pr": 5,
   "prState": "draft-open",
-  "controlPlaneParentHead": "6f52087f249ae5e4ab7dfafc42a037c9c3950d21",
   "observerSourceHead": "6d68495ec92f103c805503a42b46bd5a755c3ef9",
+  "sourceOnlyMaterializationHead": "2a8490e1ca9c720bc2e603e1244faee3a8e4da98",
+  "sourceOnlyEvidenceCommit": "83e67058cec461677e7b3769bf0755fb0d0bf4f2",
+  "checkpointCommit": "988546f17897fcc38ee92bf5d4fed5201a510435",
   "currentPublishedPackage": {
     "version": "R4S9C",
     "sha256": "917f5424deea06d224d45a1b039c0b3699d71a7bef430b2a40d059703b2acc3a",
@@ -60,6 +62,25 @@
     "classification": "FUNCTIONAL_DEFECT",
     "failedCheck": "R4_RUNTIME_ACTIVATION_TRIGGER_FAILED"
   },
+  "lastSourceOnlyEvidence": {
+    "path": "orbit360-platform/runtime-gate-crm-v20260716/r4-role-route-attribution-selftest-v20260818.json",
+    "status": "R4_ROLE_ROUTE_ATTRIBUTION_SELFTEST_PASS",
+    "classification": "VALIDATOR_STALE_ROOTFIX_PASS",
+    "targetBound": true,
+    "browserExecuted": false,
+    "secretAccess": false,
+    "dataAccess": false,
+    "productionTouched": false,
+    "firestoreWrites": 0,
+    "authWrites": 0,
+    "operationalWrites": 0,
+    "deployExecuted": false,
+    "packageRebuilt": false,
+    "materializedFromHead": "2a8490e1ca9c720bc2e603e1244faee3a8e4da98",
+    "observerGitBlob": "8190abf0ca77a5e63f228e55a7cbd7bcb0a03786",
+    "baseHarnessGitBlob": "07a002b43f6b4778891f0afdf86d9f3222dd3141",
+    "certifiedWrapperGitBlob": "c4cc63d561361b9e7967b344b9032834e6b71d53"
+  },
   "rootCauseState": {
     "methodology": {
       "classification": "PIPELINE_MECHANISM_FAILURE",
@@ -69,7 +90,7 @@
     "technicalBlocker": {
       "classification": "FUNCTIONAL_DEFECT",
       "code": "R4_RUNTIME_ACTIVATION_TRIGGER_FAILED",
-      "status": "OPEN_STOP_RETRY_SOURCE_ONLY_DIAGNOSIS"
+      "status": "OPEN_STOP_RETRY_OBSERVER_CERTIFIED_RUNTIME_OBSERVATION_PENDING"
     },
     "sourceAttribution": {
       "outerOwner": "orbit360-platform/core/product-app-p0.js",
@@ -79,6 +100,7 @@
       "publishedOwnerParity": true,
       "outerBehavior": "Converts bootstrap ok/ready failure to PRODUCT_READONLY_BOOTSTRAP_NOT_READY",
       "innerBehavior": "Captures internal exception into status.errors, transitions blocked, returns fail-closed result",
+      "observerSelfTest": "PASS",
       "specificInnerFailure": "UNKNOWN_PENDING_SANITIZED_OBSERVATION",
       "inferenceForbidden": true
     },
@@ -93,11 +115,12 @@
     "currentAddendum": "orbit360-platform/docs/ADDENDUM-MAESTRO-CIERRE-FORENSE-SINCRONIZACION-Y-PLAN-CONGELADO-20260818.md",
     "f0Checkpoint": "orbit360-platform/docs/CHECKPOINT-F0-RECONCILIACION-FORENSE-20260818.md",
     "currentCheckpoint": "orbit360-platform/docs/CHECKPOINT-F1-SOURCE-ONLY-BOOTSTRAP-ATTRIBUTION-20260818.md",
-    "readmeSynchronized": true,
-    "prSynchronized": true,
-    "indexSynchronized": true,
+    "readmeSynchronized": false,
+    "prSynchronized": false,
+    "indexSynchronized": false,
     "historicalPolicy": "HISTORICAL_NOT_CURRENT_STATE",
-    "documentationSynchronized": true
+    "documentationSynchronized": false,
+    "transactionStatus": "IN_PROGRESS_AFTER_SOURCE_ONLY_PASS"
   },
   "frozenPlan": {
     "source": "orbit360-platform/docs/ADDENDUM-MAESTRO-CIERRE-FORENSE-SINCRONIZACION-Y-PLAN-CONGELADO-20260818.md",
@@ -112,10 +135,11 @@
       "closedPhases": ["F0"],
       "remainingPhases": ["F1", "F2", "F3", "F4", "F5", "F6", "F7"]
     },
-    "currentPhaseInternalPercent": 25,
+    "currentPhaseInternalPercent": 37.5,
     "currentPhaseSubphases": {
       "F1_1_owner_and_observer_source": "CLOSED",
-      "F1_2_sanitized_inner_phase_error": "PENDING",
+      "F1_2A_observer_selftest": "CLOSED",
+      "F1_2B_sanitized_inner_phase_error_runtime_observation": "PENDING_AUTHORIZATION",
       "F1_3_owner_rootfix_source_static_synthetic": "PENDING",
       "F1_4_attribution_close_and_single_runtime_frontier": "PENDING"
     }
@@ -138,7 +162,7 @@
     "sourceOnlyDiagnosisAllowed": true
   },
   "goLive": {
-    "status": "PAUSED_FOR_RUNTIME_ACTIVATION_ROOT_CAUSE",
+    "status": "PAUSED_FOR_SINGLE_SANITIZED_RUNTIME_OBSERVATION",
     "publicUrl": "https://app.aysseguros.com",
     "publishedPackagePreserved": true,
     "productionOperationalDeclared": false,
@@ -154,16 +178,17 @@
     "deployAllowedForDiagnosis": false
   },
   "nextActionExact": {
-    "stage": "F1_2_SOURCE_ONLY_OBSERVER_SELFTEST",
-    "action": "Materialize or execute only the --self-test-only path of tools/orbit360-r4-role-route-attribution-wrapper-v20260816.mjs in a source-only lane that cannot bind provider, browser, secrets or runtime. Require R4_ROLE_ROUTE_ATTRIBUTION_SELFTEST_PASS and all single-invocation/allowlist/restore/no-external-operation checks. Persist sanitized evidence. Only after that design the single authorized runtime observation needed to capture bootstrapObservation.phase/errors. Do not rerun request 32155605314 and do not execute browser/runtime/deploy/candidate now."
+    "stage": "F1_2B_SINGLE_RUNTIME_BOOTSTRAP_OBSERVATION",
+    "authorizationRequired": "EXPLICIT_RUNTIME_BROWSER_AUTHORIZATION",
+    "action": "After explicit authorization only: run the gate-contract validator first; create a new unique immutable single-use request bound to the already-certified observer; execute one read-only browser/runtime frontier; capture only bootstrapObservation.phase/errors/assignedRoleCount/countryCount/collectionCount/ready/writeAuthorized plus sanitized outer error; stop immediately and synchronize documentation. Do not rerun 32155605314, do not deploy/rebuild/create candidate, do not reset password/create users/change memberships or data, and do not perform rootfix before this evidence."
   },
   "resumeProtocol": [
     "Read ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json",
     "Read this live-state",
     "Confirm actual HEAD and PR #5",
-    "Read lastRuntimeEvidence and lastLifecycleEvidence",
+    "Read lastRuntimeEvidence, lastLifecycleEvidence and lastSourceOnlyEvidence",
     "Read currentCheckpoint",
     "Validate nextActionExact",
-    "Execute only nextActionExact"
+    "Execute only nextActionExact within its authorization boundary"
   ]
 }
