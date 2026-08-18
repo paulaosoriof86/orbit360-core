@@ -151,7 +151,7 @@ function selfTest(contract, harness) {
   const manifestStatusBoundExactlyOnce = count(harness.patched, contract.manifestStatus) === 1;
   const serviceWorkerParityEnabled = !harness.patched.includes("serviceWorkers: 'block'");
   const runnerBrowserExecutableBound = count(harness.patched, 'ORBIT360_SYSTEM_BROWSER_EXECUTABLE') === 1 && !harness.patched.includes('chromium.launch({ headless: true })');
-  const customTokenPathBound = count(harness.patched, 'signInWithCustomToken') === 2 && count(harness.patched, 'accounts:signInWithCustomToken') === 1;
+  const customTokenPathBound = count(harness.patched, 'accounts:signInWithCustomToken') === 1 && count(harness.patched, 'ctx.modules.auth.signInWithCustomToken') === 2;
   const passwordSubmitPathRemoved = !harness.patched.includes('accounts:signInWithPassword') && !harness.patched.includes("page.fill('#lg-pass'") && !harness.patched.includes('ORBIT360_PRODUCT_SMOKE_PASSWORD');
   const postAuthActivationBound = count(harness.patched, "runStage('runtime-activation-trigger'") === 1;
   const tokenNeverPersistedByHarness = !harness.patched.includes('writeFileSync(OUT, CUSTOM_TOKEN') && !harness.patched.includes('customToken: CUSTOM_TOKEN');
