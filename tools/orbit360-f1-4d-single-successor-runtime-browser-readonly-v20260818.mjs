@@ -1,0 +1,66 @@
+#!/usr/bin/env node
+'use strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import crypto from 'node:crypto';
+import {applicationDefault,getApps,initializeApp,deleteApp} from 'firebase-admin/app';
+import {getAuth} from 'firebase-admin/auth';
+import {chromium} from 'playwright';
+
+const ROOT=process.cwd();
+const TARGET=String(process.env.ORBIT360_F1_4D_URL||'').trim();
+const PROJECT=String(process.env.ORBIT360_PRODUCT_PROJECT_ID||'').trim();
+const TENANT=String(process.env.ORBIT360_PRODUCT_TENANT_ID||'').trim();
+const EMAIL=String(process.env.ORBIT360_PRODUCT_SMOKE_EMAIL||'').trim();
+const EMAIL_HASH=String(process.env.ORBIT360_TARGET_EMAIL_HASH||'').trim().toLowerCase();
+const BROWSER=String(process.env.ORBIT360_SYSTEM_BROWSER_EXECUTABLE||'').trim();
+const SOURCE='29caae94a3db1f1626bdde2ea6ee9a21799f9df6';
+const MANIFEST_STATUS='FASE_A_PRODUCT_F1_4C_SUCCESSOR_CERTIFIED';
+const OUT=path.resolve(process.env.ORBIT360_F1_4D_OUT||path.join(ROOT,'orbit360-platform/runtime-gate-crm-v20260716/f1-4d-runtime-browser-readonly.json'));
+const OLD_ERROR='membership_invalid:email_invalido';
+const sha=v=>crypto.createHash('sha256').update(String(v??''),'utf8').digest('hex');
+const clean=v=>String(v==null?'':v).trim();
+const safe=v=>clean(v).replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/ig,'[email-redacted]').replace(/[A-Za-z0-9_-]{60,}/g,'[token-redacted]').slice(0,500);
+function persist(p){fs.mkdirSync(path.dirname(OUT),{recursive:true});fs.writeFileSync(OUT,JSON.stringify(p,null,2)+'\n','utf8');console.log(JSON.stringify(p,null,2));}
+let adminApp,browser,context,page;const writeSignals=[];const pageErrors=[];const consoleErrors=[];let customToken='';
+const base={schemaVersion:'orbit360-f1-4d-single-successor-runtime-browser-readonly-v1',candidateArtifactId:9345207863,candidateSourceHead:SOURCE,candidateZipSha256:'493009c83390901aa772842a2ba9ddd5ce5293f6969d86c5c3395ebd670a44ac',candidateManifestSha256:'29dafe5e63b425ea6cf641937fe1b9d4b9e63f72479a51ae76f9148a55771761',browserExecuted:false,runtimeExecuted:false,secretAccess:true,firestoreRead:false,authRead:true,firestoreWrites:0,authWrites:0,operationalWrites:0,packageRebuilt:false,deployExecuted:false,publicationExecuted:false,productionHostingTouched:false,containsPII:false,containsSecrets:false,customTokenPersisted:false,passwordSecretUsed:false};
+try{
+  if(!/^http:\/\/(127\.0\.0\.1|localhost):\d+\/?$/.test(TARGET))throw new Error('PIPELINE_MECHANISM_FAILURE:F1_4D_LOOPBACK_TARGET_REQUIRED');
+  if(!PROJECT||!TENANT||!EMAIL||!EMAIL_HASH||sha(EMAIL.toLowerCase().replace(/\s+/g,''))!==EMAIL_HASH)throw new Error('PIPELINE_MECHANISM_FAILURE:F1_4D_IDENTITY_CONTEXT_MISMATCH');
+  if(!BROWSER||!fs.existsSync(BROWSER)||!process.env.GOOGLE_APPLICATION_CREDENTIALS)throw new Error('PIPELINE_MECHANISM_FAILURE:F1_4D_PROVIDER_CONTEXT_MISSING');
+  adminApp=getApps()[0]||initializeApp({credential:applicationDefault(),projectId:PROJECT});
+  const adminAuth=getAuth(adminApp);const user=await adminAuth.getUserByEmail(EMAIL);
+  if(!user||user.disabled||user.emailVerified!==true)throw new Error('DATA_CONTRACT_FAILURE:F1_4D_AUTH_IDENTITY_NOT_ELIGIBLE');
+  customToken=await adminAuth.createCustomToken(user.uid,{orbit360F14DReadOnly:true});
+  if(customToken.length<100)throw new Error('PIPELINE_MECHANISM_FAILURE:F1_4D_CUSTOM_TOKEN_MINT_FAILED');
+  browser=await chromium.launch({headless:true,executablePath:BROWSER});
+  context=await browser.newContext({viewport:{width:1440,height:900},ignoreHTTPSErrors:false});
+  page=await context.newPage();base.browserExecuted=true;
+  page.on('pageerror',e=>pageErrors.push(safe(e&&e.message||e)));
+  page.on('console',m=>{if(m.type()==='error')consoleErrors.push(safe(m.text()));});
+  page.on('request',r=>{const u=r.url();if(/firestore\.googleapis\.com\/.+(documents:commit|documents:batchWrite|Firestore\/Write\/channel)/i.test(u)||/identitytoolkit\.googleapis\.com\/.+accounts:(signUp|update|delete)/i.test(u))writeSignals.push(safe(`${r.method()} ${u}`));});
+  const response=await page.goto(TARGET,{waitUntil:'domcontentloaded',timeout:45000});
+  if(!response||response.status()!==200)throw new Error(`ENVIRONMENT_FAILURE:F1_4D_LOCAL_CANDIDATE_HTTP_${response&&response.status()}`);
+  await page.waitForFunction(()=>!!(window.Orbit&&Orbit.productRuntimeBrowserProvidersP0&&Orbit.backendProductReadOnlyBootstrapP0),undefined,{timeout:30000});
+  const manifest=await page.evaluate(async()=>{const r=await fetch('/orbit360-package-manifest.json',{cache:'no-store'});return{status:r.status,json:r.ok?await r.json():null};});
+  if(manifest.status!==200||manifest.json?.status!==MANIFEST_STATUS||manifest.json?.sourceHead!==SOURCE||Number(manifest.json?.fileCount)!==194)throw new Error('ENVIRONMENT_FAILURE:F1_4D_BROWSER_MANIFEST_IDENTITY_MISMATCH');
+  const authHttp=page.waitForResponse(r=>{try{const u=new URL(r.url());return /identitytoolkit\.googleapis\.com/i.test(u.host)&&/accounts:signInWithCustomToken/i.test(u.pathname);}catch{return false;}},{timeout:30000});
+  await page.evaluate(async token=>{const p=Orbit.productRuntimeBrowserProvidersP0;const ctx=await p.initialize();await ctx.modules.auth.signInWithCustomToken(ctx.auth,token);},customToken);
+  customToken='';
+  const authResponse=await authHttp;
+  if(authResponse.status()<200||authResponse.status()>=300)throw new Error(`DATA_CONTRACT_FAILURE:F1_4D_CUSTOM_TOKEN_HTTP_${authResponse.status()}`);
+  const authProjection=await page.evaluate(async()=>{const deps=Orbit.productRuntimeBrowserProvidersP0.dependencies();const u=await Promise.race([deps.authProvider.waitForAuthenticatedUser(),new Promise((_,rej)=>setTimeout(()=>rej(new Error('auth-provider-timeout')),10000))]);return{signedIn:!!u?.uid,emailVerified:u?.emailVerified===true,uid:u?.uid?String(u.uid):''};});
+  if(!authProjection.signedIn||!authProjection.emailVerified)throw new Error('DATA_CONTRACT_FAILURE:F1_4D_AUTH_PROJECTION_INVALID');
+  const membership=await page.evaluate(async({uid,tenant})=>{const deps=Orbit.productRuntimeBrowserProvidersP0.dependencies();const m=await Promise.race([deps.membershipProvider.getByUid(uid),new Promise((_,rej)=>setTimeout(()=>rej(new Error('membership-provider-timeout')),10000))]);const roles=[...new Set([].concat(m?.roles||[],m?.role||m?.rol||[]).map(v=>String(v||'').trim()).filter(Boolean))];return{available:!!m,active:String(m?.status||m?.estado||'').toLowerCase()==='active'||m?.active===true,tenantMatches:String(m?.tenantId||m?.tenant||'')===tenant,roleCount:roles.length};},{uid:authProjection.uid,tenant:TENANT});
+  if(!membership.available||!membership.active||!membership.tenantMatches)throw new Error('DATA_CONTRACT_FAILURE:F1_4D_MEMBERSHIP_PROJECTION_INVALID');
+  base.firestoreRead=true;base.runtimeExecuted=true;
+  const boot=await page.evaluate(async()=>{const cfg=window.__ORBIT360_PRODUCT_PUBLIC_CONFIG__||{};const p=Orbit.productRuntimeBrowserProvidersP0;const owner=Orbit.backendProductReadOnlyBootstrapP0;const result=await owner.start(p.dependencies(),{mode:'product',authorizedProductReadOnly:true,runtimeAuthorized:true,collections:Array.isArray(cfg.collections)?cfg.collections:[],snapshotTimeoutMs:30000});const store=Orbit.store&&typeof Orbit.store._productStatus==='function'?Orbit.store._productStatus():{};return{ok:result?.ok===true,ready:result?.ready===true,storeInstalled:result?.storeInstalled===true,snapshotsAttached:result?.snapshotsAttached===true,writeAuthorized:result?.writeAuthorized===true,status:result?.status||{},store:{ready:store.ready===true,status:String(store.status||''),writeEnabled:store.writeEnabled===true,requiredMissingCount:[].concat(store.requiredMissing||[]).length,requiredFailedCount:[].concat(store.requiredFailed||[]).length}};});
+  const errors=[].concat(boot.status?.errors||[]).map(safe).filter(Boolean);const sameFamily=errors.some(e=>e.includes(OLD_ERROR));const oldErrorAbsent=!sameFamily;
+  const ready=boot.ok&&boot.ready&&boot.storeInstalled&&boot.snapshotsAttached&&!boot.writeAuthorized&&boot.status?.phase==='ready-read-only'&&boot.status?.ready===true&&boot.status?.writeAuthorized===false&&boot.store.ready&&boot.store.status==='ready-read-only'&&!boot.store.writeEnabled&&boot.store.requiredMissingCount===0&&boot.store.requiredFailedCount===0;
+  const securityPass=writeSignals.length===0;
+  const ok=ready&&oldErrorAbsent&&securityPass;
+  const classification=ok?'PASS':sameFamily?'STOP_RETRY_SAME_FAMILY':writeSignals.length?'SECURITY_FAILURE':'FUNCTIONAL_DEFECT';
+  persist({...base,ok,status:ok?'F1_4D_EXACT_SUCCESSOR_BOOTSTRAP_PASS':sameFamily?'F1_4D_STOP_RETRY_SAME_FAMILY':'F1_4D_EXACT_SUCCESSOR_BOOTSTRAP_FAIL',classification,oldErrorAbsent,sameFailureFamilyReappeared:sameFamily,authSignedIn:true,emailVerified:true,membershipAvailable:membership.available,membershipActive:membership.active,tenantMatches:membership.tenantMatches,roleCount:membership.roleCount,bootstrap:{phase:safe(boot.status?.phase),ready:boot.status?.ready===true,errors,assignedRoleCount:Number(boot.status?.assignedRoleCount||0),countryCount:Number(boot.status?.countryCount||0),collectionCount:Number(boot.status?.collectionCount||0),writeAuthorized:boot.status?.writeAuthorized===true,storeInstalled:boot.storeInstalled,snapshotsAttached:boot.snapshotsAttached},store:boot.store,pageErrors:[...new Set(pageErrors)],consoleErrors:[...new Set(consoleErrors)],writeSignals:[...new Set(writeSignals)],firestoreWrites:0,authWrites:0,operationalWrites:0});
+  if(!ok)process.exitCode=sameFamily?42:41;
+}catch(error){const msg=safe(error&&error.message||error);const sameFamily=msg.includes(OLD_ERROR);persist({...base,ok:false,status:sameFamily?'F1_4D_STOP_RETRY_SAME_FAMILY':'F1_4D_RUNTIME_PIPELINE_FAIL',classification:sameFamily?'STOP_RETRY_SAME_FAMILY':msg.split(':')[0]||'PIPELINE_MECHANISM_FAILURE',error:msg,oldErrorAbsent:!sameFamily,sameFailureFamilyReappeared:sameFamily,pageErrors:[...new Set(pageErrors)],consoleErrors:[...new Set(consoleErrors)],writeSignals:[...new Set(writeSignals)],firestoreWrites:0,authWrites:0,operationalWrites:0});process.exitCode=sameFamily?42:41;
+}finally{customToken='';try{if(context)await context.close();}catch{}try{if(browser)await browser.close();}catch{}try{if(adminApp)await deleteApp(adminApp);}catch{}}
