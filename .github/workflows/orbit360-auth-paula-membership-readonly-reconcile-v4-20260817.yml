@@ -3,7 +3,7 @@ on:
   push:
     branches: [ays/backend-tenant-lab-v99-20260703]
     paths:
-      - '.github/orbit360-requests/auth-paula-membership-readonly-reconcile-v2-lab-v20260817.json'
+      - '.github/orbit360-requests/auth-paula-membership-readonly-reconcile-v2-fresh-evidence-lab-v20260817.json'
 permissions:
   contents: write
 concurrency:
@@ -11,7 +11,7 @@ concurrency:
   cancel-in-progress: false
 env:
   ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
-  ORBIT360_REQUEST_FILE: .github/orbit360-requests/auth-paula-membership-readonly-reconcile-v2-lab-v20260817.json
+  ORBIT360_REQUEST_FILE: .github/orbit360-requests/auth-paula-membership-readonly-reconcile-v2-fresh-evidence-lab-v20260817.json
   ORBIT360_EXPECTED_REQUEST_VERSION: AUTH_PAULA_MEMBERSHIP_READONLY_RECONCILE_V2
   ORBIT360_GATE_ID: block-auth-paula-membership-readonly-reconcile-v2-lab-v20260817
   ORBIT360_PROJECT_ID: ays-orbit-360-lab
@@ -19,7 +19,6 @@ env:
   ORBIT360_TARGET_EMAIL_HASH: 9b663847979724e9491e1c655da32a7cb17a5f6ed26dba352de1eb811254b23f
   ORBIT360_TARGET_ADVISOR_ID: ase-paula-osorio
   ORBIT360_LIFECYCLE: tools/orbit360-validator-lifecycle-contract-auth-paula-membership-readonly-reconcile-v2-lab-v20260817.json
-  ORBIT360_RECON_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/auth-paula-membership-readonly-reconciliation-v2-sanitized-v20260817.json
   EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
 jobs:
   reconcile:
@@ -46,6 +45,19 @@ jobs:
           node --check tools/orbit360-auth-paula-membership-readonly-reconcile-v20260817.mjs
           node --check tools/orbit360-validar-gate-contracts-engine-auth-paula-membership-readonly-reconcile-v2-lab-v20260817.mjs
           node --check tools/orbit360-register-auth-paula-membership-readonly-reconcile-v2-gate-v20260817.mjs
+      - name: Validate fresh evidence mechanism source-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          WF=.github/workflows/orbit360-auth-paula-membership-readonly-reconcile-v4-20260817.yml
+          TOOL=tools/orbit360-auth-paula-membership-readonly-reconcile-v20260817.mjs
+          grep -F "ORBIT360_RECON_RUN_ID" "$TOOL" >/dev/null
+          grep -F "canonical-multirol-v2-fresh-evidence-bound" "$TOOL" >/dev/null
+          grep -F 'auth-paula-membership-readonly-reconciliation-v2-run-${GITHUB_RUN_ID}.json' "$WF" >/dev/null
+          if grep -F "const src='orbit360-platform/runtime-gate-crm-v20260716/auth-paula-membership-readonly-reconciliation-sanitized-v20260817.json'" "$WF" >/dev/null; then
+            echo 'PIPELINE_MECHANISM_FAILURE:STALE_EVIDENCE_COPY_STILL_PRESENT' >&2
+            exit 41
+          fi
       - name: Register corrected gate in working tree
         shell: bash
         run: |
@@ -59,6 +71,16 @@ jobs:
           set -euo pipefail
           node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
           jq -e '.status=="GO_GATE_CONTRACT" and .contractVersion=="14.3.0" and .failed==0 and .ok==true and .executionAuthorized==true and .secretAccessAuthorized==true and .firestoreReadAuthorized==true and .writeAuthorized==false and .authWriteAuthorized==false and .runtimeAuthorized==true and .browserAuthorized==false and .deployAuthorized==false and .productionAuthorized==false and .targetCount==1' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+      - name: Prepare unique fresh evidence channel
+        if: steps.preflight.outcome == 'success'
+        shell: bash
+        run: |
+          set -euo pipefail
+          FRESH="$EVIDENCE_DIR/auth-paula-membership-readonly-reconciliation-v2-run-${GITHUB_RUN_ID}.json"
+          rm -f "$FRESH"
+          test ! -e "$FRESH"
+          echo "ORBIT360_RECON_EVIDENCE=$FRESH" >> "$GITHUB_ENV"
+          echo "ORBIT360_RECON_RUN_ID=$GITHUB_RUN_ID" >> "$GITHUB_ENV"
       - name: Install provider dependency
         if: steps.preflight.outcome == 'success'
         run: npm install --no-save --package-lock=false --ignore-scripts firebase-admin@13.10.0 >/dev/null
@@ -88,27 +110,44 @@ jobs:
         shell: bash
         run: |
           if [ -n "${ORBIT360_TEMP_KEY_FILE:-}" ] && [ -f "$ORBIT360_TEMP_KEY_FILE" ]; then shred -u "$ORBIT360_TEMP_KEY_FILE" || rm -f "$ORBIT360_TEMP_KEY_FILE"; fi
-      - name: Seal and persist sanitized evidence
+      - name: Seal and persist sanitized evidence without mutation
         if: always()
         shell: bash
         run: |
           set -euo pipefail
+          if [ -n "${ORBIT360_RECON_EVIDENCE:-}" ]; then
+            test -f "$ORBIT360_RECON_EVIDENCE"
+            jq -e --arg run "$GITHUB_RUN_ID" '.runId==$run and .validatorRevision=="canonical-multirol-v2-fresh-evidence-bound"' "$ORBIT360_RECON_EVIDENCE" >/dev/null
+            BEFORE_SHA="$(sha256sum "$ORBIT360_RECON_EVIDENCE" | awk '{print $1}')"
+          fi
           node --input-type=module <<'NODE'
           import fs from 'node:fs';
-          const src='orbit360-platform/runtime-gate-crm-v20260716/auth-paula-membership-readonly-reconciliation-sanitized-v20260817.json';
-          const dst=process.env.ORBIT360_RECON_EVIDENCE;
-          if(fs.existsSync(src)){const e=JSON.parse(fs.readFileSync(src,'utf8'));e.schemaVersion='orbit360-auth-target-membership-readonly-reconciliation-v2';fs.writeFileSync(dst,JSON.stringify(e,null,2)+'\n');}
-          const lp=process.env.ORBIT360_LIFECYCLE;const e=fs.existsSync(dst)?JSON.parse(fs.readFileSync(dst,'utf8')):{ok:false,status:'NOT_EXECUTED',classification:'PIPELINE_MECHANISM_FAILURE',firestoreWrites:0,authWrites:0,operationalWrites:0};
-          const l=JSON.parse(fs.readFileSync(lp,'utf8'));l.status=e.ok?'AUTH_PAULA_MEMBERSHIP_READONLY_V2_CONSUMED_PASS':'AUTH_PAULA_MEMBERSHIP_READONLY_V2_CONSUMED_STOP_RETRY';l.authorization.activeRequest=false;l.authorization.allowedExecutions=0;l.authorization.consumed=true;l.executionResult={stage:e.status,classification:e.classification,failedCheck:e.failedCheck||'',ok:e.ok===true,firestoreWrites:e.firestoreWrites||0,authWrites:e.authWrites||0,operationalWrites:e.operationalWrites||0};fs.writeFileSync(lp,JSON.stringify(l,null,2)+'\n');
+          const lp=process.env.ORBIT360_LIFECYCLE;
+          const ep=process.env.ORBIT360_RECON_EVIDENCE||'';
+          const preflightPath='orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json';
+          let e;
+          if(ep && fs.existsSync(ep)) e=JSON.parse(fs.readFileSync(ep,'utf8'));
+          else if(fs.existsSync(preflightPath)){const p=JSON.parse(fs.readFileSync(preflightPath,'utf8'));e={ok:false,status:p.status||'NOT_EXECUTED',classification:p.classification||'PIPELINE_MECHANISM_FAILURE',failedCheck:(p.failedCheckIds||[])[0]||'',firestoreWrites:0,authWrites:0,operationalWrites:0};}
+          else e={ok:false,status:'NOT_EXECUTED',classification:'PIPELINE_MECHANISM_FAILURE',failedCheck:'EVIDENCE_NOT_CREATED',firestoreWrites:0,authWrites:0,operationalWrites:0};
+          const l=JSON.parse(fs.readFileSync(lp,'utf8'));
+          l.status=e.ok?'AUTH_PAULA_MEMBERSHIP_READONLY_V2_CONSUMED_PASS':'AUTH_PAULA_MEMBERSHIP_READONLY_V2_CONSUMED_STOP_RETRY';
+          l.authorization.activeRequest=false;l.authorization.allowedExecutions=0;l.authorization.consumed=true;
+          l.executionResult={stage:e.status,classification:e.classification,failedCheck:e.failedCheck||'',ok:e.ok===true,runId:e.runId||'',firestoreWrites:e.firestoreWrites||0,authWrites:e.authWrites||0,operationalWrites:e.operationalWrites||0};
+          fs.writeFileSync(lp,JSON.stringify(l,null,2)+'\n');
           NODE
+          if [ -n "${ORBIT360_RECON_EVIDENCE:-}" ]; then
+            AFTER_SHA="$(sha256sum "$ORBIT360_RECON_EVIDENCE" | awk '{print $1}')"
+            test "$BEFORE_SHA" = "$AFTER_SHA"
+          fi
           git config user.name orbit360-auth-readonly-bot
           git config user.email orbit360-auth-readonly-bot@users.noreply.github.com
           git add tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_LIFECYCLE" "$EVIDENCE_DIR/preflight-sanitizado.json"
-          if [ -f "$ORBIT360_RECON_EVIDENCE" ]; then git add "$ORBIT360_RECON_EVIDENCE"; fi
-          if ! git diff --cached --quiet; then git commit -m 'auth: persist corrected Paula membership readonly evidence [skip ci]'; git push origin "HEAD:$ORBIT360_BRANCH"; fi
-      - name: Require PASS
+          if [ -n "${ORBIT360_RECON_EVIDENCE:-}" ] && [ -f "$ORBIT360_RECON_EVIDENCE" ]; then git add "$ORBIT360_RECON_EVIDENCE"; fi
+          if ! git diff --cached --quiet; then git commit -m 'auth: persist run-bound Paula membership readonly evidence [skip ci]'; git push origin "HEAD:$ORBIT360_BRANCH"; fi
+      - name: Require PASS from this exact run
         if: always()
         shell: bash
         run: |
+          test -n "${ORBIT360_RECON_EVIDENCE:-}"
           test -f "$ORBIT360_RECON_EVIDENCE"
-          jq -e '.ok==true and .status=="TARGET_IDENTITY_MEMBERSHIP_READONLY_PASS" and .classification=="PASS" and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .readbackUnchanged==true' "$ORBIT360_RECON_EVIDENCE" >/dev/null
+          jq -e --arg run "$GITHUB_RUN_ID" '.ok==true and .status=="TARGET_IDENTITY_MEMBERSHIP_READONLY_PASS" and .classification=="PASS" and .runId==$run and .validatorRevision=="canonical-multirol-v2-fresh-evidence-bound" and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .readbackUnchanged==true' "$ORBIT360_RECON_EVIDENCE" >/dev/null
