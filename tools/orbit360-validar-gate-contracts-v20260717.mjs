@@ -80,6 +80,13 @@ const GATE_CONFIG = Object.freeze({
     defaultRequest: '.github/orbit360-requests/auth-paula-membership-readonly-reconcile-v2-lab-v20260817.json',
     sourcePhase: ''
   },
+  ['f1-4c-successor-artifact-build-lab-v20260818']: {
+    contractVersion: '1.0.0',
+    lifecycle: 'tools/orbit360-validator-lifecycle-contract-f1-4c-successor-artifact-build-v20260818.json',
+    engine: 'tools/orbit360-validar-gate-contracts-engine-f1-4c-successor-artifact-build-v20260818.mjs',
+    defaultRequest: '.github/orbit360-requests/f1-4c-successor-artifact-build-v20260818.json',
+    sourcePhase: ''
+  },
   [VISUAL_LEGACY_GATE_ID]: {
     contractVersion: '2.7.8',
     lifecycle: 'tools/orbit360-validator-lifecycle-contract-visual-matrix-corrected-post-auth-lab-v20260805.json',
@@ -154,6 +161,7 @@ const PHASE_PROFILES = Object.freeze({
   AUTH_PAULA_MEMBERSHIP_READONLY_RECONCILIATION_V2_LAB: {secrets:true,firestoreRead:true,writes:false,runtime:true,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false},
   AUTH_PAULA_MEMBERSHIP_SCOPE_CANONICAL_REPAIR_LAB: {secrets:true,firestoreRead:true,writes:true,runtime:true,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false},
   AUTH_PAULA_REAL_BROWSER_READONLY_SMOKE_LAB: {secrets:true,firestoreRead:true,writes:false,runtime:true,browser:true,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false},
+  F1_4C_SUCCESSOR_ARTIFACT_BUILD: {secrets:false,firestoreRead:false,writes:false,runtime:false,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false},
   VISUAL_MATRIX_CORRECTED_POST_AUTH_LAB_EXECUTION: {secrets:true,firestoreRead:true,writes:false,runtime:true,browser:true,deploy:true,functionsDeploy:false,rulesDeploy:false,production:false}
 });
 

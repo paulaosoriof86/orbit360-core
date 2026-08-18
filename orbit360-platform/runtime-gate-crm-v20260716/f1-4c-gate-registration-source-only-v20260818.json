@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "orbit360-f1-4c-gate-registration-source-only-v1",
+  "ok": true,
+  "status": "F1_4C_GATE_REGISTRATION_SOURCE_ONLY_PASS",
+  "classification": "PASS",
+  "gateId": "f1-4c-successor-artifact-build-lab-v20260818",
+  "gateBeforeBuild": true,
+  "singleCandidateMaximum": 1,
+  "packageRebuildAuthorizedOnlyByFreshRequest": true,
+  "browserExecuted": false,
+  "runtimeExecuted": false,
+  "secretAccess": false,
+  "dataAccess": false,
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "operationalWrites": 0,
+  "deployExecuted": false,
+  "productionTouched": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
