@@ -6,7 +6,11 @@ import { fileURLToPath } from 'node:url';
 const here = path.dirname(fileURLToPath(import.meta.url));
 const platform = path.resolve(here, '..');
 const contractPath = path.join(platform, 'core', 'membership-multirol-contract-p0.js');
+const effectivePath = path.join(platform, 'core', 'membership-multirol-effective-p0.js');
+const bootstrapPath = path.join(platform, 'core', 'backend-product-readonly-bootstrap-p0.js');
 const source = fs.readFileSync(contractPath, 'utf8');
+const effectiveSource = fs.readFileSync(effectivePath, 'utf8');
+const bootstrapSource = fs.readFileSync(bootstrapPath, 'utf8');
 
 const forbidden = [
   /Orbit\.store\s*[.\[]/,
@@ -24,7 +28,7 @@ if (staticViolations.length) {
 }
 
 const context = {
-  window: { Orbit: {} },
+  window: { Orbit: {}, dispatchEvent() {} },
   console,
   Number,
   Object,
@@ -33,14 +37,22 @@ const context = {
   RegExp,
   JSON,
   Date,
-  Math
+  Math,
+  Promise,
+  setTimeout,
+  clearTimeout,
+  CustomEvent: class CustomEvent { constructor(type, options = {}) { this.type = type; this.detail = options.detail; } }
 };
 context.window.window = context.window;
 vm.createContext(context);
 vm.runInContext(source, context, { filename: contractPath });
+vm.runInContext(effectiveSource, context, { filename: effectivePath });
+vm.runInContext(bootstrapSource, context, { filename: bootstrapPath });
 
 const api = context.window.Orbit.membershipMultirolP0;
+const bootstrap = context.window.Orbit.backendProductReadOnlyBootstrapP0;
 if (!api) throw new Error('Contrato multirol no instalado');
+if (!bootstrap) throw new Error('Bootstrap productivo read-only no instalado');
 
 const moduleCatalog = [
   'inicio', 'cliente360', 'polizas', 'cobros', 'renovaciones', 'ops', 'leads',
@@ -86,6 +98,12 @@ function actor(overrides = {}) {
 }
 
 const valid = api.validate(membership());
+const optionalEmail = api.validate(membership({ email: '' }));
+const malformedEmail = api.validate(membership({ email: 'correo-invalido' }));
+const authUser = { uid: 'user-001', email: 'user@example.com', emailVerified: true };
+const bootstrapOptionalEmail = bootstrap.validateMembershipForUser(membership({ email: '' }), authUser);
+const bootstrapMatchingEmail = bootstrap.validateMembershipForUser(membership(), authUser);
+const bootstrapMismatchedEmail = bootstrap.validateMembershipForUser(membership({ email: 'other@example.com' }), authUser);
 const modules = api.effectiveModules(membership(), { moduleCatalog }, moduleCatalog);
 const scopeClient = api.effectiveScope(membership(), 'cliente360');
 const scopeFinance = api.effectiveScope(membership(), 'finanzas');
@@ -132,6 +150,11 @@ const tenantChange = api.planChange(before, membership({ tenantId: 'other-tenant
 
 const assertions = {
   validMembership: valid.ok === true,
+  optionalMembershipEmail: optionalEmail.ok === true && optionalEmail.membership.email === '',
+  malformedEmailStillBlocked: malformedEmail.ok === false && malformedEmail.errors.includes('email_invalido'),
+  authOwnsEmailWhenMembershipOmitsIt: bootstrapOptionalEmail.ok === true,
+  matchingMembershipEmailAllowed: bootstrapMatchingEmail.ok === true,
+  mismatchedMembershipEmailBlocked: bootstrapMismatchedEmail.ok === false && bootstrapMismatchedEmail.errors.includes('membership_email_no_coincide'),
   activeRoleModulesOnly: modules.includes('cliente360') && modules.includes('finanzas') && !modules.includes('importar') && !modules.includes('configuracion'),
   moduleScopeOverride: scopeClient === 'all' && scopeFinance === 'none',
   roleSwitchProposalOnly: switchAllowed.ok === true && switchAllowed.writeAuthorized === false && switchAllowed.after.activeRole === 'Asesor',
@@ -157,7 +180,10 @@ const assertions = {
 const failed = Object.entries(assertions).filter(([, ok]) => !ok).map(([name]) => name);
 const result = {
   ok: failed.length === 0,
+  status: failed.length === 0 ? 'F1_3_MEMBERSHIP_EMAIL_OWNERSHIP_SOURCE_ONLY_PASS' : 'F1_3_MEMBERSHIP_EMAIL_OWNERSHIP_SOURCE_ONLY_FAIL',
   contract: path.relative(platform, contractPath).replaceAll('\\', '/'),
+  contractVersion: api.VERSION,
+  contractRevision: api.REVISION,
   assertions,
   failed,
   staticViolations,
@@ -167,6 +193,8 @@ const result = {
     scopeClient,
     scopeFinance,
     expansionReasons: expansion.reasons,
+    emailOptional: api.EMAIL_OPTIONAL === true,
+    emailIdentityOwner: api.EMAIL_IDENTITY_OWNER,
     writeAuthorized: planExpanded.writeAuthorized,
     writeExecuted: planExpanded.writeExecuted
   }
