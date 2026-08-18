@@ -26,7 +26,7 @@
     "requiredForExecution": true,
     "activeRequest": false,
     "allowedExecutions": 0,
-    "request": ".github/orbit360-requests/auth-paula-membership-readonly-reconcile-v2-runbound-smoke-20260817-09.json",
+    "request": ".github/orbit360-requests/auth-paula-membership-readonly-reconcile-v2-runbound-smoke-20260818-11.json",
     "consumed": true,
     "replayAllowed": false,
     "newExplicitAuthorizationRequiredAfterExecution": false
@@ -92,15 +92,15 @@
   "containsPII": false,
   "containsSecrets": false,
   "executionResult": {
-    "stage": "PIPELINE_ABORT_BEFORE_FRESH_PREFLIGHT_EVIDENCE",
-    "classification": "PIPELINE_MECHANISM_FAILURE",
-    "failedCheck": "PIPELINE_STAGE_VERIFY_SOURCE",
+    "stage": "AUTH_PAULA_REAL_BROWSER_READONLY_SMOKE_FAIL",
+    "classification": "DATA_CONTRACT_FAILURE",
+    "failedCheck": "R4_SMOKE_IDENTITY_REQUIRED_ROLES_MISSING",
     "ok": false,
-    "runId": "32154413802",
+    "runId": "32154717957",
     "firestoreWrites": 0,
     "authWrites": 0,
     "operationalWrites": 0,
     "semanticAccessExpansion": false,
-    "browserExecuted": false
+    "browserExecuted": true
   }
 }

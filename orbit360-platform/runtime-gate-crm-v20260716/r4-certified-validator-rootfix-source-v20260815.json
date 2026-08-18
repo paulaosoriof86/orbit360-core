@@ -1,8 +1,8 @@
 {
   "schemaVersion": "orbit360-r4-certified-validator-rootfix-source-v1",
-  "ok": false,
-  "status": "R4_CERTIFIED_VALIDATOR_ROOTFIX_SOURCE_FAIL",
-  "classification": "VALIDATOR_STALE_ROOTFIX_FAIL",
+  "ok": true,
+  "status": "R4_CERTIFIED_VALIDATOR_ROOTFIX_SOURCE_PASS",
+  "classification": "VALIDATOR_STALE_ROOTFIX_PASS",
   "sourceHead": "861326906558f03d9c8c2e7f34adfb4979a17d73",
   "durableArtifact": {
     "r3RunId": 32067274583,
@@ -33,7 +33,7 @@
   "runnerBrowserExecutableBound": true,
   "staleLegalInteractionRemoved": true,
   "readonlyLegalObserverBound": true,
-  "customTokenPathBound": false,
+  "customTokenPathBound": true,
   "passwordSubmitPathRemoved": true,
   "postAuthActivationBound": true,
   "tokenNeverPersistedByHarness": true,
