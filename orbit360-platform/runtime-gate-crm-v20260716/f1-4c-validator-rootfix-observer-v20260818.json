@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "orbit360-f1-4c-validator-rootfix-observer-v1",
+  "ok": true,
+  "status": "F1_4C_VALIDATOR_ROOTFIX_OBSERVATION_CAPTURED",
+  "classification": "OBSERVATION_ONLY",
+  "targetCommit": "945746ee0ce9aef6b901bb7c5abd422cffe090d8",
+  "matchingRunCount": 1,
+  "runId": "32193896132",
+  "runStatus": "completed",
+  "runConclusion": "success",
+  "buildExecuted": false,
+  "browserExecuted": false,
+  "runtimeExecuted": false,
+  "secretAccess": false,
+  "dataAccess": false,
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "operationalWrites": 0,
+  "deployExecuted": false,
+  "productionTouched": false
+}
