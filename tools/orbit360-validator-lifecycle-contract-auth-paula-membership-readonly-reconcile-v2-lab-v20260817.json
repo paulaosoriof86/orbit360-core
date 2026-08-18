@@ -2,8 +2,8 @@
   "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
   "gateId": "block-auth-paula-membership-readonly-reconcile-v2-lab-v20260817",
   "gateContractVersion": "14.3.0",
-  "validatorLifecycleRevision": "phase-capability-contract-v1",
-  "status": "AUTH_PAULA_GATE14_3_CONSUMED_STOP_RETRY",
+  "validatorLifecycleRevision": "rootfix-artifact-parity-v2-20260818",
+  "status": "F1_4B_SOURCE_ONLY_ROOTFIX_ARTIFACT_PARITY_CORRECTION",
   "currentPhase": "AUTH_PAULA_REAL_BROWSER_READONLY_SMOKE_LAB",
   "executionProfile": {
     "phase": "AUTH_PAULA_REAL_BROWSER_READONLY_SMOKE_LAB",
@@ -29,7 +29,7 @@
     "request": ".github/orbit360-requests/auth-paula-membership-readonly-reconcile-v2-runbound-smoke-20260818-f1-4-01.json",
     "consumed": true,
     "replayAllowed": false,
-    "newExplicitAuthorizationRequiredAfterExecution": false
+    "newExplicitAuthorizationRequiredAfterExecution": true
   },
   "target": {
     "projectId": "ays-orbit-360-lab",
@@ -77,6 +77,16 @@
     "customTokenPersistenceForbidden": true,
     "certifiedProductSourceHead": "861326906558f03d9c8c2e7f34adfb4979a17d73",
     "certifiedManifestStatus": "FASE_A_PRODUCT_R4S9C_CONTRACT_RECOVERY_CERTIFIED",
+    "rootfixArtifactParityRequired": true,
+    "rootfixEvidenceCommit": "7e2123f91d1cbf518a92197b6e24fed9ae29c65c",
+    "rootfixEvidencePath": "orbit360-platform/runtime-gate-crm-v20260716/f1-3-membership-email-ownership-source-only-v20260818.json",
+    "rootfixEvidenceStatus": "F1_3_MEMBERSHIP_EMAIL_OWNERSHIP_SOURCE_ONLY_PASS",
+    "requiredRootfixCommits": [
+      "a808e13d69dcb687f488be7e17411796eaec3509",
+      "b050d5a1a9861f898d2bb50d1bcc5c26beb72e9b"
+    ],
+    "artifactSourceMustContainRequiredRootfixCommits": true,
+    "artifactSourceMustMatchWorkflowSourceHead": true,
     "firestoreWritesRequired": 0,
     "authWritesRequired": 0,
     "operationalWritesRequired": 0,
@@ -93,8 +103,11 @@
   "containsSecrets": false,
   "executionResult": {
     "stage": "AUTH_PAULA_REAL_BROWSER_READONLY_SMOKE_FAIL",
-    "classification": "FUNCTIONAL_DEFECT",
+    "classificationAtRun": "FUNCTIONAL_DEFECT",
+    "classificationAfterForensicAttribution": "PIPELINE_MECHANISM_FAILURE",
     "failedCheck": "R4_PRODUCT_BOOTSTRAP_OBSERVED_FAILURE",
+    "rootCause": "ROOTFIX_ARTIFACT_PARITY_MISSING",
+    "rootfixActuallyUnderTest": false,
     "ok": false,
     "runId": "32191671405",
     "firestoreWrites": 0,
