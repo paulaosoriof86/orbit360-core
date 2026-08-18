@@ -1,0 +1,43 @@
+{
+  "schemaVersion": "orbit360-f1-4c-successor-artifact-build-request-v1",
+  "requestVersion": "F1_4C_SUCCESSOR_ARTIFACT_BUILD_V1",
+  "gateId": "f1-4c-successor-artifact-build-lab-v20260818",
+  "status": "AUTHORIZED_ONCE",
+  "approved": true,
+  "allowedExecutions": 1,
+  "consumed": false,
+  "authorizationFrozen": false,
+  "replayAllowed": false,
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "parentHead": "29caae94a3db1f1626bdde2ea6ee9a21799f9df6",
+  "scope": {
+    "packageRebuild": true,
+    "singleCandidate": true,
+    "githubArtifactUpload": true,
+    "browser": false,
+    "runtime": false,
+    "deploy": false,
+    "publish": false,
+    "production": false,
+    "authWrites": false,
+    "firestoreWrites": false,
+    "dataWrites": false,
+    "operationalWrites": false,
+    "main": false,
+    "merge": false
+  },
+  "basis": {
+    "baseArtifactId": 9300368902,
+    "baseSourceHead": "861326906558f03d9c8c2e7f34adfb4979a17d73",
+    "rootfixCommits": [
+      "a808e13d69dcb687f488be7e17411796eaec3509",
+      "b050d5a1a9861f898d2bb50d1bcc5c26beb72e9b"
+    ],
+    "f1_4bEvidenceCommit": "3c56d0baffce8fc8399050e520ee4cb54cebf4db",
+    "validatorStaleRootfixEvidence": "orbit360-platform/runtime-gate-crm-v20260716/f1-4c-validator-stale-rootfix-source-only-v20260818.json",
+    "priorPrebuildStopRunId": "32193519205",
+    "priorCandidateBuildsExecuted": 0
+  },
+  "authorizationStatement": "Continuation of the already authorized single F1.4C candidate construction after source-only VALIDATOR_STALE correction. Prior request 01 stopped before base download/build and produced zero candidates/artifacts. This request may build at most one unpublished successor; canonical gate first; include F1.3 product rootfix and F1.4B lineage; manifest/SHA256/file-count/parity evidence; zero deploy/publication/production/Auth/Firestore/data/operational writes; no runtime/browser."
+}
