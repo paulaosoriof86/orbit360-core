@@ -62,7 +62,7 @@ jobs:
           JOURNAL="$EVIDENCE_DIR/auth-paula-gate14-3-pipeline-run-${GITHUB_RUN_ID}.json"
           IDENTITY="$EVIDENCE_DIR/m6-product-smoke-identity-run-${GITHUB_RUN_ID}.json"
           RAW_BROWSER="$EVIDENCE_DIR/r4-production-readonly-smoke-run-${GITHUB_RUN_ID}.json"
-          rm -f "$RESULT" "$PREFLIGHT" "$JOURNAL" "$IDENTITY" "$RAW_BROWSER"
+          rm -f "$RESULT" "$PREFLIGHT" "$JOURNAL" "$IDENTITY" "$RAW_BROWSER" "$EVIDENCE_DIR/preflight-sanitizado.json"
           echo "ORBIT360_REQUEST_FILE=$REQUEST_FILE" >> "$GITHUB_ENV"
           echo "ORBIT360_EXPECTED_REQUEST_VERSION=$VERSION" >> "$GITHUB_ENV"
           echo "ORBIT360_PIPELINE_MODE=$MODE" >> "$GITHUB_ENV"
@@ -93,7 +93,8 @@ jobs:
           node --check tools/orbit360-register-auth-paula-membership-readonly-reconcile-v2-gate-v20260817.mjs
           grep -F 'AUTH_PAULA_REAL_BROWSER_READONLY_SMOKE_LAB' tools/orbit360-register-auth-paula-membership-readonly-reconcile-v2-gate-v20260817.mjs >/dev/null
           grep -F 'command -v google-chrome' "$GITHUB_WORKSPACE/.github/workflows/orbit360-auth-paula-membership-readonly-reconcile-v4-20260817.yml" >/dev/null
-          grep -F 'npx playwright install --with-deps chromium' "$GITHUB_WORKSPACE/.github/workflows/orbit360-auth-paula-membership-readonly-reconcile-v4-20260817.yml" && { echo 'PIPELINE_MECHANISM_FAILURE:STALE_PLAYWRIGHT_BROWSER_INSTALL_REMAINS' >&2; exit 41; } || true
+          STALE_NEEDLE='npx playwright install --with-deps ''chromium'
+          if grep -F "$STALE_NEEDLE" "$GITHUB_WORKSPACE/.github/workflows/orbit360-auth-paula-membership-readonly-reconcile-v4-20260817.yml" >/dev/null; then echo 'PIPELINE_MECHANISM_FAILURE:STALE_PLAYWRIGHT_BROWSER_INSTALL_REMAINS' >&2; exit 41; fi
           test ! -e "$ORBIT360_RECON_EVIDENCE"
           test ! -e "$ORBIT360_PREFLIGHT_EVIDENCE"
           if [ "$ORBIT360_PIPELINE_MODE" = smoke ]; then
@@ -126,7 +127,6 @@ jobs:
         run: |
           set -euo pipefail
           jq '.currentStage="CANONICAL_PREFLIGHT"' "$ORBIT360_STAGE_JOURNAL" > "$ORBIT360_STAGE_JOURNAL.tmp" && mv "$ORBIT360_STAGE_JOURNAL.tmp" "$ORBIT360_STAGE_JOURNAL"
-          rm -f "$EVIDENCE_DIR/preflight-sanitizado.json"
           node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
           test -f "$EVIDENCE_DIR/preflight-sanitizado.json"
           jq --arg run "$GITHUB_RUN_ID" '. + {runId:$run,evidenceFreshness:"current-run-only"}' "$EVIDENCE_DIR/preflight-sanitizado.json" > "$ORBIT360_PREFLIGHT_EVIDENCE"
@@ -232,7 +232,6 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if [ ! -f "$ORBIT360_PREFLIGHT_EVIDENCE" ] && [ -f "$EVIDENCE_DIR/preflight-sanitizado.json" ]; then jq --arg run "$GITHUB_RUN_ID" '. + {runId:$run,evidenceFreshness:"current-run-only"}' "$EVIDENCE_DIR/preflight-sanitizado.json" > "$ORBIT360_PREFLIGHT_EVIDENCE"; fi
           if [ -f "$ORBIT360_PREFLIGHT_EVIDENCE" ]; then jq -e --arg run "$GITHUB_RUN_ID" '.runId==$run and .evidenceFreshness=="current-run-only"' "$ORBIT360_PREFLIGHT_EVIDENCE" >/dev/null; fi
           if [ -f "$ORBIT360_RECON_EVIDENCE" ]; then jq -e --arg run "$GITHUB_RUN_ID" --arg rev "$ORBIT360_EXPECTED_RESULT_REVISION" '.runId==$run and .validatorRevision==$rev' "$ORBIT360_RECON_EVIDENCE" >/dev/null; BEFORE_SHA="$(sha256sum "$ORBIT360_RECON_EVIDENCE" | awk '{print $1}')"; fi
           node --input-type=module <<'NODE'
