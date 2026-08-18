@@ -1,0 +1,30 @@
+{
+  "schemaVersion": "orbit360-f1-4b-rootfix-artifact-parity-source-only-v1",
+  "ok": true,
+  "status": "F1_4B_ROOTFIX_ARTIFACT_PARITY_SOURCE_ONLY_PASS",
+  "classification": "PIPELINE_MECHANISM_FAILURE_ROOTFIX_PASS",
+  "validatorRevision": "rootfix-artifact-parity-v2-20260818",
+  "certifiedArtifactSourceHead": "861326906558f03d9c8c2e7f34adfb4979a17d73",
+  "oldPackageBlocked": true,
+  "currentHeadContainsRootfix": true,
+  "rootfixEvidencePass": true,
+  "workflowGateBeforeProvider": true,
+  "registryPointsParityOwner": true,
+  "rootfixCommits": [
+    "a808e13d69dcb687f488be7e17411796eaec3509",
+    "b050d5a1a9861f898d2bb50d1bcc5c26beb72e9b"
+  ],
+  "rootfixEvidenceCommit": "7e2123f91d1cbf518a92197b6e24fed9ae29c65c",
+  "browserExecuted": false,
+  "runtimeExecuted": false,
+  "secretAccess": false,
+  "dataAccess": false,
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "operationalWrites": 0,
+  "deployExecuted": false,
+  "packageRebuilt": false,
+  "productionTouched": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
