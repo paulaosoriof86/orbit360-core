@@ -1,0 +1,229 @@
+name: Orbit360 F1.4D Exact Successor Runtime Browser Readonly 20260818
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-requests/f1-4d-single-successor-runtime-browser-readonly-runbound-*.json'
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: orbit360-f1-4d-${{ github.sha }}
+  cancel-in-progress: false
+env:
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  ORBIT360_GATE_ID: block-auth-paula-membership-readonly-reconcile-v2-lab-v20260817
+  ORBIT360_EXPECTED_REQUEST_VERSION: F1_4D_SINGLE_SUCCESSOR_RUNTIME_BROWSER_READONLY_V1
+  ORBIT360_PROJECT_ID: ays-orbit-360-lab
+  ORBIT360_TENANT_ID: alianzas-soluciones
+  ORBIT360_PRODUCT_PROJECT_ID: ays-orbit-360-lab
+  ORBIT360_PRODUCT_TENANT_ID: alianzas-soluciones
+  ORBIT360_TARGET_EMAIL_HASH: 9b663847979724e9491e1c655da32a7cb17a5f6ed26dba352de1eb811254b23f
+  ORBIT360_TARGET_ADVISOR_ID: ase-paula-osorio
+  ORBIT360_CANDIDATE_ARTIFACT_ID: '9345207863'
+  ORBIT360_CANDIDATE_ZIP_NAME: orbit360-fase-a-product-f1-4c-successor-29caae94a3db.zip
+  ORBIT360_CANDIDATE_ZIP_SHA256: 493009c83390901aa772842a2ba9ddd5ce5293f6969d86c5c3395ebd670a44ac
+  ORBIT360_CANDIDATE_MANIFEST_SHA256: 29dafe5e63b425ea6cf641937fe1b9d4b9e63f72479a51ae76f9148a55771761
+  ORBIT360_CANDIDATE_SOURCE_HEAD: 29caae94a3db1f1626bdde2ea6ee9a21799f9df6
+  ORBIT360_CANDIDATE_MANIFEST_STATUS: FASE_A_PRODUCT_F1_4C_SUCCESSOR_CERTIFIED
+  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+jobs:
+  f1_4d_exact_successor:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify immutable request and source-only owners
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
+          test "${#CHANGED[@]}" = '1'
+          REQUEST_FILE="${CHANGED[0]}"
+          case "$REQUEST_FILE" in
+            .github/orbit360-requests/f1-4d-single-successor-runtime-browser-readonly-runbound-*.json) ;;
+            *) echo 'PIPELINE_MECHANISM_FAILURE:F1_4D_REQUEST_PATH_INVALID' >&2; exit 41 ;;
+          esac
+          test "$(jq -r '.requestVersion' "$REQUEST_FILE")" = "$ORBIT360_EXPECTED_REQUEST_VERSION"
+          SOURCE_PARENT="$(git rev-parse HEAD^)"
+          test "$(jq -r '.parentHead' "$REQUEST_FILE")" = "$SOURCE_PARENT"
+          node --check tools/orbit360-validar-gate-contracts-engine-auth-paula-membership-readonly-reconcile-v2-f1-4d-v20260818.mjs
+          node --check tools/orbit360-register-f1-4d-gate-v20260818.mjs
+          node --check tools/orbit360-f1-4d-single-successor-runtime-browser-readonly-v20260818.mjs
+          echo "ORBIT360_REQUEST_FILE=$REQUEST_FILE" >> "$GITHUB_ENV"
+          echo "ORBIT360_F1_4D_SOURCE_PARENT=$SOURCE_PARENT" >> "$GITHUB_ENV"
+          mkdir -p "$EVIDENCE_DIR"
+          echo "ORBIT360_F1_4D_PREFLIGHT=$EVIDENCE_DIR/f1-4d-preflight-run-${GITHUB_RUN_ID}.json" >> "$GITHUB_ENV"
+          echo "ORBIT360_F1_4D_IDENTITY=$EVIDENCE_DIR/f1-4d-identity-run-${GITHUB_RUN_ID}.json" >> "$GITHUB_ENV"
+          echo "ORBIT360_F1_4D_RAW=$EVIDENCE_DIR/f1-4d-runtime-browser-readonly-run-${GITHUB_RUN_ID}.json" >> "$GITHUB_ENV"
+          echo "ORBIT360_F1_4D_VERIFY=$EVIDENCE_DIR/f1-4d-candidate-artifact-verify-run-${GITHUB_RUN_ID}.json" >> "$GITHUB_ENV"
+          echo "ORBIT360_F1_4D_FINAL=$EVIDENCE_DIR/f1-4d-final-run-${GITHUB_RUN_ID}.json" >> "$GITHUB_ENV"
+      - name: Register F1.4D owner and lifecycle in working tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-register-f1-4d-gate-v20260818.mjs
+          grep -F "orbit360-validator-lifecycle-contract-auth-paula-membership-readonly-reconcile-v2-f1-4d-v20260818.json" tools/orbit360-validar-gate-contracts-v20260717.mjs >/dev/null
+          grep -F "orbit360-validar-gate-contracts-engine-auth-paula-membership-readonly-reconcile-v2-f1-4d-v20260818.mjs" tools/orbit360-validar-gate-contracts-v20260717.mjs >/dev/null
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const p='tools/orbit360-validator-lifecycle-contract-auth-paula-membership-readonly-reconcile-v2-f1-4d-v20260818.json';
+          const l=JSON.parse(fs.readFileSync(p,'utf8'));
+          l.status='F1_4D_SINGLE_USE_REQUEST_ACTIVE_IN_RUNNER';
+          l.authorization.activeRequest=true;
+          l.authorization.allowedExecutions=1;
+          l.authorization.request=process.env.ORBIT360_REQUEST_FILE;
+          l.authorization.consumed=false;
+          fs.writeFileSync(p,JSON.stringify(l,null,2)+'\n');
+          NODE
+          git diff --check
+      - name: Mandatory canonical gate before candidate artifact or provider/browser
+        id: gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f "$EVIDENCE_DIR/preflight-sanitizado.json"
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
+          test -f "$EVIDENCE_DIR/preflight-sanitizado.json"
+          jq --arg run "$GITHUB_RUN_ID" '. + {runId:$run,evidenceFreshness:"current-run-only"}' "$EVIDENCE_DIR/preflight-sanitizado.json" > "$ORBIT360_F1_4D_PREFLIGHT"
+          jq -e --arg run "$GITHUB_RUN_ID" --argjson artifact "$ORBIT360_CANDIDATE_ARTIFACT_ID" --arg zip "$ORBIT360_CANDIDATE_ZIP_SHA256" --arg manifest "$ORBIT360_CANDIDATE_MANIFEST_SHA256" --arg source "$ORBIT360_CANDIDATE_SOURCE_HEAD" '
+            .ok==true and .status=="GO_GATE_CONTRACT" and .classification=="GO_F1_4D_EXACT_SUCCESSOR_RUNTIME_BROWSER_READONLY" and .runId==$run and
+            .candidateArtifactId==$artifact and .candidateZipSha256==$zip and .candidateManifestSha256==$manifest and .candidateSourceHead==$source and
+            .executionAuthorized==true and .secretAccessAuthorized==true and .firestoreReadAuthorized==true and .customTokenMintAuthorized==true and
+            .runtimeAuthorized==true and .browserAuthorized==true and .writeAuthorized==false and .authWriteAuthorized==false and
+            .packageRebuildAuthorized==false and .deployAuthorized==false and .publicationAuthorized==false and .productionAuthorized==false
+          ' "$ORBIT360_F1_4D_PREFLIGHT" >/dev/null
+      - name: Download and fully verify exact candidate after GO
+        if: steps.gate.outcome == 'success'
+        env:
+          GH_TOKEN_RUNTIME: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUTER="$RUNNER_TEMP/f1-4d-artifact-outer.zip"
+          OUTER_DIR="$RUNNER_TEMP/f1-4d-outer"
+          CANDIDATE_DIR="$RUNNER_TEMP/f1-4d-candidate"
+          rm -rf "$OUTER" "$OUTER_DIR" "$CANDIDATE_DIR"
+          mkdir -p "$OUTER_DIR" "$CANDIDATE_DIR"
+          curl -L --fail --retry 3 -H "Authorization: Bearer $GH_TOKEN_RUNTIME" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/${ORBIT360_CANDIDATE_ARTIFACT_ID}/zip" -o "$OUTER"
+          unzip -q "$OUTER" -d "$OUTER_DIR"
+          mapfile -t FILES < <(find "$OUTER_DIR" -maxdepth 1 -type f -printf '%f\n' | sort)
+          test "${#FILES[@]}" = '1'
+          test "${FILES[0]}" = "$ORBIT360_CANDIDATE_ZIP_NAME"
+          INNER="$OUTER_DIR/$ORBIT360_CANDIDATE_ZIP_NAME"
+          test "$(sha256sum "$INNER" | awk '{print $1}')" = "$ORBIT360_CANDIDATE_ZIP_SHA256"
+          unzip -q "$INNER" -d "$CANDIDATE_DIR"
+          test "$(sha256sum "$CANDIDATE_DIR/orbit360-package-manifest.json" | awk '{print $1}')" = "$ORBIT360_CANDIDATE_MANIFEST_SHA256"
+          jq -e --arg status "$ORBIT360_CANDIDATE_MANIFEST_STATUS" --arg source "$ORBIT360_CANDIDATE_SOURCE_HEAD" '.status==$status and .sourceHead==$source and .fileCount==194 and (.files|length)==194' "$CANDIDATE_DIR/orbit360-package-manifest.json" >/dev/null
+          CANDIDATE_DIR="$CANDIDATE_DIR" node --input-type=module <<'NODE'
+          import fs from 'node:fs';import path from 'node:path';import crypto from 'node:crypto';
+          const root=process.env.CANDIDATE_DIR,m=JSON.parse(fs.readFileSync(path.join(root,'orbit360-package-manifest.json'),'utf8')),errors=[];
+          for(const item of m.files||[]){const p=path.join(root,item.path);if(!fs.existsSync(p)){errors.push('missing:'+item.path);continue;}const b=fs.readFileSync(p),h=crypto.createHash('sha256').update(b).digest('hex');if(b.length!==item.bytes||h!==item.sha256)errors.push('mismatch:'+item.path);}
+          if(errors.length)throw new Error('F1_4D_FULL_REHASH_FAIL:'+errors.join('|'));
+          NODE
+          jq -n --arg run "$GITHUB_RUN_ID" --arg zip "$ORBIT360_CANDIDATE_ZIP_SHA256" --arg manifest "$ORBIT360_CANDIDATE_MANIFEST_SHA256" --arg source "$ORBIT360_CANDIDATE_SOURCE_HEAD" --argjson artifact "$ORBIT360_CANDIDATE_ARTIFACT_ID" '{schemaVersion:"orbit360-f1-4d-candidate-artifact-verification-v1",ok:true,status:"F1_4D_EXACT_CANDIDATE_ARTIFACT_VERIFIED",runId:$run,artifactId:$artifact,zipSha256:$zip,manifestSha256:$manifest,sourceHead:$source,fileCount:194,fullRehashPass:true,packageRebuilt:false,deployExecuted:false,publicationExecuted:false,browserExecuted:false,runtimeExecuted:false,firestoreWrites:0,authWrites:0,operationalWrites:0,containsPII:false,containsSecrets:false}' > "$ORBIT360_F1_4D_VERIFY"
+          echo "ORBIT360_F1_4D_CANDIDATE_DIR=$CANDIDATE_DIR" >> "$GITHUB_ENV"
+      - name: Install authorized runtime dependencies after GO
+        if: steps.gate.outcome == 'success'
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false --ignore-scripts firebase-admin@13 google-auth-library@9 playwright@1.52.0 >/dev/null
+          BROWSER_EXECUTABLE="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          test -n "$BROWSER_EXECUTABLE"
+          echo "ORBIT360_SYSTEM_BROWSER_EXECUTABLE=$BROWSER_EXECUTABLE" >> "$GITHUB_ENV"
+      - name: Bind provider after GO
+        if: steps.gate.outcome == 'success'
+        env:
+          SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+          SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-${SA_ORBIT_360_LAB:-${SA_DEFAULT:-}}}"
+          test -n "$SERVICE_ACCOUNT"
+          SA_FILE="$RUNNER_TEMP/orbit360-f1-4d-service-account.json"
+          printf '%s' "$SERVICE_ACCOUNT" > "$SA_FILE"
+          chmod 600 "$SA_FILE"
+          jq -e '.type=="service_account" and (.project_id|length)>0 and (.client_email|length)>0 and (.private_key|length)>0' "$SA_FILE" >/dev/null
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$SA_FILE" >> "$GITHUB_ENV"
+      - name: Resolve exact protected smoke identity read-only
+        if: steps.gate.outcome == 'success'
+        shell: bash
+        run: |
+          set -euo pipefail
+          ORBIT360_SMOKE_IDENTITY_EVIDENCE="$ORBIT360_F1_4D_IDENTITY" ORBIT360_SMOKE_RUN_ID="$GITHUB_RUN_ID" ORBIT360_SMOKE_TARGET_EMAIL_HASH="$ORBIT360_TARGET_EMAIL_HASH" ORBIT360_SMOKE_TARGET_ADVISOR_ID="$ORBIT360_TARGET_ADVISOR_ID" node tools/orbit360-m6-resolve-smoke-identity-readonly-v20260730.mjs
+          jq -e '.ok==true and .eligibleSmokeIdentityCount==1 and .targetBindingRequested==true and .targetEmailHashMatches==true and .targetAdvisorMatches==true and .targetIdentityMatches==true and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0' "$ORBIT360_F1_4D_IDENTITY" >/dev/null
+      - name: Serve exact candidate on runner loopback
+        if: steps.gate.outcome == 'success'
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m http.server 4173 --bind 127.0.0.1 --directory "$ORBIT360_F1_4D_CANDIDATE_DIR" > "$RUNNER_TEMP/f1-4d-http.log" 2>&1 &
+          echo $! > "$RUNNER_TEMP/f1-4d-http.pid"
+          for i in $(seq 1 30); do curl --fail --silent http://127.0.0.1:4173/orbit360-package-manifest.json >/dev/null && break; sleep 1; done
+          curl --fail --silent http://127.0.0.1:4173/orbit360-package-manifest.json >/dev/null
+          echo "ORBIT360_F1_4D_URL=http://127.0.0.1:4173/" >> "$GITHUB_ENV"
+      - name: Execute one narrow bootstrap confirmation
+        id: runtime
+        if: steps.gate.outcome == 'success'
+        shell: bash
+        run: |
+          set -euo pipefail
+          set +e
+          ORBIT360_F1_4D_OUT="$ORBIT360_F1_4D_RAW" node tools/orbit360-f1-4d-single-successor-runtime-browser-readonly-v20260818.mjs
+          RC=$?
+          set -e
+          test -f "$ORBIT360_F1_4D_RAW"
+          echo "runtime_rc=$RC" >> "$GITHUB_OUTPUT"
+          echo "ORBIT360_F1_4D_RUNTIME_RC=$RC" >> "$GITHUB_ENV"
+      - name: Build sanitized F1.4D terminal evidence
+        if: always() && steps.gate.outcome == 'success'
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f "$ORBIT360_F1_4D_PREFLIGHT"
+          test -f "$ORBIT360_F1_4D_VERIFY"
+          test -f "$ORBIT360_F1_4D_IDENTITY"
+          test -f "$ORBIT360_F1_4D_RAW"
+          PREFLIGHT="$ORBIT360_F1_4D_PREFLIGHT" VERIFY="$ORBIT360_F1_4D_VERIFY" IDENTITY="$ORBIT360_F1_4D_IDENTITY" RAW="$ORBIT360_F1_4D_RAW" FINAL="$ORBIT360_F1_4D_FINAL" RUN_ID="$GITHUB_RUN_ID" node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const p=JSON.parse(fs.readFileSync(process.env.PREFLIGHT,'utf8')),v=JSON.parse(fs.readFileSync(process.env.VERIFY,'utf8')),i=JSON.parse(fs.readFileSync(process.env.IDENTITY,'utf8')),r=JSON.parse(fs.readFileSync(process.env.RAW,'utf8'));
+          const same=r.sameFailureFamilyReappeared===true||[].concat(r.bootstrap?.errors||[]).some(x=>String(x).includes('membership_invalid:email_invalido'));
+          const writes=Number(r.firestoreWrites||0)+Number(r.authWrites||0)+Number(r.operationalWrites||0);
+          const pass=r.ok===true&&r.status==='F1_4D_EXACT_SUCCESSOR_BOOTSTRAP_PASS'&&r.oldErrorAbsent===true&&!same&&writes===0&&r.deployExecuted===false&&r.packageRebuilt===false&&r.publicationExecuted===false;
+          const status=pass?'F1_4D_EXACT_SUCCESSOR_RUNTIME_BROWSER_READONLY_PASS':same?'F1_4D_SEALED_STOP_RETRY_SAME_FAMILY':'F1_4D_EXACT_SUCCESSOR_RUNTIME_BROWSER_READONLY_STOP';
+          const out={schemaVersion:'orbit360-f1-4d-terminal-evidence-v1',ok:pass,status,classification:pass?'PASS':same?'STOP_RETRY_SAME_FAMILY':String(r.classification||'FUNCTIONAL_DEFECT'),runId:process.env.RUN_ID,candidateArtifactId:9345207863,candidateZipSha256:v.zipSha256,candidateManifestSha256:v.manifestSha256,candidateSourceHead:v.sourceHead,gatePass:p.ok===true,artifactVerificationPass:v.ok===true,identityReadOnlyPass:i.ok===true,oldErrorAbsent:r.oldErrorAbsent===true,sameFailureFamilyReappeared:same,bootstrap:r.bootstrap||{},store:r.store||{},browserExecuted:r.browserExecuted===true,runtimeExecuted:r.runtimeExecuted===true,secretAccess:r.secretAccess===true,firestoreRead:r.firestoreRead===true,firestoreWrites:Number(r.firestoreWrites||0),authWrites:Number(r.authWrites||0),operationalWrites:Number(r.operationalWrites||0),packageRebuilt:false,deployExecuted:false,publicationExecuted:false,productionHostingTouched:false,containsPII:false,containsSecrets:false};
+          fs.writeFileSync(process.env.FINAL,JSON.stringify(out,null,2)+'\n');console.log(JSON.stringify(out,null,2));
+          NODE
+      - uses: actions/upload-artifact@v4
+        if: always() && steps.gate.outcome == 'success'
+        with:
+          name: orbit360-f1-4d-runtime-browser-readonly-evidence-${{ github.run_id }}
+          path: |
+            ${{ env.ORBIT360_F1_4D_PREFLIGHT }}
+            ${{ env.ORBIT360_F1_4D_VERIFY }}
+            ${{ env.ORBIT360_F1_4D_IDENTITY }}
+            ${{ env.ORBIT360_F1_4D_RAW }}
+            ${{ env.ORBIT360_F1_4D_FINAL }}
+          if-no-files-found: error
+          retention-days: 30
+      - name: Enforce single-run terminal result
+        if: always() && steps.gate.outcome == 'success'
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f "$ORBIT360_F1_4D_FINAL"
+          if jq -e '.ok==true and .status=="F1_4D_EXACT_SUCCESSOR_RUNTIME_BROWSER_READONLY_PASS"' "$ORBIT360_F1_4D_FINAL" >/dev/null; then exit 0; fi
+          if jq -e '.sameFailureFamilyReappeared==true' "$ORBIT360_F1_4D_FINAL" >/dev/null; then echo 'STOP_RETRY:F1_4D_SAME_FAMILY_REAPPEARED' >&2; exit 42; fi
+          exit 41
