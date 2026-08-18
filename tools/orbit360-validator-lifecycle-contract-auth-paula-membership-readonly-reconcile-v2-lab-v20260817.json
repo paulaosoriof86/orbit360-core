@@ -3,14 +3,14 @@
   "gateId": "block-auth-paula-membership-readonly-reconcile-v2-lab-v20260817",
   "gateContractVersion": "14.3.0",
   "validatorLifecycleRevision": "phase-capability-contract-v1",
-  "status": "AUTH_PAULA_MEMBERSHIP_READONLY_V2_CONSUMED_STOP_RETRY",
-  "currentPhase": "AUTH_PAULA_MEMBERSHIP_READONLY_RECONCILIATION_V2_LAB",
+  "status": "AUTH_PAULA_MEMBERSHIP_SCOPE_CANONICAL_REPAIR_REQUEST_PENDING",
+  "currentPhase": "AUTH_PAULA_MEMBERSHIP_SCOPE_CANONICAL_REPAIR_LAB",
   "executionProfile": {
-    "phase": "AUTH_PAULA_MEMBERSHIP_READONLY_RECONCILIATION_V2_LAB",
+    "phase": "AUTH_PAULA_MEMBERSHIP_SCOPE_CANONICAL_REPAIR_LAB",
     "capabilities": {
       "secrets": true,
       "firestoreRead": true,
-      "writes": false,
+      "writes": true,
       "runtime": true,
       "browser": false,
       "deploy": false,
@@ -24,10 +24,10 @@
   "rcId": "RC-AYS-LAB-CANONICA-01",
   "authorization": {
     "requiredForExecution": true,
-    "activeRequest": false,
-    "allowedExecutions": 0,
-    "request": ".github/orbit360-requests/auth-paula-membership-readonly-reconcile-v2-runbound-20260817-02.json",
-    "consumed": true,
+    "activeRequest": true,
+    "allowedExecutions": 1,
+    "request": ".github/orbit360-requests/auth-paula-membership-readonly-reconcile-v2-runbound-repair-20260817-03.json",
+    "consumed": false,
     "replayAllowed": false,
     "newExplicitAuthorizationRequiredAfterExecution": false
   },
@@ -37,7 +37,9 @@
     "branch": "ays/backend-tenant-lab-v99-20260703",
     "pullRequest": 5,
     "advisorId": "ase-paula-osorio",
-    "emailHash": "9b663847979724e9491e1c655da32a7cb17a5f6ed26dba352de1eb811254b23f"
+    "emailHash": "9b663847979724e9491e1c655da32a7cb17a5f6ed26dba352de1eb811254b23f",
+    "fieldPath": "dataScopes.default",
+    "value": "all"
   },
   "accessBoundary": {
     "maximumTargets": 1,
@@ -49,7 +51,9 @@
     "authUserCreateAllowed": false,
     "authUserDeleteAllowed": false,
     "directPasswordSetAllowed": false,
-    "firestoreWritesAllowed": false,
+    "firestoreWritesAllowed": true,
+    "maximumFirestoreWrites": 1,
+    "allowedWriteField": "dataScopes.default",
     "browserAllowed": false,
     "hostingDeployAllowed": false,
     "functionsDeployAllowed": false,
@@ -61,31 +65,24 @@
   "guards": {
     "gateBeforeSecrets": true,
     "exactExistingAuthIdentityRequired": true,
+    "basisEvidenceRunId": "32091977557",
     "canonicalMultirolContractOnly": true,
-    "existingMembershipRequired": true,
-    "sameUidRequired": true,
-    "tenantMatchRequired": true,
-    "activeMembershipRequired": true,
-    "countriesRequired": true,
-    "advisorBindingWhenAsesorRequired": true,
-    "readbackMustRemainUnchanged": true,
+    "authoritativeConfigScope": "todos",
+    "beforeEffectiveDefaultScope": "all",
+    "afterEffectiveDefaultScope": "all",
+    "semanticAccessExpansionAllowed": false,
+    "activeRoleMustRemain": "SuperAdmin",
+    "defaultRoleMustRemain": "SuperAdmin",
+    "moduleScopesMustRemainUnchanged": true,
+    "nonTargetMembershipMustRemainUnchanged": true,
+    "readbackRequired": true,
     "freshEvidenceRunIdRequired": true,
     "freshPreflightRunIdRequired": true,
     "stageJournalRequired": true,
-    "sanitizedScopeProvenanceRequired": true,
     "evidenceSealMustRemainByteIdentical": true,
     "stopRetryOnFailure": true
   },
   "containsPII": false,
   "containsSecrets": false,
-  "executionResult": {
-    "stage": "TARGET_IDENTITY_MEMBERSHIP_READONLY_STOP",
-    "classification": "DATA_CONTRACT_FAILURE",
-    "failedCheck": "TARGET_MEMBERSHIP_DEFAULT_SCOPE_INVALID",
-    "ok": false,
-    "runId": "32091977557",
-    "firestoreWrites": 0,
-    "authWrites": 0,
-    "operationalWrites": 0
-  }
+  "executionResult": null
 }
