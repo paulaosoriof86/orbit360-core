@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "orbit360-auth-paula-gate14-3-journal-v2",
+  "runId": "32094467414",
+  "request": ".github/orbit360-requests/auth-paula-membership-readonly-reconcile-v2-runbound-smoke-20260817-06.json",
+  "headSha": "f556e69d48f4e1b17072b6fd07fc2160357379ce",
+  "mode": "smoke",
+  "status": "SEALED_STOP_RETRY",
+  "currentStage": "SEALED",
+  "classification": "PIPELINE_MECHANISM_FAILURE",
+  "containsPII": false,
+  "containsSecrets": false,
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "operationalWrites": 0,
+  "failedCheck": "PIPELINE_STAGE_RESOLVE_EXACT_SMOKE_IDENTITY",
+  "browserExecuted": false
+}
