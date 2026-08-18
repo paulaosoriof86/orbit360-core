@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "orbit360-f1-4d-candidate-artifact-verification-v1",
+  "ok": true,
+  "status": "F1_4D_EXACT_CANDIDATE_ARTIFACT_VERIFIED",
+  "runId": "32195516901",
+  "artifactId": 9345207863,
+  "zipSha256": "493009c83390901aa772842a2ba9ddd5ce5293f6969d86c5c3395ebd670a44ac",
+  "manifestSha256": "29dafe5e63b425ea6cf641937fe1b9d4b9e63f72479a51ae76f9148a55771761",
+  "sourceHead": "29caae94a3db1f1626bdde2ea6ee9a21799f9df6",
+  "fileCount": 194,
+  "fullRehashPass": true,
+  "packageRebuilt": false,
+  "deployExecuted": false,
+  "publicationExecuted": false,
+  "browserExecuted": false,
+  "runtimeExecuted": false,
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "operationalWrites": 0,
+  "containsPII": false,
+  "containsSecrets": false
+}
