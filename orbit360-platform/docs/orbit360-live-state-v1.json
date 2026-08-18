@@ -1,8 +1,8 @@
 {
   "schemaVersion": "orbit360-live-state-v1",
-  "stateVersion": "20260818.f1-4c-successor-artifact-certified-unpublished.runtime-confirmation-pending.current",
-  "updatedAt": "2026-08-18T16:44:00-06:00",
-  "phase": "F1_SUCCESSOR_ARTIFACT_CERTIFIED_UNPUBLISHED_RUNTIME_CONFIRMATION_PENDING",
+  "stateVersion": "20260818.f1-closed-pass.f2-acceptance-gate-pending.current",
+  "updatedAt": "2026-08-18T17:06:00-06:00",
+  "phase": "F1_CLOSED_PASS_F2_PRODUCTIVE_ACCEPTANCE_GATE_PENDING",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pr": 5,
@@ -37,7 +37,6 @@
   "f1_4C": {
     "status": "CLOSED_PASS_CONSUMED",
     "gateId": "f1-4c-successor-artifact-build-lab-v20260818",
-    "lifecycle": "tools/orbit360-validator-lifecycle-contract-f1-4c-successor-artifact-build-v20260818.json",
     "request01": {
       "commit": "cc5aeeca1c42506218c59830dd302c284ddc5554",
       "runId": "32193519205",
@@ -64,8 +63,8 @@
     "candidate": {
       "status": "F1_4C_SUCCESSOR_ARTIFACT_CERTIFIED_UNPUBLISHED",
       "manifestStatus": "FASE_A_PRODUCT_F1_4C_SUCCESSOR_CERTIFIED",
-      "artifactId": "9345207863",
-      "evidenceArtifactId": "9345208103",
+      "artifactId": 9345207863,
+      "evidenceArtifactId": 9345208103,
       "zipName": "orbit360-fase-a-product-f1-4c-successor-29caae94a3db.zip",
       "zipSha256": "493009c83390901aa772842a2ba9ddd5ce5293f6969d86c5c3395ebd670a44ac",
       "manifestSha256": "29dafe5e63b425ea6cf641937fe1b9d4b9e63f72479a51ae76f9148a55771761",
@@ -89,23 +88,82 @@
       "published": false,
       "noLabRuntime": true,
       "noPrivateSecretMaterial": true
+    }
+  },
+  "f1_4D": {
+    "status": "CLOSED_PASS_CONSUMED",
+    "gateId": "block-auth-paula-membership-readonly-reconcile-v2-lab-v20260817",
+    "validatorRevision": "f1-4d-exact-successor-runtime-browser-readonly-v1-20260818",
+    "request": {
+      "path": ".github/orbit360-requests/f1-4d-single-successor-runtime-browser-readonly-runbound-20260818-01.json",
+      "commit": "45c85e6ed6e992b490262f5abf12cce94d7a13c4",
+      "runId": 32195516901,
+      "runAttempt": 1,
+      "rerunExecuted": false,
+      "consumed": true,
+      "allowedExecutions": 0,
+      "authorizationFrozen": true,
+      "replayAllowed": false
     },
+    "candidateArtifactId": 9345207863,
+    "evidenceArtifactId": 9345706388,
+    "candidateZipSha256": "493009c83390901aa772842a2ba9ddd5ce5293f6969d86c5c3395ebd670a44ac",
+    "candidateManifestSha256": "29dafe5e63b425ea6cf641937fe1b9d4b9e63f72479a51ae76f9148a55771761",
+    "candidateSourceHead": "29caae94a3db1f1626bdde2ea6ee9a21799f9df6",
+    "gatePass": true,
+    "artifactVerificationPass": true,
+    "identityReadOnlyPass": true,
+    "oldErrorAbsent": true,
+    "sameFailureFamilyReappeared": false,
+    "bootstrap": {
+      "phase": "ready-read-only",
+      "ready": true,
+      "errors": [],
+      "assignedRoleCount": 4,
+      "countryCount": 2,
+      "collectionCount": 13,
+      "writeAuthorized": false,
+      "storeInstalled": true,
+      "snapshotsAttached": true
+    },
+    "store": {
+      "ready": true,
+      "status": "ready-read-only",
+      "writeEnabled": false,
+      "requiredMissingCount": 0,
+      "requiredFailedCount": 0
+    },
+    "browserExecuted": true,
+    "runtimeExecuted": true,
+    "secretAccess": true,
+    "firestoreRead": true,
+    "firestoreWrites": 0,
+    "authWrites": 0,
+    "operationalWrites": 0,
+    "packageRebuilt": false,
+    "deployExecuted": false,
+    "publicationExecuted": false,
+    "productionHostingTouched": false,
     "evidence": {
-      "certification": "orbit360-platform/runtime-gate-crm-v20260716/f1-4c-successor-artifact-certification-v20260818.json",
-      "runSummary": "orbit360-platform/runtime-gate-crm-v20260716/f1-4c-request02-run-summary-v20260818.json",
-      "checkpoint": "orbit360-platform/docs/CHECKPOINT-F1-4C-SUCCESSOR-ARTIFACT-CERTIFIED-UNPUBLISHED-20260818.md"
+      "preflight": "orbit360-platform/runtime-gate-crm-v20260716/f1-4d-preflight-run-32195516901.json",
+      "artifactVerify": "orbit360-platform/runtime-gate-crm-v20260716/f1-4d-candidate-artifact-verify-run-32195516901.json",
+      "identity": "orbit360-platform/runtime-gate-crm-v20260716/f1-4d-identity-run-32195516901.json",
+      "rawRuntime": "orbit360-platform/runtime-gate-crm-v20260716/f1-4d-runtime-browser-readonly-run-32195516901.json",
+      "terminal": "orbit360-platform/runtime-gate-crm-v20260716/f1-4d-final-run-32195516901.json",
+      "consumption": "orbit360-platform/runtime-gate-crm-v20260716/f1-4d-request-consumption-run-32195516901.json",
+      "checkpoint": "orbit360-platform/docs/CHECKPOINT-F1-4D-RUNTIME-BROWSER-READONLY-PASS-F1-CLOSED-20260818.md"
     }
   },
   "rootCauseState": {
     "membershipValidator": {
       "classification": "VALIDATOR_STALE",
       "code": "MEMBERSHIP_EMAIL_REQUIRED_STALE_AUTH_IDENTITY_OWNERSHIP",
-      "status": "ROOTFIX_SOURCE_ONLY_PASS_VALID_RUNTIME_CONFIRMATION_PENDING"
+      "status": "CLOSED_ROOTFIX_CONFIRMED_BY_F1_4D"
     },
     "artifactParityPipeline": {
       "classification": "PIPELINE_MECHANISM_FAILURE",
       "code": "ROOTFIX_ARTIFACT_PARITY_MISSING",
-      "status": "CLOSED_BY_F1_4B"
+      "status": "CLOSED_BY_F1_4B_AND_F1_4C_F1_4D"
     },
     "f1_4CPrebuild": {
       "classification": "VALIDATOR_STALE",
@@ -113,10 +171,8 @@
       "status": "CLOSED_SOURCE_ONLY_ROOTFIX_PASS"
     },
     "currentBlockingFact": {
-      "code": "SUCCESSOR_RUNTIME_CONFIRMATION_NOT_YET_EXECUTED",
-      "status": "RUNTIME_BROWSER_AUTHORIZATION_REQUIRED",
-      "artifactId": "9345207863",
-      "zipSha256": "493009c83390901aa772842a2ba9ddd5ce5293f6969d86c5c3395ebd670a44ac"
+      "code": "F1_NO_LONGER_BLOCKED",
+      "status": "F1_CLOSED_PASS_PROCEED_TO_F2_ACCEPTANCE_GATE_DEFINITION"
     },
     "authIsCurrentBlocker": false,
     "passwordIsCurrentBlocker": false,
@@ -128,37 +184,38 @@
   "documentationControl": {
     "index": "orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json",
     "currentAddendum": "orbit360-platform/docs/ADDENDUM-MAESTRO-CIERRE-FORENSE-SINCRONIZACION-Y-PLAN-CONGELADO-20260818.md",
-    "currentCheckpoint": "orbit360-platform/docs/CHECKPOINT-F1-4C-SUCCESSOR-ARTIFACT-CERTIFIED-UNPUBLISHED-20260818.md",
+    "currentCheckpoint": "orbit360-platform/docs/CHECKPOINT-F1-4D-RUNTIME-BROWSER-READONLY-PASS-F1-CLOSED-20260818.md",
     "historicalPolicy": "HISTORICAL_NOT_CURRENT_STATE",
-    "transactionStatus": "CLOSED_AFTER_F1_4C_CERTIFIED_UNPUBLISHED_SUCCESSOR"
+    "transactionStatus": "CLOSED_AFTER_F1_4D_RUNTIME_BROWSER_READONLY_PASS_F1_CLOSED"
   },
   "frozenPlan": {
-    "currentPhase": "F1",
+    "currentPhase": "F2",
     "goLiveRoute": {
-      "percentClosed": 20,
-      "closedPhases": ["F0"],
-      "remainingPhases": ["F1", "F2", "F3"]
+      "percentClosed": 50,
+      "closedPhases": ["F0", "F1"],
+      "remainingPhases": ["F2", "F3"]
     },
     "integratedProgram": {
-      "percentClosed": 10,
-      "closedPhases": ["F0"],
-      "remainingPhases": ["F1", "F2", "F3", "F4", "F5", "F6", "F7"]
+      "percentClosed": 25,
+      "closedPhases": ["F0", "F1"],
+      "remainingPhases": ["F2", "F3", "F4", "F5", "F6", "F7"]
     },
-    "currentPhaseInternalPercent": 80,
-    "currentPhaseInternalMethod": "4_of_5_named_subphases_closed_equal_milestone_tracking",
+    "currentPhaseInternalPercent": 0,
+    "currentPhaseInternalMethod": "F1_5_of_5_named_subphases_closed_F2_not_started",
     "currentPhaseSubphases": {
       "F1_1_owner_and_observer_source": "CLOSED",
       "F1_2A_observer_selftest": "CLOSED",
       "F1_2B_sanitized_inner_phase_error_runtime_observation": "CLOSED_CONSUMED_RUN_32175674293",
       "F1_3_owner_rootfix_source_static_synthetic": "CLOSED_PASS",
-      "F1_4_valid_runtime_rootfix_confirmation": "PENDING_ON_EXACT_F1_4C_SUCCESSOR",
+      "F1_4_valid_runtime_rootfix_confirmation": "CLOSED_PASS_CONSUMED_RUN_32195516901",
       "F1_4B_pipeline_parity_remediation": "CLOSED_SOURCE_ONLY_PASS",
-      "F1_4C_successor_artifact_build": "CLOSED_PASS_CONSUMED"
+      "F1_4C_successor_artifact_build": "CLOSED_PASS_CONSUMED",
+      "F1_4D_exact_successor_runtime_confirmation": "CLOSED_PASS_CONSUMED"
     }
   },
   "lanes": {
     "A_frontend_UX": "FROZEN_NO_CHANGES",
-    "B_backend_security_gates": "F1_4C_CLOSED_PASS_AWAITING_F1_4D_RUNTIME_CONFIRMATION",
+    "B_backend_security_gates": "F1_CLOSED_PASS_F2_ACCEPTANCE_GATE_PENDING",
     "C_real_data_migration": "UNTOUCHED_ZERO_CHANGES"
   },
   "writes": {
@@ -167,9 +224,9 @@
     "operational": 0
   },
   "authorization": {
-    "f1_4CRuntimeBuildAuthorizationConsumed": true,
-    "f1_4CCandidateBuildsExecuted": 1,
-    "f1_4CRequestReplayAllowed": false,
+    "f1_4DRuntimeAuthorizationConsumed": true,
+    "f1_4DRequestReplayAllowed": false,
+    "f1_4DRunId": 32195516901,
     "candidateRebuildAuthorizedNow": false,
     "browserAuthorizedNow": false,
     "runtimeAuthorizedNow": false,
@@ -179,10 +236,10 @@
     "membershipChangesAuthorized": false,
     "dataChangesAuthorized": false,
     "mainMergeAuthorized": false,
-    "f1_4DRequiresExplicitRuntimeBrowserAuthorization": true
+    "f2AuthorizationStatus": "NOT_DERIVED_NOT_GRANTED"
   },
   "goLive": {
-    "status": "F1_EXACT_SUCCESSOR_READY_FOR_SINGLE_RUNTIME_CONFIRMATION",
+    "status": "F1_CLOSED_PASS_F2_ACCEPTANCE_GATE_PENDING",
     "publicUrl": "https://app.aysseguros.com",
     "publishedPackagePreserved": true,
     "successorPublished": false,
@@ -194,23 +251,24 @@
     "oldArtifactEquivalentRuntimeActive": true,
     "f1_4HistoricalRunMayBeRerun": false,
     "f1_4CBuildMayBeRerun": false,
+    "f1_4DRuntimeMayBeRerun": false,
     "successorRebuildAllowed": false,
-    "nextRuntimeMustBindExactArtifactIdentity": true,
-    "releaseCondition": "ONE_EXPLICITLY_AUTHORIZED_READONLY_RUNTIME_BROWSER_CONFIRMATION_BOUND_TO_ARTIFACT_9345207863_SHA_493009C8"
+    "candidateArtifactLockedForF2": true,
+    "sameFailureFamilyReappearedInF1_4D": false
   },
   "nextActionExact": {
-    "stage": "F1_4D_SINGLE_SUCCESSOR_ARTIFACT_RUNTIME_BROWSER_READONLY_CONFIRMATION",
-    "authorizationRequired": "EXPLICIT_RUNTIME_BROWSER_AUTHORIZATION",
-    "action": "After explicit authorization only: canonical gate-contract validator first; create one new immutable single-use request bound to candidate artifact 9345207863, evidence artifact 9345208103, ZIP SHA256 493009c83390901aa772842a2ba9ddd5ce5293f6969d86c5c3395ebd670a44ac, manifest SHA256 29dafe5e63b425ea6cf641937fe1b9d4b9e63f72479a51ae76f9148a55771761 and sourceHead 29caae94a3db1f1626bdde2ea6ee9a21799f9df6. Execute exactly one read-only runtime/browser confirmation using this exact successor, not R4S9C. Zero rebuild/deploy/publication/Auth/membership/data/Firestore/operational writes. Verify membership_invalid:email_invalido is absent and capture the next sanitized phase/errors or PASS. STOP_RETRY if the same failure family reappears."
+    "stage": "F2_PRODUCTIVE_ACCEPTANCE_GATE_EXACT_SUCCESSOR",
+    "authorizationRequired": "DERIVE_FROM_FROZEN_PLAN_AND_CURRENT_LIVE_STATE_BEFORE_EXECUTION",
+    "action": "Read the frozen plan and current binding sources to derive the exact F2 acceptance gate, its Definition of Done and authorization boundary. Bind F2 to the exact certified successor artifact 9345207863 unless a later explicitly certified successor supersedes it. Do not rebuild, deploy, publish, mutate production, Auth, membership or data by inference. Do not repeat F1.4D."
   },
   "resumeProtocol": [
     "Read ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json",
     "Read this live-state",
     "Confirm actual HEAD and PR #5",
-    "Read F1.4C certification and request02 run summary",
-    "Read CHECKPOINT-F1-4C-SUCCESSOR-ARTIFACT-CERTIFIED-UNPUBLISHED-20260818.md",
-    "Do not repeat F1.4, F1.4B or F1.4C build",
+    "Read F1.4D terminal evidence and request consumption",
+    "Read CHECKPOINT-F1-4D-RUNTIME-BROWSER-READONLY-PASS-F1-CLOSED-20260818.md",
+    "Do not repeat F1.4, F1.4B, F1.4C or F1.4D",
     "Do not test R4S9C as rootfix artifact",
-    "Execute only F1_4D after explicit runtime/browser authorization"
+    "Derive exact F2 contract from frozen plan before any F2 execution"
   ]
 }
