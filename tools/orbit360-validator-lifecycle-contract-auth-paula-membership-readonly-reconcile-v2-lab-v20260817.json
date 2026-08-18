@@ -3,7 +3,7 @@
   "gateId": "block-auth-paula-membership-readonly-reconcile-v2-lab-v20260817",
   "gateContractVersion": "14.3.0",
   "validatorLifecycleRevision": "phase-capability-contract-v1",
-  "status": "AUTH_PAULA_MEMBERSHIP_READONLY_V2_CONSUMED_STOP_RETRY",
+  "status": "AUTH_PAULA_MEMBERSHIP_READONLY_V2_FRESH_EVIDENCE_REQUEST_PENDING",
   "currentPhase": "AUTH_PAULA_MEMBERSHIP_READONLY_RECONCILIATION_V2_LAB",
   "executionProfile": {
     "phase": "AUTH_PAULA_MEMBERSHIP_READONLY_RECONCILIATION_V2_LAB",
@@ -24,10 +24,10 @@
   "rcId": "RC-AYS-LAB-CANONICA-01",
   "authorization": {
     "requiredForExecution": true,
-    "activeRequest": false,
-    "allowedExecutions": 0,
-    "request": ".github/orbit360-requests/auth-paula-membership-readonly-reconcile-v2-lab-v20260817.json",
-    "consumed": true,
+    "activeRequest": true,
+    "allowedExecutions": 1,
+    "request": ".github/orbit360-requests/auth-paula-membership-readonly-reconcile-v2-fresh-evidence-lab-v20260817.json",
+    "consumed": false,
     "replayAllowed": false,
     "newExplicitAuthorizationRequiredAfterExecution": false
   },
@@ -69,17 +69,11 @@
     "countriesRequired": true,
     "advisorBindingWhenAsesorRequired": true,
     "readbackMustRemainUnchanged": true,
+    "freshEvidenceRunIdRequired": true,
+    "evidenceSealMustRemainByteIdentical": true,
     "stopRetryOnFailure": true
   },
   "containsPII": false,
   "containsSecrets": false,
-  "executionResult": {
-    "stage": "TARGET_IDENTITY_MEMBERSHIP_READONLY_STOP",
-    "classification": "DATA_CONTRACT_FAILURE",
-    "failedCheck": "TARGET_MEMBERSHIP_REQUIRED_ROLES_MISSING",
-    "ok": false,
-    "firestoreWrites": 0,
-    "authWrites": 0,
-    "operationalWrites": 0
-  }
+  "executionResult": null
 }
