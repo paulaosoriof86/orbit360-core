@@ -67,6 +67,54 @@ function buildPatchedHarness(contract) {
   patched = patched.replace(baseManifestStatus, contract.manifestStatus);
   if (count(patched, contract.manifestStatus) !== 1) fail('CERTIFIED_MANIFEST_STATUS_NOT_BOUND_EXACTLY_ONCE');
 
+  const stalePasswordDecl = "const PASSWORD = String(process.env.ORBIT360_PRODUCT_SMOKE_PASSWORD || '');";
+  const customTokenDecl = "const CUSTOM_TOKEN = String(process.env.ORBIT360_PRODUCT_SMOKE_CUSTOM_TOKEN || '');";
+  if (count(patched, stalePasswordDecl) !== 1) fail(`STALE_PASSWORD_DECL_COUNT_INVALID:${count(patched, stalePasswordDecl)}`);
+  patched = patched.replace(stalePasswordDecl, customTokenDecl);
+  const stalePrecondition = "if (!TARGET.startsWith('https://') || !EMAIL || PASSWORD.length < 12 || !/^[a-f0-9]{64}$/.test(EXPECTED_AUTH_SHA256)) throw new ClassifiedError('PIPELINE_MECHANISM_FAILURE', 'R4_SMOKE_PRECONDITION_NOT_BOUND');";
+  const tokenPrecondition = "if (!TARGET.startsWith('https://') || !EMAIL || CUSTOM_TOKEN.length < 100 || !/^[a-f0-9]{64}$/.test(EXPECTED_AUTH_SHA256)) throw new ClassifiedError('PIPELINE_MECHANISM_FAILURE', 'R4_CUSTOM_TOKEN_SMOKE_PRECONDITION_NOT_BOUND');";
+  if (count(patched, stalePrecondition) !== 1) fail(`STALE_PASSWORD_PRECONDITION_COUNT_INVALID:${count(patched, stalePrecondition)}`);
+  patched = patched.replace(stalePrecondition, tokenPrecondition);
+
+  const staleAuthBlock = `  const authResponsePromise = page.waitForResponse(response => { try { const u = new URL(response.url()); return /identitytoolkit\\.googleapis\\.com/i.test(u.host) && /accounts:signInWithPassword/i.test(u.pathname); } catch { return false; } }, { timeout: 25000 });
+  await runStage('login-submit', 15000, async () => { await page.fill('#lg-user', EMAIL); await page.fill('#lg-pass', PASSWORD); await page.click('#login-form button[type="submit"]'); });
+  const authResponse = await runStage('login-http-response', 30000, () => authResponsePromise, r => ({ httpStatus: r.status() }));
+  d.authHttp.seen = true; d.authHttp.status = authResponse.status();
+  if (authResponse.status() >= 400) {
+    const body = await withTimeout('auth-error-body', 4000, () => authResponse.json().catch(() => ({})));
+    d.authHttp.errorCode = txt(body && body.error && (body.error.message || body.error.status) || '').split(/[:\\s]/)[0].replace(/[^A-Z0-9_-]/gi, '').toUpperCase().slice(0, 80);
+    checkpoint('login-http-classified', 'FAIL', { httpStatus: d.authHttp.status, errorCode: d.authHttp.errorCode });
+    throw new ClassifiedError('DATA_CONTRACT_FAILURE', 'R4_SMOKE_IDENTITY_CREDENTIAL_REJECTED');
+  }
+  checkpoint('login-http-classified', 'PASS', { httpStatus: d.authHttp.status });`;
+  const customAuthBlock = `  const authResponsePromise = page.waitForResponse(response => { try { const u = new URL(response.url()); return /identitytoolkit\\.googleapis\\.com/i.test(u.host) && /accounts:signInWithCustomToken/i.test(u.pathname); } catch { return false; } }, { timeout: 25000 });
+  await runStage('custom-token-submit', 15000, async () => { await page.evaluate(async token => { const p = window.Orbit && Orbit.productRuntimeBrowserProvidersP0; if (!p || typeof p.initialize !== 'function') throw new Error('PRODUCT_AUTH_PROVIDER_NOT_AVAILABLE'); const ctx = await p.initialize(); if (!ctx || !ctx.modules || !ctx.modules.auth || typeof ctx.modules.auth.signInWithCustomToken !== 'function') throw new Error('CUSTOM_TOKEN_AUTH_METHOD_NOT_AVAILABLE'); await ctx.modules.auth.signInWithCustomToken(ctx.auth, token); }, CUSTOM_TOKEN); });
+  const authResponse = await runStage('custom-token-http-response', 30000, () => authResponsePromise, r => ({ httpStatus: r.status() }));
+  d.authHttp.seen = true; d.authHttp.status = authResponse.status();
+  if (authResponse.status() >= 400) {
+    const body = await withTimeout('auth-error-body', 4000, () => authResponse.json().catch(() => ({})));
+    d.authHttp.errorCode = txt(body && body.error && (body.error.message || body.error.status) || '').split(/[:\\s]/)[0].replace(/[^A-Z0-9_-]/gi, '').toUpperCase().slice(0, 80);
+    checkpoint('custom-token-http-classified', 'FAIL', { httpStatus: d.authHttp.status, errorCode: d.authHttp.errorCode });
+    throw new ClassifiedError('PIPELINE_MECHANISM_FAILURE', 'R4_CUSTOM_TOKEN_AUTH_REJECTED');
+  }
+  checkpoint('custom-token-http-classified', 'PASS', { httpStatus: d.authHttp.status });`;
+  if (count(patched, staleAuthBlock) !== 1) fail(`STALE_PASSWORD_AUTH_BLOCK_COUNT_INVALID:${count(patched, staleAuthBlock)}`);
+  patched = patched.replace(staleAuthBlock, customAuthBlock);
+
+  const runtimeMarker = "  await runStage('runtime-activation', 45000, () => page.waitForFunction(() => { const app = window.Orbit && Orbit.productAppP0 && Orbit.productAppP0.status ? Orbit.productAppP0.status() : null; const loginError = document.getElementById('login-error'); return !!(app && app.started) || !!(app && app.lastError) || !!(loginError && String(loginError.textContent || '').trim()); }, undefined, { timeout: 40000 }));";
+  const runtimeTrigger = `  await runStage('runtime-activation-trigger', 45000, () => page.evaluate(async () => { if (!window.Orbit || !Orbit.productAppP0 || typeof Orbit.productAppP0.activate !== 'function') throw new Error('PRODUCT_APP_ACTIVATION_OWNER_MISSING'); return Orbit.productAppP0.activate(); }));
+${runtimeMarker}`;
+  if (count(patched, runtimeMarker) !== 1) fail(`RUNTIME_MARKER_COUNT_INVALID:${count(patched, runtimeMarker)}`);
+  patched = patched.replace(runtimeMarker, runtimeTrigger);
+
+  patched = patched.replace("if (/^(login-submit|login-http-response|auth-projection)$/.test(stage)) return ['FUNCTIONAL_DEFECT', `R4_${stage.toUpperCase().replace(/-/g, '_')}_TIMEOUT`];", "if (/^(custom-token-submit|custom-token-http-response|auth-projection|runtime-activation-trigger)$/.test(stage)) return ['FUNCTIONAL_DEFECT', `R4_${stage.toUpperCase().replace(/-/g, '_')}_TIMEOUT`];");
+  patched = patched.replace("if (/^(login-submit|login-http-response|auth-error-body|auth-projection)$/.test(stage)) return ['FUNCTIONAL_DEFECT', `R4_${stage.toUpperCase().replace(/-/g, '_')}_FAILED`];", "if (/^(custom-token-submit|custom-token-http-response|auth-error-body|auth-projection|runtime-activation-trigger)$/.test(stage)) return ['FUNCTIONAL_DEFECT', `R4_${stage.toUpperCase().replace(/-/g, '_')}_FAILED`];");
+
+  const baseFlagsNeedle = "return { containsPII: false, containsSecrets: false, secretValuesLogged: false, writesAuthorized: false, deployExecuted: false, packageRebuilt: false, productionTouched };";
+  const baseFlagsReplacement = "return { containsPII: false, containsSecrets: false, secretValuesLogged: false, writesAuthorized: false, deployExecuted: false, packageRebuilt: false, productionTouched, authMechanism: 'custom-token-ephemeral', passwordSecretUsed: false, customTokenPersisted: false, customTokenMintedForExactTarget: true };";
+  if (count(patched, baseFlagsNeedle) !== 1) fail(`BASE_FLAGS_COUNT_INVALID:${count(patched, baseFlagsNeedle)}`);
+  patched = patched.replace(baseFlagsNeedle, baseFlagsReplacement);
+
   const staleLegalBlock = `  const legal = page.locator('[data-legal-gate]');
   if (await withTimeout('legal-count', 5000, () => legal.count()) && await withTimeout('legal-check-count', 5000, () => page.locator('#lg-chk').count()) && await withTimeout('legal-ok-count', 5000, () => page.locator('#lg-ok').count())) {
     await runStage('legal-gate-local', 10000, async () => { await page.locator('#lg-chk').check(); await page.locator('#lg-ok').click(); d.legalGateHandledLocally = true; await page.waitForTimeout(200); });
@@ -103,19 +151,55 @@ function selfTest(contract, harness) {
   const manifestStatusBoundExactlyOnce = count(harness.patched, contract.manifestStatus) === 1;
   const serviceWorkerParityEnabled = !harness.patched.includes("serviceWorkers: 'block'");
   const runnerBrowserExecutableBound = count(harness.patched, 'ORBIT360_SYSTEM_BROWSER_EXECUTABLE') === 1 && !harness.patched.includes('chromium.launch({ headless: true })');
-  const ok = sourceAuth.sha256 === contract.authAsset.sha256 && sourceAuth.bytes === contract.authAsset.bytes && !harness.patched.includes('/core/auth.js') && harness.patched.includes(contract.authAsset.path) && manifestStatusBoundExactlyOnce && staleLegalInteractionRemoved && readonlyLegalObserverBound && serviceWorkerParityEnabled && runnerBrowserExecutableBound && patchedHarnessSyntaxPass;
-  const payload = { schemaVersion: 'orbit360-r4-certified-validator-rootfix-source-v1', ok, status: ok ? 'R4_CERTIFIED_VALIDATOR_ROOTFIX_SOURCE_PASS' : 'R4_CERTIFIED_VALIDATOR_ROOTFIX_SOURCE_FAIL', classification: ok ? 'VALIDATOR_STALE_ROOTFIX_PASS' : 'VALIDATOR_STALE_ROOTFIX_FAIL', sourceHead: contract.sourceHead, durableArtifact: { r3RunId: contract.r3RunId, artifactId: contract.r3DurableArtifactId, zipName: contract.zipName, zipSha256: contract.zipSha256, fileCount: contract.fileCount }, entrypoint: contract.entrypoint, manifestStatus: contract.manifestStatus, manifestStatusBoundExactlyOnce, authAsset: { ...contract.authAsset, sourceSha256Matches: sourceAuth.sha256 === contract.authAsset.sha256, sourceBytesMatch: sourceAuth.bytes === contract.authAsset.bytes }, staleLegacyAuthPathRemovedFromExecutableHarness: !harness.patched.includes('/core/auth.js'), productAuthPathBoundExactlyOnce: count(harness.patched, contract.authAsset.path) === 1, serviceWorkerParityEnabled, serviceWorkersBlockedInExecutableHarness: !serviceWorkerParityEnabled, runnerBrowserExecutableBound, staleLegalInteractionRemoved, readonlyLegalObserverBound, patchedHarnessSyntaxPass, runtimeHarnessLocation: 'workspace/tools', browserExecuted: false, secretAccess: false, dataAccess: false, firestoreWrites: 0, authWrites: 0, operationalWrites: 0, deployExecuted: false, packageRebuilt: false, productionTouched: false, containsPII: false, containsSecrets: false };
+  const customTokenPathBound = count(harness.patched, 'signInWithCustomToken') === 2 && count(harness.patched, 'accounts:signInWithCustomToken') === 1;
+  const passwordSubmitPathRemoved = !harness.patched.includes('accounts:signInWithPassword') && !harness.patched.includes("page.fill('#lg-pass'") && !harness.patched.includes('ORBIT360_PRODUCT_SMOKE_PASSWORD');
+  const postAuthActivationBound = count(harness.patched, "runStage('runtime-activation-trigger'") === 1;
+  const tokenNeverPersistedByHarness = !harness.patched.includes('writeFileSync(OUT, CUSTOM_TOKEN') && !harness.patched.includes('customToken: CUSTOM_TOKEN');
+  const ok = sourceAuth.sha256 === contract.authAsset.sha256 && sourceAuth.bytes === contract.authAsset.bytes && !harness.patched.includes('/core/auth.js') && harness.patched.includes(contract.authAsset.path) && manifestStatusBoundExactlyOnce && staleLegalInteractionRemoved && readonlyLegalObserverBound && serviceWorkerParityEnabled && runnerBrowserExecutableBound && customTokenPathBound && passwordSubmitPathRemoved && postAuthActivationBound && tokenNeverPersistedByHarness && patchedHarnessSyntaxPass;
+  const payload = { schemaVersion: 'orbit360-r4-certified-validator-rootfix-source-v1', ok, status: ok ? 'R4_CERTIFIED_VALIDATOR_ROOTFIX_SOURCE_PASS' : 'R4_CERTIFIED_VALIDATOR_ROOTFIX_SOURCE_FAIL', classification: ok ? 'VALIDATOR_STALE_ROOTFIX_PASS' : 'VALIDATOR_STALE_ROOTFIX_FAIL', sourceHead: contract.sourceHead, durableArtifact: { r3RunId: contract.r3RunId, artifactId: contract.r3DurableArtifactId, zipName: contract.zipName, zipSha256: contract.zipSha256, fileCount: contract.fileCount }, entrypoint: contract.entrypoint, manifestStatus: contract.manifestStatus, manifestStatusBoundExactlyOnce, authAsset: { ...contract.authAsset, sourceSha256Matches: sourceAuth.sha256 === contract.authAsset.sha256, sourceBytesMatch: sourceAuth.bytes === contract.authAsset.bytes }, staleLegacyAuthPathRemovedFromExecutableHarness: !harness.patched.includes('/core/auth.js'), productAuthPathBoundExactlyOnce: count(harness.patched, contract.authAsset.path) === 1, serviceWorkerParityEnabled, serviceWorkersBlockedInExecutableHarness: !serviceWorkerParityEnabled, runnerBrowserExecutableBound, staleLegalInteractionRemoved, readonlyLegalObserverBound, customTokenPathBound, passwordSubmitPathRemoved, postAuthActivationBound, tokenNeverPersistedByHarness, authMechanism: 'custom-token-ephemeral', passwordSecretUsed: false, patchedHarnessSyntaxPass, runtimeHarnessLocation: 'workspace/tools', browserExecuted: false, secretAccess: false, dataAccess: false, firestoreWrites: 0, authWrites: 0, operationalWrites: 0, deployExecuted: false, packageRebuilt: false, productionTouched: false, containsPII: false, containsSecrets: false };
   writeJson(SELF_EVIDENCE, payload); console.log(JSON.stringify(payload, null, 2)); if (!ok) process.exitCode = 41;
+}
+async function mintExactTargetCustomToken() {
+  const projectId = String(process.env.ORBIT360_PRODUCT_PROJECT_ID || '').trim();
+  const targetHash = String(process.env.ORBIT360_TARGET_EMAIL_HASH || '').trim().toLowerCase();
+  if (!projectId || !/^[a-f0-9]{64}$/.test(targetHash) || !process.env.GOOGLE_APPLICATION_CREDENTIALS) fail('CUSTOM_TOKEN_TARGET_CONTEXT_NOT_BOUND');
+  const appMod = await import('firebase-admin/app');
+  const authMod = await import('firebase-admin/auth');
+  const app = appMod.getApps()[0] || appMod.initializeApp({ credential: appMod.applicationDefault(), projectId });
+  try {
+    const auth = authMod.getAuth(app);
+    const users = [];
+    let pageToken;
+    do {
+      const page = await auth.listUsers(1000, pageToken);
+      users.push(...page.users);
+      pageToken = page.pageToken;
+    } while (pageToken && users.length < 10000);
+    const matches = users.filter(user => {
+      const email = String(user.email || '').trim().toLowerCase().replace(/\s+/g, '');
+      return email && sha256(email) === targetHash;
+    });
+    if (matches.length !== 1) fail(`CUSTOM_TOKEN_TARGET_AUTH_MATCH_${matches.length}`);
+    const user = matches[0];
+    if (user.disabled) fail('CUSTOM_TOKEN_TARGET_DISABLED');
+    if (user.emailVerified !== true) fail('CUSTOM_TOKEN_TARGET_EMAIL_NOT_VERIFIED');
+    const token = await auth.createCustomToken(user.uid, { orbitGate: '14.3', purpose: 'paula-postauth-readonly' });
+    if (typeof token !== 'string' || token.length < 100) fail('CUSTOM_TOKEN_MINT_FAILED');
+    return token;
+  } finally {
+    try { await appMod.deleteApp(app); } catch {}
+  }
 }
 
 const contract = readJson(CONTRACT_PATH); validateContract(contract); const harness = buildPatchedHarness(contract);
 if (process.argv.includes('--self-test')) {
   selfTest(contract, harness);
 } else {
+  const token = await mintExactTargetCustomToken();
   const temp = path.join(ROOT, 'tools', `.orbit360-r4-certified-${process.pid}-${Date.now()}.mjs`);
   fs.writeFileSync(temp, harness.patched, 'utf8');
   try {
-    const child = spawnSync(process.execPath, [temp], { cwd: ROOT, stdio: 'inherit', env: { ...process.env, ORBIT360_R4_EXPECTED_AUTH_SHA256: contract.authAsset.sha256, ORBIT360_R4_CERTIFIED_AUTH_ASSET_PATH: contract.authAsset.path, ORBIT360_R4_CERTIFIED_ENTRYPOINT_SHA256: contract.entrypoint.sha256, ORBIT360_R4_CERTIFIED_PACKAGE_SHA256: contract.zipSha256 } });
+    const child = spawnSync(process.execPath, [temp], { cwd: ROOT, stdio: 'inherit', env: { ...process.env, ORBIT360_PRODUCT_SMOKE_CUSTOM_TOKEN: token, ORBIT360_PRODUCT_SMOKE_PASSWORD: '', ORBIT360_R4_EXPECTED_AUTH_SHA256: contract.authAsset.sha256, ORBIT360_R4_CERTIFIED_AUTH_ASSET_PATH: contract.authAsset.path, ORBIT360_R4_CERTIFIED_ENTRYPOINT_SHA256: contract.entrypoint.sha256, ORBIT360_R4_CERTIFIED_PACKAGE_SHA256: contract.zipSha256 } });
     if (child.error) throw child.error; process.exitCode = Number.isInteger(child.status) ? child.status : 41;
   } finally { try { fs.unlinkSync(temp); } catch {} }
 }
