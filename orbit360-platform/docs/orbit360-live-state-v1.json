@@ -1,44 +1,35 @@
 {
   "schemaVersion": "orbit360-live-state-v1",
-  "stateVersion": "20260818.f1-observer-selftest-pass-37_5.runtime-observation-auth-pending.current",
-  "updatedAt": "2026-08-18T12:51:10-06:00",
-  "phase": "F1_RUNTIME_BOOTSTRAP_OBSERVATION_AUTH_PENDING",
+  "stateVersion": "20260818.f1-3-membership-email-rootfix-source-pass.runtime-confirmation-pending.current",
+  "updatedAt": "2026-08-18T15:52:07-06:00",
+  "phase": "F1_ROOTFIX_SOURCE_ONLY_PASS_RUNTIME_CONFIRMATION_PENDING",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pr": 5,
   "prState": "draft-open",
-  "observerSourceHead": "6d68495ec92f103c805503a42b46bd5a755c3ef9",
-  "sourceOnlyMaterializationHead": "2a8490e1ca9c720bc2e603e1244faee3a8e4da98",
-  "sourceOnlyEvidenceCommit": "83e67058cec461677e7b3769bf0755fb0d0bf4f2",
-  "checkpointCommit": "988546f17897fcc38ee92bf5d4fed5201a510435",
-  "documentationTransactionPrecloseHead": "806baa99d35f6c482d6290d6899b3d7aa5072d7c",
+  "operationalFailureSourceHead": "811395c09826b1f69d76af12bbaa73e7377c8f35",
+  "runtimeEvidencePersistenceHead": "1f73d29244b114d8829d5b6c9d664dfce9824a81",
+  "rootfixCommits": [
+    "a808e13d69dcb687f488be7e17411796eaec3509",
+    "b050d5a1a9861f898d2bb50d1bcc5c26beb72e9b",
+    "01fbfc9372e6a6987e70c8a0522322d18109b333",
+    "24a36d216f7f7baa407bae03f8c8a965c05fe4af"
+  ],
+  "sourceOnlyEvidenceCommit": "7e2123f91d1cbf518a92197b6e24fed9ae29c65c",
   "currentPublishedPackage": {
     "version": "R4S9C",
     "sha256": "917f5424deea06d224d45a1b039c0b3699d71a7bef430b2a40d059703b2acc3a",
     "sourceHead": "861326906558f03d9c8c2e7f34adfb4979a17d73",
-    "manifestStatus": "FASE_A_PRODUCT_R4S9C_CONTRACT_RECOVERY_CERTIFIED",
-    "manifestSha256": "fc9b9d23d8749b6c70a24381271cee6e3227d7db286d13b740995514b8d735b5",
-    "durableArtifactId": 9300368902,
-    "productFileCount": 194,
     "preserveImmutableDuringDiagnosis": true
   },
-  "historicalGate3": {
-    "status": "PASS_HISTORICAL_NOT_SUFFICIENT_FOR_CURRENT_GO_LIVE",
-    "runId": 32069742485,
-    "jobId": 95510009418,
-    "evidenceArtifactId": 9301327700,
-    "supersededForCurrentAcceptanceByRunId": 32155605314
-  },
   "lastRuntimeEvidence": {
-    "path": "orbit360-platform/runtime-gate-crm-v20260716/auth-paula-gate14-3-smoke-run-32155605314.json",
-    "rawPath": "orbit360-platform/runtime-gate-crm-v20260716/r4-production-readonly-smoke-run-32155605314.json",
-    "runId": 32155605314,
-    "jobId": 95771954009,
-    "status": "AUTH_PAULA_REAL_BROWSER_READONLY_SMOKE_FAIL",
-    "classification": "FUNCTIONAL_DEFECT",
-    "failedCheck": "R4_RUNTIME_ACTIVATION_TRIGGER_FAILED",
-    "outerError": "PRODUCT_READONLY_BOOTSTRAP_NOT_READY",
-    "membershipToActivationFailElapsedMs": 109,
+    "path": "orbit360-platform/runtime-gate-crm-v20260716/r4-production-readonly-smoke-run-32175674293.json",
+    "runId": 32175674293,
+    "status": "R4_PRODUCTION_READONLY_SMOKE_FAIL",
+    "classificationAtRun": "FUNCTIONAL_DEFECT",
+    "failedCheck": "R4_PRODUCT_BOOTSTRAP_OBSERVED_FAILURE",
+    "bootstrapPhase": "blocked",
+    "bootstrapErrors": ["membership_invalid:email_invalido"],
     "authSignedIn": true,
     "emailVerified": true,
     "membershipAvailable": true,
@@ -46,28 +37,29 @@
     "tenantMatches": true,
     "runtimeStarted": false,
     "routerStarted": false,
-    "tenantContextReady": false,
     "storeReady": false,
     "firestoreWrites": 0,
     "authWrites": 0,
     "operationalWrites": 0,
     "deployExecuted": false,
-    "packageRebuilt": false,
-    "innerBootstrapErrorCaptured": false,
-    "whyInnerErrorMissing": "Run predates observer commit 6d68495ec92f103c805503a42b46bd5a755c3ef9; no inference allowed"
+    "packageRebuilt": false
   },
   "lastLifecycleEvidence": {
-    "path": "orbit360-platform/runtime-gate-crm-v20260716/auth-paula-gate14-3-pipeline-run-32155605314.json",
-    "runId": 32155605314,
+    "path": "orbit360-platform/runtime-gate-crm-v20260716/auth-paula-gate14-3-pipeline-run-32175674293.json",
+    "runId": 32175674293,
     "status": "SEALED_STOP_RETRY",
-    "classification": "FUNCTIONAL_DEFECT",
-    "failedCheck": "R4_RUNTIME_ACTIVATION_TRIGGER_FAILED"
+    "failedCheck": "R4_PRODUCT_BOOTSTRAP_OBSERVED_FAILURE"
   },
   "lastSourceOnlyEvidence": {
-    "path": "orbit360-platform/runtime-gate-crm-v20260716/r4-role-route-attribution-selftest-v20260818.json",
-    "status": "R4_ROLE_ROUTE_ATTRIBUTION_SELFTEST_PASS",
+    "path": "orbit360-platform/runtime-gate-crm-v20260716/f1-3-membership-email-ownership-source-only-v20260818.json",
+    "status": "F1_3_MEMBERSHIP_EMAIL_OWNERSHIP_SOURCE_ONLY_PASS",
     "classification": "VALIDATOR_STALE_ROOTFIX_PASS",
-    "targetBound": true,
+    "contractVersion": "p0-20260713",
+    "contractRevision": "email-optional-auth-owned-20260818",
+    "failed": [],
+    "staticViolations": [],
+    "emailOptional": true,
+    "emailIdentityOwner": "auth",
     "browserExecuted": false,
     "secretAccess": false,
     "dataAccess": false,
@@ -76,11 +68,7 @@
     "authWrites": 0,
     "operationalWrites": 0,
     "deployExecuted": false,
-    "packageRebuilt": false,
-    "materializedFromHead": "2a8490e1ca9c720bc2e603e1244faee3a8e4da98",
-    "observerGitBlob": "8190abf0ca77a5e63f228e55a7cbd7bcb0a03786",
-    "baseHarnessGitBlob": "07a002b43f6b4778891f0afdf86d9f3222dd3141",
-    "certifiedWrapperGitBlob": "c4cc63d561361b9e7967b344b9032834e6b71d53"
+    "packageRebuilt": false
   },
   "rootCauseState": {
     "methodology": {
@@ -89,39 +77,30 @@
       "status": "CLOSED_BY_F0_RECONCILIATION_20260818"
     },
     "technicalBlocker": {
-      "classification": "FUNCTIONAL_DEFECT",
-      "code": "R4_RUNTIME_ACTIVATION_TRIGGER_FAILED",
-      "status": "OPEN_STOP_RETRY_OBSERVER_CERTIFIED_RUNTIME_OBSERVATION_PENDING"
+      "classification": "VALIDATOR_STALE",
+      "code": "MEMBERSHIP_EMAIL_REQUIRED_STALE_AUTH_IDENTITY_OWNERSHIP",
+      "status": "ROOTFIX_SOURCE_ONLY_PASS_PENDING_SINGLE_RUNTIME_CONFIRMATION"
     },
-    "sourceAttribution": {
-      "outerOwner": "orbit360-platform/core/product-app-p0.js",
-      "innerOwner": "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js",
-      "publishedBootstrapContentSha": "bd6e68d9aec9bd7a1c7868e2bab659790e288c36",
-      "currentBootstrapContentSha": "bd6e68d9aec9bd7a1c7868e2bab659790e288c36",
-      "publishedOwnerParity": true,
-      "outerBehavior": "Converts bootstrap ok/ready failure to PRODUCT_READONLY_BOOTSTRAP_NOT_READY",
-      "innerBehavior": "Captures internal exception into status.errors, transitions blocked, returns fail-closed result",
-      "observerSelfTest": "PASS",
-      "specificInnerFailure": "UNKNOWN_PENDING_SANITIZED_OBSERVATION",
-      "inferenceForbidden": true
+    "owners": {
+      "baseContract": "orbit360-platform/core/membership-multirol-contract-p0.js",
+      "effectiveContract": "orbit360-platform/core/membership-multirol-effective-p0.js",
+      "productBootstrap": "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js",
+      "authIdentityOwner": "Firebase Auth / authProvider",
+      "runtimeMembershipProvider": "orbit360-platform/core/product-runtime-browser-providers-p0.js"
     },
     "authIsCurrentBlocker": false,
     "passwordIsCurrentBlocker": false,
-    "membershipTenantIsCurrentBlocker": false,
+    "membershipExistenceIsCurrentBlocker": false,
+    "tenantIsCurrentBlocker": false,
     "hostDimeIsCurrentBlocker": false,
     "dataReimportIsCurrentBlocker": false
   },
   "documentationControl": {
     "index": "orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json",
     "currentAddendum": "orbit360-platform/docs/ADDENDUM-MAESTRO-CIERRE-FORENSE-SINCRONIZACION-Y-PLAN-CONGELADO-20260818.md",
-    "f0Checkpoint": "orbit360-platform/docs/CHECKPOINT-F0-RECONCILIACION-FORENSE-20260818.md",
-    "currentCheckpoint": "orbit360-platform/docs/CHECKPOINT-F1-SOURCE-ONLY-BOOTSTRAP-ATTRIBUTION-20260818.md",
-    "readmeSynchronized": true,
-    "prSynchronized": true,
-    "indexSynchronized": true,
+    "currentCheckpoint": "orbit360-platform/docs/CHECKPOINT-F1-3-MEMBERSHIP-EMAIL-ROOTFIX-SOURCE-ONLY-20260818.md",
     "historicalPolicy": "HISTORICAL_NOT_CURRENT_STATE",
-    "documentationSynchronized": true,
-    "transactionStatus": "CLOSED_AFTER_SOURCE_ONLY_PASS"
+    "transactionStatus": "F1_3_SYNC_IN_PROGRESS"
   },
   "frozenPlan": {
     "source": "orbit360-platform/docs/ADDENDUM-MAESTRO-CIERRE-FORENSE-SINCRONIZACION-Y-PLAN-CONGELADO-20260818.md",
@@ -136,13 +115,14 @@
       "closedPhases": ["F0"],
       "remainingPhases": ["F1", "F2", "F3", "F4", "F5", "F6", "F7"]
     },
-    "currentPhaseInternalPercent": 37.5,
+    "currentPhaseInternalPercent": 80,
+    "currentPhaseInternalMethod": "4_of_5_named_subphases_closed_equal_milestone_tracking",
     "currentPhaseSubphases": {
       "F1_1_owner_and_observer_source": "CLOSED",
       "F1_2A_observer_selftest": "CLOSED",
-      "F1_2B_sanitized_inner_phase_error_runtime_observation": "PENDING_AUTHORIZATION",
-      "F1_3_owner_rootfix_source_static_synthetic": "PENDING",
-      "F1_4_attribution_close_and_single_runtime_frontier": "PENDING"
+      "F1_2B_sanitized_inner_phase_error_runtime_observation": "CLOSED_CONSUMED_RUN_32175674293",
+      "F1_3_owner_rootfix_source_static_synthetic": "CLOSED_PASS",
+      "F1_4_attribution_close_and_single_runtime_frontier": "PENDING_AUTHORIZATION"
     }
   },
   "writes": {
@@ -151,7 +131,7 @@
     "operational": 0
   },
   "authorization": {
-    "latestRuntimeAuthorizationConsumed": true,
+    "f1_2BRuntimeAuthorizationConsumed": true,
     "browserAuthorizedNow": false,
     "runtimeAuthorizedNow": false,
     "publicationAuthorizedNow": false,
@@ -160,10 +140,11 @@
     "rulesChangesAuthorized": false,
     "storeChangesAuthorized": false,
     "mainMergeAuthorized": false,
-    "sourceOnlyDiagnosisAllowed": true
+    "sourceOnlyDiagnosisAllowed": true,
+    "f1_4RequiresExplicitRuntimeBrowserAuthorization": true
   },
   "goLive": {
-    "status": "PAUSED_FOR_SINGLE_SANITIZED_RUNTIME_OBSERVATION",
+    "status": "F1_ROOTFIX_SOURCE_PASS_AWAITING_SINGLE_RUNTIME_CONFIRMATION",
     "publicUrl": "https://app.aysseguros.com",
     "publishedPackagePreserved": true,
     "productionOperationalDeclared": false,
@@ -172,16 +153,17 @@
   },
   "stopRetry": {
     "active": true,
-    "family": "R4_RUNTIME_ACTIVATION_TRIGGER_FAILED",
-    "thirdEquivalentAttemptAllowed": false,
+    "family": "R4_PRODUCT_BOOTSTRAP_OBSERVED_FAILURE",
     "consumedRunMayBeRerun": false,
+    "thirdEquivalentAttemptAllowed": false,
     "newCandidateAllowedForDiagnosis": false,
-    "deployAllowedForDiagnosis": false
+    "deployAllowedForDiagnosis": false,
+    "singleRootfixConfirmationFrontierAllowedOnlyAfterExplicitAuthorization": true
   },
   "nextActionExact": {
-    "stage": "F1_2B_SINGLE_RUNTIME_BOOTSTRAP_OBSERVATION",
+    "stage": "F1_4_SINGLE_RUNTIME_ROOTFIX_CONFIRMATION",
     "authorizationRequired": "EXPLICIT_RUNTIME_BROWSER_AUTHORIZATION",
-    "action": "After explicit authorization only: run the gate-contract validator first; create a new unique immutable single-use request bound to the already-certified observer; execute one read-only browser/runtime frontier; capture only bootstrapObservation.phase/errors/assignedRoleCount/countryCount/collectionCount/ready/writeAuthorized plus sanitized outer error; stop immediately and synchronize documentation. Do not rerun 32155605314, do not deploy/rebuild/create candidate, do not reset password/create users/change memberships or data, and do not perform rootfix before this evidence."
+    "action": "After explicit authorization only: execute the canonical gate-contract validator first; create one new unique immutable single-use request bound to F1.3 evidence; execute one product read-only browser/runtime frontier against the same bootstrap path; verify membership_invalid:email_invalido is absent and capture the next sanitized phase/errors or PASS; zero deploy/rebuild/writes/resets/users/membership/data changes; stop immediately and synchronize documentation. If the same family reappears, STOP_RETRY with no equivalent third attempt."
   },
   "resumeProtocol": [
     "Read ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json",
@@ -189,7 +171,7 @@
     "Confirm actual HEAD and PR #5",
     "Read lastRuntimeEvidence, lastLifecycleEvidence and lastSourceOnlyEvidence",
     "Read currentCheckpoint",
-    "Validate nextActionExact",
-    "Execute only nextActionExact within its authorization boundary"
+    "Validate nextActionExact and authorization boundary",
+    "Execute only nextActionExact"
   ]
 }
