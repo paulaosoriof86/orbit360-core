@@ -1,0 +1,85 @@
+name: Orbit360 F1.4C Build Observer Source Only 20260818
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/workflows/orbit360-f1-4c-build-observer-source-only-v20260818.yml'
+permissions:
+  contents: write
+  actions: read
+jobs:
+  observe_only:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      REQUEST_COMMIT: cc5aeeca1c42506218c59830dd302c284ddc5554
+      BUILD_WORKFLOW_NAME: Orbit360 F1.4C Successor Artifact Build 20260818
+      EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+      - name: Resolve exact single build run without rerun
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          RUN_JSON=/tmp/f1-4c-runs.json
+          RUN_ID=''
+          for i in $(seq 1 30); do
+            curl -sS --fail -H "Authorization: Bearer $GH_TOKEN" -H 'Accept: application/vnd.github+json' -H 'X-GitHub-Api-Version: 2022-11-28' \
+              "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/runs?head_sha=${REQUEST_COMMIT}&event=push&per_page=20" > "$RUN_JSON"
+            RUN_ID="$(jq -r --arg n "$BUILD_WORKFLOW_NAME" '[.workflow_runs[]|select(.name==$n)]|if length==1 then .[0].id else empty end' "$RUN_JSON")"
+            if [ -n "$RUN_ID" ]; then
+              STATUS="$(jq -r --argjson id "$RUN_ID" '.workflow_runs[]|select(.id==$id)|.status' "$RUN_JSON")"
+              [ "$STATUS" = completed ] && break
+            fi
+            sleep 2
+          done
+          test -n "$RUN_ID"
+          COUNT="$(jq -r --arg n "$BUILD_WORKFLOW_NAME" '[.workflow_runs[]|select(.name==$n)]|length' "$RUN_JSON")"
+          test "$COUNT" = '1'
+          STATUS="$(jq -r --argjson id "$RUN_ID" '.workflow_runs[]|select(.id==$id)|.status' "$RUN_JSON")"
+          CONCLUSION="$(jq -r --argjson id "$RUN_ID" '.workflow_runs[]|select(.id==$id)|.conclusion' "$RUN_JSON")"
+          test "$STATUS" = completed
+          test "$CONCLUSION" = success
+          echo "F1_4C_BUILD_RUN_ID=$RUN_ID" >> "$GITHUB_ENV"
+      - name: Fetch and verify exact build artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -sS --fail -H "Authorization: Bearer $GH_TOKEN" -H 'Accept: application/vnd.github+json' -H 'X-GitHub-Api-Version: 2022-11-28' \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/runs/${F1_4C_BUILD_RUN_ID}/artifacts" > /tmp/artifacts.json
+          CAND_ID="$(jq -r '[.artifacts[]|select(.name|startswith("orbit360-f1-4c-successor-unpublished-"))]|if length==1 then .[0].id else empty end' /tmp/artifacts.json)"
+          EVID_ID="$(jq -r '[.artifacts[]|select(.name|startswith("orbit360-f1-4c-successor-evidence-"))]|if length==1 then .[0].id else empty end' /tmp/artifacts.json)"
+          test -n "$CAND_ID"; test -n "$EVID_ID"
+          curl -L -sS --fail -H "Authorization: Bearer $GH_TOKEN" -H 'Accept: application/vnd.github+json' -H 'X-GitHub-Api-Version: 2022-11-28' \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/${EVID_ID}/zip" -o /tmp/evidence.zip
+          mkdir -p /tmp/evidence; unzip -q /tmp/evidence.zip -d /tmp/evidence
+          CERT="$(find /tmp/evidence -name f1-4c-successor-artifact-certification-v20260818.json -print -quit)"
+          test -n "$CERT"
+          jq -e '.ok==true and .status=="F1_4C_SUCCESSOR_ARTIFACT_CERTIFIED_UNPUBLISHED" and .sourceHead=="f50db8707eb3d2c321c8829d06d0a26943005273" and .fileCount==194 and .deltaCount==2 and .unchangedProductFiles==192 and .published==false and .browserExecuted==false and .runtimeExecuted==false and .secretAccess==false and .dataAccess==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .deployExecuted==false and .productionTouched==false' "$CERT" >/dev/null
+          EXPECTED_SHA="$(jq -r '.zipSha256' "$CERT")"
+          ZIP_NAME="$(jq -r '.zipName' "$CERT")"
+          curl -L -sS --fail -H "Authorization: Bearer $GH_TOKEN" -H 'Accept: application/vnd.github+json' -H 'X-GitHub-Api-Version: 2022-11-28' \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/${CAND_ID}/zip" -o /tmp/candidate-artifact.zip
+          mkdir -p /tmp/candidate; unzip -q /tmp/candidate-artifact.zip -d /tmp/candidate
+          INNER="/tmp/candidate/$ZIP_NAME"; test -f "$INNER"
+          test "$(sha256sum "$INNER"|awk '{print $1}')" = "$EXPECTED_SHA"
+          mkdir -p "$EVIDENCE_DIR"
+          cp "$CERT" "$EVIDENCE_DIR/f1-4c-successor-artifact-certification-v20260818.json"
+          jq -n --arg run "$F1_4C_BUILD_RUN_ID" --arg cand "$CAND_ID" --arg evid "$EVID_ID" --arg sha "$EXPECTED_SHA" --arg zip "$ZIP_NAME" '{schemaVersion:"orbit360-f1-4c-build-run-summary-v1",ok:true,status:"F1_4C_BUILD_RUN_OBSERVED_PASS",classification:"PASS",runId:$run,candidateArtifactId:$cand,evidenceArtifactId:$evid,zipName:$zip,zipSha256:$sha,requestCommit:"cc5aeeca1c42506218c59830dd302c284ddc5554",sourceHead:"f50db8707eb3d2c321c8829d06d0a26943005273",singleBuildRunObserved:true,candidateArtifactRehashed:true,published:false,browserExecuted:false,runtimeExecuted:false,secretAccess:false,dataAccess:false,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false}' > "$EVIDENCE_DIR/f1-4c-build-run-summary-v20260818.json"
+      - name: Persist sanitized observer evidence only
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name orbit360-f1-4c-observer-bot
+          git config user.email orbit360-f1-4c-observer-bot@users.noreply.github.com
+          git add "$EVIDENCE_DIR/f1-4c-successor-artifact-certification-v20260818.json" "$EVIDENCE_DIR/f1-4c-build-run-summary-v20260818.json"
+          git commit -m 'build(f1.4c): persist single unpublished successor PASS evidence [skip ci]'
+          git push origin "HEAD:ays/backend-tenant-lab-v99-20260703"
