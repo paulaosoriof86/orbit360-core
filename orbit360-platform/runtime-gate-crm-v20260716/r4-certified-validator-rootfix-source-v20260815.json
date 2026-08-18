@@ -30,6 +30,7 @@
   "productAuthPathBoundExactlyOnce": true,
   "serviceWorkerParityEnabled": true,
   "serviceWorkersBlockedInExecutableHarness": false,
+  "runnerBrowserExecutableBound": true,
   "staleLegalInteractionRemoved": true,
   "readonlyLegalObserverBound": true,
   "patchedHarnessSyntaxPass": true,

@@ -1,0 +1,193 @@
+{
+  "schemaVersion": "orbit360-r4-production-readonly-smoke-v2-bounded-observability",
+  "ok": false,
+  "status": "R4_PRODUCTION_READONLY_SMOKE_FAIL",
+  "classification": "DATA_CONTRACT_FAILURE",
+  "failureFamily": "R4_SMOKE_IDENTITY_CREDENTIAL_REJECTED",
+  "currentStage": "login-http-classified",
+  "elapsedMs": 9751,
+  "globalDeadlineMs": 480000,
+  "manifest": {
+    "pass": true,
+    "status": "FASE_A_PRODUCT_R4S9C_CONTRACT_RECOVERY_CERTIFIED",
+    "sourceHeadMatches": true,
+    "fileCount": 194,
+    "noLabRuntime": true,
+    "noPrivateSecretMaterial": true
+  },
+  "authAsset": {
+    "pass": true,
+    "httpStatus": 200,
+    "sha256Matches": true
+  },
+  "authHttp": {
+    "seen": true,
+    "status": 400,
+    "errorCode": "INVALID_LOGIN_CREDENTIALS"
+  },
+  "auth": {
+    "signedIn": false,
+    "emailVerified": false,
+    "membershipAvailable": false,
+    "membershipActive": false,
+    "tenantMatches": false,
+    "roleCount": 0,
+    "requiredRolesPresent": false
+  },
+  "runtime": {
+    "started": false
+  },
+  "roles": [],
+  "pageErrors": [],
+  "consoleErrors": [
+    "Failed to load resource: the server responded with a status of 400 ()"
+  ],
+  "httpFailures": [],
+  "writeSignals": [],
+  "technicalCopy": [],
+  "checkpoints": [
+    {
+      "stage": "playwright-import",
+      "state": "START",
+      "atMs": 1
+    },
+    {
+      "stage": "playwright-import",
+      "state": "PASS",
+      "atMs": 147
+    },
+    {
+      "stage": "browser-launch",
+      "state": "START",
+      "atMs": 148
+    },
+    {
+      "stage": "browser-launch",
+      "state": "PASS",
+      "atMs": 6576
+    },
+    {
+      "stage": "browser-context",
+      "state": "START",
+      "atMs": 6704
+    },
+    {
+      "stage": "browser-context",
+      "state": "PASS",
+      "atMs": 6713
+    },
+    {
+      "stage": "page-create",
+      "state": "START",
+      "atMs": 6713
+    },
+    {
+      "stage": "page-create",
+      "state": "PASS",
+      "atMs": 6786
+    },
+    {
+      "stage": "target-navigation",
+      "state": "START",
+      "atMs": 6788
+    },
+    {
+      "stage": "target-navigation",
+      "state": "PASS",
+      "atMs": 9009,
+      "httpStatus": 200
+    },
+    {
+      "stage": "login-form-visible",
+      "state": "START",
+      "atMs": 9009
+    },
+    {
+      "stage": "login-form-visible",
+      "state": "PASS",
+      "atMs": 9044
+    },
+    {
+      "stage": "manifest-fetch",
+      "state": "START",
+      "atMs": 9044
+    },
+    {
+      "stage": "manifest-fetch",
+      "state": "PASS",
+      "atMs": 9449,
+      "httpStatus": 200
+    },
+    {
+      "stage": "manifest-validated",
+      "state": "PASS",
+      "atMs": 9450,
+      "sourceHeadMatches": true,
+      "fileCount": 194
+    },
+    {
+      "stage": "auth-asset-fetch",
+      "state": "START",
+      "atMs": 9450
+    },
+    {
+      "stage": "auth-asset-fetch",
+      "state": "PASS",
+      "atMs": 9574,
+      "httpStatus": 200
+    },
+    {
+      "stage": "auth-asset-validated",
+      "state": "PASS",
+      "atMs": 9575,
+      "httpStatus": 200,
+      "sha256Matches": true
+    },
+    {
+      "stage": "login-submit",
+      "state": "START",
+      "atMs": 9576
+    },
+    {
+      "stage": "login-submit",
+      "state": "PASS",
+      "atMs": 9637
+    },
+    {
+      "stage": "login-http-response",
+      "state": "START",
+      "atMs": 9637
+    },
+    {
+      "stage": "login-http-response",
+      "state": "PASS",
+      "atMs": 9748,
+      "httpStatus": 400
+    },
+    {
+      "stage": "login-http-classified",
+      "state": "FAIL",
+      "atMs": 9751,
+      "httpStatus": 400,
+      "errorCode": "INVALID_LOGIN_CREDENTIALS"
+    }
+  ],
+  "legalGateHandledLocally": false,
+  "cleanup": {
+    "browserCloseAttempted": true,
+    "browserClosed": true,
+    "browserCloseTimedOut": false
+  },
+  "error": "R4_SMOKE_IDENTITY_CREDENTIAL_REJECTED",
+  "targetHttps": true,
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "operationalWrites": 0,
+  "containsPII": false,
+  "containsSecrets": false,
+  "secretValuesLogged": false,
+  "writesAuthorized": false,
+  "deployExecuted": false,
+  "packageRebuilt": false,
+  "productionTouched": true
+}
