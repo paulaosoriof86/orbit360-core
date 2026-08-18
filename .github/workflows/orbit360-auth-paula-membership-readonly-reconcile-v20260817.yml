@@ -1,0 +1,183 @@
+name: Orbit360 Paula Identity Membership Readonly Reconciliation 20260817
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/workflows/orbit360-auth-paula-membership-readonly-reconcile-v20260817.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: orbit360-auth-paula-membership-readonly-reconcile-v20260817
+  cancel-in-progress: false
+
+env:
+  ORBIT360_GATE_ID: block2-product-readonly-runtime-v20260723
+  ORBIT360_PROJECT_ID: ays-orbit-360-lab
+  ORBIT360_TENANT_ID: alianzas-soluciones
+  ORBIT360_TARGET_EMAIL_HASH: 9b663847979724e9491e1c655da32a7cb17a5f6ed26dba352de1eb811254b23f
+  ORBIT360_TARGET_ADVISOR_ID: ase-paula-osorio
+  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+
+jobs:
+  reconcile:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - name: Checkout exact HEAD
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Mandatory contractual gate before secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
+          jq -e '.status=="GO_GATE_CONTRACT" and .ok==true and .failed==0 and .firestoreWrites==0 and .operationalWrites==0 and .rulesApplied==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+
+      - name: Install provider read-only dependency
+        shell: bash
+        run: npm install --no-save --package-lock=false --ignore-scripts firebase-admin@13.10.0 >/dev/null
+
+      - name: Bind provider credential after GO
+        env:
+          SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+          SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-${SA_ORBIT_360_LAB:-${SA_DEFAULT:-}}}"
+          test -n "$SERVICE_ACCOUNT"
+          KEY_FILE="${RUNNER_TEMP}/orbit360-paula-membership-readonly.json"
+          printf '%s' "$SERVICE_ACCOUNT" > "$KEY_FILE"
+          chmod 600 "$KEY_FILE"
+          test "$(jq -r '.project_id // empty' "$KEY_FILE")" = "$ORBIT360_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
+          echo "ORBIT360_TEMP_KEY_FILE=$KEY_FILE" >> "$GITHUB_ENV"
+
+      - name: Reconcile exact Auth UID to exact membership read-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import path from 'node:path';
+          import crypto from 'node:crypto';
+          import { applicationDefault, deleteApp, getApps, initializeApp } from 'firebase-admin/app';
+          import { getAuth } from 'firebase-admin/auth';
+          import { getFirestore } from 'firebase-admin/firestore';
+
+          const PROJECT=process.env.ORBIT360_PROJECT_ID;
+          const TENANT=process.env.ORBIT360_TENANT_ID;
+          const TARGET_HASH=process.env.ORBIT360_TARGET_EMAIL_HASH;
+          const ADVISOR=process.env.ORBIT360_TARGET_ADVISOR_ID;
+          const OUT=path.join(process.env.EVIDENCE_DIR,'auth-paula-membership-readonly-reconciliation-sanitized-v20260817.json');
+          const text=v=>String(v==null?'':v).trim();
+          const norm=v=>text(v).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'');
+          const sha=v=>crypto.createHash('sha256').update(String(v==null?'':v),'utf8').digest('hex');
+          const emailHash=v=>sha(text(v).toLowerCase().replace(/\s+/g,''));
+          const uniq=a=>[...new Set([].concat(a||[]).map(text).filter(Boolean))];
+          const scope=v=>({propios:'own',propio:'own',own:'own',equipo:'team',team:'team',todos:'all',all:'all,',ninguno:'none',none:'none'}[text(v).toLowerCase()]||text(v).toLowerCase()).replace('all,','all');
+          const stable=v=>{if(v==null)return v;if(Array.isArray(v))return v.map(stable);if(typeof v?.toDate==='function')return v.toDate().toISOString();if(typeof v==='object')return Object.fromEntries(Object.keys(v).sort().map(k=>[k,stable(v[k])]));return v;};
+          const digest=v=>sha(JSON.stringify(stable(v)));
+          const write=p=>{fs.mkdirSync(path.dirname(OUT),{recursive:true});fs.writeFileSync(OUT,JSON.stringify({...p,projectId:PROJECT,tenantIdHash:sha(TENANT),targetAdvisorId:ADVISOR,targetEmailHash:TARGET_HASH,containsPII:false,containsSecrets:false,containsPassword:false,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,productionTouched:false,mainTouched:false,mergeExecuted:false},null,2)+'\n');};
+          const fail=(code,classification='DATA_CONTRACT_FAILURE')=>{const e=new Error(code);e.classification=classification;throw e;};
+          let app;
+          try {
+            app=getApps()[0]||initializeApp({credential:applicationDefault(),projectId:PROJECT});
+            const auth=getAuth(app), db=getFirestore(app);
+            const users=[]; let token;
+            do { const page=await auth.listUsers(1000,token); users.push(...page.users); token=page.pageToken; } while(token);
+            const matches=users.filter(u=>emailHash(u.email)===TARGET_HASH);
+            if(matches.length!==1) fail(`TARGET_AUTH_IDENTITY_MATCH_${matches.length}`);
+            const user=matches[0];
+            if(user.disabled) fail('TARGET_AUTH_IDENTITY_DISABLED');
+            if(user.emailVerified!==true) fail('TARGET_AUTH_EMAIL_NOT_VERIFIED');
+
+            const ref=db.collection('tenants').doc(TENANT).collection('members').doc(user.uid);
+            const snap=await ref.get();
+            if(!snap.exists) fail('TARGET_MEMBERSHIP_NOT_FOUND');
+            const m=stable(snap.data()||{});
+            if(text(m.uid||m.userId) && text(m.uid||m.userId)!==user.uid) fail('TARGET_MEMBERSHIP_UID_MISMATCH','SECURITY_FAILURE');
+            if(text(m.tenantId||m.tenant)!==TENANT) fail('TARGET_MEMBERSHIP_TENANT_MISMATCH','SECURITY_FAILURE');
+            if(text(m.status||m.estado).toLowerCase()!=='active') fail('TARGET_MEMBERSHIP_NOT_ACTIVE');
+            if(m.email||m.correo) if(emailHash(m.email||m.correo)!==TARGET_HASH) fail('TARGET_MEMBERSHIP_EMAIL_MISMATCH','SECURITY_FAILURE');
+
+            const roles=uniq([].concat(m.roles||[],m.rolesAsignados||[],m.assignedRoles||[],m.role||[],m.rol||[]));
+            const expectedRoles=['Dirección','SuperAdmin','AdminTenant','Asesor','Operativo'];
+            const missingRoles=expectedRoles.filter(r=>!roles.includes(r));
+            if(missingRoles.length) fail('TARGET_MEMBERSHIP_REQUIRED_ROLES_MISSING');
+            const defaultRole=text(m.defaultRole||m.rolDefault||m.roleDefault);
+            const activeRole=text(m.activeRole||m.rolActivo||defaultRole);
+            if(defaultRole!=='Dirección') fail('TARGET_MEMBERSHIP_DEFAULT_ROLE_NOT_DIRECCION');
+            if(!roles.includes(defaultRole)) fail('TARGET_MEMBERSHIP_DEFAULT_ROLE_NOT_ASSIGNED');
+            if(!roles.includes(activeRole)) fail('TARGET_MEMBERSHIP_ACTIVE_ROLE_NOT_ASSIGNED');
+
+            const countries=uniq(m.countries||m.paises);
+            if(!countries.length) fail('TARGET_MEMBERSHIP_COUNTRIES_MISSING');
+            if(countries.some(c=>!['GT','CO'].includes(c))) fail('TARGET_MEMBERSHIP_COUNTRIES_INVALID');
+            const advisor=text(m.advisorId||m.asesorId||m.teamId);
+            if(advisor!==ADVISOR) fail('TARGET_MEMBERSHIP_ADVISOR_MISMATCH');
+
+            const rawScopes=m.dataScopes||m.scopes||m.scopeDatos||{};
+            let defaultScope=''; const moduleScopes={};
+            if(typeof rawScopes==='string') defaultScope=scope(rawScopes);
+            else { defaultScope=scope(rawScopes.default||rawScopes['*']||''); const mods=rawScopes.modules&&typeof rawScopes.modules==='object'?rawScopes.modules:{}; for(const [k,v] of Object.entries(mods)) moduleScopes[k]=scope(v); }
+            if(defaultScope!=='all') fail('TARGET_MEMBERSHIP_DEFAULT_SCOPE_NOT_ALL');
+            if(Object.values(moduleScopes).some(v=>!['own','team','all','none'].includes(v))) fail('TARGET_MEMBERSHIP_MODULE_SCOPE_INVALID');
+
+            const teamRefs=[
+              db.collection('tenantId').doc(TENANT).collection('asesores').doc(ADVISOR),
+              db.collection('tenants').doc(TENANT).collection('asesores').doc(ADVISOR),
+              db.collection('tenants').doc(TENANT).collection('data').doc('asesores').collection('items').doc(ADVISOR)
+            ];
+            let team=null; for(const r of teamRefs){const s=await r.get();if(s.exists){team=s;break;}}
+            if(!team) fail('TARGET_TEAM_RECORD_NOT_FOUND');
+            const teamData=stable(team.data()||{});
+            const teamRoles=uniq(teamData.roles||[]);
+            if(expectedRoles.some(r=>!teamRoles.includes(r))) fail('TARGET_TEAM_REQUIRED_ROLES_MISSING');
+            if(text(teamData.rolDefault||teamData.defaultRole)!=='Dirección') fail('TARGET_TEAM_DEFAULT_ROLE_NOT_DIRECCION');
+            if(!['activo','active'].includes(text(teamData.estado||teamData.status).toLowerCase())) fail('TARGET_TEAM_NOT_ACTIVE');
+
+            const before={auth:digest({uid:user.uid,emailHash:emailHash(user.email),disabled:!!user.disabled,emailVerified:!!user.emailVerified}),membership:digest(m),team:digest(teamData)};
+            const user2=await auth.getUser(user.uid); const snap2=await ref.get(); const team2=await team.ref.get();
+            const after={auth:digest({uid:user2.uid,emailHash:emailHash(user2.email),disabled:!!user2.disabled,emailVerified:!!user2.emailVerified}),membership:digest(stable(snap2.data()||{})),team:digest(stable(team2.data()||{}))};
+            const unchanged=before.auth===after.auth&&before.membership===after.membership&&before.team===after.team;
+            if(!unchanged) fail('READONLY_RECONCILIATION_INTEGRITY_DRIFT','SECURITY_FAILURE');
+
+            write({schemaVersion:'orbit360-auth-target-membership-readonly-reconciliation-v1',ok:true,status:'TARGET_IDENTITY_MEMBERSHIP_READONLY_PASS',classification:'PASS',authIdentityExists:true,authEnabled:true,emailVerified:true,membershipExists:true,uidMatches:true,tenantMatches:true,membershipActive:true,rolesCanonical:true,assignedRoleCount:roles.length,defaultRoleCanonical:true,activeRoleAssigned:true,countriesPresent:true,countryCount:countries.length,scopesCanonical:true,defaultScopeAll:true,advisorBound:true,teamRecordExists:true,readbackUnchanged:true,authReads:true,firestoreReads:true});
+            console.log(JSON.stringify({ok:true,status:'TARGET_IDENTITY_MEMBERSHIP_READONLY_PASS',classification:'PASS'}));
+          } catch(e) {
+            write({schemaVersion:'orbit360-auth-target-membership-readonly-reconciliation-v1',ok:false,status:'TARGET_IDENTITY_MEMBERSHIP_READONLY_STOP',classification:e.classification||'DATA_CONTRACT_FAILURE',failedCheck:String(e.message||e).slice(0,180),authReads:true,firestoreReads:true});
+            console.error(String(e.message||e).slice(0,180)); process.exitCode=41;
+          } finally { try{if(app)await deleteApp(app);}catch{} }
+          NODE
+          jq -e '.ok==true and .status=="TARGET_IDENTITY_MEMBERSHIP_READONLY_PASS" and .authIdentityExists==true and .authEnabled==true and .emailVerified==true and .membershipExists==true and .uidMatches==true and .tenantMatches==true and .membershipActive==true and .rolesCanonical==true and .defaultRoleCanonical==true and .activeRoleAssigned==true and .countriesPresent==true and .scopesCanonical==true and .defaultScopeAll==true and .advisorBound==true and .teamRecordExists==true and .readbackUnchanged==true and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .containsPII==false and .containsSecrets==false' "$EVIDENCE_DIR/auth-paula-membership-readonly-reconciliation-sanitized-v20260817.json" >/dev/null
+
+      - name: Cleanup protected material
+        if: always()
+        shell: bash
+        run: |
+          if [ -n "${ORBIT360_TEMP_KEY_FILE:-}" ] && [ -f "$ORBIT360_TEMP_KEY_FILE" ]; then shred -u "$ORBIT360_TEMP_KEY_FILE" || rm -f "$ORBIT360_TEMP_KEY_FILE"; fi
+
+      - name: Upload sanitized evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-auth-paula-membership-readonly-reconciliation-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+            orbit360-platform/runtime-gate-crm-v20260716/auth-paula-membership-readonly-reconciliation-sanitized-v20260817.json
+          if-no-files-found: warn
+          retention-days: 14
