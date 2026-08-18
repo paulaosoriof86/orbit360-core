@@ -11,6 +11,7 @@
   window.Orbit = window.Orbit || {};
 
   var VERSION = 'p0-20260713';
+  var REVISION = 'email-optional-auth-owned-20260818';
   var MEMBERSHIP_COLLECTION = 'members';
   var VALID_STATUSES = Object.freeze(['invited', 'active', 'suspended', 'inactive']);
   var VALID_SCOPES = Object.freeze(['own', 'team', 'all', 'none']);
@@ -130,7 +131,7 @@
     var sensitive = containsSensitive(membership);
 
     if (!m.uid) errors.push('uid_faltante');
-    if (!m.email || !/^\S+@\S+\.\S+$/.test(m.email)) errors.push('email_invalido');
+    if (m.email && !/^\S+@\S+\.\S+$/.test(m.email)) errors.push('email_invalido');
     if (!m.tenantId) errors.push('tenant_faltante');
     if (!m.displayName) warnings.push('nombre_visible_faltante');
     if (!m.roles.length) errors.push('roles_faltantes');
@@ -339,12 +340,15 @@
 
   window.Orbit.membershipMultirolP0 = Object.freeze({
     VERSION: VERSION,
+    REVISION: REVISION,
     MEMBERSHIP_COLLECTION: MEMBERSHIP_COLLECTION,
     VALID_STATUSES: VALID_STATUSES,
     VALID_SCOPES: VALID_SCOPES,
     PRIVILEGED_ROLES: PRIVILEGED_ROLES,
     DEFAULT_ROLE_DEFINITIONS: DEFAULT_ROLE_DEFINITIONS,
     STRONG_CONFIRMATION_PHRASE: STRONG_CONFIRMATION_PHRASE,
+    EMAIL_OPTIONAL: true,
+    EMAIL_IDENTITY_OWNER: 'auth',
     normalize: normalize,
     validate: validate,
     effectiveModules: effectiveModules,
