@@ -92,15 +92,15 @@
   "containsPII": false,
   "containsSecrets": false,
   "executionResult": {
-    "stage": "AUTH_PAULA_REAL_BROWSER_READONLY_SMOKE_FAIL",
-    "classification": "DATA_CONTRACT_FAILURE",
-    "failedCheck": "R4_SMOKE_IDENTITY_CREDENTIAL_REJECTED",
+    "stage": "PIPELINE_ABORT_BEFORE_FRESH_PREFLIGHT_EVIDENCE",
+    "classification": "PIPELINE_MECHANISM_FAILURE",
+    "failedCheck": "PIPELINE_STAGE_VERIFY_SOURCE",
     "ok": false,
-    "runId": "32095105528",
+    "runId": "32154413802",
     "firestoreWrites": 0,
     "authWrites": 0,
     "operationalWrites": 0,
     "semanticAccessExpansion": false,
-    "browserExecuted": true
+    "browserExecuted": false
   }
 }
