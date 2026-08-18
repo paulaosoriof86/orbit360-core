@@ -1,0 +1,60 @@
+{
+  "schemaVersion": "orbit360-auth-paula-real-browser-readonly-smoke-request-v1",
+  "requestVersion": "AUTH_PAULA_REAL_BROWSER_READONLY_SMOKE_V1",
+  "gateId": "block-auth-paula-membership-readonly-reconcile-v2-lab-v20260817",
+  "rcId": "RC-AYS-LAB-CANONICA-01",
+  "status": "AUTHORIZED_ONCE",
+  "approved": true,
+  "allowedExecutions": 1,
+  "consumed": false,
+  "authorizationFrozen": false,
+  "replayAllowed": false,
+  "authorizationRef": "user_continue_20260817T2019-0600_after_exact_membership_repair_execute_real_browser_sw_parity_readonly",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "projectId": "ays-orbit-360-lab",
+  "tenantId": "alianzas-soluciones",
+  "parentHead": "ac9da4bd5c665af9baa7f4a548159ba09558036f",
+  "target": {
+    "advisorId": "ase-paula-osorio",
+    "emailHash": "9b663847979724e9491e1c655da32a7cb17a5f6ed26dba352de1eb811254b23f"
+  },
+  "basis": {
+    "repairRunId": "32092348630",
+    "repairEvidencePath": "orbit360-platform/runtime-gate-crm-v20260716/auth-paula-membership-gate14-3-repair-run-32092348630.json",
+    "certifiedContractPath": "tools/orbit360-r4-certified-product-contract-v20260815.json"
+  },
+  "guards": {
+    "targetIdentityMatchRequired": true,
+    "serviceWorkerParityRequired": true,
+    "firestoreWritesAllowed": 0,
+    "authWritesAllowed": 0,
+    "deployAllowed": false,
+    "productionAllowed": false
+  },
+  "scope": {
+    "existingIdentityRead": true,
+    "membershipRead": true,
+    "passwordSecretRead": true,
+    "browser": true,
+    "serviceWorkerParity": true,
+    "firestoreWrites": false,
+    "authWrites": false,
+    "passwordReset": false,
+    "passwordResetLink": false,
+    "passwordChange": false,
+    "directPasswordSet": false,
+    "authUserCreate": false,
+    "authUserDelete": false,
+    "functionsDeploy": false,
+    "hostingDeploy": false,
+    "rulesDeploy": false,
+    "reimport": false,
+    "crmWrites": false,
+    "production": false,
+    "main": false,
+    "merge": false
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
