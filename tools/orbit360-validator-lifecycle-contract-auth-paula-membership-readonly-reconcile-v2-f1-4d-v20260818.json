@@ -3,8 +3,8 @@
   "gateId": "block-auth-paula-membership-readonly-reconcile-v2-lab-v20260817",
   "gateContractVersion": "14.3.0",
   "validatorLifecycleRevision": "phase-capability-contract-v1",
-  "status": "F1_4D_SOURCE_READY_RUNTIME_AUTHORIZED_BY_FRESH_REQUEST_ONLY",
-  "currentPhase": "AUTH_PAULA_REAL_BROWSER_READONLY_SMOKE_LAB",
+  "status": "F1_4D_CONSUMED_PASS",
+  "currentPhase": "F1_4D_CLOSED_PASS",
   "executionProfile": {
     "phase": "AUTH_PAULA_REAL_BROWSER_READONLY_SMOKE_LAB",
     "capabilities": {
@@ -20,13 +20,35 @@
     }
   },
   "singleGate": true,
-  "macroClosure": false,
+  "macroClosure": true,
   "authorization": {
     "requiredForExecution": true,
     "activeRequest": false,
+    "request": ".github/orbit360-requests/f1-4d-single-successor-runtime-browser-readonly-runbound-20260818-01.json",
+    "requestCommit": "45c85e6ed6e992b490262f5abf12cce94d7a13c4",
     "allowedExecutions": 0,
-    "consumed": false,
-    "replayAllowed": false
+    "consumed": true,
+    "authorizationFrozen": true,
+    "replayAllowed": false,
+    "runId": 32195516901,
+    "runAttempt": 1,
+    "rerunExecuted": false
+  },
+  "executionResult": {
+    "ok": true,
+    "status": "F1_4D_EXACT_SUCCESSOR_RUNTIME_BROWSER_READONLY_PASS",
+    "terminalEvidence": "orbit360-platform/runtime-gate-crm-v20260716/f1-4d-final-run-32195516901.json",
+    "oldErrorAbsent": true,
+    "sameFailureFamilyReappeared": false,
+    "bootstrapPhase": "ready-read-only",
+    "storeStatus": "ready-read-only",
+    "firestoreWrites": 0,
+    "authWrites": 0,
+    "operationalWrites": 0,
+    "packageRebuilt": false,
+    "deployExecuted": false,
+    "publicationExecuted": false,
+    "productionHostingTouched": false
   },
   "guards": {
     "candidateArtifactId": 9345207863,
