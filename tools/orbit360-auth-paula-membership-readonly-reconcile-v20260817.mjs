@@ -12,6 +12,8 @@ const TENANT=process.env.ORBIT360_TENANT_ID||'alianzas-soluciones';
 const TARGET_HASH=process.env.ORBIT360_TARGET_EMAIL_HASH||'9b663847979724e9491e1c655da32a7cb17a5f6ed26dba352de1eb811254b23f';
 const ADVISOR=process.env.ORBIT360_TARGET_ADVISOR_ID||'ase-paula-osorio';
 const OUT=process.env.ORBIT360_RECON_EVIDENCE||'orbit360-platform/runtime-gate-crm-v20260716/auth-paula-membership-readonly-reconciliation-sanitized-v20260817.json';
+const RUN_ID=String(process.env.ORBIT360_RECON_RUN_ID||'').trim();
+const VALIDATOR_REVISION='canonical-multirol-v2-fresh-evidence-bound';
 const VALID_ROLES=new Set(['Dirección','SuperAdmin','AdminTenant','Operativo','Finanzas','Marketing','Asesor','Comercial','Asistente']);
 const PRIVILEGED=new Set(['Dirección','SuperAdmin','AdminTenant']);
 const text=v=>String(v==null?'':v).trim();
@@ -21,10 +23,12 @@ const uniq=a=>[...new Set([].concat(a||[]).map(text).filter(Boolean))];
 const normScope=v=>({propios:'own',propio:'own',own:'own',equipo:'team',team:'team',todos:'all',all:'all',ninguno:'none',none:'none'}[text(v).toLowerCase()]||text(v).toLowerCase());
 const stable=v=>{if(v==null)return v;if(Array.isArray(v))return v.map(stable);if(typeof v?.toDate==='function')return v.toDate().toISOString();if(typeof v==='object')return Object.fromEntries(Object.keys(v).sort().map(k=>[k,stable(v[k])]));return v;};
 const digest=v=>sha(JSON.stringify(stable(v)));
-function write(p){fs.mkdirSync(path.dirname(OUT),{recursive:true});fs.writeFileSync(OUT,JSON.stringify({...p,projectId:PROJECT,tenantIdHash:sha(TENANT),targetAdvisorId:ADVISOR,targetEmailHash:TARGET_HASH,containsPII:false,containsSecrets:false,containsPassword:false,containsActionLink:false,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,productionTouched:false,mainTouched:false,mergeExecuted:false},null,2)+'\n','utf8');}
+function write(p){fs.mkdirSync(path.dirname(OUT),{recursive:true});fs.writeFileSync(OUT,JSON.stringify({...p,runId:RUN_ID,validatorRevision:VALIDATOR_REVISION,projectId:PROJECT,tenantIdHash:sha(TENANT),targetAdvisorId:ADVISOR,targetEmailHash:TARGET_HASH,containsPII:false,containsSecrets:false,containsPassword:false,containsActionLink:false,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,productionTouched:false,mainTouched:false,mergeExecuted:false},null,2)+'\n','utf8');}
 function fail(code,classification='DATA_CONTRACT_FAILURE'){const e=new Error(code);e.classification=classification;throw e;}
 let app;
 try{
+  if(!RUN_ID) fail('FRESH_EVIDENCE_RUN_ID_NOT_BOUND','PIPELINE_MECHANISM_FAILURE');
+  if(!process.env.ORBIT360_RECON_EVIDENCE) fail('FRESH_EVIDENCE_PATH_NOT_BOUND','PIPELINE_MECHANISM_FAILURE');
   if(!process.env.GOOGLE_APPLICATION_CREDENTIALS) fail('PROVIDER_CREDENTIAL_NOT_BOUND','ENVIRONMENT_FAILURE');
   app=getApps()[0]||initializeApp({credential:applicationDefault(),projectId:PROJECT});
   const auth=getAuth(app),db=getFirestore(app);
@@ -86,7 +90,7 @@ try{
   if(!unchanged) fail('READONLY_RECONCILIATION_INTEGRITY_DRIFT','SECURITY_FAILURE');
 
   write({schemaVersion:'orbit360-auth-target-membership-readonly-reconciliation-v2',ok:true,status:'TARGET_IDENTITY_MEMBERSHIP_READONLY_PASS',classification:'PASS',authIdentityExists:true,authEnabled:true,emailVerified:true,membershipExists:true,uidMatches:true,tenantMatches:true,membershipActive:true,rolesCanonical:true,assignedRoleCount:roles.length,privilegedRolePresent:true,defaultRoleAssigned:true,activeRoleAssigned:true,countriesPresent:true,countryCount:countries.length,scopesCanonical:true,advisorBindingValid:true,teamRecordExists:true,readbackUnchanged:true,authReads:true,firestoreReads:true});
-  console.log(JSON.stringify({ok:true,status:'TARGET_IDENTITY_MEMBERSHIP_READONLY_PASS',classification:'PASS'}));
+  console.log(JSON.stringify({ok:true,status:'TARGET_IDENTITY_MEMBERSHIP_READONLY_PASS',classification:'PASS',runId:RUN_ID}));
 }catch(e){
   write({schemaVersion:'orbit360-auth-target-membership-readonly-reconciliation-v2',ok:false,status:'TARGET_IDENTITY_MEMBERSHIP_READONLY_STOP',classification:e.classification||'DATA_CONTRACT_FAILURE',failedCheck:text(e.message||e).slice(0,180),authReads:true,firestoreReads:true});
   console.error(text(e.message||e).slice(0,180));process.exitCode=41;
