@@ -98,7 +98,8 @@ jobs:
           grep -F 'node tools/orbit360-auth-paula-real-browser-smoke-summarize-v20260817.mjs' "$GITHUB_WORKSPACE/.github/workflows/orbit360-auth-paula-membership-readonly-reconcile-v4-20260817.yml" >/dev/null
           STALE_NEEDLE='npx playwright install --with-deps ''chromium'
           if grep -F "$STALE_NEEDLE" "$GITHUB_WORKSPACE/.github/workflows/orbit360-auth-paula-membership-readonly-reconcile-v4-20260817.yml" >/dev/null; then echo 'PIPELINE_MECHANISM_FAILURE:STALE_PLAYWRIGHT_BROWSER_INSTALL_REMAINS' >&2; exit 41; fi
-          if grep -F 'ORBIT360_LAB_LOGIN_PASSWORD' "$GITHUB_WORKSPACE/.github/workflows/orbit360-auth-paula-membership-readonly-reconcile-v4-20260817.yml" >/dev/null; then echo 'PIPELINE_MECHANISM_FAILURE:STALE_PASSWORD_SECRET_BINDING_REMAINS' >&2; exit 41; fi
+          PASSWORD_NEEDLE='ORBIT360_LAB_LOGIN_''PASSWORD'
+          if grep -F "$PASSWORD_NEEDLE" "$GITHUB_WORKSPACE/.github/workflows/orbit360-auth-paula-membership-readonly-reconcile-v4-20260817.yml" >/dev/null; then echo 'PIPELINE_MECHANISM_FAILURE:STALE_PASSWORD_SECRET_BINDING_REMAINS' >&2; exit 41; fi
           test ! -e "$ORBIT360_RECON_EVIDENCE"
           test ! -e "$ORBIT360_PREFLIGHT_EVIDENCE"
           if [ "$ORBIT360_PIPELINE_MODE" = smoke ]; then
