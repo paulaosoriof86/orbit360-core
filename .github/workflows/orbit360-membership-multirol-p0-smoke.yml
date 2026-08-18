@@ -6,36 +6,70 @@ on:
       - ays/backend-tenant-lab-v99-20260703
     paths:
       - orbit360-platform/core/membership-multirol-contract-p0.js
+      - orbit360-platform/core/membership-multirol-effective-p0.js
+      - orbit360-platform/core/backend-product-readonly-bootstrap-p0.js
       - orbit360-platform/tools/orbit360-validar-membership-multirol-p0.mjs
       - .github/workflows/orbit360-membership-multirol-p0-smoke.yml
   pull_request:
     paths:
       - orbit360-platform/core/membership-multirol-contract-p0.js
+      - orbit360-platform/core/membership-multirol-effective-p0.js
+      - orbit360-platform/core/backend-product-readonly-bootstrap-p0.js
       - orbit360-platform/tools/orbit360-validar-membership-multirol-p0.mjs
       - .github/workflows/orbit360-membership-multirol-p0-smoke.yml
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
+
+concurrency:
+  group: orbit360-membership-multirol-p0-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   membership-contract:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Checkout
+      - name: Checkout exact commit
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: true
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: '22'
 
-      - name: Check contract syntax
-        run: node --check orbit360-platform/core/membership-multirol-contract-p0.js
+      - name: Check source syntax
+        run: |
+          node --check orbit360-platform/core/membership-multirol-contract-p0.js
+          node --check orbit360-platform/core/membership-multirol-effective-p0.js
+          node --check orbit360-platform/core/backend-product-readonly-bootstrap-p0.js
+          node --check orbit360-platform/tools/orbit360-validar-membership-multirol-p0.mjs
 
-      - name: Check validator syntax
-        run: node --check orbit360-platform/tools/orbit360-validar-membership-multirol-p0.mjs
+      - name: Run F1.3 source-only membership smoke
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p orbit360-platform/runtime-gate-crm-v20260716
+          OUT="orbit360-platform/runtime-gate-crm-v20260716/f1-3-membership-email-ownership-source-only-v20260818.json"
+          node orbit360-platform/tools/orbit360-validar-membership-multirol-p0.mjs | tee "$OUT"
+          jq -e '.ok==true and .status=="F1_3_MEMBERSHIP_EMAIL_OWNERSHIP_SOURCE_ONLY_PASS" and .failed==[] and .sample.emailOptional==true and .sample.emailIdentityOwner=="auth" and .sample.writeAuthorized==false and .sample.writeExecuted==false' "$OUT" >/dev/null
 
-      - name: Run membership smoke
-        run: node orbit360-platform/tools/orbit360-validar-membership-multirol-p0.mjs
+      - name: Persist sanitized source-only evidence
+        if: github.event_name == 'push'
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="orbit360-platform/runtime-gate-crm-v20260716/f1-3-membership-email-ownership-source-only-v20260818.json"
+          test -f "$OUT"
+          git config user.name orbit360-source-only-bot
+          git config user.email orbit360-source-only-bot@users.noreply.github.com
+          git add "$OUT"
+          if ! git diff --cached --quiet; then
+            git commit -m 'docs: persist F1.3 membership email source-only evidence [skip ci]'
+            git push origin "HEAD:ays/backend-tenant-lab-v99-20260703"
+          fi
