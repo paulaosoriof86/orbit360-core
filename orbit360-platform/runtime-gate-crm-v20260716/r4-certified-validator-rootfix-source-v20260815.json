@@ -35,6 +35,7 @@
   "readonlyLegalObserverBound": true,
   "customTokenPathBound": true,
   "passwordSubmitPathRemoved": true,
+  "canonicalTargetRoleContractBound": true,
   "postAuthActivationBound": true,
   "tokenNeverPersistedByHarness": true,
   "authMechanism": "custom-token-ephemeral",
