@@ -3,7 +3,7 @@
   "gateId": "f1-4c-successor-artifact-build-lab-v20260818",
   "gateContractVersion": "1.0.0",
   "validatorLifecycleRevision": "phase-capability-contract-v1",
-  "status": "F1_4C_AUTHORIZED_FRONTIER_SOURCE_READY",
+  "status": "F1_4C_CONSUMED_PASS",
   "currentPhase": "F1_4C_SUCCESSOR_ARTIFACT_BUILD",
   "executionProfile": {
     "phase": "F1_4C_SUCCESSOR_ARTIFACT_BUILD",
@@ -25,13 +25,19 @@
     "requiredForExecution": true,
     "activeRequest": false,
     "allowedExecutions": 0,
-    "consumed": false,
-    "replayAllowed": false
+    "consumed": true,
+    "replayAllowed": false,
+    "request": ".github/orbit360-requests/f1-4c-successor-artifact-build-runbound-20260818-02.json",
+    "requestCommit": "0080eafac6a48aebb46debddcae405783b29a97b",
+    "priorPrebuildStopRequest": ".github/orbit360-requests/f1-4c-successor-artifact-build-runbound-20260818-01.json",
+    "priorPrebuildStopRunId": "32193519205",
+    "priorCandidateBuildsExecuted": 0
   },
   "buildBoundary": {
     "maximumCandidates": 1,
-    "packageRebuildAllowed": true,
-    "githubArtifactUploadAllowed": true,
+    "candidateBuildsExecuted": 1,
+    "packageRebuildAllowed": false,
+    "githubArtifactUploadAllowed": false,
     "secretAccessAllowed": false,
     "dataAccessAllowed": false,
     "firestoreWritesAllowed": false,
@@ -59,6 +65,29 @@
       "orbit360-platform/core/membership-multirol-contract-p0.js"
     ],
     "stopRetryOnFailure": true
+  },
+  "executionResult": {
+    "ok": true,
+    "runId": "32194002530",
+    "status": "F1_4C_SUCCESSOR_ARTIFACT_CERTIFIED_UNPUBLISHED",
+    "classification": "PASS",
+    "sourceHead": "29caae94a3db1f1626bdde2ea6ee9a21799f9df6",
+    "candidateArtifactId": "9345207863",
+    "evidenceArtifactId": "9345208103",
+    "zipName": "orbit360-fase-a-product-f1-4c-successor-29caae94a3db.zip",
+    "zipSha256": "493009c83390901aa772842a2ba9ddd5ce5293f6969d86c5c3395ebd670a44ac",
+    "manifestSha256": "29dafe5e63b425ea6cf641937fe1b9d4b9e63f72479a51ae76f9148a55771761",
+    "fileCount": 194,
+    "deltaCount": 2,
+    "unchangedProductFiles": 192,
+    "published": false,
+    "browserExecuted": false,
+    "runtimeExecuted": false,
+    "firestoreWrites": 0,
+    "authWrites": 0,
+    "operationalWrites": 0,
+    "deployExecuted": false,
+    "productionTouched": false
   },
   "containsPII": false,
   "containsSecrets": false
