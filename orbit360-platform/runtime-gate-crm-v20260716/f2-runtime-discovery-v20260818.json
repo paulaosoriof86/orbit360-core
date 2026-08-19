@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "orbit360-f2-runtime-discovery-v1",
+  "ok": true,
+  "status": "F2_RUNTIME_RUN_DISCOVERED",
+  "classification": "PASS",
+  "requestCommit": "0fba51716d741750b617bf95fc6342444c9f720c",
+  "runtimeRunId": 32205144735,
+  "runtimeStatus": "completed",
+  "runtimeConclusion": "failure",
+  "runAttempt": 1,
+  "event": "push",
+  "headSha": "0fba51716d741750b617bf95fc6342444c9f720c",
+  "workflowName": "Orbit360 F2 Productive Acceptance Runtime Browser Readonly 20260818",
+  "createdAt": "2026-08-19T01:30:02Z",
+  "updatedAt": "2026-08-19T01:30:17Z",
+  "multipleRuns": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
