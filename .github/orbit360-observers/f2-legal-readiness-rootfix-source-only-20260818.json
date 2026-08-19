@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "orbit360-f2-legal-readiness-rootfix-source-only-trigger-v1",
+  "runtimeRunId": 32207049146,
+  "requestOrdinal": 3,
+  "candidateArtifactId": 9345207863,
+  "classificationUnderTest": "VALIDATOR_STALE",
+  "observedGateEvidence": {
+    "accepted": 1,
+    "remaining": 0,
+    "quietWindowSatisfied": false,
+    "timeout": true
+  },
+  "purpose": "prove_phase_aware_gate_readiness_without_runtime_replay",
+  "runtimeAuthorized": false,
+  "secretAccessAuthorized": false,
+  "browserAuthorized": false,
+  "writesAuthorized": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
