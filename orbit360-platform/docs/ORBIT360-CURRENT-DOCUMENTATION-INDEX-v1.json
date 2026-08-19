@@ -1,6 +1,6 @@
 {
   "schemaVersion": "orbit360-current-documentation-index-v1",
-  "updatedAt": "2026-08-19T00:40:00Z",
+  "updatedAt": "2026-08-19T01:45:57.752Z",
   "status": "CURRENT_BINDING_INDEX",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -15,34 +15,88 @@
     "orbit360-platform/docs/ADDENDUM-MAESTRO-CIERRE-FORENSE-SINCRONIZACION-Y-PLAN-CONGELADO-20260818.md"
   ],
   "bindingRules": [
-    {"id":"master-20260704","title":"Documento Maestro Consolidado 20260704","sourceType":"project_attachment","sourceName":"DOCUMENTO-MAESTRO-CONSOLIDADO-ORBIT360-AYS-20260704.md","repoPath":null},
-    {"id":"academia-20260704","title":"Addendum Academia Profunda 20260704","sourceType":"project_attachment","sourceName":"ADENDUM-ACADEMIA-PROFUNDA-INTERACTIVA-ORBIT360-AYS-20260704.md","repoPath":null},
-    {"id":"claude-backend-20260707","title":"Addendum Patrones Reutilizables Claude/Backend 20260707","sourceType":"project_attachment","sourceName":"ADDENDUM-MAESTRO-PATRONES-REUTILIZABLES-CLAUDE-BACKEND-ORBIT360-20260707.md","repoPath":null},
-    {"id":"continuidad-multirol-importadores-20260709","title":"Addendum Continuidad Clientes/Multirol/Importadores 20260709","sourceType":"project_attachment","sourceName":"addendum_continuidad_clientes_multirol_importadores_20260709.zip","repoPath":null},
-    {"id":"plan-maestro-20260716","title":"Plan Maestro de Ejecucion Productiva 20260716","sourceType":"project_attachment","sourceName":"PLAN-MAESTRO-EJECUCION-PRODUCTIVA-ANTI-DESVIACION-SINCRONIZACION-CLAUDE-ORBIT360-AYS-20260716(1).md","repoPath":null},
-    {"id":"causa-raiz-gates-20260717","title":"Addendum Control de Causa Raiz, Validadores y Gates 20260717","sourceType":"project_attachment","sourceName":"ADENDUM-MAESTRO-CONTROL-CAUSA-RAIZ-VALIDADORES-GATES-ORBIT360-AYS-20260717(1).docx","repoPath":null},
-    {"id":"aceleracion-20260730","title":"Addendum Aceleracion Productiva, Reuso Transversal y Control Autorizaciones 20260730","sourceType":"project_attachment","sourceName":"ADDENDUM-MAESTRO-ACELERACION-PRODUCTIVA-REUSO-TRANSVERSAL-Y-CONTROL-AUTORIZACIONES-20260730(1).md","repoPath":null},
-    {"id":"continuidad-antibucle-20260814","title":"Addendum Continuidad, Sincronizacion, Antibucle, Go-live y Postproduccion 20260814","sourceType":"repository","sourceName":"ADDENDUM-MAESTRO-CONTINUIDAD-SINCRONIZACION-ANTIBUCLE-GOLIVE-POSTPROD-20260814.md","repoPath":"orbit360-platform/docs/ADDENDUM-MAESTRO-CONTINUIDAD-SINCRONIZACION-ANTIBUCLE-GOLIVE-POSTPROD-20260814.md"},
-    {"id":"forense-plan-congelado-20260818","title":"Addendum Cierre Forense, Sincronizacion y Plan Congelado 20260818","sourceType":"repository","sourceName":"ADDENDUM-MAESTRO-CIERRE-FORENSE-SINCRONIZACION-Y-PLAN-CONGELADO-20260818.md","repoPath":"orbit360-platform/docs/ADDENDUM-MAESTRO-CIERRE-FORENSE-SINCRONIZACION-Y-PLAN-CONGELADO-20260818.md"}
+    {
+      "id": "master-20260704",
+      "title": "Documento Maestro Consolidado 20260704",
+      "sourceType": "project_attachment",
+      "sourceName": "DOCUMENTO-MAESTRO-CONSOLIDADO-ORBIT360-AYS-20260704.md",
+      "repoPath": null
+    },
+    {
+      "id": "academia-20260704",
+      "title": "Addendum Academia Profunda 20260704",
+      "sourceType": "project_attachment",
+      "sourceName": "ADENDUM-ACADEMIA-PROFUNDA-INTERACTIVA-ORBIT360-AYS-20260704.md",
+      "repoPath": null
+    },
+    {
+      "id": "claude-backend-20260707",
+      "title": "Addendum Patrones Reutilizables Claude/Backend 20260707",
+      "sourceType": "project_attachment",
+      "sourceName": "ADDENDUM-MAESTRO-PATRONES-REUTILIZABLES-CLAUDE-BACKEND-ORBIT360-20260707.md",
+      "repoPath": null
+    },
+    {
+      "id": "continuidad-multirol-importadores-20260709",
+      "title": "Addendum Continuidad Clientes/Multirol/Importadores 20260709",
+      "sourceType": "project_attachment",
+      "sourceName": "addendum_continuidad_clientes_multirol_importadores_20260709.zip",
+      "repoPath": null
+    },
+    {
+      "id": "plan-maestro-20260716",
+      "title": "Plan Maestro de Ejecucion Productiva 20260716",
+      "sourceType": "project_attachment",
+      "sourceName": "PLAN-MAESTRO-EJECUCION-PRODUCTIVA-ANTI-DESVIACION-SINCRONIZACION-CLAUDE-ORBIT360-AYS-20260716(1).md",
+      "repoPath": null
+    },
+    {
+      "id": "causa-raiz-gates-20260717",
+      "title": "Addendum Control de Causa Raiz, Validadores y Gates 20260717",
+      "sourceType": "project_attachment",
+      "sourceName": "ADENDUM-MAESTRO-CONTROL-CAUSA-RAIZ-VALIDADORES-GATES-ORBIT360-AYS-20260717(1).docx",
+      "repoPath": null
+    },
+    {
+      "id": "aceleracion-20260730",
+      "title": "Addendum Aceleracion Productiva, Reuso Transversal y Control Autorizaciones 20260730",
+      "sourceType": "project_attachment",
+      "sourceName": "ADDENDUM-MAESTRO-ACELERACION-PRODUCTIVA-REUSO-TRANSVERSAL-Y-CONTROL-AUTORIZACIONES-20260730(1).md",
+      "repoPath": null
+    },
+    {
+      "id": "continuidad-antibucle-20260814",
+      "title": "Addendum Continuidad, Sincronizacion, Antibucle, Go-live y Postproduccion 20260814",
+      "sourceType": "repository",
+      "sourceName": "ADDENDUM-MAESTRO-CONTINUIDAD-SINCRONIZACION-ANTIBUCLE-GOLIVE-POSTPROD-20260814.md",
+      "repoPath": "orbit360-platform/docs/ADDENDUM-MAESTRO-CONTINUIDAD-SINCRONIZACION-ANTIBUCLE-GOLIVE-POSTPROD-20260814.md"
+    },
+    {
+      "id": "forense-plan-congelado-20260818",
+      "title": "Addendum Cierre Forense, Sincronizacion y Plan Congelado 20260818",
+      "sourceType": "repository",
+      "sourceName": "ADDENDUM-MAESTRO-CIERRE-FORENSE-SINCRONIZACION-Y-PLAN-CONGELADO-20260818.md",
+      "repoPath": "orbit360-platform/docs/ADDENDUM-MAESTRO-CIERRE-FORENSE-SINCRONIZACION-Y-PLAN-CONGELADO-20260818.md"
+    }
   ],
   "operationalCurrent": {
     "liveState": "orbit360-platform/docs/orbit360-live-state-v1.json",
-    "resumePointer": "orbit360-platform/docs/CHECKPOINT-F2-SOURCE-ONLY-PASS-RUNTIME-AUTHORIZATION-PENDING-20260818.md",
+    "resumePointer": "orbit360-platform/docs/CHECKPOINT-F2-RUNTIME01-VALIDATOR-STALE-ROOTFIX-PASS-20260818.md",
     "pullRequest": 5,
     "latestHistoricalPublishedRuntimeEvidence": "orbit360-platform/runtime-gate-crm-v20260716/r4-production-readonly-smoke-run-32191671405.json",
     "latestF1_4CBuildEvidence": "orbit360-platform/runtime-gate-crm-v20260716/f1-4c-successor-artifact-certification-v20260818.json",
     "latestRuntimeEvidence": "orbit360-platform/runtime-gate-crm-v20260716/f1-4d-runtime-browser-readonly-run-32195516901.json",
-    "latestTerminalEvidence": "orbit360-platform/runtime-gate-crm-v20260716/f2-source-only-closure-v20260818.json",
-    "latestPreflightEvidence": "orbit360-platform/runtime-gate-crm-v20260716/f2-source-gate-preflight-v20260818.json",
+    "latestTerminalEvidence": "orbit360-platform/runtime-gate-crm-v20260716/f2-runtime01-validator-stale-stop-v20260818.json",
+    "latestPreflightEvidence": "orbit360-platform/runtime-gate-crm-v20260716/f2-validator-stale-rootfix-source-only-v20260818.json",
     "latestArtifactVerificationEvidence": "orbit360-platform/runtime-gate-crm-v20260716/f2-exact-candidate-source-validation-v20260818.json",
     "latestRequestConsumptionEvidence": "orbit360-platform/runtime-gate-crm-v20260716/f1-4d-request-consumption-run-32195516901.json",
-    "currentCheckpoint": "orbit360-platform/docs/CHECKPOINT-F2-SOURCE-ONLY-PASS-RUNTIME-AUTHORIZATION-PENDING-20260818.md",
+    "currentCheckpoint": "orbit360-platform/docs/CHECKPOINT-F2-RUNTIME01-VALIDATOR-STALE-ROOTFIX-PASS-20260818.md",
     "currentPhase": "F2_SOURCE_ONLY_PASS_RUNTIME_AUTHORIZATION_PENDING",
     "currentPhaseInternalPercent": 0,
-    "currentPhaseInternalMethod": "F2_source_only_preparation_closed_runtime_acceptance_not_executed",
+    "currentPhaseInternalMethod": "F2_source_only_ready_runtime01_consumed_validator_stale_rootfix_pass_runtime_acceptance_not_executed",
     "goLiveRoutePercentClosed": 50,
     "integratedProgramPercentClosed": 25,
-    "currentBlocker": "F2 runtime/browser acceptance requires one explicit authorization; source-only gate is PASS",
+    "currentBlocker": "F2 runtime01 was consumed at canonical preflight by VALIDATOR_STALE; source-only rootfix PASS; fresh explicit authorization required for request02",
     "f1Status": "CLOSED_PASS",
     "f1_4DRunId": "32195516901",
     "f1_4DRequestCommit": "45c85e6ed6e992b490262f5abf12cce94d7a13c4",
@@ -64,7 +118,14 @@
     "f1BootstrapStatus": "ready-read-only",
     "publishedPackage": "R4S9C_SOURCE_861326906558f03d9c8c2e7f34adfb4979a17d73_PRESERVED_NOT_ROOTFIX_CONFIRMATION_ARTIFACT",
     "currentPlan": "orbit360-platform/docs/ADDENDUM-MAESTRO-CIERRE-FORENSE-SINCRONIZACION-Y-PLAN-CONGELADO-20260818.md",
-    "nextAuthorizationBoundary": "F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_V1 / EXACT_ARTIFACT_9345207863 / NOT_GRANTED"
+    "nextAuthorizationBoundary": "F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_V1 / REQUEST02 / EXACT_ARTIFACT_9345207863 / NOT_GRANTED",
+    "f2Runtime01RunId": "32205144735",
+    "f2Runtime01RequestCommit": "0fba51716d741750b617bf95fc6342444c9f720c",
+    "f2Runtime01Status": "CONSUMED_STOP_VALIDATOR_STALE",
+    "f2Runtime01RequestConsumed": true,
+    "f2Runtime01ReplayAllowed": false,
+    "f2ValidatorRootfixRunId": "32205903393",
+    "f2ValidatorRootfixStatus": "CLOSED_SOURCE_ONLY_PASS"
   },
   "historicalPolicy": {
     "defaultClassification": "HISTORICAL_NOT_CURRENT_STATE",
@@ -77,25 +138,90 @@
     "Read this index",
     "Read orbit360-live-state-v1.json",
     "Confirm actual HEAD and PR #5",
-    "Read F1.4D runtime evidence only as last completed runtime baseline",
-    "Read currentCheckpoint",
-    "Do not repeat F1.4, F1.4B, F1.4C or F1.4D",
-    "Do not test R4S9C as F1.3 rootfix artifact",
-    "F2 source-only contract is closed PASS; do not rederive it",
-    "Do not create or execute F2 runtime request without explicit authorization",
-    "Bind F2 runtime only to exact artifact 9345207863"
+    "Read F2 runtime01 STOP evidence and validator rootfix source-only PASS",
+    "Do not rerun request01 or run 32205144735",
+    "Do not repeat F1 runtime closures",
+    "F2 source-only contract remains closed PASS; do not rederive it",
+    "Do not create request02 without fresh explicit authorization",
+    "Bind request02 only to exact artifact 9345207863"
   ],
   "frozenPlanPhases": [
-    {"id":"F0","name":"Reconciliacion forense y documentacion","goLiveWeight":20,"integratedWeight":10,"status":"CLOSED"},
-    {"id":"F1","name":"Causa raiz runtime/bootstrap","goLiveWeight":30,"integratedWeight":15,"status":"CLOSED","internalPercent":100,"internalMethod":"5_of_5_named_subphases_closed"},
-    {"id":"F2","name":"Gate de aceptacion productiva real","goLiveWeight":30,"integratedWeight":15,"status":"IN_PROGRESS_SOURCE_ONLY_PASS_RUNTIME_PENDING","internalPercent":0,"internalMethod":"source_only_preparation_closed_runtime_acceptance_not_executed"},
-    {"id":"F3","name":"Go-live operativo A&S","goLiveWeight":20,"integratedWeight":10,"status":"PENDING"},
-    {"id":"F4","name":"Actualizacion incremental de informacion","goLiveWeight":0,"integratedWeight":15,"status":"PENDING"},
-    {"id":"F5","name":"Control Plane no-code","goLiveWeight":0,"integratedWeight":15,"status":"PENDING"},
-    {"id":"F6","name":"Postproduccion funcional acumulativa","goLiveWeight":0,"integratedWeight":15,"status":"PENDING"},
-    {"id":"F7","name":"SaaS reusable / siguiente tenant","goLiveWeight":0,"integratedWeight":5,"status":"PENDING"}
+    {
+      "id": "F0",
+      "name": "Reconciliacion forense y documentacion",
+      "goLiveWeight": 20,
+      "integratedWeight": 10,
+      "status": "CLOSED"
+    },
+    {
+      "id": "F1",
+      "name": "Causa raiz runtime/bootstrap",
+      "goLiveWeight": 30,
+      "integratedWeight": 15,
+      "status": "CLOSED",
+      "internalPercent": 100,
+      "internalMethod": "5_of_5_named_subphases_closed"
+    },
+    {
+      "id": "F2",
+      "name": "Gate de aceptacion productiva real",
+      "goLiveWeight": 30,
+      "integratedWeight": 15,
+      "status": "IN_PROGRESS_RUNTIME01_VALIDATOR_STALE_ROOTFIX_PASS_FRESH_AUTH_PENDING",
+      "internalPercent": 0,
+      "internalMethod": "runtime01_consumed_validator_stale_rootfix_pass_runtime_acceptance_not_executed"
+    },
+    {
+      "id": "F3",
+      "name": "Go-live operativo A&S",
+      "goLiveWeight": 20,
+      "integratedWeight": 10,
+      "status": "PENDING"
+    },
+    {
+      "id": "F4",
+      "name": "Actualizacion incremental de informacion",
+      "goLiveWeight": 0,
+      "integratedWeight": 15,
+      "status": "PENDING"
+    },
+    {
+      "id": "F5",
+      "name": "Control Plane no-code",
+      "goLiveWeight": 0,
+      "integratedWeight": 15,
+      "status": "PENDING"
+    },
+    {
+      "id": "F6",
+      "name": "Postproduccion funcional acumulativa",
+      "goLiveWeight": 0,
+      "integratedWeight": 15,
+      "status": "PENDING"
+    },
+    {
+      "id": "F7",
+      "name": "SaaS reusable / siguiente tenant",
+      "goLiveWeight": 0,
+      "integratedWeight": 5,
+      "status": "PENDING"
+    }
   ],
   "reportingRequired": [
-    "phase","visibleProgress","phaseInternalPercent","goLiveRoutePercent","integratedProgramPercent","sourceHead","classification","implementation","evidence","writesDeployStatus","documentationSynchronized","claudeReusableImpact","academiaImpact","pending","nextActionExact"
+    "phase",
+    "visibleProgress",
+    "phaseInternalPercent",
+    "goLiveRoutePercent",
+    "integratedProgramPercent",
+    "sourceHead",
+    "classification",
+    "implementation",
+    "evidence",
+    "writesDeployStatus",
+    "documentationSynchronized",
+    "claudeReusableImpact",
+    "academiaImpact",
+    "pending",
+    "nextActionExact"
   ]
 }
