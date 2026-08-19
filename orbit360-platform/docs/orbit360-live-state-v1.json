@@ -1,7 +1,7 @@
 {
   "schemaVersion": "orbit360-live-state-v1",
-  "stateVersion": "20260818.f2-runtime03-consumed.legal-readiness-validator-stale-rootfix-pass.current",
-  "updatedAt": "2026-08-19T02:13:37.383Z",
+  "stateVersion": "20260818.f2-runtime04-consumed.role-view-validator-stale-rootfix-pass.current",
+  "updatedAt": "2026-08-19T02:53:05.298Z",
   "phase": "F2_SOURCE_ONLY_PASS_RUNTIME_AUTHORIZATION_PENDING",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -209,6 +209,17 @@
       "selftest": "orbit360-platform/runtime-gate-crm-v20260716/f2-legal-readiness-phase-aware-selftest-v20260818.json",
       "evidence": "orbit360-platform/runtime-gate-crm-v20260716/f2-legal-readiness-rootfix-source-only-v20260818.json",
       "productAffected": false
+    },
+    "roleViewValidatorRootfix": {
+      "classification": "VALIDATOR_STALE",
+      "code": "F2_ROLE_VIEW_VALIDATOR_REQUIRED_LITERAL_DIRECCION_INSTEAD_OF_SUPERADMIN_VISUAL_EQUIVALENT",
+      "status": "CLOSED_SOURCE_ONLY_PASS",
+      "runId": 32209972474,
+      "contractVersion": "F2_ROLE_VIEW_CANONICAL_VISUAL_V1",
+      "selftest": "orbit360-platform/runtime-gate-crm-v20260716/f2-role-view-contract-selftest-v20260818.json",
+      "evidence": "orbit360-platform/runtime-gate-crm-v20260716/f2-role-view-rootfix-source-only-v20260818.json",
+      "productAffected": false,
+      "dataAffected": false
     }
   },
   "rootCauseState": {
@@ -240,8 +251,8 @@
       "productAffected": false
     },
     "currentBlockingFact": {
-      "code": "F2_RUNTIME03_CONSUMED_LEGAL_READINESS_ROOTFIX_PASS_POSTSYNC_GATE_PASS_FRESH_AUTHORIZATION_REQUIRED",
-      "status": "F2_RUNTIME_BROWSER_READONLY_REQUEST04_NOT_AUTHORIZED"
+      "code": "F2_RUNTIME04_CONSUMED_ROLE_VIEW_VALIDATOR_STALE_ROOTFIX_PASS_POSTSYNC_GATE_PASS_FRESH_AUTHORIZATION_REQUIRED",
+      "status": "F2_RUNTIME_BROWSER_READONLY_REQUEST05_NOT_AUTHORIZED"
     },
     "authIsCurrentBlocker": false,
     "passwordIsCurrentBlocker": false,
@@ -283,14 +294,27 @@
       "gateHadPassedBeforePushFailure": true,
       "failedRunId": 32207625109,
       "retrySameMechanism": false
+    },
+    "f2Runtime04RoleViewValidatorStale": {
+      "classification": "VALIDATOR_STALE",
+      "code": "F2_ROLE_VIEW_VALIDATOR_REQUIRED_LITERAL_DIRECCION_INSTEAD_OF_SUPERADMIN_VISUAL_EQUIVALENT",
+      "status": "CLOSED_SOURCE_ONLY_ROOTFIX_PASS_RUN_32209972474",
+      "observedRuntimeClassification": "DATA_CONTRACT_FAILURE",
+      "reclassifiedAfterRootCause": true,
+      "productAffected": false,
+      "dataAffected": false,
+      "identityCanonicalRole": "SuperAdmin",
+      "visualView": "Dirección",
+      "integrityBeforeAfterPass": true,
+      "preventiveControl": "CANONICAL_TO_VISUAL_ROLE_VIEW_CONTRACT_PLUS_POST_DOCSYNC_CANONICAL_SOURCE_GATE"
     }
   },
   "documentationControl": {
     "index": "orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json",
     "currentAddendum": "orbit360-platform/docs/ADDENDUM-MAESTRO-CIERRE-FORENSE-SINCRONIZACION-Y-PLAN-CONGELADO-20260818.md",
-    "currentCheckpoint": "orbit360-platform/docs/CHECKPOINT-F2-RUNTIME03-LEGAL-READINESS-VALIDATOR-STALE-ROOTFIX-PASS-20260818.md",
+    "currentCheckpoint": "orbit360-platform/docs/CHECKPOINT-F2-RUNTIME04-ROLE-VIEW-VALIDATOR-STALE-ROOTFIX-PASS-20260818.md",
     "historicalPolicy": "HISTORICAL_NOT_CURRENT_STATE",
-    "transactionStatus": "F2_RUNTIME03_CONSUMED_VALIDATOR_STALE_ROOTFIX_POSTSYNC_SOURCE_PASS_FRESH_AUTH_PENDING"
+    "transactionStatus": "F2_RUNTIME04_CONSUMED_ROLE_VIEW_VALIDATOR_STALE_ROOTFIX_POSTSYNC_SOURCE_PASS_FRESH_AUTH_PENDING"
   },
   "frozenPlan": {
     "currentPhase": "F2",
@@ -321,7 +345,7 @@
       ]
     },
     "currentPhaseInternalPercent": 0,
-    "currentPhaseInternalMethod": "F2_runtime03_reached_browser_legal_readiness_validator_stale_rootfix_pass_runtime_acceptance_incomplete",
+    "currentPhaseInternalMethod": "F2_runtime04_reached_runtime_role_contract_then_validator_stale_rootfix_pass_runtime_acceptance_incomplete",
     "currentPhaseSubphases": {
       "F1_1_owner_and_observer_source": "CLOSED",
       "F1_2A_observer_selftest": "CLOSED",
@@ -332,7 +356,7 @@
       "F1_4C_successor_artifact_build": "CLOSED_PASS_CONSUMED",
       "F1_4D_exact_successor_runtime_confirmation": "CLOSED_PASS_CONSUMED",
       "F2_source_only_contract_artifact_topology": "CLOSED_PASS",
-      "F2_runtime_browser_readonly_acceptance": "PENDING_FRESH_EXPLICIT_AUTHORIZATION_REQUEST04",
+      "F2_runtime_browser_readonly_acceptance": "PENDING_FRESH_EXPLICIT_AUTHORIZATION_REQUEST05",
       "F2_runtime01_preflight": "CONSUMED_STOP_VALIDATOR_STALE_RUN_32205144735",
       "F2_runtime01_validator_rootfix": "CLOSED_SOURCE_ONLY_PASS_RUN_32205903393",
       "F2_runtime02_preflight": "CONSUMED_STOP_VALIDATOR_STALE_RUN_32206449703",
@@ -340,12 +364,16 @@
       "F2_runtime03_preflight_and_artifact_identity_integrity": "PASS_THROUGH_LEGAL_STAGE_RUN_32207049146",
       "F2_runtime03_legal_readiness_stop": "CONSUMED_VALIDATOR_STALE_RUN_32207049146",
       "F2_runtime03_legal_readiness_rootfix": "CLOSED_SOURCE_ONLY_PASS_RUN_32207309204",
-      "F2_runtime03_postsync_source_gate": "CLOSED_SOURCE_ONLY_PASS_RUN_32207781730"
+      "F2_runtime03_postsync_source_gate": "CLOSED_SOURCE_ONLY_PASS_RUN_32207781730",
+      "F2_runtime04_preflight_artifact_identity_integrity": "PASS",
+      "F2_runtime04_role_view_stop": "CONSUMED_VALIDATOR_STALE_RUN_32208018808",
+      "F2_runtime04_role_view_rootfix": "CLOSED_SOURCE_ONLY_PASS_RUN_32209972474",
+      "F2_runtime04_postsync_source_gate": "CLOSED_SOURCE_ONLY_PASS_RUN_32210132572"
     }
   },
   "lanes": {
     "A_frontend_UX": "FROZEN_NO_CHANGES",
-    "B_backend_security_gates": "F2_RUNTIME03_LEGAL_READINESS_VALIDATOR_STALE_ROOTFIX_POSTSYNC_SOURCE_PASS_FRESH_AUTHORIZATION_PENDING",
+    "B_backend_security_gates": "F2_RUNTIME04_ROLE_VIEW_VALIDATOR_STALE_ROOTFIX_POSTSYNC_SOURCE_PASS_FRESH_AUTHORIZATION_PENDING",
     "C_real_data_migration": "UNTOUCHED_ZERO_CHANGES"
   },
   "writes": {
@@ -366,10 +394,10 @@
     "membershipChangesAuthorized": false,
     "dataChangesAuthorized": false,
     "mainMergeAuthorized": false,
-    "f2AuthorizationStatus": "RUNTIME03_CONSUMED_LEGAL_READINESS_VALIDATOR_STALE_ROOTFIX_PASS_FRESH_AUTH_REQUIRED"
+    "f2AuthorizationStatus": "RUNTIME04_CONSUMED_ROLE_VIEW_VALIDATOR_STALE_ROOTFIX_PASS_FRESH_AUTH_REQUIRED"
   },
   "goLive": {
-    "status": "F2_RUNTIME03_LEGAL_READINESS_ROOTFIX_POSTSYNC_SOURCE_PASS_FRESH_AUTHORIZATION_PENDING",
+    "status": "F2_RUNTIME04_ROLE_VIEW_ROOTFIX_POSTSYNC_SOURCE_PASS_FRESH_AUTHORIZATION_PENDING",
     "publicUrl": "https://app.aysseguros.com",
     "publishedPackagePreserved": true,
     "successorPublished": false,
@@ -394,18 +422,22 @@
     "f2StableBoundaryRootfixSourceMayBeRerun": false,
     "f2Runtime03MayBeRerun": false,
     "f2Runtime03RequestReplayAllowed": false,
-    "f2LegalReadinessRootfixSourceMayBeRerun": false
+    "f2LegalReadinessRootfixSourceMayBeRerun": false,
+    "f2Runtime04MayBeRerun": false,
+    "f2Runtime04RequestReplayAllowed": false,
+    "f2RoleViewRootfixSourceMayBeRerun": false
   },
   "nextActionExact": {
-    "stage": "F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_REQUEST04_AUTHORIZATION_BOUNDARY",
+    "stage": "F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_REQUEST05_AUTHORIZATION_BOUNDARY",
     "gateId": "f2-productive-acceptance-exact-successor-v20260818",
     "requestVersion": "F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_V1",
-    "requestOrdinal": 4,
+    "requestOrdinal": 5,
     "candidateArtifactId": 9345207863,
     "stableBoundaryRootfixSourcePass": true,
     "legalReadinessRootfixSourcePass": true,
+    "roleViewRootfixSourcePass": true,
     "postSyncSourceGatePass": true,
-    "postSyncSourceGateRunId": 32207781730,
+    "postSyncSourceGateRunId": 32210132572,
     "authorizationRequired": true,
     "authorizationGranted": false,
     "requestCreated": false,
@@ -416,6 +448,8 @@
       "ephemeral_custom_token",
       "runtime_loopback",
       "browser_Direccion_desktop_Operativo_tablet_Asesor_mobile",
+      "cross_tenant_denial",
+      "service_worker_cache",
       "read_only_integrity_before_after"
     ],
     "forbids": [
@@ -435,14 +469,15 @@
     "Read ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json",
     "Read this live-state",
     "Confirm actual HEAD and PR #5",
-    "Read Runtime03 legal-readiness validator-stale evidence and phase-aware rootfix evidence",
-    "Do not rerun Request01/run 32205144735, Request02/run 32206449703 or Request03/run 32207049146",
-    "Do not repeat F1.4/F1.4B/F1.4C/F1.4D",
+    "Read Runtime04 role-view validator-stale STOP and role-view rootfix source-only evidence",
+    "Do not rerun Request01/run 32205144735, Request02/run 32206449703, Request03/run 32207049146 or Request04/run 32208018808",
+    "Do not repeat F1 runtime closures",
     "Do not rederive F2 source contract",
-    "Treat Runtime03 observed FUNCTIONAL_DEFECT classification as historical pre-root-cause classification; canonical classification is VALIDATOR_STALE",
+    "Treat Runtime04 observed DATA_CONTRACT_FAILURE as historical pre-root-cause classification; canonical classification is VALIDATOR_STALE",
+    "Canonical SuperAdmin maps to visual Dirección only for the Dirección view; AdminTenant does not",
     "Require canonical source-only PASS after this documentation sync before any fresh runtime request",
-    "Do not create Request04 without fresh explicit authorization",
-    "Bind Request04 only to exact artifact 9345207863"
+    "Do not create Request05 without fresh explicit authorization",
+    "Bind any fresh F2 runtime only to exact artifact 9345207863"
   ],
   "f2Runtime01": {
     "status": "CONSUMED_STOP_VALIDATOR_STALE",
@@ -581,6 +616,70 @@
       "status": "CLOSED_SOURCE_ONLY_PASS",
       "runId": 32207781730,
       "evidence": "orbit360-platform/runtime-gate-crm-v20260716/f2-runtime03-postsync-source-only-v20260818.json"
+    }
+  },
+  "f2Runtime04": {
+    "status": "CONSUMED_STOP_VALIDATOR_STALE",
+    "requestPath": ".github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-runbound-20260818-04.json",
+    "requestCommit": "c1b6fe68ccfeb13655f5242c1e02fcc2a496b3d5",
+    "runId": 32208018808,
+    "runAttempt": 1,
+    "terminalArtifactId": 9349780184,
+    "candidateArtifactId": 9345207863,
+    "canonicalGateGo": true,
+    "candidateArtifactVerified": true,
+    "identityReadOnlyPass": true,
+    "identitySelectedActiveRole": "SuperAdmin",
+    "identityAssignedRoleCount": 4,
+    "integrityBeforePass": true,
+    "browserExecuted": true,
+    "runtimeExecuted": true,
+    "browserAcceptanceCompleted": false,
+    "roleMatrixCompleted": false,
+    "crossTenantCheckReached": false,
+    "serviceWorkerCheckReached": false,
+    "observedRuntimeClassification": "DATA_CONTRACT_FAILURE",
+    "canonicalClassification": "VALIDATOR_STALE",
+    "rootCauseCode": "F2_ROLE_VIEW_VALIDATOR_REQUIRED_LITERAL_DIRECCION_INSTEAD_OF_SUPERADMIN_VISUAL_EQUIVALENT",
+    "integrityAfterPass": true,
+    "integrityBeforeAfterPass": true,
+    "countsIdentical": true,
+    "digestsIdentical": true,
+    "firestoreWrites": 0,
+    "authWrites": 0,
+    "membershipWrites": 0,
+    "dataWrites": 0,
+    "operationalWrites": 0,
+    "packageRebuilt": false,
+    "deployExecuted": false,
+    "publicationExecuted": false,
+    "productionTouched": false,
+    "requestConsumed": true,
+    "allowedExecutions": 0,
+    "replayAllowed": false,
+    "rootfix": {
+      "status": "CLOSED_SOURCE_ONLY_PASS",
+      "runId": 32209972474,
+      "contractVersion": "F2_ROLE_VIEW_CANONICAL_VISUAL_V1",
+      "selftest": "orbit360-platform/runtime-gate-crm-v20260716/f2-role-view-contract-selftest-v20260818.json",
+      "evidence": "orbit360-platform/runtime-gate-crm-v20260716/f2-role-view-rootfix-source-only-v20260818.json"
+    },
+    "postSyncSourceGate": {
+      "status": "CLOSED_SOURCE_ONLY_PASS",
+      "runId": 32210132572,
+      "evidence": "orbit360-platform/runtime-gate-crm-v20260716/f2-runtime04-postsync-source-only-v20260818.json"
+    }
+  },
+  "reuseAcademia": {
+    "runtime04RoleView": {
+      "claudeClassification": "REPLICABLE_CLAUDE_ACUMULADO",
+      "reusablePattern": "Separate canonical authorization roles from human-facing role labels in validators; validate view semantics through an explicit mapping contract.",
+      "exclude": [
+        "backend_protected",
+        "secrets",
+        "real_data"
+      ],
+      "academiaUpdate": "Multirol/scopes: canonical role identity and visual role label are different contracts; SuperAdmin may render as Dirección while authorization remains canonical. Validator stale is not a data defect."
     }
   }
 }
