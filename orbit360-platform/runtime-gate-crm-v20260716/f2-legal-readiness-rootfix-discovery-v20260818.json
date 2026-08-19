@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "orbit360-f2-legal-readiness-rootfix-discovery-v1",
+  "ok": true,
+  "status": "F2_LEGAL_READINESS_ROOTFIX_RUN_DISCOVERED",
+  "classification": "PASS",
+  "triggerSha": "6ac32f1a04f01f173e4c745ba623701d6c295258",
+  "runId": 32207309204,
+  "runStatus": "completed",
+  "runConclusion": "success",
+  "runAttempt": 1,
+  "event": "push",
+  "headSha": "6ac32f1a04f01f173e4c745ba623701d6c295258",
+  "workflowName": "Orbit360 F2 Legal Readiness Rootfix Source Only 20260818",
+  "createdAt": "2026-08-19T02:05:42Z",
+  "updatedAt": "2026-08-19T02:06:18Z",
+  "multipleRuns": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
