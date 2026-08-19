@@ -1,0 +1,37 @@
+{
+  "schemaVersion": "orbit360-run-discovery-v4",
+  "ok": true,
+  "status": "TARGET_RUN_TERMINAL_PASS",
+  "classification": "OBSERVATION_PASS",
+  "requestCommit": "f52aca73cb43cc8882bbcdfc95d98b73f63348b5",
+  "requestFile": ".github/orbit360-requests/f2-successor-source-pass-seal-runbound-20260819-01.json",
+  "requestVersion": "F2_SUCCESSOR_SOURCE_PASS_SEAL_V1",
+  "gateId": "f2-productive-acceptance-exact-successor-v20260818",
+  "targetRunId": 32310872702,
+  "targetRunStatus": "completed",
+  "targetRunConclusion": "success",
+  "runAttempt": 1,
+  "event": "push",
+  "headSha": "f52aca73cb43cc8882bbcdfc95d98b73f63348b5",
+  "workflowName": "Orbit360 Seal F2 Successor Source Pass 20260819",
+  "createdAt": "2026-08-19T22:53:37Z",
+  "runStartedAt": "2026-08-19T22:53:37Z",
+  "updatedAt": "2026-08-19T22:53:56Z",
+  "htmlUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/32310872702",
+  "artifacts": [
+    {
+      "id": 9386388721,
+      "name": "orbit360-f2-successor-source-seal-32310872702",
+      "size_in_bytes": 1336,
+      "digest": "sha256:50ce3959e00d73983e4356717a83715b71b27ceb2588af7b6e8fb31616d038f2",
+      "expired": false
+    }
+  ],
+  "artifactCount": 1,
+  "matchCount": 1,
+  "multipleRuns": false,
+  "runtimeReplay": false,
+  "productMutation": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
