@@ -1,0 +1,87 @@
+{
+  "schemaVersion": "orbit360-f2-runtime05-rules-history-observer-v1",
+  "ok": true,
+  "status": "F2_RUNTIME05_RULES_HISTORY_METADATA_OBSERVED",
+  "classification": "OBSERVATION_PASS",
+  "targets": [
+    {
+      "sha": "e792fa52fffa9d273307a8302d23b9d373c0ad9a",
+      "runs": [
+        {
+          "id": 29384553281,
+          "name": "Orbit 360 LAB Temporary Dispatcher",
+          "event": "push",
+          "status": "completed",
+          "conclusion": "skipped",
+          "run_attempt": 1,
+          "head_sha": "e792fa52fffa9d273307a8302d23b9d373c0ad9a",
+          "head_branch": "main",
+          "created_at": "2026-07-15T02:37:50Z",
+          "updated_at": "2026-07-15T02:37:51Z"
+        }
+      ]
+    },
+    {
+      "sha": "3754926514d7484fec0e9a06575d7344d09aec85",
+      "runs": [
+        {
+          "id": 29387539446,
+          "name": "Orbit 360 LAB Temporary Dispatcher",
+          "event": "push",
+          "status": "completed",
+          "conclusion": "failure",
+          "run_attempt": 1,
+          "head_sha": "3754926514d7484fec0e9a06575d7344d09aec85",
+          "head_branch": "main",
+          "created_at": "2026-07-15T03:51:25Z",
+          "updated_at": "2026-07-15T03:51:34Z"
+        }
+      ]
+    },
+    {
+      "sha": "86594f9c88ac6cc176928b8249f57b230a537603",
+      "runs": []
+    },
+    {
+      "sha": "6f55c279fa0a4f84a031c691abcf82bac9756252",
+      "runs": [
+        {
+          "id": 29388318001,
+          "name": "Orbit 360 LAB Temporary Dispatcher",
+          "event": "push",
+          "status": "completed",
+          "conclusion": "cancelled",
+          "run_attempt": 1,
+          "head_sha": "6f55c279fa0a4f84a031c691abcf82bac9756252",
+          "head_branch": "main",
+          "created_at": "2026-07-15T04:10:19Z",
+          "updated_at": "2026-07-15T04:11:02Z"
+        }
+      ]
+    },
+    {
+      "sha": "d1e2b48dd440b1ec2f6132a99380c81ff9093272",
+      "runs": [
+        {
+          "id": 29388492688,
+          "name": "Orbit 360 LAB Temporary Dispatcher",
+          "event": "push",
+          "status": "completed",
+          "conclusion": "cancelled",
+          "run_attempt": 1,
+          "head_sha": "d1e2b48dd440b1ec2f6132a99380c81ff9093272",
+          "head_branch": "main",
+          "created_at": "2026-07-15T04:14:21Z",
+          "updated_at": "2026-07-15T04:14:42Z"
+        }
+      ]
+    }
+  ],
+  "cloudMutation": false,
+  "secretAccess": false,
+  "firestoreRead": false,
+  "firestoreWrite": false,
+  "rulesDeploy": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
