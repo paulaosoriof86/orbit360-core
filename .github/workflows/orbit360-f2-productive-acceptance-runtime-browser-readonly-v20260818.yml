@@ -56,6 +56,9 @@ jobs:
           node --check tools/orbit360-register-f2-productive-acceptance-runtime-v20260818.mjs
           node --check tools/orbit360-validar-gate-contracts-engine-f2-productive-acceptance-v20260818.mjs
           node --check tools/orbit360-f2-productive-acceptance-runtime-browser-readonly-v20260818.mjs
+          node --check tools/orbit360-f2-cross-tenant-probe-contract-v20260818.mjs
+          node --check tools/orbit360-test-f2-full-runtime-known-rootfixes-v20260819.mjs
+          node tools/orbit360-test-f2-full-runtime-known-rootfixes-v20260819.mjs
           node --check tools/orbit360-f2-data-integrity-readonly-v20260818.mjs
           node --check tools/orbit360-f2-compare-integrity-v20260818.mjs
           echo "ORBIT360_REQUEST_FILE=$REQUEST_FILE" >> "$GITHUB_ENV"
