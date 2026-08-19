@@ -1,0 +1,61 @@
+name: Orbit360 F2 Runtime05 Security Rootcause Source Only 20260818
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-observers/f2-runtime05-security-rootcause-source-only-v20260818.json'
+permissions:
+  contents: write
+concurrency:
+  group: orbit360-f2-runtime05-security-rootcause-source-only-20260818
+  cancel-in-progress: false
+env:
+  GATE_ID: f2-productive-acceptance-exact-successor-v20260818
+  REQUEST_PATH: .github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-runbound-20260818-05.json
+  ROOTCAUSE_PATH: orbit360-platform/runtime-gate-crm-v20260716/f2-runtime05-cross-tenant-security-rootcause-v20260818.json
+  EVIDENCE_PATH: orbit360-platform/runtime-gate-crm-v20260716/f2-runtime05-security-rootcause-source-only-v20260818.json
+jobs:
+  source_only_security_rootcause:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify frozen Request05 security stop
+        shell: bash
+        run: |
+          set -euo pipefail
+          jq -e '.requestOrdinal==5 and .status=="CONSUMED_STOP_RETRY" and .allowedExecutions==0 and .consumed==true and .authorizationFrozen==true and .replayAllowed==false and .candidateArtifactId==9345207863 and .execution.runId==32210391764 and .execution.terminalArtifactId==9350568542 and .execution.canonicalRootClassification=="SECURITY_FAILURE" and .execution.canonicalRootCause=="FIRESTORE_RUNTIME_RULES_OUT_OF_PARITY_WITH_SOURCE_CROSS_TENANT_DENY" and .execution.crossTenantCheckReached==true and .execution.crossTenantDenied==false and .execution.integrityBeforeAfterPass==true and .execution.firestoreWrites==0 and .execution.authWrites==0 and .execution.operationalWrites==0' "$REQUEST_PATH" >/dev/null
+      - name: Verify restrictive source rules contract unchanged
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git hash-object firestore.rules)" = '35fba451bbbeb97dbae3f08303b786ddbcbdd29f'
+          grep -F 'tenantId == "alianzas-soluciones"' firestore.rules >/dev/null
+          grep -F 'allow read, write: if isTenantMember(tenantId);' firestore.rules >/dev/null
+          grep -F 'allow read, write: if false;' firestore.rules >/dev/null
+          jq -e '.classification=="SECURITY_FAILURE" and .code=="FIRESTORE_RUNTIME_RULES_OUT_OF_PARITY_WITH_SOURCE_CROSS_TENANT_DENY" and .sourceRules.sourceMutationRequired==false and .historicalDeploymentEvidence.rulesOkEvidenceFound==false and .rootCause.runtime05ReplayAllowed==false and .rootCause.request06Created==false' "$ROOTCAUSE_PATH" >/dev/null
+      - name: Canonical F2 source-only gate remains structurally valid
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+          env -u ORBIT360_REQUEST_FILE ORBIT360_EXPECTED_REQUEST_VERSION=NONE_PENDING_FRESH_AUTHORIZATION node tools/orbit360-validar-gate-contracts-v20260717.mjs "$GATE_ID"
+          P=orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+          jq -e '.ok==true and .status=="PASS_GATE_CONTRACT_SOURCE_F2_PRODUCTIVE_ACCEPTANCE" and .classification=="PASS" and .candidateArtifactId==9345207863 and .stableBoundaryContract==true and .sourceClosed==true and .phaseStillF2==true and .executionAuthorized==false and .secretAccessAuthorized==false and .firestoreReadAuthorized==false and .runtimeAuthorized==false and .browserAuthorized==false and .writeAuthorized==false and .deployAuthorized==false and .publicationAuthorized==false and .productionAuthorized==false' "$P" >/dev/null
+          jq --arg run "$GITHUB_RUN_ID" --arg sha "$GITHUB_SHA" '. + {runtime05SecurityRootcauseSourceRunId:$run,runtime05SecurityRootcauseTriggerSha:$sha,runtime05SecurityRootcauseStatus:"F2_RUNTIME05_SECURITY_ROOTCAUSE_SOURCE_ONLY_PASS",runtime05RunId:32210391764,runtime05Replayed:false,request06Created:false,rulesSourceMutation:false,rulesDeployExecuted:false,securityRepairAuthorizationGranted:false}' "$P" > "$EVIDENCE_PATH"
+      - name: Persist source-only evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$EVIDENCE_PATH"
+          git diff --cached --check
+          git commit -m '[skip ci] evidence(f2): close runtime05 security rootcause source-only'
+          git push origin "HEAD:ays/backend-tenant-lab-v99-20260703"
