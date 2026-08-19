@@ -1,0 +1,128 @@
+name: Orbit360 F2 Productive Acceptance Source Only 20260818
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/workflows/orbit360-f2-productive-acceptance-source-only-v20260818.yml'
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: orbit360-f2-productive-acceptance-source-only-20260818
+  cancel-in-progress: false
+env:
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  ORBIT360_GATE_ID: f2-productive-acceptance-exact-successor-v20260818
+  ORBIT360_CANDIDATE_ARTIFACT_ID: '9345207863'
+  ORBIT360_CANDIDATE_ZIP_NAME: orbit360-fase-a-product-f1-4c-successor-29caae94a3db.zip
+  ORBIT360_CANDIDATE_ZIP_SHA256: 493009c83390901aa772842a2ba9ddd5ce5293f6969d86c5c3395ebd670a44ac
+  ORBIT360_CANDIDATE_MANIFEST_SHA256: 29dafe5e63b425ea6cf641937fe1b9d4b9e63f72479a51ae76f9148a55771761
+  ORBIT360_CANDIDATE_SOURCE_HEAD: 29caae94a3db1f1626bdde2ea6ee9a21799f9df6
+  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+jobs:
+  source_only:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate F2 source owners and inert runtime boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
+          node --check tools/orbit360-register-f2-productive-acceptance-gate-v20260818.mjs
+          node --check tools/orbit360-register-f2-productive-acceptance-runtime-v20260818.mjs
+          node --check tools/orbit360-validar-gate-contracts-engine-f2-productive-acceptance-v20260818.mjs
+          node --check tools/orbit360-f2-exact-candidate-source-validator-v20260818.mjs
+          node --check tools/orbit360-f2-data-integrity-readonly-v20260818.mjs
+          node --check tools/orbit360-f2-compare-integrity-v20260818.mjs
+          node --check tools/orbit360-f2-productive-acceptance-runtime-browser-readonly-v20260818.mjs
+          jq -e '.gateId=="f2-productive-acceptance-exact-successor-v20260818" and .currentPhase=="F2_PRODUCTIVE_ACCEPTANCE_SOURCE_ONLY" and .executionProfile.capabilities.secrets==false and .executionProfile.capabilities.firestoreRead==false and .executionProfile.capabilities.writes==false and .executionProfile.capabilities.runtime==false and .executionProfile.capabilities.browser==false and .executionProfile.capabilities.deploy==false and .executionProfile.capabilities.production==false and .guards.candidateArtifactId==9345207863 and .authorization.activeRequest==false and .authorization.allowedExecutions==0' tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-source-v20260818.json >/dev/null
+          RUNTIME=.github/workflows/orbit360-f2-productive-acceptance-runtime-browser-readonly-v20260818.yml
+          GATE_LINE=$(grep -n 'Mandatory canonical F2 gate before artifact or provider/browser' "$RUNTIME" | head -1 | cut -d: -f1)
+          ART_LINE=$(grep -n 'Download and fully verify exact F2 candidate after GO' "$RUNTIME" | head -1 | cut -d: -f1)
+          PROVIDER_LINE=$(grep -n 'Bind provider after F2 GO' "$RUNTIME" | head -1 | cut -d: -f1)
+          BROWSER_LINE=$(grep -n 'Execute F2 complete browser acceptance' "$RUNTIME" | head -1 | cut -d: -f1)
+          test "$GATE_LINE" -lt "$ART_LINE" && test "$GATE_LINE" -lt "$PROVIDER_LINE" && test "$GATE_LINE" -lt "$BROWSER_LINE"
+          ! grep -E 'firebase(\.cmd)? deploy|firebase hosting|gcloud .*deploy|playwright install' "$RUNTIME"
+      - name: Register canonical F2 source gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-register-f2-productive-acceptance-gate-v20260818.mjs
+          node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
+          grep -F "['f2-productive-acceptance-exact-successor-v20260818']" tools/orbit360-validar-gate-contracts-v20260717.mjs >/dev/null
+          grep -F 'F2_PRODUCTIVE_ACCEPTANCE_SOURCE_ONLY' tools/orbit360-validar-gate-contracts-v20260717.mjs >/dev/null
+          grep -F 'F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY' tools/orbit360-validar-gate-contracts-v20260717.mjs >/dev/null
+          git diff --check
+      - name: Canonical F2 source gate before exact artifact inspection
+        shell: bash
+        run: |
+          set -euo pipefail
+          env -u ORBIT360_REQUEST_FILE ORBIT360_EXPECTED_REQUEST_VERSION=NONE_PENDING_FRESH_AUTHORIZATION node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
+          jq -e '.ok==true and .status=="PASS_GATE_CONTRACT_SOURCE_F2_PRODUCTIVE_ACCEPTANCE" and .classification=="PASS" and .candidateArtifactId==9345207863 and .exactCandidateBound==true and .f1Closed==true and .f1_4dConsumedPass==true and .surfaceTopologyBound==true and .runtimeWorkflowPrepared==true and .executionAuthorized==false and .secretAccessAuthorized==false and .firestoreReadAuthorized==false and .runtimeAuthorized==false and .browserAuthorized==false and .writeAuthorized==false and .deployAuthorized==false and .publicationAuthorized==false and .productionAuthorized==false and .browserExecuted==false and .runtimeExecuted==false and .secretAccess==false and .dataAccess==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+          cp "$EVIDENCE_DIR/preflight-sanitizado.json" "$EVIDENCE_DIR/f2-source-gate-preflight-v20260818.json"
+      - name: Download and fully verify exact candidate source after source GO
+        env:
+          GH_TOKEN_RUNTIME: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUTER="$RUNNER_TEMP/f2-artifact-outer.zip"
+          OUTER_DIR="$RUNNER_TEMP/f2-outer"
+          CANDIDATE_DIR="$RUNNER_TEMP/f2-candidate"
+          mkdir -p "$OUTER_DIR" "$CANDIDATE_DIR"
+          curl -L --fail --retry 3 -H "Authorization: Bearer $GH_TOKEN_RUNTIME" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/${ORBIT360_CANDIDATE_ARTIFACT_ID}/zip" -o "$OUTER"
+          unzip -q "$OUTER" -d "$OUTER_DIR"
+          mapfile -t FILES < <(find "$OUTER_DIR" -maxdepth 1 -type f -printf '%f\n' | sort)
+          test "${#FILES[@]}" = '1' && test "${FILES[0]}" = "$ORBIT360_CANDIDATE_ZIP_NAME"
+          INNER="$OUTER_DIR/$ORBIT360_CANDIDATE_ZIP_NAME"
+          test "$(sha256sum "$INNER" | awk '{print $1}')" = "$ORBIT360_CANDIDATE_ZIP_SHA256"
+          unzip -q "$INNER" -d "$CANDIDATE_DIR"
+          test "$(sha256sum "$CANDIDATE_DIR/orbit360-package-manifest.json" | awk '{print $1}')" = "$ORBIT360_CANDIDATE_MANIFEST_SHA256"
+          ORBIT360_F2_CANDIDATE_DIR="$CANDIDATE_DIR" node tools/orbit360-f2-exact-candidate-source-validator-v20260818.mjs
+          jq -e '.ok==true and .status=="F2_EXACT_CANDIDATE_SOURCE_VALIDATION_PASS" and .candidateArtifactId==9345207863 and .fullRehashPass==true and .entrypointRefsPass==true and .routes.inicio==true and .routes.cliente360==true and .routes.aseguradoras==true and .routes.ops==true and .routes.leads==true and .routes.polizas==true and .routes.cobros==true and .integratedSurfaces.vehiculos=="cliente360_policy_deeplink_fullpage" and .integratedSurfaces.recibosCartera=="policy_client360_plus_cobros_global" and .readOnlyStoreGuardPass==true and .browserExecuted==false and .runtimeExecuted==false and .secretAccess==false and .dataAccess==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0' "$EVIDENCE_DIR/f2-exact-candidate-source-validation-v20260818.json" >/dev/null
+      - name: Persist F2 source-only PASS and canonical registration
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const p='tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-source-v20260818.json';
+          const j=JSON.parse(fs.readFileSync(p,'utf8'));j.status='F2_SOURCE_ONLY_PASS';j.sourceOnlyResult={ok:true,status:'F2_SOURCE_ONLY_PASS',head:process.env.GITHUB_SHA,candidateArtifactId:9345207863,fullRehashPass:true,runtimeExecuted:false,browserExecuted:false,secretAccess:false,dataAccess:false,writes:0,deployExecuted:false,publicationExecuted:false,productionTouched:false};fs.writeFileSync(p,JSON.stringify(j,null,2)+'\n');
+          NODE
+          jq -n --arg head "$GITHUB_SHA" '{schemaVersion:"orbit360-f2-source-only-closure-v1",ok:true,status:"F2_SOURCE_ONLY_PASS",classification:"PASS",sourceHead:$head,gateId:"f2-productive-acceptance-exact-successor-v20260818",contractVersion:"2.0.0",candidateArtifactId:9345207863,candidateExact:true,fullRehashPass:true,routesPass:true,integratedVehicleSurface:true,integratedReceiptsPortfolioSurface:true,runtimeWorkflowPrepared:true,authorizationBoundary:"F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_V1",requestCreated:false,browserExecuted:false,runtimeExecuted:false,secretAccess:false,dataAccess:false,firestoreWrites:0,authWrites:0,operationalWrites:0,packageRebuilt:false,deployExecuted:false,publicationExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false}' > "$EVIDENCE_DIR/f2-source-only-closure-v20260818.json"
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const now=new Date().toISOString();
+          const livePath='orbit360-platform/docs/orbit360-live-state-v1.json';
+          const live=JSON.parse(fs.readFileSync(livePath,'utf8'));
+          live.updatedAt=now;
+          live.stateVersion='20260818.f2-source-only-pass.runtime-authorization-pending.current';
+          live.phase='F2_SOURCE_ONLY_PASS_RUNTIME_AUTHORIZATION_PENDING';
+          live.f2SourceOnly={status:'CLOSED_PASS',gateId:'f2-productive-acceptance-exact-successor-v20260818',contractVersion:'2.0.0',candidateArtifactId:9345207863,candidateSourceHead:'29caae94a3db1f1626bdde2ea6ee9a21799f9df6',candidateZipSha256:'493009c83390901aa772842a2ba9ddd5ce5293f6969d86c5c3395ebd670a44ac',candidateManifestSha256:'29dafe5e63b425ea6cf641937fe1b9d4b9e63f72479a51ae76f9148a55771761',candidateFileCount:194,fullRehashPass:true,routes:['inicio','cliente360','aseguradoras','ops','leads','polizas','cobros'],integratedSurfaces:{vehiculos:'cliente360_policy_deeplink_fullpage',recibosCartera:'policy_client360_plus_cobros_global'},runtimeWorkflowPrepared:true,requestCreated:false,runtimeAuthorized:false,browserAuthorized:false,writes:0,deployExecuted:false,publicationExecuted:false,productionTouched:false,evidence:{sourceGate:'orbit360-platform/runtime-gate-crm-v20260716/f2-source-gate-preflight-v20260818.json',candidateValidation:'orbit360-platform/runtime-gate-crm-v20260716/f2-exact-candidate-source-validation-v20260818.json',closure:'orbit360-platform/runtime-gate-crm-v20260716/f2-source-only-closure-v20260818.json'}};
+          live.frozenPlan=live.frozenPlan||{};live.frozenPlan.currentPhase='F2';live.frozenPlan.currentPhaseInternalPercent=0;live.frozenPlan.currentPhaseInternalMethod='F2_source_only_preparation_closed_runtime_acceptance_not_executed';
+          live.lanes=live.lanes||{};live.lanes.A_frontend_UX='FROZEN_NO_CHANGES';live.lanes.B_backend_security_gates='F2_SOURCE_ONLY_PASS_RUNTIME_AUTHORIZATION_PENDING';live.lanes.C_real_data_migration='UNTOUCHED_ZERO_CHANGES';
+          live.authorization=live.authorization||{};live.authorization.f2AuthorizationStatus='SOURCE_ONLY_PASS_RUNTIME_NOT_GRANTED';live.authorization.browserAuthorizedNow=false;live.authorization.runtimeAuthorizedNow=false;live.authorization.publicationAuthorizedNow=false;live.authorization.deployAuthorizedNow=false;live.authorization.authChangesAuthorized=false;live.authorization.membershipChangesAuthorized=false;live.authorization.dataChangesAuthorized=false;live.authorization.mainMergeAuthorized=false;
+          live.goLive=live.goLive||{};live.goLive.status='F2_SOURCE_ONLY_PASS_RUNTIME_AUTHORIZATION_PENDING';live.goLive.successorPublished=false;live.goLive.productionOperationalDeclared=false;
+          live.nextActionExact={stage:'F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_AUTHORIZATION_BOUNDARY',gateId:'f2-productive-acceptance-exact-successor-v20260818',requestVersion:'F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_V1',candidateArtifactId:9345207863,authorizationRequired:true,authorizationGranted:false,requestCreated:false,allows:['secret_access_after_canonical_GO','firestore_read','ephemeral_custom_token','runtime','browser_three_role_views','read_only_integrity_before_after'],forbids:['firestore_writes','auth_writes','membership_writes','data_writes','package_rebuild','deploy','publication','production_mutation','main_merge']};
+          fs.writeFileSync(livePath,JSON.stringify(live,null,2)+'\n');
+          const idxPath='orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json';
+          const idx=JSON.parse(fs.readFileSync(idxPath,'utf8'));idx.updatedAt=now;idx.operationalCurrent=idx.operationalCurrent||{};idx.operationalCurrent.resumePointer='orbit360-platform/docs/CHECKPOINT-F2-SOURCE-ONLY-PASS-RUNTIME-AUTHORIZATION-PENDING-20260818.md';idx.operationalCurrent.currentCheckpoint=idx.operationalCurrent.resumePointer;idx.operationalCurrent.latestPreflightEvidence='orbit360-platform/runtime-gate-crm-v20260716/f2-source-gate-preflight-v20260818.json';idx.operationalCurrent.latestArtifactVerificationEvidence='orbit360-platform/runtime-gate-crm-v20260716/f2-exact-candidate-source-validation-v20260818.json';idx.operationalCurrent.currentPhase='F2_SOURCE_ONLY_PASS_RUNTIME_AUTHORIZATION_PENDING';idx.operationalCurrent.currentPhaseInternalPercent=0;idx.operationalCurrent.currentPhaseInternalMethod='F2_source_only_preparation_closed_runtime_acceptance_not_executed';idx.operationalCurrent.currentBlocker='F2 runtime/browser acceptance requires one explicit authorization; source-only gate is PASS';idx.operationalCurrent.f2SourceOnlyStatus='CLOSED_PASS';idx.operationalCurrent.f2SourceOnlyGateId='f2-productive-acceptance-exact-successor-v20260818';idx.operationalCurrent.f2RuntimeRequestCreated=false;idx.operationalCurrent.nextAuthorizationBoundary='F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_V1 / EXACT_ARTIFACT_9345207863 / NOT_GRANTED';idx.requiredResumeProtocol=[...(idx.requiredResumeProtocol||[]).filter(x=>!String(x).includes('Derive exact F2 contract')),'F2 source-only contract is closed PASS; do not rederive it','Do not create or execute F2 runtime request without explicit authorization','Bind F2 runtime only to exact artifact 9345207863'];
+          fs.writeFileSync(idxPath,JSON.stringify(idx,null,2)+'\n');
+          const checkpoint='orbit360-platform/docs/CHECKPOINT-F2-SOURCE-ONLY-PASS-RUNTIME-AUTHORIZATION-PENDING-20260818.md';
+          fs.writeFileSync(checkpoint,`# CHECKPOINT — F2 SOURCE-ONLY PASS · RUNTIME AUTHORIZATION PENDING\n\nFecha: 2026-08-18\nRama: \`ays/backend-tenant-lab-v99-20260703\`\nPR: #5 draft/open\nGate: \`f2-productive-acceptance-exact-successor-v20260818\` v2.0.0\n\n## Resultado\n\n\`F2_SOURCE_ONLY_PASS\`. El contrato F2 quedó registrado en el router canónico y la candidata exacta artifact \`9345207863\` fue revalidada 194/194 por hash. No se reconstruyó ni publicó el paquete.\n\nTopología F2 cerrada: rutas reales Inicio, Cliente 360, Aseguradoras, Ops, Leads, Pólizas y Cobros; Vehículos como deep-link/ficha completa integrada de Cliente 360/Pólizas; Recibos/cartera como superficie integrada de Póliza/Cliente 360 más Cobros global.\n\n## Invariantes del cierre source-only\n\n- browser/runtime: 0;\n- secretos/datos: 0;\n- Firestore/Auth/operational writes: 0/0/0;\n- rebuild/deploy/publicación/producción: 0/0/0/0;\n- request F2 runtime creado: no.\n\n## Frontera única siguiente\n\nRequiere autorización explícita para crear un único request inmutable \`F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_V1\`, atado al artifact \`9345207863\`. Autoriza únicamente lectura/provider tras GO canónico, custom token efímero, runtime/browser de tres vistas e integridad before/after. Prohíbe escrituras, cambios Auth/membership/datos, rebuild, deploy, publicación, mutación productiva y merge a main.\n`,'utf8');
+          NODE
+          git diff --check
+          git config user.name 'orbit360-f2-source-only-bot'
+          git config user.email 'orbit360-f2-source-only-bot@users.noreply.github.com'
+          git add tools/orbit360-validar-gate-contracts-v20260717.mjs tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-source-v20260818.json "$EVIDENCE_DIR/f2-source-gate-preflight-v20260818.json" "$EVIDENCE_DIR/f2-exact-candidate-source-validation-v20260818.json" "$EVIDENCE_DIR/f2-source-only-closure-v20260818.json" orbit360-platform/docs/orbit360-live-state-v1.json orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json orbit360-platform/docs/CHECKPOINT-F2-SOURCE-ONLY-PASS-RUNTIME-AUTHORIZATION-PENDING-20260818.md
+          git commit -m 'gate(f2): persist source-only productive acceptance PASS [skip ci]'
+          git push origin "HEAD:$ORBIT360_BRANCH"
