@@ -1,8 +1,8 @@
 {
   "schemaVersion": "orbit360-live-state-v1",
-  "stateVersion": "20260818.f2-runtime05-consumed.cross-tenant-security-failure.rules-parity-repair-auth-pending.current",
-  "updatedAt": "2026-08-19T03:10:49.674Z",
-  "phase": "F2_SECURITY_FAILURE_RULES_PARITY_REPAIR_AUTHORIZATION_PENDING",
+  "stateVersion": "20260818.f2.rules01-deploy-pass.probe-validator-stale.rootfix-pass.postdeploy-probe-auth-pending.current",
+  "updatedAt": "2026-08-19T03:37:39.846Z",
+  "phase": "F2_RULES01_DEPLOY_PASS_PROBE_VALIDATOR_STALE_ROOTFIX_PASS_POSTDEPLOY_PROBE_AUTHORIZATION_PENDING",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pr": 5,
@@ -251,8 +251,8 @@
       "productAffected": false
     },
     "currentBlockingFact": {
-      "code": "F2_RUNTIME05_CROSS_TENANT_SECURITY_FAILURE_RULES_PARITY_REPAIR_REQUIRED",
-      "status": "SECURITY_REPAIR_AUTHORIZATION_PENDING"
+      "code": "F2_RULES01_POSTDEPLOY_CROSS_TENANT_PROBE_READONLY_REQUIRED",
+      "status": "FRESH_AUTHORIZATION_PENDING"
     },
     "authIsCurrentBlocker": false,
     "passwordIsCurrentBlocker": false,
@@ -320,6 +320,20 @@
       "runtime05IntegrityBeforeAfterPass": true,
       "productDataAffected": false,
       "preventiveControl": "RULES_SOURCE_TO_DEPLOYED_PARITY_GATE_PLUS_SERVER_FORCED_CROSS_TENANT_DENY_PROOF"
+    },
+    "f2Rules01ProbeValidatorStale": {
+      "classification": "VALIDATOR_STALE",
+      "code": "F2_CROSS_TENANT_PROBE_USED_RESERVED_FIRESTORE_ID",
+      "status": "CLOSED_SOURCE_ONLY_ROOTFIX_PASS_RUN_32212655647",
+      "productAffected": false,
+      "rulesSourceAffected": false,
+      "rulesRedeployRequired": false
+    },
+    "f2Rules01RootfixPersistence": {
+      "classification": "PIPELINE_MECHANISM_FAILURE",
+      "code": "ROOTFIX_EVIDENCE_PERSIST_REBASE_BLOCKED_BY_UNSTAGED_CANONICAL_PREFLIGHT",
+      "status": "CLOSED_BY_SERIALIZED_V2_RUN_32212655647",
+      "productAffected": false
     }
   },
   "documentationControl": {
@@ -389,7 +403,7 @@
   },
   "lanes": {
     "A_frontend_UX": "FROZEN_NO_CHANGES",
-    "B_backend_security_gates": "F2_RUNTIME05_SECURITY_FAILURE_RULES_PARITY_REPAIR_AUTHORIZATION_PENDING",
+    "B_backend_security_gates": "F2_RULES01_DEPLOY_PASS_PROBE_VALIDATOR_STALE_ROOTFIX_PASS_POSTDEPLOY_PROBE_AUTHORIZATION_PENDING",
     "C_real_data_migration": "UNTOUCHED_ZERO_CHANGES"
   },
   "writes": {
@@ -410,12 +424,12 @@
     "membershipChangesAuthorized": false,
     "dataChangesAuthorized": false,
     "mainMergeAuthorized": false,
-    "f2AuthorizationStatus": "RUNTIME05_CONSUMED_SECURITY_FAILURE_RULES_PARITY_REPAIR_AUTH_REQUIRED",
+    "f2AuthorizationStatus": "RULES01_DEPLOY_PASS_PROBE_ROOTFIX_PASS_POSTDEPLOY_PROBE_AUTH_REQUIRED",
     "rulesDeployAuthorizedNow": false,
     "securityRepairAuthorizedNow": false
   },
   "goLive": {
-    "status": "F2_SECURITY_FAILURE_RULES_PARITY_REPAIR_AUTHORIZATION_PENDING",
+    "status": "F2_RULES01_DEPLOY_PASS_PROBE_VALIDATOR_STALE_ROOTFIX_PASS_POSTDEPLOY_PROBE_AUTHORIZATION_PENDING",
     "publicUrl": "https://app.aysseguros.com",
     "publishedPackagePreserved": true,
     "successorPublished": false,
@@ -449,7 +463,7 @@
     "request06MayBeCreatedWithoutFreshAuthorization": false
   },
   "nextActionExact": {
-    "stage": "F2_FIRESTORE_RULES_PARITY_REPAIR_AUTHORIZATION_BOUNDARY",
+    "stage": "F2_RULES01_POSTDEPLOY_CROSS_TENANT_PROBE_READONLY_AUTHORIZATION_BOUNDARY",
     "gateId": "f2-productive-acceptance-exact-successor-v20260818",
     "requestVersion": "F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_V1",
     "runtimeRequestOrdinalAfterRepair": 6,
@@ -485,7 +499,12 @@
       "main_merge",
       "request05_replay",
       "request06_creation_before_repair_pass"
-    ]
+    ],
+    "probeRequestVersion": "F2_RULES01_POSTDEPLOY_CROSS_TENANT_PROBE_READONLY_V1",
+    "authorizationRequired": true,
+    "rulesRedeployAllowed": false,
+    "postdeployProbeRequestCreated": false,
+    "request06AllowedBeforeProbePass": false
   },
   "resumeProtocol": [
     "Read ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json",
@@ -752,6 +771,60 @@
       "status": "CLOSED_SOURCE_ONLY_PASS",
       "runId": 32211048260,
       "evidence": "orbit360-platform/runtime-gate-crm-v20260716/f2-runtime05-security-rootcause-source-only-v20260818.json"
+    }
+  },
+  "f2Rules01": {
+    "status": "RULES_DEPLOY_PASS_PROBE_VALIDATOR_STALE_ROOTFIX_PASS_POSTDEPLOY_PROBE_AUTH_PENDING",
+    "requestPath": ".github/orbit360-requests/f2-firestore-rules-parity-repair-lab-v20260818-01.json",
+    "requestCommit": "8d68f36182453ac70f2e68823e194db5a83c71f4",
+    "runId": 32211779285,
+    "runAttempt": 1,
+    "terminalArtifactId": 9351002966,
+    "requestConsumed": true,
+    "replayAllowed": false,
+    "sourceRulesBlob": "35fba451bbbeb97dbae3f08303b786ddbcbdd29f",
+    "rulesDeploy": {
+      "executed": true,
+      "ok": true,
+      "exitCode": 0,
+      "category": "ok",
+      "redeployRequired": false,
+      "redeployAuthorized": false
+    },
+    "historicalProbe": {
+      "httpStatus": 400,
+      "errorStatus": "INVALID_ARGUMENT",
+      "securityVerdictProduced": false,
+      "canonicalClassification": "VALIDATOR_STALE",
+      "canonicalCode": "F2_CROSS_TENANT_PROBE_USED_RESERVED_FIRESTORE_ID"
+    },
+    "validatorRootfix": {
+      "status": "CLOSED_SOURCE_ONLY_PASS",
+      "runId": 32212655647,
+      "contract": "F2_CROSS_TENANT_PROBE_VALID_PATH_V2",
+      "validProbePath": "tenants/orbit360-f2-cross-tenant-probe/system/config"
+    },
+    "integrity": {
+      "beforeAfterPass": true,
+      "countsIdentical": true,
+      "digestsIdentical": true,
+      "firestoreDocumentWrites": 0,
+      "authWrites": 0,
+      "membershipWrites": 0,
+      "dataWrites": 0
+    },
+    "postdeployProbe": {
+      "workflowPrepared": true,
+      "requestCreated": false,
+      "authorized": false,
+      "rulesRedeployAllowed": false
+    },
+    "request06Created": false,
+    "evidence": {
+      "rootCause": "orbit360-platform/runtime-gate-crm-v20260716/f2-rules01-probe-validator-stale-rootcause-v20260818.json",
+      "rootfix": "orbit360-platform/runtime-gate-crm-v20260716/f2-rules01-probe-validator-rootfix-source-only-v2-20260818.json",
+      "pipeline": "orbit360-platform/runtime-gate-crm-v20260716/f2-rules01-probe-rootfix-persistence-pipeline-failure-v20260818.json",
+      "checkpoint": "orbit360-platform/docs/CHECKPOINT-F2-RULES01-DEPLOY-PASS-PROBE-ROOTFIX-PASS-20260818.md"
     }
   }
 }
