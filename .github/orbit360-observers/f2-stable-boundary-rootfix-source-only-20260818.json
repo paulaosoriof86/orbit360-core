@@ -1,0 +1,17 @@
+{
+  "schemaVersion":"orbit360-f2-stable-boundary-rootfix-source-only-trigger-v1",
+  "gateId":"f2-productive-acceptance-exact-successor-v20260818",
+  "artifactId":9345207863,
+  "request01RunId":32205144735,
+  "request02RunId":32206449703,
+  "mode":"source-only",
+  "runtime":false,
+  "browser":false,
+  "secrets":false,
+  "firestoreRead":false,
+  "writes":false,
+  "deploy":false,
+  "production":false,
+  "containsPII":false,
+  "containsSecrets":false
+}
