@@ -1,0 +1,16 @@
+{
+  "schemaVersion":"orbit360-f2-validator-rootfix-source-only-trigger-v1",
+  "rootCause":"F2_LIVE_STATE_BOUNDARY_VALIDATOR_STALE",
+  "requestRunId":32205144735,
+  "requestReplay":false,
+  "runtime":false,
+  "browser":false,
+  "secrets":false,
+  "firestoreRead":false,
+  "writes":false,
+  "deploy":false,
+  "publication":false,
+  "production":false,
+  "containsPII":false,
+  "containsSecrets":false
+}
