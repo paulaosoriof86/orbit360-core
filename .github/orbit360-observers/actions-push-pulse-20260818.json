@@ -1,0 +1,14 @@
+{
+  "schemaVersion":"orbit360-actions-push-pulse-trigger-v1",
+  "mode":"source-only",
+  "singlePulse":true,
+  "browser":false,
+  "runtime":false,
+  "secrets":false,
+  "dataAccess":false,
+  "writes":false,
+  "deploy":false,
+  "production":false,
+  "containsPII":false,
+  "containsSecrets":false
+}
