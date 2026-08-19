@@ -1,0 +1,58 @@
+name: Orbit360 F2 Runtime05 Security Docsync Postsync Source Only 20260818
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-observers/f2-runtime05-security-docsync-postsync-source-only-v20260818.json'
+permissions:
+  contents: write
+concurrency:
+  group: orbit360-f2-runtime05-security-docsync-postsync-source-only-20260818
+  cancel-in-progress: false
+env:
+  GATE_ID: f2-productive-acceptance-exact-successor-v20260818
+  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+jobs:
+  docsync_postsync:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Prepare Runtime05 security documentation transaction in working tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-f2-runtime05-security-docsync-v20260818.mjs
+          git diff --check
+          test "$(jq -r '.phase' orbit360-platform/docs/orbit360-live-state-v1.json)" = 'F2_SECURITY_FAILURE_RULES_PARITY_REPAIR_AUTHORIZATION_PENDING'
+          test "$(jq -r '.nextActionExact.stage' orbit360-platform/docs/orbit360-live-state-v1.json)" = 'F2_FIRESTORE_RULES_PARITY_REPAIR_AUTHORIZATION_BOUNDARY'
+          test "$(jq -r '.f2Runtime05.canonicalClassification' orbit360-platform/docs/orbit360-live-state-v1.json)" = 'SECURITY_FAILURE'
+          test "$(jq -r '.operationalCurrent.currentPhase' orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json)" = 'F2_SECURITY_FAILURE_RULES_PARITY_REPAIR_AUTHORIZATION_PENDING'
+      - name: Mandatory canonical source-only gate after Runtime05 docs sync
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f "$EVIDENCE_DIR/preflight-sanitizado.json"
+          env -u ORBIT360_REQUEST_FILE ORBIT360_EXPECTED_REQUEST_VERSION=NONE_PENDING_FRESH_AUTHORIZATION node tools/orbit360-validar-gate-contracts-v20260717.mjs "$GATE_ID"
+          P="$EVIDENCE_DIR/preflight-sanitizado.json"
+          jq -e '.ok==true and .status=="PASS_GATE_CONTRACT_SOURCE_F2_PRODUCTIVE_ACCEPTANCE" and .classification=="PASS" and .candidateArtifactId==9345207863 and .stableBoundaryContract==true and .sourceClosed==true and .phaseStillF2==true and .nextActionBound==true and .indexBoundaryCurrent==true and .narrativeAttemptStatusMutationPass==true and .executionAuthorized==false and .secretAccessAuthorized==false and .firestoreReadAuthorized==false and .runtimeAuthorized==false and .browserAuthorized==false and .writeAuthorized==false and .deployAuthorized==false and .publicationAuthorized==false and .productionAuthorized==false' "$P" >/dev/null
+          jq --arg run "$GITHUB_RUN_ID" --arg sha "$GITHUB_SHA" '. + {runtime05PostSyncSourceRunId:$run,runtime05DocsyncTriggerSha:$sha,runtime05PostSyncStatus:"F2_RUNTIME05_SECURITY_POSTSYNC_SOURCE_ONLY_PASS",runtime05RunId:32210391764,runtime05Replayed:false,request06Created:false,rulesDeployAuthorized:false,rulesDeployExecuted:false,securityRepairAuthorizationGranted:false,serializedPersistence:true}' "$P" > "$EVIDENCE_DIR/f2-runtime05-postsync-source-only-v20260818.json"
+      - name: Persist only after post-sync gate PASS
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add orbit360-platform/docs/orbit360-live-state-v1.json \
+                  orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json \
+                  orbit360-platform/docs/CHECKPOINT-F2-RUNTIME05-CROSS-TENANT-SECURITY-FAILURE-20260818.md \
+                  "$EVIDENCE_DIR/f2-runtime05-postsync-source-only-v20260818.json"
+          git diff --cached --check
+          git commit -m '[skip ci] docs(f2): bind runtime05 security repair boundary after source gate'
+          git push origin "HEAD:ays/backend-tenant-lab-v99-20260703"
