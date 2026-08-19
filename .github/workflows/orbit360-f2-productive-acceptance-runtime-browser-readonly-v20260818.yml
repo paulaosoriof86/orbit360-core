@@ -18,11 +18,11 @@ env:
   ORBIT360_PRODUCT_TENANT_ID: alianzas-soluciones
   ORBIT360_TARGET_EMAIL_HASH: 9b663847979724e9491e1c655da32a7cb17a5f6ed26dba352de1eb811254b23f
   ORBIT360_TARGET_ADVISOR_ID: ase-paula-osorio
-  ORBIT360_CANDIDATE_ARTIFACT_ID: '9345207863'
-  ORBIT360_CANDIDATE_ZIP_NAME: orbit360-fase-a-product-f1-4c-successor-29caae94a3db.zip
-  ORBIT360_CANDIDATE_ZIP_SHA256: 493009c83390901aa772842a2ba9ddd5ce5293f6969d86c5c3395ebd670a44ac
-  ORBIT360_CANDIDATE_MANIFEST_SHA256: 29dafe5e63b425ea6cf641937fe1b9d4b9e63f72479a51ae76f9148a55771761
-  ORBIT360_CANDIDATE_SOURCE_HEAD: 29caae94a3db1f1626bdde2ea6ee9a21799f9df6
+  ORBIT360_CANDIDATE_ARTIFACT_ID: '9385306424'
+  ORBIT360_CANDIDATE_ZIP_NAME: orbit360-fase-a-product-f2-request06-rootfix-successor-b94b2ae86d26.zip
+  ORBIT360_CANDIDATE_ZIP_SHA256: 81a96f476fd0fdfd814b3f047951ce653fd324bef8a6d96d6ee6fe44dd7bdcf4
+  ORBIT360_CANDIDATE_MANIFEST_SHA256: cc6170121ed61fd6d9cde867dfcae8a3dd23d29777c6ee28c240d70e49843eef
+  ORBIT360_CANDIDATE_SOURCE_HEAD: b94b2ae86d26586a68d33be9edba8715e956b02e
   EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
 jobs:
   f2_productive_acceptance:
@@ -53,8 +53,8 @@ jobs:
           test "$(jq -r '.candidateZipSha256' "$REQUEST_FILE")" = "$ORBIT360_CANDIDATE_ZIP_SHA256"
           test "$(jq -r '.candidateManifestSha256' "$REQUEST_FILE")" = "$ORBIT360_CANDIDATE_MANIFEST_SHA256"
           test "$(jq -r '.candidateSourceHead' "$REQUEST_FILE")" = "$ORBIT360_CANDIDATE_SOURCE_HEAD"
-          node --check tools/orbit360-register-f2-productive-acceptance-runtime-v20260818.mjs
-          node --check tools/orbit360-validar-gate-contracts-engine-f2-productive-acceptance-v20260818.mjs
+          node --check tools/orbit360-register-f2-productive-acceptance-runtime-v20260819.mjs
+          node --check tools/orbit360-validar-gate-contracts-engine-f2-productive-acceptance-v20260819.mjs
           node --check tools/orbit360-f2-productive-acceptance-runtime-browser-readonly-v20260818.mjs
           node --check tools/orbit360-f2-cross-tenant-probe-contract-v20260818.mjs
           node --check tools/orbit360-test-f2-full-runtime-known-rootfixes-v20260819.mjs
@@ -67,8 +67,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          node tools/orbit360-register-f2-productive-acceptance-runtime-v20260818.mjs
-          grep -F 'orbit360-validator-lifecycle-contract-f2-productive-acceptance-runtime-v20260818.json' tools/orbit360-validar-gate-contracts-v20260717.mjs >/dev/null
+          node tools/orbit360-register-f2-productive-acceptance-runtime-v20260819.mjs
+          grep -F 'orbit360-validator-lifecycle-contract-f2-productive-acceptance-runtime-v20260819.json' tools/orbit360-validar-gate-contracts-v20260717.mjs >/dev/null
           git diff --check
       - name: Mandatory canonical F2 gate before artifact or provider/browser
         id: gate
@@ -93,8 +93,8 @@ jobs:
           mapfile -t FILES < <(find "$OUTER_DIR" -maxdepth 1 -type f -printf '%f\n' | sort); test "${#FILES[@]}" = '1'; test "${FILES[0]}" = "$ORBIT360_CANDIDATE_ZIP_NAME"
           INNER="$OUTER_DIR/$ORBIT360_CANDIDATE_ZIP_NAME"; test "$(sha256sum "$INNER" | awk '{print $1}')" = "$ORBIT360_CANDIDATE_ZIP_SHA256"
           unzip -q "$INNER" -d "$CANDIDATE_DIR"; test "$(sha256sum "$CANDIDATE_DIR/orbit360-package-manifest.json" | awk '{print $1}')" = "$ORBIT360_CANDIDATE_MANIFEST_SHA256"
-          ORBIT360_F2_CANDIDATE_DIR="$CANDIDATE_DIR" ORBIT360_F2_CANDIDATE_SOURCE_EVIDENCE="$EVIDENCE_DIR/f2-candidate-source-run-${GITHUB_RUN_ID}.json" node tools/orbit360-f2-exact-candidate-source-validator-v20260818.mjs
-          jq -e '.ok==true and .status=="F2_EXACT_CANDIDATE_SOURCE_VALIDATION_PASS" and .candidateArtifactId==9345207863 and .fullRehashPass==true' "$EVIDENCE_DIR/f2-candidate-source-run-${GITHUB_RUN_ID}.json" >/dev/null
+          ORBIT360_F2_CANDIDATE_DIR="$CANDIDATE_DIR" ORBIT360_F2_CANDIDATE_SOURCE_EVIDENCE="$EVIDENCE_DIR/f2-candidate-source-run-${GITHUB_RUN_ID}.json" node tools/orbit360-f2-exact-candidate-source-validator-v20260819.mjs
+          jq -e '.ok==true and .status=="F2_EXACT_CANDIDATE_SOURCE_VALIDATION_PASS" and .candidateArtifactId==9385306424 and .fullRehashPass==true and .inicioFiniteRootfixPass==true' "$EVIDENCE_DIR/f2-candidate-source-run-${GITHUB_RUN_ID}.json" >/dev/null
           echo "ORBIT360_F2_CANDIDATE_DIR=$CANDIDATE_DIR" >> "$GITHUB_ENV"
       - name: Install authorized runtime dependencies after F2 GO
         if: steps.gate.outcome == 'success'
@@ -170,9 +170,9 @@ jobs:
           set -euo pipefail
           B="$EVIDENCE_DIR/f2-browser-run-${GITHUB_RUN_ID}.json"; I="$EVIDENCE_DIR/f2-integrity-before-after-v20260818.json"; P="$EVIDENCE_DIR/f2-runtime-preflight-run-${GITHUB_RUN_ID}.json"
           if [ "${BROWSER_CODE:-41}" = '0' ] && [ "${INTEGRITY_CODE:-41}" = '0' ] && jq -e '.ok==true and .status=="F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_PASS" and .crossTenantDenied==true and .runtime.ready==true and .runtime.writeEnabled==false and .localWriteGuard.blocked==true and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and (.writeSignals|length)==0 and (.pageErrors|length)==0 and (.consoleErrors|length)==0' "$B" >/dev/null && jq -e '.ok==true and .status=="F2_INTEGRITY_BEFORE_AFTER_PASS" and .countsIdentical==true and .digestsIdentical==true' "$I" >/dev/null; then
-            jq -n --arg run "$GITHUB_RUN_ID" --arg request "$ORBIT360_REQUEST_FILE" '{schemaVersion:"orbit360-f2-terminal-v1",ok:true,status:"F2_PRODUCTIVE_ACCEPTANCE_PASS",classification:"PASS",runId:$run,request:$request,candidateArtifactId:9345207863,sourceOnlyPreflightPass:true,browserMatrixPass:true,integrityBeforeAfterPass:true,zeroCrossTenant:true,zeroUnexpectedWrites:true,legalIdempotent:true,serviceWorkerCachePass:true,firestoreWrites:0,authWrites:0,operationalWrites:0,packageRebuilt:false,deployExecuted:false,publicationExecuted:false,productionHostingTouched:false,containsPII:false,containsSecrets:false}' > "$ORBIT360_F2_FINAL"
+            jq -n --arg run "$GITHUB_RUN_ID" --arg request "$ORBIT360_REQUEST_FILE" '{schemaVersion:"orbit360-f2-terminal-v1",ok:true,status:"F2_PRODUCTIVE_ACCEPTANCE_PASS",classification:"PASS",runId:$run,request:$request,candidateArtifactId:9385306424,sourceOnlyPreflightPass:true,browserMatrixPass:true,integrityBeforeAfterPass:true,zeroCrossTenant:true,zeroUnexpectedWrites:true,legalIdempotent:true,serviceWorkerCachePass:true,firestoreWrites:0,authWrites:0,operationalWrites:0,packageRebuilt:false,deployExecuted:false,publicationExecuted:false,productionHostingTouched:false,containsPII:false,containsSecrets:false}' > "$ORBIT360_F2_FINAL"
           else
-            jq -n --arg run "$GITHUB_RUN_ID" --arg request "$ORBIT360_REQUEST_FILE" --arg b "${BROWSER_CODE:-missing}" --arg i "${INTEGRITY_CODE:-missing}" '{schemaVersion:"orbit360-f2-terminal-v1",ok:false,status:"F2_PRODUCTIVE_ACCEPTANCE_FAIL",classification:"FUNCTIONAL_DEFECT_OR_PIPELINE_FAILURE_REQUIRES_ROOT_CAUSE",runId:$run,request:$request,browserCode:$b,integrityCode:$i,candidateArtifactId:9345207863,firestoreWrites:0,authWrites:0,operationalWrites:0,packageRebuilt:false,deployExecuted:false,publicationExecuted:false,productionHostingTouched:false,containsPII:false,containsSecrets:false}' > "$ORBIT360_F2_FINAL"
+            jq -n --arg run "$GITHUB_RUN_ID" --arg request "$ORBIT360_REQUEST_FILE" --arg b "${BROWSER_CODE:-missing}" --arg i "${INTEGRITY_CODE:-missing}" '{schemaVersion:"orbit360-f2-terminal-v1",ok:false,status:"F2_PRODUCTIVE_ACCEPTANCE_FAIL",classification:"FUNCTIONAL_DEFECT_OR_PIPELINE_FAILURE_REQUIRES_ROOT_CAUSE",runId:$run,request:$request,browserCode:$b,integrityCode:$i,candidateArtifactId:9385306424,firestoreWrites:0,authWrites:0,operationalWrites:0,packageRebuilt:false,deployExecuted:false,publicationExecuted:false,productionHostingTouched:false,containsPII:false,containsSecrets:false}' > "$ORBIT360_F2_FINAL"
             exit 41
           fi
       - uses: actions/upload-artifact@v4
