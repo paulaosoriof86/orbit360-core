@@ -1,0 +1,67 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
+  "gateId": "f2-productive-acceptance-exact-successor-v20260818",
+  "gateContractVersion": "2.0.0",
+  "validatorLifecycleRevision": "f2-productive-acceptance-exact-successor-v1-20260818",
+  "status": "F2_SOURCE_ONLY_PENDING",
+  "currentPhase": "F2_PRODUCTIVE_ACCEPTANCE_SOURCE_ONLY",
+  "executionProfile": {
+    "phase": "F2_PRODUCTIVE_ACCEPTANCE_SOURCE_ONLY",
+    "capabilities": {"secrets":false,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false}
+  },
+  "singleGate": true,
+  "macroClosure": true,
+  "block": "F2_GATE_DE_ACEPTACION_PRODUCTIVA_REAL",
+  "authorization": {
+    "requiredForExecution": false,
+    "activeRequest": false,
+    "request": ".github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-runbound-20260818-01.json",
+    "allowedExecutions": 0,
+    "consumed": false,
+    "authorizationFrozen": true,
+    "replayAllowed": false
+  },
+  "guards": {
+    "candidateArtifactId": 9345207863,
+    "candidateZipSha256": "493009c83390901aa772842a2ba9ddd5ce5293f6969d86c5c3395ebd670a44ac",
+    "candidateManifestSha256": "29dafe5e63b425ea6cf641937fe1b9d4b9e63f72479a51ae76f9148a55771761",
+    "candidateSourceHead": "29caae94a3db1f1626bdde2ea6ee9a21799f9df6",
+    "candidateManifestStatus": "FASE_A_PRODUCT_F1_4C_SUCCESSOR_CERTIFIED",
+    "candidateFileCount": 194,
+    "exactCandidateRequired": true,
+    "f1ClosedRequired": true,
+    "f1_4dConsumedPassRequired": true,
+    "sourceOnlyBeforeAuthorization": true,
+    "gateBeforeArtifactDownloadInRuntime": true,
+    "gateBeforeSecretAccess": true,
+    "gateBeforeBrowser": true,
+    "writesAllowed": false,
+    "authChangesAllowed": false,
+    "membershipChangesAllowed": false,
+    "dataChangesAllowed": false,
+    "packageRebuildAllowed": false,
+    "deployAllowed": false,
+    "publicationAllowed": false,
+    "productionMutationAllowed": false,
+    "stopRetryOnSameFamily": true
+  },
+  "surfaceTopology": {
+    "routes": ["inicio","cliente360","aseguradoras","ops","leads","polizas","cobros"],
+    "integratedSurfaces": {"vehiculos":"cliente360_policy_deeplink_fullpage","recibosCartera":"policy_client360_plus_cobros_global"},
+    "roleViews": [{"role":"Dirección","viewport":"desktop"},{"role":"Operativo","viewport":"tablet"},{"role":"Asesor","viewport":"mobile"}],
+    "invariants": ["login_membership_tenant_role_scope","runtime_store_router","legal_idempotent","service_worker_cache","zero_technical_copy","zero_cross_tenant","zero_unexpected_writes","integrity_before_after"]
+  },
+  "owners": {
+    "canonicalGateRouter": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
+    "access": ["orbit360-platform/core/access-scope.js","orbit360-platform/core/access-role-session-owner-v20260728.js"],
+    "router": ["orbit360-platform/core/router.js","orbit360-platform/core/router-tenant-config-product-bootstrap-p0.js"],
+    "legal": "orbit360-platform/core/legal.js",
+    "pwa": "orbit360-platform/core/pwa.js",
+    "productRuntime": "orbit360-platform/core/product-app-p0.js",
+    "readOnlyStore": "orbit360-platform/data/store-firestore-product-readonly-p0.js",
+    "policiesVehiclesReceipts": "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+    "cobros": "orbit360-platform/modules/cobros.js"
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
