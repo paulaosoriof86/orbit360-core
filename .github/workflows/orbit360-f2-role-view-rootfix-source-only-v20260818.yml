@@ -83,21 +83,13 @@ jobs:
           jq -e '.ok==true and .status=="F2_PRE_REQUEST06_POSTSYNC_CANONICAL_GATE_PASS" and .knownRootfixAuditPass==true and .boundary.requestOrdinal==6 and .boundary.request06Created==false and .boundary.successorPublished==false and .scope.writes==0 and .scope.production==false' "$EVIDENCE_DIR/f2-pre-request06-postsync-source-only-v20260819.json" >/dev/null
           jq -e '.ok==true and .evidenceContractVersion=="F2_POSTDEPLOY_EVIDENCE_PRODUCER_CONTRACT_V1" and .probe.responseStatus==403 and .probe.responseErrorStatus=="PERMISSION_DENIED" and .probe.crossTenantDenied==true and .integrity.countsIdentical==true and .integrity.digestsIdentical==true and .writes.firestoreDocument==0 and .forbiddenEffects.rulesRedeploy==false and .forbiddenEffects.production==false' "$EVIDENCE_DIR/f2-rules01-postdeploy-composite-evidence-v20260819.json" >/dev/null
           git diff --check
-      - name: Retire trigger after successful closure
+      - name: Verify closure stages no workflow-file mutation remains
         id: retire
         shell: bash
         run: |
           set -euo pipefail
-          python3 - <<'PY'
-          from pathlib import Path
-          p=Path('.github/workflows/orbit360-f2-role-view-rootfix-source-only-v20260818.yml')
-          s=p.read_text(encoding='utf-8')
-          old="    paths:\n      - '.github/orbit360-observers/f2-pre-request06-no-path-execution-trigger-v20260819-1143.json'\n"
-          new="    paths:\n      - '.github/orbit360-observers/f2-pre-request06-closure-consumed-sentinel-v20260819.json'\n"
-          if s.count(old) != 1:
-              raise SystemExit('PIPELINE_MECHANISM_FAILURE:PROVEN_WORKFLOW_RETIRE_ANCHOR_MISMATCH')
-          p.write_text(s.replace(old,new,1),encoding='utf-8')
-          PY
+          test -z "$(git diff --name-only -- .github/workflows)"
+          test -z "$(git diff --cached --name-only -- .github/workflows)"
       - name: Persist one serialized source-only closure
         id: persist_success
         shell: bash
@@ -107,6 +99,7 @@ jobs:
           git config user.name 'orbit360-f2-pre-request06-bot'
           git config user.email 'orbit360-f2-pre-request06-bot@users.noreply.github.com'
           git add -A
+          test -z "$(git diff --cached --name-only -- .github/workflows)"
           test -z "$(git diff --cached --name-only | grep -E '(^|/)(\.env|.*secret.*|.*credential.*)$' || true)"
           git diff --cached --check
           test -n "$(git diff --cached --name-only)"
@@ -128,9 +121,9 @@ jobs:
             --arg boundary '${{ steps.boundary.outcome }}' \
             --arg evidence '${{ steps.evidence.outcome }}' \
             --arg closure '${{ steps.closure.outcome }}' \
-            --arg retire '${{ steps.retire.outcome }}' \
+            --arg workflowMutationGuard '${{ steps.retire.outcome }}' \
             --arg persistSuccess '${{ steps.persist_success.outcome }}' \
-            '{schemaVersion:"orbit360-f2-pre-request06-source-closure-failure-observability-v1",ok:false,status:"F2_PRE_REQUEST06_SOURCE_CLOSURE_FAILED_OBSERVED",classification:"PIPELINE_MECHANISM_FAILURE",rootCauseCandidate:"F2_PRE_REQUEST06_WORKFLOW_TRIGGER_AND_PERSISTENCE_COUPLED_TO_EXACT_EVENT_SHA",runId:$runId,triggerSha:$triggerSha,stepOutcomes:{boundary:$boundary,evidence:$evidence,closure:$closure,retire:$retire,persistSuccess:$persistSuccess},request06Created:false,browserExecuted:false,runtimeExecuted:false,secretAccess:false,firestoreRead:false,firestoreDocumentWrites:0,authWrites:0,membershipWrites:0,dataWrites:0,rulesDeploy:false,hostingDeploy:false,functionsDeploy:false,packageRebuild:false,publication:false,production:false,containsPII:false,containsSecrets:false}' > "$EVIDENCE_DIR/f2-pre-request06-source-closure-last-failure-v20260819.json"
+            '{schemaVersion:"orbit360-f2-pre-request06-source-closure-failure-observability-v2",ok:false,status:"F2_PRE_REQUEST06_SOURCE_CLOSURE_FAILED_OBSERVED",classification:"PIPELINE_MECHANISM_FAILURE",knownPreviousRootCause:"GITHUB_APP_WORKFLOW_PERMISSION_BLOCKED_SOURCE_CLOSURE_PERSISTENCE",runId:$runId,triggerSha:$triggerSha,stepOutcomes:{boundary:$boundary,evidence:$evidence,closure:$closure,workflowMutationGuard:$workflowMutationGuard,persistSuccess:$persistSuccess},request06Created:false,browserExecuted:false,runtimeExecuted:false,secretAccess:false,firestoreRead:false,firestoreDocumentWrites:0,authWrites:0,membershipWrites:0,dataWrites:0,rulesDeploy:false,hostingDeploy:false,functionsDeploy:false,packageRebuild:false,publication:false,production:false,containsPII:false,containsSecrets:false}' > "$EVIDENCE_DIR/f2-pre-request06-source-closure-last-failure-v20260819.json"
           git config user.name 'orbit360-f2-pre-request06-bot'
           git config user.email 'orbit360-f2-pre-request06-bot@users.noreply.github.com'
           git add "$EVIDENCE_DIR/f2-pre-request06-source-closure-last-failure-v20260819.json"
