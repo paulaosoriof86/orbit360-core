@@ -1,0 +1,133 @@
+name: Orbit360 Build F2 Request08 Router Readiness Successor 20260819
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - .github/orbit360-requests/f2-request08-build-router-readiness-successor-source-only-v20260819.json
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  build_successor:
+    runs-on: ubuntu-24.04
+    env:
+      PREDECESSOR_ARTIFACT_ID: '9385306424'
+      PREDECESSOR_INNER_ZIP: orbit360-fase-a-product-f2-request06-rootfix-successor-b94b2ae86d26.zip
+      PREDECESSOR_ZIP_SHA256: 81a96f476fd0fdfd814b3f047951ce653fd324bef8a6d96d6ee6fe44dd7bdcf4
+      PREDECESSOR_MANIFEST_SHA256: cc6170121ed61fd6d9cde867dfcae8a3dd23d29777c6ee28c240d70e49843eef
+      ROOTFIX_SOURCE_HEAD: fc46bd85783d8b4d524cbeb0fee54ee9a2c774af
+      INNER_ZIP_NAME: orbit360-fase-a-product-f2-request08-router-readiness-successor-fc46bd85783d.zip
+      EVIDENCE_PATH: orbit360-platform/runtime-gate-crm-v20260716/f2-request08-router-readiness-successor-build-v20260819.json
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ays/backend-tenant-lab-v99-20260703
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify inert source-only build request
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
+          test "${#CHANGED[@]}" = '1'
+          test "${CHANGED[0]}" = '.github/orbit360-requests/f2-request08-build-router-readiness-successor-source-only-v20260819.json'
+          jq -e '.approved==true and .sourceOnly==true and .predecessorArtifactId==9385306424 and .rootfixSourceHead=="fc46bd85783d8b4d524cbeb0fee54ee9a2c774af" and .browser==false and .runtime==false and .secrets==false and .firestoreRead==false and .writes==false and .deploy==false and .production==false and .request09Authorized==false' "${CHANGED[0]}" >/dev/null
+          test "$(git rev-parse ${ROOTFIX_SOURCE_HEAD}:orbit360-platform/core/product-app-p0.js)" = "$(git rev-parse HEAD:orbit360-platform/core/product-app-p0.js)"
+      - name: Validate rootfix source behavior
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check orbit360-platform/core/product-app-p0.js
+          node --check tools/orbit360-test-f2-router-readiness-rootfix-v20260819.mjs
+          node tools/orbit360-test-f2-router-readiness-rootfix-v20260819.mjs | tee "$RUNNER_TEMP/rootfix-regression.json"
+          jq -e '.ok==true and .status=="PASS_F2_REQUEST08_ROUTER_READINESS_ROOTFIX" and .activationWaitsForRenderedHost==true and .hostRenderedBeforeReady==true and .routerSourceMutationRequired==false and .browserExecuted==false and .runtimeExecuted==false' "$RUNNER_TEMP/rootfix-regression.json" >/dev/null
+      - name: Download and verify predecessor artifact
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          OUTER="$RUNNER_TEMP/predecessor-outer.zip"
+          OUTER_DIR="$RUNNER_TEMP/predecessor-outer"
+          PRE_DIR="$RUNNER_TEMP/predecessor"
+          SUCC_DIR="$RUNNER_TEMP/successor"
+          mkdir -p "$OUTER_DIR" "$PRE_DIR"
+          curl -L --fail --retry 3 -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/${PREDECESSOR_ARTIFACT_ID}/zip" -o "$OUTER"
+          unzip -q "$OUTER" -d "$OUTER_DIR"
+          mapfile -t FILES < <(find "$OUTER_DIR" -maxdepth 1 -type f -printf '%f\n' | sort)
+          test "${#FILES[@]}" = '1'
+          test "${FILES[0]}" = "$PREDECESSOR_INNER_ZIP"
+          test "$(sha256sum "$OUTER_DIR/$PREDECESSOR_INNER_ZIP" | awk '{print $1}')" = "$PREDECESSOR_ZIP_SHA256"
+          unzip -q "$OUTER_DIR/$PREDECESSOR_INNER_ZIP" -d "$PRE_DIR"
+          test "$(sha256sum "$PRE_DIR/orbit360-package-manifest.json" | awk '{print $1}')" = "$PREDECESSOR_MANIFEST_SHA256"
+          echo "ORBIT360_PREDECESSOR_DIR=$PRE_DIR" >> "$GITHUB_ENV"
+          echo "ORBIT360_SUCCESSOR_DIR=$SUCC_DIR" >> "$GITHUB_ENV"
+      - name: Build exact one-file successor and full rehash
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-build-f2-request08-router-readiness-successor-v20260819.mjs | tee "$RUNNER_TEMP/build.json"
+          jq -e '.ok==true and .status=="FASE_A_PRODUCT_F2_REQUEST08_ROUTER_READINESS_SUCCESSOR_CERTIFIED" and .sourceHead=="fc46bd85783d8b4d524cbeb0fee54ee9a2c774af" and .fileCount==194 and .fullRehashPass==true and .deltaCount==1 and .deltaPaths==["core/product-app-p0.js"] and .unchangedFileCount==193 and .regressionPass==true and .routerSourceMutationRequired==false' "$RUNNER_TEMP/build.json" >/dev/null
+          cd "$ORBIT360_SUCCESSOR_DIR"
+          zip -qr "$RUNNER_TEMP/$INNER_ZIP_NAME" .
+          cd - >/dev/null
+          ZIP_SHA=$(sha256sum "$RUNNER_TEMP/$INNER_ZIP_NAME" | awk '{print $1}')
+          MANIFEST_SHA=$(sha256sum "$ORBIT360_SUCCESSOR_DIR/orbit360-package-manifest.json" | awk '{print $1}')
+          echo "SUCCESSOR_ZIP_SHA256=$ZIP_SHA" >> "$GITHUB_ENV"
+          echo "SUCCESSOR_MANIFEST_SHA256=$MANIFEST_SHA" >> "$GITHUB_ENV"
+      - name: Validate successor archive independently
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERIFY="$RUNNER_TEMP/verify-successor"
+          mkdir -p "$VERIFY"
+          unzip -q "$RUNNER_TEMP/$INNER_ZIP_NAME" -d "$VERIFY"
+          test "$(sha256sum "$VERIFY/orbit360-package-manifest.json" | awk '{print $1}')" = "$SUCCESSOR_MANIFEST_SHA256"
+          node - "$VERIFY" <<'NODE'
+          const fs=require('fs'),path=require('path'),crypto=require('crypto');
+          const root=process.argv[2]; const m=JSON.parse(fs.readFileSync(path.join(root,'orbit360-package-manifest.json')));
+          const sha=b=>crypto.createHash('sha256').update(b).digest('hex');
+          if(m.fileCount!==194||m.files.length!==194) process.exit(41);
+          for(const f of m.files){const b=fs.readFileSync(path.join(root,f.path));if(b.length!==f.bytes||sha(b)!==f.sha256) process.exit(42);}
+          if(m.deltaFiles.length!==1||m.deltaFiles[0]!=='core/product-app-p0.js'||m.unchangedFileCount!==193) process.exit(43);
+          console.log(JSON.stringify({ok:true,status:'F2_REQUEST08_SUCCESSOR_194_REHASH_PASS'}));
+          NODE
+      - name: Upload exact successor candidate
+        id: upload_candidate
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-f2-request08-router-readiness-successor
+          path: ${{ runner.temp }}/${{ env.INNER_ZIP_NAME }}
+          retention-days: 14
+          if-no-files-found: error
+          compression-level: 0
+      - name: Persist sanitized build evidence
+        shell: bash
+        env:
+          ARTIFACT_ID: ${{ steps.upload_candidate.outputs.artifact-id }}
+          ARTIFACT_DIGEST: ${{ steps.upload_candidate.outputs.artifact-digest }}
+        run: |
+          set -euo pipefail
+          jq -n \
+            --arg artifactId "$ARTIFACT_ID" \
+            --arg artifactDigest "$ARTIFACT_DIGEST" \
+            --arg zipName "$INNER_ZIP_NAME" \
+            --arg zipSha "$SUCCESSOR_ZIP_SHA256" \
+            --arg manifestSha "$SUCCESSOR_MANIFEST_SHA256" \
+            --arg source "$ROOTFIX_SOURCE_HEAD" \
+            --arg run "$GITHUB_RUN_ID" \
+            '{schemaVersion:"orbit360-f2-request08-router-readiness-successor-evidence-v1",ok:true,status:"FASE_A_PRODUCT_F2_REQUEST08_ROUTER_READINESS_SUCCESSOR_CERTIFIED",classification:"PASS",runId:$run,artifactId:($artifactId|tonumber),artifactDigest:$artifactDigest,sourceHead:$source,predecessorArtifactId:9385306424,zipName:$zipName,zipSha256:$zipSha,manifestSha256:$manifestSha,fileCount:194,fullRehashPass:true,deltaCount:1,deltaPaths:["core/product-app-p0.js"],unchangedFileCount:193,rootCause:"FUNCTIONAL_DEFECT:F2_PRODUCT_APP_ROUTER_READINESS_PREMATURE",rootfix:"PRODUCT_APP_ROUTER_HOST_READINESS_GATE",regressionPass:true,routerSourceMutationRequired:false,browserExecuted:false,runtimeExecuted:false,secretAccess:false,firestoreRead:false,firestoreWrites:0,authWrites:0,membershipWrites:0,dataWrites:0,operationalWrites:0,deployExecuted:false,publicationExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false}' > "$EVIDENCE_PATH"
+          git config user.name 'orbit360-f2-successor-build-bot'
+          git config user.email 'orbit360-f2-successor-build-bot@users.noreply.github.com'
+          git add -- "$EVIDENCE_PATH"
+          git diff --cached --check
+          git commit -m 'evidence(f2): certify Request08 readiness successor [skip ci]'
+          git pull --rebase origin ays/backend-tenant-lab-v99-20260703
+          git push origin HEAD:ays/backend-tenant-lab-v99-20260703
