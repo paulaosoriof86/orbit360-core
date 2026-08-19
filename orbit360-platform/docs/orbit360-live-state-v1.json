@@ -1,8 +1,8 @@
 {
   "schemaVersion": "orbit360-live-state-v1",
-  "stateVersion": "20260819.f2.pre-request06-known-rootfixes-pass.authorization-pending.current",
-  "updatedAt": "2026-08-19T18:33:59.824Z",
-  "phase": "F2_PRE_REQUEST06_KNOWN_ROOTFIXES_SOURCE_AUDIT_PASS_AUTHORIZATION_PENDING",
+  "stateVersion": "20260819.f2.request06-rootfix-successor-rebind-source-pending.current",
+  "updatedAt": "2026-08-19T22:35:00.000Z",
+  "phase": "F2_SUCCESSOR_REBIND_SOURCE_ONLY_PENDING",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pr": 5,
@@ -155,18 +155,18 @@
     }
   },
   "f2SourceOnly": {
-    "status": "CLOSED_PASS",
+    "status": "PENDING_REBIND_SOURCE_ONLY",
     "gateId": "f2-productive-acceptance-exact-successor-v20260818",
-    "contractVersion": "2.0.0",
-    "validatorLifecycleRevision": "phase-capability-contract-v1",
-    "f2ValidatorRevision": "f2-productive-acceptance-exact-successor-v1-20260818",
-    "canonicalRouterVersion": "v10.5-f2-stable-boundary-contract",
-    "candidateArtifactId": 9345207863,
-    "candidateSourceHead": "29caae94a3db1f1626bdde2ea6ee9a21799f9df6",
-    "candidateZipSha256": "493009c83390901aa772842a2ba9ddd5ce5293f6969d86c5c3395ebd670a44ac",
-    "candidateManifestSha256": "29dafe5e63b425ea6cf641937fe1b9d4b9e63f72479a51ae76f9148a55771761",
+    "contractVersion": "2.1.0",
+    "validatorLifecycleRevision": "phase-capability-contract-v2-source-rebind",
+    "f2ValidatorRevision": "f2-productive-acceptance-exact-successor-rebind-v2-20260819",
+    "canonicalRouterVersion": "v10.6-f2-successor-rebind-source-pending",
+    "candidateArtifactId": 9385306424,
+    "candidateSourceHead": "b94b2ae86d26586a68d33be9edba8715e956b02e",
+    "candidateZipSha256": "81a96f476fd0fdfd814b3f047951ce653fd324bef8a6d96d6ee6fe44dd7bdcf4",
+    "candidateManifestSha256": "cc6170121ed61fd6d9cde867dfcae8a3dd23d29777c6ee28c240d70e49843eef",
     "candidateFileCount": 194,
-    "fullRehashPass": true,
+    "fullRehashPass": false,
     "routes": [
       "inicio",
       "cliente360",
@@ -196,7 +196,7 @@
       "closure": "orbit360-platform/runtime-gate-crm-v20260716/f2-source-only-closure-v20260818.json",
       "checkpoint": "orbit360-platform/docs/CHECKPOINT-F2-SOURCE-ONLY-PASS-RUNTIME-AUTHORIZATION-PENDING-20260818.md"
     },
-    "validatorRootfix": "F2_STABLE_BOUNDARY_CONTRACT_V2",
+    "validatorRootfix": "F2_SUCCESSOR_REBIND_SOURCE_BOUNDARY_V3",
     "validatorRootfixSourceRunId": 32206698751,
     "stableBoundaryContract": true,
     "narrativeStatusesAuthoritative": false,
@@ -220,7 +220,9 @@
       "evidence": "orbit360-platform/runtime-gate-crm-v20260716/f2-role-view-rootfix-source-only-v20260818.json",
       "productAffected": false,
       "dataAffected": false
-    }
+    },
+    "candidateManifestStatus": "FASE_A_PRODUCT_F2_REQUEST06_ROOTFIX_SUCCESSOR_CERTIFIED",
+    "predecessorArtifactId": 9345207863
   },
   "rootCauseState": {
     "membershipValidator": {
@@ -251,8 +253,8 @@
       "productAffected": false
     },
     "currentBlockingFact": {
-      "code": "F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_V1_REQUEST06_REQUIRED",
-      "status": "FRESH_AUTHORIZATION_PENDING"
+      "code": "F2_SUCCESSOR_REBIND_SOURCE_ONLY_REQUIRED",
+      "status": "PENDING_REBIND_SOURCE_ONLY"
     },
     "authIsCurrentBlocker": false,
     "passwordIsCurrentBlocker": false,
@@ -349,6 +351,23 @@
       "classification": "VALIDATOR_STALE",
       "code": "F2_FULL_RUNTIME_CROSS_TENANT_PROBE_STILL_USES_RESERVED_INVALID_DOCUMENT_ID_AFTER_RULES01_VALID_PATH_ROOTFIX",
       "status": "CLOSED_SOURCE_ONLY_SHARED_CONTRACT_V2"
+    },
+    "f2Request06FunctionalDefect": {
+      "classification": "FUNCTIONAL_DEFECT",
+      "code": "F2_UNDEFINED_NAN_VISIBLE_DESKTOP_DIRECTION_INICIO",
+      "status": "ROOTFIX_CERTIFIED_IN_SUCCESSOR",
+      "rootCause": "OPTIONAL_ADVISOR_PROJECTION_WITHOUT_META_PRIMA_RENDERED_NON_FINITE_PERCENTAGE",
+      "successorArtifactId": 9385306424,
+      "productAffected": true,
+      "dataAffected": false
+    },
+    "f2SuccessorGateRebind": {
+      "classification": "VALIDATOR_STALE",
+      "code": "F2_GATE_OWNERS_PINNED_REQUEST06_PREDECESSOR",
+      "status": "PENDING_SOURCE_ONLY_REBIND",
+      "productAffected": false,
+      "dataAffected": false,
+      "preflightBeforeRebindRunId": 32309043863
     }
   },
   "documentationControl": {
@@ -439,12 +458,12 @@
     "membershipChangesAuthorized": false,
     "dataChangesAuthorized": false,
     "mainMergeAuthorized": false,
-    "f2AuthorizationStatus": "RULES01_DEPLOY_PASS_PROBE_ROOTFIX_PASS_POSTDEPLOY_PROBE_AUTH_REQUIRED",
+    "f2AuthorizationStatus": "NOT_AUTHORIZED_SUCCESSOR_RUNTIME_BLOCKED_PENDING_SOURCE_ONLY",
     "rulesDeployAuthorizedNow": false,
     "securityRepairAuthorizedNow": false
   },
   "goLive": {
-    "status": "F2_PRE_REQUEST06_KNOWN_ROOTFIXES_SOURCE_AUDIT_PASS_AUTHORIZATION_PENDING",
+    "status": "BLOCKED_F2_SUCCESSOR_SOURCE_ONLY_PENDING",
     "publicUrl": "https://app.aysseguros.com",
     "publishedPackagePreserved": true,
     "successorPublished": false,
@@ -484,7 +503,7 @@
     "gateId": "f2-productive-acceptance-exact-successor-v20260818",
     "requestVersion": "F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_V1",
     "runtimeRequestOrdinalAfterRepair": 6,
-    "candidateArtifactId": 9345207863,
+    "candidateArtifactId": 9385306424,
     "securityRepairRequired": false,
     "validatorRepairRequired": false,
     "rulesSourceMutationRequired": false,
@@ -522,7 +541,11 @@
       "main_merge",
       "request01_to_request05_replay",
       "postdeploy_probe_replay"
-    ]
+    ],
+    "action": "VALIDATE_F2_SUCCESSOR_SOURCE_ONLY",
+    "candidateSourceHead": "b94b2ae86d26586a68d33be9edba8715e956b02e",
+    "status": "PENDING_REBIND_SOURCE_ONLY",
+    "runtimeAuthorizationRequiredAfterSourcePass": true
   },
   "resumeProtocol": [
     "Read ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json",
@@ -863,5 +886,98 @@
       "pipeline": "orbit360-platform/runtime-gate-crm-v20260716/f2-rules01-probe-rootfix-persistence-pipeline-failure-v20260818.json",
       "checkpoint": "orbit360-platform/docs/CHECKPOINT-F2-RULES01-DEPLOY-PASS-PROBE-ROOTFIX-PASS-20260818.md"
     }
+  },
+  "f2PredecessorSourceClosure": {
+    "status": "HISTORICAL_CLOSED_PASS_PRESERVED",
+    "artifactId": 9345207863,
+    "sourceHead": "29caae94a3db1f1626bdde2ea6ee9a21799f9df6",
+    "sourceOnly": {
+      "status": "CLOSED_PASS",
+      "gateId": "f2-productive-acceptance-exact-successor-v20260818",
+      "contractVersion": "2.0.0",
+      "validatorLifecycleRevision": "phase-capability-contract-v1",
+      "f2ValidatorRevision": "f2-productive-acceptance-exact-successor-v1-20260818",
+      "canonicalRouterVersion": "v10.5-f2-stable-boundary-contract",
+      "candidateArtifactId": 9345207863,
+      "candidateSourceHead": "29caae94a3db1f1626bdde2ea6ee9a21799f9df6",
+      "candidateZipSha256": "493009c83390901aa772842a2ba9ddd5ce5293f6969d86c5c3395ebd670a44ac",
+      "candidateManifestSha256": "29dafe5e63b425ea6cf641937fe1b9d4b9e63f72479a51ae76f9148a55771761",
+      "candidateFileCount": 194,
+      "fullRehashPass": true,
+      "routes": [
+        "inicio",
+        "cliente360",
+        "aseguradoras",
+        "ops",
+        "leads",
+        "polizas",
+        "cobros"
+      ],
+      "integratedSurfaces": {
+        "vehiculos": "cliente360_policy_deeplink_fullpage",
+        "recibosCartera": "policy_client360_plus_cobros_global"
+      },
+      "runtimeWorkflowPrepared": true,
+      "requestCreated": false,
+      "runtimeAuthorized": false,
+      "browserAuthorized": false,
+      "firestoreWrites": 0,
+      "authWrites": 0,
+      "operationalWrites": 0,
+      "deployExecuted": false,
+      "publicationExecuted": false,
+      "productionTouched": false,
+      "evidence": {
+        "sourceGate": "orbit360-platform/runtime-gate-crm-v20260716/f2-source-gate-preflight-v20260818.json",
+        "candidateValidation": "orbit360-platform/runtime-gate-crm-v20260716/f2-exact-candidate-source-validation-v20260818.json",
+        "closure": "orbit360-platform/runtime-gate-crm-v20260716/f2-source-only-closure-v20260818.json",
+        "checkpoint": "orbit360-platform/docs/CHECKPOINT-F2-SOURCE-ONLY-PASS-RUNTIME-AUTHORIZATION-PENDING-20260818.md"
+      },
+      "validatorRootfix": "F2_STABLE_BOUNDARY_CONTRACT_V2",
+      "validatorRootfixSourceRunId": 32206698751,
+      "stableBoundaryContract": true,
+      "narrativeStatusesAuthoritative": false,
+      "narrativeAttemptStatusMutationPass": true,
+      "legalReadinessValidatorRootfix": {
+        "classification": "VALIDATOR_STALE",
+        "code": "BLOCKING_GATE_HARD_TIMEOUT_INCLUDED_SUCCESSFUL_DETACH_PHASE",
+        "status": "CLOSED_SOURCE_ONLY_PASS",
+        "runId": 32207309204,
+        "selftest": "orbit360-platform/runtime-gate-crm-v20260716/f2-legal-readiness-phase-aware-selftest-v20260818.json",
+        "evidence": "orbit360-platform/runtime-gate-crm-v20260716/f2-legal-readiness-rootfix-source-only-v20260818.json",
+        "productAffected": false
+      },
+      "roleViewValidatorRootfix": {
+        "classification": "VALIDATOR_STALE",
+        "code": "F2_ROLE_VIEW_VALIDATOR_REQUIRED_LITERAL_DIRECCION_INSTEAD_OF_SUPERADMIN_VISUAL_EQUIVALENT",
+        "status": "CLOSED_SOURCE_ONLY_PASS",
+        "runId": 32209972474,
+        "contractVersion": "F2_ROLE_VIEW_CANONICAL_VISUAL_V1",
+        "selftest": "orbit360-platform/runtime-gate-crm-v20260716/f2-role-view-contract-selftest-v20260818.json",
+        "evidence": "orbit360-platform/runtime-gate-crm-v20260716/f2-role-view-rootfix-source-only-v20260818.json",
+        "productAffected": false,
+        "dataAffected": false
+      }
+    }
+  },
+  "f2Request06RootfixSuccessor": {
+    "status": "CERTIFIED_UNPUBLISHED_PENDING_SOURCE_REBIND",
+    "buildRunId": 32307750282,
+    "buildRequestCommit": "78d73bb0d93a1fee463d0676455143f358d4262c",
+    "artifactId": 9385306424,
+    "evidenceArtifactId": 9385307587,
+    "sourceHead": "b94b2ae86d26586a68d33be9edba8715e956b02e",
+    "zipName": "orbit360-fase-a-product-f2-request06-rootfix-successor-b94b2ae86d26.zip",
+    "zipSha256": "81a96f476fd0fdfd814b3f047951ce653fd324bef8a6d96d6ee6fe44dd7bdcf4",
+    "manifestSha256": "cc6170121ed61fd6d9cde867dfcae8a3dd23d29777c6ee28c240d70e49843eef",
+    "manifestStatus": "FASE_A_PRODUCT_F2_REQUEST06_ROOTFIX_SUCCESSOR_CERTIFIED",
+    "fileCount": 194,
+    "deltaCount": 1,
+    "deltaPaths": [
+      "core/queries.js"
+    ],
+    "finiteRegressionPass": true,
+    "fullRehashPass": true,
+    "productionTouched": false
   }
 }

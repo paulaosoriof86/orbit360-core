@@ -1,6 +1,6 @@
 {
   "schemaVersion": "orbit360-gate-contract-registry-v1",
-  "issuedAt": "2026-07-18",
+  "issuedAt": "2026-08-19",
   "plan": {
     "name": "PLAN-MAESTRO-EJECUCION-PRODUCTIVA-ANTI-DESVIACION-SINCRONIZACION-CLAUDE-ORBIT360-AYS-20260716",
     "activeBlock": 1,
@@ -521,6 +521,35 @@
         "dispatchAfterRetirement": true,
         "purpose": "Execute 1.0.23 once after the temporary apply workflow is removed."
       }
+    },
+    {
+      "gateId": "f2-productive-acceptance-exact-successor-v20260818",
+      "contractVersion": "2.1.0",
+      "diagnosticRevision": "f2-successor-rebind-source-pending-v1",
+      "runtimeVersion": "20260819-1",
+      "block": "F2",
+      "status": "ACTIVE_SOURCE_REBIND",
+      "classification": "VALIDATOR_STALE",
+      "rootCause": "F2 gate owners remained pinned to Request06 predecessor after certified one-file functional rootfix successor was built.",
+      "candidate": {
+        "artifactId": 9385306424,
+        "sourceHead": "b94b2ae86d26586a68d33be9edba8715e956b02e",
+        "zipSha256": "81a96f476fd0fdfd814b3f047951ce653fd324bef8a6d96d6ee6fe44dd7bdcf4",
+        "manifestSha256": "cc6170121ed61fd6d9cde867dfcae8a3dd23d29777c6ee28c240d70e49843eef",
+        "manifestStatus": "FASE_A_PRODUCT_F2_REQUEST06_ROOTFIX_SUCCESSOR_CERTIFIED",
+        "fileCount": 194
+      },
+      "sourceLifecycle": "tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-source-v20260819.json",
+      "runtimeLifecycle": "tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-runtime-v20260819.json",
+      "engine": "tools/orbit360-validar-gate-contracts-engine-f2-productive-acceptance-v20260819.mjs",
+      "stableBoundary": "tools/orbit360-f2-stable-boundary-contract-v20260819.mjs",
+      "candidateValidator": "tools/orbit360-f2-exact-candidate-source-validator-v20260819.mjs",
+      "sourceStatus": "PENDING_REBIND_SOURCE_ONLY",
+      "runtimeStatus": "BLOCKED_PENDING_SOURCE_REBIND",
+      "runtimeAuthorization": false,
+      "writesAllowed": false,
+      "deployAllowed": false,
+      "productionAllowed": false
     }
   ],
   "temporaryPipelineArtifacts": [],

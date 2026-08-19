@@ -1,0 +1,103 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
+  "gateId": "f2-productive-acceptance-exact-successor-v20260818",
+  "gateContractVersion": "2.1.0",
+  "validatorLifecycleRevision": "phase-capability-contract-v2-source-rebind",
+  "f2ValidatorRevision": "f2-productive-acceptance-exact-successor-rebind-v2-20260819",
+  "status": "F2_RUNTIME_BLOCKED_PENDING_SOURCE_REBIND",
+  "currentPhase": "F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY",
+  "executionProfile": {
+    "phase": "F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY",
+    "capabilities": {
+      "secrets": true,
+      "firestoreRead": true,
+      "writes": false,
+      "runtime": true,
+      "browser": true,
+      "deploy": false,
+      "functionsDeploy": false,
+      "rulesDeploy": false,
+      "production": false
+    }
+  },
+  "singleGate": true,
+  "macroClosure": true,
+  "block": "F2_GATE_DE_ACEPTACION_PRODUCTIVA_REAL",
+  "authorization": {
+    "requiredForExecution": true,
+    "activeRequest": false,
+    "request": "DYNAMIC:ORBIT360_REQUEST_FILE",
+    "allowedExecutions": 0,
+    "consumed": false,
+    "authorizationFrozen": true,
+    "replayAllowed": false
+  },
+  "guards": {
+    "candidateArtifactId": 9385306424,
+    "candidateZipSha256": "81a96f476fd0fdfd814b3f047951ce653fd324bef8a6d96d6ee6fe44dd7bdcf4",
+    "candidateManifestSha256": "cc6170121ed61fd6d9cde867dfcae8a3dd23d29777c6ee28c240d70e49843eef",
+    "candidateSourceHead": "b94b2ae86d26586a68d33be9edba8715e956b02e",
+    "candidateManifestStatus": "FASE_A_PRODUCT_F2_REQUEST06_ROOTFIX_SUCCESSOR_CERTIFIED",
+    "candidateFileCount": 194,
+    "exactCandidateRequired": true,
+    "gateBeforeArtifactDownloadInRuntime": true,
+    "gateBeforeSecretAccess": true,
+    "gateBeforeBrowser": true,
+    "customTokenEphemeralOnly": true,
+    "passwordResetAllowed": false,
+    "authChangesAllowed": false,
+    "membershipChangesAllowed": false,
+    "dataChangesAllowed": false,
+    "firestoreWritesAllowed": false,
+    "operationalWritesAllowed": false,
+    "packageRebuildAllowed": false,
+    "deployAllowed": false,
+    "publicationAllowed": false,
+    "productionMutationAllowed": false,
+    "stopRetryOnSameFamily": true,
+    "predecessorArtifactId": 9345207863,
+    "sourceOnlyClosedRequiredForRuntime": true
+  },
+  "surfaceTopology": {
+    "routes": [
+      "inicio",
+      "cliente360",
+      "aseguradoras",
+      "ops",
+      "leads",
+      "polizas",
+      "cobros"
+    ],
+    "integratedSurfaces": {
+      "vehiculos": "cliente360_policy_deeplink_fullpage",
+      "recibosCartera": "policy_client360_plus_cobros_global"
+    },
+    "roleViews": [
+      {
+        "role": "Dirección",
+        "viewport": "desktop"
+      },
+      {
+        "role": "Operativo",
+        "viewport": "tablet"
+      },
+      {
+        "role": "Asesor",
+        "viewport": "mobile"
+      }
+    ],
+    "invariants": [
+      "login_membership_tenant_role_scope",
+      "runtime_store_router",
+      "legal_idempotent",
+      "service_worker_cache",
+      "zero_technical_copy",
+      "zero_cross_tenant",
+      "zero_unexpected_writes",
+      "integrity_before_after",
+      "cross_tenant_probe_valid_path_v2"
+    ]
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}

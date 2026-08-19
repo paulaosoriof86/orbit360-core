@@ -28,7 +28,7 @@ const DEFAULT_BLOCK1_V30_REQUEST_REL = '.github/orbit360-requests/block1-client3
 const DEFAULT_BLOCK1_V33_REQUEST_REL = '.github/orbit360-requests/block1-client360-insurers-v33-two-client-cloud-audit-authorization.json';
 const STOP_OVERLAY_REL = 'tools/orbit360-validator-lifecycle-overlay-visual-matrix-v8-stop-preflight-v20260806.json';
 const CANONICAL_LIFECYCLE_COMPOSITION = 'phase-capability-contract-v1';
-const ROUTER_VERSION = 'v10.5-f2-stable-boundary-contract';
+const ROUTER_VERSION = 'v10.6-f2-successor-rebind-source-pending';
 
 const GATE_CONFIG = Object.freeze({
   [BLOCK1_GATE_ID]: {
@@ -88,9 +88,9 @@ const GATE_CONFIG = Object.freeze({
     sourcePhase: ''
   },
   ['f2-productive-acceptance-exact-successor-v20260818']: {
-    contractVersion: '2.0.0',
-    lifecycle: 'tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-source-v20260818.json',
-    engine: 'tools/orbit360-validar-gate-contracts-engine-f2-productive-acceptance-v20260818.mjs',
+    contractVersion: '2.1.0',
+    lifecycle: 'tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-source-v20260819.json',
+    engine: 'tools/orbit360-validar-gate-contracts-engine-f2-productive-acceptance-v20260819.mjs',
     defaultRequest: '.github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-runbound-20260818-01.json',
     sourcePhase: 'F2_PRODUCTIVE_ACCEPTANCE_SOURCE_ONLY',
     allowHistoricalConsumedRequest: true

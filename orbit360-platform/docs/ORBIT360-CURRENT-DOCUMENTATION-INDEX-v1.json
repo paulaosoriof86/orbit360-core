@@ -1,6 +1,6 @@
 {
   "schemaVersion": "orbit360-current-documentation-index-v1",
-  "updatedAt": "2026-08-19T18:33:59.824Z",
+  "updatedAt": "2026-08-19T22:35:00.000Z",
   "status": "CURRENT_BINDING_INDEX",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -101,12 +101,12 @@
     "f1_4DRunId": "32195516901",
     "f1_4DRequestCommit": "45c85e6ed6e992b490262f5abf12cce94d7a13c4",
     "f1_4DRequestConsumed": true,
-    "f2SourceOnlyStatus": "CLOSED_PASS",
+    "f2SourceOnlyStatus": "PENDING_REBIND_SOURCE_ONLY",
     "f2SourceOnlyGateId": "f2-productive-acceptance-exact-successor-v20260818",
     "f2SourceOnlyContractVersion": "2.0.0",
     "f2RuntimeRequestCreated": false,
     "f2RuntimeAuthorizationGranted": false,
-    "successorCandidateArtifactId": "9345207863",
+    "successorCandidateArtifactId": 9385306424,
     "successorEvidenceArtifactId": "9345208103",
     "successorZip": "orbit360-fase-a-product-f1-4c-successor-29caae94a3db.zip",
     "successorZipSha256": "493009c83390901aa772842a2ba9ddd5ce5293f6969d86c5c3395ebd670a44ac",
@@ -118,7 +118,7 @@
     "f1BootstrapStatus": "ready-read-only",
     "publishedPackage": "R4S9C_SOURCE_861326906558f03d9c8c2e7f34adfb4979a17d73_PRESERVED_NOT_ROOTFIX_CONFIRMATION_ARTIFACT",
     "currentPlan": "orbit360-platform/docs/ADDENDUM-MAESTRO-CIERRE-FORENSE-SINCRONIZACION-Y-PLAN-CONGELADO-20260818.md",
-    "nextAuthorizationBoundary": "F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_V1 / REQUEST06 / EXACT_ARTIFACT_9345207863 / FRESH_AUTHORIZATION_REQUIRED",
+    "nextAuthorizationBoundary": "BLOCKED_PENDING_SOURCE_ONLY_PASS:F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_V1:EXACT_ARTIFACT_9385306424",
     "f2Runtime01RunId": "32205144735",
     "f2Runtime01RequestCommit": "0fba51716d741750b617bf95fc6342444c9f720c",
     "f2Runtime01Status": "CONSUMED_STOP_VALIDATOR_STALE",
@@ -224,7 +224,12 @@
     "f2KnownRootfixSourceAuditStatus": "PASS",
     "f2KnownRootfixSourceAuditEvidence": "orbit360-platform/runtime-gate-crm-v20260716/f2-full-runtime-known-rootfixes-selftest-v20260819.json",
     "f2FullRuntimeCrossTenantRootfixEvidence": "orbit360-platform/runtime-gate-crm-v20260716/f2-full-runtime-cross-tenant-validator-stale-rootfix-source-only-v20260819.json",
-    "f2PostdeployProbePostSyncEvidence": "orbit360-platform/runtime-gate-crm-v20260716/f2-pre-request06-postsync-source-only-v20260819.json"
+    "f2PostdeployProbePostSyncEvidence": "orbit360-platform/runtime-gate-crm-v20260716/f2-pre-request06-postsync-source-only-v20260819.json",
+    "successorCandidateSourceHead": "b94b2ae86d26586a68d33be9edba8715e956b02e",
+    "successorCandidateZipSha256": "81a96f476fd0fdfd814b3f047951ce653fd324bef8a6d96d6ee6fe44dd7bdcf4",
+    "successorCandidateManifestSha256": "cc6170121ed61fd6d9cde867dfcae8a3dd23d29777c6ee28c240d70e49843eef",
+    "successorCandidateManifestStatus": "FASE_A_PRODUCT_F2_REQUEST06_ROOTFIX_SUCCESSOR_CERTIFIED",
+    "successorCandidateFileCount": 194
   },
   "historicalPolicy": {
     "defaultClassification": "HISTORICAL_NOT_CURRENT_STATE",
@@ -323,5 +328,20 @@
     "academiaImpact",
     "pending",
     "nextActionExact"
-  ]
+  ],
+  "f2SuccessorRebind": {
+    "status": "PENDING_REBIND_SOURCE_ONLY",
+    "classification": "VALIDATOR_STALE",
+    "gateId": "f2-productive-acceptance-exact-successor-v20260818",
+    "contractVersion": "2.1.0",
+    "candidateArtifactId": 9385306424,
+    "predecessorArtifactId": 9345207863,
+    "sourceLifecycle": "tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-source-v20260819.json",
+    "runtimeLifecycle": "tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-runtime-v20260819.json",
+    "engine": "tools/orbit360-validar-gate-contracts-engine-f2-productive-acceptance-v20260819.mjs",
+    "candidateValidator": "tools/orbit360-f2-exact-candidate-source-validator-v20260819.mjs",
+    "stableBoundary": "tools/orbit360-f2-stable-boundary-contract-v20260819.mjs",
+    "runtimeAuthorized": false,
+    "productionTouched": false
+  }
 }

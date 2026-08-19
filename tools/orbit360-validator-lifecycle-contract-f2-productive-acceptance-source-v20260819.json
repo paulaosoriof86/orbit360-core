@@ -1,0 +1,144 @@
+{
+  "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
+  "gateId": "f2-productive-acceptance-exact-successor-v20260818",
+  "gateContractVersion": "2.1.0",
+  "validatorLifecycleRevision": "phase-capability-contract-v2-source-rebind",
+  "f2ValidatorRevision": "f2-productive-acceptance-exact-successor-rebind-v2-20260819",
+  "status": "F2_SOURCE_ONLY_REBIND_PENDING",
+  "currentPhase": "F2_PRODUCTIVE_ACCEPTANCE_SOURCE_ONLY",
+  "executionProfile": {
+    "phase": "F2_PRODUCTIVE_ACCEPTANCE_SOURCE_ONLY",
+    "capabilities": {
+      "secrets": false,
+      "firestoreRead": false,
+      "writes": false,
+      "runtime": false,
+      "browser": false,
+      "deploy": false,
+      "functionsDeploy": false,
+      "rulesDeploy": false,
+      "production": false
+    }
+  },
+  "singleGate": true,
+  "macroClosure": true,
+  "block": "F2_GATE_DE_ACEPTACION_PRODUCTIVA_REAL",
+  "authorization": {
+    "requiredForExecution": false,
+    "activeRequest": false,
+    "request": ".github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-runbound-20260818-01.json",
+    "allowedExecutions": 0,
+    "consumed": false,
+    "authorizationFrozen": true,
+    "replayAllowed": false
+  },
+  "guards": {
+    "candidateArtifactId": 9385306424,
+    "candidateZipSha256": "81a96f476fd0fdfd814b3f047951ce653fd324bef8a6d96d6ee6fe44dd7bdcf4",
+    "candidateManifestSha256": "cc6170121ed61fd6d9cde867dfcae8a3dd23d29777c6ee28c240d70e49843eef",
+    "candidateSourceHead": "b94b2ae86d26586a68d33be9edba8715e956b02e",
+    "candidateManifestStatus": "FASE_A_PRODUCT_F2_REQUEST06_ROOTFIX_SUCCESSOR_CERTIFIED",
+    "candidateFileCount": 194,
+    "exactCandidateRequired": true,
+    "f1ClosedRequired": true,
+    "f1_4dConsumedPassRequired": true,
+    "sourceOnlyBeforeAuthorization": true,
+    "gateBeforeArtifactDownloadInRuntime": true,
+    "gateBeforeSecretAccess": true,
+    "gateBeforeBrowser": true,
+    "writesAllowed": false,
+    "authChangesAllowed": false,
+    "membershipChangesAllowed": false,
+    "dataChangesAllowed": false,
+    "packageRebuildAllowed": false,
+    "deployAllowed": false,
+    "publicationAllowed": false,
+    "productionMutationAllowed": false,
+    "stopRetryOnSameFamily": true,
+    "predecessorArtifactId": 9345207863,
+    "sourceOnlyClosedRequiredForRuntime": true
+  },
+  "surfaceTopology": {
+    "routes": [
+      "inicio",
+      "cliente360",
+      "aseguradoras",
+      "ops",
+      "leads",
+      "polizas",
+      "cobros"
+    ],
+    "integratedSurfaces": {
+      "vehiculos": "cliente360_policy_deeplink_fullpage",
+      "recibosCartera": "policy_client360_plus_cobros_global"
+    },
+    "roleViews": [
+      {
+        "role": "Dirección",
+        "viewport": "desktop"
+      },
+      {
+        "role": "Operativo",
+        "viewport": "tablet"
+      },
+      {
+        "role": "Asesor",
+        "viewport": "mobile"
+      }
+    ],
+    "invariants": [
+      "login_membership_tenant_role_scope",
+      "runtime_store_router",
+      "legal_idempotent",
+      "service_worker_cache",
+      "zero_technical_copy",
+      "zero_cross_tenant",
+      "zero_unexpected_writes",
+      "integrity_before_after"
+    ]
+  },
+  "owners": {
+    "canonicalGateRouter": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
+    "access": [
+      "orbit360-platform/core/access-scope.js",
+      "orbit360-platform/core/access-role-session-owner-v20260728.js"
+    ],
+    "router": [
+      "orbit360-platform/core/router.js",
+      "orbit360-platform/core/router-tenant-config-product-bootstrap-p0.js"
+    ],
+    "legal": "orbit360-platform/core/legal.js",
+    "pwa": "orbit360-platform/core/pwa.js",
+    "productRuntime": "orbit360-platform/core/product-app-p0.js",
+    "readOnlyStore": "orbit360-platform/data/store-firestore-product-readonly-p0.js",
+    "policiesVehiclesReceipts": "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+    "cobros": "orbit360-platform/modules/cobros.js"
+  },
+  "sourceOnlyResult": {
+    "ok": false,
+    "status": "PENDING_REBIND_SOURCE_ONLY",
+    "classification": "VALIDATOR_STALE",
+    "rootCause": "F2_GATE_OWNERS_PINNED_PREDECESSOR_AFTER_REQUEST06_FUNCTIONAL_ROOTFIX",
+    "predecessorArtifactId": 9345207863,
+    "candidateArtifactId": 9385306424,
+    "candidateSourceHead": "b94b2ae86d26586a68d33be9edba8715e956b02e",
+    "candidateZipSha256": "81a96f476fd0fdfd814b3f047951ce653fd324bef8a6d96d6ee6fe44dd7bdcf4",
+    "candidateManifestSha256": "cc6170121ed61fd6d9cde867dfcae8a3dd23d29777c6ee28c240d70e49843eef",
+    "candidateManifestStatus": "FASE_A_PRODUCT_F2_REQUEST06_ROOTFIX_SUCCESSOR_CERTIFIED",
+    "candidateFileCount": 194,
+    "canonicalRouterRegistered": true,
+    "fullRehashPass": false,
+    "runtimeWorkflowPrepared": true,
+    "requestCreated": false,
+    "runtimeExecuted": false,
+    "browserExecuted": false,
+    "secretAccess": false,
+    "dataAccess": false,
+    "writes": 0,
+    "deployExecuted": false,
+    "publicationExecuted": false,
+    "productionTouched": false
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
