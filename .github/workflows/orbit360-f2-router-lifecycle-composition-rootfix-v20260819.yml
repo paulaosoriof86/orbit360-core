@@ -70,6 +70,11 @@ jobs:
           git diff --cached --check
           test "$(git diff --cached --name-only | wc -l | tr -d ' ')" = '6'
           git commit -m 'fix(f2): make lifecycle composition gate-profile-aware [skip ci]'
+          # The canonical gate writes a tracked sync evidence file. Restore it to
+          # the just-created commit before rebasing so evidence transport cannot
+          # dirty the mechanism layer.
+          git restore --worktree --staged -- orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+          test -z "$(git diff --name-only)"
           git fetch origin "$ORBIT360_BRANCH"
           git rebase "origin/$ORBIT360_BRANCH"
           git push origin "HEAD:$ORBIT360_BRANCH"
