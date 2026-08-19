@@ -1,0 +1,29 @@
+name: Orbit360 Actions Push Pulse 20260818
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-observers/actions-push-pulse-20260818.json'
+permissions:
+  contents: write
+jobs:
+  pulse:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+      - name: Persist push pulse
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p orbit360-platform/runtime-gate-crm-v20260716
+          jq -n --arg run "$GITHUB_RUN_ID" --arg sha "$GITHUB_SHA" '{schemaVersion:"orbit360-actions-push-pulse-v1",ok:true,status:"ACTIONS_PUSH_PULSE_PASS",runId:$run,triggerSha:$sha,browserExecuted:false,runtimeExecuted:false,secretAccess:false,dataAccess:false,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false}' > orbit360-platform/runtime-gate-crm-v20260716/actions-push-pulse-v20260818.json
+          git config user.name 'orbit360-actions-pulse-bot'
+          git config user.email 'orbit360-actions-pulse-bot@users.noreply.github.com'
+          git add orbit360-platform/runtime-gate-crm-v20260716/actions-push-pulse-v20260818.json
+          git commit -m 'diag: persist Actions push pulse [skip ci]'
+          git push origin "HEAD:ays/backend-tenant-lab-v99-20260703"
