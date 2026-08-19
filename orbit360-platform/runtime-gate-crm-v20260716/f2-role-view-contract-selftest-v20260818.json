@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "orbit360-f2-role-view-contract-selftest-v1",
+  "ok": true,
+  "status": "F2_ROLE_VIEW_CONTRACT_SELFTEST_PASS",
+  "classification": "PASS",
+  "contractVersion": "F2_ROLE_VIEW_CANONICAL_VISUAL_V1",
+  "superAdminDirectionResolved": true,
+  "canonicalDirectionResolved": true,
+  "adminTenantRejectedForDirection": true,
+  "ownerVisualAliasProven": true,
+  "runnerContractBound": true,
+  "productMutation": false,
+  "runtimeExecuted": false,
+  "browserExecuted": false,
+  "secretAccess": false,
+  "firestoreRead": false,
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "operationalWrites": 0,
+  "containsPII": false,
+  "containsSecrets": false
+}
