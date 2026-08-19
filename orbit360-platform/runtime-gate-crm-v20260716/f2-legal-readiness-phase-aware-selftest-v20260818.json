@@ -1,0 +1,41 @@
+{
+  "schemaVersion": "orbit360-blocking-gate-readiness-phase-aware-selftest-v1",
+  "ok": true,
+  "status": "F2_LEGAL_READINESS_PHASE_AWARE_SELFTEST_PASS",
+  "classification": "PASS",
+  "legacyFailureShapeReproduced": {
+    "accepted": 1,
+    "remaining": 0,
+    "elapsedBeyondHardTimeout": true
+  },
+  "phaseAwareResult": {
+    "ok": true,
+    "sawGate": true,
+    "accepted": 1,
+    "remaining": 0,
+    "elapsedMs": 552,
+    "quietWindowSatisfied": true,
+    "handled": [
+      "legal"
+    ]
+  },
+  "noGateResult": {
+    "ok": true,
+    "sawGate": false,
+    "accepted": 0,
+    "remaining": 0,
+    "elapsedMs": 303,
+    "quietWindowSatisfied": true,
+    "handled": []
+  },
+  "productMutation": false,
+  "runtimeExecuted": false,
+  "browserExecuted": false,
+  "secretAccess": false,
+  "firestoreRead": false,
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "operationalWrites": 0,
+  "containsPII": false,
+  "containsSecrets": false
+}
