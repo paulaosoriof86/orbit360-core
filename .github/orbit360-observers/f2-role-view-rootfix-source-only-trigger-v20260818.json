@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "orbit360-f2-role-view-rootfix-source-only-trigger-v1",
+  "gateId": "f2-productive-acceptance-exact-successor-v20260818",
+  "request04RunId": 32208018808,
+  "request04Consumed": true,
+  "canonicalRootClassification": "VALIDATOR_STALE",
+  "canonicalRootCause": "F2_ROLE_VIEW_VALIDATOR_REQUIRED_LITERAL_DIRECCION_INSTEAD_OF_SUPERADMIN_VISUAL_EQUIVALENT",
+  "scope": "SOURCE_ONLY_VALIDATOR_ROOTFIX",
+  "request04Replay": false,
+  "request05Created": false,
+  "runtime": false,
+  "browser": false,
+  "secrets": false,
+  "firestore": false,
+  "writes": false,
+  "deploy": false,
+  "publication": false,
+  "production": false
+}
