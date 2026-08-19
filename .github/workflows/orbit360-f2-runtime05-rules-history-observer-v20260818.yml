@@ -1,0 +1,58 @@
+name: Orbit360 F2 Runtime05 Rules History Observer 20260818
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/workflows/orbit360-f2-runtime05-rules-history-observer-v20260818.yml'
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: orbit360-f2-runtime05-rules-history-observer-20260818
+  cancel-in-progress: false
+env:
+  TARGET_BRANCH: ays/backend-tenant-lab-v99-20260703
+  EVIDENCE_PATH: orbit360-platform/runtime-gate-crm-v20260716/f2-runtime05-rules-history-observer-v20260818.json
+jobs:
+  observe_rules_history:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - name: Locate historical rules-related runs without cloud mutation
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$(dirname "$EVIDENCE_PATH")"
+          SHAS=(
+            e792fa52fffa9d273307a8302d23b9d373c0ad9a
+            3754926514d7484fec0e9a06575d7344d09aec85
+            86594f9c88ac6cc176928b8249f57b230a537603
+            6f55c279fa0a4f84a031c691abcf82bac9756252
+            d1e2b48dd440b1ec2f6132a99380c81ff9093272
+          )
+          TMP="$RUNNER_TEMP/rules-history.ndjson"
+          : > "$TMP"
+          for SHA in "${SHAS[@]}"; do
+            RESP="$(curl -fsSL -H "Authorization: Bearer $GH_TOKEN" -H 'Accept: application/vnd.github+json' -H 'X-GitHub-Api-Version: 2022-11-28' "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/runs?head_sha=${SHA}&per_page=100")"
+            printf '%s' "$RESP" | jq -c --arg sha "$SHA" '{sha:$sha,runs:[.workflow_runs[]|{id,name,event,status,conclusion,run_attempt,head_sha,head_branch,created_at,updated_at}]}' >> "$TMP"
+          done
+          jq -s '{schemaVersion:"orbit360-f2-runtime05-rules-history-observer-v1",ok:true,status:"F2_RUNTIME05_RULES_HISTORY_METADATA_OBSERVED",classification:"OBSERVATION_PASS",targets:.,cloudMutation:false,secretAccess:false,firestoreRead:false,firestoreWrite:false,rulesDeploy:false,containsPII:false,containsSecrets:false}' "$TMP" > "$EVIDENCE_PATH"
+          jq -e '.ok==true and .cloudMutation==false and .rulesDeploy==false' "$EVIDENCE_PATH" >/dev/null
+      - name: Persist sanitized metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$EVIDENCE_PATH"
+          git diff --cached --check
+          git commit -m '[skip ci] evidence(f2): observe historical rules run metadata'
+          REMOTE_HEAD="$(git ls-remote origin "refs/heads/$TARGET_BRANCH" | awk '{print $1}')"
+          test "$REMOTE_HEAD" = "$GITHUB_SHA"
+          git push origin "HEAD:$TARGET_BRANCH"
