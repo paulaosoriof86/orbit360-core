@@ -1,0 +1,71 @@
+name: Orbit360 F2 Request07 Validator Stale Sourcefix Check 20260819
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-requests/f2-request07-validator-stale-sourcefix-check-20260819.json'
+permissions:
+  contents: write
+concurrency:
+  group: orbit360-f2-request07-validator-stale-sourcefix-check-v20260819
+  cancel-in-progress: false
+env:
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  ORBIT360_REQUEST07: .github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-runbound-20260819-07.json
+  ORBIT360_TRIGGER: .github/orbit360-requests/f2-request07-validator-stale-sourcefix-check-20260819.json
+  ORBIT360_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/f2-request07-validator-stale-sourcefix-check-v20260819.json
+jobs:
+  sourcefix_check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate inert sourcefix trigger
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
+          test -f "$ORBIT360_TRIGGER"
+          test -f "$ORBIT360_REQUEST07"
+          jq -e '.schemaVersion=="orbit360-f2-validator-stale-sourcefix-check-v1" and .request07Commit=="696b3700687f758fdd9c629a2268caa857aa377a" and .candidateArtifactId==9385306424 and .sourceOnly==true and .secrets==false and .firestoreRead==false and .browser==false and .runtime==false and .writes==false and .deploy==false and .production==false' "$ORBIT360_TRIGGER" >/dev/null
+          mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
+          test "${#CHANGED[@]}" = '1'
+          test "${CHANGED[0]}" = "$ORBIT360_TRIGGER"
+      - name: Check corrected validator owners
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-f2-productive-acceptance-runtime-browser-readonly-v20260818.mjs
+          node --check tools/orbit360-test-f2-full-runtime-known-rootfixes-v20260819.mjs
+          ! grep -F "artifactId:9345207863" tools/orbit360-f2-productive-acceptance-runtime-browser-readonly-v20260818.mjs
+          ! grep -F "sourceHead:'29caae94a3db1f1626bdde2ea6ee9a21799f9df6'" tools/orbit360-f2-productive-acceptance-runtime-browser-readonly-v20260818.mjs
+          grep -F 'REQUEST?.candidateArtifactId' tools/orbit360-f2-productive-acceptance-runtime-browser-readonly-v20260818.mjs >/dev/null
+          grep -F 'REQUEST?.candidateSourceHead' tools/orbit360-f2-productive-acceptance-runtime-browser-readonly-v20260818.mjs >/dev/null
+          ORBIT360_REQUEST_FILE="$ORBIT360_REQUEST07" ORBIT360_F2_KNOWN_ROOTFIXES_EVIDENCE="$RUNNER_TEMP/f2-rootfix-selftest.json" node tools/orbit360-test-f2-full-runtime-known-rootfixes-v20260819.mjs
+          jq -e '.ok==true and .status=="F2_FULL_RUNTIME_KNOWN_ROOTFIXES_SOURCE_AUDIT_PASS" and .candidateArtifactId==9385306424 and .candidateSourceHead=="b94b2ae86d26586a68d33be9edba8715e956b02e" and .dynamicCandidateBinding==true and .browserExecuted==false and .runtimeExecuted==false and .secretAccess==false and .firestoreRead==false and .firestoreWrites==0 and .authWrites==0 and .dataWrites==0' "$RUNNER_TEMP/f2-rootfix-selftest.json" >/dev/null
+      - name: Build sanitized sourcefix evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$(dirname "$ORBIT360_EVIDENCE")"
+          jq -n --arg head "$GITHUB_SHA" '{schemaVersion:"orbit360-f2-request07-validator-stale-sourcefix-check-v1",ok:true,status:"F2_REQUEST07_VALIDATOR_STALE_SOURCEFIX_PASS",classification:"PASS",sourceHead:$head,request07Commit:"696b3700687f758fdd9c629a2268caa857aa377a",request07RunId:32311320804,candidateArtifactId:9385306424,rootCause:"VALIDATOR_STALE:F2_BROWSER_MANIFEST_IDENTITY_EXPECTATION_BOUND_TO_PREDECESSOR",runtimeRunnerDynamicCandidateBinding:true,rootfixSelftestDynamicCandidateBinding:true,sourceOnly:true,browserExecuted:false,runtimeExecuted:false,secretAccess:false,firestoreRead:false,firestoreWrites:0,authWrites:0,membershipWrites:0,dataWrites:0,operationalWrites:0,deployExecuted:false,publicationExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false}' > "$ORBIT360_EVIDENCE"
+          jq -e '.ok==true and .sourceOnly==true and .browserExecuted==false and .runtimeExecuted==false and .secretAccess==false and .firestoreRead==false and .firestoreWrites==0 and .authWrites==0 and .dataWrites==0 and .deployExecuted==false and .productionTouched==false' "$ORBIT360_EVIDENCE" >/dev/null
+      - name: Persist sanitized sourcefix evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'orbit360-sourcefix-check-bot'
+          git config user.email 'orbit360-sourcefix-check-bot@users.noreply.github.com'
+          git add "$ORBIT360_EVIDENCE"
+          git diff --cached --check
+          git commit -m 'evidence(f2): certify Request07 validator-stale sourcefix [skip ci]'
+          git fetch origin "$ORBIT360_BRANCH"
+          git rebase "origin/$ORBIT360_BRANCH"
+          git push origin "HEAD:$ORBIT360_BRANCH"
