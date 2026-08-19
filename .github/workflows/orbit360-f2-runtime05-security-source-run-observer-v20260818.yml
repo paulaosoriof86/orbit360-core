@@ -1,0 +1,57 @@
+name: Orbit360 F2 Runtime05 Security Source Run Observer 20260818
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/workflows/orbit360-f2-runtime05-security-source-run-observer-v20260818.yml'
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: orbit360-f2-runtime05-security-source-run-observer-20260818
+  cancel-in-progress: false
+env:
+  TARGET_SHA: 060df6c7dfb347e51585381d0b9130078b516e6f
+  TARGET_WORKFLOW_NAME: Orbit360 F2 Runtime05 Security Rootcause Source Only 20260818
+  TARGET_BRANCH: ays/backend-tenant-lab-v99-20260703
+  EVIDENCE_PATH: orbit360-platform/runtime-gate-crm-v20260716/f2-runtime05-security-source-run-observer-v20260818.json
+jobs:
+  observe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - name: Observe exact source-only run
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$(dirname "$EVIDENCE_PATH")"
+          API="https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/runs?head_sha=${TARGET_SHA}&event=push&per_page=100"
+          for i in $(seq 1 40); do
+            R="$(curl -fsSL -H "Authorization: Bearer $GH_TOKEN" -H 'Accept: application/vnd.github+json' -H 'X-GitHub-Api-Version: 2022-11-28' "$API")"
+            M="$(printf '%s' "$R" | jq --arg sha "$TARGET_SHA" --arg name "$TARGET_WORKFLOW_NAME" '[.workflow_runs[]|select(.head_sha==$sha and .name==$name)]')"
+            C="$(printf '%s' "$M"|jq 'length')"
+            test "$C" -le 1 || { echo MULTIPLE_RUNS; exit 41; }
+            if [ "$C" -eq 1 ] && [ "$(printf '%s' "$M"|jq -r '.[0].status')" = completed ]; then
+              printf '%s' "$M"|jq --arg observer "$GITHUB_RUN_ID" '{schemaVersion:"orbit360-f2-runtime05-security-source-run-observer-v1",ok:true,status:"TERMINAL_OBSERVED",uniquenessCount:length,observerRunId:$observer,run:{id:.[0].id,status:.[0].status,conclusion:.[0].conclusion,run_attempt:.[0].run_attempt,head_sha:.[0].head_sha,event:.[0].event},containsPII:false,containsSecrets:false,cloudMutation:false}' > "$EVIDENCE_PATH"
+              break
+            fi
+            sleep 5
+          done
+          test -f "$EVIDENCE_PATH"
+      - name: Persist observer evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$EVIDENCE_PATH"
+          git commit -m '[skip ci] evidence(f2): observe runtime05 security source run'
+          REMOTE_HEAD="$(git ls-remote origin "refs/heads/$TARGET_BRANCH"|awk '{print $1}')"
+          test "$REMOTE_HEAD" = "$GITHUB_SHA"
+          git push origin "HEAD:$TARGET_BRANCH"
