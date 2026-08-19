@@ -2,6 +2,7 @@
 'use strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import {fileURLToPath} from 'node:url';
 
 export const POSTDEPLOY_EVIDENCE_CONTRACT_VERSION='F2_POSTDEPLOY_EVIDENCE_PRODUCER_CONTRACT_V1';
 export const POSTDEPLOY_RUN_ID='32272580947';
@@ -19,7 +20,6 @@ export function assemblePostdeployEvidence({terminal,probe,integrity}){
   need(probe&&typeof probe==='object','PIPELINE_MECHANISM_FAILURE:POSTDEPLOY_PROBE_DETAIL_MISSING');
   need(integrity&&typeof integrity==='object','PIPELINE_MECHANISM_FAILURE:POSTDEPLOY_INTEGRITY_DETAIL_MISSING');
 
-  // Producer 1: workflow terminal is intentionally FLAT.
   need(terminal.schemaVersion==='orbit360-f2-rules01-postdeploy-probe-terminal-v1','PIPELINE_MECHANISM_FAILURE:POSTDEPLOY_TERMINAL_SCHEMA_MISMATCH');
   need(terminal.ok===true&&terminal.status==='F2_RULES01_POSTDEPLOY_CROSS_TENANT_PROBE_PASS'&&terminal.classification==='PASS','PIPELINE_MECHANISM_FAILURE:POSTDEPLOY_TERMINAL_NOT_PASS');
   need(runEq(terminal.runId),'PIPELINE_MECHANISM_FAILURE:POSTDEPLOY_TERMINAL_RUN_MISMATCH');
@@ -28,7 +28,6 @@ export function assemblePostdeployEvidence({terminal,probe,integrity}){
   for(const k of ['hostingDeploy','functionsDeploy','packageRebuild','publication','production']) need(terminal[k]===false,`SECURITY_FAILURE:POSTDEPLOY_TERMINAL_FORBIDDEN_EFFECT:${k}`);
   need(terminal.request06Created===false,'SECURITY_FAILURE:POSTDEPLOY_TERMINAL_REQUEST06_UNEXPECTED');
 
-  // Producer 2: forced-server probe owns HTTP/provider detail.
   need(probe.schemaVersion==='orbit360-f2-cross-tenant-forced-server-probe-v2','PIPELINE_MECHANISM_FAILURE:POSTDEPLOY_PROBE_SCHEMA_MISMATCH');
   need(probe.ok===true&&probe.status==='F2_CROSS_TENANT_FORCED_SERVER_DENY_PASS'&&probe.classification==='PASS','SECURITY_FAILURE:POSTDEPLOY_PROBE_NOT_PASS');
   need(runEq(probe.runId),'PIPELINE_MECHANISM_FAILURE:POSTDEPLOY_PROBE_RUN_MISMATCH');
@@ -39,33 +38,24 @@ export function assemblePostdeployEvidence({terminal,probe,integrity}){
   for(const k of ['firestoreDocumentWrites','authWrites','membershipWrites','dataWrites']) need(Number(probe[k])===0,`SECURITY_FAILURE:POSTDEPLOY_PROBE_WRITE_NONZERO:${k}`);
   for(const k of ['hostingDeploy','functionsDeploy','packageRebuild','publication','production']) need(probe[k]===false,`SECURITY_FAILURE:POSTDEPLOY_PROBE_FORBIDDEN_EFFECT:${k}`);
 
-  // Producer 3: compare-integrity owns before/after equality.
   need(integrity.schemaVersion==='orbit360-f2-integrity-before-after-v1','PIPELINE_MECHANISM_FAILURE:POSTDEPLOY_INTEGRITY_SCHEMA_MISMATCH');
   need(integrity.ok===true&&integrity.status==='F2_INTEGRITY_BEFORE_AFTER_PASS'&&integrity.countsIdentical===true&&integrity.digestsIdentical===true,'SECURITY_FAILURE:POSTDEPLOY_INTEGRITY_NOT_IDENTICAL');
   need(Number(integrity.firestoreWrites)===0&&Number(integrity.authWrites)===0&&Number(integrity.operationalWrites)===0,'SECURITY_FAILURE:POSTDEPLOY_INTEGRITY_WRITE_NONZERO');
 
   return {
-    schemaVersion:'orbit360-f2-postdeploy-composite-evidence-v1',
-    evidenceContractVersion:POSTDEPLOY_EVIDENCE_CONTRACT_VERSION,
-    ok:true,
-    status:'F2_RULES01_POSTDEPLOY_COMPOSITE_EVIDENCE_PASS',
-    classification:'PASS',
-    runId:Number(POSTDEPLOY_RUN_ID),
-    artifactId:POSTDEPLOY_ARTIFACT_ID,
-    artifactDigest:POSTDEPLOY_ARTIFACT_DIGEST,
-    candidateArtifactId:EXACT_ARTIFACT_ID,
+    schemaVersion:'orbit360-f2-postdeploy-composite-evidence-v1',evidenceContractVersion:POSTDEPLOY_EVIDENCE_CONTRACT_VERSION,
+    ok:true,status:'F2_RULES01_POSTDEPLOY_COMPOSITE_EVIDENCE_PASS',classification:'PASS',runId:Number(POSTDEPLOY_RUN_ID),
+    artifactId:POSTDEPLOY_ARTIFACT_ID,artifactDigest:POSTDEPLOY_ARTIFACT_DIGEST,candidateArtifactId:EXACT_ARTIFACT_ID,
     terminal:{flatProducerSchema:true,status:terminal.status,rulesRedeployExecuted:false,request06Created:false},
     probe:{serverForced:true,transport:probe.transport,documentPath:probe.probeDocumentPath,pathValid:true,responseStatus:403,responseErrorStatus:'PERMISSION_DENIED',crossTenantDenied:true},
-    integrity:{beforeAfterPass:true,countsIdentical:true,digestsIdentical:true},
-    writes:{firestoreDocument:0,auth:0,membership:0,data:0,operational:0},
-    forbiddenEffects:{rulesRedeploy:false,hosting:false,functions:false,rebuild:false,publication:false,production:false},
-    containsPII:false,
-    containsSecrets:false
+    integrity:{beforeAfterPass:true,countsIdentical:true,digestsIdentical:true},writes:{firestoreDocument:0,auth:0,membership:0,data:0,operational:0},
+    forbiddenEffects:{rulesRedeploy:false,hosting:false,functions:false,rebuild:false,publication:false,production:false},containsPII:false,containsSecrets:false
   };
 }
 
 function arg(name){const i=process.argv.indexOf(name);return i>=0?process.argv[i+1]:'';}
-if(import.meta.url===new URL(`file://${process.argv[1]}`).href){
+const isCli=Boolean(process.argv[1])&&fileURLToPath(import.meta.url)===path.resolve(process.argv[1]);
+if(isCli){
   try{
     const terminalPath=arg('--terminal'),probePath=arg('--probe'),integrityPath=arg('--integrity'),out=arg('--out');
     need(terminalPath&&probePath&&integrityPath&&out,'PIPELINE_MECHANISM_FAILURE:POSTDEPLOY_EVIDENCE_CLI_ARGS_REQUIRED');
