@@ -1,4 +1,4 @@
-name: Orbit360 F2 Runtime Run Discovery 20260818
+name: Orbit360 Dynamic Run Discovery 20260819
 on:
   push:
     branches: [ays/backend-tenant-lab-v99-20260703]
@@ -8,35 +8,37 @@ permissions:
   contents: write
   actions: read
 concurrency:
-  group: orbit360-f2-runtime-discovery-v20260818
+  group: orbit360-dynamic-run-discovery-v20260819
   cancel-in-progress: false
 env:
   ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
   TRIGGER_PATH: .github/orbit360-observers/f2-runtime-discovery-20260818.json
-  EVIDENCE_PATH: orbit360-platform/runtime-gate-crm-v20260716/f2-runtime-discovery-v20260818.json
 jobs:
   discover:
     runs-on: ubuntu-24.04
-    timeout-minutes: 3
+    timeout-minutes: 4
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
           fetch-depth: 0
           persist-credentials: true
-      - name: Validate dynamic discovery boundary
+      - name: Validate generic discovery boundary
         shell: bash
         run: |
           set -euo pipefail
           test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
           test -f "$TRIGGER_PATH"
-          jq -e '.schemaVersion=="orbit360-f2-runtime-discovery-trigger-v2" and .singleDiscovery==true and .runtimeReplay==false and .browser==false and .runtime==false and .secrets==false and .dataAccess==false and .writes==false and .deploy==false and .production==false and .containsPII==false and .containsSecrets==false and (.requestCommit|type=="string" and length==40) and (.requestFile|type=="string" and length>0) and (.targetWorkflowName|type=="string" and length>0)' "$TRIGGER_PATH" >/dev/null
+          jq -e '.schemaVersion=="orbit360-run-discovery-trigger-v3" and .singleDiscovery==true and .runtimeReplay==false and .browser==false and .runtime==false and .secrets==false and .dataAccess==false and .writes==false and .deploy==false and .production==false and .containsPII==false and .containsSecrets==false and (.requestCommit|type=="string" and length==40) and (.requestFile|type=="string" and length>0) and (.targetWorkflowName|type=="string" and length>0) and (.expectedRequestVersion|type=="string" and length>0) and (.expectedGateId|type=="string" and length>0) and (.evidencePath|type=="string" and startswith("orbit360-platform/runtime-gate-crm-v20260716/") and endswith(".json"))' "$TRIGGER_PATH" >/dev/null
           REQUEST_COMMIT="$(jq -r '.requestCommit' "$TRIGGER_PATH")"
           REQUEST_FILE="$(jq -r '.requestFile' "$TRIGGER_PATH")"
           TARGET_NAME="$(jq -r '.targetWorkflowName' "$TRIGGER_PATH")"
+          EXPECTED_VERSION="$(jq -r '.expectedRequestVersion' "$TRIGGER_PATH")"
+          EXPECTED_GATE="$(jq -r '.expectedGateId' "$TRIGGER_PATH")"
+          EVIDENCE_PATH="$(jq -r '.evidencePath' "$TRIGGER_PATH")"
           test -f "$REQUEST_FILE"
-          test "$(jq -r '.requestVersion' "$REQUEST_FILE")" = 'F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_V1'
-          test "$(jq -r '.gateId' "$REQUEST_FILE")" = 'f2-productive-acceptance-exact-successor-v20260818'
+          test "$(jq -r '.requestVersion' "$REQUEST_FILE")" = "$EXPECTED_VERSION"
+          test "$(jq -r '.gateId' "$REQUEST_FILE")" = "$EXPECTED_GATE"
           test "$(jq -r '.scope.writes' "$REQUEST_FILE")" = 'false'
           test "$(jq -r '.scope.deploy' "$REQUEST_FILE")" = 'false'
           test "$(jq -r '.scope.production' "$REQUEST_FILE")" = 'false'
@@ -44,34 +46,54 @@ jobs:
           echo "REQUEST_COMMIT=$REQUEST_COMMIT" >> "$GITHUB_ENV"
           echo "REQUEST_FILE=$REQUEST_FILE" >> "$GITHUB_ENV"
           echo "TARGET_NAME=$TARGET_NAME" >> "$GITHUB_ENV"
-      - name: Discover exact authorized F2 runtime run
+          echo "EXPECTED_VERSION=$EXPECTED_VERSION" >> "$GITHUB_ENV"
+          echo "EXPECTED_GATE=$EXPECTED_GATE" >> "$GITHUB_ENV"
+          echo "EVIDENCE_PATH=$EVIDENCE_PATH" >> "$GITHUB_ENV"
+      - name: Discover exact target run and sanitized artifacts
         env:
           GH_TOKEN_RUNTIME: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
           API="https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/runs?head_sha=${REQUEST_COMMIT}&event=push&per_page=100"
-          JSON="$(curl -L --fail --silent --show-error -H "Authorization: Bearer $GH_TOKEN_RUNTIME" -H 'Accept: application/vnd.github+json' -H 'X-GitHub-Api-Version: 2022-11-28' "$API")"
-          MATCHES="$(printf '%s' "$JSON" | jq --arg n "$TARGET_NAME" --arg sha "$REQUEST_COMMIT" '[.workflow_runs[] | select(.name==$n and .event=="push" and .head_sha==$sha)]')"
+          MATCHES='[]'
+          for i in $(seq 1 24); do
+            JSON="$(curl -L --fail --silent --show-error -H "Authorization: Bearer $GH_TOKEN_RUNTIME" -H 'Accept: application/vnd.github+json' -H 'X-GitHub-Api-Version: 2022-11-28' "$API")"
+            MATCHES="$(printf '%s' "$JSON" | jq --arg n "$TARGET_NAME" --arg sha "$REQUEST_COMMIT" '[.workflow_runs[] | select(.name==$n and .event=="push" and .head_sha==$sha)]')"
+            COUNT="$(printf '%s' "$MATCHES" | jq 'length')"
+            if [ "$COUNT" = '1' ]; then
+              STATUS="$(printf '%s' "$MATCHES" | jq -r '.[0].status')"
+              [ "$STATUS" = 'completed' ] && break
+            elif [ "$COUNT" -gt 1 ]; then
+              break
+            fi
+            sleep 5
+          done
           COUNT="$(printf '%s' "$MATCHES" | jq 'length')"
           mkdir -p "$(dirname "$EVIDENCE_PATH")"
           if [ "$COUNT" = '1' ]; then
-            printf '%s' "$MATCHES" | jq --arg req "$REQUEST_COMMIT" --arg file "$REQUEST_FILE" --arg name "$TARGET_NAME" '.[0] | {schemaVersion:"orbit360-f2-runtime-discovery-v2",ok:true,status:"F2_RUNTIME_RUN_DISCOVERED",classification:"OBSERVATION_PASS",requestCommit:$req,requestFile:$file,runtimeRunId:.id,runtimeStatus:.status,runtimeConclusion:(.conclusion // null),runAttempt:.run_attempt,event:.event,headSha:.head_sha,workflowName:$name,createdAt:.created_at,runStartedAt:.run_started_at,updatedAt:.updated_at,htmlUrl:.html_url,matchCount:1,multipleRuns:false,runtimeReplay:false,productMutation:false,containsPII:false,containsSecrets:false}' > "$EVIDENCE_PATH"
+            RUN_ID="$(printf '%s' "$MATCHES" | jq -r '.[0].id')"
+            ARTIFACTS='[]'
+            if [ "$(printf '%s' "$MATCHES" | jq -r '.[0].status')" = 'completed' ]; then
+              AJSON="$(curl -L --fail --silent --show-error -H "Authorization: Bearer $GH_TOKEN_RUNTIME" -H 'Accept: application/vnd.github+json' -H 'X-GitHub-Api-Version: 2022-11-28' "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}/artifacts?per_page=100")"
+              ARTIFACTS="$(printf '%s' "$AJSON" | jq '[.artifacts[]|{id,name,size_in_bytes,digest,expired}]')"
+            fi
+            printf '%s' "$MATCHES" | jq --arg req "$REQUEST_COMMIT" --arg file "$REQUEST_FILE" --arg name "$TARGET_NAME" --arg ver "$EXPECTED_VERSION" --arg gate "$EXPECTED_GATE" --argjson arts "$ARTIFACTS" '.[0] | {schemaVersion:"orbit360-run-discovery-v3",ok:(.status=="completed" and .conclusion=="success"),status:(if .status!="completed" then "TARGET_RUN_NONTERMINAL" elif .conclusion=="success" then "TARGET_RUN_TERMINAL_PASS" else "TARGET_RUN_TERMINAL_FAILURE" end),classification:(if .status!="completed" then "PIPELINE_MECHANISM_FAILURE" elif .conclusion=="success" then "OBSERVATION_PASS" else "TARGET_EXECUTION_FAILURE" end),requestCommit:$req,requestFile:$file,requestVersion:$ver,gateId:$gate,targetRunId:.id,targetRunStatus:.status,targetRunConclusion:(.conclusion // null),runAttempt:.run_attempt,event:.event,headSha:.head_sha,workflowName:$name,createdAt:.created_at,runStartedAt:.run_started_at,updatedAt:.updated_at,htmlUrl:.html_url,artifacts:$arts,artifactCount:($arts|length),matchCount:1,multipleRuns:false,runtimeReplay:false,productMutation:false,containsPII:false,containsSecrets:false}' > "$EVIDENCE_PATH"
           elif [ "$COUNT" = '0' ]; then
-            jq -n --arg req "$REQUEST_COMMIT" --arg file "$REQUEST_FILE" --arg name "$TARGET_NAME" '{schemaVersion:"orbit360-f2-runtime-discovery-v2",ok:false,status:"F2_RUNTIME_RUN_NOT_FOUND",classification:"PIPELINE_MECHANISM_FAILURE",requestCommit:$req,requestFile:$file,workflowName:$name,matchCount:0,multipleRuns:false,runtimeReplay:false,productMutation:false,containsPII:false,containsSecrets:false}' > "$EVIDENCE_PATH"
+            jq -n --arg req "$REQUEST_COMMIT" --arg file "$REQUEST_FILE" --arg name "$TARGET_NAME" --arg ver "$EXPECTED_VERSION" --arg gate "$EXPECTED_GATE" '{schemaVersion:"orbit360-run-discovery-v3",ok:false,status:"TARGET_RUN_NOT_FOUND",classification:"PIPELINE_MECHANISM_FAILURE",requestCommit:$req,requestFile:$file,requestVersion:$ver,gateId:$gate,workflowName:$name,matchCount:0,multipleRuns:false,artifacts:[],artifactCount:0,runtimeReplay:false,productMutation:false,containsPII:false,containsSecrets:false}' > "$EVIDENCE_PATH"
           else
-            printf '%s' "$MATCHES" | jq --arg req "$REQUEST_COMMIT" --arg file "$REQUEST_FILE" --arg name "$TARGET_NAME" '{schemaVersion:"orbit360-f2-runtime-discovery-v2",ok:false,status:"F2_RUNTIME_MULTIPLE_RUNS",classification:"PIPELINE_MECHANISM_FAILURE",requestCommit:$req,requestFile:$file,workflowName:$name,matchCount:length,multipleRuns:true,runs:[.[]|{id,run_attempt,status,conclusion,created_at,updated_at}],runtimeReplay:false,productMutation:false,containsPII:false,containsSecrets:false}' > "$EVIDENCE_PATH"
+            printf '%s' "$MATCHES" | jq --arg req "$REQUEST_COMMIT" --arg file "$REQUEST_FILE" --arg name "$TARGET_NAME" --arg ver "$EXPECTED_VERSION" --arg gate "$EXPECTED_GATE" '{schemaVersion:"orbit360-run-discovery-v3",ok:false,status:"TARGET_MULTIPLE_RUNS",classification:"PIPELINE_MECHANISM_FAILURE",requestCommit:$req,requestFile:$file,requestVersion:$ver,gateId:$gate,workflowName:$name,matchCount:length,multipleRuns:true,runs:[.[]|{id,run_attempt,status,conclusion,created_at,updated_at}],artifacts:[],artifactCount:0,runtimeReplay:false,productMutation:false,containsPII:false,containsSecrets:false}' > "$EVIDENCE_PATH"
           fi
           jq -e '.requestCommit==env.REQUEST_COMMIT and .requestFile==env.REQUEST_FILE and .containsPII==false and .containsSecrets==false and .runtimeReplay==false and .productMutation==false' "$EVIDENCE_PATH" >/dev/null
       - name: Persist sanitized discovery evidence only
         shell: bash
         run: |
           set -euo pipefail
-          git config user.name 'orbit360-f2-discovery-bot'
-          git config user.email 'orbit360-f2-discovery-bot@users.noreply.github.com'
+          git config user.name 'orbit360-run-discovery-bot'
+          git config user.email 'orbit360-run-discovery-bot@users.noreply.github.com'
           git add "$EVIDENCE_PATH"
           git diff --cached --check
-          git commit -m 'diag(f2): persist dynamic runtime run discovery [skip ci]'
+          git commit -m 'diag(f2): persist generic target run discovery [skip ci]'
           REMOTE_HEAD="$(git ls-remote origin "refs/heads/$ORBIT360_BRANCH" | awk '{print $1}')"
           test "$REMOTE_HEAD" = "$GITHUB_SHA"
           git push origin "HEAD:$ORBIT360_BRANCH"
