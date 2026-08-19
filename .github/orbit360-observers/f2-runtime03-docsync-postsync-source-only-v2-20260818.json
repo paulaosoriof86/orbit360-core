@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "orbit360-f2-runtime03-docsync-postsync-source-only-v2-trigger-v1",
+  "runtimeRunId": 32207049146,
+  "legalReadinessRootfixRunId": 32207309204,
+  "priorDocsyncFailedRunId": 32207625109,
+  "candidateArtifactId": 9345207863,
+  "purpose": "serialize_runtime03_docsync_and_reprove_canonical_source_gate_before_persist",
+  "request04Created": false,
+  "runtimeAuthorized": false,
+  "secretAccessAuthorized": false,
+  "browserAuthorized": false,
+  "writesAuthorized": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
