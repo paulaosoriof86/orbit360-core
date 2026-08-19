@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "orbit360-f2-runtime03-docsync-run-discovery-trigger-v1",
+  "docsyncTriggerSha": "6cfd5846c1c15649c6752dfd4ceadc24152b66b2",
+  "runtimeRunId": 32207049146,
+  "purpose": "discover_runtime03_docsync_postsync_source_run_only",
+  "request04Created": false,
+  "runtimeAuthorized": false,
+  "secretAccessAuthorized": false,
+  "browserAuthorized": false,
+  "writesAuthorized": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
