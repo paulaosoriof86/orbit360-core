@@ -28,7 +28,7 @@ const DEFAULT_BLOCK1_V30_REQUEST_REL = '.github/orbit360-requests/block1-client3
 const DEFAULT_BLOCK1_V33_REQUEST_REL = '.github/orbit360-requests/block1-client360-insurers-v33-two-client-cloud-audit-authorization.json';
 const STOP_OVERLAY_REL = 'tools/orbit360-validator-lifecycle-overlay-visual-matrix-v8-stop-preflight-v20260806.json';
 const CANONICAL_LIFECYCLE_COMPOSITION = 'phase-capability-contract-v1';
-const ROUTER_VERSION = 'v10.2-fase-a-release-evidence';
+const ROUTER_VERSION = 'v10.3-f2-productive-acceptance';
 
 const GATE_CONFIG = Object.freeze({
   [BLOCK1_GATE_ID]: {
@@ -86,6 +86,13 @@ const GATE_CONFIG = Object.freeze({
     engine: 'tools/orbit360-validar-gate-contracts-engine-f1-4c-successor-artifact-build-v20260818.mjs',
     defaultRequest: '.github/orbit360-requests/f1-4c-successor-artifact-build-v20260818.json',
     sourcePhase: ''
+  },
+  ['f2-productive-acceptance-exact-successor-v20260818']: {
+    contractVersion: '2.0.0',
+    lifecycle: 'tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-source-v20260818.json',
+    engine: 'tools/orbit360-validar-gate-contracts-engine-f2-productive-acceptance-v20260818.mjs',
+    defaultRequest: '.github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-runbound-20260818-01.json',
+    sourcePhase: 'F2_PRODUCTIVE_ACCEPTANCE_SOURCE_ONLY'
   },
   [VISUAL_LEGACY_GATE_ID]: {
     contractVersion: '2.7.8',
@@ -162,6 +169,8 @@ const PHASE_PROFILES = Object.freeze({
   AUTH_PAULA_MEMBERSHIP_SCOPE_CANONICAL_REPAIR_LAB: {secrets:true,firestoreRead:true,writes:true,runtime:true,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false},
   AUTH_PAULA_REAL_BROWSER_READONLY_SMOKE_LAB: {secrets:true,firestoreRead:true,writes:false,runtime:true,browser:true,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false},
   F1_4C_SUCCESSOR_ARTIFACT_BUILD: {secrets:false,firestoreRead:false,writes:false,runtime:false,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false},
+  F2_PRODUCTIVE_ACCEPTANCE_SOURCE_ONLY: {secrets:false,firestoreRead:false,writes:false,runtime:false,browser:false,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false},
+  F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY: {secrets:true,firestoreRead:true,writes:false,runtime:true,browser:true,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false},
   VISUAL_MATRIX_CORRECTED_POST_AUTH_LAB_EXECUTION: {secrets:true,firestoreRead:true,writes:false,runtime:true,browser:true,deploy:true,functionsDeploy:false,rulesDeploy:false,production:false}
 });
 
