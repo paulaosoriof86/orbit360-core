@@ -1,0 +1,28 @@
+{
+  "schemaVersion": "orbit360-f2-rules01-probe-rootfix-run-observer-v1",
+  "ok": true,
+  "status": "TERMINAL_OBSERVED",
+  "uniquenessCount": 1,
+  "observerRunId": "32212497966",
+  "targetSha": "702c3fd8873d5a5db503a694ad4ac5131b90c803",
+  "targetWorkflowName": "Orbit360 F2 RULES01 Probe Validator Rootfix Source Only 20260818",
+  "run": {
+    "id": 32212371446,
+    "status": "completed",
+    "conclusion": "failure",
+    "run_attempt": 1,
+    "head_sha": "702c3fd8873d5a5db503a694ad4ac5131b90c803",
+    "head_branch": "ays/backend-tenant-lab-v99-20260703",
+    "event": "push",
+    "name": "Orbit360 F2 RULES01 Probe Validator Rootfix Source Only 20260818",
+    "path": ".github/workflows/orbit360-f2-rules01-probe-validator-rootfix-source-only-v20260818.yml",
+    "created_at": "2026-08-19T03:30:14Z",
+    "updated_at": "2026-08-19T03:30:28Z"
+  },
+  "secretAccess": false,
+  "firestoreRead": false,
+  "rulesDeploy": false,
+  "cloudMutation": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
