@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "orbit360-f2-request07-docsync-trigger-v1",
+  "requestedAt": "2026-08-19T23:32:00Z",
+  "request07RunId": 32311320804,
+  "request07Commit": "696b3700687f758fdd9c629a2268caa857aa377a",
+  "candidateArtifactId": 9385306424,
+  "sourcefixEvidenceCommit": "1b9344944f3691ac40eb7face6d33c7034e0dd37",
+  "docsOnly": true,
+  "secrets": false,
+  "browser": false,
+  "runtime": false,
+  "dataAccess": false,
+  "writes": false,
+  "deploy": false,
+  "production": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
