@@ -1,0 +1,33 @@
+{
+  "schemaVersion": "orbit360-f2-pre-request06-source-closure-failure-observability-v1",
+  "ok": false,
+  "status": "F2_PRE_REQUEST06_SOURCE_CLOSURE_FAILED_OBSERVED",
+  "classification": "PIPELINE_MECHANISM_FAILURE",
+  "rootCauseCandidate": "F2_PRE_REQUEST06_WORKFLOW_TRIGGER_AND_PERSISTENCE_COUPLED_TO_EXACT_EVENT_SHA",
+  "runId": "32287384416",
+  "triggerSha": "3873062bebc6e5f5eab53f86b09522983c760c8a",
+  "stepOutcomes": {
+    "boundary": "success",
+    "evidence": "success",
+    "closure": "success",
+    "retire": "success",
+    "persistSuccess": "failure"
+  },
+  "request06Created": false,
+  "browserExecuted": false,
+  "runtimeExecuted": false,
+  "secretAccess": false,
+  "firestoreRead": false,
+  "firestoreDocumentWrites": 0,
+  "authWrites": 0,
+  "membershipWrites": 0,
+  "dataWrites": 0,
+  "rulesDeploy": false,
+  "hostingDeploy": false,
+  "functionsDeploy": false,
+  "packageRebuild": false,
+  "publication": false,
+  "production": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
