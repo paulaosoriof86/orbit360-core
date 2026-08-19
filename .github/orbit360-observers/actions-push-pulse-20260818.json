@@ -2,6 +2,9 @@
   "schemaVersion":"orbit360-actions-push-pulse-trigger-v1",
   "mode":"source-only",
   "singlePulse":true,
+  "purpose":"Verify whether the historically registered push pulse workflow still executes on the mandatory branch before any Request06 authorization",
+  "probeOrdinal":2,
+  "triggeredAt":"2026-08-19T10:46:00-06:00",
   "browser":false,
   "runtime":false,
   "secrets":false,
@@ -9,6 +12,7 @@
   "writes":false,
   "deploy":false,
   "production":false,
+  "request06Created":false,
   "containsPII":false,
   "containsSecrets":false
 }
