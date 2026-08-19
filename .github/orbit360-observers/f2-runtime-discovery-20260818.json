@@ -1,5 +1,6 @@
 {
   "schemaVersion": "orbit360-run-discovery-trigger-v3",
+  "observerRevision": "v4-zero-write-subscopes-rebase-safe",
   "requestCommit": "037de379530917d74266f865912b376231af57b7",
   "requestFile": ".github/orbit360-requests/f2-validator-stale-rebind-apply-runbound-20260819-01.json",
   "targetWorkflowName": "Orbit360 Apply F2 Successor Rebind Validator Stale 20260819",
