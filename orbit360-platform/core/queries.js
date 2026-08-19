@@ -134,16 +134,23 @@ Orbit.q = (function () {
   function cobrosVencidos() {
     return S().where('cobros', c => c.estado === 'Vencido').sort((a, b) => String(a.vence||'').localeCompare(String(b.vence||'')));
   }
-  /** Avance por asesor (prima vigente vs meta). */
+  /** Avance por asesor (prima vigente vs meta).
+   *  `asesores` es una colección productiva opcional: cuando no está hidratada,
+   *  el store puede exponer una proyección canónica sin `metaPrima`. El consumidor
+   *  debe degradar de forma finita y honesta, nunca renderizar NaN/undefined. */
   function leaderboard() {
     const clients = clientIndex();
     const policies = S().all('polizas') || [];
     const commissions = S().all('comisiones') || [];
-    return S().all('asesores').map(a => {
+    return (S().all('asesores') || []).map(a => {
       const pol = policies.filter(p => p.asesorId === a.id && (p.estado === 'Vigente' || p.estado === 'Por renovar') && polPais(p, clients));
       const prima = pol.reduce((s, p) => s + norm(p.prima, p.moneda), 0);
       const com = commissions.filter(c => c.asesorId === a.id).reduce((s, c) => s + norm(c.monto, c.moneda), 0);
-      return { asesor: a, prima, comision: com, pct: Math.min(140, Math.round(prima / a.metaPrima * 100)) };
+      const metaPrima = Number(a && a.metaPrima);
+      const metaDisponible = Number.isFinite(metaPrima) && metaPrima > 0;
+      const rawPct = metaDisponible ? Math.round(prima / metaPrima * 100) : 0;
+      const pct = Number.isFinite(rawPct) ? Math.max(0, Math.min(140, rawPct)) : 0;
+      return { asesor: a, prima, comision: com, pct, metaPrima: metaDisponible ? metaPrima : 0, metaDisponible };
     }).sort((x, y) => y.prima - x.prima);
   }
 
