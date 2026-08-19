@@ -1,0 +1,96 @@
+#!/usr/bin/env node
+'use strict';
+import fs from 'node:fs';
+import path from 'node:path';
+
+const ROOT=process.cwd();
+const LIVE='orbit360-platform/docs/orbit360-live-state-v1.json';
+const INDEX='orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json';
+const CHECKPOINT='orbit360-platform/docs/CHECKPOINT-F2-RUNTIME05-CROSS-TENANT-SECURITY-FAILURE-20260818.md';
+const REQUEST='.github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-runbound-20260818-05.json';
+const ROOTCAUSE='orbit360-platform/runtime-gate-crm-v20260716/f2-runtime05-cross-tenant-security-rootcause-v20260818.json';
+const SOURCE_EVIDENCE='orbit360-platform/runtime-gate-crm-v20260716/f2-runtime05-security-rootcause-source-only-v20260818.json';
+const HISTORY='orbit360-platform/runtime-gate-crm-v20260716/f2-runtime05-rules-history-observer-v20260818.json';
+const GATE='f2-productive-acceptance-exact-successor-v20260818';
+const REQUEST_VERSION='F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_V1';
+const ARTIFACT=9345207863;
+const RUNTIME=32210391764;
+const ROOTSOURCE=32211048260;
+const now=new Date().toISOString();
+const read=r=>JSON.parse(fs.readFileSync(path.join(ROOT,r),'utf8').replace(/^\uFEFF/,''));
+const write=(r,o)=>fs.writeFileSync(path.join(ROOT,r),JSON.stringify(o,null,2)+'\n','utf8');
+const need=(x,c)=>{if(!x)throw new Error(c);};
+for(const r of [LIVE,INDEX,REQUEST,ROOTCAUSE,SOURCE_EVIDENCE,HISTORY])need(fs.existsSync(path.join(ROOT,r)),`DOCSYNC_MISSING:${r}`);
+const live=read(LIVE),index=read(INDEX),request=read(REQUEST),root=read(ROOTCAUSE),source=read(SOURCE_EVIDENCE),history=read(HISTORY);
+need(request.status==='CONSUMED_STOP_RETRY'&&request.allowedExecutions===0&&request.consumed===true&&request.authorizationFrozen===true&&request.replayAllowed===false&&request.execution?.runId===RUNTIME,'REQUEST05_NOT_FROZEN');
+need(request.execution?.canonicalRootClassification==='SECURITY_FAILURE'&&request.execution?.canonicalRootCause==='FIRESTORE_RUNTIME_RULES_OUT_OF_PARITY_WITH_SOURCE_CROSS_TENANT_DENY','REQUEST05_ROOTCAUSE_NOT_CLOSED');
+need(root.classification==='SECURITY_FAILURE'&&root.code==='FIRESTORE_RUNTIME_RULES_OUT_OF_PARITY_WITH_SOURCE_CROSS_TENANT_DENY'&&root.sourceRules?.sourceMutationRequired===false,'ROOTCAUSE_EVIDENCE_INVALID');
+need(source.ok===true&&source.status==='PASS_GATE_CONTRACT_SOURCE_F2_PRODUCTIVE_ACCEPTANCE'&&Number(source.runtime05SecurityRootcauseSourceRunId)===ROOTSOURCE&&source.runtime05Replayed===false&&source.request06Created===false&&source.rulesDeployExecuted===false,'SOURCE_GATE_EVIDENCE_INVALID');
+need(history.ok===true&&history.rulesDeploy===false,'HISTORY_OBSERVER_INVALID');
+
+live.stateVersion='20260818.f2-runtime05-consumed.cross-tenant-security-failure.rules-parity-repair-auth-pending.current';
+live.updatedAt=now;
+live.phase='F2_SECURITY_FAILURE_RULES_PARITY_REPAIR_AUTHORIZATION_PENDING';
+live.rootCauseState={...(live.rootCauseState||{}),f2Runtime05CrossTenantSecurity:{classification:'SECURITY_FAILURE',code:'FIRESTORE_RUNTIME_RULES_OUT_OF_PARITY_WITH_SOURCE_CROSS_TENANT_DENY',status:'OPEN_REPAIR_AUTHORIZATION_PENDING',productSourceRuleIntentIncorrect:false,sourceRulesBlobSha:'35fba451bbbeb97dbae3f08303b786ddbcbdd29f',runtimeCrossTenantDenied:false,historicalRulesOkEvidenceFound:false,historicalIamGrantResult:'permission_denied',runtime05IntegrityBeforeAfterPass:true,productDataAffected:false,preventiveControl:'RULES_SOURCE_TO_DEPLOYED_PARITY_GATE_PLUS_SERVER_FORCED_CROSS_TENANT_DENY_PROOF'},currentBlockingFact:{code:'F2_RUNTIME05_CROSS_TENANT_SECURITY_FAILURE_RULES_PARITY_REPAIR_REQUIRED',status:'SECURITY_REPAIR_AUTHORIZATION_PENDING'}};
+live.documentationControl={...(live.documentationControl||{}),currentCheckpoint:CHECKPOINT,transactionStatus:'F2_RUNTIME05_SECURITY_FAILURE_RULES_PARITY_REPAIR_AUTH_PENDING'};
+if(live.frozenPlan){
+ live.frozenPlan.currentPhase='F2';
+ live.frozenPlan.currentPhaseInternalPercent=0;
+ live.frozenPlan.currentPhaseInternalMethod='runtime05_passed_role_view_contract_then_failed_cross_tenant_security_rule_runtime_parity';
+ live.frozenPlan.currentPhaseSubphases={...(live.frozenPlan.currentPhaseSubphases||{}),F2_runtime_browser_readonly_acceptance:'BLOCKED_SECURITY_RULES_PARITY_REPAIR',F2_runtime05_preflight_artifact_identity_role_contract:'PASS_THROUGH_CROSS_TENANT_STAGE_RUN_32210391764',F2_runtime05_cross_tenant_security:'CONSUMED_SECURITY_FAILURE_RUN_32210391764',F2_runtime05_security_rootcause_source_gate:'CLOSED_SOURCE_ONLY_PASS_RUN_32211048260'};
+}
+live.lanes={...(live.lanes||{}),A_frontend_UX:'FROZEN_NO_CHANGES',B_backend_security_gates:'F2_RUNTIME05_SECURITY_FAILURE_RULES_PARITY_REPAIR_AUTHORIZATION_PENDING',C_real_data_migration:'UNTOUCHED_ZERO_CHANGES'};
+live.writes={...(live.writes||{}),firestore:0,auth:0,operational:0};
+live.authorization={...(live.authorization||{}),browserAuthorizedNow:false,runtimeAuthorizedNow:false,publicationAuthorizedNow:false,deployAuthorizedNow:false,authChangesAuthorized:false,membershipChangesAuthorized:false,dataChangesAuthorized:false,mainMergeAuthorized:false,f2AuthorizationStatus:'RUNTIME05_CONSUMED_SECURITY_FAILURE_RULES_PARITY_REPAIR_AUTH_REQUIRED',rulesDeployAuthorizedNow:false,securityRepairAuthorizedNow:false};
+live.goLive={...(live.goLive||{}),status:'F2_SECURITY_FAILURE_RULES_PARITY_REPAIR_AUTHORIZATION_PENDING',successorPublished:false,productionOperationalDeclared:false,sensitiveWritesRemainRestricted:true};
+live.stopRetry={...(live.stopRetry||{}),f2Runtime05MayBeRerun:false,f2Runtime05RequestReplayAllowed:false,request06MayBeCreatedWithoutFreshAuthorization:false};
+live.nextActionExact={stage:'F2_FIRESTORE_RULES_PARITY_REPAIR_AUTHORIZATION_BOUNDARY',gateId:GATE,requestVersion:REQUEST_VERSION,runtimeRequestOrdinalAfterRepair:6,candidateArtifactId:ARTIFACT,securityRepairRequired:true,securityRepairAuthorizationRequired:true,securityRepairAuthorizationGranted:false,rulesSourceBlobSha:'35fba451bbbeb97dbae3f08303b786ddbcbdd29f',rulesSourceMutationRequired:false,rulesDeployAuthorized:false,rulesDeployExecuted:false,runtime05Replayed:false,request06Created:false,requiredRepair:'DEPLOY_EXACT_VERSIONED_FIRESTORE_RULES_TO_AYS_ORBIT_360_LAB_THEN_SERVER_FORCED_CROSS_TENANT_DENY_PROOF',allowsAfterFreshRepairAuthorization:['canonical_gate_before_secrets','read_deployed_rules_metadata_if_available','deploy_exact_firestore_rules_only_to_ays_orbit_360_lab','server_forced_cross_tenant_readonly_denial_probe','integrity_before_after'],forbids:['firestore_document_writes','auth_writes','membership_writes','data_writes','password_reset','hosting_deploy','functions_deploy','package_rebuild','publication','production_mutation','main_merge','request05_replay','request06_creation_before_repair_pass']};
+live.resumeProtocol=['Read ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json','Read orbit360-live-state-v1.json','Confirm actual HEAD and PR #5','Read Runtime05 security root-cause, rules history observer and source-only root-cause evidence','Do not rerun Request01-Request05','Do not modify firestore.rules source: source already denies cross-tenant','Treat Runtime05 as SECURITY_FAILURE, not validator stale','Do not create Request06 before rules parity repair passes','Require fresh explicit authorization before any Firestore rules deployment','After authorized rules-only deploy, prove cross-tenant denial with a server-forced read and zero data writes'];
+live.f2Runtime05={status:'CONSUMED_STOP_SECURITY_FAILURE',requestPath:REQUEST,requestCommit:'dea238868ac2319f8f70b9e8596264234ca73a1a',runId:RUNTIME,runAttempt:1,terminalArtifactId:9350568542,candidateArtifactId:ARTIFACT,canonicalGateGo:true,candidateArtifactVerified:true,identityReadOnlyPass:true,roleViewContractPassed:true,crossTenantCheckReached:true,crossTenantDenied:false,browserAcceptanceCompleted:false,roleMatrixCompleted:false,serviceWorkerCheckReached:false,observedClassification:'SECURITY_FAILURE',canonicalClassification:'SECURITY_FAILURE',rootCauseCode:'FIRESTORE_RUNTIME_RULES_OUT_OF_PARITY_WITH_SOURCE_CROSS_TENANT_DENY',integrityAfterPass:true,integrityBeforeAfterPass:true,countsIdentical:true,digestsIdentical:true,firestoreWrites:0,authWrites:0,membershipWrites:0,dataWrites:0,operationalWrites:0,packageRebuilt:false,deployExecuted:false,publicationExecuted:false,productionTouched:false,requestConsumed:true,allowedExecutions:0,replayAllowed:false,sourceRules:{blobSha:'35fba451bbbeb97dbae3f08303b786ddbcbdd29f',crossTenantDenyExpected:true,mutationRequired:false},historicalDeployment:{rulesOkEvidenceFound:false,iamGrantResult:'permission_denied'},rootCauseEvidence:ROOTCAUSE,sourceOnlyRootCause:{status:'CLOSED_SOURCE_ONLY_PASS',runId:ROOTSOURCE,evidence:SOURCE_EVIDENCE}};
+
+const op=index.operationalCurrent||(index.operationalCurrent={});
+index.updatedAt=now;
+op.resumePointer=CHECKPOINT;
+op.latestRuntimeEvidence=ROOTCAUSE;
+op.latestTerminalEvidence=ROOTCAUSE;
+op.latestPreflightEvidence=SOURCE_EVIDENCE;
+op.latestRequestConsumptionEvidence=ROOTCAUSE;
+op.currentCheckpoint=CHECKPOINT;
+op.currentPhase='F2_SECURITY_FAILURE_RULES_PARITY_REPAIR_AUTHORIZATION_PENDING';
+op.currentPhaseInternalPercent=0;
+op.currentPhaseInternalMethod='runtime05_cross_tenant_security_failure_rules_parity_repair_required';
+op.goLiveRoutePercentClosed=50;
+op.integratedProgramPercentClosed=25;
+op.currentBlocker='Runtime05 authenticated cross-tenant read was not denied although source rules deny it; source-to-deployed Firestore rules parity repair requires fresh authorization';
+op.f2RuntimeRequestCreated=false;
+op.f2RuntimeAuthorizationGranted=false;
+op.nextAuthorizationBoundary=`F2_FIRESTORE_RULES_PARITY_REPAIR / BEFORE ${REQUEST_VERSION} REQUEST06 / EXACT_ARTIFACT_${ARTIFACT} / AUTHORIZATION_NOT_GRANTED`;
+op.f2Runtime05RunId=String(RUNTIME);
+op.f2Runtime05RequestCommit='dea238868ac2319f8f70b9e8596264234ca73a1a';
+op.f2Runtime05Status='CONSUMED_STOP_SECURITY_FAILURE_CROSS_TENANT';
+op.f2Runtime05RequestConsumed=true;
+op.f2Runtime05ReplayAllowed=false;
+op.f2Runtime05TerminalArtifactId='9350568542';
+op.f2Runtime05CanonicalGateGo=true;
+op.f2Runtime05ArtifactVerified=true;
+op.f2Runtime05IdentityReadOnlyPass=true;
+op.f2Runtime05RoleViewContractPass=true;
+op.f2Runtime05CrossTenantDenied=false;
+op.f2Runtime05IntegrityBeforeAfterPass=true;
+op.f2Runtime05RoleMatrixCompleted=false;
+op.f2Runtime05ServiceWorkerCheckReached=false;
+op.f2Runtime05SecurityRootCause='FIRESTORE_RUNTIME_RULES_OUT_OF_PARITY_WITH_SOURCE_CROSS_TENANT_DENY';
+op.f2Runtime05SecurityRootcauseSourceGateStatus='CLOSED_PASS';
+op.f2Runtime05SecurityRootcauseSourceGateRunId=String(ROOTSOURCE);
+op.firestoreRulesSourceBlobSha='35fba451bbbeb97dbae3f08303b786ddbcbdd29f';
+op.firestoreRulesSourceMutationRequired=false;
+op.firestoreRulesDeployAuthorized=false;
+op.firestoreRulesDeployExecuted=false;
+op.request06Created=false;
+index.requiredResumeProtocol=['Read this index','Read orbit360-live-state-v1.json','Confirm actual HEAD and PR #5','Read Runtime05 security root-cause + source-only root-cause evidence','Do not rerun Request01 through Request05','F2 source-only artifact contract remains closed PASS','Do not edit source firestore.rules to fix this: source rule already denies cross-tenant','Treat current block as SECURITY_FAILURE requiring deployed rules parity repair','Do not create Request06 before repair PASS','Require fresh explicit authorization before rules deploy','After repair, require server-forced cross-tenant denial proof and integrity before/after'];
+const f2=(index.frozenPlanPhases||[]).find(x=>x.id==='F2');if(f2){f2.status='IN_PROGRESS_RUNTIME05_SECURITY_FAILURE_RULES_PARITY_REPAIR_AUTH_PENDING';f2.internalPercent=0;f2.internalMethod='runtime05_cross_tenant_security_failure_before_role_matrix_completion';}
+
+const checkpoint=`# CHECKPOINT — F2 RUNTIME05 · CROSS-TENANT SECURITY FAILURE\n\nFecha: 2026-08-18\nRama: \`ays/backend-tenant-lab-v99-20260703\`\nPR: #5 draft/open\nGate: \`${GATE}\`\nArtifact bloqueado: \`${ARTIFACT}\`\n\n## Runtime05 — único intento consumido\n\nRequest05 commit \`dea238868ac2319f8f70b9e8596264234ca73a1a\`, run \`${RUNTIME}\`, attempt 1, artifact terminal \`9350568542\`. Request05 está consumido, allowedExecutions 0, authorizationFrozen true y replay false.\n\nRuntime05 pasó gate canónico, artifact exacto, provider, identidad read-only, integridad before, legal readiness y contrato de vistas de rol. Llegó por primera vez al control cross-tenant y falló con \`SECURITY_FAILURE:F2_CROSS_TENANT_READ_NOT_DENIED\`. La matriz completa y service-worker/cache no se ejecutaron después de ese STOP.\n\n## Causa raíz canónica\n\n\`SECURITY_FAILURE / FIRESTORE_RUNTIME_RULES_OUT_OF_PARITY_WITH_SOURCE_CROSS_TENANT_DENY\`. El cliente autenticado logró resolver la lectura del tenant de prueba prohibido. El \`firestore.rules\` del source del artifact y del HEAD actual tiene el mismo blob \`35fba451bbbeb97dbae3f08303b786ddbcbdd29f\`, limita tenant a \`alianzas-soluciones\` y termina en deny-all; por tanto ese source no requiere corrección.\n\nLa evidencia histórica de Actions muestra que el run \`29387539446\` falló antes de desplegar reglas; el run \`29388318001\` obtuvo \`IAM grant result: permission_denied\` y fue cancelado antes de \`Deploy Firestore rules\`; el run \`29388492688\` también fue cancelado antes del despliegue. No existe evidencia recuperada de \`RULES_OK\` en esos intentos.\n\n## Integridad\n\nBefore/after: countsIdentical=true, digestsIdentical=true. Firestore/Auth/operational writes: 0. Rebuild/deploy/publicación/producción durante Runtime05: 0/no.\n\n## Control source-only\n\nRun \`${ROOTSOURCE}\`: \`F2_RUNTIME05_SECURITY_ROOTCAUSE_SOURCE_ONLY_PASS\`. Confirmó Request05 congelado, source rules restrictivo e invariantes F2. No usó secretos, Firestore, navegador ni deploy y no creó Request06.\n\n## Estado\n\nF2 continúa abierto. Ruta inmediata a producción: 50%. Programa integral: 25%. Carril A congelado; Carril B bloqueado por reparación de seguridad/paridad de reglas; Carril C sin cambios.\n\n## Siguiente frontera exacta\n\n\`F2_FIRESTORE_RULES_PARITY_REPAIR_AUTHORIZATION_BOUNDARY\`. Antes de Request06 debe desplegarse exclusivamente el \`firestore.rules\` versionado al proyecto LAB autorizado y luego probarse el deny cross-tenant con lectura forzada a servidor e integridad before/after. Ese deploy requiere autorización explícita nueva; no está autorizado por Request05.\n\nSiguen prohibidos writes de documentos Firestore, Auth/membership/data writes, password reset, Hosting/Functions deploy, rebuild, publicación, producción, main y merge.\n\n## Reuso / Academia\n\n\`BACKEND_PROTEGIDO_NO_CLAUDE\`: reglas Firestore y su gate de paridad. \`REPLICABLE_CLAUDE_ACUMULADO\`: patrón genérico de source-to-deployed policy parity y negative authorization probe. \`ACADEMIA_ACTUALIZAR\`: una regla correcta en repositorio no garantiza seguridad runtime si no existe evidencia de despliegue/paridad; un gate debe verificar política desplegada y no solo source.\n`;
+fs.writeFileSync(path.join(ROOT,CHECKPOINT),checkpoint,'utf8');
+write(LIVE,live);write(INDEX,index);
+console.log(JSON.stringify({ok:true,status:'F2_RUNTIME05_SECURITY_DOCSYNC_PREPARED',runtime05Replayed:false,request06Created:false,rulesDeployExecuted:false,goLiveRoutePercent:50,integratedProgramPercent:25},null,2));
