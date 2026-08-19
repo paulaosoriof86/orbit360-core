@@ -1,0 +1,37 @@
+{
+  "schemaVersion": "orbit360-run-discovery-v3",
+  "ok": true,
+  "status": "TARGET_RUN_TERMINAL_PASS",
+  "classification": "OBSERVATION_PASS",
+  "requestCommit": "965d16e46bbe2a3dfd6bae0c7507557ef5bc0676",
+  "requestFile": ".github/orbit360-requests/f2-gate-contract-source-preflight-runbound-20260819-01.json",
+  "requestVersion": "F2_GATE_CONTRACT_SOURCE_PREFLIGHT_V1",
+  "gateId": "f2-productive-acceptance-exact-successor-v20260818",
+  "targetRunId": 32309043863,
+  "targetRunStatus": "completed",
+  "targetRunConclusion": "success",
+  "runAttempt": 1,
+  "event": "push",
+  "headSha": "965d16e46bbe2a3dfd6bae0c7507557ef5bc0676",
+  "workflowName": "Orbit360 F2 Gate Contract Source Preflight 20260819",
+  "createdAt": "2026-08-19T22:29:26Z",
+  "runStartedAt": "2026-08-19T22:29:26Z",
+  "updatedAt": "2026-08-19T22:29:36Z",
+  "htmlUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/32309043863",
+  "artifacts": [
+    {
+      "id": 9385752889,
+      "name": "orbit360-f2-gate-contract-source-preflight-before-rebind-32309043863",
+      "size_in_bytes": 1864,
+      "digest": "sha256:a08b642742e7704102a14c7100a5c02dba64b4edc0b1eb08410e2aff452db4ba",
+      "expired": false
+    }
+  ],
+  "artifactCount": 1,
+  "matchCount": 1,
+  "multipleRuns": false,
+  "runtimeReplay": false,
+  "productMutation": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
