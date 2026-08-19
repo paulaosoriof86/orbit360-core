@@ -1,7 +1,7 @@
 {
   "schemaVersion": "orbit360-live-state-v1",
-  "stateVersion": "20260818.f2-runtime01-validator-stale-rootfix-pass.fresh-authorization-pending.current",
-  "updatedAt": "2026-08-19T01:45:57.752Z",
+  "stateVersion": "20260818.f2-runtime02-consumed.stable-boundary-rootfix-pass.current",
+  "updatedAt": "2026-08-19T01:57:57.886Z",
   "phase": "F2_SOURCE_ONLY_PASS_RUNTIME_AUTHORIZATION_PENDING",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -160,7 +160,7 @@
     "contractVersion": "2.0.0",
     "validatorLifecycleRevision": "phase-capability-contract-v1",
     "f2ValidatorRevision": "f2-productive-acceptance-exact-successor-v1-20260818",
-    "canonicalRouterVersion": "v10.4-f2-current-boundary-rootfix",
+    "canonicalRouterVersion": "v10.5-f2-stable-boundary-contract",
     "candidateArtifactId": 9345207863,
     "candidateSourceHead": "29caae94a3db1f1626bdde2ea6ee9a21799f9df6",
     "candidateZipSha256": "493009c83390901aa772842a2ba9ddd5ce5293f6969d86c5c3395ebd670a44ac",
@@ -196,8 +196,11 @@
       "closure": "orbit360-platform/runtime-gate-crm-v20260716/f2-source-only-closure-v20260818.json",
       "checkpoint": "orbit360-platform/docs/CHECKPOINT-F2-SOURCE-ONLY-PASS-RUNTIME-AUTHORIZATION-PENDING-20260818.md"
     },
-    "validatorRootfix": "F2_LIVE_STATE_BOUNDARY_CURRENT_SOURCE_PASS",
-    "validatorRootfixSourceRunId": 32205903393
+    "validatorRootfix": "F2_STABLE_BOUNDARY_CONTRACT_V2",
+    "validatorRootfixSourceRunId": 32206698751,
+    "stableBoundaryContract": true,
+    "narrativeStatusesAuthoritative": false,
+    "narrativeAttemptStatusMutationPass": true
   },
   "rootCauseState": {
     "membershipValidator": {
@@ -228,8 +231,8 @@
       "productAffected": false
     },
     "currentBlockingFact": {
-      "code": "F2_RUNTIME01_CONSUMED_ROOTFIX_PASS_FRESH_AUTHORIZATION_REQUIRED",
-      "status": "F2_RUNTIME_BROWSER_READONLY_REQUEST02_NOT_AUTHORIZED"
+      "code": "F2_RUNTIME02_CONSUMED_ROOT_CAUSE_CLOSED_POSTSYNC_PASS_FRESH_AUTHORIZATION_REQUIRED",
+      "status": "F2_RUNTIME_BROWSER_READONLY_REQUEST03_NOT_AUTHORIZED"
     },
     "authIsCurrentBlocker": false,
     "passwordIsCurrentBlocker": false,
@@ -242,14 +245,22 @@
       "code": "F2_LIVE_STATE_BOUNDARY_VALIDATOR_STALE",
       "status": "CLOSED_SOURCE_ONLY_ROOTFIX_PASS_RUN_32205903393",
       "productAffected": false
+    },
+    "f2Runtime02ValidatorStale": {
+      "classification": "VALIDATOR_STALE",
+      "code": "F2_LIVE_STATE_BOUNDARY_STALE_REPEAT_SAME_GATE",
+      "status": "CLOSED_BY_STABLE_BOUNDARY_CONTRACT_ROOTFIX_SOURCE_ONLY_RUN_32206698751",
+      "productAffected": false,
+      "rootCause": "STRUCTURAL_GATE_BOUNDARY_DEPENDED_ON_MUTABLE_NARRATIVE_AUTHORIZATION_STATUS",
+      "preventiveControl": "POST_DOCSYNC_CANONICAL_SOURCE_ONLY_GATE_REQUIRED"
     }
   },
   "documentationControl": {
     "index": "orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json",
     "currentAddendum": "orbit360-platform/docs/ADDENDUM-MAESTRO-CIERRE-FORENSE-SINCRONIZACION-Y-PLAN-CONGELADO-20260818.md",
-    "currentCheckpoint": "orbit360-platform/docs/CHECKPOINT-F2-RUNTIME01-VALIDATOR-STALE-ROOTFIX-PASS-20260818.md",
+    "currentCheckpoint": "orbit360-platform/docs/CHECKPOINT-F2-RUNTIME02-STABLE-BOUNDARY-ROOTFIX-PASS-20260818.md",
     "historicalPolicy": "HISTORICAL_NOT_CURRENT_STATE",
-    "transactionStatus": "F2_RUNTIME01_CONSUMED_VALIDATOR_STALE_ROOTFIX_PASS_FRESH_AUTHORIZATION_PENDING"
+    "transactionStatus": "F2_RUNTIME02_CONSUMED_STABLE_BOUNDARY_ROOTFIX_POSTSYNC_SOURCE_PASS_FRESH_AUTH_PENDING"
   },
   "frozenPlan": {
     "currentPhase": "F2",
@@ -280,7 +291,7 @@
       ]
     },
     "currentPhaseInternalPercent": 0,
-    "currentPhaseInternalMethod": "F2_source_only_ready_runtime01_consumed_validator_stale_rootfix_pass_runtime_acceptance_not_executed",
+    "currentPhaseInternalMethod": "F2_runtime01_and_runtime02_consumed_at_same_gate_root_cause_stable_boundary_contract_fixed_runtime_acceptance_not_executed",
     "currentPhaseSubphases": {
       "F1_1_owner_and_observer_source": "CLOSED",
       "F1_2A_observer_selftest": "CLOSED",
@@ -293,12 +304,14 @@
       "F2_source_only_contract_artifact_topology": "CLOSED_PASS",
       "F2_runtime_browser_readonly_acceptance": "PENDING_FRESH_EXPLICIT_AUTHORIZATION_REQUEST02",
       "F2_runtime01_preflight": "CONSUMED_STOP_VALIDATOR_STALE_RUN_32205144735",
-      "F2_runtime01_validator_rootfix": "CLOSED_SOURCE_ONLY_PASS_RUN_32205903393"
+      "F2_runtime01_validator_rootfix": "CLOSED_SOURCE_ONLY_PASS_RUN_32205903393",
+      "F2_runtime02_preflight": "CONSUMED_STOP_VALIDATOR_STALE_RUN_32206449703",
+      "F2_stable_boundary_contract_rootfix": "CLOSED_SOURCE_ONLY_PASS_RUN_32206698751"
     }
   },
   "lanes": {
     "A_frontend_UX": "FROZEN_NO_CHANGES",
-    "B_backend_security_gates": "F2_RUNTIME01_VALIDATOR_STALE_ROOTFIX_PASS_FRESH_AUTHORIZATION_PENDING",
+    "B_backend_security_gates": "F2_RUNTIME02_STABLE_BOUNDARY_ROOTFIX_POSTSYNC_SOURCE_PASS_FRESH_AUTHORIZATION_PENDING",
     "C_real_data_migration": "UNTOUCHED_ZERO_CHANGES"
   },
   "writes": {
@@ -319,10 +332,10 @@
     "membershipChangesAuthorized": false,
     "dataChangesAuthorized": false,
     "mainMergeAuthorized": false,
-    "f2AuthorizationStatus": "RUNTIME01_CONSUMED_STOP_VALIDATOR_STALE_FRESH_AUTH_REQUIRED"
+    "f2AuthorizationStatus": "RUNTIME02_CONSUMED_STABLE_BOUNDARY_ROOTFIX_PASS_FRESH_AUTH_REQUIRED"
   },
   "goLive": {
-    "status": "F2_RUNTIME01_VALIDATOR_STALE_ROOTFIX_PASS_FRESH_AUTHORIZATION_PENDING",
+    "status": "F2_RUNTIME02_STABLE_BOUNDARY_ROOTFIX_POSTSYNC_SOURCE_PASS_FRESH_AUTHORIZATION_PENDING",
     "publicUrl": "https://app.aysseguros.com",
     "publishedPackagePreserved": true,
     "successorPublished": false,
@@ -341,15 +354,19 @@
     "f2SourceWorkflowRetryAllowed": false,
     "f2Runtime01MayBeRerun": false,
     "f2Runtime01RequestReplayAllowed": false,
-    "f2ValidatorRootfixSourceMayBeRerun": false
+    "f2ValidatorRootfixSourceMayBeRerun": false,
+    "f2Runtime02MayBeRerun": false,
+    "f2Runtime02RequestReplayAllowed": false,
+    "f2StableBoundaryRootfixSourceMayBeRerun": false
   },
   "nextActionExact": {
-    "stage": "F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_REQUEST02_AUTHORIZATION_BOUNDARY",
+    "stage": "F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_REQUEST03_AUTHORIZATION_BOUNDARY",
     "gateId": "f2-productive-acceptance-exact-successor-v20260818",
     "requestVersion": "F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_V1",
-    "requestOrdinal": 2,
+    "requestOrdinal": 3,
     "candidateArtifactId": 9345207863,
-    "validatorRootfixSourcePass": true,
+    "stableBoundaryRootfixSourcePass": true,
+    "postSyncSourceGatePass": true,
     "authorizationRequired": true,
     "authorizationGranted": false,
     "requestCreated": false,
@@ -379,13 +396,14 @@
     "Read ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json",
     "Read this live-state",
     "Confirm actual HEAD and PR #5",
-    "Read F2 runtime01 validator-stale STOP evidence and rootfix source-only PASS",
-    "Do not rerun request01 or run 32205144735",
+    "Read F2 runtime01/runtime02 STOP evidence and stable-boundary rootfix source-only evidence",
+    "Do not rerun request01/run 32205144735 or request02/run 32206449703",
     "Do not repeat F1.4, F1.4B, F1.4C or F1.4D",
     "Do not rederive F2 source contract",
-    "Do not classify runtime01 STOP as product defect",
-    "Do not create request02 without fresh explicit authorization",
-    "Bind request02 only to exact artifact 9345207863"
+    "Treat narrative authorization/go-live attempt statuses as non-authoritative for F2 structural boundary",
+    "Require canonical source-only PASS after any F2 documentation sync before a fresh runtime authorization",
+    "Do not create request03 without fresh explicit authorization",
+    "Bind request03 only to exact artifact 9345207863"
   ],
   "f2Runtime01": {
     "status": "CONSUMED_STOP_VALIDATOR_STALE",
@@ -427,5 +445,46 @@
       "evidence": "orbit360-platform/runtime-gate-crm-v20260716/f2-validator-stale-rootfix-source-only-v20260818.json"
     },
     "evidence": "orbit360-platform/runtime-gate-crm-v20260716/f2-runtime01-validator-stale-stop-v20260818.json"
+  },
+  "f2Runtime02": {
+    "status": "CONSUMED_STOP_VALIDATOR_STALE",
+    "requestPath": ".github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-runbound-20260818-02.json",
+    "requestCommit": "ee9cd05a73bb6abf10d8b09fe738bf8db7bff52d",
+    "runId": 32206449703,
+    "runAttempt": 1,
+    "conclusion": "failure",
+    "gateReached": true,
+    "gateGo": false,
+    "stopStage": "Mandatory canonical F2 gate before artifact or provider/browser",
+    "stopClassification": "VALIDATOR_STALE",
+    "stopCode": "F2_LIVE_STATE_BOUNDARY_STALE",
+    "candidateArtifactId": 9345207863,
+    "candidateArtifactDownloaded": false,
+    "secretAccess": false,
+    "firestoreRead": false,
+    "identityResolved": false,
+    "customTokenMinted": false,
+    "browserExecuted": false,
+    "runtimeExecuted": false,
+    "integritySnapshotExecuted": false,
+    "firestoreWrites": 0,
+    "authWrites": 0,
+    "membershipWrites": 0,
+    "dataWrites": 0,
+    "operationalWrites": 0,
+    "packageRebuilt": false,
+    "deployExecuted": false,
+    "publicationExecuted": false,
+    "productionTouched": false,
+    "requestConsumed": true,
+    "allowedExecutions": 0,
+    "replayAllowed": false,
+    "terminalArtifactId": 9349283699,
+    "stableBoundaryRootfix": {
+      "status": "CLOSED_SOURCE_ONLY_PASS",
+      "runId": 32206698751,
+      "evidence": "orbit360-platform/runtime-gate-crm-v20260716/f2-stable-boundary-contract-rootfix-source-only-v20260818.json"
+    },
+    "evidence": "orbit360-platform/runtime-gate-crm-v20260716/f2-runtime02-validator-stale-stop-v20260818.json"
   }
 }
