@@ -1,8 +1,8 @@
 {
   "schemaVersion": "orbit360-live-state-v1",
-  "stateVersion": "20260818.f1-closed-pass.f2-acceptance-gate-pending.current",
-  "updatedAt": "2026-08-18T17:06:00-06:00",
-  "phase": "F1_CLOSED_PASS_F2_PRODUCTIVE_ACCEPTANCE_GATE_PENDING",
+  "stateVersion": "20260818.f2-source-only-pass.runtime-authorization-pending.current",
+  "updatedAt": "2026-08-19T00:42:00Z",
+  "phase": "F2_SOURCE_ONLY_PASS_RUNTIME_AUTHORIZATION_PENDING",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pr": 5,
@@ -154,6 +154,41 @@
       "checkpoint": "orbit360-platform/docs/CHECKPOINT-F1-4D-RUNTIME-BROWSER-READONLY-PASS-F1-CLOSED-20260818.md"
     }
   },
+  "f2SourceOnly": {
+    "status": "CLOSED_PASS",
+    "gateId": "f2-productive-acceptance-exact-successor-v20260818",
+    "contractVersion": "2.0.0",
+    "validatorLifecycleRevision": "phase-capability-contract-v1",
+    "f2ValidatorRevision": "f2-productive-acceptance-exact-successor-v1-20260818",
+    "canonicalRouterVersion": "v10.3-f2-productive-acceptance",
+    "candidateArtifactId": 9345207863,
+    "candidateSourceHead": "29caae94a3db1f1626bdde2ea6ee9a21799f9df6",
+    "candidateZipSha256": "493009c83390901aa772842a2ba9ddd5ce5293f6969d86c5c3395ebd670a44ac",
+    "candidateManifestSha256": "29dafe5e63b425ea6cf641937fe1b9d4b9e63f72479a51ae76f9148a55771761",
+    "candidateFileCount": 194,
+    "fullRehashPass": true,
+    "routes": ["inicio", "cliente360", "aseguradoras", "ops", "leads", "polizas", "cobros"],
+    "integratedSurfaces": {
+      "vehiculos": "cliente360_policy_deeplink_fullpage",
+      "recibosCartera": "policy_client360_plus_cobros_global"
+    },
+    "runtimeWorkflowPrepared": true,
+    "requestCreated": false,
+    "runtimeAuthorized": false,
+    "browserAuthorized": false,
+    "firestoreWrites": 0,
+    "authWrites": 0,
+    "operationalWrites": 0,
+    "deployExecuted": false,
+    "publicationExecuted": false,
+    "productionTouched": false,
+    "evidence": {
+      "sourceGate": "orbit360-platform/runtime-gate-crm-v20260716/f2-source-gate-preflight-v20260818.json",
+      "candidateValidation": "orbit360-platform/runtime-gate-crm-v20260716/f2-exact-candidate-source-validation-v20260818.json",
+      "closure": "orbit360-platform/runtime-gate-crm-v20260716/f2-source-only-closure-v20260818.json",
+      "checkpoint": "orbit360-platform/docs/CHECKPOINT-F2-SOURCE-ONLY-PASS-RUNTIME-AUTHORIZATION-PENDING-20260818.md"
+    }
+  },
   "rootCauseState": {
     "membershipValidator": {
       "classification": "VALIDATOR_STALE",
@@ -170,9 +205,19 @@
       "code": "F1_3_EVIDENCE_SCHEMA_PATH_MISMATCH",
       "status": "CLOSED_SOURCE_ONLY_ROOTFIX_PASS"
     },
+    "f2LifecycleComposition": {
+      "classification": "VALIDATOR_STALE",
+      "code": "F2_LIFECYCLE_REVISION_INCOMPATIBLE_WITH_CANONICAL_ROUTER",
+      "status": "CLOSED_SOURCE_ONLY"
+    },
+    "f2SourceWorkflowDispatch": {
+      "classification": "PIPELINE_MECHANISM_FAILURE",
+      "code": "CONNECTOR_CONTENTS_PUSH_NO_OBSERVABLE_ACTIONS_DISPATCH",
+      "status": "CLOSED_BY_DIRECT_SOURCE_REPLAY_NO_RETRY"
+    },
     "currentBlockingFact": {
-      "code": "F1_NO_LONGER_BLOCKED",
-      "status": "F1_CLOSED_PASS_PROCEED_TO_F2_ACCEPTANCE_GATE_DEFINITION"
+      "code": "F2_SOURCE_ONLY_CLOSED_RUNTIME_AUTHORIZATION_REQUIRED",
+      "status": "F2_RUNTIME_BROWSER_READONLY_NOT_AUTHORIZED"
     },
     "authIsCurrentBlocker": false,
     "passwordIsCurrentBlocker": false,
@@ -184,9 +229,9 @@
   "documentationControl": {
     "index": "orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json",
     "currentAddendum": "orbit360-platform/docs/ADDENDUM-MAESTRO-CIERRE-FORENSE-SINCRONIZACION-Y-PLAN-CONGELADO-20260818.md",
-    "currentCheckpoint": "orbit360-platform/docs/CHECKPOINT-F1-4D-RUNTIME-BROWSER-READONLY-PASS-F1-CLOSED-20260818.md",
+    "currentCheckpoint": "orbit360-platform/docs/CHECKPOINT-F2-SOURCE-ONLY-PASS-RUNTIME-AUTHORIZATION-PENDING-20260818.md",
     "historicalPolicy": "HISTORICAL_NOT_CURRENT_STATE",
-    "transactionStatus": "CLOSED_AFTER_F1_4D_RUNTIME_BROWSER_READONLY_PASS_F1_CLOSED"
+    "transactionStatus": "F2_SOURCE_ONLY_CLOSED_PASS_RUNTIME_AUTHORIZATION_PENDING"
   },
   "frozenPlan": {
     "currentPhase": "F2",
@@ -201,7 +246,7 @@
       "remainingPhases": ["F2", "F3", "F4", "F5", "F6", "F7"]
     },
     "currentPhaseInternalPercent": 0,
-    "currentPhaseInternalMethod": "F1_5_of_5_named_subphases_closed_F2_not_started",
+    "currentPhaseInternalMethod": "F2_source_only_preparation_closed_runtime_acceptance_not_executed",
     "currentPhaseSubphases": {
       "F1_1_owner_and_observer_source": "CLOSED",
       "F1_2A_observer_selftest": "CLOSED",
@@ -210,12 +255,14 @@
       "F1_4_valid_runtime_rootfix_confirmation": "CLOSED_PASS_CONSUMED_RUN_32195516901",
       "F1_4B_pipeline_parity_remediation": "CLOSED_SOURCE_ONLY_PASS",
       "F1_4C_successor_artifact_build": "CLOSED_PASS_CONSUMED",
-      "F1_4D_exact_successor_runtime_confirmation": "CLOSED_PASS_CONSUMED"
+      "F1_4D_exact_successor_runtime_confirmation": "CLOSED_PASS_CONSUMED",
+      "F2_source_only_contract_artifact_topology": "CLOSED_PASS",
+      "F2_runtime_browser_readonly_acceptance": "PENDING_EXPLICIT_AUTHORIZATION"
     }
   },
   "lanes": {
     "A_frontend_UX": "FROZEN_NO_CHANGES",
-    "B_backend_security_gates": "F1_CLOSED_PASS_F2_ACCEPTANCE_GATE_PENDING",
+    "B_backend_security_gates": "F2_SOURCE_ONLY_PASS_RUNTIME_AUTHORIZATION_PENDING",
     "C_real_data_migration": "UNTOUCHED_ZERO_CHANGES"
   },
   "writes": {
@@ -236,10 +283,10 @@
     "membershipChangesAuthorized": false,
     "dataChangesAuthorized": false,
     "mainMergeAuthorized": false,
-    "f2AuthorizationStatus": "NOT_DERIVED_NOT_GRANTED"
+    "f2AuthorizationStatus": "SOURCE_ONLY_PASS_RUNTIME_NOT_GRANTED"
   },
   "goLive": {
-    "status": "F1_CLOSED_PASS_F2_ACCEPTANCE_GATE_PENDING",
+    "status": "F2_SOURCE_ONLY_PASS_RUNTIME_AUTHORIZATION_PENDING",
     "publicUrl": "https://app.aysseguros.com",
     "publishedPackagePreserved": true,
     "successorPublished": false,
@@ -254,21 +301,50 @@
     "f1_4DRuntimeMayBeRerun": false,
     "successorRebuildAllowed": false,
     "candidateArtifactLockedForF2": true,
-    "sameFailureFamilyReappearedInF1_4D": false
+    "sameFailureFamilyReappearedInF1_4D": false,
+    "f2SourceWorkflowRetryAllowed": false
   },
   "nextActionExact": {
-    "stage": "F2_PRODUCTIVE_ACCEPTANCE_GATE_EXACT_SUCCESSOR",
-    "authorizationRequired": "DERIVE_FROM_FROZEN_PLAN_AND_CURRENT_LIVE_STATE_BEFORE_EXECUTION",
-    "action": "Read the frozen plan and current binding sources to derive the exact F2 acceptance gate, its Definition of Done and authorization boundary. Bind F2 to the exact certified successor artifact 9345207863 unless a later explicitly certified successor supersedes it. Do not rebuild, deploy, publish, mutate production, Auth, membership or data by inference. Do not repeat F1.4D."
+    "stage": "F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_AUTHORIZATION_BOUNDARY",
+    "gateId": "f2-productive-acceptance-exact-successor-v20260818",
+    "requestVersion": "F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_V1",
+    "candidateArtifactId": 9345207863,
+    "authorizationRequired": true,
+    "authorizationGranted": false,
+    "requestCreated": false,
+    "allows": [
+      "secret_access_after_canonical_GO",
+      "firestore_read",
+      "resolve_existing_identity",
+      "ephemeral_custom_token",
+      "runtime_loopback",
+      "browser_Direccion_desktop_Operativo_tablet_Asesor_mobile",
+      "read_only_integrity_before_after"
+    ],
+    "forbids": [
+      "firestore_writes",
+      "auth_writes",
+      "membership_writes",
+      "data_writes",
+      "password_reset",
+      "package_rebuild",
+      "deploy",
+      "publication",
+      "production_mutation",
+      "main_merge"
+    ]
   },
   "resumeProtocol": [
     "Read ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json",
     "Read this live-state",
     "Confirm actual HEAD and PR #5",
-    "Read F1.4D terminal evidence and request consumption",
-    "Read CHECKPOINT-F1-4D-RUNTIME-BROWSER-READONLY-PASS-F1-CLOSED-20260818.md",
+    "Read F2 source-only closure evidence and current checkpoint",
+    "Use F1.4D only as the last completed runtime baseline",
     "Do not repeat F1.4, F1.4B, F1.4C or F1.4D",
+    "Do not repeat the non-dispatching F2 source workflow mechanism",
     "Do not test R4S9C as rootfix artifact",
-    "Derive exact F2 contract from frozen plan before any F2 execution"
+    "Do not rederive F2 source contract",
+    "Do not create or execute F2 runtime request without explicit authorization",
+    "Bind F2 runtime only to exact artifact 9345207863"
   ]
 }
