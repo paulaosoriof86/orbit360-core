@@ -1,0 +1,16 @@
+{
+  "schemaVersion":"orbit360-f2-postsync-consistency-v2-trigger-v1",
+  "gateId":"f2-productive-acceptance-exact-successor-v20260818",
+  "artifactId":9345207863,
+  "request03Created":false,
+  "mode":"source-only-postsync-consistency-v2",
+  "runtime":false,
+  "browser":false,
+  "secrets":false,
+  "firestoreRead":false,
+  "writes":false,
+  "deploy":false,
+  "production":false,
+  "containsPII":false,
+  "containsSecrets":false
+}
