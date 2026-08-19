@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "orbit360-f2-pre-request06-no-path-execution-trigger-v1",
+  "mode": "source-only",
+  "purpose": "Execute the already-installed proven pre-Request06 source-only closure vehicle after confirming Actions push delivery",
+  "request06Created": false,
+  "runtimeAuthorized": false,
+  "browserAuthorized": false,
+  "secretAccessAuthorized": false,
+  "firestoreReadAuthorized": false,
+  "writesAuthorized": false,
+  "deployAuthorized": false,
+  "productionAuthorized": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
