@@ -1,7 +1,7 @@
 {
   "schemaVersion": "orbit360-run-discovery-trigger-v3",
-  "requestCommit": "74381c9a856d99fbd6c239ef2467d9cf08b12805",
-  "requestFile": ".github/orbit360-requests/f2-request06-rootfix-successor-build-runbound-20260819-01.json",
+  "requestCommit": "78d73bb0d93a1fee463d0676455143f358d4262c",
+  "requestFile": ".github/orbit360-requests/f2-request06-rootfix-successor-build-runbound-20260819-02.json",
   "targetWorkflowName": "Orbit360 F2 Request06 Rootfix Successor Build 20260819",
   "expectedRequestVersion": "F2_REQUEST06_ROOTFIX_SUCCESSOR_BUILD_V1",
   "expectedGateId": "f2-request06-rootfix-successor-build-v20260819",
