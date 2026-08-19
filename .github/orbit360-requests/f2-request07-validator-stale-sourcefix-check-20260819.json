@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "orbit360-f2-validator-stale-sourcefix-check-v1",
+  "requestedAt": "2026-08-19T23:26:00Z",
+  "request07Commit": "696b3700687f758fdd9c629a2268caa857aa377a",
+  "request07RunId": 32311320804,
+  "candidateArtifactId": 9385306424,
+  "classification": "VALIDATOR_STALE",
+  "rootCause": "F2_BROWSER_MANIFEST_IDENTITY_EXPECTATION_BOUND_TO_PREDECESSOR",
+  "sourceOnly": true,
+  "secrets": false,
+  "firestoreRead": false,
+  "browser": false,
+  "runtime": false,
+  "writes": false,
+  "deploy": false,
+  "production": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
