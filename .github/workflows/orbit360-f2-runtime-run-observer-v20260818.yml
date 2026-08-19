@@ -1,0 +1,128 @@
+name: Orbit360 F2 Runtime Run Observer 20260818
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-observers/f2-runtime-observer-20260818-01.json'
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: orbit360-f2-runtime-observer-20260818
+  cancel-in-progress: false
+env:
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  REQUEST_COMMIT: 0fba51716d741750b617bf95fc6342444c9f720c
+  REQUEST_FILE: .github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-runbound-20260818-01.json
+  TARGET_WORKFLOW_NAME: Orbit360 F2 Productive Acceptance Runtime Browser Readonly 20260818
+  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+jobs:
+  observe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+      - name: Validate observer boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
+          test "$(jq -r '.requestVersion' "$REQUEST_FILE")" = 'F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_V1'
+          test "$(jq -r '.status' "$REQUEST_FILE")" = 'AUTHORIZED_ONCE'
+          test "$(jq -r '.allowedExecutions' "$REQUEST_FILE")" = '1'
+          test "$(jq -r '.consumed' "$REQUEST_FILE")" = 'false'
+          test "$(jq -r '.candidateArtifactId' "$REQUEST_FILE")" = '9345207863'
+      - name: Locate exactly one F2 push run for authorized request commit
+        id: locate
+        env:
+          GH_TOKEN_RUNTIME: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          API="https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/runs?head_sha=${REQUEST_COMMIT}&event=push&per_page=100"
+          RUN_ID=''
+          for i in $(seq 1 60); do
+            JSON="$(curl -L --fail --silent --show-error -H "Authorization: Bearer $GH_TOKEN_RUNTIME" -H 'Accept: application/vnd.github+json' -H 'X-GitHub-Api-Version: 2022-11-28' "$API")"
+            MATCHES="$(printf '%s' "$JSON" | jq --arg n "$TARGET_WORKFLOW_NAME" '[.workflow_runs[] | select(.name==$n)] | length')"
+            if [ "$MATCHES" -gt 1 ]; then echo 'PIPELINE_MECHANISM_FAILURE:F2_MULTIPLE_RUNTIME_RUNS_FOR_SINGLE_REQUEST' >&2; exit 41; fi
+            if [ "$MATCHES" = '1' ]; then RUN_ID="$(printf '%s' "$JSON" | jq -r --arg n "$TARGET_WORKFLOW_NAME" '.workflow_runs[] | select(.name==$n) | .id')"; break; fi
+            sleep 10
+          done
+          if [ -z "$RUN_ID" ]; then
+            jq -n --arg request "$REQUEST_COMMIT" '{schemaVersion:"orbit360-f2-runtime-observer-v1",ok:false,status:"F2_RUNTIME_PUSH_RUN_NOT_OBSERVED",classification:"PIPELINE_MECHANISM_FAILURE",requestCommit:$request,runtimeRunObserved:false,multipleRuns:false,browserExecuted:false,runtimeExecuted:false,secretAccess:false,dataAccess:false,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,publicationExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false}' > "$EVIDENCE_DIR/f2-runtime-observer-no-run-v20260818.json"
+            echo 'PIPELINE_MECHANISM_FAILURE:F2_RUNTIME_PUSH_RUN_NOT_OBSERVED' >&2
+            exit 42
+          fi
+          echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"
+          echo "F2_RUNTIME_RUN_ID=$RUN_ID" >> "$GITHUB_ENV"
+      - name: Wait for that exact F2 run to finish
+        env:
+          GH_TOKEN_RUNTIME: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          API="https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/runs/${F2_RUNTIME_RUN_ID}"
+          CONCLUSION=''
+          for i in $(seq 1 80); do
+            JSON="$(curl -L --fail --silent --show-error -H "Authorization: Bearer $GH_TOKEN_RUNTIME" -H 'Accept: application/vnd.github+json' -H 'X-GitHub-Api-Version: 2022-11-28' "$API")"
+            STATUS="$(printf '%s' "$JSON" | jq -r '.status')"
+            CONCLUSION="$(printf '%s' "$JSON" | jq -r '.conclusion // ""')"
+            if [ "$STATUS" = 'completed' ]; then break; fi
+            sleep 10
+          done
+          test -n "$CONCLUSION"
+          echo "F2_RUNTIME_CONCLUSION=$CONCLUSION" >> "$GITHUB_ENV"
+      - name: Download sanitized F2 evidence artifact
+        env:
+          GH_TOKEN_RUNTIME: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          META="$(curl -L --fail --silent --show-error -H "Authorization: Bearer $GH_TOKEN_RUNTIME" -H 'Accept: application/vnd.github+json' -H 'X-GitHub-Api-Version: 2022-11-28' "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/runs/${F2_RUNTIME_RUN_ID}/artifacts?per_page=100")"
+          NAME="orbit360-f2-productive-acceptance-${F2_RUNTIME_RUN_ID}"
+          COUNT="$(printf '%s' "$META" | jq --arg n "$NAME" '[.artifacts[] | select(.name==$n and .expired==false)] | length')"
+          test "$COUNT" = '1'
+          ART_ID="$(printf '%s' "$META" | jq -r --arg n "$NAME" '.artifacts[] | select(.name==$n and .expired==false) | .id')"
+          ZIP="$RUNNER_TEMP/f2-evidence.zip"; DIR="$RUNNER_TEMP/f2-evidence"; mkdir -p "$DIR"
+          curl -L --fail --silent --show-error -H "Authorization: Bearer $GH_TOKEN_RUNTIME" -H 'Accept: application/vnd.github+json' -H 'X-GitHub-Api-Version: 2022-11-28' "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/${ART_ID}/zip" -o "$ZIP"
+          unzip -q "$ZIP" -d "$DIR"
+          FINAL="$DIR/orbit360-platform/runtime-gate-crm-v20260716/f2-final-run-${F2_RUNTIME_RUN_ID}.json"
+          test -f "$FINAL"
+          jq -e '.containsPII==false and .containsSecrets==false and .candidateArtifactId==9345207863' "$FINAL" >/dev/null
+          mkdir -p "$EVIDENCE_DIR"
+          for f in \
+            "f2-runtime-preflight-run-${F2_RUNTIME_RUN_ID}.json" \
+            "f2-candidate-source-run-${F2_RUNTIME_RUN_ID}.json" \
+            "f2-identity-run-${F2_RUNTIME_RUN_ID}.json" \
+            "f2-data-integrity-before-v20260818.json" \
+            "f2-browser-run-${F2_RUNTIME_RUN_ID}.json" \
+            "f2-data-integrity-after-v20260818.json" \
+            "f2-integrity-before-after-v20260818.json" \
+            "f2-final-run-${F2_RUNTIME_RUN_ID}.json"; do
+              SRC="$DIR/orbit360-platform/runtime-gate-crm-v20260716/$f"
+              if [ -f "$SRC" ]; then jq -e '.containsPII==false and .containsSecrets==false' "$SRC" >/dev/null 2>&1 || true; cp "$SRC" "$EVIDENCE_DIR/$f"; fi
+          done
+          jq -n --arg run "$F2_RUNTIME_RUN_ID" --arg conclusion "$F2_RUNTIME_CONCLUSION" --argjson final "$(cat "$FINAL")" '{schemaVersion:"orbit360-f2-runtime-observer-v1",ok:($final.ok==true),status:(if $final.ok==true then "F2_RUNTIME_OBSERVED_PASS" else "F2_RUNTIME_OBSERVED_FAIL" end),classification:$final.classification,requestCommit:"0fba51716d741750b617bf95fc6342444c9f720c",runtimeRunId:$run,runtimeConclusion:$conclusion,runtimeRunObserved:true,multipleRuns:false,candidateArtifactId:9345207863,terminal:$final,containsPII:false,containsSecrets:false}' > "$EVIDENCE_DIR/f2-runtime-observer-run-${F2_RUNTIME_RUN_ID}.json"
+      - name: Consume and freeze the single-use F2 authorization without retrigger
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const p=process.env.REQUEST_FILE,j=JSON.parse(fs.readFileSync(p,'utf8'));
+          if(j.status!=='AUTHORIZED_ONCE'||j.allowedExecutions!==1||j.consumed!==false) throw new Error('F2_REQUEST_NOT_ACTIVE_AT_CONSUMPTION');
+          j.status=process.env.F2_RUNTIME_CONCLUSION==='success'?'CONSUMED':'CONSUMED_FAIL';
+          j.allowedExecutions=0;j.consumed=true;j.authorizationFrozen=true;j.replayAllowed=false;
+          j.runtimeRunId=Number(process.env.F2_RUNTIME_RUN_ID);j.runtimeConclusion=process.env.F2_RUNTIME_CONCLUSION;j.consumedAt=new Date().toISOString();
+          fs.writeFileSync(p,JSON.stringify(j,null,2)+'\n','utf8');
+          NODE
+          git config user.name 'orbit360-f2-runtime-observer-bot'
+          git config user.email 'orbit360-f2-runtime-observer-bot@users.noreply.github.com'
+          git add "$REQUEST_FILE" "$EVIDENCE_DIR"/f2-*.json
+          git diff --cached --check
+          git commit -m 'gate(f2): consume runtime authorization and persist evidence [skip ci]'
+          git push origin "HEAD:$ORBIT360_BRANCH"
