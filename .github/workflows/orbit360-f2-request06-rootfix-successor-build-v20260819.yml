@@ -1,0 +1,114 @@
+name: Orbit360 F2 Request06 Rootfix Successor Build 20260819
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-requests/f2-request06-rootfix-successor-build-runbound-*.json'
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: orbit360-f2-request06-rootfix-successor-build-20260819
+  cancel-in-progress: false
+env:
+  BASE_ARTIFACT_ID: '9345207863'
+  BASE_ARTIFACT_ZIP: /tmp/f2-request06-base-artifact.zip
+  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+jobs:
+  build_exact_one_file_successor:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify immutable inert request and source rootfix
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
+          test "${#CHANGED[@]}" = '1'
+          REQUEST_FILE="${CHANGED[0]}"
+          case "$REQUEST_FILE" in
+            .github/orbit360-requests/f2-request06-rootfix-successor-build-runbound-*.json) ;;
+            *) echo 'PIPELINE_MECHANISM_FAILURE:F2_SUCCESSOR_REQUEST_PATH_INVALID' >&2; exit 41 ;;
+          esac
+          test "$(jq -r '.schemaVersion' "$REQUEST_FILE")" = 'orbit360-f2-request06-rootfix-successor-build-request-v1'
+          test "$(jq -r '.requestVersion' "$REQUEST_FILE")" = 'F2_REQUEST06_ROOTFIX_SUCCESSOR_BUILD_V1'
+          test "$(jq -r '.status' "$REQUEST_FILE")" = 'INERT_PREPARATION_ONCE'
+          test "$(jq -r '.allowedExecutions' "$REQUEST_FILE")" = '1'
+          test "$(jq -r '.consumed' "$REQUEST_FILE")" = 'false'
+          test "$(jq -r '.replayAllowed' "$REQUEST_FILE")" = 'false'
+          SOURCE_HEAD="$(git rev-parse HEAD^)"
+          test "$(jq -r '.parentHead' "$REQUEST_FILE")" = "$SOURCE_HEAD"
+          test "$(jq -r '.candidateBaseArtifactId' "$REQUEST_FILE")" = "$BASE_ARTIFACT_ID"
+          jq -e '.scope.packageRebuild==true and .scope.githubArtifactUpload==true and .scope.secrets==false and .scope.firestoreRead==false and .scope.browser==false and .scope.runtime==false and .scope.writes==false and .scope.deploy==false and .scope.publish==false and .scope.production==false' "$REQUEST_FILE" >/dev/null
+          git merge-base --is-ancestor 8cd21f7a56d40027e6d910353f968988adc19e9b "$SOURCE_HEAD"
+          git merge-base --is-ancestor 80654e0e8d0bbd0a05154be14a4ad832145eaf0c "$SOURCE_HEAD"
+          node --check tools/orbit360-f2-request06-rootfix-successor-builder-v20260819.mjs
+          node --check tools/orbit360-validar-f2-inicio-finite-v20260819.mjs
+          node tools/orbit360-validar-f2-inicio-finite-v20260819.mjs | tee /tmp/f2-finite-regression.json
+          grep -F 'PASS_F2_INICIO_FINITE_OPTIONAL_ADVISOR_META' /tmp/f2-finite-regression.json >/dev/null
+          SHORT="${SOURCE_HEAD:0:12}"
+          OUT_ZIP="orbit360-fase-a-product-f2-request06-rootfix-successor-${SHORT}.zip"
+          echo "ORBIT360_REQUEST_FILE=$REQUEST_FILE" >> "$GITHUB_ENV"
+          echo "F2_SOURCE_HEAD=$SOURCE_HEAD" >> "$GITHUB_ENV"
+          echo "F2_SUCCESSOR_ZIP=$OUT_ZIP" >> "$GITHUB_ENV"
+      - name: Download exact Request06 certified candidate after static PASS
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -L --fail --retry 3 \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/${BASE_ARTIFACT_ID}/zip" \
+            -o "$BASE_ARTIFACT_ZIP"
+          test -s "$BASE_ARTIFACT_ZIP"
+      - name: Build exactly one unpublished F2 successor
+        shell: bash
+        run: |
+          set -euo pipefail
+          F2_BASE_ARTIFACT_ZIP="$BASE_ARTIFACT_ZIP" \
+          F2_BASE_ARTIFACT_ID="$BASE_ARTIFACT_ID" \
+          F2_SOURCE_HEAD="$F2_SOURCE_HEAD" \
+          F2_SUCCESSOR_ZIP="$F2_SUCCESSOR_ZIP" \
+          EVIDENCE_DIR="$EVIDENCE_DIR" \
+          node tools/orbit360-f2-request06-rootfix-successor-builder-v20260819.mjs
+          jq -e --arg source "$F2_SOURCE_HEAD" --arg zip "$F2_SUCCESSOR_ZIP" '
+            .ok==true and .status=="F2_REQUEST06_ROOTFIX_SUCCESSOR_ARTIFACT_CERTIFIED_UNPUBLISHED" and
+            .sourceHead==$source and .zipName==$zip and .fileCount==194 and
+            .deltaCount==1 and .unchangedProductFiles==193 and
+            .productDeltaPaths==["core/queries.js"] and
+            .finiteRegressionPass==true and .baseFullyRehashed==true and
+            .successorFullyRehashed==true and .packageReopened==true and
+            .allProductFilesRehashed==true and .published==false and
+            .browserExecuted==false and .runtimeExecuted==false and
+            .secretAccess==false and .dataAccess==false and
+            .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and
+            .deployExecuted==false and .productionTouched==false
+          ' "$EVIDENCE_DIR/f2-request06-rootfix-successor-artifact-certification-v20260819.json" >/dev/null
+      - name: Upload unpublished successor artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-f2-request06-rootfix-successor-unpublished-${{ github.run_id }}
+          path: ${{ env.F2_SUCCESSOR_ZIP }}
+          if-no-files-found: error
+          retention-days: 30
+      - name: Upload sanitized successor evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-f2-request06-rootfix-successor-evidence-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/f2-request06-rootfix-successor-artifact-certification-v20260819.json
+            orbit360-platform/runtime-gate-crm-v20260716/f2-request06-rootfix-successor-artifact-sha256-v20260819.txt
+          if-no-files-found: error
+          retention-days: 30
