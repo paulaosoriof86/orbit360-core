@@ -1,0 +1,18 @@
+{
+  "schemaVersion":"orbit360-f2-runtime02-postsync-source-only-trigger-v1",
+  "gateId":"f2-productive-acceptance-exact-successor-v20260818",
+  "artifactId":9345207863,
+  "runtime01RunId":32205144735,
+  "runtime02RunId":32206449703,
+  "stableBoundaryRootfixRunId":32206698751,
+  "mode":"source-only-post-docsync",
+  "runtime":false,
+  "browser":false,
+  "secrets":false,
+  "firestoreRead":false,
+  "writes":false,
+  "deploy":false,
+  "production":false,
+  "containsPII":false,
+  "containsSecrets":false
+}
