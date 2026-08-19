@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "orbit360-f2-pre-request06-proven-source-trigger-v1",
+  "workflowVehicle": ".github/workflows/orbit360-f2-role-view-rootfix-source-only-v20260818.yml",
+  "historicalVehicleRunPass": 32209972474,
+  "purpose": "Execute the pre-Request06 producer-contract source closure through a workflow already proven operational in this branch",
+  "targetHeadBeforeTrigger": "cea1977857c6f4c71cdd326e16b2c22dabed5c73",
+  "postdeployRunId": 32272580947,
+  "postdeployArtifactId": 9372746151,
+  "candidateArtifactId": 9345207863,
+  "request06Created": false,
+  "runtimeAuthorized": false,
+  "browserAuthorized": false,
+  "secretAccessAuthorized": false,
+  "writesAuthorized": false,
+  "rulesRedeployAuthorized": false,
+  "hostingAuthorized": false,
+  "functionsAuthorized": false,
+  "publicationAuthorized": false,
+  "productionAuthorized": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
