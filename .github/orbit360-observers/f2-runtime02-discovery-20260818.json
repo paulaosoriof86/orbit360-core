@@ -1,0 +1,16 @@
+{
+  "schemaVersion":"orbit360-f2-runtime02-observer-trigger-v1",
+  "requestCommit":"ee9cd05a73bb6abf10d8b09fe738bf8db7bff52d",
+  "workflow":"Orbit360 F2 Productive Acceptance Runtime Browser Readonly 20260818",
+  "mode":"source-only-observer",
+  "singleObservation":true,
+  "secrets":false,
+  "firestoreRead":false,
+  "runtime":false,
+  "browser":false,
+  "writes":false,
+  "deploy":false,
+  "production":false,
+  "containsPII":false,
+  "containsSecrets":false
+}
