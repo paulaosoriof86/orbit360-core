@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "orbit360-f2-runtime05-security-source-run-observer-v1",
+  "ok": true,
+  "status": "TERMINAL_OBSERVED",
+  "uniquenessCount": 1,
+  "observerRunId": "32211085496",
+  "run": {
+    "id": 32211048260,
+    "status": "completed",
+    "conclusion": "success",
+    "run_attempt": 1,
+    "head_sha": "060df6c7dfb347e51585381d0b9130078b516e6f",
+    "event": "push"
+  },
+  "containsPII": false,
+  "containsSecrets": false,
+  "cloudMutation": false
+}
