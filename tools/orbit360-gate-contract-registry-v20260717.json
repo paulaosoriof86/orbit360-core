@@ -525,10 +525,10 @@
     {
       "gateId": "f2-productive-acceptance-exact-successor-v20260818",
       "contractVersion": "2.1.0",
-      "diagnosticRevision": "f2-successor-rebind-source-pending-v1",
+      "diagnosticRevision": "f2-successor-rebind-lifecycle-composition-profile-aware-v2",
       "runtimeVersion": "20260819-1",
       "block": "F2",
-      "status": "ACTIVE_SOURCE_REBIND",
+      "status": "ACTIVE_SOURCE_REBIND_ROUTER_ROOTFIX",
       "classification": "VALIDATOR_STALE",
       "rootCause": "F2 gate owners remained pinned to Request06 predecessor after certified one-file functional rootfix successor was built.",
       "candidate": {
@@ -549,7 +549,11 @@
       "runtimeAuthorization": false,
       "writesAllowed": false,
       "deployAllowed": false,
-      "productionAllowed": false
+      "productionAllowed": false,
+      "lifecycleComposition": "phase-capability-contract-v2-source-rebind",
+      "routerVersion": "v10.7-f2-lifecycle-composition-profile-aware",
+      "lastFailedSourceRunId": 32310148537,
+      "lastFailedSourceCode": "CANONICAL_LIFECYCLE_REVISION_MISMATCH"
     }
   ],
   "temporaryPipelineArtifacts": [],

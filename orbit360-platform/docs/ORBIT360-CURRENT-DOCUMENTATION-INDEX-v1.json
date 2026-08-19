@@ -1,6 +1,6 @@
 {
   "schemaVersion": "orbit360-current-documentation-index-v1",
-  "updatedAt": "2026-08-19T22:35:00.000Z",
+  "updatedAt": "2026-08-19T22:48:00.000Z",
   "status": "CURRENT_BINDING_INDEX",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -330,7 +330,7 @@
     "nextActionExact"
   ],
   "f2SuccessorRebind": {
-    "status": "PENDING_REBIND_SOURCE_ONLY",
+    "status": "PENDING_SECOND_AND_FINAL_SOURCE_ONLY",
     "classification": "VALIDATOR_STALE",
     "gateId": "f2-productive-acceptance-exact-successor-v20260818",
     "contractVersion": "2.1.0",
@@ -342,6 +342,10 @@
     "candidateValidator": "tools/orbit360-f2-exact-candidate-source-validator-v20260819.mjs",
     "stableBoundary": "tools/orbit360-f2-stable-boundary-contract-v20260819.mjs",
     "runtimeAuthorized": false,
-    "productionTouched": false
+    "productionTouched": false,
+    "routerLifecycleCompositionRootfix": "PASS_STATIC_PENDING_SOURCE_EXECUTION",
+    "routerVersion": "v10.7-f2-lifecycle-composition-profile-aware",
+    "failedSourceRunId": 32310148537,
+    "failedSourceCode": "CANONICAL_LIFECYCLE_REVISION_MISMATCH"
   }
 }

@@ -28,7 +28,7 @@ const DEFAULT_BLOCK1_V30_REQUEST_REL = '.github/orbit360-requests/block1-client3
 const DEFAULT_BLOCK1_V33_REQUEST_REL = '.github/orbit360-requests/block1-client360-insurers-v33-two-client-cloud-audit-authorization.json';
 const STOP_OVERLAY_REL = 'tools/orbit360-validator-lifecycle-overlay-visual-matrix-v8-stop-preflight-v20260806.json';
 const CANONICAL_LIFECYCLE_COMPOSITION = 'phase-capability-contract-v1';
-const ROUTER_VERSION = 'v10.6-f2-successor-rebind-source-pending';
+const ROUTER_VERSION = 'v10.7-f2-lifecycle-composition-profile-aware';
 
 const GATE_CONFIG = Object.freeze({
   [BLOCK1_GATE_ID]: {
@@ -89,6 +89,7 @@ const GATE_CONFIG = Object.freeze({
   },
   ['f2-productive-acceptance-exact-successor-v20260818']: {
     contractVersion: '2.1.0',
+    lifecycleComposition: 'phase-capability-contract-v2-source-rebind',
     lifecycle: 'tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-source-v20260819.json',
     engine: 'tools/orbit360-validar-gate-contracts-engine-f2-productive-acceptance-v20260819.mjs',
     defaultRequest: '.github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-runbound-20260818-01.json',
@@ -205,7 +206,7 @@ function failOutput(config, error) {
     failed: 1,
     failedCheckIds: ['CANONICAL_PREFLIGHT_ENTRYPOINT'],
     error: String(error && error.message || error),
-    canonicalLifecycleComposition: CANONICAL_LIFECYCLE_COMPOSITION,
+    canonicalLifecycleComposition: config && config.lifecycleComposition || CANONICAL_LIFECYCLE_COMPOSITION,
     canonicalEngine: config && config.engine || '',
     canonicalRouterVersion: ROUTER_VERSION,
     canonicalStopOverlay: GATE_ID === VISUAL_LEGACY_GATE_ID ? STOP_OVERLAY_REL : '',
@@ -284,7 +285,8 @@ try {
   if (lifecycle.gateId !== GATE_ID) throw new Error('CANONICAL_GATE_MISMATCH');
   if (lifecycle.gateContractVersion !== config.contractVersion) throw new Error('CANONICAL_GATE_VERSION_MISMATCH');
   const lifecycleRevision = lifecycle.validatorLifecycleRevision || 'phase-capability-contract-v1';
-  if (lifecycleRevision !== CANONICAL_LIFECYCLE_COMPOSITION) throw new Error('CANONICAL_LIFECYCLE_REVISION_MISMATCH');
+  const expectedLifecycleComposition = config.lifecycleComposition || CANONICAL_LIFECYCLE_COMPOSITION;
+  if (lifecycleRevision !== expectedLifecycleComposition) throw new Error('CANONICAL_LIFECYCLE_REVISION_MISMATCH');
   const profile = lifecycle.executionProfile || {};
   const phase = String(lifecycle.currentPhase || profile.phase || '');
   const expected = PHASE_PROFILES[phase];
@@ -331,7 +333,7 @@ try {
     canonicalEntrypoint: 'tools/orbit360-validar-gate-contracts-v20260717.mjs',
     canonicalEngine: config.engine,
     canonicalLifecycleContract: config.lifecycle,
-    canonicalLifecycleComposition: CANONICAL_LIFECYCLE_COMPOSITION,
+    canonicalLifecycleComposition: expectedLifecycleComposition,
     canonicalRouterVersion: ROUTER_VERSION,
     canonicalStopOverlay: GATE_ID === VISUAL_LEGACY_GATE_ID ? STOP_OVERLAY_REL : '',
     gateProfile: gateProfile || 'default',

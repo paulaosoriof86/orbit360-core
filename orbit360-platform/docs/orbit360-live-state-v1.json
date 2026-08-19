@@ -1,8 +1,8 @@
 {
   "schemaVersion": "orbit360-live-state-v1",
-  "stateVersion": "20260819.f2.request06-rootfix-successor-rebind-source-pending.current",
-  "updatedAt": "2026-08-19T22:35:00.000Z",
-  "phase": "F2_SUCCESSOR_REBIND_SOURCE_ONLY_PENDING",
+  "stateVersion": "20260819.f2.request06-rootfix-successor-router-lifecycle-rootfix-pending-source.current",
+  "updatedAt": "2026-08-19T22:48:00.000Z",
+  "phase": "F2_SUCCESSOR_SOURCE_ONLY_ROUTER_ROOTFIX_APPLIED",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pr": 5,
@@ -160,7 +160,7 @@
     "contractVersion": "2.1.0",
     "validatorLifecycleRevision": "phase-capability-contract-v2-source-rebind",
     "f2ValidatorRevision": "f2-productive-acceptance-exact-successor-rebind-v2-20260819",
-    "canonicalRouterVersion": "v10.6-f2-successor-rebind-source-pending",
+    "canonicalRouterVersion": "v10.7-f2-lifecycle-composition-profile-aware",
     "candidateArtifactId": 9385306424,
     "candidateSourceHead": "b94b2ae86d26586a68d33be9edba8715e956b02e",
     "candidateZipSha256": "81a96f476fd0fdfd814b3f047951ce653fd324bef8a6d96d6ee6fe44dd7bdcf4",
@@ -253,8 +253,8 @@
       "productAffected": false
     },
     "currentBlockingFact": {
-      "code": "F2_SUCCESSOR_REBIND_SOURCE_ONLY_REQUIRED",
-      "status": "PENDING_REBIND_SOURCE_ONLY"
+      "code": "F2_SUCCESSOR_SOURCE_ONLY_RETRY_AFTER_ROUTER_LIFECYCLE_ROOTFIX",
+      "status": "PENDING_SECOND_AND_FINAL_SOURCE_ONLY"
     },
     "authIsCurrentBlocker": false,
     "passwordIsCurrentBlocker": false,
@@ -368,6 +368,17 @@
       "productAffected": false,
       "dataAffected": false,
       "preflightBeforeRebindRunId": 32309043863
+    },
+    "f2SuccessorLifecycleComposition": {
+      "classification": "VALIDATOR_STALE",
+      "code": "CANONICAL_LIFECYCLE_REVISION_MISMATCH",
+      "status": "ROOTFIX_APPLIED_PENDING_SECOND_SOURCE_ONLY",
+      "firstSourceRunId": 32310148537,
+      "rootCause": "CANONICAL_ROUTER_USED_GLOBAL_PHASE_CAPABILITY_V1_INSTEAD_OF_GATE_PROFILED_LIFECYCLE_COMPOSITION",
+      "productAffected": false,
+      "dataAffected": false,
+      "candidateArtifactId": 9385306424,
+      "routerVersion": "v10.7-f2-lifecycle-composition-profile-aware"
     }
   },
   "documentationControl": {
@@ -542,9 +553,9 @@
       "request01_to_request05_replay",
       "postdeploy_probe_replay"
     ],
-    "action": "VALIDATE_F2_SUCCESSOR_SOURCE_ONLY",
+    "action": "VALIDATE_F2_SUCCESSOR_SOURCE_ONLY_SECOND_AND_FINAL",
     "candidateSourceHead": "b94b2ae86d26586a68d33be9edba8715e956b02e",
-    "status": "PENDING_REBIND_SOURCE_ONLY",
+    "status": "PENDING_SECOND_AND_FINAL_SOURCE_ONLY",
     "runtimeAuthorizationRequiredAfterSourcePass": true
   },
   "resumeProtocol": [
