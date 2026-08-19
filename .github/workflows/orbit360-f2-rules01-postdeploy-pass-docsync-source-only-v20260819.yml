@@ -63,19 +63,17 @@ jobs:
           TERMINAL=.tmp/f2-postdeploy/f2-rules01-postdeploy-probe-terminal-run-32272580947.json
           test -f "$TERMINAL"
           jq -e '.ok==true and .status=="F2_RULES01_POSTDEPLOY_CROSS_TENANT_PROBE_PASS" and .runId==32272580947 and .requestOrdinal==1 and .candidateArtifactId==9345207863 and .probe.responseStatus==403 and .probe.responseErrorStatus=="PERMISSION_DENIED" and .probe.crossTenantDenied==true and .integrity.integrityBeforeAfterPass==true and .integrity.countsIdentical==true and .integrity.digestsIdentical==true and .scope.rulesRedeployExecuted==false and .scope.firestoreDocumentWrites==0 and .scope.authWrites==0 and .scope.membershipWrites==0 and .scope.dataWrites==0 and .scope.hostingDeploy==false and .scope.functionsDeploy==false and .scope.packageRebuilt==false and .scope.publicationExecuted==false and .scope.productionHostingTouched==false' "$TERMINAL" >/dev/null
-      - name: Apply idempotent live-state docsync
+      - name: Apply idempotent live-state docsync from canonical repo root
         shell: bash
         run: |
           set -euo pipefail
-          cd orbit360-platform
           node --check tools/orbit360-f2-rules01-postdeploy-pass-docsync-v20260819.mjs
-          node tools/orbit360-f2-rules01-postdeploy-pass-docsync-v20260819.mjs --terminal ../.tmp/f2-postdeploy/f2-rules01-postdeploy-probe-terminal-run-32272580947.json | tee /tmp/f2-docsync.txt
+          node tools/orbit360-f2-rules01-postdeploy-pass-docsync-v20260819.mjs --terminal .tmp/f2-postdeploy/f2-rules01-postdeploy-probe-terminal-run-32272580947.json | tee /tmp/f2-docsync.txt
           grep -F 'F2_RULES01_POSTDEPLOY_PASS_DOCSYNC_PREPARED' /tmp/f2-docsync.txt
       - name: Mandatory canonical F2 gate after docsync
         shell: bash
         run: |
           set -euo pipefail
-          cd orbit360-platform
           node tools/orbit360-validar-gate-contracts-v20260717.mjs "$GATE_ID" | tee /tmp/f2-source-gate.txt
           grep -F 'PASS_GATE_CONTRACT_SOURCE_F2_PRODUCTIVE_ACCEPTANCE' /tmp/f2-source-gate.txt
       - name: Write sanitized post-sync source-only evidence
@@ -85,19 +83,7 @@ jobs:
           node <<'NODE'
           const fs=require('fs');
           const p=process.env.POSTSYNC_EVIDENCE;
-          const e={
-            schemaVersion:'orbit360-f2-rules01-postdeploy-pass-postsync-source-only-v1',
-            ok:true,
-            status:'F2_RULES01_POSTDEPLOY_PASS_POSTSYNC_SOURCE_ONLY_PASS',
-            classification:'SOURCE_CONTRACT_PASS',
-            gateId:process.env.GATE_ID,
-            gateMarker:'PASS_GATE_CONTRACT_SOURCE_F2_PRODUCTIVE_ACCEPTANCE',
-            postdeployProbe:{runId:32272580947,artifactId:9372746151,httpStatus:403,errorStatus:'PERMISSION_DENIED',crossTenantDenied:true,integrityBeforeAfterPass:true,requestConsumed:true,replayAllowed:false,rulesRedeployExecuted:false},
-            boundary:{phase:'F2_RULES01_POSTDEPLOY_PROBE_PASS_REQUEST06_AUTHORIZATION_PENDING',request06Created:false,request06Authorized:false,successorArtifactId:9345207863,successorPublished:false,productionOperationalDeclared:false},
-            scope:{secretAccess:false,firestoreRead:false,authRead:false,browserExecuted:false,runtimeExecuted:false,firestoreDocumentWrites:0,authWrites:0,membershipWrites:0,dataWrites:0,rulesDeploy:false,hostingDeploy:false,functionsDeploy:false,packageRebuild:false,publication:false,production:false,mainMerge:false},
-            observerRootCause:{classification:'PIPELINE_MECHANISM_FAILURE',code:'F2_POSTDEPLOY_PROBE_OBSERVER_OVERCONSTRAINED_BY_ACTIONS_PATH_FIELD',status:'CLOSED',probeReplayed:false},
-            containsPII:false,containsSecrets:false,generatedAt:new Date().toISOString()
-          };
+          const e={schemaVersion:'orbit360-f2-rules01-postdeploy-pass-postsync-source-only-v1',ok:true,status:'F2_RULES01_POSTDEPLOY_PASS_POSTSYNC_SOURCE_ONLY_PASS',classification:'SOURCE_CONTRACT_PASS',gateId:process.env.GATE_ID,gateMarker:'PASS_GATE_CONTRACT_SOURCE_F2_PRODUCTIVE_ACCEPTANCE',postdeployProbe:{runId:32272580947,artifactId:9372746151,httpStatus:403,errorStatus:'PERMISSION_DENIED',crossTenantDenied:true,integrityBeforeAfterPass:true,requestConsumed:true,replayAllowed:false,rulesRedeployExecuted:false},boundary:{phase:'F2_RULES01_POSTDEPLOY_PROBE_PASS_REQUEST06_AUTHORIZATION_PENDING',request06Created:false,request06Authorized:false,successorArtifactId:9345207863,successorPublished:false,productionOperationalDeclared:false},scope:{secretAccess:false,firestoreRead:false,authRead:false,browserExecuted:false,runtimeExecuted:false,firestoreDocumentWrites:0,authWrites:0,membershipWrites:0,dataWrites:0,rulesDeploy:false,hostingDeploy:false,functionsDeploy:false,packageRebuild:false,publication:false,production:false,mainMerge:false},observerRootCause:{classification:'PIPELINE_MECHANISM_FAILURE',code:'F2_POSTDEPLOY_PROBE_OBSERVER_OVERCONSTRAINED_BY_ACTIONS_PATH_FIELD',status:'CLOSED',probeReplayed:false},docsyncPipeline:{classification:'PIPELINE_MECHANISM_FAILURE',code:'DOCSYNC_WORKFLOW_INVOKED_CANONICAL_ROOT_TOOLS_FROM_ORBIT360_PLATFORM_CWD',status:'CLOSED_BY_CANONICAL_REPO_ROOT_EXECUTION'},containsPII:false,containsSecrets:false,generatedAt:new Date().toISOString()};
           fs.mkdirSync(require('path').dirname(p),{recursive:true});
           fs.writeFileSync(p,JSON.stringify(e,null,2)+'\n');
           NODE
