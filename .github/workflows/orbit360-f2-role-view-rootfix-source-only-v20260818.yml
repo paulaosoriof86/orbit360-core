@@ -1,0 +1,83 @@
+name: Orbit360 F2 Role View Validator Rootfix Source Only 20260818
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-observers/f2-role-view-rootfix-source-only-trigger-v20260818.json'
+permissions:
+  contents: write
+concurrency:
+  group: orbit360-f2-role-view-rootfix-source-only-20260818
+  cancel-in-progress: false
+env:
+  BRANCH: ays/backend-tenant-lab-v99-20260703
+  RUNNER_FILE: tools/orbit360-f2-productive-acceptance-runtime-browser-readonly-v20260818.mjs
+  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+jobs:
+  source_only:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify Request04 consumed and rootfix boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          R=.github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-runbound-20260818-04.json
+          jq -e '.status=="CONSUMED_STOP_RETRY" and .allowedExecutions==0 and .consumed==true and .authorizationFrozen==true and .replayAllowed==false and .execution.runId==32208018808 and .execution.runAttempt==1 and .execution.terminalArtifactId==9349780184 and .execution.canonicalRootClassification=="VALIDATOR_STALE" and .execution.canonicalRootCause=="F2_ROLE_VIEW_VALIDATOR_REQUIRED_LITERAL_DIRECCION_INSTEAD_OF_SUPERADMIN_VISUAL_EQUIVALENT" and .execution.integrityBeforeAfterPass==true and .execution.firestoreWrites==0 and .execution.authWrites==0 and .execution.operationalWrites==0' "$R" >/dev/null
+          node --check tools/orbit360-f2-role-view-contract-v20260818.mjs
+          node --check tools/orbit360-test-f2-role-view-contract-v20260818.mjs
+      - name: Apply exact validator-only role-view rootfix
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('tools/orbit360-f2-productive-acceptance-runtime-browser-readonly-v20260818.mjs')
+          s=p.read_text(encoding='utf-8')
+          changes=[
+            ("import {settleBlockingGates} from './orbit360-browser-blocking-gate-readiness-v20260730.mjs';",
+             "import {settleBlockingGates} from './orbit360-browser-blocking-gate-readiness-v20260730.mjs';import {resolveCanonicalRoleForView,requiredViewsPresent,ROLE_VIEW_CONTRACT_VERSION} from './orbit360-f2-role-view-contract-v20260818.mjs';"),
+            ("for(const role of ['Dirección','Operativo','Asesor'])need(runtimeState.roles.includes(role),'DATA_CONTRACT_FAILURE:F2_REQUIRED_ROLE_MISSING',role);",
+             "const roleViewState=requiredViewsPresent(runtimeState.roles,['Dirección','Operativo','Asesor']);need(roleViewState.ok,'DATA_CONTRACT_FAILURE:F2_REQUIRED_ROLE_VIEW_MISSING',roleViewState.missing);"),
+            ("const roleViews={};for(const [label,role,viewport] of VIEWS){await page.setViewportSize(viewport);await setRole(page,role);roleViews[label]={role,viewport,",
+             "const roleViews={};for(const [label,role,viewport] of VIEWS){const canonicalRole=resolveCanonicalRoleForView(runtimeState.roles,role);need(canonicalRole,'DATA_CONTRACT_FAILURE:F2_REQUIRED_ROLE_VIEW_MISSING',role);await page.setViewportSize(viewport);await setRole(page,canonicalRole);roleViews[label]={role,canonicalRole,viewport,"),
+            ("rolesRequiredPass:true,runtime:runtimeState,",
+             "rolesRequiredPass:true,roleViewContractVersion:ROLE_VIEW_CONTRACT_VERSION,roleViewResolution:roleViewState.resolved,runtime:runtimeState,")
+          ]
+          for old,new in changes:
+              count=s.count(old)
+              if count != 1:
+                  raise SystemExit(f'PIPELINE_MECHANISM_FAILURE:ROLE_VIEW_ROOTFIX_MATCH_COUNT:{count}:{old[:60]}')
+              s=s.replace(old,new,1)
+          p.write_text(s,encoding='utf-8')
+          PY
+          node --check "$RUNNER_FILE"
+          git diff --check
+          git diff -- "$RUNNER_FILE"
+      - name: Deterministic role-view contract regression proof
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-test-f2-role-view-contract-v20260818.mjs > "$EVIDENCE_DIR/f2-role-view-contract-selftest-v20260818.json"
+          jq -e '.ok==true and .status=="F2_ROLE_VIEW_CONTRACT_SELFTEST_PASS" and .contractVersion=="F2_ROLE_VIEW_CANONICAL_VISUAL_V1" and .superAdminDirectionResolved==true and .canonicalDirectionResolved==true and .adminTenantRejectedForDirection==true and .ownerVisualAliasProven==true and .runnerContractBound==true and .productMutation==false and .runtimeExecuted==false and .browserExecuted==false and .secretAccess==false and .firestoreRead==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0' "$EVIDENCE_DIR/f2-role-view-contract-selftest-v20260818.json" >/dev/null
+          jq -n --arg run "$GITHUB_RUN_ID" --arg sha "$GITHUB_SHA" '{schemaVersion:"orbit360-f2-role-view-validator-rootfix-source-only-v1",ok:true,status:"F2_ROLE_VIEW_VALIDATOR_STALE_ROOTFIX_SOURCE_ONLY_PASS",classification:"PASS",canonicalRootClassification:"VALIDATOR_STALE",canonicalRootCause:"F2_ROLE_VIEW_VALIDATOR_REQUIRED_LITERAL_DIRECCION_INSTEAD_OF_SUPERADMIN_VISUAL_EQUIVALENT",rootfixContractVersion:"F2_ROLE_VIEW_CANONICAL_VISUAL_V1",sourceRunId:$run,triggerSha:$sha,request04RunId:32208018808,request04Replayed:false,request05Created:false,runtimeRunCreated:false,productMutation:false,dataMutation:false,membershipMutation:false,secretAccess:false,firestoreRead:false,browserExecuted:false,firestoreWrites:0,authWrites:0,operationalWrites:0,packageRebuilt:false,deployExecuted:false,publicationExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false}' > "$EVIDENCE_DIR/f2-role-view-rootfix-source-only-v20260818.json"
+      - name: Persist validator rootfix and sanitized evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'orbit360-f2-role-view-rootfix-bot'
+          git config user.email 'orbit360-f2-role-view-rootfix-bot@users.noreply.github.com'
+          git add "$RUNNER_FILE" "$EVIDENCE_DIR/f2-role-view-contract-selftest-v20260818.json" "$EVIDENCE_DIR/f2-role-view-rootfix-source-only-v20260818.json"
+          git diff --cached --check
+          git commit -m 'fix(f2): close role-view validator stale source-only [skip ci]'
+          REMOTE_HEAD="$(git ls-remote origin "refs/heads/$BRANCH" | awk '{print $1}')"
+          test "$REMOTE_HEAD" = "$GITHUB_SHA"
+          git push origin "HEAD:$BRANCH"
