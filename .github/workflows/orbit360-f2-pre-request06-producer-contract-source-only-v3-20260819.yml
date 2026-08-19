@@ -3,7 +3,7 @@ on:
   push:
     branches: [ays/backend-tenant-lab-v99-20260703]
     paths:
-      - '.github/workflows/orbit360-f2-pre-request06-producer-contract-source-only-v3-20260819.yml'
+      - '.github/orbit360-observers/f2-pre-request06-producer-contract-source-only-v3-trigger-v20260819.json'
 permissions:
   contents: write
   actions: read
