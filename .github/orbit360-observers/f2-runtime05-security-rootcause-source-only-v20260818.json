@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "orbit360-f2-runtime05-security-rootcause-source-trigger-v1",
+  "authorized": false,
+  "sourceOnly": true,
+  "runtime05RunId": 32210391764,
+  "request05ReplayAllowed": false,
+  "request06Created": false,
+  "rulesDeployAuthorized": false,
+  "rulesDeployExecuted": false,
+  "secretAccessAuthorized": false,
+  "firestoreReadAuthorized": false,
+  "productMutation": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
