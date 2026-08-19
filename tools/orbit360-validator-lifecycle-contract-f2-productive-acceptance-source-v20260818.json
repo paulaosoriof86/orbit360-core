@@ -4,7 +4,7 @@
   "gateContractVersion": "2.0.0",
   "validatorLifecycleRevision": "phase-capability-contract-v1",
   "f2ValidatorRevision": "f2-productive-acceptance-exact-successor-v1-20260818",
-  "status": "F2_SOURCE_ONLY_PENDING",
+  "status": "F2_SOURCE_ONLY_PASS",
   "currentPhase": "F2_PRODUCTIVE_ACCEPTANCE_SOURCE_ONLY",
   "executionProfile": {
     "phase": "F2_PRODUCTIVE_ACCEPTANCE_SOURCE_ONLY",
@@ -62,6 +62,26 @@
     "readOnlyStore": "orbit360-platform/data/store-firestore-product-readonly-p0.js",
     "policiesVehiclesReceipts": "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
     "cobros": "orbit360-platform/modules/cobros.js"
+  },
+  "sourceOnlyResult": {
+    "ok": true,
+    "status": "F2_SOURCE_ONLY_PASS",
+    "classification": "PASS",
+    "mechanism": "direct_source_replay_after_workflow_dispatch_mechanism_unavailable",
+    "canonicalRouterRegistered": true,
+    "canonicalRouterVersion": "v10.3-f2-productive-acceptance",
+    "candidateArtifactId": 9345207863,
+    "fullRehashPass": true,
+    "runtimeWorkflowPrepared": true,
+    "requestCreated": false,
+    "runtimeExecuted": false,
+    "browserExecuted": false,
+    "secretAccess": false,
+    "dataAccess": false,
+    "writes": 0,
+    "deployExecuted": false,
+    "publicationExecuted": false,
+    "productionTouched": false
   },
   "containsPII": false,
   "containsSecrets": false
