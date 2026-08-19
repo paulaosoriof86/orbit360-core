@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "orbit360-f2-runtime05-security-docsync-trigger-v1",
+  "sourceOnly": true,
+  "runtime05RunId": 32210391764,
+  "request05ReplayAllowed": false,
+  "request06Created": false,
+  "securityRepairAuthorizationGranted": false,
+  "rulesDeployAuthorized": false,
+  "rulesDeployExecuted": false,
+  "secretAccessAuthorized": false,
+  "firestoreReadAuthorized": false,
+  "cloudMutation": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
