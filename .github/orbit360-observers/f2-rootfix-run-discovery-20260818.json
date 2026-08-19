@@ -1,0 +1,14 @@
+{
+  "schemaVersion":"orbit360-f2-rootfix-run-discovery-trigger-v1",
+  "triggerSha":"24e00e7f608eda4c9156034fdc7f169beb3fa3c2",
+  "singleDiscovery":true,
+  "runtime":false,
+  "browser":false,
+  "secrets":false,
+  "firestoreRead":false,
+  "writes":false,
+  "deploy":false,
+  "production":false,
+  "containsPII":false,
+  "containsSecrets":false
+}
