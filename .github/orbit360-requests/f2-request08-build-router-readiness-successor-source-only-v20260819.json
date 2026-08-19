@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "orbit360-f2-request08-build-router-readiness-successor-source-only-v1",
+  "approved": true,
+  "authorizationSource": "user_explicit_continue_exact_next_action_20260819",
+  "sourceOnly": true,
+  "rootCause": "FUNCTIONAL_DEFECT:F2_PRODUCT_APP_ROUTER_READINESS_PREMATURE",
+  "rootfix": "PRODUCT_APP_ROUTER_HOST_READINESS_GATE",
+  "request08RunId": 32313759752,
+  "request08ReplayAllowed": false,
+  "predecessorArtifactId": 9385306424,
+  "rootfixSourceHead": "fc46bd85783d8b4d524cbeb0fee54ee9a2c774af",
+  "expectedDeltaFiles": ["core/product-app-p0.js"],
+  "expectedFileCount": 194,
+  "browser": false,
+  "runtime": false,
+  "secrets": false,
+  "firestoreRead": false,
+  "writes": false,
+  "deploy": false,
+  "production": false,
+  "request09Authorized": false,
+  "mainMergeAuthorized": false
+}
