@@ -5,56 +5,70 @@ on:
     paths:
       - '.github/workflows/orbit360-f2-rules01-postdeploy-probe-run-observer-v20260819.yml'
 permissions:
-  actions: read
   contents: write
+  actions: read
 concurrency:
   group: orbit360-f2-rules01-postdeploy-probe-run-observer-v20260819
   cancel-in-progress: false
+env:
+  TARGET_SHA: 7e346457ad178557123f7ea46bbbca3b632d505e
+  TARGET_WORKFLOW_NAME: Orbit360 F2 RULES01 Postdeploy Probe Readonly 20260818
+  TARGET_BRANCH: ays/backend-tenant-lab-v99-20260703
+  REQUEST_PATH: .github/orbit360-requests/f2-rules01-postdeploy-probe-readonly-v20260818-01.json
+  EVIDENCE_PATH: orbit360-platform/runtime-gate-crm-v20260716/f2-rules01-postdeploy-probe-run-observer-v20260819.json
 jobs:
-  observe:
+  observe_postdeploy_probe:
     runs-on: ubuntu-24.04
-    timeout-minutes: 5
-    env:
-      TARGET_SHA: 7e346457ad178557123f7ea46bbbca3b632d505e
-      TARGET_NAME: Orbit360 F2 RULES01 Postdeploy Probe Readonly 20260818
-      TARGET_PATH: .github/workflows/orbit360-f2-rules01-postdeploy-probe-readonly-v20260818.yml
-      OUT: orbit360-platform/runtime-gate-crm-v20260716/f2-rules01-postdeploy-probe-run-observer-v20260819.json
+    timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ays/backend-tenant-lab-v99-20260703
+          ref: ${{ github.sha }}
           fetch-depth: 0
-      - name: Observe exactly one target push run
+      - name: Verify observer boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "$TARGET_BRANCH"
+          test -f "$REQUEST_PATH"
+          jq -e '.requestVersion=="F2_RULES01_POSTDEPLOY_CROSS_TENANT_PROBE_READONLY_V1" and .requestOrdinal==1 and .status=="AUTHORIZED_ONCE" and .allowedExecutions==1 and .consumed==false and .replayAllowed==false and .candidateArtifactId==9345207863 and .scope.rulesDeploy==false and .scope.firestoreDocumentWrite==false and .scope.authWrite==false and .scope.membershipWrite==false and .scope.dataWrite==false and .scope.hostingDeploy==false and .scope.functionsDeploy==false and .scope.packageRebuild==false and .scope.publication==false and .scope.production==false' "$REQUEST_PATH" >/dev/null
+      - name: Locate unique postdeploy probe run and wait for terminal metadata
         env:
-          GH_TOKEN_RUNTIME: ${{ github.token }}
+          GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
-          FOUND=''
-          for i in $(seq 1 90); do
-            RAW="$RUNNER_TEMP/runs.json"
-            curl -fsSL -H "Authorization: Bearer $GH_TOKEN_RUNTIME" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/runs?head_sha=${TARGET_SHA}&event=push&per_page=100" > "$RAW"
-            COUNT=$(jq --arg sha "$TARGET_SHA" --arg name "$TARGET_NAME" --arg path "$TARGET_PATH" '[.workflow_runs[] | select(.head_sha==$sha and .name==$name and .path==$path)] | length' "$RAW")
-            if [ "$COUNT" -gt 1 ]; then echo "non-unique target run" >&2; exit 41; fi
-            if [ "$COUNT" = '1' ]; then
-              STATUS=$(jq -r --arg sha "$TARGET_SHA" --arg name "$TARGET_NAME" --arg path "$TARGET_PATH" '.workflow_runs[] | select(.head_sha==$sha and .name==$name and .path==$path) | .status' "$RAW")
-              if [ "$STATUS" = 'completed' ]; then FOUND="$RAW"; break; fi
+          API="https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/runs?head_sha=${TARGET_SHA}&event=push&per_page=100"
+          mkdir -p "$(dirname "$EVIDENCE_PATH")"
+          for i in $(seq 1 60); do
+            RESP="$(curl -fsSL -H "Authorization: Bearer $GH_TOKEN" -H 'Accept: application/vnd.github+json' -H 'X-GitHub-Api-Version: 2022-11-28' "$API")"
+            MATCHES="$(printf '%s' "$RESP" | jq --arg sha "$TARGET_SHA" --arg name "$TARGET_WORKFLOW_NAME" '[.workflow_runs[] | select(.head_sha==$sha and .name==$name and .event=="push")]')"
+            COUNT="$(printf '%s' "$MATCHES" | jq 'length')"
+            if [ "$COUNT" -gt 1 ]; then
+              printf '%s' "$MATCHES" | jq --arg sha "$TARGET_SHA" --arg name "$TARGET_WORKFLOW_NAME" '{schemaVersion:"orbit360-f2-rules01-postdeploy-probe-run-observer-v2",ok:false,status:"PIPELINE_MECHANISM_FAILURE",classification:"MULTIPLE_POSTDEPLOY_PROBE_RUNS_FOUND",targetSha:$sha,workflowName:$name,uniquenessCount:length,runs:[.[]|{id,run_attempt,status,conclusion,created_at,updated_at}],containsPII:false,containsSecrets:false,productMutation:false,requestMutation:false,runtimeReplay:false}' > "$EVIDENCE_PATH"
+              exit 41
             fi
-            sleep 2
+            if [ "$COUNT" -eq 1 ]; then
+              STATUS="$(printf '%s' "$MATCHES" | jq -r '.[0].status')"
+              if [ "$STATUS" = 'completed' ]; then
+                printf '%s' "$MATCHES" | jq --arg sha "$TARGET_SHA" --arg name "$TARGET_WORKFLOW_NAME" --arg observer "$GITHUB_RUN_ID" '{schemaVersion:"orbit360-f2-rules01-postdeploy-probe-run-observer-v2",ok:true,status:"POSTDEPLOY_PROBE_RUN_TERMINAL_METADATA_OBSERVED",classification:"OBSERVATION_PASS",targetSha:$sha,workflowName:$name,uniquenessCount:length,probeRunFound:true,observerRunId:$observer,run:{id:.[0].id,run_attempt:.[0].run_attempt,status:.[0].status,conclusion:.[0].conclusion,event:.[0].event,head_sha:.[0].head_sha,head_branch:.[0].head_branch,created_at:.[0].created_at,run_started_at:.[0].run_started_at,updated_at:.[0].updated_at,html_url:.[0].html_url},containsPII:false,containsSecrets:false,productMutation:false,requestMutation:false,runtimeReplay:false,rulesRedeploy:false}' > "$EVIDENCE_PATH"
+                break
+              fi
+            fi
+            sleep 10
           done
-          test -n "$FOUND"
-          mkdir -p "$(dirname "$OUT")"
-          jq --arg sha "$TARGET_SHA" --arg name "$TARGET_NAME" --arg path "$TARGET_PATH" --arg observer "$GITHUB_RUN_ID" '
-            [.workflow_runs[] | select(.head_sha==$sha and .name==$name and .path==$path)] as $r |
-            {schemaVersion:"orbit360-f2-rules01-postdeploy-probe-run-observer-v1",ok:($r|length)==1,status:"TERMINAL_OBSERVED",uniquenessCount:($r|length),observerRunId:$observer,targetSha:$sha,targetWorkflowName:$name,run:{id:$r[0].id,status:$r[0].status,conclusion:$r[0].conclusion,run_attempt:$r[0].run_attempt,head_sha:$r[0].head_sha,head_branch:$r[0].head_branch,event:$r[0].event,name:$r[0].name,path:$r[0].path,created_at:$r[0].created_at,updated_at:$r[0].updated_at},secretAccess:false,firestoreRead:false,rulesDeploy:false,cloudMutation:false,containsPII:false,containsSecrets:false}' "$FOUND" > "$OUT"
-          jq -e '.ok==true and .uniquenessCount==1 and .run.status=="completed" and .run.run_attempt==1' "$OUT" >/dev/null
-      - name: Persist sanitized observer evidence
+          test -f "$EVIDENCE_PATH" || { jq -n --arg sha "$TARGET_SHA" --arg name "$TARGET_WORKFLOW_NAME" '{schemaVersion:"orbit360-f2-rules01-postdeploy-probe-run-observer-v2",ok:false,status:"ENVIRONMENT_FAILURE",classification:"POSTDEPLOY_PROBE_RUN_NOT_TERMINAL_WITHIN_OBSERVER_WINDOW",targetSha:$sha,workflowName:$name,containsPII:false,containsSecrets:false,productMutation:false,requestMutation:false,runtimeReplay:false,rulesRedeploy:false}' > "$EVIDENCE_PATH"; exit 42; }
+          jq -e '.ok==true and .uniquenessCount==1 and .probeRunFound==true and .run.status=="completed" and .run.run_attempt==1 and .run.head_sha=="7e346457ad178557123f7ea46bbbca3b632d505e" and .runtimeReplay==false and .rulesRedeploy==false' "$EVIDENCE_PATH" >/dev/null
+      - name: Persist sanitized observer evidence only
+        if: success()
         shell: bash
         run: |
           set -euo pipefail
-          git config user.name 'orbit360-actions-observer'
-          git config user.email 'actions@users.noreply.github.com'
-          git add "$OUT"
-          git commit -m 'docs(gate): persist postdeploy probe run observer [skip ci]'
-          git pull --rebase origin ays/backend-tenant-lab-v99-20260703
-          git push origin HEAD:ays/backend-tenant-lab-v99-20260703
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$EVIDENCE_PATH"
+          git diff --cached --check
+          git commit -m '[skip ci] evidence(f2): persist RULES01 postdeploy probe run metadata'
+          REMOTE_HEAD="$(git ls-remote origin "refs/heads/$TARGET_BRANCH" | awk '{print $1}')"
+          test "$REMOTE_HEAD" = "$GITHUB_SHA"
+          git push origin "HEAD:$TARGET_BRANCH"
