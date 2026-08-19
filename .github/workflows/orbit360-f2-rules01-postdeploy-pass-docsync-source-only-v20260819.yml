@@ -1,0 +1,122 @@
+name: Orbit360 F2 RULES01 Postdeploy PASS Docsync Source Only 20260819
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/workflows/orbit360-f2-rules01-postdeploy-pass-docsync-source-only-v20260819.yml'
+permissions:
+  contents: write
+  actions: read
+  pull-requests: read
+concurrency:
+  group: orbit360-f2-rules01-postdeploy-pass-docsync-source-only-v20260819
+  cancel-in-progress: false
+env:
+  TARGET_BRANCH: ays/backend-tenant-lab-v99-20260703
+  TARGET_RUN_ID: '32272580947'
+  TARGET_ARTIFACT_NAME: orbit360-f2-rules01-postdeploy-probe-32272580947
+  TARGET_ARTIFACT_ID: '9372746151'
+  TARGET_ARTIFACT_DIGEST: sha256:c087ad3bae277f990c760eb04edcce96ef2746add36120040ba6da5f4d55a860
+  GATE_ID: f2-productive-acceptance-exact-successor-v20260818
+  POSTSYNC_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/f2-rules01-postdeploy-pass-postsync-source-only-v20260819.json
+jobs:
+  sync_and_validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - name: Verify immutable branch and PR boundary
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "$TARGET_BRANCH"
+          PR="$(gh api "repos/${GITHUB_REPOSITORY}/pulls/5")"
+          test "$(printf '%s' "$PR" | jq -r '.state')" = 'open'
+          test "$(printf '%s' "$PR" | jq -r '.draft')" = 'true'
+          test "$(printf '%s' "$PR" | jq -r '.merged')" = 'false'
+          test "$(printf '%s' "$PR" | jq -r '.head.ref')" = "$TARGET_BRANCH"
+          test "$(printf '%s' "$PR" | jq -r '.head.sha')" = "$GITHUB_SHA"
+          test -f .github/orbit360-requests/f2-rules01-postdeploy-probe-readonly-v20260818-01.json
+          jq -e '.status=="CONSUMED_PASS" and .consumed==true and .allowedExecutions==0 and .replayAllowed==false and .terminal.runId==32272580947 and .terminal.responseStatus==403 and .terminal.responseErrorStatus=="PERMISSION_DENIED" and .terminal.crossTenantDenied==true and .terminal.integrityBeforeAfterPass==true and .terminal.rulesRedeployExecuted==false and .terminal.firestoreDocumentWrites==0 and .terminal.authWrites==0 and .terminal.membershipWrites==0 and .terminal.dataWrites==0 and .terminal.hostingDeploy==false and .terminal.functionsDeploy==false and .terminal.packageRebuild==false and .terminal.publication==false and .terminal.production==false' .github/orbit360-requests/f2-rules01-postdeploy-probe-readonly-v20260818-01.json >/dev/null
+      - name: Verify exact existing run artifact and download evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          RUN="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${TARGET_RUN_ID}")"
+          test "$(printf '%s' "$RUN" | jq -r '.status')" = 'completed'
+          test "$(printf '%s' "$RUN" | jq -r '.conclusion')" = 'success'
+          test "$(printf '%s' "$RUN" | jq -r '.run_attempt')" = '1'
+          ARTS="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${TARGET_RUN_ID}/artifacts")"
+          MATCH="$(printf '%s' "$ARTS" | jq --arg name "$TARGET_ARTIFACT_NAME" '[.artifacts[] | select(.name==$name)]')"
+          test "$(printf '%s' "$MATCH" | jq 'length')" = '1'
+          test "$(printf '%s' "$MATCH" | jq -r '.[0].id')" = "$TARGET_ARTIFACT_ID"
+          test "$(printf '%s' "$MATCH" | jq -r '.[0].digest')" = "$TARGET_ARTIFACT_DIGEST"
+          rm -rf .tmp/f2-postdeploy && mkdir -p .tmp/f2-postdeploy
+          gh run download "$TARGET_RUN_ID" -n "$TARGET_ARTIFACT_NAME" -D .tmp/f2-postdeploy
+          TERMINAL=.tmp/f2-postdeploy/f2-rules01-postdeploy-probe-terminal-run-32272580947.json
+          test -f "$TERMINAL"
+          jq -e '.ok==true and .status=="F2_RULES01_POSTDEPLOY_CROSS_TENANT_PROBE_PASS" and .runId==32272580947 and .requestOrdinal==1 and .candidateArtifactId==9345207863 and .probe.responseStatus==403 and .probe.responseErrorStatus=="PERMISSION_DENIED" and .probe.crossTenantDenied==true and .integrity.integrityBeforeAfterPass==true and .integrity.countsIdentical==true and .integrity.digestsIdentical==true and .scope.rulesRedeployExecuted==false and .scope.firestoreDocumentWrites==0 and .scope.authWrites==0 and .scope.membershipWrites==0 and .scope.dataWrites==0 and .scope.hostingDeploy==false and .scope.functionsDeploy==false and .scope.packageRebuilt==false and .scope.publicationExecuted==false and .scope.productionHostingTouched==false' "$TERMINAL" >/dev/null
+      - name: Apply idempotent live-state docsync
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd orbit360-platform
+          node --check tools/orbit360-f2-rules01-postdeploy-pass-docsync-v20260819.mjs
+          node tools/orbit360-f2-rules01-postdeploy-pass-docsync-v20260819.mjs --terminal ../.tmp/f2-postdeploy/f2-rules01-postdeploy-probe-terminal-run-32272580947.json | tee /tmp/f2-docsync.txt
+          grep -F 'F2_RULES01_POSTDEPLOY_PASS_DOCSYNC_PREPARED' /tmp/f2-docsync.txt
+      - name: Mandatory canonical F2 gate after docsync
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd orbit360-platform
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$GATE_ID" | tee /tmp/f2-source-gate.txt
+          grep -F 'PASS_GATE_CONTRACT_SOURCE_F2_PRODUCTIVE_ACCEPTANCE' /tmp/f2-source-gate.txt
+      - name: Write sanitized post-sync source-only evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs=require('fs');
+          const p=process.env.POSTSYNC_EVIDENCE;
+          const e={
+            schemaVersion:'orbit360-f2-rules01-postdeploy-pass-postsync-source-only-v1',
+            ok:true,
+            status:'F2_RULES01_POSTDEPLOY_PASS_POSTSYNC_SOURCE_ONLY_PASS',
+            classification:'SOURCE_CONTRACT_PASS',
+            gateId:process.env.GATE_ID,
+            gateMarker:'PASS_GATE_CONTRACT_SOURCE_F2_PRODUCTIVE_ACCEPTANCE',
+            postdeployProbe:{runId:32272580947,artifactId:9372746151,httpStatus:403,errorStatus:'PERMISSION_DENIED',crossTenantDenied:true,integrityBeforeAfterPass:true,requestConsumed:true,replayAllowed:false,rulesRedeployExecuted:false},
+            boundary:{phase:'F2_RULES01_POSTDEPLOY_PROBE_PASS_REQUEST06_AUTHORIZATION_PENDING',request06Created:false,request06Authorized:false,successorArtifactId:9345207863,successorPublished:false,productionOperationalDeclared:false},
+            scope:{secretAccess:false,firestoreRead:false,authRead:false,browserExecuted:false,runtimeExecuted:false,firestoreDocumentWrites:0,authWrites:0,membershipWrites:0,dataWrites:0,rulesDeploy:false,hostingDeploy:false,functionsDeploy:false,packageRebuild:false,publication:false,production:false,mainMerge:false},
+            observerRootCause:{classification:'PIPELINE_MECHANISM_FAILURE',code:'F2_POSTDEPLOY_PROBE_OBSERVER_OVERCONSTRAINED_BY_ACTIONS_PATH_FIELD',status:'CLOSED',probeReplayed:false},
+            containsPII:false,containsSecrets:false,generatedAt:new Date().toISOString()
+          };
+          fs.mkdirSync(require('path').dirname(p),{recursive:true});
+          fs.writeFileSync(p,JSON.stringify(e,null,2)+'\n');
+          NODE
+          jq -e '.ok==true and .postdeployProbe.crossTenantDenied==true and .postdeployProbe.integrityBeforeAfterPass==true and .postdeployProbe.requestConsumed==true and .postdeployProbe.replayAllowed==false and .boundary.request06Created==false and .boundary.successorPublished==false and .scope.firestoreDocumentWrites==0 and .scope.authWrites==0 and .scope.membershipWrites==0 and .scope.dataWrites==0 and .scope.rulesDeploy==false and .scope.hostingDeploy==false and .scope.functionsDeploy==false and .scope.packageRebuild==false and .scope.publication==false and .scope.production==false' "$POSTSYNC_EVIDENCE" >/dev/null
+      - name: Persist synchronized source-only closure
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf .tmp
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add orbit360-platform/docs/orbit360-live-state-v1.json \
+                  orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json \
+                  orbit360-platform/docs/CHECKPOINT-F2-RULES01-POSTDEPLOY-CROSS-TENANT-PROBE-PASS-REQUEST06-AUTH-PENDING-20260819.md \
+                  orbit360-platform/runtime-gate-crm-v20260716/f2-rules01-postdeploy-probe-pass-v20260819.json \
+                  "$POSTSYNC_EVIDENCE"
+          git diff --cached --check
+          git diff --cached --quiet && exit 0
+          git commit -m '[skip ci] docs(f2): close RULES01 postdeploy PASS and bind Request06 boundary'
+          REMOTE_HEAD="$(git ls-remote origin "refs/heads/$TARGET_BRANCH" | awk '{print $1}')"
+          test "$REMOTE_HEAD" = "$GITHUB_SHA"
+          git push origin "HEAD:$TARGET_BRANCH"
