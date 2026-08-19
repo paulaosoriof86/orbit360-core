@@ -1,0 +1,63 @@
+name: Orbit360 F2 Validator Stale Rootfix Source Only 20260818
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-observers/f2-validator-rootfix-source-only-20260818.json'
+permissions:
+  contents: write
+concurrency:
+  group: orbit360-f2-validator-rootfix-source-only-20260818
+  cancel-in-progress: false
+env:
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  ORBIT360_GATE_ID: f2-productive-acceptance-exact-successor-v20260818
+  ORBIT360_EXPECTED_REQUEST_VERSION: NONE_PENDING_FRESH_AUTHORIZATION
+  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+jobs:
+  rootfix_source_only:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Source-only patch canonical router
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
+          node --check tools/orbit360-f2-enable-historical-consumed-source-v20260818.mjs
+          node --check tools/orbit360-validar-gate-contracts-engine-f2-productive-acceptance-v20260818.mjs
+          node tools/orbit360-f2-enable-historical-consumed-source-v20260818.mjs
+          node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
+          git diff --check
+      - name: Verify consumed request remains frozen and non-replayable
+        shell: bash
+        run: |
+          set -euo pipefail
+          R=.github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-runbound-20260818-01.json
+          jq -e '.status=="CONSUMED_STOP_RETRY" and .allowedExecutions==0 and .consumed==true and .authorizationFrozen==true and .replayAllowed==false and .runtimeRunId==32205144735 and .artifactDownloaded==false and .secretAccess==false and .firestoreRead==false and .browserExecuted==false and .runtimeExecuted==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0' "$R" >/dev/null
+      - name: Canonical source-only proof after validator rootfix
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f "$EVIDENCE_DIR/preflight-sanitizado.json"
+          env -u ORBIT360_REQUEST_FILE ORBIT360_EXPECTED_REQUEST_VERSION=NONE_PENDING_FRESH_AUTHORIZATION node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
+          jq -e '.ok==true and .status=="PASS_GATE_CONTRACT_SOURCE_F2_PRODUCTIVE_ACCEPTANCE" and .classification=="PASS" and .contractVersion=="2.0.0" and .validatorRootfix=="F2_LIVE_STATE_BOUNDARY_CURRENT_SOURCE_PASS" and .liveBoundaryCurrent==true and .indexBoundaryCurrent==true and .candidateArtifactId==9345207863 and .executionAuthorized==false and .secretAccessAuthorized==false and .firestoreReadAuthorized==false and .runtimeAuthorized==false and .browserAuthorized==false and .writeAuthorized==false and .deployAuthorized==false and .publicationAuthorized==false and .productionAuthorized==false and .browserExecuted==false and .runtimeExecuted==false and .secretAccess==false and .dataAccess==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+          jq --arg run "$GITHUB_RUN_ID" --arg sha "$GITHUB_SHA" '. + {rootfixSourceRunId:$run,rootfixTriggerSha:$sha,rootfixStatus:"F2_VALIDATOR_STALE_ROOTFIX_SOURCE_ONLY_PASS",runtimeRequestReplayed:false,runtimeRunCreated:false}' "$EVIDENCE_DIR/preflight-sanitizado.json" > "$EVIDENCE_DIR/f2-validator-stale-rootfix-source-only-v20260818.json"
+      - name: Persist only router and sanitized source evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'orbit360-f2-validator-rootfix-bot'
+          git config user.email 'orbit360-f2-validator-rootfix-bot@users.noreply.github.com'
+          git add tools/orbit360-validar-gate-contracts-v20260717.mjs "$EVIDENCE_DIR/f2-validator-stale-rootfix-source-only-v20260818.json"
+          git diff --cached --check
+          git commit -m 'fix(f2): close live-boundary validator stale source-only [skip ci]'
+          git push origin "HEAD:$ORBIT360_BRANCH"
