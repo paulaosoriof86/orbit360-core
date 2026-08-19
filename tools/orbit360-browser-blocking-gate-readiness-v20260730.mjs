@@ -15,12 +15,14 @@ export async function settleBlockingGates(page,options={}){
   const hardTimeoutMs=numberOr(options.hardTimeoutMs,5000,arrivalWindowMs+quietWindowMs,15000);
   const detachTimeoutMs=numberOr(options.detachTimeoutMs,10000,500,15000);
   const started=Date.now();
+  const hardDeadline=started+hardTimeoutMs;
   let lastActivity=started;
+  let postDetachDeadline=0;
   let accepted=0;
   let sawGate=false;
   const handled=[];
 
-  while(Date.now()-started<hardTimeoutMs){
+  while(true){
     const gates=page.locator('[data-legal-gate]');
     const count=await gates.count();
     if(count>0){
@@ -37,14 +39,22 @@ export async function settleBlockingGates(page,options={}){
       accepted+=1;
       handled.push('legal');
       lastActivity=Date.now();
+      postDetachDeadline=lastActivity+quietWindowMs;
       continue;
     }
 
-    const elapsed=Date.now()-started;
-    const quiet=Date.now()-lastActivity;
+    const now=Date.now();
+    const elapsed=now-started;
+    const quiet=now-lastActivity;
     if(elapsed>=arrivalWindowMs&&quiet>=quietWindowMs){
       return {ok:true,sawGate,accepted,remaining:0,elapsedMs:elapsed,quietWindowSatisfied:true,handled:handled.slice()};
     }
+
+    // hardTimeoutMs limits passive arrival/readiness waiting. Once a gate has
+    // actually been handled and detached, always grant its own quiet window;
+    // otherwise a slow but successful detach can be misclassified as timeout.
+    const observationDeadline=sawGate?Math.max(hardDeadline,postDetachDeadline):hardDeadline;
+    if(now>=observationDeadline)break;
     await page.waitForTimeout(pollMs);
   }
 
