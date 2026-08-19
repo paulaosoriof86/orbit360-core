@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "orbit360-f2-legal-readiness-rootfix-discovery-trigger-v1",
+  "sourceTriggerSha": "6ac32f1a04f01f173e4c745ba623701d6c295258",
+  "runtimeRunId": 32207049146,
+  "purpose": "discover_source_only_rootfix_run_only",
+  "runtimeAuthorized": false,
+  "secretAccessAuthorized": false,
+  "browserAuthorized": false,
+  "writesAuthorized": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
