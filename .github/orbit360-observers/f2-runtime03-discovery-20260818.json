@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "orbit360-f2-runtime03-discovery-trigger-v1",
+  "requestCommit": "809228b1e8d65282f553881b0e2b4dd5e1974e2a",
+  "requestOrdinal": 3,
+  "candidateArtifactId": 9345207863,
+  "purpose": "discover_exact_single_runtime03_run_only",
+  "runtimeAuthorized": false,
+  "secretAccessAuthorized": false,
+  "browserAuthorized": false,
+  "writesAuthorized": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
