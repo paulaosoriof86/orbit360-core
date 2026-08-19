@@ -2,6 +2,8 @@ name: Orbit360 F2 Proven Source Closure Vehicle 20260818
 on:
   push:
     branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-observers/f2-pre-request06-no-path-execution-trigger-v20260819-1143.json'
 permissions:
   contents: write
   actions: read
@@ -12,9 +14,9 @@ concurrency:
 env:
   BRANCH: ays/backend-tenant-lab-v99-20260703
   EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+  TRIGGER_FILE: .github/orbit360-observers/f2-pre-request06-no-path-execution-trigger-v20260819-1143.json
 jobs:
   pre_request06_source_closure:
-    if: github.event.head_commit.message == 'ci(f2): execute pre-Request06 via proven source workflow no-path'
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
@@ -34,6 +36,8 @@ jobs:
         run: |
           set -euo pipefail
           test "$GITHUB_REF_NAME" = "$BRANCH"
+          test -f "$TRIGGER_FILE"
+          jq -e '.mode=="source-only" and .request06Created==false and .runtimeAuthorized==false and .browserAuthorized==false and .secretAccessAuthorized==false and .firestoreReadAuthorized==false and .operationalWritesAuthorized==false and .deployAuthorized==false and .productionAuthorized==false' "$TRIGGER_FILE" >/dev/null
           test ! -e .github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-runbound-20260818-06.json
           jq -e '.status=="CONSUMED_PASS" and .consumed==true and .allowedExecutions==0 and .replayAllowed==false and .terminal.runId==32272580947 and .terminal.crossTenantDenied==true and .terminal.integrityBeforeAfterPass==true and .terminal.rulesRedeployExecuted==false' .github/orbit360-requests/f2-rules01-postdeploy-probe-readonly-v20260818-01.json >/dev/null
           PR="$(gh api "repos/${GITHUB_REPOSITORY}/pulls/5")"
@@ -41,7 +45,6 @@ jobs:
           test "$(printf '%s' "$PR" | jq -r '.draft')" = true
           test "$(printf '%s' "$PR" | jq -r '.merged')" = false
           test "$(printf '%s' "$PR" | jq -r '.head.ref')" = "$BRANCH"
-          test "$(printf '%s' "$PR" | jq -r '.head.sha')" = "$GITHUB_SHA"
       - name: Download immutable already-PASS postdeploy evidence
         id: evidence
         env:
@@ -80,7 +83,7 @@ jobs:
           jq -e '.ok==true and .status=="F2_PRE_REQUEST06_POSTSYNC_CANONICAL_GATE_PASS" and .knownRootfixAuditPass==true and .boundary.requestOrdinal==6 and .boundary.request06Created==false and .boundary.successorPublished==false and .scope.writes==0 and .scope.production==false' "$EVIDENCE_DIR/f2-pre-request06-postsync-source-only-v20260819.json" >/dev/null
           jq -e '.ok==true and .evidenceContractVersion=="F2_POSTDEPLOY_EVIDENCE_PRODUCER_CONTRACT_V1" and .probe.responseStatus==403 and .probe.responseErrorStatus=="PERMISSION_DENIED" and .probe.crossTenantDenied==true and .integrity.countsIdentical==true and .integrity.digestsIdentical==true and .writes.firestoreDocument==0 and .forbiddenEffects.rulesRedeploy==false and .forbiddenEffects.production==false' "$EVIDENCE_DIR/f2-rules01-postdeploy-composite-evidence-v20260819.json" >/dev/null
           git diff --check
-      - name: Retire broad trigger after successful closure
+      - name: Retire trigger after successful closure
         id: retire
         shell: bash
         run: |
@@ -89,8 +92,8 @@ jobs:
           from pathlib import Path
           p=Path('.github/workflows/orbit360-f2-role-view-rootfix-source-only-v20260818.yml')
           s=p.read_text(encoding='utf-8')
-          old="on:\n  push:\n    branches: [ays/backend-tenant-lab-v99-20260703]\n"
-          new="on:\n  push:\n    branches: [ays/backend-tenant-lab-v99-20260703]\n    paths:\n      - '.github/orbit360-observers/f2-pre-request06-closure-consumed-sentinel-v20260819.json'\n"
+          old="    paths:\n      - '.github/orbit360-observers/f2-pre-request06-no-path-execution-trigger-v20260819-1143.json'\n"
+          new="    paths:\n      - '.github/orbit360-observers/f2-pre-request06-closure-consumed-sentinel-v20260819.json'\n"
           if s.count(old) != 1:
               raise SystemExit('PIPELINE_MECHANISM_FAILURE:PROVEN_WORKFLOW_RETIRE_ANCHOR_MISMATCH')
           p.write_text(s.replace(old,new,1),encoding='utf-8')
@@ -108,8 +111,8 @@ jobs:
           git diff --cached --check
           test -n "$(git diff --cached --name-only)"
           git commit -m '[skip ci] fix(f2): pre-Request06 source closure PASS'
-          REMOTE_HEAD="$(git ls-remote origin "refs/heads/$BRANCH" | awk '{print $1}')"
-          test "$REMOTE_HEAD" = "$GITHUB_SHA"
+          git fetch origin "$BRANCH"
+          git rebase "origin/$BRANCH"
           git push origin "HEAD:$BRANCH"
       - name: Persist sanitized failure observability
         if: ${{ failure() }}
@@ -127,12 +130,12 @@ jobs:
             --arg closure '${{ steps.closure.outcome }}' \
             --arg retire '${{ steps.retire.outcome }}' \
             --arg persistSuccess '${{ steps.persist_success.outcome }}' \
-            '{schemaVersion:"orbit360-f2-pre-request06-source-closure-failure-observability-v1",ok:false,status:"F2_PRE_REQUEST06_SOURCE_CLOSURE_FAILED_OBSERVED",classification:"PIPELINE_MECHANISM_FAILURE",runId:$runId,triggerSha:$triggerSha,stepOutcomes:{boundary:$boundary,evidence:$evidence,closure:$closure,retire:$retire,persistSuccess:$persistSuccess},request06Created:false,browserExecuted:false,runtimeExecuted:false,secretAccess:false,firestoreRead:false,firestoreDocumentWrites:0,authWrites:0,membershipWrites:0,dataWrites:0,rulesDeploy:false,hostingDeploy:false,functionsDeploy:false,packageRebuild:false,publication:false,production:false,containsPII:false,containsSecrets:false}' > "$EVIDENCE_DIR/f2-pre-request06-source-closure-last-failure-v20260819.json"
+            '{schemaVersion:"orbit360-f2-pre-request06-source-closure-failure-observability-v1",ok:false,status:"F2_PRE_REQUEST06_SOURCE_CLOSURE_FAILED_OBSERVED",classification:"PIPELINE_MECHANISM_FAILURE",rootCauseCandidate:"F2_PRE_REQUEST06_WORKFLOW_TRIGGER_AND_PERSISTENCE_COUPLED_TO_EXACT_EVENT_SHA",runId:$runId,triggerSha:$triggerSha,stepOutcomes:{boundary:$boundary,evidence:$evidence,closure:$closure,retire:$retire,persistSuccess:$persistSuccess},request06Created:false,browserExecuted:false,runtimeExecuted:false,secretAccess:false,firestoreRead:false,firestoreDocumentWrites:0,authWrites:0,membershipWrites:0,dataWrites:0,rulesDeploy:false,hostingDeploy:false,functionsDeploy:false,packageRebuild:false,publication:false,production:false,containsPII:false,containsSecrets:false}' > "$EVIDENCE_DIR/f2-pre-request06-source-closure-last-failure-v20260819.json"
           git config user.name 'orbit360-f2-pre-request06-bot'
           git config user.email 'orbit360-f2-pre-request06-bot@users.noreply.github.com'
           git add "$EVIDENCE_DIR/f2-pre-request06-source-closure-last-failure-v20260819.json"
           git diff --cached --check
           git commit -m '[skip ci] diag(f2): persist pre-Request06 source closure failure'
-          REMOTE_HEAD="$(git ls-remote origin "refs/heads/$BRANCH" | awk '{print $1}')"
-          test "$REMOTE_HEAD" = "$GITHUB_SHA"
+          git fetch origin "$BRANCH"
+          git rebase "origin/$BRANCH"
           git push origin "HEAD:$BRANCH"
