@@ -4,8 +4,11 @@ on:
     branches: [ays/backend-tenant-lab-v99-20260703]
     paths:
       - '.github/orbit360-observers/f2-role-view-rootfix-source-only-trigger-v20260818.json'
+      - '.github/orbit360-observers/f2-pre-request06-via-proven-role-workflow-trigger-v20260819.json'
 permissions:
   contents: write
+  actions: read
+  pull-requests: read
 concurrency:
   group: orbit360-f2-role-view-rootfix-source-only-20260818
   cancel-in-progress: false
@@ -15,6 +18,7 @@ env:
   EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
 jobs:
   source_only:
+    if: github.event.head_commit.message != 'ci(f2): trigger pre-Request06 via proven source workflow'
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
@@ -61,7 +65,6 @@ jobs:
           PY
           node --check "$RUNNER_FILE"
           git diff --check
-          git diff -- "$RUNNER_FILE"
       - name: Deterministic role-view contract regression proof
         shell: bash
         run: |
@@ -78,6 +81,88 @@ jobs:
           git add "$RUNNER_FILE" "$EVIDENCE_DIR/f2-role-view-contract-selftest-v20260818.json" "$EVIDENCE_DIR/f2-role-view-rootfix-source-only-v20260818.json"
           git diff --cached --check
           git commit -m 'fix(f2): close role-view validator stale source-only [skip ci]'
+          REMOTE_HEAD="$(git ls-remote origin "refs/heads/$BRANCH" | awk '{print $1}')"
+          test "$REMOTE_HEAD" = "$GITHUB_SHA"
+          git push origin "HEAD:$BRANCH"
+
+  pre_request06_source_closure:
+    if: github.event.head_commit.message == 'ci(f2): trigger pre-Request06 via proven source workflow'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify exact source-only boundary
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "$BRANCH"
+          test -f .github/orbit360-observers/f2-pre-request06-via-proven-role-workflow-trigger-v20260819.json
+          jq -e '.request06Created==false and .runtimeAuthorized==false and .browserAuthorized==false and .secretAccessAuthorized==false' .github/orbit360-observers/f2-pre-request06-via-proven-role-workflow-trigger-v20260819.json >/dev/null
+          test ! -e .github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-runbound-20260818-06.json
+          jq -e '.status=="CONSUMED_PASS" and .consumed==true and .allowedExecutions==0 and .replayAllowed==false and .terminal.runId==32272580947 and .terminal.crossTenantDenied==true and .terminal.integrityBeforeAfterPass==true and .terminal.rulesRedeployExecuted==false' .github/orbit360-requests/f2-rules01-postdeploy-probe-readonly-v20260818-01.json >/dev/null
+          PR="$(gh api "repos/${GITHUB_REPOSITORY}/pulls/5")"
+          test "$(printf '%s' "$PR" | jq -r '.state')" = open
+          test "$(printf '%s' "$PR" | jq -r '.draft')" = true
+          test "$(printf '%s' "$PR" | jq -r '.merged')" = false
+          test "$(printf '%s' "$PR" | jq -r '.head.ref')" = "$BRANCH"
+          test "$(printf '%s' "$PR" | jq -r '.head.sha')" = "$GITHUB_SHA"
+      - name: Download immutable already-PASS postdeploy evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          RUN_ID=32272580947
+          ARTIFACT_NAME=orbit360-f2-rules01-postdeploy-probe-32272580947
+          RUN="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}")"
+          test "$(printf '%s' "$RUN" | jq -r '.status')" = completed
+          test "$(printf '%s' "$RUN" | jq -r '.conclusion')" = success
+          test "$(printf '%s' "$RUN" | jq -r '.run_attempt')" = 1
+          ARTS="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}/artifacts")"
+          MATCH="$(printf '%s' "$ARTS" | jq --arg name "$ARTIFACT_NAME" '[.artifacts[] | select(.name==$name)]')"
+          test "$(printf '%s' "$MATCH" | jq 'length')" = 1
+          test "$(printf '%s' "$MATCH" | jq -r '.[0].id')" = 9372746151
+          test "$(printf '%s' "$MATCH" | jq -r '.[0].digest')" = 'sha256:c087ad3bae277f990c760eb04edcce96ef2746add36120040ba6da5f4d55a860'
+          rm -rf .tmp/f2 && mkdir -p .tmp/f2
+          gh run download "$RUN_ID" -n "$ARTIFACT_NAME" -D .tmp/f2
+          test -f .tmp/f2/f2-rules01-postdeploy-probe-terminal-run-32272580947.json
+          test -f .tmp/f2/f2-rules01-cross-tenant-forced-server-run-32272580947.json
+          test -f .tmp/f2/f2-integrity-before-after-v20260818.json
+      - name: Execute single producer-contract source closure
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-f2-pre-request06-source-closure-v20260819.mjs
+          node tools/orbit360-f2-pre-request06-source-closure-v20260819.mjs \
+            --terminal .tmp/f2/f2-rules01-postdeploy-probe-terminal-run-32272580947.json \
+            --probe .tmp/f2/f2-rules01-cross-tenant-forced-server-run-32272580947.json \
+            --integrity .tmp/f2/f2-integrity-before-after-v20260818.json | tee /tmp/f2-close.txt
+          grep -F 'F2_PRE_REQUEST06_SOURCE_CLOSURE_PASS' /tmp/f2-close.txt
+          jq -e '.ok==true and .status=="F2_PRE_REQUEST06_KNOWN_ROOTFIXES_SOURCE_ONLY_PASS" and .sourceGateMarker=="PASS_GATE_CONTRACT_SOURCE_F2_PRODUCTIVE_ACCEPTANCE" and .request06Created==false and .request06Authorized==false and .browserExecuted==false and .secretAccess==false and .firestoreDocumentWrites==0 and .rulesDeploy==false and .production==false' "$EVIDENCE_DIR/f2-full-runtime-cross-tenant-validator-stale-rootfix-source-only-v20260819.json" >/dev/null
+          jq -e '.ok==true and .status=="F2_PRE_REQUEST06_POSTSYNC_CANONICAL_GATE_PASS" and .knownRootfixAuditPass==true and .boundary.requestOrdinal==6 and .boundary.request06Created==false and .boundary.successorPublished==false and .scope.writes==0 and .scope.production==false' "$EVIDENCE_DIR/f2-pre-request06-postsync-source-only-v20260819.json" >/dev/null
+          jq -e '.ok==true and .evidenceContractVersion=="F2_POSTDEPLOY_EVIDENCE_PRODUCER_CONTRACT_V1" and .probe.responseStatus==403 and .probe.responseErrorStatus=="PERMISSION_DENIED" and .probe.crossTenantDenied==true and .integrity.countsIdentical==true and .integrity.digestsIdentical==true and .writes.firestoreDocument==0 and .forbiddenEffects.rulesRedeploy==false and .forbiddenEffects.production==false' "$EVIDENCE_DIR/f2-rules01-postdeploy-composite-evidence-v20260819.json" >/dev/null
+          git diff --check
+      - name: Persist one serialized source-only closure
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf .tmp
+          git config user.name 'orbit360-f2-pre-request06-bot'
+          git config user.email 'orbit360-f2-pre-request06-bot@users.noreply.github.com'
+          git add -A
+          test -z "$(git diff --cached --name-only | grep -E '(^|/)(\.env|.*secret.*|.*credential.*)$' || true)"
+          git diff --cached --check
+          test -n "$(git diff --cached --name-only)"
+          git commit -m '[skip ci] fix(f2): pre-Request06 source closure PASS'
           REMOTE_HEAD="$(git ls-remote origin "refs/heads/$BRANCH" | awk '{print $1}')"
           test "$REMOTE_HEAD" = "$GITHUB_SHA"
           git push origin "HEAD:$BRANCH"
