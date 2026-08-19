@@ -1,0 +1,68 @@
+{
+  "schemaVersion": "orbit360-f2-pre-request06-source-closure-v1",
+  "ok": true,
+  "status": "F2_PRE_REQUEST06_KNOWN_ROOTFIXES_SOURCE_ONLY_PASS",
+  "classification": "PASS",
+  "sourceGateMarker": "PASS_GATE_CONTRACT_SOURCE_F2_PRODUCTIVE_ACCEPTANCE",
+  "rootCauseClosed": {
+    "classification": "VALIDATOR_STALE",
+    "code": "F2_FULL_RUNTIME_CROSS_TENANT_PROBE_STILL_USES_RESERVED_INVALID_DOCUMENT_ID_AFTER_RULES01_VALID_PATH_ROOTFIX",
+    "sharedContract": "F2_CROSS_TENANT_PROBE_VALID_PATH_V2"
+  },
+  "pipelineRootCausesClosed": [
+    {
+      "classification": "PIPELINE_MECHANISM_FAILURE",
+      "code": "F2_POSTDEPLOY_PROBE_OBSERVER_OVERCONSTRAINED_BY_ACTIONS_PATH_FIELD"
+    },
+    {
+      "classification": "PIPELINE_MECHANISM_FAILURE",
+      "code": "POSTDEPLOY_CLOSURE_INFERRED_ARTIFACT_SCHEMA_INSTEAD_OF_PRODUCER_CONTRACT"
+    },
+    {
+      "classification": "PIPELINE_MECHANISM_FAILURE",
+      "code": "NEW_WORKFLOW_SELF_CREATION_DID_NOT_ESTABLISH_PUSH_TRIGGER"
+    }
+  ],
+  "evidenceContractVersion": "F2_POSTDEPLOY_EVIDENCE_PRODUCER_CONTRACT_V1",
+  "postdeployProof": {
+    "runId": 32272580947,
+    "artifactId": 9372746151,
+    "httpStatus": 403,
+    "errorStatus": "PERMISSION_DENIED",
+    "crossTenantDenied": true,
+    "integrityBeforeAfterPass": true,
+    "replayed": false,
+    "rulesRedeployed": false
+  },
+  "auditedKnownContracts": [
+    "authentication_product_browser_provider",
+    "legal_detach_quiet_window",
+    "role_view_direction_superadmin",
+    "actual_route_topology",
+    "cross_tenant_valid_path_v2",
+    "dynamic_runbound_lifecycle",
+    "pwa_service_worker_build_parity",
+    "exact_artifact_binding",
+    "zero_deploy_runtime_workflow"
+  ],
+  "request06Created": false,
+  "request06Authorized": false,
+  "browserExecuted": false,
+  "runtimeExecuted": false,
+  "secretAccess": false,
+  "firestoreRead": false,
+  "firestoreDocumentWrites": 0,
+  "authWrites": 0,
+  "membershipWrites": 0,
+  "dataWrites": 0,
+  "rulesDeploy": false,
+  "hostingDeploy": false,
+  "functionsDeploy": false,
+  "packageRebuild": false,
+  "publication": false,
+  "production": false,
+  "mainMerge": false,
+  "containsPII": false,
+  "containsSecrets": false,
+  "generatedAt": "2026-08-19T18:33:59.901Z"
+}

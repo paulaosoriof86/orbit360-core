@@ -1,0 +1,73 @@
+{
+  "schemaVersion": "orbit360-f2-full-runtime-known-rootfixes-selftest-v1",
+  "ok": true,
+  "status": "F2_FULL_RUNTIME_KNOWN_ROOTFIXES_SOURCE_AUDIT_PASS",
+  "classification": "PASS",
+  "candidateArtifactId": 9345207863,
+  "candidateSourceHead": "29caae94a3db1f1626bdde2ea6ee9a21799f9df6",
+  "crossTenant": {
+    "contract": "F2_CROSS_TENANT_PROBE_VALID_PATH_V2",
+    "pathValid": true,
+    "reservedIdAbsent": true,
+    "sharedContractBound": true
+  },
+  "roleView": {
+    "rootfixBound": true,
+    "superAdminResolvesDirection": true,
+    "adminTenantRejectedForDirection": true
+  },
+  "legalGate": {
+    "detachQuietWindowRootfixBound": true
+  },
+  "topology": {
+    "routes": [
+      "inicio",
+      "cliente360",
+      "aseguradoras",
+      "ops",
+      "leads",
+      "polizas",
+      "cobros"
+    ],
+    "integrated": [
+      "vehiculos",
+      "recibosCartera"
+    ]
+  },
+  "requestLifecycle": {
+    "dynamicRunbound": true,
+    "ordinalCoupling": false
+  },
+  "pwa": {
+    "frozenSourceBuild": "20260723-10",
+    "serviceWorkerBuild": "20260723-10",
+    "buildsMatch": true,
+    "cacheCleanupContract": true
+  },
+  "auth": {
+    "frozenProductBrowserProviderPresent": true,
+    "passwordSignInProviderPresent": true
+  },
+  "runtimeWorkflow": {
+    "deployCommandPresent": false,
+    "selftestBound": true
+  },
+  "browserExecuted": false,
+  "runtimeExecuted": false,
+  "secretAccess": false,
+  "firestoreRead": false,
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "membershipWrites": 0,
+  "dataWrites": 0,
+  "rulesDeploy": false,
+  "hostingDeploy": false,
+  "functionsDeploy": false,
+  "packageRebuild": false,
+  "publication": false,
+  "production": false,
+  "request06Created": false,
+  "containsPII": false,
+  "containsSecrets": false,
+  "generatedAt": "2026-08-19T18:33:59.789Z"
+}

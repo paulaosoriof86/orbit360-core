@@ -32,6 +32,9 @@ try{
   for(const token of ["['desktopDirection','Dirección'","['tabletOperativo','Operativo'","['mobileAsesor','Asesor'",'cliente360','aseguradoras','ops','leads','polizas','cobros','orbit-policy-fullpage','orbit-vehicle-fullpage','recibosEsperados','crossTenantDenied','serviceWorker','integrityBeforeAfter']) need(exec.includes(token),`VALIDATOR_STALE:F2_RUNTIME_EXECUTOR_MATRIX_MISSING:${token}`);
   need(cv.includes('F2_EXACT_CANDIDATE_SOURCE_VALIDATION_PASS')&&cv.includes('fullRehashPass:true'),'VALIDATOR_STALE:F2_CANDIDATE_SOURCE_VALIDATOR_INVALID');
 
+  need(wf.includes('orbit360-test-f2-full-runtime-known-rootfixes-v20260819.mjs'),'VALIDATOR_STALE:F2_RUNTIME_KNOWN_ROOTFIX_SELFTEST_NOT_BOUND');
+  need(exec.includes("from './orbit360-f2-cross-tenant-probe-contract-v20260818.mjs'")&&exec.includes('validateProbeDocumentPath(PROBE_DOCUMENT_PATH)')&&!exec.includes('__orbit360_f2_cross_tenant_probe__'),'VALIDATOR_STALE:F2_FULL_RUNTIME_CROSS_TENANT_PROBE_CONTRACT_NOT_BOUND');
+
   const expectedRequest=String(process.env.ORBIT360_EXPECTED_REQUEST_VERSION||'NONE_PENDING_FRESH_AUTHORIZATION'),runtimeMode=expectedRequest!=='NONE_PENDING_FRESH_AUTHORIZATION';
   const boundaryEvidence={stableBoundaryContract:true,sourceClosed:boundary.sourceClosed,phaseStillF2:boundary.phaseStillF2,nextActionBound:boundary.nextActionBound,indexBoundaryCurrent:boundary.indexBound,narrativeStatusesAuthoritative:false,narrativeAttemptStatusMutationPass:boundarySelfTest.provesNarrativeAttemptStatusIsNonAuthoritative};
 

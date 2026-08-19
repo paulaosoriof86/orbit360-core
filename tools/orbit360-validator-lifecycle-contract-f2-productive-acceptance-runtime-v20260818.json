@@ -1,18 +1,101 @@
 {
-  "schemaVersion":"orbit360-validator-lifecycle-contract-v1",
-  "gateId":"f2-productive-acceptance-exact-successor-v20260818",
-  "gateContractVersion":"2.0.0",
-  "validatorLifecycleRevision":"phase-capability-contract-v1",
-  "f2ValidatorRevision":"f2-productive-acceptance-exact-successor-v1-20260818",
-  "status":"F2_RUNTIME_PENDING_AUTHORIZATION",
-  "currentPhase":"F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY",
-  "executionProfile":{"phase":"F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY","capabilities":{"secrets":true,"firestoreRead":true,"writes":false,"runtime":true,"browser":true,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false}},
-  "singleGate":true,
-  "macroClosure":true,
-  "block":"F2_GATE_DE_ACEPTACION_PRODUCTIVA_REAL",
-  "authorization":{"requiredForExecution":true,"activeRequest":false,"request":".github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-runbound-20260818-01.json","allowedExecutions":0,"consumed":false,"authorizationFrozen":true,"replayAllowed":false},
-  "guards":{"candidateArtifactId":9345207863,"candidateZipSha256":"493009c83390901aa772842a2ba9ddd5ce5293f6969d86c5c3395ebd670a44ac","candidateManifestSha256":"29dafe5e63b425ea6cf641937fe1b9d4b9e63f72479a51ae76f9148a55771761","candidateSourceHead":"29caae94a3db1f1626bdde2ea6ee9a21799f9df6","candidateManifestStatus":"FASE_A_PRODUCT_F1_4C_SUCCESSOR_CERTIFIED","candidateFileCount":194,"exactCandidateRequired":true,"gateBeforeArtifactDownloadInRuntime":true,"gateBeforeSecretAccess":true,"gateBeforeBrowser":true,"customTokenEphemeralOnly":true,"passwordResetAllowed":false,"authChangesAllowed":false,"membershipChangesAllowed":false,"dataChangesAllowed":false,"firestoreWritesAllowed":false,"operationalWritesAllowed":false,"packageRebuildAllowed":false,"deployAllowed":false,"publicationAllowed":false,"productionMutationAllowed":false,"stopRetryOnSameFamily":true},
-  "surfaceTopology":{"routes":["inicio","cliente360","aseguradoras","ops","leads","polizas","cobros"],"integratedSurfaces":{"vehiculos":"cliente360_policy_deeplink_fullpage","recibosCartera":"policy_client360_plus_cobros_global"},"roleViews":[{"role":"Dirección","viewport":"desktop"},{"role":"Operativo","viewport":"tablet"},{"role":"Asesor","viewport":"mobile"}],"invariants":["login_membership_tenant_role_scope","runtime_store_router","legal_idempotent","service_worker_cache","zero_technical_copy","zero_cross_tenant","zero_unexpected_writes","integrity_before_after"]},
-  "containsPII":false,
-  "containsSecrets":false
+  "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
+  "gateId": "f2-productive-acceptance-exact-successor-v20260818",
+  "gateContractVersion": "2.0.0",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
+  "f2ValidatorRevision": "f2-productive-acceptance-exact-successor-v1-20260818",
+  "status": "F2_RUNTIME_PENDING_AUTHORIZATION",
+  "currentPhase": "F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY",
+  "executionProfile": {
+    "phase": "F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY",
+    "capabilities": {
+      "secrets": true,
+      "firestoreRead": true,
+      "writes": false,
+      "runtime": true,
+      "browser": true,
+      "deploy": false,
+      "functionsDeploy": false,
+      "rulesDeploy": false,
+      "production": false
+    }
+  },
+  "singleGate": true,
+  "macroClosure": true,
+  "block": "F2_GATE_DE_ACEPTACION_PRODUCTIVA_REAL",
+  "authorization": {
+    "requiredForExecution": true,
+    "activeRequest": false,
+    "request": "DYNAMIC:ORBIT360_REQUEST_FILE",
+    "allowedExecutions": 0,
+    "consumed": false,
+    "authorizationFrozen": true,
+    "replayAllowed": false
+  },
+  "guards": {
+    "candidateArtifactId": 9345207863,
+    "candidateZipSha256": "493009c83390901aa772842a2ba9ddd5ce5293f6969d86c5c3395ebd670a44ac",
+    "candidateManifestSha256": "29dafe5e63b425ea6cf641937fe1b9d4b9e63f72479a51ae76f9148a55771761",
+    "candidateSourceHead": "29caae94a3db1f1626bdde2ea6ee9a21799f9df6",
+    "candidateManifestStatus": "FASE_A_PRODUCT_F1_4C_SUCCESSOR_CERTIFIED",
+    "candidateFileCount": 194,
+    "exactCandidateRequired": true,
+    "gateBeforeArtifactDownloadInRuntime": true,
+    "gateBeforeSecretAccess": true,
+    "gateBeforeBrowser": true,
+    "customTokenEphemeralOnly": true,
+    "passwordResetAllowed": false,
+    "authChangesAllowed": false,
+    "membershipChangesAllowed": false,
+    "dataChangesAllowed": false,
+    "firestoreWritesAllowed": false,
+    "operationalWritesAllowed": false,
+    "packageRebuildAllowed": false,
+    "deployAllowed": false,
+    "publicationAllowed": false,
+    "productionMutationAllowed": false,
+    "stopRetryOnSameFamily": true
+  },
+  "surfaceTopology": {
+    "routes": [
+      "inicio",
+      "cliente360",
+      "aseguradoras",
+      "ops",
+      "leads",
+      "polizas",
+      "cobros"
+    ],
+    "integratedSurfaces": {
+      "vehiculos": "cliente360_policy_deeplink_fullpage",
+      "recibosCartera": "policy_client360_plus_cobros_global"
+    },
+    "roleViews": [
+      {
+        "role": "Dirección",
+        "viewport": "desktop"
+      },
+      {
+        "role": "Operativo",
+        "viewport": "tablet"
+      },
+      {
+        "role": "Asesor",
+        "viewport": "mobile"
+      }
+    ],
+    "invariants": [
+      "login_membership_tenant_role_scope",
+      "runtime_store_router",
+      "legal_idempotent",
+      "service_worker_cache",
+      "zero_technical_copy",
+      "zero_cross_tenant",
+      "zero_unexpected_writes",
+      "integrity_before_after",
+      "cross_tenant_probe_valid_path_v2"
+    ]
+  },
+  "containsPII": false,
+  "containsSecrets": false
 }

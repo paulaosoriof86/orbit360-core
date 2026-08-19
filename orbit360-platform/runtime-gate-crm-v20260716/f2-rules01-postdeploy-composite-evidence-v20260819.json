@@ -1,0 +1,49 @@
+{
+  "schemaVersion": "orbit360-f2-postdeploy-composite-evidence-v1",
+  "evidenceContractVersion": "F2_POSTDEPLOY_EVIDENCE_PRODUCER_CONTRACT_V1",
+  "ok": true,
+  "status": "F2_RULES01_POSTDEPLOY_COMPOSITE_EVIDENCE_PASS",
+  "classification": "PASS",
+  "runId": 32272580947,
+  "artifactId": 9372746151,
+  "artifactDigest": "sha256:c087ad3bae277f990c760eb04edcce96ef2746add36120040ba6da5f4d55a860",
+  "candidateArtifactId": 9345207863,
+  "terminal": {
+    "flatProducerSchema": true,
+    "status": "F2_RULES01_POSTDEPLOY_CROSS_TENANT_PROBE_PASS",
+    "rulesRedeployExecuted": false,
+    "request06Created": false
+  },
+  "probe": {
+    "serverForced": true,
+    "transport": "firestore-rest-v1-node-fetch",
+    "documentPath": "tenants/orbit360-f2-cross-tenant-probe/system/config",
+    "pathValid": true,
+    "responseStatus": 403,
+    "responseErrorStatus": "PERMISSION_DENIED",
+    "crossTenantDenied": true
+  },
+  "integrity": {
+    "beforeAfterPass": true,
+    "countsIdentical": true,
+    "digestsIdentical": true
+  },
+  "writes": {
+    "firestoreDocument": 0,
+    "auth": 0,
+    "membership": 0,
+    "data": 0,
+    "operational": 0
+  },
+  "forbiddenEffects": {
+    "rulesRedeploy": false,
+    "hosting": false,
+    "functions": false,
+    "rebuild": false,
+    "publication": false,
+    "production": false
+  },
+  "containsPII": false,
+  "containsSecrets": false,
+  "generatedAt": "2026-08-19T18:33:59.795Z"
+}

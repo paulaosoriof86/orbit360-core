@@ -1,0 +1,34 @@
+{
+  "schemaVersion": "orbit360-f2-pre-request06-postsync-source-only-v1",
+  "ok": true,
+  "status": "F2_PRE_REQUEST06_POSTSYNC_CANONICAL_GATE_PASS",
+  "classification": "SOURCE_CONTRACT_PASS",
+  "gateMarker": "PASS_GATE_CONTRACT_SOURCE_F2_PRODUCTIVE_ACCEPTANCE",
+  "evidenceContractVersion": "F2_POSTDEPLOY_EVIDENCE_PRODUCER_CONTRACT_V1",
+  "knownRootfixAuditPass": true,
+  "boundary": {
+    "requestVersion": "F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_V1",
+    "requestOrdinal": 6,
+    "request06Created": false,
+    "request06Authorized": false,
+    "candidateArtifactId": 9345207863,
+    "successorPublished": false,
+    "productionOperationalDeclared": false
+  },
+  "scope": {
+    "browser": false,
+    "runtime": false,
+    "secrets": false,
+    "firestoreRead": false,
+    "writes": 0,
+    "rulesDeploy": false,
+    "hosting": false,
+    "functions": false,
+    "rebuild": false,
+    "publication": false,
+    "production": false
+  },
+  "containsPII": false,
+  "containsSecrets": false,
+  "generatedAt": "2026-08-19T18:33:59.901Z"
+}

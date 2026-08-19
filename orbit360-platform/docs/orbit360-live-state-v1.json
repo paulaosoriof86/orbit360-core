@@ -1,8 +1,8 @@
 {
   "schemaVersion": "orbit360-live-state-v1",
-  "stateVersion": "20260818.f2.rules01-deploy-pass.probe-validator-stale.rootfix-pass.postdeploy-probe-auth-pending.current",
-  "updatedAt": "2026-08-19T03:37:39.846Z",
-  "phase": "F2_RULES01_DEPLOY_PASS_PROBE_VALIDATOR_STALE_ROOTFIX_PASS_POSTDEPLOY_PROBE_AUTHORIZATION_PENDING",
+  "stateVersion": "20260819.f2.pre-request06-known-rootfixes-pass.authorization-pending.current",
+  "updatedAt": "2026-08-19T18:33:59.824Z",
+  "phase": "F2_PRE_REQUEST06_KNOWN_ROOTFIXES_SOURCE_AUDIT_PASS_AUTHORIZATION_PENDING",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pr": 5,
@@ -251,7 +251,7 @@
       "productAffected": false
     },
     "currentBlockingFact": {
-      "code": "F2_RULES01_POSTDEPLOY_CROSS_TENANT_PROBE_READONLY_REQUIRED",
+      "code": "F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_V1_REQUEST06_REQUIRED",
       "status": "FRESH_AUTHORIZATION_PENDING"
     },
     "authIsCurrentBlocker": false,
@@ -334,6 +334,21 @@
       "code": "ROOTFIX_EVIDENCE_PERSIST_REBASE_BLOCKED_BY_UNSTAGED_CANONICAL_PREFLIGHT",
       "status": "CLOSED_BY_SERIALIZED_V2_RUN_32212655647",
       "productAffected": false
+    },
+    "f2PostdeployProbeObserver": {
+      "classification": "PIPELINE_MECHANISM_FAILURE",
+      "code": "F2_POSTDEPLOY_PROBE_OBSERVER_OVERCONSTRAINED_BY_ACTIONS_PATH_FIELD",
+      "status": "CLOSED"
+    },
+    "f2PostdeployEvidenceAssembly": {
+      "classification": "PIPELINE_MECHANISM_FAILURE",
+      "code": "POSTDEPLOY_CLOSURE_INFERRED_ARTIFACT_SCHEMA_INSTEAD_OF_PRODUCER_CONTRACT",
+      "status": "CLOSED_BY_F2_POSTDEPLOY_EVIDENCE_PRODUCER_CONTRACT_V1"
+    },
+    "f2FullRuntimeCrossTenant": {
+      "classification": "VALIDATOR_STALE",
+      "code": "F2_FULL_RUNTIME_CROSS_TENANT_PROBE_STILL_USES_RESERVED_INVALID_DOCUMENT_ID_AFTER_RULES01_VALID_PATH_ROOTFIX",
+      "status": "CLOSED_SOURCE_ONLY_SHARED_CONTRACT_V2"
     }
   },
   "documentationControl": {
@@ -429,7 +444,7 @@
     "securityRepairAuthorizedNow": false
   },
   "goLive": {
-    "status": "F2_RULES01_DEPLOY_PASS_PROBE_VALIDATOR_STALE_ROOTFIX_PASS_POSTDEPLOY_PROBE_AUTHORIZATION_PENDING",
+    "status": "F2_PRE_REQUEST06_KNOWN_ROOTFIXES_SOURCE_AUDIT_PASS_AUTHORIZATION_PENDING",
     "publicUrl": "https://app.aysseguros.com",
     "publishedPackagePreserved": true,
     "successorPublished": false,
@@ -460,30 +475,37 @@
     "f2RoleViewRootfixSourceMayBeRerun": false,
     "f2Runtime05MayBeRerun": false,
     "f2Runtime05RequestReplayAllowed": false,
-    "request06MayBeCreatedWithoutFreshAuthorization": false
+    "request06MayBeCreatedWithoutFreshAuthorization": false,
+    "f2Rules01MayBeRedeployedForThisProof": false,
+    "f2PostdeployProbeRequestMayBeRerun": false
   },
   "nextActionExact": {
-    "stage": "F2_RULES01_POSTDEPLOY_CROSS_TENANT_PROBE_READONLY_AUTHORIZATION_BOUNDARY",
+    "stage": "F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_V1_REQUEST06_AUTHORIZATION_BOUNDARY",
     "gateId": "f2-productive-acceptance-exact-successor-v20260818",
     "requestVersion": "F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_V1",
     "runtimeRequestOrdinalAfterRepair": 6,
     "candidateArtifactId": 9345207863,
-    "securityRepairRequired": true,
-    "securityRepairAuthorizationRequired": true,
-    "securityRepairAuthorizationGranted": false,
-    "rulesSourceBlobSha": "35fba451bbbeb97dbae3f08303b786ddbcbdd29f",
+    "securityRepairRequired": false,
+    "validatorRepairRequired": false,
     "rulesSourceMutationRequired": false,
-    "rulesDeployAuthorized": false,
-    "rulesDeployExecuted": false,
-    "runtime05Replayed": false,
+    "rulesRedeployAllowed": false,
+    "rulesRedeployRequired": false,
+    "postdeployProbePassed": true,
+    "postdeployProbeRunId": 32272580947,
+    "postdeployProbeRequestConsumed": true,
+    "knownRootfixSourceAuditRequired": false,
+    "knownRootfixSourceAuditPassed": true,
     "request06Created": false,
-    "requiredRepair": "DEPLOY_EXACT_VERSIONED_FIRESTORE_RULES_TO_AYS_ORBIT_360_LAB_THEN_SERVER_FORCED_CROSS_TENANT_DENY_PROOF",
-    "allowsAfterFreshRepairAuthorization": [
-      "canonical_gate_before_secrets",
-      "read_deployed_rules_metadata_if_available",
-      "deploy_exact_firestore_rules_only_to_ays_orbit_360_lab",
-      "server_forced_cross_tenant_readonly_denial_probe",
-      "integrity_before_after"
+    "authorizationRequired": true,
+    "allowsAfterFreshRuntimeAuthorization": [
+      "mandatory_canonical_gate_before_secrets",
+      "exact_artifact_verification",
+      "provider_and_identity_readonly",
+      "integrity_before_after",
+      "browser_role_matrix_direccion_operativo_asesor",
+      "cross_tenant_valid_path_v2_confirmation",
+      "service_worker_cache_validation",
+      "readonly_runtime_acceptance"
     ],
     "forbids": [
       "firestore_document_writes",
@@ -491,32 +513,30 @@
       "membership_writes",
       "data_writes",
       "password_reset",
+      "rules_redeploy",
       "hosting_deploy",
       "functions_deploy",
       "package_rebuild",
       "publication",
       "production_mutation",
       "main_merge",
-      "request05_replay",
-      "request06_creation_before_repair_pass"
-    ],
-    "probeRequestVersion": "F2_RULES01_POSTDEPLOY_CROSS_TENANT_PROBE_READONLY_V1",
-    "authorizationRequired": true,
-    "rulesRedeployAllowed": false,
-    "postdeployProbeRequestCreated": false,
-    "request06AllowedBeforeProbePass": false
+      "request01_to_request05_replay",
+      "postdeploy_probe_replay"
+    ]
   },
   "resumeProtocol": [
     "Read ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json",
     "Read orbit360-live-state-v1.json",
-    "Confirm actual HEAD and PR #5",
-    "Read Runtime05 security root-cause, rules history observer and source-only root-cause evidence",
-    "Do not rerun Request01-Request05",
-    "Do not modify firestore.rules source: source already denies cross-tenant",
-    "Treat Runtime05 as SECURITY_FAILURE, not validator stale",
-    "Do not create Request06 before rules parity repair passes",
-    "Require fresh explicit authorization before any Firestore rules deployment",
-    "After authorized rules-only deploy, prove cross-tenant denial with a server-forced read and zero data writes"
+    "Confirm actual HEAD and PR #5 remain draft/open/unmerged",
+    "Read CHECKPOINT-F2-PRE-REQUEST06-KNOWN-ROOTFIXES-PASS-20260819.md",
+    "Read F2 postdeploy composite evidence producer contract PASS",
+    "Do not rerun Request01-Request05 or postdeploy Request01",
+    "Do not redeploy Firestore rules",
+    "Do not reopen authentication, password, membership existence, Cliente 360, HostDime or data reimport as current blockers",
+    "Do not use reserved Firestore IDs in the full F2 runtime probe; it is now bound to F2_CROSS_TENANT_PROBE_VALID_PATH_V2",
+    "Certified successor artifact 9345207863 remains unpublished; the public URL is not yet the certified successor",
+    "Create Request06 only after fresh explicit authorization",
+    "Request06 canonical gate and known-rootfix selftest must pass before secrets/browser"
   ],
   "f2Runtime01": {
     "status": "CONSUMED_STOP_VALIDATOR_STALE",
@@ -774,7 +794,7 @@
     }
   },
   "f2Rules01": {
-    "status": "RULES_DEPLOY_PASS_PROBE_VALIDATOR_STALE_ROOTFIX_PASS_POSTDEPLOY_PROBE_AUTH_PENDING",
+    "status": "POSTDEPLOY_PROBE_PASS_CONSUMED",
     "requestPath": ".github/orbit360-requests/f2-firestore-rules-parity-repair-lab-v20260818-01.json",
     "requestCommit": "8d68f36182453ac70f2e68823e194db5a83c71f4",
     "runId": 32211779285,
@@ -814,10 +834,27 @@
       "dataWrites": 0
     },
     "postdeployProbe": {
-      "workflowPrepared": true,
-      "requestCreated": false,
+      "requestPath": ".github/orbit360-requests/f2-rules01-postdeploy-probe-readonly-v20260818-01.json",
+      "requestCreated": true,
+      "requestConsumed": true,
       "authorized": false,
-      "rulesRedeployAllowed": false
+      "runId": 32272580947,
+      "runAttempt": 1,
+      "terminalArtifactId": 9372746151,
+      "status": "PASS",
+      "serverForced": true,
+      "responseStatus": 403,
+      "responseErrorStatus": "PERMISSION_DENIED",
+      "crossTenantDenied": true,
+      "integrityBeforeAfterPass": true,
+      "rulesRedeployAllowed": false,
+      "rulesRedeployExecuted": false,
+      "firestoreDocumentWrites": 0,
+      "authWrites": 0,
+      "membershipWrites": 0,
+      "dataWrites": 0,
+      "evidence": "orbit360-platform/runtime-gate-crm-v20260716/f2-rules01-postdeploy-composite-evidence-v20260819.json",
+      "evidenceContractVersion": "F2_POSTDEPLOY_EVIDENCE_PRODUCER_CONTRACT_V1"
     },
     "request06Created": false,
     "evidence": {
