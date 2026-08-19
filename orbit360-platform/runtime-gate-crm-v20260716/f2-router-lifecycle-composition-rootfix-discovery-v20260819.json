@@ -1,0 +1,37 @@
+{
+  "schemaVersion": "orbit360-run-discovery-v4",
+  "ok": false,
+  "status": "TARGET_RUN_TERMINAL_FAILURE",
+  "classification": "TARGET_EXECUTION_FAILURE",
+  "requestCommit": "39bea4d45e657ca29c661de03f61f2b2ce4ac170",
+  "requestFile": ".github/orbit360-requests/f2-router-lifecycle-composition-rootfix-runbound-20260819-01.json",
+  "requestVersion": "F2_ROUTER_LIFECYCLE_COMPOSITION_ROOTFIX_V1",
+  "gateId": "f2-productive-acceptance-exact-successor-v20260818",
+  "targetRunId": 32310342804,
+  "targetRunStatus": "completed",
+  "targetRunConclusion": "failure",
+  "runAttempt": 1,
+  "event": "push",
+  "headSha": "39bea4d45e657ca29c661de03f61f2b2ce4ac170",
+  "workflowName": "Orbit360 F2 Router Lifecycle Composition Rootfix 20260819",
+  "createdAt": "2026-08-19T22:46:23Z",
+  "runStartedAt": "2026-08-19T22:46:23Z",
+  "updatedAt": "2026-08-19T22:46:41Z",
+  "htmlUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/32310342804",
+  "artifacts": [
+    {
+      "id": 9386202666,
+      "name": "orbit360-f2-router-lifecycle-rootfix-32310342804",
+      "size_in_bytes": 1337,
+      "digest": "sha256:9643ce96ab745eb6c86b1df99d70c64f913fc90a3e5878925958d47dcd9bb5e0",
+      "expired": false
+    }
+  ],
+  "artifactCount": 1,
+  "matchCount": 1,
+  "multipleRuns": false,
+  "runtimeReplay": false,
+  "productMutation": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
