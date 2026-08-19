@@ -1,0 +1,30 @@
+{
+  "schemaVersion": "orbit360-f2-rules01-postdeploy-probe-run-observer-v2",
+  "ok": true,
+  "status": "POSTDEPLOY_PROBE_RUN_TERMINAL_METADATA_OBSERVED",
+  "classification": "OBSERVATION_PASS",
+  "targetSha": "7e346457ad178557123f7ea46bbbca3b632d505e",
+  "workflowName": "Orbit360 F2 RULES01 Postdeploy Probe Readonly 20260818",
+  "uniquenessCount": 1,
+  "probeRunFound": true,
+  "observerRunId": "32277591747",
+  "run": {
+    "id": 32272580947,
+    "run_attempt": 1,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "head_sha": "7e346457ad178557123f7ea46bbbca3b632d505e",
+    "head_branch": "ays/backend-tenant-lab-v99-20260703",
+    "created_at": "2026-08-19T15:51:54Z",
+    "run_started_at": "2026-08-19T15:51:54Z",
+    "updated_at": "2026-08-19T15:52:38Z",
+    "html_url": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/32272580947"
+  },
+  "containsPII": false,
+  "containsSecrets": false,
+  "productMutation": false,
+  "requestMutation": false,
+  "runtimeReplay": false,
+  "rulesRedeploy": false
+}
