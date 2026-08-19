@@ -27,6 +27,7 @@ jobs:
         with:
           node-version: '22'
       - name: Verify exact source-only boundary
+        id: boundary
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
@@ -42,6 +43,7 @@ jobs:
           test "$(printf '%s' "$PR" | jq -r '.head.ref')" = "$BRANCH"
           test "$(printf '%s' "$PR" | jq -r '.head.sha')" = "$GITHUB_SHA"
       - name: Download immutable already-PASS postdeploy evidence
+        id: evidence
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
@@ -64,6 +66,7 @@ jobs:
           test -f .tmp/f2/f2-rules01-cross-tenant-forced-server-run-32272580947.json
           test -f .tmp/f2/f2-integrity-before-after-v20260818.json
       - name: Execute single producer-contract source closure
+        id: closure
         shell: bash
         run: |
           set -euo pipefail
@@ -78,6 +81,7 @@ jobs:
           jq -e '.ok==true and .evidenceContractVersion=="F2_POSTDEPLOY_EVIDENCE_PRODUCER_CONTRACT_V1" and .probe.responseStatus==403 and .probe.responseErrorStatus=="PERMISSION_DENIED" and .probe.crossTenantDenied==true and .integrity.countsIdentical==true and .integrity.digestsIdentical==true and .writes.firestoreDocument==0 and .forbiddenEffects.rulesRedeploy==false and .forbiddenEffects.production==false' "$EVIDENCE_DIR/f2-rules01-postdeploy-composite-evidence-v20260819.json" >/dev/null
           git diff --check
       - name: Retire broad trigger after successful closure
+        id: retire
         shell: bash
         run: |
           set -euo pipefail
@@ -92,6 +96,7 @@ jobs:
           p.write_text(s.replace(old,new,1),encoding='utf-8')
           PY
       - name: Persist one serialized source-only closure
+        id: persist_success
         shell: bash
         run: |
           set -euo pipefail
@@ -103,6 +108,31 @@ jobs:
           git diff --cached --check
           test -n "$(git diff --cached --name-only)"
           git commit -m '[skip ci] fix(f2): pre-Request06 source closure PASS'
+          REMOTE_HEAD="$(git ls-remote origin "refs/heads/$BRANCH" | awk '{print $1}')"
+          test "$REMOTE_HEAD" = "$GITHUB_SHA"
+          git push origin "HEAD:$BRANCH"
+      - name: Persist sanitized failure observability
+        if: ${{ failure() }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git reset --hard "$GITHUB_SHA"
+          git clean -fd
+          mkdir -p "$EVIDENCE_DIR"
+          jq -n \
+            --arg runId "$GITHUB_RUN_ID" \
+            --arg triggerSha "$GITHUB_SHA" \
+            --arg boundary '${{ steps.boundary.outcome }}' \
+            --arg evidence '${{ steps.evidence.outcome }}' \
+            --arg closure '${{ steps.closure.outcome }}' \
+            --arg retire '${{ steps.retire.outcome }}' \
+            --arg persistSuccess '${{ steps.persist_success.outcome }}' \
+            '{schemaVersion:"orbit360-f2-pre-request06-source-closure-failure-observability-v1",ok:false,status:"F2_PRE_REQUEST06_SOURCE_CLOSURE_FAILED_OBSERVED",classification:"PIPELINE_MECHANISM_FAILURE",runId:$runId,triggerSha:$triggerSha,stepOutcomes:{boundary:$boundary,evidence:$evidence,closure:$closure,retire:$retire,persistSuccess:$persistSuccess},request06Created:false,browserExecuted:false,runtimeExecuted:false,secretAccess:false,firestoreRead:false,firestoreDocumentWrites:0,authWrites:0,membershipWrites:0,dataWrites:0,rulesDeploy:false,hostingDeploy:false,functionsDeploy:false,packageRebuild:false,publication:false,production:false,containsPII:false,containsSecrets:false}' > "$EVIDENCE_DIR/f2-pre-request06-source-closure-last-failure-v20260819.json"
+          git config user.name 'orbit360-f2-pre-request06-bot'
+          git config user.email 'orbit360-f2-pre-request06-bot@users.noreply.github.com'
+          git add "$EVIDENCE_DIR/f2-pre-request06-source-closure-last-failure-v20260819.json"
+          git diff --cached --check
+          git commit -m '[skip ci] diag(f2): persist pre-Request06 source closure failure'
           REMOTE_HEAD="$(git ls-remote origin "refs/heads/$BRANCH" | awk '{print $1}')"
           test "$REMOTE_HEAD" = "$GITHUB_SHA"
           git push origin "HEAD:$BRANCH"
