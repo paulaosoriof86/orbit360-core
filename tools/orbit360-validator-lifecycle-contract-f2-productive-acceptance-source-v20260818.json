@@ -2,7 +2,8 @@
   "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
   "gateId": "f2-productive-acceptance-exact-successor-v20260818",
   "gateContractVersion": "2.0.0",
-  "validatorLifecycleRevision": "f2-productive-acceptance-exact-successor-v1-20260818",
+  "validatorLifecycleRevision": "phase-capability-contract-v1",
+  "f2ValidatorRevision": "f2-productive-acceptance-exact-successor-v1-20260818",
   "status": "F2_SOURCE_ONLY_PENDING",
   "currentPhase": "F2_PRODUCTIVE_ACCEPTANCE_SOURCE_ONLY",
   "executionProfile": {
