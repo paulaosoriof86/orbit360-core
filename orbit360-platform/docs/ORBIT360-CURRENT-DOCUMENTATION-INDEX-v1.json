@@ -1,6 +1,6 @@
 {
   "schemaVersion": "orbit360-current-documentation-index-v1",
-  "updatedAt": "2026-08-19T01:57:57.887Z",
+  "updatedAt": "2026-08-19T01:59:14.431Z",
   "status": "CURRENT_BINDING_INDEX",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -87,13 +87,13 @@
     "latestF1_4CBuildEvidence": "orbit360-platform/runtime-gate-crm-v20260716/f1-4c-successor-artifact-certification-v20260818.json",
     "latestRuntimeEvidence": "orbit360-platform/runtime-gate-crm-v20260716/f1-4d-runtime-browser-readonly-run-32195516901.json",
     "latestTerminalEvidence": "orbit360-platform/runtime-gate-crm-v20260716/f2-runtime02-validator-stale-stop-v20260818.json",
-    "latestPreflightEvidence": "orbit360-platform/runtime-gate-crm-v20260716/f2-runtime02-postsync-source-only-v20260818.json",
+    "latestPreflightEvidence": "orbit360-platform/runtime-gate-crm-v20260716/f2-postsync-consistency-v2-source-only-v20260818.json",
     "latestArtifactVerificationEvidence": "orbit360-platform/runtime-gate-crm-v20260716/f2-exact-candidate-source-validation-v20260818.json",
     "latestRequestConsumptionEvidence": "orbit360-platform/runtime-gate-crm-v20260716/f1-4d-request-consumption-run-32195516901.json",
     "currentCheckpoint": "orbit360-platform/docs/CHECKPOINT-F2-RUNTIME02-STABLE-BOUNDARY-ROOTFIX-PASS-20260818.md",
     "currentPhase": "F2_SOURCE_ONLY_PASS_RUNTIME_AUTHORIZATION_PENDING",
     "currentPhaseInternalPercent": 0,
-    "currentPhaseInternalMethod": "F2_two_same_gate_validator_stale_attempts_consumed_stable_boundary_rootfix_pass_postsync_proof_pending",
+    "currentPhaseInternalMethod": "F2_two_same_gate_validator_stale_attempts_consumed_stable_boundary_rootfix_and_postsync_consistency_v2",
     "goLiveRoutePercentClosed": 50,
     "integratedProgramPercentClosed": 25,
     "currentBlocker": "Repeated same-gate validator-stale root cause closed; stable-boundary contract PASS after documentation sync; fresh Request03 authorization required",
@@ -136,7 +136,9 @@
     "f2StableBoundaryContract": "F2_STABLE_BOUNDARY_CONTRACT_V2",
     "f2NarrativeStatusesAuthoritative": false,
     "f2PostSyncSourceGateStatus": "CLOSED_PASS",
-    "f2PostSyncSourceGateRunId": "32206817016"
+    "f2PostSyncSourceGateRunId": "32206817016",
+    "f2PostSyncConsistencyV2Status": "CLOSED_PASS",
+    "f2PostSyncConsistencyV2RunId": "32206892119"
   },
   "historicalPolicy": {
     "defaultClassification": "HISTORICAL_NOT_CURRENT_STATE",
