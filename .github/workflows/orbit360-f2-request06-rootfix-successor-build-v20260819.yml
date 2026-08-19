@@ -14,6 +14,8 @@ env:
   BASE_ARTIFACT_ID: '9345207863'
   BASE_ARTIFACT_ZIP: /tmp/f2-request06-base-artifact.zip
   EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+  ROOTFIX_BLOB: b7cef1acda5034e572820f5f1b25fbfe2108f2f9
+  REGRESSION_BLOB: 8c3b451ded519f5382efd2fe09fe62fa94b70532
 jobs:
   build_exact_one_file_successor:
     runs-on: ubuntu-24.04
@@ -48,9 +50,11 @@ jobs:
           SOURCE_HEAD="$(git rev-parse HEAD^)"
           test "$(jq -r '.parentHead' "$REQUEST_FILE")" = "$SOURCE_HEAD"
           test "$(jq -r '.candidateBaseArtifactId' "$REQUEST_FILE")" = "$BASE_ARTIFACT_ID"
+          test "$(jq -r '.rootfixBlobSha' "$REQUEST_FILE")" = "$ROOTFIX_BLOB"
+          test "$(jq -r '.regressionBlobSha' "$REQUEST_FILE")" = "$REGRESSION_BLOB"
           jq -e '.scope.packageRebuild==true and .scope.githubArtifactUpload==true and .scope.secrets==false and .scope.firestoreRead==false and .scope.browser==false and .scope.runtime==false and .scope.writes==false and .scope.deploy==false and .scope.publish==false and .scope.production==false' "$REQUEST_FILE" >/dev/null
-          git merge-base --is-ancestor 8cd21f7a56d40027e6d910353f968988adc19e9b "$SOURCE_HEAD"
-          git merge-base --is-ancestor 80654e0e8d0bbd0a05154be14a4ad832145eaf0c "$SOURCE_HEAD"
+          test "$(git rev-parse "${SOURCE_HEAD}:orbit360-platform/core/queries.js")" = "$ROOTFIX_BLOB"
+          test "$(git rev-parse "${SOURCE_HEAD}:tools/orbit360-validar-f2-inicio-finite-v20260819.mjs")" = "$REGRESSION_BLOB"
           node --check tools/orbit360-f2-request06-rootfix-successor-builder-v20260819.mjs
           node --check tools/orbit360-validar-f2-inicio-finite-v20260819.mjs
           node tools/orbit360-validar-f2-inicio-finite-v20260819.mjs | tee /tmp/f2-finite-regression.json
@@ -83,15 +87,16 @@ jobs:
           F2_SUCCESSOR_ZIP="$F2_SUCCESSOR_ZIP" \
           EVIDENCE_DIR="$EVIDENCE_DIR" \
           node tools/orbit360-f2-request06-rootfix-successor-builder-v20260819.mjs
-          jq -e --arg source "$F2_SOURCE_HEAD" --arg zip "$F2_SUCCESSOR_ZIP" '
+          jq -e --arg source "$F2_SOURCE_HEAD" --arg zip "$F2_SUCCESSOR_ZIP" --arg rootfix "$ROOTFIX_BLOB" --arg regression "$REGRESSION_BLOB" '
             .ok==true and .status=="F2_REQUEST06_ROOTFIX_SUCCESSOR_ARTIFACT_CERTIFIED_UNPUBLISHED" and
             .sourceHead==$source and .zipName==$zip and .fileCount==194 and
             .deltaCount==1 and .unchangedProductFiles==193 and
             .productDeltaPaths==["core/queries.js"] and
-            .finiteRegressionPass==true and .baseFullyRehashed==true and
-            .successorFullyRehashed==true and .packageReopened==true and
-            .allProductFilesRehashed==true and .published==false and
-            .browserExecuted==false and .runtimeExecuted==false and
+            .rootfixBlobSha==$rootfix and .regressionBlobSha==$regression and
+            .sourceBlobBound==true and .finiteRegressionPass==true and
+            .baseFullyRehashed==true and .successorFullyRehashed==true and
+            .packageReopened==true and .allProductFilesRehashed==true and
+            .published==false and .browserExecuted==false and .runtimeExecuted==false and
             .secretAccess==false and .dataAccess==false and
             .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and
             .deployExecuted==false and .productionTouched==false
