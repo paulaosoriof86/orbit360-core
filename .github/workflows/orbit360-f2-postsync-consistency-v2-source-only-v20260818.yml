@@ -1,0 +1,75 @@
+name: Orbit360 F2 PostSync Consistency V2 Source Only 20260818
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-observers/f2-postsync-consistency-v2-source-only-20260818.json'
+permissions:
+  contents: write
+concurrency:
+  group: orbit360-f2-postsync-consistency-v2-source-only-20260818
+  cancel-in-progress: false
+env:
+  ORBIT360_GATE_ID: f2-productive-acceptance-exact-successor-v20260818
+  ORBIT360_EXPECTED_REQUEST_VERSION: NONE_PENDING_FRESH_AUTHORIZATION
+  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+jobs:
+  consistency_v2:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Apply documentary consistency v2
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-f2-runtime02-postsync-consistency-v2-v20260818.mjs
+          node tools/orbit360-f2-runtime02-postsync-consistency-v2-v20260818.mjs
+          jq -e '.frozenPlan.currentPhaseSubphases.F2_runtime_browser_readonly_acceptance=="PENDING_FRESH_EXPLICIT_AUTHORIZATION_REQUEST03" and .nextActionExact.requestOrdinal==3 and .nextActionExact.requestCreated==false and .nextActionExact.authorizationGranted==false' orbit360-platform/docs/orbit360-live-state-v1.json >/dev/null
+          git diff --check
+      - name: Canonical proof after consistency v2
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f "$EVIDENCE_DIR/preflight-sanitizado.json"
+          env -u ORBIT360_REQUEST_FILE ORBIT360_EXPECTED_REQUEST_VERSION=NONE_PENDING_FRESH_AUTHORIZATION node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
+          jq -e '.ok==true and .status=="PASS_GATE_CONTRACT_SOURCE_F2_PRODUCTIVE_ACCEPTANCE" and .validatorRootfix=="F2_STABLE_BOUNDARY_CONTRACT_V2" and .stableBoundaryContract==true and .nextActionBound==true and .narrativeAttemptStatusMutationPass==true and .executionAuthorized==false and .runtimeAuthorized==false and .browserAuthorized==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+          jq --arg run "$GITHUB_RUN_ID" --arg sha "$GITHUB_SHA" '. + {consistencyV2RunId:$run,consistencyV2TriggerSha:$sha,consistencyV2Status:"F2_POSTSYNC_CONSISTENCY_V2_SOURCE_ONLY_PASS",request03Created:false,runtimeRunCreated:false}' "$EVIDENCE_DIR/preflight-sanitizado.json" > "$EVIDENCE_DIR/f2-postsync-consistency-v2-source-only-v20260818.json"
+      - name: Mark consistency transaction closed
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const p='orbit360-platform/docs/orbit360-live-state-v1.json';
+          const v=JSON.parse(fs.readFileSync(p,'utf8'));
+          v.updatedAt=new Date().toISOString();
+          v.documentationControl.transactionStatus='F2_RUNTIME02_ROOT_CAUSE_CLOSED_POSTSYNC_CONSISTENCY_V2_SOURCE_PASS_FRESH_AUTH_PENDING';
+          v.lanes.B_backend_security_gates='F2_ROOT_CAUSE_CLOSED_POSTSYNC_CONSISTENCY_V2_PASS_FRESH_AUTHORIZATION_PENDING';
+          fs.writeFileSync(p,JSON.stringify(v,null,2)+'\n','utf8');
+          const q='orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json';
+          const i=JSON.parse(fs.readFileSync(q,'utf8'));
+          i.updatedAt=new Date().toISOString();
+          i.operationalCurrent.latestPreflightEvidence='orbit360-platform/runtime-gate-crm-v20260716/f2-postsync-consistency-v2-source-only-v20260818.json';
+          i.operationalCurrent.f2PostSyncConsistencyV2Status='CLOSED_PASS';
+          i.operationalCurrent.f2PostSyncConsistencyV2RunId=String(process.env.GITHUB_RUN_ID||'');
+          fs.writeFileSync(q,JSON.stringify(i,null,2)+'\n','utf8');
+          NODE
+          git diff --check
+      - name: Persist docs and sanitized proof
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'orbit360-f2-consistency-v2-bot'
+          git config user.email 'orbit360-f2-consistency-v2-bot@users.noreply.github.com'
+          git add orbit360-platform/docs/orbit360-live-state-v1.json orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json "$EVIDENCE_DIR/f2-postsync-consistency-v2-source-only-v20260818.json"
+          git diff --cached --check
+          git commit -m 'docs(f2): close post-sync consistency v2 [skip ci]'
+          git push origin HEAD:ays/backend-tenant-lab-v99-20260703
