@@ -1,0 +1,28 @@
+{
+  "schemaVersion": "orbit360-f2-rules01-run-observer-v1",
+  "ok": true,
+  "status": "TERMINAL_OBSERVED",
+  "uniquenessCount": 1,
+  "observerRunId": "32212056561",
+  "targetSha": "8d68f36182453ac70f2e68823e194db5a83c71f4",
+  "targetWorkflowName": "Orbit360 F2 Firestore Rules Parity Repair LAB 20260818",
+  "run": {
+    "id": 32211779285,
+    "status": "completed",
+    "conclusion": "failure",
+    "run_attempt": 1,
+    "head_sha": "8d68f36182453ac70f2e68823e194db5a83c71f4",
+    "head_branch": "ays/backend-tenant-lab-v99-20260703",
+    "event": "push",
+    "name": "Orbit360 F2 Firestore Rules Parity Repair LAB 20260818",
+    "path": ".github/workflows/orbit360-f2-firestore-rules-parity-repair-lab-v20260818.yml",
+    "created_at": "2026-08-19T03:20:22Z",
+    "updated_at": "2026-08-19T03:21:31Z"
+  },
+  "secretAccess": false,
+  "firestoreRead": false,
+  "rulesDeploy": false,
+  "cloudMutation": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
