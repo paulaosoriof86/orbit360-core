@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "orbit360-f2-runtime03-docsync-pipeline-mechanism-v1",
+  "ok": true,
+  "status": "F2_RUNTIME03_DOCSYNC_PIPELINE_MECHANISM_CLOSED_BY_SERIALIZED_V2",
+  "classification": "PIPELINE_MECHANISM_FAILURE",
+  "code": "CONCURRENT_OBSERVER_COMMIT_NON_FAST_FORWARD",
+  "failedRunId": 32207625109,
+  "canonicalGatePassedBeforePushFailure": true,
+  "productAffected": false,
+  "runtimeAffected": false,
+  "dataAffected": false,
+  "writes": 0,
+  "retrySameMechanism": false,
+  "resolution": "SERIALIZED_DOCSYNC_V2_NO_PARALLEL_DISCOVERY_WRITES",
+  "containsPII": false,
+  "containsSecrets": false
+}
