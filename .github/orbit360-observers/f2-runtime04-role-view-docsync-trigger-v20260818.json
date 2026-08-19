@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "orbit360-f2-runtime04-role-view-docsync-trigger-v1",
+  "runtime04RunId": 32208018808,
+  "request04Consumed": true,
+  "roleViewRootfixRunId": 32209972474,
+  "roleViewRootfixStatus": "F2_ROLE_VIEW_VALIDATOR_STALE_ROOTFIX_SOURCE_ONLY_PASS",
+  "postDocsyncCanonicalSourceGateRequired": true,
+  "request04Replay": false,
+  "request05Created": false,
+  "runtime": false,
+  "browser": false,
+  "secrets": false,
+  "firestore": false,
+  "writes": false,
+  "deploy": false,
+  "publication": false,
+  "production": false
+}
