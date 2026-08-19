@@ -1,0 +1,79 @@
+name: Orbit360 F2 Gate Contract Source Preflight 20260819
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-requests/f2-gate-contract-source-preflight-runbound-*.json'
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: orbit360-f2-gate-contract-source-preflight-20260819
+  cancel-in-progress: false
+jobs:
+  canonical_gate_preflight:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate immutable source-only request
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
+          test "${#CHANGED[@]}" = '1'
+          REQUEST_FILE="${CHANGED[0]}"
+          case "$REQUEST_FILE" in
+            .github/orbit360-requests/f2-gate-contract-source-preflight-runbound-*.json) ;;
+            *) echo 'PIPELINE_MECHANISM_FAILURE:F2_GATE_PREFLIGHT_REQUEST_PATH_INVALID' >&2; exit 41 ;;
+          esac
+          jq -e '
+            .schemaVersion=="orbit360-f2-gate-contract-source-preflight-request-v1" and
+            .requestVersion=="F2_GATE_CONTRACT_SOURCE_PREFLIGHT_V1" and
+            .gateId=="f2-productive-acceptance-exact-successor-v20260818" and
+            .status=="INERT_SOURCE_ONLY_ONCE" and
+            .allowedExecutions==1 and .consumed==false and .replayAllowed==false and
+            .scope.secrets==false and .scope.firestoreRead==false and
+            .scope.browser==false and .scope.runtime==false and .scope.writes==false and
+            .scope.deploy==false and .scope.production==false and
+            .containsPII==false and .containsSecrets==false
+          ' "$REQUEST_FILE" >/dev/null
+          SOURCE_HEAD="$(git rev-parse HEAD^)"
+          test "$(jq -r '.parentHead' "$REQUEST_FILE")" = "$SOURCE_HEAD"
+      - name: Execute canonical gate validator first
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p orbit360-platform/runtime-gate-crm-v20260716
+          set +e
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs \
+            f2-productive-acceptance-exact-successor-v20260818 \
+            > orbit360-platform/runtime-gate-crm-v20260716/f2-gate-contract-source-preflight-before-rebind-v20260819.log 2>&1
+          RC=$?
+          set -e
+          cat orbit360-platform/runtime-gate-crm-v20260716/f2-gate-contract-source-preflight-before-rebind-v20260819.log
+          jq -n \
+            --argjson rc "$RC" \
+            --arg head "$GITHUB_SHA" \
+            --arg parent "$(git rev-parse HEAD^)" \
+            '{schemaVersion:"orbit360-f2-gate-contract-source-preflight-evidence-v1",ok:($rc==0),status:(if $rc==0 then "CANONICAL_GATE_PREFLIGHT_PASS" else "CANONICAL_GATE_PREFLIGHT_FAIL" end),classification:(if $rc==0 then "PASS" else "VALIDATOR_STALE_PENDING_ROOT_CAUSE_CONFIRMATION" end),gateId:"f2-productive-acceptance-exact-successor-v20260818",requestHead:$head,validatedParentHead:$parent,exitCode:$rc,sourceOnly:true,secrets:false,firestoreRead:false,browser:false,runtime:false,writes:false,deploy:false,production:false,containsPII:false,containsSecrets:false}' \
+            > orbit360-platform/runtime-gate-crm-v20260716/f2-gate-contract-source-preflight-before-rebind-v20260819.json
+          exit "$RC"
+      - name: Upload sanitized preflight evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-f2-gate-contract-source-preflight-before-rebind-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/f2-gate-contract-source-preflight-before-rebind-v20260819.json
+            orbit360-platform/runtime-gate-crm-v20260716/f2-gate-contract-source-preflight-before-rebind-v20260819.log
+          if-no-files-found: error
+          retention-days: 30
