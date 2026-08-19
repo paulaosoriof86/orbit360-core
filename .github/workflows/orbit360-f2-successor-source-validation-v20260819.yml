@@ -1,0 +1,83 @@
+name: Orbit360 F2 Successor Source Validation 20260819
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-requests/f2-successor-source-validation-runbound-*.json'
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: orbit360-f2-successor-source-validation-20260819
+  cancel-in-progress: false
+env:
+  ORBIT360_GATE_ID: f2-productive-acceptance-exact-successor-v20260818
+  ORBIT360_CANDIDATE_ARTIFACT_ID: '9385306424'
+  ORBIT360_CANDIDATE_ZIP_NAME: orbit360-fase-a-product-f2-request06-rootfix-successor-b94b2ae86d26.zip
+  ORBIT360_CANDIDATE_ZIP_SHA256: 81a96f476fd0fdfd814b3f047951ce653fd324bef8a6d96d6ee6fe44dd7bdcf4
+  ORBIT360_CANDIDATE_MANIFEST_SHA256: cc6170121ed61fd6d9cde867dfcae8a3dd23d29777c6ee28c240d70e49843eef
+  ORBIT360_CANDIDATE_SOURCE_HEAD: b94b2ae86d26586a68d33be9edba8715e956b02e
+  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+jobs:
+  source_only:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate immutable SOURCE-only request
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
+          test "${#CHANGED[@]}" = '1'
+          REQUEST_FILE="${CHANGED[0]}"
+          case "$REQUEST_FILE" in .github/orbit360-requests/f2-successor-source-validation-runbound-*.json) ;; *) exit 41 ;; esac
+          jq -e '.schemaVersion=="orbit360-f2-successor-source-validation-request-v1" and .requestVersion=="F2_SUCCESSOR_SOURCE_VALIDATION_V1" and .gateId=="f2-productive-acceptance-exact-successor-v20260818" and .candidateArtifactId==9385306424 and .status=="SOURCE_ONLY_ONCE" and .allowedExecutions==1 and .consumed==false and .replayAllowed==false and .scope.secrets==false and .scope.firestoreRead==false and .scope.browser==false and .scope.runtime==false and .scope.writes==false and .scope.deploy==false and .scope.production==false and .containsPII==false and .containsSecrets==false' "$REQUEST_FILE" >/dev/null
+          test "$(jq -r '.parentHead' "$REQUEST_FILE")" = "$(git rev-parse HEAD^)"
+      - name: Canonical gate before candidate download
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f "$EVIDENCE_DIR/preflight-sanitizado.json"
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
+          cp "$EVIDENCE_DIR/preflight-sanitizado.json" "$EVIDENCE_DIR/f2-successor-source-gate-run-${GITHUB_RUN_ID}.json"
+          jq -e '.ok==true and .status=="PASS_GATE_CONTRACT_SOURCE_F2_PRODUCTIVE_ACCEPTANCE" and .candidateArtifactId==9385306424 and .sourceRebindPending==true and .sourceBoundaryAccepted==true and .runtimeAuthorized==false and .browserAuthorized==false and .writeAuthorized==false and .productionAuthorized==false' "$EVIDENCE_DIR/f2-successor-source-gate-run-${GITHUB_RUN_ID}.json" >/dev/null
+      - name: Download and fully validate exact successor SOURCE-only
+        env:
+          GH_TOKEN_SOURCE: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUTER="$RUNNER_TEMP/f2-source-outer.zip"; OUTER_DIR="$RUNNER_TEMP/f2-source-outer"; CANDIDATE_DIR="$RUNNER_TEMP/f2-source-candidate"
+          rm -rf "$OUTER" "$OUTER_DIR" "$CANDIDATE_DIR"; mkdir -p "$OUTER_DIR" "$CANDIDATE_DIR"
+          curl -L --fail --retry 3 -H "Authorization: Bearer $GH_TOKEN_SOURCE" -H 'Accept: application/vnd.github+json' -H 'X-GitHub-Api-Version: 2022-11-28' "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/${ORBIT360_CANDIDATE_ARTIFACT_ID}/zip" -o "$OUTER"
+          unzip -q "$OUTER" -d "$OUTER_DIR"
+          mapfile -t FILES < <(find "$OUTER_DIR" -maxdepth 1 -type f -printf '%f\n' | sort); test "${#FILES[@]}" = '1'; test "${FILES[0]}" = "$ORBIT360_CANDIDATE_ZIP_NAME"
+          INNER="$OUTER_DIR/$ORBIT360_CANDIDATE_ZIP_NAME"; test "$(sha256sum "$INNER" | awk '{print $1}')" = "$ORBIT360_CANDIDATE_ZIP_SHA256"
+          unzip -q "$INNER" -d "$CANDIDATE_DIR"
+          test "$(sha256sum "$CANDIDATE_DIR/orbit360-package-manifest.json" | awk '{print $1}')" = "$ORBIT360_CANDIDATE_MANIFEST_SHA256"
+          ORBIT360_F2_CANDIDATE_DIR="$CANDIDATE_DIR" ORBIT360_F2_CANDIDATE_SOURCE_EVIDENCE="$EVIDENCE_DIR/f2-successor-candidate-source-run-${GITHUB_RUN_ID}.json" node tools/orbit360-f2-exact-candidate-source-validator-v20260819.mjs
+          jq -e '.ok==true and .status=="F2_EXACT_CANDIDATE_SOURCE_VALIDATION_PASS" and .candidateArtifactId==9385306424 and .fullRehashPass==true and .inicioFiniteRootfixPass==true and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .productionTouched==false' "$EVIDENCE_DIR/f2-successor-candidate-source-run-${GITHUB_RUN_ID}.json" >/dev/null
+      - name: Build sanitized SOURCE terminal evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          jq -n --arg run "$GITHUB_RUN_ID" '{schemaVersion:"orbit360-f2-successor-source-terminal-v1",ok:true,status:"F2_SUCCESSOR_SOURCE_ONLY_PASS",classification:"PASS",runId:$run,gateId:"f2-productive-acceptance-exact-successor-v20260818",candidateArtifactId:9385306424,candidateSourceHead:"b94b2ae86d26586a68d33be9edba8715e956b02e",candidateZipSha256:"81a96f476fd0fdfd814b3f047951ce653fd324bef8a6d96d6ee6fe44dd7bdcf4",candidateManifestSha256:"cc6170121ed61fd6d9cde867dfcae8a3dd23d29777c6ee28c240d70e49843eef",fileCount:194,fullRehashPass:true,inicioFiniteRootfixPass:true,runtimeExecuted:false,browserExecuted:false,secretAccess:false,dataAccess:false,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,publicationExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false}' > "$EVIDENCE_DIR/f2-successor-source-terminal-run-${GITHUB_RUN_ID}.json"
+      - name: Upload sanitized SOURCE evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-f2-successor-source-evidence-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/f2-successor-source-gate-run-${{ github.run_id }}.json
+            orbit360-platform/runtime-gate-crm-v20260716/f2-successor-candidate-source-run-${{ github.run_id }}.json
+            orbit360-platform/runtime-gate-crm-v20260716/f2-successor-source-terminal-run-${{ github.run_id }}.json
+          if-no-files-found: error
+          retention-days: 30
