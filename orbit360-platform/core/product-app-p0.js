@@ -1,4 +1,4 @@
-/* Orbit 360 · Product application activation owner P0 · 2026-08-14 */
+/* Orbit 360 · Product application activation owner P0 · 2026-08-19 */
 (function(){
   'use strict';
   window.Orbit=window.Orbit||{};
@@ -7,6 +7,8 @@
   function clean(v){return String(v==null?'':v).trim();}
   function status(){return{initialized:state.initialized,activating:state.activating,started:state.started,routerStarted:state.routerStarted,tenantContextReady:state.tenantContextReady,lastError:state.lastError,mode:'product-readonly',writeAuthorized:false};}
   function fail(message){state.lastError=clean(message)||'PRODUCT_APP_ACTIVATION_FAILED';state.activating=false;try{document.dispatchEvent(new CustomEvent('orbit:product-app',{detail:status()}));}catch(e){}var err=new Error(state.lastError);err.code=state.lastError;throw err;}
+  function routerHostReady(){var host=document.getElementById('host');return !!(host&&(host.childElementCount>0||clean(host.textContent)));}
+  function waitForRouterReady(timeoutMs){return new Promise(function(resolve,reject){var started=Date.now();(function poll(){if(routerHostReady())return resolve({ready:true,hostRendered:true});if(Date.now()-started>=timeoutMs){var err=new Error('PRODUCT_ROUTER_NOT_READY');err.code='PRODUCT_ROUTER_NOT_READY';return reject(err);}setTimeout(poll,50);})();});}
   function init(){
     if(state.initialized)return status();
     state.initialized=true;
@@ -38,7 +40,17 @@
       var tenantStatus=tenantBridge.install();
       if(!tenantStatus||tenantStatus.ready!==true||!clean(tenantStatus.tenantId)||tenantStatus.writeAuthorized!==false)throw new Error('PRODUCT_TENANT_CONTEXT_NOT_READY');
       state.tenantContextReady=true;
-      if(!state.routerStarted){if(!Orbit.router||typeof Orbit.router.init!=='function')throw new Error('PRODUCT_ROUTER_MISSING');Orbit.router.init();state.routerStarted=true;}
+      if(!state.routerStarted){
+        if(!Orbit.router||typeof Orbit.router.init!=='function')throw new Error('PRODUCT_ROUTER_MISSING');
+        Orbit.router.init();
+        return waitForRouterReady(120000).then(function(routerStatus){
+          if(!routerStatus||routerStatus.ready!==true||routerStatus.hostRendered!==true)throw new Error('PRODUCT_ROUTER_NOT_READY');
+          state.routerStarted=true;
+          return result;
+        });
+      }
+      return result;
+    }).then(function(){
       state.started=true;state.activating=false;state.lastError='';
       if(Orbit.auth&&typeof Orbit.auth.showApp==='function')Orbit.auth.showApp();
       if(Orbit.novedades&&typeof Orbit.novedades.init==='function'){try{Orbit.novedades.init();}catch(e){}}
@@ -49,5 +61,5 @@
     }).catch(function(error){activationPromise=null;state.tenantContextReady=false;return fail(error&&error.message?error.message:error);});
     return activationPromise;
   }
-  window.Orbit.productAppP0=Object.freeze({VERSION:'fase-a-product-p0-20260814',init:init,activate:activate,isStarted:function(){return state.started===true;},status:status,writeAuthorized:false,noFallback:true});
+  window.Orbit.productAppP0=Object.freeze({VERSION:'fase-a-product-p0-20260819-router-host-readiness',init:init,activate:activate,isStarted:function(){return state.started===true;},status:status,writeAuthorized:false,noFallback:true});
 })();
