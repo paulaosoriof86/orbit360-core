@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "orbit360-f2-request08-successor-rebind-source-only-v1",
+  "approved": true,
+  "authorizationSource": "user_explicit_continue_exact_next_action_20260819",
+  "sourceOnly": true,
+  "gateId": "f2-productive-acceptance-exact-successor-v20260818",
+  "predecessorArtifactId": 9385306424,
+  "candidateArtifactId": 9387820198,
+  "candidateSourceHead": "fc46bd85783d8b4d524cbeb0fee54ee9a2c774af",
+  "candidateZipSha256": "58fcbe6e8d7d3a425509c87f229b1cb12dd35a99133d46c757544cc75c55aacc",
+  "candidateManifestSha256": "b18422fdf82830d28e82f657f83b4fd5c10ea134a4735263fa2587a2ddd808cb",
+  "browser": false,
+  "runtime": false,
+  "secrets": false,
+  "firestoreRead": false,
+  "writes": false,
+  "deploy": false,
+  "production": false,
+  "request09Authorized": false,
+  "mainMergeAuthorized": false
+}
