@@ -1,0 +1,65 @@
+name: Orbit360 F2 RULES01 Probe Validator Rootfix Source Only 20260818
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/workflows/orbit360-f2-rules01-probe-validator-rootfix-source-only-v20260818.yml'
+permissions:
+  contents: write
+concurrency:
+  group: orbit360-f2-rules01-probe-validator-rootfix-source-only
+  cancel-in-progress: false
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    env:
+      GATE_ID: f2-productive-acceptance-exact-successor-v20260818
+      EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+      RULES_BLOB: 35fba451bbbeb97dbae3f08303b786ddbcbdd29f
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ays/backend-tenant-lab-v99-20260703
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Mandatory canonical F2 source gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f "$EVIDENCE_DIR/preflight-sanitizado.json"
+          env -u ORBIT360_REQUEST_FILE -u ORBIT360_EXPECTED_REQUEST_VERSION node tools/orbit360-validar-gate-contracts-v20260717.mjs "$GATE_ID"
+          jq -e '.ok==true and .status=="PASS_GATE_CONTRACT_SOURCE_F2_PRODUCTIVE_ACCEPTANCE" and .stableBoundaryContract==true and .sourceClosed==true and .phaseStillF2==true and .executionAuthorized==false and .secretAccessAuthorized==false and .firestoreReadAuthorized==false and .deployAuthorized==false and .productionAuthorized==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
+      - name: Validate probe rootfix contract source-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-f2-cross-tenant-probe-contract-v20260818.mjs
+          node --check tools/orbit360-f2-cross-tenant-forced-server-probe-v20260818.mjs
+          node --check tools/orbit360-test-f2-cross-tenant-probe-contract-v20260818.mjs
+          node --check tools/orbit360-f2-rules01-postdeploy-probe-preflight-v20260818.mjs
+          node tools/orbit360-test-f2-cross-tenant-probe-contract-v20260818.mjs > "$RUNNER_TEMP/probe-selftest.json"
+          jq -e '.ok==true and .status=="F2_CROSS_TENANT_PROBE_CONTRACT_SELFTEST_PASS" and .legacyReservedIdRejected==true and .invalidArgumentClassification=="VALIDATOR_STALE" and .permissionDeniedClassification=="PASS" and .networkAccess==false and .secretAccess==false and .firestoreRead==false and .rulesDeploy==false and .writes==0' "$RUNNER_TEMP/probe-selftest.json" >/dev/null
+          test "$(git hash-object firestore.rules)" = "$RULES_BLOB"
+          jq -e '.status=="CONSUMED_VALIDATOR_STALE_AFTER_RULES_DEPLOY_PASS" and .allowedExecutions==0 and .consumed==true and .authorizationFrozen==true and .replayAllowed==false and .execution.rulesDeploy.ok==true and .execution.probe.canonicalClassification=="VALIDATOR_STALE" and .execution.probe.canonicalCode=="F2_CROSS_TENANT_PROBE_USED_RESERVED_FIRESTORE_ID"' .github/orbit360-requests/f2-firestore-rules-parity-repair-lab-v20260818-01.json >/dev/null
+          jq -e '.canonicalClassification=="VALIDATOR_STALE" and .canonicalCode=="F2_CROSS_TENANT_PROBE_USED_RESERVED_FIRESTORE_ID" and .rulesDeploy.ok==true and .rootCause.rulesRedeployRequired==false and .integrity.beforeAfterPass==true' "$EVIDENCE_DIR/f2-rules01-probe-validator-stale-rootcause-v20260818.json" >/dev/null
+          grep -q "orbit360-f2-cross-tenant-probe" tools/orbit360-f2-cross-tenant-probe-contract-v20260818.mjs
+          ! grep -q "__orbit360_f2_cross_tenant_probe__" tools/orbit360-f2-cross-tenant-forced-server-probe-v20260818.mjs
+          test -f .github/workflows/orbit360-f2-rules01-postdeploy-probe-readonly-v20260818.yml
+          ! grep -Eq 'firebase-tools.*deploy|deploy --only firestore:rules|firestore:rules --project' .github/workflows/orbit360-f2-rules01-postdeploy-probe-readonly-v20260818.yml
+          test ! -f .github/orbit360-requests/f2-rules01-postdeploy-probe-readonly-v20260818-01.json
+          test ! -f .github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-runbound-20260818-06.json
+      - name: Persist sanitized source-only rootfix evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="$EVIDENCE_DIR/f2-rules01-probe-validator-rootfix-source-only-v20260818.json"
+          jq -n --arg run "$GITHUB_RUN_ID" --arg sha "$GITHUB_SHA" --arg blob "$RULES_BLOB" '{schemaVersion:"orbit360-f2-rules01-probe-validator-rootfix-source-only-v1",ok:true,status:"F2_RULES01_PROBE_VALIDATOR_ROOTFIX_SOURCE_ONLY_PASS",classification:"PASS",canonicalRootCause:"VALIDATOR_STALE / F2_CROSS_TENANT_PROBE_USED_RESERVED_FIRESTORE_ID",runId:$run,triggerSha:$sha,sourceRulesBlob:$blob,probeContract:"F2_CROSS_TENANT_PROBE_VALID_PATH_V2",legacyReservedIdRejected:true,validProbePath:"tenants/orbit360-f2-cross-tenant-probe/system/config",invalidArgumentClassification:"VALIDATOR_STALE",permissionDeniedClassification:"PASS",rules01RunId:32211779285,rulesDeployPreviouslyPassed:true,rulesRedeployRequired:false,rulesRedeployAuthorized:false,rulesRedeployExecuted:false,postdeployProbeWorkflowPrepared:true,postdeployProbeRequestCreated:false,request06Created:false,secretAccess:false,firestoreRead:false,browserExecuted:false,runtimeExecuted:false,firestoreDocumentWrites:0,authWrites:0,membershipWrites:0,dataWrites:0,hostingDeploy:false,functionsDeploy:false,packageRebuild:false,publication:false,production:false,containsPII:false,containsSecrets:false}' > "$OUT"
+          git config user.name 'orbit360-actions-rootfix'
+          git config user.email 'actions@users.noreply.github.com'
+          git add "$OUT"
+          git commit -m 'docs(gate): persist RULES01 probe rootfix source-only PASS [skip ci]'
+          git pull --rebase origin ays/backend-tenant-lab-v99-20260703
+          git push origin HEAD:ays/backend-tenant-lab-v99-20260703
