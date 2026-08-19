@@ -1,0 +1,182 @@
+name: Orbit360 F2 RULES01 Postdeploy Probe Readonly 20260818
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-requests/f2-rules01-postdeploy-probe-readonly-v20260818-01.json'
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: orbit360-f2-rules01-postdeploy-probe-${{ github.sha }}
+  cancel-in-progress: false
+env:
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  ORBIT360_GATE_ID: f2-productive-acceptance-exact-successor-v20260818
+  ORBIT360_REQUEST_VERSION: F2_RULES01_POSTDEPLOY_CROSS_TENANT_PROBE_READONLY_V1
+  ORBIT360_PRODUCT_PROJECT_ID: ays-orbit-360-lab
+  ORBIT360_PRODUCT_TENANT_ID: alianzas-soluciones
+  ORBIT360_TARGET_EMAIL_HASH: 9b663847979724e9491e1c655da32a7cb17a5f6ed26dba352de1eb811254b23f
+  ORBIT360_TARGET_ADVISOR_ID: ase-paula-osorio
+  ORBIT360_RULES_BLOB: 35fba451bbbeb97dbae3f08303b786ddbcbdd29f
+  ORBIT360_CANDIDATE_ARTIFACT_ID: '9345207863'
+  ORBIT360_CANDIDATE_ZIP_NAME: orbit360-fase-a-product-f1-4c-successor-29caae94a3db.zip
+  ORBIT360_CANDIDATE_ZIP_SHA256: 493009c83390901aa772842a2ba9ddd5ce5293f6969d86c5c3395ebd670a44ac
+  ORBIT360_CANDIDATE_MANIFEST_SHA256: 29dafe5e63b425ea6cf641937fe1b9d4b9e63f72479a51ae76f9148a55771761
+  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+jobs:
+  probe:
+    name: F2 RULES01 postdeploy cross-tenant probe readonly
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify immutable probe-only request boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
+          test "${#CHANGED[@]}" = '1'
+          REQUEST_FILE="${CHANGED[0]}"
+          test "$REQUEST_FILE" = '.github/orbit360-requests/f2-rules01-postdeploy-probe-readonly-v20260818-01.json'
+          test "$(jq -r '.requestVersion' "$REQUEST_FILE")" = "$ORBIT360_REQUEST_VERSION"
+          test "$(jq -r '.parentHead' "$REQUEST_FILE")" = "$(git rev-parse HEAD^)"
+          test "$(jq -r '.scope.rulesDeploy' "$REQUEST_FILE")" = 'false'
+          test "$(git hash-object firestore.rules)" = "$ORBIT360_RULES_BLOB"
+          node --check tools/orbit360-f2-cross-tenant-probe-contract-v20260818.mjs
+          node --check tools/orbit360-f2-cross-tenant-forced-server-probe-v20260818.mjs
+          node --check tools/orbit360-f2-rules01-postdeploy-probe-preflight-v20260818.mjs
+          node tools/orbit360-test-f2-cross-tenant-probe-contract-v20260818.mjs
+          echo "ORBIT360_POSTDEPLOY_PROBE_REQUEST_FILE=$REQUEST_FILE" >> "$GITHUB_ENV"
+          echo "ORBIT360_POSTDEPLOY_FINAL=$EVIDENCE_DIR/f2-rules01-postdeploy-probe-terminal-run-${GITHUB_RUN_ID}.json" >> "$GITHUB_ENV"
+      - name: Mandatory canonical F2 source gate before secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f "$EVIDENCE_DIR/preflight-sanitizado.json"
+          env -u ORBIT360_REQUEST_FILE -u ORBIT360_EXPECTED_REQUEST_VERSION node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
+          cp "$EVIDENCE_DIR/preflight-sanitizado.json" "$EVIDENCE_DIR/f2-rules01-postdeploy-canonical-gate-run-${GITHUB_RUN_ID}.json"
+          jq -e '.ok==true and .status=="PASS_GATE_CONTRACT_SOURCE_F2_PRODUCTIVE_ACCEPTANCE" and .stableBoundaryContract==true and .sourceClosed==true and .phaseStillF2==true and .executionAuthorized==false and .secretAccessAuthorized==false and .firestoreReadAuthorized==false and .deployAuthorized==false and .productionAuthorized==false' "$EVIDENCE_DIR/f2-rules01-postdeploy-canonical-gate-run-${GITHUB_RUN_ID}.json" >/dev/null
+      - name: Validate postdeploy probe-only contract
+        id: preflight
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-f2-rules01-postdeploy-probe-preflight-v20260818.mjs
+          jq -e '.ok==true and .status=="GO_F2_RULES01_POSTDEPLOY_CROSS_TENANT_PROBE_READONLY" and .rulesRedeployAuthorized==false and .rulesRedeployExecuted==false and .probePathValid==true and .request06Created==false' "$EVIDENCE_DIR/f2-rules01-postdeploy-probe-preflight-run-${GITHUB_RUN_ID}.json" >/dev/null
+      - name: Emit read-only GO
+        id: go
+        shell: bash
+        run: |
+          set -euo pipefail
+          jq -n --arg run "$GITHUB_RUN_ID" '{schemaVersion:"orbit360-f2-rules01-postdeploy-go-v1",ok:true,status:"GO_GATE_CONTRACT",classification:"GO_F2_RULES01_POSTDEPLOY_CROSS_TENANT_PROBE_READONLY_V1",runId:$run,secretAccessAuthorized:true,firestoreReadAuthorized:true,authReadAuthorized:true,customTokenMintAuthorized:true,browserProbeAuthorized:true,rulesDeployAuthorized:false,firestoreDocumentWriteAuthorized:false,authWriteAuthorized:false,membershipWriteAuthorized:false,dataWriteAuthorized:false,hostingDeployAuthorized:false,functionsDeployAuthorized:false,packageRebuildAuthorized:false,publicationAuthorized:false,productionAuthorized:false,containsPII:false,containsSecrets:false}' > "$EVIDENCE_DIR/f2-rules01-postdeploy-go-run-${GITHUB_RUN_ID}.json"
+      - name: Install ephemeral probe dependencies after GO
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false --ignore-scripts firebase-admin@13 playwright@1.52.0 >/dev/null
+          BROWSER_EXECUTABLE="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          test -n "$BROWSER_EXECUTABLE"
+          echo "ORBIT360_SYSTEM_BROWSER_EXECUTABLE=$BROWSER_EXECUTABLE" >> "$GITHUB_ENV"
+      - name: Bind LAB provider read-only after GO
+        env:
+          SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+          SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-${SA_ORBIT_360_LAB:-${SA_DEFAULT:-}}}"
+          test -n "$SERVICE_ACCOUNT"
+          SA_FILE="$RUNNER_TEMP/orbit360-postdeploy-probe-service-account.json"
+          printf '%s' "$SERVICE_ACCOUNT" > "$SA_FILE"; chmod 600 "$SA_FILE"
+          jq -e --arg p "$ORBIT360_PRODUCT_PROJECT_ID" '.type=="service_account" and .project_id==$p and (.client_email|length)>0 and (.private_key|length)>0' "$SA_FILE" >/dev/null
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$SA_FILE" >> "$GITHUB_ENV"
+      - name: Resolve protected identity read-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          ORBIT360_SMOKE_IDENTITY_EVIDENCE="$EVIDENCE_DIR/f2-rules01-postdeploy-identity-run-${GITHUB_RUN_ID}.json" ORBIT360_SMOKE_RUN_ID="$GITHUB_RUN_ID" ORBIT360_SMOKE_TARGET_EMAIL_HASH="$ORBIT360_TARGET_EMAIL_HASH" ORBIT360_SMOKE_TARGET_ADVISOR_ID="$ORBIT360_TARGET_ADVISOR_ID" node tools/orbit360-m6-resolve-smoke-identity-readonly-v20260730.mjs
+          jq -e '.ok==true and .eligibleSmokeIdentityCount==1 and .targetIdentityMatches==true and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0' "$EVIDENCE_DIR/f2-rules01-postdeploy-identity-run-${GITHUB_RUN_ID}.json" >/dev/null
+      - name: Integrity before
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-f2-data-integrity-readonly-v20260818.mjs before
+          cp "$EVIDENCE_DIR/f2-data-integrity-before-v20260818.json" "$EVIDENCE_DIR/f2-rules01-postdeploy-integrity-before-run-${GITHUB_RUN_ID}.json"
+      - name: Download exact frozen candidate and serve loopback
+        env:
+          GH_TOKEN_RUNTIME: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUTER="$RUNNER_TEMP/postdeploy-outer.zip"; OUTER_DIR="$RUNNER_TEMP/postdeploy-outer"; CANDIDATE_DIR="$RUNNER_TEMP/postdeploy-candidate"
+          rm -rf "$OUTER" "$OUTER_DIR" "$CANDIDATE_DIR"; mkdir -p "$OUTER_DIR" "$CANDIDATE_DIR"
+          curl -L --fail --retry 3 -H "Authorization: Bearer $GH_TOKEN_RUNTIME" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/${ORBIT360_CANDIDATE_ARTIFACT_ID}/zip" -o "$OUTER"
+          unzip -q "$OUTER" -d "$OUTER_DIR"
+          test "$(sha256sum "$OUTER_DIR/$ORBIT360_CANDIDATE_ZIP_NAME" | awk '{print $1}')" = "$ORBIT360_CANDIDATE_ZIP_SHA256"
+          unzip -q "$OUTER_DIR/$ORBIT360_CANDIDATE_ZIP_NAME" -d "$CANDIDATE_DIR"
+          test "$(sha256sum "$CANDIDATE_DIR/orbit360-package-manifest.json" | awk '{print $1}')" = "$ORBIT360_CANDIDATE_MANIFEST_SHA256"
+          python3 -m http.server 4173 --bind 127.0.0.1 --directory "$CANDIDATE_DIR" > "$RUNNER_TEMP/postdeploy-http.log" 2>&1 &
+          for i in $(seq 1 30); do curl --fail --silent http://127.0.0.1:4173/orbit360-package-manifest.json >/dev/null && break; sleep 1; done
+          curl --fail --silent http://127.0.0.1:4173/orbit360-package-manifest.json >/dev/null
+          echo "ORBIT360_F2_URL=http://127.0.0.1:4173/" >> "$GITHUB_ENV"
+      - name: Forced-server cross-tenant deny probe
+        id: probe
+        shell: bash
+        run: |
+          set +e
+          node tools/orbit360-f2-cross-tenant-forced-server-probe-v20260818.mjs
+          CODE=$?; echo "exit_code=$CODE" >> "$GITHUB_OUTPUT"; exit 0
+      - name: Integrity after and compare
+        id: integrity
+        if: always()
+        shell: bash
+        run: |
+          set +e
+          node tools/orbit360-f2-data-integrity-readonly-v20260818.mjs after
+          A=$?
+          if [ "$A" -eq 0 ]; then node tools/orbit360-f2-compare-integrity-v20260818.mjs; B=$?; else B=41; fi
+          echo "exit_code=$B" >> "$GITHUB_OUTPUT"; exit 0
+      - name: Build sanitized terminal evidence
+        if: always()
+        env:
+          PROBE_CODE: ${{ steps.probe.outputs.exit_code }}
+          INTEGRITY_CODE: ${{ steps.integrity.outputs.exit_code }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          P="$EVIDENCE_DIR/f2-rules01-cross-tenant-forced-server-run-${GITHUB_RUN_ID}.json"; I="$EVIDENCE_DIR/f2-integrity-before-after-v20260818.json"
+          if [ "${PROBE_CODE:-41}" = '0' ] && [ "${INTEGRITY_CODE:-41}" = '0' ] && jq -e '.ok==true and .status=="F2_CROSS_TENANT_FORCED_SERVER_DENY_PASS" and .serverForced==true and .responseStatus==403 and .responseErrorStatus=="PERMISSION_DENIED" and .crossTenantDenied==true and .probePathValid==true' "$P" >/dev/null && jq -e '.ok==true and .status=="F2_INTEGRITY_BEFORE_AFTER_PASS" and .countsIdentical==true and .digestsIdentical==true' "$I" >/dev/null; then
+            jq -n --arg run "$GITHUB_RUN_ID" '{schemaVersion:"orbit360-f2-rules01-postdeploy-probe-terminal-v1",ok:true,status:"F2_RULES01_POSTDEPLOY_CROSS_TENANT_PROBE_PASS",classification:"PASS",runId:$run,rulesRedeployExecuted:false,crossTenantForcedServerDenied:true,integrityBeforeAfterPass:true,firestoreDocumentWrites:0,authWrites:0,membershipWrites:0,dataWrites:0,hostingDeploy:false,functionsDeploy:false,packageRebuild:false,publication:false,production:false,request06Created:false,containsPII:false,containsSecrets:false}' > "$ORBIT360_POSTDEPLOY_FINAL"
+          else
+            CLASS=PIPELINE_MECHANISM_FAILURE
+            if [ -f "$P" ]; then CLASS="$(jq -r '.classification // "PIPELINE_MECHANISM_FAILURE"' "$P")"; fi
+            jq -n --arg run "$GITHUB_RUN_ID" --arg class "$CLASS" --arg probeCode "${PROBE_CODE:-missing}" --arg integrityCode "${INTEGRITY_CODE:-missing}" '{schemaVersion:"orbit360-f2-rules01-postdeploy-probe-terminal-v1",ok:false,status:"F2_RULES01_POSTDEPLOY_CROSS_TENANT_PROBE_FAIL",classification:$class,runId:$run,probeCode:$probeCode,integrityCode:$integrityCode,rulesRedeployExecuted:false,firestoreDocumentWrites:0,authWrites:0,membershipWrites:0,dataWrites:0,hostingDeploy:false,functionsDeploy:false,packageRebuild:false,publication:false,production:false,request06Created:false,containsPII:false,containsSecrets:false}' > "$ORBIT360_POSTDEPLOY_FINAL"
+          fi
+          cat "$ORBIT360_POSTDEPLOY_FINAL"
+      - name: Upload sanitized evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-f2-rules01-postdeploy-probe-${{ github.run_id }}
+          path: |
+            orbit360-platform/runtime-gate-crm-v20260716/f2-rules01-postdeploy-*.json
+            orbit360-platform/runtime-gate-crm-v20260716/f2-rules01-cross-tenant-forced-server-run-${{ github.run_id }}.json
+            orbit360-platform/runtime-gate-crm-v20260716/f2-integrity-before-after-v20260818.json
+          retention-days: 14
+      - name: Enforce terminal PASS
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          jq -e '.ok==true and .status=="F2_RULES01_POSTDEPLOY_CROSS_TENANT_PROBE_PASS" and .rulesRedeployExecuted==false and .crossTenantForcedServerDenied==true and .integrityBeforeAfterPass==true and .firestoreDocumentWrites==0 and .authWrites==0 and .membershipWrites==0 and .dataWrites==0 and .production==false and .request06Created==false' "$ORBIT360_POSTDEPLOY_FINAL" >/dev/null
