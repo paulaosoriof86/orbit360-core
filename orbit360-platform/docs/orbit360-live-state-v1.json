@@ -1,8 +1,8 @@
 {
   "schemaVersion": "orbit360-live-state-v1",
-  "stateVersion": "20260819.f2.request06-rootfix-successor-source-closed-runtime-auth-pending.current",
-  "updatedAt": "2026-08-19T22:52:00.000Z",
-  "phase": "F2_SUCCESSOR_SOURCE_ONLY_CLOSED_RUNTIME_AUTH_PENDING",
+  "stateVersion": "20260819.f2.request07-validator-stale-sourcefix-pass-request08-auth-pending.current",
+  "updatedAt": "2026-08-19T23:30:42.063Z",
+  "phase": "F2_REQUEST07_VALIDATOR_STALE_SOURCEFIX_PASS_REQUEST08_AUTH_PENDING",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pr": 5,
@@ -181,7 +181,7 @@
       "recibosCartera": "policy_client360_plus_cobros_global"
     },
     "runtimeWorkflowPrepared": true,
-    "requestCreated": false,
+    "requestCreated": true,
     "runtimeAuthorized": false,
     "browserAuthorized": false,
     "firestoreWrites": 0,
@@ -256,9 +256,11 @@
       "productAffected": false
     },
     "currentBlockingFact": {
-      "code": "F2_REQUEST07_RUNTIME_FRESH_AUTHORIZATION_REQUIRED",
+      "code": "F2_REQUEST08_RUNTIME_FRESH_AUTHORIZATION_REQUIRED",
       "status": "FRESH_AUTHORIZATION_REQUIRED",
-      "candidateArtifactId": 9385306424
+      "candidateArtifactId": 9385306424,
+      "priorRequest": "REQUEST07_CONSUMED",
+      "priorRunId": 32311320804
     },
     "authIsCurrentBlocker": false,
     "passwordIsCurrentBlocker": false,
@@ -383,14 +385,33 @@
       "dataAffected": false,
       "candidateArtifactId": 9385306424,
       "routerVersion": "v10.7-f2-lifecycle-composition-profile-aware"
+    },
+    "f2Request07ValidatorStale": {
+      "classification": "VALIDATOR_STALE",
+      "code": "F2_BROWSER_MANIFEST_IDENTITY_EXPECTATION_BOUND_TO_PREDECESSOR",
+      "status": "CLOSED_SOURCE_ONLY_PASS",
+      "observedRuntimeClassification": "DATA_CONTRACT_FAILURE",
+      "reclassifiedAfterRootCause": true,
+      "requestCommit": "696b3700687f758fdd9c629a2268caa857aa377a",
+      "runId": 32311320804,
+      "evidenceArtifactId": 9386546905,
+      "candidateArtifactId": 9385306424,
+      "productAffected": false,
+      "dataAffected": false,
+      "runtimeActivated": false,
+      "integrityBeforeAfterPass": true,
+      "sourcefixEvidence": "orbit360-platform/runtime-gate-crm-v20260716/f2-request07-validator-stale-sourcefix-check-v20260819.json",
+      "sourcefixEvidenceCommit": "1b9344944f3691ac40eb7face6d33c7034e0dd37",
+      "preventiveControl": "DYNAMIC_IMMUTABLE_REQUEST_CANDIDATE_BINDING_IN_RUNTIME_RUNNER_AND_SELFTEST"
     }
   },
   "documentationControl": {
     "index": "orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json",
     "currentAddendum": "orbit360-platform/docs/ADDENDUM-MAESTRO-CIERRE-FORENSE-SINCRONIZACION-Y-PLAN-CONGELADO-20260818.md",
-    "currentCheckpoint": "orbit360-platform/docs/CHECKPOINT-F2-RUNTIME05-CROSS-TENANT-SECURITY-FAILURE-20260818.md",
+    "currentCheckpoint": "orbit360-platform/docs/CHECKPOINT-F2-REQUEST07-VALIDATOR-STALE-SOURCEFIX-PASS-REQUEST08-AUTH-PENDING-20260819.md",
     "historicalPolicy": "HISTORICAL_NOT_CURRENT_STATE",
-    "transactionStatus": "F2_RUNTIME05_SECURITY_FAILURE_RULES_PARITY_REPAIR_AUTH_PENDING"
+    "transactionStatus": "F2_REQUEST07_VALIDATOR_STALE_SOURCEFIX_PASS_REQUEST08_AUTH_PENDING",
+    "latestAcademiaUpdate": "orbit360-platform/docs/ACADEMIA-ACTUALIZACION-F2-REQUEST07-VALIDATOR-STALE-20260819.md"
   },
   "frozenPlan": {
     "currentPhase": "F2",
@@ -421,7 +442,7 @@
       ]
     },
     "currentPhaseInternalPercent": 0,
-    "currentPhaseInternalMethod": "runtime05_passed_role_view_contract_then_failed_cross_tenant_security_rule_runtime_parity",
+    "currentPhaseInternalMethod": "request07_consumed_validator_stale_sourcefix_pass_request08_fresh_authorization_pending",
     "currentPhaseSubphases": {
       "F1_1_owner_and_observer_source": "CLOSED",
       "F1_2A_observer_selftest": "CLOSED",
@@ -447,12 +468,14 @@
       "F2_runtime04_postsync_source_gate": "CLOSED_SOURCE_ONLY_PASS_RUN_32210132572",
       "F2_runtime05_preflight_artifact_identity_role_contract": "PASS_THROUGH_CROSS_TENANT_STAGE_RUN_32210391764",
       "F2_runtime05_cross_tenant_security": "CONSUMED_SECURITY_FAILURE_RUN_32210391764",
-      "F2_runtime05_security_rootcause_source_gate": "CLOSED_SOURCE_ONLY_PASS_RUN_32211048260"
+      "F2_runtime05_security_rootcause_source_gate": "CLOSED_SOURCE_ONLY_PASS_RUN_32211048260",
+      "F2_request07_runtime_browser_readonly_acceptance": "CONSUMED_STOP_VALIDATOR_STALE_RUN_32311320804",
+      "F2_request07_validator_stale_sourcefix": "CLOSED_SOURCE_ONLY_PASS_COMMIT_1b9344944f3691ac40eb7face6d33c7034e0dd37"
     }
   },
   "lanes": {
-    "A_frontend_UX": "FROZEN_NO_CHANGES",
-    "B_backend_security_gates": "F2_RULES01_DEPLOY_PASS_PROBE_VALIDATOR_STALE_ROOTFIX_PASS_POSTDEPLOY_PROBE_AUTHORIZATION_PENDING",
+    "A_frontend_UX": "FROZEN_ROOTFIX_CERTIFIED_SOURCE_CLOSED_PASS",
+    "B_backend_security_gates": "REQUEST07_CONSUMED_VALIDATOR_STALE_SOURCEFIX_PASS_REQUEST08_FRESH_AUTH_PENDING",
     "C_real_data_migration": "UNTOUCHED_ZERO_CHANGES"
   },
   "writes": {
@@ -473,12 +496,12 @@
     "membershipChangesAuthorized": false,
     "dataChangesAuthorized": false,
     "mainMergeAuthorized": false,
-    "f2AuthorizationStatus": "FRESH_AUTHORIZATION_REQUIRED_REQUEST07_EXACT_ARTIFACT_9385306424",
+    "f2AuthorizationStatus": "FRESH_AUTHORIZATION_REQUIRED_REQUEST08_EXACT_ARTIFACT_9385306424",
     "rulesDeployAuthorizedNow": false,
     "securityRepairAuthorizedNow": false
   },
   "goLive": {
-    "status": "BLOCKED_F2_REQUEST07_FRESH_AUTHORIZATION_REQUIRED",
+    "status": "BLOCKED_F2_REQUEST08_FRESH_AUTHORIZATION_REQUIRED",
     "publicUrl": "https://app.aysseguros.com",
     "publishedPackagePreserved": true,
     "successorPublished": false,
@@ -511,10 +534,13 @@
     "f2Runtime05RequestReplayAllowed": false,
     "request06MayBeCreatedWithoutFreshAuthorization": false,
     "f2Rules01MayBeRedeployedForThisProof": false,
-    "f2PostdeployProbeRequestMayBeRerun": false
+    "f2PostdeployProbeRequestMayBeRerun": false,
+    "request07MayBeRerun": false,
+    "request07RequestReplayAllowed": false,
+    "request08MayBeCreatedWithoutFreshAuthorization": false
   },
   "nextActionExact": {
-    "action": "PREPARE_REQUEST07_RUNTIME_AUTHORIZATION_BOUNDARY",
+    "action": "OBTAIN_FRESH_AUTHORIZATION_REQUEST08_RUNTIME_BROWSER_READONLY",
     "gateId": "f2-productive-acceptance-exact-successor-v20260818",
     "requestVersion": "F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_V1",
     "candidateArtifactId": 9385306424,
@@ -527,15 +553,13 @@
     "Read ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json",
     "Read orbit360-live-state-v1.json",
     "Confirm actual HEAD and PR #5 remain draft/open/unmerged",
-    "Read CHECKPOINT-F2-PRE-REQUEST06-KNOWN-ROOTFIXES-PASS-20260819.md",
-    "Read F2 postdeploy composite evidence producer contract PASS",
-    "Do not rerun Request01-Request05 or postdeploy Request01",
-    "Do not redeploy Firestore rules",
-    "Do not reopen authentication, password, membership existence, Cliente 360, HostDime or data reimport as current blockers",
-    "Do not use reserved Firestore IDs in the full F2 runtime probe; it is now bound to F2_CROSS_TENANT_PROBE_VALID_PATH_V2",
-    "Certified successor artifact 9345207863 remains unpublished; the public URL is not yet the certified successor",
-    "Create Request06 only after fresh explicit authorization",
-    "Request06 canonical gate and known-rootfix selftest must pass before secrets/browser"
+    "Read CHECKPOINT-F2-REQUEST07-VALIDATOR-STALE-SOURCEFIX-PASS-REQUEST08-AUTH-PENDING-20260819.md",
+    "Request07 is consumed: do not rerun or replay it",
+    "Do not reopen Request06, authentication, password, membership existence, HostDime or data reimport as current blockers",
+    "Keep candidate artifact 9385306424 frozen and unpublished",
+    "Create Request08 only after fresh explicit authorization",
+    "Run the canonical F2 gate before artifact/provider/secrets/Firestore/browser for Request08",
+    "Do not deploy, publish, merge main, or perform writes under the Request08 runtime-readonly boundary"
   ],
   "f2Runtime01": {
     "status": "CONSUMED_STOP_VALIDATOR_STALE",
@@ -967,5 +991,39 @@
     "inicioFiniteRootfixPass": true,
     "rootfixRunId": 32310462537,
     "runtimeFreshAuthorizationRequired": true
+  },
+  "f2Runtime07": {
+    "status": "CONSUMED_STOP_VALIDATOR_STALE",
+    "requestPath": ".github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-runbound-20260819-07.json",
+    "requestCommit": "696b3700687f758fdd9c629a2268caa857aa377a",
+    "runId": 32311320804,
+    "jobId": 96254728198,
+    "runAttempt": 1,
+    "conclusion": "failure",
+    "candidateArtifactId": 9385306424,
+    "candidateSourceHead": "b94b2ae86d26586a68d33be9edba8715e956b02e",
+    "canonicalGateGo": true,
+    "artifactVerified": true,
+    "identityReadOnlyPass": true,
+    "browserExecuted": true,
+    "runtimeActivated": false,
+    "stopClassification": "VALIDATOR_STALE",
+    "stopCode": "F2_BROWSER_MANIFEST_IDENTITY_EXPECTATION_BOUND_TO_PREDECESSOR",
+    "observedClassification": "DATA_CONTRACT_FAILURE",
+    "integrityBeforeAfterPass": true,
+    "firestoreWrites": 0,
+    "authWrites": 0,
+    "membershipWrites": 0,
+    "dataWrites": 0,
+    "operationalWrites": 0,
+    "deployExecuted": false,
+    "publicationExecuted": false,
+    "productionTouched": false,
+    "requestConsumed": true,
+    "replayAllowed": false,
+    "terminalArtifactId": 9386546905,
+    "sourcefixStatus": "CLOSED_SOURCE_ONLY_PASS",
+    "sourcefixEvidenceCommit": "1b9344944f3691ac40eb7face6d33c7034e0dd37",
+    "sourcefixEvidence": "orbit360-platform/runtime-gate-crm-v20260716/f2-request07-validator-stale-sourcefix-check-v20260819.json"
   }
 }
