@@ -4,7 +4,7 @@
   "gateContractVersion": "2.1.0",
   "validatorLifecycleRevision": "phase-capability-contract-v2-source-rebind",
   "f2ValidatorRevision": "f2-productive-acceptance-exact-successor-rebind-v2-20260819",
-  "status": "F2_RUNTIME_BLOCKED_PENDING_SOURCE_REBIND",
+  "status": "F2_RUNTIME_PENDING_FRESH_AUTHORIZATION",
   "currentPhase": "F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY",
   "executionProfile": {
     "phase": "F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY",
@@ -99,5 +99,13 @@
     ]
   },
   "containsPII": false,
-  "containsSecrets": false
+  "containsSecrets": false,
+  "sourceOnlyPrerequisite": {
+    "status": "CLOSED_PASS",
+    "runId": 32310630524,
+    "evidenceArtifactId": 9386304228,
+    "candidateArtifactId": 9385306424,
+    "fullRehashPass": true,
+    "inicioFiniteRootfixPass": true
+  }
 }

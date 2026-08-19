@@ -1,6 +1,6 @@
 {
   "schemaVersion": "orbit360-current-documentation-index-v1",
-  "updatedAt": "2026-08-19T22:48:00.000Z",
+  "updatedAt": "2026-08-19T22:52:00.000Z",
   "status": "CURRENT_BINDING_INDEX",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -101,7 +101,7 @@
     "f1_4DRunId": "32195516901",
     "f1_4DRequestCommit": "45c85e6ed6e992b490262f5abf12cce94d7a13c4",
     "f1_4DRequestConsumed": true,
-    "f2SourceOnlyStatus": "PENDING_REBIND_SOURCE_ONLY",
+    "f2SourceOnlyStatus": "CLOSED_PASS",
     "f2SourceOnlyGateId": "f2-productive-acceptance-exact-successor-v20260818",
     "f2SourceOnlyContractVersion": "2.0.0",
     "f2RuntimeRequestCreated": false,
@@ -118,7 +118,7 @@
     "f1BootstrapStatus": "ready-read-only",
     "publishedPackage": "R4S9C_SOURCE_861326906558f03d9c8c2e7f34adfb4979a17d73_PRESERVED_NOT_ROOTFIX_CONFIRMATION_ARTIFACT",
     "currentPlan": "orbit360-platform/docs/ADDENDUM-MAESTRO-CIERRE-FORENSE-SINCRONIZACION-Y-PLAN-CONGELADO-20260818.md",
-    "nextAuthorizationBoundary": "BLOCKED_PENDING_SOURCE_ONLY_PASS:F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_V1:EXACT_ARTIFACT_9385306424",
+    "nextAuthorizationBoundary": "FRESH_AUTHORIZATION_REQUIRED:F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_V1:REQUEST07:EXACT_ARTIFACT_9385306424",
     "f2Runtime01RunId": "32205144735",
     "f2Runtime01RequestCommit": "0fba51716d741750b617bf95fc6342444c9f720c",
     "f2Runtime01Status": "CONSUMED_STOP_VALIDATOR_STALE",
@@ -330,8 +330,8 @@
     "nextActionExact"
   ],
   "f2SuccessorRebind": {
-    "status": "PENDING_SECOND_AND_FINAL_SOURCE_ONLY",
-    "classification": "VALIDATOR_STALE",
+    "status": "CLOSED_PASS",
+    "classification": "PASS_SOURCE_ONLY",
     "gateId": "f2-productive-acceptance-exact-successor-v20260818",
     "contractVersion": "2.1.0",
     "candidateArtifactId": 9385306424,
@@ -346,6 +346,18 @@
     "routerLifecycleCompositionRootfix": "PASS_STATIC_PENDING_SOURCE_EXECUTION",
     "routerVersion": "v10.7-f2-lifecycle-composition-profile-aware",
     "failedSourceRunId": 32310148537,
-    "failedSourceCode": "CANONICAL_LIFECYCLE_REVISION_MISMATCH"
+    "failedSourceCode": "CANONICAL_LIFECYCLE_REVISION_MISMATCH",
+    "sourceValidationRunId": 32310630524,
+    "sourceEvidenceArtifactId": 9386304228,
+    "sourceFullRehashPass": true,
+    "inicioFiniteRootfixPass": true
+  },
+  "f2SuccessorSourceClosure": {
+    "status": "CLOSED_PASS",
+    "gateId": "f2-productive-acceptance-exact-successor-v20260818",
+    "candidateArtifactId": 9385306424,
+    "sourceValidationRunId": 32310630524,
+    "evidenceArtifactId": 9386304228,
+    "nextBoundary": "REQUEST07_FRESH_AUTHORIZATION_REQUIRED"
   }
 }

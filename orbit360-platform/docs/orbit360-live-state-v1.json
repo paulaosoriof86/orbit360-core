@@ -1,8 +1,8 @@
 {
   "schemaVersion": "orbit360-live-state-v1",
-  "stateVersion": "20260819.f2.request06-rootfix-successor-router-lifecycle-rootfix-pending-source.current",
-  "updatedAt": "2026-08-19T22:48:00.000Z",
-  "phase": "F2_SUCCESSOR_SOURCE_ONLY_ROUTER_ROOTFIX_APPLIED",
+  "stateVersion": "20260819.f2.request06-rootfix-successor-source-closed-runtime-auth-pending.current",
+  "updatedAt": "2026-08-19T22:52:00.000Z",
+  "phase": "F2_SUCCESSOR_SOURCE_ONLY_CLOSED_RUNTIME_AUTH_PENDING",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pr": 5,
@@ -155,7 +155,7 @@
     }
   },
   "f2SourceOnly": {
-    "status": "PENDING_REBIND_SOURCE_ONLY",
+    "status": "CLOSED_PASS",
     "gateId": "f2-productive-acceptance-exact-successor-v20260818",
     "contractVersion": "2.1.0",
     "validatorLifecycleRevision": "phase-capability-contract-v2-source-rebind",
@@ -166,7 +166,7 @@
     "candidateZipSha256": "81a96f476fd0fdfd814b3f047951ce653fd324bef8a6d96d6ee6fe44dd7bdcf4",
     "candidateManifestSha256": "cc6170121ed61fd6d9cde867dfcae8a3dd23d29777c6ee28c240d70e49843eef",
     "candidateFileCount": 194,
-    "fullRehashPass": false,
+    "fullRehashPass": true,
     "routes": [
       "inicio",
       "cliente360",
@@ -222,7 +222,10 @@
       "dataAffected": false
     },
     "candidateManifestStatus": "FASE_A_PRODUCT_F2_REQUEST06_ROOTFIX_SUCCESSOR_CERTIFIED",
-    "predecessorArtifactId": 9345207863
+    "predecessorArtifactId": 9345207863,
+    "inicioFiniteRootfixPass": true,
+    "sourceValidationRunId": 32310630524,
+    "sourceEvidenceArtifactId": 9386304228
   },
   "rootCauseState": {
     "membershipValidator": {
@@ -253,8 +256,9 @@
       "productAffected": false
     },
     "currentBlockingFact": {
-      "code": "F2_SUCCESSOR_SOURCE_ONLY_RETRY_AFTER_ROUTER_LIFECYCLE_ROOTFIX",
-      "status": "PENDING_SECOND_AND_FINAL_SOURCE_ONLY"
+      "code": "F2_REQUEST07_RUNTIME_FRESH_AUTHORIZATION_REQUIRED",
+      "status": "FRESH_AUTHORIZATION_REQUIRED",
+      "candidateArtifactId": 9385306424
     },
     "authIsCurrentBlocker": false,
     "passwordIsCurrentBlocker": false,
@@ -364,7 +368,7 @@
     "f2SuccessorGateRebind": {
       "classification": "VALIDATOR_STALE",
       "code": "F2_GATE_OWNERS_PINNED_REQUEST06_PREDECESSOR",
-      "status": "PENDING_SOURCE_ONLY_REBIND",
+      "status": "CLOSED_SOURCE_ONLY_PASS",
       "productAffected": false,
       "dataAffected": false,
       "preflightBeforeRebindRunId": 32309043863
@@ -372,7 +376,7 @@
     "f2SuccessorLifecycleComposition": {
       "classification": "VALIDATOR_STALE",
       "code": "CANONICAL_LIFECYCLE_REVISION_MISMATCH",
-      "status": "ROOTFIX_APPLIED_PENDING_SECOND_SOURCE_ONLY",
+      "status": "CLOSED_SOURCE_ONLY_PASS",
       "firstSourceRunId": 32310148537,
       "rootCause": "CANONICAL_ROUTER_USED_GLOBAL_PHASE_CAPABILITY_V1_INSTEAD_OF_GATE_PROFILED_LIFECYCLE_COMPOSITION",
       "productAffected": false,
@@ -469,12 +473,12 @@
     "membershipChangesAuthorized": false,
     "dataChangesAuthorized": false,
     "mainMergeAuthorized": false,
-    "f2AuthorizationStatus": "NOT_AUTHORIZED_SUCCESSOR_RUNTIME_BLOCKED_PENDING_SOURCE_ONLY",
+    "f2AuthorizationStatus": "FRESH_AUTHORIZATION_REQUIRED_REQUEST07_EXACT_ARTIFACT_9385306424",
     "rulesDeployAuthorizedNow": false,
     "securityRepairAuthorizedNow": false
   },
   "goLive": {
-    "status": "BLOCKED_F2_SUCCESSOR_SOURCE_ONLY_PENDING",
+    "status": "BLOCKED_F2_REQUEST07_FRESH_AUTHORIZATION_REQUIRED",
     "publicUrl": "https://app.aysseguros.com",
     "publishedPackagePreserved": true,
     "successorPublished": false,
@@ -510,53 +514,14 @@
     "f2PostdeployProbeRequestMayBeRerun": false
   },
   "nextActionExact": {
-    "stage": "F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_V1_REQUEST06_AUTHORIZATION_BOUNDARY",
+    "action": "PREPARE_REQUEST07_RUNTIME_AUTHORIZATION_BOUNDARY",
     "gateId": "f2-productive-acceptance-exact-successor-v20260818",
     "requestVersion": "F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_V1",
-    "runtimeRequestOrdinalAfterRepair": 6,
     "candidateArtifactId": 9385306424,
-    "securityRepairRequired": false,
-    "validatorRepairRequired": false,
-    "rulesSourceMutationRequired": false,
-    "rulesRedeployAllowed": false,
-    "rulesRedeployRequired": false,
-    "postdeployProbePassed": true,
-    "postdeployProbeRunId": 32272580947,
-    "postdeployProbeRequestConsumed": true,
-    "knownRootfixSourceAuditRequired": false,
-    "knownRootfixSourceAuditPassed": true,
-    "request06Created": false,
-    "authorizationRequired": true,
-    "allowsAfterFreshRuntimeAuthorization": [
-      "mandatory_canonical_gate_before_secrets",
-      "exact_artifact_verification",
-      "provider_and_identity_readonly",
-      "integrity_before_after",
-      "browser_role_matrix_direccion_operativo_asesor",
-      "cross_tenant_valid_path_v2_confirmation",
-      "service_worker_cache_validation",
-      "readonly_runtime_acceptance"
-    ],
-    "forbids": [
-      "firestore_document_writes",
-      "auth_writes",
-      "membership_writes",
-      "data_writes",
-      "password_reset",
-      "rules_redeploy",
-      "hosting_deploy",
-      "functions_deploy",
-      "package_rebuild",
-      "publication",
-      "production_mutation",
-      "main_merge",
-      "request01_to_request05_replay",
-      "postdeploy_probe_replay"
-    ],
-    "action": "VALIDATE_F2_SUCCESSOR_SOURCE_ONLY_SECOND_AND_FINAL",
     "candidateSourceHead": "b94b2ae86d26586a68d33be9edba8715e956b02e",
-    "status": "PENDING_SECOND_AND_FINAL_SOURCE_ONLY",
-    "runtimeAuthorizationRequiredAfterSourcePass": true
+    "status": "FRESH_AUTHORIZATION_REQUIRED",
+    "runtimeAuthorizationRequired": true,
+    "runtimeExecuted": false
   },
   "resumeProtocol": [
     "Read ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json",
@@ -990,5 +955,17 @@
     "finiteRegressionPass": true,
     "fullRehashPass": true,
     "productionTouched": false
+  },
+  "f2SuccessorSourceClosure": {
+    "status": "CLOSED_PASS",
+    "gateId": "f2-productive-acceptance-exact-successor-v20260818",
+    "candidateArtifactId": 9385306424,
+    "sourceValidationRunId": 32310630524,
+    "sourceEvidenceArtifactId": 9386304228,
+    "fileCount": 194,
+    "fullRehashPass": true,
+    "inicioFiniteRootfixPass": true,
+    "rootfixRunId": 32310462537,
+    "runtimeFreshAuthorizationRequired": true
   }
 }

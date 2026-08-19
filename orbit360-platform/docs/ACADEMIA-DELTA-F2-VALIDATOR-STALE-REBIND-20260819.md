@@ -7,3 +7,7 @@ Patrón: ejecutar primero el gate canónico vigente; preservar la evidencia hist
 ## Segundo patrón reusable: composición lifecycle por gate
 
 El primer SOURCE de la candidata 9385306424 se detuvo antes de descargar el artifact con `CANONICAL_LIFECYCLE_REVISION_MISMATCH`. El producto no participó. La causa fue un router canónico que exigía globalmente `phase-capability-contract-v1` aunque el gate F2 había versionado correctamente su lifecycle a `phase-capability-contract-v2-source-rebind`. El patrón correcto es conservar v1 como default y permitir que cada gate declare su composición esperada; nunca relajar capacidades ni convertir el router en un bypass.
+
+## Cierre del caso
+
+El SOURCE-only de la candidata 9385306424 quedó CLOSED_PASS en run 32310630524: 194/194 archivos rehashed, `inicioFiniteRootfixPass:true`, topología completa, cero secretos/datos/runtime/browser/writes/deploy/producción. Este cierre no autoriza runtime. La siguiente frontera es una autorización humana fresca para Request07 sobre el artifact exacto 9385306424.

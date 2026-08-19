@@ -525,12 +525,12 @@
     {
       "gateId": "f2-productive-acceptance-exact-successor-v20260818",
       "contractVersion": "2.1.0",
-      "diagnosticRevision": "f2-successor-rebind-lifecycle-composition-profile-aware-v2",
+      "diagnosticRevision": "f2-successor-source-closed-pass-v3",
       "runtimeVersion": "20260819-1",
       "block": "F2",
-      "status": "ACTIVE_SOURCE_REBIND_ROUTER_ROOTFIX",
-      "classification": "VALIDATOR_STALE",
-      "rootCause": "F2 gate owners remained pinned to Request06 predecessor after certified one-file functional rootfix successor was built.",
+      "status": "SOURCE_CLOSED_RUNTIME_PENDING_FRESH_AUTHORIZATION",
+      "classification": "PASS_SOURCE_ONLY",
+      "rootCause": "Request06 visible non-finite Inicio defect fixed in exact successor; validator-stale rebind and lifecycle-composition root causes closed by SOURCE-only PASS.",
       "candidate": {
         "artifactId": 9385306424,
         "sourceHead": "b94b2ae86d26586a68d33be9edba8715e956b02e",
@@ -544,8 +544,8 @@
       "engine": "tools/orbit360-validar-gate-contracts-engine-f2-productive-acceptance-v20260819.mjs",
       "stableBoundary": "tools/orbit360-f2-stable-boundary-contract-v20260819.mjs",
       "candidateValidator": "tools/orbit360-f2-exact-candidate-source-validator-v20260819.mjs",
-      "sourceStatus": "PENDING_REBIND_SOURCE_ONLY",
-      "runtimeStatus": "BLOCKED_PENDING_SOURCE_REBIND",
+      "sourceStatus": "CLOSED_PASS",
+      "runtimeStatus": "PENDING_FRESH_AUTHORIZATION",
       "runtimeAuthorization": false,
       "writesAllowed": false,
       "deployAllowed": false,
@@ -553,7 +553,11 @@
       "lifecycleComposition": "phase-capability-contract-v2-source-rebind",
       "routerVersion": "v10.7-f2-lifecycle-composition-profile-aware",
       "lastFailedSourceRunId": 32310148537,
-      "lastFailedSourceCode": "CANONICAL_LIFECYCLE_REVISION_MISMATCH"
+      "lastFailedSourceCode": "CANONICAL_LIFECYCLE_REVISION_MISMATCH_RESOLVED",
+      "sourceValidationRunId": 32310630524,
+      "sourceEvidenceArtifactId": 9386304228,
+      "sourceFullRehashPass": true,
+      "inicioFiniteRootfixPass": true
     }
   ],
   "temporaryPipelineArtifacts": [],
