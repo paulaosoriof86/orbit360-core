@@ -1,0 +1,74 @@
+name: Orbit360 Apply F2 Request08 Successor Rebind 20260819
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - .github/orbit360-requests/f2-request08-successor-rebind-source-only-v20260819.json
+
+permissions:
+  contents: write
+
+jobs:
+  rebind:
+    runs-on: ubuntu-24.04
+    env:
+      GATE_ID: f2-productive-acceptance-exact-successor-v20260818
+      EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/f2-request08-successor-canonical-rebind-source-v20260819.json
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ays/backend-tenant-lab-v99-20260703
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify inert rebind request
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
+          test "${#CHANGED[@]}" = '1'
+          test "${CHANGED[0]}" = '.github/orbit360-requests/f2-request08-successor-rebind-source-only-v20260819.json'
+          jq -e '.approved==true and .sourceOnly==true and .candidateArtifactId==9387820198 and .predecessorArtifactId==9385306424 and .browser==false and .runtime==false and .secrets==false and .firestoreRead==false and .writes==false and .deploy==false and .production==false and .request09Authorized==false' "${CHANGED[0]}" >/dev/null
+      - name: Apply all canonical owners together
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-apply-f2-request08-successor-rebind-v20260819.mjs | tee "$RUNNER_TEMP/rebind.json"
+          jq -e '.ok==true and .status=="F2_REQUEST08_SUCCESSOR_CANONICAL_REBIND_APPLIED" and .candidateArtifactId==9387820198 and .sourceState=="PENDING_REBIND_SOURCE_ONLY" and .request09Authorized==false' "$RUNNER_TEMP/rebind.json" >/dev/null
+          node --check tools/orbit360-validar-gate-contracts-engine-f2-productive-acceptance-v20260819.mjs
+          node --check tools/orbit360-f2-exact-candidate-source-validator-v20260819.mjs
+          node --check tools/orbit360-test-f2-full-runtime-known-rootfixes-v20260819.mjs
+          git diff --check
+      - name: Canonical SOURCE gate on rebound owners
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$GATE_ID"
+          cp orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json "$EVIDENCE"
+          jq -e '.ok==true and .status=="PASS_GATE_CONTRACT_SOURCE_F2_PRODUCTIVE_ACCEPTANCE" and .candidateArtifactId==9387820198 and .candidateSourceHead=="fc46bd85783d8b4d524cbeb0fee54ee9a2c774af" and .sourceRebindPending==true and .sourceBoundaryAccepted==true and .runtimeAuthorized==false and .browserAuthorized==false and .writeAuthorized==false and .productionAuthorized==false' "$EVIDENCE" >/dev/null
+      - name: Commit synchronized owners and preflight evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'orbit360-f2-rebind-bot'
+          git config user.email 'orbit360-f2-rebind-bot@users.noreply.github.com'
+          git add -- \
+            tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-source-v20260819.json \
+            tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-runtime-v20260819.json \
+            tools/orbit360-validar-gate-contracts-engine-f2-productive-acceptance-v20260819.mjs \
+            tools/orbit360-f2-exact-candidate-source-validator-v20260819.mjs \
+            .github/workflows/orbit360-f2-successor-source-validation-v20260819.yml \
+            .github/workflows/orbit360-f2-productive-acceptance-runtime-browser-readonly-v20260818.yml \
+            tools/orbit360-test-f2-full-runtime-known-rootfixes-v20260819.mjs \
+            orbit360-platform/docs/orbit360-live-state-v1.json \
+            orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json \
+            "$EVIDENCE"
+          git diff --cached --check
+          git commit -m 'chore(f2): rebind Request08 readiness successor canonically'
+          git pull --rebase origin ays/backend-tenant-lab-v99-20260703
+          git push origin HEAD:ays/backend-tenant-lab-v99-20260703
