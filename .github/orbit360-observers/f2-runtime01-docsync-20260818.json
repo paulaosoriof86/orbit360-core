@@ -1,0 +1,15 @@
+{
+  "schemaVersion":"orbit360-f2-runtime01-docsync-trigger-v1",
+  "runtimeRunId":32205144735,
+  "validatorRootfixRunId":32205903393,
+  "requestReplay":false,
+  "runtime":false,
+  "browser":false,
+  "secrets":false,
+  "firestoreRead":false,
+  "writes":false,
+  "deploy":false,
+  "production":false,
+  "containsPII":false,
+  "containsSecrets":false
+}
