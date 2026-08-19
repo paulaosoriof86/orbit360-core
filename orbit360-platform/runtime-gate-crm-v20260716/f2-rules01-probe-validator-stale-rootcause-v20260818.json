@@ -1,0 +1,57 @@
+{
+  "schemaVersion": "orbit360-f2-rules01-probe-validator-stale-rootcause-v1",
+  "status": "F2_RULES01_DEPLOY_PASS_PROBE_VALIDATOR_STALE",
+  "canonicalClassification": "VALIDATOR_STALE",
+  "canonicalCode": "F2_CROSS_TENANT_PROBE_USED_RESERVED_FIRESTORE_ID",
+  "rules01": {
+    "requestCommit": "8d68f36182453ac70f2e68823e194db5a83c71f4",
+    "runId": 32211779285,
+    "runAttempt": 1,
+    "artifactId": 9351002966,
+    "uniqueRunCount": 1
+  },
+  "canonicalGatePass": true,
+  "goGateContractPass": true,
+  "rulesDeploy": {
+    "executed": true,
+    "ok": true,
+    "category": "ok",
+    "exitCode": 0,
+    "sourceRulesBlob": "35fba451bbbeb97dbae3f08303b786ddbcbdd29f",
+    "projectId": "ays-orbit-360-lab"
+  },
+  "historicalProbeObservation": {
+    "httpStatus": 400,
+    "firestoreErrorStatus": "INVALID_ARGUMENT",
+    "invalidTenantId": "__orbit360_f2_cross_tenant_probe__",
+    "invalidDocumentPath": "tenants/__orbit360_f2_cross_tenant_probe__/system/config",
+    "securityVerdictProduced": false,
+    "historicalTerminalClassification": "SECURITY_FAILURE"
+  },
+  "rootCause": {
+    "firestoreNamingConstraint": "collection and document IDs cannot match __.*__",
+    "requestRejectedBeforeSecurityVerdict": true,
+    "productDefect": false,
+    "rulesSourceDefect": false,
+    "rulesRedeployRequired": false,
+    "validatorRootfixRequired": true
+  },
+  "integrity": {
+    "beforeAfterPass": true,
+    "countsIdentical": true,
+    "digestsIdentical": true,
+    "firestoreDocumentWrites": 0,
+    "authWrites": 0,
+    "membershipWrites": 0,
+    "dataWrites": 0
+  },
+  "nextBoundary": "F2_RULES01_POSTDEPLOY_CROSS_TENANT_PROBE_READONLY_AUTHORIZATION_BOUNDARY",
+  "request06Created": false,
+  "hostingDeploy": false,
+  "functionsDeploy": false,
+  "packageRebuild": false,
+  "publication": false,
+  "production": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
