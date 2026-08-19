@@ -1,0 +1,86 @@
+name: Orbit360 Seal F2 Successor Source Pass 20260819
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-requests/f2-successor-source-pass-seal-runbound-*.json'
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: orbit360-seal-f2-successor-source-pass-20260819
+  cancel-in-progress: false
+env:
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  ORBIT360_GATE_ID: f2-productive-acceptance-exact-successor-v20260818
+  ORBIT360_CANDIDATE_ARTIFACT_ID: '9385306424'
+jobs:
+  seal_source_pass:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate immutable inert seal request
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
+          test "${#CHANGED[@]}" = '1'
+          REQUEST_FILE="${CHANGED[0]}"
+          case "$REQUEST_FILE" in .github/orbit360-requests/f2-successor-source-pass-seal-runbound-*.json) ;; *) exit 41 ;; esac
+          jq -e '.schemaVersion=="orbit360-f2-successor-source-pass-seal-request-v1" and .requestVersion=="F2_SUCCESSOR_SOURCE_PASS_SEAL_V1" and .gateId=="f2-productive-acceptance-exact-successor-v20260818" and .candidateArtifactId==9385306424 and .sourceValidationRunId==32310630524 and .sourceEvidenceArtifactId==9386304228 and .status=="INERT_SEAL_ONCE" and .allowedExecutions==1 and .consumed==false and .replayAllowed==false and .scope.secrets==false and .scope.firestoreRead==false and .scope.browser==false and .scope.runtime==false and .scope.writes==false and .scope.deploy==false and .scope.production==false and .containsPII==false and .containsSecrets==false' "$REQUEST_FILE" >/dev/null
+          test "$(jq -r '.parentHead' "$REQUEST_FILE")" = "$(git rev-parse HEAD^)"
+          node --check tools/orbit360-seal-f2-successor-source-pass-v20260819.mjs
+      - name: Seal exact SOURCE PASS and revalidate canonical gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-seal-f2-successor-source-pass-v20260819.mjs | tee /tmp/f2-source-seal.json
+          grep -F 'F2_SUCCESSOR_SOURCE_CLOSED_PASS_SEALED' /tmp/f2-source-seal.json >/dev/null
+          node -e "for(const p of ['tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-source-v20260819.json','tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-runtime-v20260819.json','tools/orbit360-gate-contract-registry-v20260717.json','orbit360-platform/docs/orbit360-live-state-v1.json','orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json']) JSON.parse(require('fs').readFileSync(p,'utf8'))"
+          rm -f orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+          node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
+          cp orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json orbit360-platform/runtime-gate-crm-v20260716/f2-successor-source-seal-preflight-run-${GITHUB_RUN_ID}.json
+          jq -e '.ok==true and .status=="PASS_GATE_CONTRACT_SOURCE_F2_PRODUCTIVE_ACCEPTANCE" and .candidateArtifactId==9385306424 and .sourceClosed==true and .sourceRebindPending==false and .sourceBoundaryAccepted==true and .runtimeBoundaryMode==false and .runtimeAuthorized==false and .browserAuthorized==false and .writeAuthorized==false and .productionAuthorized==false and .canonicalLifecycleComposition=="phase-capability-contract-v2-source-rebind"' orbit360-platform/runtime-gate-crm-v20260716/f2-successor-source-seal-preflight-run-${GITHUB_RUN_ID}.json >/dev/null
+          jq -e '.status=="F2_RUNTIME_PENDING_FRESH_AUTHORIZATION" and .authorization.activeRequest==false and .authorization.allowedExecutions==0 and .authorization.authorizationFrozen==true' tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-runtime-v20260819.json >/dev/null
+          git diff --check
+          test -z "$(git diff --name-only -- orbit360-platform/data orbit360-platform/core/auth.js firestore.rules .github/workflows || true)"
+      - name: Commit SOURCE closure only
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'orbit360-f2-source-seal-bot'
+          git config user.email 'orbit360-f2-source-seal-bot@users.noreply.github.com'
+          git add \
+            tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-source-v20260819.json \
+            tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-runtime-v20260819.json \
+            tools/orbit360-gate-contract-registry-v20260717.json \
+            orbit360-platform/docs/orbit360-live-state-v1.json \
+            orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json \
+            orbit360-platform/docs/ACADEMIA-DELTA-F2-VALIDATOR-STALE-REBIND-20260819.md \
+            orbit360-platform/docs/CHECKPOINT-F2-REQUEST06-ROOTFIX-SUCCESSOR-SOURCE-PASS-20260819.md
+          git diff --cached --check
+          test "$(git diff --cached --name-only | wc -l | tr -d ' ')" = '7'
+          git commit -m 'close(f2): seal certified successor source-only PASS [skip ci]'
+          git restore --worktree --staged -- orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json
+          test -z "$(git diff --name-only)"
+          git fetch origin "$ORBIT360_BRANCH"
+          git rebase "origin/$ORBIT360_BRANCH"
+          git push origin "HEAD:$ORBIT360_BRANCH"
+      - name: Upload sanitized seal preflight
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-f2-successor-source-seal-${{ github.run_id }}
+          path: orbit360-platform/runtime-gate-crm-v20260716/f2-successor-source-seal-preflight-run-${{ github.run_id }}.json
+          if-no-files-found: warn
+          retention-days: 30
