@@ -1,0 +1,71 @@
+name: Orbit360 Persist F2 Request08 Successor Rebind Rootfix 20260820
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - .github/orbit360-requests/f2-request08-rebind-persistence-rootfix-source-only-v20260820.json
+
+permissions:
+  contents: write
+
+jobs:
+  persist_validated_rebind:
+    runs-on: ubuntu-24.04
+    env:
+      EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/f2-request08-rebind-persistence-rootfix-v20260820.json
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ays/backend-tenant-lab-v99-20260703
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate persistence-only boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
+          test "${#CHANGED[@]}" = '1'
+          test "${CHANGED[0]}" = '.github/orbit360-requests/f2-request08-rebind-persistence-rootfix-source-only-v20260820.json'
+          jq -e '.approved==true and .operation=="PERSIST_ALREADY_VALIDATED_REBIND_ONLY" and .validatedGateRunId==32315636095 and .candidateArtifactId==9387820198 and .predecessorArtifactId==9385306424 and .gateReexecutionAllowed==false and .sourceOnly==true and .browser==false and .runtime==false and .secrets==false and .firestoreRead==false and .writes==false and .deploy==false and .production==false and .request09Authorized==false' "${CHANGED[0]}" >/dev/null
+      - name: Materialize already-validated owner transformation without gate replay
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-apply-f2-request08-successor-rebind-v20260819.mjs | tee "$RUNNER_TEMP/rebind-materialized.json"
+          jq -e '.ok==true and .status=="F2_REQUEST08_SUCCESSOR_CANONICAL_REBIND_APPLIED" and .candidateArtifactId==9387820198 and .sourceState=="PENDING_REBIND_SOURCE_ONLY" and .request09Authorized==false' "$RUNNER_TEMP/rebind-materialized.json" >/dev/null
+          git restore --worktree -- .github/workflows/orbit360-f2-successor-source-validation-v20260819.yml .github/workflows/orbit360-f2-productive-acceptance-runtime-browser-readonly-v20260818.yml
+          node --check tools/orbit360-validar-gate-contracts-engine-f2-productive-acceptance-v20260819.mjs
+          node --check tools/orbit360-f2-exact-candidate-source-validator-v20260819.mjs
+          node --check tools/orbit360-test-f2-full-runtime-known-rootfixes-v20260819.mjs
+          git diff --check
+      - name: Write sanitized persistence rootfix evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          jq -n --arg run "$GITHUB_RUN_ID" '{schemaVersion:"orbit360-f2-request08-rebind-persistence-rootfix-v1",ok:true,status:"F2_REQUEST08_REBIND_PERSISTENCE_ROOTFIX_PASS",classification:"PIPELINE_MECHANISM_FAILURE_ROOTFIX",runId:$run,validatedGateRunId:32315636095,validatedGateStatus:"PASS_GATE_CONTRACT_SOURCE_F2_PRODUCTIVE_ACCEPTANCE",gateReexecuted:false,rootCause:"PIPELINE_MECHANISM_FAILURE:REBIND_PERSIST_REBASE_BLOCKED_BY_UNSTAGED_PREFLIGHT",candidateArtifactId:9387820198,candidateSourceHead:"fc46bd85783d8b4d524cbeb0fee54ee9a2c774af",predecessorArtifactId:9385306424,sourceState:"PENDING_REBIND_SOURCE_ONLY",workflowOwnersPersistedByGitHubConnectorSeparately:true,request09Authorized:false,browserExecuted:false,runtimeExecuted:false,secretAccess:false,firestoreRead:false,firestoreWrites:0,authWrites:0,membershipWrites:0,dataWrites:0,operationalWrites:0,deployExecuted:false,publicationExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false}' > "$EVIDENCE"
+      - name: Commit only non-workflow owners on clean worktree
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'orbit360-f2-persistence-rootfix-bot'
+          git config user.email 'orbit360-f2-persistence-rootfix-bot@users.noreply.github.com'
+          git add -- \
+            tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-source-v20260819.json \
+            tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-runtime-v20260819.json \
+            tools/orbit360-validar-gate-contracts-engine-f2-productive-acceptance-v20260819.mjs \
+            tools/orbit360-f2-exact-candidate-source-validator-v20260819.mjs \
+            tools/orbit360-test-f2-full-runtime-known-rootfixes-v20260819.mjs \
+            orbit360-platform/docs/orbit360-live-state-v1.json \
+            orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json \
+            "$EVIDENCE"
+          git diff --cached --check
+          git commit -m 'chore(f2): persist validated Request08 successor rebind owners'
+          test -z "$(git status --porcelain)"
+          git pull --rebase origin ays/backend-tenant-lab-v99-20260703
+          test -z "$(git status --porcelain)"
+          git push origin HEAD:ays/backend-tenant-lab-v99-20260703
