@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "orbit360-f2-request09-route-observability-sourcefix-target-v1",
+  "requestVersion": "F2_REQUEST09_ROUTE_OBSERVABILITY_SOURCEFIX_V1",
+  "gateId": "f2-productive-acceptance-exact-successor-v20260818",
+  "targetCommit": "3ee6dcb65589cd73ae3370e39923259646b801b3",
+  "candidateArtifactId": 9387820198,
+  "scope": {
+    "writes": false,
+    "dataWrites": false,
+    "operationalWrites": false,
+    "authWrites": false,
+    "membershipWrites": false,
+    "deploy": false,
+    "production": false
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
