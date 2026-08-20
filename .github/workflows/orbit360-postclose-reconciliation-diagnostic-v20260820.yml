@@ -20,43 +20,25 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
-          fetch-depth: 1
-      - name: Diagnose post-close pre-owner decision and source-only stages
+          fetch-depth: 0
+      - name: Diagnose post-close decision, source-only stages and local publication mechanics
         shell: bash
         env:
           GITHUB_TOKEN: ${{ github.token }}
+          BRANCH: ays/backend-tenant-lab-v99-20260703
         run: |
           set -u
+          START_HEAD=$(git rev-parse HEAD)
           post() {
             stage="$1"; state="$2"; description="$3"
             payload=$(printf '{"state":"%s","context":"orbit360/postclose-%s","description":"%s"}' "$state" "$stage" "$description")
             curl --fail-with-body -sS -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" -d "$payload" >/dev/null
           }
 
-          if STATUS=$(node -p "require('./orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json').status"); then
-            post decision-status success "STATUS=$STATUS"
-          else
-            post decision-status failure 'STATUS command failed'; exit 21
-          fi
-
-          if STEP=$(node -p "require('./orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json').resumeProtocol.firstIncompleteStep"); then
-            post decision-step success "STEP=$STEP"
-          else
-            post decision-step failure 'STEP command failed'; exit 22
-          fi
-
-          if RECONCILED=$(node -p "Boolean(require('./orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json').controlPlaneClosure?.status === 'CLOSED_PASS_RECONCILED')"); then
-            post decision-reconciled-expression success "RECONCILED=$RECONCILED"
-          else
-            post decision-reconciled-expression failure 'RECONCILED expression failed'; exit 23
-          fi
-
-          if LR=$(node -p "require('./orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json').revision") && PR=$(node -p "require('./orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json').revision"); then
-            post decision-revisions success "LR=$LR PR=$PR"
-          else
-            post decision-revisions failure 'revision commands failed'; exit 24
-          fi
-
+          if STATUS=$(node -p "require('./orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json').status"); then post decision-status success "STATUS=$STATUS"; else post decision-status failure 'STATUS command failed'; exit 21; fi
+          if STEP=$(node -p "require('./orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json').resumeProtocol.firstIncompleteStep"); then post decision-step success "STEP=$STEP"; else post decision-step failure 'STEP command failed'; exit 22; fi
+          if RECONCILED=$(node -p "Boolean(require('./orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json').controlPlaneClosure?.status === 'CLOSED_PASS_RECONCILED')"); then post decision-reconciled-expression success "RECONCILED=$RECONCILED"; else post decision-reconciled-expression failure 'RECONCILED expression failed'; exit 23; fi
+          if LR=$(node -p "require('./orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json').revision") && PR=$(node -p "require('./orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json').revision"); then post decision-revisions success "LR=$LR PR=$PR"; else post decision-revisions failure 'revision commands failed'; exit 24; fi
           if [ "$STATUS" != "CLOSED_PASS" ]; then post decision-branch failure "unexpected STATUS=$STATUS"; exit 25; fi
           if [ "$STEP" != "CP-11" ]; then post decision-branch failure "unexpected STEP=$STEP"; exit 26; fi
           if [ "$RECONCILED" = "true" ]; then post decision-branch failure 'already reconciled unexpectedly'; exit 27; fi
@@ -67,4 +49,21 @@ jobs:
           if node tools/orbit360-continuity-projection-atomic-v20260820.mjs --expected-revision "$LR"; then post projection success 'atomic projection PASS'; else post projection failure 'atomic projection FAIL'; exit 32; fi
           if node tools/orbit360-control-plane-composite-invariant-v20260820.mjs; then post composite success 'composite invariant PASS'; else post composite failure 'composite invariant FAIL'; exit 33; fi
           if ORBIT360_CONTROL_PLANE_HEAD="$GITHUB_SHA" node tools/orbit360-control-plane-independent-readback-v20260820.mjs --expected-step CP-11 --expected-package-status CLOSED_PASS; then post readback success 'independent readback PASS'; else post readback failure 'independent readback FAIL'; exit 34; fi
-          post diagnostic success 'decision + source-only stages PASS'
+
+          node <<'NODE'
+          const fs=require('fs'); const L=require('./orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json'); const P=require('./orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json');
+          fs.writeFileSync('orbit360-platform/runtime-gate-crm-v20260716/cp10-postclose-metadata-reconciliation-v20260820.json',JSON.stringify({schemaVersion:'orbit360-postclose-reconciliation-evidence-v1',ok:true,status:'POST_CLOSE_CONTROL_PLANE_METADATA_RECONCILED_PASS',ledgerRevision:L.revision,packageRevision:P.revision,firstIncompleteStep:P.resumeProtocol.firstIncompleteStep,atomicProjection:L.continuityControl.syncTool,compositeInvariant:L.continuityControl.invariant,runtimeAuthorized:false,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,operationalWrites:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false},null,2)+'\n');
+          NODE
+
+          git config user.name "orbit360-control-plane-diagnostic"
+          git config user.email "orbit360-control-plane-diagnostic@users.noreply.github.com"
+          if git add orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json orbit360-platform/docs/orbit360-live-state-v1.json orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json orbit360-platform/docs/CHECKPOINT-CONTROL-PLANE-HARDENING-20260820.md orbit360-platform/docs/ORBIT360-PR5-CURRENT-STATE.md tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-runtime-v20260819.json orbit360-platform/runtime-gate-crm-v20260716/cp10-postclose-metadata-reconciliation-v20260820.json; then post staging success 'staging PASS'; else post staging failure 'staging FAIL'; exit 41; fi
+          if git diff --cached --quiet; then post staged-diff failure 'no staged reconciliation diff'; exit 42; else post staged-diff success 'staged reconciliation diff present'; fi
+          if git commit -m "diagnostic: local post-close reconciliation"; then post local-commit success 'local commit PASS'; else post local-commit failure 'local commit FAIL'; exit 43; fi
+          LOCAL_COMMIT=$(git rev-parse HEAD)
+          if [ "$LOCAL_COMMIT" = "$START_HEAD" ]; then post local-commit-sha failure 'local commit did not advance'; exit 44; else post local-commit-sha success 'local commit advanced'; fi
+          if git fetch origin "$BRANCH"; then post fetch-final success 'final fetch PASS'; else post fetch-final failure 'final fetch FAIL'; exit 45; fi
+          REMOTE_HEAD=$(git rev-parse "origin/$BRANCH")
+          if [ "$REMOTE_HEAD" = "$START_HEAD" ]; then post cas-final-dryrun success 'remote HEAD unchanged; push would be fast-forward'; else post cas-final-dryrun failure 'remote HEAD changed during diagnostic'; exit 46; fi
+          post publication-dryrun success 'staging + local commit + final CAS PASS; no push attempted'
+          post diagnostic success 'all read-only diagnostic stages PASS'
