@@ -2,74 +2,58 @@
 
 Repositorio de Orbit 360.
 
-## REANUDACIÓN OBLIGATORIA — NO DIAGNOSTICAR DESDE DOCUMENTOS HISTÓRICOS
+## REANUDACIÓN OBLIGATORIA — FUENTE VIVA ÚNICA
+
+StateVersion canónica: `F2-R12-CONSUMED-ROOTCAUSE-OPEN-20260820-01`.
 
 Antes de diagnosticar, modificar, ejecutar runtime/browser/deploy o continuar una conversación interrumpida, leer en este orden:
 
-1. `orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json`;
-2. `orbit360-platform/docs/orbit360-live-state-v1.json`;
-3. HEAD real de `ays/backend-tenant-lab-v99-20260703` y PR #5;
-4. las evidencias exactas indicadas por el live-state;
-5. el checkpoint vigente indicado por el live-state;
-6. `orbit360-platform/docs/ADDENDUM-MAESTRO-CIERRE-FORENSE-SINCRONIZACION-Y-PLAN-CONGELADO-20260818.md`;
-7. reglas maestras/addenda vinculantes listadas en el índice.
+1. reglas maestras y addenda vigentes;
+2. `orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json`;
+3. `orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json`;
+4. `orbit360-platform/docs/orbit360-live-state-v1.json`;
+5. `orbit360-platform/docs/CHECKPOINT-F2-REQUEST12-CONTINUITY-ANTIBUCLE-ROOT-CAUSE-OPEN-20260820.md`;
+6. `orbit360-platform/runtime-gate-crm-v20260716/f2-continuity-audit-v20260820.json`;
+7. HEAD real de `ays/backend-tenant-lab-v99-20260703` y PR #5.
 
-**Regla:** README no es una copia autónoma del estado operativo. El estado actual vive en índice + live-state + HEAD/PR + última evidencia. Cualquier cierre, changelog, checkpoint o “siguiente acción” anterior que contradiga esas superficies es `HISTORICAL_NOT_CURRENT_STATE`.
+La autoridad operativa actual es el continuity ledger. Si PR, live-state, index, lifecycle, README, CHANGELOG o checkpoint divergen de su `stateVersion`, clasificar `PIPELINE_MECHANISM_FAILURE:DOCUMENTATION_STATE_DRIFT` y no avanzar.
 
-## Estado resumido · 2026-08-18 · F1 CLOSED/PASS
+## Estado vivo F2
 
-- Rama obligatoria: `ays/backend-tenant-lab-v99-20260703`.
-- PR #5: draft/open; sin main/merge.
-- URL pública conservada: `https://app.aysseguros.com`.
-- R4S9C publicado permanece inmutable e histórico para F1; no contiene F1.3.
-- Candidata sucesora F1.4C permanece **no publicada**: artifact `9345207863`, source `29caae94a3db1f1626bdde2ea6ee9a21799f9df6`.
-- ZIP SHA256: `493009c83390901aa772842a2ba9ddd5ce5293f6969d86c5c3395ebd670a44ac`.
-- Manifest SHA256: `29dafe5e63b425ea6cf641937fe1b9d4b9e63f72479a51ae76f9148a55771761`.
-- F1.4D runtime/browser read-only: **PASS/CONSUMED**, run `32195516901`, attempt `1`, rerun `false`.
-- Gate canónico dio GO antes de artifact/provider/browser.
-- Artifact exacto rehash 194/194 PASS.
-- `membership_invalid:email_invalido`: **ausente** en la candidata exacta.
-- Bootstrap: `ready-read-only`, `errors=[]`; store `ready-read-only`, write disabled.
-- Firestore/Auth/operational writes: `0/0/0`.
-- Package rebuild/deploy/publicación: `0/0/0` durante F1.4D.
-- Producción Hosting no fue tocada.
-- F1.4D no puede repetirse: request single-use consumido, frozen, replay=false.
+- F1: `CLOSED_PASS`.
+- F2 source-only: `CLOSED_PASS`.
+- Candidata congelada: artifact `9387820198`, source `fc46bd85783d8b4d524cbeb0fee54ee9a2c774af`, 194 archivos.
+- Request12 consumed/no-replay: run `32332301619`, artifact terminal `9393486955`.
+- Request12 y su autorización: `allowedExecutions=0`, `consumed=true`, `replayAllowed=false`.
+- Integridad before/after PASS; cross-tenant denied PASS; write guard PASS; Firestore/Auth/operational writes `0/0/0`.
+- Fallo observado: `F2_ROUTE_READINESS_TIMEOUT_CONTRADICTED_BY_CAPTURE` en `desktopDirection:polizas`, `64680 ms`, captura final visible.
 
-## Cierre de causa raíz F1
+## Causa raíz actual
 
-1. F1.3 cerró `VALIDATOR_STALE / MEMBERSHIP_EMAIL_REQUIRED_STALE_AUTH_IDENTITY_OWNERSHIP`.
-2. F1.4B cerró `PIPELINE_MECHANISM_FAILURE / ROOTFIX_ARTIFACT_PARITY_MISSING`.
-3. F1.4C construyó una candidata sucesora exacta que contiene F1.3.
-4. F1.4D ejecutó esa candidata exacta y confirmó que el error histórico desapareció y el bootstrap queda listo read-only.
+`OPEN_SECOND_SAME_FAMILY_FAILURE`.
 
-**F1 = CLOSED/PASS. No reabrir sin evidencia nueva.**
+No se asume que el fallo sea únicamente `VALIDATOR_STALE`. Antes de cualquier sucesor se debe distinguir:
+
+- `FUNCTIONAL_DEFECT:F2_ROUTE_MAIN_THREAD_BLOCKING_POLIZAS`; o
+- `VALIDATOR_STALE:F2_ROUTE_READINESS_WAITER_MISSED_VISIBLE_STATE`.
+
+La siguiente acción exacta es instrumentación source-only de event-loop → navegación → mount/render → readiness/poll → captura.
+
+## Stop-retry
+
+- Request11: no replay.
+- Request12: no replay.
+- Request13: no autorizado y no puede materializarse antes de prueba causal + auditoría de continuidad PASS.
+- No aumentar timeout para forzar PASS.
+- No modificar Pólizas antes de prueba causal.
+- No deploy, publicación, producción, main ni merge bajo este bloque.
 
 ## Plan congelado
 
-Fuente vinculante:
-`orbit360-platform/docs/ADDENDUM-MAESTRO-CIERRE-FORENSE-SINCRONIZACION-Y-PLAN-CONGELADO-20260818.md`
+Ruta inmediata a producción: 50% cerrada hasta F2 terminal PASS. Programa integral: 25% cerrado. Estos porcentajes no se incrementan por documentación, preparación o diagnóstico.
 
-Ruta inmediata a producción:
-- F0 Reconciliación/documentación = 20% — **CERRADO**;
-- F1 Causa raíz runtime/bootstrap = 30% — **CERRADO**;
-- F2 Aceptación productiva E2E real = 30% — pendiente;
-- F3 Go-live operativo = 20% — pendiente.
+## Gate de continuidad
 
-**Ruta inmediata a producción cerrada: 50%.**
+`node tools/orbit360-f2-continuity-invariant-v20260820.mjs`
 
-Programa integral producción + postproducción:
-- F0 10% — **CERRADO**;
-- F1 15% — **CERRADO**;
-- F2 15%; F3 10%; F4 15%; F5 15%; F6 15%; F7 5%.
-
-**Programa integral cerrado: 25%.**
-
-## Checkpoint activo
-
-`orbit360-platform/docs/CHECKPOINT-F1-4D-RUNTIME-BROWSER-READONLY-PASS-F1-CLOSED-20260818.md`
-
-## Siguiente acción exacta
-
-`F2_PRODUCTIVE_ACCEPTANCE_GATE_EXACT_SUCCESSOR`.
-
-Antes de ejecutar F2 se debe derivar del Plan Congelado + estado vivo el gate exacto de aceptación, Definition of Done y frontera de autorización. La candidata F1.4C **no se publica ni despliega por inferencia**. No repetir F1.4, F1.4B, F1.4C ni F1.4D; no reimportar datos ni modificar Auth/membership para avanzar F2.
+Solo `F2_CONTINUITY_ANTI_LOOP_AUDIT_PASS` habilita la siguiente acción técnica source-only. El historial vive en checkpoints/evidencias/requests/autorizaciones; no debe duplicarse como estado actual en múltiples owners.
