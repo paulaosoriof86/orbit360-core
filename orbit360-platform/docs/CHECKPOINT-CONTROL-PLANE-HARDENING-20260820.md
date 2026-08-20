@@ -1,10 +1,10 @@
 # CHECKPOINT — CONTROL PLANE HARDENING CLOSED PASS
 
-Fecha UTC: 2026-08-20T17:32:25.992Z  
+Fecha UTC: 2026-08-20T17:49:55.420Z  
 Rama obligatoria: `ays/backend-tenant-lab-v99-20260703`  
 PR #5: draft/open  
-Package: `CLOSED_PASS` revision `10`  
-Ledger: revision `16`
+Package: `CLOSED_PASS` revision `11`  
+Ledger: revision `17`
 
 ## Estado canónico
 - StateVersion: `ORBIT360-F2-CONTINUITY-CURRENT`.

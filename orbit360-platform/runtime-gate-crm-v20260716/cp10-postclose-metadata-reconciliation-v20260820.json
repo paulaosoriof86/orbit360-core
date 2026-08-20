@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "orbit360-postclose-reconciliation-evidence-v1",
+  "ok": true,
+  "status": "POST_CLOSE_CONTROL_PLANE_METADATA_RECONCILED_PASS",
+  "ledgerRevision": 17,
+  "packageRevision": 11,
+  "firstIncompleteStep": "CP-11",
+  "atomicProjection": "tools/orbit360-continuity-projection-atomic-v20260820.mjs",
+  "compositeInvariant": "tools/orbit360-control-plane-composite-invariant-v20260820.mjs",
+  "runtimeAuthorized": false,
+  "runtimeExecuted": false,
+  "browserExecuted": false,
+  "secretAccess": false,
+  "firestoreRead": false,
+  "operationalWrites": 0,
+  "deployExecuted": false,
+  "productionTouched": false,
+  "containsPII": false,
+  "containsSecrets": false
+}

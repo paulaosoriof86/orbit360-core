@@ -1,0 +1,20 @@
+{
+  "ok": true,
+  "status": "CONTROL_PLANE_COMPOSITE_INVARIANT_PASS",
+  "failed": [],
+  "ledgerRevision": 17,
+  "packageRevision": 11,
+  "packageStatus": "CLOSED_PASS",
+  "firstIncompleteStep": "CP-11",
+  "gateContractVersion": "2.2.0",
+  "candidateArtifactId": 9395391426,
+  "runtimeExecuted": false,
+  "browserExecuted": false,
+  "secretAccess": false,
+  "firestoreRead": false,
+  "operationalWrites": 0,
+  "deployExecuted": false,
+  "productionTouched": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
