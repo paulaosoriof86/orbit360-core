@@ -1,5 +1,39 @@
 {
-  "ok": false,
-  "classification": "PIPELINE_MECHANISM_FAILURE",
-  "code": "POLIZAS_PAGE_SIZE_CONTRACT_CHANGED"
+  "ok": true,
+  "status": "F2_POLIZAS_READ_AMPLIFICATION_SOURCE_PROOF_PASS",
+  "classification": "FUNCTIONAL_DEFECT",
+  "code": "F2_PRODUCT_READONLY_GET_FULL_COLLECTION_CLONE_AMPLIFICATION",
+  "sourceChain": [
+    "modules/polizas.js:100 visible rows x clienteCell+aseguradoraCell+asesorCell",
+    "core/crmkit.js:cell helpers -> store.get / q lookups",
+    "core/queries.js:q.asesor/q.aseguradora -> store.get",
+    "data/store-firestore-product-readonly-p0.js:get -> all(collection) -> map(clone)"
+  ],
+  "observedCollectionSizes": {
+    "polizas": 1375,
+    "clientes": 430,
+    "vehiculos": 1033,
+    "recibos": 1294,
+    "aseguradoras": 26,
+    "asesores": 7
+  },
+  "visiblePageRows": 100,
+  "storeGetCallsForReferenceColumns": 300,
+  "legacyRowsSerializedAndClonedForReferenceColumns": 46300,
+  "findThenCloneOneRows": 300,
+  "rowCloneAmplificationFactor": 154.33,
+  "safetyProperty": "find-then-clone-one preserves caller isolation while avoiding full-collection cloning",
+  "runtimeCorrelation": {
+    "route": "desktopDirection:polizas",
+    "waiterTimeoutMs": 20000,
+    "observedElapsedMs": 64680,
+    "capturedContractVisible": true
+  },
+  "browser": false,
+  "secrets": false,
+  "firestore": false,
+  "writes": 0,
+  "productMutation": false,
+  "containsPII": false,
+  "containsSecrets": false
 }
