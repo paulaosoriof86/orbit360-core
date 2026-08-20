@@ -1,43 +1,66 @@
 {
   "schemaVersion": "orbit360-live-state-v1",
-  "stateVersion": "20260820.f2.request12-consumed-rootcause-reopened-docsync-hardened.current",
-  "updatedAt": "2026-08-20T04:57:00.000Z",
-  "phase": "F2_REQUEST12_CONSUMED_ROOT_CAUSE_REOPENED_DOCSYNC_HARDENED",
+  "stateVersion": "F2-R12-CONSUMED-ROOTCAUSE-OPEN-20260820-01",
+  "updatedAt": "2026-08-20T05:04:00Z",
+  "phase": "F2_REQUEST12_CONSUMED_SECOND_SAME_FAMILY_ROOT_CAUSE_OPEN",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pr": 5,
   "prState": "draft-open",
-  "authority": {
-    "rules": "MASTER_ADDENDA_THEN_HEAD_PR_THEN_CURRENT_CHECKPOINT_EVIDENCE",
-    "currentCheckpoint": "orbit360-platform/docs/CHECKPOINT-F2-REQUEST12-CONSUMED-ROOTCAUSE-REOPENED-DOCSYNC-HARDENED-20260820.md",
-    "historicalStatePolicy": "HISTORY_LIVES_IN_CHECKPOINTS_EVIDENCE_REQUESTS_AUTHORIZATIONS_NOT_CURRENT_MIRRORS",
-    "narrativeStatusesAuthoritative": false
+  "currentCheckpoint": "orbit360-platform/docs/CHECKPOINT-F2-REQUEST12-CONTINUITY-ANTIBUCLE-ROOT-CAUSE-OPEN-20260820.md",
+  "continuityLedger": "orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json",
+  "canonicalCurrent": {
+    "stateVersion": "F2-R12-CONSUMED-ROOTCAUSE-OPEN-20260820-01",
+    "currentRuntime": {
+      "requestOrdinal": 12,
+      "runId": 32332301619,
+      "status": "CONSUMED_FAIL_VALIDATOR_STALE",
+      "evidenceArtifactId": 9393486955
+    },
+    "currentRootCause": {
+      "status": "OPEN_SECOND_SAME_FAMILY_FAILURE",
+      "rootCauseConcluded": false
+    }
   },
-  "baseline": {
-    "f1Status": "CLOSED_PASS",
-    "f2SourceOnlyStatus": "CLOSED_PASS",
+  "f2SourceOnly": {
+    "status": "CLOSED_PASS",
     "candidateArtifactId": 9387820198,
     "candidateSourceHead": "fc46bd85783d8b4d524cbeb0fee54ee9a2c774af",
     "candidateZipSha256": "58fcbe6e8d7d3a425509c87f229b1cb12dd35a99133d46c757544cc75c55aacc",
     "candidateManifestSha256": "b18422fdf82830d28e82f657f83b4fd5c10ea134a4735263fa2587a2ddd808cb",
     "candidateFileCount": 194,
-    "candidateFrozen": true,
-    "productChangedByRequest11Or12": false,
-    "dataChangedByRequest11Or12": false
+    "candidateFrozen": true
   },
-  "f2RuntimeCurrent": {
-    "latestRequestOrdinal": 12,
-    "requestPath": ".github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-runbound-20260820-12.json",
-    "authorizationPath": ".github/orbit360-authorizations/f2-productive-acceptance-runtime-browser-readonly-request12-v20260820.json",
-    "status": "CONSUMED_FAIL_VALIDATOR_STALE",
+  "authorization": {
+    "activeRequest": false,
+    "currentRuntimeRequestOrdinal": 12,
+    "currentRunId": 32332301619,
     "allowedExecutions": 0,
     "consumed": true,
     "authorizationFrozen": true,
     "replayAllowed": false,
-    "runtimeRunId": 32332301619,
-    "runtimeConclusion": "failure",
-    "terminalArtifactId": 9393486955,
-    "terminalArtifactDigest": "sha256:6681ed2d681c0cf23dd06e047f56988cc93ef08f5c3bc33c3cf1c39923662ed6",
+    "request13Authorized": false,
+    "deployAuthorized": false,
+    "publicationAuthorized": false,
+    "productionAuthorized": false,
+    "mainAuthorized": false,
+    "mergeAuthorized": false
+  },
+  "currentRuntime": {
+    "requestPath": ".github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-runbound-20260820-12.json",
+    "authorizationPath": ".github/orbit360-authorizations/f2-productive-acceptance-runtime-browser-readonly-request12-v20260820.json",
+    "requestOrdinal": 12,
+    "runId": 32332301619,
+    "runAttempt": 1,
+    "conclusion": "failure",
+    "status": "CONSUMED_FAIL_VALIDATOR_STALE",
+    "allowedExecutions": 0,
+    "consumed": true,
+    "replayAllowed": false,
+    "evidenceArtifactId": 9393486955,
+    "evidenceArtifactDigest": "sha256:6681ed2d681c0cf23dd06e047f56988cc93ef08f5c3bc33c3cf1c39923662ed6",
+    "observedClassification": "VALIDATOR_STALE",
+    "observedFailureCode": "F2_ROUTE_READINESS_TIMEOUT_CONTRADICTED_BY_CAPTURE",
     "observedLocation": "desktopDirection:polizas",
     "routeElapsedMs": 64680,
     "capturedContractVisible": true,
@@ -46,89 +69,49 @@
     "localWriteGuardBlocked": true,
     "firestoreWrites": 0,
     "authWrites": 0,
-    "operationalWrites": 0,
-    "deployExecuted": false,
-    "publicationExecuted": false,
-    "productionTouched": false
+    "operationalWrites": 0
   },
-  "rootCauseState": {
-    "request11ValidatorStale": {
-      "classification": "VALIDATOR_STALE",
-      "code": "F2_FULL_RUNTIME_PROBE_PATH_BINDING_LITERAL_ADJACENCY_STALE",
-      "status": "CLOSED_ROOTFIX_SOURCEONLY_PASS"
-    },
-    "request11EarlyEvidence": {
-      "classification": "PIPELINE_MECHANISM_FAILURE",
-      "code": "EARLY_FAILURE_EVIDENCE_DEPENDS_ON_LATE_ENV_EXPORT",
-      "status": "CLOSED_ROOTFIX"
-    },
-    "documentationDrift": {
-      "classification": "PIPELINE_MECHANISM_FAILURE",
-      "code": "DOCUMENTATION_CURRENT_STATE_DUPLICATION_AND_STALE_MIRRORS",
-      "status": "ROOTFIX_IN_PROGRESS_UNTIL_COHERENCE_VALIDATOR_PASS"
-    },
-    "polizasReadiness": {
-      "classification": "UNRESOLVED_FUNCTIONAL_DEFECT_VS_VALIDATOR_STALE",
-      "observedCode": "F2_ROUTE_READINESS_TIMEOUT_CONTRADICTED_BY_CAPTURE",
-      "status": "ROOT_CAUSE_REOPENED_PER_SECOND_SAME_FAMILY_FAILURE",
-      "doNotIncreaseTimeout": true,
-      "doNotCreateRequest13": true,
-      "requiredSeparation": [
-        "FUNCTIONAL_DEFECT_MAIN_THREAD_OR_ROUTE_PERFORMANCE",
-        "VALIDATOR_STALE_READINESS_WAITER"
-      ]
-    }
+  "currentRootCause": {
+    "status": "OPEN_SECOND_SAME_FAMILY_FAILURE",
+    "rootCauseConcluded": false,
+    "candidateClassifications": [
+      "FUNCTIONAL_DEFECT:F2_ROUTE_MAIN_THREAD_BLOCKING_POLIZAS",
+      "VALIDATOR_STALE:F2_ROUTE_READINESS_WAITER_MISSED_VISIBLE_STATE"
+    ],
+    "evidenceNeeded": "SOURCE_ONLY_TIMING_INSTRUMENTATION_EVENT_LOOP_NAVIGATION_MOUNT_RENDER_READINESS_BOUNDARIES"
   },
   "documentationControl": {
-    "currentStateDuplicationAllowed": false,
-    "currentStateOwner": "orbit360-platform/docs/orbit360-live-state-v1.json",
-    "indexOwner": "orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json",
-    "coherenceValidator": "tools/orbit360-validar-current-documentation-coherence-v20260820.mjs",
-    "checkpoint": "orbit360-platform/docs/CHECKPOINT-F2-REQUEST12-CONSUMED-ROOTCAUSE-REOPENED-DOCSYNC-HARDENED-20260820.md",
-    "forbidStaleCurrentTokens": [
-      "REQUEST10_CURRENT",
-      "REQUEST11_AUTHORIZATION_PENDING",
-      "REQUEST11_RUNTIME_PENDING",
-      "REQUEST12_AUTHORIZATION_PENDING"
-    ]
-  },
-  "authorization": {
-    "request12Consumed": true,
-    "request12ReplayAllowed": false,
-    "request13Authorized": false,
-    "deployAuthorized": false,
-    "productionAuthorized": false,
-    "mainAuthorized": false,
-    "mergeAuthorized": false
-  },
-  "goLive": {
-    "f2TerminalPass": false,
-    "routeToProductionPercentClosed": 50,
-    "integratedProgramPercentClosed": 25,
-    "blockedBy": "F2_POLIZAS_ROOT_CAUSE_UNRESOLVED",
-    "noProgressInflation": true
+    "canonicalStateVersion": "F2-R12-CONSUMED-ROOTCAUSE-OPEN-20260820-01",
+    "currentCheckpoint": "orbit360-platform/docs/CHECKPOINT-F2-REQUEST12-CONTINUITY-ANTIBUCLE-ROOT-CAUSE-OPEN-20260820.md",
+    "continuityInvariant": "tools/orbit360-f2-continuity-invariant-v20260820.mjs",
+    "continuityAuditEvidence": "orbit360-platform/runtime-gate-crm-v20260716/f2-continuity-audit-v20260820.json",
+    "currentStateOwner": "orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json",
+    "divergenceClassification": "PIPELINE_MECHANISM_FAILURE:DOCUMENTATION_STATE_DRIFT"
   },
   "nextActionExact": {
-    "step1": "RUN_CURRENT_DOCUMENTATION_COHERENCE_VALIDATOR",
-    "step2": "INSTRUMENT_POLIZAS_SOURCE_ONLY_NAVIGATION_EVENT_LOOP_MOUNT_RENDER_READINESS",
-    "step3": "CLASSIFY_FUNCTIONAL_DEFECT_VS_VALIDATOR_STALE",
-    "step4": "ONLY_THEN_DECIDE_RUNTIME_SUCCESSOR",
-    "request13CreationAllowedNow": false
+    "action": "INSTRUMENT_POLIZAS_SOURCE_ONLY_EVENT_LOOP_NAVIGATION_MOUNT_RENDER_READINESS",
+    "runtimeSuccessorAllowed": false,
+    "request13Allowed": false,
+    "timeoutIncreaseAllowed": false,
+    "polizasMutationAllowed": false
   },
-  "resumeProtocol": {
-    "readFirst": [
-      "orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json",
-      "orbit360-platform/docs/orbit360-live-state-v1.json",
-      "orbit360-platform/docs/CHECKPOINT-F2-REQUEST12-CONSUMED-ROOTCAUSE-REOPENED-DOCSYNC-HARDENED-20260820.md",
-      ".github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-runbound-20260820-12.json",
-      ".github/orbit360-authorizations/f2-productive-acceptance-runtime-browser-readonly-request12-v20260820.json",
-      "PR5_HEAD_LIVE"
-    ],
-    "mustValidateBeforeAction": "node tools/orbit360-validar-current-documentation-coherence-v20260820.mjs",
-    "neverResumeFrom": [
-      "REQUEST10_PENDING_STATE",
-      "REQUEST11_PENDING_STATE",
-      "REQUEST12_PENDING_AUTHORIZATION"
-    ]
-  }
+  "stopRetry": {
+    "request11ReplayAllowed": false,
+    "request12ReplayAllowed": false,
+    "request13MayBeMaterialized": false,
+    "timeoutIncreaseAllowed": false,
+    "polizasMutationAllowed": false
+  },
+  "lanes": {
+    "A_frontend_ux_academia": "FROZEN_CANDIDATE_PLUS_ACADEMIA_CONTINUITY_UPDATE",
+    "B_backend_security_gates": "F2_ROOT_CAUSE_OPEN_CONTINUITY_SYNC_REQUIRED",
+    "C_real_data_migration": "UNCHANGED"
+  },
+  "progress": {
+    "programProgressPct": 25,
+    "productionRouteProgressPct": 50,
+    "f2TerminalPass": false
+  },
+  "containsPII": false,
+  "containsSecrets": false
 }
