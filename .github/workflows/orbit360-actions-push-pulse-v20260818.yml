@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ays/backend-tenant-lab-v99-20260703
+          ref: ${{ github.sha }}
           fetch-depth: 0
           persist-credentials: true
       - uses: actions/setup-node@v4
@@ -23,6 +23,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          CANONICAL_PRE='orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json'
+          PRE_BACKUP="$RUNNER_TEMP/preflight-sanitizado.before"
+          PRE_EXISTED=false
+          if [ -f "$CANONICAL_PRE" ]; then cp "$CANONICAL_PRE" "$PRE_BACKUP"; PRE_EXISTED=true; fi
           node --check tools/orbit360-f2-validator-stale-rootfix-sourceonly-v20260820.mjs
           set +e
           node tools/orbit360-f2-validator-stale-rootfix-sourceonly-v20260820.mjs
@@ -32,6 +36,8 @@ jobs:
           PRE='orbit360-platform/runtime-gate-crm-v20260716/f2-request11-rootfix-source-preflight-v20260820.json'
           SYN='orbit360-platform/runtime-gate-crm-v20260716/f2-request12-synthetic-selftest-v20260820.json'
           test -f "$EVID"
+          if [ "$PRE_EXISTED" = true ]; then cp "$PRE_BACKUP" "$CANONICAL_PRE"; else rm -f "$CANONICAL_PRE"; fi
+          test -z "$(git status --short | awk '{print $2}' | grep -E '^\.github/orbit360-(requests|authorizations)/f2-productive-acceptance-runtime-browser-readonly-request12|^tools/orbit360-validar-gate-contracts-v20260717\.mjs$' || true)"
           git config user.name 'orbit360-sourceonly-bot'
           git config user.email 'orbit360-sourceonly-bot@users.noreply.github.com'
           git add "$EVID" "$PRE" "$SYN" 2>/dev/null || true
