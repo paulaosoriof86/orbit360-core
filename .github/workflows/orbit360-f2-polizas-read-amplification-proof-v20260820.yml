@@ -21,17 +21,49 @@ jobs:
         with:
           ref: ays/backend-tenant-lab-v99-20260703
           fetch-depth: 0
-      - name: Run source-only amplification proof
+
+      - name: Run source-only amplification proof and retain result
+        id: proof
         shell: bash
         run: |
+          set +e
           mkdir -p orbit360-platform/runtime-gate-crm-v20260716
-          node tools/orbit360-f2-polizas-read-amplification-proof-v20260820.mjs > orbit360-platform/runtime-gate-crm-v20260716/f2-polizas-read-amplification-proof-v20260820.json
-      - name: Persist sanitized proof
+          tmp="$(mktemp)"
+          node tools/orbit360-f2-polizas-read-amplification-proof-v20260820.mjs >"$tmp" 2>&1
+          rc=$?
+          evidence="orbit360-platform/runtime-gate-crm-v20260716/f2-polizas-read-amplification-proof-v20260820.json"
+          if node -e 'JSON.parse(require("fs").readFileSync(process.argv[1],"utf8"))' "$tmp" >/dev/null 2>&1; then
+            cp "$tmp" "$evidence"
+          else
+            RC="$rc" node - <<'NODE' > "$evidence"
+          const rc=Number(process.env.RC||1);
+          console.log(JSON.stringify({
+            ok:false,
+            status:'F2_POLIZAS_READ_AMPLIFICATION_SOURCE_PROOF_FAIL',
+            classification:'PIPELINE_MECHANISM_FAILURE',
+            code:'SOURCE_PROOF_NON_JSON_FAILURE',
+            exitCode:rc,
+            browser:false,secrets:false,firestore:false,writes:0,productMutation:false,
+            containsPII:false,containsSecrets:false
+          },null,2));
+          NODE
+          fi
+          echo "rc=$rc" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Persist sanitized proof regardless of result
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add orbit360-platform/runtime-gate-crm-v20260716/f2-polizas-read-amplification-proof-v20260820.json
-          git commit -m "test(f2): persist policy read amplification proof [skip ci]"
-          git pull --rebase origin ays/backend-tenant-lab-v99-20260703
-          git push origin HEAD:ays/backend-tenant-lab-v99-20260703
+          if git diff --cached --quiet; then
+            echo "No proof evidence diff"
+          else
+            git commit -m "test(f2): persist policy read amplification proof [skip ci]"
+            git pull --rebase origin ays/backend-tenant-lab-v99-20260703
+            git push origin HEAD:ays/backend-tenant-lab-v99-20260703
+          fi
+
+      - name: Enforce proof result after persistence
+        run: test "${{ steps.proof.outputs.rc }}" = "0"
