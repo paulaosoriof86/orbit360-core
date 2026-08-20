@@ -51,6 +51,7 @@ try{
   need(legal.includes('postDetachDeadline')&&legal.includes('Math.max(hardDeadline,postDetachDeadline)'),'VALIDATOR_STALE:F2_LEGAL_DETACH_QUIET_WINDOW_ROOTFIX_MISSING');
 
   need(runner.includes("ROUTES=['inicio','cliente360','aseguradoras','ops','leads','polizas','cobros']"),'VALIDATOR_STALE:F2_ROUTE_TOPOLOGY_CHANGED');
+  need(runner.includes('F2_ROUTE_NOT_RENDERED')&&runner.includes('F2_ROUTE_NOT_VISIBLE')&&runner.includes('authStage')&&runner.includes('bodyPreAuth')&&runner.includes('hostWidth')&&runner.includes('hostHeight')&&runner.includes('route(page,name,`${label}:${name}`)'),'VALIDATOR_STALE:F2_ROUTE_WAIT_OBSERVABILITY_NOT_BOUND');
   need(runner.includes('orbit-policy-fullpage')&&runner.includes('orbit-vehicle-fullpage')&&runner.includes('recibosEsperados'),'VALIDATOR_STALE:F2_INTEGRATED_SURFACE_CONTRACT_MISSING');
 
   need(lifecycle.authorization?.request==='DYNAMIC:ORBIT360_REQUEST_FILE','VALIDATOR_STALE:F2_RUNTIME_LIFECYCLE_REQUEST_POINTER_NOT_DYNAMIC');
