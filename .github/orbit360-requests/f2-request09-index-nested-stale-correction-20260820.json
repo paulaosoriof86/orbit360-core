@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "orbit360-f2-request09-index-nested-stale-correction-request-v1",
+  "sourceOnly": true,
+  "approved": true,
+  "authorizationBasis": "CONTINUE_EXACT_NEXT_ACTION_DOCUMENTATION_CONSISTENCY",
+  "rootCause": "VALIDATOR_STALE:DOCSYNC_NESTED_POINTER_COVERAGE_INCOMPLETE",
+  "request09Consumed": true,
+  "candidateArtifactId": 9387820198,
+  "candidateSourceHead": "fc46bd85783d8b4d524cbeb0fee54ee9a2c774af",
+  "request10Created": false,
+  "request10Authorized": false,
+  "browser": false,
+  "runtime": false,
+  "secrets": false,
+  "firestoreRead": false,
+  "writes": false,
+  "deploy": false,
+  "production": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
