@@ -1,0 +1,67 @@
+name: Orbit360 Continuity Canonical Source Only
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - 'orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json'
+      - 'orbit360-platform/docs/orbit360-continuity-writer-registry-v20260820.json'
+      - 'tools/orbit360-continuity-sync-v20260820.mjs'
+      - 'tools/orbit360-f2-continuity-invariant-v20260820.mjs'
+      - '.github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: orbit360-continuity-canonical-ays
+  cancel-in-progress: false
+
+jobs:
+  project-and-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ays/backend-tenant-lab-v99-20260703
+          fetch-depth: 0
+      - name: Project canonical ledger
+        run: node tools/orbit360-continuity-sync-v20260820.mjs
+      - name: Project canonical PR body
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh pr edit 5 --repo paulaosoriof86/orbit360-core --body-file orbit360-platform/docs/ORBIT360-PR5-CURRENT-STATE.md
+      - name: Audit canonical state and writer exclusivity
+        id: audit
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set +e
+          gh pr view 5 --repo paulaosoriof86/orbit360-core --json body -q .body > /tmp/orbit360-pr5-body.md
+          ORBIT360_CONTINUITY_REQUIRE_PR=true ORBIT360_PR_BODY_FILE=/tmp/orbit360-pr5-body.md node tools/orbit360-f2-continuity-invariant-v20260820.mjs
+          rc=$?
+          echo "rc=$rc" >> "$GITHUB_OUTPUT"
+          exit 0
+      - name: Persist canonical projections and sanitized audit
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md orbit360-platform/CHANGELOG.md \
+            orbit360-platform/docs/orbit360-live-state-v1.json \
+            orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json \
+            orbit360-platform/docs/ORBIT360-PR5-CURRENT-STATE.md \
+            tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-runtime-v20260819.json \
+            orbit360-platform/runtime-gate-crm-v20260716/f2-continuity-audit-v20260820.json
+          if ! git diff --cached --quiet; then
+            git commit -m "docs(continuity): project canonical live state and audit [skip ci]"
+            git pull --rebase origin ays/backend-tenant-lab-v99-20260703
+            git push origin HEAD:ays/backend-tenant-lab-v99-20260703
+          fi
+      - name: Enforce audit
+        run: test "${{ steps.audit.outputs.rc }}" = "0"

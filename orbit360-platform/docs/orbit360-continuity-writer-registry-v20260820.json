@@ -1,0 +1,40 @@
+{
+  "schemaVersion": "orbit360-continuity-writer-registry-v1",
+  "registryId": "ORBIT360-CONTINUITY-WRITER-REGISTRY",
+  "active": true,
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "sourceOfTruth": "orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json",
+  "soleProjectionLogic": "tools/orbit360-continuity-sync-v20260820.mjs",
+  "canonicalWorkflow": ".github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml",
+  "projectionTargets": [
+    "orbit360-platform/docs/orbit360-live-state-v1.json",
+    "orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json",
+    "tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-runtime-v20260819.json",
+    "README.md",
+    "orbit360-platform/CHANGELOG.md",
+    "orbit360-platform/docs/ORBIT360-PR5-CURRENT-STATE.md"
+  ],
+  "policies": {
+    "requestOrdinalAllowedOnlyInHistory": true,
+    "requestSpecificCurrentStateForbidden": true,
+    "independentProjectionWriterForbidden": true,
+    "evidenceWriterMustDelegateStateProjectionWhenItAdvancesCurrentState": true,
+    "oneShotWorkflowMayNotOwnCurrentState": true,
+    "continuityAuditFailClosed": true
+  },
+  "workflowClasses": {
+    "canonicalProjectionOwner": [
+      ".github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml"
+    ],
+    "retiredEvidenceOnly": [
+      ".github/workflows/orbit360-product-readonly-get-rootfix-sourceonly-v20260820.yml"
+    ]
+  },
+  "writerAudit": {
+    "scanRoot": ".github/workflows",
+    "requireCanonicalSyncReferenceForProjectionTargetWriters": true,
+    "forbidRequestSpecificProjectionOwners": true
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
