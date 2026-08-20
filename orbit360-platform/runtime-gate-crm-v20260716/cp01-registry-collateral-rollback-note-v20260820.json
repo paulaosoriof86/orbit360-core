@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "orbit360-control-plane-correction-note-v1",
+  "status": "COLLATERAL_REGISTRY_EDIT_DETECTED_AND_ROLLBACK_REQUIRED",
+  "classification": "PIPELINE_MECHANISM_FAILURE",
+  "affectedCommit": "403d0f42a16e0898c70a9ad678a195deb367fa75",
+  "affectedPath": "tools/orbit360-gate-contract-registry-v20260717.json",
+  "scope": "source-only registry metadata",
+  "runtimeTouched": false,
+  "productTouched": false,
+  "dataTouched": false,
+  "secretsRead": false,
+  "writesOutsideRepository": 0,
+  "requiredCorrection": "Restore exact prior registry blob d3bfea1aa5fafde7609fddde9bd4b14a2d33f4dd before applying an F2-only change.",
+  "containsPII": false,
+  "containsSecrets": false
+}
