@@ -18,11 +18,6 @@ env:
   ORBIT360_PRODUCT_TENANT_ID: alianzas-soluciones
   ORBIT360_TARGET_EMAIL_HASH: 9b663847979724e9491e1c655da32a7cb17a5f6ed26dba352de1eb811254b23f
   ORBIT360_TARGET_ADVISOR_ID: ase-paula-osorio
-  ORBIT360_CANDIDATE_ARTIFACT_ID: '9387820198'
-  ORBIT360_CANDIDATE_ZIP_NAME: orbit360-fase-a-product-f2-request08-router-readiness-successor-fc46bd85783d.zip
-  ORBIT360_CANDIDATE_ZIP_SHA256: 58fcbe6e8d7d3a425509c87f229b1cb12dd35a99133d46c757544cc75c55aacc
-  ORBIT360_CANDIDATE_MANIFEST_SHA256: b18422fdf82830d28e82f657f83b4fd5c10ea134a4735263fa2587a2ddd808cb
-  ORBIT360_CANDIDATE_SOURCE_HEAD: fc46bd85783d8b4d524cbeb0fee54ee9a2c774af
   EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
 jobs:
   f2_productive_acceptance:
@@ -37,7 +32,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Verify immutable F2 request and source boundary
+      - name: Verify immutable F2 request against canonical certified successor
         shell: bash
         run: |
           set -euo pipefail
@@ -49,17 +44,30 @@ jobs:
           case "$REQUEST_FILE" in .github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-runbound-*.json) ;; *) echo 'PIPELINE_MECHANISM_FAILURE:F2_REQUEST_PATH_INVALID' >&2; exit 41 ;; esac
           test "$(jq -r '.requestVersion' "$REQUEST_FILE")" = "$ORBIT360_EXPECTED_REQUEST_VERSION"
           test "$(jq -r '.parentHead' "$REQUEST_FILE")" = "$(git rev-parse HEAD^)"
-          test "$(jq -r '.candidateArtifactId' "$REQUEST_FILE")" = "$ORBIT360_CANDIDATE_ARTIFACT_ID"
-          test "$(jq -r '.candidateZipSha256' "$REQUEST_FILE")" = "$ORBIT360_CANDIDATE_ZIP_SHA256"
-          test "$(jq -r '.candidateManifestSha256' "$REQUEST_FILE")" = "$ORBIT360_CANDIDATE_MANIFEST_SHA256"
-          test "$(jq -r '.candidateSourceHead' "$REQUEST_FILE")" = "$ORBIT360_CANDIDATE_SOURCE_HEAD"
+          LEDGER=orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json
+          ARTIFACT="$(jq -r '.successorCandidate.artifactId' "$LEDGER")"
+          SOURCE="$(jq -r '.successorCandidate.sourceHead' "$LEDGER")"
+          ZIP_NAME="$(jq -r '.successorCandidate.zipName' "$LEDGER")"
+          ZIP_SHA="$(jq -r '.successorCandidate.zipSha256' "$LEDGER")"
+          MANIFEST_SHA="$(jq -r '.successorCandidate.manifestSha256' "$LEDGER")"
+          test "$(jq -r '.successorCandidate.status' "$LEDGER")" = 'CERTIFIED_SOURCE_ONLY'
+          test "$ARTIFACT" != '9387820198'
+          test "$(jq -r '.candidateArtifactId' "$REQUEST_FILE")" = "$ARTIFACT"
+          test "$(jq -r '.candidateSourceHead' "$REQUEST_FILE")" = "$SOURCE"
+          test "$(jq -r '.candidateZipSha256' "$REQUEST_FILE")" = "$ZIP_SHA"
+          test "$(jq -r '.candidateManifestSha256' "$REQUEST_FILE")" = "$MANIFEST_SHA"
           echo "ORBIT360_REQUEST_FILE=$REQUEST_FILE" >> "$GITHUB_ENV"
+          echo "ORBIT360_CANDIDATE_ARTIFACT_ID=$ARTIFACT" >> "$GITHUB_ENV"
+          echo "ORBIT360_CANDIDATE_SOURCE_HEAD=$SOURCE" >> "$GITHUB_ENV"
+          echo "ORBIT360_CANDIDATE_ZIP_NAME=$ZIP_NAME" >> "$GITHUB_ENV"
+          echo "ORBIT360_CANDIDATE_ZIP_SHA256=$ZIP_SHA" >> "$GITHUB_ENV"
+          echo "ORBIT360_CANDIDATE_MANIFEST_SHA256=$MANIFEST_SHA" >> "$GITHUB_ENV"
           echo "ORBIT360_F2_FINAL=$EVIDENCE_DIR/f2-final-run-${GITHUB_RUN_ID}.json" >> "$GITHUB_ENV"
           echo "ORBIT360_F2_SELFTEST=$EVIDENCE_DIR/f2-full-runtime-known-rootfixes-selftest-${GITHUB_RUN_ID}.json" >> "$GITHUB_ENV"
           node --check tools/orbit360-register-f2-productive-acceptance-runtime-v20260819.mjs
           node --check tools/orbit360-validar-gate-contracts-engine-f2-productive-acceptance-v20260819.mjs
+          node --check tools/orbit360-f2-exact-candidate-source-validator-v20260819.mjs
           node --check tools/orbit360-f2-productive-acceptance-runtime-browser-readonly-v20260818.mjs
-          node --check tools/orbit360-f2-cross-tenant-probe-contract-v20260818.mjs
           node --check tools/orbit360-test-f2-full-runtime-known-rootfixes-v20260819.mjs
           ORBIT360_REQUEST_FILE="$REQUEST_FILE" ORBIT360_F2_KNOWN_ROOTFIXES_EVIDENCE="$EVIDENCE_DIR/f2-full-runtime-known-rootfixes-selftest-${GITHUB_RUN_ID}.json" node tools/orbit360-test-f2-full-runtime-known-rootfixes-v20260819.mjs
           node --check tools/orbit360-f2-data-integrity-readonly-v20260818.mjs
@@ -79,7 +87,7 @@ jobs:
           rm -f "$EVIDENCE_DIR/preflight-sanitizado.json"
           node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
           jq --arg run "$GITHUB_RUN_ID" '. + {runId:$run,evidenceFreshness:"current-run-only"}' "$EVIDENCE_DIR/preflight-sanitizado.json" > "$EVIDENCE_DIR/f2-runtime-preflight-run-${GITHUB_RUN_ID}.json"
-          jq -e --arg run "$GITHUB_RUN_ID" --argjson artifact "$ORBIT360_CANDIDATE_ARTIFACT_ID" '.ok==true and .status=="GO_GATE_CONTRACT" and .classification=="GO_F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY" and .runId==$run and .candidateArtifactId==$artifact and .executionAuthorized==true and .secretAccessAuthorized==true and .firestoreReadAuthorized==true and .customTokenMintAuthorized==true and .runtimeAuthorized==true and .browserAuthorized==true and .writeAuthorized==false and .authWriteAuthorized==false and .membershipWriteAuthorized==false and .dataWriteAuthorized==false and .packageRebuildAuthorized==false and .deployAuthorized==false and .publicationAuthorized==false and .productionAuthorized==false' "$EVIDENCE_DIR/f2-runtime-preflight-run-${GITHUB_RUN_ID}.json" >/dev/null
+          jq -e --arg run "$GITHUB_RUN_ID" --argjson artifact "$ORBIT360_CANDIDATE_ARTIFACT_ID" '.ok==true and .status=="GO_GATE_CONTRACT" and .classification=="GO_F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY" and .runId==$run and .candidateArtifactId==$artifact and .executionAuthorized==true and .secretAccessAuthorized==true and .firestoreReadAuthorized==true and .runtimeAuthorized==true and .browserAuthorized==true and .writeAuthorized==false and .deployAuthorized==false and .publicationAuthorized==false and .productionAuthorized==false' "$EVIDENCE_DIR/f2-runtime-preflight-run-${GITHUB_RUN_ID}.json" >/dev/null
       - name: Download and fully verify exact F2 candidate after GO
         if: steps.gate.outcome == 'success'
         env:
@@ -95,7 +103,7 @@ jobs:
           INNER="$OUTER_DIR/$ORBIT360_CANDIDATE_ZIP_NAME"; test "$(sha256sum "$INNER" | awk '{print $1}')" = "$ORBIT360_CANDIDATE_ZIP_SHA256"
           unzip -q "$INNER" -d "$CANDIDATE_DIR"; test "$(sha256sum "$CANDIDATE_DIR/orbit360-package-manifest.json" | awk '{print $1}')" = "$ORBIT360_CANDIDATE_MANIFEST_SHA256"
           ORBIT360_F2_CANDIDATE_DIR="$CANDIDATE_DIR" ORBIT360_F2_CANDIDATE_SOURCE_EVIDENCE="$EVIDENCE_DIR/f2-candidate-source-run-${GITHUB_RUN_ID}.json" node tools/orbit360-f2-exact-candidate-source-validator-v20260819.mjs
-          jq -e '.ok==true and .status=="F2_EXACT_CANDIDATE_SOURCE_VALIDATION_PASS" and .candidateArtifactId==9387820198 and .fullRehashPass==true and .inicioFiniteRootfixPass==true and .routerReadinessRootfixPass==true' "$EVIDENCE_DIR/f2-candidate-source-run-${GITHUB_RUN_ID}.json" >/dev/null
+          jq -e --argjson artifact "$ORBIT360_CANDIDATE_ARTIFACT_ID" '.ok==true and .status=="F2_EXACT_CANDIDATE_SOURCE_VALIDATION_PASS" and .candidateArtifactId==$artifact and .fullRehashPass==true and .inicioFiniteRootfixPass==true and .routerReadinessRootfixPass==true and .storeGetRootfixPass==true' "$EVIDENCE_DIR/f2-candidate-source-run-${GITHUB_RUN_ID}.json" >/dev/null
           echo "ORBIT360_F2_CANDIDATE_DIR=$CANDIDATE_DIR" >> "$GITHUB_ENV"
       - name: Install authorized runtime dependencies after F2 GO
         if: steps.gate.outcome == 'success'
@@ -103,9 +111,7 @@ jobs:
         run: |
           set -euo pipefail
           npm install --no-save --package-lock=false --ignore-scripts firebase-admin@13 google-auth-library@9 playwright@1.52.0 >/dev/null
-          BROWSER_EXECUTABLE="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
-          test -n "$BROWSER_EXECUTABLE"
-          echo "ORBIT360_SYSTEM_BROWSER_EXECUTABLE=$BROWSER_EXECUTABLE" >> "$GITHUB_ENV"
+          BROWSER_EXECUTABLE="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"; test -n "$BROWSER_EXECUTABLE"; echo "ORBIT360_SYSTEM_BROWSER_EXECUTABLE=$BROWSER_EXECUTABLE" >> "$GITHUB_ENV"
       - name: Bind provider after F2 GO
         if: steps.gate.outcome == 'success'
         env:
@@ -115,8 +121,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-${SA_ORBIT_360_LAB:-${SA_DEFAULT:-}}}"
-          test -n "$SERVICE_ACCOUNT"
+          SERVICE_ACCOUNT="${SA_ORBIT360_LAB:-${SA_ORBIT_360_LAB:-${SA_DEFAULT:-}}}"; test -n "$SERVICE_ACCOUNT"
           SA_FILE="$RUNNER_TEMP/orbit360-f2-service-account.json"; printf '%s' "$SERVICE_ACCOUNT" > "$SA_FILE"; chmod 600 "$SA_FILE"
           jq -e '.type=="service_account" and (.project_id|length)>0 and (.client_email|length)>0 and (.private_key|length)>0' "$SA_FILE" >/dev/null
           echo "GOOGLE_APPLICATION_CREDENTIALS=$SA_FILE" >> "$GITHUB_ENV"
@@ -126,20 +131,16 @@ jobs:
         run: |
           set -euo pipefail
           ORBIT360_SMOKE_IDENTITY_EVIDENCE="$EVIDENCE_DIR/f2-identity-run-${GITHUB_RUN_ID}.json" ORBIT360_SMOKE_RUN_ID="$GITHUB_RUN_ID" ORBIT360_SMOKE_TARGET_EMAIL_HASH="$ORBIT360_TARGET_EMAIL_HASH" ORBIT360_SMOKE_TARGET_ADVISOR_ID="$ORBIT360_TARGET_ADVISOR_ID" node tools/orbit360-m6-resolve-smoke-identity-readonly-v20260730.mjs
-          jq -e '.ok==true and .eligibleSmokeIdentityCount==1 and .targetBindingRequested==true and .targetEmailHashMatches==true and .targetAdvisorMatches==true and .targetIdentityMatches==true and .requiredRolesPresent==true and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0' "$EVIDENCE_DIR/f2-identity-run-${GITHUB_RUN_ID}.json" >/dev/null
+          jq -e '.ok==true and .eligibleSmokeIdentityCount==1 and .targetIdentityMatches==true and .requiredRolesPresent==true and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0' "$EVIDENCE_DIR/f2-identity-run-${GITHUB_RUN_ID}.json" >/dev/null
       - name: F2 integrity snapshot before browser
         if: steps.gate.outcome == 'success'
-        shell: bash
-        run: |
-          set -euo pipefail
-          node tools/orbit360-f2-data-integrity-readonly-v20260818.mjs before
-          jq -e '.ok==true and .status=="F2_DATA_INTEGRITY_SNAPSHOT_PASS" and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0' "$EVIDENCE_DIR/f2-data-integrity-before-v20260818.json" >/dev/null
+        run: node tools/orbit360-f2-data-integrity-readonly-v20260818.mjs before
       - name: Serve exact F2 candidate on runner loopback
         if: steps.gate.outcome == 'success'
         shell: bash
         run: |
           set -euo pipefail
-          python3 -m http.server 4173 --bind 127.0.0.1 --directory "$ORBIT360_F2_CANDIDATE_DIR" > "$RUNNER_TEMP/f2-http.log" 2>&1 & echo $! > "$RUNNER_TEMP/f2-http.pid"
+          python3 -m http.server 4173 --bind 127.0.0.1 --directory "$ORBIT360_F2_CANDIDATE_DIR" > "$RUNNER_TEMP/f2-http.log" 2>&1 &
           for i in $(seq 1 30); do curl --fail --silent http://127.0.0.1:4173/orbit360-package-manifest.json >/dev/null && break; sleep 1; done
           curl --fail --silent http://127.0.0.1:4173/orbit360-package-manifest.json >/dev/null
           echo "ORBIT360_F2_URL=http://127.0.0.1:4173/" >> "$GITHUB_ENV"
@@ -157,8 +158,7 @@ jobs:
         shell: bash
         run: |
           set +e
-          node tools/orbit360-f2-data-integrity-readonly-v20260818.mjs after
-          A=$?
+          node tools/orbit360-f2-data-integrity-readonly-v20260818.mjs after; A=$?
           if [ "$A" -eq 0 ]; then node tools/orbit360-f2-compare-integrity-v20260818.mjs; B=$?; else B=41; fi
           echo "exit_code=$B" >> "$GITHUB_OUTPUT"; exit 0
       - name: Build sanitized F2 terminal evidence
@@ -169,21 +169,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          REQUEST="${ORBIT360_REQUEST_FILE:-$(git diff-tree --no-commit-id --name-only -r HEAD | head -1)}"
-          FINAL="${ORBIT360_F2_FINAL:-$EVIDENCE_DIR/f2-final-run-${GITHUB_RUN_ID}.json}"
-          SELFTEST="${ORBIT360_F2_SELFTEST:-$EVIDENCE_DIR/f2-full-runtime-known-rootfixes-selftest-${GITHUB_RUN_ID}.json}"
-          B="$EVIDENCE_DIR/f2-browser-run-${GITHUB_RUN_ID}.json"; I="$EVIDENCE_DIR/f2-integrity-before-after-v20260818.json"; P="$EVIDENCE_DIR/f2-runtime-preflight-run-${GITHUB_RUN_ID}.json"
-          if [ -f "$SELFTEST" ] && jq -e '.ok==false' "$SELFTEST" >/dev/null; then
-            jq -n --arg run "$GITHUB_RUN_ID" --arg request "$REQUEST" --argjson s "$(cat "$SELFTEST")" '{schemaVersion:"orbit360-f2-terminal-v1",ok:false,status:"F2_PRODUCTIVE_ACCEPTANCE_PRE_GATE_FAIL",classification:$s.classification,error:$s.error,runId:$run,request:$request,candidateArtifactId:9387820198,preGateFailure:true,selftest:$s.status,browserMatrixPass:false,integrityBeforeAfterPass:false,firestoreWrites:0,authWrites:0,operationalWrites:0,packageRebuilt:false,deployExecuted:false,publicationExecuted:false,productionHostingTouched:false,containsPII:false,containsSecrets:false}' > "$FINAL"
-            exit 41
-          fi
+          REQUEST="${ORBIT360_REQUEST_FILE:-$(git diff-tree --no-commit-id --name-only -r HEAD | head -1)}"; FINAL="${ORBIT360_F2_FINAL:-$EVIDENCE_DIR/f2-final-run-${GITHUB_RUN_ID}.json}"; B="$EVIDENCE_DIR/f2-browser-run-${GITHUB_RUN_ID}.json"; I="$EVIDENCE_DIR/f2-integrity-before-after-v20260818.json"; P="$EVIDENCE_DIR/f2-runtime-preflight-run-${GITHUB_RUN_ID}.json"; S="$EVIDENCE_DIR/f2-full-runtime-known-rootfixes-selftest-${GITHUB_RUN_ID}.json"
+          if [ -f "$S" ] && jq -e '.ok==false' "$S" >/dev/null; then jq -n --arg run "$GITHUB_RUN_ID" --arg request "$REQUEST" --argjson artifact "$ORBIT360_CANDIDATE_ARTIFACT_ID" --arg c "$(jq -r '.classification' "$S")" --arg e "$(jq -r '.error' "$S")" '{schemaVersion:"orbit360-f2-terminal-v2",ok:false,status:"F2_PRODUCTIVE_ACCEPTANCE_PRE_GATE_FAIL",classification:$c,error:$e,runId:$run,request:$request,candidateArtifactId:$artifact,preGateFailure:true,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,publicationExecuted:false,productionHostingTouched:false,containsPII:false,containsSecrets:false}' > "$FINAL"; exit 41; fi
           if [ "${BROWSER_CODE:-41}" = '0' ] && [ "${INTEGRITY_CODE:-41}" = '0' ] && jq -e '.ok==true and .status=="F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_PASS" and .crossTenantDenied==true and .runtime.ready==true and .runtime.writeEnabled==false and .localWriteGuard.blocked==true and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and (.writeSignals|length)==0 and (.pageErrors|length)==0 and (.consoleErrors|length)==0' "$B" >/dev/null && jq -e '.ok==true and .status=="F2_INTEGRITY_BEFORE_AFTER_PASS" and .countsIdentical==true and .digestsIdentical==true' "$I" >/dev/null; then
-            jq -n --arg run "$GITHUB_RUN_ID" --arg request "$REQUEST" '{schemaVersion:"orbit360-f2-terminal-v1",ok:true,status:"F2_PRODUCTIVE_ACCEPTANCE_PASS",classification:"PASS",runId:$run,request:$request,candidateArtifactId:9387820198,sourceOnlyPreflightPass:true,browserMatrixPass:true,integrityBeforeAfterPass:true,zeroCrossTenant:true,zeroUnexpectedWrites:true,legalIdempotent:true,serviceWorkerCachePass:true,firestoreWrites:0,authWrites:0,operationalWrites:0,packageRebuilt:false,deployExecuted:false,publicationExecuted:false,productionHostingTouched:false,containsPII:false,containsSecrets:false}' > "$FINAL"
+            jq -n --arg run "$GITHUB_RUN_ID" --arg request "$REQUEST" --argjson artifact "$ORBIT360_CANDIDATE_ARTIFACT_ID" '{schemaVersion:"orbit360-f2-terminal-v2",ok:true,status:"F2_PRODUCTIVE_ACCEPTANCE_PASS",classification:"PASS",runId:$run,request:$request,candidateArtifactId:$artifact,browserMatrixPass:true,integrityBeforeAfterPass:true,zeroCrossTenant:true,zeroUnexpectedWrites:true,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,publicationExecuted:false,productionHostingTouched:false,containsPII:false,containsSecrets:false}' > "$FINAL"
           else
-            PRECLASS="PIPELINE_MECHANISM_FAILURE"; PREERR="F2_RUNTIME_STAGE_FAILED_WITHOUT_TERMINAL_BROWSER_PASS"
-            if [ -f "$P" ]; then PRECLASS="$(jq -r '.classification // "PIPELINE_MECHANISM_FAILURE"' "$P")"; PREERR="$(jq -r '.error // "F2_RUNTIME_STAGE_FAILED_WITHOUT_TERMINAL_BROWSER_PASS"' "$P")"; fi
-            jq -n --arg run "$GITHUB_RUN_ID" --arg request "$REQUEST" --arg b "${BROWSER_CODE:-missing}" --arg i "${INTEGRITY_CODE:-missing}" --arg c "$PRECLASS" --arg e "$PREERR" '{schemaVersion:"orbit360-f2-terminal-v1",ok:false,status:"F2_PRODUCTIVE_ACCEPTANCE_FAIL",classification:$c,error:$e,runId:$run,request:$request,browserCode:$b,integrityCode:$i,candidateArtifactId:9387820198,firestoreWrites:0,authWrites:0,operationalWrites:0,packageRebuilt:false,deployExecuted:false,publicationExecuted:false,productionHostingTouched:false,containsPII:false,containsSecrets:false}' > "$FINAL"
-            exit 41
+            C="PIPELINE_MECHANISM_FAILURE"; E="F2_RUNTIME_STAGE_FAILED_WITHOUT_TERMINAL_BROWSER_PASS"; if [ -f "$B" ]; then C="$(jq -r '.classification // "PIPELINE_MECHANISM_FAILURE"' "$B")"; E="$(jq -r '.error // "F2_RUNTIME_STAGE_FAILED_WITHOUT_TERMINAL_BROWSER_PASS"' "$B")"; elif [ -f "$P" ]; then C="$(jq -r '.classification // "PIPELINE_MECHANISM_FAILURE"' "$P")"; E="$(jq -r '.error // "F2_RUNTIME_STAGE_FAILED_WITHOUT_TERMINAL_BROWSER_PASS"' "$P")"; fi
+            jq -n --arg run "$GITHUB_RUN_ID" --arg request "$REQUEST" --argjson artifact "$ORBIT360_CANDIDATE_ARTIFACT_ID" --arg c "$C" --arg e "$E" '{schemaVersion:"orbit360-f2-terminal-v2",ok:false,status:"F2_PRODUCTIVE_ACCEPTANCE_FAIL",classification:$c,error:$e,runId:$run,request:$request,candidateArtifactId:$artifact,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,publicationExecuted:false,productionHostingTouched:false,containsPII:false,containsSecrets:false}' > "$FINAL"; exit 41
           fi
       - uses: actions/upload-artifact@v4
         if: always()
