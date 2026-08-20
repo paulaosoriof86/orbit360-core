@@ -15,7 +15,10 @@ const queries = read('orbit360-platform/core/queries.js');
 const store = read('orbit360-platform/data/store-firestore-product-readonly-p0.js');
 const runtime = read('tools/orbit360-f2-productive-acceptance-runtime-browser-readonly-v20260818.mjs');
 
-need(/const PAGE\s*=\s*100/.test(polizas), 'POLIZAS_PAGE_SIZE_CONTRACT_CHANGED');
+const pageMatch = polizas.match(/const\s+PAGE(?:_SIZE)?\s*=\s*(\d+)/);
+need(pageMatch, 'POLIZAS_PAGE_SIZE_CONTRACT_MISSING');
+const pageRows = Number(pageMatch[1]);
+need(Number.isInteger(pageRows) && pageRows > 0 && pageRows <= 500, 'POLIZAS_PAGE_SIZE_CONTRACT_INVALID', {pageRows});
 need(/K\.clienteCell\(p\.clienteId\)/.test(polizas), 'POLIZAS_CLIENT_CELL_PATH_MISSING');
 need(/K\.aseguradoraCell\(p\.aseguradoraId\)/.test(polizas), 'POLIZAS_INSURER_CELL_PATH_MISSING');
 need(/K\.asesorCell\(p\.asesorId\)/.test(polizas), 'POLIZAS_ADVISOR_CELL_PATH_MISSING');
@@ -26,9 +29,10 @@ need(/function asesor\(id\)\s*\{\s*return S\(\)\.get\('asesores',\s*id\);\s*\}/.
 need(/function aseguradora\(id\)\s*\{\s*return S\(\)\.get\('aseguradoras',\s*id\);\s*\}/.test(queries), 'QUERY_INSURER_GET_PATH_MISSING');
 need(/function all\(collection\)\s*\{\s*return \(cache\[collection\] \|\| \[\]\)\.map\(clone\);\s*\}/.test(store), 'PRODUCT_STORE_ALL_CLONE_PATH_CHANGED');
 need(/function get\(collection, id\)\s*\{\s*return all\(collection\)\.find/.test(store), 'PRODUCT_STORE_GET_FULL_COLLECTION_CLONE_PATH_CHANGED');
-need(/timeout:\s*20000/.test(runtime), 'F2_RUNTIME_ROUTE_TIMEOUT_CHANGED');
+const timeoutMatch = runtime.match(/timeout:\s*(\d+)/);
+need(timeoutMatch, 'F2_RUNTIME_ROUTE_TIMEOUT_MISSING');
+const waiterTimeoutMs = Number(timeoutMatch[1]);
 
-const pageRows = 100;
 const rowReferenceGets = pageRows * 3;
 const observed = { polizas: 1375, clientes: 430, vehiculos: 1033, recibos: 1294, aseguradoras: 26, asesores: 7 };
 const clonedRowsForReferenceColumns = pageRows * observed.clientes + pageRows * observed.aseguradoras + pageRows * observed.asesores;
@@ -71,7 +75,7 @@ console.log(JSON.stringify({
   classification:'FUNCTIONAL_DEFECT',
   code:'F2_PRODUCT_READONLY_GET_FULL_COLLECTION_CLONE_AMPLIFICATION',
   sourceChain:[
-    'modules/polizas.js:100 visible rows x clienteCell+aseguradoraCell+asesorCell',
+    `modules/polizas.js:${pageRows} visible rows x clienteCell+aseguradoraCell+asesorCell`,
     'core/crmkit.js:cell helpers -> store.get / q lookups',
     'core/queries.js:q.asesor/q.aseguradora -> store.get',
     'data/store-firestore-product-readonly-p0.js:get -> all(collection) -> map(clone)'
@@ -83,6 +87,6 @@ console.log(JSON.stringify({
   findThenCloneOneRows:fixedCloneRows,
   rowCloneAmplificationFactor:Number(amplification.toFixed(2)),
   safetyProperty:'find-then-clone-one preserves caller isolation while avoiding full-collection cloning',
-  runtimeCorrelation:{route:'desktopDirection:polizas',waiterTimeoutMs:20000,observedElapsedMs:64680,capturedContractVisible:true},
-  browser:false,secrets:false,firestore:false,writes:0,productMutation:false
+  runtimeCorrelation:{route:'desktopDirection:polizas',waiterTimeoutMs,observedElapsedMs:64680,capturedContractVisible:true},
+  browser:false,secrets:false,firestore:false,writes:0,productMutation:false,containsPII:false,containsSecrets:false
 },null,2));
