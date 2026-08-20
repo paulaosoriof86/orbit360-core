@@ -4,7 +4,7 @@
   "gateContractVersion": "2.1.0",
   "validatorLifecycleRevision": "phase-capability-contract-v2-source-rebind",
   "f2ValidatorRevision": "f2-productive-acceptance-request08-readiness-successor-rebind-v3-20260819",
-  "status": "F2_RUNTIME_BLOCKED_SOURCE_REBIND",
+  "status": "F2_RUNTIME_PENDING_FRESH_AUTHORIZATION",
   "currentPhase": "F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY",
   "executionProfile": {
     "phase": "F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY",
@@ -101,8 +101,11 @@
   "containsPII": false,
   "containsSecrets": false,
   "sourceOnlyPrerequisite": {
-    "status": "PENDING_REBIND_SOURCE_ONLY",
+    "status": "CLOSED_PASS",
+    "runId": 32316010103,
+    "evidenceArtifactId": 9388061716,
     "candidateArtifactId": 9387820198,
+    "candidateSourceHead": "fc46bd85783d8b4d524cbeb0fee54ee9a2c774af",
     "fullRehashPass": true,
     "inicioFiniteRootfixPass": true,
     "routerReadinessRootfixPass": true

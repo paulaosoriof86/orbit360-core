@@ -1,8 +1,8 @@
 {
   "schemaVersion": "orbit360-live-state-v1",
-  "stateVersion": "20260819.f2.request07-validator-stale-sourcefix-pass-request08-auth-pending.current",
-  "updatedAt": "2026-08-20T00:04:37.664Z",
-  "phase": "F2_REQUEST08_SUCCESSOR_SOURCE_REBIND_PENDING",
+  "stateVersion": "20260820.f2.request08-readiness-successor-source-closed-request09-auth-pending.current",
+  "updatedAt": "2026-08-20T00:08:43.215Z",
+  "phase": "F2_REQUEST08_READINESS_SUCCESSOR_SOURCE_CLOSED_REQUEST09_AUTH_PENDING",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pr": 5,
@@ -155,7 +155,7 @@
     }
   },
   "f2SourceOnly": {
-    "status": "PENDING_REBIND_SOURCE_ONLY",
+    "status": "CLOSED_PASS",
     "gateId": "f2-productive-acceptance-exact-successor-v20260818",
     "contractVersion": "2.1.0",
     "validatorLifecycleRevision": "phase-capability-contract-v2-source-rebind",
@@ -181,7 +181,7 @@
       "recibosCartera": "policy_client360_plus_cobros_global"
     },
     "runtimeWorkflowPrepared": true,
-    "requestCreated": true,
+    "requestCreated": false,
     "runtimeAuthorized": false,
     "browserAuthorized": false,
     "firestoreWrites": 0,
@@ -224,8 +224,8 @@
     "candidateManifestStatus": "FASE_A_PRODUCT_F2_REQUEST08_ROUTER_READINESS_SUCCESSOR_CERTIFIED",
     "predecessorArtifactId": 9385306424,
     "inicioFiniteRootfixPass": true,
-    "sourceValidationRunId": 32310630524,
-    "sourceEvidenceArtifactId": 9386304228,
+    "sourceValidationRunId": 32316010103,
+    "sourceEvidenceArtifactId": 9388061716,
     "routerReadinessRootfixPass": true
   },
   "rootCauseState": {
@@ -409,10 +409,10 @@
   "documentationControl": {
     "index": "orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json",
     "currentAddendum": "orbit360-platform/docs/ADDENDUM-MAESTRO-CIERRE-FORENSE-SINCRONIZACION-Y-PLAN-CONGELADO-20260818.md",
-    "currentCheckpoint": "orbit360-platform/docs/CHECKPOINT-F2-REQUEST07-VALIDATOR-STALE-SOURCEFIX-PASS-REQUEST08-AUTH-PENDING-20260819.md",
+    "currentCheckpoint": "orbit360-platform/docs/CHECKPOINT-F2-REQUEST08-READINESS-SUCCESSOR-SOURCE-PASS-REQUEST09-AUTH-PENDING-20260820.md",
     "historicalPolicy": "HISTORICAL_NOT_CURRENT_STATE",
-    "transactionStatus": "F2_REQUEST07_VALIDATOR_STALE_SOURCEFIX_PASS_REQUEST08_AUTH_PENDING",
-    "latestAcademiaUpdate": "orbit360-platform/docs/ACADEMIA-ACTUALIZACION-F2-REQUEST07-VALIDATOR-STALE-20260819.md"
+    "transactionStatus": "F2_REQUEST08_READINESS_SUCCESSOR_SOURCE_CLOSED_REQUEST09_AUTH_PENDING",
+    "latestAcademiaUpdate": "orbit360-platform/docs/ACADEMIA-ACTUALIZACION-F2-REQUEST08-ROUTER-READINESS-20260820.md"
   },
   "frozenPlan": {
     "currentPhase": "F2",
@@ -443,7 +443,7 @@
       ]
     },
     "currentPhaseInternalPercent": 0,
-    "currentPhaseInternalMethod": "request07_consumed_validator_stale_sourcefix_pass_request08_fresh_authorization_pending",
+    "currentPhaseInternalMethod": "request08_readiness_successor_source_closed_request09_fresh_authorization_pending",
     "currentPhaseSubphases": {
       "F1_1_owner_and_observer_source": "CLOSED",
       "F1_2A_observer_selftest": "CLOSED",
@@ -475,8 +475,8 @@
     }
   },
   "lanes": {
-    "A_frontend_UX": "FROZEN_REQUEST08_ROUTER_READINESS_ROOTFIX_SUCCESSOR_BUILT",
-    "B_backend_security_gates": "F2_REQUEST08_SUCCESSOR_SOURCE_REBIND_PENDING",
+    "A_frontend_UX": "FROZEN_REQUEST08_ROUTER_READINESS_SUCCESSOR_SOURCE_CLOSED_PASS",
+    "B_backend_security_gates": "F2_REQUEST09_FRESH_RUNTIME_AUTHORIZATION_PENDING",
     "C_real_data_migration": "UNTOUCHED_ZERO_CHANGES"
   },
   "writes": {
@@ -497,12 +497,12 @@
     "membershipChangesAuthorized": false,
     "dataChangesAuthorized": false,
     "mainMergeAuthorized": false,
-    "f2AuthorizationStatus": "FRESH_AUTHORIZATION_REQUIRED_REQUEST08_EXACT_ARTIFACT_9385306424",
+    "f2AuthorizationStatus": "FRESH_AUTHORIZATION_REQUIRED_REQUEST09_EXACT_ARTIFACT_9387820198",
     "rulesDeployAuthorizedNow": false,
     "securityRepairAuthorizedNow": false
   },
   "goLive": {
-    "status": "BLOCKED_F2_REQUEST08_FRESH_AUTHORIZATION_REQUIRED",
+    "status": "BLOCKED_F2_REQUEST09_FRESH_AUTHORIZATION_REQUIRED",
     "publicUrl": "https://app.aysseguros.com",
     "publishedPackagePreserved": true,
     "successorPublished": false,
@@ -541,14 +541,10 @@
     "request08MayBeCreatedWithoutFreshAuthorization": false
   },
   "nextActionExact": {
-    "action": "RUN_F2_REQUEST08_SUCCESSOR_SOURCE_ONLY_VALIDATION",
+    "action": "OBTAIN_FRESH_AUTHORIZATION_FOR_REQUEST09",
     "gateId": "f2-productive-acceptance-exact-successor-v20260818",
     "requestVersion": "F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_V1",
-    "candidateArtifactId": 9387820198,
-    "candidateSourceHead": "b94b2ae86d26586a68d33be9edba8715e956b02e",
-    "status": "FRESH_AUTHORIZATION_REQUIRED",
-    "runtimeAuthorizationRequired": true,
-    "runtimeExecuted": false
+    "candidateArtifactId": 9387820198
   },
   "resumeProtocol": [
     "Read ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json",
@@ -1026,5 +1022,39 @@
     "sourcefixStatus": "CLOSED_SOURCE_ONLY_PASS",
     "sourcefixEvidenceCommit": "1b9344944f3691ac40eb7face6d33c7034e0dd37",
     "sourcefixEvidence": "orbit360-platform/runtime-gate-crm-v20260716/f2-request07-validator-stale-sourcefix-check-v20260819.json"
+  },
+  "failures": {
+    "f2Request08RouterReadiness": {
+      "classification": "FUNCTIONAL_DEFECT",
+      "code": "F2_PRODUCT_APP_ROUTER_READINESS_PREMATURE",
+      "status": "ROOTFIX_CERTIFIED_IN_SUCCESSOR",
+      "requestRunId": 32313759752,
+      "successorArtifactId": 9387820198,
+      "productAffected": true,
+      "dataAffected": false,
+      "rootCause": "PRODUCT_APP_DECLARED_ROUTER_READY_BEFORE_HOST_RENDERED"
+    },
+    "f2Request08RebindPersistence": {
+      "classification": "PIPELINE_MECHANISM_FAILURE",
+      "code": "REBIND_PERSIST_REBASE_BLOCKED_BY_UNSTAGED_PREFLIGHT",
+      "status": "CLOSED_BY_PERSISTENCE_ROOTFIX",
+      "failedRunId": 32315636095,
+      "rootfixRunId": 32315869277,
+      "gateHadPassedBeforePersistenceFailure": true,
+      "productAffected": false,
+      "dataAffected": false
+    }
+  },
+  "request08": {
+    "status": "CONSUMED_FUNCTIONAL_DEFECT_ROOTFIXED_IN_SUCCESSOR",
+    "runId": 32313759752,
+    "replayAllowed": false,
+    "successorArtifactId": 9387820198
+  },
+  "request09": {
+    "created": false,
+    "authorizationGranted": false,
+    "replayAllowed": false,
+    "candidateArtifactId": 9387820198
   }
 }

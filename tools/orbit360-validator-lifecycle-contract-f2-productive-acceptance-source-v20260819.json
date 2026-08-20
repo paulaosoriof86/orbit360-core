@@ -4,7 +4,7 @@
   "gateContractVersion": "2.1.0",
   "validatorLifecycleRevision": "phase-capability-contract-v2-source-rebind",
   "f2ValidatorRevision": "f2-productive-acceptance-request08-readiness-successor-rebind-v3-20260819",
-  "status": "F2_SOURCE_REBIND_PENDING",
+  "status": "F2_SOURCE_ONLY_PASS",
   "currentPhase": "F2_PRODUCTIVE_ACCEPTANCE_SOURCE_ONLY",
   "executionProfile": {
     "phase": "F2_PRODUCTIVE_ACCEPTANCE_SOURCE_ONLY",
@@ -28,7 +28,7 @@
     "activeRequest": false,
     "request": "DYNAMIC:SOURCE_ONLY_RUNBOUND",
     "allowedExecutions": 0,
-    "consumed": false,
+    "consumed": true,
     "authorizationFrozen": true,
     "replayAllowed": false
   },
@@ -115,9 +115,9 @@
     "cobros": "orbit360-platform/modules/cobros.js"
   },
   "sourceOnlyResult": {
-    "ok": false,
-    "status": "PENDING_REBIND_SOURCE_ONLY",
-    "classification": "PENDING",
+    "ok": true,
+    "status": "CLOSED_PASS",
+    "classification": "PASS",
     "predecessorArtifactId": 9385306424,
     "candidateArtifactId": 9387820198,
     "candidateSourceHead": "fc46bd85783d8b4d524cbeb0fee54ee9a2c774af",
@@ -143,7 +143,11 @@
     "operationalWrites": 0,
     "deployExecuted": false,
     "publicationExecuted": false,
-    "productionTouched": false
+    "productionTouched": false,
+    "sourceValidationRunId": 32316010103,
+    "sourceEvidenceArtifactId": 9388061716,
+    "canonicalRebindGatePassRunId": 32315636095,
+    "persistenceRootfixRunId": 32315869277
   },
   "containsPII": false,
   "containsSecrets": false
