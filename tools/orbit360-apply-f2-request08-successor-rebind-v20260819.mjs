@@ -51,7 +51,7 @@ for(const p of [paths.sourceWorkflow,paths.runtimeWorkflow]){
   s=replace(s,OLD.zipName,NEW.zipName);
   s=replace(s,OLD.zipSha,NEW.zipSha);
   s=replace(s,OLD.manifestSha,NEW.manifestSha);
-  s=replace(s,OLD.status,NEW.status);
+  if(s.includes(OLD.status)) s=replace(s,OLD.status,NEW.status);
   s=s.split('.inicioFiniteRootfixPass==true').join('.inicioFiniteRootfixPass==true and .routerReadinessRootfixPass==true');
   s=s.split('inicioFiniteRootfixPass:true').join('inicioFiniteRootfixPass:true,routerReadinessRootfixPass:true');
   fs.writeFileSync(p,s);
