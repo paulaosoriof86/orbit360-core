@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "orbit360-f2-request09-canonical-docsync-target-v1",
+  "requestVersion": "F2_REQUEST09_CANONICAL_DOCSYNC_V1",
+  "gateId": "f2-productive-acceptance-exact-successor-v20260818",
+  "targetCommit": "86c60634f4256c3e33ef1468b95c8b90f1da57b8",
+  "candidateArtifactId": 9387820198,
+  "scope": {
+    "writes": false,
+    "dataWrites": false,
+    "operationalWrites": false,
+    "authWrites": false,
+    "membershipWrites": false,
+    "deploy": false,
+    "production": false
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
