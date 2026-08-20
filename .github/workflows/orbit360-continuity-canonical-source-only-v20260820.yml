@@ -1,8 +1,8 @@
 name: Orbit360 Continuity Canonical Source Only
 
-# Fail-closed continuity lock while PRODUCTION_REOPENING_PACKAGE is open.
-# Repository projections and PR edits are intentionally disabled until CP-04
-# introduces revision-aware atomic projection semantics.
+# Fail-closed continuity audit while PRODUCTION_REOPENING_PACKAGE is open.
+# Repository projections and PR edits remain disabled until CP-04 introduces
+# revision-aware atomic projection semantics.
 on:
   push:
     branches:
@@ -11,6 +11,17 @@ on:
       - 'orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json'
       - 'orbit360-platform/docs/orbit360-continuity-writer-registry-v20260820.json'
       - 'orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json'
+      - 'orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json'
+      - 'orbit360-platform/docs/orbit360-live-state-v1.json'
+      - 'orbit360-platform/docs/CHECKPOINT-CONTROL-PLANE-HARDENING-20260820.md'
+      - 'tools/orbit360-gate-contract-f2-productive-acceptance-v20260820.json'
+      - 'tools/orbit360-gate-contract-registry-v20260717.json'
+      - 'tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-source-v20260819.json'
+      - 'tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-runtime-v20260819.json'
+      - 'tools/orbit360-validar-gate-contracts-v20260717.mjs'
+      - 'tools/orbit360-cp01-cp02-contract-authority-audit-v20260820.mjs'
+      - '.github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-runbound-20260820-14.json'
+      - '.github/orbit360-authorizations/f2-productive-acceptance-runtime-browser-readonly-request14-v20260820.json'
       - '.github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml'
   workflow_dispatch:
 
@@ -23,14 +34,15 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  enforce-hardening-lock:
+  enforce-hardening-lock-and-cp01-cp02:
     runs-on: ubuntu-latest
-    timeout-minutes: 3
+    timeout-minutes: 4
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ays/backend-tenant-lab-v99-20260703
           fetch-depth: 1
+
       - name: Enforce production reopening package lock
         shell: bash
         run: |
@@ -48,12 +60,16 @@ jobs:
           for (const key of ['runtimeAllowed','authorizationAllowed','requestMaterializationAllowed','secretAccessAllowed','firestoreReadAllowed','browserAllowed','writesAllowed','deployAllowed','publicationAllowed','productionAllowed','mainAllowed','mergeAllowed']) {
             if (pkg.lock?.[key] !== false) failures.push(`PACKAGE_${key}_MUST_BE_FALSE`);
           }
-          if (pkg.resumeProtocol?.firstIncompleteStep !== 'CP-01') failures.push('UNEXPECTED_FIRST_INCOMPLETE_STEP');
+          if (pkg.resumeProtocol?.firstIncompleteStep !== 'CP-03') failures.push('FIRST_INCOMPLETE_STEP_MUST_BE_CP03');
+          if (pkg.resumeProtocol?.nextActionExact !== 'CP-03_CREATE_SINGLE_REVISIONED_LEDGER_MUTATION_OWNER') failures.push('NEXT_ACTION_MUST_BE_CP03');
           if (ledger.productionReopeningPackage?.status !== 'OPEN_FAIL_CLOSED') failures.push('LEDGER_PACKAGE_STATUS_NOT_LOCKED');
+          if (ledger.productionReopeningPackage?.revision !== 2) failures.push('LEDGER_PACKAGE_REVISION_NOT_2');
+          if (ledger.productionReopeningPackage?.firstIncompleteStep !== 'CP-03') failures.push('LEDGER_FIRST_INCOMPLETE_STEP_NOT_CP03');
           if (ledger.authorizationBoundary?.nextRuntimeMaterializationAllowed !== false) failures.push('LEDGER_RUNTIME_MATERIALIZATION_NOT_BLOCKED');
           if (ledger.authorizationBoundary?.newRuntimeRequestAllowed !== false) failures.push('LEDGER_NEW_RUNTIME_REQUEST_NOT_BLOCKED');
           if (registry.canonicalWorkflowMode !== 'FAIL_CLOSED_READONLY_UNTIL_CP04') failures.push('WRITER_REGISTRY_MODE_NOT_LOCKED');
           if (registry.temporaryHardeningLock?.workflowMayMutateRepository !== false) failures.push('WORKFLOW_MUTATION_NOT_BLOCKED');
+          if (registry.nextHardeningStep !== 'CP-03') failures.push('WRITER_NEXT_STEP_NOT_CP03');
           if (failures.length) {
             console.error(JSON.stringify({ok:false,status:'HARDENING_LOCK_FAIL',failures}, null, 2));
             process.exit(1);
@@ -69,3 +85,12 @@ jobs:
             writesAllowed:false
           }, null, 2));
           NODE
+
+      - name: Syntax check canonical F2 preflight and audit
+        shell: bash
+        run: |
+          node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
+          node --check tools/orbit360-cp01-cp02-contract-authority-audit-v20260820.mjs
+
+      - name: Audit CP01 CP02 canonical F2 contract authority
+        run: node tools/orbit360-cp01-cp02-contract-authority-audit-v20260820.mjs
