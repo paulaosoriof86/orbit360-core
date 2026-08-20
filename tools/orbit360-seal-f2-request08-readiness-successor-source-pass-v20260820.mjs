@@ -1,0 +1,69 @@
+#!/usr/bin/env node
+'use strict';
+import fs from 'node:fs';
+
+const SOURCE='tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-source-v20260819.json';
+const RUNTIME='tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-runtime-v20260819.json';
+const LIVE='orbit360-platform/docs/orbit360-live-state-v1.json';
+const INDEX='orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json';
+const CHECKPOINT='orbit360-platform/docs/CHECKPOINT-F2-REQUEST08-READINESS-SUCCESSOR-SOURCE-PASS-REQUEST09-AUTH-PENDING-20260820.md';
+const ACADEMIA='orbit360-platform/docs/ACADEMIA-ACTUALIZACION-F2-REQUEST08-ROUTER-READINESS-20260820.md';
+const EVIDENCE='orbit360-platform/runtime-gate-crm-v20260716/f2-request08-readiness-successor-source-seal-v20260820.json';
+const NOW=new Date().toISOString();
+const C={artifactId:9387820198,sourceHead:'fc46bd85783d8b4d524cbeb0fee54ee9a2c774af',zipName:'orbit360-fase-a-product-f2-request08-router-readiness-successor-fc46bd85783d.zip',zipSha:'58fcbe6e8d7d3a425509c87f229b1cb12dd35a99133d46c757544cc75c55aacc',manifestSha:'b18422fdf82830d28e82f657f83b4fd5c10ea134a4735263fa2587a2ddd808cb',manifestStatus:'FASE_A_PRODUCT_F2_REQUEST08_ROUTER_READINESS_SUCCESSOR_CERTIFIED',fileCount:194,sourceRunId:32316010103,sourceEvidenceArtifactId:9388061716};
+const must=(v,c)=>{if(!v)throw new Error(c);};
+const j=p=>JSON.parse(fs.readFileSync(p,'utf8'));
+const w=(p,o)=>fs.writeFileSync(p,JSON.stringify(o,null,2)+'\n');
+for(const p of [SOURCE,RUNTIME,LIVE,INDEX])must(fs.existsSync(p),`SEAL_OWNER_MISSING:${p}`);
+
+const source=j(SOURCE);
+must(source.guards?.candidateArtifactId===C.artifactId,'SEAL_SOURCE_CANDIDATE_MISMATCH');
+must(source.sourceOnlyResult?.routerReadinessRootfixPass===true,'SEAL_READINESS_ROOTFIX_NOT_BOUND');
+source.status='F2_SOURCE_ONLY_PASS';
+source.sourceOnlyResult={
+  ...source.sourceOnlyResult,
+  ok:true,status:'CLOSED_PASS',classification:'PASS',predecessorArtifactId:9385306424,
+  candidateArtifactId:C.artifactId,candidateSourceHead:C.sourceHead,candidateZipSha256:C.zipSha,candidateManifestSha256:C.manifestSha,candidateManifestStatus:C.manifestStatus,candidateFileCount:C.fileCount,
+  sourceValidationRunId:C.sourceRunId,sourceEvidenceArtifactId:C.sourceEvidenceArtifactId,
+  canonicalRebindGatePassRunId:32315636095,persistenceRootfixRunId:32315869277,
+  fullRehashPass:true,inicioFiniteRootfixPass:true,routerReadinessRootfixPass:true,exactCandidateBound:true,surfaceTopologyBound:true,runtimeWorkflowPrepared:true,runtimeFreshAuthorizationRequired:true,
+  requestCreated:false,runtimeExecuted:false,browserExecuted:false,secretAccess:false,dataAccess:false,writes:0,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,publicationExecuted:false,productionTouched:false
+};
+source.authorization={...(source.authorization||{}),requiredForExecution:false,activeRequest:false,request:'DYNAMIC:SOURCE_ONLY_RUNBOUND',allowedExecutions:0,consumed:true,authorizationFrozen:true,replayAllowed:false};
+w(SOURCE,source);
+
+const runtime=j(RUNTIME);
+must(runtime.guards?.candidateArtifactId===C.artifactId,'SEAL_RUNTIME_CANDIDATE_MISMATCH');
+runtime.status='F2_RUNTIME_PENDING_FRESH_AUTHORIZATION';
+runtime.authorization={...(runtime.authorization||{}),requiredForExecution:true,activeRequest:false,request:'DYNAMIC:ORBIT360_REQUEST_FILE',allowedExecutions:0,consumed:false,authorizationFrozen:true,replayAllowed:false};
+runtime.sourceOnlyPrerequisite={status:'CLOSED_PASS',runId:C.sourceRunId,evidenceArtifactId:C.sourceEvidenceArtifactId,candidateArtifactId:C.artifactId,candidateSourceHead:C.sourceHead,fullRehashPass:true,inicioFiniteRootfixPass:true,routerReadinessRootfixPass:true};
+w(RUNTIME,runtime);
+
+const live=j(LIVE);
+live.stateVersion='20260820.f2.request08-readiness-successor-source-closed-request09-auth-pending.current';
+live.updatedAt=NOW;
+live.phase='F2_REQUEST08_READINESS_SUCCESSOR_SOURCE_CLOSED_REQUEST09_AUTH_PENDING';
+live.f2SourceOnly={...(live.f2SourceOnly||{}),status:'CLOSED_PASS',gateId:'f2-productive-acceptance-exact-successor-v20260818',candidateArtifactId:C.artifactId,candidateSourceHead:C.sourceHead,candidateZipSha256:C.zipSha,candidateManifestSha256:C.manifestSha,candidateManifestStatus:C.manifestStatus,candidateFileCount:C.fileCount,predecessorArtifactId:9385306424,sourceValidationRunId:C.sourceRunId,sourceEvidenceArtifactId:C.sourceEvidenceArtifactId,fullRehashPass:true,inicioFiniteRootfixPass:true,routerReadinessRootfixPass:true,runtimeWorkflowPrepared:true,requestCreated:false,runtimeAuthorized:false,browserAuthorized:false,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,productionTouched:false};
+live.failures={...(live.failures||{}),f2Request08RouterReadiness:{classification:'FUNCTIONAL_DEFECT',code:'F2_PRODUCT_APP_ROUTER_READINESS_PREMATURE',status:'ROOTFIX_CERTIFIED_IN_SUCCESSOR',requestRunId:32313759752,successorArtifactId:C.artifactId,productAffected:true,dataAffected:false,rootCause:'PRODUCT_APP_DECLARED_ROUTER_READY_BEFORE_HOST_RENDERED'},f2Request08RebindPersistence:{classification:'PIPELINE_MECHANISM_FAILURE',code:'REBIND_PERSIST_REBASE_BLOCKED_BY_UNSTAGED_PREFLIGHT',status:'CLOSED_BY_PERSISTENCE_ROOTFIX',failedRunId:32315636095,rootfixRunId:32315869277,gateHadPassedBeforePersistenceFailure:true,productAffected:false,dataAffected:false}};
+live.documentationControl={...(live.documentationControl||{}),currentCheckpoint:CHECKPOINT,transactionStatus:'F2_REQUEST08_READINESS_SUCCESSOR_SOURCE_CLOSED_REQUEST09_AUTH_PENDING',latestAcademiaUpdate:ACADEMIA};
+live.frozenPlan={...(live.frozenPlan||{}),currentPhase:'F2',currentPhaseInternalPercent:0,currentPhaseInternalMethod:'request08_readiness_successor_source_closed_request09_fresh_authorization_pending'};
+live.lanes={...(live.lanes||{}),A_frontend_UX:'FROZEN_REQUEST08_ROUTER_READINESS_SUCCESSOR_SOURCE_CLOSED_PASS',B_backend_security_gates:'F2_REQUEST09_FRESH_RUNTIME_AUTHORIZATION_PENDING',C_real_data_migration:'UNTOUCHED_ZERO_CHANGES'};
+live.authorization={...(live.authorization||{}),f2AuthorizationStatus:`FRESH_AUTHORIZATION_REQUIRED_REQUEST09_EXACT_ARTIFACT_${C.artifactId}`,browserAuthorizedNow:false,runtimeAuthorizedNow:false,publicationAuthorizedNow:false,deployAuthorizedNow:false,authChangesAuthorized:false,membershipChangesAuthorized:false,dataChangesAuthorized:false,mainMergeAuthorized:false};
+live.goLive={...(live.goLive||{}),status:'BLOCKED_F2_REQUEST09_FRESH_AUTHORIZATION_REQUIRED',successorPublished:false,productionOperationalDeclared:false,sensitiveWritesRemainRestricted:true};
+live.nextActionExact={action:'OBTAIN_FRESH_AUTHORIZATION_FOR_REQUEST09',gateId:'f2-productive-acceptance-exact-successor-v20260818',requestVersion:'F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_V1',candidateArtifactId:C.artifactId};
+live.request08={...(live.request08||{}),status:'CONSUMED_FUNCTIONAL_DEFECT_ROOTFIXED_IN_SUCCESSOR',runId:32313759752,replayAllowed:false,successorArtifactId:C.artifactId};
+live.request09={created:false,authorizationGranted:false,replayAllowed:false,candidateArtifactId:C.artifactId};
+w(LIVE,live);
+
+const index=j(INDEX);
+index.updatedAt=NOW;
+index.operationalCurrent={...(index.operationalCurrent||{}),resumePointer:CHECKPOINT,currentCheckpoint:CHECKPOINT,currentPhase:'F2_REQUEST08_READINESS_SUCCESSOR_SOURCE_CLOSED_REQUEST09_AUTH_PENDING',currentPhaseInternalPercent:0,currentPhaseInternalMethod:'request08_readiness_successor_source_closed_request09_fresh_authorization_pending',goLiveRoutePercentClosed:50,integratedProgramPercentClosed:25,currentBlocker:`Fresh explicit authorization is required for Request09 against exact artifact ${C.artifactId}. SOURCE is CLOSED_PASS after router-readiness rootfix.`,f2SourceOnlyStatus:'CLOSED_PASS',f2SourceOnlyGateId:'f2-productive-acceptance-exact-successor-v20260818',f2RuntimeRequestCreated:false,f2RuntimeAuthorizationGranted:false,successorCandidateArtifactId:C.artifactId,successorEvidenceArtifactId:String(C.sourceEvidenceArtifactId),successorZip:C.zipName,successorZipSha256:C.zipSha,successorManifestSha256:C.manifestSha,successorSourceHead:C.sourceHead,successorFileCount:C.fileCount,successorCandidateManifestStatus:C.manifestStatus,successorPublished:false,latestRuntimeEvidence:'orbit360-platform/runtime-gate-crm-v20260716/f2-request08-successor-source-validation-discovery-v20260820.json',latestTerminalEvidence:'orbit360-platform/runtime-gate-crm-v20260716/f2-request08-successor-source-validation-discovery-v20260820.json',latestRequestConsumptionEvidence:'orbit360-platform/runtime-gate-crm-v20260716/f2-request08-successor-source-validation-discovery-v20260820.json',latestValidatorSourcefixEvidence:'orbit360-platform/runtime-gate-crm-v20260716/f2-request08-readiness-successor-source-seal-v20260820.json',latestAcademiaUpdate:ACADEMIA,nextAuthorizationBoundary:`FRESH_AUTHORIZATION_REQUIRED:F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_V1:REQUEST09:EXACT_ARTIFACT_${C.artifactId}`,request08Status:'CONSUMED_FUNCTIONAL_DEFECT_ROOTFIXED_IN_SUCCESSOR',request08RunId:'32313759752',request08ReplayAllowed:false,request09Created:false,request09AuthorizationGranted:false,request09CandidateArtifactId:C.artifactId,request08SuccessorSourceValidationRunId:String(C.sourceRunId),request08SuccessorSourceEvidenceArtifactId:String(C.sourceEvidenceArtifactId),request08SuccessorRouterReadinessRootfixPass:true};
+w(INDEX,index);
+
+fs.writeFileSync(CHECKPOINT,`# CHECKPOINT F2 — Request08 readiness successor SOURCE PASS · Request09 authorization pending\n\nFecha: 2026-08-20\n\n## Estado canónico\n- F1: CLOSED_PASS.\n- F2 SOURCE: CLOSED_PASS.\n- Candidata exacta: artifact ${C.artifactId}.\n- Source head: ${C.sourceHead}.\n- ZIP SHA256: ${C.zipSha}.\n- Manifest SHA256: ${C.manifestSha}.\n- File count: 194.\n- SOURCE run: ${C.sourceRunId}.\n- SOURCE evidence artifact: ${C.sourceEvidenceArtifactId}.\n- fullRehashPass: true.\n- inicioFiniteRootfixPass: true.\n- routerReadinessRootfixPass: true.\n\n## Request08\nRequest08 run 32313759752 fue consumido y no es replayable. Detectó FUNCTIONAL_DEFECT:F2_PRODUCT_APP_ROUTER_READINESS_PREMATURE. El producto declaraba readiness antes de que el Router hubiera renderizado #host. El rootfix está certificado en la candidata ${C.artifactId}.\n\n## Pipeline root cause\nEl rebind tuvo un fallo de persistencia posterior a un gate SOURCE PASS: PIPELINE_MECHANISM_FAILURE:REBIND_PERSIST_REBASE_BLOCKED_BY_UNSTAGED_PREFLIGHT. Se cerró mediante persistencia separada de owners no-workflow y transporte de workflow owners por el conector GitHub. No se repitió Request08 ni se ejecutó runtime para resolverlo.\n\n## Carriles\n- A: producto congelado en candidata ${C.artifactId}, SOURCE CLOSED_PASS.\n- B: runtime pendiente de autorización humana fresca Request09.\n- C: datos A&S sin cambios.\n\n## Límites\nRequest09 no existe y no está autorizado. No hay autorización vigente para browser/runtime/secrets/Firestore read, writes, deploy, publicación, producción, main o merge.\n\n## Siguiente acción exacta\nObtener autorización fresca para F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_V1 / REQUEST09 / EXACT_ARTIFACT_${C.artifactId}.\n`);
+
+fs.writeFileSync(ACADEMIA,`# Academia Orbit 360 — actualización F2 Request08 Router Readiness\n\nFecha: 2026-08-20\nClasificación Claude: REPLICABLE_CLAUDE_INMEDIATO\n\n## Aprendizaje reusable\nUn runtime puede tener autenticación, store y tenant correctos y aun no estar listo para pruebas visuales. Product App no debe declarar started/routerStarted únicamente porque invocó Router.init(); debe esperar una señal observable de montaje real. En este caso, #host debía estar renderizado antes de exponer readiness.\n\n## Diferenciar causas\n- FUNCTIONAL_DEFECT: el producto declara readiness antes del montaje efectivo.\n- VALIDATOR_STALE: el test espera una candidata, selector o contrato histórico que ya no representa el producto.\n- DATA_CONTRACT_FAILURE: los datos/identidad no cumplen el contrato; no aplica cuando integridad y bindings pasan.\n- PIPELINE_MECHANISM_FAILURE: el producto/gate pasan pero falla transporte, persistencia o workflow; ejemplo: rebase bloqueado por evidencia no restaurada.\n\n## Patrón preventivo\n1. Gate canónico antes de secretos/runtime.\n2. Readiness debe estar vinculado a una condición real del owner, no a la mera llamada de inicialización.\n3. Source validation debe rehashar el artifact completo y probar el rootfix específico.\n4. Separar scope del observer del scope del target: observar un runtime no concede runtime.\n5. Si una etapa falla dos veces, congelar reintentos y corregir causa raíz del mecanismo.\n\n## Estado de esta actualización\nArtifact ${C.artifactId}; SOURCE run ${C.sourceRunId}; 194/194 rehash PASS; inicioFiniteRootfixPass=true; routerReadinessRootfixPass=true; runtime/browser/secrets/writes/deploy/producción=0 en SOURCE.\n`);
+
+const evidence={schemaVersion:'orbit360-f2-request08-readiness-successor-source-seal-v1',ok:true,status:'F2_REQUEST08_READINESS_SUCCESSOR_SOURCE_CLOSED_PASS',classification:'PASS',candidateArtifactId:C.artifactId,candidateSourceHead:C.sourceHead,zipSha256:C.zipSha,manifestSha256:C.manifestSha,fileCount:C.fileCount,sourceValidationRunId:C.sourceRunId,sourceEvidenceArtifactId:C.sourceEvidenceArtifactId,fullRehashPass:true,inicioFiniteRootfixPass:true,routerReadinessRootfixPass:true,rebindGatePassRunId:32315636095,persistenceRootfixRunId:32315869277,sourceLifecycleClosed:true,runtimeFreshAuthorizationRequired:true,request09Created:false,request09Authorized:false,browserExecuted:false,runtimeExecuted:false,secretAccess:false,firestoreRead:false,firestoreWrites:0,authWrites:0,membershipWrites:0,dataWrites:0,operationalWrites:0,deployExecuted:false,publicationExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
+w(EVIDENCE,evidence);
+console.log(JSON.stringify(evidence,null,2));
