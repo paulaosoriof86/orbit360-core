@@ -1,10 +1,12 @@
 {
   "schemaVersion": "orbit360-actions-push-pulse-trigger-v1",
-  "mode": "source-only",
+  "mode": "request11-dispatch-probe",
   "singlePulse": true,
-  "purpose": "Verify current Actions push channel after immutable Request11 commit 1809552cc6dceacae1527be34299ef17b32bff98; no Request11 replay",
-  "probeOrdinal": 6,
-  "triggeredAt": "2026-08-20T04:12:00.000Z",
+  "purpose": "Persist exact GitHub Actions dispatch metadata for immutable Request11 commit 1809552cc6dceacae1527be34299ef17b32bff98 without replay",
+  "probeOrdinal": 7,
+  "triggeredAt": "2026-08-20T04:18:00.000Z",
+  "targetSha": "1809552cc6dceacae1527be34299ef17b32bff98",
+  "request11Replay": false,
   "browser": false,
   "runtime": false,
   "secrets": false,
@@ -12,7 +14,6 @@
   "writes": false,
   "deploy": false,
   "production": false,
-  "request11Replay": false,
   "containsPII": false,
   "containsSecrets": false
 }
