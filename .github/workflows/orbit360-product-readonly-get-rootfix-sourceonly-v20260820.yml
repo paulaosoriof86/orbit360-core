@@ -1,0 +1,61 @@
+name: Orbit360 Product Readonly Get Rootfix Sourceonly 20260820
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - '.github/workflows/orbit360-product-readonly-get-rootfix-sourceonly-v20260820.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout exact branch head
+        uses: actions/checkout@v4
+        with:
+          ref: ays/backend-tenant-lab-v99-20260703
+          fetch-depth: 0
+
+      - name: Run rootfix contract and retain result
+        id: verify
+        shell: bash
+        run: |
+          set +e
+          mkdir -p orbit360-platform/runtime-gate-crm-v20260716
+          tmp="$(mktemp)"
+          node tools/orbit360-validar-product-readonly-get-rootfix-v20260820.mjs >"$tmp" 2>&1
+          rc=$?
+          evidence="orbit360-platform/runtime-gate-crm-v20260716/f2-product-readonly-get-rootfix-sourceonly-v20260820.json"
+          if node -e 'JSON.parse(require("fs").readFileSync(process.argv[1],"utf8"))' "$tmp" >/dev/null 2>&1; then
+            cp "$tmp" "$evidence"
+          else
+            RC="$rc" node - <<'NODE' > "$evidence"
+          const rc=Number(process.env.RC||1);
+          console.log(JSON.stringify({ok:false,status:'F2_PRODUCT_READONLY_GET_ROOTFIX_SOURCEONLY_FAIL',classification:'PIPELINE_MECHANISM_FAILURE',code:'ROOTFIX_TEST_NON_JSON_FAILURE',exitCode:rc,browser:false,secrets:false,firestore:false,writes:0,containsPII:false,containsSecrets:false},null,2));
+          NODE
+          fi
+          echo "rc=$rc" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Persist sanitized evidence
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add orbit360-platform/runtime-gate-crm-v20260716/f2-product-readonly-get-rootfix-sourceonly-v20260820.json
+          if git diff --cached --quiet; then
+            echo "No evidence diff"
+          else
+            git commit -m "test(f2): persist product readonly get rootfix evidence [skip ci]"
+            git pull --rebase origin ays/backend-tenant-lab-v99-20260703
+            git push origin HEAD:ays/backend-tenant-lab-v99-20260703
+          fi
+
+      - name: Enforce rootfix result after persistence
+        run: test "${{ steps.verify.outputs.rc }}" = "0"
