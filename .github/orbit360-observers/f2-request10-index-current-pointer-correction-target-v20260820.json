@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "orbit360-docsync-correction-trigger-v1",
+  "requestVersion": "F2_REQUEST10_INDEX_CURRENT_POINTER_CORRECTION_V1",
+  "request10RunId": 32318415706,
+  "candidateArtifactId": 9387820198,
+  "productMutation": false,
+  "dataMutation": false,
+  "browser": false,
+  "runtime": false,
+  "secrets": false,
+  "firestoreRead": false,
+  "writes": false,
+  "deploy": false,
+  "production": false,
+  "request11Created": false,
+  "request11Authorized": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
