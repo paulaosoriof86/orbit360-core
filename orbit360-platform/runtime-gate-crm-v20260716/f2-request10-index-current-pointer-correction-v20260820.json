@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "orbit360-f2-request10-index-current-pointer-correction-v1",
+  "ok": true,
+  "status": "F2_REQUEST10_INDEX_CURRENT_POINTER_CORRECTION_PASS",
+  "classification": "VALIDATOR_STALE_ROOTFIX",
+  "rootCause": "DUPLICATED_CURRENT_INDEX_FIELDS_RETAINED_STALE_REQUEST10_AUTH_AND_PREVIOUS_EVIDENCE_POINTERS",
+  "checks": {
+    "preflightCurrent": true,
+    "artifactCurrent": true,
+    "runtimeCurrent": true,
+    "request10Authorized": true,
+    "request10Consumed": true,
+    "request11Pending": true,
+    "checkpointCurrent": true,
+    "candidateFrozen": true,
+    "sourcefixCurrent": true
+  },
+  "productMutation": false,
+  "dataMutation": false,
+  "browserExecuted": false,
+  "runtimeExecuted": false,
+  "secretAccess": false,
+  "firestoreRead": false,
+  "writes": 0,
+  "deployExecuted": false,
+  "productionTouched": false,
+  "request11Created": false,
+  "request11Authorized": false,
+  "containsPII": false,
+  "containsSecrets": false
+}

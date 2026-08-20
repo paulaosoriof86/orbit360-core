@@ -1,6 +1,6 @@
 {
   "schemaVersion": "orbit360-current-documentation-index-v1",
-  "updatedAt": "2026-08-20T00:54:00.000Z",
+  "updatedAt": "2026-08-20T00:57:00.000Z",
   "status": "CURRENT_BINDING_INDEX",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -87,8 +87,8 @@
     "latestF1_4CBuildEvidence": "orbit360-platform/runtime-gate-crm-v20260716/f1-4c-successor-artifact-certification-v20260818.json",
     "latestRuntimeEvidence": "orbit360-platform/runtime-gate-crm-v20260716/f2-request10-consumed-validator-stale-rootfix-closure-v20260820.json",
     "latestTerminalEvidence": "orbit360-platform/runtime-gate-crm-v20260716/f2-request10-consumed-validator-stale-rootfix-closure-v20260820.json",
-    "latestPreflightEvidence": "orbit360-platform/runtime-gate-crm-v20260716/f2-request09-runtime-discovery-v20260820.json",
-    "latestArtifactVerificationEvidence": "orbit360-platform/runtime-gate-crm-v20260716/f2-request08-readiness-successor-source-seal-v20260820.json",
+    "latestPreflightEvidence": "orbit360-platform/runtime-gate-crm-v20260716/f2-request10-consumed-validator-stale-rootfix-closure-v20260820.json",
+    "latestArtifactVerificationEvidence": "orbit360-platform/runtime-gate-crm-v20260716/f2-request10-consumed-validator-stale-rootfix-closure-v20260820.json",
     "latestRequestConsumptionEvidence": "orbit360-platform/runtime-gate-crm-v20260716/f2-request10-consumed-validator-stale-rootfix-closure-v20260820.json",
     "currentCheckpoint": "orbit360-platform/docs/CHECKPOINT-F2-REQUEST10-CONSUMED-VISIBILITY-VALIDATOR-STALE-ROOTFIX-PASS-REQUEST11-AUTH-PENDING-20260820.md",
     "currentPhase": "F2_REQUEST10_CONSUMED_VISIBILITY_VALIDATOR_STALE_ROOTFIX_PASS_REQUEST11_AUTHORIZATION_PENDING",
@@ -273,7 +273,7 @@
     "request09RouteObservabilitySourcefixRunId": 32317619703,
     "request09RouteObservabilitySourcefixPass": true,
     "request10Created": true,
-    "request10Authorized": false,
+    "request10Authorized": true,
     "request10AuthorizationGranted": true,
     "request10Consumed": true,
     "request10ReplayAllowed": false,
@@ -490,5 +490,7 @@
       "dataMutation": false
     },
     "nextRequest": "REQUEST11_FRESH_AUTHORIZATION_REQUIRED"
-  }
+  },
+  "latestPreflightEvidence": "orbit360-platform/runtime-gate-crm-v20260716/f2-request10-consumed-validator-stale-rootfix-closure-v20260820.json",
+  "latestArtifactVerificationEvidence": "orbit360-platform/runtime-gate-crm-v20260716/f2-request10-consumed-validator-stale-rootfix-closure-v20260820.json"
 }
