@@ -1,15 +1,10 @@
 {
   "schemaVersion": "orbit360-actions-push-pulse-trigger-v1",
-  "mode": "request11-reconcile",
+  "mode": "source-only",
   "singlePulse": true,
-  "request11Reconcile": true,
-  "approvedAuthorizationAlreadyExists": true,
-  "authorizationBasis": "USER_EXPLICIT_AUTHORIZATION_F2_REQUEST11_2026-08-19_READONLY_ARTIFACT_9387820198",
-  "requestOrdinal": 11,
-  "candidateArtifactId": 9387820198,
-  "purpose": "Execute settled registered workflow revision: persist Request11 authorization, synchronize every active mirror, enforce invariant and readback",
-  "probeOrdinal": 5,
-  "precondition": "REGISTERED_WORKFLOW_REVISION_079309897060bf824e0a07e42889d32bc97955d9_SETTLED",
+  "purpose": "Verify current Actions push channel after immutable Request11 commit 1809552cc6dceacae1527be34299ef17b32bff98; no Request11 replay",
+  "probeOrdinal": 6,
+  "triggeredAt": "2026-08-20T04:12:00.000Z",
   "browser": false,
   "runtime": false,
   "secrets": false,
@@ -17,6 +12,7 @@
   "writes": false,
   "deploy": false,
   "production": false,
+  "request11Replay": false,
   "containsPII": false,
   "containsSecrets": false
 }
