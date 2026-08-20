@@ -1,8 +1,8 @@
 {
   "schemaVersion": "orbit360-live-state-v1",
-  "stateVersion": "20260820.f2.request09-consumed-route-observability-rootfix-pass-request10-auth-pending.current",
-  "updatedAt": "2026-08-20T00:35:29.595Z",
-  "phase": "F2_REQUEST09_CONSUMED_ROUTE_OBSERVABILITY_ROOTFIX_PASS_REQUEST10_AUTH_PENDING",
+  "stateVersion": "20260820.f2.request10-consumed-visibility-validator-stale-rootfix-pass-request11-auth-pending.current",
+  "updatedAt": "2026-08-20T00:54:00.000Z",
+  "phase": "F2_REQUEST10_CONSUMED_VISIBILITY_VALIDATOR_STALE_ROOTFIX_PASS_REQUEST11_AUTH_PENDING",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pr": 5,
@@ -257,12 +257,12 @@
       "productAffected": false
     },
     "currentBlockingFact": {
-      "code": "F2_REQUEST10_RUNTIME_FRESH_AUTHORIZATION_REQUIRED",
+      "code": "F2_REQUEST11_RUNTIME_FRESH_AUTHORIZATION_REQUIRED",
       "status": "FRESH_AUTHORIZATION_REQUIRED",
       "candidateArtifactId": 9387820198,
       "candidateSourceHead": "fc46bd85783d8b4d524cbeb0fee54ee9a2c774af",
-      "priorRequest": "REQUEST09_CONSUMED",
-      "priorRunId": 32316883621
+      "priorRequest": "REQUEST10_CONSUMED",
+      "priorRunId": 32318415706
     },
     "authIsCurrentBlocker": false,
     "passwordIsCurrentBlocker": false,
@@ -432,6 +432,18 @@
       "sourcefixStatus": "F2_REQUEST09_ROUTE_OBSERVABILITY_ROOTFIX_SOURCE_APPLIED",
       "preventiveControl": "Preserve strict visible-host acceptance while labeling view/route and capturing rendered-vs-visible, authStage, pre-auth and geometry.",
       "request09ReplayAllowed": false
+    },
+    "f2Runtime10VisibilityValidatorStale": {
+      "classification": "VALIDATOR_STALE",
+      "code": "F2_ROUTE_VISIBLE_WAIT_CONTRADICTS_CAPTURED_DOM_STATE",
+      "status": "CLOSED_SOURCE_ONLY_ROOTFIX_PASS",
+      "request10RunId": 32318415706,
+      "evidenceArtifactId": 9388976113,
+      "sourcefixCommit": "b3b06778d45edb15fc5bdddcd8f5cd504b57c7f0",
+      "productAffected": false,
+      "dataAffected": false,
+      "integrityBeforeAfterPass": true,
+      "preventiveControl": "EXPLICIT_ROUTE_READINESS_CONTRACT_PLUS_CAPTURED_STATE_CONTRADICTION_GUARD"
     }
   },
   "documentationControl": {
@@ -1127,5 +1139,57 @@
     "replayAllowed": false,
     "rootCause": "PIPELINE_MECHANISM_FAILURE:F2_BROWSER_ROUTE_WAIT_UNLABELED",
     "routeObservabilitySourcefixRunId": 32317619703
+  },
+  "currentCheckpoint": "orbit360-platform/docs/CHECKPOINT-F2-REQUEST10-CONSUMED-VISIBILITY-VALIDATOR-STALE-ROOTFIX-PASS-REQUEST11-AUTH-PENDING-20260820.md",
+  "nextAuthorizationBoundary": "F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_V1:REQUEST11:EXACT_ARTIFACT_9387820198",
+  "f2Runtime10": {
+    "request": "REQUEST10",
+    "requestCommit": "c3482f65b3f8deb911d756fb09383497e59cb702",
+    "runId": 32318415706,
+    "jobId": 96275510663,
+    "evidenceArtifactId": 9388976113,
+    "consumed": true,
+    "replayAllowed": false,
+    "status": "CONSUMED_STOP_VALIDATOR_STALE_ROUTE_VISIBILITY",
+    "classification": "VALIDATOR_STALE",
+    "code": "F2_ROUTE_VISIBLE_WAIT_CONTRADICTS_CAPTURED_DOM_STATE",
+    "gatePass": true,
+    "candidateVerificationPass": true,
+    "identityReadOnlyPass": true,
+    "runtimeExecuted": true,
+    "browserExecuted": true,
+    "integrityBeforeAfterPass": true,
+    "exactObservedLocation": "desktopDirection:polizas",
+    "observedHost": {
+      "exists": true,
+      "childElementCount": 1,
+      "textLength": 18141,
+      "display": "block",
+      "visibility": "visible",
+      "width": 1192,
+      "height": 7866,
+      "bodyPreAuth": false,
+      "loginHidden": true,
+      "hash": "#/polizas"
+    },
+    "pageErrors": 0,
+    "consoleErrors": 0,
+    "writeSignals": 0,
+    "firestoreWrites": 0,
+    "authWrites": 0,
+    "membershipWrites": 0,
+    "dataWrites": 0,
+    "operationalWrites": 0,
+    "deployExecuted": false,
+    "productionTouched": false,
+    "sourcefix": {
+      "status": "CLOSED_SOURCE_ONLY_PASS",
+      "commit": "b3b06778d45edb15fc5bdddcd8f5cd504b57c7f0",
+      "evidence": "orbit360-platform/runtime-gate-crm-v20260716/f2-request10-route-visibility-validator-sourcefix-v20260820.json",
+      "productMutation": false,
+      "candidateRebuild": false,
+      "dataMutation": false
+    },
+    "nextRequest": "REQUEST11_FRESH_AUTHORIZATION_REQUIRED"
   }
 }
