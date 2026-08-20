@@ -1,7 +1,7 @@
 {
   "schemaVersion": "orbit360-live-state-v1",
   "stateVersion": "ORBIT360-F2-CONTINUITY-CURRENT",
-  "updatedAt": "2026-08-20T13:50:00Z",
+  "updatedAt": "2026-08-20T16:12:00Z",
   "phase": "CONTROL_PLANE_HARDENING_BEFORE_F2_RUNTIME_REOPEN",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -10,10 +10,11 @@
   "currentCheckpoint": "orbit360-platform/docs/CHECKPOINT-CONTROL-PLANE-HARDENING-20260820.md",
   "continuityLedger": "orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json",
   "productionReopeningPackage": "orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json",
+  "canonicalF2ContractAuthority": "tools/orbit360-gate-contract-f2-productive-acceptance-v20260820.json",
   "canonicalCurrent": {
     "stateVersion": "ORBIT360-F2-CONTINUITY-CURRENT",
     "status": "PRODUCTION_REOPENING_PACKAGE_OPEN_FAIL_CLOSED",
-    "rootCauseStatus": "SYSTEMIC_ROOT_CAUSE_CONFIRMED_PENDING_HARDENING"
+    "rootCauseStatus": "CP01_CP02_SOURCE_ONLY_RESOLVED_CP03_PENDING"
   },
   "authorization": {
     "activeRuntimeAuthorization": false,
@@ -37,16 +38,18 @@
     "soleProjectionLogic": "tools/orbit360-continuity-sync-v20260820.mjs",
     "continuityInvariant": "tools/orbit360-f2-continuity-invariant-v20260820.mjs",
     "divergenceClassification": "PIPELINE_MECHANISM_FAILURE:CONTROL_PLANE_NOT_FULLY_ATOMIC",
-    "projectionWritesTemporarilyBlockedUntilCP04": true
+    "projectionWritesTemporarilyBlockedUntilCP04": true,
+    "contractAuthorityRootfixStatus": "CP01_CP02_SOURCE_ONLY_RESOLVED"
   },
   "nextActionExact": {
-    "id": "CP-01_UNIFY_F2_GATE_CONTRACT_AUTHORITY",
-    "description": "Continue the persisted production reopening package from CP-01. Do not request runtime authorization or materialize a new request ordinal while the package is open.",
+    "id": "CP-03_CREATE_SINGLE_REVISIONED_LEDGER_MUTATION_OWNER",
+    "description": "Continue the persisted production reopening package from CP-03. Runtime authorization and new request ordinals remain blocked.",
     "runtimeAllowed": false
   },
   "stopRetry": {
     "sameFailureFamily": "F2_ACTIVE_PIPELINE_HISTORICAL_CANDIDATE_LITERAL",
     "sameFamilyObservedAgainOnRequest14": true,
+    "request14MetadataReconciled": true,
     "historicalRuntimeReplayAllowed": false,
     "nextRuntimeMaterializationAllowed": false,
     "newRuntimeOrdinalAllowed": false,
@@ -54,7 +57,7 @@
   },
   "lanes": {
     "A_frontend_ux_academia": "PRODUCT_FROZEN_NO_REOPEN",
-    "B_backend_security_gates": "CONTROL_PLANE_HARDENING_CP01_REQUIRED_FAIL_CLOSED",
+    "B_backend_security_gates": "CONTROL_PLANE_HARDENING_CP03_REQUIRED_FAIL_CLOSED",
     "C_real_data_migration": "UNCHANGED_FROZEN"
   },
   "progress": {
@@ -66,7 +69,7 @@
   "activeState": {
     "phase": "CONTROL_PLANE_HARDENING_BEFORE_F2_RUNTIME_REOPEN",
     "status": "PRODUCTION_REOPENING_PACKAGE_OPEN_FAIL_CLOSED",
-    "rootCauseStatus": "SYSTEMIC_ROOT_CAUSE_CONFIRMED_PENDING_HARDENING",
+    "rootCauseStatus": "CP01_CP02_SOURCE_ONLY_RESOLVED_CP03_PENDING",
     "productFrozen": true,
     "dataFrozen": true,
     "runtimeAuthorized": false,
@@ -79,8 +82,6 @@
     "artifactId": 9395391426,
     "sourceHead": "6af0c029aebb1bfecd05569452c814584110ae4c",
     "artifactDigest": "c089ea81672225876f643399b970d1e50e7d9cdc084dfc75973e00ed8581c53c",
-    "zipSha256": "e1a711806d4ffd78004dbe5a30ebf8c5db59aaf23d2b8cd65e78b291cedc53d0",
-    "manifestSha256": "44dee7cebb174dfd630641d1e16ac649edffec18af688b62e05ceff4dc5812a5",
     "fileCount": 194,
     "runtimeAuthorized": false,
     "rebuildAllowed": false
@@ -95,7 +96,7 @@
     "secretAccess": false,
     "firestoreRead": false,
     "writes": 0,
-    "requestMetadataStillClaimsUnconsumed": true,
+    "requestMetadataReconciled": true,
     "replayAllowed": false
   },
   "containsPII": false,
