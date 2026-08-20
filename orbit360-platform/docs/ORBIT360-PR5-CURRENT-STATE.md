@@ -9,7 +9,7 @@ Rama: `ays/backend-tenant-lab-v99-20260703` · PR #5 draft/open · sin main/merg
 3. `orbit360-platform/docs/orbit360-continuity-writer-registry-v20260820.json`;
 4. `orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json`;
 5. `orbit360-platform/docs/orbit360-live-state-v1.json`;
-6. `orbit360-platform/docs/CHECKPOINT-F2-SUCCESSOR-SOURCEONLY-CANDIDATE-CERTIFIED-20260820.md`;
+6. `orbit360-platform/docs/CHECKPOINT-F2-RUNTIME-PREGATE-VALIDATOR-STALE-ROOTFIXED-20260820.md`;
 7. evidencia de continuidad + HEAD real.
 
 El estado activo **no depende del ordinal de ningún Request ni de una candidata histórica**. Ambos existen solo como evidencia histórica sellada.
@@ -23,7 +23,7 @@ El estado activo **no depende del ordinal de ningún Request ni de una candidata
 - No hay autorización runtime activa ni carry-forward.
 
 ## Historial sellado
-- Último runtime consumido: ordinal histórico 12, run `32332301619`, no replay, cero writes.
+- Último runtime consumido: ordinal histórico 13, run `32339845253`, no replay, cero writes.
 - Artifact histórico `9387820198`: no reutilizable.
 
 ## Continuidad antibucle
@@ -34,6 +34,6 @@ El estado activo **no depende del ordinal de ningún Request ni de una candidata
 Cualquier writer independiente, ordinal de Request o binding al artifact histórico dentro del estado/guards activos = `PIPELINE_MECHANISM_FAILURE` y bloqueo fail-closed.
 
 ## Siguiente acción exacta
-`AWAIT_FRESH_EXPLICIT_AUTHORIZATION_FOR_CERTIFIED_F2_SUCCESSOR_RUNTIME`: The new F2 successor candidate is certified source-only. Preserve it frozen and await a fresh explicit authorization before creating or materializing any runtime request; no authorization carry-forward, replay, deploy, publication or production action is allowed.
+`AWAIT_FRESH_EXPLICIT_AUTHORIZATION_FOR_CERTIFIED_F2_SUCCESSOR_RUNTIME`: The certified F2 successor remains frozen. The last authorized execution was consumed pre-gate as validator-stale and is sealed in history; a fresh explicit authorization is required before any new runtime request. No carry-forward, replay, deploy, publication or production action is allowed.
 
 Ruta inmediata a producción: **50%**. Programa integral: **25%**. No aumentan por certificación source-only.
