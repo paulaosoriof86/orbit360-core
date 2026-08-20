@@ -62,3 +62,12 @@ Formato basado en *Keep a Changelog*. Construcción greenfield; el estado operat
 - Pólizas permanece bloqueado y requiere fuente real vigente específica.
 
 ## [1.93.0] — 2026-07-03 · Consolidado v1.56–v1.93
+
+<!-- ORBIT360_CURRENT_STATE_START -->
+## [F2-CONTINUITY-CURRENT] — 2026-08-20 UTC · `ORBIT360-F2-CONTINUITY-CURRENT`
+- Estado activo ordinal-free: `ROOTFIX_SOURCEONLY_VERIFIED_PENDING_SUCCESSOR_CANDIDATE`.
+- Rootfix source-only verificado: `F2_PRODUCT_READONLY_GET_FULL_COLLECTION_CLONE_AMPLIFICATION`.
+- El runtime consumido previo queda solo como historia sellada; no replay.
+- Artifact histórico `9387820198` no se reutiliza; se requiere candidata sucesora source-only.
+- Un solo owner de proyección: `tools/orbit360-continuity-sync-v20260820.mjs`.
+<!-- ORBIT360_CURRENT_STATE_END -->

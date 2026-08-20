@@ -57,3 +57,17 @@ Ruta inmediata a producción: 50% cerrada hasta F2 terminal PASS. Programa integ
 `node tools/orbit360-f2-continuity-invariant-v20260820.mjs`
 
 Solo `F2_CONTINUITY_ANTI_LOOP_AUDIT_PASS` habilita la siguiente acción técnica source-only. El historial vive en checkpoints/evidencias/requests/autorizaciones; no debe duplicarse como estado actual en múltiples owners.
+
+<!-- ORBIT360_CURRENT_STATE_START -->
+## Estado operativo vivo — autoridad única
+
+- StateVersion: `ORBIT360-F2-CONTINUITY-CURRENT` (sin ordinal de Request).
+- Fase: `F2_PRODUCTIVE_ACCEPTANCE_SOURCE_ROOTFIX_VERIFIED`.
+- Estado: `ROOTFIX_SOURCEONLY_VERIFIED_PENDING_SUCCESSOR_CANDIDATE`.
+- Causa funcional: `FUNCTIONAL_DEFECT:F2_PRODUCT_READONLY_GET_FULL_COLLECTION_CLONE_AMPLIFICATION`, verificada source-only.
+- Artifact histórico `9387820198`: no reutilizable para runtime sucesor.
+- No existe autorización runtime activa; cualquier sucesor exige candidata nueva certificada + autorización explícita fresca.
+- Autoridad: `orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json`; writers: `orbit360-platform/docs/orbit360-continuity-writer-registry-v20260820.json`; proyección: `tools/orbit360-continuity-sync-v20260820.mjs`.
+- Los ordinales de Request pertenecen únicamente al historial/evidencia sellada.
+- Siguiente acción: `PREPARE_VALIDATE_SUCCESSOR_F2_SOURCEONLY_CANDIDATE`.
+<!-- ORBIT360_CURRENT_STATE_END -->
