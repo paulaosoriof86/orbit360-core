@@ -1,0 +1,44 @@
+{
+  "schemaVersion": "orbit360-f2-gate-contract-authority-v1",
+  "authorityId": "ORBIT360-F2-PRODUCTIVE-ACCEPTANCE-CONTRACT-CURRENT",
+  "gateId": "f2-productive-acceptance-exact-successor-v20260818",
+  "gateContractVersion": "2.2.0",
+  "lifecycleComposition": "phase-capability-contract-v6-canonical-authority",
+  "status": "CONTROL_PLANE_HARDENING_SOURCE_ONLY",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "lifecycles": {
+    "source": "tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-source-v20260819.json",
+    "runtime": "tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-runtime-v20260819.json"
+  },
+  "engine": "tools/orbit360-validar-gate-contracts-engine-f2-productive-acceptance-v20260819.mjs",
+  "mandatoryPreflight": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
+  "sourcePhase": "F2_PRODUCTIVE_ACCEPTANCE_SOURCE_ONLY",
+  "runtimePhase": "F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY",
+  "candidate": {
+    "artifactId": 9395391426,
+    "artifactDigest": "c089ea81672225876f643399b970d1e50e7d9cdc084dfc75973e00ed8581c53c",
+    "sourceHead": "6af0c029aebb1bfecd05569452c814584110ae4c",
+    "zipSha256": "e1a711806d4ffd78004dbe5a30ebf8c5db59aaf23d2b8cd65e78b291cedc53d0",
+    "manifestSha256": "44dee7cebb174dfd630641d1e16ac649edffec18af688b62e05ceff4dc5812a5",
+    "fileCount": 194
+  },
+  "productionReopeningPackage": "orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json",
+  "requestBinding": {
+    "activeRequest": null,
+    "defaultRequest": null,
+    "requestOrdinalHasOperationalSemantics": false,
+    "historicalRequestMayBeUsedAsActiveBinding": false
+  },
+  "capabilityLockWhilePackageOpen": {
+    "runtime": false,
+    "browser": false,
+    "secrets": false,
+    "firestoreRead": false,
+    "writes": false,
+    "deploy": false,
+    "production": false
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
