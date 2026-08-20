@@ -1,11 +1,11 @@
 {
   "schemaVersion": "orbit360-continuity-ledger-v1",
-  "stateVersion": "F2-R12-CONSUMED-ROOTCAUSE-OPEN-20260820-01",
-  "updatedAtUtc": "2026-08-20T04:46:00Z",
+  "stateVersion": "F2-R12-CONSUMED-ROOTFIX-SOURCEONLY-PASS-20260820-02",
+  "updatedAtUtc": "2026-08-20T05:24:00Z",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
-  "phase": "F2_PRODUCTIVE_ACCEPTANCE_ROOT_CAUSE_OPEN",
+  "phase": "F2_PRODUCTIVE_ACCEPTANCE_ROOTFIX_SOURCEONLY_PASS_PENDING_NEW_CANDIDATE",
   "programProgressPct": 25,
   "productionRouteProgressPct": 50,
   "gateId": "f2-productive-acceptance-exact-successor-v20260818",
@@ -16,7 +16,10 @@
     "zipSha256": "58fcbe6e8d7d3a425509c87f229b1cb12dd35a99133d46c757544cc75c55aacc",
     "manifestSha256": "b18422fdf82830d28e82f657f83b4fd5c10ea134a4735263fa2587a2ddd808cb",
     "fileCount": 194,
-    "productMutationAllowed": false
+    "historicalEvidencePreserved": true,
+    "runtimeReusable": false,
+    "status": "SUPERSEDED_FOR_NEXT_RUNTIME_BY_SOURCE_ROOTFIX",
+    "reason": "Artifact predates protected store get rootfix commit 23412e7f6c58cdd5193d8ef9d09dfabd449d12f6."
   },
   "currentRuntime": {
     "requestOrdinal": 12,
@@ -45,34 +48,36 @@
     "authWrites": 0,
     "operationalWrites": 0
   },
-  "lastProvenRootfix": {
-    "status": "F2_REQUEST11_VALIDATOR_STALE_ROOTFIX_SOURCEONLY_PASS",
-    "evidencePath": "orbit360-platform/runtime-gate-crm-v20260716/f2-request11-validator-stale-rootfix-sourceonly-v20260820.json",
-    "preflight": true,
-    "coherence": true,
-    "syntheticSuccessor": true
-  },
   "currentRootCause": {
-    "status": "OPEN_SECOND_SAME_FAMILY_FAILURE",
-    "rootCauseConcluded": false,
-    "reason": "Request10 and Request12 both reached Direccion desktop Polizas with a route-readiness timeout contradicted by a final visible capture. Request12 took 64680 ms, so validator staleness cannot be assumed until event-loop/main-thread timing is separated from waiter timing.",
-    "candidateClassifications": [
-      "FUNCTIONAL_DEFECT:F2_ROUTE_MAIN_THREAD_BLOCKING_POLIZAS",
-      "VALIDATOR_STALE:F2_ROUTE_READINESS_WAITER_MISSED_VISIBLE_STATE"
-    ],
-    "evidenceNeeded": "SOURCE_ONLY_TIMING_INSTRUMENTATION_EVENT_LOOP_NAVIGATION_MOUNT_RENDER_READINESS_BOUNDARIES"
+    "status": "CLOSED_SOURCEONLY_VERIFIED",
+    "rootCauseConcluded": true,
+    "finalClassification": "FUNCTIONAL_DEFECT",
+    "finalCode": "F2_PRODUCT_READONLY_GET_FULL_COLLECTION_CLONE_AMPLIFICATION",
+    "reason": "Pólizas renders 100 rows and resolves client, insurer and advisor per row. Product readonly get() cloned the entire collection via all() before every lookup. Source proof measured 46,300 cloned rows for 300 lookups (154.33x amplification), consistent with Request12 main-thread unavailability beyond the 20s waiter timeout.",
+    "causalProofPath": "orbit360-platform/runtime-gate-crm-v20260716/f2-polizas-read-amplification-proof-v20260820.json",
+    "causalProofStatus": "F2_POLIZAS_READ_AMPLIFICATION_SOURCE_PROOF_PASS",
+    "rootfixCommit": "23412e7f6c58cdd5193d8ef9d09dfabd449d12f6",
+    "rootfixPath": "orbit360-platform/data/store-firestore-product-readonly-p0.js",
+    "rootfixEvidencePath": "orbit360-platform/runtime-gate-crm-v20260716/f2-product-readonly-get-rootfix-sourceonly-v20260820.json",
+    "rootfixEvidenceStatus": "F2_PRODUCT_READONLY_GET_ROOTFIX_SOURCEONLY_PASS",
+    "rootfixImplementation": "cache.find -> clone(foundRow)",
+    "amplificationBefore": 154.33,
+    "apiPreserved": true,
+    "cloneIsolationPreserved": true,
+    "writesRemainBlocked": true,
+    "tenantHardcode": false
   },
-  "checkpoint": "orbit360-platform/docs/CHECKPOINT-F2-REQUEST12-CONTINUITY-ANTIBUCLE-ROOT-CAUSE-OPEN-20260820.md",
-  "academiaUpdate": "orbit360-platform/docs/ACADEMIA-ACTUALIZACION-F2-CONTINUIDAD-ANTIBUCLE-CAUSA-RAIZ-POLIZAS-20260820.md",
+  "checkpoint": "orbit360-platform/docs/CHECKPOINT-F2-POLIZAS-ROOTCAUSE-CLOSED-SOURCEONLY-PASS-20260820.md",
+  "academiaUpdate": "orbit360-platform/docs/ACADEMIA-ACTUALIZACION-F2-POLIZAS-ROOTCAUSE-STORE-GET-AMPLIFICATION-20260820.md",
   "continuityInvariant": "tools/orbit360-f2-continuity-invariant-v20260820.mjs",
   "continuityAuditEvidence": "orbit360-platform/runtime-gate-crm-v20260716/f2-continuity-audit-v20260820.json",
-  "nextActionExact": "Instrument and validate source-only timing boundaries for Direccion desktop -> Polizas to distinguish main-thread blocking from waiter defect. Do not create Request13 or increase timeout until causal proof and source-only audit PASS.",
+  "nextActionExact": "After continuity audit PASS, prepare and validate a new source-only F2 candidate containing protected store rootfix. Do not reuse artifact 9387820198 and do not materialize Request13 until the new candidate is certified and separately authorized.",
   "forbiddenActions": [
     "REQUEST11_REPLAY",
     "REQUEST12_REPLAY",
-    "REQUEST13_MATERIALIZATION_BEFORE_CAUSAL_PROOF",
-    "ROUTE_TIMEOUT_INCREASE_BEFORE_CAUSAL_PROOF",
-    "POLIZAS_PRODUCT_MUTATION_BEFORE_CAUSAL_PROOF",
+    "REQUEST13_MATERIALIZATION_BEFORE_NEW_CANDIDATE_CERTIFIED_AND_AUTHORIZED",
+    "REUSE_ARTIFACT_9387820198_FOR_SUCCESSOR_RUNTIME",
+    "ROUTE_TIMEOUT_INCREASE_AS_ROOTFIX",
     "DEPLOY",
     "PUBLICATION",
     "PRODUCTION",
@@ -80,8 +85,8 @@
     "MERGE"
   ],
   "lanes": {
-    "A_frontend_ux_academia": "FROZEN_CANDIDATE_PLUS_ACADEMIA_CONTINUITY_UPDATE",
-    "B_backend_security_gates": "F2_ROOT_CAUSE_OPEN_CONTINUITY_SYNC_REQUIRED",
+    "A_frontend_ux_academia": "ROOTFIX_DOCUMENTED_ACADEMIA_UPDATED",
+    "B_backend_security_gates": "F2_PROTECTED_STORE_ROOTFIX_SOURCEONLY_PASS_PENDING_CONTINUITY_REAUDIT_AND_NEW_CANDIDATE",
     "C_real_data_migration": "UNCHANGED"
   },
   "containsPII": false,
