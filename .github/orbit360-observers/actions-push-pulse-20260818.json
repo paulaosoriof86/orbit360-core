@@ -1,10 +1,15 @@
 {
   "schemaVersion": "orbit360-actions-push-pulse-trigger-v1",
-  "mode": "source-only",
+  "mode": "request11-reconcile",
   "singlePulse": true,
-  "purpose": "Verify current push-to-Actions execution channel after Request11 reconciliation trigger produced no persisted commit",
-  "probeOrdinal": 3,
-  "triggeredAt": "2026-08-19T21:48:00-06:00",
+  "request11Reconcile": true,
+  "approvedAuthorizationAlreadyExists": true,
+  "authorizationBasis": "USER_EXPLICIT_AUTHORIZATION_F2_REQUEST11_2026-08-19_READONLY_ARTIFACT_9387820198",
+  "requestOrdinal": 11,
+  "candidateArtifactId": 9387820198,
+  "purpose": "Persist Request11 authorization, reconcile every active control-plane mirror, enforce invariant before runtime, and require readback PASS",
+  "probeOrdinal": 4,
+  "precondition": "ACTIONS_PUSH_PULSE_PASS_RUN_32330075227",
   "browser": false,
   "runtime": false,
   "secrets": false,
@@ -12,7 +17,6 @@
   "writes": false,
   "deploy": false,
   "production": false,
-  "request11Created": false,
   "containsPII": false,
   "containsSecrets": false
 }
