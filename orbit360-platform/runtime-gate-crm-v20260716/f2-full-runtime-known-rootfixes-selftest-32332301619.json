@@ -1,0 +1,85 @@
+{
+  "schemaVersion": "orbit360-f2-full-runtime-known-rootfixes-selftest-v4",
+  "ok": true,
+  "status": "F2_FULL_RUNTIME_KNOWN_ROOTFIXES_SOURCE_AUDIT_PASS",
+  "classification": "PASS",
+  "validatorRevision": "F2_SEMANTIC_PROBE_BINDING_DYNAMIC_PERSISTED_AUTH_V4",
+  "candidateArtifactId": 9387820198,
+  "candidateSourceHead": "fc46bd85783d8b4d524cbeb0fee54ee9a2c774af",
+  "requestVersion": "F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_V1",
+  "requestOrdinal": 12,
+  "dynamicCandidateBinding": true,
+  "persistedAuthorizationBinding": true,
+  "crossTenant": {
+    "contract": "F2_CROSS_TENANT_PROBE_VALID_PATH_V2",
+    "pathValid": true,
+    "semanticBinding": true,
+    "observationPreserved": true,
+    "reservedIdAbsent": true,
+    "sharedContractBound": true
+  },
+  "roleView": {
+    "rootfixBound": true,
+    "superAdminResolvesDirection": true,
+    "adminTenantRejectedForDirection": true
+  },
+  "legalGate": {
+    "detachQuietWindowRootfixBound": true
+  },
+  "topology": {
+    "routes": [
+      "inicio",
+      "cliente360",
+      "aseguradoras",
+      "ops",
+      "leads",
+      "polizas",
+      "cobros"
+    ],
+    "integrated": [
+      "vehiculos",
+      "recibosCartera"
+    ]
+  },
+  "requestLifecycle": {
+    "dynamicRunbound": true,
+    "dynamicOrdinal": true,
+    "persistedAuthorizationBound": true
+  },
+  "pwa": {
+    "frozenSourceBuild": "20260723-10",
+    "serviceWorkerBuild": "20260723-10",
+    "buildsMatch": true,
+    "cacheCleanupContract": true
+  },
+  "auth": {
+    "frozenProductBrowserProviderPresent": true,
+    "passwordSignInProviderPresent": true,
+    "persistedAuthorizationRequired": true
+  },
+  "routerReadiness": {
+    "productAppWaitsForRenderedHost": true,
+    "timeoutMs": 120000
+  },
+  "runtimeWorkflow": {
+    "deployCommandPresent": false,
+    "selftestBound": true
+  },
+  "browserExecuted": false,
+  "runtimeExecuted": false,
+  "secretAccess": false,
+  "firestoreRead": false,
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "membershipWrites": 0,
+  "dataWrites": 0,
+  "rulesDeploy": false,
+  "hostingDeploy": false,
+  "functionsDeploy": false,
+  "packageRebuild": false,
+  "publication": false,
+  "production": false,
+  "containsPII": false,
+  "containsSecrets": false,
+  "generatedAt": "2026-08-20T04:33:24.601Z"
+}

@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "orbit360-f2-integrity-before-after-v1",
+  "ok": true,
+  "status": "F2_INTEGRITY_BEFORE_AFTER_PASS",
+  "countsIdentical": true,
+  "digestsIdentical": true,
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "operationalWrites": 0,
+  "containsPII": false,
+  "containsSecrets": false
+}

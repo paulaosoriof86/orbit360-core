@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "orbit360-f2-terminal-v1",
+  "ok": false,
+  "status": "F2_PRODUCTIVE_ACCEPTANCE_FAIL",
+  "classification": "GO_F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY",
+  "error": "F2_RUNTIME_STAGE_FAILED_WITHOUT_TERMINAL_BROWSER_PASS",
+  "runId": "32332301619",
+  "request": ".github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-runbound-20260820-12.json",
+  "browserCode": "41",
+  "integrityCode": "0",
+  "candidateArtifactId": 9387820198,
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "operationalWrites": 0,
+  "packageRebuilt": false,
+  "deployExecuted": false,
+  "publicationExecuted": false,
+  "productionHostingTouched": false,
+  "containsPII": false,
+  "containsSecrets": false
+}

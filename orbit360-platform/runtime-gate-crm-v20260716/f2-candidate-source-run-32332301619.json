@@ -1,0 +1,43 @@
+{
+  "schemaVersion": "orbit360-f2-exact-candidate-source-validation-v1",
+  "ok": true,
+  "status": "F2_EXACT_CANDIDATE_SOURCE_VALIDATION_PASS",
+  "classification": "PASS",
+  "candidateArtifactId": 9387820198,
+  "candidateSourceHead": "fc46bd85783d8b4d524cbeb0fee54ee9a2c774af",
+  "candidateZipSha256": "58fcbe6e8d7d3a425509c87f229b1cb12dd35a99133d46c757544cc75c55aacc",
+  "candidateManifestSha256": "b18422fdf82830d28e82f657f83b4fd5c10ea134a4735263fa2587a2ddd808cb",
+  "candidateManifestStatus": "FASE_A_PRODUCT_F2_REQUEST08_ROUTER_READINESS_SUCCESSOR_CERTIFIED",
+  "candidateFileCount": 194,
+  "fullRehashPass": true,
+  "entrypointRefsPass": true,
+  "routes": {
+    "inicio": true,
+    "cliente360": true,
+    "aseguradoras": true,
+    "ops": true,
+    "leads": true,
+    "polizas": true,
+    "cobros": true
+  },
+  "integratedSurfaces": {
+    "vehiculos": "cliente360_policy_deeplink_fullpage",
+    "recibosCartera": "policy_client360_plus_cobros_global"
+  },
+  "readOnlyStoreGuardPass": true,
+  "inicioFiniteRootfixPass": true,
+  "routerReadinessRootfixPass": true,
+  "browserExecuted": false,
+  "runtimeExecuted": false,
+  "secretAccess": false,
+  "dataAccess": false,
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "operationalWrites": 0,
+  "packageRebuilt": false,
+  "deployExecuted": false,
+  "publicationExecuted": false,
+  "productionTouched": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
