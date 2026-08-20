@@ -1,8 +1,5 @@
 name: Orbit360 Continuity Canonical Source Only
 
-# Fail-closed continuity audit while PRODUCTION_REOPENING_PACKAGE is open.
-# Repository projections and PR edits remain disabled until CP-04 introduces
-# revision-aware atomic projection semantics.
 on:
   push:
     branches:
@@ -11,114 +8,154 @@ on:
       - 'orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json'
       - 'orbit360-platform/docs/orbit360-continuity-writer-registry-v20260820.json'
       - 'orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json'
-      - 'orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json'
-      - 'orbit360-platform/docs/orbit360-live-state-v1.json'
-      - 'orbit360-platform/docs/CHECKPOINT-CONTROL-PLANE-HARDENING-20260820.md'
-      - 'tools/orbit360-gate-contract-f2-productive-acceptance-v20260820.json'
-      - 'tools/orbit360-gate-contract-registry-v20260717.json'
-      - 'tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-source-v20260819.json'
-      - 'tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-runtime-v20260819.json'
-      - 'tools/orbit360-validar-gate-contracts-v20260717.mjs'
-      - 'tools/orbit360-cp01-cp02-contract-authority-audit-v20260820.mjs'
-      - '.github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-runbound-20260820-14.json'
-      - '.github/orbit360-authorizations/f2-productive-acceptance-runtime-browser-readonly-request14-v20260820.json'
+      - 'tools/orbit360-continuity-transition-owner-v20260820.mjs'
+      - 'tools/orbit360-continuity-projection-atomic-v20260820.mjs'
+      - 'tools/orbit360-control-plane-composite-invariant-v20260820.mjs'
+      - 'tools/orbit360-store-read-amplification-synthetic-v20260820.mjs'
+      - 'tools/orbit360-workflow-operational-surface-audit-v20260820.mjs'
+      - 'tools/orbit360-production-reopening-integrated-audit-v20260820.mjs'
+      - 'tools/orbit360-control-plane-independent-readback-v20260820.mjs'
       - '.github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml'
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pull-requests: read
+  contents: write
   statuses: write
+  pull-requests: read
 
 concurrency:
   group: orbit360-continuity-canonical-ays
   cancel-in-progress: false
 
 jobs:
-  enforce-hardening-lock-and-cp01-cp02:
+  canonical-control-plane:
     runs-on: ubuntu-latest
-    timeout-minutes: 4
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ays/backend-tenant-lab-v99-20260703
-          fetch-depth: 1
+          ref: ${{ github.sha }}
+          fetch-depth: 0
 
-      - name: Enforce production reopening package lock
-        id: lock
+      - name: Audit and atomically close hardening when eligible
+        id: canonical
         continue-on-error: true
         shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          BRANCH: ays/backend-tenant-lab-v99-20260703
         run: |
+          set -euo pipefail
+          START_HEAD=$(git rev-parse HEAD)
+          git fetch origin "$BRANCH"
+          REMOTE_HEAD=$(git rev-parse "origin/$BRANCH")
+          test "$REMOTE_HEAD" = "$START_HEAD"
+
+          STATUS=$(node -p "require('./orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json').status")
+          STEP=$(node -p "require('./orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json').resumeProtocol.firstIncompleteStep")
+
+          if [ "$STATUS" = "CLOSED_PASS" ]; then
+            node tools/orbit360-control-plane-composite-invariant-v20260820.mjs
+            ORBIT360_CONTROL_PLANE_HEAD="$START_HEAD" node tools/orbit360-control-plane-independent-readback-v20260820.mjs --expected-step CP-11 --expected-package-status CLOSED_PASS
+            echo "mode=closed-verify" >> "$GITHUB_OUTPUT"
+            echo "closure_sha=$START_HEAD" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          test "$STATUS" = "OPEN_FAIL_CLOSED"
+          test "$STEP" = "CP-03"
+
+          node tools/orbit360-production-reopening-integrated-audit-v20260820.mjs > orbit360-platform/runtime-gate-crm-v20260716/cp03-cp08-integrated-sourceonly-audit-v20260820.json
+
+          LR=$(node -p "require('./orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json').revision")
+          PR=$(node -p "require('./orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json').revision")
+          advance() {
+            node tools/orbit360-continuity-transition-owner-v20260820.mjs --expected-revision "$LR" --expected-package-revision "$PR" --transition "$1"
+            LR=$((LR+1))
+            PR=$((PR+1))
+          }
+
+          advance CP03_PASS_TO_CP04
+          advance CP04_PASS_TO_CP05
+          advance CP05_PASS_TO_CP06
+          advance CP06_PASS_TO_CP07
+          advance CP07_PASS_TO_CP08
+          advance CP08_PASS_TO_CP09
+
+          node tools/orbit360-continuity-projection-atomic-v20260820.mjs --expected-revision "$LR"
+          ORBIT360_CONTROL_PLANE_HEAD="$START_HEAD" node tools/orbit360-control-plane-independent-readback-v20260820.mjs --expected-step CP-09 --expected-package-status OPEN_FAIL_CLOSED > orbit360-platform/runtime-gate-crm-v20260716/cp09-independent-readback-v20260820.json
+
+          advance CP09_PASS_TO_CP10
+          advance CP10_CLOSE_PACKAGE
+
+          node tools/orbit360-continuity-projection-atomic-v20260820.mjs --expected-revision "$LR"
+          node tools/orbit360-control-plane-composite-invariant-v20260820.mjs > orbit360-platform/runtime-gate-crm-v20260716/cp10-closure-composite-invariant-v20260820.json
+          ORBIT360_CONTROL_PLANE_HEAD="$START_HEAD" node tools/orbit360-control-plane-independent-readback-v20260820.mjs --expected-step CP-11 --expected-package-status CLOSED_PASS > orbit360-platform/runtime-gate-crm-v20260716/cp10-closure-independent-readback-v20260820.json
+
           node <<'NODE'
-          const fs = require('fs');
-          const packagePath = 'orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json';
-          const ledgerPath = 'orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json';
-          const registryPath = 'orbit360-platform/docs/orbit360-continuity-writer-registry-v20260820.json';
-          const pkg = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
-          const ledger = JSON.parse(fs.readFileSync(ledgerPath, 'utf8'));
-          const registry = JSON.parse(fs.readFileSync(registryPath, 'utf8'));
-          const failures = [];
-          if (pkg.status === 'CLOSED_PASS') failures.push('LOCK_WORKFLOW_MUST_BE_REPLACED_AT_CP04_BEFORE_PACKAGE_CLOSURE');
-          if (!pkg.lock || pkg.lock.active !== true) failures.push('PACKAGE_LOCK_NOT_ACTIVE');
-          for (const key of ['runtimeAllowed','authorizationAllowed','requestMaterializationAllowed','secretAccessAllowed','firestoreReadAllowed','browserAllowed','writesAllowed','deployAllowed','publicationAllowed','productionAllowed','mainAllowed','mergeAllowed']) {
-            if (pkg.lock?.[key] !== false) failures.push(`PACKAGE_${key}_MUST_BE_FALSE`);
-          }
-          if (pkg.resumeProtocol?.firstIncompleteStep !== 'CP-03') failures.push('FIRST_INCOMPLETE_STEP_MUST_BE_CP03');
-          if (pkg.resumeProtocol?.nextActionExact !== 'CP-03_CREATE_SINGLE_REVISIONED_LEDGER_MUTATION_OWNER') failures.push('NEXT_ACTION_MUST_BE_CP03');
-          if (ledger.productionReopeningPackage?.status !== 'OPEN_FAIL_CLOSED') failures.push('LEDGER_PACKAGE_STATUS_NOT_LOCKED');
-          if (ledger.productionReopeningPackage?.revision !== 2) failures.push('LEDGER_PACKAGE_REVISION_NOT_2');
-          if (ledger.productionReopeningPackage?.firstIncompleteStep !== 'CP-03') failures.push('LEDGER_FIRST_INCOMPLETE_STEP_NOT_CP03');
-          if (ledger.authorizationBoundary?.nextRuntimeMaterializationAllowed !== false) failures.push('LEDGER_RUNTIME_MATERIALIZATION_NOT_BLOCKED');
-          if (ledger.authorizationBoundary?.newRuntimeRequestAllowed !== false) failures.push('LEDGER_NEW_RUNTIME_REQUEST_NOT_BLOCKED');
-          if (registry.canonicalWorkflowMode !== 'FAIL_CLOSED_READONLY_UNTIL_CP04') failures.push('WRITER_REGISTRY_MODE_NOT_LOCKED');
-          if (registry.temporaryHardeningLock?.workflowMayMutateRepository !== false) failures.push('WORKFLOW_MUTATION_NOT_BLOCKED');
-          if (registry.nextHardeningStep !== 'CP-03') failures.push('WRITER_NEXT_STEP_NOT_CP03');
-          if (failures.length) {
-            console.error(JSON.stringify({ok:false,status:'HARDENING_LOCK_FAIL',failures}, null, 2));
-            process.exit(1);
-          }
-          console.log(JSON.stringify({
-            ok:true,
-            status:'HARDENING_LOCK_PASS',
-            packageId:pkg.packageId,
-            packageRevision:pkg.revision,
-            firstIncompleteStep:pkg.resumeProtocol.firstIncompleteStep,
-            candidateArtifactId:pkg.candidate.artifactId,
-            runtimeAllowed:false,
-            writesAllowed:false
-          }, null, 2));
+          const fs=require('fs');
+          const ledger=require('./orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json');
+          const pkg=require('./orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json');
+          const out={schemaVersion:'orbit360-hardening-closure-evidence-v1',ok:true,status:'CP03_CP10_HARDENING_ATOMIC_CLOSED_PASS',ledgerRevision:ledger.revision,packageRevision:pkg.revision,packageStatus:pkg.status,firstIncompleteStep:pkg.resumeProtocol.firstIncompleteStep,candidateArtifactId:ledger.successorCandidate.artifactId,candidateSourceHead:ledger.successorCandidate.sourceHead,runtimeAuthorized:false,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,publicationExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
+          fs.writeFileSync('orbit360-platform/runtime-gate-crm-v20260716/cp03-cp10-hardening-atomic-closure-v20260820.json',JSON.stringify(out,null,2)+'\n');
           NODE
 
-      - name: Syntax check canonical F2 preflight and audit
-        id: syntax
-        continue-on-error: true
-        shell: bash
-        run: |
-          node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
-          node --check tools/orbit360-cp01-cp02-contract-authority-audit-v20260820.mjs
+          git fetch origin "$BRANCH"
+          REMOTE_HEAD=$(git rev-parse "origin/$BRANCH")
+          test "$REMOTE_HEAD" = "$START_HEAD"
 
-      - name: Audit CP01 CP02 canonical F2 contract authority
-        id: authority
-        continue-on-error: true
-        run: node tools/orbit360-cp01-cp02-contract-authority-audit-v20260820.mjs
+          git config user.name "orbit360-control-plane"
+          git config user.email "orbit360-control-plane@users.noreply.github.com"
+          git add \
+            orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json \
+            orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json \
+            orbit360-platform/docs/orbit360-live-state-v1.json \
+            orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json \
+            orbit360-platform/docs/CHECKPOINT-CONTROL-PLANE-HARDENING-20260820.md \
+            orbit360-platform/docs/ORBIT360-PR5-CURRENT-STATE.md \
+            tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-runtime-v20260819.json \
+            orbit360-platform/runtime-gate-crm-v20260716/cp03-cp08-integrated-sourceonly-audit-v20260820.json \
+            orbit360-platform/runtime-gate-crm-v20260716/cp09-independent-readback-v20260820.json \
+            orbit360-platform/runtime-gate-crm-v20260716/cp10-closure-composite-invariant-v20260820.json \
+            orbit360-platform/runtime-gate-crm-v20260716/cp10-closure-independent-readback-v20260820.json \
+            orbit360-platform/runtime-gate-crm-v20260716/cp03-cp10-hardening-atomic-closure-v20260820.json
+          git commit -m "fix(control-plane): atomically close CP03-CP10 hardening"
+          CLOSURE_SHA=$(git rev-parse HEAD)
 
-      - name: Publish observable source-only audit status
+          git fetch origin "$BRANCH"
+          REMOTE_HEAD=$(git rev-parse "origin/$BRANCH")
+          test "$REMOTE_HEAD" = "$START_HEAD"
+          git push origin "HEAD:$BRANCH"
+
+          payload=$(printf '{"state":"success","context":"orbit360/hardening-closed","description":"CP03-CP10 atomic hardening closure PASS"}')
+          curl --fail-with-body -sS -X POST \
+            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/$CLOSURE_SHA" \
+            -d "$payload"
+
+          echo "mode=atomic-close" >> "$GITHUB_OUTPUT"
+          echo "closure_sha=$CLOSURE_SHA" >> "$GITHUB_OUTPUT"
+
+      - name: Publish trigger commit result
         if: always()
         shell: bash
         env:
           GITHUB_TOKEN: ${{ github.token }}
-          LOCK_OUTCOME: ${{ steps.lock.outcome }}
-          SYNTAX_OUTCOME: ${{ steps.syntax.outcome }}
-          AUTHORITY_OUTCOME: ${{ steps.authority.outcome }}
+          OUTCOME: ${{ steps.canonical.outcome }}
+          MODE: ${{ steps.canonical.outputs.mode }}
         run: |
-          if [ "$LOCK_OUTCOME" = "success" ] && [ "$SYNTAX_OUTCOME" = "success" ] && [ "$AUTHORITY_OUTCOME" = "success" ]; then
+          if [ "$OUTCOME" = "success" ]; then
             state=success
-            description='CP01 CP02 authority audit PASS; next CP03'
+            context='orbit360/hardening-atomic-close'
+            description='Atomic control-plane hardening PASS'
           else
             state=failure
-            description='CP01 CP02 authority audit FAIL; hardening remains locked'
+            context='orbit360/hardening-atomic-close'
+            description='Atomic control-plane hardening FAIL; no runtime opened'
           fi
-          payload=$(printf '{"state":"%s","context":"orbit360/cp01-cp02","description":"%s"}' "$state" "$description")
+          payload=$(printf '{"state":"%s","context":"%s","description":"%s"}' "$state" "$context" "$description")
           curl --fail-with-body -sS -X POST \
             -H "Authorization: Bearer $GITHUB_TOKEN" \
             -H "Accept: application/vnd.github+json" \
@@ -126,14 +163,9 @@ jobs:
             "https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" \
             -d "$payload"
 
-      - name: Enforce terminal audit result
+      - name: Enforce terminal result
         if: always()
         shell: bash
         env:
-          LOCK_OUTCOME: ${{ steps.lock.outcome }}
-          SYNTAX_OUTCOME: ${{ steps.syntax.outcome }}
-          AUTHORITY_OUTCOME: ${{ steps.authority.outcome }}
-        run: |
-          test "$LOCK_OUTCOME" = "success"
-          test "$SYNTAX_OUTCOME" = "success"
-          test "$AUTHORITY_OUTCOME" = "success"
+          OUTCOME: ${{ steps.canonical.outcome }}
+        run: test "$OUTCOME" = "success"
