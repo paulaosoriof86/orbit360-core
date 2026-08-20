@@ -1,0 +1,37 @@
+{
+  "schemaVersion": "orbit360-run-discovery-v4",
+  "ok": false,
+  "status": "TARGET_RUN_TERMINAL_FAILURE",
+  "classification": "TARGET_EXECUTION_FAILURE",
+  "requestCommit": "196c9efcb0bcbbfac5f74c839ba307601f8fe25b",
+  "requestFile": ".github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-runbound-20260819-09.json",
+  "requestVersion": "F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_V1",
+  "gateId": "f2-productive-acceptance-exact-successor-v20260818",
+  "targetRunId": 32316883621,
+  "targetRunStatus": "completed",
+  "targetRunConclusion": "failure",
+  "runAttempt": 1,
+  "event": "push",
+  "headSha": "196c9efcb0bcbbfac5f74c839ba307601f8fe25b",
+  "workflowName": "Orbit360 F2 Productive Acceptance Runtime Browser Readonly 20260818",
+  "createdAt": "2026-08-20T00:19:55Z",
+  "runStartedAt": "2026-08-20T00:19:55Z",
+  "updatedAt": "2026-08-20T00:22:01Z",
+  "htmlUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/32316883621",
+  "artifacts": [
+    {
+      "id": 9388429058,
+      "name": "orbit360-f2-productive-acceptance-32316883621",
+      "size_in_bytes": 6518,
+      "digest": "sha256:956ee47268a4d26fe19c4673cefdc5418bb244dbcf194237e8dea8b4141e3b52",
+      "expired": false
+    }
+  ],
+  "artifactCount": 1,
+  "matchCount": 1,
+  "multipleRuns": false,
+  "runtimeReplay": false,
+  "productMutation": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
