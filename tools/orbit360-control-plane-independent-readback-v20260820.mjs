@@ -12,6 +12,7 @@ const live=json('orbit360-platform/docs/orbit360-live-state-v1.json');
 const idx=json('orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json');
 const life=json('tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-runtime-v20260819.json');
 const pr=text('orbit360-platform/docs/ORBIT360-PR5-CURRENT-STATE.md');
+const checkpoint=text('orbit360-platform/docs/CHECKPOINT-CONTROL-PLANE-HARDENING-20260820.md');
 const currentHead=String(process.env.ORBIT360_CONTROL_PLANE_HEAD||execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'})).trim();
 const failures=[]; const c=(v,id)=>{if(!v)failures.push(id);};
 c(L.productionReopeningPackage?.revision===P.revision,'LEDGER_PACKAGE_REVISION');
@@ -23,6 +24,7 @@ c(live.stateVersion===L.stateVersion&&live.canonicalCurrent?.status===L.activeSt
 c(idx.canonicalCurrent?.stateVersion===L.stateVersion&&idx.operationalCurrent?.nextActionId===L.nextAction.id&&idx.operationalCurrent?.successorCandidateArtifactId===L.successorCandidate?.artifactId,'INDEX_PROJECTION');
 c(life.status===L.activeState.status&&life.nextActionExact===L.nextAction.id&&life.continuity?.stateVersion===L.stateVersion,'LIFECYCLE_PROJECTION');
 c(pr.includes(L.stateVersion)&&pr.includes(String(L.successorCandidate?.artifactId))&&pr.includes(L.nextAction.id),'PR_STATE_PROJECTION');
+c(checkpoint.includes(L.stateVersion)&&checkpoint.includes(String(L.revision))&&checkpoint.includes(String(P.revision))&&checkpoint.includes(P.resumeProtocol.nextActionExact),'CHECKPOINT_PROJECTION');
 c(L.successorCandidate?.sourceHead!==currentHead,'CONTROL_PLANE_HEAD_MUST_DIFFER_FROM_CANDIDATE_SOURCE_HEAD');
 c(L.authorizationBoundary?.activeRuntimeAuthorization===false&&L.authorizationBoundary?.nextRuntimeMaterializationAllowed===false&&L.authorizationBoundary?.newRuntimeRequestAllowed===false,'RUNTIME_BOUNDARY_FAIL_CLOSED');
 const active=JSON.stringify({a:L.activeState,n:L.nextAction,b:L.authorizationBoundary}); c(!/Request\d+/i.test(active),'ACTIVE_REQUEST_ORDINAL_PRESENT'); c(!active.includes('9387820198'),'ACTIVE_HISTORICAL_ARTIFACT_PRESENT');
