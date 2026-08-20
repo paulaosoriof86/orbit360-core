@@ -1,0 +1,133 @@
+name: Orbit360 CP11 Authorization Boundary Source Only
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - '.github/workflows/orbit360-cp11-authorization-boundary-sourceonly-v20260820.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  statuses: write
+  pull-requests: read
+
+concurrency:
+  group: orbit360-cp11-authorization-boundary-ays
+  cancel-in-progress: false
+
+jobs:
+  cp11-boundary:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+
+      - name: CP11 source-only preflight and initial CAS
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          BRANCH: ays/backend-tenant-lab-v99-20260703
+        run: |
+          set -euo pipefail
+          START_HEAD=$(git rev-parse HEAD)
+          git fetch origin "$BRANCH"
+          REMOTE_HEAD=$(git rev-parse "origin/$BRANCH")
+          test "$REMOTE_HEAD" = "$START_HEAD"
+          STATUS=$(node -p "require('./orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json').status")
+          STEP=$(node -p "require('./orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json').resumeProtocol.firstIncompleteStep")
+          CLOSURE=$(node -p "require('./orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json').controlPlaneClosure.status")
+          test "$STATUS" = "CLOSED_PASS"
+          test "$STEP" = "CP-11"
+          test "$CLOSURE" = "CLOSED_PASS_RECONCILED"
+          echo "START_HEAD=$START_HEAD" >> "$GITHUB_ENV"
+          payload='{"state":"success","context":"orbit360/cp11-preflight","description":"CP11 source-only preflight + initial CAS PASS"}'
+          curl --fail-with-body -sS -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" -d "$payload" >/dev/null
+
+      - name: Advance CP11 through revisioned owner
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          LR=$(node -p "require('./orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json').revision")
+          PR=$(node -p "require('./orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json').revision")
+          node tools/orbit360-continuity-transition-owner-v20260820.mjs --expected-revision "$LR" --expected-package-revision "$PR" --transition CP11_PASS_AWAIT_AUTHORIZATION
+          NEXT_LR=$((LR+1))
+          NEXT_PR=$((PR+1))
+          echo "NEXT_LR=$NEXT_LR" >> "$GITHUB_ENV"
+          echo "NEXT_PR=$NEXT_PR" >> "$GITHUB_ENV"
+          payload='{"state":"success","context":"orbit360/cp11-owner","description":"CP11 revisioned transition PASS"}'
+          curl --fail-with-body -sS -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" -d "$payload" >/dev/null
+
+      - name: Generate inert authorization boundary and atomic projections
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          node tools/orbit360-f2-runtime-authorization-boundary-v20260820.mjs
+          node tools/orbit360-continuity-projection-atomic-v20260820.mjs --expected-revision "$NEXT_LR"
+          payload='{"state":"success","context":"orbit360/cp11-boundary-generated","description":"inert boundary + atomic projection PASS"}'
+          curl --fail-with-body -sS -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" -d "$payload" >/dev/null
+
+      - name: Audit CP11 boundary and control-plane coherence
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          node tools/orbit360-cp11-authorization-boundary-audit-v20260820.mjs > orbit360-platform/runtime-gate-crm-v20260716/cp11-authorization-boundary-audit-v20260820.json
+          node tools/orbit360-control-plane-composite-invariant-v20260820.mjs > orbit360-platform/runtime-gate-crm-v20260716/cp11-control-plane-composite-v20260820.json
+          ORBIT360_CONTROL_PLANE_HEAD="$START_HEAD" node tools/orbit360-control-plane-independent-readback-v20260820.mjs --expected-step F2-RUNTIME-AUTHORIZATION --expected-package-status CLOSED_PASS > orbit360-platform/runtime-gate-crm-v20260716/cp11-independent-readback-v20260820.json
+          node -e "const fs=require('fs');const L=require('./orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json');const P=require('./orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json');const B=require('./orbit360-platform/docs/orbit360-f2-runtime-authorization-boundary-v20260820.json');const out={schemaVersion:'orbit360-cp11-sourceonly-closure-v1',ok:true,status:'CP11_AUTHORIZATION_BOUNDARY_SOURCEONLY_PASS',ledgerRevision:L.revision,packageRevision:P.revision,firstIncompleteStep:P.resumeProtocol.firstIncompleteStep,authorizationIdentitySha256:B.authorizationIdentity.digest,authorized:false,requestMaterialized:false,runtimeAllowed:false,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,publicationExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};fs.writeFileSync('orbit360-platform/runtime-gate-crm-v20260716/cp11-authorization-boundary-sourceonly-closure-v20260820.json',JSON.stringify(out,null,2)+'\n');"
+          payload='{"state":"success","context":"orbit360/cp11-audit","description":"CP11 boundary + composite + independent readback PASS"}'
+          curl --fail-with-body -sS -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" -d "$payload" >/dev/null
+
+      - name: Create one local CP11 source-only commit
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git config user.name "orbit360-control-plane"
+          git config user.email "orbit360-control-plane@users.noreply.github.com"
+          git add \
+            orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json \
+            orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json \
+            orbit360-platform/docs/orbit360-f2-runtime-authorization-boundary-v20260820.json \
+            orbit360-platform/docs/orbit360-live-state-v1.json \
+            orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json \
+            orbit360-platform/docs/CHECKPOINT-CONTROL-PLANE-HARDENING-20260820.md \
+            orbit360-platform/docs/ORBIT360-PR5-CURRENT-STATE.md \
+            tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-runtime-v20260819.json \
+            orbit360-platform/runtime-gate-crm-v20260716/cp11-authorization-boundary-audit-v20260820.json \
+            orbit360-platform/runtime-gate-crm-v20260716/cp11-control-plane-composite-v20260820.json \
+            orbit360-platform/runtime-gate-crm-v20260716/cp11-independent-readback-v20260820.json \
+            orbit360-platform/runtime-gate-crm-v20260716/cp11-authorization-boundary-sourceonly-closure-v20260820.json
+          git diff --cached --quiet && exit 92
+          git commit -m "feat(control-plane): prepare CP11 runtime authorization boundary"
+          CP11_SHA=$(git rev-parse HEAD)
+          echo "CP11_SHA=$CP11_SHA" >> "$GITHUB_ENV"
+          payload='{"state":"success","context":"orbit360/cp11-local-commit","description":"CP11 source-only local commit PASS"}'
+          curl --fail-with-body -sS -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" -d "$payload" >/dev/null
+
+      - name: Final CAS and fast-forward CP11 publication
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          BRANCH: ays/backend-tenant-lab-v99-20260703
+        run: |
+          set -euo pipefail
+          git fetch origin "$BRANCH"
+          REMOTE_HEAD=$(git rev-parse "origin/$BRANCH")
+          test "$REMOTE_HEAD" = "$START_HEAD"
+          git push origin "HEAD:$BRANCH"
+          payload='{"state":"success","context":"orbit360/cp11-boundary-ready","description":"CP11 source-only boundary ready; explicit runtime authorization required"}'
+          curl --fail-with-body -sS -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/$CP11_SHA" -d "$payload" >/dev/null
+          payload='{"state":"success","context":"orbit360/cp11-boundary-sourceonly","description":"CP11 source-only CAS publication PASS"}'
+          curl --fail-with-body -sS -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" -d "$payload" >/dev/null
