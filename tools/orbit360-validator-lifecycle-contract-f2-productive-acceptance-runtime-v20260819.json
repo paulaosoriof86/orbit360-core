@@ -109,5 +109,33 @@
     "fullRehashPass": true,
     "inicioFiniteRootfixPass": true,
     "routerReadinessRootfixPass": true
+  },
+  "lastExecution": {
+    "request": "REQUEST09",
+    "requestCommit": "196c9efcb0bcbbfac5f74c839ba307601f8fe25b",
+    "runId": 32316883621,
+    "jobId": 96270948026,
+    "evidenceArtifactId": 9388429058,
+    "consumed": true,
+    "replayAllowed": false,
+    "status": "STOP_PIPELINE_MECHANISM_ROUTE_UNLABELED",
+    "classification": "PIPELINE_MECHANISM_FAILURE",
+    "code": "F2_BROWSER_ROUTE_WAIT_UNLABELED",
+    "gatePass": true,
+    "candidateVerificationPass": true,
+    "identityReadOnlyPass": true,
+    "runtimeExecuted": true,
+    "browserExecuted": true,
+    "integrityBeforeAfterPass": true,
+    "firestoreWrites": 0,
+    "authWrites": 0,
+    "membershipWrites": 0,
+    "dataWrites": 0,
+    "operationalWrites": 0,
+    "deployExecuted": false,
+    "productionTouched": false,
+    "routeObservabilitySourcefixRunId": 32317619703,
+    "routeObservabilitySourcefixPass": true,
+    "nextRequest": "REQUEST10_FRESH_AUTHORIZATION_REQUIRED"
   }
 }

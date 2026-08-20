@@ -1,8 +1,8 @@
 {
   "schemaVersion": "orbit360-live-state-v1",
-  "stateVersion": "20260820.f2.request08-readiness-successor-source-closed-request09-auth-pending.current",
-  "updatedAt": "2026-08-20T00:08:43.215Z",
-  "phase": "F2_REQUEST08_READINESS_SUCCESSOR_SOURCE_CLOSED_REQUEST09_AUTH_PENDING",
+  "stateVersion": "20260820.f2.request09-consumed-route-observability-rootfix-pass-request10-auth-pending.current",
+  "updatedAt": "2026-08-20T00:35:29.595Z",
+  "phase": "F2_REQUEST09_CONSUMED_ROUTE_OBSERVABILITY_ROOTFIX_PASS_REQUEST10_AUTH_PENDING",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pr": 5,
@@ -257,11 +257,12 @@
       "productAffected": false
     },
     "currentBlockingFact": {
-      "code": "F2_REQUEST08_RUNTIME_FRESH_AUTHORIZATION_REQUIRED",
+      "code": "F2_REQUEST10_RUNTIME_FRESH_AUTHORIZATION_REQUIRED",
       "status": "FRESH_AUTHORIZATION_REQUIRED",
-      "candidateArtifactId": 9385306424,
-      "priorRequest": "REQUEST07_CONSUMED",
-      "priorRunId": 32311320804
+      "candidateArtifactId": 9387820198,
+      "candidateSourceHead": "fc46bd85783d8b4d524cbeb0fee54ee9a2c774af",
+      "priorRequest": "REQUEST09_CONSUMED",
+      "priorRunId": 32316883621
     },
     "authIsCurrentBlocker": false,
     "passwordIsCurrentBlocker": false,
@@ -404,15 +405,44 @@
       "sourcefixEvidence": "orbit360-platform/runtime-gate-crm-v20260716/f2-request07-validator-stale-sourcefix-check-v20260819.json",
       "sourcefixEvidenceCommit": "1b9344944f3691ac40eb7face6d33c7034e0dd37",
       "preventiveControl": "DYNAMIC_IMMUTABLE_REQUEST_CANDIDATE_BINDING_IN_RUNTIME_RUNNER_AND_SELFTEST"
+    },
+    "request09RouteObservability": {
+      "classification": "PIPELINE_MECHANISM_FAILURE",
+      "code": "F2_BROWSER_ROUTE_WAIT_UNLABELED",
+      "status": "CLOSED_SOURCE_ONLY_PASS",
+      "observedRuntimeClassification": "locator.waitFor",
+      "observedError": "locator #host visibility wait timed out without route/view label",
+      "request09RunId": 32316883621,
+      "request09JobId": 96270948026,
+      "request09EvidenceArtifactId": 9388429058,
+      "candidateArtifactId": 9387820198,
+      "candidateSourceHead": "fc46bd85783d8b4d524cbeb0fee54ee9a2c774af",
+      "gatePass": true,
+      "candidateVerificationPass": true,
+      "identityReadOnlyPass": true,
+      "runtimeExecuted": true,
+      "browserExecuted": true,
+      "integrityBeforeAfterPass": true,
+      "zeroWrites": true,
+      "productCandidateFrozen": true,
+      "productMutationRequired": false,
+      "perRouteProductCause": "UNDETERMINED_UNTIL_FRESH_RUNTIME_WITH_STRUCTURED_ROUTE_EVIDENCE",
+      "dataAffected": false,
+      "sourcefixRunId": 32317619703,
+      "sourcefixStatus": "F2_REQUEST09_ROUTE_OBSERVABILITY_ROOTFIX_SOURCE_APPLIED",
+      "preventiveControl": "Preserve strict visible-host acceptance while labeling view/route and capturing rendered-vs-visible, authStage, pre-auth and geometry.",
+      "request09ReplayAllowed": false
     }
   },
   "documentationControl": {
     "index": "orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json",
     "currentAddendum": "orbit360-platform/docs/ADDENDUM-MAESTRO-CIERRE-FORENSE-SINCRONIZACION-Y-PLAN-CONGELADO-20260818.md",
-    "currentCheckpoint": "orbit360-platform/docs/CHECKPOINT-F2-REQUEST08-READINESS-SUCCESSOR-SOURCE-PASS-REQUEST09-AUTH-PENDING-20260820.md",
+    "currentCheckpoint": "orbit360-platform/docs/CHECKPOINT-F2-REQUEST09-CONSUMED-ROUTE-OBSERVABILITY-ROOTFIX-PASS-REQUEST10-AUTH-PENDING-20260820.md",
     "historicalPolicy": "HISTORICAL_NOT_CURRENT_STATE",
-    "transactionStatus": "F2_REQUEST08_READINESS_SUCCESSOR_SOURCE_CLOSED_REQUEST09_AUTH_PENDING",
-    "latestAcademiaUpdate": "orbit360-platform/docs/ACADEMIA-ACTUALIZACION-F2-REQUEST08-ROUTER-READINESS-20260820.md"
+    "transactionStatus": "F2_REQUEST09_CONSUMED_ROUTE_OBSERVABILITY_ROOTFIX_PASS_REQUEST10_AUTH_PENDING",
+    "latestAcademiaUpdate": "orbit360-platform/docs/ACADEMIA-ACTUALIZACION-F2-REQUEST09-ROUTE-OBSERVABILITY-20260820.md",
+    "latestRuntimeEvidence": "orbit360-platform/runtime-gate-crm-v20260716/f2-request09-runtime-discovery-v20260820.json",
+    "latestSourcefixEvidence": "orbit360-platform/runtime-gate-crm-v20260716/f2-request09-route-observability-rootfix-source-v20260820.json"
   },
   "frozenPlan": {
     "currentPhase": "F2",
@@ -475,8 +505,8 @@
     }
   },
   "lanes": {
-    "A_frontend_UX": "FROZEN_REQUEST08_ROUTER_READINESS_SUCCESSOR_SOURCE_CLOSED_PASS",
-    "B_backend_security_gates": "F2_REQUEST09_FRESH_RUNTIME_AUTHORIZATION_PENDING",
+    "A_frontend_UX": "FROZEN_CANDIDATE_9387820198_SOURCE_CLOSED_PASS",
+    "B_backend_security_gates": "REQUEST09_CONSUMED_ROUTE_OBSERVABILITY_ROOTFIX_PASS_REQUEST10_FRESH_AUTH_PENDING",
     "C_real_data_migration": "UNTOUCHED_ZERO_CHANGES"
   },
   "writes": {
@@ -497,12 +527,18 @@
     "membershipChangesAuthorized": false,
     "dataChangesAuthorized": false,
     "mainMergeAuthorized": false,
-    "f2AuthorizationStatus": "FRESH_AUTHORIZATION_REQUIRED_REQUEST09_EXACT_ARTIFACT_9387820198",
+    "f2AuthorizationStatus": "FRESH_AUTHORIZATION_REQUIRED_REQUEST10_EXACT_ARTIFACT_9387820198",
     "rulesDeployAuthorizedNow": false,
-    "securityRepairAuthorizedNow": false
+    "securityRepairAuthorizedNow": false,
+    "runtimeAuthorized": false,
+    "browserAuthorized": false,
+    "secretAccessAuthorized": false,
+    "firestoreReadAuthorized": false,
+    "request10Created": false,
+    "request10Authorized": false
   },
   "goLive": {
-    "status": "BLOCKED_F2_REQUEST09_FRESH_AUTHORIZATION_REQUIRED",
+    "status": "BLOCKED_F2_REQUEST10_FRESH_AUTHORIZATION_REQUIRED",
     "publicUrl": "https://app.aysseguros.com",
     "publishedPackagePreserved": true,
     "successorPublished": false,
@@ -538,13 +574,20 @@
     "f2PostdeployProbeRequestMayBeRerun": false,
     "request07MayBeRerun": false,
     "request07RequestReplayAllowed": false,
-    "request08MayBeCreatedWithoutFreshAuthorization": false
+    "request08MayBeCreatedWithoutFreshAuthorization": false,
+    "request09MayBeRerun": false,
+    "request09RequestReplayAllowed": false,
+    "request10MayBeCreatedWithoutFreshAuthorization": false
   },
   "nextActionExact": {
-    "action": "OBTAIN_FRESH_AUTHORIZATION_FOR_REQUEST09",
+    "action": "OBTAIN_FRESH_AUTHORIZATION_REQUEST10_RUNTIME_BROWSER_READONLY",
     "gateId": "f2-productive-acceptance-exact-successor-v20260818",
     "requestVersion": "F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_V1",
-    "candidateArtifactId": 9387820198
+    "candidateArtifactId": 9387820198,
+    "candidateSourceHead": "fc46bd85783d8b4d524cbeb0fee54ee9a2c774af",
+    "status": "FRESH_AUTHORIZATION_REQUIRED",
+    "runtimeAuthorizationRequired": true,
+    "runtimeExecuted": false
   },
   "resumeProtocol": [
     "Read ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json",
@@ -1056,5 +1099,33 @@
     "authorizationGranted": false,
     "replayAllowed": false,
     "candidateArtifactId": 9387820198
+  },
+  "f2Runtime09": {
+    "requestVersion": "F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_V1",
+    "requestOrdinal": 9,
+    "status": "CONSUMED_STOP_PIPELINE_MECHANISM_ROUTE_UNLABELED",
+    "requestCommit": "196c9efcb0bcbbfac5f74c839ba307601f8fe25b",
+    "runId": 32316883621,
+    "jobId": 96270948026,
+    "evidenceArtifactId": 9388429058,
+    "candidateArtifactId": 9387820198,
+    "candidateSourceHead": "fc46bd85783d8b4d524cbeb0fee54ee9a2c774af",
+    "gatePass": true,
+    "candidateVerificationPass": true,
+    "identityReadOnlyPass": true,
+    "browserExecuted": true,
+    "runtimeExecuted": true,
+    "integrityBeforeAfterPass": true,
+    "firestoreWrites": 0,
+    "authWrites": 0,
+    "membershipWrites": 0,
+    "dataWrites": 0,
+    "operationalWrites": 0,
+    "deployExecuted": false,
+    "publicationExecuted": false,
+    "productionTouched": false,
+    "replayAllowed": false,
+    "rootCause": "PIPELINE_MECHANISM_FAILURE:F2_BROWSER_ROUTE_WAIT_UNLABELED",
+    "routeObservabilitySourcefixRunId": 32317619703
   }
 }
