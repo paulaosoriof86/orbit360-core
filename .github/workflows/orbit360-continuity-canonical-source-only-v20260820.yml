@@ -1,5 +1,6 @@
 name: Orbit360 Continuity Canonical Source Only
 
+# Canonical source-only projection can be retriggered after a [skip ci] documentary closure without enabling runtime.
 on:
   push:
     branches:
