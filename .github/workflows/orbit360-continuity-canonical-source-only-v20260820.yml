@@ -11,9 +11,6 @@ on:
       - 'tools/orbit360-continuity-transition-owner-v20260820.mjs'
       - 'tools/orbit360-continuity-projection-atomic-v20260820.mjs'
       - 'tools/orbit360-control-plane-composite-invariant-v20260820.mjs'
-      - 'tools/orbit360-store-read-amplification-synthetic-v20260820.mjs'
-      - 'tools/orbit360-workflow-operational-surface-audit-v20260820.mjs'
-      - 'tools/orbit360-production-reopening-integrated-audit-v20260820.mjs'
       - 'tools/orbit360-control-plane-independent-readback-v20260820.mjs'
       - '.github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml'
   workflow_dispatch:
@@ -37,119 +34,113 @@ jobs:
           ref: ${{ github.sha }}
           fetch-depth: 0
 
-      - name: Audit and atomically reconcile control plane
-        id: canonical
-        continue-on-error: true
+      - name: Preflight closed package and remote CAS
         shell: bash
         env:
           GITHUB_TOKEN: ${{ github.token }}
           BRANCH: ays/backend-tenant-lab-v99-20260703
         run: |
-          set -euo pipefail
-          START_HEAD=$(git rev-parse HEAD)
-          post_stage() {
-            stage="$1"; state="$2"; description="$3"
-            payload=$(printf '{"state":"%s","context":"orbit360/reconcile-%s","description":"%s"}' "$state" "$stage" "$description")
-            curl -sS -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" -d "$payload" >/dev/null || true
-          }
-          publish_closure_status() {
-            sha="$1"
-            payload=$(printf '{"state":"success","context":"orbit360/hardening-closed","description":"Control-plane hardening reconciled CLOSED_PASS"}')
-            curl --fail-with-body -sS -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/$sha" -d "$payload"
-          }
+          set -u
+          START_HEAD=$(git rev-parse HEAD) || exit 51
+          git fetch origin "$BRANCH" || exit 52
+          REMOTE_HEAD=$(git rev-parse "origin/$BRANCH") || exit 53
+          test "$REMOTE_HEAD" = "$START_HEAD" || exit 54
+          STATUS=$(node -p "require('./orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json').status") || exit 55
+          STEP=$(node -p "require('./orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json').resumeProtocol.firstIncompleteStep") || exit 56
+          RECONCILED=$(node -p "Boolean(require('./orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json').controlPlaneClosure?.status === 'CLOSED_PASS_RECONCILED')") || exit 57
+          test "$STATUS" = "CLOSED_PASS" || exit 58
+          test "$STEP" = "CP-11" || exit 59
+          if [ "$RECONCILED" = "true" ]; then MODE=verify; else MODE=reconcile; fi
+          echo "START_HEAD=$START_HEAD" >> "$GITHUB_ENV"
+          echo "MODE=$MODE" >> "$GITHUB_ENV"
+          payload=$(printf '{"state":"success","context":"orbit360/reconcile-preflight","description":"preflight + initial CAS PASS; mode=%s"}' "$MODE")
+          curl --fail-with-body -sS -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" -d "$payload" >/dev/null
 
-          git fetch origin "$BRANCH"
-          REMOTE_HEAD=$(git rev-parse "origin/$BRANCH")
-          if [ "$REMOTE_HEAD" != "$START_HEAD" ]; then post_stage cas-initial failure 'initial remote HEAD changed'; exit 51; fi
-          post_stage cas-initial success 'initial remote HEAD exact'
+      - name: Apply revisioned post-close transition
+        if: env.MODE == 'reconcile'
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -u
+          LR=$(node -p "require('./orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json').revision") || exit 61
+          PR=$(node -p "require('./orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json').revision") || exit 62
+          node tools/orbit360-continuity-transition-owner-v20260820.mjs --expected-revision "$LR" --expected-package-revision "$PR" --transition POST_CLOSE_RECONCILE_CONTROL_PLANE_METADATA || exit 63
+          NEXT_LR=$((LR+1))
+          echo "NEXT_LR=$NEXT_LR" >> "$GITHUB_ENV"
+          payload='{"state":"success","context":"orbit360/reconcile-owner","description":"revision-aware owner PASS"}'
+          curl --fail-with-body -sS -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" -d "$payload" >/dev/null
 
-          STATUS=$(node -p "require('./orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json').status")
-          STEP=$(node -p "require('./orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json').resumeProtocol.firstIncompleteStep")
+      - name: Build atomic projections
+        if: env.MODE == 'reconcile'
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -u
+          node tools/orbit360-continuity-projection-atomic-v20260820.mjs --expected-revision "$NEXT_LR" || exit 71
+          payload='{"state":"success","context":"orbit360/reconcile-projection","description":"atomic projection PASS"}'
+          curl --fail-with-body -sS -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" -d "$payload" >/dev/null
 
-          if [ "$STATUS" = "CLOSED_PASS" ]; then
-            RECONCILED=$(node -p "Boolean(require('./orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json').controlPlaneClosure?.status === 'CLOSED_PASS_RECONCILED')")
-            if [ "$RECONCILED" = "true" ]; then
-              node tools/orbit360-control-plane-composite-invariant-v20260820.mjs
-              ORBIT360_CONTROL_PLANE_HEAD="$START_HEAD" node tools/orbit360-control-plane-independent-readback-v20260820.mjs --expected-step CP-11 --expected-package-status CLOSED_PASS
-              publish_closure_status "$START_HEAD"
-              echo "mode=closed-verify" >> "$GITHUB_OUTPUT"
-              echo "closure_sha=$START_HEAD" >> "$GITHUB_OUTPUT"
-              exit 0
-            fi
-
-            LR=$(node -p "require('./orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json').revision")
-            PR=$(node -p "require('./orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json').revision")
-            if node tools/orbit360-continuity-transition-owner-v20260820.mjs --expected-revision "$LR" --expected-package-revision "$PR" --transition POST_CLOSE_RECONCILE_CONTROL_PLANE_METADATA; then post_stage owner success 'revision owner PASS'; else post_stage owner failure 'revision owner FAIL'; exit 52; fi
-            LR=$((LR+1))
-            if node tools/orbit360-continuity-projection-atomic-v20260820.mjs --expected-revision "$LR"; then post_stage projection success 'atomic projection PASS'; else post_stage projection failure 'atomic projection FAIL'; exit 53; fi
-            if node tools/orbit360-control-plane-composite-invariant-v20260820.mjs > orbit360-platform/runtime-gate-crm-v20260716/cp10-postclose-reconciled-composite-v20260820.json; then post_stage composite success 'composite invariant PASS'; else post_stage composite failure 'composite invariant FAIL'; exit 54; fi
-            if ORBIT360_CONTROL_PLANE_HEAD="$START_HEAD" node tools/orbit360-control-plane-independent-readback-v20260820.mjs --expected-step CP-11 --expected-package-status CLOSED_PASS > orbit360-platform/runtime-gate-crm-v20260716/cp10-postclose-reconciled-readback-v20260820.json; then post_stage readback success 'independent readback PASS'; else post_stage readback failure 'independent readback FAIL'; exit 55; fi
+      - name: Composite invariant and independent readback
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -u
+          if [ "$MODE" = "reconcile" ]; then
+            node tools/orbit360-control-plane-composite-invariant-v20260820.mjs > orbit360-platform/runtime-gate-crm-v20260716/cp10-postclose-reconciled-composite-v20260820.json || exit 81
+            ORBIT360_CONTROL_PLANE_HEAD="$START_HEAD" node tools/orbit360-control-plane-independent-readback-v20260820.mjs --expected-step CP-11 --expected-package-status CLOSED_PASS > orbit360-platform/runtime-gate-crm-v20260716/cp10-postclose-reconciled-readback-v20260820.json || exit 82
             node <<'NODE'
             const fs=require('fs'); const L=require('./orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json'); const P=require('./orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json');
             fs.writeFileSync('orbit360-platform/runtime-gate-crm-v20260716/cp10-postclose-metadata-reconciliation-v20260820.json',JSON.stringify({schemaVersion:'orbit360-postclose-reconciliation-evidence-v1',ok:true,status:'POST_CLOSE_CONTROL_PLANE_METADATA_RECONCILED_PASS',ledgerRevision:L.revision,packageRevision:P.revision,firstIncompleteStep:P.resumeProtocol.firstIncompleteStep,atomicProjection:L.continuityControl.syncTool,compositeInvariant:L.continuityControl.invariant,runtimeAuthorized:false,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,operationalWrites:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false},null,2)+'\n');
             NODE
-
-            git fetch origin "$BRANCH"
-            REMOTE_HEAD=$(git rev-parse "origin/$BRANCH")
-            if [ "$REMOTE_HEAD" != "$START_HEAD" ]; then post_stage cas-precommit failure 'remote HEAD changed before commit'; exit 56; fi
-            post_stage cas-precommit success 'remote HEAD exact before commit'
-            git config user.name "orbit360-control-plane"
-            git config user.email "orbit360-control-plane@users.noreply.github.com"
-            if git add orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json orbit360-platform/docs/orbit360-live-state-v1.json orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json orbit360-platform/docs/CHECKPOINT-CONTROL-PLANE-HARDENING-20260820.md orbit360-platform/docs/ORBIT360-PR5-CURRENT-STATE.md tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-runtime-v20260819.json orbit360-platform/runtime-gate-crm-v20260716/cp10-postclose-reconciled-composite-v20260820.json orbit360-platform/runtime-gate-crm-v20260716/cp10-postclose-reconciled-readback-v20260820.json orbit360-platform/runtime-gate-crm-v20260716/cp10-postclose-metadata-reconciliation-v20260820.json; then post_stage staging success 'staging PASS'; else post_stage staging failure 'staging FAIL'; exit 57; fi
-            if git diff --cached --quiet; then post_stage staging failure 'no staged reconciliation changes'; exit 58; fi
-            if git commit -m "fix(control-plane): reconcile post-close canonical owner metadata"; then post_stage commit success 'local commit PASS'; else post_stage commit failure 'local commit FAIL'; exit 59; fi
-            CLOSURE_SHA=$(git rev-parse HEAD)
-            git fetch origin "$BRANCH"
-            REMOTE_HEAD=$(git rev-parse "origin/$BRANCH")
-            if [ "$REMOTE_HEAD" != "$START_HEAD" ]; then post_stage cas-final failure 'remote HEAD changed before push'; exit 60; fi
-            post_stage cas-final success 'remote HEAD exact before push'
-            if git push origin "HEAD:$BRANCH"; then post_stage push success 'fast-forward push PASS'; else post_stage push failure 'fast-forward push FAIL'; exit 61; fi
-            publish_closure_status "$CLOSURE_SHA"
-            echo "mode=post-close-reconcile" >> "$GITHUB_OUTPUT"
-            echo "closure_sha=$CLOSURE_SHA" >> "$GITHUB_OUTPUT"
-            exit 0
+          else
+            node tools/orbit360-control-plane-composite-invariant-v20260820.mjs || exit 83
+            ORBIT360_CONTROL_PLANE_HEAD="$START_HEAD" node tools/orbit360-control-plane-independent-readback-v20260820.mjs --expected-step CP-11 --expected-package-status CLOSED_PASS || exit 84
           fi
+          payload='{"state":"success","context":"orbit360/reconcile-audit","description":"composite + independent readback PASS"}'
+          curl --fail-with-body -sS -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" -d "$payload" >/dev/null
 
-          test "$STATUS" = "OPEN_FAIL_CLOSED"
-          test "$STEP" = "CP-03"
-          node tools/orbit360-production-reopening-integrated-audit-v20260820.mjs > orbit360-platform/runtime-gate-crm-v20260716/cp03-cp08-integrated-sourceonly-audit-v20260820.json
-          LR=$(node -p "require('./orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json').revision")
-          PR=$(node -p "require('./orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json').revision")
-          advance() { node tools/orbit360-continuity-transition-owner-v20260820.mjs --expected-revision "$LR" --expected-package-revision "$PR" --transition "$1"; LR=$((LR+1)); PR=$((PR+1)); }
-          advance CP03_PASS_TO_CP04; advance CP04_PASS_TO_CP05; advance CP05_PASS_TO_CP06; advance CP06_PASS_TO_CP07; advance CP07_PASS_TO_CP08; advance CP08_PASS_TO_CP09
-          node tools/orbit360-continuity-projection-atomic-v20260820.mjs --expected-revision "$LR"
-          ORBIT360_CONTROL_PLANE_HEAD="$START_HEAD" node tools/orbit360-control-plane-independent-readback-v20260820.mjs --expected-step CP-09 --expected-package-status OPEN_FAIL_CLOSED > orbit360-platform/runtime-gate-crm-v20260716/cp09-independent-readback-v20260820.json
-          advance CP09_PASS_TO_CP10; advance CP10_CLOSE_PACKAGE
-          node tools/orbit360-continuity-projection-atomic-v20260820.mjs --expected-revision "$LR"
-          node tools/orbit360-control-plane-composite-invariant-v20260820.mjs > orbit360-platform/runtime-gate-crm-v20260716/cp10-closure-composite-invariant-v20260820.json
-          ORBIT360_CONTROL_PLANE_HEAD="$START_HEAD" node tools/orbit360-control-plane-independent-readback-v20260820.mjs --expected-step CP-11 --expected-package-status CLOSED_PASS > orbit360-platform/runtime-gate-crm-v20260716/cp10-closure-independent-readback-v20260820.json
-          node <<'NODE'
-          const fs=require('fs'); const L=require('./orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json'); const P=require('./orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json');
-          fs.writeFileSync('orbit360-platform/runtime-gate-crm-v20260716/cp03-cp10-hardening-atomic-closure-v20260820.json',JSON.stringify({schemaVersion:'orbit360-hardening-closure-evidence-v1',ok:true,status:'CP03_CP10_HARDENING_ATOMIC_CLOSED_PASS',ledgerRevision:L.revision,packageRevision:P.revision,packageStatus:P.status,firstIncompleteStep:P.resumeProtocol.firstIncompleteStep,candidateArtifactId:L.successorCandidate.artifactId,candidateSourceHead:L.successorCandidate.sourceHead,runtimeAuthorized:false,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,publicationExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false},null,2)+'\n');
-          NODE
-          git fetch origin "$BRANCH"; REMOTE_HEAD=$(git rev-parse "origin/$BRANCH"); test "$REMOTE_HEAD" = "$START_HEAD"
-          git config user.name "orbit360-control-plane"; git config user.email "orbit360-control-plane@users.noreply.github.com"
-          git add orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json orbit360-platform/docs/orbit360-live-state-v1.json orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json orbit360-platform/docs/CHECKPOINT-CONTROL-PLANE-HARDENING-20260820.md orbit360-platform/docs/ORBIT360-PR5-CURRENT-STATE.md tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-runtime-v20260819.json orbit360-platform/runtime-gate-crm-v20260716/cp03-cp08-integrated-sourceonly-audit-v20260820.json orbit360-platform/runtime-gate-crm-v20260716/cp09-independent-readback-v20260820.json orbit360-platform/runtime-gate-crm-v20260716/cp10-closure-composite-invariant-v20260820.json orbit360-platform/runtime-gate-crm-v20260716/cp10-closure-independent-readback-v20260820.json orbit360-platform/runtime-gate-crm-v20260716/cp03-cp10-hardening-atomic-closure-v20260820.json
-          git commit -m "fix(control-plane): atomically close CP03-CP10 hardening"
-          CLOSURE_SHA=$(git rev-parse HEAD)
-          git fetch origin "$BRANCH"; REMOTE_HEAD=$(git rev-parse "origin/$BRANCH"); test "$REMOTE_HEAD" = "$START_HEAD"; git push origin "HEAD:$BRANCH"
-          publish_closure_status "$CLOSURE_SHA"
-          echo "mode=atomic-close" >> "$GITHUB_OUTPUT"; echo "closure_sha=$CLOSURE_SHA" >> "$GITHUB_OUTPUT"
-
-      - name: Publish trigger commit result
-        if: always()
+      - name: Stage and create local reconciliation commit
+        if: env.MODE == 'reconcile'
         shell: bash
         env:
           GITHUB_TOKEN: ${{ github.token }}
-          OUTCOME: ${{ steps.canonical.outcome }}
         run: |
-          if [ "$OUTCOME" = "success" ]; then state=success; description='Atomic control-plane reconciliation PASS'; else state=failure; description='Atomic control-plane reconciliation FAIL; runtime remains closed'; fi
-          payload=$(printf '{"state":"%s","context":"orbit360/hardening-atomic-close","description":"%s"}' "$state" "$description")
-          curl --fail-with-body -sS -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" -d "$payload"
+          set -u
+          git config user.name "orbit360-control-plane"
+          git config user.email "orbit360-control-plane@users.noreply.github.com"
+          git add orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json orbit360-platform/docs/orbit360-live-state-v1.json orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json orbit360-platform/docs/CHECKPOINT-CONTROL-PLANE-HARDENING-20260820.md orbit360-platform/docs/ORBIT360-PR5-CURRENT-STATE.md tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-runtime-v20260819.json orbit360-platform/runtime-gate-crm-v20260716/cp10-postclose-reconciled-composite-v20260820.json orbit360-platform/runtime-gate-crm-v20260716/cp10-postclose-reconciled-readback-v20260820.json orbit360-platform/runtime-gate-crm-v20260716/cp10-postclose-metadata-reconciliation-v20260820.json || exit 91
+          git diff --cached --quiet && exit 92
+          git commit -m "fix(control-plane): reconcile post-close canonical owner metadata" || exit 93
+          CLOSURE_SHA=$(git rev-parse HEAD) || exit 94
+          echo "CLOSURE_SHA=$CLOSURE_SHA" >> "$GITHUB_ENV"
+          payload='{"state":"success","context":"orbit360/reconcile-local-commit","description":"staging + local commit PASS"}'
+          curl --fail-with-body -sS -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" -d "$payload" >/dev/null
 
-      - name: Enforce terminal result
-        if: always()
+      - name: Final CAS and fast-forward publication
+        if: env.MODE == 'reconcile'
         shell: bash
         env:
-          OUTCOME: ${{ steps.canonical.outcome }}
-        run: test "$OUTCOME" = "success"
+          GITHUB_TOKEN: ${{ github.token }}
+          BRANCH: ays/backend-tenant-lab-v99-20260703
+        run: |
+          set -u
+          git fetch origin "$BRANCH" || exit 101
+          REMOTE_HEAD=$(git rev-parse "origin/$BRANCH") || exit 102
+          test "$REMOTE_HEAD" = "$START_HEAD" || exit 103
+          git push origin "HEAD:$BRANCH" || exit 104
+          payload='{"state":"success","context":"orbit360/hardening-closed","description":"post-close metadata reconciled; CLOSED_PASS"}'
+          curl --fail-with-body -sS -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/$CLOSURE_SHA" -d "$payload" >/dev/null
+          payload='{"state":"success","context":"orbit360/reconcile-push","description":"final CAS + fast-forward push PASS"}'
+          curl --fail-with-body -sS -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" -d "$payload" >/dev/null
+
+      - name: Publish verification status
+        if: env.MODE == 'verify'
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          payload='{"state":"success","context":"orbit360/hardening-closed","description":"reconciled CLOSED_PASS verified"}'
+          curl --fail-with-body -sS -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" -d "$payload" >/dev/null
