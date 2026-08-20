@@ -2,20 +2,114 @@
 'use strict';
 import fs from 'node:fs';
 import path from 'node:path';
+
 const ROOT=process.cwd();
-const P={ledger:'orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json',registry:'orbit360-platform/docs/orbit360-continuity-writer-registry-v20260820.json',live:'orbit360-platform/docs/orbit360-live-state-v1.json',index:'orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json',life:'tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-runtime-v20260819.json',readme:'README.md',changelog:'orbit360-platform/CHANGELOG.md',pr:'orbit360-platform/docs/ORBIT360-PR5-CURRENT-STATE.md'};
-const a=p=>path.join(ROOT,p); const read=p=>fs.readFileSync(a(p),'utf8').replace(/^\uFEFF/,''); const json=p=>JSON.parse(read(p)); const write=(p,v)=>{fs.mkdirSync(path.dirname(a(p)),{recursive:true});fs.writeFileSync(a(p),typeof v==='string'?v:JSON.stringify(v,null,2)+'\n','utf8');};
-const L=json(P.ledger), G=json(P.registry), h=L.history.latestConsumedRuntime, s=L.activeState, r=L.sourceRootCauseResolution, c=L.candidateBoundary, ab=L.authorizationBoundary;
+const P={
+  ledger:'orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json',
+  registry:'orbit360-platform/docs/orbit360-continuity-writer-registry-v20260820.json',
+  live:'orbit360-platform/docs/orbit360-live-state-v1.json',
+  index:'orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json',
+  life:'tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-runtime-v20260819.json',
+  readme:'README.md',
+  changelog:'orbit360-platform/CHANGELOG.md',
+  pr:'orbit360-platform/docs/ORBIT360-PR5-CURRENT-STATE.md'
+};
+const a=p=>path.join(ROOT,p);
+const read=p=>fs.readFileSync(a(p),'utf8').replace(/^\uFEFF/,'');
+const json=p=>JSON.parse(read(p));
+const write=(p,v)=>{fs.mkdirSync(path.dirname(a(p)),{recursive:true});fs.writeFileSync(a(p),typeof v==='string'?v:JSON.stringify(v,null,2)+'\n','utf8');};
+
+const L=json(P.ledger),G=json(P.registry),h=L.history.latestConsumedRuntime,s=L.activeState,r=L.sourceRootCauseResolution,c=L.candidateBoundary;
 if(L.schemaVersion!=='orbit360-continuity-ledger-v2'||L.stateVersion!=='ORBIT360-F2-CONTINUITY-CURRENT') throw new Error('CONTINUITY_LEDGER_V2_REQUIRED');
+if(L.continuityControl?.status!=='CLOSED_VERIFIED') throw new Error('CONTINUITY_LEDGER_NOT_CLOSED_VERIFIED');
 const now=new Date().toISOString();
-let live=json(P.live); live.stateVersion=L.stateVersion; live.updatedAt=now; live.phase=s.phase; live.currentCheckpoint=L.checkpoint; live.continuityLedger=P.ledger; live.canonicalCurrent={stateVersion:L.stateVersion,status:s.status,rootCauseStatus:s.rootCauseStatus}; delete live.currentRuntime; delete live.currentRootCause; live.activeState={...s}; live.sourceRootCauseResolution={...r}; live.authorization={activeRuntimeAuthorization:false,freshAuthorizationRequired:true,authorizationCarryForwardForbidden:true,nextRuntimeMaterializationAllowed:false,deployAuthorized:false,publicationAuthorized:false,productionAuthorized:false,mainAuthorized:false,mergeAuthorized:false}; live.history={latestConsumedRuntime:{...h}}; live.documentationControl={canonicalStateVersion:L.stateVersion,currentCheckpoint:L.checkpoint,currentStateOwner:P.ledger,writerRegistry:P.registry,soleProjectionLogic:G.soleProjectionLogic,continuityInvariant:L.continuityControl.invariant,divergenceClassification:'PIPELINE_MECHANISM_FAILURE:DOCUMENTATION_STATE_DRIFT'}; live.nextActionExact={...L.nextAction}; live.stopRetry={historicalRuntimeReplayAllowed:false,nextRuntimeMaterializationAllowed:false,historicalArtifactRuntimeReuseAllowed:false}; live.lanes=L.lanes; live.progress=L.progress; live.containsPII=false;live.containsSecrets=false; write(P.live,live);
-let idx=json(P.index); idx.updatedAt=now; idx.status='CURRENT_BINDING_INDEX'; idx.currentCheckpoint=L.checkpoint; idx.canonicalCurrent={stateVersion:L.stateVersion,status:s.status,rootCauseStatus:s.rootCauseStatus}; idx.readOrder=['bindingRules',P.ledger,P.registry,P.index,P.live,L.checkpoint,L.continuityControl.auditEvidence,'PR5_HEAD_LIVE']; idx.operationalCurrent={stateVersion:L.stateVersion,currentPhase:s.phase,currentStatus:s.status,currentCheckpoint:L.checkpoint,continuityLedger:P.ledger,writerRegistry:P.registry,continuityInvariant:L.continuityControl.invariant,continuityAuditEvidence:L.continuityControl.auditEvidence,rootCauseStatus:s.rootCauseStatus,rootCauseClassification:r.classification,rootCauseCode:r.code,historicalCandidateArtifactId:c.historicalArtifactId,historicalCandidateRuntimeReusable:false,nextActionId:L.nextAction.id,nextRuntimeAuthorized:false,goLiveRoutePercentClosed:L.progress.productionRouteProgressPct,integratedProgramPercentClosed:L.progress.programProgressPct,deployAuthorized:false,publicationAuthorized:false,productionAuthorized:false,mainAuthorized:false,mergeAuthorized:false}; idx.history={latestConsumedRuntime:{...h}}; idx.documentationControl={canonicalStateOwner:P.ledger,writerRegistry:P.registry,soleProjectionLogic:G.soleProjectionLogic,divergenceClassification:'PIPELINE_MECHANISM_FAILURE:DOCUMENTATION_STATE_DRIFT',coherenceRequiredBeforeTechnicalAction:true,noParallelContinuityOwner:true,requestOrdinalAllowedOnlyInHistory:true}; idx.containsPII=false;idx.containsSecrets=false; write(P.index,idx);
-let life=json(P.life); life.validatorLifecycleRevision='phase-capability-contract-v3-continuity-ledger-v2'; life.f2ValidatorRevision='f2-source-rootfix-verified-ordinal-free-current-state-v20260820'; life.status=s.status; life.currentPhase=s.phase; life.continuity={stateVersion:L.stateVersion,ledger:P.ledger,writerRegistry:P.registry,checkpoint:L.checkpoint,sync:G.soleProjectionLogic,invariant:L.continuityControl.invariant}; life.authorization={requiredForExecution:true,activeRequest:false,freshAuthorizationRequired:true,authorizationCarryForwardForbidden:true,nextRuntimeMaterializationAllowed:false,replayAllowed:false}; life.guards={...(life.guards||{}),historicalCandidateArtifactId:c.historicalArtifactId,historicalCandidateRuntimeReusable:false,successorCandidateRequired:true,requestSpecificCurrentStateForbidden:true,sourceRootfixVerified:true,deployAllowed:false,publicationAllowed:false,productionMutationAllowed:false}; life.lastExecution={historical:true,...h,rootCauseFinalClassification:r.classification,rootCauseStatus:s.rootCauseStatus}; life.nextActionExact=L.nextAction.id; life.containsPII=false;life.containsSecrets=false; write(P.life,life);
-const block=`<!-- ORBIT360_CURRENT_STATE_START -->\n## Estado operativo vivo — autoridad única\n\n- StateVersion: \`${L.stateVersion}\` (sin ordinal de Request).\n- Fase: \`${s.phase}\`.\n- Estado: \`${s.status}\`.\n- Causa funcional: \`${r.classification}:${r.code}\`, verificada source-only.\n- Artifact histórico \`${c.historicalArtifactId}\`: no reutilizable para runtime sucesor.\n- No existe autorización runtime activa; cualquier sucesor exige candidata nueva certificada + autorización explícita fresca.\n- Autoridad: \`${P.ledger}\`; writers: \`${P.registry}\`; proyección: \`${G.soleProjectionLogic}\`.\n- Los ordinales de Request pertenecen únicamente al historial/evidencia sellada.\n- Siguiente acción: \`${L.nextAction.id}\`.\n<!-- ORBIT360_CURRENT_STATE_END -->`;
-const replace=(text,b,e,val)=>{const re=new RegExp(`${b}[\\s\\S]*?${e}`);return re.test(text)?text.replace(re,val):`${text.trim()}\n\n${val}\n`;};
-let rm=read(P.readme); rm=replace(rm,'<!-- ORBIT360_CURRENT_STATE_START -->','<!-- ORBIT360_CURRENT_STATE_END -->',block); if(!rm.includes('<!-- ORBIT360_CURRENT_STATE_START -->')) rm=`# orbit360-core\n\n${block}\n`; write(P.readme,rm.endsWith('\n')?rm:rm+'\n');
-const ch=`<!-- ORBIT360_CURRENT_STATE_START -->\n## [F2-CONTINUITY-CURRENT] — ${now.slice(0,10)} UTC · \`${L.stateVersion}\`\n- Estado activo ordinal-free: \`${s.status}\`.\n- Rootfix source-only verificado: \`${r.code}\`.\n- El runtime consumido previo queda solo como historia sellada; no replay.\n- Artifact histórico \`${c.historicalArtifactId}\` no se reutiliza; se requiere candidata sucesora source-only.\n- Un solo owner de proyección: \`${G.soleProjectionLogic}\`.\n<!-- ORBIT360_CURRENT_STATE_END -->`;
-let cg=read(P.changelog); cg=replace(cg,'<!-- ORBIT360_CURRENT_STATE_START -->','<!-- ORBIT360_CURRENT_STATE_END -->',ch); write(P.changelog,cg.endsWith('\n')?cg:cg+'\n');
-const pr=`# ESTADO VIVO CANÓNICO — F2 rootfix source-only verificado · continuidad viva\n\n**StateVersion:** \`${L.stateVersion}\`  \nRama: \`${L.branch}\` · PR #5 draft/open · sin main/merge/deploy/producción.\n\n## Autoridad de reanudación\n1. reglas maestras/addenda vigentes;\n2. \`${P.ledger}\`;\n3. \`${P.registry}\`;\n4. \`${P.index}\`;\n5. \`${P.live}\`;\n6. \`${L.checkpoint}\`;\n7. evidencia de continuidad + HEAD real.\n\nEl estado activo **no depende del ordinal de ningún Request**. Los Request consumidos existen solo como evidencia histórica sellada.\n\n## Estado actual\n- \`${s.phase}\` / \`${s.status}\`.\n- Causa raíz funcional cerrada source-only: \`${r.classification}:${r.code}\`.\n- Implementación: \`${r.rootfixImplementation}\`; API/aislamiento preservados y writes bloqueados.\n- Artifact histórico \`${c.historicalArtifactId}\` quedó superseded para el próximo runtime y no puede reutilizarse.\n- No hay autorización runtime activa ni carry-forward de autorizaciones.\n\n## Historial sellado (no autoridad de estado)\n- Último runtime consumido: Request ${h.requestOrdinal}, run \`${h.runId}\`, no replay, cero writes.\n- Requests 11/12 permanecen históricos y no se reabren.\n\n## Continuidad antibucle\n- ledger único: \`${P.ledger}\`;\n- registry de writers: \`${P.registry}\`;\n- proyección única: \`${G.soleProjectionLogic}\`;\n- invariant: \`${L.continuityControl.invariant}\`.\nCualquier writer independiente o reaparición de ordinal de Request en estado activo = \`PIPELINE_MECHANISM_FAILURE\` y bloqueo fail-closed.\n\n## Siguiente acción exacta\n\`${L.nextAction.id}\`: ${L.nextAction.description}\n\nRuta inmediata a producción: **${L.progress.productionRouteProgressPct}%**. Programa integral: **${L.progress.programProgressPct}%**. No aumentan por documentación.\n`;
+
+let live=json(P.live);
+live.stateVersion=L.stateVersion;
+live.updatedAt=now;
+live.phase=s.phase;
+live.currentCheckpoint=L.checkpoint;
+live.continuityLedger=P.ledger;
+live.canonicalCurrent={stateVersion:L.stateVersion,status:s.status,rootCauseStatus:s.rootCauseStatus};
+delete live.currentRuntime;
+delete live.currentRootCause;
+delete live.f2SourceOnly;
+live.activeState={...s};
+live.sourceRootCauseResolution={...r};
+live.authorization={activeRuntimeAuthorization:false,freshAuthorizationRequired:true,authorizationCarryForwardForbidden:true,nextRuntimeMaterializationAllowed:false,deployAuthorized:false,publicationAuthorized:false,productionAuthorized:false,mainAuthorized:false,mergeAuthorized:false};
+live.documentationControl={canonicalStateVersion:L.stateVersion,currentCheckpoint:L.checkpoint,currentStateOwner:P.ledger,writerRegistry:P.registry,soleProjectionLogic:G.soleProjectionLogic,continuityInvariant:L.continuityControl.invariant,divergenceClassification:'PIPELINE_MECHANISM_FAILURE:DOCUMENTATION_STATE_DRIFT'};
+live.nextActionExact={...L.nextAction};
+live.stopRetry={historicalRuntimeReplayAllowed:false,nextRuntimeMaterializationAllowed:false,historicalArtifactRuntimeReuseAllowed:false};
+live.lanes=L.lanes;
+live.progress=L.progress;
+live.history={latestConsumedRuntime:{...h},historicalCandidateBoundary:{...c}};
+live.containsPII=false;live.containsSecrets=false;
+write(P.live,live);
+
+let idx=json(P.index);
+idx.updatedAt=now;
+idx.status='CURRENT_BINDING_INDEX';
+idx.currentCheckpoint=L.checkpoint;
+idx.canonicalCurrent={stateVersion:L.stateVersion,status:s.status,rootCauseStatus:s.rootCauseStatus};
+idx.readOrder=['bindingRules',P.ledger,P.registry,P.index,P.live,L.checkpoint,L.continuityControl.auditEvidence,'PR5_HEAD_LIVE'];
+idx.operationalCurrent={stateVersion:L.stateVersion,currentPhase:s.phase,currentStatus:s.status,currentCheckpoint:L.checkpoint,continuityLedger:P.ledger,writerRegistry:P.registry,continuityInvariant:L.continuityControl.invariant,continuityAuditEvidence:L.continuityControl.auditEvidence,rootCauseStatus:s.rootCauseStatus,rootCauseClassification:r.classification,rootCauseCode:r.code,successorCandidateRequired:true,successorCandidateArtifactId:null,nextActionId:L.nextAction.id,nextRuntimeAuthorized:false,goLiveRoutePercentClosed:L.progress.productionRouteProgressPct,integratedProgramPercentClosed:L.progress.programProgressPct,deployAuthorized:false,publicationAuthorized:false,productionAuthorized:false,mainAuthorized:false,mergeAuthorized:false};
+idx.documentationControl={canonicalStateOwner:P.ledger,writerRegistry:P.registry,soleProjectionLogic:G.soleProjectionLogic,divergenceClassification:'PIPELINE_MECHANISM_FAILURE:DOCUMENTATION_STATE_DRIFT',coherenceRequiredBeforeTechnicalAction:true,noParallelContinuityOwner:true,requestOrdinalAllowedOnlyInHistory:true,historicalArtifactAllowedOnlyInHistoryOrLedgerBoundary:true};
+idx.history={latestConsumedRuntime:{...h},historicalCandidateBoundary:{...c}};
+idx.containsPII=false;idx.containsSecrets=false;
+write(P.index,idx);
+
+let life=json(P.life);
+const previousSourceOnly=life.sourceOnlyPrerequisite||life.history?.sourceOnlyPrerequisite||null;
+life.validatorLifecycleRevision='phase-capability-contract-v4-continuity-active-guards-decoupled';
+life.f2ValidatorRevision='f2-source-rootfix-verified-ordinal-free-active-guards-v20260820';
+life.status=s.status;
+life.currentPhase=s.phase;
+life.continuity={stateVersion:L.stateVersion,ledger:P.ledger,writerRegistry:P.registry,checkpoint:L.checkpoint,sync:G.soleProjectionLogic,invariant:L.continuityControl.invariant};
+life.authorization={requiredForExecution:true,activeRequest:false,freshAuthorizationRequired:true,authorizationCarryForwardForbidden:true,nextRuntimeMaterializationAllowed:false,replayAllowed:false};
+life.guards={
+  exactSuccessorCandidateRequired:true,
+  successorCandidateRequired:true,
+  successorCandidateArtifactId:null,
+  successorCandidateSourceHead:null,
+  candidateCertificationRequired:true,
+  gateBeforeArtifactDownloadInRuntime:true,
+  gateBeforeSecretAccess:true,
+  gateBeforeBrowser:true,
+  customTokenEphemeralOnly:true,
+  passwordResetAllowed:false,
+  authChangesAllowed:false,
+  membershipChangesAllowed:false,
+  dataChangesAllowed:false,
+  firestoreWritesAllowed:false,
+  operationalWritesAllowed:false,
+  packageRebuildAllowed:false,
+  deployAllowed:false,
+  publicationAllowed:false,
+  productionMutationAllowed:false,
+  stopRetryOnSameFamily:true,
+  sourceOnlyCausalProofRequiredBeforeSuccessor:true,
+  timeoutIncreaseAllowed:false,
+  requestSpecificCurrentStateForbidden:true,
+  sourceRootfixVerified:true,
+  historicalCandidateRuntimeReuseAllowed:false
+};
+delete life.sourceOnlyPrerequisite;
+life.successorSourceOnlyPrerequisite={status:'PENDING_SUCCESSOR_CANDIDATE_CERTIFICATION',successorCandidateRequired:true,successorCandidateArtifactId:null,runtimeAllowed:false};
+life.lastExecution={historical:true,runId:h.runId,runAttempt:h.runAttempt,conclusion:h.conclusion,status:h.requestStatus,rootCauseFinalClassification:r.classification,rootCauseStatus:s.rootCauseStatus,firestoreWrites:0,authWrites:0,operationalWrites:0};
+life.history={latestConsumedRuntime:{...h},sourceOnlyPrerequisite:previousSourceOnly?{historical:true,...previousSourceOnly}:undefined,historicalCandidateBoundary:{...c}};
+life.nextActionExact=L.nextAction.id;
+life.containsPII=false;life.containsSecrets=false;
+write(P.life,life);
+
+const currentBlock=`## Estado operativo vivo — autoridad única\n\n- StateVersion: \`${L.stateVersion}\` (sin ordinal de Request).\n- Fase: \`${s.phase}\`.\n- Estado: \`${s.status}\`.\n- Causa funcional verificada source-only: \`${r.classification}:${r.code}\`.\n- No existe candidata runtime sucesora certificada todavía; el artifact previo queda únicamente como historia sellada.\n- No existe autorización runtime activa ni carry-forward de autorizaciones.\n- Autoridad: \`${P.ledger}\`; writers: \`${P.registry}\`; proyección: \`${G.soleProjectionLogic}\`.\n- Los ordinales de Request y los identificadores de artifact consumidos pertenecen únicamente a historia/evidencia.\n- Siguiente acción: \`${L.nextAction.id}\`.\n`;
+write(P.readme,`# orbit360-core\n\nRepositorio de Orbit 360.\n\n${currentBlock}`);
+
+const markerStart='<!-- ORBIT360_CURRENT_STATE_START -->',markerEnd='<!-- ORBIT360_CURRENT_STATE_END -->';
+const replace=(text,val)=>{const re=new RegExp(`${markerStart}[\\s\\S]*?${markerEnd}`);return re.test(text)?text.replace(re,val):`${val}\n\n${text.trim()}\n`;};
+const ch=`${markerStart}\n## [F2-CONTINUITY-CURRENT] — ${now.slice(0,10)} UTC · \`${L.stateVersion}\`\n- Estado activo ordinal-free y guards activos desacoplados de Request/artifact histórico.\n- Rootfix source-only verificado: \`${r.code}\`.\n- Runtime consumido y artifact previo quedan únicamente como historia sellada; no replay/reuse.\n- Un solo owner de proyección: \`${G.soleProjectionLogic}\`.\n${markerEnd}`;
+write(P.changelog,replace(read(P.changelog),ch));
+
+const pr=`# ESTADO VIVO CANÓNICO — F2 rootfix source-only verificado · continuidad viva\n\n**StateVersion:** \`${L.stateVersion}\`  \nRama: \`${L.branch}\` · PR #5 draft/open · sin main/merge/deploy/producción.\n\n## Autoridad de reanudación\n1. reglas maestras/addenda vigentes;\n2. \`${P.ledger}\`;\n3. \`${P.registry}\`;\n4. \`${P.index}\`;\n5. \`${P.live}\`;\n6. \`${L.checkpoint}\`;\n7. evidencia de continuidad + HEAD real.\n\nEl estado activo **no depende del ordinal de ningún Request ni de una candidata histórica**. Ambos existen solo como evidencia histórica sellada.\n\n## Estado actual\n- \`${s.phase}\` / \`${s.status}\`.\n- Causa raíz funcional cerrada source-only: \`${r.classification}:${r.code}\`.\n- Implementación: \`${r.rootfixImplementation}\`; API/aislamiento preservados y writes bloqueados.\n- No existe candidata runtime sucesora certificada todavía.\n- No hay autorización runtime activa ni carry-forward.\n\n## Historial sellado\n- Último runtime consumido: Request ${h.requestOrdinal}, run \`${h.runId}\`, no replay, cero writes.\n- Artifact histórico \`${c.historicalArtifactId}\`: no reutilizable.\n\n## Continuidad antibucle\n- ledger único: \`${P.ledger}\`;\n- registry de writers: \`${P.registry}\`;\n- proyección única: \`${G.soleProjectionLogic}\`;\n- invariant: \`${L.continuityControl.invariant}\`.\nCualquier writer independiente, ordinal de Request o binding a candidata histórica dentro del estado/guards activos = \`PIPELINE_MECHANISM_FAILURE\` y bloqueo fail-closed.\n\n## Siguiente acción exacta\n\`${L.nextAction.id}\`: ${L.nextAction.description}\n\nRuta inmediata a producción: **${L.progress.productionRouteProgressPct}%**. Programa integral: **${L.progress.programProgressPct}%**. No aumentan por documentación.\n`;
 write(P.pr,pr);
-console.log(JSON.stringify({ok:true,status:'ORBIT360_CONTINUITY_PROJECTION_SYNC_PASS',stateVersion:L.stateVersion,targets:G.projectionTargets,requestOrdinalUsedAsHistoryOnly:h.requestOrdinal,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,writes:0},null,2));
+
+console.log(JSON.stringify({ok:true,status:'ORBIT360_CONTINUITY_PROJECTION_SYNC_PASS',stateVersion:L.stateVersion,activeGuardsDecoupled:true,successorCandidateArtifactId:null,historicalRequestOrdinal:h.requestOrdinal,historicalArtifactId:c.historicalArtifactId,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,writes:0},null,2));
