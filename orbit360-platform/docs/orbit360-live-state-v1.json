@@ -1,7 +1,7 @@
 {
   "schemaVersion": "orbit360-live-state-v1",
   "stateVersion": "ORBIT360-F2-CONTINUITY-CURRENT",
-  "updatedAt": "2026-08-20T05:37:43.853Z",
+  "updatedAt": "2026-08-20T05:49:48.356Z",
   "phase": "F2_PRODUCTIVE_ACCEPTANCE_SOURCE_ROOTFIX_VERIFIED",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -13,16 +13,6 @@
     "stateVersion": "ORBIT360-F2-CONTINUITY-CURRENT",
     "status": "ROOTFIX_SOURCEONLY_VERIFIED_PENDING_SUCCESSOR_CANDIDATE",
     "rootCauseStatus": "CLOSED_SOURCEONLY_VERIFIED"
-  },
-  "f2SourceOnly": {
-    "status": "ROOTFIX_SOURCEONLY_PASS",
-    "historicalCandidateArtifactId": 9387820198,
-    "historicalCandidateSourceHead": "fc46bd85783d8b4d524cbeb0fee54ee9a2c774af",
-    "historicalCandidateRuntimeReusable": false,
-    "historicalCandidateStatus": "SUPERSEDED_FOR_NEXT_RUNTIME_BY_SOURCE_ROOTFIX",
-    "rootfixCommit": "23412e7f6c58cdd5193d8ef9d09dfabd449d12f6",
-    "causalProof": "orbit360-platform/runtime-gate-crm-v20260716/f2-polizas-read-amplification-proof-v20260820.json",
-    "rootfixEvidence": "orbit360-platform/runtime-gate-crm-v20260716/f2-product-readonly-get-rootfix-sourceonly-v20260820.json"
   },
   "authorization": {
     "activeRuntimeAuthorization": false,
@@ -117,6 +107,15 @@
       "firestoreWrites": 0,
       "authWrites": 0,
       "operationalWrites": 0
+    },
+    "historicalCandidateBoundary": {
+      "historicalArtifactId": 9387820198,
+      "historicalSourceHead": "fc46bd85783d8b4d524cbeb0fee54ee9a2c774af",
+      "historicalZipSha256": "58fcbe6e8d7d3a425509c87f229b1cb12dd35a99133d46c757544cc75c55aacc",
+      "historicalManifestSha256": "b18422fdf82830d28e82f657f83b4fd5c10ea134a4735263fa2587a2ddd808cb",
+      "historicalFileCount": 194,
+      "historicalRuntimeReusable": false,
+      "status": "SUCCESSOR_SOURCE_CANDIDATE_REQUIRED"
     }
   }
 }

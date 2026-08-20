@@ -1,6 +1,6 @@
 {
   "schemaVersion": "orbit360-current-documentation-index-v1",
-  "updatedAt": "2026-08-20T05:37:43.853Z",
+  "updatedAt": "2026-08-20T05:49:48.356Z",
   "status": "CURRENT_BINDING_INDEX",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -70,8 +70,8 @@
     "rootCauseStatus": "CLOSED_SOURCEONLY_VERIFIED",
     "rootCauseClassification": "FUNCTIONAL_DEFECT",
     "rootCauseCode": "F2_PRODUCT_READONLY_GET_FULL_COLLECTION_CLONE_AMPLIFICATION",
-    "historicalCandidateArtifactId": 9387820198,
-    "historicalCandidateRuntimeReusable": false,
+    "successorCandidateRequired": true,
+    "successorCandidateArtifactId": null,
     "nextActionId": "PREPARE_VALIDATE_SUCCESSOR_F2_SOURCEONLY_CANDIDATE",
     "nextRuntimeAuthorized": false,
     "goLiveRoutePercentClosed": 50,
@@ -89,7 +89,8 @@
     "divergenceClassification": "PIPELINE_MECHANISM_FAILURE:DOCUMENTATION_STATE_DRIFT",
     "coherenceRequiredBeforeTechnicalAction": true,
     "noParallelContinuityOwner": true,
-    "requestOrdinalAllowedOnlyInHistory": true
+    "requestOrdinalAllowedOnlyInHistory": true,
+    "historicalArtifactAllowedOnlyInHistoryOrLedgerBoundary": true
   },
   "containsPII": false,
   "containsSecrets": false,
@@ -118,6 +119,15 @@
       "firestoreWrites": 0,
       "authWrites": 0,
       "operationalWrites": 0
+    },
+    "historicalCandidateBoundary": {
+      "historicalArtifactId": 9387820198,
+      "historicalSourceHead": "fc46bd85783d8b4d524cbeb0fee54ee9a2c774af",
+      "historicalZipSha256": "58fcbe6e8d7d3a425509c87f229b1cb12dd35a99133d46c757544cc75c55aacc",
+      "historicalManifestSha256": "b18422fdf82830d28e82f657f83b4fd5c10ea134a4735263fa2587a2ddd808cb",
+      "historicalFileCount": 194,
+      "historicalRuntimeReusable": false,
+      "status": "SUCCESSOR_SOURCE_CANDIDATE_REQUIRED"
     }
   }
 }
