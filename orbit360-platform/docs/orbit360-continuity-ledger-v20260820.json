@@ -1,0 +1,89 @@
+{
+  "schemaVersion": "orbit360-continuity-ledger-v1",
+  "stateVersion": "F2-R12-CONSUMED-ROOTCAUSE-OPEN-20260820-01",
+  "updatedAtUtc": "2026-08-20T04:46:00Z",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "phase": "F2_PRODUCTIVE_ACCEPTANCE_ROOT_CAUSE_OPEN",
+  "programProgressPct": 25,
+  "productionRouteProgressPct": 50,
+  "gateId": "f2-productive-acceptance-exact-successor-v20260818",
+  "requestVersion": "F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_V1",
+  "frozenCandidate": {
+    "artifactId": 9387820198,
+    "sourceHead": "fc46bd85783d8b4d524cbeb0fee54ee9a2c774af",
+    "zipSha256": "58fcbe6e8d7d3a425509c87f229b1cb12dd35a99133d46c757544cc75c55aacc",
+    "manifestSha256": "b18422fdf82830d28e82f657f83b4fd5c10ea134a4735263fa2587a2ddd808cb",
+    "fileCount": 194,
+    "productMutationAllowed": false
+  },
+  "currentRuntime": {
+    "requestOrdinal": 12,
+    "requestPath": ".github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-runbound-20260820-12.json",
+    "requestCommit": "3993fb5a8a8d3636914fa4a6d5bbdd18d5d6964d",
+    "requestStatus": "CONSUMED_FAIL_VALIDATOR_STALE",
+    "authorizationPath": ".github/orbit360-authorizations/f2-productive-acceptance-runtime-browser-readonly-request12-v20260820.json",
+    "authorizationStatus": "CONSUMED_FAIL_VALIDATOR_STALE",
+    "allowedExecutions": 0,
+    "consumed": true,
+    "replayAllowed": false,
+    "runId": 32332301619,
+    "runAttempt": 1,
+    "conclusion": "failure",
+    "evidenceArtifactId": 9393486955,
+    "evidenceArtifactDigest": "sha256:6681ed2d681c0cf23dd06e047f56988cc93ef08f5c3bc33c3cf1c39923662ed6",
+    "observedClassification": "VALIDATOR_STALE",
+    "observedFailureCode": "F2_ROUTE_READINESS_TIMEOUT_CONTRADICTED_BY_CAPTURE",
+    "observedLocation": "desktopDirection:polizas",
+    "routeElapsedMs": 64680,
+    "capturedContractVisible": true,
+    "integrityBeforeAfterPass": true,
+    "crossTenantDenied": true,
+    "localWriteGuardBlocked": true,
+    "firestoreWrites": 0,
+    "authWrites": 0,
+    "operationalWrites": 0
+  },
+  "lastProvenRootfix": {
+    "status": "F2_REQUEST11_VALIDATOR_STALE_ROOTFIX_SOURCEONLY_PASS",
+    "evidencePath": "orbit360-platform/runtime-gate-crm-v20260716/f2-request11-validator-stale-rootfix-sourceonly-v20260820.json",
+    "preflight": true,
+    "coherence": true,
+    "syntheticSuccessor": true
+  },
+  "currentRootCause": {
+    "status": "OPEN_SECOND_SAME_FAMILY_FAILURE",
+    "rootCauseConcluded": false,
+    "reason": "Request10 and Request12 both reached Direccion desktop Polizas with a route-readiness timeout contradicted by a final visible capture. Request12 took 64680 ms, so validator staleness cannot be assumed until event-loop/main-thread timing is separated from waiter timing.",
+    "candidateClassifications": [
+      "FUNCTIONAL_DEFECT:F2_ROUTE_MAIN_THREAD_BLOCKING_POLIZAS",
+      "VALIDATOR_STALE:F2_ROUTE_READINESS_WAITER_MISSED_VISIBLE_STATE"
+    ],
+    "evidenceNeeded": "SOURCE_ONLY_TIMING_INSTRUMENTATION_EVENT_LOOP_NAVIGATION_MOUNT_RENDER_READINESS_BOUNDARIES"
+  },
+  "checkpoint": "orbit360-platform/docs/CHECKPOINT-F2-REQUEST12-CONTINUITY-ANTIBUCLE-ROOT-CAUSE-OPEN-20260820.md",
+  "academiaUpdate": "orbit360-platform/docs/ACADEMIA-ACTUALIZACION-F2-CONTINUIDAD-ANTIBUCLE-CAUSA-RAIZ-POLIZAS-20260820.md",
+  "continuityInvariant": "tools/orbit360-f2-continuity-invariant-v20260820.mjs",
+  "continuityAuditEvidence": "orbit360-platform/runtime-gate-crm-v20260716/f2-continuity-audit-v20260820.json",
+  "nextActionExact": "Instrument and validate source-only timing boundaries for Direccion desktop -> Polizas to distinguish main-thread blocking from waiter defect. Do not create Request13 or increase timeout until causal proof and source-only audit PASS.",
+  "forbiddenActions": [
+    "REQUEST11_REPLAY",
+    "REQUEST12_REPLAY",
+    "REQUEST13_MATERIALIZATION_BEFORE_CAUSAL_PROOF",
+    "ROUTE_TIMEOUT_INCREASE_BEFORE_CAUSAL_PROOF",
+    "POLIZAS_PRODUCT_MUTATION_BEFORE_CAUSAL_PROOF",
+    "DEPLOY",
+    "PUBLICATION",
+    "PRODUCTION",
+    "MAIN",
+    "MERGE"
+  ],
+  "lanes": {
+    "A_frontend_ux_academia": "FROZEN_CANDIDATE_PLUS_ACADEMIA_CONTINUITY_UPDATE",
+    "B_backend_security_gates": "F2_ROOT_CAUSE_OPEN_CONTINUITY_SYNC_REQUIRED",
+    "C_real_data_migration": "UNCHANGED"
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
