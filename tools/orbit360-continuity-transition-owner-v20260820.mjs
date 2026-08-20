@@ -57,7 +57,38 @@ function bumpCommon() {
 }
 
 let result;
-if (transitionId === 'CP10_CLOSE_PACKAGE') {
+if (transitionId === 'POST_CLOSE_RECONCILE_CONTROL_PLANE_METADATA') {
+  if (pkg.status !== 'CLOSED_PASS' || pkg.resumeProtocol?.firstIncompleteStep !== 'CP-11') throw new Error('POST_CLOSE_RECONCILE_REQUIRES_CLOSED_CP11');
+  bumpCommon();
+  pkg.controlPlaneClosure = {
+    status:'CLOSED_PASS_RECONCILED',
+    transitionOwner:'tools/orbit360-continuity-transition-owner-v20260820.mjs',
+    projection:'tools/orbit360-continuity-projection-atomic-v20260820.mjs',
+    compositeInvariant:'tools/orbit360-control-plane-composite-invariant-v20260820.mjs',
+    independentReadback:'tools/orbit360-control-plane-independent-readback-v20260820.mjs',
+    workflow:'.github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml',
+    runtimeAuthorized:false
+  };
+  ledger.continuityControl.status='CLOSED_PASS';
+  ledger.continuityControl.syncTool='tools/orbit360-continuity-projection-atomic-v20260820.mjs';
+  ledger.continuityControl.invariant='tools/orbit360-control-plane-composite-invariant-v20260820.mjs';
+  ledger.continuityControl.projectionWorkflowTemporarilyFailClosed=false;
+  ledger.continuityControl.compositeInvariantRequiredBeforeClosure=true;
+  ledger.continuityControl.compositeInvariantStatus='PASS';
+  ledger.continuityControl.independentReadback='tools/orbit360-control-plane-independent-readback-v20260820.mjs';
+  ledger.productionReopeningPackage.status='CLOSED_PASS';
+  ledger.productionReopeningPackage.authorizationAllowed=true;
+  ledger.productionReopeningPackage.runtimeAllowed=false;
+  ledger.productionReopeningPackage.requestMaterializationAllowed=false;
+  ledger.productionReopeningPackage.firstIncompleteStep='CP-11';
+  ledger.productionReopeningPackage.nextActionExact='CP-11_PREPARE_FRESH_F2_RUNTIME_AUTHORIZATION_BOUNDARY';
+  ledger.authorizationBoundary.activeRuntimeAuthorization=false;
+  ledger.authorizationBoundary.freshAuthorizationRequired=true;
+  ledger.authorizationBoundary.authorizationBlockedByHardeningPackage=false;
+  ledger.authorizationBoundary.nextRuntimeMaterializationAllowed=false;
+  ledger.authorizationBoundary.newRuntimeRequestAllowed=false;
+  result={ok:true,status:'ORBIT360_POST_CLOSE_CONTROL_PLANE_METADATA_RECONCILED',transitionId,fromLedgerRevision:expectedRevision,toLedgerRevision:ledger.revision,fromPackageRevision:expectedPackageRevision,toPackageRevision:pkg.revision,firstIncompleteStep:'CP-11'};
+} else if (transitionId === 'CP10_CLOSE_PACKAGE') {
   if (pkg.status !== 'OPEN_FAIL_CLOSED') throw new Error('PACKAGE_MUST_BE_OPEN_FAIL_CLOSED');
   if (pkg.resumeProtocol?.firstIncompleteStep !== 'CP-10') throw new Error('CP10_NOT_ACTIVE');
   const cp10=(pkg.steps||[]).find(s=>s.id==='CP-10');
@@ -78,8 +109,12 @@ if (transitionId === 'CP10_CLOSE_PACKAGE') {
   ledger.authorizationBoundary.authorizationBlockedByHardeningPackage=false;
   ledger.authorizationBoundary.nextRuntimeMaterializationAllowed=false;
   ledger.authorizationBoundary.newRuntimeRequestAllowed=false;
-  ledger.productionReopeningPackage.status='CLOSED_PASS'; ledger.productionReopeningPackage.firstIncompleteStep='CP-11'; ledger.productionReopeningPackage.nextActionExact='CP-11_PREPARE_FRESH_F2_RUNTIME_AUTHORIZATION_BOUNDARY';
+  ledger.productionReopeningPackage.status='CLOSED_PASS'; ledger.productionReopeningPackage.authorizationAllowed=true; ledger.productionReopeningPackage.firstIncompleteStep='CP-11'; ledger.productionReopeningPackage.nextActionExact='CP-11_PREPARE_FRESH_F2_RUNTIME_AUTHORIZATION_BOUNDARY';
   ledger.continuityControl.status='CLOSED_PASS';
+  ledger.continuityControl.syncTool='tools/orbit360-continuity-projection-atomic-v20260820.mjs';
+  ledger.continuityControl.invariant='tools/orbit360-control-plane-composite-invariant-v20260820.mjs';
+  ledger.continuityControl.projectionWorkflowTemporarilyFailClosed=false;
+  ledger.continuityControl.compositeInvariantStatus='PASS';
   ledger.nextAction={id:'CP-11_PREPARE_FRESH_F2_RUNTIME_AUTHORIZATION_BOUNDARY',description:'Prepare a fresh F2 runtime authorization boundary; runtime remains unauthorized until separate explicit user authorization.',runtimeAllowed:false};
   ledger.lanes.B_backend_security_gates='CONTROL_PLANE_HARDENING_CLOSED_RUNTIME_AUTHORIZATION_PENDING';
   result={ok:true,status:'ORBIT360_CONTINUITY_PACKAGE_CLOSED_PASS',transitionId,fromLedgerRevision:expectedRevision,toLedgerRevision:ledger.revision,fromPackageRevision:expectedPackageRevision,toPackageRevision:pkg.revision,firstIncompleteStep:'CP-11'};
