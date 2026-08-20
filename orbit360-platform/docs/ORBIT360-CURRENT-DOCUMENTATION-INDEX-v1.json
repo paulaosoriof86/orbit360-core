@@ -1,16 +1,17 @@
 {
   "schemaVersion": "orbit360-current-documentation-index-v1",
-  "updatedAt": "2026-08-20T13:50:00Z",
+  "updatedAt": "2026-08-20T16:12:00Z",
   "status": "CURRENT_BINDING_INDEX_HARDENING_LOCK_ACTIVE",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
   "currentCheckpoint": "orbit360-platform/docs/CHECKPOINT-CONTROL-PLANE-HARDENING-20260820.md",
   "productionReopeningPackage": "orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json",
+  "canonicalF2ContractAuthority": "tools/orbit360-gate-contract-f2-productive-acceptance-v20260820.json",
   "canonicalCurrent": {
     "stateVersion": "ORBIT360-F2-CONTINUITY-CURRENT",
     "status": "PRODUCTION_REOPENING_PACKAGE_OPEN_FAIL_CLOSED",
-    "rootCauseStatus": "SYSTEMIC_ROOT_CAUSE_CONFIRMED_PENDING_HARDENING"
+    "rootCauseStatus": "CP01_CP02_SOURCE_ONLY_RESOLVED_CP03_PENDING"
   },
   "bindingRules": [
     {"id":"master-20260704","sourceType":"project_attachment","sourceName":"DOCUMENTO-MAESTRO-CONSOLIDADO-ORBIT360-AYS-20260704.md"},
@@ -26,6 +27,7 @@
     "orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json",
     "orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json",
     "orbit360-platform/docs/CHECKPOINT-CONTROL-PLANE-HARDENING-20260820.md",
+    "tools/orbit360-gate-contract-f2-productive-acceptance-v20260820.json",
     "orbit360-platform/docs/orbit360-continuity-writer-registry-v20260820.json",
     "orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json",
     "orbit360-platform/docs/orbit360-live-state-v1.json",
@@ -36,8 +38,8 @@
     "olderRuntimeAuthorizationNextActionSubordinate": true,
     "olderCheckpointSubordinate": true,
     "olderPrBodySubordinateWhenContradictedByNewerHead": true,
-    "firstIncompleteStep": "CP-01",
-    "nextActionExact": "CP-01_UNIFY_F2_GATE_CONTRACT_AUTHORITY",
+    "firstIncompleteStep": "CP-03",
+    "nextActionExact": "CP-03_CREATE_SINGLE_REVISIONED_LEDGER_MUTATION_OWNER",
     "newRuntimeRequestAllowed": false
   },
   "operationalCurrent": {
@@ -49,14 +51,15 @@
     "productionReopeningPackage": "orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json",
     "writerRegistry": "orbit360-platform/docs/orbit360-continuity-writer-registry-v20260820.json",
     "continuityInvariant": "tools/orbit360-f2-continuity-invariant-v20260820.mjs",
-    "rootCauseStatus": "SYSTEMIC_ROOT_CAUSE_CONFIRMED_PENDING_HARDENING",
+    "canonicalF2ContractAuthority": "tools/orbit360-gate-contract-f2-productive-acceptance-v20260820.json",
+    "canonicalGateContractVersion": "2.2.0",
+    "contractAuthorityRootfixStatus": "CP01_CP02_SOURCE_ONLY_RESOLVED",
     "rootCauseClassification": "PIPELINE_MECHANISM_FAILURE",
     "rootCauseCode": "CONTROL_PLANE_NOT_FULLY_ATOMIC",
-    "secondaryClassification": "VALIDATOR_STALE:CONTRACT_VERSION_DRIFT",
     "successorCandidateArtifactId": 9395391426,
     "successorCandidateSourceHead": "6af0c029aebb1bfecd05569452c814584110ae4c",
     "candidateArtifactDigest": "c089ea81672225876f643399b970d1e50e7d9cdc084dfc75973e00ed8581c53c",
-    "nextActionId": "CP-01_UNIFY_F2_GATE_CONTRACT_AUTHORITY",
+    "nextActionId": "CP-03_CREATE_SINGLE_REVISIONED_LEDGER_MUTATION_OWNER",
     "nextRuntimeAuthorized": false,
     "newRuntimeRequestAllowed": false,
     "goLiveRoutePercentClosed": 50,
@@ -85,7 +88,7 @@
     "failureCode": "F2_ACTIVE_PIPELINE_HISTORICAL_CANDIDATE_LITERAL",
     "preGateFailure": true,
     "writes": 0,
-    "requestMetadataStillClaimsUnconsumed": true,
+    "requestMetadataReconciled": true,
     "replayAllowed": false
   },
   "containsPII": false,
