@@ -32,5 +32,12 @@ El patrón correcto usa claves semánticas genéricas, por ejemplo `historicalAr
 ## Caso aplicado F2
 La candidata sucesora source-only fue certificada con dos deltas exactos: readiness del router y rootfix del store `cache.find -> clone(foundRow)`. El artifact histórico anterior no fue reutilizado. La certificación no habilita navegador, secrets, Firestore, writes, deploy ni producción; solo cambia la frontera canónica de `candidata pendiente` a `candidata certificada pendiente de autorización runtime fresca`.
 
+## Patrón aprendido del pre-gate runtime
+Un guard puede necesitar conocer un identificador histórico para bloquearlo, pero ese identificador tampoco debe estar hard-codeado dentro del validador activo. Si el self-test prohíbe literales históricos y el engine contiene el mismo literal como sentinel, el instrumento se contradice a sí mismo y debe clasificarse `VALIDATOR_STALE`, no como defecto del producto.
+
+La solución reusable es obtener dinámicamente `candidateBoundary.historicalArtifactId` desde el ledger y comparar la candidata activa contra ese valor. Así el guard sigue bloqueando reuso, pero el pipeline no queda enlazado a un artifact histórico específico.
+
+Si una ejecución falla **antes del gate**, se debe comprobar explícitamente que no existió acceso a secrets, Firestore o navegador, sellar request/autorización con `allowedExecutions=0`, `consumed=true`, `replayAllowed=false`, mover el ordinal únicamente a historia y exigir autorización fresca para cualquier intento posterior.
+
 ## Regla de continuidad
 Una conversación nueva debe iniciar en `orbit360-continuity-ledger-v20260820.json`, validar el writer registry y leer el audit vigente. Nunca debe inferir el estado actual desde el número del último Request ni desde un artifact histórico.

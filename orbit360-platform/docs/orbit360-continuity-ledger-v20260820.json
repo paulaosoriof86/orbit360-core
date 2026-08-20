@@ -1,8 +1,8 @@
 {
   "schemaVersion": "orbit360-continuity-ledger-v2",
   "ledgerId": "ORBIT360-F2-CONTINUITY-CURRENT",
-  "revision": 5,
-  "updatedAtUtc": "2026-08-20T06:12:00Z",
+  "revision": 6,
+  "updatedAtUtc": "2026-08-20T06:35:00Z",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
@@ -44,10 +44,7 @@
     "artifactDigest": "c089ea81672225876f643399b970d1e50e7d9cdc084dfc75973e00ed8581c53c",
     "fileCount": 194,
     "deltaCount": 2,
-    "deltaPaths": [
-      "core/product-app-p0.js",
-      "data/store-firestore-product-readonly-p0.js"
-    ],
+    "deltaPaths": ["core/product-app-p0.js", "data/store-firestore-product-readonly-p0.js"],
     "unchangedFileCount": 192,
     "predecessorArtifactId": 9385306424,
     "historicalArtifactUsed": false,
@@ -84,12 +81,7 @@
   "continuityControl": {
     "status": "CLOSED_VERIFIED",
     "classification": "PIPELINE_MECHANISM_FAILURE_ROOTFIX_VERIFIED",
-    "resolvedDesign": [
-      "ACTIVE_STATE_ORDINAL_FREE",
-      "SINGLE_CANONICAL_PROJECTION_OWNER",
-      "EVIDENCE_TO_STATE_PROJECTION_REQUIRED",
-      "CERTIFIED_SUCCESSOR_STATE_PERSISTENT"
-    ],
+    "resolvedDesign": ["ACTIVE_STATE_ORDINAL_FREE", "SINGLE_CANONICAL_PROJECTION_OWNER", "EVIDENCE_TO_STATE_PROJECTION_REQUIRED", "CERTIFIED_SUCCESSOR_STATE_PERSISTENT", "RUNTIME_PIPELINE_HISTORICAL_ID_DYNAMIC_GUARD"],
     "writerRegistry": "orbit360-platform/docs/orbit360-continuity-writer-registry-v20260820.json",
     "syncTool": "tools/orbit360-continuity-sync-v20260820.mjs",
     "invariant": "tools/orbit360-f2-continuity-invariant-v20260820.mjs",
@@ -98,44 +90,45 @@
     "writerOffenders": 0,
     "requestOrdinalInActiveState": false
   },
-  "checkpoint": "orbit360-platform/docs/CHECKPOINT-F2-SUCCESSOR-SOURCEONLY-CANDIDATE-CERTIFIED-20260820.md",
+  "checkpoint": "orbit360-platform/docs/CHECKPOINT-F2-RUNTIME-PREGATE-VALIDATOR-STALE-ROOTFIXED-20260820.md",
   "academiaUpdate": "orbit360-platform/docs/ACADEMIA-ACTUALIZACION-CONTINUIDAD-ORDINAL-FREE-SINGLE-WRITER-20260820.md",
   "nextAction": {
     "id": "AWAIT_FRESH_EXPLICIT_AUTHORIZATION_FOR_CERTIFIED_F2_SUCCESSOR_RUNTIME",
-    "description": "The new F2 successor candidate is certified source-only. Preserve it frozen and await a fresh explicit authorization before creating or materializing any runtime request; no authorization carry-forward, replay, deploy, publication or production action is allowed.",
+    "description": "The certified F2 successor remains frozen. The last authorized execution was consumed pre-gate as validator-stale and is sealed in history; a fresh explicit authorization is required before any new runtime request. No carry-forward, replay, deploy, publication or production action is allowed.",
     "runtimeAllowed": false
   },
   "history": {
     "latestConsumedRuntime": {
-      "requestOrdinal": 12,
-      "requestPath": ".github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-runbound-20260820-12.json",
-      "authorizationPath": ".github/orbit360-authorizations/f2-productive-acceptance-runtime-browser-readonly-request12-v20260820.json",
-      "requestCommit": "3993fb5a8a8d3636914fa4a6d5bbdd18d5d6964d",
-      "runId": 32332301619,
+      "requestOrdinal": 13,
+      "requestPath": ".github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-runbound-20260820-13.json",
+      "authorizationPath": ".github/orbit360-authorizations/f2-productive-acceptance-runtime-browser-readonly-request13-v20260820.json",
+      "requestCommit": "8e90f714dd9702bb2b9d3fba5158fe3e4228081a",
+      "runId": 32339845253,
       "runAttempt": 1,
       "conclusion": "failure",
-      "evidenceArtifactId": 9393486955,
-      "evidenceArtifactDigest": "sha256:6681ed2d681c0cf23dd06e047f56988cc93ef08f5c3bc33c3cf1c39923662ed6",
+      "evidenceArtifactId": 9395952863,
+      "evidenceArtifactDigest": "sha256:c75cbd38af8312a0aca99ed72a1deb0e2c877525b74fc27fee79db8cde8f3983",
       "requestStatus": "CONSUMED_FAIL_VALIDATOR_STALE",
       "authorizationStatus": "CONSUMED_FAIL_VALIDATOR_STALE",
       "allowedExecutions": 0,
       "consumed": true,
       "replayAllowed": false,
       "observedClassification": "VALIDATOR_STALE",
-      "observedFailureCode": "F2_ROUTE_READINESS_TIMEOUT_CONTRADICTED_BY_CAPTURE",
-      "observedLocation": "desktopDirection:polizas",
-      "routeElapsedMs": 64680,
-      "integrityBeforeAfterPass": true,
-      "crossTenantDenied": true,
+      "observedFailureCode": "F2_ACTIVE_PIPELINE_HISTORICAL_CANDIDATE_LITERAL",
+      "preGateFailure": true,
+      "secretAccess": false,
+      "firestoreRead": false,
+      "browserExecuted": false,
+      "runtimeExecuted": false,
       "firestoreWrites": 0,
       "authWrites": 0,
       "operationalWrites": 0
     },
-    "priorConsumedRuntimeOrdinals": [11, 12]
+    "priorConsumedRuntimeOrdinals": [11, 12, 13]
   },
   "lanes": {
     "A_frontend_ux_academia": "ROOTFIX_DOCUMENTED_ACADEMIA_UPDATED",
-    "B_backend_security_gates": "SUCCESSOR_SOURCEONLY_CANDIDATE_CERTIFIED_RUNTIME_BLOCKED_PENDING_FRESH_AUTHORIZATION",
+    "B_backend_security_gates": "CERTIFIED_SUCCESSOR_FROZEN_PREGATE_VALIDATOR_STALE_ROOTFIXED_PENDING_FRESH_AUTHORIZATION",
     "C_real_data_migration": "UNCHANGED"
   },
   "progress": {
