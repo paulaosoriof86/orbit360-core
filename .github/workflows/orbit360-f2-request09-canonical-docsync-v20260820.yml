@@ -1,0 +1,59 @@
+name: Orbit360 F2 Request09 Canonical Docs Sync 20260820
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-requests/f2-request09-canonical-docsync-20260820.json'
+permissions:
+  contents: write
+concurrency:
+  group: orbit360-f2-request09-canonical-docsync-20260820
+  cancel-in-progress: false
+jobs:
+  sync:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify inert docs-sync request
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
+          test "${#CHANGED[@]}" = '1'
+          test "${CHANGED[0]}" = '.github/orbit360-requests/f2-request09-canonical-docsync-20260820.json'
+          jq -e '.schemaVersion=="orbit360-f2-request09-canonical-docsync-request-v1" and .sourceOnly==true and .request09Consumed==true and .candidateArtifactId==9387820198 and .request10Authorized==false and .browser==false and .runtime==false and .secrets==false and .firestoreRead==false and .writes==false and .deploy==false and .production==false' "${CHANGED[0]}" >/dev/null
+      - name: Synchronize canonical state atomically
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-sync-f2-request09-route-observability-docs-v20260820.mjs
+          node -e "const fs=require('fs');const l=JSON.parse(fs.readFileSync('orbit360-platform/docs/orbit360-live-state-v1.json'));const i=JSON.parse(fs.readFileSync('orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json'));const r=JSON.parse(fs.readFileSync('tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-runtime-v20260819.json'));if(l.rootCauseState.currentBlockingFact.code!=='F2_REQUEST10_RUNTIME_FRESH_AUTHORIZATION_REQUIRED'||l.rootCauseState.currentBlockingFact.candidateArtifactId!==9387820198||l.f2Runtime09.runId!==32316883621||l.stopRetry.request09RequestReplayAllowed!==false||i.operationalCurrent.request09Consumed!==true||i.operationalCurrent.request10Authorized!==false||r.lastExecution.runId!==32316883621||r.status!=='F2_RUNTIME_PENDING_FRESH_AUTHORIZATION')process.exit(41)"
+          jq -e '.ok==true and .status=="F2_REQUEST09_CANONICAL_DOCSYNC_PASS" and .request09Consumed==true and .request09ReplayAllowed==false and .candidateArtifactId==9387820198 and .routeObservabilitySourcefixPass==true and .request10Created==false and .request10Authorized==false and .productMutation==false and .dataMutation==false and .browserExecuted==false and .runtimeExecuted==false and .firestoreWrites==0 and .productionTouched==false' orbit360-platform/runtime-gate-crm-v20260716/f2-request09-canonical-docsync-v20260820.json >/dev/null
+          git diff --check
+      - name: Persist docs transaction
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'orbit360-f2-docsync-bot'
+          git config user.email 'orbit360-f2-docsync-bot@users.noreply.github.com'
+          git add -- \
+            orbit360-platform/docs/orbit360-live-state-v1.json \
+            orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json \
+            tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-runtime-v20260819.json \
+            orbit360-platform/docs/CHECKPOINT-F2-REQUEST09-CONSUMED-ROUTE-OBSERVABILITY-ROOTFIX-PASS-REQUEST10-AUTH-PENDING-20260820.md \
+            orbit360-platform/docs/ACADEMIA-ACTUALIZACION-F2-REQUEST09-ROUTE-OBSERVABILITY-20260820.md \
+            orbit360-platform/runtime-gate-crm-v20260716/f2-request09-canonical-docsync-v20260820.json
+          git diff --cached --check
+          git commit -m 'docs(f2): sync Request09 consumed and Request10 auth boundary [skip ci]'
+          git fetch origin ays/backend-tenant-lab-v99-20260703
+          git rebase origin/ays/backend-tenant-lab-v99-20260703
+          test -z "$(git status --porcelain)"
+          git push origin HEAD:ays/backend-tenant-lab-v99-20260703
