@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "orbit360-f2-successor-candidate-build-request-v1",
+  "requestVersion": "F2_SUCCESSOR_CANDIDATE_BUILD_SOURCEONLY_V1",
+  "status": "SOURCE_ONLY_ONCE",
+  "sourceOnly": true,
+  "allowedExecutions": 1,
+  "replayAllowed": false,
+  "parentHead": "6af0c029aebb1bfecd05569452c814584110ae4c",
+  "sourceHead": "6af0c029aebb1bfecd05569452c814584110ae4c",
+  "predecessorArtifactId": 9385306424,
+  "predecessorInnerZip": "orbit360-fase-a-product-f2-request06-rootfix-successor-b94b2ae86d26.zip",
+  "predecessorZipSha256": "81a96f476fd0fdfd814b3f047951ce653fd324bef8a6d96d6ee6fe44dd7bdcf4",
+  "predecessorManifestSha256": "cc6170121ed61fd6d9cde867dfcae8a3dd23d29777c6ee28c240d70e49843eef",
+  "predecessorManifestStatus": "FASE_A_PRODUCT_F2_REQUEST06_ROOTFIX_SUCCESSOR_CERTIFIED",
+  "predecessorSourceHead": "b94b2ae86d26586a68d33be9edba8715e956b02e",
+  "forbiddenArtifactIds": [9387820198],
+  "deltaPaths": [
+    "core/product-app-p0.js",
+    "data/store-firestore-product-readonly-p0.js"
+  ],
+  "rootCause": "FUNCTIONAL_DEFECT:F2_PRODUCT_READONLY_GET_FULL_COLLECTION_CLONE_AMPLIFICATION",
+  "runtime": false,
+  "browser": false,
+  "secrets": false,
+  "firestoreRead": false,
+  "writes": false,
+  "deploy": false,
+  "production": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
