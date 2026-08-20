@@ -1,12 +1,12 @@
 {
   "schemaVersion": "orbit360-f2-continuity-audit-v4",
-  "ok": false,
-  "status": "ORBIT360_CONTINUITY_ACTIVE_GUARDS_AUDIT_FAIL",
-  "classification": "PIPELINE_MECHANISM_FAILURE",
-  "code": "CONTINUITY_CERTIFIED_SUCCESSOR_PERSISTENCE_FAILURE",
+  "ok": true,
+  "status": "ORBIT360_CONTINUITY_ACTIVE_GUARDS_AUDIT_PASS",
+  "classification": "PASS",
+  "code": null,
   "stateVersion": "ORBIT360-F2-CONTINUITY-CURRENT",
   "activeStateOrdinalFree": true,
-  "historicalArtifactAbsentFromActive": false,
+  "historicalArtifactAbsentFromActive": true,
   "lifecycleLegacyGuardKeysAbsent": true,
   "certifiedSuccessor": true,
   "successorCandidateArtifactId": 9395391426,
@@ -20,7 +20,7 @@
     "ledgerV2": true,
     "continuityClosedVerified": true,
     "ordinalFreeActiveState": true,
-    "historicalArtifactAbsentFromActive": false,
+    "historicalArtifactAbsentFromActive": true,
     "lifecycleLegacyGuardKeysAbsent": true,
     "lifecycleSuccessorGuards": true,
     "lifecycleSourcePrerequisiteDecoupled": true,
@@ -42,9 +42,7 @@
     "prAvailable": true,
     "prCurrent": true
   },
-  "failed": [
-    "historicalArtifactAbsentFromActive"
-  ],
+  "failed": [],
   "productMutation": false,
   "dataMutation": false,
   "runtimeExecuted": false,
