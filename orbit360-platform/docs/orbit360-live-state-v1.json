@@ -1,8 +1,8 @@
 {
   "schemaVersion": "orbit360-live-state-v1",
   "stateVersion": "20260819.f2.request07-validator-stale-sourcefix-pass-request08-auth-pending.current",
-  "updatedAt": "2026-08-19T23:30:42.063Z",
-  "phase": "F2_REQUEST07_VALIDATOR_STALE_SOURCEFIX_PASS_REQUEST08_AUTH_PENDING",
+  "updatedAt": "2026-08-20T00:04:37.664Z",
+  "phase": "F2_REQUEST08_SUCCESSOR_SOURCE_REBIND_PENDING",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pr": 5,
@@ -155,16 +155,16 @@
     }
   },
   "f2SourceOnly": {
-    "status": "CLOSED_PASS",
+    "status": "PENDING_REBIND_SOURCE_ONLY",
     "gateId": "f2-productive-acceptance-exact-successor-v20260818",
     "contractVersion": "2.1.0",
     "validatorLifecycleRevision": "phase-capability-contract-v2-source-rebind",
     "f2ValidatorRevision": "f2-productive-acceptance-exact-successor-rebind-v2-20260819",
     "canonicalRouterVersion": "v10.7-f2-lifecycle-composition-profile-aware",
-    "candidateArtifactId": 9385306424,
-    "candidateSourceHead": "b94b2ae86d26586a68d33be9edba8715e956b02e",
-    "candidateZipSha256": "81a96f476fd0fdfd814b3f047951ce653fd324bef8a6d96d6ee6fe44dd7bdcf4",
-    "candidateManifestSha256": "cc6170121ed61fd6d9cde867dfcae8a3dd23d29777c6ee28c240d70e49843eef",
+    "candidateArtifactId": 9387820198,
+    "candidateSourceHead": "fc46bd85783d8b4d524cbeb0fee54ee9a2c774af",
+    "candidateZipSha256": "58fcbe6e8d7d3a425509c87f229b1cb12dd35a99133d46c757544cc75c55aacc",
+    "candidateManifestSha256": "b18422fdf82830d28e82f657f83b4fd5c10ea134a4735263fa2587a2ddd808cb",
     "candidateFileCount": 194,
     "fullRehashPass": true,
     "routes": [
@@ -221,11 +221,12 @@
       "productAffected": false,
       "dataAffected": false
     },
-    "candidateManifestStatus": "FASE_A_PRODUCT_F2_REQUEST06_ROOTFIX_SUCCESSOR_CERTIFIED",
-    "predecessorArtifactId": 9345207863,
+    "candidateManifestStatus": "FASE_A_PRODUCT_F2_REQUEST08_ROUTER_READINESS_SUCCESSOR_CERTIFIED",
+    "predecessorArtifactId": 9385306424,
     "inicioFiniteRootfixPass": true,
     "sourceValidationRunId": 32310630524,
-    "sourceEvidenceArtifactId": 9386304228
+    "sourceEvidenceArtifactId": 9386304228,
+    "routerReadinessRootfixPass": true
   },
   "rootCauseState": {
     "membershipValidator": {
@@ -474,8 +475,8 @@
     }
   },
   "lanes": {
-    "A_frontend_UX": "FROZEN_ROOTFIX_CERTIFIED_SOURCE_CLOSED_PASS",
-    "B_backend_security_gates": "REQUEST07_CONSUMED_VALIDATOR_STALE_SOURCEFIX_PASS_REQUEST08_FRESH_AUTH_PENDING",
+    "A_frontend_UX": "FROZEN_REQUEST08_ROUTER_READINESS_ROOTFIX_SUCCESSOR_BUILT",
+    "B_backend_security_gates": "F2_REQUEST08_SUCCESSOR_SOURCE_REBIND_PENDING",
     "C_real_data_migration": "UNTOUCHED_ZERO_CHANGES"
   },
   "writes": {
@@ -540,10 +541,10 @@
     "request08MayBeCreatedWithoutFreshAuthorization": false
   },
   "nextActionExact": {
-    "action": "OBTAIN_FRESH_AUTHORIZATION_REQUEST08_RUNTIME_BROWSER_READONLY",
+    "action": "RUN_F2_REQUEST08_SUCCESSOR_SOURCE_ONLY_VALIDATION",
     "gateId": "f2-productive-acceptance-exact-successor-v20260818",
     "requestVersion": "F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_V1",
-    "candidateArtifactId": 9385306424,
+    "candidateArtifactId": 9387820198,
     "candidateSourceHead": "b94b2ae86d26586a68d33be9edba8715e956b02e",
     "status": "FRESH_AUTHORIZATION_REQUIRED",
     "runtimeAuthorizationRequired": true,
