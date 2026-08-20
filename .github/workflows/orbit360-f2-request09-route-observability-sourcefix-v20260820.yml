@@ -1,0 +1,57 @@
+name: Orbit360 F2 Request09 Route Observability Sourcefix 20260820
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-requests/f2-request09-route-observability-sourcefix-20260820.json'
+permissions:
+  contents: write
+concurrency:
+  group: orbit360-f2-request09-route-observability-sourcefix-20260820
+  cancel-in-progress: false
+jobs:
+  sourcefix:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify source-only boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
+          test "${#CHANGED[@]}" = '1'
+          test "${CHANGED[0]}" = '.github/orbit360-requests/f2-request09-route-observability-sourcefix-20260820.json'
+          jq -e '.schemaVersion=="orbit360-f2-request09-route-observability-sourcefix-v1" and .sourceOnly==true and .candidateArtifactId==9387820198 and .request09Consumed==true and .request10Authorized==false and .browser==false and .runtime==false and .secrets==false and .firestoreRead==false and .writes==false and .deploy==false and .production==false' "${CHANGED[0]}" >/dev/null
+      - name: Apply route observability rootfix only
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-apply-f2-request09-route-observability-rootfix-v20260820.mjs
+          node --check tools/orbit360-f2-productive-acceptance-runtime-browser-readonly-v20260818.mjs
+          node --check tools/orbit360-test-f2-full-runtime-known-rootfixes-v20260819.mjs
+          grep -F 'FUNCTIONAL_DEFECT:F2_ROUTE_NOT_RENDERED' tools/orbit360-f2-productive-acceptance-runtime-browser-readonly-v20260818.mjs >/dev/null
+          grep -F 'FUNCTIONAL_DEFECT:F2_ROUTE_NOT_VISIBLE' tools/orbit360-f2-productive-acceptance-runtime-browser-readonly-v20260818.mjs >/dev/null
+          grep -F 'F2_ROUTE_WAIT_OBSERVABILITY_NOT_BOUND' tools/orbit360-test-f2-full-runtime-known-rootfixes-v20260819.mjs >/dev/null
+          jq -e '.ok==true and .status=="F2_REQUEST09_ROUTE_OBSERVABILITY_ROOTFIX_SOURCE_APPLIED" and .productMutation==false and .candidateRebuild==false and .runnerStillRequiresVisibleHost==true and .routeLabelsBound==true and .browserExecuted==false and .runtimeExecuted==false and .request10Authorized==false' orbit360-platform/runtime-gate-crm-v20260716/f2-request09-route-observability-rootfix-source-v20260820.json >/dev/null
+          git diff --check
+      - name: Persist sourcefix atomically
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'orbit360-f2-sourcefix-bot'
+          git config user.email 'orbit360-f2-sourcefix-bot@users.noreply.github.com'
+          git add -- tools/orbit360-f2-productive-acceptance-runtime-browser-readonly-v20260818.mjs tools/orbit360-test-f2-full-runtime-known-rootfixes-v20260819.mjs orbit360-platform/runtime-gate-crm-v20260716/f2-request09-route-observability-rootfix-source-v20260820.json
+          git diff --cached --check
+          git commit -m 'fix(f2): type Request09 route visibility failures [skip ci]'
+          git fetch origin ays/backend-tenant-lab-v99-20260703
+          git rebase origin/ays/backend-tenant-lab-v99-20260703
+          test -z "$(git status --porcelain)"
+          git push origin HEAD:ays/backend-tenant-lab-v99-20260703
