@@ -1,16 +1,16 @@
 {
   "schemaVersion": "orbit360-continuity-ledger-v2",
   "ledgerId": "ORBIT360-F2-CONTINUITY-CURRENT",
-  "revision": 18,
-  "updatedAtUtc": "2026-08-20T18:03:48.697Z",
+  "revision": 20,
+  "updatedAtUtc": "2026-08-20T23:51:37.284Z",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
   "stateVersion": "ORBIT360-F2-CONTINUITY-CURRENT",
   "gateId": "f2-productive-acceptance-exact-successor-v20260818",
   "activeState": {
-    "phase": "F2_RUNTIME_AUTHORIZATION_BOUNDARY_PREPARED_AWAITING_EXPLICIT_AUTHORIZATION",
-    "status": "F2_RUNTIME_AUTHORIZATION_NOT_YET_GRANTED",
+    "phase": "F2_RUNTIME_REQUEST_MATERIALIZED_AWAITING_PREFLIGHT",
+    "status": "F2_RUNTIME_REQUEST_MATERIALIZED_SOURCE_ONLY",
     "rootCauseStatus": "CONTROL_PLANE_HARDENING_CLOSED_PASS_CP11_BOUNDARY_READY",
     "productFrozen": true,
     "dataFrozen": true,
@@ -51,8 +51,8 @@
     "successorSourceHead": "6af0c029aebb1bfecd05569452c814584110ae4c"
   },
   "authorizationBoundary": {
-    "activeRuntimeAuthorization": false,
-    "freshAuthorizationRequired": true,
+    "activeRuntimeAuthorization": true,
+    "freshAuthorizationRequired": false,
     "authorizationBlockedByHardeningPackage": false,
     "authorizationCarryForwardForbidden": true,
     "nextRuntimeMaterializationAllowed": false,
@@ -64,7 +64,9 @@
     "mergeAuthorized": false,
     "boundaryPath": "orbit360-platform/docs/orbit360-f2-runtime-authorization-boundary-v20260820.json",
     "boundaryPrepared": true,
-    "authorizationIdentityRequired": true
+    "authorizationIdentityRequired": true,
+    "authorizationRecordPath": ".github/orbit360-authorizations/f2-productive-acceptance-runtime-browser-readonly-auth-3d9975a3e599-v20260820.json",
+    "activeRequestPath": ".github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-successor-3d9975a3e599-v20260820.json"
   },
   "continuityControl": {
     "status": "CLOSED_PASS",
@@ -100,17 +102,17 @@
   "productionReopeningPackage": {
     "path": "orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json",
     "status": "CLOSED_PASS",
-    "revision": 12,
-    "firstIncompleteStep": "F2-RUNTIME-AUTHORIZATION",
-    "nextActionExact": "AWAIT_EXPLICIT_F2_RUNTIME_AUTHORIZATION_ONE_SHOT",
+    "revision": 14,
+    "firstIncompleteStep": "F2-RUNTIME-PREFLIGHT",
+    "nextActionExact": "RUN_F2_SOURCE_AND_RUNTIME_PREFLIGHT_FAIL_CLOSED",
     "runtimeAllowed": false,
     "authorizationAllowed": true,
     "requestMaterializationAllowed": false
   },
   "checkpoint": "orbit360-platform/docs/CHECKPOINT-CONTROL-PLANE-HARDENING-20260820.md",
   "nextAction": {
-    "id": "AWAIT_EXPLICIT_F2_RUNTIME_AUTHORIZATION_ONE_SHOT",
-    "description": "Await one fresh explicit user authorization bound to the prepared CP11 authorization identity. Do not materialize a runtime request before that authorization.",
+    "id": "RUN_F2_SOURCE_AND_RUNTIME_PREFLIGHT_FAIL_CLOSED",
+    "description": "Run canonical fail-closed F2 preflight. Authorization remains unconsumed until runtime execution begins.",
     "runtimeAllowed": false
   },
   "history": {
@@ -146,7 +148,7 @@
   },
   "lanes": {
     "A_frontend_ux_academia": "PRODUCT_FROZEN_NO_REOPEN",
-    "B_backend_security_gates": "F2_RUNTIME_AUTHORIZATION_BOUNDARY_PREPARED_AWAITING_USER",
+    "B_backend_security_gates": "F2_REQUEST_MATERIALIZED_AWAITING_PREFLIGHT",
     "C_real_data_migration": "UNCHANGED_FROZEN"
   },
   "progress": {
