@@ -11,6 +11,9 @@ on:
 permissions:
   contents: write
 
+env:
+  PROOF_REVISION: page-size-semantic-v2
+
 jobs:
   proof:
     runs-on: ubuntu-latest
