@@ -1,8 +1,8 @@
 {
   "schemaVersion": "orbit360-live-state-v1",
   "stateVersion": "ORBIT360-F2-CONTINUITY-CURRENT",
-  "updatedAt": "2026-08-20T17:49:55.420Z",
-  "phase": "F2_RUNTIME_REOPENING_READY_AWAITING_EXPLICIT_AUTHORIZATION",
+  "updatedAt": "2026-08-20T18:03:49.599Z",
+  "phase": "F2_RUNTIME_AUTHORIZATION_BOUNDARY_PREPARED_AWAITING_EXPLICIT_AUTHORIZATION",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pr": 5,
@@ -10,14 +10,17 @@
   "currentCheckpoint": "orbit360-platform/docs/CHECKPOINT-CONTROL-PLANE-HARDENING-20260820.md",
   "continuityLedger": "orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json",
   "productionReopeningPackage": "orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json",
+  "authorizationBoundary": "orbit360-platform/docs/orbit360-f2-runtime-authorization-boundary-v20260820.json",
   "canonicalCurrent": {
     "stateVersion": "ORBIT360-F2-CONTINUITY-CURRENT",
-    "status": "PRODUCTION_REOPENING_PACKAGE_CLOSED_PASS",
-    "rootCauseStatus": "CONTROL_PLANE_HARDENING_CLOSED_PASS"
+    "status": "F2_RUNTIME_AUTHORIZATION_NOT_YET_GRANTED",
+    "rootCauseStatus": "CONTROL_PLANE_HARDENING_CLOSED_PASS_CP11_BOUNDARY_READY"
   },
   "authorization": {
     "activeRuntimeAuthorization": false,
     "freshAuthorizationRequired": true,
+    "authorizationBoundaryPrepared": true,
+    "authorizationBoundaryStatus": "PREPARED_SOURCE_ONLY_AWAITING_EXPLICIT_USER_AUTHORIZATION",
     "authorizationBlockedByHardeningPackage": false,
     "authorizationCarryForwardForbidden": true,
     "nextRuntimeMaterializationAllowed": false,
@@ -37,13 +40,13 @@
     "projectionMode": "REVISION_AWARE_CAS"
   },
   "nextActionExact": {
-    "id": "CP-11_PREPARE_FRESH_F2_RUNTIME_AUTHORIZATION_BOUNDARY",
-    "description": "Prepare a fresh F2 runtime authorization boundary; runtime remains unauthorized until separate explicit user authorization.",
+    "id": "AWAIT_EXPLICIT_F2_RUNTIME_AUTHORIZATION_ONE_SHOT",
+    "description": "Await one fresh explicit user authorization bound to the prepared CP11 authorization identity. Do not materialize a runtime request before that authorization.",
     "runtimeAllowed": false
   },
   "lanes": {
     "A_frontend_ux_academia": "PRODUCT_FROZEN_NO_REOPEN",
-    "B_backend_security_gates": "CONTROL_PLANE_HARDENING_CLOSED_RUNTIME_AUTHORIZATION_PENDING",
+    "B_backend_security_gates": "F2_RUNTIME_AUTHORIZATION_BOUNDARY_PREPARED_AWAITING_USER",
     "C_real_data_migration": "UNCHANGED_FROZEN"
   },
   "progress": {
@@ -53,9 +56,9 @@
     "progressMayIncreaseDuringHardening": false
   },
   "activeState": {
-    "phase": "F2_RUNTIME_REOPENING_READY_AWAITING_EXPLICIT_AUTHORIZATION",
-    "status": "PRODUCTION_REOPENING_PACKAGE_CLOSED_PASS",
-    "rootCauseStatus": "CONTROL_PLANE_HARDENING_CLOSED_PASS",
+    "phase": "F2_RUNTIME_AUTHORIZATION_BOUNDARY_PREPARED_AWAITING_EXPLICIT_AUTHORIZATION",
+    "status": "F2_RUNTIME_AUTHORIZATION_NOT_YET_GRANTED",
+    "rootCauseStatus": "CONTROL_PLANE_HARDENING_CLOSED_PASS_CP11_BOUNDARY_READY",
     "productFrozen": true,
     "dataFrozen": true,
     "runtimeAuthorized": false,

@@ -1,17 +1,17 @@
 {
   "schemaVersion": "orbit360-continuity-ledger-v2",
   "ledgerId": "ORBIT360-F2-CONTINUITY-CURRENT",
-  "revision": 17,
-  "updatedAtUtc": "2026-08-20T17:49:53.948Z",
+  "revision": 18,
+  "updatedAtUtc": "2026-08-20T18:03:48.697Z",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
   "stateVersion": "ORBIT360-F2-CONTINUITY-CURRENT",
   "gateId": "f2-productive-acceptance-exact-successor-v20260818",
   "activeState": {
-    "phase": "F2_RUNTIME_REOPENING_READY_AWAITING_EXPLICIT_AUTHORIZATION",
-    "status": "PRODUCTION_REOPENING_PACKAGE_CLOSED_PASS",
-    "rootCauseStatus": "CONTROL_PLANE_HARDENING_CLOSED_PASS",
+    "phase": "F2_RUNTIME_AUTHORIZATION_BOUNDARY_PREPARED_AWAITING_EXPLICIT_AUTHORIZATION",
+    "status": "F2_RUNTIME_AUTHORIZATION_NOT_YET_GRANTED",
+    "rootCauseStatus": "CONTROL_PLANE_HARDENING_CLOSED_PASS_CP11_BOUNDARY_READY",
     "productFrozen": true,
     "dataFrozen": true,
     "runtimeAuthorized": false,
@@ -61,7 +61,10 @@
     "publicationAuthorized": false,
     "productionAuthorized": false,
     "mainAuthorized": false,
-    "mergeAuthorized": false
+    "mergeAuthorized": false,
+    "boundaryPath": "orbit360-platform/docs/orbit360-f2-runtime-authorization-boundary-v20260820.json",
+    "boundaryPrepared": true,
+    "authorizationIdentityRequired": true
   },
   "continuityControl": {
     "status": "CLOSED_PASS",
@@ -97,17 +100,17 @@
   "productionReopeningPackage": {
     "path": "orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json",
     "status": "CLOSED_PASS",
-    "revision": 11,
-    "firstIncompleteStep": "CP-11",
-    "nextActionExact": "CP-11_PREPARE_FRESH_F2_RUNTIME_AUTHORIZATION_BOUNDARY",
+    "revision": 12,
+    "firstIncompleteStep": "F2-RUNTIME-AUTHORIZATION",
+    "nextActionExact": "AWAIT_EXPLICIT_F2_RUNTIME_AUTHORIZATION_ONE_SHOT",
     "runtimeAllowed": false,
     "authorizationAllowed": true,
     "requestMaterializationAllowed": false
   },
   "checkpoint": "orbit360-platform/docs/CHECKPOINT-CONTROL-PLANE-HARDENING-20260820.md",
   "nextAction": {
-    "id": "CP-11_PREPARE_FRESH_F2_RUNTIME_AUTHORIZATION_BOUNDARY",
-    "description": "Prepare a fresh F2 runtime authorization boundary; runtime remains unauthorized until separate explicit user authorization.",
+    "id": "AWAIT_EXPLICIT_F2_RUNTIME_AUTHORIZATION_ONE_SHOT",
+    "description": "Await one fresh explicit user authorization bound to the prepared CP11 authorization identity. Do not materialize a runtime request before that authorization.",
     "runtimeAllowed": false
   },
   "history": {
@@ -143,7 +146,7 @@
   },
   "lanes": {
     "A_frontend_ux_academia": "PRODUCT_FROZEN_NO_REOPEN",
-    "B_backend_security_gates": "CONTROL_PLANE_HARDENING_CLOSED_RUNTIME_AUTHORIZATION_PENDING",
+    "B_backend_security_gates": "F2_RUNTIME_AUTHORIZATION_BOUNDARY_PREPARED_AWAITING_USER",
     "C_real_data_migration": "UNCHANGED_FROZEN"
   },
   "progress": {

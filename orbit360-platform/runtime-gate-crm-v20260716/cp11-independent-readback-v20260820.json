@@ -1,0 +1,21 @@
+{
+  "ok": true,
+  "status": "CONTROL_PLANE_INDEPENDENT_READBACK_PASS",
+  "failures": [],
+  "controlPlaneHead": "4f0f3f2dec0ad0b98d71bf0502cc0f62b2f647bf",
+  "candidateSourceHead": "6af0c029aebb1bfecd05569452c814584110ae4c",
+  "ledgerRevision": 18,
+  "packageRevision": 12,
+  "packageStatus": "CLOSED_PASS",
+  "firstIncompleteStep": "F2-RUNTIME-AUTHORIZATION",
+  "runtimeAuthorized": false,
+  "runtimeExecuted": false,
+  "browserExecuted": false,
+  "secretAccess": false,
+  "firestoreRead": false,
+  "operationalWrites": 0,
+  "deployExecuted": false,
+  "productionTouched": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
