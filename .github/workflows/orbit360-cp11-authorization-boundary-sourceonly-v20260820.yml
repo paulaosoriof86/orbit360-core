@@ -1,4 +1,5 @@
 name: Orbit360 CP11 Authorization Boundary Source Only
+# Re-run after VALIDATOR_STALE composite fix: CP11 prepared state is now a valid closed-package phase.
 
 on:
   push:
