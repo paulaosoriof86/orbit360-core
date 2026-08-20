@@ -1,0 +1,37 @@
+{
+  "schemaVersion": "orbit360-run-discovery-v4",
+  "ok": true,
+  "status": "TARGET_RUN_TERMINAL_PASS",
+  "classification": "OBSERVATION_PASS",
+  "requestCommit": "da7cc4a025ed05c44315bd7764baa50663d8e335",
+  "requestFile": ".github/orbit360-requests/f2-successor-source-validation-runbound-request08-readiness-20260820-01.json",
+  "requestVersion": "F2_SUCCESSOR_SOURCE_VALIDATION_V1",
+  "gateId": "f2-productive-acceptance-exact-successor-v20260818",
+  "targetRunId": 32316010103,
+  "targetRunStatus": "completed",
+  "targetRunConclusion": "success",
+  "runAttempt": 1,
+  "event": "push",
+  "headSha": "da7cc4a025ed05c44315bd7764baa50663d8e335",
+  "workflowName": "Orbit360 F2 Successor Source Validation 20260819",
+  "createdAt": "2026-08-20T00:06:35Z",
+  "runStartedAt": "2026-08-20T00:06:35Z",
+  "updatedAt": "2026-08-20T00:06:47Z",
+  "htmlUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/32316010103",
+  "artifacts": [
+    {
+      "id": 9388061716,
+      "name": "orbit360-f2-successor-source-evidence-32316010103",
+      "size_in_bytes": 2893,
+      "digest": "sha256:69266fe2b31f433f7565d5c89a9402486aeeb509c8756dc02ae5864221875b28",
+      "expired": false
+    }
+  ],
+  "artifactCount": 1,
+  "matchCount": 1,
+  "multipleRuns": false,
+  "runtimeReplay": false,
+  "productMutation": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
