@@ -1,60 +1,13 @@
-name: Orbit360 F2 Runtime04 Role View Docsync PostSync Source Only 20260818
+name: Orbit360 Retired Legacy Continuity Writer
+
 on:
-  push:
-    branches: [ays/backend-tenant-lab-v99-20260703]
-    paths:
-      - '.github/orbit360-observers/f2-runtime04-role-view-docsync-trigger-v20260818.json'
+  workflow_dispatch:
+
 permissions:
-  contents: write
-concurrency:
-  group: orbit360-f2-runtime04-role-view-docsync-postsync-20260818
-  cancel-in-progress: false
-env:
-  BRANCH: ays/backend-tenant-lab-v99-20260703
-  ORBIT360_GATE_ID: f2-productive-acceptance-exact-successor-v20260818
-  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+  contents: read
+
 jobs:
-  docsync_postsync_source_only:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 6
+  retired:
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.sha }}
-          fetch-depth: 0
-          persist-credentials: true
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-      - name: Prepare Runtime04 closure documents in working tree
-        shell: bash
-        run: |
-          set -euo pipefail
-          node --check tools/orbit360-f2-runtime04-role-view-docsync-v20260818.mjs
-          ORBIT360_DOCSYNC_POSTSYNC_RUN_ID="$GITHUB_RUN_ID" ORBIT360_DOCSYNC_TRIGGER_SHA="$GITHUB_SHA" node tools/orbit360-f2-runtime04-role-view-docsync-v20260818.mjs
-          git diff --check
-      - name: Mandatory canonical post-docsync source-only gate
-        shell: bash
-        run: |
-          set -euo pipefail
-          rm -f "$EVIDENCE_DIR/preflight-sanitizado.json"
-          env -u ORBIT360_REQUEST_FILE ORBIT360_EXPECTED_REQUEST_VERSION=NONE_PENDING_FRESH_AUTHORIZATION node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
-          jq -e '.ok==true and .status=="PASS_GATE_CONTRACT_SOURCE_F2_PRODUCTIVE_ACCEPTANCE" and .classification=="PASS" and .candidateArtifactId==9345207863 and .stableBoundaryContract==true and .sourceClosed==true and .phaseStillF2==true and .nextActionBound==true and .indexBoundaryCurrent==true and .narrativeAttemptStatusMutationPass==true and .executionAuthorized==false and .secretAccessAuthorized==false and .firestoreReadAuthorized==false and .customTokenMintAuthorized==false and .runtimeAuthorized==false and .browserAuthorized==false and .writeAuthorized==false and .authWriteAuthorized==false and .membershipWriteAuthorized==false and .dataWriteAuthorized==false and .packageRebuildAuthorized==false and .deployAuthorized==false and .publicationAuthorized==false and .productionAuthorized==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
-          jq --arg run "$GITHUB_RUN_ID" --arg sha "$GITHUB_SHA" '. + {runtime04PostSyncSourceRunId:$run,runtime04DocsyncTriggerSha:$sha,runtime04PostSyncStatus:"F2_RUNTIME04_POSTSYNC_SOURCE_ONLY_PASS",roleViewRootfixSourcePass:true,roleViewRootfixRunId:32209972474,request04RunId:32208018808,request04Replayed:false,request05Created:false,runtimeRunCreated:false,serializedPersistence:true}' "$EVIDENCE_DIR/preflight-sanitizado.json" > "$EVIDENCE_DIR/f2-runtime04-postsync-source-only-v20260818.json"
-          jq -e '.ok==true and .runtime04PostSyncStatus=="F2_RUNTIME04_POSTSYNC_SOURCE_ONLY_PASS" and .roleViewRootfixSourcePass==true and .request04Replayed==false and .request05Created==false and .runtimeRunCreated==false and .writeAuthorized==false and .deployAuthorized==false and .publicationAuthorized==false and .productionAuthorized==false' "$EVIDENCE_DIR/f2-runtime04-postsync-source-only-v20260818.json" >/dev/null
-      - name: Persist synchronized closure only after gate PASS
-        shell: bash
-        run: |
-          set -euo pipefail
-          git config user.name 'orbit360-f2-runtime04-docsync-bot'
-          git config user.email 'orbit360-f2-runtime04-docsync-bot@users.noreply.github.com'
-          git add orbit360-platform/docs/orbit360-live-state-v1.json \
-                  orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json \
-                  orbit360-platform/docs/CHECKPOINT-F2-RUNTIME04-ROLE-VIEW-VALIDATOR-STALE-ROOTFIX-PASS-20260818.md \
-                  "$EVIDENCE_DIR/f2-runtime04-role-view-validator-stale-stop-v20260818.json" \
-                  "$EVIDENCE_DIR/f2-runtime04-postsync-source-only-v20260818.json"
-          git diff --cached --check
-          git commit -m 'docs(f2): close Runtime04 role-view validator stale post-sync PASS [skip ci]'
-          REMOTE_HEAD="$(git ls-remote origin "refs/heads/$BRANCH" | awk '{print $1}')"
-          test "$REMOTE_HEAD" = "$GITHUB_SHA"
-          git push origin "HEAD:$BRANCH"
+      - run: echo "RETIRED_LEGACY_CONTINUITY_WRITER — current state is projected only by tools/orbit360-continuity-sync-v20260820.mjs"

@@ -1,97 +1,13 @@
-name: Orbit360 Apply F2 Successor Rebind Validator Stale 20260819
+name: Orbit360 Retired Legacy Continuity Writer
+
 on:
-  push:
-    branches: [ays/backend-tenant-lab-v99-20260703]
-    paths:
-      - '.github/orbit360-requests/f2-validator-stale-rebind-apply-runbound-*.json'
+  workflow_dispatch:
+
 permissions:
-  contents: write
-  actions: read
-concurrency:
-  group: orbit360-apply-f2-successor-rebind-validator-stale-20260819
-  cancel-in-progress: false
-env:
-  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
-  TARGET_ARTIFACT_ID: '9385306424'
-  TARGET_SOURCE_HEAD: b94b2ae86d26586a68d33be9edba8715e956b02e
-  HISTORICAL_WORKFLOW_BASE: 451958149e3134e4b0e08d6eaf35f1ba34832686
-  RUNTIME_WORKFLOW: .github/workflows/orbit360-f2-productive-acceptance-runtime-browser-readonly-v20260818.yml
-  SOURCE_WORKFLOW: .github/workflows/orbit360-f2-successor-source-validation-v20260819.yml
+  contents: read
+
 jobs:
-  apply_rebind:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 8
+  retired:
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.sha }}
-          fetch-depth: 0
-          persist-credentials: true
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-      - name: Validate immutable inert rebind request and pretransported workflows
-        shell: bash
-        run: |
-          set -euo pipefail
-          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
-          test "$GITHUB_RUN_ATTEMPT" = '1'
-          mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
-          test "${#CHANGED[@]}" = '1'
-          REQUEST_FILE="${CHANGED[0]}"
-          case "$REQUEST_FILE" in .github/orbit360-requests/f2-validator-stale-rebind-apply-runbound-*.json) ;; *) exit 41 ;; esac
-          jq -e '.schemaVersion=="orbit360-f2-validator-stale-rebind-apply-request-v1" and .gateId=="f2-productive-acceptance-exact-successor-v20260818" and .candidateArtifactId==9385306424 and .status=="INERT_APPLY_ONCE" and .allowedExecutions==1 and .consumed==false and .replayAllowed==false and .scope.secrets==false and .scope.firestoreRead==false and .scope.browser==false and .scope.runtime==false and .scope.dataWrites==false and .scope.operationalWrites==false and .scope.deploy==false and .scope.production==false' "$REQUEST_FILE" >/dev/null
-          test "$(jq -r '.parentHead' "$REQUEST_FILE")" = "$(git rev-parse HEAD^)"
-          test "$(jq -r '.candidateSourceHead' "$REQUEST_FILE")" = "$TARGET_SOURCE_HEAD"
-          test -f "$RUNTIME_WORKFLOW"; test -f "$SOURCE_WORKFLOW"
-          grep -F "ORBIT360_CANDIDATE_ARTIFACT_ID: '$TARGET_ARTIFACT_ID'" "$RUNTIME_WORKFLOW" >/dev/null
-          grep -F 'orbit360-register-f2-productive-acceptance-runtime-v20260819.mjs' "$RUNTIME_WORKFLOW" >/dev/null
-          grep -F "ORBIT360_CANDIDATE_ARTIFACT_ID: '$TARGET_ARTIFACT_ID'" "$SOURCE_WORKFLOW" >/dev/null
-          grep -F 'orbit360-f2-exact-candidate-source-validator-v20260819.mjs' "$SOURCE_WORKFLOW" >/dev/null
-          node --check tools/orbit360-apply-f2-successor-rebind-validator-stale-v20260819.mjs
-      - name: Apply same-gate synchronized non-workflow rebind
-        shell: bash
-        run: |
-          set -euo pipefail
-          # The applicator's historical patch assertions are replayed against the
-          # predecessor workflow only in the ephemeral working tree. Workflow
-          # transport itself is already complete through the GitHub connector.
-          git show "$HISTORICAL_WORKFLOW_BASE:$RUNTIME_WORKFLOW" > "$RUNTIME_WORKFLOW"
-          node tools/orbit360-apply-f2-successor-rebind-validator-stale-v20260819.mjs | tee /tmp/f2-rebind-result.json
-          grep -F 'F2_VALIDATOR_STALE_SUCCESSOR_REBIND_APPLIED_PENDING_SOURCE_ONLY' /tmp/f2-rebind-result.json >/dev/null
-          node --check tools/orbit360-validar-gate-contracts-engine-f2-productive-acceptance-v20260819.mjs
-          node --check tools/orbit360-f2-stable-boundary-contract-v20260819.mjs
-          node --check tools/orbit360-f2-exact-candidate-source-validator-v20260819.mjs
-          node --check tools/orbit360-register-f2-productive-acceptance-runtime-v20260819.mjs
-          node -e "for(const p of ['tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-source-v20260819.json','tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-runtime-v20260819.json','tools/orbit360-gate-contract-registry-v20260717.json','orbit360-platform/docs/orbit360-live-state-v1.json','orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json']) JSON.parse(require('fs').readFileSync(p,'utf8'))"
-          git diff --check
-          test -z "$(git diff --name-only -- orbit360-platform/data orbit360-platform/core/auth.js orbit360-platform/core/backend-lab- firestore.rules || true)"
-          # Never transport workflow files with the Actions token.
-          git restore --source=HEAD -- "$RUNTIME_WORKFLOW" "$SOURCE_WORKFLOW"
-          test -z "$(git diff --name-only -- .github/workflows)"
-      - name: Commit synchronized non-workflow rebind only
-        shell: bash
-        run: |
-          set -euo pipefail
-          git config user.name 'orbit360-f2-rebind-bot'
-          git config user.email 'orbit360-f2-rebind-bot@users.noreply.github.com'
-          git add \
-            tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-source-v20260819.json \
-            tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-runtime-v20260819.json \
-            tools/orbit360-validar-gate-contracts-engine-f2-productive-acceptance-v20260819.mjs \
-            tools/orbit360-f2-stable-boundary-contract-v20260819.mjs \
-            tools/orbit360-f2-exact-candidate-source-validator-v20260819.mjs \
-            tools/orbit360-register-f2-productive-acceptance-runtime-v20260819.mjs \
-            tools/orbit360-validar-gate-contracts-v20260717.mjs \
-            tools/orbit360-gate-contract-registry-v20260717.json \
-            orbit360-platform/docs/orbit360-live-state-v1.json \
-            orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json \
-            orbit360-platform/docs/CHECKPOINT-F2-REQUEST06-ROOTFIX-SUCCESSOR-REBIND-PENDING-20260819.md \
-            orbit360-platform/docs/ACADEMIA-DELTA-F2-VALIDATOR-STALE-REBIND-20260819.md
-          git diff --cached --check
-          test "$(git diff --cached --name-only | wc -l | tr -d ' ')" = '12'
-          test -z "$(git diff --cached --name-only -- .github/workflows)"
-          git commit -m 'fix(f2): rebind same gate to Request06 rootfix successor [skip ci]'
-          git fetch origin "$ORBIT360_BRANCH"
-          git rebase "origin/$ORBIT360_BRANCH"
-          git push origin "HEAD:$ORBIT360_BRANCH"
+      - run: echo "RETIRED_LEGACY_CONTINUITY_WRITER — current state is projected only by tools/orbit360-continuity-sync-v20260820.mjs"

@@ -1,85 +1,13 @@
-name: Orbit360 F2 Request10 Canonical Docs Sync 20260820
+name: Orbit360 Retired Legacy Continuity Writer
+
 on:
-  push:
-    branches: [ays/backend-tenant-lab-v99-20260703]
-    paths:
-      - '.github/orbit360-observers/f2-request10-canonical-docsync-target-v20260820.json'
+  workflow_dispatch:
+
 permissions:
-  contents: write
-concurrency:
-  group: orbit360-f2-request10-canonical-docsync
-  cancel-in-progress: false
+  contents: read
+
 jobs:
-  sync:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 8
+  retired:
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ays/backend-tenant-lab-v99-20260703
-          fetch-depth: 0
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-      - name: Verify frozen source-only boundary
-        shell: bash
-        run: |
-          set -euo pipefail
-          test "$GITHUB_REF_NAME" = 'ays/backend-tenant-lab-v99-20260703'
-          node --check tools/orbit360-sync-f2-request10-validator-stale-closure-v20260820.mjs
-          test -f orbit360-platform/runtime-gate-crm-v20260716/f2-request10-route-visibility-validator-sourcefix-v20260820.json
-          jq -e '.ok==true and .classification=="VALIDATOR_STALE_ROOTFIX" and .request10RunId==32318415706 and .request10EvidenceArtifactId==9388976113 and .candidateArtifactId==9387820198 and .productMutation==false and .candidateRebuild==false and .dataMutation==false and .browserExecuted==false and .runtimeExecuted==false and .secretAccess==false and .firestoreWrites==0 and .authWrites==0 and .membershipWrites==0 and .dataWrites==0 and .operationalWrites==0 and .deployExecuted==false and .productionTouched==false' orbit360-platform/runtime-gate-crm-v20260716/f2-request10-route-visibility-validator-sourcefix-v20260820.json >/dev/null
-      - name: Apply canonical Request10 closure sync
-        shell: bash
-        run: |
-          set -euo pipefail
-          node tools/orbit360-sync-f2-request10-validator-stale-closure-v20260820.mjs
-          git diff --check
-          node - <<'NODE'
-          const fs=require('fs');
-          const live=JSON.parse(fs.readFileSync('orbit360-platform/docs/orbit360-live-state-v1.json','utf8'));
-          const idx=JSON.parse(fs.readFileSync('orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json','utf8'));
-          const life=JSON.parse(fs.readFileSync('tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-runtime-v20260819.json','utf8'));
-          const cp='orbit360-platform/docs/CHECKPOINT-F2-REQUEST10-CONSUMED-VISIBILITY-VALIDATOR-STALE-ROOTFIX-PASS-REQUEST11-AUTH-PENDING-20260820.md';
-          const ev='orbit360-platform/runtime-gate-crm-v20260716/f2-request10-consumed-validator-stale-rootfix-closure-v20260820.json';
-          const sx='orbit360-platform/runtime-gate-crm-v20260716/f2-request10-route-visibility-validator-sourcefix-v20260820.json';
-          const boundary='F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_V1:REQUEST11:EXACT_ARTIFACT_9387820198';
-          const checks={
-            livePhase:live.phase==='F2_REQUEST10_CONSUMED_VISIBILITY_VALIDATOR_STALE_ROOTFIX_PASS_REQUEST11_AUTH_PENDING',
-            liveBlocker:live.rootCauseState?.currentBlockingFact?.code==='F2_REQUEST11_RUNTIME_FRESH_AUTHORIZATION_REQUIRED',
-            liveRequest10:live.f2Runtime10?.runId===32318415706&&live.f2Runtime10?.consumed===true&&live.f2Runtime10?.replayAllowed===false,
-            liveCandidate:live.f2Runtime10?.sourcefix?.productMutation===false&&live.f2SourceOnly?.candidateArtifactId===9387820198,
-            idxCp1:idx.operationalCurrent?.resumePointer===cp&&idx.operationalCurrent?.currentCheckpoint===cp,
-            idxCp2:idx.resumePointer===cp&&idx.currentCheckpoint===cp,
-            idxEv1:idx.operationalCurrent?.latestRuntimeEvidence===ev&&idx.operationalCurrent?.latestTerminalEvidence===ev&&idx.operationalCurrent?.latestRequestConsumptionEvidence===ev,
-            idxEv2:idx.latestRuntimeEvidence===ev&&idx.latestTerminalEvidence===ev&&idx.latestRequestConsumptionEvidence===ev,
-            idxSourcefix:idx.operationalCurrent?.latestValidatorSourcefixEvidence===sx&&idx.latestValidatorSourcefix===sx,
-            idxCandidate:idx.operationalCurrent?.successorCandidateArtifactId===9387820198&&idx.f2SuccessorRebind?.candidateArtifactId===9387820198&&idx.f2SuccessorSourceClosure?.candidateArtifactId===9387820198,
-            idxBoundary:idx.operationalCurrent?.nextAuthorizationBoundary===boundary&&idx.f2SuccessorSourceClosure?.nextBoundary==='REQUEST11_FRESH_AUTHORIZATION_REQUIRED',
-            idxRequests:idx.operationalCurrent?.request10Consumed===true&&idx.operationalCurrent?.request10ReplayAllowed===false&&idx.operationalCurrent?.request11Created===false&&idx.operationalCurrent?.request11Authorized===false,
-            idxF2:Array.isArray(idx.frozenPlanPhases)&&idx.frozenPlanPhases.find(x=>x?.id==='F2')?.status==='IN_PROGRESS_REQUEST10_CONSUMED_VALIDATOR_STALE_ROOTFIX_PASS_REQUEST11_AUTH_PENDING',
-            life:life.status==='F2_RUNTIME_PENDING_FRESH_AUTHORIZATION'&&life.authorization?.activeRequest===false&&life.authorization?.allowedExecutions===0&&life.lastExecution?.request==='REQUEST10'&&life.lastExecution?.runId===32318415706&&life.lastExecution?.classification==='VALIDATOR_STALE'&&life.routeReadinessValidatorRootfix?.status==='CLOSED_SOURCE_ONLY_PASS',
-            docs:fs.existsSync(cp)&&fs.existsSync('orbit360-platform/docs/ACADEMIA-ACTUALIZACION-F2-REQUEST10-VISIBILITY-VALIDATOR-STALE-20260820.md')&&fs.existsSync(ev)
-          };
-          if(!Object.values(checks).every(Boolean)){console.error(checks);process.exit(41)}
-          console.log(JSON.stringify({ok:true,status:'F2_REQUEST10_CANONICAL_DOCSYNC_INVARIANTS_PASS',checks},null,2));
-          NODE
-          mapfile -t CHANGED < <(git status --short | awk '{print $2}' | sort)
-          printf '%s\n' "${CHANGED[@]}"
-          test "${#CHANGED[@]}" = '6'
-          printf '%s\n' "${CHANGED[@]}" | grep -Fx 'orbit360-platform/docs/ACADEMIA-ACTUALIZACION-F2-REQUEST10-VISIBILITY-VALIDATOR-STALE-20260820.md'
-          printf '%s\n' "${CHANGED[@]}" | grep -Fx 'orbit360-platform/docs/CHECKPOINT-F2-REQUEST10-CONSUMED-VISIBILITY-VALIDATOR-STALE-ROOTFIX-PASS-REQUEST11-AUTH-PENDING-20260820.md'
-          printf '%s\n' "${CHANGED[@]}" | grep -Fx 'orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json'
-          printf '%s\n' "${CHANGED[@]}" | grep -Fx 'orbit360-platform/docs/orbit360-live-state-v1.json'
-          printf '%s\n' "${CHANGED[@]}" | grep -Fx 'orbit360-platform/runtime-gate-crm-v20260716/f2-request10-consumed-validator-stale-rootfix-closure-v20260820.json'
-          printf '%s\n' "${CHANGED[@]}" | grep -Fx 'tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-runtime-v20260819.json'
-      - name: Persist canonical synchronized state
-        shell: bash
-        run: |
-          set -euo pipefail
-          git config user.name 'orbit360-docsync-bot'
-          git config user.email 'orbit360-docsync-bot@users.noreply.github.com'
-          git add orbit360-platform/docs/ACADEMIA-ACTUALIZACION-F2-REQUEST10-VISIBILITY-VALIDATOR-STALE-20260820.md orbit360-platform/docs/CHECKPOINT-F2-REQUEST10-CONSUMED-VISIBILITY-VALIDATOR-STALE-ROOTFIX-PASS-REQUEST11-AUTH-PENDING-20260820.md orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json orbit360-platform/docs/orbit360-live-state-v1.json orbit360-platform/runtime-gate-crm-v20260716/f2-request10-consumed-validator-stale-rootfix-closure-v20260820.json tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-runtime-v20260819.json
-          git commit -m 'docs(f2): close Request10 validator stale and bind Request11 frontier'
-          git pull --rebase origin ays/backend-tenant-lab-v99-20260703
-          git push origin HEAD:ays/backend-tenant-lab-v99-20260703
+      - run: echo "RETIRED_LEGACY_CONTINUITY_WRITER — current state is projected only by tools/orbit360-continuity-sync-v20260820.mjs"

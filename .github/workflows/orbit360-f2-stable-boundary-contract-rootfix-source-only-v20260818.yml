@@ -1,80 +1,13 @@
-name: Orbit360 F2 Stable Boundary Contract Rootfix Source Only 20260818
+name: Orbit360 Retired Legacy Continuity Writer
+
 on:
-  push:
-    branches: [ays/backend-tenant-lab-v99-20260703]
-    paths:
-      - '.github/orbit360-observers/f2-stable-boundary-rootfix-source-only-20260818.json'
+  workflow_dispatch:
+
 permissions:
-  contents: write
-concurrency:
-  group: orbit360-f2-stable-boundary-rootfix-source-only-20260818
-  cancel-in-progress: false
-env:
-  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
-  ORBIT360_GATE_ID: f2-productive-acceptance-exact-successor-v20260818
-  ORBIT360_EXPECTED_REQUEST_VERSION: NONE_PENDING_FRESH_AUTHORIZATION
-  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+  contents: read
+
 jobs:
-  stable_boundary_rootfix_source_only:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 5
+  retired:
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.sha }}
-          fetch-depth: 0
-          persist-credentials: true
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-      - name: Verify owners and apply router version rootfix in working tree
-        shell: bash
-        run: |
-          set -euo pipefail
-          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
-          node --check tools/orbit360-f2-stable-boundary-contract-v20260818.mjs
-          node --check tools/orbit360-validar-gate-contracts-engine-f2-productive-acceptance-v20260818.mjs
-          node --check tools/orbit360-f2-stable-boundary-router-rootfix-v20260818.mjs
-          node tools/orbit360-f2-stable-boundary-router-rootfix-v20260818.mjs
-          node --check tools/orbit360-validar-gate-contracts-v20260717.mjs
-          grep -F "v10.5-f2-stable-boundary-contract" tools/orbit360-validar-gate-contracts-v20260717.mjs >/dev/null
-          git diff --check
-      - name: Verify both runtime attempts are frozen and non-replayable
-        shell: bash
-        run: |
-          set -euo pipefail
-          R1=.github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-runbound-20260818-01.json
-          R2=.github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-runbound-20260818-02.json
-          jq -e '.status=="CONSUMED_STOP_RETRY" and .allowedExecutions==0 and .consumed==true and .authorizationFrozen==true and .replayAllowed==false' "$R1" >/dev/null
-          jq -e '.status=="CONSUMED_STOP_RETRY" and .allowedExecutions==0 and .consumed==true and .authorizationFrozen==true and .replayAllowed==false and .runId==32206449703 and .candidateArtifactDownloaded==false and .secretAccess==false and .firestoreReadExecuted==false and .browserExecuted==false and .runtimeExecuted==false' "$R2" >/dev/null
-      - name: Self-test stable F2 boundary against narrative state mutation
-        shell: bash
-        run: |
-          set -euo pipefail
-          node --input-type=module <<'NODE'
-          import fs from 'node:fs';
-          import { selfTestF2StableBoundary } from './tools/orbit360-f2-stable-boundary-contract-v20260818.mjs';
-          const live=JSON.parse(fs.readFileSync('orbit360-platform/docs/orbit360-live-state-v1.json','utf8').replace(/^\uFEFF/,''));
-          const index=JSON.parse(fs.readFileSync('orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json','utf8').replace(/^\uFEFF/,''));
-          const result=selfTestF2StableBoundary({live,index,gateId:'f2-productive-acceptance-exact-successor-v20260818',artifactId:9345207863,requestVersion:'F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_V1'});
-          if(!result.ok || !result.provesNarrativeAttemptStatusIsNonAuthoritative){ console.error(JSON.stringify(result,null,2)); process.exit(41); }
-          console.log(JSON.stringify(result,null,2));
-          NODE
-      - name: Canonical source-only proof after stable boundary rootfix
-        shell: bash
-        run: |
-          set -euo pipefail
-          rm -f "$EVIDENCE_DIR/preflight-sanitizado.json"
-          env -u ORBIT360_REQUEST_FILE ORBIT360_EXPECTED_REQUEST_VERSION=NONE_PENDING_FRESH_AUTHORIZATION node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
-          jq -e '.ok==true and .status=="PASS_GATE_CONTRACT_SOURCE_F2_PRODUCTIVE_ACCEPTANCE" and .classification=="PASS" and .validatorRootfix=="F2_STABLE_BOUNDARY_CONTRACT_V2" and .stableBoundaryContract==true and .sourceClosed==true and .phaseStillF2==true and .nextActionBound==true and .indexBoundaryCurrent==true and .narrativeStatusesAuthoritative==false and .narrativeAttemptStatusMutationPass==true and .candidateArtifactId==9345207863 and .executionAuthorized==false and .secretAccessAuthorized==false and .firestoreReadAuthorized==false and .runtimeAuthorized==false and .browserAuthorized==false and .writeAuthorized==false and .deployAuthorized==false and .publicationAuthorized==false and .productionAuthorized==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
-          jq --arg run "$GITHUB_RUN_ID" --arg sha "$GITHUB_SHA" '. + {rootfixSourceRunId:$run,rootfixTriggerSha:$sha,rootfixStatus:"F2_STABLE_BOUNDARY_CONTRACT_ROOTFIX_SOURCE_ONLY_PASS",request01Replayed:false,request02Replayed:false,runtimeRunCreated:false}' "$EVIDENCE_DIR/preflight-sanitizado.json" > "$EVIDENCE_DIR/f2-stable-boundary-contract-rootfix-source-only-v20260818.json"
-      - name: Persist router and sanitized evidence only
-        shell: bash
-        run: |
-          set -euo pipefail
-          git config user.name 'orbit360-f2-stable-boundary-rootfix-bot'
-          git config user.email 'orbit360-f2-stable-boundary-rootfix-bot@users.noreply.github.com'
-          git add tools/orbit360-validar-gate-contracts-v20260717.mjs "$EVIDENCE_DIR/f2-stable-boundary-contract-rootfix-source-only-v20260818.json"
-          git diff --cached --check
-          git commit -m 'fix(f2): close stable-boundary contract root cause source-only [skip ci]'
-          git push origin "HEAD:$ORBIT360_BRANCH"
+      - run: echo "RETIRED_LEGACY_CONTINUITY_WRITER — current state is projected only by tools/orbit360-continuity-sync-v20260820.mjs"

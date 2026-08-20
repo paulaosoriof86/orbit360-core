@@ -1,47 +1,13 @@
-name: Orbit360 Continuidad Documental Source 20260814
+name: Orbit360 Retired Legacy Continuity Writer
 
 on:
-  push:
-    branches: [ays/backend-tenant-lab-v99-20260703]
-    paths:
-      - '.github/workflows/orbit360-continuidad-documental-source-v20260814.yml'
-      - 'tools/orbit360-validar-continuidad-documental-v20260814.mjs'
-      - 'README.md'
-      - 'orbit360-platform/docs/orbit360-live-state-v1.json'
-      - 'orbit360-platform/docs/ADDENDUM-MAESTRO-CONTINUIDAD-SINCRONIZACION-ANTIBUCLE-GOLIVE-POSTPROD-20260814.md'
-      - 'orbit360-platform/docs/FUENTES-RECTORAS-VIGENTES-ORBIT360-AYS-20260730.md'
-      - 'orbit360-platform/docs/ORBIT360-PRUEBAS-FUNCIONALES-AUTOMATIZADAS-E2E-PRE-POST-GOLIVE-20260812.md'
+  workflow_dispatch:
 
 permissions:
   contents: read
 
-concurrency:
-  group: orbit360-continuidad-documental-source-v20260814
-  cancel-in-progress: false
-
 jobs:
-  validate:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 5
+  retired:
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.sha }}
-          fetch-depth: 0
-          persist-credentials: false
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-      - name: Validate continuity control plane source-only
-        shell: bash
-        run: |
-          set -euo pipefail
-          node --check tools/orbit360-validar-continuidad-documental-v20260814.mjs
-          node tools/orbit360-validar-continuidad-documental-v20260814.mjs
-          jq -e '.ok==true and .status=="PASS_CONTINUIDAD_DOCUMENTAL" and .secretAccess==false and .dataAccess==false and .runtimeExecuted==false and .browserExecuted==false and .deployExecuted==false and .operationalWrites==0 and .productionTouched==false' orbit360-platform/runtime-gate-crm-v20260716/continuidad-documental-preflight-v20260814.json >/dev/null
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: orbit360-continuidad-documental-${{ github.run_id }}
-          path: orbit360-platform/runtime-gate-crm-v20260716/continuidad-documental-preflight-v20260814.json
-          retention-days: 14
+      - run: echo "RETIRED_LEGACY_CONTINUITY_WRITER — current state is projected only by tools/orbit360-continuity-sync-v20260820.mjs"

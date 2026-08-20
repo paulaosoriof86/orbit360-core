@@ -1,65 +1,13 @@
-name: Orbit360 F2 RULES01 Docsync + Postsync Source Only 20260818
+name: Orbit360 Retired Legacy Continuity Writer
+
 on:
-  push:
-    branches: [ays/backend-tenant-lab-v99-20260703]
-    paths:
-      - '.github/workflows/orbit360-f2-rules01-docsync-postsync-source-only-v20260818.yml'
+  workflow_dispatch:
+
 permissions:
-  contents: write
-concurrency:
-  group: orbit360-f2-rules01-docsync-postsync-source-only
-  cancel-in-progress: false
+  contents: read
+
 jobs:
-  sync_validate_persist:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 10
-    env:
-      GATE_ID: f2-productive-acceptance-exact-successor-v20260818
-      EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
-      LIVE: orbit360-platform/docs/orbit360-live-state-v1.json
-      INDEX: orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json
-      CHECKPOINT: orbit360-platform/docs/CHECKPOINT-F2-RULES01-DEPLOY-PASS-PROBE-ROOTFIX-PASS-20260818.md
+  retired:
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ays/backend-tenant-lab-v99-20260703
-          fetch-depth: 0
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-      - name: Prepare synchronized live state, index and checkpoint
-        shell: bash
-        run: |
-          set -euo pipefail
-          node --check tools/orbit360-f2-rules01-docsync-v20260818.mjs
-          node tools/orbit360-f2-rules01-docsync-v20260818.mjs
-          test -f "$CHECKPOINT"
-          jq -e '.phase=="F2_RULES01_DEPLOY_PASS_PROBE_VALIDATOR_STALE_ROOTFIX_PASS_POSTDEPLOY_PROBE_AUTHORIZATION_PENDING" and .lanes.B_backend_security_gates==.phase and .f2Rules01.rulesDeploy.ok==true and .f2Rules01.rulesDeploy.redeployRequired==false and .f2Rules01.validatorRootfix.runId==32212655647 and .f2Rules01.postdeployProbe.requestCreated==false and .f2Rules01.request06Created==false and .nextActionExact.stage=="F2_RULES01_POSTDEPLOY_CROSS_TENANT_PROBE_READONLY_AUTHORIZATION_BOUNDARY" and .nextActionExact.requestVersion=="F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_V1" and .nextActionExact.probeRequestVersion=="F2_RULES01_POSTDEPLOY_CROSS_TENANT_PROBE_READONLY_V1" and .nextActionExact.candidateArtifactId==9345207863' "$LIVE" >/dev/null
-          jq -e '.operationalCurrent.currentPhase=="F2_RULES01_DEPLOY_PASS_PROBE_VALIDATOR_STALE_ROOTFIX_PASS_POSTDEPLOY_PROBE_AUTHORIZATION_PENDING" and .operationalCurrent.firestoreRulesDeployExecuted==true and .operationalCurrent.firestoreRulesDeployStatus=="PASS" and .operationalCurrent.f2Rules01ProbeRootfixRunId=="32212655647" and .operationalCurrent.f2Rules01RulesRedeployRequired==false and .operationalCurrent.f2PostdeployProbeRequestCreated==false and .operationalCurrent.request06Created==false and (.operationalCurrent.nextAuthorizationBoundary|contains("F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_V1")) and (.operationalCurrent.nextAuthorizationBoundary|contains("9345207863"))' "$INDEX" >/dev/null
-      - name: Mandatory canonical post-docsync F2 source gate
-        shell: bash
-        run: |
-          set -euo pipefail
-          rm -f "$EVIDENCE_DIR/preflight-sanitizado.json"
-          env -u ORBIT360_REQUEST_FILE -u ORBIT360_EXPECTED_REQUEST_VERSION node tools/orbit360-validar-gate-contracts-v20260717.mjs "$GATE_ID"
-          jq -e '.ok==true and .status=="PASS_GATE_CONTRACT_SOURCE_F2_PRODUCTIVE_ACCEPTANCE" and .stableBoundaryContract==true and .sourceClosed==true and .phaseStillF2==true and .nextActionBound==true and .indexBoundaryCurrent==true and .narrativeAttemptStatusMutationPass==true and .executionAuthorized==false and .secretAccessAuthorized==false and .firestoreReadAuthorized==false and .writeAuthorized==false and .deployAuthorized==false and .productionAuthorized==false' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
-      - name: Build sanitized post-docsync evidence
-        shell: bash
-        run: |
-          set -euo pipefail
-          OUT="$EVIDENCE_DIR/f2-rules01-postsync-source-only-v20260818.json"
-          jq -n --arg run "$GITHUB_RUN_ID" --arg sha "$GITHUB_SHA" '{schemaVersion:"orbit360-f2-rules01-postsync-source-only-v1",ok:true,status:"F2_RULES01_POSTSYNC_SOURCE_ONLY_PASS",classification:"PASS",runId:$run,triggerSha:$sha,stableBoundaryContract:true,sourceClosed:true,phaseStillF2:true,nextActionBound:true,indexBoundaryCurrent:true,narrativeAttemptStatusMutationPass:true,rules01RunId:32211779285,rulesDeployPreviouslyPassed:true,rulesRedeployRequired:false,rulesRedeployAuthorized:false,rulesRedeployExecuted:false,probeValidatorRootfixRunId:32212655647,postdeployProbeWorkflowPrepared:true,postdeployProbeRequestCreated:false,postdeployProbeAuthorizationGranted:false,request06Created:false,secretAccess:false,firestoreRead:false,browserExecuted:false,runtimeExecuted:false,firestoreDocumentWrites:0,authWrites:0,membershipWrites:0,dataWrites:0,hostingDeploy:false,functionsDeploy:false,packageRebuild:false,publication:false,production:false,serializedPersistence:true,containsPII:false,containsSecrets:false}' > "$OUT"
-          jq -e '.ok==true and .status=="F2_RULES01_POSTSYNC_SOURCE_ONLY_PASS" and .rulesRedeployExecuted==false and .postdeployProbeRequestCreated==false and .request06Created==false and .secretAccess==false and .firestoreRead==false and .production==false' "$OUT" >/dev/null
-      - name: Persist synchronized documentation serially
-        shell: bash
-        run: |
-          set -euo pipefail
-          OUT="$EVIDENCE_DIR/f2-rules01-postsync-source-only-v20260818.json"
-          git restore --worktree --staged "$EVIDENCE_DIR/preflight-sanitizado.json" || true
-          git config user.name 'orbit360-actions-docsync'
-          git config user.email 'actions@users.noreply.github.com'
-          git add "$LIVE" "$INDEX" "$CHECKPOINT" "$OUT"
-          test -n "$(git diff --cached --name-only)"
-          git commit -m 'docs(gate): sync RULES01 deploy PASS and postdeploy probe boundary [skip ci]'
-          git pull --rebase origin ays/backend-tenant-lab-v99-20260703
-          git push origin HEAD:ays/backend-tenant-lab-v99-20260703
+      - run: echo "RETIRED_LEGACY_CONTINUITY_WRITER — current state is projected only by tools/orbit360-continuity-sync-v20260820.mjs"

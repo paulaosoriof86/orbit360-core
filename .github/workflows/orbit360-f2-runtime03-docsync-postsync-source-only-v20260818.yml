@@ -1,58 +1,13 @@
-name: Orbit360 F2 Runtime03 Docsync PostSync Source Only 20260818
+name: Orbit360 Retired Legacy Continuity Writer
+
 on:
-  push:
-    branches: [ays/backend-tenant-lab-v99-20260703]
-    paths:
-      - '.github/orbit360-observers/f2-runtime03-docsync-postsync-source-only-20260818.json'
+  workflow_dispatch:
+
 permissions:
-  contents: write
-concurrency:
-  group: orbit360-f2-runtime03-docsync-postsync-source-only-20260818
-  cancel-in-progress: false
-env:
-  ORBIT360_GATE_ID: f2-productive-acceptance-exact-successor-v20260818
-  ORBIT360_EXPECTED_REQUEST_VERSION: NONE_PENDING_FRESH_AUTHORIZATION
-  EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+  contents: read
+
 jobs:
-  docsync_postsync_source_only:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 5
+  retired:
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.sha }}
-          fetch-depth: 0
-          persist-credentials: true
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-      - name: Prepare Runtime03 canonical docs sync
-        env:
-          ORBIT360_DOCSYNC_POSTSYNC_RUN_ID: ${{ github.run_id }}
-          ORBIT360_DOCSYNC_TRIGGER_SHA: ${{ github.sha }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          node --check tools/orbit360-f2-runtime03-docsync-v20260818.mjs
-          node tools/orbit360-f2-runtime03-docsync-v20260818.mjs
-          jq -e '.f2Runtime03.runId==32207049146 and .f2Runtime03.requestConsumed==true and .f2Runtime03.replayAllowed==false and .f2Runtime03.canonicalClassification=="VALIDATOR_STALE" and .f2Runtime03.integrityBeforeAfterPass==true and .f2Runtime03.roleMatrixCompleted==false and .nextActionExact.requestOrdinal==4 and .nextActionExact.requestCreated==false and .nextActionExact.authorizationGranted==false and .writes.firestore==0 and .writes.auth==0 and .writes.operational==0' orbit360-platform/docs/orbit360-live-state-v1.json >/dev/null
-          jq -e '.operationalCurrent.f2Runtime03RunId=="32207049146" and .operationalCurrent.f2Runtime03RequestConsumed==true and .operationalCurrent.f2Runtime03ReplayAllowed==false and .operationalCurrent.f2LegalReadinessRootfixStatus=="CLOSED_SOURCE_ONLY_PASS" and (.operationalCurrent.nextAuthorizationBoundary|contains("REQUEST04")) and .operationalCurrent.goLiveRoutePercentClosed==50 and .operationalCurrent.integratedProgramPercentClosed==25' orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json >/dev/null
-          git diff --check
-      - name: Mandatory canonical source-only gate after Runtime03 docs sync
-        shell: bash
-        run: |
-          set -euo pipefail
-          rm -f "$EVIDENCE_DIR/preflight-sanitizado.json"
-          env -u ORBIT360_REQUEST_FILE ORBIT360_EXPECTED_REQUEST_VERSION=NONE_PENDING_FRESH_AUTHORIZATION node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
-          jq -e '.ok==true and .status=="PASS_GATE_CONTRACT_SOURCE_F2_PRODUCTIVE_ACCEPTANCE" and .classification=="PASS" and .candidateArtifactId==9345207863 and .stableBoundaryContract==true and .sourceClosed==true and .phaseStillF2==true and .nextActionBound==true and .indexBoundaryCurrent==true and .narrativeAttemptStatusMutationPass==true and .executionAuthorized==false and .secretAccessAuthorized==false and .firestoreReadAuthorized==false and .runtimeAuthorized==false and .browserAuthorized==false and .writeAuthorized==false and .deployAuthorized==false and .publicationAuthorized==false and .productionAuthorized==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0' "$EVIDENCE_DIR/preflight-sanitizado.json" >/dev/null
-          jq --arg run "$GITHUB_RUN_ID" --arg sha "$GITHUB_SHA" '. + {runtime03PostSyncSourceRunId:$run,runtime03PostSyncTriggerSha:$sha,runtime03PostSyncStatus:"F2_RUNTIME03_POSTSYNC_SOURCE_ONLY_PASS",request04Created:false,runtimeRunCreated:false,request03Replayed:false}' "$EVIDENCE_DIR/preflight-sanitizado.json" > "$EVIDENCE_DIR/f2-runtime03-postsync-source-only-v20260818.json"
-      - name: Persist docs plus post-sync source evidence only
-        shell: bash
-        run: |
-          set -euo pipefail
-          git config user.name 'orbit360-f2-runtime03-docsync-bot'
-          git config user.email 'orbit360-f2-runtime03-docsync-bot@users.noreply.github.com'
-          git add orbit360-platform/docs/orbit360-live-state-v1.json orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json orbit360-platform/docs/CHECKPOINT-F2-RUNTIME03-LEGAL-READINESS-VALIDATOR-STALE-ROOTFIX-PASS-20260818.md "$EVIDENCE_DIR/f2-runtime03-postsync-source-only-v20260818.json"
-          git diff --cached --check
-          git commit -m 'docs(f2): sync runtime03 rootfix state after canonical post-sync gate [skip ci]'
-          git push origin "HEAD:ays/backend-tenant-lab-v99-20260703"
+      - run: echo "RETIRED_LEGACY_CONTINUITY_WRITER — current state is projected only by tools/orbit360-continuity-sync-v20260820.mjs"

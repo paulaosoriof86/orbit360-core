@@ -1,82 +1,13 @@
-name: Orbit360 F2 Continuity Anti Loop Audit 20260820
+name: Orbit360 Retired Legacy Continuity Writer
+
 on:
-  push:
-    branches: [ays/backend-tenant-lab-v99-20260703]
-    paths:
-      - 'orbit360-platform/runtime-gate-crm-v20260716/f2-continuity-audit-trigger-v20260820.json'
+  workflow_dispatch:
+
 permissions:
-  contents: write
-  pull-requests: read
-concurrency:
-  group: orbit360-f2-continuity-audit
-  cancel-in-progress: false
-env:
-  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
-  ORBIT360_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/f2-continuity-audit-v20260820.json
+  contents: read
+
 jobs:
-  continuity_audit:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 10
+  retired:
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.sha }}
-          fetch-depth: 0
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-      - name: Verify trigger boundary
-        shell: bash
-        run: |
-          set -euo pipefail
-          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
-          mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
-          test "${#CHANGED[@]}" = '1'
-          test "${CHANGED[0]}" = 'orbit360-platform/runtime-gate-crm-v20260716/f2-continuity-audit-trigger-v20260820.json'
-          node --check tools/orbit360-sync-continuity-from-ledger-v20260820.mjs
-          node --check tools/orbit360-f2-continuity-invariant-v20260820.mjs
-          node --check tools/orbit360-f2-request11-authorization-documentation-invariant-v20260820.mjs
-      - name: Synchronize active continuity owners from canonical ledger
-        shell: bash
-        run: |
-          set -euo pipefail
-          node tools/orbit360-sync-continuity-from-ledger-v20260820.mjs
-          git diff --check
-      - name: Read actual PR body
-        env:
-          GH_TOKEN: ${{ github.token }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          curl -fsSL -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/${GITHUB_REPOSITORY}/pulls/5" | jq -r '.body // ""' > "$RUNNER_TEMP/pr-body.md"
-          test -s "$RUNNER_TEMP/pr-body.md"
-          echo "ORBIT360_PR_BODY_FILE=$RUNNER_TEMP/pr-body.md" >> "$GITHUB_ENV"
-      - name: Run generic fail-closed continuity invariant
-        shell: bash
-        run: |
-          set +e
-          ORBIT360_CONTINUITY_REQUIRE_PR=true ORBIT360_CONTINUITY_OUT="$ORBIT360_EVIDENCE" node tools/orbit360-f2-continuity-invariant-v20260820.mjs
-          RC=$?
-          echo "ORBIT360_AUDIT_RC=$RC" >> "$GITHUB_ENV"
-          exit 0
-      - name: Persist synchronization and PASS or FAIL evidence
-        if: always()
-        shell: bash
-        run: |
-          set -euo pipefail
-          test -f "$ORBIT360_EVIDENCE"
-          jq -e '.schemaVersion=="orbit360-f2-continuity-audit-v1" and .stateVersion=="F2-R12-CONSUMED-ROOTCAUSE-OPEN-20260820-01" and .requestOrdinal==12 and .runId==32332301619 and .containsPII==false and .containsSecrets==false and .productMutation==false and .dataMutation==false and .runtimeExecuted==false and .browserExecuted==false' "$ORBIT360_EVIDENCE" >/dev/null
-          git config user.name orbit360-continuity-bot
-          git config user.email orbit360-continuity-bot@users.noreply.github.com
-          git add README.md orbit360-platform/CHANGELOG.md orbit360-platform/docs/orbit360-live-state-v1.json orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-runtime-v20260819.json "$ORBIT360_EVIDENCE"
-          if ! git diff --cached --quiet; then
-            git commit -m 'docs(f2): persist canonical continuity sync and audit evidence [skip ci]'
-            git push origin HEAD:"$ORBIT360_BRANCH"
-          fi
-      - name: Enforce audit result after persistence
-        if: always()
-        shell: bash
-        run: |
-          set -euo pipefail
-          test "${ORBIT360_AUDIT_RC:-41}" = '0'
-          jq -e '.ok==true and .status=="F2_CONTINUITY_ANTI_LOOP_AUDIT_PASS" and (.failed|length)==0 and .prChecked==true' "$ORBIT360_EVIDENCE" >/dev/null
+      - run: echo "RETIRED_LEGACY_CONTINUITY_WRITER — current state is projected only by tools/orbit360-continuity-sync-v20260820.mjs"
