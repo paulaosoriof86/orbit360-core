@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "orbit360-sourcefix-trigger-v1",
+  "sourcefixId": "F2_REQUEST10_ROUTE_VISIBILITY_VALIDATOR_SOURCEFIX_V1",
+  "rootCause": "VALIDATOR_STALE:F2_ROUTE_VISIBLE_WAIT_CONTRADICTS_CAPTURED_DOM_STATE",
+  "request10RunId": 32318415706,
+  "request10EvidenceArtifactId": 9388976113,
+  "candidateArtifactId": 9387820198,
+  "candidateSourceHead": "fc46bd85783d8b4d524cbeb0fee54ee9a2c774af",
+  "productMutation": false,
+  "candidateRebuild": false,
+  "browser": false,
+  "runtime": false,
+  "secrets": false,
+  "firestoreRead": false,
+  "writes": false,
+  "deploy": false,
+  "production": false,
+  "request11Created": false,
+  "request11Authorized": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
