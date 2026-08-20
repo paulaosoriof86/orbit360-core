@@ -1,0 +1,42 @@
+name: Orbit360 Post-close Reconciliation Diagnostic
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - '.github/workflows/orbit360-postclose-reconciliation-diagnostic-v20260820.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  statuses: write
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+      - name: Diagnose post-close reconciliation without publication
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -u
+          post() {
+            stage="$1"; state="$2"; description="$3"
+            payload=$(printf '{"state":"%s","context":"orbit360/postclose-%s","description":"%s"}' "$state" "$stage" "$description")
+            curl --fail-with-body -sS -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" -d "$payload" >/dev/null
+          }
+          LR=$(node -p "require('./orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json').revision")
+          PR=$(node -p "require('./orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json').revision")
+          if node tools/orbit360-continuity-transition-owner-v20260820.mjs --expected-revision "$LR" --expected-package-revision "$PR" --transition POST_CLOSE_RECONCILE_CONTROL_PLANE_METADATA; then post owner success 'revision owner PASS'; else post owner failure 'revision owner FAIL'; exit 31; fi
+          LR=$((LR+1))
+          if node tools/orbit360-continuity-projection-atomic-v20260820.mjs --expected-revision "$LR"; then post projection success 'atomic projection PASS'; else post projection failure 'atomic projection FAIL'; exit 32; fi
+          if node tools/orbit360-control-plane-composite-invariant-v20260820.mjs; then post composite success 'composite invariant PASS'; else post composite failure 'composite invariant FAIL'; exit 33; fi
+          if ORBIT360_CONTROL_PLANE_HEAD="$GITHUB_SHA" node tools/orbit360-control-plane-independent-readback-v20260820.mjs --expected-step CP-11 --expected-package-status CLOSED_PASS; then post readback success 'independent readback PASS'; else post readback failure 'independent readback FAIL'; exit 34; fi
+          post diagnostic success 'all post-close source-only stages PASS'
