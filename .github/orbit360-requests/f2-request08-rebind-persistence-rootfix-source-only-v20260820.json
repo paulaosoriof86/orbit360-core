@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "orbit360-f2-request08-rebind-persistence-rootfix-request-v1",
+  "approved": true,
+  "authorizationSource": "user_explicit_continue_exact_next_action_20260819",
+  "operation": "PERSIST_ALREADY_VALIDATED_REBIND_ONLY",
+  "sourceOnly": true,
+  "validatedGateRunId": 32315636095,
+  "validatedGateStatus": "PASS_GATE_CONTRACT_SOURCE_F2_PRODUCTIVE_ACCEPTANCE",
+  "gateReexecutionAllowed": false,
+  "rootCause": "PIPELINE_MECHANISM_FAILURE:REBIND_PERSIST_REBASE_BLOCKED_BY_UNSTAGED_PREFLIGHT",
+  "predecessorArtifactId": 9385306424,
+  "candidateArtifactId": 9387820198,
+  "candidateSourceHead": "fc46bd85783d8b4d524cbeb0fee54ee9a2c774af",
+  "browser": false,
+  "runtime": false,
+  "secrets": false,
+  "firestoreRead": false,
+  "writes": false,
+  "deploy": false,
+  "production": false,
+  "request09Authorized": false,
+  "mainMergeAuthorized": false
+}
