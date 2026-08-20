@@ -1,7 +1,7 @@
 {
   "schemaVersion": "orbit360-continuity-writer-registry-v1",
   "registryId": "ORBIT360-CONTINUITY-WRITER-REGISTRY",
-  "revision": 7,
+  "revision": 8,
   "active": true,
   "status": "CANONICAL_CONTROL_PLANE_OWNERS_ACTIVE",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -13,6 +13,10 @@
   "compositeInvariant": "tools/orbit360-control-plane-composite-invariant-v20260820.mjs",
   "storePerformanceSynthetic": "tools/orbit360-store-read-amplification-synthetic-v20260820.mjs",
   "workflowSurfaceAudit": "tools/orbit360-workflow-operational-surface-audit-v20260820.mjs",
+  "authorizationBoundary": "orbit360-platform/docs/orbit360-f2-runtime-authorization-boundary-v20260820.json",
+  "authorizationBoundaryGenerator": "tools/orbit360-f2-runtime-authorization-boundary-v20260820.mjs",
+  "authorizationBoundaryAudit": "tools/orbit360-cp11-authorization-boundary-audit-v20260820.mjs",
+  "authorizationBoundaryWorkflow": ".github/workflows/orbit360-cp11-authorization-boundary-sourceonly-v20260820.yml",
   "canonicalWorkflow": ".github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml",
   "canonicalWorkflowMode": "REVISION_AWARE_CAS_SINGLE_COMMIT",
   "projectionTargets": [
@@ -39,10 +43,17 @@
     "remoteHeadCompareAndSwapRequiredBeforePublication": true,
     "silentRebaseProjectionForbidden": true,
     "projectionAndLedgerPublishedInSameCommit": true,
-    "registryContainsOwnersNotProgressState": true
+    "registryContainsOwnersNotProgressState": true,
+    "authorizationBoundaryMustBeSourceOnlyAndInert": true,
+    "authorizationBoundaryMustBindGateCandidateLedgerAndExecutionProfile": true,
+    "authorizationIdentityDigestRequired": true,
+    "authorizationCarryForwardForbidden": true,
+    "runtimeRequestMaterializationRequiresFreshExplicitUserAuthorization": true,
+    "requestOrdinalMayNotCarryOperationalAuthorizationSemantics": true
   },
   "workflowClasses": {
     "canonicalProjectionOwner": [".github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml"],
+    "cp11AuthorizationBoundaryProducer": [".github/workflows/orbit360-cp11-authorization-boundary-sourceonly-v20260820.yml"],
     "sourceOnlyCandidateEvidenceProducer": [".github/workflows/orbit360-f2-successor-candidate-build-sourceonly-v20260820.yml"],
     "legacyContinuityWritersRetiredByAudit": 24,
     "legacyRetirementMode": "HISTORICAL_NON_OWNER_OPERATIONALLY_ISOLATED"
@@ -58,6 +69,7 @@
     "mode": "REMOTE_HEAD_COMPARE_AND_SWAP",
     "workflowMayMutateRepository": true,
     "mutationOwner": ".github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml",
+    "cp11BoundaryMutationOwner": ".github/workflows/orbit360-cp11-authorization-boundary-sourceonly-v20260820.yml",
     "gitPullRebaseAllowed": false,
     "runtimeMayExecute": false,
     "browserMayExecute": false,
