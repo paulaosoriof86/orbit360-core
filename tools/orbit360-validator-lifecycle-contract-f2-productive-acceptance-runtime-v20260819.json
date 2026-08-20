@@ -4,18 +4,16 @@
   "gateContractVersion": "2.2.0",
   "validatorLifecycleRevision": "phase-capability-contract-v6-canonical-authority",
   "f2ValidatorRevision": "f2-canonical-authority-hardening-cp02-v20260820",
-  "status": "CONTROL_PLANE_HARDENING_REQUIRED_RUNTIME_BLOCKED",
-  "currentPhase": "CONTROL_PLANE_HARDENING_BEFORE_F2_RUNTIME_REOPEN",
+  "status": "PRODUCTION_REOPENING_PACKAGE_CLOSED_PASS",
+  "currentPhase": "F2_RUNTIME_REOPENING_READY_AWAITING_EXPLICIT_AUTHORIZATION",
   "canonicalContractAuthority": "tools/orbit360-gate-contract-f2-productive-acceptance-v20260820.json",
   "continuity": {
     "stateVersion": "ORBIT360-F2-CONTINUITY-CURRENT",
     "ledger": "orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json",
     "productionReopeningPackage": "orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json",
     "writerRegistry": "orbit360-platform/docs/orbit360-continuity-writer-registry-v20260820.json",
-    "checkpoint": "orbit360-platform/docs/CHECKPOINT-CONTROL-PLANE-HARDENING-20260820.md",
-    "sync": "tools/orbit360-continuity-sync-v20260820.mjs",
-    "invariant": "tools/orbit360-f2-continuity-invariant-v20260820.mjs",
-    "firstIncompleteStep": "CP-03"
+    "sync": "tools/orbit360-continuity-projection-atomic-v20260820.mjs",
+    "invariant": "tools/orbit360-control-plane-composite-invariant-v20260820.mjs"
   },
   "executionProfile": {
     "phase": "F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY",
@@ -38,8 +36,7 @@
   "authorization": {
     "requiredForExecution": true,
     "activeRequest": false,
-    "freshAuthorizationRequired": false,
-    "authorizationBlockedByHardeningPackage": true,
+    "freshAuthorizationRequired": true,
     "authorizationCarryForwardForbidden": true,
     "nextRuntimeMaterializationAllowed": false,
     "newRuntimeRequestAllowed": false,
@@ -72,9 +69,33 @@
     "compositeInvariantPassRequired": true
   },
   "surfaceTopology": {
-    "routes": ["inicio", "cliente360", "aseguradoras", "ops", "leads", "polizas", "cobros"],
-    "integratedSurfaces": {"vehiculos":"cliente360_policy_deeplink_fullpage","recibosCartera":"policy_client360_plus_cobros_global"},
-    "roleViews": [{"role":"Dirección","viewport":"desktop"},{"role":"Operativo","viewport":"tablet"},{"role":"Asesor","viewport":"mobile"}]
+    "routes": [
+      "inicio",
+      "cliente360",
+      "aseguradoras",
+      "ops",
+      "leads",
+      "polizas",
+      "cobros"
+    ],
+    "integratedSurfaces": {
+      "vehiculos": "cliente360_policy_deeplink_fullpage",
+      "recibosCartera": "policy_client360_plus_cobros_global"
+    },
+    "roleViews": [
+      {
+        "role": "Dirección",
+        "viewport": "desktop"
+      },
+      {
+        "role": "Operativo",
+        "viewport": "tablet"
+      },
+      {
+        "role": "Asesor",
+        "viewport": "mobile"
+      }
+    ]
   },
   "history": {
     "request14": {
@@ -93,7 +114,7 @@
       "replayAllowed": false
     }
   },
-  "nextActionExact": "CP-03_CREATE_SINGLE_REVISIONED_LEDGER_MUTATION_OWNER",
+  "nextActionExact": "CP-11_PREPARE_FRESH_F2_RUNTIME_AUTHORIZATION_BOUNDARY",
   "containsPII": false,
   "containsSecrets": false
 }

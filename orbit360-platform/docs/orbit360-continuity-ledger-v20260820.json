@@ -1,17 +1,17 @@
 {
   "schemaVersion": "orbit360-continuity-ledger-v2",
   "ledgerId": "ORBIT360-F2-CONTINUITY-CURRENT",
-  "revision": 8,
-  "updatedAtUtc": "2026-08-20T16:12:00Z",
+  "revision": 16,
+  "updatedAtUtc": "2026-08-20T17:32:25.955Z",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
   "stateVersion": "ORBIT360-F2-CONTINUITY-CURRENT",
   "gateId": "f2-productive-acceptance-exact-successor-v20260818",
   "activeState": {
-    "phase": "CONTROL_PLANE_HARDENING_BEFORE_F2_RUNTIME_REOPEN",
-    "status": "PRODUCTION_REOPENING_PACKAGE_OPEN_FAIL_CLOSED",
-    "rootCauseStatus": "CP01_CP02_SOURCE_ONLY_RESOLVED_CP03_PENDING",
+    "phase": "F2_RUNTIME_REOPENING_READY_AWAITING_EXPLICIT_AUTHORIZATION",
+    "status": "PRODUCTION_REOPENING_PACKAGE_CLOSED_PASS",
+    "rootCauseStatus": "CONTROL_PLANE_HARDENING_CLOSED_PASS",
     "productFrozen": true,
     "dataFrozen": true,
     "runtimeAuthorized": false,
@@ -52,8 +52,8 @@
   },
   "authorizationBoundary": {
     "activeRuntimeAuthorization": false,
-    "freshAuthorizationRequired": false,
-    "authorizationBlockedByHardeningPackage": true,
+    "freshAuthorizationRequired": true,
+    "authorizationBlockedByHardeningPackage": false,
     "authorizationCarryForwardForbidden": true,
     "nextRuntimeMaterializationAllowed": false,
     "newRuntimeRequestAllowed": false,
@@ -64,7 +64,7 @@
     "mergeAuthorized": false
   },
   "continuityControl": {
-    "status": "OPEN_FAIL_CLOSED",
+    "status": "CLOSED_PASS",
     "classification": "PIPELINE_MECHANISM_FAILURE:CONTROL_PLANE_NOT_FULLY_ATOMIC",
     "secondaryClassification": "VALIDATOR_STALE:CONTRACT_VERSION_DRIFT",
     "contractAuthorityRootfix": {
@@ -78,7 +78,13 @@
       "activeDefaultRequestOrdinal": null,
       "request14MetadataReconciled": true
     },
-    "resolvedDesignPreserved": ["ACTIVE_STATE_ORDINAL_FREE","SINGLE_CANONICAL_PROJECTION_OWNER","EVIDENCE_TO_STATE_PROJECTION_REQUIRED","CERTIFIED_SUCCESSOR_STATE_PERSISTENT","RUNTIME_PIPELINE_HISTORICAL_ID_DYNAMIC_GUARD"],
+    "resolvedDesignPreserved": [
+      "ACTIVE_STATE_ORDINAL_FREE",
+      "SINGLE_CANONICAL_PROJECTION_OWNER",
+      "EVIDENCE_TO_STATE_PROJECTION_REQUIRED",
+      "CERTIFIED_SUCCESSOR_STATE_PERSISTENT",
+      "RUNTIME_PIPELINE_HISTORICAL_ID_DYNAMIC_GUARD"
+    ],
     "hardeningPackage": "orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json",
     "writerRegistry": "orbit360-platform/docs/orbit360-continuity-writer-registry-v20260820.json",
     "syncTool": "tools/orbit360-continuity-sync-v20260820.mjs",
@@ -88,18 +94,18 @@
   },
   "productionReopeningPackage": {
     "path": "orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json",
-    "status": "OPEN_FAIL_CLOSED",
-    "revision": 2,
-    "firstIncompleteStep": "CP-03",
-    "nextActionExact": "CP-03_CREATE_SINGLE_REVISIONED_LEDGER_MUTATION_OWNER",
+    "status": "CLOSED_PASS",
+    "revision": 10,
+    "firstIncompleteStep": "CP-11",
+    "nextActionExact": "CP-11_PREPARE_FRESH_F2_RUNTIME_AUTHORIZATION_BOUNDARY",
     "runtimeAllowed": false,
     "authorizationAllowed": false,
     "requestMaterializationAllowed": false
   },
   "checkpoint": "orbit360-platform/docs/CHECKPOINT-CONTROL-PLANE-HARDENING-20260820.md",
   "nextAction": {
-    "id": "CP-03_CREATE_SINGLE_REVISIONED_LEDGER_MUTATION_OWNER",
-    "description": "Continue the persisted PRODUCTION_REOPENING_PACKAGE from CP-03. Implement the single revision-aware ledger mutation owner using expectedRevision and fail closed on concurrent state changes. Runtime authorization, new request ordinals, secrets, browser, Firestore access, deploy, publication and production remain blocked.",
+    "id": "CP-11_PREPARE_FRESH_F2_RUNTIME_AUTHORIZATION_BOUNDARY",
+    "description": "Prepare a fresh F2 runtime authorization boundary; runtime remains unauthorized until separate explicit user authorization.",
     "runtimeAllowed": false
   },
   "history": {
@@ -126,11 +132,16 @@
       "authWrites": 0,
       "operationalWrites": 0
     },
-    "priorConsumedRuntimeOrdinals": [11,12,13,14]
+    "priorConsumedRuntimeOrdinals": [
+      11,
+      12,
+      13,
+      14
+    ]
   },
   "lanes": {
     "A_frontend_ux_academia": "PRODUCT_FROZEN_NO_REOPEN",
-    "B_backend_security_gates": "CONTROL_PLANE_HARDENING_CP03_REQUIRED_FAIL_CLOSED",
+    "B_backend_security_gates": "CONTROL_PLANE_HARDENING_CLOSED_RUNTIME_AUTHORIZATION_PENDING",
     "C_real_data_migration": "UNCHANGED_FROZEN"
   },
   "progress": {
