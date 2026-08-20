@@ -65,8 +65,9 @@ Formato basado en *Keep a Changelog*. Construcción greenfield; el estado operat
 
 <!-- ORBIT360_CURRENT_STATE_START -->
 ## [F2-CONTINUITY-CURRENT] — 2026-08-20 UTC · `ORBIT360-F2-CONTINUITY-CURRENT`
-- Estado activo ordinal-free y guards activos desacoplados de Request/artifact histórico.
+- Estado activo ordinal-free y guards desacoplados de Request/artifact histórico.
 - Rootfix source-only verificado: `F2_PRODUCT_READONLY_GET_FULL_COLLECTION_CLONE_AMPLIFICATION`.
-- Runtime consumido y artifact previo quedan únicamente como historia sellada; no replay/reuse.
+- Candidata sucesora source-only: CERTIFICADA artifact `9395391426`, 194 archivos, rehash completo.
+- Runtime consumido y artifact previo permanecen como historia sellada; no replay/reuse.
 - Un solo owner de proyección: `tools/orbit360-continuity-sync-v20260820.mjs`.
 <!-- ORBIT360_CURRENT_STATE_END -->

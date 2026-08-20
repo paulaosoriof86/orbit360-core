@@ -1,17 +1,17 @@
 {
   "schemaVersion": "orbit360-live-state-v1",
   "stateVersion": "ORBIT360-F2-CONTINUITY-CURRENT",
-  "updatedAt": "2026-08-20T05:49:48.356Z",
-  "phase": "F2_PRODUCTIVE_ACCEPTANCE_SOURCE_ROOTFIX_VERIFIED",
+  "updatedAt": "2026-08-20T06:10:20.583Z",
+  "phase": "F2_PRODUCTIVE_ACCEPTANCE_SUCCESSOR_SOURCE_CANDIDATE_CERTIFIED",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pr": 5,
   "prState": "draft-open",
-  "currentCheckpoint": "orbit360-platform/docs/CHECKPOINT-F2-CONTINUITY-ORDINAL-FREE-SINGLE-WRITER-PASS-20260820.md",
+  "currentCheckpoint": "orbit360-platform/docs/CHECKPOINT-F2-SUCCESSOR-SOURCEONLY-CANDIDATE-CERTIFIED-20260820.md",
   "continuityLedger": "orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json",
   "canonicalCurrent": {
     "stateVersion": "ORBIT360-F2-CONTINUITY-CURRENT",
-    "status": "ROOTFIX_SOURCEONLY_VERIFIED_PENDING_SUCCESSOR_CANDIDATE",
+    "status": "SUCCESSOR_SOURCEONLY_CANDIDATE_CERTIFIED_PENDING_FRESH_RUNTIME_AUTHORIZATION",
     "rootCauseStatus": "CLOSED_SOURCEONLY_VERIFIED"
   },
   "authorization": {
@@ -27,7 +27,7 @@
   },
   "documentationControl": {
     "canonicalStateVersion": "ORBIT360-F2-CONTINUITY-CURRENT",
-    "currentCheckpoint": "orbit360-platform/docs/CHECKPOINT-F2-CONTINUITY-ORDINAL-FREE-SINGLE-WRITER-PASS-20260820.md",
+    "currentCheckpoint": "orbit360-platform/docs/CHECKPOINT-F2-SUCCESSOR-SOURCEONLY-CANDIDATE-CERTIFIED-20260820.md",
     "currentStateOwner": "orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json",
     "writerRegistry": "orbit360-platform/docs/orbit360-continuity-writer-registry-v20260820.json",
     "soleProjectionLogic": "tools/orbit360-continuity-sync-v20260820.mjs",
@@ -35,8 +35,8 @@
     "divergenceClassification": "PIPELINE_MECHANISM_FAILURE:DOCUMENTATION_STATE_DRIFT"
   },
   "nextActionExact": {
-    "id": "PREPARE_VALIDATE_SUCCESSOR_F2_SOURCEONLY_CANDIDATE",
-    "description": "Prepare and validate a new source-only F2 candidate containing the verified protected-store rootfix; do not reuse the historical artifact and do not authorize/materialize runtime until candidate certification and a fresh explicit authorization.",
+    "id": "AWAIT_FRESH_EXPLICIT_AUTHORIZATION_FOR_CERTIFIED_F2_SUCCESSOR_RUNTIME",
+    "description": "The new F2 successor candidate is certified source-only. Preserve it frozen and await a fresh explicit authorization before creating or materializing any runtime request; no authorization carry-forward, replay, deploy, publication or production action is allowed.",
     "runtimeAllowed": false
   },
   "stopRetry": {
@@ -46,7 +46,7 @@
   },
   "lanes": {
     "A_frontend_ux_academia": "ROOTFIX_DOCUMENTED_ACADEMIA_UPDATED",
-    "B_backend_security_gates": "CONTINUITY_CLOSED_VERIFIED_READY_FOR_SUCCESSOR_SOURCE_CANDIDATE",
+    "B_backend_security_gates": "SUCCESSOR_SOURCEONLY_CANDIDATE_CERTIFIED_RUNTIME_BLOCKED_PENDING_FRESH_AUTHORIZATION",
     "C_real_data_migration": "UNCHANGED"
   },
   "progress": {
@@ -57,8 +57,8 @@
   "containsPII": false,
   "containsSecrets": false,
   "activeState": {
-    "phase": "F2_PRODUCTIVE_ACCEPTANCE_SOURCE_ROOTFIX_VERIFIED",
-    "status": "ROOTFIX_SOURCEONLY_VERIFIED_PENDING_SUCCESSOR_CANDIDATE",
+    "phase": "F2_PRODUCTIVE_ACCEPTANCE_SUCCESSOR_SOURCE_CANDIDATE_CERTIFIED",
+    "status": "SUCCESSOR_SOURCEONLY_CANDIDATE_CERTIFIED_PENDING_FRESH_RUNTIME_AUTHORIZATION",
     "rootCauseStatus": "CLOSED_SOURCEONLY_VERIFIED",
     "productFrozen": true,
     "dataFrozen": true,
@@ -115,7 +115,21 @@
       "historicalManifestSha256": "b18422fdf82830d28e82f657f83b4fd5c10ea134a4735263fa2587a2ddd808cb",
       "historicalFileCount": 194,
       "historicalRuntimeReusable": false,
-      "status": "SUCCESSOR_SOURCE_CANDIDATE_REQUIRED"
+      "status": "SUCCESSOR_SOURCE_CANDIDATE_CERTIFIED",
+      "successorArtifactId": 9395391426,
+      "successorSourceHead": "6af0c029aebb1bfecd05569452c814584110ae4c"
     }
+  },
+  "successorCandidate": {
+    "status": "CERTIFIED_SOURCE_ONLY",
+    "artifactId": 9395391426,
+    "sourceHead": "6af0c029aebb1bfecd05569452c814584110ae4c",
+    "zipName": "orbit360-fase-a-product-f2-successor-store-rootfix-6af0c029aebb.zip",
+    "zipSha256": "e1a711806d4ffd78004dbe5a30ebf8c5db59aaf23d2b8cd65e78b291cedc53d0",
+    "manifestSha256": "44dee7cebb174dfd630641d1e16ac649edffec18af688b62e05ceff4dc5812a5",
+    "fileCount": 194,
+    "fullRehashPass": true,
+    "certificationEvidencePath": "orbit360-platform/runtime-gate-crm-v20260716/f2-successor-candidate-sourceonly-v20260820.json",
+    "runtimeAuthorized": false
   }
 }
