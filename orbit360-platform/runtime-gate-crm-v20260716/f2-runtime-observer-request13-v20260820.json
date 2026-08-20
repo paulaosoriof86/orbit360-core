@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "orbit360-f2-runtime-observer-v1",
+  "ok": false,
+  "status": "F2_PRODUCTIVE_ACCEPTANCE_PRE_GATE_FAIL",
+  "classification": "VALIDATOR_STALE",
+  "targetRequestCommit": "8e90f714dd9702bb2b9d3fba5158fe3e4228081a",
+  "targetRequestOrdinal": 13,
+  "runtimeRunId": 32339845253,
+  "runtimeStatus": "completed",
+  "runtimeConclusion": "failure",
+  "evidenceArtifactId": 9395952863,
+  "evidenceArtifactDigest": "sha256:c75cbd38af8312a0aca99ed72a1deb0e2c877525b74fc27fee79db8cde8f3983",
+  "sourceOnlyObserver": true,
+  "runtimeExecutedByObserver": false,
+  "browserExecutedByObserver": false,
+  "secretAccessByObserver": false,
+  "firestoreReadByObserver": false,
+  "writesByObserver": 0,
+  "containsPII": false,
+  "containsSecrets": false
+}
