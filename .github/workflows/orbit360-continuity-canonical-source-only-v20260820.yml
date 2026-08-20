@@ -1,4 +1,5 @@
 name: Orbit360 Continuity Canonical Source Only
+# Final clean invocation after read-only proof of owner, projection, composite, readback, staging, local commit and CAS.
 
 on:
   push:
