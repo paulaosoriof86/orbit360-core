@@ -1,9 +1,9 @@
 {
   "schemaVersion": "orbit360-continuity-writer-registry-v1",
   "registryId": "ORBIT360-CONTINUITY-WRITER-REGISTRY",
-  "revision": 6,
+  "revision": 7,
   "active": true,
-  "status": "CONTROL_PLANE_HARDENING_ATOMIC_OWNER_INSTALLED",
+  "status": "CANONICAL_CONTROL_PLANE_OWNERS_ACTIVE",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "sourceOfTruth": "orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json",
   "hardeningPackage": "orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json",
@@ -19,7 +19,8 @@
     "orbit360-platform/docs/orbit360-live-state-v1.json",
     "orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json",
     "tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-runtime-v20260819.json",
-    "orbit360-platform/docs/ORBIT360-PR5-CURRENT-STATE.md"
+    "orbit360-platform/docs/ORBIT360-PR5-CURRENT-STATE.md",
+    "orbit360-platform/docs/CHECKPOINT-CONTROL-PLANE-HARDENING-20260820.md"
   ],
   "policies": {
     "requestOrdinalAllowedOnlyInHistory": true,
@@ -30,7 +31,6 @@
     "continuityAuditFailClosed": true,
     "certifiedSuccessorStateMustPersist": true,
     "historicalArtifactMayNotReplaceCertifiedSuccessor": true,
-    "hardeningPackageOverridesOlderRuntimeNextAction": true,
     "runtimeAuthorizationForbiddenWhileHardeningPackageOpen": true,
     "newRuntimeOrdinalForbiddenWhileHardeningPackageOpen": true,
     "canonicalF2ContractMustBeDerivedFromSingleAuthority": true,
@@ -38,13 +38,11 @@
     "expectedPackageRevisionRequiredBeforePackageMutation": true,
     "remoteHeadCompareAndSwapRequiredBeforePublication": true,
     "silentRebaseProjectionForbidden": true,
-    "projectionAndLedgerPublishedInSameCommit": true
+    "projectionAndLedgerPublishedInSameCommit": true,
+    "registryContainsOwnersNotProgressState": true
   },
-  "completedHardeningSteps": ["CP-00","CP-01","CP-02"],
-  "nextHardeningStep": "CP-03",
   "workflowClasses": {
     "canonicalProjectionOwner": [".github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml"],
-    "canonicalProjectionOwnerCurrentMode": "REVISION_AWARE_CAS_SINGLE_COMMIT",
     "sourceOnlyCandidateEvidenceProducer": [".github/workflows/orbit360-f2-successor-candidate-build-sourceonly-v20260820.yml"],
     "legacyContinuityWritersRetiredByAudit": 24,
     "legacyRetirementMode": "HISTORICAL_NON_OWNER_OPERATIONALLY_ISOLATED"
@@ -54,14 +52,13 @@
     "requireCanonicalOwnerForProjectionTargetWriters": true,
     "forbidRequestSpecificProjectionOwners": true,
     "lastDetectedIndependentWriters": 0,
-    "reauditRequiredBeforeCP08": true,
-    "nextRequiredStep": "CP-07"
+    "auditTool": "tools/orbit360-workflow-operational-surface-audit-v20260820.mjs"
   },
-  "temporaryHardeningLock": {
-    "active": true,
-    "releaseStep": "CP-10",
+  "publicationGuard": {
+    "mode": "REMOTE_HEAD_COMPARE_AND_SWAP",
     "workflowMayMutateRepository": true,
-    "mutationCondition": "source-only CP03-CP10 atomic closure job only",
+    "mutationOwner": ".github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml",
+    "gitPullRebaseAllowed": false,
     "runtimeMayExecute": false,
     "browserMayExecute": false,
     "secretsMayBeRead": false,
