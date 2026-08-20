@@ -242,7 +242,8 @@
     }
 
     function get(collection, id) {
-      return all(collection).find(function (row) { return rowId(row) === id; }) || null;
+      var row = (cache[collection] || []).find(function (item) { return rowId(item) === id; });
+      return row ? clone(row) : null;
     }
 
     function where(collection, fieldOrPredicate, opOrValue, maybeValue) {
