@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "orbit360-f2-runtime-observer-request-v1",
+  "targetRequestOrdinal": 14,
+  "targetRequestCommit": "1924fce5c726d420a003ae0b2a10c0ad0f553b6d",
+  "targetCandidateArtifactId": 9395391426,
+  "sourceOnly": true,
+  "runtime": false,
+  "browser": false,
+  "secrets": false,
+  "firestoreRead": false,
+  "writes": false,
+  "deploy": false,
+  "production": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
