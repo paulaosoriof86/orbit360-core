@@ -1,0 +1,33 @@
+{
+  "schemaVersion": "orbit360-f2-successor-source-validation-request-v1",
+  "requestVersion": "F2_SUCCESSOR_SOURCE_VALIDATION_V1",
+  "gateId": "f2-productive-acceptance-exact-successor-v20260818",
+  "status": "SOURCE_ONLY_ONCE",
+  "allowedExecutions": 1,
+  "consumed": false,
+  "replayAllowed": false,
+  "parentHead": "6659cc45e411182ed7ef50d67487afced0bc48bb",
+  "candidateArtifactId": 9387820198,
+  "candidateSourceHead": "fc46bd85783d8b4d524cbeb0fee54ee9a2c774af",
+  "candidateZipSha256": "58fcbe6e8d7d3a425509c87f229b1cb12dd35a99133d46c757544cc75c55aacc",
+  "candidateManifestSha256": "b18422fdf82830d28e82f657f83b4fd5c10ea134a4735263fa2587a2ddd808cb",
+  "candidateManifestStatus": "FASE_A_PRODUCT_F2_REQUEST08_ROUTER_READINESS_SUCCESSOR_CERTIFIED",
+  "candidateFileCount": 194,
+  "sourceOnlyReason": "REQUEST08_ROUTER_READINESS_FUNCTIONAL_ROOTFIX_SUCCESSOR",
+  "scope": {
+    "secrets": false,
+    "firestoreRead": false,
+    "browser": false,
+    "runtime": false,
+    "writes": false,
+    "dataWrites": false,
+    "operationalWrites": false,
+    "authWrites": false,
+    "membershipWrites": false,
+    "deploy": false,
+    "production": false
+  },
+  "request09Authorized": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
