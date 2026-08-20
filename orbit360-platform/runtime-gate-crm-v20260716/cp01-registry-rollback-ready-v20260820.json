@@ -1,0 +1,7 @@
+{
+  "schemaVersion":"orbit360-control-plane-correction-note-v1",
+  "status":"READY_FOR_EXACT_BLOB_RESTORE",
+  "registryBlob":"d3bfea1aa5fafde7609fddde9bd4b14a2d33f4dd",
+  "containsPII":false,
+  "containsSecrets":false
+}
