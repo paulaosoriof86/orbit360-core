@@ -1,0 +1,163 @@
+name: Orbit360 F2 Successor Candidate Build Sourceonly 20260820
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - '.github/orbit360-requests/f2-successor-candidate-build-runbound-*.json'
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: orbit360-f2-successor-candidate-build-sourceonly-20260820
+  cancel-in-progress: false
+
+env:
+  EVIDENCE_PATH: orbit360-platform/runtime-gate-crm-v20260716/f2-successor-candidate-sourceonly-v20260820.json
+
+jobs:
+  build_and_certify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validate immutable source-only request and continuity boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
+          test "${#CHANGED[@]}" = '1'
+          REQUEST_FILE="${CHANGED[0]}"
+          case "$REQUEST_FILE" in .github/orbit360-requests/f2-successor-candidate-build-runbound-*.json) ;; *) echo 'PIPELINE_MECHANISM_FAILURE:F2_SUCCESSOR_REQUEST_PATH_INVALID' >&2; exit 41 ;; esac
+          SOURCE_HEAD="$(git rev-parse HEAD^)"
+          jq -e --arg source "$SOURCE_HEAD" '.schemaVersion=="orbit360-f2-successor-candidate-build-request-v1" and .requestVersion=="F2_SUCCESSOR_CANDIDATE_BUILD_SOURCEONLY_V1" and .sourceHead==$source and .parentHead==$source and .sourceOnly==true and .allowedExecutions==1 and .replayAllowed==false and .predecessorArtifactId==9385306424 and (.forbiddenArtifactIds|index(9387820198))!=null and .browser==false and .runtime==false and .secrets==false and .firestoreRead==false and .writes==false and .deploy==false and .production==false and .containsPII==false and .containsSecrets==false' "$REQUEST_FILE" >/dev/null
+          test "$(jq -r '.predecessorArtifactId' "$REQUEST_FILE")" != '9387820198'
+          node tools/orbit360-f2-continuity-invariant-v20260820.mjs >/tmp/continuity-precheck.json
+          jq -e '.ok==true and .status=="ORBIT360_CONTINUITY_ACTIVE_GUARDS_AUDIT_PASS" and .successorCandidateArtifactId==null' /tmp/continuity-precheck.json >/dev/null
+          node tools/orbit360-validar-product-readonly-get-rootfix-v20260820.mjs >/tmp/store-rootfix.json
+          jq -e '.ok==true and .status=="F2_PRODUCT_READONLY_GET_ROOTFIX_SOURCEONLY_PASS" and .apiPreserved==true and .cloneIsolationPreserved==true and .writesRemainBlocked==true' /tmp/store-rootfix.json >/dev/null
+          node tools/orbit360-test-f2-router-readiness-rootfix-v20260819.mjs >/tmp/router-rootfix.json
+          jq -e '.ok==true and .status=="PASS_F2_REQUEST08_ROUTER_READINESS_ROOTFIX" and .activationWaitsForRenderedHost==true and .hostRenderedBeforeReady==true and .routerSourceMutationRequired==false' /tmp/router-rootfix.json >/dev/null
+          echo "ORBIT360_SUCCESSOR_REQUEST=$REQUEST_FILE" >> "$GITHUB_ENV"
+          echo "ORBIT360_SUCCESSOR_SOURCE_HEAD=$SOURCE_HEAD" >> "$GITHUB_ENV"
+          echo "ORBIT360_PREDECESSOR_ARTIFACT_ID=$(jq -r '.predecessorArtifactId' "$REQUEST_FILE")" >> "$GITHUB_ENV"
+          echo "ORBIT360_PREDECESSOR_INNER_ZIP=$(jq -r '.predecessorInnerZip' "$REQUEST_FILE")" >> "$GITHUB_ENV"
+          echo "ORBIT360_PREDECESSOR_ZIP_SHA256=$(jq -r '.predecessorZipSha256' "$REQUEST_FILE")" >> "$GITHUB_ENV"
+          echo "ORBIT360_PREDECESSOR_MANIFEST_SHA256=$(jq -r '.predecessorManifestSha256' "$REQUEST_FILE")" >> "$GITHUB_ENV"
+          SHORT="${SOURCE_HEAD:0:12}"
+          echo "ORBIT360_SUCCESSOR_INNER_ZIP=orbit360-fase-a-product-f2-successor-store-rootfix-${SHORT}.zip" >> "$GITHUB_ENV"
+
+      - name: Download exact non-forbidden predecessor artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUTER="$RUNNER_TEMP/predecessor-outer.zip"; OUTER_DIR="$RUNNER_TEMP/predecessor-outer"; PRE_DIR="$RUNNER_TEMP/predecessor"; SUCC_DIR="$RUNNER_TEMP/successor"
+          rm -rf "$OUTER" "$OUTER_DIR" "$PRE_DIR" "$SUCC_DIR"; mkdir -p "$OUTER_DIR" "$PRE_DIR"
+          test "$ORBIT360_PREDECESSOR_ARTIFACT_ID" != '9387820198'
+          curl -L --fail --retry 3 -H "Authorization: Bearer $GH_TOKEN" -H 'Accept: application/vnd.github+json' -H 'X-GitHub-Api-Version: 2022-11-28' "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/${ORBIT360_PREDECESSOR_ARTIFACT_ID}/zip" -o "$OUTER"
+          unzip -q "$OUTER" -d "$OUTER_DIR"
+          mapfile -t FILES < <(find "$OUTER_DIR" -maxdepth 1 -type f -printf '%f\n' | sort)
+          test "${#FILES[@]}" = '1'
+          test "${FILES[0]}" = "$ORBIT360_PREDECESSOR_INNER_ZIP"
+          test "$(sha256sum "$OUTER_DIR/$ORBIT360_PREDECESSOR_INNER_ZIP" | awk '{print $1}')" = "$ORBIT360_PREDECESSOR_ZIP_SHA256"
+          unzip -q "$OUTER_DIR/$ORBIT360_PREDECESSOR_INNER_ZIP" -d "$PRE_DIR"
+          test "$(sha256sum "$PRE_DIR/orbit360-package-manifest.json" | awk '{print $1}')" = "$ORBIT360_PREDECESSOR_MANIFEST_SHA256"
+          echo "ORBIT360_PREDECESSOR_DIR=$PRE_DIR" >> "$GITHUB_ENV"
+          echo "ORBIT360_SUCCESSOR_DIR=$SUCC_DIR" >> "$GITHUB_ENV"
+
+      - name: Build new two-delta successor and full rehash
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-f2-successor-sourceonly-builder-v20260820.mjs
+          node tools/orbit360-f2-successor-sourceonly-builder-v20260820.mjs | tee "$RUNNER_TEMP/build.json"
+          jq -e '.ok==true and .status=="FASE_A_PRODUCT_F2_SUCCESSOR_STORE_ROOTFIX_SOURCEONLY_CERTIFIED" and .historicalArtifact9387820198Used==false and .fileCount==194 and .fullRehashPass==true and .deltaCount==2 and (.deltaPaths|sort)==(["core/product-app-p0.js","data/store-firestore-product-readonly-p0.js"]|sort) and .unchangedFileCount==192 and .routerReadinessRootfixPass==true and .storeGetRootfixPass==true and .readOnlyStoreGuardPass==true and .runtimeExecuted==false and .browserExecuted==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .productionTouched==false' "$RUNNER_TEMP/build.json" >/dev/null
+          cd "$ORBIT360_SUCCESSOR_DIR"
+          zip -qr "$RUNNER_TEMP/$ORBIT360_SUCCESSOR_INNER_ZIP" .
+          cd - >/dev/null
+          echo "ORBIT360_SUCCESSOR_ZIP_SHA256=$(sha256sum "$RUNNER_TEMP/$ORBIT360_SUCCESSOR_INNER_ZIP" | awk '{print $1}')" >> "$GITHUB_ENV"
+          echo "ORBIT360_SUCCESSOR_MANIFEST_SHA256=$(sha256sum "$ORBIT360_SUCCESSOR_DIR/orbit360-package-manifest.json" | awk '{print $1}')" >> "$GITHUB_ENV"
+
+      - name: Independently reopen candidate before upload
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERIFY="$RUNNER_TEMP/verify-preupload"; rm -rf "$VERIFY"; mkdir -p "$VERIFY"
+          unzip -q "$RUNNER_TEMP/$ORBIT360_SUCCESSOR_INNER_ZIP" -d "$VERIFY"
+          test "$(sha256sum "$VERIFY/orbit360-package-manifest.json" | awk '{print $1}')" = "$ORBIT360_SUCCESSOR_MANIFEST_SHA256"
+          node - "$VERIFY" <<'NODE'
+          const fs=require('fs'),path=require('path'),crypto=require('crypto');
+          const root=process.argv[2],m=JSON.parse(fs.readFileSync(path.join(root,'orbit360-package-manifest.json'),'utf8'));
+          const sha=b=>crypto.createHash('sha256').update(b).digest('hex');
+          if(m.fileCount!==194||m.files.length!==194||m.status!=='FASE_A_PRODUCT_F2_SUCCESSOR_STORE_ROOTFIX_SOURCEONLY_CERTIFIED'||m.historicalArtifactReuseForbidden!==true||(m.forbiddenHistoricalArtifactIds||[]).indexOf(9387820198)<0)process.exit(41);
+          for(const f of m.files){const b=fs.readFileSync(path.join(root,f.path));if(b.length!==Number(f.bytes)||sha(b)!==f.sha256)process.exit(42);}
+          const s=fs.readFileSync(path.join(root,'data/store-firestore-product-readonly-p0.js'),'utf8');
+          if(!s.includes("var row = (cache[collection] || []).find(function (item) { return rowId(item) === id; });")||s.includes("return all(collection).find(function (row) { return rowId(row) === id; }) || null;"))process.exit(43);
+          console.log(JSON.stringify({ok:true,status:'F2_SUCCESSOR_PREUPLOAD_FULL_REHASH_PASS'}));
+          NODE
+
+      - name: Upload new successor candidate
+        id: upload_candidate
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-f2-successor-store-rootfix-sourceonly-${{ github.run_id }}
+          path: ${{ runner.temp }}/${{ env.ORBIT360_SUCCESSOR_INNER_ZIP }}
+          retention-days: 30
+          if-no-files-found: error
+          compression-level: 0
+
+      - name: Redownload and certify exact uploaded artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ARTIFACT_ID: ${{ steps.upload_candidate.outputs.artifact-id }}
+          ARTIFACT_DIGEST: ${{ steps.upload_candidate.outputs.artifact-digest }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$ARTIFACT_ID" != '9387820198'
+          OUTER="$RUNNER_TEMP/uploaded-outer.zip"; OUTER_DIR="$RUNNER_TEMP/uploaded-outer"; VERIFY="$RUNNER_TEMP/uploaded-candidate"
+          rm -rf "$OUTER" "$OUTER_DIR" "$VERIFY"; mkdir -p "$OUTER_DIR" "$VERIFY"
+          curl -L --fail --retry 3 -H "Authorization: Bearer $GH_TOKEN" -H 'Accept: application/vnd.github+json' -H 'X-GitHub-Api-Version: 2022-11-28' "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/${ARTIFACT_ID}/zip" -o "$OUTER"
+          unzip -q "$OUTER" -d "$OUTER_DIR"
+          mapfile -t FILES < <(find "$OUTER_DIR" -maxdepth 1 -type f -printf '%f\n' | sort)
+          test "${#FILES[@]}" = '1'; test "${FILES[0]}" = "$ORBIT360_SUCCESSOR_INNER_ZIP"
+          INNER="$OUTER_DIR/$ORBIT360_SUCCESSOR_INNER_ZIP"
+          test "$(sha256sum "$INNER" | awk '{print $1}')" = "$ORBIT360_SUCCESSOR_ZIP_SHA256"
+          unzip -q "$INNER" -d "$VERIFY"
+          test "$(sha256sum "$VERIFY/orbit360-package-manifest.json" | awk '{print $1}')" = "$ORBIT360_SUCCESSOR_MANIFEST_SHA256"
+          VERIFY_DIR="$VERIFY" node - <<'NODE'
+          const fs=require('fs'),path=require('path'),crypto=require('crypto');
+          const root=process.env.VERIFY_DIR,m=JSON.parse(fs.readFileSync(path.join(root,'orbit360-package-manifest.json'),'utf8'));
+          const sha=b=>crypto.createHash('sha256').update(b).digest('hex');
+          if(m.fileCount!==194||m.files.length!==194||m.sourceHead!==process.env.ORBIT360_SUCCESSOR_SOURCE_HEAD||m.historicalArtifactReuseForbidden!==true||(m.forbiddenHistoricalArtifactIds||[]).indexOf(9387820198)<0)process.exit(41);
+          for(const f of m.files){const b=fs.readFileSync(path.join(root,f.path));if(b.length!==Number(f.bytes)||sha(b)!==f.sha256)process.exit(42);}
+          const p=fs.readFileSync(path.join(root,'core/product-app-p0.js'),'utf8'),s=fs.readFileSync(path.join(root,'data/store-firestore-product-readonly-p0.js'),'utf8');
+          if(!p.includes('waitForRouterReady(120000)')||!p.includes('fase-a-product-p0-20260819-router-host-readiness'))process.exit(43);
+          if(!s.includes('return row ? clone(row) : null;')||s.includes("return all(collection).find(function (row) { return rowId(row) === id; }) || null;"))process.exit(44);
+          NODE
+          jq -n --arg run "$GITHUB_RUN_ID" --arg artifactId "$ARTIFACT_ID" --arg artifactDigest "$ARTIFACT_DIGEST" --arg source "$ORBIT360_SUCCESSOR_SOURCE_HEAD" --arg zipName "$ORBIT360_SUCCESSOR_INNER_ZIP" --arg zipSha "$ORBIT360_SUCCESSOR_ZIP_SHA256" --arg manifestSha "$ORBIT360_SUCCESSOR_MANIFEST_SHA256" '{schemaVersion:"orbit360-f2-successor-candidate-sourceonly-evidence-v1",ok:true,status:"F2_SUCCESSOR_SOURCEONLY_CANDIDATE_CERTIFIED",classification:"PASS",runId:$run,candidateArtifactId:($artifactId|tonumber),artifactDigest:$artifactDigest,candidateSourceHead:$source,candidateZipName:$zipName,candidateZipSha256:$zipSha,candidateManifestSha256:$manifestSha,predecessorArtifactId:9385306424,historicalArtifact9387820198Used:false,fileCount:194,fullRehashPass:true,deltaCount:2,deltaPaths:["core/product-app-p0.js","data/store-firestore-product-readonly-p0.js"],unchangedFileCount:192,rootCause:"FUNCTIONAL_DEFECT:F2_PRODUCT_READONLY_GET_FULL_COLLECTION_CLONE_AMPLIFICATION",rootfix:"cache.find -> clone(foundRow)",routerReadinessRootfixPass:true,storeGetRootfixPass:true,readOnlyStoreGuardPass:true,runtimeAuthorized:false,runtimeExecuted:false,browserExecuted:false,secretAccess:false,dataAccess:false,firestoreRead:false,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,publicationExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false}' > "$EVIDENCE_PATH"
+
+      - name: Persist sanitized certification evidence only
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'orbit360-f2-successor-sourceonly-bot'
+          git config user.email 'orbit360-f2-successor-sourceonly-bot@users.noreply.github.com'
+          git add -- "$EVIDENCE_PATH"
+          git diff --cached --check
+          git commit -m 'evidence(f2): certify successor source-only candidate [skip ci]'
+          git pull --rebase origin ays/backend-tenant-lab-v99-20260703
+          git push origin HEAD:ays/backend-tenant-lab-v99-20260703
