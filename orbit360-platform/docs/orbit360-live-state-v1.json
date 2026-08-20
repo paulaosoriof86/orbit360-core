@@ -1,13 +1,13 @@
 {
   "schemaVersion": "orbit360-live-state-v1",
   "stateVersion": "ORBIT360-F2-CONTINUITY-CURRENT",
-  "updatedAt": "2026-08-20T05:35:54.757Z",
+  "updatedAt": "2026-08-20T05:37:43.853Z",
   "phase": "F2_PRODUCTIVE_ACCEPTANCE_SOURCE_ROOTFIX_VERIFIED",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pr": 5,
   "prState": "draft-open",
-  "currentCheckpoint": "orbit360-platform/docs/CHECKPOINT-F2-POLIZAS-ROOTCAUSE-CLOSED-SOURCEONLY-PASS-20260820.md",
+  "currentCheckpoint": "orbit360-platform/docs/CHECKPOINT-F2-CONTINUITY-ORDINAL-FREE-SINGLE-WRITER-PASS-20260820.md",
   "continuityLedger": "orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json",
   "canonicalCurrent": {
     "stateVersion": "ORBIT360-F2-CONTINUITY-CURRENT",
@@ -37,7 +37,7 @@
   },
   "documentationControl": {
     "canonicalStateVersion": "ORBIT360-F2-CONTINUITY-CURRENT",
-    "currentCheckpoint": "orbit360-platform/docs/CHECKPOINT-F2-POLIZAS-ROOTCAUSE-CLOSED-SOURCEONLY-PASS-20260820.md",
+    "currentCheckpoint": "orbit360-platform/docs/CHECKPOINT-F2-CONTINUITY-ORDINAL-FREE-SINGLE-WRITER-PASS-20260820.md",
     "currentStateOwner": "orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json",
     "writerRegistry": "orbit360-platform/docs/orbit360-continuity-writer-registry-v20260820.json",
     "soleProjectionLogic": "tools/orbit360-continuity-sync-v20260820.mjs",
@@ -56,7 +56,7 @@
   },
   "lanes": {
     "A_frontend_ux_academia": "ROOTFIX_DOCUMENTED_ACADEMIA_UPDATED",
-    "B_backend_security_gates": "CONTINUITY_ROOTFIX_PENDING_EXCLUSIVITY_AUDIT_THEN_SUCCESSOR_SOURCE_CANDIDATE",
+    "B_backend_security_gates": "CONTINUITY_CLOSED_VERIFIED_READY_FOR_SUCCESSOR_SOURCE_CANDIDATE",
     "C_real_data_migration": "UNCHANGED"
   },
   "progress": {

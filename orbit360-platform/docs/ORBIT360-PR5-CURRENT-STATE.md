@@ -9,7 +9,7 @@ Rama: `ays/backend-tenant-lab-v99-20260703` · PR #5 draft/open · sin main/merg
 3. `orbit360-platform/docs/orbit360-continuity-writer-registry-v20260820.json`;
 4. `orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json`;
 5. `orbit360-platform/docs/orbit360-live-state-v1.json`;
-6. `orbit360-platform/docs/CHECKPOINT-F2-POLIZAS-ROOTCAUSE-CLOSED-SOURCEONLY-PASS-20260820.md`;
+6. `orbit360-platform/docs/CHECKPOINT-F2-CONTINUITY-ORDINAL-FREE-SINGLE-WRITER-PASS-20260820.md`;
 7. evidencia de continuidad + HEAD real.
 
 El estado activo **no depende del ordinal de ningún Request**. Los Request consumidos existen solo como evidencia histórica sellada.
