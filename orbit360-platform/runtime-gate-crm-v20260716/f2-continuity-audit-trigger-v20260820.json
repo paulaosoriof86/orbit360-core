@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "orbit360-f2-continuity-audit-trigger-v1",
+  "stateVersion": "F2-R12-CONSUMED-ROOTCAUSE-OPEN-20260820-01",
+  "reason": "VERIFY_TRANSACTIONAL_SYNC_AND_FAIL_CLOSED_ANTI_LOOP_CONTINUITY",
+  "requestOrdinal": 12,
+  "runtimeRunId": 32332301619,
+  "runtimeExecutionRequested": false,
+  "browserExecutionRequested": false,
+  "secretAccessRequested": false,
+  "firestoreReadRequested": false,
+  "writesRequested": false,
+  "deployRequested": false,
+  "productionRequested": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
