@@ -1,81 +1,64 @@
 {
   "schemaVersion": "orbit360-current-documentation-index-v1",
-  "updatedAt": "2026-08-20T07:27:09.919Z",
-  "status": "CURRENT_BINDING_INDEX",
+  "updatedAt": "2026-08-20T13:50:00Z",
+  "status": "CURRENT_BINDING_INDEX_HARDENING_LOCK_ACTIVE",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
-  "currentCheckpoint": "orbit360-platform/docs/CHECKPOINT-F2-RUNTIME-PREGATE-VALIDATOR-STALE-ROOTFIXED-20260820.md",
+  "currentCheckpoint": "orbit360-platform/docs/CHECKPOINT-CONTROL-PLANE-HARDENING-20260820.md",
+  "productionReopeningPackage": "orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json",
   "canonicalCurrent": {
     "stateVersion": "ORBIT360-F2-CONTINUITY-CURRENT",
-    "status": "SUCCESSOR_SOURCEONLY_CANDIDATE_CERTIFIED_PENDING_FRESH_RUNTIME_AUTHORIZATION",
-    "rootCauseStatus": "CLOSED_SOURCEONLY_VERIFIED"
+    "status": "PRODUCTION_REOPENING_PACKAGE_OPEN_FAIL_CLOSED",
+    "rootCauseStatus": "SYSTEMIC_ROOT_CAUSE_CONFIRMED_PENDING_HARDENING"
   },
   "bindingRules": [
-    {
-      "id": "master-20260704",
-      "sourceType": "project_attachment",
-      "sourceName": "DOCUMENTO-MAESTRO-CONSOLIDADO-ORBIT360-AYS-20260704.md"
-    },
-    {
-      "id": "academia-20260704",
-      "sourceType": "project_attachment",
-      "sourceName": "ADENDUM-ACADEMIA-PROFUNDA-INTERACTIVA-ORBIT360-AYS-20260704.md"
-    },
-    {
-      "id": "claude-backend-20260707",
-      "sourceType": "project_attachment",
-      "sourceName": "ADDENDUM-MAESTRO-PATRONES-REUTILIZABLES-CLAUDE-BACKEND-ORBIT360-20260707.md"
-    },
-    {
-      "id": "continuidad-multirol-importadores-20260709",
-      "sourceType": "project_attachment",
-      "sourceName": "addendum_continuidad_clientes_multirol_importadores_20260709.zip"
-    },
-    {
-      "id": "plan-maestro-20260716",
-      "sourceType": "project_attachment",
-      "sourceName": "PLAN-MAESTRO-EJECUCION-PRODUCTIVA-ANTI-DESVIACION-SINCRONIZACION-CLAUDE-ORBIT360-AYS-20260716(1).md"
-    },
-    {
-      "id": "causa-raiz-gates-20260717",
-      "sourceType": "project_attachment",
-      "sourceName": "ADENDUM-MAESTRO-CONTROL-CAUSA-RAIZ-VALIDADORES-GATES-ORBIT360-AYS-20260717(1).docx"
-    },
-    {
-      "id": "aceleracion-20260730",
-      "sourceType": "project_attachment",
-      "sourceName": "ADDENDUM-MAESTRO-ACELERACION-PRODUCTIVA-REUSO-TRANSVERSAL-Y-CONTROL-AUTORIZACIONES-20260730(1).md"
-    }
+    {"id":"master-20260704","sourceType":"project_attachment","sourceName":"DOCUMENTO-MAESTRO-CONSOLIDADO-ORBIT360-AYS-20260704.md"},
+    {"id":"academia-20260704","sourceType":"project_attachment","sourceName":"ADENDUM-ACADEMIA-PROFUNDA-INTERACTIVA-ORBIT360-AYS-20260704.md"},
+    {"id":"claude-backend-20260707","sourceType":"project_attachment","sourceName":"ADDENDUM-MAESTRO-PATRONES-REUTILIZABLES-CLAUDE-BACKEND-ORBIT360-20260707.md"},
+    {"id":"continuidad-multirol-importadores-20260709","sourceType":"project_attachment","sourceName":"addendum_continuidad_clientes_multirol_importadores_20260709.zip"},
+    {"id":"plan-maestro-20260716","sourceType":"project_attachment","sourceName":"PLAN-MAESTRO-EJECUCION-PRODUCTIVA-ANTI-DESVIACION-SINCRONIZACION-CLAUDE-ORBIT360-AYS-20260716(1).md"},
+    {"id":"causa-raiz-gates-20260717","sourceType":"project_attachment","sourceName":"ADENDUM-MAESTRO-CONTROL-CAUSA-RAIZ-VALIDADORES-GATES-ORBIT360-AYS-20260717(1).docx"},
+    {"id":"aceleracion-20260730","sourceType":"project_attachment","sourceName":"ADDENDUM-MAESTRO-ACELERACION-PRODUCTIVA-REUSO-TRANSVERSAL-Y-CONTROL-AUTORIZACIONES-20260730(1).md"}
   ],
   "readOrder": [
     "bindingRules",
     "orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json",
+    "orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json",
+    "orbit360-platform/docs/CHECKPOINT-CONTROL-PLANE-HARDENING-20260820.md",
     "orbit360-platform/docs/orbit360-continuity-writer-registry-v20260820.json",
     "orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json",
     "orbit360-platform/docs/orbit360-live-state-v1.json",
-    "orbit360-platform/docs/CHECKPOINT-F2-RUNTIME-PREGATE-VALIDATOR-STALE-ROOTFIXED-20260820.md",
-    "orbit360-platform/runtime-gate-crm-v20260716/f2-continuity-audit-v20260820.json",
     "PR5_HEAD_LIVE"
   ],
+  "resumeAuthority": {
+    "hardeningPackageRequiredWhileOpen": true,
+    "olderRuntimeAuthorizationNextActionSubordinate": true,
+    "olderCheckpointSubordinate": true,
+    "olderPrBodySubordinateWhenContradictedByNewerHead": true,
+    "firstIncompleteStep": "CP-01",
+    "nextActionExact": "CP-01_UNIFY_F2_GATE_CONTRACT_AUTHORITY",
+    "newRuntimeRequestAllowed": false
+  },
   "operationalCurrent": {
     "stateVersion": "ORBIT360-F2-CONTINUITY-CURRENT",
-    "currentPhase": "F2_PRODUCTIVE_ACCEPTANCE_SUCCESSOR_SOURCE_CANDIDATE_CERTIFIED",
-    "currentStatus": "SUCCESSOR_SOURCEONLY_CANDIDATE_CERTIFIED_PENDING_FRESH_RUNTIME_AUTHORIZATION",
-    "currentCheckpoint": "orbit360-platform/docs/CHECKPOINT-F2-RUNTIME-PREGATE-VALIDATOR-STALE-ROOTFIXED-20260820.md",
+    "currentPhase": "CONTROL_PLANE_HARDENING_BEFORE_F2_RUNTIME_REOPEN",
+    "currentStatus": "PRODUCTION_REOPENING_PACKAGE_OPEN_FAIL_CLOSED",
+    "currentCheckpoint": "orbit360-platform/docs/CHECKPOINT-CONTROL-PLANE-HARDENING-20260820.md",
     "continuityLedger": "orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json",
+    "productionReopeningPackage": "orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json",
     "writerRegistry": "orbit360-platform/docs/orbit360-continuity-writer-registry-v20260820.json",
     "continuityInvariant": "tools/orbit360-f2-continuity-invariant-v20260820.mjs",
-    "continuityAuditEvidence": "orbit360-platform/runtime-gate-crm-v20260716/f2-continuity-audit-v20260820.json",
-    "rootCauseStatus": "CLOSED_SOURCEONLY_VERIFIED",
-    "rootCauseClassification": "FUNCTIONAL_DEFECT",
-    "rootCauseCode": "F2_PRODUCT_READONLY_GET_FULL_COLLECTION_CLONE_AMPLIFICATION",
-    "successorCandidateRequired": false,
+    "rootCauseStatus": "SYSTEMIC_ROOT_CAUSE_CONFIRMED_PENDING_HARDENING",
+    "rootCauseClassification": "PIPELINE_MECHANISM_FAILURE",
+    "rootCauseCode": "CONTROL_PLANE_NOT_FULLY_ATOMIC",
+    "secondaryClassification": "VALIDATOR_STALE:CONTRACT_VERSION_DRIFT",
     "successorCandidateArtifactId": 9395391426,
     "successorCandidateSourceHead": "6af0c029aebb1bfecd05569452c814584110ae4c",
-    "candidateCertificationRequired": false,
-    "nextActionId": "AWAIT_FRESH_EXPLICIT_AUTHORIZATION_FOR_CERTIFIED_F2_SUCCESSOR_RUNTIME",
+    "candidateArtifactDigest": "c089ea81672225876f643399b970d1e50e7d9cdc084dfc75973e00ed8581c53c",
+    "nextActionId": "CP-01_UNIFY_F2_GATE_CONTRACT_AUTHORITY",
     "nextRuntimeAuthorized": false,
+    "newRuntimeRequestAllowed": false,
     "goLiveRoutePercentClosed": 50,
     "integratedProgramPercentClosed": 25,
     "deployAuthorized": false,
@@ -86,53 +69,25 @@
   },
   "documentationControl": {
     "canonicalStateOwner": "orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json",
+    "hardeningPackage": "orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json",
     "writerRegistry": "orbit360-platform/docs/orbit360-continuity-writer-registry-v20260820.json",
     "soleProjectionLogic": "tools/orbit360-continuity-sync-v20260820.mjs",
-    "divergenceClassification": "PIPELINE_MECHANISM_FAILURE:DOCUMENTATION_STATE_DRIFT",
+    "divergenceClassification": "PIPELINE_MECHANISM_FAILURE:CONTROL_PLANE_NOT_FULLY_ATOMIC",
     "coherenceRequiredBeforeTechnicalAction": true,
     "noParallelContinuityOwner": true,
     "requestOrdinalAllowedOnlyInHistory": true,
-    "historicalArtifactAllowedOnlyInHistoryOrLedgerBoundary": true
+    "historicalArtifactAllowedOnlyInHistoryOrLedgerBoundary": true,
+    "projectionWritesTemporarilyBlockedUntilCP04": true
+  },
+  "request14Observation": {
+    "runId": 32344210222,
+    "classification": "VALIDATOR_STALE",
+    "failureCode": "F2_ACTIVE_PIPELINE_HISTORICAL_CANDIDATE_LITERAL",
+    "preGateFailure": true,
+    "writes": 0,
+    "requestMetadataStillClaimsUnconsumed": true,
+    "replayAllowed": false
   },
   "containsPII": false,
-  "containsSecrets": false,
-  "history": {
-    "latestConsumedRuntime": {
-      "requestOrdinal": 13,
-      "requestPath": ".github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-runbound-20260820-13.json",
-      "authorizationPath": ".github/orbit360-authorizations/f2-productive-acceptance-runtime-browser-readonly-request13-v20260820.json",
-      "requestCommit": "8e90f714dd9702bb2b9d3fba5158fe3e4228081a",
-      "runId": 32339845253,
-      "runAttempt": 1,
-      "conclusion": "failure",
-      "evidenceArtifactId": 9395952863,
-      "evidenceArtifactDigest": "sha256:c75cbd38af8312a0aca99ed72a1deb0e2c877525b74fc27fee79db8cde8f3983",
-      "requestStatus": "CONSUMED_FAIL_VALIDATOR_STALE",
-      "authorizationStatus": "CONSUMED_FAIL_VALIDATOR_STALE",
-      "allowedExecutions": 0,
-      "consumed": true,
-      "replayAllowed": false,
-      "observedClassification": "VALIDATOR_STALE",
-      "observedFailureCode": "F2_ACTIVE_PIPELINE_HISTORICAL_CANDIDATE_LITERAL",
-      "preGateFailure": true,
-      "secretAccess": false,
-      "firestoreRead": false,
-      "browserExecuted": false,
-      "runtimeExecuted": false,
-      "firestoreWrites": 0,
-      "authWrites": 0,
-      "operationalWrites": 0
-    },
-    "historicalCandidateBoundary": {
-      "historicalArtifactId": 9387820198,
-      "historicalSourceHead": "fc46bd85783d8b4d524cbeb0fee54ee9a2c774af",
-      "historicalZipSha256": "58fcbe6e8d7d3a425509c87f229b1cb12dd35a99133d46c757544cc75c55aacc",
-      "historicalManifestSha256": "b18422fdf82830d28e82f657f83b4fd5c10ea134a4735263fa2587a2ddd808cb",
-      "historicalFileCount": 194,
-      "historicalRuntimeReusable": false,
-      "status": "SUCCESSOR_SOURCE_CANDIDATE_CERTIFIED",
-      "successorArtifactId": 9395391426,
-      "successorSourceHead": "6af0c029aebb1bfecd05569452c814584110ae4c"
-    }
-  }
+  "containsSecrets": false
 }

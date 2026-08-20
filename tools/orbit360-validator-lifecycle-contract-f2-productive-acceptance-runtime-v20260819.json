@@ -2,31 +2,34 @@
   "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
   "gateId": "f2-productive-acceptance-exact-successor-v20260818",
   "gateContractVersion": "2.2.0",
-  "validatorLifecycleRevision": "phase-capability-contract-v5-certified-successor-persistent",
-  "f2ValidatorRevision": "f2-certified-successor-ordinal-free-active-guards-v20260820",
-  "status": "SUCCESSOR_SOURCEONLY_CANDIDATE_CERTIFIED_PENDING_FRESH_RUNTIME_AUTHORIZATION",
-  "currentPhase": "F2_PRODUCTIVE_ACCEPTANCE_SUCCESSOR_SOURCE_CANDIDATE_CERTIFIED",
+  "validatorLifecycleRevision": "phase-capability-contract-v5-certified-successor-persistent-hardening-lock",
+  "f2ValidatorRevision": "f2-control-plane-hardening-lock-v20260820",
+  "status": "CONTROL_PLANE_HARDENING_REQUIRED_RUNTIME_BLOCKED",
+  "currentPhase": "CONTROL_PLANE_HARDENING_BEFORE_F2_RUNTIME_REOPEN",
   "continuity": {
     "stateVersion": "ORBIT360-F2-CONTINUITY-CURRENT",
     "ledger": "orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json",
+    "productionReopeningPackage": "orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json",
     "writerRegistry": "orbit360-platform/docs/orbit360-continuity-writer-registry-v20260820.json",
-    "checkpoint": "orbit360-platform/docs/CHECKPOINT-F2-RUNTIME-PREGATE-VALIDATOR-STALE-ROOTFIXED-20260820.md",
+    "checkpoint": "orbit360-platform/docs/CHECKPOINT-CONTROL-PLANE-HARDENING-20260820.md",
     "sync": "tools/orbit360-continuity-sync-v20260820.mjs",
-    "invariant": "tools/orbit360-f2-continuity-invariant-v20260820.mjs"
+    "invariant": "tools/orbit360-f2-continuity-invariant-v20260820.mjs",
+    "firstIncompleteStep": "CP-01"
   },
   "executionProfile": {
     "phase": "F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY",
     "capabilities": {
-      "secrets": true,
-      "firestoreRead": true,
+      "secrets": false,
+      "firestoreRead": false,
       "writes": false,
-      "runtime": true,
-      "browser": true,
+      "runtime": false,
+      "browser": false,
       "deploy": false,
       "functionsDeploy": false,
       "rulesDeploy": false,
       "production": false
-    }
+    },
+    "blockedBy": "PRODUCTION_REOPENING_PACKAGE_OPEN_FAIL_CLOSED"
   },
   "singleGate": true,
   "macroClosure": true,
@@ -34,21 +37,21 @@
   "authorization": {
     "requiredForExecution": true,
     "activeRequest": false,
-    "freshAuthorizationRequired": true,
+    "freshAuthorizationRequired": false,
+    "authorizationBlockedByHardeningPackage": true,
     "authorizationCarryForwardForbidden": true,
     "nextRuntimeMaterializationAllowed": false,
+    "newRuntimeRequestAllowed": false,
     "replayAllowed": false
   },
   "guards": {
     "exactSuccessorCandidateRequired": true,
-    "successorCandidateRequired": false,
     "successorCandidateArtifactId": 9395391426,
     "successorCandidateSourceHead": "6af0c029aebb1bfecd05569452c814584110ae4c",
-    "candidateCertificationRequired": false,
+    "successorCandidateArtifactDigest": "c089ea81672225876f643399b970d1e50e7d9cdc084dfc75973e00ed8581c53c",
     "gateBeforeArtifactDownloadInRuntime": true,
     "gateBeforeSecretAccess": true,
     "gateBeforeBrowser": true,
-    "customTokenEphemeralOnly": true,
     "passwordResetAllowed": false,
     "authChangesAllowed": false,
     "membershipChangesAllowed": false,
@@ -60,109 +63,41 @@
     "publicationAllowed": false,
     "productionMutationAllowed": false,
     "stopRetryOnSameFamily": true,
-    "sourceOnlyCausalProofRequiredBeforeSuccessor": true,
-    "timeoutIncreaseAllowed": false,
-    "requestSpecificCurrentStateForbidden": true,
+    "sameFailureFamily": "F2_ACTIVE_PIPELINE_HISTORICAL_CANDIDATE_LITERAL",
+    "sameFailureFamilyObservedAgainOnRequest14": true,
     "sourceRootfixVerified": true,
-    "historicalCandidateRuntimeReuseAllowed": false
+    "historicalCandidateRuntimeReuseAllowed": false,
+    "productionReopeningPackageClosedPassRequired": true,
+    "compositeInvariantPassRequired": true
   },
   "surfaceTopology": {
-    "routes": [
-      "inicio",
-      "cliente360",
-      "aseguradoras",
-      "ops",
-      "leads",
-      "polizas",
-      "cobros"
-    ],
+    "routes": ["inicio", "cliente360", "aseguradoras", "ops", "leads", "polizas", "cobros"],
     "integratedSurfaces": {
       "vehiculos": "cliente360_policy_deeplink_fullpage",
       "recibosCartera": "policy_client360_plus_cobros_global"
     },
     "roleViews": [
-      {
-        "role": "Dirección",
-        "viewport": "desktop"
-      },
-      {
-        "role": "Operativo",
-        "viewport": "tablet"
-      },
-      {
-        "role": "Asesor",
-        "viewport": "mobile"
-      }
+      {"role":"Dirección","viewport":"desktop"},
+      {"role":"Operativo","viewport":"tablet"},
+      {"role":"Asesor","viewport":"mobile"}
     ]
   },
-  "lastExecution": {
+  "request14Observation": {
     "historical": true,
-    "runId": 32339845253,
-    "runAttempt": 1,
+    "runId": 32344210222,
     "conclusion": "failure",
-    "status": "CONSUMED_FAIL_VALIDATOR_STALE",
-    "rootCauseFinalClassification": "FUNCTIONAL_DEFECT",
-    "rootCauseStatus": "CLOSED_SOURCEONLY_VERIFIED",
-    "firestoreWrites": 0,
-    "authWrites": 0,
-    "operationalWrites": 0
+    "classification": "VALIDATOR_STALE",
+    "failureCode": "F2_ACTIVE_PIPELINE_HISTORICAL_CANDIDATE_LITERAL",
+    "preGateFailure": true,
+    "runtimeExecuted": false,
+    "browserExecuted": false,
+    "secretAccess": false,
+    "firestoreRead": false,
+    "writes": 0,
+    "requestMetadataStillClaimsUnconsumed": true,
+    "replayAllowed": false
   },
-  "nextActionExact": "AWAIT_FRESH_EXPLICIT_AUTHORIZATION_FOR_CERTIFIED_F2_SUCCESSOR_RUNTIME",
+  "nextActionExact": "CP-01_UNIFY_F2_GATE_CONTRACT_AUTHORITY",
   "containsPII": false,
-  "containsSecrets": false,
-  "successorSourceOnlyPrerequisite": {
-    "status": "CERTIFIED_SUCCESSOR_SOURCE_ONLY",
-    "successorCandidateRequired": false,
-    "successorCandidateArtifactId": 9395391426,
-    "successorCandidateSourceHead": "6af0c029aebb1bfecd05569452c814584110ae4c",
-    "candidateCertificationRequired": false,
-    "runtimeAllowed": false
-  },
-  "history": {
-    "latestConsumedRuntime": {
-      "requestOrdinal": 13,
-      "requestPath": ".github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-runbound-20260820-13.json",
-      "authorizationPath": ".github/orbit360-authorizations/f2-productive-acceptance-runtime-browser-readonly-request13-v20260820.json",
-      "requestCommit": "8e90f714dd9702bb2b9d3fba5158fe3e4228081a",
-      "runId": 32339845253,
-      "runAttempt": 1,
-      "conclusion": "failure",
-      "evidenceArtifactId": 9395952863,
-      "evidenceArtifactDigest": "sha256:c75cbd38af8312a0aca99ed72a1deb0e2c877525b74fc27fee79db8cde8f3983",
-      "requestStatus": "CONSUMED_FAIL_VALIDATOR_STALE",
-      "authorizationStatus": "CONSUMED_FAIL_VALIDATOR_STALE",
-      "allowedExecutions": 0,
-      "consumed": true,
-      "replayAllowed": false,
-      "observedClassification": "VALIDATOR_STALE",
-      "observedFailureCode": "F2_ACTIVE_PIPELINE_HISTORICAL_CANDIDATE_LITERAL",
-      "preGateFailure": true,
-      "secretAccess": false,
-      "firestoreRead": false,
-      "browserExecuted": false,
-      "runtimeExecuted": false,
-      "firestoreWrites": 0,
-      "authWrites": 0,
-      "operationalWrites": 0
-    },
-    "sourceOnlyPrerequisite": {
-      "historical": true,
-      "status": "CLOSED_PASS",
-      "runId": 32316010103,
-      "evidenceArtifactId": 9388061716,
-      "candidateArtifactId": 9387820198,
-      "candidateSourceHead": "fc46bd85783d8b4d524cbeb0fee54ee9a2c774af"
-    },
-    "historicalCandidateBoundary": {
-      "historicalArtifactId": 9387820198,
-      "historicalSourceHead": "fc46bd85783d8b4d524cbeb0fee54ee9a2c774af",
-      "historicalZipSha256": "58fcbe6e8d7d3a425509c87f229b1cb12dd35a99133d46c757544cc75c55aacc",
-      "historicalManifestSha256": "b18422fdf82830d28e82f657f83b4fd5c10ea134a4735263fa2587a2ddd808cb",
-      "historicalFileCount": 194,
-      "historicalRuntimeReusable": false,
-      "status": "SUCCESSOR_SOURCE_CANDIDATE_CERTIFIED",
-      "successorArtifactId": 9395391426,
-      "successorSourceHead": "6af0c029aebb1bfecd05569452c814584110ae4c"
-    }
-  }
+  "containsSecrets": false
 }

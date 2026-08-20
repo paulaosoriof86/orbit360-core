@@ -1,6 +1,8 @@
 name: Orbit360 Continuity Canonical Source Only
 
-# Canonical source-only projection can be retriggered after a [skip ci] documentary closure without enabling runtime.
+# Fail-closed continuity lock while PRODUCTION_REOPENING_PACKAGE is open.
+# Repository projections and PR edits are intentionally disabled until CP-04
+# introduces revision-aware atomic projection semantics.
 on:
   push:
     branches:
@@ -8,61 +10,62 @@ on:
     paths:
       - 'orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json'
       - 'orbit360-platform/docs/orbit360-continuity-writer-registry-v20260820.json'
-      - 'tools/orbit360-continuity-sync-v20260820.mjs'
-      - 'tools/orbit360-f2-continuity-invariant-v20260820.mjs'
+      - 'orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json'
       - '.github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml'
   workflow_dispatch:
 
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
+  pull-requests: read
 
 concurrency:
   group: orbit360-continuity-canonical-ays
   cancel-in-progress: false
 
 jobs:
-  project-and-audit:
+  enforce-hardening-lock:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 3
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ays/backend-tenant-lab-v99-20260703
-          fetch-depth: 0
-      - name: Project canonical ledger
-        run: node tools/orbit360-continuity-sync-v20260820.mjs
-      - name: Project canonical PR body
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: gh pr edit 5 --repo paulaosoriof86/orbit360-core --body-file orbit360-platform/docs/ORBIT360-PR5-CURRENT-STATE.md
-      - name: Audit canonical state and writer exclusivity
-        id: audit
-        shell: bash
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set +e
-          gh pr view 5 --repo paulaosoriof86/orbit360-core --json body -q .body > /tmp/orbit360-pr5-body.md
-          ORBIT360_CONTINUITY_REQUIRE_PR=true ORBIT360_PR_BODY_FILE=/tmp/orbit360-pr5-body.md node tools/orbit360-f2-continuity-invariant-v20260820.mjs
-          rc=$?
-          echo "rc=$rc" >> "$GITHUB_OUTPUT"
-          exit 0
-      - name: Persist canonical projections and sanitized audit
+          fetch-depth: 1
+      - name: Enforce production reopening package lock
         shell: bash
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add README.md orbit360-platform/CHANGELOG.md \
-            orbit360-platform/docs/orbit360-live-state-v1.json \
-            orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json \
-            orbit360-platform/docs/ORBIT360-PR5-CURRENT-STATE.md \
-            tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-runtime-v20260819.json \
-            orbit360-platform/runtime-gate-crm-v20260716/f2-continuity-audit-v20260820.json
-          if ! git diff --cached --quiet; then
-            git commit -m "docs(continuity): project canonical live state and audit [skip ci]"
-            git pull --rebase origin ays/backend-tenant-lab-v99-20260703
-            git push origin HEAD:ays/backend-tenant-lab-v99-20260703
-          fi
-      - name: Enforce audit
-        run: test "${{ steps.audit.outputs.rc }}" = "0"
+          node <<'NODE'
+          const fs = require('fs');
+          const packagePath = 'orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json';
+          const ledgerPath = 'orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json';
+          const registryPath = 'orbit360-platform/docs/orbit360-continuity-writer-registry-v20260820.json';
+          const pkg = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
+          const ledger = JSON.parse(fs.readFileSync(ledgerPath, 'utf8'));
+          const registry = JSON.parse(fs.readFileSync(registryPath, 'utf8'));
+          const failures = [];
+          if (pkg.status === 'CLOSED_PASS') failures.push('LOCK_WORKFLOW_MUST_BE_REPLACED_AT_CP04_BEFORE_PACKAGE_CLOSURE');
+          if (!pkg.lock || pkg.lock.active !== true) failures.push('PACKAGE_LOCK_NOT_ACTIVE');
+          for (const key of ['runtimeAllowed','authorizationAllowed','requestMaterializationAllowed','secretAccessAllowed','firestoreReadAllowed','browserAllowed','writesAllowed','deployAllowed','publicationAllowed','productionAllowed','mainAllowed','mergeAllowed']) {
+            if (pkg.lock?.[key] !== false) failures.push(`PACKAGE_${key}_MUST_BE_FALSE`);
+          }
+          if (pkg.resumeProtocol?.firstIncompleteStep !== 'CP-01') failures.push('UNEXPECTED_FIRST_INCOMPLETE_STEP');
+          if (ledger.productionReopeningPackage?.status !== 'OPEN_FAIL_CLOSED') failures.push('LEDGER_PACKAGE_STATUS_NOT_LOCKED');
+          if (ledger.authorizationBoundary?.nextRuntimeMaterializationAllowed !== false) failures.push('LEDGER_RUNTIME_MATERIALIZATION_NOT_BLOCKED');
+          if (ledger.authorizationBoundary?.newRuntimeRequestAllowed !== false) failures.push('LEDGER_NEW_RUNTIME_REQUEST_NOT_BLOCKED');
+          if (registry.canonicalWorkflowMode !== 'FAIL_CLOSED_READONLY_UNTIL_CP04') failures.push('WRITER_REGISTRY_MODE_NOT_LOCKED');
+          if (registry.temporaryHardeningLock?.workflowMayMutateRepository !== false) failures.push('WORKFLOW_MUTATION_NOT_BLOCKED');
+          if (failures.length) {
+            console.error(JSON.stringify({ok:false,status:'HARDENING_LOCK_FAIL',failures}, null, 2));
+            process.exit(1);
+          }
+          console.log(JSON.stringify({
+            ok:true,
+            status:'HARDENING_LOCK_PASS',
+            packageId:pkg.packageId,
+            packageRevision:pkg.revision,
+            firstIncompleteStep:pkg.resumeProtocol.firstIncompleteStep,
+            candidateArtifactId:pkg.candidate.artifactId,
+            runtimeAllowed:false,
+            writesAllowed:false
+          }, null, 2));
+          NODE

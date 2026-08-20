@@ -1,12 +1,15 @@
 {
   "schemaVersion": "orbit360-continuity-writer-registry-v1",
   "registryId": "ORBIT360-CONTINUITY-WRITER-REGISTRY",
-  "revision": 3,
+  "revision": 4,
   "active": true,
+  "status": "CONTROL_PLANE_HARDENING_LOCK_ACTIVE",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "sourceOfTruth": "orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json",
+  "hardeningPackage": "orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json",
   "soleProjectionLogic": "tools/orbit360-continuity-sync-v20260820.mjs",
   "canonicalWorkflow": ".github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml",
+  "canonicalWorkflowMode": "FAIL_CLOSED_READONLY_UNTIL_CP04",
   "projectionTargets": [
     "orbit360-platform/docs/orbit360-live-state-v1.json",
     "orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json",
@@ -23,10 +26,17 @@
     "oneShotWorkflowMayNotOwnCurrentState": true,
     "continuityAuditFailClosed": true,
     "certifiedSuccessorStateMustPersist": true,
-    "historicalArtifactMayNotReplaceCertifiedSuccessor": true
+    "historicalArtifactMayNotReplaceCertifiedSuccessor": true,
+    "hardeningPackageOverridesOlderRuntimeNextAction": true,
+    "projectionWritesForbiddenWhileHardeningPackageOpen": true,
+    "runtimeAuthorizationForbiddenWhileHardeningPackageOpen": true,
+    "newRuntimeOrdinalForbiddenWhileHardeningPackageOpen": true,
+    "expectedRevisionRequiredBeforeLedgerMutationAfterCP03": true,
+    "silentRebaseProjectionForbiddenAfterCP04": true
   },
   "workflowClasses": {
     "canonicalProjectionOwner": [".github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml"],
+    "canonicalProjectionOwnerCurrentMode": "READONLY_LOCK_ENFORCEMENT",
     "sourceOnlyCandidateEvidenceProducer": [".github/workflows/orbit360-f2-successor-candidate-build-sourceonly-v20260820.yml"],
     "legacyContinuityWritersRetiredByAudit": 24,
     "legacyRetirementMode": "WORKFLOW_DISPATCH_READONLY_STUB"
@@ -36,7 +46,18 @@
     "requireCanonicalSyncReferenceForProjectionTargetWriters": true,
     "forbidRequestSpecificProjectionOwners": true,
     "lastDetectedIndependentWriters": 0,
-    "reauditRequiredAfterRetirement": false
+    "reauditRequiredAfterRetirement": true,
+    "nextRequiredStep": "CP-07"
+  },
+  "temporaryHardeningLock": {
+    "active": true,
+    "reason": "The prior canonical workflow projected from one ledger revision and then executed git pull --rebase before push, so projection writes are temporarily disabled until CP-04 introduces atomic revision-aware projection semantics.",
+    "releaseStep": "CP-04",
+    "workflowMayMutateRepository": false,
+    "workflowMayEditPrBody": false,
+    "workflowMayProjectLifecycle": false,
+    "workflowMayProjectLiveState": false,
+    "workflowMayProjectCurrentIndex": false
   },
   "containsPII": false,
   "containsSecrets": false

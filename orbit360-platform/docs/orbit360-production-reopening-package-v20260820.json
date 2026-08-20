@@ -1,1 +1,173 @@
-placeholder
+{
+  "schemaVersion": "orbit360-production-reopening-package-v1",
+  "packageId": "ORBIT360-PRODUCTION-REOPENING-CURRENT",
+  "revision": 1,
+  "createdAtUtc": "2026-08-20T13:50:00Z",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "status": "OPEN_FAIL_CLOSED",
+  "phase": "CONTROL_PLANE_HARDENING_BEFORE_F2_RUNTIME_REOPEN",
+  "controlPlaneHeadAtLock": "19811090a5df38c248e62a90e701f5b8f362d662",
+  "canonicalLedger": "orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json",
+  "checkpoint": "orbit360-platform/docs/CHECKPOINT-CONTROL-PLANE-HARDENING-20260820.md",
+  "candidate": {
+    "frozen": true,
+    "artifactId": 9395391426,
+    "sourceHead": "6af0c029aebb1bfecd05569452c814584110ae4c",
+    "artifactDigest": "c089ea81672225876f643399b970d1e50e7d9cdc084dfc75973e00ed8581c53c",
+    "zipSha256": "e1a711806d4ffd78004dbe5a30ebf8c5db59aaf23d2b8cd65e78b291cedc53d0",
+    "manifestSha256": "44dee7cebb174dfd630641d1e16ac649edffec18af688b62e05ceff4dc5812a5",
+    "fileCount": 194,
+    "rebuildAllowed": false
+  },
+  "rootCause": {
+    "primaryClassification": "PIPELINE_MECHANISM_FAILURE",
+    "primaryCode": "CONTROL_PLANE_NOT_FULLY_ATOMIC",
+    "secondaryClassification": "VALIDATOR_STALE",
+    "secondaryCode": "CONTRACT_VERSION_DRIFT",
+    "knownContractDrift": {
+      "runtimeLifecycleVersion": "2.2.0",
+      "sourceLifecycleVersion": "2.1.0",
+      "mandatoryPreflightVersion": "2.1.0"
+    },
+    "runtimeFailureFamily": "F2_ACTIVE_PIPELINE_HISTORICAL_CANDIDATE_LITERAL",
+    "sameFamilyObservedAgainOnRequest14": true,
+    "productFunctionalRootfixPreserved": "F2_PRODUCT_READONLY_GET_FULL_COLLECTION_CLONE_AMPLIFICATION"
+  },
+  "lock": {
+    "active": true,
+    "runtimeAllowed": false,
+    "authorizationAllowed": false,
+    "requestMaterializationAllowed": false,
+    "secretAccessAllowed": false,
+    "firestoreReadAllowed": false,
+    "browserAllowed": false,
+    "writesAllowed": false,
+    "deployAllowed": false,
+    "publicationAllowed": false,
+    "productionAllowed": false,
+    "mainAllowed": false,
+    "mergeAllowed": false,
+    "historicalRuntimeReplayAllowed": false,
+    "newRuntimeOrdinalAllowed": false,
+    "stopRetry": true,
+    "releaseCondition": "CP-00_THROUGH_CP-10_ALL_PASS_AND_COMPOSITE_INVARIANT_PASS"
+  },
+  "resumeProtocol": {
+    "required": true,
+    "rule": "If package.status is not CLOSED_PASS, continue exactly from firstIncompleteStep. Do not reconstruct the roadmap, do not request runtime authorization, do not materialize a new request ordinal, and do not treat any older checkpoint, PR body, live-state projection or lifecycle nextAction as authority over this package and its canonical ledger binding.",
+    "closedStepsMayBeRecheckedReadOnly": true,
+    "closedStepsMayNotBeReprocessedWithoutNewEvidence": true,
+    "firstIncompleteStep": "CP-01",
+    "nextActionExact": "CP-01_UNIFY_F2_GATE_CONTRACT_AUTHORITY"
+  },
+  "steps": [
+    {
+      "id": "CP-00",
+      "name": "Persist hardening lock and freeze certified candidate",
+      "status": "PASS",
+      "exitCriteria": ["package and ledger committed atomically", "candidate 9395391426 frozen", "runtime/request/authorization fail-closed", "unsafe projection workflow neutralized while package open"]
+    },
+    {
+      "id": "CP-01",
+      "name": "Unify F2 gate contract authority",
+      "status": "PENDING",
+      "exitCriteria": ["registry lifecycle preflight workflow reference one canonical F2 contract", "2.1.0 versus 2.2.0 drift eliminated", "Request14 stale metadata disposition recorded without replay"]
+    },
+    {
+      "id": "CP-02",
+      "name": "Remove duplicated contract/version bindings",
+      "status": "PENDING",
+      "exitCriteria": ["mandatory preflight derives active F2 contract from canonical authority", "candidate and authorization binding use explicit typed fields"]
+    },
+    {
+      "id": "CP-03",
+      "name": "Create single revisioned ledger mutation owner",
+      "status": "PENDING",
+      "exitCriteria": ["expectedRevision required", "allowed state transition validated", "revision increments exactly once", "concurrent mutation aborts"]
+    },
+    {
+      "id": "CP-04",
+      "name": "Make continuity projection atomic",
+      "status": "PENDING",
+      "exitCriteria": ["no stale projection may be rebased onto a newer ledger", "ledger re-read/recompute or CAS semantics enforced", "silent pull-rebase publication removed"]
+    },
+    {
+      "id": "CP-05",
+      "name": "Expand composite control-plane invariant",
+      "status": "PENDING",
+      "exitCriteria": ["ledger owners registry lifecycle preflight workflow candidate authorization history guards checked together", "partial green cannot report global PASS"]
+    },
+    {
+      "id": "CP-06",
+      "name": "Add transversal Orbit.store amplification synthetic guard",
+      "status": "PENDING",
+      "exitCriteria": ["get clone amplification guarded", "all and where behavior checked", "entity-resolution patterns checked without reopening product unless defect proven"]
+    },
+    {
+      "id": "CP-07",
+      "name": "Reduce or isolate legacy workflow operational surface",
+      "status": "PENDING",
+      "exitCriteria": ["retired writer workflows cannot be mistaken for active owners", "history preserved", "no dependency broken"]
+    },
+    {
+      "id": "CP-08",
+      "name": "Run one integrated source-only synthetic audit",
+      "status": "PENDING",
+      "exitCriteria": ["composite invariant PASS", "store performance synthetic PASS", "zero writes", "zero secrets/runtime/browser/deploy/production"]
+    },
+    {
+      "id": "CP-09",
+      "name": "Independent readback of complete control plane",
+      "status": "PENDING",
+      "exitCriteria": ["ledger registry lifecycle preflight workflow package index live-state checkpoint candidate and HEAD coherent", "controlPlaneHead distinct from candidateSourceHead"]
+    },
+    {
+      "id": "CP-10",
+      "name": "Close production reopening package",
+      "status": "PENDING",
+      "exitCriteria": ["CP-00 through CP-09 PASS", "package transitions CLOSED_PASS", "runtime remains unauthorized until separate explicit authorization"]
+    },
+    {
+      "id": "CP-11",
+      "name": "Prepare fresh F2 runtime authorization boundary",
+      "status": "BLOCKED",
+      "blockedBy": "CP-10",
+      "exitCriteria": ["authorization identity binds gateId gateContractVersion candidateArtifactDigest candidateSourceHead ledgerRevision executionProfile", "no operational semantics depend on request ordinal"]
+    }
+  ],
+  "request14Observation": {
+    "requestOrdinal": 14,
+    "requestCommit": "1924fce5c726d420a003ae0b2a10c0ad0f553b6d",
+    "runtimeRunId": 32344210222,
+    "terminalEvidencePath": "orbit360-platform/runtime-gate-crm-v20260716/f2-runtime-terminal-request14-v20260820.json",
+    "observerEvidencePath": "orbit360-platform/runtime-gate-crm-v20260716/f2-runtime-observer-request14-v20260820.json",
+    "classification": "VALIDATOR_STALE",
+    "failureCode": "F2_ACTIVE_PIPELINE_HISTORICAL_CANDIDATE_LITERAL",
+    "preGateFailure": true,
+    "runtimeExecuted": false,
+    "browserExecuted": false,
+    "secretAccess": false,
+    "firestoreRead": false,
+    "writes": 0,
+    "requestRecordStillClaimsUnconsumed": true,
+    "metadataDriftRequiresReconciliation": true,
+    "replayAllowed": false
+  },
+  "iterationBudget": {
+    "hardeningTargetMacroIterations": 3,
+    "hardeningCeilingMacroIterations": 4,
+    "cleanPathMacroIterationsAfterHardeningToGoLive": 3,
+    "totalMethodologicalCeilingFromLock": 8,
+    "rule": "A macro-iteration counts only when it leaves a verifiable commit, PASS/FAIL evidence, package transition, gate consumption, or milestone closure. Diagnostics-only responses do not count as progress."
+  },
+  "progress": {
+    "productionRouteProgressPct": 50,
+    "programProgressPct": 25,
+    "f2TerminalPass": false,
+    "progressMayIncreaseDuringHardening": false
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
