@@ -1,0 +1,59 @@
+name: Orbit360 F2 Canonical Continuity Audit 20260820
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - '.github/workflows/orbit360-f2-continuity-audit-run-v20260820.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout exact branch head
+        uses: actions/checkout@v4
+        with:
+          ref: ays/backend-tenant-lab-v99-20260703
+          fetch-depth: 0
+
+      - name: Fetch PR5 body
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api repos/${{ github.repository }}/pulls/5 --jq .body > /tmp/orbit360-pr5-body.txt
+
+      - name: Run canonical continuity invariant and persist PASS or FAIL evidence
+        id: audit
+        shell: bash
+        run: |
+          set +e
+          ORBIT360_CONTINUITY_REQUIRE_PR=true \
+          ORBIT360_PR_BODY_FILE=/tmp/orbit360-pr5-body.txt \
+          node tools/orbit360-f2-continuity-invariant-v20260820.mjs
+          rc=$?
+          echo "rc=$rc" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Persist sanitized audit evidence
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add orbit360-platform/runtime-gate-crm-v20260716/f2-continuity-audit-v20260820.json
+          if git diff --cached --quiet; then
+            echo "No evidence diff to persist"
+          else
+            git commit -m "docs(f2): persist canonical continuity audit evidence [skip ci]"
+            git pull --rebase origin ays/backend-tenant-lab-v99-20260703
+            git push origin HEAD:ays/backend-tenant-lab-v99-20260703
+          fi
+
+      - name: Enforce audit result
+        run: |
+          test "${{ steps.audit.outputs.rc }}" = "0"
