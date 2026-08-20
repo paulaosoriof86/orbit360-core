@@ -1,0 +1,59 @@
+name: Orbit360 Seal F2 Request08 Readiness Successor Source Pass 20260820
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - .github/orbit360-requests/f2-request08-readiness-successor-source-seal-v20260820.json
+
+permissions:
+  contents: write
+
+jobs:
+  seal_source_pass:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ays/backend-tenant-lab-v99-20260703
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify inert seal request
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
+          test "${#CHANGED[@]}" = '1'
+          test "${CHANGED[0]}" = '.github/orbit360-requests/f2-request08-readiness-successor-source-seal-v20260820.json'
+          jq -e '.approved==true and .operation=="SEAL_ALREADY_PASSED_SOURCE_ONLY" and .sourceValidationRunId==32316010103 and .sourceEvidenceArtifactId==9388061716 and .candidateArtifactId==9387820198 and .browser==false and .runtime==false and .secrets==false and .firestoreRead==false and .writes==false and .deploy==false and .production==false and .request09Authorized==false' "${CHANGED[0]}" >/dev/null
+      - name: Seal lifecycle and synchronized documentation only
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-seal-f2-request08-readiness-successor-source-pass-v20260820.mjs | tee "$RUNNER_TEMP/seal.json"
+          jq -e '.ok==true and .status=="F2_REQUEST08_READINESS_SUCCESSOR_SOURCE_CLOSED_PASS" and .candidateArtifactId==9387820198 and .sourceValidationRunId==32316010103 and .fullRehashPass==true and .routerReadinessRootfixPass==true and .request09Created==false and .request09Authorized==false and .runtimeExecuted==false and .browserExecuted==false and .firestoreWrites==0 and .deployExecuted==false and .productionTouched==false' "$RUNNER_TEMP/seal.json" >/dev/null
+          git diff --check
+      - name: Commit seal on clean source-only boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'orbit360-f2-source-seal-bot'
+          git config user.email 'orbit360-f2-source-seal-bot@users.noreply.github.com'
+          git add -- \
+            tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-source-v20260819.json \
+            tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-runtime-v20260819.json \
+            orbit360-platform/docs/orbit360-live-state-v1.json \
+            orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json \
+            orbit360-platform/docs/CHECKPOINT-F2-REQUEST08-READINESS-SUCCESSOR-SOURCE-PASS-REQUEST09-AUTH-PENDING-20260820.md \
+            orbit360-platform/docs/ACADEMIA-ACTUALIZACION-F2-REQUEST08-ROUTER-READINESS-20260820.md \
+            orbit360-platform/runtime-gate-crm-v20260716/f2-request08-readiness-successor-source-seal-v20260820.json
+          git diff --cached --check
+          git commit -m 'docs(f2): seal Request08 readiness successor SOURCE PASS'
+          test -z "$(git status --porcelain)"
+          git pull --rebase origin ays/backend-tenant-lab-v99-20260703
+          test -z "$(git status --porcelain)"
+          git push origin HEAD:ays/backend-tenant-lab-v99-20260703
