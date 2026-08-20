@@ -1,22 +1,24 @@
 {
   "schemaVersion": "orbit360-continuity-writer-registry-v1",
   "registryId": "ORBIT360-CONTINUITY-WRITER-REGISTRY",
-  "revision": 5,
+  "revision": 6,
   "active": true,
-  "status": "CONTROL_PLANE_HARDENING_LOCK_ACTIVE_CP03_PENDING",
+  "status": "CONTROL_PLANE_HARDENING_ATOMIC_OWNER_INSTALLED",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "sourceOfTruth": "orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json",
   "hardeningPackage": "orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json",
   "canonicalF2ContractAuthority": "tools/orbit360-gate-contract-f2-productive-acceptance-v20260820.json",
-  "soleProjectionLogic": "tools/orbit360-continuity-sync-v20260820.mjs",
+  "transitionOwner": "tools/orbit360-continuity-transition-owner-v20260820.mjs",
+  "soleProjectionLogic": "tools/orbit360-continuity-projection-atomic-v20260820.mjs",
+  "compositeInvariant": "tools/orbit360-control-plane-composite-invariant-v20260820.mjs",
+  "storePerformanceSynthetic": "tools/orbit360-store-read-amplification-synthetic-v20260820.mjs",
+  "workflowSurfaceAudit": "tools/orbit360-workflow-operational-surface-audit-v20260820.mjs",
   "canonicalWorkflow": ".github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml",
-  "canonicalWorkflowMode": "FAIL_CLOSED_READONLY_UNTIL_CP04",
+  "canonicalWorkflowMode": "REVISION_AWARE_CAS_SINGLE_COMMIT",
   "projectionTargets": [
     "orbit360-platform/docs/orbit360-live-state-v1.json",
     "orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json",
     "tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-runtime-v20260819.json",
-    "README.md",
-    "orbit360-platform/CHANGELOG.md",
     "orbit360-platform/docs/ORBIT360-PR5-CURRENT-STATE.md"
   ],
   "policies": {
@@ -29,39 +31,43 @@
     "certifiedSuccessorStateMustPersist": true,
     "historicalArtifactMayNotReplaceCertifiedSuccessor": true,
     "hardeningPackageOverridesOlderRuntimeNextAction": true,
-    "projectionWritesForbiddenWhileHardeningPackageOpen": true,
     "runtimeAuthorizationForbiddenWhileHardeningPackageOpen": true,
     "newRuntimeOrdinalForbiddenWhileHardeningPackageOpen": true,
     "canonicalF2ContractMustBeDerivedFromSingleAuthority": true,
-    "expectedRevisionRequiredBeforeLedgerMutationAfterCP03": true,
-    "silentRebaseProjectionForbiddenAfterCP04": true
+    "expectedRevisionRequiredBeforeLedgerMutation": true,
+    "expectedPackageRevisionRequiredBeforePackageMutation": true,
+    "remoteHeadCompareAndSwapRequiredBeforePublication": true,
+    "silentRebaseProjectionForbidden": true,
+    "projectionAndLedgerPublishedInSameCommit": true
   },
   "completedHardeningSteps": ["CP-00","CP-01","CP-02"],
   "nextHardeningStep": "CP-03",
   "workflowClasses": {
     "canonicalProjectionOwner": [".github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml"],
-    "canonicalProjectionOwnerCurrentMode": "READONLY_LOCK_ENFORCEMENT",
+    "canonicalProjectionOwnerCurrentMode": "REVISION_AWARE_CAS_SINGLE_COMMIT",
     "sourceOnlyCandidateEvidenceProducer": [".github/workflows/orbit360-f2-successor-candidate-build-sourceonly-v20260820.yml"],
     "legacyContinuityWritersRetiredByAudit": 24,
-    "legacyRetirementMode": "WORKFLOW_DISPATCH_READONLY_STUB"
+    "legacyRetirementMode": "HISTORICAL_NON_OWNER_OPERATIONALLY_ISOLATED"
   },
   "writerAudit": {
     "scanRoot": ".github/workflows",
-    "requireCanonicalSyncReferenceForProjectionTargetWriters": true,
+    "requireCanonicalOwnerForProjectionTargetWriters": true,
     "forbidRequestSpecificProjectionOwners": true,
     "lastDetectedIndependentWriters": 0,
-    "reauditRequiredAfterRetirement": true,
+    "reauditRequiredBeforeCP08": true,
     "nextRequiredStep": "CP-07"
   },
   "temporaryHardeningLock": {
     "active": true,
-    "reason": "The prior canonical workflow projected from one ledger revision and then executed git pull --rebase before push, so projection writes are temporarily disabled until CP-04 introduces atomic revision-aware projection semantics.",
-    "releaseStep": "CP-04",
-    "workflowMayMutateRepository": false,
-    "workflowMayEditPrBody": false,
-    "workflowMayProjectLifecycle": false,
-    "workflowMayProjectLiveState": false,
-    "workflowMayProjectCurrentIndex": false
+    "releaseStep": "CP-10",
+    "workflowMayMutateRepository": true,
+    "mutationCondition": "source-only CP03-CP10 atomic closure job only",
+    "runtimeMayExecute": false,
+    "browserMayExecute": false,
+    "secretsMayBeRead": false,
+    "firestoreMayBeRead": false,
+    "deployMayExecute": false,
+    "productionMayBeTouched": false
   },
   "containsPII": false,
   "containsSecrets": false
