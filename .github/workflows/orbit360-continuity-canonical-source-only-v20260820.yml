@@ -1,5 +1,5 @@
 name: Orbit360 Continuity Canonical Source Only
-# MACRO1 DISCOVERY — sole physical writer, source-only, no runtime/browser/secrets/Firestore.
+# MACRO1 DISCOVERY ROUND 2 — sole physical writer, source-only.
 
 on:
   push:
@@ -27,7 +27,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Execute global discovery without state mutation
+      - name: Execute exhaustive discovery
         shell: bash
         run: |
           set -euo pipefail
@@ -39,13 +39,12 @@ jobs:
           node tools/orbit360-documentation-state-discovery-v20260821.mjs > orbit360-platform/runtime-gate-crm-v20260716/macro1-documentation-state-discovery-v20260821.json
           DOC_RC=$?
           set -e
-          node -e "const fs=require('fs');const w=JSON.parse(fs.readFileSync('orbit360-platform/runtime-gate-crm-v20260716/macro1-workflow-writer-discovery-v20260821.json'));const d=JSON.parse(fs.readFileSync('orbit360-platform/runtime-gate-crm-v20260716/macro1-documentation-state-discovery-v20260821.json'));const o={schemaVersion:'orbit360-macro1-discovery-v1',ok:w.ok&&d.ok,status:w.ok&&d.ok?'MACRO1_DISCOVERY_PASS':'MACRO1_DISCOVERY_FINDINGS',workflowWriterAudit:w.status,documentationAudit:d.status,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,operationalWrites:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};fs.writeFileSync('orbit360-platform/runtime-gate-crm-v20260716/macro1-discovery-summary-v20260821.json',JSON.stringify(o,null,2)+'\n');"
+          WRITER_RC="$WRITER_RC" DOC_RC="$DOC_RC" node -e "const fs=require('fs');const w=JSON.parse(fs.readFileSync('orbit360-platform/runtime-gate-crm-v20260716/macro1-workflow-writer-discovery-v20260821.json'));const d=JSON.parse(fs.readFileSync('orbit360-platform/runtime-gate-crm-v20260716/macro1-documentation-state-discovery-v20260821.json'));const o={schemaVersion:'orbit360-macro1-discovery-v2',ok:w.ok&&d.ok,status:w.ok&&d.ok?'MACRO1_DISCOVERY_PASS':'MACRO1_DISCOVERY_FINDINGS',workflowWriterAudit:w.status,unauthorizedPhysicalWriters:w.unauthorizedPhysicalWriters,documentationAudit:d.status,documentationOffenders:d.offenders,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,operationalWrites:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};fs.writeFileSync('orbit360-platform/runtime-gate-crm-v20260716/macro1-discovery-summary-v20260821.json',JSON.stringify(o,null,2)+'\n');"
           git config user.name 'orbit360-control-plane'
           git config user.email 'orbit360-control-plane@users.noreply.github.com'
           git add orbit360-platform/runtime-gate-crm-v20260716/macro1-workflow-writer-discovery-v20260821.json orbit360-platform/runtime-gate-crm-v20260716/macro1-documentation-state-discovery-v20260821.json orbit360-platform/runtime-gate-crm-v20260716/macro1-discovery-summary-v20260821.json
-          git commit -m 'evidence(control-plane): persist Macro1 global discovery [skip ci]'
+          git commit -m 'evidence(control-plane): persist definitive Macro1 discovery [skip ci]'
           git fetch origin ays/backend-tenant-lab-v99-20260703
           REMOTE_HEAD=$(git rev-parse origin/ays/backend-tenant-lab-v99-20260703)
           test "$REMOTE_HEAD" = "$START_HEAD"
           git push origin HEAD:ays/backend-tenant-lab-v99-20260703
-          echo "WRITER_RC=$WRITER_RC DOC_RC=$DOC_RC"
