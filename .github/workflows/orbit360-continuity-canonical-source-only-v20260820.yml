@@ -17,6 +17,7 @@ on:
       - '.github/orbit360-authorizations/f2-boundary-refresh-intent-*-v20260820.json'
       - '.github/orbit360-authorizations/f2-projection-reconcile-intent-*-v20260820.json'
       - '.github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-successor-*.json'
+      - '.github/orbit360-requests/f2-functional-defect-successor-promotion-*.json'
       - '.github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml'
   workflow_dispatch:
     inputs:
@@ -25,7 +26,7 @@ on:
         required: true
         default: verify
         type: choice
-        options: [verify, persist-authorization, materialize-request, terminal-reconcile, boundary-refresh, projection-reconcile]
+        options: [verify, persist-authorization, materialize-request, terminal-reconcile, boundary-refresh, projection-reconcile, functional-successor-promotion]
       authorization_identity:
         description: 'F2 authorization identity SHA-256 (active or historical according to action)'
         required: false
@@ -69,10 +70,11 @@ jobs:
           mapfile -t TERMINAL_INTENTS < <(printf '%s\n' "${CHANGED[@]}" | grep '^\.github/orbit360-authorizations/f2-terminal-reconcile-intent-[a-f0-9]\{12\}-v20260820\.json$' || true)
           mapfile -t REFRESH_INTENTS < <(printf '%s\n' "${CHANGED[@]}" | grep '^\.github/orbit360-authorizations/f2-boundary-refresh-intent-[a-f0-9]\{12\}-v20260820\.json$' || true)
           mapfile -t PROJECTION_INTENTS < <(printf '%s\n' "${CHANGED[@]}" | grep '^\.github/orbit360-authorizations/f2-projection-reconcile-intent-[a-f0-9]\{12\}-v20260820\.json$' || true)
+          mapfile -t FUNCTIONAL_PROMOTION_REQUESTS < <(printf '%s\n' "${CHANGED[@]}" | grep '^\.github/orbit360-requests/f2-functional-defect-successor-promotion-[0-9]\+-v20260820\.json$' || true)
           MUTATION_REQUESTED=false
           if [ "$GITHUB_EVENT_NAME" = 'workflow_dispatch' ] && [ "$INPUT_ACTION" != 'verify' ]; then MUTATION_REQUESTED=true; fi
           if [ "$GITHUB_EVENT_NAME" = 'push' ]; then
-            if printf '%s\n' "${CHANGED[@]}" | grep -Fx "$RUNTIME_INTENT" >/dev/null || [ "${#TERMINAL_INTENTS[@]}" = '1' ] || [ "${#REFRESH_INTENTS[@]}" = '1' ] || [ "${#PROJECTION_INTENTS[@]}" = '1' ]; then MUTATION_REQUESTED=true; fi
+            if printf '%s\n' "${CHANGED[@]}" | grep -Fx "$RUNTIME_INTENT" >/dev/null || [ "${#TERMINAL_INTENTS[@]}" = '1' ] || [ "${#REFRESH_INTENTS[@]}" = '1' ] || [ "${#PROJECTION_INTENTS[@]}" = '1' ] || [ "${#FUNCTIONAL_PROMOTION_REQUESTS[@]}" = '1' ]; then MUTATION_REQUESTED=true; fi
           fi
           git fetch origin "$BRANCH"
           REMOTE_HEAD=$(git rev-parse "origin/$BRANCH")
@@ -90,7 +92,7 @@ jobs:
           STATUS=$(node -p "require('./orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json').status")
           STEP=$(node -p "require('./orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json').resumeProtocol.firstIncompleteStep")
           test "$STATUS" = CLOSED_PASS || exit 58
-          ACTION="$INPUT_ACTION"; AUTH_IDENTITY="$INPUT_AUTH"; RUNTIME_RUN_ID="$INPUT_RUNTIME_RUN_ID"
+          ACTION="$INPUT_ACTION"; AUTH_IDENTITY="$INPUT_AUTH"; RUNTIME_RUN_ID="$INPUT_RUNTIME_RUN_ID"; PROMOTION_EVIDENCE=''
           if [ "$GITHUB_EVENT_NAME" = push ]; then
             if printf '%s\n' "${CHANGED[@]}" | grep -Fx "$RUNTIME_INTENT" >/dev/null; then
               test "${#CHANGED[@]}" = '1' || { echo INTENT_COMMIT_SURFACE_INVALID; exit 62; }
@@ -112,6 +114,17 @@ jobs:
               PROJECTION_INTENT="${PROJECTION_INTENTS[0]}"
               jq -e '.schemaVersion=="orbit360-f2-projection-reconcile-intent-v1" and .approved==true and .sourceOnly==true and .runtime==false and .browser==false and .secrets==false and .firestoreRead==false and .writes==false and .authorizationGranted==false and .requestMaterializationAllowed==false and .replayAllowed==false and (.authorizationIdentityDigest|test("^[a-f0-9]{64}$"))' "$PROJECTION_INTENT" >/dev/null
               ACTION=projection-reconcile; AUTH_IDENTITY=$(jq -r '.authorizationIdentityDigest' "$PROJECTION_INTENT")
+            elif [ "${#FUNCTIONAL_PROMOTION_REQUESTS[@]}" = '1' ]; then
+              PROMOTION_REQUEST="${FUNCTIONAL_PROMOTION_REQUESTS[0]}"
+              for f in "${CHANGED[@]}"; do
+                case "$f" in
+                  "$PROMOTION_REQUEST"|.github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml|.github/workflows/orbit360-f2-functional-defect-successor-promotion-sourceonly-v20260820.yml) ;;
+                  *) echo "FUNCTIONAL_PROMOTION_COMMIT_SURFACE_INVALID:$f"; exit 69;;
+                esac
+              done
+              jq -e '.schemaVersion=="orbit360-f2-functional-defect-successor-promotion-request-v1" and .approved==true and .sourceOnly==true and .runtime==false and .browser==false and .secrets==false and .firestoreRead==false and .writes==false and .deploy==false and .production==false and .expectedLedgerRevision==24 and .expectedPackageRevision==18 and .candidateArtifactId==9433944723 and .candidateSourceHead=="c3bb825da2b1ecae08dabc2034c753482b086fec" and .canonicalTriggerRevision==1 and .candidateEvidence=="orbit360-platform/runtime-gate-crm-v20260716/f2-successor-client-projection-rootfix-v20260820.json" and .oneShot==true and .replayAllowed==false and .containsPII==false and .containsSecrets==false' "$PROMOTION_REQUEST" >/dev/null
+              ACTION=functional-successor-promotion
+              PROMOTION_EVIDENCE=$(jq -r '.candidateEvidence' "$PROMOTION_REQUEST")
             else ACTION=verify; fi
           fi
           case "$ACTION:$STEP" in
@@ -122,9 +135,10 @@ jobs:
             terminal-reconcile:F2-RUNTIME-PREFLIGHT) ;;
             boundary-refresh:F2-RUNTIME-AUTHORIZATION-BOUNDARY-REFRESH) ;;
             projection-reconcile:F2-RUNTIME-AUTHORIZATION) ;;
+            functional-successor-promotion:F2-RUNTIME-PREFLIGHT) ;;
             *) echo "BRIDGE_ACTION_STEP_MISMATCH:$ACTION:$STEP"; exit 59;;
           esac
-          if [ "$ACTION" != verify ]; then echo "$AUTH_IDENTITY" | grep -Eq '^[a-f0-9]{64}$' || { echo AUTH_IDENTITY_REQUIRED; exit 60; }; fi
+          if [ "$ACTION" != verify ] && [ "$ACTION" != functional-successor-promotion ]; then echo "$AUTH_IDENTITY" | grep -Eq '^[a-f0-9]{64}$' || { echo AUTH_IDENTITY_REQUIRED; exit 60; }; fi
           if [ "$ACTION" = terminal-reconcile ]; then
             PREPARED=$(node -p "require('./orbit360-platform/docs/orbit360-f2-runtime-authorization-boundary-v20260820.json').authorizationIdentity.digest"); test "$AUTH_IDENTITY" = "$PREPARED" || exit 61
             echo "$RUNTIME_RUN_ID" | grep -Eq '^[0-9]+$' || exit 65
@@ -146,11 +160,15 @@ jobs:
             test "$(jq -r '.authorizationIdentity.digest' "$BOUNDARY")" = "$AUTH_IDENTITY"
             jq -e '.status=="PREPARED_SOURCE_ONLY_AWAITING_EXPLICIT_USER_AUTHORIZATION" and .authorized==false and .authorizationPersisted==false and .requestMaterialized==false and .runtimeAllowed==false' "$BOUNDARY" >/dev/null
             node tools/orbit360-cp11-authorization-boundary-audit-v20260820.mjs
+          elif [ "$ACTION" = functional-successor-promotion ]; then
+            node --check tools/orbit360-f2-functional-defect-successor-promotion-v20260820.mjs
+            test -n "$PROMOTION_EVIDENCE" && test -f "$PROMOTION_EVIDENCE"
+            jq -e '.ok==true and .status=="F2_SUCCESSOR_CLIENT_PROJECTION_ROOTFIX_SOURCEONLY_CERTIFIED" and .candidateArtifactId==9433944723 and .baseArtifactId==9395391426 and .deltaCount==1 and .deltaPaths==["core/crmkit.js"] and .unchangedFileCount==193 and .fileCount==194 and .syntheticRootfixPass==true and .fullRehashPass==true and .runtimeExecuted==false and .browserExecuted==false and .secretAccess==false and .firestoreRead==false and .writes==0 and .deployExecuted==false and .productionTouched==false' "$PROMOTION_EVIDENCE" >/dev/null
           else
             if [ "$ACTION" != verify ]; then PREPARED=$(node -p "require('./orbit360-platform/docs/orbit360-f2-runtime-authorization-boundary-v20260820.json').authorizationIdentity.digest"); test "$AUTH_IDENTITY" = "$PREPARED" || exit 61; fi
             node tools/orbit360-validar-f2-control-plane-reachability-v20260820.mjs
           fi
-          echo "START_HEAD=$START_HEAD" >> "$GITHUB_ENV"; echo "ACTION=$ACTION" >> "$GITHUB_ENV"; echo "CURRENT_STEP=$STEP" >> "$GITHUB_ENV"; echo "AUTH_IDENTITY=$AUTH_IDENTITY" >> "$GITHUB_ENV"; echo "RUNTIME_RUN_ID=$RUNTIME_RUN_ID" >> "$GITHUB_ENV"
+          echo "START_HEAD=$START_HEAD" >> "$GITHUB_ENV"; echo "ACTION=$ACTION" >> "$GITHUB_ENV"; echo "CURRENT_STEP=$STEP" >> "$GITHUB_ENV"; echo "AUTH_IDENTITY=$AUTH_IDENTITY" >> "$GITHUB_ENV"; echo "RUNTIME_RUN_ID=$RUNTIME_RUN_ID" >> "$GITHUB_ENV"; echo "PROMOTION_EVIDENCE=$PROMOTION_EVIDENCE" >> "$GITHUB_ENV"
 
       - name: Persist already-granted authorization source-only
         if: env.ACTION == 'persist-authorization' || env.ACTION == 'consume-intent'
@@ -200,6 +218,21 @@ jobs:
           ORBIT360_CONTROL_PLANE_HEAD="$START_HEAD" node tools/orbit360-control-plane-independent-readback-v20260820.mjs --expected-step F2-RUNTIME-AUTHORIZATION --expected-package-status CLOSED_PASS
           node -e "const fs=require('fs'),L=require('./orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json'),P=require('./orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json'),B=require('./orbit360-platform/docs/orbit360-f2-runtime-authorization-boundary-v20260820.json');fs.writeFileSync('orbit360-platform/runtime-gate-crm-v20260716/f2-projection-reconcile-v20260820.json',JSON.stringify({schemaVersion:'orbit360-f2-projection-reconcile-v1',ok:true,status:'F2_CANONICAL_PROJECTION_RECONCILED_SOURCE_ONLY',ledgerRevision:L.revision,packageRevision:P.revision,authorizationIdentitySha256:B.authorizationIdentity.digest,authorized:false,requestMaterialized:false,runtimeAllowed:false,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,writes:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false},null,2)+'\n')"
 
+      - name: Promote certified F2 functional rootfix successor source-only
+        if: env.ACTION == 'functional-successor-promotion'
+        shell: bash
+        run: |
+          set -euo pipefail
+          LR=$(node -p "require('./orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json').revision")
+          PR=$(node -p "require('./orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json').revision")
+          node tools/orbit360-f2-functional-defect-successor-promotion-v20260820.mjs --expected-ledger "$LR" --expected-package "$PR" --evidence "$PROMOTION_EVIDENCE" | tee "$RUNNER_TEMP/promotion.json"
+          jq -e '.ok==true and .status=="F2_FUNCTIONAL_DEFECT_SUCCESSOR_PROMOTED_SOURCE_ONLY" and .toLedgerRevision==25 and .toPackageRevision==19 and .candidateArtifactId==9433944723 and .authorizationGranted==false and .requestMaterialized==false and .runtimeAllowed==false and .writes==0' "$RUNNER_TEMP/promotion.json" >/dev/null
+          node tools/orbit360-continuity-projection-atomic-v20260820.mjs --expected-revision 25
+          node tools/orbit360-cp11-authorization-boundary-audit-v20260820.mjs | tee "$RUNNER_TEMP/cp11.json"
+          node tools/orbit360-control-plane-composite-invariant-v20260820.mjs | tee "$RUNNER_TEMP/composite.json"
+          ORBIT360_CONTROL_PLANE_HEAD="$START_HEAD" node tools/orbit360-control-plane-independent-readback-v20260820.mjs --expected-step F2-RUNTIME-AUTHORIZATION --expected-package-status CLOSED_PASS | tee "$RUNNER_TEMP/readback.json"
+          jq -n --argjson p "$(cat "$RUNNER_TEMP/promotion.json")" --argjson c "$(cat "$RUNNER_TEMP/cp11.json")" --argjson i "$(cat "$RUNNER_TEMP/composite.json")" --argjson r "$(cat "$RUNNER_TEMP/readback.json")" '{schemaVersion:"orbit360-f2-functional-defect-successor-promotion-evidence-v2",ok:true,status:"F2_FUNCTIONAL_DEFECT_SUCCESSOR_PROMOTION_CANONICAL_SOURCEONLY_PASS",publicationOwner:".github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml",promotion:$p,cp11Audit:$c,composite:$i,independentReadback:$r,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,writes:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false}' > orbit360-platform/runtime-gate-crm-v20260716/f2-functional-defect-successor-promotion-v20260820.json
+
       - name: Commit single-writer bridge mutation
         if: env.ACTION != 'verify'
         shell: bash
@@ -208,8 +241,9 @@ jobs:
         run: |
           set -euo pipefail
           git config user.name orbit360-control-plane; git config user.email orbit360-control-plane@users.noreply.github.com
-          git add orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json orbit360-platform/docs/orbit360-f2-runtime-authorization-boundary-v20260820.json orbit360-platform/docs/orbit360-live-state-v1.json orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json orbit360-platform/docs/CHECKPOINT-CONTROL-PLANE-HARDENING-20260820.md orbit360-platform/docs/ORBIT360-PR5-CURRENT-STATE.md tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-runtime-v20260819.json .github/orbit360-authorizations .github/orbit360-requests
+          git add orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json orbit360-platform/docs/orbit360-f2-runtime-authorization-boundary-v20260820.json orbit360-platform/docs/orbit360-live-state-v1.json orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json orbit360-platform/docs/CHECKPOINT-CONTROL-PLANE-HARDENING-20260820.md orbit360-platform/docs/ORBIT360-PR5-CURRENT-STATE.md tools/orbit360-gate-contract-f2-productive-acceptance-v20260820.json tools/orbit360-gate-contract-registry-v20260717.json tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-source-v20260819.json tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-runtime-v20260819.json .github/orbit360-authorizations .github/orbit360-requests
           [ -f orbit360-platform/runtime-gate-crm-v20260716/f2-projection-reconcile-v20260820.json ] && git add orbit360-platform/runtime-gate-crm-v20260716/f2-projection-reconcile-v20260820.json
+          [ -f orbit360-platform/runtime-gate-crm-v20260716/f2-functional-defect-successor-promotion-v20260820.json ] && git add orbit360-platform/runtime-gate-crm-v20260716/f2-functional-defect-successor-promotion-v20260820.json
           git diff --cached --quiet && { echo NO_MUTATION_TO_COMMIT; exit 92; }
           git commit -m "fix(control-plane): advance F2 source-only bridge ${ACTION}"
           git fetch origin "$BRANCH"; test "$(git rev-parse origin/$BRANCH)" = "$START_HEAD" || { echo FINAL_CAS_MISMATCH; exit 103; }; git push origin "HEAD:$BRANCH"
@@ -219,7 +253,8 @@ jobs:
         run: |
           set -euo pipefail
           node tools/orbit360-validar-f2-control-plane-reachability-v20260820.mjs
-          if [ "$ACTION" = 'boundary-refresh' ] || [ "$ACTION" = 'projection-reconcile' ]; then node tools/orbit360-cp11-authorization-boundary-audit-v20260820.mjs; fi
+          if [ "$ACTION" = 'boundary-refresh' ] || [ "$ACTION" = 'projection-reconcile' ] || [ "$ACTION" = 'functional-successor-promotion' ]; then node tools/orbit360-cp11-authorization-boundary-audit-v20260820.mjs; fi
+          if [ "$ACTION" = 'functional-successor-promotion' ]; then node tools/orbit360-control-plane-composite-invariant-v20260820.mjs; fi
           node -e "const B=require('./orbit360-platform/docs/orbit360-f2-runtime-authorization-boundary-v20260820.json'); if(B.runtimeAllowed) process.exit(111); console.log(JSON.stringify({ok:true,sourceOnly:true,runtimeAllowed:false,authorizationPersisted:B.authorizationPersisted,requestMaterialized:B.requestMaterialized}))"
 
       - name: Dispatch existing active F2 runtime from BP6

@@ -18,6 +18,8 @@
   "plan": "orbit360-platform/docs/PLAN-CONGELADO-CIERRE-F2-Y-GO-LIVE-20260820.md",
   "oneShot": true,
   "replayAllowed": false,
+  "canonicalTriggerRevision": 1,
+  "publicationOwner": ".github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml",
   "containsPII": false,
   "containsSecrets": false
 }
