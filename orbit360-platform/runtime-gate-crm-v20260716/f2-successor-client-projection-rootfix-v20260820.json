@@ -1,0 +1,33 @@
+{
+  "schemaVersion": "orbit360-f2-successor-single-file-evidence-v1",
+  "ok": true,
+  "status": "F2_SUCCESSOR_CLIENT_PROJECTION_ROOTFIX_SOURCEONLY_CERTIFIED",
+  "classification": "PASS",
+  "runId": 32445619511,
+  "candidateArtifactId": 9433944723,
+  "artifactDigest": "25228e96490004de39dfba685673c80247ce9e7046d7eeff1cde642e4c673643",
+  "candidateSourceHead": "c3bb825da2b1ecae08dabc2034c753482b086fec",
+  "candidateZipName": "orbit360-fase-a-product-f2-successor-client-projection-c3bb825da2b1.zip",
+  "candidateZipSha256": "1951cc7c2d3390ea1c2a6b3d9ce0bb48e26a6f95d5d10d69b7c31a0027cfbbac",
+  "candidateManifestSha256": "580921077a88badab6e4076c42e9ef88f9de7936e1b6bad0f62410b39aec6397",
+  "baseArtifactId": 9395391426,
+  "fileCount": 194,
+  "deltaCount": 1,
+  "deltaPaths": [
+    "core/crmkit.js"
+  ],
+  "unchangedFileCount": 193,
+  "rootCause": "FUNCTIONAL_DEFECT:F2_UNDEFINED_NAN_VISIBLE:desktopDirection:polizas",
+  "syntheticRootfixPass": true,
+  "fullRehashPass": true,
+  "runtimeAuthorized": false,
+  "runtimeExecuted": false,
+  "browserExecuted": false,
+  "secretAccess": false,
+  "firestoreRead": false,
+  "writes": 0,
+  "deployExecuted": false,
+  "productionTouched": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
