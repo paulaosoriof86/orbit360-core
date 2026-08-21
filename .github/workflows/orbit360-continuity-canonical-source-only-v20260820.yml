@@ -1,17 +1,12 @@
 name: Orbit360 Continuity Canonical Source Only
-# MACRO1 MAINTENANCE LOCK — 2026-08-21
-# This is the sole workflow allowed to publish operational continuity state.
-# Until the definitive reducer/audits are installed, pushes are verification-only.
+# MACRO1 MAINTENANCE LOCK — discovery phase 2026-08-21.
+# Read-only: discovers hidden branch writers and conflicting state-bearing documents.
 
 on:
   push:
     branches: [ays/backend-tenant-lab-v99-20260703]
     paths:
       - '.github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml'
-      - 'tools/orbit360-continuity-transition-owner-v20260820.mjs'
-      - 'tools/orbit360-continuity-projection-atomic-v20260820.mjs'
-      - 'tools/orbit360-control-plane-composite-invariant-v20260820.mjs'
-      - 'tools/orbit360-control-plane-independent-readback-v20260820.mjs'
       - 'tools/orbit360-workflow-operational-surface-audit-v20260820.mjs'
       - 'tools/orbit360-documentation-state-discovery-v20260821.mjs'
   workflow_dispatch:
@@ -24,18 +19,29 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  maintenance-lock:
+  discovery-readonly:
     runs-on: ubuntu-latest
-    timeout-minutes: 3
+    timeout-minutes: 4
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
           fetch-depth: 0
           persist-credentials: false
-      - name: Verify source-only maintenance boundary
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Global physical-writer discovery
         shell: bash
         run: |
           set -euo pipefail
-          test "$(git branch --show-current)" = 'ays/backend-tenant-lab-v99-20260703'
-          echo '{"ok":true,"status":"MACRO1_CONTROL_PLANE_MAINTENANCE_LOCK","branchMutation":false,"runtimeExecuted":false,"browserExecuted":false,"secretAccess":false,"firestoreRead":false,"operationalWrites":0,"deployExecuted":false,"productionTouched":false}'
+          node tools/orbit360-workflow-operational-surface-audit-v20260820.mjs
+      - name: State-bearing documentation discovery
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-documentation-state-discovery-v20260821.mjs
+      - name: Source-only boundary
+        shell: bash
+        run: |
+          echo '{"runtimeExecuted":false,"browserExecuted":false,"secretAccess":false,"firestoreRead":false,"operationalWrites":0,"deployExecuted":false,"productionTouched":false}'
