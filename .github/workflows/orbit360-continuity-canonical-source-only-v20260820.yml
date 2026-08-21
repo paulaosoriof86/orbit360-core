@@ -28,6 +28,7 @@ env:
   ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
   POINTER: .github/orbit360-requests/macro2-canonical-source-activation-pointer-v20260821.json
   LISTENER_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/macro2-permanent-listener-terminal-v20260821.json
+  FIRST_STAGE_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/macro2-first-stage-diagnostic-terminal-v20260821.json
   WHITESPACE_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/macro2-patch-apply-whitespace-policy-diagnostic-v20260821.json
   BASE_ARTIFACT_ID: '9433944723'
   BASE_SOURCE_HEAD: c3bb825da2b1ecae08dabc2034c753482b086fec
@@ -116,22 +117,52 @@ jobs:
           git apply --check "$RUNNER_TEMP/docs.patch"
       - id: patchapply
         if: steps.router.outputs.mode == 'FIRST_STAGE_DIAGNOSTIC' && steps.patchcheck.outcome == 'success'
-        name: Apply locally and validate syntax
+        name: Apply locally and validate exact tracked plus untracked source set
         shell: bash
         run: |
           set -euo pipefail
-          git apply "$RUNNER_TEMP/product.patch"
-          git apply "$RUNNER_TEMP/tools.patch"
-          git apply "$RUNNER_TEMP/docs.patch"
-          mapfile -t DELTA < <(git diff --name-only | sort)
+          git apply --whitespace=nowarn "$RUNNER_TEMP/product.patch"
+          git apply --whitespace=nowarn "$RUNNER_TEMP/tools.patch"
+          git apply --whitespace=nowarn "$RUNNER_TEMP/docs.patch"
+          mapfile -t DELTA < <({ git diff --name-only; git ls-files --others --exclude-standard; } | sed '/^$/d' | sort -u)
+          cat > "$RUNNER_TEMP/expected-paths.txt" <<'EOF'
+          orbit360-platform/core/ciclo.js
+          orbit360-platform/core/client-canonical-view-projection-v20260716.js
+          orbit360-platform/core/queries.js
+          orbit360-platform/core/ui.js
+          orbit360-platform/data/store-firestore-product-readonly-p0.js
+          orbit360-platform/docs/ACADEMIA-ACTUALIZACION-MACRO2-READMODEL-SEGURO-Y-PERFORMANCE-20260821.md
+          orbit360-platform/docs/CLAUDE-ACUMULADO-MACRO2-READMODEL-SEGURO-20260821.md
+          orbit360-platform/modules/aseguradoras.js
+          orbit360-platform/modules/cliente360.js
+          orbit360-platform/modules/cobros.js
+          orbit360-platform/modules/inicio.js
+          tools/orbit360-build-macro2-transversal-successor-v20260821.mjs
+          tools/orbit360-documentation-state-discovery-v20260821.mjs
+          tools/orbit360-promote-macro2-transversal-candidate-v20260821.mjs
+          tools/orbit360-test-macro2-transversal-source-acceptance-v20260821.mjs
+          EOF
+          sed -i 's/^          //' "$RUNNER_TEMP/expected-paths.txt"
           test "${#DELTA[@]}" = '15'
+          diff -u "$RUNNER_TEMP/expected-paths.txt" <(printf '%s\n' "${DELTA[@]}")
           node --check tools/orbit360-build-macro2-transversal-successor-v20260821.mjs
           node --check tools/orbit360-promote-macro2-transversal-candidate-v20260821.mjs
           node --check tools/orbit360-test-macro2-transversal-source-acceptance-v20260821.mjs
           node --check tools/orbit360-documentation-state-discovery-v20260821.mjs
           for f in orbit360-platform/core/ui.js orbit360-platform/core/queries.js orbit360-platform/core/client-canonical-view-projection-v20260716.js orbit360-platform/core/ciclo.js orbit360-platform/data/store-firestore-product-readonly-p0.js orbit360-platform/modules/inicio.js orbit360-platform/modules/cliente360.js orbit360-platform/modules/aseguradoras.js orbit360-platform/modules/cobros.js; do node --check "$f"; done
           git diff --check -- . ':(exclude,glob)**/*.md'
-          mapfile -t MD < <(git diff --name-only -- ':(glob)**/*.md')
+          mapfile -t UNTRACKED < <(git ls-files --others --exclude-standard | sort -u)
+          if ((${#UNTRACKED[@]})); then
+            node - "${UNTRACKED[@]}" <<'NODE'
+          const fs=require('fs');const bad=[];
+          for(const f of process.argv.slice(2)){
+            if(!fs.existsSync(f)||/\.md$/i.test(f))continue;
+            fs.readFileSync(f,'utf8').split(/\n/).forEach((line,i)=>{const m=line.match(/[ \t]+$/);if(m)bad.push(`${f}:${i+1}:${JSON.stringify(m[0])}`);});
+          }
+          if(bad.length){console.error('UNTRACKED_NON_MARKDOWN_TRAILING_WHITESPACE_INVALID\n'+bad.join('\n'));process.exit(41);}
+          NODE
+          fi
+          mapfile -t MD < <({ git diff --name-only -- ':(glob)**/*.md'; printf '%s\n' "${UNTRACKED[@]}" | grep -E '\.md$' || true; } | sed '/^$/d' | sort -u)
           if ((${#MD[@]})); then
             node - "${MD[@]}" <<'NODE'
           const fs=require('fs');const bad=[];
@@ -202,7 +233,7 @@ jobs:
           mkdir -p "$(dirname "$LISTENER_EVIDENCE")"
           cat > "$LISTENER_EVIDENCE" <<JSON
           {
-            "schemaVersion":"orbit360-macro2-permanent-listener-terminal-v1",
+            "schemaVersion":"orbit360-macro2-permanent-listener-terminal-v2",
             "ok":$([ "$FAILED_STAGE" = 'NONE' ] && echo true || echo false),
             "status":"$FINAL_STATUS",
             "classification":"$([ "$FAILED_STAGE" = 'NONE' ] && echo PASS || echo PIPELINE_MECHANISM_FAILURE)",
@@ -215,6 +246,8 @@ jobs:
             "patchApplySyntax":"$PATCHAPPLY",
             "predecessorArtifact":"$PREDECESSOR",
             "sourceAcceptance107":"$ACCEPTANCE",
+            "expectedDeltaCount":15,
+            "deltaEnumeration":"TRACKED_PLUS_UNTRACKED_EXACT_SET",
             "runId":${GITHUB_RUN_ID},
             "triggerSha":"${GITHUB_SHA}",
             "listenerPermanent":true,
@@ -233,6 +266,10 @@ jobs:
             "containsSecrets":false
           }
           JSON
+          if [ "$MODE" = 'FIRST_STAGE_DIAGNOSTIC' ]; then
+            mkdir -p "$(dirname "$FIRST_STAGE_EVIDENCE")"
+            cp "$LISTENER_EVIDENCE" "$FIRST_STAGE_EVIDENCE"
+          fi
           if [ "$MODE" = 'WHITESPACE_POLICY_DIAGNOSTIC' ] && [ -f "$RUNNER_TEMP/macro2-whitespace-policy.json" ]; then
             mkdir -p "$(dirname "$WHITESPACE_EVIDENCE")"
             cp "$RUNNER_TEMP/macro2-whitespace-policy.json" "$WHITESPACE_EVIDENCE"
@@ -240,6 +277,7 @@ jobs:
           git config user.name 'orbit360-control-plane-bot'
           git config user.email 'orbit360-control-plane-bot@users.noreply.github.com'
           git add -- "$LISTENER_EVIDENCE"
+          if [ -f "$FIRST_STAGE_EVIDENCE" ]; then git add -- "$FIRST_STAGE_EVIDENCE"; fi
           if [ -f "$WHITESPACE_EVIDENCE" ]; then git add -- "$WHITESPACE_EVIDENCE"; fi
           git diff --cached --check
           git commit -m 'evidence(macro2): persist permanent listener terminal'
