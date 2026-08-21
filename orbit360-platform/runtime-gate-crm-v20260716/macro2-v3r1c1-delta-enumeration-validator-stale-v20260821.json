@@ -1,0 +1,67 @@
+{
+  "schemaVersion": "orbit360-macro2-delta-enumeration-validator-stale-v1",
+  "ok": false,
+  "status": "VALIDATOR_STALE_ROOT_CAUSE_CLOSED",
+  "classification": "VALIDATOR_STALE",
+  "failureCode": "VALIDATOR_STALE:DELTA_ENUMERATION_OMITS_UNTRACKED_ADDITIONS",
+  "failedStage": "PATCH_APPLY_SYNTAX",
+  "assertionEvidencePath": "orbit360-platform/runtime-gate-crm-v20260716/macro2-patch-apply-whitespace-policy-diagnostic-v20260821.json",
+  "assertionTriggerSha": "7469047f42c9c6a793f0044f526c14483972f36b",
+  "expectedDeltaCount": 15,
+  "trackedDeltaCountObserved": 10,
+  "trackedDeltaFiles": [
+    "orbit360-platform/core/ciclo.js",
+    "orbit360-platform/core/client-canonical-view-projection-v20260716.js",
+    "orbit360-platform/core/queries.js",
+    "orbit360-platform/core/ui.js",
+    "orbit360-platform/data/store-firestore-product-readonly-p0.js",
+    "orbit360-platform/modules/aseguradoras.js",
+    "orbit360-platform/modules/cliente360.js",
+    "orbit360-platform/modules/cobros.js",
+    "orbit360-platform/modules/inicio.js",
+    "tools/orbit360-documentation-state-discovery-v20260821.mjs"
+  ],
+  "untrackedAdditionsOmittedByGitDiffNameOnly": [
+    "orbit360-platform/docs/ACADEMIA-ACTUALIZACION-MACRO2-READMODEL-SEGURO-Y-PERFORMANCE-20260821.md",
+    "orbit360-platform/docs/CLAUDE-ACUMULADO-MACRO2-READMODEL-SEGURO-20260821.md",
+    "tools/orbit360-build-macro2-transversal-successor-v20260821.mjs",
+    "tools/orbit360-promote-macro2-transversal-candidate-v20260821.mjs",
+    "tools/orbit360-test-macro2-transversal-source-acceptance-v20260821.mjs"
+  ],
+  "combinedExpectedCount": 15,
+  "allPatchApplyRc": {
+    "product": 0,
+    "tools": 0,
+    "docs": 0
+  },
+  "allSyntaxChecksPass": true,
+  "nonMarkdownDiffCheckRc": 0,
+  "markdownAwareValidatorRc": 0,
+  "gitApplyDefaultRc": 0,
+  "whitespaceWarningsTerminal": false,
+  "supersedes": {
+    "path": "orbit360-platform/runtime-gate-crm-v20260716/macro2-v3r1c1-markdown-whitespace-validator-stale-v20260821.json",
+    "reason": "Later controlled diagnostics proved Markdown hard-break warnings return rc=0 and are not the terminal failure. The terminal assertion is incomplete delta enumeration."
+  },
+  "rootCause": "git diff --name-only enumerates tracked modifications but omits new untracked files created by git apply. The validator compared that incomplete set against the complete expected set of 15.",
+  "rootCauseResolution": "ENUMERATE_TRACKED_PLUS_UNTRACKED_EXACT_EXPECTED_SET",
+  "requiredCorrection": {
+    "preRunnerCombinedDeltaEnumeration": true,
+    "worktreeWhitespaceValidationIncludesUntracked": true,
+    "postRunnerWorktreeValidationIncludesUntracked": true,
+    "firstStageDiagnosticDurableEvidence": true,
+    "preflightRequiresCorrectedEnumeration": true,
+    "expectedSetRemains15": true
+  },
+  "productDefect": false,
+  "sourceOnly": true,
+  "runtimeExecuted": false,
+  "browserExecuted": false,
+  "secretAccess": false,
+  "firestoreRead": false,
+  "writes": 0,
+  "deployExecuted": false,
+  "productionTouched": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
