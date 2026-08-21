@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "orbit360-f2-projection-reconcile-intent-v1",
+  "approved": true,
+  "sourceOnly": true,
+  "runtime": false,
+  "browser": false,
+  "secrets": false,
+  "firestoreRead": false,
+  "writes": false,
+  "authorizationGranted": false,
+  "requestMaterializationAllowed": false,
+  "replayAllowed": false,
+  "authorizationIdentityDigest": "d1d79fdf5c07d7067ef5ed75dd715eddae0dd25b4d7b14c6933ca3257dd7973d",
+  "expectedLedgerRevision": 22,
+  "expectedPackageRevision": 16,
+  "targetStep": "F2-RUNTIME-AUTHORIZATION",
+  "containsPII": false,
+  "containsSecrets": false
+}
