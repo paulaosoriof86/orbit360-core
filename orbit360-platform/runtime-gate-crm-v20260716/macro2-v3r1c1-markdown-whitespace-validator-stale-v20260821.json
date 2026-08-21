@@ -1,0 +1,60 @@
+{
+  "schemaVersion": "orbit360-macro2-validator-stale-markdown-v1",
+  "ok": false,
+  "status": "VALIDATOR_STALE_ROOT_CAUSE_CLOSED",
+  "classification": "VALIDATOR_STALE",
+  "failureCode": "VALIDATOR_STALE:MARKDOWN_HARD_BREAK_TRAILING_SPACES_BLOCK_SOURCE_ACCEPTANCE",
+  "runId": 32533686998,
+  "jobId": 96930520630,
+  "triggerSha": "170f2085119fdf5858ea64e8b354b27ad57363af",
+  "failedStage": "PATCH_APPLY_SYNTAX",
+  "failedCommand": "git diff --check",
+  "patchBundleCheck": "success",
+  "patchApplicationReached": true,
+  "syntaxChecksReached": true,
+  "offenders": [
+    {
+      "patch": "docs.patch",
+      "line": 9,
+      "semantic": "Markdown hard break",
+      "trailingSpaces": 2
+    },
+    {
+      "patch": "docs.patch",
+      "line": 10,
+      "semantic": "Markdown hard break",
+      "trailingSpaces": 2
+    },
+    {
+      "patch": "docs.patch",
+      "line": 45,
+      "semantic": "Markdown hard break",
+      "trailingSpaces": 2
+    },
+    {
+      "patch": "docs.patch",
+      "line": 46,
+      "semantic": "Markdown hard break",
+      "trailingSpaces": 2
+    }
+  ],
+  "secondaryWarning": "tools/orbit360-documentation-state-discovery-v20260821.mjs mode 100755 vs patch expected 100644; warning only, not terminal failure",
+  "rootCauseResolution": "SOURCE_AWARE_DIFF_CHECK_ALLOW_EXACT_TWO_SPACE_MARKDOWN_HARD_BREAKS",
+  "requiredCorrection": {
+    "codeAndNonMarkdownStrict": true,
+    "markdownExactlyTwoTrailingSpacesAllowed": true,
+    "markdownTabsOrOtherTrailingWhitespaceRejected": true,
+    "preRunnerAndPostRunnerMustChangeTogether": true,
+    "preflightMustEnforceCorrectedValidator": true
+  },
+  "productDefect": false,
+  "runtimeExecuted": false,
+  "browserExecuted": false,
+  "secretAccess": false,
+  "firestoreRead": false,
+  "writes": 0,
+  "deployExecuted": false,
+  "productionTouched": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
