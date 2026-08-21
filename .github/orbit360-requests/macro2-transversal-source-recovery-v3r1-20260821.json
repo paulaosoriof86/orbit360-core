@@ -1,13 +1,19 @@
 {
   "schemaVersion": "orbit360-macro2-source-recovery-request-v3r1",
-  "status": "PREPARED_INERT_SOURCE_ONLY",
+  "status": "CONSUMED_FAIL_PIPELINE_MECHANISM",
   "sourceOnly": true,
-  "allowedExecutions": 1,
-  "consumed": false,
-  "historical": false,
+  "allowedExecutions": 0,
+  "consumed": true,
+  "historical": true,
   "replayAllowed": false,
+  "activationCommit": "93bbee0c1d9b7db4ddd6efa4b774dcaebe076264",
+  "preflightGateRunId": 32529413424,
+  "failureCode": "PIPELINE_MECHANISM_FAILURE:PRE_RUNNER_GITHUB_ENV_SAME_STEP_VISIBILITY",
+  "failureFamily": "PIPELINE_MECHANISM_FAILURE",
+  "durableSourceMaterialized": false,
+  "candidatePublished": false,
   "rootCauseResolved": true,
-  "rootCauseResolution": "WORKFLOW_TRIGGER_REGISTRATION_HANDSHAKE_REQUIRED",
+  "rootCauseResolution": "PRE_RUNNER_LOCAL_SCOPE_ASSIGNMENTS_REQUIRED",
   "registrationEvidencePath": "orbit360-platform/runtime-gate-crm-v20260716/macro2-v3-actions-push-registration-probe-v20260821.json",
   "registrationRunId": 32527157212,
   "registrationTriggerSha": "5da25bf227fbe7fab40eb83aeb2a93e9e4da9aee",
@@ -17,52 +23,14 @@
   "activationWorkflowTemplatePath": ".github/orbit360-workflow-templates/orbit360-continuity-canonical-source-only-v3r1-20260821.yml",
   "activationWorkflowTemplateSha256": "e44c7a994bc09233f1fcde59f1a379b62aa269e87b7b49a78fbc7c180337f42f",
   "ownerSafeHead": "961e74e2aa24af744ae9026b9e68624993fe6f57",
-  "reopenedAfterStopRetry": true,
-  "rootCausePreflightRequired": true,
-  "durableSourceBeforeArtifactRequired": true,
-  "artifactDigestNormalizationRequired": true,
-  "artifactMetadataBeforePromotionRequired": true,
   "priorFailures": [
     "PIPELINE_MECHANISM_FAILURE:MACRO2_PREDECESSOR_EXTRACT_TARGET_TYPO_PRI",
     "VALIDATOR_STALE:MACRO2_PROMOTION_REQUEST_STATUS_NOT_SCHEMA_AWARE",
     "VALIDATOR_STALE:ARTIFACT_DIGEST_FORMAT_CONTRACT",
     "PIPELINE_MECHANISM_FAILURE:UPDATE_REF_DOES_NOT_MATERIALIZE_ACTIONS_PUSH_EVENT",
     "PIPELINE_MECHANISM_FAILURE:V3_FIRST_DURABLE_SOURCE_NOT_MATERIALIZED_WITHIN_CONTRACT",
-    "PIPELINE_MECHANISM_FAILURE:POST_RUNNER_GITHUB_ENV_SAME_STEP_VISIBILITY"
-  ],
-  "patchSets": [
-    {
-      "name": "product",
-      "gzipPath": ".github/orbit360-source-patches/macro2-v20260821/product.patch.gz",
-      "gzipSha256": "c7b932b2788a502ae07111d2e209d4b0cca0b844242bb1db80218b72fa4c6913",
-      "sha256": "6b3141493d69d2b25c581033460f5302498dd06dd8dfcad1245802390fafe540"
-    },
-    {
-      "name": "tools",
-      "gzipPath": ".github/orbit360-source-patches/macro2-v20260821/tools.patch.gz",
-      "gzipSha256": "64bb3f11736ce39593b12a54350270f73730a10430d1ce6e543bebaee622ba46",
-      "sha256": "035c756cc2c14ae428a87231a8cc266762b92ebc1c67974d691bbb20ffd90f97"
-    },
-    {
-      "name": "docs",
-      "gzipPath": ".github/orbit360-source-patches/macro2-v20260821/docs.patch.gz",
-      "gzipSha256": "4a6f77f7e35a89f0ef830e4b98fa8f4d1493e7973a4b91aa55ee5def78ed2167",
-      "sha256": "f5f679c113e6408981f111154e8d0fd34f515e82a70c2085d3f0f54515efa3c0"
-    }
-  ],
-  "runnerScripts": [
-    {
-      "role": "pre",
-      "encoding": "plain",
-      "path": ".github/orbit360-source-patches/macro2-v20260821/macro2-v3r1-pre.sh",
-      "sha256": "853fb21cae0d9d1dc0cf3612d121ade47370d791135ad67823457b4eec324efb"
-    },
-    {
-      "role": "post",
-      "encoding": "plain",
-      "path": ".github/orbit360-source-patches/macro2-v20260821/macro2-v3r1-post.sh",
-      "sha256": "4e01a65587f1e463ff5022ca903dadf45bd5859c409ee1d1a07b4e7c21c085ec"
-    }
+    "PIPELINE_MECHANISM_FAILURE:POST_RUNNER_GITHUB_ENV_SAME_STEP_VISIBILITY",
+    "PIPELINE_MECHANISM_FAILURE:PRE_RUNNER_GITHUB_ENV_SAME_STEP_VISIBILITY"
   ],
   "runtime": false,
   "browser": false,
