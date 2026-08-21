@@ -7,7 +7,7 @@ import zlib from 'node:zlib';
 
 const R=process.cwd();
 const wfPath=process.env.ORBIT360_MACRO2_WORKFLOW||'.github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml';
-const reqPath=process.env.ORBIT360_MACRO2_REQUEST||'.github/orbit360-requests/macro2-transversal-source-recovery-v3-20260821.json';
+const reqPath=process.env.ORBIT360_MACRO2_REQUEST||'.github/orbit360-requests/macro2-transversal-source-recovery-v3r1-20260821.json';
 const regPath=process.env.ORBIT360_ACTIONS_REGISTRATION_EVIDENCE||'orbit360-platform/runtime-gate-crm-v20260716/macro2-v3-actions-push-registration-probe-v20260821.json';
 const BRANCH='ays/backend-tenant-lab-v99-20260703';
 const EXEC_WF='.github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml';
@@ -18,6 +18,7 @@ const read=p=>fs.readFileSync(path.join(R,p),'utf8').replace(/^\uFEFF/,'');
 const J=p=>JSON.parse(read(p));
 const req=J(reqPath),wf=read(wfPath),reg=J(regPath),F=[];
 const n=(x,c)=>{if(!x)F.push(c);};
+const sha=b=>crypto.createHash('sha256').update(b).digest('hex');
 
 n(reg.ok===true&&reg.status==='ACTIONS_PUSH_REGISTRATION_PROBE_PASS','ACTIONS_REGISTRATION_PROBE_NOT_PASS');
 n(reg.classification==='PIPELINE_MECHANISM_DIAGNOSTIC_PASS','ACTIONS_REGISTRATION_CLASSIFICATION_INVALID');
@@ -34,46 +35,74 @@ n(req.registrationEvidencePath===regPath,'REGISTRATION_EVIDENCE_BINDING_MISMATCH
 n(String(req.registrationRunId||'')===REG_RUN_ID,'REGISTRATION_RUN_ID_MISMATCH');
 n(req.registrationTriggerSha===REG_TRIGGER_SHA,'REGISTRATION_TRIGGER_SHA_MISMATCH');
 n(req.triggerMechanism==='WORKFLOW_FILE_SELF_REGISTERING_PUSH','TRIGGER_MECHANISM_NOT_SELF_REGISTERING');
-n(/^[a-f0-9]{40}$/.test(req.expectedParentHead||''),'EXPECTED_PARENT_INVALID');
+n(req.activationParentBinding==='GITHUB_EVENT_BEFORE_HEAD_PARENT','ACTIVATION_PARENT_BINDING_INVALID');
+n(req.expectedParentMode==='GITHUB_EVENT_BEFORE','EXPECTED_PARENT_MODE_INVALID');
+n(!Object.prototype.hasOwnProperty.call(req,'expectedParentHead'),'STATIC_EXPECTED_PARENT_FORBIDDEN');
 n(req.ownerSafeHead===OWNER_SAFE_HEAD,'OWNER_SAFE_HEAD_INVALID');
 
-n(wf.includes("push:"),'SELF_REGISTERING_PUSH_MISSING');
+n(typeof req.activationWorkflowTemplatePath==='string'&&req.activationWorkflowTemplatePath.length>0,'ACTIVATION_TEMPLATE_PATH_MISSING');
+n(/^[a-f0-9]{64}$/.test(req.activationWorkflowTemplateSha256||''),'ACTIVATION_TEMPLATE_SHA_INVALID');
+if(typeof req.activationWorkflowTemplatePath==='string'&&req.activationWorkflowTemplatePath.length>0){
+  const tp=path.join(R,req.activationWorkflowTemplatePath);
+  n(fs.existsSync(tp),'ACTIVATION_TEMPLATE_MISSING');
+  if(fs.existsSync(tp)){
+    const tb=fs.readFileSync(tp);
+    n(sha(tb)===req.activationWorkflowTemplateSha256,'ACTIVATION_TEMPLATE_SHA_MISMATCH');
+    n(tb.toString('utf8')===wf,'ACTIVATION_TEMPLATE_WORKFLOW_MISMATCH');
+  }
+}
+
+n(wf.includes('push:'),'SELF_REGISTERING_PUSH_MISSING');
 n(wf.includes(BRANCH),'SELF_REGISTERING_BRANCH_MISSING');
 n(wf.includes("- '"+EXEC_WF+"'"),'SELF_REGISTERING_WORKFLOW_PATH_MISSING');
 n(!wf.includes("- '"+reqPath+"'"),'LEGACY_REQUEST_PATH_TRIGGER_PRESENT');
 n(wf.includes(reqPath),'REQUEST_BINDING_MISSING');
+n(wf.includes('ORBIT360_EVENT_BEFORE: ${{ github.event.before }}'),'EVENT_BEFORE_WORKFLOW_BINDING_MISSING');
 n(!wf.includes('git push origin'),'WORKFLOW_MUST_DELEGATE_WRITES');
 n(!wf.includes('actions: write'),'ACTIONS_WRITE_PRESENT');
 
-const sets=[...(req.patchSets||[]),...(req.runnerScripts||[])];
-for(const s of sets){
+for(const s of (req.patchSets||[])){
   const p=path.join(R,s.gzipPath||'');
-  n(fs.existsSync(p),'BUNDLE_MISSING:'+String(s.name||s.role));
+  n(fs.existsSync(p),'PATCH_BUNDLE_MISSING:'+String(s.name));
   if(!fs.existsSync(p))continue;
-  const gz=fs.readFileSync(p),g=crypto.createHash('sha256').update(gz).digest('hex');
-  n(g===s.gzipSha256,'GZIP_SHA:'+String(s.name||s.role));
+  const gz=fs.readFileSync(p);
+  n(sha(gz)===s.gzipSha256,'PATCH_GZIP_SHA:'+String(s.name));
   try{
-    const raw=zlib.gunzipSync(gz),h=crypto.createHash('sha256').update(raw).digest('hex');
-    n(h===s.sha256,'RAW_SHA:'+String(s.name||s.role));
-    if(s.role){
-      const t=raw.toString('utf8');
-      if(s.role==='pre'){
-        n(!/\$PRI\b/.test(t),'LEGACY_PRI');
-        n(!t.includes('git pull --rebase'),'REBASE');
-        n(t.includes("jq -r '.expectedParentHead'"),'DYNAMIC_PARENT_BINDING_MISSING');
-        n(t.includes("jq -r '.ownerSafeHead'"),'OWNER_SAFE_BINDING_MISSING');
-        n(t.includes('git rev-parse HEAD^'),'ACTIVATION_PARENT_PROOF_MISSING');
-        n(t.includes('Publish accepted source commit before candidate build'),'SOURCE_STAGE');
-        n(t.includes('git show "$OWNER_SAFE_HEAD:.github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml"'),'OWNER_RESTORE_MISSING');
-        n((t.match(/git push origin "HEAD:\$ORBIT360_BRANCH"/g)||[]).length===1,'PRE_PUSH_COUNT');
-      }else{
-        n(t.includes('sha256:$ARTIFACT_DIGEST_RAW'),'DIGEST_NORMALIZATION');
-        n(t.includes('Persist candidate artifact metadata before promotion'),'META_STAGE');
-        n(t.indexOf('Persist candidate artifact metadata before promotion')<t.indexOf('Promote candidate and prepare inert fresh authorization boundary'),'META_BEFORE_PROMOTION');
-        n((t.match(/git push origin "HEAD:\$ORBIT360_BRANCH"/g)||[]).length===2,'POST_PUSH_COUNT');
-      }
-    }
-  }catch{n(false,'GZIP_INVALID:'+String(s.name||s.role));}
+    const raw=zlib.gunzipSync(gz);
+    n(sha(raw)===s.sha256,'PATCH_RAW_SHA:'+String(s.name));
+  }catch{
+    n(false,'PATCH_GZIP_INVALID:'+String(s.name));
+  }
+}
+
+for(const s of (req.runnerScripts||[])){
+  n(s.encoding==='plain','RUNNER_ENCODING_NOT_PLAIN:'+String(s.role));
+  const p=path.join(R,s.path||'');
+  n(fs.existsSync(p),'RUNNER_MISSING:'+String(s.role));
+  if(!fs.existsSync(p))continue;
+  const raw=fs.readFileSync(p);
+  n(sha(raw)===s.sha256,'RUNNER_SHA:'+String(s.role));
+  const t=raw.toString('utf8');
+  if(s.role==='pre'){
+    n(!/\$PRI\b/.test(t),'LEGACY_PRI');
+    n(!t.includes('git pull --rebase'),'REBASE');
+    n(t.includes('ORBIT360_EVENT_BEFORE'),'EVENT_BEFORE_RUNNER_BINDING_MISSING');
+    n(t.includes('git rev-parse HEAD^'),'ACTIVATION_PARENT_PROOF_MISSING');
+    n(t.includes('git rev-parse HEAD)'),'ACTIVATION_SHA_PROOF_MISSING');
+    n(t.includes('GITHUB_SHA'),'GITHUB_SHA_PROOF_MISSING');
+    n(t.includes("jq -r '.ownerSafeHead'"),'OWNER_SAFE_BINDING_MISSING');
+    n(t.includes('Publish accepted source commit before candidate build'),'SOURCE_STAGE');
+    n(t.includes('git show "$OWNER_SAFE_HEAD:.github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml"'),'OWNER_RESTORE_MISSING');
+    n((t.match(/git push origin "HEAD:\$ORBIT360_BRANCH"/g)||[]).length===1,'PRE_PUSH_COUNT');
+  }else if(s.role==='post'){
+    n(t.includes('sha256:$ARTIFACT_DIGEST_RAW'),'DIGEST_NORMALIZATION');
+    n(t.includes('NORMALIZED_ARTIFACT_DIGEST="$ARTIFACT_DIGEST"'),'LOCAL_NORMALIZED_DIGEST_ASSIGNMENT_MISSING');
+    n(t.includes('Persist candidate artifact metadata before promotion'),'META_STAGE');
+    n(t.indexOf('Persist candidate artifact metadata before promotion')<t.indexOf('Promote candidate and prepare inert fresh authorization boundary'),'META_BEFORE_PROMOTION');
+    n((t.match(/git push origin "HEAD:\$ORBIT360_BRANCH"/g)||[]).length===2,'POST_PUSH_COUNT');
+  }else{
+    n(false,'RUNNER_ROLE_INVALID:'+String(s.role));
+  }
 }
 
 const out={
@@ -83,9 +112,13 @@ const out={
   failures:F,
   stopRetryReopenValidated:F.length===0,
   actionsRegistrationHandshakeValidated:F.length===0,
+  activationParentBindingValidated:F.length===0,
+  workflowTemplateBound:F.length===0,
+  runnerPlainTextValidated:F.length===0,
   registrationRunId:reg.runId||null,
   registrationTriggerSha:reg.triggerSha||null,
   triggerMechanism:req.triggerMechanism||null,
+  activationParentBinding:req.activationParentBinding||null,
   durableSourceBeforeArtifact:true,
   durableArtifactMetadataBeforePromotion:true,
   artifactDigestContractNormalized:true,
