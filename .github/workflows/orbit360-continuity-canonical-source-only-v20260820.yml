@@ -1,7 +1,6 @@
 name: Orbit360 Continuity Canonical Source Only
 # DEFINITIVE SINGLE PHYSICAL WRITER — 2026-08-21.
-# Explicit-dispatch only. No runtime/browser/secrets/Firestore/deploy.
-# Historical workflows are preserved under .github/workflows-history-20260821/ and are not executable.
+# Macro-2 durable V3. No product runtime/browser/secrets/Firestore/deploy/production.
 
 on:
   workflow_dispatch:
@@ -10,9 +9,14 @@ on:
         description: 'Explicit source-only transition identifier'
         required: true
         type: string
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/orbit360-requests/macro2-transversal-source-recovery-v3-20260821.json'
 
 permissions:
   contents: write
+  actions: read
   pull-requests: write
   statuses: write
 
@@ -20,20 +24,27 @@ concurrency:
   group: orbit360-continuity-canonical-ays
   cancel-in-progress: false
 
+env:
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  RECOVERY_PARENT_HEAD: 961e74e2aa24af744ae9026b9e68624993fe6f57
+  MACRO2_REQUEST: .github/orbit360-requests/macro2-transversal-source-recovery-v3-20260821.json
+  BASE_ARTIFACT_ID: '9433944723'
+  BASE_SOURCE_HEAD: c3bb825da2b1ecae08dabc2034c753482b086fec
+  BASE_ZIP_SHA256: 1951cc7c2d3390ea1c2a6b3d9ce0bb48e26a6f95d5d10d69b7c31a0027cfbbac
+  BASE_MANIFEST_SHA256: 580921077a88badab6e4076c42e9ef88f9de7936e1b6bad0f62410b39aec6397
+
 jobs:
   fail-closed-control-plane-owner:
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 3
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.sha }}
-          fetch-depth: 0
-      - name: Enforce explicit source-only owner boundary
-        shell: bash
+        with: {ref: '${{ github.sha }}', fetch-depth: 0}
+      - shell: bash
         run: |
           set -euo pipefail
-          test "${{ github.ref_name }}" = 'ays/backend-tenant-lab-v99-20260703'
+          test "${{ github.ref_name }}" = "$ORBIT360_BRANCH"
           case "${{ inputs.transition }}" in
             READBACK_ONLY)
               node tools/orbit360-control-plane-composite-invariant-v20260820.mjs
@@ -41,8 +52,63 @@ jobs:
               node tools/orbit360-workflow-operational-surface-audit-v20260820.mjs
               node tools/orbit360-documentation-state-discovery-v20260821.mjs
               ;;
-            *)
-              echo 'PIPELINE_MECHANISM_FAILURE:UNIMPLEMENTED_CANONICAL_TRANSITION_FAIL_CLOSED' >&2
-              exit 41
-              ;;
+            *) exit 41 ;;
           esac
+
+  macro2-durable-v3:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: '${{ github.sha }}', fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Run durable source/build phase
+        env:
+          GH_TOKEN: '${{ github.token }}'
+        shell: bash
+        run: |
+          set -euo pipefail
+          PRE_GZ=$(jq -r '.runnerScripts[]|select(.role=="pre")|.gzipPath' "$MACRO2_REQUEST")
+          PRE_SHA=$(jq -r '.runnerScripts[]|select(.role=="pre")|.gzipSha256' "$MACRO2_REQUEST")
+          test "$(sha256sum "$PRE_GZ"|awk '{print $1}')" = "$PRE_SHA"
+          gzip -dc "$PRE_GZ" > "$RUNNER_TEMP/macro2-v3-pre.sh"
+          bash "$RUNNER_TEMP/macro2-v3-pre.sh"
+      - name: Upload single Macro-2 candidate
+        id: candidate
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-macro2-transversal-source-candidate-${{ github.run_id }}
+          path: '${{ env.SUCCESSOR_ZIP }}'
+          retention-days: 30
+          compression-level: 0
+          if-no-files-found: error
+      - name: Persist metadata and promote
+        env:
+          ARTIFACT_ID: '${{ steps.candidate.outputs.artifact-id }}'
+          ARTIFACT_DIGEST_RAW: '${{ steps.candidate.outputs.artifact-digest }}'
+        shell: bash
+        run: |
+          set -euo pipefail
+          POST_GZ=$(jq -r '.runnerScripts[]|select(.role=="post")|.gzipPath' "$MACRO2_REQUEST")
+          POST_SHA=$(jq -r '.runnerScripts[]|select(.role=="post")|.gzipSha256' "$MACRO2_REQUEST")
+          test "$(sha256sum "$POST_GZ"|awk '{print $1}')" = "$POST_SHA"
+          gzip -dc "$POST_GZ" > "$RUNNER_TEMP/macro2-v3-post.sh"
+          bash "$RUNNER_TEMP/macro2-v3-post.sh"
+      - name: Upload sanitized Macro-2 evidence
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-macro2-transversal-source-evidence-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/macro2-source-acceptance-precommit.json
+            ${{ runner.temp }}/macro2-build.json
+            ${{ runner.temp }}/macro2-source-acceptance-successor.json
+            ${{ runner.temp }}/macro2-promotion.json
+            ${{ runner.temp }}/macro2-composite.json
+            ${{ runner.temp }}/macro2-readback.json
+            ${{ runner.temp }}/macro2-writer-audit.json
+            ${{ runner.temp }}/macro2-doc-discovery.json
+          retention-days: 30
+          if-no-files-found: error

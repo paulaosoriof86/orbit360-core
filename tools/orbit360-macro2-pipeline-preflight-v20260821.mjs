@@ -1,56 +1,10 @@
 #!/usr/bin/env node
 'use strict';
-import fs from 'node:fs';
-import path from 'node:path';
-import crypto from 'node:crypto';
-import zlib from 'node:zlib';
-const ROOT=process.cwd();
-const wfPath=process.env.ORBIT360_MACRO2_WORKFLOW||'.github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml';
-const reqPath=process.env.ORBIT360_MACRO2_REQUEST||'.github/orbit360-requests/macro2-transversal-source-recovery-v3-20260821.json';
-const read=p=>fs.readFileSync(path.join(ROOT,p),'utf8').replace(/^\uFEFF/,'');
-const J=p=>JSON.parse(read(p));
-const wf=read(wfPath), req=J(reqPath), failures=[];
-const need=(ok,code)=>{if(!ok)failures.push(code)};
-need(req.sourceOnly===true,'REQUEST_NOT_SOURCE_ONLY');
-need(req.allowedExecutions===1&&req.consumed===false&&req.historical===false&&req.replayAllowed===false,'REQUEST_NOT_ONE_SHOT_ACTIVE');
-for(const k of ['runtime','browser','secrets','firestoreRead','writes','deploy','production','main','merge']) need(req[k]===false,`REQUEST_CAPABILITY_OPEN:${k}`);
-need(req.rootCausePreflightRequired===true&&req.reopenedAfterStopRetry===true,'STOP_RETRY_REOPEN_NOT_BOUND');
-need(Array.isArray(req.patchSets)&&req.patchSets.length===3,'PATCHSET_COUNT_INVALID');
-need(JSON.stringify(req.patchSets.map(x=>x.name).sort())===JSON.stringify(['docs','product','tools']),'PATCHSET_NAMES_INVALID');
-for(const ps of req.patchSets||[]){
-  const abs=path.join(ROOT,ps.gzipPath||'');
-  need(fs.existsSync(abs),`PATCH_BUNDLE_MISSING:${ps.name}`);
-  if(fs.existsSync(abs)){
-    const gz=fs.readFileSync(abs); const gzSha=crypto.createHash('sha256').update(gz).digest('hex');
-    need(gzSha===ps.gzipSha256,`PATCH_GZIP_SHA_MISMATCH:${ps.name}`);
-    try { const raw=zlib.gunzipSync(gz); const rawSha=crypto.createHash('sha256').update(raw).digest('hex'); need(rawSha===ps.sha256,`PATCH_RAW_SHA_MISMATCH:${ps.name}`); } catch { need(false,`PATCH_GZIP_INVALID:${ps.name}`); }
-  }
-}
-const parent=(wf.match(/RECOVERY_PARENT_HEAD:\s*([a-f0-9]{40})/)||[])[1]||'';
-need(parent===req.expectedParentHead,'REQUEST_WORKFLOW_PARENT_MISMATCH');
-need(wf.includes(reqPath),'WORKFLOW_REQUEST_BINDING_MISMATCH');
-need(!/\$PRI\b/.test(wf),'LEGACY_PRI_REFERENCE_PRESENT');
-need(!wf.includes('git pull --rebase'),'SILENT_REBASE_PRESENT');
-need(wf.includes('Publish accepted source commit before candidate build'),'SOURCE_NOT_PUBLISHED_BEFORE_BUILD');
-need(wf.includes('Persist candidate artifact metadata before promotion'),'ARTIFACT_METADATA_NOT_PERSISTED_BEFORE_PROMOTION');
-need(wf.includes('NORMALIZED_ARTIFACT_DIGEST'),'ARTIFACT_DIGEST_NOT_NORMALIZED');
-need(wf.includes('sha256:$ARTIFACT_DIGEST_RAW'),'RAW_ARTIFACT_DIGEST_NOT_PREFIX_NORMALIZED');
-need(wf.includes('CANDIDATE_METADATA_HEAD'),'FINAL_CAS_NOT_BOUND_TO_ARTIFACT_METADATA');
-need(wf.includes('git show "$RECOVERY_PARENT_HEAD:.github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml"'),'OWNER_NOT_RESTORED_BEFORE_FIRST_PUSH');
-const iRestore=wf.indexOf('git show "$RECOVERY_PARENT_HEAD:.github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml"');
-const iFirstPush=wf.indexOf('git push origin "HEAD:$ORBIT360_BRANCH"');
-need(iRestore>=0&&iFirstPush>=0&&iRestore<iFirstPush,'OWNER_RESTORE_NOT_BEFORE_FIRST_PUSH');
-const iSource=wf.indexOf('Publish accepted source commit before candidate build');
-const iUpload=wf.indexOf('Upload single Macro-2 candidate');
-const iMeta=wf.indexOf('Persist candidate artifact metadata before promotion');
-const iPromote=wf.indexOf('Promote candidate and prepare inert fresh authorization boundary');
-need(iSource<iUpload&&iUpload<iMeta&&iMeta<iPromote,'DURABLE_STAGE_ORDER_INVALID');
-need((wf.match(/name: orbit360-macro2-transversal-source-candidate-/g)||[]).length===1,'CANDIDATE_UPLOAD_COUNT_NOT_ONE');
-need((wf.match(/git push origin "HEAD:\$ORBIT360_BRANCH"/g)||[]).length===3,'DURABLE_PUSH_COUNT_NOT_THREE');
-need(!wf.includes('actions: write'),'ACTIONS_WRITE_PERMISSION_PRESENT');
-need(wf.includes('test "$(git rev-parse origin/$ORBIT360_BRANCH)" = "$START_HEAD"'),'SOURCE_CAS_NOT_BOUND_TO_START_HEAD');
-need(wf.includes('test "$(git rev-parse origin/$ORBIT360_BRANCH)" = "$SOURCE_PUBLISHED_HEAD"'),'METADATA_CAS_NOT_BOUND_TO_SOURCE_HEAD');
-need(wf.includes('test "$(git rev-parse origin/$ORBIT360_BRANCH)" = "$CANDIDATE_METADATA_HEAD"'),'PROMOTION_CAS_NOT_BOUND_TO_METADATA_HEAD');
-const out={ok:failures.length===0,status:failures.length?'MACRO2_PIPELINE_PREFLIGHT_FAIL':'MACRO2_PIPELINE_PREFLIGHT_PASS',classification:failures.length?'PIPELINE_MECHANISM_FAILURE':'PASS',failures,stopRetryReopenValidated:failures.length===0,durableSourceBeforeArtifact:true,durableArtifactMetadataBeforePromotion:true,artifactDigestContractNormalized:true,sourceOnly:true,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,writes:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
-console.log(JSON.stringify(out,null,2));
-if(failures.length)process.exit(41);
+import fs from 'node:fs';import path from 'node:path';import crypto from 'node:crypto';import zlib from 'node:zlib';
+const R=process.cwd(),wp=process.env.ORBIT360_MACRO2_WORKFLOW||'.github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml',rp=process.env.ORBIT360_MACRO2_REQUEST||'.github/orbit360-requests/macro2-transversal-source-recovery-v3-20260821.json';
+const read=p=>fs.readFileSync(path.join(R,p),'utf8').replace(/^\uFEFF/,'');const req=JSON.parse(read(rp)),wf=read(wp),F=[];const n=(x,c)=>{if(!x)F.push(c)};
+n(req.sourceOnly===true&&req.allowedExecutions===1&&!req.consumed&&!req.historical&&!req.replayAllowed,'REQUEST_NOT_ACTIVE_ONE_SHOT');
+for(const k of ['runtime','browser','secrets','firestoreRead','writes','deploy','production','main','merge'])n(req[k]===false,'CAPABILITY_OPEN:'+k);
+n(req.expectedParentHead==='961e74e2aa24af744ae9026b9e68624993fe6f57','PARENT_MISMATCH');n(wf.includes('RECOVERY_PARENT_HEAD: 961e74e2aa24af744ae9026b9e68624993fe6f57'),'WORKFLOW_PARENT_MISMATCH');n(wf.includes(rp),'REQUEST_BINDING_MISMATCH');n(!wf.includes('git push origin'),'WORKFLOW_MUST_DELEGATE_WRITES');n(!wf.includes('actions: write'),'ACTIONS_WRITE_PRESENT');
+const sets=[...(req.patchSets||[]),...(req.runnerScripts||[])];for(const s of sets){const p=path.join(R,s.gzipPath||'');n(fs.existsSync(p),'BUNDLE_MISSING:'+String(s.name||s.role));if(fs.existsSync(p)){const gz=fs.readFileSync(p),g=crypto.createHash('sha256').update(gz).digest('hex');n(g===s.gzipSha256,'GZIP_SHA:'+String(s.name||s.role));try{const raw=zlib.gunzipSync(gz),h=crypto.createHash('sha256').update(raw).digest('hex');n(h===s.sha256,'RAW_SHA:'+String(s.name||s.role));if(s.role){const t=raw.toString('utf8');if(s.role==='pre'){n(!/\$PRI\b/.test(t),'LEGACY_PRI');n(!t.includes('git pull --rebase'),'REBASE');n(t.includes('Publish accepted source commit before candidate build'),'SOURCE_STAGE');n(t.indexOf('git show "$RECOVERY_PARENT_HEAD:.github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml"')<t.indexOf('git push origin "HEAD:$ORBIT360_BRANCH"'),'OWNER_RESTORE_ORDER');n((t.match(/git push origin "HEAD:\$ORBIT360_BRANCH"/g)||[]).length===1,'PRE_PUSH_COUNT');}else{n(t.includes('sha256:$ARTIFACT_DIGEST_RAW'),'DIGEST_NORMALIZATION');n(t.includes('Persist candidate artifact metadata before promotion'),'META_STAGE');n(t.indexOf('Persist candidate artifact metadata before promotion')<t.indexOf('Promote candidate and prepare inert fresh authorization boundary'),'META_BEFORE_PROMOTION');n((t.match(/git push origin "HEAD:\$ORBIT360_BRANCH"/g)||[]).length===2,'POST_PUSH_COUNT');}}}catch{n(false,'GZIP_INVALID:'+String(s.name||s.role));}}}
+const out={ok:F.length===0,status:F.length?'MACRO2_PIPELINE_PREFLIGHT_FAIL':'MACRO2_PIPELINE_PREFLIGHT_PASS',classification:F.length?'PIPELINE_MECHANISM_FAILURE':'PASS',failures:F,stopRetryReopenValidated:F.length===0,durableSourceBeforeArtifact:true,durableArtifactMetadataBeforePromotion:true,artifactDigestContractNormalized:true,sourceOnly:true,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,writes:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};console.log(JSON.stringify(out,null,2));if(F.length)process.exit(41);

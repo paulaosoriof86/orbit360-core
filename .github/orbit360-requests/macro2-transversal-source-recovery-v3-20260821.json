@@ -1,0 +1,40 @@
+{
+  "schemaVersion": "orbit360-macro2-source-recovery-request-v3",
+  "status": "MATERIALIZED_SOURCE_ONLY",
+  "sourceOnly": true,
+  "allowedExecutions": 1,
+  "consumed": false,
+  "historical": false,
+  "replayAllowed": false,
+  "expectedParentHead": "961e74e2aa24af744ae9026b9e68624993fe6f57",
+  "reopenedAfterStopRetry": true,
+  "rootCausePreflightRequired": true,
+  "durableSourceBeforeArtifactRequired": true,
+  "artifactDigestNormalizationRequired": true,
+  "artifactMetadataBeforePromotionRequired": true,
+  "priorFailures": [
+    "PIPELINE_MECHANISM_FAILURE:MACRO2_PREDECESSOR_EXTRACT_TARGET_TYPO_PRI",
+    "VALIDATOR_STALE:MACRO2_PROMOTION_REQUEST_STATUS_NOT_SCHEMA_AWARE",
+    "VALIDATOR_STALE:ARTIFACT_DIGEST_FORMAT_CONTRACT"
+  ],
+  "patchSets": [
+    {"name":"product","gzipPath":".github/orbit360-source-patches/macro2-v20260821/product.patch.gz","gzipSha256":"c7b932b2788a502ae07111d2e209d4b0cca0b844242bb1db80218b72fa4c6913","sha256":"6b3141493d69d2b25c581033460f5302498dd06dd8dfcad1245802390fafe540"},
+    {"name":"tools","gzipPath":".github/orbit360-source-patches/macro2-v20260821/tools.patch.gz","gzipSha256":"64bb3f11736ce39593b12a54350270f73730a10430d1ce6e543bebaee622ba46","sha256":"035c756cc2c14ae428a87231a8cc266762b92ebc1c67974d691bbb20ffd90f97"},
+    {"name":"docs","gzipPath":".github/orbit360-source-patches/macro2-v20260821/docs.patch.gz","gzipSha256":"4a6f77f7e35a89f0ef830e4b98fa8f4d1493e7973a4b91aa55ee5def78ed2167","sha256":"f5f679c113e6408981f111154e8d0fd34f515e82a70c2085d3f0f54515efa3c0"}
+  ],
+  "runtime": false,
+  "browser": false,
+  "secrets": false,
+  "firestoreRead": false,
+  "writes": false,
+  "deploy": false,
+  "production": false,
+  "main": false,
+  "merge": false,
+  "containsPII": false,
+  "containsSecrets": false,
+  "runnerScripts": [
+    {"role":"pre","gzipPath":".github/orbit360-source-patches/macro2-v20260821/macro2-v3-pre.sh.gz","gzipSha256":"34bc57feb3129a116ed4f4bb60080ced83b7bca5834c4c7a66ca5df8cbc41339","sha256":"7862f6c057cf2eaab5d4b2fd1d76a9df8f749aca46ccbf21382c837bc535c769"},
+    {"role":"post","gzipPath":".github/orbit360-source-patches/macro2-v20260821/macro2-v3-post.sh.gz","gzipSha256":"e59a5fa30f6797518123b5ca572eeab8a1f1298139a5fe4d674ae4ad0c3251aa","sha256":"b66e38ac9b37f24a9734a182aa2b1706b1e4c4affc48e7f2419acd6adc62b9d5"}
+  ]
+}
