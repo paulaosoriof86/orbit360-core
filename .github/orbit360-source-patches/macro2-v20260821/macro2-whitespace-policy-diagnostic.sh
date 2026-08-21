@@ -10,7 +10,10 @@ APPLY_CFG="$(git config --show-origin --get-all apply.whitespace 2>/dev/null || 
 CORE_CFG="$(git config --show-origin --get-all core.whitespace 2>/dev/null || true)"
 
 run_apply() {
-  local label="$1" mode="$2" ws="$RUNNER_TEMP/ws-$label" out="$RUNNER_TEMP/$label.log"
+  local label="$1"
+  local mode="$2"
+  local ws="$RUNNER_TEMP/ws-$label"
+  local out="$RUNNER_TEMP/$label.log"
   rm -rf "$ws"
   git worktree add --detach "$ws" "$GITHUB_SHA" >/dev/null 2>&1
   set +e
