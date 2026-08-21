@@ -1,12 +1,23 @@
 {
   "schemaVersion": "orbit360-macro2-canonical-source-activation-pointer-v1",
-  "status": "ACTIVE",
-  "mode": "FIRST_STAGE_DIAGNOSTIC",
+  "status": "IDLE",
+  "mode": "NONE",
   "activeRequestPath": null,
   "activationNonce": "macro2-first-stage-diagnostic-untracked-aware-20260821-04",
-  "allowedExecutions": 1,
-  "consumed": false,
+  "allowedExecutions": 0,
+  "consumed": true,
   "replayAllowed": false,
+  "lastTerminal": {
+    "runId": 32538832096,
+    "triggerSha": "762c6cb6270d29d44f5c569c56df93670f75c2b3",
+    "status": "FIRST_STAGE_DIAGNOSTIC_FAIL",
+    "classification": "PIPELINE_MECHANISM_FAILURE",
+    "failedStage": "SOURCE_ACCEPTANCE_107",
+    "patchBundleCheck": "success",
+    "patchApplySyntax": "success",
+    "predecessorArtifact": "success",
+    "sourceAcceptance107": "failure"
+  },
   "sourceOnly": true,
   "runtime": false,
   "browser": false,
@@ -17,7 +28,7 @@
   "production": false,
   "main": false,
   "merge": false,
-  "rootCauseResolution": "ENUMERATE_TRACKED_PLUS_UNTRACKED_EXACT_EXPECTED_SET",
+  "rootCauseResolution": "IDENTIFY_SOURCE_ACCEPTANCE_107_EXACT_FAILURE",
   "containsPII": false,
   "containsSecrets": false
 }
