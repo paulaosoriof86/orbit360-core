@@ -14,6 +14,8 @@
   "triggerMechanism": "WORKFLOW_FILE_SELF_REGISTERING_PUSH",
   "activationParentBinding": "GITHUB_EVENT_BEFORE_HEAD_PARENT",
   "expectedParentMode": "GITHUB_EVENT_BEFORE",
+  "activationWorkflowTemplatePath": ".github/orbit360-workflow-templates/orbit360-continuity-canonical-source-only-v3r1-20260821.yml",
+  "activationWorkflowTemplateSha256": "e44c7a994bc09233f1fcde59f1a379b62aa269e87b7b49a78fbc7c180337f42f",
   "ownerSafeHead": "961e74e2aa24af744ae9026b9e68624993fe6f57",
   "reopenedAfterStopRetry": true,
   "rootCausePreflightRequired": true,
@@ -53,7 +55,7 @@
       "role": "pre",
       "encoding": "plain",
       "path": ".github/orbit360-source-patches/macro2-v20260821/macro2-v3r1-pre.sh",
-      "sha256": "6af25c5c21d3645ee88c468f7aefa947d609b9ef6ea41685a156031fe5af3f73"
+      "sha256": "853fb21cae0d9d1dc0cf3612d121ade47370d791135ad67823457b4eec324efb"
     },
     {
       "role": "post",
