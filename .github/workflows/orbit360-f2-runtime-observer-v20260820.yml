@@ -32,7 +32,6 @@ jobs:
           test -f "$TARGET_PATH"
           test "$(jq -r '.authorizationIdentityDigest' "$TARGET_PATH")" = "$(jq -r '.authorizationIdentityDigest' "$REQUEST")"
           test "$(jq -r '.requestVersion' "$TARGET_PATH")" = 'F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_V2'
-          test "$(jq -r '.consumed' "$TARGET_PATH")" = 'false'
           test "$(jq -r '.replayAllowed' "$TARGET_PATH")" = 'false'
           echo "OBSERVER_REQUEST=$REQUEST" >> "$GITHUB_ENV"
           echo "TARGET_PATH=$TARGET_PATH" >> "$GITHUB_ENV"
@@ -49,6 +48,23 @@ jobs:
           API="https://api.github.com/repos/${GITHUB_REPOSITORY}"
           RUNTIME_NAME='Orbit360 F2 Productive Acceptance Runtime Browser Readonly 20260818'
           CONTROL_NAME='Orbit360 Continuity Canonical Source Only'
+          OUT="orbit360-platform/runtime-gate-crm-v20260716/f2-runtime-observer-dispatch-${AUTH_SHORT}-v20260820.json"
+          FINAL_COPY="orbit360-platform/runtime-gate-crm-v20260716/f2-runtime-terminal-dispatch-${AUTH_SHORT}-v20260820.json"
+          mkdir -p "$(dirname "$OUT")"
+
+          # Terminal evidence is monotonic. Once a safe terminal result is sealed for this request/artifact,
+          # a later diagnostic cut may not downgrade it to pending/not-found or bind it to a later control-plane run.
+          if [ -f "$FINAL_COPY" ] && jq -e --arg request "$TARGET_PATH" --argjson artifact "$(jq -r '.candidateArtifactId' "$TARGET_PATH")" '.request==$request and (.candidateArtifactId|tonumber)==$artifact and (.runId|tostring|length)>0 and (.classification|length)>0 and .containsPII==false and .containsSecrets==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0' "$FINAL_COPY" >/dev/null 2>&1; then
+            echo '{"ok":true,"status":"TERMINAL_EVIDENCE_ALREADY_SEALED_NO_DOWNGRADE","sourceOnlyObserver":true,"runtimeExecutedByObserver":false,"browserExecutedByObserver":false,"secretAccessByObserver":false,"firestoreReadByObserver":false,"writesByObserver":0}'
+            exit 0
+          fi
+
+          # A consumed/historical request is also terminal and must never be re-observed as an active runtime request.
+          if [ "$(jq -r '.consumed // false' "$TARGET_PATH")" = 'true' ] || [ "$(jq -r '.historical // false' "$TARGET_PATH")" = 'true' ]; then
+            echo '{"ok":true,"status":"REQUEST_ALREADY_CONSUMED_NO_OBSERVER_DOWNGRADE","sourceOnlyObserver":true,"runtimeExecutedByObserver":false,"writesByObserver":0}'
+            exit 0
+          fi
+
           curl -fsSL -H "Authorization: Bearer $GH_TOKEN" -H 'Accept: application/vnd.github+json' -H 'X-GitHub-Api-Version: 2022-11-28' "$API/actions/runs?branch=$BRANCH&per_page=100" -o "$RUNNER_TEMP/runs.json"
           RUN_ID="$(jq -r --arg since "$NOT_BEFORE" --arg branch "$BRANCH" --arg name "$RUNTIME_NAME" '[.workflow_runs[]|select(.name==$name and .event=="workflow_dispatch" and .head_branch==$branch and .created_at >= $since)]|sort_by(.created_at)|reverse|.[0].id // empty' "$RUNNER_TEMP/runs.json")"
           CONTROL_ID="$(jq -r --arg since "$NOT_BEFORE" --arg branch "$BRANCH" --arg name "$CONTROL_NAME" '[.workflow_runs[]|select(.name==$name and .head_branch==$branch and .created_at >= $since)]|sort_by(.created_at)|reverse|.[0].id // empty' "$RUNNER_TEMP/runs.json")"
@@ -63,9 +79,6 @@ jobs:
             CONTROL_CONCLUSION="$(jq -r --argjson id "$CONTROL_ID" '.workflow_runs[]|select(.id==$id)|.conclusion // ""' "$RUNNER_TEMP/runs.json")"
             CONTROL_HEAD="$(jq -r --argjson id "$CONTROL_ID" '.workflow_runs[]|select(.id==$id)|.head_sha // ""' "$RUNNER_TEMP/runs.json")"
           fi
-          OUT="orbit360-platform/runtime-gate-crm-v20260716/f2-runtime-observer-dispatch-${AUTH_SHORT}-v20260820.json"
-          FINAL_COPY="orbit360-platform/runtime-gate-crm-v20260716/f2-runtime-terminal-dispatch-${AUTH_SHORT}-v20260820.json"
-          mkdir -p "$(dirname "$OUT")"
           TERMINAL_OK=false; TERMINAL_STATUS='RUNTIME_RUN_NOT_FOUND'; CLASS='PIPELINE_MECHANISM_FAILURE'; ARTIFACT_ID=''; ARTIFACT_DIGEST=''
           if [ -n "$RUN_ID" ]; then
             if [ "$STATUS" != 'completed' ]; then
@@ -91,6 +104,7 @@ jobs:
           git config user.name 'orbit360-f2-runtime-observer-bot'
           git config user.email 'orbit360-f2-runtime-observer-bot@users.noreply.github.com'
           git add "$OUT"; [ -f "$FINAL_COPY" ] && git add "$FINAL_COPY"
+          git diff --cached --quiet && { echo OBSERVER_NO_CHANGE; exit 0; }
           git commit -m "evidence(f2): persist immediate workflow-dispatch diagnostic ${AUTH_SHORT} [skip ci]"
           git pull --rebase origin ays/backend-tenant-lab-v99-20260703
           git push origin HEAD:ays/backend-tenant-lab-v99-20260703
