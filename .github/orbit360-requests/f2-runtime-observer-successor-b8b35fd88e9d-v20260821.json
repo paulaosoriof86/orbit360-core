@@ -6,11 +6,12 @@
   "secrets": false,
   "firestoreRead": false,
   "writes": false,
-  "event": "push",
-  "notBeforeUtc": "2026-08-21T14:37:00Z",
+  "event": "workflow_dispatch",
+  "notBeforeUtc": "2026-08-21T14:40:30Z",
   "authorizationIdentityDigest": "b8b35fd88e9dc36a2b8a5770cd067b22142a218332faface5a9eb46262ff0ecb",
   "targetRequestPath": ".github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-successor-b8b35fd88e9d-v20260820.json",
   "targetMaterializationHead": "cee0ce27cdbbbc180904c1c0f2cb3ff3c082359f",
+  "validatorRootfixCommit": "35425eb3f9f7dc1b294336dcbec0666d0ea8c402",
   "containsPII": false,
   "containsSecrets": false
 }
