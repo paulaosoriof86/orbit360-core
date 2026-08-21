@@ -1,14 +1,14 @@
 {
   "schemaVersion": "orbit360-f2-runtime-authorization-boundary-v1",
   "boundaryId": "ORBIT360-F2-RUNTIME-AUTHORIZATION-BOUNDARY-CURRENT",
-  "status": "PREPARED_SOURCE_ONLY_AWAITING_EXPLICIT_USER_AUTHORIZATION",
+  "status": "REQUEST_MATERIALIZED_SOURCE_ONLY_AWAITING_PREFLIGHT",
   "preparedAtUtc": "2026-08-21T02:59:07.540Z",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
-  "authorized": false,
-  "authorizationPersisted": false,
-  "requestMaterialized": false,
+  "authorized": true,
+  "authorizationPersisted": true,
+  "requestMaterialized": true,
   "runtimeAllowed": false,
   "gate": {
     "id": "f2-productive-acceptance-exact-successor-v20260818",
@@ -25,8 +25,8 @@
   },
   "controlPlane": {
     "stateVersion": "ORBIT360-F2-CONTINUITY-CURRENT",
-    "ledgerRevision": 22,
-    "packageRevision": 16,
+    "ledgerRevision": 24,
+    "packageRevision": 18,
     "packageStatus": "CLOSED_PASS",
     "controlPlaneClosure": "CLOSED_PASS_RECONCILED"
   },
@@ -107,5 +107,7 @@
     "replayAllowed": false
   },
   "containsPII": false,
-  "containsSecrets": false
+  "containsSecrets": false,
+  "authorizationRecordPath": ".github/orbit360-authorizations/f2-productive-acceptance-runtime-browser-readonly-auth-d1d79fdf5c07-v20260820.json",
+  "activeRequestPath": ".github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-successor-d1d79fdf5c07-v20260820.json"
 }

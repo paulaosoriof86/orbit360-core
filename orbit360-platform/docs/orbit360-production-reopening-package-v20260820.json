@@ -1,14 +1,14 @@
 {
   "schemaVersion": "orbit360-production-reopening-package-v1",
   "packageId": "ORBIT360-PRODUCTION-REOPENING-CURRENT",
-  "revision": 16,
+  "revision": 18,
   "createdAtUtc": "2026-08-20T13:50:00Z",
-  "updatedAtUtc": "2026-08-21T02:59:07.540Z",
+  "updatedAtUtc": "2026-08-21T03:42:54.340Z",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
   "status": "CLOSED_PASS",
-  "phase": "F2_RUNTIME_AUTHORIZATION_BOUNDARY_PREPARED_AWAITING_EXPLICIT_AUTHORIZATION",
+  "phase": "F2_RUNTIME_REQUEST_MATERIALIZED_AWAITING_PREFLIGHT",
   "controlPlaneHeadAtLock": "19811090a5df38c248e62a90e701f5b8f362d662",
   "canonicalLedger": "orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json",
   "checkpoint": "orbit360-platform/docs/CHECKPOINT-CONTROL-PLANE-HARDENING-20260820.md",
@@ -60,8 +60,8 @@
     "rule": "If package.status is not CLOSED_PASS, continue exactly from firstIncompleteStep. Do not reconstruct the roadmap, do not request runtime authorization, do not materialize a new request ordinal, and do not treat any older checkpoint, PR body, live-state projection or lifecycle nextAction as authority over this package and its canonical ledger binding.",
     "closedStepsMayBeRecheckedReadOnly": true,
     "closedStepsMayNotBeReprocessedWithoutNewEvidence": true,
-    "firstIncompleteStep": "F2-RUNTIME-AUTHORIZATION",
-    "nextActionExact": "AWAIT_EXPLICIT_F2_RUNTIME_AUTHORIZATION_ONE_SHOT"
+    "firstIncompleteStep": "F2-RUNTIME-PREFLIGHT",
+    "nextActionExact": "RUN_F2_SOURCE_AND_RUNTIME_PREFLIGHT_FAIL_CLOSED"
   },
   "steps": [
     {
@@ -254,13 +254,14 @@
   },
   "authorizationBoundary": {
     "path": "orbit360-platform/docs/orbit360-f2-runtime-authorization-boundary-v20260820.json",
-    "status": "PREPARED_SOURCE_ONLY_AWAITING_EXPLICIT_USER_AUTHORIZATION",
-    "ledgerRevision": 22,
-    "packageRevision": 16,
-    "authorizationIdentityDigest": "d1d79fdf5c07d7067ef5ed75dd715eddae0dd25b4d7b14c6933ca3257dd7973d",
-    "authorized": false,
-    "authorizationPersisted": false,
-    "requestMaterialized": false,
+    "status": "REQUEST_MATERIALIZED_SOURCE_ONLY_AWAITING_PREFLIGHT",
+    "ledgerRevision": 24,
+    "packageRevision": 18,
+    "authorized": true,
+    "authorizationPersisted": true,
+    "authorizationRecordPath": ".github/orbit360-authorizations/f2-productive-acceptance-runtime-browser-readonly-auth-d1d79fdf5c07-v20260820.json",
+    "requestMaterialized": true,
+    "activeRequestPath": ".github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-successor-d1d79fdf5c07-v20260820.json",
     "runtimeAllowed": false
   }
 }
