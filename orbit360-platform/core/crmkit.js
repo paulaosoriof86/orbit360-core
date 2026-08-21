@@ -46,11 +46,16 @@ Orbit.kit = (function () {
     }).join('') + '</div>';
   }
   function clienteCell(cliId) {
-    const c = S().get('clientes', cliId); if (!c) return '—';
-    return `<a style="display:flex;align-items:center;gap:10px;cursor:pointer" onclick="event.stopPropagation();location.hash='#/cliente360?c=${c.id}'">
-      ${U.avatar(c.nombre, c.tipo === 'Empresa' ? '#1E2227' : '#C5162E', 'sm')}
-      <span style="min-width:0"><span style="font-weight:600;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px">${U.esc(c.nombre)}</span>
-      <span class="muted" style="font-size:11px">${c.tipo} · ${c.pais}</span></span></a>`;
+    const projected = Orbit.clientProjection && typeof Orbit.clientProjection.get === 'function' ? Orbit.clientProjection.get(cliId) : null;
+    const c = projected || S().get('clientes', cliId); if (!c) return '—';
+    const nombre = c.nombre || 'Cliente';
+    const tipo = c.tipo || 'Pendiente de completar';
+    const pais = c.pais || '';
+    const meta = pais ? `${U.esc(tipo)} · ${U.esc(pais)}` : U.esc(tipo);
+    return `<a style="display:flex;align-items:center;gap:10px;cursor:pointer" onclick="event.stopPropagation();location.hash='#/cliente360?c=${U.esc(c.id || cliId || '')}'">
+      ${U.avatar(nombre, tipo === 'Empresa' ? '#1E2227' : '#C5162E', 'sm')}
+      <span style="min-width:0"><span style="font-weight:600;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px">${U.esc(nombre)}</span>
+      <span class="muted" style="font-size:11px">${meta}</span></span></a>`;
   }
   function asesorCell(aseId) {
     const a = q.asesor(aseId); if (!a) return '—';
@@ -123,7 +128,7 @@ Orbit.kpi = function (preset, arg) {
       rows = arr.map(c => ({ cells: [cliName(c.clienteId), c.cuota || '—', money(c.monto, c.moneda), U.fmtDate(c.vence), badge(c.estado)], go: () => { location.hash = '#/cliente360?c=' + c.clienteId; } }));
     } else if (tipo === 'cancel') {
       cols = ['Cliente', 'Motivo', 'Valor perdido', 'Fecha'];
-      rows = arr.map(c => ({ cells: [cliName(c.clienteId), c.motivo || '—', money(c.valorPerdido, c.moneda), U.fmtDate(c.fecha)], go: () => { location.hash = '#/cliente360?c=' + c.clienteId; } }));
+      rows = arr.map(c => ({ cells: [cliName(c.clienteId), c.motivo || '—', money(c.valorPerdido, c.moneda), U.fmtDate(c.fecha), badge(c.estado)], go: () => { location.hash = '#/cliente360?c=' + c.clienteId; } }));
     } else if (tipo === 'reclamo') {
       cols = ['Cliente', 'N°', 'Tipo', 'Estado'];
       rows = arr.map(r => ({ cells: [cliName(r.clienteId), r.numero || '—', r.tipo || '—', badge(r.estado)], go: () => { location.hash = '#/cliente360?c=' + r.clienteId; } }));
