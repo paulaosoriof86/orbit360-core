@@ -19,6 +19,9 @@
   "oneShot": true,
   "replayAllowed": false,
   "canonicalTriggerRevision": 1,
+  "mechanismRevision": 2,
+  "writerRegistryRevision": 9,
+  "retryReason": "ROOT_CAUSE_SINGLE_WRITER_REGISTRY_SYNC",
   "publicationOwner": ".github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml",
   "containsPII": false,
   "containsSecrets": false
