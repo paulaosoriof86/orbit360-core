@@ -1,5 +1,33 @@
 #!/usr/bin/env bash
 set -euo pipefail
+
+source_aware_diff_check(){
+  local mode="${1:-worktree}"
+  local -a md=()
+  if [ "$mode" = 'staged' ]; then
+    git diff --cached --check -- . ':(exclude,glob)**/*.md'
+    mapfile -t md < <(git diff --cached --name-only -- ':(glob)**/*.md')
+  else
+    git diff --check -- . ':(exclude,glob)**/*.md'
+    mapfile -t md < <(git diff --name-only -- ':(glob)**/*.md')
+  fi
+  if ((${#md[@]})); then
+    node - "${md[@]}" <<'NODE'
+const fs=require('fs');
+const bad=[];
+for(const f of process.argv.slice(2)){
+  if(!fs.existsSync(f)) continue;
+  const lines=fs.readFileSync(f,'utf8').split(/\n/);
+  lines.forEach((line,i)=>{
+    const m=line.match(/[ \t]+$/);
+    if(m && m[0] !== '  ') bad.push(`${f}:${i+1}:${JSON.stringify(m[0])}`);
+  });
+}
+if(bad.length){console.error('MARKDOWN_TRAILING_WHITESPACE_INVALID\n'+bad.join('\n'));process.exit(41);}
+NODE
+  fi
+}
+
 # STAGE: Mandatory Macro-2 durable pipeline preflight
 set -euo pipefail
 test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
@@ -16,6 +44,9 @@ DOCS_PATCH="$RUNNER_TEMP/macro2-docs.patch"
 gzip -dc "$(jq -r '.patchSets[]|select(.name=="product")|.gzipPath' "$MACRO2_REQUEST")" > "$PRODUCT_PATCH"
 gzip -dc "$(jq -r '.patchSets[]|select(.name=="tools")|.gzipPath' "$MACRO2_REQUEST")" > "$TOOLS_PATCH"
 gzip -dc "$(jq -r '.patchSets[]|select(.name=="docs")|.gzipPath' "$MACRO2_REQUEST")" > "$DOCS_PATCH"
+git apply --check "$PRODUCT_PATCH"
+git apply --check "$TOOLS_PATCH"
+git apply --check "$DOCS_PATCH"
 echo "PRODUCT_PATCH=$PRODUCT_PATCH" >> "$GITHUB_ENV"
 echo "TOOLS_PATCH=$TOOLS_PATCH" >> "$GITHUB_ENV"
 echo "DOCS_PATCH=$DOCS_PATCH" >> "$GITHUB_ENV"
@@ -51,7 +82,7 @@ node --check tools/orbit360-promote-macro2-transversal-candidate-v20260821.mjs
 node --check tools/orbit360-test-macro2-transversal-source-acceptance-v20260821.mjs
 node --check tools/orbit360-documentation-state-discovery-v20260821.mjs
 for f in orbit360-platform/core/ui.js orbit360-platform/core/queries.js orbit360-platform/core/client-canonical-view-projection-v20260716.js orbit360-platform/core/ciclo.js orbit360-platform/data/store-firestore-product-readonly-p0.js orbit360-platform/modules/inicio.js orbit360-platform/modules/cliente360.js orbit360-platform/modules/aseguradoras.js orbit360-platform/modules/cobros.js; do node --check "$f"; done
-git diff --check
+source_aware_diff_check worktree
 
 # STAGE: Download exact predecessor artifact 9433944723
 set -euo pipefail
@@ -85,7 +116,7 @@ set -euo pipefail
 git config user.name 'orbit360-control-plane'
 git config user.email 'orbit360-control-plane@users.noreply.github.com'
 git add -- orbit360-platform/core/ui.js orbit360-platform/core/queries.js orbit360-platform/core/client-canonical-view-projection-v20260716.js orbit360-platform/core/ciclo.js orbit360-platform/data/store-firestore-product-readonly-p0.js orbit360-platform/modules/inicio.js orbit360-platform/modules/cliente360.js orbit360-platform/modules/aseguradoras.js orbit360-platform/modules/cobros.js orbit360-platform/docs/ACADEMIA-ACTUALIZACION-MACRO2-READMODEL-SEGURO-Y-PERFORMANCE-20260821.md orbit360-platform/docs/CLAUDE-ACUMULADO-MACRO2-READMODEL-SEGURO-20260821.md tools/orbit360-build-macro2-transversal-successor-v20260821.mjs tools/orbit360-promote-macro2-transversal-candidate-v20260821.mjs tools/orbit360-test-macro2-transversal-source-acceptance-v20260821.mjs tools/orbit360-documentation-state-discovery-v20260821.mjs
-git diff --cached --check
+source_aware_diff_check staged
 git commit -m 'fix(macro2): transversal safe read-model source acceptance'
 SOURCE_HEAD=$(git rev-parse HEAD)
 echo "SOURCE_HEAD=$SOURCE_HEAD" >> "$GITHUB_ENV"
@@ -94,9 +125,7 @@ echo "SOURCE_HEAD=$SOURCE_HEAD" >> "$GITHUB_ENV"
 set -euo pipefail
 OWNER_SAFE_HEAD=$(jq -r '.ownerSafeHead' "$MACRO2_REQUEST")
 test "$OWNER_SAFE_HEAD" != ""
-git show "$OWNER_SAFE_HEAD:.github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml" > .github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml
-git add -- .github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml
-git commit --amend --no-edit
+# Permanent canonical listener remains registered; source push does not touch workflow path and cannot retrigger.
 SOURCE_HEAD=$(git rev-parse HEAD)
 echo "SOURCE_HEAD=$SOURCE_HEAD" >> "$GITHUB_ENV"
 git fetch origin "$ORBIT360_BRANCH"
