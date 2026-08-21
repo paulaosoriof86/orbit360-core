@@ -56,3 +56,62 @@ Por eso el refresh durable debe cerrar en una sola secuencia source-only: transi
 
 ## Regla de continuidad
 Una conversación nueva debe iniciar en `orbit360-continuity-ledger-v20260820.json`, validar el writer registry, leer package + authorization boundary y verificar HEAD real. Nunca debe inferir el estado actual desde el número del último Request, desde un artifact histórico ni desde un PR body no proyectado.
+
+---
+
+## Actualización 2026-08-21 — Macro-iteración 1 y certificación dinámica
+
+### Defecto funcional real vs. instrumento obsoleto
+
+El runtime F2 `32444530576` demostró un `FUNCTIONAL_DEFECT` real: Pólizas podía mostrar `undefined/NaN` porque `core/crmkit.js::clienteCell()` consumía el registro bruto del cliente y renderizaba `tipo` y `pais` sin una proyección/fallback honesto. El fix correcto fue de producto y quedó certificado en la candidata `9433944723`, cuyo único delta es `core/crmkit.js`.
+
+Después del fix apareció una clase diferente de problema que no debía confundirse con el producto: cuatro consumidores activos —workflow runtime, gate engine, source validator y selftest— seguían fijados a la evidencia de certificación histórica del artifact `9395391426`. Eso se clasificó `VALIDATOR_STALE:CANONICAL_CERTIFICATION_POINTER_NOT_DYNAMIC`.
+
+La enseñanza es binaria: cuando la UI demuestra un defecto real, se corrige el producto; cuando la candidata correcta ya existe pero el instrumento sigue comparando contra una certificación histórica, se congela el producto y se corrige el validador.
+
+### Regla nueva: una sola autoridad de candidata y certificación
+
+La F2 authority `tools/orbit360-gate-contract-f2-productive-acceptance-v20260820.json` pasa a ser la fuente única tanto de identidad de candidata como de `candidateCertificationEvidence`.
+
+Los consumidores activos deben resolver dinámicamente desde esa authority:
+
+- artifactId;
+- sourceHead;
+- artifactDigest;
+- zipSha256;
+- manifestSha256;
+- fileCount;
+- path de evidencia de certificación.
+
+Una copia de `candidate` dentro del gate registry puede existir por compatibilidad/historia, pero no es autoridad operacional. El invariant debe comprobar el puntero del registry hacia la authority y la coherencia ledger↔authority↔boundary, no reconstruir una segunda fuente viva de candidata.
+
+También queda prohibido que un validador activo contenga como literal la ruta de una certificación histórica concreta cuando la candidata vigente puede cambiar.
+
+### Promoción source-only y rescate CAS
+
+La candidata `9433944723` fue promovida a candidata canónica sin ejecutar runtime. Los intentos de materializar la promoción mediante GitHub Actions no produjeron la transición esperada; la clasificación fue `PIPELINE_MECHANISM_FAILURE:ACTIONS_PROMOTION_TRIGGER_NOT_MATERIALIZED`.
+
+La regla de no bucle impidió crear una sucesión de workflows o requests. Se utilizó un rescate source-only mediante árbol Git atómico + CAS externo, conservando las mismas autoridades, revisiones y proyecciones canónicas. El resultado quedó en:
+
+`orbit360-platform/runtime-gate-crm-v20260716/f2-functional-defect-successor-promotion-v20260820.json`
+
+El rescate avanzó ledger `24 → 25` y package `18 → 19`, dejó artifact `9433944723` como candidata canónica y mantuvo browser/runtime/secrets/Firestore/writes/deploy/producción en false/0.
+
+### Nueva frontera de autorización
+
+La nueva authorization identity es:
+
+`b8b35fd88e9dc36a2b8a5770cd067b22142a218332faface5a9eb46262ff0ecb`
+
+Está ligada a la candidata `9433944723`, ledger 25, package 19 y al execution profile F2 read-only. Mientras no exista autorización explícita para ese digest:
+
+- `authorized=false`;
+- `authorizationPersisted=false`;
+- `requestMaterialized=false`;
+- `runtimeAllowed=false`.
+
+La autorización anterior `d1d79fdf...` y su request permanecen históricos, consumidos y sin replay. Un cambio de candidata exige una identidad nueva; nunca se arrastra autorización entre artifacts.
+
+### Cierre académico de Macro-iteración 1
+
+Macro-iteración 1 queda `CLOSED_PASS` cuando ledger/package/authority/boundary/proyecciones/documentación y PR real muestran el mismo estado. El siguiente bloque no es otro diagnóstico ni otra promoción: es Macro-iteración 2, que comienza únicamente con autorización explícita one-shot para el digest fresco y obliga a ejecutar primero el gate contractual antes de secrets, Firestore, browser o runtime.

@@ -237,3 +237,55 @@ El plan no busca seguir diagnosticando indefinidamente. Busca una secuencia bina
 `9433944723 PROMOTED` → `FRESH AUTH DIGEST` → `F2_TERMINAL_PASS` → `AUTHORIZED GO-LIVE` → `PRODUCTION SMOKE PASS`.
 
 Cualquier desviación debe clasificarse antes de corregir y debe volver a esta secuencia, no crear una ruta paralela.
+
+---
+
+## 10. ACTUALIZACIÓN DE CIERRE — MACRO-ITERACIÓN 1 — 2026-08-21
+
+**Estado:** `CLOSED_PASS`.
+
+Esta actualización es posterior al estado de congelación original y **prevalece operacionalmente sobre las frases históricas de las secciones 2, 4 y 7 que describían la promoción como pendiente**. Se preservan esas frases únicamente como trazabilidad del punto de partida del plan.
+
+### Resultado verificado
+
+- candidata canónica vigente: artifact `9433944723`;
+- source: `c3bb825da2b1ecae08dabc2034c753482b086fec`;
+- artifact digest: `25228e96490004de39dfba685673c80247ce9e7046d7eeff1cde642e4c673643`;
+- certificación activa: `orbit360-platform/runtime-gate-crm-v20260716/f2-successor-client-projection-rootfix-v20260820.json`;
+- ledger: `24 → 25`;
+- package: `18 → 19`, `CLOSED_PASS`;
+- authorization boundary: `PREPARED_SOURCE_ONLY_AWAITING_EXPLICIT_USER_AUTHORIZATION`;
+- authorization identity SHA-256: `b8b35fd88e9dc36a2b8a5770cd067b22142a218332faface5a9eb46262ff0ecb`;
+- `authorized:false`;
+- `authorizationPersisted:false`;
+- `requestMaterialized:false`;
+- `runtimeAllowed:false`;
+- deploy/publicación/producción/main/merge: no autorizados.
+
+La autorización/request ligados a `d1d79fdf...` y el runtime `32444530576` permanecen históricos, consumidos, `allowedExecutions=0` y `replayAllowed=false`.
+
+### Causa raíz adicional cerrada dentro de Macro-1
+
+Se identificó `VALIDATOR_STALE:CANONICAL_CERTIFICATION_POINTER_NOT_DYNAMIC`: el workflow runtime, el gate engine, el source validator y el selftest conservaban un literal hacia la certificación histórica del artifact `9395391426`. La corrección source-only establece:
+
+1. `tools/orbit360-gate-contract-f2-productive-acceptance-v20260820.json` como autoridad única de candidata y certificación activa;
+2. `candidateCertificationEvidence` resuelto dinámicamente desde esa authority;
+3. los campos `candidate` duplicados del gate registry F2 dejan de ser autoritativos;
+4. los validadores activos no pueden depender de un literal de certificación histórica;
+5. el selftest verifica además el rootfix de `core/crmkit.js`.
+
+### Mecanismo de promoción
+
+Los intentos de promoción por Actions no materializaron la transición. Se clasificó `PIPELINE_MECHANISM_FAILURE:ACTIONS_PROMOTION_TRIGGER_NOT_MATERIALIZED`. No se hizo un tercer retry. La promoción se cerró mediante árbol Git atómico + CAS externo, reutilizando el estado, bindings y proyección canónicos, con evidencia sanitizada `ok:true` en:
+
+`orbit360-platform/runtime-gate-crm-v20260716/f2-functional-defect-successor-promotion-v20260820.json`
+
+La promoción CAS no ejecutó browser, runtime, secrets ni Firestore; registró cero writes y no ejecutó deploy ni tocó producción.
+
+### Siguiente acción exacta vigente
+
+`AWAIT_EXPLICIT_F2_RUNTIME_AUTHORIZATION_ONE_SHOT`
+
+La primera macro-iteración ya no debe reabrirse ni repetirse sin nueva evidencia material. El siguiente bloque es **Macro-iteración 2 — autorización fresca + F2 FINAL**, y requiere autorización explícita ligada únicamente al digest:
+
+`b8b35fd88e9dc36a2b8a5770cd067b22142a218332faface5a9eb46262ff0ecb`
