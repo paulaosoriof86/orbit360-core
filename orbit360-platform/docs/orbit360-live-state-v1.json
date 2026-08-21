@@ -1,7 +1,7 @@
 {
   "schemaVersion": "orbit360-live-state-v1",
   "stateVersion": "ORBIT360-F2-CONTINUITY-CURRENT",
-  "updatedAt": "2026-08-20T18:03:49.599Z",
+  "updatedAt": "2026-08-21T03:18:28.000Z",
   "phase": "F2_RUNTIME_AUTHORIZATION_BOUNDARY_PREPARED_AWAITING_EXPLICIT_AUTHORIZATION",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -14,7 +14,7 @@
   "canonicalCurrent": {
     "stateVersion": "ORBIT360-F2-CONTINUITY-CURRENT",
     "status": "F2_RUNTIME_AUTHORIZATION_NOT_YET_GRANTED",
-    "rootCauseStatus": "CONTROL_PLANE_HARDENING_CLOSED_PASS_CP11_BOUNDARY_READY"
+    "rootCauseStatus": "VALIDATOR_STALE_ROUTE_READINESS_CAPTURE_CONTRADICTION_FIXED_AWAITING_FRESH_AUTHORIZATION"
   },
   "authorization": {
     "activeRuntimeAuthorization": false,
@@ -41,7 +41,7 @@
   },
   "nextActionExact": {
     "id": "AWAIT_EXPLICIT_F2_RUNTIME_AUTHORIZATION_ONE_SHOT",
-    "description": "Await one fresh explicit user authorization bound to the prepared CP11 authorization identity. Do not materialize a runtime request before that authorization.",
+    "description": "Await one fresh explicit user authorization bound to the newly prepared F2 authorization identity. Prior runtime authorization and request remain historical with replay forbidden.",
     "runtimeAllowed": false
   },
   "lanes": {
@@ -58,7 +58,7 @@
   "activeState": {
     "phase": "F2_RUNTIME_AUTHORIZATION_BOUNDARY_PREPARED_AWAITING_EXPLICIT_AUTHORIZATION",
     "status": "F2_RUNTIME_AUTHORIZATION_NOT_YET_GRANTED",
-    "rootCauseStatus": "CONTROL_PLANE_HARDENING_CLOSED_PASS_CP11_BOUNDARY_READY",
+    "rootCauseStatus": "VALIDATOR_STALE_ROUTE_READINESS_CAPTURE_CONTRADICTION_FIXED_AWAITING_FRESH_AUTHORIZATION",
     "productFrozen": true,
     "dataFrozen": true,
     "runtimeAuthorized": false,

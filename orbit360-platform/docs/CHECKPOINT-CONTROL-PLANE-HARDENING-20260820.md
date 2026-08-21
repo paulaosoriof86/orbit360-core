@@ -1,10 +1,10 @@
 # CHECKPOINT — CP11 AUTHORIZATION BOUNDARY READY
 
-Fecha UTC: 2026-08-20T18:03:49.599Z  
+Fecha UTC: 2026-08-21T03:18:28.000Z  
 Rama obligatoria: `ays/backend-tenant-lab-v99-20260703`  
 PR #5: draft/open  
-Package: `CLOSED_PASS` revision `12`  
-Ledger: revision `18`
+Package: `CLOSED_PASS` revision `16`  
+Ledger: revision `22`
 
 ## Estado canónico
 - StateVersion: `ORBIT360-F2-CONTINUITY-CURRENT`.

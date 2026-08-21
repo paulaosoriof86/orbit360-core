@@ -1,6 +1,6 @@
 {
   "schemaVersion": "orbit360-current-documentation-index-v1",
-  "updatedAt": "2026-08-20T18:03:49.599Z",
+  "updatedAt": "2026-08-21T03:18:28.000Z",
   "status": "CURRENT_BINDING_INDEX_CP11_BOUNDARY_READY",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -11,7 +11,7 @@
   "canonicalCurrent": {
     "stateVersion": "ORBIT360-F2-CONTINUITY-CURRENT",
     "status": "F2_RUNTIME_AUTHORIZATION_NOT_YET_GRANTED",
-    "rootCauseStatus": "CONTROL_PLANE_HARDENING_CLOSED_PASS_CP11_BOUNDARY_READY"
+    "rootCauseStatus": "VALIDATOR_STALE_ROUTE_READINESS_CAPTURE_CONTRADICTION_FIXED_AWAITING_FRESH_AUTHORIZATION"
   },
   "readOrder": [
     "bindingRules",
