@@ -1,7 +1,7 @@
 name: Orbit360 Continuity Canonical Source Only
 # DEFINITIVE SINGLE PHYSICAL WRITER — 2026-08-21.
-# Macro-2 source application/build/promotion is handled by this same canonical owner.
-# No product runtime/browser/secrets/Firestore/deploy/production in Macro-2.
+# Explicit-dispatch only. No runtime/browser/secrets/Firestore/deploy.
+# Historical workflows are preserved under .github/workflows-history-20260821/ and are not executable.
 
 on:
   workflow_dispatch:
@@ -10,14 +10,9 @@ on:
         description: 'Explicit source-only transition identifier'
         required: true
         type: string
-  push:
-    branches: [ays/backend-tenant-lab-v99-20260703]
-    paths:
-      - '.github/orbit360-requests/macro2-transversal-source-apply-v20260821.json'
 
 permissions:
   contents: write
-  actions: read
   pull-requests: write
   statuses: write
 
@@ -25,19 +20,8 @@ concurrency:
   group: orbit360-continuity-canonical-ays
   cancel-in-progress: false
 
-env:
-  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
-  MACRO1_HEAD: 397da1595fbdf156096c98d37343d9076d3cd8a0
-  MACRO2_REQUEST: .github/orbit360-requests/macro2-transversal-source-apply-v20260821.json
-  MACRO2_PATCH_BUNDLE_DIR: .github/orbit360-source-patches/macro2-v20260821
-  BASE_ARTIFACT_ID: '9433944723'
-  BASE_SOURCE_HEAD: c3bb825da2b1ecae08dabc2034c753482b086fec
-  BASE_ZIP_SHA256: 1951cc7c2d3390ea1c2a6b3d9ce0bb48e26a6f95d5d10d69b7c31a0027cfbbac
-  BASE_MANIFEST_SHA256: 580921077a88badab6e4076c42e9ef88f9de7936e1b6bad0f62410b39aec6397
-
 jobs:
   fail-closed-control-plane-owner:
-    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 3
     steps:
@@ -49,7 +33,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          test "${{ github.ref_name }}" = "$ORBIT360_BRANCH"
+          test "${{ github.ref_name }}" = 'ays/backend-tenant-lab-v99-20260703'
           case "${{ inputs.transition }}" in
             READBACK_ONLY)
               node tools/orbit360-control-plane-composite-invariant-v20260820.mjs
@@ -62,195 +46,3 @@ jobs:
               exit 41
               ;;
           esac
-
-  macro2-transversal-source-apply-build-promote:
-    if: github.event_name == 'push'
-    runs-on: ubuntu-24.04
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.sha }}
-          fetch-depth: 0
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-
-      - name: Validate one-shot Macro-2 source request and patch
-        shell: bash
-        run: |
-          set -euo pipefail
-          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
-          test "$(git rev-parse HEAD^)" = "$MACRO1_HEAD"
-          test -f "$MACRO2_REQUEST"
-          jq -e --arg parent "$MACRO1_HEAD" '.schemaVersion=="orbit360-macro2-source-apply-request-v1" and .status=="MATERIALIZED_SOURCE_ONLY" and .sourceOnly==true and .allowedExecutions==1 and .consumed==false and .historical==false and .replayAllowed==false and .expectedParentHead==$parent and (.patchSets|length)==3 and ([.patchSets[].name]|sort)==(["docs","product","tools"]|sort) and .runtime==false and .browser==false and .secrets==false and .firestoreRead==false and .writes==false and .deploy==false and .production==false and .containsPII==false and .containsSecrets==false' "$MACRO2_REQUEST" >/dev/null
-          while IFS=$'\t' read -r GZ GZSHA; do test -f "$GZ"; test "$(sha256sum "$GZ" | awk '{print $1}')" = "$GZSHA"; done < <(jq -r '.patchSets[] | [.gzipPath,.gzipSha256] | @tsv' "$MACRO2_REQUEST")
-          PRODUCT_PATCH="$RUNNER_TEMP/macro2-product.patch"; TOOLS_PATCH="$RUNNER_TEMP/macro2-tools.patch"; DOCS_PATCH="$RUNNER_TEMP/macro2-docs.patch"
-          gzip -dc "$(jq -r '.patchSets[]|select(.name=="product")|.gzipPath' "$MACRO2_REQUEST")" > "$PRODUCT_PATCH"
-          gzip -dc "$(jq -r '.patchSets[]|select(.name=="tools")|.gzipPath' "$MACRO2_REQUEST")" > "$TOOLS_PATCH"
-          gzip -dc "$(jq -r '.patchSets[]|select(.name=="docs")|.gzipPath' "$MACRO2_REQUEST")" > "$DOCS_PATCH"
-          test "$(sha256sum "$PRODUCT_PATCH" | awk '{print $1}')" = "$(jq -r '.patchSets[]|select(.name=="product")|.sha256' "$MACRO2_REQUEST")"
-          test "$(sha256sum "$TOOLS_PATCH" | awk '{print $1}')" = "$(jq -r '.patchSets[]|select(.name=="tools")|.sha256' "$MACRO2_REQUEST")"
-          test "$(sha256sum "$DOCS_PATCH" | awk '{print $1}')" = "$(jq -r '.patchSets[]|select(.name=="docs")|.sha256' "$MACRO2_REQUEST")"
-          git apply --check "$PRODUCT_PATCH"; git apply --check "$TOOLS_PATCH"; git apply --check "$DOCS_PATCH"
-          echo "PRODUCT_PATCH=$PRODUCT_PATCH" >> "$GITHUB_ENV"
-          echo "TOOLS_PATCH=$TOOLS_PATCH" >> "$GITHUB_ENV"
-          echo "DOCS_PATCH=$DOCS_PATCH" >> "$GITHUB_ENV"
-          jq -e '.activeState.status=="CONTROL_PLANE_DEFINITIVE_PASS" and .nextAction.id=="EXECUTE_MACRO2_TRANSVERSAL_SOURCE_ACCEPTANCE_AND_SINGLE_CANDIDATE" and .progress.productionRouteProgressPct==62 and .authorizationBoundary.activeRuntimeAuthorization==false and .authorizationBoundary.newRuntimeRequestAllowed==false' orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json >/dev/null
-          jq -e '.lock.stopRetry==true and .lock.runtimeAllowed==false and .lock.authorizationAllowed==false and .lock.requestMaterializationAllowed==false and .lock.secretAccessAllowed==false and .lock.firestoreReadAllowed==false and .lock.deployAllowed==false and .lock.productionAllowed==false' orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json >/dev/null
-          echo "START_HEAD=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
-
-      - name: Apply exact source-only patch and execute transversal acceptance
-        shell: bash
-        run: |
-          set -euo pipefail
-          git apply "$PRODUCT_PATCH"
-          git apply "$TOOLS_PATCH"
-          git apply "$DOCS_PATCH"
-          mapfile -t DELTA < <(git diff --name-only | sort)
-          cat > "$RUNNER_TEMP/expected-paths.txt" <<'EOF'
-          orbit360-platform/core/ciclo.js
-          orbit360-platform/core/client-canonical-view-projection-v20260716.js
-          orbit360-platform/core/queries.js
-          orbit360-platform/core/ui.js
-          orbit360-platform/data/store-firestore-product-readonly-p0.js
-          orbit360-platform/docs/ACADEMIA-ACTUALIZACION-MACRO2-READMODEL-SEGURO-Y-PERFORMANCE-20260821.md
-          orbit360-platform/docs/CLAUDE-ACUMULADO-MACRO2-READMODEL-SEGURO-20260821.md
-          orbit360-platform/modules/aseguradoras.js
-          orbit360-platform/modules/cliente360.js
-          orbit360-platform/modules/cobros.js
-          orbit360-platform/modules/inicio.js
-          tools/orbit360-build-macro2-transversal-successor-v20260821.mjs
-          tools/orbit360-documentation-state-discovery-v20260821.mjs
-          tools/orbit360-promote-macro2-transversal-candidate-v20260821.mjs
-          tools/orbit360-test-macro2-transversal-source-acceptance-v20260821.mjs
-          EOF
-          sed -i 's/^          //' "$RUNNER_TEMP/expected-paths.txt"
-          diff -u "$RUNNER_TEMP/expected-paths.txt" <(printf '%s\n' "${DELTA[@]}")
-          node --check tools/orbit360-build-macro2-transversal-successor-v20260821.mjs
-          node --check tools/orbit360-promote-macro2-transversal-candidate-v20260821.mjs
-          node --check tools/orbit360-test-macro2-transversal-source-acceptance-v20260821.mjs
-          node --check tools/orbit360-documentation-state-discovery-v20260821.mjs
-          for f in orbit360-platform/core/ui.js orbit360-platform/core/queries.js orbit360-platform/core/client-canonical-view-projection-v20260716.js orbit360-platform/core/ciclo.js orbit360-platform/data/store-firestore-product-readonly-p0.js orbit360-platform/modules/inicio.js orbit360-platform/modules/cliente360.js orbit360-platform/modules/aseguradoras.js orbit360-platform/modules/cobros.js; do node --check "$f"; done
-          git diff --check
-
-      - name: Download exact predecessor artifact 9433944723
-        env:
-          GH_TOKEN: ${{ github.token }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          OUTER="$RUNNER_TEMP/base-outer.zip"; OD="$RUNNER_TEMP/base-outer"; PRE="$RUNNER_TEMP/predecessor"
-          rm -rf "$OUTER" "$OD" "$PRE"; mkdir -p "$OD" "$PRE"
-          curl -L --fail --retry 3 -H "Authorization: Bearer $GH_TOKEN" -H 'Accept: application/vnd.github+json' -H 'X-GitHub-Api-Version: 2022-11-28' "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/${BASE_ARTIFACT_ID}/zip" -o "$OUTER"
-          unzip -q "$OUTER" -d "$OD"
-          mapfile -t FILES < <(find "$OD" -maxdepth 1 -type f -printf '%f\n' | sort)
-          test "${#FILES[@]}" = '1'
-          INNER="$OD/${FILES[0]}"
-          test "$(sha256sum "$INNER" | awk '{print $1}')" = "$BASE_ZIP_SHA256"
-          unzip -q "$INNER" -d "$PRI"
-          test "$(sha256sum "$PRE/orbit360-package-manifest.json" | awk '{print $1}')" = "$BASE_MANIFEST_SHA256"
-          test "$(jq -r '.sourceHead' "$PRE/orbit360-package-manifest.json")" = "$BASE_SOURCE_HEAD"
-          cp "$PRE/orbit360-package-manifest.json" "$RUNNER_TEMP/base-manifest.json"
-          echo "MACRO2_PRE=$PRE" >> "$GITHUB_ENV"
-          echo "MACRO2_BASE_MANIFEST=$RUNNER_TEMP/base-manifest.json" >> "$GITHUB_ENV"
-
-      - name: Source acceptance before candidate commit
-        shell: bash
-        run: |
-          set -euo pipefail
-          ORBIT360_MACRO2_CANDIDATE_DIR="$GITHUB_WORKSPACE/orbit360-platform" ORBIT360_MACRO2_BASE_MANIFEST="$MACRO2_BASE_MANIFEST" node tools/orbit360-test-macro2-transversal-source-acceptance-v20260821.mjs > "$RUNNER_TEMP/macro2-source-acceptance-precommit.json"
-          jq -e '.ok==true and .status=="TRANSVERSAL_SOURCE_ACCEPTANCE_PASS" and .checksPassed==107 and .checksTotal==107 and .performance.clients==414 and .performance.allPolizas==1 and .performance.wherePolizas==0' "$RUNNER_TEMP/macro2-source-acceptance-precommit.json" >/dev/null
-
-      - name: Create immutable local source commit
-        shell: bash
-        run: |
-          set -euo pipefail
-          git config user.name 'orbit360-control-plane'
-          git config user.email 'orbit360-control-plane@users.noreply.github.com'
-          git add -- orbit360-platform/core/ui.js orbit360-platform/core/queries.js orbit360-platform/core/client-canonical-view-projection-v20260716.js orbit360-platform/core/ciclo.js orbit360-platform/data/store-firestore-product-readonly-p0.js orbit360-platform/modules/inicio.js orbit360-platform/modules/cliente360.js orbit360-platform/modules/aseguradoras.js orbit360-platform/modules/cobros.js orbit360-platform/docs/ACADEMIA-ACTUALIZACION-MACRO2-READMODEL-SEGURO-Y-PERFORMANCE-20260821.md orbit360-platform/docs/CLAUDE-ACUMULADO-MACRO2-READMODEL-SEGURO-20260821.md tools/orbit360-build-macro2-transversal-successor-v20260821.mjs tools/orbit360-promote-macro2-transversal-candidate-v20260821.mjs tools/orbit360-test-macro2-transversal-source-acceptance-v20260821.mjs tools/orbit360-documentation-state-discovery-v20260821.mjs
-          git diff --cached --check
-          git commit -m 'fix(macro2): transversal safe read-model source acceptance'
-          echo "SOURCE_HEAD=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
-
-      - name: Build and revalidate single successor candidate
-        shell: bash
-        run: |
-          set -euo pipefail
-          OUT="$RUNNER_TEMP/macro2-successor"
-          ORBIT360_MACRO2_PREDECESSOR_DIR="$MACRO2_PRE" ORBIT360_MACRO2_SOURCE_ROOT="$GITHUB_WORKSPACE" ORBIT360_MACRO2_SUCCESSOR_DIR="$OUT" ORBIT360_MACRO2_SOURCE_HEAD="$SOURCE_HEAD" node tools/orbit360-build-macro2-transversal-successor-v20260821.mjs > "$RUNNER_TEMP/macro2-build.json"
-          jq -e '.ok==true and .status=="MACRO2_TRANSVERSAL_SUCCESSOR_BUILD_PASS" and .fileCount==194 and .deltaCount==9 and .unchangedFileCount==185 and .fullRehashPass==true and (.protectedTouched==["data/store-firestore-product-readonly-p0.js"])' "$RUNNER_TEMP/macro2-build.json" >/dev/null
-          ORBIT360_MACRO2_CANDIDATE_DIR="$OUT" ORBIT360_MACRO2_BASE_MANIFEST="$MACRO2_BASE_MANIFEST" node tools/orbit360-test-macro2-transversal-source-acceptance-v20260821.mjs > "$RUNNER_TEMP/macro2-source-acceptance-successor.json"
-          jq -e '.ok==true and .checksPassed==107 and .checksTotal==107 and .runtimeExecuted==false and .browserExecuted==false and .secretAccess==false and .firestoreRead==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0' "$RUNNER_TEMP/macro2-source-acceptance-successor.json" >/dev/null
-          cd "$OUT"; zip -qr "$RUNNER_TEMP/orbit360-macro2-transversal-${SOURCE_HEAD:0:12}.zip" .; cd - >/dev/null
-          echo "SUCCESSOR_DIR=$OUT" >> "$GITHUB_ENV"
-          echo "SUCCESSOR_ZIP=$RUNNER_TEMP/orbit360-macro2-transversal-${SOURCE_HEAD:0:12}.zip" >> "$GITHUB_ENV"
-          echo "SUCCESSOR_ZIP_SHA=$(sha256sum "$RUNNER_TEMP/orbit360-macro2-transversal-${SOURCE_HEAD:0:12}.zip" | awk '{print $1}')" >> "$GITHUB_ENV"
-          echo "SUCCESSOR_MANIFEST_SHA=$(sha256sum "$OUT/orbit360-package-manifest.json" | awk '{print $1}')" >> "$GITHUB_ENV"
-
-      - name: Upload single Macro-2 candidate
-        id: candidate
-        uses: actions/upload-artifact@v4
-        with:
-          name: orbit360-macro2-transversal-source-candidate-${{ github.run_id }}
-          path: ${{ env.SUCCESSOR_ZIP }}
-          retention-days: 30
-          compression-level: 0
-          if-no-files-found: error
-
-      - name: Promote candidate and prepare inert fresh authorization boundary
-        env:
-          ORBIT360_MACRO2_ARTIFACT_ID: ${{ steps.candidate.outputs.artifact-id }}
-          ORBIT360_MACRO2_ARTIFACT_DIGEST: ${{ steps.candidate.outputs.artifact-digest }}
-          ORBIT360_MACRO2_SOURCE_HEAD: ${{ env.SOURCE_HEAD }}
-          ORBIT360_MACRO2_ZIP_SHA256: ${{ env.SUCCESSOR_ZIP_SHA }}
-          ORBIT360_MACRO2_MANIFEST_SHA256: ${{ env.SUCCESSOR_MANIFEST_SHA }}
-          ORBIT360_MACRO2_RUN_ID: ${{ github.run_id }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          node tools/orbit360-promote-macro2-transversal-candidate-v20260821.mjs > "$RUNNER_TEMP/macro2-promotion.json"
-          jq -e '.ok==true and .status=="MACRO2_CANDIDATE_PROMOTION_SOURCE_ONLY_PASS" and .progress==75 and .authorized==false and .requestMaterialized==false and .runtimeAllowed==false' "$RUNNER_TEMP/macro2-promotion.json" >/dev/null
-          node tools/orbit360-continuity-projection-atomic-v20260820.mjs --expected-revision 30 > "$RUNNER_TEMP/macro2-projection.json"
-          node tools/orbit360-control-plane-composite-invariant-v20260820.mjs > "$RUNNER_TEMP/macro2-composite.json"
-          node tools/orbit360-control-plane-independent-readback-v20260820.mjs > "$RUNNER_TEMP/macro2-readback.json"
-          node tools/orbit360-workflow-operational-surface-audit-v20260820.mjs > "$RUNNER_TEMP/macro2-writer-audit.json"
-          node tools/orbit360-documentation-state-discovery-v20260821.mjs > "$RUNNER_TEMP/macro2-doc-discovery.json"
-          jq -e '.ok==true' "$RUNNER_TEMP/macro2-composite.json" >/dev/null
-          jq -e '.ok==true and .productionRouteProgressPct==75' "$RUNNER_TEMP/macro2-readback.json" >/dev/null
-          jq -e '.ok==true and .unauthorizedControlWorkflows==0' "$RUNNER_TEMP/macro2-writer-audit.json" >/dev/null
-          jq -e '.ok==true and (.offenders|length)==0' "$RUNNER_TEMP/macro2-doc-discovery.json" >/dev/null
-          node - <<'NODE'
-          const fs=require('fs'),crypto=require('crypto');const B=require('./orbit360-platform/docs/orbit360-f2-runtime-authorization-boundary-v20260820.json');const m={gateId:B.gate.id,gateContractVersion:B.gate.contractVersion,candidateArtifactId:B.candidate.artifactId,candidateArtifactDigest:B.candidate.artifactDigest,candidateSourceHead:B.candidate.sourceHead,ledgerRevision:B.controlPlane.ledgerRevision,packageRevision:B.controlPlane.packageRevision,executionProfile:B.requestedExecutionProfile};const d=crypto.createHash('sha256').update(JSON.stringify(m)).digest('hex');if(d!==B.authorizationIdentity.digest||B.authorized||B.authorizationPersisted||B.requestMaterialized||B.runtimeAllowed)process.exit(41);console.log(JSON.stringify({ok:true,status:'MACRO2_AUTH_IDENTITY_PREPARED_INERT_PASS',digest:d}));
-          NODE
-          git diff --check
-
-      - name: Create local promotion commit and final remote CAS
-        shell: bash
-        run: |
-          set -euo pipefail
-          git add -- .github/orbit360-requests/macro2-transversal-source-apply-v20260821.json orbit360-platform/docs orbit360-platform/runtime-gate-crm-v20260716 tools/orbit360-gate-contract-f2-productive-acceptance-v20260820.json tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-source-v20260819.json tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-runtime-v20260819.json README.md orbit360-platform/CHANGELOG.md
-          git diff --cached --check
-          git commit -m 'gate(macro2): promote transversal source candidate and prepare fresh auth'
-          FINAL_HEAD=$(git rev-parse HEAD)
-          git fetch origin "$ORBIT360_BRANCH"
-          test "$(git rev-parse origin/$ORBIT360_BRANCH)" = "$START_HEAD"
-          git push origin "HEAD:$ORBIT360_BRANCH"
-          echo "FINAL_HEAD=$FINAL_HEAD" >> "$GITHUB_ENV"
-
-      - name: Upload sanitized Macro-2 evidence
-        if: success()
-        uses: actions/upload-artifact@v4
-        with:
-          name: orbit360-macro2-transversal-source-evidence-${{ github.run_id }}
-          path: |
-            ${{ runner.temp }}/macro2-source-acceptance-precommit.json
-            ${{ runner.temp }}/macro2-build.json
-            ${{ runner.temp }}/macro2-source-acceptance-successor.json
-            ${{ runner.temp }}/macro2-promotion.json
-            ${{ runner.temp }}/macro2-composite.json
-            ${{ runner.temp }}/macro2-readback.json
-            ${{ runner.temp }}/macro2-writer-audit.json
-            ${{ runner.temp }}/macro2-doc-discovery.json
-          retention-days: 30
-          if-no-files-found: error

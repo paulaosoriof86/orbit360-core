@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "orbit360-macro2-pipeline-mechanism-failure-v1",
+  "ok": false,
+  "status": "MACRO2_CANONICAL_ACTION_BUILD_NOT_COMPLETED",
+  "classification": "PIPELINE_MECHANISM_FAILURE",
+  "code": "MACRO2_PREDECESSOR_EXTRACT_TARGET_TYPO_PRI",
+  "transportHead": "cdd0051e013ed01aacbc0bbaa1280fdb6d6b0e59",
+  "expectedVariable": "PRE",
+  "observedVariable": "PRI",
+  "runtimeExecuted": false,
+  "browserExecuted": false,
+  "secretAccess": false,
+  "firestoreRead": false,
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "operationalWrites": 0,
+  "deployExecuted": false,
+  "productionTouched": false,
+  "replayAllowed": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
