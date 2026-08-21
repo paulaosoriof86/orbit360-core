@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "orbit360-f2-materialization-mechanism-failure-v1",
+  "classification": "PIPELINE_MECHANISM_FAILURE",
+  "code": "MATERIALIZATION_COMMIT_NOT_ATOMIC",
+  "authorizationIdentityDigest": "b8b35fd88e9dc36a2b8a5770cd067b22142a218332faface5a9eb46262ff0ecb",
+  "authorizationCommit": "894b61296711cc31f724051f71c88a59f3d06384",
+  "requestCommit": "3c7e85f5b67aa4be7376426ee5af0ff879169951",
+  "gateReached": false,
+  "runtimeCapabilitiesOpened": false,
+  "secretAccess": false,
+  "firestoreRead": false,
+  "browserExecuted": false,
+  "writes": 0,
+  "deployExecuted": false,
+  "productionTouched": false,
+  "retryBudgetForSameStageRemaining": 1,
+  "containsPII": false,
+  "containsSecrets": false
+}
