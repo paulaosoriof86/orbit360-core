@@ -1,0 +1,37 @@
+{
+  "schemaVersion": "orbit360-macro2-ephemeral-listener-rootcause-v1",
+  "ok": false,
+  "status": "ROOT_CAUSE_FAMILY_CLOSED_SOURCE_ONLY",
+  "classification": "PIPELINE_MECHANISM_FAILURE",
+  "failureCode": "PIPELINE_MECHANISM_FAILURE:EPHEMERAL_SELF_REGISTERING_LISTENER_NOT_RELIABLY_OBSERVABLE",
+  "evidence": {
+    "v3r1c1ActivationCommit": "6e6e768fa53bbb41889f204e1bcf9c83c490c8c2",
+    "v3r1c1DurableSourceMaterialized": false,
+    "v3r1c1TerminalEvidence": "orbit360-platform/runtime-gate-crm-v20260716/macro2-v3r1c1-terminal-stop-retry-v20260821.json",
+    "firstStageDiagnosticRegistrationCommit": "1aeb99667eb89cf16e1586863d2b1c97402c9f4c",
+    "firstStageDiagnosticTriggerCommit": "5b010b07140f9b589af99af5e06f230b19dfa119",
+    "firstStageDiagnosticEvidenceMaterialized": false,
+    "diagnosticTimeoutMinutes": 8,
+    "safeOwnerRestoreCommit": "4ab495b63ba3705d770310b46b2bc37352144b0d",
+    "knownSuccessfulSelfWorkflowPushRunId": 32527157212
+  },
+  "rootCauseResolution": "PERMANENT_CANONICAL_FAIL_CLOSED_LISTENER_REQUIRED",
+  "rules": {
+    "ephemeralListenerToggleForbidden": true,
+    "parallelWorkflowForbidden": true,
+    "singlePhysicalWriterRequired": true,
+    "listenerMustRemainRegistered": true,
+    "inactiveStateMustFailClosed": true,
+    "activationMustBeDataDriven": true,
+    "everyRunMustPersistTerminalEvidence": true
+  },
+  "runtimeExecuted": false,
+  "browserExecuted": false,
+  "secretAccess": false,
+  "firestoreRead": false,
+  "writes": 0,
+  "deployExecuted": false,
+  "productionTouched": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
