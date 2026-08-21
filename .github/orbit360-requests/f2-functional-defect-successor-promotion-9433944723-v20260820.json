@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "orbit360-f2-functional-defect-successor-promotion-request-v1",
+  "requestId": "F2-FUNCTIONAL-ROOTFIX-PROMOTION-9433944723",
+  "approved": true,
+  "sourceOnly": true,
+  "runtime": false,
+  "browser": false,
+  "secrets": false,
+  "firestoreRead": false,
+  "writes": false,
+  "deploy": false,
+  "production": false,
+  "expectedLedgerRevision": 24,
+  "expectedPackageRevision": 18,
+  "candidateEvidence": "orbit360-platform/runtime-gate-crm-v20260716/f2-successor-client-projection-rootfix-v20260820.json",
+  "candidateArtifactId": 9433944723,
+  "candidateSourceHead": "c3bb825da2b1ecae08dabc2034c753482b086fec",
+  "plan": "orbit360-platform/docs/PLAN-CONGELADO-CIERRE-F2-Y-GO-LIVE-20260820.md",
+  "oneShot": true,
+  "replayAllowed": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
