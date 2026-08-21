@@ -84,7 +84,7 @@ jobs:
             mapfile -t REMOTE_DRIFT < <(git diff --name-only "$START_HEAD..$REMOTE_HEAD")
             for f in "${REMOTE_DRIFT[@]}"; do
               case "$f" in
-                .github/orbit360-requests/f2-runtime-observer-successor-*.json|.github/workflows/orbit360-f2-runtime-observer-v20260820.yml|orbit360-platform/runtime-gate-crm-v20260716/f2-runtime-observer-dispatch-*-v20260820.json|orbit360-platform/runtime-gate-crm-v20260716/f2-runtime-terminal-dispatch-*-v20260820.json) ;;
+                .github/orbit360-requests/f2-runtime-observer-successor-*.json|.github/workflows/orbit360-f2-runtime-observer-v20260820.yml|orbit360-platform/runtime-gate-crm-v20260716/f2-runtime-observer-dispatch-*-v20260820.json|orbit360-platform/runtime-gate-crm-v20260716/f2-runtime-terminal-dispatch-*-v20260820.json|orbit360-platform/runtime-gate-crm-v20260716/f2-runtime-terminal-pre-gate-*-v20260820.json) ;;
                 *) echo "REMOTE_CAS_MISMATCH_NON_OBSERVER_DRIFT:$f"; exit 54;;
               esac
             done
@@ -271,7 +271,16 @@ jobs:
           jq -e --arg request "$REQUEST" --arg auth "$AUTH" '.authorized==true and .authorizationPersisted==true and .requestMaterialized==true and .runtimeAllowed==false and .activeRequestPath==$request and .authorizationIdentity.digest==$auth' "$BOUNDARY" >/dev/null
           jq -e --arg auth "$AUTH" '.requestVersion=="F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_V2" and .status=="MATERIALIZED_SOURCE_ONLY_AWAITING_PREFLIGHT" and .approved==true and .allowedExecutions==1 and .consumed==false and .authorizationFrozen==true and .replayAllowed==false and .historical==false and .authorizationIdentityDigest==$auth' "$REQUEST" >/dev/null
           TERMINAL="orbit360-platform/runtime-gate-crm-v20260716/f2-runtime-terminal-dispatch-${AUTH:0:12}-v20260820.json"
-          if [ -f "$TERMINAL" ] && jq -e --arg request "$REQUEST" --argjson artifact "$(jq -r '.candidateArtifactId' "$REQUEST")" '.request==$request and (.candidateArtifactId|tonumber)==$artifact and (.runId|tostring|length)>0 and (.classification|length)>0 and .containsPII==false and .containsSecrets==false' "$TERMINAL" >/dev/null 2>&1; then echo '{"ok":true,"status":"F2_ONE_SHOT_TERMINAL_EVIDENCE_PRESENT_NO_REPLAY","runtimeDispatched":false,"authorizationReplayAllowed":false,"writes":0}'; exit 0; fi
+          REQUEST_CONSUMED=$(jq -r '.consumed // false' "$REQUEST")
+          REQUEST_HISTORICAL=$(jq -r '.historical // false' "$REQUEST")
+          if [ -f "$TERMINAL" ] && jq -e --arg request "$REQUEST" --argjson artifact "$(jq -r '.candidateArtifactId' "$REQUEST")" '.request==$request and (.candidateArtifactId|tonumber)==$artifact and (.runId|tostring|length)>0 and (.classification|length)>0 and .containsPII==false and .containsSecrets==false' "$TERMINAL" >/dev/null 2>&1; then
+            PRE_GATE=$(jq -r '.preGateFailure // false' "$TERMINAL")
+            if [ "$REQUEST_CONSUMED" = 'true' ] || [ "$REQUEST_HISTORICAL" = 'true' ] || [ "$PRE_GATE" != 'true' ]; then
+              echo '{"ok":true,"status":"F2_ONE_SHOT_TERMINAL_EVIDENCE_PRESENT_NO_REPLAY","runtimeDispatched":false,"authorizationReplayAllowed":false,"writes":0}'
+              exit 0
+            fi
+            echo '{"ok":true,"status":"F2_ACTIVE_PRE_GATE_RETRY_ALLOWED","priorTerminalPreserved":true,"authorizationConsumed":false,"writes":0}'
+          fi
           payload=$(jq -n --arg ref "$BRANCH" --arg request "$REQUEST" --arg auth "$AUTH" '{ref:$ref,inputs:{request_path:$request,authorization_identity:$auth}}')
           curl --fail-with-body -sS -X POST -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/workflows/$RUNTIME_WORKFLOW/dispatches" -d "$payload"
           echo '{"ok":true,"status":"F2_RUNTIME_WORKFLOW_DISPATCH_ACCEPTED","authorizationConsumed":false,"runtimeExecutedByDispatcher":false,"secretAccessByDispatcher":false,"firestoreReadByDispatcher":false,"browserExecutedByDispatcher":false,"writesByDispatcher":0}'
