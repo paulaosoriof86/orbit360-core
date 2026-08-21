@@ -1,5 +1,5 @@
 name: Orbit360 Continuity Canonical Source Only
-# PERMANENT CANONICAL FAIL-CLOSED LISTENER — trigger macro2-whitespace-policy-diagnostic-20260821-01.
+# PERMANENT CANONICAL FAIL-CLOSED LISTENER — pointer-driven source-only activation.
 # One physical writer. Listener remains registered; activation is data-driven by an inert pointer.
 # No runtime/browser/secrets/Firestore/deploy/production.
 
@@ -14,6 +14,7 @@ on:
     branches: [ays/backend-tenant-lab-v99-20260703]
     paths:
       - '.github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml'
+      - '.github/orbit360-requests/macro2-canonical-source-activation-pointer-v20260821.json'
 
 permissions:
   contents: write
