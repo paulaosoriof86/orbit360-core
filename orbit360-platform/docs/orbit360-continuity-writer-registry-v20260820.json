@@ -1,7 +1,7 @@
 {
   "schemaVersion": "orbit360-continuity-writer-registry-v1",
   "registryId": "ORBIT360-CONTINUITY-WRITER-REGISTRY",
-  "revision": 8,
+  "revision": 9,
   "active": true,
   "status": "CANONICAL_CONTROL_PLANE_OWNERS_ACTIVE",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -9,6 +9,7 @@
   "hardeningPackage": "orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json",
   "canonicalF2ContractAuthority": "tools/orbit360-gate-contract-f2-productive-acceptance-v20260820.json",
   "transitionOwner": "tools/orbit360-continuity-transition-owner-v20260820.mjs",
+  "functionalSuccessorPromotionDelegate": "tools/orbit360-f2-functional-defect-successor-promotion-v20260820.mjs",
   "soleProjectionLogic": "tools/orbit360-continuity-projection-atomic-v20260820.mjs",
   "compositeInvariant": "tools/orbit360-control-plane-composite-invariant-v20260820.mjs",
   "storePerformanceSynthetic": "tools/orbit360-store-read-amplification-synthetic-v20260820.mjs",
@@ -49,12 +50,16 @@
     "authorizationIdentityDigestRequired": true,
     "authorizationCarryForwardForbidden": true,
     "runtimeRequestMaterializationRequiresFreshExplicitUserAuthorization": true,
-    "requestOrdinalMayNotCarryOperationalAuthorizationSemantics": true
+    "requestOrdinalMayNotCarryOperationalAuthorizationSemantics": true,
+    "functionalSuccessorPromotionDelegateMayMutateWorkingTreeOnlyInsideCanonicalWorkflow": true,
+    "functionalSuccessorPromotionDelegateMayPublish": false,
+    "functionalSuccessorPromotionDelegateMayDispatchRuntime": false
   },
   "workflowClasses": {
     "canonicalProjectionOwner": [".github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml"],
     "cp11AuthorizationBoundaryProducer": [".github/workflows/orbit360-cp11-authorization-boundary-sourceonly-v20260820.yml"],
     "sourceOnlyCandidateEvidenceProducer": [".github/workflows/orbit360-f2-successor-candidate-build-sourceonly-v20260820.yml"],
+    "canonicalTransitionDelegates": ["tools/orbit360-f2-functional-defect-successor-promotion-v20260820.mjs"],
     "legacyContinuityWritersRetiredByAudit": 24,
     "legacyRetirementMode": "HISTORICAL_NON_OWNER_OPERATIONALLY_ISOLATED"
   },
@@ -70,6 +75,8 @@
     "workflowMayMutateRepository": true,
     "mutationOwner": ".github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml",
     "cp11BoundaryMutationOwner": ".github/workflows/orbit360-cp11-authorization-boundary-sourceonly-v20260820.yml",
+    "functionalSuccessorPromotionDelegate": "tools/orbit360-f2-functional-defect-successor-promotion-v20260820.mjs",
+    "functionalSuccessorPromotionDelegatePublishes": false,
     "gitPullRebaseAllowed": false,
     "runtimeMayExecute": false,
     "browserMayExecute": false,
