@@ -1,7 +1,6 @@
 name: Orbit360 Continuity Canonical Source Only
-# DEFINITIVE SINGLE PHYSICAL WRITER — 2026-08-21.
-# Explicit-dispatch only. No runtime/browser/secrets/Firestore/deploy.
-# Historical workflows are preserved under .github/workflows-history-20260821/ and are not executable.
+# V3R1C1 registration edge only. Listener registration; no source execution.
+# No patch apply/build/artifact/runtime/browser/secrets/Firestore/deploy/production.
 
 on:
   workflow_dispatch:
@@ -10,6 +9,10 @@ on:
         description: 'Explicit source-only transition identifier'
         required: true
         type: string
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml'
 
 permissions:
   contents: write
@@ -20,8 +23,12 @@ concurrency:
   group: orbit360-continuity-canonical-ays
   cancel-in-progress: false
 
+env:
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+
 jobs:
   fail-closed-control-plane-owner:
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 3
     steps:
@@ -29,11 +36,10 @@ jobs:
         with:
           ref: ${{ github.sha }}
           fetch-depth: 0
-      - name: Enforce explicit source-only owner boundary
-        shell: bash
+      - shell: bash
         run: |
           set -euo pipefail
-          test "${{ github.ref_name }}" = 'ays/backend-tenant-lab-v99-20260703'
+          test "${{ github.ref_name }}" = "$ORBIT360_BRANCH"
           case "${{ inputs.transition }}" in
             READBACK_ONLY)
               node tools/orbit360-control-plane-composite-invariant-v20260820.mjs
@@ -41,8 +47,5 @@ jobs:
               node tools/orbit360-workflow-operational-surface-audit-v20260820.mjs
               node tools/orbit360-documentation-state-discovery-v20260821.mjs
               ;;
-            *)
-              echo 'PIPELINE_MECHANISM_FAILURE:UNIMPLEMENTED_CANONICAL_TRANSITION_FAIL_CLOSED' >&2
-              exit 41
-              ;;
+            *) exit 41 ;;
           esac
