@@ -1,5 +1,5 @@
 name: Orbit360 Continuity Canonical Source Only
-# Single-writer, revision-aware control-plane bridge. Never executes runtime/browser/secrets/Firestore.
+# Single-writer, revision-aware control-plane bridge. Never executes runtime/browser/secrets/Firestore itself.
 
 on:
   push:
@@ -12,6 +12,7 @@ on:
       - 'tools/orbit360-validar-f2-control-plane-reachability-v20260820.mjs'
       - '.github/orbit360-authorizations/f2-productive-acceptance-runtime-browser-readonly-auth-*.json'
       - '.github/orbit360-authorizations/f2-runtime-one-shot-intent-v20260820.json'
+      - '.github/orbit360-authorizations/f2-terminal-reconcile-intent-*-v20260820.json'
       - '.github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-successor-*.json'
       - '.github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml'
   workflow_dispatch:
@@ -21,9 +22,13 @@ on:
         required: true
         default: verify
         type: choice
-        options: [verify, persist-authorization, materialize-request]
+        options: [verify, persist-authorization, materialize-request, terminal-reconcile]
       authorization_identity:
         description: 'Prepared F2 authorization identity SHA-256 (required for mutation actions)'
+        required: false
+        type: string
+      runtime_run_id:
+        description: 'Completed F2 runtime run id (terminal-reconcile only)'
         required: false
         type: string
 
@@ -32,6 +37,7 @@ permissions:
   actions: write
   statuses: write
   pull-requests: read
+
 concurrency:
   group: orbit360-continuity-canonical-ays
   cancel-in-progress: false
@@ -45,32 +51,30 @@ jobs:
         with:
           ref: ${{ github.sha }}
           fetch-depth: 0
-      - name: Fail-closed CAS and reachability preflight
+
+      - name: Fail-closed CAS and source-only preflight
         shell: bash
         env:
           BRANCH: ays/backend-tenant-lab-v99-20260703
           INPUT_ACTION: ${{ inputs.bridge_action || 'verify' }}
           INPUT_AUTH: ${{ inputs.authorization_identity || '' }}
+          INPUT_RUNTIME_RUN_ID: ${{ inputs.runtime_run_id || '' }}
         run: |
           set -euo pipefail
           START_HEAD=$(git rev-parse HEAD)
-          INTENT='.github/orbit360-authorizations/f2-runtime-one-shot-intent-v20260820.json'
+          RUNTIME_INTENT='.github/orbit360-authorizations/f2-runtime-one-shot-intent-v20260820.json'
+          mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
+          mapfile -t TERMINAL_INTENTS < <(printf '%s\n' "${CHANGED[@]}" | grep '^\.github/orbit360-authorizations/f2-terminal-reconcile-intent-[a-f0-9]\{12\}-v20260820\.json$' || true)
           MUTATION_REQUESTED=false
-          if [ "$GITHUB_EVENT_NAME" = 'workflow_dispatch' ] && [ "$INPUT_ACTION" != 'verify' ]; then
-            MUTATION_REQUESTED=true
-          fi
+          if [ "$GITHUB_EVENT_NAME" = 'workflow_dispatch' ] && [ "$INPUT_ACTION" != 'verify' ]; then MUTATION_REQUESTED=true; fi
           if [ "$GITHUB_EVENT_NAME" = 'push' ]; then
-            mapfile -t CAS_CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
-            if printf '%s\n' "${CAS_CHANGED[@]}" | grep -Fx "$INTENT" >/dev/null; then
-              MUTATION_REQUESTED=true
-            fi
+            if printf '%s\n' "${CHANGED[@]}" | grep -Fx "$RUNTIME_INTENT" >/dev/null || [ "${#TERMINAL_INTENTS[@]}" = '1' ]; then MUTATION_REQUESTED=true; fi
           fi
+
           git fetch origin "$BRANCH"
           REMOTE_HEAD=$(git rev-parse "origin/$BRANCH")
           if [ "$REMOTE_HEAD" != "$START_HEAD" ]; then
-            if [ "$MUTATION_REQUESTED" = 'true' ]; then
-              echo "REMOTE_CAS_MISMATCH_MUTATION:$REMOTE_HEAD"; exit 54
-            fi
+            if [ "$MUTATION_REQUESTED" = 'true' ]; then echo "REMOTE_CAS_MISMATCH_MUTATION:$REMOTE_HEAD"; exit 54; fi
             git merge-base --is-ancestor "$START_HEAD" "$REMOTE_HEAD" || { echo "REMOTE_CAS_NON_DESCENDANT:$REMOTE_HEAD"; exit 54; }
             mapfile -t REMOTE_DRIFT < <(git diff --name-only "$START_HEAD..$REMOTE_HEAD")
             for f in "${REMOTE_DRIFT[@]}"; do
@@ -81,40 +85,65 @@ jobs:
             done
             echo "REMOTE_CAS_OBSERVER_ONLY_DRIFT_ACCEPTED:$REMOTE_HEAD"
           fi
+
           STATUS=$(node -p "require('./orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json').status")
           STEP=$(node -p "require('./orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json').resumeProtocol.firstIncompleteStep")
           test "$STATUS" = CLOSED_PASS || exit 58
-          node tools/orbit360-validar-f2-control-plane-reachability-v20260820.mjs
+
           ACTION="$INPUT_ACTION"
           AUTH_IDENTITY="$INPUT_AUTH"
+          RUNTIME_RUN_ID="$INPUT_RUNTIME_RUN_ID"
           if [ "$GITHUB_EVENT_NAME" = push ]; then
-            mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
-            if printf '%s\n' "${CHANGED[@]}" | grep -Fx "$INTENT" >/dev/null; then
+            if printf '%s\n' "${CHANGED[@]}" | grep -Fx "$RUNTIME_INTENT" >/dev/null; then
               test "${#CHANGED[@]}" = '1' || { echo INTENT_COMMIT_SURFACE_INVALID; exit 62; }
-              jq -e '.schemaVersion=="orbit360-f2-runtime-one-shot-intent-v1" and .approved==true and .oneShot==true and .consumed==false and .replayAllowed==false and .runtimeProfile=="F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY" and (.authorizationIdentityDigest|test("^[a-f0-9]{64}$")) and (.parentHead|test("^[a-f0-9]{40}$"))' "$INTENT" >/dev/null
-              test "$(jq -r '.parentHead' "$INTENT")" = "$(git rev-parse HEAD^)" || { echo INTENT_PARENT_HEAD_MISMATCH; exit 63; }
+              jq -e '.schemaVersion=="orbit360-f2-runtime-one-shot-intent-v1" and .approved==true and .oneShot==true and .consumed==false and .replayAllowed==false and .runtimeProfile=="F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY" and (.authorizationIdentityDigest|test("^[a-f0-9]{64}$")) and (.parentHead|test("^[a-f0-9]{40}$"))' "$RUNTIME_INTENT" >/dev/null
+              test "$(jq -r '.parentHead' "$RUNTIME_INTENT")" = "$(git rev-parse HEAD^)" || { echo INTENT_PARENT_HEAD_MISMATCH; exit 63; }
               ACTION=consume-intent
-              AUTH_IDENTITY=$(jq -r '.authorizationIdentityDigest' "$INTENT")
+              AUTH_IDENTITY=$(jq -r '.authorizationIdentityDigest' "$RUNTIME_INTENT")
+            elif [ "${#TERMINAL_INTENTS[@]}" = '1' ]; then
+              test "${#CHANGED[@]}" = '1' || { echo TERMINAL_INTENT_COMMIT_SURFACE_INVALID; exit 64; }
+              TERMINAL_INTENT="${TERMINAL_INTENTS[0]}"
+              jq -e '.schemaVersion=="orbit360-f2-terminal-reconcile-intent-v1" and .approved==true and .sourceOnly==true and .runtime==false and .browser==false and .secrets==false and .firestoreRead==false and .writes==false and .replayAllowed==false and (.authorizationIdentityDigest|test("^[a-f0-9]{64}$")) and (.runtimeRunId|type=="number") and .runtimeRunId>0' "$TERMINAL_INTENT" >/dev/null
+              ACTION=terminal-reconcile
+              AUTH_IDENTITY=$(jq -r '.authorizationIdentityDigest' "$TERMINAL_INTENT")
+              RUNTIME_RUN_ID=$(jq -r '.runtimeRunId' "$TERMINAL_INTENT")
             else
               ACTION=verify
             fi
           fi
+
           case "$ACTION:$STEP" in
             verify:*) ;;
             persist-authorization:F2-RUNTIME-AUTHORIZATION) ;;
             materialize-request:F2-RUNTIME-REQUEST-MATERIALIZATION) ;;
             consume-intent:F2-RUNTIME-AUTHORIZATION) ;;
+            terminal-reconcile:F2-RUNTIME-PREFLIGHT) ;;
             *) echo "BRIDGE_ACTION_STEP_MISMATCH:$ACTION:$STEP"; exit 59;;
           esac
+
           if [ "$ACTION" != verify ]; then
             echo "$AUTH_IDENTITY" | grep -Eq '^[a-f0-9]{64}$' || { echo AUTH_IDENTITY_REQUIRED; exit 60; }
             PREPARED=$(node -p "require('./orbit360-platform/docs/orbit360-f2-runtime-authorization-boundary-v20260820.json').authorizationIdentity.digest")
             test "$AUTH_IDENTITY" = "$PREPARED" || { echo AUTH_IDENTITY_MISMATCH; exit 61; }
           fi
+
+          if [ "$ACTION" = terminal-reconcile ]; then
+            echo "$RUNTIME_RUN_ID" | grep -Eq '^[0-9]+$' || { echo RUNTIME_RUN_ID_REQUIRED; exit 65; }
+            node --check tools/orbit360-continuity-transition-owner-v20260820.mjs
+            REQUEST=$(node -p "require('./orbit360-platform/docs/orbit360-f2-runtime-authorization-boundary-v20260820.json').activeRequestPath")
+            TERMINAL="orbit360-platform/runtime-gate-crm-v20260716/f2-runtime-terminal-dispatch-${AUTH_IDENTITY:0:12}-v20260820.json"
+            test -f "$REQUEST" && test -f "$TERMINAL"
+            jq -e --arg run "$RUNTIME_RUN_ID" --arg request "$REQUEST" '.status=="F2_PRODUCTIVE_ACCEPTANCE_FAIL" and .classification=="VALIDATOR_STALE" and (.runId|tostring)==$run and .request==$request and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .deployExecuted==false and .publicationExecuted==false and .productionHostingTouched==false and .containsPII==false and .containsSecrets==false' "$TERMINAL" >/dev/null
+          else
+            node tools/orbit360-validar-f2-control-plane-reachability-v20260820.mjs
+          fi
+
           echo "START_HEAD=$START_HEAD" >> "$GITHUB_ENV"
           echo "ACTION=$ACTION" >> "$GITHUB_ENV"
           echo "CURRENT_STEP=$STEP" >> "$GITHUB_ENV"
           echo "AUTH_IDENTITY=$AUTH_IDENTITY" >> "$GITHUB_ENV"
+          echo "RUNTIME_RUN_ID=$RUNTIME_RUN_ID" >> "$GITHUB_ENV"
+
       - name: Persist already-granted authorization source-only
         if: env.ACTION == 'persist-authorization' || env.ACTION == 'consume-intent'
         shell: bash
@@ -124,6 +153,7 @@ jobs:
           PR=$(node -p "require('./orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json').revision")
           node tools/orbit360-continuity-transition-owner-v20260820.mjs --expected-revision "$LR" --expected-package-revision "$PR" --transition F2_RUNTIME_AUTHORIZATION_PERSIST --authorization-identity "$AUTH_IDENTITY"
           node tools/orbit360-validar-f2-control-plane-reachability-v20260820.mjs
+
       - name: Materialize exactly one immutable successor request source-only
         if: env.ACTION == 'materialize-request' || env.ACTION == 'consume-intent'
         shell: bash
@@ -133,6 +163,17 @@ jobs:
           PR=$(node -p "require('./orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json').revision")
           node tools/orbit360-continuity-transition-owner-v20260820.mjs --expected-revision "$LR" --expected-package-revision "$PR" --transition F2_RUNTIME_REQUEST_MATERIALIZE --authorization-identity "$AUTH_IDENTITY" --parent-head "$START_HEAD"
           node tools/orbit360-validar-f2-control-plane-reachability-v20260820.mjs
+
+      - name: Reconcile consumed F2 terminal runtime source-only
+        if: env.ACTION == 'terminal-reconcile'
+        shell: bash
+        run: |
+          set -euo pipefail
+          LR=$(node -p "require('./orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json').revision")
+          PR=$(node -p "require('./orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json').revision")
+          node tools/orbit360-continuity-transition-owner-v20260820.mjs --expected-revision "$LR" --expected-package-revision "$PR" --transition F2_RUNTIME_TERMINAL_RECONCILE --authorization-identity "$AUTH_IDENTITY" --runtime-run-id "$RUNTIME_RUN_ID"
+          node tools/orbit360-validar-f2-control-plane-reachability-v20260820.mjs
+
       - name: Commit single-writer bridge mutation
         if: env.ACTION != 'verify'
         shell: bash
@@ -148,12 +189,14 @@ jobs:
           git fetch origin "$BRANCH"
           test "$(git rev-parse origin/$BRANCH)" = "$START_HEAD" || { echo FINAL_CAS_MISMATCH; exit 103; }
           git push origin "HEAD:$BRANCH"
+
       - name: Verify post-state remains fail-closed
         shell: bash
         run: |
           set -euo pipefail
           node tools/orbit360-validar-f2-control-plane-reachability-v20260820.mjs
-          node -e "const B=require('./orbit360-platform/docs/orbit360-f2-runtime-authorization-boundary-v20260820.json'); if(B.runtimeAllowed) process.exit(111); console.log(JSON.stringify({ok:true,sourceOnly:true,runtimeAllowed:false,authorizationConsumed:false}))"
+          node -e "const B=require('./orbit360-platform/docs/orbit360-f2-runtime-authorization-boundary-v20260820.json'); if(B.runtimeAllowed) process.exit(111); console.log(JSON.stringify({ok:true,sourceOnly:true,runtimeAllowed:false,authorizationConsumed:process.env.ACTION==='terminal-reconcile'}))"
+
       - name: Dispatch existing active F2 runtime from BP6
         if: env.ACTION == 'verify' && env.CURRENT_STEP == 'F2-RUNTIME-PREFLIGHT'
         shell: bash
