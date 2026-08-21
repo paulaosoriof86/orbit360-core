@@ -2,14 +2,15 @@
 
 Repositorio de Orbit 360.
 
-## Estado operativo vivo — autoridad única
+## Estado operativo vivo — proyección derivada
 
-- StateVersion: `ORBIT360-F2-CONTINUITY-CURRENT` (sin ordinal de Request).
-- Fase: `F2_PRODUCTIVE_ACCEPTANCE_SUCCESSOR_SOURCE_CANDIDATE_CERTIFIED`.
-- Estado: `SUCCESSOR_SOURCEONLY_CANDIDATE_CERTIFIED_PENDING_FRESH_RUNTIME_AUTHORIZATION`.
-- Causa funcional verificada source-only: `FUNCTIONAL_DEFECT:F2_PRODUCT_READONLY_GET_FULL_COLLECTION_CLONE_AMPLIFICATION`.
-- Candidata sucesora source-only certificada: artifact `9395391426`, source `6af0c029aebb1bfecd05569452c814584110ae4c`, 194 archivos, rehash completo; artifact histórico no reutilizado.
-- No existe autorización runtime activa ni carry-forward de autorizaciones.
-- Autoridad: `orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json`; writers: `orbit360-platform/docs/orbit360-continuity-writer-registry-v20260820.json`; proyección: `tools/orbit360-continuity-sync-v20260820.mjs`.
-- Los ordinales de Request y los identificadores de artifacts consumidos pertenecen únicamente a historia/evidencia.
-- Siguiente acción: `AWAIT_FRESH_EXPLICIT_AUTHORIZATION_FOR_CERTIFIED_F2_SUCCESSOR_RUNTIME`.
+- Plan vigente: `orbit360-platform/docs/PLAN-MAESTRO-CONGELADO-DEFINITIVO-RUTA-PRODUCCION-ORBIT360-AYS-20260821.md`.
+- StateVersion: `ORBIT360-F2-CONTINUITY-CURRENT`.
+- Fase: `MACRO1_CONTROL_PLANE_DEFINITIVE_PASS_AWAITING_TRANSVERSAL_SOURCE_ACCEPTANCE`.
+- Estado: `CONTROL_PLANE_DEFINITIVE_PASS`.
+- Ledger/package: `29/23`.
+- Candidata: artifact `9433944723`, candidateSourceHead `c3bb825da2b1ecae08dabc2034c753482b086fec`.
+- Autorización/request/runtime: `false/false/false`.
+- Progreso ruta a producción: **62%**.
+- Siguiente acción: `EXECUTE_MACRO2_TRANSVERSAL_SOURCE_ACCEPTANCE_AND_SINGLE_CANDIDATE`.
+- Autoridad operativa mutable única: `orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json`; este README es una proyección generada.

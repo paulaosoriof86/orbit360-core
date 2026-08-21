@@ -1,6 +1,6 @@
 {
   "schemaVersion": "orbit360-f2-runtime-authorization-v2",
-  "status": "PERSISTED_SOURCE_ONLY_AWAITING_REQUEST_MATERIALIZATION",
+  "status": "CONSUMED_FAIL_FUNCTIONAL_DEFECT",
   "approved": true,
   "authorizationIdentityDigest": "b8b35fd88e9dc36a2b8a5770cd067b22142a218332faface5a9eb46262ff0ecb",
   "gateId": "f2-productive-acceptance-exact-successor-v20260818",
@@ -8,11 +8,11 @@
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
   "authorizedAt": "2026-08-21T14:35:00.000Z",
-  "allowedExecutions": 1,
-  "consumed": false,
+  "allowedExecutions": 0,
+  "consumed": true,
   "authorizationFrozen": true,
   "replayAllowed": false,
-  "historical": false,
+  "historical": true,
   "candidateArtifactId": 9433944723,
   "candidateSourceHead": "c3bb825da2b1ecae08dabc2034c753482b086fec",
   "candidateArtifactDigest": "25228e96490004de39dfba685673c80247ce9e7046d7eeff1cde642e4c673643",
@@ -38,6 +38,9 @@
     "main": false,
     "merge": false
   },
+  "consumedByRuntimeRunId": 32494402695,
+  "terminalEvidencePath": "orbit360-platform/runtime-gate-crm-v20260716/f2-runtime-terminal-dispatch-b8b35fd88e9d-v20260821.json",
+  "disposition": "NO_REPLAY_TERMINAL_FUNCTIONAL_DEFECT",
   "containsPII": false,
   "containsSecrets": false
 }

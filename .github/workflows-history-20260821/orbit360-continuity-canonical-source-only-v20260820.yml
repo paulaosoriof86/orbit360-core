@@ -1,0 +1,176 @@
+name: Orbit360 Continuity Canonical Source Only
+# DEFINITIVE MACRO1 owner — source-only. No product runtime/browser/secrets/Firestore/deploy.
+
+on:
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+  pull-requests: write
+  statuses: write
+
+concurrency:
+  group: orbit360-continuity-canonical-ays
+  cancel-in-progress: false
+
+jobs:
+  macro1-definitive-repair:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Fail-closed branch and plan preflight
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git branch --show-current)" = 'ays/backend-tenant-lab-v99-20260703'
+          test -f orbit360-platform/docs/PLAN-MAESTRO-CONGELADO-DEFINITIVO-RUTA-PRODUCCION-ORBIT360-AYS-20260821.md
+          START_HEAD=$(git rev-parse HEAD)
+          git fetch origin ays/backend-tenant-lab-v99-20260703
+          test "$(git rev-parse origin/ays/backend-tenant-lab-v99-20260703)" = "$START_HEAD"
+          echo "START_HEAD=$START_HEAD" >> "$GITHUB_ENV"
+          node --check tools/orbit360-continuity-transition-owner-v20260820.mjs
+          node --check tools/orbit360-continuity-projection-atomic-v20260820.mjs
+          node --check tools/orbit360-control-plane-composite-invariant-v20260820.mjs
+          node --check tools/orbit360-control-plane-independent-readback-v20260820.mjs
+          node --check tools/orbit360-workflow-operational-surface-audit-v20260820.mjs
+          node --check tools/orbit360-documentation-state-discovery-v20260821.mjs
+          node --check tools/orbit360-neutralize-legacy-control-surfaces-v20260821.mjs
+      - name: Neutralize all unauthorized control surfaces source-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          E=orbit360-platform/runtime-gate-crm-v20260716
+          mkdir -p "$E"
+          node tools/orbit360-neutralize-legacy-control-surfaces-v20260821.mjs > "$E/macro1-control-surface-neutralization-v20260821.json"
+          node tools/orbit360-workflow-operational-surface-audit-v20260820.mjs > "$E/macro1-workflow-writer-audit-preterminal-v20260821.json"
+          node tools/orbit360-documentation-state-discovery-v20260821.mjs > "$E/macro1-documentation-discovery-preterminal-v20260821.json"
+          jq -e '.ok==true and .unauthorizedControlWorkflows==0' "$E/macro1-workflow-writer-audit-preterminal-v20260821.json" >/dev/null
+          jq -e '.ok==true and (.offenders|length)==0' "$E/macro1-documentation-discovery-preterminal-v20260821.json" >/dev/null
+      - name: Retrieve and verify already-consumed F2 terminal evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          E=orbit360-platform/runtime-gate-crm-v20260716
+          API="https://api.github.com/repos/${GITHUB_REPOSITORY}"
+          RUN_ID=32494402695
+          ARTIFACT_ID=9451106452
+          AUTH_SHORT=b8b35fd88e9d
+          curl -L --fail --retry 3 -H "Authorization: Bearer $GH_TOKEN" -H 'Accept: application/vnd.github+json' -H 'X-GitHub-Api-Version: 2022-11-28' "$API/actions/artifacts/$ARTIFACT_ID/zip" -o "$RUNNER_TEMP/f2-terminal.zip"
+          rm -rf "$RUNNER_TEMP/f2-terminal"; mkdir -p "$RUNNER_TEMP/f2-terminal"; unzip -q "$RUNNER_TEMP/f2-terminal.zip" -d "$RUNNER_TEMP/f2-terminal"
+          F="$RUNNER_TEMP/f2-terminal/f2-final-run-${RUN_ID}.json"
+          B="$RUNNER_TEMP/f2-terminal/f2-browser-run-${RUN_ID}.json"
+          I="$RUNNER_TEMP/f2-terminal/f2-integrity-before-after-v20260818.json"
+          test -f "$F" && test -f "$B" && test -f "$I"
+          jq -e '.ok==false and .status=="F2_PRODUCTIVE_ACCEPTANCE_FAIL" and .classification=="FUNCTIONAL_DEFECT" and .error=="FUNCTIONAL_DEFECT:F2_UNDEFINED_NAN_VISIBLE:desktopDirection:cobros" and (.runId|tostring)=="32494402695" and .candidateArtifactId==9433944723 and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .deployExecuted==false and .publicationExecuted==false and .productionHostingTouched==false and .containsPII==false and .containsSecrets==false' "$F" >/dev/null
+          jq -e '.browserExecuted==true and .runtimeExecuted==true and .secretAccess==true and .firestoreRead==true and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .crossTenantDenied==true and .localWriteGuard.blocked==true' "$B" >/dev/null
+          jq -e '.ok==true and .countsIdentical==true and .digestsIdentical==true and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0' "$I" >/dev/null
+          REQUEST='.github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-successor-b8b35fd88e9d-v20260820.json'
+          TERMINAL="$E/f2-runtime-terminal-dispatch-${AUTH_SHORT}-v20260821.json"
+          jq -s --arg request "$REQUEST" '.[0] + {request:$request,candidateSourceHead:.[1].candidateSourceHead,candidateArtifactDigest:"25228e96490004de39dfba685673c80247ce9e7046d7eeff1cde642e4c673643",secretAccess:.[1].secretAccess,firestoreRead:.[1].firestoreRead,browserExecuted:.[1].browserExecuted,runtimeExecuted:.[1].runtimeExecuted,crossTenantDenied:.[1].crossTenantDenied,integrityBeforeAfterPass:true,artifactId:9451106452,evidenceOrigin:"github-actions-artifact-32494402695",containsPII:false,containsSecrets:false}' "$F" "$B" > "$TERMINAL"
+          echo "TERMINAL=$TERMINAL" >> "$GITHUB_ENV"
+      - name: Reconcile executed one-shot through generic terminal reducer
+        shell: bash
+        run: |
+          set -euo pipefail
+          LR=$(node -p "require('./orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json').revision")
+          PR=$(node -p "require('./orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json').revision")
+          node tools/orbit360-continuity-transition-owner-v20260820.mjs --expected-revision "$LR" --expected-package-revision "$PR" --transition F2_RUNTIME_TERMINAL_RECONCILE_GENERIC --terminal-evidence "$TERMINAL" --expected-runtime-run-id 32494402695 > orbit360-platform/runtime-gate-crm-v20260716/macro1-terminal-reconcile-v20260821.json
+          LR2=$(node -p "require('./orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json').revision")
+          node tools/orbit360-continuity-projection-atomic-v20260820.mjs --expected-revision "$LR2" > orbit360-platform/runtime-gate-crm-v20260716/macro1-projection-after-terminal-v20260821.json
+          jq -e '.ok==true and .classification=="FUNCTIONAL_DEFECT" and .replayAllowed==false' orbit360-platform/runtime-gate-crm-v20260716/macro1-terminal-reconcile-v20260821.json >/dev/null
+      - name: Preliminary dynamic invariants before closure
+        shell: bash
+        run: |
+          set -euo pipefail
+          E=orbit360-platform/runtime-gate-crm-v20260716
+          node tools/orbit360-control-plane-composite-invariant-v20260820.mjs > "$E/macro1-composite-preclose-v20260821.json"
+          node tools/orbit360-control-plane-independent-readback-v20260820.mjs > "$E/macro1-readback-preclose-v20260821.json"
+          node tools/orbit360-workflow-operational-surface-audit-v20260820.mjs > "$E/macro1-writer-preclose-v20260821.json"
+          node tools/orbit360-documentation-state-discovery-v20260821.mjs > "$E/macro1-docs-preclose-v20260821.json"
+      - name: Close Macro1 through revisioned owner
+        shell: bash
+        run: |
+          set -euo pipefail
+          E=orbit360-platform/runtime-gate-crm-v20260716
+          LR=$(node -p "require('./orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json').revision")
+          PR=$(node -p "require('./orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json').revision")
+          CLOSURE="$E/macro1-composite-preclose-v20260821.json,$E/macro1-readback-preclose-v20260821.json,$E/macro1-writer-preclose-v20260821.json,$E/macro1-docs-preclose-v20260821.json"
+          node tools/orbit360-continuity-transition-owner-v20260820.mjs --expected-revision "$LR" --expected-package-revision "$PR" --transition MACRO1_CONTROL_PLANE_CLOSE --closure-evidence "$CLOSURE" > "$E/macro1-control-plane-close-v20260821.json"
+          LR2=$(node -p "require('./orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json').revision")
+          node tools/orbit360-continuity-projection-atomic-v20260820.mjs --expected-revision "$LR2" > "$E/macro1-projection-final-v20260821.json"
+      - name: Final definitive gates
+        shell: bash
+        run: |
+          set -euo pipefail
+          E=orbit360-platform/runtime-gate-crm-v20260716
+          node tools/orbit360-control-plane-composite-invariant-v20260820.mjs > "$E/macro1-control-plane-composite-final-v20260821.json"
+          node tools/orbit360-control-plane-independent-readback-v20260820.mjs > "$E/macro1-control-plane-readback-final-v20260821.json"
+          node tools/orbit360-workflow-operational-surface-audit-v20260820.mjs > "$E/macro1-workflow-writer-audit-final-v20260821.json"
+          node tools/orbit360-documentation-state-discovery-v20260821.mjs > "$E/macro1-documentation-discovery-final-v20260821.json"
+          jq -e '.ok==true and .status=="CONTROL_PLANE_COMPOSITE_INVARIANT_PASS" and .activeStatus=="CONTROL_PLANE_DEFINITIVE_PASS"' "$E/macro1-control-plane-composite-final-v20260821.json" >/dev/null
+          jq -e '.ok==true and .status=="CONTROL_PLANE_INDEPENDENT_READBACK_PASS" and .activeStatus=="CONTROL_PLANE_DEFINITIVE_PASS" and .productionRouteProgressPct==62' "$E/macro1-control-plane-readback-final-v20260821.json" >/dev/null
+          jq -e '.ok==true and .unauthorizedControlWorkflows==0' "$E/macro1-workflow-writer-audit-final-v20260821.json" >/dev/null
+          jq -e '.ok==true and (.offenders|length)==0' "$E/macro1-documentation-discovery-final-v20260821.json" >/dev/null
+          node -e "const fs=require('fs'),L=require('./orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json'),P=require('./orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json'),B=require('./orbit360-platform/docs/orbit360-f2-runtime-authorization-boundary-v20260820.json'),N=require('./orbit360-platform/runtime-gate-crm-v20260716/macro1-control-surface-neutralization-v20260821.json');const o={schemaVersion:'orbit360-macro1-definitive-closure-v1',ok:true,status:'CONTROL_PLANE_DEFINITIVE_PASS',classification:'PIPELINE_MECHANISM_FAILURE_RESOLVED',ledgerRevision:L.revision,packageRevision:P.revision,productionRouteProgressPct:L.progress.productionRouteProgressPct,nextAction:L.nextAction.id,workflowFilesNeutralized:N.workflowFilesNeutralized,documentationFilesMarkedHistorical:N.documentationFilesMarkedHistorical,terminalRunReconciled:32494402695,authorizationRequestConsumed:true,replayAllowed:false,authorized:false,requestMaterialized:false,runtimeAllowed:false,runtimeExecutedDuringMacro1:false,browserExecutedDuringMacro1:false,productSecretAccessDuringMacro1:false,firestoreReadDuringMacro1:false,operationalWritesDuringMacro1:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};if(L.activeState.status!=='CONTROL_PLANE_DEFINITIVE_PASS'||L.progress.productionRouteProgressPct!==62||B.authorized||B.requestMaterialized||B.runtimeAllowed)process.exit(41);fs.writeFileSync('orbit360-platform/runtime-gate-crm-v20260716/macro1-control-plane-definitive-closure-v20260821.json',JSON.stringify(o,null,2)+'\n');"
+      - name: Publish one atomic source-only state commit with final CAS
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'orbit360-control-plane'
+          git config user.email 'orbit360-control-plane@users.noreply.github.com'
+          git add .github/workflows .github/orbit360-authorizations .github/orbit360-requests orbit360-platform/docs orbit360-platform/runtime-gate-crm-v20260716 README.md orbit360-platform/CHANGELOG.md tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-runtime-v20260819.json
+          git diff --cached --check
+          git diff --cached --quiet && { echo NO_MACRO1_DIFF; exit 92; }
+          git commit -m 'fix(control-plane): close definitive Macro1 single-writer repair [skip ci]'
+          FINAL_SHA=$(git rev-parse HEAD)
+          git fetch origin ays/backend-tenant-lab-v99-20260703
+          REMOTE_HEAD=$(git rev-parse origin/ays/backend-tenant-lab-v99-20260703)
+          test "$REMOTE_HEAD" = "$START_HEAD"
+          git push origin HEAD:ays/backend-tenant-lab-v99-20260703
+          echo "FINAL_SHA=$FINAL_SHA" >> "$GITHUB_ENV"
+      - name: Synchronize real PR body after successful branch CAS
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          NEXT=$(node -p "require('./orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json').nextAction.id")
+          LR=$(node -p "require('./orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json').revision")
+          PRV=$(node -p "require('./orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json').revision")
+          cat > "$RUNNER_TEMP/pr-body.md" <<EOF
+          # ESTADO CANÓNICO — MACRO-1 CLOSED_PASS
+
+          Plan vigente: orbit360-platform/docs/PLAN-MAESTRO-CONGELADO-DEFINITIVO-RUTA-PRODUCCION-ORBIT360-AYS-20260821.md
+
+          - Rama: ays/backend-tenant-lab-v99-20260703
+          - branchHead: $FINAL_SHA
+          - Estado: CONTROL_PLANE_DEFINITIVE_PASS
+          - Ledger/package: $LR/$PRV
+          - Runtime 32494402695: reconciliado y sellado; FUNCTIONAL_DEFECT Cobros preservado como evidencia.
+          - Authorization/request b8b35fd88e9d: consumido, histórico, replay=false.
+          - Runtime/browser/secrets/Firestore durante Macro-1: 0.
+          - Deploy/producción/main/merge: no ejecutados.
+          - Ruta a producción: 62%.
+          - Siguiente acción: $NEXT
+
+          Reanudar leyendo primero el plan congelado 20260821, luego HEAD real y ledger. No reconstruir roadmap ni reabrir Macro-1 sin evidencia material nueva.
+          EOF
+          BODY=$(jq -Rs . < "$RUNNER_TEMP/pr-body.md")
+          curl --fail-with-body -sS -X PATCH -H "Authorization: Bearer $GH_TOKEN" -H 'Accept: application/vnd.github+json' -H 'X-GitHub-Api-Version: 2022-11-28' "https://api.github.com/repos/$GITHUB_REPOSITORY/pulls/5" -d "{\"body\":$BODY}" >/dev/null
+          curl --fail-with-body -sS -H "Authorization: Bearer $GH_TOKEN" -H 'Accept: application/vnd.github+json' -H 'X-GitHub-Api-Version: 2022-11-28' "https://api.github.com/repos/$GITHUB_REPOSITORY/pulls/5" | jq -e --arg sha "$FINAL_SHA" --arg next "$NEXT" '.state=="open" and .draft==true and .head.ref=="ays/backend-tenant-lab-v99-20260703" and (.body|contains($sha)) and (.body|contains("CONTROL_PLANE_DEFINITIVE_PASS")) and (.body|contains($next))' >/dev/null
+          payload=$(jq -nc '{state:"success",context:"orbit360/macro1-definitive",description:"CONTROL_PLANE_DEFINITIVE_PASS · 62% · runtime closed"}')
+          curl --fail-with-body -sS -X POST -H "Authorization: Bearer $GH_TOKEN" -H 'Accept: application/vnd.github+json' -H 'X-GitHub-Api-Version: 2022-11-28' "https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/$FINAL_SHA" -d "$payload" >/dev/null

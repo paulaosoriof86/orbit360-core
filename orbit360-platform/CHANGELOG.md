@@ -64,10 +64,13 @@ Formato basado en *Keep a Changelog*. Construcción greenfield; el estado operat
 ## [1.93.0] — 2026-07-03 · Consolidado v1.56–v1.93
 
 <!-- ORBIT360_CURRENT_STATE_START -->
-## [F2-CONTINUITY-CURRENT] — 2026-08-20 UTC · `ORBIT360-F2-CONTINUITY-CURRENT`
-- Estado activo ordinal-free y guards desacoplados de Request/artifact histórico.
-- Rootfix source-only verificado: `F2_PRODUCT_READONLY_GET_FULL_COLLECTION_CLONE_AMPLIFICATION`.
-- Candidata sucesora source-only: CERTIFICADA artifact `9395391426`, 194 archivos, rehash completo.
-- Runtime consumido y artifact previo permanecen como historia sellada; no replay/reuse.
-- Un solo owner de proyección: `tools/orbit360-continuity-sync-v20260820.mjs`.
+## [F2-CONTINUITY-CURRENT] — 2026-08-21 UTC · `ORBIT360-F2-CONTINUITY-CURRENT`
+- **DERIVED PROJECTION** desde `orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json`; no es autoridad mutable independiente.
+- Fase: `MACRO1_CONTROL_PLANE_DEFINITIVE_PASS_AWAITING_TRANSVERSAL_SOURCE_ACCEPTANCE`.
+- Estado: `CONTROL_PLANE_DEFINITIVE_PASS`.
+- Ledger/package: `29/23`.
+- Candidata: artifact `9433944723`, source `c3bb825da2b1ecae08dabc2034c753482b086fec`.
+- Authorization/request/runtime: `false/false/false`.
+- Progreso producción: **62%**.
+- Siguiente acción: `EXECUTE_MACRO2_TRANSVERSAL_SOURCE_ACCEPTANCE_AND_SINGLE_CANDIDATE`.
 <!-- ORBIT360_CURRENT_STATE_END -->
