@@ -1,22 +1,27 @@
 {
   "schemaVersion": "orbit360-macro2-source-recovery-request-v2",
-  "status": "MATERIALIZED_SOURCE_ONLY",
+  "status": "CONSUMED_FAIL_VALIDATOR_STALE",
   "sourceOnly": true,
-  "allowedExecutions": 1,
-  "consumed": false,
-  "historical": false,
+  "allowedExecutions": 0,
+  "consumed": true,
+  "historical": true,
   "replayAllowed": false,
   "expectedParentHead": "a800d30621672c9a931e1ffdc166254b8704f3ed",
+  "transportHead": "43ceed32f99a91cbf021a2b94db12af91f2f09fc",
   "reopenedAfterStopRetry": true,
   "rootCausePreflightRequired": true,
+  "classification": "VALIDATOR_STALE",
+  "failureCode": "ARTIFACT_DIGEST_FORMAT_CONTRACT",
+  "executionObserved": false,
+  "branchPromotionObserved": false,
+  "sourcePublished": false,
+  "candidatePromoted": false,
+  "deterministicBlocker": "actions/upload-artifact@v4 outputs artifact-digest as raw 64-hex SHA-256 while the promoter requires sha256:<64hex>",
+  "nextMechanism": "PUBLISH_ACCEPTED_SOURCE_BEFORE_ARTIFACT__PERSIST_ARTIFACT_METADATA_BEFORE_PROMOTION__NORMALIZE_DIGEST",
   "priorFailures": [
     "PIPELINE_MECHANISM_FAILURE:MACRO2_PREDECESSOR_EXTRACT_TARGET_TYPO_PRI",
-    "VALIDATOR_STALE:MACRO2_PROMOTION_REQUEST_STATUS_NOT_SCHEMA_AWARE"
-  ],
-  "patchSets": [
-    {"name":"product","gzipPath":".github/orbit360-source-patches/macro2-v20260821/product.patch.gz","gzipSha256":"c7b932b2788a502ae07111d2e209d4b0cca0b844242bb1db80218b72fa4c6913","sha256":"6b3141493d69d2b25c581033460f5302498dd06dd8dfcad1245802390fafe540"},
-    {"name":"tools","gzipPath":".github/orbit360-source-patches/macro2-v20260821/tools.patch.gz","gzipSha256":"64bb3f11736ce39593b12a54350270f73730a10430d1ce6e543bebaee622ba46","sha256":"035c756cc2c14ae428a87231a8cc266762b92ebc1c67974d691bbb20ffd90f97"},
-    {"name":"docs","gzipPath":".github/orbit360-source-patches/macro2-v20260821/docs.patch.gz","gzipSha256":"4a6f77f7e35a89f0ef830e4b98fa8f4d1493e7973a4b91aa55ee5def78ed2167","sha256":"f5f679c113e6408981f111154e8d0fd34f515e82a70c2085d3f0f54515efa3c0"}
+    "VALIDATOR_STALE:MACRO2_PROMOTION_REQUEST_STATUS_NOT_SCHEMA_AWARE",
+    "VALIDATOR_STALE:ARTIFACT_DIGEST_FORMAT_CONTRACT"
   ],
   "runtime": false,
   "browser": false,

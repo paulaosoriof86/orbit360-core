@@ -1,0 +1,33 @@
+{
+  "schemaVersion": "orbit360-macro2-v2-stop-retry-artifact-contract-v1",
+  "ok": true,
+  "status": "STOP_RETRY_MECHANISM_REPAIR_REQUIRED",
+  "classification": "VALIDATOR_STALE",
+  "failureCode": "ARTIFACT_DIGEST_FORMAT_CONTRACT",
+  "transportHead": "43ceed32f99a91cbf021a2b94db12af91f2f09fc",
+  "executionObserved": false,
+  "branchPromotionObserved": false,
+  "officialContract": {
+    "provider": "actions/upload-artifact@v4",
+    "output": "artifact-digest",
+    "format": "64-hex SHA-256 without sha256: prefix"
+  },
+  "promoterContractBeforeRepair": "sha256:<64hex>",
+  "additionalStructuralRisk": "artifact can be uploaded before source commit is published, leaving an artifact bound to an unpublished sourceHead if later promotion fails",
+  "requiredRepair": [
+    "publish accepted source commit before candidate build/upload",
+    "restore canonical owner to dispatch-only before first push",
+    "normalize artifact-digest to sha256:<64hex> before promotion",
+    "persist artifact metadata before promotion",
+    "bind final promotion CAS to persisted artifact metadata head"
+  ],
+  "runtimeExecuted": false,
+  "browserExecuted": false,
+  "secretAccess": false,
+  "firestoreRead": false,
+  "writes": 0,
+  "deployExecuted": false,
+  "productionTouched": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
