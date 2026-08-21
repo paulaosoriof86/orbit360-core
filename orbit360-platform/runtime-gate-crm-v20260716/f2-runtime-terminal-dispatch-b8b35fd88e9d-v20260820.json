@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "orbit360-f2-terminal-v3",
+  "ok": false,
+  "status": "F2_PRODUCTIVE_ACCEPTANCE_PRE_GATE_FAIL",
+  "classification": "VALIDATOR_STALE",
+  "error": "VALIDATOR_STALE:F2_RUNTIME_WORKFLOW_CERTIFICATION_RESOLVER_NOT_DYNAMIC",
+  "runId": "32493214390",
+  "request": ".github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-successor-b8b35fd88e9d-v20260820.json",
+  "candidateArtifactId": 9433944723,
+  "preGateFailure": true,
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "operationalWrites": 0,
+  "deployExecuted": false,
+  "publicationExecuted": false,
+  "productionHostingTouched": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
