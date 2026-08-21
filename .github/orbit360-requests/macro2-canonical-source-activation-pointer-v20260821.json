@@ -1,12 +1,19 @@
 {
   "schemaVersion": "orbit360-macro2-canonical-source-activation-pointer-v1",
-  "status": "ACTIVE",
-  "mode": "FIRST_STAGE_DIAGNOSTIC",
+  "status": "IDLE",
+  "mode": "NONE",
   "activeRequestPath": null,
   "activationNonce": "macro2-first-stage-diagnostic-markdown-aware-20260821-02",
-  "allowedExecutions": 1,
-  "consumed": false,
+  "allowedExecutions": 0,
+  "consumed": true,
   "replayAllowed": false,
+  "lastTerminal": {
+    "runId": 32534184526,
+    "triggerSha": "78e7e92e8d83a5c7c781f252d2fba851b23b5f6d",
+    "status": "FIRST_STAGE_DIAGNOSTIC_FAIL",
+    "classification": "PIPELINE_MECHANISM_FAILURE",
+    "failedStage": "PATCH_APPLY_SYNTAX"
+  },
   "sourceOnly": true,
   "runtime": false,
   "browser": false,
