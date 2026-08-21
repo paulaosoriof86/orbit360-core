@@ -1,11 +1,40 @@
 #!/usr/bin/env bash
 set -euo pipefail
+
+source_aware_diff_check(){
+  local mode="${1:-worktree}"
+  local -a md=()
+  if [ "$mode" = 'staged' ]; then
+    git diff --cached --check -- . ':(exclude,glob)**/*.md'
+    mapfile -t md < <(git diff --cached --name-only -- ':(glob)**/*.md')
+  else
+    git diff --check -- . ':(exclude,glob)**/*.md'
+    mapfile -t md < <(git diff --name-only -- ':(glob)**/*.md')
+  fi
+  if ((${#md[@]})); then
+    node - "${md[@]}" <<'NODE'
+const fs=require('fs');
+const bad=[];
+for(const f of process.argv.slice(2)){
+  if(!fs.existsSync(f)) continue;
+  const lines=fs.readFileSync(f,'utf8').split(/\n/);
+  lines.forEach((line,i)=>{
+    const m=line.match(/[ \t]+$/);
+    if(m && m[0] !== '  ') bad.push(`${f}:${i+1}:${JSON.stringify(m[0])}`);
+  });
+}
+if(bad.length){console.error('MARKDOWN_TRAILING_WHITESPACE_INVALID\n'+bad.join('\n'));process.exit(41);}
+NODE
+  fi
+}
+
 export ORBIT360_MACRO2_ARTIFACT_ID="$ARTIFACT_ID"
 export ORBIT360_MACRO2_ARTIFACT_DIGEST_RAW="$ARTIFACT_DIGEST_RAW"
 export ORBIT360_MACRO2_SOURCE_HEAD="$SOURCE_HEAD"
 export ORBIT360_MACRO2_ZIP_SHA256="$SUCCESSOR_ZIP_SHA"
 export ORBIT360_MACRO2_MANIFEST_SHA256="$SUCCESSOR_MANIFEST_SHA"
 export ORBIT360_MACRO2_RUN_ID="$GITHUB_RUN_ID"
+
 # STAGE: Persist candidate artifact metadata before promotion
 set -euo pipefail
 test "$SOURCE_HEAD" = "$SOURCE_PUBLISHED_HEAD"
@@ -53,12 +82,12 @@ node - <<'NODE'
 const crypto=require('crypto');const B=require('./orbit360-platform/docs/orbit360-f2-runtime-authorization-boundary-v20260820.json');const m={gateId:B.gate.id,gateContractVersion:B.gate.contractVersion,candidateArtifactId:B.candidate.artifactId,candidateArtifactDigest:B.candidate.artifactDigest,candidateSourceHead:B.candidate.sourceHead,ledgerRevision:B.controlPlane.ledgerRevision,packageRevision:B.controlPlane.packageRevision,executionProfile:B.requestedExecutionProfile};const d=crypto.createHash('sha256').update(JSON.stringify(m)).digest('hex');if(d!==B.authorizationIdentity.digest||B.authorized||B.authorizationPersisted||B.requestMaterialized||B.runtimeAllowed)process.exit(41);console.log(JSON.stringify({ok:true,status:'MACRO2_AUTH_IDENTITY_PREPARED_INERT_PASS',digest:d}));
 NODE
 git checkout -- tools/orbit360-promote-macro2-transversal-candidate-v20260821.mjs
-git diff --check
+source_aware_diff_check worktree
 
 # STAGE: Create promotion commit and final remote CAS
 set -euo pipefail
 git add -- "$MACRO2_REQUEST" orbit360-platform/docs orbit360-platform/runtime-gate-crm-v20260716 tools/orbit360-gate-contract-f2-productive-acceptance-v20260820.json tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-source-v20260819.json tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-runtime-v20260819.json README.md orbit360-platform/CHANGELOG.md
-git diff --cached --check
+source_aware_diff_check staged
 git commit -m 'gate(macro2): promote transversal source candidate and prepare fresh auth'
 FINAL_HEAD=$(git rev-parse HEAD)
 git fetch origin "$ORBIT360_BRANCH"
