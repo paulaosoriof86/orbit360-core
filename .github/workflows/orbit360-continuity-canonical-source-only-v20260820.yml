@@ -1,5 +1,5 @@
 name: Orbit360 Continuity Canonical Source Only
-# PERMANENT CANONICAL FAIL-CLOSED LISTENER — activation nonce macro2-first-stage-diagnostic-permanent-listener-20260821-01.
+# PERMANENT CANONICAL FAIL-CLOSED LISTENER — Markdown-aware validator contract.
 # One physical writer. Listener remains registered; activation is data-driven by an inert pointer.
 # No runtime/browser/secrets/Firestore/deploy/production.
 
@@ -120,7 +120,18 @@ jobs:
           node --check tools/orbit360-test-macro2-transversal-source-acceptance-v20260821.mjs
           node --check tools/orbit360-documentation-state-discovery-v20260821.mjs
           for f in orbit360-platform/core/ui.js orbit360-platform/core/queries.js orbit360-platform/core/client-canonical-view-projection-v20260716.js orbit360-platform/core/ciclo.js orbit360-platform/data/store-firestore-product-readonly-p0.js orbit360-platform/modules/inicio.js orbit360-platform/modules/cliente360.js orbit360-platform/modules/aseguradoras.js orbit360-platform/modules/cobros.js; do node --check "$f"; done
-          git diff --check
+          git diff --check -- . ':(exclude,glob)**/*.md'
+          mapfile -t MD < <(git diff --name-only -- ':(glob)**/*.md')
+          if ((${#MD[@]})); then
+            node - "${MD[@]}" <<'NODE'
+          const fs=require('fs');const bad=[];
+          for(const f of process.argv.slice(2)){
+            if(!fs.existsSync(f))continue;
+            fs.readFileSync(f,'utf8').split(/\n/).forEach((line,i)=>{const m=line.match(/[ \t]+$/);if(m&&m[0]!=='  ')bad.push(`${f}:${i+1}:${JSON.stringify(m[0])}`);});
+          }
+          if(bad.length){console.error('MARKDOWN_TRAILING_WHITESPACE_INVALID\n'+bad.join('\n'));process.exit(41);}
+          NODE
+          fi
       - id: predecessor
         if: steps.router.outputs.mode == 'FIRST_STAGE_DIAGNOSTIC' && steps.patchapply.outcome == 'success'
         name: Verify exact predecessor artifact
