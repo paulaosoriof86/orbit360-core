@@ -128,7 +128,7 @@ Orbit.kpi = function (preset, arg) {
       rows = arr.map(c => ({ cells: [cliName(c.clienteId), c.cuota || '—', money(c.monto, c.moneda), U.fmtDate(c.vence), badge(c.estado)], go: () => { location.hash = '#/cliente360?c=' + c.clienteId; } }));
     } else if (tipo === 'cancel') {
       cols = ['Cliente', 'Motivo', 'Valor perdido', 'Fecha'];
-      rows = arr.map(c => ({ cells: [cliName(c.clienteId), c.motivo || '—', money(c.valorPerdido, c.moneda), U.fmtDate(c.fecha), badge(c.estado)], go: () => { location.hash = '#/cliente360?c=' + c.clienteId; } }));
+      rows = arr.map(c => ({ cells: [cliName(c.clienteId), c.motivo || '—', money(c.valorPerdido, c.moneda), U.fmtDate(c.fecha)], go: () => { location.hash = '#/cliente360?c=' + c.clienteId; } }));
     } else if (tipo === 'reclamo') {
       cols = ['Cliente', 'N°', 'Tipo', 'Estado'];
       rows = arr.map(r => ({ cells: [cliName(r.clienteId), r.numero || '—', r.tipo || '—', badge(r.estado)], go: () => { location.hash = '#/cliente360?c=' + r.clienteId; } }));
