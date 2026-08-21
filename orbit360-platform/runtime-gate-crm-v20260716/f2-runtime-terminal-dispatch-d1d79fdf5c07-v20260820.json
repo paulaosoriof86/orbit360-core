@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "orbit360-f2-terminal-v3",
+  "ok": false,
+  "status": "F2_PRODUCTIVE_ACCEPTANCE_FAIL",
+  "classification": "FUNCTIONAL_DEFECT",
+  "error": "FUNCTIONAL_DEFECT:F2_UNDEFINED_NAN_VISIBLE:desktopDirection:polizas",
+  "runId": "32444530576",
+  "request": ".github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-successor-d1d79fdf5c07-v20260820.json",
+  "candidateArtifactId": 9395391426,
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "operationalWrites": 0,
+  "deployExecuted": false,
+  "publicationExecuted": false,
+  "productionHostingTouched": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
