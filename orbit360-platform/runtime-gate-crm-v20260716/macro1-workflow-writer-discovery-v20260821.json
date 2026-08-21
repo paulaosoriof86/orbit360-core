@@ -1,0 +1,2351 @@
+{
+  "schemaVersion": "orbit360-workflow-physical-writer-audit-v2",
+  "ok": false,
+  "status": "WORKFLOW_PHYSICAL_WRITER_AUDIT_FAIL",
+  "canonicalWorkflow": ".github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml",
+  "totalWorkflowFiles": 538,
+  "mutationCapableWorkflowFiles": 147,
+  "unauthorizedPhysicalWriters": 146,
+  "offenders": [
+    {
+      "path": ".github/workflows/orbit360-actions-push-pulse-v20260818.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit",
+        "git-pull-rebase"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-apply-f2-request08-router-readiness-rootfix-v20260819.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-aseguradoras-batch-admin-p09i-smoke.yml",
+      "signals": [
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-aseguradoras-batch-form-p09j-smoke.yml",
+      "signals": [
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-aseguradoras-knowledge-p09-smoke.yml",
+      "signals": [
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-aseguradoras-lab-p09e-binding-p10c-smoke.yml",
+      "signals": [
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-aseguradoras-runtime-p09f-smoke.yml",
+      "signals": [
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-aseguradoras-same-origin-p09l-smoke.yml",
+      "signals": [
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-auth-access-recovery-lab-v2-20260805.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-auth-access-recovery-lab-v20260805.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-auth-access-recovery-lab-v3-20260805.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-auth-foundation-all-team-runtime-v20260805.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-auth-foundation-roster-resolution-and-runtime-v20260805.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-auth-paula-membership-readonly-reconcile-v2-20260817.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-auth-paula-membership-readonly-reconcile-v3-20260817.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-auth-paula-membership-readonly-reconcile-v4-20260817.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-auth-paula-password-reset-lab-v20260817.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-auth-paula-reset-link-handoff-lab-v20260817.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-auth-selfmanaged-credentials-runtime-v20260805.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-auth-selfmanaged-pipeline-rootfix-source-v20260805.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-block1-owner-runtime-gate-apply-v20260717.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-block12-cdp-screenshot-synthetic-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-block12-imp001-rootfix-source-v20260805.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-block12-isolated-routes-synthetic-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-block12-layout-free-probe-synthetic-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-block12-operational-runtime-lab-rootfix-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-block12-operational-runtime-lab-rootfix2-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-block12-operational-runtime-lab-rootfix4-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-block12-operational-runtime-lab-rootfix5-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-block12-operational-runtime-lab-rootfix6-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-block12-operational-runtime-lab-rootfix7-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-block12-operational-runtime-lab-rootfix8-resume-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-block12-operational-runtime-lab-rootfix8-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-block12-operational-runtime-lab-rootfix9-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-block12-operational-runtime-lab-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-block12-runtime-hang-rescue-lab-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-block12-runtime-hang-rescue-rootfix-lab-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-block12-video-frame-synthetic-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-block12-video-visual-contract-source-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-build-f2-request08-router-readiness-successor-v20260819.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit",
+        "git-pull-rebase"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-claude-paquete-reconciliado-v1205.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-close-visual-observable-rootcause-v20260805.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-close-visual-validator-stale-source-v20260805.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-cobros-10102-router-rootfix-source-v20260811.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-cobros-full-ledger-static-v20260805.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-cobros-full-ledger-write-runtime-v20260811.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-dispatch-visual-observable-rootfix-v2-once-v20260805.yml",
+      "signals": [
+        "contents:write"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-document-backend-capability-p09k-smoke.yml",
+      "signals": [
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f1-4b-rootfix-artifact-parity-source-only-v20260818.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f1-4c-build-observer-diagnostic-source-only-v20260818.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f1-4c-build-observer-source-only-v20260818.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f1-4c-gate-registration-source-only-v20260818.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f1-4c-request02-observer-source-only-v20260818.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f1-4c-validator-rootfix-observer-v20260818.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f1-4c-validator-stale-rootfix-source-only-v20260818.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f1-4d-run-observer-v20260818.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f1-4d-source-only-selftest-v20260818.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f2-legal-readiness-rootfix-discovery-v20260818.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f2-legal-readiness-rootfix-source-only-v20260818.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f2-polizas-read-amplification-proof-v20260820.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit",
+        "git-pull-rebase"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f2-request04-run-observer-v20260818.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f2-request05-run-observer-v20260818.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit",
+        "git-pull-rebase"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f2-request07-validator-stale-sourcefix-check-v20260819.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f2-request09-route-observability-sourcefix-v20260820.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f2-request10-route-visibility-validator-sourcefix-20260820.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit",
+        "git-pull-rebase"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f2-rootfix-run-discovery-v20260818.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f2-rules01-postdeploy-probe-run-observer-v20260819.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f2-rules01-probe-rootfix-run-observer-v20260818.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit",
+        "git-pull-rebase"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f2-rules01-probe-validator-rootfix-source-only-v2-20260818.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit",
+        "git-pull-rebase"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f2-rules01-probe-validator-rootfix-source-only-v20260818.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit",
+        "git-pull-rebase"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f2-rules01-run-observer-v20260818.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit",
+        "git-pull-rebase"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f2-runtime-run-discovery-v20260818.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f2-runtime-run-observer-v20260818.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f2-runtime02-run-discovery-v20260818.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f2-runtime03-docsync-run-discovery-v20260818.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f2-runtime03-run-discovery-v20260818.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f2-runtime05-rules-history-observer-v20260818.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f2-runtime05-security-rootcause-source-only-v20260818.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f2-runtime05-security-source-run-observer-v20260818.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f2-single-file-successor-sourceonly-v20260820.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f2-successor-candidate-build-sourceonly-v20260820.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit",
+        "git-pull-rebase"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f2-validator-stale-rootfix-source-only-v20260818.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-functions-dependency-rootfix-source-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-functions-dependency-rootfix2-source-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-functions-dependency-rootfix3-source-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-gate711-correct-validator-seal-v20260803.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-gate711-post-rootfix-package-apply-corrective-v20260802.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-gate711-post-rootfix-package-apply-v20260802.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-gate711-rootfix-frozen-guard-apply-corrective-v20260802.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-gate711-rootfix-frozen-guard-apply-v20260802.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-m5-hosting-close-router-538-v20260730.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-m5-hosting-router-patch-538-v20260730.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-m5-runtime-router-539-v20260730.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-m5-runtime-stop-router-539-v20260730.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-m5-static-router-540-v20260730.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-main-thread-diagnostic-b1-v20260718.yml",
+      "signals": [
+        "contents:write"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-membership-multirol-p0-smoke.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-observe-bootstrap-timeline-v1023.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-patch-normalizer-membership-docid-uid-v20260803.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-patch-rc12-closure-macro-firebase-bin-v20260803.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-product-readonly-get-rootfix-sourceonly-v20260820.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit",
+        "git-pull-rebase"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-r4-access-filter-fastpath-apply-once-v20260815.yml",
+      "signals": [
+        "contents:write",
+        "contents-api-mutation"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-r4-access-filter-fastpath-rootfix-v20260815.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-r4s2-apply-two-proven-rootfixes-v20260815.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-r4s3-access-scope-rootfix-apply-v20260816.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-r4s5-client360-deep-clone-rootfix-source-v20260816.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-r4s6-client-projection-consecutive-read-rootfix-source-v20260817.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-r4s7-client360-policy-index-rootfix-apply-v20260817.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-r4s7-source-only-rebind-apply-v20260817.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-r4s8-cliente360-first-paint-rootfix-source-v20260817.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-rc12-approved-roster-final-go-live-resume-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-rc12-approved-roster-rollback-recovery-corrective-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-rc12-approved-roster-rollback-recovery-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-rc12-final-postrollback-go-live-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-rc12-forensic-module-audit-v20260803.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-rc12-gate7151-post-stop-retry-continuation-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-rc12-membership-auth-source-run-v20260803.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-receipts-portfolio-projection-lifecycle-fix-v910-20260730.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-receipts-portfolio-rules-compat-visual-v910-20260730.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-recover-bootstrap-log-tail-v1023.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-recover-bootstrap-timeline-v1023.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-register-gate713-rc12-v20260803.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-register-gate714-normal-onboarding-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-register-gate715-approved-roster-final-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-register-visual-observable-rootfix-gate-v20260805.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-register-visual-rootfix-gate-v20260805.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-registered-relay-v21-event-driven-render-v20260807.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-registered-relay-v23-native-block1-v20260807.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-registered-relay-v24-canonical-evidence-handoff-v20260807.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-registered-relay-v25-differential-universe-diagnosis-v20260807.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-registered-relay-v28-focal-provenance-universe-v20260807.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-registered-relay-v29-identity-reconciliation-universe-v20260807.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-registered-relay-v30-retained26-export-v20260807.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-rootfix-approved-roster-reconciler-corrective-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-rootfix-approved-roster-reconciler-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-rootfix-evidence-path-gate713-v20260803.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-rootfix-final-writer-gate714-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-run-visual-matrix-runtime-v7-once-20260806.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-sourcecheck-v14-two-phase-activation-v20260807.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-validate-portable-source-windows-v20260806.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-visual-hydration-required-optional-source-v20260805.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-visual-matrix-lifecycle-sequence-source-v20260806.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-visual-observable-rootfix-lab-v20260805.yml",
+      "signals": [
+        "contents:write"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-visual-runtime-rootfix-lab-v20260805.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-visual-runtime-rootfix-relay-v20260805.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-visual-runtime-rootfix-static-v20260805.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    }
+  ],
+  "inspected": [
+    {
+      "path": ".github/workflows/orbit360-actions-push-pulse-v20260818.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit",
+        "git-pull-rebase"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-apply-f2-request08-router-readiness-rootfix-v20260819.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-aseguradoras-batch-admin-p09i-smoke.yml",
+      "signals": [
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-aseguradoras-batch-form-p09j-smoke.yml",
+      "signals": [
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-aseguradoras-knowledge-p09-smoke.yml",
+      "signals": [
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-aseguradoras-lab-p09e-binding-p10c-smoke.yml",
+      "signals": [
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-aseguradoras-runtime-p09f-smoke.yml",
+      "signals": [
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-aseguradoras-same-origin-p09l-smoke.yml",
+      "signals": [
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-auth-access-recovery-lab-v2-20260805.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-auth-access-recovery-lab-v20260805.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-auth-access-recovery-lab-v3-20260805.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-auth-foundation-all-team-runtime-v20260805.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-auth-foundation-roster-resolution-and-runtime-v20260805.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-auth-paula-membership-readonly-reconcile-v2-20260817.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-auth-paula-membership-readonly-reconcile-v3-20260817.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-auth-paula-membership-readonly-reconcile-v4-20260817.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-auth-paula-password-reset-lab-v20260817.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-auth-paula-reset-link-handoff-lab-v20260817.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-auth-selfmanaged-credentials-runtime-v20260805.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-auth-selfmanaged-pipeline-rootfix-source-v20260805.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-block1-owner-runtime-gate-apply-v20260717.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-block12-cdp-screenshot-synthetic-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-block12-imp001-rootfix-source-v20260805.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-block12-isolated-routes-synthetic-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-block12-layout-free-probe-synthetic-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-block12-operational-runtime-lab-rootfix-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-block12-operational-runtime-lab-rootfix2-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-block12-operational-runtime-lab-rootfix4-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-block12-operational-runtime-lab-rootfix5-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-block12-operational-runtime-lab-rootfix6-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-block12-operational-runtime-lab-rootfix7-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-block12-operational-runtime-lab-rootfix8-resume-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-block12-operational-runtime-lab-rootfix8-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-block12-operational-runtime-lab-rootfix9-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-block12-operational-runtime-lab-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-block12-runtime-hang-rescue-lab-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-block12-runtime-hang-rescue-rootfix-lab-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-block12-video-frame-synthetic-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-block12-video-visual-contract-source-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-build-f2-request08-router-readiness-successor-v20260819.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit",
+        "git-pull-rebase"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-claude-paquete-reconciliado-v1205.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-close-visual-observable-rootcause-v20260805.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-close-visual-validator-stale-source-v20260805.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-cobros-10102-router-rootfix-source-v20260811.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-cobros-full-ledger-static-v20260805.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-cobros-full-ledger-write-runtime-v20260811.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-dispatch-visual-observable-rootfix-v2-once-v20260805.yml",
+      "signals": [
+        "contents:write"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-document-backend-capability-p09k-smoke.yml",
+      "signals": [
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f1-4b-rootfix-artifact-parity-source-only-v20260818.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f1-4c-build-observer-diagnostic-source-only-v20260818.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f1-4c-build-observer-source-only-v20260818.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f1-4c-gate-registration-source-only-v20260818.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f1-4c-request02-observer-source-only-v20260818.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f1-4c-validator-rootfix-observer-v20260818.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f1-4c-validator-stale-rootfix-source-only-v20260818.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f1-4d-run-observer-v20260818.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f1-4d-source-only-selftest-v20260818.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f2-legal-readiness-rootfix-discovery-v20260818.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f2-legal-readiness-rootfix-source-only-v20260818.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f2-polizas-read-amplification-proof-v20260820.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit",
+        "git-pull-rebase"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f2-request04-run-observer-v20260818.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f2-request05-run-observer-v20260818.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit",
+        "git-pull-rebase"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f2-request07-validator-stale-sourcefix-check-v20260819.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f2-request09-route-observability-sourcefix-v20260820.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f2-request10-route-visibility-validator-sourcefix-20260820.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit",
+        "git-pull-rebase"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f2-rootfix-run-discovery-v20260818.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f2-rules01-postdeploy-probe-run-observer-v20260819.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f2-rules01-probe-rootfix-run-observer-v20260818.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit",
+        "git-pull-rebase"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f2-rules01-probe-validator-rootfix-source-only-v2-20260818.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit",
+        "git-pull-rebase"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f2-rules01-probe-validator-rootfix-source-only-v20260818.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit",
+        "git-pull-rebase"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f2-rules01-run-observer-v20260818.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit",
+        "git-pull-rebase"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f2-runtime-run-discovery-v20260818.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f2-runtime-run-observer-v20260818.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f2-runtime02-run-discovery-v20260818.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f2-runtime03-docsync-run-discovery-v20260818.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f2-runtime03-run-discovery-v20260818.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f2-runtime05-rules-history-observer-v20260818.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f2-runtime05-security-rootcause-source-only-v20260818.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f2-runtime05-security-source-run-observer-v20260818.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f2-single-file-successor-sourceonly-v20260820.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f2-successor-candidate-build-sourceonly-v20260820.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit",
+        "git-pull-rebase"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-f2-validator-stale-rootfix-source-only-v20260818.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-functions-dependency-rootfix-source-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-functions-dependency-rootfix2-source-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-functions-dependency-rootfix3-source-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-gate711-correct-validator-seal-v20260803.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-gate711-post-rootfix-package-apply-corrective-v20260802.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-gate711-post-rootfix-package-apply-v20260802.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-gate711-rootfix-frozen-guard-apply-corrective-v20260802.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-gate711-rootfix-frozen-guard-apply-v20260802.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-m5-hosting-close-router-538-v20260730.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-m5-hosting-router-patch-538-v20260730.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-m5-runtime-router-539-v20260730.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-m5-runtime-stop-router-539-v20260730.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-m5-static-router-540-v20260730.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-main-thread-diagnostic-b1-v20260718.yml",
+      "signals": [
+        "contents:write"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-membership-multirol-p0-smoke.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-observe-bootstrap-timeline-v1023.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-patch-normalizer-membership-docid-uid-v20260803.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-patch-rc12-closure-macro-firebase-bin-v20260803.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-product-readonly-get-rootfix-sourceonly-v20260820.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit",
+        "git-pull-rebase"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-r4-access-filter-fastpath-apply-once-v20260815.yml",
+      "signals": [
+        "contents:write",
+        "contents-api-mutation"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-r4-access-filter-fastpath-rootfix-v20260815.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-r4s2-apply-two-proven-rootfixes-v20260815.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-r4s3-access-scope-rootfix-apply-v20260816.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-r4s5-client360-deep-clone-rootfix-source-v20260816.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-r4s6-client-projection-consecutive-read-rootfix-source-v20260817.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-r4s7-client360-policy-index-rootfix-apply-v20260817.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-r4s7-source-only-rebind-apply-v20260817.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-r4s8-cliente360-first-paint-rootfix-source-v20260817.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-rc12-approved-roster-final-go-live-resume-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-rc12-approved-roster-rollback-recovery-corrective-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-rc12-approved-roster-rollback-recovery-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-rc12-final-postrollback-go-live-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-rc12-forensic-module-audit-v20260803.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-rc12-gate7151-post-stop-retry-continuation-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-rc12-membership-auth-source-run-v20260803.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-receipts-portfolio-projection-lifecycle-fix-v910-20260730.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-receipts-portfolio-rules-compat-visual-v910-20260730.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-recover-bootstrap-log-tail-v1023.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-recover-bootstrap-timeline-v1023.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-register-gate713-rc12-v20260803.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-register-gate714-normal-onboarding-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-register-gate715-approved-roster-final-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-register-visual-observable-rootfix-gate-v20260805.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-register-visual-rootfix-gate-v20260805.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-registered-relay-v21-event-driven-render-v20260807.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-registered-relay-v23-native-block1-v20260807.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-registered-relay-v24-canonical-evidence-handoff-v20260807.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-registered-relay-v25-differential-universe-diagnosis-v20260807.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-registered-relay-v28-focal-provenance-universe-v20260807.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-registered-relay-v29-identity-reconciliation-universe-v20260807.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-registered-relay-v30-retained26-export-v20260807.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-rootfix-approved-roster-reconciler-corrective-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-rootfix-approved-roster-reconciler-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-rootfix-evidence-path-gate713-v20260803.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-rootfix-final-writer-gate714-v20260804.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-run-visual-matrix-runtime-v7-once-20260806.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-sourcecheck-v14-two-phase-activation-v20260807.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-validate-portable-source-windows-v20260806.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-visual-hydration-required-optional-source-v20260805.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-visual-matrix-lifecycle-sequence-source-v20260806.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-visual-observable-rootfix-lab-v20260805.yml",
+      "signals": [
+        "contents:write"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-visual-runtime-rootfix-lab-v20260805.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-visual-runtime-rootfix-relay-v20260805.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    },
+    {
+      "path": ".github/workflows/orbit360-visual-runtime-rootfix-static-v20260805.yml",
+      "signals": [
+        "contents:write",
+        "git-push",
+        "git-commit"
+      ]
+    }
+  ],
+  "rule": "Only the canonical continuity workflow may mutate the Git branch or PR. Runtime, observers, candidate builders and diagnostics must publish artifacts/status only.",
+  "runtimeExecuted": false,
+  "browserExecuted": false,
+  "secretAccess": false,
+  "firestoreRead": false,
+  "operationalWrites": 0,
+  "deployExecuted": false,
+  "productionTouched": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
