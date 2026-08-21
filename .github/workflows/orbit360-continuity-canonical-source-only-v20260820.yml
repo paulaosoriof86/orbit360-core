@@ -1,6 +1,6 @@
 name: Orbit360 Continuity Canonical Source Only
-# Macro-2 first-stage diagnostic registration edge only.
-# Source-only diagnostic: no product commit/candidate/runtime/browser/secrets/Firestore/deploy/production.
+# Macro-2 first-stage diagnostic second edge: execute source-only checks and always persist exact failed stage.
+# No product commit/candidate/runtime/browser/secrets/Firestore/deploy/production.
 
 on:
   workflow_dispatch:
