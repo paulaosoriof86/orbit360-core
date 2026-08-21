@@ -1,7 +1,6 @@
 name: Orbit360 Continuity Canonical Source Only
-# DEFINITIVE SINGLE PHYSICAL WRITER — 2026-08-21.
-# Explicit-dispatch only. No runtime/browser/secrets/Firestore/deploy.
-# Historical workflows are preserved under .github/workflows-history-20260821/ and are not executable.
+# Macro-2 first-stage diagnostic registration edge only.
+# Source-only diagnostic: no product commit/candidate/runtime/browser/secrets/Firestore/deploy/production.
 
 on:
   workflow_dispatch:
@@ -10,18 +9,31 @@ on:
         description: 'Explicit source-only transition identifier'
         required: true
         type: string
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml'
 
 permissions:
   contents: write
-  pull-requests: write
-  statuses: write
+  actions: read
 
 concurrency:
   group: orbit360-continuity-canonical-ays
   cancel-in-progress: false
 
+env:
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  OWNER_SAFE_HEAD: 961e74e2aa24af744ae9026b9e68624993fe6f57
+  BASE_ARTIFACT_ID: '9433944723'
+  BASE_SOURCE_HEAD: c3bb825da2b1ecae08dabc2034c753482b086fec
+  BASE_ZIP_SHA256: 1951cc7c2d3390ea1c2a6b3d9ce0bb48e26a6f95d5d10d69b7c31a0027cfbbac
+  BASE_MANIFEST_SHA256: 580921077a88badab6e4076c42e9ef88f9de7936e1b6bad0f62410b39aec6397
+  DIAG_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/macro2-v3r1c1-first-stage-diagnostic-v20260821.json
+
 jobs:
   fail-closed-control-plane-owner:
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 3
     steps:
@@ -29,20 +41,138 @@ jobs:
         with:
           ref: ${{ github.sha }}
           fetch-depth: 0
-      - name: Enforce explicit source-only owner boundary
-        shell: bash
+      - shell: bash
         run: |
           set -euo pipefail
-          test "${{ github.ref_name }}" = 'ays/backend-tenant-lab-v99-20260703'
+          test "${{ github.ref_name }}" = "$ORBIT360_BRANCH"
           case "${{ inputs.transition }}" in
             READBACK_ONLY)
               node tools/orbit360-control-plane-composite-invariant-v20260820.mjs
               node tools/orbit360-control-plane-independent-readback-v20260820.mjs
-              node tools/orbit360-workflow-operational-surface-audit-v20260820.mjs
-              node tools/orbit360-documentation-state-discovery-v20260821.mjs
               ;;
-            *)
-              echo 'PIPELINE_MECHANISM_FAILURE:UNIMPLEMENTED_CANONICAL_TRANSITION_FAIL_CLOSED' >&2
-              exit 41
-              ;;
+            *) exit 41 ;;
           esac
+
+  macro2-first-stage-diagnostic:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - id: patchcheck
+        name: Check exact patch bundles
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(sha256sum .github/orbit360-source-patches/macro2-v20260821/product.patch.gz | awk '{print $1}')" = 'c7b932b2788a502ae07111d2e209d4b0cca0b844242bb1db80218b72fa4c6913'
+          test "$(sha256sum .github/orbit360-source-patches/macro2-v20260821/tools.patch.gz | awk '{print $1}')" = '64bb3f11736ce39593b12a54350270f73730a10430d1ce6e543bebaee622ba46'
+          test "$(sha256sum .github/orbit360-source-patches/macro2-v20260821/docs.patch.gz | awk '{print $1}')" = '4a6f77f7e35a89f0ef830e4b98fa8f4d1493e7973a4b91aa55ee5def78ed2167'
+          gzip -dc .github/orbit360-source-patches/macro2-v20260821/product.patch.gz > "$RUNNER_TEMP/product.patch"
+          gzip -dc .github/orbit360-source-patches/macro2-v20260821/tools.patch.gz > "$RUNNER_TEMP/tools.patch"
+          gzip -dc .github/orbit360-source-patches/macro2-v20260821/docs.patch.gz > "$RUNNER_TEMP/docs.patch"
+          test "$(sha256sum "$RUNNER_TEMP/product.patch" | awk '{print $1}')" = '6b3141493d69d2b25c581033460f5302498dd06dd8dfcad1245802390fafe540'
+          test "$(sha256sum "$RUNNER_TEMP/tools.patch" | awk '{print $1}')" = '035c756cc2c14ae428a87231a8cc266762b92ebc1c67974d691bbb20ffd90f97'
+          test "$(sha256sum "$RUNNER_TEMP/docs.patch" | awk '{print $1}')" = 'f5f679c113e6408981f111154e8d0fd34f515e82a70c2085d3f0f54515efa3c0'
+          git apply --check "$RUNNER_TEMP/product.patch"
+          git apply --check "$RUNNER_TEMP/tools.patch"
+          git apply --check "$RUNNER_TEMP/docs.patch"
+      - id: patchapply
+        name: Apply locally and validate syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          git apply "$RUNNER_TEMP/product.patch"
+          git apply "$RUNNER_TEMP/tools.patch"
+          git apply "$RUNNER_TEMP/docs.patch"
+          mapfile -t DELTA < <(git diff --name-only | sort)
+          test "${#DELTA[@]}" = '15'
+          node --check tools/orbit360-build-macro2-transversal-successor-v20260821.mjs
+          node --check tools/orbit360-promote-macro2-transversal-candidate-v20260821.mjs
+          node --check tools/orbit360-test-macro2-transversal-source-acceptance-v20260821.mjs
+          node --check tools/orbit360-documentation-state-discovery-v20260821.mjs
+          for f in orbit360-platform/core/ui.js orbit360-platform/core/queries.js orbit360-platform/core/client-canonical-view-projection-v20260716.js orbit360-platform/core/ciclo.js orbit360-platform/data/store-firestore-product-readonly-p0.js orbit360-platform/modules/inicio.js orbit360-platform/modules/cliente360.js orbit360-platform/modules/aseguradoras.js orbit360-platform/modules/cobros.js; do node --check "$f"; done
+          git diff --check
+      - id: predecessor
+        name: Verify exact predecessor artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUTER="$RUNNER_TEMP/base-outer.zip"; OD="$RUNNER_TEMP/base-outer"; PRE="$RUNNER_TEMP/predecessor"
+          rm -rf "$OUTER" "$OD" "$PRE"; mkdir -p "$OD" "$PRE"
+          curl -L --fail --retry 3 -H "Authorization: Bearer $GH_TOKEN" -H 'Accept: application/vnd.github+json' -H 'X-GitHub-Api-Version: 2022-11-28' "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/${BASE_ARTIFACT_ID}/zip" -o "$OUTER"
+          unzip -q "$OUTER" -d "$OD"
+          mapfile -t FILES < <(find "$OD" -maxdepth 1 -type f -printf '%f\n' | sort)
+          test "${#FILES[@]}" = '1'
+          INNER="$OD/${FILES[0]}"
+          test "$(sha256sum "$INNER" | awk '{print $1}')" = "$BASE_ZIP_SHA256"
+          unzip -q "$INNER" -d "$PRE"
+          test "$(sha256sum "$PRE/orbit360-package-manifest.json" | awk '{print $1}')" = "$BASE_MANIFEST_SHA256"
+          test "$(jq -r '.sourceHead' "$PRE/orbit360-package-manifest.json")" = "$BASE_SOURCE_HEAD"
+          cp "$PRE/orbit360-package-manifest.json" "$RUNNER_TEMP/base-manifest.json"
+          echo "MACRO2_PRE=$PRE" >> "$GITHUB_ENV"
+          echo "MACRO2_BASE_MANIFEST=$RUNNER_TEMP/base-manifest.json" >> "$GITHUB_ENV"
+      - id: acceptance
+        name: Run transversal source acceptance only
+        shell: bash
+        run: |
+          set -euo pipefail
+          ORBIT360_MACRO2_CANDIDATE_DIR="$GITHUB_WORKSPACE/orbit360-platform" ORBIT360_MACRO2_BASE_MANIFEST="$MACRO2_BASE_MANIFEST" node tools/orbit360-test-macro2-transversal-source-acceptance-v20260821.mjs > "$RUNNER_TEMP/acceptance.json"
+          jq -e '.ok==true and .status=="TRANSVERSAL_SOURCE_ACCEPTANCE_PASS" and .checksPassed==107 and .checksTotal==107 and .performance.clients==414 and .performance.allPolizas==1 and .performance.wherePolizas==0' "$RUNNER_TEMP/acceptance.json" >/dev/null
+      - name: Persist exact stage outcomes and restore dispatch-only
+        if: always()
+        env:
+          PATCHCHECK: ${{ steps.patchcheck.outcome }}
+          PATCHAPPLY: ${{ steps.patchapply.outcome }}
+          PREDECESSOR: ${{ steps.predecessor.outcome }}
+          ACCEPTANCE: ${{ steps.acceptance.outcome }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          FAILED_STAGE='NONE'
+          for pair in "PATCH_BUNDLE_CHECK:$PATCHCHECK" "PATCH_APPLY_SYNTAX:$PATCHAPPLY" "PREDECESSOR_ARTIFACT:$PREDECESSOR" "SOURCE_ACCEPTANCE_107:$ACCEPTANCE"; do
+            stage="${pair%%:*}"; outcome="${pair#*:}"; if [ "$outcome" != 'success' ] && [ "$FAILED_STAGE" = 'NONE' ]; then FAILED_STAGE="$stage"; fi
+          done
+          git reset --hard "$GITHUB_SHA"
+          mkdir -p "$(dirname "$DIAG_EVIDENCE")"
+          cat > "$DIAG_EVIDENCE" <<JSON
+          {
+            "schemaVersion":"orbit360-macro2-first-stage-diagnostic-v1",
+            "ok":$([ "$FAILED_STAGE" = 'NONE' ] && echo true || echo false),
+            "status":"$([ "$FAILED_STAGE" = 'NONE' ] && echo FIRST_STAGE_DIAGNOSTIC_PASS || echo FIRST_STAGE_DIAGNOSTIC_FAIL)",
+            "classification":"$([ "$FAILED_STAGE" = 'NONE' ] && echo PASS || echo PIPELINE_MECHANISM_FAILURE)",
+            "failedStage":"$FAILED_STAGE",
+            "patchBundleCheck":"$PATCHCHECK",
+            "patchApplySyntax":"$PATCHAPPLY",
+            "predecessorArtifact":"$PREDECESSOR",
+            "sourceAcceptance107":"$ACCEPTANCE",
+            "runId":${GITHUB_RUN_ID},
+            "triggerSha":"${GITHUB_SHA}",
+            "sourceOnly":true,
+            "productCommitted":false,
+            "candidatePublished":false,
+            "runtimeExecuted":false,
+            "browserExecuted":false,
+            "secretAccess":false,
+            "firestoreRead":false,
+            "writes":0,
+            "deployExecuted":false,
+            "productionTouched":false,
+            "containsPII":false,
+            "containsSecrets":false
+          }
+          JSON
+          git show "$OWNER_SAFE_HEAD:.github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml" > .github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml
+          git config user.name 'orbit360-control-plane-bot'
+          git config user.email 'orbit360-control-plane-bot@users.noreply.github.com'
+          git add -- "$DIAG_EVIDENCE" .github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml
+          git diff --cached --check
+          git commit -m 'diagnostic(macro2): persist first-stage outcome and restore owner'
+          git push origin "HEAD:$ORBIT360_BRANCH"
