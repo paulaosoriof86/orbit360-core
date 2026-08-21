@@ -75,7 +75,7 @@ jobs:
             mapfile -t REMOTE_DRIFT < <(git diff --name-only "$START_HEAD..$REMOTE_HEAD")
             for f in "${REMOTE_DRIFT[@]}"; do
               case "$f" in
-                .github/orbit360-requests/f2-runtime-observer-successor-*.json|orbit360-platform/runtime-gate-crm-v20260716/f2-runtime-observer-dispatch-*-v20260820.json|orbit360-platform/runtime-gate-crm-v20260716/f2-runtime-terminal-dispatch-*-v20260820.json) ;;
+                .github/orbit360-requests/f2-runtime-observer-successor-*.json|.github/workflows/orbit360-f2-runtime-observer-v20260820.yml|orbit360-platform/runtime-gate-crm-v20260716/f2-runtime-observer-dispatch-*-v20260820.json|orbit360-platform/runtime-gate-crm-v20260716/f2-runtime-terminal-dispatch-*-v20260820.json) ;;
                 *) echo "REMOTE_CAS_MISMATCH_NON_OBSERVER_DRIFT:$f"; exit 54;;
               esac
             done
