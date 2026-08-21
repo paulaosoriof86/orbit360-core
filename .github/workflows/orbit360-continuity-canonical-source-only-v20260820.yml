@@ -1,5 +1,5 @@
 name: Orbit360 Continuity Canonical Source Only
-# PERMANENT CANONICAL FAIL-CLOSED LISTENER — trigger macro2-first-stage-diagnostic-markdown-aware-20260821-02.
+# PERMANENT CANONICAL FAIL-CLOSED LISTENER — whitespace policy diagnostic capability added 2026-08-21.
 # One physical writer. Listener remains registered; activation is data-driven by an inert pointer.
 # No runtime/browser/secrets/Firestore/deploy/production.
 
@@ -27,6 +27,7 @@ env:
   ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
   POINTER: .github/orbit360-requests/macro2-canonical-source-activation-pointer-v20260821.json
   LISTENER_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/macro2-permanent-listener-terminal-v20260821.json
+  WHITESPACE_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/macro2-patch-apply-whitespace-policy-diagnostic-v20260821.json
   BASE_ARTIFACT_ID: '9433944723'
   BASE_SOURCE_HEAD: c3bb825da2b1ecae08dabc2034c753482b086fec
   BASE_ZIP_SHA256: 1951cc7c2d3390ea1c2a6b3d9ce0bb48e26a6f95d5d10d69b7c31a0027cfbbac
@@ -81,11 +82,19 @@ jobs:
           case "$STATUS:$MODE:$ALLOWED" in
             IDLE:NONE:0) ;;
             ACTIVE:FIRST_STAGE_DIAGNOSTIC:1) ;;
+            ACTIVE:WHITESPACE_POLICY_DIAGNOSTIC:1) ;;
             *) echo 'PIPELINE_MECHANISM_FAILURE:INVALID_CANONICAL_POINTER' >&2; exit 41 ;;
           esac
           echo "status=$STATUS" >> "$GITHUB_OUTPUT"
           echo "mode=$MODE" >> "$GITHUB_OUTPUT"
           echo "allowed=$ALLOWED" >> "$GITHUB_OUTPUT"
+      - id: whitespacepolicy
+        if: steps.router.outputs.mode == 'WHITESPACE_POLICY_DIAGNOSTIC'
+        name: Diagnose git apply and diff whitespace policy
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash .github/orbit360-source-patches/macro2-v20260821/macro2-whitespace-policy-diagnostic.sh
       - id: patchcheck
         if: steps.router.outputs.mode == 'FIRST_STAGE_DIAGNOSTIC'
         name: Check exact patch bundles
@@ -167,6 +176,7 @@ jobs:
           ROUTER: ${{ steps.router.outcome }}
           MODE: ${{ steps.router.outputs.mode }}
           POINTER_STATUS: ${{ steps.router.outputs.status }}
+          WHITESPACEPOLICY: ${{ steps.whitespacepolicy.outcome }}
           PATCHCHECK: ${{ steps.patchcheck.outcome }}
           PATCHAPPLY: ${{ steps.patchapply.outcome }}
           PREDECESSOR: ${{ steps.predecessor.outcome }}
@@ -177,6 +187,10 @@ jobs:
           FAILED_STAGE='NONE'
           FINAL_STATUS='PERMANENT_LISTENER_REGISTERED_PASS'
           if [ "$ROUTER" != 'success' ]; then FAILED_STAGE='POINTER_ROUTER'; FINAL_STATUS='PERMANENT_LISTENER_ROUTER_FAIL'; fi
+          if [ "$MODE" = 'WHITESPACE_POLICY_DIAGNOSTIC' ]; then
+            FINAL_STATUS='WHITESPACE_POLICY_DIAGNOSTIC_PASS'
+            if [ "$WHITESPACEPOLICY" != 'success' ]; then FAILED_STAGE='WHITESPACE_POLICY_DIAGNOSTIC'; FINAL_STATUS='WHITESPACE_POLICY_DIAGNOSTIC_FAIL'; fi
+          fi
           if [ "$MODE" = 'FIRST_STAGE_DIAGNOSTIC' ]; then
             FINAL_STATUS='FIRST_STAGE_DIAGNOSTIC_PASS'
             for pair in "PATCH_BUNDLE_CHECK:$PATCHCHECK" "PATCH_APPLY_SYNTAX:$PATCHAPPLY" "PREDECESSOR_ARTIFACT:$PREDECESSOR" "SOURCE_ACCEPTANCE_107:$ACCEPTANCE"; do
@@ -195,6 +209,7 @@ jobs:
             "pointerStatus":"${POINTER_STATUS:-UNKNOWN}",
             "failedStage":"$FAILED_STAGE",
             "router":"$ROUTER",
+            "whitespacePolicyDiagnostic":"$WHITESPACEPOLICY",
             "patchBundleCheck":"$PATCHCHECK",
             "patchApplySyntax":"$PATCHAPPLY",
             "predecessorArtifact":"$PREDECESSOR",
@@ -217,9 +232,14 @@ jobs:
             "containsSecrets":false
           }
           JSON
+          if [ "$MODE" = 'WHITESPACE_POLICY_DIAGNOSTIC' ] && [ -f "$RUNNER_TEMP/macro2-whitespace-policy.json" ]; then
+            mkdir -p "$(dirname "$WHITESPACE_EVIDENCE")"
+            cp "$RUNNER_TEMP/macro2-whitespace-policy.json" "$WHITESPACE_EVIDENCE"
+          fi
           git config user.name 'orbit360-control-plane-bot'
           git config user.email 'orbit360-control-plane-bot@users.noreply.github.com'
           git add -- "$LISTENER_EVIDENCE"
+          if [ -f "$WHITESPACE_EVIDENCE" ]; then git add -- "$WHITESPACE_EVIDENCE"; fi
           git diff --cached --check
           git commit -m 'evidence(macro2): persist permanent listener terminal'
           git push origin "HEAD:$ORBIT360_BRANCH"
