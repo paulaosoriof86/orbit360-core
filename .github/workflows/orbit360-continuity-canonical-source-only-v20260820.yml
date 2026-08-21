@@ -1,7 +1,5 @@
 name: Orbit360 Continuity Canonical Source Only
-# DEFINITIVE SINGLE PHYSICAL WRITER — 2026-08-21.
-# Explicit-dispatch only. No runtime/browser/secrets/Firestore/deploy.
-# Historical workflows are preserved under .github/workflows-history-20260821/ and are not executable.
+# V3R1 inert preflight gate only. No patch apply/build/artifact/runtime/browser/secrets/Firestore/deploy/production.
 
 on:
   workflow_dispatch:
@@ -10,6 +8,10 @@ on:
         description: 'Explicit source-only transition identifier'
         required: true
         type: string
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
+    paths:
+      - '.github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml'
 
 permissions:
   contents: write
@@ -20,8 +22,16 @@ concurrency:
   group: orbit360-continuity-canonical-ays
   cancel-in-progress: false
 
+env:
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  MACRO2_REQUEST: .github/orbit360-requests/macro2-transversal-source-recovery-v3r1-20260821.json
+  MACRO2_TEMPLATE: .github/orbit360-workflow-templates/orbit360-continuity-canonical-source-only-v3r1-20260821.yml
+  OWNER_SAFE_HEAD: 961e74e2aa24af744ae9026b9e68624993fe6f57
+  PREFLIGHT_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/macro2-v3r1-inert-preflight-pass-v20260821.json
+
 jobs:
   fail-closed-control-plane-owner:
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 3
     steps:
@@ -29,11 +39,10 @@ jobs:
         with:
           ref: ${{ github.sha }}
           fetch-depth: 0
-      - name: Enforce explicit source-only owner boundary
-        shell: bash
+      - shell: bash
         run: |
           set -euo pipefail
-          test "${{ github.ref_name }}" = 'ays/backend-tenant-lab-v99-20260703'
+          test "${{ github.ref_name }}" = "$ORBIT360_BRANCH"
           case "${{ inputs.transition }}" in
             READBACK_ONLY)
               node tools/orbit360-control-plane-composite-invariant-v20260820.mjs
@@ -41,8 +50,42 @@ jobs:
               node tools/orbit360-workflow-operational-surface-audit-v20260820.mjs
               node tools/orbit360-documentation-state-discovery-v20260821.mjs
               ;;
-            *)
-              echo 'PIPELINE_MECHANISM_FAILURE:UNIMPLEMENTED_CANONICAL_TRANSITION_FAIL_CLOSED' >&2
-              exit 41
-              ;;
+            *) exit 41 ;;
           esac
+
+  macro2-v3r1-inert-preflight:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate inert V3R1 package only
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash -n .github/orbit360-source-patches/macro2-v20260821/macro2-v3r1-pre.sh
+          bash -n .github/orbit360-source-patches/macro2-v20260821/macro2-v3r1-post.sh
+          ORBIT360_MACRO2_REQUEST="$MACRO2_REQUEST" ORBIT360_MACRO2_WORKFLOW="$MACRO2_TEMPLATE" node tools/orbit360-macro2-pipeline-preflight-v20260821.mjs | tee "$RUNNER_TEMP/v3r1-preflight.json"
+          jq -e '.ok==true and .status=="MACRO2_PIPELINE_PREFLIGHT_PASS" and .failures==[] and .stopRetryReopenValidated==true and .actionsRegistrationHandshakeValidated==true and .activationParentBindingValidated==true and .workflowTemplateBound==true and .runnerPlainTextValidated==true and .runtimeExecuted==false and .browserExecuted==false and .secretAccess==false and .firestoreRead==false and .writes==0 and .deployExecuted==false and .productionTouched==false' "$RUNNER_TEMP/v3r1-preflight.json" >/dev/null
+      - name: Persist sanitized gate evidence and restore dispatch-only owner
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$(dirname "$PREFLIGHT_EVIDENCE")"
+          cp "$RUNNER_TEMP/v3r1-preflight.json" "$PREFLIGHT_EVIDENCE"
+          node - "$PREFLIGHT_EVIDENCE" "$GITHUB_RUN_ID" "$GITHUB_SHA" <<'NODE'
+          const fs=require('fs');const [p,run,sha]=process.argv.slice(2);const x=JSON.parse(fs.readFileSync(p,'utf8'));x.schemaVersion='orbit360-macro2-v3r1-inert-preflight-v1';x.runId=Number(run);x.triggerSha=sha;x.materialized=false;x.requestActivated=false;x.productTouched=false;x.containsPII=false;x.containsSecrets=false;fs.writeFileSync(p,JSON.stringify(x,null,2)+'\n');
+          NODE
+          git show "$OWNER_SAFE_HEAD:.github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml" > .github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml
+          git config user.name 'orbit360-control-plane-bot'
+          git config user.email 'orbit360-control-plane-bot@users.noreply.github.com'
+          git add -- "$PREFLIGHT_EVIDENCE" .github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml
+          git diff --cached --check
+          git commit -m 'gate(macro2): persist V3R1 inert preflight pass and restore owner'
+          git push origin "HEAD:$ORBIT360_BRANCH"
