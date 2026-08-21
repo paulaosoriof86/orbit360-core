@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "orbit360-macro2-canonical-source-activation-pointer-v1",
+  "status": "IDLE",
+  "mode": "NONE",
+  "activeRequestPath": null,
+  "activationNonce": null,
+  "allowedExecutions": 0,
+  "consumed": true,
+  "replayAllowed": false,
+  "sourceOnly": true,
+  "runtime": false,
+  "browser": false,
+  "secrets": false,
+  "firestoreRead": false,
+  "writes": false,
+  "deploy": false,
+  "production": false,
+  "main": false,
+  "merge": false,
+  "rootCauseResolution": "PERMANENT_CANONICAL_FAIL_CLOSED_LISTENER_REQUIRED",
+  "containsPII": false,
+  "containsSecrets": false
+}
