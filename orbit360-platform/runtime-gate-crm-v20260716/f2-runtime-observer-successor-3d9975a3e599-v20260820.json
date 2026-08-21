@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "orbit360-f2-runtime-observer-v3",
+  "ok": false,
+  "status": "RUNTIME_RUN_NOT_COMPLETED_OR_NOT_FOUND",
+  "classification": "PIPELINE_MECHANISM_FAILURE",
+  "targetRequestCommit": "049bc2579fbf82dd5f6590a509628b1edfd0f6e4",
+  "targetRequestPath": ".github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-successor-3d9975a3e599-v20260820.json",
+  "authorizationIdentityDigest": "3d9975a3e599362ed1683f13d7e8b92367c626159240485e0c47f06de654ff47",
+  "runtimeRunId": null,
+  "runtimeStatus": "",
+  "runtimeConclusion": "",
+  "evidenceArtifactId": null,
+  "evidenceArtifactDigest": "",
+  "sourceOnlyObserver": true,
+  "runtimeExecutedByObserver": false,
+  "browserExecutedByObserver": false,
+  "secretAccessByObserver": false,
+  "firestoreReadByObserver": false,
+  "writesByObserver": 0,
+  "containsPII": false,
+  "containsSecrets": false
+}
