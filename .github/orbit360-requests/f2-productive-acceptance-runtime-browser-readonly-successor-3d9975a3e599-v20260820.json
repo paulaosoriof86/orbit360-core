@@ -5,13 +5,13 @@
   "gateId": "f2-productive-acceptance-exact-successor-v20260818",
   "gateContractVersion": "2.2.0",
   "rcId": "RC-AYS-LAB-CANONICA-01",
-  "status": "MATERIALIZED_SOURCE_ONLY_AWAITING_PREFLIGHT",
+  "status": "CONSUMED_FAIL_VALIDATOR_STALE",
   "approved": true,
-  "allowedExecutions": 1,
-  "consumed": false,
+  "allowedExecutions": 0,
+  "consumed": true,
   "authorizationFrozen": true,
   "replayAllowed": false,
-  "historical": false,
+  "historical": true,
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
   "projectId": "ays-orbit-360-lab",
@@ -24,5 +24,9 @@
   "authorizationIdentityDigest": "3d9975a3e599362ed1683f13d7e8b92367c626159240485e0c47f06de654ff47",
   "materializedAt": "2026-08-20T23:51:37.284Z",
   "containsPII": false,
-  "containsSecrets": false
+  "containsSecrets": false,
+  "consumedAt": "2026-08-21T02:52:15.108Z",
+  "runtimeRunId": 32439647187,
+  "terminalEvidencePath": "orbit360-platform/runtime-gate-crm-v20260716/f2-runtime-terminal-dispatch-3d9975a3e599-v20260820.json",
+  "disposition": "NO_REPLAY_TERMINAL_VALIDATOR_STALE"
 }
