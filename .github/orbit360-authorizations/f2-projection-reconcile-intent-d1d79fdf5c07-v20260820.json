@@ -14,6 +14,8 @@
   "expectedLedgerRevision": 22,
   "expectedPackageRevision": 16,
   "targetStep": "F2-RUNTIME-AUTHORIZATION",
+  "triggerRevision": 2,
+  "retryReason": "SOURCE_ONLY_FINAL_CAS_RETRY_AFTER_NON_CONTROL_DOC_COMMIT",
   "containsPII": false,
   "containsSecrets": false
 }
