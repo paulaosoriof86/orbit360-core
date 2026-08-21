@@ -1,6 +1,5 @@
 name: Orbit360 Continuity Canonical Source Only
-# V3R1 two-edge registration handshake: second edge runs inert preflight only.
-# No patch apply/build/artifact/runtime/browser/secrets/Firestore/deploy/production.
+# V3R1 self-registering source-only activation. No product runtime/browser/secrets/Firestore/deploy/production.
 
 on:
   workflow_dispatch:
@@ -16,6 +15,7 @@ on:
 
 permissions:
   contents: write
+  actions: read
   pull-requests: write
   statuses: write
 
@@ -26,9 +26,10 @@ concurrency:
 env:
   ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
   MACRO2_REQUEST: .github/orbit360-requests/macro2-transversal-source-recovery-v3r1-20260821.json
-  MACRO2_TEMPLATE: .github/orbit360-workflow-templates/orbit360-continuity-canonical-source-only-v3r1-20260821.yml
-  REGISTRATION_PARENT: 0c6028d50a5cbc907f5c22383290cf93bb381e0d
-  PREFLIGHT_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/macro2-v3r1-inert-preflight-pass-v20260821.json
+  BASE_ARTIFACT_ID: '9433944723'
+  BASE_SOURCE_HEAD: c3bb825da2b1ecae08dabc2034c753482b086fec
+  BASE_ZIP_SHA256: 1951cc7c2d3390ea1c2a6b3d9ce0bb48e26a6f95d5d10d69b7c31a0027cfbbac
+  BASE_MANIFEST_SHA256: 580921077a88badab6e4076c42e9ef88f9de7936e1b6bad0f62410b39aec6397
 
 jobs:
   fail-closed-control-plane-owner:
@@ -40,7 +41,8 @@ jobs:
         with:
           ref: ${{ github.sha }}
           fetch-depth: 0
-      - shell: bash
+      - name: Enforce explicit source-only owner boundary
+        shell: bash
         run: |
           set -euo pipefail
           test "${{ github.ref_name }}" = "$ORBIT360_BRANCH"
@@ -54,10 +56,10 @@ jobs:
             *) exit 41 ;;
           esac
 
-  macro2-v3r1-inert-preflight:
+  macro2-v3r1-source-only:
     if: github.event_name == 'push'
-    runs-on: ubuntu-latest
-    timeout-minutes: 3
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
         with:
@@ -66,31 +68,51 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Prove registered second edge and validate inert V3R1 package
+      - name: Run durable source/build phase
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ORBIT360_EVENT_BEFORE: ${{ github.event.before }}
         shell: bash
         run: |
           set -euo pipefail
-          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
-          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
-          test "$(git rev-parse HEAD^)" = "$REGISTRATION_PARENT"
-          bash -n .github/orbit360-source-patches/macro2-v20260821/macro2-v3r1-pre.sh
-          bash -n .github/orbit360-source-patches/macro2-v20260821/macro2-v3r1-post.sh
-          ORBIT360_MACRO2_REQUEST="$MACRO2_REQUEST" ORBIT360_MACRO2_WORKFLOW="$MACRO2_TEMPLATE" node tools/orbit360-macro2-pipeline-preflight-v20260821.mjs | tee "$RUNNER_TEMP/v3r1-preflight.json"
-          jq -e '.ok==true and .status=="MACRO2_PIPELINE_PREFLIGHT_PASS" and .failures==[] and .stopRetryReopenValidated==true and .actionsRegistrationHandshakeValidated==true and .activationParentBindingValidated==true and .workflowTemplateBound==true and .runnerPlainTextValidated==true and .runtimeExecuted==false and .browserExecuted==false and .secretAccess==false and .firestoreRead==false and .writes==0 and .deployExecuted==false and .productionTouched==false' "$RUNNER_TEMP/v3r1-preflight.json" >/dev/null
-      - name: Persist sanitized gate evidence and keep registered listener
+          PRE_PATH=$(jq -r '.runnerScripts[]|select(.role=="pre")|.path' "$MACRO2_REQUEST")
+          PRE_SHA=$(jq -r '.runnerScripts[]|select(.role=="pre")|.sha256' "$MACRO2_REQUEST")
+          test "$(sha256sum "$PRE_PATH"|awk '{print $1}')" = "$PRE_SHA"
+          bash "$PRE_PATH"
+      - name: Upload single Macro-2 candidate
+        id: candidate
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-macro2-transversal-source-candidate-${{ github.run_id }}
+          path: ${{ env.SUCCESSOR_ZIP }}
+          retention-days: 30
+          compression-level: 0
+          if-no-files-found: error
+      - name: Persist metadata and promote
+        env:
+          ARTIFACT_ID: ${{ steps.candidate.outputs.artifact-id }}
+          ARTIFACT_DIGEST_RAW: ${{ steps.candidate.outputs.artifact-digest }}
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p "$(dirname "$PREFLIGHT_EVIDENCE")"
-          cp "$RUNNER_TEMP/v3r1-preflight.json" "$PREFLIGHT_EVIDENCE"
-          node - "$PREFLIGHT_EVIDENCE" "$GITHUB_RUN_ID" "$GITHUB_SHA" "$REGISTRATION_PARENT" <<'NODE'
-          const fs=require('fs');const [p,run,sha,parent]=process.argv.slice(2);const x=JSON.parse(fs.readFileSync(p,'utf8'));x.schemaVersion='orbit360-macro2-v3r1-inert-preflight-v2';x.runId=Number(run);x.triggerSha=sha;x.registrationParent=parent;x.twoEdgeHandshakeValidated=true;x.materialized=false;x.requestActivated=false;x.productTouched=false;x.containsPII=false;x.containsSecrets=false;fs.writeFileSync(p,JSON.stringify(x,null,2)+'\n');
-          NODE
-          git config user.name 'orbit360-control-plane-bot'
-          git config user.email 'orbit360-control-plane-bot@users.noreply.github.com'
-          git add -- "$PREFLIGHT_EVIDENCE"
-          git diff --cached --check
-          git commit -m 'gate(macro2): persist V3R1 two-edge inert preflight pass'
-          git fetch origin "$ORBIT360_BRANCH"
-          test "$(git rev-parse origin/$ORBIT360_BRANCH)" = "$GITHUB_SHA"
-          git push origin "HEAD:$ORBIT360_BRANCH"
+          POST_PATH=$(jq -r '.runnerScripts[]|select(.role=="post")|.path' "$MACRO2_REQUEST")
+          POST_SHA=$(jq -r '.runnerScripts[]|select(.role=="post")|.sha256' "$MACRO2_REQUEST")
+          test "$(sha256sum "$POST_PATH"|awk '{print $1}')" = "$POST_SHA"
+          bash "$POST_PATH"
+      - name: Upload sanitized Macro-2 evidence
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-macro2-transversal-source-evidence-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/macro2-pipeline-preflight.json
+            ${{ runner.temp }}/macro2-source-acceptance-precommit.json
+            ${{ runner.temp }}/macro2-build.json
+            ${{ runner.temp }}/macro2-source-acceptance-successor.json
+            ${{ runner.temp }}/macro2-promotion.json
+            ${{ runner.temp }}/macro2-composite.json
+            ${{ runner.temp }}/macro2-readback.json
+            ${{ runner.temp }}/macro2-writer-audit.json
+            ${{ runner.temp }}/macro2-doc-discovery.json
+          retention-days: 30
+          if-no-files-found: error
