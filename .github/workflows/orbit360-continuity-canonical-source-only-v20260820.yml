@@ -1,5 +1,5 @@
 name: Orbit360 Continuity Canonical Source Only
-# V3R1C1 registration edge only. Listener registration; no source execution.
+# V3R1C1 registered inert preflight only.
 # No patch apply/build/artifact/runtime/browser/secrets/Firestore/deploy/production.
 
 on:
@@ -25,6 +25,10 @@ concurrency:
 
 env:
   ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  MACRO2_REQUEST: .github/orbit360-requests/macro2-transversal-source-recovery-v3r1c1-20260821.json
+  MACRO2_TEMPLATE: .github/orbit360-workflow-templates/orbit360-continuity-canonical-source-only-v3r1c1-20260821.yml
+  REGISTRATION_PARENT: 293d01741f8656291199ca2bce9f924e41919494
+  PREFLIGHT_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/macro2-v3r1c1-inert-preflight-pass-v20260821.json
 
 jobs:
   fail-closed-control-plane-owner:
@@ -49,3 +53,44 @@ jobs:
               ;;
             *) exit 41 ;;
           esac
+
+  macro2-v3r1c1-inert-preflight:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate V3R1C1 package and local runner scope
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test "$(git rev-parse HEAD^)" = "$REGISTRATION_PARENT"
+          bash -n .github/orbit360-source-patches/macro2-v20260821/macro2-v3r1-pre.sh
+          bash -n .github/orbit360-source-patches/macro2-v20260821/macro2-v3r1-post.sh
+          ORBIT360_MACRO2_REQUEST="$MACRO2_REQUEST" ORBIT360_MACRO2_WORKFLOW="$MACRO2_TEMPLATE" node tools/orbit360-macro2-pipeline-preflight-v20260821.mjs | tee "$RUNNER_TEMP/v3r1c1-preflight.json"
+          jq -e '.ok==true and .status=="MACRO2_PIPELINE_PREFLIGHT_PASS" and .failures==[] and .stopRetryReopenValidated==true and .actionsRegistrationHandshakeValidated==true and .preRunnerScopeRootCauseValidated==true and .activationParentBindingValidated==true and .workflowTemplateBound==true and .runnerPlainTextValidated==true and .runnerLocalScopeValidated==true and .runnerGitBlobBindingSupported==true and .runtimeExecuted==false and .browserExecuted==false and .secretAccess==false and .firestoreRead==false and .writes==0 and .deployExecuted==false and .productionTouched==false' "$RUNNER_TEMP/v3r1c1-preflight.json" >/dev/null
+      - name: Persist sanitized V3R1C1 preflight evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$(dirname "$PREFLIGHT_EVIDENCE")"
+          cp "$RUNNER_TEMP/v3r1c1-preflight.json" "$PREFLIGHT_EVIDENCE"
+          node - "$PREFLIGHT_EVIDENCE" "$GITHUB_RUN_ID" "$GITHUB_SHA" "$REGISTRATION_PARENT" <<'NODE'
+          const fs=require('fs');const [p,run,sha,parent]=process.argv.slice(2);const x=JSON.parse(fs.readFileSync(p,'utf8'));x.schemaVersion='orbit360-macro2-v3r1c1-inert-preflight-v1';x.runId=Number(run);x.triggerSha=sha;x.registrationParent=parent;x.twoEdgeHandshakeValidated=true;x.materialized=false;x.requestActivated=false;x.productTouched=false;x.containsPII=false;x.containsSecrets=false;fs.writeFileSync(p,JSON.stringify(x,null,2)+'\n');
+          NODE
+          git config user.name 'orbit360-control-plane-bot'
+          git config user.email 'orbit360-control-plane-bot@users.noreply.github.com'
+          git add -- "$PREFLIGHT_EVIDENCE"
+          git diff --cached --check
+          git commit -m 'gate(macro2): persist V3R1C1 inert preflight pass'
+          git fetch origin "$ORBIT360_BRANCH"
+          test "$(git rev-parse origin/$ORBIT360_BRANCH)" = "$GITHUB_SHA"
+          git push origin "HEAD:$ORBIT360_BRANCH"
