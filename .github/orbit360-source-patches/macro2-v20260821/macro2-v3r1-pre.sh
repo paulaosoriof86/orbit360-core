@@ -4,10 +4,10 @@ set -euo pipefail
 set -euo pipefail
 test "$GITHUB_REF_NAME" = "$ORBIT360_BRANCH"
 test "$GITHUB_RUN_ATTEMPT" = '1'
-test "$GITHUB_EVENT_BEFORE" != ""
-test "$GITHUB_EVENT_BEFORE" != "0000000000000000000000000000000000000000"
+test "$ORBIT360_EVENT_BEFORE" != ""
+test "$ORBIT360_EVENT_BEFORE" != "0000000000000000000000000000000000000000"
 test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
-test "$(git rev-parse HEAD^)" = "$GITHUB_EVENT_BEFORE"
+test "$(git rev-parse HEAD^)" = "$ORBIT360_EVENT_BEFORE"
 ORBIT360_MACRO2_REQUEST="$MACRO2_REQUEST" node tools/orbit360-macro2-pipeline-preflight-v20260821.mjs | tee "$RUNNER_TEMP/macro2-pipeline-preflight.json"
 jq -e '.ok==true and .status=="MACRO2_PIPELINE_PREFLIGHT_PASS" and .stopRetryReopenValidated==true and .actionsRegistrationHandshakeValidated==true and .activationParentBindingValidated==true and .durableSourceBeforeArtifact==true and .durableArtifactMetadataBeforePromotion==true and .artifactDigestContractNormalized==true and .runtimeExecuted==false and .browserExecuted==false and .secretAccess==false and .firestoreRead==false and .writes==0 and .deployExecuted==false and .productionTouched==false' "$RUNNER_TEMP/macro2-pipeline-preflight.json" >/dev/null
 PRODUCT_PATCH="$RUNNER_TEMP/macro2-product.patch"
