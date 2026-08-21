@@ -4,24 +4,31 @@ set -euo pipefail
 source_aware_diff_check(){
   local mode="${1:-worktree}"
   local -a md=()
+  local -a untracked=()
   if [ "$mode" = 'staged' ]; then
     git diff --cached --check -- . ':(exclude,glob)**/*.md'
-    mapfile -t md < <(git diff --cached --name-only -- ':(glob)**/*.md')
+    mapfile -t md < <(git diff --cached --name-only -- ':(glob)**/*.md' | sort -u)
   else
     git diff --check -- . ':(exclude,glob)**/*.md'
-    mapfile -t md < <(git diff --name-only -- ':(glob)**/*.md')
+    mapfile -t untracked < <(git ls-files --others --exclude-standard | sort -u)
+    mapfile -t md < <({ git diff --name-only -- ':(glob)**/*.md'; printf '%s\n' "${untracked[@]}" | grep -E '\.md$' || true; } | sed '/^$/d' | sort -u)
+    if ((${#untracked[@]})); then
+      node - "${untracked[@]}" <<'NODE'
+const fs=require('fs');const bad=[];
+for(const f of process.argv.slice(2)){
+  if(!fs.existsSync(f)||/\.md$/i.test(f))continue;
+  fs.readFileSync(f,'utf8').split(/\n/).forEach((line,i)=>{const m=line.match(/[ \t]+$/);if(m)bad.push(`${f}:${i+1}:${JSON.stringify(m[0])}`);});
+}
+if(bad.length){console.error('UNTRACKED_NON_MARKDOWN_TRAILING_WHITESPACE_INVALID\n'+bad.join('\n'));process.exit(41);}
+NODE
+    fi
   fi
   if ((${#md[@]})); then
     node - "${md[@]}" <<'NODE'
-const fs=require('fs');
-const bad=[];
+const fs=require('fs');const bad=[];
 for(const f of process.argv.slice(2)){
-  if(!fs.existsSync(f)) continue;
-  const lines=fs.readFileSync(f,'utf8').split(/\n/);
-  lines.forEach((line,i)=>{
-    const m=line.match(/[ \t]+$/);
-    if(m && m[0] !== '  ') bad.push(`${f}:${i+1}:${JSON.stringify(m[0])}`);
-  });
+  if(!fs.existsSync(f))continue;
+  fs.readFileSync(f,'utf8').split(/\n/).forEach((line,i)=>{const m=line.match(/[ \t]+$/);if(m&&m[0]!=='  ')bad.push(`${f}:${i+1}:${JSON.stringify(m[0])}`);});
 }
 if(bad.length){console.error('MARKDOWN_TRAILING_WHITESPACE_INVALID\n'+bad.join('\n'));process.exit(41);}
 NODE
