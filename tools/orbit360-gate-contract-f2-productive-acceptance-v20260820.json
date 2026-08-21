@@ -23,6 +23,8 @@
     "manifestSha256": "44dee7cebb174dfd630641d1e16ac649edffec18af688b62e05ceff4dc5812a5",
     "fileCount": 194
   },
+  "candidateCertificationEvidence": "orbit360-platform/runtime-gate-crm-v20260716/f2-successor-candidate-sourceonly-v20260820.json",
+  "candidateCertificationPolicy": "DYNAMIC_FROM_CANONICAL_AUTHORITY_NO_HISTORICAL_CERT_LITERAL",
   "productionReopeningPackage": "orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json",
   "requestBinding": {
     "activeRequest": null,

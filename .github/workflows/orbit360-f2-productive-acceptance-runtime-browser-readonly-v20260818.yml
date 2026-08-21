@@ -88,17 +88,24 @@ jobs:
           test "$(jq -r '.replayAllowed' "$REQUEST_FILE")" = 'false'
           test "$(jq -r '.historical' "$REQUEST_FILE")" = 'false'
           LEDGER=orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json
-          CERT="$EVIDENCE_DIR/f2-successor-candidate-sourceonly-v20260820.json"
+          AUTHORITY=tools/orbit360-gate-contract-f2-productive-acceptance-v20260820.json
+          CERT="$(jq -r '.candidateCertificationEvidence // ""' "$AUTHORITY")"
+          test -n "$CERT" && test -f "$CERT"
           ARTIFACT="$(jq -r '.successorCandidate.artifactId' "$LEDGER")"
           SOURCE="$(jq -r '.successorCandidate.sourceHead' "$LEDGER")"
+          DIGEST="$(jq -r '.successorCandidate.artifactDigest' "$LEDGER")"
           ZIP_SHA="$(jq -r '.successorCandidate.zipSha256' "$LEDGER")"
           MANIFEST_SHA="$(jq -r '.successorCandidate.manifestSha256' "$LEDGER")"
+          FILE_COUNT="$(jq -r '.successorCandidate.fileCount' "$LEDGER")"
           test "$(jq -r '.successorCandidate.status' "$LEDGER")" != ''
           jq -e '.successorCandidate.status|startswith("CERTIFIED_SOURCE_ONLY")' "$LEDGER" >/dev/null
-          jq -e --argjson artifact "$ARTIFACT" --arg source "$SOURCE" --arg zip "$ZIP_SHA" --arg manifest "$MANIFEST_SHA" '.ok==true and .candidateArtifactId==$artifact and .candidateSourceHead==$source and .candidateZipSha256==$zip and .candidateManifestSha256==$manifest' "$CERT" >/dev/null
+          jq -e --argjson artifact "$ARTIFACT" --arg source "$SOURCE" --arg digest "$DIGEST" --arg zip "$ZIP_SHA" --arg manifest "$MANIFEST_SHA" --argjson count "$FILE_COUNT" '.candidate.artifactId==$artifact and .candidate.sourceHead==$source and .candidate.artifactDigest==$digest and .candidate.zipSha256==$zip and .candidate.manifestSha256==$manifest and .candidate.fileCount==$count and (.candidateCertificationEvidence|type=="string") and (.candidateCertificationEvidence|length)>0' "$AUTHORITY" >/dev/null
+          jq -e --argjson artifact "$ARTIFACT" --arg source "$SOURCE" --arg digest "$DIGEST" --arg zip "$ZIP_SHA" --arg manifest "$MANIFEST_SHA" --argjson count "$FILE_COUNT" '.ok==true and .classification=="PASS" and .candidateArtifactId==$artifact and .candidateSourceHead==$source and .artifactDigest==$digest and .candidateZipSha256==$zip and .candidateManifestSha256==$manifest and .fileCount==$count' "$CERT" >/dev/null
           test "$(jq -r '.candidateArtifactId' "$REQUEST_FILE")" = "$ARTIFACT"
           test "$(jq -r '.candidateSourceHead' "$REQUEST_FILE")" = "$SOURCE"
+          test "$(jq -r '.candidateArtifactDigest' "$REQUEST_FILE")" = "$DIGEST"
           echo "ORBIT360_REQUEST_FILE=$REQUEST_FILE" >> "$GITHUB_ENV"
+          echo "ORBIT360_CANDIDATE_CERTIFICATION_EVIDENCE=$CERT" >> "$GITHUB_ENV"
           echo "ORBIT360_CANDIDATE_ARTIFACT_ID=$ARTIFACT" >> "$GITHUB_ENV"
           echo "ORBIT360_CANDIDATE_SOURCE_HEAD=$SOURCE" >> "$GITHUB_ENV"
           echo "ORBIT360_CANDIDATE_ZIP_SHA256=$ZIP_SHA" >> "$GITHUB_ENV"
@@ -127,7 +134,7 @@ jobs:
           rm -f "$EVIDENCE_DIR/preflight-sanitizado.json"
           node tools/orbit360-validar-gate-contracts-v20260717.mjs "$ORBIT360_GATE_ID"
           jq --arg run "$GITHUB_RUN_ID" '. + {runId:$run,evidenceFreshness:"current-run-only"}' "$EVIDENCE_DIR/preflight-sanitizado.json" > "$EVIDENCE_DIR/f2-runtime-preflight-run-${GITHUB_RUN_ID}.json"
-          jq -e --arg run "$GITHUB_RUN_ID" --argjson artifact "$ORBIT360_CANDIDATE_ARTIFACT_ID" '.ok==true and .status=="GO_GATE_CONTRACT" and .classification=="GO_F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY" and .runId==$run and .candidateArtifactId==$artifact and .executionAuthorized==true and .secretAccessAuthorized==true and .firestoreReadAuthorized==true and .runtimeAuthorized==true and .browserAuthorized==true and .writeAuthorized==false and .deployAuthorized==false and .publicationAuthorized==false and .productionAuthorized==false' "$EVIDENCE_DIR/f2-runtime-preflight-run-${GITHUB_RUN_ID}.json" >/dev/null
+          jq -e --arg run "$GITHUB_RUN_ID" --argjson artifact "$ORBIT360_CANDIDATE_ARTIFACT_ID" '.ok==true and .status=="GO_GATE_CONTRACT" and .classification=="GO_F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY" and .runId==$run and .candidateArtifactId==$artifact and .certificationPathDerivedFromCanonicalAuthority==true and .executionAuthorized==true and .secretAccessAuthorized==true and .firestoreReadAuthorized==true and .runtimeAuthorized==true and .browserAuthorized==true and .writeAuthorized==false and .deployAuthorized==false and .publicationAuthorized==false and .productionAuthorized==false' "$EVIDENCE_DIR/f2-runtime-preflight-run-${GITHUB_RUN_ID}.json" >/dev/null
       - name: Download and fully verify exact F2 candidate after GO
         if: steps.gate.outcome == 'success'
         env:
@@ -143,7 +150,7 @@ jobs:
           INNER="$OUTER_DIR/${FILES[0]}"; test "$(sha256sum "$INNER" | awk '{print $1}')" = "$ORBIT360_CANDIDATE_ZIP_SHA256"
           unzip -q "$INNER" -d "$CANDIDATE_DIR"; test "$(sha256sum "$CANDIDATE_DIR/orbit360-package-manifest.json" | awk '{print $1}')" = "$ORBIT360_CANDIDATE_MANIFEST_SHA256"
           ORBIT360_F2_CANDIDATE_DIR="$CANDIDATE_DIR" ORBIT360_F2_CANDIDATE_SOURCE_EVIDENCE="$EVIDENCE_DIR/f2-candidate-source-run-${GITHUB_RUN_ID}.json" node tools/orbit360-f2-exact-candidate-source-validator-v20260819.mjs
-          jq -e --argjson artifact "$ORBIT360_CANDIDATE_ARTIFACT_ID" '.ok==true and .status=="F2_EXACT_CANDIDATE_SOURCE_VALIDATION_PASS" and .candidateArtifactId==$artifact and .fullRehashPass==true and .inicioFiniteRootfixPass==true and .routerReadinessRootfixPass==true and .storeGetRootfixPass==true' "$EVIDENCE_DIR/f2-candidate-source-run-${GITHUB_RUN_ID}.json" >/dev/null
+          jq -e --argjson artifact "$ORBIT360_CANDIDATE_ARTIFACT_ID" '.ok==true and .status=="F2_EXACT_CANDIDATE_SOURCE_VALIDATION_PASS" and .candidateArtifactId==$artifact and .certificationPathDerivedFromCanonicalAuthority==true and .fullRehashPass==true and .inicioFiniteRootfixPass==true and .routerReadinessRootfixPass==true and .storeGetRootfixPass==true' "$EVIDENCE_DIR/f2-candidate-source-run-${GITHUB_RUN_ID}.json" >/dev/null
           echo "ORBIT360_F2_CANDIDATE_DIR=$CANDIDATE_DIR" >> "$GITHUB_ENV"
           echo "ORBIT360_F2_MANIFEST_STATUS=$(jq -r '.status' "$CANDIDATE_DIR/orbit360-package-manifest.json")" >> "$GITHUB_ENV"
           echo "ORBIT360_F2_MANIFEST_FILE_COUNT=$(jq -r '.fileCount' "$CANDIDATE_DIR/orbit360-package-manifest.json")" >> "$GITHUB_ENV"
