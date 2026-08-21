@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "orbit360-f2-terminal-reconcile-intent-v1",
+  "approved": true,
+  "sourceOnly": true,
+  "runtime": false,
+  "browser": false,
+  "secrets": false,
+  "firestoreRead": false,
+  "writes": false,
+  "replayAllowed": false,
+  "authorizationIdentityDigest": "3d9975a3e599362ed1683f13d7e8b92367c626159240485e0c47f06de654ff47",
+  "runtimeRunId": 32439647187,
+  "targetRequestPath": ".github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-successor-3d9975a3e599-v20260820.json",
+  "terminalEvidencePath": "orbit360-platform/runtime-gate-crm-v20260716/f2-runtime-terminal-dispatch-3d9975a3e599-v20260820.json",
+  "containsPII": false,
+  "containsSecrets": false
+}
