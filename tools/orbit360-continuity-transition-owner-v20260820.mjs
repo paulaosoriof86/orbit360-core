@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
@@ -10,99 +11,313 @@ const PACKAGE_REL = 'orbit360-platform/docs/orbit360-production-reopening-packag
 const BOUNDARY_REL = 'orbit360-platform/docs/orbit360-f2-runtime-authorization-boundary-v20260820.json';
 const AUTH_DIR = '.github/orbit360-authorizations';
 const REQUEST_DIR = '.github/orbit360-requests';
+const EVIDENCE_DIR = 'orbit360-platform/runtime-gate-crm-v20260716';
+
 const abs = rel => path.join(ROOT, rel);
 const readText = rel => fs.readFileSync(abs(rel), 'utf8').replace(/^\uFEFF/, '');
+const readJson = rel => JSON.parse(readText(rel));
 const digest = text => crypto.createHash('sha256').update(text).digest('hex');
 const writeAtomic = (rel, value) => {
-  const target = abs(rel); fs.mkdirSync(path.dirname(target), {recursive:true});
+  const target = abs(rel);
+  fs.mkdirSync(path.dirname(target), {recursive: true});
   const tmp = `${target}.orbit360-tmp-${process.pid}`;
-  fs.writeFileSync(tmp, JSON.stringify(value, null, 2) + '\n', 'utf8'); fs.renameSync(tmp, target);
+  fs.writeFileSync(tmp, JSON.stringify(value, null, 2) + '\n', 'utf8');
+  fs.renameSync(tmp, target);
 };
+
 const args = process.argv.slice(2);
-const valueOf = flag => { const i = args.indexOf(flag); return i >= 0 ? args[i + 1] : null; };
+const valueOf = flag => {
+  const i = args.indexOf(flag);
+  return i >= 0 ? args[i + 1] : null;
+};
 const expectedRevision = Number(valueOf('--expected-revision'));
 const expectedPackageRevision = Number(valueOf('--expected-package-revision'));
 const transitionId = String(valueOf('--transition') || '');
 const authorizationIdentity = String(valueOf('--authorization-identity') || '');
 const parentHead = String(valueOf('--parent-head') || '');
+const runtimeRunId = String(valueOf('--runtime-run-id') || '');
 const dryRun = args.includes('--dry-run');
+
 if (!Number.isInteger(expectedRevision) || expectedRevision < 0) throw new Error('EXPECTED_REVISION_REQUIRED');
 if (!Number.isInteger(expectedPackageRevision) || expectedPackageRevision < 0) throw new Error('EXPECTED_PACKAGE_REVISION_REQUIRED');
 if (!transitionId) throw new Error('TRANSITION_ID_REQUIRED');
 
-const ledgerTextBefore = readText(LEDGER_REL); const packageTextBefore = readText(PACKAGE_REL);
+const ledgerTextBefore = readText(LEDGER_REL);
+const packageTextBefore = readText(PACKAGE_REL);
 const boundaryTextBefore = fs.existsSync(abs(BOUNDARY_REL)) ? readText(BOUNDARY_REL) : null;
-const ledger = JSON.parse(ledgerTextBefore); const pkg = JSON.parse(packageTextBefore);
+const ledger = JSON.parse(ledgerTextBefore);
+const pkg = JSON.parse(packageTextBefore);
 const boundary = boundaryTextBefore ? JSON.parse(boundaryTextBefore) : null;
+
 if (ledger.revision !== expectedRevision) throw new Error(`EXPECTED_REVISION_MISMATCH:${expectedRevision}:${ledger.revision}`);
 if (pkg.revision !== expectedPackageRevision) throw new Error(`EXPECTED_PACKAGE_REVISION_MISMATCH:${expectedPackageRevision}:${pkg.revision}`);
 if (ledger.productionReopeningPackage?.revision !== pkg.revision) throw new Error('LEDGER_PACKAGE_REVISION_DRIFT');
 if (ledger.productionReopeningPackage?.firstIncompleteStep !== pkg.resumeProtocol?.firstIncompleteStep) throw new Error('LEDGER_PACKAGE_STEP_DRIFT');
 
 const transitions = {
-  CP03_PASS_TO_CP04:{from:'CP-03',pass:'CP-03',to:'CP-04',next:'CP-04_MAKE_CONTINUITY_PROJECTION_ATOMIC',root:'CP03_PASS_CP04_PENDING'},
-  CP04_PASS_TO_CP05:{from:'CP-04',pass:'CP-04',to:'CP-05',next:'CP-05_EXPAND_COMPOSITE_CONTROL_PLANE_INVARIANT',root:'CP04_PASS_CP05_PENDING'},
-  CP05_PASS_TO_CP06:{from:'CP-05',pass:'CP-05',to:'CP-06',next:'CP-06_ADD_TRANSVERSAL_STORE_AMPLIFICATION_SYNTHETIC',root:'CP05_PASS_CP06_PENDING'},
-  CP06_PASS_TO_CP07:{from:'CP-06',pass:'CP-06',to:'CP-07',next:'CP-07_ISOLATE_LEGACY_WORKFLOW_OPERATIONAL_SURFACE',root:'CP06_PASS_CP07_PENDING'},
-  CP07_PASS_TO_CP08:{from:'CP-07',pass:'CP-07',to:'CP-08',next:'CP-08_RUN_INTEGRATED_SOURCE_ONLY_SYNTHETIC_AUDIT',root:'CP07_PASS_CP08_PENDING'},
-  CP08_PASS_TO_CP09:{from:'CP-08',pass:'CP-08',to:'CP-09',next:'CP-09_INDEPENDENT_CONTROL_PLANE_READBACK',root:'CP08_PASS_CP09_PENDING'},
-  CP09_PASS_TO_CP10:{from:'CP-09',pass:'CP-09',to:'CP-10',next:'CP-10_CLOSE_PRODUCTION_REOPENING_PACKAGE',root:'CP09_PASS_CP10_PENDING'}
+  CP03_PASS_TO_CP04: {from:'CP-03', pass:'CP-03', to:'CP-04', next:'CP-04_MAKE_CONTINUITY_PROJECTION_ATOMIC', root:'CP03_PASS_CP04_PENDING'},
+  CP04_PASS_TO_CP05: {from:'CP-04', pass:'CP-04', to:'CP-05', next:'CP-05_EXPAND_COMPOSITE_CONTROL_PLANE_INVARIANT', root:'CP04_PASS_CP05_PENDING'},
+  CP05_PASS_TO_CP06: {from:'CP-05', pass:'CP-05', to:'CP-06', next:'CP-06_ADD_TRANSVERSAL_STORE_AMPLIFICATION_SYNTHETIC', root:'CP05_PASS_CP06_PENDING'},
+  CP06_PASS_TO_CP07: {from:'CP-06', pass:'CP-06', to:'CP-07', next:'CP-07_ISOLATE_LEGACY_WORKFLOW_OPERATIONAL_SURFACE', root:'CP06_PASS_CP07_PENDING'},
+  CP07_PASS_TO_CP08: {from:'CP-07', pass:'CP-07', to:'CP-08', next:'CP-08_RUN_INTEGRATED_SOURCE_ONLY_SYNTHETIC_AUDIT', root:'CP07_PASS_CP08_PENDING'},
+  CP08_PASS_TO_CP09: {from:'CP-08', pass:'CP-08', to:'CP-09', next:'CP-09_INDEPENDENT_CONTROL_PLANE_READBACK', root:'CP08_PASS_CP09_PENDING'},
+  CP09_PASS_TO_CP10: {from:'CP-09', pass:'CP-09', to:'CP-10', next:'CP-10_CLOSE_PRODUCTION_REOPENING_PACKAGE', root:'CP09_PASS_CP10_PENDING'}
 };
+
 function assertNoLocalConcurrentMutation() {
-  if (digest(readText(LEDGER_REL)) !== digest(ledgerTextBefore) || digest(readText(PACKAGE_REL)) !== digest(packageTextBefore)) throw new Error('LOCAL_CONCURRENT_MUTATION_DETECTED');
-  if (boundaryTextBefore && digest(readText(BOUNDARY_REL)) !== digest(boundaryTextBefore)) throw new Error('LOCAL_BOUNDARY_CONCURRENT_MUTATION_DETECTED');
+  if (digest(readText(LEDGER_REL)) !== digest(ledgerTextBefore) || digest(readText(PACKAGE_REL)) !== digest(packageTextBefore)) {
+    throw new Error('LOCAL_CONCURRENT_MUTATION_DETECTED');
+  }
+  if (boundaryTextBefore && digest(readText(BOUNDARY_REL)) !== digest(boundaryTextBefore)) {
+    throw new Error('LOCAL_BOUNDARY_CONCURRENT_MUTATION_DETECTED');
+  }
 }
-function bumpCommon() { const now=new Date().toISOString(); pkg.revision+=1; pkg.updatedAtUtc=now; ledger.revision+=1; ledger.updatedAtUtc=now; ledger.productionReopeningPackage.revision=pkg.revision; return now; }
-function requireBoundary(){ if(!boundary) throw new Error('F2_AUTHORIZATION_BOUNDARY_REQUIRED'); return boundary; }
-function authPathFor(d){ return `${AUTH_DIR}/f2-productive-acceptance-runtime-browser-readonly-auth-${d.slice(0,12)}-v20260820.json`; }
-function requestPathFor(d){ return `${REQUEST_DIR}/f2-productive-acceptance-runtime-browser-readonly-successor-${d.slice(0,12)}-v20260820.json`; }
-let result; let authorizationRecord=null; let requestRecord=null; let authPath=null; let requestPath=null;
+function bumpCommon() {
+  const now = new Date().toISOString();
+  pkg.revision += 1;
+  pkg.updatedAtUtc = now;
+  ledger.revision += 1;
+  ledger.updatedAtUtc = now;
+  ledger.productionReopeningPackage.revision = pkg.revision;
+  return now;
+}
+function requireBoundary() {
+  if (!boundary) throw new Error('F2_AUTHORIZATION_BOUNDARY_REQUIRED');
+  return boundary;
+}
+function authPathFor(d) {
+  return `${AUTH_DIR}/f2-productive-acceptance-runtime-browser-readonly-auth-${d.slice(0, 12)}-v20260820.json`;
+}
+function requestPathFor(d) {
+  return `${REQUEST_DIR}/f2-productive-acceptance-runtime-browser-readonly-successor-${d.slice(0, 12)}-v20260820.json`;
+}
+function terminalPathFor(d) {
+  return `${EVIDENCE_DIR}/f2-runtime-terminal-dispatch-${d.slice(0, 12)}-v20260820.json`;
+}
+
+let result;
+let authorizationRecord = null;
+let requestRecord = null;
+let authPath = null;
+let requestPath = null;
+let writeBoundary = false;
 
 if (transitionId === 'F2_RUNTIME_AUTHORIZATION_PERSIST') {
-  const b=requireBoundary();
-  if (pkg.status!=='CLOSED_PASS' || pkg.resumeProtocol?.firstIncompleteStep!=='F2-RUNTIME-AUTHORIZATION') throw new Error('F2_AUTH_PERSIST_NOT_ACTIVE');
+  const b = requireBoundary();
+  if (pkg.status !== 'CLOSED_PASS' || pkg.resumeProtocol?.firstIncompleteStep !== 'F2-RUNTIME-AUTHORIZATION') throw new Error('F2_AUTH_PERSIST_NOT_ACTIVE');
   if (!/^[a-f0-9]{64}$/.test(authorizationIdentity)) throw new Error('F2_AUTHORIZATION_IDENTITY_SHA256_REQUIRED');
-  if (authorizationIdentity!==b.authorizationIdentity?.digest) throw new Error('F2_AUTHORIZATION_IDENTITY_MISMATCH');
+  if (authorizationIdentity !== b.authorizationIdentity?.digest) throw new Error('F2_AUTHORIZATION_IDENTITY_MISMATCH');
   if (b.authorizationPersisted || b.authorized) throw new Error('F2_AUTHORIZATION_ALREADY_PERSISTED');
-  authPath=authPathFor(authorizationIdentity); if(fs.existsSync(abs(authPath))) throw new Error('F2_AUTHORIZATION_RECORD_ALREADY_EXISTS');
-  const now=bumpCommon();
-  authorizationRecord={schemaVersion:'orbit360-f2-runtime-authorization-v2',status:'PERSISTED_SOURCE_ONLY_AWAITING_REQUEST_MATERIALIZATION',approved:true,authorizationIdentityDigest:authorizationIdentity,gateId:b.gate.id,gateContractVersion:b.gate.contractVersion,branch:b.branch,pullRequest:b.pullRequest,authorizedAt:now,allowedExecutions:1,consumed:false,authorizationFrozen:true,replayAllowed:false,historical:false,candidateArtifactId:b.candidate.artifactId,candidateSourceHead:b.candidate.sourceHead,candidateArtifactDigest:b.candidate.artifactDigest,preparedLedgerRevision:expectedRevision,preparedPackageRevision:expectedPackageRevision,scopeAuthorized:b.requestedExecutionProfile.capabilities,containsPII:false,containsSecrets:false};
-  b.status='AUTHORIZED_SOURCE_ONLY_AWAITING_REQUEST_MATERIALIZATION'; b.authorized=true; b.authorizationPersisted=true; b.authorizationRecordPath=authPath; b.requestMaterialized=false; b.runtimeAllowed=false; b.controlPlane.ledgerRevision=ledger.revision; b.controlPlane.packageRevision=pkg.revision;
-  pkg.phase='F2_RUNTIME_AUTHORIZATION_PERSISTED_AWAITING_REQUEST_MATERIALIZATION'; pkg.resumeProtocol.firstIncompleteStep='F2-RUNTIME-REQUEST-MATERIALIZATION'; pkg.resumeProtocol.nextActionExact='MATERIALIZE_SINGLE_F2_RUNTIME_REQUEST_SOURCE_ONLY'; pkg.authorizationBoundary={path:BOUNDARY_REL,status:b.status,ledgerRevision:ledger.revision,packageRevision:pkg.revision,authorized:true,authorizationPersisted:true,authorizationRecordPath:authPath,requestMaterialized:false,runtimeAllowed:false}; pkg.lock.requestMaterializationAllowed=true;
-  ledger.activeState.phase=pkg.phase; ledger.activeState.status='F2_RUNTIME_AUTHORIZATION_PERSISTED_SOURCE_ONLY'; ledger.activeState.runtimeAuthorized=false; ledger.authorizationBoundary.activeRuntimeAuthorization=true; ledger.authorizationBoundary.freshAuthorizationRequired=false; ledger.authorizationBoundary.nextRuntimeMaterializationAllowed=true; ledger.authorizationBoundary.newRuntimeRequestAllowed=true; ledger.authorizationBoundary.authorizationRecordPath=authPath; ledger.productionReopeningPackage.firstIncompleteStep=pkg.resumeProtocol.firstIncompleteStep; ledger.productionReopeningPackage.nextActionExact=pkg.resumeProtocol.nextActionExact; ledger.productionReopeningPackage.requestMaterializationAllowed=true; ledger.nextAction={id:pkg.resumeProtocol.nextActionExact,description:'Materialize exactly one immutable successor F2 request from the already-persisted authorization. Runtime remains closed.',runtimeAllowed:false}; ledger.lanes.B_backend_security_gates='F2_AUTHORIZATION_PERSISTED_AWAITING_SINGLE_REQUEST';
+  authPath = authPathFor(authorizationIdentity);
+  if (fs.existsSync(abs(authPath))) throw new Error('F2_AUTHORIZATION_RECORD_ALREADY_EXISTS');
+  const now = bumpCommon();
+  authorizationRecord = {
+    schemaVersion:'orbit360-f2-runtime-authorization-v2', status:'PERSISTED_SOURCE_ONLY_AWAITING_REQUEST_MATERIALIZATION', approved:true,
+    authorizationIdentityDigest:authorizationIdentity, gateId:b.gate.id, gateContractVersion:b.gate.contractVersion, branch:b.branch,
+    pullRequest:b.pullRequest, authorizedAt:now, allowedExecutions:1, consumed:false, authorizationFrozen:true, replayAllowed:false,
+    historical:false, candidateArtifactId:b.candidate.artifactId, candidateSourceHead:b.candidate.sourceHead,
+    candidateArtifactDigest:b.candidate.artifactDigest, preparedLedgerRevision:expectedRevision, preparedPackageRevision:expectedPackageRevision,
+    scopeAuthorized:b.requestedExecutionProfile.capabilities, containsPII:false, containsSecrets:false
+  };
+  b.status='AUTHORIZED_SOURCE_ONLY_AWAITING_REQUEST_MATERIALIZATION';
+  b.authorized=true; b.authorizationPersisted=true; b.authorizationRecordPath=authPath; b.requestMaterialized=false; b.runtimeAllowed=false;
+  b.controlPlane.ledgerRevision=ledger.revision; b.controlPlane.packageRevision=pkg.revision;
+  pkg.phase='F2_RUNTIME_AUTHORIZATION_PERSISTED_AWAITING_REQUEST_MATERIALIZATION';
+  pkg.resumeProtocol.firstIncompleteStep='F2-RUNTIME-REQUEST-MATERIALIZATION';
+  pkg.resumeProtocol.nextActionExact='MATERIALIZE_SINGLE_F2_RUNTIME_REQUEST_SOURCE_ONLY';
+  pkg.authorizationBoundary={path:BOUNDARY_REL,status:b.status,ledgerRevision:ledger.revision,packageRevision:pkg.revision,authorized:true,authorizationPersisted:true,authorizationRecordPath:authPath,requestMaterialized:false,runtimeAllowed:false};
+  pkg.lock.requestMaterializationAllowed=true;
+  ledger.activeState.phase=pkg.phase; ledger.activeState.status='F2_RUNTIME_AUTHORIZATION_PERSISTED_SOURCE_ONLY'; ledger.activeState.runtimeAuthorized=false;
+  ledger.authorizationBoundary.activeRuntimeAuthorization=true; ledger.authorizationBoundary.freshAuthorizationRequired=false;
+  ledger.authorizationBoundary.nextRuntimeMaterializationAllowed=true; ledger.authorizationBoundary.newRuntimeRequestAllowed=true;
+  ledger.authorizationBoundary.authorizationRecordPath=authPath;
+  ledger.productionReopeningPackage.firstIncompleteStep=pkg.resumeProtocol.firstIncompleteStep;
+  ledger.productionReopeningPackage.nextActionExact=pkg.resumeProtocol.nextActionExact;
+  ledger.productionReopeningPackage.requestMaterializationAllowed=true;
+  ledger.nextAction={id:pkg.resumeProtocol.nextActionExact,description:'Materialize exactly one immutable successor F2 request from the already-persisted authorization. Runtime remains closed.',runtimeAllowed:false};
+  ledger.lanes.B_backend_security_gates='F2_AUTHORIZATION_PERSISTED_AWAITING_SINGLE_REQUEST';
+  writeBoundary=true;
   result={ok:true,status:'ORBIT360_F2_RUNTIME_AUTHORIZATION_PERSISTED_SOURCE_ONLY',transitionId,authorizationIdentity,authorizationRecordPath:authPath,fromLedgerRevision:expectedRevision,toLedgerRevision:ledger.revision,fromPackageRevision:expectedPackageRevision,toPackageRevision:pkg.revision,firstIncompleteStep:pkg.resumeProtocol.firstIncompleteStep};
+
 } else if (transitionId === 'F2_RUNTIME_REQUEST_MATERIALIZE') {
-  const b=requireBoundary();
-  if (pkg.status!=='CLOSED_PASS' || pkg.resumeProtocol?.firstIncompleteStep!=='F2-RUNTIME-REQUEST-MATERIALIZATION') throw new Error('F2_REQUEST_MATERIALIZE_NOT_ACTIVE');
-  if (!/^[a-f0-9]{64}$/.test(authorizationIdentity) || authorizationIdentity!==b.authorizationIdentity?.digest) throw new Error('F2_AUTHORIZATION_IDENTITY_MISMATCH');
-  authPath=b.authorizationRecordPath || authPathFor(authorizationIdentity); if(!fs.existsSync(abs(authPath))) throw new Error('F2_AUTHORIZATION_RECORD_NOT_FOUND');
-  const auth=JSON.parse(readText(authPath)); if(!auth.approved || auth.consumed || auth.historical || auth.authorizationIdentityDigest!==authorizationIdentity) throw new Error('F2_AUTHORIZATION_RECORD_NOT_ACTIVE');
-  if(!/^[a-f0-9]{40}$/.test(parentHead)) throw new Error('F2_PARENT_HEAD_SHA_REQUIRED');
-  if(!b.authorizationPersisted || !b.authorized || b.requestMaterialized) throw new Error('F2_BOUNDARY_NOT_READY_FOR_SINGLE_REQUEST');
-  requestPath=requestPathFor(authorizationIdentity); if(fs.existsSync(abs(requestPath))) throw new Error('F2_SUCCESSOR_REQUEST_ALREADY_EXISTS');
-  const now=bumpCommon();
+  const b = requireBoundary();
+  if (pkg.status !== 'CLOSED_PASS' || pkg.resumeProtocol?.firstIncompleteStep !== 'F2-RUNTIME-REQUEST-MATERIALIZATION') throw new Error('F2_REQUEST_MATERIALIZE_NOT_ACTIVE');
+  if (!/^[a-f0-9]{64}$/.test(authorizationIdentity) || authorizationIdentity !== b.authorizationIdentity?.digest) throw new Error('F2_AUTHORIZATION_IDENTITY_MISMATCH');
+  authPath = b.authorizationRecordPath || authPathFor(authorizationIdentity);
+  if (!fs.existsSync(abs(authPath))) throw new Error('F2_AUTHORIZATION_RECORD_NOT_FOUND');
+  const auth = readJson(authPath);
+  if (!auth.approved || auth.consumed || auth.historical || auth.authorizationIdentityDigest !== authorizationIdentity) throw new Error('F2_AUTHORIZATION_RECORD_NOT_ACTIVE');
+  if (!/^[a-f0-9]{40}$/.test(parentHead)) throw new Error('F2_PARENT_HEAD_SHA_REQUIRED');
+  if (!b.authorizationPersisted || !b.authorized || b.requestMaterialized) throw new Error('F2_BOUNDARY_NOT_READY_FOR_SINGLE_REQUEST');
+  requestPath = requestPathFor(authorizationIdentity);
+  if (fs.existsSync(abs(requestPath))) throw new Error('F2_SUCCESSOR_REQUEST_ALREADY_EXISTS');
+  const now = bumpCommon();
   requestRecord={schemaVersion:'orbit360-f2-productive-acceptance-runtime-browser-readonly-request-v2',requestVersion:'F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_V2',requestId:`F2-${authorizationIdentity.slice(0,12)}`,gateId:b.gate.id,gateContractVersion:b.gate.contractVersion,rcId:'RC-AYS-LAB-CANONICA-01',status:'MATERIALIZED_SOURCE_ONLY_AWAITING_PREFLIGHT',approved:true,allowedExecutions:1,consumed:false,authorizationFrozen:true,replayAllowed:false,historical:false,branch:b.branch,pullRequest:b.pullRequest,projectId:'ays-orbit-360-lab',tenantId:'alianzas-soluciones',parentHead,candidateArtifactId:b.candidate.artifactId,candidateSourceHead:b.candidate.sourceHead,candidateArtifactDigest:b.candidate.artifactDigest,authorizationRecordPath:authPath,authorizationIdentityDigest:authorizationIdentity,materializedAt:now,containsPII:false,containsSecrets:false};
-  b.status='REQUEST_MATERIALIZED_SOURCE_ONLY_AWAITING_PREFLIGHT'; b.requestMaterialized=true; b.activeRequestPath=requestPath; b.runtimeAllowed=false; b.controlPlane.ledgerRevision=ledger.revision; b.controlPlane.packageRevision=pkg.revision;
-  pkg.phase='F2_RUNTIME_REQUEST_MATERIALIZED_AWAITING_PREFLIGHT'; pkg.resumeProtocol.firstIncompleteStep='F2-RUNTIME-PREFLIGHT'; pkg.resumeProtocol.nextActionExact='RUN_F2_SOURCE_AND_RUNTIME_PREFLIGHT_FAIL_CLOSED'; pkg.authorizationBoundary={path:BOUNDARY_REL,status:b.status,ledgerRevision:ledger.revision,packageRevision:pkg.revision,authorized:true,authorizationPersisted:true,authorizationRecordPath:authPath,requestMaterialized:true,activeRequestPath:requestPath,runtimeAllowed:false}; pkg.lock.requestMaterializationAllowed=false; pkg.lock.newRuntimeOrdinalAllowed=false;
-  ledger.activeState.phase=pkg.phase; ledger.activeState.status='F2_RUNTIME_REQUEST_MATERIALIZED_SOURCE_ONLY'; ledger.authorizationBoundary.nextRuntimeMaterializationAllowed=false; ledger.authorizationBoundary.newRuntimeRequestAllowed=false; ledger.authorizationBoundary.activeRequestPath=requestPath; ledger.productionReopeningPackage.firstIncompleteStep=pkg.resumeProtocol.firstIncompleteStep; ledger.productionReopeningPackage.nextActionExact=pkg.resumeProtocol.nextActionExact; ledger.productionReopeningPackage.requestMaterializationAllowed=false; ledger.nextAction={id:pkg.resumeProtocol.nextActionExact,description:'Run canonical fail-closed F2 preflight. Authorization remains unconsumed until runtime execution begins.',runtimeAllowed:false}; ledger.lanes.B_backend_security_gates='F2_REQUEST_MATERIALIZED_AWAITING_PREFLIGHT';
+  b.status='REQUEST_MATERIALIZED_SOURCE_ONLY_AWAITING_PREFLIGHT'; b.requestMaterialized=true; b.activeRequestPath=requestPath; b.runtimeAllowed=false;
+  b.controlPlane.ledgerRevision=ledger.revision; b.controlPlane.packageRevision=pkg.revision;
+  pkg.phase='F2_RUNTIME_REQUEST_MATERIALIZED_AWAITING_PREFLIGHT'; pkg.resumeProtocol.firstIncompleteStep='F2-RUNTIME-PREFLIGHT'; pkg.resumeProtocol.nextActionExact='RUN_F2_SOURCE_AND_RUNTIME_PREFLIGHT_FAIL_CLOSED';
+  pkg.authorizationBoundary={path:BOUNDARY_REL,status:b.status,ledgerRevision:ledger.revision,packageRevision:pkg.revision,authorized:true,authorizationPersisted:true,authorizationRecordPath:authPath,requestMaterialized:true,activeRequestPath:requestPath,runtimeAllowed:false};
+  pkg.lock.requestMaterializationAllowed=false; pkg.lock.newRuntimeOrdinalAllowed=false;
+  ledger.activeState.phase=pkg.phase; ledger.activeState.status='F2_RUNTIME_REQUEST_MATERIALIZED_SOURCE_ONLY';
+  ledger.authorizationBoundary.nextRuntimeMaterializationAllowed=false; ledger.authorizationBoundary.newRuntimeRequestAllowed=false; ledger.authorizationBoundary.activeRequestPath=requestPath;
+  ledger.productionReopeningPackage.firstIncompleteStep=pkg.resumeProtocol.firstIncompleteStep; ledger.productionReopeningPackage.nextActionExact=pkg.resumeProtocol.nextActionExact; ledger.productionReopeningPackage.requestMaterializationAllowed=false;
+  ledger.nextAction={id:pkg.resumeProtocol.nextActionExact,description:'Run canonical fail-closed F2 preflight. Authorization remains unconsumed until runtime execution begins.',runtimeAllowed:false};
+  ledger.lanes.B_backend_security_gates='F2_REQUEST_MATERIALIZED_AWAITING_PREFLIGHT';
+  writeBoundary=true;
   result={ok:true,status:'ORBIT360_F2_RUNTIME_REQUEST_MATERIALIZED_SOURCE_ONLY',transitionId,authorizationIdentity,authorizationRecordPath:authPath,requestPath,parentHead,fromLedgerRevision:expectedRevision,toLedgerRevision:ledger.revision,fromPackageRevision:expectedPackageRevision,toPackageRevision:pkg.revision,firstIncompleteStep:pkg.resumeProtocol.firstIncompleteStep};
+
+} else if (transitionId === 'F2_RUNTIME_TERMINAL_RECONCILE') {
+  const b = requireBoundary();
+  if (pkg.status !== 'CLOSED_PASS' || pkg.resumeProtocol?.firstIncompleteStep !== 'F2-RUNTIME-PREFLIGHT') throw new Error('F2_TERMINAL_RECONCILE_NOT_ACTIVE');
+  if (!/^[a-f0-9]{64}$/.test(authorizationIdentity) || authorizationIdentity !== b.authorizationIdentity?.digest) throw new Error('F2_AUTHORIZATION_IDENTITY_MISMATCH');
+  if (!/^\d+$/.test(runtimeRunId)) throw new Error('F2_RUNTIME_RUN_ID_REQUIRED');
+  authPath = b.authorizationRecordPath || authPathFor(authorizationIdentity);
+  requestPath = b.activeRequestPath || requestPathFor(authorizationIdentity);
+  if (!fs.existsSync(abs(authPath))) throw new Error('F2_AUTHORIZATION_RECORD_NOT_FOUND');
+  if (!fs.existsSync(abs(requestPath))) throw new Error('F2_ACTIVE_REQUEST_NOT_FOUND');
+  const auth = readJson(authPath);
+  const req = readJson(requestPath);
+  if (!auth.approved || auth.consumed || auth.historical || auth.allowedExecutions !== 1 || auth.replayAllowed !== false || auth.authorizationIdentityDigest !== authorizationIdentity) throw new Error('F2_AUTHORIZATION_RECORD_NOT_ACTIVE');
+  if (!req.approved || req.consumed || req.historical || req.allowedExecutions !== 1 || req.replayAllowed !== false || req.authorizationIdentityDigest !== authorizationIdentity) throw new Error('F2_REQUEST_RECORD_NOT_ACTIVE');
+  const terminalPath = terminalPathFor(authorizationIdentity);
+  if (!fs.existsSync(abs(terminalPath))) throw new Error('F2_TERMINAL_EVIDENCE_NOT_FOUND');
+  const terminal = readJson(terminalPath);
+  if (terminal.status !== 'F2_PRODUCTIVE_ACCEPTANCE_FAIL' || terminal.classification !== 'VALIDATOR_STALE') throw new Error('F2_TERMINAL_NOT_VALIDATOR_STALE');
+  if (String(terminal.runId) !== runtimeRunId) throw new Error('F2_TERMINAL_RUN_ID_MISMATCH');
+  if (terminal.request !== requestPath) throw new Error('F2_TERMINAL_REQUEST_BINDING_MISMATCH');
+  if (Number(terminal.candidateArtifactId) !== Number(req.candidateArtifactId)) throw new Error('F2_TERMINAL_CANDIDATE_BINDING_MISMATCH');
+  if (Number(terminal.firestoreWrites) !== 0 || Number(terminal.authWrites) !== 0 || Number(terminal.operationalWrites) !== 0) throw new Error('F2_TERMINAL_WRITE_SIGNAL_PRESENT');
+  if (terminal.deployExecuted !== false || terminal.publicationExecuted !== false || terminal.productionHostingTouched !== false) throw new Error('F2_TERMINAL_FORBIDDEN_SIDE_EFFECT_PRESENT');
+  if (terminal.containsPII !== false || terminal.containsSecrets !== false) throw new Error('F2_TERMINAL_EVIDENCE_UNSAFE');
+
+  const now = bumpCommon();
+  Object.assign(auth, {
+    status:'CONSUMED_FAIL_VALIDATOR_STALE', allowedExecutions:0, consumed:true, historical:true, replayAllowed:false,
+    consumedAt:now, runtimeRunId:Number(runtimeRunId), terminalEvidencePath:terminalPath,
+    disposition:'NO_REPLAY_TERMINAL_VALIDATOR_STALE'
+  });
+  Object.assign(req, {
+    status:'CONSUMED_FAIL_VALIDATOR_STALE', allowedExecutions:0, consumed:true, historical:true, replayAllowed:false,
+    consumedAt:now, runtimeRunId:Number(runtimeRunId), terminalEvidencePath:terminalPath,
+    disposition:'NO_REPLAY_TERMINAL_VALIDATOR_STALE'
+  });
+  authorizationRecord = auth;
+  requestRecord = req;
+
+  b.status='CONSUMED_FAIL_VALIDATOR_STALE_AWAITING_FRESH_BOUNDARY';
+  b.authorized=false; b.authorizationPersisted=false; b.requestMaterialized=false; b.runtimeAllowed=false;
+  b.historicalAuthorizationRecordPath=authPath; b.historicalRequestPath=requestPath; b.terminalEvidencePath=terminalPath; b.terminalRunId=Number(runtimeRunId);
+  delete b.authorizationRecordPath; delete b.activeRequestPath;
+  b.controlPlane.ledgerRevision=ledger.revision; b.controlPlane.packageRevision=pkg.revision;
+
+  pkg.phase='F2_RUNTIME_TERMINAL_RECONCILED_VALIDATOR_STALE';
+  pkg.resumeProtocol.firstIncompleteStep='F2-RUNTIME-AUTHORIZATION-BOUNDARY-REFRESH';
+  pkg.resumeProtocol.nextActionExact='PREPARE_FRESH_F2_RUNTIME_AUTHORIZATION_BOUNDARY_AFTER_VALIDATOR_STALE';
+  pkg.authorizationBoundary={path:BOUNDARY_REL,status:b.status,ledgerRevision:ledger.revision,packageRevision:pkg.revision,authorized:false,authorizationPersisted:false,requestMaterialized:false,runtimeAllowed:false,historicalAuthorizationRecordPath:authPath,historicalRequestPath:requestPath,terminalEvidencePath:terminalPath,terminalRunId:Number(runtimeRunId)};
+  pkg.lock.authorizationAllowed=false; pkg.lock.runtimeAllowed=false; pkg.lock.requestMaterializationAllowed=false; pkg.lock.newRuntimeOrdinalAllowed=false;
+  pkg.lock.secretAccessAllowed=false; pkg.lock.firestoreReadAllowed=false; pkg.lock.browserAllowed=false; pkg.lock.writesAllowed=false;
+  pkg.lock.deployAllowed=false; pkg.lock.publicationAllowed=false; pkg.lock.productionAllowed=false; pkg.lock.mainAllowed=false; pkg.lock.mergeAllowed=false;
+  pkg.lock.stopRetry=true;
+
+  ledger.activeState.phase=pkg.phase; ledger.activeState.status='F2_TERMINAL_FAIL_VALIDATOR_STALE_RECONCILED';
+  ledger.activeState.rootCauseStatus='VALIDATOR_STALE_ROUTE_READINESS_CAPTURE_CONTRADICTION';
+  ledger.activeState.productFrozen=true; ledger.activeState.dataFrozen=true; ledger.activeState.runtimeAuthorized=false; ledger.activeState.runtimeReplayAllowed=false;
+  ledger.authorizationBoundary.activeRuntimeAuthorization=false; ledger.authorizationBoundary.freshAuthorizationRequired=true;
+  ledger.authorizationBoundary.nextRuntimeMaterializationAllowed=false; ledger.authorizationBoundary.newRuntimeRequestAllowed=false;
+  ledger.authorizationBoundary.historicalAuthorizationRecordPath=authPath; ledger.authorizationBoundary.historicalRequestPath=requestPath;
+  ledger.authorizationBoundary.terminalEvidencePath=terminalPath; ledger.authorizationBoundary.terminalRunId=Number(runtimeRunId);
+  delete ledger.authorizationBoundary.authorizationRecordPath; delete ledger.authorizationBoundary.activeRequestPath;
+  ledger.productionReopeningPackage.firstIncompleteStep=pkg.resumeProtocol.firstIncompleteStep;
+  ledger.productionReopeningPackage.nextActionExact=pkg.resumeProtocol.nextActionExact;
+  ledger.productionReopeningPackage.runtimeAllowed=false; ledger.productionReopeningPackage.authorizationAllowed=false; ledger.productionReopeningPackage.requestMaterializationAllowed=false;
+  ledger.nextAction={id:pkg.resumeProtocol.nextActionExact,description:'Prepare a fresh F2 authorization boundary after terminal VALIDATOR_STALE reconciliation. Runtime remains closed and prior authorization/request cannot replay.',runtimeAllowed:false};
+  ledger.lanes.B_backend_security_gates='F2_TERMINAL_VALIDATOR_STALE_RECONCILED_AWAITING_FRESH_BOUNDARY';
+  ledger.history = ledger.history || {};
+  ledger.history.latestSealedConsumedRuntime={
+    requestId:req.requestId, requestPath, authorizationPath:authPath, runId:Number(runtimeRunId), conclusion:'failure',
+    requestStatus:req.status, authorizationStatus:auth.status, allowedExecutions:0, consumed:true, replayAllowed:false,
+    observedClassification:'VALIDATOR_STALE', observedFailureCode:String(terminal.error || '').split(':').slice(1,3).join(':') || 'F2_ROUTE_READINESS_TIMEOUT_CONTRADICTED_BY_CAPTURE',
+    preGateFailure:false, secretAccess:true, firestoreRead:true, browserExecuted:true, runtimeExecuted:true,
+    firestoreWrites:0, authWrites:0, operationalWrites:0, terminalEvidencePath:terminalPath
+  };
+  writeBoundary=true;
+  result={ok:true,status:'ORBIT360_F2_RUNTIME_TERMINAL_RECONCILED_VALIDATOR_STALE',transitionId,authorizationIdentity,runtimeRunId:Number(runtimeRunId),authorizationRecordPath:authPath,requestPath,terminalEvidencePath:terminalPath,authorizationConsumed:true,fromLedgerRevision:expectedRevision,toLedgerRevision:ledger.revision,fromPackageRevision:expectedPackageRevision,toPackageRevision:pkg.revision,firstIncompleteStep:pkg.resumeProtocol.firstIncompleteStep};
+
 } else if (transitionId === 'POST_CLOSE_RECONCILE_CONTROL_PLANE_METADATA') {
   if (pkg.status !== 'CLOSED_PASS' || pkg.resumeProtocol?.firstIncompleteStep !== 'CP-11') throw new Error('POST_CLOSE_RECONCILE_REQUIRES_CLOSED_CP11');
-  bumpCommon(); pkg.controlPlaneClosure={status:'CLOSED_PASS_RECONCILED',transitionOwner:'tools/orbit360-continuity-transition-owner-v20260820.mjs',projection:'tools/orbit360-continuity-projection-atomic-v20260820.mjs',compositeInvariant:'tools/orbit360-control-plane-composite-invariant-v20260820.mjs',independentReadback:'tools/orbit360-control-plane-independent-readback-v20260820.mjs',workflow:'.github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml',runtimeAuthorized:false};
-  ledger.continuityControl.status='CLOSED_PASS'; ledger.productionReopeningPackage.status='CLOSED_PASS'; ledger.productionReopeningPackage.authorizationAllowed=true; ledger.productionReopeningPackage.runtimeAllowed=false; ledger.productionReopeningPackage.requestMaterializationAllowed=false; ledger.productionReopeningPackage.firstIncompleteStep='CP-11'; ledger.productionReopeningPackage.nextActionExact='CP-11_PREPARE_FRESH_F2_RUNTIME_AUTHORIZATION_BOUNDARY'; ledger.authorizationBoundary.activeRuntimeAuthorization=false; ledger.authorizationBoundary.freshAuthorizationRequired=true; ledger.authorizationBoundary.nextRuntimeMaterializationAllowed=false; ledger.authorizationBoundary.newRuntimeRequestAllowed=false;
+  bumpCommon();
+  pkg.controlPlaneClosure={status:'CLOSED_PASS_RECONCILED',transitionOwner:'tools/orbit360-continuity-transition-owner-v20260820.mjs',projection:'tools/orbit360-continuity-projection-atomic-v20260820.mjs',compositeInvariant:'tools/orbit360-control-plane-composite-invariant-v20260820.mjs',independentReadback:'tools/orbit360-control-plane-independent-readback-v20260820.mjs',workflow:'.github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml',runtimeAuthorized:false};
+  ledger.continuityControl.status='CLOSED_PASS'; ledger.productionReopeningPackage.status='CLOSED_PASS'; ledger.productionReopeningPackage.authorizationAllowed=true; ledger.productionReopeningPackage.runtimeAllowed=false; ledger.productionReopeningPackage.requestMaterializationAllowed=false;
+  ledger.productionReopeningPackage.firstIncompleteStep='CP-11'; ledger.productionReopeningPackage.nextActionExact='CP-11_PREPARE_FRESH_F2_RUNTIME_AUTHORIZATION_BOUNDARY';
+  ledger.authorizationBoundary.activeRuntimeAuthorization=false; ledger.authorizationBoundary.freshAuthorizationRequired=true; ledger.authorizationBoundary.nextRuntimeMaterializationAllowed=false; ledger.authorizationBoundary.newRuntimeRequestAllowed=false;
   result={ok:true,status:'ORBIT360_POST_CLOSE_CONTROL_PLANE_METADATA_RECONCILED',transitionId,fromLedgerRevision:expectedRevision,toLedgerRevision:ledger.revision,fromPackageRevision:expectedPackageRevision,toPackageRevision:pkg.revision,firstIncompleteStep:'CP-11'};
+
 } else if (transitionId === 'CP11_PASS_AWAIT_AUTHORIZATION') {
   if (pkg.status !== 'CLOSED_PASS' || pkg.controlPlaneClosure?.status !== 'CLOSED_PASS_RECONCILED' || pkg.resumeProtocol?.firstIncompleteStep !== 'CP-11') throw new Error('CP11_NOT_ACTIVE');
-  const cp11=(pkg.steps||[]).find(s=>s.id==='CP-11'); if(!cp11||cp11.status!=='PENDING') throw new Error('CP11_NOT_PENDING'); cp11.status='PASS'; cp11.completedBy='tools/orbit360-continuity-transition-owner-v20260820.mjs'; cp11.evidence=[BOUNDARY_REL,'tools/orbit360-cp11-authorization-boundary-audit-v20260820.mjs']; bumpCommon();
-  pkg.phase='F2_RUNTIME_AUTHORIZATION_BOUNDARY_PREPARED_AWAITING_EXPLICIT_AUTHORIZATION'; pkg.resumeProtocol.firstIncompleteStep='F2-RUNTIME-AUTHORIZATION'; pkg.resumeProtocol.nextActionExact='AWAIT_EXPLICIT_F2_RUNTIME_AUTHORIZATION_ONE_SHOT'; pkg.authorizationBoundary={path:BOUNDARY_REL,status:'PREPARED_SOURCE_ONLY_AWAITING_EXPLICIT_USER_AUTHORIZATION',ledgerRevision:ledger.revision,packageRevision:pkg.revision,authorized:false,authorizationPersisted:false,requestMaterialized:false,runtimeAllowed:false}; pkg.lock.authorizationAllowed=true; pkg.lock.runtimeAllowed=false; pkg.lock.requestMaterializationAllowed=false; pkg.lock.newRuntimeOrdinalAllowed=false;
-  ledger.activeState.phase=pkg.phase; ledger.activeState.status='F2_RUNTIME_AUTHORIZATION_NOT_YET_GRANTED'; ledger.authorizationBoundary.activeRuntimeAuthorization=false; ledger.authorizationBoundary.freshAuthorizationRequired=true; ledger.authorizationBoundary.nextRuntimeMaterializationAllowed=false; ledger.authorizationBoundary.newRuntimeRequestAllowed=false; ledger.authorizationBoundary.boundaryPath=BOUNDARY_REL; ledger.authorizationBoundary.boundaryPrepared=true; ledger.authorizationBoundary.authorizationIdentityRequired=true; ledger.productionReopeningPackage.firstIncompleteStep='F2-RUNTIME-AUTHORIZATION'; ledger.productionReopeningPackage.nextActionExact=pkg.resumeProtocol.nextActionExact; ledger.nextAction={id:pkg.resumeProtocol.nextActionExact,description:'Await one fresh explicit user authorization bound to the prepared CP11 authorization identity.',runtimeAllowed:false}; ledger.lanes.B_backend_security_gates='F2_RUNTIME_AUTHORIZATION_BOUNDARY_PREPARED_AWAITING_USER';
+  const cp11=(pkg.steps||[]).find(s=>s.id==='CP-11');
+  if(!cp11||cp11.status!=='PENDING') throw new Error('CP11_NOT_PENDING');
+  cp11.status='PASS'; cp11.completedBy='tools/orbit360-continuity-transition-owner-v20260820.mjs'; cp11.evidence=[BOUNDARY_REL,'tools/orbit360-cp11-authorization-boundary-audit-v20260820.mjs'];
+  bumpCommon();
+  pkg.phase='F2_RUNTIME_AUTHORIZATION_BOUNDARY_PREPARED_AWAITING_EXPLICIT_AUTHORIZATION'; pkg.resumeProtocol.firstIncompleteStep='F2-RUNTIME-AUTHORIZATION'; pkg.resumeProtocol.nextActionExact='AWAIT_EXPLICIT_F2_RUNTIME_AUTHORIZATION_ONE_SHOT';
+  pkg.authorizationBoundary={path:BOUNDARY_REL,status:'PREPARED_SOURCE_ONLY_AWAITING_EXPLICIT_USER_AUTHORIZATION',ledgerRevision:ledger.revision,packageRevision:pkg.revision,authorized:false,authorizationPersisted:false,requestMaterialized:false,runtimeAllowed:false};
+  pkg.lock.authorizationAllowed=true; pkg.lock.runtimeAllowed=false; pkg.lock.requestMaterializationAllowed=false; pkg.lock.newRuntimeOrdinalAllowed=false;
+  ledger.activeState.phase=pkg.phase; ledger.activeState.status='F2_RUNTIME_AUTHORIZATION_NOT_YET_GRANTED';
+  ledger.authorizationBoundary.activeRuntimeAuthorization=false; ledger.authorizationBoundary.freshAuthorizationRequired=true; ledger.authorizationBoundary.nextRuntimeMaterializationAllowed=false; ledger.authorizationBoundary.newRuntimeRequestAllowed=false;
+  ledger.authorizationBoundary.boundaryPath=BOUNDARY_REL; ledger.authorizationBoundary.boundaryPrepared=true; ledger.authorizationBoundary.authorizationIdentityRequired=true;
+  ledger.productionReopeningPackage.firstIncompleteStep='F2-RUNTIME-AUTHORIZATION'; ledger.productionReopeningPackage.nextActionExact=pkg.resumeProtocol.nextActionExact;
+  ledger.nextAction={id:pkg.resumeProtocol.nextActionExact,description:'Await one fresh explicit user authorization bound to the prepared CP11 authorization identity.',runtimeAllowed:false};
+  ledger.lanes.B_backend_security_gates='F2_RUNTIME_AUTHORIZATION_BOUNDARY_PREPARED_AWAITING_USER';
   result={ok:true,status:'ORBIT360_CP11_AUTHORIZATION_BOUNDARY_STATE_PREPARED',transitionId,fromLedgerRevision:expectedRevision,toLedgerRevision:ledger.revision,fromPackageRevision:expectedPackageRevision,toPackageRevision:pkg.revision,firstIncompleteStep:'F2-RUNTIME-AUTHORIZATION'};
+
 } else if (transitionId === 'CP10_CLOSE_PACKAGE') {
-  if (pkg.status!=='OPEN_FAIL_CLOSED'||pkg.resumeProtocol?.firstIncompleteStep!=='CP-10') throw new Error('CP10_NOT_ACTIVE'); const cp10=(pkg.steps||[]).find(s=>s.id==='CP-10'); if(!cp10||cp10.status!=='PENDING') throw new Error('CP10_NOT_PENDING'); if((pkg.steps||[]).filter(s=>/^CP-0[0-9]$/.test(s.id)).some(s=>s.status!=='PASS')) throw new Error('CP00_CP09_NOT_ALL_PASS'); cp10.status='PASS'; cp10.completedBy='tools/orbit360-continuity-transition-owner-v20260820.mjs'; bumpCommon(); pkg.status='CLOSED_PASS'; pkg.phase='F2_RUNTIME_REOPENING_READY_AWAITING_EXPLICIT_AUTHORIZATION'; pkg.lock.active=false; pkg.lock.authorizationAllowed=true; pkg.resumeProtocol.firstIncompleteStep='CP-11'; pkg.resumeProtocol.nextActionExact='CP-11_PREPARE_FRESH_F2_RUNTIME_AUTHORIZATION_BOUNDARY'; const cp11=(pkg.steps||[]).find(s=>s.id==='CP-11'); if(cp11){cp11.status='PENDING';delete cp11.blockedBy;} pkg.iterationBudget.completedHardeningMacroIterations=3; ledger.productionReopeningPackage.status='CLOSED_PASS'; ledger.productionReopeningPackage.firstIncompleteStep='CP-11'; ledger.productionReopeningPackage.nextActionExact=pkg.resumeProtocol.nextActionExact; ledger.nextAction={id:pkg.resumeProtocol.nextActionExact,description:'Prepare fresh F2 authorization boundary.',runtimeAllowed:false}; result={ok:true,status:'ORBIT360_CONTINUITY_PACKAGE_CLOSED_PASS',transitionId,fromLedgerRevision:expectedRevision,toLedgerRevision:ledger.revision,fromPackageRevision:expectedPackageRevision,toPackageRevision:pkg.revision,firstIncompleteStep:'CP-11'};
+  if (pkg.status!=='OPEN_FAIL_CLOSED'||pkg.resumeProtocol?.firstIncompleteStep!=='CP-10') throw new Error('CP10_NOT_ACTIVE');
+  const cp10=(pkg.steps||[]).find(s=>s.id==='CP-10');
+  if(!cp10||cp10.status!=='PENDING') throw new Error('CP10_NOT_PENDING');
+  if((pkg.steps||[]).filter(s=>/^CP-0[0-9]$/.test(s.id)).some(s=>s.status!=='PASS')) throw new Error('CP00_CP09_NOT_ALL_PASS');
+  cp10.status='PASS'; cp10.completedBy='tools/orbit360-continuity-transition-owner-v20260820.mjs'; bumpCommon();
+  pkg.status='CLOSED_PASS'; pkg.phase='F2_RUNTIME_REOPENING_READY_AWAITING_EXPLICIT_AUTHORIZATION'; pkg.lock.active=false; pkg.lock.authorizationAllowed=true;
+  pkg.resumeProtocol.firstIncompleteStep='CP-11'; pkg.resumeProtocol.nextActionExact='CP-11_PREPARE_FRESH_F2_RUNTIME_AUTHORIZATION_BOUNDARY';
+  const cp11=(pkg.steps||[]).find(s=>s.id==='CP-11'); if(cp11){cp11.status='PENDING';delete cp11.blockedBy;}
+  pkg.iterationBudget.completedHardeningMacroIterations=3;
+  ledger.productionReopeningPackage.status='CLOSED_PASS'; ledger.productionReopeningPackage.firstIncompleteStep='CP-11'; ledger.productionReopeningPackage.nextActionExact=pkg.resumeProtocol.nextActionExact;
+  ledger.nextAction={id:pkg.resumeProtocol.nextActionExact,description:'Prepare fresh F2 authorization boundary.',runtimeAllowed:false};
+  result={ok:true,status:'ORBIT360_CONTINUITY_PACKAGE_CLOSED_PASS',transitionId,fromLedgerRevision:expectedRevision,toLedgerRevision:ledger.revision,fromPackageRevision:expectedPackageRevision,toPackageRevision:pkg.revision,firstIncompleteStep:'CP-11'};
+
 } else {
-  const t=transitions[transitionId]; if(!t) throw new Error('TRANSITION_NOT_ALLOWED'); if(pkg.status!=='OPEN_FAIL_CLOSED'||pkg.resumeProtocol?.firstIncompleteStep!==t.from) throw new Error(`TRANSITION_FROM_MISMATCH:${t.from}:${pkg.resumeProtocol?.firstIncompleteStep}`); const step=(pkg.steps||[]).find(s=>s.id===t.pass); if(!step||step.status!=='PENDING') throw new Error(`TRANSITION_STEP_NOT_PENDING:${t.pass}`); step.status='PASS'; step.completedBy='tools/orbit360-continuity-transition-owner-v20260820.mjs'; bumpCommon(); pkg.resumeProtocol.firstIncompleteStep=t.to; pkg.resumeProtocol.nextActionExact=t.next; ledger.activeState.rootCauseStatus=t.root; ledger.productionReopeningPackage.firstIncompleteStep=t.to; ledger.productionReopeningPackage.nextActionExact=t.next; ledger.nextAction={id:t.next,description:`Continue production reopening package from ${t.to}.`,runtimeAllowed:false}; ledger.lanes.B_backend_security_gates=`CONTROL_PLANE_HARDENING_${t.to.replace('-','')}_REQUIRED_FAIL_CLOSED`; result={ok:true,status:'ORBIT360_CONTINUITY_TRANSITION_PREPARED',transitionId,fromLedgerRevision:expectedRevision,toLedgerRevision:ledger.revision,fromPackageRevision:expectedPackageRevision,toPackageRevision:pkg.revision,firstIncompleteStep:t.to};
+  const t=transitions[transitionId];
+  if(!t) throw new Error('TRANSITION_NOT_ALLOWED');
+  if(pkg.status!=='OPEN_FAIL_CLOSED'||pkg.resumeProtocol?.firstIncompleteStep!==t.from) throw new Error(`TRANSITION_FROM_MISMATCH:${t.from}:${pkg.resumeProtocol?.firstIncompleteStep}`);
+  const step=(pkg.steps||[]).find(s=>s.id===t.pass);
+  if(!step||step.status!=='PENDING') throw new Error(`TRANSITION_STEP_NOT_PENDING:${t.pass}`);
+  step.status='PASS'; step.completedBy='tools/orbit360-continuity-transition-owner-v20260820.mjs'; bumpCommon();
+  pkg.resumeProtocol.firstIncompleteStep=t.to; pkg.resumeProtocol.nextActionExact=t.next;
+  ledger.activeState.rootCauseStatus=t.root; ledger.productionReopeningPackage.firstIncompleteStep=t.to; ledger.productionReopeningPackage.nextActionExact=t.next;
+  ledger.nextAction={id:t.next,description:`Continue production reopening package from ${t.to}.`,runtimeAllowed:false};
+  ledger.lanes.B_backend_security_gates=`CONTROL_PLANE_HARDENING_${t.to.replace('-','')}_REQUIRED_FAIL_CLOSED`;
+  result={ok:true,status:'ORBIT360_CONTINUITY_TRANSITION_PREPARED',transitionId,fromLedgerRevision:expectedRevision,toLedgerRevision:ledger.revision,fromPackageRevision:expectedPackageRevision,toPackageRevision:pkg.revision,firstIncompleteStep:t.to};
 }
+
 assertNoLocalConcurrentMutation();
-Object.assign(result,{dryRun,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,operationalWrites:0,deployExecuted:false,productionTouched:false,authorizationConsumed:false,containsPII:false,containsSecrets:false});
-if(!dryRun){ writeAtomic(PACKAGE_REL,pkg); writeAtomic(LEDGER_REL,ledger); if(boundary && ['F2_RUNTIME_AUTHORIZATION_PERSIST','F2_RUNTIME_REQUEST_MATERIALIZE'].includes(transitionId)) writeAtomic(BOUNDARY_REL,boundary); if(authorizationRecord) writeAtomic(authPath,authorizationRecord); if(requestRecord) writeAtomic(requestPath,requestRecord); }
-console.log(JSON.stringify(result,null,2));
+Object.assign(result, {
+  dryRun,
+  runtimeExecuted:false,
+  browserExecuted:false,
+  secretAccess:false,
+  firestoreRead:false,
+  operationalWrites:0,
+  deployExecuted:false,
+  productionTouched:false,
+  authorizationConsumed:Boolean(result.authorizationConsumed),
+  containsPII:false,
+  containsSecrets:false
+});
+
+if (!dryRun) {
+  writeAtomic(PACKAGE_REL, pkg);
+  writeAtomic(LEDGER_REL, ledger);
+  if (boundary && writeBoundary) writeAtomic(BOUNDARY_REL, boundary);
+  if (authorizationRecord) writeAtomic(authPath, authorizationRecord);
+  if (requestRecord) writeAtomic(requestPath, requestRecord);
+}
+
+console.log(JSON.stringify(result, null, 2));
