@@ -1,5 +1,5 @@
 name: Orbit360 Continuity Canonical Source Only
-# PERMANENT CANONICAL FAIL-CLOSED LISTENER — whitespace policy diagnostic capability added 2026-08-21.
+# PERMANENT CANONICAL FAIL-CLOSED LISTENER — trigger macro2-whitespace-policy-diagnostic-20260821-01.
 # One physical writer. Listener remains registered; activation is data-driven by an inert pointer.
 # No runtime/browser/secrets/Firestore/deploy/production.
 
