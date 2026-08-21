@@ -170,6 +170,11 @@ jobs:
           echo "$AUTH" | grep -Eq '^[a-f0-9]{64}$'
           jq -e --arg request "$REQUEST" --arg auth "$AUTH" '.authorized==true and .authorizationPersisted==true and .requestMaterialized==true and .runtimeAllowed==false and .activeRequestPath==$request and .authorizationIdentity.digest==$auth' "$BOUNDARY" >/dev/null
           jq -e --arg auth "$AUTH" '.requestVersion=="F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_V2" and .status=="MATERIALIZED_SOURCE_ONLY_AWAITING_PREFLIGHT" and .approved==true and .allowedExecutions==1 and .consumed==false and .authorizationFrozen==true and .replayAllowed==false and .historical==false and .authorizationIdentityDigest==$auth' "$REQUEST" >/dev/null
+          TERMINAL="orbit360-platform/runtime-gate-crm-v20260716/f2-runtime-terminal-dispatch-${AUTH:0:12}-v20260820.json"
+          if [ -f "$TERMINAL" ] && jq -e --arg request "$REQUEST" --argjson artifact "$(jq -r '.candidateArtifactId' "$REQUEST")" '.request==$request and (.candidateArtifactId|tonumber)==$artifact and (.runId|tostring|length)>0 and .replayAllowed==false' "$TERMINAL" >/dev/null 2>&1; then
+            echo '{"ok":true,"status":"F2_ONE_SHOT_TERMINAL_EVIDENCE_PRESENT_NO_REPLAY","runtimeDispatched":false,"authorizationReplayAllowed":false,"writes":0}'
+            exit 0
+          fi
           payload=$(jq -n --arg ref "$BRANCH" --arg request "$REQUEST" --arg auth "$AUTH" '{ref:$ref,inputs:{request_path:$request,authorization_identity:$auth}}')
           curl --fail-with-body -sS -X POST \
             -H "Authorization: Bearer $GH_TOKEN" \
