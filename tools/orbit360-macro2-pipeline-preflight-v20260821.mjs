@@ -2,6 +2,8 @@
 'use strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import crypto from 'node:crypto';
+import zlib from 'node:zlib';
 const ROOT=process.cwd();
 const wfPath=process.env.ORBIT360_MACRO2_WORKFLOW||'.github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml';
 const reqPath=process.env.ORBIT360_MACRO2_REQUEST||'.github/orbit360-requests/macro2-transversal-source-recovery-v3-20260821.json';
@@ -14,6 +16,19 @@ need(req.allowedExecutions===1&&req.consumed===false&&req.historical===false&&re
 for(const k of ['runtime','browser','secrets','firestoreRead','writes','deploy','production','main','merge']) need(req[k]===false,`REQUEST_CAPABILITY_OPEN:${k}`);
 need(req.rootCausePreflightRequired===true&&req.reopenedAfterStopRetry===true,'STOP_RETRY_REOPEN_NOT_BOUND');
 need(Array.isArray(req.patchSets)&&req.patchSets.length===3,'PATCHSET_COUNT_INVALID');
+need(JSON.stringify(req.patchSets.map(x=>x.name).sort())===JSON.stringify(['docs','product','tools']),'PATCHSET_NAMES_INVALID');
+for(const ps of req.patchSets||[]){
+  const abs=path.join(ROOT,ps.gzipPath||'');
+  need(fs.existsSync(abs),`PATCH_BUNDLE_MISSING:${ps.name}`);
+  if(fs.existsSync(abs)){
+    const gz=fs.readFileSync(abs); const gzSha=crypto.createHash('sha256').update(gz).digest('hex');
+    need(gzSha===ps.gzipSha256,`PATCH_GZIP_SHA_MISMATCH:${ps.name}`);
+    try { const raw=zlib.gunzipSync(gz); const rawSha=crypto.createHash('sha256').update(raw).digest('hex'); need(rawSha===ps.sha256,`PATCH_RAW_SHA_MISMATCH:${ps.name}`); } catch { need(false,`PATCH_GZIP_INVALID:${ps.name}`); }
+  }
+}
+const parent=(wf.match(/RECOVERY_PARENT_HEAD:\s*([a-f0-9]{40})/)||[])[1]||'';
+need(parent===req.expectedParentHead,'REQUEST_WORKFLOW_PARENT_MISMATCH');
+need(wf.includes(reqPath),'WORKFLOW_REQUEST_BINDING_MISMATCH');
 need(!/\$PRI\b/.test(wf),'LEGACY_PRI_REFERENCE_PRESENT');
 need(!wf.includes('git pull --rebase'),'SILENT_REBASE_PRESENT');
 need(wf.includes('Publish accepted source commit before candidate build'),'SOURCE_NOT_PUBLISHED_BEFORE_BUILD');
