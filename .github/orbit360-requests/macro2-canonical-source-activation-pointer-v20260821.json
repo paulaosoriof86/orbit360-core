@@ -1,19 +1,12 @@
 {
   "schemaVersion": "orbit360-macro2-canonical-source-activation-pointer-v1",
-  "status": "IDLE",
-  "mode": "NONE",
+  "status": "ACTIVE",
+  "mode": "FIRST_STAGE_DIAGNOSTIC",
   "activeRequestPath": null,
-  "activationNonce": "macro2-patch-assertion-diagnostic-20260821-03",
-  "allowedExecutions": 0,
-  "consumed": true,
+  "activationNonce": "macro2-first-stage-diagnostic-untracked-aware-20260821-04",
+  "allowedExecutions": 1,
+  "consumed": false,
   "replayAllowed": false,
-  "lastTerminal": {
-    "status": "PATCH_APPLY_ASSERTION_DIAGNOSTIC_COMPLETE",
-    "classification": "VALIDATOR_STALE",
-    "failureCode": "VALIDATOR_STALE:DELTA_ENUMERATION_OMITS_UNTRACKED_ADDITIONS",
-    "expectedDeltaCount": 15,
-    "actualTrackedDeltaCount": 10
-  },
   "sourceOnly": true,
   "runtime": false,
   "browser": false,
@@ -24,7 +17,7 @@
   "production": false,
   "main": false,
   "merge": false,
-  "rootCauseResolution": "COUNT_TRACKED_PLUS_UNTRACKED_EXPECTED_DELTA_SET",
+  "rootCauseResolution": "ENUMERATE_TRACKED_PLUS_UNTRACKED_EXACT_EXPECTED_SET",
   "containsPII": false,
   "containsSecrets": false
 }
