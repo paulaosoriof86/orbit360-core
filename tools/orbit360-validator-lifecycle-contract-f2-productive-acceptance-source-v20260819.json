@@ -1,86 +1,18 @@
 {
-  "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
-  "gateId": "f2-productive-acceptance-exact-successor-v20260818",
-  "gateContractVersion": "2.2.0",
-  "validatorLifecycleRevision": "phase-capability-contract-v6-canonical-authority",
-  "f2ValidatorRevision": "f2-source-canonical-authority-hardening-v20260820",
-  "status": "CONTROL_PLANE_HARDENING_SOURCE_ONLY",
-  "currentPhase": "F2_PRODUCTIVE_ACCEPTANCE_SOURCE_ONLY",
-  "canonicalContractAuthority": "tools/orbit360-gate-contract-f2-productive-acceptance-v20260820.json",
-  "continuity": {
-    "ledger": "orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json",
-    "productionReopeningPackage": "orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json",
-    "checkpoint": "orbit360-platform/docs/CHECKPOINT-CONTROL-PLANE-HARDENING-20260820.md"
-  },
-  "executionProfile": {
-    "phase": "F2_PRODUCTIVE_ACCEPTANCE_SOURCE_ONLY",
-    "capabilities": {
-      "secrets": false,
-      "firestoreRead": false,
-      "writes": false,
-      "runtime": false,
-      "browser": false,
-      "deploy": false,
-      "functionsDeploy": false,
-      "rulesDeploy": false,
-      "production": false
-    }
-  },
-  "singleGate": true,
-  "macroClosure": true,
-  "block": "F2_GATE_DE_ACEPTACION_PRODUCTIVA_REAL",
-  "authorization": {
-    "requiredForExecution": false,
-    "activeRequest": false,
-    "allowedExecutions": 0,
-    "authorizationFrozen": true,
-    "replayAllowed": false
-  },
-  "guards": {
-    "candidateArtifactId": 9395391426,
-    "candidateArtifactDigest": "c089ea81672225876f643399b970d1e50e7d9cdc084dfc75973e00ed8581c53c",
-    "candidateSourceHead": "6af0c029aebb1bfecd05569452c814584110ae4c",
-    "candidateZipSha256": "e1a711806d4ffd78004dbe5a30ebf8c5db59aaf23d2b8cd65e78b291cedc53d0",
-    "candidateManifestSha256": "44dee7cebb174dfd630641d1e16ac649edffec18af688b62e05ceff4dc5812a5",
-    "candidateFileCount": 194,
-    "exactCandidateRequired": true,
-    "sourceOnlyBeforeAuthorization": true,
-    "writesAllowed": false,
-    "authChangesAllowed": false,
-    "membershipChangesAllowed": false,
-    "dataChangesAllowed": false,
-    "packageRebuildAllowed": false,
-    "deployAllowed": false,
-    "publicationAllowed": false,
-    "productionMutationAllowed": false,
-    "stopRetryOnSameFamily": true,
-    "historicalCandidateRuntimeReuseAllowed": false,
-    "productionReopeningPackageClosedPassRequiredForRuntime": true
-  },
-  "surfaceTopology": {
-    "routes": ["inicio", "cliente360", "aseguradoras", "ops", "leads", "polizas", "cobros"],
-    "integratedSurfaces": {
-      "vehiculos": "cliente360_policy_deeplink_fullpage",
-      "recibosCartera": "policy_client360_plus_cobros_global"
-    },
-    "roleViews": [
-      {"role":"Dirección","viewport":"desktop"},
-      {"role":"Operativo","viewport":"tablet"},
-      {"role":"Asesor","viewport":"mobile"}
-    ]
-  },
-  "history": {
-    "priorSourceOnlyPass": {
-      "historical": true,
-      "status": "CLOSED_PASS",
-      "candidateArtifactId": 9387820198,
-      "candidateSourceHead": "fc46bd85783d8b4d524cbeb0fee54ee9a2c774af",
-      "sourceValidationRunId": 32316010103,
-      "sourceEvidenceArtifactId": 9388061716,
-      "runtimeReusable": false
-    }
-  },
-  "nextActionExact": "CP-02_REMOVE_DUPLICATED_CONTRACT_VERSION_BINDINGS",
-  "containsPII": false,
-  "containsSecrets": false
+  "schemaVersion":"orbit360-validator-lifecycle-contract-v1",
+  "gateId":"f2-productive-acceptance-exact-successor-v20260818",
+  "gateContractVersion":"2.2.0",
+  "validatorLifecycleRevision":"phase-capability-contract-v6-canonical-authority",
+  "f2ValidatorRevision":"f2-source-dynamic-cert-authority-v9-20260821",
+  "status":"F2_FUNCTIONAL_ROOTFIX_SOURCE_ONLY_CERTIFIED",
+  "currentPhase":"F2_PRODUCTIVE_ACCEPTANCE_SOURCE_ONLY",
+  "canonicalContractAuthority":"tools/orbit360-gate-contract-f2-productive-acceptance-v20260820.json",
+  "continuity":{"ledger":"orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json","productionReopeningPackage":"orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json","checkpoint":"orbit360-platform/docs/CHECKPOINT-CONTROL-PLANE-HARDENING-20260820.md"},
+  "executionProfile":{"phase":"F2_PRODUCTIVE_ACCEPTANCE_SOURCE_ONLY","capabilities":{"secrets":false,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false}},
+  "singleGate":true,"macroClosure":true,"block":"F2_GATE_DE_ACEPTACION_PRODUCTIVA_REAL",
+  "authorization":{"requiredForExecution":false,"activeRequest":false,"allowedExecutions":0,"authorizationFrozen":true,"replayAllowed":false},
+  "guards":{"candidateArtifactId":9433944723,"candidateArtifactDigest":"25228e96490004de39dfba685673c80247ce9e7046d7eeff1cde642e4c673643","candidateSourceHead":"c3bb825da2b1ecae08dabc2034c753482b086fec","candidateZipSha256":"1951cc7c2d3390ea1c2a6b3d9ce0bb48e26a6f95d5d10d69b7c31a0027cfbbac","candidateManifestSha256":"580921077a88badab6e4076c42e9ef88f9de7936e1b6bad0f62410b39aec6397","candidateFileCount":194,"exactCandidateRequired":true,"sourceOnlyBeforeAuthorization":true,"writesAllowed":false,"authChangesAllowed":false,"membershipChangesAllowed":false,"dataChangesAllowed":false,"packageRebuildAllowed":false,"deployAllowed":false,"publicationAllowed":false,"productionMutationAllowed":false,"stopRetryOnSameFamily":true,"historicalCandidateRuntimeReuseAllowed":false,"productionReopeningPackageClosedPassRequiredForRuntime":true,"candidateCertificationDerivedFromCanonicalAuthority":true},
+  "surfaceTopology":{"routes":["inicio","cliente360","aseguradoras","ops","leads","polizas","cobros"],"integratedSurfaces":{"vehiculos":"cliente360_policy_deeplink_fullpage","recibosCartera":"policy_client360_plus_cobros_global"},"roleViews":[{"role":"Dirección","viewport":"desktop"},{"role":"Operativo","viewport":"tablet"},{"role":"Asesor","viewport":"mobile"}]},
+  "history":{"priorSourceOnlyPass":{"historical":true,"status":"CLOSED_PASS","candidateArtifactId":9387820198,"candidateSourceHead":"fc46bd85783d8b4d524cbeb0fee54ee9a2c774af","sourceValidationRunId":32316010103,"sourceEvidenceArtifactId":9388061716,"runtimeReusable":false}},
+  "nextActionExact":"AWAIT_EXPLICIT_F2_RUNTIME_AUTHORIZATION_ONE_SHOT","containsPII":false,"containsSecrets":false
 }

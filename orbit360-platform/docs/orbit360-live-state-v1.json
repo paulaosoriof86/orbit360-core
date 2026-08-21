@@ -1,81 +1,23 @@
 {
-  "schemaVersion": "orbit360-live-state-v1",
-  "stateVersion": "ORBIT360-F2-CONTINUITY-CURRENT",
-  "updatedAt": "2026-08-21T03:18:28.000Z",
-  "phase": "F2_RUNTIME_AUTHORIZATION_BOUNDARY_PREPARED_AWAITING_EXPLICIT_AUTHORIZATION",
-  "repository": "paulaosoriof86/orbit360-core",
-  "branch": "ays/backend-tenant-lab-v99-20260703",
-  "pr": 5,
-  "prState": "draft-open",
-  "currentCheckpoint": "orbit360-platform/docs/CHECKPOINT-CONTROL-PLANE-HARDENING-20260820.md",
-  "continuityLedger": "orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json",
-  "productionReopeningPackage": "orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json",
-  "authorizationBoundary": "orbit360-platform/docs/orbit360-f2-runtime-authorization-boundary-v20260820.json",
-  "canonicalCurrent": {
-    "stateVersion": "ORBIT360-F2-CONTINUITY-CURRENT",
-    "status": "F2_RUNTIME_AUTHORIZATION_NOT_YET_GRANTED",
-    "rootCauseStatus": "VALIDATOR_STALE_ROUTE_READINESS_CAPTURE_CONTRADICTION_FIXED_AWAITING_FRESH_AUTHORIZATION"
-  },
-  "authorization": {
-    "activeRuntimeAuthorization": false,
-    "freshAuthorizationRequired": true,
-    "authorizationBoundaryPrepared": true,
-    "authorizationBoundaryStatus": "PREPARED_SOURCE_ONLY_AWAITING_EXPLICIT_USER_AUTHORIZATION",
-    "authorizationBlockedByHardeningPackage": false,
-    "authorizationCarryForwardForbidden": true,
-    "nextRuntimeMaterializationAllowed": false,
-    "newRuntimeRequestAllowed": false,
-    "deployAuthorized": false,
-    "publicationAuthorized": false,
-    "productionAuthorized": false,
-    "mainAuthorized": false,
-    "mergeAuthorized": false
-  },
-  "documentationControl": {
-    "canonicalStateOwner": "orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json",
-    "hardeningPackage": "orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json",
-    "writerRegistry": "orbit360-platform/docs/orbit360-continuity-writer-registry-v20260820.json",
-    "soleProjectionLogic": "tools/orbit360-continuity-projection-atomic-v20260820.mjs",
-    "continuityInvariant": "tools/orbit360-control-plane-composite-invariant-v20260820.mjs",
-    "projectionMode": "REVISION_AWARE_CAS"
-  },
-  "nextActionExact": {
-    "id": "AWAIT_EXPLICIT_F2_RUNTIME_AUTHORIZATION_ONE_SHOT",
-    "description": "Await one fresh explicit user authorization bound to the newly prepared F2 authorization identity. Prior runtime authorization and request remain historical with replay forbidden.",
-    "runtimeAllowed": false
-  },
-  "lanes": {
-    "A_frontend_ux_academia": "PRODUCT_FROZEN_NO_REOPEN",
-    "B_backend_security_gates": "F2_RUNTIME_AUTHORIZATION_BOUNDARY_PREPARED_AWAITING_USER",
-    "C_real_data_migration": "UNCHANGED_FROZEN"
-  },
-  "progress": {
-    "productionRouteProgressPct": 50,
-    "programProgressPct": 25,
-    "f2TerminalPass": false,
-    "progressMayIncreaseDuringHardening": false
-  },
-  "activeState": {
-    "phase": "F2_RUNTIME_AUTHORIZATION_BOUNDARY_PREPARED_AWAITING_EXPLICIT_AUTHORIZATION",
-    "status": "F2_RUNTIME_AUTHORIZATION_NOT_YET_GRANTED",
-    "rootCauseStatus": "VALIDATOR_STALE_ROUTE_READINESS_CAPTURE_CONTRADICTION_FIXED_AWAITING_FRESH_AUTHORIZATION",
-    "productFrozen": true,
-    "dataFrozen": true,
-    "runtimeAuthorized": false,
-    "runtimeReplayAllowed": false,
-    "deployAuthorized": false,
-    "productionAuthorized": false
-  },
-  "successorCandidate": {
-    "artifactId": 9395391426,
-    "sourceHead": "6af0c029aebb1bfecd05569452c814584110ae4c",
-    "artifactDigest": "c089ea81672225876f643399b970d1e50e7d9cdc084dfc75973e00ed8581c53c",
-    "zipSha256": "e1a711806d4ffd78004dbe5a30ebf8c5db59aaf23d2b8cd65e78b291cedc53d0",
-    "manifestSha256": "44dee7cebb174dfd630641d1e16ac649edffec18af688b62e05ceff4dc5812a5",
-    "fileCount": 194,
-    "runtimeAuthorized": false,
-    "rebuildAllowed": false
-  },
-  "containsPII": false,
-  "containsSecrets": false
+  "schemaVersion":"orbit360-live-state-v1",
+  "stateVersion":"ORBIT360-F2-CONTINUITY-CURRENT",
+  "updatedAt":"2026-08-21T13:55:00.000Z",
+  "phase":"F2_RUNTIME_AUTHORIZATION_BOUNDARY_PREPARED_AWAITING_EXPLICIT_AUTHORIZATION",
+  "repository":"paulaosoriof86/orbit360-core",
+  "branch":"ays/backend-tenant-lab-v99-20260703",
+  "pr":5,
+  "prState":"draft-open",
+  "currentCheckpoint":"orbit360-platform/docs/CHECKPOINT-CONTROL-PLANE-HARDENING-20260820.md",
+  "continuityLedger":"orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json",
+  "productionReopeningPackage":"orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json",
+  "authorizationBoundary":"orbit360-platform/docs/orbit360-f2-runtime-authorization-boundary-v20260820.json",
+  "canonicalCurrent":{"stateVersion":"ORBIT360-F2-CONTINUITY-CURRENT","status":"F2_RUNTIME_AUTHORIZATION_NOT_YET_GRANTED","rootCauseStatus":"FUNCTIONAL_DEFECT_POLIZAS_CLIENT_CELL_FIXED_SOURCE_ONLY_AWAITING_FRESH_AUTHORIZATION"},
+  "authorization":{"activeRuntimeAuthorization":false,"freshAuthorizationRequired":true,"authorizationBoundaryPrepared":true,"authorizationBoundaryStatus":"PREPARED_SOURCE_ONLY_AWAITING_EXPLICIT_USER_AUTHORIZATION","authorizationBlockedByHardeningPackage":false,"authorizationCarryForwardForbidden":true,"nextRuntimeMaterializationAllowed":false,"newRuntimeRequestAllowed":false,"deployAuthorized":false,"publicationAuthorized":false,"productionAuthorized":false,"mainAuthorized":false,"mergeAuthorized":false},
+  "documentationControl":{"canonicalStateOwner":"orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json","hardeningPackage":"orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json","writerRegistry":"orbit360-platform/docs/orbit360-continuity-writer-registry-v20260820.json","soleProjectionLogic":"tools/orbit360-continuity-projection-atomic-v20260820.mjs","continuityInvariant":"tools/orbit360-control-plane-composite-invariant-v20260820.mjs","projectionMode":"REVISION_AWARE_CAS"},
+  "nextActionExact":{"id":"AWAIT_EXPLICIT_F2_RUNTIME_AUTHORIZATION_ONE_SHOT","description":"Await one fresh explicit user authorization bound to the certified client-projection rootfix successor candidate.","runtimeAllowed":false},
+  "lanes":{"A_frontend_ux_academia":"PRODUCT_FROZEN_NO_REOPEN","B_backend_security_gates":"F2_FUNCTIONAL_ROOTFIX_CERTIFIED_AWAITING_FRESH_AUTHORIZATION","C_real_data_migration":"UNCHANGED_FROZEN"},
+  "progress":{"productionRouteProgressPct":50,"programProgressPct":25,"f2TerminalPass":false,"progressMayIncreaseDuringHardening":false},
+  "activeState":{"phase":"F2_RUNTIME_AUTHORIZATION_BOUNDARY_PREPARED_AWAITING_EXPLICIT_AUTHORIZATION","status":"F2_RUNTIME_AUTHORIZATION_NOT_YET_GRANTED","rootCauseStatus":"FUNCTIONAL_DEFECT_POLIZAS_CLIENT_CELL_FIXED_SOURCE_ONLY_AWAITING_FRESH_AUTHORIZATION","productFrozen":true,"dataFrozen":true,"runtimeAuthorized":false,"runtimeReplayAllowed":false,"deployAuthorized":false,"productionAuthorized":false},
+  "successorCandidate":{"artifactId":9433944723,"sourceHead":"c3bb825da2b1ecae08dabc2034c753482b086fec","artifactDigest":"25228e96490004de39dfba685673c80247ce9e7046d7eeff1cde642e4c673643","zipSha256":"1951cc7c2d3390ea1c2a6b3d9ce0bb48e26a6f95d5d10d69b7c31a0027cfbbac","manifestSha256":"580921077a88badab6e4076c42e9ef88f9de7936e1b6bad0f62410b39aec6397","fileCount":194,"runtimeAuthorized":false,"rebuildAllowed":false},
+  "containsPII":false,"containsSecrets":false
 }
