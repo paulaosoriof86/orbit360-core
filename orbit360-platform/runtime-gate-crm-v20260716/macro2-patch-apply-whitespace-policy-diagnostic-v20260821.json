@@ -1,6 +1,6 @@
 {
-  "schemaVersion": "orbit360-macro2-whitespace-policy-diagnostic-v1",
-  "status": "PATCH_APPLY_WHITESPACE_POLICY_DIAGNOSTIC_COMPLETE",
+  "schemaVersion": "orbit360-macro2-whitespace-policy-diagnostic-v2",
+  "status": "PATCH_APPLY_ASSERTION_DIAGNOSTIC_COMPLETE",
   "classification": "PIPELINE_MECHANISM_DIAGNOSTIC",
   "applyWhitespaceConfig": null,
   "coreWhitespaceConfig": null,
@@ -15,7 +15,83 @@
   "warnReportedTrailingWhitespace": true,
   "nowarnReportedTrailingWhitespace": false,
   "errorAllReportedTrailingWhitespace": true,
-  "conclusion": "GIT_APPLY_WARN_ONLY_MARKDOWN_VALIDATOR_PASS",
+  "allPatchApply": {
+    "productRc": 0,
+    "toolsRc": 0,
+    "docsRc": 0
+  },
+  "expectedDeltaCount": 15,
+  "actualDeltaCount": 10,
+  "deltaCountMatchesExpected": false,
+  "deltaFiles": [
+    "orbit360-platform/core/ciclo.js",
+    "orbit360-platform/core/client-canonical-view-projection-v20260716.js",
+    "orbit360-platform/core/queries.js",
+    "orbit360-platform/core/ui.js",
+    "orbit360-platform/data/store-firestore-product-readonly-p0.js",
+    "orbit360-platform/modules/aseguradoras.js",
+    "orbit360-platform/modules/cliente360.js",
+    "orbit360-platform/modules/cobros.js",
+    "orbit360-platform/modules/inicio.js",
+    "tools/orbit360-documentation-state-discovery-v20260821.mjs"
+  ],
+  "syntaxChecks": [
+    {
+      "file": "tools/orbit360-build-macro2-transversal-successor-v20260821.mjs",
+      "rc": 0
+    },
+    {
+      "file": "tools/orbit360-promote-macro2-transversal-candidate-v20260821.mjs",
+      "rc": 0
+    },
+    {
+      "file": "tools/orbit360-test-macro2-transversal-source-acceptance-v20260821.mjs",
+      "rc": 0
+    },
+    {
+      "file": "tools/orbit360-documentation-state-discovery-v20260821.mjs",
+      "rc": 0
+    },
+    {
+      "file": "orbit360-platform/core/ui.js",
+      "rc": 0
+    },
+    {
+      "file": "orbit360-platform/core/queries.js",
+      "rc": 0
+    },
+    {
+      "file": "orbit360-platform/core/client-canonical-view-projection-v20260716.js",
+      "rc": 0
+    },
+    {
+      "file": "orbit360-platform/core/ciclo.js",
+      "rc": 0
+    },
+    {
+      "file": "orbit360-platform/data/store-firestore-product-readonly-p0.js",
+      "rc": 0
+    },
+    {
+      "file": "orbit360-platform/modules/inicio.js",
+      "rc": 0
+    },
+    {
+      "file": "orbit360-platform/modules/cliente360.js",
+      "rc": 0
+    },
+    {
+      "file": "orbit360-platform/modules/aseguradoras.js",
+      "rc": 0
+    },
+    {
+      "file": "orbit360-platform/modules/cobros.js",
+      "rc": 0
+    }
+  ],
+  "nonMarkdownDiffCheckRc": 0,
+  "allMarkdownAwareValidatorRc": 0,
+  "conclusion": "DELTA_COUNT_ASSERTION_MISMATCH",
   "sourceOnly": true,
   "productCommitted": false,
   "candidatePublished": false,
