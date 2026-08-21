@@ -1,9 +1,18 @@
 {
-  "schemaVersion": "orbit360-macro1-discovery-v1",
+  "schemaVersion": "orbit360-macro1-discovery-v2",
   "ok": false,
   "status": "MACRO1_DISCOVERY_FINDINGS",
   "workflowWriterAudit": "WORKFLOW_PHYSICAL_WRITER_AUDIT_FAIL",
+  "unauthorizedPhysicalWriters": 146,
   "documentationAudit": "DOCUMENTATION_STATE_DISCOVERY_FAIL",
+  "documentationOffenders": [
+    "orbit360-platform/docs/CHANGELOG-V188-CONTINUIDAD.md",
+    "orbit360-platform/docs/PROMPT-SIGUIENTE-SESION.md",
+    "orbit360-platform/docs/README-GATE711-CURRENT.md",
+    "orbit360-platform/docs/STATUS.md",
+    "orbit360-platform/docs/cliente360.md",
+    "orbit360-platform/docs/crm-vistas-globales.md"
+  ],
   "runtimeExecuted": false,
   "browserExecuted": false,
   "secretAccess": false,
