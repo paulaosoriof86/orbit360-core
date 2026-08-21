@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "orbit360-f2-boundary-refresh-intent-v1",
+  "approved": true,
+  "sourceOnly": true,
+  "runtime": false,
+  "browser": false,
+  "secrets": false,
+  "firestoreRead": false,
+  "writes": false,
+  "authorizationGranted": false,
+  "requestMaterializationAllowed": false,
+  "replayAllowed": false,
+  "priorAuthorizationIdentityDigest": "3d9975a3e599362ed1683f13d7e8b92367c626159240485e0c47f06de654ff47",
+  "priorRuntimeRunId": 32439647187,
+  "terminalClassification": "VALIDATOR_STALE",
+  "targetStep": "F2-RUNTIME-AUTHORIZATION-BOUNDARY-REFRESH",
+  "containsPII": false,
+  "containsSecrets": false
+}
