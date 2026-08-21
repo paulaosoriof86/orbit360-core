@@ -4,24 +4,31 @@ set -euo pipefail
 source_aware_diff_check(){
   local mode="${1:-worktree}"
   local -a md=()
+  local -a untracked=()
   if [ "$mode" = 'staged' ]; then
     git diff --cached --check -- . ':(exclude,glob)**/*.md'
-    mapfile -t md < <(git diff --cached --name-only -- ':(glob)**/*.md')
+    mapfile -t md < <(git diff --cached --name-only -- ':(glob)**/*.md' | sort -u)
   else
     git diff --check -- . ':(exclude,glob)**/*.md'
-    mapfile -t md < <(git diff --name-only -- ':(glob)**/*.md')
+    mapfile -t untracked < <(git ls-files --others --exclude-standard | sort -u)
+    mapfile -t md < <({ git diff --name-only -- ':(glob)**/*.md'; printf '%s\n' "${untracked[@]}" | grep -E '\.md$' || true; } | sed '/^$/d' | sort -u)
+    if ((${#untracked[@]})); then
+      node - "${untracked[@]}" <<'NODE'
+const fs=require('fs');const bad=[];
+for(const f of process.argv.slice(2)){
+  if(!fs.existsSync(f)||/\.md$/i.test(f))continue;
+  fs.readFileSync(f,'utf8').split(/\n/).forEach((line,i)=>{const m=line.match(/[ \t]+$/);if(m)bad.push(`${f}:${i+1}:${JSON.stringify(m[0])}`);});
+}
+if(bad.length){console.error('UNTRACKED_NON_MARKDOWN_TRAILING_WHITESPACE_INVALID\n'+bad.join('\n'));process.exit(41);}
+NODE
+    fi
   fi
   if ((${#md[@]})); then
     node - "${md[@]}" <<'NODE'
-const fs=require('fs');
-const bad=[];
+const fs=require('fs');const bad=[];
 for(const f of process.argv.slice(2)){
-  if(!fs.existsSync(f)) continue;
-  const lines=fs.readFileSync(f,'utf8').split(/\n/);
-  lines.forEach((line,i)=>{
-    const m=line.match(/[ \t]+$/);
-    if(m && m[0] !== '  ') bad.push(`${f}:${i+1}:${JSON.stringify(m[0])}`);
-  });
+  if(!fs.existsSync(f))continue;
+  fs.readFileSync(f,'utf8').split(/\n/).forEach((line,i)=>{const m=line.match(/[ \t]+$/);if(m&&m[0]!=='  ')bad.push(`${f}:${i+1}:${JSON.stringify(m[0])}`);});
 }
 if(bad.length){console.error('MARKDOWN_TRAILING_WHITESPACE_INVALID\n'+bad.join('\n'));process.exit(41);}
 NODE
@@ -55,10 +62,10 @@ echo "START_HEAD=$START_HEAD" >> "$GITHUB_ENV"
 
 # STAGE: Apply exact source-only patches
 set -euo pipefail
-git apply "$PRODUCT_PATCH"
-git apply "$TOOLS_PATCH"
-git apply "$DOCS_PATCH"
-mapfile -t DELTA < <(git diff --name-only | sort)
+git apply --whitespace=nowarn "$PRODUCT_PATCH"
+git apply --whitespace=nowarn "$TOOLS_PATCH"
+git apply --whitespace=nowarn "$DOCS_PATCH"
+mapfile -t DELTA < <({ git diff --name-only; git ls-files --others --exclude-standard; } | sed '/^$/d' | sort -u)
 cat > "$RUNNER_TEMP/expected-paths.txt" <<'EOF'
 orbit360-platform/core/ciclo.js
 orbit360-platform/core/client-canonical-view-projection-v20260716.js
@@ -76,6 +83,7 @@ tools/orbit360-documentation-state-discovery-v20260821.mjs
 tools/orbit360-promote-macro2-transversal-candidate-v20260821.mjs
 tools/orbit360-test-macro2-transversal-source-acceptance-v20260821.mjs
 EOF
+test "${#DELTA[@]}" = '15'
 diff -u "$RUNNER_TEMP/expected-paths.txt" <(printf '%s\n' "${DELTA[@]}")
 node --check tools/orbit360-build-macro2-transversal-successor-v20260821.mjs
 node --check tools/orbit360-promote-macro2-transversal-candidate-v20260821.mjs
@@ -125,7 +133,7 @@ echo "SOURCE_HEAD=$SOURCE_HEAD" >> "$GITHUB_ENV"
 set -euo pipefail
 OWNER_SAFE_HEAD=$(jq -r '.ownerSafeHead' "$MACRO2_REQUEST")
 test "$OWNER_SAFE_HEAD" != ""
-# Permanent canonical listener remains registered; source push does not touch workflow path and cannot retrigger.
+# Permanent canonical listener remains registered; source push does not touch workflow/pointer paths and cannot retrigger.
 SOURCE_HEAD=$(git rev-parse HEAD)
 echo "SOURCE_HEAD=$SOURCE_HEAD" >> "$GITHUB_ENV"
 git fetch origin "$ORBIT360_BRANCH"
