@@ -1,0 +1,133 @@
+name: Orbit360 F2 Single File Successor Source Only
+
+on:
+  push:
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - '.github/orbit360-requests/f2-single-file-successor-*.json'
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: orbit360-f2-single-file-successor-ays
+  cancel-in-progress: false
+
+jobs:
+  build-certify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validate immutable source-only request
+        shell: bash
+        run: |
+          set -euo pipefail
+          START_HEAD=$(git rev-parse HEAD)
+          mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
+          test "${#CHANGED[@]}" = '1'
+          REQUEST="${CHANGED[0]}"
+          case "$REQUEST" in .github/orbit360-requests/f2-single-file-successor-*.json) ;; *) exit 41;; esac
+          jq -e '.schemaVersion=="orbit360-f2-single-file-successor-request-v1" and .approved==true and .sourceOnly==true and .runtime==false and .browser==false and .secrets==false and .firestoreRead==false and .writes==false and .deploy==false and .production==false and .baseArtifactId==9395391426 and .deltaPath=="core/crmkit.js" and (.sourceHead|test("^[a-f0-9]{40}$")) and (.expectedBeforeBlob|test("^[a-f0-9]{40}$")) and (.expectedAfterBlob|test("^[a-f0-9]{40}$")) and .containsPII==false and .containsSecrets==false' "$REQUEST" >/dev/null
+          echo "START_HEAD=$START_HEAD" >> "$GITHUB_ENV"
+          echo "REQUEST=$REQUEST" >> "$GITHUB_ENV"
+          for k in baseArtifactId baseInnerZip baseZipSha256 baseManifestSha256 baseSourceHead sourceHead deltaPath expectedBeforeBlob expectedAfterBlob rootCause rootfix; do echo "${k^^}=$(jq -r --arg k "$k" '.[$k]' "$REQUEST")" >> "$GITHUB_ENV"; done
+
+      - name: Download and verify exact certified base
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUTER="$RUNNER_TEMP/base-outer.zip"; OUTER_DIR="$RUNNER_TEMP/base-outer"; BASE="$RUNNER_TEMP/base"; SUCC="$RUNNER_TEMP/succ"
+          mkdir -p "$OUTER_DIR" "$BASE"
+          curl -L --fail --retry 3 -H "Authorization: Bearer $GH_TOKEN" -H 'Accept: application/vnd.github+json' -H 'X-GitHub-Api-Version: 2022-11-28' "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/${BASEARTIFACTID}/zip" -o "$OUTER"
+          unzip -q "$OUTER" -d "$OUTER_DIR"
+          mapfile -t FILES < <(find "$OUTER_DIR" -maxdepth 1 -type f -printf '%f\n' | sort)
+          test "${#FILES[@]}" = '1' && test "${FILES[0]}" = "$BASEINNERZIP"
+          test "$(sha256sum "$OUTER_DIR/$BASEINNERZIP" | awk '{print $1}')" = "$BASEZIPSHA256"
+          unzip -q "$OUTER_DIR/$BASEINNERZIP" -d "$BASE"
+          test "$(sha256sum "$BASE/orbit360-package-manifest.json" | awk '{print $1}')" = "$BASEMANIFESTSHA256"
+          test "$(git hash-object "$BASE/$DELTAPATH")" = "$EXPECTEDBEFOREBLOB"
+          cp -a "$BASE" "$SUCC"
+          echo "BASE_DIR=$BASE" >> "$GITHUB_ENV"; echo "SUCC_DIR=$SUCC" >> "$GITHUB_ENV"
+
+      - name: Apply one authorized product delta and prove root cause
+        shell: bash
+        run: |
+          set -euo pipefail
+          git cat-file -e "$SOURCEHEAD^{commit}"
+          git show "$SOURCEHEAD:orbit360-platform/$DELTAPATH" > "$SUCC_DIR/$DELTAPATH"
+          test "$(git hash-object "$SUCC_DIR/$DELTAPATH")" = "$EXPECTEDAFTERBLOB"
+          node - "$SUCC_DIR/$DELTAPATH" <<'NODE'
+          const fs=require('fs'),vm=require('vm');const src=fs.readFileSync(process.argv[2],'utf8');
+          const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,'');
+          const raw={id:'cli-1',nombre:'Cliente Uno'},projected={id:'cli-1',nombre:'Cliente Uno',tipo:'Persona',pais:'GT'};
+          const Orbit={ui:{esc,avatar:n=>`<i>${esc(n)}</i>`,money:()=>'',fmtDate:()=>'',estadoBadge:()=>''},q:{asesor:()=>null,aseguradora:()=>null},store:{get:(c,id)=>c==='clientes'&&id==='cli-1'?raw:null,all:()=>[],where:()=>[]},clientProjection:{get:id=>id==='cli-1'?projected:null},MODULE_TITLES:{}};
+          const ctx={window:{Orbit},Orbit,location:{hash:''},document:{}};ctx.window.window=ctx.window;vm.createContext(ctx);vm.runInContext(src,ctx);
+          const html=ctx.Orbit.kit.clienteCell('cli-1');
+          if(/\bundefined\b|\bNaN\b/i.test(html)||!html.includes('Persona')||!html.includes('GT')) process.exit(42);
+          console.log(JSON.stringify({ok:true,status:'F2_POLIZAS_CLIENT_CELL_ROOTFIX_SYNTHETIC_PASS',undefinedVisible:false,projectionUsed:true}));
+          NODE
+
+      - name: Rehash full package and update lineage
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASEARTIFACTID="$BASEARTIFACTID" BASEZIPSHA256="$BASEZIPSHA256" BASEMANIFESTSHA256="$BASEMANIFESTSHA256" BASESOURCEHEAD="$BASESOURCEHEAD" SOURCEHEAD="$SOURCEHEAD" DELTAPATH="$DELTAPATH" ROOTCAUSE="$ROOTCAUSE" ROOTFIX="$ROOTFIX" SUCC_DIR="$SUCC_DIR" node - <<'NODE'
+          const fs=require('fs'),path=require('path'),crypto=require('crypto');const root=process.env.SUCC_DIR,p=path.join(root,'orbit360-package-manifest.json'),m=JSON.parse(fs.readFileSync(p,'utf8'));const sha=b=>crypto.createHash('sha256').update(b).digest('hex');
+          const entry=m.files.find(x=>x.path===process.env.DELTAPATH);if(!entry)process.exit(41);const b=fs.readFileSync(path.join(root,entry.path));entry.bytes=b.length;entry.sha256=sha(b);
+          m.status='FASE_A_PRODUCT_F2_SUCCESSOR_CLIENT_PROJECTION_ROOTFIX_SOURCEONLY_CERTIFIED';m.sourceHead=process.env.SOURCEHEAD;m.generatedAt=new Date().toISOString();m.basePackageSha256=process.env.BASEZIPSHA256;m.baseManifestSha256=process.env.BASEMANIFESTSHA256;m.baseArtifactId=Number(process.env.BASEARTIFACTID);m.baseSourceHead=process.env.BASESOURCEHEAD;m.deltaFiles=[process.env.DELTAPATH];m.deltaSourceHead=process.env.SOURCEHEAD;m.successorOrdinal=Number(m.successorOrdinal||0)+1;m.unchangedFileCount=m.fileCount-1;m.candidateOrigin='F2_SUCCESSOR_CLIENT_PROJECTION_ROOTFIX_SOURCEONLY';m.rootCause=process.env.ROOTCAUSE;m.rootfix=process.env.ROOTFIX;m.runtimeAuthorized=false;m.writeAuthorized=false;m.deployExecuted=false;m.productionTouched=false;m.lineage=m.lineage||{};m.lineage.f2_client_projection_rootfix={baseArtifactId:Number(process.env.BASEARTIFACTID),baseZipSha256:process.env.BASEZIPSHA256,baseManifestSha256:process.env.BASEMANIFESTSHA256,baseSourceHead:process.env.BASESOURCEHEAD,sourceHead:process.env.SOURCEHEAD,productDeltaCount:1,productDeltaPaths:[process.env.DELTAPATH],sourceOnly:true,runtimeAuthorized:false};
+          fs.writeFileSync(p,JSON.stringify(m,null,2)+'\n');
+          for(const f of m.files){const x=fs.readFileSync(path.join(root,f.path));if(x.length!==Number(f.bytes)||sha(x)!==f.sha256)process.exit(43);}if(m.files.length!==194||m.fileCount!==194||m.unchangedFileCount!==193)process.exit(44);
+          NODE
+          INNER="orbit360-fase-a-product-f2-successor-client-projection-${SOURCEHEAD:0:12}.zip"
+          (cd "$SUCC_DIR" && zip -qr "$RUNNER_TEMP/$INNER" .)
+          echo "INNER=$INNER" >> "$GITHUB_ENV"; echo "ZIP_SHA=$(sha256sum "$RUNNER_TEMP/$INNER"|awk '{print $1}')" >> "$GITHUB_ENV"; echo "MANIFEST_SHA=$(sha256sum "$SUCC_DIR/orbit360-package-manifest.json"|awk '{print $1}')" >> "$GITHUB_ENV"
+
+      - name: Upload successor candidate
+        id: upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-f2-successor-client-projection-${{ github.run_id }}
+          path: ${{ runner.temp }}/${{ env.INNER }}
+          retention-days: 30
+          if-no-files-found: error
+          compression-level: 0
+
+      - name: Redownload exact uploaded artifact and certify
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ARTIFACT_ID: ${{ steps.upload.outputs.artifact-id }}
+          ARTIFACT_DIGEST: ${{ steps.upload.outputs.artifact-digest }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          O="$RUNNER_TEMP/redownload.zip"; D="$RUNNER_TEMP/redownload"; V="$RUNNER_TEMP/verify";mkdir -p "$D" "$V"
+          curl -L --fail --retry 3 -H "Authorization: Bearer $GH_TOKEN" -H 'Accept: application/vnd.github+json' -H 'X-GitHub-Api-Version: 2022-11-28' "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/${ARTIFACT_ID}/zip" -o "$O"
+          unzip -q "$O" -d "$D"; mapfile -t F < <(find "$D" -maxdepth 1 -type f -printf '%f\n'); test "${#F[@]}" = '1' && test "${F[0]}" = "$INNER"; test "$(sha256sum "$D/$INNER"|awk '{print $1}')" = "$ZIP_SHA"; unzip -q "$D/$INNER" -d "$V"; test "$(sha256sum "$V/orbit360-package-manifest.json"|awk '{print $1}')" = "$MANIFEST_SHA"; test "$(git hash-object "$V/$DELTAPATH")" = "$EXPECTEDAFTERBLOB"
+          node - "$V" <<'NODE'
+          const fs=require('fs'),path=require('path'),crypto=require('crypto');const root=process.argv[2],m=JSON.parse(fs.readFileSync(path.join(root,'orbit360-package-manifest.json'),'utf8')),sha=b=>crypto.createHash('sha256').update(b).digest('hex');if(m.fileCount!==194||m.files.length!==194||m.deltaFiles.length!==1||m.deltaFiles[0]!=='core/crmkit.js'||m.unchangedFileCount!==193)process.exit(41);for(const f of m.files){const b=fs.readFileSync(path.join(root,f.path));if(b.length!==Number(f.bytes)||sha(b)!==f.sha256)process.exit(42);}console.log(JSON.stringify({ok:true,status:'F2_SUCCESSOR_FULL_REHASH_REDOWLOAD_PASS'}));
+          NODE
+          mkdir -p orbit360-platform/runtime-gate-crm-v20260716
+          jq -n --arg run "$GITHUB_RUN_ID" --argjson artifactId "$ARTIFACT_ID" --arg artifactDigest "$ARTIFACT_DIGEST" --arg source "$SOURCEHEAD" --arg inner "$INNER" --arg zipSha "$ZIP_SHA" --arg manifestSha "$MANIFEST_SHA" --arg delta "$DELTAPATH" --arg rootCause "$ROOTCAUSE" '{schemaVersion:"orbit360-f2-successor-single-file-evidence-v1",ok:true,status:"F2_SUCCESSOR_CLIENT_PROJECTION_ROOTFIX_SOURCEONLY_CERTIFIED",classification:"PASS",runId:($run|tonumber),candidateArtifactId:$artifactId,artifactDigest:$artifactDigest,candidateSourceHead:$source,candidateZipName:$inner,candidateZipSha256:$zipSha,candidateManifestSha256:$manifestSha,baseArtifactId:9395391426,fileCount:194,deltaCount:1,deltaPaths:[$delta],unchangedFileCount:193,rootCause:$rootCause,syntheticRootfixPass:true,fullRehashPass:true,runtimeAuthorized:false,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,writes:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false}' > orbit360-platform/runtime-gate-crm-v20260716/f2-successor-client-projection-rootfix-v20260820.json
+
+      - name: Persist sanitized certification evidence with final CAS
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name orbit360-candidate-builder; git config user.email orbit360-candidate-builder@users.noreply.github.com
+          git add orbit360-platform/runtime-gate-crm-v20260716/f2-successor-client-projection-rootfix-v20260820.json
+          git commit -m 'evidence(f2): certify client projection rootfix successor [skip ci]'
+          git fetch origin ays/backend-tenant-lab-v99-20260703
+          test "$(git rev-parse origin/ays/backend-tenant-lab-v99-20260703)" = "$START_HEAD" || { echo FINAL_CAS_MISMATCH; exit 103; }
+          git push origin HEAD:ays/backend-tenant-lab-v99-20260703
