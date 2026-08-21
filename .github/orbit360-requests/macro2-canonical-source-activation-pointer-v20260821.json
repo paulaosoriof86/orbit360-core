@@ -1,19 +1,12 @@
 {
   "schemaVersion": "orbit360-macro2-canonical-source-activation-pointer-v1",
-  "status": "IDLE",
-  "mode": "NONE",
+  "status": "ACTIVE",
+  "mode": "WHITESPACE_POLICY_DIAGNOSTIC",
   "activeRequestPath": null,
-  "activationNonce": "macro2-whitespace-policy-diagnostic-20260821-02",
-  "allowedExecutions": 0,
-  "consumed": true,
+  "activationNonce": "macro2-patch-assertion-diagnostic-20260821-03",
+  "allowedExecutions": 1,
+  "consumed": false,
   "replayAllowed": false,
-  "lastTerminal": {
-    "runId": 32538183300,
-    "triggerSha": "cf5d89c804c60cd94c1a1ea81b53ed7a9ccdaeba",
-    "status": "WHITESPACE_POLICY_DIAGNOSTIC_PASS",
-    "classification": "PASS",
-    "failedStage": "NONE"
-  },
   "sourceOnly": true,
   "runtime": false,
   "browser": false,
@@ -24,7 +17,7 @@
   "production": false,
   "main": false,
   "merge": false,
-  "rootCauseResolution": "GIT_APPLY_WARN_ONLY_MARKDOWN_VALIDATOR_PASS",
+  "rootCauseResolution": "IDENTIFY_PATCH_APPLY_SYNTAX_ASSERTION_EXACTLY",
   "containsPII": false,
   "containsSecrets": false
 }
