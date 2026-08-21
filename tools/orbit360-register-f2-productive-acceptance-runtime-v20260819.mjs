@@ -11,6 +11,7 @@ const LIFE_REL='tools/orbit360-validator-lifecycle-contract-f2-productive-accept
 const LIFE=path.join(ROOT,LIFE_REL);
 const REQUEST=String(process.env.ORBIT360_REQUEST_FILE||'').trim();
 const EXPECTED='F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_V2';
+const SOURCE_PHASE='F2_PRODUCTIVE_ACCEPTANCE_SOURCE_ONLY';
 const need=(v,c)=>{if(!v)throw new Error(c);};
 need(REQUEST&&fs.existsSync(path.join(ROOT,REQUEST)),'F2_RUNTIME_REGISTER_REQUEST_REQUIRED');
 const req=JSON.parse(fs.readFileSync(path.join(ROOT,REQUEST),'utf8'));
@@ -20,13 +21,15 @@ need(req.requestVersion===EXPECTED&&req.status==='MATERIALIZED_SOURCE_ONLY_AWAIT
 need(/^[a-f0-9]{64}$/.test(String(req.authorizationIdentityDigest||'')),'F2_RUNTIME_REGISTER_AUTH_IDENTITY_REQUIRED');
 need(life.gateId==='f2-productive-acceptance-exact-successor-v20260818'&&authority.gateId===life.gateId,'F2_RUNTIME_REGISTER_GATE_MISMATCH');
 need(Number(life.guards?.successorCandidateArtifactId)===Number(req.candidateArtifactId)&&life.guards?.successorCandidateSourceHead===req.candidateSourceHead,'F2_RUNTIME_REGISTER_CANDIDATE_MISMATCH');
+need(authority.sourcePhase===SOURCE_PHASE,'F2_RUNTIME_REGISTER_SOURCE_PHASE_AUTHORITY_INVALID');
 life.currentPhase='F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY';
 life.status='AUTHORIZED_ONCE_RUNTIME_REGISTERED_TRANSIENT_V2';
 life.executionProfile={phase:'F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY',capabilities:{secrets:true,firestoreRead:true,writes:false,runtime:true,browser:true,deploy:false,functionsDeploy:false,rulesDeploy:false,production:false}};
 life.authorization={requiredForExecution:true,activeRequest:true,freshAuthorizationRequired:false,authorizationCarryForwardForbidden:true,nextRuntimeMaterializationAllowed:false,replayAllowed:false,request:'DYNAMIC:ORBIT360_REQUEST_FILE',authorizationIdentityDigest:req.authorizationIdentityDigest,allowedExecutions:1,consumed:false};
 fs.writeFileSync(LIFE,JSON.stringify(life,null,2)+'\n','utf8');
 authority.lifecycles.source=LIFE_REL;
-authority.sourcePhase='';
+// Preserve the canonical source phase. Runtime registration rebinds the lifecycle/request only;
+// blanking sourcePhase makes the canonical router reject this valid runtime authority before the gate.
 authority.requestBinding={...(authority.requestBinding||{}),activeRequest:REQUEST,defaultRequest:REQUEST,requestOrdinalHasOperationalSemantics:false,historicalRequestMayBeUsedAsActiveBinding:false};
 fs.writeFileSync(AUTHORITY,JSON.stringify(authority,null,2)+'\n','utf8');
 let router=fs.readFileSync(ROUTER,'utf8');
@@ -35,4 +38,4 @@ const newBlock=`    if (GATE_ID===F2_GATE_ID && expectedRequestVersion==='${EXPE
 need(router.includes(oldLine),'F2_RUNTIME_REGISTER_ROUTER_ACTIVE_REQUEST_GUARD_NOT_FOUND');
 router=router.replace(oldLine,newBlock);
 fs.writeFileSync(ROUTER,router,'utf8');
-console.log(JSON.stringify({ok:true,status:'F2_RUNTIME_LIFECYCLE_AND_ROUTER_REGISTERED_TRANSIENT_V2',gateId:life.gateId,candidateArtifactId:req.candidateArtifactId,authorizationIdentityDigest:req.authorizationIdentityDigest,lifecycle:LIFE_REL,authority:AUTHORITY_REL,router:ROUTER_REL,contractVersion:life.gateContractVersion,lifecycleRevision:life.validatorLifecycleRevision,persistentSourceChanged:false},null,2));
+console.log(JSON.stringify({ok:true,status:'F2_RUNTIME_LIFECYCLE_AND_ROUTER_REGISTERED_TRANSIENT_V2',gateId:life.gateId,candidateArtifactId:req.candidateArtifactId,authorizationIdentityDigest:req.authorizationIdentityDigest,lifecycle:LIFE_REL,authority:AUTHORITY_REL,router:ROUTER_REL,sourcePhasePreserved:authority.sourcePhase===SOURCE_PHASE,contractVersion:life.gateContractVersion,lifecycleRevision:life.validatorLifecycleRevision,persistentSourceChanged:false},null,2));
