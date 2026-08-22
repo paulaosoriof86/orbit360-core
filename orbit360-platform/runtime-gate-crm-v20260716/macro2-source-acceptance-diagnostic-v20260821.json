@@ -1,0 +1,30 @@
+{
+  "schemaVersion": "orbit360-macro2-source-acceptance-diagnostic-v1",
+  "validatorRc": 41,
+  "runId": 32539000715,
+  "triggerSha": "2fc5c41005a122400c8894832221b520e0813088",
+  "ok": false,
+  "status": "TRANSVERSAL_SOURCE_ACCEPTANCE_FAIL",
+  "classification": "FUNCTIONAL_DEFECT",
+  "checksPassed": 106,
+  "checksTotal": 107,
+  "failureCodes": [
+    "DELTA_EXACTLY_ALLOWED_TRANSVERSAL_SET"
+  ],
+  "performance": {
+    "clients": 414,
+    "policies": 620,
+    "allPolizas": 1,
+    "wherePolizas": 0
+  },
+  "sourceOnly": true,
+  "runtimeExecuted": false,
+  "browserExecuted": false,
+  "secretAccess": false,
+  "firestoreRead": false,
+  "writes": 0,
+  "deployExecuted": false,
+  "productionTouched": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
