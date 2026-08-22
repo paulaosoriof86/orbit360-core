@@ -1,41 +1,14 @@
 {
-  "schemaVersion": "orbit360-macro2-delta-contract-diagnostic-v4",
-  "status": "DELTA_CONTRACT_SOURCE_ONLY_DIAGNOSTIC_COMPLETE",
+  "schemaVersion": "orbit360-macro2-delta-contract-diagnostic-v5",
+  "status": "DELTA_CONTRACT_BRACKET_PARSE_DIAGNOSTIC_COMPLETE",
   "classification": "PIPELINE_MECHANISM_DIAGNOSTIC",
-  "applyWhitespaceConfig": null,
-  "coreWhitespaceConfig": null,
-  "defaultApplyRc": 0,
-  "warnApplyRc": 0,
-  "nowarnApplyRc": 0,
-  "errorAllApplyRc": 128,
-  "diffCheckPreparationApplyRc": 0,
-  "diffCheckExcludeMarkdownRc": 0,
-  "markdownAwareValidatorRc": 0,
-  "defaultReportedTrailingWhitespace": true,
-  "warnReportedTrailingWhitespace": true,
-  "nowarnReportedTrailingWhitespace": false,
-  "errorAllReportedTrailingWhitespace": true,
   "allPatchApply": {
     "productRc": 0,
     "toolsRc": 0,
     "docsRc": 0
   },
-  "legacyTrackedDeltaCount": 10,
-  "legacyTrackedDeltaFiles": [
-    "orbit360-platform/core/ciclo.js",
-    "orbit360-platform/core/client-canonical-view-projection-v20260716.js",
-    "orbit360-platform/core/queries.js",
-    "orbit360-platform/core/ui.js",
-    "orbit360-platform/data/store-firestore-product-readonly-p0.js",
-    "orbit360-platform/modules/aseguradoras.js",
-    "orbit360-platform/modules/cliente360.js",
-    "orbit360-platform/modules/cobros.js",
-    "orbit360-platform/modules/inicio.js",
-    "tools/orbit360-documentation-state-discovery-v20260821.mjs"
-  ],
   "expectedSourceDeltaCount": 15,
   "combinedSourceDeltaCount": 15,
-  "combinedSourceDeltaCountMatchesExpected": true,
   "combinedSourceDeltaFiles": [
     "orbit360-platform/core/ciclo.js",
     "orbit360-platform/core/client-canonical-view-projection-v20260716.js",
@@ -53,212 +26,6 @@
     "tools/orbit360-promote-macro2-transversal-candidate-v20260821.mjs",
     "tools/orbit360-test-macro2-transversal-source-acceptance-v20260821.mjs"
   ],
-  "syntaxChecks": [
-    {
-      "file": "tools/orbit360-build-macro2-transversal-successor-v20260821.mjs",
-      "rc": 0
-    },
-    {
-      "file": "tools/orbit360-promote-macro2-transversal-candidate-v20260821.mjs",
-      "rc": 0
-    },
-    {
-      "file": "tools/orbit360-test-macro2-transversal-source-acceptance-v20260821.mjs",
-      "rc": 0
-    },
-    {
-      "file": "tools/orbit360-documentation-state-discovery-v20260821.mjs",
-      "rc": 0
-    },
-    {
-      "file": "orbit360-platform/core/ui.js",
-      "rc": 0
-    },
-    {
-      "file": "orbit360-platform/core/queries.js",
-      "rc": 0
-    },
-    {
-      "file": "orbit360-platform/core/client-canonical-view-projection-v20260716.js",
-      "rc": 0
-    },
-    {
-      "file": "orbit360-platform/core/ciclo.js",
-      "rc": 0
-    },
-    {
-      "file": "orbit360-platform/data/store-firestore-product-readonly-p0.js",
-      "rc": 0
-    },
-    {
-      "file": "orbit360-platform/modules/inicio.js",
-      "rc": 0
-    },
-    {
-      "file": "orbit360-platform/modules/cliente360.js",
-      "rc": 0
-    },
-    {
-      "file": "orbit360-platform/modules/aseguradoras.js",
-      "rc": 0
-    },
-    {
-      "file": "orbit360-platform/modules/cobros.js",
-      "rc": 0
-    }
-  ],
-  "nonMarkdownDiffCheckRc": 0,
-  "allMarkdownAwareValidatorRc": 0,
-  "validatorCheckContext": [
-    {
-      "line": 158,
-      "text": "for (const role of ['Dirección','Operativo','Asesor']) check(roleSrc.includes(role),`ROLE_VIEW_PRESENT:${role}`);"
-    },
-    {
-      "line": 159,
-      "text": ""
-    },
-    {
-      "line": 160,
-      "text": "// 8) Security/read-only regression surfaces: present and unmodified by Macro2 delta set."
-    },
-    {
-      "line": 161,
-      "text": "const securityFiles = ["
-    },
-    {
-      "line": 162,
-      "text": " 'core/auth-product-runtime-p0.js','core/membership-multirol-contract-p0.js','core/membership-multirol-effective-p0.js',"
-    },
-    {
-      "line": 163,
-      "text": " 'core/access-scope.js','core/access-role-session-owner-v20260728.js','core/tenant-access-policy-product-p0.js','core/product-app-p0.js'"
-    },
-    {
-      "line": 164,
-      "text": "];"
-    },
-    {
-      "line": 165,
-      "text": "for (const f of securityFiles) check(exists(f),`SECURITY_SURFACE_PRESENT:${f}`);"
-    },
-    {
-      "line": 166,
-      "text": "check(storeSrc.includes('WRITE_BLOCKED_PRODUCT_READ_ONLY_P0'),'WRITE_GUARD_CODE_PRESERVED');"
-    },
-    {
-      "line": 167,
-      "text": ""
-    },
-    {
-      "line": 168,
-      "text": "// 9) Delta audit against predecessor manifest before manifest regeneration."
-    },
-    {
-      "line": 169,
-      "text": "const manifestPath=path.resolve(process.env.ORBIT360_MACRO2_BASE_MANIFEST || rel('orbit360-package-manifest.json'));"
-    },
-    {
-      "line": 170,
-      "text": "check(fs.existsSync(manifestPath),'PREDECESSOR_MANIFEST_PRESENT');"
-    },
-    {
-      "line": 171,
-      "text": "let deltaPaths=[];"
-    },
-    {
-      "line": 172,
-      "text": "if(fs.existsSync(manifestPath)){"
-    },
-    {
-      "line": 173,
-      "text": " const m=JSON.parse(fs.readFileSync(manifestPath,'utf8'));"
-    },
-    {
-      "line": 174,
-      "text": " check(Number(m.fileCount)===194 && Array.isArray(m.files) && m.files.length===194,'MANIFEST_194_FILE_BASELINE');"
-    },
-    {
-      "line": 175,
-      "text": " deltaPaths=m.files.filter(f=>exists(f.path)&&sha(fs.readFileSync(rel(f.path)))!==f.sha256).map(f=>f.path).sort();"
-    },
-    {
-      "line": 176,
-      "text": " check(JSON.stringify(deltaPaths)===JSON.stringify(ALLOWED_DELTAS),'DELTA_EXACTLY_ALLOWED_TRANSVERSAL_SET',deltaPaths);"
-    },
-    {
-      "line": 177,
-      "text": " const protectedTouched=deltaPaths.filter(p=>/^(data\\/store|core\\/backend-lab-|core\\/auth\\.js|core\\/importa\\.js|firestore\\.rules|tools\\/orbit360-)/.test(p));"
-    },
-    {
-      "line": 178,
-      "text": " check(JSON.stringify(protectedTouched)===JSON.stringify(['data/store-firestore-product-readonly-p0.js']),'PROTECTED_DELTA_ONLY_EXPLICIT_STORE',protectedTouched);"
-    },
-    {
-      "line": 179,
-      "text": "}"
-    },
-    {
-      "line": 180,
-      "text": ""
-    },
-    {
-      "line": 181,
-      "text": "// 10) No invalid visible sentinel remains in deterministic helper outputs produced by fixtures."
-    },
-    {
-      "line": 182,
-      "text": "const fixtureOutputs=[U.text(undefined),U.money(NaN,'GTQ'),U.moneyShort(Infinity,'GTQ'),U.fmtDate('bad'),U.estadoBadge(undefined),U.text('')];"
-    },
-    {
-      "line": 183,
-      "text": "check(fixtureOutputs.every(x=>!forbiddenVisible.test(String(x))),'FIXTURE_VISIBLE_INVALID_ZERO',fixtureOutputs);"
-    },
-    {
-      "line": 184,
-      "text": ""
-    },
-    {
-      "line": 185,
-      "text": "const result={"
-    },
-    {
-      "line": 186,
-      "text": " schemaVersion:'orbit360-macro2-transversal-source-acceptance-v1',"
-    },
-    {
-      "line": 187,
-      "text": " ok:failures.length===0,"
-    },
-    {
-      "line": 188,
-      "text": " status:failures.length?'TRANSVERSAL_SOURCE_ACCEPTANCE_FAIL':'TRANSVERSAL_SOURCE_ACCEPTANCE_PASS',"
-    },
-    {
-      "line": 189,
-      "text": " classification:failures.length?'FUNCTIONAL_DEFECT':'PASS',"
-    },
-    {
-      "line": 190,
-      "text": " candidateDir:CANDIDATE,"
-    },
-    {
-      "line": 191,
-      "text": " routes:ROUTES,"
-    },
-    {
-      "line": 192,
-      "text": " roleViews:['Dirección desktop','Operativo tablet','Asesor mobile'],"
-    },
-    {
-      "line": 193,
-      "text": " integratedSurfaces:['policyFullPage','vehicleFullPage','receiptsPortfolio'],"
-    },
-    {
-      "line": 194,
-      "text": " performance:{clients:414,policies:620,...perfCounts},"
-    }
-  ],
   "allowedDeltasContract": {
     "declarationFound": true,
     "declared": [
@@ -270,17 +37,20 @@
       "modules/inicio.js",
       "modules/cliente360.js",
       "modules/aseguradoras.js",
+      "modules/cobros.js"
+    ],
+    "suffix": ".sort();",
+    "sortApplied": true,
+    "runtimeAllowedDeltas": [
+      "core/ciclo.js",
+      "core/client-canonical-view-projection-v20260716.js",
+      "core/queries.js",
+      "core/ui.js",
+      "data/store-firestore-product-readonly-p0.js",
+      "modules/aseguradoras.js",
+      "modules/cliente360.js",
       "modules/cobros.js",
-      " },\n  document: { createElement(){ return { style:{}, className:",
-      ", appendChild(){}, addEventListener(){}, querySelector(){return null;} }; }, body:{ appendChild(){} } },\n  CustomEvent: class { constructor(type, init){ this.type=type; this.detail=init?.detail; } },\n  window: null,\n  Orbit: { tenant: { demoDate: ",
-      " }, modules: {} }\n};\nuiCtx.window = uiCtx;\nvm.runInNewContext(read(",
-      "), uiCtx, { filename: ",
-      " });\nconst U = uiCtx.Orbit.ui;\nconst displayCases = [undefined, null, NaN, Infinity, -Infinity, ",
-      ", ",
-      ", ",
-      ", ",
-      ", ",
-      ", "
+      "modules/inicio.js"
     ],
     "canonical": [
       "core/ciclo.js",
@@ -293,23 +63,12 @@
       "modules/cobros.js",
       "modules/inicio.js"
     ],
-    "sameSet": false,
-    "sameOrder": false,
+    "sameSet": true,
+    "sameRuntimeOrder": true,
     "missingFromDeclared": [],
-    "extraInDeclared": [
-      " },\n  document: { createElement(){ return { style:{}, className:",
-      ", appendChild(){}, addEventListener(){}, querySelector(){return null;} }; }, body:{ appendChild(){} } },\n  CustomEvent: class { constructor(type, init){ this.type=type; this.detail=init?.detail; } },\n  window: null,\n  Orbit: { tenant: { demoDate: ",
-      " }, modules: {} }\n};\nuiCtx.window = uiCtx;\nvm.runInNewContext(read(",
-      "), uiCtx, { filename: ",
-      " });\nconst U = uiCtx.Orbit.ui;\nconst displayCases = [undefined, null, NaN, Infinity, -Infinity, ",
-      ", ",
-      ", ",
-      ", ",
-      ", ",
-      ", "
-    ]
+    "extraInDeclared": []
   },
-  "conclusion": "ALLOWED_DELTAS_CONTENT_MISMATCH",
+  "conclusion": "ALLOWED_DELTAS_RUNTIME_MATCHES_CANONICAL_9",
   "sourceOnly": true,
   "productCommitted": false,
   "candidatePublished": false,
