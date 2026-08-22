@@ -29,6 +29,7 @@ env:
   POINTER: .github/orbit360-requests/macro2-canonical-source-activation-pointer-v20260821.json
   LISTENER_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/macro2-permanent-listener-terminal-v20260821.json
   FIRST_STAGE_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/macro2-first-stage-diagnostic-terminal-v20260821.json
+  SOURCE_ACCEPTANCE_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/macro2-source-acceptance-diagnostic-v20260821.json
   WHITESPACE_EVIDENCE: orbit360-platform/runtime-gate-crm-v20260716/macro2-patch-apply-whitespace-policy-diagnostic-v20260821.json
   BASE_ARTIFACT_ID: '9433944723'
   BASE_SOURCE_HEAD: c3bb825da2b1ecae08dabc2034c753482b086fec
@@ -196,11 +197,16 @@ jobs:
           echo "MACRO2_BASE_MANIFEST=$RUNNER_TEMP/base-manifest.json" >> "$GITHUB_ENV"
       - id: acceptance
         if: steps.router.outputs.mode == 'FIRST_STAGE_DIAGNOSTIC' && steps.predecessor.outcome == 'success'
-        name: Run transversal source acceptance only
+        name: Run transversal source acceptance only with durable diagnostic
         shell: bash
         run: |
           set -euo pipefail
-          ORBIT360_MACRO2_CANDIDATE_DIR="$GITHUB_WORKSPACE/orbit360-platform" ORBIT360_MACRO2_BASE_MANIFEST="$MACRO2_BASE_MANIFEST" node tools/orbit360-test-macro2-transversal-source-acceptance-v20260821.mjs > "$RUNNER_TEMP/acceptance.json"
+          set +e
+          ORBIT360_MACRO2_CANDIDATE_DIR="$GITHUB_WORKSPACE/orbit360-platform" ORBIT360_MACRO2_BASE_MANIFEST="$MACRO2_BASE_MANIFEST" node tools/orbit360-test-macro2-transversal-source-acceptance-v20260821.mjs > "$RUNNER_TEMP/acceptance.json" 2> "$RUNNER_TEMP/acceptance.stderr"
+          VALIDATOR_RC=$?
+          set -e
+          echo "validator_rc=$VALIDATOR_RC" >> "$GITHUB_OUTPUT"
+          if [ "$VALIDATOR_RC" -ne 0 ]; then exit "$VALIDATOR_RC"; fi
           jq -e '.ok==true and .status=="TRANSVERSAL_SOURCE_ACCEPTANCE_PASS" and .checksPassed==107 and .checksTotal==107 and .performance.clients==414 and .performance.allPolizas==1 and .performance.wherePolizas==0' "$RUNNER_TEMP/acceptance.json" >/dev/null
       - name: Persist terminal evidence without touching workflow
         if: always()
@@ -213,6 +219,7 @@ jobs:
           PATCHAPPLY: ${{ steps.patchapply.outcome }}
           PREDECESSOR: ${{ steps.predecessor.outcome }}
           ACCEPTANCE: ${{ steps.acceptance.outcome }}
+          ACCEPTANCE_RC: ${{ steps.acceptance.outputs.validator_rc }}
         shell: bash
         run: |
           set -euo pipefail
@@ -246,6 +253,7 @@ jobs:
             "patchApplySyntax":"$PATCHAPPLY",
             "predecessorArtifact":"$PREDECESSOR",
             "sourceAcceptance107":"$ACCEPTANCE",
+            "sourceAcceptanceValidatorRc":${ACCEPTANCE_RC:-99},
             "expectedDeltaCount":15,
             "deltaEnumeration":"TRACKED_PLUS_UNTRACKED_EXACT_SET",
             "runId":${GITHUB_RUN_ID},
@@ -269,6 +277,18 @@ jobs:
           if [ "$MODE" = 'FIRST_STAGE_DIAGNOSTIC' ]; then
             mkdir -p "$(dirname "$FIRST_STAGE_EVIDENCE")"
             cp "$LISTENER_EVIDENCE" "$FIRST_STAGE_EVIDENCE"
+            if [ -s "$RUNNER_TEMP/acceptance.json" ]; then
+              node - "$RUNNER_TEMP/acceptance.json" "$SOURCE_ACCEPTANCE_EVIDENCE" "${ACCEPTANCE_RC:-99}" "$GITHUB_RUN_ID" "$GITHUB_SHA" <<'NODE'
+          const fs=require('fs');const [src,dst,rc,run,sha]=process.argv.slice(2);let j={};
+          try{j=JSON.parse(fs.readFileSync(src,'utf8'));}catch{}
+          const codes=[];const add=x=>{if(typeof x==='string')codes.push(x);else if(x&&typeof x==='object'){const v=x.code??x.id??x.name??x.check??x.key;if(v!=null)codes.push(String(v));}};
+          for(const k of ['failures','failedChecks'])if(Array.isArray(j[k]))for(const x of j[k])add(x);
+          if(Array.isArray(j.checks))for(const x of j.checks)if(x&&typeof x==='object'&&(x.ok===false||x.pass===false||x.status==='FAIL'||x.status==='failed'))add(x);
+          const p=j.performance||{};
+          const out={schemaVersion:'orbit360-macro2-source-acceptance-diagnostic-v1',validatorRc:Number(rc),runId:Number(run),triggerSha:sha,ok:j.ok??false,status:j.status??null,classification:j.classification??null,checksPassed:j.checksPassed??null,checksTotal:j.checksTotal??null,failureCodes:[...new Set(codes)],performance:{clients:p.clients??null,policies:p.policies??p.polizas??null,allPolizas:p.allPolizas??null,wherePolizas:p.wherePolizas??null},sourceOnly:true,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,writes:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
+          fs.mkdirSync(require('path').dirname(dst),{recursive:true});fs.writeFileSync(dst,JSON.stringify(out,null,2)+'\n');
+          NODE
+            fi
           fi
           if [ "$MODE" = 'WHITESPACE_POLICY_DIAGNOSTIC' ] && [ -f "$RUNNER_TEMP/macro2-whitespace-policy.json" ]; then
             mkdir -p "$(dirname "$WHITESPACE_EVIDENCE")"
@@ -278,6 +298,7 @@ jobs:
           git config user.email 'orbit360-control-plane-bot@users.noreply.github.com'
           git add -- "$LISTENER_EVIDENCE"
           if [ -f "$FIRST_STAGE_EVIDENCE" ]; then git add -- "$FIRST_STAGE_EVIDENCE"; fi
+          if [ -f "$SOURCE_ACCEPTANCE_EVIDENCE" ]; then git add -- "$SOURCE_ACCEPTANCE_EVIDENCE"; fi
           if [ -f "$WHITESPACE_EVIDENCE" ]; then git add -- "$WHITESPACE_EVIDENCE"; fi
           git diff --cached --check
           git commit -m 'evidence(macro2): persist permanent listener terminal'
