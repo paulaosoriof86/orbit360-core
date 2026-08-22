@@ -1,13 +1,35 @@
 {
   "schemaVersion": "orbit360-macro2-canonical-source-activation-pointer-v1",
-  "status": "ACTIVE",
-  "mode": "WHITESPACE_POLICY_DIAGNOSTIC",
+  "status": "IDLE",
+  "mode": "IDLE",
   "activeRequestPath": null,
-  "activationNonce": "macro2-hash-index-gate-and-exact-delta-20260821-11",
-  "allowedExecutions": 1,
+  "activationNonce": null,
+  "allowedExecutions": 0,
   "consumed": false,
   "replayAllowed": false,
   "sourceOnly": true,
+  "predecessor": {
+    "artifactId": 9433944723,
+    "sourceHead": "c3bb825da2b1ecae08dabc2034c753482b086fec",
+    "zipSha256": "1951cc7c2d3390ea1c2a6b3d9ce0bb48e26a6f95d5d10d69b7c31a0027cfbbac",
+    "manifestSha256": "580921077a88badab6e4076c42e9ef88f9de7936e1b6bad0f62410b39aec6397"
+  },
+  "certifiedBundles": {
+    "product": {
+      "path": ".github/orbit360-source-patches/macro2-v20260821/product.patch.gz",
+      "gitBlobSha": "dfbc1cadfbd33dda3519dd974ec636585c82eca2"
+    },
+    "tools": {
+      "path": ".github/orbit360-source-patches/macro2-v20260821/tools.patch.gz",
+      "gitBlobSha": "682e27cc1625bd26edc5071be0dbd0b6f6c288ba"
+    },
+    "docs": {
+      "path": ".github/orbit360-source-patches/macro2-v20260821/docs.patch.gz",
+      "gitBlobSha": "644044bfb891956cf47e7afd7bb687cb23596229"
+    }
+  },
+  "allowedTransition": "IDLE_TO_FINALIZE_SOURCE_ONLY",
+  "terminalOnFailure": true,
   "runtime": false,
   "browser": false,
   "secrets": false,
@@ -17,7 +39,14 @@
   "production": false,
   "main": false,
   "merge": false,
-  "rootCauseResolution": "DIAGNOSE_HASH_INDEX_GATE_ASSERTION_AND_REPRODUCE_EXACT_194_DELTA_PATHS",
+  "rootCauseResolution": "COLLAPSED_CONTROL_PLANE_TO_SINGLE_SOURCE_FINALIZATION",
+  "forbidden": [
+    "MATERIALIZE_NEW_REQUEST",
+    "OPEN_C1_C2_C3_CHAIN",
+    "CREATE_V3R1C2_OR_V3R1C3",
+    "CREATE_PARALLEL_LISTENER",
+    "PATCH_PRODUCT_TO_SATISFY_STALE_VALIDATOR"
+  ],
   "containsPII": false,
   "containsSecrets": false
 }
