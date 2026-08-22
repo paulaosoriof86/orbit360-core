@@ -37,6 +37,7 @@
   "gitBlobIdentityAuthoritative": false,
   "receiptMovedBeforePreflight": true,
   "terminalCatchesPreflightFailure": true,
+  "materializationAction": "ONE_SHOT_CONTENTS_API_PUSH_AFTER_CANONICAL_ROOTFIX",
   "newRequestCreated": false,
   "newTriggerVariantCreated": false,
   "sourceOnly": true,
