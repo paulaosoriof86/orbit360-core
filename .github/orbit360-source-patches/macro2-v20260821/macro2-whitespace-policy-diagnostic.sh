@@ -100,6 +100,7 @@ CHECKS_JSON='[]'
 NON_MD_DIFF_RC=99
 ALL_MD_VALIDATOR_RC=99
 VALIDATOR_CONTEXT_JSON='[]'
+ALLOWED_CONTRACT_JSON='{"declarationFound":false,"declared":[],"canonical":[],"sameSet":false,"sameOrder":false,"missingFromDeclared":[],"extraInDeclared":[]}'
 if [ "$ALL_PRODUCT_RC" -eq 0 ] && [ "$ALL_TOOLS_RC" -eq 0 ] && [ "$ALL_DOCS_RC" -eq 0 ]; then
   mapfile -t DELTA < <(cd "$WSALL" && git diff --name-only | sort)
   DELTA_COUNT="${#DELTA[@]}"
@@ -142,6 +143,33 @@ NODE
 const fs=require('fs');const p=process.argv[2];const lines=fs.readFileSync(p,'utf8').split(/\n/);const needle='DELTA_EXACTLY_ALLOWED_TRANSVERSAL_SET';const i=lines.findIndex(x=>x.includes(needle));if(i<0){process.stdout.write('[]');process.exit(0);}const lo=Math.max(0,i-18),hi=Math.min(lines.length,i+19);process.stdout.write(JSON.stringify(lines.slice(lo,hi).map((text,j)=>({line:lo+j+1,text}))));
 NODE
 )"
+    ALLOWED_CONTRACT_JSON="$(node - "$VALIDATOR_FILE" <<'NODE'
+const fs=require('fs');
+const p=process.argv[2];
+const src=fs.readFileSync(p,'utf8');
+const canonical=[
+  'core/ciclo.js',
+  'core/client-canonical-view-projection-v20260716.js',
+  'core/queries.js',
+  'core/ui.js',
+  'data/store-firestore-product-readonly-p0.js',
+  'modules/aseguradoras.js',
+  'modules/cliente360.js',
+  'modules/cobros.js',
+  'modules/inicio.js'
+];
+const m=src.match(/const\s+ALLOWED_DELTAS\s*=\s*\[([\s\S]*?)\];/);
+if(!m){process.stdout.write(JSON.stringify({declarationFound:false,declared:[],canonical,sameSet:false,sameOrder:false,missingFromDeclared:canonical,extraInDeclared:[]}));process.exit(0);}
+const declared=[...m[1].matchAll(/['"]([^'"]+)['"]/g)].map(x=>x[1]);
+const ds=[...declared].sort();
+const cs=[...canonical].sort();
+const sameSet=JSON.stringify(ds)===JSON.stringify(cs);
+const sameOrder=JSON.stringify(declared)===JSON.stringify(canonical);
+const missingFromDeclared=canonical.filter(x=>!declared.includes(x));
+const extraInDeclared=declared.filter(x=>!canonical.includes(x));
+process.stdout.write(JSON.stringify({declarationFound:true,declared,canonical,sameSet,sameOrder,missingFromDeclared,extraInDeclared}));
+NODE
+)"
   fi
 
   set +e
@@ -176,25 +204,34 @@ if [ "$ALL_PRODUCT_RC" -ne 0 ] || [ "$ALL_TOOLS_RC" -ne 0 ] || [ "$ALL_DOCS_RC" 
   CONCLUSION='ALL_PATCH_APPLICATION_FAIL'
 elif [ "$(node -e "const a=$COMBINED_DELTA_JSON;process.stdout.write(String(a.length))")" -ne 15 ]; then
   CONCLUSION='COMBINED_DELTA_COUNT_ASSERTION_MISMATCH'
-elif node -e "const a=$CHECKS_JSON;if(a.some(x=>x.rc!==0))process.exit(1)"; then
-  if [ "$NON_MD_DIFF_RC" -ne 0 ]; then
-    CONCLUSION='NON_MARKDOWN_DIFF_CHECK_FAIL'
-  elif [ "$ALL_MD_VALIDATOR_RC" -ne 0 ]; then
-    CONCLUSION='MARKDOWN_VALIDATOR_FAIL'
-  else
-    CONCLUSION='PATCH_APPLY_SYNTAX_STAGE_SHOULD_PASS'
-  fi
-else
+elif ! node -e "const a=$CHECKS_JSON;if(a.some(x=>x.rc!==0))process.exit(1)"; then
   CONCLUSION='NODE_SYNTAX_CHECK_FAIL'
+elif [ "$NON_MD_DIFF_RC" -ne 0 ]; then
+  CONCLUSION='NON_MARKDOWN_DIFF_CHECK_FAIL'
+elif [ "$ALL_MD_VALIDATOR_RC" -ne 0 ]; then
+  CONCLUSION='MARKDOWN_VALIDATOR_FAIL'
+else
+  ALLOWED_FOUND="$(node -e "const x=$ALLOWED_CONTRACT_JSON;process.stdout.write(String(x.declarationFound===true))")"
+  ALLOWED_SAME_SET="$(node -e "const x=$ALLOWED_CONTRACT_JSON;process.stdout.write(String(x.sameSet===true))")"
+  ALLOWED_SAME_ORDER="$(node -e "const x=$ALLOWED_CONTRACT_JSON;process.stdout.write(String(x.sameOrder===true))")"
+  if [ "$ALLOWED_FOUND" != 'true' ]; then
+    CONCLUSION='ALLOWED_DELTAS_DECLARATION_NOT_FOUND'
+  elif [ "$ALLOWED_SAME_SET" = 'true' ] && [ "$ALLOWED_SAME_ORDER" != 'true' ]; then
+    CONCLUSION='VALIDATOR_STALE_ALLOWED_DELTAS_ORDER_MISMATCH'
+  elif [ "$ALLOWED_SAME_SET" != 'true' ]; then
+    CONCLUSION='ALLOWED_DELTAS_CONTENT_MISMATCH'
+  else
+    CONCLUSION='ALLOWED_DELTAS_DECLARATION_MATCHES_CANONICAL_9'
+  fi
 fi
 
-node - "$OUT_JSON" "$APPLY_CFG" "$CORE_CFG" "$DEFAULT_RC" "$WARN_RC" "$NOWARN_RC" "$ERRORALL_RC" "$DIFF_APPLY_RC" "$DIFFCHECK_RC" "$MDVALIDATOR_RC" "$DEFAULT_WARN" "$WARN_WARN" "$NOWARN_WARN" "$ERRORALL_WARN" "$ALL_PRODUCT_RC" "$ALL_TOOLS_RC" "$ALL_DOCS_RC" "$DELTA_COUNT" "$DELTA_JSON" "$COMBINED_DELTA_JSON" "$CHECKS_JSON" "$NON_MD_DIFF_RC" "$ALL_MD_VALIDATOR_RC" "$VALIDATOR_CONTEXT_JSON" "$CONCLUSION" <<'NODE'
+node - "$OUT_JSON" "$APPLY_CFG" "$CORE_CFG" "$DEFAULT_RC" "$WARN_RC" "$NOWARN_RC" "$ERRORALL_RC" "$DIFF_APPLY_RC" "$DIFFCHECK_RC" "$MDVALIDATOR_RC" "$DEFAULT_WARN" "$WARN_WARN" "$NOWARN_WARN" "$ERRORALL_WARN" "$ALL_PRODUCT_RC" "$ALL_TOOLS_RC" "$ALL_DOCS_RC" "$DELTA_COUNT" "$DELTA_JSON" "$COMBINED_DELTA_JSON" "$CHECKS_JSON" "$NON_MD_DIFF_RC" "$ALL_MD_VALIDATOR_RC" "$VALIDATOR_CONTEXT_JSON" "$ALLOWED_CONTRACT_JSON" "$CONCLUSION" <<'NODE'
 const fs=require('fs');
-const [p,applyCfg,coreCfg,defaultRc,warnRc,nowarnRc,errorAllRc,diffApplyRc,diffCheckRc,mdValidatorRc,defaultWarn,warnWarn,nowarnWarn,errorAllWarn,allProductRc,allToolsRc,allDocsRc,deltaCount,deltaJson,combinedDeltaJson,checksJson,nonMdDiffRc,allMdValidatorRc,validatorContextJson,conclusion]=process.argv.slice(2);
+const [p,applyCfg,coreCfg,defaultRc,warnRc,nowarnRc,errorAllRc,diffApplyRc,diffCheckRc,mdValidatorRc,defaultWarn,warnWarn,nowarnWarn,errorAllWarn,allProductRc,allToolsRc,allDocsRc,deltaCount,deltaJson,combinedDeltaJson,checksJson,nonMdDiffRc,allMdValidatorRc,validatorContextJson,allowedContractJson,conclusion]=process.argv.slice(2);
 const combined=JSON.parse(combinedDeltaJson);
 const x={
-  schemaVersion:'orbit360-macro2-whitespace-policy-diagnostic-v3',
-  status:'PATCH_APPLY_ASSERTION_AND_VALIDATOR_CONTEXT_DIAGNOSTIC_COMPLETE',
+  schemaVersion:'orbit360-macro2-delta-contract-diagnostic-v4',
+  status:'DELTA_CONTRACT_SOURCE_ONLY_DIAGNOSTIC_COMPLETE',
   classification:'PIPELINE_MECHANISM_DIAGNOSTIC',
   applyWhitespaceConfig:applyCfg||null,coreWhitespaceConfig:coreCfg||null,
   defaultApplyRc:Number(defaultRc),warnApplyRc:Number(warnRc),nowarnApplyRc:Number(nowarnRc),errorAllApplyRc:Number(errorAllRc),
@@ -202,9 +239,9 @@ const x={
   defaultReportedTrailingWhitespace:defaultWarn==='true',warnReportedTrailingWhitespace:warnWarn==='true',nowarnReportedTrailingWhitespace:nowarnWarn==='true',errorAllReportedTrailingWhitespace:errorAllWarn==='true',
   allPatchApply:{productRc:Number(allProductRc),toolsRc:Number(allToolsRc),docsRc:Number(allDocsRc)},
   legacyTrackedDeltaCount:Number(deltaCount),legacyTrackedDeltaFiles:JSON.parse(deltaJson),
-  expectedDeltaCount:15,combinedDeltaCount:combined.length,combinedDeltaCountMatchesExpected:combined.length===15,combinedDeltaFiles:combined,
+  expectedSourceDeltaCount:15,combinedSourceDeltaCount:combined.length,combinedSourceDeltaCountMatchesExpected:combined.length===15,combinedSourceDeltaFiles:combined,
   syntaxChecks:JSON.parse(checksJson),nonMarkdownDiffCheckRc:Number(nonMdDiffRc),allMarkdownAwareValidatorRc:Number(allMdValidatorRc),
-  validatorCheckContext:JSON.parse(validatorContextJson),conclusion,
+  validatorCheckContext:JSON.parse(validatorContextJson),allowedDeltasContract:JSON.parse(allowedContractJson),conclusion,
   sourceOnly:true,productCommitted:false,candidatePublished:false,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,writes:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false
 };
 fs.writeFileSync(p,JSON.stringify(x,null,2)+'\n');
