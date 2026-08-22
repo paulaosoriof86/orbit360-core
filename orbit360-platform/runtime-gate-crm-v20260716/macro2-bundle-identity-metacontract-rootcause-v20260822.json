@@ -1,0 +1,56 @@
+{
+  "schemaVersion": "orbit360-macro2-bundle-identity-metacontract-rootcause-v1",
+  "ok": true,
+  "status": "MACRO2_BUNDLE_IDENTITY_METACONTRACT_ROOT_CAUSE_RESOLVED",
+  "classification": "VALIDATOR_STALE",
+  "secondaryClassification": "PIPELINE_MECHANISM_FAILURE",
+  "date": "2026-08-22",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pr": 5,
+  "historicalRequestPath": ".github/orbit360-requests/macro2-transversal-source-recovery-v3r1c1-20260821.json",
+  "historicalContract": "PATCH_SETS_CERTIFY_GZIP_SHA256_AND_RAW_SHA256",
+  "staleInjectedBundleGitBlobs": {
+    "product": "dfbc1cadfbd33dda3519dd974ec636585c82eca2",
+    "tools": "682e27cc1625bd26edc5071be0dbd0b6f6c288ba",
+    "docs": "644044bfb891956cf47e7afd7bb687cb23596229"
+  },
+  "actualObservedGitBlobs": {
+    "product": "dfbc1cad27b3067f701b16156373a656f8a28379",
+    "tools": "682e27cc46e63f09444efe089c81f53febda59a1",
+    "docs": "644044bfb074d0130de90e653317b37ca7937c38"
+  },
+  "authoritativeBundleIdentity": {
+    "product": {
+      "gzipSha256": "c7b932b2788a502ae07111d2e209d4b0cca0b844242bb1db80218b72fa4c6913",
+      "rawSha256": "6b3141493d69d2b25c581033460f5302498dd06dd8dfcad1245802390fafe540"
+    },
+    "tools": {
+      "gzipSha256": "64bb3f11736ce39593b12a54350270f73730a10430d1ce6e543bebaee622ba46",
+      "rawSha256": "035c756cc2c14ae428a87231a8cc266762b92ebc1c67974d691bbb20ffd90f97"
+    },
+    "docs": {
+      "gzipSha256": "4a6f77f7e35a89f0ef830e4b98fa8f4d1493e7973a4b91aa55ee5def78ed2167",
+      "rawSha256": "f5f679c113e6408981f111154e8d0fd34f515e82a70c2085d3f0f54515efa3c0"
+    }
+  },
+  "authoritativeIdentityType": "GZIP_SHA256_PLUS_RAW_SHA256",
+  "gitBlobIdentityAuthoritative": false,
+  "receiptMovedBeforePreflight": true,
+  "terminalCatchesPreflightFailure": true,
+  "newRequestCreated": false,
+  "newTriggerVariantCreated": false,
+  "sourceOnly": true,
+  "runtimeExecuted": false,
+  "browserExecuted": false,
+  "providerSecretAccess": false,
+  "firestoreRead": false,
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "operationalWrites": 0,
+  "deployExecuted": false,
+  "productionTouched": false,
+  "mainTouched": false,
+  "mergeExecuted": false,
+  "containsPII": false,
+  "containsSecrets": false
+}

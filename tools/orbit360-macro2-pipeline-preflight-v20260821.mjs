@@ -27,19 +27,16 @@ const EXPECTED_PREDECESSOR = {
 const BUNDLES = {
   product: {
     path: '.github/orbit360-source-patches/macro2-v20260821/product.patch.gz',
-    gitBlobSha: 'dfbc1cadfbd33dda3519dd974ec636585c82eca2',
     gzipSha256: 'c7b932b2788a502ae07111d2e209d4b0cca0b844242bb1db80218b72fa4c6913',
     rawSha256: '6b3141493d69d2b25c581033460f5302498dd06dd8dfcad1245802390fafe540'
   },
   tools: {
     path: '.github/orbit360-source-patches/macro2-v20260821/tools.patch.gz',
-    gitBlobSha: '682e27cc1625bd26edc5071be0dbd0b6f6c288ba',
     gzipSha256: '64bb3f11736ce39593b12a54350270f73730a10430d1ce6e543bebaee622ba46',
     rawSha256: '035c756cc2c14ae428a87231a8cc266762b92ebc1c67974d691bbb20ffd90f97'
   },
   docs: {
     path: '.github/orbit360-source-patches/macro2-v20260821/docs.patch.gz',
-    gitBlobSha: '644044bfb891956cf47e7afd7bb687cb23596229',
     gzipSha256: '4a6f77f7e35a89f0ef830e4b98fa8f4d1493e7973a4b91aa55ee5def78ed2167',
     rawSha256: 'f5f679c113e6408981f111154e8d0fd34f515e82a70c2085d3f0f54515efa3c0'
   }
@@ -85,11 +82,16 @@ for (const [k,v] of Object.entries(EXPECTED_PREDECESSOR)) {
 }
 for (const [name, spec] of Object.entries(BUNDLES)) {
   const declared = pointer.certifiedBundles && pointer.certifiedBundles[name];
-  check(declared && declared.path === spec.path && declared.gitBlobSha === spec.gitBlobSha, `POINTER_BUNDLE_BINDING_MISMATCH:${name}`);
+  check(
+    declared &&
+    declared.path === spec.path &&
+    declared.gzipSha256 === spec.gzipSha256 &&
+    declared.rawSha256 === spec.rawSha256,
+    `POINTER_BUNDLE_CONTENT_BINDING_MISMATCH:${name}`
+  );
   check(fs.existsSync(abs(spec.path)), `PATCH_BUNDLE_MISSING:${name}`);
   if (!fs.existsSync(abs(spec.path))) continue;
   const gz = read(spec.path);
-  check(gitBlobSha(gz) === spec.gitBlobSha, `PATCH_GIT_BLOB_SHA_MISMATCH:${name}`);
   check(sha256(gz) === spec.gzipSha256, `PATCH_GZIP_SHA256_MISMATCH:${name}`);
   try {
     const raw = zlib.gunzipSync(gz);
@@ -167,6 +169,8 @@ const out = {
   activeRequestPath: pointer.activeRequestPath ?? null,
   predecessorValidated: failures.every(x => !x.startsWith('PREDECESSOR_')),
   certifiedBundlesValidated: failures.every(x => !x.startsWith('PATCH_') && !x.startsWith('POINTER_BUNDLE_')),
+  bundleIdentityAuthority: 'GZIP_SHA256_PLUS_RAW_SHA256',
+  gitBlobIdentityAuthoritative: false,
   runnersValidated: failures.every(x => !x.startsWith('RUNNER_') && !x.startsWith('PRE_RUNNER_') && !x.startsWith('POST_RUNNER_')),
   staleVariantPathsAbsent: failures.every(x => !x.startsWith('STALE_VARIANT_RESURRECTED:')),
   collapsedStateMachineValidated: !failures.includes('POINTER_STATE_INVALID') && !failures.includes('ALLOWED_TRANSITION_INVALID'),

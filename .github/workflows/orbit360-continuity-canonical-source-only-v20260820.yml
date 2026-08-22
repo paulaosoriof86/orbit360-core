@@ -17,6 +17,7 @@ on:
       - '.github/orbit360-requests/macro2-canonical-source-activation-pointer-v20260821.json'
       - 'tools/orbit360-macro2-pipeline-preflight-v20260821.mjs'
       - 'orbit360-platform/runtime-gate-crm-v20260716/macro2-run-observer-rootcause-v20260822.json'
+      - 'orbit360-platform/runtime-gate-crm-v20260716/macro2-bundle-identity-metacontract-rootcause-v20260822.json'
 
 permissions:
   contents: write
@@ -71,16 +72,8 @@ jobs:
         with:
           node-version: '22'
 
-      - id: preflight
-        name: Validate collapsed Macro-2 contract and observer rootfix
-        shell: bash
-        run: |
-          set -euo pipefail
-          node "$PREFLIGHT" | tee "$RUNNER_TEMP/macro2-pipeline-preflight.json"
-          jq -e '.ok==true and .status=="MACRO2_PIPELINE_PREFLIGHT_PASS" and .collapsedStateMachineValidated==true and .certifiedBundlesValidated==true and .runnersValidated==true and .staleVariantPathsAbsent==true and .actionsRegistrationHandshakeValidated==true and .runObserverRootCauseValidated==true and .executionReceiptObserverValidated==true and .observerIndependentOfFilteredCommitRunReader==true and .runtimeExecuted==false and .browserExecuted==false and .secretAccess==false and .firestoreRead==false and .writes==0 and .deployExecuted==false and .productionTouched==false' "$RUNNER_TEMP/macro2-pipeline-preflight.json" >/dev/null
-
-      - id: router
-        name: Resolve two-state activation
+      - id: activation_probe
+        name: Observe two-state pointer before any validator
         shell: bash
         run: |
           set -euo pipefail
@@ -88,25 +81,52 @@ jobs:
           MODE=$(jq -r '.mode' "$POINTER")
           ALLOWED=$(jq -r '.allowedExecutions' "$POINTER")
           ACTIVE_REQUEST=$(jq -r '.activeRequestPath // ""' "$POINTER")
+          echo "status=$STATUS" >> "$GITHUB_OUTPUT"
+          echo "mode=$MODE" >> "$GITHUB_OUTPUT"
+          echo "allowed=$ALLOWED" >> "$GITHUB_OUTPUT"
           test -z "$ACTIVE_REQUEST"
           case "$STATUS:$MODE:$ALLOWED" in
             IDLE:IDLE:0) ;;
             ACTIVE:FINALIZE_SOURCE_ONLY:1) ;;
             *) echo 'PIPELINE_MECHANISM_FAILURE:INVALID_COLLAPSED_POINTER' >&2; exit 41 ;;
           esac
-          echo "status=$STATUS" >> "$GITHUB_OUTPUT"
-          echo "mode=$MODE" >> "$GITHUB_OUTPUT"
-          echo "allowed=$ALLOWED" >> "$GITHUB_OUTPUT"
+
+      - id: receipt_start
+        if: steps.activation_probe.outputs.mode == 'FINALIZE_SOURCE_ONLY'
+        name: Publish sanitized finalization start receipt before validators
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          BODY="ORBIT360_MACRO2_FINALIZE_START runId=${GITHUB_RUN_ID} triggerSha=${GITHUB_SHA} event=${GITHUB_EVENT_NAME} mode=FINALIZE_SOURCE_ONLY sourceOnly=true"
+          jq -n --arg body "$BODY" '{body:$body}' > "$RUNNER_TEMP/macro2-start-receipt.json"
+          curl -L --fail --silent --show-error \
+            -X POST \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/issues/5/comments" \
+            --data-binary @"$RUNNER_TEMP/macro2-start-receipt.json" >/dev/null
+
+      - id: preflight
+        if: steps.activation_probe.outputs.mode == 'FINALIZE_SOURCE_ONLY'
+        name: Validate canonical Macro-2 content contract and observer rootfix
+        shell: bash
+        run: |
+          set -euo pipefail
+          node "$PREFLIGHT" | tee "$RUNNER_TEMP/macro2-pipeline-preflight.json"
+          jq -e '.ok==true and .status=="MACRO2_PIPELINE_PREFLIGHT_PASS" and .collapsedStateMachineValidated==true and .certifiedBundlesValidated==true and .bundleIdentityAuthority=="GZIP_SHA256_PLUS_RAW_SHA256" and .gitBlobIdentityAuthoritative==false and .runnersValidated==true and .staleVariantPathsAbsent==true and .actionsRegistrationHandshakeValidated==true and .runObserverRootCauseValidated==true and .executionReceiptObserverValidated==true and .observerIndependentOfFilteredCommitRunReader==true and .runtimeExecuted==false and .browserExecuted==false and .secretAccess==false and .firestoreRead==false and .writes==0 and .deployExecuted==false and .productionTouched==false' "$RUNNER_TEMP/macro2-pipeline-preflight.json" >/dev/null
 
       - name: Confirm inert IDLE
-        if: steps.router.outputs.mode == 'IDLE'
+        if: steps.activation_probe.outputs.mode == 'IDLE'
         shell: bash
         run: |
           set -euo pipefail
           echo 'MACRO2_COLLAPSED_CONTROL_PLANE_IDLE_PASS'
 
       - id: binding
-        if: steps.router.outputs.mode == 'FINALIZE_SOURCE_ONLY'
+        if: steps.activation_probe.outputs.mode == 'FINALIZE_SOURCE_ONLY'
         name: Materialize ephemeral compatible runner binding only
         shell: bash
         env:
@@ -166,26 +186,8 @@ jobs:
           printf '/%s\n' "$MACRO2_REQUEST" >> .git/info/exclude
           echo "macro2_request=$MACRO2_REQUEST" >> "$GITHUB_OUTPUT"
 
-      - id: receipt_start
-        if: steps.router.outputs.mode == 'FINALIZE_SOURCE_ONLY'
-        name: Publish sanitized finalization start receipt
-        env:
-          GH_TOKEN: ${{ github.token }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          BODY="ORBIT360_MACRO2_FINALIZE_START runId=${GITHUB_RUN_ID} triggerSha=${GITHUB_SHA} event=${GITHUB_EVENT_NAME} mode=FINALIZE_SOURCE_ONLY sourceOnly=true"
-          jq -n --arg body "$BODY" '{body:$body}' > "$RUNNER_TEMP/macro2-start-receipt.json"
-          curl -L --fail --silent --show-error \
-            -X POST \
-            -H "Authorization: Bearer $GH_TOKEN" \
-            -H "Accept: application/vnd.github+json" \
-            -H "X-GitHub-Api-Version: 2022-11-28" \
-            "https://api.github.com/repos/${GITHUB_REPOSITORY}/issues/5/comments" \
-            --data-binary @"$RUNNER_TEMP/macro2-start-receipt.json" >/dev/null
-
       - id: pre
-        if: steps.router.outputs.mode == 'FINALIZE_SOURCE_ONLY'
+        if: steps.activation_probe.outputs.mode == 'FINALIZE_SOURCE_ONLY'
         name: Apply certified bundles, 107/107, source commit and 194/9/185 build
         env:
           GH_TOKEN: ${{ github.token }}
@@ -198,7 +200,7 @@ jobs:
           bash "$PRE_RUNNER"
 
       - id: candidate
-        if: steps.router.outputs.mode == 'FINALIZE_SOURCE_ONLY' && steps.pre.outcome == 'success'
+        if: steps.activation_probe.outputs.mode == 'FINALIZE_SOURCE_ONLY' && steps.pre.outcome == 'success'
         name: Upload the single legitimate Macro-2 candidate
         uses: actions/upload-artifact@v4
         with:
@@ -209,7 +211,7 @@ jobs:
           if-no-files-found: error
 
       - id: post
-        if: steps.router.outputs.mode == 'FINALIZE_SOURCE_ONLY' && steps.candidate.outcome == 'success'
+        if: steps.activation_probe.outputs.mode == 'FINALIZE_SOURCE_ONLY' && steps.candidate.outcome == 'success'
         name: Persist metadata, promote Macro-2 to 75 and close pointer
         env:
           ARTIFACT_ID: ${{ steps.candidate.outputs.artifact-id }}
@@ -238,7 +240,7 @@ jobs:
           test -z "$(git status --porcelain)"
 
       - name: Publish sanitized finalization success receipt
-        if: success() && steps.router.outputs.mode == 'FINALIZE_SOURCE_ONLY'
+        if: success() && steps.activation_probe.outputs.mode == 'FINALIZE_SOURCE_ONLY'
         env:
           GH_TOKEN: ${{ github.token }}
           ARTIFACT_ID: ${{ steps.candidate.outputs.artifact-id }}
@@ -256,10 +258,11 @@ jobs:
             --data-binary @"$RUNNER_TEMP/macro2-pass-receipt.json" >/dev/null
 
       - name: Seal a single terminal failure and return pointer to IDLE
-        if: failure() && steps.router.outputs.mode == 'FINALIZE_SOURCE_ONLY'
+        if: failure() && steps.activation_probe.outputs.mode == 'FINALIZE_SOURCE_ONLY'
         env:
           GH_TOKEN: ${{ github.token }}
           RECEIPT_OUTCOME: ${{ steps.receipt_start.outcome }}
+          PREFLIGHT_OUTCOME: ${{ steps.preflight.outcome }}
           PRE_OUTCOME: ${{ steps.pre.outcome }}
           CANDIDATE_OUTCOME: ${{ steps.candidate.outcome }}
           POST_OUTCOME: ${{ steps.post.outcome }}
@@ -270,9 +273,9 @@ jobs:
           git fetch origin "$ORBIT360_BRANCH"
           git reset --hard "origin/$ORBIT360_BRANCH"
           git clean -fd
-          node - "$POINTER" "$GITHUB_RUN_ID" "$RECEIPT_OUTCOME" "$PRE_OUTCOME" "$CANDIDATE_OUTCOME" "$POST_OUTCOME" <<'NODE'
-          const fs=require('fs');const [p,runId,receipt,pre,candidate,post]=process.argv.slice(2);const x=JSON.parse(fs.readFileSync(p,'utf8'));
-          const stage=receipt!=='success'?'EXECUTION_RECEIPT':pre!=='success'?'SOURCE_ACCEPTANCE_OR_BUILD':candidate!=='success'?'ARTIFACT_UPLOAD':post!=='success'?'METADATA_OR_PROMOTION':'UNKNOWN';
+          node - "$POINTER" "$GITHUB_RUN_ID" "$RECEIPT_OUTCOME" "$PREFLIGHT_OUTCOME" "$PRE_OUTCOME" "$CANDIDATE_OUTCOME" "$POST_OUTCOME" <<'NODE'
+          const fs=require('fs');const [p,runId,receipt,preflight,pre,candidate,post]=process.argv.slice(2);const x=JSON.parse(fs.readFileSync(p,'utf8'));
+          const stage=receipt!=='success'?'EXECUTION_RECEIPT':preflight!=='success'?'PREFLIGHT':pre!=='success'?'SOURCE_ACCEPTANCE_OR_BUILD':candidate!=='success'?'ARTIFACT_UPLOAD':post!=='success'?'METADATA_OR_PROMOTION':'UNKNOWN';
           x.status='IDLE';x.mode='IDLE';x.activeRequestPath=null;x.activationNonce=null;x.allowedExecutions=0;x.consumed=true;x.replayAllowed=false;x.reopenAllowed=false;
           x.lastTerminal={status:'FINALIZE_SOURCE_ONLY_TERMINAL_FAIL',classification:'PIPELINE_MECHANISM_FAILURE',failureStage:stage,runId:Number(runId),automaticRetry:false};
           x.rootCauseResolution='FINALIZE_SOURCE_ONLY_TERMINAL_FAIL_NO_VARIANT_OPENED';
@@ -299,7 +302,7 @@ jobs:
           exit 41
 
       - name: Upload sanitized Macro-2 finalization evidence
-        if: success() && steps.router.outputs.mode == 'FINALIZE_SOURCE_ONLY'
+        if: success() && steps.activation_probe.outputs.mode == 'FINALIZE_SOURCE_ONLY'
         uses: actions/upload-artifact@v4
         with:
           name: orbit360-macro2-finalize-source-only-evidence-${{ github.run_id }}
