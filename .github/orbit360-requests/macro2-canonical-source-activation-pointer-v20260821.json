@@ -1,12 +1,20 @@
 {
   "schemaVersion": "orbit360-macro2-canonical-source-activation-pointer-v1",
-  "status": "ACTIVE",
-  "mode": "WHITESPACE_POLICY_DIAGNOSTIC",
+  "status": "IDLE",
+  "mode": "NONE",
   "activeRequestPath": null,
   "activationNonce": "macro2-allowed-deltas-bracket-parse-20260821-08",
-  "allowedExecutions": 1,
-  "consumed": false,
+  "allowedExecutions": 0,
+  "consumed": true,
   "replayAllowed": false,
+  "lastTerminal": {
+    "runId": 32542683067,
+    "triggerSha": "4fdead47405e44cba1e1bcacd15b4b038b5af294",
+    "status": "DELTA_CONTRACT_BRACKET_PARSE_DIAGNOSTIC_COMPLETE",
+    "classification": "PASS",
+    "allowedDeltasRuntimeMatchesCanonical9": true,
+    "sourceDeltaCount": 15
+  },
   "sourceOnly": true,
   "runtime": false,
   "browser": false,
@@ -17,7 +25,7 @@
   "production": false,
   "main": false,
   "merge": false,
-  "rootCauseResolution": "PARSE_ALLOWED_DELTAS_ARRAY_AND_EFFECTIVE_SORT_SEMANTICS",
+  "rootCauseResolution": "FORENSIC_IDENTIFY_PREEXISTING_PACKAGE_DOC_DRIFT_WITHOUT_RERUN",
   "containsPII": false,
   "containsSecrets": false
 }
