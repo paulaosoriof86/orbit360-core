@@ -104,7 +104,7 @@ jobs:
 
       - id: binding
         if: steps.router.outputs.mode == 'FINALIZE_SOURCE_ONLY'
-        name: Materialize ephemeral runner binding only
+        name: Materialize ephemeral compatible runner binding only
         shell: bash
         env:
           ORBIT360_EVENT_BEFORE: ${{ github.event.before }}
@@ -120,10 +120,33 @@ jobs:
           const x={
             schemaVersion:'orbit360-macro2-source-recovery-request-v3r1c1',
             status:'PREFLIGHT_PASS_AWAITING_SOURCE_ONLY_ACTIVATION',
-            sourceOnly:true,allowedExecutions:1,consumed:false,historical:false,replayAllowed:false,
-            rootCauseResolved:true,rootCauseResolution:'COLLAPSED_CONTROL_PLANE_TO_SINGLE_SOURCE_FINALIZATION',
-            ownerSafeHead,reopenedAfterStopRetry:false,rootCausePreflightRequired:true,
-            durableSourceBeforeArtifactRequired:true,artifactDigestNormalizationRequired:true,artifactMetadataBeforePromotionRequired:true,
+            sourceOnly:true,
+            allowedExecutions:1,
+            consumed:false,
+            historical:false,
+            replayAllowed:false,
+            rootCauseResolved:true,
+            rootCauseResolution:'PRE_RUNNER_LOCAL_SCOPE_ASSIGNMENTS_REQUIRED',
+            registrationEvidencePath:'orbit360-platform/runtime-gate-crm-v20260716/macro2-v3-actions-push-registration-probe-v20260821.json',
+            preRunnerScopeEvidencePath:'orbit360-platform/runtime-gate-crm-v20260716/macro2-v3r1-pre-runner-same-step-env-failure-v20260821.json',
+            inertPreflightEvidencePath:'orbit360-platform/runtime-gate-crm-v20260716/macro2-v3r1c1-inert-preflight-pass-v20260821.json',
+            registrationRunId:32527157212,
+            registrationTriggerSha:'5da25bf227fbe7fab40eb83aeb2a93e9e4da9aee',
+            priorInertPreflightRunId:32529413424,
+            inertPreflightRunId:32530518960,
+            inertPreflightTriggerSha:'5f78fe5738d67916ca582b7ac3ea220a681e78e3',
+            inertPreflightPassed:true,
+            triggerMechanism:'WORKFLOW_FILE_SELF_REGISTERING_PUSH',
+            activationParentBinding:'GITHUB_EVENT_BEFORE_HEAD_PARENT',
+            expectedParentMode:'GITHUB_EVENT_BEFORE',
+            activationWorkflowTemplatePath:'.github/orbit360-workflow-templates/orbit360-continuity-canonical-source-only-v3r1c1-20260821.yml',
+            activationWorkflowTemplateSha256:'c2c58e8dd12922ffb6443558eaac290e2fdae33cddc2ca8bc5e4f7db6a7a57c4',
+            ownerSafeHead,
+            reopenedAfterStopRetry:true,
+            rootCausePreflightRequired:true,
+            durableSourceBeforeArtifactRequired:true,
+            artifactDigestNormalizationRequired:true,
+            artifactMetadataBeforePromotionRequired:true,
             patchSets:[
               {name:'product',gzipPath:'.github/orbit360-source-patches/macro2-v20260821/product.patch.gz',gzipSha256:'c7b932b2788a502ae07111d2e209d4b0cca0b844242bb1db80218b72fa4c6913',sha256:'6b3141493d69d2b25c581033460f5302498dd06dd8dfcad1245802390fafe540'},
               {name:'tools',gzipPath:'.github/orbit360-source-patches/macro2-v20260821/tools.patch.gz',gzipSha256:'64bb3f11736ce39593b12a54350270f73730a10430d1ce6e543bebaee622ba46',sha256:'035c756cc2c14ae428a87231a8cc266762b92ebc1c67974d691bbb20ffd90f97'},
