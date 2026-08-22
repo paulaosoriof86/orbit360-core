@@ -81,7 +81,6 @@ grep -q 'trailing whitespace' "$RUNNER_TEMP/nowarn.log" && NOWARN_WARN=true || t
 ERRORALL_WARN=false
 grep -q 'trailing whitespace' "$RUNNER_TEMP/errorall.log" && ERRORALL_WARN=true || true
 
-# Reproduce the full PATCH_APPLY_SYNTAX stage in an isolated worktree, but capture every assertion.
 WSALL="$RUNNER_TEMP/ws-all-patches"
 rm -rf "$WSALL"
 git worktree add --detach "$WSALL" "$GITHUB_SHA" >/dev/null 2>&1
@@ -96,13 +95,17 @@ set -e
 
 DELTA_COUNT=-1
 DELTA_JSON='[]'
+COMBINED_DELTA_JSON='[]'
 CHECKS_JSON='[]'
 NON_MD_DIFF_RC=99
 ALL_MD_VALIDATOR_RC=99
+VALIDATOR_CONTEXT_JSON='[]'
 if [ "$ALL_PRODUCT_RC" -eq 0 ] && [ "$ALL_TOOLS_RC" -eq 0 ] && [ "$ALL_DOCS_RC" -eq 0 ]; then
   mapfile -t DELTA < <(cd "$WSALL" && git diff --name-only | sort)
   DELTA_COUNT="${#DELTA[@]}"
   DELTA_JSON="$(printf '%s\n' "${DELTA[@]}" | node -e "const fs=require('fs');const a=fs.readFileSync(0,'utf8').split(/\n/).filter(Boolean);process.stdout.write(JSON.stringify(a));")"
+  mapfile -t COMBINED_DELTA < <(cd "$WSALL" && { git diff --name-only; git ls-files --others --exclude-standard; } | sed '/^$/d' | sort -u)
+  COMBINED_DELTA_JSON="$(printf '%s\n' "${COMBINED_DELTA[@]}" | node -e "const fs=require('fs');const a=fs.readFileSync(0,'utf8').split(/\n/).filter(Boolean);process.stdout.write(JSON.stringify(a));")"
 
   CHECK_NAMES=(
     tools/orbit360-build-macro2-transversal-successor-v20260821.mjs
@@ -133,10 +136,18 @@ const fs=require('fs');const p=process.argv[2];const rows=fs.readFileSync(p,'utf
 NODE
 )"
 
+  VALIDATOR_FILE="$WSALL/tools/orbit360-test-macro2-transversal-source-acceptance-v20260821.mjs"
+  if [ -f "$VALIDATOR_FILE" ]; then
+    VALIDATOR_CONTEXT_JSON="$(node - "$VALIDATOR_FILE" <<'NODE'
+const fs=require('fs');const p=process.argv[2];const lines=fs.readFileSync(p,'utf8').split(/\n/);const needle='DELTA_EXACTLY_ALLOWED_TRANSVERSAL_SET';const i=lines.findIndex(x=>x.includes(needle));if(i<0){process.stdout.write('[]');process.exit(0);}const lo=Math.max(0,i-18),hi=Math.min(lines.length,i+19);process.stdout.write(JSON.stringify(lines.slice(lo,hi).map((text,j)=>({line:lo+j+1,text}))));
+NODE
+)"
+  fi
+
   set +e
   (cd "$WSALL" && git diff --check -- . ':(exclude,glob)**/*.md') >"$RUNNER_TEMP/all-diffcheck.log" 2>&1
   NON_MD_DIFF_RC=$?
-  mapfile -t ALL_MD_FILES < <(cd "$WSALL" && git diff --name-only -- ':(glob)**/*.md')
+  mapfile -t ALL_MD_FILES < <(cd "$WSALL" && { git diff --name-only -- ':(glob)**/*.md'; git ls-files --others --exclude-standard | grep -E '\.md$' || true; } | sed '/^$/d' | sort -u)
   if ((${#ALL_MD_FILES[@]})); then
     (
       cd "$WSALL"
@@ -163,8 +174,8 @@ if [ "$DEFAULT_RC" -eq 0 ] && [ "$WARN_RC" -eq 0 ] && [ "$NOWARN_RC" -eq 0 ] && 
 fi
 if [ "$ALL_PRODUCT_RC" -ne 0 ] || [ "$ALL_TOOLS_RC" -ne 0 ] || [ "$ALL_DOCS_RC" -ne 0 ]; then
   CONCLUSION='ALL_PATCH_APPLICATION_FAIL'
-elif [ "$DELTA_COUNT" -ne 15 ]; then
-  CONCLUSION='DELTA_COUNT_ASSERTION_MISMATCH'
+elif [ "$(node -e "const a=$COMBINED_DELTA_JSON;process.stdout.write(String(a.length))")" -ne 15 ]; then
+  CONCLUSION='COMBINED_DELTA_COUNT_ASSERTION_MISMATCH'
 elif node -e "const a=$CHECKS_JSON;if(a.some(x=>x.rc!==0))process.exit(1)"; then
   if [ "$NON_MD_DIFF_RC" -ne 0 ]; then
     CONCLUSION='NON_MARKDOWN_DIFF_CHECK_FAIL'
@@ -177,25 +188,23 @@ else
   CONCLUSION='NODE_SYNTAX_CHECK_FAIL'
 fi
 
-node - "$OUT_JSON" "$APPLY_CFG" "$CORE_CFG" "$DEFAULT_RC" "$WARN_RC" "$NOWARN_RC" "$ERRORALL_RC" "$DIFF_APPLY_RC" "$DIFFCHECK_RC" "$MDVALIDATOR_RC" "$DEFAULT_WARN" "$WARN_WARN" "$NOWARN_WARN" "$ERRORALL_WARN" "$ALL_PRODUCT_RC" "$ALL_TOOLS_RC" "$ALL_DOCS_RC" "$DELTA_COUNT" "$DELTA_JSON" "$CHECKS_JSON" "$NON_MD_DIFF_RC" "$ALL_MD_VALIDATOR_RC" "$CONCLUSION" <<'NODE'
+node - "$OUT_JSON" "$APPLY_CFG" "$CORE_CFG" "$DEFAULT_RC" "$WARN_RC" "$NOWARN_RC" "$ERRORALL_RC" "$DIFF_APPLY_RC" "$DIFFCHECK_RC" "$MDVALIDATOR_RC" "$DEFAULT_WARN" "$WARN_WARN" "$NOWARN_WARN" "$ERRORALL_WARN" "$ALL_PRODUCT_RC" "$ALL_TOOLS_RC" "$ALL_DOCS_RC" "$DELTA_COUNT" "$DELTA_JSON" "$COMBINED_DELTA_JSON" "$CHECKS_JSON" "$NON_MD_DIFF_RC" "$ALL_MD_VALIDATOR_RC" "$VALIDATOR_CONTEXT_JSON" "$CONCLUSION" <<'NODE'
 const fs=require('fs');
-const [p,applyCfg,coreCfg,defaultRc,warnRc,nowarnRc,errorAllRc,diffApplyRc,diffCheckRc,mdValidatorRc,defaultWarn,warnWarn,nowarnWarn,errorAllWarn,allProductRc,allToolsRc,allDocsRc,deltaCount,deltaJson,checksJson,nonMdDiffRc,allMdValidatorRc,conclusion]=process.argv.slice(2);
+const [p,applyCfg,coreCfg,defaultRc,warnRc,nowarnRc,errorAllRc,diffApplyRc,diffCheckRc,mdValidatorRc,defaultWarn,warnWarn,nowarnWarn,errorAllWarn,allProductRc,allToolsRc,allDocsRc,deltaCount,deltaJson,combinedDeltaJson,checksJson,nonMdDiffRc,allMdValidatorRc,validatorContextJson,conclusion]=process.argv.slice(2);
+const combined=JSON.parse(combinedDeltaJson);
 const x={
-  schemaVersion:'orbit360-macro2-whitespace-policy-diagnostic-v2',
-  status:'PATCH_APPLY_ASSERTION_DIAGNOSTIC_COMPLETE',
+  schemaVersion:'orbit360-macro2-whitespace-policy-diagnostic-v3',
+  status:'PATCH_APPLY_ASSERTION_AND_VALIDATOR_CONTEXT_DIAGNOSTIC_COMPLETE',
   classification:'PIPELINE_MECHANISM_DIAGNOSTIC',
-  applyWhitespaceConfig:applyCfg||null,
-  coreWhitespaceConfig:coreCfg||null,
+  applyWhitespaceConfig:applyCfg||null,coreWhitespaceConfig:coreCfg||null,
   defaultApplyRc:Number(defaultRc),warnApplyRc:Number(warnRc),nowarnApplyRc:Number(nowarnRc),errorAllApplyRc:Number(errorAllRc),
   diffCheckPreparationApplyRc:Number(diffApplyRc),diffCheckExcludeMarkdownRc:Number(diffCheckRc),markdownAwareValidatorRc:Number(mdValidatorRc),
   defaultReportedTrailingWhitespace:defaultWarn==='true',warnReportedTrailingWhitespace:warnWarn==='true',nowarnReportedTrailingWhitespace:nowarnWarn==='true',errorAllReportedTrailingWhitespace:errorAllWarn==='true',
   allPatchApply:{productRc:Number(allProductRc),toolsRc:Number(allToolsRc),docsRc:Number(allDocsRc)},
-  expectedDeltaCount:15,actualDeltaCount:Number(deltaCount),deltaCountMatchesExpected:Number(deltaCount)===15,
-  deltaFiles:JSON.parse(deltaJson),
-  syntaxChecks:JSON.parse(checksJson),
-  nonMarkdownDiffCheckRc:Number(nonMdDiffRc),
-  allMarkdownAwareValidatorRc:Number(allMdValidatorRc),
-  conclusion,
+  legacyTrackedDeltaCount:Number(deltaCount),legacyTrackedDeltaFiles:JSON.parse(deltaJson),
+  expectedDeltaCount:15,combinedDeltaCount:combined.length,combinedDeltaCountMatchesExpected:combined.length===15,combinedDeltaFiles:combined,
+  syntaxChecks:JSON.parse(checksJson),nonMarkdownDiffCheckRc:Number(nonMdDiffRc),allMarkdownAwareValidatorRc:Number(allMdValidatorRc),
+  validatorCheckContext:JSON.parse(validatorContextJson),conclusion,
   sourceOnly:true,productCommitted:false,candidatePublished:false,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,writes:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false
 };
 fs.writeFileSync(p,JSON.stringify(x,null,2)+'\n');
