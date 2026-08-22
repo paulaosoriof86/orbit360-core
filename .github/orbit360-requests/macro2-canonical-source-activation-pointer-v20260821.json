@@ -1,12 +1,22 @@
 {
   "schemaVersion": "orbit360-macro2-canonical-source-activation-pointer-v1",
-  "status": "ACTIVE",
-  "mode": "FIRST_STAGE_DIAGNOSTIC",
+  "status": "IDLE",
+  "mode": "NONE",
   "activeRequestPath": null,
   "activationNonce": "macro2-first-stage-source-acceptance-observable-20260821-05",
-  "allowedExecutions": 1,
-  "consumed": false,
+  "allowedExecutions": 0,
+  "consumed": true,
   "replayAllowed": false,
+  "lastTerminal": {
+    "runId": 32539000715,
+    "triggerSha": "2fc5c41005a122400c8894832221b520e0813088",
+    "status": "FIRST_STAGE_DIAGNOSTIC_FAIL",
+    "classification": "FUNCTIONAL_DEFECT_REPORTED_BY_SOURCE_ACCEPTANCE_PENDING_CONTRACT_DIAGNOSIS",
+    "failedStage": "SOURCE_ACCEPTANCE_107",
+    "checksPassed": 106,
+    "checksTotal": 107,
+    "failureCode": "DELTA_EXACTLY_ALLOWED_TRANSVERSAL_SET"
+  },
   "sourceOnly": true,
   "runtime": false,
   "browser": false,
@@ -17,7 +27,7 @@
   "production": false,
   "main": false,
   "merge": false,
-  "rootCauseResolution": "CAPTURE_SOURCE_ACCEPTANCE_107_FAILURE_CODES",
+  "rootCauseResolution": "DIAGNOSE_DELTA_CONTRACT_EXPECTED_VS_ACTUAL_BEFORE_PRODUCT_CHANGE",
   "containsPII": false,
   "containsSecrets": false
 }
