@@ -1,19 +1,12 @@
 {
   "schemaVersion": "orbit360-macro2-canonical-source-activation-pointer-v1",
-  "status": "IDLE",
-  "mode": "NONE",
+  "status": "ACTIVE",
+  "mode": "WHITESPACE_POLICY_DIAGNOSTIC",
   "activeRequestPath": null,
-  "activationNonce": "macro2-exact-manifest-delta-forensic-20260821-10",
-  "allowedExecutions": 0,
-  "consumed": true,
+  "activationNonce": "macro2-hash-index-gate-and-exact-delta-20260821-11",
+  "allowedExecutions": 1,
+  "consumed": false,
   "replayAllowed": false,
-  "lastTerminal": {
-    "runId": 32543500304,
-    "triggerSha": "2c0930bd5b3a7f328c5b8ecb730be96165b051fb",
-    "status": "WHITESPACE_POLICY_DIAGNOSTIC_FAIL",
-    "classification": "PIPELINE_MECHANISM_FAILURE",
-    "failedStage": "WHITESPACE_POLICY_DIAGNOSTIC"
-  },
   "sourceOnly": true,
   "runtime": false,
   "browser": false,
@@ -24,7 +17,7 @@
   "production": false,
   "main": false,
   "merge": false,
-  "rootCauseResolution": "DIAGNOSE_EXACT_MANIFEST_FORENSIC_INSTRUMENT_FAILURE_BEFORE_RETRY",
+  "rootCauseResolution": "DIAGNOSE_HASH_INDEX_GATE_ASSERTION_AND_REPRODUCE_EXACT_194_DELTA_PATHS",
   "containsPII": false,
   "containsSecrets": false
 }
