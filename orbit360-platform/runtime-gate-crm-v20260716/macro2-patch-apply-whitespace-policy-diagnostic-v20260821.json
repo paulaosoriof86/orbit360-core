@@ -1,123 +1,34 @@
 {
-  "schemaVersion": "orbit360-macro2-postpatch-hash-forensic-v1",
-  "status": "POSTPATCH_HASH_FORENSIC_COMPLETE",
-  "classification": "PIPELINE_MECHANISM_DIAGNOSTIC",
-  "allPatchApply": {
-    "productRc": 0,
-    "toolsRc": 0,
-    "docsRc": 0
+  "schemaVersion": "orbit360-macro2-hash-index-gate-precheck-v1",
+  "status": "HASH_INDEX_REQUIRED_IDENTITY_FAIL",
+  "classification": "DATA_CONTRACT_FAILURE",
+  "failureCode": "HASH_INDEX_REQUIRED_IDENTITY_MISMATCH",
+  "requiredIdentityChecks": {
+    "schemaVersion": true,
+    "status": true,
+    "artifactId": true,
+    "sourceHead": true,
+    "zipSha256": true,
+    "manifestSha256": true,
+    "fileCount": true,
+    "filesLength": false,
+    "fileRowsWellFormed": false
   },
-  "combinedSourceDeltaCount": 15,
-  "combinedSourceDeltaFiles": [
-    "orbit360-platform/core/ciclo.js",
-    "orbit360-platform/core/client-canonical-view-projection-v20260716.js",
-    "orbit360-platform/core/queries.js",
-    "orbit360-platform/core/ui.js",
-    "orbit360-platform/data/store-firestore-product-readonly-p0.js",
-    "orbit360-platform/docs/ACADEMIA-ACTUALIZACION-MACRO2-READMODEL-SEGURO-Y-PERFORMANCE-20260821.md",
-    "orbit360-platform/docs/CLAUDE-ACUMULADO-MACRO2-READMODEL-SEGURO-20260821.md",
-    "orbit360-platform/modules/aseguradoras.js",
-    "orbit360-platform/modules/cliente360.js",
-    "orbit360-platform/modules/cobros.js",
-    "orbit360-platform/modules/inicio.js",
-    "tools/orbit360-build-macro2-transversal-successor-v20260821.mjs",
-    "tools/orbit360-documentation-state-discovery-v20260821.mjs",
-    "tools/orbit360-promote-macro2-transversal-candidate-v20260821.mjs",
-    "tools/orbit360-test-macro2-transversal-source-acceptance-v20260821.mjs"
+  "failedRequiredChecks": [
+    "filesLength",
+    "fileRowsWellFormed"
   ],
-  "postPatchProductHashes": [
-    {
-      "path": "core/ciclo.js",
-      "sha256": "5e0edda0eaddd53b5d2814ddc9a9f3f3ced094fa461d8fd1491d9afc56f99dbb",
-      "gitBlobSha": "1809ff73e8cdbceb908aa65b3aaf177f5ebee908",
-      "bytes": 52869
-    },
-    {
-      "path": "core/client-canonical-view-projection-v20260716.js",
-      "sha256": "1cca71016e2935348f1c53ecb43b13f35186d08139e77e7836b005e6b452619d",
-      "gitBlobSha": "3681e56bc11951ee8418479cca2f0e51f4630cfc",
-      "bytes": 11599
-    },
-    {
-      "path": "core/queries.js",
-      "sha256": "c0efd6582a54bc766a01d74dfd7aadcf7426825bf1d841a51e71562c746b7050",
-      "gitBlobSha": "341b0da2b9671c2791a091bee737b36a25bf81a2",
-      "bytes": 10805
-    },
-    {
-      "path": "core/ui.js",
-      "sha256": "80b88933cac3b74031366d75db282e5293fefab4e74925b9550f015a290b54a0",
-      "gitBlobSha": "702cc1a64bda7a7795930a1ca6d4ca8cca8c04cc",
-      "bytes": 10182
-    },
-    {
-      "path": "data/store-firestore-product-readonly-p0.js",
-      "sha256": "35d6d433e12906215bbe7ec377e4e9ad8d2e47f87e25f1bb673c4cc19d7efb59",
-      "gitBlobSha": "384281afa84aff4aef7f14ac4c3d01a35bb7677d",
-      "bytes": 13053
-    },
-    {
-      "path": "modules/aseguradoras.js",
-      "sha256": "42bd4e23e0ba38b14fea4349548d3d6e874baa4b3cf1a035748eac0bab63c92e",
-      "gitBlobSha": "9c0ea8d7b160619c74a8c5ee150a1d7e89df8c23",
-      "bytes": 83405
-    },
-    {
-      "path": "modules/cliente360.js",
-      "sha256": "2ddb62204796d341e5fcdda070c3252baff113de0fb4357158960146f06e1c17",
-      "gitBlobSha": "fa50bae659ed03909a220d720fc0305838c75b31",
-      "bytes": 131989
-    },
-    {
-      "path": "modules/cobros.js",
-      "sha256": "77c6d2f9884b103f270259aee911b821c59dcba0a9f934e92227fce6f65d6d8d",
-      "gitBlobSha": "4c2daaf9420a166583af84d00a682253ee5fef22",
-      "bytes": 30569
-    },
-    {
-      "path": "modules/inicio.js",
-      "sha256": "b042fd8beb92d0d1ba9a3323264da1626880f5cd423341b3c0f4954b5e56d35a",
-      "gitBlobSha": "b1bfb0ce131848ee0892cd6aaff55b1bde2b7cd4",
-      "bytes": 12109
-    }
-  ],
-  "validatorPrimitives": [
-    {
-      "line": 9,
-      "text": "const CANDIDATE = path.resolve(process.env.ORBIT360_MACRO2_CANDIDATE_DIR || process.argv[2] || path.join(ROOT, 'orbit360-platform'));"
-    },
-    {
-      "line": 10,
-      "text": "const rel = p => path.join(CANDIDATE, p);"
-    },
-    {
-      "line": 12,
-      "text": "const exists = p => fs.existsSync(rel(p));"
-    },
-    {
-      "line": 13,
-      "text": "const sha = b => crypto.createHash('sha256').update(b).digest('hex');"
-    },
-    {
-      "line": 21,
-      "text": "const ALLOWED_DELTAS = ["
-    },
-    {
-      "line": 176,
-      "text": " check(JSON.stringify(deltaPaths)===JSON.stringify(ALLOWED_DELTAS),'DELTA_EXACTLY_ALLOWED_TRANSVERSAL_SET',deltaPaths);"
-    },
-    {
-      "line": 190,
-      "text": " candidateDir:CANDIDATE,"
-    },
-    {
-      "line": 195,
-      "text": " allowedDeltaPaths:ALLOWED_DELTAS,"
-    }
-  ],
+  "auxiliaryMetadata": {
+    "verificationObjectPresent": true,
+    "fullRehashPass": true,
+    "missingFiles": 0,
+    "hashMismatches": 0,
+    "containsPIIPresent": true,
+    "containsPII": false,
+    "containsSecretsPresent": true,
+    "containsSecrets": false
+  },
   "sourceOnly": true,
-  "productCommitted": false,
-  "candidatePublished": false,
   "runtimeExecuted": false,
   "browserExecuted": false,
   "secretAccess": false,
