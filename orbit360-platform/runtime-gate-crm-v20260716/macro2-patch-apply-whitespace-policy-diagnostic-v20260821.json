@@ -1,6 +1,6 @@
 {
-  "schemaVersion": "orbit360-macro2-whitespace-policy-diagnostic-v3",
-  "status": "PATCH_APPLY_ASSERTION_AND_VALIDATOR_CONTEXT_DIAGNOSTIC_COMPLETE",
+  "schemaVersion": "orbit360-macro2-delta-contract-diagnostic-v4",
+  "status": "DELTA_CONTRACT_SOURCE_ONLY_DIAGNOSTIC_COMPLETE",
   "classification": "PIPELINE_MECHANISM_DIAGNOSTIC",
   "applyWhitespaceConfig": null,
   "coreWhitespaceConfig": null,
@@ -33,10 +33,10 @@
     "orbit360-platform/modules/inicio.js",
     "tools/orbit360-documentation-state-discovery-v20260821.mjs"
   ],
-  "expectedDeltaCount": 15,
-  "combinedDeltaCount": 15,
-  "combinedDeltaCountMatchesExpected": true,
-  "combinedDeltaFiles": [
+  "expectedSourceDeltaCount": 15,
+  "combinedSourceDeltaCount": 15,
+  "combinedSourceDeltaCountMatchesExpected": true,
+  "combinedSourceDeltaFiles": [
     "orbit360-platform/core/ciclo.js",
     "orbit360-platform/core/client-canonical-view-projection-v20260716.js",
     "orbit360-platform/core/queries.js",
@@ -259,7 +259,57 @@
       "text": " performance:{clients:414,policies:620,...perfCounts},"
     }
   ],
-  "conclusion": "PATCH_APPLY_SYNTAX_STAGE_SHOULD_PASS",
+  "allowedDeltasContract": {
+    "declarationFound": true,
+    "declared": [
+      "core/ui.js",
+      "core/queries.js",
+      "core/client-canonical-view-projection-v20260716.js",
+      "core/ciclo.js",
+      "data/store-firestore-product-readonly-p0.js",
+      "modules/inicio.js",
+      "modules/cliente360.js",
+      "modules/aseguradoras.js",
+      "modules/cobros.js",
+      " },\n  document: { createElement(){ return { style:{}, className:",
+      ", appendChild(){}, addEventListener(){}, querySelector(){return null;} }; }, body:{ appendChild(){} } },\n  CustomEvent: class { constructor(type, init){ this.type=type; this.detail=init?.detail; } },\n  window: null,\n  Orbit: { tenant: { demoDate: ",
+      " }, modules: {} }\n};\nuiCtx.window = uiCtx;\nvm.runInNewContext(read(",
+      "), uiCtx, { filename: ",
+      " });\nconst U = uiCtx.Orbit.ui;\nconst displayCases = [undefined, null, NaN, Infinity, -Infinity, ",
+      ", ",
+      ", ",
+      ", ",
+      ", ",
+      ", "
+    ],
+    "canonical": [
+      "core/ciclo.js",
+      "core/client-canonical-view-projection-v20260716.js",
+      "core/queries.js",
+      "core/ui.js",
+      "data/store-firestore-product-readonly-p0.js",
+      "modules/aseguradoras.js",
+      "modules/cliente360.js",
+      "modules/cobros.js",
+      "modules/inicio.js"
+    ],
+    "sameSet": false,
+    "sameOrder": false,
+    "missingFromDeclared": [],
+    "extraInDeclared": [
+      " },\n  document: { createElement(){ return { style:{}, className:",
+      ", appendChild(){}, addEventListener(){}, querySelector(){return null;} }; }, body:{ appendChild(){} } },\n  CustomEvent: class { constructor(type, init){ this.type=type; this.detail=init?.detail; } },\n  window: null,\n  Orbit: { tenant: { demoDate: ",
+      " }, modules: {} }\n};\nuiCtx.window = uiCtx;\nvm.runInNewContext(read(",
+      "), uiCtx, { filename: ",
+      " });\nconst U = uiCtx.Orbit.ui;\nconst displayCases = [undefined, null, NaN, Infinity, -Infinity, ",
+      ", ",
+      ", ",
+      ", ",
+      ", ",
+      ", "
+    ]
+  },
+  "conclusion": "ALLOWED_DELTAS_CONTENT_MISMATCH",
   "sourceOnly": true,
   "productCommitted": false,
   "candidatePublished": false,
