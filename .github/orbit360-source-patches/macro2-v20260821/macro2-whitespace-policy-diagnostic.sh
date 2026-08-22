@@ -10,8 +10,44 @@ PRODUCT_PATCH="$RUNNER_TEMP/product.patch"
 TOOLS_PATCH="$RUNNER_TEMP/tools.patch"
 DOC_PATCH="$RUNNER_TEMP/docs.patch"
 
-test -f "$BASE_INDEX"
-jq -e '.schemaVersion=="orbit360-predecessor-file-hash-index-v1" and .status=="VERIFIED_PREDECESSOR_HASH_INDEX" and .artifactId==9433944723 and .sourceHead=="c3bb825da2b1ecae08dabc2034c753482b086fec" and .zipSha256=="1951cc7c2d3390ea1c2a6b3d9ce0bb48e26a6f95d5d10d69b7c31a0027cfbbac" and .manifestSha256=="580921077a88badab6e4076c42e9ef88f9de7936e1b6bad0f62410b39aec6397" and .fileCount==194 and (.files|length)==194 and .verification.fullRehashPass==true and .verification.missingFiles==0 and .verification.hashMismatches==0 and .containsPII==false and .containsSecrets==false' "$BASE_INDEX" >/dev/null
+node - "$BASE_INDEX" "$OUT_JSON" <<'NODE'
+const fs=require('fs');
+const [indexPath,outPath]=process.argv.slice(2);
+const baseline=JSON.parse(fs.readFileSync(indexPath,'utf8'));
+const required={
+  schemaVersion:baseline.schemaVersion==='orbit360-predecessor-file-hash-index-v1',
+  status:baseline.status==='VERIFIED_PREDECESSOR_HASH_INDEX',
+  artifactId:baseline.artifactId===9433944723,
+  sourceHead:baseline.sourceHead==='c3bb825da2b1ecae08dabc2034c753482b086fec',
+  zipSha256:baseline.zipSha256==='1951cc7c2d3390ea1c2a6b3d9ce0bb48e26a6f95d5d10d69b7c31a0027cfbbac',
+  manifestSha256:baseline.manifestSha256==='580921077a88badab6e4076c42e9ef88f9de7936e1b6bad0f62410b39aec6397',
+  fileCount:baseline.fileCount===194,
+  filesLength:Array.isArray(baseline.files)&&baseline.files.length===194,
+  fileRowsWellFormed:Array.isArray(baseline.files)&&baseline.files.every(x=>x&&typeof x.path==='string'&&/^[a-f0-9]{64}$/.test(String(x.sha256||'')))
+};
+const failedRequired=Object.entries(required).filter(([,v])=>!v).map(([k])=>k);
+const auxiliary={
+  verificationObjectPresent:baseline.verification!=null,
+  fullRehashPass:baseline.verification?.fullRehashPass??null,
+  missingFiles:baseline.verification?.missingFiles??null,
+  hashMismatches:baseline.verification?.hashMismatches??null,
+  containsPIIPresent:Object.prototype.hasOwnProperty.call(baseline,'containsPII'),
+  containsPII:baseline.containsPII??null,
+  containsSecretsPresent:Object.prototype.hasOwnProperty.call(baseline,'containsSecrets'),
+  containsSecrets:baseline.containsSecrets??null
+};
+fs.writeFileSync(outPath,JSON.stringify({
+  schemaVersion:'orbit360-macro2-hash-index-gate-precheck-v1',
+  status:failedRequired.length?'HASH_INDEX_REQUIRED_IDENTITY_FAIL':'HASH_INDEX_REQUIRED_IDENTITY_PASS',
+  classification:failedRequired.length?'DATA_CONTRACT_FAILURE':'PASS',
+  failureCode:failedRequired.length?'HASH_INDEX_REQUIRED_IDENTITY_MISMATCH':null,
+  requiredIdentityChecks:required,
+  failedRequiredChecks:failedRequired,
+  auxiliaryMetadata:auxiliary,
+  sourceOnly:true,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,writes:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false
+},null,2)+'\n');
+if(failedRequired.length) process.exit(42);
+NODE
 
 gzip -dc "$PRODUCT_GZ" > "$PRODUCT_PATCH"
 gzip -dc "$TOOLS_GZ" > "$TOOLS_PATCH"
@@ -36,21 +72,36 @@ const crypto=require('crypto');
 const [root,indexPath,outPath,productRc,toolsRc,docsRc]=process.argv.slice(2);
 const baseline=JSON.parse(fs.readFileSync(indexPath,'utf8'));
 const sha=b=>crypto.createHash('sha256').update(b).digest('hex');
+const required={
+  schemaVersion:baseline.schemaVersion==='orbit360-predecessor-file-hash-index-v1',
+  status:baseline.status==='VERIFIED_PREDECESSOR_HASH_INDEX',
+  artifactId:baseline.artifactId===9433944723,
+  sourceHead:baseline.sourceHead==='c3bb825da2b1ecae08dabc2034c753482b086fec',
+  zipSha256:baseline.zipSha256==='1951cc7c2d3390ea1c2a6b3d9ce0bb48e26a6f95d5d10d69b7c31a0027cfbbac',
+  manifestSha256:baseline.manifestSha256==='580921077a88badab6e4076c42e9ef88f9de7936e1b6bad0f62410b39aec6397',
+  fileCount:baseline.fileCount===194,
+  filesLength:Array.isArray(baseline.files)&&baseline.files.length===194,
+  fileRowsWellFormed:Array.isArray(baseline.files)&&baseline.files.every(x=>x&&typeof x.path==='string'&&/^[a-f0-9]{64}$/.test(String(x.sha256||'')))
+};
+const failedRequired=Object.entries(required).filter(([,v])=>!v).map(([k])=>k);
+const auxiliary={
+  verificationObjectPresent:baseline.verification!=null,
+  fullRehashPass:baseline.verification?.fullRehashPass??null,
+  missingFiles:baseline.verification?.missingFiles??null,
+  hashMismatches:baseline.verification?.hashMismatches??null,
+  containsPIIPresent:Object.prototype.hasOwnProperty.call(baseline,'containsPII'),
+  containsPII:baseline.containsPII??null,
+  containsSecretsPresent:Object.prototype.hasOwnProperty.call(baseline,'containsSecrets'),
+  containsSecrets:baseline.containsSecrets??null
+};
 const candidate=path.join(root,'orbit360-platform');
 const actual=[];
 const missing=[];
-const comparisons=[];
 for(const f of baseline.files){
   const full=path.join(candidate,f.path);
-  if(!fs.existsSync(full)){
-    missing.push(f.path);
-    comparisons.push({path:f.path,exists:false,baselineSha256:f.sha256,currentSha256:null,delta:false});
-    continue;
-  }
+  if(!fs.existsSync(full)){missing.push(f.path);continue;}
   const current=sha(fs.readFileSync(full));
-  const delta=current!==f.sha256;
-  if(delta) actual.push(f.path);
-  comparisons.push({path:f.path,exists:true,baselineSha256:f.sha256,currentSha256:current,delta});
+  if(current!==f.sha256) actual.push(f.path);
 }
 actual.sort();
 const validatorPath=path.join(root,'tools/orbit360-test-macro2-transversal-source-acceptance-v20260821.mjs');
@@ -61,12 +112,12 @@ if(fs.existsSync(validatorPath)){
   const src=fs.readFileSync(validatorPath,'utf8');
   const marker=src.indexOf('const ALLOWED_DELTAS');
   if(marker>=0){
-    const eq=src.indexOf('=',marker), open=src.indexOf('[',eq);
+    const eq=src.indexOf('=',marker),open=src.indexOf('[',eq);
     if(eq>=0&&open>=0){
       let close=-1,depth=0,quote=null,esc=false;
       for(let i=open;i<src.length;i++){
         const ch=src[i];
-        if(quote){if(esc){esc=false;continue;} if(ch==='\\'){esc=true;continue;} if(ch===quote)quote=null; continue;}
+        if(quote){if(esc){esc=false;continue;}if(ch==='\\'){esc=true;continue;}if(ch===quote)quote=null;continue;}
         if(ch==='"'||ch==="'"||ch==='`'){quote=ch;continue;}
         if(ch==='['){depth++;continue;}
         if(ch===']'){depth--;if(depth===0){close=i;break;}}
@@ -76,10 +127,10 @@ if(fs.existsSync(validatorPath)){
         const body=src.slice(open+1,close);
         const declared=[];
         for(let i=0;i<body.length;i++){
-          const q=body[i]; if(q!=="'"&&q!=='"')continue;
+          const q=body[i];if(q!=="'"&&q!=='"')continue;
           let s='',e=false,j=i+1;
           for(;j<body.length;j++){
-            const ch=body[j]; if(e){s+=ch;e=false;continue;} if(ch==='\\'){e=true;continue;} if(ch===q)break; s+=ch;
+            const ch=body[j];if(e){s+=ch;e=false;continue;}if(ch==='\\'){e=true;continue;}if(ch===q)break;s+=ch;
           }
           if(j<body.length){declared.push(s);i=j;}
         }
@@ -92,20 +143,22 @@ if(fs.existsSync(validatorPath)){
 }
 const unexpected=actual.filter(x=>!allowed.includes(x));
 const missingAllowed=allowed.filter(x=>!actual.includes(x));
-const exact=declarationFound&&missing.length===0&&unexpected.length===0&&missingAllowed.length===0&&JSON.stringify(actual)===JSON.stringify(allowed);
+const exact=failedRequired.length===0&&declarationFound&&missing.length===0&&unexpected.length===0&&missingAllowed.length===0&&JSON.stringify(actual)===JSON.stringify(allowed);
 let classification='PIPELINE_MECHANISM_DIAGNOSTIC';
 let failureCode=null;
-if(Number(productRc)!==0||Number(toolsRc)!==0||Number(docsRc)!==0){classification='PIPELINE_MECHANISM_FAILURE';failureCode='PATCH_APPLICATION_FAIL';}
+if(failedRequired.length){classification='DATA_CONTRACT_FAILURE';failureCode='HASH_INDEX_REQUIRED_IDENTITY_MISMATCH';}
+else if(Number(productRc)!==0||Number(toolsRc)!==0||Number(docsRc)!==0){classification='PIPELINE_MECHANISM_FAILURE';failureCode='PATCH_APPLICATION_FAIL';}
 else if(missing.length){classification='DATA_CONTRACT_FAILURE';failureCode='PREDECESSOR_MANIFEST_FILE_MISSING_IN_CANDIDATE';}
 else if(unexpected.length){classification='DATA_CONTRACT_FAILURE';failureCode='PREDECESSOR_ARTIFACT_SOURCEHEAD_PROVENANCE_MISMATCH';}
 else if(missingAllowed.length){classification='VALIDATOR_STALE';failureCode='ALLOWED_DELTA_NOT_ACTUALLY_CHANGED';}
 else if(exact){classification='PASS';}
 const out={
-  schemaVersion:'orbit360-macro2-exact-manifest-delta-forensic-v1',
+  schemaVersion:'orbit360-macro2-exact-manifest-delta-forensic-v2',
   status:exact?'EXACT_MANIFEST_DELTA_FORENSIC_PASS':'EXACT_MANIFEST_DELTA_FORENSIC_FINDING',
   classification,
   failureCode,
-  baseline:{artifactId:baseline.artifactId,sourceHead:baseline.sourceHead,fileCount:baseline.fileCount,zipSha256:baseline.zipSha256,manifestSha256:baseline.manifestSha256,fullRehashPass:baseline.verification.fullRehashPass},
+  indexContract:{requiredIdentityChecks:required,failedRequiredChecks:failedRequired,auxiliaryMetadata:auxiliary,previousProbeRequiredAuxiliaryMetadata:true},
+  baseline:{artifactId:baseline.artifactId,sourceHead:baseline.sourceHead,fileCount:baseline.fileCount,zipSha256:baseline.zipSha256,manifestSha256:baseline.manifestSha256},
   allPatchApply:{productRc:Number(productRc),toolsRc:Number(toolsRc),docsRc:Number(docsRc)},
   allowedDeltasDeclarationFound:declarationFound,
   allowedDeltasSortApplied:sortApplied,
