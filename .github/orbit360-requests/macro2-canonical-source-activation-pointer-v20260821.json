@@ -1,10 +1,10 @@
 {
   "schemaVersion": "orbit360-macro2-canonical-source-activation-pointer-v1",
-  "status": "IDLE",
-  "mode": "IDLE",
+  "status": "ACTIVE",
+  "mode": "FINALIZE_SOURCE_ONLY",
   "activeRequestPath": null,
-  "activationNonce": null,
-  "allowedExecutions": 0,
+  "activationNonce": "macro2-finalize-source-only-20260822-01",
+  "allowedExecutions": 1,
   "consumed": false,
   "replayAllowed": false,
   "sourceOnly": true,
@@ -39,7 +39,7 @@
   "production": false,
   "main": false,
   "merge": false,
-  "rootCauseResolution": "COLLAPSED_CONTROL_PLANE_TO_SINGLE_SOURCE_FINALIZATION",
+  "rootCauseResolution": "COLLAPSED_CONTROL_PLANE_SINGLE_FINALIZATION_ACTIVE",
   "forbidden": [
     "MATERIALIZE_NEW_REQUEST",
     "OPEN_C1_C2_C3_CHAIN",
