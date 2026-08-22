@@ -33,6 +33,7 @@
   },
   "conclusion": "EMPTY_FETCH_COMMIT_WORKFLOW_RUNS_RESULT_CANNOT_PROVE_ABSENCE_OF_PUSH_RUN",
   "chosenMechanism": "WORKFLOW_FILE_SELF_REGISTERING_PUSH",
+  "materializationAction": "ONE_SHOT_CONTENTS_API_PUSH_ON_OBSERVED_PATH",
   "newTriggerVariant": false,
   "executionObserver": "PR_ISSUE_COMMENT_RECEIPTS",
   "receiptMarkers": [
