@@ -1,12 +1,19 @@
 {
   "schemaVersion": "orbit360-macro2-canonical-source-activation-pointer-v1",
-  "status": "ACTIVE",
-  "mode": "WHITESPACE_POLICY_DIAGNOSTIC",
+  "status": "IDLE",
+  "mode": "NONE",
   "activeRequestPath": null,
   "activationNonce": "macro2-allowed-deltas-contract-compare-20260821-07",
-  "allowedExecutions": 1,
-  "consumed": false,
+  "allowedExecutions": 0,
+  "consumed": true,
   "replayAllowed": false,
+  "lastTerminal": {
+    "status": "DELTA_CONTRACT_SOURCE_ONLY_DIAGNOSTIC_COMPLETE",
+    "classification": "PIPELINE_MECHANISM_DIAGNOSTIC",
+    "evidenceHead": "7cc92f0916332f7d33adbd5941649b88ab20d51e",
+    "sourceDeltaCount": 15,
+    "parserStatus": "OVER_CAPTURED_DECLARATION_BOUNDARY_REQUIRES_NO_PRODUCT_INFERENCE"
+  },
   "sourceOnly": true,
   "runtime": false,
   "browser": false,
@@ -17,7 +24,7 @@
   "production": false,
   "main": false,
   "merge": false,
-  "rootCauseResolution": "COMPARE_ALLOWED_DELTAS_VS_CANONICAL_9_PRODUCT_DELTAS",
+  "rootCauseResolution": "COMPARE_PREDECESSOR_194_MANIFEST_AGAINST_LIVE_PACKAGE_DRIFT",
   "containsPII": false,
   "containsSecrets": false
 }
