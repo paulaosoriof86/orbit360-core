@@ -1,12 +1,19 @@
 {
   "schemaVersion": "orbit360-macro2-canonical-source-activation-pointer-v1",
-  "status": "ACTIVE",
-  "mode": "WHITESPACE_POLICY_DIAGNOSTIC",
+  "status": "IDLE",
+  "mode": "NONE",
   "activeRequestPath": null,
   "activationNonce": "macro2-delta-contract-source-context-20260821-06",
-  "allowedExecutions": 1,
-  "consumed": false,
+  "allowedExecutions": 0,
+  "consumed": true,
   "replayAllowed": false,
+  "lastTerminal": {
+    "runId": 32539149063,
+    "triggerSha": "bbaf13a65759129cea7470367a4b244245851c54",
+    "status": "WHITESPACE_POLICY_DIAGNOSTIC_PASS",
+    "classification": "PASS",
+    "failedStage": "NONE"
+  },
   "sourceOnly": true,
   "runtime": false,
   "browser": false,
