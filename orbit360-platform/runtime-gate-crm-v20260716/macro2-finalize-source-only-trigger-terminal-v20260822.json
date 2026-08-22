@@ -1,0 +1,64 @@
+{
+  "schemaVersion": "orbit360-macro2-finalize-source-only-trigger-terminal-v1",
+  "ok": false,
+  "status": "FINALIZE_SOURCE_ONLY_TRIGGER_TERMINAL_FAIL",
+  "classification": "PIPELINE_MECHANISM_FAILURE",
+  "failureCode": "ACTIONS_RUN_NOT_MATERIALIZED_FROM_AVAILABLE_CONNECTOR_WRITES",
+  "date": "2026-08-22",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pr": 5,
+  "productFrozen": true,
+  "dataFrozen": true,
+  "predecessorArtifactId": 9433944723,
+  "predecessorSourceHead": "c3bb825da2b1ecae08dabc2034c753482b086fec",
+  "certifiedBundleBlobs": {
+    "product": "dfbc1cadfbd33dda3519dd974ec636585c82eca2",
+    "tools": "682e27cc1625bd26edc5071be0dbd0b6f6c288ba",
+    "docs": "644044bfb891956cf47e7afd7bb687cb23596229"
+  },
+  "attempts": [
+    {
+      "mechanism": "CONTENTS_API_PUSH_TRIGGER",
+      "activationCommit": "1d51481d669443235b4fd9807584d8505128cbed",
+      "workflowRunMaterialized": false
+    },
+    {
+      "mechanism": "PULL_REQUEST_SYNCHRONIZE_TRIGGER",
+      "ownerCommit": "809023152dfc5a6558ce65b44394b2aa79d3bb25",
+      "workflowRunMaterialized": false,
+      "blockingCondition": "PR_MERGEABLE_STATE_DIRTY"
+    },
+    {
+      "mechanism": "ATOMIC_GIT_REF_PUSH_TRIGGER",
+      "ownerCommit": "49211e391517bf5b898d2646b9b4ace4aaefe3de",
+      "workflowRunMaterialized": false
+    }
+  ],
+  "sourceFinalizationExecuted": false,
+  "sourceCommitCreated": false,
+  "candidateBuilt": false,
+  "artifactCreated": false,
+  "progressPromoted": false,
+  "runtimeExecuted": false,
+  "browserExecuted": false,
+  "secretAccess": false,
+  "firestoreRead": false,
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "operationalWrites": 0,
+  "deployExecuted": false,
+  "productionTouched": false,
+  "mainTouched": false,
+  "mergeExecuted": false,
+  "stopRetry": true,
+  "nextRequiredCapability": "DIRECT_WORKFLOW_DISPATCH_OR_EQUIVALENT_EXECUTION_CHANNEL_NOT_EXPOSED_BY_CURRENT_CONNECTOR",
+  "forbiddenNextActions": [
+    "ANOTHER_TRIGGER_VARIANT",
+    "NEW_REQUEST",
+    "PRODUCT_PATCH",
+    "REIMPORT_DATA",
+    "MAIN_OR_MERGE_TO_ENABLE_WORKFLOW"
+  ],
+  "containsPII": false,
+  "containsSecrets": false
+}
