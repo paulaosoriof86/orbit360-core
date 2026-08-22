@@ -1,13 +1,13 @@
 {
   "schemaVersion": "orbit360-macro2-canonical-source-activation-pointer-v1",
-  "status": "IDLE",
-  "mode": "IDLE",
+  "status": "ACTIVE",
+  "mode": "FINALIZE_SOURCE_ONLY",
   "activeRequestPath": null,
-  "activationNonce": null,
-  "allowedExecutions": 0,
-  "consumed": true,
+  "activationNonce": "macro2-finalize-source-only-observer-rootfix-20260822-01",
+  "allowedExecutions": 1,
+  "consumed": false,
   "replayAllowed": false,
-  "reopenAllowed": false,
+  "reopenAllowed": true,
   "sourceOnly": true,
   "predecessor": {
     "artifactId": 9433944723,
@@ -16,22 +16,32 @@
     "manifestSha256": "580921077a88badab6e4076c42e9ef88f9de7936e1b6bad0f62410b39aec6397"
   },
   "certifiedBundles": {
-    "product": {"path": ".github/orbit360-source-patches/macro2-v20260821/product.patch.gz", "gitBlobSha": "dfbc1cadfbd33dda3519dd974ec636585c82eca2"},
-    "tools": {"path": ".github/orbit360-source-patches/macro2-v20260821/tools.patch.gz", "gitBlobSha": "682e27cc1625bd26edc5071be0dbd0b6f6c288ba"},
-    "docs": {"path": ".github/orbit360-source-patches/macro2-v20260821/docs.patch.gz", "gitBlobSha": "644044bfb891956cf47e7afd7bb687cb23596229"}
+    "product": {
+      "path": ".github/orbit360-source-patches/macro2-v20260821/product.patch.gz",
+      "gitBlobSha": "dfbc1cadfbd33dda3519dd974ec636585c82eca2"
+    },
+    "tools": {
+      "path": ".github/orbit360-source-patches/macro2-v20260821/tools.patch.gz",
+      "gitBlobSha": "682e27cc1625bd26edc5071be0dbd0b6f6c288ba"
+    },
+    "docs": {
+      "path": ".github/orbit360-source-patches/macro2-v20260821/docs.patch.gz",
+      "gitBlobSha": "644044bfb891956cf47e7afd7bb687cb23596229"
+    }
   },
   "allowedTransition": "IDLE_TO_FINALIZE_SOURCE_ONLY",
   "terminalOnFailure": true,
   "lastTerminal": {
-    "status": "FINALIZE_SOURCE_ONLY_TRIGGER_TERMINAL_FAIL",
-    "classification": "PIPELINE_MECHANISM_FAILURE",
-    "failureCode": "ACTIONS_RUN_NOT_MATERIALIZED_FROM_AVAILABLE_CONNECTOR_WRITES",
-    "sourceFinalizationExecuted": false,
-    "candidateBuilt": false,
-    "artifactCreated": false,
-    "progressPromoted": false,
+    "status": "SUPERSEDED_OBSERVER_FALSE_NEGATIVE",
+    "classification": "VALIDATOR_STALE",
+    "secondaryClassification": "PIPELINE_MECHANISM_FAILURE",
+    "failureCode": "RUN_OBSERVER_FILTERED_TO_PULL_REQUEST_FALSE_NEGATIVE",
+    "priorFailureCode": "ACTIONS_RUN_NOT_MATERIALIZED_FROM_AVAILABLE_CONNECTOR_WRITES",
+    "priorTerminalEvidencePath": "orbit360-platform/runtime-gate-crm-v20260716/macro2-finalize-source-only-trigger-terminal-v20260822.json",
+    "provenPushRunId": 32527157212,
+    "provenPushTriggerSha": "5da25bf227fbe7fab40eb83aeb2a93e9e4da9aee",
     "automaticRetry": false,
-    "terminalEvidencePath": "orbit360-platform/runtime-gate-crm-v20260716/macro2-finalize-source-only-trigger-terminal-v20260822.json"
+    "supersededByEvidencePath": "orbit360-platform/runtime-gate-crm-v20260716/macro2-run-observer-rootcause-v20260822.json"
   },
   "runtime": false,
   "browser": false,
@@ -42,14 +52,15 @@
   "production": false,
   "main": false,
   "merge": false,
-  "rootCauseResolution": "STOP_RETRY_CONNECTOR_CANNOT_MATERIALIZE_REQUIRED_ACTIONS_RUN",
+  "rootCauseResolution": "RUN_OBSERVER_FALSE_NEGATIVE_RESOLVED_REOPEN_PROVEN_PUSH_FINALIZER",
+  "executionObserver": "PR_ISSUE_COMMENT_RECEIPTS",
   "forbidden": [
     "MATERIALIZE_NEW_REQUEST",
     "OPEN_C1_C2_C3_CHAIN",
     "CREATE_V3R1C2_OR_V3R1C3",
     "CREATE_PARALLEL_LISTENER",
     "PATCH_PRODUCT_TO_SATISFY_STALE_VALIDATOR",
-    "RETRY_TRIGGER_WITHOUT_NEW_EXECUTION_CAPABILITY"
+    "CREATE_ANOTHER_TRIGGER_VARIANT"
   ],
   "containsPII": false,
   "containsSecrets": false

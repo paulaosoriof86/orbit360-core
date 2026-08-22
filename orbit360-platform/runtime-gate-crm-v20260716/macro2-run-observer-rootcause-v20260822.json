@@ -1,0 +1,58 @@
+{
+  "schemaVersion": "orbit360-macro2-run-observer-rootcause-v1",
+  "ok": true,
+  "status": "MACRO2_RUN_OBSERVER_ROOT_CAUSE_RESOLVED",
+  "classification": "VALIDATOR_STALE",
+  "secondaryClassification": "PIPELINE_MECHANISM_FAILURE",
+  "date": "2026-08-22",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pr": 5,
+  "supersedesConclusionOnly": {
+    "evidencePath": "orbit360-platform/runtime-gate-crm-v20260716/macro2-finalize-source-only-trigger-terminal-v20260822.json",
+    "failureCode": "ACTIONS_RUN_NOT_MATERIALIZED_FROM_AVAILABLE_CONNECTOR_WRITES",
+    "historyPreserved": true
+  },
+  "observerConstraint": {
+    "tool": "fetch_commit_workflow_runs",
+    "effectiveFilter": "pull_request_triggered_runs_only",
+    "invalidInference": "EMPTY_RESULT_MEANS_NO_PUSH_RUN"
+  },
+  "knownPushProof": {
+    "evidencePath": "orbit360-platform/runtime-gate-crm-v20260716/macro2-v3-actions-push-registration-probe-v20260821.json",
+    "runId": 32527157212,
+    "triggerSha": "5da25bf227fbe7fab40eb83aeb2a93e9e4da9aee",
+    "eventName": "push",
+    "actor": "paulaosoriof86",
+    "conclusion": "success"
+  },
+  "negativeControl": {
+    "observerQuerySha": "5da25bf227fbe7fab40eb83aeb2a93e9e4da9aee",
+    "observerReturnedRuns": 0,
+    "knownActualRunId": 32527157212,
+    "result": "FALSE_NEGATIVE_PROVEN"
+  },
+  "conclusion": "EMPTY_FETCH_COMMIT_WORKFLOW_RUNS_RESULT_CANNOT_PROVE_ABSENCE_OF_PUSH_RUN",
+  "chosenMechanism": "WORKFLOW_FILE_SELF_REGISTERING_PUSH",
+  "newTriggerVariant": false,
+  "executionObserver": "PR_ISSUE_COMMENT_RECEIPTS",
+  "receiptMarkers": [
+    "ORBIT360_MACRO2_FINALIZE_START",
+    "ORBIT360_MACRO2_FINALIZE_PASS",
+    "ORBIT360_MACRO2_FINALIZE_TERMINAL_FAIL"
+  ],
+  "singleExecution": true,
+  "sourceOnly": true,
+  "runtimeExecuted": false,
+  "browserExecuted": false,
+  "providerSecretAccess": false,
+  "firestoreRead": false,
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "operationalWrites": 0,
+  "deployExecuted": false,
+  "productionTouched": false,
+  "mainTouched": false,
+  "mergeExecuted": false,
+  "containsPII": false,
+  "containsSecrets": false
+}

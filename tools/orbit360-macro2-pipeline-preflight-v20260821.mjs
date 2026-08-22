@@ -11,6 +11,8 @@ const POINTER = '.github/orbit360-requests/macro2-canonical-source-activation-po
 const WORKFLOW = '.github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml';
 const PRE_RUNNER = '.github/orbit360-source-patches/macro2-v20260821/macro2-v3r1-pre.sh';
 const POST_RUNNER = '.github/orbit360-source-patches/macro2-v20260821/macro2-v3r1-post.sh';
+const PUSH_PROOF = 'orbit360-platform/runtime-gate-crm-v20260716/macro2-v3-actions-push-registration-probe-v20260821.json';
+const OBSERVER_ROOTCAUSE = 'orbit360-platform/runtime-gate-crm-v20260716/macro2-run-observer-rootcause-v20260822.json';
 const FORBIDDEN_ACTIVE_PATHS = [
   '.github/orbit360-requests/macro2-transversal-source-recovery-v3r1c2-20260821.json',
   '.github/orbit360-requests/auc-macro2-transversal-source-v3r1c2-20260821.json',
@@ -57,10 +59,14 @@ const gitBlobSha = b => crypto.createHash('sha1').update(Buffer.concat([Buffer.f
 
 check(fs.existsSync(abs(POINTER)), 'POINTER_MISSING');
 check(fs.existsSync(abs(WORKFLOW)), 'WORKFLOW_MISSING');
+check(fs.existsSync(abs(PUSH_PROOF)), 'PUSH_REGISTRATION_PROOF_MISSING');
+check(fs.existsSync(abs(OBSERVER_ROOTCAUSE)), 'RUN_OBSERVER_ROOTCAUSE_EVIDENCE_MISSING');
 if (process.env.GITHUB_REF_NAME) check(process.env.GITHUB_REF_NAME === BRANCH, 'BRANCH_MISMATCH');
 
 const pointer = fs.existsSync(abs(POINTER)) ? json(POINTER) : {};
 const workflow = fs.existsSync(abs(WORKFLOW)) ? read(WORKFLOW).toString('utf8') : '';
+const pushProof = fs.existsSync(abs(PUSH_PROOF)) ? json(PUSH_PROOF) : {};
+const observerRootcause = fs.existsSync(abs(OBSERVER_ROOTCAUSE)) ? json(OBSERVER_ROOTCAUSE) : {};
 const pointerIdle = pointer.status === 'IDLE' && pointer.mode === 'IDLE';
 const pointerFinalize = pointer.status === 'ACTIVE' && pointer.mode === 'FINALIZE_SOURCE_ONLY';
 check(pointerIdle || pointerFinalize, 'POINTER_STATE_INVALID');
@@ -110,17 +116,44 @@ for (const [role, spec] of Object.entries(RUNNERS)) {
 }
 for (const p of FORBIDDEN_ACTIVE_PATHS) check(!fs.existsSync(abs(p)), `STALE_VARIANT_RESURRECTED:${p}`);
 
-const workflowFinalizationReady = workflow.includes('FINALIZE_SOURCE_ONLY');
+const workflowFinalizationReady =
+  workflow.includes('FINALIZE_SOURCE_ONLY') &&
+  workflow.includes('canonical-source-finalizer') &&
+  workflow.includes('github.event_name == \'push\'');
+const pushRegistrationValidated =
+  workflow.includes('push:') &&
+  workflow.includes('branches: [ays/backend-tenant-lab-v99-20260703]') &&
+  pushProof.ok === true &&
+  pushProof.status === 'ACTIONS_PUSH_REGISTRATION_PROBE_PASS' &&
+  pushProof.eventName === 'push' &&
+  String(pushProof.runId) === '32527157212' &&
+  pushProof.triggerSha === '5da25bf227fbe7fab40eb83aeb2a93e9e4da9aee';
+const runObserverRootCauseValidated =
+  observerRootcause.ok === true &&
+  observerRootcause.status === 'MACRO2_RUN_OBSERVER_ROOT_CAUSE_RESOLVED' &&
+  observerRootcause.classification === 'VALIDATOR_STALE' &&
+  observerRootcause.secondaryClassification === 'PIPELINE_MECHANISM_FAILURE' &&
+  observerRootcause.knownPushProof?.runId === 32527157212 &&
+  observerRootcause.negativeControl?.observerReturnedRuns === 0 &&
+  observerRootcause.negativeControl?.knownActualRunId === 32527157212 &&
+  observerRootcause.chosenMechanism === 'WORKFLOW_FILE_SELF_REGISTERING_PUSH';
+const executionReceiptObserverValidated =
+  workflow.includes('ORBIT360_MACRO2_FINALIZE_START') &&
+  workflow.includes('ORBIT360_MACRO2_FINALIZE_PASS') &&
+  workflow.includes('ORBIT360_MACRO2_FINALIZE_TERMINAL_FAIL') &&
+  workflow.includes('issues: write');
+check(workflowFinalizationReady, 'FINALIZE_WORKFLOW_NOT_READY');
+check(pushRegistrationValidated, 'PUSH_REGISTRATION_HANDSHAKE_INVALID');
+check(runObserverRootCauseValidated, 'RUN_OBSERVER_ROOTCAUSE_INVALID');
+check(executionReceiptObserverValidated, 'EXECUTION_RECEIPT_OBSERVER_INVALID');
 check(!workflow.includes('actions: write'), 'ACTIONS_WRITE_FORBIDDEN');
-if (pointerFinalize) {
-  check(workflowFinalizationReady, 'FINALIZE_WORKFLOW_NOT_READY');
-  if (process.env.GITHUB_EVENT_NAME === 'push') {
-    const { execFileSync } = await import('node:child_process');
-    const head = execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
-    const parent = execFileSync('git',['rev-parse','HEAD^'],{encoding:'utf8'}).trim();
-    check(!process.env.GITHUB_SHA || head === process.env.GITHUB_SHA, 'ACTIVATION_HEAD_MISMATCH');
-    check(!process.env.GITHUB_EVENT_BEFORE || parent === process.env.GITHUB_EVENT_BEFORE, 'ACTIVATION_PARENT_MISMATCH');
-  }
+
+if (pointerFinalize && process.env.GITHUB_EVENT_NAME === 'push') {
+  const { execFileSync } = await import('node:child_process');
+  const head = execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
+  const parent = execFileSync('git',['rev-parse','HEAD^'],{encoding:'utf8'}).trim();
+  check(!process.env.GITHUB_SHA || head === process.env.GITHUB_SHA, 'ACTIVATION_HEAD_MISMATCH');
+  check(!process.env.GITHUB_EVENT_BEFORE || parent === process.env.GITHUB_EVENT_BEFORE, 'ACTIVATION_PARENT_MISMATCH');
 }
 
 const out = {
@@ -139,7 +172,10 @@ const out = {
   collapsedStateMachineValidated: !failures.includes('POINTER_STATE_INVALID') && !failures.includes('ALLOWED_TRANSITION_INVALID'),
   workflowFinalizationReady,
   stopRetryReopenValidated: failures.length === 0,
-  actionsRegistrationHandshakeValidated: true,
+  actionsRegistrationHandshakeValidated: pushRegistrationValidated,
+  runObserverRootCauseValidated,
+  executionReceiptObserverValidated,
+  observerIndependentOfFilteredCommitRunReader: true,
   activationParentBindingValidated: pointerIdle || failures.every(x => !x.startsWith('ACTIVATION_')),
   durableSourceBeforeArtifact: true,
   durableArtifactMetadataBeforePromotion: true,
