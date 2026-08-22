@@ -1,20 +1,12 @@
 {
   "schemaVersion": "orbit360-macro2-canonical-source-activation-pointer-v1",
-  "status": "IDLE",
-  "mode": "NONE",
+  "status": "ACTIVE",
+  "mode": "WHITESPACE_POLICY_DIAGNOSTIC",
   "activeRequestPath": null,
-  "activationNonce": "macro2-allowed-deltas-bracket-parse-20260821-08",
-  "allowedExecutions": 0,
-  "consumed": true,
+  "activationNonce": "macro2-postpatch-hash-forensic-20260821-09",
+  "allowedExecutions": 1,
+  "consumed": false,
   "replayAllowed": false,
-  "lastTerminal": {
-    "runId": 32542683067,
-    "triggerSha": "4fdead47405e44cba1e1bcacd15b4b038b5af294",
-    "status": "DELTA_CONTRACT_BRACKET_PARSE_DIAGNOSTIC_COMPLETE",
-    "classification": "PASS",
-    "allowedDeltasRuntimeMatchesCanonical9": true,
-    "sourceDeltaCount": 15
-  },
   "sourceOnly": true,
   "runtime": false,
   "browser": false,
@@ -25,7 +17,7 @@
   "production": false,
   "main": false,
   "merge": false,
-  "rootCauseResolution": "FORENSIC_IDENTIFY_PREEXISTING_PACKAGE_DOC_DRIFT_WITHOUT_RERUN",
+  "rootCauseResolution": "CAPTURE_EXACT_POSTPATCH_HASHES_AND_VALIDATOR_SHA_PRIMITIVES",
   "containsPII": false,
   "containsSecrets": false
 }
