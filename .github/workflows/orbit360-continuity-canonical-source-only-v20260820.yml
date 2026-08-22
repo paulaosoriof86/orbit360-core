@@ -1,7 +1,6 @@
 name: Orbit360 Continuity Canonical Source Only
 # COLLAPSED CONTROL PLANE: IDLE -> FINALIZE_SOURCE_ONLY -> terminal IDLE.
-# Single existing owner. Triggered by the real PR synchronize event because Contents API commits
-# do not reliably materialize a push Actions event in this connector path.
+# Single existing owner. The executable transition is triggered only by a real Git ref push.
 # No runtime/browser/private secrets/Firestore/deploy/production.
 
 on:
@@ -11,9 +10,8 @@ on:
         description: 'Explicit source-only readback transition'
         required: true
         type: string
-  pull_request:
-    types: [synchronize]
-    branches: [main]
+  push:
+    branches: [ays/backend-tenant-lab-v99-20260703]
 
 permissions:
   contents: write
@@ -49,18 +47,18 @@ jobs:
         run: |
           set -euo pipefail
           test "${{ inputs.transition }}" = 'READBACK_ONLY'
-          GITHUB_REF_NAME="$ORBIT360_BRANCH" node "$PREFLIGHT"
+          node "$PREFLIGHT"
           node tools/orbit360-control-plane-composite-invariant-v20260820.mjs
           node tools/orbit360-control-plane-independent-readback-v20260820.mjs
 
   canonical-source-finalizer:
-    if: github.event_name == 'pull_request' && github.event.pull_request.number == 5 && github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'ays/backend-tenant-lab-v99-20260703'
+    if: github.event_name == 'push'
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: ${{ github.sha }}
           fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
@@ -71,7 +69,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          GITHUB_REF_NAME="$ORBIT360_BRANCH" node "$PREFLIGHT" | tee "$RUNNER_TEMP/macro2-pipeline-preflight.json"
+          node "$PREFLIGHT" | tee "$RUNNER_TEMP/macro2-pipeline-preflight.json"
           jq -e '.ok==true and .status=="MACRO2_PIPELINE_PREFLIGHT_PASS" and .collapsedStateMachineValidated==true and .certifiedBundlesValidated==true and .runnersValidated==true and .staleVariantPathsAbsent==true and .runtimeExecuted==false and .browserExecuted==false and .secretAccess==false and .firestoreRead==false and .writes==0 and .deployExecuted==false and .productionTouched==false' "$RUNNER_TEMP/macro2-pipeline-preflight.json" >/dev/null
 
       - id: router
@@ -104,14 +102,15 @@ jobs:
         if: steps.router.outputs.mode == 'FINALIZE_SOURCE_ONLY'
         name: Materialize ephemeral compatible runner binding only
         shell: bash
+        env:
+          ORBIT360_EVENT_BEFORE: ${{ github.event.before }}
         run: |
           set -euo pipefail
           test "$GITHUB_RUN_ATTEMPT" = '1'
-          ACTIVATION_HEAD=$(git rev-parse HEAD)
-          ACTIVATION_PARENT=$(git rev-parse HEAD^)
-          test "$ACTIVATION_HEAD" = "${{ github.event.pull_request.head.sha }}"
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test "$(git rev-parse HEAD^)" = "$ORBIT360_EVENT_BEFORE"
           MACRO2_REQUEST='.macro2-finalize-binding.tmp.json'
-          node - "$MACRO2_REQUEST" "$ACTIVATION_PARENT" <<'NODE'
+          node - "$MACRO2_REQUEST" "$ORBIT360_EVENT_BEFORE" <<'NODE'
           const fs=require('fs');
           const [p,ownerSafeHead]=process.argv.slice(2);
           const x={
@@ -159,20 +158,19 @@ jobs:
           NODE
           printf '/%s\n' "$MACRO2_REQUEST" >> .git/info/exclude
           echo "macro2_request=$MACRO2_REQUEST" >> "$GITHUB_OUTPUT"
-          echo "activation_head=$ACTIVATION_HEAD" >> "$GITHUB_OUTPUT"
-          echo "activation_parent=$ACTIVATION_PARENT" >> "$GITHUB_OUTPUT"
 
       - id: pre
         if: steps.router.outputs.mode == 'FINALIZE_SOURCE_ONLY'
         name: Apply certified bundles, 107/107, source commit and 194/9/185 build
         env:
           GH_TOKEN: ${{ github.token }}
+          ORBIT360_EVENT_BEFORE: ${{ github.event.before }}
           MACRO2_REQUEST: ${{ steps.binding.outputs.macro2_request }}
         shell: bash
         run: |
           set -euo pipefail
           test "$(git hash-object "$PRE_RUNNER")" = '5311a3a9b9bc645f420b232f31d9845ac5a6023b'
-          GITHUB_REF_NAME="$ORBIT360_BRANCH" GITHUB_SHA="${{ steps.binding.outputs.activation_head }}" ORBIT360_EVENT_BEFORE="${{ steps.binding.outputs.activation_parent }}" bash "$PRE_RUNNER"
+          bash "$PRE_RUNNER"
 
       - id: candidate
         if: steps.router.outputs.mode == 'FINALIZE_SOURCE_ONLY' && steps.pre.outcome == 'success'
