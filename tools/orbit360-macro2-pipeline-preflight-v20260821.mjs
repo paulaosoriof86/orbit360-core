@@ -15,6 +15,7 @@ const POST_RUNNER='.github/orbit360-source-patches/macro2-v20260821/macro2-v3r1-
 const PUSH_PROOF='orbit360-platform/runtime-gate-crm-v20260716/macro2-v3-actions-push-registration-probe-v20260821.json';
 const OBSERVER_ROOTCAUSE='orbit360-platform/runtime-gate-crm-v20260716/macro2-run-observer-rootcause-v20260822.json';
 const RECEIPT_ROOTCAUSE='orbit360-platform/runtime-gate-crm-v20260716/macro2-execution-receipt-observer-rootcause-v20260822.json';
+const SOURCE_ACCEPTANCE_OBSERVABILITY_ROOTCAUSE='orbit360-platform/runtime-gate-crm-v20260716/macro2-source-acceptance-observability-rootcause-v20260822.json';
 const FORBIDDEN_ACTIVE_PATHS=[
   '.github/orbit360-requests/macro2-transversal-source-recovery-v3r1c2-20260821.json',
   '.github/orbit360-requests/auc-macro2-transversal-source-v3r1c2-20260821.json',
@@ -44,7 +45,7 @@ const json=p=>JSON.parse(read(p).toString('utf8').replace(/^\uFEFF/,''));
 const sha256=b=>crypto.createHash('sha256').update(b).digest('hex');
 const gitBlobSha=b=>crypto.createHash('sha1').update(Buffer.concat([Buffer.from(`blob ${b.length}\0`),b])).digest('hex');
 
-for(const p of [POINTER,WORKFLOW,PUSH_PROOF,OBSERVER_ROOTCAUSE,RECEIPT_ROOTCAUSE]) check(fs.existsSync(abs(p)),`REQUIRED_CONTROL_FILE_MISSING:${p}`);
+for(const p of [POINTER,WORKFLOW,PUSH_PROOF,OBSERVER_ROOTCAUSE,RECEIPT_ROOTCAUSE,SOURCE_ACCEPTANCE_OBSERVABILITY_ROOTCAUSE]) check(fs.existsSync(abs(p)),`REQUIRED_CONTROL_FILE_MISSING:${p}`);
 if(process.env.GITHUB_REF_NAME) check(process.env.GITHUB_REF_NAME===BRANCH,'BRANCH_MISMATCH');
 
 const pointer=fs.existsSync(abs(POINTER))?json(POINTER):{};
@@ -52,6 +53,7 @@ const workflow=fs.existsSync(abs(WORKFLOW))?read(WORKFLOW).toString('utf8'):'';
 const pushProof=fs.existsSync(abs(PUSH_PROOF))?json(PUSH_PROOF):{};
 const observerRootcause=fs.existsSync(abs(OBSERVER_ROOTCAUSE))?json(OBSERVER_ROOTCAUSE):{};
 const receiptRootcause=fs.existsSync(abs(RECEIPT_ROOTCAUSE))?json(RECEIPT_ROOTCAUSE):{};
+const sourceAcceptanceObservabilityRootcause=fs.existsSync(abs(SOURCE_ACCEPTANCE_OBSERVABILITY_ROOTCAUSE))?json(SOURCE_ACCEPTANCE_OBSERVABILITY_ROOTCAUSE):{};
 
 const pointerIdle=pointer.status==='IDLE'&&pointer.mode==='IDLE';
 const pointerFinalize=pointer.status==='ACTIVE'&&pointer.mode==='FINALIZE_SOURCE_ONLY';
@@ -119,6 +121,25 @@ const receiptRootCauseValidated=
   receiptRootcause.failureStage==='EXECUTION_RECEIPT'&&
   receiptRootcause.httpStatus===403&&
   receiptRootcause.observerAuthoritative===false;
+const sourceAcceptanceObservabilityRootCauseValidated=
+  sourceAcceptanceObservabilityRootcause.ok===true&&
+  sourceAcceptanceObservabilityRootcause.status==='MACRO2_SOURCE_ACCEPTANCE_OBSERVABILITY_ROOT_CAUSE_RESOLVED'&&
+  sourceAcceptanceObservabilityRootcause.classification==='PIPELINE_MECHANISM_FAILURE'&&
+  sourceAcceptanceObservabilityRootcause.failedRunId===32607530811&&
+  sourceAcceptanceObservabilityRootcause.failureStage==='SOURCE_ACCEPTANCE_OR_BUILD'&&
+  sourceAcceptanceObservabilityRootcause.exactLocalReproduction?.sourceAcceptancePrecommit==='107/107_PASS'&&
+  sourceAcceptanceObservabilityRootcause.exactLocalReproduction?.successorBuild==='194_9_185_FULL_REHASH_PASS'&&
+  sourceAcceptanceObservabilityRootcause.exactLocalReproduction?.successorSourceAcceptance==='107/107_PASS'&&
+  sourceAcceptanceObservabilityRootcause.validationSemanticsChanged===false;
+const sourceAcceptanceDiagnosticPreservationValidated=
+  sourceAcceptanceObservabilityRootCauseValidated&&
+  workflow.includes('SOURCE_ACCEPTANCE_EVIDENCE_NON_LOSSY')&&
+  workflow.includes('PRESERVE_PRE_RUNNER_FAILURE_JSON')&&
+  workflow.includes('macro2-source-acceptance-precommit.json')&&
+  workflow.includes('diagnosticPreserved:true')&&
+  workflow.includes('failedChecks')&&
+  workflow.includes('observedDeltaPaths');
+
 const executionReceiptObserverValidated=
   workflow.includes('ORBIT360_MACRO2_FINALIZE_START')&&
   workflow.includes('ORBIT360_MACRO2_FINALIZE_PASS')&&
@@ -135,6 +156,8 @@ check(pushRegistrationValidated,'PUSH_REGISTRATION_HANDSHAKE_INVALID');
 check(runObserverRootCauseValidated,'RUN_OBSERVER_ROOTCAUSE_INVALID');
 check(executionReceiptObserverValidated,'EXECUTION_RECEIPT_OBSERVER_INVALID');
 check(nonBlockingExecutionObserverValidated,'EXECUTION_RECEIPT_OBSERVER_STILL_BLOCKING');
+check(sourceAcceptanceObservabilityRootCauseValidated,'SOURCE_ACCEPTANCE_OBSERVABILITY_ROOTCAUSE_INVALID');
+check(sourceAcceptanceDiagnosticPreservationValidated,'SOURCE_ACCEPTANCE_DIAGNOSTIC_PRESERVATION_INVALID');
 check(!workflow.includes('actions: write'),'ACTIONS_WRITE_FORBIDDEN');
 
 if(pointerFinalize&&process.env.GITHUB_EVENT_NAME==='push'){
@@ -166,6 +189,8 @@ const out={
   runObserverRootCauseValidated,
   executionReceiptObserverValidated,
   nonBlockingExecutionObserverValidated,
+  sourceAcceptanceObservabilityRootCauseValidated,
+  sourceAcceptanceDiagnosticPreservationValidated,
   observerIndependentOfFilteredCommitRunReader:true,
   activationParentBindingValidated:pointerIdle||failures.every(x=>!x.startsWith('ACTIVATION_')),
   durableSourceBeforeArtifact:true,
