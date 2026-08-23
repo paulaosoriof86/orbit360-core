@@ -2,66 +2,52 @@
   "schemaVersion": "orbit360-macro2-source-acceptance-observability-rootcause-v1",
   "ok": true,
   "status": "MACRO2_SOURCE_ACCEPTANCE_OBSERVABILITY_ROOT_CAUSE_RESOLVED",
-  "classification": "PIPELINE_MECHANISM_FAILURE",
-  "secondaryClassification": "VALIDATOR_STALE",
+  "classification": "VALIDATOR_STALE",
+  "secondaryClassification": "PIPELINE_MECHANISM_FAILURE",
   "date": "2026-08-22",
-  "failedRunId": 32607530811,
-  "failedJobId": 97114891777,
+  "firstFailedRunId": 32607530811,
+  "diagnosticRunId": 32611062188,
   "failureStage": "SOURCE_ACCEPTANCE_OR_BUILD",
-  "observedFailure": {
-    "preflight": "PASS",
-    "ephemeralBinding": "PASS",
-    "preRunnerExitCode": 41,
-    "sourceAcceptanceJsonRedirected": true,
-    "sourceAcceptanceJsonPreservedInRunEvidence": false,
+  "diagnostic": {
+    "sourceAcceptanceStatus": "TRANSVERSAL_SOURCE_ACCEPTANCE_FAIL",
+    "checksPassed": 106,
+    "checksTotal": 107,
+    "failedChecks": ["DELTA_EXACTLY_ALLOWED_TRANSVERSAL_SET"],
+    "expectedDeltaCount": 9,
+    "observedDeltaCount": 11,
+    "unexpectedDeltaPaths": ["index.html", "product-runtime-config.js"],
+    "productFunctionalChecksPassed": true,
+    "performance": {"clients": 414, "allPolizas": 1, "wherePolizas": 0},
     "artifactCreated": false,
     "sourceCommitCreated": false,
     "progressPromoted": false
   },
   "rootCause": {
-    "code": "SOURCE_ACCEPTANCE_FAILURE_JSON_LOST_BY_SET_E_REDIRECTION",
-    "description": "The certified pre-runner redirected source-acceptance JSON to RUNNER_TEMP under set -e. On exit 41 the step terminated before the JSON was surfaced or persisted, while the terminal recorded only the coarse stage. This made the exact failed check unobservable.",
-    "underlying107FailureCodeKnown": false,
-    "productDefectProven": false
+    "code": "ARTIFACT_MANIFEST_MISUSED_AS_SOURCE_BASELINE",
+    "description": "The precommit source validator compared the live source checkout against the predecessor package manifest. That package contains build-materialized versions of index.html and product-runtime-config.js, so those two paths are different from their sourceHead versions even when source has not drifted. The validator therefore produced two false-positive deltas in addition to the nine certified product deltas.",
+    "underlying107FailureCodeKnown": true,
+    "productDefectProven": false,
+    "sourceDriftProven": false,
+    "artifactBuildTransformationProven": true
   },
-  "exactLocalReproduction": {
+  "evidence": {
     "predecessorArtifactId": 9433944723,
     "predecessorSourceHead": "c3bb825da2b1ecae08dabc2034c753482b086fec",
     "predecessorManifestSha256": "580921077a88badab6e4076c42e9ef88f9de7936e1b6bad0f62410b39aec6397",
-    "productBundleGzipSha256": "c7b932b2788a502ae07111d2e209d4b0cca0b844242bb1db80218b72fa4c6913",
-    "productBundleRawSha256": "6b3141493d69d2b25c581033460f5302498dd06dd8dfcad1245802390fafe540",
-    "sourceAcceptancePrecommit": "107/107_PASS",
-    "successorBuild": "194_9_185_FULL_REHASH_PASS",
-    "successorSourceAcceptance": "107/107_PASS",
-    "performance": {
-      "clients": 414,
-      "allPolizas": 1,
-      "wherePolizas": 0
+    "sourceTreesUnchanged": ["core", "data", "modules", "styles"],
+    "sourceFilesUnchanged": ["index.html", "product-runtime-config.js", "sw.js"],
+    "artifactMaterializedPaths": ["index.html", "product-runtime-config.js"],
+    "exactLocalArtifactBasedReproduction": {
+      "sourceAcceptancePrecommit": "107/107_PASS",
+      "successorBuild": "194_9_185_FULL_REHASH_PASS",
+      "successorSourceAcceptance": "107/107_PASS"
     }
-  },
-  "preimageIdentity": {
-    "activationHead": "7d02a51676a15ce7edde31b203739534cc096cbc",
-    "allNineProductPreimagesMatchCertifiedPredecessorGitBlobBytes": true,
-    "gitBlobShaByPath": {
-      "core/ui.js": "bb86d69c8e195e0b3a2731423eba4ff6272eaa65",
-      "core/queries.js": "b7cef1acda5034e572820f5f1b25fbfe2108f2f9",
-      "core/client-canonical-view-projection-v20260716.js": "0027731abe5b947e0b36bcbcc7e6135b00c4898e",
-      "core/ciclo.js": "f9999887c62b54f1bc6498a95f8cbb2a060e4cea",
-      "data/store-firestore-product-readonly-p0.js": "7fa3a4440515fb2940c0cce218ebbbffd22ca76c",
-      "modules/inicio.js": "65d53441ace11987002d6b45c52db598e7baf989",
-      "modules/cliente360.js": "2fa5ffc0cd67144ff751281fc803e82a5a4acf8d",
-      "modules/aseguradoras.js": "992b482b6bba24b3b4486b273a5345075d1aa7ca",
-      "modules/cobros.js": "5b657ff0819f1c942abf6e68549f83102ce830fb"
-    }
-  },
-  "additionalStaleEvidence": {
-    "path": ".github/orbit360-source-patches/macro2-v20260821/predecessor-hash-index-9433944723.json",
-    "authoritative": false,
-    "finding": "Auxiliary predecessor hash index contains values inconsistent with the certified artifact manifest; it must not be promoted to authority. Current finalizer does not use it for the 107/107 decision."
   },
   "resolution": {
-    "validationSemantics": "UNCHANGED",
-    "workflowChange": "Wrap the immutable certified pre-runner, surface any existing source-acceptance/build JSON on nonzero exit, and embed failed checks/delta summary in the terminal pointer before sealing IDLE.",
+    "sourcePrecommitBaseline": "DERIVE_194_PATH_HASHES_FROM_BASE_SOURCE_HEAD",
+    "artifactBuildBaseline": "KEEP_ORIGINAL_CERTIFIED_ARTIFACT_MANIFEST",
+    "expectedArtifactMaterializedPaths": ["index.html", "product-runtime-config.js"],
+    "validationSemantics": "SEPARATE_SOURCE_BASELINE_FROM_ARTIFACT_BASELINE",
     "newRunnerVariant": false,
     "newRequest": false,
     "newProductPatch": false,
