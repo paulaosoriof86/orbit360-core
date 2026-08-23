@@ -1,0 +1,54 @@
+{
+  "schemaVersion": "orbit360-macro2-execution-receipt-observer-rootcause-v1",
+  "ok": true,
+  "status": "MACRO2_EXECUTION_RECEIPT_OBSERVER_ROOT_CAUSE_RESOLVED",
+  "classification": "PIPELINE_MECHANISM_FAILURE",
+  "secondaryClassification": "VALIDATOR_STALE",
+  "date": "2026-08-22",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pr": 5,
+  "failedRunId": 32596094127,
+  "failedRunHead": "2cdc57428764c8b5d361aac543b8846290c66cb1",
+  "failedJobId": 97087167161,
+  "failureStage": "EXECUTION_RECEIPT",
+  "httpStatus": 403,
+  "observedTokenPermissions": {
+    "actions": "read",
+    "contents": "write",
+    "issues": "write",
+    "pullRequests": "not_granted_in_failed_run"
+  },
+  "rootCause": "NON_AUTHORITATIVE_PR_COMMENT_OBSERVER_BLOCKED_CANONICAL_OWNER_BEFORE_PREFLIGHT",
+  "observerAuthoritative": false,
+  "fix": {
+    "pullRequestsPermission": "write",
+    "prCommentReceipt": "BEST_EFFORT_NON_BLOCKING",
+    "authoritativeObserver": [
+      "GITHUB_ACTIONS_RUN",
+      "JOB_LOGS",
+      "GITHUB_STEP_SUMMARY",
+      "POINTER_TERMINAL_STATE"
+    ],
+    "preflightGuard": "NON_BLOCKING_EXECUTION_OBSERVER_REQUIRED"
+  },
+  "retryPolicy": {
+    "sameStageBlindRetry": false,
+    "rootCauseCorrected": true,
+    "singleCanonicalReactivationAllowed": true,
+    "newRequestCreated": false,
+    "newTriggerVariantCreated": false
+  },
+  "runtimeExecuted": false,
+  "browserExecuted": false,
+  "providerSecretAccess": false,
+  "firestoreRead": false,
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "operationalWrites": 0,
+  "deployExecuted": false,
+  "productionTouched": false,
+  "mainTouched": false,
+  "mergeExecuted": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
