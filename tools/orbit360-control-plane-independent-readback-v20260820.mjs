@@ -1,20 +1,10 @@
 #!/usr/bin/env node
 'use strict';
-import fs from 'node:fs';
-const J=p=>JSON.parse(fs.readFileSync(p,'utf8').replace(/^\uFEFF/,'')),T=p=>fs.readFileSync(p,'utf8');
-const P={ledger:'orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json',pkg:'orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json',boundary:'orbit360-platform/docs/orbit360-f2-runtime-authorization-boundary-v20260820.json',live:'orbit360-platform/docs/orbit360-live-state-v1.json',idx:'orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json',life:'tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-runtime-v20260819.json',pr:'orbit360-platform/docs/ORBIT360-PR5-CURRENT-STATE.md',checkpoint:'orbit360-platform/docs/CHECKPOINT-CONTROL-PLANE-HARDENING-20260820.md',readme:'README.md',changelog:'orbit360-platform/CHANGELOG.md',plan:'orbit360-platform/docs/PLAN-MAESTRO-CONGELADO-DEFINITIVO-RUTA-PRODUCCION-ORBIT360-AYS-20260821.md'};
-const L=J(P.ledger),pkg=J(P.pkg),B=J(P.boundary),live=J(P.live),idx=J(P.idx),life=J(P.life),pr=T(P.pr),checkpoint=T(P.checkpoint),readme=T(P.readme),changelog=T(P.changelog),fail=[];const c=(v,id)=>{if(!v)fail.push(id);};
-const s={phase:L.activeState.phase,status:L.activeState.status,next:L.nextAction.id,artifact:String(L.successorCandidate.artifactId),source:L.successorCandidate.sourceHead,lr:String(L.revision),prv:String(pkg.revision),progress:String(L.progress.productionRouteProgressPct)};
-c(fs.existsSync(P.plan),'FROZEN_PLAN_EXISTS');
-c(live.derived===true&&live.canonicalCurrent?.phase===s.phase&&live.canonicalCurrent?.status===s.status&&live.canonicalCurrent?.nextActionId===s.next,'LIVE_DERIVED');
-c(idx.status==='CURRENT_DERIVED_FROM_LEDGER'&&idx.operationalCurrent?.phase===s.phase&&idx.operationalCurrent?.status===s.status&&idx.operationalCurrent?.nextActionId===s.next,'INDEX_DERIVED');
-c(life.currentPhase===s.phase&&life.status===s.status&&life.nextActionExact===s.next,'LIFECYCLE_DERIVED');
-c(Boolean(live.authorization?.authorized)===Boolean(B.authorized)&&Boolean(live.authorization?.requestMaterialized)===Boolean(B.requestMaterialized)&&Boolean(live.authorization?.runtimeAllowed)===Boolean(B.runtimeAllowed),'AUTH_PROJECTION');
-for(const [name,text] of [['PR_STATE',pr],['CHECKPOINT',checkpoint],['README',readme],['CHANGELOG',changelog]]){
- c(text.includes(s.phase),`${name}_PHASE`);c(text.includes(s.status),`${name}_STATUS`);c(text.includes(s.next),`${name}_NEXT`);c(text.includes(s.artifact),`${name}_CANDIDATE`);c(text.includes(s.source),`${name}_SOURCE`);c(text.includes(s.progress+'%'),`${name}_PROGRESS`);
-}
-c(readme.includes(P.plan),'README_PLAN_AUTHORITY');c(pr.includes(P.plan),'PR_STATE_PLAN_AUTHORITY');
-c(!/artifact `9395391426`|artifact `9387820198`|AWAIT_FRESH_EXPLICIT_AUTHORIZATION_FOR_CERTIFIED_F2_SUCCESSOR_RUNTIME/.test(readme),'README_NO_STALE_CURRENT');
-const current=(changelog.match(/<!-- ORBIT360_CURRENT_STATE_START -->([\s\S]*?)<!-- ORBIT360_CURRENT_STATE_END -->/)||[])[1]||'';c(current.includes(s.phase)&&current.includes(s.status)&&current.includes(s.next)&&current.includes(s.artifact),'CHANGELOG_CURRENT_BLOCK');c(!current.includes('9395391426')&&!current.includes('9387820198'),'CHANGELOG_NO_STALE_CURRENT');
-if(s.status==='CONTROL_PLANE_DEFINITIVE_PASS'){c(B.authorized===false&&B.requestMaterialized===false&&B.runtimeAllowed===false,'DEFINITIVE_BOUNDARY_CLOSED');c(pkg.resumeProtocol.firstIncompleteStep==='MACRO2-TRANSVERSAL-SOURCE-ACCEPTANCE','MACRO2_NEXT');}
-const out={schemaVersion:'orbit360-control-plane-independent-readback-v2',ok:fail.length===0,status:fail.length?'CONTROL_PLANE_INDEPENDENT_READBACK_FAIL':'CONTROL_PLANE_INDEPENDENT_READBACK_PASS',failures:fail,phase:s.phase,activeStatus:s.status,ledgerRevision:L.revision,packageRevision:pkg.revision,candidateArtifactId:Number(s.artifact),productionRouteProgressPct:Number(s.progress),runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,operationalWrites:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};console.log(JSON.stringify(out,null,2));if(!out.ok)process.exit(41);
+import {spawnSync} from 'node:child_process';
+import path from 'node:path';
+const ROOT=process.env.ORBIT360_ROOT?path.resolve(process.env.ORBIT360_ROOT):process.cwd();
+const gate=path.join(ROOT,'tools/orbit360-control-plane-evidence-convergence-v20260822.mjs');
+const args=[gate];if(process.env.ORBIT360_PR_BODY_FILE)args.push('--pr-body-file',process.env.ORBIT360_PR_BODY_FILE);else args.push('--repo-only');
+const r=spawnSync(process.execPath,args,{cwd:ROOT,encoding:'utf8'});let detail={};try{detail=JSON.parse(r.stdout||'{}');}catch{}
+const out={schemaVersion:'orbit360-control-plane-independent-readback-v3',ok:r.status===0&&detail.ok===true,status:r.status===0?'CONTROL_PLANE_INDEPENDENT_READBACK_PASS':'CONTROL_PLANE_INDEPENDENT_READBACK_FAIL',canonicalConvergenceStatus:detail.status||null,prBodyValidated:Boolean(process.env.ORBIT360_PR_BODY_FILE)&&detail.prBodyValidated===true,failures:detail.failures||[],stateFingerprint:detail.stateFingerprint||null,ledgerRevision:detail.ledgerRevision||null,packageRevision:detail.packageRevision||null,candidateArtifactId:detail.candidateArtifactId||null,productionRouteProgressPct:detail.productionRouteProgressPct||null,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,operationalWrites:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
+console.log(JSON.stringify(out,null,2));if(!out.ok)process.exit(41);
