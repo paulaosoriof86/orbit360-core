@@ -42,7 +42,7 @@ export ORBIT360_MACRO2_ZIP_SHA256="$SUCCESSOR_ZIP_SHA"
 export ORBIT360_MACRO2_MANIFEST_SHA256="$SUCCESSOR_MANIFEST_SHA"
 export ORBIT360_MACRO2_RUN_ID="$GITHUB_RUN_ID"
 
-# STAGE: Persist candidate artifact metadata before promotion
+# STAGE: Persist or verify candidate artifact metadata before promotion
 set -euo pipefail
 test "$SOURCE_HEAD" = "$SOURCE_PUBLISHED_HEAD"
 test "$ARTIFACT_ID" != ''
@@ -53,17 +53,28 @@ case "$ARTIFACT_DIGEST_RAW" in
 esac
 NORMALIZED_ARTIFACT_DIGEST="$ARTIFACT_DIGEST"
 META="orbit360-platform/runtime-gate-crm-v20260716/macro2-candidate-artifact-metadata-v20260821.json"
-node - "$META" "$ARTIFACT_ID" "$ARTIFACT_DIGEST" "$SOURCE_PUBLISHED_HEAD" "$SUCCESSOR_ZIP_SHA" "$SUCCESSOR_MANIFEST_SHA" "$GITHUB_RUN_ID" <<'NODE'
+if [ "${ORBIT360_MACRO2_RESUME_METADATA:-false}" = 'true' ]; then
+  test -f "$META"
+  node - "$META" "$ARTIFACT_ID" "$ARTIFACT_DIGEST" "$SOURCE_PUBLISHED_HEAD" "$SUCCESSOR_ZIP_SHA" "$SUCCESSOR_MANIFEST_SHA" <<'NODE'
+const fs=require('fs');const [p,id,digest,source,zip,manifest]=process.argv.slice(2);const x=JSON.parse(fs.readFileSync(p,'utf8'));
+const ok=x.status==='CANDIDATE_ARTIFACT_PUBLISHED_SOURCE_ONLY'&&Number(x.artifactId)===Number(id)&&x.artifactDigest===digest&&x.sourceHead===source&&x.zipSha256===zip&&x.manifestSha256===manifest&&x.fileCount===194&&x.deltaCount===9&&x.unchangedFileCount===185&&x.sourcePublished===true&&x.runtimeExecuted===false&&x.browserExecuted===false&&x.secretAccess===false&&x.firestoreRead===false&&Number(x.writes)===0&&x.deployExecuted===false&&x.productionTouched===false;
+if(!ok){console.error('PIPELINE_MECHANISM_FAILURE:DURABLE_CANDIDATE_METADATA_RESUME_MISMATCH');process.exit(41);}
+console.log(JSON.stringify({ok:true,status:'MACRO2_DURABLE_CANDIDATE_METADATA_RESUME_PASS',artifactId:x.artifactId,sourceHead:x.sourceHead}));
+NODE
+  CANDIDATE_METADATA_HEAD=$(git rev-parse HEAD)
+else
+  node - "$META" "$ARTIFACT_ID" "$ARTIFACT_DIGEST" "$SOURCE_PUBLISHED_HEAD" "$SUCCESSOR_ZIP_SHA" "$SUCCESSOR_MANIFEST_SHA" "$GITHUB_RUN_ID" <<'NODE'
 const fs=require('fs'); const [p,id,digest,source,zip,manifest,run]=process.argv.slice(2);
 const x={schemaVersion:'orbit360-macro2-candidate-artifact-metadata-v1',status:'CANDIDATE_ARTIFACT_PUBLISHED_SOURCE_ONLY',artifactId:Number(id),artifactDigest:digest,sourceHead:source,zipSha256:zip,manifestSha256:manifest,runId:Number(run),fileCount:194,deltaCount:9,unchangedFileCount:185,sourcePublished:true,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,writes:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
 fs.mkdirSync(require('path').dirname(p),{recursive:true}); fs.writeFileSync(p,JSON.stringify(x,null,2)+'\n');
 NODE
-git add -- "$META"
-git commit -m 'gate(macro2): persist candidate artifact metadata before promotion'
-CANDIDATE_METADATA_HEAD=$(git rev-parse HEAD)
-git fetch origin "$ORBIT360_BRANCH"
-test "$(git rev-parse origin/$ORBIT360_BRANCH)" = "$SOURCE_PUBLISHED_HEAD"
-git push origin "HEAD:$ORBIT360_BRANCH"
+  git add -- "$META"
+  git commit -m 'gate(macro2): persist candidate artifact metadata before promotion'
+  CANDIDATE_METADATA_HEAD=$(git rev-parse HEAD)
+  git fetch origin "$ORBIT360_BRANCH"
+  test "$(git rev-parse origin/$ORBIT360_BRANCH)" = "$SOURCE_PUBLISHED_HEAD"
+  git push origin "HEAD:$ORBIT360_BRANCH"
+fi
 echo "CANDIDATE_METADATA_HEAD=$CANDIDATE_METADATA_HEAD" >> "$GITHUB_ENV"
 echo "NORMALIZED_ARTIFACT_DIGEST=$NORMALIZED_ARTIFACT_DIGEST" >> "$GITHUB_ENV"
 
