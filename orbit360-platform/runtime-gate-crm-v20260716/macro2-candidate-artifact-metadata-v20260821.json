@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "orbit360-macro2-candidate-artifact-metadata-v1",
+  "status": "CANDIDATE_ARTIFACT_PUBLISHED_SOURCE_ONLY",
+  "artifactId": 9485621192,
+  "artifactDigest": "sha256:6a89448084b3aac162378aa4fedd05acfa571c667765c3c7fd06473075705dce",
+  "sourceHead": "842f762f199f4c7dbf13062a33ca220d92398c51",
+  "zipSha256": "4f6006ebb3ee2e10ef35e61053243ed74c4adcb46c4abb6c8d90fe27047f37da",
+  "manifestSha256": "ce44011eb874bd44fe646b93bd89cef97ecee8218f16ffacf3917177f7fccb18",
+  "runId": 32611388980,
+  "fileCount": 194,
+  "deltaCount": 9,
+  "unchangedFileCount": 185,
+  "sourcePublished": true,
+  "runtimeExecuted": false,
+  "browserExecuted": false,
+  "secretAccess": false,
+  "firestoreRead": false,
+  "writes": 0,
+  "deployExecuted": false,
+  "productionTouched": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
