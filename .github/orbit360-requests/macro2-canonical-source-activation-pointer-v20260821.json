@@ -1,13 +1,13 @@
 {
   "schemaVersion": "orbit360-macro2-canonical-source-activation-pointer-v1",
-  "status": "IDLE",
-  "mode": "IDLE",
+  "status": "ACTIVE",
+  "mode": "FINALIZE_SOURCE_ONLY",
   "activeRequestPath": null,
-  "activationNonce": null,
-  "allowedExecutions": 0,
-  "consumed": true,
+  "activationNonce": "macro2-finalize-source-only-nonblocking-observer-rootfix-20260822-03",
+  "allowedExecutions": 1,
+  "consumed": false,
   "replayAllowed": false,
-  "reopenAllowed": false,
+  "reopenAllowed": true,
   "sourceOnly": true,
   "predecessor": {
     "artifactId": 9433944723,
@@ -35,11 +35,13 @@
   "allowedTransition": "IDLE_TO_FINALIZE_SOURCE_ONLY",
   "terminalOnFailure": true,
   "lastTerminal": {
-    "status": "FINALIZE_SOURCE_ONLY_TERMINAL_FAIL",
+    "status": "SUPERSEDED_EXECUTION_RECEIPT_OBSERVER_FAILURE",
     "classification": "PIPELINE_MECHANISM_FAILURE",
     "failureStage": "EXECUTION_RECEIPT",
+    "failureCode": "PR_COMMENT_HTTP_403_BLOCKED_OWNER",
     "runId": 32596094127,
-    "automaticRetry": false
+    "automaticRetry": false,
+    "rootCauseEvidencePath": "orbit360-platform/runtime-gate-crm-v20260716/macro2-execution-receipt-observer-rootcause-v20260822.json"
   },
   "runtime": false,
   "browser": false,
@@ -50,8 +52,8 @@
   "production": false,
   "main": false,
   "merge": false,
-  "rootCauseResolution": "FINALIZE_SOURCE_ONLY_TERMINAL_FAIL_NO_VARIANT_OPENED",
-  "executionObserver": "PR_ISSUE_COMMENT_RECEIPTS",
+  "rootCauseResolution": "NON_AUTHORITATIVE_RECEIPT_OBSERVER_NO_LONGER_BLOCKING",
+  "executionObserver": "ACTIONS_RUN_LOGS_STEP_SUMMARY_PLUS_BEST_EFFORT_PR_RECEIPTS",
   "bundleIdentityAuthority": "GZIP_SHA256_PLUS_RAW_SHA256",
   "gitBlobIdentityAuthoritative": false,
   "forbidden": [
