@@ -64,13 +64,13 @@ Formato basado en *Keep a Changelog*. Construcción greenfield; el estado operat
 ## [1.93.0] — 2026-07-03 · Consolidado v1.56–v1.93
 
 <!-- ORBIT360_CURRENT_STATE_START -->
-## [F2-CONTINUITY-CURRENT] — 2026-08-21 UTC · `ORBIT360-F2-CONTINUITY-CURRENT`
-- **DERIVED PROJECTION** desde `orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json`; no es autoridad mutable independiente.
-- Fase: `MACRO1_CONTROL_PLANE_DEFINITIVE_PASS_AWAITING_TRANSVERSAL_SOURCE_ACCEPTANCE`.
-- Estado: `CONTROL_PLANE_DEFINITIVE_PASS`.
-- Ledger/package: `29/23`.
-- Candidata: artifact `9433944723`, source `c3bb825da2b1ecae08dabc2034c753482b086fec`.
+## [F2-CONTINUITY-CURRENT] — `ORBIT360-F2-CONTINUITY-CURRENT`
+CANONICAL_STATE_FINGERPRINT: b99667ff034c3a1a59f9988044011c1e100716091ccde54a90d8a9ced697f32b
+- Fase: `MACRO2_TRANSVERSAL_SOURCE_ACCEPTANCE_PASS_AWAITING_FRESH_F2_AUTHORIZATION`.
+- Estado: `TRANSVERSAL_SOURCE_ACCEPTANCE_PASS`.
+- Ledger/package: `30/24`.
+- Candidata: artifact `9485621192`, source `842f762f199f4c7dbf13062a33ca220d92398c51`.
 - Authorization/request/runtime: `false/false/false`.
-- Progreso producción: **62%**.
-- Siguiente acción: `EXECUTE_MACRO2_TRANSVERSAL_SOURCE_ACCEPTANCE_AND_SINGLE_CANDIDATE`.
+- Progreso producción: **75%**.
+- Siguiente acción: `AWAIT_EXPLICIT_F2_RUNTIME_AUTHORIZATION_ONE_SHOT`.
 <!-- ORBIT360_CURRENT_STATE_END -->

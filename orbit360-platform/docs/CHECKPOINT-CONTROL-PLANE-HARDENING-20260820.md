@@ -1,15 +1,13 @@
 # CHECKPOINT CANÓNICO — DERIVADO DEL LEDGER
 
-Fecha UTC: 2026-08-21T16:12:00.000Z  
+CANONICAL_STATE_FINGERPRINT: b99667ff034c3a1a59f9988044011c1e100716091ccde54a90d8a9ced697f32b
+
 Plan: `orbit360-platform/docs/PLAN-MAESTRO-CONGELADO-DEFINITIVO-RUTA-PRODUCCION-ORBIT360-AYS-20260821.md`  
-branch: `ays/backend-tenant-lab-v99-20260703` · PR #5 draft/open
+Rama: `ays/backend-tenant-lab-v99-20260703` · PR #5 draft/open. branchHead se verifica vivo y no se congela aquí.
 
-- Ledger revision: `29`.
-- Package revision: `23`.
-- Fase/estado: `MACRO1_CONTROL_PLANE_DEFINITIVE_PASS_AWAITING_TRANSVERSAL_SOURCE_ACCEPTANCE` / `CONTROL_PLANE_DEFINITIVE_PASS`.
-- Candidate: `9433944723` / `c3bb825da2b1ecae08dabc2034c753482b086fec`.
+- Ledger/package: `30/24`.
+- Fase/estado: `MACRO2_TRANSVERSAL_SOURCE_ACCEPTANCE_PASS_AWAITING_FRESH_F2_AUTHORIZATION` / `TRANSVERSAL_SOURCE_ACCEPTANCE_PASS`.
+- Candidate: `9485621192` / `842f762f199f4c7dbf13062a33ca220d92398c51`.
 - Runtime permitido: **no**.
-- Progreso producción: **62%**.
-- Reanudar exactamente en: `EXECUTE_MACRO2_TRANSVERSAL_SOURCE_ACCEPTANCE_AND_SINGLE_CANDIDATE`.
-
-Proyección generada. Leer primero el plan congelado 20260821 + HEAD real + ledger.
+- Progreso producción: **75%**.
+- Reanudar exactamente en: `AWAIT_EXPLICIT_F2_RUNTIME_AUTHORIZATION_ONE_SHOT`.
