@@ -33,7 +33,7 @@ const BUNDLES={
   docs:{path:'.github/orbit360-source-patches/macro2-v20260821/docs.patch.gz',gzipSha256:'4a6f77f7e35a89f0ef830e4b98fa8f4d1493e7973a4b91aa55ee5def78ed2167',rawSha256:'f5f679c113e6408981f111154e8d0fd34f515e82a70c2085d3f0f54515efa3c0'}
 };
 const RUNNERS={
-  pre:{path:PRE_RUNNER,gitBlobSha:'5311a3a9b9bc645f420b232f31d9845ac5a6023b'},
+  pre:{path:PRE_RUNNER,gitBlobSha:'0e248b63640d62a96fcf4b80837c8ab5a66d1978'},
   post:{path:POST_RUNNER,gitBlobSha:'c57f699b3e72f4aba856f359a09f227d7a25255a'}
 };
 
@@ -77,6 +77,7 @@ for(const [name,spec] of Object.entries(BUNDLES)){
   try{check(sha256(zlib.gunzipSync(gz))===spec.rawSha256,`PATCH_RAW_SHA256_MISMATCH:${name}`);}
   catch{check(false,`PATCH_GZIP_INVALID:${name}`);}
 }
+let sourceArtifactBaselineSplitValidated=false;
 for(const [role,spec] of Object.entries(RUNNERS)){
   check(fs.existsSync(abs(spec.path)),`RUNNER_MISSING:${role}`);
   if(!fs.existsSync(abs(spec.path))) continue;
@@ -86,6 +87,13 @@ for(const [role,spec] of Object.entries(RUNNERS)){
   if(role==='pre'){
     check(t.includes('checksPassed==107')&&t.includes('checksTotal==107'),'PRE_RUNNER_107_CONTRACT_MISSING');
     check(t.includes('fileCount==194')&&t.includes('deltaCount==9')&&t.includes('unchangedFileCount==185'),'PRE_RUNNER_194_9_185_CONTRACT_MISSING');
+    sourceArtifactBaselineSplitValidated=
+      t.includes('SOURCE_ARTIFACT_BASELINE_SPLIT_V1')&&
+      t.includes('MACRO2_SOURCE_BASE_MANIFEST')&&
+      t.includes("expected=['index.html','product-runtime-config.js']")&&
+      t.includes('ORBIT360_MACRO2_BASE_MANIFEST="$MACRO2_SOURCE_BASE_MANIFEST"')&&
+      t.includes('ORBIT360_MACRO2_BASE_MANIFEST="$MACRO2_BASE_MANIFEST"');
+    check(sourceArtifactBaselineSplitValidated,'PRE_RUNNER_SOURCE_ARTIFACT_BASELINE_SPLIT_MISSING');
     check(!t.includes('git pull --rebase'),'PRE_RUNNER_REBASE_FORBIDDEN');
   }else{
     check(t.includes('progress==75'),'POST_RUNNER_75_PROMOTION_CONTRACT_MISSING');
@@ -124,12 +132,21 @@ const receiptRootCauseValidated=
 const sourceAcceptanceObservabilityRootCauseValidated=
   sourceAcceptanceObservabilityRootcause.ok===true&&
   sourceAcceptanceObservabilityRootcause.status==='MACRO2_SOURCE_ACCEPTANCE_OBSERVABILITY_ROOT_CAUSE_RESOLVED'&&
-  sourceAcceptanceObservabilityRootcause.classification==='PIPELINE_MECHANISM_FAILURE'&&
-  sourceAcceptanceObservabilityRootcause.failedRunId===32607530811&&
+  sourceAcceptanceObservabilityRootcause.classification==='VALIDATOR_STALE'&&
+  sourceAcceptanceObservabilityRootcause.secondaryClassification==='PIPELINE_MECHANISM_FAILURE'&&
+  sourceAcceptanceObservabilityRootcause.diagnosticRunId===32611062188&&
   sourceAcceptanceObservabilityRootcause.failureStage==='SOURCE_ACCEPTANCE_OR_BUILD'&&
-  sourceAcceptanceObservabilityRootcause.exactLocalReproduction?.sourceAcceptancePrecommit==='107/107_PASS'&&
-  sourceAcceptanceObservabilityRootcause.exactLocalReproduction?.successorBuild==='194_9_185_FULL_REHASH_PASS'&&
-  sourceAcceptanceObservabilityRootcause.exactLocalReproduction?.successorSourceAcceptance==='107/107_PASS'&&
+  sourceAcceptanceObservabilityRootcause.diagnostic?.checksPassed===106&&
+  sourceAcceptanceObservabilityRootcause.diagnostic?.checksTotal===107&&
+  Array.isArray(sourceAcceptanceObservabilityRootcause.diagnostic?.failedChecks)&&
+  sourceAcceptanceObservabilityRootcause.diagnostic.failedChecks.length===1&&
+  sourceAcceptanceObservabilityRootcause.diagnostic.failedChecks[0]==='DELTA_EXACTLY_ALLOWED_TRANSVERSAL_SET'&&
+  JSON.stringify(sourceAcceptanceObservabilityRootcause.diagnostic?.unexpectedDeltaPaths||[])===JSON.stringify(['index.html','product-runtime-config.js'])&&
+  sourceAcceptanceObservabilityRootcause.rootCause?.code==='ARTIFACT_MANIFEST_MISUSED_AS_SOURCE_BASELINE'&&
+  sourceAcceptanceObservabilityRootcause.rootCause?.productDefectProven===false&&
+  sourceAcceptanceObservabilityRootcause.rootCause?.artifactBuildTransformationProven===true&&
+  sourceAcceptanceObservabilityRootcause.resolution?.sourcePrecommitBaseline==='DERIVE_194_PATH_HASHES_FROM_BASE_SOURCE_HEAD'&&
+  sourceAcceptanceObservabilityRootcause.resolution?.artifactBuildBaseline==='KEEP_ORIGINAL_CERTIFIED_ARTIFACT_MANIFEST'&&
   sourceAcceptanceObservabilityRootcause.validationSemanticsChanged===false;
 const sourceAcceptanceDiagnosticPreservationValidated=
   sourceAcceptanceObservabilityRootCauseValidated&&
@@ -158,6 +175,7 @@ check(executionReceiptObserverValidated,'EXECUTION_RECEIPT_OBSERVER_INVALID');
 check(nonBlockingExecutionObserverValidated,'EXECUTION_RECEIPT_OBSERVER_STILL_BLOCKING');
 check(sourceAcceptanceObservabilityRootCauseValidated,'SOURCE_ACCEPTANCE_OBSERVABILITY_ROOTCAUSE_INVALID');
 check(sourceAcceptanceDiagnosticPreservationValidated,'SOURCE_ACCEPTANCE_DIAGNOSTIC_PRESERVATION_INVALID');
+check(sourceArtifactBaselineSplitValidated,'SOURCE_ARTIFACT_BASELINE_SPLIT_INVALID');
 check(!workflow.includes('actions: write'),'ACTIONS_WRITE_FORBIDDEN');
 
 if(pointerFinalize&&process.env.GITHUB_EVENT_NAME==='push'){
@@ -191,6 +209,7 @@ const out={
   nonBlockingExecutionObserverValidated,
   sourceAcceptanceObservabilityRootCauseValidated,
   sourceAcceptanceDiagnosticPreservationValidated,
+  sourceArtifactBaselineSplitValidated,
   observerIndependentOfFilteredCommitRunReader:true,
   activationParentBindingValidated:pointerIdle||failures.every(x=>!x.startsWith('ACTIVATION_')),
   durableSourceBeforeArtifact:true,
