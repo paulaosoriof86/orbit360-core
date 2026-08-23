@@ -1,6 +1,6 @@
 name: Orbit360 Continuity Canonical Source Only
 # COLLAPSED CONTROL PLANE: IDLE -> FINALIZE_SOURCE_ONLY -> terminal IDLE.
-# Single canonical writer. Proven push execution + PR receipt observability.
+# Single canonical writer. PR comment receipts are best-effort observers only.
 # No product runtime/browser/private provider secrets/Firestore/deploy/production.
 
 on:
@@ -18,11 +18,13 @@ on:
       - 'tools/orbit360-macro2-pipeline-preflight-v20260821.mjs'
       - 'orbit360-platform/runtime-gate-crm-v20260716/macro2-run-observer-rootcause-v20260822.json'
       - 'orbit360-platform/runtime-gate-crm-v20260716/macro2-bundle-identity-metacontract-rootcause-v20260822.json'
+      - 'orbit360-platform/runtime-gate-crm-v20260716/macro2-execution-receipt-observer-rootcause-v20260822.json'
 
 permissions:
   contents: write
   actions: read
   issues: write
+  pull-requests: write
 
 concurrency:
   group: orbit360-continuity-canonical-ays
@@ -68,6 +70,7 @@ jobs:
         with:
           ref: ${{ github.sha }}
           fetch-depth: 0
+
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -93,21 +96,24 @@ jobs:
 
       - id: receipt_start
         if: steps.activation_probe.outputs.mode == 'FINALIZE_SOURCE_ONLY'
-        name: Publish sanitized finalization start receipt before validators
+        name: Publish non-blocking sanitized finalization start receipt
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
           BODY="ORBIT360_MACRO2_FINALIZE_START runId=${GITHUB_RUN_ID} triggerSha=${GITHUB_SHA} event=${GITHUB_EVENT_NAME} mode=FINALIZE_SOURCE_ONLY sourceOnly=true"
+          echo "$BODY" >> "$GITHUB_STEP_SUMMARY"
           jq -n --arg body "$BODY" '{body:$body}' > "$RUNNER_TEMP/macro2-start-receipt.json"
-          curl -L --fail --silent --show-error \
+          if ! curl -L --fail --silent --show-error \
             -X POST \
             -H "Authorization: Bearer $GH_TOKEN" \
             -H "Accept: application/vnd.github+json" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
             "https://api.github.com/repos/${GITHUB_REPOSITORY}/issues/5/comments" \
-            --data-binary @"$RUNNER_TEMP/macro2-start-receipt.json" >/dev/null
+            --data-binary @"$RUNNER_TEMP/macro2-start-receipt.json" >/dev/null; then
+            echo "PR_COMMENT_OBSERVER_NON_BLOCKING start-receipt unavailable; authoritative run/log evidence continues." >> "$GITHUB_STEP_SUMMARY"
+          fi
 
       - id: preflight
         if: steps.activation_probe.outputs.mode == 'FINALIZE_SOURCE_ONLY'
@@ -116,7 +122,7 @@ jobs:
         run: |
           set -euo pipefail
           node "$PREFLIGHT" | tee "$RUNNER_TEMP/macro2-pipeline-preflight.json"
-          jq -e '.ok==true and .status=="MACRO2_PIPELINE_PREFLIGHT_PASS" and .collapsedStateMachineValidated==true and .certifiedBundlesValidated==true and .bundleIdentityAuthority=="GZIP_SHA256_PLUS_RAW_SHA256" and .gitBlobIdentityAuthoritative==false and .runnersValidated==true and .staleVariantPathsAbsent==true and .actionsRegistrationHandshakeValidated==true and .runObserverRootCauseValidated==true and .executionReceiptObserverValidated==true and .observerIndependentOfFilteredCommitRunReader==true and .runtimeExecuted==false and .browserExecuted==false and .secretAccess==false and .firestoreRead==false and .writes==0 and .deployExecuted==false and .productionTouched==false' "$RUNNER_TEMP/macro2-pipeline-preflight.json" >/dev/null
+          jq -e '.ok==true and .status=="MACRO2_PIPELINE_PREFLIGHT_PASS" and .collapsedStateMachineValidated==true and .certifiedBundlesValidated==true and .bundleIdentityAuthority=="GZIP_SHA256_PLUS_RAW_SHA256" and .gitBlobIdentityAuthoritative==false and .runnersValidated==true and .staleVariantPathsAbsent==true and .actionsRegistrationHandshakeValidated==true and .runObserverRootCauseValidated==true and .executionReceiptObserverValidated==true and .nonBlockingExecutionObserverValidated==true and .observerIndependentOfFilteredCommitRunReader==true and .runtimeExecuted==false and .browserExecuted==false and .secretAccess==false and .firestoreRead==false and .writes==0 and .deployExecuted==false and .productionTouched==false' "$RUNNER_TEMP/macro2-pipeline-preflight.json" >/dev/null
 
       - name: Confirm inert IDLE
         if: steps.activation_probe.outputs.mode == 'IDLE'
@@ -128,18 +134,22 @@ jobs:
       - id: binding
         if: steps.activation_probe.outputs.mode == 'FINALIZE_SOURCE_ONLY'
         name: Materialize ephemeral compatible runner binding only
-        shell: bash
         env:
           ORBIT360_EVENT_BEFORE: ${{ github.event.before }}
+        shell: bash
         run: |
           set -euo pipefail
           test "$GITHUB_RUN_ATTEMPT" = '1'
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
           test "$(git rev-parse HEAD^)" = "$ORBIT360_EVENT_BEFORE"
           MACRO2_REQUEST='.macro2-finalize-binding.tmp.json'
-          node - "$MACRO2_REQUEST" "$ORBIT360_EVENT_BEFORE" <<'NODE'
+          node - "$MACRO2_REQUEST" "$ORBIT360_EVENT_BEFORE" "$POINTER" <<'NODE'
           const fs=require('fs');
-          const [p,ownerSafeHead]=process.argv.slice(2);
+          const [p,ownerSafeHead,pointerPath]=process.argv.slice(2);
+          const pointer=JSON.parse(fs.readFileSync(pointerPath,'utf8'));
+          const patchSets=Object.entries(pointer.certifiedBundles||{}).map(([name,v])=>({
+            name,gzipPath:v.path,gzipSha256:v.gzipSha256,sha256:v.rawSha256
+          }));
           const x={
             schemaVersion:'orbit360-macro2-source-recovery-request-v3r1c1',
             status:'PREFLIGHT_PASS_AWAITING_SOURCE_ONLY_ACTIVATION',
@@ -149,38 +159,22 @@ jobs:
             historical:false,
             replayAllowed:false,
             rootCauseResolved:true,
-            rootCauseResolution:'PRE_RUNNER_LOCAL_SCOPE_ASSIGNMENTS_REQUIRED',
-            registrationEvidencePath:'orbit360-platform/runtime-gate-crm-v20260716/macro2-v3-actions-push-registration-probe-v20260821.json',
-            preRunnerScopeEvidencePath:'orbit360-platform/runtime-gate-crm-v20260716/macro2-v3r1-pre-runner-same-step-env-failure-v20260821.json',
-            inertPreflightEvidencePath:'orbit360-platform/runtime-gate-crm-v20260716/macro2-v3r1c1-inert-preflight-pass-v20260821.json',
-            registrationRunId:32527157212,
-            registrationTriggerSha:'5da25bf227fbe7fab40eb83aeb2a93e9e4da9aee',
-            priorInertPreflightRunId:32529413424,
-            inertPreflightRunId:32530518960,
-            inertPreflightTriggerSha:'5f78fe5738d67916ca582b7ac3ea220a681e78e3',
-            inertPreflightPassed:true,
-            triggerMechanism:'WORKFLOW_FILE_SELF_REGISTERING_PUSH',
-            activationParentBinding:'GITHUB_EVENT_BEFORE_HEAD_PARENT',
-            expectedParentMode:'GITHUB_EVENT_BEFORE',
-            activationWorkflowTemplatePath:'.github/orbit360-workflow-templates/orbit360-continuity-canonical-source-only-v3r1c1-20260821.yml',
-            activationWorkflowTemplateSha256:'c2c58e8dd12922ffb6443558eaac290e2fdae33cddc2ca8bc5e4f7db6a7a57c4',
+            rootCauseResolution:'CANONICAL_COLLAPSED_FINALIZE_SOURCE_ONLY',
             ownerSafeHead,
             reopenedAfterStopRetry:true,
             rootCausePreflightRequired:true,
             durableSourceBeforeArtifactRequired:true,
             artifactDigestNormalizationRequired:true,
             artifactMetadataBeforePromotionRequired:true,
-            patchSets:[
-              {name:'product',gzipPath:'.github/orbit360-source-patches/macro2-v20260821/product.patch.gz',gzipSha256:'c7b932b2788a502ae07111d2e209d4b0cca0b844242bb1db80218b72fa4c6913',sha256:'6b3141493d69d2b25c581033460f5302498dd06dd8dfcad1245802390fafe540'},
-              {name:'tools',gzipPath:'.github/orbit360-source-patches/macro2-v20260821/tools.patch.gz',gzipSha256:'64bb3f11736ce39593b12a54350270f73730a10430d1ce6e543bebaee622ba46',sha256:'035c756cc2c14ae428a87231a8cc266762b92ebc1c67974d691bbb20ffd90f97'},
-              {name:'docs',gzipPath:'.github/orbit360-source-patches/macro2-v20260821/docs.patch.gz',gzipSha256:'4a6f77f7e35a89f0ef830e4b98fa8f4d1493e7973a4b91aa55ee5def78ed2167',sha256:'f5f679c113e6408981f111154e8d0fd34f515e82a70c2085d3f0f54515efa3c0'}
-            ],
+            patchSets,
             runnerScripts:[
-              {role:'pre',encoding:'plain',path:'.github/orbit360-source-patches/macro2-v20260821/macro2-v3r1-pre.sh',gitBlobSha:'5311a3a9b9bc645f420b232f31d9845ac5a6023b'},
-              {role:'post',encoding:'plain',path:'.github/orbit360-source-patches/macro2-v20260821/macro2-v3r1-post.sh',gitBlobSha:'c57f699b3e72f4aba856f359a09f227d7a25255a'}
+              {role:'pre',encoding:'plain',path:process.env.PRE_RUNNER,gitBlobSha:'5311a3a9b9bc645f420b232f31d9845ac5a6023b'},
+              {role:'post',encoding:'plain',path:process.env.POST_RUNNER,gitBlobSha:'c57f699b3e72f4aba856f359a09f227d7a25255a'}
             ],
-            runtime:false,browser:false,secrets:false,firestoreRead:false,writes:false,deploy:false,production:false,main:false,merge:false,containsPII:false,containsSecrets:false
+            runtime:false,browser:false,secrets:false,firestoreRead:false,writes:false,
+            deploy:false,production:false,main:false,merge:false,containsPII:false,containsSecrets:false
           };
+          if(patchSets.length!==3) throw new Error('PIPELINE_MECHANISM_FAILURE:EPHEMERAL_BINDING_PATCHSET_INVALID');
           fs.writeFileSync(p,JSON.stringify(x,null,2)+'\n');
           NODE
           printf '/%s\n' "$MACRO2_REQUEST" >> .git/info/exclude
@@ -239,7 +233,7 @@ jobs:
           rm -f "$MACRO2_REQUEST"
           test -z "$(git status --porcelain)"
 
-      - name: Publish sanitized finalization success receipt
+      - name: Publish non-blocking sanitized finalization success receipt
         if: success() && steps.activation_probe.outputs.mode == 'FINALIZE_SOURCE_ONLY'
         env:
           GH_TOKEN: ${{ github.token }}
@@ -248,20 +242,22 @@ jobs:
         run: |
           set -euo pipefail
           BODY="ORBIT360_MACRO2_FINALIZE_PASS runId=${GITHUB_RUN_ID} triggerSha=${GITHUB_SHA} sourceHead=${SOURCE_HEAD} artifactId=${ARTIFACT_ID} progress=75 sourceOnly=true"
+          echo "$BODY" >> "$GITHUB_STEP_SUMMARY"
           jq -n --arg body "$BODY" '{body:$body}' > "$RUNNER_TEMP/macro2-pass-receipt.json"
-          curl -L --fail --silent --show-error \
+          if ! curl -L --fail --silent --show-error \
             -X POST \
             -H "Authorization: Bearer $GH_TOKEN" \
             -H "Accept: application/vnd.github+json" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
             "https://api.github.com/repos/${GITHUB_REPOSITORY}/issues/5/comments" \
-            --data-binary @"$RUNNER_TEMP/macro2-pass-receipt.json" >/dev/null
+            --data-binary @"$RUNNER_TEMP/macro2-pass-receipt.json" >/dev/null; then
+            echo "PR_COMMENT_OBSERVER_NON_BLOCKING pass-receipt unavailable; authoritative run/log evidence preserved." >> "$GITHUB_STEP_SUMMARY"
+          fi
 
       - name: Seal a single terminal failure and return pointer to IDLE
         if: failure() && steps.activation_probe.outputs.mode == 'FINALIZE_SOURCE_ONLY'
         env:
           GH_TOKEN: ${{ github.token }}
-          RECEIPT_OUTCOME: ${{ steps.receipt_start.outcome }}
           PREFLIGHT_OUTCOME: ${{ steps.preflight.outcome }}
           PRE_OUTCOME: ${{ steps.pre.outcome }}
           CANDIDATE_OUTCOME: ${{ steps.candidate.outcome }}
@@ -273,9 +269,9 @@ jobs:
           git fetch origin "$ORBIT360_BRANCH"
           git reset --hard "origin/$ORBIT360_BRANCH"
           git clean -fd
-          node - "$POINTER" "$GITHUB_RUN_ID" "$RECEIPT_OUTCOME" "$PREFLIGHT_OUTCOME" "$PRE_OUTCOME" "$CANDIDATE_OUTCOME" "$POST_OUTCOME" <<'NODE'
-          const fs=require('fs');const [p,runId,receipt,preflight,pre,candidate,post]=process.argv.slice(2);const x=JSON.parse(fs.readFileSync(p,'utf8'));
-          const stage=receipt!=='success'?'EXECUTION_RECEIPT':preflight!=='success'?'PREFLIGHT':pre!=='success'?'SOURCE_ACCEPTANCE_OR_BUILD':candidate!=='success'?'ARTIFACT_UPLOAD':post!=='success'?'METADATA_OR_PROMOTION':'UNKNOWN';
+          node - "$POINTER" "$GITHUB_RUN_ID" "$PREFLIGHT_OUTCOME" "$PRE_OUTCOME" "$CANDIDATE_OUTCOME" "$POST_OUTCOME" <<'NODE'
+          const fs=require('fs');const [p,runId,preflight,pre,candidate,post]=process.argv.slice(2);const x=JSON.parse(fs.readFileSync(p,'utf8'));
+          const stage=preflight!=='success'?'PREFLIGHT':pre!=='success'?'SOURCE_ACCEPTANCE_OR_BUILD':candidate!=='success'?'ARTIFACT_UPLOAD':post!=='success'?'METADATA_OR_PROMOTION':'UNKNOWN';
           x.status='IDLE';x.mode='IDLE';x.activeRequestPath=null;x.activationNonce=null;x.allowedExecutions=0;x.consumed=true;x.replayAllowed=false;x.reopenAllowed=false;
           x.lastTerminal={status:'FINALIZE_SOURCE_ONLY_TERMINAL_FAIL',classification:'PIPELINE_MECHANISM_FAILURE',failureStage:stage,runId:Number(runId),automaticRetry:false};
           x.rootCauseResolution='FINALIZE_SOURCE_ONLY_TERMINAL_FAIL_NO_VARIANT_OPENED';
@@ -291,14 +287,17 @@ jobs:
           test "$(git rev-parse origin/$ORBIT360_BRANCH)" = "$EXPECTED"
           git push origin "HEAD:$ORBIT360_BRANCH"
           BODY="ORBIT360_MACRO2_FINALIZE_TERMINAL_FAIL runId=${GITHUB_RUN_ID} triggerSha=${GITHUB_SHA} stage=${STAGE} automaticRetry=false sourceOnly=true"
+          echo "$BODY" >> "$GITHUB_STEP_SUMMARY"
           jq -n --arg body "$BODY" '{body:$body}' > "$RUNNER_TEMP/macro2-fail-receipt.json"
-          curl -L --fail --silent --show-error \
+          if ! curl -L --fail --silent --show-error \
             -X POST \
             -H "Authorization: Bearer $GH_TOKEN" \
             -H "Accept: application/vnd.github+json" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
             "https://api.github.com/repos/${GITHUB_REPOSITORY}/issues/5/comments" \
-            --data-binary @"$RUNNER_TEMP/macro2-fail-receipt.json" >/dev/null
+            --data-binary @"$RUNNER_TEMP/macro2-fail-receipt.json" >/dev/null; then
+            echo "PR_COMMENT_OBSERVER_NON_BLOCKING terminal-receipt unavailable; terminal already persisted." >> "$GITHUB_STEP_SUMMARY"
+          fi
           exit 41
 
       - name: Upload sanitized Macro-2 finalization evidence
