@@ -6,6 +6,8 @@ window.Orbit = window.Orbit || {};
 Orbit.q = (function () {
   const S = () => Orbit.store;
   const U = Orbit.ui;
+  const finite = v => U.finiteNumber ? U.finiteNumber(v) : (Number.isFinite(Number(v)) ? Number(v) : null);
+  const amount = v => { const n = finite(v); return n == null ? 0 : n; };
 
   function asesor(id) { return S().get('asesores', id); }
   function aseguradora(id) { return S().get('aseguradoras', id); }
@@ -28,11 +30,11 @@ Orbit.q = (function () {
     const cob = cobrosDe(cliId);
     const com = comisionesDe(cliId);
     const vigentes = pol.filter(p => p.estado === 'Vigente' || p.estado === 'Por renovar');
-    const primaAnual = vigentes.reduce((s, p) => s + p.prima, 0);
-    const cobrado = cob.filter(c => c.estado === 'Pagado').reduce((s, c) => s + c.monto, 0);
-    const pendiente = cob.filter(c => c.estado === 'Pendiente').reduce((s, c) => s + c.monto, 0);
-    const vencido = cob.filter(c => c.estado === 'Vencido').reduce((s, c) => s + c.monto, 0);
-    const comisionGen = com.reduce((s, c) => s + c.monto, 0);
+    const primaAnual = vigentes.reduce((s, p) => s + amount(p.prima), 0);
+    const cobrado = cob.filter(c => c.estado === 'Pagado').reduce((s, c) => s + amount(c.monto), 0);
+    const pendiente = cob.filter(c => c.estado === 'Pendiente').reduce((s, c) => s + amount(c.monto), 0);
+    const vencido = cob.filter(c => c.estado === 'Vencido').reduce((s, c) => s + amount(c.monto), 0);
+    const comisionGen = com.reduce((s, c) => s + amount(c.monto), 0);
     const porRenovar = pol.filter(p => p.estado === 'Por renovar').length;
     // salud del cliente 0-100
     let salud = 70;
@@ -78,11 +80,11 @@ Orbit.q = (function () {
       const cob = cobByClient.get(cli.id) || [];
       const com = comByClient.get(cli.id) || [];
       const vigentes = pol.filter(p => p.estado === 'Vigente' || p.estado === 'Por renovar');
-      const primaAnual = vigentes.reduce((s, p) => s + p.prima, 0);
-      const cobrado = cob.filter(c => c.estado === 'Pagado').reduce((s, c) => s + c.monto, 0);
-      const pendiente = cob.filter(c => c.estado === 'Pendiente').reduce((s, c) => s + c.monto, 0);
-      const vencido = cob.filter(c => c.estado === 'Vencido').reduce((s, c) => s + c.monto, 0);
-      const comisionGen = com.reduce((s, c) => s + c.monto, 0);
+      const primaAnual = vigentes.reduce((s, p) => s + amount(p.prima), 0);
+      const cobrado = cob.filter(c => c.estado === 'Pagado').reduce((s, c) => s + amount(c.monto), 0);
+      const pendiente = cob.filter(c => c.estado === 'Pendiente').reduce((s, c) => s + amount(c.monto), 0);
+      const vencido = cob.filter(c => c.estado === 'Vencido').reduce((s, c) => s + amount(c.monto), 0);
+      const comisionGen = com.reduce((s, c) => s + amount(c.monto), 0);
       const porRenovar = pol.filter(p => p.estado === 'Por renovar').length;
       let salud = 70;
       salud += Math.min(20, vigentes.length * 6);
@@ -106,7 +108,7 @@ Orbit.q = (function () {
   const TC_COP_GTQ = 1000; // tasa de referencia declarada para vistas mixtas
   function paisActivo() { const p = Orbit.pais; return (p && p !== 'TODOS') ? p : null; }
   function monedaPais() { const p = paisActivo(); return p === 'CO' ? 'COP' : 'GTQ'; }
-  const norm = (m, cur) => { if (paisActivo()) return m; return cur === 'COP' ? m / TC_COP_GTQ : m; };
+  const norm = (m, cur) => { const n = finite(m); if (n == null) return 0; if (paisActivo()) return n; return cur === 'COP' ? n / TC_COP_GTQ : n; };
   function clientIndex() { return new Map((S().all('clientes') || []).filter(c => c && c.id).map(c => [c.id, c])); }
   function cobPais(c, clients) { const cli = clients instanceof Map ? clients.get(c.clienteId) : S().get('clientes', c.clienteId); const p = paisActivo(); return !p || (cli && cli.pais === p); }
   function polPais(p2, clients) { const cli = clients instanceof Map ? clients.get(p2.clienteId) : S().get('clientes', p2.clienteId); const p = paisActivo(); return !p || (cli && cli.pais === p); }

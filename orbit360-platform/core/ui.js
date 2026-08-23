@@ -26,20 +26,34 @@ Orbit.ui = (function () {
   function monthKey() { return NOW.getFullYear() + '-' + String(NOW.getMonth() + 1).padStart(2, '0'); }
   function monthProgressPct() { const dim = new Date(NOW.getFullYear(), NOW.getMonth() + 1, 0).getDate(); return NOW.getDate() / dim; }
 
+  function finiteNumber(value) {
+    if (value == null || value === '') return null;
+    const n = typeof value === 'number' ? value : Number(value);
+    return Number.isFinite(n) ? n : null;
+  }
+  function text(value, fallback) {
+    const fb = fallback == null ? '—' : String(fallback);
+    if (value == null) return fb;
+    const out = String(value).trim();
+    if (!out || /^(undefined|nan|infinity|-infinity|invalid date)$/i.test(out)) return fb;
+    return out;
+  }
   function money(n, cur) {
-    if (n == null) return '—';
+    const num = finiteNumber(n);
+    if (num == null) return '—';
     const sym = cur === 'COP' ? '$' : cur === 'USD' ? 'US$' : 'Q';
-    const v = Math.round(n);
+    const v = Math.round(num);
     return sym + ' ' + v.toLocaleString('es-GT');
   }
   function moneyShort(n, cur) {
-    if (n == null) return '—';
+    const num = finiteNumber(n);
+    if (num == null) return '—';
     const sym = cur === 'COP' ? '$' : cur === 'USD' ? 'US$' : 'Q';
-    const a = Math.abs(n);
-    if (a >= 1e9) return sym + (n / 1e9).toFixed(1) + 'B';
-    if (a >= 1e6) return sym + (n / 1e6).toFixed(1) + 'M';
-    if (a >= 1e3) return sym + (n / 1e3).toFixed(0) + 'K';
-    return sym + Math.round(n);
+    const a = Math.abs(num);
+    if (a >= 1e9) return sym + (num / 1e9).toFixed(1) + 'B';
+    if (a >= 1e6) return sym + (num / 1e6).toFixed(1) + 'M';
+    if (a >= 1e3) return sym + (num / 1e3).toFixed(0) + 'K';
+    return sym + Math.round(num);
   }
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -49,12 +63,15 @@ Orbit.ui = (function () {
   }
   function fmtDate(iso) {
     if (!iso) return '—';
-    const d = new Date(iso + 'T00:00:00');
-    return d.toLocaleDateString('es-GT', { day: '2-digit', month: 'short', year: 'numeric' });
+    const raw = iso instanceof Date ? iso : new Date(String(iso).length <= 10 ? String(iso) + 'T00:00:00' : iso);
+    if (!(raw instanceof Date) || !Number.isFinite(raw.getTime())) return '—';
+    return raw.toLocaleDateString('es-GT', { day: '2-digit', month: 'short', year: 'numeric' });
   }
   function daysFromNow(iso) {
     if (!iso) return null;
-    return Math.round((new Date(iso + 'T00:00:00') - NOW) / 86400000);
+    const d = iso instanceof Date ? iso : new Date(String(iso).length <= 10 ? String(iso) + 'T00:00:00' : iso);
+    if (!(d instanceof Date) || !Number.isFinite(d.getTime())) return null;
+    return Math.round((d - NOW) / 86400000);
   }
   function ago(iso) {
     const d = -daysFromNow(iso);
@@ -87,7 +104,7 @@ Orbit.ui = (function () {
       'Próxima': 'info'
     };
     const cls = map[estado] || 'neutral';
-    return `<span class="badge ${cls}">${esc(estado)}</span>`;
+    return `<span class="badge ${cls}">${esc(text(estado, 'Sin estado'))}</span>`;
   }
   /* ---- Modales Orbit (reemplazo de alert/confirm/prompt nativos) ---- */
   function _overlay() {
@@ -151,5 +168,5 @@ Orbit.ui = (function () {
     });
   }
 
-  return { NOW, now, monthLabel, monthKey, monthProgressPct, money, moneyShort, esc, initials, fmtDate, daysFromNow, ago, avatar, shade, estadoBadge, toast, alert: alertm, confirm: confirmm, prompt: promptm, today };
+  return { NOW, now, monthLabel, monthKey, monthProgressPct, finiteNumber, text, money, moneyShort, esc, initials, fmtDate, daysFromNow, ago, avatar, shade, estadoBadge, toast, alert: alertm, confirm: confirmm, prompt: promptm, today };
 })();

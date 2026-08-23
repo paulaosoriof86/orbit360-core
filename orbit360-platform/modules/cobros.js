@@ -46,12 +46,12 @@ Orbit.modules.cobros = (function () {
     if (c.requiereValidacion) return 'Requiere validación';
     if (c.estado === 'Bloqueado') return 'Bloqueado';
     if (c.reportado && (c.estado === 'Pendiente' || c.estado === 'Vencido')) return c.enRevision ? 'En revisión' : 'Reportado por cliente';
-    return c.estado;
+    return U.text(c.estado, 'Sin estado');
   }
   function badgeValidacion(c) {
     const e = estadoValidacion(c);
     const tone = e === 'Conciliado' ? 'ok' : /Pagado/.test(e) ? 'ok' : e === 'Validada (por aplicar)' ? 'ok' : e === 'Reportado por cliente' ? 'info' : e === 'En revisión' ? 'info' : e === 'Requiere validación' ? 'warn' : e === 'Bloqueado' ? 'danger' : e === 'Vencido' ? 'danger' : 'warn';
-    return '<span class="badge ' + tone + '">' + e + '</span>';
+    return '<span class="badge ' + tone + '">' + U.esc(U.text(e, 'Sin estado')) + '</span>';
   }
   function render(host) {
     const cart = q.carteraGlobal();
@@ -93,8 +93,8 @@ Orbit.modules.cobros = (function () {
             const aplicable = c.estado === 'Pendiente' || c.estado === 'Vencido';
             return `<tr class="clickable" onclick="Orbit.modules.cobros.detalle('${c.id}')">
               <td>${K.clienteCell(c.clienteId)}</td>
-              <td>${p ? `<a class="mono" style="font-size:12px;color:var(--red);cursor:pointer" title="Ver póliza" onclick="event.stopPropagation();Orbit.modules.cliente360.verPoliza('${p.id}')">${p.numero}</a>` : '<span class="mono" style="font-size:12px">—</span>'}</td>
-              <td>${c.cuota}</td>
+              <td>${p ? `<a class="mono" style="font-size:12px;color:var(--red);cursor:pointer" title="Ver póliza" onclick="event.stopPropagation();Orbit.modules.cliente360.verPoliza('${p.id}')">${U.esc(U.text(p.numero))}</a>` : '<span class="mono" style="font-size:12px">—</span>'}</td>
+              <td>${U.esc(U.text(c.cuota))}</td>
               <td class="num">${U.money(c.monto, c.moneda)}</td>
               <td style="font-size:12.5px">${U.fmtDate(c.vence)}</td>
               <td style="font-size:12.5px">${c.fechaPago ? U.fmtDate(c.fechaPago) : '<span class="muted">—</span>'}</td>
@@ -125,9 +125,9 @@ Orbit.modules.cobros = (function () {
     const vr = (l, v) => `<div class="vp-row"><span class="vp-l">${l}</span><span class="vp-v">${v}</span></div>`;
     back.innerHTML = `<div class="card" style="width:min(560px,95vw);max-height:92vh;overflow:auto;padding:0">
       <div style="padding:18px 20px;background:linear-gradient(120deg,var(--graph),#10141a);display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
-        <div><div class="crumb" style="margin-bottom:4px;color:rgba(255,255,255,.8)">${TT('recibo')} · cuota ${c.cuota}</div>
+        <div><div class="crumb" style="margin-bottom:4px;color:rgba(255,255,255,.8)">${U.esc(U.text(TT('recibo'), 'Recibo'))} · cuota ${U.esc(U.text(c.cuota))}</div>
           <b style="font-family:var(--f-display);font-size:18px;color:#fff">REC-${c.id.slice(-5).toUpperCase()}</b>
-          <div class="mono" style="font-size:12.5px;margin-top:3px;color:rgba(255,255,255,.85)">${cli ? U.esc(cli.nombre) : '—'} · ${p ? p.numero : '—'}</div></div>
+          <div class="mono" style="font-size:12.5px;margin-top:3px;color:rgba(255,255,255,.85)">${cli ? U.esc(cli.nombre) : '—'} · ${p ? U.esc(U.text(p.numero)) : '—'}</div></div>
         <button class="imp-x" id="cd-x" style="background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.3);color:#fff">✕</button>
       </div>
       <div style="padding:18px 20px;display:grid;gap:16px">
@@ -224,7 +224,7 @@ Orbit.modules.cobros = (function () {
     pm.innerHTML = `<div class="card" style="width:min(460px,94vw);padding:0">
       <div style="padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center"><b style="font-family:var(--f-display);font-size:16px">🔎 Validar pago reportado</b><button class="imp-x" id="cv-x">✕</button></div>
       <div style="padding:18px 20px;display:grid;gap:12px">
-        <div class="cfg-note">El cliente <b>${U.esc(cli.nombre || '')}</b> reportó este pago (cuota ${c.cuota}, ${U.money(c.monto, c.moneda)}) el ${U.fmtDate(c.reportado)}. ${c.soporteNombre ? 'Soporte: <b>' + U.esc(c.soporteNombre) + '</b>.' : 'Sin soporte adjunto.'} Revisa contra el estado de cuenta antes de aplicar.</div>
+        <div class="cfg-note">El cliente <b>${U.esc(cli.nombre || '')}</b> reportó este pago (cuota ${U.esc(U.text(c.cuota, '—'))}, ${U.money(c.monto, c.moneda)}) el ${U.fmtDate(c.reportado)}. ${c.soporteNombre ? 'Soporte: <b>' + U.esc(c.soporteNombre) + '</b>.' : 'Sin soporte adjunto.'} Revisa contra el estado de cuenta antes de aplicar.</div>
         ${c.notaReporte ? `<div style="font-size:12.5px"><b>Nota del cliente:</b> ${U.esc(c.notaReporte)}</div>` : ''}
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <button class="btn ghost sm" id="cv-rev">◷ Marcar en revisión</button>
@@ -318,7 +318,7 @@ Orbit.modules.cobros = (function () {
         const cli = S().get('clientes', c.clienteId), p = S().get('polizas', c.polizaId), d = U.daysFromNow(c.vence);
         return `<label class="lote-row ${incl.has(c.id) ? '' : 'off'}">
           <input type="checkbox" data-lo="${c.id}" ${incl.has(c.id) ? 'checked' : ''}>
-          <span style="flex:1;min-width:0"><b>${cli ? U.esc(cli.nombre) : '—'}</b> <span class="muted" style="font-size:11.5px">· ${p ? p.numero : ''} · ${c.cuota}</span><br><span class="muted" style="font-size:11px">${d < 0 ? 'venció hace ' + (-d) + 'd' : 'vence en ' + d + 'd'}</span></span>
+          <span style="flex:1;min-width:0"><b>${cli ? U.esc(cli.nombre) : '—'}</b> <span class="muted" style="font-size:11.5px">· ${p ? U.esc(U.text(p.numero, '—')) : '—'} · ${U.esc(U.text(c.cuota, '—'))}</span><br><span class="muted" style="font-size:11px">${d == null ? 'Vencimiento pendiente' : d < 0 ? 'venció hace ' + (-d) + 'd' : 'vence en ' + d + 'd'}</span></span>
           <span class="mono">${U.money(c.monto, c.moneda)}</span></label>`;
       }).join('') || '<div class="muted" style="padding:18px;text-align:center">Sin recibos pendientes.</div>';
       back.querySelector('#lo-tot').textContent = U.money(tot, Orbit.q.monedaPais());

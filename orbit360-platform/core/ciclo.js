@@ -162,7 +162,7 @@ Orbit.ciclo = (function () {
   function metricasLeads() {
     const ng = negocios().filter(n => n.etapa !== 'perdido');
     const tot = ng.reduce((s, n) => s + q.norm(n.primaEst, n.moneda), 0);
-    const pond = ng.reduce((s, n) => s + q.norm(n.primaEst, n.moneda) * n.prob / 100, 0);
+    const pond = ng.reduce((s, n) => { const prob = U.finiteNumber(n.prob); return s + q.norm(n.primaEst, n.moneda) * (prob == null ? 0 : prob) / 100; }, 0);
     const ganados = negocios({ incArchivado: true }).filter(n => n.etapa === 'emitido').length;
     return { activos: ng.length, tot, pond, ganados };
   }
@@ -171,27 +171,27 @@ Orbit.ciclo = (function () {
   function cardNegocio(n, opts) {
     opts = opts || {};
     const ase = q.asesor(n.asesorId), ei = etapaInfo(n.etapa);
-    const d = U.daysFromNow(n.proximoToque);
+    const d = U.daysFromNow(n.proximoToque), prob = U.finiteNumber(n.prob);
     const done = (n.checklist || []).filter(c => c.done).length, tot = (n.checklist || []).length;
     const pr = { Alta: 'danger', Media: 'warn', Baja: 'neutral' }[n.prioridad] || 'neutral';
     const espejo = opts.espejo;
     return `<div class="kcard ${espejo ? 'kcard-espejo' : ''}" data-neg="${n.id}">
       <div class="kcard-top">
-        <span class="badge ${pr}">${n.prioridad}</span>
-        <span class="badge neutral">${n.ramo}</span>
-        <span class="kflag" title="${n.pais}">${flag(n.pais)}</span>
-        ${opts.board === 'ops' && n.origen ? `<span class="badge info" title="Ingreso por ${n.origen}">${n.origen === 'Leads' ? '🎯' : n.origen === 'Solicitud del cliente' ? '🙋' : '🗂'} ${n.origen}</span>` : ''}
+        <span class="badge ${pr}">${U.esc(U.text(n.prioridad, 'Sin prioridad'))}</span>
+        <span class="badge neutral">${U.esc(U.text(n.ramo, 'Sin ramo'))}</span>
+        <span class="kflag" title="${U.esc(U.text(n.pais, 'Sin país'))}">${flag(n.pais)}</span>
+        ${opts.board === 'ops' && n.origen ? `<span class="badge info" title="Ingreso por ${n.origen}">${n.origen === 'Leads' ? '🎯' : n.origen === 'Solicitud del cliente' ? '🙋' : '🗂'} ${U.esc(U.text(n.origen, 'Sin origen'))}</span>` : ''}
         ${espejo ? `<span class="kmirror" title="Gestión operativa en curso por el equipo">🔗 en Ops</span>` : ''}
         ${n.cadenciaActiva ? `<span class="badge ok" title="Cadencia automática activa">🔁</span>` : ''}
       </div>
       <div class="kcard-t">${U.esc(n.nombre)}</div>
       <div class="kcard-cli">${U.esc(n.producto)} · <span class="mono">${primaShort(n)}</span></div>
-      <div class="kcard-meta"><span class="dot-s" style="background:${ei.color}"></span>${ei.emoji} ${ei.label} · ${n.prob}%</div>
+      <div class="kcard-meta"><span class="dot-s" style="background:${ei.color}"></span>${ei.emoji} ${U.esc(U.text(ei.label, 'Sin etapa'))} · ${prob == null ? '—' : prob + '%'}</div>
       ${n.cadenciaActiva && !espejo ? `<div class="kcad">🔁 ${U.esc(n.cadencia || 'Cadencia activa')}</div>` : ''}
       <div class="kcard-foot">
         <span title="${U.esc(ase ? ase.nombre : '')}">${U.avatar(ase ? ase.nombre : '?', ase ? ase.color : '#999', 'sm')}</span>
         ${tot ? `<span class="kchk">✓ ${done}/${tot}</span>` : ''}
-        <span class="kvence ${d < 0 ? 'over' : ''}" title="Próximo toque">${d < 0 ? (-d) + 'd' : 'en ' + d + 'd'}</span>
+        <span class="kvence ${d < 0 ? 'over' : ''}" title="Próximo toque">${d == null ? '—' : d < 0 ? (-d) + 'd' : 'en ' + d + 'd'}</span>
       </div>
     </div>`;
   }
@@ -202,14 +202,14 @@ Orbit.ciclo = (function () {
     const pr = { Alta: 'danger', Media: 'warn', Baja: 'neutral' }[g.prioridad] || 'neutral';
     const est = { 'Pendiente': 'warn', 'En proceso': 'info', 'Resuelta': 'ok' }[g.estado] || 'neutral';
     return `<div class="kcard" data-ges="${g.id}">
-      <div class="kcard-top"><span class="badge ${pr}">${g.prioridad}</span><span class="badge ${est}">${g.estado}</span></div>
+      <div class="kcard-top"><span class="badge ${pr}">${U.esc(U.text(g.prioridad, 'Sin prioridad'))}</span><span class="badge ${est}">${U.esc(U.text(g.estado, 'Sin estado'))}</span></div>
       <div class="kcard-t">${U.esc(g.titulo || g.tipo)}</div>
       <div class="kcard-cli">${cli ? U.esc(cli.nombre) : '<span class="muted">Sin cliente</span>'}</div>
       <div class="kcard-meta"><span class="dot-s" style="background:${asg ? asg.color : '#999'}"></span>${asg ? U.esc(asg.nombre) : '—'}</div>
       <div class="kcard-foot">
         <span title="${U.esc(ase ? ase.nombre : '')}">${U.avatar(ase ? ase.nombre : '?', ase ? ase.color : '#999', 'sm')}</span>
         ${tot ? `<span class="kchk">✓ ${done}/${tot}</span>` : ''}
-        <span class="kvence ${d < 0 ? 'over' : ''}">${d < 0 ? (-d) + 'd' : d + 'd'}</span>
+        <span class="kvence ${d < 0 ? 'over' : ''}">${d == null ? '—' : d < 0 ? (-d) + 'd' : d + 'd'}</span>
       </div>
     </div>`;
   }
@@ -235,7 +235,7 @@ Orbit.ciclo = (function () {
   /* ===================== ficha de NEGOCIO (rediseñada) ===================== */
   function openNegocio(id) {
     const n = S().get('negocios', id); if (!n) return;
-    const ase = q.asesor(n.asesorId), asg = q.aseguradora(n.aseguradoraId), ei = etapaInfo(n.etapa);
+    const ase = q.asesor(n.asesorId), asg = q.aseguradora(n.aseguradoraId), ei = etapaInfo(n.etapa), prob = U.finiteNumber(n.prob);
     const asesores = S().all('asesores'), asgs = S().all('aseguradoras');
     const enOps = !!ei.ops;
     // stepper
@@ -252,7 +252,7 @@ Orbit.ciclo = (function () {
         <div>
           <div class="ciclo-eyebrow">Negocio · ciclo comercial</div>
           <h2>${ei.emoji} ${U.esc(n.nombre)}</h2>
-          <div class="ciclo-sub">${U.esc(n.producto)} · ${n.ramo} · ${primaShort(n)} · ${n.prob}% prob.</div>
+          <div class="ciclo-sub">${U.esc(U.text(n.producto, 'Producto pendiente'))} · ${U.esc(U.text(n.ramo, 'Ramo pendiente'))} · ${primaShort(n)} · ${prob == null ? '—' : prob + '%'} prob.</div>
         </div>
         <div class="ciclo-h-act">
           <span class="ciclo-syncbadge">${enOps ? '🗂 Visible en Ops · ' + ei.ops : '🎯 Solo en Leads'}</span>

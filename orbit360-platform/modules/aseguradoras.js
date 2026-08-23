@@ -328,17 +328,17 @@ Orbit.modules.aseguradoras = (function () {
     const estAcc = portales.length ? (portales.some(p => p.estadoAcceso === 'Acceso disponible') ? 'Acceso disponible' : portales.some(p => p.estadoAcceso === 'Requiere actualización') ? 'Requiere actualización' : 'Pendiente de conexión segura') : 'Sin acceso registrado';
     const estDoc = (a.docs || []).length ? ((a.docs || []).length + ' documentos') : 'Sin documentos';
     const productos = (a.ramos || []).slice(0, 3);
-    const logo = a.logo ? `<span class="asg-dot" style="padding:0;overflow:hidden"><img src="${a.logo}" style="width:100%;height:100%;object-fit:contain"></span>` : `<span class="asg-dot" style="background:${a.color}">${U.esc(a.nombre[0])}</span>`;
+    const logo = a.logo ? `<span class="asg-dot" style="padding:0;overflow:hidden"><img src="${U.esc(a.logo)}" style="width:100%;height:100%;object-fit:contain"></span>` : `<span class="asg-dot" style="background:${U.esc(a.color || '#5a6472')}">${U.esc(U.text(a.nombre, 'A')[0])}</span>`;
     return `<div class="asg-card ${on ? '' : 'off'}" data-asg="${a.id}">
       <div class="asg-card-h">
         ${logo}
-        <div style="flex:1;min-width:0"><b>${U.esc(a.nombre)}</b><div class="muted" style="font-size:11.5px">${a.pais} · ${(a.ramos || []).length} ramos · ${nPol} pólizas</div></div>
+        <div style="flex:1;min-width:0"><b>${U.esc(a.nombre)}</b><div class="muted" style="font-size:11.5px">${U.esc(U.text(a.pais, 'País pendiente'))} · ${(a.ramos || []).length} ramos · ${nPol} pólizas</div></div>
         <label class="asg-switch" title="Vinculación" onclick="event.stopPropagation()"><input type="checkbox" data-toggle="${a.id}" ${on ? 'checked' : ''} ${canEdit() ? '' : 'disabled'}><span></span></label>
       </div>
-      <div class="asg-card-tags">${productos.map(r => `<span class="badge neutral">${r}</span>`).join('')}</div>
+      <div class="asg-card-tags">${productos.map(r => `<span class="badge neutral">${U.esc(U.text(r, 'Ramo pendiente'))}</span>`).join('')}</div>
       <div style="font-size:11.5px;color:var(--ink-2);margin-top:8px;display:grid;gap:3px">
         <div>👤 ${contactoP ? U.esc(contactoP.nombre || contactoP.area) + (contactoP.tel ? ' · ' + U.esc(contactoP.tel) : '') : 'Sin contacto registrado'}</div>
-        <div>🔗 <span class="badge ${ACCESO_TONE[estAcc] || 'neutral'}" style="font-size:10.5px">${estAcc}</span> · 📎 ${estDoc}</div>
+        <div>🔗 <span class="badge ${ACCESO_TONE[estAcc] || 'neutral'}" style="font-size:10.5px">${U.esc(U.text(estAcc, 'Sin acceso registrado'))}</span> · 📎 ${U.esc(U.text(estDoc, 'Sin documentos'))}</div>
       </div>
       <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
         <button class="btn ghost sm" data-act="contactar" data-id="${a.id}">👤 Contactar</button>
@@ -918,18 +918,18 @@ Orbit.modules.aseguradoras = (function () {
     let title = '', rows = [];
     if (tipo === 'activas') {
       title = 'Aseguradoras activas';
-      rows = base.filter(a => a.vinculada !== false).map(a => ({ a, detalle: `${a.pais} · ${(a.ramos || []).length} ramos` }));
+      rows = base.filter(a => a.vinculada !== false).map(a => ({ a, detalle: `${U.esc(U.text(a.pais, 'País pendiente'))} · ${(a.ramos || []).length} ramos` }));
     } else if (tipo === 'contacto') {
       title = 'Con contacto principal';
       rows = base.map(a => { const c = (a.contactos || []).find(x => x.principal); return { a, detalle: c ? `👤 ${U.esc(c.nombre || c.area)}` : '⚠ Sin contacto principal — requiere asignar', falta: !c }; });
       rows.sort((x, y) => (x.falta === y.falta) ? 0 : (x.falta ? -1 : 1));
     } else if (tipo === 'acceso') {
       title = 'Con acceso disponible';
-      base.forEach(a => (a.portales || []).forEach(p => rows.push({ a, detalle: `${U.esc(p.nombre || 'Plataforma')} · <span class="badge ${ACCESO_TONE[p.estadoAcceso] || 'neutral'}" style="font-size:10.5px">${p.estadoAcceso || 'Sin registrar'}</span> · última verificación: ${p.ultimaVerificacion || 'sin registrar'}` })));
+      base.forEach(a => (a.portales || []).forEach(p => rows.push({ a, detalle: `${U.esc(p.nombre || 'Plataforma')} · <span class="badge ${ACCESO_TONE[p.estadoAcceso] || 'neutral'}" style="font-size:10.5px">${U.esc(U.text(p.estadoAcceso, 'Sin registrar'))}</span> · última verificación: ${U.esc(U.text(p.ultimaVerificacion, 'sin registrar'))}` })));
       if (!rows.length) title += ' — sin plataformas registradas';
     } else if (tipo === 'docs') {
       title = 'Con documentación';
-      base.forEach(a => (a.docs || []).forEach(d => rows.push({ a, detalle: `${U.esc(d.nombre || d.tipo || 'Documento')} · ${d.tipo || ''} · v${d.version || '1'} · vigencia: ${d.vigencia || 'sin definir'} · ${d.estado || 'pendiente'}` })));
+      base.forEach(a => (a.docs || []).forEach(d => rows.push({ a, detalle: `${U.esc(d.nombre || d.tipo || 'Documento')} · ${U.esc(U.text(d.tipo, 'Documento'))} · v${U.esc(U.text(d.version, '1'))} · vigencia: ${U.esc(U.text(d.vigencia, 'sin definir'))} · ${U.esc(U.text(d.estado, 'pendiente'))}` })));
     } else if (tipo === 'pend') {
       title = 'Requieren actualización';
       base.forEach(a => (a.portales || []).filter(p => p.estadoAcceso === 'Requiere actualización').forEach(p => rows.push({ a, detalle: `${U.esc(p.nombre || 'Plataforma')} · acción recomendada: reverificar acceso y actualizar credencial` })));

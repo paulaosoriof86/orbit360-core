@@ -10,7 +10,9 @@ Orbit.modules.inicio = (function () {
   const U = Orbit.ui, q = Orbit.q;
 
   function dial(pct, label, val) {
-    const p = Math.min(100, pct);
+    const rawPct = U.finiteNumber(pct);
+    const p = rawPct == null ? 0 : Math.max(0, Math.min(100, rawPct));
+    pct = p;
     const deg = p * 3.6;
     return `<div style="display:flex;flex-direction:column;align-items:center;gap:8px">
       <div style="width:118px;height:118px;border-radius:50%;display:grid;place-items:center;
@@ -37,7 +39,7 @@ Orbit.modules.inicio = (function () {
     const mesKey = U.monthKey();
     const metasMes = (Orbit.store.all('metas') || []).filter(m => (m.mes || '') === mesKey);
     const gMeta = (tipo, def) => { const r = metasMes.find(m => m.tipo === tipo && !m.asesorId); return r && r.valor ? +r.valor : def; };
-    const metaEmpresa = Orbit.store.all('asesores').reduce((s, a) => s + (a.metaPrima || 0), 0) || Math.round(prima * 1.1);
+    const metaEmpresa = Orbit.store.all('asesores').reduce((s, a) => s + (U.finiteNumber(a.metaPrima) || 0), 0) || Math.round((U.finiteNumber(prima) || 0) * 1.1);
     const metaPrima = gMeta('prima', metaEmpresa), pctPrima = metaPrima ? Math.min(100, Math.round(prima / metaPrima * 100)) : 0;
     const recaudo = cart.alDia, metaRec = gMeta('recaudo', Math.round(metaPrima * 0.85)), pctRec = metaRec ? Math.min(100, Math.round(recaudo / metaRec * 100)) : 0;
     const diasMes = new Date(U.now().getFullYear(), U.now().getMonth() + 1, 0).getDate() - U.now().getDate();
@@ -124,7 +126,7 @@ Orbit.modules.inicio = (function () {
               return `<div class="clickable" onclick="location.hash='#/cliente360?c=${c.clienteId}'" style="display:flex;align-items:center;gap:10px;padding:9px 11px;background:var(--danger-soft);border-radius:var(--r-sm);cursor:pointer">
                 <span style="font-size:16px">⚠</span>
                 <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${U.esc(cli ? cli.nombre : '—')}</div>
-                <div class="muted" style="font-size:11.5px">cuota ${c.cuota} vencida · ${U.money(c.monto, c.moneda)}</div></div>
+                <div class="muted" style="font-size:11.5px">cuota ${U.esc(U.text(c.cuota))} vencida · ${U.money(c.monto, c.moneda)}</div></div>
               </div>`;
             }).join('')}
           </div>

@@ -247,30 +247,37 @@
     }
 
     function where(collection, fieldOrPredicate, opOrValue, maybeValue) {
-      var rows = all(collection);
-      if (typeof fieldOrPredicate === 'function') return rows.filter(fieldOrPredicate);
-      if (fieldOrPredicate && typeof fieldOrPredicate === 'object') {
-        return rows.filter(function (row) {
+      var source = cache[collection] || [];
+      var matches;
+      if (typeof fieldOrPredicate === 'function') matches = source.filter(fieldOrPredicate);
+      else if (fieldOrPredicate && typeof fieldOrPredicate === 'object') {
+        matches = source.filter(function (row) {
           return Object.keys(fieldOrPredicate).every(function (key) { return row[key] === fieldOrPredicate[key]; });
         });
+      } else {
+        var field = fieldOrPredicate;
+        var op = arguments.length >= 4 ? opOrValue : '==';
+        var value = arguments.length >= 4 ? maybeValue : opOrValue;
+        matches = source.filter(function (row) {
+          if (op === '==' || op === '=') return row[field] === value;
+          if (op === '!=') return row[field] !== value;
+          if (op === '>') return row[field] > value;
+          if (op === '>=') return row[field] >= value;
+          if (op === '<') return row[field] < value;
+          if (op === '<=') return row[field] <= value;
+          if (op === 'array-contains') return Array.isArray(row[field]) && row[field].indexOf(value) >= 0;
+          return false;
+        });
       }
-      var field = fieldOrPredicate;
-      var op = arguments.length >= 4 ? opOrValue : '==';
-      var value = arguments.length >= 4 ? maybeValue : opOrValue;
-      return rows.filter(function (row) {
-        if (op === '==' || op === '=') return row[field] === value;
-        if (op === '!=') return row[field] !== value;
-        if (op === '>') return row[field] > value;
-        if (op === '>=') return row[field] >= value;
-        if (op === '<') return row[field] < value;
-        if (op === '<=') return row[field] <= value;
-        if (op === 'array-contains') return Array.isArray(row[field]) && row[field].indexOf(value) >= 0;
-        return false;
-      });
+      return matches.map(clone);
     }
 
     function find(collection, predicate) {
-      return typeof predicate === 'function' ? (all(collection).find(predicate) || null) : (where(collection, predicate)[0] || null);
+      var source = cache[collection] || [];
+      var row = null;
+      if (typeof predicate === 'function') row = source.find(predicate) || null;
+      else if (predicate && typeof predicate === 'object') row = source.find(function (item) { return Object.keys(predicate).every(function (key) { return item[key] === predicate[key]; }); }) || null;
+      return row ? clone(row) : null;
     }
 
     function on(collection, callback) {

@@ -97,10 +97,12 @@
     }
     return '';
   }
-  function hasPolicies(client) {
+  function hasPolicies(client, context) {
     if (!client) return false;
-    if (typeof client.numPolizas === 'number') return client.numPolizas > 0;
-    try { return !!(Orbit.store && Orbit.store.where && Orbit.store.where('polizas', function (p) { return p.clienteId === client.id; }).length); }
+    if (Number.isFinite(Number(client.numPolizas))) return Number(client.numPolizas) > 0;
+    var clientId = clean(client.id);
+    if (context && context.policyClientIds instanceof Set) return context.policyClientIds.has(clientId);
+    try { return !!(Orbit.store && Orbit.store.find && Orbit.store.find('polizas', function (p) { return clean(p && p.clienteId) === clientId; })); }
     catch (error) { return false; }
   }
   function qualityAlerts(client) {
@@ -110,12 +112,12 @@
     if (Array.isArray(client.alertas)) return unique(client.alertas);
     return [];
   }
-  function operationalState(client) {
+  function operationalState(client, context) {
     var state = pick(client, ALIAS.estado);
     if (state) return state;
-    return hasPolicies(client) ? clean(client && client.estado) : 'pendiente_polizas';
+    return hasPolicies(client, context) ? (clean(client && client.estado) || 'pendiente_polizas') : 'pendiente_polizas';
   }
-  function project(client) {
+  function project(client, context) {
     if (!client || typeof client !== 'object') return client;
     var out = Object.assign({}, client);
     Object.keys(ALIAS).forEach(function (canon) {
@@ -129,7 +131,7 @@
     out.whatsapp = clean(out.whatsapp || out.telefono || out.contactoPrincipalTelefono);
     out.segmento = clean(out.segmento || 'Nuevo');
     out.canal = clean(out.canal || out.canalOrigen || 'Migración');
-    out.estado = operationalState(client);
+    out.estado = operationalState(client, context);
     out.estadoOperativo = clean(out.estadoOperativo || out.estado || 'pendiente_polizas');
     out.moneda = clean(out.moneda || (out.pais === 'CO' ? 'COP' : out.pais === 'GT' ? 'GTQ' : ''));
     out.etiquetas = unique(out.etiquetas || []);
@@ -164,9 +166,9 @@
       Array.isArray(row.alertasCalidad) ? row.alertasCalidad : '__MISSING_ALERTAS_ARRAY__'
     ]);
   }
-  function projectInPlace(row) {
+  function projectInPlace(row, context) {
     if (!row || typeof row !== 'object') return false;
-    var projected = project(row);
+    var projected = project(row, context);
     var before = signature(row);
     var after = signature(projected);
     if (before !== after || row.__canonicalViewProjection !== PROJECTION_MARKER) {
@@ -185,7 +187,10 @@
     var rows = [];
     var changed = 0;
     try { rows = Orbit.store && Orbit.store.all ? (Orbit.store.all('clientes') || []) : []; } catch (error) {}
-    rows.forEach(function (row) { if (projectInPlace(row)) changed += 1; });
+    var policyClientIds = new Set();
+    try { (Orbit.store && Orbit.store.all ? (Orbit.store.all('polizas') || []) : []).forEach(function (p) { var id = clean(p && p.clienteId); if (id) policyClientIds.add(id); }); } catch (error) {}
+    var context = { policyClientIds: policyClientIds };
+    rows.forEach(function (row) { if (projectInPlace(row, context)) changed += 1; });
     if (changed) {
       publishProjectionChange(changed);
       try { if (window.OrbitLabCanonicalViewSync && typeof OrbitLabCanonicalViewSync.schedule === 'function') OrbitLabCanonicalViewSync.schedule('clientes'); }

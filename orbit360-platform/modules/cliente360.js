@@ -98,9 +98,9 @@ Orbit.modules.cliente360 = (function () {
       const pol = policyByClient.get(c.id) || [];
       const cob = collectionByClient.get(c.id) || [];
       const vigentes = pol.filter(esRenovable);
-      const primaAnual = vigentes.reduce((s, p) => s + p.prima, 0);
-      const pendiente = cob.filter(x => x.estado === 'Pendiente').reduce((s, x) => s + x.monto, 0);
-      const vencido = cob.filter(x => x.estado === 'Vencido').reduce((s, x) => s + x.monto, 0);
+      const primaAnual = vigentes.reduce((s, p) => s + (U.finiteNumber(p.prima) || 0), 0);
+      const pendiente = cob.filter(x => x.estado === 'Pendiente').reduce((s, x) => s + (U.finiteNumber(x.monto) || 0), 0);
+      const vencido = cob.filter(x => x.estado === 'Vencido').reduce((s, x) => s + (U.finiteNumber(x.monto) || 0), 0);
       let salud = 70;
       salud += Math.min(20, vigentes.length * 6);
       salud -= vencido > 0 ? 25 : 0;
@@ -130,7 +130,7 @@ Orbit.modules.cliente360 = (function () {
               <td><div style="display:flex;align-items:center;gap:11px">
                 ${U.avatar(c.nombre, c.tipo === 'Empresa' ? '#1E2227' : '#C5162E', 'md')}
                 <div><div style="font-weight:700">${U.esc(c.nombre)}</div>
-                <div class="muted" style="font-size:11.5px">${c.tipo} · ${c.ciudad} · ${c.pais}</div></div>
+                <div class="muted" style="font-size:11.5px">${U.esc(U.text(c.tipo, 'Pendiente de completar'))} · ${U.esc(U.text(c.ciudad, 'Pendiente de completar'))} · ${U.esc(U.text(c.pais, 'Pendiente de completar'))}</div></div>
               </div></td>
               <td><div style="display:flex;align-items:center;gap:7px"><span class="dot-s" style="background:${ase ? ase.color : '#999'}"></span>${U.esc(ase ? ase.nombre : '—')}</div></td>
               <td class="num">${r.nVigentes}<span class="muted">/${r.nPolizas}</span></td>
