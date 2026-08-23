@@ -12,10 +12,12 @@ const POINTER='.github/orbit360-requests/macro2-canonical-source-activation-poin
 const WORKFLOW='.github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml';
 const PRE_RUNNER='.github/orbit360-source-patches/macro2-v20260821/macro2-v3r1-pre.sh';
 const POST_RUNNER='.github/orbit360-source-patches/macro2-v20260821/macro2-v3r1-post.sh';
+const PROMOTE_TOOL='tools/orbit360-promote-macro2-transversal-candidate-v20260821.mjs';
 const PUSH_PROOF='orbit360-platform/runtime-gate-crm-v20260716/macro2-v3-actions-push-registration-probe-v20260821.json';
 const OBSERVER_ROOTCAUSE='orbit360-platform/runtime-gate-crm-v20260716/macro2-run-observer-rootcause-v20260822.json';
 const RECEIPT_ROOTCAUSE='orbit360-platform/runtime-gate-crm-v20260716/macro2-execution-receipt-observer-rootcause-v20260822.json';
 const SOURCE_ACCEPTANCE_OBSERVABILITY_ROOTCAUSE='orbit360-platform/runtime-gate-crm-v20260716/macro2-source-acceptance-observability-rootcause-v20260822.json';
+const PROMOTION_ROOTCAUSE='orbit360-platform/runtime-gate-crm-v20260716/macro2-promotion-ephemeral-binding-rootcause-v20260822.json';
 const FORBIDDEN_ACTIVE_PATHS=[
   '.github/orbit360-requests/macro2-transversal-source-recovery-v3r1c2-20260821.json',
   '.github/orbit360-requests/auc-macro2-transversal-source-v3r1c2-20260821.json',
@@ -34,7 +36,7 @@ const BUNDLES={
 };
 const RUNNERS={
   pre:{path:PRE_RUNNER,gitBlobSha:'0e248b63640d62a96fcf4b80837c8ab5a66d1978'},
-  post:{path:POST_RUNNER,gitBlobSha:'c57f699b3e72f4aba856f359a09f227d7a25255a'}
+  post:{path:POST_RUNNER,gitBlobSha:'2e536316d14422271ece9ec131889a6539dc6644'}
 };
 
 const failures=[];
@@ -45,7 +47,7 @@ const json=p=>JSON.parse(read(p).toString('utf8').replace(/^\uFEFF/,''));
 const sha256=b=>crypto.createHash('sha256').update(b).digest('hex');
 const gitBlobSha=b=>crypto.createHash('sha1').update(Buffer.concat([Buffer.from(`blob ${b.length}\0`),b])).digest('hex');
 
-for(const p of [POINTER,WORKFLOW,PUSH_PROOF,OBSERVER_ROOTCAUSE,RECEIPT_ROOTCAUSE,SOURCE_ACCEPTANCE_OBSERVABILITY_ROOTCAUSE]) check(fs.existsSync(abs(p)),`REQUIRED_CONTROL_FILE_MISSING:${p}`);
+for(const p of [POINTER,WORKFLOW,PUSH_PROOF,OBSERVER_ROOTCAUSE,RECEIPT_ROOTCAUSE,SOURCE_ACCEPTANCE_OBSERVABILITY_ROOTCAUSE,PROMOTION_ROOTCAUSE,PROMOTE_TOOL]) check(fs.existsSync(abs(p)),`REQUIRED_CONTROL_FILE_MISSING:${p}`);
 if(process.env.GITHUB_REF_NAME) check(process.env.GITHUB_REF_NAME===BRANCH,'BRANCH_MISMATCH');
 
 const pointer=fs.existsSync(abs(POINTER))?json(POINTER):{};
@@ -54,6 +56,8 @@ const pushProof=fs.existsSync(abs(PUSH_PROOF))?json(PUSH_PROOF):{};
 const observerRootcause=fs.existsSync(abs(OBSERVER_ROOTCAUSE))?json(OBSERVER_ROOTCAUSE):{};
 const receiptRootcause=fs.existsSync(abs(RECEIPT_ROOTCAUSE))?json(RECEIPT_ROOTCAUSE):{};
 const sourceAcceptanceObservabilityRootcause=fs.existsSync(abs(SOURCE_ACCEPTANCE_OBSERVABILITY_ROOTCAUSE))?json(SOURCE_ACCEPTANCE_OBSERVABILITY_ROOTCAUSE):{};
+const promotionRootcause=fs.existsSync(abs(PROMOTION_ROOTCAUSE))?json(PROMOTION_ROOTCAUSE):{};
+const promoteTool=fs.existsSync(abs(PROMOTE_TOOL))?read(PROMOTE_TOOL).toString('utf8'):'';
 
 const pointerIdle=pointer.status==='IDLE'&&pointer.mode==='IDLE';
 const pointerFinalize=pointer.status==='ACTIVE'&&pointer.mode==='FINALIZE_SOURCE_ONLY';
@@ -98,8 +102,16 @@ for(const [role,spec] of Object.entries(RUNNERS)){
   }else{
     check(t.includes('progress==75'),'POST_RUNNER_75_PROMOTION_CONTRACT_MISSING');
     check(t.includes('authorized==false')&&t.includes('requestMaterialized==false')&&t.includes('runtimeAllowed==false'),'POST_RUNNER_INERT_BOUNDARY_CONTRACT_MISSING');
+    check(t.includes('ORBIT360_MACRO2_RESUME_METADATA')&&t.includes('MACRO2_DURABLE_CANDIDATE_METADATA_RESUME_PASS'),'POST_RUNNER_DURABLE_METADATA_RESUME_MISSING');
   }
 }
+const ephemeralPromotionBindingValidated=
+  promoteTool.includes('MACRO2_EPHEMERAL_SOURCE_BINDING_NOT_ACTIVE')&&
+  promoteTool.includes("req.schemaVersion==='orbit360-macro2-source-recovery-request-v3r1c1'")&&
+  promoteTool.includes("req.status==='PREFLIGHT_PASS_AWAITING_SOURCE_ONLY_ACTIVATION'")&&
+  promoteTool.includes('req.sourceOnly===true')&&
+  !promoteTool.includes("req.status==='MATERIALIZED_SOURCE_ONLY'");
+check(ephemeralPromotionBindingValidated,'PROMOTER_EPHEMERAL_BINDING_CONTRACT_INVALID');
 for(const p of FORBIDDEN_ACTIVE_PATHS) check(!fs.existsSync(abs(p)),`STALE_VARIANT_RESURRECTED:${p}`);
 
 const workflowFinalizationReady=
@@ -157,6 +169,35 @@ const sourceAcceptanceDiagnosticPreservationValidated=
   workflow.includes('failedChecks')&&
   workflow.includes('observedDeltaPaths');
 
+const promotionRootCauseValidated=
+  promotionRootcause.ok===true&&
+  promotionRootcause.status==='MACRO2_PROMOTION_EPHEMERAL_BINDING_ROOT_CAUSE_RESOLVED'&&
+  promotionRootcause.classification==='VALIDATOR_STALE'&&
+  promotionRootcause.secondaryClassification==='PIPELINE_MECHANISM_FAILURE'&&
+  promotionRootcause.failedRunId===32611388980&&
+  promotionRootcause.failureStage==='METADATA_OR_PROMOTION'&&
+  promotionRootcause.failureCode==='MACRO2_SOURCE_REQUEST_NOT_ACTIVE'&&
+  promotionRootcause.durableCandidate?.artifactId===9485621192&&
+  promotionRootcause.durableCandidate?.sourceHead==='842f762f199f4c7dbf13062a33ca220d92398c51'&&
+  promotionRootcause.durableCandidate?.fileCount===194&&
+  promotionRootcause.durableCandidate?.deltaCount===9&&
+  promotionRootcause.durableCandidate?.unchangedFileCount===185&&
+  promotionRootcause.durableCandidate?.artifactExpired===false&&
+  promotionRootcause.rootCause?.code==='PROMOTER_STILL_REQUIRES_PERSISTENT_SOURCE_REQUEST'&&
+  promotionRootcause.resolution?.promotionBinding==='CANONICAL_EPHEMERAL_BINDING_ONLY'&&
+  promotionRootcause.resolution?.reuseDurableCandidate===true&&
+  promotionRootcause.resolution?.rebuildCandidate===false&&
+  promotionRootcause.resolution?.uploadNewArtifact===false&&
+  promotionRootcause.resolution?.sameCanonicalOwner===true&&
+  promotionRootcause.resolution?.newWorkflowVariant===false&&
+  promotionRootcause.resolution?.newRequest===false;
+const promotionResumeOwnerValidated=
+  workflow.includes('PROMOTION_DURABLE_CANDIDATE_RESUME_V1')&&
+  workflow.includes('resume_probe')&&
+  workflow.includes('CANDIDATE_ARTIFACT_PUBLISHED_SOURCE_ONLY')&&
+  workflow.includes('ORBIT360_MACRO2_RESUME_METADATA')&&
+  workflow.includes('reuse_durable_candidate');
+
 const executionReceiptObserverValidated=
   workflow.includes('ORBIT360_MACRO2_FINALIZE_START')&&
   workflow.includes('ORBIT360_MACRO2_FINALIZE_PASS')&&
@@ -176,6 +217,9 @@ check(nonBlockingExecutionObserverValidated,'EXECUTION_RECEIPT_OBSERVER_STILL_BL
 check(sourceAcceptanceObservabilityRootCauseValidated,'SOURCE_ACCEPTANCE_OBSERVABILITY_ROOTCAUSE_INVALID');
 check(sourceAcceptanceDiagnosticPreservationValidated,'SOURCE_ACCEPTANCE_DIAGNOSTIC_PRESERVATION_INVALID');
 check(sourceArtifactBaselineSplitValidated,'SOURCE_ARTIFACT_BASELINE_SPLIT_INVALID');
+check(promotionRootCauseValidated,'PROMOTION_EPHEMERAL_BINDING_ROOTCAUSE_INVALID');
+check(promotionResumeOwnerValidated,'PROMOTION_DURABLE_CANDIDATE_RESUME_OWNER_INVALID');
+check(ephemeralPromotionBindingValidated,'PROMOTION_EPHEMERAL_BINDING_TOOL_INVALID');
 check(!workflow.includes('actions: write'),'ACTIONS_WRITE_FORBIDDEN');
 
 if(pointerFinalize&&process.env.GITHUB_EVENT_NAME==='push'){
@@ -210,6 +254,9 @@ const out={
   sourceAcceptanceObservabilityRootCauseValidated,
   sourceAcceptanceDiagnosticPreservationValidated,
   sourceArtifactBaselineSplitValidated,
+  promotionRootCauseValidated,
+  promotionResumeOwnerValidated,
+  ephemeralPromotionBindingValidated,
   observerIndependentOfFilteredCommitRunReader:true,
   activationParentBindingValidated:pointerIdle||failures.every(x=>!x.startsWith('ACTIVATION_')),
   durableSourceBeforeArtifact:true,
