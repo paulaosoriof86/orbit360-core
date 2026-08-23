@@ -9,6 +9,8 @@
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
   "auditedHead": "c08b6fe8c7ca32537b50ef84a4ba4ee709218738",
+  "repairCommit": "ccaead43e891194423a3a2a25bb7796fa42bb6e2",
+  "repairSignal": "CANONICAL_REPAIR_PUBLISHED_AWAITING_CONVERGENCE_OWNER",
   "formalProgressPct": 62,
   "productFrozen": true,
   "dataFrozen": true,
