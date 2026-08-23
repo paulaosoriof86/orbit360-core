@@ -1,0 +1,50 @@
+{
+  "schemaVersion": "orbit360-macro2-promotion-ephemeral-binding-rootcause-v1",
+  "ok": true,
+  "status": "MACRO2_PROMOTION_EPHEMERAL_BINDING_ROOT_CAUSE_RESOLVED",
+  "classification": "VALIDATOR_STALE",
+  "secondaryClassification": "PIPELINE_MECHANISM_FAILURE",
+  "date": "2026-08-22",
+  "failedRunId": 32611388980,
+  "failureStage": "METADATA_OR_PROMOTION",
+  "failureCode": "MACRO2_SOURCE_REQUEST_NOT_ACTIVE",
+  "durableCandidate": {
+    "artifactId": 9485621192,
+    "sourceHead": "842f762f199f4c7dbf13062a33ca220d92398c51",
+    "fileCount": 194,
+    "deltaCount": 9,
+    "unchangedFileCount": 185,
+    "artifactExpired": false,
+    "sourcePublished": true,
+    "metadataPersisted": true
+  },
+  "rootCause": {
+    "code": "PROMOTER_STILL_REQUIRES_PERSISTENT_SOURCE_REQUEST",
+    "description": "The canonical owner already replaces the historical persistent request path with the ephemeral Macro-2 binding, but the promotion validator still requires status MATERIALIZED_SOURCE_ONLY. The canonical ephemeral binding has status PREFLIGHT_PASS_AWAITING_SOURCE_ONLY_ACTIVATION, so promotion rejects a valid durable candidate after source acceptance and artifact publication have passed.",
+    "productDefect": false,
+    "candidateDefect": false,
+    "artifactDefect": false,
+    "persistentRequestRequired": false
+  },
+  "resolution": {
+    "promotionBinding": "CANONICAL_EPHEMERAL_BINDING_ONLY",
+    "acceptedSchemaVersion": "orbit360-macro2-source-recovery-request-v3r1c1",
+    "acceptedStatus": "PREFLIGHT_PASS_AWAITING_SOURCE_ONLY_ACTIVATION",
+    "persistentRequestMaterialization": false,
+    "reuseDurableCandidate": true,
+    "rebuildCandidate": false,
+    "uploadNewArtifact": false,
+    "sameCanonicalOwner": true,
+    "newWorkflowVariant": false,
+    "newRequest": false
+  },
+  "runtimeExecuted": false,
+  "browserExecuted": false,
+  "secretAccess": false,
+  "firestoreRead": false,
+  "writes": 0,
+  "deployExecuted": false,
+  "productionTouched": false,
+  "mainTouched": false,
+  "mergeExecuted": false
+}
