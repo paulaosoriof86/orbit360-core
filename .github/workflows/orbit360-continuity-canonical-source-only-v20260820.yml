@@ -129,6 +129,7 @@ jobs:
             and .nonBlockingExecutionObserverValidated==true
             and .sourceAcceptanceObservabilityRootCauseValidated==true
             and .sourceAcceptanceDiagnosticPreservationValidated==true
+            and .sourceArtifactBaselineSplitValidated==true
             and .observerIndependentOfFilteredCommitRunReader==true
             and .runtimeExecuted==false and .browserExecuted==false and .secretAccess==false
             and .firestoreRead==false and .writes==0 and .deployExecuted==false and .productionTouched==false' \
@@ -165,7 +166,7 @@ jobs:
             durableSourceBeforeArtifactRequired:true,artifactDigestNormalizationRequired:true,
             artifactMetadataBeforePromotionRequired:true,patchSets,
             runnerScripts:[
-              {role:'pre',encoding:'plain',path:process.env.PRE_RUNNER,gitBlobSha:'5311a3a9b9bc645f420b232f31d9845ac5a6023b'},
+              {role:'pre',encoding:'plain',path:process.env.PRE_RUNNER,gitBlobSha:'0e248b63640d62a96fcf4b80837c8ab5a66d1978'},
               {role:'post',encoding:'plain',path:process.env.POST_RUNNER,gitBlobSha:'c57f699b3e72f4aba856f359a09f227d7a25255a'}
             ],
             runtime:false,browser:false,secrets:false,firestoreRead:false,writes:false,
@@ -187,7 +188,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          test "$(git hash-object "$PRE_RUNNER")" = '5311a3a9b9bc645f420b232f31d9845ac5a6023b'
+          test "$(git hash-object "$PRE_RUNNER")" = '0e248b63640d62a96fcf4b80837c8ab5a66d1978'
           # SOURCE_ACCEPTANCE_EVIDENCE_NON_LOSSY
           set +e
           bash "$PRE_RUNNER"
