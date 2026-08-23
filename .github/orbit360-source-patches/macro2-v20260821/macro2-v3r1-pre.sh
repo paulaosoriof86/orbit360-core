@@ -111,12 +111,52 @@ test "$(jq -r '.sourceHead' "$PRE/orbit360-package-manifest.json")" = "$BASE_SOU
 MACRO2_PRE="$PRE"
 MACRO2_BASE_MANIFEST="$RUNNER_TEMP/base-manifest.json"
 cp "$PRE/orbit360-package-manifest.json" "$MACRO2_BASE_MANIFEST"
+
+# SOURCE_ARTIFACT_BASELINE_SPLIT_V1
+# The package manifest is authoritative for artifact rehash/build, not for source-tree delta auditing.
+# Reconstruct the same 194-path manifest from BASE_SOURCE_HEAD and prove that only the two known
+# CI-materialized package paths differ between source and predecessor artifact.
+MACRO2_SOURCE_BASE_MANIFEST="$RUNNER_TEMP/source-base-manifest.json"
+node - "$MACRO2_BASE_MANIFEST" "$MACRO2_SOURCE_BASE_MANIFEST" "$BASE_SOURCE_HEAD" <<'NODE'
+const fs=require('fs');
+const crypto=require('crypto');
+const {execFileSync}=require('child_process');
+const [artifactManifestPath,sourceManifestPath,sourceHead]=process.argv.slice(2);
+const artifact=JSON.parse(fs.readFileSync(artifactManifestPath,'utf8'));
+if(Number(artifact.fileCount)!==194||!Array.isArray(artifact.files)||artifact.files.length!==194){
+  console.error('DATA_CONTRACT_FAILURE:SOURCE_BASELINE_ARTIFACT_MANIFEST_INVALID');process.exit(41);
+}
+const source=JSON.parse(JSON.stringify(artifact));
+const artifactByPath=new Map(artifact.files.map(f=>[f.path,f]));
+for(const f of source.files){
+  let b;
+  try{
+    b=execFileSync('git',['show',`${sourceHead}:orbit360-platform/${f.path}`],{encoding:null,maxBuffer:64*1024*1024});
+  }catch{
+    console.error(`DATA_CONTRACT_FAILURE:SOURCE_BASELINE_FILE_MISSING:${f.path}`);process.exit(41);
+  }
+  f.bytes=b.length;
+  f.sha256=crypto.createHash('sha256').update(b).digest('hex');
+}
+const materialized=source.files.filter(f=>artifactByPath.get(f.path)?.sha256!==f.sha256).map(f=>f.path).sort();
+const expected=['index.html','product-runtime-config.js'];
+if(JSON.stringify(materialized)!==JSON.stringify(expected)){
+  console.error('VALIDATOR_STALE:ARTIFACT_SOURCE_TRANSFORM_SET_UNEXPECTED:'+JSON.stringify(materialized));process.exit(41);
+}
+source.baselineKind='SOURCE_HEAD';
+source.baselineSourceHead=sourceHead;
+source.artifactMaterializedPaths=materialized;
+fs.writeFileSync(sourceManifestPath,JSON.stringify(source,null,2)+'\n');
+console.log(JSON.stringify({ok:true,status:'MACRO2_SOURCE_ARTIFACT_BASELINE_SPLIT_PASS',sourceHead,fileCount:source.files.length,artifactMaterializedPaths:materialized}));
+NODE
+
 echo "MACRO2_PRE=$MACRO2_PRE" >> "$GITHUB_ENV"
 echo "MACRO2_BASE_MANIFEST=$MACRO2_BASE_MANIFEST" >> "$GITHUB_ENV"
+echo "MACRO2_SOURCE_BASE_MANIFEST=$MACRO2_SOURCE_BASE_MANIFEST" >> "$GITHUB_ENV"
 
 # STAGE: Source acceptance before source commit
 set -euo pipefail
-ORBIT360_MACRO2_CANDIDATE_DIR="$GITHUB_WORKSPACE/orbit360-platform" ORBIT360_MACRO2_BASE_MANIFEST="$MACRO2_BASE_MANIFEST" node tools/orbit360-test-macro2-transversal-source-acceptance-v20260821.mjs > "$RUNNER_TEMP/macro2-source-acceptance-precommit.json"
+ORBIT360_MACRO2_CANDIDATE_DIR="$GITHUB_WORKSPACE/orbit360-platform" ORBIT360_MACRO2_BASE_MANIFEST="$MACRO2_SOURCE_BASE_MANIFEST" node tools/orbit360-test-macro2-transversal-source-acceptance-v20260821.mjs > "$RUNNER_TEMP/macro2-source-acceptance-precommit.json"
 jq -e '.ok==true and .status=="TRANSVERSAL_SOURCE_ACCEPTANCE_PASS" and .checksPassed==107 and .checksTotal==107 and .performance.clients==414 and .performance.allPolizas==1 and .performance.wherePolizas==0' "$RUNNER_TEMP/macro2-source-acceptance-precommit.json" >/dev/null
 
 # STAGE: Create immutable local source commit
