@@ -1,9 +1,9 @@
 {
-  "schemaVersion": "orbit360-continuity-writer-registry-v3",
+  "schemaVersion": "orbit360-continuity-writer-registry-v4",
   "registryId": "ORBIT360-CONTINUITY-WRITER-REGISTRY",
-  "revision": 12,
+  "revision": 13,
   "active": true,
-  "status": "DEFINITIVE_SINGLE_PHYSICAL_WRITER_AND_SINGLE_LOGICAL_STATE_OWNER",
+  "status": "DEFINITIVE_SINGLE_WORKFLOW_SINGLE_LOGICAL_OWNER_INLINE_MACRO3",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "sourceOfTruth": "orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json",
   "canonicalityContract": "orbit360-platform/docs/orbit360-control-plane-canonicality-contract-v20260822.json",
@@ -14,8 +14,9 @@
   "independentReadback": "tools/orbit360-control-plane-independent-readback-v20260820.mjs",
   "workflowSurfaceAudit": "tools/orbit360-workflow-operational-surface-audit-v20260820.mjs",
   "documentationStateDiscovery": "tools/orbit360-documentation-state-discovery-v20260821.mjs",
+  "macro3MechanismPreflight": "tools/orbit360-macro3-mechanism-preflight-v20260823.mjs",
   "canonicalWorkflow": ".github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml",
-  "canonicalWorkflowMode": "EVIDENCE_REDUCTION_THEN_DERIVED_PROJECTION_REMOTE_CAS",
+  "canonicalWorkflowMode": "INLINE_MACRO3_SOURCE_GATE_ONE_SHOT_ACCEPT_READONLY_RUNTIME_TERMINAL_REDUCER",
   "projectionTargets": [
     "orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json",
     "orbit360-platform/docs/orbit360-f2-runtime-authorization-boundary-v20260820.json",
@@ -53,22 +54,41 @@
     "silentRebaseProjectionForbidden": true,
     "documentationStateDiscoveryRequiredBeforeClosure": true,
     "stateBearingCurrentDocsMustBeSemanticallyConverged": true,
-    "runtimeRequestMaterializationRequiresFreshExplicitUserAuthorization": true
+    "runtimeRequestMaterializationRequiresFreshExplicitUserAuthorization": true,
+    "crossWorkflowDispatchForbidden": true,
+    "workflowRunChainingForbidden": true,
+    "actionsWritePermissionForbidden": true,
+    "oneShotBudgetConsumedBeforeRuntimePreflight": true,
+    "runtimeAttemptBoundToGithubRunId": true,
+    "terminalReductionRequiredInSameCanonicalRun": true,
+    "internalStatePublicationMustNotRetriggerWorkflow": true
   },
   "workflowClasses": {
-    "solePhysicalWriter": [".github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml"],
-    "runtimeAndEvidenceProducers": "ARTIFACT_OR_STATUS_ONLY_NO_BRANCH_MUTATION"
+    "solePhysicalWorkflow": [
+      ".github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml"
+    ],
+    "runtimeAndEvidenceExecution": "INLINE_IN_CANONICAL_WORKFLOW_ONLY",
+    "parallelRuntimeWorkflow": "FORBIDDEN"
   },
   "publicationGuard": {
     "mode": "REMOTE_HEAD_COMPARE_AND_SWAP",
     "mutationOwner": ".github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml",
     "gitPullRebaseAllowed": false,
-    "runtimeMayExecute": false,
-    "browserMayExecute": false,
-    "secretsMayBeRead": false,
-    "firestoreMayBeRead": false,
+    "workflowDispatchAllowed": false,
+    "workflowRunChainingAllowed": false,
+    "actionsWriteAllowed": false,
+    "runtimeMayExecuteBeforeAttemptAccept": false,
+    "runtimeMayExecuteAfterAttemptAccept": true,
+    "runtimeExecutionPolicy": "ONLY_AFTER_F2_RUNTIME_ATTEMPT_ACCEPT_IN_SAME_CANONICAL_RUN",
+    "runtimeReadOnly": true,
+    "browserMayExecuteAfterGate": true,
+    "secretsMayBeReadAfterGate": true,
+    "firestoreMayBeReadAfterGate": true,
+    "writesMayExecute": false,
     "deployMayExecute": false,
-    "productionMayBeTouched": false
+    "productionMayBeTouched": false,
+    "mainMayBeTouched": false,
+    "mergeMayExecute": false
   },
   "containsPII": false,
   "containsSecrets": false
