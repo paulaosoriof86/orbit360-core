@@ -40,7 +40,10 @@ if(!failures.length){
   need(plan.includes('VIGENTE_CONGELADO / AUTORIDAD_OPERATIVA_DE_RUTA / NO_RECONSTRUIR'),'PLAN_20260824_NOT_FROZEN');
   need(expectedLedger>0&&L.revision===expectedLedger,'LEDGER_REVISION_MISMATCH');
   need(expectedPackage>0&&Number(L.productionReopeningPackage?.revision)===expectedPackage,'PACKAGE_REVISION_MISMATCH');
-  need(L.activeState?.phase==='MACRO1_CONTROL_PLANE_TRUTH_HARDENING_SOURCE_ONLY','SELFTEST_PHASE_NOT_HARDENING');
+  const hardeningOpen=L.activeState?.phase==='MACRO1_CONTROL_PLANE_TRUTH_HARDENING_SOURCE_ONLY'&&L.activeState?.status==='CONTROL_PLANE_FALSE_PASS_INVALIDATED';
+  const hardeningClosed=L.activeState?.phase==='CONTROL_PLANE_DEFINITIVE_CAUSAL_PASS_AWAITING_F2_AUTHORIZATION'&&L.activeState?.status==='CONTROL_PLANE_DEFINITIVE_CAUSAL_PASS';
+  need(hardeningOpen||hardeningClosed,'SELFTEST_PHASE_NOT_HARDENING_OR_CLOSED');
+  if(hardeningClosed)need(L.nextAction?.id==='AWAIT_EXPLICIT_F2_RUNTIME_AUTHORIZATION_ONE_SHOT','SELFTEST_CLOSED_NEXT_ACTION_DRIFT');
   need(L.activeState?.runtimeAuthorized===false&&L.activeState?.runtimeReplayAllowed===false,'SELFTEST_RUNTIME_NOT_CLOSED');
   need(L.authorizationBoundary?.activeRuntimeAuthorization===false&&L.authorizationBoundary?.activeRequestPath==null&&L.authorizationBoundary?.authorizationRecordPath==null&&(L.authorizationBoundary?.runtimeAttemptAccepted??false)===false,'SELFTEST_AUTH_REQUEST_NOT_INERT');
   need(Number(L.progress?.productionRouteProgressPct)===75&&L.progress?.f2TerminalPass===false,'SELFTEST_PROGRESS_NOT_FAIL_CLOSED');
@@ -67,5 +70,5 @@ if(!failures.length){
   try{execFileSync(process.execPath,[A(P.preflight)],{cwd:ROOT,stdio:'ignore',env:{...process.env,ORBIT360_F2_WORKFLOW_SOURCE_FILE:A(P.workflow)}});}catch{need(false,'MECHANISM_PREFLIGHT_FAIL');}
   cleanGeneratedEvidence();
 }
-const out={schemaVersion:'orbit360-control-plane-selftest-v4-markdown-whitespace-aware',ok:failures.length===0,status:failures.length?'CONTROL_PLANE_SELFTEST_FAIL':'CONTROL_PLANE_SELFTEST_PASS',classification:failures.length?'PIPELINE_MECHANISM_FAILURE':'PASS',failures:[...new Set(failures)],expectedLedgerRevision:expectedLedger,expectedPackageRevision:expectedPackage,generatedEvidenceCleaned:true,canonicalOwner:'tools/orbit360-continuity-transition-owner-v20260824.mjs',hardeningCloseModeRequired:true,markdownWhitespacePolicyRequired:true,authorizationMaterialized:false,requestMaterialized:false,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
+const out={schemaVersion:'orbit360-control-plane-selftest-v5-idempotent-hardening-readback',ok:failures.length===0,status:failures.length?'CONTROL_PLANE_SELFTEST_FAIL':'CONTROL_PLANE_SELFTEST_PASS',classification:failures.length?'PIPELINE_MECHANISM_FAILURE':'PASS',failures:[...new Set(failures)],expectedLedgerRevision:expectedLedger,expectedPackageRevision:expectedPackage,generatedEvidenceCleaned:true,canonicalOwner:'tools/orbit360-continuity-transition-owner-v20260824.mjs',hardeningCloseModeRequired:true,markdownWhitespacePolicyRequired:true,authorizationMaterialized:false,requestMaterialized:false,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
 console.log(JSON.stringify(out,null,2));if(!out.ok)process.exit(41);
