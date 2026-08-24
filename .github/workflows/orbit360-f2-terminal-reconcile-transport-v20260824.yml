@@ -1,0 +1,145 @@
+name: Orbit360 F2 Terminal Reconcile Transport
+
+on:
+  pull_request:
+    types: [synchronize]
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: read
+
+env:
+  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+  ORBIT360_ACTIVATION_BRANCH: orbit360/f2-one-shot-activation-9b50d4e95cf3-20260823
+  ORBIT360_RUN_ID: '32679948489'
+  ORBIT360_TERMINAL: orbit360-platform/runtime-gate-crm-v20260716/f2-runtime-terminal-inline-32679948489.json
+  ORBIT360_CONTRACT: orbit360-platform/runtime-gate-crm-v20260716/f2-terminal-reconciliation-contract-v20260824.json
+  ORBIT360_MARKER: .github/orbit360-activation/f2-terminal-reconcile-32679948489-v20260824.json
+  LEDGER: orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json
+  PACKAGE: orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json
+  BOUNDARY: orbit360-platform/docs/orbit360-f2-runtime-authorization-boundary-v20260820.json
+  PR_STATE: orbit360-platform/docs/ORBIT360-PR5-CURRENT-STATE.md
+  OWNER: tools/orbit360-continuity-transition-owner-v20260820.mjs
+  CONVERGENCE: tools/orbit360-control-plane-evidence-convergence-v20260822.mjs
+
+jobs:
+  terminal-reconcile-source-only:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout transport merge ref
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validate terminal-only transport
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_EVENT_NAME" = 'pull_request'
+          test "${{ github.event.action }}" = 'synchronize'
+          test "${{ github.event.pull_request.base.ref }}" = "$ORBIT360_BRANCH"
+          test "${{ github.event.pull_request.head.ref }}" = "$ORBIT360_ACTIVATION_BRANCH"
+          test "${{ github.event.pull_request.head.repo.full_name }}" = "$GITHUB_REPOSITORY"
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          curl -L --fail --silent --show-error -H "Authorization: Bearer $GH_TOKEN" -H 'Accept: application/vnd.github+json' "https://api.github.com/repos/${GITHUB_REPOSITORY}/pulls/${{ github.event.pull_request.number }}/files?per_page=100" > "$RUNNER_TEMP/files.json"
+          jq -e 'length==1 and .[0].filename==".github/workflows/orbit360-f2-terminal-reconcile-transport-v20260824.yml"' "$RUNNER_TEMP/files.json" >/dev/null
+
+      - name: Switch to exact canonical base
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE='${{ github.event.pull_request.base.sha }}'
+          git fetch --no-tags origin "$ORBIT360_BRANCH"
+          test "$(git rev-parse FETCH_HEAD)" = "$BASE"
+          git checkout --force -B orbit360-terminal-reconcile "$BASE"
+          test -z "$(git status --porcelain)"
+
+      - name: Validate consumed run and corrected terminal evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check "$OWNER"
+          node tools/orbit360-f2-terminal-evidence-normalizer-v20260824.mjs | tee "$RUNNER_TEMP/normalizer.json"
+          jq -e '.ok==true' "$RUNNER_TEMP/normalizer.json" >/dev/null
+          jq -e --argjson run "$ORBIT360_RUN_ID" '.revision==33 and .productionReopeningPackage.revision==27 and .authorizationBoundary.activeRuntimeAuthorization==true and .authorizationBoundary.runtimeAttemptAccepted==true and .authorizationBoundary.runtimeRunId==$run and .activeState.runtimeReplayAllowed==false and .progress.productionRouteProgressPct==75' "$LEDGER" >/dev/null
+          jq -e --argjson run "$ORBIT360_RUN_ID" '.ok==false and .classification=="FUNCTIONAL_DEFECT" and .failureCode=="FUNCTIONAL_DEFECT:F2_OPERATIVO_ASEGURADORAS_MODULE_VISIBILITY_MISSING" and .runId==$run and .runtimeAttemptAccepted==true and .allowedExecutions==0 and .browserMatrixPass==false and .integrityBeforeAfterPass==true and .zeroCrossTenant==true and .zeroUnexpectedWrites==true and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .deployExecuted==false and .productionHostingTouched==false and .runtimeReexecutedForReconciliation==false' "$ORBIT360_TERMINAL" >/dev/null
+          jq -e --argjson run "$ORBIT360_RUN_ID" '.runtimeRunId==$run and .runtimeReexecutionAllowed==false and .secretAccessAllowed==false and .firestoreReadAllowed==false and .browserAllowed==false and .replayAllowed==false' "$ORBIT360_CONTRACT" >/dev/null
+          jq -e --argjson run "$ORBIT360_RUN_ID" '.runtimeRunId==$run and .runtimeReexecution==false and .secrets==false and .firestoreRead==false and .browser==false and .replayAllowed==false' "$ORBIT360_MARKER" >/dev/null
+          grep -q 'operativoInsurerRoleParity' orbit360-platform/core/access-ceilings-v1199.js
+          AUTH=$(jq -r '.authorizationBoundary.authorizationRecordPath' "$LEDGER")
+          REQUEST=$(jq -r '.authorizationBoundary.activeRequestPath' "$LEDGER")
+          test -f "$AUTH" && test -f "$REQUEST"
+          jq -e --argjson run "$ORBIT360_RUN_ID" '.allowedExecutions==0 and .runtimeAttemptAccepted==true and .runtimeRunId==$run and .consumed==false and .historical==false and .replayAllowed==false' "$AUTH" >/dev/null
+          jq -e --argjson run "$ORBIT360_RUN_ID" '.allowedExecutions==0 and .runtimeAttemptAccepted==true and .runtimeRunId==$run and .consumed==false and .historical==false and .replayAllowed==false' "$REQUEST" >/dev/null
+          printf '%s\n' "$AUTH" > "$RUNNER_TEMP/auth-path"
+          printf '%s\n' "$REQUEST" > "$RUNNER_TEMP/request-path"
+
+      - name: Reconcile terminal exactly once through canonical owner
+        shell: bash
+        run: |
+          set -euo pipefail
+          node "$OWNER" --transition F2_RUNTIME_TERMINAL_RECONCILE_GENERIC --expected-revision 33 --expected-package-revision 27 --terminal-evidence "$ORBIT360_TERMINAL" | tee "$RUNNER_TEMP/reconcile.json"
+          jq -e '.ok==true and .status=="F2_RUNTIME_TERMINAL_RECONCILED_GENERIC" and .classification=="FUNCTIONAL_DEFECT" and .ledgerRevision==34 and .packageRevision==28 and .replayAllowed==false' "$RUNNER_TEMP/reconcile.json" >/dev/null
+
+      - name: Prove terminal fail-closed state before publication
+        shell: bash
+        run: |
+          set -euo pipefail
+          AUTH=$(cat "$RUNNER_TEMP/auth-path")
+          REQUEST=$(cat "$RUNNER_TEMP/request-path")
+          jq -e '.revision==34 and .productionReopeningPackage.revision==28 and .activeState.phase=="F2_TERMINAL_FAIL_AWAITING_SOURCE_ONLY_ROOT_CAUSE" and .activeState.status=="F2_TERMINAL_RECONCILED_NO_REPLAY" and .activeState.runtimeAuthorized==false and .activeState.runtimeReplayAllowed==false and .authorizationBoundary.activeRuntimeAuthorization==false and .authorizationBoundary.activeRequestPath==null and .authorizationBoundary.authorizationRecordPath==null and .authorizationBoundary.runtimeAttemptAccepted==false and .authorizationBoundary.freshAuthorizationRequired==true and .progress.productionRouteProgressPct==75 and .progress.f2TerminalPass==false and .nextAction.id=="DIAGNOSE_ROOT_CAUSE_BEFORE_ANY_FRESH_AUTHORIZATION"' "$LEDGER" >/dev/null
+          jq -e '.consumed==true and .historical==true and .allowedExecutions==0 and .replayAllowed==false and .status=="CONSUMED_FAIL_FUNCTIONAL_DEFECT"' "$AUTH" >/dev/null
+          jq -e '.consumed==true and .historical==true and .allowedExecutions==0 and .replayAllowed==false and .status=="CONSUMED_FAIL_FUNCTIONAL_DEFECT"' "$REQUEST" >/dev/null
+          node "$CONVERGENCE" --repo-only | tee "$RUNNER_TEMP/convergence.json"
+          jq -e '.ok==true and .productionRouteProgressPct==75 and .authorized==false and .requestMaterialized==false and .runtimeAllowed==false' "$RUNNER_TEMP/convergence.json" >/dev/null
+          node tools/orbit360-control-plane-composite-invariant-v20260820.mjs
+          node tools/orbit360-documentation-state-discovery-v20260821.mjs
+
+      - name: Publish terminal state to canonical branch with remote CAS
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE='${{ github.event.pull_request.base.sha }}'
+          mapfile -t CHANGED < <(git status --porcelain | sed 's/^...//' | sort -u)
+          test "${#CHANGED[@]}" -gt 0
+          for f in "${CHANGED[@]}"; do
+            case "$f" in
+              .github/orbit360-authorizations/f2-productive-acceptance-runtime-browser-readonly-auth-*.json|.github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-successor-*.json|.github/orbit360-requests/macro2-canonical-source-activation-pointer-v20260821.json|README.md|orbit360-platform/CHANGELOG.md|orbit360-platform/docs/*|tools/orbit360-gate-contract-f2-productive-acceptance-v20260820.json|tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-runtime-v20260819.json|tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-source-v20260819.json) ;;
+              *) echo "UNEXPECTED_TERMINAL_STATE_FILE:$f"; exit 41 ;;
+            esac
+          done
+          git config user.name 'orbit360-control-plane'
+          git config user.email 'orbit360-control-plane@users.noreply.github.com'
+          git add -A
+          git commit -m 'gate(f2): seal consumed one-shot functional defect terminal'
+          git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          REMOTE=$(git ls-remote origin "refs/heads/${ORBIT360_BRANCH}" | cut -f1)
+          test "$REMOTE" = "$BASE"
+          git push origin "HEAD:refs/heads/${ORBIT360_BRANCH}"
+          echo "published_head=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+
+      - name: Project terminal state into PR and verify readback
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          jq -Rs '{body:.}' "$PR_STATE" > "$RUNNER_TEMP/pr-body.json"
+          curl -L --fail --silent --show-error -X PATCH -H "Authorization: Bearer $GH_TOKEN" -H 'Accept: application/vnd.github+json' -H 'Content-Type: application/json' --data-binary @"$RUNNER_TEMP/pr-body.json" "https://api.github.com/repos/${GITHUB_REPOSITORY}/pulls/5" > "$RUNNER_TEMP/pr5.json"
+          jq -e '.state=="open" and .draft==true and .merged==false' "$RUNNER_TEMP/pr5.json" >/dev/null
+          curl -L --fail --silent --show-error -H "Authorization: Bearer $GH_TOKEN" -H 'Accept: application/vnd.github+json' "https://api.github.com/repos/${GITHUB_REPOSITORY}/branches/${ORBIT360_BRANCH//\//%2F}" > "$RUNNER_TEMP/branch.json"
+          jq -e --arg h "$published_head" '.commit.sha==$h' "$RUNNER_TEMP/branch.json" >/dev/null
+          echo 'F2_TERMINAL_RECONCILIATION_CLOSED_NO_REPLAY'
