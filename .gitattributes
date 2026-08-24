@@ -1,0 +1,4 @@
+# Markdown uses two trailing spaces as an intentional hard line break.
+# Keep git diff --check strict for code/data while not classifying valid Markdown formatting as whitespace corruption.
+*.md whitespace=-blank-at-eol
+**/*.md whitespace=-blank-at-eol
