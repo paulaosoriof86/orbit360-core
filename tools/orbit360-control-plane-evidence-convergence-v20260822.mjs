@@ -28,6 +28,7 @@ const P={
  projection:'tools/orbit360-continuity-projection-atomic-v20260820.mjs',
  noRewrite:'tools/orbit360-control-plane-no-source-rewrite-guard-v20260824.mjs'
 };
+const TRANSIENT_PREFLIGHT='orbit360-platform/runtime-gate-crm-v20260716/macro3-mechanism-preflight-sanitized-v20260823.json';
 const A=p=>path.join(ROOT,p),exists=p=>fs.existsSync(A(p)),txt=p=>fs.readFileSync(A(p),'utf8').replace(/^\uFEFF/,''),J=p=>JSON.parse(txt(p));
 const sha=s=>crypto.createHash('sha256').update(String(s)).digest('hex');
 const same=(a,b)=>Number(a?.artifactId)===Number(b?.artifactId)&&a?.sourceHead===b?.sourceHead&&String(a?.artifactDigest||a?.digest||'')===String(b?.artifactDigest||b?.digest||'');
@@ -129,5 +130,14 @@ if(prBodyFile){
   need(body.includes(`${L.progress.productionRouteProgressPct}%`),'ACTUAL_PR_BODY_PROGRESS');
 }else if(!repoOnly)need(false,'ACTUAL_PR_BODY_NOT_VALIDATED');
 
-const out={schemaVersion:'orbit360-control-plane-evidence-convergence-v3-direct',ok:failures.length===0,status:failures.length?'CONTROL_PLANE_EVIDENCE_CONVERGENCE_FAIL':'CONTROL_PLANE_EVIDENCE_CONVERGENCE_PASS',classification:failures.length?'PIPELINE_MECHANISM_FAILURE':'PASS',failures:[...new Set(failures)],repairable:false,stateFingerprint:fingerprint,ledgerRevision:L.revision,packageRevision:pkg.revision,phase:L.activeState?.phase,statusCurrent:L.activeState?.status,nextAction:expectedNext,firstIncompleteStep:expectedFirst,candidateArtifactId:cand.artifactId,candidateSourceHead:cand.sourceHead,candidateCertificationEvidence:metadataPath,productionRouteProgressPct:L.progress?.productionRouteProgressPct,authorized:authActive,authorizationPersisted,requestMaterialized:requestActive,runtimeAttemptAccepted:attemptAccepted,runtimeRunId,runtimeAllowed,prBodyValidated:Boolean(prBodyFile)&&failures.length===0,noSourceRewriteGuard:true,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,writes:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
+if(repoOnly&&exists(TRANSIENT_PREFLIGHT)){
+  let tracked=false;
+  try{execFileSync('git',['ls-files','--error-unmatch',TRANSIENT_PREFLIGHT],{cwd:ROOT,stdio:'ignore'});tracked=true;}catch{}
+  try{
+    if(tracked)execFileSync('git',['restore','--',TRANSIENT_PREFLIGHT],{cwd:ROOT,stdio:'ignore'});
+    else fs.unlinkSync(A(TRANSIENT_PREFLIGHT));
+  }catch{need(false,'TRANSIENT_PREFLIGHT_CLEANUP_FAIL');}
+}
+
+const out={schemaVersion:'orbit360-control-plane-evidence-convergence-v4-transient-cleanup',ok:failures.length===0,status:failures.length?'CONTROL_PLANE_EVIDENCE_CONVERGENCE_FAIL':'CONTROL_PLANE_EVIDENCE_CONVERGENCE_PASS',classification:failures.length?'PIPELINE_MECHANISM_FAILURE':'PASS',failures:[...new Set(failures)],repairable:false,stateFingerprint:fingerprint,ledgerRevision:L.revision,packageRevision:pkg.revision,phase:L.activeState?.phase,statusCurrent:L.activeState?.status,nextAction:expectedNext,firstIncompleteStep:expectedFirst,candidateArtifactId:cand.artifactId,candidateSourceHead:cand.sourceHead,candidateCertificationEvidence:metadataPath,productionRouteProgressPct:L.progress?.productionRouteProgressPct,authorized:authActive,authorizationPersisted,requestMaterialized:requestActive,runtimeAttemptAccepted:attemptAccepted,runtimeRunId,runtimeAllowed,prBodyValidated:Boolean(prBodyFile)&&failures.length===0,noSourceRewriteGuard:true,transientPreflightCleaned:repoOnly&&!exists(TRANSIENT_PREFLIGHT),runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,writes:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
 console.log(JSON.stringify(out,null,2));if(!out.ok)process.exit(41);
