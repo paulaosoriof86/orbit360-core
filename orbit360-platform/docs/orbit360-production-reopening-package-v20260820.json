@@ -87,7 +87,7 @@
   },
   "resumeProtocol": {
     "required": true,
-    "rule": "Read frozen plan 20260821, live PR head and ledger. Continue from firstIncompleteStep. Do not reconstruct roadmap or reuse historical authorization/request.",
+    "rule": "Read orbit360-platform/docs/PLAN-MAESTRO-CONGELADO-SALIDA-PRODUCCION-SIN-BUCLES-ORBIT360-AYS-20260824.md, live PR head and ledger. Continue from firstIncompleteStep. Do not reconstruct roadmap or reuse historical authorization/request.",
     "closedStepsMayBeRecheckedReadOnly": true,
     "closedStepsMayNotBeReprocessedWithoutNewEvidence": true,
     "firstIncompleteStep": "F2-RUNTIME-AUTHORIZATION",
