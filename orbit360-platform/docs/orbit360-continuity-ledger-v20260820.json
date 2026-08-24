@@ -1,16 +1,16 @@
 {
   "schemaVersion": "orbit360-continuity-ledger-v3",
   "ledgerId": "ORBIT360-F2-CONTINUITY-CURRENT",
-  "revision": 38,
-  "updatedAtUtc": "2026-08-24T03:32:56.090Z",
+  "revision": 39,
+  "updatedAtUtc": "2026-08-24T03:33:01.475Z",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
   "stateVersion": "ORBIT360-F2-CONTINUITY-CURRENT",
   "gateId": "f2-productive-acceptance-exact-successor-v20260818",
   "activeState": {
-    "phase": "F2_RUNTIME_ATTEMPT_ACCEPTED_PREFLIGHT_PENDING",
-    "status": "F2_RUNTIME_ATTEMPT_ACCEPTED_ONE_SHOT",
+    "phase": "F2_TERMINAL_PASS_AWAITING_AUTHORIZED_GO_LIVE",
+    "status": "F2_TERMINAL_PASS",
     "rootCauseStatus": "FUNCTIONAL_DEFECT_OPERATIVO_ASEGURADORAS_FIXED_SOURCE_ONLY",
     "productFrozen": true,
     "dataFrozen": true,
@@ -79,7 +79,7 @@
     "closedAtUtc": "2026-08-24T02:33:42.759Z"
   },
   "authorizationBoundary": {
-    "activeRuntimeAuthorization": true,
+    "activeRuntimeAuthorization": false,
     "freshAuthorizationRequired": false,
     "authorizationBlockedByHardeningPackage": false,
     "authorizationCarryForwardForbidden": true,
@@ -92,17 +92,17 @@
     "mergeAuthorized": false,
     "boundaryPath": "orbit360-platform/docs/orbit360-f2-runtime-authorization-boundary-v20260820.json",
     "boundaryPrepared": true,
-    "currentBoundaryStatus": "RUNTIME_ATTEMPT_ACCEPTED_ONE_SHOT_PREFLIGHT_PENDING",
+    "currentBoundaryStatus": "CONSUMED_PASS_AWAITING_GO_LIVE",
     "authorizationIdentityRequired": true,
     "preparedAuthorizationIdentityDigest": "225f0f73b44b56006ae92d57a4f8024dba64ead40beec903cf064c03db87f924",
-    "activeRequestPath": ".github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-successor-225f0f73b44b-v20260820.json",
-    "authorizationRecordPath": ".github/orbit360-authorizations/f2-productive-acceptance-runtime-browser-readonly-auth-225f0f73b44b-v20260820.json",
+    "activeRequestPath": null,
+    "authorizationRecordPath": null,
     "historicalAuthorizationRecordPath": ".github/orbit360-authorizations/f2-productive-acceptance-runtime-browser-readonly-auth-b8b35fd88e9d-v20260820.json",
     "historicalRequestPath": ".github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-successor-b8b35fd88e9d-v20260820.json",
     "terminalEvidencePath": "orbit360-platform/runtime-gate-crm-v20260716/f2-runtime-terminal-dispatch-b8b35fd88e9d-v20260821.json",
     "terminalRunId": 32494402695,
-    "runtimeAttemptAccepted": true,
-    "runtimeRunId": 32686810800
+    "runtimeAttemptAccepted": false,
+    "runtimeRunId": null
   },
   "continuityControl": {
     "status": "CONTROL_PLANE_DEFINITIVE_PASS",
@@ -147,34 +147,34 @@
   "productionReopeningPackage": {
     "path": "orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json",
     "status": "CLOSED_PASS",
-    "revision": 32,
-    "firstIncompleteStep": "F2-RUNTIME-PREFLIGHT",
-    "nextActionExact": "RUN_F2_SOURCE_AND_RUNTIME_PREFLIGHT_FAIL_CLOSED",
+    "revision": 33,
+    "firstIncompleteStep": "MACRO4-GO-LIVE-AUTHORIZATION",
+    "nextActionExact": "AWAIT_EXPLICIT_GO_LIVE_AUTHORIZATION",
     "runtimeAllowed": false,
     "authorizationAllowed": false,
     "requestMaterializationAllowed": false
   },
   "checkpoint": "orbit360-platform/docs/CHECKPOINT-CONTROL-PLANE-HARDENING-20260820.md",
   "nextAction": {
-    "id": "RUN_F2_SOURCE_AND_RUNTIME_PREFLIGHT_FAIL_CLOSED",
-    "description": "Execute the already accepted one-shot F2 preflight. A second runtime attempt is mechanically forbidden.",
+    "id": "AWAIT_EXPLICIT_GO_LIVE_AUTHORIZATION",
+    "description": "Await separate explicit go-live authorization.",
     "runtimeAllowed": false
   },
   "history": {
     "latestSealedConsumedRuntime": {
-      "requestPath": ".github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-successor-9b50d4e95cf3-v20260820.json",
-      "authorizationPath": ".github/orbit360-authorizations/f2-productive-acceptance-runtime-browser-readonly-auth-9b50d4e95cf3-v20260820.json",
-      "runId": 32679948489,
-      "conclusion": "failure",
-      "observedClassification": "FUNCTIONAL_DEFECT",
-      "observedFailureCode": "FUNCTIONAL_DEFECT:F2_OPERATIVO_ASEGURADORAS_MODULE_VISIBILITY_MISSING",
+      "requestPath": ".github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-successor-225f0f73b44b-v20260820.json",
+      "authorizationPath": ".github/orbit360-authorizations/f2-productive-acceptance-runtime-browser-readonly-auth-225f0f73b44b-v20260820.json",
+      "runId": 32686810800,
+      "conclusion": "success",
+      "observedClassification": "PASS",
+      "observedFailureCode": "F2_STAGE_OUTCOME:preruntime=failure;runtime=skipped",
       "allowedExecutions": 0,
       "consumed": true,
       "replayAllowed": false,
       "firestoreWrites": 0,
       "authWrites": 0,
       "operationalWrites": 0,
-      "terminalEvidencePath": "orbit360-platform/runtime-gate-crm-v20260716/f2-runtime-terminal-inline-32679948489.json"
+      "terminalEvidencePath": "orbit360-platform/runtime-gate-crm-v20260716/f2-runtime-terminal-inline-32686810800.json"
     },
     "priorConsumedRuntimeOrdinals": [
       11,
@@ -206,9 +206,9 @@
     "C_real_data_migration": "UNCHANGED_FROZEN"
   },
   "progress": {
-    "productionRouteProgressPct": 75,
+    "productionRouteProgressPct": 85,
     "programProgressPct": 25,
-    "f2TerminalPass": false,
+    "f2TerminalPass": true,
     "progressMayIncreaseDuringHardening": false
   },
   "containsPII": false,

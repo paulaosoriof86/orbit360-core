@@ -1,6 +1,6 @@
 {
   "schemaVersion": "orbit360-f2-runtime-authorization-v3",
-  "status": "RUNTIME_ATTEMPT_ACCEPTED_ONE_SHOT",
+  "status": "CONSUMED_PASS",
   "approved": true,
   "authorizationIdentityDigest": "225f0f73b44b56006ae92d57a4f8024dba64ead40beec903cf064c03db87f924",
   "gateId": "f2-productive-acceptance-exact-successor-v20260818",
@@ -9,10 +9,10 @@
   "pullRequest": 5,
   "authorizedAt": "2026-08-24T03:32:55.826Z",
   "allowedExecutions": 0,
-  "consumed": false,
+  "consumed": true,
   "authorizationFrozen": true,
   "replayAllowed": false,
-  "historical": false,
+  "historical": true,
   "runtimeAttemptAccepted": true,
   "runtimeAttemptCount": 1,
   "candidateArtifactId": 9504702901,
@@ -41,5 +41,7 @@
   "containsPII": false,
   "containsSecrets": false,
   "runtimeRunId": 32686810800,
-  "runtimeAttemptAcceptedAt": "2026-08-24T03:32:56.090Z"
+  "runtimeAttemptAcceptedAt": "2026-08-24T03:32:56.090Z",
+  "consumedAt": "2026-08-24T03:33:01.475Z",
+  "terminalEvidencePath": "orbit360-platform/runtime-gate-crm-v20260716/f2-runtime-terminal-inline-32686810800.json"
 }

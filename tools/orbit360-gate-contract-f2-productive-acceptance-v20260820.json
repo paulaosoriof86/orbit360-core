@@ -4,7 +4,7 @@
   "gateId": "f2-productive-acceptance-exact-successor-v20260818",
   "gateContractVersion": "2.2.0",
   "lifecycleComposition": "phase-capability-contract-v7-canonical-convergence",
-  "status": "F2_RUNTIME_ATTEMPT_ACCEPTED_ONE_SHOT",
+  "status": "F2_TERMINAL_PASS",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
   "lifecycles": {
@@ -27,7 +27,7 @@
   "candidateCertificationPolicy": "DYNAMIC_FROM_LEDGER_AND_DURABLE_EVIDENCE",
   "productionReopeningPackage": "orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json",
   "requestBinding": {
-    "activeRequest": ".github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-successor-225f0f73b44b-v20260820.json",
+    "activeRequest": null,
     "defaultRequest": null,
     "requestOrdinalHasOperationalSemantics": false,
     "historicalRequestMayBeUsedAsActiveBinding": false
@@ -41,7 +41,7 @@
     "deploy": false,
     "production": false
   },
-  "canonicalStateFingerprint": "a61b615031946f164ea9e7274a8dedaed563e497a854fa02a391db1321bf2f50",
+  "canonicalStateFingerprint": "7fde5395897fe83f46e71c1c35f97d1865b84348223466654e67985cf96739d5",
   "containsPII": false,
   "containsSecrets": false
 }

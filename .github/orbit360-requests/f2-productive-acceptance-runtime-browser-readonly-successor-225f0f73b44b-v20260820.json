@@ -1,13 +1,13 @@
 {
   "schemaVersion": "orbit360-f2-productive-acceptance-runtime-browser-readonly-request-v3",
   "requestId": "F2-225f0f73b44b",
-  "status": "RUNTIME_ATTEMPT_ACCEPTED_PREFLIGHT_PENDING",
+  "status": "CONSUMED_PASS",
   "approved": true,
   "allowedExecutions": 0,
-  "consumed": false,
+  "consumed": true,
   "authorizationFrozen": true,
   "replayAllowed": false,
-  "historical": false,
+  "historical": true,
   "runtimeAttemptAccepted": true,
   "runtimeAttemptCount": 1,
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -22,5 +22,7 @@
   "containsPII": false,
   "containsSecrets": false,
   "runtimeRunId": 32686810800,
-  "runtimeAttemptAcceptedAt": "2026-08-24T03:32:56.090Z"
+  "runtimeAttemptAcceptedAt": "2026-08-24T03:32:56.090Z",
+  "consumedAt": "2026-08-24T03:33:01.475Z",
+  "terminalEvidencePath": "orbit360-platform/runtime-gate-crm-v20260716/f2-runtime-terminal-inline-32686810800.json"
 }
