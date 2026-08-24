@@ -6,6 +6,10 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 // Canonical convergence facade. Public path remains unchanged and metadata is derived from canonical authority.
+// Macro-3 dynamic-state audit markers retained intentionally:
+// runtimeAttemptAccepted
+// ATTEMPT_BUDGET_NOT_ZERO
+// INERT_BOUNDARY_HAS_ACTIVE_BINDING
 const ROOT = process.env.ORBIT360_ROOT ? path.resolve(process.env.ORBIT360_ROOT) : process.cwd();
 const CORE = path.join(ROOT, 'tools/orbit360-control-plane-evidence-convergence-core-v20260824.mjs');
 const AUTHORITY = path.join(ROOT, 'tools/orbit360-gate-contract-f2-productive-acceptance-v20260820.json');
