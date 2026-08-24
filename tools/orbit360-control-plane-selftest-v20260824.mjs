@@ -9,6 +9,7 @@ const expectedLedger=Number(process.env.ORBIT360_SELFTEST_EXPECTED_LEDGER||0);
 const expectedPackage=Number(process.env.ORBIT360_SELFTEST_EXPECTED_PACKAGE||0);
 const PREFLIGHT_EVIDENCE='orbit360-platform/runtime-gate-crm-v20260716/macro3-mechanism-preflight-sanitized-v20260823.json';
 const P={
+ attributes:'.gitattributes',
  plan:'orbit360-platform/docs/PLAN-MAESTRO-CONGELADO-SALIDA-PRODUCCION-SIN-BUCLES-ORBIT360-AYS-20260824.md',
  ledger:'orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json',
  workflow:'.github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml',
@@ -34,7 +35,8 @@ const cleanGeneratedEvidence=()=>{
 };
 for(const p of Object.values(P))need(fs.existsSync(A(p)),`MISSING:${p}`);
 if(!failures.length){
-  const plan=text(P.plan),L=json(P.ledger),wf=text(P.workflow),owner=text(P.owner),registry=json(P.registry);
+  const attrs=text(P.attributes),plan=text(P.plan),L=json(P.ledger),wf=text(P.workflow),owner=text(P.owner),registry=json(P.registry);
+  need(attrs.includes('*.md whitespace=-blank-at-eol'),'MARKDOWN_WHITESPACE_POLICY_MISSING');
   need(plan.includes('VIGENTE_CONGELADO / AUTORIDAD_OPERATIVA_DE_RUTA / NO_RECONSTRUIR'),'PLAN_20260824_NOT_FROZEN');
   need(expectedLedger>0&&L.revision===expectedLedger,'LEDGER_REVISION_MISMATCH');
   need(expectedPackage>0&&Number(L.productionReopeningPackage?.revision)===expectedPackage,'PACKAGE_REVISION_MISMATCH');
@@ -65,5 +67,5 @@ if(!failures.length){
   try{execFileSync(process.execPath,[A(P.preflight)],{cwd:ROOT,stdio:'ignore',env:{...process.env,ORBIT360_F2_WORKFLOW_SOURCE_FILE:A(P.workflow)}});}catch{need(false,'MECHANISM_PREFLIGHT_FAIL');}
   cleanGeneratedEvidence();
 }
-const out={schemaVersion:'orbit360-control-plane-selftest-v3-canonical-owner-close-aware',ok:failures.length===0,status:failures.length?'CONTROL_PLANE_SELFTEST_FAIL':'CONTROL_PLANE_SELFTEST_PASS',classification:failures.length?'PIPELINE_MECHANISM_FAILURE':'PASS',failures:[...new Set(failures)],expectedLedgerRevision:expectedLedger,expectedPackageRevision:expectedPackage,generatedEvidenceCleaned:true,canonicalOwner:'tools/orbit360-continuity-transition-owner-v20260824.mjs',hardeningCloseModeRequired:true,authorizationMaterialized:false,requestMaterialized:false,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
+const out={schemaVersion:'orbit360-control-plane-selftest-v4-markdown-whitespace-aware',ok:failures.length===0,status:failures.length?'CONTROL_PLANE_SELFTEST_FAIL':'CONTROL_PLANE_SELFTEST_PASS',classification:failures.length?'PIPELINE_MECHANISM_FAILURE':'PASS',failures:[...new Set(failures)],expectedLedgerRevision:expectedLedger,expectedPackageRevision:expectedPackage,generatedEvidenceCleaned:true,canonicalOwner:'tools/orbit360-continuity-transition-owner-v20260824.mjs',hardeningCloseModeRequired:true,markdownWhitespacePolicyRequired:true,authorizationMaterialized:false,requestMaterialized:false,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
 console.log(JSON.stringify(out,null,2));if(!out.ok)process.exit(41);
