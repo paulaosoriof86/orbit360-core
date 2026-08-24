@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "orbit360-f2-runtime-authorization-intent-v1",
+  "status": "USER_AUTHORIZATION_RECEIVED",
+  "authorizationIdentityDigest": "225f0f73b44b56006ae92d57a4f8024dba64ead40beec903cf064c03db87f924",
+  "candidateArtifactId": 9504702901,
+  "candidateArtifactDigest": "sha256:f11dd2a350b4160465dfc93b0dd9153e697d09773fa00aa4ee5ed13d93401ca2",
+  "candidateSourceHead": "8c9668d6d423e82826b0295431ec699390d79b4b",
+  "candidateZipSha256": "4a3660a18229a923412aa5a1bffc0817b1d5666c83ba96c81c92cea0fce9491c",
+  "candidateManifestSha256": "b1c98c1faf644b5d83cfe6e6bb1a602927c438cd85b7855cb0b1a6b98c08053c",
+  "gateId": "f2-productive-acceptance-exact-successor-v20260818",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "scope": {
+    "runtimeReadOnly": true,
+    "secrets": true,
+    "firestoreRead": true,
+    "browser": true,
+    "writes": false,
+    "deploy": false,
+    "production": false,
+    "main": false,
+    "merge": false
+  },
+  "oneShotOnly": true,
+  "replayAllowed": false,
+  "authorizationOperationallyPersisted": false,
+  "requestMaterialized": false,
+  "runtimeStarted": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
