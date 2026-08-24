@@ -8,7 +8,8 @@ const ROOT=process.env.ORBIT360_ROOT?path.resolve(process.env.ORBIT360_ROOT):pro
 const OUT=path.join(ROOT,'orbit360-platform/runtime-gate-crm-v20260716/macro3-mechanism-preflight-sanitized-v20260823.json');
 const P={
  workflow:'.github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml',
- owner:'tools/orbit360-continuity-transition-owner-v20260820.mjs',
+ owner:'tools/orbit360-continuity-transition-owner-v20260824.mjs',
+ delegatedOwner:'tools/orbit360-continuity-transition-owner-v20260820.mjs',
  convergence:'tools/orbit360-control-plane-evidence-convergence-v20260822.mjs',
  gate:'tools/orbit360-f2-gate-semantic-v20260824.mjs',
  register:'tools/orbit360-register-f2-productive-acceptance-runtime-v20260819.mjs',
@@ -26,26 +27,29 @@ const A=p=>path.join(ROOT,p),t=p=>fs.readFileSync(A(p),'utf8').replace(/^\uFEFF/
 const failures=[],need=(v,c)=>{if(!v)failures.push(c);};
 for(const p of Object.values(P))need(fs.existsSync(A(p)),`MISSING:${p}`);
 if(!failures.length){
-  const wf=t(P.workflow),owner=t(P.owner),conv=t(P.convergence),gate=t(P.gate),register=t(P.register),validator=t(P.validator),selftest=t(P.selftest),promoter=t(P.promoter),audit=t(P.audit),registry=j(P.registry),authority=j(P.authority),L=j(P.ledger);
+  const wf=t(P.workflow),owner=t(P.owner),delegated=t(P.delegatedOwner),conv=t(P.convergence),gate=t(P.gate),register=t(P.register),validator=t(P.validator),selftest=t(P.selftest),promoter=t(P.promoter),audit=t(P.audit),registry=j(P.registry),authority=j(P.authority),L=j(P.ledger);
   const certPath=String(authority.candidateCertificationEvidence||'').trim();need(certPath&&fs.existsSync(A(certPath)),'DURABLE_CERTIFICATION_POINTER_MISSING');const cert=certPath&&fs.existsSync(A(certPath))?j(certPath):{};
   const workflows=fs.readdirSync(path.join(ROOT,'.github/workflows')).filter(x=>/\.ya?ml$/i.test(x)).sort();need(workflows.length===1&&workflows[0]===path.basename(P.workflow),'MULTIPLE_OR_NONCANONICAL_WORKFLOWS');
-  need(wf.includes('GENERIC_INTENT_ROUTER_V1')&&wf.includes('MACRO3_INLINE_F2_V1'),'GENERIC_INLINE_WORKFLOW_MARKERS_MISSING');
+  need(wf.includes('GENERIC_INTENT_ROUTER_V1')&&wf.includes('MACRO3_INLINE_F2_V1')&&wf.includes('CONTROL_PLANE_SELFTEST_V1')&&wf.includes('CONTROL_PLANE_HARDENING_CLOSE_V1'),'GENERIC_INLINE_WORKFLOW_MARKERS_MISSING');
   need(wf.includes("'.github/orbit360-intents/*.json'"),'INTENT_ONLY_TRIGGER_MISSING');
   need(!/^\s*workflow_dispatch\s*:/mi.test(wf)&&!/^\s*workflow_run\s*:/mi.test(wf)&&!wf.includes('/dispatches')&&!wf.includes('gh workflow run'),'WORKFLOW_CHAINING_OR_DISPATCH_FORBIDDEN');
   need(!/permissions\s*:[\s\S]{0,500}?actions\s*:\s*write\b/i.test(wf),'ACTIONS_WRITE_FORBIDDEN');
   need(!wf.includes('git pull --rebase'),'REBASE_FORBIDDEN');
   need(!/F2_ARTIFACT_ID\s*:\s*['"]?\d{6,}/.test(wf),'WORKFLOW_CANDIDATE_HARDCODED');
   need(!/F2_AUTH_IDENTITY\s*:\s*[a-f0-9]{64}/.test(wf),'WORKFLOW_AUTH_IDENTITY_HARDCODED');
+  need(wf.includes('OWNER: tools/orbit360-continuity-transition-owner-v20260824.mjs'),'WORKFLOW_CANONICAL_OWNER_V24_MISSING');
+  need(wf.includes('CONTROL_PLANE_HARDENING_CLOSE')&&wf.includes("steps.intent.outputs.mode == 'CONTROL_PLANE_HARDENING_CLOSE'"),'WORKFLOW_HARDENING_CLOSE_MODE_MISSING');
   const gatePos=(/^\s*-\s*id\s*:\s*gate\s*$/mi.exec(wf)||{}).index,providerPos=(/^\s*-\s*id\s*:\s*provider\s*$/mi.exec(wf)||{}).index;
   need(Number.isInteger(gatePos)&&Number.isInteger(providerPos)&&gatePos<providerPos,'WORKFLOW_SEMANTIC_GATE_ORDER_INVALID');
   const providerBlock=Number.isInteger(providerPos)?wf.slice(providerPos,providerPos+1200):'';need(/if\s*:\s*[^\n]*steps\.gate\.(outcome|outputs\.)/.test(providerBlock),'WORKFLOW_PROVIDER_NOT_GATED');
 
-  for(const [name,src] of [['owner',owner],['convergence',conv],['validator',validator],['selftest',selftest],['promoter',promoter]]){
+  for(const [name,src] of [['owner',owner],['delegatedOwner',delegated],['convergence',conv],['validator',validator],['selftest',selftest],['promoter',promoter]]){
     need(!/\bapplyOnce\b|\bsource\.replace\s*\(|\bos\.tmpdir\s*\(|CORE_REL\s*=|-core-v202608(?:20|24)\.mjs/.test(src),`ACTIVE_SOURCE_REWRITE_PRESENT:${name}`);
   }
   try{execFileSync(process.execPath,[A(P.noRewrite)],{cwd:ROOT,stdio:'ignore'});}catch{need(false,'NO_SOURCE_REWRITE_GUARD_FAIL');}
-  need(owner.includes("transition==='F2_RUNTIME_ATTEMPT_ACCEPT'")&&owner.includes('RUNTIME_ATTEMPT_ALREADY_ACCEPTED_STOP_RETRY'),'OWNER_ATTEMPT_STOP_RETRY_MISSING');
-  need(owner.includes('normalizeTerminalClassification')&&owner.includes('terminalPassContract')&&owner.includes('DATA_CONTRACT_FAILURE:TERMINAL_PASS_CONTRACT_INCOMPLETE'),'OWNER_TERMINAL_TRUTH_CONTRACT_MISSING');
+  need(owner.includes("transition!=='CONTROL_PLANE_HARDENING_CLOSE'")&&owner.includes("DELEGATE='tools/orbit360-continuity-transition-owner-v20260820.mjs'")&&owner.includes('CONTROL_PLANE_HARDENING_CLOSED_CAUSAL_PASS'),'OWNER_V24_HARDENING_CLOSE_CONTRACT_MISSING');
+  need(delegated.includes("transition==='F2_RUNTIME_ATTEMPT_ACCEPT'")&&delegated.includes('RUNTIME_ATTEMPT_ALREADY_ACCEPTED_STOP_RETRY'),'DELEGATED_OWNER_ATTEMPT_STOP_RETRY_MISSING');
+  need(delegated.includes('normalizeTerminalClassification')&&delegated.includes('terminalPassContract')&&delegated.includes('DATA_CONTRACT_FAILURE:TERMINAL_PASS_CONTRACT_INCOMPLETE'),'DELEGATED_OWNER_TERMINAL_TRUTH_CONTRACT_MISSING');
   need(conv.includes('candidateCertificationEvidence')&&conv.includes('ACTIVE_SOURCE_REWRITE_GUARD_FAIL'),'CONVERGENCE_DYNAMIC_OR_REWRITE_GUARD_MISSING');
   need(gate.includes("stepIndex(wf,'gate')")&&gate.includes("stepIndex(wf,'provider')")&&gate.includes('F2_PROVIDER_NOT_DEPENDENT_ON_GATE'),'SEMANTIC_GATE_CONTRACT_MISSING');
   need(register.includes('runtimeAttemptAccepted===true')&&register.includes('allowedExecutions===0'),'REGISTER_ONE_SHOT_ACCEPT_GUARD_MISSING');
@@ -54,10 +58,13 @@ if(!failures.length){
   need(promoter.includes('MACRO2_DYNAMIC_COUNTS_INVALID')&&promoter.includes('PROMOTER_STATE_MUTATION_FORBIDDEN'),'PROMOTER_DIRECT_DYNAMIC_CONTRACT_MISSING');
   need(audit.includes('generic intent workflow')||audit.includes('generic intent'),'WORKFLOW_AUDIT_GENERIC_RULE_MISSING');
 
-  need(registry.status==='DEFINITIVE_SINGLE_WORKFLOW_GENERIC_INTENT_ROUTER','REGISTRY_STATUS_DRIFT');
-  need(registry.canonicalWorkflow===P.workflow&&registry.canonicalWorkflowMode==='GENERIC_INTENT_ROUTER_INLINE_F2_ONE_SHOT_READONLY_TERMINAL_REDUCER','REGISTRY_MODE_DRIFT');
+  need(registry.status==='DEFINITIVE_SINGLE_WORKFLOW_GENERIC_INTENT_ROUTER_CAUSAL','REGISTRY_STATUS_DRIFT');
+  need(registry.transitionOwner===P.owner&&registry.delegatedF2TransitionOwner===P.delegatedOwner,'REGISTRY_OWNER_DRIFT');
+  need(registry.canonicalWorkflow===P.workflow&&registry.canonicalWorkflowMode==='GENERIC_INTENT_ROUTER_SELFTEST_HARDENING_CLOSE_INLINE_F2_ONE_SHOT','REGISTRY_MODE_DRIFT');
+  need(Array.isArray(registry.supportedIntentModes)&&['CONTROL_PLANE_SELFTEST','CONTROL_PLANE_HARDENING_CLOSE','F2_RUNTIME_ONE_SHOT'].every(x=>registry.supportedIntentModes.includes(x)),'REGISTRY_SUPPORTED_INTENT_MODES_DRIFT');
   need(registry.policies?.executionTransportIntentOnly===true&&registry.policies?.executionPrMayModifyWorkflow===false&&registry.policies?.workflowDefinitionMayChangePerCandidate===false,'REGISTRY_INTENT_ONLY_POLICY_OPEN');
   need(registry.policies?.terminalEvidenceMustBeCurrentRunScoped===true&&registry.policies?.terminalPassRequiresCausalEvidence===true,'REGISTRY_TERMINAL_TRUTH_POLICY_MISSING');
+  need(registry.policies?.controlPlaneHandshakeRequiredBeforeRuntimeAuthorization===true&&registry.policies?.controlPlaneHardeningClosureMustUseCanonicalWorkflow===true&&registry.policies?.sourceRewriteInActivePathsForbidden===true,'REGISTRY_CAUSAL_CLOSURE_POLICY_MISSING');
   need(registry.policies?.gateOrderValidatedByTechnicalStepIds===true&&registry.policies?.visibleStepNamesHaveNoSecuritySemantics===true,'REGISTRY_GATE_SEMANTICS_MISSING');
   need(registry.publicationGuard?.writesMayExecute===false&&registry.publicationGuard?.deployMayExecute===false&&registry.publicationGuard?.productionMayBeTouched===false&&registry.publicationGuard?.mainMayBeTouched===false&&registry.publicationGuard?.mergeMayExecute===false,'REGISTRY_FORBIDDEN_CAPABILITY_OPEN');
 
@@ -69,5 +76,5 @@ if(!failures.length){
   if(L.nextAction?.id==='AWAIT_EXPLICIT_F2_RUNTIME_AUTHORIZATION_ONE_SHOT'){need(L.authorizationBoundary?.activeRuntimeAuthorization===false,'LEDGER_AUTH_ACTIVE_BEFORE_PREFLIGHT');need(L.authorizationBoundary?.activeRequestPath==null,'LEDGER_REQUEST_ACTIVE_BEFORE_PREFLIGHT');need((L.authorizationBoundary?.runtimeAttemptAccepted??false)===false,'LEDGER_ATTEMPT_ACTIVE_BEFORE_PREFLIGHT');}
   need(L.activeState?.runtimeReplayAllowed===false,'LEDGER_REPLAY_OPEN');
 }
-const out={schemaVersion:'orbit360-macro3-mechanism-preflight-v5-direct-no-source-rewrite',ok:failures.length===0,status:failures.length?'MACRO3_MECHANISM_PREFLIGHT_FAIL':'MACRO3_MECHANISM_PREFLIGHT_PASS',classification:failures.length?'PIPELINE_MECHANISM_FAILURE':'PASS',failures:[...new Set(failures)],singleWorkflowRequired:true,genericIntentRouterRequired:true,executionPrMayModifyWorkflow:false,workflowDispatchForbidden:true,workflowRunChainingForbidden:true,actionsWriteForbidden:true,currentRunEvidenceRequired:true,terminalTruthRequired:true,gateOrderByStepIds:true,noSourceRewriteRequired:true,oneShotAcceptedBeforeRuntime:true,allowedExecutionsAfterAccept:0,terminalReducerRequired:true,replayAllowed:false,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
+const out={schemaVersion:'orbit360-macro3-mechanism-preflight-v6-canonical-owner-close-aware',ok:failures.length===0,status:failures.length?'MACRO3_MECHANISM_PREFLIGHT_FAIL':'MACRO3_MECHANISM_PREFLIGHT_PASS',classification:failures.length?'PIPELINE_MECHANISM_FAILURE':'PASS',failures:[...new Set(failures)],singleWorkflowRequired:true,genericIntentRouterRequired:true,hardeningCloseModeRequired:true,canonicalOwnerV24Required:true,executionPrMayModifyWorkflow:false,workflowDispatchForbidden:true,workflowRunChainingForbidden:true,actionsWriteForbidden:true,currentRunEvidenceRequired:true,terminalTruthRequired:true,gateOrderByStepIds:true,noSourceRewriteRequired:true,oneShotAcceptedBeforeRuntime:true,allowedExecutionsAfterAccept:0,terminalReducerRequired:true,replayAllowed:false,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
 fs.mkdirSync(path.dirname(OUT),{recursive:true});fs.writeFileSync(OUT,JSON.stringify(out,null,2)+'\n','utf8');console.log(JSON.stringify(out,null,2));if(!out.ok)process.exit(41);
