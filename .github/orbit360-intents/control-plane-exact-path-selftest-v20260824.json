@@ -14,5 +14,6 @@
   "expectedLedgerRevision": 42,
   "expectedPackageRevision": 36,
   "candidateArtifactId": 9504702901,
-  "candidateSourceHead": "8c9668d6d423e82826b0295431ec699390d79b4b"
+  "candidateSourceHead": "8c9668d6d423e82826b0295431ec699390d79b4b",
+  "triggerNonce": "20260824-exact-path-selftest-1"
 }
