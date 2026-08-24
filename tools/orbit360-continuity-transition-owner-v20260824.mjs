@@ -36,16 +36,30 @@ if(!controlPlaneEvidence||!fs.existsSync(A(controlPlaneEvidence)))throw new Erro
 const L=J(P.ledger),G=J(P.authority),E=J(controlPlaneEvidence);
 if(Number(L.revision)!==expectedRevision)throw new Error(`EXPECTED_REVISION_MISMATCH:${expectedRevision}:${L.revision}`);
 if(Number(L.productionReopeningPackage?.revision)!==expectedPackageRevision)throw new Error(`EXPECTED_PACKAGE_REVISION_MISMATCH:${expectedPackageRevision}:${L.productionReopeningPackage?.revision}`);
-if(L.activeState?.phase!=='MACRO1_CONTROL_PLANE_TRUTH_HARDENING_SOURCE_ONLY'||L.activeState?.status!=='CONTROL_PLANE_FALSE_PASS_INVALIDATED')throw new Error('CONTROL_PLANE_CLOSE_PHASE_INVALID');
+const hardeningOpen=L.activeState?.phase==='MACRO1_CONTROL_PLANE_TRUTH_HARDENING_SOURCE_ONLY'&&L.activeState?.status==='CONTROL_PLANE_FALSE_PASS_INVALIDATED';
+const hardeningClosed=L.activeState?.phase==='CONTROL_PLANE_DEFINITIVE_CAUSAL_PASS_AWAITING_F2_AUTHORIZATION'&&L.activeState?.status==='CONTROL_PLANE_DEFINITIVE_CAUSAL_PASS';
+if(!hardeningOpen&&!hardeningClosed)throw new Error('CONTROL_PLANE_CLOSE_PHASE_INVALID');
 if(L.activeState?.runtimeAuthorized!==false||L.activeState?.runtimeReplayAllowed!==false||L.authorizationBoundary?.activeRuntimeAuthorization!==false||L.authorizationBoundary?.activeRequestPath!=null||L.authorizationBoundary?.authorizationRecordPath!=null||(L.authorizationBoundary?.runtimeAttemptAccepted??false)!==false)throw new Error('CONTROL_PLANE_CLOSE_BOUNDARY_NOT_INERT');
 if(Number(L.progress?.productionRouteProgressPct)!==75||L.progress?.f2TerminalPass!==false)throw new Error('CONTROL_PLANE_CLOSE_PROGRESS_INVALID');
 if(E.ok!==true||E.status!=='CONTROL_PLANE_SELFTEST_HANDSHAKE_PASS'||E.classification!=='PASS'||E.controlPlaneSelftestPass!==true)throw new Error('CONTROL_PLANE_HANDSHAKE_EVIDENCE_INVALID');
-if(Number(E.expectedLedgerRevision)!==expectedRevision||Number(E.expectedPackageRevision)!==expectedPackageRevision)throw new Error('CONTROL_PLANE_HANDSHAKE_REVISION_MISMATCH');
 if(Number(E.candidateArtifactId)!==Number(L.successorCandidate?.artifactId)||E.candidateSourceHead!==L.successorCandidate?.sourceHead)throw new Error('CONTROL_PLANE_HANDSHAKE_CANDIDATE_MISMATCH');
 if(E.authorizationMaterialized!==false||E.requestMaterialized!==false||E.runtimeExecuted!==false||E.browserExecuted!==false||E.secretAccess!==false||E.firestoreRead!==false||Number(E.firestoreWrites)!==0||Number(E.authWrites)!==0||Number(E.operationalWrites)!==0||E.deployExecuted!==false||E.productionTouched!==false)throw new Error('CONTROL_PLANE_HANDSHAKE_SIDE_EFFECT_SIGNAL');
+if(hardeningOpen){
+  if(Number(E.expectedLedgerRevision)!==expectedRevision||Number(E.expectedPackageRevision)!==expectedPackageRevision)throw new Error('CONTROL_PLANE_HANDSHAKE_REVISION_MISMATCH');
+}else{
+  if(String(L.continuityControl?.workflowHandshakeEvidence||'')!==controlPlaneEvidence)throw new Error('CONTROL_PLANE_CLOSED_HANDSHAKE_PATH_MISMATCH');
+  if(Number(L.continuityControl?.workflowHandshakeRunId||0)!==Number(E.runId||0)||Number(L.continuityControl?.workflowHandshakeJobId||0)!==Number(E.jobId||0))throw new Error('CONTROL_PLANE_CLOSED_HANDSHAKE_IDENTITY_MISMATCH');
+  if(L.nextAction?.id!=='AWAIT_EXPLICIT_F2_RUNTIME_AUTHORIZATION_ONE_SHOT')throw new Error('CONTROL_PLANE_CLOSED_NEXT_ACTION_DRIFT');
+}
 try{execFileSync('git',['merge-base','--is-ancestor',String(E.canonicalBaseHead),'HEAD'],{cwd:ROOT,stdio:'ignore'});}catch{throw new Error('CONTROL_PLANE_HANDSHAKE_BASE_NOT_ANCESTOR');}
 execFileSync(process.execPath,[A(P.noRewrite)],{cwd:ROOT,stdio:'ignore'});
 execFileSync(process.execPath,[A(P.terminalTruth)],{cwd:ROOT,stdio:'ignore'});
+
+if(hardeningClosed){
+  execFileSync(process.execPath,[A(P.projection),'--expected-revision',String(L.revision)],{cwd:ROOT,stdio:'inherit'});
+  console.log(JSON.stringify({ok:true,status:'CONTROL_PLANE_HARDENING_CLOSED_CAUSAL_PASS',transition,ledgerRevision:L.revision,packageRevision:L.productionReopeningPackage.revision,authorizationIdentityDigest:L.authorizationBoundary?.preparedAuthorizationIdentityDigest||null,candidateArtifactId:L.successorCandidate.artifactId,candidateSourceHead:L.successorCandidate.sourceHead,progress:75,closedStateReprojection:true,authorizationMaterialized:false,requestMaterialized:false,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false},null,2));
+  process.exit(0);
+}
 
 const ts=new Date().toISOString();
 L.revision+=1;
@@ -65,4 +79,4 @@ L.progress={...L.progress,productionRouteProgressPct:75,programProgressPct:25,f2
 L.history={...(L.history||{}),latestControlPlaneHandshake:{runId:Number(E.runId),jobId:Number(E.jobId),technicalPullRequest:Number(E.technicalPullRequest),conclusion:'success',status:E.status,evidencePath:controlPlaneEvidence,canonicalBaseHead:E.canonicalBaseHead,intentHead:E.intentHead,candidateArtifactId:E.candidateArtifactId,candidateSourceHead:E.candidateSourceHead,sourceOnly:true,authorizationMaterialized:false,requestMaterialized:false,runtimeExecuted:false,browserExecuted:false,replayAllowed:false,closedAtUtc:ts}};
 W(P.ledger,L);
 execFileSync(process.execPath,[A(P.projection),'--expected-revision',String(L.revision)],{cwd:ROOT,stdio:'inherit'});
-console.log(JSON.stringify({ok:true,status:'CONTROL_PLANE_HARDENING_CLOSED_CAUSAL_PASS',transition,ledgerRevision:L.revision,packageRevision:L.productionReopeningPackage.revision,authorizationIdentityDigest:authDigest,candidateArtifactId:L.successorCandidate.artifactId,candidateSourceHead:L.successorCandidate.sourceHead,progress:75,authorizationMaterialized:false,requestMaterialized:false,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false},null,2));
+console.log(JSON.stringify({ok:true,status:'CONTROL_PLANE_HARDENING_CLOSED_CAUSAL_PASS',transition,ledgerRevision:L.revision,packageRevision:L.productionReopeningPackage.revision,authorizationIdentityDigest:authDigest,candidateArtifactId:L.successorCandidate.artifactId,candidateSourceHead:L.successorCandidate.sourceHead,progress:75,closedStateReprojection:false,authorizationMaterialized:false,requestMaterialized:false,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false},null,2));
