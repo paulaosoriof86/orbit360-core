@@ -1,5 +1,7 @@
 # MACRO-3 — Corrección de causa raíz del mecanismo de activación F2
 
+> **HISTORICAL SUPPORTING EVIDENCE — NOT CURRENT STATE AUTHORITY.** Conserva la evidencia causal de esta reparación; el estado vivo se deriva exclusivamente del ledger y sus proyecciones canónicas.
+
 **Fecha:** 2026-08-23 (America/Guatemala)  
 **Módulo:** Control plane / Macro-3 / F2 productive acceptance  
 **Estado:** `SOURCE_ONLY_ROOT_CAUSE_FIXED_PENDING_CANONICAL_PREFLIGHT`  
