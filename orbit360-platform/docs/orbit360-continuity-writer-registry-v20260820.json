@@ -1,7 +1,7 @@
 {
   "schemaVersion": "orbit360-continuity-writer-registry-v8",
   "registryId": "ORBIT360-CONTINUITY-WRITER-REGISTRY",
-  "revision": 17,
+  "revision": 18,
   "active": true,
   "status": "DEFINITIVE_SINGLE_WORKFLOW_GENERIC_INTENT_ROUTER_CAUSAL",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -20,8 +20,9 @@
   "macro3MechanismPreflight": "tools/orbit360-macro3-mechanism-preflight-v20260823.mjs",
   "noSourceRewriteGuard": "tools/orbit360-control-plane-no-source-rewrite-guard-v20260824.mjs",
   "canonicalWorkflow": ".github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml",
-  "canonicalWorkflowMode": "GENERIC_INTENT_ROUTER_SELFTEST_HARDENING_CLOSE_INLINE_F2_ONE_SHOT",
+  "canonicalWorkflowMode": "GENERIC_INTENT_ROUTER_REGRESSION_REOPEN_SELFTEST_HARDENING_CLOSE_INLINE_F2_ONE_SHOT",
   "supportedIntentModes": [
+    "CONTROL_PLANE_REGRESSION_REOPEN",
     "CONTROL_PLANE_SELFTEST",
     "CONTROL_PLANE_HARDENING_CLOSE",
     "F2_RUNTIME_ONE_SHOT"
@@ -76,6 +77,7 @@
     "runtimeRequestMaterializationRequiresFreshExplicitUserAuthorization": true,
     "controlPlaneHandshakeRequiredBeforeRuntimeAuthorization": true,
     "controlPlaneHardeningClosureMustUseCanonicalWorkflow": true,
+    "controlPlaneRegressionReopenMustUseCanonicalWorkflow": true,
     "sourceRewriteInActivePathsForbidden": true,
     "crossWorkflowDispatchForbidden": true,
     "workflowRunChainingForbidden": true,
@@ -103,6 +105,7 @@
     "solePhysicalWorkflow": [
       ".github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml"
     ],
+    "controlPlaneRegressionReopen": "INLINE_SOURCE_ONLY_DURABLE_FAILURE_REDUCTION_NO_RUNTIME",
     "runtimeAndEvidenceExecution": "INLINE_IN_BASE_OWNED_CANONICAL_WORKFLOW_ONLY",
     "controlPlaneSelftest": "INLINE_SOURCE_ONLY_EXACT_F2_PREAUTH_PATH_NO_STATE_MUTATION",
     "controlPlaneHardeningClosure": "INLINE_SOURCE_ONLY_CANONICAL_STATE_TRANSITION_OR_IDEMPOTENT_REPROJECTION",
