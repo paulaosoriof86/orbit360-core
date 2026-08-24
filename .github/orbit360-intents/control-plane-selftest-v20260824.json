@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "orbit360-control-plane-intent-v1",
+  "mode": "CONTROL_PLANE_SELFTEST",
+  "sourceOnly": true,
+  "oneShotOnly": false,
+  "replayAllowed": false,
+  "writesAllowed": false,
+  "deployAllowed": false,
+  "productionAllowed": false,
+  "mainAllowed": false,
+  "mergeAllowed": false,
+  "expectedLedgerRevision": 40,
+  "expectedPackageRevision": 34,
+  "candidateArtifactId": 9504702901,
+  "candidateSourceHead": "8c9668d6d423e82826b0295431ec699390d79b4b",
+  "triggerNonce": 2,
+  "purpose": "Prove base-owned canonical workflow registration and source-only mechanism gates before any F2 authorization or request.",
+  "containsPII": false,
+  "containsSecrets": false
+}
