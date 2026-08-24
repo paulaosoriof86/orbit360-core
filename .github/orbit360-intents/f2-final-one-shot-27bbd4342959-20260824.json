@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "orbit360-control-plane-intent-v1",
+  "mode": "F2_RUNTIME_ONE_SHOT",
+  "oneShotOnly": true,
+  "replayAllowed": false,
+  "sourceOnly": false,
+  "writesAllowed": false,
+  "deployAllowed": false,
+  "productionAllowed": false,
+  "mainAllowed": false,
+  "mergeAllowed": false,
+  "authorizationIdentityDigest": "27bbd434295938cffcc6873974944e4a2e0ca2b669716eb72b750c7489367eef",
+  "authorizationIntentPath": ".github/orbit360-authorizations/f2-runtime-authorization-intent-27bbd4342959-v20260824.json",
+  "candidateArtifactId": 9504702901,
+  "candidateArtifactDigest": "sha256:f11dd2a350b4160465dfc93b0dd9153e697d09773fa00aa4ee5ed13d93401ca2",
+  "candidateSourceHead": "8c9668d6d423e82826b0295431ec699390d79b4b",
+  "expectedLedgerRevision": 41,
+  "expectedPackageRevision": 35,
+  "containsPII": false,
+  "containsSecrets": false,
+  "purpose": "F2_FINAL_ONE_SHOT_REAL authorized explicitly by user for certified artifact 9504702901; runtime/browser/Firestore reads only, zero writes, deploy, production, main or merge."
+}
