@@ -51,11 +51,14 @@ if(!failures.length){
   need(wf.includes('CONTROL_PLANE_SELFTEST'),'WORKFLOW_SELFTEST_MODE_MISSING');
   need(wf.includes('CONTROL_PLANE_HARDENING_CLOSE'),'WORKFLOW_HARDENING_CLOSE_MODE_MISSING');
   need(wf.includes('F2_PUBLICATION_CHAIN_GUARD_V1'),'WORKFLOW_F2_PUBLICATION_CHAIN_GUARD_MISSING');
+  need(wf.includes('CONTROL_PLANE_IDEMPOTENT_REPROJECTION_V1'),'WORKFLOW_IDEMPOTENT_REPROJECTION_GUARD_MISSING');
   need(wf.includes("steps.intent.outputs.mode == 'CONTROL_PLANE_SELFTEST'"),'WORKFLOW_SELFTEST_CONDITION_MISSING');
   need(wf.includes("steps.intent.outputs.mode == 'CONTROL_PLANE_HARDENING_CLOSE'"),'WORKFLOW_HARDENING_CLOSE_CONDITION_MISSING');
   need(wf.includes("steps.intent.outputs.mode == 'F2_RUNTIME_ONE_SHOT'"),'WORKFLOW_F2_MODE_GUARD_MISSING');
   need(wf.includes("if: always() && steps.materialize.outcome == 'success' && steps.authpublish.outcome == 'success'"),'WORKFLOW_TERMINAL_PUBLISH_REQUIRES_AUTH_PUBLISH');
   need(wf.includes("if: always() && steps.materialize.outcome == 'success' && steps.terminalpublish.outcome == 'success'"),'WORKFLOW_PR_BODY_REQUIRES_TERMINAL_PUBLISH');
+  need(wf.includes('FINAL_HEAD=\'${{ steps.intent.outputs.live_base }}\''),'WORKFLOW_IDEMPOTENT_FINAL_HEAD_DEFAULT_MISSING');
+  need(wf.includes('if [ "${#CHANGED[@]}" -gt 0 ]; then'),'WORKFLOW_IDEMPOTENT_ZERO_DIFF_BRANCH_MISSING');
   need(convergence.includes("TRANSIENT_PREFLIGHT='orbit360-platform/runtime-gate-crm-v20260716/macro3-mechanism-preflight-sanitized-v20260823.json'"),'CONVERGENCE_TRANSIENT_PREFLIGHT_CLEANUP_MISSING');
   need(wf.includes('OWNER: tools/orbit360-continuity-transition-owner-v20260824.mjs'),'WORKFLOW_CANONICAL_OWNER_V24_MISSING');
   need(owner.includes("transition!=='CONTROL_PLANE_HARDENING_CLOSE'")&&owner.includes("DELEGATE='tools/orbit360-continuity-transition-owner-v20260820.mjs'"),'OWNER_V24_DELEGATION_CONTRACT_MISSING');
@@ -74,5 +77,5 @@ if(!failures.length){
   try{execFileSync(process.execPath,[A(P.preflight)],{cwd:ROOT,stdio:'ignore',env:{...process.env,ORBIT360_F2_WORKFLOW_SOURCE_FILE:A(P.workflow)}});}catch{need(false,'MECHANISM_PREFLIGHT_FAIL');}
   cleanGeneratedEvidence();
 }
-const out={schemaVersion:'orbit360-control-plane-selftest-v6-f2-publication-chain-guard',ok:failures.length===0,status:failures.length?'CONTROL_PLANE_SELFTEST_FAIL':'CONTROL_PLANE_SELFTEST_PASS',classification:failures.length?'PIPELINE_MECHANISM_FAILURE':'PASS',failures:[...new Set(failures)],expectedLedgerRevision:expectedLedger,expectedPackageRevision:expectedPackage,generatedEvidenceCleaned:true,canonicalOwner:'tools/orbit360-continuity-transition-owner-v20260824.mjs',hardeningCloseModeRequired:true,publicationChainGuardRequired:true,transientPreflightCleanupRequired:true,markdownWhitespacePolicyRequired:true,authorizationMaterialized:false,requestMaterialized:false,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
+const out={schemaVersion:'orbit360-control-plane-selftest-v7-idempotent-reprojection',ok:failures.length===0,status:failures.length?'CONTROL_PLANE_SELFTEST_FAIL':'CONTROL_PLANE_SELFTEST_PASS',classification:failures.length?'PIPELINE_MECHANISM_FAILURE':'PASS',failures:[...new Set(failures)],expectedLedgerRevision:expectedLedger,expectedPackageRevision:expectedPackage,generatedEvidenceCleaned:true,canonicalOwner:'tools/orbit360-continuity-transition-owner-v20260824.mjs',hardeningCloseModeRequired:true,publicationChainGuardRequired:true,transientPreflightCleanupRequired:true,idempotentZeroDiffReprojectionRequired:true,markdownWhitespacePolicyRequired:true,authorizationMaterialized:false,requestMaterialized:false,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
 console.log(JSON.stringify(out,null,2));if(!out.ok)process.exit(41);
