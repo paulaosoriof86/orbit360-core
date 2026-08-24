@@ -2,6 +2,7 @@ name: Orbit360 Canonical Control Plane
 # CONTROL_PLANE_CONVERGENCE_V1
 # MACRO3_INLINE_F2_V1
 # GENERIC_INTENT_ROUTER_V1
+# CONTROL_PLANE_SELFTEST_V1
 # Stable base-owned workflow. Execution PRs may change one intent JSON only; they may not change this workflow.
 
 on:
@@ -72,25 +73,40 @@ jobs:
           test "${#CHANGED[@]}" = '1'
           INTENT="${CHANGED[0]}"
           [[ "$INTENT" =~ ^\.github/orbit360-intents/[A-Za-z0-9._-]+\.json$ ]]
-          jq -e '.schemaVersion=="orbit360-control-plane-intent-v1" and .mode=="F2_RUNTIME_ONE_SHOT" and .oneShotOnly==true and .replayAllowed==false and .sourceOnly==false and .writesAllowed==false and .deployAllowed==false and .productionAllowed==false and .mainAllowed==false and .mergeAllowed==false' "$INTENT" >/dev/null
-          cp "$INTENT" "$RUNNER_TEMP/control-plane-intent.json"
-          cp .github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml "$RUNNER_TEMP/executing-workflow.yml"
-          IDENTITY=$(jq -r '.authorizationIdentityDigest' "$INTENT")
-          AUTH_INTENT=$(jq -r '.authorizationIntentPath' "$INTENT")
-          ARTIFACT=$(jq -r '.candidateArtifactId' "$INTENT")
-          SOURCE=$(jq -r '.candidateSourceHead' "$INTENT")
-          DIGEST=$(jq -r '.candidateArtifactDigest' "$INTENT")
-          EXPECTED_LEDGER=$(jq -r '.expectedLedgerRevision' "$INTENT")
-          EXPECTED_PACKAGE=$(jq -r '.expectedPackageRevision' "$INTENT")
-          [[ "$IDENTITY" =~ ^[a-f0-9]{64}$ ]]
-          [[ "$AUTH_INTENT" =~ ^\.github/orbit360-authorizations/f2-runtime-authorization-intent-[a-f0-9]{12}-v[0-9]{8}\.json$ ]]
-          [[ "$ARTIFACT" =~ ^[0-9]+$ ]]
-          [[ "$SOURCE" =~ ^[a-f0-9]{40}$ ]]
-          [[ "$DIGEST" =~ ^sha256:[a-f0-9]{64}$ ]]
+          MODE=$(jq -r '.mode // empty' "$INTENT")
+          EXPECTED_LEDGER=$(jq -r '.expectedLedgerRevision // empty' "$INTENT")
+          EXPECTED_PACKAGE=$(jq -r '.expectedPackageRevision // empty' "$INTENT")
           [[ "$EXPECTED_LEDGER" =~ ^[0-9]+$ ]]
           [[ "$EXPECTED_PACKAGE" =~ ^[0-9]+$ ]]
-          curl -L --fail --silent --show-error -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/${ARTIFACT}" > "$RUNNER_TEMP/f2-artifact-metadata.json"
-          jq -e --argjson id "$ARTIFACT" --arg digest "$DIGEST" '.id==$id and .expired==false and .digest==$digest' "$RUNNER_TEMP/f2-artifact-metadata.json" >/dev/null
+          IDENTITY=''; AUTH_INTENT=''; ARTIFACT=''; SOURCE=''; DIGEST=''
+          case "$MODE" in
+            CONTROL_PLANE_SELFTEST)
+              jq -e '.schemaVersion=="orbit360-control-plane-intent-v1" and .mode=="CONTROL_PLANE_SELFTEST" and .sourceOnly==true and .oneShotOnly==false and .replayAllowed==false and .writesAllowed==false and .deployAllowed==false and .productionAllowed==false and .mainAllowed==false and .mergeAllowed==false and .containsPII==false and .containsSecrets==false' "$INTENT" >/dev/null
+              ARTIFACT=$(jq -r '.candidateArtifactId // empty' "$INTENT")
+              SOURCE=$(jq -r '.candidateSourceHead // empty' "$INTENT")
+              [[ "$ARTIFACT" =~ ^[0-9]+$ ]]
+              [[ "$SOURCE" =~ ^[a-f0-9]{40}$ ]]
+              ;;
+            F2_RUNTIME_ONE_SHOT)
+              jq -e '.schemaVersion=="orbit360-control-plane-intent-v1" and .mode=="F2_RUNTIME_ONE_SHOT" and .oneShotOnly==true and .replayAllowed==false and .sourceOnly==false and .writesAllowed==false and .deployAllowed==false and .productionAllowed==false and .mainAllowed==false and .mergeAllowed==false' "$INTENT" >/dev/null
+              IDENTITY=$(jq -r '.authorizationIdentityDigest' "$INTENT")
+              AUTH_INTENT=$(jq -r '.authorizationIntentPath' "$INTENT")
+              ARTIFACT=$(jq -r '.candidateArtifactId' "$INTENT")
+              SOURCE=$(jq -r '.candidateSourceHead' "$INTENT")
+              DIGEST=$(jq -r '.candidateArtifactDigest' "$INTENT")
+              [[ "$IDENTITY" =~ ^[a-f0-9]{64}$ ]]
+              [[ "$AUTH_INTENT" =~ ^\.github/orbit360-authorizations/f2-runtime-authorization-intent-[a-f0-9]{12}-v[0-9]{8}\.json$ ]]
+              [[ "$ARTIFACT" =~ ^[0-9]+$ ]]
+              [[ "$SOURCE" =~ ^[a-f0-9]{40}$ ]]
+              [[ "$DIGEST" =~ ^sha256:[a-f0-9]{64}$ ]]
+              curl -L --fail --silent --show-error -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/${ARTIFACT}" > "$RUNNER_TEMP/f2-artifact-metadata.json"
+              jq -e --argjson id "$ARTIFACT" --arg digest "$DIGEST" '.id==$id and .expired==false and .digest==$digest' "$RUNNER_TEMP/f2-artifact-metadata.json" >/dev/null
+              ;;
+            *) echo "PIPELINE_MECHANISM_FAILURE:UNSUPPORTED_CONTROL_PLANE_INTENT_MODE:$MODE" >&2; exit 41 ;;
+          esac
+          cp "$INTENT" "$RUNNER_TEMP/control-plane-intent.json"
+          cp .github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml "$RUNNER_TEMP/executing-workflow.yml"
+          echo "mode=$MODE" >> "$GITHUB_OUTPUT"
           echo "live_base=$LIVE_BASE" >> "$GITHUB_OUTPUT"
           echo "intent=$INTENT" >> "$GITHUB_OUTPUT"
           echo "identity=$IDENTITY" >> "$GITHUB_OUTPUT"
@@ -101,11 +117,13 @@ jobs:
           echo "expected_ledger=$EXPECTED_LEDGER" >> "$GITHUB_OUTPUT"
           echo "expected_package=$EXPECTED_PACKAGE" >> "$GITHUB_OUTPUT"
           echo "ORBIT360_F2_WORKFLOW_SOURCE_FILE=$RUNNER_TEMP/executing-workflow.yml" >> "$GITHUB_ENV"
-          echo "F2_ARTIFACT_ID=$ARTIFACT" >> "$GITHUB_ENV"
-          echo "F2_AUTH_IDENTITY=$IDENTITY" >> "$GITHUB_ENV"
-          echo "F2_AUTH_INTENT=$AUTH_INTENT" >> "$GITHUB_ENV"
+          if [ "$MODE" = 'F2_RUNTIME_ONE_SHOT' ]; then
+            echo "F2_ARTIFACT_ID=$ARTIFACT" >> "$GITHUB_ENV"
+            echo "F2_AUTH_IDENTITY=$IDENTITY" >> "$GITHUB_ENV"
+            echo "F2_AUTH_INTENT=$AUTH_INTENT" >> "$GITHUB_ENV"
+          fi
 
-      - name: Switch to exact live canonical base before reading authorization state
+      - name: Switch to exact live canonical base before reading mode state
         shell: bash
         run: |
           set -euo pipefail
@@ -113,12 +131,33 @@ jobs:
           test "$(git rev-parse FETCH_HEAD)" = '${{ steps.intent.outputs.live_base }}'
           git checkout --force -B orbit360-control-plane-runtime '${{ steps.intent.outputs.live_base }}'
           test -z "$(git status --porcelain)"
-          test -f "$F2_AUTH_INTENT"
-          jq -e --arg auth "$F2_AUTH_IDENTITY" --argjson artifact "$F2_ARTIFACT_ID" --arg source '${{ steps.intent.outputs.source }}' --arg digest '${{ steps.intent.outputs.digest }}' '.status=="USER_AUTHORIZATION_RECEIVED" and .authorizationIdentityDigest==$auth and .candidateArtifactId==$artifact and .candidateArtifactDigest==$digest and .candidateSourceHead==$source and .oneShotOnly==true and .replayAllowed==false and .scope.runtimeReadOnly==true and .scope.secrets==true and .scope.firestoreRead==true and .scope.browser==true and .scope.writes==false and .scope.deploy==false and .scope.production==false and .scope.main==false and .scope.merge==false' "$F2_AUTH_INTENT" >/dev/null
-          jq -e --arg auth "$F2_AUTH_IDENTITY" --argjson artifact "$F2_ARTIFACT_ID" --arg source '${{ steps.intent.outputs.source }}' --arg digest '${{ steps.intent.outputs.digest }}' --argjson lr '${{ steps.intent.outputs.expected_ledger }}' --argjson pr '${{ steps.intent.outputs.expected_package }}' '.revision==$lr and .productionReopeningPackage.revision==$pr and .successorCandidate.artifactId==$artifact and .successorCandidate.sourceHead==$source and .successorCandidate.artifactDigest==$digest and .authorizationBoundary.preparedAuthorizationIdentityDigest==$auth and .authorizationBoundary.activeRuntimeAuthorization==false and .authorizationBoundary.activeRequestPath==null and .authorizationBoundary.authorizationRecordPath==null and (.authorizationBoundary.runtimeAttemptAccepted // false)==false and .productionReopeningPackage.authorizationAllowed==true and .nextAction.id=="AWAIT_EXPLICIT_F2_RUNTIME_AUTHORIZATION_ONE_SHOT" and .progress.productionRouteProgressPct==75' "$LEDGER" >/dev/null
-          jq -e --arg auth "$F2_AUTH_IDENTITY" --argjson artifact "$F2_ARTIFACT_ID" '.authorized==false and .authorizationPersisted==false and .requestMaterialized==false and .runtimeAllowed==false and .authorizationIdentity.digest==$auth and .candidate.artifactId==$artifact' "$BOUNDARY" >/dev/null
+          MODE='${{ steps.intent.outputs.mode }}'
+          if [ "$MODE" = 'CONTROL_PLANE_SELFTEST' ]; then
+            jq -e --argjson lr '${{ steps.intent.outputs.expected_ledger }}' --argjson pr '${{ steps.intent.outputs.expected_package }}' --argjson artifact '${{ steps.intent.outputs.artifact }}' --arg source '${{ steps.intent.outputs.source }}' '.revision==$lr and .productionReopeningPackage.revision==$pr and .activeState.phase=="MACRO1_CONTROL_PLANE_TRUTH_HARDENING_SOURCE_ONLY" and .activeState.runtimeAuthorized==false and .activeState.runtimeReplayAllowed==false and .authorizationBoundary.activeRuntimeAuthorization==false and .authorizationBoundary.activeRequestPath==null and .authorizationBoundary.authorizationRecordPath==null and (.authorizationBoundary.runtimeAttemptAccepted // false)==false and .progress.productionRouteProgressPct==75 and .progress.f2TerminalPass==false and .successorCandidate.artifactId==$artifact and .successorCandidate.sourceHead==$source' "$LEDGER" >/dev/null
+            test -f orbit360-platform/docs/PLAN-MAESTRO-CONGELADO-SALIDA-PRODUCCION-SIN-BUCLES-ORBIT360-AYS-20260824.md
+          else
+            test -f "$F2_AUTH_INTENT"
+            jq -e --arg auth "$F2_AUTH_IDENTITY" --argjson artifact "$F2_ARTIFACT_ID" --arg source '${{ steps.intent.outputs.source }}' --arg digest '${{ steps.intent.outputs.digest }}' '.status=="USER_AUTHORIZATION_RECEIVED" and .authorizationIdentityDigest==$auth and .candidateArtifactId==$artifact and .candidateArtifactDigest==$digest and .candidateSourceHead==$source and .oneShotOnly==true and .replayAllowed==false and .scope.runtimeReadOnly==true and .scope.secrets==true and .scope.firestoreRead==true and .scope.browser==true and .scope.writes==false and .scope.deploy==false and .scope.production==false and .scope.main==false and .scope.merge==false' "$F2_AUTH_INTENT" >/dev/null
+            jq -e --arg auth "$F2_AUTH_IDENTITY" --argjson artifact "$F2_ARTIFACT_ID" --arg source '${{ steps.intent.outputs.source }}' --arg digest '${{ steps.intent.outputs.digest }}' --argjson lr '${{ steps.intent.outputs.expected_ledger }}' --argjson pr '${{ steps.intent.outputs.expected_package }}' '.revision==$lr and .productionReopeningPackage.revision==$pr and .successorCandidate.artifactId==$artifact and .successorCandidate.sourceHead==$source and .successorCandidate.artifactDigest==$digest and .authorizationBoundary.preparedAuthorizationIdentityDigest==$auth and .authorizationBoundary.activeRuntimeAuthorization==false and .authorizationBoundary.activeRequestPath==null and .authorizationBoundary.authorizationRecordPath==null and (.authorizationBoundary.runtimeAttemptAccepted // false)==false and .productionReopeningPackage.authorizationAllowed==true and .nextAction.id=="AWAIT_EXPLICIT_F2_RUNTIME_AUTHORIZATION_ONE_SHOT" and .progress.productionRouteProgressPct==75' "$LEDGER" >/dev/null
+            jq -e --arg auth "$F2_AUTH_IDENTITY" --argjson artifact "$F2_ARTIFACT_ID" '.authorized==false and .authorizationPersisted==false and .requestMaterialized==false and .runtimeAllowed==false and .authorizationIdentity.digest==$auth and .candidate.artifactId==$artifact' "$BOUNDARY" >/dev/null
+          fi
+
+      - id: control_plane_selftest
+        name: Run source-only control-plane selftest
+        if: steps.intent.outputs.mode == 'CONTROL_PLANE_SELFTEST'
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-control-plane-no-source-rewrite-guard-v20260824.mjs
+          ORBIT360_SELFTEST_EXPECTED_LEDGER='${{ steps.intent.outputs.expected_ledger }}' ORBIT360_SELFTEST_EXPECTED_PACKAGE='${{ steps.intent.outputs.expected_package }}' node tools/orbit360-control-plane-selftest-v20260824.mjs | tee "$RUNNER_TEMP/control-plane-selftest.json"
+          jq -e '.ok==true and .status=="CONTROL_PLANE_SELFTEST_PASS" and .authorizationMaterialized==false and .requestMaterialized==false and .runtimeExecuted==false and .browserExecuted==false and .secretAccess==false and .firestoreRead==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .deployExecuted==false and .productionTouched==false' "$RUNNER_TEMP/control-plane-selftest.json" >/dev/null
+          git restore orbit360-platform/runtime-gate-crm-v20260716/macro3-mechanism-preflight-sanitized-v20260823.json 2>/dev/null || true
+          rm -f orbit360-platform/runtime-gate-crm-v20260716/macro3-mechanism-preflight-sanitized-v20260823.json~
+          test -z "$(git status --porcelain)"
+          jq -e --argjson lr '${{ steps.intent.outputs.expected_ledger }}' '.revision==$lr and .activeState.runtimeAuthorized==false and .authorizationBoundary.activeRuntimeAuthorization==false and .authorizationBoundary.activeRequestPath==null and .authorizationBoundary.authorizationRecordPath==null and (.authorizationBoundary.runtimeAttemptAccepted // false)==false and .progress.productionRouteProgressPct==75 and .progress.f2TerminalPass==false' "$LEDGER" >/dev/null
 
       - name: Source-only mechanism gates before authorization consumption
+        if: steps.intent.outputs.mode == 'F2_RUNTIME_ONE_SHOT'
         shell: bash
         run: |
           set -euo pipefail
@@ -129,6 +168,7 @@ jobs:
           node --check tools/orbit360-control-plane-independent-readback-v20260820.mjs
           node --check tools/orbit360-f2-data-integrity-readonly-v20260818.mjs
           node --check tools/orbit360-f2-compare-integrity-v20260818.mjs
+          node tools/orbit360-control-plane-no-source-rewrite-guard-v20260824.mjs
           node tools/orbit360-workflow-operational-surface-audit-v20260820.mjs | tee "$RUNNER_TEMP/workflow-audit.json"
           jq -e '.ok==true and .totalWorkflowFiles==1' "$RUNNER_TEMP/workflow-audit.json" >/dev/null
           ORBIT360_F2_WORKFLOW_SOURCE_FILE="$RUNNER_TEMP/executing-workflow.yml" node tools/orbit360-macro3-mechanism-preflight-v20260823.mjs
@@ -141,6 +181,7 @@ jobs:
 
       - id: materialize
         name: Persist authorization request and F2_RUNTIME_ATTEMPT_ACCEPT once
+        if: steps.intent.outputs.mode == 'F2_RUNTIME_ONE_SHOT'
         shell: bash
         run: |
           set -euo pipefail
@@ -160,6 +201,7 @@ jobs:
 
       - id: authpublish
         name: Publish accepted one-shot state with remote CAS
+        if: steps.intent.outputs.mode == 'F2_RUNTIME_ONE_SHOT'
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
@@ -186,6 +228,7 @@ jobs:
 
       - id: gate
         name: Enforce semantic F2 gate and verify exact artifact before provider
+        if: steps.intent.outputs.mode == 'F2_RUNTIME_ONE_SHOT'
         continue-on-error: true
         shell: bash
         env:
