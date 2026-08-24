@@ -4,7 +4,7 @@
   "gateId": "f2-productive-acceptance-exact-successor-v20260818",
   "gateContractVersion": "2.2.0",
   "lifecycleComposition": "phase-capability-contract-v7-canonical-convergence",
-  "status": "CONTROL_PLANE_DEFINITIVE_CAUSAL_PASS",
+  "status": "CONTROL_PLANE_REGRESSION_OPEN_STOP_RETRY",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
   "lifecycles": {
@@ -41,7 +41,7 @@
     "deploy": false,
     "production": false
   },
-  "canonicalStateFingerprint": "3800eaa026b6294fde34bfa88396b687634faacdd741f318d99260e826c8b9c2",
+  "canonicalStateFingerprint": "adeb7cd2a050854d82fc0979579cdabb47d3ae75f175fce16695b97bdfcb0769",
   "containsPII": false,
   "containsSecrets": false,
   "canonicalPlan": "orbit360-platform/docs/PLAN-MAESTRO-CONGELADO-SALIDA-PRODUCCION-SIN-BUCLES-ORBIT360-AYS-20260824.md"
