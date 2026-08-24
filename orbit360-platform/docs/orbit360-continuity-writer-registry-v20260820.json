@@ -1,7 +1,7 @@
 {
-  "schemaVersion": "orbit360-continuity-writer-registry-v6",
+  "schemaVersion": "orbit360-continuity-writer-registry-v7",
   "registryId": "ORBIT360-CONTINUITY-WRITER-REGISTRY",
-  "revision": 15,
+  "revision": 16,
   "active": true,
   "status": "DEFINITIVE_SINGLE_WORKFLOW_GENERIC_INTENT_ROUTER_CAUSAL",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -50,6 +50,7 @@
     "terminalPassRequiresCausalEvidence": true,
     "projectionAndLedgerPublishedInSameCommit": true,
     "actualPrBodyMustBeProjectedByCanonicalWorkflow": true,
+    "externalProjectionMayAdvanceOnlyFromPublishedCanonicalState": true,
     "branchHeadMayNotBePersistedAsCurrentAuthority": true,
     "allBranchOrPrMutationMustUseCanonicalWorkflow": true,
     "executionTransportIntentOnly": true,
@@ -82,7 +83,12 @@
     "terminalReductionRequiredInSameCanonicalRun": true,
     "internalStatePublicationMustNotRetriggerWorkflow": true,
     "gateOrderValidatedByTechnicalStepIds": true,
-    "visibleStepNamesHaveNoSecuritySemantics": true
+    "visibleStepNamesHaveNoSecuritySemantics": true,
+    "transientPreflightEvidenceMustBeCleanedBeforePublication": true,
+    "terminalPublicationRequiresAcceptedStatePublication": true,
+    "prBodyPublicationRequiresTerminalPublication": true,
+    "idempotentZeroDiffReprojectionAllowed": true,
+    "idempotentZeroDiffReprojectionRequiresLiveHeadCAS": true
   },
   "workflowClasses": {
     "solePhysicalWorkflow": [
@@ -90,7 +96,7 @@
     ],
     "runtimeAndEvidenceExecution": "INLINE_IN_BASE_OWNED_CANONICAL_WORKFLOW_ONLY",
     "controlPlaneSelftest": "INLINE_SOURCE_ONLY_NO_STATE_MUTATION",
-    "controlPlaneHardeningClosure": "INLINE_SOURCE_ONLY_CANONICAL_STATE_TRANSITION",
+    "controlPlaneHardeningClosure": "INLINE_SOURCE_ONLY_CANONICAL_STATE_TRANSITION_OR_IDEMPOTENT_REPROJECTION",
     "executionTransport": "ONE_INTENT_JSON_ONLY",
     "parallelRuntimeWorkflow": "FORBIDDEN"
   },
@@ -112,7 +118,11 @@
     "deployMayExecute": false,
     "productionMayBeTouched": false,
     "mainMayBeTouched": false,
-    "mergeMayExecute": false
+    "mergeMayExecute": false,
+    "transientPreflightEvidencePublicationAllowed": false,
+    "terminalPublicationRequiresAuthPublication": true,
+    "prBodyPublicationRequiresTerminalPublication": true,
+    "idempotentZeroDiffReprojectionUsesLiveHeadCAS": true
   },
   "containsPII": false,
   "containsSecrets": false
