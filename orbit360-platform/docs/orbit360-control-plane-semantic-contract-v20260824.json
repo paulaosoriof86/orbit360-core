@@ -35,8 +35,11 @@
     "tools/orbit360-documentation-state-discovery-v20260821.mjs",
     "tools/orbit360-f2-gate-semantic-v20260824.mjs",
     "tools/orbit360-validar-gate-contracts-engine-f2-productive-acceptance-v20260819.mjs",
+    "tools/orbit360-validar-gate-contracts-v20260717.mjs",
     "tools/orbit360-register-f2-productive-acceptance-runtime-v20260819.mjs",
     "tools/orbit360-f2-exact-candidate-source-validator-v20260819.mjs",
+    "tools/orbit360-test-f2-full-runtime-known-rootfixes-v20260819.mjs",
+    "tools/orbit360-promote-macro2-transversal-candidate-v20260821.mjs",
     "tools/orbit360-f2-terminal-evidence-normalizer-v20260824.mjs"
   ],
   "sourceRewriteGuardScope": [
@@ -52,8 +55,11 @@
     "tools/orbit360-control-plane-independent-readback-v20260820.mjs",
     "tools/orbit360-f2-gate-semantic-v20260824.mjs",
     "tools/orbit360-validar-gate-contracts-engine-f2-productive-acceptance-v20260819.mjs",
+    "tools/orbit360-validar-gate-contracts-v20260717.mjs",
     "tools/orbit360-register-f2-productive-acceptance-runtime-v20260819.mjs",
     "tools/orbit360-f2-exact-candidate-source-validator-v20260819.mjs",
+    "tools/orbit360-test-f2-full-runtime-known-rootfixes-v20260819.mjs",
+    "tools/orbit360-promote-macro2-transversal-candidate-v20260821.mjs",
     "tools/orbit360-f2-terminal-evidence-normalizer-v20260824.mjs"
   ],
   "workflowSemanticRequirements": {
