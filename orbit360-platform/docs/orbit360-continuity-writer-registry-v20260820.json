@@ -1,12 +1,13 @@
 {
-  "schemaVersion": "orbit360-continuity-writer-registry-v8",
+  "schemaVersion": "orbit360-continuity-writer-registry-v9-semantic",
   "registryId": "ORBIT360-CONTINUITY-WRITER-REGISTRY",
-  "revision": 18,
+  "revision": 19,
   "active": true,
   "status": "DEFINITIVE_SINGLE_WORKFLOW_GENERIC_INTENT_ROUTER_CAUSAL",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "sourceOfTruth": "orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json",
   "canonicalityContract": "orbit360-platform/docs/orbit360-control-plane-canonicality-contract-v20260822.json",
+  "semanticContract": "orbit360-platform/docs/orbit360-control-plane-semantic-contract-v20260824.json",
   "transitionOwner": "tools/orbit360-continuity-transition-owner-v20260824.mjs",
   "delegatedF2TransitionOwner": "tools/orbit360-continuity-transition-owner-v20260820.mjs",
   "soleProjectionLogic": "tools/orbit360-continuity-projection-atomic-v20260820.mjs",
@@ -99,7 +100,13 @@
     "terminalPublicationRequiresAcceptedStatePublication": true,
     "prBodyPublicationRequiresTerminalPublication": true,
     "idempotentZeroDiffReprojectionAllowed": true,
-    "idempotentZeroDiffReprojectionRequiresLiveHeadCAS": true
+    "idempotentZeroDiffReprojectionRequiresLiveHeadCAS": true,
+    "behavioralValidatorsUseSemanticContract": true,
+    "sourceTextBehaviorValidationForbidden": true,
+    "selftestCandidateBindingDynamic": true,
+    "sourceRewriteScopeDerivedFromSemanticContract": true,
+    "preProviderScratchSimulationRequired": true,
+    "negativeRegressionSuiteRequiredBeforeClosure": true
   },
   "workflowClasses": {
     "solePhysicalWorkflow": [
@@ -107,10 +114,19 @@
     ],
     "controlPlaneRegressionReopen": "INLINE_SOURCE_ONLY_DURABLE_FAILURE_REDUCTION_NO_RUNTIME",
     "runtimeAndEvidenceExecution": "INLINE_IN_BASE_OWNED_CANONICAL_WORKFLOW_ONLY",
-    "controlPlaneSelftest": "INLINE_SOURCE_ONLY_EXACT_F2_PREAUTH_PATH_NO_STATE_MUTATION",
+    "controlPlaneSelftest": "INLINE_SOURCE_ONLY_EXACT_F2_PREAUTH_PLUS_ISOLATED_SCRATCH_BEHAVIORAL_TRANSITIONS",
     "controlPlaneHardeningClosure": "INLINE_SOURCE_ONLY_CANONICAL_STATE_TRANSITION_OR_IDEMPOTENT_REPROJECTION",
     "executionTransport": "ONE_INTENT_JSON_ONLY",
     "parallelRuntimeWorkflow": "FORBIDDEN"
+  },
+  "semanticValidation": {
+    "contract": "orbit360-platform/docs/orbit360-control-plane-semantic-contract-v20260824.json",
+    "mode": "MACHINE_READABLE_CONTRACT_PLUS_BEHAVIORAL_EXECUTION",
+    "candidateBinding": "DYNAMIC_FROM_CANONICAL_LEDGER",
+    "sourceShapeBehaviorProofAllowed": false,
+    "scratchWorktreeRequired": true,
+    "preProviderSimulationRequired": true,
+    "negativeRegressionSuiteRequired": true
   },
   "evidenceLifecycle": {
     "scope": "orbit360-platform/runtime-gate-crm-v20260716",
