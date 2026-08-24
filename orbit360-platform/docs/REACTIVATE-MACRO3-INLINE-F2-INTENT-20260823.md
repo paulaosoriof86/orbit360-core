@@ -1,5 +1,7 @@
 # REACTIVACIÓN FINAL MACRO-3 INLINE F2 — 2026-08-23
 
+> **HISTORICAL SUPPORTING EVIDENCE — NOT CURRENT STATE AUTHORITY.** Este registro describe una activación anterior ya detenida; no define el estado vivo ni autoriza un nuevo intento.
+
 Clasificación previa: `PIPELINE_MECHANISM_FAILURE` con `VALIDATOR_STALE` secundario, corregidos source-only.
 
 Este registro no autoriza producción, deploy, main ni merge y no crea una autorización nueva. Conserva la autorización explícita existente ligada a la identidad `9b50d4e95cf32cc8e693dd184ca945e1f532521f37ea8b64f7a1c65e546baa22` y artifact `9485621192`.
@@ -19,4 +21,4 @@ Condiciones de reactivación verificadas antes de retirar el freeze:
 - remote CAS obligatorio en publicación;
 - runtime únicamente read-only después del gate; cero writes/deploy/production/main/merge.
 
-Siguiente acción: retirar el freeze mediante una sola restauración del workflow inline canónico. Ese commit es el único evento de activación. No se permiten retries automáticos ni un segundo request.
+Siguiente acción histórica de ese intento: retirar el freeze mediante una sola restauración del workflow inline canónico. Ese intento fue posteriormente detenido por `STOP_RETRY`; consultar el ledger y el comentario vivo de PR #5 para el estado vigente.
