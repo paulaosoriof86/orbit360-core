@@ -17,5 +17,5 @@
   "candidateSourceHead": "8c9668d6d423e82826b0295431ec699390d79b4b",
   "controlPlaneEvidence": "orbit360-platform/runtime-gate-crm-v20260716/control-plane-selftest-handshake-run-32765588479-v20260824.json",
   "purpose": "Idempotent canonical reprojection after DATA_CONTRACT_FAILURE: the production reopening package retained a stale 20260821 resume rule. Reproject only through the canonical owner and validate semantic readback before any F2 authorization.",
-  "synchronizeNonce": "20260824T1341GT"
+  "synchronizeNonce": "20260824T1342GT"
 }
