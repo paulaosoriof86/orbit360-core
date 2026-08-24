@@ -4,15 +4,15 @@ Repositorio de Orbit 360.
 
 ## Estado operativo vivo — proyección derivada
 
-CANONICAL_STATE_FINGERPRINT: 5e2a1e0e243b8ce68a86c67d10e58e2a15e09b8e75abc60f04ba7e6550d6e86d
+CANONICAL_STATE_FINGERPRINT: c11336462d686cc8d5e3ea55b188a28e178a3c0a6c74fd484535a21ece7139f1
 
 - Plan vigente: `orbit360-platform/docs/PLAN-MAESTRO-CONGELADO-DEFINITIVO-RUTA-PRODUCCION-ORBIT360-AYS-20260821.md`.
 - Autoridad mutable única: `orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json`.
-- Fase: `F2_RUNTIME_ATTEMPT_ACCEPTED_PREFLIGHT_PENDING`.
-- Estado: `F2_RUNTIME_ATTEMPT_ACCEPTED_ONE_SHOT`.
-- Ledger/package: `33/27`.
+- Fase: `F2_TERMINAL_FAIL_AWAITING_SOURCE_ONLY_ROOT_CAUSE`.
+- Estado: `F2_TERMINAL_RECONCILED_NO_REPLAY`.
+- Ledger/package: `34/28`.
 - Candidata: artifact `9485621192`, candidateSourceHead `842f762f199f4c7dbf13062a33ca220d92398c51`.
 - Progreso ruta a producción: **75%**.
-- Autorización/request/runtime: `true/true/false`.
-- Siguiente acción: `RUN_F2_SOURCE_AND_RUNTIME_PREFLIGHT_FAIL_CLOSED`.
+- Autorización/request/runtime: `false/false/false`.
+- Siguiente acción: `DIAGNOSE_ROOT_CAUSE_BEFORE_ANY_FRESH_AUTHORIZATION`.
 - branchHead no se persiste: se verifica desde el PR vivo para evitar drift autoinducido.
