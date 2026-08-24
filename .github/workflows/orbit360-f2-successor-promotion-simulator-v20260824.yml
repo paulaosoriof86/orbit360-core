@@ -1,0 +1,138 @@
+name: Orbit360 F2 Successor Promotion Simulator
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - '.github/workflows/orbit360-f2-successor-promotion-simulator-v20260824.yml'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  simulate-promotion-readonly:
+    if: github.event.pull_request.head.ref == 'orbit360/f2-successor-promotion-sim-9504702901-20260824'
+    runs-on: ubuntu-24.04
+    env:
+      CANONICAL_BASE: ca1f984e965e7ba7ed0b4d9820eba55f399338f8
+      ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+      META: orbit360-platform/runtime-gate-crm-v20260716/f2-successor-candidate-artifact-metadata-v20260824.json
+      ATTEST: orbit360-platform/runtime-gate-crm-v20260716/f2-successor-candidate-artifact-attestation-v20260824.json
+      OWNER: tools/orbit360-continuity-transition-owner-v20260820.mjs
+      PROMOTER: tools/orbit360-promote-macro2-transversal-candidate-v20260821.mjs
+      CONVERGENCE: tools/orbit360-control-plane-evidence-convergence-v20260822.mjs
+      LEDGER: orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json
+    steps:
+      - name: Checkout simulator transport
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Validate simulator boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "${{ github.event.pull_request.base.ref }}" = "$ORBIT360_BRANCH"
+          test "${{ github.event.pull_request.base.sha }}" = "$CANONICAL_BASE"
+          test "${{ github.event.pull_request.head.ref }}" = 'orbit360/f2-successor-promotion-sim-9504702901-20260824'
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          mapfile -t changed < <(git diff --name-only "${{ github.event.pull_request.base.sha }}" "${{ github.event.pull_request.head.sha }}")
+          test "${#changed[@]}" -eq 1
+          test "${changed[0]}" = '.github/workflows/orbit360-f2-successor-promotion-simulator-v20260824.yml'
+
+      - name: Checkout exact canonical base
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --no-tags origin "$ORBIT360_BRANCH"
+          test "$(git rev-parse FETCH_HEAD)" = "$CANONICAL_BASE"
+          git checkout --force -B orbit360-promotion-simulation "$CANONICAL_BASE"
+          test -z "$(git status --porcelain)"
+
+      - name: Execute canonical owner in ephemeral worktree only
+        shell: bash
+        run: |
+          set -euo pipefail
+          jq -e '.revision==34 and .productionReopeningPackage.revision==28 and .activeState.status=="F2_TERMINAL_RECONCILED_NO_REPLAY" and .authorizationBoundary.activeRuntimeAuthorization==false and .authorizationBoundary.activeRequestPath==null and .progress.productionRouteProgressPct==75' "$LEDGER" >/dev/null
+          node "$OWNER" --transition CONTROL_PLANE_EVIDENCE_RECONCILE --expected-revision 34 --expected-package-revision 28 --candidate-metadata "$META" --artifact-attestation "$ATTEST" | tee "$RUNNER_TEMP/promotion.json"
+          jq -e '.ok==true and .ledgerRevision==35 and .packageRevision==29 and .candidateArtifactId==9504702901 and .progress==75 and .runtimeAllowed==false' "$RUNNER_TEMP/promotion.json" >/dev/null
+          jq -e '.revision==35 and .productionReopeningPackage.revision==29 and .successorCandidate.artifactId==9504702901 and .successorCandidate.sourceHead=="8c9668d6d423e82826b0295431ec699390d79b4b" and .sourceRootCauseResolution.code=="F2_OPERATIVO_ASEGURADORAS_MODULE_VISIBILITY_MISSING" and .activeState.status=="TRANSVERSAL_SOURCE_ACCEPTANCE_PASS" and .authorizationBoundary.activeRuntimeAuthorization==false and .authorizationBoundary.activeRequestPath==null and .authorizationBoundary.authorizationRecordPath==null and .authorizationBoundary.currentBoundaryStatus=="PREPARED_SOURCE_ONLY_AWAITING_EXPLICIT_USER_AUTHORIZATION" and .progress.productionRouteProgressPct==75' "$LEDGER" >/dev/null
+
+      - name: Run complete source-only gate suite
+        shell: bash
+        run: |
+          set -euo pipefail
+          node "$PROMOTER" | tee "$RUNNER_TEMP/promoter.json"
+          jq -e '.ok==true and .candidateArtifactId==9504702901 and .fileCount==194 and .deltaCount==1 and .unchangedFileCount==193' "$RUNNER_TEMP/promoter.json" >/dev/null
+          node "$CONVERGENCE" --repo-only | tee "$RUNNER_TEMP/convergence.json"
+          jq -e '.ok==true and .ledgerRevision==35 and .packageRevision==29 and .candidateArtifactId==9504702901 and .productionRouteProgressPct==75 and .authorized==false and .requestMaterialized==false and .runtimeAllowed==false' "$RUNNER_TEMP/convergence.json" >/dev/null
+          node tools/orbit360-control-plane-composite-invariant-v20260820.mjs | tee "$RUNNER_TEMP/composite.json"
+          jq -e '.ok==true' "$RUNNER_TEMP/composite.json" >/dev/null
+          node tools/orbit360-control-plane-independent-readback-v20260820.mjs | tee "$RUNNER_TEMP/readback.json"
+          jq -e '.ok==true' "$RUNNER_TEMP/readback.json" >/dev/null
+          node tools/orbit360-workflow-operational-surface-audit-v20260820.mjs | tee "$RUNNER_TEMP/workflow-audit.json"
+          jq -e '.ok==true and .totalWorkflowFiles==1' "$RUNNER_TEMP/workflow-audit.json" >/dev/null
+          node tools/orbit360-documentation-state-discovery-v20260821.mjs | tee "$RUNNER_TEMP/docs-discovery.json"
+          jq -e '.ok==true' "$RUNNER_TEMP/docs-discovery.json" >/dev/null
+
+      - name: Verify exact projection delta
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import subprocess
+          allowed={
+            'README.md',
+            '.github/orbit360-requests/macro2-canonical-source-activation-pointer-v20260821.json',
+            'orbit360-platform/CHANGELOG.md',
+            'orbit360-platform/docs/CHECKPOINT-CONTROL-PLANE-HARDENING-20260820.md',
+            'orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json',
+            'orbit360-platform/docs/ORBIT360-PR5-CURRENT-STATE.md',
+            'orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json',
+            'orbit360-platform/docs/orbit360-f2-runtime-authorization-boundary-v20260820.json',
+            'orbit360-platform/docs/orbit360-live-state-v1.json',
+            'orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json',
+            'tools/orbit360-gate-contract-f2-productive-acceptance-v20260820.json',
+            'tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-runtime-v20260819.json',
+            'tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-source-v20260819.json'
+          }
+          changed=set(filter(None,subprocess.check_output(['git','diff','--name-only'],text=True).splitlines()))
+          assert changed==allowed,(sorted(changed),sorted(allowed))
+          assert not any(p.startswith(('orbit360-platform/core/','orbit360-platform/modules/','orbit360-platform/data/')) for p in changed)
+          open('/tmp/changed.txt','w').write('\n'.join(sorted(changed))+'\n')
+          PY
+
+      - name: Build exact promotion-state artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/state-root"
+          while IFS= read -r p; do mkdir -p "$RUNNER_TEMP/state-root/$(dirname "$p")"; cp "$p" "$RUNNER_TEMP/state-root/$p"; done < /tmp/changed.txt
+          (cd "$RUNNER_TEMP/state-root" && zip -q -r "$RUNNER_TEMP/orbit360-f2-successor-promotion-state-9504702901.zip" .)
+          FINGERPRINT=$(grep -m1 'CANONICAL_STATE_FINGERPRINT:' orbit360-platform/docs/ORBIT360-PR5-CURRENT-STATE.md | awk '{print $2}')
+          AUTH_ID=$(jq -r '.authorizationIdentityDigest' "$RUNNER_TEMP/promotion.json")
+          STATE_ZIP_SHA=$(sha256sum "$RUNNER_TEMP/orbit360-f2-successor-promotion-state-9504702901.zip" | awk '{print $1}')
+          jq -n --arg fp "$FINGERPRINT" --arg auth "$AUTH_ID" --arg z "$STATE_ZIP_SHA" '{schemaVersion:"orbit360-f2-successor-promotion-simulation-v1",ok:true,status:"F2_SUCCESSOR_PROMOTION_SIMULATION_PASS",classification:"PASS",baseHead:"ca1f984e965e7ba7ed0b4d9820eba55f399338f8",ledgerRevision:35,packageRevision:29,candidateArtifactId:9504702901,candidateSourceHead:"8c9668d6d423e82826b0295431ec699390d79b4b",productionRouteProgressPct:75,authorizationIdentityDigest:$auth,canonicalStateFingerprint:$fp,stateZipSha256:$z,projectionFileCount:13,authorized:false,requestMaterialized:false,runtimeAllowed:false,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,writes:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false}' > "$RUNNER_TEMP/promotion-simulation-evidence.json"
+          cat "$RUNNER_TEMP/promotion-simulation-evidence.json"
+
+      - name: Upload exact state bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-f2-successor-promotion-state-9504702901
+          path: ${{ runner.temp }}/orbit360-f2-successor-promotion-state-9504702901.zip
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 30
+
+      - name: Upload simulation evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-f2-successor-promotion-simulation-evidence
+          path: ${{ runner.temp }}/promotion-simulation-evidence.json
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 30
