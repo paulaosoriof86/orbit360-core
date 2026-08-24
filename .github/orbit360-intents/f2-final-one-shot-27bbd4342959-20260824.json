@@ -18,5 +18,6 @@
   "expectedPackageRevision": 35,
   "containsPII": false,
   "containsSecrets": false,
-  "purpose": "F2_FINAL_ONE_SHOT_REAL authorized explicitly by user for certified artifact 9504702901; runtime/browser/Firestore reads only, zero writes, deploy, production, main or merge."
+  "purpose": "F2_FINAL_ONE_SHOT_REAL authorized explicitly by user for certified artifact 9504702901; runtime/browser/Firestore reads only, zero writes, deploy, production, main or merge.",
+  "synchronizeNonce": "20260824T1356GT"
 }
