@@ -65,12 +65,12 @@ Formato basado en *Keep a Changelog*. Construcción greenfield; el estado operat
 
 <!-- ORBIT360_CURRENT_STATE_START -->
 ## [F2-CONTINUITY-CURRENT] — `ORBIT360-F2-CONTINUITY-CURRENT`
-CANONICAL_STATE_FINGERPRINT: b99667ff034c3a1a59f9988044011c1e100716091ccde54a90d8a9ced697f32b
-- Fase: `MACRO2_TRANSVERSAL_SOURCE_ACCEPTANCE_PASS_AWAITING_FRESH_F2_AUTHORIZATION`.
-- Estado: `TRANSVERSAL_SOURCE_ACCEPTANCE_PASS`.
-- Ledger/package: `30/24`.
+CANONICAL_STATE_FINGERPRINT: 5e2a1e0e243b8ce68a86c67d10e58e2a15e09b8e75abc60f04ba7e6550d6e86d
+- Fase: `F2_RUNTIME_ATTEMPT_ACCEPTED_PREFLIGHT_PENDING`.
+- Estado: `F2_RUNTIME_ATTEMPT_ACCEPTED_ONE_SHOT`.
+- Ledger/package: `33/27`.
 - Candidata: artifact `9485621192`, source `842f762f199f4c7dbf13062a33ca220d92398c51`.
-- Authorization/request/runtime: `false/false/false`.
+- Authorization/request/runtime: `true/true/false`.
 - Progreso producción: **75%**.
-- Siguiente acción: `AWAIT_EXPLICIT_F2_RUNTIME_AUTHORIZATION_ONE_SHOT`.
+- Siguiente acción: `RUN_F2_SOURCE_AND_RUNTIME_PREFLIGHT_FAIL_CLOSED`.
 <!-- ORBIT360_CURRENT_STATE_END -->

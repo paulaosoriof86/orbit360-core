@@ -1,1 +1,50 @@
-{"schemaVersion":"orbit360-current-documentation-index-v3-derived","updatedAt":"2026-08-23T02:51:00.000Z","status":"CURRENT_DERIVED_FROM_LEDGER","repository":"paulaosoriof86/orbit360-core","branch":"ays/backend-tenant-lab-v99-20260703","pullRequest":5,"canonicalPlan":"orbit360-platform/docs/PLAN-MAESTRO-CONGELADO-DEFINITIVO-RUTA-PRODUCCION-ORBIT360-AYS-20260821.md","canonicalityContract":"orbit360-platform/docs/orbit360-control-plane-canonicality-contract-v20260822.json","canonicalStateFingerprint":"b99667ff034c3a1a59f9988044011c1e100716091ccde54a90d8a9ced697f32b","readOrder":["MASTER_RULES_AND_ADDENDA","orbit360-platform/docs/PLAN-MAESTRO-CONGELADO-DEFINITIVO-RUTA-PRODUCCION-ORBIT360-AYS-20260821.md","PR5_HEAD_LIVE","orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json","orbit360-platform/docs/orbit360-control-plane-canonicality-contract-v20260822.json","orbit360-platform/docs/orbit360-live-state-v1.json"],"resumeAuthority":{"stateOwner":"orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json","firstIncompleteStep":"F2-RUNTIME-AUTHORIZATION","nextActionExact":"AWAIT_EXPLICIT_F2_RUNTIME_AUTHORIZATION_ONE_SHOT","branchHeadAuthority":"LIVE_PR_HEAD_ONLY"},"operationalCurrent":{"stateVersion":"ORBIT360-F2-CONTINUITY-CURRENT","ledgerRevision":30,"packageRevision":24,"phase":"MACRO2_TRANSVERSAL_SOURCE_ACCEPTANCE_PASS_AWAITING_FRESH_F2_AUTHORIZATION","status":"TRANSVERSAL_SOURCE_ACCEPTANCE_PASS","nextAction":"AWAIT_EXPLICIT_F2_RUNTIME_AUTHORIZATION_ONE_SHOT","firstIncompleteStep":"F2-RUNTIME-AUTHORIZATION","artifactId":9485621192,"artifactDigest":"sha256:6a89448084b3aac162378aa4fedd05acfa571c667765c3c7fd06473075705dce","sourceHead":"842f762f199f4c7dbf13062a33ca220d92398c51","progress":75,"authorized":false,"authorizationPersisted":false,"requestMaterialized":false,"runtimeAllowed":false},"documentationControl":{"canonicalStateOwner":"orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json","derivedProjection":true,"evidenceFreshnessRequired":true,"noParallelContinuityOwner":true},"containsPII":false,"containsSecrets":false}
+{
+  "schemaVersion": "orbit360-current-documentation-index-v3-derived",
+  "updatedAt": "2026-08-24T01:29:53.608Z",
+  "status": "CURRENT_DERIVED_FROM_LEDGER",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "canonicalPlan": "orbit360-platform/docs/PLAN-MAESTRO-CONGELADO-DEFINITIVO-RUTA-PRODUCCION-ORBIT360-AYS-20260821.md",
+  "canonicalityContract": "orbit360-platform/docs/orbit360-control-plane-canonicality-contract-v20260822.json",
+  "canonicalStateFingerprint": "5e2a1e0e243b8ce68a86c67d10e58e2a15e09b8e75abc60f04ba7e6550d6e86d",
+  "readOrder": [
+    "MASTER_RULES_AND_ADDENDA",
+    "orbit360-platform/docs/PLAN-MAESTRO-CONGELADO-DEFINITIVO-RUTA-PRODUCCION-ORBIT360-AYS-20260821.md",
+    "PR5_HEAD_LIVE",
+    "orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json",
+    "orbit360-platform/docs/orbit360-control-plane-canonicality-contract-v20260822.json",
+    "orbit360-platform/docs/orbit360-live-state-v1.json"
+  ],
+  "resumeAuthority": {
+    "stateOwner": "orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json",
+    "firstIncompleteStep": "F2-RUNTIME-PREFLIGHT",
+    "nextActionExact": "RUN_F2_SOURCE_AND_RUNTIME_PREFLIGHT_FAIL_CLOSED",
+    "branchHeadAuthority": "LIVE_PR_HEAD_ONLY"
+  },
+  "operationalCurrent": {
+    "stateVersion": "ORBIT360-F2-CONTINUITY-CURRENT",
+    "ledgerRevision": 33,
+    "packageRevision": 27,
+    "phase": "F2_RUNTIME_ATTEMPT_ACCEPTED_PREFLIGHT_PENDING",
+    "status": "F2_RUNTIME_ATTEMPT_ACCEPTED_ONE_SHOT",
+    "nextAction": "RUN_F2_SOURCE_AND_RUNTIME_PREFLIGHT_FAIL_CLOSED",
+    "firstIncompleteStep": "F2-RUNTIME-PREFLIGHT",
+    "artifactId": 9485621192,
+    "artifactDigest": "sha256:6a89448084b3aac162378aa4fedd05acfa571c667765c3c7fd06473075705dce",
+    "sourceHead": "842f762f199f4c7dbf13062a33ca220d92398c51",
+    "progress": 75,
+    "authorized": true,
+    "authorizationPersisted": true,
+    "requestMaterialized": true,
+    "runtimeAllowed": false
+  },
+  "documentationControl": {
+    "canonicalStateOwner": "orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json",
+    "derivedProjection": true,
+    "evidenceFreshnessRequired": true,
+    "noParallelContinuityOwner": true
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}

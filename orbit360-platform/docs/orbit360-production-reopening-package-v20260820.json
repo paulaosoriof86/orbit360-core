@@ -1,1 +1,227 @@
-{"schemaVersion":"orbit360-production-reopening-package-v2-derived","packageId":"ORBIT360-PRODUCTION-REOPENING-CURRENT","revision":24,"createdAtUtc":"2026-08-20T13:50:00Z","updatedAtUtc":"2026-08-23T02:51:00.000Z","repository":"paulaosoriof86/orbit360-core","branch":"ays/backend-tenant-lab-v99-20260703","pullRequest":5,"status":"CLOSED_PASS","phase":"MACRO2_TRANSVERSAL_SOURCE_ACCEPTANCE_PASS_AWAITING_FRESH_F2_AUTHORIZATION","canonicalLedger":"orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json","checkpoint":"orbit360-platform/docs/CHECKPOINT-CONTROL-PLANE-HARDENING-20260820.md","canonicalF2ContractAuthority":"tools/orbit360-gate-contract-f2-productive-acceptance-v20260820.json","candidate":{"frozen":true,"status":"CERTIFIED_SOURCE_ONLY_TRANSVERSAL_SOURCE_ACCEPTANCE","artifactId":9485621192,"artifactDigest":"sha256:6a89448084b3aac162378aa4fedd05acfa571c667765c3c7fd06473075705dce","sourceHead":"842f762f199f4c7dbf13062a33ca220d92398c51","zipSha256":"4f6006ebb3ee2e10ef35e61053243ed74c4adcb46c4abb6c8d90fe27047f37da","manifestSha256":"ce44011eb874bd44fe646b93bd89cef97ecee8218f16ffacf3917177f7fccb18","fileCount":194,"runtimeAuthorized":false,"rebuildAllowed":false},"rootCause":{"primaryClassification":"PIPELINE_MECHANISM_FAILURE","primaryCode":"CONTROL_PLANE_NOT_FULLY_ATOMIC","secondaryClassification":"DOCUMENTATION_STATE_DRIFT","secondaryCode":"MULTIPLE_PHYSICAL_WRITERS_AND_NON_DERIVED_PROJECTIONS","contractAuthorityStatus":"CP01_CP02_SOURCE_ONLY_RESOLVED","canonicalGateContractVersion":"2.2.0","productFunctionalRootfixPreserved":"F2_PRODUCT_READONLY_GET_FULL_COLLECTION_CLONE_AMPLIFICATION","latestFunctionalDefect":{"classification":"FUNCTIONAL_DEFECT","code":"F2_UNDEFINED_NAN_VISIBLE:desktopDirection:cobros","terminalRunId":32494402695,"artifactId":9433944723,"sourceOnlyRootCauseRequired":true,"runtimeReplayAllowed":false},"definitiveMechanismRepair":{"status":"CLOSED_PASS","classification":"PIPELINE_MECHANISM_FAILURE","terminalReducerGeneric":true,"projectionDerived":true,"dynamicInvariant":true,"physicalSingleWriter":true,"activeWorkflowCount":1,"stopRetryEnforced":true,"documentationDiscovery":true,"evidenceFreshnessValidated":true,"canonicalityConvergenceVersion":"v1-20260822","closedAtUtc":"2026-08-23T02:51:00.000Z"},"macro2SourceAcceptance":{"status":"CLOSED_PASS","runId":32611388980,"artifactId":9485621192,"sourceHead":"842f762f199f4c7dbf13062a33ca220d92398c51","artifactDigest":"sha256:6a89448084b3aac162378aa4fedd05acfa571c667765c3c7fd06473075705dce","checksPassed":107,"fileCount":194,"deltaCount":9,"unchangedFileCount":185,"replayAllowed":false}},"lock":{"active":true,"runtimeAllowed":false,"authorizationAllowed":true,"requestMaterializationAllowed":false,"secretAccessAllowed":false,"firestoreReadAllowed":false,"browserAllowed":false,"writesAllowed":false,"deployAllowed":false,"publicationAllowed":false,"productionAllowed":false,"mainAllowed":false,"mergeAllowed":false,"historicalRuntimeReplayAllowed":false,"newRuntimeOrdinalAllowed":false,"stopRetry":true},"resumeProtocol":{"required":true,"rule":"Read frozen plan 20260821, live PR head and ledger. Continue from firstIncompleteStep. Do not reconstruct roadmap or reuse historical authorization/request.","closedStepsMayBeRecheckedReadOnly":true,"closedStepsMayNotBeReprocessedWithoutNewEvidence":true,"firstIncompleteStep":"F2-RUNTIME-AUTHORIZATION","nextActionExact":"AWAIT_EXPLICIT_F2_RUNTIME_AUTHORIZATION_ONE_SHOT"},"steps":[{"id":"CP-00","name":"Persist hardening lock and freeze certified candidate","status":"PASS"},{"id":"CP-01","name":"Unify F2 gate contract authority","status":"PASS"},{"id":"CP-02","name":"Remove duplicated contract/version bindings","status":"PASS"},{"id":"CP-03","name":"Create single revisioned ledger mutation owner","status":"PASS"},{"id":"CP-04","name":"Make continuity projection atomic","status":"PASS"},{"id":"CP-05","name":"Expand composite control-plane invariant","status":"PASS"},{"id":"CP-06","name":"Add transversal Orbit.store amplification synthetic guard","status":"PASS"},{"id":"CP-07","name":"Reduce or isolate legacy workflow operational surface","status":"PASS"},{"id":"CP-08","name":"Run one integrated source-only synthetic audit","status":"PASS"},{"id":"CP-09","name":"Independent readback of complete control plane","status":"PASS"},{"id":"CP-10","name":"Close production reopening package","status":"PASS"},{"id":"CP-11","name":"Prepare fresh F2 runtime authorization boundary","status":"PASS"},{"id":"MACRO1-DEFINITIVE-CONTROL-PLANE","name":"Generic reducer + derived projections + physical single writer + STOP_RETRY + discovery + durable evidence freshness","status":"PASS"},{"id":"MACRO2-TRANSVERSAL-SOURCE-ACCEPTANCE","name":"Transversal source acceptance + single durable candidate","status":"PASS"}],"request14Observation":{"requestOrdinal":14,"historical":true,"classification":"VALIDATOR_STALE","replayAllowed":false},"latestRuntimeObservation":{"runId":32494402695,"artifactId":9451106452,"classification":"FUNCTIONAL_DEFECT","failureCode":"F2_UNDEFINED_NAN_VISIBLE:desktopDirection:cobros","authorizationRequestConsumed":true,"replayAllowed":false,"integrityBeforeAfterPass":true,"firestoreWrites":0,"authWrites":0,"operationalWrites":0},"iterationBudget":{"routeToPublishedProductionMacroIterationsRemaining":2,"routeToClosedProductionMacroIterationsRemaining":3,"currentMacroClosed":2,"rule":"A macro counts only with verifiable state/evidence transition; failures remain inside their owning macro and same stage/code second failure activates STOP_RETRY."},"progress":{"productionRouteProgressPct":75,"programProgressPct":25,"f2TerminalPass":false,"progressMayIncreaseDuringHardening":false},"containsPII":false,"containsSecrets":false,"controlPlaneClosure":{"status":"CONTROL_PLANE_DEFINITIVE_PASS","transitionOwner":"tools/orbit360-continuity-transition-owner-v20260820.mjs","projection":"tools/orbit360-continuity-projection-atomic-v20260820.mjs","compositeInvariant":"tools/orbit360-control-plane-composite-invariant-v20260820.mjs","independentReadback":"tools/orbit360-control-plane-independent-readback-v20260820.mjs","workflowAudit":"tools/orbit360-workflow-operational-surface-audit-v20260820.mjs","documentationDiscovery":"tools/orbit360-documentation-state-discovery-v20260821.mjs","workflow":".github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml","runtimeAuthorized":false,"physicalSingleWriter":true,"terminalReducerGeneric":true,"stopRetryEnforced":true,"evidenceFreshnessValidated":true},"authorizationBoundary":{"path":"orbit360-platform/docs/orbit360-f2-runtime-authorization-boundary-v20260820.json","status":"PREPARED_SOURCE_ONLY_AWAITING_EXPLICIT_USER_AUTHORIZATION","ledgerRevision":30,"packageRevision":24,"authorizationIdentityDigest":"9b50d4e95cf32cc8e693dd184ca945e1f532521f37ea8b64f7a1c65e546baa22","authorized":false,"authorizationPersisted":false,"requestMaterialized":false,"runtimeAllowed":false},"canonicalStateFingerprint":"b99667ff034c3a1a59f9988044011c1e100716091ccde54a90d8a9ced697f32b"}
+{
+  "schemaVersion": "orbit360-production-reopening-package-v2-derived",
+  "packageId": "ORBIT360-PRODUCTION-REOPENING-CURRENT",
+  "revision": 27,
+  "createdAtUtc": "2026-08-20T13:50:00Z",
+  "updatedAtUtc": "2026-08-24T01:29:53.608Z",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "status": "CLOSED_PASS",
+  "phase": "F2_RUNTIME_ATTEMPT_ACCEPTED_PREFLIGHT_PENDING",
+  "canonicalLedger": "orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json",
+  "checkpoint": "orbit360-platform/docs/CHECKPOINT-CONTROL-PLANE-HARDENING-20260820.md",
+  "canonicalF2ContractAuthority": "tools/orbit360-gate-contract-f2-productive-acceptance-v20260820.json",
+  "candidate": {
+    "frozen": true,
+    "status": "CERTIFIED_SOURCE_ONLY_TRANSVERSAL_SOURCE_ACCEPTANCE",
+    "artifactId": 9485621192,
+    "artifactDigest": "sha256:6a89448084b3aac162378aa4fedd05acfa571c667765c3c7fd06473075705dce",
+    "sourceHead": "842f762f199f4c7dbf13062a33ca220d92398c51",
+    "zipSha256": "4f6006ebb3ee2e10ef35e61053243ed74c4adcb46c4abb6c8d90fe27047f37da",
+    "manifestSha256": "ce44011eb874bd44fe646b93bd89cef97ecee8218f16ffacf3917177f7fccb18",
+    "fileCount": 194,
+    "runtimeAuthorized": false,
+    "rebuildAllowed": false
+  },
+  "rootCause": {
+    "primaryClassification": "PIPELINE_MECHANISM_FAILURE",
+    "primaryCode": "CONTROL_PLANE_NOT_FULLY_ATOMIC",
+    "secondaryClassification": "DOCUMENTATION_STATE_DRIFT",
+    "secondaryCode": "MULTIPLE_PHYSICAL_WRITERS_AND_NON_DERIVED_PROJECTIONS",
+    "contractAuthorityStatus": "CP01_CP02_SOURCE_ONLY_RESOLVED",
+    "canonicalGateContractVersion": "2.2.0",
+    "productFunctionalRootfixPreserved": "F2_PRODUCT_READONLY_GET_FULL_COLLECTION_CLONE_AMPLIFICATION",
+    "latestFunctionalDefect": {
+      "classification": "FUNCTIONAL_DEFECT",
+      "code": "F2_UNDEFINED_NAN_VISIBLE:desktopDirection:cobros",
+      "terminalRunId": 32494402695,
+      "artifactId": 9433944723,
+      "sourceOnlyRootCauseRequired": true,
+      "runtimeReplayAllowed": false
+    },
+    "definitiveMechanismRepair": {
+      "status": "CLOSED_PASS",
+      "classification": "PIPELINE_MECHANISM_FAILURE",
+      "terminalReducerGeneric": true,
+      "projectionDerived": true,
+      "dynamicInvariant": true,
+      "physicalSingleWriter": true,
+      "activeWorkflowCount": 1,
+      "stopRetryEnforced": true,
+      "documentationDiscovery": true,
+      "evidenceFreshnessValidated": true,
+      "canonicalityConvergenceVersion": "v1-20260822",
+      "closedAtUtc": "2026-08-23T02:51:00.000Z"
+    },
+    "macro2SourceAcceptance": {
+      "status": "CLOSED_PASS",
+      "runId": 32611388980,
+      "artifactId": 9485621192,
+      "sourceHead": "842f762f199f4c7dbf13062a33ca220d92398c51",
+      "artifactDigest": "sha256:6a89448084b3aac162378aa4fedd05acfa571c667765c3c7fd06473075705dce",
+      "checksPassed": 107,
+      "fileCount": 194,
+      "deltaCount": 9,
+      "unchangedFileCount": 185,
+      "replayAllowed": false
+    }
+  },
+  "lock": {
+    "active": true,
+    "runtimeAllowed": false,
+    "authorizationAllowed": false,
+    "requestMaterializationAllowed": false,
+    "secretAccessAllowed": false,
+    "firestoreReadAllowed": false,
+    "browserAllowed": false,
+    "writesAllowed": false,
+    "deployAllowed": false,
+    "publicationAllowed": false,
+    "productionAllowed": false,
+    "mainAllowed": false,
+    "mergeAllowed": false,
+    "historicalRuntimeReplayAllowed": false,
+    "newRuntimeOrdinalAllowed": false,
+    "stopRetry": true
+  },
+  "resumeProtocol": {
+    "required": true,
+    "rule": "Read frozen plan 20260821, live PR head and ledger. Continue from firstIncompleteStep. Do not reconstruct roadmap or reuse historical authorization/request.",
+    "closedStepsMayBeRecheckedReadOnly": true,
+    "closedStepsMayNotBeReprocessedWithoutNewEvidence": true,
+    "firstIncompleteStep": "F2-RUNTIME-PREFLIGHT",
+    "nextActionExact": "RUN_F2_SOURCE_AND_RUNTIME_PREFLIGHT_FAIL_CLOSED"
+  },
+  "steps": [
+    {
+      "id": "CP-00",
+      "name": "Persist hardening lock and freeze certified candidate",
+      "status": "PASS"
+    },
+    {
+      "id": "CP-01",
+      "name": "Unify F2 gate contract authority",
+      "status": "PASS"
+    },
+    {
+      "id": "CP-02",
+      "name": "Remove duplicated contract/version bindings",
+      "status": "PASS"
+    },
+    {
+      "id": "CP-03",
+      "name": "Create single revisioned ledger mutation owner",
+      "status": "PASS"
+    },
+    {
+      "id": "CP-04",
+      "name": "Make continuity projection atomic",
+      "status": "PASS"
+    },
+    {
+      "id": "CP-05",
+      "name": "Expand composite control-plane invariant",
+      "status": "PASS"
+    },
+    {
+      "id": "CP-06",
+      "name": "Add transversal Orbit.store amplification synthetic guard",
+      "status": "PASS"
+    },
+    {
+      "id": "CP-07",
+      "name": "Reduce or isolate legacy workflow operational surface",
+      "status": "PASS"
+    },
+    {
+      "id": "CP-08",
+      "name": "Run one integrated source-only synthetic audit",
+      "status": "PASS"
+    },
+    {
+      "id": "CP-09",
+      "name": "Independent readback of complete control plane",
+      "status": "PASS"
+    },
+    {
+      "id": "CP-10",
+      "name": "Close production reopening package",
+      "status": "PASS"
+    },
+    {
+      "id": "CP-11",
+      "name": "Prepare fresh F2 runtime authorization boundary",
+      "status": "PASS"
+    },
+    {
+      "id": "MACRO1-DEFINITIVE-CONTROL-PLANE",
+      "name": "Generic reducer + derived projections + physical single writer + STOP_RETRY + discovery + durable evidence freshness",
+      "status": "PASS"
+    },
+    {
+      "id": "MACRO2-TRANSVERSAL-SOURCE-ACCEPTANCE",
+      "name": "Transversal source acceptance + single durable candidate",
+      "status": "PASS"
+    }
+  ],
+  "request14Observation": {
+    "requestOrdinal": 14,
+    "historical": true,
+    "classification": "VALIDATOR_STALE",
+    "replayAllowed": false
+  },
+  "latestRuntimeObservation": {
+    "runId": 32494402695,
+    "artifactId": 9451106452,
+    "classification": "FUNCTIONAL_DEFECT",
+    "failureCode": "F2_UNDEFINED_NAN_VISIBLE:desktopDirection:cobros",
+    "authorizationRequestConsumed": true,
+    "replayAllowed": false,
+    "integrityBeforeAfterPass": true,
+    "firestoreWrites": 0,
+    "authWrites": 0,
+    "operationalWrites": 0
+  },
+  "iterationBudget": {
+    "routeToPublishedProductionMacroIterationsRemaining": 2,
+    "routeToClosedProductionMacroIterationsRemaining": 3,
+    "currentMacroClosed": 2,
+    "rule": "A macro counts only with verifiable state/evidence transition; failures remain inside their owning macro and same stage/code second failure activates STOP_RETRY."
+  },
+  "progress": {
+    "productionRouteProgressPct": 75,
+    "programProgressPct": 25,
+    "f2TerminalPass": false,
+    "progressMayIncreaseDuringHardening": false
+  },
+  "containsPII": false,
+  "containsSecrets": false,
+  "controlPlaneClosure": {
+    "status": "CONTROL_PLANE_DEFINITIVE_PASS",
+    "transitionOwner": "tools/orbit360-continuity-transition-owner-v20260820.mjs",
+    "projection": "tools/orbit360-continuity-projection-atomic-v20260820.mjs",
+    "compositeInvariant": "tools/orbit360-control-plane-composite-invariant-v20260820.mjs",
+    "independentReadback": "tools/orbit360-control-plane-independent-readback-v20260820.mjs",
+    "workflowAudit": "tools/orbit360-workflow-operational-surface-audit-v20260820.mjs",
+    "documentationDiscovery": "tools/orbit360-documentation-state-discovery-v20260821.mjs",
+    "workflow": ".github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml",
+    "runtimeAuthorized": false,
+    "physicalSingleWriter": true,
+    "terminalReducerGeneric": true,
+    "stopRetryEnforced": true,
+    "evidenceFreshnessValidated": true
+  },
+  "authorizationBoundary": {
+    "path": "orbit360-platform/docs/orbit360-f2-runtime-authorization-boundary-v20260820.json",
+    "status": "RUNTIME_ATTEMPT_ACCEPTED_ONE_SHOT_PREFLIGHT_PENDING",
+    "ledgerRevision": 33,
+    "packageRevision": 27,
+    "authorizationIdentityDigest": "9b50d4e95cf32cc8e693dd184ca945e1f532521f37ea8b64f7a1c65e546baa22",
+    "authorized": true,
+    "authorizationPersisted": true,
+    "requestMaterialized": true,
+    "runtimeAllowed": false
+  },
+  "canonicalStateFingerprint": "5e2a1e0e243b8ce68a86c67d10e58e2a15e09b8e75abc60f04ba7e6550d6e86d"
+}
