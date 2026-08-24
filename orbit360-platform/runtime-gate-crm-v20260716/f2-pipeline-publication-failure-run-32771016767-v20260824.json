@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "orbit360-f2-pipeline-publication-failure-v1",
+  "status": "DURABLE_SOURCE_ONLY_INCIDENT_EVIDENCE",
+  "classification": "PIPELINE_MECHANISM_FAILURE",
+  "runId": 32771016767,
+  "workflowRunConclusion": "failure",
+  "candidateArtifactId": 9504702901,
+  "candidateArtifactDigest": "sha256:f11dd2a350b4160465dfc93b0dd9153e697d09773fa00aa4ee5ed13d93401ca2",
+  "candidateSourceHead": "8c9668d6d423e82826b0295431ec699390d79b4b",
+  "authorizationIdentityDigest": "27bbd434295938cffcc6873974944e4a2e0ca2b669716eb72b750c7489367eef",
+  "terminalEvidenceArtifactId": 9536179630,
+  "terminalEvidenceArtifactName": "orbit360-f2-productive-acceptance-32771016767",
+  "terminalEvidence": {
+    "ok": false,
+    "status": "F2_PRODUCTIVE_ACCEPTANCE_FAIL",
+    "classification": "PIPELINE_MECHANISM_FAILURE",
+    "error": "F2_STAGE_OUTCOME:gate=skipped;provider=skipped;browser=skipped;integrity=skipped",
+    "runtimeAttemptAccepted": true,
+    "allowedExecutions": 0,
+    "runtimeExecuted": false,
+    "browserExecuted": false,
+    "zeroUnexpectedWrites": true,
+    "firestoreWrites": 0,
+    "authWrites": 0,
+    "operationalWrites": 0,
+    "deployExecuted": false,
+    "productionHostingTouched": false
+  },
+  "rootCause": {
+    "code": "F2_AUTH_PUBLICATION_SURFACE_TRANSIENT_PREFLIGHT_NOT_CLEANED",
+    "offendingPath": "orbit360-platform/runtime-gate-crm-v20260716/macro3-mechanism-preflight-sanitized-v20260823.json",
+    "detail": "The source-only mechanism preflight left its transient sanitized evidence in the working tree. The publication surface guard correctly rejected the extra path before semantic runtime gate/provider/browser execution."
+  },
+  "secondaryMechanismFinding": {
+    "code": "PR_BODY_PATCHED_FROM_UNPUBLISHED_TERMINAL_WORKTREE",
+    "detail": "The final PR-body projection step ran after terminal publication failed, so PR #5 temporarily reflected unpublished 45/39 working-tree state while the canonical branch remained 41/35."
+  },
+  "canonicalPublication": {
+    "acceptedAttemptStatePublished": false,
+    "terminalStatePublished": false,
+    "branchOperationalLedgerMutatedByRun": false,
+    "replayAllowed": false,
+    "freshAuthorizationRequired": true
+  },
+  "rootfix": {
+    "transientCleanupImplementedIn": "tools/orbit360-control-plane-evidence-convergence-v20260822.mjs",
+    "prBodyPublicationGuardRequired": true,
+    "productChangeRequired": false,
+    "dataChangeRequired": false
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
