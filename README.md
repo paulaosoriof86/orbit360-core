@@ -4,15 +4,16 @@ Repositorio de Orbit 360.
 
 ## Estado operativo vivo — proyección derivada
 
-CANONICAL_STATE_FINGERPRINT: 7fde5395897fe83f46e71c1c35f97d1865b84348223466654e67985cf96739d5
+CANONICAL_STATE_FINGERPRINT: 3800eaa026b6294fde34bfa88396b687634faacdd741f318d99260e826c8b9c2
 
-- Plan vigente: `orbit360-platform/docs/PLAN-MAESTRO-CONGELADO-DEFINITIVO-RUTA-PRODUCCION-ORBIT360-AYS-20260821.md`.
+- Plan vigente: `orbit360-platform/docs/PLAN-MAESTRO-CONGELADO-SALIDA-PRODUCCION-SIN-BUCLES-ORBIT360-AYS-20260824.md`.
 - Autoridad mutable única: `orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json`.
-- Fase: `F2_TERMINAL_PASS_AWAITING_AUTHORIZED_GO_LIVE`.
-- Estado: `F2_TERMINAL_PASS`.
-- Ledger/package: `39/33`.
+- Fase: `CONTROL_PLANE_DEFINITIVE_CAUSAL_PASS_AWAITING_F2_AUTHORIZATION`.
+- Estado: `CONTROL_PLANE_DEFINITIVE_CAUSAL_PASS`.
+- Ledger/package: `41/35`.
 - Candidata: artifact `9504702901`, candidateSourceHead `8c9668d6d423e82826b0295431ec699390d79b4b`.
-- Progreso ruta a producción: **85%**.
+- Progreso ruta a producción: **75%**.
 - Autorización/request/runtime: `false/false/false`.
-- Siguiente acción: `AWAIT_EXPLICIT_GO_LIVE_AUTHORIZATION`.
+- Siguiente acción: `AWAIT_EXPLICIT_F2_RUNTIME_AUTHORIZATION_ONE_SHOT`.
+- Control-plane causal: `CONTROL_PLANE_DEFINITIVE_CAUSAL_PASS`.
 - branchHead no se persiste: se verifica desde el PR vivo para evitar drift autoinducido.

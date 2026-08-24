@@ -70,12 +70,12 @@
     "CREATE_ANOTHER_TRIGGER_VARIANT"
   ],
   "macro2Closed": true,
-  "canonicalStateFingerprint": "7fde5395897fe83f46e71c1c35f97d1865b84348223466654e67985cf96739d5",
+  "canonicalStateFingerprint": "3800eaa026b6294fde34bfa88396b687634faacdd741f318d99260e826c8b9c2",
   "lastReconciliation": {
     "status": "CONTROL_PLANE_EVIDENCE_CONVERGENCE_RECONCILED",
     "candidateArtifactId": 9504702901,
     "candidateSourceHead": "8c9668d6d423e82826b0295431ec699390d79b4b",
-    "progress": 85
+    "progress": 75
   },
   "containsPII": false,
   "containsSecrets": false

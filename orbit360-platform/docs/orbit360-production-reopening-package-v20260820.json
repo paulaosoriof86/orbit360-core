@@ -1,14 +1,14 @@
 {
   "schemaVersion": "orbit360-production-reopening-package-v2-derived",
   "packageId": "ORBIT360-PRODUCTION-REOPENING-CURRENT",
-  "revision": 33,
+  "revision": 35,
   "createdAtUtc": "2026-08-20T13:50:00Z",
-  "updatedAtUtc": "2026-08-24T03:33:01.475Z",
+  "updatedAtUtc": "2026-08-24T19:25:05.471Z",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
   "status": "CLOSED_PASS",
-  "phase": "F2_TERMINAL_PASS_AWAITING_AUTHORIZED_GO_LIVE",
+  "phase": "CONTROL_PLANE_DEFINITIVE_CAUSAL_PASS_AWAITING_F2_AUTHORIZATION",
   "canonicalLedger": "orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json",
   "checkpoint": "orbit360-platform/docs/CHECKPOINT-CONTROL-PLANE-HARDENING-20260820.md",
   "canonicalF2ContractAuthority": "tools/orbit360-gate-contract-f2-productive-acceptance-v20260820.json",
@@ -70,7 +70,7 @@
   "lock": {
     "active": true,
     "runtimeAllowed": false,
-    "authorizationAllowed": false,
+    "authorizationAllowed": true,
     "requestMaterializationAllowed": false,
     "secretAccessAllowed": false,
     "firestoreReadAllowed": false,
@@ -90,8 +90,8 @@
     "rule": "Read frozen plan 20260821, live PR head and ledger. Continue from firstIncompleteStep. Do not reconstruct roadmap or reuse historical authorization/request.",
     "closedStepsMayBeRecheckedReadOnly": true,
     "closedStepsMayNotBeReprocessedWithoutNewEvidence": true,
-    "firstIncompleteStep": "MACRO4-GO-LIVE-AUTHORIZATION",
-    "nextActionExact": "AWAIT_EXPLICIT_GO_LIVE_AUTHORIZATION"
+    "firstIncompleteStep": "F2-RUNTIME-AUTHORIZATION",
+    "nextActionExact": "AWAIT_EXPLICIT_F2_RUNTIME_AUTHORIZATION_ONE_SHOT"
   },
   "steps": [
     {
@@ -190,16 +190,16 @@
     "rule": "A macro counts only with verifiable state/evidence transition; failures remain inside their owning macro and same stage/code second failure activates STOP_RETRY."
   },
   "progress": {
-    "productionRouteProgressPct": 85,
+    "productionRouteProgressPct": 75,
     "programProgressPct": 25,
-    "f2TerminalPass": true,
+    "f2TerminalPass": false,
     "progressMayIncreaseDuringHardening": false
   },
   "containsPII": false,
   "containsSecrets": false,
   "controlPlaneClosure": {
-    "status": "CONTROL_PLANE_DEFINITIVE_PASS",
-    "transitionOwner": "tools/orbit360-continuity-transition-owner-v20260820.mjs",
+    "status": "CONTROL_PLANE_DEFINITIVE_CAUSAL_PASS",
+    "transitionOwner": "tools/orbit360-continuity-transition-owner-v20260824.mjs",
     "projection": "tools/orbit360-continuity-projection-atomic-v20260820.mjs",
     "compositeInvariant": "tools/orbit360-control-plane-composite-invariant-v20260820.mjs",
     "independentReadback": "tools/orbit360-control-plane-independent-readback-v20260820.mjs",
@@ -210,18 +210,22 @@
     "physicalSingleWriter": true,
     "terminalReducerGeneric": true,
     "stopRetryEnforced": true,
-    "evidenceFreshnessValidated": true
+    "evidenceFreshnessValidated": true,
+    "terminalReducerTruthContractValidated": true,
+    "sourceRewriteGuardEnforced": true,
+    "workflowHandshakeValidated": true
   },
   "authorizationBoundary": {
     "path": "orbit360-platform/docs/orbit360-f2-runtime-authorization-boundary-v20260820.json",
-    "status": "CONSUMED_PASS_AWAITING_GO_LIVE",
-    "ledgerRevision": 39,
-    "packageRevision": 33,
-    "authorizationIdentityDigest": "225f0f73b44b56006ae92d57a4f8024dba64ead40beec903cf064c03db87f924",
+    "status": "PREPARED_SOURCE_ONLY_AWAITING_EXPLICIT_USER_AUTHORIZATION",
+    "ledgerRevision": 41,
+    "packageRevision": 35,
+    "authorizationIdentityDigest": "27bbd434295938cffcc6873974944e4a2e0ca2b669716eb72b750c7489367eef",
     "authorized": false,
     "authorizationPersisted": false,
     "requestMaterialized": false,
     "runtimeAllowed": false
   },
-  "canonicalStateFingerprint": "7fde5395897fe83f46e71c1c35f97d1865b84348223466654e67985cf96739d5"
+  "canonicalStateFingerprint": "3800eaa026b6294fde34bfa88396b687634faacdd741f318d99260e826c8b9c2",
+  "canonicalPlan": "orbit360-platform/docs/PLAN-MAESTRO-CONGELADO-SALIDA-PRODUCCION-SIN-BUCLES-ORBIT360-AYS-20260824.md"
 }

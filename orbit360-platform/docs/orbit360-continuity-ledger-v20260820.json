@@ -1,17 +1,17 @@
 {
   "schemaVersion": "orbit360-continuity-ledger-v3",
   "ledgerId": "ORBIT360-F2-CONTINUITY-CURRENT",
-  "revision": 40,
-  "updatedAtUtc": "2026-08-24T11:54:23.000Z",
+  "revision": 41,
+  "updatedAtUtc": "2026-08-24T19:25:05.471Z",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
   "stateVersion": "ORBIT360-F2-CONTINUITY-CURRENT",
   "gateId": "f2-productive-acceptance-exact-successor-v20260818",
   "activeState": {
-    "phase": "MACRO1_CONTROL_PLANE_TRUTH_HARDENING_SOURCE_ONLY",
-    "status": "CONTROL_PLANE_FALSE_PASS_INVALIDATED",
-    "rootCauseStatus": "PIPELINE_MECHANISM_FAILURE_FALSE_TERMINAL_PASS_WITH_VALIDATOR_STALE_GATE_ORDER",
+    "phase": "CONTROL_PLANE_DEFINITIVE_CAUSAL_PASS_AWAITING_F2_AUTHORIZATION",
+    "status": "CONTROL_PLANE_DEFINITIVE_CAUSAL_PASS",
+    "rootCauseStatus": "PIPELINE_MECHANISM_FAILURE_AND_VALIDATOR_STALE_ROOT_CAUSES_CLOSED_SOURCE_ONLY",
     "productFrozen": true,
     "dataFrozen": true,
     "runtimeAuthorized": false,
@@ -48,7 +48,7 @@
     "historicalRuntimeReusable": false,
     "priorCertifiedArtifactId": 9485621192,
     "priorCertifiedSourceHead": "842f762f199f4c7dbf13062a33ca220d92398c51",
-    "status": "F2_ONE_SHOT_CONSUMED_NO_REPLAY_SOURCE_REPAIR_REQUIRED",
+    "status": "MACRO3_FRESH_AUTHORIZATION_BOUNDARY_PREPARED",
     "successorArtifactId": 9504702901,
     "successorSourceHead": "8c9668d6d423e82826b0295431ec699390d79b4b"
   },
@@ -80,8 +80,8 @@
   },
   "authorizationBoundary": {
     "activeRuntimeAuthorization": false,
-    "freshAuthorizationRequired": false,
-    "authorizationBlockedByHardeningPackage": true,
+    "freshAuthorizationRequired": true,
+    "authorizationBlockedByHardeningPackage": false,
     "authorizationCarryForwardForbidden": true,
     "nextRuntimeMaterializationAllowed": false,
     "newRuntimeRequestAllowed": false,
@@ -92,9 +92,9 @@
     "mergeAuthorized": false,
     "boundaryPath": "orbit360-platform/docs/orbit360-f2-runtime-authorization-boundary-v20260820.json",
     "boundaryPrepared": true,
-    "currentBoundaryStatus": "CONSUMED_FAIL_AWAITING_SOURCE_ONLY_ROOT_CAUSE",
+    "currentBoundaryStatus": "PREPARED_SOURCE_ONLY_AWAITING_EXPLICIT_USER_AUTHORIZATION",
     "authorizationIdentityRequired": true,
-    "preparedAuthorizationIdentityDigest": "225f0f73b44b56006ae92d57a4f8024dba64ead40beec903cf064c03db87f924",
+    "preparedAuthorizationIdentityDigest": "27bbd434295938cffcc6873974944e4a2e0ca2b669716eb72b750c7489367eef",
     "activeRequestPath": null,
     "authorizationRecordPath": null,
     "historicalAuthorizationRecordPath": ".github/orbit360-authorizations/f2-productive-acceptance-runtime-browser-readonly-auth-225f0f73b44b-v20260820.json",
@@ -105,18 +105,18 @@
     "runtimeRunId": null
   },
   "continuityControl": {
-    "status": "CONTROL_PLANE_TRUTH_HARDENING_REQUIRED",
-    "classification": "PIPELINE_MECHANISM_FAILURE",
-    "secondaryClassification": "VALIDATOR_STALE",
-    "canonicalityConvergenceVersion": "v1-20260822",
+    "status": "CONTROL_PLANE_DEFINITIVE_CAUSAL_PASS",
+    "classification": "PIPELINE_MECHANISM_FAILURE_RESOLVED",
+    "secondaryClassification": "VALIDATOR_STALE_RESOLVED",
+    "canonicalityConvergenceVersion": "v2-20260824-causal",
     "evidenceFreshnessValidated": true,
     "physicalSingleWriterEnforced": true,
-    "terminalReducerGeneric": false,
-    "terminalReducerTruthContractValidated": false,
+    "terminalReducerGeneric": true,
+    "terminalReducerTruthContractValidated": true,
     "stopRetryMechanicallyEnforced": true,
-    "projectionWorkflowTemporarilyFailClosed": true,
+    "projectionWorkflowTemporarilyFailClosed": false,
     "compositeInvariantRequiredBeforeClosure": true,
-    "compositeInvariantStatus": "INVALIDATED_BY_FALSE_PASS",
+    "compositeInvariantStatus": "CONTROL_PLANE_DEFINITIVE_CAUSAL_PASS",
     "documentationDiscoveryGateRequired": true,
     "activeWorkflowCount": 1,
     "hardeningPackage": "orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json",
@@ -160,22 +160,28 @@
       "sourceOnly": true,
       "runtimeReexecuted": false,
       "replayAllowed": false
-    }
+    },
+    "sourceRewriteGuardEnforced": true,
+    "workflowHandshakeValidated": true,
+    "workflowHandshakeRunId": 32765588479,
+    "workflowHandshakeJobId": 97554203637,
+    "workflowHandshakePullRequest": 88,
+    "workflowHandshakeEvidence": "orbit360-platform/runtime-gate-crm-v20260716/control-plane-selftest-handshake-run-32765588479-v20260824.json"
   },
   "productionReopeningPackage": {
     "path": "orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json",
-    "status": "OPEN_SOURCE_ONLY_CONTROL_PLANE_REPAIR",
-    "revision": 34,
-    "firstIncompleteStep": "MACRO1-CONTROL-PLANE-TRUTH-HARDENING",
-    "nextActionExact": "REPAIR_CONTROL_PLANE_TRUTH_AND_VALIDATOR_CONTRACTS_SOURCE_ONLY",
+    "status": "CLOSED_PASS",
+    "revision": 35,
+    "firstIncompleteStep": "F2-RUNTIME-AUTHORIZATION",
+    "nextActionExact": "AWAIT_EXPLICIT_F2_RUNTIME_AUTHORIZATION_ONE_SHOT",
     "runtimeAllowed": false,
-    "authorizationAllowed": false,
+    "authorizationAllowed": true,
     "requestMaterializationAllowed": false
   },
   "checkpoint": "orbit360-platform/docs/CHECKPOINT-CONTROL-PLANE-HARDENING-20260820.md",
   "nextAction": {
-    "id": "REPAIR_CONTROL_PLANE_TRUTH_AND_VALIDATOR_CONTRACTS_SOURCE_ONLY",
-    "description": "Reopen only Macro-1 of the frozen production plan: harden terminal truth, current-run evidence provenance, semantic workflow contracts and independent readback before any fresh F2 authorization.",
+    "id": "AWAIT_EXPLICIT_F2_RUNTIME_AUTHORIZATION_ONE_SHOT",
+    "description": "Await one fresh explicit F2 runtime authorization bound to the certified candidate after causal control-plane closure.",
     "runtimeAllowed": false
   },
   "history": {
@@ -201,7 +207,12 @@
       "operationalWrites": 0,
       "terminalEvidencePath": "orbit360-platform/runtime-gate-crm-v20260716/f2-runtime-terminal-inline-32686810800.json"
     },
-    "priorConsumedRuntimeOrdinals": [11, 12, 13, 14],
+    "priorConsumedRuntimeOrdinals": [
+      11,
+      12,
+      13,
+      14
+    ],
     "priorLatestSealedRuntime": {
       "runId": 32444530576,
       "classification": "FUNCTIONAL_DEFECT",
@@ -218,11 +229,30 @@
       "deltaCount": 1,
       "unchangedFileCount": 193,
       "replayAllowed": false
+    },
+    "latestControlPlaneHandshake": {
+      "runId": 32765588479,
+      "jobId": 97554203637,
+      "technicalPullRequest": 88,
+      "conclusion": "success",
+      "status": "CONTROL_PLANE_SELFTEST_HANDSHAKE_PASS",
+      "evidencePath": "orbit360-platform/runtime-gate-crm-v20260716/control-plane-selftest-handshake-run-32765588479-v20260824.json",
+      "canonicalBaseHead": "b11a54bd017cabc7c352ecb35c5329d47834b1d4",
+      "intentHead": "3b8b8553928e4a50ff9dfba833b6cd1a6a227abb",
+      "candidateArtifactId": 9504702901,
+      "candidateSourceHead": "8c9668d6d423e82826b0295431ec699390d79b4b",
+      "sourceOnly": true,
+      "authorizationMaterialized": false,
+      "requestMaterialized": false,
+      "runtimeExecuted": false,
+      "browserExecuted": false,
+      "replayAllowed": false,
+      "closedAtUtc": "2026-08-24T19:25:05.471Z"
     }
   },
   "lanes": {
     "A_frontend_ux_academia": "MACRO2_TRANSVERSAL_SOURCE_ACCEPTANCE_CLOSED",
-    "B_backend_security_gates": "MACRO1_CONTROL_PLANE_TRUTH_HARDENING_SOURCE_ONLY",
+    "B_backend_security_gates": "CONTROL_PLANE_CAUSAL_PASS_AWAITING_FRESH_F2_AUTHORIZATION",
     "C_real_data_migration": "UNCHANGED_FROZEN"
   },
   "progress": {
