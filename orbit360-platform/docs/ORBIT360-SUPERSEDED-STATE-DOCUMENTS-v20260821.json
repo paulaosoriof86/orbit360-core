@@ -1,9 +1,10 @@
 {
-  "schemaVersion": "orbit360-superseded-state-documents-v1",
-  "issuedAt": "2026-08-21",
-  "canonicalPlan": "orbit360-platform/docs/PLAN-MAESTRO-CONGELADO-DEFINITIVO-RUTA-PRODUCCION-ORBIT360-AYS-20260821.md",
+  "schemaVersion": "orbit360-superseded-state-documents-v2",
+  "issuedAt": "2026-08-24",
+  "canonicalPlan": "orbit360-platform/docs/PLAN-MAESTRO-CONGELADO-SALIDA-PRODUCCION-SIN-BUCLES-ORBIT360-AYS-20260824.md",
   "policy": "Listed documents remain preserved as historical evidence and must not be interpreted as current operational state or nextAction authority.",
   "documents": [
+    "orbit360-platform/docs/PLAN-MAESTRO-CONGELADO-DEFINITIVO-RUTA-PRODUCCION-ORBIT360-AYS-20260821.md",
     "orbit360-platform/docs/CHANGELOG-V188-CONTINUIDAD.md",
     "orbit360-platform/docs/PROMPT-SIGUIENTE-SESION.md",
     "orbit360-platform/docs/README-GATE711-CURRENT.md",
