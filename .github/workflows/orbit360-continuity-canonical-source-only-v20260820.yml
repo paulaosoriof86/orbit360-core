@@ -3,6 +3,7 @@ name: Orbit360 Canonical Control Plane
 # MACRO3_INLINE_F2_V1
 # GENERIC_INTENT_ROUTER_V1
 # CONTROL_PLANE_SELFTEST_V1
+# CONTROL_PLANE_HARDENING_CLOSE_V1
 # Stable base-owned workflow. Execution PRs may change one intent JSON only; they may not change this workflow.
 
 on:
@@ -34,7 +35,7 @@ env:
   PACKAGE: orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json
   BOUNDARY: orbit360-platform/docs/orbit360-f2-runtime-authorization-boundary-v20260820.json
   PR_STATE: orbit360-platform/docs/ORBIT360-PR5-CURRENT-STATE.md
-  OWNER: tools/orbit360-continuity-transition-owner-v20260820.mjs
+  OWNER: tools/orbit360-continuity-transition-owner-v20260824.mjs
   CONVERGENCE: tools/orbit360-control-plane-evidence-convergence-v20260822.mjs
   EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
 
@@ -78,7 +79,7 @@ jobs:
           EXPECTED_PACKAGE=$(jq -r '.expectedPackageRevision // empty' "$INTENT")
           [[ "$EXPECTED_LEDGER" =~ ^[0-9]+$ ]]
           [[ "$EXPECTED_PACKAGE" =~ ^[0-9]+$ ]]
-          IDENTITY=''; AUTH_INTENT=''; ARTIFACT=''; SOURCE=''; DIGEST=''
+          IDENTITY=''; AUTH_INTENT=''; ARTIFACT=''; SOURCE=''; DIGEST=''; CONTROL_PLANE_EVIDENCE=''
           case "$MODE" in
             CONTROL_PLANE_SELFTEST)
               jq -e '.schemaVersion=="orbit360-control-plane-intent-v1" and .mode=="CONTROL_PLANE_SELFTEST" and .sourceOnly==true and .oneShotOnly==false and .replayAllowed==false and .writesAllowed==false and .deployAllowed==false and .productionAllowed==false and .mainAllowed==false and .mergeAllowed==false and .containsPII==false and .containsSecrets==false' "$INTENT" >/dev/null
@@ -86,6 +87,15 @@ jobs:
               SOURCE=$(jq -r '.candidateSourceHead // empty' "$INTENT")
               [[ "$ARTIFACT" =~ ^[0-9]+$ ]]
               [[ "$SOURCE" =~ ^[a-f0-9]{40}$ ]]
+              ;;
+            CONTROL_PLANE_HARDENING_CLOSE)
+              jq -e '.schemaVersion=="orbit360-control-plane-intent-v1" and .mode=="CONTROL_PLANE_HARDENING_CLOSE" and .sourceOnly==true and .oneShotOnly==false and .replayAllowed==false and .writesAllowed==false and .deployAllowed==false and .productionAllowed==false and .mainAllowed==false and .mergeAllowed==false and .containsPII==false and .containsSecrets==false' "$INTENT" >/dev/null
+              ARTIFACT=$(jq -r '.candidateArtifactId // empty' "$INTENT")
+              SOURCE=$(jq -r '.candidateSourceHead // empty' "$INTENT")
+              CONTROL_PLANE_EVIDENCE=$(jq -r '.controlPlaneEvidence // empty' "$INTENT")
+              [[ "$ARTIFACT" =~ ^[0-9]+$ ]]
+              [[ "$SOURCE" =~ ^[a-f0-9]{40}$ ]]
+              [[ "$CONTROL_PLANE_EVIDENCE" =~ ^orbit360-platform/runtime-gate-crm-v20260716/control-plane-selftest-handshake-run-[0-9]+-v20260824\.json$ ]]
               ;;
             F2_RUNTIME_ONE_SHOT)
               jq -e '.schemaVersion=="orbit360-control-plane-intent-v1" and .mode=="F2_RUNTIME_ONE_SHOT" and .oneShotOnly==true and .replayAllowed==false and .sourceOnly==false and .writesAllowed==false and .deployAllowed==false and .productionAllowed==false and .mainAllowed==false and .mergeAllowed==false' "$INTENT" >/dev/null
@@ -114,6 +124,7 @@ jobs:
           echo "artifact=$ARTIFACT" >> "$GITHUB_OUTPUT"
           echo "source=$SOURCE" >> "$GITHUB_OUTPUT"
           echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
+          echo "control_plane_evidence=$CONTROL_PLANE_EVIDENCE" >> "$GITHUB_OUTPUT"
           echo "expected_ledger=$EXPECTED_LEDGER" >> "$GITHUB_OUTPUT"
           echo "expected_package=$EXPECTED_PACKAGE" >> "$GITHUB_OUTPUT"
           echo "ORBIT360_F2_WORKFLOW_SOURCE_FILE=$RUNNER_TEMP/executing-workflow.yml" >> "$GITHUB_ENV"
@@ -132,9 +143,14 @@ jobs:
           git checkout --force -B orbit360-control-plane-runtime '${{ steps.intent.outputs.live_base }}'
           test -z "$(git status --porcelain)"
           MODE='${{ steps.intent.outputs.mode }}'
-          if [ "$MODE" = 'CONTROL_PLANE_SELFTEST' ]; then
-            jq -e --argjson lr '${{ steps.intent.outputs.expected_ledger }}' --argjson pr '${{ steps.intent.outputs.expected_package }}' --argjson artifact '${{ steps.intent.outputs.artifact }}' --arg source '${{ steps.intent.outputs.source }}' '.revision==$lr and .productionReopeningPackage.revision==$pr and .activeState.phase=="MACRO1_CONTROL_PLANE_TRUTH_HARDENING_SOURCE_ONLY" and .activeState.runtimeAuthorized==false and .activeState.runtimeReplayAllowed==false and .authorizationBoundary.activeRuntimeAuthorization==false and .authorizationBoundary.activeRequestPath==null and .authorizationBoundary.authorizationRecordPath==null and (.authorizationBoundary.runtimeAttemptAccepted // false)==false and .progress.productionRouteProgressPct==75 and .progress.f2TerminalPass==false and .successorCandidate.artifactId==$artifact and .successorCandidate.sourceHead==$source' "$LEDGER" >/dev/null
+          if [ "$MODE" = 'CONTROL_PLANE_SELFTEST' ] || [ "$MODE" = 'CONTROL_PLANE_HARDENING_CLOSE' ]; then
+            jq -e --argjson lr '${{ steps.intent.outputs.expected_ledger }}' --argjson pr '${{ steps.intent.outputs.expected_package }}' --argjson artifact '${{ steps.intent.outputs.artifact }}' --arg source '${{ steps.intent.outputs.source }}' '.revision==$lr and .productionReopeningPackage.revision==$pr and .activeState.phase=="MACRO1_CONTROL_PLANE_TRUTH_HARDENING_SOURCE_ONLY" and .activeState.status=="CONTROL_PLANE_FALSE_PASS_INVALIDATED" and .activeState.runtimeAuthorized==false and .activeState.runtimeReplayAllowed==false and .authorizationBoundary.activeRuntimeAuthorization==false and .authorizationBoundary.activeRequestPath==null and .authorizationBoundary.authorizationRecordPath==null and (.authorizationBoundary.runtimeAttemptAccepted // false)==false and .progress.productionRouteProgressPct==75 and .progress.f2TerminalPass==false and .successorCandidate.artifactId==$artifact and .successorCandidate.sourceHead==$source' "$LEDGER" >/dev/null
             test -f orbit360-platform/docs/PLAN-MAESTRO-CONGELADO-SALIDA-PRODUCCION-SIN-BUCLES-ORBIT360-AYS-20260824.md
+            if [ "$MODE" = 'CONTROL_PLANE_HARDENING_CLOSE' ]; then
+              E='${{ steps.intent.outputs.control_plane_evidence }}'
+              test -f "$E"
+              jq -e --argjson lr '${{ steps.intent.outputs.expected_ledger }}' --argjson pr '${{ steps.intent.outputs.expected_package }}' --argjson artifact '${{ steps.intent.outputs.artifact }}' --arg source '${{ steps.intent.outputs.source }}' '.ok==true and .status=="CONTROL_PLANE_SELFTEST_HANDSHAKE_PASS" and .classification=="PASS" and .controlPlaneSelftestPass==true and .expectedLedgerRevision==$lr and .expectedPackageRevision==$pr and .candidateArtifactId==$artifact and .candidateSourceHead==$source and .authorizationMaterialized==false and .requestMaterialized==false and .runtimeExecuted==false and .browserExecuted==false and .secretAccess==false and .firestoreRead==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .deployExecuted==false and .productionTouched==false' "$E" >/dev/null
+            fi
           else
             test -f "$F2_AUTH_INTENT"
             jq -e --arg auth "$F2_AUTH_IDENTITY" --argjson artifact "$F2_ARTIFACT_ID" --arg source '${{ steps.intent.outputs.source }}' --arg digest '${{ steps.intent.outputs.digest }}' '.status=="USER_AUTHORIZATION_RECEIVED" and .authorizationIdentityDigest==$auth and .candidateArtifactId==$artifact and .candidateArtifactDigest==$digest and .candidateSourceHead==$source and .oneShotOnly==true and .replayAllowed==false and .scope.runtimeReadOnly==true and .scope.secrets==true and .scope.firestoreRead==true and .scope.browser==true and .scope.writes==false and .scope.deploy==false and .scope.production==false and .scope.main==false and .scope.merge==false' "$F2_AUTH_INTENT" >/dev/null
@@ -155,6 +171,49 @@ jobs:
           rm -f orbit360-platform/runtime-gate-crm-v20260716/macro3-mechanism-preflight-sanitized-v20260823.json~
           test -z "$(git status --porcelain)"
           jq -e --argjson lr '${{ steps.intent.outputs.expected_ledger }}' '.revision==$lr and .activeState.runtimeAuthorized==false and .authorizationBoundary.activeRuntimeAuthorization==false and .authorizationBoundary.activeRequestPath==null and .authorizationBoundary.authorizationRecordPath==null and (.authorizationBoundary.runtimeAttemptAccepted // false)==false and .progress.productionRouteProgressPct==75 and .progress.f2TerminalPass==false' "$LEDGER" >/dev/null
+
+      - id: control_plane_close
+        name: Close control-plane hardening through canonical owner
+        if: steps.intent.outputs.mode == 'CONTROL_PLANE_HARDENING_CLOSE'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          E='${{ steps.intent.outputs.control_plane_evidence }}'
+          node tools/orbit360-control-plane-no-source-rewrite-guard-v20260824.mjs
+          ORBIT360_SELFTEST_EXPECTED_LEDGER='${{ steps.intent.outputs.expected_ledger }}' ORBIT360_SELFTEST_EXPECTED_PACKAGE='${{ steps.intent.outputs.expected_package }}' node tools/orbit360-control-plane-selftest-v20260824.mjs | tee "$RUNNER_TEMP/control-plane-close-selftest.json"
+          jq -e '.ok==true and .status=="CONTROL_PLANE_SELFTEST_PASS"' "$RUNNER_TEMP/control-plane-close-selftest.json" >/dev/null
+          git restore orbit360-platform/runtime-gate-crm-v20260716/macro3-mechanism-preflight-sanitized-v20260823.json 2>/dev/null || true
+          LR='${{ steps.intent.outputs.expected_ledger }}'; PRV='${{ steps.intent.outputs.expected_package }}'
+          node "$OWNER" --transition CONTROL_PLANE_HARDENING_CLOSE --expected-revision "$LR" --expected-package-revision "$PRV" --control-plane-evidence "$E" | tee "$RUNNER_TEMP/control-plane-hardening-close.json"
+          jq -e '.ok==true and .status=="CONTROL_PLANE_HARDENING_CLOSED_CAUSAL_PASS" and .ledgerRevision==41 and .packageRevision==35 and .progress==75 and .authorizationMaterialized==false and .requestMaterialized==false and .runtimeExecuted==false and .browserExecuted==false and .secretAccess==false and .firestoreRead==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .deployExecuted==false and .productionTouched==false' "$RUNNER_TEMP/control-plane-hardening-close.json" >/dev/null
+          node "$CONVERGENCE" --repo-only | tee "$RUNNER_TEMP/control-plane-close-convergence.json"
+          jq -e '.ok==true and .authorized==false and .requestMaterialized==false and .runtimeAllowed==false' "$RUNNER_TEMP/control-plane-close-convergence.json" >/dev/null
+          node tools/orbit360-terminal-truth-invariant-v20260824.mjs
+          node tools/orbit360-control-plane-independent-readback-v20260820.mjs
+          node tools/orbit360-control-plane-composite-invariant-v20260820.mjs
+          node tools/orbit360-documentation-state-discovery-v20260821.mjs
+          mapfile -t CHANGED < <(git status --porcelain | sed 's/^...//' | sort -u)
+          test "${#CHANGED[@]}" -gt 0
+          for f in "${CHANGED[@]}"; do
+            case "$f" in
+              .github/orbit360-requests/macro2-canonical-source-activation-pointer-v20260821.json|README.md|orbit360-platform/CHANGELOG.md|orbit360-platform/docs/CHECKPOINT-CONTROL-PLANE-HARDENING-20260820.md|orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json|orbit360-platform/docs/ORBIT360-PR5-CURRENT-STATE.md|orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json|orbit360-platform/docs/orbit360-f2-runtime-authorization-boundary-v20260820.json|orbit360-platform/docs/orbit360-live-state-v1.json|orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json|tools/orbit360-gate-contract-f2-productive-acceptance-v20260820.json|tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-runtime-v20260819.json|tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-source-v20260819.json) ;;
+              *) echo "PIPELINE_MECHANISM_FAILURE:CONTROL_PLANE_CLOSE_PUBLICATION_SURFACE:$f" >&2; exit 41 ;;
+            esac
+          done
+          git config user.name 'orbit360-control-plane'
+          git config user.email 'orbit360-control-plane@users.noreply.github.com'
+          git add -- "${CHANGED[@]}"; git diff --cached --check
+          git commit -m 'gate(control-plane): close causal hardening and project state'
+          FINAL_HEAD=$(git rev-parse HEAD)
+          git fetch --no-tags origin "$ORBIT360_BRANCH"
+          test "$(git rev-parse FETCH_HEAD)" = '${{ steps.intent.outputs.live_base }}'
+          git push "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:refs/heads/${ORBIT360_BRANCH}"
+          jq -Rs '{body:.}' < "$PR_STATE" > "$RUNNER_TEMP/pr-body-control-plane-close.json"
+          curl -L --fail --silent --show-error -X PATCH -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/${GITHUB_REPOSITORY}/pulls/5" --data-binary @"$RUNNER_TEMP/pr-body-control-plane-close.json" >/dev/null
+          jq -e '.revision==41 and .productionReopeningPackage.revision==35 and .activeState.status=="CONTROL_PLANE_DEFINITIVE_CAUSAL_PASS" and .progress.productionRouteProgressPct==75 and .progress.f2TerminalPass==false and .authorizationBoundary.activeRuntimeAuthorization==false and .authorizationBoundary.activeRequestPath==null and .authorizationBoundary.authorizationRecordPath==null and (.authorizationBoundary.runtimeAttemptAccepted // false)==false and .nextAction.id=="AWAIT_EXPLICIT_F2_RUNTIME_AUTHORIZATION_ONE_SHOT"' "$LEDGER" >/dev/null
+          echo "final_head=$FINAL_HEAD" >> "$GITHUB_OUTPUT"
 
       - name: Source-only mechanism gates before authorization consumption
         if: steps.intent.outputs.mode == 'F2_RUNTIME_ONE_SHOT'
