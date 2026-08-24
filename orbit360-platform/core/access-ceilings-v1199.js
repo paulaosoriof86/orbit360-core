@@ -7,6 +7,16 @@ window.Orbit = window.Orbit || {};
 (function () {
   const A = Orbit.access;
   if (!A || A.__ceilingsV1199 || typeof A.can !== 'function') return;
+
+  /* Rootfix 2026-08-24 — paridad de contrato Operativo/Aseguradoras.
+     Aseguradoras es un directorio operativo no record-scoped y el propio
+     módulo autoriza a Operativo. Esta guarda corrige cualquier catálogo
+     legacy que omita la ruta antes de que router/sidebar evalúen A.can(). */
+  const operativo = Orbit.ROLES && Orbit.ROLES['Operativo'];
+  if (operativo && Array.isArray(operativo.modulos) && !operativo.modulos.includes('aseguradoras')) {
+    operativo.modulos = operativo.modulos.concat('aseguradoras');
+  }
+
   const originalCan = A.can.bind(A);
   const BLOCKED_ADVISOR_MODULES = new Set([
     'polizas','cobros','conciliaciones','comisiones','finanzas',
@@ -36,6 +46,7 @@ window.Orbit = window.Orbit || {};
   A.__ceilingsV1199 = {
     originalCan,
     blockedAdvisorModules: Array.from(BLOCKED_ADVISOR_MODULES),
-    writeActions: Array.from(WRITE_ACTIONS)
+    writeActions: Array.from(WRITE_ACTIONS),
+    operativoInsurerRoleParity: !!(operativo && Array.isArray(operativo.modulos) && operativo.modulos.includes('aseguradoras'))
   };
 })();
