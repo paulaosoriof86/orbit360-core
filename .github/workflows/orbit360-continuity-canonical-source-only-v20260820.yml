@@ -1,24 +1,163 @@
 name: Orbit360 Continuity Canonical Source Only
-# MACRO3_SOURCE_REPAIR_FREEZE_20260823
-# MACRO3_ENVIRONMENT_TRIGGER_FREEZE_20260823
-# STOP_RETRY: connector-originated repository writes did not produce an observable/effective Actions run.
-# Fail closed until a deterministic activation channel is available. No runtime, secrets, Firestore, browser, deploy, production, main or merge.
+# CONTROL_PLANE_CONVERGENCE_V1
+# MACRO3_INLINE_F2_V1
+# F2_SUCCESSOR_PROMOTION_SOURCE_ONLY_V1
 
 on:
-  push:
-    branches: [ays/backend-tenant-lab-v99-20260703]
+  pull_request:
+    types: [synchronize]
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
     paths:
-      - '.github/orbit360-freeze/NEVER_MATCH_MACRO3_ENVIRONMENT_TRIGGER_20260823'
+      - '.github/orbit360-activation/f2-successor-promotion-9504702901-v20260824.json'
 
 permissions:
-  contents: read
+  contents: write
+  pull-requests: write
   actions: read
 
 jobs:
-  environment-trigger-freeze:
+  promote-certified-successor-source-only:
+    if: github.event.pull_request.head.ref == 'orbit360/f2-successor-promote-9504702901-20260824'
     runs-on: ubuntu-24.04
+    env:
+      ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
+      INTENT: .github/orbit360-activation/f2-successor-promotion-9504702901-v20260824.json
+      META: orbit360-platform/runtime-gate-crm-v20260716/f2-successor-candidate-artifact-metadata-v20260824.json
+      ATTEST: orbit360-platform/runtime-gate-crm-v20260716/f2-successor-candidate-artifact-attestation-v20260824.json
+      OWNER: tools/orbit360-continuity-transition-owner-v20260820.mjs
+      PROMOTER: tools/orbit360-promote-macro2-transversal-candidate-v20260821.mjs
+      CONVERGENCE: tools/orbit360-control-plane-evidence-convergence-v20260822.mjs
+      LEDGER: orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json
+      PR_STATE: orbit360-platform/docs/ORBIT360-PR5-CURRENT-STATE.md
     steps:
-      - run: |
-          echo 'ENVIRONMENT_FAILURE:ACTIONS_PUSH_EVENT_NOT_EMITTED_OR_NOT_OBSERVABLE_FROM_CONNECTOR_WRITES'
-          echo 'STOP_RETRY active. No F2 runtime execution is permitted from this freeze workflow.'
-          exit 41
+      - name: Checkout promotion transport merge context
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Validate source-only activation transport
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          test "$GITHUB_EVENT_NAME" = 'pull_request'
+          test "${{ github.event.action }}" = 'synchronize'
+          test "${{ github.event.pull_request.base.ref }}" = "$ORBIT360_BRANCH"
+          test "${{ github.event.pull_request.head.ref }}" = 'orbit360/f2-successor-promote-9504702901-20260824'
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          mapfile -t changed < <(git diff --name-only "${{ github.event.pull_request.base.sha }}" "${{ github.event.pull_request.head.sha }}")
+          test "${#changed[@]}" -eq 1
+          test "${changed[0]}" = "$INTENT"
+          cp "$INTENT" "$RUNNER_TEMP/promotion-intent.json"
+          jq -e --arg base "${{ github.event.pull_request.base.sha }}" \
+            '.schemaVersion=="orbit360-f2-successor-promotion-intent-v1" and .status=="SOURCE_ONLY_PROMOTION_REQUESTED" and .transition=="CONTROL_PLANE_EVIDENCE_RECONCILE" and .baseHead==$base and .expectedLedgerRevision==34 and .expectedPackageRevision==28 and .candidateArtifactId==9504702901 and .metadataPath=="orbit360-platform/runtime-gate-crm-v20260716/f2-successor-candidate-artifact-metadata-v20260824.json" and .attestationPath=="orbit360-platform/runtime-gate-crm-v20260716/f2-successor-candidate-artifact-attestation-v20260824.json" and .sourceOnly==true and .runtimeAllowed==false and .browserAllowed==false and .secretAccessAllowed==false and .firestoreReadAllowed==false and .deployAllowed==false and .productionAllowed==false and .mainAllowed==false and .mergeAllowed==false' \
+            "$RUNNER_TEMP/promotion-intent.json" >/dev/null
+
+      - name: Switch to exact canonical base
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE='${{ github.event.pull_request.base.sha }}'
+          git fetch --no-tags origin "$ORBIT360_BRANCH"
+          test "$(git rev-parse FETCH_HEAD)" = "$BASE"
+          git checkout --force -B orbit360-successor-promotion "$BASE"
+          test -z "$(git status --porcelain)"
+
+      - name: Validate canonical prestate and durable successor evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check "$OWNER"
+          node --check "$PROMOTER"
+          node --check "$CONVERGENCE"
+          node tools/orbit360-workflow-operational-surface-audit-v20260820.mjs | tee "$RUNNER_TEMP/workflow-audit-pre.json"
+          jq -e '.ok==true' "$RUNNER_TEMP/workflow-audit-pre.json" >/dev/null
+          jq -e '.revision==34 and .productionReopeningPackage.revision==28 and .activeState.status=="F2_TERMINAL_RECONCILED_NO_REPLAY" and .activeState.runtimeAuthorized==false and .activeState.runtimeReplayAllowed==false and .authorizationBoundary.activeRuntimeAuthorization==false and .authorizationBoundary.activeRequestPath==null and .authorizationBoundary.authorizationRecordPath==null and .authorizationBoundary.runtimeAttemptAccepted==false and .progress.productionRouteProgressPct==75' "$LEDGER" >/dev/null
+          jq -e '.schemaVersion=="orbit360-macro2-candidate-artifact-metadata-v2" and .status=="CANDIDATE_ARTIFACT_PUBLISHED_SOURCE_ONLY" and .artifactId==9504702901 and .artifactDigest=="sha256:f11dd2a350b4160465dfc93b0dd9153e697d09773fa00aa4ee5ed13d93401ca2" and .sourceHead=="8c9668d6d423e82826b0295431ec699390d79b4b" and .zipSha256=="4a3660a18229a923412aa5a1bffc0817b1d5666c83ba96c81c92cea0fce9491c" and .manifestSha256=="b1c98c1faf644b5d83cfe6e6bb1a602927c438cd85b7855cb0b1a6b98c08053c" and .fileCount==194 and .deltaCount==1 and .unchangedFileCount==193 and .checksPassed==12 and .sourcePublished==true and .runtimeExecuted==false and .browserExecuted==false and .secretAccess==false and .firestoreRead==false and .writes==0 and .deployExecuted==false and .productionTouched==false' "$META" >/dev/null
+          jq -e '.id==9504702901 and .digest=="sha256:f11dd2a350b4160465dfc93b0dd9153e697d09773fa00aa4ee5ed13d93401ca2" and .expired==false and .readbackVerified==true and .runtimeExecuted==false and .writes==0' "$ATTEST" >/dev/null
+          git merge-base --is-ancestor 8c9668d6d423e82826b0295431ec699390d79b4b HEAD
+
+      - name: Reconcile successor through canonical owner
+        shell: bash
+        run: |
+          set -euo pipefail
+          node "$OWNER" \
+            --transition CONTROL_PLANE_EVIDENCE_RECONCILE \
+            --expected-revision 34 \
+            --expected-package-revision 28 \
+            --candidate-metadata "$META" \
+            --artifact-attestation "$ATTEST" | tee "$RUNNER_TEMP/promotion.json"
+          jq -e '.ok==true and .status=="CONTROL_PLANE_EVIDENCE_RECONCILED_AND_MACRO2_PROMOTED" and .ledgerRevision==35 and .packageRevision==29 and .candidateArtifactId==9504702901 and .candidateSourceHead=="8c9668d6d423e82826b0295431ec699390d79b4b" and .progress==75 and .runtimeAllowed==false' "$RUNNER_TEMP/promotion.json" >/dev/null
+          jq -e '.revision==35 and .productionReopeningPackage.revision==29 and .successorCandidate.artifactId==9504702901 and .successorCandidate.sourceHead=="8c9668d6d423e82826b0295431ec699390d79b4b" and .sourceRootCauseResolution.code=="F2_OPERATIVO_ASEGURADORAS_MODULE_VISIBILITY_MISSING" and .activeState.status=="TRANSVERSAL_SOURCE_ACCEPTANCE_PASS" and .activeState.runtimeAuthorized==false and .activeState.runtimeReplayAllowed==false and .authorizationBoundary.activeRuntimeAuthorization==false and .authorizationBoundary.activeRequestPath==null and .authorizationBoundary.authorizationRecordPath==null and .authorizationBoundary.currentBoundaryStatus=="PREPARED_SOURCE_ONLY_AWAITING_EXPLICIT_USER_AUTHORIZATION" and .productionReopeningPackage.firstIncompleteStep=="F2-RUNTIME-AUTHORIZATION" and .productionReopeningPackage.nextActionExact=="AWAIT_EXPLICIT_F2_RUNTIME_AUTHORIZATION_ONE_SHOT" and .progress.productionRouteProgressPct==75 and .progress.f2TerminalPass==false' "$LEDGER" >/dev/null
+
+      - name: Validate all source-only control-plane gates before publication
+        shell: bash
+        run: |
+          set -euo pipefail
+          node "$PROMOTER" | tee "$RUNNER_TEMP/promoter.json"
+          jq -e '.ok==true and .candidateArtifactId==9504702901 and .fileCount==194 and .deltaCount==1 and .unchangedFileCount==193' "$RUNNER_TEMP/promoter.json" >/dev/null
+          node "$CONVERGENCE" --repo-only | tee "$RUNNER_TEMP/convergence.json"
+          jq -e '.ok==true and .ledgerRevision==35 and .packageRevision==29 and .candidateArtifactId==9504702901 and .productionRouteProgressPct==75 and .authorized==false and .requestMaterialized==false and .runtimeAllowed==false' "$RUNNER_TEMP/convergence.json" >/dev/null
+          node tools/orbit360-control-plane-composite-invariant-v20260820.mjs | tee "$RUNNER_TEMP/composite.json"
+          jq -e '.ok==true' "$RUNNER_TEMP/composite.json" >/dev/null
+          node tools/orbit360-control-plane-independent-readback-v20260820.mjs | tee "$RUNNER_TEMP/readback.json"
+          jq -e '.ok==true' "$RUNNER_TEMP/readback.json" >/dev/null
+          node tools/orbit360-workflow-operational-surface-audit-v20260820.mjs | tee "$RUNNER_TEMP/workflow-audit.json"
+          jq -e '.ok==true and .totalWorkflowFiles==1' "$RUNNER_TEMP/workflow-audit.json" >/dev/null
+          node tools/orbit360-documentation-state-discovery-v20260821.mjs | tee "$RUNNER_TEMP/docs-discovery.json"
+          jq -e '.ok==true' "$RUNNER_TEMP/docs-discovery.json" >/dev/null
+          python3 - <<'PY'
+          import subprocess
+          allowed={
+            'README.md',
+            '.github/orbit360-requests/macro2-canonical-source-activation-pointer-v20260821.json',
+            'orbit360-platform/CHANGELOG.md',
+            'orbit360-platform/docs/CHECKPOINT-CONTROL-PLANE-HARDENING-20260820.md',
+            'orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json',
+            'orbit360-platform/docs/ORBIT360-PR5-CURRENT-STATE.md',
+            'orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json',
+            'orbit360-platform/docs/orbit360-f2-runtime-authorization-boundary-v20260820.json',
+            'orbit360-platform/docs/orbit360-live-state-v1.json',
+            'orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json',
+            'tools/orbit360-gate-contract-f2-productive-acceptance-v20260820.json',
+            'tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-runtime-v20260819.json',
+            'tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-source-v20260819.json'
+          }
+          changed=set(filter(None,subprocess.check_output(['git','diff','--name-only'],text=True).splitlines()))
+          assert changed==allowed,(sorted(changed),sorted(allowed))
+          assert not any(p.startswith(('orbit360-platform/core/','orbit360-platform/modules/','orbit360-platform/data/')) for p in changed)
+          PY
+
+      - name: Publish one atomic canonical state commit with remote CAS
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          BASE='${{ github.event.pull_request.base.sha }}'
+          git config user.name 'orbit360-canonical-writer'
+          git config user.email 'orbit360-canonical-writer@users.noreply.github.com'
+          git add README.md .github/orbit360-requests/macro2-canonical-source-activation-pointer-v20260821.json orbit360-platform/CHANGELOG.md orbit360-platform/docs/CHECKPOINT-CONTROL-PLANE-HARDENING-20260820.md orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json orbit360-platform/docs/ORBIT360-PR5-CURRENT-STATE.md orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json orbit360-platform/docs/orbit360-f2-runtime-authorization-boundary-v20260820.json orbit360-platform/docs/orbit360-live-state-v1.json orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json tools/orbit360-gate-contract-f2-productive-acceptance-v20260820.json tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-runtime-v20260819.json tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-source-v20260819.json
+          git commit -m 'gate(f2): promote certified successor artifact 9504702901'
+          NEW_HEAD=$(git rev-parse HEAD)
+          git fetch --no-tags origin "$ORBIT360_BRANCH"
+          test "$(git rev-parse FETCH_HEAD)" = "$BASE"
+          git push "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:refs/heads/${ORBIT360_BRANCH}"
+          echo "NEW_HEAD=$NEW_HEAD" >> "$GITHUB_ENV"
+
+      - name: Project actual PR body and verify final readback
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          jq -n --rawfile body "$PR_STATE" '{body:$body}' > "$RUNNER_TEMP/pr5-patch.json"
+          gh api -X PATCH "repos/${GITHUB_REPOSITORY}/pulls/5" --input "$RUNNER_TEMP/pr5-patch.json" >/dev/null
+          gh api "repos/${GITHUB_REPOSITORY}/pulls/5" --jq '.body' > "$RUNNER_TEMP/pr5-body.md"
+          test "$(gh api "repos/${GITHUB_REPOSITORY}/pulls/5" --jq '.head.sha')" = "$NEW_HEAD"
+          node "$CONVERGENCE" --pr-body-file "$RUNNER_TEMP/pr5-body.md" | tee "$RUNNER_TEMP/final-convergence.json"
+          jq -e '.ok==true and .prBodyValidated==true and .ledgerRevision==35 and .packageRevision==29 and .candidateArtifactId==9504702901 and .authorized==false and .requestMaterialized==false and .runtimeAllowed==false' "$RUNNER_TEMP/final-convergence.json" >/dev/null
+          echo 'ORBIT360_F2_SUCCESSOR_PROMOTION_SOURCE_ONLY_PASS'

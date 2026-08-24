@@ -44,6 +44,18 @@ patched = applyOnce(
   'fileCount:Number(M.fileCount),deltaCount:Number(M.deltaCount),unchangedFileCount:Number(M.unchangedFileCount)',
   'OWNER_DYNAMIC_HISTORY_COUNTS'
 );
+patched = applyOnce(
+  patched,
+  'L.successorCandidate=candidate;',
+  "L.successorCandidate=candidate;L.sourceRootCauseResolution={status:'VERIFIED_SOURCE_ONLY',classification:String(M.rootCauseClassification||'FUNCTIONAL_DEFECT'),code:String(M.rootCauseCode||'F2_SUCCESSOR_ROOTFIX'),rootfixCommit:String(M.rootfixCommit||M.sourceHead),rootfixPath:String(M.rootfixPath||''),candidateArtifactId:Number(M.artifactId),candidateSourceHead:String(M.sourceHead),checksPassed:Number(M.checksPassed),apiPreserved:true,writesRemainBlocked:true};",
+  'OWNER_CURRENT_ROOT_CAUSE_PROJECTION'
+);
+patched = applyOnce(
+  patched,
+  "rootCauseStatus:'FUNCTIONAL_DEFECT_VISIBLE_VALUE_READMODEL_FAMILY_FIXED_SOURCE_ONLY'",
+  "rootCauseStatus:String(M.rootCauseStatus||'FUNCTIONAL_DEFECT_SUCCESSOR_ROOTFIX_CERTIFIED_SOURCE_ONLY')",
+  'OWNER_DYNAMIC_ROOT_CAUSE_STATUS'
+);
 if (!patched.includes('terminalEvidencePath:terminalEvidence')) fail('PIPELINE_MECHANISM_FAILURE:OWNER_TERMINAL_ALIAS_PATCH_FAILED');
 const tmp = path.join(os.tmpdir(), `orbit360-transition-owner-${process.pid}-${Date.now()}.mjs`);
 try {

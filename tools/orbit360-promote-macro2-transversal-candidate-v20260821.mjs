@@ -9,6 +9,7 @@ import { spawnSync } from 'node:child_process';
 const ROOT = process.env.ORBIT360_ROOT ? path.resolve(process.env.ORBIT360_ROOT) : process.cwd();
 const CORE_REL = 'tools/orbit360-promote-macro2-transversal-candidate-core-v20260824.mjs';
 const CORE = path.join(ROOT, CORE_REL);
+const AUTHORITY = path.join(ROOT, 'tools/orbit360-gate-contract-f2-productive-acceptance-v20260820.json');
 const fail = code => { throw new Error(code); };
 const applyOnce = (source, from, to, code) => {
   const n = source.split(from).length - 1;
@@ -24,10 +25,16 @@ patched = applyOnce(
   'PROMOTER_DYNAMIC_COUNTS'
 );
 patched = applyOnce(patched, 'MACRO2_194_9_185_INVALID', 'MACRO2_DYNAMIC_COUNTS_INVALID', 'PROMOTER_ERROR_CODE');
+const childEnv = { ...process.env };
+if (!childEnv.ORBIT360_MACRO2_RESUME_METADATA && fs.existsSync(AUTHORITY)) {
+  const authority = JSON.parse(fs.readFileSync(AUTHORITY, 'utf8').replace(/^\uFEFF/, ''));
+  const current = String(authority.candidateCertificationEvidence || '').trim();
+  if (current) childEnv.ORBIT360_MACRO2_RESUME_METADATA = current;
+}
 const tmp = path.join(os.tmpdir(), `orbit360-promoter-${process.pid}-${Date.now()}.mjs`);
 try {
   fs.writeFileSync(tmp, patched, 'utf8');
-  const run = spawnSync(process.execPath, [tmp, ...process.argv.slice(2)], { cwd: ROOT, env: process.env, stdio: 'inherit' });
+  const run = spawnSync(process.execPath, [tmp, ...process.argv.slice(2)], { cwd: ROOT, env: childEnv, stdio: 'inherit' });
   if (run.error) throw run.error;
   process.exitCode = Number.isInteger(run.status) ? run.status : 41;
 } finally { try { fs.unlinkSync(tmp); } catch {} }
