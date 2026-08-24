@@ -144,12 +144,31 @@ jobs:
           test -z "$(git status --porcelain)"
           MODE='${{ steps.intent.outputs.mode }}'
           if [ "$MODE" = 'CONTROL_PLANE_SELFTEST' ] || [ "$MODE" = 'CONTROL_PLANE_HARDENING_CLOSE' ]; then
-            jq -e --argjson lr '${{ steps.intent.outputs.expected_ledger }}' --argjson pr '${{ steps.intent.outputs.expected_package }}' --argjson artifact '${{ steps.intent.outputs.artifact }}' --arg source '${{ steps.intent.outputs.source }}' '.revision==$lr and .productionReopeningPackage.revision==$pr and .activeState.phase=="MACRO1_CONTROL_PLANE_TRUTH_HARDENING_SOURCE_ONLY" and .activeState.status=="CONTROL_PLANE_FALSE_PASS_INVALIDATED" and .activeState.runtimeAuthorized==false and .activeState.runtimeReplayAllowed==false and .authorizationBoundary.activeRuntimeAuthorization==false and .authorizationBoundary.activeRequestPath==null and .authorizationBoundary.authorizationRecordPath==null and (.authorizationBoundary.runtimeAttemptAccepted // false)==false and .progress.productionRouteProgressPct==75 and .progress.f2TerminalPass==false and .successorCandidate.artifactId==$artifact and .successorCandidate.sourceHead==$source' "$LEDGER" >/dev/null
+            jq -e --argjson lr '${{ steps.intent.outputs.expected_ledger }}' --argjson pr '${{ steps.intent.outputs.expected_package }}' --argjson artifact '${{ steps.intent.outputs.artifact }}' --arg source '${{ steps.intent.outputs.source }}' '.revision==$lr and .productionReopeningPackage.revision==$pr and .activeState.runtimeAuthorized==false and .activeState.runtimeReplayAllowed==false and .authorizationBoundary.activeRuntimeAuthorization==false and .authorizationBoundary.activeRequestPath==null and .authorizationBoundary.authorizationRecordPath==null and (.authorizationBoundary.runtimeAttemptAccepted // false)==false and .progress.productionRouteProgressPct==75 and .progress.f2TerminalPass==false and .successorCandidate.artifactId==$artifact and .successorCandidate.sourceHead==$source' "$LEDGER" >/dev/null
+            PHASE=$(jq -r '.activeState.phase' "$LEDGER")
+            STATUS=$(jq -r '.activeState.status' "$LEDGER")
+            if [ "$PHASE" = 'MACRO1_CONTROL_PLANE_TRUTH_HARDENING_SOURCE_ONLY' ] && [ "$STATUS" = 'CONTROL_PLANE_FALSE_PASS_INVALIDATED' ]; then
+              CONTROL_PLANE_STATE='OPEN'
+            elif [ "$PHASE" = 'CONTROL_PLANE_DEFINITIVE_CAUSAL_PASS_AWAITING_F2_AUTHORIZATION' ] && [ "$STATUS" = 'CONTROL_PLANE_DEFINITIVE_CAUSAL_PASS' ]; then
+              CONTROL_PLANE_STATE='CLOSED'
+              test "$(jq -r '.nextAction.id' "$LEDGER")" = 'AWAIT_EXPLICIT_F2_RUNTIME_AUTHORIZATION_ONE_SHOT'
+            else
+              echo "PIPELINE_MECHANISM_FAILURE:CONTROL_PLANE_MODE_STATE_INVALID:${PHASE}:${STATUS}" >&2; exit 41
+            fi
             test -f orbit360-platform/docs/PLAN-MAESTRO-CONGELADO-SALIDA-PRODUCCION-SIN-BUCLES-ORBIT360-AYS-20260824.md
             if [ "$MODE" = 'CONTROL_PLANE_HARDENING_CLOSE' ]; then
               E='${{ steps.intent.outputs.control_plane_evidence }}'
               test -f "$E"
-              jq -e --argjson lr '${{ steps.intent.outputs.expected_ledger }}' --argjson pr '${{ steps.intent.outputs.expected_package }}' --argjson artifact '${{ steps.intent.outputs.artifact }}' --arg source '${{ steps.intent.outputs.source }}' '.ok==true and .status=="CONTROL_PLANE_SELFTEST_HANDSHAKE_PASS" and .classification=="PASS" and .controlPlaneSelftestPass==true and .expectedLedgerRevision==$lr and .expectedPackageRevision==$pr and .candidateArtifactId==$artifact and .candidateSourceHead==$source and .authorizationMaterialized==false and .requestMaterialized==false and .runtimeExecuted==false and .browserExecuted==false and .secretAccess==false and .firestoreRead==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .deployExecuted==false and .productionTouched==false' "$E" >/dev/null
+              jq -e --argjson artifact '${{ steps.intent.outputs.artifact }}' --arg source '${{ steps.intent.outputs.source }}' '.ok==true and .status=="CONTROL_PLANE_SELFTEST_HANDSHAKE_PASS" and .classification=="PASS" and .controlPlaneSelftestPass==true and .candidateArtifactId==$artifact and .candidateSourceHead==$source and .authorizationMaterialized==false and .requestMaterialized==false and .runtimeExecuted==false and .browserExecuted==false and .secretAccess==false and .firestoreRead==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .deployExecuted==false and .productionTouched==false' "$E" >/dev/null
+              if [ "$CONTROL_PLANE_STATE" = 'OPEN' ]; then
+                jq -e --argjson lr '${{ steps.intent.outputs.expected_ledger }}' --argjson pr '${{ steps.intent.outputs.expected_package }}' '.expectedLedgerRevision==$lr and .expectedPackageRevision==$pr' "$E" >/dev/null
+              else
+                RECORDED_E=$(jq -r '.continuityControl.workflowHandshakeEvidence // empty' "$LEDGER")
+                RECORDED_RUN=$(jq -r '.continuityControl.workflowHandshakeRunId // 0' "$LEDGER")
+                RECORDED_JOB=$(jq -r '.continuityControl.workflowHandshakeJobId // 0' "$LEDGER")
+                test "$E" = "$RECORDED_E"
+                jq -e --argjson run "$RECORDED_RUN" --argjson job "$RECORDED_JOB" '.runId==$run and .jobId==$job' "$E" >/dev/null
+              fi
             fi
           else
             test -f "$F2_AUTH_INTENT"
@@ -205,7 +224,7 @@ jobs:
           git config user.name 'orbit360-control-plane'
           git config user.email 'orbit360-control-plane@users.noreply.github.com'
           git add -- "${CHANGED[@]}"; git diff --cached --check
-          git commit -m 'gate(control-plane): close causal hardening and project state'
+          git commit -m 'gate(control-plane): project causal hardening state'
           FINAL_HEAD=$(git rev-parse HEAD)
           git fetch --no-tags origin "$ORBIT360_BRANCH"
           test "$(git rev-parse FETCH_HEAD)" = '${{ steps.intent.outputs.live_base }}'
