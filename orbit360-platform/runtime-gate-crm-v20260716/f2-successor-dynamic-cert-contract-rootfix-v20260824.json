@@ -1,0 +1,37 @@
+{
+  "schemaVersion": "orbit360-f2-successor-dynamic-cert-contract-rootfix-v1",
+  "status": "SOURCE_ONLY_ROOTFIX_INSTALLED",
+  "classification": "VALIDATOR_STALE",
+  "failureCode": "F2_SUCCESSOR_CERTIFICATION_COUNTS_HARDCODED_TO_PRIOR_CANDIDATE",
+  "priorCandidate": {
+    "artifactId": 9485621192,
+    "sourceHead": "842f762f199f4c7dbf13062a33ca220d92398c51",
+    "fileCount": 194,
+    "deltaCount": 9,
+    "unchangedFileCount": 185
+  },
+  "successorInvariant": {
+    "fileCount": "positive integer from candidate evidence",
+    "deltaCount": "integer between 0 and fileCount",
+    "unchangedFileCount": "fileCount - deltaCount",
+    "checksPassed": "positive integer from durable closure evidence",
+    "noPriorCandidateLiteralBinding": true
+  },
+  "canonicalPublicPathsPreserved": [
+    "tools/orbit360-promote-macro2-transversal-candidate-v20260821.mjs",
+    "tools/orbit360-f2-exact-candidate-source-validator-v20260819.mjs",
+    "tools/orbit360-control-plane-evidence-convergence-v20260822.mjs",
+    "tools/orbit360-continuity-transition-owner-v20260820.mjs"
+  ],
+  "logicalOwnerCount": 1,
+  "runtimeExecuted": false,
+  "browserExecuted": false,
+  "secretAccess": false,
+  "firestoreRead": false,
+  "writes": 0,
+  "deployExecuted": false,
+  "productionTouched": false,
+  "replayAllowed": false,
+  "containsPII": false,
+  "containsSecrets": false
+}

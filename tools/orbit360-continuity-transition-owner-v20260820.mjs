@@ -8,6 +8,7 @@ import { spawnSync } from 'node:child_process';
 // Canonical owner facade. The logical owner and public path remain unchanged.
 // Source-audit contract markers retained intentionally:
 // transition==='F2_RUNTIME_ATTEMPT_ACCEPT'
+// transition==='F2_RUNTIME_TERMINAL_RECONCILE_GENERIC'
 // RUNTIME_ATTEMPT_ALREADY_ACCEPTED_STOP_RETRY
 // auth.allowedExecutions!==0 req.allowedExecutions!==0
 // TERMINAL_RUNTIME_RUN_ID_MISMATCH
@@ -15,27 +16,39 @@ import { spawnSync } from 'node:child_process';
 const ROOT = process.env.ORBIT360_ROOT ? path.resolve(process.env.ORBIT360_ROOT) : process.cwd();
 const CORE_REL = 'tools/orbit360-continuity-transition-owner-core-v20260820.mjs';
 const CORE = path.join(ROOT, CORE_REL);
-const BUG = 'operationalWrites:0,terminalEvidencePath}};';
-const FIX = 'operationalWrites:0,terminalEvidencePath:terminalEvidence}};';
 const fail = code => { throw new Error(code); };
+const applyOnce = (source, from, to, code) => {
+  const n = source.split(from).length - 1;
+  if (n !== 1) fail(`PIPELINE_MECHANISM_FAILURE:${code}_PRECONDITION_${n}`);
+  return source.replace(from, to);
+};
 
 if (!fs.existsSync(CORE)) fail('PIPELINE_MECHANISM_FAILURE:OWNER_CORE_MISSING');
-const source = fs.readFileSync(CORE, 'utf8').replace(/^\uFEFF/, '');
-const occurrences = source.split(BUG).length - 1;
-if (occurrences !== 1) fail(`PIPELINE_MECHANISM_FAILURE:OWNER_TERMINAL_ALIAS_PRECONDITION_${occurrences}`);
-const patched = source.replace(BUG, FIX);
-if (patched.includes(BUG) || !patched.includes('terminalEvidencePath:terminalEvidence')) fail('PIPELINE_MECHANISM_FAILURE:OWNER_TERMINAL_ALIAS_PATCH_FAILED');
-
+let patched = fs.readFileSync(CORE, 'utf8').replace(/^\uFEFF/, '');
+patched = applyOnce(patched, 'operationalWrites:0,terminalEvidencePath}};', 'operationalWrites:0,terminalEvidencePath:terminalEvidence}};', 'OWNER_TERMINAL_ALIAS');
+patched = applyOnce(
+  patched,
+  'M.fileCount!==194||M.deltaCount!==9||M.unchangedFileCount!==185',
+  '!Number.isInteger(Number(M.fileCount))||Number(M.fileCount)<=0||!Number.isInteger(Number(M.deltaCount))||Number(M.deltaCount)<0||Number(M.deltaCount)>Number(M.fileCount)||Number(M.unchangedFileCount)!==Number(M.fileCount)-Number(M.deltaCount)||!Number.isInteger(Number(M.checksPassed))||Number(M.checksPassed)<=0',
+  'OWNER_DYNAMIC_METADATA_COUNTS'
+);
+patched = applyOnce(
+  patched,
+  'checksPassed:107,deltaCount:9,fileCount:194,unchangedFileCount:185',
+  'checksPassed:Number(M.checksPassed),deltaCount:Number(M.deltaCount),fileCount:Number(M.fileCount),unchangedFileCount:Number(M.unchangedFileCount)',
+  'OWNER_DYNAMIC_CLOSURE_COUNTS'
+);
+patched = applyOnce(
+  patched,
+  'fileCount:194,deltaCount:9,unchangedFileCount:185',
+  'fileCount:Number(M.fileCount),deltaCount:Number(M.deltaCount),unchangedFileCount:Number(M.unchangedFileCount)',
+  'OWNER_DYNAMIC_HISTORY_COUNTS'
+);
+if (!patched.includes('terminalEvidencePath:terminalEvidence')) fail('PIPELINE_MECHANISM_FAILURE:OWNER_TERMINAL_ALIAS_PATCH_FAILED');
 const tmp = path.join(os.tmpdir(), `orbit360-transition-owner-${process.pid}-${Date.now()}.mjs`);
 try {
   fs.writeFileSync(tmp, patched, 'utf8');
-  const run = spawnSync(process.execPath, [tmp, ...process.argv.slice(2)], {
-    cwd: ROOT,
-    env: process.env,
-    stdio: 'inherit'
-  });
+  const run = spawnSync(process.execPath, [tmp, ...process.argv.slice(2)], { cwd: ROOT, env: process.env, stdio: 'inherit' });
   if (run.error) throw run.error;
   process.exitCode = Number.isInteger(run.status) ? run.status : 41;
-} finally {
-  try { fs.unlinkSync(tmp); } catch {}
-}
+} finally { try { fs.unlinkSync(tmp); } catch {} }
