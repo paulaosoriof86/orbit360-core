@@ -47,12 +47,14 @@ const requireSuccess=(root,rel,args=[],env={},code='COMMAND_FAIL')=>{
 for(const p of Object.values(P))need(fs.existsSync(A(ROOT,p)),`MISSING:${p}`);
 let sourcePathExecuted=false,classWidePreAuthPass=false,classWideTerminalPass=false,arbitraryFilenamePass=false;
 let candidateBindingDynamic=false,semanticPreflightPass=false,scratchBehavioralTransitionsPass=false,negativeRegressionSuitePass=false,preProviderGatePathPass=false,projectionImmutabilityPass=false,remoteCASReadbackPass=false,secondAttemptStopRetryPass=false;
+let workflowProviderUngatedNegativePass=false,workflowCandidateHardcodeNegativePass=false,workflowOperationalRevisionHardcodeNegativePass=false;
 
 if(!failures.length){
   const L=json(ROOT,P.ledger),contract=json(ROOT,P.contract),registry=json(ROOT,P.registry),candidate=L.successorCandidate||{};
   need(expectedLedger>0&&L.revision===expectedLedger,'LEDGER_REVISION_MISMATCH');
   need(expectedPackage>0&&Number(L.productionReopeningPackage?.revision)===expectedPackage,'PACKAGE_REVISION_MISMATCH');
   need(contract.active===true&&contract.candidateBinding==='DYNAMIC_FROM_CANONICAL_LEDGER','SEMANTIC_CONTRACT_NOT_ACTIVE');
+  need(contract.behavioralSelftestRequirements?.workflowOperationalRevisionHardcodeNegativeTest===true,'SEMANTIC_CONTRACT_REVISION_NEGATIVE_TEST_MISSING');
   candidateBindingDynamic=Number.isInteger(Number(candidate.artifactId))&&Number(candidate.artifactId)>0&&/^[a-f0-9]{40}$/.test(String(candidate.sourceHead||''))&&/^sha256:[a-f0-9]{64}$/.test(String(candidate.artifactDigest||''));
   need(candidateBindingDynamic,'DYNAMIC_CANDIDATE_INVALID');
   const hardeningOpen=L.activeState?.phase==='MACRO1_CONTROL_PLANE_TRUTH_HARDENING_SOURCE_ONLY'&&['CONTROL_PLANE_FALSE_PASS_INVALIDATED','CONTROL_PLANE_REGRESSION_OPEN_STOP_RETRY'].includes(L.activeState?.status);
@@ -113,16 +115,24 @@ if(!failures.length){
     if(!providerMatch)throw new Error('NEGATIVE_PROVIDER_FIXTURE_NOT_FOUND');
     fs.writeFileSync(A(scratch,P.workflow),originalWorkflow.replace(providerRx,`${providerMatch[1]}always()${providerMatch[3]}`),'utf8');
     const ungated=runJson(scratch,P.workflowAudit);
-    const ungatedDetected=ungated.result.status!==0&&Array.isArray(ungated.json?.offenders)&&ungated.json.offenders.some(x=>x.reason==='PROVIDER_NOT_EXPLICITLY_GATED');
+    workflowProviderUngatedNegativePass=ungated.result.status!==0&&Array.isArray(ungated.json?.offenders)&&ungated.json.offenders.some(x=>x.reason==='PROVIDER_NOT_EXPLICITLY_GATED');
     fs.writeFileSync(A(scratch,P.workflow),originalWorkflow,'utf8');
-    need(ungatedDetected,'NEGATIVE_PROVIDER_UNGATED_NOT_DETECTED');
+    need(workflowProviderUngatedNegativePass,'NEGATIVE_PROVIDER_UNGATED_NOT_DETECTED');
 
-    const injected=originalWorkflow.replace(/^env:\s*$/m,`env:\n  F2_ARTIFACT_ID: ${Number(scratchCandidate.artifactId)}`);
-    fs.writeFileSync(A(scratch,P.workflow),injected,'utf8');
+    const candidateInjected=originalWorkflow.replace(/^env:\s*$/m,`env:\n  F2_ARTIFACT_ID: ${Number(scratchCandidate.artifactId)}`);
+    fs.writeFileSync(A(scratch,P.workflow),candidateInjected,'utf8');
     const hardcoded=runJson(scratch,P.workflowAudit);
-    const hardcodeDetected=hardcoded.result.status!==0&&Array.isArray(hardcoded.json?.offenders)&&hardcoded.json.offenders.some(x=>x.reason==='CANDIDATE_ARTIFACT_HARDCODED_IN_WORKFLOW');
+    workflowCandidateHardcodeNegativePass=hardcoded.result.status!==0&&Array.isArray(hardcoded.json?.offenders)&&hardcoded.json.offenders.some(x=>x.reason==='CANDIDATE_ARTIFACT_HARDCODED_IN_WORKFLOW');
     fs.writeFileSync(A(scratch,P.workflow),originalWorkflow,'utf8');
-    need(hardcodeDetected,'NEGATIVE_CANDIDATE_HARDCODE_NOT_DETECTED');
+    need(workflowCandidateHardcodeNegativePass,'NEGATIVE_CANDIDATE_HARDCODE_NOT_DETECTED');
+
+    const revisionInjected=originalWorkflow.replace(/run:\s*\|\n/,`run: |\n          jq -e '.revision==999999' \"$LEDGER\" >/dev/null\n`);
+    if(revisionInjected===originalWorkflow)throw new Error('NEGATIVE_REVISION_FIXTURE_NOT_FOUND');
+    fs.writeFileSync(A(scratch,P.workflow),revisionInjected,'utf8');
+    const revisionHardcoded=runJson(scratch,P.workflowAudit);
+    workflowOperationalRevisionHardcodeNegativePass=revisionHardcoded.result.status!==0&&Array.isArray(revisionHardcoded.json?.offenders)&&revisionHardcoded.json.offenders.some(x=>x.reason==='OPERATIONAL_REVISION_HARDCODED_IN_WORKFLOW');
+    fs.writeFileSync(A(scratch,P.workflow),originalWorkflow,'utf8');
+    need(workflowOperationalRevisionHardcodeNegativePass,'NEGATIVE_OPERATIONAL_REVISION_HARDCODE_NOT_DETECTED');
 
     const baseHead=git(scratch,['rev-parse','HEAD']);
     const latestRegression=Number(scratchL.continuityControl?.latestControlPlaneRegression?.runId||0);
@@ -188,7 +198,7 @@ if(!failures.length){
     scratchBehavioralTransitionsPass=reduced.activeState?.status==='F2_TERMINAL_RECONCILED_NO_REPLAY'&&reduced.authorizationBoundary?.activeRuntimeAuthorization===false&&reduced.authorizationBoundary?.activeRequestPath==null&&reduced.authorizationBoundary?.authorizationRecordPath==null&&reduced.activeState?.runtimeReplayAllowed===false&&reduced.nextAction?.id==='DIAGNOSE_ROOT_CAUSE_BEFORE_ANY_FRESH_AUTHORIZATION'&&Number(reduced.progress?.productionRouteProgressPct)===75;
     need(scratchBehavioralTransitionsPass,'SCRATCH_TERMINAL_REDUCER_STATE_INVALID');
 
-    negativeRegressionSuitePass=ungatedDetected&&hardcodeDetected&&secondAttemptStopRetryPass&&projectionImmutabilityPass;
+    negativeRegressionSuitePass=workflowProviderUngatedNegativePass&&workflowCandidateHardcodeNegativePass&&workflowOperationalRevisionHardcodeNegativePass&&secondAttemptStopRetryPass&&projectionImmutabilityPass;
     need(negativeRegressionSuitePass,'NEGATIVE_REGRESSION_SUITE_FAIL');
   }catch(error){need(false,`SCRATCH_BEHAVIORAL_SIMULATION_FAIL:${String(error?.message||error).slice(0,700)}`);}
   finally{
@@ -198,7 +208,7 @@ if(!failures.length){
 }
 
 const out={
-  schemaVersion:'orbit360-control-plane-selftest-v10-semantic-contract-behavioral-scratch',
+  schemaVersion:'orbit360-control-plane-selftest-v11-semantic-contract-behavioral-scratch-negative-suite',
   ok:failures.length===0,
   status:failures.length?'CONTROL_PLANE_SELFTEST_FAIL':'CONTROL_PLANE_SELFTEST_PASS',
   classification:failures.length?'PIPELINE_MECHANISM_FAILURE':'PASS',
@@ -216,6 +226,9 @@ const out={
   projectionImmutabilityPass,
   remoteCASReadbackPass,
   secondAttemptStopRetryPass,
+  workflowProviderUngatedNegativePass,
+  workflowCandidateHardcodeNegativePass,
+  workflowOperationalRevisionHardcodeNegativePass,
   negativeRegressionSuitePass,
   validatorMode:'MACHINE_READABLE_CONTRACT_PLUS_BEHAVIORAL_EXECUTION',
   sourceShapeValidationUsed:false,
