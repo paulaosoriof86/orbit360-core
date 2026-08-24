@@ -1,1 +1,70 @@
-{"schemaVersion":"orbit360-live-state-v3-derived","updatedAt":"2026-08-24T01:53:00.000Z","repository":"paulaosoriof86/orbit360-core","branch":"ays/backend-tenant-lab-v99-20260703","pullRequest":5,"canonicalPlan":"orbit360-platform/docs/PLAN-MAESTRO-CONGELADO-DEFINITIVO-RUTA-PRODUCCION-ORBIT360-AYS-20260821.md","canonicalLedger":"orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json","canonicalityContract":"orbit360-platform/docs/orbit360-control-plane-canonicality-contract-v20260822.json","productionReopeningPackage":"orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json","authorizationBoundary":"orbit360-platform/docs/orbit360-f2-runtime-authorization-boundary-v20260820.json","writerRegistry":"orbit360-platform/docs/orbit360-continuity-writer-registry-v20260820.json","derived":true,"canonicalStateFingerprint":"c11336462d686cc8d5e3ea55b188a28e178a3c0a6c74fd484535a21ece7139f1","canonicalCurrent":{"stateVersion":"ORBIT360-F2-CONTINUITY-CURRENT","ledgerRevision":34,"packageRevision":28,"phase":"F2_TERMINAL_FAIL_AWAITING_SOURCE_ONLY_ROOT_CAUSE","status":"F2_TERMINAL_RECONCILED_NO_REPLAY","nextAction":"DIAGNOSE_ROOT_CAUSE_BEFORE_ANY_FRESH_AUTHORIZATION","firstIncompleteStep":"F2-SOURCE-ROOT-CAUSE","artifactId":9485621192,"artifactDigest":"sha256:6a89448084b3aac162378aa4fedd05acfa571c667765c3c7fd06473075705dce","sourceHead":"842f762f199f4c7dbf13062a33ca220d92398c51","progress":75,"authorized":false,"authorizationPersisted":false,"requestMaterialized":false,"runtimeAllowed":false},"successorCandidate":{"status":"CERTIFIED_SOURCE_ONLY_TRANSVERSAL_SOURCE_ACCEPTANCE","artifactId":9485621192,"artifactDigest":"sha256:6a89448084b3aac162378aa4fedd05acfa571c667765c3c7fd06473075705dce","sourceHead":"842f762f199f4c7dbf13062a33ca220d92398c51","zipSha256":"4f6006ebb3ee2e10ef35e61053243ed74c4adcb46c4abb6c8d90fe27047f37da","manifestSha256":"ce44011eb874bd44fe646b93bd89cef97ecee8218f16ffacf3917177f7fccb18","fileCount":194,"runtimeAuthorized":false,"rebuildAllowed":false},"authorization":{"activeRuntimeAuthorization":false,"authorized":false,"authorizationPersisted":false,"requestMaterialized":false,"activeRequestPath":null,"freshAuthorizationRequired":true,"runtimeAllowed":false},"nextActionExact":{"id":"DIAGNOSE_ROOT_CAUSE_BEFORE_ANY_FRESH_AUTHORIZATION","description":"Diagnose source-only root cause. No replay.","runtimeAllowed":false},"lanes":{"A_frontend_ux_academia":"MACRO2_TRANSVERSAL_SOURCE_ACCEPTANCE_CLOSED","B_backend_security_gates":"AWAITING_FRESH_F2_RUNTIME_AUTHORIZATION","C_real_data_migration":"UNCHANGED_FROZEN"},"progress":{"productionRouteProgressPct":75,"programProgressPct":25,"f2TerminalPass":false,"progressMayIncreaseDuringHardening":false},"containsPII":false,"containsSecrets":false}
+{
+  "schemaVersion": "orbit360-live-state-v3-derived",
+  "updatedAt": "2026-08-24T02:33:42.759Z",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "canonicalPlan": "orbit360-platform/docs/PLAN-MAESTRO-CONGELADO-DEFINITIVO-RUTA-PRODUCCION-ORBIT360-AYS-20260821.md",
+  "canonicalLedger": "orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json",
+  "canonicalityContract": "orbit360-platform/docs/orbit360-control-plane-canonicality-contract-v20260822.json",
+  "productionReopeningPackage": "orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json",
+  "authorizationBoundary": "orbit360-platform/docs/orbit360-f2-runtime-authorization-boundary-v20260820.json",
+  "writerRegistry": "orbit360-platform/docs/orbit360-continuity-writer-registry-v20260820.json",
+  "derived": true,
+  "canonicalStateFingerprint": "1bb7ef422538918bdaf1d96f70ddc448b5dd7910b23105d1b9b3b64996633a41",
+  "canonicalCurrent": {
+    "stateVersion": "ORBIT360-F2-CONTINUITY-CURRENT",
+    "ledgerRevision": 35,
+    "packageRevision": 29,
+    "phase": "MACRO2_TRANSVERSAL_SOURCE_ACCEPTANCE_PASS_AWAITING_FRESH_F2_AUTHORIZATION",
+    "status": "TRANSVERSAL_SOURCE_ACCEPTANCE_PASS",
+    "nextAction": "AWAIT_EXPLICIT_F2_RUNTIME_AUTHORIZATION_ONE_SHOT",
+    "firstIncompleteStep": "F2-RUNTIME-AUTHORIZATION",
+    "artifactId": 9504702901,
+    "artifactDigest": "sha256:f11dd2a350b4160465dfc93b0dd9153e697d09773fa00aa4ee5ed13d93401ca2",
+    "sourceHead": "8c9668d6d423e82826b0295431ec699390d79b4b",
+    "progress": 75,
+    "authorized": false,
+    "authorizationPersisted": false,
+    "requestMaterialized": false,
+    "runtimeAllowed": false
+  },
+  "successorCandidate": {
+    "status": "CERTIFIED_SOURCE_ONLY_TRANSVERSAL_SOURCE_ACCEPTANCE",
+    "artifactId": 9504702901,
+    "artifactDigest": "sha256:f11dd2a350b4160465dfc93b0dd9153e697d09773fa00aa4ee5ed13d93401ca2",
+    "sourceHead": "8c9668d6d423e82826b0295431ec699390d79b4b",
+    "zipSha256": "4a3660a18229a923412aa5a1bffc0817b1d5666c83ba96c81c92cea0fce9491c",
+    "manifestSha256": "b1c98c1faf644b5d83cfe6e6bb1a602927c438cd85b7855cb0b1a6b98c08053c",
+    "fileCount": 194,
+    "runtimeAuthorized": false,
+    "rebuildAllowed": false
+  },
+  "authorization": {
+    "activeRuntimeAuthorization": false,
+    "authorized": false,
+    "authorizationPersisted": false,
+    "requestMaterialized": false,
+    "activeRequestPath": null,
+    "freshAuthorizationRequired": true,
+    "runtimeAllowed": false
+  },
+  "nextActionExact": {
+    "id": "AWAIT_EXPLICIT_F2_RUNTIME_AUTHORIZATION_ONE_SHOT",
+    "description": "Await one fresh explicit F2 runtime authorization bound to the certified Macro-2 candidate. No request is materialized yet.",
+    "runtimeAllowed": false
+  },
+  "lanes": {
+    "A_frontend_ux_academia": "MACRO2_TRANSVERSAL_SOURCE_ACCEPTANCE_CLOSED",
+    "B_backend_security_gates": "AWAITING_FRESH_F2_RUNTIME_AUTHORIZATION",
+    "C_real_data_migration": "UNCHANGED_FROZEN"
+  },
+  "progress": {
+    "productionRouteProgressPct": 75,
+    "programProgressPct": 25,
+    "f2TerminalPass": false,
+    "progressMayIncreaseDuringHardening": false
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
