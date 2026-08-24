@@ -22,6 +22,20 @@ const applyOnce = (source, from, to, code) => {
   if (n !== 1) fail(`PIPELINE_MECHANISM_FAILURE:${code}_PRECONDITION_${n}`);
   return source.replace(from, to);
 };
+const argv=process.argv.slice(2);const value=flag=>{const i=argv.indexOf(flag);return i>=0?argv[i+1]:'';};
+const transition=value('--transition');
+if(transition==='F2_RUNTIME_TERMINAL_RECONCILE_GENERIC'){
+  const terminalRel=value('--terminal-evidence');
+  const terminalPath=terminalRel?path.resolve(ROOT,terminalRel):'';
+  if(!terminalPath||!fs.existsSync(terminalPath))fail('TERMINAL_EVIDENCE_REQUIRED');
+  const T=JSON.parse(fs.readFileSync(terminalPath,'utf8').replace(/^\uFEFF/,''));
+  const run=Number(T.runId||0);
+  if(T.ok!==true&&String(T.classification||'')==='PASS')fail('DATA_CONTRACT_FAILURE:TERMINAL_OK_FALSE_CLASSIFICATION_PASS');
+  if(T.ok===true){
+    const pass=T.status==='F2_PRODUCTIVE_ACCEPTANCE_PASS'&&String(T.classification||'PASS')==='PASS'&&T.browserMatrixPass===true&&T.integrityBeforeAfterPass===true&&T.zeroCrossTenant===true&&T.zeroUnexpectedWrites===true&&Number(T.firestoreWrites||0)===0&&Number(T.authWrites||0)===0&&Number(T.operationalWrites||0)===0&&T.deployExecuted===false&&T.productionHostingTouched===false&&Number(T.browserRunId||0)===run&&Number(T.integrityRunId||0)===run;
+    if(!pass)fail('DATA_CONTRACT_FAILURE:TERMINAL_PASS_CONTRACT_INCOMPLETE');
+  }
+}
 
 if (!fs.existsSync(CORE)) fail('PIPELINE_MECHANISM_FAILURE:OWNER_CORE_MISSING');
 let patched = fs.readFileSync(CORE, 'utf8').replace(/^\uFEFF/, '');
