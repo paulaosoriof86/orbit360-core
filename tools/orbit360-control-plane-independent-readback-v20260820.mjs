@@ -15,10 +15,20 @@ const latest=L.history?.latestSealedConsumedRuntime||{};const terminalPath=Strin
 need(terminalPath&&fs.existsSync(A(terminalPath)),'TERMINAL_EVIDENCE_MISSING');
 let E={};if(terminalPath&&fs.existsSync(A(terminalPath)))E=J(terminalPath);
 const run=Number(latest.runId||0);need(run>0&&Number(E.runId||0)===run,'LATEST_TERMINAL_RUN_MISMATCH');
-need(!(E.ok!==true&&E.classification==='PASS'),'TERMINAL_FALSE_PASS_CLASSIFICATION');
+const stateClaimsPass=L.activeState?.status==='F2_TERMINAL_PASS'||L.progress?.f2TerminalPass===true||Number(L.progress?.productionRouteProgressPct)>75||L.nextAction?.id==='AWAIT_EXPLICIT_GO_LIVE_AUTHORIZATION';
+const historicalFalsePass=E.ok!==true&&E.classification==='PASS';
+const invalidation=L.continuityControl?.falsePassInvalidation||{};
+const falsePassInvalidationMatched=historicalFalsePass&&
+  Number(invalidation.runId||0)===run&&
+  String(invalidation.terminalEvidencePath||'')===terminalPath&&
+  invalidation.terminalOk===false&&
+  String(invalidation.terminalClassificationRaw||'')==='PASS';
+if(historicalFalsePass){
+  if(stateClaimsPass)need(false,'STATE_PASS_WITH_HISTORICAL_FALSE_PASS');
+  else need(falsePassInvalidationMatched,'TERMINAL_FALSE_PASS_NOT_CANONICALLY_INVALIDATED');
+}
 const currentRunBound=Number(E.browserRunId||0)===run&&Number(E.integrityRunId||0)===run;
 const passEvidence=terminalPassContract(E)&&currentRunBound;
-const stateClaimsPass=L.activeState?.status==='F2_TERMINAL_PASS'||L.progress?.f2TerminalPass===true||Number(L.progress?.productionRouteProgressPct)>75||L.nextAction?.id==='AWAIT_EXPLICIT_GO_LIVE_AUTHORIZATION';
 if(stateClaimsPass)need(passEvidence,'STATE_PASS_WITHOUT_RUNTIME_EVIDENCE');
 else{need(Number(L.progress?.productionRouteProgressPct)<=75,'NONPASS_PROGRESS_ABOVE_75');need(L.progress?.f2TerminalPass===false,'NONPASS_F2_FLAG_TRUE');}
 need(Number(pkg.revision)===Number(L.productionReopeningPackage?.revision),'PACKAGE_REVISION_DRIFT');
@@ -31,5 +41,5 @@ const core={stateVersion:L.stateVersion,ledgerRevision:L.revision,packageRevisio
 const fingerprint=crypto.createHash('sha256').update(JSON.stringify(core)).digest('hex');
 need(T(P.prState).includes(`CANONICAL_STATE_FINGERPRINT: ${fingerprint}`),'PR_STATE_FINGERPRINT_DRIFT');
 if(process.env.ORBIT360_PR_BODY_FILE){const body=T(process.env.ORBIT360_PR_BODY_FILE);need(body.includes(`CANONICAL_STATE_FINGERPRINT: ${fingerprint}`),'ACTUAL_PR_BODY_FINGERPRINT_DRIFT');}
-const out={schemaVersion:'orbit360-control-plane-independent-readback-v4',ok:failures.length===0,status:failures.length?'CONTROL_PLANE_INDEPENDENT_READBACK_FAIL':'CONTROL_PLANE_INDEPENDENT_READBACK_PASS',classification:failures.length?'DATA_CONTRACT_FAILURE':'PASS',failures:[...new Set(failures)],stateFingerprint:fingerprint,ledgerRevision:L.revision||null,packageRevision:pkg.revision||null,candidateArtifactId:L.successorCandidate?.artifactId||null,productionRouteProgressPct:L.progress?.productionRouteProgressPct||null,terminalEvidencePath:terminalPath,latestRunId:run,terminalOk:E.ok===true,terminalClassification:E.classification||null,currentRunEvidenceBound:currentRunBound,terminalPassEvidence:passEvidence,prBodyValidated:Boolean(process.env.ORBIT360_PR_BODY_FILE)&&failures.length===0,runtimeExecuted:Boolean(E.runtimeExecuted),browserExecuted:Boolean(E.browserExecuted||E.browserMatrixPass),firestoreWrites:Number(E.firestoreWrites||0),authWrites:Number(E.authWrites||0),operationalWrites:Number(E.operationalWrites||0),deployExecuted:Boolean(E.deployExecuted),productionTouched:Boolean(E.productionHostingTouched),containsPII:false,containsSecrets:false};
+const out={schemaVersion:'orbit360-control-plane-independent-readback-v5-historical-invalidation-aware',ok:failures.length===0,status:failures.length?'CONTROL_PLANE_INDEPENDENT_READBACK_FAIL':'CONTROL_PLANE_INDEPENDENT_READBACK_PASS',classification:failures.length?'DATA_CONTRACT_FAILURE':'PASS',failures:[...new Set(failures)],stateFingerprint:fingerprint,ledgerRevision:L.revision||null,packageRevision:pkg.revision||null,candidateArtifactId:L.successorCandidate?.artifactId||null,productionRouteProgressPct:L.progress?.productionRouteProgressPct||null,terminalEvidencePath:terminalPath,latestRunId:run,terminalOk:E.ok===true,terminalClassification:E.classification||null,historicalFalsePass,falsePassInvalidationMatched,currentRunEvidenceBound:currentRunBound,terminalPassEvidence:passEvidence,prBodyValidated:Boolean(process.env.ORBIT360_PR_BODY_FILE)&&failures.length===0,runtimeExecuted:Boolean(E.runtimeExecuted),browserExecuted:Boolean(E.browserExecuted||E.browserMatrixPass),firestoreWrites:Number(E.firestoreWrites||0),authWrites:Number(E.authWrites||0),operationalWrites:Number(E.operationalWrites||0),deployExecuted:Boolean(E.deployExecuted),productionTouched:Boolean(E.productionHostingTouched),containsPII:false,containsSecrets:false};
 console.log(JSON.stringify(out,null,2));if(!out.ok)process.exit(41);
