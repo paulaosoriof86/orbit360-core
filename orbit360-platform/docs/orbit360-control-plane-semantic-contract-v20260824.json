@@ -101,6 +101,7 @@
     "projectionMustNotMutateLedger": true,
     "workflowProviderUngatedNegativeTest": true,
     "workflowCandidateHardcodeNegativeTest": true,
+    "workflowOperationalRevisionHardcodeNegativeTest": true,
     "runtimeExecuted": false,
     "browserExecuted": false,
     "secretAccess": false,
