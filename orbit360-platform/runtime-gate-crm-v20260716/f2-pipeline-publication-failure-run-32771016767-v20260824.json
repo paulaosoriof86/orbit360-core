@@ -1,6 +1,6 @@
 {
-  "schemaVersion": "orbit360-f2-pipeline-publication-failure-v1",
-  "status": "DURABLE_SOURCE_ONLY_INCIDENT_EVIDENCE",
+  "schemaVersion": "orbit360-f2-pipeline-publication-failure-v2-rootfix-validated",
+  "status": "CLOSED_PASS_SOURCE_ONLY_ROOT_CAUSE_REPAIRED",
   "classification": "PIPELINE_MECHANISM_FAILURE",
   "runId": 32771016767,
   "workflowRunConclusion": "failure",
@@ -8,6 +8,8 @@
   "candidateArtifactDigest": "sha256:f11dd2a350b4160465dfc93b0dd9153e697d09773fa00aa4ee5ed13d93401ca2",
   "candidateSourceHead": "8c9668d6d423e82826b0295431ec699390d79b4b",
   "authorizationIdentityDigest": "27bbd434295938cffcc6873974944e4a2e0ca2b669716eb72b750c7489367eef",
+  "authorizationRetired": true,
+  "authorizationReplayAllowed": false,
   "terminalEvidenceArtifactId": 9536179630,
   "terminalEvidenceArtifactName": "orbit360-f2-productive-acceptance-32771016767",
   "terminalEvidence": {
@@ -26,28 +28,73 @@
     "deployExecuted": false,
     "productionHostingTouched": false
   },
-  "rootCause": {
-    "code": "F2_AUTH_PUBLICATION_SURFACE_TRANSIENT_PREFLIGHT_NOT_CLEANED",
-    "offendingPath": "orbit360-platform/runtime-gate-crm-v20260716/macro3-mechanism-preflight-sanitized-v20260823.json",
-    "detail": "The source-only mechanism preflight left its transient sanitized evidence in the working tree. The publication surface guard correctly rejected the extra path before semantic runtime gate/provider/browser execution."
-  },
-  "secondaryMechanismFinding": {
-    "code": "PR_BODY_PATCHED_FROM_UNPUBLISHED_TERMINAL_WORKTREE",
-    "detail": "The final PR-body projection step ran after terminal publication failed, so PR #5 temporarily reflected unpublished 45/39 working-tree state while the canonical branch remained 41/35."
-  },
+  "rootCauses": [
+    {
+      "code": "F2_AUTH_PUBLICATION_SURFACE_TRANSIENT_PREFLIGHT_NOT_CLEANED",
+      "offendingPath": "orbit360-platform/runtime-gate-crm-v20260716/macro3-mechanism-preflight-sanitized-v20260823.json",
+      "detail": "The source-only mechanism preflight left transient sanitized evidence in the working tree. The publication surface guard correctly rejected the extra path before semantic runtime gate/provider/browser execution.",
+      "classification": "PIPELINE_MECHANISM_FAILURE"
+    },
+    {
+      "code": "PR_BODY_PATCHED_FROM_UNPUBLISHED_TERMINAL_WORKTREE",
+      "detail": "The final PR-body projection step ran after terminal publication failed, temporarily showing unpublished 45/39 state while the canonical branch remained 41/35.",
+      "classification": "PIPELINE_MECHANISM_FAILURE"
+    },
+    {
+      "code": "CONTROL_PLANE_IDEMPOTENT_REPROJECTION_REQUIRES_FILE_DIFF",
+      "regressionRunId": 32772300322,
+      "detail": "The first source-only regression proved all semantic guards PASS but failed because the hardening-close publication block required CHANGED > 0 even when canonical repository projections were already correct and only the external PR body required repair.",
+      "classification": "PIPELINE_MECHANISM_FAILURE"
+    }
+  ],
   "canonicalPublication": {
     "acceptedAttemptStatePublished": false,
     "terminalStatePublished": false,
-    "branchOperationalLedgerMutatedByRun": false,
+    "branchOperationalLedgerMutatedByFailedF2Run": false,
     "replayAllowed": false,
     "freshAuthorizationRequired": true
   },
   "rootfix": {
     "transientCleanupImplementedIn": "tools/orbit360-control-plane-evidence-convergence-v20260822.mjs",
-    "prBodyPublicationGuardRequired": true,
+    "publicationChainImplementedIn": ".github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml",
+    "idempotentZeroDiffReprojectionImplementedIn": ".github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml",
+    "selftest": "tools/orbit360-control-plane-selftest-v20260824.mjs",
+    "preflight": "tools/orbit360-macro3-mechanism-preflight-v20260823.mjs",
+    "registry": "orbit360-platform/docs/orbit360-continuity-writer-registry-v20260820.json",
     "productChangeRequired": false,
     "dataChangeRequired": false
   },
+  "validation": {
+    "runId": 32772861551,
+    "jobId": 97576994800,
+    "conclusion": "success",
+    "controlPlaneSelftest": "PASS",
+    "selftestSchema": "orbit360-control-plane-selftest-v7-idempotent-reprojection",
+    "transientPreflightCleaned": true,
+    "publicationChainGuardRequired": true,
+    "idempotentZeroDiffReprojectionRequired": true,
+    "hardeningClose": "CONTROL_PLANE_HARDENING_CLOSED_CAUSAL_PASS",
+    "ledgerRevision": 41,
+    "packageRevision": 35,
+    "productionRouteProgressPct": 75,
+    "independentReadback": "PASS",
+    "packageResumePlanValidated": true,
+    "compositeInvariant": "PASS",
+    "documentationDiscovery": "PASS",
+    "documentationOffenders": 0,
+    "actualPrBodyReprojectedToCanonicalState": true,
+    "runtimeExecuted": false,
+    "browserExecuted": false,
+    "secretAccess": false,
+    "firestoreRead": false,
+    "firestoreWrites": 0,
+    "authWrites": 0,
+    "operationalWrites": 0,
+    "deployExecuted": false,
+    "productionTouched": false
+  },
+  "classificationForClaude": "BACKEND_PROTEGIDO_NO_CLAUDE",
+  "academiaImpact": "ACADEMIA_ACTUALIZAR: teach transient-vs-durable evidence, publication ordering, external projection truth, STOP_RETRY and idempotent zero-diff reprojection with live-head CAS.",
   "containsPII": false,
   "containsSecrets": false
 }
