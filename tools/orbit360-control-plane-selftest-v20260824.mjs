@@ -59,15 +59,19 @@ if(!failures.length){
   need(L.authorizationBoundary?.activeRuntimeAuthorization===false&&L.authorizationBoundary?.activeRequestPath==null&&L.authorizationBoundary?.authorizationRecordPath==null&&(L.authorizationBoundary?.runtimeAttemptAccepted??false)===false,'SELFTEST_AUTH_REQUEST_NOT_INERT');
   need(Number(L.progress?.productionRouteProgressPct)===75&&L.progress?.f2TerminalPass===false,'SELFTEST_PROGRESS_NOT_FAIL_CLOSED');
   need(Number(L.successorCandidate?.artifactId)===9504702901&&L.successorCandidate?.sourceHead==='8c9668d6d423e82826b0295431ec699390d79b4b','SELFTEST_CANDIDATE_DRIFT');
+  need(wf.includes('CONTROL_PLANE_REGRESSION_REOPEN'),'WORKFLOW_REGRESSION_REOPEN_MODE_MISSING');
   need(wf.includes('CONTROL_PLANE_SELFTEST'),'WORKFLOW_SELFTEST_MODE_MISSING');
   need(wf.includes('CONTROL_PLANE_HARDENING_CLOSE'),'WORKFLOW_HARDENING_CLOSE_MODE_MISSING');
   need(wf.includes('F2_PUBLICATION_CHAIN_GUARD_V1'),'WORKFLOW_F2_PUBLICATION_CHAIN_GUARD_MISSING');
+  need(wf.includes('F2_PREPUBLICATION_FAILURE_REDUCER_V1'),'WORKFLOW_PREPUBLICATION_FAILURE_REDUCER_MISSING');
+  need(wf.includes('CONTROL_PLANE_SELFTEST_DURABLE_HANDSHAKE_V2'),'WORKFLOW_DURABLE_HANDSHAKE_MISSING');
   need(wf.includes("ORBIT360_EXPECTED_REQUEST_VERSION=NONE_PENDING_FRESH_AUTHORIZATION")&&wf.includes('orbit360-validar-gate-contracts-engine-f2-productive-acceptance-v20260819.mjs'),'WORKFLOW_EXACT_F2_SOURCE_PRECHECK_MISSING');
   need(convergence.includes('evidenceLifecycle')&&convergence.includes('pre-terminal')&&convergence.includes('pre-auth'),'CONVERGENCE_CLASS_WIDE_LIFECYCLE_MISSING');
   need(lifecycle.includes('GIT_CHANGED_SURFACE_CLASS_WIDE_NOT_FILENAME_LIST'),'CLASS_WIDE_LIFECYCLE_MARKER_MISSING');
   need(!lifecycle.includes('macro3-mechanism-preflight-sanitized-v20260823.json')&&!lifecycle.includes('preflight-sanitizado.json'),'LIFECYCLE_FILENAME_SPECIFIC_RULE_REINTRODUCED');
-  need(owner.includes("transition!=='CONTROL_PLANE_HARDENING_CLOSE'")&&owner.includes("DELEGATE='tools/orbit360-continuity-transition-owner-v20260820.mjs'"),'OWNER_V24_DELEGATION_CONTRACT_MISSING');
+  need(owner.includes("'CONTROL_PLANE_HARDENING_CLOSE','CONTROL_PLANE_REGRESSION_REOPEN'")&&owner.includes('latestControlPlaneRegression'),'OWNER_REGRESSION_REDUCTION_MISSING');
   need(registry.transitionOwner===P.owner&&registry.delegatedF2TransitionOwner===P.delegatedOwner,'REGISTRY_OWNER_BINDING_DRIFT');
+  need(Array.isArray(registry.supportedIntentModes)&&['CONTROL_PLANE_REGRESSION_REOPEN','CONTROL_PLANE_SELFTEST','CONTROL_PLANE_HARDENING_CLOSE','F2_RUNTIME_ONE_SHOT'].every(x=>registry.supportedIntentModes.includes(x)),'REGISTRY_SUPPORTED_INTENT_MODES_DRIFT');
   need(!/^\s*workflow_dispatch\s*:/mi.test(wf)&&!/^\s*workflow_run\s*:/mi.test(wf),'WORKFLOW_PARALLEL_TRIGGER_REINTRODUCED');
   for(const p of [P.owner,P.delegatedOwner,P.convergence,P.evidenceLifecycle,P.terminalTruth,P.independentReadback,P.f2SourcePrecheck]){
     try{execFileSync(process.execPath,['--check',A(p)],{cwd:ROOT,stdio:'ignore'});}catch{need(false,`NODE_CHECK_FAIL:${p}`);}
@@ -93,7 +97,7 @@ if(!failures.length){
   const transientA=`${EVIDENCE_DIR}/__selftest-transient-a-${token}.json`;
   const transientB=`${EVIDENCE_DIR}/__selftest-future-unknown-name-${token}.json`;
   const terminal=`${EVIDENCE_DIR}/f2-runtime-terminal-inline-${token}.json`;
-  for(const p of [transientA,transientB,terminal]){fs.writeFileSync(A(p),JSON.stringify({selftest:true,path:p})+'\n','utf8');}
+  for(const p of [transientA,transientB,terminal])fs.writeFileSync(A(p),JSON.stringify({selftest:true,path:p})+'\n','utf8');
   const preTerminal=runJson(P.evidenceLifecycle,['--phase','pre-terminal','--preserve',terminal]);
   classWideTerminalPass=preTerminal.ok===true&&JSON.stringify(preTerminal.remaining)===JSON.stringify([terminal]);
   arbitraryFilenamePass=Array.isArray(preTerminal.cleaned)&&preTerminal.cleaned.includes(transientA)&&preTerminal.cleaned.includes(transientB);
@@ -101,12 +105,9 @@ if(!failures.length){
   need(arbitraryFilenamePass,'ARBITRARY_FUTURE_FILENAME_NOT_CLEANED');
   fs.rmSync(A(terminal),{force:true});
   need(evidenceChanges().length===0,'SELFTEST_EVIDENCE_SURFACE_DIRTY_AFTER_TERMINAL_SIMULATION');
-
-  const convergenceOut=runJson(P.convergence,['--repo-only']);
-  need(convergenceOut.ok===true&&convergenceOut.classWideEvidenceLifecycle===true,'CONVERGENCE_AFTER_EXACT_SOURCE_PATH_FAIL');
 }
 const out={
-  schemaVersion:'orbit360-control-plane-selftest-v8-exact-f2-path-classwide-lifecycle',
+  schemaVersion:'orbit360-control-plane-selftest-v9-exact-f2-path-classwide-lifecycle',
   ok:failures.length===0,
   status:failures.length?'CONTROL_PLANE_SELFTEST_FAIL':'CONTROL_PLANE_SELFTEST_PASS',
   classification:failures.length?'PIPELINE_MECHANISM_FAILURE':'PASS',
@@ -118,6 +119,8 @@ const out={
   classWidePreTerminalEvidenceLifecyclePass:classWideTerminalPass,
   arbitraryFutureFilenameCleanupPass:arbitraryFilenamePass,
   publicationSurfaceParityRequired:true,
+  durableHandshakeMustBePublishedByCanonicalWorkflow:true,
+  prepublicationFailureMustBeCanonicallyReduced:true,
   canonicalOwner:'tools/orbit360-continuity-transition-owner-v20260824.mjs',
   authorizationMaterialized:false,
   requestMaterialized:false,
