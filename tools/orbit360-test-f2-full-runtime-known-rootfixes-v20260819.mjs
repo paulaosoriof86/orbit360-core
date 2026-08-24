@@ -6,6 +6,8 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 
 // Canonical F2 source selftest facade. Public path remains unchanged.
+// F2_INLINE_ONE_SHOT_ACCEPT_V13
+// F2_CANDIDATE_VALIDATOR_V2_CONTRACT_REINTRODUCED
 // Removes prior-candidate 9/185/107 bindings and adds Operativo/Aseguradoras regression guard.
 const ROOT=process.env.ORBIT360_ROOT?path.resolve(process.env.ORBIT360_ROOT):process.cwd();
 const CORE_REL='tools/orbit360-test-f2-full-runtime-known-rootfixes-core-v20260824.mjs';
