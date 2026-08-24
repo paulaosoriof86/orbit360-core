@@ -1,36 +1,28 @@
 {
-  "schemaVersion": "orbit360-control-plane-canonicality-contract-v1",
-  "contractVersion": "1.0.0-20260822",
+  "schemaVersion": "orbit360-control-plane-canonicality-contract-v2",
+  "contractVersion": "2.0.0-20260824",
   "status": "ACTIVE_CANONICAL_CONVERGENCE_CONTRACT",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
-  "canonicalPlan": "orbit360-platform/docs/PLAN-MAESTRO-CONGELADO-DEFINITIVO-RUTA-PRODUCCION-ORBIT360-AYS-20260821.md",
+  "canonicalPlan": "orbit360-platform/docs/PLAN-MAESTRO-CONGELADO-SALIDA-PRODUCCION-SIN-BUCLES-ORBIT360-AYS-20260824.md",
   "singleMutableOperationalState": "orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json",
-  "transitionOwner": "tools/orbit360-continuity-transition-owner-v20260820.mjs",
+  "transitionOwner": "tools/orbit360-continuity-transition-owner-v20260824.mjs",
+  "delegatedF2TransitionOwner": "tools/orbit360-continuity-transition-owner-v20260820.mjs",
   "projectionOwner": "tools/orbit360-continuity-projection-atomic-v20260820.mjs",
   "evidenceConvergenceGate": "tools/orbit360-control-plane-evidence-convergence-v20260822.mjs",
   "canonicalWorkflow": ".github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml",
   "durableEvidence": {
-    "macro2CandidateMetadata": "orbit360-platform/runtime-gate-crm-v20260716/macro2-candidate-artifact-metadata-v20260821.json",
-    "canonicalityAudit": "orbit360-platform/runtime-gate-crm-v20260716/control-plane-canonicality-convergence-audit-v20260822.json",
-    "externalArtifactMustBeVerifiedFromGitHubActionsBeforeReduction": true
+    "macro2CandidateMetadata": "orbit360-platform/runtime-gate-crm-v20260716/f2-successor-candidate-artifact-metadata-v20260824.json",
+    "controlPlaneHandshake": "orbit360-platform/runtime-gate-crm-v20260716/control-plane-selftest-handshake-run-32753102715-v20260824.json",
+    "externalArtifactMustBeVerifiedFromGitHubActionsBeforeReduction": true,
+    "runtimeEvidenceMustBeRunScoped": true
   },
-  "componentIdentity": {
-    "preRunner": "0e248b63640d62a96fcf4b80837c8ab5a66d1978",
-    "postRunner": "5cbc583500c9353565d6809c39425988873b1505",
-    "promoter": "6d38c5daf2033cbf71f0c27940aaec695096582d",
-    "transitionOwner": "00e67882c3e068c289450e6506a90caae9fc40cc",
-    "projectionOwner": "f5b18458f413f9ef6b7bc87b61328038c300a902",
-    "convergenceGate": "1eb9ec2ed35ee58ab0af1a5f652b2b077d36b747",
-    "compositeInvariant": "d007625d33169e15414d73d914791ffa48f003b2",
-    "independentReadback": "07063f02ba9b3cc4d5b3d48c66ef4e3ba076b717",
-    "documentationDiscovery": "4bab316dc4b052a00e30a89fe4d0c10f47a2cacf"
-  },
-  "certifiedBundles": {
-    "product": {"path": ".github/orbit360-source-patches/macro2-v20260821/product.patch.gz", "gzipSha256": "c7b932b2788a502ae07111d2e209d4b0cca0b844242bb1db80218b72fa4c6913", "rawSha256": "6b3141493d69d2b25c581033460f5302498dd06dd8dfcad1245802390fafe540"},
-    "tools": {"path": ".github/orbit360-source-patches/macro2-v20260821/tools.patch.gz", "gzipSha256": "64bb3f11736ce39593b12a54350270f73730a10430d1ce6e543bebaee622ba46", "rawSha256": "035c756cc2c14ae428a87231a8cc266762b92ebc1c67974d691bbb20ffd90f97"},
-    "docs": {"path": ".github/orbit360-source-patches/macro2-v20260821/docs.patch.gz", "gzipSha256": "4a6f77f7e35a89f0ef830e4b98fa8f4d1493e7973a4b91aa55ee5def78ed2167", "rawSha256": "f5f679c113e6408981f111154e8d0fd34f515e82a70c2085d3f0f54515efa3c0"}
+  "componentIdentityPolicy": {
+    "hardcodedComponentShaBindingsForbidden": true,
+    "validationMode": "SEMANTIC_CONTRACT_AND_RUNTIME_EVIDENCE",
+    "visibleStepNamesHaveNoSecuritySemantics": true,
+    "technicalStepIdsAndDependenciesAreAuthoritative": true
   },
   "projectionTargets": [
     "orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json",
@@ -53,7 +45,7 @@
     "actualPrBodyMustShareCanonicalStateFingerprint": true,
     "persistedBranchHeadShaForbidden": true,
     "branchHeadAuthority": "LIVE_PR_HEAD_ONLY",
-    "allMacro2PassFailStateTransitionsThroughTransitionOwner": true,
+    "allOperationalStateTransitionsThroughTransitionOwner": true,
     "promoterStateMutationForbidden": true,
     "postRunnerStateMutationForbidden": true,
     "historicalRevisionLiteralForbiddenInActivePromoter": true,
@@ -61,16 +53,21 @@
     "atomicPublicationRequired": true,
     "remoteHeadCompareAndSwapRequired": true,
     "singlePhysicalWriterWorkflow": true,
-    "macro2CandidateRebuildAfterDurableReconciliationForbidden": true,
-    "macro2NewArtifactAfterDurableReconciliationForbidden": true,
-    "macro2ReplayForbidden": true,
+    "candidateRebuildAfterDurableReconciliationForbidden": true,
+    "runtimeReplayForbidden": true,
     "inertReadbackRequiredAfterRepair": true,
-    "runtimeBrowserSecretsFirestoreDeployProductionForbiddenDuringRepair": true
+    "runtimeBrowserSecretsFirestoreDeployProductionForbiddenDuringRepair": true,
+    "sourceRewriteInActivePathsForbidden": true,
+    "workflowHandshakeRequiredBeforeRuntimeAuthorization": true,
+    "historicalFalsePassMustBeExplicitlyInvalidated": true,
+    "componentShaBindingForbidden": true,
+    "workflowDefinitionMayNotChangePerCandidate": true,
+    "executionTransportIntentOnly": true
   },
   "repairBootstrap": {
-    "sourceAudit": "orbit360-platform/runtime-gate-crm-v20260716/control-plane-canonicality-convergence-audit-v20260822.json",
-    "repairTransition": "CONTROL_PLANE_EVIDENCE_RECONCILE",
-    "repairableOnlyIfConvergenceGateSaysRepairable": true,
+    "forensicAudit": "orbit360-platform/docs/AUDITORIA-FORENSE-CONTROL-PLANE-ORBIT360-AYS-20260824.md",
+    "controlPlaneHandshakeEvidence": "orbit360-platform/runtime-gate-crm-v20260716/control-plane-selftest-handshake-run-32753102715-v20260824.json",
+    "repairTransition": "CONTROL_PLANE_HARDENING_CLOSE",
     "candidateReuseRequired": true,
     "newWorkflowVariant": false,
     "newRequestChain": false
