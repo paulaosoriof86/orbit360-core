@@ -1,13 +1,14 @@
 {
-  "schemaVersion": "orbit360-continuity-writer-registry-v5",
+  "schemaVersion": "orbit360-continuity-writer-registry-v6",
   "registryId": "ORBIT360-CONTINUITY-WRITER-REGISTRY",
-  "revision": 14,
+  "revision": 15,
   "active": true,
-  "status": "DEFINITIVE_SINGLE_WORKFLOW_GENERIC_INTENT_ROUTER",
+  "status": "DEFINITIVE_SINGLE_WORKFLOW_GENERIC_INTENT_ROUTER_CAUSAL",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "sourceOfTruth": "orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json",
   "canonicalityContract": "orbit360-platform/docs/orbit360-control-plane-canonicality-contract-v20260822.json",
-  "transitionOwner": "tools/orbit360-continuity-transition-owner-v20260820.mjs",
+  "transitionOwner": "tools/orbit360-continuity-transition-owner-v20260824.mjs",
+  "delegatedF2TransitionOwner": "tools/orbit360-continuity-transition-owner-v20260820.mjs",
   "soleProjectionLogic": "tools/orbit360-continuity-projection-atomic-v20260820.mjs",
   "evidenceConvergenceGate": "tools/orbit360-control-plane-evidence-convergence-v20260822.mjs",
   "terminalTruthInvariant": "tools/orbit360-terminal-truth-invariant-v20260824.mjs",
@@ -16,8 +17,14 @@
   "workflowSurfaceAudit": "tools/orbit360-workflow-operational-surface-audit-v20260820.mjs",
   "documentationStateDiscovery": "tools/orbit360-documentation-state-discovery-v20260821.mjs",
   "macro3MechanismPreflight": "tools/orbit360-macro3-mechanism-preflight-v20260823.mjs",
+  "noSourceRewriteGuard": "tools/orbit360-control-plane-no-source-rewrite-guard-v20260824.mjs",
   "canonicalWorkflow": ".github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml",
-  "canonicalWorkflowMode": "GENERIC_INTENT_ROUTER_INLINE_F2_ONE_SHOT_READONLY_TERMINAL_REDUCER",
+  "canonicalWorkflowMode": "GENERIC_INTENT_ROUTER_SELFTEST_HARDENING_CLOSE_INLINE_F2_ONE_SHOT",
+  "supportedIntentModes": [
+    "CONTROL_PLANE_SELFTEST",
+    "CONTROL_PLANE_HARDENING_CLOSE",
+    "F2_RUNTIME_ONE_SHOT"
+  ],
   "intentPathPattern": ".github/orbit360-intents/*.json",
   "projectionTargets": [
     "orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json",
@@ -64,6 +71,9 @@
     "documentationStateDiscoveryRequiredBeforeClosure": true,
     "stateBearingCurrentDocsMustBeSemanticallyConverged": true,
     "runtimeRequestMaterializationRequiresFreshExplicitUserAuthorization": true,
+    "controlPlaneHandshakeRequiredBeforeRuntimeAuthorization": true,
+    "controlPlaneHardeningClosureMustUseCanonicalWorkflow": true,
+    "sourceRewriteInActivePathsForbidden": true,
     "crossWorkflowDispatchForbidden": true,
     "workflowRunChainingForbidden": true,
     "actionsWritePermissionForbidden": true,
@@ -75,8 +85,12 @@
     "visibleStepNamesHaveNoSecuritySemantics": true
   },
   "workflowClasses": {
-    "solePhysicalWorkflow": [".github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml"],
+    "solePhysicalWorkflow": [
+      ".github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml"
+    ],
     "runtimeAndEvidenceExecution": "INLINE_IN_BASE_OWNED_CANONICAL_WORKFLOW_ONLY",
+    "controlPlaneSelftest": "INLINE_SOURCE_ONLY_NO_STATE_MUTATION",
+    "controlPlaneHardeningClosure": "INLINE_SOURCE_ONLY_CANONICAL_STATE_TRANSITION",
     "executionTransport": "ONE_INTENT_JSON_ONLY",
     "parallelRuntimeWorkflow": "FORBIDDEN"
   },
