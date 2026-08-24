@@ -48,6 +48,26 @@ if(phase==='pre-terminal'&&!preservePath){
   process.exit(41);
 }
 
+let publicationLineageReset=false;
+let publicationLineageRemoteHead=null;
+let publicationLineageLocalHead=null;
+if(phase==='pre-terminal'&&!assertOnly&&process.env.GITHUB_ACTIONS==='true'&&String(process.env.ORBIT360_BRANCH||'').trim()){
+  try{
+    publicationLineageLocalHead=runGit(['rev-parse','HEAD']);
+    runGit(['fetch','--no-tags','origin',String(process.env.ORBIT360_BRANCH).trim()]);
+    publicationLineageRemoteHead=runGit(['rev-parse','FETCH_HEAD']);
+    if(publicationLineageLocalHead!==publicationLineageRemoteHead){
+      try{execFileSync('git',['merge-base','--is-ancestor',publicationLineageRemoteHead,publicationLineageLocalHead],{cwd:ROOT,stdio:'ignore'});}
+      catch{throw new Error(`REMOTE_CANONICAL_DIVERGED:${publicationLineageRemoteHead}:${publicationLineageLocalHead}`);}
+      execFileSync('git',['reset','--mixed',publicationLineageRemoteHead],{cwd:ROOT,stdio:'ignore'});
+      publicationLineageReset=true;
+    }
+  }catch(error){
+    console.error(JSON.stringify({ok:false,status:'CONTROL_PLANE_EVIDENCE_LIFECYCLE_FAIL',classification:'PIPELINE_MECHANISM_FAILURE',phase,error:`PUBLICATION_LINEAGE_NORMALIZATION_FAILED:${String(error?.message||error).slice(0,300)}`,publicationLineageLocalHead,publicationLineageRemoteHead},null,2));
+    process.exit(41);
+  }
+}
+
 const before=currentChanges();
 const cleaned=[];
 if(!assertOnly){
@@ -71,7 +91,7 @@ const remaining=currentChanges();
 const expected=phase==='pre-auth'?[]:[preservePath];
 const ok=JSON.stringify(remaining)===JSON.stringify(expected);
 const out={
-  schemaVersion:'orbit360-control-plane-evidence-lifecycle-v1-classwide',
+  schemaVersion:'orbit360-control-plane-evidence-lifecycle-v2-classwide-publication-lineage',
   ok,
   status:ok?'CONTROL_PLANE_EVIDENCE_LIFECYCLE_PASS':'CONTROL_PLANE_EVIDENCE_LIFECYCLE_FAIL',
   classification:ok?'PASS':'PIPELINE_MECHANISM_FAILURE',
@@ -80,6 +100,9 @@ const out={
   strategy:'GIT_CHANGED_SURFACE_CLASS_WIDE_NOT_FILENAME_LIST',
   assertOnly,
   preservePath:preservePath||null,
+  publicationLineageReset,
+  publicationLineageLocalHead,
+  publicationLineageRemoteHead,
   before,
   cleaned,
   remaining,
