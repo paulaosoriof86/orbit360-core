@@ -15,10 +15,20 @@ need(terminalPath&&exists(terminalPath),'TERMINAL_EVIDENCE_MISSING');
 let T={};if(terminalPath&&exists(terminalPath))T=read(terminalPath);
 const run=Number(latest.runId||0),terminalRun=Number(T.runId||0);
 need(run>0&&terminalRun===run,'TERMINAL_RUN_ID_NOT_BOUND_TO_LATEST_SEALED_RUNTIME');
-need(!(T.ok!==true&&T.classification==='PASS'),'TERMINAL_FALSE_PASS_CLASSIFICATION');
+const stateClaimsPass=L.activeState?.status==='F2_TERMINAL_PASS'||L.activeState?.phase==='F2_TERMINAL_PASS_AWAITING_AUTHORIZED_GO_LIVE'||L.progress?.f2TerminalPass===true||Number(L.progress?.productionRouteProgressPct)>75||L.nextAction?.id==='AWAIT_EXPLICIT_GO_LIVE_AUTHORIZATION';
+const historicalFalsePass=T.ok!==true&&T.classification==='PASS';
+const invalidation=L.continuityControl?.falsePassInvalidation||{};
+const falsePassInvalidationMatched=historicalFalsePass&&
+  Number(invalidation.runId||0)===run&&
+  String(invalidation.terminalEvidencePath||'')===terminalPath&&
+  invalidation.terminalOk===false&&
+  String(invalidation.terminalClassificationRaw||'')==='PASS';
+if(historicalFalsePass){
+  if(stateClaimsPass)need(false,'STATE_PASS_WITH_HISTORICAL_FALSE_PASS');
+  else need(falsePassInvalidationMatched,'TERMINAL_FALSE_PASS_NOT_CANONICALLY_INVALIDATED');
+}
 const currentRunEvidenceBound=Number(T.browserRunId||0)===run&&Number(T.integrityRunId||0)===run;
 const passEvidence=terminalPassContract(T)&&currentRunEvidenceBound;
-const stateClaimsPass=L.activeState?.status==='F2_TERMINAL_PASS'||L.activeState?.phase==='F2_TERMINAL_PASS_AWAITING_AUTHORIZED_GO_LIVE'||L.progress?.f2TerminalPass===true||Number(L.progress?.productionRouteProgressPct)>75||L.nextAction?.id==='AWAIT_EXPLICIT_GO_LIVE_AUTHORIZATION';
 if(stateClaimsPass){
   need(passEvidence,'STATE_PASS_WITHOUT_CURRENT_RUN_TERMINAL_PASS_EVIDENCE');
 }else{
@@ -29,5 +39,5 @@ if(stateClaimsPass){
 need(L.activeState?.runtimeReplayAllowed===false,'RUNTIME_REPLAY_OPEN');
 need(latest.replayAllowed===false,'LATEST_RUNTIME_REPLAY_OPEN');
 need(Number(latest.allowedExecutions)===0,'LATEST_RUNTIME_BUDGET_NOT_ZERO');
-const out={schemaVersion:'orbit360-terminal-truth-invariant-v1',ok:failures.length===0,status:failures.length?'TERMINAL_TRUTH_INVARIANT_FAIL':'TERMINAL_TRUTH_INVARIANT_PASS',classification:failures.length?'DATA_CONTRACT_FAILURE':'PASS',failures,ledgerRevision:L.revision,terminalEvidencePath:terminalPath,latestRunId:run,terminalRunId:terminalRun,terminalOk:T.ok===true,terminalClassification:T.classification||null,currentRunEvidenceBound,passEvidence,stateClaimsPass,productionRouteProgressPct:L.progress?.productionRouteProgressPct,runtimeExecuted:Boolean(T.runtimeExecuted),browserExecuted:Boolean(T.browserExecuted||T.browserMatrixPass),firestoreWrites:Number(T.firestoreWrites||0),authWrites:Number(T.authWrites||0),operationalWrites:Number(T.operationalWrites||0),deployExecuted:Boolean(T.deployExecuted),productionTouched:Boolean(T.productionHostingTouched),containsPII:false,containsSecrets:false};
+const out={schemaVersion:'orbit360-terminal-truth-invariant-v2-historical-invalidation-aware',ok:failures.length===0,status:failures.length?'TERMINAL_TRUTH_INVARIANT_FAIL':'TERMINAL_TRUTH_INVARIANT_PASS',classification:failures.length?'DATA_CONTRACT_FAILURE':'PASS',failures:[...new Set(failures)],ledgerRevision:L.revision,terminalEvidencePath:terminalPath,latestRunId:run,terminalRunId:terminalRun,terminalOk:T.ok===true,terminalClassification:T.classification||null,historicalFalsePass,falsePassInvalidationMatched,currentRunEvidenceBound,passEvidence,stateClaimsPass,productionRouteProgressPct:L.progress?.productionRouteProgressPct,runtimeExecuted:Boolean(T.runtimeExecuted),browserExecuted:Boolean(T.browserExecuted||T.browserMatrixPass),firestoreWrites:Number(T.firestoreWrites||0),authWrites:Number(T.authWrites||0),operationalWrites:Number(T.operationalWrites||0),deployExecuted:Boolean(T.deployExecuted),productionTouched:Boolean(T.productionHostingTouched),containsPII:false,containsSecrets:false};
 console.log(JSON.stringify(out,null,2));if(!out.ok)process.exit(41);
