@@ -4,6 +4,7 @@ name: Orbit360 Canonical Control Plane
 # GENERIC_INTENT_ROUTER_V1
 # CONTROL_PLANE_SELFTEST_V1
 # CONTROL_PLANE_HARDENING_CLOSE_V1
+# F2_PUBLICATION_CHAIN_GUARD_V1
 # Stable base-owned workflow. Execution PRs may change one intent JSON only; they may not change this workflow.
 
 on:
@@ -469,7 +470,7 @@ jobs:
 
       - id: terminalpublish
         name: Publish terminal transition with compare-and-swap
-        if: always() && steps.materialize.outcome == 'success'
+        if: always() && steps.materialize.outcome == 'success' && steps.authpublish.outcome == 'success'
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
@@ -481,7 +482,7 @@ jobs:
           FINAL_HEAD=$(git rev-parse HEAD); git fetch --no-tags origin "$ORBIT360_BRANCH"; test "$(git rev-parse FETCH_HEAD)" = '${{ steps.authpublish.outputs.final_head }}'; git push "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:refs/heads/${ORBIT360_BRANCH}"; echo "final_head=$FINAL_HEAD" >> "$GITHUB_OUTPUT"
 
       - name: Project actual PR body and enforce terminal truth
-        if: always() && steps.materialize.outcome == 'success'
+        if: always() && steps.materialize.outcome == 'success' && steps.terminalpublish.outcome == 'success'
         env:
           GH_TOKEN: ${{ github.token }}
           TERMINAL: ${{ steps.terminal_evidence.outputs.evidence }}
