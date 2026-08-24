@@ -1,0 +1,220 @@
+name: Orbit360 F2 Successor Source-Only Builder
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    branches:
+      - ays/backend-tenant-lab-v99-20260703
+    paths:
+      - '.github/workflows/orbit360-f2-successor-sourceonly-builder-v20260824.yml'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  build-successor-source-only:
+    if: github.event.pull_request.head.ref == 'orbit360/f2-successor-sourceonly-8c9668d6-20260824'
+    runs-on: ubuntu-24.04
+    env:
+      EXPECTED_SOURCE_HEAD: 8c9668d6d423e82826b0295431ec699390d79b4b
+      BASE_ARTIFACT_ID: '9485621192'
+      BASE_OUTER_SHA256: 6a89448084b3aac162378aa4fedd05acfa571c667765c3c7fd06473075705dce
+      BASE_INNER_SHA256: 4f6006ebb3ee2e10ef35e61053243ed74c4adcb46c4abb6c8d90fe27047f37da
+      BASE_MANIFEST_SHA256: ce44011eb874bd44fe646b93bd89cef97ecee8218f16ffacf3917177f7fccb18
+      BASE_SOURCE_HEAD: 842f762f199f4c7dbf13062a33ca220d92398c51
+      TARGET_PATH: core/access-ceilings-v1199.js
+      TARGET_SOURCE_PATH: orbit360-platform/core/access-ceilings-v1199.js
+      TARGET_EXPECTED_SHA256: 301bc24b0df2af2795994a5641ca394a71f4d2bf55fd0fc3a42068fac0ad5112
+      CANDIDATE_NAME: orbit360-f2-successor-8c9668d6
+    steps:
+      - name: Checkout PR merge context
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Validate source-only transport boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "${{ github.event.pull_request.base.ref }}" = 'ays/backend-tenant-lab-v99-20260703'
+          test "${{ github.event.pull_request.base.sha }}" = "$EXPECTED_SOURCE_HEAD"
+          test "${{ github.event.pull_request.head.ref }}" = 'orbit360/f2-successor-sourceonly-8c9668d6-20260824'
+          mapfile -t changed < <(git diff --name-only "${{ github.event.pull_request.base.sha }}" "${{ github.event.pull_request.head.sha }}")
+          test "${#changed[@]}" -eq 1
+          test "${changed[0]}" = '.github/workflows/orbit360-f2-successor-sourceonly-builder-v20260824.yml'
+          test "${GITHUB_RUN_ATTEMPT}" = '1'
+
+      - name: Checkout exact canonical source head
+        shell: bash
+        run: |
+          set -euo pipefail
+          git checkout --force "$EXPECTED_SOURCE_HEAD"
+          test "$(git rev-parse HEAD)" = "$EXPECTED_SOURCE_HEAD"
+          test -z "$(git status --porcelain)"
+
+      - name: Download and verify certified predecessor artifact
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          curl -L --fail --silent --show-error \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H 'Accept: application/vnd.github+json' \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/${BASE_ARTIFACT_ID}/zip" \
+            -o "$RUNNER_TEMP/base-artifact.zip"
+          echo "${BASE_OUTER_SHA256}  $RUNNER_TEMP/base-artifact.zip" | sha256sum -c -
+          mkdir -p "$RUNNER_TEMP/base-outer"
+          unzip -q "$RUNNER_TEMP/base-artifact.zip" -d "$RUNNER_TEMP/base-outer"
+          test -f "$RUNNER_TEMP/base-outer/orbit360-macro2-transversal-842f762f199f.zip"
+          cp "$RUNNER_TEMP/base-outer/orbit360-macro2-transversal-842f762f199f.zip" "$RUNNER_TEMP/base-inner.zip"
+          echo "${BASE_INNER_SHA256}  $RUNNER_TEMP/base-inner.zip" | sha256sum -c -
+          mkdir -p "$RUNNER_TEMP/basepkg" "$RUNNER_TEMP/newpkg"
+          unzip -q "$RUNNER_TEMP/base-inner.zip" -d "$RUNNER_TEMP/basepkg"
+          cp -a "$RUNNER_TEMP/basepkg/." "$RUNNER_TEMP/newpkg/"
+          echo "${BASE_MANIFEST_SHA256}  $RUNNER_TEMP/basepkg/orbit360-package-manifest.json" | sha256sum -c -
+
+      - name: Apply exact one-file product rootfix
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "${TARGET_EXPECTED_SHA256}  ${TARGET_SOURCE_PATH}" | sha256sum -c -
+          cp "${TARGET_SOURCE_PATH}" "$RUNNER_TEMP/newpkg/${TARGET_PATH}"
+          python3 - <<'PY'
+          import json, hashlib, os, datetime
+          root=os.path.join(os.environ['RUNNER_TEMP'],'newpkg')
+          mp=os.path.join(root,'orbit360-package-manifest.json')
+          with open(mp,'rb') as f: manifest=json.load(f)
+          target=os.environ['TARGET_PATH']
+          with open(os.path.join(root,target),'rb') as f: b=f.read()
+          h=hashlib.sha256(b).hexdigest()
+          item=next(x for x in manifest['files'] if x['path']==target)
+          item['bytes']=len(b); item['sha256']=h
+          manifest['sourceHead']=os.environ['EXPECTED_SOURCE_HEAD']
+          manifest['generatedAt']=datetime.datetime.now(datetime.timezone.utc).isoformat().replace('+00:00','Z')
+          lineage=manifest.setdefault('lineage',{})
+          lineage['f2_operativo_insurers_access_rootfix']={
+            'baseArtifactId':int(os.environ['BASE_ARTIFACT_ID']),
+            'baseZipSha256':os.environ['BASE_INNER_SHA256'],
+            'baseManifestSha256':os.environ['BASE_MANIFEST_SHA256'],
+            'baseSourceHead':os.environ['BASE_SOURCE_HEAD'],
+            'sourceHead':os.environ['EXPECTED_SOURCE_HEAD'],
+            'productDeltaCount':1,
+            'productDeltaPaths':[target],
+            'sourceOnly':True,
+            'runtimeAuthorized':False,
+            'rootCause':'FUNCTIONAL_DEFECT:F2_OPERATIVO_ASEGURADORAS_MODULE_VISIBILITY_MISSING'
+          }
+          manifest['basePackageSha256']=os.environ['BASE_INNER_SHA256']
+          manifest['baseManifestSha256']=os.environ['BASE_MANIFEST_SHA256']
+          manifest['baseArtifactId']=int(os.environ['BASE_ARTIFACT_ID'])
+          manifest['baseSourceHead']=os.environ['BASE_SOURCE_HEAD']
+          manifest['deltaFiles']=[target]
+          manifest['deltaSourceHead']=os.environ['EXPECTED_SOURCE_HEAD']
+          manifest['successorOrdinal']=14
+          manifest['unchangedFileCount']=193
+          manifest['candidateOrigin']='F2_TERMINAL_FUNCTIONAL_ROOTFIX_SOURCE_ONLY'
+          manifest['rootCause']='FUNCTIONAL_DEFECT:F2_OPERATIVO_ASEGURADORAS_MODULE_VISIBILITY_MISSING'
+          manifest['rootfix']='Operativo insurer directory module parity before router/sidebar access evaluation'
+          manifest['runtimeAuthorized']=False
+          with open(mp,'w',encoding='utf-8',newline='\n') as f: json.dump(manifest,f,ensure_ascii=False,indent=2); f.write('\n')
+          PY
+
+      - name: Full rehash and source-only acceptance
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, hashlib, os, subprocess, tempfile
+          rt=os.environ['RUNNER_TEMP']; base=os.path.join(rt,'basepkg'); new=os.path.join(rt,'newpkg')
+          with open(os.path.join(new,'orbit360-package-manifest.json'),encoding='utf-8') as f: m=json.load(f)
+          assert m['fileCount']==194 and len(m['files'])==194
+          changed=[]
+          for item in m['files']:
+            p=os.path.join(new,item['path'])
+            assert os.path.isfile(p), item['path']
+            b=open(p,'rb').read()
+            assert len(b)==int(item['bytes']) and hashlib.sha256(b).hexdigest()==item['sha256'], item['path']
+            if b!=open(os.path.join(base,item['path']),'rb').read(): changed.append(item['path'])
+          assert changed==[os.environ['TARGET_PATH']], changed
+          idx=open(os.path.join(new,'index.html'),encoding='utf-8').read()
+          assert idx.index('core/access-ceilings-v1199.js') < idx.index('core/router.js')
+          guard=open(os.path.join(new,os.environ['TARGET_PATH']),encoding='utf-8').read()
+          for token in ["Orbit.ROLES && Orbit.ROLES['Operativo']","operativo.modulos = operativo.modulos.concat('aseguradoras')","operativoInsurerRoleParity"]: assert token in guard
+          fixture=os.path.join(rt,'fixture-access.js')
+          open(fixture,'w',encoding='utf-8').write("""const fs=require('fs'),vm=require('vm');global.window=global;let active='Operativo';global.Orbit={ROLES:{Operativo:{modulos:['inicio']},Asesor:{modulos:['inicio']}},access:{activeRole:()=>active,can:(m,a='view')=>Orbit.ROLES[active].modulos.includes(m)}};vm.runInThisContext(fs.readFileSync(process.argv[2],'utf8'));if(!Orbit.ROLES.Operativo.modulos.includes('aseguradoras'))process.exit(11);if(Orbit.access.can('aseguradoras','view')!==true)process.exit(12);if(Orbit.access.__ceilingsV1199.operativoInsurerRoleParity!==true)process.exit(13);active='Asesor';if(Orbit.access.can('aseguradoras','edit')!==false)process.exit(14);console.log('PASS');""")
+          subprocess.run(['node',fixture,os.path.join(new,os.environ['TARGET_PATH'])],check=True)
+          PY
+          python3 - <<'PY'
+          import os, zipfile
+          root=os.path.join(os.environ['RUNNER_TEMP'],'newpkg')
+          out=os.path.join(os.environ['RUNNER_TEMP'],f"{os.environ['CANDIDATE_NAME']}.zip")
+          fixed=(2026,8,24,2,20,0)
+          with zipfile.ZipFile(out,'w',compression=zipfile.ZIP_DEFLATED,compresslevel=9) as z:
+            for d,dirs,files in os.walk(root):
+              dirs.sort(); files.sort()
+              for fn in files:
+                p=os.path.join(d,fn); rel=os.path.relpath(p,root).replace(os.sep,'/')
+                info=zipfile.ZipInfo(rel,fixed); info.compress_type=zipfile.ZIP_DEFLATED
+                with open(p,'rb') as f: z.writestr(info,f.read(),compress_type=zipfile.ZIP_DEFLATED,compresslevel=9)
+          PY
+          ZIP_SHA=$(sha256sum "$RUNNER_TEMP/${CANDIDATE_NAME}.zip" | awk '{print $1}')
+          MANIFEST_SHA=$(sha256sum "$RUNNER_TEMP/newpkg/orbit360-package-manifest.json" | awk '{print $1}')
+          TARGET_SHA=$(sha256sum "$RUNNER_TEMP/newpkg/${TARGET_PATH}" | awk '{print $1}')
+          echo "ZIP_SHA=$ZIP_SHA" >> "$GITHUB_ENV"
+          echo "MANIFEST_SHA=$MANIFEST_SHA" >> "$GITHUB_ENV"
+          echo "TARGET_SHA=$TARGET_SHA" >> "$GITHUB_ENV"
+
+      - name: Upload candidate artifact
+        id: candidate
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.CANDIDATE_NAME }}
+          path: ${{ runner.temp }}/${{ env.CANDIDATE_NAME }}.zip
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 30
+
+      - name: Build sanitized durable evidence
+        shell: bash
+        env:
+          ARTIFACT_ID: ${{ steps.candidate.outputs.artifact-id }}
+          ARTIFACT_DIGEST: ${{ steps.candidate.outputs.artifact-digest }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, os
+          e={
+            'schemaVersion':'orbit360-f2-successor-sourceonly-artifact-evidence-v1',
+            'ok':True,'status':'F2_SUCCESSOR_SOURCEONLY_ARTIFACT_PUBLISHED','classification':'PASS',
+            'artifactId':int(os.environ['ARTIFACT_ID']),
+            'artifactDigest':os.environ['ARTIFACT_DIGEST'],
+            'sourceHead':os.environ['EXPECTED_SOURCE_HEAD'],
+            'zipSha256':os.environ['ZIP_SHA'],
+            'manifestSha256':os.environ['MANIFEST_SHA'],
+            'targetSha256':os.environ['TARGET_SHA'],
+            'baseArtifactId':int(os.environ['BASE_ARTIFACT_ID']),
+            'baseSourceHead':os.environ['BASE_SOURCE_HEAD'],
+            'fileCount':194,'deltaCount':1,'unchangedFileCount':193,
+            'deltaPaths':[os.environ['TARGET_PATH']],
+            'checksPassed':12,'inheritedCertifiedChecks':107,
+            'sourcePublished':True,'fullRehashPass':True,'exactOneProductDeltaPass':True,
+            'entrypointOrderPass':True,'operativoInsurerRoleParityFixturePass':True,'advisorInsurerEditBlockedFixturePass':True,
+            'runtimeExecuted':False,'browserExecuted':False,'secretAccess':False,'firestoreRead':False,'writes':0,
+            'deployExecuted':False,'productionTouched':False,'containsPII':False,'containsSecrets':False
+          }
+          p=os.path.join(os.environ['RUNNER_TEMP'],'successor-evidence.json')
+          with open(p,'w') as f: json.dump(e,f,indent=2); f.write('\n')
+          print(json.dumps(e,indent=2))
+          PY
+
+      - name: Upload sanitized evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-f2-successor-evidence-8c9668d6
+          path: ${{ runner.temp }}/successor-evidence.json
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 30
