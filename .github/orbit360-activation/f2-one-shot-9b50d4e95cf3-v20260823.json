@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "orbit360-macro3-pr-transport-v1",
+  "status": "INERT_EVENT_TRANSPORT_ONLY",
+  "baseBranch": "ays/backend-tenant-lab-v99-20260703",
+  "baseHeadAtPreparation": "020212e5013dc9f2d93c56819e728c0a3c4eb3e8",
+  "authorizationIdentityDigest": "9b50d4e95cf32cc8e693dd184ca945e1f532521f37ea8b64f7a1c65e546baa22",
+  "candidateArtifactId": 9485621192,
+  "oneShotOnly": true,
+  "mergeAllowed": false,
+  "mainAllowed": false,
+  "deployAllowed": false,
+  "productionAllowed": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
