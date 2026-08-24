@@ -4,7 +4,7 @@
 
 `SOURCE_ONLY_ROOTFIX_IMPLEMENTED_AWAITING_CANONICAL_ACTIONS_VALIDATION`
 
-No constituye PASS de Iteración 1. El cierre solo puede ocurrir después de una ejecución real del workflow canónico que produzca selftest y handshake del mismo run con todos los gates de este documento en PASS.
+No constituye PASS de Iteración 1. El cierre solo puede ocurrir después de una ejecución real del workflow canónico que produzca selftest y handshake del mismo run y después de que el owner de cierre vuelva a validar conductualmente el contrato completo antes de mutar el ledger.
 
 ## Clasificación
 
@@ -23,7 +23,8 @@ La reparación previa cerró correctamente la clase `TRANSIENT_EVIDENCE_CLEANUP_
 2. selftest amarrado al artifact/source de una candidata concreta;
 3. cobertura del guard de source-rewrite definida mediante una lista manual incompleta;
 4. ausencia de ejecución conductual aislada de la secuencia owner → autorización → request → attempt accept → pre-provider gate → terminal reducer;
-5. reglas negativas escritas pero no necesariamente ejercitadas.
+5. reglas negativas escritas pero no necesariamente ejercitadas;
+6. riesgo de que el handshake y el owner de cierre transportaran/verificaran menos propiedades que las que realmente prueba el selftest.
 
 Esto viola el principio rector R2 del Plan Maestro 20260824: los validators no pueden quedar ligados a forma/texto, IDs históricos o datos de una candidata.
 
@@ -39,7 +40,7 @@ Se incorpora `orbit360-control-plane-semantic-contract-v20260824.json` como cont
 
 ### 3. Guard por alcance contractual
 
-`orbit360-control-plane-no-source-rewrite-guard-v20260824.mjs` obtiene su universo de componentes activos del contrato semántico. La cobertura ya no depende de una lista local de seis archivos que pueda quedar obsoleta silenciosamente.
+`orbit360-control-plane-no-source-rewrite-guard-v20260824.mjs` obtiene su universo de componentes activos del contrato semántico. La cobertura ya no depende de una lista local que pueda quedar obsoleta silenciosamente.
 
 ### 4. Workflow audit revision-agnostic
 
@@ -71,9 +72,17 @@ Se incorpora `orbit360-control-plane-semantic-contract-v20260824.json` como cont
 
 Nada de lo que ocurre en el scratch modifica ledger canónico, autorización real, provider o datos.
 
+### 6. Owner de cierre como segundo verificador independiente
+
+El handshake durable conserva la identidad causal del run canónico. No se usa como sustituto de las pruebas completas.
+
+En un cierre canónico real, `tools/orbit360-continuity-transition-owner-v20260824.mjs` ejecuta nuevamente el selftest conductual completo y exige todas sus propiedades críticas antes de cambiar el ledger de `CONTROL_PLANE_REGRESSION_OPEN_STOP_RETRY` a estado cerrado. De esta forma, una lista incompleta de campos en el YAML o en el handshake no puede producir un falso cierre.
+
+La única excepción es el handshake sintético generado dentro del worktree del propio selftest, identificado simultáneamente por `technicalPullRequest:0` y ruta `__selftest-handshake-*`. Esa excepción no es aceptable para un cierre canónico real y evita recursión infinita durante la simulación.
+
 ## Gate de confiabilidad para declarar Iteración 1 cerrada
 
-Se prohíbe cerrar Iteración 1 solamente porque desaparezca el error anterior. El selftest canónico debe demostrar simultáneamente:
+Se prohíbe cerrar Iteración 1 solamente porque desaparezca el error anterior. El selftest canónico y la revalidación independiente del owner deben demostrar simultáneamente:
 
 - `candidateBindingDynamic:true`;
 - `semanticPreflightPass:true`;
@@ -93,7 +102,7 @@ Se prohíbe cerrar Iteración 1 solamente porque desaparezca el error anterior. 
 - `negativeRegressionSuitePass:true`;
 - autorización/request/runtime/browser/secrets/Firestore reales en false y writes en 0.
 
-El mismo workflow canónico debe producir y publicar el handshake durable del mismo run. Solo ese handshake puede alimentar `CONTROL_PLANE_HARDENING_CLOSE`.
+El mismo workflow canónico debe producir y publicar el handshake durable del mismo run. Solo ese handshake puede alimentar `CONTROL_PLANE_HARDENING_CLOSE`, y el owner vuelve a ejecutar el contrato conductual antes de cerrar.
 
 ## Efectos y límites
 
@@ -116,6 +125,8 @@ Actualizar el patrón reusable para enseñar:
 - lifecycle de evidencias por clase;
 - scratch behavioral testing antes de provider;
 - gates negativos obligatorios;
+- handshake como identidad causal, no como sustituto del comportamiento;
+- owner de cierre con revalidación independiente;
 - `STOP_RETRY` como propiedad ejecutada, no solo documentada.
 
 ## Claude
@@ -126,6 +137,6 @@ No enviar este bloque a Claude: pertenece al control-plane/backend protegido.
 
 ## Siguiente acción exacta
 
-`AUDIT_FAST_FORWARD_ROOTFIX → BOOTSTRAP_SOURCE_ONLY_IF_CLEAN → ONE_CANONICAL_CONTROL_PLANE_SELFTEST → SAME_RUN_HANDSHAKE → CONTROL_PLANE_HARDENING_CLOSE`
+`AUDIT_FAST_FORWARD_ROOTFIX → BOOTSTRAP_SOURCE_ONLY_IF_CLEAN → ONE_CANONICAL_CONTROL_PLANE_SELFTEST → SAME_RUN_HANDSHAKE → OWNER_REVALIDATES_FULL_BEHAVIOR → CONTROL_PLANE_HARDENING_CLOSE`
 
-Si el selftest falla, no se reintenta automáticamente y no se abre F2. Se clasifica la causa y la Iteración 1 permanece abierta.
+Si el selftest o la revalidación independiente del owner fallan, no se reintenta automáticamente y no se abre F2. Se clasifica la causa y la Iteración 1 permanece abierta.
