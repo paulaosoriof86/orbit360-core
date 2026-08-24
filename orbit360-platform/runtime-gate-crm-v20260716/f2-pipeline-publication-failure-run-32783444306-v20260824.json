@@ -1,0 +1,92 @@
+{
+  "schemaVersion": "orbit360-f2-pipeline-publication-failure-v1-stop-retry-root-cause-diagnosed",
+  "status": "STOP_RETRY_SOURCE_ONLY_ROOT_CAUSE_DIAGNOSED_NO_REMEDIATION_EXECUTED",
+  "classification": "PIPELINE_MECHANISM_FAILURE",
+  "failureCode": "PIPELINE_MECHANISM_FAILURE:F2_AUTH_PUBLICATION_SURFACE:orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json",
+  "runId": 32783444306,
+  "jobId": 97610271784,
+  "technicalPullRequest": 93,
+  "terminalEvidenceArtifactId": 9540579722,
+  "terminalEvidenceArtifactDigest": "sha256:dda5d8971dc4e8bc7f38b458101e21fed6286700a9b531f65a9934631804831d",
+  "candidateArtifactId": 9504702901,
+  "candidateSourceHead": "8c9668d6d423e82826b0295431ec699390d79b4b",
+  "candidateArtifactDigest": "sha256:f11dd2a350b4160465dfc93b0dd9153e697d09773fa00aa4ee5ed13d93401ca2",
+  "canonicalBaseHeadAtAttempt": "7434630dc6bbd1372121a6f0b0eb8eaea1911707",
+  "authorizationEventPath": ".github/orbit360-authorizations/f2-runtime-authorization-intent-06527a7b470f-v20260824.json",
+  "authorizationEventRetired": true,
+  "attemptAccepted": true,
+  "allowedExecutionsAfterAccept": 0,
+  "replayAllowed": false,
+  "stageOutcomes": {
+    "sourceOnlyMechanismGates": "PASS",
+    "authorizationRequestAttemptAccept": "PASS_LOCAL_RUNNER_ONLY",
+    "acceptedStatePublication": "FAIL",
+    "semanticF2Gate": "SKIPPED",
+    "providerBinding": "SKIPPED",
+    "browser": "SKIPPED",
+    "integrity": "SKIPPED",
+    "terminalReconcile": "PASS_LOCAL_RUNNER_ONLY",
+    "terminalPublication": "SKIPPED_BY_PUBLICATION_CHAIN_GUARD",
+    "prBodyProjection": "SKIPPED_BY_PUBLICATION_CHAIN_GUARD"
+  },
+  "sideEffects": {
+    "runtimeExecuted": false,
+    "browserExecuted": false,
+    "secretAccess": false,
+    "firestoreRead": false,
+    "firestoreWrites": 0,
+    "authWrites": 0,
+    "operationalWrites": 0,
+    "deployExecuted": false,
+    "productionTouched": false,
+    "mainTouched": false,
+    "mergeExecuted": false
+  },
+  "canonicalPublication": {
+    "acceptedStatePublished": false,
+    "terminalStatePublished": false,
+    "prBodyAdvancedFromUnpublishedState": false,
+    "canonicalLedgerRevisionRemains": 41,
+    "canonicalPackageRevisionRemains": 35,
+    "productionRouteProgressPctRemains": 75
+  },
+  "sameStageSecondFailure": {
+    "active": true,
+    "previousRunId": 32771016767,
+    "previousFailureCode": "PIPELINE_MECHANISM_FAILURE:F2_AUTH_PUBLICATION_SURFACE:orbit360-platform/runtime-gate-crm-v20260716/macro3-mechanism-preflight-sanitized-v20260823.json",
+    "currentRunId": 32783444306,
+    "currentFailureCode": "PIPELINE_MECHANISM_FAILURE:F2_AUTH_PUBLICATION_SURFACE:orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json",
+    "stopRetryRequired": true
+  },
+  "rootCause": {
+    "status": "DIAGNOSED",
+    "code": "TRANSIENT_EVIDENCE_CLEANUP_PATH_SPECIFIC_NOT_CLASS_WIDE",
+    "description": "Source-only preflight evidence is written to fixed runtime-gate paths before accepted-state publication. The convergence cleanup contract removes only the previously known Macro-3 transient file, while the F2 semantic gate source precheck writes preflight-sanitizado.json. The publication guard correctly rejects this residual transient file. The prior repair addressed one filename rather than enforcing a class-wide transient-evidence invariant.",
+    "generator": "tools/orbit360-f2-gate-semantic-v20260824.mjs",
+    "generatorOutput": "orbit360-platform/runtime-gate-crm-v20260716/preflight-sanitizado.json",
+    "cleanupOwner": "tools/orbit360-control-plane-evidence-convergence-v20260822.mjs",
+    "cleanupCurrentlyCovers": "orbit360-platform/runtime-gate-crm-v20260716/macro3-mechanism-preflight-sanitized-v20260823.json",
+    "preflightSelfCheck": "tools/orbit360-macro3-mechanism-preflight-v20260823.mjs",
+    "preflightSelfCheckGap": "Checks cleanup presence for one exact Macro-3 path rather than proving all transient source-only evidence is absent before publication."
+  },
+  "productConclusion": {
+    "functionalDefectObserved": false,
+    "candidateDisproven": false,
+    "dataDefectObserved": false,
+    "providerDefectObserved": false,
+    "browserDefectObserved": false
+  },
+  "stopRetry": {
+    "active": true,
+    "newF2AttemptAllowed": false,
+    "newAuthorizationShouldBeRequested": false,
+    "workflowRerunAllowed": false,
+    "failedJobRerunAllowed": false,
+    "nextActionId": "DESIGN_GENERAL_TRANSIENT_EVIDENCE_CLEANUP_INVARIANT_SOURCE_ONLY",
+    "nextAction": "Design and document a generalized transient-evidence cleanup/publication invariant and its source-only validation before any further F2 authorization or runtime attempt. Do not implement a second symptom-specific filename patch."
+  },
+  "classificationForClaude": "BACKEND_PROTEGIDO_NO_CLAUDE",
+  "academiaImpact": "Teach that transient evidence must be governed by a class-wide lifecycle invariant rather than filename-specific cleanup; repeated same-stage failures activate STOP_RETRY; publication guards protect canonical truth even when local runner transitions have occurred.",
+  "containsPII": false,
+  "containsSecrets": false
+}
