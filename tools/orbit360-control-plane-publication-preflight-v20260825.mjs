@@ -63,7 +63,7 @@ function prepareTransaction(){
   if(!allChanged.length){
     const out={ok:true,status:'CONTROL_PLANE_PUBLICATION_TRANSACTION_PASS_NO_CHANGES',classification:'PASS',mode:'PREPARE',publicationClass,changedCount:0,remoteCASPass:false,pushDryRunPass:false,canonicalRunner:false,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
     if(txnOut)fs.writeFileSync(txnOut,JSON.stringify(out,null,2)+'\n','utf8');
-    emit(out);return;
+    emit(out,process.stderr);return;
   }
   const selftestMode=Boolean(process.env.ORBIT360_SELFTEST_EXPECTED_LEDGER);
   const closeState=ledger.activeState?.status==='CONTROL_PLANE_DEFINITIVE_CAUSAL_PASS'&&ledger.activeState?.phase==='CONTROL_PLANE_DEFINITIVE_CAUSAL_PASS_AWAITING_F2_AUTHORIZATION';
@@ -103,7 +103,7 @@ function prepareTransaction(){
     }
     const out={ok:true,status:'CONTROL_PLANE_PUBLICATION_TRANSACTION_PREPARED',classification:'PASS',mode:'PREPARE',publicationClass,selftestMode,closeState,baseHead,treeSha,commitSha,branch,allChangedCount:allChanged.length,changedCount:changed.length,changed,ignoredSelftestEvidence,diffCheckPass:true,commitTreePass:true,remoteCASPass,pushDryRunPass,canonicalRunner,ledgerRevision:ledger.revision,packageRevision:ledger.productionReopeningPackage?.revision,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
     if(txnOut)fs.writeFileSync(txnOut,JSON.stringify(out,null,2)+'\n','utf8');
-    emit(out);
+    emit(out,process.stderr);
   }finally{try{fs.rmSync(tempDir,{recursive:true,force:true});}catch{}}
 }
 
