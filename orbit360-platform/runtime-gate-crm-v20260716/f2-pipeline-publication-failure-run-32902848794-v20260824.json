@@ -1,0 +1,57 @@
+{
+  "schemaVersion": "orbit360-f2-control-plane-failure-v7-provider-current-step-env",
+  "ok": false,
+  "status": "F2_SEALED_FAILURE_SOURCE_ROOT_CAUSE_CONFIRMED",
+  "classification": "PIPELINE_MECHANISM_FAILURE",
+  "correctedClassification": "PIPELINE_MECHANISM_FAILURE",
+  "failureCode": "PIPELINE_MECHANISM_FAILURE:IDENTITY_CONTEXT_NOT_BOUND",
+  "correctedFailureCode": "PIPELINE_MECHANISM_FAILURE:GOOGLE_APPLICATION_CREDENTIALS_NOT_BOUND_TO_CURRENT_PROVIDER_PROCESS",
+  "runId": 32902848794,
+  "jobId": 97980325711,
+  "technicalPullRequest": 128,
+  "terminalEvidencePath": "orbit360-platform/runtime-gate-crm-v20260716/f2-runtime-terminal-inline-32902848794.json",
+  "candidateArtifactId": 9504702901,
+  "candidateSourceHead": "8c9668d6d423e82826b0295431ec699390d79b4b",
+  "candidateArtifactDigest": "sha256:f11dd2a350b4160465dfc93b0dd9153e697d09773fa00aa4ee5ed13d93401ca2",
+  "rootCause": {
+    "code": "PIPELINE_MECHANISM_FAILURE:GOOGLE_APPLICATION_CREDENTIALS_NOT_BOUND_TO_CURRENT_PROVIDER_PROCESS",
+    "family": "GITHUB_ENV_CURRENT_STEP_PROPAGATION",
+    "providerResolver": "tools/orbit360-m6-resolve-smoke-identity-readonly-v20260730.mjs",
+    "currentStepEnvResolver": "tools/orbit360-current-step-env-resolver-v20260825.mjs",
+    "observedMismatch": "The provider shell wrote GOOGLE_APPLICATION_CREDENTIALS to the file referenced by GITHUB_ENV and invoked the resolver in the same shell step. GitHub applies GITHUB_ENV entries to later steps, so the resolver process did not receive GOOGLE_APPLICATION_CREDENTIALS in process.env and failed closed before Auth or Firestore reads.",
+    "rootfix": "Resolve the current-step value from process.env first and, when absent, from the current GITHUB_ENV file; bind it into the current process before applicationDefault(). Validate this behavior source-only through a behavioral selftest executed by the existing semantic policy audit."
+  },
+  "rootfixPaths": [
+    "tools/orbit360-current-step-env-resolver-v20260825.mjs",
+    "tools/orbit360-m6-resolve-smoke-identity-readonly-v20260730.mjs",
+    "tools/orbit360-f2-validator-semantic-policy-audit-v20260825.mjs"
+  ],
+  "canonicalPublication": {
+    "acceptedStatePublished": true,
+    "terminalStatePublished": true,
+    "prBodyAdvancedFromUnpublishedState": false
+  },
+  "stopRetry": {
+    "active": true,
+    "newF2AttemptAllowed": false,
+    "workflowRerunAllowed": false,
+    "freshAuthorizationRequiredAfterSourceOnlyClosure": true
+  },
+  "sideEffects": {
+    "runtimeExecuted": false,
+    "browserExecuted": false,
+    "secretAccess": false,
+    "firestoreRead": false,
+    "firestoreWrites": 0,
+    "authWrites": 0,
+    "operationalWrites": 0,
+    "deployExecuted": false,
+    "productionTouched": false
+  },
+  "candidateUnchanged": true,
+  "replayAllowed": false,
+  "sourceOnlyRootfix": true,
+  "legacyTransportFilename": true,
+  "containsPII": false,
+  "containsSecrets": false
+}
