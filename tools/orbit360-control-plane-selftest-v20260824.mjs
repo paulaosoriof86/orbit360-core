@@ -120,6 +120,17 @@ if(!failures.length){
     git(scratch,['config','user.name','orbit360-control-plane-selftest']);
     git(scratch,['config','user.email','orbit360-control-plane-selftest@users.noreply.github.com']);
     const scratchContract=json(scratch,P.contract),scratchRegistry=json(scratch,P.registry),scratchL=json(scratch,P.ledger),scratchCandidate=scratchL.successorCandidate;
+    if(hardeningClosed){
+      scratchL.activeState={...scratchL.activeState,phase:'MACRO1_CONTROL_PLANE_TRUTH_HARDENING_SOURCE_ONLY',status:'CONTROL_PLANE_REGRESSION_OPEN_STOP_RETRY',rootCauseStatus:'SELFTEST_SYNTHETIC_OPEN_FIXTURE',productFrozen:true,dataFrozen:true,runtimeAuthorized:false,runtimeReplayAllowed:false,deployAuthorized:false,productionAuthorized:false};
+      scratchL.authorizationBoundary={...scratchL.authorizationBoundary,activeRuntimeAuthorization:false,freshAuthorizationRequired:true,authorizationBlockedByHardeningPackage:true,authorizationCarryForwardForbidden:true,nextRuntimeMaterializationAllowed:false,newRuntimeRequestAllowed:false,currentBoundaryStatus:'STOP_RETRY_CONTROL_PLANE_REGRESSION_OPEN',activeRequestPath:null,authorizationRecordPath:null,runtimeAttemptAccepted:false,runtimeRunId:null};
+      scratchL.productionReopeningPackage={...scratchL.productionReopeningPackage,status:'OPEN_BLOCKED_CONTROL_PLANE_REGRESSION',firstIncompleteStep:'CONTROL-PLANE-FULL-PATH-REGRESSION',nextActionExact:'RUN_EXACT_F2_SOURCE_PATH_CLASSWIDE_EVIDENCE_SELFTEST',runtimeAllowed:false,authorizationAllowed:false,requestMaterializationAllowed:false};
+      scratchL.nextAction={id:'RUN_EXACT_F2_SOURCE_PATH_CLASSWIDE_EVIDENCE_SELFTEST',description:'Synthetic selftest fixture: revalidate control-plane before any authorization.',runtimeAllowed:false};
+      scratchL.continuityControl={...scratchL.continuityControl,status:'CONTROL_PLANE_REGRESSION_OPEN_STOP_RETRY',classification:'PIPELINE_MECHANISM_FAILURE',compositeInvariantStatus:'CONTROL_PLANE_REGRESSION_REQUIRES_FULL_PATH_REVALIDATION',evidenceFreshnessValidated:false,workflowHandshakeValidated:false,semanticBehavioralSelftestValidated:false,negativeRegressionSuiteValidated:false,preProviderScratchValidated:false,projectionImmutabilityValidated:false};
+      fs.writeFileSync(A(scratch,P.ledger),JSON.stringify(scratchL,null,2)+'\n','utf8');
+      requireSuccess(scratch,P.projection,['--expected-revision',String(scratchL.revision)],{},'SCRATCH_CLOSED_STATE_FIXTURE_PROJECTION_FAIL');
+      git(scratch,['add','-A']);git(scratch,['commit','-m','selftest: normalize closed canonical state to synthetic open fixture']);
+      need(repoChanges(scratch).length===0,'SCRATCH_CLOSED_STATE_FIXTURE_NOT_CLEAN');
+    }
     need(scratchContract.candidateBinding==='DYNAMIC_FROM_CANONICAL_LEDGER','SCRATCH_CONTRACT_CANDIDATE_NOT_DYNAMIC');
     need(typeof scratchRegistry.sourceOfTruth==='string'&&scratchRegistry.sourceOfTruth===P.ledger,'SCRATCH_CANONICAL_STATE_OWNER_DRIFT');
     const immutablePaths=Array.isArray(scratchContract.runtimePreProviderImmutablePaths)?scratchContract.runtimePreProviderImmutablePaths:[];
