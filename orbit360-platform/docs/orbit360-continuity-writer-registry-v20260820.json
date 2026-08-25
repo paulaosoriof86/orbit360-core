@@ -1,7 +1,7 @@
 {
-  "schemaVersion":"orbit360-continuity-writer-registry-v13-single-validated-publication-transaction",
+  "schemaVersion":"orbit360-continuity-writer-registry-v14-publication-cli-single-json",
   "registryId":"ORBIT360-CONTINUITY-WRITER-REGISTRY",
-  "revision":23,
+  "revision":24,
   "active":true,
   "status":"DEFINITIVE_SINGLE_WORKFLOW_GENERIC_INTENT_ROUTER_SINGLE_PUBLICATION_TRANSACTION",
   "branch":"ays/backend-tenant-lab-v99-20260703",
@@ -14,6 +14,7 @@
   "projectionCore":"tools/orbit360-continuity-projection-core-v20260825.mjs",
   "publicationPreflightOwner":"tools/orbit360-control-plane-publication-preflight-v20260825.mjs",
   "publicationTransactionOwner":"tools/orbit360-control-plane-publication-preflight-v20260825.mjs",
+  "publicationProtocolSelftest":"tools/orbit360-publication-owner-cli-contract-selftest-v20260825.mjs",
   "evidenceConvergenceGate":"tools/orbit360-control-plane-evidence-convergence-v20260822.mjs",
   "evidenceLifecycleOwner":"tools/orbit360-control-plane-evidence-lifecycle-v20260824.mjs",
   "terminalTruthInvariant":"tools/orbit360-terminal-truth-invariant-v20260824.mjs",
@@ -113,7 +114,10 @@
     "publicationRemoteReadbackRequired":true,
     "publicationLocalReadbackRequired":true,
     "publicationWorktreeMustMatchPreparedTreeAtCommit":true,
-    "publicationSurfaceGuardOwnedByTransactionOwner":true
+    "publicationSurfaceGuardOwnedByTransactionOwner":true,
+    "publicationValidatedCliStdoutSingleJsonRequired":true,
+    "publicationValidatedCliStderrMachineContractForbidden":true,
+    "f2MechanismTerminalFailureReopensControlPlaneWithoutProductMutation":true
   },
   "workflowClasses":{
     "solePhysicalWorkflow":[".github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml"],
@@ -138,7 +142,8 @@
     "workflowTopologySemanticOwner":"tools/orbit360-workflow-operational-surface-audit-v20260820.mjs",
     "executingWorkflowSnapshotBoundToCanonicalRequired":true,
     "publicationPreflightOwner":"tools/orbit360-control-plane-publication-preflight-v20260825.mjs",
-    "publicationTransactionOwner":"tools/orbit360-control-plane-publication-preflight-v20260825.mjs"
+    "publicationTransactionOwner":"tools/orbit360-control-plane-publication-preflight-v20260825.mjs",
+    "publicationProtocolSelftest":"tools/orbit360-publication-owner-cli-contract-selftest-v20260825.mjs"
   },
   "evidenceLifecycle":{
     "scope":"orbit360-platform/runtime-gate-crm-v20260716",
@@ -184,7 +189,9 @@
     "preparedCommitMustBePublishedUnchanged":true,
     "duplicateGitAddCommitInWorkflowForbidden":true,
     "remoteReadbackAfterPush":true,
-    "localReadbackAfterPush":true
+    "localReadbackAfterPush":true,
+    "publishValidatedStdoutSingleJson":true,
+    "publishValidatedMachineContractOnStderr":false
   },
   "containsPII":false,
   "containsSecrets":false
