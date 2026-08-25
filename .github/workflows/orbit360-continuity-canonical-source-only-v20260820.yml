@@ -10,6 +10,7 @@ name: Orbit360 Canonical Control Plane
 # F2_PREPUBLICATION_FAILURE_REDUCER_V1
 # EVIDENCE_LIFECYCLE_CLASS_WIDE_V1
 # CONTROL_PLANE_IDEMPOTENT_REPROJECTION_V1
+# SINGLE_VALIDATED_PUBLICATION_TRANSACTION_V1
 # Stable base-owned workflow. Execution PRs may change one intent JSON only; they may not change this workflow.
 
 on:
@@ -45,6 +46,7 @@ env:
   CONVERGENCE: tools/orbit360-control-plane-evidence-convergence-v20260822.mjs
   EVIDENCE_LIFECYCLE: tools/orbit360-control-plane-evidence-lifecycle-v20260824.mjs
   EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
+  PUBLICATION_OWNER: tools/orbit360-control-plane-publication-preflight-v20260825.mjs
 
 jobs:
   canonical-control-plane:
@@ -264,6 +266,11 @@ jobs:
       - id: control_plane_close
         name: Close control-plane hardening through canonical owner
         if: steps.intent.outputs.mode == 'CONTROL_PLANE_HARDENING_CLOSE'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ORBIT360_PUBLICATION_CLASS: CONTROL_PLANE_CLOSE
+          ORBIT360_PUBLICATION_TRANSACTION_OUT: ${{ runner.temp }}/control-plane-close-publication.json
+          ORBIT360_PUBLICATION_COMMIT_MESSAGE: 'gate(control-plane): close full-path causal hardening'
         shell: bash
         run: |
           set -euo pipefail
@@ -279,9 +286,10 @@ jobs:
           node tools/orbit360-control-plane-independent-readback-v20260820.mjs
           node tools/orbit360-control-plane-composite-invariant-v20260820.mjs
           node tools/orbit360-documentation-state-discovery-v20260821.mjs
+          jq -e '.ok==true and .status=="CONTROL_PLANE_PUBLICATION_TRANSACTION_PREPARED" and .publicationClass=="CONTROL_PLANE_CLOSE" and .canonicalRunner==true and .diffCheckPass==true and .commitTreePass==true and .remoteCASPass==true and .pushDryRunPass==true' "$ORBIT360_PUBLICATION_TRANSACTION_OUT" >/dev/null
 
       - id: control_plane_close_publish
-        name: Publish hardening closure with dynamic revisions and CAS
+        name: Publish hardening closure exact prepared commit with CAS and readback
         if: steps.intent.outputs.mode == 'CONTROL_PLANE_HARDENING_CLOSE' && steps.control_plane_close.outcome == 'success'
         env:
           GH_TOKEN: ${{ github.token }}
@@ -289,15 +297,10 @@ jobs:
         run: |
           set -euo pipefail
           LR=$(jq -r '.ledgerRevision' "$RUNNER_TEMP/control-plane-hardening-close.json"); PRV=$(jq -r '.packageRevision' "$RUNNER_TEMP/control-plane-hardening-close.json"); [[ "$LR" =~ ^[0-9]+$ ]]; [[ "$PRV" =~ ^[0-9]+$ ]]
-          mapfile -t CHANGED < <(git status --porcelain | sed 's/^...//' | sort -u); FINAL_HEAD='${{ steps.intent.outputs.live_base }}'
-          if [ "${#CHANGED[@]}" -gt 0 ]; then
-            for f in "${CHANGED[@]}"; do case "$f" in .github/orbit360-requests/macro2-canonical-source-activation-pointer-v20260821.json|README.md|orbit360-platform/CHANGELOG.md|orbit360-platform/docs/CHECKPOINT-CONTROL-PLANE-HARDENING-20260820.md|orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json|orbit360-platform/docs/ORBIT360-PR5-CURRENT-STATE.md|orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json|orbit360-platform/docs/orbit360-f2-runtime-authorization-boundary-v20260820.json|orbit360-platform/docs/orbit360-live-state-v1.json|orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json|tools/orbit360-gate-contract-f2-productive-acceptance-v20260820.json|tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-runtime-v20260819.json|tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-source-v20260819.json) ;; *) echo "PIPELINE_MECHANISM_FAILURE:CONTROL_PLANE_CLOSE_PUBLICATION_SURFACE:$f" >&2; exit 41 ;; esac; done
-            git config user.name 'orbit360-control-plane'; git config user.email 'orbit360-control-plane@users.noreply.github.com'
-            git add -- "${CHANGED[@]}"; git diff --cached --check; git commit -m 'gate(control-plane): close full-path causal hardening'; FINAL_HEAD=$(git rev-parse HEAD)
-            git fetch --no-tags origin "$ORBIT360_BRANCH"; test "$(git rev-parse FETCH_HEAD)" = '${{ steps.intent.outputs.live_base }}'; git push "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:refs/heads/${ORBIT360_BRANCH}"
-          else
-            git fetch --no-tags origin "$ORBIT360_BRANCH"; test "$(git rev-parse FETCH_HEAD)" = '${{ steps.intent.outputs.live_base }}'
-          fi
+          TXN="$RUNNER_TEMP/control-plane-close-publication.json"
+          node "$PUBLICATION_OWNER" --publish-validated "$TXN" | tee "$RUNNER_TEMP/control-plane-close-publish.json"
+          jq -e '.ok==true and .status=="CONTROL_PLANE_PUBLICATION_TRANSACTION_PUBLISHED" and .publicationClass=="CONTROL_PLANE_CLOSE" and .remoteCASPass==true and .pushDryRunPass==true and .pushPass==true and .remoteReadbackPass==true and .localReadbackPass==true' "$RUNNER_TEMP/control-plane-close-publish.json" >/dev/null
+          FINAL_HEAD=$(jq -r '.commitSha' "$RUNNER_TEMP/control-plane-close-publish.json"); [[ "$FINAL_HEAD" =~ ^[a-f0-9]{40}$ ]]
           jq -Rs '{body:.}' < "$PR_STATE" > "$RUNNER_TEMP/pr-body-control-plane-close.json"
           curl -L --fail --silent --show-error -X PATCH -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/${GITHUB_REPOSITORY}/pulls/5" --data-binary @"$RUNNER_TEMP/pr-body-control-plane-close.json" >/dev/null
           jq -e --argjson lr "$LR" --argjson pr "$PRV" '.revision==$lr and .productionReopeningPackage.revision==$pr and .activeState.status=="CONTROL_PLANE_DEFINITIVE_CAUSAL_PASS" and .progress.productionRouteProgressPct==75 and .progress.f2TerminalPass==false and .authorizationBoundary.activeRuntimeAuthorization==false and .authorizationBoundary.activeRequestPath==null and .authorizationBoundary.authorizationRecordPath==null and (.authorizationBoundary.runtimeAttemptAccepted // false)==false and .nextAction.id=="AWAIT_EXPLICIT_F2_RUNTIME_AUTHORIZATION_ONE_SHOT"' "$LEDGER" >/dev/null
@@ -320,6 +323,11 @@ jobs:
       - id: materialize
         name: Persist authorization request and F2_RUNTIME_ATTEMPT_ACCEPT once
         if: steps.intent.outputs.mode == 'F2_RUNTIME_ONE_SHOT'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ORBIT360_PUBLICATION_CLASS: F2_AUTH_ACCEPT
+          ORBIT360_PUBLICATION_TRANSACTION_OUT: ${{ runner.temp }}/f2-auth-publication.json
+          ORBIT360_PUBLICATION_COMMIT_MESSAGE: 'gate(f2): accept generic-intent one-shot runtime attempt'
         shell: bash
         run: |
           set -euo pipefail
@@ -331,9 +339,10 @@ jobs:
           node "$OWNER" --transition F2_RUNTIME_ATTEMPT_ACCEPT --expected-revision "$LR" --expected-package-revision "$PRV" --runtime-run-id "$GITHUB_RUN_ID" > "$RUNNER_TEMP/f2-attempt-accept.json"
           jq -e --argjson run "$GITHUB_RUN_ID" '.ok==true and .status=="ORBIT360_F2_RUNTIME_ATTEMPT_ACCEPTED_ONE_SHOT" and .runtimeRunId==$run and .replayAllowed==false' "$RUNNER_TEMP/f2-attempt-accept.json" >/dev/null
           REQUEST=$(jq -r '.authorizationBoundary.activeRequestPath' "$LEDGER"); echo "request=$REQUEST" >> "$GITHUB_OUTPUT"; echo "ORBIT360_REQUEST_FILE=$REQUEST" >> "$GITHUB_ENV"
+          jq -e '.ok==true and .status=="CONTROL_PLANE_PUBLICATION_TRANSACTION_PREPARED" and .publicationClass=="F2_AUTH_ACCEPT" and .canonicalRunner==true and .diffCheckPass==true and .commitTreePass==true and .remoteCASPass==true and .pushDryRunPass==true' "$ORBIT360_PUBLICATION_TRANSACTION_OUT" >/dev/null
 
       - id: authpublish
-        name: Publish accepted one-shot state with remote CAS
+        name: Publish accepted one-shot exact prepared commit with CAS and readback
         if: steps.intent.outputs.mode == 'F2_RUNTIME_ONE_SHOT'
         continue-on-error: true
         env:
@@ -343,11 +352,18 @@ jobs:
           set -euo pipefail
           FAILFILE="$RUNNER_TEMP/authpublish-failure.txt"; rm -f "$FAILFILE"
           node "$CONVERGENCE" --repo-only >/dev/null || { echo 'PIPELINE_MECHANISM_FAILURE:F2_AUTH_CONVERGENCE_FAIL' > "$FAILFILE"; exit 41; }
-          mapfile -t CHANGED < <(git status --porcelain | sed 's/^...//' | sort -u); test "${#CHANGED[@]}" -gt 0 || { echo 'PIPELINE_MECHANISM_FAILURE:F2_AUTH_PUBLICATION_EMPTY' > "$FAILFILE"; exit 41; }
-          for f in "${CHANGED[@]}"; do case "$f" in .github/orbit360-authorizations/f2-productive-acceptance-runtime-browser-readonly-auth-*.json|.github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-successor-*.json|.github/orbit360-requests/macro2-canonical-source-activation-pointer-v20260821.json|README.md|orbit360-platform/CHANGELOG.md|orbit360-platform/docs/CHECKPOINT-CONTROL-PLANE-HARDENING-20260820.md|orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json|orbit360-platform/docs/ORBIT360-PR5-CURRENT-STATE.md|orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json|orbit360-platform/docs/orbit360-f2-runtime-authorization-boundary-v20260820.json|orbit360-platform/docs/orbit360-live-state-v1.json|orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json|tools/orbit360-gate-contract-f2-productive-acceptance-v20260820.json|tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-runtime-v20260819.json|tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-source-v20260819.json) ;; *) echo "PIPELINE_MECHANISM_FAILURE:F2_AUTH_PUBLICATION_SURFACE:$f" > "$FAILFILE"; cat "$FAILFILE" >&2; exit 41 ;; esac; done
-          git config user.name 'orbit360-control-plane'; git config user.email 'orbit360-control-plane@users.noreply.github.com'; git add -- "${CHANGED[@]}"; git diff --cached --check; git commit -m 'gate(f2): accept generic-intent one-shot runtime attempt'
-          FINAL_HEAD=$(git rev-parse HEAD); git fetch --no-tags origin "$ORBIT360_BRANCH"; if [ "$(git rev-parse FETCH_HEAD)" != '${{ steps.intent.outputs.live_base }}' ]; then echo 'PIPELINE_MECHANISM_FAILURE:F2_AUTH_REMOTE_CAS_MISMATCH' > "$FAILFILE"; exit 41; fi
-          git push "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:refs/heads/${ORBIT360_BRANCH}" || { echo 'PIPELINE_MECHANISM_FAILURE:F2_AUTH_PUSH_FAILED' > "$FAILFILE"; exit 41; }
+          set +e
+          node "$PUBLICATION_OWNER" --publish-validated "$RUNNER_TEMP/f2-auth-publication.json" > "$RUNNER_TEMP/f2-auth-publish.json" 2>&1
+          RC=$?
+          set -e
+          if [ "$RC" -ne 0 ]; then
+            CODE=$(jq -r '.code // "PUBLICATION_TRANSACTION_FAILED"' "$RUNNER_TEMP/f2-auth-publish.json" 2>/dev/null || echo 'PUBLICATION_TRANSACTION_FAILED')
+            echo "PIPELINE_MECHANISM_FAILURE:F2_AUTH_${CODE}" > "$FAILFILE"
+            cat "$RUNNER_TEMP/f2-auth-publish.json" >&2
+            exit 41
+          fi
+          jq -e '.ok==true and .status=="CONTROL_PLANE_PUBLICATION_TRANSACTION_PUBLISHED" and .publicationClass=="F2_AUTH_ACCEPT" and .pushPass==true and .remoteReadbackPass==true and .localReadbackPass==true' "$RUNNER_TEMP/f2-auth-publish.json" >/dev/null
+          FINAL_HEAD=$(jq -r '.commitSha' "$RUNNER_TEMP/f2-auth-publish.json"); [[ "$FINAL_HEAD" =~ ^[a-f0-9]{40}$ ]]
           echo "final_head=$FINAL_HEAD" >> "$GITHUB_OUTPUT"
 
       - id: gate
@@ -481,35 +497,40 @@ jobs:
         if: always() && steps.materialize.outcome == 'success' && steps.terminal_evidence.outcome == 'success'
         env:
           TERMINAL: ${{ steps.terminal_evidence.outputs.evidence }}
+          GH_TOKEN: ${{ github.token }}
+          ORBIT360_PUBLICATION_CLASS: F2_TERMINAL
+          ORBIT360_PUBLICATION_TRANSACTION_OUT: ${{ runner.temp }}/f2-terminal-publication.json
+          ORBIT360_PUBLICATION_COMMIT_MESSAGE: 'gate(f2): reconcile generic-intent one-shot terminal'
         shell: bash
         run: |
           set -euo pipefail
           LR=$(jq -r '.revision' "$LEDGER"); PRV=$(jq -r '.revision' "$PACKAGE"); node "$OWNER" --transition F2_RUNTIME_TERMINAL_RECONCILE_GENERIC --expected-revision "$LR" --expected-package-revision "$PRV" --terminal-evidence "$TERMINAL" | tee "$RUNNER_TEMP/f2-terminal-reconcile.json"; jq -e '.ok==true and .status=="F2_RUNTIME_TERMINAL_RECONCILED_GENERIC" and .replayAllowed==false' "$RUNNER_TEMP/f2-terminal-reconcile.json" >/dev/null
           node tools/orbit360-control-plane-composite-invariant-v20260820.mjs; node tools/orbit360-documentation-state-discovery-v20260821.mjs
+          jq -e '.ok==true and .status=="CONTROL_PLANE_PUBLICATION_TRANSACTION_PREPARED" and .publicationClass=="F2_TERMINAL" and .canonicalRunner==true and .diffCheckPass==true and .commitTreePass==true and .remoteCASPass==true and .pushDryRunPass==true' "$ORBIT360_PUBLICATION_TRANSACTION_OUT" >/dev/null
 
       - id: terminalpublish
-        name: Publish terminal transition with compare-and-swap
+        name: Publish terminal exact prepared commit with compare-and-swap
         if: always() && steps.materialize.outcome == 'success' && steps.authpublish.outcome == 'success' && steps.reconcile.outcome == 'success'
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
-          mapfile -t CHANGED < <(git status --porcelain | sed 's/^...//' | sort -u); test "${#CHANGED[@]}" -gt 0
-          for f in "${CHANGED[@]}"; do case "$f" in orbit360-platform/runtime-gate-crm-v20260716/f2-runtime-terminal-inline-*.json|.github/orbit360-authorizations/f2-productive-acceptance-runtime-browser-readonly-auth-*.json|.github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-successor-*.json|.github/orbit360-requests/macro2-canonical-source-activation-pointer-v20260821.json|README.md|orbit360-platform/CHANGELOG.md|orbit360-platform/docs/CHECKPOINT-CONTROL-PLANE-HARDENING-20260820.md|orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json|orbit360-platform/docs/ORBIT360-PR5-CURRENT-STATE.md|orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json|orbit360-platform/docs/orbit360-f2-runtime-authorization-boundary-v20260820.json|orbit360-platform/docs/orbit360-live-state-v1.json|orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json|tools/orbit360-gate-contract-f2-productive-acceptance-v20260820.json|tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-runtime-v20260819.json|tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-source-v20260819.json) ;; *) echo "PIPELINE_MECHANISM_FAILURE:F2_TERMINAL_PUBLICATION_SURFACE:$f" >&2; exit 41 ;; esac; done
-          git add -- "${CHANGED[@]}"; git diff --cached --check; git commit -m 'gate(f2): reconcile generic-intent one-shot terminal'; FINAL_HEAD=$(git rev-parse HEAD); git fetch --no-tags origin "$ORBIT360_BRANCH"; test "$(git rev-parse FETCH_HEAD)" = '${{ steps.authpublish.outputs.final_head }}'; git push "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:refs/heads/${ORBIT360_BRANCH}"; echo "final_head=$FINAL_HEAD" >> "$GITHUB_OUTPUT"
+          node "$PUBLICATION_OWNER" --publish-validated "$RUNNER_TEMP/f2-terminal-publication.json" | tee "$RUNNER_TEMP/f2-terminal-publish.json"
+          jq -e '.ok==true and .status=="CONTROL_PLANE_PUBLICATION_TRANSACTION_PUBLISHED" and .publicationClass=="F2_TERMINAL" and .pushPass==true and .remoteReadbackPass==true and .localReadbackPass==true' "$RUNNER_TEMP/f2-terminal-publish.json" >/dev/null
+          FINAL_HEAD=$(jq -r '.commitSha' "$RUNNER_TEMP/f2-terminal-publish.json"); [[ "$FINAL_HEAD" =~ ^[a-f0-9]{40}$ ]]; echo "final_head=$FINAL_HEAD" >> "$GITHUB_OUTPUT"
 
       - id: failurepublish
-        name: Atomically publish terminal FAIL when accepted state publication failed
+        name: Atomically publish terminal FAIL exact prepared commit when accepted state publication failed
         if: always() && steps.materialize.outcome == 'success' && steps.authpublish.outcome == 'failure' && steps.reconcile.outcome == 'success'
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
-          mapfile -t CHANGED < <(git status --porcelain | sed 's/^...//' | sort -u); test "${#CHANGED[@]}" -gt 0
-          for f in "${CHANGED[@]}"; do case "$f" in orbit360-platform/runtime-gate-crm-v20260716/f2-runtime-terminal-inline-*.json|.github/orbit360-authorizations/f2-productive-acceptance-runtime-browser-readonly-auth-*.json|.github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-successor-*.json|.github/orbit360-requests/macro2-canonical-source-activation-pointer-v20260821.json|README.md|orbit360-platform/CHANGELOG.md|orbit360-platform/docs/CHECKPOINT-CONTROL-PLANE-HARDENING-20260820.md|orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json|orbit360-platform/docs/ORBIT360-PR5-CURRENT-STATE.md|orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json|orbit360-platform/docs/orbit360-f2-runtime-authorization-boundary-v20260820.json|orbit360-platform/docs/orbit360-live-state-v1.json|orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json|tools/orbit360-gate-contract-f2-productive-acceptance-v20260820.json|tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-runtime-v20260819.json|tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-source-v20260819.json) ;; *) echo "PIPELINE_MECHANISM_FAILURE:F2_FAILURE_PUBLICATION_SURFACE:$f" >&2; exit 41 ;; esac; done
-          git add -- "${CHANGED[@]}"; git diff --cached --check; git commit -m 'gate(f2): atomically seal prepublication failure'; FINAL_HEAD=$(git rev-parse HEAD); git fetch --no-tags origin "$ORBIT360_BRANCH"; test "$(git rev-parse FETCH_HEAD)" = '${{ steps.intent.outputs.live_base }}'; git push "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:refs/heads/${ORBIT360_BRANCH}"; echo "final_head=$FINAL_HEAD" >> "$GITHUB_OUTPUT"
+          node "$PUBLICATION_OWNER" --publish-validated "$RUNNER_TEMP/f2-terminal-publication.json" | tee "$RUNNER_TEMP/f2-failure-publish.json"
+          jq -e '.ok==true and .status=="CONTROL_PLANE_PUBLICATION_TRANSACTION_PUBLISHED" and .publicationClass=="F2_TERMINAL" and .pushPass==true and .remoteReadbackPass==true and .localReadbackPass==true' "$RUNNER_TEMP/f2-failure-publish.json" >/dev/null
+          FINAL_HEAD=$(jq -r '.commitSha' "$RUNNER_TEMP/f2-failure-publish.json"); [[ "$FINAL_HEAD" =~ ^[a-f0-9]{40}$ ]]; echo "final_head=$FINAL_HEAD" >> "$GITHUB_OUTPUT"
 
       - name: Project actual PR body and enforce terminal truth
         if: always() && steps.materialize.outcome == 'success' && steps.terminalpublish.outcome == 'success'
