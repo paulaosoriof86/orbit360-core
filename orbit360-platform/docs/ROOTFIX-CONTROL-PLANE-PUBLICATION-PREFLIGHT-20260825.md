@@ -1,5 +1,7 @@
 # ROOTFIX — Preflight causal de publicación del control-plane
 
+**HISTORICAL INCIDENT EVIDENCE — NOT CURRENT STATE AUTHORITY.** Este documento conserva el diagnóstico y la corrección aplicados en su momento; no define estado vigente, nextAction ni autoridad de reanudación. El estado operativo actual se deriva únicamente del ledger y de sus proyecciones canónicas.
+
 Fecha: 2026-08-25
 
 ## Contexto
@@ -34,7 +36,7 @@ El preflight usa un `GIT_INDEX_FILE` temporal y no altera el índice real ni el 
 
 Cada familia tiene código causal independiente: `PUBLICATION_PREFLIGHT_DIFF_CHECK`, `PUBLICATION_PREFLIGHT_COMMIT_TREE`, `PUBLICATION_PREFLIGHT_REMOTE_CAS_MISMATCH`, `PUBLICATION_PREFLIGHT_PUSH_DRY_RUN`, `CONTROL_PLANE_CLOSE_PUBLICATION_SURFACE`, etc.
 
-## Criterio de cierre
+## Criterio histórico de cierre de esa iteración
 
 No se repite el run fallido. Primero el nuevo preflight debe ejecutarse dentro del selftest/cierre source-only. Solo si pasa se permite un nuevo intent de hardening close. Si falla, el código causal se usa como causa raíz y no se crea otro parche ni otra autorización F2.
 
