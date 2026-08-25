@@ -65,14 +65,14 @@ Formato basado en *Keep a Changelog*. Construcción greenfield; el estado operat
 
 <!-- ORBIT360_CURRENT_STATE_START -->
 ## [F2-CONTINUITY-CURRENT] — `ORBIT360-F2-CONTINUITY-CURRENT`
-CANONICAL_STATE_FINGERPRINT: 30cb83ffbac563c75ea9b86ab25722f3648aa21a870a01bd1381de1d6c9d49d3
+CANONICAL_STATE_FINGERPRINT: 5e2d0052bae8ddaf1e5238bbb84011fe1b7ed60dbdd27d9d345a6336601ca855
 - Plan: `orbit360-platform/docs/PLAN-MAESTRO-CONGELADO-SALIDA-PRODUCCION-SIN-BUCLES-ORBIT360-AYS-20260824.md`.
-- Fase: `CONTROL_PLANE_DEFINITIVE_CAUSAL_PASS_AWAITING_F2_AUTHORIZATION`.
-- Estado: `CONTROL_PLANE_DEFINITIVE_CAUSAL_PASS`.
-- Ledger/package: `49/43`.
+- Fase: `F2_RUNTIME_ATTEMPT_ACCEPTED_PREFLIGHT_PENDING`.
+- Estado: `F2_RUNTIME_ATTEMPT_ACCEPTED_ONE_SHOT`.
+- Ledger/package: `52/46`.
 - Candidata: artifact `9504702901`, source `8c9668d6d423e82826b0295431ec699390d79b4b`.
-- Authorization/request/runtime: `false/false/false`.
+- Authorization/request/runtime: `true/true/false`.
 - Progreso producción: **75%**.
 - Control-plane causal: `CONTROL_PLANE_DEFINITIVE_CAUSAL_PASS`.
-- Siguiente acción: `AWAIT_EXPLICIT_F2_RUNTIME_AUTHORIZATION_ONE_SHOT`.
+- Siguiente acción: `RUN_F2_SOURCE_AND_RUNTIME_PREFLIGHT_FAIL_CLOSED`.
 <!-- ORBIT360_CURRENT_STATE_END -->

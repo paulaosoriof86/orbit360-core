@@ -4,16 +4,16 @@ Repositorio de Orbit 360.
 
 ## Estado operativo vivo — proyección derivada
 
-CANONICAL_STATE_FINGERPRINT: 30cb83ffbac563c75ea9b86ab25722f3648aa21a870a01bd1381de1d6c9d49d3
+CANONICAL_STATE_FINGERPRINT: 5e2d0052bae8ddaf1e5238bbb84011fe1b7ed60dbdd27d9d345a6336601ca855
 
 - Plan vigente: `orbit360-platform/docs/PLAN-MAESTRO-CONGELADO-SALIDA-PRODUCCION-SIN-BUCLES-ORBIT360-AYS-20260824.md`.
 - Autoridad mutable única: `orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json`.
-- Fase: `CONTROL_PLANE_DEFINITIVE_CAUSAL_PASS_AWAITING_F2_AUTHORIZATION`.
-- Estado: `CONTROL_PLANE_DEFINITIVE_CAUSAL_PASS`.
-- Ledger/package: `49/43`.
+- Fase: `F2_RUNTIME_ATTEMPT_ACCEPTED_PREFLIGHT_PENDING`.
+- Estado: `F2_RUNTIME_ATTEMPT_ACCEPTED_ONE_SHOT`.
+- Ledger/package: `52/46`.
 - Candidata: artifact `9504702901`, candidateSourceHead `8c9668d6d423e82826b0295431ec699390d79b4b`.
 - Progreso ruta a producción: **75%**.
-- Autorización/request/runtime: `false/false/false`.
-- Siguiente acción: `AWAIT_EXPLICIT_F2_RUNTIME_AUTHORIZATION_ONE_SHOT`.
+- Autorización/request/runtime: `true/true/false`.
+- Siguiente acción: `RUN_F2_SOURCE_AND_RUNTIME_PREFLIGHT_FAIL_CLOSED`.
 - Control-plane causal: `CONTROL_PLANE_DEFINITIVE_CAUSAL_PASS`.
 - branchHead no se persiste: se verifica desde el PR vivo para evitar drift autoinducido.
