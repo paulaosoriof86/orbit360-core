@@ -16,5 +16,5 @@
   "candidateArtifactId": 9504702901,
   "candidateSourceHead": "8c9668d6d423e82826b0295431ec699390d79b4b",
   "controlPlaneEvidence": "orbit360-platform/runtime-gate-crm-v20260716/control-plane-selftest-handshake-run-32882294356-v20260824.json",
-  "transportNonce": "hardening-close-single-transaction-prepare-20260825"
+  "transportNonce": "hardening-close-single-transaction-run-20260825"
 }
