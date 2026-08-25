@@ -15,5 +15,5 @@
   "expectedPackageRevision": 54,
   "candidateArtifactId": 9504702901,
   "candidateSourceHead": "8c9668d6d423e82826b0295431ec699390d79b4b",
-  "transportNonce": "provider-causal-rootfix-selftest-prepare-20260825"
+  "transportNonce": "provider-causal-rootfix-selftest-execute-once-20260825"
 }
