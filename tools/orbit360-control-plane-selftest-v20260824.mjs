@@ -15,6 +15,7 @@ const P={
   workflow:'.github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml',
   noRewrite:'tools/orbit360-control-plane-no-source-rewrite-guard-v20260824.mjs',
   sourceWriteGuardSelftest:'tools/orbit360-source-write-guard-behavioral-selftest-v20260825.mjs',
+  authLifecycle:'tools/orbit360-f2-authorization-lifecycle-v20260825.mjs',
   preflight:'tools/orbit360-macro3-mechanism-preflight-v20260823.mjs',
   sourcePrecheck:'tools/orbit360-validar-gate-contracts-engine-f2-productive-acceptance-v20260819.mjs',
   workflowAudit:'tools/orbit360-workflow-operational-surface-audit-v20260820.mjs',
@@ -53,6 +54,7 @@ let candidateBindingDynamic=false,semanticPreflightPass=false,scratchBehavioralT
 let workflowProviderUngatedNegativePass=false,workflowCandidateHardcodeNegativePass=false,workflowOperationalRevisionHardcodeNegativePass=false,sourceRewriteMutationNegativePass=false;
 let sourceWriteGuardBehavioralPass=false,temporaryInfrastructureAllowedPass=false,actualSourceWriteNegativePass=false;
 let authPublicationSurfacePass=false,runtimeRunIdBindingSimulationPass=false,runtimeRegisterReadOnlyPass=false,routerNativeRuntimeContractPass=false;
+let authorizationLifecyclePass=false,authorizationReservationDoesNotConsumePass=false,preRiskAuthorizationPreservationPass=false,preRiskAuthorizationReusePass=false,historicalRun329028RegressionPass=false,historicalRun329044RegressionPass=false;
 let semanticContract={};
 
 if(!failures.length){
@@ -65,6 +67,7 @@ if(!failures.length){
   need(contract.behavioralContractPolicy?.runtimeRouterMustSupportF2V3Natively===true,'SEMANTIC_CONTRACT_NATIVE_ROUTER_MISSING');
   need(contract.behavioralContractPolicy?.activeSourceFileWritesForbidden===true,'SEMANTIC_CONTRACT_SOURCE_WRITE_FORBIDDEN_MISSING');
   need(contract.behavioralContractPolicy?.sourceWriteGuardBehavioralNegativeRequired===true,'SEMANTIC_CONTRACT_SOURCE_WRITE_BEHAVIORAL_NEGATIVE_MISSING');
+  need(contract.behavioralContractPolicy?.authorizationReservationDoesNotConsumeOneShot===true&&contract.behavioralContractPolicy?.oneShotBudgetConsumedBeforeRuntimePreflight===false&&contract.behavioralContractPolicy?.oneShotBudgetConsumedOnlyAfterObservedPrivilegedRisk===true&&contract.behavioralContractPolicy?.preRiskMechanismFailurePreservesAuthorization===true,'SEMANTIC_CONTRACT_F2_AUTHORIZATION_RISK_BOUNDARY_MISSING');
   need(contract.behavioralSelftestRequirements?.workflowOperationalRevisionHardcodeNegativeTest===true,'SEMANTIC_CONTRACT_REVISION_NEGATIVE_TEST_MISSING');
   need(contract.behavioralSelftestRequirements?.sourceRewriteMutationNegativeTest===true,'SEMANTIC_CONTRACT_SOURCE_REWRITE_NEGATIVE_TEST_MISSING');
   need(contract.behavioralSelftestRequirements?.sourceWriteGuardBehavioralSelftest===true,'SEMANTIC_CONTRACT_SOURCE_WRITE_BEHAVIORAL_SELFTEST_MISSING');
@@ -72,6 +75,7 @@ if(!failures.length){
   need(contract.behavioralSelftestRequirements?.runtimeRunIdBindingSimulation===true,'SEMANTIC_CONTRACT_RUNTIME_RUN_BINDING_MISSING');
   need(contract.behavioralSelftestRequirements?.runtimeRegisterReadOnlyBehavioralTest===true,'SEMANTIC_CONTRACT_REGISTER_BEHAVIOR_TEST_MISSING');
   need(contract.behavioralSelftestRequirements?.nativeRuntimeRouterBehavioralTest===true,'SEMANTIC_CONTRACT_ROUTER_BEHAVIOR_TEST_MISSING');
+  need(contract.behavioralSelftestRequirements?.attemptReservationDoesNotConsumeTest===true&&contract.behavioralSelftestRequirements?.preRiskFailurePreservesAuthorizationTest===true&&contract.behavioralSelftestRequirements?.preRiskAuthorizationReuseTest===true,'SEMANTIC_CONTRACT_AUTHORIZATION_LIFECYCLE_BEHAVIORAL_TESTS_MISSING');
   candidateBindingDynamic=Number.isInteger(Number(candidate.artifactId))&&Number(candidate.artifactId)>0&&/^[a-f0-9]{40}$/.test(String(candidate.sourceHead||''))&&/^sha256:[a-f0-9]{64}$/.test(String(candidate.artifactDigest||''));
   need(candidateBindingDynamic,'DYNAMIC_CANDIDATE_INVALID');
   const hardeningOpen=L.activeState?.phase==='MACRO1_CONTROL_PLANE_TRUTH_HARDENING_SOURCE_ONLY'&&['CONTROL_PLANE_FALSE_PASS_INVALIDATED','CONTROL_PLANE_REGRESSION_OPEN_STOP_RETRY'].includes(L.activeState?.status);
@@ -80,6 +84,16 @@ if(!failures.length){
   need(L.activeState?.runtimeAuthorized===false&&L.activeState?.runtimeReplayAllowed===false,'SELFTEST_RUNTIME_NOT_CLOSED');
   need(L.authorizationBoundary?.activeRuntimeAuthorization===false&&L.authorizationBoundary?.activeRequestPath==null&&L.authorizationBoundary?.authorizationRecordPath==null&&(L.authorizationBoundary?.runtimeAttemptAccepted??false)===false,'SELFTEST_AUTH_REQUEST_NOT_INERT');
   need(Number(L.progress?.productionRouteProgressPct)===75&&L.progress?.f2TerminalPass===false,'SELFTEST_PROGRESS_NOT_FAIL_CLOSED');
+
+  const lifecycleProbe=runJson(ROOT,P.authLifecycle);
+  authorizationLifecyclePass=lifecycleProbe.result.status===0&&lifecycleProbe.json?.ok===true&&lifecycleProbe.json?.status==='F2_AUTHORIZATION_LIFECYCLE_SELFTEST_PASS';
+  authorizationReservationDoesNotConsumePass=authorizationLifecyclePass&&lifecycleProbe.json?.reservationDoesNotConsume===true;
+  historicalRun329028RegressionPass=authorizationLifecyclePass&&lifecycleProbe.json?.historicalRun329028PreservesAuthorization===true;
+  historicalRun329044RegressionPass=authorizationLifecyclePass&&lifecycleProbe.json?.historicalRun329044ConsumesAfterRisk===true;
+  need(authorizationLifecyclePass,'F2_AUTHORIZATION_LIFECYCLE_SELFTEST_FAIL');
+  need(authorizationReservationDoesNotConsumePass,'F2_AUTHORIZATION_RESERVATION_CONSUMED_BUDGET');
+  need(historicalRun329028RegressionPass,'F2_HISTORICAL_RUN_329028_REGRESSION_NOT_PROTECTED');
+  need(historicalRun329044RegressionPass,'F2_HISTORICAL_RUN_329044_REGRESSION_NOT_PROTECTED');
 
   const nr=runJson(ROOT,P.noRewrite);need(nr.result.status===0&&nr.json?.ok===true&&nr.json?.scopeMode==='MACHINE_READABLE_CONTRACT_DERIVED'&&nr.json?.sourceWritePatternsForbidden===true,'NO_SOURCE_REWRITE_GUARD_FAIL');
   const sourceWriteGuardProbe=runJson(ROOT,P.sourceWriteGuardSelftest);
@@ -208,8 +222,11 @@ if(!failures.length){
     const runtimeRun=handshakeRun+1;
     requireSuccess(scratch,P.delegatedOwner,['--transition','F2_RUNTIME_ATTEMPT_ACCEPT','--expected-revision',String(state.revision),'--expected-package-revision',String(state.productionReopeningPackage.revision),'--runtime-run-id',String(runtimeRun)],{},'SCRATCH_ATTEMPT_ACCEPT_FAIL');
     state=json(scratch,P.ledger);
+    const reservedAuth=json(scratch,state.authorizationBoundary.authorizationRecordPath),reservedRequest=json(scratch,state.authorizationBoundary.activeRequestPath);
+    authorizationReservationDoesNotConsumePass=authorizationReservationDoesNotConsumePass&&reservedAuth.allowedExecutions===1&&reservedRequest.allowedExecutions===1&&reservedAuth.consumed===false&&reservedRequest.consumed===false&&reservedAuth.runtimeAttemptReserved===true&&reservedRequest.runtimeAttemptReserved===true;
+    need(authorizationReservationDoesNotConsumePass,'SCRATCH_ATTEMPT_RESERVATION_CONSUMED_ONE_SHOT');
     const second=run(scratch,P.delegatedOwner,['--transition','F2_RUNTIME_ATTEMPT_ACCEPT','--expected-revision',String(state.revision),'--expected-package-revision',String(state.productionReopeningPackage.revision),'--runtime-run-id',String(runtimeRun)]);
-    secondAttemptStopRetryPass=second.status!==0&&`${second.stdout||''}\n${second.stderr||''}`.includes('RUNTIME_ATTEMPT_ALREADY_ACCEPTED_STOP_RETRY');
+    secondAttemptStopRetryPass=second.status!==0&&`${second.stdout||''}\n${second.stderr||''}`.includes('RUNTIME_ATTEMPT_ALREADY_RESERVED_STOP_RETRY');
     need(secondAttemptStopRetryPass,'SECOND_ATTEMPT_STOP_RETRY_NOT_ENFORCED');
 
     const allowed=new Set([scratchRegistry.sourceOfTruth,...(scratchRegistry.projectionTargets||[]),state.authorizationBoundary?.authorizationRecordPath,state.authorizationBoundary?.activeRequestPath].filter(Boolean));
@@ -217,7 +234,7 @@ if(!failures.length){
     authPublicationSurfacePass=changedAfterAccept.length>0&&unauthorized.length===0&&allowed.has(scratchRegistry.sourceOfTruth);
     need(authPublicationSurfacePass,`AUTH_PUBLICATION_SURFACE_NOT_CANONICAL:${JSON.stringify(unauthorized)}`);
     need(evidenceChanges(scratch).length===0,'AUTH_PUBLICATION_SURFACE_CONTAINS_TRANSIENT_EVIDENCE');
-    git(scratch,['add','-A']);git(scratch,['commit','-m','selftest: accept one-shot in scratch']);
+    git(scratch,['add','-A']);git(scratch,['commit','-m','selftest: reserve one-shot in scratch without consuming budget']);
 
     state=json(scratch,P.ledger);
     const requestPath=state.authorizationBoundary?.activeRequestPath;
@@ -245,14 +262,22 @@ if(!failures.length){
     state=json(scratch,P.ledger);
     const terminalRel=`${EVIDENCE_DIR}/f2-runtime-terminal-inline-${runtimeRun}.json`;
     fs.writeFileSync(A(scratch,terminalRel),JSON.stringify({
-      schemaVersion:'orbit360-f2-terminal-v7-publication-aware',ok:false,status:'F2_PRODUCTIVE_ACCEPTANCE_FAIL',classification:'PIPELINE_MECHANISM_FAILURE',failureCode:'PIPELINE_MECHANISM_FAILURE:SELFTEST_SYNTHETIC_PREPUBLICATION_FAILURE',error:'PIPELINE_MECHANISM_FAILURE:SELFTEST_SYNTHETIC_PREPUBLICATION_FAILURE',runId:runtimeRun,browserRunId:0,integrityRunId:0,request:requestPath,candidateArtifactId:Number(scratchCandidate.artifactId),runtimeAttemptAccepted:true,allowedExecutions:0,browserMatrixPass:false,integrityBeforeAfterPass:false,zeroCrossTenant:false,zeroUnexpectedWrites:true,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,publicationExecuted:false,productionHostingTouched:false,containsPII:false,containsSecrets:false
+      schemaVersion:'orbit360-f2-terminal-v7-publication-aware',ok:false,status:'F2_PRODUCTIVE_ACCEPTANCE_FAIL',classification:'PIPELINE_MECHANISM_FAILURE',failureCode:'PIPELINE_MECHANISM_FAILURE:SELFTEST_SYNTHETIC_PREPUBLICATION_FAILURE',error:'PIPELINE_MECHANISM_FAILURE:SELFTEST_SYNTHETIC_PREPUBLICATION_FAILURE',runId:runtimeRun,browserRunId:0,integrityRunId:0,request:requestPath,candidateArtifactId:Number(scratchCandidate.artifactId),runtimeAttemptAccepted:true,allowedExecutions:1,browserMatrixPass:false,integrityBeforeAfterPass:false,zeroCrossTenant:false,zeroUnexpectedWrites:true,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,publicationExecuted:false,productionHostingTouched:false,containsPII:false,containsSecrets:false
     },null,2)+'\n','utf8');
     requireSuccess(scratch,P.delegatedOwner,['--transition','F2_RUNTIME_TERMINAL_RECONCILE_GENERIC','--expected-revision',String(state.revision),'--expected-package-revision',String(state.productionReopeningPackage.revision),'--terminal-evidence',terminalRel],{},'SCRATCH_TERMINAL_REDUCER_FAIL');
     const reduced=json(scratch,P.ledger);
-    scratchBehavioralTransitionsPass=reduced.activeState?.status==='F2_TERMINAL_RECONCILED_NO_REPLAY'&&reduced.authorizationBoundary?.activeRuntimeAuthorization===false&&reduced.authorizationBoundary?.activeRequestPath==null&&reduced.authorizationBoundary?.authorizationRecordPath==null&&reduced.activeState?.runtimeReplayAllowed===false&&reduced.nextAction?.id==='DIAGNOSE_ROOT_CAUSE_BEFORE_ANY_FRESH_AUTHORIZATION'&&Number(reduced.progress?.productionRouteProgressPct)===75;
-    need(scratchBehavioralTransitionsPass,'SCRATCH_TERMINAL_REDUCER_STATE_INVALID');
+    preRiskAuthorizationPreservationPass=reduced.activeState?.status==='F2_PRE_RISK_FAILURE_AUTHORIZATION_PRESERVED'&&reduced.authorizationBoundary?.activeRuntimeAuthorization===false&&reduced.authorizationBoundary?.activeRequestPath==null&&reduced.authorizationBoundary?.authorizationRecordPath==null&&reduced.authorizationBoundary?.freshAuthorizationRequired===false&&reduced.authorizationBoundary?.preRiskAuthorizationReuseAllowed===true&&reduced.productionReopeningPackage?.authorizationAllowed===true&&reduced.productionReopeningPackage?.authorizationReuseAllowed===true&&reduced.nextAction?.userActionRequired===false&&reduced.nextAction?.reuseExistingAuthorization===true&&Number(reduced.progress?.productionRouteProgressPct)===75;
+    need(preRiskAuthorizationPreservationPass,'SCRATCH_PRE_RISK_AUTHORIZATION_NOT_PRESERVED');
+    const reuseAuth=runJson(scratch,P.delegatedOwner,['--transition','F2_RUNTIME_AUTHORIZATION_PERSIST','--expected-revision',String(reduced.revision),'--expected-package-revision',String(reduced.productionReopeningPackage.revision),'--authorization-identity',authIdentity]);
+    need(reuseAuth.result.status===0&&reuseAuth.json?.authorizationReused===true,'SCRATCH_PRE_RISK_AUTHORIZATION_REUSE_FAIL');
+    state=json(scratch,P.ledger);
+    const reuseRequest=runJson(scratch,P.delegatedOwner,['--transition','F2_RUNTIME_REQUEST_MATERIALIZE','--expected-revision',String(state.revision),'--expected-package-revision',String(state.productionReopeningPackage.revision),'--authorization-identity',authIdentity,'--parent-head',closedHead]);
+    preRiskAuthorizationReusePass=reuseRequest.result.status===0&&reuseRequest.json?.requestReused===true;
+    need(preRiskAuthorizationReusePass,'SCRATCH_PRE_RISK_REQUEST_REUSE_FAIL');
+    scratchBehavioralTransitionsPass=preRiskAuthorizationPreservationPass&&preRiskAuthorizationReusePass&&authorizationReservationDoesNotConsumePass&&secondAttemptStopRetryPass;
+    need(scratchBehavioralTransitionsPass,'SCRATCH_AUTHORIZATION_LIFECYCLE_STATE_INVALID');
 
-    negativeRegressionSuitePass=workflowProviderUngatedNegativePass&&workflowCandidateHardcodeNegativePass&&workflowOperationalRevisionHardcodeNegativePass&&sourceRewriteMutationNegativePass&&secondAttemptStopRetryPass&&projectionImmutabilityPass&&authPublicationSurfacePass&&runtimeRunIdBindingSimulationPass&&runtimeRegisterReadOnlyPass&&routerNativeRuntimeContractPass;
+    negativeRegressionSuitePass=workflowProviderUngatedNegativePass&&workflowCandidateHardcodeNegativePass&&workflowOperationalRevisionHardcodeNegativePass&&sourceRewriteMutationNegativePass&&secondAttemptStopRetryPass&&projectionImmutabilityPass&&authPublicationSurfacePass&&runtimeRunIdBindingSimulationPass&&runtimeRegisterReadOnlyPass&&routerNativeRuntimeContractPass&&authorizationLifecyclePass&&authorizationReservationDoesNotConsumePass&&preRiskAuthorizationPreservationPass&&preRiskAuthorizationReusePass&&historicalRun329028RegressionPass&&historicalRun329044RegressionPass;
     need(negativeRegressionSuitePass,'NEGATIVE_REGRESSION_SUITE_FAIL');
   }catch(error){need(false,`SCRATCH_BEHAVIORAL_SIMULATION_FAIL:${String(error?.message||error).slice(0,700)}`);}
   finally{
@@ -262,7 +287,7 @@ if(!failures.length){
 }
 
 const out={
-  schemaVersion:'orbit360-control-plane-selftest-v14-canonical-source-write-behavioral-owner',
+  schemaVersion:'orbit360-control-plane-selftest-v15-f2-authorization-risk-boundary',
   ok:false,
   status:'CONTROL_PLANE_SELFTEST_FAIL',
   classification:'PIPELINE_MECHANISM_FAILURE',
@@ -291,10 +316,17 @@ const out={
   runtimeRunIdBindingSimulationPass,
   runtimeRegisterReadOnlyPass,
   routerNativeRuntimeContractPass,
+  authorizationLifecyclePass,
+  authorizationReservationDoesNotConsumePass,
+  preRiskAuthorizationPreservationPass,
+  preRiskAuthorizationReusePass,
+  historicalRun329028RegressionPass,
+  historicalRun329044RegressionPass,
   negativeRegressionSuitePass,
   validatorMode:'MACHINE_READABLE_CONTRACT_PLUS_BEHAVIORAL_EXECUTION',
   sourceShapeValidationUsed:false,
   sourceWriteNegativeTestOwner:P.sourceWriteGuardSelftest,
+  authorizationLifecycleOwner:P.authLifecycle,
   sourceRewriteMutationNegativeCompatibilityAlias:true,
   durableHandshakeMustBePublishedByCanonicalWorkflow:true,
   prepublicationFailureMustBeCanonicallyReduced:true,
