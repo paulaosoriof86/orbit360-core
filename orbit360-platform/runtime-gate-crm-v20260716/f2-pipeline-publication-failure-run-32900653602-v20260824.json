@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "orbit360-f2-control-plane-failure-v7-provider-causal-evidence",
+  "ok": false,
+  "status": "F2_SEALED_FAILURE_SOURCE_ROOT_CAUSE_CONFIRMED",
+  "classification": "PIPELINE_MECHANISM_FAILURE",
+  "correctedClassification": "PIPELINE_MECHANISM_FAILURE",
+  "failureCode": "F2_STAGE_OUTCOME:authpublish=success;gate=success;provider=failure;browser=skipped;integrity=skipped",
+  "correctedFailureCode": "PIPELINE_MECHANISM_FAILURE:F2_PROVIDER_CAUSAL_EVIDENCE_DROPPED_AND_OBSERVATION_FLAGS_NON_MONOTONIC",
+  "runId": 32900653602,
+  "jobId": 97973478928,
+  "technicalPullRequest": 124,
+  "terminalEvidencePath": "orbit360-platform/runtime-gate-crm-v20260716/f2-runtime-terminal-inline-32900653602.json",
+  "candidateArtifactId": 9504702901,
+  "candidateSourceHead": "8c9668d6d423e82826b0295431ec699390d79b4b",
+  "candidateArtifactDigest": "sha256:f11dd2a350b4160465dfc93b0dd9153e697d09773fa00aa4ee5ed13d93401ca2",
+  "rootCause": {
+    "code": "PIPELINE_MECHANISM_FAILURE:F2_PROVIDER_CAUSAL_EVIDENCE_DROPPED_AND_OBSERVATION_FLAGS_NON_MONOTONIC",
+    "family": "PROVIDER_CAUSAL_EVIDENCE_REDUCTION",
+    "primaryComponent": "tools/orbit360-m6-resolve-smoke-identity-readonly-v20260730.mjs",
+    "terminalComponent": "tools/orbit360-f2-terminal-evidence-normalizer-v20260824.mjs",
+    "observedMismatch": "The provider resolver exited 41 and wrote a current-run identity evidence file, but did not emit it to stdout; terminal construction had no provider input and reduced only a generic stage outcome. Class-wide pre-terminal cleanup then removed the transient identity evidence.",
+    "observationMismatch": "The resolver catch forced authRead/firestoreRead false independent of the stage reached; job logs also prove the GitHub Actions service-account secret was bound and structurally validated before resolver execution, while the terminal recorded secretAccess=false.",
+    "unknownUnderlyingProviderCause": true,
+    "unknownUnderlyingProviderCauseReason": "The causal provider JSON was not preserved or logged in run 32900653602. Assigning a secret, permission, network, identity, membership or data cause would be speculative.",
+    "rootfix": "Emit sanitized provider evidence, track attempted/completed observations monotonically, create a current-run pre-browser runtime failure envelope consumed by the existing terminal reducer, and gate the contract through the existing source-only validator policy audit before future authorization."
+  },
+  "rootfixCommits": [
+    "52c9dfa18924ad97f97f3ea42cec429b7f4fe123",
+    "863f679df71fde344f7085ebfec9e1396f8f71bf",
+    "16c0d8e1e69c3df1158cf75b92784c914001c428",
+    "5ffcfc188062ad3d837d1837cd549c062a112831"
+  ],
+  "rootfixPaths": [
+    "tools/orbit360-f2-provider-failure-evidence-v20260825.mjs",
+    "tools/orbit360-m6-resolve-smoke-identity-readonly-v20260730.mjs",
+    "tools/orbit360-f2-validator-semantic-policy-audit-v20260825.mjs",
+    "orbit360-platform/docs/ROOTFIX-F2-PROVIDER-CAUSAL-EVIDENCE-20260825.md"
+  ],
+  "canonicalPublication": {
+    "acceptedStatePublished": true,
+    "terminalStatePublished": true,
+    "prBodyAdvancedFromUnpublishedState": false
+  },
+  "stopRetry": {
+    "active": true,
+    "newF2AttemptAllowed": false,
+    "workflowRerunAllowed": false,
+    "freshAuthorizationRequiredAfterSourceOnlyClosure": true
+  },
+  "sideEffects": {
+    "runtimeExecuted": false,
+    "browserExecuted": false,
+    "secretAccess": false,
+    "firestoreRead": false,
+    "firestoreWrites": 0,
+    "authWrites": 0,
+    "operationalWrites": 0,
+    "deployExecuted": false,
+    "productionTouched": false
+  },
+  "observationCorrection": {
+    "terminalSideEffectFlagsAboveAreSealedRunRecordedFlags": true,
+    "credentialMaterialBoundObservedInSanitizedJobLog": true,
+    "credentialJsonStructureValidatedBeforeResolver": true,
+    "actualAuthReadCompletionUnknown": true,
+    "actualFirestoreReadCompletionUnknown": true,
+    "reason": "The root cause is precisely that provider observation evidence was not durably reduced. No unproven read completion is asserted."
+  },
+  "candidateUnchanged": true,
+  "replayAllowed": false,
+  "sourceOnlyRootfix": true,
+  "legacyTransportFilename": true,
+  "legacyTransportFilenameNote": "The existing canonical CONTROL_PLANE_REGRESSION_REOPEN transport uses this historical file family name. The file records a provider causal-observability mechanism failure, not a publication failure.",
+  "containsPII": false,
+  "containsSecrets": false
+}
