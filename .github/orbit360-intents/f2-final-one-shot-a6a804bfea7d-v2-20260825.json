@@ -20,5 +20,5 @@
   "candidateArtifactDigest": "sha256:f11dd2a350b4160465dfc93b0dd9153e697d09773fa00aa4ee5ed13d93401ca2",
   "candidateSourceHead": "8c9668d6d423e82826b0295431ec699390d79b4b",
   "purpose": "Execute exactly one fresh F2 read-only runtime acceptance after closed-state pre-auth selftest PASS. Same explicit authorization event remains unconsumed. No replay, writes, deploy, production, main or merge.",
-  "synchronizeNonce": "prepare-v2-20260825"
+  "synchronizeNonce": "execute-once-v2-20260825"
 }
