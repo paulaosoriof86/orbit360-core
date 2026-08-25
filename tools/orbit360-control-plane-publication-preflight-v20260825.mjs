@@ -44,7 +44,7 @@ function allowedSurface(registry,allChanged,selftestMode,closeState){
     if(publicationClass==='F2_TERMINAL')return m.f2Auth||m.f2Request||m.f2Terminal;
     return false;
   };
-  if(selftestMode&&publicationClass==='CONTROL_PLANE_CLOSE'){
+  if(selftestMode&&closeState){
     const unexpected=allChanged.filter(p=>!classAllows(p)&&!isEvidence(p));
     if(unexpected.length)fail('SELFTEST_PUBLICATION_NON_EVIDENCE_RESIDUE',unexpected.join(','));
     ignoredSelftestEvidence=allChanged.filter(p=>!classAllows(p)&&isEvidence(p));
