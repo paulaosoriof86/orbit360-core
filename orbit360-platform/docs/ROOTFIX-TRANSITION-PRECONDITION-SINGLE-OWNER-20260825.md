@@ -22,9 +22,11 @@ La precondición de estado de `CONTROL_PLANE_REGRESSION_REOPEN` estaba duplicada
 8. Macro3 ejecuta conductualmente el precondition owner cuando el ledger vivo está en un F2 terminal de mecanismo; el workflow vuelve a ejecutarlo inmediatamente antes de la transición real. La recuperación no depende de una comprobación textual.
 9. El contrato de publicación machine-readable del rootfix anterior permanece obligatorio: stdout JSON único para `PUBLISH_VALIDATED`; stderr queda fuera del contrato.
 
-## Alcance
+## Alcance congelado para bootstrap
 
-Solo control-plane, documentación y validadores. No modifica candidata `9504702901`, producto, datos, Auth funcional, Firestore, provider, navegador, deploy, producción, main ni merge.
+El delta contra la rama canónica previa contiene exclusivamente siete superficies de control-plane/documentación: workflow canónico, este documento, semantic contract, writer registry, Macro3, workflow audit y transition precondition owner. No contiene candidata, módulos de producto, datos, Auth funcional, Firestore, provider ni runtime.
+
+No modifica candidata `9504702901`, producto, datos, Auth funcional, Firestore, provider, navegador, deploy, producción, main ni merge.
 
 ## Gate de salida
 
