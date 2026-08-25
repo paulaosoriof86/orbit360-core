@@ -15,5 +15,5 @@
   "expectedPackageRevision": 42,
   "candidateArtifactId": 9504702901,
   "candidateSourceHead": "8c9668d6d423e82826b0295431ec699390d79b4b",
-  "transportNonce": "control-plane-selftest-post-source-write-guard-initial"
+  "transportNonce": "control-plane-selftest-post-source-write-guard-run-once-20260825"
 }
