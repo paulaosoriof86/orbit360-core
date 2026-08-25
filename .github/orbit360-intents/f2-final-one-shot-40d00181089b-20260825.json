@@ -20,5 +20,5 @@
   "candidateArtifactDigest": "sha256:f11dd2a350b4160465dfc93b0dd9153e697d09773fa00aa4ee5ed13d93401ca2",
   "candidateSourceHead": "8c9668d6d423e82826b0295431ec699390d79b4b",
   "purpose": "Execute exactly one fresh F2 read-only runtime acceptance against certified candidate 9504702901 under the explicit authorization received on 2026-08-25. No replay, writes, deploy, production, main or merge.",
-  "synchronizeNonce": "prepare-20260825T2203Z"
+  "synchronizeNonce": "execute-once-20260825T2205Z"
 }
