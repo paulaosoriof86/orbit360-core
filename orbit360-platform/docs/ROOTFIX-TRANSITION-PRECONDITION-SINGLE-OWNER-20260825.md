@@ -26,6 +26,8 @@ La precondición de estado de `CONTROL_PLANE_REGRESSION_REOPEN` estaba duplicada
 
 El delta contra la rama canónica previa contiene exclusivamente siete superficies de control-plane/documentación: workflow canónico, este documento, semantic contract, writer registry, Macro3, workflow audit y transition precondition owner. No contiene candidata, módulos de producto, datos, Auth funcional, Firestore, provider ni runtime.
 
+La auditoría previa al bootstrap confirmó avance lineal sin divergencia (`ahead`, `behind:0`) y la rama canónica permaneció inmutable durante la preparación. No se ejecutó runtime para validar este rootfix.
+
 No modifica candidata `9504702901`, producto, datos, Auth funcional, Firestore, provider, navegador, deploy, producción, main ni merge.
 
 ## Gate de salida
