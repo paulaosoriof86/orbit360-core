@@ -6,10 +6,25 @@ import path from 'node:path';
 const ROOT=process.env.ORBIT360_ROOT?path.resolve(process.env.ORBIT360_ROOT):process.cwd();
 const DIR=path.join(ROOT,'.github/workflows');
 const CANONICAL='.github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml';
+const SNAPSHOT=String(process.env.ORBIT360_WORKFLOW_SOURCE_FILE||'').trim();
 const files=fs.existsSync(DIR)?fs.readdirSync(DIR).filter(f=>/\.ya?ml$/i.test(f)).sort():[];
 const offenders=[],inspected=[];
+const canonicalAbs=path.join(ROOT,CANONICAL);
+const canonicalRepoText=fs.existsSync(canonicalAbs)?fs.readFileSync(canonicalAbs,'utf8'):'';
+let snapshotText=null,snapshotBound=true;
+if(SNAPSHOT){
+  const abs=path.resolve(SNAPSHOT);
+  if(!fs.existsSync(abs)||!fs.statSync(abs).isFile()){offenders.push({path:CANONICAL,reason:'EXECUTING_WORKFLOW_SNAPSHOT_MISSING'});snapshotBound=false;}
+  else{
+    snapshotText=fs.readFileSync(abs,'utf8');
+    if(snapshotText!==canonicalRepoText){offenders.push({path:CANONICAL,reason:'EXECUTING_WORKFLOW_SNAPSHOT_DRIFT'});snapshotBound=false;}
+  }
+}
 for(const name of files){
-  const rel='.github/workflows/'+name,text=fs.readFileSync(path.join(DIR,name),'utf8'),signals=[];
+  const rel='.github/workflows/'+name;
+  const repoText=fs.readFileSync(path.join(DIR,name),'utf8');
+  const text=rel===CANONICAL&&snapshotText!=null?snapshotText:repoText;
+  const signals=[];
   if(/permissions\s*:[\s\S]{0,600}?contents\s*:\s*write\b/i.test(text))signals.push('contents:write');
   if(/permissions\s*:[\s\S]{0,600}?actions\s*:\s*write\b/i.test(text))signals.push('actions:write');
   if(/^\s*workflow_dispatch\s*:/mi.test(text))signals.push('workflow-dispatch-event');
@@ -39,16 +54,19 @@ for(const name of files){
 const canonicalCount=files.filter(name=>'.github/workflows/'+name===CANONICAL).length;
 if(files.length!==1||canonicalCount!==1)offenders.push({path:CANONICAL,reason:'SINGLE_WORKFLOW_INVARIANT_BROKEN',totalWorkflowFiles:files.length});
 const result={
-  schemaVersion:'orbit360-workflow-control-surface-audit-v6-dynamic-operational-contract',
+  schemaVersion:'orbit360-workflow-control-surface-audit-v7-snapshot-aware-single-topology-owner',
   ok:offenders.length===0,
   status:offenders.length?'WORKFLOW_CONTROL_SURFACE_AUDIT_FAIL':'WORKFLOW_CONTROL_SURFACE_AUDIT_PASS',
   canonicalWorkflow:CANONICAL,
+  topologySemanticOwner:'tools/orbit360-workflow-operational-surface-audit-v20260820.mjs',
+  executingSnapshotProvided:Boolean(SNAPSHOT),
+  executingSnapshotBound:SNAPSHOT?snapshotBound:true,
   totalWorkflowFiles:files.length,
   workflowsWithSignals:inspected.length,
   unauthorizedControlWorkflows:offenders.length,
   offenders,
   inspected,
-  semanticPolicy:{gateOrderByTechnicalStepIds:true,providerDependencyRequired:true,candidateHardcodingForbidden:true,authorizationHardcodingForbidden:true,operationalRevisionHardcodingForbidden:true},
+  semanticPolicy:{gateOrderByTechnicalStepIds:true,providerDependencyRequired:true,candidateHardcodingForbidden:true,authorizationHardcodingForbidden:true,operationalRevisionHardcodingForbidden:true,executingSnapshotMustEqualCanonical:true,duplicateTopologyParsersForbidden:true},
   runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,operationalWrites:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false
 };
 console.log(JSON.stringify(result,null,2));if(!result.ok)process.exit(41);
