@@ -1,0 +1,66 @@
+{
+  "schemaVersion": "orbit360-f2-control-plane-failure-v6-causal-rootcause",
+  "ok": false,
+  "status": "F2_SEALED_FAILURE_SOURCE_ROOT_CAUSE_CONFIRMED",
+  "classification": "PIPELINE_MECHANISM_FAILURE",
+  "correctedClassification": "VALIDATOR_STALE",
+  "failureCode": "PIPELINE_MECHANISM_FAILURE:F2_ONE_SHOT_ACCEPT_CONTRACT_MISSING",
+  "correctedFailureCode": "VALIDATOR_STALE:F2_PREPROVIDER_VALIDATORS_BOUND_TO_IMPLEMENTATION_LITERALS",
+  "runId": 32898203403,
+  "jobId": 97965614370,
+  "technicalPullRequest": 120,
+  "terminalEvidencePath": "orbit360-platform/runtime-gate-crm-v20260716/f2-runtime-terminal-inline-32898203403.json",
+  "candidateArtifactId": 9504702901,
+  "candidateSourceHead": "8c9668d6d423e82826b0295431ec699390d79b4b",
+  "candidateArtifactDigest": "sha256:f11dd2a350b4160465dfc93b0dd9153e697d09773fa00aa4ee5ed13d93401ca2",
+  "rootCause": {
+    "code": "VALIDATOR_STALE:F2_PREPROVIDER_VALIDATORS_BOUND_TO_IMPLEMENTATION_LITERALS",
+    "family": "SOURCE_TEXT_USED_AS_BEHAVIORAL_PROOF",
+    "primaryValidator": "tools/orbit360-test-f2-full-runtime-known-rootfixes-v20260819.mjs",
+    "sameFamilyValidator": "tools/orbit360-f2-exact-candidate-source-validator-v20260819.mjs",
+    "observedMismatch": "The accepted request proved runtimeAttemptAccepted=true, allowedExecutions=0 and current-run binding, while the validator rejected the workflow because the literal text allowedExecutions==0 was absent.",
+    "contractConflict": "orbit360-platform/docs/orbit360-control-plane-semantic-contract-v20260824.json already requires sourceTextMayNotProveBehavior=true and literalImplementationStringChecksForbidden=true.",
+    "rootfix": "Replace implementation-text behavioral assertions with request state, durable candidate certification, manifest/full rehash, semantic contract and canonical workflow topology owner; add a pre-auth validator semantic policy audit through Macro3."
+  },
+  "rootfixCommits": [
+    "2727ee31b7553990659a7b11b5ca8b5e488c9131",
+    "799e6ce36b083ee18303dbdf5e26092fa8e03a01",
+    "236540ebe66060cc699388067c7ee6980c4996e2",
+    "924c935fee0519ca4db66123671c7c68ca30fbb3"
+  ],
+  "rootfixPaths": [
+    "tools/orbit360-test-f2-full-runtime-known-rootfixes-v20260819.mjs",
+    "tools/orbit360-f2-exact-candidate-source-validator-v20260819.mjs",
+    "tools/orbit360-f2-validator-semantic-policy-audit-v20260825.mjs",
+    "tools/orbit360-macro3-mechanism-preflight-v20260823.mjs"
+  ],
+  "canonicalPublication": {
+    "acceptedStatePublished": true,
+    "terminalStatePublished": true,
+    "prBodyAdvancedFromUnpublishedState": false
+  },
+  "stopRetry": {
+    "active": true,
+    "newF2AttemptAllowed": false,
+    "workflowRerunAllowed": false,
+    "freshAuthorizationRequiredAfterSourceOnlyClosure": true
+  },
+  "sideEffects": {
+    "runtimeExecuted": false,
+    "browserExecuted": false,
+    "secretAccess": false,
+    "firestoreRead": false,
+    "firestoreWrites": 0,
+    "authWrites": 0,
+    "operationalWrites": 0,
+    "deployExecuted": false,
+    "productionTouched": false
+  },
+  "candidateUnchanged": true,
+  "replayAllowed": false,
+  "sourceOnlyRootfix": true,
+  "legacyTransportFilename": true,
+  "legacyTransportFilenameNote": "The existing canonical CONTROL_PLANE_REGRESSION_REOPEN transport accepts this historical file family name. Classification is preserved as observed in the sealed terminal; correctedClassification records the causal diagnosis.",
+  "containsPII": false,
+  "containsSecrets": false
+}
