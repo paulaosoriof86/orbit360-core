@@ -1,6 +1,6 @@
 {
   "schemaVersion": "orbit360-live-state-v4-derived",
-  "updatedAt": "2026-08-25T22:41:39.134Z",
+  "updatedAt": "2026-08-25T22:45:21.200Z",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
@@ -11,15 +11,15 @@
   "authorizationBoundary": "orbit360-platform/docs/orbit360-f2-runtime-authorization-boundary-v20260820.json",
   "writerRegistry": "orbit360-platform/docs/orbit360-continuity-writer-registry-v20260820.json",
   "derived": true,
-  "canonicalStateFingerprint": "7c59e3f380e82a8b6eb68574e184a32d5424d7431ece634697a05c5fb80302ce",
+  "canonicalStateFingerprint": "26034ba9e56235b81cd9a4c729345225fae081ba7dd5a0214099c4f304c5557c",
   "canonicalCurrent": {
     "stateVersion": "ORBIT360-F2-CONTINUITY-CURRENT",
-    "ledgerRevision": 72,
-    "packageRevision": 66,
-    "phase": "MACRO1_CONTROL_PLANE_TRUTH_HARDENING_SOURCE_ONLY",
-    "status": "CONTROL_PLANE_REGRESSION_OPEN_STOP_RETRY",
-    "nextAction": "RUN_EXACT_F2_SOURCE_PATH_CLASSWIDE_EVIDENCE_SELFTEST",
-    "firstIncompleteStep": "CONTROL-PLANE-FULL-PATH-REGRESSION",
+    "ledgerRevision": 73,
+    "packageRevision": 67,
+    "phase": "CONTROL_PLANE_DEFINITIVE_CAUSAL_PASS_AWAITING_F2_AUTHORIZATION",
+    "status": "CONTROL_PLANE_DEFINITIVE_CAUSAL_PASS",
+    "nextAction": "AWAIT_EXPLICIT_F2_RUNTIME_AUTHORIZATION_ONE_SHOT",
+    "firstIncompleteStep": "F2-RUNTIME-AUTHORIZATION",
     "artifactId": 9504702901,
     "artifactDigest": "sha256:f11dd2a350b4160465dfc93b0dd9153e697d09773fa00aa4ee5ed13d93401ca2",
     "sourceHead": "8c9668d6d423e82826b0295431ec699390d79b4b",
@@ -50,13 +50,13 @@
     "runtimeAllowed": false
   },
   "nextActionExact": {
-    "id": "RUN_EXACT_F2_SOURCE_PATH_CLASSWIDE_EVIDENCE_SELFTEST",
-    "description": "Revalidate the exact F2 pre-authorization source path, semantic contracts and behavioral scratch transitions before any fresh authorization.",
+    "id": "AWAIT_EXPLICIT_F2_RUNTIME_AUTHORIZATION_ONE_SHOT",
+    "description": "Await one fresh explicit F2 runtime authorization only after semantic-contract and behavioral scratch closure.",
     "runtimeAllowed": false
   },
   "lanes": {
-    "A_frontend_ux_academia": "MACRO2_TRANSVERSAL_SOURCE_ACCEPTANCE_CLOSED_PRODUCT_FROZEN",
-    "B_backend_security_gates": "CONTROL_PLANE_REGRESSION_OPEN_STOP_RETRY",
+    "A_frontend_ux_academia": "MACRO2_TRANSVERSAL_SOURCE_ACCEPTANCE_CLOSED",
+    "B_backend_security_gates": "CONTROL_PLANE_SEMANTIC_BEHAVIORAL_PASS_AWAITING_FRESH_F2_AUTHORIZATION",
     "C_real_data_migration": "UNCHANGED_FROZEN"
   },
   "progress": {
