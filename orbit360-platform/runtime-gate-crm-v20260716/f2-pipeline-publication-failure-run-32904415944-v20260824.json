@@ -1,0 +1,68 @@
+{
+  "schemaVersion": "orbit360-f2-control-plane-failure-v8-cross-tenant-console-attribution",
+  "ok": false,
+  "status": "F2_SEALED_FAILURE_SOURCE_ROOT_CAUSE_CONFIRMED",
+  "classification": "FUNCTIONAL_DEFECT",
+  "correctedClassification": "VALIDATOR_STALE",
+  "failureCode": "FUNCTIONAL_DEFECT:F2_CONSOLE_ERRORS:HTTP_400_GENERIC",
+  "correctedFailureCode": "VALIDATOR_STALE:F2_EXPECTED_DENIAL_CONSOLE_ERROR_CAUSAL_ATTRIBUTION_MISSING",
+  "runId": 32904415944,
+  "jobId": 97985158067,
+  "technicalPullRequest": 132,
+  "terminalEvidencePath": "orbit360-platform/runtime-gate-crm-v20260716/f2-runtime-terminal-inline-32904415944.json",
+  "candidateArtifactId": 9504702901,
+  "candidateSourceHead": "8c9668d6d423e82826b0295431ec699390d79b4b",
+  "candidateArtifactDigest": "sha256:f11dd2a350b4160465dfc93b0dd9153e697d09773fa00aa4ee5ed13d93401ca2",
+  "rootCause": {
+    "code": "VALIDATOR_STALE:F2_EXPECTED_DENIAL_CONSOLE_ERROR_CAUSAL_ATTRIBUTION_MISSING",
+    "family": "EXPECTED_SECURITY_DENIAL_SIGNAL_MIXED_WITH_GENERIC_CONSOLE_FAILURES",
+    "observedFacts": {
+      "sourceOnlyGatePass": true,
+      "attemptAcceptedOnce": true,
+      "semanticGatePass": true,
+      "providerPass": true,
+      "integrityBeforePass": true,
+      "browserExecuted": true,
+      "routeTraceCount": 21,
+      "routeTraceAllPass": true,
+      "crossTenantDenied": true,
+      "pageErrors": 0,
+      "consoleErrors": 1,
+      "consoleErrorWasGenericHttp400": true,
+      "writeSignals": 0,
+      "integrityAfterPass": true,
+      "integrityComparePass": true,
+      "zeroWrites": true
+    },
+    "sourceMismatch": "The browser runner intentionally performs the cross-tenant denied getDoc before the global consoleErrors.length===0 assertion, while the console listener stores only generic text without request URL, status origin or probe phase. Therefore the terminal cannot causally prove that the single HTTP 400 is a product defect.",
+    "rootfix": "Keep the full runner strict. At current-run evidence binding, only for the exact console-only ambiguity, execute a targeted read-only diagnostic against the same candidate and identity. Normalize the signal only if cross-tenant denial is reproduced, a Firestore 400/403 is observed in the diagnostic window, and the diagnostic console message exactly matches the original single console error. Any unrelated or unreproduced 400 remains FAIL. Add a pure attribution selftest to the existing pre-auth semantic-policy gate."
+  },
+  "rootfixPaths": [
+    "tools/orbit360-f2-cross-tenant-console-attribution-v20260825.mjs",
+    "tools/orbit360-f2-cross-tenant-console-diagnostic-v20260825.mjs",
+    "tools/orbit360-bind-f2-browser-evidence-run-v20260824.mjs",
+    "tools/orbit360-f2-validator-semantic-policy-audit-v20260825.mjs"
+  ],
+  "stopRetry": {
+    "active": true,
+    "consumedRunReplayAllowed": false,
+    "workflowRerunAllowed": false,
+    "freshAuthorizationRequiredAfterSourceOnlyClosure": true
+  },
+  "sideEffects": {
+    "runtimeExecuted": true,
+    "browserExecuted": true,
+    "secretAccess": true,
+    "firestoreRead": true,
+    "firestoreWrites": 0,
+    "authWrites": 0,
+    "operationalWrites": 0,
+    "deployExecuted": false,
+    "productionTouched": false
+  },
+  "candidateUnchanged": true,
+  "replayAllowed": false,
+  "sourceOnlyRootfix": true,
+  "containsPII": false,
+  "containsSecrets": false
+}
