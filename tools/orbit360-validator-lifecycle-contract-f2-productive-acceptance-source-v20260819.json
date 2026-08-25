@@ -4,8 +4,8 @@
   "gateContractVersion": "2.2.0",
   "validatorLifecycleRevision": "phase-capability-contract-v7-canonical-convergence",
   "f2ValidatorRevision": "f2-source-dynamic-cert-authority-v10-20260822",
-  "status": "F2_TERMINAL_RECONCILED_NO_REPLAY",
-  "currentPhase": "F2_TERMINAL_FAIL_AWAITING_SOURCE_ONLY_ROOT_CAUSE",
+  "status": "CONTROL_PLANE_REGRESSION_OPEN_STOP_RETRY",
+  "currentPhase": "MACRO1_CONTROL_PLANE_TRUTH_HARDENING_SOURCE_ONLY",
   "canonicalContractAuthority": "tools/orbit360-gate-contract-f2-productive-acceptance-v20260820.json",
   "continuity": {
     "stateVersion": "ORBIT360-F2-CONTINUITY-CURRENT",
@@ -119,8 +119,8 @@
       "unchangedFileCount": 185
     }
   },
-  "nextActionExact": "DIAGNOSE_ROOT_CAUSE_BEFORE_ANY_FRESH_AUTHORIZATION",
-  "canonicalStateFingerprint": "786e5366adcb07f0cabd658fb90f0f67432ae9e0cdcba5f9649afa613b304d9a",
+  "nextActionExact": "RUN_EXACT_F2_SOURCE_PATH_CLASSWIDE_EVIDENCE_SELFTEST",
+  "canonicalStateFingerprint": "7c59e3f380e82a8b6eb68574e184a32d5424d7431ece634697a05c5fb80302ce",
   "containsPII": false,
   "containsSecrets": false
 }
