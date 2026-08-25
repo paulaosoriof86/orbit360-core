@@ -12,14 +12,21 @@ const EVIDENCE_DIR='orbit360-platform/runtime-gate-crm-v20260716';
 const args=process.argv.slice(2);
 const valueFor=flag=>{const i=args.indexOf(flag);return i>=0?String(args[i+1]||''):'';};
 const publishTransaction=valueFor('--publish-validated');
+const publishMode=Boolean(publishTransaction);
 const A=p=>path.join(ROOT,p);
 const readJson=p=>JSON.parse(fs.readFileSync(A(p),'utf8').replace(/^\uFEFF/,''));
-const run=(gitArgs,opts={})=>execFileSync('git',gitArgs,{cwd:ROOT,encoding:'utf8',maxBuffer:16*1024*1024,...opts});
+const run=(gitArgs,opts={})=>execFileSync('git',gitArgs,{cwd:ROOT,encoding:'utf8',maxBuffer:16*1024*1024,stdio:['pipe','pipe','pipe'],...opts});
 class PublicationError extends Error{constructor(code,detail=''){super(code);this.name='PublicationError';this.publicationCode=code;this.detail=String(detail||'').slice(0,1600);}}
 const fail=(code,detail='')=>{throw new PublicationError(code,detail);};
 const redact=(value,secret)=>secret?String(value||'').split(secret).join('[redacted]'):String(value||'');
 const emit=(obj,stream=process.stdout)=>stream.write(JSON.stringify(obj,null,2)+'\n');
-const emitFailure=(error)=>{const code=error instanceof PublicationError?error.publicationCode:'PUBLICATION_TRANSACTION_UNEXPECTED';const detail=error instanceof PublicationError?error.detail:String(error?.stack||error?.message||error).slice(0,1600);emit({ok:false,status:'CONTROL_PLANE_PUBLICATION_TRANSACTION_FAIL',classification:'PIPELINE_MECHANISM_FAILURE',code,detail,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false},process.stderr);process.exitCode=41;};
+const emitFailure=(error)=>{
+  const code=error instanceof PublicationError?error.publicationCode:'PUBLICATION_TRANSACTION_UNEXPECTED';
+  const detail=error instanceof PublicationError?error.detail:String(error?.stack||error?.message||error).slice(0,1600);
+  const out={ok:false,status:'CONTROL_PLANE_PUBLICATION_TRANSACTION_FAIL',classification:'PIPELINE_MECHANISM_FAILURE',mode:publishMode?'PUBLISH_VALIDATED':'PREPARE',publicationClass,code,detail,stdoutSingleJson:publishMode,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
+  emit(out,publishMode?process.stdout:process.stderr);
+  process.exitCode=41;
+};
 const zlist=gitArgs=>String(run(gitArgs)).split('\0').map(x=>x.trim()).filter(Boolean);
 const changedSurface=()=>[...new Set([...zlist(['diff','--name-only','-z']),...zlist(['diff','--cached','--name-only','-z']),...zlist(['ls-files','--others','--exclude-standard','-z'])])].sort();
 const isEvidence=p=>p===EVIDENCE_DIR||p.startsWith(`${EVIDENCE_DIR}/`);
@@ -155,7 +162,7 @@ function publishValidatedTransaction(file){
   try{run(['reset','--hard',txn.commitSha],{stdio:['ignore','pipe','pipe']});}catch(error){fail('PUBLICATION_TRANSACTION_LOCAL_READBACK_RESET_FAIL',String(error?.stdout||error?.stderr||error?.message||error));}
   const remaining=changedSurface();
   if(remaining.length)fail('PUBLICATION_TRANSACTION_LOCAL_POSTPUBLISH_DIRTY',remaining.join(','));
-  emit({ok:true,status:'CONTROL_PLANE_PUBLICATION_TRANSACTION_PUBLISHED',classification:'PASS',mode:'PUBLISH_VALIDATED',publicationClass:txn.publicationClass,baseHead:txn.baseHead,treeSha:txn.treeSha,commitSha:txn.commitSha,branch:txn.branch,remoteCASPass:true,pushDryRunPass:true,pushPass:true,pushConfirmedAfterAmbiguousError,remoteReadbackPass:true,localReadbackPass:true,changedCount:txn.changedCount,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false});
+  emit({ok:true,status:'CONTROL_PLANE_PUBLICATION_TRANSACTION_PUBLISHED',classification:'PASS',mode:'PUBLISH_VALIDATED',publicationClass:txn.publicationClass,baseHead:txn.baseHead,treeSha:txn.treeSha,commitSha:txn.commitSha,branch:txn.branch,remoteCASPass:true,pushDryRunPass:true,pushPass:true,pushConfirmedAfterAmbiguousError,remoteReadbackPass:true,localReadbackPass:true,stdoutSingleJson:true,stderrMachineContract:false,changedCount:txn.changedCount,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false});
 }
 
 try{
