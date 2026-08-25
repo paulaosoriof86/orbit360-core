@@ -16,5 +16,5 @@
   "candidateArtifactId": 9504702901,
   "candidateSourceHead": "8c9668d6d423e82826b0295431ec699390d79b4b",
   "controlPlaneFailureEvidence": "orbit360-platform/runtime-gate-crm-v20260716/f2-pipeline-publication-failure-run-32887741144-v20260824.json",
-  "transportNonce": "regression-reopen-32887741144-v3-initial"
+  "transportNonce": "regression-reopen-32887741144-v3-run-once-20260825"
 }
