@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "orbit360-control-plane-semantic-contract-v7-publication-cli-single-json",
+  "schemaVersion": "orbit360-control-plane-semantic-contract-v8-transition-precondition-single-owner",
   "contractId": "ORBIT360-CONTROL-PLANE-SEMANTIC-CONTRACT",
   "active": true,
   "status": "ACTIVE_SOURCE_ONLY_FAIL_CLOSED",
@@ -8,6 +8,7 @@
   "ledger": "orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json",
   "canonicalWorkflow": ".github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml",
   "workflowTopologySemanticOwner": "tools/orbit360-workflow-operational-surface-audit-v20260820.mjs",
+  "transitionPreconditionBehavioralOwner": "tools/orbit360-control-plane-transition-precondition-owner-v20260825.mjs",
   "publicationPreflightOwner": "tools/orbit360-control-plane-publication-preflight-v20260825.mjs",
   "publicationTransactionOwner": "tools/orbit360-control-plane-publication-preflight-v20260825.mjs",
   "candidateBinding": "DYNAMIC_FROM_CANONICAL_LEDGER",
@@ -40,10 +41,13 @@
     "publicationPushMustLocalReadbackExactCommit": true,
     "publicationWorktreeMayNotDriftBetweenPrepareAndPush": true,
     "publicationValidatedCliStdoutSingleJsonRequired": true,
-    "publicationValidatedCliStderrMachineContractForbidden": true
+    "publicationValidatedCliStderrMachineContractForbidden": true,
+    "transitionPreconditionsMustUseCanonicalOwnerBehavioralSimulation": true,
+    "workflowTransitionStatePredicateDuplicationForbidden": true
   },
   "activeControlPlaneComponents": [
     "tools/orbit360-continuity-transition-owner-v20260824.mjs",
+    "tools/orbit360-control-plane-transition-precondition-owner-v20260825.mjs",
     "tools/orbit360-continuity-transition-owner-v20260820.mjs",
     "tools/orbit360-continuity-projection-atomic-v20260820.mjs",
     "tools/orbit360-continuity-projection-core-v20260825.mjs",
@@ -70,6 +74,7 @@
   ],
   "sourceRewriteGuardScope": [
     "tools/orbit360-continuity-transition-owner-v20260824.mjs",
+    "tools/orbit360-control-plane-transition-precondition-owner-v20260825.mjs",
     "tools/orbit360-continuity-transition-owner-v20260820.mjs",
     "tools/orbit360-continuity-projection-atomic-v20260820.mjs",
     "tools/orbit360-control-plane-evidence-convergence-v20260822.mjs",
@@ -116,6 +121,9 @@
     "nativeF2RuntimeRequestVersion": "F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_V3",
     "topologySemanticOwner": "tools/orbit360-workflow-operational-surface-audit-v20260820.mjs",
     "executingSnapshotBoundToCanonical": true,
+    "transitionPreconditionBehavioralOwner": "tools/orbit360-control-plane-transition-precondition-owner-v20260825.mjs",
+    "regressionReopenStatePredicateDelegated": true,
+    "regressionReopenStatePredicateDuplicatedInWorkflow": false,
     "publicationTransactionOwner": "tools/orbit360-control-plane-publication-preflight-v20260825.mjs",
     "workflowGitAddCommitForCanonicalStatePublicationForbidden": true
   },
@@ -174,6 +182,7 @@
     "publicationPreflightExecutedByEveryProjection": true,
     "singleValidatedCommitPublicationRequired": true,
     "publicationOwnerCliMachineContractProbe": true,
+    "regressionReopenPreconditionUsesCanonicalOwnerScratchSimulation": true,
     "runtimeExecuted": false,
     "browserExecuted": false,
     "secretAccess": false,
@@ -189,6 +198,7 @@
     "publicationPreflightComponentPresent": true,
     "singleValidatedCommitPublicationConfigured": true,
     "publicationOwnerCliMachineContractPass": true,
+    "regressionReopenPreconditionSingleOwnerPass": true,
     "exactF2SourcePathPass": true,
     "classWideEvidenceLifecyclePass": true,
     "scratchBehavioralTransitionsPass": true,
