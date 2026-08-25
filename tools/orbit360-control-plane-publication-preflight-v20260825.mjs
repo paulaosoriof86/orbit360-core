@@ -50,7 +50,7 @@ function allowedSurface(registry,allChanged,selftestMode,closeState){
     ignoredSelftestEvidence=allChanged.filter(p=>!classAllows(p)&&isEvidence(p));
     changed=allChanged.filter(classAllows);
     if(!changed.includes(registry.sourceOfTruth))fail('SELFTEST_PUBLICATION_LEDGER_NOT_CHANGED',allChanged.join(','));
-  }else if(closeState||['CONTROL_PLANE_CLOSE','CONTROL_PLANE_REGRESSION','F2_AUTH_ACCEPT','F2_TERMINAL'].includes(publicationClass)){
+  }else if(!selftestMode&&(closeState||['CONTROL_PLANE_CLOSE','CONTROL_PLANE_REGRESSION','F2_AUTH_ACCEPT','F2_TERMINAL'].includes(publicationClass))){
     const offenders=allChanged.filter(p=>!classAllows(p));
     if(offenders.length)fail(`PUBLICATION_SURFACE_${publicationClass}`,offenders.join(','));
   }
