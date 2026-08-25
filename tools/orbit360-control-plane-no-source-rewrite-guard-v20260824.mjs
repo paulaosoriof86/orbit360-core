@@ -20,6 +20,10 @@ const forbidden=[
   /\bapplyOnce\b/,
   /\bsource\.replace\s*\(/,
   /\bpatched\s*=\s*[^;]*\.replace\s*\(/,
+  /\brouter\s*=\s*[^;]*\.replace\s*\(/i,
+  /fs\.writeFileSync\s*\(\s*(?:ROUTER|SOURCE|CORE|TARGET|[A-Z_]*_SOURCE)\b/,
+  /fs\.writeFileSync\s*\(\s*['"][^'"]+\.(?:mjs|cjs|js)['"]/,
+  /fs\.writeFileSync\s*\(\s*(?:path\.join|A)\([^\n)]*['"][^'"]+\.(?:mjs|cjs|js)['"]/,
   /\bos\.tmpdir\s*\(/,
   /spawnSync\s*\(\s*process\.execPath\s*,\s*\[\s*tmp\b/,
   /pathToFileURL\s*\(\s*tmp\s*\)/,
@@ -34,7 +38,7 @@ for(const rel of scope){
   for(const rx of forbidden){if(rx.test(text))failures.push(`ACTIVE_SOURCE_REWRITE_FORBIDDEN:${rel}:${rx.source}`);}
 }
 const out={
-  schemaVersion:'orbit360-control-plane-no-source-rewrite-guard-v3-contract-derived',
+  schemaVersion:'orbit360-control-plane-no-source-rewrite-guard-v4-contract-derived-source-write-forbidden',
   ok:failures.length===0,
   status:failures.length?'CONTROL_PLANE_NO_SOURCE_REWRITE_FAIL':'CONTROL_PLANE_NO_SOURCE_REWRITE_PASS',
   classification:failures.length?'PIPELINE_MECHANISM_FAILURE':'PASS',
@@ -42,6 +46,7 @@ const out={
   scopeMode:'MACHINE_READABLE_CONTRACT_DERIVED',
   activePaths:scope,
   activePathCount:scope.length,
+  sourceWritePatternsForbidden:true,
   failures:[...new Set(failures)],
   runtimeExecuted:false,
   browserExecuted:false,
