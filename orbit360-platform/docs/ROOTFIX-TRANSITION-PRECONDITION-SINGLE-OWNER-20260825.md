@@ -34,6 +34,14 @@ No se solicita ni consume una nueva autorización F2 hasta completar de forma so
 
 Cada etapa se ejecuta una sola vez. Cualquier fallo vuelve a STOP_RETRY y se diagnostica sin rerun.
 
+## Evidencia requerida para declarar cierre
+
+- `REGRESSION_REOPEN` debe pasar desde el F2 terminal sellado usando la simulación del owner canónico.
+- `CONTROL_PLANE_SELFTEST` debe pasar con Macro3, workflow audit, publication CLI probe, exact F2 source path, lifecycle class-wide, CAS, STOP_RETRY, register read-only y router nativo.
+- Debe publicarse handshake durable del mismo run.
+- `CONTROL_PLANE_HARDENING_CLOSE` debe volver a ejecutar el selftest y cerrar con autorización/request/runtime inertes y progreso 75.
+- Solo entonces se prepara una identidad F2 nueva; la autorización consumida del run `32887741144` no puede reutilizarse.
+
 ## Carriles
 
 - A frontend/UX/Academia: congelado, sin cambios de producto.
