@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "orbit360-control-plane-semantic-contract-v9-source-write-guard-behavioral",
+  "schemaVersion": "orbit360-control-plane-semantic-contract-v10-source-write-negative-single-owner",
   "contractId": "ORBIT360-CONTROL-PLANE-SEMANTIC-CONTRACT",
   "active": true,
   "status": "ACTIVE_SOURCE_ONLY_FAIL_CLOSED",
@@ -33,6 +33,8 @@
     "contextFreeTemporaryUsageCannotProveSourceMutation": true,
     "sourceWriteGuardMustTargetActualWriteOperations": true,
     "sourceWriteGuardBehavioralNegativeRequired": true,
+    "sourceWriteNegativeTestSingleOwnerRequired": true,
+    "duplicateSourceWriteNegativeFixturesForbidden": true,
     "duplicateWorkflowTopologyParsersForbidden": true,
     "executingWorkflowSnapshotMustMatchCanonical": true,
     "closureOwnerMustConsumeSelftestOkDerivedFromDynamicRequiredFields": true,
@@ -182,6 +184,7 @@
     "workflowOperationalRevisionHardcodeNegativeTest": true,
     "sourceRewriteMutationNegativeTest": true,
     "sourceWriteGuardBehavioralSelftest": true,
+    "sourceWriteNegativeTestDelegatesToCanonicalBehavioralOwner": true,
     "temporaryInfrastructureAllowedButSourceWritesRejected": true,
     "authPublicationSurfaceIncludesCanonicalStateOwner": true,
     "runtimeRunIdBindingSimulation": true,
@@ -197,7 +200,7 @@
     "firestoreRead": false
   },
   "selftestRequiredTrueFields": [
-    "candidateBindingDynamic","semanticPreflightPass","exactF2SourcePathExecuted","classWidePreAuthEvidenceLifecyclePass","classWidePreTerminalEvidenceLifecyclePass","arbitraryFutureFilenameCleanupPass","scratchBehavioralTransitionsPass","preProviderGatePathPass","projectionImmutabilityPass","remoteCASReadbackPass","secondAttemptStopRetryPass","workflowProviderUngatedNegativePass","workflowCandidateHardcodeNegativePass","workflowOperationalRevisionHardcodeNegativePass","sourceRewriteMutationNegativePass","authPublicationSurfacePass","runtimeRunIdBindingSimulationPass","runtimeRegisterReadOnlyPass","routerNativeRuntimeContractPass","negativeRegressionSuitePass"
+    "candidateBindingDynamic","semanticPreflightPass","exactF2SourcePathExecuted","classWidePreAuthEvidenceLifecyclePass","classWidePreTerminalEvidenceLifecyclePass","arbitraryFutureFilenameCleanupPass","scratchBehavioralTransitionsPass","preProviderGatePathPass","projectionImmutabilityPass","remoteCASReadbackPass","secondAttemptStopRetryPass","workflowProviderUngatedNegativePass","workflowCandidateHardcodeNegativePass","workflowOperationalRevisionHardcodeNegativePass","sourceWriteGuardBehavioralPass","temporaryInfrastructureAllowedPass","actualSourceWriteNegativePass","sourceRewriteMutationNegativePass","authPublicationSurfacePass","runtimeRunIdBindingSimulationPass","runtimeRegisterReadOnlyPass","routerNativeRuntimeContractPass","negativeRegressionSuitePass"
   ],
   "closureRequirements": {
     "macro3SemanticPreflightPass": true,
