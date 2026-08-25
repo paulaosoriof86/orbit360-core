@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "orbit360-control-plane-intent-v1",
+  "mode": "CONTROL_PLANE_HARDENING_CLOSE",
+  "sourceOnly": true,
+  "oneShotOnly": false,
+  "replayAllowed": false,
+  "writesAllowed": false,
+  "deployAllowed": false,
+  "productionAllowed": false,
+  "mainAllowed": false,
+  "mergeAllowed": false,
+  "containsPII": false,
+  "containsSecrets": false,
+  "expectedLedgerRevision": 54,
+  "expectedPackageRevision": 48,
+  "candidateArtifactId": 9504702901,
+  "candidateSourceHead": "8c9668d6d423e82826b0295431ec699390d79b4b",
+  "controlPlaneEvidence": "orbit360-platform/runtime-gate-crm-v20260716/control-plane-selftest-handshake-run-32899656845-v20260824.json",
+  "transportNonce": "validator-stale-rootfix-hardening-close-prepare-20260825"
+}
