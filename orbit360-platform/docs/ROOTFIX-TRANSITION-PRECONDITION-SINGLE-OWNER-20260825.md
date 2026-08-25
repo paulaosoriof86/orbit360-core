@@ -19,7 +19,8 @@ La precondición de estado de `CONTROL_PLANE_REGRESSION_REOPEN` estaba duplicada
 5. `tools/orbit360-workflow-operational-surface-audit-v20260820.mjs` rechaza cualquier reintroducción de predicados de estado duplicados en el bloque de regresión.
 6. El mismo auditor rechaza `2>&1` en invocaciones `--publish-validated` que alimenten superficies machine-readable.
 7. Macro3, semantic contract y writer registry declaran y validan el mismo owner de precondición, el mismo publisher y el mismo workflow.
-8. El contrato de publicación machine-readable del rootfix anterior permanece obligatorio: stdout JSON único para `PUBLISH_VALIDATED`; stderr queda fuera del contrato.
+8. Macro3 ejecuta conductualmente el precondition owner cuando el ledger vivo está en un F2 terminal de mecanismo; el workflow vuelve a ejecutarlo inmediatamente antes de la transición real. La recuperación no depende de una comprobación textual.
+9. El contrato de publicación machine-readable del rootfix anterior permanece obligatorio: stdout JSON único para `PUBLISH_VALIDATED`; stderr queda fuera del contrato.
 
 ## Alcance
 
