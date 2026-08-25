@@ -1,14 +1,14 @@
 {
   "schemaVersion": "orbit360-production-reopening-package-v2-derived",
   "packageId": "ORBIT360-PRODUCTION-REOPENING-CURRENT",
-  "revision": 55,
+  "revision": 58,
   "createdAtUtc": "2026-08-20T13:50:00Z",
-  "updatedAtUtc": "2026-08-25T21:36:28.138Z",
+  "updatedAtUtc": "2026-08-25T21:47:41.105Z",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
   "status": "CLOSED_PASS",
-  "phase": "CONTROL_PLANE_DEFINITIVE_CAUSAL_PASS_AWAITING_F2_AUTHORIZATION",
+  "phase": "F2_RUNTIME_ATTEMPT_ACCEPTED_PREFLIGHT_PENDING",
   "canonicalLedger": "orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json",
   "checkpoint": "orbit360-platform/docs/CHECKPOINT-CONTROL-PLANE-HARDENING-20260820.md",
   "canonicalF2ContractAuthority": "tools/orbit360-gate-contract-f2-productive-acceptance-v20260820.json",
@@ -70,7 +70,7 @@
   "lock": {
     "active": true,
     "runtimeAllowed": false,
-    "authorizationAllowed": true,
+    "authorizationAllowed": false,
     "requestMaterializationAllowed": false,
     "secretAccessAllowed": false,
     "firestoreReadAllowed": false,
@@ -90,8 +90,8 @@
     "rule": "Read orbit360-platform/docs/PLAN-MAESTRO-CONGELADO-SALIDA-PRODUCCION-SIN-BUCLES-ORBIT360-AYS-20260824.md, live PR head and ledger. Continue from firstIncompleteStep. Do not reconstruct roadmap or reuse historical authorization/request.",
     "closedStepsMayBeRecheckedReadOnly": true,
     "closedStepsMayNotBeReprocessedWithoutNewEvidence": true,
-    "firstIncompleteStep": "F2-RUNTIME-AUTHORIZATION",
-    "nextActionExact": "AWAIT_EXPLICIT_F2_RUNTIME_AUTHORIZATION_ONE_SHOT"
+    "firstIncompleteStep": "F2-RUNTIME-PREFLIGHT",
+    "nextActionExact": "RUN_F2_SOURCE_AND_RUNTIME_PREFLIGHT_FAIL_CLOSED"
   },
   "steps": [
     {
@@ -217,15 +217,15 @@
   },
   "authorizationBoundary": {
     "path": "orbit360-platform/docs/orbit360-f2-runtime-authorization-boundary-v20260820.json",
-    "status": "PREPARED_SOURCE_ONLY_AWAITING_EXPLICIT_USER_AUTHORIZATION",
-    "ledgerRevision": 61,
-    "packageRevision": 55,
+    "status": "RUNTIME_ATTEMPT_ACCEPTED_ONE_SHOT_PREFLIGHT_PENDING",
+    "ledgerRevision": 64,
+    "packageRevision": 58,
     "authorizationIdentityDigest": "a63091afd21c24fd2e0a54d1b52ad65b689aad8060b44f175520f645b66ac891",
-    "authorized": false,
-    "authorizationPersisted": false,
-    "requestMaterialized": false,
+    "authorized": true,
+    "authorizationPersisted": true,
+    "requestMaterialized": true,
     "runtimeAllowed": false
   },
-  "canonicalStateFingerprint": "0cc04a7882dd978fb375b61228828ebafbf452a9cb433cc6ab57271cd6a4b3cd",
+  "canonicalStateFingerprint": "4c1b0bb3240df1ae8d51eee5184288663b083e02940c7107766328bae96297fa",
   "canonicalPlan": "orbit360-platform/docs/PLAN-MAESTRO-CONGELADO-SALIDA-PRODUCCION-SIN-BUCLES-ORBIT360-AYS-20260824.md"
 }
