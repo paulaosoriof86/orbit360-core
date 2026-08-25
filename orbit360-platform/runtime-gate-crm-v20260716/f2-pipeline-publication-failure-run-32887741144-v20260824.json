@@ -1,0 +1,64 @@
+{
+  "schemaVersion": "orbit360-f2-pipeline-publication-failure-v3-machine-protocol",
+  "status": "DURABLE_PIPELINE_MECHANISM_FAILURE_STOP_RETRY",
+  "classification": "PIPELINE_MECHANISM_FAILURE",
+  "failureCode": "PIPELINE_MECHANISM_FAILURE:F2_AUTH_PUBLICATION_MACHINE_OUTPUT_NOT_PARSEABLE",
+  "runId": 32887741144,
+  "jobId": 97932059504,
+  "technicalPullRequest": 114,
+  "candidateArtifactId": 9504702901,
+  "candidateArtifactDigest": "sha256:f11dd2a350b4160465dfc93b0dd9153e697d09773fa00aa4ee5ed13d93401ca2",
+  "candidateSourceHead": "8c9668d6d423e82826b0295431ec699390d79b4b",
+  "terminalEvidencePath": "orbit360-platform/runtime-gate-crm-v20260716/f2-runtime-terminal-inline-32887741144.json",
+  "rootCause": {
+    "code": "PUBLISH_VALIDATED_STDOUT_STDERR_MACHINE_PROTOCOL_MIXED",
+    "family": "MACHINE_READABLE_CLI_BOUNDARY",
+    "stage": "F2_AUTH_ACCEPT_PUBLICATION",
+    "detail": "The accepted-state publisher was invoked with stdout and stderr merged into the JSON capture. jq then rejected the captured stream before the semantic F2 gate. PUBLISH_VALIDATED now guarantees a single JSON machine contract on stdout for success and failure, and Macro3 behaviorally probes that contract before authorization."
+  },
+  "canonicalPublication": {
+    "acceptedStatePublished": true,
+    "acceptedStateCommit": "2f67ffefdab0e20873c117b9c2bb04cea957918f",
+    "terminalStatePublished": true,
+    "terminalStateCommit": "8a7c14b4a4448c9e11205b1e5542d64d241ba158",
+    "prBodyAdvancedFromUnpublishedState": false
+  },
+  "stageOutcomes": {
+    "sourceOnlyMechanismGate": "success",
+    "attemptAccept": "success",
+    "acceptedStatePrepare": "success",
+    "acceptedStatePublicationMachineParse": "failure",
+    "semanticF2Gate": "skipped",
+    "provider": "skipped",
+    "browser": "skipped",
+    "integrity": "skipped",
+    "terminalReconcile": "success",
+    "terminalPublication": "success"
+  },
+  "sideEffects": {
+    "runtimeExecuted": false,
+    "browserExecuted": false,
+    "secretAccess": false,
+    "firestoreRead": false,
+    "firestoreWrites": 0,
+    "authWrites": 0,
+    "operationalWrites": 0,
+    "deployExecuted": false,
+    "productionTouched": false
+  },
+  "stopRetry": {
+    "active": true,
+    "newF2AttemptAllowed": false,
+    "workflowRerunAllowed": false,
+    "sourceOnlyRootCauseRequired": true
+  },
+  "sameStageSecondFailure": {
+    "active": false,
+    "reason": "First consumed one-shot failure after the single-publication-transaction rootfix; no replay is permitted regardless."
+  },
+  "productFrozen": true,
+  "dataFrozen": true,
+  "candidateRebuildRequired": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
