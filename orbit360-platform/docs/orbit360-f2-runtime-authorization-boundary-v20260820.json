@@ -1,7 +1,7 @@
 {
   "schemaVersion": "orbit360-f2-runtime-authorization-boundary-v2-derived",
   "boundaryId": "ORBIT360-F2-RUNTIME-AUTHORIZATION-BOUNDARY-CURRENT",
-  "status": "CONSUMED_FAIL_AWAITING_SOURCE_ONLY_ROOT_CAUSE",
+  "status": "STOP_RETRY_CONTROL_PLANE_REGRESSION_OPEN",
   "preparedAtUtc": "2026-08-23T02:51:00.000Z",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -25,10 +25,10 @@
   },
   "controlPlane": {
     "stateVersion": "ORBIT360-F2-CONTINUITY-CURRENT",
-    "ledgerRevision": 47,
-    "packageRevision": 41,
-    "packageStatus": "CLOSED_PASS",
-    "controlPlaneClosure": "CONTROL_PLANE_DEFINITIVE_CAUSAL_PASS"
+    "ledgerRevision": 48,
+    "packageRevision": 42,
+    "packageStatus": "OPEN_BLOCKED_CONTROL_PLANE_REGRESSION",
+    "controlPlaneClosure": "CONTROL_PLANE_REGRESSION_OPEN_STOP_RETRY"
   },
   "requestedExecutionProfile": {
     "phase": "F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY",
@@ -95,7 +95,7 @@
   },
   "lifecycleAtPreparation": {
     "path": "tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-runtime-v20260819.json",
-    "currentPhase": "F2_TERMINAL_FAIL_AWAITING_SOURCE_ONLY_ROOT_CAUSE",
+    "currentPhase": "MACRO1_CONTROL_PLANE_TRUTH_HARDENING_SOURCE_ONLY",
     "activeRequest": false
   },
   "previousTerminal": {
@@ -112,7 +112,7 @@
   "historicalRequestPath": ".github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-successor-9b50d4e95cf3-v20260820.json",
   "terminalEvidencePath": "orbit360-platform/runtime-gate-crm-v20260716/f2-runtime-terminal-inline-32679948489.json",
   "terminalRunId": 32679948489,
-  "canonicalStateFingerprint": "a858fc4af53f5e2822860ef75a5c2622b518aca662f0d1e77a984f45fd2e336a",
+  "canonicalStateFingerprint": "77d620a0972e5264145a5857575fbeca6fad94654f560dae4b574f0ba6355d29",
   "containsPII": false,
   "containsSecrets": false,
   "canonicalPlan": "orbit360-platform/docs/PLAN-MAESTRO-CONGELADO-SALIDA-PRODUCCION-SIN-BUCLES-ORBIT360-AYS-20260824.md"
