@@ -1,7 +1,7 @@
 {
-  "schemaVersion":"orbit360-continuity-writer-registry-v14-publication-cli-single-json",
+  "schemaVersion":"orbit360-continuity-writer-registry-v15-transition-precondition-single-owner",
   "registryId":"ORBIT360-CONTINUITY-WRITER-REGISTRY",
-  "revision":24,
+  "revision":25,
   "active":true,
   "status":"DEFINITIVE_SINGLE_WORKFLOW_GENERIC_INTENT_ROUTER_SINGLE_PUBLICATION_TRANSACTION",
   "branch":"ays/backend-tenant-lab-v99-20260703",
@@ -9,6 +9,7 @@
   "canonicalityContract":"orbit360-platform/docs/orbit360-control-plane-canonicality-contract-v20260822.json",
   "semanticContract":"orbit360-platform/docs/orbit360-control-plane-semantic-contract-v20260824.json",
   "transitionOwner":"tools/orbit360-continuity-transition-owner-v20260824.mjs",
+  "transitionPreconditionBehavioralOwner":"tools/orbit360-control-plane-transition-precondition-owner-v20260825.mjs",
   "delegatedF2TransitionOwner":"tools/orbit360-continuity-transition-owner-v20260820.mjs",
   "soleProjectionLogic":"tools/orbit360-continuity-projection-atomic-v20260820.mjs",
   "projectionCore":"tools/orbit360-continuity-projection-core-v20260825.mjs",
@@ -33,6 +34,8 @@
   "policies":{
     "ledgerIsSoleMutableOperationalState":true,
     "transitionOwnerIsSoleLogicalStateMutationOwner":true,
+    "transitionPreconditionUsesCanonicalOwnerScratchBehavioralSimulation":true,
+    "workflowTransitionStatePredicateDuplicationForbidden":true,
     "packageBoundaryAuthorityLifecyclesAreDerivedCurrentViews":true,
     "authorizationRequestAndEvidenceAreAppendOnlyEvents":true,
     "durableEvidenceMustBeReducedBeforeCoherenceCanPass":true,
@@ -141,6 +144,7 @@
     "runtimePreProviderImmutableSurfaceRequired":true,
     "workflowTopologySemanticOwner":"tools/orbit360-workflow-operational-surface-audit-v20260820.mjs",
     "executingWorkflowSnapshotBoundToCanonicalRequired":true,
+    "transitionPreconditionBehavioralOwner":"tools/orbit360-control-plane-transition-precondition-owner-v20260825.mjs",
     "publicationPreflightOwner":"tools/orbit360-control-plane-publication-preflight-v20260825.mjs",
     "publicationTransactionOwner":"tools/orbit360-control-plane-publication-preflight-v20260825.mjs",
     "publicationProtocolSelftest":"tools/orbit360-publication-owner-cli-contract-selftest-v20260825.mjs"
