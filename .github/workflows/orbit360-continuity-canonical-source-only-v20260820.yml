@@ -11,6 +11,7 @@ name: Orbit360 Canonical Control Plane
 # EVIDENCE_LIFECYCLE_CLASS_WIDE_V1
 # CONTROL_PLANE_IDEMPOTENT_REPROJECTION_V1
 # SINGLE_VALIDATED_PUBLICATION_TRANSACTION_V1
+# TRANSITION_PRECONDITION_SINGLE_OWNER_V1
 # Stable base-owned workflow. Execution PRs may change one intent JSON only; they may not change this workflow.
 
 on:
@@ -43,6 +44,7 @@ env:
   BOUNDARY: orbit360-platform/docs/orbit360-f2-runtime-authorization-boundary-v20260820.json
   PR_STATE: orbit360-platform/docs/ORBIT360-PR5-CURRENT-STATE.md
   OWNER: tools/orbit360-continuity-transition-owner-v20260824.mjs
+  TRANSITION_PRECONDITION_OWNER: tools/orbit360-control-plane-transition-precondition-owner-v20260825.mjs
   CONVERGENCE: tools/orbit360-control-plane-evidence-convergence-v20260822.mjs
   EVIDENCE_LIFECYCLE: tools/orbit360-control-plane-evidence-lifecycle-v20260824.mjs
   EVIDENCE_DIR: orbit360-platform/runtime-gate-crm-v20260716
@@ -166,10 +168,9 @@ jobs:
           PHASE=$(jq -r '.activeState.phase' "$LEDGER")
           STATUS=$(jq -r '.activeState.status' "$LEDGER")
           if [ "$MODE" = 'CONTROL_PLANE_REGRESSION_REOPEN' ]; then
-            test "$PHASE" = 'CONTROL_PLANE_DEFINITIVE_CAUSAL_PASS_AWAITING_F2_AUTHORIZATION'
-            test "$STATUS" = 'CONTROL_PLANE_DEFINITIVE_CAUSAL_PASS'
             F='${{ steps.intent.outputs.control_plane_failure_evidence }}'; test -f "$F"
-            jq -e '.classification=="PIPELINE_MECHANISM_FAILURE" and .stopRetry.active==true and .stopRetry.newF2AttemptAllowed==false and .canonicalPublication.acceptedStatePublished==false and .canonicalPublication.terminalStatePublished==false' "$F" >/dev/null
+            node "$TRANSITION_PRECONDITION_OWNER" --transition CONTROL_PLANE_REGRESSION_REOPEN --expected-revision '${{ steps.intent.outputs.expected_ledger }}' --expected-package-revision '${{ steps.intent.outputs.expected_package }}' --control-plane-failure-evidence "$F" > "$RUNNER_TEMP/regression-reopen-precondition.json"
+            jq -e '.ok==true and .status=="CONTROL_PLANE_REGRESSION_REOPEN_PRECONDITION_PASS" and .validationMode=="CANONICAL_OWNER_SCRATCH_BEHAVIORAL_SIMULATION" and .canonicalLedgerMutated==false and .runtimeExecuted==false and .browserExecuted==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0' "$RUNNER_TEMP/regression-reopen-precondition.json" >/dev/null
           elif [ "$MODE" = 'CONTROL_PLANE_SELFTEST' ] || [ "$MODE" = 'CONTROL_PLANE_HARDENING_CLOSE' ]; then
             if [ "$PHASE" = 'MACRO1_CONTROL_PLANE_TRUTH_HARDENING_SOURCE_ONLY' ] && { [ "$STATUS" = 'CONTROL_PLANE_FALSE_PASS_INVALIDATED' ] || [ "$STATUS" = 'CONTROL_PLANE_REGRESSION_OPEN_STOP_RETRY' ]; }; then
               CONTROL_PLANE_STATE='OPEN'
@@ -354,18 +355,24 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          FAILFILE="$RUNNER_TEMP/authpublish-failure.txt"; rm -f "$FAILFILE"
+          FAILFILE="$RUNNER_TEMP/authpublish-failure.txt"; STDERRFILE="$RUNNER_TEMP/f2-auth-publish.stderr.log"; rm -f "$FAILFILE" "$STDERRFILE"
           node "$CONVERGENCE" --repo-only >/dev/null || { echo 'PIPELINE_MECHANISM_FAILURE:F2_AUTH_CONVERGENCE_FAIL' > "$FAILFILE"; exit 41; }
           set +e
-          node "$PUBLICATION_OWNER" --publish-validated "$RUNNER_TEMP/f2-auth-publication.json" > "$RUNNER_TEMP/f2-auth-publish.json" 2>&1
+          node "$PUBLICATION_OWNER" --publish-validated "$RUNNER_TEMP/f2-auth-publication.json" > "$RUNNER_TEMP/f2-auth-publish.json" 2> "$STDERRFILE"
           RC=$?
           set -e
           if [ "$RC" -ne 0 ]; then
-            CODE=$(jq -r '.code // "PUBLICATION_TRANSACTION_FAILED"' "$RUNNER_TEMP/f2-auth-publish.json" 2>/dev/null || echo 'PUBLICATION_TRANSACTION_FAILED')
-            echo "PIPELINE_MECHANISM_FAILURE:F2_AUTH_${CODE}" > "$FAILFILE"
+            if ! jq -e '.ok==false and .status=="CONTROL_PLANE_PUBLICATION_TRANSACTION_FAIL" and .classification=="PIPELINE_MECHANISM_FAILURE" and (.code|type=="string")' "$RUNNER_TEMP/f2-auth-publish.json" >/dev/null 2>&1; then
+              echo 'PIPELINE_MECHANISM_FAILURE:F2_AUTH_PUBLICATION_MACHINE_JSON_INVALID' > "$FAILFILE"
+            else
+              CODE=$(jq -r '.code' "$RUNNER_TEMP/f2-auth-publish.json")
+              echo "PIPELINE_MECHANISM_FAILURE:F2_AUTH_${CODE}" > "$FAILFILE"
+            fi
+            if [ -s "$STDERRFILE" ]; then cat "$STDERRFILE" >&2; fi
             cat "$RUNNER_TEMP/f2-auth-publish.json" >&2
             exit 41
           fi
+          test ! -s "$STDERRFILE"
           jq -e '.ok==true and .status=="CONTROL_PLANE_PUBLICATION_TRANSACTION_PUBLISHED" and .publicationClass=="F2_AUTH_ACCEPT" and .pushPass==true and .remoteReadbackPass==true and .localReadbackPass==true' "$RUNNER_TEMP/f2-auth-publish.json" >/dev/null
           FINAL_HEAD=$(jq -r '.commitSha' "$RUNNER_TEMP/f2-auth-publish.json"); [[ "$FINAL_HEAD" =~ ^[a-f0-9]{40}$ ]]
           echo "final_head=$FINAL_HEAD" >> "$GITHUB_OUTPUT"
