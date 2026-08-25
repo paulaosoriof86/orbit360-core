@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "orbit360-control-plane-intent-v1",
+  "mode": "CONTROL_PLANE_REGRESSION_REOPEN",
+  "sourceOnly": true,
+  "oneShotOnly": false,
+  "replayAllowed": false,
+  "writesAllowed": false,
+  "deployAllowed": false,
+  "productionAllowed": false,
+  "mainAllowed": false,
+  "mergeAllowed": false,
+  "containsPII": false,
+  "containsSecrets": false,
+  "expectedLedgerRevision": 71,
+  "expectedPackageRevision": 65,
+  "candidateArtifactId": 9504702901,
+  "candidateSourceHead": "8c9668d6d423e82826b0295431ec699390d79b4b",
+  "controlPlaneFailureEvidence": "orbit360-platform/runtime-gate-crm-v20260716/f2-pipeline-publication-failure-run-32904415944-v20260824.json",
+  "transportNonce": "cross-tenant-console-regression-reopen-v2-prepare-20260825"
+}
