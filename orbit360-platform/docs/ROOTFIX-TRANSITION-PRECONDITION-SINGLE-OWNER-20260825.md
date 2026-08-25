@@ -2,7 +2,7 @@
 
 ## Incidente evitado antes de ejecución
 
-Tras sellar el run F2 `32887741144` como `PIPELINE_MECHANISM_FAILURE`, el owner canónico ya admitía `CONTROL_PLANE_REGRESSION_REOPEN` desde `F2_TERMINAL_RECONCILED_NO_REPLAY`, pero el precheck del workflow seguía admitiendo únicamente `CONTROL_PLANE_DEFINITIVE_CAUSAL_PASS_AWAITING_F2_AUTHORIZATION / CONTROL_PLANE_DEFINITIVE_CAUSAL_PASS`.
+Tras sellar el run F2 `32887741144` como `PIPELINE_MECHANISM_FAILURE`, el owner canónico ya admitía `CONTROL_PLANE_REGRESSION_REOPEN` desde `F2_TERMINAL_RECONCILED_NO_REPLAY`, pero el precheck del workflow seguía admitiendo únicamente el estado cerrado pre-F2.
 
 Clasificación: `VALIDATOR_STALE` dentro de `PIPELINE_MECHANISM_FAILURE`.
 
@@ -12,12 +12,14 @@ La precondición de estado de `CONTROL_PLANE_REGRESSION_REOPEN` estaba duplicada
 
 ## Rootfix definitivo
 
-1. `tools/orbit360-continuity-transition-owner-v20260824.mjs` se convierte también en owner semántico de precondición mediante `--validate-only`.
-2. El workflow no interpreta localmente los estados permitidos para `CONTROL_PLANE_REGRESSION_REOPEN`; invoca al owner con `--validate-only` y exige `CONTROL_PLANE_REGRESSION_REOPEN_PRECONDITION_PASS`.
-3. La misma validación se reutiliza inmediatamente después para ejecutar la transición real; no existe una segunda tabla de estados permitidos.
-4. El control-plane selftest simula y valida la ruta `sealed F2 mechanism failure -> validate-only -> regression reopen`, además del STOP_RETRY y de las transiciones ya cubiertas.
-5. Semantic contract, writer registry y Macro3 declaran y validan que las precondiciones críticas de transición tienen owner único y que el workflow no mantiene una copia semántica paralela.
-6. El contrato de publicación machine-readable del rootfix anterior permanece obligatorio: stdout JSON único para `PUBLISH_VALIDATED`, stderr fuera del contrato y prohibición de `2>&1` hacia archivos JSON.
+1. `tools/orbit360-control-plane-transition-precondition-owner-v20260825.mjs` valida la precondición ejecutando el owner canónico real en un worktree scratch desechable.
+2. El workflow no interpreta localmente los estados permitidos para `CONTROL_PLANE_REGRESSION_REOPEN`; invoca ese precondition owner y exige `CONTROL_PLANE_REGRESSION_REOPEN_PRECONDITION_PASS`.
+3. La transición real se ejecuta inmediatamente después mediante el mismo owner canónico; no existe una segunda tabla de estados permitidos.
+4. El precondition owner garantiza cleanup del worktree tanto en PASS como en FAIL; los errores se emiten como JSON fail-closed solo después de intentar la limpieza.
+5. `tools/orbit360-workflow-operational-surface-audit-v20260820.mjs` rechaza cualquier reintroducción de predicados de estado duplicados en el bloque de regresión.
+6. El mismo auditor rechaza `2>&1` en invocaciones `--publish-validated` que alimenten superficies machine-readable.
+7. Macro3, semantic contract y writer registry declaran y validan el mismo owner de precondición, el mismo publisher y el mismo workflow.
+8. El contrato de publicación machine-readable del rootfix anterior permanece obligatorio: stdout JSON único para `PUBLISH_VALIDATED`; stderr queda fuera del contrato.
 
 ## Alcance
 
@@ -29,7 +31,7 @@ No se solicita ni consume una nueva autorización F2 hasta completar de forma so
 
 `REGRESSION_REOPEN -> CONTROL_PLANE_SELFTEST -> durable handshake -> CONTROL_PLANE_HARDENING_CLOSE`.
 
-Cualquier fallo vuelve a STOP_RETRY y se diagnostica sin rerun.
+Cada etapa se ejecuta una sola vez. Cualquier fallo vuelve a STOP_RETRY y se diagnostica sin rerun.
 
 ## Carriles
 
