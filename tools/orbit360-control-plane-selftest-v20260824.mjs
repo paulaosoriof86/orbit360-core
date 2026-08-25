@@ -43,12 +43,14 @@ const evidenceChanges=root=>repoChanges(root).filter(p=>p===EVIDENCE_DIR||p.star
 const requireSuccess=(root,rel,args=[],env={},code='COMMAND_FAIL')=>{
   const r=run(root,rel,args,env);if(r.status!==0)throw new Error(`${code}:${String(r.stderr||r.stdout||'').slice(-700)}`);return r;
 };
+const snapshot=(root,paths)=>Object.fromEntries(paths.map(p=>[p,text(root,p)]));
+const snapshotEqual=(root,snap)=>Object.entries(snap).every(([p,v])=>text(root,p)===v);
 
 for(const p of Object.values(P))need(fs.existsSync(A(ROOT,p)),`MISSING:${p}`);
 let sourcePathExecuted=false,classWidePreAuthPass=false,classWideTerminalPass=false,arbitraryFilenamePass=false;
 let candidateBindingDynamic=false,semanticPreflightPass=false,scratchBehavioralTransitionsPass=false,negativeRegressionSuitePass=false,preProviderGatePathPass=false,projectionImmutabilityPass=false,remoteCASReadbackPass=false,secondAttemptStopRetryPass=false;
-let workflowProviderUngatedNegativePass=false,workflowCandidateHardcodeNegativePass=false,workflowOperationalRevisionHardcodeNegativePass=false;
-let authPublicationSurfacePass=false,runtimeRunIdBindingSimulationPass=false;
+let workflowProviderUngatedNegativePass=false,workflowCandidateHardcodeNegativePass=false,workflowOperationalRevisionHardcodeNegativePass=false,sourceRewriteMutationNegativePass=false;
+let authPublicationSurfacePass=false,runtimeRunIdBindingSimulationPass=false,runtimeRegisterReadOnlyPass=false,routerNativeRuntimeContractPass=false;
 let semanticContract={};
 
 if(!failures.length){
@@ -57,9 +59,15 @@ if(!failures.length){
   need(expectedLedger>0&&L.revision===expectedLedger,'LEDGER_REVISION_MISMATCH');
   need(expectedPackage>0&&Number(L.productionReopeningPackage?.revision)===expectedPackage,'PACKAGE_REVISION_MISMATCH');
   need(contract.active===true&&contract.candidateBinding==='DYNAMIC_FROM_CANONICAL_LEDGER','SEMANTIC_CONTRACT_NOT_ACTIVE');
+  need(contract.behavioralContractPolicy?.runtimeRegisterMustBeReadOnly===true,'SEMANTIC_CONTRACT_REGISTER_READONLY_MISSING');
+  need(contract.behavioralContractPolicy?.runtimeRouterMustSupportF2V3Natively===true,'SEMANTIC_CONTRACT_NATIVE_ROUTER_MISSING');
+  need(contract.behavioralContractPolicy?.activeSourceFileWritesForbidden===true,'SEMANTIC_CONTRACT_SOURCE_WRITE_FORBIDDEN_MISSING');
   need(contract.behavioralSelftestRequirements?.workflowOperationalRevisionHardcodeNegativeTest===true,'SEMANTIC_CONTRACT_REVISION_NEGATIVE_TEST_MISSING');
+  need(contract.behavioralSelftestRequirements?.sourceRewriteMutationNegativeTest===true,'SEMANTIC_CONTRACT_SOURCE_REWRITE_NEGATIVE_TEST_MISSING');
   need(contract.behavioralSelftestRequirements?.authPublicationSurfaceIncludesCanonicalStateOwner===true,'SEMANTIC_CONTRACT_AUTH_SURFACE_OWNER_MISSING');
   need(contract.behavioralSelftestRequirements?.runtimeRunIdBindingSimulation===true,'SEMANTIC_CONTRACT_RUNTIME_RUN_BINDING_MISSING');
+  need(contract.behavioralSelftestRequirements?.runtimeRegisterReadOnlyBehavioralTest===true,'SEMANTIC_CONTRACT_REGISTER_BEHAVIOR_TEST_MISSING');
+  need(contract.behavioralSelftestRequirements?.nativeRuntimeRouterBehavioralTest===true,'SEMANTIC_CONTRACT_ROUTER_BEHAVIOR_TEST_MISSING');
   candidateBindingDynamic=Number.isInteger(Number(candidate.artifactId))&&Number(candidate.artifactId)>0&&/^[a-f0-9]{40}$/.test(String(candidate.sourceHead||''))&&/^sha256:[a-f0-9]{64}$/.test(String(candidate.artifactDigest||''));
   need(candidateBindingDynamic,'DYNAMIC_CANDIDATE_INVALID');
   const hardeningOpen=L.activeState?.phase==='MACRO1_CONTROL_PLANE_TRUTH_HARDENING_SOURCE_ONLY'&&['CONTROL_PLANE_FALSE_PASS_INVALIDATED','CONTROL_PLANE_REGRESSION_OPEN_STOP_RETRY'].includes(L.activeState?.status);
@@ -69,7 +77,7 @@ if(!failures.length){
   need(L.authorizationBoundary?.activeRuntimeAuthorization===false&&L.authorizationBoundary?.activeRequestPath==null&&L.authorizationBoundary?.authorizationRecordPath==null&&(L.authorizationBoundary?.runtimeAttemptAccepted??false)===false,'SELFTEST_AUTH_REQUEST_NOT_INERT');
   need(Number(L.progress?.productionRouteProgressPct)===75&&L.progress?.f2TerminalPass===false,'SELFTEST_PROGRESS_NOT_FAIL_CLOSED');
 
-  const nr=runJson(ROOT,P.noRewrite);need(nr.result.status===0&&nr.json?.ok===true&&nr.json?.scopeMode==='MACHINE_READABLE_CONTRACT_DERIVED','NO_SOURCE_REWRITE_GUARD_FAIL');
+  const nr=runJson(ROOT,P.noRewrite);need(nr.result.status===0&&nr.json?.ok===true&&nr.json?.scopeMode==='MACHINE_READABLE_CONTRACT_DERIVED'&&nr.json?.sourceWritePatternsForbidden===true,'NO_SOURCE_REWRITE_GUARD_FAIL');
   const wa=runJson(ROOT,P.workflowAudit);need(wa.result.status===0&&wa.json?.ok===true&&Number(wa.json?.totalWorkflowFiles)===1,'WORKFLOW_SURFACE_AUDIT_FAIL');
   const mp=runJson(ROOT,P.preflight,[],{ORBIT360_F2_WORKFLOW_SOURCE_FILE:A(ROOT,P.workflow)});
   semanticPreflightPass=mp.result.status===0&&mp.json?.ok===true&&mp.json?.sourceShapeValidationUsed===false&&mp.json?.candidateBinding==='DYNAMIC_FROM_CANONICAL_LEDGER';
@@ -114,6 +122,8 @@ if(!failures.length){
     const scratchContract=json(scratch,P.contract),scratchRegistry=json(scratch,P.registry),scratchL=json(scratch,P.ledger),scratchCandidate=scratchL.successorCandidate;
     need(scratchContract.candidateBinding==='DYNAMIC_FROM_CANONICAL_LEDGER','SCRATCH_CONTRACT_CANDIDATE_NOT_DYNAMIC');
     need(typeof scratchRegistry.sourceOfTruth==='string'&&scratchRegistry.sourceOfTruth===P.ledger,'SCRATCH_CANONICAL_STATE_OWNER_DRIFT');
+    const immutablePaths=Array.isArray(scratchContract.runtimePreProviderImmutablePaths)?scratchContract.runtimePreProviderImmutablePaths:[];
+    need(immutablePaths.length>=7&&immutablePaths.every(p=>fs.existsSync(A(scratch,p))),'SCRATCH_RUNTIME_IMMUTABLE_SURFACE_INVALID');
 
     const originalWorkflow=text(scratch,P.workflow);
     const providerRx=/(^\s*-\s*id:\s*provider\s*$[\s\S]*?^\s*if:\s*)([^\n]+)(\n)/m;
@@ -139,6 +149,15 @@ if(!failures.length){
     workflowOperationalRevisionHardcodeNegativePass=revisionHardcoded.result.status!==0&&Array.isArray(revisionHardcoded.json?.offenders)&&revisionHardcoded.json.offenders.some(x=>x.reason==='OPERATIONAL_REVISION_HARDCODED_IN_WORKFLOW');
     fs.writeFileSync(A(scratch,P.workflow),originalWorkflow,'utf8');
     need(workflowOperationalRevisionHardcodeNegativePass,'NEGATIVE_OPERATIONAL_REVISION_HARDCODE_NOT_DETECTED');
+
+    const originalRegister=text(scratch,P.register);
+    const mutationCall=`${['fs','writeFileSync'].join('.')}(${JSON.stringify(P.gateRouter)},'tamper');`;
+    fs.writeFileSync(A(scratch,P.register),`${originalRegister}\n${mutationCall}\n`,'utf8');
+    const rewriteProbe=runJson(scratch,P.noRewrite);
+    sourceRewriteMutationNegativePass=rewriteProbe.result.status!==0&&Array.isArray(rewriteProbe.json?.failures)&&rewriteProbe.json.failures.some(x=>String(x).startsWith(`ACTIVE_SOURCE_REWRITE_FORBIDDEN:${P.register}:`));
+    fs.writeFileSync(A(scratch,P.register),originalRegister,'utf8');
+    need(sourceRewriteMutationNegativePass,'NEGATIVE_SOURCE_REWRITE_NOT_DETECTED');
+    need(repoChanges(scratch).length===0,'NEGATIVE_FIXTURES_NOT_CLEAN');
 
     const baseHead=git(scratch,['rev-parse','HEAD']);
     const latestRegression=Number(scratchL.continuityControl?.latestControlPlaneRegression?.runId||0);
@@ -184,14 +203,21 @@ if(!failures.length){
 
     state=json(scratch,P.ledger);
     const requestPath=state.authorizationBoundary?.activeRequestPath;
-    const gateEnv={ORBIT360_F2_WORKFLOW_SOURCE_FILE:A(scratch,P.workflow),ORBIT360_REQUEST_FILE:requestPath,GITHUB_RUN_ID:String(runtimeRun)};
+    const gateEnv={ORBIT360_F2_WORKFLOW_SOURCE_FILE:A(scratch,P.workflow),ORBIT360_REQUEST_FILE:requestPath,ORBIT360_EXPECTED_REQUEST_VERSION:'F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_V3',GITHUB_RUN_ID:String(runtimeRun)};
     const acceptedRequest=json(scratch,requestPath);
     runtimeRunIdBindingSimulationPass=Number(acceptedRequest.runtimeRunId)===runtimeRun&&Number(gateEnv.GITHUB_RUN_ID)===runtimeRun;
     need(runtimeRunIdBindingSimulationPass,'SCRATCH_RUNTIME_RUN_BINDING_SIMULATION_INVALID');
-    requireSuccess(scratch,P.register,[],gateEnv,'SCRATCH_RUNTIME_REGISTER_FAIL');
+
+    const beforeRegister=snapshot(scratch,immutablePaths);
+    const registerResult=runJson(scratch,P.register,[],gateEnv);
+    runtimeRegisterReadOnlyPass=registerResult.result.status===0&&registerResult.json?.ok===true&&registerResult.json?.status==='F2_RUNTIME_REGISTER_READ_ONLY_VALIDATED_V4'&&registerResult.json?.registerMode==='READ_ONLY_VALIDATOR'&&registerResult.json?.persistentSourceChanged===false&&snapshotEqual(scratch,beforeRegister)&&repoChanges(scratch).length===0;
+    need(runtimeRegisterReadOnlyPass,`SCRATCH_RUNTIME_REGISTER_NOT_READ_ONLY:${JSON.stringify(repoChanges(scratch))}`);
+
     const gateResult=run(scratch,P.gateRouter,[state.gateId],gateEnv);
     const gateEvidenceRel=`${EVIDENCE_DIR}/preflight-sanitizado.json`;
     const gateEvidence=fs.existsSync(A(scratch,gateEvidenceRel))?json(scratch,gateEvidenceRel):{};
+    routerNativeRuntimeContractPass=gateResult.status===0&&gateEvidence.nativeRouterRuntimeContract===true&&gateEvidence.registerMode==='READ_ONLY_VALIDATOR'&&snapshotEqual(scratch,beforeRegister);
+    need(routerNativeRuntimeContractPass,'SCRATCH_NATIVE_RUNTIME_ROUTER_CONTRACT_FAIL');
     preProviderGatePathPass=gateResult.status===0&&gateEvidence.ok===true&&gateEvidence.status==='GO_GATE_CONTRACT'&&gateEvidence.runtimeAttemptAccepted===true&&gateEvidence.executionAuthorized===true&&gateEvidence.secretAccessAuthorized===true&&gateEvidence.firestoreReadAuthorized===true&&gateEvidence.runtimeAuthorized===true&&gateEvidence.browserAuthorized===true&&gateEvidence.writeAuthorized===false&&gateEvidence.deployAuthorized===false&&gateEvidence.productionAuthorized===false;
     need(preProviderGatePathPass,'SCRATCH_PRE_PROVIDER_GATE_PATH_FAIL');
     git(scratch,['reset','--hard','HEAD']);
@@ -208,7 +234,7 @@ if(!failures.length){
     scratchBehavioralTransitionsPass=reduced.activeState?.status==='F2_TERMINAL_RECONCILED_NO_REPLAY'&&reduced.authorizationBoundary?.activeRuntimeAuthorization===false&&reduced.authorizationBoundary?.activeRequestPath==null&&reduced.authorizationBoundary?.authorizationRecordPath==null&&reduced.activeState?.runtimeReplayAllowed===false&&reduced.nextAction?.id==='DIAGNOSE_ROOT_CAUSE_BEFORE_ANY_FRESH_AUTHORIZATION'&&Number(reduced.progress?.productionRouteProgressPct)===75;
     need(scratchBehavioralTransitionsPass,'SCRATCH_TERMINAL_REDUCER_STATE_INVALID');
 
-    negativeRegressionSuitePass=workflowProviderUngatedNegativePass&&workflowCandidateHardcodeNegativePass&&workflowOperationalRevisionHardcodeNegativePass&&secondAttemptStopRetryPass&&projectionImmutabilityPass&&authPublicationSurfacePass&&runtimeRunIdBindingSimulationPass;
+    negativeRegressionSuitePass=workflowProviderUngatedNegativePass&&workflowCandidateHardcodeNegativePass&&workflowOperationalRevisionHardcodeNegativePass&&sourceRewriteMutationNegativePass&&secondAttemptStopRetryPass&&projectionImmutabilityPass&&authPublicationSurfacePass&&runtimeRunIdBindingSimulationPass&&runtimeRegisterReadOnlyPass&&routerNativeRuntimeContractPass;
     need(negativeRegressionSuitePass,'NEGATIVE_REGRESSION_SUITE_FAIL');
   }catch(error){need(false,`SCRATCH_BEHAVIORAL_SIMULATION_FAIL:${String(error?.message||error).slice(0,700)}`);}
   finally{
@@ -218,7 +244,7 @@ if(!failures.length){
 }
 
 const out={
-  schemaVersion:'orbit360-control-plane-selftest-v12-semantic-contract-behavioral-harness-bound',
+  schemaVersion:'orbit360-control-plane-selftest-v13-native-runtime-router-readonly-register',
   ok:false,
   status:'CONTROL_PLANE_SELFTEST_FAIL',
   classification:'PIPELINE_MECHANISM_FAILURE',
@@ -239,8 +265,11 @@ const out={
   workflowProviderUngatedNegativePass,
   workflowCandidateHardcodeNegativePass,
   workflowOperationalRevisionHardcodeNegativePass,
+  sourceRewriteMutationNegativePass,
   authPublicationSurfacePass,
   runtimeRunIdBindingSimulationPass,
+  runtimeRegisterReadOnlyPass,
+  routerNativeRuntimeContractPass,
   negativeRegressionSuitePass,
   validatorMode:'MACHINE_READABLE_CONTRACT_PLUS_BEHAVIORAL_EXECUTION',
   sourceShapeValidationUsed:false,
