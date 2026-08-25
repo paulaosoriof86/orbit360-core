@@ -15,5 +15,5 @@
   "expectedPackageRevision": 42,
   "candidateArtifactId": 9504702901,
   "candidateSourceHead": "8c9668d6d423e82826b0295431ec699390d79b4b",
-  "transportNonce": "control-plane-selftest-single-owner-v2-initial"
+  "transportNonce": "control-plane-selftest-single-owner-v2-run-once-20260825"
 }
