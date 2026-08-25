@@ -15,5 +15,5 @@
   "expectedPackageRevision": 37,
   "candidateArtifactId": 9504702901,
   "candidateSourceHead": "8c9668d6d423e82826b0295431ec699390d79b4b",
-  "transportNonce": "prepare-closed-state-preauth-20260825"
+  "transportNonce": "execute-once-closed-state-preauth-20260825"
 }
