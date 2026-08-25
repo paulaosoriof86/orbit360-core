@@ -15,5 +15,5 @@
   "expectedPackageRevision": 48,
   "candidateArtifactId": 9504702901,
   "candidateSourceHead": "8c9668d6d423e82826b0295431ec699390d79b4b",
-  "transportNonce": "validator-stale-rootfix-selftest-prepare-20260825"
+  "transportNonce": "validator-stale-rootfix-selftest-run-once-20260825"
 }
