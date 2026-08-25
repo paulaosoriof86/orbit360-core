@@ -11,7 +11,7 @@ const BLOCK1_GATE_ID = 'block1-client360-insurers-lab-v20260717';
 const F2_GATE_ID = 'f2-productive-acceptance-exact-successor-v20260818';
 const F2_CONTRACT_AUTHORITY_REL = 'tools/orbit360-gate-contract-f2-productive-acceptance-v20260820.json';
 const F2_RUNTIME_REQUEST_VERSION = 'F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_V3';
-const F2_RUNTIME_REQUEST_SCHEMA = 'orbit360-f2-productive-acceptance-runtime-browser-readonly-request-v3';
+const F2_RUNTIME_REQUEST_SCHEMA = 'orbit360-f2-productive-acceptance-runtime-browser-readonly-request-v4-risk-boundary';
 const VISUAL_LEGACY_GATE_ID = 'block2.7-visual-matrix-corrected-post-auth-lab-v20260805';
 const COBROS_10102_GATE_ID = 'block10.10-cobros-full-ledger-write-lab-v20260805';
 const FASE_A_OPS_LEADS_CRM_GATE_ID = 'fase-a-ops-leads-crm-release-lab-v20260812';
@@ -32,7 +32,7 @@ const DEFAULT_BLOCK1_V30_REQUEST_REL = '.github/orbit360-requests/block1-client3
 const DEFAULT_BLOCK1_V33_REQUEST_REL = '.github/orbit360-requests/block1-client360-insurers-v33-two-client-cloud-audit-authorization.json';
 const STOP_OVERLAY_REL = 'tools/orbit360-validator-lifecycle-overlay-visual-matrix-v8-stop-preflight-v20260806.json';
 const CANONICAL_LIFECYCLE_COMPOSITION = 'phase-capability-contract-v1';
-const ROUTER_VERSION = 'v10.9-f2-native-v3-readonly-register';
+const ROUTER_VERSION = 'v10.10-f2-native-v4-risk-boundary';
 
 const GATE_CONFIG = Object.freeze({
   [BLOCK1_GATE_ID]: {
@@ -149,7 +149,7 @@ function f2CanonicalConfig() {
 }
 function failOutput(config, error) {
   return {
-    schemaVersion:'orbit360-gate-contract-preflight-canonical-router-v10.9-f2-native-v3-readonly-register',gateId:GATE_ID,contractVersion:config&&config.contractVersion||'',status:'VALIDATOR_STALE',classification:'PIPELINE_MECHANISM_FAILURE',failed:1,failedCheckIds:['CANONICAL_PREFLIGHT_ENTRYPOINT'],error:String(error&&error.message||error),canonicalLifecycleComposition:config&&config.lifecycleComposition||CANONICAL_LIFECYCLE_COMPOSITION,canonicalEngine:config&&config.engine||'',canonicalContractAuthority:config&&config.canonicalAuthority||'',canonicalRouterVersion:ROUTER_VERSION,canonicalStopOverlay:GATE_ID===VISUAL_LEGACY_GATE_ID?STOP_OVERLAY_REL:'',gateProfile:process.env.ORBIT360_GATE_PROFILE||'default',legacyDelegate:LEGACY_ROUTER,sourceTransformed:false,dataAccess:false,secretAccess:false,operationalWrites:0,evidenceWrites:1,secretsRead:false,firestoreRead:false,runtimeExecuted:false,browserExecuted:false,rulesApplied:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false,ok:false
+    schemaVersion:'orbit360-gate-contract-preflight-canonical-router-v10.10-f2-native-v4-risk-boundary',gateId:GATE_ID,contractVersion:config&&config.contractVersion||'',status:'VALIDATOR_STALE',classification:'PIPELINE_MECHANISM_FAILURE',failed:1,failedCheckIds:['CANONICAL_PREFLIGHT_ENTRYPOINT'],error:String(error&&error.message||error),canonicalLifecycleComposition:config&&config.lifecycleComposition||CANONICAL_LIFECYCLE_COMPOSITION,canonicalEngine:config&&config.engine||'',canonicalContractAuthority:config&&config.canonicalAuthority||'',canonicalRouterVersion:ROUTER_VERSION,canonicalStopOverlay:GATE_ID===VISUAL_LEGACY_GATE_ID?STOP_OVERLAY_REL:'',gateProfile:process.env.ORBIT360_GATE_PROFILE||'default',legacyDelegate:LEGACY_ROUTER,sourceTransformed:false,dataAccess:false,secretAccess:false,operationalWrites:0,evidenceWrites:1,secretsRead:false,firestoreRead:false,runtimeExecuted:false,browserExecuted:false,rulesApplied:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false,ok:false
   };
 }
 
@@ -174,7 +174,7 @@ try {
 if (!config) {
   const legacyPath = path.join(ROOT, LEGACY_ROUTER);
   if (!fs.existsSync(legacyPath)) {
-    const missing = {schemaVersion:'orbit360-gate-contract-preflight-canonical-router-v10.9-f2-native-v3-readonly-register',gateId:GATE_ID,status:'VALIDATOR_STALE',classification:'PIPELINE_MECHANISM_FAILURE',failed:1,failedCheckIds:['LEGACY_CANONICAL_ROUTER_MISSING'],legacyDelegate:LEGACY_ROUTER,dataAccess:false,secretAccess:false,secretsRead:false,firestoreRead:false,runtimeExecuted:false,browserExecuted:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false,ok:false};
+    const missing = {schemaVersion:'orbit360-gate-contract-preflight-canonical-router-v10.10-f2-native-v4-risk-boundary',gateId:GATE_ID,status:'VALIDATOR_STALE',classification:'PIPELINE_MECHANISM_FAILURE',failed:1,failedCheckIds:['LEGACY_CANONICAL_ROUTER_MISSING'],legacyDelegate:LEGACY_ROUTER,dataAccess:false,secretAccess:false,secretsRead:false,firestoreRead:false,runtimeExecuted:false,browserExecuted:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false,ok:false};
     writeEvidence(missing); console.log(JSON.stringify(missing,null,2)); process.exit(41);
   }
   const legacy = spawnSync(process.execPath,[legacyPath,...process.argv.slice(2)],{cwd:ROOT,env:process.env,stdio:'inherit'});
@@ -230,8 +230,8 @@ try {
     const request=readJson(requestFile);
     if(isF2&&config.f2Mode==='runtime'){
       if(expectedRequestVersion!==F2_RUNTIME_REQUEST_VERSION)throw new Error('CANONICAL_REQUEST_VERSION_MISMATCH_V3');
-      if(request.schemaVersion!==F2_RUNTIME_REQUEST_SCHEMA)throw new Error('CANONICAL_REQUEST_SCHEMA_MISMATCH_V3');
-      if(request.status!=='RUNTIME_ATTEMPT_ACCEPTED_PREFLIGHT_PENDING'||request.allowedExecutions!==0||request.consumed!==false||request.authorizationFrozen!==true||request.replayAllowed!==false||request.historical!==false||request.runtimeAttemptAccepted!==true||Number(request.runtimeAttemptCount)!==1||Number(request.runtimeRunId)!==Number(process.env.GITHUB_RUN_ID||0))throw new Error('CANONICAL_REQUEST_NOT_ACCEPTED_ONE_SHOT_V3');
+      if(request.schemaVersion!==F2_RUNTIME_REQUEST_SCHEMA)throw new Error('CANONICAL_REQUEST_SCHEMA_MISMATCH_V4');
+      if(request.status!=='RUNTIME_ATTEMPT_RESERVED_PREFLIGHT_PENDING'||request.allowedExecutions!==1||request.consumed!==false||request.authorizationFrozen!==true||request.replayAllowed!==false||request.historical!==false||request.runtimeAttemptAccepted!==true||request.runtimeAttemptReserved!==true||request.privilegedRiskBoundaryEntered===true||Number(request.runtimeAttemptCount)!==0||Number(request.runtimeRunId)!==Number(process.env.GITHUB_RUN_ID||0))throw new Error('CANONICAL_REQUEST_NOT_RESERVED_UNCONSUMED_ONE_SHOT_V4');
       if(config.activeRequest!==requestFile)throw new Error('F2_CANONICAL_AUTHORITY_REQUEST_BINDING_DRIFT');
     }else{
       if (request.requestVersion!==expectedRequestVersion) throw new Error('CANONICAL_REQUEST_VERSION_MISMATCH');
