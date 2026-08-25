@@ -11,12 +11,13 @@ const P={
   known:'tools/orbit360-test-f2-full-runtime-known-rootfixes-v20260819.mjs',
   exact:'tools/orbit360-f2-exact-candidate-source-validator-v20260819.mjs',
   provider:'tools/orbit360-m6-resolve-smoke-identity-readonly-v20260730.mjs',
-  providerEvidence:'tools/orbit360-f2-provider-failure-evidence-v20260825.mjs'
+  providerEvidence:'tools/orbit360-f2-provider-failure-evidence-v20260825.mjs',
+  currentStepEnv:'tools/orbit360-current-step-env-resolver-v20260825.mjs'
 };
 const A=p=>path.join(ROOT,p),T=p=>fs.readFileSync(A(p),'utf8').replace(/^\uFEFF/,''),J=p=>JSON.parse(T(p));
 const failures=[],need=(v,c)=>{if(!v)failures.push(c);};
 for(const p of Object.values(P))need(fs.existsSync(A(p)),`MISSING:${p}`);
-let contract={},registry={},known='',exact='',provider='',providerEvidenceSelftest={};
+let contract={},registry={},known='',exact='',provider='',providerEvidenceSelftest={},currentStepEnvSelftest={};
 if(!failures.length){contract=J(P.contract);registry=J(P.registry);known=T(P.known);exact=T(P.exact);provider=T(P.provider);}
 if(!failures.length){
   need(contract.active===true&&contract.behavioralContractPolicy?.sourceTextMayNotProveBehavior===true&&contract.behavioralContractPolicy?.literalImplementationStringChecksForbidden===true,'SEMANTIC_LITERAL_BEHAVIOR_POLICY_NOT_ACTIVE');
@@ -32,9 +33,14 @@ if(!failures.length){
   }
   try{providerEvidenceSelftest=JSON.parse(execFileSync(process.execPath,[A(P.providerEvidence)],{cwd:ROOT,encoding:'utf8'}));}catch(error){providerEvidenceSelftest={ok:false,error:String(error?.message||error)};}
   need(providerEvidenceSelftest.ok===true&&providerEvidenceSelftest.status==='F2_PROVIDER_FAILURE_EVIDENCE_SELFTEST_PASS'&&providerEvidenceSelftest.causalClassificationPass===true&&providerEvidenceSelftest.observationMonotonicPass===true,'F2_PROVIDER_FAILURE_EVIDENCE_SELFTEST_FAIL');
+  try{currentStepEnvSelftest=JSON.parse(execFileSync(process.execPath,[A(P.currentStepEnv)],{cwd:ROOT,encoding:'utf8'}));}catch(error){currentStepEnvSelftest={ok:false,error:String(error?.message||error)};}
+  need(currentStepEnvSelftest.ok===true&&currentStepEnvSelftest.status==='CURRENT_STEP_ENV_RESOLVER_SELFTEST_PASS'&&currentStepEnvSelftest.currentStepGithubEnvBridgePass===true&&currentStepEnvSelftest.currentProcessBindingPass===true&&currentStepEnvSelftest.directProcessEnvPrecedencePass===true&&currentStepEnvSelftest.missingFailsClosedPass===true,'F2_PROVIDER_CURRENT_STEP_ENV_SELFTEST_FAIL');
   need(provider.includes("from './orbit360-f2-provider-failure-evidence-v20260825.mjs'"),'F2_PROVIDER_CAUSAL_EVIDENCE_HELPER_NOT_BOUND');
   need(provider.includes('writeRuntimeFailureEnvelope'),'F2_PROVIDER_RUNTIME_FAILURE_ENVELOPE_NOT_BOUND');
+  need(provider.includes("from './orbit360-current-step-env-resolver-v20260825.mjs'"),'F2_PROVIDER_CURRENT_STEP_ENV_HELPER_NOT_BOUND');
+  need(provider.includes("bindCurrentStepEnvValue('GOOGLE_APPLICATION_CREDENTIALS')"),'F2_PROVIDER_CURRENT_STEP_CREDENTIAL_BINDING_NOT_BOUND');
 }
 const providerCausalEvidencePass=providerEvidenceSelftest.ok===true&&providerEvidenceSelftest.causalClassificationPass===true&&providerEvidenceSelftest.observationMonotonicPass===true;
-const out={schemaVersion:'orbit360-f2-validator-semantic-policy-audit-v2-provider-causal-evidence',ok:failures.length===0,status:failures.length?'F2_VALIDATOR_SEMANTIC_POLICY_AUDIT_FAIL':'F2_VALIDATOR_SEMANTIC_POLICY_AUDIT_PASS',classification:failures.length?'VALIDATOR_STALE':'PASS',failures:[...new Set(failures)],targets:[P.known,P.exact,P.provider,P.providerEvidence],policySource:P.contract,registry:P.registry,sourceTextBehaviorProofAllowed:false,literalImplementationStringChecksAllowed:false,providerCausalEvidencePass,providerObservationMonotonicPass:providerEvidenceSelftest.observationMonotonicPass===true,providerExternalFailureFailsClosedAs:providerEvidenceSelftest.unknownExternalFailureFailsClosedAs||null,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
+const providerCurrentStepEnvPass=currentStepEnvSelftest.ok===true&&currentStepEnvSelftest.currentStepGithubEnvBridgePass===true&&currentStepEnvSelftest.currentProcessBindingPass===true&&currentStepEnvSelftest.directProcessEnvPrecedencePass===true&&currentStepEnvSelftest.missingFailsClosedPass===true;
+const out={schemaVersion:'orbit360-f2-validator-semantic-policy-audit-v3-provider-current-step-env',ok:failures.length===0,status:failures.length?'F2_VALIDATOR_SEMANTIC_POLICY_AUDIT_FAIL':'F2_VALIDATOR_SEMANTIC_POLICY_AUDIT_PASS',classification:failures.length?'VALIDATOR_STALE':'PASS',failures:[...new Set(failures)],targets:[P.known,P.exact,P.provider,P.providerEvidence,P.currentStepEnv],policySource:P.contract,registry:P.registry,sourceTextBehaviorProofAllowed:false,literalImplementationStringChecksAllowed:false,providerCausalEvidencePass,providerObservationMonotonicPass:providerEvidenceSelftest.observationMonotonicPass===true,providerExternalFailureFailsClosedAs:providerEvidenceSelftest.unknownExternalFailureFailsClosedAs||null,providerCurrentStepEnvPass,currentStepGithubEnvBridgePass:currentStepEnvSelftest.currentStepGithubEnvBridgePass===true,currentProcessCredentialBindingPass:currentStepEnvSelftest.currentProcessBindingPass===true,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
 console.log(JSON.stringify(out,null,2));if(!out.ok)process.exit(41);
