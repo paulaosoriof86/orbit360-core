@@ -14,6 +14,7 @@ const P={
   registry:'orbit360-platform/docs/orbit360-continuity-writer-registry-v20260820.json',
   workflow:'.github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml',
   noRewrite:'tools/orbit360-control-plane-no-source-rewrite-guard-v20260824.mjs',
+  sourceWriteGuardSelftest:'tools/orbit360-source-write-guard-behavioral-selftest-v20260825.mjs',
   preflight:'tools/orbit360-macro3-mechanism-preflight-v20260823.mjs',
   sourcePrecheck:'tools/orbit360-validar-gate-contracts-engine-f2-productive-acceptance-v20260819.mjs',
   workflowAudit:'tools/orbit360-workflow-operational-surface-audit-v20260820.mjs',
@@ -50,6 +51,7 @@ for(const p of Object.values(P))need(fs.existsSync(A(ROOT,p)),`MISSING:${p}`);
 let sourcePathExecuted=false,classWidePreAuthPass=false,classWideTerminalPass=false,arbitraryFilenamePass=false;
 let candidateBindingDynamic=false,semanticPreflightPass=false,scratchBehavioralTransitionsPass=false,negativeRegressionSuitePass=false,preProviderGatePathPass=false,projectionImmutabilityPass=false,remoteCASReadbackPass=false,secondAttemptStopRetryPass=false;
 let workflowProviderUngatedNegativePass=false,workflowCandidateHardcodeNegativePass=false,workflowOperationalRevisionHardcodeNegativePass=false,sourceRewriteMutationNegativePass=false;
+let sourceWriteGuardBehavioralPass=false,temporaryInfrastructureAllowedPass=false,actualSourceWriteNegativePass=false;
 let authPublicationSurfacePass=false,runtimeRunIdBindingSimulationPass=false,runtimeRegisterReadOnlyPass=false,routerNativeRuntimeContractPass=false;
 let semanticContract={};
 
@@ -62,8 +64,10 @@ if(!failures.length){
   need(contract.behavioralContractPolicy?.runtimeRegisterMustBeReadOnly===true,'SEMANTIC_CONTRACT_REGISTER_READONLY_MISSING');
   need(contract.behavioralContractPolicy?.runtimeRouterMustSupportF2V3Natively===true,'SEMANTIC_CONTRACT_NATIVE_ROUTER_MISSING');
   need(contract.behavioralContractPolicy?.activeSourceFileWritesForbidden===true,'SEMANTIC_CONTRACT_SOURCE_WRITE_FORBIDDEN_MISSING');
+  need(contract.behavioralContractPolicy?.sourceWriteGuardBehavioralNegativeRequired===true,'SEMANTIC_CONTRACT_SOURCE_WRITE_BEHAVIORAL_NEGATIVE_MISSING');
   need(contract.behavioralSelftestRequirements?.workflowOperationalRevisionHardcodeNegativeTest===true,'SEMANTIC_CONTRACT_REVISION_NEGATIVE_TEST_MISSING');
   need(contract.behavioralSelftestRequirements?.sourceRewriteMutationNegativeTest===true,'SEMANTIC_CONTRACT_SOURCE_REWRITE_NEGATIVE_TEST_MISSING');
+  need(contract.behavioralSelftestRequirements?.sourceWriteGuardBehavioralSelftest===true,'SEMANTIC_CONTRACT_SOURCE_WRITE_BEHAVIORAL_SELFTEST_MISSING');
   need(contract.behavioralSelftestRequirements?.authPublicationSurfaceIncludesCanonicalStateOwner===true,'SEMANTIC_CONTRACT_AUTH_SURFACE_OWNER_MISSING');
   need(contract.behavioralSelftestRequirements?.runtimeRunIdBindingSimulation===true,'SEMANTIC_CONTRACT_RUNTIME_RUN_BINDING_MISSING');
   need(contract.behavioralSelftestRequirements?.runtimeRegisterReadOnlyBehavioralTest===true,'SEMANTIC_CONTRACT_REGISTER_BEHAVIOR_TEST_MISSING');
@@ -78,6 +82,16 @@ if(!failures.length){
   need(Number(L.progress?.productionRouteProgressPct)===75&&L.progress?.f2TerminalPass===false,'SELFTEST_PROGRESS_NOT_FAIL_CLOSED');
 
   const nr=runJson(ROOT,P.noRewrite);need(nr.result.status===0&&nr.json?.ok===true&&nr.json?.scopeMode==='MACHINE_READABLE_CONTRACT_DERIVED'&&nr.json?.sourceWritePatternsForbidden===true,'NO_SOURCE_REWRITE_GUARD_FAIL');
+  const sourceWriteGuardProbe=runJson(ROOT,P.sourceWriteGuardSelftest);
+  sourceWriteGuardBehavioralPass=sourceWriteGuardProbe.result.status===0&&sourceWriteGuardProbe.json?.ok===true&&sourceWriteGuardProbe.json?.status==='SOURCE_WRITE_GUARD_BEHAVIORAL_SELFTEST_PASS';
+  temporaryInfrastructureAllowedPass=sourceWriteGuardBehavioralPass&&sourceWriteGuardProbe.json?.temporaryInfrastructureAllowedPass===true&&sourceWriteGuardProbe.json?.cleanupPass===true;
+  actualSourceWriteNegativePass=sourceWriteGuardBehavioralPass&&sourceWriteGuardProbe.json?.actualSourceWriteNegativePass===true;
+  sourceRewriteMutationNegativePass=sourceWriteGuardBehavioralPass&&temporaryInfrastructureAllowedPass&&actualSourceWriteNegativePass;
+  need(sourceWriteGuardBehavioralPass,'SOURCE_WRITE_GUARD_BEHAVIORAL_SELFTEST_FAIL');
+  need(temporaryInfrastructureAllowedPass,'SOURCE_WRITE_GUARD_TEMP_INFRASTRUCTURE_NOT_PROVEN');
+  need(actualSourceWriteNegativePass,'SOURCE_WRITE_GUARD_ACTUAL_SOURCE_WRITE_NOT_REJECTED');
+  need(sourceRewriteMutationNegativePass,'NEGATIVE_SOURCE_REWRITE_NOT_DETECTED');
+
   const wa=runJson(ROOT,P.workflowAudit);need(wa.result.status===0&&wa.json?.ok===true&&Number(wa.json?.totalWorkflowFiles)===1,'WORKFLOW_SURFACE_AUDIT_FAIL');
   const mp=runJson(ROOT,P.preflight,[],{ORBIT360_F2_WORKFLOW_SOURCE_FILE:A(ROOT,P.workflow)});
   semanticPreflightPass=mp.result.status===0&&mp.json?.ok===true&&mp.json?.sourceShapeValidationUsed===false&&mp.json?.candidateBinding==='DYNAMIC_FROM_CANONICAL_LEDGER';
@@ -160,13 +174,6 @@ if(!failures.length){
     workflowOperationalRevisionHardcodeNegativePass=revisionHardcoded.result.status!==0&&Array.isArray(revisionHardcoded.json?.offenders)&&revisionHardcoded.json.offenders.some(x=>x.reason==='OPERATIONAL_REVISION_HARDCODED_IN_WORKFLOW');
     fs.writeFileSync(A(scratch,P.workflow),originalWorkflow,'utf8');
     need(workflowOperationalRevisionHardcodeNegativePass,'NEGATIVE_OPERATIONAL_REVISION_HARDCODE_NOT_DETECTED');
-
-    const originalRegister=text(scratch,P.register);
-    const mutationCall=`${['fs','writeFileSync'].join('.')}(${JSON.stringify(P.gateRouter)},'tamper');`;
-    fs.writeFileSync(A(scratch,P.register),`${originalRegister}\n${mutationCall}\n`,'utf8');
-    const rewriteProbe=runJson(scratch,P.noRewrite);
-    sourceRewriteMutationNegativePass=rewriteProbe.result.status!==0&&Array.isArray(rewriteProbe.json?.failures)&&rewriteProbe.json.failures.some(x=>String(x).startsWith(`ACTIVE_SOURCE_REWRITE_FORBIDDEN:${P.register}:`));
-    fs.writeFileSync(A(scratch,P.register),originalRegister,'utf8');
     need(sourceRewriteMutationNegativePass,'NEGATIVE_SOURCE_REWRITE_NOT_DETECTED');
     need(repoChanges(scratch).length===0,'NEGATIVE_FIXTURES_NOT_CLEAN');
 
@@ -255,7 +262,7 @@ if(!failures.length){
 }
 
 const out={
-  schemaVersion:'orbit360-control-plane-selftest-v13-native-runtime-router-readonly-register',
+  schemaVersion:'orbit360-control-plane-selftest-v14-canonical-source-write-behavioral-owner',
   ok:false,
   status:'CONTROL_PLANE_SELFTEST_FAIL',
   classification:'PIPELINE_MECHANISM_FAILURE',
@@ -276,6 +283,9 @@ const out={
   workflowProviderUngatedNegativePass,
   workflowCandidateHardcodeNegativePass,
   workflowOperationalRevisionHardcodeNegativePass,
+  sourceWriteGuardBehavioralPass,
+  temporaryInfrastructureAllowedPass,
+  actualSourceWriteNegativePass,
   sourceRewriteMutationNegativePass,
   authPublicationSurfacePass,
   runtimeRunIdBindingSimulationPass,
@@ -284,6 +294,8 @@ const out={
   negativeRegressionSuitePass,
   validatorMode:'MACHINE_READABLE_CONTRACT_PLUS_BEHAVIORAL_EXECUTION',
   sourceShapeValidationUsed:false,
+  sourceWriteNegativeTestOwner:P.sourceWriteGuardSelftest,
+  sourceRewriteMutationNegativeCompatibilityAlias:true,
   durableHandshakeMustBePublishedByCanonicalWorkflow:true,
   prepublicationFailureMustBeCanonicallyReduced:true,
   canonicalOwner:'tools/orbit360-continuity-transition-owner-v20260824.mjs',
