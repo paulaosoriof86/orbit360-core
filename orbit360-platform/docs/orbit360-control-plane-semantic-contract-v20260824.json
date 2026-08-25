@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "orbit360-control-plane-semantic-contract-v1",
+  "schemaVersion": "orbit360-control-plane-semantic-contract-v2-harness-bound",
   "contractId": "ORBIT360-CONTROL-PLANE-SEMANTIC-CONTRACT",
   "active": true,
   "status": "ACTIVE_SOURCE_ONLY_FAIL_CLOSED",
@@ -17,7 +17,9 @@
     "historicalOrdinalHardcodingForbidden": true,
     "technicalWorkflowStepIdsAllowed": true,
     "versionedMachineReadableContractsRequired": true,
-    "behavioralExecutionRequiredForCriticalTransitions": true
+    "behavioralExecutionRequiredForCriticalTransitions": true,
+    "canonicalPublicationSurfaceIncludesStateOwner": true,
+    "runtimeRunIdentityMustPropagateEndToEnd": true
   },
   "activeControlPlaneComponents": [
     "tools/orbit360-continuity-transition-owner-v20260824.mjs",
@@ -102,11 +104,32 @@
     "workflowProviderUngatedNegativeTest": true,
     "workflowCandidateHardcodeNegativeTest": true,
     "workflowOperationalRevisionHardcodeNegativeTest": true,
+    "authPublicationSurfaceIncludesCanonicalStateOwner": true,
+    "runtimeRunIdBindingSimulation": true,
     "runtimeExecuted": false,
     "browserExecuted": false,
     "secretAccess": false,
     "firestoreRead": false
   },
+  "selftestRequiredTrueFields": [
+    "candidateBindingDynamic",
+    "semanticPreflightPass",
+    "exactF2SourcePathExecuted",
+    "classWidePreAuthEvidenceLifecyclePass",
+    "classWidePreTerminalEvidenceLifecyclePass",
+    "arbitraryFutureFilenameCleanupPass",
+    "scratchBehavioralTransitionsPass",
+    "preProviderGatePathPass",
+    "projectionImmutabilityPass",
+    "remoteCASReadbackPass",
+    "secondAttemptStopRetryPass",
+    "workflowProviderUngatedNegativePass",
+    "workflowCandidateHardcodeNegativePass",
+    "workflowOperationalRevisionHardcodeNegativePass",
+    "authPublicationSurfacePass",
+    "runtimeRunIdBindingSimulationPass",
+    "negativeRegressionSuitePass"
+  ],
   "closureRequirements": {
     "macro3SemanticPreflightPass": true,
     "workflowSurfaceAuditPass": true,
@@ -114,6 +137,8 @@
     "exactF2SourcePathPass": true,
     "classWideEvidenceLifecyclePass": true,
     "scratchBehavioralTransitionsPass": true,
+    "authPublicationSurfacePass": true,
+    "runtimeRunIdBindingSimulationPass": true,
     "negativeRegressionSuitePass": true,
     "durableHandshakeFromSameCanonicalWorkflowRun": true,
     "authorizationMaterialized": false,
