@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "orbit360-control-plane-semantic-contract-v2-harness-bound",
+  "schemaVersion": "orbit360-control-plane-semantic-contract-v3-native-runtime-router",
   "contractId": "ORBIT360-CONTROL-PLANE-SEMANTIC-CONTRACT",
   "active": true,
   "status": "ACTIVE_SOURCE_ONLY_FAIL_CLOSED",
@@ -19,7 +19,11 @@
     "versionedMachineReadableContractsRequired": true,
     "behavioralExecutionRequiredForCriticalTransitions": true,
     "canonicalPublicationSurfaceIncludesStateOwner": true,
-    "runtimeRunIdentityMustPropagateEndToEnd": true
+    "runtimeRunIdentityMustPropagateEndToEnd": true,
+    "runtimeRegisterMustBeReadOnly": true,
+    "runtimeRouterMustSupportF2V3Natively": true,
+    "runtimeGateMayNotDependOnTransientSourceRewrite": true,
+    "activeSourceFileWritesForbidden": true
   },
   "activeControlPlaneComponents": [
     "tools/orbit360-continuity-transition-owner-v20260824.mjs",
@@ -64,6 +68,15 @@
     "tools/orbit360-promote-macro2-transversal-candidate-v20260821.mjs",
     "tools/orbit360-f2-terminal-evidence-normalizer-v20260824.mjs"
   ],
+  "runtimePreProviderImmutablePaths": [
+    "tools/orbit360-register-f2-productive-acceptance-runtime-v20260819.mjs",
+    "tools/orbit360-validar-gate-contracts-v20260717.mjs",
+    "tools/orbit360-f2-gate-semantic-v20260824.mjs",
+    "tools/orbit360-validar-gate-contracts-engine-f2-productive-acceptance-v20260819.mjs",
+    "tools/orbit360-gate-contract-f2-productive-acceptance-v20260820.json",
+    "tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-source-v20260819.json",
+    "tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-runtime-v20260819.json"
+  ],
   "workflowSemanticRequirements": {
     "singleWorkflow": true,
     "genericIntentRouter": true,
@@ -78,7 +91,9 @@
     "gateStepId": "gate",
     "providerStepId": "provider",
     "providerDependsOnGate": true,
-    "remoteHeadCASRequired": true
+    "remoteHeadCASRequired": true,
+    "runtimeRegisterReadOnly": true,
+    "nativeF2RuntimeRequestVersion": "F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_V3"
   },
   "evidenceLifecycleRequirements": {
     "scope": "orbit360-platform/runtime-gate-crm-v20260716",
@@ -104,8 +119,11 @@
     "workflowProviderUngatedNegativeTest": true,
     "workflowCandidateHardcodeNegativeTest": true,
     "workflowOperationalRevisionHardcodeNegativeTest": true,
+    "sourceRewriteMutationNegativeTest": true,
     "authPublicationSurfaceIncludesCanonicalStateOwner": true,
     "runtimeRunIdBindingSimulation": true,
+    "runtimeRegisterReadOnlyBehavioralTest": true,
+    "nativeRuntimeRouterBehavioralTest": true,
     "runtimeExecuted": false,
     "browserExecuted": false,
     "secretAccess": false,
@@ -126,8 +144,11 @@
     "workflowProviderUngatedNegativePass",
     "workflowCandidateHardcodeNegativePass",
     "workflowOperationalRevisionHardcodeNegativePass",
+    "sourceRewriteMutationNegativePass",
     "authPublicationSurfacePass",
     "runtimeRunIdBindingSimulationPass",
+    "runtimeRegisterReadOnlyPass",
+    "routerNativeRuntimeContractPass",
     "negativeRegressionSuitePass"
   ],
   "closureRequirements": {
@@ -139,6 +160,9 @@
     "scratchBehavioralTransitionsPass": true,
     "authPublicationSurfacePass": true,
     "runtimeRunIdBindingSimulationPass": true,
+    "runtimeRegisterReadOnlyPass": true,
+    "routerNativeRuntimeContractPass": true,
+    "sourceRewriteMutationNegativePass": true,
     "negativeRegressionSuitePass": true,
     "durableHandshakeFromSameCanonicalWorkflowRun": true,
     "authorizationMaterialized": false,
