@@ -196,6 +196,11 @@ jobs:
       - id: regression_reopen
         name: Reduce durable control-plane regression and reopen Iteration 1
         if: steps.intent.outputs.mode == 'CONTROL_PLANE_REGRESSION_REOPEN'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ORBIT360_PUBLICATION_CLASS: CONTROL_PLANE_REGRESSION
+          ORBIT360_PUBLICATION_TRANSACTION_OUT: ${{ runner.temp }}/control-plane-regression-publication.json
+          ORBIT360_PUBLICATION_COMMIT_MESSAGE: 'gate(control-plane): reopen regression stop-retry'
         shell: bash
         run: |
           set -euo pipefail
@@ -203,20 +208,19 @@ jobs:
           jq -e '.ok==true and .status=="CONTROL_PLANE_REGRESSION_REOPENED_STOP_RETRY" and .progress==75 and .runtimeExecuted==false and .browserExecuted==false and .secretAccess==false and .firestoreRead==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .deployExecuted==false and .productionTouched==false' "$RUNNER_TEMP/regression-reopen.json" >/dev/null
           node tools/orbit360-terminal-truth-invariant-v20260824.mjs
           node tools/orbit360-control-plane-independent-readback-v20260820.mjs
+          jq -e '.ok==true and .status=="CONTROL_PLANE_PUBLICATION_TRANSACTION_PREPARED" and .publicationClass=="CONTROL_PLANE_REGRESSION" and .canonicalRunner==true and .diffCheckPass==true and .commitTreePass==true and .remoteCASPass==true and .pushDryRunPass==true' "$ORBIT360_PUBLICATION_TRANSACTION_OUT" >/dev/null
 
       - id: regression_publish
-        name: Publish regression reopen with remote CAS
-        if: steps.intent.outputs.mode == 'CONTROL_PLANE_REGRESSION_REOPEN'
+        name: Publish regression reopen exact prepared commit with remote CAS and readback
+        if: steps.intent.outputs.mode == 'CONTROL_PLANE_REGRESSION_REOPEN' && steps.regression_reopen.outcome == 'success'
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
-          mapfile -t CHANGED < <(git status --porcelain | sed 's/^...//' | sort -u); test "${#CHANGED[@]}" -gt 0
-          for f in "${CHANGED[@]}"; do case "$f" in .github/orbit360-requests/macro2-canonical-source-activation-pointer-v20260821.json|README.md|orbit360-platform/CHANGELOG.md|orbit360-platform/docs/CHECKPOINT-CONTROL-PLANE-HARDENING-20260820.md|orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json|orbit360-platform/docs/ORBIT360-PR5-CURRENT-STATE.md|orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json|orbit360-platform/docs/orbit360-f2-runtime-authorization-boundary-v20260820.json|orbit360-platform/docs/orbit360-live-state-v1.json|orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json|tools/orbit360-gate-contract-f2-productive-acceptance-v20260820.json|tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-runtime-v20260819.json|tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-source-v20260819.json) ;; *) echo "PIPELINE_MECHANISM_FAILURE:REGRESSION_REOPEN_PUBLICATION_SURFACE:$f" >&2; exit 41 ;; esac; done
-          git config user.name 'orbit360-control-plane'; git config user.email 'orbit360-control-plane@users.noreply.github.com'
-          git add -- "${CHANGED[@]}"; git diff --cached --check; git commit -m 'gate(control-plane): reopen regression stop-retry'
-          FINAL_HEAD=$(git rev-parse HEAD); git fetch --no-tags origin "$ORBIT360_BRANCH"; test "$(git rev-parse FETCH_HEAD)" = '${{ steps.intent.outputs.live_base }}'; git push "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:refs/heads/${ORBIT360_BRANCH}"
+          node "$PUBLICATION_OWNER" --publish-validated "$RUNNER_TEMP/control-plane-regression-publication.json" | tee "$RUNNER_TEMP/control-plane-regression-publish.json"
+          jq -e '.ok==true and .status=="CONTROL_PLANE_PUBLICATION_TRANSACTION_PUBLISHED" and .publicationClass=="CONTROL_PLANE_REGRESSION" and .pushPass==true and .remoteReadbackPass==true and .localReadbackPass==true' "$RUNNER_TEMP/control-plane-regression-publish.json" >/dev/null
+          FINAL_HEAD=$(jq -r '.commitSha' "$RUNNER_TEMP/control-plane-regression-publish.json"); [[ "$FINAL_HEAD" =~ ^[a-f0-9]{40}$ ]]
           jq -Rs '{body:.}' < "$PR_STATE" > "$RUNNER_TEMP/pr-body-regression.json"
           curl -L --fail --silent --show-error -X PATCH -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/${GITHUB_REPOSITORY}/pulls/5" --data-binary @"$RUNNER_TEMP/pr-body-regression.json" >/dev/null
           jq -e '.activeState.status=="CONTROL_PLANE_REGRESSION_OPEN_STOP_RETRY" and .productionReopeningPackage.authorizationAllowed==false and .progress.productionRouteProgressPct==75' "$LEDGER" >/dev/null
