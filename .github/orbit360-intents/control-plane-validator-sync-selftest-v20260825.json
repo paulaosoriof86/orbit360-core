@@ -15,5 +15,5 @@
   "expectedPackageRevision": 36,
   "candidateArtifactId": 9504702901,
   "candidateSourceHead": "8c9668d6d423e82826b0295431ec699390d79b4b",
-  "transportNonce": "validator-sync-selftest-prepare-20260825"
+  "transportNonce": "validator-sync-selftest-run-20260825"
 }
