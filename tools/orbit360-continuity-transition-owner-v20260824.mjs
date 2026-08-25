@@ -54,11 +54,19 @@ execFileSync(process.execPath,[A(P.noRewrite)],{cwd:ROOT,stdio:'ignore'});
 execFileSync(process.execPath,[A(P.terminalTruth)],{cwd:ROOT,stdio:'ignore'});
 
 if(transition==='CONTROL_PLANE_REGRESSION_REOPEN'){
-  if(L.activeState?.phase!=='CONTROL_PLANE_DEFINITIVE_CAUSAL_PASS_AWAITING_F2_AUTHORIZATION'||L.activeState?.status!=='CONTROL_PLANE_DEFINITIVE_CAUSAL_PASS')throw new Error('CONTROL_PLANE_REGRESSION_REOPEN_PHASE_INVALID');
+  const fromClosed=L.activeState?.phase==='CONTROL_PLANE_DEFINITIVE_CAUSAL_PASS_AWAITING_F2_AUTHORIZATION'&&L.activeState?.status==='CONTROL_PLANE_DEFINITIVE_CAUSAL_PASS';
+  const sealed=L.history?.latestSealedConsumedRuntime||{};
+  const fromSealedF2Mechanism=L.activeState?.phase==='F2_TERMINAL_FAIL_AWAITING_SOURCE_ONLY_ROOT_CAUSE'&&L.activeState?.status==='F2_TERMINAL_RECONCILED_NO_REPLAY'&&sealed.consumed===true&&sealed.replayAllowed===false&&sealed.observedClassification==='PIPELINE_MECHANISM_FAILURE'&&Number(sealed.firestoreWrites||0)===0&&Number(sealed.authWrites||0)===0&&Number(sealed.operationalWrites||0)===0;
+  if(!fromClosed&&!fromSealedF2Mechanism)throw new Error('CONTROL_PLANE_REGRESSION_REOPEN_PHASE_INVALID');
   if(!controlPlaneFailureEvidence||!/^orbit360-platform\/runtime-gate-crm-v20260716\/f2-pipeline-publication-failure-run-[0-9]+-v20260824\.json$/.test(controlPlaneFailureEvidence)||!fs.existsSync(A(controlPlaneFailureEvidence)))throw new Error('CONTROL_PLANE_DURABLE_FAILURE_EVIDENCE_REQUIRED');
   const F=J(controlPlaneFailureEvidence),run=Number(F.runId||0);
   if(F.classification!=='PIPELINE_MECHANISM_FAILURE'||F.stopRetry?.active!==true||F.stopRetry?.newF2AttemptAllowed!==false||F.stopRetry?.workflowRerunAllowed!==false)throw new Error('CONTROL_PLANE_FAILURE_STOP_RETRY_CONTRACT_INVALID');
-  if(F.canonicalPublication?.acceptedStatePublished!==false||F.canonicalPublication?.terminalStatePublished!==false||F.canonicalPublication?.prBodyAdvancedFromUnpublishedState!==false)throw new Error('CONTROL_PLANE_FAILURE_PUBLICATION_TRUTH_INVALID');
+  if(fromClosed){
+    if(F.canonicalPublication?.acceptedStatePublished!==false||F.canonicalPublication?.terminalStatePublished!==false||F.canonicalPublication?.prBodyAdvancedFromUnpublishedState!==false)throw new Error('CONTROL_PLANE_FAILURE_PUBLICATION_TRUTH_INVALID');
+  }else{
+    if(F.canonicalPublication?.acceptedStatePublished!==true||F.canonicalPublication?.terminalStatePublished!==true||F.canonicalPublication?.prBodyAdvancedFromUnpublishedState!==false)throw new Error('CONTROL_PLANE_F2_MECHANISM_TERMINAL_PUBLICATION_TRUTH_INVALID');
+    if(Number(sealed.runId)!==run||String(sealed.terminalEvidencePath||'')!==String(F.terminalEvidencePath||''))throw new Error('CONTROL_PLANE_F2_MECHANISM_SEALED_RUNTIME_MISMATCH');
+  }
   if(!noSideEffects(F.sideEffects||{}))throw new Error('CONTROL_PLANE_FAILURE_SIDE_EFFECT_SIGNAL');
   if(Number(F.candidateArtifactId)!==Number(L.successorCandidate?.artifactId)||F.candidateSourceHead!==L.successorCandidate?.sourceHead||F.candidateArtifactDigest!==L.successorCandidate?.artifactDigest)throw new Error('CONTROL_PLANE_FAILURE_CANDIDATE_MISMATCH');
   if(!Number.isInteger(run)||run<=Number(L.continuityControl?.workflowHandshakeRunId||0))throw new Error('CONTROL_PLANE_FAILURE_NOT_NEWER_THAN_CLOSURE');
@@ -76,7 +84,7 @@ if(transition==='CONTROL_PLANE_REGRESSION_REOPEN'){
   L.history={...(L.history||{}),latestControlPlaneFailure:{runId:run,jobId:Number(F.jobId||0),technicalPullRequest:Number(F.technicalPullRequest||0),conclusion:'failure',classification:F.classification,failureCode:F.failureCode,evidencePath:controlPlaneFailureEvidence,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,firestoreWrites:0,authWrites:0,operationalWrites:0,replayAllowed:false,reducedAtUtc:ts}};
   W(P.ledger,L);
   project(L.revision);
-  console.log(JSON.stringify({ok:true,status:'CONTROL_PLANE_REGRESSION_REOPENED_STOP_RETRY',transition,ledgerRevision:L.revision,packageRevision:L.productionReopeningPackage.revision,regressionRunId:run,regressionEvidence:controlPlaneFailureEvidence,progress:75,authorizationMaterialized:false,requestMaterialized:false,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false},null,2));
+  console.log(JSON.stringify({ok:true,status:'CONTROL_PLANE_REGRESSION_REOPENED_STOP_RETRY',transition,ledgerRevision:L.revision,packageRevision:L.productionReopeningPackage.revision,regressionRunId:run,regressionEvidence:controlPlaneFailureEvidence,reopenedFrom:fromSealedF2Mechanism?'SEALED_F2_PIPELINE_MECHANISM_FAILURE':'CONTROL_PLANE_CLOSED_REGRESSION',progress:75,authorizationMaterialized:false,requestMaterialized:false,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false},null,2));
   process.exit(0);
 }
 
