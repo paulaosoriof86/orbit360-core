@@ -1,5 +1,7 @@
 # ROOTFIX — Scope scratch del preflight de publicación
 
+**HISTORICAL INCIDENT EVIDENCE — NOT CURRENT STATE AUTHORITY.** Este documento conserva el diagnóstico y la corrección aplicados en su momento; no define estado vigente, nextAction ni autoridad de reanudación. El estado operativo actual se deriva únicamente del ledger y de sus proyecciones canónicas.
+
 Fecha: 2026-08-25
 
 ## Hallazgo
@@ -32,6 +34,6 @@ Además, los fallos del preflight ahora usan errores tipados en lugar de `proces
 
 Cero F2, runtime, browser, secrets, Firestore, writes operativos, deploy, producción, main o merge. Producto y candidata permanecen congelados.
 
-## Siguiente gate
+## Siguiente gate histórico de esa iteración
 
 No reutilizar el run fallido. Tras auditoría y fast-forward source-only, ejecutar un único `CONTROL_PLANE_SELFTEST` fresco. Solo un PASS integral permite producir un handshake nuevo y volver a intentar `CONTROL_PLANE_HARDENING_CLOSE`.
