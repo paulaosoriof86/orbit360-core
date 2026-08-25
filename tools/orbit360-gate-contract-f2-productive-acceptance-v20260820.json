@@ -4,7 +4,7 @@
   "gateId": "f2-productive-acceptance-exact-successor-v20260818",
   "gateContractVersion": "2.2.0",
   "lifecycleComposition": "phase-capability-contract-v7-canonical-convergence",
-  "status": "CONTROL_PLANE_DEFINITIVE_CAUSAL_PASS",
+  "status": "F2_RUNTIME_ATTEMPT_ACCEPTED_ONE_SHOT",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
   "lifecycles": {
@@ -27,7 +27,7 @@
   "candidateCertificationPolicy": "DYNAMIC_FROM_LEDGER_AND_DURABLE_EVIDENCE",
   "productionReopeningPackage": "orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json",
   "requestBinding": {
-    "activeRequest": null,
+    "activeRequest": ".github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-successor-e581c74b3a90-v20260820.json",
     "defaultRequest": null,
     "requestOrdinalHasOperationalSemantics": false,
     "historicalRequestMayBeUsedAsActiveBinding": false
@@ -41,7 +41,7 @@
     "deploy": false,
     "production": false
   },
-  "canonicalStateFingerprint": "d016087c9a7d2d9c38910a5d3c253e44fcf920ce9c370f706fcb1471c87c36bc",
+  "canonicalStateFingerprint": "680e5ac005ed72f2a293b4a9a253dd43dc57aa50f42ba35e0212ba5eb5ed4ad6",
   "containsPII": false,
   "containsSecrets": false,
   "canonicalPlan": "orbit360-platform/docs/PLAN-MAESTRO-CONGELADO-SALIDA-PRODUCCION-SIN-BUCLES-ORBIT360-AYS-20260824.md"
