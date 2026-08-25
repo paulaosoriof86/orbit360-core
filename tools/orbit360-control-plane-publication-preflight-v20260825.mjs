@@ -23,6 +23,7 @@ const emitFailure=(error)=>{const code=error instanceof PublicationError?error.p
 const zlist=gitArgs=>String(run(gitArgs)).split('\0').map(x=>x.trim()).filter(Boolean);
 const changedSurface=()=>[...new Set([...zlist(['diff','--name-only','-z']),...zlist(['diff','--cached','--name-only','-z']),...zlist(['ls-files','--others','--exclude-standard','-z'])])].sort();
 const isEvidence=p=>p===EVIDENCE_DIR||p.startsWith(`${EVIDENCE_DIR}/`);
+const fetchRemote=(branch,attempts=3)=>{let last;for(let i=0;i<attempts;i++){try{run(['fetch','--no-tags','origin',branch]);return run(['rev-parse','FETCH_HEAD']).trim();}catch(error){last=error;}}throw last||new Error('remote fetch failed');};
 const match=p=>({
   f2Auth:/^\.github\/orbit360-authorizations\/f2-productive-acceptance-runtime-browser-readonly-auth-[^/]+\.json$/.test(p),
   f2Request:/^\.github\/orbit360-requests\/f2-productive-acceptance-runtime-browser-readonly-successor-[^/]+\.json$/.test(p),
@@ -49,7 +50,7 @@ function allowedSurface(registry,allChanged,selftestMode,closeState){
     ignoredSelftestEvidence=allChanged.filter(p=>!classAllows(p)&&isEvidence(p));
     changed=allChanged.filter(classAllows);
     if(!changed.includes(registry.sourceOfTruth))fail('SELFTEST_PUBLICATION_LEDGER_NOT_CHANGED',allChanged.join(','));
-  }else if(closeState||publicationClass==='CONTROL_PLANE_CLOSE'||publicationClass==='F2_AUTH_ACCEPT'||publicationClass==='F2_TERMINAL'){
+  }else if(closeState||['CONTROL_PLANE_CLOSE','CONTROL_PLANE_REGRESSION','F2_AUTH_ACCEPT','F2_TERMINAL'].includes(publicationClass)){
     const offenders=allChanged.filter(p=>!classAllows(p));
     if(offenders.length)fail(`PUBLICATION_SURFACE_${publicationClass}`,offenders.join(','));
   }
@@ -93,8 +94,7 @@ function prepareTransaction(){
     if(canonicalRunner){
       if(!branch)fail('PUBLICATION_TRANSACTION_BRANCH_MISSING');
       try{
-        run(['fetch','--no-tags','origin',branch]);
-        const remote=run(['rev-parse','FETCH_HEAD']).trim();
+        const remote=fetchRemote(branch);
         if(remote!==baseHead)fail('PUBLICATION_TRANSACTION_REMOTE_CAS_MISMATCH',`${remote}:${baseHead}`);
         remoteCASPass=true;
       }catch(error){if(error instanceof PublicationError)throw error;fail('PUBLICATION_TRANSACTION_REMOTE_CAS',String(error?.stdout||error?.stderr||error?.message||error));}
@@ -114,7 +114,7 @@ function publishValidatedTransaction(file){
   const token=String(process.env.GH_TOKEN||'').trim(),repo=String(process.env.GITHUB_REPOSITORY||'').trim();
   if(process.env.GITHUB_ACTIONS!=='true'||!token||!repo)fail('PUBLICATION_TRANSACTION_CANONICAL_RUNNER_REQUIRED');
   if(txn.canonicalRunner!==true||txn.remoteCASPass!==true||txn.pushDryRunPass!==true)fail('PUBLICATION_TRANSACTION_REMOTE_PREFLIGHT_INCOMPLETE');
-  const ledger=readJson(LEDGER),registry=readJson(REGISTRY);
+  const ledger=readJson(LEDGER);
   if(String(txn.branch)!==String(ledger.branch||''))fail('PUBLICATION_TRANSACTION_BRANCH_DRIFT');
   const head=run(['rev-parse','HEAD']).trim();
   if(head!==txn.baseHead)fail('PUBLICATION_TRANSACTION_LOCAL_BASE_DRIFT',`${head}:${txn.baseHead}`);
@@ -133,17 +133,29 @@ function publishValidatedTransaction(file){
   }finally{try{fs.rmSync(tempDir,{recursive:true,force:true});}catch{}}
   const commitType=run(['cat-file','-t',txn.commitSha]).trim();
   if(commitType!=='commit')fail('PUBLICATION_TRANSACTION_COMMIT_MISSING',txn.commitSha);
-  run(['fetch','--no-tags','origin',txn.branch]);
-  const remoteBefore=run(['rev-parse','FETCH_HEAD']).trim();
+  let remoteBefore;
+  try{remoteBefore=fetchRemote(txn.branch);}catch(error){fail('PUBLICATION_TRANSACTION_REMOTE_READ_BEFORE_PUSH',String(error?.stdout||error?.stderr||error?.message||error));}
   if(remoteBefore!==txn.baseHead)fail('PUBLICATION_TRANSACTION_REMOTE_CAS_MISMATCH',`${remoteBefore}:${txn.baseHead}`);
   const url=`https://x-access-token:${token}@github.com/${repo}.git`;
-  try{run(['push',url,`${txn.commitSha}:refs/heads/${txn.branch}`],{stdio:['ignore','pipe','pipe']});}catch(error){fail('PUBLICATION_TRANSACTION_PUSH_FAILED',redact(error?.stdout||error?.stderr||error?.message||error,token));}
-  run(['fetch','--no-tags','origin',txn.branch]);
-  const remoteAfter=run(['rev-parse','FETCH_HEAD']).trim();
+  let pushPass=false,pushConfirmedAfterAmbiguousError=false;
+  try{
+    run(['push',url,`${txn.commitSha}:refs/heads/${txn.branch}`],{stdio:['ignore','pipe','pipe']});
+    pushPass=true;
+  }catch(error){
+    let observed='';
+    try{observed=fetchRemote(txn.branch);}catch{}
+    if(observed===txn.commitSha){pushPass=true;pushConfirmedAfterAmbiguousError=true;}
+    else if(observed&&observed!==txn.baseHead)fail('PUBLICATION_TRANSACTION_PUSH_AMBIGUOUS_REMOTE_MOVED',`${observed}:${txn.baseHead}:${txn.commitSha}`);
+    else fail('PUBLICATION_TRANSACTION_PUSH_FAILED',redact(error?.stdout||error?.stderr||error?.message||error,token));
+  }
+  if(!pushPass)fail('PUBLICATION_TRANSACTION_PUSH_NOT_CONFIRMED');
+  let remoteAfter;
+  try{remoteAfter=fetchRemote(txn.branch);}catch(error){fail('PUBLICATION_TRANSACTION_REMOTE_READBACK_FAILED',String(error?.stdout||error?.stderr||error?.message||error));}
   if(remoteAfter!==txn.commitSha)fail('PUBLICATION_TRANSACTION_REMOTE_READBACK_MISMATCH',`${remoteAfter}:${txn.commitSha}`);
   try{run(['reset','--hard',txn.commitSha],{stdio:['ignore','pipe','pipe']});}catch(error){fail('PUBLICATION_TRANSACTION_LOCAL_READBACK_RESET_FAIL',String(error?.stdout||error?.stderr||error?.message||error));}
-  if(changedSurface().length)fail('PUBLICATION_TRANSACTION_LOCAL_POSTPUBLISH_DIRTY',changedSurface().join(','));
-  emit({ok:true,status:'CONTROL_PLANE_PUBLICATION_TRANSACTION_PUBLISHED',classification:'PASS',mode:'PUBLISH_VALIDATED',publicationClass:txn.publicationClass,baseHead:txn.baseHead,treeSha:txn.treeSha,commitSha:txn.commitSha,branch:txn.branch,remoteCASPass:true,pushDryRunPass:true,pushPass:true,remoteReadbackPass:true,localReadbackPass:true,changedCount:txn.changedCount,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false});
+  const remaining=changedSurface();
+  if(remaining.length)fail('PUBLICATION_TRANSACTION_LOCAL_POSTPUBLISH_DIRTY',remaining.join(','));
+  emit({ok:true,status:'CONTROL_PLANE_PUBLICATION_TRANSACTION_PUBLISHED',classification:'PASS',mode:'PUBLISH_VALIDATED',publicationClass:txn.publicationClass,baseHead:txn.baseHead,treeSha:txn.treeSha,commitSha:txn.commitSha,branch:txn.branch,remoteCASPass:true,pushDryRunPass:true,pushPass:true,pushConfirmedAfterAmbiguousError,remoteReadbackPass:true,localReadbackPass:true,changedCount:txn.changedCount,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false});
 }
 
 try{
