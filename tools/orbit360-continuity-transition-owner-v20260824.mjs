@@ -29,10 +29,17 @@ const W=(p,x)=>{fs.mkdirSync(path.dirname(A(p)),{recursive:true});fs.writeFileSy
 const sha=s=>crypto.createHash('sha256').update(String(s)).digest('hex');
 const noSideEffects=x=>x?.runtimeExecuted===false&&x?.browserExecuted===false&&x?.secretAccess===false&&x?.firestoreRead===false&&Number(x?.firestoreWrites||0)===0&&Number(x?.authWrites||0)===0&&Number(x?.operationalWrites||0)===0&&x?.deployExecuted===false&&x?.productionTouched===false;
 const parseJson=s=>{try{return JSON.parse(String(s||'').trim());}catch{return null;}};
+const lastJson=s=>{const parts=String(s||'').trim().split(/\n(?=\{)/);for(let i=parts.length-1;i>=0;i--){const parsed=parseJson(parts[i]);if(parsed)return parsed;}return null;};
+const project=revision=>execFileSync(process.execPath,[A(P.projection),'--expected-revision',String(revision)],{cwd:ROOT,stdio:['ignore','ignore','inherit']});
 
 if(!['CONTROL_PLANE_HARDENING_CLOSE','CONTROL_PLANE_REGRESSION_REOPEN'].includes(transition)){
-  const r=spawnSync(process.execPath,[A(DELEGATE),...args],{cwd:ROOT,stdio:'inherit',env:process.env});
-  process.exit(r.status==null?41:r.status);
+  const r=spawnSync(process.execPath,[A(DELEGATE),...args],{cwd:ROOT,encoding:'utf8',env:process.env});
+  if(r.stderr)process.stderr.write(r.stderr);
+  if(r.status!==0){if(r.stdout)process.stdout.write(r.stdout);process.exit(r.status==null?41:r.status);}
+  const delegated=lastJson(r.stdout);
+  if(!delegated)throw new Error('DATA_CONTRACT_FAILURE:DELEGATED_TRANSITION_OWNER_STDOUT_SINGLE_JSON_REQUIRED');
+  console.log(JSON.stringify(delegated,null,2));
+  process.exit(0);
 }
 
 if(!Number.isInteger(expectedRevision)||!Number.isInteger(expectedPackageRevision))throw new Error('TRANSITION_PRECONDITION_REQUIRED');
@@ -68,7 +75,7 @@ if(transition==='CONTROL_PLANE_REGRESSION_REOPEN'){
   L.progress={...L.progress,productionRouteProgressPct:75,programProgressPct:25,f2TerminalPass:false,progressMayIncreaseDuringHardening:false};
   L.history={...(L.history||{}),latestControlPlaneFailure:{runId:run,jobId:Number(F.jobId||0),technicalPullRequest:Number(F.technicalPullRequest||0),conclusion:'failure',classification:F.classification,failureCode:F.failureCode,evidencePath:controlPlaneFailureEvidence,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,firestoreWrites:0,authWrites:0,operationalWrites:0,replayAllowed:false,reducedAtUtc:ts}};
   W(P.ledger,L);
-  execFileSync(process.execPath,[A(P.projection),'--expected-revision',String(L.revision)],{cwd:ROOT,stdio:'inherit'});
+  project(L.revision);
   console.log(JSON.stringify({ok:true,status:'CONTROL_PLANE_REGRESSION_REOPENED_STOP_RETRY',transition,ledgerRevision:L.revision,packageRevision:L.productionReopeningPackage.revision,regressionRunId:run,regressionEvidence:controlPlaneFailureEvidence,progress:75,authorizationMaterialized:false,requestMaterialized:false,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false},null,2));
   process.exit(0);
 }
@@ -106,7 +113,7 @@ if(hardeningOpen&&!internalScratchHandshake){
 }
 
 if(hardeningClosed){
-  execFileSync(process.execPath,[A(P.projection),'--expected-revision',String(L.revision)],{cwd:ROOT,stdio:'inherit'});
+  project(L.revision);
   console.log(JSON.stringify({ok:true,status:'CONTROL_PLANE_HARDENING_CLOSED_CAUSAL_PASS',transition,ledgerRevision:L.revision,packageRevision:L.productionReopeningPackage.revision,authorizationIdentityDigest:L.authorizationBoundary?.preparedAuthorizationIdentityDigest||null,candidateArtifactId:L.successorCandidate.artifactId,candidateSourceHead:L.successorCandidate.sourceHead,progress:75,closedStateReprojection:true,semanticBehavioralSelftestValidated:L.continuityControl?.semanticBehavioralSelftestValidated===true,authorizationMaterialized:false,requestMaterialized:false,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false},null,2));
   process.exit(0);
 }
@@ -129,5 +136,5 @@ L.lanes={A_frontend_ux_academia:'MACRO2_TRANSVERSAL_SOURCE_ACCEPTANCE_CLOSED',B_
 L.progress={...L.progress,productionRouteProgressPct:75,programProgressPct:25,f2TerminalPass:false,progressMayIncreaseDuringHardening:false};
 L.history={...(L.history||{}),latestControlPlaneHandshake:{runId:Number(E.runId),jobId:Number(E.jobId),technicalPullRequest:Number(E.technicalPullRequest),conclusion:'success',status:E.status,evidencePath:controlPlaneEvidence,canonicalBaseHead:E.canonicalBaseHead,intentHead:E.intentHead,candidateArtifactId:E.candidateArtifactId,candidateSourceHead:E.candidateSourceHead,sourceOnly:true,exactF2SourcePathExecuted:true,classWidePreAuthEvidenceLifecyclePass:true,classWidePreTerminalEvidenceLifecyclePass:true,arbitraryFutureFilenameCleanupPass:true,semanticBehavioralSelftestValidated:true,negativeRegressionSuiteValidated:true,preProviderScratchValidated:true,projectionImmutabilityValidated:true,authorizationMaterialized:false,requestMaterialized:false,runtimeExecuted:false,browserExecuted:false,replayAllowed:false,closedAtUtc:ts}};
 W(P.ledger,L);
-execFileSync(process.execPath,[A(P.projection),'--expected-revision',String(L.revision)],{cwd:ROOT,stdio:'inherit'});
+project(L.revision);
 console.log(JSON.stringify({ok:true,status:'CONTROL_PLANE_HARDENING_CLOSED_CAUSAL_PASS',transition,ledgerRevision:L.revision,packageRevision:L.productionReopeningPackage.revision,authorizationIdentityDigest:authDigest,candidateArtifactId:L.successorCandidate.artifactId,candidateSourceHead:L.successorCandidate.sourceHead,progress:75,closedStateReprojection:false,exactF2SourcePathValidated:true,classWideEvidenceLifecycleValidated:true,semanticBehavioralSelftestValidated:true,negativeRegressionSuiteValidated:true,preProviderScratchValidated:true,projectionImmutabilityValidated:true,authorizationMaterialized:false,requestMaterialized:false,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false},null,2));
