@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "orbit360-control-plane-semantic-contract-v5-causal-publication-preflight",
+  "schemaVersion": "orbit360-control-plane-semantic-contract-v6-single-validated-publication-transaction",
   "contractId": "ORBIT360-CONTROL-PLANE-SEMANTIC-CONTRACT",
   "active": true,
   "status": "ACTIVE_SOURCE_ONLY_FAIL_CLOSED",
@@ -9,6 +9,7 @@
   "canonicalWorkflow": ".github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml",
   "workflowTopologySemanticOwner": "tools/orbit360-workflow-operational-surface-audit-v20260820.mjs",
   "publicationPreflightOwner": "tools/orbit360-control-plane-publication-preflight-v20260825.mjs",
+  "publicationTransactionOwner": "tools/orbit360-control-plane-publication-preflight-v20260825.mjs",
   "candidateBinding": "DYNAMIC_FROM_CANONICAL_LEDGER",
   "revisionBinding": "DYNAMIC_FROM_INTENT_AND_CANONICAL_LEDGER",
   "behavioralContractPolicy": {
@@ -30,9 +31,14 @@
     "executingWorkflowSnapshotMustMatchCanonical": true,
     "closureOwnerMustConsumeSelftestOkDerivedFromDynamicRequiredFields": true,
     "publicationFailureMustHaveCausalStageCode": true,
-    "publicationPreflightMustUseTemporaryGitIndex": true,
-    "publicationPreflightMustNotMutateCanonicalRef": true,
-    "publicationPreflightMustValidateDiffCommitCasAndPushDryRun": true
+    "publicationPrepareMustUseTemporaryGitIndex": true,
+    "publicationPrepareMustNotMutateCanonicalRef": true,
+    "publicationPrepareMustValidateDiffCommitCasAndPushDryRun": true,
+    "publicationPreparedCommitMustBePublishedUnchanged": true,
+    "duplicatePhysicalPublisherForbidden": true,
+    "publicationPushMustRemoteReadbackExactCommit": true,
+    "publicationPushMustLocalReadbackExactCommit": true,
+    "publicationWorktreeMayNotDriftBetweenPrepareAndPush": true
   },
   "activeControlPlaneComponents": [
     "tools/orbit360-continuity-transition-owner-v20260824.mjs",
@@ -106,7 +112,9 @@
     "runtimeRegisterReadOnly": true,
     "nativeF2RuntimeRequestVersion": "F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_V3",
     "topologySemanticOwner": "tools/orbit360-workflow-operational-surface-audit-v20260820.mjs",
-    "executingSnapshotBoundToCanonical": true
+    "executingSnapshotBoundToCanonical": true,
+    "publicationTransactionOwner": "tools/orbit360-control-plane-publication-preflight-v20260825.mjs",
+    "workflowGitAddCommitForCanonicalStatePublicationForbidden": true
   },
   "publicationPreflightRequirements": {
     "owner": "tools/orbit360-control-plane-publication-preflight-v20260825.mjs",
@@ -118,7 +126,11 @@
     "commitTree": true,
     "remoteHeadCAS": true,
     "pushDryRunOnCanonicalRunner": true,
-    "canonicalRefMutation": false,
+    "canonicalRefMutationDuringPrepare": false,
+    "preparedCommitIsPublishedCommit": true,
+    "worktreeRevalidationBeforePush": true,
+    "remoteReadbackAfterPush": true,
+    "localReadbackAfterPush": true,
     "runtimeExecuted": false,
     "browserExecuted": false,
     "secretAccess": false,
@@ -154,6 +166,7 @@
     "runtimeRegisterReadOnlyBehavioralTest": true,
     "nativeRuntimeRouterBehavioralTest": true,
     "publicationPreflightExecutedByEveryProjection": true,
+    "singleValidatedCommitPublicationRequired": true,
     "runtimeExecuted": false,
     "browserExecuted": false,
     "secretAccess": false,
@@ -167,6 +180,7 @@
     "workflowSurfaceAuditPass": true,
     "sourceRewriteGuardPass": true,
     "publicationPreflightComponentPresent": true,
+    "singleValidatedCommitPublicationConfigured": true,
     "exactF2SourcePathPass": true,
     "classWideEvidenceLifecyclePass": true,
     "scratchBehavioralTransitionsPass": true,
