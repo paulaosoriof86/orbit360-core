@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "orbit360-control-plane-semantic-contract-v3-native-runtime-router",
+  "schemaVersion": "orbit360-control-plane-semantic-contract-v4-single-workflow-topology-owner",
   "contractId": "ORBIT360-CONTROL-PLANE-SEMANTIC-CONTRACT",
   "active": true,
   "status": "ACTIVE_SOURCE_ONLY_FAIL_CLOSED",
@@ -7,6 +7,7 @@
   "registry": "orbit360-platform/docs/orbit360-continuity-writer-registry-v20260820.json",
   "ledger": "orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json",
   "canonicalWorkflow": ".github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml",
+  "workflowTopologySemanticOwner": "tools/orbit360-workflow-operational-surface-audit-v20260820.mjs",
   "candidateBinding": "DYNAMIC_FROM_CANONICAL_LEDGER",
   "revisionBinding": "DYNAMIC_FROM_INTENT_AND_CANONICAL_LEDGER",
   "behavioralContractPolicy": {
@@ -23,7 +24,10 @@
     "runtimeRegisterMustBeReadOnly": true,
     "runtimeRouterMustSupportF2V3Natively": true,
     "runtimeGateMayNotDependOnTransientSourceRewrite": true,
-    "activeSourceFileWritesForbidden": true
+    "activeSourceFileWritesForbidden": true,
+    "duplicateWorkflowTopologyParsersForbidden": true,
+    "executingWorkflowSnapshotMustMatchCanonical": true,
+    "closureOwnerMustConsumeDynamicSelftestRequiredFields": true
   },
   "activeControlPlaneComponents": [
     "tools/orbit360-continuity-transition-owner-v20260824.mjs",
@@ -93,7 +97,9 @@
     "providerDependsOnGate": true,
     "remoteHeadCASRequired": true,
     "runtimeRegisterReadOnly": true,
-    "nativeF2RuntimeRequestVersion": "F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_V3"
+    "nativeF2RuntimeRequestVersion": "F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_V3",
+    "topologySemanticOwner": "tools/orbit360-workflow-operational-surface-audit-v20260820.mjs",
+    "executingSnapshotBoundToCanonical": true
   },
   "evidenceLifecycleRequirements": {
     "scope": "orbit360-platform/runtime-gate-crm-v20260716",
@@ -124,32 +130,14 @@
     "runtimeRunIdBindingSimulation": true,
     "runtimeRegisterReadOnlyBehavioralTest": true,
     "nativeRuntimeRouterBehavioralTest": true,
+    "workflowTopologySingleSemanticOwnerTest": true,
     "runtimeExecuted": false,
     "browserExecuted": false,
     "secretAccess": false,
     "firestoreRead": false
   },
   "selftestRequiredTrueFields": [
-    "candidateBindingDynamic",
-    "semanticPreflightPass",
-    "exactF2SourcePathExecuted",
-    "classWidePreAuthEvidenceLifecyclePass",
-    "classWidePreTerminalEvidenceLifecyclePass",
-    "arbitraryFutureFilenameCleanupPass",
-    "scratchBehavioralTransitionsPass",
-    "preProviderGatePathPass",
-    "projectionImmutabilityPass",
-    "remoteCASReadbackPass",
-    "secondAttemptStopRetryPass",
-    "workflowProviderUngatedNegativePass",
-    "workflowCandidateHardcodeNegativePass",
-    "workflowOperationalRevisionHardcodeNegativePass",
-    "sourceRewriteMutationNegativePass",
-    "authPublicationSurfacePass",
-    "runtimeRunIdBindingSimulationPass",
-    "runtimeRegisterReadOnlyPass",
-    "routerNativeRuntimeContractPass",
-    "negativeRegressionSuitePass"
+    "candidateBindingDynamic","semanticPreflightPass","exactF2SourcePathExecuted","classWidePreAuthEvidenceLifecyclePass","classWidePreTerminalEvidenceLifecyclePass","arbitraryFutureFilenameCleanupPass","scratchBehavioralTransitionsPass","preProviderGatePathPass","projectionImmutabilityPass","remoteCASReadbackPass","secondAttemptStopRetryPass","workflowProviderUngatedNegativePass","workflowCandidateHardcodeNegativePass","workflowOperationalRevisionHardcodeNegativePass","sourceRewriteMutationNegativePass","authPublicationSurfacePass","runtimeRunIdBindingSimulationPass","runtimeRegisterReadOnlyPass","routerNativeRuntimeContractPass","workflowTopologySingleSemanticOwnerPass","negativeRegressionSuitePass"
   ],
   "closureRequirements": {
     "macro3SemanticPreflightPass": true,
@@ -162,6 +150,7 @@
     "runtimeRunIdBindingSimulationPass": true,
     "runtimeRegisterReadOnlyPass": true,
     "routerNativeRuntimeContractPass": true,
+    "workflowTopologySingleSemanticOwnerPass": true,
     "sourceRewriteMutationNegativePass": true,
     "negativeRegressionSuitePass": true,
     "durableHandshakeFromSameCanonicalWorkflowRun": true,
