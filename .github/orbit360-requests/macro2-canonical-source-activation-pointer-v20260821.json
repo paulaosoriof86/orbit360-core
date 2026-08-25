@@ -70,7 +70,7 @@
     "CREATE_ANOTHER_TRIGGER_VARIANT"
   ],
   "macro2Closed": true,
-  "canonicalStateFingerprint": "4c1b0bb3240df1ae8d51eee5184288663b083e02940c7107766328bae96297fa",
+  "canonicalStateFingerprint": "9a42f6fbd37cdc471e8c27481e3839e769029a87d4c4766f2c43f0f9262e0425",
   "lastReconciliation": {
     "status": "CONTROL_PLANE_EVIDENCE_CONVERGENCE_RECONCILED",
     "candidateArtifactId": 9504702901,
