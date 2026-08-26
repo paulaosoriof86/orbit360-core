@@ -31,6 +31,9 @@ const before=T(P.ledger),now=()=>new Date().toISOString(),sha=s=>crypto.createHa
 const bump=()=>{L.revision+=1;L.productionReopeningPackage.revision+=1;L.updatedAtUtc=now();return L.updatedAtUtc;};
 const project=()=>execFileSync(process.execPath,[A(P.projection),'--expected-revision',String(L.revision)],{cwd:ROOT,stdio:'inherit'});
 const profile={phase:'F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY',capabilities:{secrets:true,firestoreRead:true,customTokenMint:true,browser:true,runtime:true,writes:false,firestoreWrites:false,authWrites:false,membershipWrites:false,dataWrites:false,operationalWrites:false,packageRebuild:false,deploy:false,publish:false,publication:false,production:false,main:false,merge:false}};
+const sameCandidate=x=>Number(x?.candidateArtifactId)===Number(L.successorCandidate?.artifactId)&&String(x?.candidateSourceHead||'')===String(L.successorCandidate?.sourceHead||'')&&String(x?.candidateArtifactDigest||'')===String(L.successorCandidate?.artifactDigest||'');
+const reusableAuthSemantics=(x,identity)=>x&&x.authorizationIdentityDigest===identity&&x.consumed===false&&x.historical===false&&Number(x.allowedExecutions)===1&&x.runtimeAttemptAccepted===false&&x.runtimeAttemptReserved===false&&x.privilegedRiskBoundaryEntered===false&&Number(x.runtimeAttemptCount)===0&&(x.runtimeRunId==null)&&Boolean(x.lastPreRiskFailure)&&sameCandidate(x);
+const reusableRequestSemantics=(x,identity,authPath)=>x&&x.authorizationIdentityDigest===identity&&x.authorizationRecordPath===authPath&&x.consumed===false&&x.historical===false&&Number(x.allowedExecutions)===1&&x.runtimeAttemptAccepted===false&&x.runtimeAttemptReserved===false&&x.privilegedRiskBoundaryEntered===false&&Number(x.runtimeAttemptCount)===0&&(x.runtimeRunId==null)&&Boolean(x.lastPreRiskFailure)&&sameCandidate(x);
 let out={};
 
 if(transition==='CONTROL_PLANE_EVIDENCE_RECONCILE'){
@@ -66,18 +69,21 @@ if(transition==='CONTROL_PLANE_EVIDENCE_RECONCILE'){
   if(authIdentity!==L.authorizationBoundary?.preparedAuthorizationIdentityDigest||!/^[a-f0-9]{64}$/.test(authIdentity))throw new Error('AUTHORIZATION_IDENTITY_MISMATCH');
   if(!L.productionReopeningPackage?.authorizationAllowed)throw new Error('AUTHORIZATION_NOT_ALLOWED');
   if(L.authorizationBoundary?.activeRuntimeAuthorization||L.authorizationBoundary?.activeRequestPath||L.authorizationBoundary?.runtimeAttemptAccepted)throw new Error('AUTHORIZATION_BOUNDARY_NOT_INERT');
-  const authPath=`.github/orbit360-authorizations/f2-productive-acceptance-runtime-browser-readonly-auth-${authIdentity.slice(0,12)}-v20260820.json`;
-  const reusable=L.authorizationBoundary?.preRiskAuthorizationReuseAllowed===true&&L.authorizationBoundary?.reusableAuthorizationRecordPath===authPath&&fs.existsSync(A(authPath));
+  const expectedAuthPath=`.github/orbit360-authorizations/f2-productive-acceptance-runtime-browser-readonly-auth-${authIdentity.slice(0,12)}-v20260820.json`;
+  const preservedAuthPath=String(L.authorizationBoundary?.reusableAuthorizationRecordPath||'').trim();
+  const reusable=L.authorizationBoundary?.preRiskAuthorizationReuseAllowed===true&&Boolean(preservedAuthPath)&&fs.existsSync(A(preservedAuthPath));
+  const authPath=reusable?preservedAuthPath:expectedAuthPath;
+  if(reusable&&authPath!==expectedAuthPath)throw new Error('REUSABLE_AUTHORIZATION_PATH_IDENTITY_DRIFT');
   const ts=bump();
   if(reusable){
-    const auth=J(authPath);if(auth.consumed||auth.historical||Number(auth.allowedExecutions)!==1||auth.runtimeAttemptAccepted!==false||auth.status!=='PRE_RISK_FAIL_AUTHORIZATION_REUSABLE')throw new Error('REUSABLE_AUTHORIZATION_STATE_INVALID');
+    const auth=J(authPath);if(!reusableAuthSemantics(auth,authIdentity))throw new Error('REUSABLE_AUTHORIZATION_SEMANTIC_STATE_INVALID');
     auth.status='PERSISTED_SOURCE_ONLY_AWAITING_REQUEST_MATERIALIZATION';auth.reactivatedAt=ts;auth.lastPreRiskFailurePreserved=true;W(authPath,auth);
   }else{
     if(fs.existsSync(A(authPath)))throw new Error('AUTHORIZATION_RECORD_ALREADY_EXISTS');
     W(authPath,{schemaVersion:'orbit360-f2-runtime-authorization-v4-risk-boundary',status:'PERSISTED_SOURCE_ONLY_AWAITING_REQUEST_MATERIALIZATION',approved:true,authorizationIdentityDigest:authIdentity,gateId:L.gateId,gateContractVersion:String(authority.gateContractVersion||'2.2.0'),branch:L.branch,pullRequest:L.pullRequest,authorizedAt:ts,allowedExecutions:1,consumed:false,authorizationFrozen:true,replayAllowed:false,historical:false,runtimeAttemptAccepted:false,runtimeAttemptReserved:false,privilegedRiskBoundaryEntered:false,runtimeAttemptCount:0,candidateArtifactId:L.successorCandidate.artifactId,candidateSourceHead:L.successorCandidate.sourceHead,candidateArtifactDigest:L.successorCandidate.artifactDigest,scopeAuthorized:profile.capabilities,containsPII:false,containsSecrets:false});
   }
-  L.authorizationBoundary.activeRuntimeAuthorization=true;L.authorizationBoundary.freshAuthorizationRequired=false;L.authorizationBoundary.authorizationRecordPath=authPath;L.authorizationBoundary.preRiskAuthorizationReuseAllowed=false;L.authorizationBoundary.runtimeAttemptAccepted=false;L.authorizationBoundary.runtimeRunId=null;L.authorizationBoundary.currentBoundaryStatus='AUTHORIZED_SOURCE_ONLY_AWAITING_REQUEST_MATERIALIZATION';
-  L.productionReopeningPackage.authorizationAllowed=false;L.productionReopeningPackage.requestMaterializationAllowed=true;L.productionReopeningPackage.authorizationReuseAllowed=false;L.productionReopeningPackage.firstIncompleteStep='F2-RUNTIME-REQUEST-MATERIALIZATION';L.productionReopeningPackage.nextActionExact='MATERIALIZE_SINGLE_F2_RUNTIME_REQUEST_SOURCE_ONLY';
+  L.authorizationBoundary.activeRuntimeAuthorization=true;L.authorizationBoundary.freshAuthorizationRequired=false;L.authorizationBoundary.authorizationRecordPath=authPath;L.authorizationBoundary.reusableAuthorizationRecordPath=null;L.authorizationBoundary.preRiskAuthorizationReuseAllowed=false;L.authorizationBoundary.runtimeAttemptAccepted=false;L.authorizationBoundary.runtimeRunId=null;L.authorizationBoundary.currentBoundaryStatus='AUTHORIZED_SOURCE_ONLY_AWAITING_REQUEST_MATERIALIZATION';
+  L.productionReopeningPackage.authorizationAllowed=false;L.productionReopeningPackage.requestMaterializationAllowed=true;L.productionReopeningPackage.authorizationReuseAllowed=reusable;L.productionReopeningPackage.firstIncompleteStep='F2-RUNTIME-REQUEST-MATERIALIZATION';L.productionReopeningPackage.nextActionExact='MATERIALIZE_SINGLE_F2_RUNTIME_REQUEST_SOURCE_ONLY';
   L.nextAction={id:L.productionReopeningPackage.nextActionExact,description:'Materialize exactly one immutable F2 runtime request.',runtimeAllowed:false,userActionRequired:false};L.activeState.phase='F2_RUNTIME_AUTHORIZATION_PERSISTED_AWAITING_REQUEST_MATERIALIZATION';L.activeState.status='F2_RUNTIME_AUTHORIZATION_PERSISTED_SOURCE_ONLY';
   W(P.ledger,L);project();out={ok:true,status:'ORBIT360_F2_RUNTIME_AUTHORIZATION_PERSISTED_SOURCE_ONLY',authorizationRecordPath:authPath,authorizationReused:reusable,ledgerRevision:L.revision,packageRevision:L.productionReopeningPackage.revision};
 
@@ -87,18 +93,21 @@ if(transition==='CONTROL_PLANE_EVIDENCE_RECONCILE'){
   const authPath=L.authorizationBoundary?.authorizationRecordPath;
   if(!authPath||!fs.existsSync(A(authPath))||L.authorizationBoundary?.activeRequestPath||L.authorizationBoundary?.runtimeAttemptAccepted)throw new Error('BOUNDARY_NOT_READY_FOR_REQUEST');
   const auth=J(authPath);if(auth.consumed||auth.historical||auth.allowedExecutions!==1||auth.runtimeAttemptAccepted!==false)throw new Error('AUTHORIZATION_NOT_ACTIVE');
-  const requestPath=`.github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-successor-${authIdentity.slice(0,12)}-v20260820.json`;
-  const reusable=L.authorizationBoundary?.reusableRequestPath===requestPath&&fs.existsSync(A(requestPath));
+  const expectedRequestPath=`.github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-successor-${authIdentity.slice(0,12)}-v20260820.json`;
+  const preservedRequestPath=String(L.authorizationBoundary?.reusableRequestPath||'').trim();
+  const reusable=Boolean(preservedRequestPath)&&fs.existsSync(A(preservedRequestPath));
+  const requestPath=reusable?preservedRequestPath:expectedRequestPath;
+  if(reusable&&requestPath!==expectedRequestPath)throw new Error('REUSABLE_REQUEST_PATH_IDENTITY_DRIFT');
   const ts=bump();
   if(reusable){
-    const req=J(requestPath);if(req.consumed||req.historical||Number(req.allowedExecutions)!==1||req.runtimeAttemptAccepted!==false||req.status!=='PRE_RISK_FAIL_REQUEST_REUSABLE')throw new Error('REUSABLE_REQUEST_STATE_INVALID');
-    req.status='MATERIALIZED_SOURCE_ONLY_AWAITING_PREFLIGHT';req.parentHead=parentHead;req.reactivatedAt=ts;W(requestPath,req);
+    const req=J(requestPath);if(!reusableRequestSemantics(req,authIdentity,authPath))throw new Error('REUSABLE_REQUEST_SEMANTIC_STATE_INVALID');
+    req.status='MATERIALIZED_SOURCE_ONLY_AWAITING_PREFLIGHT';req.parentHead=parentHead;req.reactivatedAt=ts;req.lastPreRiskFailurePreserved=true;W(requestPath,req);
   }else{
     if(fs.existsSync(A(requestPath)))throw new Error('REQUEST_ALREADY_EXISTS');
     W(requestPath,{schemaVersion:'orbit360-f2-productive-acceptance-runtime-browser-readonly-request-v4-risk-boundary',requestId:`F2-${authIdentity.slice(0,12)}`,status:'MATERIALIZED_SOURCE_ONLY_AWAITING_PREFLIGHT',approved:true,allowedExecutions:1,consumed:false,authorizationFrozen:true,replayAllowed:false,historical:false,runtimeAttemptAccepted:false,runtimeAttemptReserved:false,privilegedRiskBoundaryEntered:false,runtimeAttemptCount:0,branch:L.branch,pullRequest:L.pullRequest,parentHead,candidateArtifactId:L.successorCandidate.artifactId,candidateSourceHead:L.successorCandidate.sourceHead,candidateArtifactDigest:L.successorCandidate.artifactDigest,authorizationRecordPath:authPath,authorizationIdentityDigest:authIdentity,materializedAt:ts,containsPII:false,containsSecrets:false});
   }
-  L.authorizationBoundary.activeRequestPath=requestPath;L.authorizationBoundary.nextRuntimeMaterializationAllowed=false;L.authorizationBoundary.newRuntimeRequestAllowed=false;L.authorizationBoundary.runtimeAttemptAccepted=false;L.authorizationBoundary.currentBoundaryStatus='REQUEST_MATERIALIZED_SOURCE_ONLY_AWAITING_PREFLIGHT';
-  L.productionReopeningPackage.requestMaterializationAllowed=false;L.productionReopeningPackage.firstIncompleteStep='F2-RUNTIME-ATTEMPT-RESERVATION';L.productionReopeningPackage.nextActionExact='RESERVE_SINGLE_F2_RUNTIME_ATTEMPT_WITHOUT_CONSUMING_BUDGET';
+  L.authorizationBoundary.activeRequestPath=requestPath;L.authorizationBoundary.reusableRequestPath=null;L.authorizationBoundary.nextRuntimeMaterializationAllowed=false;L.authorizationBoundary.newRuntimeRequestAllowed=false;L.authorizationBoundary.runtimeAttemptAccepted=false;L.authorizationBoundary.currentBoundaryStatus='REQUEST_MATERIALIZED_SOURCE_ONLY_AWAITING_PREFLIGHT';
+  L.productionReopeningPackage.requestMaterializationAllowed=false;L.productionReopeningPackage.authorizationReuseAllowed=false;L.productionReopeningPackage.firstIncompleteStep='F2-RUNTIME-ATTEMPT-RESERVATION';L.productionReopeningPackage.nextActionExact='RESERVE_SINGLE_F2_RUNTIME_ATTEMPT_WITHOUT_CONSUMING_BUDGET';
   L.nextAction={id:L.productionReopeningPackage.nextActionExact,description:'Reserve the single F2 attempt for this GitHub run without consuming the one-shot budget before privileged risk.',runtimeAllowed:false,userActionRequired:false};L.activeState.phase='F2_RUNTIME_REQUEST_MATERIALIZED_AWAITING_ATTEMPT_RESERVATION';L.activeState.status='F2_RUNTIME_REQUEST_MATERIALIZED_SOURCE_ONLY';
   W(P.ledger,L);project();out={ok:true,status:'ORBIT360_F2_RUNTIME_REQUEST_MATERIALIZED_SOURCE_ONLY',requestPath,requestReused:reusable,ledgerRevision:L.revision,packageRevision:L.productionReopeningPackage.revision};
 
