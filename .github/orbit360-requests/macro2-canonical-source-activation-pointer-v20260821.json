@@ -1,82 +1,10 @@
 {
-  "schemaVersion": "orbit360-macro2-canonical-source-activation-pointer-v2-derived",
-  "status": "IDLE",
-  "mode": "IDLE",
-  "activeRequestPath": null,
-  "activationNonce": null,
-  "allowedExecutions": 0,
-  "consumed": true,
-  "replayAllowed": false,
+  "schemaVersion": "orbit360-macro2-activation-pointer-historical-v3-single-state",
+  "status": "HISTORICAL_MACRO2_CLOSED",
+  "stateBearing": false,
+  "canonicalLedger": "orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json",
   "reopenAllowed": false,
-  "sourceOnly": true,
-  "predecessor": {
-    "artifactId": 9433944723,
-    "sourceHead": "c3bb825da2b1ecae08dabc2034c753482b086fec",
-    "zipSha256": "1951cc7c2d3390ea1c2a6b3d9ce0bb48e26a6f95d5d10d69b7c31a0027cfbbac",
-    "manifestSha256": "580921077a88badab6e4076c42e9ef88f9de7936e1b6bad0f62410b39aec6397"
-  },
-  "certifiedBundles": {
-    "product": {
-      "path": ".github/orbit360-source-patches/macro2-v20260821/product.patch.gz",
-      "gzipSha256": "c7b932b2788a502ae07111d2e209d4b0cca0b844242bb1db80218b72fa4c6913",
-      "rawSha256": "6b3141493d69d2b25c581033460f5302498dd06dd8dfcad1245802390fafe540"
-    },
-    "tools": {
-      "path": ".github/orbit360-source-patches/macro2-v20260821/tools.patch.gz",
-      "gzipSha256": "64bb3f11736ce39593b12a54350270f73730a10430d1ce6e543bebaee622ba46",
-      "rawSha256": "035c756cc2c14ae428a87231a8cc266762b92ebc1c67974d691bbb20ffd90f97"
-    },
-    "docs": {
-      "path": ".github/orbit360-source-patches/macro2-v20260821/docs.patch.gz",
-      "gzipSha256": "4a6f77f7e35a89f0ef830e4b98fa8f4d1493e7973a4b91aa55ee5def78ed2167",
-      "rawSha256": "f5f679c113e6408981f111154e8d0fd34f515e82a70c2085d3f0f54515efa3c0"
-    }
-  },
-  "allowedTransition": "NONE_MACRO2_CLOSED",
-  "terminalOnFailure": true,
-  "lastTerminal": {
-    "status": "FINALIZE_SOURCE_ONLY_TERMINAL_FAIL",
-    "classification": "PIPELINE_MECHANISM_FAILURE",
-    "failureStage": "METADATA_OR_PROMOTION",
-    "failureCode": "PIPELINE_MECHANISM_FAILURE_UNCLASSIFIED",
-    "diagnosticStatus": null,
-    "failedChecks": [],
-    "checksPassed": null,
-    "checksTotal": null,
-    "observedDeltaPaths": null,
-    "runId": 32611388980,
-    "automaticRetry": false,
-    "diagnosticPreserved": true
-  },
-  "runtime": false,
-  "browser": false,
-  "secrets": false,
-  "firestoreRead": false,
-  "writes": false,
-  "deploy": false,
-  "production": false,
-  "main": false,
-  "merge": false,
-  "rootCauseResolution": "CONTROL_PLANE_EVIDENCE_CONVERGENCE_RECONCILED_MACRO2_CLOSED",
-  "executionObserver": "ACTIONS_RUN_LOGS_STEP_SUMMARY_PLUS_BEST_EFFORT_PR_RECEIPTS",
-  "bundleIdentityAuthority": "GZIP_SHA256_PLUS_RAW_SHA256",
-  "gitBlobIdentityAuthoritative": false,
-  "forbidden": [
-    "MATERIALIZE_NEW_REQUEST",
-    "OPEN_C1_C2_C3_CHAIN",
-    "CREATE_V3R1C2_OR_V3R1C3",
-    "CREATE_PARALLEL_LISTENER",
-    "PATCH_PRODUCT_TO_SATISFY_STALE_VALIDATOR",
-    "CREATE_ANOTHER_TRIGGER_VARIANT"
-  ],
-  "macro2Closed": true,
-  "canonicalStateFingerprint": "e08e448f196c3ce21e42458fb5cc9b3689c0ac07f8c05ea63a362c1ba42aabfd",
-  "lastReconciliation": {
-    "status": "CONTROL_PLANE_EVIDENCE_CONVERGENCE_RECONCILED",
-    "candidateArtifactId": 9504702901,
-    "candidateSourceHead": "8c9668d6d423e82826b0295431ec699390d79b4b",
-    "progress": 75
-  },
+  "replayAllowed": false,
   "containsPII": false,
   "containsSecrets": false
 }

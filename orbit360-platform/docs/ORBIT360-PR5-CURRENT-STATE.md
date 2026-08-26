@@ -1,19 +1,11 @@
-# ESTADO VIVO CANÓNICO — DERIVADO DEL LEDGER
+# ESTADO VIVO — PUNTERO ESTÁTICO
 
-CANONICAL_STATE_FINGERPRINT: e08e448f196c3ce21e42458fb5cc9b3689c0ac07f8c05ea63a362c1ba42aabfd
+La única autoridad mutable de estado operativo de Orbit 360 A&S es:
 
-**Plan vigente:** `orbit360-platform/docs/PLAN-MAESTRO-CONGELADO-SALIDA-PRODUCCION-SIN-BUCLES-ORBIT360-AYS-20260824.md`  
-**Autoridad mutable única:** `orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json`  
-**branchHead:** verificar siempre desde PR #5; no se persiste un SHA de branchHead en esta proyección.  
-**Rama:** `ays/backend-tenant-lab-v99-20260703` · PR #5 draft/open · sin main/merge/deploy/producción salvo autorización explícita.
+`orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json`
 
-- Ledger/package: `86/80`.
-- Fase: `F2_RUNTIME_ATTEMPT_RESERVED_PREFLIGHT_PENDING`.
-- Estado: `F2_RUNTIME_ATTEMPT_RESERVED_ONE_SHOT_UNCONSUMED`.
-- Candidata: artifact `9504702901`, candidateSourceHead `8c9668d6d423e82826b0295431ec699390d79b4b`.
-- Progreso ruta a producción: **75%**.
-- Autorización/request/runtime: `true/true/false`.
-- Siguiente acción: `RUN_F2_SOURCE_AND_RUNTIME_PREFLIGHT_FAIL_CLOSED`.
-- Control-plane causal: `CONTROL_PLANE_DEFINITIVE_CAUSAL_PASS`.
+El HEAD se verifica siempre directamente en el PR #5 / rama obligatoria.
 
-Esta es una proyección generada. Si su fingerprint no coincide con el ledger o con el body real del PR, el gate de convergencia debe fallar cerrado.
+Este archivo **no replica** fase, revisión, progreso, autorización ni siguiente acción. Es deliberadamente no autoritativo para impedir desincronización documental.
+
+Producción, `main` y merge permanecen sujetos a autorización explícita.

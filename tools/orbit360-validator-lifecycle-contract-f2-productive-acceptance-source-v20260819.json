@@ -1,126 +1,17 @@
 {
-  "schemaVersion": "orbit360-validator-lifecycle-contract-v2-derived",
+  "schemaVersion": "orbit360-f2-source-lifecycle-static-v3-single-state",
   "gateId": "f2-productive-acceptance-exact-successor-v20260818",
-  "gateContractVersion": "2.2.0",
-  "validatorLifecycleRevision": "phase-capability-contract-v7-canonical-convergence",
-  "f2ValidatorRevision": "f2-source-dynamic-cert-authority-v10-20260822",
-  "status": "F2_RUNTIME_ATTEMPT_RESERVED_ONE_SHOT_UNCONSUMED",
-  "currentPhase": "F2_RUNTIME_ATTEMPT_RESERVED_PREFLIGHT_PENDING",
-  "canonicalContractAuthority": "tools/orbit360-gate-contract-f2-productive-acceptance-v20260820.json",
-  "continuity": {
-    "stateVersion": "ORBIT360-F2-CONTINUITY-CURRENT",
-    "ledger": "orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json",
-    "productionReopeningPackage": "orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json",
-    "writerRegistry": "orbit360-platform/docs/orbit360-continuity-writer-registry-v20260820.json",
-    "sync": "tools/orbit360-continuity-projection-atomic-v20260820.mjs",
-    "invariant": "tools/orbit360-control-plane-composite-invariant-v20260820.mjs",
-    "derived": true,
-    "canonicalPlan": "orbit360-platform/docs/PLAN-MAESTRO-CONGELADO-SALIDA-PRODUCCION-SIN-BUCLES-ORBIT360-AYS-20260824.md"
-  },
-  "executionProfile": {
-    "phase": "F2_PRODUCTIVE_ACCEPTANCE_SOURCE_ONLY",
-    "capabilities": {
-      "secrets": false,
-      "firestoreRead": false,
-      "writes": false,
-      "runtime": false,
-      "browser": false,
-      "deploy": false,
-      "functionsDeploy": false,
-      "rulesDeploy": false,
-      "production": false
-    }
-  },
-  "singleGate": true,
-  "macroClosure": true,
-  "block": "F2_GATE_DE_ACEPTACION_PRODUCTIVA_REAL",
-  "authorization": {
-    "requiredForExecution": false,
-    "activeRequest": true,
-    "freshAuthorizationRequired": false,
-    "authorizationBoundaryPrepared": true,
-    "authorizationBoundaryPath": "orbit360-platform/docs/orbit360-f2-runtime-authorization-boundary-v20260820.json",
-    "nextRuntimeMaterializationAllowed": false,
-    "newRuntimeRequestAllowed": false,
-    "replayAllowed": false,
-    "authorizationIdentityDigest": "d202a6d0331369761e9ea6f8556c41dd3c695d81cb46fd9908e756cfe93f6d95"
-  },
-  "guards": {
-    "candidateArtifactId": 9504702901,
-    "candidateArtifactDigest": "sha256:f11dd2a350b4160465dfc93b0dd9153e697d09773fa00aa4ee5ed13d93401ca2",
-    "candidateSourceHead": "8c9668d6d423e82826b0295431ec699390d79b4b",
-    "candidateZipSha256": "4a3660a18229a923412aa5a1bffc0817b1d5666c83ba96c81c92cea0fce9491c",
-    "candidateManifestSha256": "b1c98c1faf644b5d83cfe6e6bb1a602927c438cd85b7855cb0b1a6b98c08053c",
-    "candidateFileCount": 194,
-    "exactCandidateRequired": true,
-    "transversalSourceAcceptancePass": true,
-    "sourceOnlyBeforeAuthorization": true,
-    "writesAllowed": false,
-    "authChangesAllowed": false,
-    "membershipChangesAllowed": false,
-    "dataChangesAllowed": false,
-    "packageRebuildAllowed": false,
-    "deployAllowed": false,
-    "publicationAllowed": false,
-    "productionMutationAllowed": false,
-    "stopRetryOnSameFamily": true,
-    "historicalCandidateRuntimeReuseAllowed": false,
-    "productionReopeningPackageClosedPassRequiredForRuntime": true,
-    "candidateCertificationDerivedFromCanonicalAuthority": true
-  },
-  "surfaceTopology": {
-    "routes": [
-      "inicio",
-      "cliente360",
-      "aseguradoras",
-      "ops",
-      "leads",
-      "polizas",
-      "cobros"
-    ],
-    "integratedSurfaces": {
-      "vehiculos": "cliente360_policy_deeplink_fullpage",
-      "recibosCartera": "policy_client360_plus_cobros_global"
-    },
-    "roleViews": [
-      {
-        "role": "Dirección",
-        "viewport": "desktop"
-      },
-      {
-        "role": "Operativo",
-        "viewport": "tablet"
-      },
-      {
-        "role": "Asesor",
-        "viewport": "mobile"
-      }
-    ]
-  },
-  "history": {
-    "priorSourceOnlyPass": {
-      "historical": true,
-      "status": "CLOSED_PASS",
-      "candidateArtifactId": 9387820198,
-      "candidateSourceHead": "fc46bd85783d8b4d524cbeb0fee54ee9a2c774af",
-      "sourceValidationRunId": 32316010103,
-      "sourceEvidenceArtifactId": 9388061716,
-      "runtimeReusable": false
-    },
-    "macro2CurrentPass": {
-      "historical": false,
-      "status": "CLOSED_PASS",
-      "runId": 32611388980,
-      "candidateArtifactId": 9485621192,
-      "candidateSourceHead": "842f762f199f4c7dbf13062a33ca220d92398c51",
-      "checksPassed": 107,
-      "fileCount": 194,
-      "deltaCount": 9,
-      "unchangedFileCount": 185
-    }
-  },
-  "nextActionExact": "RUN_F2_SOURCE_AND_RUNTIME_PREFLIGHT_FAIL_CLOSED",
-  "canonicalStateFingerprint": "e08e448f196c3ce21e42458fb5cc9b3689c0ac07f8c05ea63a362c1ba42aabfd",
+  "status": "STATIC_CONTRACT_HISTORICAL_F2_CLOSED",
+  "currentStateAuthority": "orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json",
+  "stateBearing": false,
+  "allowedLifecycle": [
+    "source-only readiness",
+    "explicit authorization boundary",
+    "one-shot claim",
+    "runtime evidence",
+    "terminal reconciliation"
+  ],
+  "writesAllowed": false,
   "containsPII": false,
   "containsSecrets": false
 }

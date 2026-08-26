@@ -1,100 +1,147 @@
-name: Orbit360 Control Plane Concurrency Recovery V2
+name: Orbit360 Canonical Single-State Runner
+# SINGLE_STATE_CONTROL_PLANE_V1
+# Evidence/runtime runner. Canonical operational state lives only in the ledger.
 
 on:
-  pull_request:
-    types: [synchronize]
+  push:
     branches:
-      - ays/backend-tenant-lab-v99-20260703
+      - 'ays/orbit360-exec-*'
     paths:
-      - '.github/orbit360-intents/control-plane-concurrency-recovery-v2-20260826.json'
+      - '.github/orbit360-intents/*.json'
 
 permissions:
   contents: write
   actions: read
-  pull-requests: read
 
 concurrency:
-  group: orbit360-control-plane-recovery-v2-${{ github.event.pull_request.base.sha }}
+  group: orbit360-single-state-${{ github.sha }}
   cancel-in-progress: false
 
 env:
-  ORBIT360_BRANCH: ays/backend-tenant-lab-v99-20260703
-  ORIGINAL_WORKFLOW_BLOB: 1ba4d377d457e3e77919be30ca293690257d66cc
-  WORKFLOW_PATH: .github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml
+  ORBIT360_CANONICAL_BRANCH: ays/backend-tenant-lab-v99-20260703
+  ORBIT360_LEDGER: orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json
+  ORBIT360_REGISTRY: orbit360-platform/docs/orbit360-continuity-writer-registry-v20260820.json
+  ORBIT360_OWNER: tools/orbit360-single-state-ledger-owner-v20260826.mjs
+  ORBIT360_INVARIANT: tools/orbit360-single-state-invariant-v20260826.mjs
+  ORBIT360_PUBLISHER: tools/orbit360-control-plane-publication-preflight-v20260825.mjs
 
 jobs:
-  repair-concurrency-generation:
-    if: github.event.pull_request.head.repo.full_name == github.repository
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
+  single-state-runner:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
     steps:
-      - name: Validate one recovery intent without checkout
+      - name: Checkout immutable execution commit
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - id: inspect
+        name: Validate one-commit execution transport against live canonical state
         shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$GITHUB_REF_NAME" == ays/orbit360-exec-* ]]
+          PARENT=$(git rev-parse HEAD^)
+          mapfile -t CHANGED < <(git diff --name-only "$PARENT" HEAD)
+          test "${#CHANGED[@]}" = '1'
+          INTENT="${CHANGED[0]}"
+          [[ "$INTENT" =~ ^\.github/orbit360-intents/[A-Za-z0-9._-]+\.json$ ]]
+          cp "$INTENT" "$RUNNER_TEMP/orbit360-intent.json"
+          BASE=$(jq -r '.canonicalBaseHead // empty' "$INTENT")
+          EXPECTED=$(jq -r '.expectedLedgerRevision // empty' "$INTENT")
+          [[ "$BASE" =~ ^[a-f0-9]{40}$ ]]
+          [[ "$EXPECTED" =~ ^[0-9]+$ ]]
+          test "$PARENT" = "$BASE"
+          git fetch --no-tags origin "$ORBIT360_CANONICAL_BRANCH"
+          LIVE=$(git rev-parse FETCH_HEAD)
+          test "$LIVE" = "$BASE"
+          git checkout --force -B orbit360-canonical "$LIVE"
+          node "$ORBIT360_INVARIANT"
+          node "$ORBIT360_OWNER" --inspect-intent "$RUNNER_TEMP/orbit360-intent.json" > "$RUNNER_TEMP/inspect.json"
+          jq -e '.ok==true and .status=="SINGLE_STATE_INTENT_VALID"' "$RUNNER_TEMP/inspect.json" >/dev/null
+          echo "transition=$(jq -r '.transitionId' "$RUNNER_TEMP/inspect.json")" >> "$GITHUB_OUTPUT"
+          echo "class=$(jq -r '.capabilityClass' "$RUNNER_TEMP/inspect.json")" >> "$GITHUB_OUTPUT"
+          echo "state_mutation=$(jq -r '.stateMutation' "$RUNNER_TEMP/inspect.json")" >> "$GITHUB_OUTPUT"
+          echo "handler=$(jq -r '.handler // ""' "$RUNNER_TEMP/inspect.json")" >> "$GITHUB_OUTPUT"
+          echo "handler_ready=$(jq -r '.handlerReady' "$RUNNER_TEMP/inspect.json")" >> "$GITHUB_OUTPUT"
+          test "$(jq -r '.handlerReady' "$RUNNER_TEMP/inspect.json")" = 'true'
+
+      - name: Run source-only single-state selftest
+        if: steps.inspect.outputs.transition == 'CONTROL_PLANE_SELFTEST'
+        shell: bash
+        run: |
+          set -euo pipefail
+          node "$ORBIT360_OWNER" --selftest | tee "$RUNNER_TEMP/single-state-selftest.json"
+          jq -e '.ok==true and .status=="SINGLE_STATE_CONTROL_PLANE_SELFTEST_PASS" and .projectionWrites==0 and .secondClaimBlocked==true and .staleRevisionBlocked==true' "$RUNNER_TEMP/single-state-selftest.json" >/dev/null
+          node "$ORBIT360_INVARIANT"
+          test -z "$(git status --porcelain)"
+
+      - id: claim
+        name: Atomically claim risk transition in ledger before privileged capabilities
+        if: steps.inspect.outputs.state_mutation == 'CLAIM_TERMINAL'
         env:
           GH_TOKEN: ${{ github.token }}
+          ORBIT360_PUBLICATION_CLASS: SINGLE_STATE_CLAIM
+          ORBIT360_PUBLICATION_TRANSACTION_OUT: ${{ runner.temp }}/single-state-claim-publication.json
+          ORBIT360_PUBLICATION_COMMIT_MESSAGE: 'gate(control-plane): claim single-state execution before privileged risk'
+        shell: bash
         run: |
           set -euo pipefail
-          test "$GITHUB_EVENT_NAME" = 'pull_request'
-          test "${{ github.event.action }}" = 'synchronize'
-          test "${{ github.event.pull_request.base.ref }}" = "$ORBIT360_BRANCH"
-          test "${{ github.event.pull_request.head.repo.full_name }}" = "$GITHUB_REPOSITORY"
-          API="https://api.github.com/repos/${GITHUB_REPOSITORY}"
-          curl -L --fail --silent --show-error -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" "$API/compare/${{ github.event.pull_request.base.sha }}...${{ github.event.pull_request.head.sha }}" > "$RUNNER_TEMP/compare.json"
-          jq -e '.files|length==1' "$RUNNER_TEMP/compare.json" >/dev/null
-          test "$(jq -r '.files[0].filename' "$RUNNER_TEMP/compare.json")" = '.github/orbit360-intents/control-plane-concurrency-recovery-v2-20260826.json'
+          node "$ORBIT360_OWNER" --claim "$RUNNER_TEMP/orbit360-intent.json" --run-id "$GITHUB_RUN_ID" | tee "$RUNNER_TEMP/claim.json"
+          jq -e --argjson run "$GITHUB_RUN_ID" '.ok==true and .status=="SINGLE_STATE_EXECUTION_CLAIMED" and .runId==$run' "$RUNNER_TEMP/claim.json" >/dev/null
+          node "$ORBIT360_PUBLISHER"
+          jq -e '.ok==true and .status=="CONTROL_PLANE_PUBLICATION_TRANSACTION_PREPARED" and .changed==["orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json"] and .remoteCASPass==true and .pushDryRunPass==true' "$ORBIT360_PUBLICATION_TRANSACTION_OUT" >/dev/null
+          node "$ORBIT360_PUBLISHER" --publish-validated "$ORBIT360_PUBLICATION_TRANSACTION_OUT" | tee "$RUNNER_TEMP/claim-publish.json"
+          jq -e '.ok==true and .status=="CONTROL_PLANE_PUBLICATION_TRANSACTION_PUBLISHED" and .remoteReadbackPass==true and .localReadbackPass==true' "$RUNNER_TEMP/claim-publish.json" >/dev/null
 
-      - name: Rebuild exact canonical workflow with base-SHA generation mutex
+      - id: execute
+        name: Execute registered handler only after canonical claim
+        if: steps.inspect.outputs.state_mutation == 'CLAIM_TERMINAL' && steps.claim.outcome == 'success'
+        env:
+          ORBIT360_EXECUTION_INTENT: ${{ runner.temp }}/orbit360-intent.json
+          ORBIT360_EXECUTION_RUN_ID: ${{ github.run_id }}
+          ORBIT360_TERMINAL_EVIDENCE: ${{ runner.temp }}/orbit360-terminal.json
+          FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
         shell: bash
+        run: |
+          set -euo pipefail
+          HANDLER='${{ steps.inspect.outputs.handler }}'
+          test -n "$HANDLER" && test -f "$HANDLER"
+          node "$HANDLER" --intent "$ORBIT360_EXECUTION_INTENT" --run-id "$ORBIT360_EXECUTION_RUN_ID" --terminal-out "$ORBIT360_TERMINAL_EVIDENCE"
+          test -f "$ORBIT360_TERMINAL_EVIDENCE"
+
+      - id: terminal
+        name: Reduce run-scoped terminal evidence to ledger only
+        if: always() && steps.inspect.outputs.state_mutation == 'CLAIM_TERMINAL' && steps.claim.outcome == 'success' && steps.execute.outcome != 'skipped'
         env:
           GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          API="https://api.github.com/repos/${GITHUB_REPOSITORY}"
-          AUTH=(-H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28")
-          curl -L --fail --silent --show-error "${AUTH[@]}" "$API/git/blobs/$ORIGINAL_WORKFLOW_BLOB" > "$RUNNER_TEMP/original-blob.json"
-          jq -r '.content' "$RUNNER_TEMP/original-blob.json" | tr -d '\n' | base64 -d > "$RUNNER_TEMP/original.yml"
-          test "$(wc -c < "$RUNNER_TEMP/original.yml" | tr -d ' ')" = '74147'
-          test "$(grep -c '^  group: orbit360-continuity-canonical-ays$' "$RUNNER_TEMP/original.yml")" = '1'
-          python3 - "$RUNNER_TEMP/original.yml" "$RUNNER_TEMP/patched.yml" <<'PY'
-          import sys
-          src,dst=sys.argv[1:]
-          text=open(src,'r',encoding='utf-8').read()
-          old='  group: orbit360-continuity-canonical-ays\n'
-          new='  group: orbit360-continuity-canonical-ays-' + '$' + '{{ github.event.pull_request.base.sha }}\n'
-          if text.count(old)!=1:
-              raise SystemExit('PIPELINE_MECHANISM_FAILURE:CONCURRENCY_SOURCE_LINE_COUNT')
-          out=text.replace(old,new,1)
-          if out.count(new)!=1 or old in out:
-              raise SystemExit('PIPELINE_MECHANISM_FAILURE:CONCURRENCY_PATCH_VERIFY')
-          open(dst,'w',encoding='utf-8',newline='').write(out)
-          PY
-          test "$(wc -l < "$RUNNER_TEMP/patched.yml" | tr -d ' ')" = "$(wc -l < "$RUNNER_TEMP/original.yml" | tr -d ' ')"
-          jq -Rs '{content:.,encoding:"utf-8"}' < "$RUNNER_TEMP/patched.yml" > "$RUNNER_TEMP/blob-request.json"
-          curl -L --fail --silent --show-error -X POST "${AUTH[@]}" "$API/git/blobs" --data-binary @"$RUNNER_TEMP/blob-request.json" > "$RUNNER_TEMP/new-blob.json"
-          NEW_BLOB=$(jq -r '.sha' "$RUNNER_TEMP/new-blob.json"); [[ "$NEW_BLOB" =~ ^[a-f0-9]{40}$ ]]
-          REF_URL="$API/git/ref/heads/$ORBIT360_BRANCH"
-          curl -L --fail --silent --show-error "${AUTH[@]}" "$REF_URL" > "$RUNNER_TEMP/ref-before.json"
-          LIVE_HEAD=$(jq -r '.object.sha' "$RUNNER_TEMP/ref-before.json"); [[ "$LIVE_HEAD" =~ ^[a-f0-9]{40}$ ]]
-          test "$LIVE_HEAD" = '${{ github.event.pull_request.base.sha }}'
-          curl -L --fail --silent --show-error "${AUTH[@]}" "$API/git/commits/$LIVE_HEAD" > "$RUNNER_TEMP/commit-before.json"
-          BASE_TREE=$(jq -r '.tree.sha' "$RUNNER_TEMP/commit-before.json"); [[ "$BASE_TREE" =~ ^[a-f0-9]{40}$ ]]
-          jq -n --arg base "$BASE_TREE" --arg path "$WORKFLOW_PATH" --arg blob "$NEW_BLOB" '{base_tree:$base,tree:[{path:$path,mode:"100644",type:"blob",sha:$blob}]}' > "$RUNNER_TEMP/tree-request.json"
-          curl -L --fail --silent --show-error -X POST "${AUTH[@]}" "$API/git/trees" --data-binary @"$RUNNER_TEMP/tree-request.json" > "$RUNNER_TEMP/tree.json"
-          TREE=$(jq -r '.sha' "$RUNNER_TEMP/tree.json"); [[ "$TREE" =~ ^[a-f0-9]{40}$ ]]
-          jq -n --arg msg 'fix(control-plane): isolate orphaned concurrency by canonical base generation' --arg tree "$TREE" --arg parent "$LIVE_HEAD" '{message:$msg,tree:$tree,parents:[$parent]}' > "$RUNNER_TEMP/commit-request.json"
-          curl -L --fail --silent --show-error -X POST "${AUTH[@]}" "$API/git/commits" --data-binary @"$RUNNER_TEMP/commit-request.json" > "$RUNNER_TEMP/commit-new.json"
-          NEW_HEAD=$(jq -r '.sha' "$RUNNER_TEMP/commit-new.json"); [[ "$NEW_HEAD" =~ ^[a-f0-9]{40}$ ]]
-          curl -L --fail --silent --show-error "${AUTH[@]}" "$REF_URL" > "$RUNNER_TEMP/ref-cas.json"
-          test "$(jq -r '.object.sha' "$RUNNER_TEMP/ref-cas.json")" = "$LIVE_HEAD"
-          jq -n --arg sha "$NEW_HEAD" '{sha:$sha,force:false}' > "$RUNNER_TEMP/ref-update.json"
-          curl -L --fail --silent --show-error -X PATCH "${AUTH[@]}" "$REF_URL" --data-binary @"$RUNNER_TEMP/ref-update.json" > "$RUNNER_TEMP/ref-after.json"
-          test "$(jq -r '.object.sha' "$RUNNER_TEMP/ref-after.json")" = "$NEW_HEAD"
-          echo "ROOTFIX_HEAD=$NEW_HEAD"
-          echo "ROOTFIX_BLOB=$NEW_BLOB"
-
-      - name: Prove source-only recovery boundary
+          ORBIT360_PUBLICATION_CLASS: SINGLE_STATE_TERMINAL
+          ORBIT360_PUBLICATION_TRANSACTION_OUT: ${{ runner.temp }}/single-state-terminal-publication.json
+          ORBIT360_PUBLICATION_COMMIT_MESSAGE: 'gate(control-plane): reconcile single-state execution terminal'
+          ORBIT360_TERMINAL_EVIDENCE: ${{ runner.temp }}/orbit360-terminal.json
         shell: bash
         run: |
           set -euo pipefail
-          echo 'PIPELINE_MECHANISM_FAILURE_ROOTFIXED:CONCURRENCY_GENERATION_BY_CANONICAL_BASE_SHA'
-          echo 'runtimeExecuted=false browserExecuted=false secretAccess=false firestoreRead=false writes=0 deployExecuted=false productionTouched=false'
+          test -f "$ORBIT360_TERMINAL_EVIDENCE"
+          node "$ORBIT360_OWNER" --terminal "$ORBIT360_TERMINAL_EVIDENCE" | tee "$RUNNER_TEMP/terminal.json"
+          node "$ORBIT360_PUBLISHER"
+          node "$ORBIT360_PUBLISHER" --publish-validated "$ORBIT360_PUBLICATION_TRANSACTION_OUT" | tee "$RUNNER_TEMP/terminal-publish.json"
+          jq -e '.ok==true and .status=="CONTROL_PLANE_PUBLICATION_TRANSACTION_PUBLISHED" and .remoteReadbackPass==true and .localReadbackPass==true' "$RUNNER_TEMP/terminal-publish.json" >/dev/null
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: orbit360-single-state-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/inspect.json
+            ${{ runner.temp }}/single-state-selftest.json
+            ${{ runner.temp }}/orbit360-terminal.json
+          if-no-files-found: ignore
+          retention-days: 14
