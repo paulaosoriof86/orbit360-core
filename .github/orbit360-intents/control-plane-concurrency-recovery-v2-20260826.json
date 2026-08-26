@@ -1,0 +1,16 @@
+{
+  "schemaVersion":"orbit360-control-plane-concurrency-recovery-v1",
+  "classification":"PIPELINE_MECHANISM_FAILURE",
+  "code":"ORPHANED_STATIC_CONCURRENCY_RESERVATION",
+  "orphanRunId":32983846998,
+  "startupFailureRunId":32985489704,
+  "expectedCanonicalHead":"e8cbb437c625dca92ad39d50974cd5c0725e56de",
+  "sourceOnly":true,
+  "runtimeReplayAllowed":false,
+  "writesAllowed":false,
+  "deployAllowed":false,
+  "productionAllowed":false,
+  "mainAllowed":false,
+  "mergeAllowed":false,
+  "nonce":0
+}
