@@ -142,15 +142,20 @@ if(repoOnly){
     ...String(execFileSync('git',['diff','--cached','--name-only','--',EVIDENCE_DIR],{cwd:ROOT,encoding:'utf8'})).split(/\r?\n/),
     ...String(execFileSync('git',['ls-files','--others','--exclude-standard','--',EVIDENCE_DIR],{cwd:ROOT,encoding:'utf8'})).split(/\r?\n/)
   ].map(x=>x.trim()).filter(Boolean))].sort();
-  const terminalCandidate=String(L.history?.latestSealedConsumedRuntime?.terminalEvidencePath||L.authorizationBoundary?.terminalEvidencePath||'').trim();
+  const terminalCandidate=String(
+    L.history?.latestPreRiskFailure?.terminalEvidencePath||
+    L.history?.latestSealedConsumedRuntime?.terminalEvidencePath||
+    L.authorizationBoundary?.terminalEvidencePath||''
+  ).trim();
   const preserve=terminalCandidate&&changedEvidence.includes(terminalCandidate)?terminalCandidate:'';
-  const lifeArgs=[A(P.evidenceLifecycle),'--phase',preserve?'pre-terminal':'pre-auth'];
+  const lifeArgs=[A(P.evidenceLifecycle),'--phase',preserve?'pre-terminal':'pre-auth','--assert-only'];
   if(preserve)lifeArgs.push('--preserve',preserve);
   try{
     lifecycle=JSON.parse(execFileSync(process.execPath,lifeArgs,{cwd:ROOT,encoding:'utf8'}));
     need(lifecycle.ok===true,'CLASS_WIDE_EVIDENCE_LIFECYCLE_FAIL');
+    need(Array.isArray(lifecycle.cleaned)&&lifecycle.cleaned.length===0,'INVARIANT_EVIDENCE_LIFECYCLE_MUTATED_WORKTREE');
   }catch(error){need(false,`CLASS_WIDE_EVIDENCE_LIFECYCLE_FAIL:${String(error?.message||error).slice(0,180)}`);}
 }
 
-const out={schemaVersion:'orbit360-control-plane-evidence-convergence-v6-phase-aware-risk-boundary',ok:failures.length===0,status:failures.length?'CONTROL_PLANE_EVIDENCE_CONVERGENCE_FAIL':'CONTROL_PLANE_EVIDENCE_CONVERGENCE_PASS',classification:failures.length?'PIPELINE_MECHANISM_FAILURE':'PASS',failures:[...new Set(failures)],repairable:false,validationMode:openReadiness?'PRE_CLOSE_READINESS':'CLOSED_OR_RUNTIME_STATE',allowOpenReadiness,openReadiness,stateFingerprint:fingerprint,ledgerRevision:L.revision,packageRevision:pkg.revision,phase:L.activeState?.phase,statusCurrent:L.activeState?.status,nextAction:expectedNext,firstIncompleteStep:expectedFirst,candidateArtifactId:cand.artifactId,candidateSourceHead:cand.sourceHead,candidateCertificationEvidence:metadataPath,productionRouteProgressPct:L.progress?.productionRouteProgressPct,authorized:authActive,authorizationPersisted,requestMaterialized:requestActive,runtimeAttemptAccepted:attemptAccepted,runtimeRunId,runtimeAllowed,prBodyValidated:Boolean(prBodyFile)&&failures.length===0,noSourceRewriteGuard:true,classWideEvidenceLifecycle:true,evidenceLifecycleStatus:lifecycle.status,evidenceLifecyclePhase:lifecycle.phase,evidenceLifecycleCleaned:lifecycle.cleaned||[],evidenceLifecycleRemaining:lifecycle.remaining||[],transientPreflightCleaned:repoOnly&&lifecycle.ok===true,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,writes:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
+const out={schemaVersion:'orbit360-control-plane-evidence-convergence-v7-readonly-invariant-risk-boundary',ok:failures.length===0,status:failures.length?'CONTROL_PLANE_EVIDENCE_CONVERGENCE_FAIL':'CONTROL_PLANE_EVIDENCE_CONVERGENCE_PASS',classification:failures.length?'PIPELINE_MECHANISM_FAILURE':'PASS',failures:[...new Set(failures)],repairable:false,validationMode:openReadiness?'PRE_CLOSE_READINESS':'CLOSED_OR_RUNTIME_STATE',allowOpenReadiness,openReadiness,stateFingerprint:fingerprint,ledgerRevision:L.revision,packageRevision:pkg.revision,phase:L.activeState?.phase,statusCurrent:L.activeState?.status,nextAction:expectedNext,firstIncompleteStep:expectedFirst,candidateArtifactId:cand.artifactId,candidateSourceHead:cand.sourceHead,candidateCertificationEvidence:metadataPath,productionRouteProgressPct:L.progress?.productionRouteProgressPct,authorized:authActive,authorizationPersisted,requestMaterialized:requestActive,runtimeAttemptAccepted:attemptAccepted,runtimeRunId,runtimeAllowed,prBodyValidated:Boolean(prBodyFile)&&failures.length===0,noSourceRewriteGuard:true,classWideEvidenceLifecycle:true,evidenceLifecycleStatus:lifecycle.status,evidenceLifecyclePhase:lifecycle.phase,evidenceLifecycleCleaned:lifecycle.cleaned||[],evidenceLifecycleRemaining:lifecycle.remaining||[],invariantReadOnly:true,transientPreflightCleaned:false,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,writes:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
 console.log(JSON.stringify(out,null,2));if(!out.ok)process.exit(41);
