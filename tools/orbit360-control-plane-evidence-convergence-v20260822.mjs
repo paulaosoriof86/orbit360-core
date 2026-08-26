@@ -142,10 +142,16 @@ if(repoOnly){
     ...String(execFileSync('git',['diff','--cached','--name-only','--',EVIDENCE_DIR],{cwd:ROOT,encoding:'utf8'})).split(/\r?\n/),
     ...String(execFileSync('git',['ls-files','--others','--exclude-standard','--',EVIDENCE_DIR],{cwd:ROOT,encoding:'utf8'})).split(/\r?\n/)
   ].map(x=>x.trim()).filter(Boolean))].sort();
+  const changedTerminals=changedEvidence.filter(p=>/^orbit360-platform\/runtime-gate-crm-v20260716\/f2-runtime-terminal-inline-[0-9]+\.json$/.test(p));
+  const knownRuns=[runtimeRunId,Number(L.authorizationBoundary?.terminalRunId||0),Number(L.history?.latestSealedConsumedRuntime?.runId||0)].filter(n=>Number.isInteger(n)&&n>0);
+  const matchingCurrent=changedTerminals.filter(p=>{try{const e=J(p),run=Number(e.runId||0),artifact=Number(e.candidateArtifactId||0);return artifact===Number(cand.artifactId)&&(knownRuns.length===0||knownRuns.includes(run));}catch{return false;}});
+  need(changedTerminals.length<=1||matchingCurrent.length===1,'AMBIGUOUS_CURRENT_TERMINAL_EVIDENCE');
+  const currentChangedTerminal=matchingCurrent.length===1?matchingCurrent[0]:(changedTerminals.length===1?changedTerminals[0]:'');
   const terminalCandidate=String(
-    L.history?.latestPreRiskFailure?.terminalEvidencePath||
+    currentChangedTerminal||
+    L.authorizationBoundary?.terminalEvidencePath||
     L.history?.latestSealedConsumedRuntime?.terminalEvidencePath||
-    L.authorizationBoundary?.terminalEvidencePath||''
+    L.history?.latestPreRiskFailure?.terminalEvidencePath||''
   ).trim();
   const preserve=terminalCandidate&&changedEvidence.includes(terminalCandidate)?terminalCandidate:'';
   const lifeArgs=[A(P.evidenceLifecycle),'--phase',preserve?'pre-terminal':'pre-auth','--assert-only'];
@@ -157,5 +163,5 @@ if(repoOnly){
   }catch(error){need(false,`CLASS_WIDE_EVIDENCE_LIFECYCLE_FAIL:${String(error?.message||error).slice(0,180)}`);}
 }
 
-const out={schemaVersion:'orbit360-control-plane-evidence-convergence-v7-readonly-invariant-risk-boundary',ok:failures.length===0,status:failures.length?'CONTROL_PLANE_EVIDENCE_CONVERGENCE_FAIL':'CONTROL_PLANE_EVIDENCE_CONVERGENCE_PASS',classification:failures.length?'PIPELINE_MECHANISM_FAILURE':'PASS',failures:[...new Set(failures)],repairable:false,validationMode:openReadiness?'PRE_CLOSE_READINESS':'CLOSED_OR_RUNTIME_STATE',allowOpenReadiness,openReadiness,stateFingerprint:fingerprint,ledgerRevision:L.revision,packageRevision:pkg.revision,phase:L.activeState?.phase,statusCurrent:L.activeState?.status,nextAction:expectedNext,firstIncompleteStep:expectedFirst,candidateArtifactId:cand.artifactId,candidateSourceHead:cand.sourceHead,candidateCertificationEvidence:metadataPath,productionRouteProgressPct:L.progress?.productionRouteProgressPct,authorized:authActive,authorizationPersisted,requestMaterialized:requestActive,runtimeAttemptAccepted:attemptAccepted,runtimeRunId,runtimeAllowed,prBodyValidated:Boolean(prBodyFile)&&failures.length===0,noSourceRewriteGuard:true,classWideEvidenceLifecycle:true,evidenceLifecycleStatus:lifecycle.status,evidenceLifecyclePhase:lifecycle.phase,evidenceLifecycleCleaned:lifecycle.cleaned||[],evidenceLifecycleRemaining:lifecycle.remaining||[],invariantReadOnly:true,transientPreflightCleaned:false,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,writes:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
+const out={schemaVersion:'orbit360-control-plane-evidence-convergence-v8-current-terminal-first',ok:failures.length===0,status:failures.length?'CONTROL_PLANE_EVIDENCE_CONVERGENCE_FAIL':'CONTROL_PLANE_EVIDENCE_CONVERGENCE_PASS',classification:failures.length?'PIPELINE_MECHANISM_FAILURE':'PASS',failures:[...new Set(failures)],repairable:false,validationMode:openReadiness?'PRE_CLOSE_READINESS':'CLOSED_OR_RUNTIME_STATE',allowOpenReadiness,openReadiness,stateFingerprint:fingerprint,ledgerRevision:L.revision,packageRevision:pkg.revision,phase:L.activeState?.phase,statusCurrent:L.activeState?.status,nextAction:expectedNext,firstIncompleteStep:expectedFirst,candidateArtifactId:cand.artifactId,candidateSourceHead:cand.sourceHead,candidateCertificationEvidence:metadataPath,productionRouteProgressPct:L.progress?.productionRouteProgressPct,authorized:authActive,authorizationPersisted,requestMaterialized:requestActive,runtimeAttemptAccepted:attemptAccepted,runtimeRunId,runtimeAllowed,prBodyValidated:Boolean(prBodyFile)&&failures.length===0,noSourceRewriteGuard:true,classWideEvidenceLifecycle:true,evidenceLifecycleStatus:lifecycle.status,evidenceLifecyclePhase:lifecycle.phase,evidenceLifecycleCleaned:lifecycle.cleaned||[],evidenceLifecycleRemaining:lifecycle.remaining||[],invariantReadOnly:true,transientPreflightCleaned:false,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,writes:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
 console.log(JSON.stringify(out,null,2));if(!out.ok)process.exit(41);
