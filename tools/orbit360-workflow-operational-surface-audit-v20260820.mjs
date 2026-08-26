@@ -53,6 +53,7 @@ for(const name of files){
   if(rel===CANONICAL){
     const gate=(/^\s*-\s*id\s*:\s*gate\s*$/mi.exec(text)||{}).index,provider=(/^\s*-\s*id\s*:\s*provider\s*$/mi.exec(text)||{}).index;
     if(!text.includes('GENERIC_INTENT_ROUTER_V1'))offenders.push({path:rel,reason:'GENERIC_INTENT_ROUTER_MARKER_MISSING'});
+    if(!text.includes('F2_PRE_RISK_TERMINAL_RECONCILE_V1'))offenders.push({path:rel,reason:'PRE_RISK_TERMINAL_RECONCILE_MARKER_MISSING'});
     if(!text.includes('SINGLE_VALIDATED_PUBLICATION_TRANSACTION_V1'))offenders.push({path:rel,reason:'SINGLE_VALIDATED_PUBLICATION_TRANSACTION_MARKER_MISSING'});
     if(!text.includes('TRANSITION_PRECONDITION_SINGLE_OWNER_V1'))offenders.push({path:rel,reason:'TRANSITION_PRECONDITION_SINGLE_OWNER_MARKER_MISSING'});
     if(!text.includes("'.github/orbit360-intents/*.json'"))offenders.push({path:rel,reason:'INTENT_ONLY_TRIGGER_MISSING'});
@@ -70,7 +71,9 @@ for(const name of files){
       if(!regressionBlock.includes('$TRANSITION_PRECONDITION_OWNER')||!regressionBlock.includes('--transition CONTROL_PLANE_REGRESSION_REOPEN'))offenders.push({path:rel,reason:'REGRESSION_REOPEN_PRECHECK_NOT_DELEGATED_TO_SINGLE_OWNER'});
       if(/CONTROL_PLANE_DEFINITIVE_CAUSAL_PASS|F2_TERMINAL_RECONCILED_NO_REPLAY|F2_TERMINAL_FAIL_AWAITING_SOURCE_ONLY_ROOT_CAUSE/.test(regressionBlock))offenders.push({path:rel,reason:'REGRESSION_REOPEN_STATE_PREDICATE_DUPLICATED_IN_WORKFLOW'});
     }
-    for(const id of ['regression_publish','control_plane_close_publish','authpublish','terminalpublish','failurepublish']){
+    const preRiskBlock=stepBlock(text,'pre_risk_reconcile');
+    if(!preRiskBlock||!preRiskBlock.includes('F2_RUNTIME_TERMINAL_RECONCILE_GENERIC')||!preRiskBlock.includes('authorizationPreserved==true')||!preRiskBlock.includes('privilegedRiskObserved==false'))offenders.push({path:rel,reason:'PRE_RISK_TERMINAL_RECONCILE_FAIL_CLOSED_CONTRACT_MISSING'});
+    for(const id of ['pre_risk_publish','regression_publish','control_plane_close_publish','authpublish','terminalpublish','failurepublish']){
       const block=stepBlock(text,id);
       if(!block){offenders.push({path:rel,reason:'CANONICAL_STATE_PUBLICATION_STEP_MISSING',stepId:id});continue;}
       if(!block.includes('$PUBLICATION_OWNER')||!block.includes('--publish-validated'))offenders.push({path:rel,reason:'CANONICAL_STATE_PUBLICATION_NOT_OWNED_BY_TRANSACTION_OWNER',stepId:id});
@@ -82,7 +85,7 @@ for(const name of files){
 const canonicalCount=files.filter(name=>'.github/workflows/'+name===CANONICAL).length;
 if(files.length!==1||canonicalCount!==1)offenders.push({path:CANONICAL,reason:'SINGLE_WORKFLOW_INVARIANT_BROKEN',totalWorkflowFiles:files.length});
 const result={
-  schemaVersion:'orbit360-workflow-control-surface-audit-v9-single-transition-precondition-owner',
+  schemaVersion:'orbit360-workflow-control-surface-audit-v10-pre-risk-terminal-reconcile',
   ok:offenders.length===0,
   status:offenders.length?'WORKFLOW_CONTROL_SURFACE_AUDIT_FAIL':'WORKFLOW_CONTROL_SURFACE_AUDIT_PASS',
   canonicalWorkflow:CANONICAL,
@@ -95,7 +98,7 @@ const result={
   unauthorizedControlWorkflows:offenders.length,
   offenders,
   inspected,
-  semanticPolicy:{gateOrderByTechnicalStepIds:true,providerDependencyRequired:true,candidateHardcodingForbidden:true,authorizationHardcodingForbidden:true,operationalRevisionHardcodingForbidden:true,executingSnapshotMustEqualCanonical:true,duplicateTopologyParsersForbidden:true,singleValidatedPublicationTransactionRequired:true,duplicatePhysicalStatePublisherForbidden:true,publicationMachineJsonStderrMergeForbidden:true,regressionReopenStatePredicateSingleOwnerRequired:true},
+  semanticPolicy:{gateOrderByTechnicalStepIds:true,providerDependencyRequired:true,candidateHardcodingForbidden:true,authorizationHardcodingForbidden:true,operationalRevisionHardcodingForbidden:true,executingSnapshotMustEqualCanonical:true,duplicateTopologyParsersForbidden:true,singleValidatedPublicationTransactionRequired:true,duplicatePhysicalStatePublisherForbidden:true,publicationMachineJsonStderrMergeForbidden:true,regressionReopenStatePredicateSingleOwnerRequired:true,preRiskTerminalReconcileFailClosedRequired:true},
   runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,operationalWrites:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false
 };
 console.log(JSON.stringify(result,null,2));if(!result.ok)process.exit(41);
