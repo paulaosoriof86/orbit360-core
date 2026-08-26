@@ -1,17 +1,17 @@
 {
   "schemaVersion": "orbit360-continuity-ledger-v3",
   "ledgerId": "ORBIT360-F2-CONTINUITY-CURRENT",
-  "revision": 89,
-  "updatedAtUtc": "2026-08-26T20:31:00.000Z",
+  "revision": 90,
+  "updatedAtUtc": "2026-08-26T21:03:00.000Z",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
   "stateVersion": "ORBIT360-F2-CONTINUITY-CURRENT",
   "gateId": "f2-productive-acceptance-exact-successor-v20260818",
   "activeState": {
-    "phase": "SINGLE_STATE_ROOTFIX_PASS_P2_RELEASE_HANDLER_REQUIRED",
-    "status": "SINGLE_STATE_ROOTFIX_PASS",
-    "rootCauseStatus": "SINGLE_STATE_ROOTFIX_PASS_RUN_33010597855",
+    "phase": "GO_LIVE_RELEASE_HANDLER_READY_P3_HANDSHAKE_REQUIRED",
+    "status": "GO_LIVE_RELEASE_HANDLER_READY",
+    "rootCauseStatus": "GO_LIVE_RELEASE_HANDLER_SOURCE_ONLY_PASS_RUN_33013157934",
     "productFrozen": true,
     "dataFrozen": true,
     "runtimeAuthorized": false,
@@ -92,7 +92,7 @@
     "mergeAuthorized": false,
     "boundaryPath": "orbit360-platform/docs/orbit360-f2-runtime-authorization-boundary-v20260820.json",
     "boundaryPrepared": true,
-    "currentBoundaryStatus": "CONSUMED_PASS_P1_CLOSED_P2_SOURCE_ONLY",
+    "currentBoundaryStatus": "P2_CLOSED_PASS_P3_SOURCE_ONLY",
     "authorizationIdentityRequired": true,
     "preparedAuthorizationIdentityDigest": "d202a6d0331369761e9ea6f8556c41dd3c695d81cb46fd9908e756cfe93f6d95",
     "activeRequestPath": null,
@@ -165,6 +165,24 @@
       "deployExecuted": false,
       "productionTouched": false
     },
+    "p2ReleaseHandler": {
+      "status": "CLOSED_PASS",
+      "classification": "PASS",
+      "runId": 33013157934,
+      "jobId": 98324403103,
+      "artifactId": 9623369940,
+      "artifactDigest": "sha256:69224478ae06bd264b85785bb9a274021cdf28045c790fe5f022fcfccb661ee2",
+      "handler": "tools/orbit360-go-live-release-handler-v20260826.mjs",
+      "evidencePath": "orbit360-platform/runtime-gate-crm-v20260716/p2-go-live-release-handler-source-only-pass-run-33013157934-v20260826.json",
+      "fullRehashPass": true,
+      "rollbackPreflightPass": true,
+      "runtimeExecuted": false,
+      "browserExecuted": false,
+      "secretAccess": false,
+      "firestoreRead": false,
+      "deployExecuted": false,
+      "productionTouched": false
+    },
     "historicalControlPlaneHandshake": {
       "validated": true,
       "runId": 32914461679,
@@ -224,9 +242,9 @@
   "productionReopeningPackage": {
     "path": "orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json",
     "status": "CLOSED_PASS",
-    "revision": 82,
-    "firstIncompleteStep": "P2-GO-LIVE-RELEASE-HANDLER",
-    "nextActionExact": "P2_IMPLEMENT_GO_LIVE_RELEASE_HANDLER_AND_PROVE_DRY_RUN_ROLLBACK_SOURCE_ONLY",
+    "revision": 83,
+    "firstIncompleteStep": "P3-FINAL-SOURCE-ONLY-HANDSHAKE",
+    "nextActionExact": "P3_RUN_FINAL_SOURCE_ONLY_HANDSHAKE_AND_SEAL_CONTROL_PLANE_BASELINE",
     "runtimeAllowed": false,
     "authorizationAllowed": false,
     "requestMaterializationAllowed": false,
@@ -234,8 +252,8 @@
   },
   "checkpoint": "orbit360-platform/docs/PLAN-MAESTRO-DEFINITIVO-PRODUCCION-POSTPRODUCCION-ANTI-LOOP-ORBIT360-AYS-20260826.md",
   "nextAction": {
-    "id": "P2_IMPLEMENT_GO_LIVE_RELEASE_HANDLER_AND_PROVE_DRY_RUN_ROLLBACK_SOURCE_ONLY",
-    "description": "Implement only the stable GO_LIVE_RELEASE_WINDOW handler and prove exact manifest/provider/config/rollback readiness source-only; do not request go-live authorization yet.",
+    "id": "P3_RUN_FINAL_SOURCE_ONLY_HANDSHAKE_AND_SEAL_CONTROL_PLANE_BASELINE",
+    "description": "Run one final source-only handshake against the live P2 handler-ready baseline and seal the control-plane hashes; do not request go-live authorization until P3 passes.",
     "runtimeAllowed": false,
     "userActionRequired": false
   },
@@ -322,15 +340,26 @@
       "deployExecuted": false,
       "productionTouched": false,
       "replayAllowed": false
+    },
+    "latestP2SourceOnly": {
+      "runId": 33013157934,
+      "conclusion": "GO_LIVE_RELEASE_HANDLER_SOURCE_ONLY_PASS",
+      "artifactId": 9623369940,
+      "artifactDigest": "sha256:69224478ae06bd264b85785bb9a274021cdf28045c790fe5f022fcfccb661ee2",
+      "evidencePath": "orbit360-platform/runtime-gate-crm-v20260716/p2-go-live-release-handler-source-only-pass-run-33013157934-v20260826.json",
+      "runtimeExecuted": false,
+      "deployExecuted": false,
+      "productionTouched": false,
+      "replayAllowed": false
     }
   },
   "lanes": {
     "A_frontend_ux_academia": "MACRO2_TRANSVERSAL_SOURCE_ACCEPTANCE_CLOSED",
-    "B_backend_security_gates": "P1_SINGLE_STATE_ROOTFIX_CLOSED_PASS_P2_RELEASE_HANDLER_ACTIVE",
+    "B_backend_security_gates": "P2_RELEASE_HANDLER_CLOSED_PASS_P3_FINAL_HANDSHAKE_ACTIVE",
     "C_real_data_migration": "UNCHANGED_FROZEN"
   },
   "progress": {
-    "productionRouteProgressPct": 88,
+    "productionRouteProgressPct": 91,
     "programProgressPct": 25,
     "f2TerminalPass": true,
     "progressMayIncreaseDuringHardening": false
