@@ -1,0 +1,28 @@
+{
+  "schemaVersion": "orbit360-execution-intent-v1",
+  "transitionId": "GO_LIVE_RELEASE_WINDOW",
+  "canonicalBaseHead": "e036bb2b39a971fd7974e7ee20b981de3358375f",
+  "expectedLedgerRevision": 91,
+  "oneShotOnly": true,
+  "replayAllowed": false,
+  "explicitUserAuthorization": true,
+  "authorizationDigest": "ba0cc077c866e06027e65c0cbd88d95eb4ae780fec9afb9209364577f1ef8aa4",
+  "candidateArtifactId": 9504702901,
+  "candidateSourceHead": "8c9668d6d423e82826b0295431ec699390d79b4b",
+  "scope": {
+    "runtime": true,
+    "browser": true,
+    "secrets": true,
+    "firestoreRead": true,
+    "deploy": true,
+    "production": true,
+    "firestoreWrites": false,
+    "authWrites": false,
+    "operationalWrites": false,
+    "dataWrites": false,
+    "main": false,
+    "merge": false
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
