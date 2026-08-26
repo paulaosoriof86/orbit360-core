@@ -1,7 +1,7 @@
 {
-  "schemaVersion":"orbit360-continuity-writer-registry-v19-minimal-release-readiness",
+  "schemaVersion":"orbit360-continuity-writer-registry-v20-pre-risk-reconcile-readonly-invariants",
   "registryId":"ORBIT360-CONTINUITY-WRITER-REGISTRY",
-  "revision":29,
+  "revision":30,
   "active":true,
   "status":"DEFINITIVE_SINGLE_WORKFLOW_GENERIC_INTENT_ROUTER_MINIMAL_RELEASE_READINESS",
   "branch":"ays/backend-tenant-lab-v99-20260703",
@@ -33,7 +33,7 @@
   "noSourceRewriteGuard":"tools/orbit360-control-plane-no-source-rewrite-guard-v20260824.mjs",
   "canonicalWorkflow":".github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml",
   "canonicalWorkflowMode":"GENERIC_INTENT_ROUTER_MINIMAL_READINESS_HARDENING_CLOSE_INLINE_F2_ONE_SHOT",
-  "supportedIntentModes":["CONTROL_PLANE_REGRESSION_REOPEN","CONTROL_PLANE_SELFTEST","CONTROL_PLANE_HARDENING_CLOSE","F2_RUNTIME_ONE_SHOT"],
+  "supportedIntentModes":["CONTROL_PLANE_REGRESSION_REOPEN","CONTROL_PLANE_SELFTEST","CONTROL_PLANE_HARDENING_CLOSE","F2_PRE_RISK_TERMINAL_RECONCILE","F2_RUNTIME_ONE_SHOT"],
   "intentPathPattern":".github/orbit360-intents/*.json",
   "projectionTargets":["orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json","orbit360-platform/docs/orbit360-f2-runtime-authorization-boundary-v20260820.json","tools/orbit360-gate-contract-f2-productive-acceptance-v20260820.json","tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-source-v20260819.json","tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-runtime-v20260819.json","orbit360-platform/docs/orbit360-live-state-v1.json","orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json","orbit360-platform/docs/ORBIT360-PR5-CURRENT-STATE.md","orbit360-platform/docs/CHECKPOINT-CONTROL-PLANE-HARDENING-20260820.md","README.md","orbit360-platform/CHANGELOG.md",".github/orbit360-requests/macro2-canonical-source-activation-pointer-v20260821.json"],
   "policies":{
@@ -48,6 +48,7 @@
     "actualPrBodyMustBeProjectedByCanonicalWorkflow":true,
     "externalProjectionMayAdvanceOnlyFromPublishedCanonicalState":true,
     "branchHeadMayNotBePersistedAsCurrentAuthority":true,
+    "allOperationalStateTransitionsThroughTransitionOwner":true,
     "allBranchOrPrMutationMustUseCanonicalWorkflow":true,
     "executionTransportIntentOnly":true,
     "executionPrMayModifyWorkflow":false,
@@ -132,7 +133,13 @@
     "syntheticPreRiskAuthorizationReuseBlocking":false,
     "legacySyntheticRecoveryHarnessRetiredFromCriticalPath":true,
     "runtimeRecoveryStillFailsClosedAfterRealPreRiskFailure":true,
-    "f2MechanismTerminalFailureReopensControlPlaneWithoutProductMutation":true
+    "f2MechanismTerminalFailureReopensControlPlaneWithoutProductMutation":true,
+    "invariantsMustBeReadOnly":true,
+    "evidenceConvergenceInvariantMustUseAssertOnlyLifecycle":true,
+    "preRiskTerminalReconcileSourceOnlySupported":true,
+    "preRiskTerminalReconcileRequiresExactRunScopedEvidence":true,
+    "preRiskTerminalReconcileRequiresZeroPrivilegedRisk":true,
+    "preRiskTerminalReconcileMayReuseExistingAuthorization":true
   },
   "workflowClasses":{
     "solePhysicalWorkflow":[".github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml"],
@@ -140,6 +147,7 @@
     "runtimeAndEvidenceExecution":"INLINE_IN_BASE_OWNED_CANONICAL_WORKFLOW_ONLY",
     "controlPlaneSelftest":"COMPATIBILITY_ENTRYPOINT_TO_DETERMINISTIC_MINIMAL_RELEASE_READINESS",
     "controlPlaneHardeningClosure":"INLINE_SOURCE_ONLY_CANONICAL_STATE_TRANSITION_OR_IDEMPOTENT_REPROJECTION",
+    "preRiskTerminalReconciliation":"INLINE_SOURCE_ONLY_CANONICAL_OWNER_ZERO_PRIVILEGED_RISK_ONLY",
     "executionTransport":"ONE_INTENT_JSON_ONLY",
     "parallelRuntimeWorkflow":"FORBIDDEN"
   },
@@ -165,7 +173,8 @@
     "sourceWriteGuardBehavioralSelftest":"tools/orbit360-source-write-guard-behavioral-selftest-v20260825.mjs",
     "publicationPreflightOwner":"tools/orbit360-control-plane-publication-preflight-v20260825.mjs",
     "publicationTransactionOwner":"tools/orbit360-control-plane-publication-preflight-v20260825.mjs",
-    "publicationProtocolSelftest":"tools/orbit360-publication-owner-cli-contract-selftest-v20260825.mjs"
+    "publicationProtocolSelftest":"tools/orbit360-publication-owner-cli-contract-selftest-v20260825.mjs",
+    "invariantExecutionMode":"READ_ONLY_ASSERT_ONLY"
   },
   "evidenceLifecycle":{
     "scope":"orbit360-platform/runtime-gate-crm-v20260716",
@@ -175,7 +184,8 @@
     "trackedTransientAction":"RESTORE",
     "untrackedTransientAction":"REMOVE",
     "unknownFutureFilenameAction":"TREAT_AS_TRANSIENT_UNLESS_EXPLICIT_CURRENT_TERMINAL",
-    "filenameSpecificCleanupForbidden":true
+    "filenameSpecificCleanupForbidden":true,
+    "invariantInvocationMode":"ASSERT_ONLY_NO_MUTATION"
   },
   "publicationGuard":{
     "mode":"SINGLE_VALIDATED_COMMIT_TRANSACTION_REMOTE_CAS",
@@ -191,6 +201,7 @@
     "attemptAcceptMeaning":"RESERVATION_NOT_ONE_SHOT_CONSUMPTION",
     "oneShotBudgetConsumptionPolicy":"ONLY_AFTER_OBSERVED_PRIVILEGED_RISK",
     "preRiskFailureAuthorizationReuseAllowed":true,
+    "preRiskTerminalReconcileSourceOnlyAllowed":true,
     "runtimeExecutionPolicy":"ONLY_AFTER_F2_RUNTIME_ATTEMPT_RESERVATION_IN_SAME_CANONICAL_RUN",
     "runtimeReadOnly":true,
     "browserMayExecuteAfterGate":true,
