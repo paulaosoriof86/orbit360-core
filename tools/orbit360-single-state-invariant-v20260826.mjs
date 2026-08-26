@@ -2,20 +2,47 @@
 'use strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import {execFileSync} from 'node:child_process';
-const ROOT=process.env.ORBIT360_ROOT?path.resolve(process.env.ORBIT360_ROOT):process.cwd();const A=p=>path.join(ROOT,p),T=p=>fs.readFileSync(A(p),'utf8').replace(/^\uFEFF/,''),J=p=>JSON.parse(T(p));const fail=c=>{throw new Error(c);};
-const LEDGER='orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json',REG='orbit360-platform/docs/orbit360-continuity-writer-registry-v20260820.json',CAN='orbit360-platform/docs/orbit360-control-plane-canonicality-contract-v20260822.json',SEM='orbit360-platform/docs/orbit360-control-plane-semantic-contract-v20260824.json',TRANS='tools/orbit360-control-plane-transport-contract-v20260826.json',WF='.github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml',PROJ='tools/orbit360-continuity-projection-core-v20260825.mjs',PROJA='tools/orbit360-continuity-projection-atomic-v20260820.mjs';
+
+const ROOT=process.env.ORBIT360_ROOT?path.resolve(process.env.ORBIT360_ROOT):process.cwd();
+const A=p=>path.join(ROOT,p);
+const T=p=>fs.readFileSync(A(p),'utf8').replace(/^\uFEFF/,'');
+const J=p=>JSON.parse(T(p));
+const fail=c=>{throw new Error(c);};
+const LEDGER='orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json';
+const REG='orbit360-platform/docs/orbit360-continuity-writer-registry-v20260820.json';
+const CAN='orbit360-platform/docs/orbit360-control-plane-canonicality-contract-v20260822.json';
+const SEM='orbit360-platform/docs/orbit360-control-plane-semantic-contract-v20260824.json';
+const TRANS='tools/orbit360-control-plane-transport-contract-v20260826.json';
+const WF='.github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml';
+const PROJ='tools/orbit360-continuity-projection-core-v20260825.mjs';
+const PROJA='tools/orbit360-continuity-projection-atomic-v20260820.mjs';
 const pointers=['orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json','orbit360-platform/docs/orbit360-f2-runtime-authorization-boundary-v20260820.json','orbit360-platform/docs/orbit360-live-state-v1.json','orbit360-platform/docs/ORBIT360-CURRENT-DOCUMENTATION-INDEX-v1.json','orbit360-platform/docs/ORBIT360-PR5-CURRENT-STATE.md','orbit360-platform/docs/CHECKPOINT-CONTROL-PLANE-HARDENING-20260820.md','README.md'];
+
+function validCurrentMilestone(L){
+  const phase=String(L.activeState?.phase||''),status=String(L.activeState?.status||''),progress=Number(L.progress?.productionRouteProgressPct),next=String(L.nextAction?.id||'');
+  const p1Required=phase==='F2_TERMINAL_PASS_P1_SOURCE_ONLY_REQUIRED_BEFORE_GO_LIVE'&&status==='F2_TERMINAL_PASS'&&progress===85&&next==='P1_FIX_SINGLE_STATE_DUPLICATE_CLAIM_AND_SEPARATE_STATIC_INVARIANT_FROM_BEHAVIORAL_SELFTEST_SOURCE_ONLY';
+  const p1Pass=phase==='SINGLE_STATE_ROOTFIX_PASS_P2_RELEASE_HANDLER_REQUIRED'&&status==='SINGLE_STATE_ROOTFIX_PASS'&&progress===88&&next==='P2_IMPLEMENT_GO_LIVE_RELEASE_HANDLER_AND_PROVE_DRY_RUN_ROLLBACK_SOURCE_ONLY';
+  const legacy=phase==='F2_TERMINAL_PASS_AWAITING_AUTHORIZED_GO_LIVE'&&status==='F2_TERMINAL_PASS'&&progress===85&&next==='AWAIT_EXPLICIT_GO_LIVE_AUTHORIZATION';
+  return p1Required||p1Pass||legacy;
+}
+
 try{
   for(const p of [LEDGER,REG,CAN,SEM,TRANS,WF,PROJ,PROJA,...pointers])if(!fs.existsSync(A(p)))fail(`SINGLE_STATE_DEPENDENCY_MISSING:${p}`);
-  const L=J(LEDGER),R=J(REG),C=J(CAN),S=J(SEM),Tr=J(TRANS),wf=T(WF);if(R.sourceOfTruth!==LEDGER||JSON.stringify(R.stateBearingFiles)!==JSON.stringify([LEDGER])||!Array.isArray(R.projectionTargets)||R.projectionTargets.length!==0)fail('SINGLE_STATE_REGISTRY_STATE_SURFACE_INVALID');
+  const L=J(LEDGER),R=J(REG),C=J(CAN),S=J(SEM),Tr=J(TRANS),wf=T(WF);
+  if(R.sourceOfTruth!==LEDGER||JSON.stringify(R.stateBearingFiles)!==JSON.stringify([LEDGER])||!Array.isArray(R.projectionTargets)||R.projectionTargets.length!==0)fail('SINGLE_STATE_REGISTRY_STATE_SURFACE_INVALID');
   if(C.singleMutableOperationalState!==LEDGER||JSON.stringify(C.stateBearingFiles)!==JSON.stringify([LEDGER])||C.actualPrBodyStateBearing!==false)fail('SINGLE_STATE_CANONICALITY_INVALID');
   if(S.singleMutableOperationalState!==LEDGER||S.dynamicStateMustBeReadFromLedger!==true)fail('SINGLE_STATE_SEMANTIC_CONTRACT_INVALID');
   if(Tr.transport!=='EPHEMERAL_EXECUTION_BRANCH_SINGLE_PUSH'||Tr.statePublication!=='LEDGER_ONLY_REMOTE_CAS')fail('SINGLE_STATE_TRANSPORT_INVALID');
   if(!wf.includes("branches:\n      - 'ays/orbit360-exec-*'")||wf.includes('pull_request:')||wf.includes('PR_STATE')||wf.includes('CHANGELOG')||wf.includes('continuity-projection'))fail('SINGLE_STATE_WORKFLOW_SURFACE_INVALID');
   if(!T(PROJ).includes('SINGLE_STATE_COMPATIBILITY_NO_MUTATION')||!T(PROJA).includes('SINGLE_STATE_COMPATIBILITY_NO_MUTATION'))fail('SINGLE_STATE_PROJECTION_NOT_RETIRED');
   for(const p of pointers){const t=T(p);if(/"ledgerRevision"|"packageRevision"|productionRouteProgressPct|AWAIT_EXPLICIT_GO_LIVE_AUTHORIZATION|F2_TERMINAL_PASS_AWAITING_AUTHORIZED_GO_LIVE/.test(t))fail(`SINGLE_STATE_POINTER_CONTAINS_DYNAMIC_STATE:${p}`);}
-  if(L.progress?.f2TerminalPass===true){if(L.activeState?.status!=='F2_TERMINAL_PASS'||Number(L.progress.productionRouteProgressPct)!==85||L.nextAction?.id!=='AWAIT_EXPLICIT_GO_LIVE_AUTHORIZATION')fail('SINGLE_STATE_LEDGER_F2_PASS_INVALID');const e=L.continuityControl?.latestDurableEvidence;if(Number(e?.runId)!==32920087220||e?.type!=='F2_TERMINAL_PASS_ARTIFACT')fail('SINGLE_STATE_LEDGER_TERMINAL_POINTER_INVALID');const E=J(e.path);if(E.ok!==true||E.classification!=='PASS'||Number(E.runId)!==32920087220||Number(E.browserRunId)!==32920087220||Number(E.integrityRunId)!==32920087220||Number(E.firestoreWrites)!==0||Number(E.authWrites)!==0||Number(E.operationalWrites)!==0||E.deployExecuted!==false||E.productionHostingTouched!==false)fail('SINGLE_STATE_TERMINAL_EVIDENCE_INVALID');}
-  let ownerSelftest={};try{const raw=execFileSync(process.execPath,[A('tools/orbit360-single-state-ledger-owner-v20260826.mjs'),'--selftest'],{cwd:ROOT,encoding:'utf8',stdio:['ignore','pipe','pipe']});ownerSelftest=JSON.parse(String(raw||'').trim());if(ownerSelftest.ok!==true||ownerSelftest.status!=='SINGLE_STATE_CONTROL_PLANE_SELFTEST_PASS')fail('SINGLE_STATE_OWNER_SELFTEST_NOT_PASS');}catch(error){const detail=String(error?.stdout||error?.stderr||error?.message||error).replace(/\s+/g,' ').slice(0,900);fail(`SINGLE_STATE_OWNER_SELFTEST_FAIL:${detail}`);}
-  console.log(JSON.stringify({ok:true,status:'SINGLE_STATE_CONTROL_PLANE_INVARIANT_PASS',singleMutableOperationalState:LEDGER,stateBearingFileCount:1,projectionTargets:0,prBodyStateBearing:false,technicalPrTransport:false,workflowWritesHumanProjections:false,ownerSelftestPass:true,secondClaimBlocked:ownerSelftest.secondClaimBlocked===true,staleRevisionBlocked:ownerSelftest.staleRevisionBlocked===true,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false},null,2));
-}catch(error){console.error(JSON.stringify({ok:false,status:'SINGLE_STATE_CONTROL_PLANE_INVARIANT_FAIL',classification:'PIPELINE_MECHANISM_FAILURE',code:String(error?.message||error),containsPII:false,containsSecrets:false}));process.exit(41);}
+  if(L.progress?.f2TerminalPass===true){
+    if(!validCurrentMilestone(L))fail('SINGLE_STATE_LEDGER_F2_OR_P1_STATE_INVALID');
+    if(L.authorizationBoundary?.activeRuntimeAuthorization!==false||L.authorizationBoundary?.activeRequestPath!=null||L.authorizationBoundary?.authorizationRecordPath!=null)fail('SINGLE_STATE_LEDGER_ACTIVE_AUTH_INVALID');
+    const e=L.continuityControl?.latestDurableEvidence;
+    if(Number(e?.runId)!==32920087220||e?.type!=='F2_TERMINAL_PASS_ARTIFACT')fail('SINGLE_STATE_LEDGER_TERMINAL_POINTER_INVALID');
+    const E=J(e.path);
+    if(E.ok!==true||E.classification!=='PASS'||Number(E.runId)!==32920087220||Number(E.browserRunId)!==32920087220||Number(E.integrityRunId)!==32920087220||Number(E.firestoreWrites)!==0||Number(E.authWrites)!==0||Number(E.operationalWrites)!==0||E.deployExecuted!==false||E.productionHostingTouched!==false)fail('SINGLE_STATE_TERMINAL_EVIDENCE_INVALID');
+  }
+  console.log(JSON.stringify({ok:true,status:'SINGLE_STATE_CONTROL_PLANE_STATIC_INVARIANT_PASS',singleMutableOperationalState:LEDGER,stateBearingFileCount:1,projectionTargets:0,prBodyStateBearing:false,technicalPrTransport:false,workflowWritesHumanProjections:false,behavioralSelftestDelegated:true,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false},null,2));
+}catch(error){console.error(JSON.stringify({ok:false,status:'SINGLE_STATE_CONTROL_PLANE_STATIC_INVARIANT_FAIL',classification:'PIPELINE_MECHANISM_FAILURE',code:String(error?.message||error),containsPII:false,containsSecrets:false}));process.exit(41);}
