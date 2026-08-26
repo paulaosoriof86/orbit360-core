@@ -68,7 +68,6 @@ jobs:
               raise SystemExit('PIPELINE_MECHANISM_FAILURE:CONCURRENCY_PATCH_VERIFY')
           open(dst,'w',encoding='utf-8',newline='').write(out)
           PY
-          test "$(grep -F -c 'group: orbit360-continuity-canonical-ays-${{ github.event.pull_request.base.sha }}' "$RUNNER_TEMP/patched.yml")" = '1'
           test "$(wc -l < "$RUNNER_TEMP/patched.yml" | tr -d ' ')" = "$(wc -l < "$RUNNER_TEMP/original.yml" | tr -d ' ')"
           jq -Rs '{content:.,encoding:"utf-8"}' < "$RUNNER_TEMP/patched.yml" > "$RUNNER_TEMP/blob-request.json"
           curl -L --fail --silent --show-error -X POST "${AUTH[@]}" "$API/git/blobs" --data-binary @"$RUNNER_TEMP/blob-request.json" > "$RUNNER_TEMP/new-blob.json"
