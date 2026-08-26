@@ -24,8 +24,9 @@ function validCurrentMilestone(L){
   const p1Pass=phase==='SINGLE_STATE_ROOTFIX_PASS_P2_RELEASE_HANDLER_REQUIRED'&&status==='SINGLE_STATE_ROOTFIX_PASS'&&progress===88&&next==='P2_IMPLEMENT_GO_LIVE_RELEASE_HANDLER_AND_PROVE_DRY_RUN_ROLLBACK_SOURCE_ONLY';
   const p2Pass=phase==='GO_LIVE_RELEASE_HANDLER_READY_P3_HANDSHAKE_REQUIRED'&&status==='GO_LIVE_RELEASE_HANDLER_READY'&&progress===91&&next==='P3_RUN_FINAL_SOURCE_ONLY_HANDSHAKE_AND_SEAL_CONTROL_PLANE_BASELINE';
   const p3Pass=phase==='CONTROL_PLANE_FROZEN_BASELINE_AWAITING_GO_LIVE_AUTHORIZATION'&&status==='FINAL_RELEASE_HANDSHAKE_PASS'&&progress===93&&next==='AWAIT_EXPLICIT_GO_LIVE_AUTHORIZATION';
+  const releaseFail=phase==='AUTHORIZED_RELEASE_WINDOW_FAILED'&&status==='RELEASE_TERMINAL_FAIL_NO_REPLAY'&&progress===93&&next==='DIAGNOSE_RELEASE_ROOT_CAUSE_AND_VERIFY_ROLLBACK';
   const legacy=phase==='F2_TERMINAL_PASS_AWAITING_AUTHORIZED_GO_LIVE'&&status==='F2_TERMINAL_PASS'&&progress===85&&next==='AWAIT_EXPLICIT_GO_LIVE_AUTHORIZATION';
-  return p1Required||p1Pass||p2Pass||p3Pass||legacy;
+  return p1Required||p1Pass||p2Pass||p3Pass||releaseFail||legacy;
 }
 
 try{
@@ -39,12 +40,12 @@ try{
   if(!T(PROJ).includes('SINGLE_STATE_COMPATIBILITY_NO_MUTATION')||!T(PROJA).includes('SINGLE_STATE_COMPATIBILITY_NO_MUTATION'))fail('SINGLE_STATE_PROJECTION_NOT_RETIRED');
   for(const p of pointers){const t=T(p);if(/"ledgerRevision"|"packageRevision"|productionRouteProgressPct|AWAIT_EXPLICIT_GO_LIVE_AUTHORIZATION|F2_TERMINAL_PASS_AWAITING_AUTHORIZED_GO_LIVE/.test(t))fail(`SINGLE_STATE_POINTER_CONTAINS_DYNAMIC_STATE:${p}`);}
   if(L.progress?.f2TerminalPass===true){
-    if(!validCurrentMilestone(L))fail('SINGLE_STATE_LEDGER_F2_P1_P2_OR_P3_STATE_INVALID');
+    if(!validCurrentMilestone(L))fail('SINGLE_STATE_LEDGER_F2_P1_P2_P3_OR_RELEASE_RECOVERY_STATE_INVALID');
     if(L.authorizationBoundary?.activeRuntimeAuthorization!==false||L.authorizationBoundary?.activeRequestPath!=null||L.authorizationBoundary?.authorizationRecordPath!=null)fail('SINGLE_STATE_LEDGER_ACTIVE_AUTH_INVALID');
     const e=L.continuityControl?.latestDurableEvidence;
     if(Number(e?.runId)!==32920087220||e?.type!=='F2_TERMINAL_PASS_ARTIFACT')fail('SINGLE_STATE_LEDGER_TERMINAL_POINTER_INVALID');
     const E=J(e.path);
     if(E.ok!==true||E.classification!=='PASS'||Number(E.runId)!==32920087220||Number(E.browserRunId)!==32920087220||Number(E.integrityRunId)!==32920087220||Number(E.firestoreWrites)!==0||Number(E.authWrites)!==0||Number(E.operationalWrites)!==0||E.deployExecuted!==false||E.productionHostingTouched!==false)fail('SINGLE_STATE_TERMINAL_EVIDENCE_INVALID');
   }
-  console.log(JSON.stringify({ok:true,status:'SINGLE_STATE_CONTROL_PLANE_STATIC_INVARIANT_PASS',singleMutableOperationalState:LEDGER,stateBearingFileCount:1,projectionTargets:0,prBodyStateBearing:false,technicalPrTransport:false,workflowWritesHumanProjections:false,behavioralSelftestDelegated:true,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false},null,2));
+  console.log(JSON.stringify({ok:true,status:'SINGLE_STATE_CONTROL_PLANE_STATIC_INVARIANT_PASS',singleMutableOperationalState:LEDGER,stateBearingFileCount:1,projectionTargets:0,prBodyStateBearing:false,technicalPrTransport:false,workflowWritesHumanProjections:false,releaseFailureRecoveryAdmitted:true,behavioralSelftestDelegated:true,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false},null,2));
 }catch(error){console.error(JSON.stringify({ok:false,status:'SINGLE_STATE_CONTROL_PLANE_STATIC_INVARIANT_FAIL',classification:'PIPELINE_MECHANISM_FAILURE',code:String(error?.message||error),containsPII:false,containsSecrets:false}));process.exit(41);}
