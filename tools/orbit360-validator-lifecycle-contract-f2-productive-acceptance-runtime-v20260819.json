@@ -4,8 +4,8 @@
   "gateContractVersion": "2.2.0",
   "validatorLifecycleRevision": "phase-capability-contract-v7-canonical-convergence",
   "f2ValidatorRevision": "f2-dynamic-cert-authority-v10-20260822",
-  "status": "F2_RUNTIME_ATTEMPT_RESERVED_ONE_SHOT_UNCONSUMED",
-  "currentPhase": "F2_RUNTIME_ATTEMPT_RESERVED_PREFLIGHT_PENDING",
+  "status": "F2_TERMINAL_PASS",
+  "currentPhase": "F2_TERMINAL_PASS_AWAITING_AUTHORIZED_GO_LIVE",
   "canonicalContractAuthority": "tools/orbit360-gate-contract-f2-productive-acceptance-v20260820.json",
   "continuity": {
     "stateVersion": "ORBIT360-F2-CONTINUITY-CURRENT",
@@ -19,25 +19,15 @@
   },
   "executionProfile": {
     "phase": "F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY",
-    "capabilities": {
-      "secrets": false,
-      "firestoreRead": false,
-      "writes": false,
-      "runtime": false,
-      "browser": false,
-      "deploy": false,
-      "functionsDeploy": false,
-      "rulesDeploy": false,
-      "production": false
-    },
-    "blockedBy": "RUN_F2_SOURCE_AND_RUNTIME_PREFLIGHT_FAIL_CLOSED"
+    "capabilities": {"secrets":false,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false},
+    "blockedBy": "AWAIT_EXPLICIT_GO_LIVE_AUTHORIZATION"
   },
   "singleGate": true,
   "macroClosure": true,
   "block": "F2_GATE_DE_ACEPTACION_PRODUCTIVA_REAL",
   "authorization": {
     "requiredForExecution": true,
-    "activeRequest": true,
+    "activeRequest": false,
     "freshAuthorizationRequired": false,
     "authorizationBoundaryPrepared": true,
     "authorizationBoundaryPath": "orbit360-platform/docs/orbit360-f2-runtime-authorization-boundary-v20260820.json",
@@ -70,69 +60,36 @@
     "historicalCandidateRuntimeReuseAllowed": false,
     "productionReopeningPackageClosedPassRequired": true,
     "compositeInvariantPassRequired": true,
-    "candidateCertificationDerivedFromCanonicalAuthority": true
+    "candidateCertificationDerivedFromCanonicalAuthority": true,
+    "f2TerminalPass": true,
+    "terminalRunId": 32920087220,
+    "terminalEvidencePath": "orbit360-platform/runtime-gate-crm-v20260716/f2-runtime-terminal-inline-32920087220.json"
   },
   "surfaceTopology": {
-    "routes": [
-      "inicio",
-      "cliente360",
-      "aseguradoras",
-      "ops",
-      "leads",
-      "polizas",
-      "cobros"
-    ],
-    "integratedSurfaces": {
-      "vehiculos": "cliente360_policy_deeplink_fullpage",
-      "recibosCartera": "policy_client360_plus_cobros_global"
-    },
-    "roleViews": [
-      {
-        "role": "Dirección",
-        "viewport": "desktop"
-      },
-      {
-        "role": "Operativo",
-        "viewport": "tablet"
-      },
-      {
-        "role": "Asesor",
-        "viewport": "mobile"
-      }
-    ]
+    "routes": ["inicio","cliente360","aseguradoras","ops","leads","polizas","cobros"],
+    "integratedSurfaces": {"vehiculos":"cliente360_policy_deeplink_fullpage","recibosCartera":"policy_client360_plus_cobros_global"},
+    "roleViews": [{"role":"Dirección","viewport":"desktop"},{"role":"Operativo","viewport":"tablet"},{"role":"Asesor","viewport":"mobile"}]
   },
   "history": {
     "latestRuntime": {
-      "historical": true,
-      "runId": 32679948489,
-      "conclusion": "failure",
-      "classification": "FUNCTIONAL_DEFECT",
-      "failureCode": "FUNCTIONAL_DEFECT:F2_OPERATIVO_ASEGURADORAS_MODULE_VISIBILITY_MISSING",
+      "historical": false,
+      "runId": 32920087220,
+      "conclusion": "success",
+      "classification": "PASS",
       "runtimeExecuted": true,
       "browserExecuted": true,
       "secretAccess": true,
       "firestoreRead": true,
       "writes": 0,
-      "replayAllowed": false
+      "replayAllowed": false,
+      "browserMatrixPass": true,
+      "integrityBeforeAfterPass": true,
+      "zeroCrossTenant": true
     },
-    "request14": {
-      "historical": true,
-      "runId": 32344210222,
-      "conclusion": "failure",
-      "classification": "VALIDATOR_STALE",
-      "failureCode": "F2_ACTIVE_PIPELINE_HISTORICAL_CANDIDATE_LITERAL",
-      "preGateFailure": true,
-      "runtimeExecuted": false,
-      "browserExecuted": false,
-      "secretAccess": false,
-      "firestoreRead": false,
-      "writes": 0,
-      "metadataReconciled": true,
-      "replayAllowed": false
-    }
+    "request14": {"historical":true,"runId":32344210222,"conclusion":"failure","classification":"VALIDATOR_STALE","failureCode":"F2_ACTIVE_PIPELINE_HISTORICAL_CANDIDATE_LITERAL","preGateFailure":true,"runtimeExecuted":false,"browserExecuted":false,"secretAccess":false,"firestoreRead":false,"writes":0,"metadataReconciled":true,"replayAllowed":false}
   },
-  "nextActionExact": "RUN_F2_SOURCE_AND_RUNTIME_PREFLIGHT_FAIL_CLOSED",
-  "canonicalStateFingerprint": "e08e448f196c3ce21e42458fb5cc9b3689c0ac07f8c05ea63a362c1ba42aabfd",
+  "nextActionExact": "AWAIT_EXPLICIT_GO_LIVE_AUTHORIZATION",
+  "canonicalStateFingerprint": "275651e8a7369ba340241a49be72d48ec5785fc2d0e2e43b2a6971c0b34fcaf2",
   "containsPII": false,
   "containsSecrets": false
 }
