@@ -4,8 +4,8 @@
   "gateContractVersion": "2.2.0",
   "validatorLifecycleRevision": "phase-capability-contract-v7-canonical-convergence",
   "f2ValidatorRevision": "f2-dynamic-cert-authority-v10-20260822",
-  "status": "F2_PRE_RISK_FAILURE_AUTHORIZATION_PRESERVED",
-  "currentPhase": "F2_PRE_RISK_FAILURE_AWAITING_SOURCE_ONLY_ROOT_CAUSE_WITH_AUTH_PRESERVED",
+  "status": "F2_RUNTIME_ATTEMPT_RESERVED_ONE_SHOT_UNCONSUMED",
+  "currentPhase": "F2_RUNTIME_ATTEMPT_RESERVED_PREFLIGHT_PENDING",
   "canonicalContractAuthority": "tools/orbit360-gate-contract-f2-productive-acceptance-v20260820.json",
   "continuity": {
     "stateVersion": "ORBIT360-F2-CONTINUITY-CURRENT",
@@ -30,15 +30,15 @@
       "rulesDeploy": false,
       "production": false
     },
-    "blockedBy": "DIAGNOSE_ROOT_CAUSE_BEFORE_ANY_FRESH_AUTHORIZATION"
+    "blockedBy": "RUN_F2_SOURCE_AND_RUNTIME_PREFLIGHT_FAIL_CLOSED"
   },
   "singleGate": true,
   "macroClosure": true,
   "block": "F2_GATE_DE_ACEPTACION_PRODUCTIVA_REAL",
   "authorization": {
     "requiredForExecution": true,
-    "activeRequest": false,
-    "freshAuthorizationRequired": true,
+    "activeRequest": true,
+    "freshAuthorizationRequired": false,
     "authorizationBoundaryPrepared": true,
     "authorizationBoundaryPath": "orbit360-platform/docs/orbit360-f2-runtime-authorization-boundary-v20260820.json",
     "nextRuntimeMaterializationAllowed": false,
@@ -131,8 +131,8 @@
       "replayAllowed": false
     }
   },
-  "nextActionExact": "DIAGNOSE_ROOT_CAUSE_BEFORE_ANY_FRESH_AUTHORIZATION",
-  "canonicalStateFingerprint": "4146f174758213ac6a09ade1cfc3531f7e90d3173701613bb8baef06bdd2384f",
+  "nextActionExact": "RUN_F2_SOURCE_AND_RUNTIME_PREFLIGHT_FAIL_CLOSED",
+  "canonicalStateFingerprint": "e08e448f196c3ce21e42458fb5cc9b3689c0ac07f8c05ea63a362c1ba42aabfd",
   "containsPII": false,
   "containsSecrets": false
 }

@@ -1,6 +1,6 @@
 {
   "schemaVersion": "orbit360-f2-runtime-authorization-v4-risk-boundary",
-  "status": "PRE_RISK_FAIL_AUTHORIZATION_REUSABLE",
+  "status": "RUNTIME_ATTEMPT_RESERVED_ONE_SHOT_UNCONSUMED",
   "approved": true,
   "authorizationIdentityDigest": "d202a6d0331369761e9ea6f8556c41dd3c695d81cb46fd9908e756cfe93f6d95",
   "gateId": "f2-productive-acceptance-exact-successor-v20260818",
@@ -13,8 +13,8 @@
   "authorizationFrozen": true,
   "replayAllowed": false,
   "historical": false,
-  "runtimeAttemptAccepted": false,
-  "runtimeAttemptReserved": false,
+  "runtimeAttemptAccepted": true,
+  "runtimeAttemptReserved": true,
   "privilegedRiskBoundaryEntered": false,
   "runtimeAttemptCount": 0,
   "candidateArtifactId": 9504702901,
@@ -42,14 +42,14 @@
   },
   "containsPII": false,
   "containsSecrets": false,
-  "runtimeRunId": null,
-  "runtimeAttemptAcceptedAt": null,
+  "runtimeRunId": 32920087220,
+  "runtimeAttemptAcceptedAt": "2026-08-26T01:44:27.997Z",
   "lastPreRiskFailure": {
     "runId": 32919846112,
     "classification": "PIPELINE_MECHANISM_FAILURE",
     "failureCode": "F2_STAGE_OUTCOME:authpublish=success;gate=failure;provider=skipped;browser=skipped;integrity=skipped",
     "at": "2026-08-26T01:40:36.231Z"
   },
-  "reactivatedAt": "2026-08-26T01:40:28.057Z",
+  "reactivatedAt": "2026-08-26T01:44:26.241Z",
   "lastPreRiskFailurePreserved": true
 }
