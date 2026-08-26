@@ -12,9 +12,11 @@
     "cancelInProgress": false,
     "technicalPullRequestMustBeClosedBeforeBranchReset": true,
     "resetTechnicalBranchWhileOpenForbidden": true,
-    "intentMustBeFullyMaterializedWhileTechnicalPrClosed": true,
-    "technicalPrReopenDoesNotCountAsExecutionTrigger": true,
-    "exactlyOneSynchronizeMutationAfterReopen": true,
+    "intentMustBeFullyMaterializedBeforeExecutionTrigger": true,
+    "reopenExistingTechnicalPrPreferred": true,
+    "freshIntentOnlyTechnicalPrAllowedWhenGitHubForbidsReopenAfterForceReset": true,
+    "openingTechnicalPrDoesNotCountAsExecutionTrigger": true,
+    "exactlyOneSynchronizeMutationAfterOpenOrReopen": true,
     "exactlyOneIntentPathMayDifferFromCanonicalBase": true,
     "intentExpectedLedgerAndPackageMustMatchLiveCanonicalState": true,
     "staleEventMustFailClosed": true,
@@ -29,10 +31,10 @@
   "sequence": [
     "READ_LIVE_PR5_HEAD_AND_LEDGER",
     "ASSERT_NO_ACTIVE_OR_QUEUED_CANONICAL_MUTATOR",
-    "CLOSE_TECHNICAL_PR",
-    "RESET_TECHNICAL_BRANCH_TO_LIVE_CANONICAL_HEAD",
-    "MATERIALIZE_COMPLETE_INTENT_WHILE_PR_CLOSED",
-    "REOPEN_TECHNICAL_PR",
+    "CLOSE_TECHNICAL_PR_IF_REUSING",
+    "RESET_OR_CREATE_TECHNICAL_BRANCH_FROM_LIVE_CANONICAL_HEAD_WITHOUT_OPEN_PR",
+    "MATERIALIZE_COMPLETE_SINGLE_INTENT_BEFORE_EXECUTION_TRIGGER",
+    "REOPEN_EXISTING_TECHNICAL_PR_OR_CREATE_FRESH_INTENT_ONLY_PR_IF_GITHUB_REOPEN_IS_FORBIDDEN",
     "PERFORM_ONE_NONCE_MUTATION_ONLY",
     "EXPECT_ONE_SYNCHRONIZE_EVENT",
     "VALIDATE_EVENT_AGAINST_LIVE_LEDGER_PACKAGE_AND_CANDIDATE",
@@ -41,10 +43,15 @@
   "incidentEvidence": {
     "successfulReadinessRunId": 32914461679,
     "staleTransportRunIds": [32914479088, 32914729979],
-    "rootCause": "TECHNICAL_PR_BRANCH_RESET_OR_MUTATION_GENERATED_MORE_THAN_ONE_SYNCHRONIZE_EVENT; EARLIER CANONICAL RUN ADVANCED BASE BEFORE LATER EVENT VALIDATED BASE_SHA",
+    "rootCause": "TECHNICAL_PR_BRANCH_RESET_OR_MUTATION_GENERATED_MORE_THAN_ONE_SYNCHRONIZE_EVENT; EARLIER_CANONICAL_RUN_ADVANCED_BASE_BEFORE_LATER_EVENT_VALIDATED_BASE_SHA",
     "productDefect": false,
     "runtimeExecutedInStaleRuns": false,
-    "authorizationConsumedInStaleRuns": false
+    "authorizationConsumedInStaleRuns": false,
+    "githubReopenConstraintObserved": {
+      "code": "PIPELINE_MECHANISM_FAILURE:TECHNICAL_PR_REOPEN_FORBIDDEN_AFTER_FORCE_RESET",
+      "httpStatus": 422,
+      "safeFallback": "CREATE_FRESH_INTENT_ONLY_TECHNICAL_PR_FROM_EXACT_LIVE_HEAD_THEN_TRIGGER_EXACTLY_ONE_SYNCHRONIZE"
+    }
   },
   "stopRetry": {
     "sameTransportFailureSecondOccurrence": "DO_NOT_RETRY_SAME_EVENT",
