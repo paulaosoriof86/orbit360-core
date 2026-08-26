@@ -22,9 +22,10 @@ function milestoneKind(L){
   if(phase==='F2_TERMINAL_PASS_P1_SOURCE_ONLY_REQUIRED_BEFORE_GO_LIVE'&&status==='F2_TERMINAL_PASS'&&progress===85&&next==='P1_FIX_SINGLE_STATE_DUPLICATE_CLAIM_AND_SEPARATE_STATIC_INVARIANT_FROM_BEHAVIORAL_SELFTEST_SOURCE_ONLY')return 'P1_REQUIRED';
   if(phase==='SINGLE_STATE_ROOTFIX_PASS_P2_RELEASE_HANDLER_REQUIRED'&&status==='SINGLE_STATE_ROOTFIX_PASS'&&progress===88&&next==='P2_IMPLEMENT_GO_LIVE_RELEASE_HANDLER_AND_PROVE_DRY_RUN_ROLLBACK_SOURCE_ONLY')return 'P1_PASS';
   if(phase==='GO_LIVE_RELEASE_HANDLER_READY_P3_HANDSHAKE_REQUIRED'&&status==='GO_LIVE_RELEASE_HANDLER_READY'&&progress===91&&next==='P3_RUN_FINAL_SOURCE_ONLY_HANDSHAKE_AND_SEAL_CONTROL_PLANE_BASELINE')return 'P2_PASS';
-  if(phase==='AUTHORIZED_RELEASE_WINDOW_RUNNING'&&status==='AUTHORIZED_RELEASE_WINDOW_CLAIMED'&&(progress===85||progress===93)&&next==='RUN_AUTHORIZED_RELEASE_WINDOW')return 'CLAIMED';
+  if(phase==='CONTROL_PLANE_FROZEN_BASELINE_AWAITING_GO_LIVE_AUTHORIZATION'&&status==='FINAL_RELEASE_HANDSHAKE_PASS'&&progress===93&&next==='AWAIT_EXPLICIT_GO_LIVE_AUTHORIZATION')return 'P3_PASS';
+  if(phase==='AUTHORIZED_RELEASE_WINDOW_RUNNING'&&status==='AUTHORIZED_RELEASE_WINDOW_CLAIMED'&&progress===93&&next==='RUN_AUTHORIZED_RELEASE_WINDOW')return 'CLAIMED';
   if(phase==='PRODUCTION_SMOKE_PASS'&&status==='PRODUCTION_GO_LIVE_PASS'&&progress===100&&next==='POST_GO_LIVE_MONITORING')return 'RELEASE_PASS';
-  if(phase==='AUTHORIZED_RELEASE_WINDOW_FAILED'&&status==='RELEASE_TERMINAL_FAIL_NO_REPLAY'&&(progress===85||progress===93)&&next==='DIAGNOSE_RELEASE_ROOT_CAUSE_AND_VERIFY_ROLLBACK')return 'RELEASE_FAIL';
+  if(phase==='AUTHORIZED_RELEASE_WINDOW_FAILED'&&status==='RELEASE_TERMINAL_FAIL_NO_REPLAY'&&progress===93&&next==='DIAGNOSE_RELEASE_ROOT_CAUSE_AND_VERIFY_ROLLBACK')return 'RELEASE_FAIL';
   return '';
 }
 function assertLedger(L){
@@ -34,7 +35,7 @@ function assertLedger(L){
   if(L.progress?.f2TerminalPass===true){
     const kind=milestoneKind(L);
     if(!kind)fail(`SINGLE_STATE_F2_MILESTONE_PHASE_INVALID:${L.activeState?.phase}:${L.activeState?.status}:${L.progress?.productionRouteProgressPct}:${L.nextAction?.id}`);
-    if(['LEGACY_WAITING_FIXTURE','P1_REQUIRED','P1_PASS','P2_PASS'].includes(kind)&&(L.authorizationBoundary?.activeRuntimeAuthorization!==false||L.authorizationBoundary?.activeRequestPath!=null||L.authorizationBoundary?.authorizationRecordPath!=null))fail('SINGLE_STATE_F2_PASS_ACTIVE_AUTH_INVALID');
+    if(['LEGACY_WAITING_FIXTURE','P1_REQUIRED','P1_PASS','P2_PASS','P3_PASS'].includes(kind)&&(L.authorizationBoundary?.activeRuntimeAuthorization!==false||L.authorizationBoundary?.activeRequestPath!=null||L.authorizationBoundary?.authorizationRecordPath!=null))fail('SINGLE_STATE_F2_PASS_ACTIVE_AUTH_INVALID');
   }
   return true;
 }
@@ -100,7 +101,7 @@ function terminalPure(input,evidence){
   assertLedger(L);return L;
 }
 function selftest(){
-  const base={schemaVersion:'orbit360-continuity-ledger-v3',revision:87,updatedAtUtc:'2026-08-26T17:02:59.000Z',repository:'paulaosoriof86/orbit360-core',branch:'ays/backend-tenant-lab-v99-20260703',pullRequest:5,activeState:{phase:'F2_TERMINAL_PASS_AWAITING_AUTHORIZED_GO_LIVE',status:'F2_TERMINAL_PASS',runtimeAuthorized:false,runtimeReplayAllowed:false,deployAuthorized:false,productionAuthorized:false},successorCandidate:{artifactId:9504702901,sourceHead:'8c9668d6d423e82826b0295431ec699390d79b4b'},authorizationBoundary:{activeRuntimeAuthorization:false,activeRequestPath:null,authorizationRecordPath:null},productionReopeningPackage:{revision:81},nextAction:{id:'AWAIT_EXPLICIT_GO_LIVE_AUTHORIZATION'},progress:{productionRouteProgressPct:85,f2TerminalPass:true},lanes:{}};
+  const base={schemaVersion:'orbit360-continuity-ledger-v3',revision:87,updatedAtUtc:'2026-08-26T17:02:59.000Z',repository:'paulaosoriof86/orbit360-core',branch:'ays/backend-tenant-lab-v99-20260703',pullRequest:5,activeState:{phase:'CONTROL_PLANE_FROZEN_BASELINE_AWAITING_GO_LIVE_AUTHORIZATION',status:'FINAL_RELEASE_HANDSHAKE_PASS',runtimeAuthorized:false,runtimeReplayAllowed:false,deployAuthorized:false,productionAuthorized:false},successorCandidate:{artifactId:9504702901,sourceHead:'8c9668d6d423e82826b0295431ec699390d79b4b'},authorizationBoundary:{activeRuntimeAuthorization:false,activeRequestPath:null,authorizationRecordPath:null},productionReopeningPackage:{revision:81},nextAction:{id:'AWAIT_EXPLICIT_GO_LIVE_AUTHORIZATION'},progress:{productionRouteProgressPct:93,f2TerminalPass:true},lanes:{}};
   const intent={schemaVersion:'orbit360-execution-intent-v1',transitionId:'GO_LIVE_RELEASE_WINDOW',canonicalBaseHead:'523b57335524884f0cae56af5c818af7a25bc015',expectedLedgerRevision:87,oneShotOnly:true,replayAllowed:false,explicitUserAuthorization:true,authorizationDigest:'a'.repeat(64),candidateArtifactId:9504702901,candidateSourceHead:'8c9668d6d423e82826b0295431ec699390d79b4b',scope:{runtime:true,browser:true,secrets:true,firestoreRead:true,deploy:true,production:true,firestoreWrites:false,authWrites:false,operationalWrites:false,dataWrites:false,main:false,merge:false}};
   let staleRevisionBlocked=false;try{claimPure(base,{...intent,expectedLedgerRevision:86},123456);}catch(e){staleRevisionBlocked=String(e.message).includes('EXPECTED_REVISION_MISMATCH');}
   let staleBaseBlocked=false;try{assertCanonicalBase(intent,'623b57335524884f0cae56af5c818af7a25bc015');}catch(e){staleBaseBlocked=String(e.message).includes('CANONICAL_BASE_MISMATCH');}
