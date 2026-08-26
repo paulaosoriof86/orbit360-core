@@ -7,6 +7,7 @@ name: Orbit360 Canonical Control Plane
 # CONTROL_PLANE_SELFTEST_DURABLE_HANDSHAKE_V2
 # CONTROL_PLANE_HARDENING_CLOSE_V1
 # F2_PRE_RISK_TERMINAL_RECONCILE_V1
+# F2_TERMINAL_ARTIFACT_RECONCILE_V1
 # F2_PRE_RISK_AUTHORIZATION_REUSE_V1
 # F2_PUBLICATION_CHAIN_GUARD_V1
 # F2_PREPUBLICATION_FAILURE_REDUCER_V1
@@ -92,7 +93,7 @@ jobs:
           EXPECTED_PACKAGE=$(jq -r '.expectedPackageRevision // empty' "$INTENT")
           [[ "$EXPECTED_LEDGER" =~ ^[0-9]+$ ]]
           [[ "$EXPECTED_PACKAGE" =~ ^[0-9]+$ ]]
-          IDENTITY=''; AUTH_INTENT=''; ARTIFACT=''; SOURCE=''; DIGEST=''; CONTROL_PLANE_EVIDENCE=''; CONTROL_PLANE_FAILURE_EVIDENCE=''; TERMINAL_EVIDENCE=''
+          IDENTITY=''; AUTH_INTENT=''; ARTIFACT=''; SOURCE=''; DIGEST=''; CONTROL_PLANE_EVIDENCE=''; CONTROL_PLANE_FAILURE_EVIDENCE=''; TERMINAL_EVIDENCE=''; TERMINAL_ARTIFACT=''; TERMINAL_RUN=''; TERMINAL_ARTIFACT_DIGEST=''
           case "$MODE" in
             CONTROL_PLANE_REGRESSION_REOPEN)
               jq -e '.schemaVersion=="orbit360-control-plane-intent-v1" and .mode=="CONTROL_PLANE_REGRESSION_REOPEN" and .sourceOnly==true and .oneShotOnly==false and .replayAllowed==false and .writesAllowed==false and .deployAllowed==false and .productionAllowed==false and .mainAllowed==false and .mergeAllowed==false and .containsPII==false and .containsSecrets==false' "$INTENT" >/dev/null
@@ -128,6 +129,23 @@ jobs:
               [[ "$SOURCE" =~ ^[a-f0-9]{40}$ ]]
               [[ "$TERMINAL_EVIDENCE" =~ ^orbit360-platform/runtime-gate-crm-v20260716/f2-runtime-terminal-inline-[0-9]+\.json$ ]]
               ;;
+            F2_TERMINAL_ARTIFACT_RECONCILE)
+              jq -e '.schemaVersion=="orbit360-control-plane-intent-v1" and .mode=="F2_TERMINAL_ARTIFACT_RECONCILE" and .sourceOnly==true and .oneShotOnly==false and .replayAllowed==false and .writesAllowed==false and .deployAllowed==false and .productionAllowed==false and .mainAllowed==false and .mergeAllowed==false and .containsPII==false and .containsSecrets==false' "$INTENT" >/dev/null
+              ARTIFACT=$(jq -r '.candidateArtifactId // empty' "$INTENT")
+              SOURCE=$(jq -r '.candidateSourceHead // empty' "$INTENT")
+              TERMINAL_EVIDENCE=$(jq -r '.terminalEvidence // empty' "$INTENT")
+              TERMINAL_ARTIFACT=$(jq -r '.terminalArtifactId // empty' "$INTENT")
+              TERMINAL_RUN=$(jq -r '.terminalRunId // empty' "$INTENT")
+              TERMINAL_ARTIFACT_DIGEST=$(jq -r '.terminalArtifactDigest // empty' "$INTENT")
+              [[ "$ARTIFACT" =~ ^[0-9]+$ ]]
+              [[ "$SOURCE" =~ ^[a-f0-9]{40}$ ]]
+              [[ "$TERMINAL_ARTIFACT" =~ ^[0-9]+$ ]]
+              [[ "$TERMINAL_RUN" =~ ^[0-9]+$ ]]
+              [[ "$TERMINAL_ARTIFACT_DIGEST" =~ ^sha256:[a-f0-9]{64}$ ]]
+              test "$TERMINAL_EVIDENCE" = "orbit360-platform/runtime-gate-crm-v20260716/f2-runtime-terminal-inline-${TERMINAL_RUN}.json"
+              curl -L --fail --silent --show-error -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/${TERMINAL_ARTIFACT}" > "$RUNNER_TEMP/f2-terminal-artifact-metadata.json"
+              jq -e --argjson id "$TERMINAL_ARTIFACT" --argjson run "$TERMINAL_RUN" --arg digest "$TERMINAL_ARTIFACT_DIGEST" '.id==$id and .expired==false and .digest==$digest and .workflow_run.id==$run' "$RUNNER_TEMP/f2-terminal-artifact-metadata.json" >/dev/null
+              ;;
             F2_RUNTIME_ONE_SHOT)
               jq -e '.schemaVersion=="orbit360-control-plane-intent-v1" and .mode=="F2_RUNTIME_ONE_SHOT" and .oneShotOnly==true and .replayAllowed==false and .sourceOnly==false and .writesAllowed==false and .deployAllowed==false and .productionAllowed==false and .mainAllowed==false and .mergeAllowed==false' "$INTENT" >/dev/null
               IDENTITY=$(jq -r '.authorizationIdentityDigest' "$INTENT")
@@ -158,6 +176,9 @@ jobs:
           echo "control_plane_evidence=$CONTROL_PLANE_EVIDENCE" >> "$GITHUB_OUTPUT"
           echo "control_plane_failure_evidence=$CONTROL_PLANE_FAILURE_EVIDENCE" >> "$GITHUB_OUTPUT"
           echo "terminal_evidence=$TERMINAL_EVIDENCE" >> "$GITHUB_OUTPUT"
+          echo "terminal_artifact=$TERMINAL_ARTIFACT" >> "$GITHUB_OUTPUT"
+          echo "terminal_run=$TERMINAL_RUN" >> "$GITHUB_OUTPUT"
+          echo "terminal_artifact_digest=$TERMINAL_ARTIFACT_DIGEST" >> "$GITHUB_OUTPUT"
           echo "expected_ledger=$EXPECTED_LEDGER" >> "$GITHUB_OUTPUT"
           echo "expected_package=$EXPECTED_PACKAGE" >> "$GITHUB_OUTPUT"
           echo "ORBIT360_F2_WORKFLOW_SOURCE_FILE=$RUNNER_TEMP/executing-workflow.yml" >> "$GITHUB_ENV"
@@ -181,12 +202,14 @@ jobs:
             RUN=$(jq -r '.runId' "$TERMINAL"); [[ "$RUN" =~ ^[0-9]+$ ]]
             jq -e --argjson lr '${{ steps.intent.outputs.expected_ledger }}' --argjson pr '${{ steps.intent.outputs.expected_package }}' --argjson artifact '${{ steps.intent.outputs.artifact }}' --arg source '${{ steps.intent.outputs.source }}' --argjson run "$RUN" '.revision==$lr and .productionReopeningPackage.revision==$pr and .activeState.phase=="F2_RUNTIME_ATTEMPT_RESERVED_PREFLIGHT_PENDING" and .activeState.status=="F2_RUNTIME_ATTEMPT_RESERVED_ONE_SHOT_UNCONSUMED" and .activeState.runtimeAuthorized==false and .activeState.runtimeReplayAllowed==false and .authorizationBoundary.activeRuntimeAuthorization==true and (.authorizationBoundary.activeRequestPath|type=="string") and (.authorizationBoundary.authorizationRecordPath|type=="string") and .authorizationBoundary.runtimeAttemptAccepted==true and (.authorizationBoundary.privilegedRiskBoundaryEntered // false)==false and .authorizationBoundary.runtimeRunId==$run and .progress.productionRouteProgressPct==75 and .progress.f2TerminalPass==false and .successorCandidate.artifactId==$artifact and .successorCandidate.sourceHead==$source' "$LEDGER" >/dev/null
             jq -e --argjson run "$RUN" --argjson artifact '${{ steps.intent.outputs.artifact }}' '.ok==false and .classification!="PASS" and .runId==$run and .candidateArtifactId==$artifact and .runtimeAttemptAccepted==true and .runtimeExecuted==false and .browserExecuted==false and .secretAccess==false and .firestoreRead==false and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .deployExecuted==false and .productionHostingTouched==false' "$TERMINAL" >/dev/null
+          elif [ "$MODE" = 'F2_TERMINAL_ARTIFACT_RECONCILE' ]; then
+            jq -e --argjson lr '${{ steps.intent.outputs.expected_ledger }}' --argjson pr '${{ steps.intent.outputs.expected_package }}' --argjson artifact '${{ steps.intent.outputs.artifact }}' --arg source '${{ steps.intent.outputs.source }}' --argjson run '${{ steps.intent.outputs.terminal_run }}' '.revision==$lr and .productionReopeningPackage.revision==$pr and .activeState.phase=="F2_RUNTIME_ATTEMPT_RESERVED_PREFLIGHT_PENDING" and .activeState.status=="F2_RUNTIME_ATTEMPT_RESERVED_ONE_SHOT_UNCONSUMED" and .activeState.runtimeAuthorized==false and .activeState.runtimeReplayAllowed==false and .authorizationBoundary.activeRuntimeAuthorization==true and (.authorizationBoundary.activeRequestPath|type=="string") and (.authorizationBoundary.authorizationRecordPath|type=="string") and .authorizationBoundary.runtimeAttemptAccepted==true and (.authorizationBoundary.privilegedRiskBoundaryEntered // false)==false and .authorizationBoundary.runtimeRunId==$run and .progress.productionRouteProgressPct==75 and .progress.f2TerminalPass==false and .successorCandidate.artifactId==$artifact and .successorCandidate.sourceHead==$source' "$LEDGER" >/dev/null
           else
             jq -e --argjson lr '${{ steps.intent.outputs.expected_ledger }}' --argjson pr '${{ steps.intent.outputs.expected_package }}' --argjson artifact '${{ steps.intent.outputs.artifact }}' --arg source '${{ steps.intent.outputs.source }}' '.revision==$lr and .productionReopeningPackage.revision==$pr and .activeState.runtimeAuthorized==false and .activeState.runtimeReplayAllowed==false and .authorizationBoundary.activeRuntimeAuthorization==false and .authorizationBoundary.activeRequestPath==null and .authorizationBoundary.authorizationRecordPath==null and (.authorizationBoundary.runtimeAttemptAccepted // false)==false and .progress.productionRouteProgressPct==75 and .progress.f2TerminalPass==false and .successorCandidate.artifactId==$artifact and .successorCandidate.sourceHead==$source' "$LEDGER" >/dev/null
           fi
           PHASE=$(jq -r '.activeState.phase' "$LEDGER")
           STATUS=$(jq -r '.activeState.status' "$LEDGER")
-          if [ "$MODE" = 'F2_PRE_RISK_TERMINAL_RECONCILE' ]; then
+          if [ "$MODE" = 'F2_PRE_RISK_TERMINAL_RECONCILE' ] || [ "$MODE" = 'F2_TERMINAL_ARTIFACT_RECONCILE' ]; then
             test "$PHASE" = 'F2_RUNTIME_ATTEMPT_RESERVED_PREFLIGHT_PENDING'
             test "$STATUS" = 'F2_RUNTIME_ATTEMPT_RESERVED_ONE_SHOT_UNCONSUMED'
           elif [ "$MODE" = 'CONTROL_PLANE_REGRESSION_REOPEN' ]; then
@@ -208,7 +231,7 @@ jobs:
                 jq -e --argjson lr '${{ steps.intent.outputs.expected_ledger }}' --argjson pr '${{ steps.intent.outputs.expected_package }}' '.expectedLedgerRevision==$lr and .expectedPackageRevision==$pr' "$E" >/dev/null
               fi
             fi
-          else
+          elif [ "$MODE" = 'F2_RUNTIME_ONE_SHOT' ]; then
             test -f "$F2_AUTH_INTENT"
             jq -e --arg auth "$F2_AUTH_IDENTITY" --argjson artifact "$F2_ARTIFACT_ID" --arg source '${{ steps.intent.outputs.source }}' --arg digest '${{ steps.intent.outputs.digest }}' '.status=="USER_AUTHORIZATION_RECEIVED" and .authorizationIdentityDigest==$auth and .candidateArtifactId==$artifact and .candidateArtifactDigest==$digest and .candidateSourceHead==$source and .oneShotOnly==true and .replayAllowed==false and .scope.runtimeReadOnly==true and .scope.secrets==true and .scope.firestoreRead==true and .scope.browser==true and .scope.writes==false and .scope.deploy==false and .scope.production==false and .scope.main==false and .scope.merge==false' "$F2_AUTH_INTENT" >/dev/null
             if [ "$PHASE" = 'CONTROL_PLANE_DEFINITIVE_CAUSAL_PASS_AWAITING_F2_AUTHORIZATION' ] && [ "$STATUS" = 'CONTROL_PLANE_DEFINITIVE_CAUSAL_PASS' ]; then
@@ -253,6 +276,55 @@ jobs:
           jq -Rs '{body:.}' < "$PR_STATE" > "$RUNNER_TEMP/pr-body-pre-risk-reconcile.json"
           curl -L --fail --silent --show-error -X PATCH -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/${GITHUB_REPOSITORY}/pulls/5" --data-binary @"$RUNNER_TEMP/pr-body-pre-risk-reconcile.json" >/dev/null
           jq -e '.activeState.status=="F2_PRE_RISK_FAILURE_AUTHORIZATION_PRESERVED" and .authorizationBoundary.activeRuntimeAuthorization==false and .authorizationBoundary.activeRequestPath==null and .authorizationBoundary.authorizationRecordPath==null and .authorizationBoundary.preRiskAuthorizationReuseAllowed==true and (.authorizationBoundary.privilegedRiskBoundaryEntered // false)==false and .productionReopeningPackage.authorizationReuseAllowed==true and .nextAction.id=="DIAGNOSE_ROOT_CAUSE_BEFORE_ANY_FRESH_AUTHORIZATION" and .progress.productionRouteProgressPct==75 and .progress.f2TerminalPass==false' "$LEDGER" >/dev/null
+          echo "final_head=$FINAL_HEAD" >> "$GITHUB_OUTPUT"
+
+      - id: terminal_artifact_reconcile
+        name: Reconcile sealed F2 PASS artifact without runtime replay
+        if: steps.intent.outputs.mode == 'F2_TERMINAL_ARTIFACT_RECONCILE'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ORBIT360_PUBLICATION_CLASS: F2_TERMINAL
+          ORBIT360_PUBLICATION_TRANSACTION_OUT: ${{ runner.temp }}/f2-terminal-artifact-reconcile-publication.json
+          ORBIT360_PUBLICATION_COMMIT_MESSAGE: 'gate(f2): seal verified terminal artifact without runtime replay'
+        shell: bash
+        run: |
+          set -euo pipefail
+          RUN='${{ steps.intent.outputs.terminal_run }}'; TERMINAL='${{ steps.intent.outputs.terminal_evidence }}'; AID='${{ steps.intent.outputs.terminal_artifact }}'; ARTIFACT='${{ steps.intent.outputs.artifact }}'
+          ZIP="$RUNNER_TEMP/f2-terminal-recovery.zip"; DIR="$RUNNER_TEMP/f2-terminal-recovery"; rm -rf "$ZIP" "$DIR"; mkdir -p "$DIR"
+          curl -L --fail --silent --show-error -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/${AID}/zip" -o "$ZIP"
+          unzip -q "$ZIP" -d "$DIR"
+          SRC_TERMINAL="$DIR/f2-runtime-terminal-inline-${RUN}.json"; BROWSER="$DIR/f2-browser-run-${RUN}.json"; BEFORE="$DIR/f2-data-integrity-before-run-${RUN}.json"; AFTER="$DIR/f2-data-integrity-after-run-${RUN}.json"; INTEGRITY="$DIR/f2-integrity-before-after-run-${RUN}.json"
+          for f in "$SRC_TERMINAL" "$BROWSER" "$BEFORE" "$AFTER" "$INTEGRITY"; do test -f "$f"; done
+          test "$(find "$DIR" -maxdepth 1 -type f | wc -l | tr -d ' ')" = '5'
+          jq -e --argjson run "$RUN" --argjson artifact "$ARTIFACT" '.ok==true and .status=="F2_PRODUCTIVE_ACCEPTANCE_PASS" and .classification=="PASS" and .runId==$run and .browserRunId==$run and .integrityRunId==$run and .candidateArtifactId==$artifact and .runtimeAttemptAccepted==true and .runtimeAttemptReserved==true and .privilegedRiskObserved==true and .allowedExecutions==0 and .browserMatrixPass==true and .integrityBeforeAfterPass==true and .zeroCrossTenant==true and .zeroUnexpectedWrites==true and .runtimeExecuted==true and .browserExecuted==true and .secretAccess==true and .firestoreRead==true and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .deployExecuted==false and .productionHostingTouched==false and .containsPII==false and .containsSecrets==false' "$SRC_TERMINAL" >/dev/null
+          jq -e --argjson run "$RUN" --argjson artifact "$ARTIFACT" '.ok==true and .status=="F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_PASS" and (.runId==$run or .browserRunId==$run) and .candidateArtifactId==$artifact and .runtimeExecuted==true and .browserExecuted==true and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0 and .deployExecuted==false and .productionHostingTouched==false and (.writeSignals|length)==0 and (.pageErrors|length)==0 and (.consoleErrors|length)==0' "$BROWSER" >/dev/null
+          jq -e --argjson run "$RUN" '.ok==true and .status=="F2_INTEGRITY_BEFORE_AFTER_PASS" and (.runId==$run or .integrityRunId==$run) and .countsIdentical==true and .digestsIdentical==true and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0' "$INTEGRITY" >/dev/null
+          jq -e --argjson run "$RUN" '.ok==true and .status=="F2_DATA_INTEGRITY_SNAPSHOT_PASS" and (.runId==$run or .integrityRunId==$run) and .phase=="before" and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0' "$BEFORE" >/dev/null
+          jq -e --argjson run "$RUN" '.ok==true and .status=="F2_DATA_INTEGRITY_SNAPSHOT_PASS" and (.runId==$run or .integrityRunId==$run) and .phase=="after" and .firestoreWrites==0 and .authWrites==0 and .operationalWrites==0' "$AFTER" >/dev/null
+          test ! -e "$TERMINAL"; cp "$SRC_TERMINAL" "$TERMINAL"
+          node "$EVIDENCE_LIFECYCLE" --phase pre-terminal --preserve "$TERMINAL" | tee "$RUNNER_TEMP/f2-terminal-artifact-lifecycle.json"
+          jq -e --arg terminal "$TERMINAL" '.ok==true and .remaining==[$terminal]' "$RUNNER_TEMP/f2-terminal-artifact-lifecycle.json" >/dev/null
+          node "$OWNER" --transition F2_RUNTIME_TERMINAL_RECONCILE_GENERIC --expected-revision '${{ steps.intent.outputs.expected_ledger }}' --expected-package-revision '${{ steps.intent.outputs.expected_package }}' --terminal-evidence "$TERMINAL" | tee "$RUNNER_TEMP/f2-terminal-artifact-reconcile.json"
+          jq -e '.ok==true and .status=="F2_RUNTIME_TERMINAL_RECONCILED_GENERIC" and .classification=="PASS" and .replayAllowed==false and .privilegedRiskObserved==true and .authorizationPreserved==false and .freshAuthorizationRequired==false' "$RUNNER_TEMP/f2-terminal-artifact-reconcile.json" >/dev/null
+          node tools/orbit360-control-plane-composite-invariant-v20260820.mjs
+          node tools/orbit360-documentation-state-discovery-v20260821.mjs
+          jq -e '.ok==true and .status=="CONTROL_PLANE_PUBLICATION_TRANSACTION_PREPARED" and .publicationClass=="F2_TERMINAL" and .canonicalRunner==true and .diffCheckPass==true and .commitTreePass==true and .remoteCASPass==true and .pushDryRunPass==true' "$ORBIT360_PUBLICATION_TRANSACTION_OUT" >/dev/null
+
+      - id: terminal_artifact_publish
+        name: Publish sealed F2 PASS artifact exactly once with CAS and readback
+        if: steps.intent.outputs.mode == 'F2_TERMINAL_ARTIFACT_RECONCILE' && steps.terminal_artifact_reconcile.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ORBIT360_PUBLICATION_CLASS: F2_TERMINAL
+        shell: bash
+        run: |
+          set -euo pipefail
+          node "$PUBLICATION_OWNER" --publish-validated "$RUNNER_TEMP/f2-terminal-artifact-reconcile-publication.json" | tee "$RUNNER_TEMP/f2-terminal-artifact-publish.json"
+          jq -e '.ok==true and .status=="CONTROL_PLANE_PUBLICATION_TRANSACTION_PUBLISHED" and .publicationClass=="F2_TERMINAL" and .pushPass==true and .remoteReadbackPass==true and .localReadbackPass==true' "$RUNNER_TEMP/f2-terminal-artifact-publish.json" >/dev/null
+          FINAL_HEAD=$(jq -r '.commitSha' "$RUNNER_TEMP/f2-terminal-artifact-publish.json"); [[ "$FINAL_HEAD" =~ ^[a-f0-9]{40}$ ]]
+          jq -Rs '{body:.}' < "$PR_STATE" > "$RUNNER_TEMP/pr-body-terminal-artifact.json"
+          curl -L --fail --silent --show-error -X PATCH -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/${GITHUB_REPOSITORY}/pulls/5" --data-binary @"$RUNNER_TEMP/pr-body-terminal-artifact.json" >/dev/null
+          jq -e '.activeState.phase=="F2_TERMINAL_PASS_AWAITING_AUTHORIZED_GO_LIVE" and .activeState.status=="F2_TERMINAL_PASS" and .authorizationBoundary.activeRuntimeAuthorization==false and .authorizationBoundary.activeRequestPath==null and .authorizationBoundary.authorizationRecordPath==null and (.authorizationBoundary.runtimeAttemptAccepted // false)==false and .authorizationBoundary.privilegedRiskBoundaryEntered==true and .productionReopeningPackage.authorizationAllowed==false and .productionReopeningPackage.authorizationReuseAllowed==false and .nextAction.id=="AWAIT_EXPLICIT_GO_LIVE_AUTHORIZATION" and .progress.productionRouteProgressPct==85 and .progress.f2TerminalPass==true' "$LEDGER" >/dev/null
           echo "final_head=$FINAL_HEAD" >> "$GITHUB_OUTPUT"
 
       - id: regression_reopen
