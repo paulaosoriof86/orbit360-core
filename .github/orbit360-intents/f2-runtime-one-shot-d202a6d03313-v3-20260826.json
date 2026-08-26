@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "orbit360-control-plane-intent-v1",
+  "mode": "F2_RUNTIME_ONE_SHOT",
+  "sourceOnly": false,
+  "oneShotOnly": true,
+  "replayAllowed": false,
+  "writesAllowed": false,
+  "deployAllowed": false,
+  "productionAllowed": false,
+  "mainAllowed": false,
+  "mergeAllowed": false,
+  "containsPII": false,
+  "containsSecrets": false,
+  "expectedLedgerRevision": 79,
+  "expectedPackageRevision": 73,
+  "authorizationIdentityDigest": "d202a6d0331369761e9ea6f8556c41dd3c695d81cb46fd9908e756cfe93f6d95",
+  "authorizationIntentPath": ".github/orbit360-authorizations/f2-runtime-authorization-intent-d202a6d03313-v20260826.json",
+  "candidateArtifactId": 9504702901,
+  "candidateSourceHead": "8c9668d6d423e82826b0295431ec699390d79b4b",
+  "candidateArtifactDigest": "sha256:f11dd2a350b4160465dfc93b0dd9153e697d09773fa00aa4ee5ed13d93401ca2",
+  "purpose": "Reuse the exact preserved, unconsumed d202 authorization after source-only root-cause fixes and behavioral reuse readiness. F2 runtime/browser read-only only; no writes, deploy, production, main or merge.",
+  "nonce": 1
+}
