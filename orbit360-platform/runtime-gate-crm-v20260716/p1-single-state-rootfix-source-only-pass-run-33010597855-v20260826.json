@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "orbit360-p1-single-state-rootfix-source-only-pass-v1",
+  "generatedAtUtc": "2026-08-26T20:29:07.000Z",
+  "status": "SINGLE_STATE_ROOTFIX_PASS",
+  "ok": true,
+  "classification": "PASS",
+  "branch": "ays/backend-tenant-lab-v99-20260703",
+  "canonicalBaseHead": "0defd3b59fb69d2735ea980f4a2d0ae7683f4e73",
+  "ownerRootfixCommit": "c61fbec5f92e2d7c1dd474187cea334ea621c2ae",
+  "invariantRootfixCommit": "0defd3b59fb69d2735ea980f4a2d0ae7683f4e73",
+  "executionBranch": "ays/orbit360-exec-p1-rootfix-20260826",
+  "executionCommit": "f593fd60c27956648e4888367f3568d0e8febc9f",
+  "runId": 33010597855,
+  "jobId": 98315539779,
+  "artifactId": 9622346023,
+  "artifactDigest": "sha256:22ea959c1deddb19b5b2ff6f8fac0b1c40338a51de17c7c9fbe7bc82f83b273e",
+  "expectedLedgerRevision": 88,
+  "checks": {
+    "transportOneCommit": true,
+    "staticInvariantSeparated": true,
+    "firstClaimPass": true,
+    "duplicateClaimStopRetry": true,
+    "duplicateNoSideEffects": true,
+    "staleRevisionBlocked": true,
+    "staleBaseBlocked": true,
+    "candidateMismatchBlocked": true,
+    "authorizationReservedBeforeRisk": true,
+    "preRiskAuthorizationPreserved": true,
+    "privilegedAuthorizationConsumedOnce": true,
+    "doubleTerminalBlocked": true,
+    "replayBlocked": true
+  },
+  "risk": {
+    "runtimeExecuted": false,
+    "browserExecuted": false,
+    "secretAccess": false,
+    "firestoreRead": false,
+    "firestoreWrites": 0,
+    "authWrites": 0,
+    "operationalWrites": 0,
+    "deployExecuted": false,
+    "productionTouched": false,
+    "main": false,
+    "merge": false
+  },
+  "candidatePreserved": {
+    "artifactId": 9504702901,
+    "sourceHead": "8c9668d6d423e82826b0295431ec699390d79b4b"
+  },
+  "containsPII": false,
+  "containsSecrets": false,
+  "nextAction": "P2_IMPLEMENT_GO_LIVE_RELEASE_HANDLER_AND_PROVE_DRY_RUN_ROLLBACK_SOURCE_ONLY"
+}
