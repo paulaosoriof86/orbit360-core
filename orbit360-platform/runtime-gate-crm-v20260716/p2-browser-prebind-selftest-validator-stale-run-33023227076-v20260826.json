@@ -1,0 +1,48 @@
+{
+  "schemaVersion": "orbit360-p2-browser-prebind-selftest-validator-stale-v1",
+  "ok": false,
+  "status": "VALIDATOR_STALE_CONFIRMED_SOURCE_ONLY",
+  "classification": "VALIDATOR_STALE",
+  "secondaryClassification": "PIPELINE_MECHANISM_FAILURE",
+  "code": "P2_SELFTEST_SELF_REFERENTIAL_RAW_BROWSER_EXIT_STRING_FALSE_NEGATIVE",
+  "runId": 33023227076,
+  "jobId": 98358414799,
+  "artifactId": 9627357817,
+  "artifactDigest": "sha256:8c48466c96b112e2a6a63b6e6c36c6f8b03f5bee8b7cd9206a253e5fa9d10d90",
+  "canonicalBaseHead": "68c83d566191e0940a6b45333f344e92f8718a3b",
+  "ledgerRevision": 102,
+  "observed": {
+    "staticInvariantPass": true,
+    "ownerSelftestPass": true,
+    "handlerSelftestOk": false,
+    "browserBinderBeforeDecisionPass": false,
+    "candidateFullRehashPass": true,
+    "hostingManifestPartitionPass": true,
+    "publicEndpointReachable": true
+  },
+  "rootCause": {
+    "productDefect": false,
+    "releaseImplementationDefect": false,
+    "validatorSelfReference": true,
+    "description": "The selftest searched the entire handler source for the deprecated raw browser exit string while that exact string was embedded inside the selftest's own negative assertion, producing a false negative."
+  },
+  "rootfix": {
+    "commit": "4e73fc6fb7098789f932b51c3e75c7fc41725b2d",
+    "handlerBlobSha": "7a5646367fd55234d3aa1b40f7b809e3da4d8819",
+    "method": "Inspect only the source segment between browser invocation and binder invocation for a raw br.status terminal exit."
+  },
+  "claimStepSkipped": true,
+  "privilegedHandlerStepSkipped": true,
+  "terminalReducerStepSkipped": true,
+  "runtimeExecuted": false,
+  "browserExecuted": false,
+  "secretAccess": false,
+  "firestoreRead": false,
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "operationalWrites": 0,
+  "deployExecuted": false,
+  "productionTouched": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
