@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 'use strict';
-// F2_SEMANTIC_BEHAVIORAL_ONE_SHOT_V15
-// Pre-provider semantic audit: current accepted request + durable candidate certification + canonical workflow topology owner.
-// Implementation-text literals are not used as behavioral proof.
+// F2_SEMANTIC_BEHAVIORAL_ONE_SHOT_V16_RISK_BOUNDARY
+// Pre-provider semantic audit: current reserved/unconsumed V4 request + durable candidate certification + canonical workflow topology owner.
+// Reservation is not one-shot consumption. Privileged risk remains closed until provider/runtime evidence proves otherwise.
 import fs from 'node:fs';
 import path from 'node:path';
 import {spawnSync} from 'node:child_process';
@@ -17,7 +17,8 @@ const P={
   registry:'orbit360-platform/docs/orbit360-continuity-writer-registry-v20260820.json',
   workflowAudit:'tools/orbit360-workflow-operational-surface-audit-v20260820.mjs'
 };
-const REQUEST_SCHEMA='orbit360-f2-productive-acceptance-runtime-browser-readonly-request-v3';
+const REQUEST_SCHEMA='orbit360-f2-productive-acceptance-runtime-browser-readonly-request-v4-risk-boundary';
+const RESERVED_STATUS='RUNTIME_ATTEMPT_RESERVED_PREFLIGHT_PENDING';
 const need=(v,c)=>{if(!v)throw new Error(c);};
 const A=p=>path.join(ROOT,p);
 const json=p=>JSON.parse(fs.readFileSync(A(p),'utf8').replace(/^\uFEFF/,''));
@@ -33,8 +34,25 @@ try{
   need(certPath&&fs.existsSync(A(certPath)),'VALIDATOR_STALE:F2_CANONICAL_CERTIFICATION_POINTER_MISSING');
   const cert=json(certPath);
 
-  const oneShotAcceptanceBehavioralPass=r.schemaVersion===REQUEST_SCHEMA&&r.status==='RUNTIME_ATTEMPT_ACCEPTED_PREFLIGHT_PENDING'&&r.approved===true&&r.allowedExecutions===0&&r.consumed===false&&r.authorizationFrozen===true&&r.replayAllowed===false&&r.historical===false&&r.runtimeAttemptAccepted===true&&Number(r.runtimeAttemptCount)===1&&runId>0&&Number(r.runtimeRunId)===runId&&Number(ledger.authorizationBoundary?.runtimeRunId)===runId&&ledger.authorizationBoundary?.runtimeAttemptAccepted===true;
-  need(oneShotAcceptanceBehavioralPass,'VALIDATOR_STALE:F2_RUNTIME_REQUEST_IDENTITY_INVALID');
+  const oneShotReservationBehavioralPass=
+    r.schemaVersion===REQUEST_SCHEMA&&
+    r.status===RESERVED_STATUS&&
+    r.approved===true&&
+    r.allowedExecutions===1&&
+    r.consumed===false&&
+    r.authorizationFrozen===true&&
+    r.replayAllowed===false&&
+    r.historical===false&&
+    r.runtimeAttemptAccepted===true&&
+    r.runtimeAttemptReserved===true&&
+    r.privilegedRiskBoundaryEntered===false&&
+    Number(r.runtimeAttemptCount)===0&&
+    runId>0&&
+    Number(r.runtimeRunId)===runId&&
+    Number(ledger.authorizationBoundary?.runtimeRunId)===runId&&
+    ledger.authorizationBoundary?.runtimeAttemptAccepted===true&&
+    ledger.authorizationBoundary?.privilegedRiskBoundaryEntered!==true;
+  need(oneShotReservationBehavioralPass,'VALIDATOR_STALE:F2_RUNTIME_REQUEST_RESERVATION_IDENTITY_INVALID_V4');
   need(/^[a-f0-9]{64}$/.test(String(r.authorizationIdentityDigest||'')),'VALIDATOR_STALE:F2_RUNTIME_AUTH_IDENTITY_MISSING');
   need(Number(authority.candidate?.artifactId)===Number(c.artifactId)&&authority.candidate?.sourceHead===c.sourceHead&&authority.candidate?.artifactDigest===c.artifactDigest,'VALIDATOR_STALE:F2_AUTHORITY_LEDGER_CANDIDATE_DRIFT');
   need(Number(r.candidateArtifactId)===Number(c.artifactId)&&r.candidateSourceHead===c.sourceHead&&r.candidateArtifactDigest===c.artifactDigest,'VALIDATOR_STALE:F2_RUNTIME_LEDGER_CANDIDATE_MISMATCH');
@@ -44,15 +62,37 @@ try{
   const durableCertificationPass=/^orbit360-macro2-candidate-artifact-metadata-v\d+$/.test(String(cert.schemaVersion||''))&&cert.status==='CANDIDATE_ARTIFACT_PUBLISHED_SOURCE_ONLY'&&cert.sourcePublished===true&&Number(cert.artifactId)===Number(c.artifactId)&&cert.sourceHead===c.sourceHead&&cert.artifactDigest===c.artifactDigest&&cert.zipSha256===c.zipSha256&&cert.manifestSha256===c.manifestSha256&&Number(cert.fileCount)===fileCount&&dynamicCounts&&cert.runtimeExecuted===false&&cert.browserExecuted===false&&cert.secretAccess===false&&cert.firestoreRead===false&&Number(cert.writes)===0&&cert.deployExecuted===false&&cert.productionTouched===false&&closure.status==='TRANSVERSAL_SOURCE_ACCEPTANCE_PASS'&&closure.evidencePath===certPath&&Number(closure.runId)===Number(cert.runId)&&Number(closure.checksPassed)===certChecks&&Number(closure.deltaCount)===certDelta&&Number(closure.fileCount)===fileCount&&Number(closure.unchangedFileCount)===certUnchanged;
   need(durableCertificationPass,'VALIDATOR_STALE:F2_MACRO2_DURABLE_CERTIFICATION_CONTRACT_INVALID');
 
-  const semanticContractPass=contract.active===true&&contract.behavioralContractPolicy?.sourceTextMayNotProveBehavior===true&&contract.behavioralContractPolicy?.literalImplementationStringChecksForbidden===true&&contract.behavioralContractPolicy?.behavioralExecutionRequiredForCriticalTransitions===true&&contract.behavioralContractPolicy?.runtimeRunIdentityMustPropagateEndToEnd===true&&contract.behavioralContractPolicy?.runtimeRegisterMustBeReadOnly===true&&contract.behavioralContractPolicy?.runtimeRouterMustSupportF2V3Natively===true&&contract.behavioralSelftestRequirements?.attemptAcceptTransitionTest===true&&contract.behavioralSelftestRequirements?.secondAttemptMustStopRetry===true&&contract.behavioralSelftestRequirements?.preProviderGatePathTest===true&&contract.behavioralSelftestRequirements?.runtimeRunIdBindingSimulation===true&&contract.behavioralSelftestRequirements?.runtimeRegisterReadOnlyBehavioralTest===true&&contract.behavioralSelftestRequirements?.nativeRuntimeRouterBehavioralTest===true;
-  need(semanticContractPass,'VALIDATOR_STALE:F2_SEMANTIC_BEHAVIORAL_CONTRACT_INCOMPLETE');
-  const registryPass=registry.active===true&&registry.sourceOfTruth===P.ledger&&registry.policies?.behavioralValidatorsUseSemanticContract===true&&registry.policies?.sourceTextBehaviorValidationForbidden===true&&registry.policies?.oneShotBudgetConsumedBeforeRuntimePreflight===true&&registry.policies?.runtimeAttemptBoundToGithubRunId===true&&registry.policies?.stopRetryMechanicallyEnforced===true;
-  need(registryPass,'VALIDATOR_STALE:F2_WRITER_REGISTRY_BEHAVIORAL_POLICY_INCOMPLETE');
+  const semanticContractPass=
+    contract.active===true&&
+    contract.behavioralContractPolicy?.sourceTextMayNotProveBehavior===true&&
+    contract.behavioralContractPolicy?.literalImplementationStringChecksForbidden===true&&
+    contract.behavioralContractPolicy?.behavioralExecutionRequiredForCriticalTransitions===true&&
+    contract.behavioralContractPolicy?.runtimeRunIdentityMustPropagateEndToEnd===true&&
+    contract.behavioralContractPolicy?.runtimeRegisterMustBeReadOnly===true&&
+    contract.behavioralContractPolicy?.runtimeRouterMustSupportF2V4RiskBoundary===true&&
+    contract.behavioralContractPolicy?.authorizationReservationDoesNotConsumeOneShot===true&&
+    contract.behavioralContractPolicy?.oneShotBudgetConsumedBeforeRuntimePreflight===false&&
+    contract.behavioralContractPolicy?.oneShotBudgetConsumedOnlyAfterObservedPrivilegedRisk===true&&
+    contract.behavioralContractPolicy?.preRiskMechanismFailurePreservesAuthorization===true;
+  need(semanticContractPass,'VALIDATOR_STALE:F2_SEMANTIC_BEHAVIORAL_CONTRACT_INCOMPLETE_V4');
+
+  const registryPass=
+    registry.active===true&&
+    registry.sourceOfTruth===P.ledger&&
+    registry.policies?.behavioralValidatorsUseSemanticContract===true&&
+    registry.policies?.sourceTextBehaviorValidationForbidden===true&&
+    registry.policies?.authorizationReservationDoesNotConsumeOneShot===true&&
+    registry.policies?.oneShotBudgetConsumedBeforeRuntimePreflight===false&&
+    registry.policies?.oneShotBudgetConsumedOnlyAfterObservedPrivilegedRisk===true&&
+    registry.policies?.preRiskMechanismFailurePreservesAuthorization===true&&
+    registry.policies?.runtimeAttemptBoundToGithubRunId===true&&
+    registry.policies?.stopRetryMechanicallyEnforced===true;
+  need(registryPass,'VALIDATOR_STALE:F2_WRITER_REGISTRY_BEHAVIORAL_POLICY_INCOMPLETE_V4');
 
   const workflowSource=String(process.env.ORBIT360_F2_WORKFLOW_SOURCE_FILE||'').trim();
   const audit=runJson(P.workflowAudit,workflowSource?{ORBIT360_WORKFLOW_SOURCE_FILE:workflowSource}:{});
   const workflowTopologySemanticPass=audit.r.status===0&&audit.j?.ok===true&&audit.j?.status==='WORKFLOW_CONTROL_SURFACE_AUDIT_PASS'&&Number(audit.j?.totalWorkflowFiles)===1&&Number(audit.j?.unauthorizedControlWorkflows)===0&&audit.j?.semanticPolicy?.gateOrderByTechnicalStepIds===true&&audit.j?.semanticPolicy?.providerDependencyRequired===true&&audit.j?.semanticPolicy?.candidateHardcodingForbidden===true&&audit.j?.semanticPolicy?.authorizationHardcodingForbidden===true&&audit.j?.semanticPolicy?.operationalRevisionHardcodingForbidden===true&&audit.j?.semanticPolicy?.singleValidatedPublicationTransactionRequired===true&&audit.j?.semanticPolicy?.regressionReopenStatePredicateSingleOwnerRequired===true;
   need(workflowTopologySemanticPass,'VALIDATOR_STALE:F2_WORKFLOW_TOPOLOGY_SEMANTIC_AUDIT_FAIL');
 
-  write({schemaVersion:'orbit360-f2-full-runtime-known-rootfixes-selftest-v15-semantic-behavioral',ok:true,status:'F2_FULL_RUNTIME_KNOWN_ROOTFIXES_SEMANTIC_AUDIT_PASS',classification:'PASS',validatorRevision:'F2_SEMANTIC_BEHAVIORAL_ONE_SHOT_V15',candidateArtifactId:Number(r.candidateArtifactId),candidateSourceHead:r.candidateSourceHead,candidateCertificationEvidence:certPath,certificationSchema:cert.schemaVersion,macro2DurableCertificationValidated:true,oneShotAcceptanceBehavioralPass:true,runtimeRunId:runId,runtimeAttemptAccepted:true,allowedExecutions:0,semanticContractPass:true,writerRegistryPass:true,workflowTopologySemanticPass:true,sourceTextBehaviorProofUsed:false,literalImplementationStringChecksUsed:false,behavioralAuthority:'CANONICAL_REQUEST_STATE_PLUS_SEMANTIC_CONTRACT_PLUS_WORKFLOW_TOPOLOGY_OWNER',browserExecuted:false,runtimeExecuted:false,secretAccess:false,firestoreRead:false,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false});
-}catch(error){write({schemaVersion:'orbit360-f2-full-runtime-known-rootfixes-selftest-v15-semantic-behavioral',ok:false,status:'F2_FULL_RUNTIME_KNOWN_ROOTFIXES_SEMANTIC_AUDIT_FAIL',classification:String(error?.message||error).split(':')[0]||'VALIDATOR_STALE',error:String(error?.message||error).slice(0,900),sourceTextBehaviorProofUsed:false,literalImplementationStringChecksUsed:false,browserExecuted:false,runtimeExecuted:false,secretAccess:false,firestoreRead:false,writes:0,containsPII:false,containsSecrets:false});process.exitCode=41;}
+  write({schemaVersion:'orbit360-f2-full-runtime-known-rootfixes-selftest-v16-risk-boundary',ok:true,status:'F2_FULL_RUNTIME_KNOWN_ROOTFIXES_SEMANTIC_AUDIT_PASS',classification:'PASS',validatorRevision:'F2_SEMANTIC_BEHAVIORAL_ONE_SHOT_V16_RISK_BOUNDARY',candidateArtifactId:Number(r.candidateArtifactId),candidateSourceHead:r.candidateSourceHead,candidateCertificationEvidence:certPath,certificationSchema:cert.schemaVersion,macro2DurableCertificationValidated:true,oneShotReservationBehavioralPass:true,runtimeRunId:runId,runtimeAttemptAccepted:true,runtimeAttemptReserved:true,oneShotConsumed:false,allowedExecutions:1,privilegedRiskBoundaryEntered:false,semanticContractPass:true,writerRegistryPass:true,workflowTopologySemanticPass:true,sourceTextBehaviorProofUsed:false,literalImplementationStringChecksUsed:false,behavioralAuthority:'CANONICAL_RESERVED_REQUEST_V4_PLUS_SEMANTIC_CONTRACT_PLUS_WORKFLOW_TOPOLOGY_OWNER',browserExecuted:false,runtimeExecuted:false,secretAccess:false,firestoreRead:false,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false});
+}catch(error){write({schemaVersion:'orbit360-f2-full-runtime-known-rootfixes-selftest-v16-risk-boundary',ok:false,status:'F2_FULL_RUNTIME_KNOWN_ROOTFIXES_SEMANTIC_AUDIT_FAIL',classification:String(error?.message||error).split(':')[0]||'VALIDATOR_STALE',error:String(error?.message||error).slice(0,900),sourceTextBehaviorProofUsed:false,literalImplementationStringChecksUsed:false,browserExecuted:false,runtimeExecuted:false,secretAccess:false,firestoreRead:false,writes:0,containsPII:false,containsSecrets:false});process.exitCode=41;}
