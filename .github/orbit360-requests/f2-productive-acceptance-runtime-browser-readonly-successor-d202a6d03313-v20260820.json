@@ -1,20 +1,20 @@
 {
   "schemaVersion": "orbit360-f2-productive-acceptance-runtime-browser-readonly-request-v4-risk-boundary",
   "requestId": "F2-d202a6d03313",
-  "status": "PRE_RISK_FAIL_REQUEST_REUSABLE",
+  "status": "RUNTIME_ATTEMPT_RESERVED_PREFLIGHT_PENDING",
   "approved": true,
   "allowedExecutions": 1,
   "consumed": false,
   "authorizationFrozen": true,
   "replayAllowed": false,
   "historical": false,
-  "runtimeAttemptAccepted": false,
-  "runtimeAttemptReserved": false,
+  "runtimeAttemptAccepted": true,
+  "runtimeAttemptReserved": true,
   "privilegedRiskBoundaryEntered": false,
   "runtimeAttemptCount": 0,
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
-  "parentHead": "6edba186b2314b24d490da0b9f212ad5e3cf89dd",
+  "parentHead": "c26af9272aa3b53626567626fc40e8c39d741ec9",
   "candidateArtifactId": 9504702901,
   "candidateSourceHead": "8c9668d6d423e82826b0295431ec699390d79b4b",
   "candidateArtifactDigest": "sha256:f11dd2a350b4160465dfc93b0dd9153e697d09773fa00aa4ee5ed13d93401ca2",
@@ -23,12 +23,14 @@
   "materializedAt": "2026-08-26T00:45:35.722Z",
   "containsPII": false,
   "containsSecrets": false,
-  "runtimeRunId": null,
-  "runtimeAttemptAcceptedAt": null,
+  "runtimeRunId": 32919846112,
+  "runtimeAttemptAcceptedAt": "2026-08-26T01:40:30.225Z",
   "lastPreRiskFailure": {
     "runId": 32916345049,
     "classification": "VALIDATOR_STALE",
     "failureCode": "VALIDATOR_STALE:F2_RUNTIME_REQUEST_IDENTITY_INVALID",
     "at": "2026-08-26T01:01:56.764Z"
-  }
+  },
+  "reactivatedAt": "2026-08-26T01:40:29.036Z",
+  "lastPreRiskFailurePreserved": true
 }
