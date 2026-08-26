@@ -17,5 +17,5 @@
   "candidateSourceHead": "8c9668d6d423e82826b0295431ec699390d79b4b",
   "terminalEvidence": "orbit360-platform/runtime-gate-crm-v20260716/f2-runtime-terminal-inline-32916345049.json",
   "purpose": "Source-only canonical reconciliation of pre-risk run 32916345049; preserve existing unconsumed d202 authorization; no runtime, browser, secrets, Firestore, writes, deploy or production.",
-  "nonce": 1
+  "nonce": 2
 }
