@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "orbit360-f2-data-integrity-readonly-v3-run-scoped",
+  "ok": false,
+  "status": "F2_DATA_INTEGRITY_AFTER_BROWSER_RUN_MISMATCH",
+  "classification": "DATA_CONTRACT_FAILURE",
+  "phase": "after",
+  "browserEvidencePresent": true,
+  "firestoreRead": false,
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "operationalWrites": 0,
+  "runId": 33019446768,
+  "integrityRunId": 33019446768,
+  "containsPII": false,
+  "containsSecrets": false
+}

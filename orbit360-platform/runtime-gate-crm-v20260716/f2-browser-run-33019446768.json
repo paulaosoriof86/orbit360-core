@@ -1,0 +1,618 @@
+{
+  "schemaVersion": "orbit360-f2-productive-acceptance-runtime-browser-readonly-v1",
+  "candidateArtifactId": 9504702901,
+  "candidateSourceHead": "8c9668d6d423e82826b0295431ec699390d79b4b",
+  "visibleTechnicalCopyPredicateVersion": "20260729.1",
+  "browserExecuted": true,
+  "runtimeExecuted": true,
+  "secretAccess": true,
+  "firestoreRead": true,
+  "authRead": true,
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "operationalWrites": 0,
+  "packageRebuilt": false,
+  "deployExecuted": false,
+  "publicationExecuted": false,
+  "productionHostingTouched": false,
+  "containsPII": false,
+  "containsSecrets": false,
+  "customTokenPersisted": false,
+  "passwordSecretUsed": false,
+  "ok": true,
+  "status": "F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_PASS",
+  "classification": "PASS",
+  "authSignedIn": true,
+  "emailVerified": true,
+  "tenantBound": true,
+  "rolesRequiredPass": true,
+  "roleViewContractVersion": "F2_ROLE_VIEW_CANONICAL_VISUAL_V1",
+  "roleViewResolution": {
+    "Dirección": "Dirección",
+    "Operativo": "Operativo",
+    "Asesor": "Asesor"
+  },
+  "runtime": {
+    "ready": true,
+    "status": "ready-read-only",
+    "writeEnabled": false,
+    "noFallback": true,
+    "tenantId": "alianzas-soluciones",
+    "userTenant": "alianzas-soluciones",
+    "roles": [
+      "AdminTenant",
+      "Asesor",
+      "Dirección",
+      "Operativo",
+      "SuperAdmin"
+    ],
+    "planTenantSafe": true,
+    "requiredMissing": 0,
+    "requiredFailed": 0
+  },
+  "legal": {
+    "ok": true,
+    "sawGate": true,
+    "accepted": 1,
+    "remaining": 0,
+    "elapsedMs": 6550,
+    "quietWindowSatisfied": true,
+    "handled": [
+      "legal"
+    ],
+    "idempotent": true
+  },
+  "crossTenantDenied": true,
+  "localWriteGuard": {
+    "blocked": true,
+    "code": "WRITE_BLOCKED_PRODUCT_READ_ONLY_P0"
+  },
+  "roleViews": {
+    "desktopDirection": {
+      "role": "Dirección",
+      "canonicalRole": "Dirección",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "inicio": {
+        "textLength": 1038,
+        "technical": false,
+        "undefinedNaN": false
+      },
+      "cliente360": {
+        "storeCount": 430,
+        "rowCount": 1,
+        "textLength": 790,
+        "technical": false,
+        "undefinedNaN": false
+      },
+      "aseguradoras": {
+        "count": 30,
+        "editVisible": true,
+        "textLength": 931,
+        "technical": false,
+        "undefinedNaN": false
+      },
+      "ops": {
+        "textLength": 1031,
+        "technical": false,
+        "undefinedNaN": false
+      },
+      "leads": {
+        "textLength": 529,
+        "technical": false,
+        "undefinedNaN": false
+      },
+      "polizas": {
+        "textLength": 18118,
+        "technical": false,
+        "undefinedNaN": false
+      },
+      "cobros": {
+        "textLength": 793,
+        "technical": false,
+        "undefinedNaN": false
+      },
+      "integrated": {
+        "target": {
+          "hasPolicy": true,
+          "hasVehicle": true,
+          "receiptCount": 0
+        },
+        "relations": {
+          "clientExists": true,
+          "vehiclePolicyMatches": true,
+          "vehicleClientMatches": true
+        },
+        "policyFullPage": {
+          "textLength": 1826,
+          "technical": false,
+          "undefinedNaN": false
+        },
+        "vehicleFullPage": {
+          "notApplicable": false,
+          "textLength": 663,
+          "technical": false,
+          "undefinedNaN": false
+        },
+        "recibosEsperados": true
+      }
+    },
+    "tabletOperativo": {
+      "role": "Operativo",
+      "canonicalRole": "Operativo",
+      "viewport": {
+        "width": 900,
+        "height": 1100
+      },
+      "inicio": {
+        "textLength": 1038,
+        "technical": false,
+        "undefinedNaN": false
+      },
+      "cliente360": {
+        "storeCount": 430,
+        "rowCount": 1,
+        "textLength": 787,
+        "technical": false,
+        "undefinedNaN": false
+      },
+      "aseguradoras": {
+        "count": 30,
+        "editVisible": true,
+        "textLength": 931,
+        "technical": false,
+        "undefinedNaN": false
+      },
+      "ops": {
+        "textLength": 1031,
+        "technical": false,
+        "undefinedNaN": false
+      },
+      "leads": {
+        "textLength": 529,
+        "technical": false,
+        "undefinedNaN": false
+      },
+      "polizas": {
+        "textLength": 18227,
+        "technical": false,
+        "undefinedNaN": false
+      },
+      "cobros": {
+        "textLength": 629,
+        "technical": false,
+        "undefinedNaN": false
+      },
+      "integrated": {
+        "target": {
+          "hasPolicy": true,
+          "hasVehicle": true,
+          "receiptCount": 0
+        },
+        "relations": {
+          "clientExists": true,
+          "vehiclePolicyMatches": true,
+          "vehicleClientMatches": true
+        },
+        "policyFullPage": {
+          "textLength": 1826,
+          "technical": false,
+          "undefinedNaN": false
+        },
+        "vehicleFullPage": {
+          "notApplicable": false,
+          "textLength": 663,
+          "technical": false,
+          "undefinedNaN": false
+        },
+        "recibosEsperados": true
+      }
+    },
+    "mobileAsesor": {
+      "role": "Asesor",
+      "canonicalRole": "Asesor",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "inicio": {
+        "textLength": 994,
+        "technical": false,
+        "undefinedNaN": false
+      },
+      "cliente360": {
+        "storeCount": 430,
+        "rowCount": 1,
+        "textLength": 590,
+        "technical": false,
+        "undefinedNaN": false
+      },
+      "aseguradoras": {
+        "count": 30,
+        "editVisible": false,
+        "textLength": 912,
+        "technical": false,
+        "undefinedNaN": false
+      },
+      "ops": {
+        "textLength": 562,
+        "technical": false,
+        "undefinedNaN": false
+      },
+      "leads": {
+        "textLength": 473,
+        "technical": false,
+        "undefinedNaN": false
+      },
+      "polizas": {
+        "textLength": 18169,
+        "technical": false,
+        "undefinedNaN": false
+      },
+      "cobros": {
+        "textLength": 550,
+        "technical": false,
+        "undefinedNaN": false
+      },
+      "integrated": {
+        "target": {
+          "hasPolicy": true,
+          "hasVehicle": true,
+          "receiptCount": 0
+        },
+        "relations": {
+          "clientExists": true,
+          "vehiclePolicyMatches": true,
+          "vehicleClientMatches": true
+        },
+        "policyFullPage": {
+          "textLength": 1826,
+          "technical": false,
+          "undefinedNaN": false
+        },
+        "vehicleFullPage": {
+          "notApplicable": false,
+          "textLength": 663,
+          "technical": false,
+          "undefinedNaN": false
+        },
+        "recibosEsperados": true
+      }
+    }
+  },
+  "serviceWorker": {
+    "supported": true,
+    "swHttp": 200,
+    "registrationCount": 1,
+    "scriptUrls": [
+      "/sw.js"
+    ],
+    "controller": true
+  },
+  "integrityBeforeAfter": "verified_by_workflow_after_browser",
+  "routeTrace": [
+    {
+      "label": "desktopDirection:inicio",
+      "name": "inicio",
+      "ok": true,
+      "elapsedMs": 455,
+      "routeKey": "inicio",
+      "childElementCount": 1,
+      "textLength": 1038,
+      "hostDisplay": "block",
+      "hostVisibility": "visible",
+      "hostWidth": 1192,
+      "hostHeight": 1037,
+      "hash": "#/inicio"
+    },
+    {
+      "label": "desktopDirection:cliente360",
+      "name": "cliente360",
+      "ok": true,
+      "elapsedMs": 952,
+      "routeKey": "cliente360",
+      "childElementCount": 1,
+      "textLength": 790,
+      "hostDisplay": "block",
+      "hostVisibility": "visible",
+      "hostWidth": 1192,
+      "hostHeight": 944,
+      "hash": "#/cliente360"
+    },
+    {
+      "label": "desktopDirection:aseguradoras",
+      "name": "aseguradoras",
+      "ok": true,
+      "elapsedMs": 10183,
+      "routeKey": "aseguradoras",
+      "childElementCount": 1,
+      "textLength": 4698,
+      "hostDisplay": "block",
+      "hostVisibility": "visible",
+      "hostWidth": 1192,
+      "hostHeight": 2410,
+      "hash": "#/aseguradoras"
+    },
+    {
+      "label": "desktopDirection:ops",
+      "name": "ops",
+      "ok": true,
+      "elapsedMs": 457,
+      "routeKey": "ops",
+      "childElementCount": 1,
+      "textLength": 1031,
+      "hostDisplay": "block",
+      "hostVisibility": "visible",
+      "hostWidth": 1192,
+      "hostHeight": 944,
+      "hash": "#/ops"
+    },
+    {
+      "label": "desktopDirection:leads",
+      "name": "leads",
+      "ok": true,
+      "elapsedMs": 456,
+      "routeKey": "leads",
+      "childElementCount": 1,
+      "textLength": 529,
+      "hostDisplay": "block",
+      "hostVisibility": "visible",
+      "hostWidth": 1192,
+      "hostHeight": 944,
+      "hash": "#/leads"
+    },
+    {
+      "label": "desktopDirection:polizas",
+      "name": "polizas",
+      "ok": true,
+      "recoveredAfterWaitTimeout": true,
+      "elapsedMs": 58950,
+      "contractVisible": true,
+      "hostExists": true,
+      "routeKey": "polizas",
+      "childElementCount": 1,
+      "textLength": 18114,
+      "hostDisplay": "block",
+      "hostVisibility": "visible",
+      "hostWidth": 1192,
+      "hostHeight": 7866,
+      "mainDisplay": "block",
+      "shellDisplay": "flex",
+      "bodyPreAuth": false,
+      "authStage": "",
+      "loginHidden": true,
+      "hash": "#/polizas"
+    },
+    {
+      "label": "desktopDirection:cobros",
+      "name": "cobros",
+      "ok": true,
+      "elapsedMs": 1562,
+      "routeKey": "cobros",
+      "childElementCount": 1,
+      "textLength": 793,
+      "hostDisplay": "block",
+      "hostVisibility": "visible",
+      "hostWidth": 1192,
+      "hostHeight": 944,
+      "hash": "#/cobros"
+    },
+    {
+      "label": "tabletOperativo:inicio",
+      "name": "inicio",
+      "ok": true,
+      "elapsedMs": 457,
+      "routeKey": "inicio",
+      "childElementCount": 1,
+      "textLength": 1038,
+      "hostDisplay": "block",
+      "hostVisibility": "visible",
+      "hostWidth": 900,
+      "hostHeight": 1192,
+      "hash": "#/inicio"
+    },
+    {
+      "label": "tabletOperativo:cliente360",
+      "name": "cliente360",
+      "ok": true,
+      "elapsedMs": 999,
+      "routeKey": "cliente360",
+      "childElementCount": 1,
+      "textLength": 787,
+      "hostDisplay": "block",
+      "hostVisibility": "visible",
+      "hostWidth": 900,
+      "hostHeight": 1044,
+      "hash": "#/cliente360"
+    },
+    {
+      "label": "tabletOperativo:aseguradoras",
+      "name": "aseguradoras",
+      "ok": true,
+      "elapsedMs": 5538,
+      "routeKey": "aseguradoras",
+      "childElementCount": 1,
+      "textLength": 4862,
+      "hostDisplay": "block",
+      "hostVisibility": "visible",
+      "hostWidth": 900,
+      "hostHeight": 3701,
+      "hash": "#/aseguradoras"
+    },
+    {
+      "label": "tabletOperativo:ops",
+      "name": "ops",
+      "ok": true,
+      "elapsedMs": 458,
+      "routeKey": "ops",
+      "childElementCount": 1,
+      "textLength": 1031,
+      "hostDisplay": "block",
+      "hostVisibility": "visible",
+      "hostWidth": 900,
+      "hostHeight": 1044,
+      "hash": "#/ops"
+    },
+    {
+      "label": "tabletOperativo:leads",
+      "name": "leads",
+      "ok": true,
+      "elapsedMs": 457,
+      "routeKey": "leads",
+      "childElementCount": 1,
+      "textLength": 529,
+      "hostDisplay": "block",
+      "hostVisibility": "visible",
+      "hostWidth": 900,
+      "hostHeight": 1044,
+      "hash": "#/leads"
+    },
+    {
+      "label": "tabletOperativo:polizas",
+      "name": "polizas",
+      "ok": true,
+      "recoveredAfterWaitTimeout": true,
+      "elapsedMs": 92511,
+      "contractVisible": true,
+      "hostExists": true,
+      "routeKey": "polizas",
+      "childElementCount": 1,
+      "textLength": 18223,
+      "hostDisplay": "block",
+      "hostVisibility": "visible",
+      "hostWidth": 900,
+      "hostHeight": 8005,
+      "mainDisplay": "block",
+      "shellDisplay": "flex",
+      "bodyPreAuth": false,
+      "authStage": "",
+      "loginHidden": true,
+      "hash": "#/polizas"
+    },
+    {
+      "label": "tabletOperativo:cobros",
+      "name": "cobros",
+      "ok": true,
+      "elapsedMs": 1543,
+      "routeKey": "cobros",
+      "childElementCount": 1,
+      "textLength": 629,
+      "hostDisplay": "block",
+      "hostVisibility": "visible",
+      "hostWidth": 900,
+      "hostHeight": 1044,
+      "hash": "#/cobros"
+    },
+    {
+      "label": "mobileAsesor:inicio",
+      "name": "inicio",
+      "ok": true,
+      "elapsedMs": 457,
+      "routeKey": "inicio",
+      "childElementCount": 1,
+      "textLength": 994,
+      "hostDisplay": "block",
+      "hostVisibility": "visible",
+      "hostWidth": 390,
+      "hostHeight": 1527,
+      "hash": "#/inicio"
+    },
+    {
+      "label": "mobileAsesor:cliente360",
+      "name": "cliente360",
+      "ok": true,
+      "elapsedMs": 824,
+      "routeKey": "cliente360",
+      "childElementCount": 1,
+      "textLength": 590,
+      "hostDisplay": "block",
+      "hostVisibility": "visible",
+      "hostWidth": 390,
+      "hostHeight": 914,
+      "hash": "#/cliente360"
+    },
+    {
+      "label": "mobileAsesor:aseguradoras",
+      "name": "aseguradoras",
+      "ok": true,
+      "elapsedMs": 1131,
+      "routeKey": "aseguradoras",
+      "childElementCount": 1,
+      "textLength": 4881,
+      "hostDisplay": "block",
+      "hostVisibility": "visible",
+      "hostWidth": 390,
+      "hostHeight": 6700,
+      "hash": "#/aseguradoras"
+    },
+    {
+      "label": "mobileAsesor:ops",
+      "name": "ops",
+      "ok": true,
+      "elapsedMs": 457,
+      "routeKey": "ops",
+      "childElementCount": 1,
+      "textLength": 562,
+      "hostDisplay": "block",
+      "hostVisibility": "visible",
+      "hostWidth": 390,
+      "hostHeight": 1070,
+      "hash": "#/ops"
+    },
+    {
+      "label": "mobileAsesor:leads",
+      "name": "leads",
+      "ok": true,
+      "elapsedMs": 457,
+      "routeKey": "leads",
+      "childElementCount": 1,
+      "textLength": 473,
+      "hostDisplay": "block",
+      "hostVisibility": "visible",
+      "hostWidth": 390,
+      "hostHeight": 1853,
+      "hash": "#/leads"
+    },
+    {
+      "label": "mobileAsesor:polizas",
+      "name": "polizas",
+      "ok": true,
+      "recoveredAfterWaitTimeout": true,
+      "elapsedMs": 64069,
+      "contractVisible": true,
+      "hostExists": true,
+      "routeKey": "polizas",
+      "childElementCount": 1,
+      "textLength": 18180,
+      "hostDisplay": "block",
+      "hostVisibility": "visible",
+      "hostWidth": 390,
+      "hostHeight": 8187,
+      "mainDisplay": "block",
+      "shellDisplay": "block",
+      "bodyPreAuth": false,
+      "authStage": "",
+      "loginHidden": true,
+      "hash": "#/polizas"
+    },
+    {
+      "label": "mobileAsesor:cobros",
+      "name": "cobros",
+      "ok": true,
+      "elapsedMs": 1038,
+      "routeKey": "cobros",
+      "childElementCount": 1,
+      "textLength": 550,
+      "hostDisplay": "block",
+      "hostVisibility": "visible",
+      "hostWidth": 390,
+      "hostHeight": 916,
+      "hash": "#/cobros"
+    }
+  ],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "writeSignals": []
+}
