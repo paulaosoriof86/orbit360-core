@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "orbit360-control-plane-semantic-contract-v12-minimal-release-readiness",
+  "schemaVersion": "orbit360-control-plane-semantic-contract-v13-pre-risk-reconcile-readonly-invariants",
   "contractId": "ORBIT360-CONTROL-PLANE-SEMANTIC-CONTRACT",
   "active": true,
   "status": "ACTIVE_SOURCE_ONLY_FAIL_CLOSED",
@@ -52,7 +52,13 @@
     "historicalMechanismFailuresMustRemainRegressionFixtures": true,
     "initialF2ReleaseReadinessUsesDeterministicController": true,
     "syntheticPreRiskAuthorizationReuseBlocking": false,
-    "recoveryHarnessMayNotBlockInitialF2": true
+    "recoveryHarnessMayNotBlockInitialF2": true,
+    "invariantsMustBeReadOnly": true,
+    "evidenceConvergenceLifecycleInvocationMustBeAssertOnly": true,
+    "preRiskTerminalReconcileMustBeSourceOnly": true,
+    "preRiskTerminalReconcileRequiresExactRunScopedEvidence": true,
+    "preRiskTerminalReconcileRequiresZeroPrivilegedRisk": true,
+    "preRiskTerminalReconcilePreservesUnconsumedAuthorization": true
   },
   "activeControlPlaneComponents": [
     "tools/orbit360-continuity-transition-owner-v20260824.mjs",
@@ -128,6 +134,8 @@
     "attemptReservationConsumesBudget": false,
     "privilegedRiskObservationOwner": "tools/orbit360-f2-authorization-lifecycle-v20260825.mjs",
     "preRiskFailurePreservesAuthorization": true,
+    "preRiskTerminalReconcileMode": "F2_PRE_RISK_TERMINAL_RECONCILE",
+    "preRiskTerminalReconcileSourceOnly": true,
     "remoteHeadCASRequired": true,
     "runtimeRegisterReadOnly": true,
     "nativeF2RuntimeRequestVersion": "F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_V3",
@@ -135,7 +143,8 @@
     "topologySemanticOwner": "tools/orbit360-workflow-operational-surface-audit-v20260820.mjs",
     "executingSnapshotBoundToCanonical": true,
     "publicationTransactionOwner": "tools/orbit360-control-plane-publication-preflight-v20260825.mjs",
-    "workflowGitAddCommitForCanonicalStatePublicationForbidden": true
+    "workflowGitAddCommitForCanonicalStatePublicationForbidden": true,
+    "invariantsReadOnly": true
   },
   "releaseReadinessRequirements": {
     "candidateDurableCertification": true,
