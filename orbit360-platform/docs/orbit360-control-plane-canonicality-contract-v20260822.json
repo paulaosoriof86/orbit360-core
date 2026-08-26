@@ -1,6 +1,6 @@
 {
   "schemaVersion": "orbit360-control-plane-canonicality-contract-v2",
-  "contractVersion": "2.0.0-20260824",
+  "contractVersion": "2.1.0-20260826",
   "status": "ACTIVE_CANONICAL_CONVERGENCE_CONTRACT",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -12,9 +12,13 @@
   "projectionOwner": "tools/orbit360-continuity-projection-atomic-v20260820.mjs",
   "evidenceConvergenceGate": "tools/orbit360-control-plane-evidence-convergence-v20260822.mjs",
   "canonicalWorkflow": ".github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml",
+  "transportContract": "tools/orbit360-control-plane-transport-contract-v20260826.json",
+  "transportRunbook": "orbit360-platform/docs/CONTROL-PLANE-TRANSPORT-CONTRACT-20260826.md",
+  "academiaTransportDelta": "orbit360-platform/docs/ACADEMIA-DELTA-CONTROL-PLANE-TRANSPORT-20260826.md",
   "durableEvidence": {
     "macro2CandidateMetadata": "orbit360-platform/runtime-gate-crm-v20260716/f2-successor-candidate-artifact-metadata-v20260824.json",
-    "controlPlaneHandshake": "orbit360-platform/runtime-gate-crm-v20260716/control-plane-selftest-handshake-run-32753102715-v20260824.json",
+    "controlPlaneHandshake": "orbit360-platform/runtime-gate-crm-v20260716/control-plane-selftest-handshake-run-32914461679-v20260824.json",
+    "controlPlaneHandshakeRunId": 32914461679,
     "externalArtifactMustBeVerifiedFromGitHubActionsBeforeReduction": true,
     "runtimeEvidenceMustBeRunScoped": true
   },
@@ -62,15 +66,22 @@
     "historicalFalsePassMustBeExplicitlyInvalidated": true,
     "componentShaBindingForbidden": true,
     "workflowDefinitionMayNotChangePerCandidate": true,
-    "executionTransportIntentOnly": true
+    "executionTransportIntentOnly": true,
+    "technicalPullRequestMustBeClosedBeforeBranchReset": true,
+    "resetTechnicalBranchWhileOpenForbidden": true,
+    "intentMustBeFullyMaterializedWhileTechnicalPrClosed": true,
+    "exactlyOneSynchronizeMutationAfterReopen": true,
+    "staleTransportEventMustFailClosedWithoutRetry": true,
+    "staleTransportEventMayNotConsumeAuthorization": true
   },
   "repairBootstrap": {
     "forensicAudit": "orbit360-platform/docs/AUDITORIA-FORENSE-CONTROL-PLANE-ORBIT360-AYS-20260824.md",
-    "controlPlaneHandshakeEvidence": "orbit360-platform/runtime-gate-crm-v20260716/control-plane-selftest-handshake-run-32753102715-v20260824.json",
+    "controlPlaneHandshakeEvidence": "orbit360-platform/runtime-gate-crm-v20260716/control-plane-selftest-handshake-run-32914461679-v20260824.json",
     "repairTransition": "CONTROL_PLANE_HARDENING_CLOSE",
     "candidateReuseRequired": true,
     "newWorkflowVariant": false,
-    "newRequestChain": false
+    "newRequestChain": false,
+    "transportContractRequired": true
   },
   "containsPII": false,
   "containsSecrets": false
