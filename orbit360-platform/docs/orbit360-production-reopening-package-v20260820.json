@@ -1,14 +1,14 @@
 {
   "schemaVersion": "orbit360-production-reopening-package-v2-derived",
   "packageId": "ORBIT360-PRODUCTION-REOPENING-CURRENT",
-  "revision": 68,
+  "revision": 69,
   "createdAtUtc": "2026-08-20T13:50:00Z",
-  "updatedAtUtc": "2026-08-25T23:41:45.555Z",
+  "updatedAtUtc": "2026-08-26T00:21:20.038Z",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
-  "status": "OPEN_BLOCKED_CONTROL_PLANE_REGRESSION",
-  "phase": "MACRO1_CONTROL_PLANE_TRUTH_HARDENING_SOURCE_ONLY",
+  "status": "CLOSED_PASS",
+  "phase": "CONTROL_PLANE_DEFINITIVE_CAUSAL_PASS_AWAITING_F2_AUTHORIZATION",
   "canonicalLedger": "orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json",
   "checkpoint": "orbit360-platform/docs/CHECKPOINT-CONTROL-PLANE-HARDENING-20260820.md",
   "canonicalF2ContractAuthority": "tools/orbit360-gate-contract-f2-productive-acceptance-v20260820.json",
@@ -70,7 +70,7 @@
   "lock": {
     "active": true,
     "runtimeAllowed": false,
-    "authorizationAllowed": false,
+    "authorizationAllowed": true,
     "requestMaterializationAllowed": false,
     "secretAccessAllowed": false,
     "firestoreReadAllowed": false,
@@ -90,8 +90,8 @@
     "rule": "Read orbit360-platform/docs/PLAN-MAESTRO-CONGELADO-SALIDA-PRODUCCION-SIN-BUCLES-ORBIT360-AYS-20260824.md, live PR head and ledger. Continue from firstIncompleteStep. Do not reconstruct roadmap or reuse historical authorization/request.",
     "closedStepsMayBeRecheckedReadOnly": true,
     "closedStepsMayNotBeReprocessedWithoutNewEvidence": true,
-    "firstIncompleteStep": "CONTROL-PLANE-FULL-PATH-REGRESSION",
-    "nextActionExact": "RUN_EXACT_F2_SOURCE_PATH_CLASSWIDE_EVIDENCE_SELFTEST"
+    "firstIncompleteStep": "F2-RUNTIME-AUTHORIZATION",
+    "nextActionExact": "AWAIT_EXPLICIT_F2_RUNTIME_AUTHORIZATION_ONE_SHOT"
   },
   "steps": [
     {
@@ -198,7 +198,7 @@
   "containsPII": false,
   "containsSecrets": false,
   "controlPlaneClosure": {
-    "status": "CONTROL_PLANE_REGRESSION_OPEN_STOP_RETRY",
+    "status": "CONTROL_PLANE_DEFINITIVE_CAUSAL_PASS",
     "transitionOwner": "tools/orbit360-continuity-transition-owner-v20260824.mjs",
     "projection": "tools/orbit360-continuity-projection-atomic-v20260820.mjs",
     "compositeInvariant": "tools/orbit360-control-plane-composite-invariant-v20260820.mjs",
@@ -210,22 +210,22 @@
     "physicalSingleWriter": true,
     "terminalReducerGeneric": true,
     "stopRetryEnforced": true,
-    "evidenceFreshnessValidated": false,
+    "evidenceFreshnessValidated": true,
     "terminalReducerTruthContractValidated": true,
     "sourceRewriteGuardEnforced": true,
-    "workflowHandshakeValidated": false
+    "workflowHandshakeValidated": true
   },
   "authorizationBoundary": {
     "path": "orbit360-platform/docs/orbit360-f2-runtime-authorization-boundary-v20260820.json",
-    "status": "STOP_RETRY_CONTROL_PLANE_REGRESSION_OPEN",
-    "ledgerRevision": 74,
-    "packageRevision": 68,
-    "authorizationIdentityDigest": "b5860c829fa279c76b4bd899f08f20c062b98d1f69a342db86958b1a811c4661",
+    "status": "PREPARED_SOURCE_ONLY_AWAITING_EXPLICIT_USER_AUTHORIZATION",
+    "ledgerRevision": 75,
+    "packageRevision": 69,
+    "authorizationIdentityDigest": "d202a6d0331369761e9ea6f8556c41dd3c695d81cb46fd9908e756cfe93f6d95",
     "authorized": false,
     "authorizationPersisted": false,
     "requestMaterialized": false,
     "runtimeAllowed": false
   },
-  "canonicalStateFingerprint": "cb1cce943bbb376abfa82986649ba9599e2e083fb5589816983112983d1c9ccd",
+  "canonicalStateFingerprint": "e68f08213c32fb17d17615efb300880cbb79240c44ee843768ae428d742c2c9b",
   "canonicalPlan": "orbit360-platform/docs/PLAN-MAESTRO-CONGELADO-SALIDA-PRODUCCION-SIN-BUCLES-ORBIT360-AYS-20260824.md"
 }
