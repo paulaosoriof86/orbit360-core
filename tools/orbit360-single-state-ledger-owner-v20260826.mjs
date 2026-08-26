@@ -21,6 +21,7 @@ function milestoneKind(L){
   if(phase==='F2_TERMINAL_PASS_AWAITING_AUTHORIZED_GO_LIVE'&&status==='F2_TERMINAL_PASS'&&progress===85&&next==='AWAIT_EXPLICIT_GO_LIVE_AUTHORIZATION')return 'LEGACY_WAITING_FIXTURE';
   if(phase==='F2_TERMINAL_PASS_P1_SOURCE_ONLY_REQUIRED_BEFORE_GO_LIVE'&&status==='F2_TERMINAL_PASS'&&progress===85&&next==='P1_FIX_SINGLE_STATE_DUPLICATE_CLAIM_AND_SEPARATE_STATIC_INVARIANT_FROM_BEHAVIORAL_SELFTEST_SOURCE_ONLY')return 'P1_REQUIRED';
   if(phase==='SINGLE_STATE_ROOTFIX_PASS_P2_RELEASE_HANDLER_REQUIRED'&&status==='SINGLE_STATE_ROOTFIX_PASS'&&progress===88&&next==='P2_IMPLEMENT_GO_LIVE_RELEASE_HANDLER_AND_PROVE_DRY_RUN_ROLLBACK_SOURCE_ONLY')return 'P1_PASS';
+  if(phase==='GO_LIVE_RELEASE_HANDLER_READY_P3_HANDSHAKE_REQUIRED'&&status==='GO_LIVE_RELEASE_HANDLER_READY'&&progress===91&&next==='P3_RUN_FINAL_SOURCE_ONLY_HANDSHAKE_AND_SEAL_CONTROL_PLANE_BASELINE')return 'P2_PASS';
   if(phase==='AUTHORIZED_RELEASE_WINDOW_RUNNING'&&status==='AUTHORIZED_RELEASE_WINDOW_CLAIMED'&&(progress===85||progress===93)&&next==='RUN_AUTHORIZED_RELEASE_WINDOW')return 'CLAIMED';
   if(phase==='PRODUCTION_SMOKE_PASS'&&status==='PRODUCTION_GO_LIVE_PASS'&&progress===100&&next==='POST_GO_LIVE_MONITORING')return 'RELEASE_PASS';
   if(phase==='AUTHORIZED_RELEASE_WINDOW_FAILED'&&status==='RELEASE_TERMINAL_FAIL_NO_REPLAY'&&(progress===85||progress===93)&&next==='DIAGNOSE_RELEASE_ROOT_CAUSE_AND_VERIFY_ROLLBACK')return 'RELEASE_FAIL';
@@ -33,7 +34,7 @@ function assertLedger(L){
   if(L.progress?.f2TerminalPass===true){
     const kind=milestoneKind(L);
     if(!kind)fail(`SINGLE_STATE_F2_MILESTONE_PHASE_INVALID:${L.activeState?.phase}:${L.activeState?.status}:${L.progress?.productionRouteProgressPct}:${L.nextAction?.id}`);
-    if(['LEGACY_WAITING_FIXTURE','P1_REQUIRED','P1_PASS'].includes(kind)&&(L.authorizationBoundary?.activeRuntimeAuthorization!==false||L.authorizationBoundary?.activeRequestPath!=null||L.authorizationBoundary?.authorizationRecordPath!=null))fail('SINGLE_STATE_F2_PASS_ACTIVE_AUTH_INVALID');
+    if(['LEGACY_WAITING_FIXTURE','P1_REQUIRED','P1_PASS','P2_PASS'].includes(kind)&&(L.authorizationBoundary?.activeRuntimeAuthorization!==false||L.authorizationBoundary?.activeRequestPath!=null||L.authorizationBoundary?.authorizationRecordPath!=null))fail('SINGLE_STATE_F2_PASS_ACTIVE_AUTH_INVALID');
   }
   return true;
 }
