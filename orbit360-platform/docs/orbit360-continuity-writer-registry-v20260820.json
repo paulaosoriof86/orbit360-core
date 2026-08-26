@@ -1,7 +1,7 @@
 {
   "schemaVersion": "orbit360-continuity-writer-registry-v22-single-state",
   "registryId": "ORBIT360-CONTINUITY-WRITER-REGISTRY",
-  "revision": 33,
+  "revision": 34,
   "active": true,
   "status": "SINGLE_STATE_LEDGER_ONLY_CONTROL_PLANE",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -75,9 +75,9 @@
         "terminalEvidenceRunScoped": true
       },
       "from": {
-        "phase": "F2_TERMINAL_PASS_AWAITING_AUTHORIZED_GO_LIVE",
-        "status": "F2_TERMINAL_PASS",
-        "progress": 85
+        "phase": "CONTROL_PLANE_FROZEN_BASELINE_AWAITING_GO_LIVE_AUTHORIZATION",
+        "status": "FINAL_RELEASE_HANDSHAKE_PASS",
+        "progress": 93
       },
       "claimState": {
         "phase": "AUTHORIZED_RELEASE_WINDOW_RUNNING",
@@ -98,7 +98,7 @@
       "terminalFailState": {
         "phase": "AUTHORIZED_RELEASE_WINDOW_FAILED",
         "status": "RELEASE_TERMINAL_FAIL_NO_REPLAY",
-        "progress": 85,
+        "progress": 93,
         "nextAction": "DIAGNOSE_RELEASE_ROOT_CAUSE_AND_VERIFY_ROLLBACK",
         "firstIncompleteStep": "RELEASE-ROOT-CAUSE-ROLLBACK",
         "laneB": "RELEASE_TERMINAL_FAIL_STOP_RETRY",
