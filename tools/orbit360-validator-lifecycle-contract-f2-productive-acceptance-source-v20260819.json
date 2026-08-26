@@ -4,8 +4,8 @@
   "gateContractVersion": "2.2.0",
   "validatorLifecycleRevision": "phase-capability-contract-v7-canonical-convergence",
   "f2ValidatorRevision": "f2-source-dynamic-cert-authority-v10-20260822",
-  "status": "F2_RUNTIME_ATTEMPT_RESERVED_ONE_SHOT_UNCONSUMED",
-  "currentPhase": "F2_RUNTIME_ATTEMPT_RESERVED_PREFLIGHT_PENDING",
+  "status": "F2_TERMINAL_PASS",
+  "currentPhase": "F2_TERMINAL_PASS_AWAITING_AUTHORIZED_GO_LIVE",
   "canonicalContractAuthority": "tools/orbit360-gate-contract-f2-productive-acceptance-v20260820.json",
   "continuity": {
     "stateVersion": "ORBIT360-F2-CONTINUITY-CURRENT",
@@ -19,24 +19,14 @@
   },
   "executionProfile": {
     "phase": "F2_PRODUCTIVE_ACCEPTANCE_SOURCE_ONLY",
-    "capabilities": {
-      "secrets": false,
-      "firestoreRead": false,
-      "writes": false,
-      "runtime": false,
-      "browser": false,
-      "deploy": false,
-      "functionsDeploy": false,
-      "rulesDeploy": false,
-      "production": false
-    }
+    "capabilities": {"secrets":false,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":false,"functionsDeploy":false,"rulesDeploy":false,"production":false}
   },
   "singleGate": true,
   "macroClosure": true,
   "block": "F2_GATE_DE_ACEPTACION_PRODUCTIVA_REAL",
   "authorization": {
     "requiredForExecution": false,
-    "activeRequest": true,
+    "activeRequest": false,
     "freshAuthorizationRequired": false,
     "authorizationBoundaryPrepared": true,
     "authorizationBoundaryPath": "orbit360-platform/docs/orbit360-f2-runtime-authorization-boundary-v20260820.json",
@@ -66,61 +56,22 @@
     "stopRetryOnSameFamily": true,
     "historicalCandidateRuntimeReuseAllowed": false,
     "productionReopeningPackageClosedPassRequiredForRuntime": true,
-    "candidateCertificationDerivedFromCanonicalAuthority": true
+    "candidateCertificationDerivedFromCanonicalAuthority": true,
+    "f2TerminalPass": true,
+    "terminalRunId": 32920087220
   },
   "surfaceTopology": {
-    "routes": [
-      "inicio",
-      "cliente360",
-      "aseguradoras",
-      "ops",
-      "leads",
-      "polizas",
-      "cobros"
-    ],
-    "integratedSurfaces": {
-      "vehiculos": "cliente360_policy_deeplink_fullpage",
-      "recibosCartera": "policy_client360_plus_cobros_global"
-    },
-    "roleViews": [
-      {
-        "role": "Dirección",
-        "viewport": "desktop"
-      },
-      {
-        "role": "Operativo",
-        "viewport": "tablet"
-      },
-      {
-        "role": "Asesor",
-        "viewport": "mobile"
-      }
-    ]
+    "routes": ["inicio","cliente360","aseguradoras","ops","leads","polizas","cobros"],
+    "integratedSurfaces": {"vehiculos":"cliente360_policy_deeplink_fullpage","recibosCartera":"policy_client360_plus_cobros_global"},
+    "roleViews": [{"role":"Dirección","viewport":"desktop"},{"role":"Operativo","viewport":"tablet"},{"role":"Asesor","viewport":"mobile"}]
   },
   "history": {
-    "priorSourceOnlyPass": {
-      "historical": true,
-      "status": "CLOSED_PASS",
-      "candidateArtifactId": 9387820198,
-      "candidateSourceHead": "fc46bd85783d8b4d524cbeb0fee54ee9a2c774af",
-      "sourceValidationRunId": 32316010103,
-      "sourceEvidenceArtifactId": 9388061716,
-      "runtimeReusable": false
-    },
-    "macro2CurrentPass": {
-      "historical": false,
-      "status": "CLOSED_PASS",
-      "runId": 32611388980,
-      "candidateArtifactId": 9485621192,
-      "candidateSourceHead": "842f762f199f4c7dbf13062a33ca220d92398c51",
-      "checksPassed": 107,
-      "fileCount": 194,
-      "deltaCount": 9,
-      "unchangedFileCount": 185
-    }
+    "priorSourceOnlyPass": {"historical":true,"status":"CLOSED_PASS","candidateArtifactId":9387820198,"candidateSourceHead":"fc46bd85783d8b4d524cbeb0fee54ee9a2c774af","sourceValidationRunId":32316010103,"sourceEvidenceArtifactId":9388061716,"runtimeReusable":false},
+    "macro2CurrentPass": {"historical":true,"status":"CLOSED_PASS","runId":32683020310,"candidateArtifactId":9504702901,"candidateSourceHead":"8c9668d6d423e82826b0295431ec699390d79b4b","checksPassed":12,"fileCount":194,"deltaCount":1,"unchangedFileCount":193},
+    "f2TerminalPass": {"historical":false,"status":"CLOSED_PASS","runId":32920087220,"artifactId":9589635019,"replayAllowed":false}
   },
-  "nextActionExact": "RUN_F2_SOURCE_AND_RUNTIME_PREFLIGHT_FAIL_CLOSED",
-  "canonicalStateFingerprint": "e08e448f196c3ce21e42458fb5cc9b3689c0ac07f8c05ea63a362c1ba42aabfd",
+  "nextActionExact": "AWAIT_EXPLICIT_GO_LIVE_AUTHORIZATION",
+  "canonicalStateFingerprint": "275651e8a7369ba340241a49be72d48ec5785fc2d0e2e43b2a6971c0b34fcaf2",
   "containsPII": false,
   "containsSecrets": false
 }
