@@ -1,6 +1,6 @@
 {
   "schemaVersion": "orbit360-f2-runtime-authorization-v4-risk-boundary",
-  "status": "RUNTIME_ATTEMPT_RESERVED_ONE_SHOT_UNCONSUMED",
+  "status": "CONSUMED_PASS",
   "approved": true,
   "authorizationIdentityDigest": "d202a6d0331369761e9ea6f8556c41dd3c695d81cb46fd9908e756cfe93f6d95",
   "gateId": "f2-productive-acceptance-exact-successor-v20260818",
@@ -8,15 +8,15 @@
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
   "authorizedAt": "2026-08-26T00:45:34.729Z",
-  "allowedExecutions": 1,
-  "consumed": false,
+  "allowedExecutions": 0,
+  "consumed": true,
   "authorizationFrozen": true,
   "replayAllowed": false,
-  "historical": false,
+  "historical": true,
   "runtimeAttemptAccepted": true,
   "runtimeAttemptReserved": true,
-  "privilegedRiskBoundaryEntered": false,
-  "runtimeAttemptCount": 0,
+  "privilegedRiskBoundaryEntered": true,
+  "runtimeAttemptCount": 1,
   "candidateArtifactId": 9504702901,
   "candidateSourceHead": "8c9668d6d423e82826b0295431ec699390d79b4b",
   "candidateArtifactDigest": "sha256:f11dd2a350b4160465dfc93b0dd9153e697d09773fa00aa4ee5ed13d93401ca2",
@@ -51,5 +51,8 @@
     "at": "2026-08-26T01:40:36.231Z"
   },
   "reactivatedAt": "2026-08-26T01:44:26.241Z",
-  "lastPreRiskFailurePreserved": true
+  "lastPreRiskFailurePreserved": true,
+  "privilegedRiskBoundaryEnteredAt": "2026-08-26T17:02:59.000Z",
+  "consumedAt": "2026-08-26T17:02:59.000Z",
+  "terminalEvidencePath": "orbit360-platform/runtime-gate-crm-v20260716/f2-runtime-terminal-inline-32920087220.json"
 }
