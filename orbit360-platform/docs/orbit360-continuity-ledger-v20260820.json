@@ -1,16 +1,16 @@
 {
   "schemaVersion": "orbit360-continuity-ledger-v3",
   "ledgerId": "ORBIT360-F2-CONTINUITY-CURRENT",
-  "revision": 78,
-  "updatedAtUtc": "2026-08-26T00:45:37.147Z",
+  "revision": 79,
+  "updatedAtUtc": "2026-08-26T01:01:56.764Z",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
   "stateVersion": "ORBIT360-F2-CONTINUITY-CURRENT",
   "gateId": "f2-productive-acceptance-exact-successor-v20260818",
   "activeState": {
-    "phase": "F2_RUNTIME_ATTEMPT_RESERVED_PREFLIGHT_PENDING",
-    "status": "F2_RUNTIME_ATTEMPT_RESERVED_ONE_SHOT_UNCONSUMED",
+    "phase": "F2_PRE_RISK_FAILURE_AWAITING_SOURCE_ONLY_ROOT_CAUSE_WITH_AUTH_PRESERVED",
+    "status": "F2_PRE_RISK_FAILURE_AUTHORIZATION_PRESERVED",
     "rootCauseStatus": "PIPELINE_MECHANISM_FAILURE_ROOT_CAUSES_CLOSED_DETERMINISTIC_RELEASE_READINESS_SOURCE_ONLY",
     "productFrozen": true,
     "dataFrozen": true,
@@ -79,7 +79,7 @@
     "closedAtUtc": "2026-08-24T02:33:42.759Z"
   },
   "authorizationBoundary": {
-    "activeRuntimeAuthorization": true,
+    "activeRuntimeAuthorization": false,
     "freshAuthorizationRequired": false,
     "authorizationBlockedByHardeningPackage": false,
     "authorizationCarryForwardForbidden": true,
@@ -92,20 +92,20 @@
     "mergeAuthorized": false,
     "boundaryPath": "orbit360-platform/docs/orbit360-f2-runtime-authorization-boundary-v20260820.json",
     "boundaryPrepared": true,
-    "currentBoundaryStatus": "RUNTIME_ATTEMPT_RESERVED_ONE_SHOT_PREFLIGHT_PENDING",
+    "currentBoundaryStatus": "PRE_RISK_FAILURE_AUTHORIZATION_PRESERVED",
     "authorizationIdentityRequired": true,
     "preparedAuthorizationIdentityDigest": "d202a6d0331369761e9ea6f8556c41dd3c695d81cb46fd9908e756cfe93f6d95",
-    "activeRequestPath": ".github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-successor-d202a6d03313-v20260820.json",
-    "authorizationRecordPath": ".github/orbit360-authorizations/f2-productive-acceptance-runtime-browser-readonly-auth-d202a6d03313-v20260820.json",
+    "activeRequestPath": null,
+    "authorizationRecordPath": null,
     "historicalAuthorizationRecordPath": ".github/orbit360-authorizations/f2-productive-acceptance-runtime-browser-readonly-auth-225f0f73b44b-v20260820.json",
     "historicalRequestPath": ".github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-successor-225f0f73b44b-v20260820.json",
     "terminalEvidencePath": "orbit360-platform/runtime-gate-crm-v20260716/f2-runtime-terminal-inline-32686810800.json",
     "terminalRunId": 32686810800,
-    "runtimeAttemptAccepted": true,
-    "runtimeRunId": 32916345049,
-    "reusableAuthorizationRecordPath": null,
-    "preRiskAuthorizationReuseAllowed": false,
-    "reusableRequestPath": null,
+    "runtimeAttemptAccepted": false,
+    "runtimeRunId": null,
+    "reusableAuthorizationRecordPath": ".github/orbit360-authorizations/f2-productive-acceptance-runtime-browser-readonly-auth-d202a6d03313-v20260820.json",
+    "preRiskAuthorizationReuseAllowed": true,
+    "reusableRequestPath": ".github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-successor-d202a6d03313-v20260820.json",
     "privilegedRiskBoundaryEntered": false
   },
   "continuityControl": {
@@ -203,20 +203,21 @@
   "productionReopeningPackage": {
     "path": "orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json",
     "status": "CLOSED_PASS",
-    "revision": 72,
-    "firstIncompleteStep": "F2-RUNTIME-PREFLIGHT",
-    "nextActionExact": "RUN_F2_SOURCE_AND_RUNTIME_PREFLIGHT_FAIL_CLOSED",
+    "revision": 73,
+    "firstIncompleteStep": "F2-SOURCE-ROOT-CAUSE-PRE-RISK",
+    "nextActionExact": "DIAGNOSE_ROOT_CAUSE_BEFORE_ANY_FRESH_AUTHORIZATION",
     "runtimeAllowed": false,
-    "authorizationAllowed": false,
+    "authorizationAllowed": true,
     "requestMaterializationAllowed": false,
-    "authorizationReuseAllowed": false
+    "authorizationReuseAllowed": true
   },
   "checkpoint": "orbit360-platform/docs/CHECKPOINT-CONTROL-PLANE-HARDENING-20260820.md",
   "nextAction": {
-    "id": "RUN_F2_SOURCE_AND_RUNTIME_PREFLIGHT_FAIL_CLOSED",
-    "description": "Execute the reserved F2 preflight. The one-shot budget remains unconsumed until privileged risk is actually observed.",
+    "id": "DIAGNOSE_ROOT_CAUSE_BEFORE_ANY_FRESH_AUTHORIZATION",
+    "description": "Diagnose the pre-risk source-only root cause, then reuse the already granted unconsumed authorization. No fresh user authorization is required.",
     "runtimeAllowed": false,
-    "userActionRequired": false
+    "userActionRequired": false,
+    "reuseExistingAuthorization": true
   },
   "history": {
     "latestSealedConsumedRuntime": {
@@ -311,6 +312,19 @@
       "operationalWrites": 0,
       "replayAllowed": false,
       "reducedAtUtc": "2026-08-25T23:41:45.555Z"
+    },
+    "latestPreRiskFailure": {
+      "runId": 32916345049,
+      "classification": "VALIDATOR_STALE",
+      "failureCode": "VALIDATOR_STALE:F2_RUNTIME_REQUEST_IDENTITY_INVALID",
+      "authorizationPreserved": true,
+      "authorizationPath": ".github/orbit360-authorizations/f2-productive-acceptance-runtime-browser-readonly-auth-d202a6d03313-v20260820.json",
+      "requestPath": ".github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-successor-d202a6d03313-v20260820.json",
+      "replayAllowed": false,
+      "firestoreWrites": 0,
+      "authWrites": 0,
+      "operationalWrites": 0,
+      "terminalEvidencePath": "orbit360-platform/runtime-gate-crm-v20260716/f2-runtime-terminal-inline-32916345049.json"
     }
   },
   "lanes": {

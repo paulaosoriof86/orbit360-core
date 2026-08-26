@@ -1,15 +1,15 @@
 {
   "schemaVersion": "orbit360-f2-productive-acceptance-runtime-browser-readonly-request-v4-risk-boundary",
   "requestId": "F2-d202a6d03313",
-  "status": "RUNTIME_ATTEMPT_RESERVED_PREFLIGHT_PENDING",
+  "status": "PRE_RISK_FAIL_REQUEST_REUSABLE",
   "approved": true,
   "allowedExecutions": 1,
   "consumed": false,
   "authorizationFrozen": true,
   "replayAllowed": false,
   "historical": false,
-  "runtimeAttemptAccepted": true,
-  "runtimeAttemptReserved": true,
+  "runtimeAttemptAccepted": false,
+  "runtimeAttemptReserved": false,
   "privilegedRiskBoundaryEntered": false,
   "runtimeAttemptCount": 0,
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -23,6 +23,12 @@
   "materializedAt": "2026-08-26T00:45:35.722Z",
   "containsPII": false,
   "containsSecrets": false,
-  "runtimeRunId": 32916345049,
-  "runtimeAttemptAcceptedAt": "2026-08-26T00:45:37.147Z"
+  "runtimeRunId": null,
+  "runtimeAttemptAcceptedAt": null,
+  "lastPreRiskFailure": {
+    "runId": 32916345049,
+    "classification": "VALIDATOR_STALE",
+    "failureCode": "VALIDATOR_STALE:F2_RUNTIME_REQUEST_IDENTITY_INVALID",
+    "at": "2026-08-26T01:01:56.764Z"
+  }
 }

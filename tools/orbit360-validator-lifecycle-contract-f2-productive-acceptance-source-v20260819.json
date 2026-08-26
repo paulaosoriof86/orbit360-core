@@ -4,8 +4,8 @@
   "gateContractVersion": "2.2.0",
   "validatorLifecycleRevision": "phase-capability-contract-v7-canonical-convergence",
   "f2ValidatorRevision": "f2-source-dynamic-cert-authority-v10-20260822",
-  "status": "F2_RUNTIME_ATTEMPT_RESERVED_ONE_SHOT_UNCONSUMED",
-  "currentPhase": "F2_RUNTIME_ATTEMPT_RESERVED_PREFLIGHT_PENDING",
+  "status": "F2_PRE_RISK_FAILURE_AUTHORIZATION_PRESERVED",
+  "currentPhase": "F2_PRE_RISK_FAILURE_AWAITING_SOURCE_ONLY_ROOT_CAUSE_WITH_AUTH_PRESERVED",
   "canonicalContractAuthority": "tools/orbit360-gate-contract-f2-productive-acceptance-v20260820.json",
   "continuity": {
     "stateVersion": "ORBIT360-F2-CONTINUITY-CURRENT",
@@ -36,8 +36,8 @@
   "block": "F2_GATE_DE_ACEPTACION_PRODUCTIVA_REAL",
   "authorization": {
     "requiredForExecution": false,
-    "activeRequest": true,
-    "freshAuthorizationRequired": false,
+    "activeRequest": false,
+    "freshAuthorizationRequired": true,
     "authorizationBoundaryPrepared": true,
     "authorizationBoundaryPath": "orbit360-platform/docs/orbit360-f2-runtime-authorization-boundary-v20260820.json",
     "nextRuntimeMaterializationAllowed": false,
@@ -119,8 +119,8 @@
       "unchangedFileCount": 185
     }
   },
-  "nextActionExact": "RUN_F2_SOURCE_AND_RUNTIME_PREFLIGHT_FAIL_CLOSED",
-  "canonicalStateFingerprint": "62c4a7bead5b409a62126d66744a3e38da0961690d3237711269e23bf405ee72",
+  "nextActionExact": "DIAGNOSE_ROOT_CAUSE_BEFORE_ANY_FRESH_AUTHORIZATION",
+  "canonicalStateFingerprint": "5d285f8973d7e413ca7f7163c2a9798a6748df6f84b1c1f0284861022fa6f317",
   "containsPII": false,
   "containsSecrets": false
 }
