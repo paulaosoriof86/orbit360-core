@@ -20,10 +20,13 @@ function assertLedger(L){
   if(L.branch!=='ays/backend-tenant-lab-v99-20260703'||Number(L.pullRequest)!==5)fail('SINGLE_STATE_LEDGER_REPO_BINDING_INVALID');
   if(!Number.isInteger(Number(L.revision))||Number(L.revision)<1)fail('SINGLE_STATE_LEDGER_REVISION_INVALID');
   if(L.progress?.f2TerminalPass===true){
-    if(L.activeState?.phase!=='F2_TERMINAL_PASS_AWAITING_AUTHORIZED_GO_LIVE'||L.activeState?.status!=='F2_TERMINAL_PASS')fail('SINGLE_STATE_F2_PASS_PHASE_INVALID');
-    if(Number(L.progress?.productionRouteProgressPct)!==85)fail('SINGLE_STATE_F2_PASS_PROGRESS_INVALID');
-    if(L.nextAction?.id!=='AWAIT_EXPLICIT_GO_LIVE_AUTHORIZATION')fail('SINGLE_STATE_F2_PASS_NEXT_ACTION_INVALID');
-    if(L.authorizationBoundary?.activeRuntimeAuthorization!==false||L.authorizationBoundary?.activeRequestPath!=null||L.authorizationBoundary?.authorizationRecordPath!=null)fail('SINGLE_STATE_F2_PASS_ACTIVE_AUTH_INVALID');
+    const phase=String(L.activeState?.phase||''),status=String(L.activeState?.status||''),progress=Number(L.progress?.productionRouteProgressPct),next=String(L.nextAction?.id||'');
+    const waiting=phase==='F2_TERMINAL_PASS_AWAITING_AUTHORIZED_GO_LIVE'&&status==='F2_TERMINAL_PASS'&&progress===85&&next==='AWAIT_EXPLICIT_GO_LIVE_AUTHORIZATION';
+    const claimed=phase==='AUTHORIZED_RELEASE_WINDOW_RUNNING'&&status==='AUTHORIZED_RELEASE_WINDOW_CLAIMED'&&progress===85&&next==='RUN_AUTHORIZED_RELEASE_WINDOW';
+    const releasePass=phase==='PRODUCTION_SMOKE_PASS'&&status==='PRODUCTION_GO_LIVE_PASS'&&progress===100&&next==='POST_GO_LIVE_MONITORING';
+    const releaseFail=phase==='AUTHORIZED_RELEASE_WINDOW_FAILED'&&status==='RELEASE_TERMINAL_FAIL_NO_REPLAY'&&progress===85&&next==='DIAGNOSE_RELEASE_ROOT_CAUSE_AND_VERIFY_ROLLBACK';
+    if(!waiting&&!claimed&&!releasePass&&!releaseFail)fail(`SINGLE_STATE_F2_MILESTONE_PHASE_INVALID:${phase}:${status}:${progress}:${next}`);
+    if(waiting&&(L.authorizationBoundary?.activeRuntimeAuthorization!==false||L.authorizationBoundary?.activeRequestPath!=null||L.authorizationBoundary?.authorizationRecordPath!=null))fail('SINGLE_STATE_F2_PASS_ACTIVE_AUTH_INVALID');
   }
   return true;
 }
@@ -59,7 +62,7 @@ function claimPure(input,intent,runId){
   L.productionReopeningPackage={...L.productionReopeningPackage,firstIncompleteStep:c.firstIncompleteStep||i.transitionId,nextActionExact:c.nextAction,runtimeAllowed:s.capabilityClass!=='SOURCE_ONLY',authorizationAllowed:false,requestMaterializationAllowed:false,authorizationReuseAllowed:false};
   L.nextAction={id:c.nextAction,description:c.description||c.nextAction,runtimeAllowed:s.capabilityClass!=='SOURCE_ONLY',userActionRequired:false};
   L.lanes={...(L.lanes||{}),B_backend_security_gates:c.laneB||`EXECUTION_CLAIMED_${i.transitionId}`};
-  return L;
+  assertLedger(L);return L;
 }
 function terminalPure(input,evidence){
   const L=clone(input);assertLedger(L);const claim=L.executionClaim;if(claim?.active!==true)fail('SINGLE_STATE_ACTIVE_EXECUTION_CLAIM_REQUIRED');const s=specFor(claim.transitionId);
@@ -80,7 +83,7 @@ function terminalPure(input,evidence){
   L.nextAction={id:t.nextAction,description:t.description||t.nextAction,runtimeAllowed:false,userActionRequired:Boolean(t.userActionRequired)};
   L.lanes={...(L.lanes||{}),B_backend_security_gates:t.laneB||t.status};
   L.history={...(L.history||{}),latestExecutionTerminal:{transitionId:claim.transitionId,runId:run,classification:cls,ok:pass,evidencePath:String(evidence.evidencePath||''),replayAllowed:false,firestoreWrites:0,authWrites:0,operationalWrites:0,reducedAtUtc:L.updatedAtUtc}};
-  return L;
+  assertLedger(L);return L;
 }
 function selftest(){
   const base={schemaVersion:'orbit360-continuity-ledger-v3',revision:87,updatedAtUtc:'2026-08-26T17:02:59.000Z',repository:'paulaosoriof86/orbit360-core',branch:'ays/backend-tenant-lab-v99-20260703',pullRequest:5,activeState:{phase:'F2_TERMINAL_PASS_AWAITING_AUTHORIZED_GO_LIVE',status:'F2_TERMINAL_PASS',runtimeAuthorized:false,runtimeReplayAllowed:false,deployAuthorized:false,productionAuthorized:false},successorCandidate:{artifactId:9504702901,sourceHead:'8c9668d6d423e82826b0295431ec699390d79b4b'},authorizationBoundary:{activeRuntimeAuthorization:false,activeRequestPath:null,authorizationRecordPath:null},productionReopeningPackage:{revision:81},nextAction:{id:'AWAIT_EXPLICIT_GO_LIVE_AUTHORIZATION'},progress:{productionRouteProgressPct:85,f2TerminalPass:true},lanes:{}};
