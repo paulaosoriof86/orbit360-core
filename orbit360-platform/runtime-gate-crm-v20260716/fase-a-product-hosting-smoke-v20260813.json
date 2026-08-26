@@ -1,0 +1,144 @@
+{
+  "schemaVersion": "orbit360-fase-a-hosting-smoke-v1",
+  "generatedAt": "2026-08-26T21:57:49.058Z",
+  "projectId": "ays-orbit-360-lab",
+  "liveUrl": "https://ays-orbit-360-lab.web.app",
+  "artifact": "orbit360-artifacts/fase-a-product",
+  "hosting": {
+    "siteStatus": 200,
+    "releasesStatus": 200,
+    "siteName": "projects/ays-orbit-360-lab/sites/ays-orbit-360-lab",
+    "defaultUrl": "https://ays-orbit-360-lab.web.app",
+    "currentRelease": {
+      "name": "sites/ays-orbit-360-lab/releases/1787781460635000",
+      "version": "sites/ays-orbit-360-lab/versions/31f591f0ccf81cdf",
+      "type": "DEPLOY",
+      "releaseTime": "2026-08-26T21:57:40.635Z"
+    },
+    "previousRelease": {
+      "name": "sites/ays-orbit-360-lab/releases/1786685116806000",
+      "version": "sites/ays-orbit-360-lab/versions/8572f3b23b9f8005",
+      "type": "ROLLBACK",
+      "releaseTime": "2026-08-14T05:25:16.806Z"
+    },
+    "releases": [
+      {
+        "name": "sites/ays-orbit-360-lab/releases/1787781460635000",
+        "version": "sites/ays-orbit-360-lab/versions/31f591f0ccf81cdf",
+        "type": "DEPLOY",
+        "releaseTime": "2026-08-26T21:57:40.635Z"
+      },
+      {
+        "name": "sites/ays-orbit-360-lab/releases/1786685116806000",
+        "version": "sites/ays-orbit-360-lab/versions/8572f3b23b9f8005",
+        "type": "ROLLBACK",
+        "releaseTime": "2026-08-14T05:25:16.806Z"
+      },
+      {
+        "name": "sites/ays-orbit-360-lab/releases/1786685047975000",
+        "version": "sites/ays-orbit-360-lab/versions/692cfc39cc2cc49e",
+        "type": "DEPLOY",
+        "releaseTime": "2026-08-14T05:24:07.975Z"
+      },
+      {
+        "name": "sites/ays-orbit-360-lab/releases/1786674389766000",
+        "version": "sites/ays-orbit-360-lab/versions/8572f3b23b9f8005",
+        "type": "ROLLBACK",
+        "releaseTime": "2026-08-14T02:26:29.766Z"
+      },
+      {
+        "name": "sites/ays-orbit-360-lab/releases/1786674363674000",
+        "version": "sites/ays-orbit-360-lab/versions/20fecdf332820c2e",
+        "type": "DEPLOY",
+        "releaseTime": "2026-08-14T02:26:03.674Z"
+      },
+      {
+        "name": "sites/ays-orbit-360-lab/releases/1786488910394000",
+        "version": "sites/ays-orbit-360-lab/versions/8572f3b23b9f8005",
+        "type": "DEPLOY",
+        "releaseTime": "2026-08-11T22:55:10.394Z"
+      },
+      {
+        "name": "sites/ays-orbit-360-lab/releases/1786469990659000",
+        "version": "sites/ays-orbit-360-lab/versions/1e98b26c82c4171d",
+        "type": "ROLLBACK",
+        "releaseTime": "2026-08-11T17:39:50.659Z"
+      },
+      {
+        "name": "sites/ays-orbit-360-lab/releases/1786469444257000",
+        "version": "sites/ays-orbit-360-lab/versions/00add7a127cec488",
+        "type": "DEPLOY",
+        "releaseTime": "2026-08-11T17:30:44.257Z"
+      },
+      {
+        "name": "sites/ays-orbit-360-lab/releases/1786466086116000",
+        "version": "sites/ays-orbit-360-lab/versions/1e98b26c82c4171d",
+        "type": "ROLLBACK",
+        "releaseTime": "2026-08-11T16:34:46.116Z"
+      },
+      {
+        "name": "sites/ays-orbit-360-lab/releases/1786466055034000",
+        "version": "sites/ays-orbit-360-lab/versions/ed23dc58f1b9764c",
+        "type": "DEPLOY",
+        "releaseTime": "2026-08-11T16:34:15.034Z"
+      }
+    ],
+    "ok": true
+  },
+  "publicAssets": {
+    "index.html": {
+      "status": 200,
+      "sha256": "125b24a3fc215a368a7183a107cd55eb5a6332fc8a7f8354ed94e3169340ec4e"
+    },
+    "product-runtime-config.js": {
+      "status": 200,
+      "sha256": "7dba6d6f85f9ae437cb230cb8f07de8a573535487e44c5329f31319967383c5c"
+    },
+    "core/auth-product-runtime-p0.js": {
+      "status": 200,
+      "sha256": "d0bb399fe0e1dd102a03950673044eda5bc8d181e4e98cf477d22d141aa7b3a8"
+    },
+    "core/backend-product-readonly-bootstrap-p0.js": {
+      "status": 200,
+      "sha256": "a6bf74ad903590777caff25bd0dcb8719531d61735fcb0c04b99db1a7cdc73e0"
+    },
+    "data/store-firestore-product-readonly-p0.js": {
+      "status": 200,
+      "sha256": "35d6d433e12906215bbe7ec377e4e9ad8d2e47f87e25f1bb673c4cc19d7efb59"
+    },
+    "modules/cliente360.js": {
+      "status": 200,
+      "sha256": "2ddb62204796d341e5fcdda070c3252baff113de0fb4357158960146f06e1c17"
+    },
+    "modules/aseguradoras.js": {
+      "status": 200,
+      "sha256": "42bd4e23e0ba38b14fea4349548d3d6e874baa4b3cf1a035748eac0bab63c92e"
+    },
+    "modules/ops.js": {
+      "status": 200,
+      "sha256": "26f2dd7371144b53edd061ee2709e55a06b84e2a696ae5f9c881aabe6b418b34"
+    },
+    "modules/leads.js": {
+      "status": 200,
+      "sha256": "9f56dee8d8da1fcdcb3fa1068f163b9de9a5ff80bcaa651d7c450f296a239ed0"
+    }
+  },
+  "checks": {
+    "assetsExactlyProductArtifact": true,
+    "hostingReadable": true,
+    "newReleaseObserved": true,
+    "priorAnchorPreserved": true
+  },
+  "deployExecuted": true,
+  "productionTouched": true,
+  "rollbackExecuted": false,
+  "ok": true,
+  "containsPII": false,
+  "containsSecrets": false,
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "operationalWrites": 0,
+  "reimportExecuted": false,
+  "mainTouched": false,
+  "mergeExecuted": false
+}
