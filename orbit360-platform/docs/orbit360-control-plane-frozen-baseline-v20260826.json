@@ -1,13 +1,13 @@
 {
-  "schemaVersion": "orbit360-control-plane-frozen-baseline-v4-browser-prebind-transitive-sealed",
+  "schemaVersion": "orbit360-control-plane-frozen-baseline-v5-provider-transport-rollback-idempotent-sealed",
   "status": "CONTROL_PLANE_FROZEN_BASELINE_SOURCE_ONLY_PASS",
   "ok": true,
   "classification": "PASS",
-  "sealedAtUtc": "2026-08-26T23:28:33Z",
+  "sealedAtUtc": "2026-08-26T23:49:11Z",
   "canonicalBranch": "ays/backend-tenant-lab-v99-20260703",
-  "p3HandshakeRunId": 33023473634,
-  "p3HandshakeEvidence": "orbit360-platform/runtime-gate-crm-v20260716/p3-browser-prebind-reseal-source-only-pass-run-33023473634-v20260826.json",
-  "ledgerRevisionBeforeSeal": 102,
+  "p3HandshakeRunId": 33024671035,
+  "p3HandshakeEvidence": "orbit360-platform/runtime-gate-crm-v20260716/p3-rollback-idempotence-reseal-source-only-pass-run-33024671035-v20260826.json",
+  "ledgerRevisionBeforeSeal": 105,
   "sourceIdentityAlgorithm": "git-blob-sha1",
   "sourceIdentities": {
     ".github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml": "0531b1610da53ac00c81224e3d4e96878f0d60f0",
@@ -24,32 +24,27 @@
     "tools/orbit360-f2-cross-tenant-probe-contract-v20260818.mjs": "0dc20952eb988d367bb76d3de2ef24213d0624e9",
     "tools/orbit360-f2-data-integrity-readonly-v20260818.mjs": "1383de31e329d352093730ca0e0b2aebceb68a53",
     "tools/orbit360-f2-compare-integrity-v20260818.mjs": "af78cf6b45a55bd4cf5e504fe8dc3d4a5bc1e954",
-    "tools/orbit360-fase-a-hosting-release-helper-v20260813.mjs": "888ef81d32775d2fd582fe0143210b25119d19e3",
+    "tools/orbit360-fase-a-hosting-release-helper-v20260813.mjs": "8da8ab7ab7f7e69f79a67d3583e1713c450e1894",
     "tools/orbit360-m6-resolve-smoke-identity-readonly-v20260730.mjs": "ed6ccb2c7734b7d80be653607b9a991fdc0ec9a5",
     "firebase.product-go-live.json": "a46c7e622e323ee11e31685ae33818d4c3e981e0",
     "firestore.product-readonly.rules": "53bfe3da0eb4acf82dd1992f88dbbb130ab2d3ae",
     "firebase.product-rollback-safe.json": "59ad6095c6835d64376d834dca2ec175e7f9f420"
   },
   "sourceChangeSincePriorSeal": {
-    "classification": "VALIDATOR_STALE",
+    "primaryClassification": "ENVIRONMENT_FAILURE",
     "secondaryClassification": "PIPELINE_MECHANISM_FAILURE",
-    "triggerRunId": 33022313740,
-    "rootCauseCode": "RELEASE_HANDLER_ABORTS_ON_RAW_BROWSER_EXIT_BEFORE_ACCEPTED_BINDER_ATTRIBUTION",
-    "rootCauseEvidence": "orbit360-platform/runtime-gate-crm-v20260716/p4-go-live-browser-prebind-root-cause-run-33022313740-v20260826.json",
-    "p2InitialValidatorStaleRunId": 33023227076,
-    "p2InitialValidatorStaleEvidence": "orbit360-platform/runtime-gate-crm-v20260716/p2-browser-prebind-selftest-validator-stale-run-33023227076-v20260826.json",
-    "p2RootfixRunId": 33023420594,
-    "p2RootfixEvidence": "orbit360-platform/runtime-gate-crm-v20260716/p2-browser-prebind-rootfix-source-only-pass-run-33023420594-v20260826.json",
+    "triggerRunId": 33024130969,
+    "primaryCode": "RELEASE_EXACT_DEPLOY_PROVIDER_SITE_REQUEST_FAILED",
+    "secondaryCode": "ROLLBACK_HELPER_NON_IDEMPOTENT_WHEN_ANCHOR_ALREADY_ACTIVE_OR_RESTORED",
+    "rootCauseEvidence": "orbit360-platform/runtime-gate-crm-v20260716/p4-go-live-provider-transport-rollback-idempotence-root-cause-run-33024130969-v20260826.json",
+    "p2RootfixRunId": 33024604845,
+    "p2RootfixEvidence": "orbit360-platform/runtime-gate-crm-v20260716/p2-rollback-idempotence-source-only-pass-run-33024604845-v20260826.json",
     "changedActiveSources": [
-      "tools/orbit360-go-live-release-handler-v20260826.mjs"
-    ],
-    "newlySealedTransitiveRuntimeDependencies": [
-      "tools/orbit360-f2-cross-tenant-console-diagnostic-v20260825.mjs",
-      "tools/orbit360-f2-cross-tenant-console-attribution-v20260825.mjs",
-      "tools/orbit360-f2-cross-tenant-probe-contract-v20260818.mjs"
+      "tools/orbit360-fase-a-hosting-release-helper-v20260813.mjs"
     ],
     "browserHarnessChanged": false,
     "binderChanged": false,
+    "releaseHandlerChanged": false,
     "workflowChanged": false,
     "productChanged": false,
     "candidateChanged": false,
@@ -57,6 +52,23 @@
     "hostingIgnorePolicyChanged": false,
     "p1Rerun": false,
     "f2Rerun": false
+  },
+  "rollbackIdempotenceContract": {
+    "helper": "tools/orbit360-fase-a-hosting-release-helper-v20260813.mjs",
+    "helperBlobSha": "8da8ab7ab7f7e69f79a67d3583e1713c450e1894",
+    "preCreateReadbackRequired": true,
+    "safeNoopWhenAnchorAlreadyActiveAndHashesRestored": true,
+    "non2xxCreateRequiresStateRevalidationBeforeFailure": true,
+    "actualRollbackRequiresCurrentReleaseAtAnchor": true,
+    "actualRollbackRequiresPublicHashesRestored": true,
+    "sourceMarkers": [
+      "ROLLBACK_ALREADY_AT_ANCHOR_NOOP_SAFE",
+      "ROLLBACK_POST_NONOK_BUT_ANCHOR_ALREADY_ACTIVE_SAFE",
+      "currentReleaseAtAnchor",
+      "publicAssetsRestored"
+    ],
+    "p2SourceOnlyPass": true,
+    "p3SourceOnlyPass": true
   },
   "browserDecisionContract": {
     "acceptedHistoricalReferenceRunId": 32920087220,
@@ -119,6 +131,7 @@
     "preRiskFailurePreservesAuthorization": true,
     "rollbackAnchorCapturedBeforeRisk": true,
     "exactPriorHostingReleaseRollback": true,
+    "rollbackIdempotentWhenAnchorAlreadyActive": true,
     "browserEvidenceMustBeBoundBeforeBrowserPassFailDecision": true,
     "browserEvidenceMustBeBoundBeforeIntegrityAfter": true
   },
@@ -134,7 +147,7 @@
   "authorizationActive": false,
   "executionClaimActive": false,
   "priorGoLiveAuthorizationConsumed": true,
-  "priorGoLiveRunId": 33022313740,
+  "priorGoLiveRunId": 33024130969,
   "freshGoLiveAuthorizationRequired": true,
   "runtimeExecuted": false,
   "browserExecuted": false,
