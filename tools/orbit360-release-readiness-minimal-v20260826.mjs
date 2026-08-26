@@ -15,6 +15,7 @@ const P={
  contract:'orbit360-platform/docs/orbit360-control-plane-semantic-contract-v20260824.json',
  registry:'orbit360-platform/docs/orbit360-continuity-writer-registry-v20260820.json',
  authority:'tools/orbit360-gate-contract-f2-productive-acceptance-v20260820.json',
+ readiness:'tools/orbit360-release-readiness-minimal-v20260826.mjs',
  router:'tools/orbit360-validar-gate-contracts-v20260717.mjs',
  register:'tools/orbit360-register-f2-productive-acceptance-runtime-v20260819.mjs',
  semanticGate:'tools/orbit360-f2-gate-semantic-v20260824.mjs',
@@ -45,7 +46,7 @@ need(Number(L.progress?.productionRouteProgressPct)===75&&L.progress?.f2Terminal
 need(L.activeState?.runtimeAuthorized===false&&L.activeState?.runtimeReplayAllowed===false,'RUNTIME_BOUNDARY_OPEN');
 need(L.authorizationBoundary?.activeRuntimeAuthorization===false&&L.authorizationBoundary?.activeRequestPath==null&&L.authorizationBoundary?.authorizationRecordPath==null&&(L.authorizationBoundary?.runtimeAttemptAccepted??false)===false,'AUTHORIZATION_BOUNDARY_NOT_INERT');
 need(C.active===true&&C.status==='ACTIVE_SOURCE_ONLY_FAIL_CLOSED','SEMANTIC_CONTRACT_NOT_ACTIVE');
-need(C.releaseReadinessOwner===P.selftest||C.releaseReadinessOwner===undefined,'RELEASE_READINESS_OWNER_DRIFT');
+need(C.releaseReadinessOwner===P.readiness||C.releaseReadinessOwner===undefined,'RELEASE_READINESS_OWNER_DRIFT');
 need(R.active===true&&R.sourceOfTruth===P.ledger&&R.canonicalWorkflow===P.workflow,'REGISTRY_CANONICALITY_DRIFT');
 need(G.gateId===L.gateId&&Number(G.candidate?.artifactId)===Number(L.successorCandidate?.artifactId)&&G.candidate?.sourceHead===L.successorCandidate?.sourceHead&&G.candidate?.artifactDigest===L.successorCandidate?.artifactDigest,'F2_AUTHORITY_CANDIDATE_DRIFT');
 const certPath=String(G.candidateCertificationEvidence||'');
@@ -56,9 +57,10 @@ if(certPath&&fs.existsSync(A(certPath))){
   need(Number(cert.artifactId)===Number(L.successorCandidate?.artifactId)&&cert.sourceHead===L.successorCandidate?.sourceHead&&cert.artifactDigest===L.successorCandidate?.artifactDigest,'DURABLE_CANDIDATE_CERTIFICATION_DRIFT');
   need(cert.runtimeExecuted===false&&cert.browserExecuted===false&&cert.secretAccess===false&&cert.firestoreRead===false&&Number(cert.writes||0)===0&&cert.deployExecuted===false&&cert.productionTouched===false,'DURABLE_CANDIDATE_SIDE_EFFECT_SIGNAL');
 }
-const criticalMjs=[P.router,P.register,P.semanticGate,P.workflowAudit,P.noRewrite,P.sourceWrite,P.authLifecycle,P.evidenceLifecycle,P.publicationCli,P.convergence];
+const criticalMjs=[P.readiness,P.router,P.register,P.semanticGate,P.workflowAudit,P.noRewrite,P.sourceWrite,P.authLifecycle,P.evidenceLifecycle,P.publicationCli,P.convergence];
 for(const p of criticalMjs){const r=spawnSync(process.execPath,['--check',A(p)],{cwd:ROOT,encoding:'utf8'});need(r.status===0,`NODE_CHECK_FAIL:${p}`);}
-let workflowAudit={},noRewrite={},sourceWrite={},authLifecycle={},publicationCli={},sourceGate={},lifecycle={},convergence={};
+let workflowAudit={},noRewrite={},sourceWrite={},authLifecycle={},publicationCli={},sourceGate={},preAuthLifecycle={},preTerminalLifecycle={},convergence={};
+let arbitraryFutureFilenameCleanupPass=false,classWidePreTerminalEvidenceLifecyclePass=false;
 if(!failures.length){
   const snapshot=String(process.env.ORBIT360_F2_WORKFLOW_SOURCE_FILE||'').trim();
   const wa=runJson(P.workflowAudit,[],snapshot?{ORBIT360_WORKFLOW_SOURCE_FILE:snapshot}:{});workflowAudit=wa.json||{};
@@ -69,8 +71,20 @@ if(!failures.length){
   const pc=runJson(P.publicationCli);publicationCli=pc.json||{};need(pc.status===0&&publicationCli.ok===true&&publicationCli.stdoutSingleJson===true&&publicationCli.stderrEmpty===true,'PUBLICATION_CLI_CONTRACT_FAIL');
   const sg=runJson(P.router,[L.gateId],{ORBIT360_EXPECTED_REQUEST_VERSION:'NONE_PENDING_FRESH_AUTHORIZATION',ORBIT360_REQUEST_FILE:''});sourceGate=sg.json||{};
   need(sg.status===0&&sourceGate.ok===true&&sourceGate.status==='PASS_GATE_CONTRACT_SOURCE_F2_PRODUCTIVE_ACCEPTANCE'&&sourceGate.executionAuthorized===false&&sourceGate.runtimeAuthorized===false&&sourceGate.browserAuthorized===false,'F2_SOURCE_GATE_FAIL');
-  const lc=runJson(P.evidenceLifecycle,['--phase','pre-auth']);lifecycle=lc.json||{};need(lc.status===0&&lifecycle.ok===true&&Number(lifecycle.remaining||0)===0,'EVIDENCE_LIFECYCLE_PREAUTH_FAIL');
   const cv=runJson(P.convergence,['--repo-only']);convergence=cv.json||{};need(cv.status===0&&convergence.ok===true&&convergence.authorized===false&&convergence.requestMaterialized===false&&convergence.runtimeAllowed===false,'CANONICAL_CONVERGENCE_FAIL');
+  const evidenceDir='orbit360-platform/runtime-gate-crm-v20260716';
+  const unknown=`${evidenceDir}/__minimal-readiness-unknown-${process.pid}.json`;
+  fs.writeFileSync(A(unknown),JSON.stringify({synthetic:true})+'\n','utf8');
+  const lc=runJson(P.evidenceLifecycle,['--phase','pre-auth']);preAuthLifecycle=lc.json||{};
+  arbitraryFutureFilenameCleanupPass=lc.status===0&&preAuthLifecycle.ok===true&&!fs.existsSync(A(unknown))&&Array.isArray(preAuthLifecycle.remaining)&&preAuthLifecycle.remaining.length===0;
+  need(arbitraryFutureFilenameCleanupPass,'EVIDENCE_LIFECYCLE_PREAUTH_FAIL');
+  const terminal=`${evidenceDir}/f2-runtime-terminal-inline-99999999999.json`;
+  fs.writeFileSync(A(terminal),JSON.stringify({synthetic:true})+'\n','utf8');
+  const lt=runJson(P.evidenceLifecycle,['--phase','pre-terminal','--preserve',terminal,'--assert-only']);preTerminalLifecycle=lt.json||{};
+  classWidePreTerminalEvidenceLifecyclePass=lt.status===0&&preTerminalLifecycle.ok===true&&Array.isArray(preTerminalLifecycle.remaining)&&preTerminalLifecycle.remaining.length===1&&preTerminalLifecycle.remaining[0]===terminal;
+  need(classWidePreTerminalEvidenceLifecyclePass,'EVIDENCE_LIFECYCLE_PRETERMINAL_FAIL');
+  fs.rmSync(A(terminal),{force:true});
+  const cleanup=runJson(P.evidenceLifecycle,['--phase','pre-auth']);need(cleanup.status===0&&cleanup.json?.ok===true,'EVIDENCE_LIFECYCLE_FINAL_CLEANUP_FAIL');
 }
 let remoteCASReadbackPass=false;
 try{
@@ -83,7 +97,7 @@ let cleanRepoPass=false;
 try{cleanRepoPass=execFileSync('git',['status','--porcelain'],{cwd:ROOT,encoding:'utf8'}).trim()==='';need(cleanRepoPass,'SOURCE_ONLY_READINESS_LEFT_REPO_DIRTY');}catch{need(false,'SOURCE_ONLY_READINESS_GIT_STATUS_FAIL');}
 const criticalNegativeRegressionSuitePass=authLifecycle.ok===true&&authLifecycle.secondReservationStopRetry===true&&authLifecycle.historicalRun329028PreservesAuthorization===true&&authLifecycle.historicalRun329044ConsumesAfterRisk===true&&sourceWrite.ok===true&&workflowAudit.ok===true;
 const out={
-  schemaVersion:'orbit360-release-readiness-minimal-v1-20260826',
+  schemaVersion:'orbit360-release-readiness-minimal-v2-20260826',
   ok:failures.length===0,
   status:failures.length?'CONTROL_PLANE_RELEASE_READINESS_FAIL':'CONTROL_PLANE_RELEASE_READINESS_PASS',
   classification:failures.length?'PIPELINE_MECHANISM_FAILURE':'PASS',
@@ -95,10 +109,10 @@ const out={
   candidateBindingDynamic:Number(G.candidate?.artifactId)===Number(L.successorCandidate?.artifactId),
   semanticPreflightPass:sourceGate.ok===true,
   exactF2SourcePathExecuted:sourceGate.ok===true,
-  classWidePreAuthEvidenceLifecyclePass:lifecycle.ok===true,
-  classWidePreTerminalEvidenceLifecyclePass:true,
-  arbitraryFutureFilenameCleanupPass:true,
-  scratchBehavioralTransitionsPass:true,
+  classWidePreAuthEvidenceLifecyclePass:preAuthLifecycle.ok===true,
+  classWidePreTerminalEvidenceLifecyclePass,
+  arbitraryFutureFilenameCleanupPass,
+  scratchBehavioralTransitionsPass:false,
   preProviderGatePathPass:sourceGate.ok===true,
   projectionImmutabilityPass:true,
   remoteCASReadbackPass,
@@ -117,7 +131,7 @@ const out={
   authorizationLifecyclePass:authLifecycle.ok===true,
   authorizationReservationDoesNotConsumePass:authLifecycle.reservationDoesNotConsume===true,
   preRiskAuthorizationPreservationPass:authLifecycle.historicalRun329028PreservesAuthorization===true,
-  preRiskAuthorizationReusePass:true,
+  preRiskAuthorizationReusePass:false,
   historicalRun329028RegressionPass:authLifecycle.historicalRun329028PreservesAuthorization===true,
   historicalRun329044RegressionPass:authLifecycle.historicalRun329044ConsumesAfterRisk===true,
   negativeRegressionSuitePass:criticalNegativeRegressionSuitePass,
