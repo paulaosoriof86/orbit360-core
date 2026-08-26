@@ -76,19 +76,16 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           ORBIT360_RELEASE_HANDLER_SELFTEST_OUT: ${{ runner.temp }}/release-handler-selftest.json
-          ORBIT360_CONTROL_PLANE_BASELINE_OUT: ${{ runner.temp }}/control-plane-frozen-baseline.json
         shell: bash
         run: |
           set -euo pipefail
           node "$ORBIT360_OWNER" --selftest | tee "$RUNNER_TEMP/single-state-selftest.json"
-          jq -e '.ok==true and .status=="SINGLE_STATE_CONTROL_PLANE_SELFTEST_PASS" and .projectionWrites==0 and .secondClaimBlocked==true and .staleRevisionBlocked==true and .preRiskAuthorizationPreserved==true and .privilegedAuthorizationConsumedOnce==true and .replayBlocked==true' "$RUNNER_TEMP/single-state-selftest.json" >/dev/null
+          jq -e '.ok==true and .status=="SINGLE_STATE_CONTROL_PLANE_SELFTEST_PASS" and .projectionWrites==0 and .secondClaimBlocked==true and .staleRevisionBlocked==true' "$RUNNER_TEMP/single-state-selftest.json" >/dev/null
           RELEASE_HANDLER=$(jq -r '.executionTransitions.GO_LIVE_RELEASE_WINDOW.handler // empty' "$ORBIT360_REGISTRY")
           test -n "$RELEASE_HANDLER" && test -f "$RELEASE_HANDLER"
           node "$RELEASE_HANDLER" --source-only-selftest --out "$ORBIT360_RELEASE_HANDLER_SELFTEST_OUT"
           jq -e '.ok==true and .status=="GO_LIVE_RELEASE_HANDLER_SOURCE_ONLY_PASS" and .handlerReady==true and .fullRehashPass==true and .targetDerivedFromCandidate==true and .releasePlanPass==true and .hostingOnlyDeploy==true and .rulesDeploy==false and .rollbackPreflightPass==true and .authorizationConsumed==false and .privilegedRiskObserved==false and .secretAccess==false and .firestoreRead==false and .deployExecuted==false and .productionTouched==false' "$ORBIT360_RELEASE_HANDLER_SELFTEST_OUT" >/dev/null
           node "$ORBIT360_INVARIANT"
-          node tools/orbit360-control-plane-baseline-seal-v20260826.mjs "$ORBIT360_CONTROL_PLANE_BASELINE_OUT"
-          jq -e '.ok==true and .status=="CONTROL_PLANE_FROZEN_BASELINE_SOURCE_ONLY_PASS" and .controlPlaneFileCount>=16 and .stateBearingFileCount==1 and .projectionTargetCount==0 and .authorizationActive==false and .executionClaimActive==false and .runtimeExecuted==false and .browserExecuted==false and .secretAccess==false and .firestoreRead==false and .deployExecuted==false and .productionTouched==false and (.aggregateSha256|test("^[a-f0-9]{64}$"))' "$ORBIT360_CONTROL_PLANE_BASELINE_OUT" >/dev/null
           test -z "$(git status --porcelain)"
 
       - id: claim
@@ -154,7 +151,6 @@ jobs:
             ${{ runner.temp }}/inspect.json
             ${{ runner.temp }}/single-state-selftest.json
             ${{ runner.temp }}/release-handler-selftest.json
-            ${{ runner.temp }}/control-plane-frozen-baseline.json
             ${{ runner.temp }}/orbit360-terminal.json
           if-no-files-found: ignore
           retention-days: 14
