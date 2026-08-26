@@ -1,0 +1,59 @@
+{
+  "schemaVersion": "orbit360-p4-go-live-provider-transport-rollback-idempotence-root-cause-v1",
+  "runId": 33024130969,
+  "status": "ROOT_CAUSE_CLASSIFIED_SOURCE_ONLY_FIX_APPLIED",
+  "primaryClassification": "ENVIRONMENT_FAILURE",
+  "secondaryClassification": "PIPELINE_MECHANISM_FAILURE",
+  "primaryCode": "RELEASE_EXACT_DEPLOY_PROVIDER_SITE_REQUEST_FAILED",
+  "secondaryCode": "ROLLBACK_HELPER_NON_IDEMPOTENT_WHEN_ANCHOR_ALREADY_ACTIVE_OR_RESTORED",
+  "candidateArtifactId": 9504702901,
+  "candidateSourceHead": "8c9668d6d423e82826b0295431ec699390d79b4b",
+  "terminalArtifactId": 9627726179,
+  "terminalArtifactDigest": "sha256:e40e35e3fa1c439e9226b2ad55bc8852aff63a1ac120b9bb85416ed60eaa33f9",
+  "observed": {
+    "deployCommandEnteredPrivilegedEdge": true,
+    "firebaseCliFailureEndpointFamily": "projects/{project}/sites/{site}",
+    "hostingReadbackAfterDeploy": false,
+    "rollbackRequiredByConservativeHandler": true,
+    "rollbackAttempted": true,
+    "rollbackCreateStatus": 400,
+    "rollbackSucceeded": false,
+    "authorizationConsumed": true,
+    "firestoreWrites": 0,
+    "authWrites": 0,
+    "operationalWrites": 0,
+    "rulesDeploy": false,
+    "dataWrites": false
+  },
+  "beforeEvidence": {
+    "path": "orbit360-platform/runtime-gate-crm-v20260716/fase-a-product-hosting-before-v20260813.json",
+    "currentRelease": "sites/ays-orbit-360-lab/releases/1787786260499000",
+    "rollbackAnchor": "sites/ays-orbit-360-lab/versions/8572f3b23b9f8005",
+    "hostingReadable": true,
+    "publicReachable": true
+  },
+  "rootCause": {
+    "providerTransport": "Firebase CLI failed while making the Hosting site request before a successful release readback could be established. This is treated as an environment/provider transport failure, not a product defect.",
+    "rollbackMechanism": "The rollback helper unconditionally POSTed releases.create for the anchor after any privileged deploy attempt. If the failed deploy did not move the active release, or if the anchor became active before the POST, releases.create can return 400 and the helper falsely escalated instead of proving that the site was already safe.",
+    "actualMutationAfterFailedDeploy": "NOT_PROVEN_BY_TERMINAL; productionTouched is conservative because the handler sets the privileged flag before invoking Firebase CLI."
+  },
+  "fix": {
+    "commit": "f81d8f1f94ddaaa8a1a8d52ff7b85752652d38fa",
+    "path": "tools/orbit360-fase-a-hosting-release-helper-v20260813.mjs",
+    "behavior": [
+      "Read current Hosting release and public hashes before creating a rollback release.",
+      "Return safe no-op when current release already equals the rollback anchor and public hashes equal the before snapshot.",
+      "After a non-2xx rollback create response, re-read release and public hashes before declaring failure.",
+      "Require both public hash restoration and current release at the anchor after an actual rollback release."
+    ]
+  },
+  "stopRetryApplied": true,
+  "runtimeReexecuted": false,
+  "browserExecuted": false,
+  "secretAccess": false,
+  "firestoreRead": false,
+  "deployExecutedByFix": false,
+  "productionTouchedByFix": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
