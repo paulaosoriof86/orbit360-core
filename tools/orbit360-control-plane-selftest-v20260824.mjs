@@ -9,13 +9,15 @@ const r=spawnSync(process.execPath,[OWNER],{cwd:ROOT,encoding:'utf8',env:process
 let detail={};
 try{detail=JSON.parse(String(r.stdout||'').trim());}catch{}
 const pass=r.status===0&&detail.ok===true&&detail.status==='CONTROL_PLANE_RELEASE_READINESS_PASS'&&detail.minimalReleaseReadinessPass===true;
+const closeMode=String(process.env.ORBIT360_PUBLICATION_CLASS||'')==='CONTROL_PLANE_CLOSE';
 const out={
   ...detail,
   ok:pass,
-  status:pass?'CONTROL_PLANE_SELFTEST_PASS':'CONTROL_PLANE_SELFTEST_FAIL',
+  status:pass?(closeMode?'CONTROL_PLANE_RELEASE_READINESS_PASS':'CONTROL_PLANE_SELFTEST_PASS'):'CONTROL_PLANE_SELFTEST_FAIL',
   classification:pass?'PASS':'PIPELINE_MECHANISM_FAILURE',
   controlPlaneSelftestPass:pass,
   compatibilityEntrypoint:true,
+  closeMode,
   delegatedReleaseReadinessOwner:'tools/orbit360-release-readiness-minimal-v20260826.mjs',
   releaseReadinessStatus:detail.status||null,
   minimalReleaseReadinessPass:detail.minimalReleaseReadinessPass===true,
