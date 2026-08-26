@@ -1,0 +1,102 @@
+{
+  "schemaVersion": "orbit360-p4-go-live-browser-binder-root-cause-v1",
+  "ok": false,
+  "status": "ROOT_CAUSE_CONFIRMED_STOP_RETRY_SOURCE_ONLY",
+  "observedClassification": "DATA_CONTRACT_FAILURE",
+  "correctedClassification": "VALIDATOR_STALE",
+  "secondaryClassification": "PIPELINE_MECHANISM_FAILURE",
+  "code": "F2_BROWSER_EVIDENCE_RUN_BINDER_OMITTED_IN_RELEASE_ORCHESTRATION",
+  "runId": 33019446768,
+  "jobId": 98345891150,
+  "terminalArtifactId": 9626042117,
+  "terminalArtifactDigest": "sha256:d50d2c4ec0122d1a1ae560869a319fdc0fb0cfe69f7097d1405676ecc9fb724c",
+  "candidateArtifactId": 9504702901,
+  "candidateSourceHead": "8c9668d6d423e82826b0295431ec699390d79b4b",
+  "candidateManifestSha256": "b1c98c1faf644b5d83cfe6e6bb1a602927c438cd85b7855cb0b1a6b98c08053c",
+  "candidateZipSha256": "4a3660a18229a923412aa5a1bffc0817b1d5666c83ba96c81c92cea0fce9491c",
+  "hostingReadback": {
+    "candidateFileCount": 194,
+    "publicFileCount": 189,
+    "excludedInternalFileCount": 5,
+    "fullRemotePublicRehashPass": true,
+    "excludedInternalFilesRemainNonPublic": true
+  },
+  "browserEvidence": {
+    "path": "orbit360-platform/runtime-gate-crm-v20260716/f2-browser-run-33019446768.json",
+    "ok": true,
+    "status": "F2_PRODUCTIVE_ACCEPTANCE_RUNTIME_BROWSER_READONLY_PASS",
+    "crossTenantDenied": true,
+    "writeSignals": 0,
+    "pageErrors": 0,
+    "consoleErrors": 0,
+    "runIdPresentBeforeBinder": false,
+    "browserRunIdPresentBeforeBinder": false
+  },
+  "integrityBefore": {
+    "path": "orbit360-platform/runtime-gate-crm-v20260716/f2-data-integrity-before-run-33019446768.json",
+    "ok": true,
+    "runId": 33019446768,
+    "integrityRunId": 33019446768,
+    "firestoreRead": true,
+    "firestoreWrites": 0,
+    "authWrites": 0,
+    "operationalWrites": 0
+  },
+  "integrityAfter": {
+    "path": "orbit360-platform/runtime-gate-crm-v20260716/f2-data-integrity-after-run-33019446768.json",
+    "ok": false,
+    "status": "F2_DATA_INTEGRITY_AFTER_BROWSER_RUN_MISMATCH",
+    "browserEvidencePresent": true,
+    "firestoreRead": false,
+    "firestoreWrites": 0,
+    "authWrites": 0,
+    "operationalWrites": 0,
+    "failureOccurredBeforeDataRead": true
+  },
+  "acceptedPatternEvidence": {
+    "historicalAcceptedRunId": 32920087220,
+    "browserHarnessBlobSha": "e261dbc006581f0a34996fc8371d420d3f8a7bc7",
+    "currentBrowserHarnessBlobSha": "e261dbc006581f0a34996fc8371d420d3f8a7bc7",
+    "browserHarnessUnchanged": true,
+    "binder": "tools/orbit360-bind-f2-browser-evidence-run-v20260824.mjs",
+    "binderBlobSha": "7404e5d199058e7e35a55418d65b9feb8a58bcb7",
+    "historicalWorkflowSequence": [
+      "BROWSER_HARNESS",
+      "BIND_F2_BROWSER_EVIDENCE_CURRENT_RUN",
+      "INTEGRITY_AFTER",
+      "INTEGRITY_COMPARE"
+    ],
+    "historicalBinderStatus": "F2_BROWSER_EVIDENCE_BOUND_TO_CURRENT_RUN",
+    "historicalIntegrityStatus": "F2_INTEGRITY_BEFORE_AFTER_PASS"
+  },
+  "rootCause": {
+    "productDefect": false,
+    "dataCorruption": false,
+    "hostingFailure": false,
+    "browserHarnessRegression": false,
+    "validatorConsumerDefect": false,
+    "releaseOrchestrationOmittedAcceptedBinder": true,
+    "description": "The accepted F2 contract binds runId/browserRunId to browser evidence before integrity-after. The release orchestration invoked integrity-after directly after browser PASS, so the current-run validator correctly rejected unbound evidence."
+  },
+  "releaseTerminal": {
+    "privilegedRiskObserved": true,
+    "deployExecuted": true,
+    "productionTouched": true,
+    "productionSmokePass": false,
+    "rollbackRequired": true,
+    "rollbackExecuted": true,
+    "rollbackSucceeded": true,
+    "authorizationConsumed": true,
+    "authorizationReusable": false,
+    "firestoreWrites": 0,
+    "authWrites": 0,
+    "operationalWrites": 0,
+    "rulesDeploy": false,
+    "dataWrites": false
+  },
+  "stopRetryApplied": true,
+  "runtimeReexecutionAllowed": false,
+  "sourceOnlyRootfixRequired": true,
+  "containsPII": false,
+  "containsSecrets": false
+}
