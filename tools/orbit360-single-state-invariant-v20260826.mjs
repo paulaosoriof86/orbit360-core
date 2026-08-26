@@ -22,8 +22,9 @@ function validCurrentMilestone(L){
   const phase=String(L.activeState?.phase||''),status=String(L.activeState?.status||''),progress=Number(L.progress?.productionRouteProgressPct),next=String(L.nextAction?.id||'');
   const p1Required=phase==='F2_TERMINAL_PASS_P1_SOURCE_ONLY_REQUIRED_BEFORE_GO_LIVE'&&status==='F2_TERMINAL_PASS'&&progress===85&&next==='P1_FIX_SINGLE_STATE_DUPLICATE_CLAIM_AND_SEPARATE_STATIC_INVARIANT_FROM_BEHAVIORAL_SELFTEST_SOURCE_ONLY';
   const p1Pass=phase==='SINGLE_STATE_ROOTFIX_PASS_P2_RELEASE_HANDLER_REQUIRED'&&status==='SINGLE_STATE_ROOTFIX_PASS'&&progress===88&&next==='P2_IMPLEMENT_GO_LIVE_RELEASE_HANDLER_AND_PROVE_DRY_RUN_ROLLBACK_SOURCE_ONLY';
+  const p2Pass=phase==='GO_LIVE_RELEASE_HANDLER_READY_P3_HANDSHAKE_REQUIRED'&&status==='GO_LIVE_RELEASE_HANDLER_READY'&&progress===91&&next==='P3_RUN_FINAL_SOURCE_ONLY_HANDSHAKE_AND_SEAL_CONTROL_PLANE_BASELINE';
   const legacy=phase==='F2_TERMINAL_PASS_AWAITING_AUTHORIZED_GO_LIVE'&&status==='F2_TERMINAL_PASS'&&progress===85&&next==='AWAIT_EXPLICIT_GO_LIVE_AUTHORIZATION';
-  return p1Required||p1Pass||legacy;
+  return p1Required||p1Pass||p2Pass||legacy;
 }
 
 try{
@@ -37,7 +38,7 @@ try{
   if(!T(PROJ).includes('SINGLE_STATE_COMPATIBILITY_NO_MUTATION')||!T(PROJA).includes('SINGLE_STATE_COMPATIBILITY_NO_MUTATION'))fail('SINGLE_STATE_PROJECTION_NOT_RETIRED');
   for(const p of pointers){const t=T(p);if(/"ledgerRevision"|"packageRevision"|productionRouteProgressPct|AWAIT_EXPLICIT_GO_LIVE_AUTHORIZATION|F2_TERMINAL_PASS_AWAITING_AUTHORIZED_GO_LIVE/.test(t))fail(`SINGLE_STATE_POINTER_CONTAINS_DYNAMIC_STATE:${p}`);}
   if(L.progress?.f2TerminalPass===true){
-    if(!validCurrentMilestone(L))fail('SINGLE_STATE_LEDGER_F2_OR_P1_STATE_INVALID');
+    if(!validCurrentMilestone(L))fail('SINGLE_STATE_LEDGER_F2_P1_OR_P2_STATE_INVALID');
     if(L.authorizationBoundary?.activeRuntimeAuthorization!==false||L.authorizationBoundary?.activeRequestPath!=null||L.authorizationBoundary?.authorizationRecordPath!=null)fail('SINGLE_STATE_LEDGER_ACTIVE_AUTH_INVALID');
     const e=L.continuityControl?.latestDurableEvidence;
     if(Number(e?.runId)!==32920087220||e?.type!=='F2_TERMINAL_PASS_ARTIFACT')fail('SINGLE_STATE_LEDGER_TERMINAL_POINTER_INVALID');
