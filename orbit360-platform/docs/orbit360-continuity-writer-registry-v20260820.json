@@ -1,7 +1,7 @@
 {
   "schemaVersion": "orbit360-continuity-writer-registry-v22-single-state",
   "registryId": "ORBIT360-CONTINUITY-WRITER-REGISTRY",
-  "revision": 32,
+  "revision": 33,
   "active": true,
   "status": "SINGLE_STATE_LEDGER_ONLY_CONTROL_PLANE",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -41,8 +41,8 @@
     "GO_LIVE_RELEASE_WINDOW": {
       "capabilityClass": "RELEASE",
       "stateMutation": "CLAIM_TERMINAL",
-      "handler": null,
-      "handlerReady": false,
+      "handler": "tools/orbit360-go-live-release-handler-v20260826.mjs",
+      "handlerReady": true,
       "requiresExplicitUserAuthorization": true,
       "bindCandidate": true,
       "requiredScope": {
@@ -58,6 +58,21 @@
         "dataWrites": false,
         "main": false,
         "merge": false
+      },
+      "releaseHandlerContract": {
+        "candidateIdentityFromLedger": true,
+        "manifestFullRehashBeforeRisk": true,
+        "targetDerivedFromCandidateConfig": true,
+        "hostingOnlyDeploy": true,
+        "rulesDeploy": false,
+        "snapshotBeforeAfter": true,
+        "browserSmokeReusesF2Harness": true,
+        "crossTenantDeniedRequired": true,
+        "rollbackAnchorCapturedBeforeRisk": true,
+        "exactPriorHostingReleaseRollback": true,
+        "authorizationConsumedAtPrivilegedEdgeOnly": true,
+        "preRiskFailurePreservesAuthorization": true,
+        "terminalEvidenceRunScoped": true
       },
       "from": {
         "phase": "F2_TERMINAL_PASS_AWAITING_AUTHORIZED_GO_LIVE",
@@ -102,6 +117,8 @@
     "executionBranchMayContainExactlyOneIntentCommit": true,
     "canonicalClaimMustCASBeforePrivilegedRisk": true,
     "duplicateExecutionFailsAfterFirstClaim": true,
+    "authorizationConsumedAtPrivilegedEdgeOnly": true,
+    "preRiskFailurePreservesAuthorization": true,
     "terminalEvidenceMustBeRunScoped": true,
     "terminalReductionWritesLedgerOnly": true,
     "remoteHeadCompareAndSwapRequired": true,
