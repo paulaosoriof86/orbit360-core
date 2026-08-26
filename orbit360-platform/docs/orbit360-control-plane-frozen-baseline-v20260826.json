@@ -17,8 +17,22 @@
     "tools/orbit360-go-live-release-handler-v20260826.mjs": "962e94c70a97e37c244d8f071ebbd65956866f26",
     "tools/orbit360-control-plane-publication-preflight-v20260825.mjs": "65a7d2ead248886bab61d00f5f914c8dbd05099c",
     "tools/orbit360-control-plane-transport-contract-v20260826.json": "d527de5e6c23086043a78e59b36f364be46610c4",
-    "tools/orbit360-f2-productive-acceptance-runtime-browser-readonly-v20260818.mjs": "e261dbc006581f0a34996fc8371d420d3f8a7bc7",
-    "tools/orbit360-control-plane-baseline-seal-v20260826.mjs": "67e29ce765e1b776d7b16113a1989215995869e4"
+    "tools/orbit360-f2-productive-acceptance-runtime-browser-readonly-v20260818.mjs": "e261dbc006581f0a34996fc8371d420d3f8a7bc7"
+  },
+  "evidenceCorrection": {
+    "correctedAtUtc": "2026-08-26T21:40:00Z",
+    "classification": "VALIDATOR_STALE",
+    "code": "P3_BASELINE_EVIDENCE_TEMPORARY_SEALER_IDENTITY_STALE",
+    "cause": "The temporary baseline sealer was created after the consumed P3 handshake and was not part of the active control-plane validated by run 33013712604.",
+    "fix": "Removed the temporary sealer identity from the frozen active-source set after direct Git blob readback of every active control-plane component.",
+    "activeSourceIdentityCount": 8,
+    "allActiveSourceIdentitiesReadbackMatch": true,
+    "p3HandshakeReexecuted": false,
+    "p3ReplayAllowed": false,
+    "productTouched": false,
+    "dataTouched": false,
+    "runtimeExecuted": false,
+    "deployExecuted": false
   },
   "candidateIdentity": {
     "artifactId": 9504702901,
