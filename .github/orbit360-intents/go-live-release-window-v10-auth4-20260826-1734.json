@@ -1,0 +1,36 @@
+{
+  "schemaVersion": "orbit360-execution-intent-v1",
+  "transitionId": "GO_LIVE_RELEASE_WINDOW",
+  "canonicalBaseHead": "6f091c5ce5886157d08ae1d09ee9c5198f71b3aa",
+  "expectedLedgerRevision": 103,
+  "oneShotOnly": true,
+  "replayAllowed": false,
+  "explicitUserAuthorization": true,
+  "authorizationDigest": "7c3497ce7c7bf562ed84364d450f796cc2a3157276ceed854112ccc6355e60b4",
+  "candidateArtifactId": 9504702901,
+  "candidateSourceHead": "8c9668d6d423e82826b0295431ec699390d79b4b",
+  "candidateManifestSha256": "b1c98c1faf644b5d83cfe6e6bb1a602927c438cd85b7855cb0b1a6b98c08053c",
+  "candidateZipSha256": "4a3660a18229a923412aa5a1bffc0817b1d5666c83ba96c81c92cea0fce9491c",
+  "target": {
+    "projectId": "ays-orbit-360-lab",
+    "tenantId": "alianzas-soluciones",
+    "liveUrl": "https://ays-orbit-360-lab.web.app",
+    "siteId": "ays-orbit-360-lab"
+  },
+  "scope": {
+    "runtime": true,
+    "browser": true,
+    "secrets": true,
+    "firestoreRead": true,
+    "deploy": true,
+    "production": true,
+    "firestoreWrites": false,
+    "authWrites": false,
+    "operationalWrites": false,
+    "dataWrites": false,
+    "main": false,
+    "merge": false
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
