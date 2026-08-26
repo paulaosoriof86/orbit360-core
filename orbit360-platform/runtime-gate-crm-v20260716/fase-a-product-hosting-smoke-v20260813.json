@@ -1,6 +1,6 @@
 {
   "schemaVersion": "orbit360-fase-a-hosting-smoke-v1",
-  "generatedAt": "2026-08-26T22:23:14.434Z",
+  "generatedAt": "2026-08-26T23:11:53.760Z",
   "projectId": "ays-orbit-360-lab",
   "liveUrl": "https://ays-orbit-360-lab.web.app",
   "artifact": "orbit360-artifacts/fase-a-product",
@@ -10,18 +10,30 @@
     "siteName": "projects/ays-orbit-360-lab/sites/ays-orbit-360-lab",
     "defaultUrl": "https://ays-orbit-360-lab.web.app",
     "currentRelease": {
-      "name": "sites/ays-orbit-360-lab/releases/1787782991899000",
-      "version": "sites/ays-orbit-360-lab/versions/ceeb31e1f4ae444e",
+      "name": "sites/ays-orbit-360-lab/releases/1787785911159000",
+      "version": "sites/ays-orbit-360-lab/versions/6e0d58b70ae1ca71",
       "type": "DEPLOY",
-      "releaseTime": "2026-08-26T22:23:11.899Z"
+      "releaseTime": "2026-08-26T23:11:51.159Z"
     },
     "previousRelease": {
-      "name": "sites/ays-orbit-360-lab/releases/1787781471358000",
+      "name": "sites/ays-orbit-360-lab/releases/1787783313944000",
       "version": "sites/ays-orbit-360-lab/versions/8572f3b23b9f8005",
       "type": "ROLLBACK",
-      "releaseTime": "2026-08-26T21:57:51.358Z"
+      "releaseTime": "2026-08-26T22:28:33.944Z"
     },
     "releases": [
+      {
+        "name": "sites/ays-orbit-360-lab/releases/1787785911159000",
+        "version": "sites/ays-orbit-360-lab/versions/6e0d58b70ae1ca71",
+        "type": "DEPLOY",
+        "releaseTime": "2026-08-26T23:11:51.159Z"
+      },
+      {
+        "name": "sites/ays-orbit-360-lab/releases/1787783313944000",
+        "version": "sites/ays-orbit-360-lab/versions/8572f3b23b9f8005",
+        "type": "ROLLBACK",
+        "releaseTime": "2026-08-26T22:28:33.944Z"
+      },
       {
         "name": "sites/ays-orbit-360-lab/releases/1787782991899000",
         "version": "sites/ays-orbit-360-lab/versions/ceeb31e1f4ae444e",
@@ -69,18 +81,6 @@
         "version": "sites/ays-orbit-360-lab/versions/8572f3b23b9f8005",
         "type": "DEPLOY",
         "releaseTime": "2026-08-11T22:55:10.394Z"
-      },
-      {
-        "name": "sites/ays-orbit-360-lab/releases/1786469990659000",
-        "version": "sites/ays-orbit-360-lab/versions/1e98b26c82c4171d",
-        "type": "ROLLBACK",
-        "releaseTime": "2026-08-11T17:39:50.659Z"
-      },
-      {
-        "name": "sites/ays-orbit-360-lab/releases/1786469444257000",
-        "version": "sites/ays-orbit-360-lab/versions/00add7a127cec488",
-        "type": "DEPLOY",
-        "releaseTime": "2026-08-11T17:30:44.257Z"
       }
     ],
     "ok": true
