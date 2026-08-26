@@ -1,6 +1,6 @@
 {
   "schemaVersion": "orbit360-control-plane-canonicality-contract-v2",
-  "contractVersion": "2.1.0-20260826",
+  "contractVersion": "2.2.0-20260826",
   "status": "ACTIVE_CANONICAL_CONVERGENCE_CONTRACT",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -15,12 +15,16 @@
   "transportContract": "tools/orbit360-control-plane-transport-contract-v20260826.json",
   "transportRunbook": "orbit360-platform/docs/CONTROL-PLANE-TRANSPORT-CONTRACT-20260826.md",
   "academiaTransportDelta": "orbit360-platform/docs/ACADEMIA-DELTA-CONTROL-PLANE-TRANSPORT-20260826.md",
+  "terminalArtifactRecoveryAcademiaDelta": "orbit360-platform/docs/ACADEMIA-DELTA-F2-TERMINAL-ARTIFACT-RECOVERY-20260826.md",
   "durableEvidence": {
     "macro2CandidateMetadata": "orbit360-platform/runtime-gate-crm-v20260716/f2-successor-candidate-artifact-metadata-v20260824.json",
     "controlPlaneHandshake": "orbit360-platform/runtime-gate-crm-v20260716/control-plane-selftest-handshake-run-32914461679-v20260824.json",
     "controlPlaneHandshakeRunId": 32914461679,
     "externalArtifactMustBeVerifiedFromGitHubActionsBeforeReduction": true,
-    "runtimeEvidenceMustBeRunScoped": true
+    "runtimeEvidenceMustBeRunScoped": true,
+    "terminalArtifactRecoveryMustBindReservedRuntimeRun": true,
+    "terminalArtifactRecoveryMustVerifyArtifactDigest": true,
+    "terminalArtifactRecoveryMayCopyOnlySanitizedTerminalIntoCanonicalEvidence": true
   },
   "componentIdentityPolicy": {
     "hardcodedComponentShaBindingsForbidden": true,
@@ -72,12 +76,22 @@
     "intentMustBeFullyMaterializedWhileTechnicalPrClosed": true,
     "exactlyOneSynchronizeMutationAfterReopen": true,
     "staleTransportEventMustFailClosedWithoutRetry": true,
-    "staleTransportEventMayNotConsumeAuthorization": true
+    "staleTransportEventMayNotConsumeAuthorization": true,
+    "currentChangedTerminalEvidenceMustPrecedeHistoricalTerminalPointers": true,
+    "ambiguousChangedTerminalEvidenceMustFailClosed": true,
+    "terminalArtifactRecoveryMustNotExecuteRuntime": true,
+    "terminalArtifactRecoveryMustNotExecuteBrowser": true,
+    "terminalArtifactRecoveryMustNotAccessSecrets": true,
+    "terminalArtifactRecoveryMustNotReadFirestore": true,
+    "terminalArtifactRecoveryMustNotReplayConsumedOrRiskEnteredAuthorization": true,
+    "terminalArtifactRecoveryMustUseExistingGenericTerminalOwner": true,
+    "terminalArtifactRecoveryMustPublishThroughExistingCasPublicationOwner": true
   },
   "repairBootstrap": {
     "forensicAudit": "orbit360-platform/docs/AUDITORIA-FORENSE-CONTROL-PLANE-ORBIT360-AYS-20260824.md",
     "controlPlaneHandshakeEvidence": "orbit360-platform/runtime-gate-crm-v20260716/control-plane-selftest-handshake-run-32914461679-v20260824.json",
     "repairTransition": "CONTROL_PLANE_HARDENING_CLOSE",
+    "terminalArtifactRecoveryMode": "F2_TERMINAL_ARTIFACT_RECONCILE",
     "candidateReuseRequired": true,
     "newWorkflowVariant": false,
     "newRequestChain": false,
