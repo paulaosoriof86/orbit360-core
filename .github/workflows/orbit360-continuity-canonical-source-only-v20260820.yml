@@ -73,11 +73,18 @@ jobs:
 
       - name: Run source-only single-state selftest
         if: steps.inspect.outputs.transition == 'CONTROL_PLANE_SELFTEST'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ORBIT360_RELEASE_HANDLER_SELFTEST_OUT: ${{ runner.temp }}/release-handler-selftest.json
         shell: bash
         run: |
           set -euo pipefail
           node "$ORBIT360_OWNER" --selftest | tee "$RUNNER_TEMP/single-state-selftest.json"
           jq -e '.ok==true and .status=="SINGLE_STATE_CONTROL_PLANE_SELFTEST_PASS" and .projectionWrites==0 and .secondClaimBlocked==true and .staleRevisionBlocked==true' "$RUNNER_TEMP/single-state-selftest.json" >/dev/null
+          RELEASE_HANDLER=$(jq -r '.executionTransitions.GO_LIVE_RELEASE_WINDOW.handler // empty' "$ORBIT360_REGISTRY")
+          test -n "$RELEASE_HANDLER" && test -f "$RELEASE_HANDLER"
+          node "$RELEASE_HANDLER" --source-only-selftest --out "$ORBIT360_RELEASE_HANDLER_SELFTEST_OUT"
+          jq -e '.ok==true and .status=="GO_LIVE_RELEASE_HANDLER_SOURCE_ONLY_PASS" and .handlerReady==true and .fullRehashPass==true and .targetDerivedFromCandidate==true and .releasePlanPass==true and .hostingOnlyDeploy==true and .rulesDeploy==false and .rollbackPreflightPass==true and .authorizationConsumed==false and .privilegedRiskObserved==false and .secretAccess==false and .firestoreRead==false and .deployExecuted==false and .productionTouched==false' "$ORBIT360_RELEASE_HANDLER_SELFTEST_OUT" >/dev/null
           node "$ORBIT360_INVARIANT"
           test -z "$(git status --porcelain)"
 
@@ -103,6 +110,7 @@ jobs:
         name: Execute registered handler only after canonical claim
         if: steps.inspect.outputs.state_mutation == 'CLAIM_TERMINAL' && steps.claim.outcome == 'success'
         env:
+          GH_TOKEN: ${{ github.token }}
           ORBIT360_EXECUTION_INTENT: ${{ runner.temp }}/orbit360-intent.json
           ORBIT360_EXECUTION_RUN_ID: ${{ github.run_id }}
           ORBIT360_TERMINAL_EVIDENCE: ${{ runner.temp }}/orbit360-terminal.json
@@ -142,6 +150,7 @@ jobs:
           path: |
             ${{ runner.temp }}/inspect.json
             ${{ runner.temp }}/single-state-selftest.json
+            ${{ runner.temp }}/release-handler-selftest.json
             ${{ runner.temp }}/orbit360-terminal.json
           if-no-files-found: ignore
           retention-days: 14
