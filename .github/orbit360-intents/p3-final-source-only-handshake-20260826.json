@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "orbit360-execution-intent-v1",
+  "transitionId": "CONTROL_PLANE_SELFTEST",
+  "canonicalBaseHead": "7c101199cdf3ab9a485178aa8738ebfe33e92e2f",
+  "expectedLedgerRevision": 90,
+  "oneShotOnly": true,
+  "replayAllowed": false,
+  "explicitUserAuthorization": false,
+  "authorizationDigest": "",
+  "scope": {},
+  "containsPII": false,
+  "containsSecrets": false
+}
