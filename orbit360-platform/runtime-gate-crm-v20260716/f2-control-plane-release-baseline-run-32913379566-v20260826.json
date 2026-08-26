@@ -1,0 +1,72 @@
+{
+  "schemaVersion": "orbit360-f2-control-plane-release-baseline-v1-20260826",
+  "ok": true,
+  "status": "INITIAL_F2_RELEASE_BASELINE_VALIDATED_WITH_RECOVERY_HARNESS_NONBLOCKING",
+  "classification": "PASS_WITH_NONBLOCKING_RECOVERY_DIAGNOSTIC",
+  "runId": 32913379566,
+  "jobId": 98011857647,
+  "technicalPullRequest": 138,
+  "canonicalBaseHead": "7df8b87d1a89deaf0cd19e295ffe40320284cb82",
+  "candidateArtifactId": 9504702901,
+  "candidateSourceHead": "8c9668d6d423e82826b0295431ec699390d79b4b",
+  "validated": {
+    "candidateBindingDynamic": true,
+    "semanticPreflightPass": true,
+    "exactF2SourcePathExecuted": true,
+    "classWidePreAuthEvidenceLifecyclePass": true,
+    "classWidePreTerminalEvidenceLifecyclePass": true,
+    "arbitraryFutureFilenameCleanupPass": true,
+    "preProviderGatePathPass": true,
+    "projectionImmutabilityPass": true,
+    "remoteCASReadbackPass": true,
+    "secondAttemptStopRetryPass": true,
+    "workflowProviderUngatedNegativePass": true,
+    "workflowCandidateHardcodeNegativePass": true,
+    "workflowOperationalRevisionHardcodeNegativePass": true,
+    "sourceWriteGuardBehavioralPass": true,
+    "temporaryInfrastructureAllowedPass": true,
+    "actualSourceWriteNegativePass": true,
+    "sourceRewriteMutationNegativePass": true,
+    "authPublicationSurfacePass": true,
+    "runtimeRunIdBindingSimulationPass": true,
+    "runtimeRegisterReadOnlyPass": true,
+    "routerNativeRuntimeContractPass": true,
+    "authorizationLifecyclePass": true,
+    "authorizationReservationDoesNotConsumePass": true,
+    "preRiskAuthorizationPreservationPass": true,
+    "historicalRun329028RegressionPass": true,
+    "historicalRun329044RegressionPass": true
+  },
+  "nonBlockingDiagnosticFailure": {
+    "preRiskAuthorizationReuseSyntheticLoopPass": false,
+    "failureCodes": [
+      "SCRATCH_PRE_RISK_AUTHORIZATION_REUSE_FAIL",
+      "SCRATCH_PRE_RISK_REQUEST_REUSE_FAIL",
+      "SCRATCH_AUTHORIZATION_LIFECYCLE_STATE_INVALID"
+    ],
+    "scope": "SYNTHETIC_RECOVERY_AFTER_HYPOTHETICAL_PRE_RISK_FAILURE",
+    "blocksInitialF2Readiness": false,
+    "runtimeRecoveryPolicyStillFailClosed": true
+  },
+  "criticalFilesBoundToThisEvidence": [
+    "tools/orbit360-validar-gate-contracts-v20260717.mjs",
+    "tools/orbit360-register-f2-productive-acceptance-runtime-v20260819.mjs",
+    "tools/orbit360-f2-gate-semantic-v20260824.mjs",
+    "tools/orbit360-f2-authorization-lifecycle-v20260825.mjs"
+  ],
+  "sideEffects": {
+    "authorizationMaterialized": false,
+    "requestMaterialized": false,
+    "runtimeExecuted": false,
+    "browserExecuted": false,
+    "secretAccess": false,
+    "firestoreRead": false,
+    "firestoreWrites": 0,
+    "authWrites": 0,
+    "operationalWrites": 0,
+    "deployExecuted": false,
+    "productionTouched": false
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
