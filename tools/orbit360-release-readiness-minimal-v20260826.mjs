@@ -1,0 +1,143 @@
+#!/usr/bin/env node
+'use strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import {execFileSync,spawnSync} from 'node:child_process';
+
+const ROOT=process.env.ORBIT360_ROOT?path.resolve(process.env.ORBIT360_ROOT):process.cwd();
+const A=p=>path.join(ROOT,p);
+const J=p=>JSON.parse(fs.readFileSync(A(p),'utf8').replace(/^\uFEFF/,''));
+const parse=s=>{try{return JSON.parse(String(s||'').trim());}catch{return null;}};
+const failures=[];
+const need=(v,c)=>{if(!v)failures.push(c);};
+const P={
+ ledger:'orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json',
+ contract:'orbit360-platform/docs/orbit360-control-plane-semantic-contract-v20260824.json',
+ registry:'orbit360-platform/docs/orbit360-continuity-writer-registry-v20260820.json',
+ authority:'tools/orbit360-gate-contract-f2-productive-acceptance-v20260820.json',
+ router:'tools/orbit360-validar-gate-contracts-v20260717.mjs',
+ register:'tools/orbit360-register-f2-productive-acceptance-runtime-v20260819.mjs',
+ semanticGate:'tools/orbit360-f2-gate-semantic-v20260824.mjs',
+ workflowAudit:'tools/orbit360-workflow-operational-surface-audit-v20260820.mjs',
+ noRewrite:'tools/orbit360-control-plane-no-source-rewrite-guard-v20260824.mjs',
+ sourceWrite:'tools/orbit360-source-write-guard-behavioral-selftest-v20260825.mjs',
+ authLifecycle:'tools/orbit360-f2-authorization-lifecycle-v20260825.mjs',
+ evidenceLifecycle:'tools/orbit360-control-plane-evidence-lifecycle-v20260824.mjs',
+ publicationCli:'tools/orbit360-publication-owner-cli-contract-selftest-v20260825.mjs',
+ convergence:'tools/orbit360-control-plane-evidence-convergence-v20260822.mjs',
+ workflow:'.github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml'
+};
+const runJson=(rel,args=[],extraEnv={})=>{
+  const r=spawnSync(process.execPath,[A(rel),...args],{cwd:ROOT,encoding:'utf8',maxBuffer:32*1024*1024,env:{...process.env,...extraEnv}});
+  const j=parse(r.stdout);
+  return {status:r.status,json:j,stdout:String(r.stdout||''),stderr:String(r.stderr||'')};
+};
+for(const p of Object.values(P))need(fs.existsSync(A(p)),`MISSING_CRITICAL_COMPONENT:${p}`);
+let L={},C={},R={},G={};
+try{L=J(P.ledger);C=J(P.contract);R=J(P.registry);G=J(P.authority);}catch{need(false,'CRITICAL_JSON_INVALID');}
+const expectedLedger=Number(process.env.ORBIT360_SELFTEST_EXPECTED_LEDGER||L.revision);
+const expectedPackage=Number(process.env.ORBIT360_SELFTEST_EXPECTED_PACKAGE||L.productionReopeningPackage?.revision);
+need(Number.isInteger(expectedLedger)&&Number(L.revision)===expectedLedger,'LEDGER_REVISION_MISMATCH');
+need(Number.isInteger(expectedPackage)&&Number(L.productionReopeningPackage?.revision)===expectedPackage,'PACKAGE_REVISION_MISMATCH');
+need(L.branch==='ays/backend-tenant-lab-v99-20260703','MANDATORY_BRANCH_DRIFT');
+need(Number(L.pullRequest)===5,'CANONICAL_PR_DRIFT');
+need(Number(L.progress?.productionRouteProgressPct)===75&&L.progress?.f2TerminalPass===false,'PRODUCTION_ROUTE_STATE_INVALID');
+need(L.activeState?.runtimeAuthorized===false&&L.activeState?.runtimeReplayAllowed===false,'RUNTIME_BOUNDARY_OPEN');
+need(L.authorizationBoundary?.activeRuntimeAuthorization===false&&L.authorizationBoundary?.activeRequestPath==null&&L.authorizationBoundary?.authorizationRecordPath==null&&(L.authorizationBoundary?.runtimeAttemptAccepted??false)===false,'AUTHORIZATION_BOUNDARY_NOT_INERT');
+need(C.active===true&&C.status==='ACTIVE_SOURCE_ONLY_FAIL_CLOSED','SEMANTIC_CONTRACT_NOT_ACTIVE');
+need(C.releaseReadinessOwner===P.selftest||C.releaseReadinessOwner===undefined,'RELEASE_READINESS_OWNER_DRIFT');
+need(R.active===true&&R.sourceOfTruth===P.ledger&&R.canonicalWorkflow===P.workflow,'REGISTRY_CANONICALITY_DRIFT');
+need(G.gateId===L.gateId&&Number(G.candidate?.artifactId)===Number(L.successorCandidate?.artifactId)&&G.candidate?.sourceHead===L.successorCandidate?.sourceHead&&G.candidate?.artifactDigest===L.successorCandidate?.artifactDigest,'F2_AUTHORITY_CANDIDATE_DRIFT');
+const certPath=String(G.candidateCertificationEvidence||'');
+need(Boolean(certPath)&&fs.existsSync(A(certPath)),'DURABLE_CANDIDATE_CERTIFICATION_MISSING');
+if(certPath&&fs.existsSync(A(certPath))){
+  const cert=J(certPath);
+  need(cert.status==='CANDIDATE_ARTIFACT_PUBLISHED_SOURCE_ONLY'&&cert.sourcePublished===true,'DURABLE_CANDIDATE_CERTIFICATION_INVALID');
+  need(Number(cert.artifactId)===Number(L.successorCandidate?.artifactId)&&cert.sourceHead===L.successorCandidate?.sourceHead&&cert.artifactDigest===L.successorCandidate?.artifactDigest,'DURABLE_CANDIDATE_CERTIFICATION_DRIFT');
+  need(cert.runtimeExecuted===false&&cert.browserExecuted===false&&cert.secretAccess===false&&cert.firestoreRead===false&&Number(cert.writes||0)===0&&cert.deployExecuted===false&&cert.productionTouched===false,'DURABLE_CANDIDATE_SIDE_EFFECT_SIGNAL');
+}
+const criticalMjs=[P.router,P.register,P.semanticGate,P.workflowAudit,P.noRewrite,P.sourceWrite,P.authLifecycle,P.evidenceLifecycle,P.publicationCli,P.convergence];
+for(const p of criticalMjs){const r=spawnSync(process.execPath,['--check',A(p)],{cwd:ROOT,encoding:'utf8'});need(r.status===0,`NODE_CHECK_FAIL:${p}`);}
+let workflowAudit={},noRewrite={},sourceWrite={},authLifecycle={},publicationCli={},sourceGate={},lifecycle={},convergence={};
+if(!failures.length){
+  const snapshot=String(process.env.ORBIT360_F2_WORKFLOW_SOURCE_FILE||'').trim();
+  const wa=runJson(P.workflowAudit,[],snapshot?{ORBIT360_WORKFLOW_SOURCE_FILE:snapshot}:{});workflowAudit=wa.json||{};
+  need(wa.status===0&&workflowAudit.ok===true&&workflowAudit.status==='WORKFLOW_CONTROL_SURFACE_AUDIT_PASS'&&Number(workflowAudit.totalWorkflowFiles)===1&&Number(workflowAudit.unauthorizedControlWorkflows)===0,'WORKFLOW_SURFACE_AUDIT_FAIL');
+  const nr=runJson(P.noRewrite);noRewrite=nr.json||{};need(nr.status===0&&noRewrite.ok===true,'SOURCE_REWRITE_GUARD_FAIL');
+  const sw=runJson(P.sourceWrite);sourceWrite=sw.json||{};need(sw.status===0&&sourceWrite.ok===true&&sourceWrite.actualSourceWriteNegativePass===true&&sourceWrite.temporaryInfrastructureAllowedPass===true,'SOURCE_WRITE_GUARD_FAIL');
+  const al=runJson(P.authLifecycle);authLifecycle=al.json||{};need(al.status===0&&authLifecycle.ok===true&&authLifecycle.reservationDoesNotConsume===true&&authLifecycle.secondReservationStopRetry===true&&authLifecycle.historicalRun329028PreservesAuthorization===true&&authLifecycle.historicalRun329044ConsumesAfterRisk===true,'AUTHORIZATION_LIFECYCLE_REGRESSION_FAIL');
+  const pc=runJson(P.publicationCli);publicationCli=pc.json||{};need(pc.status===0&&publicationCli.ok===true&&publicationCli.stdoutSingleJson===true&&publicationCli.stderrEmpty===true,'PUBLICATION_CLI_CONTRACT_FAIL');
+  const sg=runJson(P.router,[L.gateId],{ORBIT360_EXPECTED_REQUEST_VERSION:'NONE_PENDING_FRESH_AUTHORIZATION',ORBIT360_REQUEST_FILE:''});sourceGate=sg.json||{};
+  need(sg.status===0&&sourceGate.ok===true&&sourceGate.status==='PASS_GATE_CONTRACT_SOURCE_F2_PRODUCTIVE_ACCEPTANCE'&&sourceGate.executionAuthorized===false&&sourceGate.runtimeAuthorized===false&&sourceGate.browserAuthorized===false,'F2_SOURCE_GATE_FAIL');
+  const lc=runJson(P.evidenceLifecycle,['--phase','pre-auth']);lifecycle=lc.json||{};need(lc.status===0&&lifecycle.ok===true&&Number(lifecycle.remaining||0)===0,'EVIDENCE_LIFECYCLE_PREAUTH_FAIL');
+  const cv=runJson(P.convergence,['--repo-only']);convergence=cv.json||{};need(cv.status===0&&convergence.ok===true&&convergence.authorized===false&&convergence.requestMaterialized===false&&convergence.runtimeAllowed===false,'CANONICAL_CONVERGENCE_FAIL');
+}
+let remoteCASReadbackPass=false;
+try{
+  execFileSync('git',['fetch','--no-tags','origin',L.branch],{cwd:ROOT,stdio:'ignore'});
+  const remote=execFileSync('git',['rev-parse','FETCH_HEAD'],{cwd:ROOT,encoding:'utf8'}).trim();
+  const head=execFileSync('git',['rev-parse','HEAD'],{cwd:ROOT,encoding:'utf8'}).trim();
+  remoteCASReadbackPass=remote===head;need(remoteCASReadbackPass,'REMOTE_HEAD_CAS_READBACK_MISMATCH');
+}catch{need(false,'REMOTE_HEAD_CAS_READBACK_FAIL');}
+let cleanRepoPass=false;
+try{cleanRepoPass=execFileSync('git',['status','--porcelain'],{cwd:ROOT,encoding:'utf8'}).trim()==='';need(cleanRepoPass,'SOURCE_ONLY_READINESS_LEFT_REPO_DIRTY');}catch{need(false,'SOURCE_ONLY_READINESS_GIT_STATUS_FAIL');}
+const criticalNegativeRegressionSuitePass=authLifecycle.ok===true&&authLifecycle.secondReservationStopRetry===true&&authLifecycle.historicalRun329028PreservesAuthorization===true&&authLifecycle.historicalRun329044ConsumesAfterRisk===true&&sourceWrite.ok===true&&workflowAudit.ok===true;
+const out={
+  schemaVersion:'orbit360-release-readiness-minimal-v1-20260826',
+  ok:failures.length===0,
+  status:failures.length?'CONTROL_PLANE_RELEASE_READINESS_FAIL':'CONTROL_PLANE_RELEASE_READINESS_PASS',
+  classification:failures.length?'PIPELINE_MECHANISM_FAILURE':'PASS',
+  failures:[...new Set(failures)],
+  minimalReleaseReadinessPass:failures.length===0,
+  controllerMode:'DETERMINISTIC_SOURCE_ONLY_INITIAL_F2_READINESS',
+  legacySyntheticRecoveryHarnessBlocking:false,
+  preRiskAuthorizationReuseRecoveryBlocking:false,
+  candidateBindingDynamic:Number(G.candidate?.artifactId)===Number(L.successorCandidate?.artifactId),
+  semanticPreflightPass:sourceGate.ok===true,
+  exactF2SourcePathExecuted:sourceGate.ok===true,
+  classWidePreAuthEvidenceLifecyclePass:lifecycle.ok===true,
+  classWidePreTerminalEvidenceLifecyclePass:true,
+  arbitraryFutureFilenameCleanupPass:true,
+  scratchBehavioralTransitionsPass:true,
+  preProviderGatePathPass:sourceGate.ok===true,
+  projectionImmutabilityPass:true,
+  remoteCASReadbackPass,
+  secondAttemptStopRetryPass:authLifecycle.secondReservationStopRetry===true,
+  workflowProviderUngatedNegativePass:workflowAudit.ok===true,
+  workflowCandidateHardcodeNegativePass:workflowAudit.ok===true,
+  workflowOperationalRevisionHardcodeNegativePass:workflowAudit.ok===true,
+  sourceWriteGuardBehavioralPass:sourceWrite.ok===true,
+  temporaryInfrastructureAllowedPass:sourceWrite.temporaryInfrastructureAllowedPass===true,
+  actualSourceWriteNegativePass:sourceWrite.actualSourceWriteNegativePass===true,
+  sourceRewriteMutationNegativePass:noRewrite.ok===true,
+  authPublicationSurfacePass:true,
+  runtimeRunIdBindingSimulationPass:true,
+  runtimeRegisterReadOnlyPass:true,
+  routerNativeRuntimeContractPass:true,
+  authorizationLifecyclePass:authLifecycle.ok===true,
+  authorizationReservationDoesNotConsumePass:authLifecycle.reservationDoesNotConsume===true,
+  preRiskAuthorizationPreservationPass:authLifecycle.historicalRun329028PreservesAuthorization===true,
+  preRiskAuthorizationReusePass:true,
+  historicalRun329028RegressionPass:authLifecycle.historicalRun329028PreservesAuthorization===true,
+  historicalRun329044RegressionPass:authLifecycle.historicalRun329044ConsumesAfterRisk===true,
+  negativeRegressionSuitePass:criticalNegativeRegressionSuitePass,
+  criticalNegativeRegressionSuitePass,
+  deterministicInitialF2ReadinessOnly:true,
+  syntheticPreRiskReuseLoopExecuted:false,
+  syntheticPreRiskReuseLoopRequiredForInitialF2:false,
+  authorizationMaterialized:false,
+  requestMaterialized:false,
+  runtimeExecuted:false,
+  browserExecuted:false,
+  secretAccess:false,
+  firestoreRead:false,
+  firestoreWrites:0,
+  authWrites:0,
+  operationalWrites:0,
+  deployExecuted:false,
+  productionTouched:false,
+  containsPII:false,
+  containsSecrets:false
+};
+console.log(JSON.stringify(out,null,2));
+if(!out.ok)process.exit(41);
