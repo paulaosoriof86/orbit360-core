@@ -1,6 +1,6 @@
 {
   "schemaVersion": "orbit360-f2-runtime-authorization-v4-risk-boundary",
-  "status": "RUNTIME_ATTEMPT_RESERVED_ONE_SHOT_UNCONSUMED",
+  "status": "PRE_RISK_FAIL_AUTHORIZATION_REUSABLE",
   "approved": true,
   "authorizationIdentityDigest": "d202a6d0331369761e9ea6f8556c41dd3c695d81cb46fd9908e756cfe93f6d95",
   "gateId": "f2-productive-acceptance-exact-successor-v20260818",
@@ -13,8 +13,8 @@
   "authorizationFrozen": true,
   "replayAllowed": false,
   "historical": false,
-  "runtimeAttemptAccepted": true,
-  "runtimeAttemptReserved": true,
+  "runtimeAttemptAccepted": false,
+  "runtimeAttemptReserved": false,
   "privilegedRiskBoundaryEntered": false,
   "runtimeAttemptCount": 0,
   "candidateArtifactId": 9504702901,
@@ -42,13 +42,13 @@
   },
   "containsPII": false,
   "containsSecrets": false,
-  "runtimeRunId": 32919846112,
-  "runtimeAttemptAcceptedAt": "2026-08-26T01:40:30.225Z",
+  "runtimeRunId": null,
+  "runtimeAttemptAcceptedAt": null,
   "lastPreRiskFailure": {
-    "runId": 32916345049,
-    "classification": "VALIDATOR_STALE",
-    "failureCode": "VALIDATOR_STALE:F2_RUNTIME_REQUEST_IDENTITY_INVALID",
-    "at": "2026-08-26T01:01:56.764Z"
+    "runId": 32919846112,
+    "classification": "PIPELINE_MECHANISM_FAILURE",
+    "failureCode": "F2_STAGE_OUTCOME:authpublish=success;gate=failure;provider=skipped;browser=skipped;integrity=skipped",
+    "at": "2026-08-26T01:40:36.231Z"
   },
   "reactivatedAt": "2026-08-26T01:40:28.057Z",
   "lastPreRiskFailurePreserved": true

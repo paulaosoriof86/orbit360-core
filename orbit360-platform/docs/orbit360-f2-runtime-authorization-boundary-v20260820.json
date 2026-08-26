@@ -1,14 +1,14 @@
 {
   "schemaVersion": "orbit360-f2-runtime-authorization-boundary-v2-derived",
   "boundaryId": "ORBIT360-F2-RUNTIME-AUTHORIZATION-BOUNDARY-CURRENT",
-  "status": "RUNTIME_ATTEMPT_RESERVED_ONE_SHOT_PREFLIGHT_PENDING",
+  "status": "PRE_RISK_FAILURE_AUTHORIZATION_PRESERVED",
   "preparedAtUtc": "2026-08-23T02:51:00.000Z",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
-  "authorized": true,
-  "authorizationPersisted": true,
-  "requestMaterialized": true,
+  "authorized": false,
+  "authorizationPersisted": false,
+  "requestMaterialized": false,
   "runtimeAllowed": false,
   "gate": {
     "id": "f2-productive-acceptance-exact-successor-v20260818",
@@ -25,8 +25,8 @@
   },
   "controlPlane": {
     "stateVersion": "ORBIT360-F2-CONTINUITY-CURRENT",
-    "ledgerRevision": 82,
-    "packageRevision": 76,
+    "ledgerRevision": 83,
+    "packageRevision": 77,
     "packageStatus": "CLOSED_PASS",
     "controlPlaneClosure": "CONTROL_PLANE_DEFINITIVE_CAUSAL_PASS"
   },
@@ -95,8 +95,8 @@
   },
   "lifecycleAtPreparation": {
     "path": "tools/orbit360-validator-lifecycle-contract-f2-productive-acceptance-runtime-v20260819.json",
-    "currentPhase": "F2_RUNTIME_ATTEMPT_RESERVED_PREFLIGHT_PENDING",
-    "activeRequest": true
+    "currentPhase": "F2_PRE_RISK_FAILURE_AWAITING_SOURCE_ONLY_ROOT_CAUSE_WITH_AUTH_PRESERVED",
+    "activeRequest": false
   },
   "previousTerminal": {
     "authorizationRecordPath": ".github/orbit360-authorizations/f2-productive-acceptance-runtime-browser-readonly-auth-9b50d4e95cf3-v20260820.json",
@@ -112,10 +112,8 @@
   "historicalRequestPath": ".github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-successor-9b50d4e95cf3-v20260820.json",
   "terminalEvidencePath": "orbit360-platform/runtime-gate-crm-v20260716/f2-runtime-terminal-inline-32679948489.json",
   "terminalRunId": 32679948489,
-  "canonicalStateFingerprint": "0e167ab24cfd2d061ccce087544b3de3e51f4f6359192bfda199a4d6757a2f60",
+  "canonicalStateFingerprint": "4146f174758213ac6a09ade1cfc3531f7e90d3173701613bb8baef06bdd2384f",
   "containsPII": false,
   "containsSecrets": false,
-  "canonicalPlan": "orbit360-platform/docs/PLAN-MAESTRO-CONGELADO-SALIDA-PRODUCCION-SIN-BUCLES-ORBIT360-AYS-20260824.md",
-  "authorizationRecordPath": ".github/orbit360-authorizations/f2-productive-acceptance-runtime-browser-readonly-auth-d202a6d03313-v20260820.json",
-  "activeRequestPath": ".github/orbit360-requests/f2-productive-acceptance-runtime-browser-readonly-successor-d202a6d03313-v20260820.json"
+  "canonicalPlan": "orbit360-platform/docs/PLAN-MAESTRO-CONGELADO-SALIDA-PRODUCCION-SIN-BUCLES-ORBIT360-AYS-20260824.md"
 }
