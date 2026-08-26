@@ -7,7 +7,7 @@ import {execFileSync} from 'node:child_process';
 
 const ROOT=process.env.ORBIT360_ROOT?path.resolve(process.env.ORBIT360_ROOT):process.cwd();
 const args=process.argv.slice(2),val=f=>{const i=args.indexOf(f);return i>=0?args[i+1]:'';};
-const prBodyFile=val('--pr-body-file'),repoOnly=args.includes('--repo-only');
+const prBodyFile=val('--pr-body-file'),repoOnly=args.includes('--repo-only'),allowOpenReadiness=args.includes('--allow-open-readiness');
 const P={
  contract:'orbit360-platform/docs/orbit360-control-plane-canonicality-contract-v20260822.json',
  ledger:'orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json',
@@ -50,6 +50,7 @@ const authorizationPersisted=Boolean(authorizationRecordPath);
 const runtimeAllowed=Boolean(L.activeState?.runtimeAuthorized);
 const attemptAccepted=Boolean(L.authorizationBoundary?.runtimeAttemptAccepted);
 const runtimeRunId=L.authorizationBoundary?.runtimeRunId==null?null:Number(L.authorizationBoundary.runtimeRunId);
+const openReadiness=allowOpenReadiness&&L.activeState?.phase==='MACRO1_CONTROL_PLANE_TRUTH_HARDENING_SOURCE_ONLY'&&['CONTROL_PLANE_FALSE_PASS_INVALIDATED','CONTROL_PLANE_REGRESSION_OPEN_STOP_RETRY'].includes(String(L.activeState?.status||''));
 const stateCore={stateVersion:L.stateVersion,ledgerRevision:L.revision,packageRevision:L.productionReopeningPackage?.revision,phase:L.activeState?.phase,status:L.activeState?.status,nextAction:L.nextAction?.id,artifactId:cand.artifactId,artifactDigest:cand.artifactDigest,sourceHead:cand.sourceHead,progress:L.progress?.productionRouteProgressPct};
 const fingerprint=sha(JSON.stringify(stateCore));
 const expectedFirst=L.productionReopeningPackage?.firstIncompleteStep;
@@ -65,7 +66,7 @@ const pointerSafe=ptr.status==='IDLE'&&ptr.mode==='IDLE'&&Number(ptr.allowedExec
 need(C.status==='ACTIVE_CANONICAL_CONVERGENCE_CONTRACT','CONTRACT_NOT_ACTIVE');
 need(C.singleMutableOperationalState===P.ledger,'LEDGER_AUTHORITY_CONTRACT');
 need(metadataSafe,'DURABLE_METADATA_UNSAFE');need(sourceAncestor,'DURABLE_SOURCE_NOT_ANCESTOR');need(ledgerFresh,'LEDGER_NOT_REDUCED_DURABLE_CANDIDATE');need(pointerSafe,'POINTER_NOT_INERT');
-need(L.continuityControl?.evidenceFreshnessValidated===true,'LEDGER_EVIDENCE_FRESHNESS_FLAG');
+need(L.continuityControl?.evidenceFreshnessValidated===true||(openReadiness&&L.continuityControl?.evidenceFreshnessValidated===false),'LEDGER_EVIDENCE_FRESHNESS_FLAG');
 need(L.activeState?.runtimeReplayAllowed===false,'LEDGER_RUNTIME_REPLAY_OPEN');
 need(L.activeState?.deployAuthorized===false&&L.activeState?.productionAuthorized===false,'LEDGER_FORBIDDEN_CAPABILITY_OPEN');
 
@@ -118,8 +119,11 @@ if(attemptAccepted){
   need(Number.isInteger(runtimeRunId)&&runtimeRunId>0,'ATTEMPT_ACCEPT_RUN_ID_MISSING');
   const req=J(activeRequestPath),auth=J(authorizationRecordPath);
   need(req.runtimeAttemptAccepted===true&&auth.runtimeAttemptAccepted===true,'ATTEMPT_ACCEPT_RECORD_DRIFT');
+  need(req.runtimeAttemptReserved===true&&auth.runtimeAttemptReserved===true,'ATTEMPT_RESERVATION_RECORD_DRIFT');
   need(Number(req.runtimeRunId)===runtimeRunId&&Number(auth.runtimeRunId)===runtimeRunId,'ATTEMPT_RUN_ID_DRIFT');
-  need(req.allowedExecutions===0&&auth.allowedExecutions===0,'ATTEMPT_BUDGET_NOT_ZERO');
+  need(req.allowedExecutions===1&&auth.allowedExecutions===1&&req.consumed===false&&auth.consumed===false,'ATTEMPT_RESERVATION_BUDGET_CONSUMED_PRE_RISK');
+  need(req.privilegedRiskBoundaryEntered===false&&auth.privilegedRiskBoundaryEntered===false,'ATTEMPT_PRIVILEGED_RISK_PREOPENED');
+  need(Number(req.runtimeAttemptCount||0)===0&&Number(auth.runtimeAttemptCount||0)===0,'ATTEMPT_COUNT_INCREMENTED_PRE_RISK');
   need(req.replayAllowed===false&&auth.replayAllowed===false,'ATTEMPT_REPLAY_OPEN');
 }
 if(!authActive)need(!requestActive&&!authorizationPersisted&&!attemptAccepted,'INERT_BOUNDARY_HAS_ACTIVE_BINDING');
@@ -145,10 +149,8 @@ if(repoOnly){
   try{
     lifecycle=JSON.parse(execFileSync(process.execPath,lifeArgs,{cwd:ROOT,encoding:'utf8'}));
     need(lifecycle.ok===true,'CLASS_WIDE_EVIDENCE_LIFECYCLE_FAIL');
-  }catch(error){
-    need(false,`CLASS_WIDE_EVIDENCE_LIFECYCLE_FAIL:${String(error?.message||error).slice(0,180)}`);
-  }
+  }catch(error){need(false,`CLASS_WIDE_EVIDENCE_LIFECYCLE_FAIL:${String(error?.message||error).slice(0,180)}`);}
 }
 
-const out={schemaVersion:'orbit360-control-plane-evidence-convergence-v5-classwide-evidence-lifecycle',ok:failures.length===0,status:failures.length?'CONTROL_PLANE_EVIDENCE_CONVERGENCE_FAIL':'CONTROL_PLANE_EVIDENCE_CONVERGENCE_PASS',classification:failures.length?'PIPELINE_MECHANISM_FAILURE':'PASS',failures:[...new Set(failures)],repairable:false,stateFingerprint:fingerprint,ledgerRevision:L.revision,packageRevision:pkg.revision,phase:L.activeState?.phase,statusCurrent:L.activeState?.status,nextAction:expectedNext,firstIncompleteStep:expectedFirst,candidateArtifactId:cand.artifactId,candidateSourceHead:cand.sourceHead,candidateCertificationEvidence:metadataPath,productionRouteProgressPct:L.progress?.productionRouteProgressPct,authorized:authActive,authorizationPersisted,requestMaterialized:requestActive,runtimeAttemptAccepted:attemptAccepted,runtimeRunId,runtimeAllowed,prBodyValidated:Boolean(prBodyFile)&&failures.length===0,noSourceRewriteGuard:true,classWideEvidenceLifecycle:true,evidenceLifecycleStatus:lifecycle.status,evidenceLifecyclePhase:lifecycle.phase,evidenceLifecycleCleaned:lifecycle.cleaned||[],evidenceLifecycleRemaining:lifecycle.remaining||[],transientPreflightCleaned:repoOnly&&lifecycle.ok===true,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,writes:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
+const out={schemaVersion:'orbit360-control-plane-evidence-convergence-v6-phase-aware-risk-boundary',ok:failures.length===0,status:failures.length?'CONTROL_PLANE_EVIDENCE_CONVERGENCE_FAIL':'CONTROL_PLANE_EVIDENCE_CONVERGENCE_PASS',classification:failures.length?'PIPELINE_MECHANISM_FAILURE':'PASS',failures:[...new Set(failures)],repairable:false,validationMode:openReadiness?'PRE_CLOSE_READINESS':'CLOSED_OR_RUNTIME_STATE',allowOpenReadiness,openReadiness,stateFingerprint:fingerprint,ledgerRevision:L.revision,packageRevision:pkg.revision,phase:L.activeState?.phase,statusCurrent:L.activeState?.status,nextAction:expectedNext,firstIncompleteStep:expectedFirst,candidateArtifactId:cand.artifactId,candidateSourceHead:cand.sourceHead,candidateCertificationEvidence:metadataPath,productionRouteProgressPct:L.progress?.productionRouteProgressPct,authorized:authActive,authorizationPersisted,requestMaterialized:requestActive,runtimeAttemptAccepted:attemptAccepted,runtimeRunId,runtimeAllowed,prBodyValidated:Boolean(prBodyFile)&&failures.length===0,noSourceRewriteGuard:true,classWideEvidenceLifecycle:true,evidenceLifecycleStatus:lifecycle.status,evidenceLifecyclePhase:lifecycle.phase,evidenceLifecycleCleaned:lifecycle.cleaned||[],evidenceLifecycleRemaining:lifecycle.remaining||[],transientPreflightCleaned:repoOnly&&lifecycle.ok===true,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,writes:0,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false};
 console.log(JSON.stringify(out,null,2));if(!out.ok)process.exit(41);
