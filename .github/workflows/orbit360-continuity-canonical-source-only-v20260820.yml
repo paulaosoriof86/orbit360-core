@@ -7,6 +7,7 @@ name: Orbit360 Canonical Control Plane
 # CONTROL_PLANE_SELFTEST_DURABLE_HANDSHAKE_V2
 # CONTROL_PLANE_HARDENING_CLOSE_V1
 # F2_PRE_RISK_TERMINAL_RECONCILE_V1
+# F2_PRE_RISK_AUTHORIZATION_REUSE_V1
 # F2_PUBLICATION_CHAIN_GUARD_V1
 # F2_PREPUBLICATION_FAILURE_REDUCER_V1
 # EVIDENCE_LIFECYCLE_CLASS_WIDE_V1
@@ -208,11 +209,15 @@ jobs:
               fi
             fi
           else
-            test "$PHASE" = 'CONTROL_PLANE_DEFINITIVE_CAUSAL_PASS_AWAITING_F2_AUTHORIZATION'
-            test "$STATUS" = 'CONTROL_PLANE_DEFINITIVE_CAUSAL_PASS'
             test -f "$F2_AUTH_INTENT"
             jq -e --arg auth "$F2_AUTH_IDENTITY" --argjson artifact "$F2_ARTIFACT_ID" --arg source '${{ steps.intent.outputs.source }}' --arg digest '${{ steps.intent.outputs.digest }}' '.status=="USER_AUTHORIZATION_RECEIVED" and .authorizationIdentityDigest==$auth and .candidateArtifactId==$artifact and .candidateArtifactDigest==$digest and .candidateSourceHead==$source and .oneShotOnly==true and .replayAllowed==false and .scope.runtimeReadOnly==true and .scope.secrets==true and .scope.firestoreRead==true and .scope.browser==true and .scope.writes==false and .scope.deploy==false and .scope.production==false and .scope.main==false and .scope.merge==false' "$F2_AUTH_INTENT" >/dev/null
-            jq -e --arg auth "$F2_AUTH_IDENTITY" '.authorizationBoundary.preparedAuthorizationIdentityDigest==$auth and .productionReopeningPackage.authorizationAllowed==true and .nextAction.id=="AWAIT_EXPLICIT_F2_RUNTIME_AUTHORIZATION_ONE_SHOT"' "$LEDGER" >/dev/null
+            if [ "$PHASE" = 'CONTROL_PLANE_DEFINITIVE_CAUSAL_PASS_AWAITING_F2_AUTHORIZATION' ] && [ "$STATUS" = 'CONTROL_PLANE_DEFINITIVE_CAUSAL_PASS' ]; then
+              jq -e --arg auth "$F2_AUTH_IDENTITY" '.authorizationBoundary.preparedAuthorizationIdentityDigest==$auth and .productionReopeningPackage.authorizationAllowed==true and .nextAction.id=="AWAIT_EXPLICIT_F2_RUNTIME_AUTHORIZATION_ONE_SHOT"' "$LEDGER" >/dev/null
+            elif [ "$PHASE" = 'F2_PRE_RISK_FAILURE_AWAITING_SOURCE_ONLY_ROOT_CAUSE_WITH_AUTH_PRESERVED' ] && [ "$STATUS" = 'F2_PRE_RISK_FAILURE_AUTHORIZATION_PRESERVED' ]; then
+              jq -e --arg auth "$F2_AUTH_IDENTITY" '.authorizationBoundary.preparedAuthorizationIdentityDigest==$auth and .authorizationBoundary.freshAuthorizationRequired==false and .authorizationBoundary.preRiskAuthorizationReuseAllowed==true and (.authorizationBoundary.reusableAuthorizationRecordPath|type=="string") and (.authorizationBoundary.reusableRequestPath|type=="string") and (.authorizationBoundary.privilegedRiskBoundaryEntered // false)==false and .productionReopeningPackage.authorizationAllowed==true and .productionReopeningPackage.authorizationReuseAllowed==true and .nextAction.id=="DIAGNOSE_ROOT_CAUSE_BEFORE_ANY_FRESH_AUTHORIZATION"' "$LEDGER" >/dev/null
+            else
+              echo "PIPELINE_MECHANISM_FAILURE:F2_RUNTIME_ONE_SHOT_STATE_INVALID:${PHASE}:${STATUS}" >&2; exit 41
+            fi
           fi
 
       - id: pre_risk_reconcile
