@@ -1,5 +1,5 @@
 name: Orbit360 Canonical Single-State Runner
-# SINGLE_STATE_CONTROL_PLANE_V4_SEMANTIC_SINGLE_STATE
+# SINGLE_STATE_CONTROL_PLANE_V5_SOURCE_ONLY_ORPHAN_RECOVERY
 on:
   push:
     branches:
@@ -93,6 +93,29 @@ jobs:
           set -euo pipefail
           node "$ORBIT360_INVARIANT" --anti-stale-selftest | tee "$RUNNER_TEMP/anti-stale-selftest.json"
           jq -e '.ok==true and .status=="SINGLE_STATE_ANTI_STALE_SELFTEST_PASS" and .dynamicEvidenceMutationRequiresStaticConsumerEdit==false and .runtimeExecuted==false and .browserExecuted==false and .secretAccess==false and .firestoreRead==false and .deployExecuted==false and .productionTouched==false' "$RUNNER_TEMP/anti-stale-selftest.json" >/dev/null
+      - id: recover_orphan
+        name: Recover orphaned source-only claim through original terminal owner
+        if: steps.inspect.outputs.transition == 'CONTROL_PLANE_RECOVER_ORPHANED_SOURCE_ONLY_TERMINAL'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ORBIT360_EXECUTION_INTENT: ${{ runner.temp }}/orbit360-intent.json
+          ORBIT360_EXECUTION_RUN_ID: ${{ github.run_id }}
+          ORBIT360_TERMINAL_EVIDENCE: ${{ runner.temp }}/orbit360-terminal.json
+          ORBIT360_PUBLICATION_CLASS: SINGLE_STATE_TERMINAL
+          ORBIT360_PUBLICATION_TRANSACTION_OUT: ${{ runner.temp }}/single-state-terminal-publication.json
+          ORBIT360_PUBLICATION_COMMIT_MESSAGE: 'gate(control-plane): recover orphaned source-only terminal'
+        shell: bash
+        run: |
+          set -euo pipefail
+          HANDLER='${{ steps.inspect.outputs.handler }}'
+          node "$HANDLER" --intent "$ORBIT360_EXECUTION_INTENT" --run-id "$ORBIT360_EXECUTION_RUN_ID" --terminal-out "$ORBIT360_TERMINAL_EVIDENCE" | tee "$RUNNER_TEMP/orphan-recovery.json"
+          jq -e '.ok==false and .classification=="PIPELINE_MECHANISM_FAILURE" and .privilegedRiskObserved==false and .runtimeExecuted==false and .browserExecuted==false and .secretAccess==false and .firestoreRead==false and .deployExecuted==false and .productionTouched==false' "$ORBIT360_TERMINAL_EVIDENCE" >/dev/null
+          node "$ORBIT360_OWNER" --terminal "$ORBIT360_TERMINAL_EVIDENCE" | tee "$RUNNER_TEMP/terminal.json"
+          jq -e '.ok==true and .status=="SINGLE_STATE_EXECUTION_TERMINAL_RECONCILED" and .classification=="PIPELINE_MECHANISM_FAILURE" and .authorizationConsumed==false and .authorizationPreserved==true' "$RUNNER_TEMP/terminal.json" >/dev/null
+          node "$ORBIT360_PUBLISHER"
+          jq -e '.ok==true and .changed==["orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json"] and .remoteCASPass==true and .pushDryRunPass==true' "$ORBIT360_PUBLICATION_TRANSACTION_OUT" >/dev/null
+          node "$ORBIT360_PUBLISHER" --publish-validated "$ORBIT360_PUBLICATION_TRANSACTION_OUT" | tee "$RUNNER_TEMP/terminal-publish.json"
+          jq -e '.ok==true and .status=="CONTROL_PLANE_PUBLICATION_TRANSACTION_PUBLISHED" and .remoteReadbackPass==true' "$RUNNER_TEMP/terminal-publish.json" >/dev/null
       - id: claim
         name: Atomically claim registered transition in ledger
         if: steps.inspect.outputs.state_mutation == 'CLAIM_TERMINAL'
@@ -185,11 +208,13 @@ jobs:
             ${{ runner.temp }}/inspect.json
             ${{ runner.temp }}/static-invariant.json
             ${{ runner.temp }}/anti-stale-selftest.json
+            ${{ runner.temp }}/orphan-recovery.json
             ${{ runner.temp }}/single-state-selftest.json
             ${{ runner.temp }}/release-handler-selftest.json
             ${{ runner.temp }}/access-handler-selftest.json
             ${{ runner.temp }}/browser-binder-selftest.json
             ${{ runner.temp }}/certified-product-preservation.json
+            ${{ runner.temp }}/terminal.json
             ${{ runner.temp }}/orbit360-terminal.json
           if-no-files-found: ignore
           retention-days: 14
