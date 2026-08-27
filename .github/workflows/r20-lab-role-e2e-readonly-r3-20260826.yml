@@ -1,0 +1,206 @@
+name: Orbit 360 · R20 LAB role E2E read-only r3
+
+on:
+  push:
+    branches:
+      - qa/r20-lab-role-e2e-20260826
+    paths:
+      - '.github/orbit360-r20-e2e/request-20260826-r3.json'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: orbit360-r20-lab-role-e2e-r3-20260826
+  cancel-in-progress: false
+
+env:
+  ORBIT360_PROJECT_ID: ays-orbit-360-lab
+  ORBIT360_TENANT_ID: alianzas-soluciones
+  ORBIT360_BASE_URL: https://ays-orbit-360-lab.web.app/index.html?orbitBackend=firestore-lab&tenant=alianzas-soluciones&runtime=20260717-2
+  ORBIT360_REQUEST_FILE: .github/orbit360-r20-e2e/request-20260826-r3.json
+  ORBIT360_EVIDENCE_DIR: r20-lab-role-e2e-r3-evidence
+
+jobs:
+  role-e2e:
+    name: Operativo + Asesor · browser evidence r3
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 3
+          persist-credentials: false
+
+      - name: Verify bounded mechanism retry
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_RUN_ATTEMPT" = '1'
+          mapfile -t CHANGED < <(git diff-tree --no-commit-id --name-only -r HEAD)
+          test "${#CHANGED[@]}" = '1'
+          test "${CHANGED[0]}" = "$ORBIT360_REQUEST_FILE"
+          jq -e '
+            .schemaVersion=="orbit360-r20-lab-role-e2e-request-v1" and
+            .status=="AUTHORIZED_ONCE_MECHANISM_RETRY" and .approved==true and
+            .allowedExecutions==1 and .replayAllowed==false and
+            .retryOfRunId==33039450759 and
+            .retryReason=="AUTH_UI_BIND_MISSED_AFTER_FALLBACK_FIREBASE_BOOTSTRAP" and
+            .baseCandidateSha=="8c9668d6d423e82826b0295431ec699390d79b4b" and
+            .projectId=="ays-orbit-360-lab" and .tenantId=="alianzas-soluciones" and
+            .targetRoles==["Operativo","Asesor"] and
+            .scope.labOnly==true and .scope.realExistingIdentities==true and
+            .scope.customTokenEphemeralAuth==true and .scope.firestoreReadOnly==true and
+            .scope.production==false and .scope.deploy==false and .scope.dataWrites==false and
+            .scope.adminAuthWrites==false and .scope.notifications==false and
+            .scope.captureScreenshots==true
+          ' "$ORBIT360_REQUEST_FILE" >/dev/null
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Resolve LAB service account
+        shell: bash
+        env:
+          SA1: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          SA2: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+          SA3: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          set -euo pipefail
+          SERVICE_ACCOUNT="${SA1:-${SA2:-${SA3:-}}}"
+          test -n "$SERVICE_ACCOUNT"
+          KEY="$RUNNER_TEMP/orbit360-r20-e2e-service-account.json"
+          printf '%s' "$SERVICE_ACCOUNT" > "$KEY"
+          chmod 600 "$KEY"
+          test "$(jq -r '.project_id // empty' "$KEY")" = "$ORBIT360_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY" >> "$GITHUB_ENV"
+
+      - name: Install reproducible browser runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false firebase-admin@13.10.0 playwright@1.52.0 >/dev/null
+          npx playwright install --with-deps chromium >/dev/null
+          mkdir -p "$ORBIT360_EVIDENCE_DIR"
+
+      - name: Execute LAB read-only role E2E
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import path from 'node:path';
+          import crypto from 'node:crypto';
+          import { chromium } from 'playwright';
+          import { cert, getApps, initializeApp } from 'firebase-admin/app';
+          import { getAuth } from 'firebase-admin/auth';
+          import { getFirestore } from 'firebase-admin/firestore';
+
+          const projectId=process.env.ORBIT360_PROJECT_ID;
+          const tenantId=process.env.ORBIT360_TENANT_ID;
+          const baseUrl=process.env.ORBIT360_BASE_URL;
+          const evidenceDir=process.env.ORBIT360_EVIDENCE_DIR;
+          const credential=JSON.parse(fs.readFileSync(process.env.GOOGLE_APPLICATION_CREDENTIALS,'utf8'));
+          const app=getApps()[0]||initializeApp({credential:cert(credential),projectId});
+          const db=getFirestore(app), auth=getAuth(app);
+          const sha=v=>crypto.createHash('sha256').update(String(v),'utf8').digest('hex');
+          const text=v=>String(v==null?'':v).trim();
+          const norm=v=>text(v).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');
+          const aliases=new Map([['direccion','Dirección'],['director','Dirección'],['superadmin','SuperAdmin'],['super_admin','SuperAdmin'],['admin','AdminTenant'],['administrador','AdminTenant'],['admin_tenant','AdminTenant'],['admintenant','AdminTenant'],['operativo','Operativo'],['operaciones','Operativo'],['finanzas','Finanzas'],['financiero','Finanzas'],['marketing','Marketing'],['asesor','Asesor'],['comercial','Comercial'],['asistente','Asistente']]);
+          const canonical=v=>aliases.get(norm(v))||text(v);
+          const unique=values=>[...new Set([].concat(values||[]).map(text).filter(Boolean))];
+          const rolesOf=row=>unique([].concat(row.roles||[],row.rolesAsignados||[],row.assignedRoles||[],row.role||[],row.rol||[],row.defaultRole||[],row.rolDefault||[],row.activeRole||[],row.rolActivo||[])).map(canonical).filter(Boolean);
+          const active=row=>{const s=norm(row.status||row.estado);return row.active!==false&&row.activo!==false&&!['inactive','inactivo','blocked','bloqueado'].includes(s);};
+          const stamp=doc=>`${doc.id}:${doc.updateTime?doc.updateTime.toMillis():0}`;
+          async function colStamp(ref){const s=await ref.get();const rows=s.docs.map(stamp).sort();return{count:rows.length,digest:sha(rows.join('|'))};}
+          async function integrity(){
+            const t=db.collection('tenants').doc(tenantId), l=db.collection('tenantId').doc(tenantId);
+            const refs={members:t.collection('members'),workflowEvents:t.collection('workflowEvents'),workflowRequests:t.collection('workflowRequests'),notificationOutbox:t.collection('notificationOutbox'),legacyNegocios:l.collection('negocios'),legacyGestiones:l.collection('gestiones'),legacyNotifs:l.collection('notifs'),canonicalNegocios:t.collection('workflow').doc('negocios').collection('items'),canonicalGestiones:t.collection('workflow').doc('gestiones').collection('items')};
+            const out={}; for(const [k,r] of Object.entries(refs)) out[k]=await colStamp(r);
+            const cfg=await t.collection('config').doc('workflow').get(); out.workflowConfig={exists:cfg.exists,updateTime:cfg.updateTime?cfg.updateTime.toMillis():0}; return out;
+          }
+          async function ensureFirebase(page){
+            try{await page.waitForFunction(()=>window.firebase&&firebase.apps&&firebase.apps.length&&typeof firebase.auth==='function'&&typeof firebase.firestore==='function',null,{timeout:8000});return'site-loader';}catch{}
+            for(const url of ['https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js','https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js','https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js']) await page.addScriptTag({url});
+            await page.addScriptTag({url:`${new URL(baseUrl).origin}/__/firebase/init.js`});
+            await page.waitForFunction(()=>window.firebase&&firebase.apps&&firebase.apps.length&&typeof firebase.auth==='function'&&typeof firebase.firestore==='function',null,{timeout:20000});return'fallback-injected';
+          }
+
+          const ms=await db.collection('tenants').doc(tenantId).collection('members').get();
+          const members=ms.docs.map(d=>({id:d.id,...(d.data()||{})})).filter(active);
+          const pool=role=>members.filter(m=>rolesOf(m).includes(role));
+          const opPool=pool('Operativo'), asPool=pool('Asesor');
+          if(!opPool.length) throw new Error('NO_ACTIVE_OPERATIVO_MEMBER');
+          if(!asPool.length) throw new Error('NO_ACTIVE_ASESOR_MEMBER');
+          const operativo=opPool[0], asesor=asPool.find(m=>m.id!==operativo.id)||asPool[0];
+          if(operativo.id===asesor.id) throw new Error('OPERATIVO_ASESOR_DISTINCT_MEMBER_REQUIRED');
+
+          const cfgSnap=await db.collection('tenants').doc(tenantId).collection('config').doc('workflow').get();
+          const cfg=cfgSnap.exists?(cfgSnap.data()||{}):{};
+          const channels=unique(cfg.notificationChannels||['portal','in_app']).map(norm);
+          const external=channels.filter(x=>!['portal','in_app'].includes(x));
+          const before=await integrity();
+          const browser=await chromium.launch({headless:true});
+          const results=[]; let fatal=null;
+          try{
+            for(const target of [{role:'Operativo',member:operativo,primary:'ops'},{role:'Asesor',member:asesor,primary:'leads'}]){
+              const user=await auth.getUser(target.member.id);
+              const token=await auth.createCustomToken(user.uid,{orbit360R20ReadOnlyE2E:true});
+              const context=await browser.newContext({viewport:{width:1600,height:1000},locale:'es-GT'});
+              const page=await context.newPage(); const pageErrors=[]; const requestFailures=[];
+              page.on('pageerror',e=>pageErrors.push(String(e?.message||e).slice(0,500)));
+              page.on('requestfailed',r=>requestFailures.push({url:r.url().slice(0,300),error:String(r.failure()?.errorText||'').slice(0,200)}));
+              let bootstrapMode='';
+              try{
+                await page.goto(`${baseUrl}#/inicio`,{waitUntil:'domcontentloaded',timeout:60000});
+                bootstrapMode=await ensureFirebase(page);
+                await page.evaluate(async t=>{await firebase.auth().signInWithCustomToken(t);},token);
+                await page.evaluate(()=>{try{localStorage.setItem('orbit360_confidencialidad','r20-e2e-accepted-for-browser-evidence');}catch{}; if(window.Orbit&&Orbit.session&&Orbit.session.bindLabMembershipProjection) Orbit.session.bindLabMembershipProjection();});
+                await page.waitForFunction(()=>window.Orbit&&Orbit.session&&Orbit.session.membershipProjectionStatus&&Orbit.session.membershipProjectionStatus().ready===true,null,{timeout:60000});
+                const allowed=await page.evaluate(()=>Orbit.session.allowedRoles());
+                if(!allowed.includes(target.role)) throw new Error(`ROLE_NOT_ASSIGNED_${target.role.toUpperCase()}`);
+                const switched=await page.evaluate(role=>Orbit.session.set(role),target.role);
+                if(!switched) throw new Error(`ROLE_SWITCH_BLOCKED_${target.role.toUpperCase()}`);
+                await page.waitForFunction(role=>Orbit.session.rol()===role,target.role,{timeout:15000});
+                const shown=await page.evaluate(()=>{if(!window.Orbit||!Orbit.auth||typeof Orbit.auth.showApp!=='function')return false;const ok=Orbit.auth.showApp();try{if(Orbit.router&&typeof Orbit.router.rebuildSidebar==='function')Orbit.router.rebuildSidebar();}catch{};try{window.dispatchEvent(new HashChangeEvent('hashchange'));}catch{};return ok;});
+                if(!shown) throw new Error('AUTH_SHOW_APP_BLOCKED');
+                await page.waitForFunction(()=>!document.body.classList.contains('pre-auth'),null,{timeout:15000});
+                const routeResults=[];
+                for(const route of [{key:'ops',hash:'#/ops',marker:'Orbit Ops'},{key:'leads',hash:'#/leads',marker:'Orbit Leads'}]){
+                  await page.evaluate(hash=>{location.hash=hash;try{window.dispatchEvent(new HashChangeEvent('hashchange'));}catch{}},route.hash);
+                  let markerPresent=true; try{await page.waitForFunction(marker=>document.body&&document.body.innerText.includes(marker),route.marker,{timeout:15000});}catch{markerPresent=false;}
+                  await page.waitForTimeout(800);
+                  const safe=await page.evaluate(marker=>({activeRole:Orbit.session.rol(),allowedRoles:Orbit.session.allowedRoles(),membership:Orbit.session.membershipProjectionStatus(),bodyPreAuth:document.body.classList.contains('pre-auth'),markerPresent:document.body.innerText.includes(marker),href:location.href}),route.marker);
+                  const file=`r20-${target.role.toLowerCase()}-${route.key}.png`; await page.screenshot({path:path.join(evidenceDir,file),fullPage:true});
+                  routeResults.push({route:route.key,screenshot:file,expectedPrimary:route.key===target.primary,markerWaitPass:markerPresent,...safe});
+                }
+                results.push({role:target.role,primaryRoute:target.primary,identityDigest:sha(user.uid).slice(0,16),emailDigest:sha(String(user.email||'').toLowerCase()).slice(0,16),authIdentityExists:true,bootstrapMode,assignedRoles:allowed,routes:routeResults,pageErrorCount:pageErrors.length,pageErrors,requestFailureCount:requestFailures.length,requestFailures});
+              }catch(error){
+                const diag=`r20-${target.role.toLowerCase()}-diagnostic-fail.png`;try{await page.screenshot({path:path.join(evidenceDir,diag),fullPage:true});}catch{}
+                const state=await page.evaluate(()=>({href:location.href,title:document.title,preAuth:document.body?.classList.contains('pre-auth'),bodyText:String(document.body?.innerText||'').slice(0,1500),firebasePresent:!!window.firebase,firebaseApps:window.firebase?.apps?.length||0,orbitSessionPresent:!!(window.Orbit&&Orbit.session),membership:window.Orbit?.session?.membershipProjectionStatus?Orbit.session.membershipProjectionStatus():null,activeRole:window.Orbit?.session?.rol?Orbit.session.rol():''})).catch(()=>null);
+                fatal={role:target.role,code:String(error?.message||error).slice(0,500),bootstrapMode,diagnosticScreenshot:diag,state,pageErrors,requestFailures}; await context.close(); break;
+              }
+              await context.close();
+            }
+          }finally{await browser.close();}
+          const after=await integrity();
+          const integrityPass=JSON.stringify(before)===JSON.stringify(after);
+          const requiredRoutesPass=!fatal&&results.length===2&&results.every(r=>{const p=r.routes.find(x=>x.route===r.primaryRoute);return p&&p.markerPresent&&p.activeRole===r.role&&p.membership?.ready===true&&!p.bodyPreAuth;});
+          const communicationsPass=external.length===0;
+          const ok=!fatal&&integrityPass&&requiredRoutesPass&&communicationsPass;
+          const report={schemaVersion:'orbit360-r20-lab-role-e2e-evidence-v1',status:ok?'R20_LAB_ROLE_E2E_READONLY_PASS':'R20_LAB_ROLE_E2E_READONLY_FAIL',classification:ok?'PASS':'FAIL',executedAtUtc:new Date().toISOString(),retryOfRunId:33039450759,baseCandidateSha:'8c9668d6d423e82826b0295431ec699390d79b4b',projectId,tenantId,host:new URL(baseUrl).host,targetRoles:['Operativo','Asesor'],distinctRealExistingIdentities:operativo.id!==asesor.id,authMethod:'firebase-admin-custom-token-ephemeral',humanPasswordAccessed:false,adminAuthWritesExecuted:0,firestoreWritesExecutedByTest:0,deployExecuted:false,productionTouched:false,notificationChannels:channels,externalNotificationChannels:external,communicationsGatePass:communicationsPass,integrityBefore:before,integrityAfter:after,beforeAfterIntegrityPass:integrityPass,requiredRoleRoutesPass:requiredRoutesPass,roleRouteResults:results,screenshots:results.flatMap(r=>r.routes.map(x=>x.screenshot)),fatal,ok};
+          fs.writeFileSync(path.join(evidenceDir,'r20-lab-role-e2e-report.json'),JSON.stringify(report,null,2)+'\n');
+          if(!ok)process.exitCode=2;
+          NODE
+          jq -e '.status=="R20_LAB_ROLE_E2E_READONLY_PASS" and .ok==true and .distinctRealExistingIdentities==true and .beforeAfterIntegrityPass==true and .communicationsGatePass==true and .requiredRoleRoutesPass==true and .productionTouched==false and .deployExecuted==false and .firestoreWritesExecutedByTest==0 and (.screenshots|length)==4' "$ORBIT360_EVIDENCE_DIR/r20-lab-role-e2e-report.json" >/dev/null
+
+      - name: Upload screenshots and sanitized report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-r20-lab-role-e2e-r3-${{ github.run_id }}
+          path: r20-lab-role-e2e-r3-evidence/
+          retention-days: 14
+          if-no-files-found: error
