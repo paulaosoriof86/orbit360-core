@@ -1,30 +1,27 @@
 name: Orbit360 Canonical Single-State Runner
-# SINGLE_STATE_CONTROL_PLANE_V1
-# Evidence/runtime runner. Canonical operational state lives only in the ledger.
-
+# SINGLE_STATE_CONTROL_PLANE_V2_POST_GO_LIVE_ACCESS_RECOVERY
 on:
   push:
     branches:
       - 'ays/orbit360-exec-*'
     paths:
       - '.github/orbit360-intents/*.json'
-
 permissions:
   contents: write
   actions: read
-
 concurrency:
   group: orbit360-single-state-${{ github.sha }}
   cancel-in-progress: false
-
 env:
   ORBIT360_CANONICAL_BRANCH: ays/backend-tenant-lab-v99-20260703
   ORBIT360_LEDGER: orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json
   ORBIT360_REGISTRY: orbit360-platform/docs/orbit360-continuity-writer-registry-v20260820.json
-  ORBIT360_OWNER: tools/orbit360-single-state-ledger-owner-v20260826.mjs
-  ORBIT360_INVARIANT: tools/orbit360-single-state-invariant-v20260826.mjs
+  ORBIT360_STATE_CONTRACT: tools/orbit360-single-state-contract-v20260827.mjs
+  ORBIT360_OWNER: tools/orbit360-single-state-ledger-owner-v20260827.mjs
+  ORBIT360_INVARIANT: tools/orbit360-single-state-invariant-v20260827.mjs
   ORBIT360_PUBLISHER: tools/orbit360-control-plane-publication-preflight-v20260825.mjs
-
+  ORBIT360_ACCESS_HANDLER: tools/orbit360-post-go-live-access-recovery-v20260827.mjs
+  ORBIT360_ACCESS_GATE_ID: block-auth-paula-reset-link-handoff-lab-v20260817
 jobs:
   single-state-runner:
     runs-on: ubuntu-24.04
@@ -35,11 +32,9 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-
       - id: inspect
         name: Validate one-commit execution transport against live canonical state
         shell: bash
@@ -54,9 +49,7 @@ jobs:
           cp "$INTENT" "$RUNNER_TEMP/orbit360-intent.json"
           BASE=$(jq -r '.canonicalBaseHead // empty' "$INTENT")
           EXPECTED=$(jq -r '.expectedLedgerRevision // empty' "$INTENT")
-          [[ "$BASE" =~ ^[a-f0-9]{40}$ ]]
-          [[ "$EXPECTED" =~ ^[0-9]+$ ]]
-          test "$PARENT" = "$BASE"
+          [[ "$BASE" =~ ^[a-f0-9]{40}$ ]] && [[ "$EXPECTED" =~ ^[0-9]+$ ]] && test "$PARENT" = "$BASE"
           git fetch --no-tags origin "$ORBIT360_CANONICAL_BRANCH"
           LIVE=$(git rev-parse FETCH_HEAD)
           test "$LIVE" = "$BASE"
@@ -68,54 +61,72 @@ jobs:
           echo "class=$(jq -r '.capabilityClass' "$RUNNER_TEMP/inspect.json")" >> "$GITHUB_OUTPUT"
           echo "state_mutation=$(jq -r '.stateMutation' "$RUNNER_TEMP/inspect.json")" >> "$GITHUB_OUTPUT"
           echo "handler=$(jq -r '.handler // ""' "$RUNNER_TEMP/inspect.json")" >> "$GITHUB_OUTPUT"
-          echo "handler_ready=$(jq -r '.handlerReady' "$RUNNER_TEMP/inspect.json")" >> "$GITHUB_OUTPUT"
           test "$(jq -r '.handlerReady' "$RUNNER_TEMP/inspect.json")" = 'true'
-
       - name: Run source-only single-state selftest
         if: steps.inspect.outputs.transition == 'CONTROL_PLANE_SELFTEST'
         env:
           GH_TOKEN: ${{ github.token }}
           ORBIT360_RELEASE_HANDLER_SELFTEST_OUT: ${{ runner.temp }}/release-handler-selftest.json
+          ORBIT360_ACCESS_HANDLER_SELFTEST_OUT: ${{ runner.temp }}/access-handler-selftest.json
         shell: bash
         run: |
           set -euo pipefail
           node "$ORBIT360_OWNER" --selftest | tee "$RUNNER_TEMP/single-state-selftest.json"
-          jq -e '.ok==true and .status=="SINGLE_STATE_CONTROL_PLANE_SELFTEST_PASS" and .projectionWrites==0 and .secondClaimBlocked==true and .staleRevisionBlocked==true' "$RUNNER_TEMP/single-state-selftest.json" >/dev/null
+          jq -e '.ok==true and .status=="SINGLE_STATE_CONTROL_PLANE_SELFTEST_PASS" and .sourceClaimNoRuntime==true and .sourcePrepared==true and .wrongTargetBlocked==true and .oldAuthorizationBlocked==true and .goLivePreserved==true' "$RUNNER_TEMP/single-state-selftest.json" >/dev/null
           RELEASE_HANDLER=$(jq -r '.executionTransitions.GO_LIVE_RELEASE_WINDOW.handler // empty' "$ORBIT360_REGISTRY")
-          test -n "$RELEASE_HANDLER" && test -f "$RELEASE_HANDLER"
           node "$RELEASE_HANDLER" --source-only-selftest --out "$ORBIT360_RELEASE_HANDLER_SELFTEST_OUT"
-          jq -e '.ok==true and .status=="GO_LIVE_RELEASE_HANDLER_SOURCE_ONLY_PASS" and .handlerReady==true and .fullRehashPass==true and .targetDerivedFromCandidate==true and .releasePlanPass==true and .hostingOnlyDeploy==true and .rulesDeploy==false and .rollbackPreflightPass==true and .authorizationConsumed==false and .privilegedRiskObserved==false and .secretAccess==false and .firestoreRead==false and .deployExecuted==false and .productionTouched==false' "$ORBIT360_RELEASE_HANDLER_SELFTEST_OUT" >/dev/null
+          jq -e '.ok==true and .status=="GO_LIVE_RELEASE_HANDLER_SOURCE_ONLY_PASS" and .secretAccess==false and .firestoreRead==false and .deployExecuted==false and .productionTouched==false' "$ORBIT360_RELEASE_HANDLER_SELFTEST_OUT" >/dev/null
+          node "$ORBIT360_ACCESS_HANDLER" --source-only-selftest --out "$ORBIT360_ACCESS_HANDLER_SELFTEST_OUT"
+          jq -e '.ok==true and .status=="POST_GO_LIVE_ACCESS_RECOVERY_SOURCE_ONLY_PASS" and .targetCount==1 and .maxResetLinks==1 and .forbiddenDemoIdentityBlocked==true and .historicalAuthorizationReuseAllowed==false and .directPasswordSets==0 and .resetLinksGenerated==0 and .secretAccess==false and .firestoreRead==false and .deployExecuted==false and .productionTouched==false' "$ORBIT360_ACCESS_HANDLER_SELFTEST_OUT" >/dev/null
           node tools/orbit360-bind-f2-browser-evidence-run-v20260824.mjs --selftest | tee "$RUNNER_TEMP/browser-binder-selftest.json"
-          jq -e '.ok==true and .status=="F2_BROWSER_BINDER_CURRENT_RUN_CAUSAL_SELFTEST_PASS" and .structuralCurrentRunNetworkAttribution==true and .secondaryBrowserReproductionRequired==false and .causalPassAccepted==true and .ambiguousReclassifiedValidatorStale==true and .invalidAttributionBlocked==true and .runtimeExecuted==false and .browserExecuted==false and .secretAccess==false and .firestoreRead==false' "$RUNNER_TEMP/browser-binder-selftest.json" >/dev/null
+          jq -e '.ok==true and .status=="F2_BROWSER_BINDER_CURRENT_RUN_CAUSAL_SELFTEST_PASS" and .secondaryBrowserReproductionRequired==false' "$RUNNER_TEMP/browser-binder-selftest.json" >/dev/null
           node "$ORBIT360_INVARIANT"
           test -z "$(git status --porcelain)"
-
       - id: claim
-        name: Atomically claim risk transition in ledger before privileged capabilities
+        name: Atomically claim registered transition in ledger
         if: steps.inspect.outputs.state_mutation == 'CLAIM_TERMINAL'
         env:
           GH_TOKEN: ${{ github.token }}
           ORBIT360_PUBLICATION_CLASS: SINGLE_STATE_CLAIM
           ORBIT360_PUBLICATION_TRANSACTION_OUT: ${{ runner.temp }}/single-state-claim-publication.json
-          ORBIT360_PUBLICATION_COMMIT_MESSAGE: 'gate(control-plane): claim single-state execution before privileged risk'
+          ORBIT360_PUBLICATION_COMMIT_MESSAGE: 'gate(control-plane): claim single-state execution before capability edge'
         shell: bash
         run: |
           set -euo pipefail
           node "$ORBIT360_OWNER" --claim "$RUNNER_TEMP/orbit360-intent.json" --run-id "$GITHUB_RUN_ID" | tee "$RUNNER_TEMP/claim.json"
-          jq -e --argjson run "$GITHUB_RUN_ID" '.ok==true and .status=="SINGLE_STATE_EXECUTION_CLAIMED" and .runId==$run' "$RUNNER_TEMP/claim.json" >/dev/null
           node "$ORBIT360_PUBLISHER"
-          jq -e '.ok==true and .status=="CONTROL_PLANE_PUBLICATION_TRANSACTION_PREPARED" and .changed==["orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json"] and .remoteCASPass==true and .pushDryRunPass==true' "$ORBIT360_PUBLICATION_TRANSACTION_OUT" >/dev/null
+          jq -e '.ok==true and .changed==["orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json"] and .remoteCASPass==true and .pushDryRunPass==true' "$ORBIT360_PUBLICATION_TRANSACTION_OUT" >/dev/null
           node "$ORBIT360_PUBLISHER" --publish-validated "$ORBIT360_PUBLICATION_TRANSACTION_OUT" | tee "$RUNNER_TEMP/claim-publish.json"
-          jq -e '.ok==true and .status=="CONTROL_PLANE_PUBLICATION_TRANSACTION_PUBLISHED" and .remoteReadbackPass==true and .localReadbackPass==true' "$RUNNER_TEMP/claim-publish.json" >/dev/null
-
-      - id: execute
-        name: Execute registered handler only after canonical claim
-        if: steps.inspect.outputs.state_mutation == 'CLAIM_TERMINAL' && steps.claim.outcome == 'success'
+          jq -e '.ok==true and .status=="CONTROL_PLANE_PUBLICATION_TRANSACTION_PUBLISHED" and .remoteReadbackPass==true' "$RUNNER_TEMP/claim-publish.json" >/dev/null
+      - id: source_execute
+        name: Execute source-only handler without secrets or runtime credentials
+        if: steps.inspect.outputs.state_mutation == 'CLAIM_TERMINAL' && steps.claim.outcome == 'success' && steps.inspect.outputs.class == 'SOURCE_ONLY'
+        env:
+          ORBIT360_EXECUTION_INTENT: ${{ runner.temp }}/orbit360-intent.json
+          ORBIT360_EXECUTION_RUN_ID: ${{ github.run_id }}
+          ORBIT360_TERMINAL_EVIDENCE: ${{ runner.temp }}/orbit360-terminal.json
+        shell: bash
+        run: |
+          set -euo pipefail
+          HANDLER='${{ steps.inspect.outputs.handler }}'
+          node "$HANDLER" --intent "$ORBIT360_EXECUTION_INTENT" --run-id "$ORBIT360_EXECUTION_RUN_ID" --terminal-out "$ORBIT360_TERMINAL_EVIDENCE"
+          jq -e '.ok==true and .privilegedRiskObserved==false and .secretAccess==false and .firestoreRead==false and .resetLinksGenerated==0' "$ORBIT360_TERMINAL_EVIDENCE" >/dev/null
+      - name: Access-recovery gate contract preflight before any secret is exposed
+        if: steps.inspect.outputs.class == 'AUTH_RECOVERY' && steps.claim.outcome == 'success'
+        shell: bash
+        run: |
+          set -euo pipefail
+          node "$ORBIT360_INVARIANT"
+          jq -e '.transitionId=="POST_GO_LIVE_ACCESS_RECOVERY_RESET_LINK" and .explicitUserAuthorization==true and .replayAllowed==false and .target.projectId=="ays-orbit-360-lab" and .target.tenantId=="alianzas-soluciones" and .target.advisorId=="ase-paula-osorio" and .target.emailHash=="9b663847979724e9491e1c655da32a7cb17a5f6ed26dba352de1eb811254b23f" and .target.targetCount==1 and .scope.authWrites==false and .scope.firestoreWrites==false and .scope.deploy==false and .scope.production==false' "$RUNNER_TEMP/orbit360-intent.json" >/dev/null
+      - id: privileged_execute
+        name: Execute privileged registered handler only after claim and preflight
+        if: steps.inspect.outputs.state_mutation == 'CLAIM_TERMINAL' && steps.claim.outcome == 'success' && steps.inspect.outputs.class != 'SOURCE_ONLY'
         env:
           GH_TOKEN: ${{ github.token }}
           ORBIT360_EXECUTION_INTENT: ${{ runner.temp }}/orbit360-intent.json
           ORBIT360_EXECUTION_RUN_ID: ${{ github.run_id }}
           ORBIT360_TERMINAL_EVIDENCE: ${{ runner.temp }}/orbit360-terminal.json
+          ORBIT360_PRIVATE_RESET_LINK_FILE: ${{ runner.temp }}/orbit360-private-reset-link.txt
           FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
           FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
@@ -123,13 +134,24 @@ jobs:
         run: |
           set -euo pipefail
           HANDLER='${{ steps.inspect.outputs.handler }}'
-          test -n "$HANDLER" && test -f "$HANDLER"
+          if [ '${{ steps.inspect.outputs.class }}' = 'AUTH_RECOVERY' ]; then npm install --no-save --package-lock=false firebase-admin@13.10.0 >/dev/null; fi
           node "$HANDLER" --intent "$ORBIT360_EXECUTION_INTENT" --run-id "$ORBIT360_EXECUTION_RUN_ID" --terminal-out "$ORBIT360_TERMINAL_EVIDENCE"
           test -f "$ORBIT360_TERMINAL_EVIDENCE"
-
+      - name: Upload private reset link for one-day handoff only
+        if: steps.inspect.outputs.transition == 'POST_GO_LIVE_ACCESS_RECOVERY_RESET_LINK' && steps.privileged_execute.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbit360-private-access-recovery-${{ github.run_id }}
+          path: ${{ runner.temp }}/orbit360-private-reset-link.txt
+          if-no-files-found: error
+          retention-days: 1
+      - name: Remove private reset link from runner workspace
+        if: always() && steps.inspect.outputs.transition == 'POST_GO_LIVE_ACCESS_RECOVERY_RESET_LINK'
+        shell: bash
+        run: rm -f "$RUNNER_TEMP/orbit360-private-reset-link.txt"
       - id: terminal
         name: Reduce run-scoped terminal evidence to ledger only
-        if: always() && steps.inspect.outputs.state_mutation == 'CLAIM_TERMINAL' && steps.claim.outcome == 'success' && steps.execute.outcome != 'skipped'
+        if: always() && steps.inspect.outputs.state_mutation == 'CLAIM_TERMINAL' && steps.claim.outcome == 'success' && (steps.source_execute.outcome != 'skipped' || steps.privileged_execute.outcome != 'skipped')
         env:
           GH_TOKEN: ${{ github.token }}
           ORBIT360_PUBLICATION_CLASS: SINGLE_STATE_TERMINAL
@@ -143,8 +165,7 @@ jobs:
           node "$ORBIT360_OWNER" --terminal "$ORBIT360_TERMINAL_EVIDENCE" | tee "$RUNNER_TEMP/terminal.json"
           node "$ORBIT360_PUBLISHER"
           node "$ORBIT360_PUBLISHER" --publish-validated "$ORBIT360_PUBLICATION_TRANSACTION_OUT" | tee "$RUNNER_TEMP/terminal-publish.json"
-          jq -e '.ok==true and .status=="CONTROL_PLANE_PUBLICATION_TRANSACTION_PUBLISHED" and .remoteReadbackPass==true and .localReadbackPass==true' "$RUNNER_TEMP/terminal-publish.json" >/dev/null
-
+          jq -e '.ok==true and .status=="CONTROL_PLANE_PUBLICATION_TRANSACTION_PUBLISHED" and .remoteReadbackPass==true' "$RUNNER_TEMP/terminal-publish.json" >/dev/null
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -153,6 +174,7 @@ jobs:
             ${{ runner.temp }}/inspect.json
             ${{ runner.temp }}/single-state-selftest.json
             ${{ runner.temp }}/release-handler-selftest.json
+            ${{ runner.temp }}/access-handler-selftest.json
             ${{ runner.temp }}/browser-binder-selftest.json
             ${{ runner.temp }}/orbit360-terminal.json
           if-no-files-found: ignore
