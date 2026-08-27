@@ -1,9 +1,10 @@
 {
-  "schemaVersion": "orbit360-gate-contract-registry-v2-single-control-plane",
+  "schemaVersion": "orbit360-gate-contract-registry-v3-single-state-static-authority",
   "issuedAt": "2026-08-27",
-  "status": "ACTIVE_STATIC_CONFIGURATION_SINGLE_CONTROL_PLANE",
+  "status": "ACTIVE_STATIC_CONFIGURATION_SINGLE_STATE_LEDGER_ONLY",
   "stateBearing": false,
   "dynamicStateForbidden": true,
+  "historicalExecutionForbidden": true,
   "currentStateAuthority": "orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json",
   "canonicalControlPlane": {
     "workflow": ".github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml",
@@ -11,148 +12,41 @@
     "singleStateInvariant": "tools/orbit360-single-state-invariant-v20260827.mjs",
     "writerRegistry": "orbit360-platform/docs/orbit360-continuity-writer-registry-v20260820.json",
     "canonicalGatePreflight": "tools/orbit360-validar-gate-contracts-v20260717.mjs",
-    "legacyDelegate": "tools/orbit360-validar-gate-contracts-legacy-v20260717.mjs"
+    "legacyDelegate": "tools/orbit360-validar-gate-contracts-legacy-v20260717.mjs",
+    "historicalEngineFence": "tools/orbit360-historical-gate-engine-fence-v20260827.mjs"
   },
   "compatibilityFingerprint": {
-    "canonicalRouterBlobSha": "b4a707df3061f951045ddee0457f910d83070d87",
-    "legacyRouterBlobSha": "03d1c45db555a3e482afb4be6aaf8d29c74a79dc",
+    "canonicalRouterBlobSha": "ebaa01da351e5609d0aab991e633839319a54c23",
+    "legacyRouterBlobSha": "1c8ccaf817a77e2bc7035934cfd39b81d79c5904",
+    "historicalEngineFenceBlobSha": "0af842fd2497a082c388cb560b7658474e13c12d",
     "canonicalWorkflowBlobSha": "748f7c3f27ee3d40f38219d4ac0c1c400bdff6e8",
-    "f2AuthorityBlobSha": "f9dd8c04e5dbf752f673c7d213ccfa185f0175c4"
+    "f2AuthorityBlobSha": "f9dd8c04e5dbf752f673c7d213ccfa185f0175c4",
+    "singleStateInvariantBlobSha": "13a7db8b2a255442385d88570e37e1fda06a6e5b",
+    "writerRegistryBlobSha": "373d7bf735bb5bac4c7e2a52a555950d45f9c546",
+    "stateContractBlobSha": "3c85bb0a10f375743c52397e147f709cb87370e7"
   },
-  "routerBindings": [
-    {
-      "gateId": "block1-client360-insurers-lab-v20260717",
-      "profile": "default",
-      "contractVersion": "1.0.41",
-      "lifecycle": "tools/orbit360-validator-lifecycle-block1-v23-native-v20260807.json",
-      "engine": "tools/orbit360-validar-gate-contracts-engine-block1-v23-native-v20260807.mjs"
-    },
-    {
-      "gateId": "block1-client360-insurers-lab-v20260717",
-      "profile": "v28-focal-provenance-universe",
-      "contractVersion": "1.0.41",
-      "lifecycle": "tools/orbit360-validator-lifecycle-block1-focal-provenance-universe-v28-v20260807.json",
-      "engine": "tools/orbit360-validar-gate-contracts-engine-block1-focal-provenance-universe-v28-v20260807.mjs"
-    },
-    {
-      "gateId": "block1-client360-insurers-lab-v20260717",
-      "profile": "v29-identity-reconciliation-universe",
-      "contractVersion": "1.0.41",
-      "lifecycle": "tools/orbit360-validator-lifecycle-block1-identity-reconciliation-universe-v29-v20260807.json",
-      "engine": "tools/orbit360-validar-gate-contracts-engine-block1-identity-reconciliation-universe-v29-v20260807.mjs"
-    },
-    {
-      "gateId": "block1-client360-insurers-lab-v20260717",
-      "profile": "v30-retained26-psi-universe",
-      "contractVersion": "1.0.41",
-      "lifecycle": "tools/orbit360-validator-lifecycle-block1-retained26-psi-v30-v20260807.json",
-      "engine": "tools/orbit360-validar-gate-contracts-engine-block1-retained26-psi-v30-v20260807.mjs"
-    },
-    {
-      "gateId": "block1-client360-insurers-lab-v20260717",
-      "profile": "v33-two-client-cloud-audit",
-      "contractVersion": "1.0.41",
-      "lifecycle": "tools/orbit360-validator-lifecycle-block1-two-client-cloud-audit-v33-v20260807.json",
-      "engine": "tools/orbit360-validar-gate-contracts-engine-block1-two-client-cloud-audit-v33-v20260807.mjs"
-    },
-    {
-      "gateId": "block1-client360-insurers-lab-v20260717",
-      "profile": "v33-two-client-cloud-audit-runtime",
-      "contractVersion": "1.0.41",
-      "lifecycle": "tools/orbit360-validator-lifecycle-block1-two-client-cloud-audit-runtime-v33-v20260810.json",
-      "engine": "tools/orbit360-validar-gate-contracts-engine-block1-two-client-cloud-audit-runtime-v33-v20260810.mjs"
-    },
-    {
-      "gateId": "block10.10-cobros-full-ledger-write-lab-v20260805",
-      "profile": "default",
-      "contractVersion": "10.10.2",
-      "lifecycle": "tools/orbit360-validator-lifecycle-contract-cobros-full-ledger-write-lab-v20260805.json",
-      "engine": "tools/orbit360-validar-gate-contracts-engine-cobros-full-ledger-write-v20260811.mjs"
-    },
-    {
-      "gateId": "block10.10-cobros-full-ledger-write-lab-v20260805",
-      "profile": "cobros-10102-runtime",
-      "contractVersion": "10.10.2",
-      "lifecycle": "tools/orbit360-validator-lifecycle-contract-cobros-full-ledger-write-runtime-v20260811.json",
-      "engine": "tools/orbit360-validar-gate-contracts-engine-cobros-full-ledger-write-v20260811.mjs"
-    },
-    {
-      "gateId": "fase-a-ops-leads-crm-release-lab-v20260812",
-      "profile": "default",
-      "contractVersion": "1.0.0",
-      "lifecycle": "tools/orbit360-validator-lifecycle-contract-fase-a-ops-leads-crm-release-v20260812.json",
-      "engine": "tools/orbit360-validar-gate-contracts-engine-fase-a-ops-leads-crm-release-v20260812.mjs"
-    },
-    {
-      "gateId": "block-auth-paula-password-reset-lab-v20260817",
-      "profile": "default",
-      "contractVersion": "14.0.0",
-      "lifecycle": "tools/orbit360-validator-lifecycle-contract-auth-paula-password-reset-lab-v20260817.json",
-      "engine": "tools/orbit360-validar-gate-contracts-engine-auth-paula-password-reset-lab-v20260817.mjs"
-    },
-    {
-      "gateId": "block-auth-paula-reset-link-handoff-lab-v20260817",
-      "profile": "default",
-      "contractVersion": "14.1.0",
-      "lifecycle": "tools/orbit360-validator-lifecycle-contract-auth-paula-reset-link-handoff-lab-v20260817.json",
-      "engine": "tools/orbit360-validar-gate-contracts-engine-auth-paula-reset-link-handoff-lab-v20260817.mjs"
-    },
-    {
-      "gateId": "block-auth-paula-membership-readonly-reconcile-lab-v20260817",
-      "profile": "default",
-      "contractVersion": "14.2.0",
-      "lifecycle": "tools/orbit360-validator-lifecycle-contract-auth-paula-membership-readonly-reconcile-lab-v20260817.json",
-      "engine": "tools/orbit360-validar-gate-contracts-engine-auth-paula-membership-readonly-reconcile-lab-v20260817.mjs"
-    },
-    {
-      "gateId": "block-auth-paula-membership-readonly-reconcile-v2-lab-v20260817",
-      "profile": "default",
-      "contractVersion": "14.3.0",
-      "lifecycle": "tools/orbit360-validator-lifecycle-contract-auth-paula-membership-readonly-reconcile-v2-lab-v20260817.json",
-      "engine": "tools/orbit360-validar-gate-contracts-engine-auth-paula-membership-readonly-reconcile-v2-lab-v20260818.mjs"
-    },
-    {
-      "gateId": "f1-4c-successor-artifact-build-lab-v20260818",
-      "profile": "default",
-      "contractVersion": "1.0.0",
-      "lifecycle": "tools/orbit360-validator-lifecycle-contract-f1-4c-successor-artifact-build-v20260818.json",
-      "engine": "tools/orbit360-validar-gate-contracts-engine-f1-4c-successor-artifact-build-v20260818.mjs"
-    },
-    {
-      "gateId": "block2.7-visual-matrix-corrected-post-auth-lab-v20260805",
-      "profile": "default",
-      "contractVersion": "2.7.8",
-      "lifecycle": "tools/orbit360-validator-lifecycle-contract-visual-matrix-corrected-post-auth-lab-v20260805.json",
-      "engine": "tools/orbit360-validar-gate-contracts-engine-visual-matrix-corrected-post-auth-lab-v20260805.mjs"
-    },
-    {
-      "gateId": "f2-productive-acceptance-exact-successor-v20260818",
-      "profile": "authority",
-      "contractVersion": "3.0.0-single-state",
-      "authority": "tools/orbit360-gate-contract-f2-productive-acceptance-v20260820.json"
-    }
+  "historicalBindings": [
+    {"gateId":"block1-client360-insurers-lab-v20260717","profile":"default","contractVersion":"1.0.41","executionMode":"HISTORICAL_FROZEN_NO_EXECUTION","activeAuthority":false,"lifecycleArtifact":"tools/orbit360-validator-lifecycle-block1-v23-native-v20260807.json","lifecycleBlobSha":"bb7a98fab934ac244fe320e461f1c6516d2bf213","engineArtifact":"tools/orbit360-validar-gate-contracts-engine-block1-v23-native-v20260807.mjs","engineBlobSha":"5bfc61295334863108353551dd22b32360bf7f45","historicalSourceCommit":"3b2abfa3dc5aac4de3fc4230e061adfcf4bb2c40"},
+    {"gateId":"block1-client360-insurers-lab-v20260717","profile":"v28-focal-provenance-universe","contractVersion":"1.0.41","executionMode":"HISTORICAL_FROZEN_NO_EXECUTION","activeAuthority":false,"lifecycleArtifact":"tools/orbit360-validator-lifecycle-block1-focal-provenance-universe-v28-v20260807.json","lifecycleBlobSha":"bb7a98fab934ac244fe320e461f1c6516d2bf213","engineArtifact":"tools/orbit360-validar-gate-contracts-engine-block1-focal-provenance-universe-v28-v20260807.mjs","engineBlobSha":"5bfc61295334863108353551dd22b32360bf7f45","historicalSourceCommit":"3b2abfa3dc5aac4de3fc4230e061adfcf4bb2c40"},
+    {"gateId":"block1-client360-insurers-lab-v20260717","profile":"v29-identity-reconciliation-universe","contractVersion":"1.0.41","executionMode":"HISTORICAL_FROZEN_NO_EXECUTION","activeAuthority":false,"lifecycleArtifact":"tools/orbit360-validator-lifecycle-block1-identity-reconciliation-universe-v29-v20260807.json","lifecycleBlobSha":"bb7a98fab934ac244fe320e461f1c6516d2bf213","engineArtifact":"tools/orbit360-validar-gate-contracts-engine-block1-identity-reconciliation-universe-v29-v20260807.mjs","engineBlobSha":"5bfc61295334863108353551dd22b32360bf7f45","historicalSourceCommit":"3b2abfa3dc5aac4de3fc4230e061adfcf4bb2c40"},
+    {"gateId":"block1-client360-insurers-lab-v20260717","profile":"v30-retained26-psi-universe","contractVersion":"1.0.41","executionMode":"HISTORICAL_FROZEN_NO_EXECUTION","activeAuthority":false,"lifecycleArtifact":"tools/orbit360-validator-lifecycle-block1-retained26-psi-v30-v20260807.json","lifecycleBlobSha":"bb7a98fab934ac244fe320e461f1c6516d2bf213","engineArtifact":"tools/orbit360-validar-gate-contracts-engine-block1-retained26-psi-v30-v20260807.mjs","engineBlobSha":"5bfc61295334863108353551dd22b32360bf7f45","historicalSourceCommit":"3b2abfa3dc5aac4de3fc4230e061adfcf4bb2c40"},
+    {"gateId":"block1-client360-insurers-lab-v20260717","profile":"v33-two-client-cloud-audit","contractVersion":"1.0.41","executionMode":"HISTORICAL_FROZEN_NO_EXECUTION","activeAuthority":false,"lifecycleArtifact":"tools/orbit360-validator-lifecycle-block1-two-client-cloud-audit-v33-v20260807.json","lifecycleBlobSha":"bb7a98fab934ac244fe320e461f1c6516d2bf213","engineArtifact":"tools/orbit360-validar-gate-contracts-engine-block1-two-client-cloud-audit-v33-v20260807.mjs","engineBlobSha":"5bfc61295334863108353551dd22b32360bf7f45","historicalSourceCommit":"3b2abfa3dc5aac4de3fc4230e061adfcf4bb2c40"},
+    {"gateId":"block1-client360-insurers-lab-v20260717","profile":"v33-two-client-cloud-audit-runtime","contractVersion":"1.0.41","executionMode":"HISTORICAL_FROZEN_NO_EXECUTION","activeAuthority":false,"lifecycleArtifact":"tools/orbit360-validator-lifecycle-block1-two-client-cloud-audit-runtime-v33-v20260810.json","lifecycleBlobSha":"bb7a98fab934ac244fe320e461f1c6516d2bf213","engineArtifact":"tools/orbit360-validar-gate-contracts-engine-block1-two-client-cloud-audit-runtime-v33-v20260810.mjs","engineBlobSha":"5bfc61295334863108353551dd22b32360bf7f45","historicalSourceCommit":"3b2abfa3dc5aac4de3fc4230e061adfcf4bb2c40"},
+    {"gateId":"block10.10-cobros-full-ledger-write-lab-v20260805","profile":"default","contractVersion":"10.10.2","executionMode":"HISTORICAL_FROZEN_NO_EXECUTION","activeAuthority":false,"lifecycleArtifact":"tools/orbit360-validator-lifecycle-contract-cobros-full-ledger-write-lab-v20260805.json","lifecycleBlobSha":"bb7a98fab934ac244fe320e461f1c6516d2bf213","engineArtifact":"tools/orbit360-validar-gate-contracts-engine-cobros-full-ledger-write-v20260811.mjs","engineBlobSha":"5bfc61295334863108353551dd22b32360bf7f45","historicalSourceCommit":"3b2abfa3dc5aac4de3fc4230e061adfcf4bb2c40"},
+    {"gateId":"block10.10-cobros-full-ledger-write-lab-v20260805","profile":"cobros-10102-runtime","contractVersion":"10.10.2","executionMode":"HISTORICAL_FROZEN_NO_EXECUTION","activeAuthority":false,"lifecycleArtifact":"tools/orbit360-validator-lifecycle-contract-cobros-full-ledger-write-runtime-v20260811.json","lifecycleBlobSha":"bb7a98fab934ac244fe320e461f1c6516d2bf213","engineArtifact":"tools/orbit360-validar-gate-contracts-engine-cobros-full-ledger-write-v20260811.mjs","engineBlobSha":"5bfc61295334863108353551dd22b32360bf7f45","historicalSourceCommit":"3b2abfa3dc5aac4de3fc4230e061adfcf4bb2c40"},
+    {"gateId":"fase-a-ops-leads-crm-release-lab-v20260812","profile":"default","contractVersion":"1.0.0","executionMode":"HISTORICAL_FROZEN_NO_EXECUTION","activeAuthority":false,"lifecycleArtifact":"tools/orbit360-validator-lifecycle-fase-a-ops-leads-crm-release-v20260812.json","lifecycleBlobSha":"bb7a98fab934ac244fe320e461f1c6516d2bf213","engineArtifact":"tools/orbit360-validar-gate-contracts-engine-fase-a-ops-leads-crm-release-v20260812.mjs","engineBlobSha":"5bfc61295334863108353551dd22b32360bf7f45","historicalSourceCommit":"3b2abfa3dc5aac4de3fc4230e061adfcf4bb2c40"},
+    {"gateId":"block-auth-paula-password-reset-lab-v20260817","profile":"default","contractVersion":"14.0.0","executionMode":"HISTORICAL_FROZEN_NO_EXECUTION","activeAuthority":false,"lifecycleArtifact":"tools/orbit360-validator-lifecycle-contract-auth-paula-password-reset-lab-v20260817.json","lifecycleBlobSha":"bb7a98fab934ac244fe320e461f1c6516d2bf213","engineArtifact":"tools/orbit360-validar-gate-contracts-engine-auth-paula-password-reset-lab-v20260817.mjs","engineBlobSha":"5bfc61295334863108353551dd22b32360bf7f45","historicalSourceCommit":"3b2abfa3dc5aac4de3fc4230e061adfcf4bb2c40"},
+    {"gateId":"block-auth-paula-reset-link-handoff-lab-v20260817","profile":"default","contractVersion":"14.1.0","executionMode":"HISTORICAL_FROZEN_NO_EXECUTION","activeAuthority":false,"lifecycleArtifact":"tools/orbit360-validator-lifecycle-contract-auth-paula-reset-link-handoff-lab-v20260817.json","lifecycleBlobSha":"bb7a98fab934ac244fe320e461f1c6516d2bf213","engineArtifact":"tools/orbit360-validar-gate-contracts-engine-auth-paula-reset-link-handoff-lab-v20260817.mjs","engineBlobSha":"5bfc61295334863108353551dd22b32360bf7f45","historicalSourceCommit":"3b2abfa3dc5aac4de3fc4230e061adfcf4bb2c40"},
+    {"gateId":"block-auth-paula-membership-readonly-reconcile-lab-v20260817","profile":"default","contractVersion":"14.2.0","executionMode":"HISTORICAL_FROZEN_NO_EXECUTION","activeAuthority":false,"lifecycleArtifact":"tools/orbit360-validator-lifecycle-contract-auth-paula-membership-readonly-reconcile-lab-v20260817.json","lifecycleBlobSha":"bb7a98fab934ac244fe320e461f1c6516d2bf213","engineArtifact":"tools/orbit360-validar-gate-contracts-engine-auth-paula-membership-readonly-reconcile-lab-v20260817.mjs","engineBlobSha":"5bfc61295334863108353551dd22b32360bf7f45","historicalSourceCommit":"3b2abfa3dc5aac4de3fc4230e061adfcf4bb2c40"},
+    {"gateId":"block-auth-paula-membership-readonly-reconcile-v2-lab-v20260817","profile":"default","contractVersion":"14.3.0","executionMode":"HISTORICAL_FROZEN_NO_EXECUTION","activeAuthority":false,"lifecycleArtifact":"tools/orbit360-validator-lifecycle-contract-auth-paula-membership-readonly-reconcile-v2-lab-v20260817.json","lifecycleBlobSha":"bb7a98fab934ac244fe320e461f1c6516d2bf213","engineArtifact":"tools/orbit360-validar-gate-contracts-engine-auth-paula-membership-readonly-reconcile-v2-lab-v20260818.mjs","engineBlobSha":"5bfc61295334863108353551dd22b32360bf7f45","historicalSourceCommit":"3b2abfa3dc5aac4de3fc4230e061adfcf4bb2c40"},
+    {"gateId":"f1-4c-successor-artifact-build-lab-v20260818","profile":"default","contractVersion":"1.0.0","executionMode":"HISTORICAL_FROZEN_NO_EXECUTION","activeAuthority":false,"lifecycleArtifact":"tools/orbit360-validator-lifecycle-contract-f1-4c-successor-artifact-build-v20260818.json","lifecycleBlobSha":"bb7a98fab934ac244fe320e461f1c6516d2bf213","engineArtifact":"tools/orbit360-validar-gate-contracts-engine-f1-4c-successor-artifact-build-v20260818.mjs","engineBlobSha":"5bfc61295334863108353551dd22b32360bf7f45","historicalSourceCommit":"3b2abfa3dc5aac4de3fc4230e061adfcf4bb2c40"},
+    {"gateId":"block2.7-visual-matrix-corrected-post-auth-lab-v20260805","profile":"default","contractVersion":"2.7.8","executionMode":"HISTORICAL_FROZEN_NO_EXECUTION","activeAuthority":false,"lifecycleArtifact":"tools/orbit360-validator-lifecycle-contract-visual-matrix-corrected-post-auth-lab-v20260805.json","lifecycleBlobSha":"bb7a98fab934ac244fe320e461f1c6516d2bf213","engineArtifact":"tools/orbit360-validar-gate-contracts-engine-visual-matrix-corrected-post-auth-lab-v20260805.mjs","engineBlobSha":"5bfc61295334863108353551dd22b32360bf7f45","historicalSourceCommit":"3b2abfa3dc5aac4de3fc4230e061adfcf4bb2c40"},
+    {"gateId":"f2-productive-acceptance-exact-successor-v20260818","profile":"authority","contractVersion":"3.0.0-single-state","executionMode":"HISTORICAL_FROZEN_NO_EXECUTION","activeAuthority":false,"authorityArtifact":"tools/orbit360-gate-contract-f2-productive-acceptance-v20260820.json","authorityBlobSha":"f9dd8c04e5dbf752f673c7d213ccfa185f0175c4","historicalSourceCommit":"3b2abfa3dc5aac4de3fc4230e061adfcf4bb2c40"}
   ],
-  "legacyRouting": {
-    "status": "HISTORICAL_ONLY_DELEGATED",
-    "delegate": "tools/orbit360-validar-gate-contracts-legacy-v20260717.mjs",
-    "activeAuthority": false,
-    "mayCarryMutableState": false
-  },
-  "policies": {
-    "singleStaticGateRegistry": true,
-    "routerRegistryParityRequired": true,
-    "authorityRegistryParityRequired": true,
-    "dynamicStateMustComeFromLedger": true,
-    "newGateMustBeRegisteredBeforeExecution": true,
-    "staleRegistryFailsClosed": true,
-    "staleRouterFailsClosed": true,
-    "legacyRouteCannotBecomeActiveWithoutRegistryPromotion": true,
-    "productMutationOnParityFailure": false,
-    "dataMutationOnParityFailure": false,
-    "runtimeOnParityFailure": false,
-    "deployOnParityFailure": false
-  },
-  "classification": "PIPELINE_MECHANISM_FAILURE_ROOTFIX_STATIC_GATE_AUTHORITY_CONVERGENCE",
+  "routerBindings": [],
+  "legacyRouting": {"status":"HISTORICAL_FROZEN_NO_EXECUTION","delegate":"tools/orbit360-validar-gate-contracts-legacy-v20260717.mjs","activeAuthority":false,"mayCarryMutableState":false,"executionForbidden":true},
+  "policies": {"singleStaticGateRegistry":true,"singleMutableStateLedger":true,"dynamicStateMustComeFromLedger":true,"historicalLifecycleStateForbidden":true,"historicalEngineExecutionForbidden":true,"newGateMustUseSingleStateControlPlane":true,"productMutationOnParityFailure":false,"dataMutationOnParityFailure":false,"runtimeOnParityFailure":false,"deployOnParityFailure":false},
+  "classification": "PIPELINE_MECHANISM_FAILURE_ROOTFIX_STATIC_AND_MUTABLE_AUTHORITY_CONVERGENCE",
   "containsPII": false,
   "containsSecrets": false
 }

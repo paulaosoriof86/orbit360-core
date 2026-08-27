@@ -1,94 +1,13 @@
 {
-  "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
-  "gateId": "f1-4c-successor-artifact-build-lab-v20260818",
-  "gateContractVersion": "1.0.0",
-  "validatorLifecycleRevision": "phase-capability-contract-v1",
-  "status": "F1_4C_CONSUMED_PASS",
-  "currentPhase": "F1_4C_SUCCESSOR_ARTIFACT_BUILD",
-  "executionProfile": {
-    "phase": "F1_4C_SUCCESSOR_ARTIFACT_BUILD",
-    "capabilities": {
-      "secrets": false,
-      "firestoreRead": false,
-      "writes": false,
-      "runtime": false,
-      "browser": false,
-      "deploy": false,
-      "functionsDeploy": false,
-      "rulesDeploy": false,
-      "production": false
-    }
-  },
-  "singleGate": true,
-  "macroClosure": false,
-  "authorization": {
-    "requiredForExecution": true,
-    "activeRequest": false,
-    "allowedExecutions": 0,
-    "consumed": true,
-    "replayAllowed": false,
-    "request": ".github/orbit360-requests/f1-4c-successor-artifact-build-runbound-20260818-02.json",
-    "requestCommit": "0080eafac6a48aebb46debddcae405783b29a97b",
-    "priorPrebuildStopRequest": ".github/orbit360-requests/f1-4c-successor-artifact-build-runbound-20260818-01.json",
-    "priorPrebuildStopRunId": "32193519205",
-    "priorCandidateBuildsExecuted": 0
-  },
-  "buildBoundary": {
-    "maximumCandidates": 1,
-    "candidateBuildsExecuted": 1,
-    "packageRebuildAllowed": false,
-    "githubArtifactUploadAllowed": false,
-    "secretAccessAllowed": false,
-    "dataAccessAllowed": false,
-    "firestoreWritesAllowed": false,
-    "authWritesAllowed": false,
-    "operationalWritesAllowed": false,
-    "browserAllowed": false,
-    "runtimeAllowed": false,
-    "hostingDeployAllowed": false,
-    "publicationAllowed": false,
-    "productionMutationAllowed": false,
-    "mainAllowed": false,
-    "mergeAllowed": false
-  },
-  "guards": {
-    "gateBeforeBuild": true,
-    "baseArtifactId": 9300368902,
-    "baseSourceHead": "861326906558f03d9c8c2e7f34adfb4979a17d73",
-    "rootfixCommitsRequired": [
-      "a808e13d69dcb687f488be7e17411796eaec3509",
-      "b050d5a1a9861f898d2bb50d1bcc5c26beb72e9b"
-    ],
-    "f1_4bEvidenceCommitRequired": "3c56d0baffce8fc8399050e520ee4cb54cebf4db",
-    "expectedProductDeltaPaths": [
-      "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js",
-      "orbit360-platform/core/membership-multirol-contract-p0.js"
-    ],
-    "stopRetryOnFailure": true
-  },
-  "executionResult": {
-    "ok": true,
-    "runId": "32194002530",
-    "status": "F1_4C_SUCCESSOR_ARTIFACT_CERTIFIED_UNPUBLISHED",
-    "classification": "PASS",
-    "sourceHead": "29caae94a3db1f1626bdde2ea6ee9a21799f9df6",
-    "candidateArtifactId": "9345207863",
-    "evidenceArtifactId": "9345208103",
-    "zipName": "orbit360-fase-a-product-f1-4c-successor-29caae94a3db.zip",
-    "zipSha256": "493009c83390901aa772842a2ba9ddd5ce5293f6969d86c5c3395ebd670a44ac",
-    "manifestSha256": "29dafe5e63b425ea6cf641937fe1b9d4b9e63f72479a51ae76f9148a55771761",
-    "fileCount": 194,
-    "deltaCount": 2,
-    "unchangedProductFiles": 192,
-    "published": false,
-    "browserExecuted": false,
-    "runtimeExecuted": false,
-    "firestoreWrites": 0,
-    "authWrites": 0,
-    "operationalWrites": 0,
-    "deployExecuted": false,
-    "productionTouched": false
-  },
+  "schemaVersion": "orbit360-validator-lifecycle-historical-tombstone-v1",
+  "status": "HISTORICAL_FROZEN_NON_AUTHORITATIVE",
+  "stateBearing": false,
+  "dynamicStateForbidden": true,
+  "executionAuthority": false,
+  "runtimeAllowed": false,
+  "currentStateAuthority": "orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json",
+  "historicalSourceCommit": "3b2abfa3dc5aac4de3fc4230e061adfcf4bb2c40",
+  "historicalPurpose": "Forensic path tombstone only. Gate identity/configuration lives exclusively in the static gate registry; operational state lives exclusively in the ledger.",
   "containsPII": false,
   "containsSecrets": false
 }

@@ -1,54 +1,13 @@
 {
-  "schemaVersion": "orbit360-validator-lifecycle-contract-v1",
-  "validatorLifecycleRevision": "phase-capability-contract-v1",
-  "gateId": "fase-a-ops-leads-crm-release-lab-v20260812",
-  "gateContractVersion": "1.0.0",
-  "status": "SOURCE_ONLY_BINDING",
-  "currentPhase": "SOURCE_ONLY_FASE_A_OPS_LEADS_CRM_RELEASE",
-  "singleGate": true,
-  "macroClosure": true,
-  "executionProfile": {
-    "phase": "SOURCE_ONLY_FASE_A_OPS_LEADS_CRM_RELEASE",
-    "capabilities": {
-      "secrets": false,
-      "firestoreRead": false,
-      "writes": false,
-      "runtime": false,
-      "browser": false,
-      "deploy": false,
-      "functionsDeploy": false,
-      "rulesDeploy": false,
-      "production": false
-    }
-  },
-  "authorization": {
-    "runtimeRequestRequired": true,
-    "status": "ABSENT_UNTIL_SOURCE_PASS_AND_EXPLICIT_AUTHORIZATION",
-    "allowedExecutions": 0,
-    "consumed": false,
-    "replayAllowed": false,
-    "productionAuthorized": false,
-    "mainAuthorized": false,
-    "mergeAuthorized": false
-  },
-  "scope": {
-    "branch": "ays/backend-tenant-lab-v99-20260703",
-    "pullRequest": 5,
-    "tenantId": "alianzas-soluciones",
-    "labExistingHostingOnly": true,
-    "hostingDeployRequired": false,
-    "visualRoutes": ["ops", "leads", "cliente360"],
-    "roles": ["Direccion", "Operativo", "Asesor"],
-    "snapshotBeforeAfterRequired": true,
-    "firestoreWritesAuthorized": 0,
-    "authWritesAuthorized": 0,
-    "operationalWritesAuthorized": 0
-  },
-  "antiLoop": {
-    "reopenClosedBlocks": false,
-    "touchFinance": false,
-    "reuseConsumedAuthorization": false,
-    "newAuthHarness": false,
-    "newBrowserHarness": false
-  }
+  "schemaVersion": "orbit360-validator-lifecycle-historical-tombstone-v1",
+  "status": "HISTORICAL_FROZEN_NON_AUTHORITATIVE",
+  "stateBearing": false,
+  "dynamicStateForbidden": true,
+  "executionAuthority": false,
+  "runtimeAllowed": false,
+  "currentStateAuthority": "orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json",
+  "historicalSourceCommit": "3b2abfa3dc5aac4de3fc4230e061adfcf4bb2c40",
+  "historicalPurpose": "Forensic path tombstone only. Gate identity/configuration lives exclusively in the static gate registry; operational state lives exclusively in the ledger.",
+  "containsPII": false,
+  "containsSecrets": false
 }
