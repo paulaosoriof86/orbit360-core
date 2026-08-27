@@ -26,19 +26,29 @@ Esto **no** equivale a `PASS_PRESERVED_VISUAL`. La validación visual humana sig
 
 ## Sincronización del mecanismo
 
-El cambio se prepara de forma conjunta en:
+El primer cierre atómico se publicó en la rama canónica como `5f19d2eb8fa58a31d57ee0d64659a851a4468d11`, sincronizando:
 
 1. `orbit360-certified-product-preservation-registry-v20260827.json`
 2. `orbit360-certified-product-preservation-v20260827.mjs`
 3. workflow canónico source-only
 4. fingerprint del workflow en `orbit360-gate-contract-registry-v20260717.json`
 
-La rama canónica debe recibirlos en un único commit atómico. Después debe ejecutarse un `CONTROL_PLANE_SELFTEST` nuevo sobre el HEAD canónico.
+El `CONTROL_PLANE_SELFTEST` run `33109149445` confirmó que el guard exacto de Cliente 360 pasa con `CLIENTE360_LAST_APPROVED_LINEAGE_PRESERVATION_PASS`, pero se detuvo inmediatamente después en `single-state-invariant` con `CLIENTE360_MODULE_LINEAGE_INVALID`.
+
+## Causa raíz del self-test fallido
+
+Clasificación: `PIPELINE_MECHANISM_FAILURE` con manifestación `VALIDATOR_STALE`.
+
+El invariant activo todavía exigía tres representaciones antiguas de `HISTORICAL_CHAIN_IN_PROGRESS`: validación del registro, validación del workflow y salida PASS. No se ejecutó self-test posterior, claim, secretos, Firestore, navegador, runtime, deploy ni producción.
+
+El inventario de consumidores activos comprobó que writer registry, state contract, ledger owner y publication preflight no fijan el estado histórico viejo. El consumidor obsoleto restante es `tools/orbit360-single-state-invariant-v20260827.mjs`; como el state contract fingerprinta ese archivo, su corrección exige actualizar conjuntamente `singleStateInvariantBlobSha` en `tools/orbit360-gate-contract-registry-v20260717.json`.
+
+La corrección del invariant no acepta una etiqueta aislada. Debe verificar el artifact aprobado `9485621192`, source `842f762f199f4c7dbf13062a33ca220d92398c51`, árbol de módulos `f61c22138107cae5971338ad45c2e6225f72da5b`, blob Cliente 360 `fa50bae659ed03909a220d720fc0305838c75b31`, v22 sin delta de producto, `promotionOmissionConfirmed:false`, evidencia visual humana todavía requerida y `visualPass:false`.
 
 ## Carriles
 
 - A: sin cambios de frontend/producto; solo trazabilidad y preparación de validación visual.
-- B: sincronización source-only del guard de preservación y sus consumidores.
+- B: sincronización source-only del guard de preservación, invariant y fingerprints.
 - C: datos A&S intactos; cero reimportación/reproceso.
 
 ## Claude / Academia
@@ -49,4 +59,4 @@ La rama canónica debe recibirlos en un único commit atómico. Después debe ej
 
 ## Estado
 
-`PREPARED_AWAITING_CANONICAL_SOURCE_ONLY_SELFTEST`.
+`INVARIANT_STALE_ROOTFIX_PREPARED_AWAITING_CANONICAL_SOURCE_ONLY_SELFTEST`.
