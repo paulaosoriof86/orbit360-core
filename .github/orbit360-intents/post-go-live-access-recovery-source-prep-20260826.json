@@ -1,0 +1,32 @@
+{
+  "schemaVersion": "orbit360-execution-intent-v1",
+  "transitionId": "POST_GO_LIVE_ACCESS_RECOVERY_SOURCE_PREP",
+  "canonicalBaseHead": "317439e7972f471f0d227f2ae3c3f64591076e5a",
+  "expectedLedgerRevision": 111,
+  "oneShotOnly": true,
+  "replayAllowed": false,
+  "explicitUserAuthorization": false,
+  "target": {
+    "projectId": "ays-orbit-360-lab",
+    "tenantId": "alianzas-soluciones",
+    "advisorId": "ase-paula-osorio",
+    "emailHash": "9b663847979724e9491e1c655da32a7cb17a5f6ed26dba352de1eb811254b23f",
+    "targetCount": 1
+  },
+  "scope": {
+    "runtime": false,
+    "browser": false,
+    "secrets": false,
+    "firestoreRead": false,
+    "deploy": false,
+    "production": false,
+    "firestoreWrites": false,
+    "authWrites": false,
+    "operationalWrites": false,
+    "dataWrites": false,
+    "main": false,
+    "merge": false
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
