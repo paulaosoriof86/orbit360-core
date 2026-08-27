@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "orbit360-execution-intent-v1",
+  "transitionId": "POST_GO_LIVE_CONTROL_PLANE_METADATA_RECONCILE",
+  "canonicalBaseHead": "b6bada3fa79275232cdd355fa06ec092b4df7706",
+  "expectedLedgerRevision": 113,
+  "oneShotOnly": true,
+  "replayAllowed": false,
+  "explicitUserAuthorization": false,
+  "scope": {
+    "runtime": false,
+    "browser": false,
+    "secrets": false,
+    "firestoreRead": false,
+    "deploy": false,
+    "production": false,
+    "firestoreWrites": false,
+    "authWrites": false,
+    "operationalWrites": false,
+    "dataWrites": false,
+    "main": false,
+    "merge": false
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
