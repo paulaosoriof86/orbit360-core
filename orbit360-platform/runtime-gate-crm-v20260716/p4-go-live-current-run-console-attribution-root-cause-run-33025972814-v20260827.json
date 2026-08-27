@@ -1,0 +1,42 @@
+{
+  "schemaVersion": "orbit360-root-cause-evidence-v1",
+  "runId": 33025972814,
+  "observedClassification": "FUNCTIONAL_DEFECT",
+  "correctedClassification": "VALIDATOR_STALE",
+  "secondaryClassification": "PIPELINE_MECHANISM_FAILURE",
+  "code": "SECONDARY_BROWSER_DIAGNOSTIC_TIMEOUT_LEFT_EXPECTED_CROSS_TENANT_400_UNATTRIBUTED",
+  "cause": "The primary browser run completed all required role/module routes successfully and observed the cross-tenant denial, but the binder depended on a second browser navigation to reproduce and attribute the single 400 console signal. That secondary diagnostic timed out at page.goto before attribution, so the browser evidence remained incorrectly classified as a functional defect.",
+  "productEvidence": {
+    "allRequiredRouteChecksPass": true,
+    "routeCheckCount": 21,
+    "crossTenantDenied": true,
+    "pageErrors": 0,
+    "writeSignals": 0,
+    "singleConsole400": true,
+    "hostingPublicReadbackPass": true,
+    "hostingPublicFileCount": 189,
+    "rollbackSucceeded": true
+  },
+  "rootfix": {
+    "browserCapturesNetworkAttributionInCurrentRun": true,
+    "binderSecondaryBrowserReproductionRemoved": true,
+    "ambiguousConsoleSignalMustNotBeFunctionalDefect": true,
+    "sourceOnlySelftestRequired": true,
+    "registryAndInvariantSynchronized": true
+  },
+  "authorizationConsumed": true,
+  "authorizationReusable": false,
+  "runtimeReplayAllowed": false,
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "operationalWrites": 0,
+  "rulesDeploy": false,
+  "dataWrites": false,
+  "productTouchedByRootfix": false,
+  "candidateChanged": false,
+  "dataChanged": false,
+  "classificationForClaude": "BACKEND_PROTEGIDO_NO_CLAUDE",
+  "academiaImpact": "ACADEMIA_ACTUALIZAR: distinguir defecto funcional de VALIDATOR_STALE/PIPELINE_MECHANISM_FAILURE y exigir atribucion causal current-run antes de clasificar errores de consola.",
+  "containsPII": false,
+  "containsSecrets": false
+}
