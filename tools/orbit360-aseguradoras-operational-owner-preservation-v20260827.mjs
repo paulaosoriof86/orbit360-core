@@ -42,15 +42,20 @@ const checks = missing.length ? [check('required-files-present', false, missing)
   check('owner-no-store-writes', has(owner, 'writesStore: false'), 'read/render owner only'),
   check('owner-no-reimport', has(owner, 'reimportsData: false'), 'no data reimport'),
   check('bootstrap-requests-final-owner', has(bootstrap, "operationalDirectoryOwnerVersion: '20260723.2'") && has(bootstrap, 'operationalDirectoryOwnerRequested: true'), EXPECTED_VERSION),
-  check('bootstrap-loads-final-owner-source', has(bootstrap, 'client-insurer-operational-directory-owner-v20260722.js?v=20260723-2') && has(bootstrap, "data-orbit-operational-directory-owner"), OWNER_REL),
+  check('bootstrap-loads-final-owner-source', has(bootstrap, 'client-insurer-operational-directory-owner-v20260722.js?v=20260723-2') && has(bootstrap, 'data-orbit-operational-directory-owner'), OWNER_REL),
   check('bootstrap-readiness-requires-final-version', has(bootstrap, "Orbit.clientInsurerOperationalDirectoryOwnerV20260722.version === '20260723.2'"), 'loadOperationalOwner fail-closed version check'),
   check('bootstrap-owner-before-tenant-config-and-router', has(bootstrap, 'function loadOperationalOwner()') && has(bootstrap, 'loadOperationalOwner,') && has(index, 'core/router-tenant-config-bootstrap.js') && has(index, 'core/router.js'), 'owner requested by bootstrap before router.js executes'),
-  check('legacy-bridge-not-authority', has(legacy, 'credentialRef') && !has(legacy, 'ownerId: \'clientInsurerOperationalDirectoryOwner\''), 'legacy consumer may exist but cannot be canonical owner')
+  check(
+    'legacy-bridge-explicit-post-router-consumer',
+    has(legacy, "mod.__resourcesRuntimeOwnershipV20260718 = { phase: 'post-router-render', autoloadsBeforeRouter: false };") &&
+      has(legacy, 'mod.__resourcesV1202 = { originalRender, loadAysRuntime };'),
+    'legacy bridge explicitly declares post-router-render and no pre-router autoload ownership'
+  )
 ];
 
 const failed = checks.filter(x => !x.ok);
 const payload = {
-  schemaVersion: 'orbit360-aseguradoras-operational-owner-preservation-v1',
+  schemaVersion: 'orbit360-aseguradoras-operational-owner-preservation-v2',
   validatorId: 'aseguradoras-operational-owner-preservation-v20260827',
   module: 'Aseguradoras',
   classificationOnFailure: 'VALIDATOR_STALE',
