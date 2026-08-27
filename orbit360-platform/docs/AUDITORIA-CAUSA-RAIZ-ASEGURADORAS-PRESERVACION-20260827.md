@@ -2,7 +2,7 @@
 
 Fecha: 2026-08-27  
 Módulo: Aseguradoras  
-Tipo de cambio: mecanismo de preservación source-only; producto/datos congelados.
+Tipo de cambio: mecanismo de preservación source-only; producto/datos sin cambios.
 
 ## Necesidad
 
@@ -39,9 +39,9 @@ El archivo histórico `orbit360-platform/tools/orbit360-aseguradoras-owner-contr
 
 La matriz nativa posterior verificaba directorio/ficha/conocimiento/responsive, pero no todas las invariantes de usuario/contraseña/banco/owner final.
 
-### Clasificación actual
+### Clasificación
 
-**`VALIDATOR_STALE`**
+**`VALIDATOR_STALE` — RESUELTO.**
 
 No se clasifica como regresión de producto porque el source canónico conserva el owner final y el bootstrap correcto.
 
@@ -60,7 +60,7 @@ Esto permitía dos riesgos:
 
 `tools/orbit360-aseguradoras-operational-owner-preservation-v20260827.mjs`
 
-Comprueba 16 invariantes de owner, semántica, bootstrap y ausencia de autoridad legacy.
+Comprueba 16 invariantes de owner, semántica, bootstrap y rol explícito del consumidor legacy.
 
 ### 2. Registry específico
 
@@ -72,7 +72,7 @@ Declara la autoridad final, marca el validador histórico como stale para esta v
 
 `orbit360-platform/docs/orbit360-continuity-writer-registry-v20260820.json`
 
-Ahora registra el guard como `ACTIVE_SOURCE_ONLY_FAIL_CLOSED`, exige ejecución antes de inspeccionar intents y prohíbe mutar producto/datos cuando falle.
+Registra el guard como `ACTIVE_SOURCE_ONLY_FAIL_CLOSED`, exige ejecución antes de inspeccionar intents y prohíbe mutar producto/datos cuando falle.
 
 ### 4. Workflow canónico único
 
@@ -84,7 +84,7 @@ Ejecuta el guard antes de inspeccionar/aceptar cualquier intent y también dentr
 
 `tools/orbit360-single-state-invariant-v20260827.mjs`
 
-Ahora exige coherencia entre registry, guard, workflow, versión final y registry específico. Si alguien elimina o desincroniza el guard, falla cerrado.
+Exige coherencia entre registry, guard, workflow, versión final y registry específico. Si alguien elimina o desincroniza el guard, falla cerrado.
 
 ### 6. Matriz canónica post-go-live
 
@@ -98,45 +98,102 @@ Aseguradoras queda protegido como `PASS_PRESERVED_SOURCE`; no se reconstruye ni 
 
 Enseña owner vs consumidor, dato operativo vs secreto y `VALIDATOR_STALE` vs defecto funcional.
 
-## Verificación source readback
+## Primer selftest causal — hallazgo del propio validador
 
-El source vivo confirma:
+Run `33040721176` falló antes de cualquier claim/runtime. El invariant general dio PASS y 15/16 checks del guard de Aseguradoras dieron PASS. El único fallo fue `legacy-bridge-not-authority`.
 
-- owner final `20260723.2`;
-- `usernameOperationalVisible: true`;
-- `passwordProtectedTemporaryReveal: true`;
-- `bankNumberOperationalVisible: true`;
-- `bankRevealDependency: false`;
-- `bankCopyDirect: true`;
-- campos de copia `banco,tipo,numero,moneda,titular`;
-- `writesStore: false`;
-- `reimportsData: false`;
-- bootstrap solicitando/cargando `20260723.2`;
-- bridge v1202 sin declararse owner final.
+Causa: el check intentaba inferir ausencia de ownership mediante una condición textual indirecta. Se clasificó como `VALIDATOR_STALE` del guard nuevo y se aplicó `STOP_RETRY`; el run no se reejecutó.
 
-No se ejecutó browser/runtime/Firebase/deploy para este cierre porque la clasificación es `VALIDATOR_STALE` y el producto permanece congelado hasta completar la verificación source-only del mecanismo.
+El bridge legacy ya declara explícitamente:
+
+`phase: 'post-router-render', autoloadsBeforeRouter: false`
+
+Por tanto, el rootfix reemplazó la inferencia frágil por una validación del metadata real de ownership. Commit del rootfix: `33709b658635bd5bc40234c6b281d7bf562be4c4`.
+
+## Selftest causal fresco — PASS
+
+Rama efímera: `ays/orbit360-exec-aseguradoras-preservation-selftest-v2-20260827`  
+Intent commit: `22bd246cfff018b7d49e4c9042b77ab69a0517f1`  
+Run: `33040847676`  
+Job: `98413866140`  
+Conclusión: **SUCCESS**  
+Artifact: `9633785865`  
+Artifact SHA256: `73dd6df8b2473595e7ed4fb412d2ef8a6381f4694b98c5dfeb91f1038b91d68b`
+
+### Evidencia del guard final
+
+`ASEGURADORAS_FINAL_OWNER_PRESERVATION_PASS`
+
+16/16 checks PASS:
+
+1. owner final `20260723.2`;
+2. ownerId canónico;
+3. supersesión explícita de secciones legacy;
+4. usuario operativo visible;
+5. contraseña protegida/reveal temporal;
+6. cuenta bancaria visible;
+7. banco sin dependencia de reveal;
+8. copia bancaria directa;
+9. campos exactos de copia;
+10. owner sin writes de store;
+11. owner sin reimportación;
+12. bootstrap solicita owner final;
+13. bootstrap carga source final;
+14. readiness exige versión final;
+15. owner se solicita antes de Router;
+16. bridge legacy explícitamente `post-router-render` y sin autoload pre-Router.
+
+`failedCheckIds = []`.
+
+### Evidencia transversal del control plane
+
+También PASS:
+
+- `SINGLE_STATE_CONTROL_PLANE_STATIC_INVARIANT_PASS`;
+- `SINGLE_STATE_CONTROL_PLANE_SELFTEST_PASS`;
+- `wrongTargetBlocked = true`;
+- `oldAuthorizationBlocked = true`;
+- `secondClaimBlocked = true`;
+- `staleRevisionBlocked = true`;
+- `goLivePreserved = true`;
+- `GO_LIVE_RELEASE_HANDLER_SOURCE_ONLY_PASS`;
+- `POST_GO_LIVE_ACCESS_RECOVERY_SOURCE_ONLY_PASS`;
+- `F2_BROWSER_BINDER_CURRENT_RUN_CAUSAL_SELFTEST_PASS`.
+
+No hubo claim ni capacidad privilegiada en este selftest:
+
+- runtime ejecutado: no;
+- browser ejecutado: no;
+- secretos: no;
+- Firestore read: no;
+- Firestore writes: 0;
+- Auth writes: 0;
+- operational writes: 0;
+- deploy: no;
+- producción: no.
 
 ## Impacto
 
 - Se conserva toda la solución histórica de Aseguradoras.
 - Se elimina el incentivo a reimportar/reconstruir por anomalías de UI/wiring.
-- El control plane gana una protección fail-closed específica sobre la semántica final.
+- El control plane tiene ahora protección fail-closed específica sobre la semántica final.
 - Una futura regresión del owner ya no debe pasar silenciosamente por un check superficial.
+- El bridge legacy puede permanecer por compatibilidad sin confundirse con la autoridad final.
 
 ## Clasificación para Claude
 
 - arquitectura reusable del patrón owner/consumer + preservation guard: `REPLICABLE_CLAUDE_ACUMULADO`;
-- Academia: `ACADEMIA_ACTUALIZAR` — ya actualizado;
+- Academia: `ACADEMIA_ACTUALIZAR` — actualizado;
 - mecanismo control plane y validadores: `BACKEND_PROTEGIDO_NO_CLAUDE`;
 - datos reales/credenciales: no enviados.
 
 ## Estado
 
-**FIX SOURCE-ONLY MATERIALIZADO / VALIDACIÓN EJECUTABLE INCORPORADA / PRODUCTO Y DATOS SIN CAMBIOS.**
+**CLOSED/PASS — `VALIDATOR_STALE` RESUELTO. PRODUCTO Y DATOS DE ASEGURADORAS NO FUERON REPROCESADOS NI MODIFICADOS.**
 
 ## Siguiente acción exacta
 
-1. comprobar source-only del control plane actualizado sin secretos/runtime;
-2. mantener `HUMAN-LOGIN-VERIFICATION` como primera frontera funcional productiva pendiente;
-3. tras login humano estable, ejecutar smoke diferencial de Aseguradoras contra el owner `20260723.2`;
-4. si pasa, declarar `PASS_PRESERVED` y continuar con Cliente 360/Pólizas/Recibos/Cobros/Ops/Leads sin reprocesamiento.
+1. mantener `HUMAN-LOGIN-VERIFICATION` como primera frontera funcional productiva pendiente;
+2. tras login humano estable, ejecutar smoke diferencial de Aseguradoras contra el owner `20260723.2`;
+3. si el comportamiento productivo coincide con el contrato preservado, declarar `PASS_PRESERVED` post-go-live;
+4. continuar Cliente 360 → Pólizas → Vehículos → Recibos/cartera → Cobros → Ops → Leads → roles/scopes → sincronizaciones, sin reprocesar dominios cerrados.
