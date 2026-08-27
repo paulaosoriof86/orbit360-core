@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "orbit360-r20-lab-role-e2e-request-v1",
+  "status": "AUTHORIZED_ONCE_MECHANISM_RETRY",
+  "approved": true,
+  "authorizationRef": "user_direct_request_20260826_haz_las_pruebas_y_toma_las_capturas_directamente",
+  "allowedExecutions": 1,
+  "replayAllowed": false,
+  "retryOfRunId": 33039868838,
+  "retryReason": "TERMINAL_REPORT_TYPO_AND_LEGAL_OVERLAY_CAPTURE_WITHOUT_ACCEPTANCE",
+  "baseCandidateSha": "8c9668d6d423e82826b0295431ec699390d79b4b",
+  "projectId": "ays-orbit-360-lab",
+  "tenantId": "alianzas-soluciones",
+  "targetRoles": ["Operativo", "Asesor"],
+  "scope": {
+    "labOnly": true,
+    "realExistingIdentities": true,
+    "customTokenEphemeralAuth": true,
+    "firestoreReadOnly": true,
+    "production": false,
+    "deploy": false,
+    "dataWrites": false,
+    "adminAuthWrites": false,
+    "notifications": false,
+    "legalAcceptance": false,
+    "captureScreenshots": true
+  }
+}
