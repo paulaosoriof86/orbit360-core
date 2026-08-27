@@ -1,0 +1,29 @@
+{
+  "schemaVersion": "orbit360-validator-stale-evidence-v1",
+  "runId": 33026810850,
+  "observedClassification": "PIPELINE_MECHANISM_FAILURE",
+  "correctedClassification": "VALIDATOR_STALE",
+  "code": "SINGLE_STATE_BROWSER_EVIDENCE_BINDER_CONTRACT_INVALID",
+  "stage": "PRE_SELFTEST_STATIC_INVARIANT",
+  "cause": "The invariant still matched the previous binder implementation markers after the binder was intentionally changed to current-run causal attribution and secondary-browser reproduction was removed.",
+  "fix": {
+    "invariantSynchronized": true,
+    "registryRevision": 35,
+    "workflowCurrentRunCausalSelftestEnforced": true,
+    "secondaryBrowserReproductionForbidden": true,
+    "ambiguousConsoleSignalMustNotBeFunctionalDefect": true
+  },
+  "claimExecuted": false,
+  "runtimeExecuted": false,
+  "browserExecuted": false,
+  "secretAccess": false,
+  "firestoreRead": false,
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "operationalWrites": 0,
+  "deployExecuted": false,
+  "productionTouched": false,
+  "authorizationConsumed": false,
+  "containsPII": false,
+  "containsSecrets": false
+}
