@@ -85,6 +85,8 @@ jobs:
           test -n "$RELEASE_HANDLER" && test -f "$RELEASE_HANDLER"
           node "$RELEASE_HANDLER" --source-only-selftest --out "$ORBIT360_RELEASE_HANDLER_SELFTEST_OUT"
           jq -e '.ok==true and .status=="GO_LIVE_RELEASE_HANDLER_SOURCE_ONLY_PASS" and .handlerReady==true and .fullRehashPass==true and .targetDerivedFromCandidate==true and .releasePlanPass==true and .hostingOnlyDeploy==true and .rulesDeploy==false and .rollbackPreflightPass==true and .authorizationConsumed==false and .privilegedRiskObserved==false and .secretAccess==false and .firestoreRead==false and .deployExecuted==false and .productionTouched==false' "$ORBIT360_RELEASE_HANDLER_SELFTEST_OUT" >/dev/null
+          node tools/orbit360-bind-f2-browser-evidence-run-v20260824.mjs --selftest | tee "$RUNNER_TEMP/browser-binder-selftest.json"
+          jq -e '.ok==true and .status=="F2_BROWSER_BINDER_CURRENT_RUN_CAUSAL_SELFTEST_PASS" and .structuralCurrentRunNetworkAttribution==true and .secondaryBrowserReproductionRequired==false and .causalPassAccepted==true and .ambiguousReclassifiedValidatorStale==true and .invalidAttributionBlocked==true and .runtimeExecuted==false and .browserExecuted==false and .secretAccess==false and .firestoreRead==false' "$RUNNER_TEMP/browser-binder-selftest.json" >/dev/null
           node "$ORBIT360_INVARIANT"
           test -z "$(git status --porcelain)"
 
@@ -151,6 +153,7 @@ jobs:
             ${{ runner.temp }}/inspect.json
             ${{ runner.temp }}/single-state-selftest.json
             ${{ runner.temp }}/release-handler-selftest.json
+            ${{ runner.temp }}/browser-binder-selftest.json
             ${{ runner.temp }}/orbit360-terminal.json
           if-no-files-found: ignore
           retention-days: 14
