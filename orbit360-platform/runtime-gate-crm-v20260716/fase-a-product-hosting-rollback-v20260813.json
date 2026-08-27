@@ -1,13 +1,140 @@
 {
-  "schemaVersion": "orbit360-fase-a-hosting-helper-error-v1",
-  "generatedAt": "2026-08-26T23:40:04.414Z",
-  "mode": "rollback",
-  "classification": "PIPELINE_MECHANISM_FAILURE",
-  "error": "ROLLBACK_RELEASE_CREATE_FAILED_400",
+  "schemaVersion": "orbit360-fase-a-hosting-rollback-v2-idempotent",
+  "generatedAt": "2026-08-27T00:18:36.280Z",
+  "projectId": "ays-orbit-360-lab",
+  "liveUrl": "https://ays-orbit-360-lab.web.app",
+  "rollbackAnchor": "sites/ays-orbit-360-lab/versions/8572f3b23b9f8005",
+  "hosting": {
+    "siteStatus": 200,
+    "releasesStatus": 200,
+    "siteName": "projects/ays-orbit-360-lab/sites/ays-orbit-360-lab",
+    "defaultUrl": "https://ays-orbit-360-lab.web.app",
+    "currentRelease": {
+      "name": "sites/ays-orbit-360-lab/releases/1787789914161000",
+      "version": "sites/ays-orbit-360-lab/versions/8572f3b23b9f8005",
+      "type": "ROLLBACK",
+      "releaseTime": "2026-08-27T00:18:34.161Z"
+    },
+    "previousRelease": {
+      "name": "sites/ays-orbit-360-lab/releases/1787789505872000",
+      "version": "sites/ays-orbit-360-lab/versions/1762250949270ec9",
+      "type": "DEPLOY",
+      "releaseTime": "2026-08-27T00:11:45.872Z"
+    },
+    "releases": [
+      {
+        "name": "sites/ays-orbit-360-lab/releases/1787789914161000",
+        "version": "sites/ays-orbit-360-lab/versions/8572f3b23b9f8005",
+        "type": "ROLLBACK",
+        "releaseTime": "2026-08-27T00:18:34.161Z"
+      },
+      {
+        "name": "sites/ays-orbit-360-lab/releases/1787789505872000",
+        "version": "sites/ays-orbit-360-lab/versions/1762250949270ec9",
+        "type": "DEPLOY",
+        "releaseTime": "2026-08-27T00:11:45.872Z"
+      },
+      {
+        "name": "sites/ays-orbit-360-lab/releases/1787786260499000",
+        "version": "sites/ays-orbit-360-lab/versions/8572f3b23b9f8005",
+        "type": "ROLLBACK",
+        "releaseTime": "2026-08-26T23:17:40.499Z"
+      },
+      {
+        "name": "sites/ays-orbit-360-lab/releases/1787785911159000",
+        "version": "sites/ays-orbit-360-lab/versions/6e0d58b70ae1ca71",
+        "type": "DEPLOY",
+        "releaseTime": "2026-08-26T23:11:51.159Z"
+      },
+      {
+        "name": "sites/ays-orbit-360-lab/releases/1787783313944000",
+        "version": "sites/ays-orbit-360-lab/versions/8572f3b23b9f8005",
+        "type": "ROLLBACK",
+        "releaseTime": "2026-08-26T22:28:33.944Z"
+      },
+      {
+        "name": "sites/ays-orbit-360-lab/releases/1787782991899000",
+        "version": "sites/ays-orbit-360-lab/versions/ceeb31e1f4ae444e",
+        "type": "DEPLOY",
+        "releaseTime": "2026-08-26T22:23:11.899Z"
+      },
+      {
+        "name": "sites/ays-orbit-360-lab/releases/1787781471358000",
+        "version": "sites/ays-orbit-360-lab/versions/8572f3b23b9f8005",
+        "type": "ROLLBACK",
+        "releaseTime": "2026-08-26T21:57:51.358Z"
+      },
+      {
+        "name": "sites/ays-orbit-360-lab/releases/1787781460635000",
+        "version": "sites/ays-orbit-360-lab/versions/31f591f0ccf81cdf",
+        "type": "DEPLOY",
+        "releaseTime": "2026-08-26T21:57:40.635Z"
+      },
+      {
+        "name": "sites/ays-orbit-360-lab/releases/1786685116806000",
+        "version": "sites/ays-orbit-360-lab/versions/8572f3b23b9f8005",
+        "type": "ROLLBACK",
+        "releaseTime": "2026-08-14T05:25:16.806Z"
+      },
+      {
+        "name": "sites/ays-orbit-360-lab/releases/1786685047975000",
+        "version": "sites/ays-orbit-360-lab/versions/692cfc39cc2cc49e",
+        "type": "DEPLOY",
+        "releaseTime": "2026-08-14T05:24:07.975Z"
+      }
+    ],
+    "ok": true
+  },
+  "publicAssets": {
+    "index.html": {
+      "status": 200,
+      "sha256": "07571bf25485b07042f8a07d7510a323990f21d3cf809a76f99f5d39c454e7d0"
+    },
+    "product-runtime-config.js": {
+      "status": 200,
+      "sha256": "139c38ee633516bcf5b139f18b26ca22865443fcfa662325e0e140855f4e20bd"
+    },
+    "core/auth-product-runtime-p0.js": {
+      "status": 200,
+      "sha256": "d0bb399fe0e1dd102a03950673044eda5bc8d181e4e98cf477d22d141aa7b3a8"
+    },
+    "core/backend-product-readonly-bootstrap-p0.js": {
+      "status": 200,
+      "sha256": "ead861dfb4b3fa45a55e0e1ded7dcf973759054b864ebc3a2850deb0d083bfa3"
+    },
+    "data/store-firestore-product-readonly-p0.js": {
+      "status": 200,
+      "sha256": "2352b8157afc9052a25f85f3596cc01aae93907c069bf40b13c4974371a66c17"
+    },
+    "modules/cliente360.js": {
+      "status": 200,
+      "sha256": "665f3499a4eb6a1eafa723543a73bdd7057de344b2daf61776b6701ff3e3fbd9"
+    },
+    "modules/aseguradoras.js": {
+      "status": 200,
+      "sha256": "e8606280633ed642f5de06a4da76de06e6dbdee0fd2f8407aa866e122ca430a4"
+    },
+    "modules/ops.js": {
+      "status": 200,
+      "sha256": "26f2dd7371144b53edd061ee2709e55a06b84e2a696ae5f9c881aabe6b418b34"
+    },
+    "modules/leads.js": {
+      "status": 200,
+      "sha256": "9f56dee8d8da1fcdcb3fa1068f163b9de9a5ff80bcaa651d7c450f296a239ed0"
+    }
+  },
+  "checks": {
+    "rollbackReleaseCreated": true,
+    "rollbackNoopAlreadyAtAnchor": false,
+    "currentReleaseAtAnchor": true,
+    "publicAssetsRestored": true,
+    "hostingReadable": true
+  },
   "deployExecuted": true,
   "productionTouched": true,
   "rollbackExecuted": true,
-  "ok": false,
+  "decision": "ROLLED_BACK_SAFE",
+  "ok": true,
   "containsPII": false,
   "containsSecrets": false,
   "firestoreWrites": 0,
