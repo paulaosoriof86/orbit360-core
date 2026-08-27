@@ -9,7 +9,7 @@
   "sourceIdentityAlgorithm": "git-blob-sha1",
   "sourceIdentities": {
     ".github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml": "ae60b0af3cefa9e2d3fcd87aeda559ec4b71e221",
-    "tools/orbit360-single-state-ledger-owner-v20260827.mjs": "e65898237d485312aafd090c63c597d127e0bf28",
+    "tools/orbit360-single-state-ledger-owner-v20260827.mjs": "020f951174ee0465c787cc6fadd90008d5d5223b",
     "tools/orbit360-single-state-invariant-v20260827.mjs": "586dee9a8da42cddecadcff3e817fe0dda50420a",
     "tools/orbit360-single-state-contract-v20260827.mjs": "c1adca047f864b1460bc2760adf23a1612286efc",
     "orbit360-platform/docs/orbit360-continuity-writer-registry-v20260820.json": "218d8fdb600b9f2d25bd47c2550816856a3b95f1",
@@ -40,7 +40,9 @@
     "validatorSourceMayNameForbiddenConceptsWhenEnforcingTheirAbsence": true,
     "historicalGatesArchivedByImmutableSourceCommit": true,
     "historicalGateFilesNotRequiredInCurrentTree": true,
-    "sourceIdentityAuthorityIsThisBaseline": true
+    "sourceIdentityAuthorityIsThisBaseline": true,
+    "operationalPatchSanitizationIsStructuralNotKeywordBased": true,
+    "semanticLabelsMayMentionSecurityConceptsWithoutBeingSecretMaterial": true
   },
   "sealPolicy": {
     "passOrFailIsRecordedInLedgerTerminalEvidence": true,
