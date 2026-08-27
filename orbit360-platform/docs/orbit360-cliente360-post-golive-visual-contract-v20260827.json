@@ -1,0 +1,89 @@
+{
+  "schemaVersion": "orbit360-cliente360-post-golive-visual-contract-v1",
+  "contractId": "CLIENTE360-POST-GOLIVE-DIFFERENTIAL-VISUAL",
+  "createdAt": "2026-08-27",
+  "status": "SOURCE_CONTRACT_READY_RUNTIME_PENDING_HUMAN_LOGIN",
+  "module": "Cliente 360",
+  "baseline": {
+    "artifactId": 9504702901,
+    "sourceHead": "8c9668d6d423e82826b0295431ec699390d79b4b",
+    "sourceStatus": "PASS_PRESERVED_SOURCE"
+  },
+  "historicalEvidence": {
+    "f2BrowserRunId": 33029077881,
+    "storeCountObservedEachRole": 430,
+    "tbodyRowCountObservedEachRole": 1,
+    "historicalPredicate": "storeCount>0 && tbodyRowCount>0",
+    "historicalPredicateStatus": "STALE_FOR_EFFECTIVE_CLIENT_VISIBILITY",
+    "reason": "A placeholder row such as Sin resultados satisfies tbodyRowCount>0 and cannot prove that any client is visible."
+  },
+  "classification": "VALIDATOR_STALE",
+  "productMutationAllowed": false,
+  "dataMutationAllowed": false,
+  "reimportClientsAllowed": false,
+  "historicalGateReopenAllowed": false,
+  "retiredHypotheses": [
+    "clientProjection empty/stale as demonstrated cause",
+    "base product store ready after first collection as demonstrated cause"
+  ],
+  "runtimePrerequisite": {
+    "humanEmailPasswordLoginVerified": true,
+    "runtimeMustBeExplicitlyAuthorizedByCurrentBoundary": true,
+    "browserMustBeExplicitlyAuthorizedByCurrentBoundary": true,
+    "writes": false,
+    "firestoreWrites": false,
+    "authWrites": false,
+    "operationalWrites": false,
+    "deploy": false,
+    "productionMutation": false
+  },
+  "requiredTelemetryPerRole": [
+    "canonicalRole",
+    "allowedRoles",
+    "advisorId",
+    "cliente360DataScope",
+    "permittedCountries",
+    "activeCountry",
+    "rawClientCount",
+    "accessFilteredClientCount",
+    "scopedStoreClientCountInsideWithScope",
+    "realClientDomRowCount",
+    "placeholderRowVisible",
+    "displayedTotalLabel",
+    "diagnosticsTotalRows",
+    "diagnosticsFilteredRows",
+    "diagnosticsRenderedRows",
+    "runtimeStatus",
+    "requiredMissing",
+    "requiredFailed"
+  ],
+  "requiredRoles": [
+    {"view":"desktopDirection","role":"Dirección","viewport":{"width":1440,"height":1000}},
+    {"view":"tabletOperativo","role":"Operativo","viewport":{"width":900,"height":1100}},
+    {"view":"mobileAsesor","role":"Asesor","viewport":{"width":390,"height":844}}
+  ],
+  "passRules": {
+    "rawStoreMustContainClients": true,
+    "placeholderRowDoesNotCountAsClient": true,
+    "realClientDomRowCountMustBeGreaterThanZeroWhenAccessFilteredCountGreaterThanZero": true,
+    "displayedTotalMustEqualAccessFilteredClientCountBeforeLocalSearchFilters": true,
+    "scopedStoreCountMustEqualAccessFilteredClientCount": true,
+    "diagnosticsTotalRowsMustEqualAccessFilteredClientCount": true,
+    "diagnosticsRenderedRowsMustEqualRealClientDomRowCountForCurrentPage": true,
+    "undefinedNaNForbidden": true,
+    "technicalCopyForbidden": true,
+    "crossRoleUniverseDifferenceAllowedOnlyWhenExplainedByScopeCountryAdvisor": true
+  },
+  "failureClassification": {
+    "rawClientCountZeroButIntegritySnapshotNonzero": "DATA_CONTRACT_FAILURE",
+    "accessFilterUnexpectedlyZero": "FUNCTIONAL_DEFECT_OR_DATA_CONTRACT_FAILURE_REQUIRES_FIRST_DIVERGENCE",
+    "scopedStoreDiffersFromAccessFilter": "FUNCTIONAL_DEFECT",
+    "baseRenderDiffersFromEquivalentEnhancerFilter": "FUNCTIONAL_DEFECT",
+    "placeholderAcceptedAsPass": "VALIDATOR_STALE",
+    "runtimeOrHumanLoginUnavailable": "ENVIRONMENT_FAILURE",
+    "evidenceCannotAttributeSameRun": "PIPELINE_MECHANISM_FAILURE"
+  },
+  "firstDivergenceRule": "Correct only the first layer where equivalent counts diverge; do not modify another layer or reimport data.",
+  "containsPII": false,
+  "containsSecrets": false
+}
