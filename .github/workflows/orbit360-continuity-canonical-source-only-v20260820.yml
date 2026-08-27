@@ -22,6 +22,7 @@ env:
   ORBIT360_PUBLISHER: tools/orbit360-control-plane-publication-preflight-v20260825.mjs
   ORBIT360_ACCESS_HANDLER: tools/orbit360-post-go-live-access-recovery-v20260827.mjs
   ORBIT360_ACCESS_GATE_ID: block-auth-paula-reset-link-handoff-lab-v20260817
+  ORBIT360_ASEGURADORAS_PRESERVATION: tools/orbit360-aseguradoras-operational-owner-preservation-v20260827.mjs
 jobs:
   single-state-runner:
     runs-on: ubuntu-24.04
@@ -55,6 +56,8 @@ jobs:
           test "$LIVE" = "$BASE"
           git checkout --force -B orbit360-canonical "$LIVE"
           node "$ORBIT360_INVARIANT"
+          node "$ORBIT360_ASEGURADORAS_PRESERVATION" | tee "$RUNNER_TEMP/aseguradoras-preservation.json"
+          jq -e '.ok==true and .status=="ASEGURADORAS_FINAL_OWNER_PRESERVATION_PASS" and .sourceOnly==true and .secrets==false and .firestoreRead==false and .writes==false and .runtime==false and .browser==false and .deploy==false and .productionTouched==false' "$RUNNER_TEMP/aseguradoras-preservation.json" >/dev/null
           node "$ORBIT360_OWNER" --inspect-intent "$RUNNER_TEMP/orbit360-intent.json" > "$RUNNER_TEMP/inspect.json"
           jq -e '.ok==true and .status=="SINGLE_STATE_INTENT_VALID"' "$RUNNER_TEMP/inspect.json" >/dev/null
           echo "transition=$(jq -r '.transitionId' "$RUNNER_TEMP/inspect.json")" >> "$GITHUB_OUTPUT"
@@ -80,6 +83,8 @@ jobs:
           jq -e '.ok==true and .status=="POST_GO_LIVE_ACCESS_RECOVERY_SOURCE_ONLY_PASS" and .targetCount==1 and .maxResetLinks==1 and .forbiddenDemoIdentityBlocked==true and .historicalAuthorizationReuseAllowed==false and .directPasswordSets==0 and .resetLinksGenerated==0 and .secretAccess==false and .firestoreRead==false and .deployExecuted==false and .productionTouched==false' "$ORBIT360_ACCESS_HANDLER_SELFTEST_OUT" >/dev/null
           node tools/orbit360-bind-f2-browser-evidence-run-v20260824.mjs --selftest | tee "$RUNNER_TEMP/browser-binder-selftest.json"
           jq -e '.ok==true and .status=="F2_BROWSER_BINDER_CURRENT_RUN_CAUSAL_SELFTEST_PASS" and .secondaryBrowserReproductionRequired==false' "$RUNNER_TEMP/browser-binder-selftest.json" >/dev/null
+          node "$ORBIT360_ASEGURADORAS_PRESERVATION" | tee "$RUNNER_TEMP/aseguradoras-preservation-selftest.json"
+          jq -e '.ok==true and .status=="ASEGURADORAS_FINAL_OWNER_PRESERVATION_PASS"' "$RUNNER_TEMP/aseguradoras-preservation-selftest.json" >/dev/null
           node "$ORBIT360_INVARIANT"
           test -z "$(git status --porcelain)"
       - id: claim
@@ -176,6 +181,8 @@ jobs:
             ${{ runner.temp }}/release-handler-selftest.json
             ${{ runner.temp }}/access-handler-selftest.json
             ${{ runner.temp }}/browser-binder-selftest.json
+            ${{ runner.temp }}/aseguradoras-preservation.json
+            ${{ runner.temp }}/aseguradoras-preservation-selftest.json
             ${{ runner.temp }}/orbit360-terminal.json
           if-no-files-found: ignore
           retention-days: 14
