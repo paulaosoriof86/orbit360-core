@@ -5,7 +5,6 @@ Proyecto: Orbit 360 / A&S
 Repositorio: `paulaosoriof86/orbit360-core`  
 Rama obligatoria: `ays/backend-tenant-lab-v99-20260703`  
 PR: #5 draft/open  
-HEAD observado antes de este documento: `e3504dcc35a6b48bdf2ea2baaa08dc516d69aa6b`  
 Artefacto productivo certificado/desplegado: `8c9668d6d423e82826b0295431ec699390d79b4b`
 
 ## 1. Propósito
@@ -30,7 +29,7 @@ No se usa una anomalía visual como autorización para reimportar, reconstruir, 
 
 La autoridad mutable sigue siendo `orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json`.
 
-Corte observado antes de este documento:
+Corte observado para esta matriz:
 
 - `activeState.phase = PRODUCTION_SMOKE_PASS`;
 - `activeState.status = PRODUCTION_GO_LIVE_PASS`;
@@ -61,7 +60,76 @@ Preservar:
 
 La auditoría acumulativa RC1.2 del 4 de agosto clasificó Cliente 360 como módulo trabajado con datos reales read-only y conservó paridad de hashes de módulos entre baseline sellada y rama viva del corte.
 
-### 3.2 Pólizas
+### 3.2 Aseguradoras
+
+**Estado protegido: `PASS_PRESERVED_SOURCE`. No es un módulo pendiente de construir ni de reimportar.**
+
+Preservar:
+
+- 26 aseguradoras como universo canónico del corte validado;
+- directorio, ficha, conocimiento y responsive ya trabajados;
+- visibilidad por Dirección, Operativo y Asesor conforme roles/scopes;
+- importador con contratos de no falso éxito y no reimportación para resolver UI/access;
+- separación entre dato operativo y secreto;
+- owner único y bootstrap del Router;
+- solución final consolidada en el commit histórico `6145e3b0a4173c582617bfc26dbfdc0c55b88b86` y presente en el artefacto certificado/desplegado `8c9668d6...`.
+
+#### Historia causal preservada
+
+Aseguradoras sí tuvo defectos reales antes del cierre final:
+
+1. acceso/visibilidad incompletos por rol;
+2. semántica incorrecta de usuario/cuentas como si fueran secretos;
+3. permisos bancarios/plataformas mezclados;
+4. ownership/wiring competido;
+5. validadores que llegaron a aceptar semántica anterior.
+
+La clasificación histórica final fue:
+
+`DATA_CONTRACT_FAILURE + FUNCTIONAL_DEFECT + VALIDATOR_STALE`.
+
+La reparación fue selectiva. No exigió reimportar las 26 aseguradoras.
+
+#### Contrato final que prevalece
+
+Owner canónico:
+
+`orbit360-platform/core/client-insurer-operational-directory-owner-v20260722.js`
+
+Versión final:
+
+`20260723.2`
+
+Semántica obligatoria:
+
+- usuario de portal = dato operativo visible/copiable según permisos;
+- contraseña = secreto, no plaintext en store, revelado temporal mediante proveedor seguro y retorno a `Oculta`;
+- número de cuenta bancaria = dato operativo visible directamente;
+- copia bancaria directa = banco, tipo, número, moneda y titular;
+- `accountRef`/reveal no es requisito para visualizar/copiar banco;
+- owner no escribe store ni reimporta datos.
+
+`modules/aseguradoras-v1202-resources-bridge.js` puede seguir existiendo como consumidor legacy, pero **no es autoridad final**. El bootstrap `core/router-tenant-config-bootstrap.js` solicita/carga el owner `20260723.2`, y el owner declara supersesión de las secciones bancarias/plataformas legacy.
+
+#### Brecha de mecanismo encontrada el 27 de agosto
+
+El validador histórico `orbit360-platform/tools/orbit360-aseguradoras-owner-contract-v20260717.js` es anterior al owner final. No comprueba `20260723.2`, `bankCopyDirect` ni la carga final del owner por el bootstrap.
+
+La matriz nativa posterior también comprobaba principalmente presencia del directorio/ficha/conocimiento/responsive, pero no todas las invariantes finales de usuario/contraseña/cuenta/copia/owner.
+
+Por ello:
+
+- **producto canónico:** `PASS_PRESERVED_SOURCE`;
+- **mecanismo antiguo de preservación:** `VALIDATOR_STALE`;
+- **acción correcta:** endurecer el guard source-only, no tocar Aseguradoras ni reimportar datos.
+
+Autoridad nueva de preservación:
+
+- registro: `orbit360-platform/docs/orbit360-aseguradoras-preservation-registry-v20260827.json`;
+- validador: `tools/orbit360-aseguradoras-operational-owner-preservation-v20260827.mjs`;
+- Academia: `orbit360-platform/docs/ACADEMIA-PRESERVACION-ASEGURADORAS-POSTGO-LIVE-20260827.md`.
+
+### 3.3 Pólizas
 
 Preservar:
 
@@ -76,7 +144,7 @@ Preservar:
 
 El artefacto desplegado `modules/polizas.js` no contiene una segunda llamada a `getRoutePermission()` ni un segundo owner Auth de autorización. El acceso de ruta pertenece al owner Router/Access.
 
-### 3.3 Recibos / cartera
+### 3.4 Recibos / cartera
 
 Preservar el corte reconciliado existente. Evidencia conocida del dry-run 2026-07-30:
 
@@ -100,7 +168,7 @@ Reglas congeladas:
 
 No regenerar ni reimportar recibos/cartera por una diferencia visual.
 
-### 3.4 Cobros
+### 3.5 Cobros
 
 Preservar:
 
@@ -113,7 +181,7 @@ Preservar:
 
 El módulo desplegado mantiene explícitamente la diferencia entre `reportado por cliente`, `validado`, `pagado` y `conciliado`. No rediseñar la semántica de cobros sin una regresión concreta.
 
-### 3.5 Ops / OX
+### 3.6 Ops / OX
 
 Preservar:
 
@@ -126,7 +194,7 @@ Preservar:
 
 No reconstruir Ops por falta de aceptación visual postproducción.
 
-### 3.6 Leads
+### 3.7 Leads
 
 Preservar:
 
@@ -143,7 +211,8 @@ No reconstruir Leads ni su investigación previa sin una regresión reproducible
 
 | Área | Evidencia/observación actual | Clasificación actual | Qué está permitido | Qué está prohibido |
 |---|---|---|---|---|
-| Acceso humano | Ledger mantiene `HUMAN-LOGIN-VERIFICATION` como primera frontera incompleta | `ENVIRONMENT_FAILURE` hasta cierre de la ruta humana | Verificar/corregir únicamente entorno/proveedor/ruta de autenticación y luego validar login humano | Tocar Cliente 360/Pólizas/datos para resolver login |
+| Acceso humano | Ledger mantiene `HUMAN-LOGIN-VERIFICATION` como primera frontera incompleta | `ENVIRONMENT_FAILURE` hasta cierre de la ruta humana | Verificar/corregir únicamente entorno/proveedor/ruta de autenticación y luego validar login humano | Tocar Cliente 360/Aseguradoras/Pólizas/datos para resolver login |
+| Aseguradoras | Solución final presente en `8c9668d6...`, pero el validador histórico no protege el owner final `20260723.2` ni todas sus invariantes | **`VALIDATOR_STALE` del mecanismo; producto `PASS_PRESERVED_SOURCE`** | Endurecer contrato source-only y luego smoke diferencial por roles | Reimportar 26 aseguradoras, rehacer directorio, volver a ocultar cuentas/usuarios como secretos |
 | Cliente 360 | Se observó divergencia visual lista `0 de 0` vs KPI con datos | `FUNCTIONAL_DEFECT` o `DATA_CONTRACT_FAILURE` todavía por aislar en borde común Access/store/readiness; causa final NO probada | Reproducir una vez y comparar lecturas contractualmente equivalentes | Reimportar clientes, rehacer Cliente 360, cambiar scopes sin evidencia |
 | Pólizas | Históricamente hubo `undefined/NaN` y luego un timeout recuperado; ambos entraron al hardening transversal y F2 terminal posterior PASS | Cerrado respecto de esos defectos históricos; solo regresión nueva si se reproduce | Smoke diferencial después de acceso humano estable | Volver a usar “doble owner Router/Auth” como causa vigente |
 | Recibos/cartera | Censo/dry-run reconciliado existe; sin anomalía post-go-live reproducida todavía | Cerrado hasta evidencia contraria | Verificación diferencial de presencia, relaciones, totales y estado | Regenerar/reimportar calendario/cartera |
@@ -176,6 +245,19 @@ Hechos:
 
 Si Pólizas vuelve a fallar, debe diagnosticarse desde el comportamiento contemporáneo, no reutilizando esta hipótesis.
 
+### RETIRADA 3 — “El bridge legacy de Aseguradoras demuestra que la solución final se perdió”
+
+No se acepta como causa vigente.
+
+Hechos:
+
+- el bridge v1202 conserva semántica anterior por compatibilidad;
+- el artefacto canónico también contiene el owner final `20260723.2`;
+- Router bootstrap solicita/carga ese owner;
+- el owner final declara supersesión de las secciones bancarias/plataformas legacy y materializa la semántica vigente.
+
+La existencia del archivo legacy no equivale a ser owner final. La prueba correcta es verificar wiring, versión, readiness y supersesión.
+
 ## 6. Cliente 360 — frontera causal actual más estrecha
 
 El artefacto productivo ejecuta el render de Cliente 360 dentro de `Orbit.access.withScope('cliente360', ...)` mediante `crm-v1198-operational-bridge.js`.
@@ -199,23 +281,47 @@ Esto NO autoriza todavía a modificar Access/store. La siguiente prueba debe med
 
 La primera divergencia observable entre esos ocho puntos define la capa responsable. No se cambia producto antes de esa prueba.
 
-## 7. Orden canónico de aceptación post-go-live
+## 7. Aseguradoras — frontera causal y contrato de preservación
+
+Antes de cualquier smoke post-go-live de Aseguradoras debe pasar el guard source-only final.
+
+Ese guard debe fallar si se pierde cualquiera de estas invariantes:
+
+1. owner final exactamente `20260723.2`;
+2. `ownerId=clientInsurerOperationalDirectoryOwner`;
+3. supersesión explícita de bancos/plataformas legacy;
+4. usuario operativo visible;
+5. contraseña protegida, temporal y oculta por defecto;
+6. cuenta bancaria visible directamente;
+7. cero dependencia de reveal para cuenta bancaria;
+8. copia bancaria directa con banco/tipo/número/moneda/titular;
+9. cero writes de store;
+10. cero reimportación;
+11. bootstrap solicitando/cargando la misma versión final;
+12. bridge legacy sin convertirse en autoridad final.
+
+Si este source guard falla, la clasificación inicial es `VALIDATOR_STALE`/divergencia de contrato de preservación y se congela producto. No se ejecuta browser, Firebase, deploy ni migración para “ver qué pasa”.
+
+Después de PASS source-only, el smoke diferencial por roles debe verificar comportamiento visible real de esas mismas invariantes junto con las 26 aseguradoras, ficha, conocimiento y responsive.
+
+## 8. Orden canónico de aceptación post-go-live
 
 Después de cerrar login humano:
 
-1. Cliente 360 — solo reproducir y aislar la divergencia Access/store si persiste.
-2. Pólizas — smoke diferencial, no rediseño.
-3. Vehículos — dependencia de póliza, smoke diferencial.
-4. Recibos/cartera — comparar contra censo/corte canónico, no regenerar.
-5. Cobros — estados/relaciones/moneda/conciliación; no reimportar banco.
-6. Ops — flujo y visibilidad por rol.
-7. Leads — flujo comercial y sincronización con Ops.
-8. Roles/scopes.
-9. Sincronizaciones y efectos entre módulos.
+1. **Aseguradoras — source guard final ya endurecido; smoke diferencial de owner/usuario/password/bancos + directorio/ficha/conocimiento.**
+2. Cliente 360 — solo reproducir y aislar la divergencia Access/store si persiste.
+3. Pólizas — smoke diferencial, no rediseño.
+4. Vehículos — dependencia de póliza, smoke diferencial.
+5. Recibos/cartera — comparar contra censo/corte canónico, no regenerar.
+6. Cobros — estados/relaciones/moneda/conciliación; no reimportar banco.
+7. Ops — flujo y visibilidad por rol.
+8. Leads — flujo comercial y sincronización con Ops.
+9. Roles/scopes.
+10. Sincronizaciones y efectos entre módulos.
 
 Cada módulo se declara `PASS_PRESERVED` si no contradice su evidencia histórica. Solo una regresión reproducible abre corrección.
 
-## 8. Regla anti-bucle para conversaciones futuras
+## 9. Regla anti-bucle para conversaciones futuras
 
 Antes de proponer una corrección:
 
@@ -223,22 +329,23 @@ Antes de proponer una corrección:
 2. confirmar SHA productivo;
 3. buscar PASS histórico del dominio;
 4. comparar source desplegado, no HEAD incremental si este difiere del artefacto productivo;
-5. retirar hipótesis incompatibles con el source actual;
-6. ejecutar una sola prueba diferencial mínima;
-7. clasificar la primera divergencia;
-8. corregir una sola capa;
-9. no reimportar ni reconstruir si la causa no es datos/proceso.
+5. confirmar owner final y cadena de carga, no solo presencia de archivos legacy;
+6. retirar hipótesis incompatibles con el source actual;
+7. ejecutar una sola prueba diferencial mínima;
+8. clasificar la primera divergencia;
+9. corregir una sola capa;
+10. no reimportar ni reconstruir si la causa no es datos/proceso.
 
 Dos fallos iguales de etapa/código activan `STOP_RETRY`.
 
-## 9. Estado de carriles tras esta matriz
+## 10. Estado de carriles tras esta matriz
 
-- Carril A — frontend/UX/Academia: aceptación visual post-go-live pendiente; sin rediseño general.
-- Carril B — backend/seguridad: go-live técnico PASS; login humano es la primera frontera; Cliente 360 requiere diagnóstico diferencial Access/store solo si persiste tras acceso estable.
-- Carril C — datos reales: preservado/frozen; no reimportar; refresh 2026-08-01→fecha actual solo después de go-live estable y con dry-run/autorización correspondiente.
+- Carril A — frontend/UX/Academia: aceptación visual post-go-live pendiente; Aseguradoras y demás dominios cerrados no se rediseñan sin regresión.
+- Carril B — backend/seguridad/gates: go-live técnico PASS; login humano es la primera frontera; **Aseguradoras tenía un `VALIDATOR_STALE` de preservación y se corrige solo en el mecanismo source-only**; Cliente 360 requiere diagnóstico diferencial Access/store solo si persiste tras acceso estable.
+- Carril C — datos reales: preservado/frozen; no reimportar clientes/aseguradoras; refresh 2026-08-01→fecha actual solo después de go-live estable y con dry-run/autorización correspondiente.
 
-## 10. Siguiente acción exacta
+## 11. Siguiente acción exacta
 
-`CERRAR HUMAN-LOGIN-VERIFICATION → REPRODUCIR UNA VEZ CLIENTE360 CON TELEMETRÍA COMPARATIVA WITHSCOPE VS A.FILTER → CLASIFICAR PRIMERA DIVERGENCIA → CORREGIR SOLO ESA CAPA SI EXISTE → CONTINUAR SMOKES DIFERENCIALES SIN REPROCESAR DOMINIOS CERRADOS.`
+`CERRAR HARDENING SOURCE-ONLY DE PRESERVACIÓN ASEGURADORAS → MANTENER PRODUCTO/DATOS CONGELADOS → CERRAR HUMAN-LOGIN-VERIFICATION → SMOKE DIFERENCIAL ASEGURADORAS CONTRA OWNER 20260723.2 → CLIENTE360 CON TELEMETRÍA COMPARATIVA SI PERSISTE DIVERGENCIA → CONTINUAR PÓLIZAS/VEHÍCULOS/RECIBOS/COBROS/OPS/LEADS SIN REPROCESAR DOMINIOS CERRADOS.`
 
 No se autoriza por este documento ningún deploy, escritura, reimportación, main ni merge.
