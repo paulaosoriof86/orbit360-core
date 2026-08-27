@@ -1,8 +1,9 @@
 {
-  "schemaVersion": "orbit360-certified-product-preservation-registry-v1",
+  "schemaVersion": "orbit360-certified-product-preservation-registry-v2-module-lineage",
   "registryId": "ORBIT360-CERTIFIED-PRODUCT-PRESERVATION",
   "createdAt": "2026-08-27",
-  "status": "ACTIVE_SOURCE_ONLY_FAIL_CLOSED",
+  "updatedAt": "2026-08-27",
+  "status": "ACTIVE_SOURCE_ONLY_FAIL_CLOSED_WITH_HISTORICAL_LINEAGE",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
@@ -19,10 +20,13 @@
   },
   "preservationRule": {
     "approvedProductBaselineIsReference": true,
-    "historicalPassPlusSameArtifactMeansNoReprocess": true,
+    "candidateToHeadPreservationRequired": true,
+    "lastApprovedModuleToCandidateIdentityRequired": true,
+    "candidatePreservedDoesNotImplyLastApprovedModulePreserved": true,
+    "historicalPassPlusSameArtifactMeansNoBusinessReprocess": true,
     "visualAnomalyDoesNotAuthorizeRebuild": true,
     "visualAnomalyDoesNotAuthorizeReimport": true,
-    "firstCheckIsVisibilityAccessWiringRuntime": true,
+    "retiredHypothesisCannotReopenWithoutNewEvidence": true,
     "productDeltaRequiresNewExplicitlyAcceptedBaseline": true,
     "productMutationOnGuardFailure": false,
     "dataMutationOnGuardFailure": false,
@@ -41,6 +45,106 @@
     ],
     "expectedChangedFilesSinceBaseline": 0,
     "classificationOnUnexpectedDelta": "PIPELINE_MECHANISM_FAILURE"
+  },
+  "lineageSemantics": {
+    "purpose": "Prove once per module that the certified candidate contains the last approved human/functional source before visual smoke.",
+    "states": [
+      "LINEAGE_AUDIT_REQUIRED",
+      "HISTORICAL_CHAIN_IN_PROGRESS",
+      "LAST_APPROVED_LINEAGE_PRESERVED_SOURCE",
+      "PROMOTION_OMISSION_CONFIRMED",
+      "PASS_PRESERVED_VISUAL"
+    ],
+    "candidateToHeadGuardAlreadyProven": true,
+    "candidateToHeadLastSuccessfulRunId": 33075749665,
+    "candidateToHeadObservedChangedProductFiles": 0,
+    "humanVisualEvidenceRequiredForVisualPass": true,
+    "noReprocess": true,
+    "noReimport": true
+  },
+  "moduleLineage": {
+    "aseguradoras": {
+      "status": "LAST_APPROVED_LINEAGE_PRESERVED_SOURCE",
+      "canonicalOwnerId": "clientInsurerOperationalDirectoryOwner",
+      "canonicalOwnerVersion": "20260723.2",
+      "preservationGuard": "tools/orbit360-aseguradoras-operational-owner-preservation-v20260827.mjs",
+      "guardStatus": "ASEGURADORAS_FINAL_OWNER_PRESERVATION_PASS",
+      "guardChecks": 16,
+      "guardFailedChecks": 0,
+      "lastCausalGuardRunId": 33040847676,
+      "candidateWideRecheckRunId": 33075749665,
+      "liveVisualStatus": "MODULE_VISIBLE_CREDENTIAL_ACCESS_DELTA_OPEN",
+      "openDelta": [
+        "authorized platform-password access",
+        "module latency"
+      ],
+      "retiredOrBoundedFindings": [
+        "TARGET_MAPPING_EMPTY_BEFORE_PROVIDER",
+        "REQUEST_DID_NOT_REACH_PROVIDER",
+        "DATA_CONTRACT_FAILURE / PROVIDER_NOT_INVOKED"
+      ],
+      "rebuildAllowed": false,
+      "reimportAllowed": false
+    },
+    "cliente360": {
+      "status": "HISTORICAL_CHAIN_IN_PROGRESS",
+      "historicalChainToResolve": [
+        "v17 advisor/cache/route-readiness",
+        "v18 transactional hydration",
+        "v19 Cliente360 bounded render",
+        "v21 event-driven render observability",
+        "v22 block1 gate scope-universe"
+      ],
+      "knownHistoricalValidatorIssue": "F2 storeCount=430 + tbodyRowCount=1 could accept a placeholder row as visual PASS",
+      "knownHistoricalValidatorClassification": "VALIDATOR_STALE",
+      "currentBoundedDivergence": "Access/store/readiness/order boundary when list and KPI universes disagree",
+      "retiredHypotheses": [
+        "Orbit.clientProjection as demonstrated productive root cause",
+        "missing client data as sufficient explanation",
+        "client reimport as visual fix"
+      ],
+      "productMutationAllowedBeforeLineageClose": false,
+      "dataMutationAllowed": false,
+      "reimportAllowed": false,
+      "liveVisualStatus": "NOT_CORRECTLY_VISUALIZED"
+    },
+    "polizas": {
+      "status": "LINEAGE_AUDIT_REQUIRED",
+      "retiredHypotheses": [
+        "second getRoutePermission call as current productive root cause"
+      ],
+      "businessReprocessAllowed": false,
+      "reimportAllowed": false
+    },
+    "vehiculos": {
+      "status": "LINEAGE_AUDIT_REQUIRED",
+      "businessReprocessAllowed": false,
+      "reimportAllowed": false
+    },
+    "recibos-cartera": {
+      "status": "LINEAGE_AUDIT_REQUIRED",
+      "preserveExistingReconciledCensus": true,
+      "regenerateAllowed": false,
+      "businessReprocessAllowed": false
+    },
+    "cobros": {
+      "status": "LINEAGE_AUDIT_REQUIRED",
+      "preserveSemanticContract": "reportado != validado != pagado != conciliado",
+      "businessReprocessAllowed": false,
+      "reimportAllowed": false
+    },
+    "ops": {
+      "status": "LINEAGE_AUDIT_REQUIRED",
+      "businessReprocessAllowed": false
+    },
+    "leads": {
+      "status": "LINEAGE_AUDIT_REQUIRED",
+      "businessReprocessAllowed": false
+    },
+    "resto": {
+      "status": "LINEAGE_AUDIT_REQUIRED",
+      "businessReprocessAllowed": false
+    }
   },
   "approvedModuleScripts": [
     "modules/academia.js",
@@ -134,8 +238,9 @@
     "ia"
   ],
   "validationSemantics": {
-    "sourceStatus": "PASS_PRESERVED_SOURCE",
-    "liveVisualStatus": "PENDING_UNTIL_HUMAN_LOGIN_AND_DIFFERENTIAL_SMOKE",
+    "candidateSourceStatus": "PASS_PRESERVED_SOURCE",
+    "lastApprovedModuleSourceStatus": "MODULE_SPECIFIC_LINEAGE_REQUIRED",
+    "liveVisualStatus": "MODULE_SPECIFIC_HUMAN_VALIDATION_REQUIRED",
     "backendMaturityIsNotRewrittenByThisRegistry": true,
     "historicalWorkIsNotReopenedByDefault": true
   },
