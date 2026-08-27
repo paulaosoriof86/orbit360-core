@@ -58,14 +58,15 @@ La última visualización humana aprobada de agosto y el trabajo profundo previo
 
 Para cada módulo:
 
-1. probar identidad de baseline source-only;
-2. probar owner/wiring/contrato semántico vigente cuando exista owner específico;
-3. abrir el módulo en la sesión humana productiva;
-4. comparar lo visible contra el aprobado, no contra una reconstrucción nueva;
-5. si coincide, conservar `PASS_PRESERVED` y avanzar;
-6. si no coincide, clasificar la primera divergencia;
-7. corregir únicamente la capa causal;
-8. volver a visualizar ese módulo antes de avanzar.
+1. recuperar primero la última conclusión forense/funcional ya cerrada del módulo;
+2. probar identidad de baseline source-only;
+3. probar owner/wiring/contrato semántico vigente cuando exista owner específico;
+4. abrir el módulo en la sesión humana productiva;
+5. comparar lo visible contra el aprobado, no contra una reconstrucción nueva;
+6. si coincide, conservar `PASS_PRESERVED` y avanzar;
+7. si no coincide, clasificar la primera divergencia contemporánea sin reabrir causas históricas descartadas;
+8. corregir únicamente la capa causal;
+9. volver a visualizar ese módulo antes de avanzar.
 
 No se acumulan módulos invisibles para revisarlos todos al final. La validación es incremental y visible.
 
@@ -75,13 +76,14 @@ La ruta debe optimizar simultáneamente **tiempo hasta la siguiente visualizaci�
 
 - no se construye un hardening transversal especulativo antes de poder volver a visualizar el módulo actual;
 - antes de browser/runtime se usa el preflight/gate-contract vigente requerido por las reglas maestras;
-- se traza únicamente la primera divergencia real;
+- se recuperan y preservan las conclusiones recientes ya demostradas antes de formular nuevas hipótesis;
+- se traza únicamente la primera divergencia real todavía abierta;
 - se corrige una sola capa causal;
 - se hace una verificación acotada;
 - se vuelve a visualización humana inmediatamente;
 - solo una causa real ya demostrada se incorpora después al guard transversal reutilizable.
 
-Un síntoma de rendimiento no autoriza a inflar timeouts. Debe medirse por fronteras: Auth → membership/sesión → store/readiness → router → módulo → proveedor específico. Si una superficie finalmente carga, la lentitud sigue abierta como defecto de rendimiento, pero no convierte por sí sola el módulo en “no construido” ni obliga a detener la revisión visual de otros módulos cuando la visualización sigue siendo utilizable.
+Un síntoma de rendimiento no autoriza a inflar timeouts. Debe medirse por fronteras: Auth → membership/sesión → store/readiness → router → módulo → capacidad específica. Si una superficie finalmente carga, la lentitud sigue abierta como defecto de rendimiento, pero no convierte por sí sola el módulo en “no construido” ni obliga a reinvestigar su proceso funcional.
 
 ## Secuencia inicial
 
@@ -91,50 +93,56 @@ Aseguradoras ya cuenta además con guard semántico específico del owner `20260
 
 ## Precisión congelada — Aseguradoras
 
-**Aseguradoras SÍ se visualiza.** El pendiente observado actualmente no es reconstruir el directorio ni recuperar la ficha completa. El alcance puntual es:
+**Aseguradoras SÍ se visualiza.** El pendiente observado actualmente no es reconstruir el directorio ni recuperar la ficha completa. El delta puntual observado es el acceso seguro a las contraseñas de las plataformas para los roles autorizados, más la latencia perceptible como problema de rendimiento separado.
 
-1. **acceso seguro a las contraseñas de las plataformas de las aseguradoras** para roles autorizados;
-2. estado/wiring real del proveedor seguro que resuelve los `credentialRef`;
-3. latencia perceptible del módulo como síntoma de rendimiento separado.
+### Conclusiones históricas ya cerradas que NO se vuelven a investigar desde cero
 
-Por seguridad, la contraseña real **no debe persistirse ni mostrarse como dato normal de la ficha o de `Orbit.store`**. El contrato vigente exige `credentialRef` y proveedor seguro; la experiencia esperada es recuperación/copiar/revelar de forma controlada, auditada y temporal para el rol autorizado. Por tanto:
+1. Las contraseñas no se guardan ni se muestran como dato normal de la ficha o de `Orbit.store`. La arquitectura aprobada usa referencias/guardas seguras y acceso controlado por rol.
+2. El bridge/proveedor seguro recibe contexto de permiso y entidad; el navegador no debe recibir ni persistir secretos en claro.
+3. `TARGET_MAPPING_EMPTY_BEFORE_PROVIDER` ya fue diagnosticado: el mapeo destino quedó vacío **antes** de invocar al proveedor.
+4. `REQUEST_DID_NOT_REACH_PROVIDER` ya fue diagnosticado: la solicitud **no alcanzó al proveedor**.
+5. Esos dos hallazgos prueban una falla pre-proveedor y **no prueban** ausencia, rechazo ni incapacidad del proveedor.
+6. El cierre histórico clasificó esa ruta como `DATA_CONTRACT_FAILURE / PROVIDER_NOT_INVOKED`; no corresponde degradarla retrospectivamente a una hipótesis genérica de “proveedor ausente”.
+7. Existió bridge seguro trabajado/validado en LAB; la evidencia posterior no confirmó por sí sola una entrega productiva completa de valores protegidos. Por tanto, el problema actual debe compararse contra ese linaje y contra la promoción/wiring efectivo de la candidata, no diseñarse de nuevo.
+
+### Regla para el síntoma actual
+
+La ausencia actual de contraseñas en la visualización **no autoriza** a concluir a priori que el proveedor no existe, no está registrado o no fue materializado. La primera comprobación debe responder únicamente:
+
+> ¿El síntoma post-go-live actual reproduce la causa histórica pre-proveedor (`TARGET_MAPPING_EMPTY_BEFORE_PROVIDER` / `REQUEST_DID_NOT_REACH_PROVIDER`) o existe una divergencia posterior de promoción/wiring respecto del bridge ya trabajado?
+
+Solo si la evidencia contemporánea demuestra una divergencia distinta se abre una clasificación nueva. No se repite la investigación del proveedor ni se reimporta el directorio para resolverlo.
+
+Por seguridad:
 
 - “la contraseña no aparece como texto guardado en la ficha” **no es un defecto**;
-- “el rol autorizado no puede recuperar/copiar/revelar la contraseña mediante el proveedor seguro” **sí es una anomalía a diagnosticar**;
-- no se vuelve a importar el directorio para resolverlo;
-- no se escriben contraseñas reales en código, documentación, `Orbit.store` ni módulos genéricos.
-
-Clasificación por primera divergencia:
-
-- contrato presente + proveedor/configuración real no disponible en runtime → `ENVIRONMENT_FAILURE`;
-- proveedor disponible + wiring/registro/acción del frontend no llega al proveedor → `FUNCTIONAL_DEFECT`;
-- `credentialRef` ausente, inválido o no resoluble respecto del dato canónico → `DATA_CONTRACT_FAILURE`;
-- gate que declara PASS sin comprobar recuperación segura real → `VALIDATOR_STALE`;
-- exposición indebida, bypass de rol o secreto persistido → `SECURITY_FAILURE` y fail-closed.
-
-Hasta que se trace la primera divergencia, no se asigna una causa por intuición.
+- “el rol autorizado no puede obtener el acceso por el mecanismo seguro ya diseñado” **sí es el síntoma vigente a resolver**;
+- no se escriben contraseñas reales en código, documentación, `Orbit.store` ni módulos genéricos;
+- no se atribuye el fallo al proveedor sin evidencia de que la solicitud efectivamente llegó a él.
 
 ### Criterio de cierre de Aseguradoras para avanzar
 
-Aseguradoras puede marcarse `PASS_PRESERVED` cuando:
+Aseguradoras se conserva como módulo visualmente recuperado y no se reconstruye. Para cerrar el delta de credenciales antes de avanzar se debe:
 
-- directorio/ficha continúan visibles respecto de la baseline aprobada;
-- los roles autorizados pueden usar el mecanismo seguro de credenciales conforme al contrato, o el proveedor pendiente queda identificado honestamente como capacidad externa no materializada sin falsear un PASS;
-- no se expone ninguna contraseña fuera del canal seguro;
-- el rendimiento queda medido y, si excede el umbral operativo aceptable, con causa clasificada y corrección causal acotada;
-- Paula vuelve a visualizar el módulo después de la corrección causal aplicable.
+- comparar el camino actual `credentialRef/mapping → bridge seguro → solicitud protegida` contra el linaje ya trabajado;
+- identificar la primera diferencia respecto del root cause/fix histórico, sin reabrir lo ya probado;
+- corregir solo esa diferencia si existe;
+- verificar el acceso autorizado sin exponer secretos;
+- volver a visualizar Aseguradoras después de la corrección aplicable.
 
-No se espera a reconstruir otros módulos para realizar esta visualización.
+La latencia de Aseguradoras y del login se mide y diagnostica por separado; no se usa para reabrir la arquitectura de credenciales.
 
 ## Siguiente módulo: Cliente 360
 
-Cliente 360 ya dispone de contrato diferencial post-go-live específico. Al llegar a él se conserva la misma candidata, no se reimportan clientes, no se reabre el gate histórico y se corrige únicamente la primera divergencia entre conteos canónicos/scopes/store/render si existiera.
+Cliente 360 no parte de una hipótesis abierta desde cero. La investigación post-go-live reciente ya confirmó una divergencia concreta: el render base recibe una colección vacía y muestra `0 de 0`, mientras un bridge posterior reescribe los KPIs con el universo cargado. Esa evidencia descarta “ausencia de datos” como explicación suficiente y no autoriza reimportación.
+
+La siguiente acción al entrar a Cliente 360 es continuar desde esa conclusión: localizar/corregir el owner productivo de `Orbit.clientProjection` y el bootstrap/readiness que alimenta el primer render vacío, validar lista/ficha/calidad y volver a visualización humana. No se reinicia el diagnóstico de clientes.
 
 ## Regla sobre gates y falsos PASS
 
 Un PASS histórico conserva valor, pero si se demuestra que el validador no comprobaba el comportamiento exigido se clasifica `VALIDATOR_STALE` y se corrige el mecanismo antes de tocar producto. El PASS técnico previo no se usa para negar una anomalía visual reproducible ni la anomalía visual se usa para reconstruir el módulo.
 
-La verificación humana de correo + contraseña ya demostrada no debe reabrirse por un marcador histórico obsoleto. Si un paquete o proyección secundaria vuelve a declarar `HUMAN-LOGIN-VERIFICATION` como pendiente mientras la evidencia vigente ya lo cerró, esa discrepancia se trata como sincronización/validador obsoleto y no como orden para repetir recuperación de acceso.
+La verificación humana de correo + contraseña ya demostrada no debe reabrirse por un marcador histórico obsoleto. Si un paquete o proyección secundaria vuelve a declarar `HUMAN-LOGIN-VERIFICATION` como pendiente mientras la evidencia vigente ya lo cerró, esa discrepancia se trata como sincronización/validador obsoleto y no como orden para repetir recuperación de acceso. La lentitud del login permanece como síntoma de rendimiento distinto de la validez de las credenciales humanas.
 
 ## Anti-desencarrilamiento entre conversaciones
 
@@ -142,15 +150,16 @@ Ante una conversación nueva, antes de decidir la siguiente acción se debe mant
 
 1. reglas maestras/addenda;
 2. estado vivo único del ledger y HEAD actual;
-3. esta regla congelada de preservación y visualización;
-4. contrato diferencial del módulo actual;
-5. evidencia humana más reciente del mismo módulo.
+3. conclusiones forenses/funcionales recientes ya cerradas del módulo;
+4. esta regla congelada de preservación y visualización;
+5. contrato diferencial del módulo actual;
+6. evidencia humana más reciente del mismo módulo.
 
-No se vuelve a una investigación global por perder contexto conversacional. Si aparece una contradicción documental, se clasifica y corrige la contradicción; no se reinicia el producto.
+No se vuelve a una investigación global por perder contexto conversacional. Si aparece una contradicción documental, se clasifica y corrige la contradicción; no se reinicia el producto ni se resucitan hipótesis ya descartadas.
 
 ## Impacto Academia
 
-La Academia debe enseñar esta distinción: **módulo visible vs capacidad protegida pendiente**, credenciales por referencia segura, recuperación controlada por rol, diferencia entre defecto funcional/contrato de datos/entorno/validador obsoleto y regla de no reimportar para resolver problemas de wiring o visualización.
+La Academia debe enseñar esta distinción: **módulo visible vs capacidad protegida pendiente**, credenciales por referencia segura, recuperación controlada por rol, diferencia entre falla pre-proveedor y falla del proveedor, diferencia entre defecto funcional/contrato de datos/entorno/validador obsoleto y regla de no reimportar para resolver problemas de wiring o visualización.
 
 ## Estado operativo
 
