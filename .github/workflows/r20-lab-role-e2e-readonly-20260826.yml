@@ -5,7 +5,7 @@ on:
     branches:
       - qa/r20-lab-role-e2e-20260826
     paths:
-      - '.github/orbit360-r20-e2e/request-20260826.json'
+      - '.github/orbit360-r20-e2e/request-20260826-r2.json'
 
 permissions:
   contents: read
@@ -18,7 +18,7 @@ env:
   ORBIT360_PROJECT_ID: ays-orbit-360-lab
   ORBIT360_TENANT_ID: alianzas-soluciones
   ORBIT360_BASE_URL: https://ays-orbit-360-lab.web.app/index.html?orbitBackend=firestore-lab&tenant=alianzas-soluciones&runtime=20260717-2
-  ORBIT360_REQUEST_FILE: .github/orbit360-r20-e2e/request-20260826.json
+  ORBIT360_REQUEST_FILE: .github/orbit360-r20-e2e/request-20260826-r2.json
   ORBIT360_EVIDENCE_DIR: r20-lab-role-e2e-evidence
 
 jobs:
@@ -34,7 +34,7 @@ jobs:
           fetch-depth: 3
           persist-credentials: false
 
-      - name: Verify one-shot read-only request
+      - name: Verify one-shot read-only mechanism retry
         shell: bash
         run: |
           set -euo pipefail
@@ -44,8 +44,9 @@ jobs:
           test "${CHANGED[0]}" = "$ORBIT360_REQUEST_FILE"
           jq -e '
             .schemaVersion=="orbit360-r20-lab-role-e2e-request-v1" and
-            .status=="AUTHORIZED_ONCE" and .approved==true and
+            .status=="AUTHORIZED_ONCE_MECHANISM_RETRY" and .approved==true and
             .allowedExecutions==1 and .replayAllowed==false and
+            .retryOfRunId==33039231275 and .retryReason=="HEADLESS_FIREBASE_BOOTSTRAP_TIMEOUT_BEFORE_AUTH" and
             .baseCandidateSha=="8c9668d6d423e82826b0295431ec699390d79b4b" and
             .projectId=="ays-orbit-360-lab" and .tenantId=="alianzas-soluciones" and
             .targetRoles==["Operativo","Asesor"] and
@@ -147,6 +148,21 @@ jobs:
             out.workflowConfig = { exists: cfg.exists, updateTime: cfg.updateTime ? cfg.updateTime.toMillis() : 0 };
             return out;
           }
+          async function ensureFirebase(page) {
+            try {
+              await page.waitForFunction(() => window.firebase && window.firebase.apps && window.firebase.apps.length && typeof window.firebase.auth === 'function' && typeof window.firebase.firestore === 'function', null, { timeout: 8000 });
+              return 'site-loader';
+            } catch {}
+            const urls = [
+              'https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js',
+              'https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js',
+              'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js'
+            ];
+            for (const url of urls) await page.addScriptTag({ url });
+            await page.addScriptTag({ url: `${new URL(baseUrl).origin}/__/firebase/init.js` });
+            await page.waitForFunction(() => window.firebase && window.firebase.apps && window.firebase.apps.length && typeof window.firebase.auth === 'function' && typeof window.firebase.firestore === 'function', null, { timeout: 20000 });
+            return 'fallback-injected';
+          }
 
           const membersSnap = await db.collection('tenants').doc(tenantId).collection('members').get();
           const members = membersSnap.docs.map(d => ({ id: d.id, ...(d.data() || {}) })).filter(active);
@@ -167,65 +183,94 @@ jobs:
           const before = await integritySnapshot();
           const browser = await chromium.launch({ headless: true });
           const results = [];
-          for (const target of [{ role: 'Operativo', member: operativo }, { role: 'Asesor', member: asesor }]) {
-            const user = await auth.getUser(target.member.id);
-            const token = await auth.createCustomToken(user.uid, { orbit360R20ReadOnlyE2E: true });
-            const context = await browser.newContext({ viewport: { width: 1600, height: 1000 }, locale: 'es-GT' });
-            const page = await context.newPage();
-            const pageErrors = [];
-            page.on('pageerror', error => pageErrors.push(String(error && error.message || error).slice(0, 500)));
-            await page.goto(`${baseUrl}#/inicio`, { waitUntil: 'domcontentloaded', timeout: 60000 });
-            await page.waitForFunction(() => window.firebase && window.firebase.apps && window.firebase.apps.length && typeof window.firebase.auth === 'function', null, { timeout: 60000 });
-            await page.evaluate(async t => { await window.firebase.auth().signInWithCustomToken(t); }, token);
-            await page.waitForFunction(() => window.Orbit && Orbit.session && Orbit.session.membershipProjectionStatus && Orbit.session.membershipProjectionStatus().ready === true, null, { timeout: 60000 });
-            const allowedRoles = await page.evaluate(() => Orbit.session.allowedRoles());
-            if (!allowedRoles.includes(target.role)) throw new Error(`ROLE_NOT_ASSIGNED_${target.role.toUpperCase()}`);
-            const switched = await page.evaluate(role => Orbit.session.set(role), target.role);
-            if (!switched) throw new Error(`ROLE_SWITCH_BLOCKED_${target.role.toUpperCase()}`);
-            await page.waitForFunction(role => window.Orbit && Orbit.session && Orbit.session.rol() === role, target.role, { timeout: 15000 });
+          let fatal = null;
+          try {
+            for (const target of [{ role: 'Operativo', member: operativo }, { role: 'Asesor', member: asesor }]) {
+              const user = await auth.getUser(target.member.id);
+              const token = await auth.createCustomToken(user.uid, { orbit360R20ReadOnlyE2E: true });
+              const context = await browser.newContext({ viewport: { width: 1600, height: 1000 }, locale: 'es-GT' });
+              const page = await context.newPage();
+              const pageErrors = [];
+              const requestFailures = [];
+              page.on('pageerror', error => pageErrors.push(String(error && error.message || error).slice(0, 500)));
+              page.on('requestfailed', req => requestFailures.push({ url: req.url().slice(0, 300), error: String(req.failure()?.errorText || '').slice(0, 200) }));
+              let bootstrapMode = '';
+              try {
+                await page.goto(`${baseUrl}#/inicio`, { waitUntil: 'domcontentloaded', timeout: 60000 });
+                bootstrapMode = await ensureFirebase(page);
+                await page.evaluate(async t => { await window.firebase.auth().signInWithCustomToken(t); }, token);
+                await page.evaluate(() => { if (window.Orbit && Orbit.session && Orbit.session.bindLabMembershipProjection) Orbit.session.bindLabMembershipProjection(); });
+                await page.waitForFunction(() => window.Orbit && Orbit.session && Orbit.session.membershipProjectionStatus && Orbit.session.membershipProjectionStatus().ready === true, null, { timeout: 60000 });
+                const allowedRoles = await page.evaluate(() => Orbit.session.allowedRoles());
+                if (!allowedRoles.includes(target.role)) throw new Error(`ROLE_NOT_ASSIGNED_${target.role.toUpperCase()}`);
+                const switched = await page.evaluate(role => Orbit.session.set(role), target.role);
+                if (!switched) throw new Error(`ROLE_SWITCH_BLOCKED_${target.role.toUpperCase()}`);
+                await page.waitForFunction(role => window.Orbit && Orbit.session && Orbit.session.rol() === role, target.role, { timeout: 15000 });
 
-            const routeResults = [];
-            for (const route of [
-              { hash: '#/ops', marker: 'Orbit Ops', key: 'ops' },
-              { hash: '#/leads', marker: 'Orbit Leads', key: 'leads' }
-            ]) {
-              await page.evaluate(hash => { window.location.hash = hash; }, route.hash);
-              await page.waitForFunction(marker => document.body && document.body.innerText.includes(marker), route.marker, { timeout: 60000 });
-              await page.waitForTimeout(1200);
-              const safeRoleState = await page.evaluate(() => ({
-                activeRole: Orbit.session.rol(),
-                allowedRoles: Orbit.session.allowedRoles(),
-                membership: Orbit.session.membershipProjectionStatus(),
-                headingPresent: document.body.innerText.includes(location.hash.includes('leads') ? 'Orbit Leads' : 'Orbit Ops')
-              }));
-              const fileName = `r20-${target.role.toLowerCase()}-${route.key}.png`;
-              await page.screenshot({ path: path.join(evidenceDir, fileName), fullPage: true });
-              routeResults.push({ route: route.key, screenshot: fileName, ...safeRoleState });
+                const routeResults = [];
+                for (const route of [
+                  { hash: '#/ops', marker: 'Orbit Ops', key: 'ops' },
+                  { hash: '#/leads', marker: 'Orbit Leads', key: 'leads' }
+                ]) {
+                  await page.evaluate(hash => { window.location.hash = hash; }, route.hash);
+                  await page.waitForFunction(marker => document.body && document.body.innerText.includes(marker), route.marker, { timeout: 60000 });
+                  await page.waitForTimeout(1200);
+                  const safeRoleState = await page.evaluate(() => ({
+                    activeRole: Orbit.session.rol(),
+                    allowedRoles: Orbit.session.allowedRoles(),
+                    membership: Orbit.session.membershipProjectionStatus(),
+                    headingPresent: document.body.innerText.includes(location.hash.includes('leads') ? 'Orbit Leads' : 'Orbit Ops')
+                  }));
+                  const fileName = `r20-${target.role.toLowerCase()}-${route.key}.png`;
+                  await page.screenshot({ path: path.join(evidenceDir, fileName), fullPage: true });
+                  routeResults.push({ route: route.key, screenshot: fileName, ...safeRoleState });
+                }
+                results.push({
+                  role: target.role,
+                  identityDigest: sha(user.uid).slice(0, 16),
+                  emailDigest: sha(String(user.email || '').toLowerCase()).slice(0, 16),
+                  authIdentityExists: true,
+                  bootstrapMode,
+                  assignedRoles: allowedRoles,
+                  routes: routeResults,
+                  pageErrorCount: pageErrors.length,
+                  pageErrors,
+                  requestFailureCount: requestFailures.length,
+                  requestFailures
+                });
+              } catch (error) {
+                const diagName = `r20-${target.role.toLowerCase()}-diagnostic-fail.png`;
+                try { await page.screenshot({ path: path.join(evidenceDir, diagName), fullPage: true }); } catch {}
+                const state = await page.evaluate(() => ({
+                  href: location.href,
+                  title: document.title,
+                  bodyText: String(document.body?.innerText || '').slice(0, 1200),
+                  firebasePresent: !!window.firebase,
+                  firebaseApps: window.firebase?.apps?.length || 0,
+                  orbitSessionPresent: !!(window.Orbit && Orbit.session),
+                  membership: window.Orbit?.session?.membershipProjectionStatus ? Orbit.session.membershipProjectionStatus() : null
+                })).catch(() => null);
+                fatal = { role: target.role, code: String(error && error.message || error).slice(0, 500), bootstrapMode, diagnosticScreenshot: diagName, state, pageErrors, requestFailures };
+                await context.close();
+                break;
+              }
+              await context.close();
             }
-            results.push({
-              role: target.role,
-              identityDigest: sha(user.uid).slice(0, 16),
-              emailDigest: sha(String(user.email || '').toLowerCase()).slice(0, 16),
-              authIdentityExists: true,
-              assignedRoles: allowedRoles,
-              routes: routeResults,
-              pageErrorCount: pageErrors.length,
-              pageErrors
-            });
-            await context.close();
+          } finally {
+            await browser.close();
           }
-          await browser.close();
           const after = await integritySnapshot();
           const integrityPass = JSON.stringify(before) === JSON.stringify(after);
-          const routesPass = results.every(r => r.routes.length === 2 && r.routes.every(x => x.headingPresent && x.activeRole === r.role && x.membership && x.membership.ready === true));
-          const pageErrorsPass = results.every(r => r.pageErrorCount === 0);
+          const routesPass = !fatal && results.length === 2 && results.every(r => r.routes.length === 2 && r.routes.every(x => x.headingPresent && x.activeRole === r.role && x.membership && x.membership.ready === true));
+          const pageErrorsPass = !fatal && results.every(r => r.pageErrorCount === 0);
           const communicationsPass = externalChannels.length === 0;
-          const ok = integrityPass && routesPass && pageErrorsPass && communicationsPass;
+          const ok = !fatal && integrityPass && routesPass && pageErrorsPass && communicationsPass;
           const report = {
             schemaVersion: 'orbit360-r20-lab-role-e2e-evidence-v1',
             status: ok ? 'R20_LAB_ROLE_E2E_READONLY_PASS' : 'R20_LAB_ROLE_E2E_READONLY_FAIL',
             classification: ok ? 'PASS' : 'FAIL',
             executedAtUtc: new Date().toISOString(),
+            retryOfRunId: 33039231275,
             baseCandidateSha: '8c9668d6d423e82826b0295431ec699390d79b4b',
             projectId,
             tenantId,
@@ -246,6 +291,7 @@ jobs:
             beforeAfterIntegrityPass: integrityPass,
             roleRouteResults: results,
             screenshots: results.flatMap(r => r.routes.map(x => x.screenshot)),
+            fatal,
             ok
           };
           fs.writeFileSync(path.join(evidenceDir, 'r20-lab-role-e2e-report.json'), JSON.stringify(report, null, 2) + '\n');
