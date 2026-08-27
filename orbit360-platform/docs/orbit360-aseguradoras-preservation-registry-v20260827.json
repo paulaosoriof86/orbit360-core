@@ -1,14 +1,11 @@
 {
-  "schemaVersion": "orbit360-aseguradoras-preservation-registry-v1",
+  "schemaVersion": "orbit360-aseguradoras-preservation-registry-v2-static-owner-contract",
   "updatedAtUtc": "2026-08-27T00:00:00Z",
   "module": "Aseguradoras",
-  "status": "VALIDATOR_STALE_REMEDIATION_SOURCE_ONLY",
-  "historicalClassification": [
-    "DATA_CONTRACT_FAILURE",
-    "FUNCTIONAL_DEFECT",
-    "VALIDATOR_STALE"
-  ],
-  "productStatus": "PASS_PRESERVED_SOURCE",
+  "status": "STATIC_OWNER_CONTRACT",
+  "stateBearing": false,
+  "dynamicStateForbidden": true,
+  "dynamicOperationalStateAuthority": "orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json",
   "canonicalCertifiedSourceHead": "8c9668d6d423e82826b0295431ec699390d79b4b",
   "finalOperationalOwner": {
     "path": "orbit360-platform/core/client-insurer-operational-directory-owner-v20260722.js",
@@ -37,10 +34,11 @@
     "status": "STALE_FOR_FINAL_20260723_OWNER",
     "mayBeUsedAsSolePreservationGuard": false
   },
-  "activePreservationValidator": {
+  "domainPreservationValidator": {
     "path": "tools/orbit360-aseguradoras-operational-owner-preservation-v20260827.mjs",
-    "status": "AUTHORITATIVE_SOURCE_ONLY_PRESERVATION_GUARD",
-    "expectedPassStatus": "ASEGURADORAS_FINAL_OWNER_PRESERVATION_PASS",
+    "role": "DOMAIN_SOURCE_ONLY_VALIDATOR",
+    "expectedOwnerVersion": "20260723.2",
+    "globalControlPlaneDependency": false,
     "capabilities": {
       "secrets": false,
       "firestoreRead": false,
@@ -56,5 +54,7 @@
     "rebuildDirectoryWithoutReproducibleRegression": false,
     "reopenHistoricalM1Gate": false,
     "postGoLiveValidationMode": "DIFFERENTIAL_AGAINST_FINAL_OWNER_CONTRACT"
-  }
+  },
+  "containsPII": false,
+  "containsSecrets": false
 }

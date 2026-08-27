@@ -1,8 +1,10 @@
 {
-  "schemaVersion": "orbit360-control-plane-semantic-contract-v16-module-lineage-sync",
+  "schemaVersion": "orbit360-control-plane-semantic-contract-v17-semantic-single-state",
   "contractId": "ORBIT360-CONTROL-PLANE-SEMANTIC-CONTRACT",
   "active": true,
-  "status": "ACTIVE_SINGLE_STATE_FAIL_CLOSED_MODULE_LINEAGE_SYNCED",
+  "status": "ACTIVE_SINGLE_STATE_FAIL_CLOSED_SEMANTIC",
+  "stateBearing": false,
+  "dynamicStateForbidden": true,
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "registry": "orbit360-platform/docs/orbit360-continuity-writer-registry-v20260820.json",
   "singleMutableOperationalState": "orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json",
@@ -14,12 +16,16 @@
   "canonicalWorkflow": ".github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml",
   "certifiedProductPreservationRegistry": "orbit360-platform/docs/orbit360-certified-product-preservation-registry-v20260827.json",
   "certifiedProductPreservationGuard": "tools/orbit360-certified-product-preservation-v20260827.mjs",
-  "requiredPreservationContractVersion": "v2-module-lineage",
+  "frozenBaseline": "orbit360-platform/docs/orbit360-control-plane-frozen-baseline-v20260827.json",
   "behavioralContractPolicy": {
     "oneMutableStateFile": true,
+    "oneSemanticStateAuthority": true,
     "projectionStateDuplicationForbidden": true,
     "humanDocumentationStateDuplicationForbidden": true,
+    "dynamicModuleStateInStaticRegistriesForbidden": true,
     "contractsDoNotCarryCurrentPhaseRevisionProgress": true,
+    "preservationGuardFunctionalAcceptanceForbidden": true,
+    "moduleSpecificAssertionsInGlobalWorkflowForbidden": true,
     "sourceOnlySelftestRequiredBeforeRisk": true,
     "expectedRevisionRequiredBeforeClaim": true,
     "remoteHeadCASRequiredBeforeClaimPublication": true,
@@ -35,11 +41,7 @@
     "technicalPullRequestTransportForbidden": true,
     "executionTransportSinglePushBranch": true,
     "invariantsReadOnly": true,
-    "canonicalitySemanticWriterRegistryMustShareActiveOwnerInvariantAndStateContract": true,
-    "candidateToHeadAndLastApprovedModuleToCandidateMustRemainSeparate": true,
-    "moduleLineageRequiredBeforeVisualPass": true,
-    "humanVisualEvidenceRequiredForVisualPass": true,
-    "retiredHypothesisCannotReopenWithoutNewEvidence": true,
+    "antiStaleSelftestRequired": true,
     "productAndDataRemainFrozenOnMechanismFailure": true
   },
   "activeControlPlaneComponents": [
@@ -48,17 +50,8 @@
     "tools/orbit360-single-state-invariant-v20260827.mjs",
     "tools/orbit360-control-plane-publication-preflight-v20260825.mjs",
     "tools/orbit360-certified-product-preservation-v20260827.mjs",
+    "tools/orbit360-semantic-single-state-rootfix-handler-v20260827.mjs",
     ".github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml"
-  ],
-  "retiredFromCriticalPath": [
-    "tools/orbit360-single-state-ledger-owner-v20260826.mjs",
-    "tools/orbit360-single-state-invariant-v20260826.mjs",
-    "tools/orbit360-continuity-transition-owner-v20260824.mjs",
-    "tools/orbit360-continuity-transition-owner-v20260820.mjs",
-    "tools/orbit360-continuity-projection-core-v20260825.mjs",
-    "tools/orbit360-continuity-projection-atomic-v20260820.mjs",
-    "tools/orbit360-control-plane-evidence-convergence-v20260822.mjs",
-    "tools/orbit360-documentation-state-discovery-v20260821.mjs"
   ],
   "containsPII": false,
   "containsSecrets": false

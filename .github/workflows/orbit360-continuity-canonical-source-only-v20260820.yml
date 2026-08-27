@@ -1,5 +1,5 @@
 name: Orbit360 Canonical Single-State Runner
-# SINGLE_STATE_CONTROL_PLANE_V3_MODULE_LINEAGE_SYNC_POST_GO_LIVE_ACCESS_RECOVERY
+# SINGLE_STATE_CONTROL_PLANE_V4_SEMANTIC_SINGLE_STATE
 on:
   push:
     branches:
@@ -21,9 +21,7 @@ env:
   ORBIT360_INVARIANT: tools/orbit360-single-state-invariant-v20260827.mjs
   ORBIT360_PUBLISHER: tools/orbit360-control-plane-publication-preflight-v20260825.mjs
   ORBIT360_ACCESS_HANDLER: tools/orbit360-post-go-live-access-recovery-v20260827.mjs
-  ORBIT360_ACCESS_GATE_ID: block-auth-paula-reset-link-handoff-lab-v20260817
   ORBIT360_CERTIFIED_PRODUCT_PRESERVATION: tools/orbit360-certified-product-preservation-v20260827.mjs
-  ORBIT360_ASEGURADORAS_PRESERVATION: tools/orbit360-aseguradoras-operational-owner-preservation-v20260827.mjs
 jobs:
   single-state-runner:
     runs-on: ubuntu-24.04
@@ -57,10 +55,9 @@ jobs:
           test "$LIVE" = "$BASE"
           git checkout --force -B orbit360-canonical "$LIVE"
           node "$ORBIT360_CERTIFIED_PRODUCT_PRESERVATION" | tee "$RUNNER_TEMP/certified-product-preservation.json"
-          jq -e '.ok==true and .status=="CERTIFIED_PRODUCT_BASELINE_PRESERVATION_PASS" and .contractVersion=="v2-module-lineage" and .candidateToHeadStatus=="CANDIDATE_PRESERVED" and .moduleLineageContractStatus=="MODULE_LINEAGE_CONTRACT_PASS" and .aseguradorasLineageStatus=="LAST_APPROVED_LINEAGE_PRESERVED_SOURCE" and .cliente360LineageStatus=="LAST_APPROVED_LINEAGE_PRESERVED_SOURCE" and .cliente360LineageProofStatus=="CLIENTE360_LAST_APPROVED_LINEAGE_PRESERVATION_PASS" and .approvedModuleScriptCount==53 and .changedProductFilesSinceBaseline==0 and .noReprocess==true and .noReimport==true and .sourceOnly==true and .runtime==false and .browser==false and .secrets==false and .firestoreRead==false and .writes==false and .deploy==false and .productionTouched==false' "$RUNNER_TEMP/certified-product-preservation.json" >/dev/null
-          node "$ORBIT360_INVARIANT"
-          node "$ORBIT360_ASEGURADORAS_PRESERVATION" | tee "$RUNNER_TEMP/aseguradoras-preservation.json"
-          jq -e '.ok==true and .status=="ASEGURADORAS_FINAL_OWNER_PRESERVATION_PASS" and .sourceOnly==true and .secrets==false and .firestoreRead==false and .writes==false and .runtime==false and .browser==false and .deploy==false and .productionTouched==false' "$RUNNER_TEMP/aseguradoras-preservation.json" >/dev/null
+          jq -e '.ok==true and .status=="CERTIFIED_PRODUCT_BASELINE_PRESERVATION_PASS" and .contractVersion=="v3-static-product-integrity" and .candidateToHeadStatus=="CANDIDATE_PRESERVED" and .approvedModuleScriptCount==53 and .changedProductFilesSinceBaseline==0 and .noReprocess==true and .noReimport==true and .sourceOnly==true and .runtime==false and .browser==false and .secrets==false and .firestoreRead==false and .writes==false and .deploy==false and .productionTouched==false' "$RUNNER_TEMP/certified-product-preservation.json" >/dev/null
+          node "$ORBIT360_INVARIANT" | tee "$RUNNER_TEMP/static-invariant.json"
+          jq -e '.ok==true and .status=="SINGLE_STATE_CONTROL_PLANE_STATIC_INVARIANT_PASS" and .semanticSingleState==true' "$RUNNER_TEMP/static-invariant.json" >/dev/null
           node "$ORBIT360_OWNER" --inspect-intent "$RUNNER_TEMP/orbit360-intent.json" > "$RUNNER_TEMP/inspect.json"
           jq -e '.ok==true and .status=="SINGLE_STATE_INTENT_VALID"' "$RUNNER_TEMP/inspect.json" >/dev/null
           echo "transition=$(jq -r '.transitionId' "$RUNNER_TEMP/inspect.json")" >> "$GITHUB_OUTPUT"
@@ -68,7 +65,7 @@ jobs:
           echo "state_mutation=$(jq -r '.stateMutation' "$RUNNER_TEMP/inspect.json")" >> "$GITHUB_OUTPUT"
           echo "handler=$(jq -r '.handler // ""' "$RUNNER_TEMP/inspect.json")" >> "$GITHUB_OUTPUT"
           test "$(jq -r '.handlerReady' "$RUNNER_TEMP/inspect.json")" = 'true'
-      - name: Run source-only single-state selftest
+      - name: Run source-only global control-plane selftest
         if: steps.inspect.outputs.transition == 'CONTROL_PLANE_SELFTEST'
         env:
           GH_TOKEN: ${{ github.token }}
@@ -77,10 +74,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          node "$ORBIT360_CERTIFIED_PRODUCT_PRESERVATION" | tee "$RUNNER_TEMP/certified-product-preservation-selftest.json"
-          jq -e '.ok==true and .status=="CERTIFIED_PRODUCT_BASELINE_PRESERVATION_PASS" and .contractVersion=="v2-module-lineage" and .candidateToHeadStatus=="CANDIDATE_PRESERVED" and .moduleLineageContractStatus=="MODULE_LINEAGE_CONTRACT_PASS" and .aseguradorasLineageStatus=="LAST_APPROVED_LINEAGE_PRESERVED_SOURCE" and .cliente360LineageStatus=="LAST_APPROVED_LINEAGE_PRESERVED_SOURCE" and .cliente360LineageProofStatus=="CLIENTE360_LAST_APPROVED_LINEAGE_PRESERVATION_PASS" and .changedProductFilesSinceBaseline==0 and .noReprocess==true and .noReimport==true' "$RUNNER_TEMP/certified-product-preservation-selftest.json" >/dev/null
           node "$ORBIT360_OWNER" --selftest | tee "$RUNNER_TEMP/single-state-selftest.json"
-          jq -e '.ok==true and .status=="SINGLE_STATE_CONTROL_PLANE_SELFTEST_PASS" and .sourceClaimNoRuntime==true and .sourcePrepared==true and .wrongTargetBlocked==true and .oldAuthorizationBlocked==true and .goLivePreserved==true' "$RUNNER_TEMP/single-state-selftest.json" >/dev/null
+          jq -e '.ok==true and .status=="SINGLE_STATE_CONTROL_PLANE_SELFTEST_PASS" and .patchApplied==true and .mechanismFailureFreezes==true' "$RUNNER_TEMP/single-state-selftest.json" >/dev/null
+          node "$ORBIT360_INVARIANT" --anti-stale-selftest | tee "$RUNNER_TEMP/anti-stale-selftest.json"
+          jq -e '.ok==true and .status=="SINGLE_STATE_ANTI_STALE_SELFTEST_PASS" and .dynamicEvidenceMutationRequiresStaticConsumerEdit==false' "$RUNNER_TEMP/anti-stale-selftest.json" >/dev/null
           RELEASE_HANDLER=$(jq -r '.executionTransitions.GO_LIVE_RELEASE_WINDOW.handler // empty' "$ORBIT360_REGISTRY")
           node "$RELEASE_HANDLER" --source-only-selftest --out "$ORBIT360_RELEASE_HANDLER_SELFTEST_OUT"
           jq -e '.ok==true and .status=="GO_LIVE_RELEASE_HANDLER_SOURCE_ONLY_PASS" and .secretAccess==false and .firestoreRead==false and .deployExecuted==false and .productionTouched==false' "$ORBIT360_RELEASE_HANDLER_SELFTEST_OUT" >/dev/null
@@ -88,10 +85,14 @@ jobs:
           jq -e '.ok==true and .status=="POST_GO_LIVE_ACCESS_RECOVERY_SOURCE_ONLY_PASS" and .targetCount==1 and .maxResetLinks==1 and .forbiddenDemoIdentityBlocked==true and .historicalAuthorizationReuseAllowed==false and .directPasswordSets==0 and .resetLinksGenerated==0 and .secretAccess==false and .firestoreRead==false and .deployExecuted==false and .productionTouched==false' "$ORBIT360_ACCESS_HANDLER_SELFTEST_OUT" >/dev/null
           node tools/orbit360-bind-f2-browser-evidence-run-v20260824.mjs --selftest | tee "$RUNNER_TEMP/browser-binder-selftest.json"
           jq -e '.ok==true and .status=="F2_BROWSER_BINDER_CURRENT_RUN_CAUSAL_SELFTEST_PASS" and .secondaryBrowserReproductionRequired==false' "$RUNNER_TEMP/browser-binder-selftest.json" >/dev/null
-          node "$ORBIT360_ASEGURADORAS_PRESERVATION" | tee "$RUNNER_TEMP/aseguradoras-preservation-selftest.json"
-          jq -e '.ok==true and .status=="ASEGURADORAS_FINAL_OWNER_PRESERVATION_PASS"' "$RUNNER_TEMP/aseguradoras-preservation-selftest.json" >/dev/null
-          node "$ORBIT360_INVARIANT"
           test -z "$(git status --porcelain)"
+      - name: Run semantic single-state anti-stale preflight
+        if: steps.inspect.outputs.transition == 'POST_GO_LIVE_SEMANTIC_SINGLE_STATE_ROOTFIX_VALIDATE_AND_SEAL'
+        shell: bash
+        run: |
+          set -euo pipefail
+          node "$ORBIT360_INVARIANT" --anti-stale-selftest | tee "$RUNNER_TEMP/anti-stale-selftest.json"
+          jq -e '.ok==true and .status=="SINGLE_STATE_ANTI_STALE_SELFTEST_PASS" and .dynamicEvidenceMutationRequiresStaticConsumerEdit==false and .runtimeExecuted==false and .browserExecuted==false and .secretAccess==false and .firestoreRead==false and .deployExecuted==false and .productionTouched==false' "$RUNNER_TEMP/anti-stale-selftest.json" >/dev/null
       - id: claim
         name: Atomically claim registered transition in ledger
         if: steps.inspect.outputs.state_mutation == 'CLAIM_TERMINAL'
@@ -182,14 +183,13 @@ jobs:
           name: orbit360-single-state-${{ github.run_id }}
           path: |
             ${{ runner.temp }}/inspect.json
+            ${{ runner.temp }}/static-invariant.json
+            ${{ runner.temp }}/anti-stale-selftest.json
             ${{ runner.temp }}/single-state-selftest.json
             ${{ runner.temp }}/release-handler-selftest.json
             ${{ runner.temp }}/access-handler-selftest.json
             ${{ runner.temp }}/browser-binder-selftest.json
             ${{ runner.temp }}/certified-product-preservation.json
-            ${{ runner.temp }}/certified-product-preservation-selftest.json
-            ${{ runner.temp }}/aseguradoras-preservation.json
-            ${{ runner.temp }}/aseguradoras-preservation-selftest.json
             ${{ runner.temp }}/orbit360-terminal.json
           if-no-files-found: ignore
           retention-days: 14

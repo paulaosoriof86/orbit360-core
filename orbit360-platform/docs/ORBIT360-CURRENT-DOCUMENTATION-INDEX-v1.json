@@ -1,13 +1,18 @@
 {
-  "schemaVersion": "orbit360-current-documentation-index-v5-single-state",
+  "schemaVersion": "orbit360-current-documentation-index-v6-semantic-single-state",
   "status": "STATIC_DISCOVERY_INDEX",
   "stateBearing": false,
+  "dynamicStateForbidden": true,
   "readOrder": [
     "MASTER_RULES_AND_ADDENDA",
-    "orbit360-platform/docs/PLAN-MAESTRO-CONGELADO-SALIDA-PRODUCCION-SIN-BUCLES-ORBIT360-AYS-20260824.md",
+    "orbit360-platform/docs/PLAN-MAESTRO-DEFINITIVO-PRODUCCION-POSTPRODUCCION-ANTI-LOOP-ORBIT360-AYS-20260826.md",
     "LIVE_PR5_HEAD",
     "orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json",
-    "orbit360-platform/docs/ADDENDUM-MECANISMO-ESTADO-UNICO-CONTROL-PLANE-20260826.md"
+    "orbit360-platform/docs/AUDITORIA-CAUSAL-DESINCRONIZACION-SEMANTICA-SINGLE-STATE-POST-GO-LIVE-20260827.md"
+  ],
+  "historicalPlans": [
+    "orbit360-platform/docs/PLAN-MAESTRO-CONGELADO-SALIDA-PRODUCCION-SIN-BUCLES-ORBIT360-AYS-20260824.md",
+    "orbit360-platform/docs/PLAN-MAESTRO-CONGELADO-DEFINITIVO-RUTA-PRODUCCION-ORBIT360-AYS-20260821.md"
   ],
   "canonicalStateOwner": "orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json",
   "containsPII": false,
