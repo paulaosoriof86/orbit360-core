@@ -10,10 +10,10 @@
   "sourceIdentities": {
     ".github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml": "ae60b0af3cefa9e2d3fcd87aeda559ec4b71e221",
     "tools/orbit360-single-state-ledger-owner-v20260827.mjs": "e65898237d485312aafd090c63c597d127e0bf28",
-    "tools/orbit360-single-state-invariant-v20260827.mjs": "7b2ec15473fe0e428804842dcf5faea2c8baccdd",
+    "tools/orbit360-single-state-invariant-v20260827.mjs": "586dee9a8da42cddecadcff3e817fe0dda50420a",
     "tools/orbit360-single-state-contract-v20260827.mjs": "792a8f9f2d7ace92987bae528c6475dd8332c052",
     "orbit360-platform/docs/orbit360-continuity-writer-registry-v20260820.json": "218d8fdb600b9f2d25bd47c2550816856a3b95f1",
-    "tools/orbit360-gate-contract-registry-v20260717.json": "a54558e6839e71badffffb67006345c8aaf4bce5",
+    "tools/orbit360-gate-contract-registry-v20260717.json": "8895b167490719691fec2a9d47cafae8f7e2cbfb",
     "tools/orbit360-certified-product-preservation-v20260827.mjs": "9e2ac24c435667b75716136d186ac18adefa93fe",
     "orbit360-platform/docs/orbit360-certified-product-preservation-registry-v20260827.json": "9c6f527e27ad5acfb34c7e2f8ea159659ec6abe2",
     "orbit360-platform/docs/orbit360-aseguradoras-preservation-registry-v20260827.json": "e18e3d7d4abb8e9a04e5ceb6e6c647c1337b5118",
@@ -36,7 +36,8 @@
     "staticRegistriesNoCurrentModuleState": true,
     "globalWorkflowNoModuleSpecificStateAssertions": true,
     "productPreservationNoFunctionalAcceptance": true,
-    "antiStaleSelftestRequired": true
+    "antiStaleSelftestRequired": true,
+    "validatorSourceMayNameForbiddenConceptsWhenEnforcingTheirAbsence": true
   },
   "sealPolicy": {
     "passOrFailIsRecordedInLedgerTerminalEvidence": true,
