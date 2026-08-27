@@ -1,0 +1,60 @@
+{
+  "schemaVersion": "orbit360-aseguradoras-preservation-registry-v1",
+  "updatedAtUtc": "2026-08-27T00:00:00Z",
+  "module": "Aseguradoras",
+  "status": "VALIDATOR_STALE_REMEDIATION_SOURCE_ONLY",
+  "historicalClassification": [
+    "DATA_CONTRACT_FAILURE",
+    "FUNCTIONAL_DEFECT",
+    "VALIDATOR_STALE"
+  ],
+  "productStatus": "PASS_PRESERVED_SOURCE",
+  "canonicalCertifiedSourceHead": "8c9668d6d423e82826b0295431ec699390d79b4b",
+  "finalOperationalOwner": {
+    "path": "orbit360-platform/core/client-insurer-operational-directory-owner-v20260722.js",
+    "version": "20260723.2",
+    "ownerId": "clientInsurerOperationalDirectoryOwner",
+    "bootstrap": "orbit360-platform/core/router-tenant-config-bootstrap.js",
+    "semantics": {
+      "portalUsernameOperationalVisible": true,
+      "passwordSecretTemporaryReveal": true,
+      "bankNumberOperationalVisible": true,
+      "bankRevealDependency": false,
+      "bankCopyDirect": true,
+      "bankCopyFields": ["banco", "tipo", "numero", "moneda", "titular"],
+      "writesStore": false,
+      "reimportsData": false
+    }
+  },
+  "legacyConsumer": {
+    "path": "orbit360-platform/modules/aseguradoras-v1202-resources-bridge.js",
+    "allowedToExist": true,
+    "mayBeFinalAuthority": false,
+    "mustBeSupersededByFinalOperationalOwner": true
+  },
+  "historicalValidator": {
+    "path": "orbit360-platform/tools/orbit360-aseguradoras-owner-contract-v20260717.js",
+    "status": "STALE_FOR_FINAL_20260723_OWNER",
+    "mayBeUsedAsSolePreservationGuard": false
+  },
+  "activePreservationValidator": {
+    "path": "tools/orbit360-aseguradoras-operational-owner-preservation-v20260827.mjs",
+    "status": "AUTHORITATIVE_SOURCE_ONLY_PRESERVATION_GUARD",
+    "expectedPassStatus": "ASEGURADORAS_FINAL_OWNER_PRESERVATION_PASS",
+    "capabilities": {
+      "secrets": false,
+      "firestoreRead": false,
+      "writes": false,
+      "runtime": false,
+      "browser": false,
+      "deploy": false,
+      "production": false
+    }
+  },
+  "antiReprocess": {
+    "reimportInsurersForDisplayAccessOwnerGateIssues": false,
+    "rebuildDirectoryWithoutReproducibleRegression": false,
+    "reopenHistoricalM1Gate": false,
+    "postGoLiveValidationMode": "DIFFERENTIAL_AGAINST_FINAL_OWNER_CONTRACT"
+  }
+}
