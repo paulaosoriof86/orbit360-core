@@ -1,7 +1,7 @@
 {
-  "schemaVersion": "orbit360-continuity-writer-registry-v23-post-go-live-access-recovery",
+  "schemaVersion": "orbit360-continuity-writer-registry-v24-post-go-live-metadata-reconcile",
   "registryId": "ORBIT360-CONTINUITY-WRITER-REGISTRY",
-  "revision": 36,
+  "revision": 37,
   "active": true,
   "status": "SINGLE_STATE_LEDGER_ONLY_CONTROL_PLANE_POST_GO_LIVE_RECOVERY",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -56,6 +56,16 @@
       "terminalPassState":{"phase":"PRODUCTION_SMOKE_PASS","status":"PRODUCTION_GO_LIVE_PASS","progress":100,"nextAction":"AWAIT_EXPLICIT_HUMAN_ACCESS_RECOVERY_AUTHORIZATION","firstIncompleteStep":"HUMAN-ACCESS-RECOVERY-AUTHORIZATION","laneB":"PRODUCTION_GO_LIVE_PASS_ACCESS_RECOVERY_SOURCE_READY","userActionRequired":true,"freshAuthorizationRequired":true,"newRuntimeRequestAllowed":true},
       "terminalFailState":{"phase":"PRODUCTION_SMOKE_PASS","status":"PRODUCTION_GO_LIVE_PASS","progress":100,"nextAction":"DIAGNOSE_ACCESS_RECOVERY_SOURCE_PREP_NO_GO_LIVE_REOPEN","firstIncompleteStep":"ACCESS-RECOVERY-SOURCE-ROOT-CAUSE","laneB":"PRODUCTION_GO_LIVE_PASS_ACCESS_RECOVERY_SOURCE_STOP_RETRY","userActionRequired":false}
     },
+    "POST_GO_LIVE_CONTROL_PLANE_METADATA_RECONCILE": {
+      "capabilityClass":"SOURCE_ONLY","stateMutation":"CLAIM_TERMINAL",
+      "handler":"tools/orbit360-control-plane-metadata-reconcile-v20260827.mjs","handlerReady":true,
+      "requiresExplicitUserAuthorization":false,"bindCandidate":false,
+      "requiredScope":{"runtime":false,"browser":false,"secrets":false,"firestoreRead":false,"deploy":false,"production":false,"firestoreWrites":false,"authWrites":false,"operationalWrites":false,"dataWrites":false,"main":false,"merge":false},
+      "from":{"phase":"PRODUCTION_SMOKE_PASS","status":"PRODUCTION_GO_LIVE_PASS","progress":100,"nextAction":"AWAIT_EXPLICIT_HUMAN_ACCESS_RECOVERY_AUTHORIZATION"},
+      "claimState":{"phase":"POST_GO_LIVE_CONTROL_PLANE_METADATA_RECONCILE_RUNNING","status":"SOURCE_ONLY_CLAIMED","nextAction":"RUN_POST_GO_LIVE_CONTROL_PLANE_METADATA_RECONCILE","firstIncompleteStep":"CONTROL-PLANE-METADATA-RECONCILE","laneB":"PRODUCTION_GO_LIVE_PASS_METADATA_RECONCILE_RUNNING"},
+      "terminalPassState":{"phase":"PRODUCTION_SMOKE_PASS","status":"PRODUCTION_GO_LIVE_PASS","progress":100,"nextAction":"AWAIT_EXPLICIT_HUMAN_ACCESS_RECOVERY_AUTHORIZATION","firstIncompleteStep":"HUMAN-ACCESS-RECOVERY-AUTHORIZATION","laneB":"PRODUCTION_GO_LIVE_PASS_ACCESS_RECOVERY_SOURCE_READY_METADATA_SYNCED","userActionRequired":true,"freshAuthorizationRequired":true,"newRuntimeRequestAllowed":true},
+      "terminalFailState":{"phase":"PRODUCTION_SMOKE_PASS","status":"PRODUCTION_GO_LIVE_PASS","progress":100,"nextAction":"DIAGNOSE_ACCESS_RECOVERY_SOURCE_PREP_NO_GO_LIVE_REOPEN","firstIncompleteStep":"CONTROL-PLANE-METADATA-ROOT-CAUSE","laneB":"PRODUCTION_GO_LIVE_PASS_METADATA_RECONCILE_STOP_RETRY","userActionRequired":false}
+    },
     "POST_GO_LIVE_ACCESS_RECOVERY_RESET_LINK": {
       "capabilityClass":"AUTH_RECOVERY","stateMutation":"CLAIM_TERMINAL",
       "handler":"tools/orbit360-post-go-live-access-recovery-v20260827.mjs","handlerReady":true,
@@ -69,7 +79,7 @@
     }
   },
   "policies": {
-    "ledgerIsSoleMutableOperationalState":true,"dynamicStateInHumanDocsForbidden":true,"dynamicStateInGateContractsForbidden":true,"projectionWritesForbidden":true,"actualPrBodyStateBearingForbidden":true,"technicalPullRequestTransportForbidden":true,"ephemeralExecutionBranchSinglePush":true,"executionBranchMayContainExactlyOneIntentCommit":true,"canonicalClaimMustCASBeforePrivilegedRisk":true,"duplicateExecutionFailsAfterFirstClaim":true,"authorizationConsumedAtPrivilegedEdgeOnly":true,"preRiskFailurePreservesAuthorization":true,"terminalEvidenceMustBeRunScoped":true,"terminalReductionWritesLedgerOnly":true,"remoteHeadCompareAndSwapRequired":true,"stopRetryMechanicallyEnforced":true,"runtimeReplayForbidden":true,"productAndDataRemainFrozenOnMechanismFailure":true,"postGoLiveRecoveryMustNotReopenGoLive":true,"humanPasswordProofSeparateFromCustomTokenProof":true,"mainAllowed":false,"mergeAllowed":false
+    "ledgerIsSoleMutableOperationalState":true,"dynamicStateInHumanDocsForbidden":true,"dynamicStateInGateContractsForbidden":true,"projectionWritesForbidden":true,"actualPrBodyStateBearingForbidden":true,"technicalPullRequestTransportForbidden":true,"ephemeralExecutionBranchSinglePush":true,"executionBranchMayContainExactlyOneIntentCommit":true,"canonicalClaimMustCASBeforePrivilegedRisk":true,"duplicateExecutionFailsAfterFirstClaim":true,"authorizationConsumedAtPrivilegedEdgeOnly":true,"preRiskFailurePreservesAuthorization":true,"terminalEvidenceMustBeRunScoped":true,"terminalReductionWritesLedgerOnly":true,"remoteHeadCompareAndSwapRequired":true,"stopRetryMechanicallyEnforced":true,"runtimeReplayForbidden":true,"productAndDataRemainFrozenOnMechanismFailure":true,"postGoLiveRecoveryMustNotReopenGoLive":true,"humanPasswordProofSeparateFromCustomTokenProof":true,"metadataReconcileSourceOnlyRequiredBeforeAuthRecovery":true,"mainAllowed":false,"mergeAllowed":false
   },
   "containsPII": false,
   "containsSecrets": false

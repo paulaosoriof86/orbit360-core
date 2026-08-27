@@ -28,6 +28,7 @@ export function milestoneKind(L){
   if(phase===RELEASE_PHASE&&status===RELEASE_STATUS&&progress===100&&releaseNext.has(next))return 'RELEASE_PASS';
   if(phase==='POST_GO_LIVE_ACCESS_RECOVERY_SOURCE_PREP_RUNNING'&&status==='SOURCE_ONLY_CLAIMED'&&progress===100)return 'ACCESS_SOURCE_CLAIMED';
   if(phase==='POST_GO_LIVE_ACCESS_RECOVERY_RUNNING'&&status==='AUTHORIZED_RECOVERY_CLAIMED'&&progress===100)return 'ACCESS_RUNTIME_CLAIMED';
+  if(phase==='POST_GO_LIVE_CONTROL_PLANE_METADATA_RECONCILE_RUNNING'&&status==='SOURCE_ONLY_CLAIMED'&&progress===100)return 'METADATA_RECONCILE_CLAIMED';
   return '';
 }
 export function assertRecoveryTarget(intent,fail){
@@ -50,7 +51,7 @@ export function freezeReleaseMilestone(L){
 }
 export function assertFollowupConsistency(L,fail){
   const f=L.postGoLiveAccessRecovery;if(!f)return;
-  if(['POST_GO_LIVE_ACCESS_RECOVERY_SOURCE_PREP_RUNNING','POST_GO_LIVE_ACCESS_RECOVERY_RUNNING'].includes(String(L.activeState?.phase||'')))return;
+  if(['POST_GO_LIVE_ACCESS_RECOVERY_SOURCE_PREP_RUNNING','POST_GO_LIVE_ACCESS_RECOVERY_RUNNING','POST_GO_LIVE_CONTROL_PLANE_METADATA_RECONCILE_RUNNING'].includes(String(L.activeState?.phase||'')))return;
   const next=String(L.nextAction?.id||'');
   if(f.status==='SOURCE_PREPARED_AWAITING_AUTHORIZATION'&&next!=='AWAIT_EXPLICIT_HUMAN_ACCESS_RECOVERY_AUTHORIZATION')fail('ACCESS_RECOVERY_NEXT_ACTION_DESYNC');
   if(f.status==='RESET_LINK_READY_FOR_PRIVATE_HANDOFF'&&next!=='VERIFY_HUMAN_EMAIL_PASSWORD_LOGIN_AND_START_POST_GO_LIVE_FUNCTIONAL_VALIDATION')fail('ACCESS_RECOVERY_NEXT_ACTION_DESYNC');
