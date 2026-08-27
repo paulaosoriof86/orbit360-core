@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "orbit360-f2-integrity-before-after-v2-run-scoped",
+  "ok": true,
+  "status": "F2_INTEGRITY_BEFORE_AFTER_PASS",
+  "classification": "PASS",
+  "runId": 33029077881,
+  "integrityRunId": 33029077881,
+  "countsIdentical": true,
+  "digestsIdentical": true,
+  "firestoreWrites": 0,
+  "authWrites": 0,
+  "operationalWrites": 0,
+  "containsPII": false,
+  "containsSecrets": false
+}
