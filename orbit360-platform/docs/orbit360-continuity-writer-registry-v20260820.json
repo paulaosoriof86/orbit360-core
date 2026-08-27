@@ -1,7 +1,7 @@
 {
-  "schemaVersion": "orbit360-continuity-writer-registry-v24-post-go-live-metadata-reconcile",
+  "schemaVersion": "orbit360-continuity-writer-registry-v25-post-go-live-preservation-guards",
   "registryId": "ORBIT360-CONTINUITY-WRITER-REGISTRY",
-  "revision": 37,
+  "revision": 38,
   "active": true,
   "status": "SINGLE_STATE_LEDGER_ONLY_CONTROL_PLANE_POST_GO_LIVE_RECOVERY",
   "branch": "ays/backend-tenant-lab-v99-20260703",
@@ -13,6 +13,21 @@
   "singleStateInvariant": "tools/orbit360-single-state-invariant-v20260827.mjs",
   "publicationTransactionOwner": "tools/orbit360-control-plane-publication-preflight-v20260825.mjs",
   "canonicalWorkflow": ".github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml",
+  "preservationGuards": {
+    "aseguradoras": {
+      "status": "ACTIVE_SOURCE_ONLY_FAIL_CLOSED",
+      "module": "Aseguradoras",
+      "validator": "tools/orbit360-aseguradoras-operational-owner-preservation-v20260827.mjs",
+      "registry": "orbit360-platform/docs/orbit360-aseguradoras-preservation-registry-v20260827.json",
+      "expectedPassStatus": "ASEGURADORAS_FINAL_OWNER_PRESERVATION_PASS",
+      "expectedOwnerVersion": "20260723.2",
+      "historicalValidator": "orbit360-platform/tools/orbit360-aseguradoras-owner-contract-v20260717.js",
+      "historicalValidatorStatus": "STALE_FOR_FINAL_20260723_OWNER",
+      "preflightBeforeIntentInspection": true,
+      "productMutationOnFailure": false,
+      "dataMutationOnFailure": false
+    }
+  },
   "canonicalityContract": "orbit360-platform/docs/orbit360-control-plane-canonicality-contract-v20260822.json",
   "semanticContract": "orbit360-platform/docs/orbit360-control-plane-semantic-contract-v20260824.json",
   "transportContract": "tools/orbit360-control-plane-transport-contract-v20260826.json",
@@ -79,7 +94,7 @@
     }
   },
   "policies": {
-    "ledgerIsSoleMutableOperationalState":true,"dynamicStateInHumanDocsForbidden":true,"dynamicStateInGateContractsForbidden":true,"projectionWritesForbidden":true,"actualPrBodyStateBearingForbidden":true,"technicalPullRequestTransportForbidden":true,"ephemeralExecutionBranchSinglePush":true,"executionBranchMayContainExactlyOneIntentCommit":true,"canonicalClaimMustCASBeforePrivilegedRisk":true,"duplicateExecutionFailsAfterFirstClaim":true,"authorizationConsumedAtPrivilegedEdgeOnly":true,"preRiskFailurePreservesAuthorization":true,"terminalEvidenceMustBeRunScoped":true,"terminalReductionWritesLedgerOnly":true,"remoteHeadCompareAndSwapRequired":true,"stopRetryMechanicallyEnforced":true,"runtimeReplayForbidden":true,"productAndDataRemainFrozenOnMechanismFailure":true,"postGoLiveRecoveryMustNotReopenGoLive":true,"humanPasswordProofSeparateFromCustomTokenProof":true,"metadataReconcileSourceOnlyRequiredBeforeAuthRecovery":true,"mainAllowed":false,"mergeAllowed":false
+    "ledgerIsSoleMutableOperationalState":true,"dynamicStateInHumanDocsForbidden":true,"dynamicStateInGateContractsForbidden":true,"projectionWritesForbidden":true,"actualPrBodyStateBearingForbidden":true,"technicalPullRequestTransportForbidden":true,"ephemeralExecutionBranchSinglePush":true,"executionBranchMayContainExactlyOneIntentCommit":true,"canonicalClaimMustCASBeforePrivilegedRisk":true,"duplicateExecutionFailsAfterFirstClaim":true,"authorizationConsumedAtPrivilegedEdgeOnly":true,"preRiskFailurePreservesAuthorization":true,"terminalEvidenceMustBeRunScoped":true,"terminalReductionWritesLedgerOnly":true,"remoteHeadCompareAndSwapRequired":true,"stopRetryMechanicallyEnforced":true,"runtimeReplayForbidden":true,"productAndDataRemainFrozenOnMechanismFailure":true,"postGoLiveRecoveryMustNotReopenGoLive":true,"humanPasswordProofSeparateFromCustomTokenProof":true,"metadataReconcileSourceOnlyRequiredBeforeAuthRecovery":true,"preservationGuardsMustPassBeforeIntentInspection":true,"mainAllowed":false,"mergeAllowed":false
   },
   "containsPII": false,
   "containsSecrets": false
