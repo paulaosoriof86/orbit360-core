@@ -1,16 +1,16 @@
 {
   "schemaVersion": "orbit360-continuity-ledger-v3",
   "ledgerId": "ORBIT360-F2-CONTINUITY-CURRENT",
-  "revision": 114,
-  "updatedAtUtc": "2026-08-27T02:53:42.999Z",
+  "revision": 115,
+  "updatedAtUtc": "2026-08-27T02:53:45.258Z",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
   "stateVersion": "ORBIT360-F2-CONTINUITY-CURRENT",
   "gateId": "f2-productive-acceptance-exact-successor-v20260818",
   "activeState": {
-    "phase": "POST_GO_LIVE_CONTROL_PLANE_METADATA_RECONCILE_RUNNING",
-    "status": "SOURCE_ONLY_CLAIMED",
+    "phase": "PRODUCTION_SMOKE_PASS",
+    "status": "PRODUCTION_GO_LIVE_PASS",
     "rootCauseStatus": "PASS",
     "productFrozen": false,
     "dataFrozen": false,
@@ -32,18 +32,18 @@
   },
   "authorizationBoundary": {
     "activeRuntimeAuthorization": false,
-    "freshAuthorizationRequired": false,
+    "freshAuthorizationRequired": true,
     "authorizationBlockedByHardeningPackage": false,
     "authorizationCarryForwardForbidden": true,
-    "nextRuntimeMaterializationAllowed": false,
-    "newRuntimeRequestAllowed": false,
+    "nextRuntimeMaterializationAllowed": true,
+    "newRuntimeRequestAllowed": true,
     "deployAuthorized": false,
     "publicationAuthorized": false,
     "productionAuthorized": false,
     "mainAuthorized": false,
     "mergeAuthorized": false,
     "boundaryPrepared": true,
-    "currentBoundaryStatus": "SOURCE_ONLY:POST_GO_LIVE_CONTROL_PLANE_METADATA_RECONCILE",
+    "currentBoundaryStatus": "PRESERVED_PRE_RISK:POST_GO_LIVE_CONTROL_PLANE_METADATA_RECONCILE",
     "authorizationIdentityRequired": true,
     "preparedAuthorizationIdentityDigest": null,
     "activeRequestPath": null,
@@ -61,10 +61,10 @@
     "runtimeRunId": null
   },
   "continuityControl": {
-    "status": "CONTROL_PLANE_DEFINITIVE_CAUSAL_PASS",
+    "status": "CONTROL_PLANE_POST_GO_LIVE_ACCESS_RECOVERY_ANTI_DESYNC_PASS",
     "classification": "VALIDATOR_STALE_RESOLVED",
     "secondaryClassification": "PIPELINE_MECHANISM_FAILURE_RESOLVED",
-    "canonicalityConvergenceVersion": "v12-20260827-current-run-causal-browser-attribution-sealed",
+    "canonicalityConvergenceVersion": "v13-20260827-post-go-live-access-recovery-anti-desync",
     "singleMutableOperationalState": "orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json",
     "stateBearingFileCount": 1,
     "projectionTargetCount": 0,
@@ -72,8 +72,8 @@
     "technicalPullRequestTransport": false,
     "executionTransport": "EPHEMERAL_EXECUTION_BRANCH_SINGLE_PUSH",
     "canonicalPublication": "LEDGER_ONLY_REMOTE_CAS",
-    "transitionOwner": "tools/orbit360-single-state-ledger-owner-v20260826.mjs",
-    "singleStateInvariant": "tools/orbit360-single-state-invariant-v20260826.mjs",
+    "transitionOwner": "tools/orbit360-single-state-ledger-owner-v20260827.mjs",
+    "singleStateInvariant": "tools/orbit360-single-state-invariant-v20260827.mjs",
     "publicationOwner": "tools/orbit360-control-plane-publication-preflight-v20260825.mjs",
     "canonicalWorkflow": ".github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml",
     "physicalSingleWriterEnforced": true,
@@ -178,25 +178,42 @@
       "rulesDeploy": false,
       "dataWrites": false,
       "stopRetryApplied": true
+    },
+    "stateContract": "tools/orbit360-single-state-contract-v20260827.mjs",
+    "postGoLiveAccessRecoveryRootfix": {
+      "status": "CLOSED_PASS_METADATA_SYNCHRONIZED",
+      "classification": "PASS",
+      "selftestRunId": 33034348092,
+      "sourcePrepRunId": 33034388422,
+      "metadataReconcileRunId": 33034680704,
+      "ownerInvariantSharedStateContract": true,
+      "goLiveReopened": false,
+      "historicalAuthorizationReusable": false,
+      "sourceOnly": true,
+      "runtimeExecuted": false,
+      "secretAccess": false,
+      "firestoreRead": false,
+      "deployExecuted": false,
+      "productionTouched": false
     }
   },
   "productionReopeningPackage": {
     "path": "orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json",
     "status": "CLOSED_PASS",
-    "revision": 107,
-    "firstIncompleteStep": "CONTROL-PLANE-METADATA-RECONCILE",
-    "nextActionExact": "RUN_POST_GO_LIVE_CONTROL_PLANE_METADATA_RECONCILE",
+    "revision": 108,
+    "firstIncompleteStep": "HUMAN-ACCESS-RECOVERY-AUTHORIZATION",
+    "nextActionExact": "AWAIT_EXPLICIT_HUMAN_ACCESS_RECOVERY_AUTHORIZATION",
     "runtimeAllowed": false,
-    "authorizationAllowed": false,
-    "requestMaterializationAllowed": false,
+    "authorizationAllowed": true,
+    "requestMaterializationAllowed": true,
     "authorizationReuseAllowed": false
   },
   "checkpoint": "orbit360-platform/docs/PLAN-MAESTRO-DEFINITIVO-PRODUCCION-POSTPRODUCCION-ANTI-LOOP-ORBIT360-AYS-20260826.md",
   "nextAction": {
-    "id": "RUN_POST_GO_LIVE_CONTROL_PLANE_METADATA_RECONCILE",
-    "description": "RUN_POST_GO_LIVE_CONTROL_PLANE_METADATA_RECONCILE",
+    "id": "AWAIT_EXPLICIT_HUMAN_ACCESS_RECOVERY_AUTHORIZATION",
+    "description": "AWAIT_EXPLICIT_HUMAN_ACCESS_RECOVERY_AUTHORIZATION",
     "runtimeAllowed": false,
-    "userActionRequired": false
+    "userActionRequired": true
   },
   "postGoLiveCommitments": {
     "liveFunctionalValidationRequired": true,
@@ -237,11 +254,11 @@
       "reason": "Preserve complete detailed v11 terminal history before v12 live-state reconciliation."
     },
     "latestExecutionTerminal": {
-      "transitionId": "POST_GO_LIVE_ACCESS_RECOVERY_SOURCE_PREP",
-      "runId": 33034388422,
+      "transitionId": "POST_GO_LIVE_CONTROL_PLANE_METADATA_RECONCILE",
+      "runId": 33034680704,
       "classification": "PASS",
       "ok": true,
-      "evidencePath": "source-only:selftest",
+      "evidencePath": "actions-artifact:orbit360-single-state-33034680704/orbit360-terminal.json",
       "replayAllowed": false,
       "privilegedRiskObserved": false,
       "authorizationConsumed": false,
@@ -249,7 +266,7 @@
       "firestoreWrites": 0,
       "authWrites": 0,
       "operationalWrites": 0,
-      "reducedAtUtc": "2026-08-27T02:48:00.461Z"
+      "reducedAtUtc": "2026-08-27T02:53:45.258Z"
     },
     "latestP2ValidatorStale": {
       "runId": 33026810850,
@@ -277,7 +294,7 @@
   },
   "lanes": {
     "A_frontend_ux_academia": "MACRO2_TRANSVERSAL_SOURCE_ACCEPTANCE_CLOSED_POST_GO_LIVE_VISUAL_AND_FUNCTIONAL_REVIEW_QUEUED",
-    "B_backend_security_gates": "PRODUCTION_GO_LIVE_PASS_METADATA_RECONCILE_RUNNING",
+    "B_backend_security_gates": "PRODUCTION_GO_LIVE_PASS_ACCESS_RECOVERY_SOURCE_READY_METADATA_SYNCED",
     "C_real_data_migration": "FROZEN_DATA_THROUGH_2026_07_31_REFRESH_2026_08_01_TO_CURRENT_QUEUED_AFTER_STABLE_GO_LIVE"
   },
   "progress": {
@@ -287,17 +304,22 @@
     "progressMayIncreaseDuringHardening": false
   },
   "executionClaim": {
-    "active": true,
+    "active": false,
     "transitionId": "POST_GO_LIVE_CONTROL_PLANE_METADATA_RECONCILE",
     "capabilityClass": "SOURCE_ONLY",
     "runId": 33034680704,
     "authorizationDigest": "",
     "canonicalBaseHead": "b6bada3fa79275232cdd355fa06ec092b4df7706",
     "claimedAtUtc": "2026-08-27T02:53:42.999Z",
-    "allowedExecutions": 1,
+    "allowedExecutions": 0,
     "consumed": false,
-    "historical": false,
-    "replayAllowed": false
+    "historical": true,
+    "replayAllowed": false,
+    "consumedAtUtc": null,
+    "terminalEvidencePath": "actions-artifact:orbit360-single-state-33034680704/orbit360-terminal.json",
+    "terminalClassification": "PASS",
+    "privilegedRiskObserved": false,
+    "authorizationPreserved": true
   },
   "containsPII": false,
   "containsSecrets": false,
