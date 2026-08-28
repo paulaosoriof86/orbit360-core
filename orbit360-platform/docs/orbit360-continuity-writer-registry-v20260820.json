@@ -1,7 +1,7 @@
 {
-  "schemaVersion": "orbit360-continuity-writer-registry-v30-post-go-live-successor-source-stage",
+  "schemaVersion": "orbit360-continuity-writer-registry-v31-post-go-live-successor-explicit-acceptance",
   "registryId": "ORBIT360-CONTINUITY-WRITER-REGISTRY",
-  "revision": 43,
+  "revision": 44,
   "active": true,
   "status": "SINGLE_STATE_LEDGER_ONLY_SEMANTIC_CONTROL_PLANE",
   "stateBearing": false,
@@ -61,28 +61,15 @@
     "orbit360-platform/CHANGELOG.md"
   ],
   "executionTransitions": {
-    "CONTROL_PLANE_SELFTEST": {
-      "capabilityClass": "SOURCE_ONLY",
-      "stateMutation": "NONE",
-      "handler": "tools/orbit360-single-state-ledger-owner-v20260827.mjs",
-      "handlerReady": true,
-      "requiresExplicitUserAuthorization": false,
-      "requiredScope": {},
-      "bindCandidate": false
-    },
+    "CONTROL_PLANE_SELFTEST": {"capabilityClass":"SOURCE_ONLY","stateMutation":"NONE","handler":"tools/orbit360-single-state-ledger-owner-v20260827.mjs","handlerReady":true,"requiresExplicitUserAuthorization":false,"requiredScope":{},"bindCandidate":false},
     "GO_LIVE_RELEASE_WINDOW": {
-      "capabilityClass": "RELEASE",
-      "stateMutation": "CLAIM_TERMINAL",
-      "handler": "tools/orbit360-go-live-release-handler-v20260826.mjs",
-      "handlerReady": true,
-      "requiresExplicitUserAuthorization": true,
-      "bindCandidate": true,
-      "requiredScope": {"runtime":true,"browser":true,"secrets":true,"firestoreRead":true,"deploy":true,"production":true,"firestoreWrites":false,"authWrites":false,"operationalWrites":false,"dataWrites":false,"main":false,"merge":false},
-      "releaseHandlerContract": {"candidateIdentityFromLedger":true,"manifestFullRehashBeforeRisk":true,"targetDerivedFromCandidateConfig":true,"hostingOnlyDeploy":true,"rulesDeploy":false,"snapshotBeforeAfter":true,"browserSmokeReusesF2Harness":true,"crossTenantDeniedRequired":true,"browserConsoleAttributionCurrentRunOnly":true,"browserNetworkCausalAttributionRequired":true,"secondaryBrowserReproductionForbidden":true,"ambiguousConsoleSignalMustNotBeFunctionalDefect":true,"rollbackAnchorCapturedBeforeRisk":true,"exactPriorHostingReleaseRollback":true,"authorizationConsumedAtPrivilegedEdgeOnly":true,"preRiskFailurePreservesAuthorization":true,"terminalEvidenceRunScoped":true},
-      "from": {"phase":"CONTROL_PLANE_FROZEN_BASELINE_AWAITING_GO_LIVE_AUTHORIZATION","status":"FINAL_RELEASE_HANDSHAKE_PASS","progress":93,"nextAction":"AWAIT_EXPLICIT_GO_LIVE_AUTHORIZATION"},
-      "claimState": {"phase":"AUTHORIZED_RELEASE_WINDOW_RUNNING","status":"AUTHORIZED_RELEASE_WINDOW_CLAIMED","nextAction":"RUN_AUTHORIZED_RELEASE_WINDOW","firstIncompleteStep":"AUTHORIZED-RELEASE-WINDOW","laneB":"AUTHORIZED_RELEASE_WINDOW_RUNNING"},
-      "terminalPassState": {"phase":"PRODUCTION_SMOKE_PASS","status":"PRODUCTION_GO_LIVE_PASS","progress":100,"nextAction":"POST_GO_LIVE_MONITORING","firstIncompleteStep":"POST-GO-LIVE-MONITORING","laneB":"PRODUCTION_GO_LIVE_PASS","userActionRequired":false},
-      "terminalFailState": {"phase":"AUTHORIZED_RELEASE_WINDOW_FAILED","status":"RELEASE_TERMINAL_FAIL_NO_REPLAY","progress":93,"nextAction":"DIAGNOSE_RELEASE_ROOT_CAUSE_AND_VERIFY_ROLLBACK","firstIncompleteStep":"RELEASE-ROOT-CAUSE-ROLLBACK","laneB":"RELEASE_TERMINAL_FAIL_STOP_RETRY","userActionRequired":false}
+      "capabilityClass":"RELEASE","stateMutation":"CLAIM_TERMINAL","handler":"tools/orbit360-go-live-release-handler-v20260826.mjs","handlerReady":true,"requiresExplicitUserAuthorization":true,"bindCandidate":true,
+      "requiredScope":{"runtime":true,"browser":true,"secrets":true,"firestoreRead":true,"deploy":true,"production":true,"firestoreWrites":false,"authWrites":false,"operationalWrites":false,"dataWrites":false,"main":false,"merge":false},
+      "releaseHandlerContract":{"candidateIdentityFromLedger":true,"manifestFullRehashBeforeRisk":true,"targetDerivedFromCandidateConfig":true,"hostingOnlyDeploy":true,"rulesDeploy":false,"snapshotBeforeAfter":true,"browserSmokeReusesF2Harness":true,"crossTenantDeniedRequired":true,"browserConsoleAttributionCurrentRunOnly":true,"browserNetworkCausalAttributionRequired":true,"secondaryBrowserReproductionForbidden":true,"ambiguousConsoleSignalMustNotBeFunctionalDefect":true,"rollbackAnchorCapturedBeforeRisk":true,"exactPriorHostingReleaseRollback":true,"authorizationConsumedAtPrivilegedEdgeOnly":true,"preRiskFailurePreservesAuthorization":true,"terminalEvidenceRunScoped":true},
+      "from":{"phase":"CONTROL_PLANE_FROZEN_BASELINE_AWAITING_GO_LIVE_AUTHORIZATION","status":"FINAL_RELEASE_HANDSHAKE_PASS","progress":93,"nextAction":"AWAIT_EXPLICIT_GO_LIVE_AUTHORIZATION"},
+      "claimState":{"phase":"AUTHORIZED_RELEASE_WINDOW_RUNNING","status":"AUTHORIZED_RELEASE_WINDOW_CLAIMED","nextAction":"RUN_AUTHORIZED_RELEASE_WINDOW","firstIncompleteStep":"AUTHORIZED-RELEASE-WINDOW","laneB":"AUTHORIZED_RELEASE_WINDOW_RUNNING"},
+      "terminalPassState":{"phase":"PRODUCTION_SMOKE_PASS","status":"PRODUCTION_GO_LIVE_PASS","progress":100,"nextAction":"POST_GO_LIVE_MONITORING","firstIncompleteStep":"POST-GO-LIVE-MONITORING","laneB":"PRODUCTION_GO_LIVE_PASS","userActionRequired":false},
+      "terminalFailState":{"phase":"AUTHORIZED_RELEASE_WINDOW_FAILED","status":"RELEASE_TERMINAL_FAIL_NO_REPLAY","progress":93,"nextAction":"DIAGNOSE_RELEASE_ROOT_CAUSE_AND_VERIFY_ROLLBACK","firstIncompleteStep":"RELEASE-ROOT-CAUSE-ROLLBACK","laneB":"RELEASE_TERMINAL_FAIL_STOP_RETRY","userActionRequired":false}
     },
     "POST_GO_LIVE_ACCESS_RECOVERY_SOURCE_PREP": {
       "capabilityClass":"SOURCE_ONLY","stateMutation":"CLAIM_TERMINAL","handler":"tools/orbit360-post-go-live-access-recovery-v20260827.mjs","handlerReady":true,"requiresExplicitUserAuthorization":false,"bindCandidate":false,
@@ -128,6 +115,16 @@
       "terminalPassState":{"phase":"PRODUCTION_SMOKE_PASS","status":"PRODUCTION_GO_LIVE_PASS","progress":100,"nextAction":"REVIEW_STAGED_POST_GO_LIVE_PRODUCT_SUCCESSOR_SOURCE_ONLY","firstIncompleteStep":"POST-GO-LIVE-SUCCESSOR-SOURCE-REVIEW","laneB":"PRODUCT_SUCCESSOR_SOURCE_STAGED_PENDING_REVIEW","userActionRequired":false},
       "terminalFailState":{"phase":"PRODUCTION_SMOKE_PASS","status":"PRODUCTION_GO_LIVE_PASS","progress":100,"nextAction":"DIAGNOSE_POST_GO_LIVE_SUCCESSOR_STAGE_MECHANISM_ROOT_CAUSE_STOP_RETRY","firstIncompleteStep":"POST-GO-LIVE-SUCCESSOR-STAGE-ROOT-CAUSE","laneB":"PRODUCT_SUCCESSOR_SOURCE_STAGE_STOP_RETRY","userActionRequired":false}
     },
+    "POST_GO_LIVE_PRODUCT_SUCCESSOR_ACCEPT_SOURCE_ONLY": {
+      "capabilityClass":"SOURCE_ONLY","stateMutation":"CLAIM_TERMINAL","handler":"tools/orbit360-post-go-live-successor-source-accept-v20260828.mjs","handlerReady":true,"requiresExplicitUserAuthorization":false,"bindCandidate":false,
+      "requiredScope":{"runtime":false,"browser":false,"secrets":false,"firestoreRead":false,"deploy":false,"production":false,"firestoreWrites":false,"authWrites":false,"operationalWrites":false,"dataWrites":false,"main":false,"merge":false},
+      "freezeProductDuringClaim":true,"freezeDataDuringClaim":true,
+      "successorAcceptanceContract":{"registry":"orbit360-platform/docs/orbit360-post-go-live-successor-source-registry-v20260828.json","requiresStagePass":true,"stageRunBindingRequired":true,"candidateManifestDigestBindingRequired":true,"patchManifestDigestBindingRequired":true,"mutatesCertifiedBaseline":false,"productFreezeMutationForbidden":true,"terminalPublicationExactSurfaceRequired":true},
+      "from":{"phase":"PRODUCTION_SMOKE_PASS","status":"PRODUCTION_GO_LIVE_PASS","progress":100,"nextAction":"REVIEW_STAGED_POST_GO_LIVE_PRODUCT_SUCCESSOR_SOURCE_ONLY"},
+      "claimState":{"phase":"POST_GO_LIVE_PRODUCT_SUCCESSOR_ACCEPT_RUNNING","status":"SOURCE_ONLY_CLAIMED","nextAction":"RUN_POST_GO_LIVE_PRODUCT_SUCCESSOR_ACCEPT_SOURCE_ONLY","firstIncompleteStep":"POST-GO-LIVE-SUCCESSOR-EXPLICIT-ACCEPTANCE","laneB":"PRODUCT_SUCCESSOR_EXPLICIT_ACCEPTANCE_RUNNING"},
+      "terminalPassState":{"phase":"PRODUCTION_SMOKE_PASS","status":"PRODUCTION_GO_LIVE_PASS","progress":100,"nextAction":"VALIDATE_ACCEPTED_RUNTIME_CAPABILITY_COMPOSITION_SOURCE_ONLY","firstIncompleteStep":"POST-GO-LIVE-RUNTIME-CAPABILITY-COMPOSITION-VALIDATION","laneB":"PRODUCT_SUCCESSOR_SOURCE_ACCEPTED_PENDING_COMPOSITION_VALIDATION","userActionRequired":false},
+      "terminalFailState":{"phase":"PRODUCTION_SMOKE_PASS","status":"PRODUCTION_GO_LIVE_PASS","progress":100,"nextAction":"DIAGNOSE_POST_GO_LIVE_SUCCESSOR_ACCEPTANCE_MECHANISM_ROOT_CAUSE_STOP_RETRY","firstIncompleteStep":"POST-GO-LIVE-SUCCESSOR-ACCEPTANCE-ROOT-CAUSE","laneB":"PRODUCT_SUCCESSOR_ACCEPTANCE_STOP_RETRY","userActionRequired":false}
+    },
     "CONTROL_PLANE_RECOVER_ORPHANED_SOURCE_ONLY_TERMINAL": {
       "capabilityClass":"SOURCE_ONLY","stateMutation":"NONE","handler":"tools/orbit360-semantic-single-state-rootfix-handler-v20260827.mjs","handlerReady":true,"requiresExplicitUserAuthorization":false,"bindCandidate":false,
       "requiredScope":{"runtime":false,"browser":false,"secrets":false,"firestoreRead":false,"deploy":false,"production":false,"firestoreWrites":false,"authWrites":false,"operationalWrites":false,"dataWrites":false,"main":false,"merge":false},
@@ -164,6 +161,8 @@
     "certifiedProductBaselineMustNotDriftWithoutExplicitAcceptance": true,
     "postGoLiveProductDeltaMustUseRegisteredSourceOnlySuccessorStage": true,
     "postGoLiveSuccessorAcceptanceMustBeSeparate": true,
+    "postGoLiveSuccessorAcceptanceExactSurfaceFailClosed": true,
+    "postGoLiveSuccessorAcceptanceMustBindLatestStagePass": true,
     "antiStaleSelftestRequired": true,
     "sourceOnlyOrphanClaimRecoveryMustNotCreateSecondClaim": true,
     "sourceOnlyOrphanClaimRecoveryMustReduceOriginalClaim": true,
