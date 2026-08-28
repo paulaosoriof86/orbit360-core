@@ -1,0 +1,32 @@
+{
+  "schemaVersion": "orbit360-execution-intent-v1",
+  "transitionId": "POST_GO_LIVE_PRODUCT_SUCCESSOR_ACCEPT_SOURCE_ONLY",
+  "canonicalBaseHead": "60289c41a2f422fb3245592a61f38e73fded4edd",
+  "expectedLedgerRevision": 123,
+  "oneShotOnly": true,
+  "replayAllowed": false,
+  "explicitUserAuthorization": false,
+  "scope": {
+    "runtime": false,
+    "browser": false,
+    "secrets": false,
+    "firestoreRead": false,
+    "deploy": false,
+    "production": false,
+    "firestoreWrites": false,
+    "authWrites": false,
+    "operationalWrites": false,
+    "dataWrites": false,
+    "main": false,
+    "merge": false
+  },
+  "stagedRunId": 33188977631,
+  "stagedCandidateManifestSha256": "f3d00c3f3a428b90bb0245314ea9cbc2c329ba7a4a5669e71367f4a24b8d52f6",
+  "successorPatch": {
+    "candidateId": "runtime-capability-causal-v20260828-01",
+    "patchManifestPath": "tools/orbit360-post-go-live-patches/runtime-composition-v20260828/manifest.json",
+    "patchManifestSha256": "fb0fc032c3858c3f48e6930f5bd9bfa56460b1efe127ad28455f127bd385871c"
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
