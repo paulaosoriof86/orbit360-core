@@ -1,19 +1,19 @@
 {
   "schemaVersion": "orbit360-continuity-ledger-v3",
   "ledgerId": "ORBIT360-F2-CONTINUITY-CURRENT",
-  "revision": 120,
-  "updatedAtUtc": "2026-08-28T00:29:40.102Z",
+  "revision": 121,
+  "updatedAtUtc": "2026-08-28T00:29:43.186Z",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
   "stateVersion": "ORBIT360-F2-CONTINUITY-CURRENT",
   "gateId": "f2-productive-acceptance-exact-successor-v20260818",
   "activeState": {
-    "phase": "POST_GO_LIVE_SEMANTIC_SINGLE_STATE_ROOTFIX_RUNNING",
-    "status": "SOURCE_ONLY_CLAIMED",
-    "rootCauseStatus": "PIPELINE_MECHANISM_FAILURE_HANDLER_DUPLICATE_SANITIZATION_ORPHANED",
-    "productFrozen": true,
-    "dataFrozen": true,
+    "phase": "PRODUCTION_SMOKE_PASS",
+    "status": "PRODUCTION_GO_LIVE_PASS",
+    "rootCauseStatus": "PASS",
+    "productFrozen": false,
+    "dataFrozen": false,
     "runtimeAuthorized": false,
     "runtimeReplayAllowed": false,
     "deployAuthorized": false,
@@ -43,7 +43,7 @@
     "mainAuthorized": false,
     "mergeAuthorized": false,
     "boundaryPrepared": true,
-    "currentBoundaryStatus": "SOURCE_ONLY:POST_GO_LIVE_SEMANTIC_SINGLE_STATE_ROOTFIX_VALIDATE_AND_SEAL",
+    "currentBoundaryStatus": "PRESERVED_PRE_RISK:POST_GO_LIVE_SEMANTIC_SINGLE_STATE_ROOTFIX_VALIDATE_AND_SEAL",
     "authorizationIdentityRequired": true,
     "preparedAuthorizationIdentityDigest": null,
     "activeRequestPath": null,
@@ -200,9 +200,9 @@
   "productionReopeningPackage": {
     "path": "orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json",
     "status": "CLOSED_PASS",
-    "revision": 113,
-    "firstIncompleteStep": "SEMANTIC-SINGLE-STATE-ROOTFIX",
-    "nextActionExact": "RUN_SEMANTIC_SINGLE_STATE_ROOTFIX_VALIDATE_AND_SEAL",
+    "revision": 114,
+    "firstIncompleteStep": "POST-GO-LIVE-FUNCTIONAL-BLOCKERS",
+    "nextActionExact": "DIAGNOSE_POST_GO_LIVE_FUNCTIONAL_BLOCKERS",
     "runtimeAllowed": false,
     "authorizationAllowed": false,
     "requestMaterializationAllowed": false,
@@ -210,8 +210,8 @@
   },
   "checkpoint": "orbit360-platform/docs/PLAN-MAESTRO-DEFINITIVO-PRODUCCION-POSTPRODUCCION-ANTI-LOOP-ORBIT360-AYS-20260826.md",
   "nextAction": {
-    "id": "RUN_SEMANTIC_SINGLE_STATE_ROOTFIX_VALIDATE_AND_SEAL",
-    "description": "RUN_SEMANTIC_SINGLE_STATE_ROOTFIX_VALIDATE_AND_SEAL",
+    "id": "DIAGNOSE_POST_GO_LIVE_FUNCTIONAL_BLOCKERS",
+    "description": "DIAGNOSE_POST_GO_LIVE_FUNCTIONAL_BLOCKERS",
     "runtimeAllowed": false,
     "userActionRequired": false
   },
@@ -255,10 +255,10 @@
     },
     "latestExecutionTerminal": {
       "transitionId": "POST_GO_LIVE_SEMANTIC_SINGLE_STATE_ROOTFIX_VALIDATE_AND_SEAL",
-      "runId": 33125331344,
-      "classification": "PIPELINE_MECHANISM_FAILURE",
-      "ok": false,
-      "evidencePath": "actions-artifact:orbit360-single-state-33129454248/orbit360-terminal.json",
+      "runId": 33129885554,
+      "classification": "PASS",
+      "ok": true,
+      "evidencePath": "actions-artifact:orbit360-single-state-33129885554/orbit360-terminal.json",
       "replayAllowed": false,
       "privilegedRiskObserved": false,
       "authorizationConsumed": false,
@@ -267,7 +267,7 @@
       "firestoreWrites": 0,
       "authWrites": 0,
       "operationalWrites": 0,
-      "reducedAtUtc": "2026-08-28T00:21:37.674Z"
+      "reducedAtUtc": "2026-08-28T00:29:43.186Z"
     },
     "latestP2ValidatorStale": {
       "runId": 33026810850,
@@ -295,7 +295,7 @@
   },
   "lanes": {
     "A_frontend_ux_academia": "MACRO2_TRANSVERSAL_SOURCE_ACCEPTANCE_CLOSED_POST_GO_LIVE_VISUAL_AND_FUNCTIONAL_REVIEW_QUEUED",
-    "B_backend_security_gates": "SEMANTIC_SINGLE_STATE_ROOTFIX_RUNNING",
+    "B_backend_security_gates": "SEMANTIC_SINGLE_STATE_ROOTFIX_PASS_FUNCTIONAL_BLOCKERS_ACTIVE",
     "C_real_data_migration": "FROZEN_DATA_THROUGH_2026_07_31_REFRESH_2026_08_01_TO_CURRENT_QUEUED_AFTER_STABLE_GO_LIVE"
   },
   "progress": {
@@ -305,7 +305,7 @@
     "progressMayIncreaseDuringHardening": false
   },
   "executionClaim": {
-    "active": true,
+    "active": false,
     "transitionId": "POST_GO_LIVE_SEMANTIC_SINGLE_STATE_ROOTFIX_VALIDATE_AND_SEAL",
     "capabilityClass": "SOURCE_ONLY",
     "runId": 33129885554,
@@ -313,10 +313,15 @@
     "canonicalBaseHead": "74dc30112a2fb2af99e8b01117b522a15ef6a3d5",
     "statePatchDigest": "25522fad4197395f976c2b338d6a9f42bbef7cbe6a6261a9f23056d9f0cf57d9",
     "claimedAtUtc": "2026-08-28T00:29:40.102Z",
-    "allowedExecutions": 1,
+    "allowedExecutions": 0,
     "consumed": false,
-    "historical": false,
-    "replayAllowed": false
+    "historical": true,
+    "replayAllowed": false,
+    "consumedAtUtc": null,
+    "terminalEvidencePath": "actions-artifact:orbit360-single-state-33129885554/orbit360-terminal.json",
+    "terminalClassification": "PASS",
+    "privilegedRiskObserved": false,
+    "authorizationPreserved": true
   },
   "containsPII": false,
   "containsSecrets": false,
@@ -330,18 +335,48 @@
     "goLiveAuthorizationDigest": "091cc68a2e3f7882a851605858d15e68ef8e189f180dbbfa6dfedb50bf3ba6b2"
   },
   "postGoLiveAccessRecovery": {
-    "status": "RESET_LINK_READY_FOR_PRIVATE_HANDOFF",
-    "gateId": "block-auth-paula-reset-link-handoff-lab-v20260817",
+    "status": "HUMAN_LOGIN_VERIFIED_LATENCY_OPEN",
+    "humanEmailPasswordProven": true,
+    "humanInteractiveNavigationProven": true,
     "goLiveReopened": false,
     "historicalAuthorizationReusable": false,
-    "sourceOnlySelftestPass": true,
-    "targetCount": 1,
-    "maxResetLinks": 1,
-    "automatedSmokeAuthMethod": "custom_token",
-    "automatedSessionAuthProven": true,
-    "humanEmailPasswordProven": false,
-    "humanInteractiveNavigationProven": false,
-    "resetLinksGenerated": 1,
-    "resetCodeVerified": true
+    "latencyStatus": "OPEN"
+  },
+  "functionalValidation": {
+    "schemaVersion": "orbit360-post-go-live-functional-validation-v1",
+    "status": "BLOCKING_THREE_VISIBLE_DEFECTS",
+    "evidenceDate": "2026-08-27",
+    "blockers": [
+      {
+        "id": "INSURER_PORTAL_REVEAL_OPEN",
+        "classification": "FUNCTIONAL_DEFECT",
+        "status": "OPEN",
+        "nextDiagnostic": "secure_reference_to_provider_to_runtime_to_reveal"
+      },
+      {
+        "id": "CLIENT360_LIST_EMPTY_WITH_DATA_OPEN",
+        "classification": "FUNCTIONAL_DEFECT",
+        "status": "OPEN",
+        "nextDiagnostic": "served_asset_to_store_to_filters_to_rows_to_render"
+      },
+      {
+        "id": "LOGIN_LATENCY_OPEN",
+        "classification": "FUNCTIONAL_DEFECT",
+        "status": "OPEN",
+        "nextDiagnostic": "submit_to_auth_to_membership_to_store_to_router_to_shell"
+      }
+    ],
+    "validationSequence": [
+      "aseguradoras",
+      "cliente360",
+      "login",
+      "polizas"
+    ],
+    "noReprocess": true,
+    "noReimport": true,
+    "productMutationAllowedBeforeDiagnosis": false,
+    "dataReimportAllowed": false,
+    "containsPII": false,
+    "containsSecrets": false
   }
 }
