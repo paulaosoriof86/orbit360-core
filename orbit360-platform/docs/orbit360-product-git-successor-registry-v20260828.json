@@ -1,0 +1,77 @@
+{
+  "schemaVersion": "orbit360-product-git-successor-registry-v1",
+  "registryId": "ORBIT360-PRODUCT-GIT-SUCCESSOR",
+  "createdAt": "2026-08-28",
+  "status": "ACTIVE_SOURCE_ONLY_GIT_BOUND_BASELINE_PROMOTION",
+  "stateBearing": false,
+  "dynamicStateForbidden": true,
+  "canonicalBranch": "ays/backend-tenant-lab-v99-20260703",
+  "pullRequest": 5,
+  "stageTransitionId": "POST_GO_LIVE_PRODUCT_SUCCESSOR_GIT_STAGE_SOURCE_ONLY",
+  "acceptTransitionId": "POST_GO_LIVE_PRODUCT_SUCCESSOR_ACCEPT_BASELINE_SOURCE_ONLY",
+  "sourceValidateTransitionId": "POST_GO_LIVE_PRODUCT_SUCCESSOR_VALIDATE_SOURCE_ONLY",
+  "preservationRegistry": "orbit360-platform/docs/orbit360-certified-product-preservation-registry-v20260827.json",
+  "preservationValidator": "tools/orbit360-certified-product-preservation-v20260827.mjs",
+  "runtimeCapabilityRegistry": "orbit360-platform/docs/orbit360-runtime-capability-registry-v20260828.json",
+  "runtimeCapabilityValidator": "tools/orbit360-validar-runtime-capability-composition-v20260828.mjs",
+  "allowedProductPrefixes": [
+    "orbit360-platform/core/",
+    "orbit360-platform/modules/",
+    "orbit360-platform/data/",
+    "orbit360-platform/styles/",
+    "orbit360-platform/index.html",
+    "orbit360-platform/product-runtime-config.js",
+    "orbit360-platform/sw.js",
+    "functions/"
+  ],
+  "forbiddenProductPrefixes": [
+    ".github/",
+    "tools/",
+    "orbit360-platform/docs/"
+  ],
+  "candidateContract": {
+    "mustDescendFromCurrentCanonicalHead": true,
+    "baseMustEqualCurrentCanonicalHead": true,
+    "deletionsForbidden": true,
+    "renamesForbidden": true,
+    "maxChangedFiles": 30,
+    "perFileGitBlobBindingRequired": true,
+    "sortedDiffDigestRequired": true,
+    "candidateBranchRequired": true
+  },
+  "validationProfiles": {
+    "ASEGURADORAS_CREDENTIALS_ROOTFIX_V1": {
+      "validators": [
+        "tools/orbit360-validar-aseguradoras-credentials-rootfix-v20260828.mjs"
+      ],
+      "requiredChangedTargets": [
+        "orbit360-platform/core/aseguradoras-credentials-provider-lab-v20260720.js",
+        "functions/index.js"
+      ],
+      "exactChangedTargets": true
+    }
+  },
+  "acceptanceContract": {
+    "stageRecordAuthority": "postGoLiveProductGitStage",
+    "candidateHeadBindingRequired": true,
+    "diffDigestBindingRequired": true,
+    "validationProfileBindingRequired": true,
+    "transactionalApplyRequired": true,
+    "preservationRegistryPromotionRequired": true,
+    "publisherExactSurfaceRequired": true,
+    "automaticDeployForbidden": true,
+    "runtimeForbidden": true,
+    "browserForbidden": true,
+    "secretAccessForbidden": true,
+    "firestoreReadForbidden": true,
+    "dataWritesForbidden": true
+  },
+  "runtimeProofContract": {
+    "sourceValidationCannotCloseVisibleDefect": true,
+    "explicitRuntimeAuthorizationRequiredAfterSourcePass": true,
+    "deployAuthorizationRequiredBeforeHostedRuntimeChanges": true,
+    "credentialRevealAuditWriteMustBeExplicitlyAuthorized": true
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
