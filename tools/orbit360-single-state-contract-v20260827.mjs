@@ -73,7 +73,7 @@ function collectIssues(root, R) {
     issues.push('CANONICAL_ROUTER_NOT_INERT');
   }
   if (!legacy.includes(LEGACY_ROUTER_FENCE) || /from ['"]node:child_process|require\(['"](?:node:)?child_process|spawnSync\(|execSync\(/i.test(legacy)) {
-    issues.push('LEGACY_ROUTER_NOT_INERT');
+    issues.push('LEGACY_ROUTING_NOT_FROZEN');
   }
   if (!fence.includes(ENGINE_FENCE) || !/process\.exit\(41\)/.test(fence) || /from ['"]node:child_process|require\(['"](?:node:)?child_process|spawnSync\(|execSync\(/i.test(fence)) {
     issues.push('HISTORICAL_ENGINE_FENCE_NOT_INERT');
@@ -219,17 +219,25 @@ export function assertReleaseMilestoneFrozen(L, fail) {
   if (m.closed !== true || m.immutable !== true || m.phase !== RELEASE_PHASE || m.status !== RELEASE_STATUS || Number(m.progress) !== 100) {
     fail('GO_LIVE_RELEASE_MILESTONE_REOPENED');
   }
+  if (m.goLiveAuthorizationDigest != null && !/^[a-f0-9]{64}$/.test(String(m.goLiveAuthorizationDigest))) {
+    fail('GO_LIVE_RELEASE_AUTHORIZATION_DIGEST_INVALID');
+  }
 }
 
 export function freezeReleaseMilestone(L) {
   if (!L.releaseMilestone) {
+    const priorGoLiveAuthorizationDigest =
+      L.executionClaim?.transitionId === 'GO_LIVE_RELEASE_WINDOW' && /^[a-f0-9]{64}$/.test(String(L.executionClaim?.authorizationDigest || ''))
+        ? String(L.executionClaim.authorizationDigest)
+        : null;
     L.releaseMilestone = {
       closed: true,
       immutable: true,
       phase: RELEASE_PHASE,
       status: RELEASE_STATUS,
       progress: 100,
-      closedAtUtc: L.history?.goLiveReleaseTerminal?.reducedAtUtc || L.updatedAtUtc || null
+      closedAtUtc: L.history?.goLiveReleaseTerminal?.reducedAtUtc || L.updatedAtUtc || null,
+      ...(priorGoLiveAuthorizationDigest ? {goLiveAuthorizationDigest: priorGoLiveAuthorizationDigest} : {})
     };
   }
   return L;
