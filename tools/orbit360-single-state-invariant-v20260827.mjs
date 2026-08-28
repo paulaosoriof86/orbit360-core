@@ -24,6 +24,7 @@ const PRODUCT_REG = 'orbit360-platform/docs/orbit360-certified-product-preservat
 const PRODUCT_GUARD = 'tools/orbit360-certified-product-preservation-v20260827.mjs';
 const ASEG_REG = 'orbit360-platform/docs/orbit360-aseguradoras-preservation-registry-v20260827.json';
 const BASELINE = 'orbit360-platform/docs/orbit360-control-plane-frozen-baseline-v20260827.json';
+const VISIBLE_PRIORITY_LOCK = 'orbit360-platform/docs/orbit360-post-go-live-visible-priority-lock-v20260827.json';
 const OWNER = 'tools/orbit360-single-state-ledger-owner-v20260827.mjs';
 const STATE = 'tools/orbit360-single-state-contract-v20260827.mjs';
 const SELF = 'tools/orbit360-single-state-invariant-v20260827.mjs';
@@ -48,10 +49,99 @@ function gitBlobSha(buf) {
   return createHash('sha1').update(Buffer.from(`blob ${buf.length}\0`)).update(buf).digest('hex');
 }
 
+function assertVisiblePriorityLock(L, D) {
+  const requiredSequence = [
+    'INSURER_PORTAL_REVEAL',
+    'CLIENT360_LIST_RENDER',
+    'LOGIN_INTERACTIVE_LATENCY',
+    'USER_VISUAL_ACCEPTANCE_VISIBLE_TRIO',
+    'POLIZAS_AND_REST'
+  ];
+  const blockerIds = [
+    'INSURER_PORTAL_REVEAL_OPEN',
+    'CLIENT360_LIST_EMPTY_WITH_DATA_OPEN',
+    'LOGIN_LATENCY_OPEN'
+  ];
+  if (
+    D.schemaVersion !== 'orbit360-post-go-live-visible-priority-lock-v1' ||
+    D.status !== 'ACTIVE_STATIC_DECISION_LOCK' ||
+    D.stateBearing !== false || D.dynamicStateForbidden !== true ||
+    D.operationalStateAuthority !== LEDGER ||
+    JSON.stringify(D.requiredSequence) !== JSON.stringify(requiredSequence) ||
+    JSON.stringify(D.visibleBlockerIds) !== JSON.stringify(blockerIds) ||
+    D.containsPII !== false || D.containsSecrets !== false
+  ) throw new Error('POST_GO_LIVE_VISIBLE_PRIORITY_LOCK_INVALID');
+
+  const gate = D.advancementGate || {};
+  if (
+    gate.allThreeVisibleBlockersMustPass !== true ||
+    gate.explicitUserVisualAcceptanceRequired !== true ||
+    gate.requiredFunctionalValidationStatusBeforeDownstream !== 'VISIBLE_TRIO_USER_ACCEPTED_PASS' ||
+    gate.polizasForbiddenWhileGateClosed !== true
+  ) throw new Error('POST_GO_LIVE_VISIBLE_PRIORITY_ADVANCEMENT_GATE_INVALID');
+
+  const anti = D.antiReprocess || {};
+  if (
+    anti.noReprocess !== true || anti.noReimport !== true ||
+    anti.clientReimportForbiddenForRenderingAccessCacheProjectionOrGateDefects !== true ||
+    anti.insurerReimportForbiddenForCredentialRevealAccessProjectionOrGateDefects !== true ||
+    anti.dataRefreshForbiddenBeforeVisibleGatePass !== true
+  ) throw new Error('POST_GO_LIVE_VISIBLE_PRIORITY_ANTI_REPROCESS_INVALID');
+
+  const insurer = D.insurerCredentialReveal || {};
+  if (
+    insurer.requiredDiagnosticPath !== 'secure_reference_to_provider_to_runtime_to_reveal' ||
+    insurer.passwordHiddenByDefault !== true || insurer.temporaryAuthorizedRevealOnly !== true ||
+    insurer.copyAndOpenPortalAllowedOnlyThroughAuthorizedRuntimePath !== true ||
+    insurer.secretMaterialForbiddenInLogsEvidenceDocsAndChat !== true ||
+    insurer.hardcodedCredentialsForbidden !== true
+  ) throw new Error('POST_GO_LIVE_INSURER_REVEAL_LOCK_INVALID');
+
+  const c360 = D.cliente360 || {};
+  if (
+    c360.requiredDiagnosticPath !== 'served_asset_to_store_to_filters_to_rows_to_render' ||
+    c360.sameSourceUniverseMustFeedKpisAndRenderedList !== true ||
+    c360.syntheticDataWorkaroundForbidden !== true || c360.reimportWorkaroundForbidden !== true
+  ) throw new Error('POST_GO_LIVE_CLIENT360_LOCK_INVALID');
+
+  const login = D.login || {};
+  if (
+    login.requiredDiagnosticPath !== 'submit_to_auth_to_membership_to_store_to_router_to_shell' ||
+    login.passRequiresUsableShellWithoutObservedExcessiveLatency !== true ||
+    login.eventualEntryAloneIsNotPass !== true || login.demoIdentityForbidden !== true
+  ) throw new Error('POST_GO_LIVE_LOGIN_LOCK_INVALID');
+
+  const fp = D.failurePolicy || {};
+  if (
+    fp.classifyBeforeFix !== true ||
+    fp.validatorStaleOrPipelineMechanismFailureFreezesProductAndData !== true ||
+    fp.sameStageFailureTwiceRequiresRootCauseBeforeRetry !== true ||
+    fp.noModuleHoppingToEscapeOpenGate !== true
+  ) throw new Error('POST_GO_LIVE_VISIBLE_PRIORITY_FAILURE_POLICY_INVALID');
+
+  const fv = L.functionalValidation || {};
+  const unlocked = fv.status === gate.requiredFunctionalValidationStatusBeforeDownstream;
+  const next = String(L.nextAction?.id || '');
+  const downstreamPattern = /(POLIZ|VEHIC|RECIB|CARTER|COBRO|OPS|LEAD|DATA_REFRESH|MIGRA)/i;
+  if (!unlocked && downstreamPattern.test(next)) {
+    throw new Error(`POST_GO_LIVE_VISIBLE_PRIORITY_DOWNSTREAM_BLOCKED:${next}`);
+  }
+  if (fv.status === 'BLOCKING_THREE_VISIBLE_DEFECTS') {
+    const currentIds = Array.isArray(fv.blockers) ? fv.blockers.map(x => String(x?.id || '')) : [];
+    if (JSON.stringify(currentIds) !== JSON.stringify(blockerIds)) {
+      throw new Error('POST_GO_LIVE_VISIBLE_PRIORITY_BLOCKER_SET_DESYNC');
+    }
+    if (fv.noReprocess !== true || fv.noReimport !== true || fv.dataReimportAllowed !== false) {
+      throw new Error('POST_GO_LIVE_VISIBLE_PRIORITY_DYNAMIC_ANTI_REPROCESS_DESYNC');
+    }
+  }
+  return {unlocked, next};
+}
+
 function structural() {
   const required = [
     LEDGER, REG, WF, CAN, SEM, PRODUCT_REG, PRODUCT_GUARD, ASEG_REG,
-    BASELINE, OWNER, STATE, SELF, PUBLISHER, ROOTFIX_HANDLER
+    BASELINE, VISIBLE_PRIORITY_LOCK, OWNER, STATE, SELF, PUBLISHER, ROOTFIX_HANDLER
   ];
   for (const p of required) {
     if (!fs.existsSync(A(p))) throw new Error(`SINGLE_STATE_DEPENDENCY_MISSING:${p}`);
@@ -66,6 +156,7 @@ function structural() {
   const P = J(PRODUCT_REG);
   const AR = J(ASEG_REG);
   const B = J(BASELINE);
+  const D = J(VISIBLE_PRIORITY_LOCK);
   const wf = T(WF);
 
   if (
@@ -118,11 +209,6 @@ function structural() {
     throw new Error(`PRODUCT_REGISTRY_OPERATIONAL_STATE_DUPLICATION:${duplicatedKeys.join(',')}`);
   }
 
-  // Do not grep PRODUCT_GUARD source for words such as "moduleLineage" or "visualPass".
-  // A validator must be allowed to name forbidden concepts while enforcing that they are absent
-  // from the structured registry. The guard itself is validated by its static contract, execution
-  // output in the canonical workflow, and frozen source identity below.
-
   if (
     AR.schemaVersion !== 'orbit360-aseguradoras-preservation-registry-v2-static-owner-contract' ||
     AR.stateBearing !== false || AR.dynamicStateForbidden !== true ||
@@ -165,6 +251,8 @@ function structural() {
     const actual = gitBlobSha(fs.readFileSync(A(p)));
     if (actual !== sha) throw new Error(`CONTROL_PLANE_BASELINE_SOURCE_DRIFT:${p}`);
   }
+
+  const visiblePriority = assertVisiblePriorityLock(L, D);
 
   if (!milestoneKind(L)) throw new Error('SINGLE_STATE_LEDGER_CURRENT_MILESTONE_INVALID');
   assertReleaseMilestoneFrozen(L, c => { throw new Error(c); });
@@ -215,7 +303,7 @@ function structural() {
     orphanRecovery.recoveryContract?.production !== false
   ) throw new Error('SOURCE_ONLY_ORPHAN_RECOVERY_CONTRACT_INVALID');
 
-  return {L};
+  return {L, visiblePriority};
 }
 
 try {
@@ -240,6 +328,8 @@ try {
       structuralInvariantReused: true,
       validatorSelfReferenceFalsePositiveBlocked: true,
       orphanSourceOnlyRecoveryContractValidated: true,
+      visiblePriorityLockValidated: true,
+      downstreamUnlocked: snapshot.visiblePriority.unlocked,
       runtimeExecuted: false,
       browserExecuted: false,
       secretAccess: false,
@@ -261,6 +351,8 @@ try {
       baselineIdentityValidated: true,
       validatorSelfReferenceFalsePositiveBlocked: true,
       orphanSourceOnlyRecoveryContractValidated: true,
+      visiblePriorityLockValidated: true,
+      downstreamUnlocked: snapshot.visiblePriority.unlocked,
       runtimeExecuted: false,
       browserExecuted: false,
       secretAccess: false,
