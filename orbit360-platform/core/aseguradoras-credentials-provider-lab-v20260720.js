@@ -15,7 +15,9 @@
   var mode = params.get('orbitBackend') || (window.OrbitBackend && OrbitBackend.mode) || '';
   var tenant = params.get('tenant') || (window.OrbitBackend && (OrbitBackend.tenantId || OrbitBackend.tenant)) || '';
   var host = String(window.location.hostname || '').toLowerCase();
-  var authorizedHost = /^ays-orbit-360-lab--orbit360-ays-lab-[a-z0-9-]+\.(?:web\.app|firebaseapp\.com)$/i.test(host);
+  var canonicalHost = /^(?:ays-orbit-360-lab\.(?:web\.app|firebaseapp\.com))$/i.test(host);
+  var previewHost = /^ays-orbit-360-lab--orbit360-ays-lab-[a-z0-9-]+\.(?:web\.app|firebaseapp\.com)$/i.test(host);
+  var authorizedHost = canonicalHost || previewHost;
   var TENANT_ID = 'alianzas-soluciones';
   var PROJECT_ID = 'ays-orbit-360-lab';
   var REGION = 'us-central1';
@@ -26,7 +28,7 @@
 
   var endpointBase = 'https://' + REGION + '-' + PROJECT_ID + '.cloudfunctions.net/';
   var state = {
-    version: '20260720.1',
+    version: '20260828.1',
     tenantId: TENANT_ID,
     providerRegistered: false,
     importProviderRegistered: false,
@@ -284,7 +286,7 @@
     getCredential: resolveCredential,
     copyCredential: copyCredential,
     credentialStatus: status,
-    version: '20260720.1',
+    version: '20260828.1',
     tenantId: TENANT_ID,
     exposesSecretsInStore: false
   });
@@ -297,7 +299,7 @@
       Orbit.secureImport.lastImportPromise = pending;
       return pending;
     },
-    version: '20260720.1',
+    version: '20260828.1',
     remoteConfirmationRequired: true,
     retainsSecretPayload: false,
     appliesOpaqueRefsAfterRemoteConfirmation: true
@@ -322,5 +324,5 @@
   }
 
   Orbit.__insurerCredentialProviderLabV20260720 = state;
-  try { window.dispatchEvent(new CustomEvent('orbit:insurer-credential-provider-ready', { detail: { version: state.version, tenantId: TENANT_ID } })); } catch (error) {}
+  try { window.dispatchEvent(new CustomEvent('orbit:insurer-credential-provider-ready', { detail: { version: state.version, tenantId: TENANT_ID, canonicalHost: canonicalHost, previewHost: previewHost } })); } catch (error) {}
 })();
