@@ -1,7 +1,7 @@
 {
-  "schemaVersion": "orbit360-continuity-writer-registry-v32-runtime-capability-composition-validation",
+  "schemaVersion": "orbit360-continuity-writer-registry-v33-runtime-capability-validator-stale-rootfix",
   "registryId": "ORBIT360-CONTINUITY-WRITER-REGISTRY",
-  "revision": 45,
+  "revision": 46,
   "active": true,
   "status": "SINGLE_STATE_LEDGER_ONLY_SEMANTIC_CONTROL_PLANE",
   "stateBearing": false,
@@ -129,11 +129,21 @@
       "capabilityClass":"SOURCE_ONLY","stateMutation":"CLAIM_TERMINAL","handler":"tools/orbit360-post-go-live-runtime-capability-composition-validate-v20260828.mjs","handlerReady":true,"requiresExplicitUserAuthorization":false,"bindCandidate":false,
       "requiredScope":{"runtime":false,"browser":false,"secrets":false,"firestoreRead":false,"deploy":false,"production":false,"firestoreWrites":false,"authWrites":false,"operationalWrites":false,"dataWrites":false,"main":false,"merge":false},
       "freezeProductDuringClaim":true,"freezeDataDuringClaim":true,
-      "runtimeCapabilityValidationContract":{"validator":"tools/orbit360-validar-runtime-capability-composition-v20260828.mjs","runtimeRegistry":"orbit360-platform/docs/orbit360-runtime-capability-registry-v20260828.json","acceptanceBindingRequired":true,"certifiedBaselinePreservationRequired":true,"aseguradorasFinalOwnerPreservationRequired":true,"sourceOnly":true,"productMutation":false,"dataMutation":false},
+      "runtimeCapabilityValidationContract":{"validator":"tools/orbit360-validar-runtime-capability-composition-v20260828.mjs","runtimeRegistry":"orbit360-platform/docs/orbit360-runtime-capability-registry-v20260828.json","acceptanceBindingRequired":true,"certifiedBaselinePreservationRequired":true,"aseguradorasFinalOwnerPreservationRequired":true,"aseguradorasValidatorSemanticPassContract":"ok_true_plus_ASEGURADORAS_FINAL_OWNER_PRESERVATION_PASS","aseguradorasClassificationFieldRequired":false,"sourceOnly":true,"productMutation":false,"dataMutation":false},
       "from":{"phase":"PRODUCTION_SMOKE_PASS","status":"PRODUCTION_GO_LIVE_PASS","progress":100,"nextAction":"VALIDATE_ACCEPTED_RUNTIME_CAPABILITY_COMPOSITION_SOURCE_ONLY"},
       "claimState":{"phase":"POST_GO_LIVE_RUNTIME_CAPABILITY_COMPOSITION_VALIDATE_RUNNING","status":"SOURCE_ONLY_CLAIMED","nextAction":"RUN_POST_GO_LIVE_RUNTIME_CAPABILITY_COMPOSITION_VALIDATE_SOURCE_ONLY","firstIncompleteStep":"POST-GO-LIVE-RUNTIME-CAPABILITY-COMPOSITION-VALIDATION","laneB":"RUNTIME_CAPABILITY_COMPOSITION_VALIDATION_RUNNING"},
       "terminalPassState":{"phase":"PRODUCTION_SMOKE_PASS","status":"PRODUCTION_GO_LIVE_PASS","progress":100,"nextAction":"REVIEW_RUNTIME_CAPABILITY_OWNER_LINEAGE_SOURCE_ONLY","firstIncompleteStep":"POST-GO-LIVE-RUNTIME-CAPABILITY-OWNER-LINEAGE-REVIEW","laneB":"RUNTIME_CAPABILITY_COMPOSITION_VALIDATED_OWNER_LINEAGE_REVIEW","userActionRequired":false},
       "terminalFailState":{"phase":"PRODUCTION_SMOKE_PASS","status":"PRODUCTION_GO_LIVE_PASS","progress":100,"nextAction":"DIAGNOSE_RUNTIME_CAPABILITY_COMPOSITION_VALIDATION_MECHANISM_ROOT_CAUSE_STOP_RETRY","firstIncompleteStep":"POST-GO-LIVE-RUNTIME-CAPABILITY-COMPOSITION-VALIDATION-ROOT-CAUSE","laneB":"RUNTIME_CAPABILITY_COMPOSITION_VALIDATION_STOP_RETRY","userActionRequired":false}
+    },
+    "POST_GO_LIVE_RUNTIME_CAPABILITY_COMPOSITION_VALIDATOR_STALE_ROOTFIX": {
+      "capabilityClass":"SOURCE_ONLY","stateMutation":"CLAIM_TERMINAL","handler":"tools/orbit360-runtime-capability-validator-stale-rootfix-v20260828.mjs","handlerReady":true,"requiresExplicitUserAuthorization":false,"bindCandidate":false,
+      "requiredScope":{"runtime":false,"browser":false,"secrets":false,"firestoreRead":false,"deploy":false,"production":false,"firestoreWrites":false,"authWrites":false,"operationalWrites":false,"dataWrites":false,"main":false,"merge":false},
+      "freezeProductDuringClaim":true,"freezeDataDuringClaim":true,
+      "rootCauseContract":{"classification":"VALIDATOR_STALE","failedRunId":33191302163,"failureCode":"RUNTIME_COMPOSITION_VALIDATE_ASEG_OWNER_NOT_PASS","staleAssumption":"aseguradoras_validator_classification_field_required","currentValidatorStatus":"ASEGURADORAS_FINAL_OWNER_PRESERVATION_PASS","currentValidatorClassificationFieldRequired":false,"retrySameFailedRunForbidden":true,"newRunAllowedOnlyAfterRootfixPass":true,"sourceOnly":true},
+      "from":{"phase":"PRODUCTION_SMOKE_PASS","status":"PRODUCTION_GO_LIVE_PASS","progress":100,"nextAction":"DIAGNOSE_RUNTIME_CAPABILITY_COMPOSITION_VALIDATION_MECHANISM_ROOT_CAUSE_STOP_RETRY"},
+      "claimState":{"phase":"POST_GO_LIVE_RUNTIME_CAPABILITY_VALIDATOR_STALE_ROOTFIX_RUNNING","status":"SOURCE_ONLY_CLAIMED","nextAction":"RUN_RUNTIME_CAPABILITY_VALIDATOR_STALE_ROOTFIX","firstIncompleteStep":"RUNTIME-CAPABILITY-VALIDATOR-STALE-ROOTFIX","laneB":"RUNTIME_CAPABILITY_VALIDATOR_STALE_ROOTFIX_RUNNING"},
+      "terminalPassState":{"phase":"PRODUCTION_SMOKE_PASS","status":"PRODUCTION_GO_LIVE_PASS","progress":100,"nextAction":"VALIDATE_ACCEPTED_RUNTIME_CAPABILITY_COMPOSITION_SOURCE_ONLY","firstIncompleteStep":"POST-GO-LIVE-RUNTIME-CAPABILITY-COMPOSITION-VALIDATION","laneB":"RUNTIME_CAPABILITY_VALIDATOR_STALE_ROOTFIX_PASS_D3_NEW_RUN_REQUIRED","userActionRequired":false},
+      "terminalFailState":{"phase":"PRODUCTION_SMOKE_PASS","status":"PRODUCTION_GO_LIVE_PASS","progress":100,"nextAction":"DIAGNOSE_RUNTIME_CAPABILITY_COMPOSITION_VALIDATION_MECHANISM_ROOT_CAUSE_STOP_RETRY","firstIncompleteStep":"RUNTIME-CAPABILITY-VALIDATOR-STALE-ROOTFIX-ROOT-CAUSE","laneB":"RUNTIME_CAPABILITY_VALIDATOR_STALE_ROOTFIX_STOP_RETRY","userActionRequired":false}
     },
     "CONTROL_PLANE_RECOVER_ORPHANED_SOURCE_ONLY_TERMINAL": {
       "capabilityClass":"SOURCE_ONLY","stateMutation":"NONE","handler":"tools/orbit360-semantic-single-state-rootfix-handler-v20260827.mjs","handlerReady":true,"requiresExplicitUserAuthorization":false,"bindCandidate":false,
@@ -174,6 +184,8 @@
     "postGoLiveSuccessorAcceptanceExactSurfaceFailClosed": true,
     "postGoLiveSuccessorAcceptanceMustBindLatestStagePass": true,
     "acceptedRuntimeCapabilityCompositionValidationMustUseRegisteredSourceOnlyTransition": true,
+    "runtimeCapabilityCompositionValidatorStaleRootfixRequiredBeforeRetry": true,
+    "sameFailedD3RunReplayForbidden": true,
     "antiStaleSelftestRequired": true,
     "sourceOnlyOrphanClaimRecoveryMustNotCreateSecondClaim": true,
     "sourceOnlyOrphanClaimRecoveryMustReduceOriginalClaim": true,
