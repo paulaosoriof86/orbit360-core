@@ -210,6 +210,7 @@ export function milestoneKind(L) {
   if (phase === 'POST_GO_LIVE_PRODUCT_SUCCESSOR_ACCEPT_RUNNING' && status === 'SOURCE_ONLY_CLAIMED' && progress === 100 && next === 'RUN_POST_GO_LIVE_PRODUCT_SUCCESSOR_ACCEPT_SOURCE_ONLY') return 'PRODUCT_SUCCESSOR_ACCEPT_CLAIMED';
   if (phase === 'POST_GO_LIVE_RUNTIME_CAPABILITY_COMPOSITION_VALIDATE_RUNNING' && status === 'SOURCE_ONLY_CLAIMED' && progress === 100 && next === 'RUN_POST_GO_LIVE_RUNTIME_CAPABILITY_COMPOSITION_VALIDATE_SOURCE_ONLY') return 'RUNTIME_CAPABILITY_COMPOSITION_VALIDATE_CLAIMED';
   if (phase === 'POST_GO_LIVE_RUNTIME_CAPABILITY_VALIDATOR_STALE_ROOTFIX_RUNNING' && status === 'SOURCE_ONLY_CLAIMED' && progress === 100 && next === 'RUN_RUNTIME_CAPABILITY_VALIDATOR_STALE_ROOTFIX') return 'RUNTIME_CAPABILITY_VALIDATOR_STALE_ROOTFIX_CLAIMED';
+  if (phase.startsWith('POST_GO_LIVE_') && status === 'SOURCE_ONLY_CLAIMED' && progress === 100 && /^RUN_[A-Z0-9_]+$/.test(next)) return 'POST_GO_LIVE_SOURCE_ONLY_CLAIMED';
   return '';
 }
 
@@ -256,18 +257,12 @@ export function freezeReleaseMilestone(L) {
 export function assertFollowupConsistency(L, fail) {
   const f = L.postGoLiveAccessRecovery;
   if (!f) return;
-  if ([
-    'POST_GO_LIVE_ACCESS_RECOVERY_SOURCE_PREP_RUNNING',
-    'POST_GO_LIVE_ACCESS_RECOVERY_RUNNING',
-    'POST_GO_LIVE_CONTROL_PLANE_METADATA_RECONCILE_RUNNING',
-    'POST_GO_LIVE_SEMANTIC_SINGLE_STATE_ROOTFIX_RUNNING',
-    'POST_GO_LIVE_PRODUCT_SUCCESSOR_SOURCE_STAGE_RUNNING',
-    'POST_GO_LIVE_PRODUCT_SUCCESSOR_ACCEPT_RUNNING',
-    'POST_GO_LIVE_RUNTIME_CAPABILITY_COMPOSITION_VALIDATE_RUNNING',
-    'POST_GO_LIVE_RUNTIME_CAPABILITY_VALIDATOR_STALE_ROOTFIX_RUNNING'
-  ].includes(String(L.activeState?.phase || ''))) return;
-
+  const phase = String(L.activeState?.phase || '');
+  const status = String(L.activeState?.status || '');
   const next = String(L.nextAction?.id || '');
+  if (phase.startsWith('POST_GO_LIVE_') && status === 'SOURCE_ONLY_CLAIMED' && /^RUN_[A-Z0-9_]+$/.test(next)) return;
+  if (phase === 'POST_GO_LIVE_ACCESS_RECOVERY_RUNNING' && status === 'AUTHORIZED_RECOVERY_CLAIMED') return;
+
   if (f.status === 'SOURCE_PREPARED_AWAITING_AUTHORIZATION' && next !== 'AWAIT_EXPLICIT_HUMAN_ACCESS_RECOVERY_AUTHORIZATION') {
     fail('ACCESS_RECOVERY_NEXT_ACTION_DESYNC');
   }
