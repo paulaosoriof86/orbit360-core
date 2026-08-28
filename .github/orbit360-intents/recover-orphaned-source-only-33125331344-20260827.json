@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "orbit360-execution-intent-v1",
+  "transitionId": "CONTROL_PLANE_RECOVER_ORPHANED_SOURCE_ONLY_TERMINAL",
+  "canonicalBaseHead": "650c7b32386f383699cfc4f04fa832e4ca7d9568",
+  "expectedLedgerRevision": 118,
+  "oneShotOnly": true,
+  "replayAllowed": false,
+  "explicitUserAuthorization": false,
+  "scope": {
+    "runtime": false,
+    "browser": false,
+    "secrets": false,
+    "firestoreRead": false,
+    "deploy": false,
+    "production": false,
+    "firestoreWrites": false,
+    "authWrites": false,
+    "operationalWrites": false,
+    "dataWrites": false,
+    "main": false,
+    "merge": false
+  },
+  "recovery": {
+    "claimedTransitionId": "POST_GO_LIVE_SEMANTIC_SINGLE_STATE_ROOTFIX_VALIDATE_AND_SEAL",
+    "claimedRunId": 33125331344,
+    "claimCanonicalBaseHead": "eae84ea81c22bce27880129aa8a45077dd6899be",
+    "failureCode": "PIPELINE_MECHANISM_FAILURE_HANDLER_DUPLICATE_SANITIZATION_ORPHANED",
+    "originalStatePatch": {
+      "schemaVersion": "orbit360-operational-state-patch-v1",
+      "values": {
+        "postGoLiveAccessRecovery": {
+          "status": "HUMAN_LOGIN_VERIFIED_LATENCY_OPEN",
+          "humanEmailPasswordProven": true,
+          "humanInteractiveNavigationProven": true,
+          "goLiveReopened": false,
+          "historicalAuthorizationReusable": false,
+          "latencyStatus": "OPEN"
+        },
+        "functionalValidation": {
+          "schemaVersion": "orbit360-post-go-live-functional-validation-v1",
+          "status": "BLOCKING_THREE_VISIBLE_DEFECTS",
+          "evidenceDate": "2026-08-27",
+          "blockers": [
+            {
+              "id": "INSURER_PORTAL_REVEAL_OPEN",
+              "classification": "FUNCTIONAL_DEFECT",
+              "status": "OPEN",
+              "nextDiagnostic": "secure_reference_to_provider_to_runtime_to_reveal"
+            },
+            {
+              "id": "CLIENT360_LIST_EMPTY_WITH_DATA_OPEN",
+              "classification": "FUNCTIONAL_DEFECT",
+              "status": "OPEN",
+              "nextDiagnostic": "served_asset_to_store_to_filters_to_rows_to_render"
+            },
+            {
+              "id": "LOGIN_LATENCY_OPEN",
+              "classification": "FUNCTIONAL_DEFECT",
+              "status": "OPEN",
+              "nextDiagnostic": "submit_to_auth_to_membership_to_store_to_router_to_shell"
+            }
+          ],
+          "validationSequence": ["aseguradoras", "cliente360", "login", "polizas"],
+          "noReprocess": true,
+          "noReimport": true,
+          "productMutationAllowedBeforeDiagnosis": false,
+          "dataReimportAllowed": false,
+          "containsPII": false,
+          "containsSecrets": false
+        }
+      },
+      "containsPII": false,
+      "containsSecrets": false
+    }
+  }
+}
