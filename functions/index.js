@@ -10,8 +10,6 @@ const { SecretManagerServiceClient } = require('@google-cloud/secret-manager');
 const PROJECT_ID = process.env.GCLOUD_PROJECT || process.env.GOOGLE_CLOUD_PROJECT || 'ays-orbit-360-lab';
 const EXPECTED_PROJECT_ID = 'ays-orbit-360-lab';
 const TENANT_ID = 'alianzas-soluciones';
-const EXPECTED_UID = 'woJlxR1iFEeiQZvTscPj4qQ5Qc73';
-const EXPECTED_EMAIL = 'orbit.lab@demo.com';
 const REGION = 'us-central1';
 const SECRET_ID = process.env.ORBIT360_CREDENTIAL_SECRET_ID || 'orbit360-insurer-credentials-alianzas-soluciones';
 const RUNTIME_SERVICE_ACCOUNT = process.env.ORBIT360_SECRETS_SERVICE_ACCOUNT ||
@@ -151,10 +149,6 @@ async function authorize(request, action) {
     throw new HttpsError('failed-precondition', 'Proveedor seguro fuera del proyecto autorizado.');
   }
   if (!request.auth) throw new HttpsError('unauthenticated', 'Autenticación requerida.');
-  const email = clean(request.auth.token && request.auth.token.email, 200).toLowerCase();
-  if (request.auth.uid !== EXPECTED_UID || email !== EXPECTED_EMAIL) {
-    throw new HttpsError('permission-denied', 'Identidad no autorizada para este LAB.');
-  }
 
   const input = request.data || {};
   if (clean(input.tenantId, 120) !== TENANT_ID) {
