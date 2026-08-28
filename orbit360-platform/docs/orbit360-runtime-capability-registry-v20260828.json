@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "orbit360-runtime-capability-registry-v1",
+  "registryId": "ORBIT360-RUNTIME-CAPABILITY-COMPOSITION",
+  "createdAt": "2026-08-28",
+  "stateBearing": false,
+  "containsPII": false,
+  "containsSecrets": false,
+  "entrypoint": "index.html",
+  "certifiedProductRegistry": "docs/orbit360-certified-product-preservation-registry-v20260827.json",
+  "rules": {
+    "fileExistenceDoesNotEqualRuntimeReachability": true,
+    "certifiedModuleScriptsMustBeReachable": true,
+    "capabilityOwnersMustBeReachable": true,
+    "failClosedOnOrphanedApprovedCapability": true,
+    "dataMutationAllowed": false,
+    "deploymentAllowed": false
+  },
+  "capabilities": [
+    {
+      "capabilityId": "ASEGURADORAS_OP2_OPERATIONAL_RESOURCES",
+      "status": "APPROVED_HISTORICAL_CAPABILITY",
+      "requiredReachableScripts": [
+        "core/aseguradoras-op2-role-visibility.js",
+        "core/aseguradoras-op2-operational-access-policy.js",
+        "core/aseguradoras-op2-secure-provider-policy-guard.js",
+        "modules/aseguradoras-op2-closure-bridge.js",
+        "modules/aseguradoras-op2-permission-guard.js",
+        "modules/aseguradoras-op2-operational-resources.js"
+      ],
+      "requiredDirectStyles": [
+        "styles/aseguradoras-op2-v1217.css"
+      ],
+      "invariants": [
+        "credentialRef resolves only through secure provider",
+        "password is not persisted in insurer store",
+        "Asesor cannot reveal or copy portal passwords",
+        "Dirección/Admin/Operativo may reveal or copy according to policy",
+        "approved reveal re-render fix remains active"
+      ]
+    },
+    {
+      "capabilityId": "CLIENTE360_PRIMARY_RUNTIME_OWNER",
+      "status": "CERTIFIED_SOURCE_OWNER",
+      "requiredReachableScripts": [
+        "modules/cliente360.js"
+      ],
+      "requiredDirectStyles": [],
+      "invariants": [
+        "certified Cliente360 owner remains reachable from operational entrypoint"
+      ]
+    }
+  ]
+}
