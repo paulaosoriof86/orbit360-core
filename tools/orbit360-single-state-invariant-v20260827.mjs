@@ -69,7 +69,7 @@ function structural() {
   const wf = T(WF);
 
   if (
-    R.schemaVersion !== 'orbit360-continuity-writer-registry-v28-semantic-single-state' ||
+    R.schemaVersion !== 'orbit360-continuity-writer-registry-v29-source-only-orphan-recovery' ||
     R.active !== true || R.stateBearing !== false || R.dynamicStateForbidden !== true ||
     R.sourceOfTruth !== LEDGER ||
     JSON.stringify(R.stateBearingFiles) !== JSON.stringify([LEDGER]) ||
@@ -81,7 +81,9 @@ function structural() {
     R.policies?.dynamicModuleStateInStaticRegistriesForbidden !== true ||
     R.policies?.functionalAcceptanceInProductPreservationForbidden !== true ||
     R.policies?.moduleSpecificAssertionsInGlobalWorkflowForbidden !== true ||
-    R.policies?.antiStaleSelftestRequired !== true
+    R.policies?.antiStaleSelftestRequired !== true ||
+    R.policies?.sourceOnlyOrphanClaimRecoveryMustNotCreateSecondClaim !== true ||
+    R.policies?.sourceOnlyOrphanClaimRecoveryMustReduceOriginalClaim !== true
   ) throw new Error('SINGLE_STATE_SEMANTIC_POLICIES_INVALID');
 
   if (
@@ -191,6 +193,28 @@ function structural() {
     rootfix.handlerReady !== true
   ) throw new Error('SEMANTIC_SINGLE_STATE_ROOTFIX_TRANSITION_INVALID');
 
+  const orphanRecovery = R.executionTransitions?.CONTROL_PLANE_RECOVER_ORPHANED_SOURCE_ONLY_TERMINAL;
+  if (
+    !orphanRecovery || orphanRecovery.capabilityClass !== 'SOURCE_ONLY' ||
+    orphanRecovery.stateMutation !== 'NONE' || orphanRecovery.recoveryOnly !== true ||
+    orphanRecovery.handler !== ROOTFIX_HANDLER || orphanRecovery.handlerReady !== true ||
+    orphanRecovery.recoveryContract?.activeClaimRequired !== true ||
+    orphanRecovery.recoveryContract?.claimedCapabilityClass !== 'SOURCE_ONLY' ||
+    orphanRecovery.recoveryContract?.privilegedRiskForbidden !== true ||
+    orphanRecovery.recoveryContract?.authorizationConsumptionForbidden !== true ||
+    orphanRecovery.recoveryContract?.statePatchDigestMustMatchActiveClaim !== true ||
+    orphanRecovery.recoveryContract?.terminalReducedByCanonicalOwner !== true ||
+    orphanRecovery.recoveryContract?.ledgerOnlyPublication !== true ||
+    orphanRecovery.recoveryContract?.productMutation !== false ||
+    orphanRecovery.recoveryContract?.dataMutation !== false ||
+    orphanRecovery.recoveryContract?.runtime !== false ||
+    orphanRecovery.recoveryContract?.browser !== false ||
+    orphanRecovery.recoveryContract?.secrets !== false ||
+    orphanRecovery.recoveryContract?.firestoreRead !== false ||
+    orphanRecovery.recoveryContract?.deploy !== false ||
+    orphanRecovery.recoveryContract?.production !== false
+  ) throw new Error('SOURCE_ONLY_ORPHAN_RECOVERY_CONTRACT_INVALID');
+
   return {L};
 }
 
@@ -215,6 +239,7 @@ try {
       syntheticLedgerEvidenceMutationAccepted: true,
       structuralInvariantReused: true,
       validatorSelfReferenceFalsePositiveBlocked: true,
+      orphanSourceOnlyRecoveryContractValidated: true,
       runtimeExecuted: false,
       browserExecuted: false,
       secretAccess: false,
@@ -235,6 +260,7 @@ try {
       pureProductPreservation: true,
       baselineIdentityValidated: true,
       validatorSelfReferenceFalsePositiveBlocked: true,
+      orphanSourceOnlyRecoveryContractValidated: true,
       runtimeExecuted: false,
       browserExecuted: false,
       secretAccess: false,
