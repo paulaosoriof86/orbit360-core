@@ -1,0 +1,70 @@
+{
+  "schemaVersion": "orbit360-execution-intent-v1",
+  "transitionId": "POST_GO_LIVE_SEMANTIC_SINGLE_STATE_ROOTFIX_VALIDATE_AND_SEAL",
+  "canonicalBaseHead": "74dc30112a2fb2af99e8b01117b522a15ef6a3d5",
+  "expectedLedgerRevision": 119,
+  "oneShotOnly": true,
+  "replayAllowed": false,
+  "explicitUserAuthorization": false,
+  "scope": {
+    "runtime": false,
+    "browser": false,
+    "secrets": false,
+    "firestoreRead": false,
+    "deploy": false,
+    "production": false,
+    "firestoreWrites": false,
+    "authWrites": false,
+    "operationalWrites": false,
+    "dataWrites": false,
+    "main": false,
+    "merge": false
+  },
+  "statePatch": {
+    "schemaVersion": "orbit360-operational-state-patch-v1",
+    "values": {
+      "postGoLiveAccessRecovery": {
+        "status": "HUMAN_LOGIN_VERIFIED_LATENCY_OPEN",
+        "humanEmailPasswordProven": true,
+        "humanInteractiveNavigationProven": true,
+        "goLiveReopened": false,
+        "historicalAuthorizationReusable": false,
+        "latencyStatus": "OPEN"
+      },
+      "functionalValidation": {
+        "schemaVersion": "orbit360-post-go-live-functional-validation-v1",
+        "status": "BLOCKING_THREE_VISIBLE_DEFECTS",
+        "evidenceDate": "2026-08-27",
+        "blockers": [
+          {
+            "id": "INSURER_PORTAL_REVEAL_OPEN",
+            "classification": "FUNCTIONAL_DEFECT",
+            "status": "OPEN",
+            "nextDiagnostic": "secure_reference_to_provider_to_runtime_to_reveal"
+          },
+          {
+            "id": "CLIENT360_LIST_EMPTY_WITH_DATA_OPEN",
+            "classification": "FUNCTIONAL_DEFECT",
+            "status": "OPEN",
+            "nextDiagnostic": "served_asset_to_store_to_filters_to_rows_to_render"
+          },
+          {
+            "id": "LOGIN_LATENCY_OPEN",
+            "classification": "FUNCTIONAL_DEFECT",
+            "status": "OPEN",
+            "nextDiagnostic": "submit_to_auth_to_membership_to_store_to_router_to_shell"
+          }
+        ],
+        "validationSequence": ["aseguradoras", "cliente360", "login", "polizas"],
+        "noReprocess": true,
+        "noReimport": true,
+        "productMutationAllowedBeforeDiagnosis": false,
+        "dataReimportAllowed": false,
+        "containsPII": false,
+        "containsSecrets": false
+      }
+    },
+    "containsPII": false,
+    "containsSecrets": false
+  }
+}
