@@ -22,6 +22,7 @@ const SESSION='orbit360-platform/core/access-role-session-owner-v20260728.js';
 const TRANSITION='POST_GO_LIVE_RUNTIME_CAPABILITY_OWNER_LINEAGE_REVIEW_SOURCE_ONLY';
 const EXPECTED_CLIENT_BLOB='fa50bae659ed03909a220d720fc0305838c75b31';
 const P09_SUPPORT=['modules/aseguradoras-batch-admin-form-p09j.js','modules/aseguradoras-knowledge-p09.js','modules/aseguradoras-knowledge-panel-p09f.js'];
+const ZERO_KEYS=['runtime','browser','secrets','firestoreRead','deploy','production','firestoreWrites','authWrites','operationalWrites','dataWrites','main','merge'];
 const args=process.argv.slice(2);
 const val=f=>{const i=args.indexOf(f);return i>=0?String(args[i+1]||''):'';};
 const intentPath=val('--intent')||process.env.ORBIT360_EXECUTION_INTENT||'';
@@ -31,22 +32,33 @@ const selftest=args.includes('--source-only-selftest');
 const A=p=>path.join(ROOT,p);
 const T=p=>fs.readFileSync(A(p),'utf8').replace(/^\uFEFF/,'');
 const J=p=>JSON.parse(T(p));
-const write=(p,x)=>{if(!p)return;fs.mkdirSync(path.dirname(p),{recursive:true});fs.writeFileSync(p,JSON.stringify(x,null,2)+'\n','utf8');};
+const readExternalJson=p=>JSON.parse(fs.readFileSync(path.resolve(p),'utf8').replace(/^\uFEFF/,''));
+const write=(p,x)=>{if(!p)return;fs.mkdirSync(path.dirname(path.resolve(p)),{recursive:true});fs.writeFileSync(path.resolve(p),JSON.stringify(x,null,2)+'\n','utf8');};
 const zero=extra=>({privilegedRiskObserved:false,secretAccess:false,firestoreRead:false,resetLinksGenerated:0,firestoreWrites:0,authWrites:0,operationalWrites:0,deployExecuted:false,productionTouched:false,runtimeExecuted:false,browserExecuted:false,productMutation:false,dataMutation:false,containsPII:false,containsSecrets:false,...extra});
 const gitBlobSha=buf=>createHash('sha1').update(Buffer.from(`blob ${buf.length}\0`)).update(buf).digest('hex');
-function fail(code,meta={}){const out=zero({schemaVersion:'orbit360-runtime-capability-owner-lineage-terminal-v1',transitionId:TRANSITION,runId:Number.isInteger(runId)?runId:0,ok:false,status:'POST_GO_LIVE_RUNTIME_CAPABILITY_OWNER_LINEAGE_REVIEW_FAIL',classification:'PIPELINE_MECHANISM_FAILURE',failureCode:code,...meta});write(terminalOut,out);console.error(JSON.stringify({ok:false,status:out.status,classification:out.classification,code,containsPII:false,containsSecrets:false}));process.exit(41);}
-function zeroScope(scope={}){for(const k of ['runtime','browser','secrets','firestoreRead','deploy','production','firestoreWrites','authWrites','operationalWrites','dataWrites','main','merge'])if(scope[k]!==false)throw new Error(`OWNER_LINEAGE_SCOPE_NOT_ZERO:${k}`);}
-function runJson(script,argv=[]){const r=spawnSync(process.execPath,[A(script),...argv],{cwd:ROOT,encoding:'utf8',env:{...process.env,ORBIT360_ROOT:ROOT}});let out={};try{out=JSON.parse(String(r.stdout||'').trim());}catch{throw new Error(`OWNER_LINEAGE_DEPENDENCY_OUTPUT_INVALID:${script}`);}if(r.status!==0||out.ok!==true)throw new Error(`OWNER_LINEAGE_DEPENDENCY_FAIL:${script}:${out.status||r.status}`);return out;}
+
+function fail(code,meta={}){
+  const out=zero({schemaVersion:'orbit360-runtime-capability-owner-lineage-terminal-v1',transitionId:TRANSITION,runId:Number.isInteger(runId)?runId:0,ok:false,status:'POST_GO_LIVE_RUNTIME_CAPABILITY_OWNER_LINEAGE_REVIEW_FAIL',classification:'PIPELINE_MECHANISM_FAILURE',failureCode:code,...meta});
+  write(terminalOut,out);
+  console.error(JSON.stringify({ok:false,status:out.status,classification:out.classification,code,containsPII:false,containsSecrets:false}));
+  process.exit(41);
+}
+function zeroScope(scope={}){for(const k of ZERO_KEYS)if(scope[k]!==false)throw new Error(`OWNER_LINEAGE_SCOPE_NOT_ZERO:${k}`);}
+function runJson(script,argv=[]){
+  const r=spawnSync(process.execPath,[A(script),...argv],{cwd:ROOT,encoding:'utf8',env:{...process.env,ORBIT360_ROOT:ROOT}});
+  let out={};try{out=JSON.parse(String(r.stdout||'').trim());}catch{throw new Error(`OWNER_LINEAGE_DEPENDENCY_OUTPUT_INVALID:${script}`);}
+  if(r.status!==0||out.ok!==true)throw new Error(`OWNER_LINEAGE_DEPENDENCY_FAIL:${script}:${out.status||r.status}`);
+  return out;
+}
 function inspect(I,L){
   if(I.schemaVersion!=='orbit360-execution-intent-v1'||I.transitionId!==TRANSITION)throw new Error('OWNER_LINEAGE_INTENT_INVALID');
   zeroScope(I.scope||{});
-  if(!Number.isInteger(Number(I.compositionRunId))||Number(I.compositionRunId)<=0)throw new Error('OWNER_LINEAGE_COMPOSITION_RUN_INVALID');
   if(!Number.isInteger(Number(I.acceptanceRunId))||Number(I.acceptanceRunId)<=0)throw new Error('OWNER_LINEAGE_ACCEPTANCE_RUN_INVALID');
+  if(!/^[A-Za-z0-9_.:-]{1,180}$/.test(String(I.candidateId||'')))throw new Error('OWNER_LINEAGE_CANDIDATE_ID_INVALID');
   for(const k of ['candidateManifestSha256','patchManifestSha256'])if(!/^[a-f0-9]{64}$/.test(String(I[k]||'')))throw new Error(`OWNER_LINEAGE_DIGEST_INVALID:${k}`);
-  const H=L.history?.latestExecutionTerminal||{};
-  if(H.transitionId!=='POST_GO_LIVE_RUNTIME_CAPABILITY_COMPOSITION_VALIDATE_SOURCE_ONLY'||H.ok!==true||H.classification!=='PASS'||Number(H.runId)!==Number(I.compositionRunId)||H.status!=='POST_GO_LIVE_RUNTIME_CAPABILITY_COMPOSITION_VALIDATION_PASS'||Number(H.acceptanceRunId)!==Number(I.acceptanceRunId)||H.candidateId!==I.candidateId||H.candidateManifestSha256!==I.candidateManifestSha256||H.patchManifestSha256!==I.patchManifestSha256)throw new Error('OWNER_LINEAGE_D3_BINDING_NOT_PASS');
   const S=L.postGoLiveSuccessorAcceptance||{};
-  if(S.status!=='ACCEPTED_SOURCE_ONLY_PENDING_COMPOSITION_VALIDATION'||S.classification!=='PASS'||Number(S.acceptanceRunId)!==Number(I.acceptanceRunId)||S.candidateId!==I.candidateId||S.candidateManifestSha256!==I.candidateManifestSha256||S.patchManifestSha256!==I.patchManifestSha256)throw new Error('OWNER_LINEAGE_ACCEPTANCE_BINDING_MISMATCH');
+  if(S.status!=='ACCEPTED_SOURCE_ONLY_PENDING_COMPOSITION_VALIDATION'||S.classification!=='PASS'||Number(S.acceptanceRunId)!==Number(I.acceptanceRunId)||S.candidateId!==I.candidateId||S.candidateManifestSha256!==I.candidateManifestSha256||S.patchManifestSha256!==I.patchManifestSha256||S.certifiedBaselinePreserved!==true)throw new Error('OWNER_LINEAGE_ACCEPTANCE_BINDING_MISMATCH');
+  return true;
 }
 function review(){
   const R=J(RUNTIME_REG),P=J(PRODUCT_REG),D=J(ASEG_REG),index=T(INDEX),owner=T(ASEG_OWNER),bridge=T(ASEG_BRIDGE),boot=T(P09_BOOT),clientDoc=T(CLIENT_DOC),auth=T(AUTH),session=T(SESSION),L=J(LEDGER);
@@ -72,12 +84,24 @@ function review(){
   if(!auth.includes('Orbit.auth = (function ()')||!auth.includes('signInWithEmailAndPassword')||!auth.includes('waitForMembership')||!session.includes('function productProjection()')||!session.includes('function syncFromAuth()')||session.includes('signInWithEmailAndPassword'))throw new Error('OWNER_LINEAGE_LOGIN_ROLE_SEPARATION_INVALID');
   const blockers=Array.isArray(L.functionalValidation?.blockers)?L.functionalValidation.blockers.map(x=>x.id):[];
   for(const id of ['INSURER_PORTAL_REVEAL_OPEN','CLIENT360_LIST_EMPTY_WITH_DATA_OPEN','LOGIN_LATENCY_OPEN'])if(!blockers.includes(id))throw new Error(`OWNER_LINEAGE_VISIBLE_BLOCKER_MISSING:${id}`);
-  return {capabilityCount:caps.length,aseguradoras:{finalOwner:aseg.finalOwner,legacyConsumerFinalAuthority:false,p09SupportClassification:'INDIRECT_LAB_SUPPORT_NOT_FINAL_AUTHORITY',p09SupportAssets:P09_SUPPORT},cliente360:{finalOwner:c360.finalOwner,lineage:'LAST_APPROVED_LINEAGE_PRESERVED_SOURCE',blobSha:clientBlob,visualPass:false},login:{finalOwner:login.finalOwner,sessionRoleOwner:'core/access-role-session-owner-v20260728.js',interactiveLoginOwnerPreserved:true,latencyStillOpen:true},visibleBlockersStillOpen:true,compositionValidatorStatus:comp.status};
+  return {
+    capabilityCount:caps.length,
+    compositionValidatedNow:true,
+    compositionValidatorStatus:comp.status,
+    aseguradoras:{finalOwner:aseg.finalOwner,legacyConsumerFinalAuthority:false,p09SupportClassification:'INDIRECT_LAB_SUPPORT_NOT_FINAL_AUTHORITY',p09SupportAssets:P09_SUPPORT},
+    cliente360:{finalOwner:c360.finalOwner,lineage:'LAST_APPROVED_LINEAGE_PRESERVED_SOURCE',blobSha:clientBlob,visualPass:false},
+    login:{finalOwner:login.finalOwner,sessionRoleOwner:'core/access-role-session-owner-v20260728.js',interactiveLoginOwnerPreserved:true,latencyStillOpen:true},
+    visibleBlockersStillOpen:true
+  };
 }
-if(selftest){try{const r=review();console.log(JSON.stringify(zero({ok:true,status:'POST_GO_LIVE_RUNTIME_CAPABILITY_OWNER_LINEAGE_REVIEW_SELFTEST_PASS',classification:'PASS',sourceOnly:true,...r}),null,2));process.exit(0);}catch(error){fail(String(error?.message||error));}}
+if(selftest){
+  try{const r=review();console.log(JSON.stringify(zero({ok:true,status:'POST_GO_LIVE_RUNTIME_CAPABILITY_OWNER_LINEAGE_REVIEW_SELFTEST_PASS',classification:'PASS',sourceOnly:true,latestExecutionTerminalDependency:false,...r}),null,2));process.exit(0);}
+  catch(error){fail(String(error?.message||error));}
+}
 try{
-  if(!intentPath||!terminalOut||!Number.isInteger(runId)||runId<=0||!fs.existsSync(intentPath))throw new Error('OWNER_LINEAGE_HANDLER_ARGS_INVALID');
-  const I=J(path.relative(ROOT,path.resolve(intentPath))||intentPath),L=J(LEDGER);inspect(I,L);const r=review();
-  const terminal=zero({schemaVersion:'orbit360-runtime-capability-owner-lineage-terminal-v1',transitionId:TRANSITION,runId,ok:true,status:'POST_GO_LIVE_RUNTIME_CAPABILITY_OWNER_LINEAGE_REVIEW_PASS',classification:'PASS',compositionRunId:Number(I.compositionRunId),acceptanceRunId:Number(I.acceptanceRunId),candidateId:I.candidateId,candidateManifestSha256:I.candidateManifestSha256,patchManifestSha256:I.patchManifestSha256,sourceOnly:true,...r,evidencePath:`actions-artifact:orbit360-single-state-${runId}/orbit360-terminal.json`});
-  write(terminalOut,terminal);console.log(JSON.stringify({ok:true,status:terminal.status,classification:'PASS',compositionRunId:terminal.compositionRunId,acceptanceRunId:terminal.acceptanceRunId,capabilityCount:terminal.capabilityCount,aseguradoras:terminal.aseguradoras,cliente360:terminal.cliente360,login:terminal.login,visibleBlockersStillOpen:true,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false},null,2));
+  if(!intentPath||!terminalOut||!Number.isInteger(runId)||runId<=0||!fs.existsSync(path.resolve(intentPath)))throw new Error('OWNER_LINEAGE_HANDLER_ARGS_INVALID');
+  const I=readExternalJson(intentPath),L=J(LEDGER);inspect(I,L);const r=review();
+  const terminal=zero({schemaVersion:'orbit360-runtime-capability-owner-lineage-terminal-v1',transitionId:TRANSITION,runId,ok:true,status:'POST_GO_LIVE_RUNTIME_CAPABILITY_OWNER_LINEAGE_REVIEW_PASS',classification:'PASS',acceptanceRunId:Number(I.acceptanceRunId),candidateId:I.candidateId,candidateManifestSha256:I.candidateManifestSha256,patchManifestSha256:I.patchManifestSha256,sourceOnly:true,latestExecutionTerminalDependency:false,...r,evidencePath:`actions-artifact:orbit360-single-state-${runId}/orbit360-terminal.json`});
+  write(terminalOut,terminal);
+  console.log(JSON.stringify({ok:true,status:terminal.status,classification:'PASS',acceptanceRunId:terminal.acceptanceRunId,capabilityCount:terminal.capabilityCount,compositionValidatedNow:true,aseguradoras:terminal.aseguradoras,cliente360:terminal.cliente360,login:terminal.login,visibleBlockersStillOpen:true,latestExecutionTerminalDependency:false,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false},null,2));
 }catch(error){fail(String(error?.message||error));}
