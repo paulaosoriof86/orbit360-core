@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "orbit360-control-plane-frozen-baseline-v7-semantic-single-state-static-identities",
+  "schemaVersion": "orbit360-control-plane-frozen-baseline-v8-semantic-single-state-static-identities",
   "status": "STATIC_SOURCE_IDENTITY_BASELINE",
   "stateBearing": false,
   "dynamicStateForbidden": true,
@@ -10,14 +10,17 @@
   "sourceIdentities": {
     ".github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml": "eb0515fbff91cffb4ceef5cc386f7ed8212522a3",
     "tools/orbit360-single-state-ledger-owner-v20260827.mjs": "ff59dbb0d342eb5aa1c723c59e8f4a3e133824e2",
-    "tools/orbit360-single-state-invariant-v20260827.mjs": "63bc80d8b730c7ca91f1d2e19010d2971fd3ffac",
+    "tools/orbit360-single-state-invariant-v20260827.mjs": "7746020c4851568aa2642f149e460abaf0af7079",
     "tools/orbit360-single-state-contract-v20260827.mjs": "bb1b190059df10ba57fc551df1939cf416a4aff9",
-    "orbit360-platform/docs/orbit360-continuity-writer-registry-v20260820.json": "276f6ba9bf5c8ec909f04f872bd74ab53b80a5fd",
+    "orbit360-platform/docs/orbit360-continuity-writer-registry-v20260820.json": "b16a19376b239f32f1a60f3f524e58b33db5b768",
     "orbit360-platform/docs/orbit360-post-go-live-visible-priority-lock-v20260827.json": "4fbc4934fb526f92ecc87cf771b22644c92c0415",
     "tools/orbit360-gate-contract-registry-v20260717.json": "2a5eb2443adf1ce74ae1cc189cf85489b027f35c",
+    "tools/orbit360-validar-gate-contracts-v20260717.mjs": "885b9d33e02bb95c886f607049a2cc73a73065e5",
     "tools/orbit360-certified-product-preservation-v20260827.mjs": "9e2ac24c435667b75716136d186ac18adefa93fe",
     "orbit360-platform/docs/orbit360-certified-product-preservation-registry-v20260827.json": "9c6f527e27ad5acfb34c7e2f8ea159659ec6abe2",
     "orbit360-platform/docs/orbit360-aseguradoras-preservation-registry-v20260827.json": "e18e3d7d4abb8e9a04e5ceb6e6c647c1337b5118",
+    "orbit360-platform/docs/orbit360-post-go-live-successor-source-registry-v20260828.json": "d1cc3413330aeee9eaee10a72918480635364e7b",
+    "tools/orbit360-post-go-live-successor-source-stage-v20260828.mjs": "f1a486fb63d4832ad3c7525f7dfdfc416e8386ad",
     "orbit360-platform/docs/orbit360-control-plane-canonicality-contract-v20260822.json": "47563b433ce0cfb947beae7f4584a98e48667bdf",
     "orbit360-platform/docs/orbit360-control-plane-semantic-contract-v20260824.json": "14113c685c6ced0c4726f02599591c84f3b415bf",
     "tools/orbit360-semantic-single-state-rootfix-handler-v20260827.mjs": "c3232052193fc0d9176f6952a219f4a4b53eb9aa",
@@ -49,7 +52,10 @@
     "ownerSelftestDerivesCurrentTransitionFromRegistry": true,
     "goLiveAuthorizationIdentityFrozenBeforePostGoLiveClaimOverwrite": true,
     "postGoLiveVisiblePriorityLockMachineEnforcedBeforeEveryExecution": true,
-    "polizasAndDownstreamBlockedUntilVisibleTrioAndUserAcceptancePass": true
+    "polizasAndDownstreamBlockedUntilVisibleTrioAndUserAcceptancePass": true,
+    "postGoLiveProductDeltaUsesRegisteredEphemeralSuccessorStage": true,
+    "certifiedProductBaselineNeverMutatedBySourceStage": true,
+    "successorBaselineAcceptanceIsSeparateAndExplicit": true
   },
   "sealPolicy": {
     "passOrFailIsRecordedInLedgerTerminalEvidence": true,
