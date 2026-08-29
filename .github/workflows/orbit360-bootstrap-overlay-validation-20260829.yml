@@ -1,0 +1,86 @@
+name: Orbit360 Bootstrap Overlay Validation
+on:
+  push:
+    branches:
+      - 'ays/orbit360-exec-baseline-promotion-bootstrap-20260828'
+permissions:
+  contents: write
+jobs:
+  bootstrap-validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Synchronize overlay consumers deterministically
+        run: node tools/orbit360-bootstrap-overlay-consumer-sync-v20260829.mjs | tee /tmp/bootstrap-sync.json
+      - name: Syntax checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/orbit360-certified-product-preservation-v20260827.mjs
+          node --check tools/orbit360-post-go-live-successor-source-stage-v20260828.mjs
+          node --check tools/orbit360-post-go-live-successor-source-accept-v20260828.mjs
+          node --check tools/orbit360-validar-aseguradoras-credentials-rootfix-v20260828.mjs
+          node --check tools/orbit360-validar-runtime-capability-composition-v20260828.mjs
+          node --check tools/orbit360-post-go-live-runtime-capability-composition-validate-v20260828.mjs
+          node --check tools/orbit360-control-plane-publication-preflight-v20260825.mjs
+          node --check tools/orbit360-single-state-invariant-v20260827.mjs
+      - name: Preservation and control-plane selftests
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/orbit360-certified-product-preservation-v20260827.mjs | tee /tmp/preservation.json
+          jq -e '.ok==true and .status=="CERTIFIED_PRODUCT_BASELINE_PRESERVATION_PASS" and .contractVersion=="v4-explicit-overlay-integrity" and .changedProductFilesSinceBaseline==0 and .unexpectedProductFilesSinceBaseline==0' /tmp/preservation.json >/dev/null
+          node tools/orbit360-post-go-live-successor-source-stage-v20260828.mjs --source-only-selftest | tee /tmp/stage-selftest.json
+          jq -e '.ok==true and .status=="POST_GO_LIVE_PRODUCT_GIT_STAGE_SELFTEST_PASS"' /tmp/stage-selftest.json >/dev/null
+          node tools/orbit360-post-go-live-successor-source-accept-v20260828.mjs --source-only-selftest | tee /tmp/accept-selftest.json
+          jq -e '.ok==true and .status=="POST_GO_LIVE_PRODUCT_BASELINE_ACCEPT_SELFTEST_PASS"' /tmp/accept-selftest.json >/dev/null
+          node tools/orbit360-single-state-invariant-v20260827.mjs | tee /tmp/invariant.json
+          jq -e '.ok==true' /tmp/invariant.json >/dev/null
+          node tools/orbit360-single-state-ledger-owner-v20260827.mjs --selftest | tee /tmp/owner-selftest.json
+          jq -e '.ok==true and .status=="SINGLE_STATE_CONTROL_PLANE_SELFTEST_PASS"' /tmp/owner-selftest.json >/dev/null
+      - name: Confirm visible Aseguradoras defect remains fail-closed before product rootfix
+        shell: bash
+        run: |
+          set -euo pipefail
+          set +e
+          node tools/orbit360-validar-aseguradoras-credentials-rootfix-v20260828.mjs . > /tmp/aseg-current.json
+          rc=$?
+          set -e
+          test "$rc" -ne 0
+          jq -e '.ok==false and .status=="ASEGURADORAS_CREDENTIALS_ROOTFIX_SOURCE_FAIL"' /tmp/aseg-current.json >/dev/null
+      - name: Commit synchronized static consumers on bootstrap branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name orbit360-bootstrap-owner
+          git config user.email orbit360-bootstrap-owner@users.noreply.github.com
+          git add orbit360-platform/docs/orbit360-continuity-writer-registry-v20260820.json \
+                  orbit360-platform/docs/orbit360-control-plane-frozen-baseline-v20260827.json \
+                  .github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml \
+                  tools/orbit360-single-state-invariant-v20260827.mjs
+          if git diff --cached --quiet; then
+            echo 'bootstrap consumers already synchronized'
+          else
+            git commit -m 'bootstrap(mechanism): synchronize overlay consumers and frozen identities'
+            git push origin HEAD:ays/orbit360-exec-baseline-promotion-bootstrap-20260828
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: orbit360-bootstrap-overlay-${{ github.run_id }}
+          path: |
+            /tmp/bootstrap-sync.json
+            /tmp/preservation.json
+            /tmp/stage-selftest.json
+            /tmp/accept-selftest.json
+            /tmp/invariant.json
+            /tmp/owner-selftest.json
+            /tmp/aseg-current.json
+          if-no-files-found: ignore
+          retention-days: 7
