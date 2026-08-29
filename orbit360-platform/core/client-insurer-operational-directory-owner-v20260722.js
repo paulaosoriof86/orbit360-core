@@ -4,7 +4,7 @@
   'use strict';
   window.Orbit = window.Orbit || {};
   var Orbit = window.Orbit;
-  var VERSION = '20260829.1';
+  var VERSION = '20260723.2';
   if (Orbit.clientInsurerOperationalDirectoryOwnerV20260722 && Orbit.clientInsurerOperationalDirectoryOwnerV20260722.version === VERSION) return;
 
   function clean(value) { return String(value == null ? '' : value).trim(); }
@@ -39,57 +39,6 @@
         : { available: false };
     } catch (error) { return { available: false }; }
   }
-  function activeRole() {
-    try { return clean(Orbit.session && Orbit.session.rol && Orbit.session.rol()); }
-    catch (error) { return ''; }
-  }
-  function roleKey(value) {
-    return clean(value).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z]/g, '');
-  }
-  function activeAdvisor() {
-    try {
-      var advisorId = Orbit.session && Orbit.session.asesorId && Orbit.session.asesorId();
-      return advisorId && Orbit.store && Orbit.store.get ? (Orbit.store.get('asesores', advisorId) || {}) : {};
-    } catch (error) { return {}; }
-  }
-  function credentialAccessAllowed() {
-    var advisor = activeAdvisor();
-    var restricted = [].concat(advisor.restricciones || [], advisor.restrictions || []);
-    if (restricted.indexOf('aseguradoras_plataformas_credenciales') >= 0 || restricted.indexOf('aseguradoras_editar') >= 0) return false;
-    var extras = [].concat(advisor.permisosExtra || [], advisor.permissionsExtra || []);
-    if (extras.indexOf('aseguradoras_plataformas_credenciales') >= 0 || extras.indexOf('aseguradoras_editar') >= 0) return true;
-    try {
-      if (Orbit.access && Orbit.access.can && (Orbit.access.can('aseguradoras', 'credentials') === true || Orbit.access.can('aseguradoras', 'edit') === true)) return true;
-    } catch (error) {}
-    return ['direccion','admin','superadmin','superadministrador','admintenant','operativo'].indexOf(roleKey(activeRole())) >= 0;
-  }
-  function inlineCredential(portal) {
-    if (!credentialAccessAllowed()) return '';
-    return clean(portal && (portal.password || portal.pass || portal.contrasena || portal.clave));
-  }
-  function credentialState(portal) {
-    if (!credentialAccessAllowed()) return { allowed:false, available:false, revealAvailable:false, copyAvailable:false };
-    if (inlineCredential(portal)) return { allowed:true, available:true, revealAvailable:true, copyAvailable:true, source:'record' };
-    var ref = clean(portal && portal.credentialRef);
-    var state = providerStatus(ref);
-    return {
-      allowed:true,
-      available:!!(ref && state.available),
-      revealAvailable:!!(ref && (state.revealAvailable || state.available)),
-      copyAvailable:!!(ref && (state.copyAvailable || state.available)),
-      source:'provider'
-    };
-  }
-  async function resolveCredential(portal, insurer, index) {
-    if (!credentialAccessAllowed()) return { ok:false, message:'Acceso restringido para el rol activo.' };
-    var inline = inlineCredential(portal);
-    if (inline) return { ok:true, value:inline, expiresInMs:6000, source:'record' };
-    var ref = clean(portal && portal.credentialRef);
-    if (!ref || !Orbit.secureResources || typeof Orbit.secureResources.revealCredential !== 'function') {
-      return { ok:false, message:'Contraseña no disponible.' };
-    }
-    return await Orbit.secureResources.revealCredential(ref, { module:'aseguradoras', insurerId:insurer.id, portalIndex:index });
-  }
   async function copyText(value) {
     try {
       if (Orbit.vault && Orbit.vault.copyText) return await Orbit.vault.copyText(value);
@@ -107,8 +56,8 @@
     var portal = insurer && insurer.portales && insurer.portales[index] || {};
     var user = portalUser(portal);
     var ref = clean(portal.credentialRef);
-    var state = credentialState(portal);
-    var fp = fingerprint([portal.nombre, portal.tipo, portal.url, portal.urlHint, portal.pais, portal.estadoAcceso, portal.responsable, portal.ultimaVerificacion, user, ref, state.allowed, state.available, state.revealAvailable, state.copyAvailable, state.source]);
+    var state = providerStatus(ref);
+    var fp = fingerprint([portal.nombre, portal.tipo, portal.url, portal.urlHint, portal.pais, portal.estadoAcceso, portal.responsable, portal.ultimaVerificacion, user, ref, state.available, state.revealAvailable, state.copyAvailable]);
     if (row.dataset.odOwnerVersion === VERSION && row.dataset.odFingerprint === fp) return;
     var name = clean(portal.nombre) || 'Plataforma sin nombre';
     var type = clean(portal.tipo);
@@ -117,8 +66,8 @@
     var status = clean(portal.estadoAcceso) || 'Sin verificar';
     var owner = clean(portal.responsable) || 'Por confirmar';
     var verified = clean(portal.ultimaVerificacion) || 'Sin verificar';
-    var canReveal = !!(state.allowed && (state.revealAvailable || state.available));
-    var canCopy = !!(state.allowed && (state.copyAvailable || state.available));
+    var canReveal = !!(ref && (state.revealAvailable || state.available));
+    var canCopy = !!(ref && (state.copyAvailable || state.available));
     row.dataset.m1PortalCard = '1';
     row.dataset.odOwnerVersion = VERSION;
     row.dataset.odFingerprint = fp;
@@ -129,7 +78,7 @@
       '<div class="m1-credential-box od-credential-box"><div class="m1-credential-row"><span class="m1-read-label">Usuario</span><div class="m1-credential-value m1-credential-user" data-od-credential-user>' + esc(user || 'Sin usuario registrado') + '</div></div>' +
       '<div class="m1-credential-row"><span class="m1-read-label">Contraseña</span><div class="m1-credential-value m1-credential-secret" data-od-credential-secret aria-live="polite">Oculta</div></div>' +
       '<div class="m1-contact-actions">' +
-        (canReveal ? '<button class="btn ghost sm" type="button" data-od-credential-reveal="' + index + '">Ver temporalmente</button>' : '<button class="btn ghost sm" type="button" disabled>' + (state.allowed ? 'Contraseña no disponible' : 'Acceso restringido') + '</button>') +
+        (canReveal ? '<button class="btn ghost sm" type="button" data-od-credential-reveal="' + index + '">Ver temporalmente</button>' : '<button class="btn ghost sm" type="button" disabled>Contraseña no disponible</button>') +
         (canCopy ? '<button class="btn ghost sm" type="button" data-od-credential-copy="' + index + '">Copiar acceso seguro</button>' : '') +
       '</div></div>' +
       (url ? '<div class="m1-contact-actions"><a class="btn primary sm" href="' + esc(safeUrl(url)) + '" target="_blank" rel="noopener">Abrir plataforma</a></div>' : '');
@@ -174,8 +123,12 @@
       var insurer = currentInsurer();
       var index = Number((reveal || credentialCopy).dataset[reveal ? 'odCredentialReveal' : 'odCredentialCopy']);
       var portal = insurer && insurer.portales && insurer.portales[index];
+      var ref = clean(portal && portal.credentialRef);
       var user = portalUser(portal);
-      var out = await resolveCredential(portal, insurer, index);
+      if (!ref || !Orbit.secureResources) { toast('Contraseña no disponible.'); return; }
+      var out = reveal
+        ? await Orbit.secureResources.revealCredential(ref, { module:'aseguradoras', insurerId:insurer.id, portalIndex:index })
+        : await Orbit.secureResources.revealCredential(ref, { module:'aseguradoras', insurerId:insurer.id, portalIndex:index });
       if (!out || out.ok === false || !clean(out.value)) { toast(out && out.message || 'Contraseña no disponible.'); return; }
       if (reveal) {
         var secret = reveal.closest('.od-credential-box') && reveal.closest('.od-credential-box').querySelector('[data-od-credential-secret]');
@@ -224,8 +177,6 @@
     supersedesBankAndPortalSectionsOf: 'client-insurer-visual-contract-v20260720',
     usernameOperationalVisible: true,
     passwordProtectedTemporaryReveal: true,
-    credentialRecordFallbackForAuthorizedRoles: true,
-    credentialProviderFallbackPreserved: true,
     bankNumberOperationalVisible: true,
     bankRevealDependency: false,
     bankCopyDirect: true,
