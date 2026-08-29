@@ -35,7 +35,7 @@ jobs:
         run: |
           set -euo pipefail
           node tools/orbit360-certified-product-preservation-v20260827.mjs | tee /tmp/preservation.json
-          jq -e '.ok==true and .status=="CERTIFIED_PRODUCT_BASELINE_PRESERVATION_PASS" and .contractVersion=="v4-explicit-overlay-integrity" and .changedProductFilesSinceBaseline==0 and .unexpectedProductFilesSinceBaseline==0' /tmp/preservation.json >/dev/null
+          jq -e '.ok==true and .status=="CERTIFIED_PRODUCT_BASELINE_PRESERVATION_PASS" and .contractVersion=="v3-static-product-integrity" and .overlayContractVersion=="v4-explicit-overlay-integrity" and .changedProductFilesSinceBaseline==0 and .unexpectedProductFilesSinceBaseline==0' /tmp/preservation.json >/dev/null
           node tools/orbit360-post-go-live-successor-source-stage-v20260828.mjs --source-only-selftest | tee /tmp/stage-selftest.json
           jq -e '.ok==true and .status=="POST_GO_LIVE_PRODUCT_GIT_STAGE_SELFTEST_PASS"' /tmp/stage-selftest.json >/dev/null
           node tools/orbit360-post-go-live-successor-source-accept-v20260828.mjs --source-only-selftest | tee /tmp/accept-selftest.json
@@ -62,7 +62,6 @@ jobs:
           git config user.email orbit360-bootstrap-owner@users.noreply.github.com
           git add orbit360-platform/docs/orbit360-continuity-writer-registry-v20260820.json \
                   orbit360-platform/docs/orbit360-control-plane-frozen-baseline-v20260827.json \
-                  .github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml \
                   tools/orbit360-single-state-invariant-v20260827.mjs
           if git diff --cached --quiet; then
             echo 'bootstrap consumers already synchronized'
