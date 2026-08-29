@@ -1,8 +1,10 @@
 {
   "schemaVersion": "orbit360-post-go-live-successor-source-registry-v4-git-bound-overlay",
   "registryId": "ORBIT360-POST-GO-LIVE-SUCCESSOR-SOURCE",
-  "contractRevision": 5,
+  "contractRevision": 6,
   "status": "ACTIVE_SOURCE_ONLY_GIT_BOUND_EXPLICIT_BASELINE_ACCEPTANCE",
+  "stateBearing": false,
+  "dynamicStateForbidden": true,
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
   "transitionId": "POST_GO_LIVE_PRODUCT_SUCCESSOR_SOURCE_STAGE",
