@@ -18,7 +18,7 @@
     editOwner:['core/client-insurer-edit-owner-v20260722.js?v=20260723-2','/core/client-insurer-edit-owner-v20260722.js','script'],
     visualStability:['core/client-insurer-visual-stability-barrier-v20260721.js?v=20260722-5','/core/client-insurer-visual-stability-barrier-v20260721.js','script'],
     visualBase:['core/client-insurer-visual-contract-v20260720.js?v=20260721-4','/core/client-insurer-visual-contract-v20260720.js','script'],
-    operationalOwner:['core/client-insurer-operational-directory-owner-v20260722.js?v=20260723-2','/core/client-insurer-operational-directory-owner-v20260722.js','script']
+    operationalOwner:['core/client-insurer-operational-directory-owner-v20260722.js?v=20260829-1','/core/client-insurer-operational-directory-owner-v20260722.js','script']
   };
   var order=['visualStyle','editStyle','session','importerContract','importerAcademy','secureTargetBridge','operationalPolicy','editOwner','visualStability','visualBase','operationalOwner'];
   var state=window.OrbitTenantBootstrapState={owner:'core/router-tenant-config-product-bootstrap-p0.js',version:VERSION,mode:'product-readonly',tenantAuthority:'authenticated-membership-later',tenantResolved:false,sourceResolved:false,writeAuthorized:false,status:'product-static-validating',requested:order.slice(),loaded:[],errors:[]};
