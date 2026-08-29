@@ -36,16 +36,18 @@ const safeRel=p=>typeof p==='string'&&p.length>0&&p.length<360&&!path.isAbsolute
 function successorAcceptanceTargets(ledger){
   if(ledger.executionClaim?.transitionId!==SUCCESSOR_ACCEPT)return null;
   const rec=ledger.postGoLiveSuccessorAcceptance||{};
-  const rel=String(rec.patchManifestPath||'');
-  if(!safeRel(rel)||!/^[a-f0-9]{64}$/.test(String(rec.patchManifestSha256||'')))fail('SUCCESSOR_ACCEPTANCE_PUBLICATION_BINDING_INVALID');
-  if(!fs.existsSync(A(SUCCESSOR_REGISTRY))||!fs.existsSync(A(rel)))fail('SUCCESSOR_ACCEPTANCE_PUBLICATION_DEPENDENCY_MISSING');
-  const SR=readJson(SUCCESSOR_REGISTRY),M=readJson(rel),contract=SR.acceptanceContract||{};
-  if(contract.transitionId!==SUCCESSOR_ACCEPT||contract.terminalPublicationExactSurfaceRequired!==true||M.candidateId!==rec.candidateId)fail('SUCCESSOR_ACCEPTANCE_PUBLICATION_CONTRACT_INVALID');
-  const targets=(M.targets||[]).map(t=>String(t.targetPath||''));
-  if(!targets.length||targets.some(p=>!safeRel(p)))fail('SUCCESSOR_ACCEPTANCE_PUBLICATION_TARGETS_INVALID');
-  const allowed=[...(contract.allowedCurrentTargets||[])].sort();
-  if(JSON.stringify([...targets].sort())!==JSON.stringify(allowed))fail('SUCCESSOR_ACCEPTANCE_PUBLICATION_TARGET_ALLOWLIST_MISMATCH');
-  return new Set([LEDGER,...targets]);
+  if(rec.status!=='ACCEPTED_SOURCE_ONLY_PENDING_COMPOSITION_VALIDATION'||rec.classification!=='PASS'||rec.sourceOnly!==true||rec.certifiedBaselinePreserved!==true)fail('SUCCESSOR_ACCEPTANCE_PUBLICATION_RECORD_INVALID');
+  if(!/^[A-Za-z0-9._-]{1,120}$/.test(String(rec.candidateId||''))||!/^[a-f0-9]{64}$/.test(String(rec.candidateManifestSha256||''))||!/^[a-f0-9]{64}$/.test(String(rec.patchManifestSha256||'')))fail('SUCCESSOR_ACCEPTANCE_PUBLICATION_BINDING_INVALID');
+  if(!fs.existsSync(A(SUCCESSOR_REGISTRY)))fail('SUCCESSOR_ACCEPTANCE_PUBLICATION_DEPENDENCY_MISSING');
+  const SR=readJson(SUCCESSOR_REGISTRY),contract=SR.acceptanceContract||{};
+  if(SR.schemaVersion!=='orbit360-post-go-live-successor-source-registry-v4-git-bound-overlay'||SR.status!=='ACTIVE_SOURCE_ONLY_GIT_BOUND_EXPLICIT_BASELINE_ACCEPTANCE'||contract.transitionId!==SUCCESSOR_ACCEPT||contract.terminalPublicationExactSurfaceRequired!==true||contract.preservationRegistryPromotionRequired!==true)fail('SUCCESSOR_ACCEPTANCE_PUBLICATION_CONTRACT_INVALID');
+  const preservationRegistry=String(SR.preservationRegistry||'');
+  if(!safeRel(preservationRegistry)||!fs.existsSync(A(preservationRegistry)))fail('SUCCESSOR_ACCEPTANCE_PRESERVATION_REGISTRY_INVALID');
+  const targets=Array.isArray(rec.acceptedTargetPaths)?rec.acceptedTargetPaths.map(String):[];
+  if(!targets.length||Number(rec.changedTargetCount)!==targets.length||new Set(targets).size!==targets.length||targets.some(p=>!safeRel(p)))fail('SUCCESSOR_ACCEPTANCE_PUBLICATION_TARGETS_INVALID');
+  const allowed=p=>!(SR.forbiddenProductPrefixes||[]).some(x=>p===x||p.startsWith(x))&&(SR.allowedProductPrefixes||[]).some(x=>x.endsWith('/')?p.startsWith(x):p===x);
+  const forbidden=targets.filter(p=>!allowed(p));if(forbidden.length)fail('SUCCESSOR_ACCEPTANCE_PUBLICATION_TARGET_NOT_REGISTERED',forbidden.join(','));
+  return new Set([LEDGER,preservationRegistry,...targets]);
 }
 
 function allowedSurface(registry,ledger,allChanged,selftestMode,closeState){
