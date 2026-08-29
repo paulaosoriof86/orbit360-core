@@ -1,7 +1,7 @@
 {
   "schemaVersion": "orbit360-post-go-live-successor-source-registry-v4-git-bound-overlay",
   "registryId": "ORBIT360-POST-GO-LIVE-SUCCESSOR-SOURCE",
-  "contractRevision": 4,
+  "contractRevision": 5,
   "status": "ACTIVE_SOURCE_ONLY_GIT_BOUND_EXPLICIT_BASELINE_ACCEPTANCE",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
@@ -73,7 +73,27 @@
         "orbit360-platform/core/aseguradoras-credentials-provider-lab-v20260720.js",
         "functions/index.js"
       ],
-      "exactChangedTargets": true
+      "exactChangedTargets": true,
+      "status": "SUPERSEDED_FOR_CURRENT_AUTHORIZED_REVEAL_DECISION"
+    },
+    "ASEGURADORAS_AUTHORIZED_REVEAL_V2": {
+      "validators": [
+        "tools/orbit360-validar-aseguradoras-authorized-reveal-v20260829.mjs"
+      ],
+      "postApplyValidators": [
+        "tools/orbit360-validar-aseguradoras-authorized-reveal-v20260829.mjs",
+        "tools/orbit360-aseguradoras-operational-owner-preservation-v20260827.mjs"
+      ],
+      "requiredChangedTargets": [
+        "orbit360-platform/core/client-insurer-operational-directory-owner-v20260722.js",
+        "orbit360-platform/core/router-tenant-config-product-bootstrap-p0.js"
+      ],
+      "exactChangedTargets": true,
+      "decision": "AUTHORIZED_ROLES_MAY_REVEAL_EXISTING_OPERATIONAL_CREDENTIAL_WITH_PROVIDER_FALLBACK",
+      "noNewProviderRequired": true,
+      "noFunctionsChangeRequired": true,
+      "noReimport": true,
+      "noDataMutation": true
     }
   },
   "acceptanceContract": {
@@ -111,8 +131,9 @@
   },
   "rootCause": {
     "classification": "PIPELINE_MECHANISM_FAILURE",
-    "code": "SUCCESSOR_ACCEPTANCE_COULD_NOT_PROMOTE_REAL_PRODUCT_DELTA",
-    "resolvedBy": "GIT_BOUND_STAGE_PLUS_EXPLICIT_OVERLAY_BASELINE_ACCEPTANCE_WITH_TRANSACTIONAL_ROLLBACK"
+    "secondaryClassification": "VALIDATOR_STALE",
+    "code": "SUCCESSOR_PROFILE_STILL_REQUIRED_SUPERSEDED_PROVIDER_PATH_AFTER_AUTHORIZED_REVEAL_DECISION",
+    "resolvedBy": "GIT_BOUND_EXACT_OWNER_PLUS_PRODUCT_BOOTSTRAP_OVERLAY_WITH_AUTHORIZED_DIRECT_RECORD_READ_FALLBACK"
   },
   "containsPII": false,
   "containsSecrets": false
