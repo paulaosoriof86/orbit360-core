@@ -54,7 +54,7 @@ inv=inv.replace("P.schemaVersion!=='orbit360-certified-product-preservation-regi
 inv=inv.replace("if(!wf.includes('CERTIFIED_PRODUCT_BASELINE_PRESERVATION_PASS')||!wf.includes('v3-static-product-integrity')||!wf.includes('SINGLE_STATE_ANTI_STALE_SELFTEST_PASS'))","if(!wf.includes('CERTIFIED_PRODUCT_BASELINE_PRESERVATION_PASS')||!wf.includes('v4-explicit-overlay-integrity')||!wf.includes('unexpectedProductFilesSinceBaseline')||!wf.includes('SINGLE_STATE_ANTI_STALE_SELFTEST_PASS'))");
 fs.writeFileSync(A(INV),inv,'utf8');
 
-const B=json(FROZEN);B.schemaVersion='orbit360-control-plane-frozen-baseline-v17-explicit-product-overlay';
+const B=json(FROZEN);B.schemaVersion='orbit360-control-plane-frozen-baseline-v17-semantic-single-state-static-identities';
 B.semanticSingleStateRules={...(B.semanticSingleStateRules||{}),explicitProductOverlayBaselinePromotion:true,productSourceAcceptanceBoundToGitCandidate:true,successorPublicationSurfaceDerivedFromAcceptedTargetPaths:true,runtimeCapabilitySourcePassCannotCloseVisibleDefect:true};
 B.sourceIdentities={...(B.sourceIdentities||{}),[ROOTFIX]:''};
 for(const p of Object.keys(B.sourceIdentities)){if(!fs.existsSync(A(p)))throw new Error(`BOOTSTRAP_SYNC_FROZEN_SOURCE_MISSING:${p}`);B.sourceIdentities[p]=git(['hash-object','--',p]);}
