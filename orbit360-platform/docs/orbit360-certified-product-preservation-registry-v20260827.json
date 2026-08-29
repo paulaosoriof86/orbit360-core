@@ -1,9 +1,9 @@
 {
-  "schemaVersion": "orbit360-certified-product-preservation-registry-v3-static-integrity",
+  "schemaVersion": "orbit360-certified-product-preservation-registry-v4-explicit-overlay",
   "registryId": "ORBIT360-CERTIFIED-PRODUCT-PRESERVATION",
   "createdAt": "2026-08-27",
-  "updatedAt": "2026-08-27",
-  "status": "ACTIVE_STATIC_PRODUCT_INTEGRITY_FAIL_CLOSED",
+  "updatedAt": "2026-08-29",
+  "status": "ACTIVE_EXPLICIT_OVERLAY_PRODUCT_INTEGRITY_FAIL_CLOSED",
   "stateBearing": false,
   "dynamicStateForbidden": true,
   "dynamicOperationalStateAuthority": "orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json",
@@ -28,6 +28,7 @@
     "visualAnomalyDoesNotAuthorizeRebuild": true,
     "visualAnomalyDoesNotAuthorizeReimport": true,
     "productDeltaRequiresNewExplicitlyAcceptedBaseline": true,
+    "explicitOverlayRequiredForPostBaselineProductDelta": true,
     "productMutationOnGuardFailure": false,
     "dataMutationOnGuardFailure": false,
     "goLiveReopenOnGuardFailure": false,
@@ -43,10 +44,17 @@
       "orbit360-platform/styles/",
       "orbit360-platform/index.html",
       "orbit360-platform/product-runtime-config.js",
-      "orbit360-platform/sw.js"
+      "orbit360-platform/sw.js",
+      "functions/"
     ],
-    "expectedChangedFilesSinceBaseline": 0,
+    "expectedUnapprovedChangedFilesSinceBaseline": 0,
     "classificationOnUnexpectedDelta": "PIPELINE_MECHANISM_FAILURE"
+  },
+  "activeOverlay": {
+    "schemaVersion": "orbit360-certified-product-active-overlay-v1",
+    "mode": "HISTORICAL_ARTIFACT_PLUS_EXPLICIT_OVERLAY",
+    "baseSourceHead": "8c9668d6d423e82826b0295431ec699390d79b4b",
+    "acceptedFiles": []
   },
   "approvedModuleScripts": [
     "modules/academia.js",
