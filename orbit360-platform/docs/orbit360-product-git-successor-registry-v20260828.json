@@ -1,19 +1,23 @@
 {
-  "schemaVersion": "orbit360-product-git-successor-registry-v1",
+  "schemaVersion": "orbit360-product-git-successor-registry-v2",
   "registryId": "ORBIT360-PRODUCT-GIT-SUCCESSOR",
   "createdAt": "2026-08-28",
+  "updatedAt": "2026-08-29",
   "status": "ACTIVE_SOURCE_ONLY_GIT_BOUND_BASELINE_PROMOTION",
   "stateBearing": false,
   "dynamicStateForbidden": true,
   "canonicalBranch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
-  "stageTransitionId": "POST_GO_LIVE_PRODUCT_SUCCESSOR_GIT_STAGE_SOURCE_ONLY",
-  "acceptTransitionId": "POST_GO_LIVE_PRODUCT_SUCCESSOR_ACCEPT_BASELINE_SOURCE_ONLY",
-  "sourceValidateTransitionId": "POST_GO_LIVE_PRODUCT_SUCCESSOR_VALIDATE_SOURCE_ONLY",
+  "stageTransitionId": "POST_GO_LIVE_PRODUCT_SUCCESSOR_SOURCE_STAGE",
+  "acceptTransitionId": "POST_GO_LIVE_PRODUCT_SUCCESSOR_ACCEPT_SOURCE_ONLY",
+  "sourceValidateTransitionId": "POST_GO_LIVE_RUNTIME_CAPABILITY_COMPOSITION_VALIDATE_SOURCE_ONLY",
+  "stageHandler": "tools/orbit360-post-go-live-product-git-stage-v20260828.mjs",
+  "acceptHandler": "tools/orbit360-post-go-live-product-baseline-accept-v20260829.mjs",
   "preservationRegistry": "orbit360-platform/docs/orbit360-certified-product-preservation-registry-v20260827.json",
   "preservationValidator": "tools/orbit360-certified-product-preservation-v20260827.mjs",
   "runtimeCapabilityRegistry": "orbit360-platform/docs/orbit360-runtime-capability-registry-v20260828.json",
   "runtimeCapabilityValidator": "tools/orbit360-validar-runtime-capability-composition-v20260828.mjs",
+  "aseguradorasOwnerValidator": "tools/orbit360-aseguradoras-operational-owner-preservation-v20260827.mjs",
   "allowedProductPrefixes": [
     "orbit360-platform/core/",
     "orbit360-platform/modules/",
@@ -30,8 +34,9 @@
     "orbit360-platform/docs/"
   ],
   "candidateContract": {
-    "mustDescendFromCurrentCanonicalHead": true,
-    "baseMustEqualCurrentCanonicalHead": true,
+    "mustDescendFromStagedBaseHead": true,
+    "stagedBaseMustEqualIntentCanonicalBaseHead": true,
+    "currentProductBlobsMustMatchStagedBeforeBindings": true,
     "deletionsForbidden": true,
     "renamesForbidden": true,
     "maxChangedFiles": 30,
@@ -44,6 +49,11 @@
       "validators": [
         "tools/orbit360-validar-aseguradoras-credentials-rootfix-v20260828.mjs"
       ],
+      "postApplyValidators": [
+        "tools/orbit360-validar-aseguradoras-credentials-rootfix-v20260828.mjs",
+        "tools/orbit360-validar-runtime-capability-composition-v20260828.mjs",
+        "tools/orbit360-aseguradoras-operational-owner-preservation-v20260827.mjs"
+      ],
       "requiredChangedTargets": [
         "orbit360-platform/core/aseguradoras-credentials-provider-lab-v20260720.js",
         "functions/index.js"
@@ -53,12 +63,16 @@
   },
   "acceptanceContract": {
     "stageRecordAuthority": "postGoLiveProductGitStage",
+    "acceptanceRecordAuthority": "postGoLiveSuccessorAcceptance",
     "candidateHeadBindingRequired": true,
+    "baseHeadBindingRequired": true,
     "diffDigestBindingRequired": true,
+    "perFileBeforeAfterBindingRequired": true,
     "validationProfileBindingRequired": true,
     "transactionalApplyRequired": true,
     "preservationRegistryPromotionRequired": true,
     "publisherExactSurfaceRequired": true,
+    "rollbackBeforePublicationRequired": true,
     "automaticDeployForbidden": true,
     "runtimeForbidden": true,
     "browserForbidden": true,
