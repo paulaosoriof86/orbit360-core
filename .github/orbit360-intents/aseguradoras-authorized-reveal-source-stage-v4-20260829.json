@@ -1,0 +1,30 @@
+{
+  "schemaVersion": "orbit360-execution-intent-v1",
+  "transitionId": "POST_GO_LIVE_PRODUCT_SUCCESSOR_SOURCE_STAGE",
+  "expectedLedgerRevision": 137,
+  "canonicalBaseHead": "0d85732473b172ae6a0ab219eade50284a021412",
+  "oneShotOnly": true,
+  "replayAllowed": false,
+  "explicitUserAuthorization": false,
+  "scope": {
+    "runtime": false,
+    "browser": false,
+    "secrets": false,
+    "firestoreRead": false,
+    "deploy": false,
+    "production": false,
+    "firestoreWrites": false,
+    "authWrites": false,
+    "operationalWrites": false,
+    "dataWrites": false,
+    "main": false,
+    "merge": false
+  },
+  "gitCandidate": {
+    "candidateHead": "619c58251eb5046097d0177e5312a1def41c1118",
+    "candidateBranch": "ays/orbit360-product-candidate-authorized-reveal-v4-20260829",
+    "validationProfile": "ASEGURADORAS_AUTHORIZED_REVEAL_V2"
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
