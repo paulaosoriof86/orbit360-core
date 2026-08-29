@@ -21,18 +21,16 @@ for(const p of [WR,WF,INV,FROZEN,SR,ROOTFIX])if(!fs.existsSync(A(p)))throw new E
 
 const R=json(WR);R.schemaVersion='orbit360-continuity-writer-registry-v36-explicit-product-overlay';R.revision=49;
 const G=R.preservationGuards?.certifiedProductBaseline;if(!G)throw new Error('BOOTSTRAP_SYNC_PRESERVATION_GUARD_MISSING');
-Object.assign(G,{status:'ACTIVE_EXPLICIT_OVERLAY_PRODUCT_INTEGRITY_FAIL_CLOSED',registrySchemaVersion:'orbit360-certified-product-preservation-registry-v4-explicit-overlay',expectedContractVersion:'v4-explicit-overlay-integrity',explicitOverlayAcceptanceRequired:true,functionsSourceIncluded:true});
+Object.assign(G,{status:'ACTIVE_EXPLICIT_OVERLAY_PRODUCT_INTEGRITY_FAIL_CLOSED',registrySchemaVersion:'orbit360-certified-product-preservation-registry-v4-explicit-overlay',expectedContractVersion:'v3-static-product-integrity',expectedOverlayContractVersion:'v4-explicit-overlay-integrity',explicitOverlayAcceptanceRequired:true,functionsSourceIncluded:true});
 const S=R.executionTransitions?.POST_GO_LIVE_PRODUCT_SUCCESSOR_SOURCE_STAGE;if(!S)throw new Error('BOOTSTRAP_SYNC_STAGE_TRANSITION_MISSING');
 S.successorSourceContract={registry:SR,candidateBinding:'GIT_COMMIT_PLUS_PER_FILE_BLOBS_PLUS_DIFF_DIGEST',candidateWorkspace:'GIT_WORKTREE_TEMP_ONLY',mutatesCertifiedBaseline:false,baselineAcceptanceSeparate:true,automaticAcceptanceForbidden:true,automaticDeployForbidden:true};
 const C=R.executionTransitions?.POST_GO_LIVE_PRODUCT_SUCCESSOR_ACCEPT_SOURCE_ONLY;if(!C)throw new Error('BOOTSTRAP_SYNC_ACCEPT_TRANSITION_MISSING');
 C.successorAcceptanceContract={registry:SR,requiresStagePass:true,stageRunBindingRequired:true,gitCandidateBindingRequired:true,perFileBeforeAfterBindingRequired:true,transactionalApplyRequired:true,preservationRegistryPromotionRequired:true,rollbackBeforePublicationRequired:true,terminalPublicationExactSurfaceRequired:true,sourceOnly:true};
-R.policies={...(R.policies||{}),postGoLiveSuccessorAcceptancePromotesExplicitOverlay:true,productSourceMutationRequiresGitBoundAcceptance:true,runtimeCapabilitySourcePassCannotCloseVisibleDefect:true};
+R.policies={...(R.policies||{}),postGoLiveSuccessorAcceptancePromotesExplicitOverlay:true,productSourceMutationRequiresGitBoundAcceptance:true,runtimeCapabilitySourcePassCannotCloseVisibleDefect:true,canonicalWorkflowCompatibilityAliasPreserved:true};
 writeJson(WR,R);
 
-let wf=read(WF);
-wf=wf.replaceAll('v3-static-product-integrity','v4-explicit-overlay-integrity');
-wf=wf.replace('.changedProductFilesSinceBaseline==0 and .noReprocess==true','.changedProductFilesSinceBaseline==0 and .unexpectedProductFilesSinceBaseline==0 and .noReprocess==true');
-fs.writeFileSync(A(WF),wf,'utf8');
+const wf=read(WF);
+if(!wf.includes('v3-static-product-integrity')||wf.includes('v4-explicit-overlay-integrity'))throw new Error('BOOTSTRAP_SYNC_CANONICAL_WORKFLOW_COMPATIBILITY_DRIFT');
 
 let inv=read(INV);
 const start=inv.indexOf('function assertSuccessorSource(R,SR){');
@@ -51,13 +49,12 @@ const replacement=`function assertSuccessorSource(R,SR){
 }`;
 inv=inv.slice(0,start)+replacement+inv.slice(end);
 inv=inv.replace("P.schemaVersion!=='orbit360-certified-product-preservation-registry-v3-static-integrity'","P.schemaVersion!=='orbit360-certified-product-preservation-registry-v4-explicit-overlay'");
-inv=inv.replace("if(!wf.includes('CERTIFIED_PRODUCT_BASELINE_PRESERVATION_PASS')||!wf.includes('v3-static-product-integrity')||!wf.includes('SINGLE_STATE_ANTI_STALE_SELFTEST_PASS'))","if(!wf.includes('CERTIFIED_PRODUCT_BASELINE_PRESERVATION_PASS')||!wf.includes('v4-explicit-overlay-integrity')||!wf.includes('unexpectedProductFilesSinceBaseline')||!wf.includes('SINGLE_STATE_ANTI_STALE_SELFTEST_PASS'))");
 fs.writeFileSync(A(INV),inv,'utf8');
 
 const B=json(FROZEN);B.schemaVersion='orbit360-control-plane-frozen-baseline-v17-semantic-single-state-static-identities';
-B.semanticSingleStateRules={...(B.semanticSingleStateRules||{}),explicitProductOverlayBaselinePromotion:true,productSourceAcceptanceBoundToGitCandidate:true,successorPublicationSurfaceDerivedFromAcceptedTargetPaths:true,runtimeCapabilitySourcePassCannotCloseVisibleDefect:true};
+B.semanticSingleStateRules={...(B.semanticSingleStateRules||{}),explicitProductOverlayBaselinePromotion:true,productSourceAcceptanceBoundToGitCandidate:true,successorPublicationSurfaceDerivedFromAcceptedTargetPaths:true,runtimeCapabilitySourcePassCannotCloseVisibleDefect:true,canonicalWorkflowCompatibilityAliasPreserved:true};
 B.sourceIdentities={...(B.sourceIdentities||{}),[ROOTFIX]:''};
 for(const p of Object.keys(B.sourceIdentities)){if(!fs.existsSync(A(p)))throw new Error(`BOOTSTRAP_SYNC_FROZEN_SOURCE_MISSING:${p}`);B.sourceIdentities[p]=git(['hash-object','--',p]);}
 writeJson(FROZEN,B);
 
-console.log(JSON.stringify({ok:true,status:'ORBIT360_BOOTSTRAP_OVERLAY_CONSUMER_SYNC_PASS',classification:'PASS',writerRevision:R.revision,preservationContract:G.expectedContractVersion,successorRegistrySchema:json(SR).schemaVersion,frozenSchema:B.schemaVersion,sourceIdentityCount:Object.keys(B.sourceIdentities).length,containsPII:false,containsSecrets:false},null,2));
+console.log(JSON.stringify({ok:true,status:'ORBIT360_BOOTSTRAP_OVERLAY_CONSUMER_SYNC_PASS',classification:'PASS',writerRevision:R.revision,preservationCompatibilityContract:G.expectedContractVersion,preservationOverlayContract:G.expectedOverlayContractVersion,successorRegistrySchema:json(SR).schemaVersion,frozenSchema:B.schemaVersion,canonicalWorkflowModified:false,sourceIdentityCount:Object.keys(B.sourceIdentities).length,containsPII:false,containsSecrets:false},null,2));
