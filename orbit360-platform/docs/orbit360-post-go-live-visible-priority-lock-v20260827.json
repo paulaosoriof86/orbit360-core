@@ -1,36 +1,18 @@
 {
-  "schemaVersion": "orbit360-post-go-live-visible-priority-lock-v1",
+  "schemaVersion": "orbit360-post-go-live-visible-priority-lock-v2-authorized-record-fallback",
   "status": "ACTIVE_STATIC_DECISION_LOCK",
   "stateBearing": false,
   "dynamicStateForbidden": true,
   "operationalStateAuthority": "orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json",
   "scope": "POST_GO_LIVE_VISIBLE_FUNCTIONAL_ACCEPTANCE_BEFORE_DOWNSTREAM_MODULES",
-  "requiredSequence": [
-    "INSURER_PORTAL_REVEAL",
-    "CLIENT360_LIST_RENDER",
-    "LOGIN_INTERACTIVE_LATENCY",
-    "USER_VISUAL_ACCEPTANCE_VISIBLE_TRIO",
-    "POLIZAS_AND_REST"
-  ],
-  "visibleBlockerIds": [
-    "INSURER_PORTAL_REVEAL_OPEN",
-    "CLIENT360_LIST_EMPTY_WITH_DATA_OPEN",
-    "LOGIN_LATENCY_OPEN"
-  ],
+  "requiredSequence": ["INSURER_PORTAL_REVEAL","CLIENT360_LIST_RENDER","LOGIN_INTERACTIVE_LATENCY","USER_VISUAL_ACCEPTANCE_VISIBLE_TRIO","POLIZAS_AND_REST"],
+  "visibleBlockerIds": ["INSURER_PORTAL_REVEAL_OPEN","CLIENT360_LIST_EMPTY_WITH_DATA_OPEN","LOGIN_LATENCY_OPEN"],
   "advancementGate": {
     "allThreeVisibleBlockersMustPass": true,
     "explicitUserVisualAcceptanceRequired": true,
     "requiredFunctionalValidationStatusBeforeDownstream": "VISIBLE_TRIO_USER_ACCEPTED_PASS",
     "polizasForbiddenWhileGateClosed": true,
-    "downstreamDomainsBlockedWhileGateClosed": [
-      "polizas",
-      "vehiculos",
-      "recibos_cartera",
-      "cobros",
-      "ops",
-      "leads",
-      "data_refresh"
-    ]
+    "downstreamDomainsBlockedWhileGateClosed": ["polizas","vehiculos","recibos_cartera","cobros","ops","leads","data_refresh"]
   },
   "antiReprocess": {
     "noReprocess": true,
@@ -40,12 +22,16 @@
     "dataRefreshForbiddenBeforeVisibleGatePass": true
   },
   "insurerCredentialReveal": {
-    "requiredDiagnosticPath": "secure_reference_to_provider_to_runtime_to_reveal",
+    "requiredDiagnosticPath": "authorized_record_or_secure_reference_to_runtime_reveal",
     "passwordHiddenByDefault": true,
     "temporaryAuthorizedRevealOnly": true,
+    "authorizedExistingRecordCredentialAllowed": true,
+    "directCredentialFields": ["password","pass","contrasena","clave"],
+    "providerFallbackPreserved": true,
     "copyAndOpenPortalAllowedOnlyThroughAuthorizedRuntimePath": true,
     "secretMaterialForbiddenInLogsEvidenceDocsAndChat": true,
-    "hardcodedCredentialsForbidden": true
+    "sourceHardcodedCredentialsForbidden": true,
+    "dataReimportForRevealForbidden": true
   },
   "cliente360": {
     "requiredDiagnosticPath": "served_asset_to_store_to_filters_to_rows_to_render",
