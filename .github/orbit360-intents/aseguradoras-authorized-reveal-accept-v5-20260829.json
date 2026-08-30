@@ -1,0 +1,28 @@
+{
+  "schemaVersion": "orbit360-execution-intent-v1",
+  "transitionId": "POST_GO_LIVE_PRODUCT_SUCCESSOR_ACCEPT_SOURCE_ONLY",
+  "canonicalBaseHead": "a6adcde304be47fd305ff7b51909e359328a0966",
+  "expectedLedgerRevision": 139,
+  "oneShotOnly": true,
+  "replayAllowed": false,
+  "explicitUserAuthorization": false,
+  "scope": {"runtime":false,"browser":false,"secrets":false,"firestoreRead":false,"deploy":false,"production":false,"firestoreWrites":false,"authWrites":false,"operationalWrites":false,"dataWrites":false,"main":false,"merge":false},
+  "stagedRunId": 33281823576,
+  "candidateHead": "619c58251eb5046097d0177e5312a1def41c1118",
+  "candidateBranch": "ays/orbit360-product-candidate-authorized-reveal-v4-20260829",
+  "baseHead": "0d85732473b172ae6a0ab219eade50284a021412",
+  "validationProfile": "ASEGURADORAS_AUTHORIZED_REVEAL_V2",
+  "diffDigest": "11e8ca82a4ef83f65a03c79a36528fcbf49266ad6057e94c1042e0b75c21faf5",
+  "stagedCandidateManifestSha256": "11e8ca82a4ef83f65a03c79a36528fcbf49266ad6057e94c1042e0b75c21faf5",
+  "targetBindings": [
+    {"path":"orbit360-platform/core/client-insurer-operational-directory-owner-v20260722.js","beforeGitBlobSha":"3165a788f23fda760482f4b9504bd5ba1b975a16","afterGitBlobSha":"9a3578a4297584274392030697a674585b53c5e0"},
+    {"path":"orbit360-platform/core/router-tenant-config-product-bootstrap-p0.js","beforeGitBlobSha":"902c85c83388ebf0a71bf0e7595faa61284872d7","afterGitBlobSha":"41c4a7c8ba46b243581f643bc057b780d03f4a00"}
+  ],
+  "successorPatch": {
+    "candidateId": "aseguradoras-authorized-reveal-v4-20260829",
+    "patchManifestPath": "orbit360-platform/docs/orbit360-successor-stage-manifest-aseguradoras-authorized-reveal-v4-20260829.json",
+    "patchManifestSha256": "5fdcf04f78df04e3977550d0cb0b38e5e99ad4c5ccab56a53e5cc7beddf310f0"
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
