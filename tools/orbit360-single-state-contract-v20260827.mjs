@@ -76,7 +76,7 @@ function collectIssues(root, R) {
     issues.push('LEGACY_ROUTING_NOT_FROZEN');
   }
   if (!fence.includes(ENGINE_FENCE) || !/process\.exit\(41\)/.test(fence) || /from ['"]node:child_process|require\(['"](?:node:)?child_process|spawnSync\(|execSync\(/i.test(fence)) {
-    issues.push('HISTORICAL_GATE_ENGINE_NOT_INERT');
+    issues.push('HISTORICAL_ENGINE_FENCE_NOT_INERT');
   }
 
   const bindings = Array.isArray(R.historicalBindings) ? R.historicalBindings : [];
