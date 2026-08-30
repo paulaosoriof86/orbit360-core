@@ -1,0 +1,29 @@
+{
+  "schemaVersion": "orbit360-execution-intent-v1",
+  "transitionId": "POST_GO_LIVE_PRODUCT_SUCCESSOR_STAGE_MECHANISM_ROOTFIX",
+  "expectedLedgerRevision": 153,
+  "canonicalBaseHead": "f6e52c1cfd06f54c67e5a4f9e69ba26afdd5496b",
+  "oneShotOnly": true,
+  "replayAllowed": false,
+  "failedStageRunId": 33291506841,
+  "gitCandidate": {
+    "candidateHead": "4d31bb025cb2a021749e40ab862162496e9a9c85",
+    "candidateBranch": "ays/product-visual-runtime-rootfix-v5-20260830",
+    "candidateBaseHead": "52a3ad607954f83069c4cc3e8352d13eda86fefb",
+    "validationProfile": "PRODUCT_VISUAL_RUNTIME_CHAIN_ROOTFIX_V1"
+  },
+  "scope": {
+    "runtime": false,
+    "browser": false,
+    "secrets": false,
+    "firestoreRead": false,
+    "deploy": false,
+    "production": false,
+    "firestoreWrites": false,
+    "authWrites": false,
+    "operationalWrites": false,
+    "dataWrites": false,
+    "main": false,
+    "merge": false
+  }
+}
