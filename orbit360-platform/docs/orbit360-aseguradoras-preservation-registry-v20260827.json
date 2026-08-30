@@ -1,6 +1,6 @@
 {
-  "schemaVersion": "orbit360-aseguradoras-preservation-registry-v2-static-owner-contract",
-  "updatedAtUtc": "2026-08-27T00:00:00Z",
+  "schemaVersion": "orbit360-aseguradoras-preservation-registry-v3-authorized-reveal",
+  "updatedAtUtc": "2026-08-29T00:00:00Z",
   "module": "Aseguradoras",
   "status": "STATIC_OWNER_CONTRACT",
   "stateBearing": false,
@@ -9,12 +9,15 @@
   "canonicalCertifiedSourceHead": "8c9668d6d423e82826b0295431ec699390d79b4b",
   "finalOperationalOwner": {
     "path": "orbit360-platform/core/client-insurer-operational-directory-owner-v20260722.js",
-    "version": "20260723.2",
+    "version": "20260829.1",
     "ownerId": "clientInsurerOperationalDirectoryOwner",
-    "bootstrap": "orbit360-platform/core/router-tenant-config-bootstrap.js",
+    "bootstrap": "orbit360-platform/core/router-tenant-config-product-bootstrap-p0.js",
     "semantics": {
       "portalUsernameOperationalVisible": true,
       "passwordSecretTemporaryReveal": true,
+      "credentialRecordFallbackForAuthorizedRoles": true,
+      "credentialProviderFallbackPreserved": true,
+      "directCredentialFields": ["password", "pass", "contrasena", "clave"],
       "bankNumberOperationalVisible": true,
       "bankRevealDependency": false,
       "bankCopyDirect": true,
@@ -29,31 +32,19 @@
     "mayBeFinalAuthority": false,
     "mustBeSupersededByFinalOperationalOwner": true
   },
-  "historicalValidator": {
-    "path": "orbit360-platform/tools/orbit360-aseguradoras-owner-contract-v20260717.js",
-    "status": "STALE_FOR_FINAL_20260723_OWNER",
-    "mayBeUsedAsSolePreservationGuard": false
-  },
   "domainPreservationValidator": {
     "path": "tools/orbit360-aseguradoras-operational-owner-preservation-v20260827.mjs",
     "role": "DOMAIN_SOURCE_ONLY_VALIDATOR",
-    "expectedOwnerVersion": "20260723.2",
+    "expectedOwnerVersion": "20260829.1",
     "globalControlPlaneDependency": false,
-    "capabilities": {
-      "secrets": false,
-      "firestoreRead": false,
-      "writes": false,
-      "runtime": false,
-      "browser": false,
-      "deploy": false,
-      "production": false
-    }
+    "capabilities": {"secrets":false,"firestoreRead":false,"writes":false,"runtime":false,"browser":false,"deploy":false,"production":false}
   },
+  "runtimeClosureRegistry": "orbit360-platform/docs/orbit360-approved-runtime-closure-registry-v20260829.json",
   "antiReprocess": {
     "reimportInsurersForDisplayAccessOwnerGateIssues": false,
     "rebuildDirectoryWithoutReproducibleRegression": false,
     "reopenHistoricalM1Gate": false,
-    "postGoLiveValidationMode": "DIFFERENTIAL_AGAINST_FINAL_OWNER_CONTRACT"
+    "postGoLiveValidationMode": "DIFFERENTIAL_AGAINST_FINAL_OWNER_AND_PACKAGE_CLOSURE"
   },
   "containsPII": false,
   "containsSecrets": false
