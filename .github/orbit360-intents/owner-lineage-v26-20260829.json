@@ -1,0 +1,29 @@
+{
+  "schemaVersion": "orbit360-execution-intent-v1",
+  "transitionId": "POST_GO_LIVE_RUNTIME_CAPABILITY_OWNER_LINEAGE_REVIEW_SOURCE_ONLY",
+  "canonicalBaseHead": "3fdd7807d48f231219d0ea074eaefded4c278d97",
+  "expectedLedgerRevision": 149,
+  "oneShotOnly": true,
+  "replayAllowed": false,
+  "explicitUserAuthorization": false,
+  "scope": {
+    "runtime": false,
+    "browser": false,
+    "secrets": false,
+    "firestoreRead": false,
+    "deploy": false,
+    "production": false,
+    "firestoreWrites": false,
+    "authWrites": false,
+    "operationalWrites": false,
+    "dataWrites": false,
+    "main": false,
+    "merge": false
+  },
+  "acceptanceRunId": 33284848913,
+  "candidateId": "aseguradoras-authorized-reveal-v4-20260829",
+  "candidateManifestSha256": "11e8ca82a4ef83f65a03c79a36528fcbf49266ad6057e94c1042e0b75c21faf5",
+  "patchManifestSha256": "35a1197735ab417171367f3c70be390846ce2c0622dfc791fe3358122ef2b2b8",
+  "containsPII": false,
+  "containsSecrets": false
+}
