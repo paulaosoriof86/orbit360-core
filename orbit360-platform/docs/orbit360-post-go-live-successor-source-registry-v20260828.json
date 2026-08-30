@@ -2,7 +2,7 @@
   "schemaVersion": "orbit360-post-go-live-successor-source-registry-v4-git-bound-overlay",
   "registryId": "ORBIT360-POST-GO-LIVE-SUCCESSOR-SOURCE",
   "contractRevision": 4,
-  "contentRevision": 6,
+  "contentRevision": 7,
   "status": "ACTIVE_SOURCE_ONLY_GIT_BOUND_EXPLICIT_BASELINE_ACCEPTANCE",
   "stateBearing": false,
   "dynamicStateForbidden": true,
@@ -43,11 +43,7 @@
     "orbit360-platform/sw.js",
     "functions/"
   ],
-  "forbiddenProductPrefixes": [
-    ".github/",
-    "tools/",
-    "orbit360-platform/docs/"
-  ],
+  "forbiddenProductPrefixes": [".github/", "tools/", "orbit360-platform/docs/"],
   "candidateContract": {
     "mustDescendFromStagedBaseHead": true,
     "stagedBaseMustEqualIntentCanonicalBaseHead": true,
@@ -64,9 +60,7 @@
   },
   "validationProfiles": {
     "ASEGURADORAS_CREDENTIALS_ROOTFIX_V1": {
-      "validators": [
-        "tools/orbit360-validar-aseguradoras-credentials-rootfix-v20260828.mjs"
-      ],
+      "validators": ["tools/orbit360-validar-aseguradoras-credentials-rootfix-v20260828.mjs"],
       "postApplyValidators": [
         "tools/orbit360-validar-aseguradoras-credentials-rootfix-v20260828.mjs",
         "tools/orbit360-validar-runtime-capability-composition-v20260828.mjs",
@@ -80,9 +74,7 @@
       "status": "SUPERSEDED_FOR_CURRENT_AUTHORIZED_REVEAL_DECISION"
     },
     "ASEGURADORAS_AUTHORIZED_REVEAL_V2": {
-      "validators": [
-        "tools/orbit360-validar-aseguradoras-authorized-reveal-v20260829.mjs"
-      ],
+      "validators": ["tools/orbit360-validar-aseguradoras-authorized-reveal-v20260829.mjs"],
       "postApplyValidators": [
         "tools/orbit360-validar-aseguradoras-authorized-reveal-v20260829.mjs",
         "tools/orbit360-aseguradoras-operational-owner-preservation-v20260827.mjs"
@@ -97,6 +89,25 @@
       "noFunctionsChangeRequired": true,
       "noReimport": true,
       "noDataMutation": true
+    },
+    "PRODUCT_VISUAL_RUNTIME_CHAIN_ROOTFIX_V1": {
+      "validators": ["tools/orbit360-validar-product-visual-runtime-chain-rootfix-v20260830.mjs"],
+      "postApplyValidators": [
+        "tools/orbit360-validar-product-visual-runtime-chain-rootfix-v20260830.mjs"
+      ],
+      "requiredChangedTargets": [
+        "orbit360-platform/core/router.js",
+        "orbit360-platform/core/pwa.js",
+        "orbit360-platform/sw.js",
+        "orbit360-platform/data/store-firestore-product-readonly-p0.js",
+        "orbit360-platform/core/product-hydration-required-optional-p0.js"
+      ],
+      "exactChangedTargets": true,
+      "decision": "PRODUCT_RUNTIME_VISUALIZATION_CHAIN_MUST_USE_REAL_PRODUCT_OWNERS_NONBLOCKING_PWA_NETWORK_FIRST_CONTRACTS_AND_SERVER_CONFIRMED_REQUIRED_HYDRATION",
+      "noReimport": true,
+      "noDataMutation": true,
+      "noRuntime": true,
+      "noDeploy": true
     }
   },
   "acceptanceContract": {
@@ -135,8 +146,8 @@
   "rootCause": {
     "classification": "PIPELINE_MECHANISM_FAILURE",
     "secondaryClassification": "VALIDATOR_STALE",
-    "code": "SUCCESSOR_PROFILE_STILL_REQUIRED_SUPERSEDED_PROVIDER_PATH_AFTER_AUTHORIZED_REVEAL_DECISION",
-    "resolvedBy": "GIT_BOUND_EXACT_OWNER_PLUS_PRODUCT_BOOTSTRAP_OVERLAY_WITH_AUTHORIZED_DIRECT_RECORD_READ_FALLBACK"
+    "code": "SOURCE_GATE_MODELED_LAB_ENTRYPOINT_WHILE_CERTIFIED_PRODUCT_RUNTIME_USED_PRODUCT_OWNERS_AND_PWA_CACHE_READINESS_COULD_DELAY_OR_RENDER_PREAUTHORITATIVE_STATE",
+    "resolvedBy": "CERTIFIED_PRODUCT_ENTRYPOINT_CONTRACT_PLUS_NONBLOCKING_PWA_PLUS_NETWORK_FIRST_RUNTIME_CONTRACTS_PLUS_SERVER_CONFIRMED_REQUIRED_HYDRATION"
   },
   "containsPII": false,
   "containsSecrets": false
