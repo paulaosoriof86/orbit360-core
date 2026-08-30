@@ -1,7 +1,7 @@
 {
-  "schemaVersion": "orbit360-continuity-writer-registry-v37-successor-stage-rootfix",
+  "schemaVersion": "orbit360-continuity-writer-registry-v38-post-go-live-overlay-release",
   "registryId": "ORBIT360-CONTINUITY-WRITER-REGISTRY",
-  "revision": 50,
+  "revision": 51,
   "active": true,
   "status": "SINGLE_STATE_LEDGER_ONLY_SEMANTIC_CONTROL_PLANE",
   "stateBearing": false,
@@ -849,6 +849,137 @@
         "deploy": false,
         "production": false
       }
+    },
+    "POST_GO_LIVE_OVERLAY_RELEASE_PREP_SOURCE_ONLY": {
+      "capabilityClass": "SOURCE_ONLY",
+      "stateMutation": "CLAIM_TERMINAL",
+      "handler": "tools/orbit360-post-go-live-overlay-release-prep-v20260830.mjs",
+      "handlerReady": true,
+      "requiresExplicitUserAuthorization": false,
+      "bindCandidate": false,
+      "requiredScope": {
+        "runtime": false,
+        "browser": false,
+        "secrets": false,
+        "firestoreRead": false,
+        "deploy": false,
+        "production": false,
+        "firestoreWrites": false,
+        "authWrites": false,
+        "operationalWrites": false,
+        "dataWrites": false,
+        "main": false,
+        "merge": false
+      },
+      "freezeProductDuringClaim": true,
+      "freezeDataDuringClaim": true,
+      "overlayReleasePrepContract": {
+        "contract": "orbit360-platform/docs/orbit360-post-go-live-overlay-release-contract-v20260830.json",
+        "operationalSemanticsAuthority": "tools/orbit360-operational-semantic-authority-v20260830.mjs",
+        "acceptedOverlayAuthority": "orbit360-platform/docs/orbit360-certified-product-preservation-registry-v20260827.json",
+        "entrypointAuthority": "orbit360-platform/docs/orbit360-certified-product-entrypoint-contract-v20260830.json",
+        "runtimeCapabilityAuthority": "orbit360-platform/docs/orbit360-runtime-capability-registry-v20260828.json",
+        "dynamicParityRequired": true,
+        "noReimport": true,
+        "noReprocess": true
+      },
+      "from": {
+        "phase": "PRODUCTION_SMOKE_PASS",
+        "status": "PRODUCTION_GO_LIVE_PASS",
+        "progress": 100,
+        "nextAction": "DIAGNOSE_POST_GO_LIVE_FUNCTIONAL_BLOCKERS"
+      },
+      "claimState": {
+        "phase": "POST_GO_LIVE_OVERLAY_RELEASE_PREP_RUNNING",
+        "status": "SOURCE_ONLY_CLAIMED",
+        "nextAction": "RUN_POST_GO_LIVE_OVERLAY_RELEASE_PREP_SOURCE_ONLY",
+        "firstIncompleteStep": "POST-GO-LIVE-OVERLAY-RELEASE-PREP",
+        "laneB": "POST_GO_LIVE_OVERLAY_RELEASE_PREP_RUNNING"
+      },
+      "terminalPassState": {
+        "phase": "PRODUCTION_SMOKE_PASS",
+        "status": "PRODUCTION_GO_LIVE_PASS",
+        "progress": 100,
+        "nextAction": "AWAIT_EXPLICIT_POST_GO_LIVE_OVERLAY_RELEASE_AUTHORIZATION",
+        "firstIncompleteStep": "POST-GO-LIVE-OVERLAY-RELEASE-AUTHORIZATION",
+        "laneB": "POST_GO_LIVE_OVERLAY_RELEASE_PREP_PASS_AWAITING_AUTHORIZATION",
+        "userActionRequired": true,
+        "freshAuthorizationRequired": true,
+        "newRuntimeRequestAllowed": true
+      },
+      "terminalFailState": {
+        "phase": "PRODUCTION_SMOKE_PASS",
+        "status": "PRODUCTION_GO_LIVE_PASS",
+        "progress": 100,
+        "nextAction": "DIAGNOSE_POST_GO_LIVE_OVERLAY_RELEASE_PREP_STOP_RETRY",
+        "firstIncompleteStep": "POST-GO-LIVE-OVERLAY-RELEASE-PREP-ROOT-CAUSE",
+        "laneB": "POST_GO_LIVE_OVERLAY_RELEASE_PREP_STOP_RETRY",
+        "userActionRequired": false
+      }
+    },
+    "POST_GO_LIVE_OVERLAY_RELEASE_WINDOW": {
+      "capabilityClass": "RELEASE",
+      "stateMutation": "CLAIM_TERMINAL",
+      "handler": "tools/orbit360-post-go-live-overlay-release-v20260830.mjs",
+      "handlerReady": true,
+      "requiresExplicitUserAuthorization": true,
+      "bindCandidate": false,
+      "requiredScope": {
+        "runtime": true,
+        "browser": true,
+        "secrets": true,
+        "firestoreRead": true,
+        "deploy": true,
+        "production": true,
+        "firestoreWrites": false,
+        "authWrites": false,
+        "operationalWrites": false,
+        "dataWrites": false,
+        "main": false,
+        "merge": false
+      },
+      "overlayReleaseContract": {
+        "contract": "orbit360-platform/docs/orbit360-post-go-live-overlay-release-contract-v20260830.json",
+        "composeHistoricalArtifactPlusCurrentActiveOverlay": true,
+        "delegateCertifiedReleaseExecutor": "tools/orbit360-go-live-release-handler-v20260826.mjs",
+        "hostingOnlyDeploy": true,
+        "rulesDeploy": false,
+        "fullRemoteRehash": true,
+        "rollbackBeforeRisk": true,
+        "credentialRevealProofRequired": true,
+        "userVisualAcceptanceStillRequired": true
+      },
+      "from": {
+        "phase": "PRODUCTION_SMOKE_PASS",
+        "status": "PRODUCTION_GO_LIVE_PASS",
+        "progress": 100,
+        "nextAction": "AWAIT_EXPLICIT_POST_GO_LIVE_OVERLAY_RELEASE_AUTHORIZATION"
+      },
+      "claimState": {
+        "phase": "POST_GO_LIVE_OVERLAY_RELEASE_RUNNING",
+        "status": "AUTHORIZED_RELEASE_CLAIMED",
+        "nextAction": "RUN_POST_GO_LIVE_OVERLAY_RELEASE_WINDOW",
+        "firstIncompleteStep": "POST-GO-LIVE-OVERLAY-RELEASE",
+        "laneB": "POST_GO_LIVE_OVERLAY_RELEASE_RUNNING"
+      },
+      "terminalPassState": {
+        "phase": "PRODUCTION_SMOKE_PASS",
+        "status": "PRODUCTION_GO_LIVE_PASS",
+        "progress": 100,
+        "nextAction": "AWAIT_USER_VISUAL_ACCEPTANCE_VISIBLE_TRIO",
+        "firstIncompleteStep": "USER-VISUAL-ACCEPTANCE-VISIBLE-TRIO",
+        "laneB": "POST_GO_LIVE_OVERLAY_RELEASE_PASS_USER_VISUAL_ACCEPTANCE_REQUIRED",
+        "userActionRequired": true
+      },
+      "terminalFailState": {
+        "phase": "PRODUCTION_SMOKE_PASS",
+        "status": "PRODUCTION_GO_LIVE_PASS",
+        "progress": 100,
+        "nextAction": "DIAGNOSE_POST_GO_LIVE_OVERLAY_RELEASE_ROOT_CAUSE_AND_VERIFY_ROLLBACK",
+        "firstIncompleteStep": "POST-GO-LIVE-OVERLAY-RELEASE-ROOT-CAUSE",
+        "laneB": "POST_GO_LIVE_OVERLAY_RELEASE_STOP_RETRY",
+        "userActionRequired": false
+      }
     }
   },
   "policies": {
@@ -900,7 +1031,15 @@
     "postGoLiveSuccessorAcceptancePromotesExplicitOverlay": true,
     "productSourceMutationRequiresGitBoundAcceptance": true,
     "runtimeCapabilitySourcePassCannotCloseVisibleDefect": true,
-    "canonicalWorkflowCompatibilityAliasPreserved": true
+    "canonicalWorkflowCompatibilityAliasPreserved": true,
+    "postGoLiveOperationalDiagnosticsMustMatchSemanticAuthority": true,
+    "postGoLiveAcceptedOverlayReleaseMustUseRegisteredTransition": true,
+    "postGoLiveOverlayReleaseMustComposeCurrentActiveOverlay": true,
+    "postGoLiveOverlayReleaseMustDelegateCertifiedReleaseExecutor": true,
+    "postGoLiveOverlayReleaseRequiresExplicitAuthorization": true,
+    "postGoLiveOverlayReleaseRemoteRehashRequired": true,
+    "postGoLiveOverlayReleaseCredentialRevealProofRequired": true,
+    "postGoLiveOverlayReleaseCannotAutoCloseVisibleDefects": true
   },
   "containsPII": false,
   "containsSecrets": false

@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "orbit360-post-go-live-overlay-release-contract-v1-dynamic-authorities",
+  "contractId": "ORBIT360-POST-GO-LIVE-OVERLAY-RELEASE",
+  "createdAt": "2026-08-30",
+  "status": "ACTIVE_FAIL_CLOSED_DYNAMIC_AUTHORITY_COMPOSITION",
+  "stateBearing": false,
+  "dynamicStateForbidden": true,
+  "authorities": {
+    "operationalState": "orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json",
+    "operationalSemantics": "tools/orbit360-operational-semantic-authority-v20260830.mjs",
+    "acceptedOverlay": "orbit360-platform/docs/orbit360-certified-product-preservation-registry-v20260827.json",
+    "productEntrypoint": "orbit360-platform/docs/orbit360-certified-product-entrypoint-contract-v20260830.json",
+    "visiblePriority": "orbit360-platform/docs/orbit360-post-go-live-visible-priority-lock-v20260827.json",
+    "runtimeCapabilities": "orbit360-platform/docs/orbit360-runtime-capability-registry-v20260828.json",
+    "releaseExecutor": "tools/orbit360-go-live-release-handler-v20260826.mjs",
+    "browserEvidenceBinder": "tools/orbit360-bind-f2-browser-evidence-run-v20260824.mjs"
+  },
+  "baseline": {
+    "artifactId": 9504702901,
+    "sourceHead": "8c9668d6d423e82826b0295431ec699390d79b4b",
+    "manifestSha256": "b1c98c1faf644b5d83cfe6e6bb1a602927c438cd85b7855cb0b1a6b98c08053c",
+    "zipSha256": "4a3660a18229a923412aa5a1bffc0817b1d5666c83ba96c81c92cea0fce9491c",
+    "fileCount": 194
+  },
+  "rules": {
+    "dynamicValuesReadAtExecution": true,
+    "duplicatedOverlayListForbidden": true,
+    "duplicatedDiagnosticPathsForbidden": true,
+    "historicalArtifactPlusCurrentActiveOverlayRequired": true,
+    "allAcceptedOverlayFilesAppliedExactlyOnce": true,
+    "overlayPathMustExistInHistoricalPackage": true,
+    "overlayBlobMustMatchAcceptedAfterGitBlobSha": true,
+    "physicalEntrypointDirectAssetParityRequired": true,
+    "composedManifestRegeneratedAfterOverlay": true,
+    "hostingOnlyDeploy": true,
+    "rulesDeployForbidden": true,
+    "firestoreWritesForbidden": true,
+    "authWritesForbidden": true,
+    "operationalWritesForbidden": true,
+    "dataWritesForbidden": true,
+    "rollbackAnchorRequiredBeforeDeploy": true,
+    "remotePublicRehashRequired": true,
+    "browserCurrentRunCausalEvidenceRequired": true,
+    "cliente360NonzeroRowsWhenStoreNonzeroRequired": true,
+    "insurerAuthorizedTemporaryRevealProofRequired": true,
+    "revealedSecretValueForbiddenInEvidence": true,
+    "humanPasswordProofSeparateFromCustomTokenProof": true,
+    "sourcePassCannotCloseVisibleDefect": true,
+    "userVisualAcceptanceStillRequired": true
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
