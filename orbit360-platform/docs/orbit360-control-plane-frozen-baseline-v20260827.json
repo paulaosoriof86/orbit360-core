@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "orbit360-control-plane-frozen-baseline-v21-semantic-single-state-static-identities",
+  "schemaVersion": "orbit360-control-plane-frozen-baseline-v22-semantic-single-state-static-identities",
   "status": "STATIC_SOURCE_IDENTITY_BASELINE",
   "stateBearing": false,
   "dynamicStateForbidden": true,
@@ -20,12 +20,12 @@
     "orbit360-platform/docs/orbit360-aseguradoras-preservation-registry-v20260827.json": "2110be8931121ad33212868563650ccca6b9c1f3",
     "orbit360-platform/docs/orbit360-runtime-capability-registry-v20260828.json": "b081d16a9a05884b7057d0d87bc6e59ebc6b095d",
     "orbit360-platform/docs/orbit360-approved-runtime-closure-registry-v20260829.json": "4a028b89a1b7d3f0f1c71bb7adf53067c47e6990",
-    "tools/orbit360-validar-runtime-capability-composition-v20260828.mjs": "bbedda6f0a8e7bc6db55b2bb8448794a6f5d4cc0",
+    "tools/orbit360-validar-runtime-capability-composition-v20260828.mjs": "3d40159848d996c5f12e94a95f07b77470a15ea7",
     "orbit360-platform/docs/orbit360-post-go-live-successor-source-registry-v20260828.json": "4ec454d8038ec4c4675fd43cc8e08afe58b6d42d",
     "tools/orbit360-post-go-live-successor-source-stage-v20260828.mjs": "0c25669ba9022ef803ea1787212214f358a6244a",
     "tools/orbit360-post-go-live-successor-source-accept-v20260828.mjs": "8bb3cacdd91b209f6a443c296458351e3339659e",
     "tools/orbit360-post-go-live-runtime-capability-composition-validate-v20260828.mjs": "cf9cb90880997e650923085e80b5c17b03635b7b",
-    "tools/orbit360-runtime-capability-validator-stale-rootfix-v20260828.mjs": "69805277e922b55a7089cc1da0e02fef93bdca2e",
+    "tools/orbit360-runtime-capability-validator-stale-rootfix-v20260828.mjs": "40c7df632ffb5e0aa03e92483377a3c14f8e1232",
     "orbit360-platform/docs/orbit360-control-plane-canonicality-contract-v20260822.json": "47563b433ce0cfb947beae7f4584a98e48667bdf",
     "orbit360-platform/docs/orbit360-control-plane-semantic-contract-v20260824.json": "14113c685c6ced0c4726f02599591c84f3b415bf",
     "tools/orbit360-semantic-single-state-rootfix-handler-v20260827.mjs": "c3232052193fc0d9176f6952a219f4a4b53eb9aa",
@@ -102,7 +102,10 @@
     "transactionalProductOverlayRegistryExcludedFromStaticBlobFreeze": true,
     "runtimeCompositionHandlerConsumesApprovedPackageClosureStatus": true,
     "cliente360CompositionValidatorUsesSemanticStoreWrapperAssertions": true,
-    "runtimeCompositionDependencyFailuresPreserveChildCode": true
+    "cliente360RouterAndHydrationAssertionsUseCurrentSemantics": true,
+    "runtimeCompositionDependencyFailuresPreserveChildCode": true,
+    "d3RootfixDerivesCurrentFailureAndAcceptanceFromLedger": true,
+    "d3RootfixHistoricalRunIdsForbidden": true
   },
   "sealPolicy": {
     "passOrFailIsRecordedInLedgerTerminalEvidence": true,
