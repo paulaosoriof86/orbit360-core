@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "orbit360-successor-stage-compatibility-manifest-v1",
+  "createdAt": "2026-08-29",
+  "transition": "POST_GO_LIVE_PRODUCT_SUCCESSOR_SOURCE_STAGE",
+  "stagedRunId": 33281823576,
+  "candidateHead": "619c58251eb5046097d0177e5312a1def41c1118",
+  "candidateBranch": "ays/orbit360-product-candidate-authorized-reveal-v4-20260829",
+  "baseHead": "0d85732473b172ae6a0ab219eade50284a021412",
+  "validationProfile": "ASEGURADORAS_AUTHORIZED_REVEAL_V2",
+  "diffDigest": "11e8ca82a4ef83f65a03c79a36528fcbf49266ad6057e94c1042e0b75c21faf5",
+  "targets": [
+    {"path":"orbit360-platform/core/client-insurer-operational-directory-owner-v20260722.js","beforeGitBlobSha":"3165a788f23fda760482f4b9504bd5ba1b975a16","afterGitBlobSha":"9a3578a4297584274392030697a674585b53c5e0"},
+    {"path":"orbit360-platform/core/router-tenant-config-product-bootstrap-p0.js","beforeGitBlobSha":"902c85c83388ebf0a71bf0e7595faa61284872d7","afterGitBlobSha":"41c4a7c8ba46b243581f643bc057b780d03f4a00"}
+  ],
+  "scope": {"sourceOnly":true,"secretAccess":false,"firestoreRead":false,"dataWrites":false,"deploy":false,"production":false},
+  "containsPII": false,
+  "containsSecrets": false
+}
