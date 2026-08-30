@@ -1,10 +1,10 @@
 /* Orbit 360 · Service Worker — red primero con fallback offline y CSS esencial.
    El shell nunca debe quedar sin estilos por caché incompleta o respuesta MIME inválida. */
-var CACHE = 'orbit360-v20260729-11-multirol-owner';
-var BUILD = '20260723-10';
-var CRITICAL_RELEASE = 'block1-critical-runtime-20260723-10';
+var CACHE = 'orbit360-v20260830-visual-runtime-rootfix-1';
+var BUILD = '20260830-visual-runtime-rootfix-1';
+var CRITICAL_RELEASE = 'post-go-live-visual-runtime-rootfix-20260830-1';
 var RUNTIME_CONTRACT_TIMEOUT_MS = 8000;
-var RUNTIME_CONTRACT_CACHE_STRATEGY = 'cache-first-bounded-revalidate';
+var RUNTIME_CONTRACT_CACHE_STRATEGY = 'network-first-bounded-fallback';
 var RUNTIME_CONTRACT_PATHS = [
   '/core/session-multirol-visibility-v20260716.js',
   '/core/client-canonical-view-projection-v20260716.js',
@@ -20,13 +20,19 @@ var ESSENTIAL_STYLE_PATHS = [
   '/styles/client-insurer-edit-mode-v20260722.css'
 ];
 var CRITICAL_RUNTIME_PATHS = [
-  '/core/router-tenant-config-bootstrap.js',
+  '/core/router-tenant-config-product-bootstrap-p0.js',
+  '/core/product-app-p0.js',
+  '/core/auth-product-runtime-p0.js',
+  '/core/backend-product-readonly-bootstrap-p0.js',
+  '/core/product-hydration-required-optional-p0.js',
+  '/data/store-firestore-product-readonly-p0.js',
   '/core/client-insurer-visual-stability-barrier-v20260721.js',
   '/core/client-insurer-visual-contract-v20260720.js',
   '/core/client-insurer-edit-owner-v20260722.js',
   '/core/client-insurer-operational-directory-owner-v20260722.js',
   '/core/pwa.js',
   '/modules/aseguradoras.js',
+  '/modules/cliente360.js',
   '/modules/ia.js'
 ].concat(ESSENTIAL_STYLE_PATHS);
 
@@ -110,20 +116,16 @@ self.addEventListener('fetch', function (event) {
   if (isRuntimeContract(originalUrl.pathname)) {
     var key = canonicalRequest(originalUrl.pathname);
     var cachePromise = caches.open(CACHE);
-    var refreshPromise = cachePromise.then(function (cache) {
+    var networkPromise = cachePromise.then(function (cache) {
       return fetchWithTimeout(event.request, RUNTIME_CONTRACT_TIMEOUT_MS).then(function (response) {
         return cacheResponse(cache, key, originalUrl.pathname, response);
       });
     });
-    event.waitUntil(refreshPromise.catch(function () { return null; }));
     event.respondWith(
-      cachePromise.then(function (cache) { return cache.match(key); }).then(function (hit) {
-        if (hit) return hit;
-        return refreshPromise.catch(function (error) {
-          return cachePromise.then(function (cache) { return canonicalFallback(cache, originalUrl.pathname, event.request); }).then(function (fallback) {
-            if (fallback) return fallback;
-            throw error;
-          });
+      networkPromise.catch(function (error) {
+        return cachePromise.then(function (cache) { return canonicalFallback(cache, originalUrl.pathname, event.request); }).then(function (fallback) {
+          if (fallback) return fallback;
+          throw error;
         });
       })
     );
@@ -133,7 +135,7 @@ self.addEventListener('fetch', function (event) {
   event.respondWith(
     caches.open(CACHE).then(function (cache) {
       var request = event.request;
-      if (isCriticalRuntime(originalUrl.pathname) || /\/core\/auth\.js$/i.test(originalUrl.pathname)) {
+      if (isCriticalRuntime(originalUrl.pathname) || /\/core\/auth(?:-product-runtime-p0)?\.js$/i.test(originalUrl.pathname)) {
         request = releaseRequest(event.request, originalUrl);
       }
       return fetch(request, { cache: 'no-store' }).then(function (response) {
