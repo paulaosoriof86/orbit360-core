@@ -2,7 +2,7 @@
   "schemaVersion": "orbit360-post-go-live-successor-source-registry-v4-git-bound-overlay",
   "registryId": "ORBIT360-POST-GO-LIVE-SUCCESSOR-SOURCE",
   "contractRevision": 4,
-  "contentRevision": 7,
+  "contentRevision": 8,
   "status": "ACTIVE_SOURCE_ONLY_GIT_BOUND_EXPLICIT_BASELINE_ACCEPTANCE",
   "stateBearing": false,
   "dynamicStateForbidden": true,
@@ -148,6 +148,28 @@
     "secondaryClassification": "VALIDATOR_STALE",
     "code": "SOURCE_GATE_MODELED_LAB_ENTRYPOINT_WHILE_CERTIFIED_PRODUCT_RUNTIME_USED_PRODUCT_OWNERS_AND_PWA_CACHE_READINESS_COULD_DELAY_OR_RENDER_PREAUTHORITATIVE_STATE",
     "resolvedBy": "CERTIFIED_PRODUCT_ENTRYPOINT_CONTRACT_PLUS_NONBLOCKING_PWA_PLUS_NETWORK_FIRST_RUNTIME_CONTRACTS_PLUS_SERVER_CONFIRMED_REQUIRED_HYDRATION"
+  },
+  "latestStageValidatorStale": {
+    "runId": 33291506841,
+    "classification": "VALIDATOR_STALE",
+    "secondaryClassification": "PIPELINE_MECHANISM_FAILURE",
+    "failedProfile": "PRODUCT_VISUAL_RUNTIME_CHAIN_ROOTFIX_V1",
+    "productCandidateHead": "a0fa9346f2b74b902ea637087db1848d3d48e69e",
+    "productCandidateMutated": false,
+    "cause": "CERTIFIED_PRODUCT_ENTRYPOINT_DIRECT_ASSET_ARRAY_TRUNCATED_TO_26_WHILE_PHYSICAL_CERTIFIED_INDEX_CONTAINED_115_DIRECT_JS_CSS_ASSETS",
+    "physicalEvidence": {
+      "artifactId": 9504702901,
+      "indexSha256": "125b24a3fc215a368a7183a107cd55eb5a6332fc8a7f8354ed94e3169340ec4e",
+      "physicalDirectAssetCount": 115,
+      "secureResourceFieldsDirect": true
+    },
+    "rootfix": {
+      "completeDirectAssetInventoryRequired": true,
+      "directAssetCountParityMachineEnforced": true,
+      "stageChildValidatorClassificationStatusCodePreserved": true,
+      "failedRunReplayForbidden": true,
+      "newStageForbiddenUntilControlPlaneSelftestPass": true
+    }
   },
   "containsPII": false,
   "containsSecrets": false
