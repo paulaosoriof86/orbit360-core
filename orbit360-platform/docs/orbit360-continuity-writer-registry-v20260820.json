@@ -1,7 +1,7 @@
 {
-  "schemaVersion": "orbit360-continuity-writer-registry-v36-explicit-product-overlay",
+  "schemaVersion": "orbit360-continuity-writer-registry-v37-successor-stage-rootfix",
   "registryId": "ORBIT360-CONTINUITY-WRITER-REGISTRY",
-  "revision": 49,
+  "revision": 50,
   "active": true,
   "status": "SINGLE_STATE_LEDGER_ONLY_SEMANTIC_CONTROL_PLANE",
   "stateBearing": false,
@@ -455,6 +455,75 @@
         "userActionRequired": false
       }
     },
+    "POST_GO_LIVE_PRODUCT_SUCCESSOR_STAGE_MECHANISM_ROOTFIX": {
+      "capabilityClass": "SOURCE_ONLY",
+      "stateMutation": "CLAIM_TERMINAL",
+      "handler": "tools/orbit360-successor-stage-mechanism-rootfix-v20260830.mjs",
+      "handlerReady": true,
+      "requiresExplicitUserAuthorization": false,
+      "bindCandidate": false,
+      "requiredScope": {
+        "runtime": false,
+        "browser": false,
+        "secrets": false,
+        "firestoreRead": false,
+        "deploy": false,
+        "production": false,
+        "firestoreWrites": false,
+        "authWrites": false,
+        "operationalWrites": false,
+        "dataWrites": false,
+        "main": false,
+        "merge": false
+      },
+      "freezeProductDuringClaim": true,
+      "freezeDataDuringClaim": true,
+      "rootCauseContract": {
+        "failedTransition": "POST_GO_LIVE_PRODUCT_SUCCESSOR_SOURCE_STAGE",
+        "failureClass": "PIPELINE_MECHANISM_FAILURE",
+        "rootCauseClassification": "VALIDATOR_STALE",
+        "entrypointDirectAssetParityRequired": true,
+        "expectedDirectAssetCount": 115,
+        "secureResourceFieldsDirectRequired": true,
+        "validatorChildCausalDetailRequired": true,
+        "candidateRevalidationWithFixedMechanismRequired": true,
+        "retryFailedRunForbidden": true,
+        "newStageAllowedOnlyAfterRootfixPass": true,
+        "freshCandidateOnCurrentCanonicalHeadRequiredAfterPass": true,
+        "sourceOnly": true
+      },
+      "from": {
+        "phase": "PRODUCTION_SMOKE_PASS",
+        "status": "PRODUCTION_GO_LIVE_PASS",
+        "progress": 100,
+        "nextAction": "DIAGNOSE_POST_GO_LIVE_SUCCESSOR_STAGE_MECHANISM_ROOT_CAUSE_STOP_RETRY"
+      },
+      "claimState": {
+        "phase": "POST_GO_LIVE_PRODUCT_SUCCESSOR_STAGE_MECHANISM_ROOTFIX_RUNNING",
+        "status": "SOURCE_ONLY_CLAIMED",
+        "nextAction": "RUN_POST_GO_LIVE_PRODUCT_SUCCESSOR_STAGE_MECHANISM_ROOTFIX",
+        "firstIncompleteStep": "POST-GO-LIVE-SUCCESSOR-STAGE-MECHANISM-ROOTFIX",
+        "laneB": "PRODUCT_SUCCESSOR_STAGE_MECHANISM_ROOTFIX_RUNNING"
+      },
+      "terminalPassState": {
+        "phase": "PRODUCTION_SMOKE_PASS",
+        "status": "PRODUCTION_GO_LIVE_PASS",
+        "progress": 100,
+        "nextAction": "DIAGNOSE_POST_GO_LIVE_FUNCTIONAL_BLOCKERS",
+        "firstIncompleteStep": "POST-GO-LIVE-FUNCTIONAL-BLOCKERS",
+        "laneB": "PRODUCT_SUCCESSOR_STAGE_MECHANISM_ROOTFIX_PASS_NEW_STAGE_REQUIRED",
+        "userActionRequired": false
+      },
+      "terminalFailState": {
+        "phase": "PRODUCTION_SMOKE_PASS",
+        "status": "PRODUCTION_GO_LIVE_PASS",
+        "progress": 100,
+        "nextAction": "DIAGNOSE_POST_GO_LIVE_SUCCESSOR_STAGE_MECHANISM_ROOT_CAUSE_STOP_RETRY",
+        "firstIncompleteStep": "POST-GO-LIVE-SUCCESSOR-STAGE-MECHANISM-ROOT-CAUSE",
+        "laneB": "PRODUCT_SUCCESSOR_STAGE_MECHANISM_ROOTFIX_STOP_RETRY",
+        "userActionRequired": false
+      }
+    },
     "POST_GO_LIVE_PRODUCT_SUCCESSOR_ACCEPT_SOURCE_ONLY": {
       "capabilityClass": "SOURCE_ONLY",
       "stateMutation": "CLAIM_TERMINAL",
@@ -697,10 +766,10 @@
         "acceptanceBindingRequired": true,
         "runtimeCapabilityRegistry": "orbit360-platform/docs/orbit360-runtime-capability-registry-v20260828.json",
         "aseguradorasFinalOwner": "core/client-insurer-operational-directory-owner-v20260722.js",
-        "aseguradorasFinalOwnerVersion": "20260723.2",
+        "aseguradorasFinalOwnerVersion": "20260829.1",
         "p09SupportIndirectLabOnly": true,
         "cliente360LastApprovedSourceRequired": true,
-        "loginInteractiveOwner": "core/auth.js",
+        "loginInteractiveOwner": "core/auth-product-runtime-p0.js",
         "sessionRoleOwnerComplementary": true,
         "visibleBlockersRemainOpen": true,
         "sourceOnly": true,
@@ -813,6 +882,9 @@
     "postGoLiveSuccessorAcceptanceMustBeSeparate": true,
     "postGoLiveSuccessorAcceptanceExactSurfaceFailClosed": true,
     "postGoLiveSuccessorAcceptanceMustBindLatestStagePass": true,
+    "successorStageMechanismRootfixRequiredBeforeRetry": true,
+    "failedSuccessorStageRunsReplayForbidden": true,
+    "successorStageRootfixMustRevalidateCandidateWithFixedMechanism": true,
     "acceptedRuntimeCapabilityCompositionValidationMustUseRegisteredSourceOnlyTransition": true,
     "runtimeCapabilityCompositionValidatorStaleRootfixRequiredBeforeRetry": true,
     "sameFailedD3RunReplayForbidden": true,
