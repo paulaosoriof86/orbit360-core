@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "orbit360-control-plane-frozen-baseline-v17-semantic-single-state-static-identities",
+  "schemaVersion": "orbit360-control-plane-frozen-baseline-v18-semantic-single-state-static-identities",
   "status": "STATIC_SOURCE_IDENTITY_BASELINE",
   "stateBearing": false,
   "dynamicStateForbidden": true,
@@ -10,15 +10,18 @@
   "sourceIdentities": {
     ".github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml": "eb0515fbff91cffb4ceef5cc386f7ed8212522a3",
     "tools/orbit360-single-state-ledger-owner-v20260827.mjs": "e4294e00831396a9933649415beaf63f28c1d66e",
-    "tools/orbit360-single-state-invariant-v20260827.mjs": "8614a3b167636381caff3314e53246f8af4c4004",
+    "tools/orbit360-single-state-invariant-v20260827.mjs": "385baa646ac10839d857da610f97b5eef6af5630",
     "tools/orbit360-single-state-contract-v20260827.mjs": "b55610f7b2a08130cf56ec27f039513257afddfc",
     "orbit360-platform/docs/orbit360-continuity-writer-registry-v20260820.json": "ddb3c5ff26150e0b2a7a03df54588d6750b9fffd",
-    "orbit360-platform/docs/orbit360-post-go-live-visible-priority-lock-v20260827.json": "4fbc4934fb526f92ecc87cf771b22644c92c0415",
+    "orbit360-platform/docs/orbit360-post-go-live-visible-priority-lock-v20260827.json": "310caea8f4e362a559e4d734e25343616d83195c",
     "tools/orbit360-gate-contract-registry-v20260717.json": "2a5eb2443adf1ce74ae1cc189cf85489b027f35c",
     "tools/orbit360-validar-gate-contracts-v20260717.mjs": "885b9d33e02bb95c886f607049a2cc73a73065e5",
     "tools/orbit360-certified-product-preservation-v20260827.mjs": "b08a1a62e2d369f00971297182da0002fdae5b6d",
     "orbit360-platform/docs/orbit360-certified-product-preservation-registry-v20260827.json": "bc9214e46cbc22a1220ecf997e79710d12d9f870",
-    "orbit360-platform/docs/orbit360-aseguradoras-preservation-registry-v20260827.json": "e18e3d7d4abb8e9a04e5ceb6e6c647c1337b5118",
+    "orbit360-platform/docs/orbit360-aseguradoras-preservation-registry-v20260827.json": "2110be8931121ad33212868563650ccca6b9c1f3",
+    "orbit360-platform/docs/orbit360-runtime-capability-registry-v20260828.json": "b081d16a9a05884b7057d0d87bc6e59ebc6b095d",
+    "orbit360-platform/docs/orbit360-approved-runtime-closure-registry-v20260829.json": "4a028b89a1b7d3f0f1c71bb7adf53067c47e6990",
+    "tools/orbit360-validar-runtime-capability-composition-v20260828.mjs": "f6c32994589315948d5d03b004a04dcba261d77d",
     "orbit360-platform/docs/orbit360-post-go-live-successor-source-registry-v20260828.json": "4ec454d8038ec4c4675fd43cc8e08afe58b6d42d",
     "tools/orbit360-post-go-live-successor-source-stage-v20260828.mjs": "0c25669ba9022ef803ea1787212214f358a6244a",
     "tools/orbit360-post-go-live-successor-source-accept-v20260828.mjs": "8bb3cacdd91b209f6a443c296458351e3339659e",
@@ -92,7 +95,11 @@
     "runtimeCapabilitySourcePassCannotCloseVisibleDefect": true,
     "canonicalWorkflowCompatibilityAliasPreserved": true,
     "successorContractRevisionSeparatedFromContentRevision": true,
-    "authorizedRevealValidatorSourceIdentityFrozen": true
+    "authorizedRevealValidatorSourceIdentityFrozen": true,
+    "authorizedRevealVisibleLockAndInvariantAtomic": true,
+    "approvedRuntimePackageClosureRegistryFrozen": true,
+    "approvedRuntimePackageClosureValidatorFrozen": true,
+    "runtimeCapabilityRegistryFrozenWithClosureContract": true
   },
   "sealPolicy": {
     "passOrFailIsRecordedInLedgerTerminalEvidence": true,
