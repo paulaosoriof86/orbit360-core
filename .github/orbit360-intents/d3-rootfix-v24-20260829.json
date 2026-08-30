@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "orbit360-execution-intent-v1",
+  "transitionId": "POST_GO_LIVE_RUNTIME_CAPABILITY_COMPOSITION_VALIDATOR_STALE_ROOTFIX",
+  "canonicalBaseHead": "cd9cd0466d1e7778bbf7005b9427266385318314",
+  "expectedLedgerRevision": 145,
+  "oneShotOnly": true,
+  "replayAllowed": false,
+  "explicitUserAuthorization": false,
+  "scope": {
+    "runtime": false,
+    "browser": false,
+    "secrets": false,
+    "firestoreRead": false,
+    "deploy": false,
+    "production": false,
+    "firestoreWrites": false,
+    "authWrites": false,
+    "operationalWrites": false,
+    "dataWrites": false,
+    "main": false,
+    "merge": false
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
