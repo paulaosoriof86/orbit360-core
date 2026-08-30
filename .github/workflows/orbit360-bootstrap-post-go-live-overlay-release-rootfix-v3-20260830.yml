@@ -1,0 +1,111 @@
+name: Orbit360 Bootstrap Post-Go-Live Overlay Release Rootfix V3
+on:
+  push:
+    branches:
+      - 'ays/orbit360-bootstrap-overlay-release-rootfix-v3-*'
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: orbit360-bootstrap-overlay-release-rootfix-v3
+  cancel-in-progress: false
+env:
+  CANONICAL_BRANCH: ays/backend-tenant-lab-v99-20260703
+jobs:
+  rootfix:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Bind bootstrap to exact live canonical parent
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp tools/orbit360-bootstrap-post-go-live-overlay-release-rootfix-v3-20260830.mjs "$RUNNER_TEMP/rootfix.mjs"
+          python - "$RUNNER_TEMP/rootfix.mjs" <<'PY'
+          import pathlib, sys
+          p=pathlib.Path(sys.argv[1]); s=p.read_text()
+          s=s.replace('orbit360-control-plane-frozen-baseline-v29-post-go-live-overlay-release','orbit360-control-plane-frozen-baseline-v29-semantic-single-state-static-identities')
+          old="git(['status','--porcelain'])"
+          new="execFileSync('git',['status','--porcelain'],{cwd:ROOT,encoding:'utf8'}).trimEnd()"
+          if old not in s: raise SystemExit('STATUS_PARSER_ANCHOR_MISSING')
+          s=s.replace(old,new,1)
+          p.write_text(s)
+          PY
+          BASE="$(git rev-parse HEAD^)"
+          git fetch --no-tags origin "$CANONICAL_BRANCH"
+          LIVE="$(git rev-parse FETCH_HEAD)"
+          test "$BASE" = "$LIVE"
+          echo "BASE=$BASE" >> "$GITHUB_ENV"
+          git checkout --force -B orbit360-rootfix "$LIVE"
+      - name: Apply and validate static mechanism rootfix
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ORBIT360_RELEASE_HANDLER_SELFTEST_OUT: ${{ runner.temp }}/release-selftest.json
+        shell: bash
+        run: |
+          set -euo pipefail
+          node "$RUNNER_TEMP/rootfix.mjs" | tee "$RUNNER_TEMP/rootfix.json"
+          jq -e '.ok==true and .status=="POST_GO_LIVE_OVERLAY_RELEASE_MECHANISM_ROOTFIX_V2_PREPARED" and .containsPII==false and .containsSecrets==false' "$RUNNER_TEMP/rootfix.json" >/dev/null
+          node --check tools/orbit360-operational-semantic-authority-v20260830.mjs
+          node --check tools/orbit360-post-go-live-overlay-release-prep-v20260830.mjs
+          node --check tools/orbit360-post-go-live-overlay-release-v20260830.mjs
+          node --check tools/orbit360-single-state-contract-v20260827.mjs
+          node --check tools/orbit360-single-state-invariant-v20260827.mjs
+          node --check tools/orbit360-f2-productive-acceptance-runtime-browser-readonly-v20260818.mjs
+          node tools/orbit360-operational-semantic-authority-v20260830.mjs | tee "$RUNNER_TEMP/operational-semantic.json"
+          jq -e '.ok==true and .status=="OPERATIONAL_SEMANTIC_AUTHORITY_PASS" and (.blockerIds|length)==3' "$RUNNER_TEMP/operational-semantic.json" >/dev/null
+          node tools/orbit360-certified-product-preservation-v20260827.mjs | tee "$RUNNER_TEMP/preservation.json"
+          jq -e '.ok==true and .status=="CERTIFIED_PRODUCT_BASELINE_PRESERVATION_PASS" and .noReprocess==true and .noReimport==true and .runtime==false and .deploy==false' "$RUNNER_TEMP/preservation.json" >/dev/null
+          node tools/orbit360-single-state-invariant-v20260827.mjs | tee "$RUNNER_TEMP/invariant.json"
+          jq -e '.ok==true and .status=="SINGLE_STATE_CONTROL_PLANE_STATIC_INVARIANT_PASS"' "$RUNNER_TEMP/invariant.json" >/dev/null
+          node tools/orbit360-single-state-ledger-owner-v20260827.mjs --selftest | tee "$RUNNER_TEMP/owner-selftest.json"
+          jq -e '.ok==true and .status=="SINGLE_STATE_CONTROL_PLANE_SELFTEST_PASS" and .staleDiagnosticPatchBlocked==true' "$RUNNER_TEMP/owner-selftest.json" >/dev/null
+          node tools/orbit360-bind-f2-browser-evidence-run-v20260824.mjs --selftest | tee "$RUNNER_TEMP/browser-binder.json"
+          jq -e '.ok==true and .status=="F2_BROWSER_BINDER_CURRENT_RUN_CAUSAL_SELFTEST_PASS"' "$RUNNER_TEMP/browser-binder.json" >/dev/null
+          node tools/orbit360-go-live-release-handler-v20260826.mjs --source-only-selftest --out "$ORBIT360_RELEASE_HANDLER_SELFTEST_OUT"
+          jq -e '.ok==true and .status=="GO_LIVE_RELEASE_HANDLER_SOURCE_ONLY_PASS" and .deployExecuted==false and .productionTouched==false' "$ORBIT360_RELEASE_HANDLER_SELFTEST_OUT" >/dev/null
+          git diff --check
+          test -z "$(git diff --name-only -- orbit360-platform/docs/orbit360-continuity-ledger-v20260820.json)"
+      - name: Publish validated static rootfix with CAS
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "orbit360-rootfix-owner"
+          git config user.email "orbit360-rootfix-owner@users.noreply.github.com"
+          git add \
+            tools/orbit360-operational-semantic-authority-v20260830.mjs \
+            orbit360-platform/docs/orbit360-continuity-writer-registry-v20260820.json \
+            tools/orbit360-single-state-contract-v20260827.mjs \
+            tools/orbit360-single-state-invariant-v20260827.mjs \
+            orbit360-platform/docs/orbit360-control-plane-frozen-baseline-v20260827.json \
+            tools/orbit360-f2-productive-acceptance-runtime-browser-readonly-v20260818.mjs \
+            orbit360-platform/docs/orbit360-post-go-live-overlay-release-contract-v20260830.json \
+            tools/orbit360-post-go-live-overlay-release-prep-v20260830.mjs \
+            tools/orbit360-post-go-live-overlay-release-v20260830.mjs \
+            orbit360-platform/docs/ROOTFIX-POST-GO-LIVE-OVERLAY-RELEASE-20260830.md
+          test "$(git diff --cached --name-only | wc -l)" = "10"
+          git commit -m "rootfix(control-plane): bridge accepted overlays to served release"
+          git fetch --no-tags origin "$CANONICAL_BRANCH"
+          test "$(git rev-parse FETCH_HEAD)" = "$BASE"
+          git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push origin "HEAD:${CANONICAL_BRANCH}"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: orbit360-overlay-release-rootfix-bootstrap-v3-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/rootfix.json
+            ${{ runner.temp }}/operational-semantic.json
+            ${{ runner.temp }}/preservation.json
+            ${{ runner.temp }}/invariant.json
+            ${{ runner.temp }}/owner-selftest.json
+            ${{ runner.temp }}/browser-binder.json
+            ${{ runner.temp }}/release-selftest.json
+          if-no-files-found: ignore
+          retention-days: 14
