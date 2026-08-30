@@ -61,7 +61,14 @@ function sourceAssertions(capabilityId){
    requireText(hydration,'hydration_contract_observes_clientes',[/cliente360\s*:\s*\{\s*required\s*:\s*\[[^\]]*['"]clientes['"]/,'Orbit.store.on']);
    return {ok:true,assertions:7,runtimeRowsStillRequired:true,storeWrapperSemanticValidated:true,emptyStateSemanticValidated:true,reactiveRouterSemanticValidated:true,hydrationSemanticValidated:true};
  }
- if(capabilityId==='LOGIN_INTERACTIVE_ENTRY'){const auth=read('core/auth.js'),store=read('data/store-firestore-lab.local.js'),router=read('core/router.js');requireText(auth,'auth_is_membership_gated',['waitForMembership','signInWithEmailAndPassword']);requireText(store,'store_is_membership_gated',['membershipRequired: true','authGatedSnapshots: true']);requireText(router,'router_waits_are_bounded',['waitForPwaReady','Promise.race']);forbidText(auth+store,'human_login_has_no_demo_identity_fallback',['orbit.lab@demo.com']);return {ok:true,assertions:4,latencyRuntimeMeasurementRequired:true};}
+ if(capabilityId==='LOGIN_INTERACTIVE_ENTRY'){
+   const auth=read('core/auth.js'),store=read('data/store-firestore-lab.local.js');
+   requireText(auth,'auth_is_membership_gated',['waitForMembership','activeProjection','signInWithEmailAndPassword','loginFirebase','withTimeout','AUTH_SIGNIN_TIMEOUT',/attempts\s*>=\s*180/,/attempts\s*<\s*120/]);
+   requireText(store,'store_is_membership_gated',['membershipRequired: true','authGatedSnapshots: true','tenant-membership']);
+   requireText(auth,'firestore_login_uses_human_credentials_without_demo_fallback',[/if\s*\(isFirestoreRuntime\(\)\)/,/await\s+loginFirebase\(email,\s*password\)/,/if\s*\(!email\)\s*throw\s+new Error\(['"]AUTH_EMAIL_REQUIRED['"]\)/,/if\s*\(!password\)\s*throw\s+new Error\(['"]AUTH_PASSWORD_REQUIRED['"]\)/]);
+   forbidText(auth+store,'human_login_has_no_orbit_lab_demo_identity_fallback',['orbit.lab@demo.com']);
+   return {ok:true,assertions:12,latencyRuntimeMeasurementRequired:true,boundedAuthWaitsValidated:true,humanCredentialPathValidated:true};
+ }
  fail('UNKNOWN_CAPABILITY_SOURCE_ASSERTION',{capabilityId});
 }
 
