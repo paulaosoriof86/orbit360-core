@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "orbit360-control-plane-frozen-baseline-v27-semantic-single-state-static-identities",
+  "schemaVersion": "orbit360-control-plane-frozen-baseline-v28-operational-semantic-authority",
   "status": "STATIC_SOURCE_IDENTITY_BASELINE",
   "stateBearing": false,
   "dynamicStateForbidden": true,
@@ -9,7 +9,8 @@
   "sourceIdentityAlgorithm": "git-blob-sha1",
   "sourceIdentities": {
     ".github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml": "eb0515fbff91cffb4ceef5cc386f7ed8212522a3",
-    "tools/orbit360-single-state-ledger-owner-v20260827.mjs": "e4294e00831396a9933649415beaf63f28c1d66e",
+    "tools/orbit360-single-state-ledger-owner-v20260827.mjs": "df35baf5f07cfb4feb68801b24c82fc0114ad4f5",
+    "tools/orbit360-operational-semantic-authority-v20260830.mjs": "ff91ec9ef5b926afc318406c14283431cf66c5be",
     "tools/orbit360-single-state-invariant-v20260827.mjs": "27c23453c6979d206c28e7cac7940e2c860bb9c8",
     "tools/orbit360-single-state-contract-v20260827.mjs": "b55610f7b2a08130cf56ec27f039513257afddfc",
     "orbit360-platform/docs/orbit360-continuity-writer-registry-v20260820.json": "f3c68d936834dc8cdc208f37e1450881efca218a",
@@ -63,6 +64,10 @@
     "ownerSelftestDerivesCurrentTransitionFromRegistry": true,
     "goLiveAuthorizationIdentityFrozenBeforePostGoLiveClaimOverwrite": true,
     "postGoLiveVisiblePriorityLockMachineEnforcedBeforeEveryExecution": true,
+    "operationalDiagnosticPathsDerivedFromVisiblePriorityLock": true,
+    "operationalStatePatchRejectsUnregisteredOrStaleDiagnosticRoutes": true,
+    "semanticRepairAliasRequiresObservedOperationalDrift": true,
+    "semanticRepairAliasSelfExtinguishesAfterReconciliation": true,
     "polizasAndDownstreamBlockedUntilVisibleTrioAndUserAcceptancePass": true,
     "postGoLiveProductDeltaUsesRegisteredEphemeralSuccessorStage": true,
     "certifiedProductBaselineNeverMutatedBySourceStage": true,
