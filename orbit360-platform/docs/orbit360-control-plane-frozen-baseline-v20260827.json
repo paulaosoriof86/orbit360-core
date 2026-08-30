@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "orbit360-control-plane-frozen-baseline-v18-semantic-single-state-static-identities",
+  "schemaVersion": "orbit360-control-plane-frozen-baseline-v19-semantic-single-state-static-identities",
   "status": "STATIC_SOURCE_IDENTITY_BASELINE",
   "stateBearing": false,
   "dynamicStateForbidden": true,
@@ -10,14 +10,13 @@
   "sourceIdentities": {
     ".github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml": "eb0515fbff91cffb4ceef5cc386f7ed8212522a3",
     "tools/orbit360-single-state-ledger-owner-v20260827.mjs": "e4294e00831396a9933649415beaf63f28c1d66e",
-    "tools/orbit360-single-state-invariant-v20260827.mjs": "385baa646ac10839d857da610f97b5eef6af5630",
+    "tools/orbit360-single-state-invariant-v20260827.mjs": "27c23453c6979d206c28e7cac7940e2c860bb9c8",
     "tools/orbit360-single-state-contract-v20260827.mjs": "b55610f7b2a08130cf56ec27f039513257afddfc",
     "orbit360-platform/docs/orbit360-continuity-writer-registry-v20260820.json": "ddb3c5ff26150e0b2a7a03df54588d6750b9fffd",
     "orbit360-platform/docs/orbit360-post-go-live-visible-priority-lock-v20260827.json": "310caea8f4e362a559e4d734e25343616d83195c",
     "tools/orbit360-gate-contract-registry-v20260717.json": "2a5eb2443adf1ce74ae1cc189cf85489b027f35c",
     "tools/orbit360-validar-gate-contracts-v20260717.mjs": "885b9d33e02bb95c886f607049a2cc73a73065e5",
     "tools/orbit360-certified-product-preservation-v20260827.mjs": "b08a1a62e2d369f00971297182da0002fdae5b6d",
-    "orbit360-platform/docs/orbit360-certified-product-preservation-registry-v20260827.json": "bc9214e46cbc22a1220ecf997e79710d12d9f870",
     "orbit360-platform/docs/orbit360-aseguradoras-preservation-registry-v20260827.json": "2110be8931121ad33212868563650ccca6b9c1f3",
     "orbit360-platform/docs/orbit360-runtime-capability-registry-v20260828.json": "b081d16a9a05884b7057d0d87bc6e59ebc6b095d",
     "orbit360-platform/docs/orbit360-approved-runtime-closure-registry-v20260829.json": "4a028b89a1b7d3f0f1c71bb7adf53067c47e6990",
@@ -99,11 +98,13 @@
     "authorizedRevealVisibleLockAndInvariantAtomic": true,
     "approvedRuntimePackageClosureRegistryFrozen": true,
     "approvedRuntimePackageClosureValidatorFrozen": true,
-    "runtimeCapabilityRegistryFrozenWithClosureContract": true
+    "runtimeCapabilityRegistryFrozenWithClosureContract": true,
+    "transactionalProductOverlayRegistryExcludedFromStaticBlobFreeze": true
   },
   "sealPolicy": {
     "passOrFailIsRecordedInLedgerTerminalEvidence": true,
     "thisFileDoesNotCarryCurrentPassState": true,
+    "transactionalProductOverlayRegistryProtectedBySchemaValidatorAndAcceptanceTransactionNotStaticBlobHash": true,
     "changeRequiresNewSourceOnlyRootfixAndNewBaseline": true
   },
   "containsPII": false,
