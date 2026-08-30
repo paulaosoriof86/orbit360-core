@@ -1,0 +1,29 @@
+{
+  "schemaVersion": "orbit360-execution-intent-v1",
+  "transitionId": "POST_GO_LIVE_RUNTIME_CAPABILITY_COMPOSITION_VALIDATE_SOURCE_ONLY",
+  "canonicalBaseHead": "b5ea200f448b9d4107d9b9ab6381219c74c8a65a",
+  "expectedLedgerRevision": 159,
+  "oneShotOnly": true,
+  "replayAllowed": false,
+  "explicitUserAuthorization": false,
+  "scope": {
+    "runtime": false,
+    "browser": false,
+    "secrets": false,
+    "firestoreRead": false,
+    "deploy": false,
+    "production": false,
+    "firestoreWrites": false,
+    "authWrites": false,
+    "operationalWrites": false,
+    "dataWrites": false,
+    "main": false,
+    "merge": false
+  },
+  "acceptanceRunId": 33315372521,
+  "candidateId": "product-visual-runtime-rootfix-v6-20260830",
+  "candidateManifestSha256": "0f89b99003e32030aa463b91d7be8e1d53bdba4429399a06942ee3a7b47bf8ab",
+  "patchManifestSha256": "6d8887e8168d7d49675da83a9856705fa235f068642d9cbe75bc1f9f5a2620c4",
+  "containsPII": false,
+  "containsSecrets": false
+}
