@@ -54,7 +54,13 @@ function sourceAssertions(capabilityId){
    requireText(boot,'product_bootstrap_loads_approved_owner',['client-insurer-operational-directory-owner-v20260722.js?v=20260829-1',"mode:'product-readonly'",'writeAuthorized:false']);
    return {ok:true,assertions:3,directRecordAuthorized:true,providerFallback:true};
  }
- if(capabilityId==='CLIENTE360_PRIMARY_RUNTIME'){const module=read('modules/cliente360.js'),router=read('core/router.js'),hydration=read('core/visual-runtime-hydration-contract-v20260805.js');requireText(module,'cliente360_reads_clientes_from_orbit_store',["Orbit.store.all('clientes')",'data-list-placeholder']);requireText(router,'router_reacts_to_clientes_store_updates',['installReactiveRefresh',"'clientes'",'setTimeout']);requireText(hydration,'hydration_contract_observes_clientes',["'clientes'",'Orbit.store.on']);return {ok:true,assertions:4,runtimeRowsStillRequired:true};}
+ if(capabilityId==='CLIENTE360_PRIMARY_RUNTIME'){
+   const module=read('modules/cliente360.js'),router=read('core/router.js'),hydration=read('core/visual-runtime-hydration-contract-v20260805.js');
+   requireText(module,'cliente360_reads_clientes_from_orbit_store',[/S\s*=\s*\(\)\s*=>\s*Orbit\.store/,/S\(\)\.all\(['"]clientes['"]\)/,/rows\.length\s*===\s*0/]);
+   requireText(router,'router_reacts_to_clientes_store_updates',['installReactiveRefresh',"'clientes'",'setTimeout']);
+   requireText(hydration,'hydration_contract_observes_clientes',["'clientes'",'Orbit.store.on']);
+   return {ok:true,assertions:5,runtimeRowsStillRequired:true,storeWrapperSemanticValidated:true,emptyStateSemanticValidated:true};
+ }
  if(capabilityId==='LOGIN_INTERACTIVE_ENTRY'){const auth=read('core/auth.js'),store=read('data/store-firestore-lab.local.js'),router=read('core/router.js');requireText(auth,'auth_is_membership_gated',['waitForMembership','signInWithEmailAndPassword']);requireText(store,'store_is_membership_gated',['membershipRequired: true','authGatedSnapshots: true']);requireText(router,'router_waits_are_bounded',['waitForPwaReady','Promise.race']);forbidText(auth+store,'human_login_has_no_demo_identity_fallback',['orbit.lab@demo.com']);return {ok:true,assertions:4,latencyRuntimeMeasurementRequired:true};}
  fail('UNKNOWN_CAPABILITY_SOURCE_ASSERTION',{capabilityId});
 }
