@@ -1,19 +1,19 @@
 {
   "schemaVersion": "orbit360-continuity-ledger-v3",
   "ledgerId": "ORBIT360-F2-CONTINUITY-CURRENT",
-  "revision": 158,
-  "updatedAtUtc": "2026-08-30T13:53:24.421Z",
+  "revision": 159,
+  "updatedAtUtc": "2026-08-30T13:53:27.869Z",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
   "stateVersion": "ORBIT360-F2-CONTINUITY-CURRENT",
   "gateId": "f2-productive-acceptance-exact-successor-v20260818",
   "activeState": {
-    "phase": "POST_GO_LIVE_PRODUCT_SUCCESSOR_ACCEPT_RUNNING",
-    "status": "SOURCE_ONLY_CLAIMED",
+    "phase": "PRODUCTION_SMOKE_PASS",
+    "status": "PRODUCTION_GO_LIVE_PASS",
     "rootCauseStatus": "PASS",
-    "productFrozen": true,
-    "dataFrozen": true,
+    "productFrozen": false,
+    "dataFrozen": false,
     "runtimeAuthorized": false,
     "runtimeReplayAllowed": false,
     "deployAuthorized": false,
@@ -43,7 +43,7 @@
     "mainAuthorized": false,
     "mergeAuthorized": false,
     "boundaryPrepared": true,
-    "currentBoundaryStatus": "SOURCE_ONLY:POST_GO_LIVE_PRODUCT_SUCCESSOR_ACCEPT_SOURCE_ONLY",
+    "currentBoundaryStatus": "PRESERVED_PRE_RISK:POST_GO_LIVE_PRODUCT_SUCCESSOR_ACCEPT_SOURCE_ONLY",
     "authorizationIdentityRequired": true,
     "preparedAuthorizationIdentityDigest": null,
     "activeRequestPath": null,
@@ -200,9 +200,9 @@
   "productionReopeningPackage": {
     "path": "orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json",
     "status": "CLOSED_PASS",
-    "revision": 151,
-    "firstIncompleteStep": "POST-GO-LIVE-SUCCESSOR-EXPLICIT-ACCEPTANCE",
-    "nextActionExact": "RUN_POST_GO_LIVE_PRODUCT_SUCCESSOR_ACCEPT_SOURCE_ONLY",
+    "revision": 152,
+    "firstIncompleteStep": "POST-GO-LIVE-RUNTIME-CAPABILITY-COMPOSITION-VALIDATION",
+    "nextActionExact": "VALIDATE_ACCEPTED_RUNTIME_CAPABILITY_COMPOSITION_SOURCE_ONLY",
     "runtimeAllowed": false,
     "authorizationAllowed": false,
     "requestMaterializationAllowed": false,
@@ -210,8 +210,8 @@
   },
   "checkpoint": "orbit360-platform/docs/PLAN-MAESTRO-DEFINITIVO-PRODUCCION-POSTPRODUCCION-ANTI-LOOP-ORBIT360-AYS-20260826.md",
   "nextAction": {
-    "id": "RUN_POST_GO_LIVE_PRODUCT_SUCCESSOR_ACCEPT_SOURCE_ONLY",
-    "description": "RUN_POST_GO_LIVE_PRODUCT_SUCCESSOR_ACCEPT_SOURCE_ONLY",
+    "id": "VALIDATE_ACCEPTED_RUNTIME_CAPABILITY_COMPOSITION_SOURCE_ONLY",
+    "description": "VALIDATE_ACCEPTED_RUNTIME_CAPABILITY_COMPOSITION_SOURCE_ONLY",
     "runtimeAllowed": false,
     "userActionRequired": false
   },
@@ -254,11 +254,11 @@
       "reason": "Preserve complete detailed v11 terminal history before v12 live-state reconciliation."
     },
     "latestExecutionTerminal": {
-      "transitionId": "POST_GO_LIVE_PRODUCT_SUCCESSOR_SOURCE_STAGE",
-      "runId": 33315238700,
+      "transitionId": "POST_GO_LIVE_PRODUCT_SUCCESSOR_ACCEPT_SOURCE_ONLY",
+      "runId": 33315372521,
       "classification": "PASS",
       "ok": true,
-      "evidencePath": "actions-artifact:orbit360-single-state-33315238700/orbit360-terminal.json",
+      "evidencePath": "actions-artifact:orbit360-single-state-33315372521/orbit360-terminal.json",
       "replayAllowed": false,
       "privilegedRiskObserved": false,
       "authorizationConsumed": false,
@@ -267,7 +267,7 @@
       "firestoreWrites": 0,
       "authWrites": 0,
       "operationalWrites": 0,
-      "reducedAtUtc": "2026-08-30T13:50:28.530Z"
+      "reducedAtUtc": "2026-08-30T13:53:27.869Z"
     },
     "latestP2ValidatorStale": {
       "runId": 33026810850,
@@ -295,7 +295,7 @@
   },
   "lanes": {
     "A_frontend_ux_academia": "MACRO2_TRANSVERSAL_SOURCE_ACCEPTANCE_CLOSED_POST_GO_LIVE_VISUAL_AND_FUNCTIONAL_REVIEW_QUEUED",
-    "B_backend_security_gates": "PRODUCT_SUCCESSOR_EXPLICIT_ACCEPTANCE_RUNNING",
+    "B_backend_security_gates": "PRODUCT_SUCCESSOR_SOURCE_ACCEPTED_PENDING_COMPOSITION_VALIDATION",
     "C_real_data_migration": "FROZEN_DATA_THROUGH_2026_07_31_REFRESH_2026_08_01_TO_CURRENT_QUEUED_AFTER_STABLE_GO_LIVE"
   },
   "progress": {
@@ -305,7 +305,7 @@
     "progressMayIncreaseDuringHardening": false
   },
   "executionClaim": {
-    "active": true,
+    "active": false,
     "transitionId": "POST_GO_LIVE_PRODUCT_SUCCESSOR_ACCEPT_SOURCE_ONLY",
     "capabilityClass": "SOURCE_ONLY",
     "runId": 33315372521,
@@ -313,10 +313,15 @@
     "canonicalBaseHead": "54c9b85bc8aed97960f8d89d8229a645d4f6048a",
     "statePatchDigest": "",
     "claimedAtUtc": "2026-08-30T13:53:24.421Z",
-    "allowedExecutions": 1,
+    "allowedExecutions": 0,
     "consumed": false,
-    "historical": false,
-    "replayAllowed": false
+    "historical": true,
+    "replayAllowed": false,
+    "consumedAtUtc": null,
+    "terminalEvidencePath": "actions-artifact:orbit360-single-state-33315372521/orbit360-terminal.json",
+    "terminalClassification": "PASS",
+    "privilegedRiskObserved": false,
+    "authorizationPreserved": true
   },
   "containsPII": false,
   "containsSecrets": false,
@@ -377,16 +382,19 @@
   "postGoLiveSuccessorAcceptance": {
     "status": "ACCEPTED_SOURCE_ONLY_PENDING_COMPOSITION_VALIDATION",
     "classification": "PASS",
-    "candidateId": "aseguradoras-authorized-reveal-v4-20260829",
-    "stagedRunId": 33281823576,
-    "acceptanceRunId": 33284848913,
-    "patchManifestPath": "orbit360-platform/docs/orbit360-successor-stage-manifest-aseguradoras-authorized-reveal-v4-20260829.json",
-    "patchManifestSha256": "35a1197735ab417171367f3c70be390846ce2c0622dfc791fe3358122ef2b2b8",
-    "candidateManifestSha256": "11e8ca82a4ef83f65a03c79a36528fcbf49266ad6057e94c1042e0b75c21faf5",
-    "changedTargetCount": 2,
+    "candidateId": "product-visual-runtime-rootfix-v6-20260830",
+    "stagedRunId": 33315238700,
+    "acceptanceRunId": 33315372521,
+    "patchManifestPath": "orbit360-platform/docs/orbit360-successor-stage-manifest-product-visual-runtime-rootfix-v6-20260830.json",
+    "patchManifestSha256": "6d8887e8168d7d49675da83a9856705fa235f068642d9cbe75bc1f9f5a2620c4",
+    "candidateManifestSha256": "0f89b99003e32030aa463b91d7be8e1d53bdba4429399a06942ee3a7b47bf8ab",
+    "changedTargetCount": 5,
     "acceptedTargetPaths": [
-      "orbit360-platform/core/client-insurer-operational-directory-owner-v20260722.js",
-      "orbit360-platform/core/router-tenant-config-product-bootstrap-p0.js"
+      "orbit360-platform/core/product-hydration-required-optional-p0.js",
+      "orbit360-platform/core/pwa.js",
+      "orbit360-platform/core/router.js",
+      "orbit360-platform/data/store-firestore-product-readonly-p0.js",
+      "orbit360-platform/sw.js"
     ],
     "sourceOnly": true,
     "runtimeExecuted": false,

@@ -67,6 +67,28 @@
         "acceptanceRunId": 33284848913
       },
       {
+        "path": "orbit360-platform/core/product-hydration-required-optional-p0.js",
+        "beforeGitBlobSha": "804cc6cf45505e5452b75f20400935f88f009f8b",
+        "afterGitBlobSha": "15825fbe43ecd350e897d562f9e4e239bd667beb",
+        "acceptanceKind": "explicit_acceptance",
+        "acceptedCandidateHead": "717513c9f3c38213edcecfd6d7b01fd613409925",
+        "acceptedBaseHead": "c420039a4f42c615706b811268fcc720d269951c",
+        "validationProfile": "PRODUCT_VISUAL_RUNTIME_CHAIN_ROOTFIX_V1",
+        "diffDigest": "0f89b99003e32030aa463b91d7be8e1d53bdba4429399a06942ee3a7b47bf8ab",
+        "acceptanceRunId": 33315372521
+      },
+      {
+        "path": "orbit360-platform/core/pwa.js",
+        "beforeGitBlobSha": "ed9a06b385d4cc5b1f8d1a9202b2c3d986332730",
+        "afterGitBlobSha": "c7fd770b714746ade10a4d44d9853d68930da68f",
+        "acceptanceKind": "explicit_acceptance",
+        "acceptedCandidateHead": "717513c9f3c38213edcecfd6d7b01fd613409925",
+        "acceptedBaseHead": "c420039a4f42c615706b811268fcc720d269951c",
+        "validationProfile": "PRODUCT_VISUAL_RUNTIME_CHAIN_ROOTFIX_V1",
+        "diffDigest": "0f89b99003e32030aa463b91d7be8e1d53bdba4429399a06942ee3a7b47bf8ab",
+        "acceptanceRunId": 33315372521
+      },
+      {
         "path": "orbit360-platform/core/router-tenant-config-product-bootstrap-p0.js",
         "beforeGitBlobSha": "902c85c83388ebf0a71bf0e7595faa61284872d7",
         "afterGitBlobSha": "41c4a7c8ba46b243581f643bc057b780d03f4a00",
@@ -76,6 +98,39 @@
         "validationProfile": "ASEGURADORAS_AUTHORIZED_REVEAL_V2",
         "diffDigest": "11e8ca82a4ef83f65a03c79a36528fcbf49266ad6057e94c1042e0b75c21faf5",
         "acceptanceRunId": 33284848913
+      },
+      {
+        "path": "orbit360-platform/core/router.js",
+        "beforeGitBlobSha": "844bb7181a3dea5d960e91dd7200d9ca475cbd97",
+        "afterGitBlobSha": "480f4083634d71798e4ca4ea29377c1e15c55a35",
+        "acceptanceKind": "explicit_acceptance",
+        "acceptedCandidateHead": "717513c9f3c38213edcecfd6d7b01fd613409925",
+        "acceptedBaseHead": "c420039a4f42c615706b811268fcc720d269951c",
+        "validationProfile": "PRODUCT_VISUAL_RUNTIME_CHAIN_ROOTFIX_V1",
+        "diffDigest": "0f89b99003e32030aa463b91d7be8e1d53bdba4429399a06942ee3a7b47bf8ab",
+        "acceptanceRunId": 33315372521
+      },
+      {
+        "path": "orbit360-platform/data/store-firestore-product-readonly-p0.js",
+        "beforeGitBlobSha": "384281afa84aff4aef7f14ac4c3d01a35bb7677d",
+        "afterGitBlobSha": "98b75ec3e271e1f1f659a81db080002ef023cefc",
+        "acceptanceKind": "explicit_acceptance",
+        "acceptedCandidateHead": "717513c9f3c38213edcecfd6d7b01fd613409925",
+        "acceptedBaseHead": "c420039a4f42c615706b811268fcc720d269951c",
+        "validationProfile": "PRODUCT_VISUAL_RUNTIME_CHAIN_ROOTFIX_V1",
+        "diffDigest": "0f89b99003e32030aa463b91d7be8e1d53bdba4429399a06942ee3a7b47bf8ab",
+        "acceptanceRunId": 33315372521
+      },
+      {
+        "path": "orbit360-platform/sw.js",
+        "beforeGitBlobSha": "d51a08179f2da61f21281cc767519cfc42e6c745",
+        "afterGitBlobSha": "195b6909ae93769a97db375448988aa0d58d4475",
+        "acceptanceKind": "explicit_acceptance",
+        "acceptedCandidateHead": "717513c9f3c38213edcecfd6d7b01fd613409925",
+        "acceptedBaseHead": "c420039a4f42c615706b811268fcc720d269951c",
+        "validationProfile": "PRODUCT_VISUAL_RUNTIME_CHAIN_ROOTFIX_V1",
+        "diffDigest": "0f89b99003e32030aa463b91d7be8e1d53bdba4429399a06942ee3a7b47bf8ab",
+        "acceptanceRunId": 33315372521
       }
     ]
   },
