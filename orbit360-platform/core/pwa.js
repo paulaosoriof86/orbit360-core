@@ -6,178 +6,25 @@
    - Registra service worker (no-op si el origen no lo permite)
    ============================================================ */
 (function () {
-  var RUNTIME_BUILD = '20260723-10';
-  var CRITICAL_RELEASE = 'block1-critical-runtime-20260723-10';
-  var workerState = window.OrbitPwaWorkerState = {
-    runtimeBuild: RUNTIME_BUILD,
-    criticalRelease: CRITICAL_RELEASE,
-    status: 'registering',
-    controlled: false,
-    scriptPath: ''
-  };
-
-  function workerPath(worker) {
-    try { return worker && worker.scriptURL ? new URL(worker.scriptURL).pathname + new URL(worker.scriptURL).search : ''; } catch (e) { return ''; }
-  }
-
-  function controllerMatches(registration) {
-    var controller = navigator.serviceWorker && navigator.serviceWorker.controller;
-    var active = registration && registration.active;
-    if (!controller || !active) return false;
-    return workerPath(controller) === workerPath(active) && workerPath(controller).indexOf('v=' + RUNTIME_BUILD) >= 0;
-  }
-
-  function signalWorker(status) {
-    workerState.status = status;
-    workerState.controlled = status === 'controlled';
-    try { console.log('ORBIT360_RUNTIME_SIGNAL:pwa-controller:' + status); } catch (e) {}
-  }
-
-  function waitForWorkerActivation(registration) {
-    var worker = registration && (registration.installing || registration.waiting);
-    if (!worker || worker.state === 'activated') return Promise.resolve(registration);
-    return new Promise(function (resolve) {
-      var settled = false;
-      var timer = setTimeout(finish, 15000);
-      function finish() {
-        if (settled) return;
-        settled = true;
-        clearTimeout(timer);
-        resolve(registration);
-      }
-      worker.addEventListener('statechange', function () {
-        if (worker.state === 'activated' || worker.state === 'redundant') finish();
-      });
-    });
-  }
-
-  function waitForWorkerControl(registration) {
-    if (controllerMatches(registration)) return Promise.resolve(registration);
-    return new Promise(function (resolve) {
-      var settled = false;
-      var timer = setTimeout(finish, 10000);
-      function finish() {
-        if (settled) return;
-        settled = true;
-        clearTimeout(timer);
-        navigator.serviceWorker.removeEventListener('controllerchange', check);
-        resolve(registration);
-      }
-      function check() { if (controllerMatches(registration)) finish(); }
-      navigator.serviceWorker.addEventListener('controllerchange', check);
-      check();
-    });
-  }
-
-  function registerServiceWorker() {
-    if (!('serviceWorker' in navigator)) {
-      signalWorker('unsupported');
-      return Promise.resolve(workerState);
-    }
-    try {
-      return navigator.serviceWorker.register('sw.js?v=' + RUNTIME_BUILD).then(function (registration) {
-        return registration.update().catch(function () { return registration; }).then(function () {
-          return waitForWorkerActivation(registration);
-        }).then(function () {
-          return waitForWorkerControl(registration);
-        }).then(function () {
-          workerState.scriptPath = workerPath(navigator.serviceWorker.controller || registration.active);
-          signalWorker(controllerMatches(registration) ? 'controlled' : 'uncontrolled');
-          return workerState;
-        });
-      }).catch(function () {
-        signalWorker('error');
-        return workerState;
-      });
-    } catch (error) {
-      signalWorker('error');
-      return Promise.resolve(workerState);
-    }
-  }
-
+  var RUNTIME_BUILD = '20260830-visual-runtime-rootfix-1';
+  var CRITICAL_RELEASE = 'post-go-live-visual-runtime-rootfix-20260830-1';
+  var workerState = window.OrbitPwaWorkerState = { runtimeBuild: RUNTIME_BUILD, criticalRelease: CRITICAL_RELEASE, status: 'registering', controlled: false, scriptPath: '' };
+  function workerPath(worker) { try { return worker && worker.scriptURL ? new URL(worker.scriptURL).pathname + new URL(worker.scriptURL).search : ''; } catch (e) { return ''; } }
+  function controllerMatches(registration) { var controller = navigator.serviceWorker && navigator.serviceWorker.controller; var active = registration && registration.active; if (!controller || !active) return false; return workerPath(controller) === workerPath(active) && workerPath(controller).indexOf('v=' + RUNTIME_BUILD) >= 0; }
+  function signalWorker(status) { workerState.status = status; workerState.controlled = status === 'controlled'; try { console.log('ORBIT360_RUNTIME_SIGNAL:pwa-controller:' + status); } catch (e) {} }
+  function waitForWorkerActivation(registration) { var worker = registration && (registration.installing || registration.waiting); if (!worker || worker.state === 'activated') return Promise.resolve(registration); return new Promise(function (resolve) { var settled = false; var timer = setTimeout(finish, 15000); function finish() { if (settled) return; settled = true; clearTimeout(timer); resolve(registration); } worker.addEventListener('statechange', function () { if (worker.state === 'activated' || worker.state === 'redundant') finish(); }); }); }
+  function waitForWorkerControl(registration) { if (controllerMatches(registration)) return Promise.resolve(registration); return new Promise(function (resolve) { var settled = false; var timer = setTimeout(finish, 10000); function finish() { if (settled) return; settled = true; clearTimeout(timer); navigator.serviceWorker.removeEventListener('controllerchange', check); resolve(registration); } function check() { if (controllerMatches(registration)) finish(); } navigator.serviceWorker.addEventListener('controllerchange', check); check(); }); }
+  function registerServiceWorker() { if (!('serviceWorker' in navigator)) { signalWorker('unsupported'); return Promise.resolve(workerState); } try { return navigator.serviceWorker.register('sw.js?v=' + RUNTIME_BUILD).then(function (registration) { return registration.update().catch(function () { return registration; }).then(function () { return waitForWorkerActivation(registration); }).then(function () { return waitForWorkerControl(registration); }).then(function () { workerState.scriptPath = workerPath(navigator.serviceWorker.controller || registration.active); signalWorker(controllerMatches(registration) ? 'controlled' : 'uncontrolled'); return workerState; }); }).catch(function () { signalWorker('error'); return workerState; }); } catch (error) { signalWorker('error'); return Promise.resolve(workerState); } }
   window.OrbitPwaWorkerReady = registerServiceWorker();
-
   function clientLogo() { try { var t = Orbit.tenant && Orbit.tenant.get(); return (t && t.branding && t.branding.logo) || localStorage.getItem('orbit360_logo') || ''; } catch (e) { return ''; } }
   function clientName() { try { var t = Orbit.tenant && Orbit.tenant.get(); return (t && t.empresa) || 'Orbit 360'; } catch (e) { return 'Orbit 360'; } }
   function themeColor() { try { return getComputedStyle(document.documentElement).getPropertyValue('--red').trim() || '#C5162E'; } catch (e) { return '#C5162E'; } }
-
-  function fallbackIcon() {
-    var c = themeColor();
-    var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"><rect width="192" height="192" rx="34" fill="#1E2227"/><circle cx="96" cy="96" r="42" fill="' + c + '"/><circle cx="96" cy="96" r="18" fill="#1E2227"/></svg>';
-    return 'data:image/svg+xml;base64,' + btoa(svg);
-  }
-
-  function setFavicons() {
-    var icon = clientLogo() || fallbackIcon();
-    ['icon', 'apple-touch-icon'].forEach(function (rel) {
-      var l = document.querySelector('link[rel="' + rel + '"]');
-      if (!l) { l = document.createElement('link'); l.rel = rel; document.head.appendChild(l); }
-      l.href = icon;
-    });
-  }
-
-  function buildManifest() {
-    var icon = clientLogo() || fallbackIcon();
-    var manifest = {
-      name: clientName() + ' · Orbit 360',
-      short_name: clientName().slice(0, 18),
-      start_url: '.',
-      scope: '.',
-      display: 'standalone',
-      orientation: 'any',
-      background_color: '#1E2227',
-      theme_color: themeColor(),
-      description: 'Sistema 360 para intermediarios de seguros.',
-      icons: [
-        { src: icon, sizes: '192x192', type: icon.indexOf('svg') >= 0 ? 'image/svg+xml' : 'image/png', purpose: 'any maskable' },
-        { src: icon, sizes: '512x512', type: icon.indexOf('svg') >= 0 ? 'image/svg+xml' : 'image/png', purpose: 'any maskable' }
-      ]
-    };
-    var blob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
-    var url = URL.createObjectURL(blob);
-    var link = document.querySelector('link[rel="manifest"]');
-    if (!link) { link = document.createElement('link'); link.rel = 'manifest'; document.head.appendChild(link); }
-    link.href = url;
-  }
-
+  function fallbackIcon() { var c = themeColor(); var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"><rect width="192" height="192" rx="34" fill="#1E2227"/><circle cx="96" cy="96" r="42" fill="' + c + '"/><circle cx="96" cy="96" r="18" fill="#1E2227"/></svg>'; return 'data:image/svg+xml;base64,' + btoa(svg); }
+  function setFavicons() { var icon = clientLogo() || fallbackIcon(); ['icon', 'apple-touch-icon'].forEach(function (rel) { var l = document.querySelector('link[rel="' + rel + '"]'); if (!l) { l = document.createElement('link'); l.rel = rel; document.head.appendChild(l); } l.href = icon; }); }
+  function buildManifest() { var icon = clientLogo() || fallbackIcon(); var manifest = { name: clientName() + ' · Orbit 360', short_name: clientName().slice(0, 18), start_url: '.', scope: '.', display: 'standalone', orientation: 'any', background_color: '#1E2227', theme_color: themeColor(), description: 'Sistema 360 para intermediarios de seguros.', icons: [{ src: icon, sizes: '192x192', type: icon.indexOf('svg') >= 0 ? 'image/svg+xml' : 'image/png', purpose: 'any maskable' }, { src: icon, sizes: '512x512', type: icon.indexOf('svg') >= 0 ? 'image/svg+xml' : 'image/png', purpose: 'any maskable' }] }; var blob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' }); var url = URL.createObjectURL(blob); var link = document.querySelector('link[rel="manifest"]'); if (!link) { link = document.createElement('link'); link.rel = 'manifest'; document.head.appendChild(link); } link.href = url; }
   var deferredPrompt = null;
-  function showInstall(estado) {
-    var prev = document.getElementById('pwa-install'); if (prev) prev.remove();
-    var btn = document.createElement('button');
-    btn.id = 'pwa-install';
-    if (estado === 'instalada') { btn.textContent = '✓ App instalada'; btn.setAttribute('data-state', 'instalada'); }
-    else if (estado === 'ios') { btn.textContent = '📲 Instalar en iPhone/iPad'; btn.setAttribute('data-state', 'ios'); }
-    else { btn.textContent = '⬇ Instalar como app'; btn.setAttribute('data-state', 'instalar'); }
-    var bg = estado === 'instalada' ? 'var(--ok,#1F8A5B)' : 'var(--red,#C5162E)';
-    btn.style.cssText = 'position:fixed;right:18px;bottom:18px;z-index:300;background:' + bg + ';color:#fff;border:none;border-radius:30px;padding:11px 20px;font-weight:700;font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,.25);cursor:pointer;font-family:var(--f-display,sans-serif);transition:opacity .3s';
-    btn.onclick = function () {
-      if (estado === 'instalada') { btn.style.opacity = '0'; setTimeout(function () { btn.remove(); }, 300); return; }
-      if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt.userChoice.then(function () { deferredPrompt = null; btn.remove(); }); }
-      else { iosHint(); }
-    };
-    document.body.appendChild(btn);
-    if (estado === 'instalada') setTimeout(function () { if (btn.parentNode) { btn.style.opacity = '0'; setTimeout(function () { btn.remove(); }, 300); } }, 4000);
-    else setTimeout(function () { if (document.getElementById('pwa-install')) btn.style.opacity = '0.85'; }, 8000);
-  }
-
-  function iosHint() {
-    var d = document.createElement('div');
-    d.style.cssText = 'position:fixed;left:50%;bottom:74px;transform:translateX(-50%);z-index:301;background:#1E2227;color:#fff;padding:12px 16px;border-radius:12px;font-size:13px;max-width:300px;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.3)';
-    d.innerHTML = 'Para instalar en iPhone/iPad: toca <b>Compartir</b> ⬆ y luego <b>"Agregar a inicio"</b>.';
-    document.body.appendChild(d); setTimeout(function () { d.remove(); }, 6000);
-  }
-
-  function init() {
-    try { setFavicons(); buildManifest(); } catch (e) {}
-    var _ab = Orbit.applyBrand;
-    if (_ab) Orbit.applyBrand = function () { try { _ab.apply(this, arguments); } catch (e) {} try { setFavicons(); buildManifest(); } catch (e) {} };
-    window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); deferredPrompt = e; if (!(window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true)) showInstall('instalar'); });
-    window.addEventListener('appinstalled', function () { deferredPrompt = null; showInstall('instalada'); });
-    var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-    var standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-    if (standalone) { setTimeout(function () { if (!document.body.classList.contains('pre-auth')) showInstall('instalada'); }, 2500); }
-    else if (isIOS) { setTimeout(function () { if (!document.body.classList.contains('pre-auth')) showInstall('ios'); }, 4000); }
-    Orbit.pwa = { refresh: function () { try { setFavicons(); buildManifest(); } catch (e) {} }, install: showInstall, workerReady: window.OrbitPwaWorkerReady };
-  }
+  function showInstall(estado) { var prev = document.getElementById('pwa-install'); if (prev) prev.remove(); var btn = document.createElement('button'); btn.id = 'pwa-install'; if (estado === 'instalada') { btn.textContent = '✓ App instalada'; btn.setAttribute('data-state', 'instalada'); } else if (estado === 'ios') { btn.textContent = '📲 Instalar en iPhone/iPad'; btn.setAttribute('data-state', 'ios'); } else { btn.textContent = '⬇ Instalar como app'; btn.setAttribute('data-state', 'instalar'); } var bg = estado === 'instalada' ? 'var(--ok,#1F8A5B)' : 'var(--red,#C5162E)'; btn.style.cssText = 'position:fixed;right:18px;bottom:18px;z-index:300;background:' + bg + ';color:#fff;border:none;border-radius:30px;padding:11px 20px;font-weight:700;font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,.25);cursor:pointer;font-family:var(--f-display,sans-serif);transition:opacity .3s'; btn.onclick = function () { if (estado === 'instalada') { btn.style.opacity = '0'; setTimeout(function () { btn.remove(); }, 300); return; } if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt.userChoice.then(function () { deferredPrompt = null; btn.remove(); }); } else { iosHint(); } }; document.body.appendChild(btn); if (estado === 'instalada') setTimeout(function () { if (btn.parentNode) { btn.style.opacity = '0'; setTimeout(function () { btn.remove(); }, 300); } }, 4000); else setTimeout(function () { if (document.getElementById('pwa-install')) btn.style.opacity = '0.85'; }, 8000); }
+  function iosHint() { var d = document.createElement('div'); d.style.cssText = 'position:fixed;left:50%;bottom:74px;transform:translateX(-50%);z-index:301;background:#1E2227;color:#fff;padding:12px 16px;border-radius:12px;font-size:13px;max-width:300px;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.3)'; d.innerHTML = 'Para instalar en iPhone/iPad: toca <b>Compartir</b> ⬆ y luego <b>"Agregar a inicio"</b>.'; document.body.appendChild(d); setTimeout(function () { d.remove(); }, 6000); }
+  function init() { try { setFavicons(); buildManifest(); } catch (e) {} var _ab = Orbit.applyBrand; if (_ab) Orbit.applyBrand = function () { try { _ab.apply(this, arguments); } catch (e) {} try { setFavicons(); buildManifest(); } catch (e) {} }; window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); deferredPrompt = e; if (!(window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true)) showInstall('instalar'); }); window.addEventListener('appinstalled', function () { deferredPrompt = null; showInstall('instalada'); }); var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent); var standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone; if (standalone) { setTimeout(function () { if (!document.body.classList.contains('pre-auth')) showInstall('instalada'); }, 2500); } else if (isIOS) { setTimeout(function () { if (!document.body.classList.contains('pre-auth')) showInstall('ios'); }, 4000); } Orbit.pwa = { refresh: function () { try { setFavicons(); buildManifest(); } catch (e) {} }, install: showInstall, workerReady: window.OrbitPwaWorkerReady }; }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
