@@ -1,0 +1,84 @@
+{
+  "schemaVersion": "orbit360-approved-runtime-closure-registry-v1",
+  "registryId": "ORBIT360-APPROVED-RUNTIME-CLOSURE",
+  "createdAt": "2026-08-29",
+  "status": "ACTIVE_SOURCE_ONLY_FAIL_CLOSED",
+  "stateBearing": false,
+  "dynamicStateForbidden": true,
+  "baseline": {
+    "artifactId": 9504702901,
+    "sourceHead": "8c9668d6d423e82826b0295431ec699390d79b4b",
+    "manifestSha256": "b1c98c1faf644b5d83cfe6e6bb1a602927c438cd85b7855cb0b1a6b98c08053c",
+    "manifestStatus": "FASE_A_PRODUCT_MACRO2_TRANSVERSAL_SOURCE_ACCEPTANCE_CERTIFIED",
+    "fileCount": 194,
+    "publicFileCount": 189,
+    "productEntrypoint": "index.html"
+  },
+  "rules": {
+    "approvedBaselineToSourceToEntrypointToPackageRequired": true,
+    "approvedModuleScriptsMustRemainPackageMembers": true,
+    "acceptedOverlayMayReplaceExistingPackageMembers": true,
+    "acceptedOverlayMayNotSilentlyCreateUnpackagedOwner": true,
+    "productBootstrapMustLoadFinalOwner": true,
+    "sourcePassDoesNotEqualRuntimeProof": true,
+    "runtimeProofRequiredBeforeVisibleDefectClosure": true,
+    "reimportForbiddenForCompositionFailure": true,
+    "deployForbiddenInSourceOnlyValidation": true
+  },
+  "baselineCertifiedCoreAssets": [
+    "core/router-tenant-config-product-bootstrap-p0.js",
+    "core/client-insurer-operational-directory-owner-v20260722.js",
+    "core/operational-directory-field-policy-v20260722.js",
+    "core/insurer-secure-target-bridge-v20260720.js",
+    "core/secure-resource-fields-v1202.js",
+    "core/router.js",
+    "core/auth-product-runtime-p0.js",
+    "core/backend-product-readonly-bootstrap-p0.js",
+    "data/store-firestore-product-readonly-p0.js"
+  ],
+  "productEntrypointDirectAssets": [
+    "core/router-tenant-config-product-bootstrap-p0.js",
+    "modules/aseguradoras.js",
+    "modules/aseguradoras-v1197-ux-bridge.js",
+    "modules/aseguradoras-v1202-import-bridge.js",
+    "modules/aseguradoras-v1202-resources-bridge.js",
+    "modules/cliente360.js",
+    "modules/polizas.js",
+    "modules/cobros.js",
+    "modules/ops.js",
+    "modules/leads.js"
+  ],
+  "capabilities": [
+    {
+      "capabilityId": "ASEGURADORAS_OPERATIONAL_DIRECTORY",
+      "finalOwner": "core/client-insurer-operational-directory-owner-v20260722.js",
+      "finalOwnerVersion": "20260829.1",
+      "productBootstrap": "core/router-tenant-config-product-bootstrap-p0.js",
+      "requiredPackageAssets": [
+        "core/router-tenant-config-product-bootstrap-p0.js",
+        "core/client-insurer-operational-directory-owner-v20260722.js",
+        "core/operational-directory-field-policy-v20260722.js",
+        "core/insurer-secure-target-bridge-v20260720.js",
+        "core/secure-resource-fields-v1202.js",
+        "modules/aseguradoras.js",
+        "modules/aseguradoras-v1197-ux-bridge.js",
+        "modules/aseguradoras-v1202-import-bridge.js",
+        "modules/aseguradoras-v1202-resources-bridge.js"
+      ]
+    },
+    {"capabilityId":"CLIENTE360_PRIMARY_RUNTIME","requiredPackageAssets":["modules/cliente360.js","core/router.js"]},
+    {"capabilityId":"POLIZAS_PRIMARY_RUNTIME","requiredPackageAssets":["modules/polizas.js","core/router.js"]},
+    {"capabilityId":"COBROS_PRIMARY_RUNTIME","requiredPackageAssets":["modules/cobros.js","core/router.js"]},
+    {"capabilityId":"OPS_PRIMARY_RUNTIME","requiredPackageAssets":["modules/ops.js","core/router.js"]},
+    {"capabilityId":"LEADS_PRIMARY_RUNTIME","requiredPackageAssets":["modules/leads.js","core/router.js"]}
+  ],
+  "evidence": {
+    "baselineArtifactInspected": true,
+    "baselineProductEntrypointInspected": true,
+    "baselinePackageManifestInspected": true,
+    "overlayAuthority": "docs/orbit360-certified-product-preservation-registry-v20260827.json",
+    "approvedModuleAuthority": "docs/orbit360-certified-product-preservation-registry-v20260827.json"
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
