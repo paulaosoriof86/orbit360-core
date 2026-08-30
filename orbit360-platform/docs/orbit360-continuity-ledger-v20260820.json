@@ -1,17 +1,17 @@
 {
   "schemaVersion": "orbit360-continuity-ledger-v3",
   "ledgerId": "ORBIT360-F2-CONTINUITY-CURRENT",
-  "revision": 144,
-  "updatedAtUtc": "2026-08-30T01:53:41.877Z",
+  "revision": 145,
+  "updatedAtUtc": "2026-08-30T01:53:44.693Z",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
   "stateVersion": "ORBIT360-F2-CONTINUITY-CURRENT",
   "gateId": "f2-productive-acceptance-exact-successor-v20260818",
   "activeState": {
-    "phase": "POST_GO_LIVE_RUNTIME_CAPABILITY_VALIDATOR_STALE_ROOTFIX_RUNNING",
-    "status": "SOURCE_ONLY_CLAIMED",
-    "rootCauseStatus": "RUNTIME_COMPOSITION_VALIDATE_DEPENDENCY_FAIL:tools/orbit360-validar-runtime-capability-composition-v20260828.mjs:RUNTIME_CAPABILITY_APPROVED_CLOSURE_FAIL",
+    "phase": "PRODUCTION_SMOKE_PASS",
+    "status": "PRODUCTION_GO_LIVE_PASS",
+    "rootCauseStatus": "D3_MECHANISM_ROOTFIX_EXPECTED_FROZEN_POST_GO_LIVE_STATE_MISSING",
     "productFrozen": true,
     "dataFrozen": true,
     "runtimeAuthorized": false,
@@ -43,7 +43,7 @@
     "mainAuthorized": false,
     "mergeAuthorized": false,
     "boundaryPrepared": true,
-    "currentBoundaryStatus": "SOURCE_ONLY:POST_GO_LIVE_RUNTIME_CAPABILITY_COMPOSITION_VALIDATOR_STALE_ROOTFIX",
+    "currentBoundaryStatus": "PRESERVED_PRE_RISK:POST_GO_LIVE_RUNTIME_CAPABILITY_COMPOSITION_VALIDATOR_STALE_ROOTFIX",
     "authorizationIdentityRequired": true,
     "preparedAuthorizationIdentityDigest": null,
     "activeRequestPath": null,
@@ -200,9 +200,9 @@
   "productionReopeningPackage": {
     "path": "orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json",
     "status": "CLOSED_PASS",
-    "revision": 137,
-    "firstIncompleteStep": "RUNTIME-CAPABILITY-VALIDATOR-STALE-ROOTFIX",
-    "nextActionExact": "RUN_RUNTIME_CAPABILITY_VALIDATOR_STALE_ROOTFIX",
+    "revision": 138,
+    "firstIncompleteStep": "RUNTIME-CAPABILITY-VALIDATOR-STALE-ROOTFIX-ROOT-CAUSE",
+    "nextActionExact": "DIAGNOSE_RUNTIME_CAPABILITY_COMPOSITION_VALIDATION_MECHANISM_ROOT_CAUSE_STOP_RETRY",
     "runtimeAllowed": false,
     "authorizationAllowed": false,
     "requestMaterializationAllowed": false,
@@ -210,8 +210,8 @@
   },
   "checkpoint": "orbit360-platform/docs/PLAN-MAESTRO-DEFINITIVO-PRODUCCION-POSTPRODUCCION-ANTI-LOOP-ORBIT360-AYS-20260826.md",
   "nextAction": {
-    "id": "RUN_RUNTIME_CAPABILITY_VALIDATOR_STALE_ROOTFIX",
-    "description": "RUN_RUNTIME_CAPABILITY_VALIDATOR_STALE_ROOTFIX",
+    "id": "DIAGNOSE_RUNTIME_CAPABILITY_COMPOSITION_VALIDATION_MECHANISM_ROOT_CAUSE_STOP_RETRY",
+    "description": "DIAGNOSE_RUNTIME_CAPABILITY_COMPOSITION_VALIDATION_MECHANISM_ROOT_CAUSE_STOP_RETRY",
     "runtimeAllowed": false,
     "userActionRequired": false
   },
@@ -254,11 +254,11 @@
       "reason": "Preserve complete detailed v11 terminal history before v12 live-state reconciliation."
     },
     "latestExecutionTerminal": {
-      "transitionId": "POST_GO_LIVE_RUNTIME_CAPABILITY_COMPOSITION_VALIDATE_SOURCE_ONLY",
-      "runId": 33286372307,
+      "transitionId": "POST_GO_LIVE_RUNTIME_CAPABILITY_COMPOSITION_VALIDATOR_STALE_ROOTFIX",
+      "runId": 33286698590,
       "classification": "PIPELINE_MECHANISM_FAILURE",
       "ok": false,
-      "evidencePath": "actions-artifact:orbit360-single-state-33286372307/orbit360-terminal.json",
+      "evidencePath": "actions-artifact:orbit360-single-state-33286698590/orbit360-terminal.json",
       "replayAllowed": false,
       "privilegedRiskObserved": false,
       "authorizationConsumed": false,
@@ -267,7 +267,7 @@
       "firestoreWrites": 0,
       "authWrites": 0,
       "operationalWrites": 0,
-      "reducedAtUtc": "2026-08-30T01:45:02.047Z"
+      "reducedAtUtc": "2026-08-30T01:53:44.693Z"
     },
     "latestP2ValidatorStale": {
       "runId": 33026810850,
@@ -295,7 +295,7 @@
   },
   "lanes": {
     "A_frontend_ux_academia": "MACRO2_TRANSVERSAL_SOURCE_ACCEPTANCE_CLOSED_POST_GO_LIVE_VISUAL_AND_FUNCTIONAL_REVIEW_QUEUED",
-    "B_backend_security_gates": "RUNTIME_CAPABILITY_VALIDATOR_STALE_ROOTFIX_RUNNING",
+    "B_backend_security_gates": "RUNTIME_CAPABILITY_VALIDATOR_STALE_ROOTFIX_STOP_RETRY",
     "C_real_data_migration": "FROZEN_DATA_THROUGH_2026_07_31_REFRESH_2026_08_01_TO_CURRENT_QUEUED_AFTER_STABLE_GO_LIVE"
   },
   "progress": {
@@ -305,7 +305,7 @@
     "progressMayIncreaseDuringHardening": false
   },
   "executionClaim": {
-    "active": true,
+    "active": false,
     "transitionId": "POST_GO_LIVE_RUNTIME_CAPABILITY_COMPOSITION_VALIDATOR_STALE_ROOTFIX",
     "capabilityClass": "SOURCE_ONLY",
     "runId": 33286698590,
@@ -313,10 +313,15 @@
     "canonicalBaseHead": "e229dd2ffb029abdb6c9c0f9d3a0f5b577ffe4c4",
     "statePatchDigest": "",
     "claimedAtUtc": "2026-08-30T01:53:41.877Z",
-    "allowedExecutions": 1,
+    "allowedExecutions": 0,
     "consumed": false,
-    "historical": false,
-    "replayAllowed": false
+    "historical": true,
+    "replayAllowed": false,
+    "consumedAtUtc": null,
+    "terminalEvidencePath": "actions-artifact:orbit360-single-state-33286698590/orbit360-terminal.json",
+    "terminalClassification": "PIPELINE_MECHANISM_FAILURE",
+    "privilegedRiskObserved": false,
+    "authorizationPreserved": true
   },
   "containsPII": false,
   "containsSecrets": false,
