@@ -10,7 +10,7 @@
   "sourceIdentities": {
     ".github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml": "136213dbda16989a94719b48757644d1b29323d7",
     "tools/orbit360-single-state-ledger-owner-v20260827.mjs": "df35baf5f07cfb4feb68801b24c82fc0114ad4f5",
-    "tools/orbit360-operational-semantic-authority-v20260830.mjs": "c53e7fb48d0e879b2d3f7989cef5cba2b364e755",
+    "tools/orbit360-operational-semantic-authority-v20260830.mjs": "91c29cc5f519cb2ac4b1934e07781ed4d0c28a93",
     "tools/orbit360-preclaim-operational-semantic-guard-v20260830.mjs": "8f5436237565c81c117f005cc3c3b9e6668eb34d",
     "tools/orbit360-single-state-invariant-v20260827.mjs": "11e26de039702fcf5771474c3a9366f6e7ffda11",
     "tools/orbit360-single-state-contract-v20260827.mjs": "9af2a80db92d8ec055616d352133891a8e8fba7b",
