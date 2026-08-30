@@ -1,12 +1,12 @@
 {
-  "schemaVersion": "orbit360-runtime-capability-registry-v4-approved-package-closure",
+  "schemaVersion": "orbit360-runtime-capability-registry-v5-certified-product-entrypoint",
   "registryId": "ORBIT360-RUNTIME-CAPABILITY-REGISTRY",
   "createdAt": "2026-08-28",
-  "updatedAt": "2026-08-29",
-  "status": "ACTIVE_SOURCE_PACKAGE_CLOSURE_FAIL_CLOSED_RUNTIME_PROOF_REQUIRED",
+  "updatedAt": "2026-08-30",
+  "status": "ACTIVE_CERTIFIED_PRODUCT_ENTRYPOINT_FAIL_CLOSED_RUNTIME_PROOF_REQUIRED",
   "stateBearing": false,
   "dynamicStateForbidden": true,
-  "entrypoint": "index.html",
+  "entrypointAuthority": "docs/orbit360-certified-product-entrypoint-contract-v20260830.json",
   "approvedClosureRegistry": "docs/orbit360-approved-runtime-closure-registry-v20260829.json",
   "rules": {
     "repositoryExistenceDoesNotEqualRuntimeReachability": true,
@@ -21,14 +21,33 @@
     "approvedBaselineToPackageClosureRequired": true,
     "acceptedOverlayMustRemainInsidePackageClosure": true,
     "productMutationOnFailure": false,
-    "dataMutationOnFailure": false
+    "dataMutationOnFailure": false,
+    "sourceIndexIsNotProductEntrypointAuthority": true,
+    "requiredReachableAssetsMustActuallyBeReachable": true,
+    "requiredDirectAssetsMustActuallyBeDirect": true,
+    "packageMembershipCannotSubstituteForReachability": true,
+    "productRuntimeOwnersMustMatchCertifiedArtifact": true,
+    "pwaMustNotBlockRouterStartup": true,
+    "requiredHydrationNeedsServerConfirmedSnapshot": true,
+    "runtimeContractsPreferNetworkWithCacheFallback": true
   },
-  "domainRegistries": {"aseguradoras":"docs/orbit360-aseguradoras-preservation-registry-v20260827.json"},
+  "domainRegistries": {
+    "aseguradoras": "docs/orbit360-aseguradoras-preservation-registry-v20260827.json"
+  },
   "capabilities": [
     {
       "capabilityId": "ASEGURADORAS_OPERATIONAL_DIRECTORY",
-      "finalOwner": {"path":"core/client-insurer-operational-directory-owner-v20260722.js","version":"20260829.1","ownerId":"clientInsurerOperationalDirectoryOwner"},
+      "finalOwner": {
+        "path": "core/client-insurer-operational-directory-owner-v20260722.js",
+        "version": "20260829.1",
+        "ownerId": "clientInsurerOperationalDirectoryOwner"
+      },
       "bootstrap": "core/router-tenant-config-product-bootstrap-p0.js",
+      "requiredDirectAssets": [
+        "core/router-tenant-config-product-bootstrap-p0.js",
+        "modules/aseguradoras.js",
+        "modules/aseguradoras-v1202-resources-bridge.js"
+      ],
       "requiredReachableAssets": [
         "core/router-tenant-config-product-bootstrap-p0.js",
         "core/insurer-secure-target-bridge-v20260720.js",
@@ -38,43 +57,122 @@
         "modules/aseguradoras.js",
         "modules/aseguradoras-v1202-resources-bridge.js"
       ],
-      "legacyReachableConsumers": [{"path":"modules/aseguradoras-v1202-resources-bridge.js","mayBeFinalAuthority":false}],
+      "legacyReachableConsumers": [
+        {"path": "modules/aseguradoras-v1202-resources-bridge.js", "mayBeFinalAuthority": false}
+      ],
       "sourceOperationalAssertions": [
         "authorized_role_gate",
         "direct_record_password_pass_contrasena_clave_fallback",
         "provider_fallback_preserved",
         "temporary_reveal_rehide",
-        "frontend_does_not_persist_secret_values"
+        "frontend_does_not_persist_secret_values",
+        "product_bootstrap_loads_owner_20260829_1"
       ],
       "runtimeProof": {
         "required": true,
         "visibleDefectId": "INSURER_PORTAL_REVEAL_OPEN",
-        "chain": ["canonical_host_served","authenticated_human_identity","active_membership_resolved","role_policy_applied","direct_record_or_credentialRef_resolved","temporary_reveal_visible"],
+        "chain": [
+          "canonical_host_served",
+          "certified_product_entrypoint_served",
+          "authenticated_human_identity",
+          "active_membership_resolved",
+          "role_policy_applied",
+          "direct_record_or_credentialRef_resolved",
+          "temporary_reveal_visible"
+        ],
         "secretValueMayAppearOnlyInAuthorizedTemporaryUiMemory": true,
         "sourcePassClosesDefect": false
-      },
-      "invariants": ["portal_username_operational_visible","password_secret_temporary_reveal_authorized","provider_fallback_preserved","bank_number_operational_visible","no_store_write_by_final_owner","no_reimport_for_display_access_owner_gate_issues"]
+      }
     },
     {
-      "capabilityId":"CLIENTE360_PRIMARY_RUNTIME",
-      "finalOwner":{"path":"modules/cliente360.js","ownerId":"Orbit.modules.cliente360"},
-      "requiredDirectAssets":["modules/cliente360.js"],
-      "requiredReachableAssets":["modules/cliente360.js","core/router.js","core/visual-runtime-hydration-contract-v20260805.js"],
-      "sourceOperationalAssertions":["cliente360_reads_clientes_from_orbit_store","router_reacts_to_clientes_store_updates","empty_placeholder_is_not_counted_as_data_row","hydration_contract_observes_clientes"],
-      "runtimeProof":{"required":true,"visibleDefectId":"CLIENT360_LIST_EMPTY_WITH_DATA_OPEN","chain":["membership_ready","clientes_snapshot_ready","visible_client_projection_ready","cliente360_render_invoked_after_snapshot","rendered_data_rows_nonzero_when_visible_count_nonzero"],"sourcePassClosesDefect":false}
+      "capabilityId": "CLIENTE360_PRIMARY_RUNTIME",
+      "finalOwner": {"path": "modules/cliente360.js", "ownerId": "Orbit.modules.cliente360"},
+      "requiredDirectAssets": [
+        "data/store-firestore-product-readonly-p0.js",
+        "core/product-hydration-required-optional-p0.js",
+        "core/router.js",
+        "modules/cliente360.js",
+        "core/product-app-p0.js"
+      ],
+      "requiredReachableAssets": [
+        "data/store-firestore-product-readonly-p0.js",
+        "core/product-hydration-required-optional-p0.js",
+        "core/client-canonical-view-projection-v20260716.js",
+        "core/router.js",
+        "modules/cliente360.js",
+        "core/product-app-p0.js"
+      ],
+      "sourceOperationalAssertions": [
+        "cliente360_reads_clientes_from_orbit_store",
+        "router_reacts_to_clientes_store_updates",
+        "required_product_hydration_waits_for_server_confirmed_snapshots",
+        "cache_only_snapshot_cannot_satisfy_required_readiness",
+        "empty_placeholder_is_not_counted_as_data_row"
+      ],
+      "runtimeProof": {
+        "required": true,
+        "visibleDefectId": "CLIENT360_LIST_EMPTY_WITH_DATA_OPEN",
+        "chain": [
+          "membership_ready",
+          "required_server_snapshots_ready",
+          "clientes_snapshot_server_confirmed",
+          "visible_client_projection_ready",
+          "cliente360_render_invoked_after_authoritative_snapshot",
+          "rendered_data_rows_nonzero_when_visible_count_nonzero"
+        ],
+        "sourcePassClosesDefect": false
+      }
     },
     {
-      "capabilityId":"LOGIN_INTERACTIVE_ENTRY",
-      "finalOwner":{"path":"core/auth.js","ownerId":"Orbit.auth"},
-      "requiredReachableAssets":["core/backend-lab-loader.js","core/backend-lab-init.js","data/store-firestore-lab.local.js","core/auth.js","core/access-role-session-owner-v20260728.js","core/router.js","core/visual-runtime-hydration-contract-v20260805.js"],
-      "sourceOperationalAssertions":["auth_is_membership_gated","store_is_membership_gated","router_has_bounded_startup_waits","human_login_has_no_demo_identity_fallback"],
-      "runtimeProof":{"required":true,"visibleDefectId":"LOGIN_LATENCY_OPEN","chain":["submit","firebase_auth","membership_projection","critical_store_snapshots","router_ready","shell_usable"],"measureStageDurations":true,"sourcePassClosesDefect":false}
+      "capabilityId": "LOGIN_INTERACTIVE_ENTRY",
+      "finalOwner": {"path": "core/auth-product-runtime-p0.js", "ownerId": "Orbit.auth"},
+      "requiredDirectAssets": [
+        "core/product-runtime-browser-providers-p0.js",
+        "core/backend-product-readonly-bootstrap-p0.js",
+        "core/auth-product-runtime-p0.js",
+        "core/router.js",
+        "core/pwa.js",
+        "core/product-app-p0.js"
+      ],
+      "requiredReachableAssets": [
+        "core/product-runtime-browser-providers-p0.js",
+        "core/backend-product-readonly-bootstrap-p0.js",
+        "data/store-firestore-product-readonly-p0.js",
+        "core/product-hydration-required-optional-p0.js",
+        "core/auth-product-runtime-p0.js",
+        "core/router.js",
+        "core/pwa.js",
+        "sw.js",
+        "core/product-app-p0.js"
+      ],
+      "sourceOperationalAssertions": [
+        "product_auth_is_human_credential_owner",
+        "membership_is_resolved_before_product_store",
+        "required_server_snapshots_ready_before_shell",
+        "pwa_does_not_gate_router_start",
+        "service_worker_runtime_contracts_network_first",
+        "human_login_has_no_demo_identity_fallback"
+      ],
+      "runtimeProof": {
+        "required": true,
+        "visibleDefectId": "LOGIN_LATENCY_OPEN",
+        "chain": [
+          "submit",
+          "firebase_auth",
+          "membership_projection",
+          "required_server_snapshots",
+          "router_contracts",
+          "shell_usable"
+        ],
+        "measureStageDurations": true,
+        "sourcePassClosesDefect": false
+      }
     }
   ],
   "certifiedNonEntrypointAssets": [
-    {"path":"modules/aseguradoras-batch-admin-form-p09j.js","reason":"certified support asset; runtime entrypoint not required by current operational owner contract"},
-    {"path":"modules/aseguradoras-knowledge-p09.js","reason":"certified support asset; runtime entrypoint not required by current operational owner contract"},
-    {"path":"modules/aseguradoras-knowledge-panel-p09f.js","reason":"certified support asset; runtime entrypoint not required by current operational owner contract"}
+    {"path": "modules/aseguradoras-batch-admin-form-p09j.js", "reason": "certified support asset; runtime entrypoint not required by current operational owner contract"},
+    {"path": "modules/aseguradoras-knowledge-p09.js", "reason": "certified support asset; runtime entrypoint not required by current operational owner contract"},
+    {"path": "modules/aseguradoras-knowledge-panel-p09f.js", "reason": "certified support asset; runtime entrypoint not required by current operational owner contract"}
   ],
   "containsPII": false,
   "containsSecrets": false
