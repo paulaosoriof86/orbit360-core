@@ -16,10 +16,11 @@ const digest=v=>createHash('sha256').update(JSON.stringify(stable(v))).digest('h
 let I=null;
 let p=null;
 
-function writeFailureEvidence(code,transitionId,runId,statePatch){
-  if(!terminalOut||!transitionId||!Number.isInteger(runId)||runId<=0||!statePatch)return false;
+function writeFailureEvidence(code,transitionId,runId,statePatch=null){
+  if(!terminalOut||!transitionId||!Number.isInteger(runId)||runId<=0)return false;
+  const statePatchDigest=statePatch?digest(statePatch):'';
   const evidence={
-    schemaVersion:'orbit360-semantic-single-state-rootfix-terminal-v3',
+    schemaVersion:'orbit360-semantic-single-state-rootfix-terminal-v4',
     transitionId,
     runId,
     ok:false,
@@ -37,8 +38,8 @@ function writeFailureEvidence(code,transitionId,runId,statePatch){
     productionTouched:false,
     runtimeExecuted:false,
     browserExecuted:false,
-    statePatchDigest:digest(statePatch),
-    statePatch,
+    statePatchDigest,
+    ...(statePatch?{statePatch}:{}),
     productMutation:false,
     dataMutation:false,
     goLiveReopened:false,
@@ -71,20 +72,26 @@ const L=loadLedger();
 
 if(I.transitionId===RECOVERY){
   const r=I.recovery||{};
-  p=r.originalStatePatch;
+  p=r.originalStatePatch??null;
   const claim=L.executionClaim||{};
   if(claim.active!==true)fail('ORPHAN_RECOVERY_ACTIVE_CLAIM_REQUIRED',String(r.claimedTransitionId||''),Number(r.claimedRunId||0),p);
   if(claim.capabilityClass!=='SOURCE_ONLY')fail('ORPHAN_RECOVERY_NON_SOURCE_ONLY_CLAIM_FORBIDDEN',String(claim.transitionId||''),Number(claim.runId||0),p);
   if(L.activeState?.runtimeAuthorized!==false||L.authorizationBoundary?.privilegedRiskBoundaryEntered===true||L.authorizationBoundary?.authorizationConsumed===true)fail('ORPHAN_RECOVERY_PRIVILEGED_RISK_FORBIDDEN',String(claim.transitionId||''),Number(claim.runId||0),p);
   if(String(r.claimedTransitionId||'')!==String(claim.transitionId||'')||Number(r.claimedRunId)!==Number(claim.runId)||String(r.claimCanonicalBaseHead||'')!==String(claim.canonicalBaseHead||''))fail('ORPHAN_RECOVERY_CLAIM_IDENTITY_MISMATCH',String(claim.transitionId||''),Number(claim.runId||0),p);
-  if(!p||p.schemaVersion!=='orbit360-operational-state-patch-v1'||p.containsPII!==false||p.containsSecrets!==false||!p.values||typeof p.values!=='object'||Array.isArray(p.values))fail('ORPHAN_RECOVERY_STATE_PATCH_INVALID',String(claim.transitionId||''),Number(claim.runId||0),p);
-  if(JSON.stringify(p).length>24000)fail('ORPHAN_RECOVERY_STATE_PATCH_SIZE_INVALID',String(claim.transitionId||''),Number(claim.runId||0),p);
-  if(!/^[a-f0-9]{64}$/.test(String(claim.statePatchDigest||''))||digest(p)!==String(claim.statePatchDigest))fail('ORPHAN_RECOVERY_STATE_PATCH_DIGEST_MISMATCH',String(claim.transitionId||''),Number(claim.runId||0),p);
+  const claimPatchDigest=String(claim.statePatchDigest||'');
+  if(claimPatchDigest===''){
+    if(p!=null)fail('ORPHAN_RECOVERY_UNEXPECTED_STATE_PATCH_FOR_PATCHLESS_CLAIM',String(claim.transitionId||''),Number(claim.runId||0),p);
+  }else{
+    if(!/^[a-f0-9]{64}$/.test(claimPatchDigest))fail('ORPHAN_RECOVERY_STATE_PATCH_DIGEST_INVALID',String(claim.transitionId||''),Number(claim.runId||0),p);
+    if(!p||p.schemaVersion!=='orbit360-operational-state-patch-v1'||p.containsPII!==false||p.containsSecrets!==false||!p.values||typeof p.values!=='object'||Array.isArray(p.values))fail('ORPHAN_RECOVERY_STATE_PATCH_INVALID',String(claim.transitionId||''),Number(claim.runId||0),p);
+    if(JSON.stringify(p).length>24000)fail('ORPHAN_RECOVERY_STATE_PATCH_SIZE_INVALID',String(claim.transitionId||''),Number(claim.runId||0),p);
+    if(digest(p)!==claimPatchDigest)fail('ORPHAN_RECOVERY_STATE_PATCH_DIGEST_MISMATCH',String(claim.transitionId||''),Number(claim.runId||0),p);
+  }
   const failureCode=String(r.failureCode||'PIPELINE_MECHANISM_FAILURE_ORPHANED_SOURCE_ONLY_CLAIM');
   if(!/^[A-Z0-9_.:-]{1,180}$/.test(failureCode))fail('ORPHAN_RECOVERY_FAILURE_CODE_INVALID',String(claim.transitionId||''),Number(claim.runId||0),p);
   const prepared=writeFailureEvidence(failureCode,String(claim.transitionId),Number(claim.runId),p);
   if(!prepared)fail('ORPHAN_RECOVERY_TERMINAL_EVIDENCE_NOT_PREPARED',String(claim.transitionId||''),Number(claim.runId||0),p);
-  console.log(JSON.stringify({ok:true,status:'ORPHANED_SOURCE_ONLY_CLAIM_TERMINAL_EVIDENCE_PREPARED',classification:'PIPELINE_MECHANISM_FAILURE',recoveryRunId:executionRunId,claimedRunId:Number(claim.runId),claimedTransitionId:String(claim.transitionId),privilegedRiskObserved:false,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false},null,2));
+  console.log(JSON.stringify({ok:true,status:'ORPHANED_SOURCE_ONLY_CLAIM_TERMINAL_EVIDENCE_PREPARED',classification:'PIPELINE_MECHANISM_FAILURE',recoveryRunId:executionRunId,claimedRunId:Number(claim.runId),claimedTransitionId:String(claim.transitionId),patchlessClaimRecovered:claimPatchDigest==='',privilegedRiskObserved:false,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false},null,2));
   process.exit(0);
 }
 
@@ -99,7 +106,7 @@ const statePatchDigest=digest(p);
 if(!/^[a-f0-9]{64}$/.test(String(claim.statePatchDigest||''))||claim.statePatchDigest!==statePatchDigest)fail('ROOTFIX_HANDLER_STATE_PATCH_DIGEST_MISMATCH');
 
 const evidence={
-  schemaVersion:'orbit360-semantic-single-state-rootfix-terminal-v3',
+  schemaVersion:'orbit360-semantic-single-state-rootfix-terminal-v4',
   transitionId:I.transitionId,
   runId:executionRunId,
   ok:true,
@@ -123,6 +130,7 @@ const evidence={
   duplicateKeywordSanitizationForbidden:true,
   failureAlwaysPreparesTerminalEvidenceAfterValidatedIntent:true,
   orphanSourceOnlyClaimRecoverySupported:true,
+  patchlessSourceOnlyClaimRecoverySupported:true,
   productMutation:false,
   dataMutation:false,
   goLiveReopened:false,
@@ -131,4 +139,4 @@ const evidence={
   evidencePath:`actions-artifact:orbit360-single-state-${executionRunId}/orbit360-terminal.json`
 };
 fs.writeFileSync(terminalOut,JSON.stringify(evidence,null,2)+'\n','utf8');
-console.log(JSON.stringify({ok:true,status:evidence.status,classification:'PASS',runId:executionRunId,statePatchDigest,handlerUsesOwnerValidatedClaimDigest:true,failureAlwaysPreparesTerminalEvidenceAfterValidatedIntent:true,orphanSourceOnlyClaimRecoverySupported:true,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false},null,2));
+console.log(JSON.stringify({ok:true,status:evidence.status,classification:'PASS',runId:executionRunId,statePatchDigest,handlerUsesOwnerValidatedClaimDigest:true,failureAlwaysPreparesTerminalEvidenceAfterValidatedIntent:true,orphanSourceOnlyClaimRecoverySupported:true,patchlessSourceOnlyClaimRecoverySupported:true,runtimeExecuted:false,browserExecuted:false,secretAccess:false,firestoreRead:false,deployExecuted:false,productionTouched:false,containsPII:false,containsSecrets:false},null,2));
