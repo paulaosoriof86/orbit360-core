@@ -34,7 +34,7 @@
     "tools/orbit360-control-plane-publication-preflight-v20260825.mjs": "b854477fc2c702678547e7410bbe19715d23fd3c",
     "tools/orbit360-go-live-release-handler-v20260826.mjs": "7a5646367fd55234d3aa1b40f7b809e3da4d8819",
     "tools/orbit360-control-plane-transport-contract-v20260826.json": "d527de5e6c23086043a78e59b36f364be46610c4",
-    "tools/orbit360-post-go-live-runtime-capability-owner-lineage-review-v20260828.mjs": "f484e9f83c915d2235662c5049aafb77a73b03e0",
+    "tools/orbit360-post-go-live-runtime-capability-owner-lineage-review-v20260828.mjs": "93891a551dece414c233e8c0a9cd23c9de83783f",
     "tools/orbit360-validar-aseguradoras-credentials-rootfix-v20260828.mjs": "678add0afaad0238f517312729a91bd2f74a1cb4",
     "tools/orbit360-validar-aseguradoras-authorized-reveal-v20260829.mjs": "b0690739355be066cf9766f291cba23560eac829"
   },
