@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "orbit360-execution-intent-v1",
+  "transitionId": "CONTROL_PLANE_RECOVER_ORPHANED_SOURCE_ONLY_TERMINAL",
+  "canonicalBaseHead": "cd04b17d150e9b6e583afb01d082bf442cc50a3f",
+  "expectedLedgerRevision": 164,
+  "oneShotOnly": true,
+  "replayAllowed": false,
+  "explicitUserAuthorization": false,
+  "scope": {
+    "runtime": false,
+    "browser": false,
+    "secrets": false,
+    "firestoreRead": false,
+    "deploy": false,
+    "production": false,
+    "firestoreWrites": false,
+    "authWrites": false,
+    "operationalWrites": false,
+    "dataWrites": false,
+    "main": false,
+    "merge": false
+  },
+  "recovery": {
+    "claimedTransitionId": "POST_GO_LIVE_OVERLAY_RELEASE_PREP_SOURCE_ONLY",
+    "claimedRunId": 33335353690,
+    "claimCanonicalBaseHead": "35e05a2a5e25a6e451ab0694a175aea7bc4f9d69",
+    "failureCode": "PIPELINE_MECHANISM_FAILURE:OVERLAY_RELEASE_PREP_ORPHAN_AFTER_VALIDATOR_STALE"
+  },
+  "containsPII": false,
+  "containsSecrets": false
+}
