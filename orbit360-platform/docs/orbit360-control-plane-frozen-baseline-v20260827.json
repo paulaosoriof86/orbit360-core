@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "orbit360-control-plane-frozen-baseline-v26-semantic-single-state-static-identities",
+  "schemaVersion": "orbit360-control-plane-frozen-baseline-v27-semantic-single-state-static-identities",
   "status": "STATIC_SOURCE_IDENTITY_BASELINE",
   "stateBearing": false,
   "dynamicStateForbidden": true,
@@ -12,7 +12,7 @@
     "tools/orbit360-single-state-ledger-owner-v20260827.mjs": "e4294e00831396a9933649415beaf63f28c1d66e",
     "tools/orbit360-single-state-invariant-v20260827.mjs": "27c23453c6979d206c28e7cac7940e2c860bb9c8",
     "tools/orbit360-single-state-contract-v20260827.mjs": "b55610f7b2a08130cf56ec27f039513257afddfc",
-    "orbit360-platform/docs/orbit360-continuity-writer-registry-v20260820.json": "ddb3c5ff26150e0b2a7a03df54588d6750b9fffd",
+    "orbit360-platform/docs/orbit360-continuity-writer-registry-v20260820.json": "f3c68d936834dc8cdc208f37e1450881efca218a",
     "orbit360-platform/docs/orbit360-post-go-live-visible-priority-lock-v20260827.json": "310caea8f4e362a559e4d734e25343616d83195c",
     "tools/orbit360-gate-contract-registry-v20260717.json": "2a5eb2443adf1ce74ae1cc189cf85489b027f35c",
     "tools/orbit360-validar-gate-contracts-v20260717.mjs": "885b9d33e02bb95c886f607049a2cc73a73065e5",
@@ -25,6 +25,7 @@
     "tools/orbit360-validar-product-visual-runtime-chain-rootfix-v20260830.mjs": "5e1af850cb7e442fbc344432e7db1d68bf99820a",
     "orbit360-platform/docs/orbit360-post-go-live-successor-source-registry-v20260828.json": "f0cb54148f36a1fc6a14025a819f6a2ade916aea",
     "tools/orbit360-post-go-live-successor-source-stage-v20260828.mjs": "44d4b12618704b547f675d3b1bbd71640261b341",
+    "tools/orbit360-successor-stage-mechanism-rootfix-v20260830.mjs": "fa3eb0eed66ef8220def3bb8b96750baf60bbcac",
     "tools/orbit360-post-go-live-successor-source-accept-v20260828.mjs": "8bb3cacdd91b209f6a443c296458351e3339659e",
     "tools/orbit360-post-go-live-runtime-capability-composition-validate-v20260828.mjs": "d835d09db587f3b9e6d4c02b2ea8141ad6eb994e",
     "tools/orbit360-runtime-capability-validator-stale-rootfix-v20260828.mjs": "88c84b94bf69c4e9f11b0a9a69a8d8fa8e81a46c",
@@ -124,7 +125,11 @@
     "certifiedDirectAssetInventoryDerivedFromPhysicalArtifactIndex": true,
     "certifiedDirectAssetCountParityMachineEnforced": true,
     "failedProductStageRunReplayForbidden": true,
-    "productStagePreservesChildValidatorClassificationStatusAndCode": true
+    "productStagePreservesChildValidatorClassificationStatusAndCode": true,
+    "successorStageMechanismRootfixUsesRegisteredSourceOnlyTransition": true,
+    "successorStageMechanismRootfixRevalidatesFailedCandidateWithFixedMechanism": true,
+    "successorStageMechanismRootfixRequiresFreshCandidateAfterPass": true,
+    "writerRegistryOwnerLineageContractUsesCurrentProductOwners": true
   },
   "sealPolicy": {
     "passOrFailIsRecordedInLedgerTerminalEvidence": true,
