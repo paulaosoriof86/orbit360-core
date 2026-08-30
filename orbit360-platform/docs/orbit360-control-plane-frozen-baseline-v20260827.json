@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "orbit360-control-plane-frozen-baseline-v19-semantic-single-state-static-identities",
+  "schemaVersion": "orbit360-control-plane-frozen-baseline-v20-semantic-single-state-static-identities",
   "status": "STATIC_SOURCE_IDENTITY_BASELINE",
   "stateBearing": false,
   "dynamicStateForbidden": true,
@@ -24,7 +24,7 @@
     "orbit360-platform/docs/orbit360-post-go-live-successor-source-registry-v20260828.json": "4ec454d8038ec4c4675fd43cc8e08afe58b6d42d",
     "tools/orbit360-post-go-live-successor-source-stage-v20260828.mjs": "0c25669ba9022ef803ea1787212214f358a6244a",
     "tools/orbit360-post-go-live-successor-source-accept-v20260828.mjs": "8bb3cacdd91b209f6a443c296458351e3339659e",
-    "tools/orbit360-post-go-live-runtime-capability-composition-validate-v20260828.mjs": "3dde50572c5f9e6b08e08ab2c5e488dd3cbfae47",
+    "tools/orbit360-post-go-live-runtime-capability-composition-validate-v20260828.mjs": "eb96c420ebe414c0fc49da47b1f330f73f38349c",
     "tools/orbit360-runtime-capability-validator-stale-rootfix-v20260828.mjs": "69805277e922b55a7089cc1da0e02fef93bdca2e",
     "orbit360-platform/docs/orbit360-control-plane-canonicality-contract-v20260822.json": "47563b433ce0cfb947beae7f4584a98e48667bdf",
     "orbit360-platform/docs/orbit360-control-plane-semantic-contract-v20260824.json": "14113c685c6ced0c4726f02599591c84f3b415bf",
@@ -99,7 +99,8 @@
     "approvedRuntimePackageClosureRegistryFrozen": true,
     "approvedRuntimePackageClosureValidatorFrozen": true,
     "runtimeCapabilityRegistryFrozenWithClosureContract": true,
-    "transactionalProductOverlayRegistryExcludedFromStaticBlobFreeze": true
+    "transactionalProductOverlayRegistryExcludedFromStaticBlobFreeze": true,
+    "runtimeCompositionHandlerConsumesApprovedPackageClosureStatus": true
   },
   "sealPolicy": {
     "passOrFailIsRecordedInLedgerTerminalEvidence": true,
