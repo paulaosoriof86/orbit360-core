@@ -54,7 +54,30 @@
     "schemaVersion": "orbit360-certified-product-active-overlay-v1",
     "mode": "HISTORICAL_ARTIFACT_PLUS_EXPLICIT_OVERLAY",
     "baseSourceHead": "8c9668d6d423e82826b0295431ec699390d79b4b",
-    "acceptedFiles": []
+    "acceptedFiles": [
+      {
+        "path": "orbit360-platform/core/client-insurer-operational-directory-owner-v20260722.js",
+        "beforeGitBlobSha": "3165a788f23fda760482f4b9504bd5ba1b975a16",
+        "afterGitBlobSha": "9a3578a4297584274392030697a674585b53c5e0",
+        "acceptanceKind": "explicit_acceptance",
+        "acceptedCandidateHead": "619c58251eb5046097d0177e5312a1def41c1118",
+        "acceptedBaseHead": "0d85732473b172ae6a0ab219eade50284a021412",
+        "validationProfile": "ASEGURADORAS_AUTHORIZED_REVEAL_V2",
+        "diffDigest": "11e8ca82a4ef83f65a03c79a36528fcbf49266ad6057e94c1042e0b75c21faf5",
+        "acceptanceRunId": 33284848913
+      },
+      {
+        "path": "orbit360-platform/core/router-tenant-config-product-bootstrap-p0.js",
+        "beforeGitBlobSha": "902c85c83388ebf0a71bf0e7595faa61284872d7",
+        "afterGitBlobSha": "41c4a7c8ba46b243581f643bc057b780d03f4a00",
+        "acceptanceKind": "explicit_acceptance",
+        "acceptedCandidateHead": "619c58251eb5046097d0177e5312a1def41c1118",
+        "acceptedBaseHead": "0d85732473b172ae6a0ab219eade50284a021412",
+        "validationProfile": "ASEGURADORAS_AUTHORIZED_REVEAL_V2",
+        "diffDigest": "11e8ca82a4ef83f65a03c79a36528fcbf49266ad6057e94c1042e0b75c21faf5",
+        "acceptanceRunId": 33284848913
+      }
+    ]
   },
   "approvedModuleScripts": [
     "modules/academia.js",
