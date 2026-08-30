@@ -2,6 +2,29 @@
 
 Formato basado en *Keep a Changelog*. Construcción greenfield; el estado operativo vigente se mantiene en la rama obligatoria y PR #5 draft/open, sin merge ni producción salvo autorización explícita.
 
+## [ROOTFIX-APPROVED-MODULE-RUNTIME-CLOSURE] — 2026-08-29
+### Root cause
+- `PIPELINE_MECHANISM_FAILURE`: una capacidad aprobada podía existir en source sin una prueba transversal que obligara a conservar su autoridad final a través de owner/entrypoint/accepted overlay/package closure.
+- `VALIDATOR_STALE`: consumidores globales conservaban versiones y firmas históricas de Aseguradoras, Cliente 360, router/hydration, login, rootfix y owner-lineage.
+### Changed
+- Aseguradoras queda aceptada en el owner canónico `client-insurer-operational-directory-owner-v20260722.js` versión `20260829.1`; se descartó reinsertar OP2 como autoridad paralela.
+- Reveal autorizado puede resolver credencial operacional existente (`password`, `pass`, `contrasena`, `clave`) y conserva provider seguro como fallback; contraseña oculta por defecto y sin reimportación.
+- Se incorporó contrato `approved baseline -> source -> final owner/entrypoint -> accepted overlay -> approved package closure -> owner lineage -> runtime proof`.
+- Package closure explícito cubre Aseguradoras, Cliente 360, Pólizas, Cobros, Ops y Leads.
+- El registro transaccional de overlays queda protegido por aceptación/schema/validator y no por hash estático incompatible con su propia mutación autorizada.
+- Validadores de Cliente 360, router/hydration y login pasan a comprobar semántica vigente en lugar de literales históricos.
+- Rootfix D3 deriva fallo/aceptación del ledger y valida claim+freeze; owner-lineage consume contratos vigentes y deja de usar owner/blob/status históricos como autoridad.
+### Verified
+- aceptación source-only Aseguradoras: run `33284848913` PASS.
+- rootfix reusable de mecanismo: run `33286857084` PASS.
+- approved package closure: run `33286888487` PASS, `packageClosureCapabilityCount=6`, baseline `9504702901` preservado.
+- owner lineage vigente: run `33287054078` PASS.
+- Firestore/Auth/operational/data writes `0/0/0/0`; sin runtime, browser, secretos, deploy ni producción.
+### Boundary
+- Los blockers `INSURER_PORTAL_REVEAL_OPEN`, `CLIENT360_LIST_EMPTY_WITH_DATA_OPEN` y `LOGIN_LATENCY_OPEN` permanecen abiertos hasta prueba runtime/live.
+- El cierre source/composición/lineage no implica deploy a `app.aysseguros.com`; cualquier deploy requiere autorización explícita.
+- Cierre durable: `docs/ROOTFIX-APPROVED-MODULE-RUNTIME-CLOSURE-20260829.md`.
+
 ## [CONTROL-PLANE-SINGLE-STATE] — 2026-08-26
 ### Changed
 - El ledger queda como única autoridad mutable del estado operativo.
