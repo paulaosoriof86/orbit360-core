@@ -1,14 +1,17 @@
 {
-  "schemaVersion": "orbit360-approved-runtime-closure-registry-v1",
+  "schemaVersion": "orbit360-approved-runtime-closure-registry-v2-certified-product-entrypoint",
   "registryId": "ORBIT360-APPROVED-RUNTIME-CLOSURE",
   "createdAt": "2026-08-29",
-  "status": "ACTIVE_SOURCE_ONLY_FAIL_CLOSED",
+  "updatedAt": "2026-08-30",
+  "status": "ACTIVE_CERTIFIED_PRODUCT_ENTRYPOINT_SOURCE_ONLY_FAIL_CLOSED",
   "stateBearing": false,
   "dynamicStateForbidden": true,
+  "entrypointAuthority": "docs/orbit360-certified-product-entrypoint-contract-v20260830.json",
   "baseline": {
     "artifactId": 9504702901,
     "sourceHead": "8c9668d6d423e82826b0295431ec699390d79b4b",
     "manifestSha256": "b1c98c1faf644b5d83cfe6e6bb1a602927c438cd85b7855cb0b1a6b98c08053c",
+    "indexSha256": "125b24a3fc215a368a7183a107cd55eb5a6332fc8a7f8354ed94e3169340ec4e",
     "manifestStatus": "FASE_A_PRODUCT_MACRO2_TRANSVERSAL_SOURCE_ACCEPTANCE_CERTIFIED",
     "fileCount": 194,
     "publicFileCount": 189,
@@ -23,7 +26,11 @@
     "sourcePassDoesNotEqualRuntimeProof": true,
     "runtimeProofRequiredBeforeVisibleDefectClosure": true,
     "reimportForbiddenForCompositionFailure": true,
-    "deployForbiddenInSourceOnlyValidation": true
+    "deployForbiddenInSourceOnlyValidation": true,
+    "sourceIndexIsNotProductEntrypointAuthority": true,
+    "packageMembershipCannotSubstituteForReachability": true,
+    "productPwaCannotBlockBusinessStartup": true,
+    "requiredReadinessNeedsAuthoritativeServerSnapshot": true
   },
   "baselineCertifiedCoreAssets": [
     "core/router-tenant-config-product-bootstrap-p0.js",
@@ -32,12 +39,24 @@
     "core/insurer-secure-target-bridge-v20260720.js",
     "core/secure-resource-fields-v1202.js",
     "core/router.js",
+    "core/pwa.js",
+    "sw.js",
+    "core/product-runtime-browser-providers-p0.js",
     "core/auth-product-runtime-p0.js",
     "core/backend-product-readonly-bootstrap-p0.js",
-    "data/store-firestore-product-readonly-p0.js"
+    "core/product-hydration-required-optional-p0.js",
+    "data/store-firestore-product-readonly-p0.js",
+    "core/product-app-p0.js"
   ],
   "productEntrypointDirectAssets": [
+    "data/store-firestore-product-readonly-p0.js",
+    "core/product-hydration-required-optional-p0.js",
+    "core/product-runtime-browser-providers-p0.js",
+    "core/backend-product-readonly-bootstrap-p0.js",
+    "core/auth-product-runtime-p0.js",
     "core/router-tenant-config-product-bootstrap-p0.js",
+    "core/router.js",
+    "core/pwa.js",
     "modules/aseguradoras.js",
     "modules/aseguradoras-v1197-ux-bridge.js",
     "modules/aseguradoras-v1202-import-bridge.js",
@@ -46,7 +65,8 @@
     "modules/polizas.js",
     "modules/cobros.js",
     "modules/ops.js",
-    "modules/leads.js"
+    "modules/leads.js",
+    "core/product-app-p0.js"
   ],
   "capabilities": [
     {
@@ -66,16 +86,41 @@
         "modules/aseguradoras-v1202-resources-bridge.js"
       ]
     },
-    {"capabilityId":"CLIENTE360_PRIMARY_RUNTIME","requiredPackageAssets":["modules/cliente360.js","core/router.js"]},
-    {"capabilityId":"POLIZAS_PRIMARY_RUNTIME","requiredPackageAssets":["modules/polizas.js","core/router.js"]},
-    {"capabilityId":"COBROS_PRIMARY_RUNTIME","requiredPackageAssets":["modules/cobros.js","core/router.js"]},
-    {"capabilityId":"OPS_PRIMARY_RUNTIME","requiredPackageAssets":["modules/ops.js","core/router.js"]},
-    {"capabilityId":"LEADS_PRIMARY_RUNTIME","requiredPackageAssets":["modules/leads.js","core/router.js"]}
+    {
+      "capabilityId": "CLIENTE360_PRIMARY_RUNTIME",
+      "requiredPackageAssets": [
+        "data/store-firestore-product-readonly-p0.js",
+        "core/product-hydration-required-optional-p0.js",
+        "core/client-canonical-view-projection-v20260716.js",
+        "core/router.js",
+        "modules/cliente360.js",
+        "core/product-app-p0.js"
+      ]
+    },
+    {"capabilityId": "POLIZAS_PRIMARY_RUNTIME", "requiredPackageAssets": ["modules/polizas.js", "core/router.js", "data/store-firestore-product-readonly-p0.js", "core/product-hydration-required-optional-p0.js"]},
+    {"capabilityId": "COBROS_PRIMARY_RUNTIME", "requiredPackageAssets": ["modules/cobros.js", "core/router.js", "data/store-firestore-product-readonly-p0.js", "core/product-hydration-required-optional-p0.js"]},
+    {"capabilityId": "OPS_PRIMARY_RUNTIME", "requiredPackageAssets": ["modules/ops.js", "core/router.js", "data/store-firestore-product-readonly-p0.js", "core/product-hydration-required-optional-p0.js"]},
+    {"capabilityId": "LEADS_PRIMARY_RUNTIME", "requiredPackageAssets": ["modules/leads.js", "core/router.js", "data/store-firestore-product-readonly-p0.js", "core/product-hydration-required-optional-p0.js"]},
+    {
+      "capabilityId": "LOGIN_INTERACTIVE_ENTRY",
+      "requiredPackageAssets": [
+        "core/product-runtime-browser-providers-p0.js",
+        "core/auth-product-runtime-p0.js",
+        "core/backend-product-readonly-bootstrap-p0.js",
+        "data/store-firestore-product-readonly-p0.js",
+        "core/product-hydration-required-optional-p0.js",
+        "core/router.js",
+        "core/pwa.js",
+        "sw.js",
+        "core/product-app-p0.js"
+      ]
+    }
   ],
   "evidence": {
     "baselineArtifactInspected": true,
     "baselineProductEntrypointInspected": true,
     "baselinePackageManifestInspected": true,
+    "baselineProductEntrypointSha256": "125b24a3fc215a368a7183a107cd55eb5a6332fc8a7f8354ed94e3169340ec4e",
     "overlayAuthority": "docs/orbit360-certified-product-preservation-registry-v20260827.json",
     "approvedModuleAuthority": "docs/orbit360-certified-product-preservation-registry-v20260827.json"
   },
