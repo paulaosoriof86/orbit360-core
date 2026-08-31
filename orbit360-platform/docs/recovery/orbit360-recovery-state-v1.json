@@ -1,0 +1,50 @@
+{
+  "schemaVersion": "orbit360-recovery-state-v1",
+  "stateId": "ORBIT360-FASE-A-CLEAN-RECOVERY",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "forensicOriginSha": "9c95f31461f2eabe9804625b5659bee772f5602a",
+  "createdAtUtc": "2026-08-31T18:00:00Z",
+  "status": "ITERATION_0_FROZEN",
+  "currentIteration": 0,
+  "productionTargetIteration": 5,
+  "dataRefreshIteration": 6,
+  "productionAccepted": false,
+  "productionTouchedByRecovery": false,
+  "dataCutoff": "2026-07-31",
+  "dataRefreshFrom": "2026-08-01",
+  "dataRefreshThrough": "2026-08-31",
+  "newRepositoryRequired": false,
+  "newFirebaseProjectRequired": false,
+  "newChatGPTProjectRequired": false,
+  "firebasePreviewRequired": true,
+  "sameArtifactPreviewToProductionRequired": true,
+  "legacyOverlayReleaseForbidden": true,
+  "legacySourceIndexAsProductionAuthorityForbidden": true,
+  "runtimeScratchInsideProductTreeForbidden": true,
+  "roles": {
+    "aseguradorasFullOperationalVisibilityRequired": [
+      "Operativo",
+      "Admin",
+      "AdminTenant",
+      "SuperAdmin",
+      "Dirección"
+    ],
+    "asesorFullOperationalVisibilityAuthorized": false
+  },
+  "iterations": {
+    "0": {"name": "FORENSIC_FREEZE_AND_AUTHORITY", "status": "PASS"},
+    "1": {"name": "APPROVED_CAPABILITY_LINEAGE_RECONSTRUCTION", "status": "PENDING"},
+    "2": {"name": "CLEAN_SOURCE_SINGLE_ENTRYPOINT_AND_STARTUP_PERFORMANCE", "status": "PENDING"},
+    "3": {"name": "IMMUTABLE_BUILD_AND_FIREBASE_PREVIEW", "status": "PENDING"},
+    "4": {"name": "TRANSVERSAL_E2E_APPROVED_VS_PREVIEW", "status": "PENDING"},
+    "5": {"name": "PROMOTE_SAME_ARTIFACT_TO_PRODUCTION", "status": "PENDING"},
+    "6": {"name": "DATA_REFRESH_20260801_TO_20260831", "status": "PENDING_POST_PRODUCTION"}
+  },
+  "nextAction": "ITERATION_1_RECONSTRUCT_APPROVED_CAPABILITY_LINEAGE",
+  "sourceOfTruth": {
+    "mutableState": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
+    "approvedCapabilities": "orbit360-platform/docs/recovery/orbit360-approved-capability-manifest-v1.json",
+    "processContract": "orbit360-platform/docs/recovery/ORBIT360-FASE-A-CLEAN-RECOVERY-MASTER-PLAN-20260831.md"
+  }
+}
