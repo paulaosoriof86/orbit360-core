@@ -1,11 +1,12 @@
-# Orbit 360 Fase A — Matriz Canónica de Validación Módulo por Módulo v1
+# Gravicentra Insurance Fase A — Matriz Canónica de Validación Módulo por Módulo v1
 
 **Estado:** plantilla de evidencia; no sustituye `orbit360-recovery-state-v1.json`.  
-**Plan:** Recovery Master Plan v1.1.
+**Plan rector:** `GRAVICENTRA-INSURANCE-FASE-A-RECOVERY-MASTER-PLAN-v1.3-20260831.md`.  
+**Marca visible:** `Gravicentra Insurance`. Identificadores técnicos `orbit360-*` se conservan cuando corresponda por compatibilidad.
 
 ## Regla
 
-Cada capability Fase A debe tener lineage aprobado y alcanzar dos estados: `LATEST_APPROVED_VERSION_PREVIEW_PASS` y `LATEST_APPROVED_VERSION_LIVE_PASS`. El módulo no se cierra por presencia de archivo ni por smoke global.
+Cada capability Fase A debe tener lineage aprobado y alcanzar dos estados: `LATEST_APPROVED_VERSION_PREVIEW_PASS` y `LATEST_APPROVED_VERSION_LIVE_PASS`. El módulo no se cierra por presencia de archivo, hash, deploy ni smoke global.
 
 | Capability / superficie | Lineage | Source/blob SHA | Owner final | Roles | Read/Write | Build esperado | Preview individual | Live individual | Evidencia |
 |---|---|---|---|---|---|---|---|---|---|
@@ -39,6 +40,10 @@ Para cada fila:
 9. 404/page/console errors;
 10. responsive aplicable.
 
-## Prueba live previa a datos
+## Gate preview
+
+Ninguna capability permite avanzar mientras no alcance `LATEST_APPROVED_VERSION_PREVIEW_PASS`.
+
+## Gate live previo a datos
 
 Después de promover el mismo artifact a producción, repetir el test individual sobre producción. Ningún refresh de datos agosto puede iniciar mientras exista una fila Fase A sin `LATEST_APPROVED_VERSION_LIVE_PASS`.
