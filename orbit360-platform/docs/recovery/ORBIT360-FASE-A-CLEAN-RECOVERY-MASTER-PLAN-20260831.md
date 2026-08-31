@@ -1,55 +1,65 @@
-# Orbit 360 A&S — Plan Maestro Congelado de Recuperación Limpia Fase A
+# Orbit 360 A&S — Plan Maestro Congelado de Recuperación Limpia Fase A v1.1
 
-Fecha de congelación: 2026-08-31
-Rama de recuperación: `recovery/fase-a-clean-20260831`
-SHA forense de origen: `9c95f31461f2eabe9804625b5659bee772f5602a`
-Repositorio: `paulaosoriof86/orbit360-core`
+**Fecha de congelación:** 2026-08-31  
+**Rama de recuperación:** `recovery/fase-a-clean-20260831`  
+**SHA forense de origen:** `9c95f31461f2eabe9804625b5659bee772f5602a`  
+**Repositorio:** `paulaosoriof86/orbit360-core`  
+**Estado:** VIGENTE / ANTI-DESVIACIÓN / sustituye como plan operativo de recuperación a planes previos que queden incompatibles con este corte.
 
 ## 1. Objetivo no negociable
 
-Recuperar y publicar hoy una Fase A estable de Orbit 360 que sirva exactamente la última versión aprobada de cada módulo/capacidad incluida en Fase A, sin volver a desarrollar los módulos, sin reimportar datos durante la recuperación del software y sin seguir acumulando overlays/rootfixes sobre el mecanismo anterior.
+Recuperar y publicar una Fase A estable que sirva **exactamente la última versión aprobada de cada módulo/capacidad Fase A**, sin reconstruir módulos funcionales, sin reimportar datos durante la recuperación del software y sin seguir acumulando overlays/rootfixes sobre el mecanismo anterior.
 
-La definición de versión correcta es obligatoriamente:
+Cadena obligatoria de verdad:
 
-`aceptación aprobada -> source exacto -> dependencia alcanzable -> artefacto inmutable -> preview exacto -> browser E2E -> mismo artefacto promovido -> producción exacta`.
+`aceptación aprobada -> source exacto -> owner/dependencias -> entrypoint alcanzable -> artifact inmutable -> preview exacto -> prueba individual del módulo -> matriz transversal -> mismo artifact en producción -> pruebas en vivo -> data refresh`.
 
-Un SHA de ZIP o la mera presencia de un archivo en el paquete NO son evidencia suficiente de versión correcta.
+La mera presencia de un archivo, un ZIP o un hash de paquete NO demuestra que la capacidad aprobada se ejecute.
 
-## 2. Reglas duras congeladas
+## 2. Autoridad y continuidad
 
-1. No crear un repositorio nuevo. Este repositorio conserva toda la historia forense y la recuperación vive en una rama limpia independiente.
-2. No crear un nuevo proyecto Firebase para esta salida. Se usa el proyecto Firebase actualmente conectado a A&S, con un Hosting preview/channel aislado antes de producción. Una separación futura DEV/STG/PROD podrá evaluarse después del go-live, fuera de este alcance.
-3. No crear un proyecto nuevo de ChatGPT como requisito. Ninguna conversación es fuente de verdad. GitHub y los artefactos de CI son la autoridad.
-4. No modificar producción durante las iteraciones 0 a 4.
-5. No reimportar ni actualizar datos de negocio durante las iteraciones 0 a 5. El dataset operativo se conserva con corte conocido al 2026-07-31 mientras se estabiliza el software.
-6. No volver a utilizar `baseline histórico + overlays` como mecanismo normal de publicación.
-7. No reconstruir el artefacto después de haberlo certificado. El mismo digest probado en preview es el único que puede promoverse a producción.
-8. No reabrir un módulo funcional cerrado para reinterpretarlo. Se reconstruye su última aceptación comprobable y se valida end-to-end.
-9. No usar el `index.html` LAB como autoridad productiva. La recuperación produce UN SOLO entrypoint productivo canónico, generado desde el manifiesto aprobado.
-10. Todo runtime scratch, screenshots, browser evidence, terminal evidence y archivos temporales deben quedar fuera del árbol de producto/publicación.
-11. La rama vieja y sus documentos quedan como historia forense, no como mecanismo activo de release.
-12. No se autoriza merge a `main` como requisito de esta salida. `main` no es actualmente autoridad de release.
-13. Una producción que solo permite consultar NO se considera terminada si alguna capacidad Fase A aprobada requiere CRUD/escrituras operativas. Iteración 1 reconstruye la semántica de escritura aprobada por capability; preview puede mantenerse read-only, pero producción debe habilitar exclusivamente las escrituras aprobadas y probarlas por rol.
+Las conversaciones de ChatGPT, Codex, PR bodies y mensajes narrativos son contexto, no autoridad de estado.
 
-## 3. Regla de Aseguradoras — corrección explícita
+Autoridades únicas de la recuperación:
+1. `orbit360-recovery-state-v1.json`: único estado mutable.
+2. `orbit360-approved-capability-manifest-v1.json`: versión/capability aprobada.
+3. este Plan Maestro v1.1: orden, gates y prohibiciones.
+4. `ORBIT360-RECOVERY-ANTI-DERAILMENT-ADDENDUM-20260831.md`: protocolo obligatorio de retorno si aparece un desvío.
 
-No debe existir ocultamiento accidental de las capacidades operativas de Aseguradoras para roles autorizados.
+El Proyecto ChatGPT **Orbit 360** puede y debe usarse como contenedor de continuidad. Sus instrucciones y fuentes deben apuntar a estas autoridades; no se necesita crear otro proyecto de ChatGPT para esta recuperación.
 
-Roles que deben visualizar y operar el directorio completo, incluyendo usuario, contraseña/revelado y cuentas según el contrato funcional final:
+## 3. Reglas duras
 
+1. Mismo repositorio GitHub; recuperación en rama independiente.
+2. Mismo proyecto Firebase para esta salida; preview/channel aislado antes de producción.
+3. No tocar producción durante iteraciones 0–4.
+4. No actualizar datos de negocio durante iteraciones 0–5; corte funcional de validación: 2026-07-31.
+5. Prohibido volver a publicar mediante `baseline histórico + overlays` como mecanismo normal.
+6. Build una vez; el artifact certificado no se modifica ni recompone.
+7. No reabrir trabajo funcional cerrado sin regresión demostrada.
+8. Un solo entrypoint productivo canónico; el `index.html` LAB no es autoridad productiva.
+9. Runtime scratch/evidencias temporales fuera del árbol publicable.
+10. No usar `main` como requisito de release mientras no sea autoridad reconciliada.
+11. No reimportar Clientes/Aseguradoras ni otras fuentes para corregir defectos de visualización, caché, routing, composición o permisos.
+12. No pedir trabajo manual local a Paula salvo que sea técnicamente indispensable y no exista ruta automatizable.
+13. No confundir source, build, preview, producción, validación técnica, validación humana y uso real.
+14. Cada fallo permanece dentro de su iteración; no crea otra metodología ni otro plan.
+15. Codex es recurso limitado: usar solo cuando reduzca materialmente trabajo mecánico de gran volumen; no para documentación ni tareas que puedan resolverse desde ChatGPT/GitHub.
+
+## 4. Regla funcional Aseguradoras
+
+El directorio operativo completo debe ser visible y operable para:
 - `Operativo`
 - `Admin` / `AdminTenant`
 - `SuperAdmin`
-- `Dirección` se conserva como rol autorizado existente mientras no exista una instrucción posterior que lo retire.
+- `Dirección`
 
-`Asesor` no se incorpora a esta autorización en esta recuperación salvo aceptación funcional explícita posterior.
+Incluye usuario, contraseña/revelado y cuentas conforme a la última funcionalidad aprobada. No se acepta ocultamiento accidental de UI ni el DOM como mecanismo de seguridad. `Asesor` no recibe esa visibilidad completa salvo evidencia aprobada posterior.
 
-La autorización se prueba por capability y rol. No se acepta una solución basada solo en esconder/mostrar DOM.
+## 5. Alcance mínimo Fase A
 
-## 4. Alcance Fase A a reconstruir y certificar transversalmente
-
-Como mínimo:
-
+La Iteración 1 debe reconstruir la lista final desde evidencia; como mínimo:
+- Login/acceso
 - Inicio
 - Cliente 360
 - Aseguradoras
@@ -57,261 +67,222 @@ Como mínimo:
 - Leads
 - Pólizas
 - Vehículos
-- Recibos y cartera
+- Recibos/cartera
 - Cobros
-- roles y scopes
-- sincronizaciones y relaciones entre módulos
-- login / acceso
-- shell / router / navegación
+- Roles/scopes
+- relaciones y sincronizaciones entre módulos
+- shell/router/navegación
 - hidratación de datos
-- PWA/service worker solo si no bloquea startup
-- operaciones CRUD/escrituras que formen parte de la última versión aprobada de las capacidades Fase A
+- PWA/service worker sin bloqueo de startup
+- CRUD/escrituras que pertenezcan a la última versión aprobada
 
-La iteración 1 debe reconstruir desde evidencia histórica cualquier capacidad adicional que ya hubiese sido formalmente aprobada para Fase A y agregarla al manifiesto antes del build limpio.
+Cualquier capacidad adicional formalmente aprobada para Fase A se agrega antes del build limpio.
 
-## 5. Causa arquitectónica que esta recuperación elimina
+## 6. Prueba obligatoria módulo por módulo
 
-La rama histórica tiene dos verdades distintas de entrada:
+**No existe aprobación transversal sin aprobación individual.** Por cada módulo/capability Fase A se genera una fila canónica con:
+- última aceptación comprobable;
+- run/commit/artifact de origen;
+- source/blob SHA exacto;
+- owner final y bridges imprescindibles;
+- dependencias runtime;
+- rol(es) aplicables;
+- lectura/escritura aprobada;
+- comportamiento visual/funcional esperado;
+- prueba original de aceptación;
+- `runtimeVersion/buildId` esperado;
+- evidencia de preview;
+- evidencia de producción.
 
-- el `index.html` de source continúa siendo LAB;
-- producción usa un `index.html` materializado/certificado distinto.
+Cada módulo debe ejecutar, individualmente y antes de la matriz transversal:
+1. carga/ruta;
+2. comprobación de build/version exacta;
+3. render de la última UI aprobada;
+4. datos esperados sin `undefined/NaN`;
+5. acciones principales;
+6. persistencia/recarga si aplica;
+7. permisos por rol;
+8. dependencias y relaciones;
+9. 404/console/page errors;
+10. responsive aplicable.
 
-Además, el artefacto certificado tiene una superficie de arranque de más de cien scripts directos, bootstrap dinámico adicional, hidratación de varias colecciones antes de mostrar la app y esperas PWA/readiness que pueden prolongar el acceso.
+Estado válido por módulo: `LATEST_APPROVED_VERSION_PREVIEW_PASS`. Ningún módulo con estado pendiente permite avanzar a producción.
 
-La recuperación elimina esta bifurcación y crea un único entrypoint productivo reproducible.
+## 7. Causa arquitectónica que se elimina
 
-## 6. Arquitectura de release congelada
+La rama histórica ha tenido bifurcación entre source/entrypoint LAB y entrypoint productivo materializado, múltiples bridges/owners y una ruta de arranque extensa. La recuperación crea **un único entrypoint productivo reproducible**, absorbe deltas aprobados en owners finales y elimina la recomposición posterior a la prueba.
 
-### Autoridades únicas
+La performance es parte del gate: login y primer render no pueden depender del control del service worker ni de esperas artificiales de 30/120 s como flujo exitoso normal.
 
-1. `orbit360-recovery-state-v1.json` — único estado mutable de la recuperación.
-2. `orbit360-approved-capability-manifest-v1.json` — inventario canónico de capacidades/versiones aprobadas.
-3. Este Plan Maestro — proceso y gates, inmutable salvo versión sucesora explícita.
+## 8. Iteraciones cerradas
 
-### Flujo
-
-`historia/aprobaciones -> capability manifest -> clean source tree -> build once -> immutable artifact -> preview -> full E2E -> promote same artifact -> postprod smoke -> data refresh separado`.
-
-## 7. Iteraciones cerradas
-
-### ITERACIÓN 0 — FREEZE FORENSE Y AUTORIDAD
-
-Objetivo: impedir que la recuperación dependa del HEAD móvil de la rama histórica.
-
-Entradas:
-- SHA `9c95f31461f2eabe9804625b5659bee772f5602a`.
-- baseline certificado `9504702901` solo como evidencia histórica, no como base automática del release final.
-
-Tareas:
-- congelar rama de recuperación;
-- crear estado y manifiesto;
-- registrar decisiones duras;
-- bloquear en esta rama cualquier mecanismo viejo de overlay/reseal como release path.
-
-Salida PASS:
+### ITERACIÓN 0 — FREEZE FORENSE Y AUTORIDAD — PASS
 - rama independiente;
-- documentos autoridad presentes;
-- SHA de origen fijado.
+- SHA de origen fijo;
+- estado/manifiesto/plan presentes;
+- release path antiguo fuera de la recuperación.
 
-### ITERACIÓN 1 — RECONSTRUCCIÓN DE ÚLTIMA VERSIÓN APROBADA DE TODOS LOS MÓDULOS FASE A
+### ITERACIÓN 1 — LINEAGE DE ÚLTIMA VERSIÓN APROBADA
+Por cada capability reconstruir aceptación, source exacto, owner, dependencias, roles y write semantics.
 
-Objetivo: resolver la pregunta que el mecanismo anterior nunca cerró transversalmente: cuál es la última versión aprobada de cada capability.
+**Gate:**
+- 100% capacidades Fase A con lineage único;
+- cero owners ambiguos;
+- cero aprobados huérfanos/no alcanzables;
+- cada módulo identifica su prueba individual y su última versión aprobada;
+- cada módulo declara `READ_ONLY` o operaciones de escritura aprobadas.
 
-Por cada capability:
-- módulo/superficie;
-- aceptación/run/commit/artefacto de origen;
-- archivos implementadores;
-- owners/bridges necesarios;
-- dependencias;
-- rol esperado;
-- semántica de lectura/escritura aprobada;
-- prueba de aceptación original;
-- SHA/blob exacto elegido;
-- razón para descartar versiones anteriores/posteriores no aprobadas.
+### ITERACIÓN 2 — CLEAN SOURCE + INDEX ÚNICO + STARTUP
+- árbol limpio de producto;
+- un solo `index.html` productivo generado desde el capability manifest;
+- excluir LAB/seeds/auth LAB del entrypoint;
+- absorber overlays aprobados en owners finales;
+- retirar/shadow-disable duplicados;
+- dependency/reachability graph;
+- assets por build/digest;
+- separar pre-auth de post-auth cuando sea seguro;
+- service worker fuera de la ruta crítica de login;
+- required hydration mínima;
+- capa de escritura productiva separada de writers LAB.
 
-No se permitirá inferir que el baseline actual es el último solo porque el archivo no cambió después.
+**Gate:** clean source PASS + reachability PASS + startup PASS + write contract PASS.
 
-Salida PASS:
-- 100% de capabilities Fase A tienen lineage único y comprobable;
-- cero capacidades con dos owners activos ambiguos;
-- cero archivos aprobados huérfanos/no alcanzables;
-- cada capability declara `READ_ONLY` o las operaciones de escritura aprobadas y sus roles.
+### ITERACIÓN 3 — BUILD ÚNICO + FIREBASE PREVIEW
+- build una sola vez;
+- manifest SHA-256 completo;
+- digest único;
+- mismo artifact a Hosting Preview/Channel;
+- full remote readback;
+- writes/rules en emulador o harness aislado antes de producción.
 
-### ITERACIÓN 2 — CLEAN SOURCE + ENTRYPOINT ÚNICO + PERFORMANCE STARTUP
+**Gate:** artifact/readback exacto PASS.
 
-Objetivo: generar una versión productiva coherente y eliminar la bifurcación LAB/producto.
+### ITERACIÓN 4 — QA PREVIEW EN DOS NIVELES
 
-Tareas obligatorias:
-- crear árbol de producto limpio;
-- crear un único `index.html` productivo canónico desde el capability manifest;
-- excluir `backend-lab-*`, `store-firestore-lab*`, `seed` LAB y `auth` LAB del entrypoint productivo;
-- absorber overlays aprobados en archivos finales, sin overlay runtime;
-- eliminar/suspender owners duplicados o shadowed;
-- validar que cada asset aprobado sea alcanzable y ejecutable;
-- versionar assets por digest/build;
-- separar arranque pre-auth de módulos post-auth cuando sea seguro;
-- no exigir que PWA/service worker controle la página para permitir login;
-- no bloquear showApp por colecciones opcionales;
-- mantener required collections estrictamente en el mínimo necesario para Inicio/Cliente360/Aseguradoras/Ops/Leads/Polizas/Cobros;
-- medir startup y eliminar esperas artificiales/seriales no indispensables;
-- separar store productivo de lectura de la capa de comandos/escritura aprobada, sin reactivar writers LAB.
+#### 4A. Prueba individual de cada módulo
+Cada módulo debe alcanzar `LATEST_APPROVED_VERSION_PREVIEW_PASS` según sección 6.
 
-Gate de rendimiento mínimo:
-- login visible inmediatamente con shell pre-auth;
-- autenticación no espera service worker;
-- módulos no esenciales no bloquean el primer render;
-- ningún timeout de 30/120 segundos puede ser parte del flujo normal exitoso.
-
-Salida PASS:
-- clean source tree;
-- entrypoint único;
-- dependency/reachability graph PASS;
-- startup contract PASS;
-- write contract por capability PASS.
-
-### ITERACIÓN 3 — BUILD ÚNICO E INMUTABLE + PREVIEW AISLADO
-
-Objetivo: producir exactamente una candidata.
-
-Tareas:
-- build una vez;
-- manifest completo con SHA-256 de todos los archivos;
-- artifact digest único;
-- cero reconstrucción posterior;
-- publicar ESE artifact en Firebase Hosting preview/channel del mismo proyecto;
-- no tocar producción;
-- ejecutar reglas/commands de escritura en emulador o harness aislado con los mismos contratos antes de habilitarlos en producción.
-
-Salida PASS:
-- URL preview;
-- artifact id/digest;
-- readback remoto completo coincide con manifest;
-- write-rule emulator/harness PASS para las capacidades que requieran escritura.
-
-### ITERACIÓN 4 — MATRIZ E2E TRANSVERSAL `APROBADO vs PREVIEW`
-
-Objetivo: certificar semántica real, no solo archivos.
-
-Matriz mínima:
-- superficies Fase A x roles aplicables x desktop/tablet/mobile.
-
-Pruebas obligatorias:
+#### 4B. Matriz E2E transversal
+Módulos Fase A × roles aplicables × desktop/tablet/mobile, incluyendo:
 - login;
+- navegación;
 - Inicio;
-- Cliente360;
+- Cliente 360;
 - Aseguradoras;
 - Ops;
 - Leads;
-- Polizas;
+- Pólizas;
 - Vehículos;
 - Recibos/cartera;
 - Cobros;
-- relaciones entre cliente/póliza/vehículo/cobros;
-- navegación;
-- permisos;
-- ausencia de controles indebidamente ocultos para Operativo/Admin/SuperAdmin;
-- ausencia de controles indebidamente habilitados para roles no autorizados;
-- 404/asset failures;
-- page errors y console errors relevantes;
-- version/digest runtime;
-- PWA/service worker no sirve un build anterior;
-- datos read-only íntegros antes/después;
-- commands/escrituras aprobadas PASS en harness aislado y reglas exactas antes del cambio productivo.
-
-Gate:
-- 100% PASS en capacidades Fase A;
-- cualquier fallo se corrige EN LA CLEAN SOURCE y obliga a nuevo artifact/digest, nunca parche directo en preview/producción.
-
-### ITERACIÓN 5 — PROMOCIÓN A PRODUCCIÓN DEL MISMO ARTEFACTO
-
-Objetivo: promover sin recomposición y dejar Fase A realmente operable según sus capacidades aprobadas.
-
-Precondiciones:
-- Iteraciones 0-4 PASS;
-- artifact preview congelado;
-- autorización explícita de producción sobre digest exacto;
-- matriz exacta de escrituras aprobadas cerrada.
-
-Tareas:
-- promover exactamente el artifact certificado;
-- aplicar únicamente reglas/endpoints/commands de escritura que Iteración 1 haya demostrado como parte de Fase A;
-- remote full rehash;
-- browser smoke corto;
-- login;
-- roles clave;
-- superficies Fase A;
-- prueba controlada de cada clase de escritura autorizada con before/after y cleanup/rollback;
+- relaciones Cliente–Póliza–Vehículo–Recibo/Cobro;
+- scopes/permisos;
+- roles autorizados de Aseguradoras sin ocultamiento indebido;
+- ausencia de controles indebidos para roles no autorizados;
+- buildId/digest runtime;
+- 404/page/console errors;
+- SW/caché sin versión anterior;
 - integridad before/after;
-- rollback automático al último release conocido si falla cualquier gate.
+- writers aprobados probados en harness.
 
-Salida PASS:
-- producción sirve exactamente el digest certificado;
-- no hay reconstrucción ni overlay;
-- las capacidades de consulta funcionan;
-- las capacidades de escritura aprobadas funcionan solamente para roles autorizados;
-- Fase A `PRODUCTION_ACCEPTED`.
+**Gate:** 100% módulos individuales PASS + 100% matriz transversal PASS.
 
-## 8. Iteración posterior separada — actualización de datos
+### ITERACIÓN 5 — MISMO ARTIFACT A PRODUCCIÓN + PRUEBAS EN VIVO
+
+Precondición: Iteraciones 0–4 PASS y autorización explícita sobre digest exacto.
+
+1. promover exactamente el artifact certificado;
+2. aplicar únicamente rules/endpoints/commands aprobados;
+3. full remote rehash;
+4. smoke postdeploy;
+5. **prueba en vivo módulo por módulo sobre producción**, no solo smoke agregado;
+6. prueba en vivo de login, navegación, roles/scopes y relaciones;
+7. prueba controlada de escrituras aprobadas con before/after y cleanup/rollback;
+8. verificación de persistencia/recarga;
+9. verificación de buildId/digest servido;
+10. integridad before/after;
+11. rollback automático al último release aceptado si falla un gate.
+
+Cada módulo debe alcanzar `LATEST_APPROVED_VERSION_LIVE_PASS`.
+
+**Solo después de que todos los módulos estén `LIVE_PASS` se declara `PRODUCTION_ACCEPTED`.** Esta es la misma filosofía de validación en vivo usada en Finanzas: la publicación no sustituye la comprobación real del navegador y del comportamiento productivo.
 
 ### ITERACIÓN 6 — DATA REFRESH 2026-08-01 A 2026-08-31
 
-Esta iteración NO bloquea el go-live de software y NO se mezcla con la reparación de release.
+No empieza únicamente por haber desplegado. Precondición absoluta:
+- `PRODUCTION_ACCEPTED=true`;
+- todos los módulos Fase A `LATEST_APPROVED_VERSION_LIVE_PASS`;
+- integridad postprod PASS.
 
-Decisión congelada:
-- durante Iteraciones 0-5 se trabaja con los datos actuales con corte 2026-07-31;
-- después de `PRODUCTION_ACCEPTED`, se incorporan fuentes desde 2026-08-01 hasta 2026-08-31;
-- cada fuente se procesa por separado;
-- dry-run obligatorio;
-- conciliación y deduplicación;
-- trazabilidad por registro;
-- before/after integrity;
-- no inferir datos faltantes entre fuentes;
-- ninguna escritura productiva sin autorización explícita del refresh.
+Luego, por fuente separada:
+`perfilado -> dry-run -> diff -> deduplicación -> validación -> autorización -> escritura -> auditoría -> smoke -> integrity -> rollback disponible`.
 
-Por tanto, NO solicitar datos nuevos a Paula antes de estabilizar el software, salvo que una prueba revele que una capability no puede validarse con el dataset existente.
+No pedir/cargar la información de agosto antes de cerrar producción, salvo que una prueba funcional no pueda ejecutarse con el dataset al 31-jul.
 
-## 9. Definición de terminado
+## 9. Benchmarking y criterio de producto
 
-Orbit Fase A solo se considera terminado cuando simultáneamente:
+Se preserva el benchmarking B97/B97-DR de la tesis/Gravicentra; no se rehace. Su lectura estratégica se incorpora como principio:
+- integralidad, CRM/Cliente 360, renovaciones, comisiones, portal, automatización, IA, integraciones y capacitación son capacidades de mercado, no diferenciadores demostrados por sí solos;
+- el valor a perseguir/probar está en adaptación a mercados con estandarización desigual, interoperabilidad progresiva, trazabilidad, gobierno de información, configuración/localización, implementación acompañada y resultados medibles;
+- la recuperación de hoy no añade features por benchmarking; primero recupera fielmente lo aprobado.
 
-1. capability manifest completo PASS;
-2. clean source PASS;
-3. un solo index productivo PASS;
-4. artifact inmutable PASS;
-5. preview exacto PASS;
-6. matriz E2E Fase A PASS;
-7. mismo artifact en producción PASS;
-8. rehash remoto PASS;
-9. postprod browser PASS;
-10. integridad de datos before/after PASS;
-11. rollback probado/disponible;
-12. escrituras aprobadas operativas por rol, si la capability las exige;
-13. estado de recuperación cerrado como `PRODUCTION_ACCEPTED`.
+## 10. Definición de terminado
 
-## 10. Política anti-loop
+Fase A termina únicamente con:
+1. capability manifest completo;
+2. lineage 100%;
+3. clean source;
+4. index único;
+5. artifact inmutable;
+6. preview/readback exacto;
+7. cada módulo `LATEST_APPROVED_VERSION_PREVIEW_PASS`;
+8. matriz E2E transversal PASS;
+9. mismo artifact en producción;
+10. cada módulo `LATEST_APPROVED_VERSION_LIVE_PASS`;
+11. roles/scopes/relaciones PASS;
+12. writes aprobados PASS cuando apliquen;
+13. integridad before/after PASS;
+14. rollback probado/disponible;
+15. estado `PRODUCTION_ACCEPTED`.
 
-- Un fallo funcional no autoriza reabrir infraestructura no relacionada.
-- Un fallo de infraestructura no autoriza reescribir módulos aprobados.
-- Un fallo de validator no se clasifica como defecto de producto hasta reproducción causal.
-- Un fallo después del build nunca se corrige modificando el artefacto; se corrige source y se genera digest nuevo.
-- Cada iteración tiene un único gate de salida y un único estado autoridad.
-- No existen estados narrativos paralelos en PR bodies/conversaciones.
-- No se crean ramas one-shot por cada validación ordinaria.
+## 11. Política anti-loop
 
-## 11. Número de iteraciones comprometido
+- fallo funcional ≠ permiso para reabrir infraestructura;
+- fallo de infraestructura ≠ permiso para reescribir módulos;
+- fallo del validator ≠ defecto de producto hasta reproducción causal;
+- fallo después de build => corregir source y producir digest nuevo;
+- nunca parchear directamente el artifact certificado;
+- una desviación obliga a aplicar el Addendum Anti-Derailment y regresar al último gate PASS;
+- no crear ramas one-shot por validación ordinaria;
+- no cambiar plan silenciosamente: modificación material exige versión sucesora, motivo, antes/después e impacto.
 
-Producción Fase A: 6 iteraciones numeradas 0 a 5.
+## 12. Número de iteraciones
 
-Actualización de datos al 31 de agosto: Iteración 6 posterior a producción.
+Producción Fase A: **6 iteraciones (0–5)**.  
+Actualización agosto: **Iteración 6 posterior a producción**.
 
-No se amplía el número de iteraciones por cada bug encontrado: una corrección permanece dentro de la iteración/gate donde fue detectada. Si un gate no pasa, no se avanza al siguiente.
+Un bug no crea una iteración adicional; se resuelve dentro del gate en el que fue detectado.
 
-## 12. Herramientas
+## 13. Herramientas y uso de Codex
 
-- GitHub: mismo repositorio, rama de recovery.
-- Firebase: mismo proyecto actual, Hosting preview/channel + producción.
-- GitHub Actions: CI reproducible del clean artifact.
-- Browser E2E/Playwright: validación real por roles/superficies.
-- Firebase Emulator/harness aislado: validación de reglas y comandos de escritura antes de producción.
-- Codex: recomendado para la consolidación mecánica de lineage, dependency graph y clean source si está disponible conectado a este mismo repositorio; no crea una segunda fuente de verdad.
-- ChatGPT: coordinación/análisis; nunca autoridad documental.
+- ChatGPT + GitHub: auditoría, documentación, decisiones, lectura de repo, seguimiento y tareas que no requieran cómputo mecánico masivo.
+- GitHub Actions: CI reproducible.
+- Firebase Preview/Hosting: preview y producción.
+- Browser E2E/Playwright: preview y pruebas live.
+- Firebase Emulator/harness: writers/rules antes de producción.
+- **Codex: solo cuando sea claramente más eficiente por volumen**, principalmente: reconstrucción mecánica del lineage a gran escala, inventario/grafo de dependencias, búsqueda de owners/bridges duplicados/shadowed y consolidación de clean tree. No usar Codex para redactar documentos, resumir, decidir el plan ni ejecutar comprobaciones pequeñas que puedan resolverse aquí.
+
+## 14. Reporte obligatorio por iteración
+
+Toda continuidad debe declarar:
+- iteración/gate;
+- última autoridad leída;
+- SHA/branch/artifact aplicable;
+- módulos cerrados y pendientes;
+- pruebas/evidencias;
+- desviaciones y retorno al plan;
+- producción tocada sí/no;
+- datos tocados sí/no;
+- siguiente acción exacta.
+
+Sin estos campos no se considera handoff completo.
