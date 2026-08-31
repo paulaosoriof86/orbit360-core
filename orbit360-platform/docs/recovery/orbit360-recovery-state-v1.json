@@ -5,26 +5,33 @@
   "branch": "recovery/fase-a-clean-20260831",
   "forensicOriginSha": "9c95f31461f2eabe9804625b5659bee772f5602a",
   "createdAtUtc": "2026-08-31T18:00:00Z",
+  "updatedAtUtc": "2026-08-31T18:35:00Z",
   "status": "ITERATION_0_FROZEN",
   "currentIteration": 0,
   "productionTargetIteration": 5,
   "dataRefreshIteration": 6,
   "productionAccepted": false,
   "productionTouchedByRecovery": false,
+  "dataTouchedByRecovery": false,
   "dataCutoff": "2026-07-31",
   "dataRefreshFrom": "2026-08-01",
   "dataRefreshThrough": "2026-08-31",
+  "chatGPTProjectContinuity": "USE_EXISTING_ORBIT_360_PROJECT",
+  "newChatGPTProjectRequired": false,
   "newRepositoryRequired": false,
   "newFirebaseProjectRequired": false,
-  "newChatGPTProjectRequired": false,
   "firebasePreviewRequired": true,
   "sameArtifactPreviewToProductionRequired": true,
+  "moduleByModulePreviewRequired": true,
+  "moduleByModuleLiveRequired": true,
+  "liveValidationBeforeDataRefreshRequired": true,
   "legacyOverlayReleaseForbidden": true,
   "legacySourceIndexAsProductionAuthorityForbidden": true,
   "runtimeScratchInsideProductTreeForbidden": true,
   "currentCertifiedRuntimeReadOnlyObserved": true,
   "operationalProductionRequiredIfApprovedCapabilitiesWrite": true,
   "writeCapabilitiesLineagePending": true,
+  "codexPolicy": "LIMITED_HIGH_VALUE_MECHANICAL_ONLY",
   "roles": {
     "aseguradorasFullOperationalVisibilityRequired": [
       "Operativo",
@@ -40,14 +47,20 @@
     "1": {"name": "APPROVED_CAPABILITY_LINEAGE_RECONSTRUCTION", "status": "PENDING"},
     "2": {"name": "CLEAN_SOURCE_SINGLE_ENTRYPOINT_AND_STARTUP_PERFORMANCE", "status": "PENDING"},
     "3": {"name": "IMMUTABLE_BUILD_AND_FIREBASE_PREVIEW", "status": "PENDING"},
-    "4": {"name": "TRANSVERSAL_E2E_APPROVED_VS_PREVIEW", "status": "PENDING"},
-    "5": {"name": "PROMOTE_SAME_ARTIFACT_TO_PRODUCTION", "status": "PENDING"},
+    "4": {"name": "MODULE_BY_MODULE_PREVIEW_PLUS_TRANSVERSAL_E2E", "status": "PENDING"},
+    "5": {"name": "PROMOTE_SAME_ARTIFACT_AND_MODULE_BY_MODULE_LIVE_VALIDATION", "status": "PENDING"},
     "6": {"name": "DATA_REFRESH_20260801_TO_20260831", "status": "PENDING_POST_PRODUCTION"}
+  },
+  "requiredModuleStates": {
+    "preview": "LATEST_APPROVED_VERSION_PREVIEW_PASS",
+    "production": "LATEST_APPROVED_VERSION_LIVE_PASS"
   },
   "nextAction": "ITERATION_1_RECONSTRUCT_APPROVED_CAPABILITY_LINEAGE",
   "sourceOfTruth": {
     "mutableState": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
     "approvedCapabilities": "orbit360-platform/docs/recovery/orbit360-approved-capability-manifest-v1.json",
-    "processContract": "orbit360-platform/docs/recovery/ORBIT360-FASE-A-CLEAN-RECOVERY-MASTER-PLAN-20260831.md"
+    "processContract": "orbit360-platform/docs/recovery/ORBIT360-FASE-A-CLEAN-RECOVERY-MASTER-PLAN-20260831.md",
+    "antiDerailment": "orbit360-platform/docs/recovery/ORBIT360-RECOVERY-ANTI-DERAILMENT-ADDENDUM-20260831.md",
+    "chatGPTProjectInstructions": "orbit360-platform/docs/recovery/INSTRUCCIONES-PROYECTO-CHATGPT-ORBIT360-RECOVERY-20260831.txt"
   }
 }
