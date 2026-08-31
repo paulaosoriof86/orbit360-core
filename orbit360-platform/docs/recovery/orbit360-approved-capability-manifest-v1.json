@@ -1,6 +1,8 @@
 {
   "schemaVersion": "orbit360-approved-capability-manifest-v1",
-  "manifestId": "ORBIT360-FASE-A-APPROVED-CAPABILITIES",
+  "manifestId": "GRAVICENTRA-INSURANCE-FASE-A-APPROVED-CAPABILITIES",
+  "productBrand": "Gravicentra Insurance",
+  "technicalLegacyIdentifiers": ["Orbit 360", "orbit360-*"],
   "status": "LINEAGE_RECONSTRUCTION_REQUIRED",
   "forensicOriginSha": "9c95f31461f2eabe9804625b5659bee772f5602a",
   "historicalCertifiedBaseline": {
@@ -18,7 +20,8 @@
     "sameArtifactPreviewToProductionRequired": true,
     "legacyOverlayCompositionForbidden": true,
     "readWriteSemanticsMustBeRecoveredFromApprovalEvidence": true,
-    "readOnlyProductionCannotCloseWriteApprovedCapability": true
+    "readOnlyProductionCannotCloseWriteApprovedCapability": true,
+    "visibleBrandMustResolveToGravicentraInsurance": true
   },
   "rolePolicy": {
     "ASEGURADORAS_OPERATIONAL_DIRECTORY": {
