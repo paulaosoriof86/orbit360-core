@@ -5,9 +5,10 @@
   "branch": "recovery/fase-a-clean-20260831",
   "forensicOriginSha": "9c95f31461f2eabe9804625b5659bee772f5602a",
   "createdAtUtc": "2026-08-31T18:00:00Z",
-  "updatedAtUtc": "2026-08-31T18:35:00Z",
-  "status": "ITERATION_0_FROZEN",
-  "currentIteration": 0,
+  "updatedAtUtc": "2026-08-31T18:39:00Z",
+  "status": "ITERATION_1_IN_PROGRESS",
+  "currentIteration": 1,
+  "lastCompletedIteration": 0,
   "productionTargetIteration": 5,
   "dataRefreshIteration": 6,
   "productionAccepted": false,
@@ -44,7 +45,7 @@
   },
   "iterations": {
     "0": {"name": "FORENSIC_FREEZE_AND_AUTHORITY", "status": "PASS"},
-    "1": {"name": "APPROVED_CAPABILITY_LINEAGE_RECONSTRUCTION", "status": "PENDING"},
+    "1": {"name": "APPROVED_CAPABILITY_LINEAGE_RECONSTRUCTION", "status": "IN_PROGRESS"},
     "2": {"name": "CLEAN_SOURCE_SINGLE_ENTRYPOINT_AND_STARTUP_PERFORMANCE", "status": "PENDING"},
     "3": {"name": "IMMUTABLE_BUILD_AND_FIREBASE_PREVIEW", "status": "PENDING"},
     "4": {"name": "MODULE_BY_MODULE_PREVIEW_PLUS_TRANSVERSAL_E2E", "status": "PENDING"},
@@ -55,12 +56,24 @@
     "preview": "LATEST_APPROVED_VERSION_PREVIEW_PASS",
     "production": "LATEST_APPROVED_VERSION_LIVE_PASS"
   },
-  "nextAction": "ITERATION_1_RECONSTRUCT_APPROVED_CAPABILITY_LINEAGE",
+  "iteration1Evidence": {
+    "started": true,
+    "codexUsed": false,
+    "firstRepositoryHistoryCheck": {
+      "capability": "INICIO_PRIMARY_RUNTIME",
+      "path": "orbit360-platform/modules/inicio.js",
+      "latestObservedPathCommitOnHistoricalCanonicalBranch": "842f762f199f4c7dbf13062a33ca220d92398c51",
+      "commitMessage": "fix(macro2): transversal safe read-model source acceptance",
+      "classification": "EVIDENCE_ONLY_NOT_YET_FINAL_APPROVAL"
+    }
+  },
+  "nextAction": "ITERATION_1_BUILD_COMPLETE_APPROVED_CAPABILITY_LINEAGE_MATRIX_FROM_APPROVAL_EVIDENCE_AND_PATH_HISTORY",
   "sourceOfTruth": {
     "mutableState": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
     "approvedCapabilities": "orbit360-platform/docs/recovery/orbit360-approved-capability-manifest-v1.json",
     "processContract": "orbit360-platform/docs/recovery/ORBIT360-FASE-A-CLEAN-RECOVERY-MASTER-PLAN-20260831.md",
     "antiDerailment": "orbit360-platform/docs/recovery/ORBIT360-RECOVERY-ANTI-DERAILMENT-ADDENDUM-20260831.md",
+    "moduleValidationMatrix": "orbit360-platform/docs/recovery/ORBIT360-FASE-A-MODULE-VALIDATION-MATRIX-v1.md",
     "chatGPTProjectInstructions": "orbit360-platform/docs/recovery/INSTRUCCIONES-PROYECTO-CHATGPT-ORBIT360-RECOVERY-20260831.txt"
   }
 }
