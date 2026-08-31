@@ -1,32 +1,35 @@
-# Orbit 360 — Addendum Anti-Descarrilamiento de Recuperación
+# Gravicentra Insurance — Addendum Anti-Descarrilamiento de Recovery
 
 **Fecha:** 2026-08-31  
 **Rama:** `recovery/fase-a-clean-20260831`  
-**Plan rector:** `ORBIT360-FASE-A-CLEAN-RECOVERY-MASTER-PLAN-20260831.md` v1.1
+**Plan rector:** `GRAVICENTRA-INSURANCE-FASE-A-RECOVERY-MASTER-PLAN-v1.3-20260831.md`  
+**Proyecto ChatGPT:** `Gravicentra Insurance` con Memoria solo del proyecto.
 
 ## Propósito
 
-Este addendum existe para impedir que un fallo, nueva conversación, handoff, agente, validator o root-cause secundario desplace la recuperación fuera del plan maestro.
+Impedir que un fallo, nueva conversación, handoff, agente, validator o root-cause secundario desplace la recuperación fuera del plan maestro.
 
 ## Regla de retorno obligatorio
 
 Ante cualquier desvío o interrupción:
+1. Leer `ADDENDUM_PREVALENTE_CHATGPT_PROJECT_BOUNDARY_20260831.md`.
+2. Leer `orbit360-recovery-state-v1.json`.
+3. Leer Plan Maestro v1.3.
+4. Leer `orbit360-approved-capability-manifest-v1.json`.
+5. Leer esta Addendum y la matriz módulo por módulo.
+6. Identificar el **último gate PASS**.
+7. Identificar el **primer gate incompleto**.
+8. Clasificar el hallazgo únicamente como `PRODUCT`, `DATA`, `SECURITY`, `PERFORMANCE`, `RELEASE/COMPOSITION`, `PIPELINE/VALIDATOR` o `ENVIRONMENT`.
+9. Resolverlo dentro de ese gate; no abrir metodología paralela.
+10. No tocar módulos ya PASS salvo regresión causal reproducible.
+11. No tocar datos si el fallo es source, visualización, routing, cache, composición, permisos o validator.
+12. No tocar producción salvo Iteración 5 y autorización explícita.
+13. Actualizar `orbit360-recovery-state-v1.json` con la siguiente acción exacta.
 
-1. Leer `orbit360-recovery-state-v1.json`.
-2. Leer `orbit360-approved-capability-manifest-v1.json`.
-3. Leer el Plan Maestro v1.1.
-4. Identificar el **último gate PASS**.
-5. Identificar el **primer gate incompleto**.
-6. Clasificar el nuevo hallazgo únicamente como `PRODUCT`, `DATA`, `SECURITY`, `PERFORMANCE`, `RELEASE/COMPOSITION`, `PIPELINE/VALIDATOR` o `ENVIRONMENT`.
-7. Resolver el hallazgo dentro de ese gate; no abrir metodología paralela.
-8. No tocar módulos ya PASS salvo regresión reproducible que los involucre causalmente.
-9. No tocar datos si el fallo es de source, visualización, routing, cache, composición o validator.
-10. No tocar producción salvo que el gate activo sea Iteración 5 y exista autorización explícita.
-11. Actualizar `orbit360-recovery-state-v1.json` con la acción siguiente exacta.
+## Nueva conversación o agente
 
-## Condición especial: nueva conversación o nuevo agente
-
-El primer mensaje operativo debe declarar:
+La primera respuesta operativa debe declarar:
+- proyecto/branding;
 - rama;
 - SHA/estado de recovery;
 - iteración activa;
@@ -35,43 +38,45 @@ El primer mensaje operativo debe declarar:
 - módulos PASS/PENDING;
 - producción tocada sí/no;
 - datos tocados sí/no;
+- Codex usado sí/no;
 - siguiente acción exacta.
 
 Si no puede demostrar estos datos desde las autoridades, debe leerlas antes de ejecutar cambios.
 
-## Condición especial: defecto nuevo
+## Defecto nuevo
 
 Un defecto nuevo NO autoriza:
 - nueva rama de release ordinaria;
-- nuevo plan maestro;
+- nuevo plan paralelo;
 - reimportación;
 - reconstrucción completa;
 - reemplazo de Firebase;
 - reabrir todos los módulos;
-- otro mecanismo de overlay.
+- otro mecanismo de overlay;
+- volver al Proyecto ChatGPT histórico Orbit 360.
 
-Solo se amplía el alcance si existe evidencia causal de que el defecto afecta más componentes.
+Solo se amplía alcance si existe evidencia causal de que el defecto afecta más componentes.
 
-## Condición especial: build/preview/producción
+## Build / preview / producción
 
-- Cambio de source después de build => digest nuevo y regreso al inicio de Iteración 3.
-- Fallo individual de módulo en preview => Iteración 4A sigue abierta; corregir source, nuevo artifact, repetir pruebas afectadas + regresión transversal.
-- Fallo transversal en preview => Iteración 4B sigue abierta.
-- Fallo en producción => rollback automático y Iteración 5 continúa abierta; no cargar datos.
+- Cambio source después de build => digest nuevo y regreso al inicio de Iteración 3.
+- Fallo individual preview => Iteración 4A abierta; corregir source, nuevo artifact y repetir pruebas afectadas + regresión necesaria.
+- Fallo transversal preview => Iteración 4B abierta.
+- Fallo producción => rollback automático y Iteración 5 abierta; datos HOLD.
 - Data refresh nunca se usa para reparar producto.
 
-## Condición especial: pruebas módulo por módulo
+## Pruebas módulo por módulo
 
 No puede declararse Fase A lista si una sola capacidad Fase A carece de:
 - lineage aprobado;
-- preview individual PASS;
-- versión/build comprobada;
-- live individual PASS después de producción.
+- `LATEST_APPROVED_VERSION_PREVIEW_PASS`;
+- build/version comprobado;
+- `LATEST_APPROVED_VERSION_LIVE_PASS` después de producción.
 
 ## Uso de Codex
 
-Codex solo puede abrirse cuando la tarea sea mecánica, amplia y mediblemente más eficiente que realizarla con ChatGPT/GitHub. Debe recibir como autoridades el state, capability manifest, plan y este addendum. Su salida no cambia estados por sí sola; debe ser verificada antes de promoverse.
+Codex solo se usa cuando la tarea es mecánica, amplia y mediblemente más eficiente que ChatGPT/GitHub. Debe recibir Addendum Prevalente, state, Plan v1.3, capability manifest y esta addendum. Su salida no cambia estados por sí sola.
 
-## Frase de recuperación universal
+## Frase universal
 
-`RETORNAR_A_PLAN: leer state + capability manifest + Plan Maestro v1.1 + Addendum; volver al último gate PASS y ejecutar solo el primer gate incompleto.`
+`RETORNAR_A_PLAN: leer Addendum Prevalente + state + Plan v1.3 + capability manifest + Addendum Anti-Descarrilamiento + matriz; volver al último gate PASS y ejecutar solo el primer gate incompleto.`
