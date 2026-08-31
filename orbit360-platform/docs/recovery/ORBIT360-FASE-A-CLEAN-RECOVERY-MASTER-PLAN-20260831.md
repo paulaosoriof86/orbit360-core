@@ -29,6 +29,7 @@ Un SHA de ZIP o la mera presencia de un archivo en el paquete NO son evidencia s
 10. Todo runtime scratch, screenshots, browser evidence, terminal evidence y archivos temporales deben quedar fuera del árbol de producto/publicación.
 11. La rama vieja y sus documentos quedan como historia forense, no como mecanismo activo de release.
 12. No se autoriza merge a `main` como requisito de esta salida. `main` no es actualmente autoridad de release.
+13. Una producción que solo permite consultar NO se considera terminada si alguna capacidad Fase A aprobada requiere CRUD/escrituras operativas. Iteración 1 reconstruye la semántica de escritura aprobada por capability; preview puede mantenerse read-only, pero producción debe habilitar exclusivamente las escrituras aprobadas y probarlas por rol.
 
 ## 3. Regla de Aseguradoras — corrección explícita
 
@@ -64,6 +65,7 @@ Como mínimo:
 - shell / router / navegación
 - hidratación de datos
 - PWA/service worker solo si no bloquea startup
+- operaciones CRUD/escrituras que formen parte de la última versión aprobada de las capacidades Fase A
 
 La iteración 1 debe reconstruir desde evidencia histórica cualquier capacidad adicional que ya hubiese sido formalmente aprobada para Fase A y agregarla al manifiesto antes del build limpio.
 
@@ -122,6 +124,7 @@ Por cada capability:
 - owners/bridges necesarios;
 - dependencias;
 - rol esperado;
+- semántica de lectura/escritura aprobada;
 - prueba de aceptación original;
 - SHA/blob exacto elegido;
 - razón para descartar versiones anteriores/posteriores no aprobadas.
@@ -131,7 +134,8 @@ No se permitirá inferir que el baseline actual es el último solo porque el arc
 Salida PASS:
 - 100% de capabilities Fase A tienen lineage único y comprobable;
 - cero capacidades con dos owners activos ambiguos;
-- cero archivos aprobados huérfanos/no alcanzables.
+- cero archivos aprobados huérfanos/no alcanzables;
+- cada capability declara `READ_ONLY` o las operaciones de escritura aprobadas y sus roles.
 
 ### ITERACIÓN 2 — CLEAN SOURCE + ENTRYPOINT ÚNICO + PERFORMANCE STARTUP
 
@@ -149,7 +153,8 @@ Tareas obligatorias:
 - no exigir que PWA/service worker controle la página para permitir login;
 - no bloquear showApp por colecciones opcionales;
 - mantener required collections estrictamente en el mínimo necesario para Inicio/Cliente360/Aseguradoras/Ops/Leads/Polizas/Cobros;
-- medir startup y eliminar esperas artificiales/seriales no indispensables.
+- medir startup y eliminar esperas artificiales/seriales no indispensables;
+- separar store productivo de lectura de la capa de comandos/escritura aprobada, sin reactivar writers LAB.
 
 Gate de rendimiento mínimo:
 - login visible inmediatamente con shell pre-auth;
@@ -161,7 +166,8 @@ Salida PASS:
 - clean source tree;
 - entrypoint único;
 - dependency/reachability graph PASS;
-- startup contract PASS.
+- startup contract PASS;
+- write contract por capability PASS.
 
 ### ITERACIÓN 3 — BUILD ÚNICO E INMUTABLE + PREVIEW AISLADO
 
@@ -173,12 +179,14 @@ Tareas:
 - artifact digest único;
 - cero reconstrucción posterior;
 - publicar ESE artifact en Firebase Hosting preview/channel del mismo proyecto;
-- no tocar producción.
+- no tocar producción;
+- ejecutar reglas/commands de escritura en emulador o harness aislado con los mismos contratos antes de habilitarlos en producción.
 
 Salida PASS:
 - URL preview;
 - artifact id/digest;
-- readback remoto completo coincide con manifest.
+- readback remoto completo coincide con manifest;
+- write-rule emulator/harness PASS para las capacidades que requieran escritura.
 
 ### ITERACIÓN 4 — MATRIZ E2E TRANSVERSAL `APROBADO vs PREVIEW`
 
@@ -207,7 +215,8 @@ Pruebas obligatorias:
 - page errors y console errors relevantes;
 - version/digest runtime;
 - PWA/service worker no sirve un build anterior;
-- datos read-only íntegros antes/después.
+- datos read-only íntegros antes/después;
+- commands/escrituras aprobadas PASS en harness aislado y reglas exactas antes del cambio productivo.
 
 Gate:
 - 100% PASS en capacidades Fase A;
@@ -215,26 +224,31 @@ Gate:
 
 ### ITERACIÓN 5 — PROMOCIÓN A PRODUCCIÓN DEL MISMO ARTEFACTO
 
-Objetivo: promover sin recomposición.
+Objetivo: promover sin recomposición y dejar Fase A realmente operable según sus capacidades aprobadas.
 
 Precondiciones:
 - Iteraciones 0-4 PASS;
 - artifact preview congelado;
-- autorización explícita de producción sobre digest exacto.
+- autorización explícita de producción sobre digest exacto;
+- matriz exacta de escrituras aprobadas cerrada.
 
 Tareas:
 - promover exactamente el artifact certificado;
+- aplicar únicamente reglas/endpoints/commands de escritura que Iteración 1 haya demostrado como parte de Fase A;
 - remote full rehash;
 - browser smoke corto;
 - login;
 - roles clave;
 - superficies Fase A;
+- prueba controlada de cada clase de escritura autorizada con before/after y cleanup/rollback;
 - integridad before/after;
 - rollback automático al último release conocido si falla cualquier gate.
 
 Salida PASS:
 - producción sirve exactamente el digest certificado;
 - no hay reconstrucción ni overlay;
+- las capacidades de consulta funcionan;
+- las capacidades de escritura aprobadas funcionan solamente para roles autorizados;
 - Fase A `PRODUCTION_ACCEPTED`.
 
 ## 8. Iteración posterior separada — actualización de datos
@@ -271,7 +285,8 @@ Orbit Fase A solo se considera terminado cuando simultáneamente:
 9. postprod browser PASS;
 10. integridad de datos before/after PASS;
 11. rollback probado/disponible;
-12. estado de recuperación cerrado como `PRODUCTION_ACCEPTED`.
+12. escrituras aprobadas operativas por rol, si la capability las exige;
+13. estado de recuperación cerrado como `PRODUCTION_ACCEPTED`.
 
 ## 10. Política anti-loop
 
@@ -297,5 +312,6 @@ No se amplía el número de iteraciones por cada bug encontrado: una corrección
 - Firebase: mismo proyecto actual, Hosting preview/channel + producción.
 - GitHub Actions: CI reproducible del clean artifact.
 - Browser E2E/Playwright: validación real por roles/superficies.
+- Firebase Emulator/harness aislado: validación de reglas y comandos de escritura antes de producción.
 - Codex: recomendado para la consolidación mecánica de lineage, dependency graph y clean source si está disponible conectado a este mismo repositorio; no crea una segunda fuente de verdad.
 - ChatGPT: coordinación/análisis; nunca autoridad documental.
