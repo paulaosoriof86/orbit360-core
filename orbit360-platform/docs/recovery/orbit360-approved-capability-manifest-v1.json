@@ -1,0 +1,57 @@
+{
+  "schemaVersion": "orbit360-approved-capability-manifest-v1",
+  "manifestId": "ORBIT360-FASE-A-APPROVED-CAPABILITIES",
+  "status": "LINEAGE_RECONSTRUCTION_REQUIRED",
+  "forensicOriginSha": "9c95f31461f2eabe9804625b5659bee772f5602a",
+  "historicalCertifiedBaseline": {
+    "artifactId": 9504702901,
+    "sourceHead": "8c9668d6d423e82826b0295431ec699390d79b4b",
+    "use": "historical_evidence_only_not_automatic_final_source"
+  },
+  "rules": {
+    "latestApprovedEvidenceWins": true,
+    "latestRepositoryFileDoesNotAutomaticallyMeanApproved": true,
+    "historicalBaselineDoesNotAutomaticallyMeanLatestApproved": true,
+    "packageMembershipIsNotRuntimeReachabilityProof": true,
+    "singleFinalOwnerPerCapabilityRequired": true,
+    "allRuntimeDependenciesMustBeReachable": true,
+    "sameArtifactPreviewToProductionRequired": true,
+    "legacyOverlayCompositionForbidden": true
+  },
+  "rolePolicy": {
+    "ASEGURADORAS_OPERATIONAL_DIRECTORY": {
+      "fullVisibilityRequired": ["Operativo", "Admin", "AdminTenant", "SuperAdmin", "Dirección"],
+      "Asesor": "NOT_AUTHORIZED_UNLESS_EXPLICITLY_APPROVED_LATER",
+      "uiHidingAsSecurityControlForbidden": true
+    }
+  },
+  "capabilities": [
+    {"id": "LOGIN_AND_ACCESS", "surface": "Login", "lineageStatus": "PENDING_RECONSTRUCTION"},
+    {"id": "INICIO_PRIMARY_RUNTIME", "surface": "Inicio", "lineageStatus": "PENDING_RECONSTRUCTION"},
+    {"id": "CLIENTE360_PRIMARY_RUNTIME", "surface": "Cliente 360", "lineageStatus": "PENDING_RECONSTRUCTION"},
+    {"id": "ASEGURADORAS_PRIMARY_RUNTIME", "surface": "Aseguradoras", "lineageStatus": "PENDING_RECONSTRUCTION"},
+    {"id": "ASEGURADORAS_OPERATIONAL_DIRECTORY", "surface": "Aseguradoras/directorio operativo", "lineageStatus": "PENDING_RECONSTRUCTION"},
+    {"id": "OPS_PRIMARY_RUNTIME", "surface": "Ops", "lineageStatus": "PENDING_RECONSTRUCTION"},
+    {"id": "LEADS_PRIMARY_RUNTIME", "surface": "Leads", "lineageStatus": "PENDING_RECONSTRUCTION"},
+    {"id": "POLIZAS_PRIMARY_RUNTIME", "surface": "Pólizas", "lineageStatus": "PENDING_RECONSTRUCTION"},
+    {"id": "VEHICULOS_PRIMARY_RUNTIME", "surface": "Vehículos", "lineageStatus": "PENDING_RECONSTRUCTION"},
+    {"id": "RECIBOS_CARTERA_PRIMARY_RUNTIME", "surface": "Recibos y cartera", "lineageStatus": "PENDING_RECONSTRUCTION"},
+    {"id": "COBROS_PRIMARY_RUNTIME", "surface": "Cobros", "lineageStatus": "PENDING_RECONSTRUCTION"},
+    {"id": "ROLE_SCOPE_RUNTIME", "surface": "Roles y scopes", "lineageStatus": "PENDING_RECONSTRUCTION"},
+    {"id": "CROSS_MODULE_RELATIONSHIPS", "surface": "Relaciones y sincronizaciones", "lineageStatus": "PENDING_RECONSTRUCTION"},
+    {"id": "SINGLE_PRODUCT_ENTRYPOINT", "surface": "index/router/bootstrap", "lineageStatus": "TO_BE_RECONSTITUTED"},
+    {"id": "STARTUP_PERFORMANCE", "surface": "login/bootstrap/hydration/PWA", "lineageStatus": "TO_BE_RECONSTITUTED"}
+  ],
+  "requiredLineageFieldsPerCapability": [
+    "approvalEvidence",
+    "approvalRunOrCommit",
+    "finalSourceFiles",
+    "finalOwner",
+    "runtimeDependencies",
+    "allowedRoles",
+    "expectedVisibleBehavior",
+    "sourceBlobSha",
+    "acceptanceTest",
+    "discardedAlternativesAndReason"
+  ]
+}
