@@ -1,5 +1,5 @@
 name: Orbit360 Canonical Single-State Runner
-# SINGLE_STATE_CONTROL_PLANE_V6_PRECLAIM_SEMANTIC_GUARD_PHYSICAL_OVERLAY_SELFTEST
+# SINGLE_STATE_CONTROL_PLANE_V7_PRIVILEGED_PREFLIGHT_ISOLATED_TERMINAL
 on:
   push:
     branches:
@@ -24,6 +24,8 @@ env:
   ORBIT360_CERTIFIED_PRODUCT_PRESERVATION: tools/orbit360-certified-product-preservation-v20260827.mjs
   ORBIT360_PRECLAIM_SEMANTIC_GUARD: tools/orbit360-preclaim-operational-semantic-guard-v20260830.mjs
   ORBIT360_OVERLAY_RELEASE_HANDLER: tools/orbit360-post-go-live-overlay-release-v20260830.mjs
+  ORBIT360_GATE_ROUTER: tools/orbit360-validar-gate-contracts-v20260717.mjs
+  ORBIT360_PRIVILEGED_PREFLIGHT: tools/orbit360-single-state-privileged-preflight-v20260831.mjs
 jobs:
   single-state-runner:
     runs-on: ubuntu-24.04
@@ -85,6 +87,8 @@ jobs:
           jq -e '.ok==true and .status=="SINGLE_STATE_CONTROL_PLANE_SELFTEST_PASS" and .patchApplied==true and .mechanismFailureFreezes==true' "$RUNNER_TEMP/single-state-selftest.json" >/dev/null
           node "$ORBIT360_INVARIANT" --anti-stale-selftest | tee "$RUNNER_TEMP/anti-stale-selftest.json"
           jq -e '.ok==true and .status=="SINGLE_STATE_ANTI_STALE_SELFTEST_PASS" and .dynamicEvidenceMutationRequiresStaticConsumerEdit==false' "$RUNNER_TEMP/anti-stale-selftest.json" >/dev/null
+          node "$ORBIT360_PRIVILEGED_PREFLIGHT" --selftest | tee "$RUNNER_TEMP/privileged-preflight-selftest.json"
+          jq -e '.ok==true and .status=="SINGLE_STATE_PRIVILEGED_PREFLIGHT_SELFTEST_PASS" and .staleClaimBlocked==true and .writeScopeBlocked==true and .consumedBlocked==true and .secretAccess==false' "$RUNNER_TEMP/privileged-preflight-selftest.json" >/dev/null
           RELEASE_HANDLER=$(jq -r '.executionTransitions.GO_LIVE_RELEASE_WINDOW.handler // empty' "$ORBIT360_REGISTRY")
           node "$RELEASE_HANDLER" --source-only-selftest --out "$ORBIT360_RELEASE_HANDLER_SELFTEST_OUT"
           jq -e '.ok==true and .status=="GO_LIVE_RELEASE_HANDLER_SOURCE_ONLY_PASS" and .secretAccess==false and .firestoreRead==false and .deployExecuted==false and .productionTouched==false' "$ORBIT360_RELEASE_HANDLER_SELFTEST_OUT" >/dev/null
@@ -154,16 +158,29 @@ jobs:
           HANDLER='${{ steps.inspect.outputs.handler }}'
           node "$HANDLER" --intent "$ORBIT360_EXECUTION_INTENT" --run-id "$ORBIT360_EXECUTION_RUN_ID" --terminal-out "$ORBIT360_TERMINAL_EVIDENCE"
           jq -e '.ok==true and .privilegedRiskObserved==false and .secretAccess==false and .firestoreRead==false and .resetLinksGenerated==0' "$ORBIT360_TERMINAL_EVIDENCE" >/dev/null
-      - name: Access-recovery gate contract preflight before any secret is exposed
-        if: steps.inspect.outputs.class == 'AUTH_RECOVERY' && steps.claim.outcome == 'success'
+      - id: privileged_preflight
+        name: Validate historical gate fence and current single-state privilege before secrets
+        if: steps.inspect.outputs.state_mutation == 'CLAIM_TERMINAL' && steps.claim.outcome == 'success' && steps.inspect.outputs.class != 'SOURCE_ONLY'
+        env:
+          ORBIT360_EXECUTION_INTENT: ${{ runner.temp }}/orbit360-intent.json
+          ORBIT360_EXECUTION_RUN_ID: ${{ github.run_id }}
         shell: bash
         run: |
           set -euo pipefail
-          node "$ORBIT360_INVARIANT"
-          jq -e '.transitionId=="POST_GO_LIVE_ACCESS_RECOVERY_RESET_LINK" and .explicitUserAuthorization==true and .replayAllowed==false and .target.projectId=="ays-orbit-360-lab" and .target.tenantId=="alianzas-soluciones" and .target.advisorId=="ase-paula-osorio" and .target.emailHash=="9b663847979724e9491e1c655da32a7cb17a5f6ed26dba352de1eb811254b23f" and .target.targetCount==1 and .scope.authWrites==false and .scope.firestoreWrites==false and .scope.deploy==false and .scope.production==false' "$RUNNER_TEMP/orbit360-intent.json" >/dev/null
+          GATE_ID=$(jq -r '.gateId // empty' "$ORBIT360_LEDGER")
+          test -n "$GATE_ID"
+          set +e
+          node "$ORBIT360_GATE_ROUTER" "$GATE_ID" > "$RUNNER_TEMP/historical-gate-fence.json"
+          FENCE_RC=$?
+          set -e
+          test "$FENCE_RC" = '41'
+          jq -e '.ok==true and .blocked==true and .executionAllowed==false and .secretAccess==false and .runtimeExecuted==false and .deployExecuted==false' "$RUNNER_TEMP/historical-gate-fence.json" >/dev/null
+          node "$ORBIT360_INVARIANT" > "$RUNNER_TEMP/pre-privilege-invariant.json"
+          node "$ORBIT360_PRIVILEGED_PREFLIGHT" --intent "$ORBIT360_EXECUTION_INTENT" --run-id "$ORBIT360_EXECUTION_RUN_ID" | tee "$RUNNER_TEMP/privileged-preflight.json"
+          jq -e '.ok==true and .status=="SINGLE_STATE_PRIVILEGED_PREFLIGHT_PASS" and .secretAccess==false and .runtimeExecuted==false and .deployExecuted==false' "$RUNNER_TEMP/privileged-preflight.json" >/dev/null
       - id: privileged_execute
-        name: Execute privileged registered handler only after claim and preflight
-        if: steps.inspect.outputs.state_mutation == 'CLAIM_TERMINAL' && steps.claim.outcome == 'success' && steps.inspect.outputs.class != 'SOURCE_ONLY'
+        name: Execute privileged registered handler after secret-free preflight
+        if: steps.inspect.outputs.state_mutation == 'CLAIM_TERMINAL' && steps.claim.outcome == 'success' && steps.inspect.outputs.class != 'SOURCE_ONLY' && steps.privileged_preflight.outcome == 'success'
         env:
           GH_TOKEN: ${{ github.token }}
           ORBIT360_EXECUTION_INTENT: ${{ runner.temp }}/orbit360-intent.json
@@ -193,7 +210,7 @@ jobs:
         shell: bash
         run: rm -f "$RUNNER_TEMP/orbit360-private-reset-link.txt"
       - id: terminal
-        name: Reduce run-scoped terminal evidence to ledger only
+        name: Reduce terminal with privileged worktree isolation
         if: always() && steps.inspect.outputs.state_mutation == 'CLAIM_TERMINAL' && steps.claim.outcome == 'success' && (steps.source_execute.outcome != 'skipped' || steps.privileged_execute.outcome != 'skipped')
         env:
           GH_TOKEN: ${{ github.token }}
@@ -205,9 +222,26 @@ jobs:
         run: |
           set -euo pipefail
           test -f "$ORBIT360_TERMINAL_EVIDENCE"
-          node "$ORBIT360_OWNER" --terminal "$ORBIT360_TERMINAL_EVIDENCE" | tee "$RUNNER_TEMP/terminal.json"
-          node "$ORBIT360_PUBLISHER"
-          node "$ORBIT360_PUBLISHER" --publish-validated "$ORBIT360_PUBLICATION_TRANSACTION_OUT" | tee "$RUNNER_TEMP/terminal-publish.json"
+          if [ '${{ steps.inspect.outputs.class }}' = 'SOURCE_ONLY' ]; then
+            node "$ORBIT360_OWNER" --terminal "$ORBIT360_TERMINAL_EVIDENCE" | tee "$RUNNER_TEMP/terminal.json"
+            node "$ORBIT360_PUBLISHER"
+            node "$ORBIT360_PUBLISHER" --publish-validated "$ORBIT360_PUBLICATION_TRANSACTION_OUT" | tee "$RUNNER_TEMP/terminal-publish.json"
+          else
+            mkdir -p "$RUNNER_TEMP/runtime-evidence"
+            git status --porcelain | awk '{print $2}' | grep '^orbit360-platform/runtime-gate-crm-v20260716/' | while read -r p; do test -f "$p" && { mkdir -p "$RUNNER_TEMP/runtime-evidence/$(dirname "$p")"; cp "$p" "$RUNNER_TEMP/runtime-evidence/$p"; } || true; done
+            git fetch --no-tags origin "$ORBIT360_CANONICAL_BRANCH"
+            CLAIM_HEAD=$(git rev-parse FETCH_HEAD)
+            git show "$CLAIM_HEAD:$ORBIT360_LEDGER" > "$RUNNER_TEMP/claim-ledger.json"
+            jq -e --argjson run "$GITHUB_RUN_ID" '.executionClaim.active==true and .executionClaim.runId==$run and .executionClaim.replayAllowed==false' "$RUNNER_TEMP/claim-ledger.json" >/dev/null
+            TW="$RUNNER_TEMP/orbit360-terminal-worktree"
+            rm -rf "$TW"
+            git worktree add --detach "$TW" "$CLAIM_HEAD" >/dev/null
+            export ORBIT360_ROOT="$TW"
+            node "$TW/$ORBIT360_OWNER" --terminal "$ORBIT360_TERMINAL_EVIDENCE" | tee "$RUNNER_TEMP/terminal.json"
+            node "$TW/$ORBIT360_PUBLISHER"
+            node "$TW/$ORBIT360_PUBLISHER" --publish-validated "$ORBIT360_PUBLICATION_TRANSACTION_OUT" | tee "$RUNNER_TEMP/terminal-publish.json"
+            git worktree remove --force "$TW" >/dev/null || true
+          fi
           jq -e '.ok==true and .status=="CONTROL_PLANE_PUBLICATION_TRANSACTION_PUBLISHED" and .remoteReadbackPass==true' "$RUNNER_TEMP/terminal-publish.json" >/dev/null
       - uses: actions/upload-artifact@v4
         if: always()
@@ -225,7 +259,12 @@ jobs:
             ${{ runner.temp }}/overlay-release-selftest.json
             ${{ runner.temp }}/access-handler-selftest.json
             ${{ runner.temp }}/browser-binder-selftest.json
+            ${{ runner.temp }}/privileged-preflight-selftest.json
+            ${{ runner.temp }}/historical-gate-fence.json
+            ${{ runner.temp }}/pre-privilege-invariant.json
+            ${{ runner.temp }}/privileged-preflight.json
             ${{ runner.temp }}/certified-product-preservation.json
+            ${{ runner.temp }}/runtime-evidence
             ${{ runner.temp }}/terminal.json
             ${{ runner.temp }}/orbit360-terminal.json
           if-no-files-found: ignore
