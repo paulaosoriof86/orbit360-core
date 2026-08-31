@@ -2,64 +2,79 @@
 
 **Fecha:** 2026-08-31  
 **Estado:** PREVALENTE / OBLIGATORIO  
+**Marca:** `Gravicentra Insurance`  
 **Rama:** `recovery/fase-a-clean-20260831`
 
-## 1. Decisión corregida y definitiva
+## 1. Decisión definitiva
 
-Para la recuperación productiva Fase A se crea un **Proyecto ChatGPT nuevo y aislado**:
+Para la recuperación productiva Fase A se crea un Proyecto ChatGPT NUEVO y aislado llamado exactamente:
 
-`Orbit 360 — Recovery Producción 2026-08-31`
+`Gravicentra Insurance`
 
 Configuración obligatoria: **Memoria solo del proyecto**.
 
-El Proyecto ChatGPT histórico `Orbit 360` queda como **ARCHIVO_HISTORICO_READ_ONLY_DE_CONTEXTO**. No se elimina, pero no se usa como contenedor operativo de la recuperación.
+El Proyecto histórico `Orbit 360` queda como `ARCHIVO_HISTORICO_READ_ONLY_DE_CONTEXTO`. No se elimina, pero NO se usa como contenedor operativo del recovery.
 
-## 2. Motivo
+## 2. Fundamento
 
-El proyecto histórico contiene chats, fuentes e instrucciones creadas durante múltiples mecanismos de integración/release ya supersedidos. Mantener la recuperación dentro de ese mismo contexto aumenta el riesgo de reintroducir decisiones, contratos o narrativas incompatibles.
+El proyecto histórico contiene chats, fuentes e instrucciones creados durante mecanismos de integración/release posteriormente supersedidos. Mantener la recuperación dentro de ese mismo contexto eleva el riesgo de reintroducir decisiones incompatibles.
 
-La frontera nueva evita que el proyecto de recovery consulte conversaciones externas cuando usa Memoria solo del proyecto y permite cargar únicamente autoridades curadas.
+Con Memoria solo del proyecto, el nuevo proyecto queda aislado de conversaciones externas. Dentro del proyecto nuevo, los chats sí pueden referenciar otros chats del mismo proyecto; por eso el proyecto debe iniciar limpio y solo recibir conversaciones creadas bajo las autoridades de recovery.
 
-## 3. Qué NO se mueve al proyecto nuevo
+## 3. Qué NO se mueve a Gravicentra Insurance
 
 - No mover conversaciones históricas del Proyecto Orbit 360.
-- No mover esta conversación de diagnóstico/decisión, porque contiene estados y recomendaciones posteriormente corregidos.
+- No mover la conversación en la que se diagnosticó y decidió esta recuperación, porque contiene recomendaciones supersedidas.
 - No subir planes maestros históricos como fuentes activas.
-- No subir paquetes de candidatas antiguas como autoridad; solo consultar GitHub cuando una evidencia histórica sea necesaria para lineage.
+- No subir candidatas o paquetes antiguos como autoridad.
+- Cuando una evidencia histórica sea necesaria para lineage, consultarla en GitHub/archivo y promover únicamente el hecho comprobado al manifest/state.
 
-## 4. Fuentes iniciales permitidas en el proyecto nuevo
+## 4. Fuentes iniciales permitidas
 
-1. `00_DOCUMENTO_MAESTRO_ORBIT360_RECOVERY_PRODUCCION_20260831.docx`.
-2. `01_INSTRUCCIONES_PROYECTO_CHATGPT_ORBIT360_RECOVERY_20260831.txt`.
-3. `02_ADDENDUM_PREVALENTE_CHATGPT_PROJECT_BOUNDARY_20260831.md`.
-4. `03_ADDENDUM_ANTI_DESCARRILAMIENTO_ORBIT360_20260831.md`.
-5. `04_MATRIZ_PRUEBAS_MODULO_A_MODULO_FASE_A_20260831.md`.
-6. `05_ESTADO_VIVO_RECOVERY_ORBIT360.json`.
-7. `06_MANIFIESTO_CAPACIDADES_APROBADAS_FASE_A.json`.
+El paquete limpio del Proyecto `Gravicentra Insurance` debe contener únicamente autoridades vigentes y material curado:
+
+1. Documento Maestro actualizado de Gravicentra Insurance Recovery.
+2. Instrucciones del Proyecto `Gravicentra Insurance`.
+3. Este Addendum Prevalente.
+4. Addendum Anti-Descarrilamiento actualizado.
+5. Matriz de pruebas módulo por módulo Fase A.
+6. Estado vivo de recovery.
+7. Manifiesto de capacidades aprobadas Fase A.
 
 GitHub sigue siendo autoridad técnica de source, commits, artifacts, workflows y estado vivo.
 
 ## 5. Precedencia
 
-Ante cualquier contradicción sobre el contenedor ChatGPT:
+Ante cualquier contradicción:
 
 1. Este Addendum PREVALENTE.
 2. `orbit360-recovery-state-v1.json`.
-3. Plan Maestro Recovery v1.2.
-4. Addendum Anti-Descarrilamiento.
-5. Manifiesto de capacidades.
-6. Documentos históricos solo como evidencia.
+3. `GRAVICENTRA-INSURANCE-FASE-A-RECOVERY-MASTER-PLAN-v1.3-20260831.md`.
+4. `orbit360-approved-capability-manifest-v1.json`.
+5. `ORBIT360-RECOVERY-ANTI-DERAILMENT-ADDENDUM-20260831.md`.
+6. `ORBIT360-FASE-A-MODULE-VALIDATION-MATRIX-v1.md`.
+7. Documentos históricos solo como evidencia.
 
-Cualquier texto anterior que diga `USE_EXISTING_ORBIT_360_PROJECT` o `newChatGPTProjectRequired:false` queda **SUPERSEDED**.
+Quedan `SUPERSEDED`:
+- `USE_EXISTING_ORBIT_360_PROJECT`;
+- `newChatGPTProjectRequired:false`;
+- el nombre provisional `Orbit 360 — Recovery Producción 2026-08-31`;
+- Plan Maestro v1.1 y v1.2 cuando contradigan v1.3.
 
 ## 6. Inicio obligatorio del proyecto nuevo
 
-Crear un chat nuevo dentro del proyecto y usar este mensaje inicial:
+Crear un chat NUEVO dentro de `Gravicentra Insurance` y usar este mensaje inicial:
 
-`Inicia formalmente la recuperación Orbit 360 Fase A desde las autoridades prevalentes adjuntas y GitHub recovery/fase-a-clean-20260831. Verifica primero state, Plan v1.2, capability manifest, ambos addenda y matriz. Declara último gate PASS, primer gate incompleto y ejecuta únicamente ese gate. No reabras trabajo cerrado, no uses overlays históricos, no toques producción ni datos fuera del gate autorizado.`
+`Inicia formalmente la recuperación Gravicentra Insurance Fase A desde las autoridades prevalentes adjuntas y GitHub recovery/fase-a-clean-20260831. Verifica primero Addendum Prevalente, state, Plan v1.3, capability manifest, Addendum Anti-Descarrilamiento y matriz. Declara último gate PASS, primer gate incompleto y ejecuta únicamente ese gate. No reabras trabajo cerrado, no uses overlays históricos, no toques producción ni datos fuera del gate autorizado.`
 
 ## 7. Regla anti-contaminación
 
-Si una nueva afirmación procede únicamente de un chat histórico, debe ser confirmada contra GitHub o una fuente rectora antes de entrar al recovery.
+Toda afirmación procedente solo de un chat/documento histórico debe confirmarse contra GitHub o fuente rectora antes de entrar al recovery.
 
-Este addendum no cambia el número de iteraciones ni la arquitectura de release; únicamente fija la frontera de contexto para evitar regresiones de continuidad.
+## 8. Regla de branding
+
+Marca visible y nombre del Proyecto ChatGPT: `Gravicentra Insurance`.
+
+Identificadores técnicos heredados `Orbit 360` y `orbit360-*` pueden mantenerse internamente por compatibilidad y genealogía. No representan dos productos ni autorizan bifurcar branding, documentación o arquitectura.
+
+Este addendum no cambia el número de iteraciones ni la arquitectura de release; fija la frontera de contexto y branding que debe prevalecer.
