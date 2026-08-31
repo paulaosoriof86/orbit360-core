@@ -1,15 +1,18 @@
 {
   "schemaVersion": "orbit360-recovery-state-v1",
-  "stateId": "ORBIT360-FASE-A-CLEAN-RECOVERY",
+  "stateId": "GRAVICENTRA-INSURANCE-FASE-A-CLEAN-RECOVERY",
+  "productBrand": "Gravicentra Insurance",
+  "technicalLegacyIdentifiers": ["Orbit 360", "orbit360-*"],
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "forensicOriginSha": "9c95f31461f2eabe9804625b5659bee772f5602a",
   "createdAtUtc": "2026-08-31T18:00:00Z",
-  "updatedAtUtc": "2026-08-31T19:18:00Z",
+  "updatedAtUtc": "2026-08-31T19:24:00Z",
   "status": "ITERATION_1_IN_PROGRESS",
   "currentIteration": 1,
   "lastCompletedIteration": 0,
   "productionTargetIteration": 5,
+  "targetProductionDate": "2026-08-31",
   "dataRefreshIteration": 6,
   "productionAccepted": false,
   "productionTouchedByRecovery": false,
@@ -18,18 +21,19 @@
   "dataRefreshFrom": "2026-08-01",
   "dataRefreshThrough": "2026-08-31",
   "chatGPTProjectDecision": {
-    "status": "FINAL_SUPERSEDING_DECISION",
+    "status": "FINAL_PREVALENT_DECISION",
     "newChatGPTProjectRequired": true,
-    "projectName": "Orbit 360 — Recovery Producción 2026-08-31",
+    "projectName": "Gravicentra Insurance",
     "memoryModeRequired": "PROJECT_ONLY_MEMORY",
     "historicalProject": "Orbit 360",
     "historicalProjectDisposition": "ARCHIVE_CONTEXT_DO_NOT_EXECUTE_RECOVERY_HERE",
     "moveHistoricalChatsToRecoveryProject": false,
-    "moveThisConversationToRecoveryProject": false,
+    "moveDecisionConversationToRecoveryProject": false,
     "startWithCleanRecoveryChat": true,
-    "supersedes": [
+    "supersededDecisions": [
       "USE_EXISTING_ORBIT_360_PROJECT",
-      "newChatGPTProjectRequired:false"
+      "newChatGPTProjectRequired:false",
+      "Orbit 360 — Recovery Producción 2026-08-31"
     ]
   },
   "newRepositoryRequired": false,
@@ -74,14 +78,14 @@
       "classification": "EVIDENCE_ONLY_NOT_YET_FINAL_APPROVAL"
     }
   },
-  "nextAction": "CREATE_ISOLATED_CHATGPT_RECOVERY_PROJECT_THEN_CONTINUE_ITERATION_1_LINEAGE",
+  "nextAction": "CREATE_CHATGPT_PROJECT_GRAVICENTRA_INSURANCE_WITH_PROJECT_ONLY_MEMORY_AND_CLEAN_SOURCES_THEN_CONTINUE_ITERATION_1_LINEAGE",
   "sourceOfTruth": {
-    "mutableState": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
-    "approvedCapabilities": "orbit360-platform/docs/recovery/orbit360-approved-capability-manifest-v1.json",
-    "processContract": "orbit360-platform/docs/recovery/ORBIT360-FASE-A-CLEAN-RECOVERY-MASTER-PLAN-v1.2-20260831.md",
     "projectBoundaryPrevalentAddendum": "orbit360-platform/docs/recovery/ADDENDUM_PREVALENTE_CHATGPT_PROJECT_BOUNDARY_20260831.md",
+    "mutableState": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
+    "processContract": "orbit360-platform/docs/recovery/GRAVICENTRA-INSURANCE-FASE-A-RECOVERY-MASTER-PLAN-v1.3-20260831.md",
+    "approvedCapabilities": "orbit360-platform/docs/recovery/orbit360-approved-capability-manifest-v1.json",
     "antiDerailment": "orbit360-platform/docs/recovery/ORBIT360-RECOVERY-ANTI-DERAILMENT-ADDENDUM-20260831.md",
     "moduleValidationMatrix": "orbit360-platform/docs/recovery/ORBIT360-FASE-A-MODULE-VALIDATION-MATRIX-v1.md",
-    "chatGPTProjectInstructions": "orbit360-platform/docs/recovery/INSTRUCCIONES-PROYECTO-CHATGPT-ORBIT360-RECOVERY-20260831.txt"
+    "chatGPTProjectInstructions": "orbit360-platform/docs/recovery/INSTRUCCIONES-PROYECTO-CHATGPT-GRAVICENTRA-INSURANCE-RECOVERY-20260831.txt"
   }
 }
