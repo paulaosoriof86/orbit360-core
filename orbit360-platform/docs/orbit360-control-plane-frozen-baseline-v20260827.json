@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "orbit360-control-plane-frozen-baseline-v30-semantic-single-state-static-identities",
+  "schemaVersion": "orbit360-control-plane-frozen-baseline-v31-privileged-preflight-isolated-terminal",
   "status": "STATIC_SOURCE_IDENTITY_BASELINE",
   "stateBearing": false,
   "dynamicStateForbidden": true,
@@ -8,12 +8,13 @@
   "supersedes": "orbit360-platform/docs/orbit360-control-plane-frozen-baseline-v20260826.json",
   "sourceIdentityAlgorithm": "git-blob-sha1",
   "sourceIdentities": {
-    ".github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml": "136213dbda16989a94719b48757644d1b29323d7",
+    ".github/workflows/orbit360-continuity-canonical-source-only-v20260820.yml": "e5ad14f22e65b2ee209465cac371108a6cc8237e",
     "tools/orbit360-single-state-ledger-owner-v20260827.mjs": "df35baf5f07cfb4feb68801b24c82fc0114ad4f5",
     "tools/orbit360-operational-semantic-authority-v20260830.mjs": "91c29cc5f519cb2ac4b1934e07781ed4d0c28a93",
     "tools/orbit360-preclaim-operational-semantic-guard-v20260830.mjs": "8f5436237565c81c117f005cc3c3b9e6668eb34d",
     "tools/orbit360-single-state-invariant-v20260827.mjs": "f01e8efb0e21f8326e9a6ff8a49a619fd0b5d239",
     "tools/orbit360-single-state-contract-v20260827.mjs": "dae6e9b7d915600fc05581fa27fb451ad8b72870",
+    "tools/orbit360-single-state-privileged-preflight-v20260831.mjs": "f246d5ea3d6c7b0c7cdbfe01c86dcfb40c04fb3b",
     "orbit360-platform/docs/orbit360-continuity-writer-registry-v20260820.json": "d9e09b60c30d4d3f6d7e5a16f399b3a0783f70ca",
     "orbit360-platform/docs/orbit360-post-go-live-visible-priority-lock-v20260827.json": "310caea8f4e362a559e4d734e25343616d83195c",
     "tools/orbit360-gate-contract-registry-v20260717.json": "2a5eb2443adf1ce74ae1cc189cf85489b027f35c",
@@ -156,7 +157,10 @@
     "postGoLiveOverlayReleaseRequiresExplicitAuthorization": true,
     "postGoLiveOverlayReleaseRemoteRehashRequired": true,
     "postGoLiveCredentialRevealBrowserProofSanitized": true,
-    "postGoLiveClaimFollowupConsistencyDerivesFromMilestoneAuthority": true
+    "postGoLiveClaimFollowupConsistencyDerivesFromMilestoneAuthority": true,
+    "privilegedCapabilityRequiresSecretFreePreflightAfterClaim": true,
+    "privilegedTerminalReductionUsesCleanWorktree": true,
+    "historicalGateRouterRunsBeforeCurrentPrivilegedPreflight": true
   },
   "sealPolicy": {
     "passOrFailIsRecordedInLedgerTerminalEvidence": true,
