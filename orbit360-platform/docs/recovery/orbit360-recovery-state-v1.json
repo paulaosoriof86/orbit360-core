@@ -22,6 +22,9 @@
   "legacyOverlayReleaseForbidden": true,
   "legacySourceIndexAsProductionAuthorityForbidden": true,
   "runtimeScratchInsideProductTreeForbidden": true,
+  "currentCertifiedRuntimeReadOnlyObserved": true,
+  "operationalProductionRequiredIfApprovedCapabilitiesWrite": true,
+  "writeCapabilitiesLineagePending": true,
   "roles": {
     "aseguradorasFullOperationalVisibilityRequired": [
       "Operativo",
