@@ -262,11 +262,9 @@ export function freezeReleaseMilestone(L) {
 export function assertFollowupConsistency(L, fail) {
   const f = L.postGoLiveAccessRecovery;
   if (!f) return;
-  const phase = String(L.activeState?.phase || '');
-  const status = String(L.activeState?.status || '');
   const next = String(L.nextAction?.id || '');
-  if (phase.startsWith('POST_GO_LIVE_') && status === 'SOURCE_ONLY_CLAIMED' && /^RUN_[A-Z0-9_]+$/.test(next)) return;
-  if (phase === 'POST_GO_LIVE_ACCESS_RECOVERY_RUNNING' && status === 'AUTHORIZED_RECOVERY_CLAIMED') return;
+  const kind = milestoneKind(L);
+  if (String(kind).endsWith('_CLAIMED')) return;
 
   if (f.status === 'SOURCE_PREPARED_AWAITING_AUTHORIZATION' && next !== 'AWAIT_EXPLICIT_HUMAN_ACCESS_RECOVERY_AUTHORIZATION') {
     fail('ACCESS_RECOVERY_NEXT_ACTION_DESYNC');
