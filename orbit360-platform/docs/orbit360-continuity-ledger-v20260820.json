@@ -1,23 +1,23 @@
 {
   "schemaVersion": "orbit360-continuity-ledger-v3",
   "ledgerId": "ORBIT360-F2-CONTINUITY-CURRENT",
-  "revision": 169,
-  "updatedAtUtc": "2026-08-30T21:42:46.921Z",
+  "revision": 170,
+  "updatedAtUtc": "2026-08-31T17:06:58.431Z",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "ays/backend-tenant-lab-v99-20260703",
   "pullRequest": 5,
   "stateVersion": "ORBIT360-F2-CONTINUITY-CURRENT",
   "gateId": "f2-productive-acceptance-exact-successor-v20260818",
   "activeState": {
-    "phase": "PRODUCTION_SMOKE_PASS",
-    "status": "PRODUCTION_GO_LIVE_PASS",
+    "phase": "POST_GO_LIVE_OVERLAY_RELEASE_RUNNING",
+    "status": "AUTHORIZED_RELEASE_CLAIMED",
     "rootCauseStatus": "PASS",
     "productFrozen": false,
     "dataFrozen": false,
-    "runtimeAuthorized": false,
+    "runtimeAuthorized": true,
     "runtimeReplayAllowed": false,
-    "deployAuthorized": false,
-    "productionAuthorized": false
+    "deployAuthorized": true,
+    "productionAuthorized": true
   },
   "successorCandidate": {
     "status": "CERTIFIED_SOURCE_ONLY_TRANSVERSAL_SOURCE_ACCEPTANCE",
@@ -31,19 +31,19 @@
     "rebuildAllowed": false
   },
   "authorizationBoundary": {
-    "activeRuntimeAuthorization": false,
-    "freshAuthorizationRequired": true,
+    "activeRuntimeAuthorization": true,
+    "freshAuthorizationRequired": false,
     "authorizationBlockedByHardeningPackage": false,
     "authorizationCarryForwardForbidden": true,
-    "nextRuntimeMaterializationAllowed": true,
-    "newRuntimeRequestAllowed": true,
+    "nextRuntimeMaterializationAllowed": false,
+    "newRuntimeRequestAllowed": false,
     "deployAuthorized": false,
     "publicationAuthorized": false,
     "productionAuthorized": false,
     "mainAuthorized": false,
     "mergeAuthorized": false,
     "boundaryPrepared": true,
-    "currentBoundaryStatus": "PRESERVED_PRE_RISK:POST_GO_LIVE_OVERLAY_RELEASE_PREP_SOURCE_ONLY",
+    "currentBoundaryStatus": "RESERVED:POST_GO_LIVE_OVERLAY_RELEASE_WINDOW",
     "authorizationIdentityRequired": true,
     "preparedAuthorizationIdentityDigest": null,
     "activeRequestPath": null,
@@ -52,13 +52,13 @@
     "preRiskAuthorizationReuseAllowed": false,
     "reusableRequestPath": null,
     "privilegedRiskBoundaryEntered": false,
-    "authorizationReserved": false,
+    "authorizationReserved": true,
     "authorizationConsumed": false,
     "authorizationPreserved": true,
     "priorGoLiveAuthorizationConsumed": true,
     "priorGoLiveRunId": 33025972814,
-    "runtimeAttemptAccepted": false,
-    "runtimeRunId": null
+    "runtimeAttemptAccepted": true,
+    "runtimeRunId": 33417795615
   },
   "continuityControl": {
     "status": "CONTROL_PLANE_POST_GO_LIVE_ACCESS_RECOVERY_ANTI_DESYNC_PASS",
@@ -200,20 +200,20 @@
   "productionReopeningPackage": {
     "path": "orbit360-platform/docs/orbit360-production-reopening-package-v20260820.json",
     "status": "CLOSED_PASS",
-    "revision": 162,
-    "firstIncompleteStep": "POST-GO-LIVE-OVERLAY-RELEASE-AUTHORIZATION",
-    "nextActionExact": "AWAIT_EXPLICIT_POST_GO_LIVE_OVERLAY_RELEASE_AUTHORIZATION",
-    "runtimeAllowed": false,
-    "authorizationAllowed": true,
-    "requestMaterializationAllowed": true,
+    "revision": 163,
+    "firstIncompleteStep": "POST-GO-LIVE-OVERLAY-RELEASE",
+    "nextActionExact": "RUN_POST_GO_LIVE_OVERLAY_RELEASE_WINDOW",
+    "runtimeAllowed": true,
+    "authorizationAllowed": false,
+    "requestMaterializationAllowed": false,
     "authorizationReuseAllowed": false
   },
   "checkpoint": "orbit360-platform/docs/PLAN-MAESTRO-DEFINITIVO-PRODUCCION-POSTPRODUCCION-ANTI-LOOP-ORBIT360-AYS-20260826.md",
   "nextAction": {
-    "id": "AWAIT_EXPLICIT_POST_GO_LIVE_OVERLAY_RELEASE_AUTHORIZATION",
-    "description": "AWAIT_EXPLICIT_POST_GO_LIVE_OVERLAY_RELEASE_AUTHORIZATION",
-    "runtimeAllowed": false,
-    "userActionRequired": true
+    "id": "RUN_POST_GO_LIVE_OVERLAY_RELEASE_WINDOW",
+    "description": "RUN_POST_GO_LIVE_OVERLAY_RELEASE_WINDOW",
+    "runtimeAllowed": true,
+    "userActionRequired": false
   },
   "postGoLiveCommitments": {
     "liveFunctionalValidationRequired": true,
@@ -295,7 +295,7 @@
   },
   "lanes": {
     "A_frontend_ux_academia": "MACRO2_TRANSVERSAL_SOURCE_ACCEPTANCE_CLOSED_POST_GO_LIVE_VISUAL_AND_FUNCTIONAL_REVIEW_QUEUED",
-    "B_backend_security_gates": "POST_GO_LIVE_OVERLAY_RELEASE_PREP_PASS_AWAITING_AUTHORIZATION",
+    "B_backend_security_gates": "POST_GO_LIVE_OVERLAY_RELEASE_RUNNING",
     "C_real_data_migration": "FROZEN_DATA_THROUGH_2026_07_31_REFRESH_2026_08_01_TO_CURRENT_QUEUED_AFTER_STABLE_GO_LIVE"
   },
   "progress": {
@@ -305,23 +305,18 @@
     "progressMayIncreaseDuringHardening": false
   },
   "executionClaim": {
-    "active": false,
-    "transitionId": "POST_GO_LIVE_OVERLAY_RELEASE_PREP_SOURCE_ONLY",
-    "capabilityClass": "SOURCE_ONLY",
-    "runId": 33337167111,
-    "authorizationDigest": "",
-    "canonicalBaseHead": "b170697406208408f31c690e44fa12a877b3941c",
+    "active": true,
+    "transitionId": "POST_GO_LIVE_OVERLAY_RELEASE_WINDOW",
+    "capabilityClass": "RELEASE",
+    "runId": 33417795615,
+    "authorizationDigest": "106a831e94974073bfa9b0b50654b65a4fd312e7c5c8c0fcdb87e2ac84705763",
+    "canonicalBaseHead": "d358f9bc2e9e148e20a4dfc86d74b2dacf0a2824",
     "statePatchDigest": "",
-    "claimedAtUtc": "2026-08-30T21:42:43.612Z",
-    "allowedExecutions": 0,
+    "claimedAtUtc": "2026-08-31T17:06:58.431Z",
+    "allowedExecutions": 1,
     "consumed": false,
-    "historical": true,
-    "replayAllowed": false,
-    "consumedAtUtc": null,
-    "terminalEvidencePath": "actions-artifact:orbit360-single-state-33337167111/orbit360-terminal.json",
-    "terminalClassification": "PASS",
-    "privilegedRiskObserved": false,
-    "authorizationPreserved": true
+    "historical": false,
+    "replayAllowed": false
   },
   "containsPII": false,
   "containsSecrets": false,
