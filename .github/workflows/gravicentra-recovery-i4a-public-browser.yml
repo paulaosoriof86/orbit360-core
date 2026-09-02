@@ -1,4 +1,4 @@
-name: Gravicentra Recovery I4A Public Browser
+name: Gravicentra Recovery I4A Browser QA
 
 on:
   push:
@@ -27,19 +27,16 @@ jobs:
           ref: ${{ github.sha }}
           fetch-depth: 1
           persist-credentials: false
-
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-
       - name: Install Chromium QA dependency
         shell: bash
         run: |
           set -euo pipefail
           npm install --no-save --package-lock=false playwright@1.55.0 >/dev/null
           npx playwright install --with-deps chromium >/dev/null
-
       - name: Execute public browser smoke against exact Preview
         env:
           I4A_PUBLIC_EVIDENCE_DIR: ${{ runner.temp }}/gravicentra-i4a-public-evidence
@@ -47,7 +44,6 @@ jobs:
         run: |
           set -euo pipefail
           node tools/gravicentra-i4a-public-browser.mjs
-
       - name: Publish evidence summary
         if: always()
         env:
@@ -72,12 +68,73 @@ jobs:
               echo '- Status: `NO_EVIDENCE_FAIL_CLOSED`'
             fi
           } >> "$GITHUB_STEP_SUMMARY"
-
       - name: Preserve public browser evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: gravicentra-i4a-public-browser-${{ github.run_id }}
           path: ${{ runner.temp }}/gravicentra-i4a-public-evidence
+          if-no-files-found: warn
+          retention-days: 30
+
+  authenticated-browser:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    steps:
+      - name: Checkout QA executor
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install read-only QA dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false playwright@1.55.0 firebase-admin@13.10.0 >/dev/null
+          npx playwright install --with-deps chromium >/dev/null
+      - name: Execute authenticated browser QA against exact Preview
+        env:
+          I4A_AUTH_EVIDENCE_DIR: ${{ runner.temp }}/gravicentra-i4a-auth-evidence
+          SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-i4a-authenticated-browser.mjs
+      - name: Publish authenticated evidence summary
+        if: always()
+        env:
+          EVIDENCE: ${{ runner.temp }}/gravicentra-i4a-auth-evidence/i4a-authenticated-browser.json
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo '## Gravicentra Insurance — I4A authenticated browser'
+            echo "- Source under test: \`$SOURCE_SHA\`"
+            echo "- Build ID: \`$BUILD_ID\`"
+            if [ -f "$EVIDENCE" ]; then
+              echo "- Status: \`$(jq -r '.status' "$EVIDENCE")\`"
+              echo "- Roles available: \`$(jq -r '.coverage.availableRoles | join(",")' "$EVIDENCE")\`"
+              echo "- Writes executed: \`$(jq -r '.writesExecuted' "$EVIDENCE")\`"
+              echo "- User identities recorded: \`$(jq -r '.userIdentitiesRecorded' "$EVIDENCE")\`"
+              echo "- Tokens recorded: \`$(jq -r '.tokensRecorded' "$EVIDENCE")\`"
+              echo "- Production touched: \`$(jq -r '.productionTouched' "$EVIDENCE")\`"
+              echo "- Data touched: \`$(jq -r '.dataTouched' "$EVIDENCE")\`"
+            else
+              echo '- Status: `NO_EVIDENCE_FAIL_CLOSED`'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Preserve authenticated browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i4a-authenticated-browser-${{ github.run_id }}
+          path: ${{ runner.temp }}/gravicentra-i4a-auth-evidence
           if-no-files-found: warn
           retention-days: 30
