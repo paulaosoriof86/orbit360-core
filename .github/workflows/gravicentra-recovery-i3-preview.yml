@@ -247,7 +247,16 @@ jobs:
         run: |
           set -euo pipefail
           BUNDLE="$RUNNER_TEMP/gravicentra-i3-release-package/bundle"; CHANNEL_ID="gi-i3-${GITHUB_RUN_ID}"; cd "$BUNDLE"
-          npx --yes firebase-tools@14.10.1 hosting:channel:deploy "$CHANNEL_ID" --project "$PROJECT_ID" --only hosting --expires 7d --non-interactive --json > "$RUNNER_TEMP/gravicentra-i3-deploy.json"
+          set +e
+          npx --yes firebase-tools@14.10.1 hosting:channel:deploy "$CHANNEL_ID" --project "$PROJECT_ID" --expires 7d --non-interactive --json > "$RUNNER_TEMP/gravicentra-i3-deploy.json" 2> "$RUNNER_TEMP/gravicentra-i3-deploy.err"
+          RC=$?
+          set -e
+          if [ "$RC" -ne 0 ]; then
+            echo 'PREVIEW_DEPLOY_COMMAND_FAILED' >&2
+            cat "$RUNNER_TEMP/gravicentra-i3-deploy.err" >&2 || true
+            cat "$RUNNER_TEMP/gravicentra-i3-deploy.json" >&2 || true
+            exit "$RC"
+          fi
           export DEPLOY_JSON="$RUNNER_TEMP/gravicentra-i3-deploy.json"
           PREVIEW_URL=$(python3 - <<'PY'
           import json,os,re
