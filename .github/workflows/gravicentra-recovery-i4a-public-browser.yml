@@ -8,6 +8,7 @@ on:
       - .github/workflows/gravicentra-recovery-i4a-public-browser.yml
       - tools/gravicentra-i4a-public-browser.mjs
       - tools/gravicentra-i4a-bootstrap-diagnostic.mjs
+      - tools/gravicentra-i4a-authenticated-browser-v2.mjs
   workflow_dispatch:
 
 permissions:
@@ -98,5 +99,59 @@ jobs:
         with:
           name: gravicentra-i4a-bootstrap-diagnostic-${{ github.run_id }}
           path: ${{ runner.temp }}/gravicentra-i4a-bootstrap-diagnostic
+          if-no-files-found: error
+          retention-days: 30
+
+  authenticated-browser:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install authenticated QA dependencies
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false playwright@1.55.0 firebase-admin@13.10.0 >/dev/null
+          npx playwright install --with-deps chromium >/dev/null
+      - name: Execute authenticated module discriminants
+        env:
+          I4A_AUTH_EVIDENCE_DIR: ${{ runner.temp }}/gravicentra-i4a-auth-evidence
+          SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+        run: node tools/gravicentra-i4a-authenticated-browser-v2.mjs
+      - name: Publish authenticated summary
+        if: always()
+        env:
+          EVIDENCE: ${{ runner.temp }}/gravicentra-i4a-auth-evidence/i4a-authenticated-browser.json
+        run: |
+          set -euo pipefail
+          {
+            echo '## Gravicentra Insurance — I4A authenticated module QA'
+            echo "- Source under test: \`$SOURCE_SHA\`"
+            echo "- Build ID: \`$BUILD_ID\`"
+            if [ -f "$EVIDENCE" ]; then
+              echo "- Status: \`$(jq -r '.status' "$EVIDENCE")\`"
+              echo "- Available roles: \`$(jq -r '.coverage.availableRoles | join(",")' "$EVIDENCE")\`"
+              echo "- Passing roles: \`$(jq -r '[.roles|to_entries[]|select(.value.pass==true)|.key] | join(",")' "$EVIDENCE")\`"
+              echo "- Writes executed: \`$(jq -r '.writesExecuted' "$EVIDENCE")\`"
+              echo "- Production touched: \`$(jq -r '.productionTouched' "$EVIDENCE")\`"
+              echo "- Data touched: \`$(jq -r '.dataTouched' "$EVIDENCE")\`"
+            else
+              echo '- Status: `NO_EVIDENCE_FAIL_CLOSED`'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Preserve authenticated evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i4a-authenticated-browser-${{ github.run_id }}
+          path: ${{ runner.temp }}/gravicentra-i4a-auth-evidence
           if-no-files-found: error
           retention-days: 30
