@@ -6,6 +6,8 @@ on:
       - recovery/fase-a-clean-20260831
     paths:
       - .github/workflows/gravicentra-recovery-i4a-public-browser.yml
+      - tools/gravicentra-i4a-public-browser.mjs
+      - tools/gravicentra-i4a-bootstrap-diagnostic.mjs
   workflow_dispatch:
 
 permissions:
@@ -82,7 +84,7 @@ jobs:
             echo "- Source under test: \`$SOURCE_SHA\`"
             echo "- Build ID: \`$BUILD_ID\`"
             if [ -f "$EVIDENCE" ]; then
-              echo "- Roles diagnosed: \`$(jq -r '.roles | keys | join(",")' "$EVIDENCE")\`"
+              echo "- Cases diagnosed: \`$(jq -r '.cases | keys | join(",")' "$EVIDENCE")\`"
               echo "- Writes executed: \`$(jq -r '.writesExecuted' "$EVIDENCE")\`"
               echo "- Production touched: \`$(jq -r '.productionTouched' "$EVIDENCE")\`"
               echo "- Data touched: \`$(jq -r '.dataTouched' "$EVIDENCE")\`"
