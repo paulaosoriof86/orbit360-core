@@ -13,7 +13,7 @@
   'use strict';
 
   window.Orbit = window.Orbit || {};
-  var VERSION = 'p0-20260830-authoritative-required-optional-1';
+  var VERSION = 'p0-20260902-authoritative-required-optional-2';
   var MARKER = 'PRODUCT_HYDRATION_AUTHORITATIVE_REQUIRED_OPTIONAL_P0';
   var originalCreate = window.Orbit.createFirestoreProductReadOnlyStoreP0;
 
@@ -31,6 +31,8 @@
 
   function wrapStore(base, hydration) {
     var baseStatus = base._productStatus.bind(base), baseAttach = base._attachSnapshots.bind(base), baseRaw = base.raw.bind(base), baseAll = base.all.bind(base), baseGet = base.get.bind(base), baseWhere = base.where.bind(base), baseFind = base.find.bind(base);
+    var advisorProjectionCache = null;
+    var advisorProjectionSources = ['clientes', 'polizas', 'cobros', 'recibosEsperados', 'carteraPrimas'];
 
     function status() {
       var raw = baseStatus() || {};
@@ -75,23 +77,34 @@
     base._productStatus = status;
     base.raw = function () { var out = baseRaw() || {}; out.__backend = status(); return out; };
 
-    function advisorProjection() {
-      var durable = baseAll('asesores') || []; if (durable.length) return durable.map(clone); var map = {};
-      function add(id, name, extra) { id = text(id); if (!id) return; var prior = map[id] || {}; var label = text(name || prior.nombre) || 'Asesor asignado'; map[id] = Object.assign({}, prior, extra || {}, { id: id, nombre: label, name: label, displayName: label, projectionOnly: true, projectionSource: 'active-membership-and-canonical-relations', activo: true, estado: 'activo' }); }
-      try { var active = window.Orbit.auth && window.Orbit.auth.productUser || {}; if (active.advisorId) add(active.advisorId, active.nombre, { email: active.email, roles: active.roles || [], rol: active.activeRole || active.rol || 'Asesor' }); } catch (error) {}
-      ['clientes', 'polizas', 'cobros', 'recibosEsperados', 'carteraPrimas'].forEach(function (collection) { (baseAll(collection) || []).forEach(function (row) { add(row && (row.asesorId || row.advisorId || row.vendedorId || row.responsableId), row && (row.asesorNombre || row.advisorName || row.vendedorNombre || row.responsableNombre), {}); }); });
-      return Object.keys(map).map(function (id) { return clone(map[id]); });
+    function invalidateAdvisorProjection(collection) {
+      if (!collection || collection === '*' || collection === 'asesores' || advisorProjectionSources.indexOf(collection) >= 0) advisorProjectionCache = null;
     }
 
+    function advisorProjection() {
+      var durable = baseAll('asesores') || [];
+      if (durable.length) return durable.map(clone);
+      if (advisorProjectionCache) return advisorProjectionCache.map(clone);
+      var map = {};
+      function add(id, name, extra) { id = text(id); if (!id) return; var prior = map[id] || {}; var label = text(name || prior.nombre) || 'Asesor asignado'; map[id] = Object.assign({}, prior, extra || {}, { id: id, nombre: label, name: label, displayName: label, projectionOnly: true, projectionSource: 'active-membership-and-canonical-relations', activo: true, estado: 'activo' }); }
+      try { var active = window.Orbit.auth && window.Orbit.auth.productUser || {}; if (active.advisorId) add(active.advisorId, active.nombre, { email: active.email, roles: active.roles || [], rol: active.activeRole || active.rol || 'Asesor' }); } catch (error) {}
+      advisorProjectionSources.forEach(function (collection) { (baseAll(collection) || []).forEach(function (row) { add(row && (row.asesorId || row.advisorId || row.vendedorId || row.responsableId), row && (row.asesorNombre || row.advisorName || row.vendedorNombre || row.responsableNombre), {}); }); });
+      advisorProjectionCache = Object.keys(map).map(function (id) { return clone(map[id]); });
+      return advisorProjectionCache.map(clone);
+    }
+
+    if (typeof base.on === 'function') {
+      base.on('*', function (collection) { invalidateAdvisorProjection(collection); });
+    }
     base.all = function (collection) { return collection === 'asesores' ? advisorProjection() : baseAll(collection); };
     base.get = function (collection, id) { if (collection !== 'asesores') return baseGet(collection, id); return advisorProjection().find(function (row) { return rowId(row) === id; }) || null; };
     base.where = function (collection, fieldOrPredicate, opOrValue, maybeValue) { if (collection !== 'asesores') return baseWhere.apply(null, arguments); var rows = advisorProjection(); if (typeof fieldOrPredicate === 'function') return rows.filter(fieldOrPredicate); if (fieldOrPredicate && typeof fieldOrPredicate === 'object') return rows.filter(function (row) { return Object.keys(fieldOrPredicate).every(function (key) { return row[key] === fieldOrPredicate[key]; }); }); var op = arguments.length >= 4 ? opOrValue : '=='; var value = arguments.length >= 4 ? maybeValue : opOrValue; return rows.filter(function (row) { return (op === '==' || op === '=') ? row[fieldOrPredicate] === value : op === '!=' ? row[fieldOrPredicate] !== value : false; }); };
     base.find = function (collection, predicate) { if (collection !== 'asesores') return baseFind(collection, predicate); return typeof predicate === 'function' ? (advisorProjection().find(predicate) || null) : null; };
-    base.__productHydrationRequiredOptionalP0 = Object.freeze({ version: VERSION, marker: MARKER, writes: 0, noFallback: true, authoritativeServerSnapshotRequired: true });
+    base.__productHydrationRequiredOptionalP0 = Object.freeze({ version: VERSION, marker: MARKER, writes: 0, noFallback: true, authoritativeServerSnapshotRequired: true, advisorProjectionMemoized: true });
     return base;
   }
 
   if (typeof originalCreate !== 'function') throw new Error('product_readonly_store_factory_missing');
   window.Orbit.createFirestoreProductReadOnlyStoreP0 = function (deps, options) { var hydration = contract(); var next = Object.assign({}, options || {}, { collections: hydration.all.slice() }); return wrapStore(originalCreate(deps, next), hydration); };
-  window.Orbit.productHydrationRequiredOptionalP0 = Object.freeze({ VERSION: VERSION, MARKER: MARKER, contract: contract, writesAuthorized: false, noFallback: true, authoritativeServerSnapshotRequired: true });
+  window.Orbit.productHydrationRequiredOptionalP0 = Object.freeze({ VERSION: VERSION, MARKER: MARKER, contract: contract, writesAuthorized: false, noFallback: true, authoritativeServerSnapshotRequired: true, advisorProjectionMemoized: true });
 })();
