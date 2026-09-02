@@ -14,9 +14,9 @@ permissions:
   contents: read
 
 env:
-  SOURCE_SHA: 3af19a03f98f61fefafd3edb0df813883929d502
-  BUILD_ID: gi-i3-3af19a03f98f-57f234755dc1
-  PREVIEW_URL: https://ays-orbit-360-lab--gi-i3-33687991974-3ab21udp.web.app
+  SOURCE_SHA: 069aa1805570556283447151c3bc27b0a32b64f2
+  BUILD_ID: gi-i3-069aa1805570-57f234755dc1
+  PREVIEW_URL: https://ays-orbit-360-lab--gi-i3-33691360986-okgo6xla.web.app
 
 jobs:
   public-browser:
