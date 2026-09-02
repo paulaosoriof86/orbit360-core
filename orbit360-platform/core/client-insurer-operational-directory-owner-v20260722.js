@@ -5,6 +5,7 @@
   window.Orbit = window.Orbit || {};
   var Orbit = window.Orbit;
   var VERSION = '20260829.1';
+  var COMPOSITION_REVISION = '20260902.1-predecessor-row-reclaim';
   if (Orbit.clientInsurerOperationalDirectoryOwnerV20260722 && Orbit.clientInsurerOperationalDirectoryOwnerV20260722.version === VERSION) return;
 
   function clean(value) { return String(value == null ? '' : value).trim(); }
@@ -157,8 +158,8 @@
     var insurer = currentInsurer();
     if (!root || !insurer) return false;
     if (root.querySelector('#af-guardar') || root.classList.contains('od-edit-mode-ready')) return true;
-    root.querySelectorAll('#af-portales .asg-row[data-portal]').forEach(function (row) { renderPortalRow(row, insurer, Number(row.dataset.portal)); });
-    root.querySelectorAll('#af-cuentas .asg-row[data-cta]').forEach(function (row) { renderBankRow(row, insurer, Number(row.dataset.cta)); });
+    root.querySelectorAll('#af-portales [data-portal]').forEach(function (row) { renderPortalRow(row, insurer, Number(row.dataset.portal)); });
+    root.querySelectorAll('#af-cuentas [data-cta]').forEach(function (row) { renderBankRow(row, insurer, Number(row.dataset.cta)); });
     var portalsNote = root.querySelector('#af-portales') && root.querySelector('#af-portales').parentElement.querySelector('.cfg-note');
     if (portalsNote) portalsNote.innerHTML = '<b>Directorio operativo:</b> el usuario permanece visible. La contraseña se revela temporalmente según rol y vuelve a Oculta.';
     var accountsSection = root.querySelector('#af-cuentas') && root.querySelector('#af-cuentas').parentElement;
@@ -220,6 +221,7 @@
   }
   Orbit.clientInsurerOperationalDirectoryOwnerV20260722 = {
     version: VERSION,
+    compositionRevision: COMPOSITION_REVISION,
     ownerId: 'clientInsurerOperationalDirectoryOwner',
     supersedesBankAndPortalSectionsOf: 'client-insurer-visual-contract-v20260720',
     usernameOperationalVisible: true,
