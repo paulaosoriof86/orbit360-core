@@ -1,14 +1,14 @@
 {
   "name": "orbit360-secure-functions",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "private": true,
-  "description": "Orbit 360 secure multi-tenant backend for onboarding, self-service configuration, workflows, advisor inbox, recurring imports, reconciliation and operational resources.",
+  "description": "Gravicentra Insurance secure multi-tenant backend for onboarding, workflows, reconciliation, operational writes and protected insurer resources.",
   "main": "bootstrap.js",
   "engines": {
     "node": "22"
   },
   "scripts": {
-    "check": "node --check user-onboarding.js && node --check tenant-domain-config.js && node --check ops-leads-domain.js && node --check ops-advisor-inbox.js && node --check cobros-reconciliation-domain.js && node --check recurring-insurance-import.js && node --check index.js && node --check bank-accounts.js && node --check bootstrap.js"
+    "check": "node --check user-onboarding.js && node --check tenant-domain-config.js && node --check ops-leads-domain.js && node --check product-ops-leads-domain.js && node --check ops-advisor-inbox.js && node --check cobros-reconciliation-domain.js && node --check product-operational-domain.js && node --check product-insurer-credentials.js && node --check recurring-insurance-import.js && node --check index.js && node --check bank-accounts.js && node --check bootstrap.js"
   },
   "dependencies": {
     "@google-cloud/secret-manager": "6.2.0",
