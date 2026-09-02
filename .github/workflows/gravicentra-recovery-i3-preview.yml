@@ -40,8 +40,45 @@ jobs:
         with:
           node-version: '22'
 
+      - id: auth
+        name: Select existing service account for the same Firebase project
+        env:
+          SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          target=os.environ['PROJECT_ID']
+          candidates=[('FIREBASE_SERVICE_ACCOUNT',os.environ.get('SA_DEFAULT','')),('FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB',os.environ.get('SA_ORBIT360_LAB','')),('FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB',os.environ.get('SA_ORBIT_360_LAB',''))]
+          chosen=None
+          for name,raw in candidates:
+              if not raw.strip():
+                  continue
+              try:
+                  data=json.loads(raw)
+              except Exception:
+                  continue
+              if data.get('type')=='service_account' and data.get('project_id')==target and data.get('client_email') and data.get('private_key'):
+                  chosen=(name,data)
+                  break
+          if not chosen:
+              raise SystemExit('NO_EXISTING_SERVICE_ACCOUNT_FOR_TARGET_PROJECT')
+          out=Path(os.environ['RUNNER_TEMP'])/'gravicentra-i3-firebase-sa.json'
+          out.write_text(json.dumps(chosen[1]),encoding='utf-8')
+          out.chmod(0o600)
+          with open(os.environ['GITHUB_OUTPUT'],'a',encoding='utf-8') as f:
+              f.write('credential_source='+chosen[0]+'\n')
+              f.write('credential_file='+str(out)+'\n')
+          PY
+
       - id: build
         name: Materialize isolated immutable product artifact
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.auth.outputs.credential_file }}
         shell: bash
         run: |
           set -euo pipefail
@@ -53,7 +90,7 @@ jobs:
           EVIDENCE="$PACKAGE/evidence"
           rm -rf "$PACKAGE"
           mkdir -p "$SITE" "$EVIDENCE"
-          export SRC SITE BUNDLE EVIDENCE
+          export SRC SITE BUNDLE EVIDENCE PACKAGE
 
           test -f "$SRC/index.html"
           test -f "$SRC/product-runtime-config.js"
@@ -152,16 +189,47 @@ jobs:
           print(f'REACHABLE_PRODUCT_FILES={len(seen)}')
           PY
 
-          curl -fsSL --retry 3 --connect-timeout 10 --max-time 30 \
-            "https://${HOSTING_SITE}.web.app/__/firebase/init.json" \
-            -o "$RUNNER_TEMP/firebase-public-config.json"
+          npx --yes firebase-tools@14.10.1 apps:list WEB \
+            --project "$PROJECT_ID" --non-interactive --json \
+            > "$RUNNER_TEMP/firebase-web-apps.json"
+          export APP_LIST_JSON="$RUNNER_TEMP/firebase-web-apps.json"
+          APP_ID=$(python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          data=json.loads(Path(os.environ['APP_LIST_JSON']).read_text(encoding='utf-8'))
+          apps=data.get('result') if isinstance(data,dict) else None
+          if not isinstance(apps,list):
+              raise SystemExit('FIREBASE_WEB_APP_LIST_INVALID')
+          web=[a for a in apps if str(a.get('platform','')).upper() in ('WEB','PLATFORM_WEB','')]
+          if len(web) != 1:
+              safe=[{'appId':a.get('appId',''),'displayName':a.get('displayName',''),'platform':a.get('platform','')} for a in web]
+              raise SystemExit('FIREBASE_WEB_APP_CARDINALITY_NOT_ONE:'+json.dumps(safe,separators=(',',':')))
+          app_id=str(web[0].get('appId','')).strip()
+          if not app_id:
+              raise SystemExit('FIREBASE_WEB_APP_ID_MISSING')
+          print(app_id)
+          PY
+          )
+          test -n "$APP_ID"
+          npx --yes firebase-tools@14.10.1 apps:sdkconfig WEB "$APP_ID" \
+            --project "$PROJECT_ID" --non-interactive --json \
+            > "$RUNNER_TEMP/firebase-public-config.json"
 
           export PUBLIC_CONFIG="$RUNNER_TEMP/firebase-public-config.json"
           python3 - <<'PY'
-          import hashlib, json, os
+          import hashlib, json, os, re
           from pathlib import Path
 
-          cfg = json.loads(Path(os.environ['PUBLIC_CONFIG']).read_text(encoding='utf-8'))
+          raw=json.loads(Path(os.environ['PUBLIC_CONFIG']).read_text(encoding='utf-8'))
+          result=raw.get('result',{}) if isinstance(raw,dict) else {}
+          cfg=result.get('sdkConfig') if isinstance(result,dict) else None
+          if not isinstance(cfg,dict):
+              text=result.get('fileContents','') if isinstance(result,dict) else ''
+              m=re.search(r'initializeApp\((\{.*?\})\)',text,re.S)
+              if m:
+                  cfg=json.loads(m.group(1))
+          if not isinstance(cfg,dict):
+              raise SystemExit('PUBLIC_FIREBASE_SDK_CONFIG_INVALID')
           required = ['apiKey','authDomain','projectId','appId']
           missing = [k for k in required if not str(cfg.get(k,'')).strip()]
           if missing:
@@ -230,7 +298,6 @@ jobs:
           }
           JSON
 
-          export PACKAGE
           python3 - <<'PY'
           import hashlib, os
           from pathlib import Path
@@ -257,41 +324,6 @@ jobs:
               f.write(f'hosted_payload_digest={site_digest}\n')
               f.write(f'bundle_file_count={bundle_count}\n')
               f.write(f'bundle_digest={bundle_digest}\n')
-          PY
-
-      - id: auth
-        name: Select existing service account for the same Firebase project
-        env:
-          SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-          SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
-          SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          python3 - <<'PY'
-          import json, os
-          from pathlib import Path
-          target=os.environ['PROJECT_ID']
-          candidates=[('FIREBASE_SERVICE_ACCOUNT',os.environ.get('SA_DEFAULT','')),('FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB',os.environ.get('SA_ORBIT360_LAB','')),('FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB',os.environ.get('SA_ORBIT_360_LAB',''))]
-          chosen=None
-          for name,raw in candidates:
-              if not raw.strip():
-                  continue
-              try:
-                  data=json.loads(raw)
-              except Exception:
-                  continue
-              if data.get('type')=='service_account' and data.get('project_id')==target and data.get('client_email') and data.get('private_key'):
-                  chosen=(name,data)
-                  break
-          if not chosen:
-              raise SystemExit('NO_EXISTING_SERVICE_ACCOUNT_FOR_TARGET_PROJECT')
-          out=Path(os.environ['RUNNER_TEMP'])/'gravicentra-i3-firebase-sa.json'
-          out.write_text(json.dumps(chosen[1]),encoding='utf-8')
-          out.chmod(0o600)
-          with open(os.environ['GITHUB_OUTPUT'],'a',encoding='utf-8') as f:
-              f.write('credential_source='+chosen[0]+'\n')
-              f.write('credential_file='+str(out)+'\n')
           PY
 
       - id: deploy
