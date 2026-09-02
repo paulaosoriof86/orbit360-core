@@ -13,7 +13,7 @@
   'use strict';
 
   window.Orbit = window.Orbit || {};
-  var VERSION = 'p0-20260902-authoritative-required-optional-2';
+  var VERSION = 'p0-20260902-authoritative-required-optional-3';
   var MARKER = 'PRODUCT_HYDRATION_AUTHORITATIVE_REQUIRED_OPTIONAL_P0';
   var originalCreate = window.Orbit.createFirestoreProductReadOnlyStoreP0;
 
@@ -69,7 +69,8 @@
         writeEnabled: false,
         writeAuthorized: false,
         requiredReadinessAuthority: MARKER,
-        authoritativeServerSnapshotRequired: true
+        authoritativeServerSnapshotRequired: true,
+        authoritativeFirstReadRequired: true
       });
     }
 
@@ -100,11 +101,19 @@
     base.get = function (collection, id) { if (collection !== 'asesores') return baseGet(collection, id); return advisorProjection().find(function (row) { return rowId(row) === id; }) || null; };
     base.where = function (collection, fieldOrPredicate, opOrValue, maybeValue) { if (collection !== 'asesores') return baseWhere.apply(null, arguments); var rows = advisorProjection(); if (typeof fieldOrPredicate === 'function') return rows.filter(fieldOrPredicate); if (fieldOrPredicate && typeof fieldOrPredicate === 'object') return rows.filter(function (row) { return Object.keys(fieldOrPredicate).every(function (key) { return row[key] === fieldOrPredicate[key]; }); }); var op = arguments.length >= 4 ? opOrValue : '=='; var value = arguments.length >= 4 ? maybeValue : opOrValue; return rows.filter(function (row) { return (op === '==' || op === '=') ? row[fieldOrPredicate] === value : op === '!=' ? row[fieldOrPredicate] !== value : false; }); };
     base.find = function (collection, predicate) { if (collection !== 'asesores') return baseFind(collection, predicate); return typeof predicate === 'function' ? (advisorProjection().find(predicate) || null) : null; };
-    base.__productHydrationRequiredOptionalP0 = Object.freeze({ version: VERSION, marker: MARKER, writes: 0, noFallback: true, authoritativeServerSnapshotRequired: true, advisorProjectionMemoized: true });
+    base.__productHydrationRequiredOptionalP0 = Object.freeze({ version: VERSION, marker: MARKER, writes: 0, noFallback: true, authoritativeServerSnapshotRequired: true, authoritativeFirstReadRequired: true, advisorProjectionMemoized: true });
     return base;
   }
 
   if (typeof originalCreate !== 'function') throw new Error('product_readonly_store_factory_missing');
-  window.Orbit.createFirestoreProductReadOnlyStoreP0 = function (deps, options) { var hydration = contract(); var next = Object.assign({}, options || {}, { collections: hydration.all.slice() }); return wrapStore(originalCreate(deps, next), hydration); };
-  window.Orbit.productHydrationRequiredOptionalP0 = Object.freeze({ VERSION: VERSION, MARKER: MARKER, contract: contract, writesAuthorized: false, noFallback: true, authoritativeServerSnapshotRequired: true, advisorProjectionMemoized: true });
+  window.Orbit.createFirestoreProductReadOnlyStoreP0 = function (deps, options) {
+    var hydration = contract();
+    var next = Object.assign({}, options || {}, {
+      collections: hydration.all.slice(),
+      requiredCollections: hydration.required.slice(),
+      authoritativeFirstReadRequired: true
+    });
+    return wrapStore(originalCreate(deps, next), hydration);
+  };
+  window.Orbit.productHydrationRequiredOptionalP0 = Object.freeze({ VERSION: VERSION, MARKER: MARKER, contract: contract, writesAuthorized: false, noFallback: true, authoritativeServerSnapshotRequired: true, authoritativeFirstReadRequired: true, advisorProjectionMemoized: true });
 })();
