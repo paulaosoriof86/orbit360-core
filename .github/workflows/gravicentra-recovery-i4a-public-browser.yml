@@ -106,7 +106,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          node tools/gravicentra-i4a-authenticated-browser.mjs
+          node tools/gravicentra-i4a-authenticated-browser-v2.mjs
       - name: Publish authenticated evidence summary
         if: always()
         env:
@@ -121,6 +121,7 @@ jobs:
             if [ -f "$EVIDENCE" ]; then
               echo "- Status: \`$(jq -r '.status' "$EVIDENCE")\`"
               echo "- Roles available: \`$(jq -r '.coverage.availableRoles | join(",")' "$EVIDENCE")\`"
+              echo "- Persisted-active roles: \`$(jq -r '.coverage.persistedActiveRoles | join(",")' "$EVIDENCE")\`"
               echo "- Writes executed: \`$(jq -r '.writesExecuted' "$EVIDENCE")\`"
               echo "- User identities recorded: \`$(jq -r '.userIdentitiesRecorded' "$EVIDENCE")\`"
               echo "- Tokens recorded: \`$(jq -r '.tokensRecorded' "$EVIDENCE")\`"
