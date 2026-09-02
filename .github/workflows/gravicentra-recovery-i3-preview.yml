@@ -1,5 +1,4 @@
 name: Gravicentra Recovery I3 Immutable Preview
-# I3 credential recheck trigger: 2026-09-02
 
 on:
   workflow_dispatch:
@@ -18,9 +17,8 @@ concurrency:
 
 env:
   SOURCE_SHA: 25c17c6f40dc5b64e5bbf0ab833ec0e71bc99dcc
-  PROJECT_ID: aysaseguradores
-  HOSTING_TARGET: orbit360
-  HOSTING_SITE: aysaseguradores
+  PROJECT_ID: ays-orbit-360-lab
+  HOSTING_SITE: ays-orbit-360-lab
   TENANT_HINT: alianzas-soluciones
 
 jobs:
@@ -42,7 +40,7 @@ jobs:
           node-version: '22'
 
       - id: auth
-        name: Select an existing service account by proven target access
+        name: Prove credential access to the existing Firebase
         env:
           SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
@@ -50,11 +48,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p "$RUNNER_TEMP/gravicentra-i3-auth-candidates"
+          ROOT="$RUNNER_TEMP/gravicentra-i3-auth-candidates"
+          mkdir -p "$ROOT"
+          export ROOT
           python3 - <<'PY'
           import json, os
           from pathlib import Path
-          root=Path(os.environ['RUNNER_TEMP'])/'gravicentra-i3-auth-candidates'
+          root=Path(os.environ['ROOT'])
           candidates=[
             ('FIREBASE_SERVICE_ACCOUNT',os.environ.get('SA_DEFAULT','')),
             ('FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB',os.environ.get('SA_ORBIT360_LAB','')),
@@ -62,65 +62,42 @@ jobs:
           ]
           valid=[]
           for idx,(name,raw) in enumerate(candidates):
-              if not raw.strip():
-                  continue
-              try:
-                  data=json.loads(raw)
-              except Exception:
-                  continue
-              if data.get('type')!='service_account' or not data.get('client_email') or not data.get('private_key'):
-                  continue
+              if not raw.strip(): continue
+              try: data=json.loads(raw)
+              except Exception: continue
+              if data.get('type')!='service_account' or not data.get('client_email') or not data.get('private_key'): continue
               path=root/f'{idx}.json'
               path.write_text(json.dumps(data),encoding='utf-8')
               path.chmod(0o600)
               valid.append({'name':name,'path':str(path),'ownerProjectId':str(data.get('project_id',''))})
-          if not valid:
-              raise SystemExit('NO_EXISTING_WELL_FORMED_SERVICE_ACCOUNT')
+          if not valid: raise SystemExit('NO_EXISTING_WELL_FORMED_SERVICE_ACCOUNT')
           (root/'index.json').write_text(json.dumps(valid),encoding='utf-8')
           print('WELL_FORMED_EXISTING_SERVICE_ACCOUNTS='+str(len(valid)))
+          for row in valid:
+              print('CREDENTIAL_METADATA name='+row['name']+' ownerProject='+row['ownerProjectId'])
           PY
 
-          SELECTED_NAME=''
-          SELECTED_FILE=''
-          SELECTED_OWNER=''
-          export AUTH_INDEX="$RUNNER_TEMP/gravicentra-i3-auth-candidates/index.json"
+          SELECTED_NAME=''; SELECTED_FILE=''; SELECTED_OWNER=''
           while IFS=$'\t' read -r NAME FILE OWNER; do
+            echo "PROBE_EXISTING_FIREBASE credential=$NAME ownerProject=$OWNER target=$PROJECT_ID"
             set +e
-            GOOGLE_APPLICATION_CREDENTIALS="$FILE" npx --yes firebase-tools@14.10.1 apps:list WEB \
-              --project "$PROJECT_ID" --non-interactive --json \
-              > "$RUNNER_TEMP/i3-auth-probe.json" 2> "$RUNNER_TEMP/i3-auth-probe.err"
-            RC=$?
+            GOOGLE_APPLICATION_CREDENTIALS="$FILE" npx --yes firebase-tools@14.10.1 apps:list WEB --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/i3-apps-$NAME.json" 2> "$RUNNER_TEMP/i3-apps-$NAME.err"
+            APPS_RC=$?
+            GOOGLE_APPLICATION_CREDENTIALS="$FILE" npx --yes firebase-tools@14.10.1 hosting:sites:get "$HOSTING_SITE" --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/i3-site-$NAME.json" 2> "$RUNNER_TEMP/i3-site-$NAME.err"
+            SITE_RC=$?
             set -e
-            if [ "$RC" -eq 0 ]; then
-              export PROBE_JSON="$RUNNER_TEMP/i3-auth-probe.json"
-              if python3 - <<'PY'
-          import json, os
-          from pathlib import Path
-          try:
-              data=json.loads(Path(os.environ['PROBE_JSON']).read_text(encoding='utf-8'))
-          except Exception:
-              raise SystemExit(1)
-          result=data.get('result') if isinstance(data,dict) else None
-          if not isinstance(result,list):
-              raise SystemExit(1)
-          PY
-              then
-                SELECTED_NAME="$NAME"
-                SELECTED_FILE="$FILE"
-                SELECTED_OWNER="$OWNER"
-                break
-              fi
+            if [ "$APPS_RC" -eq 0 ] && [ "$SITE_RC" -eq 0 ]; then
+              SELECTED_NAME="$NAME"; SELECTED_FILE="$FILE"; SELECTED_OWNER="$OWNER"; break
             fi
           done < <(python3 - <<'PY'
-          import json, os
+          import json,os
           from pathlib import Path
-          for row in json.loads(Path(os.environ['AUTH_INDEX']).read_text(encoding='utf-8')):
+          for row in json.loads((Path(os.environ['ROOT'])/'index.json').read_text(encoding='utf-8')):
               print(row['name']+'\t'+row['path']+'\t'+row['ownerProjectId'])
           PY
           )
-
           if [ -z "$SELECTED_FILE" ]; then
-            echo 'NO_EXISTING_SERVICE_ACCOUNT_HAS_PROVEN_FIREBASE_TARGET_ACCESS' >&2
+            echo "EXISTING_FIREBASE_ACCESS_NOT_PROVEN target=$PROJECT_ID site=$HOSTING_SITE" >&2
             exit 42
           fi
           cp "$SELECTED_FILE" "$RUNNER_TEMP/gravicentra-i3-firebase-sa.json"
@@ -128,7 +105,7 @@ jobs:
           echo "credential_source=$SELECTED_NAME" >> "$GITHUB_OUTPUT"
           echo "credential_file=$RUNNER_TEMP/gravicentra-i3-firebase-sa.json" >> "$GITHUB_OUTPUT"
           echo "credential_owner_project=$SELECTED_OWNER" >> "$GITHUB_OUTPUT"
-          echo "TARGET_ACCESS_PROBE_PASS source=$SELECTED_NAME ownerProject=$SELECTED_OWNER target=$PROJECT_ID"
+          echo "EXISTING_FIREBASE_ACCESS_PASS credential=$SELECTED_NAME target=$PROJECT_ID site=$HOSTING_SITE"
 
       - id: build
         name: Materialize isolated immutable product artifact
@@ -143,20 +120,16 @@ jobs:
           BUNDLE="$PACKAGE/bundle"
           SITE="$BUNDLE/site"
           EVIDENCE="$PACKAGE/evidence"
-          rm -rf "$PACKAGE"
-          mkdir -p "$SITE" "$EVIDENCE"
+          rm -rf "$PACKAGE"; mkdir -p "$SITE" "$EVIDENCE"
           export SRC SITE BUNDLE EVIDENCE PACKAGE
-
-          test -f "$SRC/index.html"
-          test -f "$SRC/product-runtime-config.js"
-          test -f "$SRC/sw.js"
+          test -f "$SRC/index.html"; test -f "$SRC/product-runtime-config.js"; test -f "$SRC/sw.js"
           grep -Fq "hydrationContractVersion: 'fase-a-i2-20260902.1'" "$SRC/product-runtime-config.js"
           grep -Fq "hydrationContractSource: 'recovery/fase-a-clean-20260831'" "$SRC/product-runtime-config.js"
           grep -Fq "enabled: false" "$SRC/product-runtime-config.js"
           grep -Fq "'alianzas-soluciones'" "$SRC/data/tenant-runtime-config-index.js"
 
           python3 - <<'PY'
-          import os, re, shutil
+          import os,re,shutil
           from pathlib import Path
           src=Path(os.environ['SRC']).resolve(); site=Path(os.environ['SITE']).resolve()
           queue=['index.html','product-runtime-config.js','sw.js']; seen=set()
@@ -246,12 +219,13 @@ jobs:
           with open(os.environ['GITHUB_OUTPUT'],'a',encoding='utf-8') as f: f.write('build_id='+build_id+'\n')
           PY
 
-          cat > "$BUNDLE/firebase.json" <<'JSON'
-          {"hosting":{"target":"orbit360","public":"site","ignore":["firebase.json","**/.*","**/node_modules/**"],"rewrites":[{"source":"**","destination":"/index.html"}]}}
-          JSON
-          cat > "$BUNDLE/.firebaserc" <<'JSON'
-          {"projects":{"default":"aysaseguradores"},"targets":{"aysaseguradores":{"hosting":{"orbit360":["aysaseguradores"]}}}}
-          JSON
+          python3 - <<'PY'
+          import json,os
+          from pathlib import Path
+          bundle=Path(os.environ['BUNDLE'])
+          (bundle/'firebase.json').write_text(json.dumps({'hosting':{'site':os.environ['HOSTING_SITE'],'public':'site','ignore':['firebase.json','**/.*','**/node_modules/**'],'rewrites':[{'source':'**','destination':'/index.html'}]}},separators=(',',':'))+'\n',encoding='utf-8')
+          (bundle/'.firebaserc').write_text(json.dumps({'projects':{'default':os.environ['PROJECT_ID']}},separators=(',',':'))+'\n',encoding='utf-8')
+          PY
           python3 - <<'PY'
           import hashlib,os
           from pathlib import Path
@@ -273,7 +247,7 @@ jobs:
         run: |
           set -euo pipefail
           BUNDLE="$RUNNER_TEMP/gravicentra-i3-release-package/bundle"; CHANNEL_ID="gi-i3-${GITHUB_RUN_ID}"; cd "$BUNDLE"
-          npx --yes firebase-tools@14.10.1 hosting:channel:deploy "$CHANNEL_ID" --project "$PROJECT_ID" --only "hosting:$HOSTING_TARGET" --expires 7d --non-interactive --json > "$RUNNER_TEMP/gravicentra-i3-deploy.json"
+          npx --yes firebase-tools@14.10.1 hosting:channel:deploy "$CHANNEL_ID" --project "$PROJECT_ID" --only hosting --expires 7d --non-interactive --json > "$RUNNER_TEMP/gravicentra-i3-deploy.json"
           export DEPLOY_JSON="$RUNNER_TEMP/gravicentra-i3-deploy.json"
           PREVIEW_URL=$(python3 - <<'PY'
           import json,os,re
@@ -296,6 +270,7 @@ jobs:
           PY
           )
           echo "channel_id=$CHANNEL_ID" >> "$GITHUB_OUTPUT"; echo "preview_url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
+          echo "PREVIEW_DEPLOY_PASS url=$PREVIEW_URL"
 
       - id: readback
         name: Read back every hosted byte from the same Preview
@@ -348,7 +323,7 @@ jobs:
           import json,os
           from pathlib import Path
           if os.environ.get('READBACK_EXACT')!='true': raise SystemExit('READBACK_NOT_EXACT')
-          evidence={'schemaVersion':'gravicentra-recovery-i3-evidence-v1','status':'ARTIFACT_READBACK_EXACT_PASS','product':'Gravicentra Insurance','gate':'I3','sourceSha':os.environ['SOURCE_SHA'],'runnerCommit':os.environ['GITHUB_SHA'],'githubRunId':os.environ['GITHUB_RUN_ID'],'buildId':os.environ['BUILD_ID'],'hostedFileCount':int(os.environ['HOSTED_FILE_COUNT']),'hostedPayloadDigest':os.environ['HOSTED_PAYLOAD_DIGEST'],'bundleFileCount':int(os.environ['BUNDLE_FILE_COUNT']),'bundleDigest':os.environ['BUNDLE_DIGEST'],'previewChannelId':os.environ['CHANNEL_ID'],'previewUrl':os.environ['PREVIEW_URL'],'credentialSourceName':os.environ['CREDENTIAL_SOURCE'],'credentialOwnerProjectId':os.environ['CREDENTIAL_OWNER_PROJECT'],'credentialTargetAccessProven':True,'sameArtifactPreviewToProductionRequired':True,'sourceMutatedAfterBuild':False,'productionTouched':False,'dataTouched':False,'readbackExact':True}
+          evidence={'schemaVersion':'gravicentra-recovery-i3-evidence-v1','status':'ARTIFACT_READBACK_EXACT_PASS','product':'Gravicentra Insurance','gate':'I3','sourceSha':os.environ['SOURCE_SHA'],'runnerCommit':os.environ['GITHUB_SHA'],'githubRunId':os.environ['GITHUB_RUN_ID'],'buildId':os.environ['BUILD_ID'],'firebaseProjectId':os.environ['PROJECT_ID'],'hostingSiteId':os.environ['HOSTING_SITE'],'hostedFileCount':int(os.environ['HOSTED_FILE_COUNT']),'hostedPayloadDigest':os.environ['HOSTED_PAYLOAD_DIGEST'],'bundleFileCount':int(os.environ['BUNDLE_FILE_COUNT']),'bundleDigest':os.environ['BUNDLE_DIGEST'],'previewChannelId':os.environ['CHANNEL_ID'],'previewUrl':os.environ['PREVIEW_URL'],'credentialSourceName':os.environ['CREDENTIAL_SOURCE'],'credentialOwnerProjectId':os.environ['CREDENTIAL_OWNER_PROJECT'],'credentialTargetAccessProven':True,'sameArtifactPreviewToProductionRequired':True,'sourceMutatedAfterBuild':False,'productionTouched':False,'dataTouched':False,'readbackExact':True}
           Path(os.environ['EVIDENCE_DIR']+'/i3-evidence.json').write_text(json.dumps(evidence,sort_keys=True,separators=(',',':'))+'\n',encoding='utf-8')
           PY
 
@@ -367,14 +342,15 @@ jobs:
         run: |
           {
             echo '## Gravicentra Insurance — I3 immutable Preview'
+            echo "- Existing Firebase project: \`$PROJECT_ID\`"
+            echo "- Existing Hosting site: \`$HOSTING_SITE\`"
             echo "- Source SHA: \`$SOURCE_SHA\`"
             echo "- Build ID: \`${{ steps.build.outputs.build_id }}\`"
             echo "- Hosted payload digest: \`${{ steps.build.outputs.hosted_payload_digest }}\`"
             echo "- Bundle digest: \`${{ steps.build.outputs.bundle_digest }}\`"
             echo "- Preview: ${{ steps.deploy.outputs.preview_url }}"
             echo "- Exact byte readback: ${{ steps.readback.outputs.readback_exact }}"
-            echo "- Credential target access: proven"
             echo "- Artifact: \`gravicentra-i3-${GITHUB_RUN_ID}\`"
-            echo "- Production touched: false"
-            echo "- Data touched: false"
+            echo '- Production touched: false'
+            echo '- Data touched: false'
           } >> "$GITHUB_STEP_SUMMARY"
