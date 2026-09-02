@@ -12,6 +12,11 @@
    - marca conflictos país/código como REQUIERE_VALIDACION;
    - evita aplicar la misma proyección repetidamente;
    - conserva estado pendiente_polizas cuando aún no existen relaciones.
+
+   Recovery Fase A · 2026-09-02:
+   - el store productivo read-only devuelve copias; no intentar proyectarlas
+     "in place" ni reemitir orbit:store:emit porque genera un feedback loop;
+   - withReadBatch proyecta copias para renderers aprobados sin escribir store.
    ============================================================ */
 (function () {
   'use strict';
@@ -19,6 +24,7 @@
 
   var SHAPE_REVISION = '20260731.1-optional-arrays';
   var PROJECTION_MARKER = '20260731.1-temporal';
+  var PRODUCT_COPY_SAFE_REVISION = '20260902.1-product-copy-safe';
 
   function clean(value) { return String(value == null ? '' : value).trim(); }
   function normalized(value) {
@@ -150,9 +156,33 @@
     try { var client = Orbit.store && Orbit.store.get ? Orbit.store.get('clientes', clientId) : null; return client ? project(client) : null; }
     catch (error) { return null; }
   }
+  function policyContext(rows) {
+    var ids = new Set();
+    (rows || []).forEach(function (p) { var id = clean(p && p.clienteId); if (id) ids.add(id); });
+    return { policyClientIds: ids };
+  }
+  function withReadBatch(collections, projector) {
+    var names = Array.isArray(collections) ? collections.slice() : [];
+    var source = {};
+    names.forEach(function (name) {
+      try { source[name] = Orbit.store && Orbit.store.all ? (Orbit.store.all(name) || []) : []; }
+      catch (error) { source[name] = []; }
+    });
+    if (names.indexOf('clientes') >= 0) {
+      var policies = source.polizas;
+      if (!Array.isArray(policies)) {
+        try { policies = Orbit.store && Orbit.store.all ? (Orbit.store.all('polizas') || []) : []; }
+        catch (error) { policies = []; }
+      }
+      var context = policyContext(policies);
+      source.clientes = (source.clientes || []).map(function (row) { return project(row, context); });
+    }
+    return typeof projector === 'function' ? projector(source) : source;
+  }
 
   Orbit.clientProjection = {
-    version: '20260719.2', shapeRevision: SHAPE_REVISION, project: project, get: get, field: field,
+    version: '20260719.2', shapeRevision: SHAPE_REVISION, runtimeCompatibilityRevision: PRODUCT_COPY_SAFE_REVISION,
+    project: project, get: get, field: field, withReadBatch: withReadBatch,
     estadoOperativo: operationalState, alertasCalidad: qualityAlerts,
     normalizeType: normalizeType, normalizeCountry: normalizeCountry, normalizeDate: normalizeDate,
     ALIAS: ALIAS, writesStore: false, reimportsData: false, createsRelations: false
@@ -183,6 +213,9 @@
     try { window.dispatchEvent(new CustomEvent('orbit:store:emit', { detail: { collection: 'clientes', source: 'client-canonical-view-projection', shapeRevision: SHAPE_REVISION } })); }
     catch (error) {}
   }
+  function productCopyStore() {
+    return !!(Orbit.store && Orbit.store.__productReadOnlyP0 === true);
+  }
   function applyAll() {
     var rows = [];
     var changed = 0;
@@ -190,17 +223,24 @@
     var policyClientIds = new Set();
     try { (Orbit.store && Orbit.store.all ? (Orbit.store.all('polizas') || []) : []).forEach(function (p) { var id = clean(p && p.clienteId); if (id) policyClientIds.add(id); }); } catch (error) {}
     var context = { policyClientIds: policyClientIds };
+
+    if (productCopyStore()) {
+      return { total: rows.length, changed: 0, projectedCopies: rows.length, shapeRevision: SHAPE_REVISION, runtimeCompatibilityRevision: PRODUCT_COPY_SAFE_REVISION };
+    }
+
     rows.forEach(function (row) { if (projectInPlace(row, context)) changed += 1; });
     if (changed) {
       publishProjectionChange(changed);
       try { if (window.OrbitLabCanonicalViewSync && typeof OrbitLabCanonicalViewSync.schedule === 'function') OrbitLabCanonicalViewSync.schedule('clientes'); }
       catch (error) {}
     }
-    return { total: rows.length, changed: changed, shapeRevision: SHAPE_REVISION };
+    return { total: rows.length, changed: changed, shapeRevision: SHAPE_REVISION, runtimeCompatibilityRevision: PRODUCT_COPY_SAFE_REVISION };
   }
 
   window.addEventListener('orbit:store:emit', function (event) {
     var collection = event && event.detail && event.detail.collection;
+    var source = event && event.detail && event.detail.source;
+    if (source === 'client-canonical-view-projection') return;
     if (!collection || collection === '*' || collection === 'clientes' || collection === 'asesores') setTimeout(applyAll, 0);
   });
   window.addEventListener('hashchange', function () { setTimeout(applyAll, 0); });
@@ -208,8 +248,10 @@
   document.addEventListener('orbit:session', function () { setTimeout(applyAll, 0); });
 
   Orbit.clientCanonicalViewProjectionV20260716 = {
-    version: '20260719.2', shapeRevision: SHAPE_REVISION, project: projectInPlace, projectCopy: project, applyAll: applyAll,
-    temporaryInPlaceBridge: true, writesStore: false, reimportsData: false, replacesRenderer: false
+    version: '20260719.2', shapeRevision: SHAPE_REVISION, runtimeCompatibilityRevision: PRODUCT_COPY_SAFE_REVISION,
+    project: projectInPlace, projectCopy: project, withReadBatch: withReadBatch, applyAll: applyAll,
+    temporaryInPlaceBridge: true, productCopyStoreSafe: true,
+    writesStore: false, reimportsData: false, replacesRenderer: false
   };
 
   setTimeout(function () { var result = applyAll(); if (!result.total) setTimeout(applyAll, 500); }, 0);
