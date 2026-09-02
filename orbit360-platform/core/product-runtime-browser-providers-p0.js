@@ -54,12 +54,12 @@
   function dependencies(){
     return{
       environmentProvider:{describePublicConfig:publicDescriptor},
-      firebaseAdapter:{initializeFromEnvironment:function(){return initialize();},storeDependencies:function(ctx){var m=ctx.modules.store;return{db:ctx.db,collection:m.collection,query:m.query,where:m.where,onSnapshot:m.onSnapshot};}},
+      firebaseAdapter:{initializeFromEnvironment:function(){return initialize();},storeDependencies:function(ctx){var m=ctx.modules.store;return{db:ctx.db,collection:m.collection,query:m.query,where:m.where,onSnapshot:m.onSnapshot,getDocsFromServer:m.getDocsFromServer};}},
       authProvider:{waitForAuthenticatedUser:function(){return waitUser().then(function(u){return{uid:u.uid,email:u.email||'',emailVerified:u.emailVerified===true,disabled:false};});}},
       membershipProvider:{getByUid:membershipByUid}
     };
   }
   function signIn(email,password){return initialize().then(function(ctx){return ctx.modules.auth.signInWithEmailAndPassword(ctx.auth,String(email||'').trim(),String(password||''));});}
   function signOut(){return initialize().then(function(ctx){return ctx.modules.auth.signOut(ctx.auth);});}
-  window.Orbit.productRuntimeBrowserProvidersP0=Object.freeze({VERSION:'p0-i2-server-transport-20260901.1',enabled:enabled,initialize:initialize,dependencies:dependencies,signIn:signIn,signOut:signOut,waitForUser:waitUser,readTenantConfig:readTenantConfig,callFunction:callFunction,configDescriptor:publicDescriptor,containsSecrets:false,tenantSource:'membership_only',browserFirestoreWriteAuthorized:false,serverWriteTransport:'firebase-functions',noFallback:true});
+  window.Orbit.productRuntimeBrowserProvidersP0=Object.freeze({VERSION:'p0-i4a-authoritative-first-read-20260902.2',enabled:enabled,initialize:initialize,dependencies:dependencies,signIn:signIn,signOut:signOut,waitForUser:waitUser,readTenantConfig:readTenantConfig,callFunction:callFunction,configDescriptor:publicDescriptor,containsSecrets:false,tenantSource:'membership_only',browserFirestoreWriteAuthorized:false,serverWriteTransport:'firebase-functions',authoritativeFirstRead:true,noFallback:true});
 })();
