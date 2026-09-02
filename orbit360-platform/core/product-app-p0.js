@@ -1,8 +1,8 @@
-/* Gravicentra Insurance · Product application owner · Iteration 2 clean startup · 2026-09-01 */
+/* Gravicentra Insurance · Product application owner · Iteration 2 clean startup · 2026-09-02 */
 (function(){
   'use strict';
   window.Orbit=window.Orbit||{};
-  var VERSION='fase-a-i2-clean-20260901.1';
+  var VERSION='fase-a-i2-clean-20260902.2';
   var state={initialized:false,activating:false,started:false,routerStarted:false,tenantContextReady:false,operationalWriteReady:false,lastError:''};
   var activationPromise=null;
 
@@ -52,14 +52,19 @@
       var cfg=window.__ORBIT360_PRODUCT_PUBLIC_CONFIG__||{};
       var providers=Orbit.productRuntimeBrowserProvidersP0;
       var owner=Orbit.backendProductReadOnlyBootstrapP0;
+      var hydrationOwner=Orbit.productHydrationRequiredOptionalP0;
       if(cfg.enabled!==true)throw new Error('PRODUCT_RUNTIME_NOT_CONFIGURED');
       if(!providers||typeof providers.dependencies!=='function')throw new Error('PRODUCT_RUNTIME_PROVIDERS_MISSING');
       if(!owner||typeof owner.start!=='function')throw new Error('PRODUCT_READONLY_BOOTSTRAP_MISSING');
+      if(!hydrationOwner||typeof hydrationOwner.contract!=='function')throw new Error('PRODUCT_HYDRATION_CONTRACT_MISSING');
+      var hydration=hydrationOwner.contract();
+      var bootstrapCollections=hydration.required.concat(hydration.optional);
+      if(!hydration.required.length||!bootstrapCollections.length)throw new Error('PRODUCT_HYDRATION_CONTRACT_EMPTY');
       return owner.start(providers.dependencies(),{
         mode:'product',
         authorizedProductReadOnly:true,
         runtimeAuthorized:true,
-        collections:Array.isArray(cfg.collections)?cfg.collections:[],
+        collections:bootstrapCollections,
         snapshotTimeoutMs:20000
       });
     }).then(function(result){
