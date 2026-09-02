@@ -1,0 +1,459 @@
+name: Gravicentra Recovery I3 Immutable Preview
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - recovery/fase-a-clean-20260831
+    paths:
+      - .github/workflows/gravicentra-recovery-i3-preview.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gravicentra-recovery-i3-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  SOURCE_SHA: 25c17c6f40dc5b64e5bbf0ab833ec0e71bc99dcc
+  PROJECT_ID: aysaseguradores
+  HOSTING_TARGET: orbit360
+  HOSTING_SITE: aysaseguradores
+  TENANT_HINT: alianzas-soluciones
+
+jobs:
+  immutable-preview:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Checkout fixed certified I2 product source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.SOURCE_SHA }}
+          path: source
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - id: build
+        name: Materialize isolated immutable product artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git -C source rev-parse HEAD)" = "$SOURCE_SHA"
+          SRC="$GITHUB_WORKSPACE/source/orbit360-platform"
+          PACKAGE="$RUNNER_TEMP/gravicentra-i3-release-package"
+          BUNDLE="$PACKAGE/bundle"
+          SITE="$BUNDLE/site"
+          EVIDENCE="$PACKAGE/evidence"
+          rm -rf "$PACKAGE"
+          mkdir -p "$SITE" "$EVIDENCE"
+          export SRC SITE BUNDLE EVIDENCE
+
+          test -f "$SRC/index.html"
+          test -f "$SRC/product-runtime-config.js"
+          test -f "$SRC/sw.js"
+          grep -Fq "hydrationContractVersion: 'fase-a-i2-20260902.1'" "$SRC/product-runtime-config.js"
+          grep -Fq "hydrationContractSource: 'recovery/fase-a-clean-20260831'" "$SRC/product-runtime-config.js"
+          grep -Fq "enabled: false" "$SRC/product-runtime-config.js"
+          grep -Fq "'alianzas-soluciones'" "$SRC/data/tenant-runtime-config-index.js"
+
+          python3 - <<'PY'
+          import os, re, shutil
+          from pathlib import Path
+
+          src = Path(os.environ['SRC']).resolve()
+          site = Path(os.environ['SITE']).resolve()
+          seeds = {'index.html', 'product-runtime-config.js', 'sw.js'}
+          queue = list(seeds)
+          seen = set()
+          text_ext = {'.html','.js','.css','.json','.webmanifest','.svg'}
+          asset_ext = r'(?:js|css|json|webmanifest|png|jpg|jpeg|webp|svg|ico|woff2?|ttf|pdf)'
+          generic = re.compile(r"(?<![A-Za-z0-9_])(/?(?:[A-Za-z0-9_.-]+/)*[A-Za-z0-9_.-]+\." + asset_ext + r")(?:\?[^\s'\"<>)]*)?")
+          html_ref = re.compile(r'(?:src|href)=[\"\']([^\"\']+)[\"\']', re.I)
+          css_ref = re.compile(r'url\((?:[\"\']?)([^)\"\']+)', re.I)
+
+          def norm(raw, parent=''):
+              raw = raw.strip().split('#',1)[0].split('?',1)[0]
+              if not raw or raw.startswith(('http://','https://','data:','blob:','mailto:','tel:','#','//')):
+                  return None
+              if raw.startswith('/'):
+                  candidate = raw[1:]
+              else:
+                  candidate = str((Path(parent).parent / raw).as_posix()) if raw.startswith(('./','../')) else raw
+              candidate = str(Path(candidate).as_posix()).lstrip('./')
+              if candidate.startswith('../') or candidate == '..':
+                  return None
+              return candidate
+
+          def add_if_exists(candidate):
+              if not candidate or candidate in seen or candidate in queue:
+                  return
+              p = (src / candidate).resolve()
+              try:
+                  p.relative_to(src)
+              except ValueError:
+                  return
+              if p.is_file():
+                  queue.append(candidate)
+
+          while queue:
+              rel = queue.pop(0)
+              if rel in seen:
+                  continue
+              p = (src / rel).resolve()
+              try:
+                  p.relative_to(src)
+              except ValueError:
+                  raise SystemExit(f'PATH_ESCAPE:{rel}')
+              if not p.is_file():
+                  raise SystemExit(f'REQUIRED_PRODUCT_FILE_MISSING:{rel}')
+              if re.search(r'(^|/)(?:lab|seeds?|demo-auth)(?:/|[-_.])', rel, re.I):
+                  raise SystemExit(f'FORBIDDEN_PRODUCT_DEPENDENCY:{rel}')
+              seen.add(rel)
+              out = site / rel
+              out.parent.mkdir(parents=True, exist_ok=True)
+              shutil.copy2(p, out)
+              if p.suffix.lower() not in text_ext:
+                  continue
+              text = p.read_text(encoding='utf-8', errors='strict')
+              if p.suffix.lower() == '.html':
+                  for raw in html_ref.findall(text):
+                      c = norm(raw, rel)
+                      if c:
+                          target = (src / c).resolve()
+                          if not target.is_file():
+                              raise SystemExit(f'HTML_LOCAL_REFERENCE_MISSING:{rel}:{c}')
+                          add_if_exists(c)
+              if p.suffix.lower() == '.css':
+                  for raw in css_ref.findall(text):
+                      c = norm(raw, rel)
+                      if c:
+                          target = (src / c).resolve()
+                          if target.is_file():
+                              add_if_exists(c)
+              for raw in generic.findall(text):
+                  c = norm(raw, rel)
+                  if c:
+                      add_if_exists(c)
+
+          required = {'index.html','product-runtime-config.js','sw.js','core/product-app-p0.js','core/pwa.js','data/tenant-runtime-config-index.js'}
+          missing = sorted(required - seen)
+          if missing:
+              raise SystemExit('REACHABILITY_CLOSURE_MISSING:' + ','.join(missing))
+          if any(x.startswith(('tools/','docs/','reports/','functions/','.github/')) for x in seen):
+              raise SystemExit('NON_PRODUCT_TREE_REACHED')
+          (Path(os.environ['EVIDENCE'])/'reachable-files.txt').write_text('\n'.join(sorted(seen))+'\n', encoding='utf-8')
+          print(f'REACHABLE_PRODUCT_FILES={len(seen)}')
+          PY
+
+          curl -fsSL --retry 3 --connect-timeout 10 --max-time 30 \
+            "https://${HOSTING_SITE}.web.app/__/firebase/init.json" \
+            -o "$RUNNER_TEMP/firebase-public-config.json"
+
+          export PUBLIC_CONFIG="$RUNNER_TEMP/firebase-public-config.json"
+          python3 - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+
+          cfg = json.loads(Path(os.environ['PUBLIC_CONFIG']).read_text(encoding='utf-8'))
+          required = ['apiKey','authDomain','projectId','appId']
+          missing = [k for k in required if not str(cfg.get(k,'')).strip()]
+          if missing:
+              raise SystemExit('PUBLIC_FIREBASE_CONFIG_INCOMPLETE:' + ','.join(missing))
+          if cfg['projectId'] != os.environ['PROJECT_ID']:
+              raise SystemExit('PUBLIC_FIREBASE_PROJECT_MISMATCH')
+          canonical = {k: cfg.get(k,'') for k in ['apiKey','authDomain','projectId','appId','storageBucket']}
+          cfg_hash = hashlib.sha256(json.dumps(canonical, sort_keys=True, separators=(',',':')).encode()).hexdigest()
+          source_sha = os.environ['SOURCE_SHA']
+          build_id = f"gi-i3-{source_sha[:12]}-{cfg_hash[:12]}"
+          payload = {
+              'enabled': True,
+              'environmentRef': 'firebase-hosting-preview-i3',
+              'tenantHint': os.environ['TENANT_HINT'],
+              'projectId': cfg['projectId'],
+              'authDomain': cfg['authDomain'],
+              'appId': cfg['appId'],
+              'apiKey': cfg['apiKey'],
+              'storageBucket': cfg.get('storageBucket',''),
+              'buildId': build_id,
+              'sourceSha': source_sha,
+              'hydrationContractVersion': 'fase-a-i2-20260902.1',
+              'hydrationContractSource': 'recovery/fase-a-clean-20260831',
+              'requiredCollections': ['clientes','polizas','cobros','aseguradoras'],
+              'optionalCollections': ['vehiculos','recibosEsperados','carteraPrimas','asesores','metas','negocios','gestiones','comisiones','cancelaciones']
+          }
+          js = "/* Generated only inside the certified I3 artifact. Public Firebase Web config; no secrets. */\n"
+          js += "window.__ORBIT360_PRODUCT_PUBLIC_CONFIG__ = Object.freeze(" + json.dumps(payload, ensure_ascii=False, separators=(',',':')) + ");\n"
+          site = Path(os.environ['SITE'])
+          (site/'product-runtime-config.js').write_text(js, encoding='utf-8')
+          marker = site/'__recovery__'/'build.json'
+          marker.parent.mkdir(parents=True, exist_ok=True)
+          marker.write_text(json.dumps({
+              'product':'Gravicentra Insurance',
+              'gate':'I3',
+              'sourceSha':source_sha,
+              'buildId':build_id,
+              'environmentRef':'firebase-hosting-preview-i3'
+          }, sort_keys=True, separators=(',',':'))+'\n', encoding='utf-8')
+          Path(os.environ['EVIDENCE']+'/public-config-descriptor.json').write_text(json.dumps({
+              'projectId':cfg['projectId'],
+              'authDomain':cfg['authDomain'],
+              'appIdPresent':True,
+              'apiKeyPresent':True,
+              'storageBucketPresent':bool(cfg.get('storageBucket')),
+              'configSha256':cfg_hash
+          }, sort_keys=True, separators=(',',':'))+'\n', encoding='utf-8')
+          with open(os.environ['GITHUB_OUTPUT'],'a',encoding='utf-8') as f:
+              f.write(f'build_id={build_id}\n')
+          PY
+
+          cat > "$BUNDLE/firebase.json" <<'JSON'
+          {
+            "hosting": {
+              "target": "orbit360",
+              "public": "site",
+              "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+              "rewrites": [{"source": "**", "destination": "/index.html"}]
+            }
+          }
+          JSON
+          cat > "$BUNDLE/.firebaserc" <<'JSON'
+          {
+            "projects": {"default": "aysaseguradores"},
+            "targets": {"aysaseguradores": {"hosting": {"orbit360": ["aysaseguradores"]}}}
+          }
+          JSON
+
+          export PACKAGE
+          python3 - <<'PY'
+          import hashlib, os
+          from pathlib import Path
+
+          package = Path(os.environ['PACKAGE'])
+          site = package/'bundle'/'site'
+          bundle = package/'bundle'
+          evidence = package/'evidence'
+
+          def make_manifest(root, out):
+              rows=[]
+              for p in sorted(x for x in root.rglob('*') if x.is_file()):
+                  rel=p.relative_to(root).as_posix()
+                  digest=hashlib.sha256(p.read_bytes()).hexdigest()
+                  rows.append(f'{digest}  {rel}')
+              text='\n'.join(rows)+'\n'
+              out.write_text(text,encoding='utf-8')
+              return len(rows), hashlib.sha256(text.encode()).hexdigest()
+
+          site_count, site_digest = make_manifest(site, evidence/'site-manifest.sha256')
+          bundle_count, bundle_digest = make_manifest(bundle, evidence/'bundle-manifest.sha256')
+          with open(os.environ['GITHUB_OUTPUT'],'a',encoding='utf-8') as f:
+              f.write(f'hosted_file_count={site_count}\n')
+              f.write(f'hosted_payload_digest={site_digest}\n')
+              f.write(f'bundle_file_count={bundle_count}\n')
+              f.write(f'bundle_digest={bundle_digest}\n')
+          PY
+
+      - id: auth
+        name: Select existing service account for the same Firebase project
+        env:
+          SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          target=os.environ['PROJECT_ID']
+          candidates=[('FIREBASE_SERVICE_ACCOUNT',os.environ.get('SA_DEFAULT','')),('FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB',os.environ.get('SA_ORBIT360_LAB','')),('FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB',os.environ.get('SA_ORBIT_360_LAB',''))]
+          chosen=None
+          for name,raw in candidates:
+              if not raw.strip():
+                  continue
+              try:
+                  data=json.loads(raw)
+              except Exception:
+                  continue
+              if data.get('type')=='service_account' and data.get('project_id')==target and data.get('client_email') and data.get('private_key'):
+                  chosen=(name,data)
+                  break
+          if not chosen:
+              raise SystemExit('NO_EXISTING_SERVICE_ACCOUNT_FOR_TARGET_PROJECT')
+          out=Path(os.environ['RUNNER_TEMP'])/'gravicentra-i3-firebase-sa.json'
+          out.write_text(json.dumps(chosen[1]),encoding='utf-8')
+          out.chmod(0o600)
+          with open(os.environ['GITHUB_OUTPUT'],'a',encoding='utf-8') as f:
+              f.write('credential_source='+chosen[0]+'\n')
+              f.write('credential_file='+str(out)+'\n')
+          PY
+
+      - id: deploy
+        name: Deploy exact bundle to isolated Firebase Hosting Preview
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.auth.outputs.credential_file }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          BUNDLE="$RUNNER_TEMP/gravicentra-i3-release-package/bundle"
+          CHANNEL_ID="gi-i3-${GITHUB_RUN_ID}"
+          cd "$BUNDLE"
+          npx --yes firebase-tools@14.10.1 hosting:channel:deploy "$CHANNEL_ID" \
+            --project "$PROJECT_ID" \
+            --only "hosting:$HOSTING_TARGET" \
+            --expires 7d \
+            --non-interactive \
+            --json > "$RUNNER_TEMP/gravicentra-i3-deploy.json"
+          export DEPLOY_JSON="$RUNNER_TEMP/gravicentra-i3-deploy.json" CHANNEL_ID
+          PREVIEW_URL=$(python3 - <<'PY'
+          import json, os, re
+          from pathlib import Path
+          raw=Path(os.environ['DEPLOY_JSON']).read_text(encoding='utf-8')
+          try:
+              data=json.loads(raw)
+          except Exception:
+              data=raw
+          vals=[]
+          def walk(v):
+              if isinstance(v,dict):
+                  for x in v.values(): walk(x)
+              elif isinstance(v,list):
+                  for x in v: walk(x)
+              elif isinstance(v,str): vals.append(v)
+          walk(data)
+          urls=[]
+          for s in vals+[raw]:
+              urls += re.findall(r'https://[A-Za-z0-9._-]+\.web\.app', s)
+          prod='https://'+os.environ['HOSTING_SITE']+'.web.app'
+          urls=[u.rstrip('/') for u in urls if u.rstrip('/') != prod]
+          if not urls:
+              raise SystemExit('PREVIEW_URL_NOT_FOUND_IN_DEPLOY_RESULT')
+          print(urls[-1])
+          PY
+          )
+          test -n "$PREVIEW_URL"
+          echo "channel_id=$CHANNEL_ID" >> "$GITHUB_OUTPUT"
+          echo "preview_url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
+
+      - id: readback
+        name: Read back every hosted byte from the same Preview
+        shell: bash
+        env:
+          PREVIEW_URL: ${{ steps.deploy.outputs.preview_url }}
+          EXPECTED_BUILD_ID: ${{ steps.build.outputs.build_id }}
+          EXPECTED_HOSTED_DIGEST: ${{ steps.build.outputs.hosted_payload_digest }}
+        run: |
+          set -euo pipefail
+          export MANIFEST="$RUNNER_TEMP/gravicentra-i3-release-package/evidence/site-manifest.sha256"
+          python3 - <<'PY'
+          import hashlib, json, os, urllib.parse, urllib.request
+          from pathlib import Path
+
+          base=os.environ['PREVIEW_URL'].rstrip('/')
+          manifest=Path(os.environ['MANIFEST'])
+          rows=[]
+          for line in manifest.read_text(encoding='utf-8').splitlines():
+              if not line.strip(): continue
+              digest, rel=line.split('  ',1)
+              rows.append((digest,rel))
+          mismatches=[]
+          for expected,rel in rows:
+              url=base+'/'+urllib.parse.quote(rel,safe='/')+'?i3readback='+os.environ['EXPECTED_HOSTED_DIGEST'][:16]
+              req=urllib.request.Request(url,headers={'Accept-Encoding':'identity','Cache-Control':'no-cache','User-Agent':'Gravicentra-Recovery-I3-Readback/1.0'})
+              with urllib.request.urlopen(req,timeout=30) as r:
+                  body=r.read()
+                  status=getattr(r,'status',200)
+              actual=hashlib.sha256(body).hexdigest()
+              if status != 200 or actual != expected:
+                  mismatches.append({'path':rel,'status':status,'expected':expected,'actual':actual})
+          if mismatches:
+              raise SystemExit('PREVIEW_BYTE_READBACK_MISMATCH:'+json.dumps(mismatches[:10],separators=(',',':')))
+          marker_url=base+'/__recovery__/build.json?i3marker=1'
+          req=urllib.request.Request(marker_url,headers={'Accept-Encoding':'identity','Cache-Control':'no-cache','User-Agent':'Gravicentra-Recovery-I3-Readback/1.0'})
+          with urllib.request.urlopen(req,timeout=30) as r:
+              marker=json.loads(r.read().decode('utf-8'))
+          if marker.get('sourceSha') != os.environ['SOURCE_SHA'] or marker.get('buildId') != os.environ['EXPECTED_BUILD_ID']:
+              raise SystemExit('PREVIEW_BUILD_MARKER_MISMATCH')
+          print('PREVIEW_READBACK_EXACT_PASS files='+str(len(rows)))
+          with open(os.environ['GITHUB_OUTPUT'],'a',encoding='utf-8') as f:
+              f.write('readback_exact=true\n')
+              f.write('readback_file_count='+str(len(rows))+'\n')
+          PY
+
+      - name: Seal I3 evidence without changing the certified bundle
+        shell: bash
+        env:
+          PREVIEW_URL: ${{ steps.deploy.outputs.preview_url }}
+          CHANNEL_ID: ${{ steps.deploy.outputs.channel_id }}
+          BUILD_ID: ${{ steps.build.outputs.build_id }}
+          HOSTED_FILE_COUNT: ${{ steps.build.outputs.hosted_file_count }}
+          HOSTED_PAYLOAD_DIGEST: ${{ steps.build.outputs.hosted_payload_digest }}
+          BUNDLE_FILE_COUNT: ${{ steps.build.outputs.bundle_file_count }}
+          BUNDLE_DIGEST: ${{ steps.build.outputs.bundle_digest }}
+          CREDENTIAL_SOURCE: ${{ steps.auth.outputs.credential_source }}
+          READBACK_EXACT: ${{ steps.readback.outputs.readback_exact }}
+        run: |
+          set -euo pipefail
+          export EVIDENCE_DIR="$RUNNER_TEMP/gravicentra-i3-release-package/evidence"
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          if os.environ.get('READBACK_EXACT') != 'true':
+              raise SystemExit('READBACK_NOT_EXACT')
+          evidence={
+              'schemaVersion':'gravicentra-recovery-i3-evidence-v1',
+              'status':'ARTIFACT_READBACK_EXACT_PASS',
+              'product':'Gravicentra Insurance',
+              'gate':'I3',
+              'sourceSha':os.environ['SOURCE_SHA'],
+              'runnerCommit':os.environ['GITHUB_SHA'],
+              'githubRunId':os.environ['GITHUB_RUN_ID'],
+              'buildId':os.environ['BUILD_ID'],
+              'hostedFileCount':int(os.environ['HOSTED_FILE_COUNT']),
+              'hostedPayloadDigest':os.environ['HOSTED_PAYLOAD_DIGEST'],
+              'bundleFileCount':int(os.environ['BUNDLE_FILE_COUNT']),
+              'bundleDigest':os.environ['BUNDLE_DIGEST'],
+              'previewChannelId':os.environ['CHANNEL_ID'],
+              'previewUrl':os.environ['PREVIEW_URL'],
+              'credentialSourceName':os.environ['CREDENTIAL_SOURCE'],
+              'sameArtifactPreviewToProductionRequired':True,
+              'sourceMutatedAfterBuild':False,
+              'productionTouched':False,
+              'dataTouched':False,
+              'readbackExact':True
+          }
+          Path(os.environ['EVIDENCE_DIR']+'/i3-evidence.json').write_text(json.dumps(evidence,sort_keys=True,separators=(',',':'))+'\n',encoding='utf-8')
+          PY
+
+      - id: upload
+        name: Preserve exact I3 release package for later same-artifact promotion
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i3-${{ github.run_id }}
+          path: ${{ runner.temp }}/gravicentra-i3-release-package
+          include-hidden-files: true
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Publish non-secret run summary
+        shell: bash
+        run: |
+          {
+            echo '## Gravicentra Insurance — I3 immutable Preview'
+            echo "- Source SHA: \`$SOURCE_SHA\`"
+            echo "- Build ID: \`${{ steps.build.outputs.build_id }}\`"
+            echo "- Hosted payload digest: \`${{ steps.build.outputs.hosted_payload_digest }}\`"
+            echo "- Bundle digest: \`${{ steps.build.outputs.bundle_digest }}\`"
+            echo "- Preview: ${{ steps.deploy.outputs.preview_url }}"
+            echo "- Exact byte readback: ${{ steps.readback.outputs.readback_exact }}"
+            echo "- Artifact: \`gravicentra-i3-${GITHUB_RUN_ID}\`"
+            echo "- Production touched: false"
+            echo "- Data touched: false"
+          } >> "$GITHUB_STEP_SUMMARY"
