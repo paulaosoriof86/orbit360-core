@@ -6,7 +6,7 @@
   window.Orbit = window.Orbit || {};
   var registryContract = { version: '20260722.1' };
   var CRITICAL_RELEASE = 'block1-critical-runtime-20260722-7';
-  var DIRECTORY_VISIBILITY_REVISION = '20260722.5-edit-aware-fail-visible';
+  var DIRECTORY_VISIBILITY_REVISION = '20260902.1-latest-operational-owner-precedence';
   var previous = window.Orbit.__clientInsurerVisualStabilityBarrierV20260721;
   if (previous && previous.version === '20260722.5' && previous.directoryVisibilityRevision === DIRECTORY_VISIBILITY_REVISION) return;
 
@@ -51,8 +51,8 @@
     if (editMode(view)) return editModeReady(view);
     var tab = activeTab(view);
     if (tab === 'contactos') { var contactRows = count(view, '#af-contactos .asg-row[data-cont]'); return contactRows === 0 || count(view, '.m1-contact-card') >= contactRows; }
-    if (tab === 'plataformas') { var portalRows = count(view, '#af-portales .asg-row[data-portal]'); return portalRows === 0 || (count(view, '.m1-portal-card') >= portalRows && count(view, '.m1-credential-box') >= portalRows); }
-    if (tab === 'bancos') { var bankRows = count(view, '#af-cuentas .asg-row[data-cta]'); return bankRows === 0 || count(view, '.m1-bank-card') >= bankRows; }
+    if (tab === 'plataformas') { var portalRows = count(view, '#af-portales [data-portal]'); return portalRows === 0 || (count(view, '.od-operational-portal-card[data-portal]') >= portalRows && count(view, '.od-credential-box') >= portalRows); }
+    if (tab === 'bancos') { var bankRows = count(view, '#af-cuentas [data-cta]'); return bankRows === 0 || count(view, '.od-operational-bank-card[data-cta]') >= bankRows; }
     if (tab === 'tarifas') return Boolean(view.querySelector('#af-body .m1-knowledge-summary'));
     return true;
   }
@@ -87,7 +87,10 @@
       var editOwner = window.Orbit && window.Orbit.clientInsurerEditOwnerV20260722;
       if (editOwner && typeof editOwner.enhance === 'function') editOwner.enhance();
       var readOwner = window.Orbit && window.Orbit.clientInsurerVisualContractV20260720;
+      var operationalOwner = window.Orbit && window.Orbit.clientInsurerOperationalDirectoryOwnerV20260722;
+      if (!editMode(ficha()) && operationalOwner && typeof operationalOwner.render === 'function') operationalOwner.render();
       if (!editMode(ficha()) && readOwner && typeof readOwner.enhance === 'function') readOwner.enhance();
+      if (!editMode(ficha()) && operationalOwner && typeof operationalOwner.render === 'function') operationalOwner.render();
     } catch (error) {}
   }
   function releaseStableView(reason, passes, status) {
@@ -179,6 +182,8 @@
     directoryVisibilityRevision: DIRECTORY_VISIBILITY_REVISION,
     owner: 'core/router-tenant-config-bootstrap.js',
     canonicalVisualOwner: 'core/client-insurer-visual-contract-v20260720.js',
+    canonicalOperationalDirectoryOwner: 'core/client-insurer-operational-directory-owner-v20260722.js',
+    latestOperationalDirectoryOwnerVersion: '20260829.1',
     canonicalEditOwner: 'core/client-insurer-edit-owner-v20260722.js',
     editModeAware: true,
     editModeStatus: 'EDIT_MODE_READY',
