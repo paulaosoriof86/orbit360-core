@@ -6,13 +6,12 @@
 (function(){
   'use strict';
   window.Orbit=window.Orbit||{};
-  var VERSION='p0-20260814.2';
+  var VERSION='p0-20260902.1-phase-a-no-academia-writers';
   var sources={
     visualStyle:['styles/client-insurer-visual-contract-v20260720.css?v=20260722-6','/styles/client-insurer-visual-contract-v20260720.css','style'],
     editStyle:['styles/client-insurer-edit-mode-v20260722.css?v=20260722-1','/styles/client-insurer-edit-mode-v20260722.css','style'],
     session:['core/session-readiness-contract-v20260720.js?v=20260720-1','/core/session-readiness-contract-v20260720.js','script'],
     importerContract:['core/importer-execution-contract-v20260720.js?v=20260720-2','/core/importer-execution-contract-v20260720.js','script'],
-    importerAcademy:['data/academia-v1225-importadores-e2e.js?v=20260720-3','/data/academia-v1225-importadores-e2e.js','script'],
     secureTargetBridge:['core/insurer-secure-target-bridge-v20260720.js?v=20260722-2','/core/insurer-secure-target-bridge-v20260720.js','script'],
     operationalPolicy:['core/operational-directory-field-policy-v20260722.js?v=20260722-1','/core/operational-directory-field-policy-v20260722.js','script'],
     editOwner:['core/client-insurer-edit-owner-v20260722.js?v=20260723-2','/core/client-insurer-edit-owner-v20260722.js','script'],
@@ -20,7 +19,7 @@
     visualBase:['core/client-insurer-visual-contract-v20260720.js?v=20260721-4','/core/client-insurer-visual-contract-v20260720.js','script'],
     operationalOwner:['core/client-insurer-operational-directory-owner-v20260722.js?v=20260829-1','/core/client-insurer-operational-directory-owner-v20260722.js','script']
   };
-  var order=['visualStyle','editStyle','session','importerContract','importerAcademy','secureTargetBridge','operationalPolicy','editOwner','visualStability','visualBase','operationalOwner'];
+  var order=['visualStyle','editStyle','session','importerContract','secureTargetBridge','operationalPolicy','editOwner','visualStability','visualBase','operationalOwner'];
   var state=window.OrbitTenantBootstrapState={owner:'core/router-tenant-config-product-bootstrap-p0.js',version:VERSION,mode:'product-readonly',tenantAuthority:'authenticated-membership-later',tenantResolved:false,sourceResolved:false,writeAuthorized:false,status:'product-static-validating',requested:order.slice(),loaded:[],errors:[]};
   function sameOrigin(value,expected){var target;try{target=new URL(value,window.location.href);}catch(e){return null;}return target.origin===window.location.origin&&target.pathname===expected?target:null;}
   function esc(target){return (target.pathname+target.search).replace(/&/g,'&amp;').replace(/"/g,'&quot;');}
