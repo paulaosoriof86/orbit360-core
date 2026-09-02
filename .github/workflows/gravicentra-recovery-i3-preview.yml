@@ -16,7 +16,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  SOURCE_SHA: 069aa1805570556283447151c3bc27b0a32b64f2
+  SOURCE_SHA: a856910751e684797fcd9dbcca73d70137134b5f
   PROJECT_ID: ays-orbit-360-lab
   HOSTING_SITE: ays-orbit-360-lab
   TENANT_HINT: alianzas-soluciones
