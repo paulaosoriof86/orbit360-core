@@ -1,0 +1,83 @@
+name: Gravicentra Recovery I4A Public Browser
+
+on:
+  push:
+    branches:
+      - recovery/fase-a-clean-20260831
+    paths:
+      - .github/workflows/gravicentra-recovery-i4a-public-browser.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  SOURCE_SHA: b46f3237429a498e2930c0e25158a3c9b66746d2
+  BUILD_ID: gi-i3-b46f3237429a-57f234755dc1
+  PREVIEW_URL: https://ays-orbit-360-lab--gi-i3-33678846654-6whyq2pw.web.app
+
+jobs:
+  public-browser:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - name: Checkout QA executor
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install Chromium QA dependency
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false playwright@1.55.0 >/dev/null
+          npx playwright install --with-deps chromium >/dev/null
+
+      - name: Execute public browser smoke against exact Preview
+        env:
+          I4A_PUBLIC_EVIDENCE_DIR: ${{ runner.temp }}/gravicentra-i4a-public-evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-i4a-public-browser.mjs
+
+      - name: Publish evidence summary
+        if: always()
+        env:
+          EVIDENCE: ${{ runner.temp }}/gravicentra-i4a-public-evidence/i4a-public-browser.json
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo '## Gravicentra Insurance — I4A public browser'
+            echo "- Source under test: \`$SOURCE_SHA\`"
+            echo "- Build ID: \`$BUILD_ID\`"
+            echo "- Preview: $PREVIEW_URL"
+            if [ -f "$EVIDENCE" ]; then
+              echo "- Status: \`$(jq -r '.status' "$EVIDENCE")\`"
+              echo "- DOMContentLoaded ms: \`$(jq -r '.checks.domContentLoadedMs // "n/a"' "$EVIDENCE")\`"
+              echo "- Login visible ms: \`$(jq -r '.checks.loginVisibleMs // "n/a"' "$EVIDENCE")\`"
+              echo "- Heartbeat ms: \`$(jq -r '.checks.heartbeatMs // "n/a"' "$EVIDENCE")\`"
+              echo "- Authenticated: \`$(jq -r '.authenticated' "$EVIDENCE")\`"
+              echo "- Production touched: \`$(jq -r '.productionTouched' "$EVIDENCE")\`"
+              echo "- Data touched: \`$(jq -r '.dataTouched' "$EVIDENCE")\`"
+            else
+              echo '- Status: `NO_EVIDENCE_FAIL_CLOSED`'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Preserve public browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i4a-public-browser-${{ github.run_id }}
+          path: ${{ runner.temp }}/gravicentra-i4a-public-evidence
+          if-no-files-found: warn
+          retention-days: 30
