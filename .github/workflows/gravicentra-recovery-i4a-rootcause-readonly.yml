@@ -1,0 +1,149 @@
+name: Gravicentra Recovery I4A Root Cause Readonly
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - recovery/fase-a-clean-20260831
+    paths:
+      - .github/workflows/gravicentra-recovery-i4a-rootcause-readonly.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gravicentra-recovery-i4a-rootcause-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  PROJECT_ID: ays-orbit-360-lab
+  TENANT_ID: alianzas-soluciones
+  TARGET_POLICY: AUTO39012
+  SOURCE_UNDER_TEST: a856910751e684797fcd9dbcca73d70137134b5f
+  BUILD_UNDER_TEST: gi-i3-a856910751e6-57f234755dc1
+
+jobs:
+  readonly-rootcause:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install read-only diagnostic dependency
+        run: npm install --no-save --package-lock=false firebase-admin@13.10.0 >/dev/null
+      - name: Read canonical Firestore state without mutation
+        env:
+          SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/gravicentra-i4a-rootcause"
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import { initializeApp, cert, deleteApp } from 'firebase-admin/app';
+          import { getFirestore } from 'firebase-admin/firestore';
+
+          const project=process.env.PROJECT_ID, tenant=process.env.TENANT_ID, target=process.env.TARGET_POLICY;
+          const clean=v=>String(v==null?'':v).trim();
+          function serviceAccount(){
+            for(const raw of [process.env.SA_DEFAULT,process.env.SA_ORBIT360_LAB,process.env.SA_ORBIT_360_LAB].filter(Boolean)){
+              try{const x=JSON.parse(raw);if(x?.type==='service_account'&&x?.project_id===project&&x?.client_email&&x?.private_key)return x;}catch{}
+            }
+            throw new Error('I4A_EXISTING_SERVICE_ACCOUNT_NOT_AVAILABLE');
+          }
+          const app=initializeApp({credential:cert(serviceAccount()),projectId:project},'gravicentra-i4a-rootcause-readonly');
+          const db=getFirestore(app);
+          const path=name=>db.collection('tenants').doc(tenant).collection('data').doc(name).collection('items');
+          const names=['clientes','polizas','aseguradoras','cobros','recibosEsperados','carteraPrimas','vehiculos'];
+          const counts={};
+          for(const name of names){const s=await path(name).get();counts[name]=s.size;}
+
+          const policySnap=await path('polizas').where('numero','==',target).get();
+          const policies=policySnap.docs.map(d=>({id:d.id,...d.data()}));
+          const safePolicy=p=>({
+            id:p.id,numero:p.numero,clienteId:p.clienteId,estado:p.estado,pais:p.pais,moneda:p.moneda,
+            prima:p.prima,primaType:typeof p.prima,
+            primaNeta:p.primaNeta,primaNetaType:typeof p.primaNeta,
+            primaTotal:p.primaTotal,primaTotalType:typeof p.primaTotal,
+            gastosEmision:p.gastosEmision,gastosFinan:p.gastosFinan,iva:p.iva,ivaMonto:p.ivaMonto,
+            fuente:p.fuente||p.sourceRef||'',origenHoja:p._origenHoja||'',numeroFila:p._numeroFila??null,
+            requiereValidacion:p.requiereValidacion===true
+          });
+          const policyEvidence=policies.map(safePolicy);
+
+          const allPolicies=(await path('polizas').get()).docs.map(d=>({id:d.id,...d.data()}));
+          const active=allPolicies.filter(p=>['Vigente','Por renovar'].includes(clean(p.estado)));
+          const numeric=v=>typeof v==='number'&&Number.isFinite(v)?v:Number.isFinite(Number(v))?Number(v):null;
+          const premiumAnomalies=active.filter(p=>{
+            const a=numeric(p.prima),t=numeric(p.primaTotal);
+            if(a==null||t==null||a===0)return false;
+            const r=Math.abs(t/a);
+            return r>100||r<0.01;
+          }).slice(0,25).map(p=>({id:p.id,numero:p.numero,prima:p.prima,primaTotal:p.primaTotal,ratio:numeric(p.primaTotal)/numeric(p.prima),moneda:p.moneda,fuente:p.fuente||p.sourceRef||''}));
+
+          const insurers=(await path('aseguradoras').get()).docs.map(d=>({id:d.id,...d.data()}));
+          let portalRows=0,userBearing=0,inlineCredentials=0,credentialRefs=0,bankAccounts=0,bankNumbers=0;
+          for(const a of insurers){
+            for(const p of Array.isArray(a.portales)?a.portales:[]){
+              portalRows++;
+              if(clean(p?.usuario||p?.user||p?.login||p?.emailUsuario||p?.correoUsuario))userBearing++;
+              if(clean(p?.password||p?.pass||p?.contrasena||p?.clave))inlineCredentials++;
+              if(clean(p?.credentialRef))credentialRefs++;
+            }
+            for(const c of Array.isArray(a.cuentas)?a.cuentas:[]){bankAccounts++;if(clean(c?.numero||c?.numeroCuenta||c?.accountNumber))bankNumbers++;}
+          }
+
+          const targetPolicyIds=new Set(policies.map(p=>p.id));
+          const relationCounts={};
+          for(const name of ['cobros','recibosEsperados','carteraPrimas']){
+            const rows=(await path(name).get()).docs.map(d=>({id:d.id,...d.data()}));
+            relationCounts[name]=rows.filter(r=>targetPolicyIds.has(clean(r.polizaId||r.policyId))).length;
+          }
+
+          const evidence={
+            schemaVersion:'gravicentra-i4a-rootcause-readonly-v1',gate:'I4A',sourceUnderTest:process.env.SOURCE_UNDER_TEST,
+            buildUnderTest:process.env.BUILD_UNDER_TEST,projectId:project,tenantId:tenant,targetPolicy:target,
+            writesExecuted:0,dataTouched:false,productionTouched:false,
+            counts,activePolicyCount:active.length,targetPolicyMatches:policyEvidence.length,targetPolicyEvidence:policyEvidence,
+            premiumAnomalyCountSampled:premiumAnomalies.length,premiumAnomalies,
+            targetPolicyRelationCounts:relationCounts,
+            insurerDirectory:{insurerCount:insurers.length,portalRows,userBearing,inlineCredentials,credentialRefs,bankAccounts,bankNumbers},
+            completedAt:new Date().toISOString()
+          };
+          const out=process.env.RUNNER_TEMP+'/gravicentra-i4a-rootcause/i4a-rootcause-readonly.json';
+          fs.writeFileSync(out,JSON.stringify(evidence,null,2)+'\n');
+          console.log('I4A_ROOTCAUSE_READONLY='+JSON.stringify(evidence));
+          await deleteApp(app);
+          NODE
+      - name: Publish sanitized root-cause summary
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          F="$RUNNER_TEMP/gravicentra-i4a-rootcause/i4a-rootcause-readonly.json"
+          {
+            echo '## Gravicentra Insurance — I4A root-cause read-only probe'
+            echo "- Source: \`$SOURCE_UNDER_TEST\`"
+            echo "- Build: \`$BUILD_UNDER_TEST\`"
+            if [ -f "$F" ]; then
+              echo "- Counts: \`$(jq -c '.counts' "$F")\`"
+              echo "- AUTO39012: \`$(jq -c '.targetPolicyEvidence' "$F")\`"
+              echo "- Target relations: \`$(jq -c '.targetPolicyRelationCounts' "$F")\`"
+              echo "- Premium anomalies sampled: \`$(jq -r '.premiumAnomalyCountSampled' "$F")\`"
+              echo "- Insurer directory availability (counts only): \`$(jq -c '.insurerDirectory' "$F")\`"
+              echo "- Writes: \`$(jq -r '.writesExecuted' "$F")\`; data touched: \`$(jq -r '.dataTouched' "$F")\`; production touched: \`$(jq -r '.productionTouched' "$F")\`"
+            else
+              echo '- Status: `NO_EVIDENCE_FAIL_CLOSED`'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Preserve root-cause evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i4a-rootcause-readonly-${{ github.run_id }}
+          path: ${{ runner.temp }}/gravicentra-i4a-rootcause
+          if-no-files-found: error
+          retention-days: 30
