@@ -1,0 +1,127 @@
+{
+  "schemaVersion": "gravicentra-recovery-continuity-v1",
+  "stateId": "GRAVICENTRA-INSURANCE-FASE-A-CONTINUITY-20260903",
+  "frozenAt": "2026-09-03",
+  "productBrand": "Gravicentra Insurance",
+  "repository": "paulaosoriof86/orbit360-core",
+  "authorityBranch": "recovery/fase-a-clean-20260831",
+  "forensicOriginSha": "9c95f31461f2eabe9804625b5659bee772f5602a",
+  "observedHeadAtFreeze": "9b5d16f236afe95261b54fd7e4fe0e797b30a64d",
+  "observedTreeAtFreeze": "b4938e26459e8c9861be79d9596320cbdb81a100",
+  "observedHeadRule": "VERIFY_PHYSICALLY_ON_EVERY_RESUME_DO_NOT_ASSUME_STALE_SHA",
+  "formalState": {
+    "lastPassedGate": "I0",
+    "currentGate": "I1",
+    "currentGateName": "LINEAGE_GLOBAL",
+    "currentGateStatus": "IN_PROGRESS",
+    "releaseState": "RELEASE_BLOCKED",
+    "productionAccepted": false,
+    "productionTouchedByGovernanceFreeze": false,
+    "dataTouchedByGovernanceFreeze": false,
+    "dataCutoffThroughI5": "2026-07-31",
+    "augustRefresh": "HOLD_UNTIL_PRODUCTION_ACCEPTED",
+    "targetProductionDateStatus": "2026-08-31_MISSED_RECOVERY_EXPEDITED_NO_GATE_BYPASS"
+  },
+  "supersededOperationalStateFields": {
+    "legacyNextAction": "CREATE_CHATGPT_PROJECT_GRAVICENTRA_INSURANCE_WITH_PROJECT_ONLY_MEMORY_AND_CLEAN_SOURCES_THEN_CONTINUE_ITERATION_1_LINEAGE",
+    "replacement": "PROJECT_ALREADY_EXISTS_CONTINUE_I1_LINEAGE",
+    "scope": "OPERATIONAL_RESUME_FIELD_ONLY_DOES_NOT_SUPERSEDE_ADDENDUM_PREVALENTE_OR_PLAN_V1_3"
+  },
+  "mandatoryAuthorities": [
+    "02_ADDENDUM_PREVALENTE_FRONTERA_PROYECTO",
+    "05_ESTADO_VIVO_RECOVERY + this continuity state",
+    "Plan Maestro Gravicentra Insurance Recovery v1.3",
+    "06_MANIFIESTO_CAPACIDADES_FASE_A",
+    "03_ADDENDUM_ANTI_DESCARRILAMIENTO",
+    "04_MATRIZ_MODULO_POR_MODULO_FASE_A",
+    "10_ADDENDUM_FORENSE_CONTINUIDAD_LINEAGE_CIERRE_FASE_A_20260903"
+  ],
+  "protectedHistoricalLineageTargets": {
+    "status": "USER_REPORTED_HISTORICAL_ACCEPTANCE_CLAIMS_PENDING_SOURCE_PROOF",
+    "recibosCarteraCobros": [
+      "insurer settlement-sheet reconciliations",
+      "insurer account-statement reconciliations",
+      "all receipts per policy",
+      "pending/paid/reconciled status determination",
+      "commission-payment inference logic if approved implementation/evidence confirms it",
+      "policy-client-insurer-receipt-portfolio-collection relationships"
+    ],
+    "polizas": [
+      "net premium",
+      "assistance charges",
+      "issuance expenses and calculation base",
+      "VAT/tax and taxable base",
+      "total premium",
+      "payment form and periodicity",
+      "installment surcharge by insurer/payment form",
+      "insurer-specific exceptions only when source/acceptance proves them"
+    ],
+    "vehiculos": [
+      "latest approved vehicle detail",
+      "Cliente-Poliza-Vehiculo relationships"
+    ],
+    "crmOpsLeadsAseguradoras": [
+      "recover latest approved mature capabilities; do not redesign or simplify",
+      "Aseguradoras credential reveal and operational directory contract"
+    ]
+  },
+  "currentVisualCheckpoint": {
+    "capability": "Aseguradoras",
+    "result": "FAIL_PARTIAL",
+    "knownPending": [
+      "password reveal does not yet work in user visual validation",
+      "repeatable access to the same Preview/artifact must be demonstrated"
+    ],
+    "passForbiddenUntilRetest": true
+  },
+  "forensicFindingsToPreserve": {
+    "financialReadModel": "CANONICAL_FINANCIAL_READ_MODEL_COLLECTION_OWNER_MISMATCH_PROVEN_IN_CURRENT_RUNTIME; final approved semantics still require I1 lineage",
+    "dataCorruption": "NOT_PROVEN_FOR_INVESTIGATED_PREMIUM_CARTERA_CASES",
+    "p127GoldenRecord": {
+      "policy": "AUTO39012",
+      "primaNetaGTQ": 1800,
+      "primaTotalGTQ": 2678.53,
+      "rule": "NO_RUNTIME_MAY_MATERIALIZE_BILLION_SCALE_VALUE_FROM_THIS_RECORD"
+    },
+    "transverseCause": "LINEAGE + CANONICAL_READ_MODEL/OWNER_COMPOSITION + SOURCE/ARTIFACT_EXECUTION_DRIFT"
+  },
+  "capabilityProofFlow": [
+    "LINEAGE_LOCATED",
+    "SOURCE_RECONCILED",
+    "PREVIEW_CANDIDATE",
+    "USER_VISUAL_CONFIRMED",
+    "TECHNICAL_PREVIEW_PASS",
+    "LATEST_APPROVED_VERSION_PREVIEW_PASS",
+    "I4B_E2E",
+    "SAME_ARTIFACT_PRODUCTION",
+    "LATEST_APPROVED_VERSION_LIVE_PASS"
+  ],
+  "nextExecution": {
+    "gate": "I1",
+    "action": "Close lineage surgically, starting with semantically separate contracts Recibos Esperados -> Cartera Primas -> Cobros; then reconcile the remaining manifest capabilities using existing creditable evidence without restarting global diagnosis.",
+    "productionChangesAuthorized": false,
+    "dataChangesAuthorized": false,
+    "sourceChangesAuthorizedByThisGovernanceFreeze": false
+  },
+  "forbidden": [
+    "new parallel recovery plan",
+    "new iteration per bug",
+    "rebuild product from zero",
+    "historical baseline plus overlays as final release",
+    "data reimport to fix visualization/routing/cache/composition/permissions/validator",
+    "patch certified artifact",
+    "different Preview and production artifacts",
+    "declare PASS without source/artifact/evidence proof",
+    "treat missing current UI as proof the approved capability never existed",
+    "delay all user visual validation until final production review"
+  ],
+  "resumeProtocol": [
+    "read mandatory authorities",
+    "verify current GitHub HEAD on authorityBranch",
+    "identify last formal PASS and first incomplete gate",
+    "preserve/reconcile later physical work rather than discard it",
+    "reuse only evidence still tied to the source/artifact/semantics being certified",
+    "execute only first incomplete gate",
+    "if drift occurs, RETORNAR_A_PLAN"
+  ]
+}
