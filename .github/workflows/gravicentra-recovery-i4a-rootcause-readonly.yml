@@ -75,6 +75,7 @@ jobs:
           const policyEvidence=policies.map(safePolicy);
 
           const allPolicies=(await path('polizas').get()).docs.map(d=>({id:d.id,...d.data()}));
+          const policyById=new Map(allPolicies.map(p=>[clean(p.id),p]));
           const active=allPolicies.filter(p=>['Vigente','Por renovar'].includes(clean(p.estado)));
           const numeric=v=>typeof v==='number'&&Number.isFinite(v)?v:Number.isFinite(Number(v))?Number(v):null;
           const premiumAnomalies=active.filter(p=>{
@@ -103,13 +104,57 @@ jobs:
             relationCounts[name]=rows.filter(r=>targetPolicyIds.has(clean(r.polizaId||r.policyId))).length;
           }
 
+          async function shape(name){
+            const rows=(await path(name).get()).docs.map(d=>({id:d.id,...d.data()}));
+            const out={
+              total:rows.length,
+              tenantIdPresent:0,
+              tenantIdMatches:0,
+              paisPresent:0,
+              asesorIdPresent:0,
+              advisorIdPresent:0,
+              polizaIdPresent:0,
+              linkedPolicyFound:0,
+              linkedPolicyPaisPresent:0,
+              linkedPolicyAsesorPresent:0,
+              rowPaisMatchesLinkedPolicy:0
+            };
+            for(const r of rows){
+              const tenantValue=clean(r.tenantId);
+              const rowPais=clean(r.pais||r.country);
+              const rowAsesor=clean(r.asesorId);
+              const rowAdvisor=clean(r.advisorId);
+              const pid=clean(r.polizaId||r.policyId);
+              if(tenantValue)out.tenantIdPresent++;
+              if(tenantValue===tenant)out.tenantIdMatches++;
+              if(rowPais)out.paisPresent++;
+              if(rowAsesor)out.asesorIdPresent++;
+              if(rowAdvisor)out.advisorIdPresent++;
+              if(pid)out.polizaIdPresent++;
+              const p=pid?policyById.get(pid):null;
+              if(p){
+                out.linkedPolicyFound++;
+                const pp=clean(p.pais||p.country);
+                const pa=clean(p.asesorId||p.advisorId);
+                if(pp)out.linkedPolicyPaisPresent++;
+                if(pa)out.linkedPolicyAsesorPresent++;
+                if(rowPais&&pp&&rowPais===pp)out.rowPaisMatchesLinkedPolicy++;
+              }
+            }
+            return out;
+          }
+          const collectionShape={
+            carteraPrimas:await shape('carteraPrimas'),
+            recibosEsperados:await shape('recibosEsperados')
+          };
+
           const evidence={
-            schemaVersion:'gravicentra-i4a-rootcause-readonly-v1',gate:'I4A',sourceUnderTest:process.env.SOURCE_UNDER_TEST,
+            schemaVersion:'gravicentra-i4a-rootcause-readonly-v2',gate:'I4A',sourceUnderTest:process.env.SOURCE_UNDER_TEST,
             buildUnderTest:process.env.BUILD_UNDER_TEST,projectId:project,tenantId:tenant,targetPolicy:target,
             writesExecuted:0,dataTouched:false,productionTouched:false,
             counts,activePolicyCount:active.length,targetPolicyMatches:policyEvidence.length,targetPolicyEvidence:policyEvidence,
             premiumAnomalyCountSampled:premiumAnomalies.length,premiumAnomalies,
-            targetPolicyRelationCounts:relationCounts,
+            targetPolicyRelationCounts:relationCounts,collectionShape,
             insurerDirectory:{insurerCount:insurers.length,portalRows,userBearing,inlineCredentials,credentialRefs,bankAccounts,bankNumbers},
             completedAt:new Date().toISOString()
           };
@@ -132,6 +177,7 @@ jobs:
               echo "- Counts: \`$(jq -c '.counts' "$F")\`"
               echo "- AUTO39012: \`$(jq -c '.targetPolicyEvidence' "$F")\`"
               echo "- Target relations: \`$(jq -c '.targetPolicyRelationCounts' "$F")\`"
+              echo "- Read-model shape counts: \`$(jq -c '.collectionShape' "$F")\`"
               echo "- Premium anomalies sampled: \`$(jq -r '.premiumAnomalyCountSampled' "$F")\`"
               echo "- Insurer directory availability (counts only): \`$(jq -c '.insurerDirectory' "$F")\`"
               echo "- Writes: \`$(jq -r '.writesExecuted' "$F")\`; data touched: \`$(jq -r '.dataTouched' "$F")\`; production touched: \`$(jq -r '.productionTouched' "$F")\`"
