@@ -1,0 +1,153 @@
+{
+  "schemaVersion": "gravicentra-i1-access-entrypoint-startup-v1",
+  "gate": "I1_LINEAGE_GLOBAL",
+  "createdAt": "2026-09-04",
+  "authority": {
+    "repository": "paulaosoriof86/orbit360-core",
+    "branch": "recovery/fase-a-clean-20260831",
+    "headBeforeLedger": "1e50932aa4e0c5ef3998789bfe7d81b3ba49e254",
+    "treeBeforeLedger": "623d3c157448f820e4848ed6ff266545a1d9a442",
+    "productionTouched": false,
+    "dataTouched": false
+  },
+  "sharedPositiveAcceptance": {
+    "ownerDirectiveComment": 5132518780,
+    "ownerDirectiveDate": "2026-07-30",
+    "decision": "later modules must reuse Auth/membership/scopes/store/readiness/harness/integrity/rollback already built; common infrastructure must not be reconstructed absent a demonstrated regression",
+    "macroClosureComment": 5132663837,
+    "macroContract": "6.2.0",
+    "staticRun": 30555149234,
+    "runConclusion": "success",
+    "acceptedHead": "9f54f6f165a762c5c617ad883da7cb80fccf7cc7",
+    "acceptedTree": "5edfb5f9cbb094d04a35251b65677391d49c35db",
+    "artifact": "8764440108",
+    "artifactDigest": "sha256:40005b2a221ba5f4c385add2ea07470e02497b9d9ef2bb56fa5fdd4baf79e89d",
+    "checks": ["HELPER_CONTRACT","SMOKE_USES_HELPER","SYNTHETIC_DELAY_TEST","FINAL_LIFECYCLE","FINAL_ENGINE","FINAL_WORKFLOW","ACCELERATION_GOVERNANCE","TRANSVERSAL_ARCHITECTURE","NO_NEW_RECOVERY_REQUEST"],
+    "boundary": "This is positive lineage/reuse evidence for the shared transversal base; it is not Preview PASS, LIVE PASS, or production acceptance."
+  },
+  "capabilities": {
+    "LOGIN_AND_ACCESS": {
+      "lineageStatus": "LATEST_APPROVED_LINEAGE_TARGET_BOUND",
+      "latestAcceptanceEvidence": "OWNER reuse directive 5132518780 plus successful M6 macro package 30555149234 and OWNER macro marker 5132663837",
+      "exactApprovedSource": {
+        "commit": "9f54f6f165a762c5c617ad883da7cb80fccf7cc7",
+        "tree": "5edfb5f9cbb094d04a35251b65677391d49c35db",
+        "path": "orbit360-platform/core/auth-product-runtime-p0.js",
+        "blob": "8fb5586a924c91a7bf954c07c99d49191d48026e"
+      },
+      "currentRuntime": {
+        "path": "orbit360-platform/core/auth-product-runtime-p0.js",
+        "blob": "8fb5586a924c91a7bf954c07c99d49191d48026e",
+        "approvedBlobStillExact": true,
+        "loginMarkup": "inline in orbit360-platform/index.html; no productive auth/login.html owner"
+      },
+      "ownersDependencies": ["core/auth-product-runtime-p0.js","core/product-runtime-browser-providers-p0.js","core/product-app-p0.js","core/backend-product-readonly-bootstrap-p0.js","Firebase Auth","membership projection"],
+      "canonicalReads": ["authenticated Firebase user","tenant membership projection"],
+      "canonicalWrites": ["Firebase Auth provider sign-in/sign-out only; no browser business-store writes"],
+      "idsJoins": ["uid","email","tenantId","membership uid/tenant binding"],
+      "aliasesNormalizers": "user visual identity may derive displayName/email; tenant cannot come from URL; no demo identity",
+      "readWriteSemantics": "Firebase-authenticated, verified account then product activation; fail closed when provider/config/account is unavailable",
+      "rolesScopes": "delegated to membership-bound ROLE_SCOPE_RUNTIME after authentication",
+      "approvedUIFlow": "inline login form -> authenticated provider -> verified account -> product activation -> app shell",
+      "approvedActions": ["login","logout"],
+      "persistenceReload": "Firebase auth session/provider-owned; no localStorage auth session",
+      "relationships": ["LOGIN_AND_ACCESS -> membership -> ROLE_SCOPE_RUNTIME -> tenant store -> router"],
+      "transforms": "no money/unit transforms; identity strings only",
+      "writeOwnerSecurityBoundary": "Firebase Auth/provider; browser product auth owner declares writeAuthorized=false and noLocalSession=true",
+      "loadRouteAssets": ["orbit360-platform/index.html","core/product-app-p0.js","core/auth-product-runtime-p0.js"],
+      "candidateBuildBinding": "I3_REQUIRED_NEW_IMMUTABLE_ARTIFACT; historical M6 artifact is lineage evidence only",
+      "goldenInvariants": ["no demo/localStorage login","no tenant from URL","wrong/unverified identity fails closed","successful login resolves authenticated membership before app use"]
+    },
+    "ROLE_SCOPE_RUNTIME": {
+      "lineageStatus": "LATEST_APPROVED_LINEAGE_TARGET_BOUND_CURRENT_DELTA_REQUIRES_RECONCILIATION",
+      "latestAcceptanceEvidence": "OWNER reuse directive 5132518780 explicitly preserves membership/scopes as shared approved infrastructure",
+      "exactApprovedSource": {
+        "commit": "9f54f6f165a762c5c617ad883da7cb80fccf7cc7",
+        "roleOwnerPath": "orbit360-platform/core/access-role-session-owner-v20260728.js",
+        "roleOwnerBlob": "00cf380fdfeeb1f97651d69f54e8468463f3e3a6",
+        "scopeOwnerPath": "orbit360-platform/core/access-scope.js",
+        "scopeOwnerBlob": "754c91a45aa9a0d7dbf61a107635c922e722718b"
+      },
+      "currentRuntime": {
+        "roleOwnerPath": "orbit360-platform/core/access-role-session-owner-v20260728.js",
+        "roleOwnerBlob": "3101898f8551c55d23db6d09b633f3132896502c",
+        "scopeOwnerPath": "orbit360-platform/core/access-scope.js",
+        "scopeOwnerBlob": "ea36eb157a0a5b1f3011cdcdb770fcad62e1b7c6",
+        "classification": "post-acceptance source deltas; preserve only if I2 reconciliation proves no regression against approved membership/scopes semantics"
+      },
+      "ownersDependencies": ["access-role-session-owner-v20260728.js","access-scope.js","product-role-taxonomy-p0.js","membership projection","tenant context","store relationships"],
+      "canonicalReads": ["authenticated membership roles","advisorId","teamId","countries","dataScopes","modulesExtra","modulesRestricted","entity relations"],
+      "canonicalWrites": ["selected effective role view only; memberships/backend remain server-owned"],
+      "idsJoins": ["uid","tenantId","advisorId","teamId","clienteId","polizaId"],
+      "aliasesNormalizers": "Admin visual alias maps to AdminTenant; SuperAdmin may display Dirección while canonical role remains separate",
+      "readWriteSemantics": "fail closed if assigned role/membership/scope/country/relation cannot be resolved",
+      "rolesScopes": ["Dirección","SuperAdmin","AdminTenant/Admin","Operativo","Finanzas","Marketing","Asesor-family own-scope roles"],
+      "approvedUIFlow": "membership roles -> effective role selector limited to assigned roles -> module/data/action authorization",
+      "approvedActions": ["select assigned role","authorize module","authorize record/action"],
+      "persistenceReload": "only effective selected role may persist locally; authentication and role assignment never originate from localStorage",
+      "relationships": ["all protected modules consume the common role/scope engine"],
+      "transforms": "role aliases are visual/read compatibility only; canonical role is preserved",
+      "writeOwnerSecurityBoundary": "membership/back-end authority; frontend owner writeAuthorized=false for membership",
+      "loadRouteAssets": ["core/access-scope.js","core/product-role-taxonomy-p0.js","core/access-role-session-owner-v20260728.js","core/product-membership-access-bridge-p0.js"],
+      "candidateBuildBinding": "I3_REQUIRED_NEW_IMMUTABLE_ARTIFACT",
+      "goldenInvariants": ["unassigned role cannot be selected","Asesor cannot gain all-scope through UI","Dirección/Admin/SuperAdmin/Operativo insurer-directory contract remains enforceable by data/security boundary, not UI hiding"]
+    },
+    "SINGLE_PRODUCT_ENTRYPOINT": {
+      "lineageStatus": "GOVERNANCE_APPROVED_TARGET_CURRENT_CANDIDATE_BOUND",
+      "latestAcceptanceEvidence": "2026-08-31/2026-09-03 recovery authorities mandate one canonical productive index and exclusion of LAB/seeds/auth-LAB; this governance decision supersedes historical LAB entrypoints as release targets",
+      "exactApprovedSource": "semantic target is authority-bound; current recovery candidate is orbit360-platform/index.html blob 5206cc86c2775680e04b210f4fbfc9dbf09bae34 and must be tested before Preview PASS",
+      "ownersDependencies": ["orbit360-platform/index.html","product-runtime-config.js","product-app-p0.js","auth-product-runtime-p0.js","router","hydration/store owners"],
+      "canonicalReads": "all product assets through the one canonical entrypoint",
+      "canonicalWrites": "none owned by index; writes delegated to approved server-owned/domain owners",
+      "idsJoins": "not applicable except build/source identity",
+      "aliasesNormalizers": "technical Orbit 360 identifiers may remain; visible brand Gravicentra Insurance",
+      "readWriteSemantics": "composition-only owner; no LAB/seed/demo-auth/local business store",
+      "rolesScopes": "loads common role/scope runtime but does not itself grant access",
+      "approvedUIFlow": "single login+shell+router composition",
+      "approvedActions": "load canonical product",
+      "persistenceReload": "reload must resolve same canonical entrypoint and runtime",
+      "relationships": "composition root for all 15 capabilities",
+      "transforms": "none",
+      "writeOwnerSecurityBoundary": "index owns no business writes",
+      "loadRouteAssets": ["orbit360-platform/index.html"],
+      "candidateBuildBinding": "I3 must bind current source commit/tree/buildId/asset SHA/artifact digest and read back served index",
+      "goldenInvariants": ["exactly one productive index","no LAB/seeds/demo-auth entrypoint assets","visible Gravicentra Insurance brand","same served index in Preview and promoted production artifact"]
+    },
+    "STARTUP_PERFORMANCE": {
+      "lineageStatus": "GOVERNANCE_APPROVED_TARGET_CURRENT_CANDIDATE_BOUND",
+      "latestAcceptanceEvidence": "recovery authority explicitly requires login/first render not to wait for service worker or nonessential modules and forbids 30/120s normal-success timeouts; M6 owner directive preserves shared readiness harness rather than rebuilding it",
+      "exactApprovedSource": {
+        "semanticTarget": "authority-bound performance/readiness contract",
+        "currentCandidateAssets": {
+          "productApp": "89dbf69b80e053568b1ff372bc3734cede4acc0a",
+          "hydration": "c2c1b8d566d2f736e83db9f17ef4e65d35c0833b",
+          "runtimeConfig": "eb3e49ea97205a52858376bddd16944821792b91",
+          "index": "5206cc86c2775680e04b210f4fbfc9dbf09bae34"
+        }
+      },
+      "ownersDependencies": ["product-app-p0.js","product-hydration-required-optional-p0.js","backend-product-readonly-bootstrap-p0.js","product-runtime-config.js","index.html","pwa.js"],
+      "canonicalReads": ["required hydration readiness","optional degradation status"],
+      "canonicalWrites": "none; startup/readiness cannot create business data",
+      "idsJoins": "build/runtime identity only",
+      "aliasesNormalizers": "required vs optional collections are explicit runtime configuration",
+      "readWriteSemantics": "required collections gate readiness; optional collections may degrade; service worker is last/asynchronous and not a startup blocker",
+      "rolesScopes": "authentication/membership still required before tenant data activation",
+      "approvedUIFlow": "login visible immediately -> authenticate -> required authoritative hydration -> shell/router first render; optional work deferred/degradable",
+      "approvedActions": "startup/activate",
+      "persistenceReload": "reload repeats bounded authoritative readiness without relying on stale local business fallback",
+      "relationships": "shared startup prerequisite for every module",
+      "transforms": "none",
+      "writeOwnerSecurityBoundary": "read-only startup path",
+      "loadRouteAssets": ["product-runtime-config.js","product-prebootstrap-store-p0.js","store-firestore-product-readonly-p0.js","product-hydration-required-optional-p0.js","backend-product-readonly-bootstrap-p0.js","product-app-p0.js","auth-product-runtime-p0.js","pwa.js"],
+      "candidateBuildBinding": "I3/I4 performance measurement required; no PASS inferred from source inspection",
+      "goldenInvariants": ["service worker never blocks successful login/first render","optional collections do not block readiness","no 30/120 second timeout is part of normal success","first render uses authoritative required snapshots and no business fallback"]
+    }
+  },
+  "decision": {
+    "familyLineageTarget": "BOUND_FOR_I1_RECONCILIATION",
+    "previewPass": false,
+    "livePass": false,
+    "productionAccepted": false,
+    "nextExactAction": "Continue I1 with INICIO_PRIMARY_RUNTIME + CLIENTE360_PRIMARY_RUNTIME + VEHICULOS_PRIMARY_RUNTIME + CROSS_MODULE_RELATIONSHIPS; do not reopen this family unless new evidence contradicts the bound lineage target. I2 must reconcile current post-acceptance role/scope deltas and then I3/I4 must prove the candidate artifact."
+  }
+}
