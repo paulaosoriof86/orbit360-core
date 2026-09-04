@@ -2,8 +2,8 @@
   "schemaVersion": "gravicentra-i1-capability-lineage-v1",
   "capability": "POLIZAS_PRIMARY_RUNTIME",
   "gate": "I1_LINEAGE_GLOBAL",
-  "status": "OPEN_NOT_PASS",
-  "failClosedReason": "Positive frontend acceptance exists, but the exact approved polizas.js blob is not yet tied without ambiguity to the accepted package; later source changes also remain unadjudicated as approved versions.",
+  "status": "OPEN_EVIDENCE_UNAVAILABLE_CONTINUE_I1",
+  "failClosedReason": "Positive frontend acceptance exists, but the exact approved polizas.js blob cannot be tied without ambiguity to the accepted package with the evidence exposed in the recovery branch and historical PR comments. Later source changes also remain unadjudicated as approved versions. This gap is now dispositioned EVIDENCE_UNAVAILABLE and must not be re-audited absent new authoritative evidence.",
   "authority": {
     "repository": "paulaosoriof86/orbit360-core",
     "branch": "recovery/fase-a-clean-20260831",
@@ -41,12 +41,25 @@
     }
   ],
   "acceptedSourceLinkage": {
-    "status": "UNRESOLVED_EXACT_BLOB_LINK",
+    "status": "EVIDENCE_UNAVAILABLE_EXACT_BLOB_LINK",
     "candidateImportCommit": "317f3fb0a36a748d82d42b0d96d30fc9f0533684",
     "candidateImportCommitMessage": "feat(ays): empalme real completo v1330 candidato 20260706",
     "polizasBlobAtCandidateImportCommit": "65ae0711bd30fc17ae383d7afb23e9b01caf9c4c",
     "evidenceStrength": "STRONG_CANDIDATE_NOT_FINAL_ADJUDICATION",
-    "remainingGap": "The current branch does not expose an extractable copy or per-file manifest of the 2026-07-06T182633.902 ZIP that independently proves its modules/polizas.js blob equals 65ae0711bd30fc17ae383d7afb23e9b01caf9c4c. Commit naming plus content history is not treated as sufficient to declare PASS."
+    "remainingGap": "The current branch does not expose an extractable copy or per-file manifest of the 2026-07-06T182633.902 ZIP that independently proves its modules/polizas.js blob equals 65ae0711bd30fc17ae383d7afb23e9b01caf9c4c. Commit naming plus content history is not treated as sufficient to declare PASS.",
+    "disposition": {
+      "code": "EVIDENCE_UNAVAILABLE",
+      "doesNotAuthorizePass": true,
+      "doNotReauditWithoutNewAuthoritativeEvidence": true,
+      "searchesExhausted": [
+        "current recovery branch recursive tree",
+        "commit 317f3fb0a36a748d82d42b0d96d30fc9f0533684 tree and direct modules/polizas.js delta",
+        "historical PR #5 comments searched for exact July 6 package timestamp, prior package SHA256, candidate blob SHA and empalme identifiers",
+        "AUDITORIA-CERTEZA-CANDIDATA-CLAUDE-V1330-20260708T135740.md",
+        "AUDITORIA-CANDIDATO-CLAUDE-POST-FIX.md",
+        "EMPALME-ZIP-CLAUDE-20260702.md rejected as exact July 6 provenance because it refers to a different package"
+      ]
+    }
   },
   "currentRuntime": {
     "owner": "orbit360-platform/modules/polizas.js",
@@ -112,8 +125,8 @@
   ],
   "contract20": {
     "01_capability": "PROVEN",
-    "02_latestAcceptanceEvidence": "POSITIVE_EVIDENCE_LOCATED_BUT_EXACT_MODULE_BINDING_OPEN",
-    "03_exactApprovedSourceSha": "OPEN_STRONG_CANDIDATE_65ae0711bd30fc17ae383d7afb23e9b01caf9c4c",
+    "02_latestAcceptanceEvidence": "POSITIVE_EVIDENCE_LOCATED_BUT_EXACT_MODULE_BINDING_UNAVAILABLE",
+    "03_exactApprovedSourceSha": "EVIDENCE_UNAVAILABLE_STRONG_CANDIDATE_65ae0711bd30fc17ae383d7afb23e9b01caf9c4c",
     "04_functionalAndRuntimeOwner": "CURRENT_RUNTIME_PROVEN_APPROVED_OWNER_BINDING_OPEN",
     "05_bridgesDependencies": "PARTIAL_STRONG",
     "06_canonicalReads": "CURRENT_PROVEN_polizas_clientes_vehiculos_recibosEsperados",
@@ -122,7 +135,7 @@
     "09_aliasesNormalizers": "PARTIAL",
     "10_readWriteSemantics": "PARTIAL",
     "11_rolesScopes": "PARTIAL",
-    "12_approvedUIFlow": "POSITIVE_FUNCTION_LEVEL_EVIDENCE_EXACT_BLOB_LINK_OPEN",
+    "12_approvedUIFlow": "POSITIVE_FUNCTION_LEVEL_EVIDENCE_EXACT_BLOB_LINK_UNAVAILABLE",
     "13_approvedActions": "PARTIAL",
     "14_persistenceReload": "OPEN",
     "15_relationships": "PARTIAL_STRONG",
@@ -133,10 +146,10 @@
     "20_goldenRecords": "DEFINED_AUTO39012_CHAIN_NOT_YET_PROVEN"
   },
   "decision": {
-    "polizasPrimaryRuntime": "OPEN_NOT_PASS",
+    "polizasPrimaryRuntime": "OPEN_EVIDENCE_UNAVAILABLE_CONTINUE_I1",
     "iteration1": "IN_PROGRESS",
     "iteration2Authorized": false,
     "release": "RELEASE_BLOCKED",
-    "nextExactAction": "Resolve exact accepted polizas.js blob linkage or locate a later owner acceptance tied to one of the post-acceptance source commits; do not patch source before that adjudication."
+    "nextExactAction": "Continue I1 with the next unresolved capability. Preserve this disposition and do not re-audit Pólizas absent new authoritative evidence; do not patch source before capability adjudication."
   }
 }
