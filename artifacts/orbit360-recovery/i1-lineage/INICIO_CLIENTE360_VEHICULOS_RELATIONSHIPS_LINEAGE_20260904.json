@@ -1,0 +1,248 @@
+{
+  "schemaVersion": "gravicentra-i1-inicio-cliente360-vehiculos-relations-v1",
+  "gate": "I1_LINEAGE_GLOBAL",
+  "createdAt": "2026-09-04",
+  "authority": {
+    "repository": "paulaosoriof86/orbit360-core",
+    "branch": "recovery/fase-a-clean-20260831",
+    "headBeforeLedger": "4a7ed8641231cdca3e503df626b454af663193da",
+    "treeBeforeLedger": "94db61ea22e076d8287ec31753dec814dbaafce0",
+    "productionTouched": false,
+    "dataTouched": false,
+    "dataCutoff": "2026-07-31"
+  },
+  "positiveEvidence": {
+    "latestTransversalSourceAcceptance": {
+      "commit": "842f762f199f4c7dbf13062a33ca220d92398c51",
+      "tree": "c063bc2c43100ca1e20888d30c41f147c8a76380",
+      "message": "fix(macro2): transversal safe read-model source acceptance",
+      "currentExactBlobs": {
+        "inicio": "b1bfb0ce131848ee0892cd6aaff55b1bde2b7cd4",
+        "cliente360": "fa50bae659ed03909a220d720fc0305838c75b31",
+        "queries": "341b0da2b9671c2791a091bee737b36a25bf81a2"
+      },
+      "currentStillExact": true,
+      "boundary": "Source-acceptance lineage evidence only. It is not Preview PASS, LIVE PASS or production acceptance."
+    },
+    "vehiclesPoliciesReceiptsChain": {
+      "run": 31403410005,
+      "runConclusion": "success",
+      "sourceCommit": "1f7b86b60edb8e3c61da55fa5073214f7d52cdbd",
+      "sourceTree": "5c2c0d0617633bc3e6053b3d62f404deff5e3aea",
+      "artifactId": 9068589195,
+      "artifactName": "orbit360-control-plane-route-critical-source-31403410005",
+      "artifactDigest": "sha256:52896dc18bfc3fe326a73d5b12f7b134379fe83899b79711f4a8b6c988f5fc71",
+      "status": "GO_CRITICAL_ROUTE_CONTROL_PLANE_SOURCE",
+      "gates": {
+        "policies": "POLICIES_WRITE_CLOSED_REUSABLE",
+        "vehicles": "VEHICLES_WRITE_CLOSED_REUSABLE",
+        "receipts": "RECEIPTS_PORTFOLIO_WRITE_CLOSED_REUSABLE"
+      },
+      "counts": {
+        "policies": 1373,
+        "vehicles": 1032,
+        "receipts": 1293,
+        "portfolio": 673
+      },
+      "operationalWrites": 0,
+      "productionTouched": false,
+      "runtimeExecuted": false,
+      "browserExecuted": false,
+      "boundary": "Positive source/write-closure lineage for the chained capabilities. Runtime/user visual acceptance must still be proven on the new immutable I3 artifact."
+    },
+    "historicalRuntimeClaim": {
+      "claim": "R4S4 reportedly recorded Inicio PASS with 430 clients, 30 insurers, Direccion all-scope, zero page/console/HTTP errors and zero writes.",
+      "status": "PENDING_DIRECT_EVIDENCE_LINK",
+      "rule": "Do not upgrade this claim to proved evidence until its run/artifact is linked physically."
+    }
+  },
+  "capabilities": {
+    "INICIO_PRIMARY_RUNTIME": {
+      "lineageStatus": "LATEST_SOURCE_ACCEPTANCE_BOUND_CURRENT_BLOB_EXACT_RUNTIME_RETEST_REQUIRED",
+      "latestAcceptanceEvidence": "Control-plane source acceptance 842f762f199f4c7dbf13062a33ca220d92398c51; earlier accepted route-critical source at 1f7b86b60edb8e3c61da55fa5073214f7d52cdbd had Inicio blob 65d53441ace11987002d6b45c52db598e7baf989, but the later source acceptance supersedes it as source target.",
+      "exactApprovedSource": {
+        "commit": "842f762f199f4c7dbf13062a33ca220d92398c51",
+        "tree": "c063bc2c43100ca1e20888d30c41f147c8a76380",
+        "path": "orbit360-platform/modules/inicio.js",
+        "blob": "b1bfb0ce131848ee0892cd6aaff55b1bde2b7cd4"
+      },
+      "currentRuntime": {
+        "path": "orbit360-platform/modules/inicio.js",
+        "blob": "b1bfb0ce131848ee0892cd6aaff55b1bde2b7cd4",
+        "approvedBlobStillExact": true,
+        "queriesPath": "orbit360-platform/core/queries.js",
+        "queriesBlob": "341b0da2b9671c2791a091bee737b36a25bf81a2"
+      },
+      "ownersDependencies": [
+        "modules/inicio.js",
+        "core/queries.js",
+        "Orbit.store read model",
+        "clientes",
+        "polizas",
+        "cobros",
+        "aseguradoras",
+        "asesores",
+        "metas",
+        "ROLE_SCOPE_RUNTIME"
+      ],
+      "canonicalReads": ["clientes", "polizas", "aseguradoras", "asesores", "metas", "financial read models after I2 reconciliation"],
+      "canonicalWrites": "none owned by Inicio; dashboard is a read consumer and navigation surface",
+      "idsJoins": ["cliente.id -> poliza.clienteId", "cliente.id -> cobro.clienteId (legacy financial projection pending I2 reconciliation)", "asesor.id -> cliente/poliza.asesorId", "aseguradora.id -> poliza.aseguradoraId"],
+      "aliasesNormalizers": "country/global monetary normalization is delegated to core/queries.js; current finite-number guard must preserve approved values without NaN/undefined",
+      "readWriteSemantics": "read-only dashboard over scoped tenant data; no business writes from dashboard rendering",
+      "rolesScopes": "consumes common ROLE_SCOPE_RUNTIME; historical Direccion all-scope runtime claim remains pending direct run link",
+      "approvedUIFlow": "Inicio/Mi Dia dashboard -> scoped KPIs/alerts/leaderboard -> navigation to operational modules",
+      "approvedActions": ["view KPIs", "navigate to Cliente360 and related operational surfaces"],
+      "persistenceReload": "no independent business persistence owner; reload must reproduce scoped values from authoritative store",
+      "relationships": ["Inicio summarizes Cliente360, Polizas, Aseguradoras, financial state and advisor scope"],
+      "transforms": "native country currency when a country is active; mixed global views use only declared normalization in queries.js",
+      "writeOwnerSecurityBoundary": "read-only module; business writes delegated to approved domain/server owners",
+      "loadRouteAssets": ["orbit360-platform/index.html", "core/queries.js", "modules/inicio.js", "core/router.js"],
+      "candidateBuildBinding": "I3_REQUIRED_NEW_IMMUTABLE_ARTIFACT",
+      "goldenInvariants": ["client/insurer counts are scoped and finite", "no dashboard business writes", "no NaN/undefined monetary rendering", "same values after reload on the same scoped identity"],
+      "i2Reconciliation": "REQUIRED: current carteraGlobal/cobrosVencidos still derive financial dashboard state from cobros; reconcile against separately approved recibosEsperados/carteraPrimas/cobros contracts without reimporting data."
+    },
+    "CLIENTE360_PRIMARY_RUNTIME": {
+      "lineageStatus": "LATEST_SOURCE_ACCEPTANCE_BOUND_CURRENT_BLOB_EXACT_FINANCIAL_COMPOSITION_RECONCILIATION_REQUIRED",
+      "latestAcceptanceEvidence": "Control-plane source acceptance 842f762f199f4c7dbf13062a33ca220d92398c51 is the latest commit modifying Cliente360 and its current blob is exact.",
+      "exactApprovedSource": {
+        "commit": "842f762f199f4c7dbf13062a33ca220d92398c51",
+        "tree": "c063bc2c43100ca1e20888d30c41f147c8a76380",
+        "path": "orbit360-platform/modules/cliente360.js",
+        "blob": "fa50bae659ed03909a220d720fc0305838c75b31"
+      },
+      "currentRuntime": {
+        "path": "orbit360-platform/modules/cliente360.js",
+        "blob": "fa50bae659ed03909a220d720fc0305838c75b31",
+        "approvedBlobStillExact": true,
+        "queriesPath": "orbit360-platform/core/queries.js",
+        "queriesBlob": "341b0da2b9671c2791a091bee737b36a25bf81a2",
+        "listPageSize": 40
+      },
+      "ownersDependencies": [
+        "modules/cliente360.js",
+        "core/queries.js",
+        "core/client-canonical-view-projection-v20260716.js",
+        "core/ciclo.js",
+        "modules/polizas.js",
+        "modules/cobros.js",
+        "vehiculos read model",
+        "ROLE_SCOPE_RUNTIME"
+      ],
+      "canonicalReads": ["clientes", "polizas", "vehiculos", "aseguradoras", "asesores", "comisiones", "actividades/cancelaciones when available", "financial read models after I2 reconciliation"],
+      "canonicalWrites": "Cliente360 may invoke approved edit/operational actions but must delegate persistence to the canonical store/domain write owner; no ad-hoc Firestore browser writes",
+      "idsJoins": ["cliente.id -> poliza.clienteId", "cliente.id -> vehiculo.clienteId", "poliza.id -> vehiculo.polizaId", "cliente.id -> related operational records.clienteId"],
+      "aliasesNormalizers": "current queries use canonical clienteId/polizaId; finite-number normalization is additive safety and cannot change business magnitude",
+      "readWriteSemantics": "master-detail CRM surface; list and detail read scoped canonical tenant data; actions delegate to domain owners",
+      "rolesScopes": "common ROLE_SCOPE_RUNTIME; source inspection does not replace I4A per-role proof",
+      "approvedUIFlow": "#/cliente360 list -> client deep-link #/cliente360?c=<id> -> resumen/polizas/vehiculos/cobros/recibos/renovaciones/siniestros/comisiones/correos/historial",
+      "approvedActions": ["open client", "edit client", "open policy", "request operational management", "compose email/WhatsApp", "view vehicle", "approved financial actions only after I2 reconciliation"],
+      "persistenceReload": "client/policy/vehicle relationships and approved writes must remain after reload; I4A/I5 proof required on immutable artifact",
+      "relationships": ["Cliente360 <-> Polizas", "Cliente360 <-> Vehiculos", "Cliente360 <-> Aseguradoras", "Cliente360 <-> Ops/Leads", "Cliente360 <-> financial capabilities"],
+      "transforms": "money/date/percentage formatting must preserve canonical raw magnitude; no inferred giant-number transforms",
+      "writeOwnerSecurityBoundary": "domain/server owner per action; Cliente360 itself is not authorization authority",
+      "loadRouteAssets": ["orbit360-platform/index.html", "core/queries.js", "modules/cliente360.js", "core/client-canonical-view-projection-v20260716.js", "core/router.js"],
+      "candidateBuildBinding": "I3_REQUIRED_NEW_IMMUTABLE_ARTIFACT",
+      "goldenInvariants": ["430-client all-scope claim requires direct runtime evidence", "LIST_PAGE_SIZE=40 source invariant", "client-policy-vehicle joins remain correct", "AUTO39012 magnitude remains consistent where presented", "reload preserves canonical relationships"],
+      "i2Reconciliation": "REQUIRED: current tabRecibos and clienteResumen still derive receipt/portfolio presentation from r.cob/cobros. Replace composition with the latest separately-approved recibosEsperados/carteraPrimas/cobros owners without changing operational data."
+    },
+    "VEHICULOS_PRIMARY_RUNTIME": {
+      "lineageStatus": "LATEST_APPROVED_CHAIN_BOUND_EFFECTIVE_OWNER_CONFIRMED_CURRENT_UI_PRESERVED",
+      "latestAcceptanceEvidence": "Run 31403410005 success at source 1f7b86b60edb8e3c61da55fa5073214f7d52cdbd closes vehicles source/write lineage as VEHICLES_WRITE_CLOSED_REUSABLE with 1032 vehicles; later transversal source acceptance 842f762f preserves the same vehicle UI/joins through Cliente360/queries.",
+      "exactApprovedSource": {
+        "chainCommit": "1f7b86b60edb8e3c61da55fa5073214f7d52cdbd",
+        "chainRun": 31403410005,
+        "chainArtifactDigest": "sha256:52896dc18bfc3fe326a73d5b12f7b134379fe83899b79711f4a8b6c988f5fc71",
+        "effectiveUiOwnerCommit": "842f762f199f4c7dbf13062a33ca220d92398c51",
+        "effectiveUiOwnerPath": "orbit360-platform/modules/cliente360.js",
+        "effectiveUiOwnerBlob": "fa50bae659ed03909a220d720fc0305838c75b31",
+        "queryOwnerPath": "orbit360-platform/core/queries.js",
+        "queryOwnerBlob": "341b0da2b9671c2791a091bee737b36a25bf81a2"
+      },
+      "effectiveOwner": "Vehiculos is not a standalone modules/vehiculos.js runtime in the current canonical tree. Its Fase A UI is owned inside Cliente360 tabVehiculos; joins are owned by core/queries.js; data is hydrated from collection vehiculos.",
+      "canonicalReads": ["vehiculos", "polizas", "clientes"],
+      "canonicalWrites": "run 31403410005 proves source/write closure for the historical chain; current product write owner must be revalidated in I2 and I4A before any write is credited",
+      "idsJoins": ["vehiculo.clienteId -> cliente.id", "vehiculo.polizaId -> poliza.id"],
+      "aliasesNormalizers": "no synthetic vehicle owner or inferred joins; canonical clienteId/polizaId are required",
+      "readWriteSemantics": "vehicle records are policy/client-linked insured objects, not embedded policy text; UI reads the vehicle collection and resolves its policy by polizaId",
+      "rolesScopes": "inherits client/policy scope through ROLE_SCOPE_RUNTIME; role matrix proof remains I4A/I4B",
+      "approvedUIFlow": "Cliente360 -> Vehiculos tab -> vehicle cards -> Ver poliza / Importar documentos",
+      "approvedActions": ["view vehicle details", "navigate to linked policy", "import policy documents through approved importer"],
+      "approvedFields": ["marca", "linea", "placa", "anio", "uso", "color", "chasis/VIN", "motor", "sumaAsegurada", "poliza"],
+      "persistenceReload": "linked vehicle and policy must resolve identically after reload",
+      "relationships": ["Cliente -> Vehiculo", "Poliza -> Vehiculo", "Cliente -> Poliza -> Vehiculo"],
+      "transforms": "sumaAsegurada formatted using linked policy currency only; no unit/magnitude rewrite",
+      "writeOwnerSecurityBoundary": "no write inferred from Cliente360 rendering; approved write owner must be server/domain-bound",
+      "loadRouteAssets": ["product-runtime-config.js", "product-hydration-required-optional-p0.js", "core/queries.js", "modules/cliente360.js"],
+      "hydration": {
+        "currentClassification": "optional startup collection",
+        "meaning": "vehiculos may not block global startup readiness, but Fase A Vehiculos cannot be marked Preview/LIVE PASS unless its authoritative records are available and correct when the capability is exercised"
+      },
+      "candidateBuildBinding": "I3_REQUIRED_NEW_IMMUTABLE_ARTIFACT",
+      "goldenInvariants": ["vehicleCountHistoricalCutoff=1032 in accepted chain evidence", "vehicle resolves client by clienteId", "vehicle resolves policy by polizaId", "approved vehicle fields remain visible", "reload preserves both joins"]
+    },
+    "CROSS_MODULE_RELATIONSHIPS": {
+      "lineageStatus": "LATEST_SOURCE_ACCEPTANCE_BOUND_CANONICAL_JOIN_SEMANTICS_STABLE_FINANCIAL_RELATION_RECONCILIATION_REQUIRED",
+      "latestAcceptanceEvidence": "queries.js at 842f762f source acceptance is blob-identical to current and preserves vehicle/client/policy join functions; run 31403410005 independently proves the Policies->Vehicles->Receipts/Portfolio source chain quantities and write closure.",
+      "exactApprovedSource": {
+        "commit": "842f762f199f4c7dbf13062a33ca220d92398c51",
+        "tree": "c063bc2c43100ca1e20888d30c41f147c8a76380",
+        "path": "orbit360-platform/core/queries.js",
+        "blob": "341b0da2b9671c2791a091bee737b36a25bf81a2"
+      },
+      "currentRuntime": {
+        "blobStillExact": true,
+        "joins": {
+          "Cliente_to_Poliza": "poliza.clienteId === cliente.id",
+          "Cliente_to_Vehiculo": "vehiculo.clienteId === cliente.id",
+          "Poliza_to_Vehiculo": "vehiculo.polizaId === poliza.id"
+        }
+      },
+      "ownersDependencies": ["core/queries.js", "modules/cliente360.js", "modules/polizas.js", "financial read-model owners", "ROLE_SCOPE_RUNTIME"],
+      "canonicalReads": ["clientes", "polizas", "vehiculos", "recibosEsperados", "carteraPrimas", "cobros", "aseguradoras"],
+      "canonicalWrites": "writes belong to each domain owner; relationships must not be repaired by reimport or client-side synthetic duplication",
+      "idsJoins": ["clienteId", "polizaId", "aseguradoraId", "advisor/asesorId where applicable"],
+      "aliasesNormalizers": "no alias may change canonical relationship identity; compatibility aliases are read-only and must resolve to canonical IDs",
+      "readWriteSemantics": "cross-module projections must resolve the same canonical entity IDs and business values in every module",
+      "rolesScopes": "relationships are filtered by common data scope; a UI route cannot expand scope",
+      "approvedUIFlow": "navigate Cliente360 <-> Polizas <-> Vehiculos and financial/insurer context without losing identity",
+      "approvedActions": ["cross-navigation", "linked-record lookup", "approved delegated actions"],
+      "persistenceReload": "same canonical relationship must resolve after reload",
+      "relationships": ["Cliente<->Poliza", "Cliente<->Vehiculo", "Poliza<->Vehiculo", "Poliza<->Aseguradora", "Poliza/Cliente<->Recibos/Cartera/Cobros after I2 reconciliation"],
+      "transforms": "identity joins never transform money; any monetary transformation is governed by its owning financial/policy capability",
+      "writeOwnerSecurityBoundary": "domain owners plus server/security boundary; no UI hiding or synthetic repair",
+      "loadRouteAssets": ["core/queries.js", "modules/cliente360.js", "modules/polizas.js", "financial capability owners"],
+      "candidateBuildBinding": "I3_REQUIRED_NEW_IMMUTABLE_ARTIFACT",
+      "goldenInvariants": ["AUTO39012 remains same policy/client/insurer identity across modules", "vehicle clienteId and polizaId joins are stable", "no receipt/portfolio/cobro semantic collapse", "reload preserves canonical IDs"],
+      "i2Reconciliation": "REQUIRED: relations to recibosEsperados/carteraPrimas/cobros must be composed from their latest approved owners; current legacy Cliente360/Inicio financial projections cannot define the final relation contract."
+    }
+  },
+  "i2Findings": [
+    {
+      "classification": "RELEASE-COMPOSITION",
+      "scope": "Inicio financial summary",
+      "finding": "core/queries.js carteraGlobal and cobrosVencidos still derive portfolio/aging from cobros.",
+      "requiredAction": "reconcile with separate latest-approved recibosEsperados/carteraPrimas/cobros semantics in I2; do not alter operational data."
+    },
+    {
+      "classification": "RELEASE-COMPOSITION",
+      "scope": "Cliente360 Recibos/Cartera tabs and client summary",
+      "finding": "Cliente360 tabRecibos and clienteResumen still consume r.cob/cobros for receipt/portfolio presentation.",
+      "requiredAction": "wire the separate approved financial read-model owners in I2 while preserving Cliente360, Vehiculos and relationship semantics."
+    },
+    {
+      "classification": "PERFORMANCE/READINESS",
+      "scope": "Vehiculos hydration",
+      "finding": "vehiculos is optional for global startup readiness in current product-runtime-config.",
+      "requiredAction": "preserve non-blocking startup behavior but prove authoritative vehicle availability when the Fase A capability is exercised in I4A."
+    }
+  ],
+  "decision": {
+    "familyLineageTarget": "BOUND_FOR_I1_RECONCILIATION",
+    "previewPass": false,
+    "livePass": false,
+    "productionAccepted": false,
+    "directRuntimeClaimStillPending": "R4S4 Inicio evidence link",
+    "nextExactAction": "Continue I1 with ASEGURADORAS_PRIMARY_RUNTIME + ASEGURADORAS_OPERATIONAL_DIRECTORY + OPS_PRIMARY_RUNTIME + LEADS_PRIMARY_RUNTIME. Do not reopen this family unless new evidence contradicts the bound lineage/source target. I2 must reconcile the documented financial composition findings; I3/I4 must prove the immutable candidate artifact."
+  }
+}
