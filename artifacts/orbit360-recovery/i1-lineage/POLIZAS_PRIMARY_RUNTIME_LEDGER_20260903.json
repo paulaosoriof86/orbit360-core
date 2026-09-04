@@ -1,0 +1,142 @@
+{
+  "schemaVersion": "gravicentra-i1-capability-lineage-v1",
+  "capability": "POLIZAS_PRIMARY_RUNTIME",
+  "gate": "I1_LINEAGE_GLOBAL",
+  "status": "OPEN_NOT_PASS",
+  "failClosedReason": "Positive frontend acceptance exists, but the exact approved polizas.js blob is not yet tied without ambiguity to the accepted package; later source changes also remain unadjudicated as approved versions.",
+  "authority": {
+    "repository": "paulaosoriof86/orbit360-core",
+    "branch": "recovery/fase-a-clean-20260831",
+    "headBeforeLedger": "21e0c0dff509f316e33d252c23208ae9fac08c5b",
+    "treeBeforeLedger": "6f59697d29ed1153e8c4f222e7b985ed636b6c60",
+    "forensicOrigin": "9c95f31461f2eabe9804625b5659bee772f5602a",
+    "productionTouched": false,
+    "dataTouched": false
+  },
+  "positiveAcceptanceEvidence": [
+    {
+      "date": "2026-07-04",
+      "evidence": "GitHub PR #5 owner comment 4883346493",
+      "decision": "baseline frontend mas reciente aceptado con reservas / empalme aditivo controlado",
+      "polizasEvidence": "Pólizas separan prima neta/gastos/IVA/total y bloquean recibos/cartera sin estado/pais/moneda/forma confiable",
+      "scope": "PACKAGE_LEVEL_ACCEPTANCE_WITH_RESERVATIONS"
+    },
+    {
+      "date": "2026-07-04",
+      "evidence": "docs/BITACORA-CAMBIOS.md",
+      "decision": "v1.128 P0-03 verified live; v1.129 verified live; v1.132 declares P0-03 closed",
+      "polizasEvidence": "drawer premium breakdown, seven required sections, historical states, validation state; P0-03-FIX later corrects gastosFinancieros to gastosFinan",
+      "scope": "FUNCTION_LEVEL_LIVE_VERIFICATION"
+    },
+    {
+      "date": "2026-07-08",
+      "evidence": "GitHub PR #5 owner comment 4918812017",
+      "decision": "candidate accepted as latest incremental frontend base; hotfix P0 still required before complete splice",
+      "candidate": "Prototype Development Request - 2026-07-08T135740.684.zip",
+      "candidateSha256FromCurrentAuditDoc": "97e968810029181dc10747a13d7c4f343f058b6ed9b4400af6d11f68dee6836c",
+      "comparedAgainst": "Prototype Development Request - 2026-07-06T182633.902.zip",
+      "priorSha256FromCurrentAuditDoc": "8c2af05e685601f5990e7555002a8bd8632b5becad1acf0dcb9210f8d2602c7c",
+      "polizasChangedBetweenPackages": false,
+      "scope": "LATEST_LOCATED_PACKAGE_LEVEL_FRONTEND_ACCEPTANCE"
+    }
+  ],
+  "acceptedSourceLinkage": {
+    "status": "UNRESOLVED_EXACT_BLOB_LINK",
+    "candidateImportCommit": "317f3fb0a36a748d82d42b0d96d30fc9f0533684",
+    "candidateImportCommitMessage": "feat(ays): empalme real completo v1330 candidato 20260706",
+    "polizasBlobAtCandidateImportCommit": "65ae0711bd30fc17ae383d7afb23e9b01caf9c4c",
+    "evidenceStrength": "STRONG_CANDIDATE_NOT_FINAL_ADJUDICATION",
+    "remainingGap": "The current branch does not expose an extractable copy or per-file manifest of the 2026-07-06T182633.902 ZIP that independently proves its modules/polizas.js blob equals 65ae0711bd30fc17ae383d7afb23e9b01caf9c4c. Commit naming plus content history is not treated as sufficient to declare PASS."
+  },
+  "currentRuntime": {
+    "owner": "orbit360-platform/modules/polizas.js",
+    "blobSha": "46b197a77c162c88af498b5a89a759386a36e9e7",
+    "ownerDeclaration": "Pólizas (vista global) — owner productivo",
+    "currentSemantics": {
+      "kpi": "prima neta vigente",
+      "table": "prima total",
+      "financialBreakdown": [
+        "prima neta",
+        "gastos de expedicion",
+        "gastos financieros",
+        "descuento/ajuste de fuente",
+        "IVA/impuestos",
+        "prima total",
+        "total calendario de recibos"
+      ],
+      "receiptsReadModel": "recibosEsperados",
+      "newPolicyActionDelegatesTo": "Orbit.modules.cliente360.nuevaPoliza()"
+    }
+  },
+  "postAcceptanceSourceDeltas": [
+    {
+      "commit": "a084e371820a747e0b3af519da87c20d8532545d",
+      "date": "2026-07-07",
+      "change": "prima vigente uses prima neta",
+      "classification": "SOURCE_CHANGE_NOT_INDEPENDENTLY_PROVEN_AS_OWNER_APPROVED_VERSION"
+    },
+    {
+      "commit": "4047a56c0dfe1c719e955bd2fdd893408957e26d",
+      "date": "2026-07-17",
+      "change": "adopt canonical Cliente projection",
+      "classification": "SOURCE_CHANGE_NOT_INDEPENDENTLY_PROVEN_AS_OWNER_APPROVED_VERSION"
+    },
+    {
+      "commit": "f1aebf8afec798cb1b7a93b6e6d7742d505a95f2",
+      "date": "2026-07-31",
+      "change": "index, paginate and use canonical expected receipts",
+      "classification": "SOURCE_CHANGE_NOT_INDEPENDENTLY_PROVEN_AS_OWNER_APPROVED_VERSION"
+    }
+  ],
+  "financialRuntimeBinding": {
+    "status": "CLOSED_SEPARATELY_FOR_I1",
+    "reference": "artifacts/orbit360-recovery/i1-lineage/FINANCIAL_EFFECTIVE_RUNTIME_BINDING_20260903.md",
+    "recibosEsperadosWriteOwner": "core/primas.js",
+    "carteraPrimasWriteOwner": "core/primas.js",
+    "cobrosWriteOwner": "approved explicit user-flow route only",
+    "legacyV1199AutomaticBridge": "EXCLUDED_FROM_PRODUCT_ENTRYPOINT_AUTO_BINDING"
+  },
+  "goldenRecords": [
+    {
+      "id": "AUTO39012",
+      "primaNetaGTQ": 1800,
+      "primaTotalGTQ": 2678.53,
+      "invariants": [
+        "must not inflate to millions/billions",
+        "must remain consistent across Pólizas and Cliente360 where the same magnitude is shown",
+        "must preserve Cliente/Aseguradora/financial relationships",
+        "must survive reload when tested in the authorized gate"
+      ],
+      "status": "DEFINED_NOT_YET_END_TO_END_PROVEN"
+    }
+  ],
+  "contract20": {
+    "01_capability": "PROVEN",
+    "02_latestAcceptanceEvidence": "POSITIVE_EVIDENCE_LOCATED_BUT_EXACT_MODULE_BINDING_OPEN",
+    "03_exactApprovedSourceSha": "OPEN_STRONG_CANDIDATE_65ae0711bd30fc17ae383d7afb23e9b01caf9c4c",
+    "04_functionalAndRuntimeOwner": "CURRENT_RUNTIME_PROVEN_APPROVED_OWNER_BINDING_OPEN",
+    "05_bridgesDependencies": "PARTIAL_STRONG",
+    "06_canonicalReads": "CURRENT_PROVEN_polizas_clientes_vehiculos_recibosEsperados",
+    "07_canonicalWrites": "PARTIAL_DELEGATED_TO_CLIENTE360_AND_FINANCIAL_OWNERS",
+    "08_idsJoins": "PARTIAL_STRONG_clienteId_aseguradoraId_asesorId_polizaId_policyKey",
+    "09_aliasesNormalizers": "PARTIAL",
+    "10_readWriteSemantics": "PARTIAL",
+    "11_rolesScopes": "PARTIAL",
+    "12_approvedUIFlow": "POSITIVE_FUNCTION_LEVEL_EVIDENCE_EXACT_BLOB_LINK_OPEN",
+    "13_approvedActions": "PARTIAL",
+    "14_persistenceReload": "OPEN",
+    "15_relationships": "PARTIAL_STRONG",
+    "16_moneyPercentDateStateTransforms": "PARTIAL_CRITICAL",
+    "17_writeOwnerSecurityBoundary": "PARTIAL_OPEN",
+    "18_loadRouteAssets": "CURRENT_RUNTIME_PROVEN",
+    "19_sourceTreeBuildAssetDigest": "SOURCE_CURRENT_PROVEN_BUILD_ARTIFACT_NOT_YET_CERTIFIED",
+    "20_goldenRecords": "DEFINED_AUTO39012_CHAIN_NOT_YET_PROVEN"
+  },
+  "decision": {
+    "polizasPrimaryRuntime": "OPEN_NOT_PASS",
+    "iteration1": "IN_PROGRESS",
+    "iteration2Authorized": false,
+    "release": "RELEASE_BLOCKED",
+    "nextExactAction": "Resolve exact accepted polizas.js blob linkage or locate a later owner acceptance tied to one of the post-acceptance source commits; do not patch source before that adjudication."
+  }
+}
