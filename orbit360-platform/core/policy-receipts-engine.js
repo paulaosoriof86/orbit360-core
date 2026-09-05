@@ -1,6 +1,7 @@
 /* ============================================================
-   Orbit 360 · Motor operativo Póliza → Recibos/Cobros v1.199
+   Gravicentra Insurance · Motor operativo Póliza → Recibos Esperados v1.199/I2
    Contrato multi-tenant, idempotente y no destructivo.
+   Recibos Esperados, Cartera Primas y Cobros son dominios separados.
    No reemplaza Orbit.store ni crea movimientos financieros.
    ============================================================ */
 window.Orbit = window.Orbit || {};
@@ -79,7 +80,7 @@ Orbit.policyReceipts = (function () {
     const m = raw.match(/^(\d+)/);
     return m ? +m[1] : (+fallback || 0);
   }
-  function receiptId(policyId, sequence) { return 'cob_' + clean(policyId) + '_' + String(sequence).padStart(3, '0'); }
+  function receiptId(policyId, sequence) { return 'rec_' + clean(policyId) + '_' + String(sequence).padStart(3, '0'); }
   function operationId(prefix) { return (prefix || 'op') + '_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 7); }
 
   function validatePolicy(input, currentId) {
@@ -229,11 +230,11 @@ Orbit.policyReceipts = (function () {
   function syncReceipts(policy, opts) {
     opts = opts || {};
     const opId = opts.operationId || policy.operationId || operationId('rec');
-    const existing = (S().where('cobros', c => c.polizaId === policy.id) || []).slice()
+    const existing = (S().where('recibosEsperados', c => c.polizaId === policy.id) || []).slice()
       .sort((a, b) => sequenceOf(a) - sequenceOf(b));
     const expected = expectedReceipts(policy);
     const used = new Set();
-    const result = { inserted: [], updated: [], preserved: [], annulled: [], expected: expected.length, operationId: opId };
+    const result = { inserted: [], updated: [], preserved: [], annulled: [], expected: expected.length, operationId: opId, collection: 'recibosEsperados' };
 
     function candidatesFor(seq) {
       return existing.filter(c => !used.has(c.id) && sequenceOf(c) === seq);
@@ -258,12 +259,12 @@ Orbit.policyReceipts = (function () {
             operationId: opId,
             actualizado: now()
           });
-          S().update('cobros', reusable.id, patch);
+          S().update('recibosEsperados', reusable.id, patch);
           result.updated.push(reusable.id);
         }
         candidates.filter(x => x.id !== reusable.id && !isPaidReceipt(x)).forEach(x => {
           used.add(x.id);
-          S().update('cobros', x.id, {
+          S().update('recibosEsperados', x.id, {
             estado: 'Anulado', carteraActiva: false, anuladoMotivo: 'duplicado_recibo_misma_secuencia',
             operationId: opId, actualizado: now()
           });
@@ -271,14 +272,14 @@ Orbit.policyReceipts = (function () {
         });
       } else {
         const row = Object.assign({}, target, { operationId: opId, creado: now(), actualizado: now() });
-        S().insert('cobros', row);
+        S().insert('recibosEsperados', row);
         used.add(row.id);
         result.inserted.push(row.id);
       }
     });
 
     existing.filter(c => !used.has(c.id) && !isPaidReceipt(c) && norm(c.estado) !== 'anulado').forEach(c => {
-      S().update('cobros', c.id, {
+      S().update('recibosEsperados', c.id, {
         estado: 'Anulado', carteraActiva: false,
         anuladoMotivo: isActiveState(policy.estado) ? 'plan_pago_reemplazado' : 'poliza_sin_cartera',
         operationId: opId, actualizado: now()
@@ -309,7 +310,7 @@ Orbit.policyReceipts = (function () {
       S().insert('actividades', {
         id: 'act_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5),
         tenantId: policy.tenantId, clienteId: policy.clienteId, asesorId: policy.asesorId,
-        tipo: 'poliza', icon: '📑', fecha: today(), titulo, detalle, operacionId: opId
+        tipo: 'poliza', icon: '📑', fecha: today(), titulo: title, detalle: detail, operacionId: opId
       });
     } catch (e) {}
   }
@@ -392,69 +393,16 @@ Orbit.policyReceipts = (function () {
     options = options || {};
     if (!canApplyPayments()) return { ok: false, errors: ['permiso_cobro_denegado'] };
     const c = S().get('cobros', receiptIdValue);
-    if (!c) return { ok: false, errors: ['recibo_no_encontrado'] };
+    if (!c) return { ok: false, errors: ['cobro_no_encontrado'] };
     if (isPaidReceipt(c)) return { ok: true, alreadyApplied: true, receipt: c };
-    if (!['pendiente','vencido'].includes(norm(c.estado))) return { ok: false, errors: ['estado_recibo_no_aplicable'] };
-    const policy = S().get('polizas', c.polizaId);
-    if (!policy || !isActiveState(policy.estado)) return { ok: false, errors: ['poliza_sin_cartera_activa'] };
-    if (c.reportado && !c.validadoReporte && !options.bypassReportValidation) return { ok: false, errors: ['reporte_cliente_requiere_validacion'] };
-    const before = clone(c);
-    const opId = options.operationId || operationId('pay');
-    const patch = {
-      estado: 'Pagado',
-      fechaPago: clean(payment && payment.fecha) || today(),
-      metodo: clean(payment && payment.metodo) || 'No especificado',
-      conciliado: false,
-      carteraActiva: true,
-      pagoAplicadoPor: actor(),
-      pagoAplicadoAt: now(),
-      soporteRef: clean(payment && (payment.documentRef || payment.soporteRef)),
-      operationId: opId,
-      actualizado: now()
-    };
-    S().update('cobros', c.id, patch);
-    const after = S().get('cobros', c.id);
-    updateClientState(c.clienteId);
-    try { if (Orbit.q && Orbit.q.postRecaudo) Orbit.q.postRecaudo(after, patch.fechaPago, patch.metodo); } catch (e) {}
-    try {
-      S().insert('actividades', {
-        id: 'act_' + Date.now().toString(36), tenantId: c.tenantId || policy.tenantId,
-        clienteId: c.clienteId, asesorId: c.asesorId, tipo: 'cobro', icon: '💳',
-        fecha: patch.fechaPago, titulo: 'Pago confirmado', detalle: clean(c.moneda) + ' ' + (+c.monto || 0) + ' · pendiente conciliación bancaria',
-        operacionId: opId
-      });
-    } catch (e) {}
-    if (A() && A().audit) A().audit('aplicar_pago', 'cobros', c.id, before, after, options.motivo || 'Confirmación operativa de recaudo', { operacionId: opId, noFinmovs: true });
-    return { ok: true, receipt: after, operationId: opId };
+    return { ok: false, errors: ['cobro_no_confirmado_por_backend'], contract: 'Cobros 10.10.2' };
   }
 
   function createReconciliationProposal(receiptIdValue, input) {
     if (!canApplyPayments()) return { ok: false, errors: ['permiso_conciliacion_denegado'] };
     const c = S().get('cobros', receiptIdValue);
-    if (!c || norm(c.estado) !== 'pagado') return { ok: false, errors: ['recibo_pagado_requerido'] };
-    const p = S().get('polizas', c.polizaId) || {};
-    const cli = S().get('clientes', c.clienteId) || {};
-    const opId = operationId('conc');
-    const proposal = {
-      id: 'conc_' + Date.now().toString(36), tenantId: c.tenantId || p.tenantId || tenantId(),
-      estado_bandeja: 'PROPUESTA', estado_revision: 'Pendiente de revisión', score: 'REQUIERE_VALIDACION',
-      fuente: clean(input && input.fuente) || 'soporte_pago_plataforma',
-      archivo: clean(input && input.archivo), fila: clean(input && input.fila),
-      pais: c.pais || p.pais || cli.pais, moneda: c.moneda || p.moneda,
-      clienteId: c.clienteId, polizaId: c.polizaId, reciboId: c.id,
-      cliente: cli.nombre || '', poliza: p.numero || '', recibo: c.cuota || '',
-      cliente_poliza_recibo: [cli.nombre, p.numero, c.cuota].filter(Boolean).join(' · '),
-      monto: +c.monto || 0, accion_propuesta: 'conciliar_recibo_pagado',
-      responsable: actor().nombre, ultima_actualizacion: now(),
-      documentRef: clean(input && input.documentRef),
-      bloqueos: clean(input && input.documentRef) ? [] : ['documento_soporte_requerido'],
-      acciones_permitidas: ['ver_detalle','tomar_en_revision','bloquear','anular'],
-      operationId: opId
-    };
-    S().insert('conciliaciones', proposal);
-    S().update('cobros', c.id, { conciliacionPropuestaId: proposal.id, conciliacionEstado: 'PROPUESTA', actualizado: now() });
-    if (A() && A().audit) A().audit('proponer_conciliacion', 'conciliaciones', proposal.id, null, proposal, 'Propuesta creada; no aplica pago ni conciliación', { operacionId: opId });
-    return { ok: true, proposal, operationId: opId };
+    if (!c || !isPaidReceipt(c)) return { ok: false, errors: ['cobro_confirmado_requerido'] };
+    return { ok: false, errors: ['ledger_run_requerido'], contract: 'Cobros 10.10.2', cobroId: c.id };
   }
 
   return {
