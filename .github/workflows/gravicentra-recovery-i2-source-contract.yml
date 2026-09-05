@@ -1,0 +1,42 @@
+name: Gravicentra Recovery I2 Source Contract
+
+on:
+  push:
+    branches:
+      - recovery/fase-a-clean-20260831
+    paths:
+      - 'functions/**'
+      - 'orbit360-platform/core/ops-leads-domain-client.js'
+      - 'orbit360-platform/core/cobros-reconciliation-domain-client.js'
+      - 'orbit360-platform/data/store-firestore-product-operational-p0.js'
+      - 'orbit360-platform/product-runtime-config.js'
+      - 'orbit360-platform/index.html'
+      - 'tools/orbit360-recovery-i2-*.mjs'
+      - '.github/workflows/gravicentra-recovery-i2-source-contract.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax check product server owners
+        run: |
+          node --check functions/product-active-role-contract.js
+          node --check functions/cobros-ledger-contract.js
+          node --check functions/product-operational-domain.js
+          node --check functions/product-ops-leads-domain.js
+          node --check functions/product-insurer-credentials.js
+          node --check functions/cobros-reconciliation-domain.js
+          node --check functions/bootstrap.js
+      - name: Active role fail-closed contract
+        run: node tools/orbit360-recovery-i2-product-active-role-contract-test.mjs
+      - name: Cobros 10.10.2 exact ledger contract
+        run: node tools/orbit360-recovery-i2-cobros-10102-contract-test.mjs
