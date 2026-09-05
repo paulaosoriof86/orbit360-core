@@ -3,7 +3,8 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath, createRequire } from 'node:module';
+import { fileURLToPath } from 'node:url';
+import { createRequire } from 'node:module';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '..');
