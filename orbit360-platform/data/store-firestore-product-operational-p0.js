@@ -128,7 +128,7 @@
       if(workflow){
         var operation=workflowOperation(action,collection,prior,payload||prior||{});
         if(!operation)throw new Error('PRODUCT_WRITE_WORKFLOW_OPERATION_UNRESOLVED');
-        return p.callFunction(WORKFLOW_COMMAND,{tenantId:m.tenantId,operation:operation,entityId:id,payload:clone(payload)||{},reason:workflowReason(operation,prior,payload)},'us-central1');
+        return p.callFunction(WORKFLOW_COMMAND,{tenantId:m.tenantId,activeRole:m.activeRole,operation:operation,entityId:id,payload:clone(payload)||{},reason:workflowReason(operation,prior,payload)},'us-central1');
       }
       return p.callFunction(GENERAL_COMMAND,{tenantId:m.tenantId,activeRole:m.activeRole,mutations:[{action:action,collection:collection,id:id,payload:action==='remove'?null:clone(payload)}]},'us-central1');
     }).then(function(result){
