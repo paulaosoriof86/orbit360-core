@@ -80,7 +80,8 @@ Orbit.policyReceipts = (function () {
     const m = raw.match(/^(\d+)/);
     return m ? +m[1] : (+fallback || 0);
   }
-  function receiptId(policyId, sequence) { return 'rec_' + clean(policyId) + '_' + String(sequence).padStart(3, '0'); }
+  // Preserve approved durable IDs; the historical prefix is technical compatibility only.
+  function receiptId(policyId, sequence) { return 'cob_' + clean(policyId) + '_' + String(sequence).padStart(3, '0'); }
   function operationId(prefix) { return (prefix || 'op') + '_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 7); }
 
   function validatePolicy(input, currentId) {
