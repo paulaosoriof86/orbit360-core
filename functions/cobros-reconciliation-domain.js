@@ -5,6 +5,7 @@ const { getApps, initializeApp } = require('firebase-admin/app');
 const { getFirestore, FieldValue } = require('firebase-admin/firestore');
 const { HttpsError, onCall } = require('firebase-functions/v2/https');
 const { validateActiveLedgerContract } = require('./cobros-ledger-contract');
+const { normalizeRole, resolveProductActiveRole } = require('./product-active-role-contract');
 
 const REGION = process.env.ORBIT360_FUNCTIONS_REGION || 'us-central1';
 const VERSION = 'orbit360-cobros-reconciliation-domain-v2-active-ledger';
@@ -58,18 +59,15 @@ function stageCollection(tenantId, runId, collection) {
   return runRef(tenantId, runId).collection(collection);
 }
 
-function roles(member) {
-  return unique([...(member.roles || []), member.activeRole, member.rolActivo, member.rol]).map(norm);
-}
 function permissions(member) {
-  return unique([...(member.permissions || []), ...(member.permisosExtra || []), ...(member.extras || [])]).map(norm);
+  return unique([...(member.permissions || []), ...(member.permisosExtra || []), ...(member.extras || [])]).map(normalizeRole);
 }
 function active(member) {
   const state = norm(member && (member.status || member.estado));
   return !!member && member.active !== false && member.activo !== false && !['inactive', 'inactivo', 'blocked', 'bloqueado'].includes(state);
 }
-function canManage(member) {
-  return roles(member).some(role => ADMIN_ROLES.has(role)) || permissions(member).some(permission => PERMISSIONS.has(permission));
+function canManage(activeRole, member) {
+  return ADMIN_ROLES.has(activeRole) || permissions(member).some(permission => PERMISSIONS.has(permission));
 }
 async function authorize(request, operation) {
   if (!request.auth || !request.auth.uid) throw new HttpsError('unauthenticated', 'Se requiere sesión activa.');
@@ -77,14 +75,20 @@ async function authorize(request, operation) {
   const snap = await memberRef(tenantId, request.auth.uid).get();
   const member = snap.exists ? snap.data() : null;
   if (!active(member)) throw new HttpsError('permission-denied', 'Membresía inactiva.');
-  if (operation !== 'preview_policy' && !canManage(member)) throw new HttpsError('permission-denied', 'No puede administrar conciliaciones.');
+  let roleState;
+  try {
+    roleState = resolveProductActiveRole(member, request.data && request.data.activeRole);
+  } catch (error) {
+    throw new HttpsError('permission-denied', error && error.code === 'PRODUCT_ASSIGNED_ROLES_MISSING' ? 'La membresía no tiene roles asignados.' : 'El rol activo no está asignado.');
+  }
+  if (operation !== 'preview_policy' && !canManage(roleState.activeRole, member)) throw new HttpsError('permission-denied', 'No puede administrar conciliaciones.');
   return {
     tenantId,
     member,
     actor: {
       uid: request.auth.uid,
       advisorId: text(member.advisorId || member.asesorId, 180),
-      activeRole: text(member.activeRole || member.rolActivo || member.rol, 100)
+      activeRole: roleState.activeRole
     }
   };
 }
