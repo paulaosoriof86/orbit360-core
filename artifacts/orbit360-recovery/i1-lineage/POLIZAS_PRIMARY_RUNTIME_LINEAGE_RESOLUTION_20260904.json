@@ -1,0 +1,48 @@
+{
+  "schemaVersion": "gravicentra-i1-capability-lineage-resolution-v1",
+  "artifactId": "POLIZAS_PRIMARY_RUNTIME_LINEAGE_RESOLUTION_20260904",
+  "capability": "POLIZAS_PRIMARY_RUNTIME",
+  "date": "2026-09-04",
+  "supersedesForExactBlobBinding": "artifacts/orbit360-recovery/i1-lineage/POLIZAS_PRIMARY_RUNTIME_LEDGER_20260903.json",
+  "reasonForSupersession": "New authoritative positive acceptance evidence binds the accepted 2026-08-10 source HEAD directly to modules/polizas.js.",
+  "acceptedEvidence": {
+    "chain": "Polizas 7.0.1 -> Vehiculos 8.0.1 -> Recibos/Cartera 9.1.0",
+    "controlPlaneRun": "31403410005",
+    "result": "PASS",
+    "acceptedSourceHead": "1f7b86b60edb8e3c61da55fa5073214f7d52cdbd",
+    "preservedVehicles": 1032,
+    "preservedPolicies": 1373,
+    "preservedExpectedReceipts": 1293,
+    "preservedPortfolioRows": 673
+  },
+  "approvedOwnerBinding": {
+    "owner": "orbit360-platform/modules/polizas.js",
+    "approvedBlobShaAtAcceptedHead": "46b197a77c162c88af498b5a89a759386a36e9e7",
+    "currentBlobSha": "46b197a77c162c88af498b5a89a759386a36e9e7",
+    "exactMatch": true,
+    "ownerDeclaration": "Polizas (vista global) — owner productivo"
+  },
+  "approvedSemantics": {
+    "kpi": "prima neta vigente",
+    "table": "prima total",
+    "financialBreakdown": ["prima neta", "gastos de expedicion", "gastos financieros", "descuento/ajuste de fuente", "IVA/impuestos", "prima total", "total calendario de recibos"],
+    "receiptsReadModel": "recibosEsperados",
+    "vehicleJoin": "vehiculos.polizaId -> polizas.id",
+    "clientJoin": "polizas.clienteId -> clientes.id",
+    "insurerJoin": "polizas.aseguradoraId -> aseguradoras.id",
+    "newPolicyActionDelegatesTo": "Orbit.modules.cliente360.nuevaPoliza()"
+  },
+  "goldenRecord": {
+    "policy": "AUTO39012",
+    "primaNetaGTQ": 1800,
+    "primaTotalGTQ": 2678.53,
+    "mustNotInflate": true,
+    "mustRemainCrossModuleConsistent": true,
+    "previewProofRequired": true
+  },
+  "lineageDecision": "LATEST_APPROVED_VERSION_BOUND_EXACTLY",
+  "runtimeDecision": "SOURCE_OWNER_MATCHES_ACCEPTED_BLOB_BUT_I4A_RUNTIME_PROOF_STILL_REQUIRED",
+  "productionTouched": false,
+  "dataTouched": false,
+  "dataCutoff": "2026-07-31"
+}
