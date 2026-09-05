@@ -21,7 +21,16 @@
       "**/node_modules/**",
       "docs/**",
       "**/*.local.json",
-      "_*/**"
+      "_*/**",
+      "ays-lab-preview.html",
+      "product-readonly.html",
+      "rollback-safe/**",
+      "runtime-gate-crm-v20260716/**",
+      "runtime-incident-importer-20260721/**",
+      "tools/**",
+      "data/seed.js",
+      "data/store.js",
+      "data/store-firestore-lab.local.js"
     ],
     "cleanUrls": false,
     "trailingSlash": false,
