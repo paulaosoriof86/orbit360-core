@@ -1,6 +1,9 @@
 /* ============================================================
    Orbit 360 · Queries — agregaciones de negocio sobre el store
    Reutilizadas por Inicio, Cliente 360, Insights, etc.
+   I2 recovery: Recibos Esperados, Cartera Primas y Cobros se
+   proyectan como dominios separados. Cobros nunca representa
+   obligaciones esperadas ni cartera pendiente por conveniencia.
    ============================================================ */
 window.Orbit = window.Orbit || {};
 Orbit.q = (function () {
@@ -8,12 +11,15 @@ Orbit.q = (function () {
   const U = Orbit.ui;
   const finite = v => U.finiteNumber ? U.finiteNumber(v) : (Number.isFinite(Number(v)) ? Number(v) : null);
   const amount = v => { const n = finite(v); return n == null ? 0 : n; };
+  const textNorm = v => String(v == null ? '' : v).trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
   function asesor(id) { return S().get('asesores', id); }
   function aseguradora(id) { return S().get('aseguradoras', id); }
 
   // ---- por cliente ----
   function polizasDe(cliId) { return S().where('polizas', p => p.clienteId === cliId); }
+  function recibosEsperadosDe(cliId) { return S().where('recibosEsperados', r => r.clienteId === cliId); }
+  function carteraPrimasDe(cliId) { return S().where('carteraPrimas', r => r.clienteId === cliId); }
   function cobrosDe(cliId) { return S().where('cobros', c => c.clienteId === cliId); }
   function comisionesDe(cliId) { return S().where('comisiones', c => c.clienteId === cliId); }
   function actividadesDe(cliId) {
@@ -23,53 +29,83 @@ Orbit.q = (function () {
   function vehiculosDe(cliId) { return S().where('vehiculos', v => v.clienteId === cliId); }
   function vehiculoDePoliza(polId) { return S().find('vehiculos', v => v.polizaId === polId); }
 
-  /** Resumen 360 de un cliente: el "cerebro". */
+  function portfolioOpen(row) {
+    const state = textNorm(row && (row.estadoCartera || row.estado));
+    if (row && row.conciliadoPago === true) return false;
+    return !['pagado','cobrado','cerrado','anulado','cancelado','cancelada'].includes(state);
+  }
+  function portfolioDue(row) {
+    return row && (row.vence || row.fechaVencimiento || row.fechaLimite || '');
+  }
+  function portfolioIsOverdue(row) {
+    if (!portfolioOpen(row)) return false;
+    const due = portfolioDue(row);
+    const d = due ? U.daysFromNow(due) : null;
+    return d != null && d < 0;
+  }
+  function expectedReceiptOpen(row) {
+    const state = textNorm(row && row.estado);
+    return !['pagado','conciliado','anulado','cancelado','cancelada'].includes(state) && !(row && row.fechaPago);
+  }
+  function expectedReceiptIsOverdue(row) {
+    if (!expectedReceiptOpen(row)) return false;
+    const due = row && (row.vence || row.fechaLimite || row.fechaVencimiento || '');
+    const d = due ? U.daysFromNow(due) : null;
+    return d != null && d < 0;
+  }
+  function confirmedCobro(row) {
+    const state = textNorm(row && row.estado);
+    return state === 'pagado' || state === 'conciliado' || row && row.conciliado === true;
+  }
+
+  /** Resumen 360 de un cliente: dominios financieros separados. */
   function clienteResumen(cliId) {
     const cli = S().get('clientes', cliId);
     const pol = polizasDe(cliId);
+    const rec = recibosEsperadosDe(cliId);
+    const car = carteraPrimasDe(cliId);
     const cob = cobrosDe(cliId);
     const com = comisionesDe(cliId);
     const vigentes = pol.filter(p => p.estado === 'Vigente' || p.estado === 'Por renovar');
     const primaAnual = vigentes.reduce((s, p) => s + amount(p.prima), 0);
-    const cobrado = cob.filter(c => c.estado === 'Pagado').reduce((s, c) => s + amount(c.monto), 0);
-    const pendiente = cob.filter(c => c.estado === 'Pendiente').reduce((s, c) => s + amount(c.monto), 0);
-    const vencido = cob.filter(c => c.estado === 'Vencido').reduce((s, c) => s + amount(c.monto), 0);
+    const cobrado = cob.filter(confirmedCobro).reduce((s, c) => s + amount(c.monto), 0);
+    const pendiente = car.filter(r => portfolioOpen(r) && !portfolioIsOverdue(r)).reduce((s, r) => s + amount(r.monto != null ? r.monto : r.saldo), 0);
+    const vencido = car.filter(portfolioIsOverdue).reduce((s, r) => s + amount(r.monto != null ? r.monto : r.saldo), 0);
+    const recibosPendientes = rec.filter(r => expectedReceiptOpen(r) && !expectedReceiptIsOverdue(r)).reduce((s, r) => s + amount(r.monto != null ? r.monto : r.montoTotal), 0);
+    const recibosVencidos = rec.filter(expectedReceiptIsOverdue).reduce((s, r) => s + amount(r.monto != null ? r.monto : r.montoTotal), 0);
     const comisionGen = com.reduce((s, c) => s + amount(c.monto), 0);
     const porRenovar = pol.filter(p => p.estado === 'Por renovar').length;
-    // salud del cliente 0-100
     let salud = 70;
     salud += Math.min(20, vigentes.length * 6);
     salud -= vencido > 0 ? 25 : 0;
     salud += cli && cli.segmento === 'Premium' ? 8 : 0;
     salud = Math.max(8, Math.min(100, salud));
     return {
-      cli, pol, cob, com,
+      cli, pol, rec, car, cob, com,
       moneda: cli ? cli.moneda : 'GTQ',
       nPolizas: pol.length, nVigentes: vigentes.length,
-      primaAnual, cobrado, pendiente, vencido, comisionGen, porRenovar,
+      primaAnual, cobrado, pendiente, vencido, recibosPendientes, recibosVencidos, comisionGen, porRenovar,
       salud
     };
   }
 
-  /**
-   * Índice batched para la lista de Cliente 360.
-   * Preserva exactamente la semántica de clienteResumen para clientes existentes,
-   * pero resuelve las cuatro colecciones una sola vez y evita N×clone en el store
-   * productivo read-only.
-   */
+  /** Índice batched con la misma separación semántica del resumen individual. */
   function clientesResumenIndex() {
     const clientes = S().all('clientes') || [];
     const polizas = S().all('polizas') || [];
+    const recibos = S().all('recibosEsperados') || [];
+    const cartera = S().all('carteraPrimas') || [];
     const cobros = S().all('cobros') || [];
     const comisiones = S().all('comisiones') || [];
-    const polByClient = new Map();
-    const cobByClient = new Map();
-    const comByClient = new Map();
+    const polByClient = new Map(), recByClient = new Map(), carByClient = new Map(), cobByClient = new Map(), comByClient = new Map();
     const add = (map, id, row) => {
+      if (id == null) return;
       if (!map.has(id)) map.set(id, []);
       map.get(id).push(row);
     };
     polizas.forEach(p => add(polByClient, p.clienteId, p));
+    recibos.forEach(r => add(recByClient, r.clienteId, r));
+    cartera.forEach(r => add(carByClient, r.clienteId, r));
     cobros.forEach(c => add(cobByClient, c.clienteId, c));
     comisiones.forEach(c => add(comByClient, c.clienteId, c));
 
@@ -77,13 +113,17 @@ Orbit.q = (function () {
     clientes.forEach(cli => {
       if (!cli || cli.id == null) return;
       const pol = polByClient.get(cli.id) || [];
+      const rec = recByClient.get(cli.id) || [];
+      const car = carByClient.get(cli.id) || [];
       const cob = cobByClient.get(cli.id) || [];
       const com = comByClient.get(cli.id) || [];
       const vigentes = pol.filter(p => p.estado === 'Vigente' || p.estado === 'Por renovar');
       const primaAnual = vigentes.reduce((s, p) => s + amount(p.prima), 0);
-      const cobrado = cob.filter(c => c.estado === 'Pagado').reduce((s, c) => s + amount(c.monto), 0);
-      const pendiente = cob.filter(c => c.estado === 'Pendiente').reduce((s, c) => s + amount(c.monto), 0);
-      const vencido = cob.filter(c => c.estado === 'Vencido').reduce((s, c) => s + amount(c.monto), 0);
+      const cobrado = cob.filter(confirmedCobro).reduce((s, c) => s + amount(c.monto), 0);
+      const pendiente = car.filter(r => portfolioOpen(r) && !portfolioIsOverdue(r)).reduce((s, r) => s + amount(r.monto != null ? r.monto : r.saldo), 0);
+      const vencido = car.filter(portfolioIsOverdue).reduce((s, r) => s + amount(r.monto != null ? r.monto : r.saldo), 0);
+      const recibosPendientes = rec.filter(r => expectedReceiptOpen(r) && !expectedReceiptIsOverdue(r)).reduce((s, r) => s + amount(r.monto != null ? r.monto : r.montoTotal), 0);
+      const recibosVencidos = rec.filter(expectedReceiptIsOverdue).reduce((s, r) => s + amount(r.monto != null ? r.monto : r.montoTotal), 0);
       const comisionGen = com.reduce((s, c) => s + amount(c.monto), 0);
       const porRenovar = pol.filter(p => p.estado === 'Por renovar').length;
       let salud = 70;
@@ -92,10 +132,10 @@ Orbit.q = (function () {
       salud += cli.segmento === 'Premium' ? 8 : 0;
       salud = Math.max(8, Math.min(100, salud));
       index.set(cli.id, {
-        cli, pol, cob, com,
+        cli, pol, rec, car, cob, com,
         moneda: cli.moneda,
         nPolizas: pol.length, nVigentes: vigentes.length,
-        primaAnual, cobrado, pendiente, vencido, comisionGen, porRenovar,
+        primaAnual, cobrado, pendiente, vencido, recibosPendientes, recibosVencidos, comisionGen, porRenovar,
         salud
       });
     });
@@ -103,23 +143,23 @@ Orbit.q = (function () {
   }
 
   // ---- globales ----
-  // Moneda por país: cuando hay un país activo, NO se convierte (montos nativos).
-  // Solo en la vista global mixta ('TODOS') se normaliza con una tasa DECLARADA (COP↔GTQ ≈ /1000).
-  const TC_COP_GTQ = 1000; // tasa de referencia declarada para vistas mixtas
+  const TC_COP_GTQ = 1000;
   function paisActivo() { const p = Orbit.pais; return (p && p !== 'TODOS') ? p : null; }
   function monedaPais() { const p = paisActivo(); return p === 'CO' ? 'COP' : 'GTQ'; }
   const norm = (m, cur) => { const n = finite(m); if (n == null) return 0; if (paisActivo()) return n; return cur === 'COP' ? n / TC_COP_GTQ : n; };
   function clientIndex() { return new Map((S().all('clientes') || []).filter(c => c && c.id).map(c => [c.id, c])); }
-  function cobPais(c, clients) { const cli = clients instanceof Map ? clients.get(c.clienteId) : S().get('clientes', c.clienteId); const p = paisActivo(); return !p || (cli && cli.pais === p); }
+  function rowPais(row, clients) { const cli = clients instanceof Map ? clients.get(row.clienteId) : S().get('clientes', row.clienteId); const p = paisActivo(); return !p || (cli && cli.pais === p) || row.pais === p; }
   function polPais(p2, clients) { const cli = clients instanceof Map ? clients.get(p2.clienteId) : S().get('clientes', p2.clienteId); const p = paisActivo(); return !p || (cli && cli.pais === p); }
 
+  /** Cartera Primas es la autoridad de pendiente/vencido; Cobros solo aporta recaudo confirmado. */
   function carteraGlobal() {
     const clients = clientIndex();
-    const cob = S().all('cobros').filter(c => cobPais(c, clients));
-    const alDia = cob.filter(c => c.estado === 'Pagado').reduce((s, c) => s + norm(c.monto, c.moneda), 0);
-    const pend = cob.filter(c => c.estado === 'Pendiente').reduce((s, c) => s + norm(c.monto, c.moneda), 0);
-    const venc = cob.filter(c => c.estado === 'Vencido').reduce((s, c) => s + norm(c.monto, c.moneda), 0);
-    return { alDia, pend, venc, moneda: monedaPais() };
+    const cob = (S().all('cobros') || []).filter(c => rowPais(c, clients));
+    const car = (S().all('carteraPrimas') || []).filter(c => rowPais(c, clients));
+    const alDia = cob.filter(confirmedCobro).reduce((s, c) => s + norm(c.monto, c.moneda), 0);
+    const pend = car.filter(r => portfolioOpen(r) && !portfolioIsOverdue(r)).reduce((s, r) => s + norm(r.monto != null ? r.monto : r.saldo, r.moneda), 0);
+    const venc = car.filter(portfolioIsOverdue).reduce((s, r) => s + norm(r.monto != null ? r.monto : r.saldo, r.moneda), 0);
+    return { alDia, pend, venc, moneda: monedaPais(), source: 'cobros+carteraPrimas' };
   }
   function primaVigenteGlobal() {
     const clients = clientIndex();
@@ -133,13 +173,11 @@ Orbit.q = (function () {
       return (p.estado === 'Vigente' || p.estado === 'Por renovar') && d != null && d >= 0 && d <= dias;
     }).sort((a, b) => String(a.vigenciaFin||'').localeCompare(String(b.vigenciaFin||'')));
   }
+  /** Nombre conservado por compatibilidad: retorna obligaciones esperadas vencidas, no Cobros reales. */
   function cobrosVencidos() {
-    return S().where('cobros', c => c.estado === 'Vencido').sort((a, b) => String(a.vence||'').localeCompare(String(b.vence||'')));
+    return (S().all('recibosEsperados') || []).filter(expectedReceiptIsOverdue)
+      .sort((a, b) => String(a.vence||a.fechaLimite||'').localeCompare(String(b.vence||b.fechaLimite||'')));
   }
-  /** Avance por asesor (prima vigente vs meta).
-   *  `asesores` es una colección productiva opcional: cuando no está hidratada,
-   *  el store puede exponer una proyección canónica sin `metaPrima`. El consumidor
-   *  debe degradar de forma finita y honesta, nunca renderizar NaN/undefined. */
   function leaderboard() {
     const clients = clientIndex();
     const policies = S().all('polizas') || [];
@@ -156,12 +194,13 @@ Orbit.q = (function () {
     }).sort((x, y) => y.prima - x.prima);
   }
 
-  /** Aging de cartera vencida en tramos de días. */
+  /** Aging exclusivo de Cartera Primas; Cobros realizados no generan deuda vencida. */
   function agingVencido() {
     const buckets = { '1-30': 0, '31-60': 0, '61-90': 0, '90+': 0 };
-    S().where('cobros', c => c.estado === 'Vencido').forEach(c => {
-      const d = -U.daysFromNow(c.vence);
-      const v = norm(c.monto, c.moneda);
+    (S().all('carteraPrimas') || []).filter(portfolioIsOverdue).forEach(c => {
+      const due = portfolioDue(c);
+      const d = -U.daysFromNow(due);
+      const v = norm(c.monto != null ? c.monto : c.saldo, c.moneda);
       if (d <= 30) buckets['1-30'] += v;
       else if (d <= 60) buckets['31-60'] += v;
       else if (d <= 90) buckets['61-90'] += v;
@@ -169,7 +208,6 @@ Orbit.q = (function () {
     });
     return buckets;
   }
-  /** Comisiones agregadas por clave (asesorId | aseguradoraId | periodo). */
   function comisionesPor(campo) {
     const map = {};
     S().all('comisiones').forEach(c => {
@@ -183,17 +221,12 @@ Orbit.q = (function () {
   }
   function clienteNombre(id) { const c = S().get('clientes', id); return c ? c.nombre : '—'; }
 
-  /** REGLA DE NEGOCIO (multi-tenant, no solo A&S): el pago aplicado por el cliente a un
-   *  recibo/póliza NO es un movimiento financiero real de la empresa — es RECAUDO COMERCIAL.
-   *  Afecta cartera, recibos, metas de recaudo y producción recaudada (todo derivado de `cobros`),
-   *  NO la colección `finmovs`. A `finmovs` solo van ingresos/egresos REALES de la empresa
-   *  (comisión recibida, factura cobrada, liquidación pagada por aseguradora, pago a asesor, gasto).
-   *  Por eso este helper NO escribe en finmovs (prevención de regresión). Se conserva la firma
-   *  para no romper llamadas existentes. */
+  /** Recaudo comercial no es movimiento financiero de empresa. Cobros contiene eventos
+   * confirmados; recibosEsperados y carteraPrimas permanecen dominios separados. */
   function postRecaudo(/* cobro, fecha, metodo */) { return; }
 
   return {
-    asesor, aseguradora, polizasDe, cobrosDe, comisionesDe, actividadesDe, cancelacionesDe,
+    asesor, aseguradora, polizasDe, recibosEsperadosDe, carteraPrimasDe, cobrosDe, comisionesDe, actividadesDe, cancelacionesDe,
     clienteResumen, clientesResumenIndex, carteraGlobal, primaVigenteGlobal, renovacionesProximas, cobrosVencidos, leaderboard,
     agingVencido, comisionesPor, clienteNombre, norm, monedaPais, vehiculosDe, vehiculoDePoliza, postRecaudo
   };
