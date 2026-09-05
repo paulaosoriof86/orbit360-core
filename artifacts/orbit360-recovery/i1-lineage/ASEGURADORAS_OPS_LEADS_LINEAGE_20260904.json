@@ -1,0 +1,85 @@
+{
+  "schemaVersion": "orbit360-recovery-i1-lineage-v1",
+  "artifactId": "ASEGURADORAS_OPS_LEADS_LINEAGE_20260904",
+  "productBrand": "Gravicentra Insurance",
+  "iteration": 1,
+  "gate": "LATEST_APPROVED_LINEAGE",
+  "createdDate": "2026-09-04",
+  "baseHead": "077aca1c45c19749d693b7ba2f3710620ac53c1e",
+  "baseTree": "b50401796d44fc424e8f4a25ddcd3d1504f8eeb2",
+  "productionTouched": false,
+  "dataTouched": false,
+  "dataCutoff": "2026-07-31",
+  "capabilities": {
+    "ASEGURADORAS_PRIMARY_RUNTIME": {
+      "lineageStatus": "LOCATED_RECONCILIATION_REQUIRED",
+      "owner": "orbit360-platform/modules/aseguradoras.js",
+      "currentBlobSha": "9c0ea8d7b160619c74a8c5ee150a1d7e89df8c23",
+      "contract": "Directorio operativo GT/CO con ficha, edición controlada, fuentes/conocimiento y seguridad por credentialRef; no secretos persistidos en store.",
+      "previewRuntimeStatus": "OPEN_FAIL_PARTIAL",
+      "reason": "La última prueba visual reportada no materializó correctamente el revelado de contraseña; source inspection no equivale a PASS. Debe probarse en I4A."
+    },
+    "ASEGURADORAS_OPERATIONAL_DIRECTORY": {
+      "lineageStatus": "LOCATED_RECONCILIATION_REQUIRED",
+      "accessPolicyOwner": "orbit360-platform/core/aseguradoras-op2-operational-access-policy.js",
+      "accessPolicyBlobSha": "d16cdf4c8dd4051f88ac9e255e20103642e4af36",
+      "credentialProviderOwner": "orbit360-platform/core/product-insurer-credential-provider-p0.js",
+      "credentialProviderBlobSha": "3ec81e120bc36f52b4cc50016f677de4f4b160ea",
+      "requiredFullCredentialRoles": ["Dirección", "SuperAdmin", "AdminTenant", "Admin", "Operativo"],
+      "advisorRule": "NOT_AUTHORIZED_UNLESS_EXPLICITLY_APPROVED_LATER",
+      "bankAccounts": "visible/copyable to module viewers unless explicitly restricted",
+      "credentialSecurity": {
+        "providerCallable": "orbit360ProductInsurerCredentialCommand",
+        "persistentSecrets": false,
+        "browserSecretCache": false,
+        "directFirestoreWrites": false,
+        "requiresReauth": true
+      },
+      "previewRuntimeStatus": "OPEN_FAIL_PARTIAL"
+    },
+    "OPS_PRIMARY_RUNTIME": {
+      "lineageStatus": "SOURCE_ACCEPTANCE_LOCATED",
+      "moduleOwner": "orbit360-platform/modules/ops.js",
+      "moduleBlobSha": "c7fc7914d5f3b5a69a31d33e6800e032fe6b7dd2",
+      "sharedSemanticOwner": "orbit360-platform/core/ciclo.js",
+      "sharedSemanticOwnerBlobSha": "1809ff73e8cdbceb908aa65b3aaf177f5ebee908",
+      "sharedSourceAcceptanceCommit": "842f762f199f4c7dbf13062a33ca220d92398c51",
+      "writeTransportOwner": "orbit360-platform/core/ops-leads-domain-client.js",
+      "writeTransportBlobSha": "fd7bcd30e8e13556f11fc05cee3820cc59dedccc",
+      "writeCallable": "orbit360OpsLeadsCommand",
+      "semanticContract": "Ops y Leads proyectan el mismo negocio; Ops añade gestiones administrativas que no son prospectos.",
+      "previewRuntimeStatus": "REQUIRES_I4A_PROOF"
+    },
+    "LEADS_PRIMARY_RUNTIME": {
+      "lineageStatus": "SOURCE_ACCEPTANCE_LOCATED",
+      "moduleOwner": "orbit360-platform/modules/leads.js",
+      "moduleBlobSha": "e25b6ea1c715634f2b56b8769640e78600fc062e",
+      "lastDirectModuleCommit": "317f3fb0",
+      "sharedSemanticOwner": "orbit360-platform/core/ciclo.js",
+      "sharedSemanticOwnerBlobSha": "1809ff73e8cdbceb908aa65b3aaf177f5ebee908",
+      "sharedSourceAcceptanceCommit": "842f762f199f4c7dbf13062a33ca220d92398c51",
+      "writeTransportOwner": "orbit360-platform/core/ops-leads-domain-client.js",
+      "writeTransportBlobSha": "fd7bcd30e8e13556f11fc05cee3820cc59dedccc",
+      "writeCallable": "orbit360OpsLeadsCommand",
+      "semanticContract": "Un negocio único se proyecta en Leads y Ops según etapa canónica; una transición en cualquiera se refleja en ambos.",
+      "previewRuntimeStatus": "REQUIRES_I4A_PROOF"
+    }
+  },
+  "sharedOpsLeadsContract": {
+    "owner": "orbit360-platform/core/ciclo.js",
+    "ownerBlobSha": "1809ff73e8cdbceb908aa65b3aaf177f5ebee908",
+    "acceptedAtCommit": "842f762f199f4c7dbf13062a33ca220d92398c51",
+    "acceptanceMessage": "fix(macro2): transversal safe read-model source acceptance",
+    "singleBusinessRecord": true,
+    "synchronizedBoards": true,
+    "opsOnlyAdministrativeGestiones": true,
+    "productionWriteTransportSeparated": true
+  },
+  "failClosed": {
+    "noModulePassDeclaredFromSourceInspection": true,
+    "aseguradorasRevealMustBeReprovedInPreview": true,
+    "noHistoricalOverlayPromoted": true,
+    "noDataReimport": true
+  },
+  "next": "Consolidate POLIZAS_PRIMARY_RUNTIME + RECIBOS_CARTERA_PRIMARY_RUNTIME + COBROS_PRIMARY_RUNTIME against existing I1 ledgers, then evaluate all 15 manifest capabilities for I1 closure."
+}
