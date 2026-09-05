@@ -4,6 +4,7 @@ const crypto = require('node:crypto');
 const { getApps, initializeApp } = require('firebase-admin/app');
 const { getFirestore, FieldValue } = require('firebase-admin/firestore');
 const { HttpsError, onCall } = require('firebase-functions/v2/https');
+const { validateActiveLedgerContract } = require('./cobros-ledger-contract');
 
 const REGION = process.env.ORBIT360_FUNCTIONS_REGION || 'us-central1';
 const VERSION = 'orbit360-cobros-reconciliation-domain-v2-active-ledger';
@@ -100,13 +101,19 @@ function operationRequestId(tenantId, operation, payload, supplied) {
 async function resolveActiveRun(tenantId) {
   const pointer = await controlRef(tenantId).get();
   if (!pointer.exists) throw new HttpsError('failed-precondition', 'COBROS_LEDGER_ACTIVE_POINTER_MISSING');
-  const data = pointer.data() || {};
-  const activeRunId = text(data.activeRunId, 180);
+  const pointerData = pointer.data() || {};
+  const activeRunId = text(pointerData.activeRunId, 180);
   if (!activeRunId) throw new HttpsError('failed-precondition', 'COBROS_LEDGER_ACTIVE_RUN_MISSING');
   id(activeRunId, 'activeRunId');
   const manifest = await runRef(tenantId, activeRunId).get();
   if (!manifest.exists) throw new HttpsError('failed-precondition', 'COBROS_LEDGER_ACTIVE_RUN_NOT_FOUND');
-  return { activeRunId, manifest: Object.assign({ id: manifest.id }, manifest.data() || {}) };
+  const manifestData = manifest.data() || {};
+  try {
+    validateActiveLedgerContract(pointerData, manifestData, tenantId);
+  } catch (error) {
+    throw new HttpsError('failed-precondition', text(error && (error.code || error.message) || 'COBROS_LEDGER_CONTRACT_INVALID', 180));
+  }
+  return { activeRunId, manifest: manifestData };
 }
 async function queryCanonicalByPolicy(tenantId, collection, policyId) {
   const snap = await tenantData(tenantId, collection).where('polizaId', '==', policyId).get();
