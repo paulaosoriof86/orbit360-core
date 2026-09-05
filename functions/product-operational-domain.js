@@ -4,6 +4,7 @@ const crypto = require('node:crypto');
 const { getApps, initializeApp } = require('firebase-admin/app');
 const { getFirestore, FieldValue } = require('firebase-admin/firestore');
 const { HttpsError, onCall } = require('firebase-functions/v2/https');
+const { resolveProductActiveRole } = require('./product-active-role-contract');
 
 const REGION = process.env.ORBIT360_FUNCTIONS_REGION || 'us-central1';
 const VERSION = 'gravicentra-product-operational-domain-v1';
@@ -51,9 +52,6 @@ function cleanId(value, label) {
   const out = text(value, 256);
   if (!ID_RE.test(out)) throw new HttpsError('invalid-argument', `${label || 'ID'} inválido.`);
   return out;
-}
-function rolesOf(member) {
-  return unique([...(member.roles || []), member.activeRole, member.defaultRole, member.rolActivo, member.rol]).map(norm);
 }
 function permissionsOf(member) {
   return unique([...(member.permissions || []), ...(member.permisosExtra || []), ...(member.extras || [])]).map(norm);
@@ -116,9 +114,12 @@ async function authorize(request, tenantId, mutations) {
   const snap = await memberRef(tenantId, request.auth.uid).get();
   const member = snap.exists ? snap.data() : null;
   if (!activeMember(member) || text(member.tenantId, 160) !== tenantId) throw new HttpsError('permission-denied', 'Membresía activa requerida.');
-  const assigned = rolesOf(member);
-  const requestedRole = norm(request.data && request.data.activeRole || member.activeRole || member.defaultRole || member.rol);
-  if (!requestedRole || !assigned.includes(requestedRole)) throw new HttpsError('permission-denied', 'El rol activo no está asignado.');
+  let requestedRole;
+  try {
+    requestedRole = resolveProductActiveRole(member, request.data && request.data.activeRole).activeRole;
+  } catch (error) {
+    throw new HttpsError('permission-denied', error && error.code === 'PRODUCT_ASSIGNED_ROLES_MISSING' ? 'La membresía no tiene roles asignados.' : 'El rol activo no está asignado.');
+  }
   const permissions = permissionsOf(member);
   for (const mutation of mutations) {
     const collection = text(mutation.collection, 80);
