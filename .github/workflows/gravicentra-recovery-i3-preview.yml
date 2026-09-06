@@ -16,7 +16,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  SOURCE_SHA: a856910751e684797fcd9dbcca73d70137134b5f
+  SOURCE_SHA: 2c0f27707815b2bbe46b96cbb665d33e8b870bfe
   PROJECT_ID: ays-orbit-360-lab
   HOSTING_SITE: ays-orbit-360-lab
   TENANT_HINT: alianzas-soluciones
@@ -106,7 +106,7 @@ jobs:
           SRC="$GITHUB_WORKSPACE/source/orbit360-platform"; PACKAGE="$RUNNER_TEMP/gravicentra-i3-release-package"; BUNDLE="$PACKAGE/bundle"; SITE="$BUNDLE/site"; EVIDENCE="$PACKAGE/evidence"
           rm -rf "$PACKAGE"; mkdir -p "$SITE" "$EVIDENCE"; export SRC SITE BUNDLE EVIDENCE PACKAGE
           test -f "$SRC/index.html"; test -f "$SRC/product-runtime-config.js"; test -f "$SRC/sw.js"
-          grep -Fq "hydrationContractVersion: 'fase-a-i2-20260902.1'" "$SRC/product-runtime-config.js"
+          grep -Fq "hydrationContractVersion: 'fase-a-i2-20260905.3-ledger-server-owned'" "$SRC/product-runtime-config.js"
           grep -Fq "hydrationContractSource: 'recovery/fase-a-clean-20260831'" "$SRC/product-runtime-config.js"
           grep -Fq "enabled: false" "$SRC/product-runtime-config.js"
           grep -Fq "'alianzas-soluciones'" "$SRC/data/tenant-runtime-config-index.js"
@@ -149,7 +149,7 @@ jobs:
               if p.suffix.lower()=='.css':
                   for raw in css_ref.findall(text): add(norm(raw,rel))
               for raw in generic.findall(text): add(norm(raw,rel))
-          required={'index.html','product-runtime-config.js','sw.js','core/product-app-p0.js','core/pwa.js','data/tenant-runtime-config-index.js'}
+          required={'index.html','product-runtime-config.js','sw.js','core/product-app-p0.js','core/pwa.js','data/tenant-runtime-config-index.js','data/store-firestore-product-readonly-p0.js','data/store-firestore-product-operational-p0.js'}
           missing=sorted(required-seen)
           if missing: raise SystemExit('REACHABILITY_CLOSURE_MISSING:'+','.join(missing))
           if any(x.startswith(('tools/','docs/','reports/','functions/','.github/')) for x in seen): raise SystemExit('NON_PRODUCT_TREE_REACHED')
@@ -184,7 +184,7 @@ jobs:
           if missing: raise SystemExit('PUBLIC_FIREBASE_CONFIG_INCOMPLETE:'+','.join(missing))
           if cfg['projectId']!=os.environ['PROJECT_ID']: raise SystemExit('PUBLIC_FIREBASE_PROJECT_MISMATCH')
           canonical={k:cfg.get(k,'') for k in ['apiKey','authDomain','projectId','appId','storageBucket']}; cfg_hash=hashlib.sha256(json.dumps(canonical,sort_keys=True,separators=(',',':')).encode()).hexdigest(); source_sha=os.environ['SOURCE_SHA']; build_id=f"gi-i3-{source_sha[:12]}-{cfg_hash[:12]}"
-          payload={'enabled':True,'environmentRef':'firebase-hosting-preview-i3','tenantHint':os.environ['TENANT_HINT'],'projectId':cfg['projectId'],'authDomain':cfg['authDomain'],'appId':cfg['appId'],'apiKey':cfg['apiKey'],'storageBucket':cfg.get('storageBucket',''),'buildId':build_id,'sourceSha':source_sha,'hydrationContractVersion':'fase-a-i2-20260902.1','hydrationContractSource':'recovery/fase-a-clean-20260831','requiredCollections':['clientes','polizas','cobros','aseguradoras'],'optionalCollections':['vehiculos','recibosEsperados','carteraPrimas','asesores','metas','negocios','gestiones','comisiones','cancelaciones']}
+          payload={'enabled':True,'environmentRef':'firebase-hosting-preview-i3','tenantHint':os.environ['TENANT_HINT'],'projectId':cfg['projectId'],'authDomain':cfg['authDomain'],'appId':cfg['appId'],'apiKey':cfg['apiKey'],'storageBucket':cfg.get('storageBucket',''),'buildId':build_id,'sourceSha':source_sha,'hydrationContractVersion':'fase-a-i2-20260905.3-ledger-server-owned','hydrationContractSource':'recovery/fase-a-clean-20260831','requiredCollections':['clientes','polizas','cobros','aseguradoras'],'optionalCollections':['vehiculos','recibosEsperados','carteraPrimas','estadosCuentaAseguradora','recibosAseguradora','conciliacionesPrimas','conciliaciones','asesores','metas','negocios','gestiones','comisiones','cancelaciones']}
           site=Path(os.environ['SITE']); (site/'product-runtime-config.js').write_text('/* Generated only inside the certified I3 artifact. Public Firebase Web config; no secrets. */\nwindow.__ORBIT360_PRODUCT_PUBLIC_CONFIG__ = Object.freeze('+json.dumps(payload,ensure_ascii=False,separators=(',',':'))+');\n',encoding='utf-8')
           marker=site/'__recovery__'/'build.json'; marker.parent.mkdir(parents=True,exist_ok=True); marker.write_text(json.dumps({'product':'Gravicentra Insurance','gate':'I3','sourceSha':source_sha,'buildId':build_id,'environmentRef':'firebase-hosting-preview-i3'},sort_keys=True,separators=(',',':'))+'\n',encoding='utf-8')
           Path(os.environ['EVIDENCE']+'/public-config-descriptor.json').write_text(json.dumps({'projectId':cfg['projectId'],'authDomain':cfg['authDomain'],'appIdPresent':True,'apiKeyPresent':True,'storageBucketPresent':bool(cfg.get('storageBucket')),'configSha256':cfg_hash},sort_keys=True,separators=(',',':'))+'\n',encoding='utf-8')
