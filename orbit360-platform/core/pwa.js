@@ -6,8 +6,8 @@
    - Registra service worker (no-op si el origen no lo permite)
    ============================================================ */
 (function () {
-  var RUNTIME_BUILD = '20260830-visual-runtime-rootfix-1';
-  var CRITICAL_RELEASE = 'post-go-live-visual-runtime-rootfix-20260830-1';
+  var RUNTIME_BUILD = '20260905-recovery-i2-canonical-role-owner-1';
+  var CRITICAL_RELEASE = 'recovery-i2-canonical-role-owner-20260905-1';
   var workerState = window.OrbitPwaWorkerState = { runtimeBuild: RUNTIME_BUILD, criticalRelease: CRITICAL_RELEASE, status: 'registering', controlled: false, scriptPath: '' };
   function workerPath(worker) { try { return worker && worker.scriptURL ? new URL(worker.scriptURL).pathname + new URL(worker.scriptURL).search : ''; } catch (e) { return ''; } }
   function controllerMatches(registration) { var controller = navigator.serviceWorker && navigator.serviceWorker.controller; var active = registration && registration.active; if (!controller || !active) return false; return workerPath(controller) === workerPath(active) && workerPath(controller).indexOf('v=' + RUNTIME_BUILD) >= 0; }
