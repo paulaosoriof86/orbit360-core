@@ -49,3 +49,5 @@ jobs:
         run: node tools/orbit360-recovery-i2-cobros-10102-contract-test.mjs
       - name: Composition startup and write boundary contract
         run: node tools/orbit360-recovery-i2-composition-startup-write-boundary-test.mjs
+      - name: Canonical product reachability closure
+        run: node tools/orbit360-recovery-i2-reachability-test.mjs
