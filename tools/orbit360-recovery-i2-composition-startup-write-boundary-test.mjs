@@ -47,9 +47,13 @@ assert.ok(index.lastIndexOf('core/pwa.js') > index.indexOf('core/product-app-p0.
 const sw = read('orbit360-platform/sw.js');
 mustContain(sw, '/core/access-role-session-owner-v20260728.js', 'SW_CANONICAL_ROLE_OWNER');
 mustNotContain(sw, '/core/session-multirol-visibility-v20260716.js', 'SW_STALE_ROLE_OWNER');
+mustContain(sw, "var BUILD = '20260905-recovery-i2-canonical-role-owner-1'", 'SW_BUILD_IDENTITY');
+mustContain(sw, "var CRITICAL_RELEASE = 'recovery-i2-canonical-role-owner-20260905-1'", 'SW_RELEASE_IDENTITY');
 mustContain(sw, 'orbit360-v20260905-recovery-i2-canonical-role-owner-1', 'SW_CACHE_ROTATION');
 
 const pwa = read('orbit360-platform/core/pwa.js');
+mustContain(pwa, "var RUNTIME_BUILD = '20260905-recovery-i2-canonical-role-owner-1'", 'PWA_BUILD_IDENTITY');
+mustContain(pwa, "var CRITICAL_RELEASE = 'recovery-i2-canonical-role-owner-20260905-1'", 'PWA_RELEASE_IDENTITY');
 mustContain(pwa, 'window.OrbitPwaWorkerReady = registerServiceWorker();', 'PWA_ASYNC_REGISTRATION');
 mustNotContain(pwa, 'await navigator.serviceWorker', 'PWA_BLOCKING_AWAIT');
 
