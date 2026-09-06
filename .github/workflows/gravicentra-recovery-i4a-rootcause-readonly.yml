@@ -18,9 +18,9 @@ concurrency:
 env:
   PROJECT_ID: ays-orbit-360-lab
   TENANT_ID: alianzas-soluciones
-  TARGET_POLICY: AUTO39012
-  SOURCE_UNDER_TEST: a856910751e684797fcd9dbcca73d70137134b5f
-  BUILD_UNDER_TEST: gi-i3-a856910751e6-57f234755dc1
+  TARGET_POLICY: '39012'
+  SOURCE_UNDER_TEST: 2c0f27707815b2bbe46b96cbb665d33e8b870bfe
+  BUILD_UNDER_TEST: gi-i3-2c0f27707815-57f234755dc1
 
 jobs:
   readonly-rootcause:
@@ -148,11 +148,19 @@ jobs:
             recibosEsperados:await shape('recibosEsperados')
           };
 
+          const targetClientIds=new Set(policies.map(p=>clean(p.clienteId)).filter(Boolean));
+          const clientes=(await path('clientes').get()).docs.map(d=>({id:d.id,...d.data()}));
+          const targetClients=clientes.filter(c=>targetClientIds.has(clean(c.id))).map(c=>({id:c.id,nombre:c.nombre||c.razonSocial||'',tipo:c.tipo||'',pais:c.pais||'',asesorId:c.asesorId||''}));
+          const relatedPolicies=allPolicies.filter(p=>targetClientIds.has(clean(p.clienteId))).map(p=>({id:p.id,numero:p.numero,estado:p.estado,prima:p.prima,primaNeta:p.primaNeta,primaTotal:p.primaTotal,pais:p.pais,clienteId:p.clienteId}));
+          const validationPolicies=allPolicies.filter(p=>clean(p.numero).startsWith('entorno de validación-')||clean(p.numero).startsWith('entorno de validacion-')).map(p=>({id:p.id,numero:p.numero,estado:p.estado,clienteId:p.clienteId,pais:p.pais,prima:p.prima,primaNeta:p.primaNeta,primaTotal:p.primaTotal}));
+
           const evidence={
-            schemaVersion:'gravicentra-i4a-rootcause-readonly-v2',gate:'I4A',sourceUnderTest:process.env.SOURCE_UNDER_TEST,
+            schemaVersion:'gravicentra-i4a-rootcause-readonly-v3',gate:'I4A',sourceUnderTest:process.env.SOURCE_UNDER_TEST,
             buildUnderTest:process.env.BUILD_UNDER_TEST,projectId:project,tenantId:tenant,targetPolicy:target,
             writesExecuted:0,dataTouched:false,productionTouched:false,
             counts,activePolicyCount:active.length,targetPolicyMatches:policyEvidence.length,targetPolicyEvidence:policyEvidence,
+            targetClients,targetClientRelatedPolicyCount:relatedPolicies.length,targetClientRelatedPolicies:relatedPolicies,
+            validationPolicyCount:validationPolicies.length,validationPolicies,
             premiumAnomalyCountSampled:premiumAnomalies.length,premiumAnomalies,
             targetPolicyRelationCounts:relationCounts,collectionShape,
             insurerDirectory:{insurerCount:insurers.length,portalRows,userBearing,inlineCredentials,credentialRefs,bankAccounts,bankNumbers},
@@ -175,7 +183,9 @@ jobs:
             echo "- Build: \`$BUILD_UNDER_TEST\`"
             if [ -f "$F" ]; then
               echo "- Counts: \`$(jq -c '.counts' "$F")\`"
-              echo "- AUTO39012: \`$(jq -c '.targetPolicyEvidence' "$F")\`"
+              echo "- Policy 39012: \`$(jq -c '.targetPolicyEvidence' "$F")\`"
+              echo "- Target client policies: \`$(jq -r '.targetClientRelatedPolicyCount' "$F")\`"
+              echo "- Validation policies: \`$(jq -r '.validationPolicyCount' "$F")\`"
               echo "- Target relations: \`$(jq -c '.targetPolicyRelationCounts' "$F")\`"
               echo "- Read-model shape counts: \`$(jq -c '.collectionShape' "$F")\`"
               echo "- Premium anomalies sampled: \`$(jq -r '.premiumAnomalyCountSampled' "$F")\`"
