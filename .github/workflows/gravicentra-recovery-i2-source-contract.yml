@@ -6,11 +6,18 @@ on:
       - recovery/fase-a-clean-20260831
     paths:
       - 'functions/**'
+      - 'firebase.json'
+      - 'orbit360-platform/index.html'
+      - 'orbit360-platform/product-runtime-config.js'
+      - 'orbit360-platform/sw.js'
+      - 'orbit360-platform/core/pwa.js'
+      - 'orbit360-platform/core/product-app-p0.js'
+      - 'orbit360-platform/core/auth-product-runtime-p0.js'
+      - 'orbit360-platform/core/backend-product-readonly-bootstrap-p0.js'
       - 'orbit360-platform/core/ops-leads-domain-client.js'
       - 'orbit360-platform/core/cobros-reconciliation-domain-client.js'
+      - 'orbit360-platform/data/store-firestore-product-readonly-p0.js'
       - 'orbit360-platform/data/store-firestore-product-operational-p0.js'
-      - 'orbit360-platform/product-runtime-config.js'
-      - 'orbit360-platform/index.html'
       - 'tools/orbit360-recovery-i2-*.mjs'
       - '.github/workflows/gravicentra-recovery-i2-source-contract.yml'
   workflow_dispatch:
@@ -40,3 +47,5 @@ jobs:
         run: node tools/orbit360-recovery-i2-product-active-role-contract-test.mjs
       - name: Cobros 10.10.2 exact ledger contract
         run: node tools/orbit360-recovery-i2-cobros-10102-contract-test.mjs
+      - name: Composition startup and write boundary contract
+        run: node tools/orbit360-recovery-i2-composition-startup-write-boundary-test.mjs
