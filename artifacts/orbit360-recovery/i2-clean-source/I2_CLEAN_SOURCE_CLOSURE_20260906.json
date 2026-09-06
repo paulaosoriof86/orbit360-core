@@ -1,0 +1,48 @@
+{
+  "schemaVersion": "gravicentra-recovery-i2-closure-v1",
+  "artifactId": "I2_CLEAN_SOURCE_CLOSURE_20260906",
+  "productBrand": "Gravicentra Insurance",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "iteration": 2,
+  "decision": "PASS",
+  "testedSourceCommit": "2c0f27707815b2bbe46b96cbb665d33e8b870bfe",
+  "testedSourceTree": "2650d6c218895483c42e9f7249294b312ca23922",
+  "workflow": {
+    "name": "Gravicentra Recovery I2 Source Contract",
+    "runId": 34057730350,
+    "conclusion": "success",
+    "requiredSteps": {
+      "syntaxProductServerOwners": "PASS",
+      "activeRoleFailClosedContract": "PASS",
+      "cobros10102ExactLedgerContract": "PASS",
+      "compositionStartupWriteBoundaryContract": "PASS",
+      "canonicalProductReachabilityClosure": "PASS"
+    }
+  },
+  "criteria": {
+    "SOURCE_CONTRACT_PASS": true,
+    "REACHABILITY_PASS": true,
+    "PERFORMANCE_STARTUP_CONTRACT_PASS": true,
+    "WRITE_CONTRACT_PASS": true,
+    "SINGLE_ENTRYPOINT_PASS": true,
+    "HOSTING_HISTORICAL_SURFACES_EXCLUDED": true,
+    "PWA_SERVICE_WORKER_RELEASE_IDENTITY_ALIGNED": true
+  },
+  "preservedContracts": {
+    "readAuthority": "Firestore product readonly store; browser writes fail closed",
+    "writeAuthority": "Approved server-side callable contracts; no browser Firestore direct write",
+    "financialReadModels": "recibosEsperados, carteraPrimas and cobros remain semantically distinct",
+    "roleBoundary": "active role must be explicitly assigned; forged/unassigned roles fail closed",
+    "startup": "product app does not wait for service worker; no 30/120 second successful-flow waits",
+    "entrypoint": "single productive orbit360-platform/index.html with LAB/seeds/historical surfaces excluded from Hosting artifact"
+  },
+  "productionTouched": false,
+  "dataTouched": false,
+  "dataCutoff": "2026-07-31",
+  "augustRefresh": "HOLD",
+  "nextIteration": 3,
+  "nextGate": "IMMUTABLE_BUILD_FIREBASE_PREVIEW_EXACT_READBACK",
+  "i3SourcePinRequired": "2c0f27707815b2bbe46b96cbb665d33e8b870bfe",
+  "releaseRule": "I3 must build exactly testedSourceCommit once; all later Preview and Production promotion must use that immutable artifact/digest unless source changes and a new I2/I3 certification is performed."
+}
