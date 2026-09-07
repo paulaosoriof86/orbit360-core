@@ -10,6 +10,8 @@ on:
       - tools/gravicentra-i4a-bootstrap-diagnostic.mjs
       - tools/gravicentra-i4a-authenticated-browser-v2.mjs
       - tools/gravicentra-i4a-runtime-boundary-diagnostic.mjs
+      - tools/gravicentra-release-lineage-guard.mjs
+      - artifacts/orbit360-recovery/release-control/ACTIVE_RELEASE_LOCK.json
   workflow_dispatch:
 
 permissions:
@@ -32,11 +34,13 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
-          fetch-depth: 1
+          fetch-depth: 0
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Verify certified release lock
+        run: node tools/gravicentra-release-lineage-guard.mjs --mode=certified
       - name: Install Chromium QA dependency
         run: |
           set -euo pipefail
@@ -62,11 +66,13 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
-          fetch-depth: 1
+          fetch-depth: 0
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Verify certified release lock
+        run: node tools/gravicentra-release-lineage-guard.mjs --mode=certified
       - name: Install diagnostic dependencies
         run: |
           set -euo pipefail
@@ -114,11 +120,13 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
-          fetch-depth: 1
+          fetch-depth: 0
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Verify certified release lock
+        run: node tools/gravicentra-release-lineage-guard.mjs --mode=certified
       - name: Install authenticated QA dependencies
         run: |
           set -euo pipefail
