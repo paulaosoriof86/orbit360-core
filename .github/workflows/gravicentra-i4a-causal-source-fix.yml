@@ -21,70 +21,105 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
-          fetch-depth: 20
+          fetch-depth: 0
           persist-credentials: true
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Patch only physically closed causal owners
+      - name: Verify current certified release before source mutation
+        run: node tools/gravicentra-release-lineage-guard.mjs --mode=certified
+      - name: Patch authoritative hydration and redundant router rerender only
         shell: bash
         run: |
           set -euo pipefail
           test "${GITHUB_REF_NAME}" = "recovery/fase-a-clean-20260831"
           python3 - <<'PY'
           from pathlib import Path
-          def rx(path, old, new, expected=1):
-              p=Path(path); text=p.read_text(encoding='utf-8'); n=text.count(old)
-              if n!=expected: raise SystemExit(f'PATCH_PRECONDITION_FAIL:{path}:expected={expected}:actual={n}:{old[:90]!r}')
-              p.write_text(text.replace(old,new),encoding='utf-8')
 
-          cfg='orbit360-platform/modules/configuracion.js'
-          rx(cfg,"root=root||document.body;","root=root||document.querySelector('#cfg-body'); if(!root)return;")
-          rx(cfg,"setTimeout(function(){scrub(document.querySelector('#cfg-body')||document.body);},250);","setTimeout(function(){scrub(document.querySelector('#cfg-body'));},250);")
-          rx(cfg,"setTimeout(function(){scrub(document.querySelector('#cfg-body')||document.body);},1000);","setTimeout(function(){scrub(document.querySelector('#cfg-body'));},1000);")
-          rx(cfg,"try{ new MutationObserver(function(){scrub(document.querySelector('#cfg-body')||document.body);}).observe(document.body,{childList:true,subtree:true}); }catch(e){}","try{ new MutationObserver(function(){scrub(document.querySelector('#cfg-body'));}).observe(document.body,{childList:true,subtree:true}); }catch(e){}")
+          def once(path, old, new):
+              p=Path(path); s=p.read_text(encoding='utf-8'); n=s.count(old)
+              if n!=1: raise SystemExit(f'PATCH_PRECONDITION_FAIL:{path}:count={n}:{old[:100]!r}')
+              p.write_text(s.replace(old,new,1),encoding='utf-8')
 
-          c='orbit360-platform/modules/cliente360.js'
-          rx(c,"  const esRenovable = p => p && (p.estado === 'Vigente' || p.estado === 'Por renovar');\n","  const esRenovable = p => p && (p.estado === 'Vigente' || p.estado === 'Por renovar');\n  const policyTotal = p => U.finiteNumber(p && p.primaTotal);\n")
-          rx(c,"      const primaAnual = vigentes.reduce((s, p) => s + (U.finiteNumber(p.prima) || 0), 0);","      const primaAnual = vigentes.reduce((s, p) => s + (policyTotal(p) || 0), 0);")
-          rx(c,"      return s + (cli.moneda === 'COP' ? p.prima / 1000 : p.prima);","      const total = policyTotal(p);\n      if (total == null) return s;\n      return s + (cli.moneda === 'COP' ? total / 1000 : total);")
-          rx(c,"    r.pol.filter(esRenovable).forEach(p => porRamo[p.ramo] = (porRamo[p.ramo] || 0) + p.prima);","    r.pol.filter(esRenovable).forEach(p => porRamo[p.ramo] = (porRamo[p.ramo] || 0) + (policyTotal(p) || 0));")
-          rx(c,"          <td class=\"num\">${U.money(p.prima, p.moneda)}</td>","          <td class=\"num\">${policyTotal(p) == null ? 'Pendiente de completar' : U.money(policyTotal(p), p.moneda)}</td>")
+          store='orbit360-platform/data/store-firestore-product-readonly-p0.js'
+          old="""    function acceptRows(collection, rows, snapshotMeta) { var accepted = [], quarantined = [], fromCache = !!(snapshotMeta && snapshotMeta.fromCache === true); (rows || []).forEach(function (row) { var normalized = Object.assign({}, row); if (!normalized.tenantId) normalized.tenantId = state.tenantId; if (normalized.tenantId !== state.tenantId || !rowId(normalized)) quarantined.push(normalized); else accepted.push(normalized); }); cache[collection] = accepted; state.quarantinedRows[collection] = quarantined.map(function (row) { return { id: rowId(row) || '', reason: row.tenantId !== state.tenantId ? 'tenant_mismatch' : 'id_missing' }; }); if (state.observedCollections.indexOf(collection) < 0) state.observedCollections.push(collection); if (state.attachedCollections.indexOf(collection) < 0) state.attachedCollections.push(collection); state.snapshotSources[collection] = fromCache ? 'cache' : 'server'; if (fromCache) { if (state.serverConfirmedCollections.indexOf(collection) < 0 && state.cacheOnlyCollections.indexOf(collection) < 0) state.cacheOnlyCollections.push(collection); } else { if (state.serverConfirmedCollections.indexOf(collection) < 0) state.serverConfirmedCollections.push(collection); state.cacheOnlyCollections = state.cacheOnlyCollections.filter(function (name) { return name !== collection; }); } state.ready = state.serverConfirmedCollections.length > 0; state.status = state.ready ? 'authoritative-snapshots-progress' : 'waiting-authoritative-snapshots'; state.lastSnapshotAt = new Date().toISOString(); emit(collection); maybeAttachDeferred(); }"""
+          new="""    function sameRows(a, b) { if (a === b) return true; if (!Array.isArray(a) || !Array.isArray(b) || a.length !== b.length) return false; for (var i = 0; i < a.length; i += 1) { if (JSON.stringify(a[i]) !== JSON.stringify(b[i])) return false; } return true; }
+    function acceptRows(collection, rows, snapshotMeta) { var accepted = [], quarantined = [], fromCache = !!(snapshotMeta && snapshotMeta.fromCache === true), alreadyServerConfirmed = state.serverConfirmedCollections.indexOf(collection) >= 0; if (fromCache && authoritativeFirstReadRequired && alreadyServerConfirmed) { state.snapshotSources[collection] = 'server'; return; } (rows || []).forEach(function (row) { var normalized = Object.assign({}, row); if (!normalized.tenantId) normalized.tenantId = state.tenantId; if (normalized.tenantId !== state.tenantId || !rowId(normalized)) quarantined.push(normalized); else accepted.push(normalized); }); var dataChanged = !sameRows(cache[collection] || [], accepted); cache[collection] = accepted; state.quarantinedRows[collection] = quarantined.map(function (row) { return { id: rowId(row) || '', reason: row.tenantId !== state.tenantId ? 'tenant_mismatch' : 'id_missing' }; }); if (state.observedCollections.indexOf(collection) < 0) state.observedCollections.push(collection); if (state.attachedCollections.indexOf(collection) < 0) state.attachedCollections.push(collection); state.snapshotSources[collection] = fromCache ? 'cache' : 'server'; if (fromCache) { if (state.serverConfirmedCollections.indexOf(collection) < 0 && state.cacheOnlyCollections.indexOf(collection) < 0) state.cacheOnlyCollections.push(collection); } else { if (state.serverConfirmedCollections.indexOf(collection) < 0) state.serverConfirmedCollections.push(collection); state.cacheOnlyCollections = state.cacheOnlyCollections.filter(function (name) { return name !== collection; }); } state.ready = state.serverConfirmedCollections.length > 0; state.status = state.ready ? 'authoritative-snapshots-progress' : 'waiting-authoritative-snapshots'; state.lastSnapshotAt = new Date().toISOString(); if (!alreadyServerConfirmed || dataChanged) emit(collection); maybeAttachDeferred(); }"""
+          once(store,old,new)
 
-          q='orbit360-platform/core/queries.js'
-          rx(q,"  function polizasDe(cliId) { return S().where('polizas', p => p.clienteId === cliId); }\n  function recibosEsperadosDe(cliId) { return S().where('recibosEsperados', r => r.clienteId === cliId); }\n  function carteraPrimasDe(cliId) { return S().where('carteraPrimas', r => r.clienteId === cliId); }","  function polizasDe(cliId) { return S().where('polizas', p => p.clienteId === cliId); }\n  function policyLinkedClientId(row) {\n    if (!row || row.polizaId == null) return null;\n    const policy = S().get('polizas', row.polizaId);\n    return policy && policy.clienteId != null ? policy.clienteId : null;\n  }\n  function recibosEsperadosDe(cliId) { return S().where('recibosEsperados', r => policyLinkedClientId(r) === cliId); }\n  function carteraPrimasDe(cliId) { return S().where('carteraPrimas', r => policyLinkedClientId(r) === cliId); }")
-          rx(q,"    const primaAnual = vigentes.reduce((s, p) => s + amount(p.prima), 0);","    const primaAnual = vigentes.reduce((s, p) => s + amount(p.primaTotal), 0);",expected=2)
-          rx(q,"    const polByClient = new Map(), recByClient = new Map(), carByClient = new Map(), cobByClient = new Map(), comByClient = new Map();","    const polByClient = new Map(), polById = new Map(), recByClient = new Map(), carByClient = new Map(), cobByClient = new Map(), comByClient = new Map();")
-          rx(q,"    polizas.forEach(p => add(polByClient, p.clienteId, p));\n    recibos.forEach(r => add(recByClient, r.clienteId, r));\n    cartera.forEach(r => add(carByClient, r.clienteId, r));","    polizas.forEach(p => { add(polByClient, p.clienteId, p); if (p && p.id != null) polById.set(p.id, p); });\n    recibos.forEach(r => { const p = r && polById.get(r.polizaId); if (p) add(recByClient, p.clienteId, r); });\n    cartera.forEach(r => { const p = r && polById.get(r.polizaId); if (p) add(carByClient, p.clienteId, r); });")
-          rx(q,"  function rowPais(row, clients) { const cli = clients instanceof Map ? clients.get(row.clienteId) : S().get('clientes', row.clienteId); const p = paisActivo(); return !p || (cli && cli.pais === p) || row.pais === p; }\n  function polPais(p2, clients) {","  function rowPais(row, clients) { const cli = clients instanceof Map ? clients.get(row.clienteId) : S().get('clientes', row.clienteId); const p = paisActivo(); return !p || (cli && cli.pais === p) || row.pais === p; }\n  function policyLinkedRowPais(row, clients, policies) {\n    if (!row || row.polizaId == null) return false;\n    const policy = policies instanceof Map ? policies.get(row.polizaId) : S().get('polizas', row.polizaId);\n    if (!policy || policy.clienteId == null) return false;\n    const cli = clients instanceof Map ? clients.get(policy.clienteId) : S().get('clientes', policy.clienteId);\n    const p = paisActivo();\n    return !p || !!(cli && cli.pais === p);\n  }\n  function polPais(p2, clients) {")
-          rx(q,"    const clients = clientIndex();\n    const cob = (S().all('cobros') || []).filter(c => rowPais(c, clients));\n    const car = (S().all('carteraPrimas') || []).filter(c => rowPais(c, clients));","    const clients = clientIndex();\n    const policies = new Map((S().all('polizas') || []).filter(p => p && p.id != null).map(p => [p.id, p]));\n    const cob = (S().all('cobros') || []).filter(c => rowPais(c, clients));\n    const car = (S().all('carteraPrimas') || []).filter(c => policyLinkedRowPais(c, clients, policies));")
-          rx(q,"      .reduce((s, p) => s + norm(p.prima, p.moneda), 0);","      .reduce((s, p) => s + norm(p.primaTotal, p.moneda), 0);")
+          router='orbit360-platform/core/router.js'
+          old="""  function init() { host = document.getElementById('host'); sidebar = document.getElementById('sidebar'); start(); const defer = window.requestIdleCallback || function (fn) { return setTimeout(fn, 0); }; defer(function () { loadRuntimeContracts(function () { try { if (Orbit.session && Orbit.session.syncFromAuth) Orbit.session.syncFromAuth(); } catch (e) {} try { buildSidebar(); setActive((Orbit.route && Orbit.route.key) || 'inicio'); onHash(); } catch (e) {} runtimeSignal('router-optional-contracts-ready', '1'); }); }); const pwaReady = window.OrbitPwaWorkerReady;"""
+          new="""  function init() { host = document.getElementById('host'); sidebar = document.getElementById('sidebar'); start(); const defer = window.requestIdleCallback || function (fn) { return setTimeout(fn, 0); }; defer(function () { loadRuntimeContracts(function () { let roleBefore = '', roleAfter = ''; try { roleBefore = String(Orbit.session && Orbit.session.rol ? Orbit.session.rol() : ''); if (Orbit.session && Orbit.session.syncFromAuth) Orbit.session.syncFromAuth(); roleAfter = String(Orbit.session && Orbit.session.rol ? Orbit.session.rol() : ''); } catch (e) {} try { buildSidebar(); setActive((Orbit.route && Orbit.route.key) || 'inicio'); if (current == null || roleBefore !== roleAfter) onHash(); } catch (e) {} runtimeSignal('router-optional-contracts-ready', '1'); }); }); const pwaReady = window.OrbitPwaWorkerReady;"""
+          once(router,old,new)
 
-          a=Path(cfg).read_text(encoding='utf-8'); b=Path(q).read_text(encoding='utf-8'); d=Path(c).read_text(encoding='utf-8')
-          if "root=root||document.body" in a or "#cfg-body')||document.body" in a: raise SystemExit('CONFIG_GLOBAL_SCRUB_STILL_PRESENT')
-          if "recibosEsperados', r => r.clienteId === cliId" in b or "carteraPrimas', r => r.clienteId === cliId" in b: raise SystemExit('FINANCIAL_DIRECT_CLIENT_JOIN_STILL_PRESENT')
-          if "primaAnual = vigentes.reduce((s, p) => s + amount(p.prima)" in b: raise SystemExit('QUERY_PRIMA_LEGACY_SEMANTIC_STILL_PRESENT')
-          if "const primaAnual = vigentes.reduce((s, p) => s + (U.finiteNumber(p.prima)" in d: raise SystemExit('CLIENT360_PRIMA_LEGACY_SEMANTIC_STILL_PRESENT')
+          s=Path(store).read_text(encoding='utf-8')
+          r=Path(router).read_text(encoding='utf-8')
+          checks={
+            'cache_downgrade_blocked': "fromCache && authoritativeFirstReadRequired && alreadyServerConfirmed" in s,
+            'equivalent_server_emit_suppressed': "if (!alreadyServerConfirmed || dataChanged) emit(collection)" in s,
+            'first_server_confirmation_still_emits': "!alreadyServerConfirmed || dataChanged" in s,
+            'router_optional_contract_no_unconditional_onhash': "if (current == null || roleBefore !== roleAfter) onHash();" in r,
+          }
+          bad=[k for k,v in checks.items() if not v]
+          if bad: raise SystemExit('HYDRATION_FIX_STATIC_CONTRACT_FAIL:'+','.join(bad))
+          print('HYDRATION_FIX_STATIC_CONTRACT='+','.join(k+'=PASS' for k in checks))
           PY
-      - name: Validate exact source changes
+      - name: Validate exact source scope
         shell: bash
         run: |
           set -euo pipefail
-          node --check orbit360-platform/modules/configuracion.js
-          node --check orbit360-platform/modules/cliente360.js
-          node --check orbit360-platform/core/queries.js
+          node --check orbit360-platform/data/store-firestore-product-readonly-p0.js
+          node --check orbit360-platform/core/router.js
           git diff --check
-          test "$(git diff --name-only | sort | tr '\n' ' ')" = "orbit360-platform/core/queries.js orbit360-platform/modules/cliente360.js orbit360-platform/modules/configuracion.js "
+          test "$(git diff --name-only | sort | tr '\n' ' ')" = "orbit360-platform/core/router.js orbit360-platform/data/store-firestore-product-readonly-p0.js "
+          ! git diff -- orbit360-platform/data/store-firestore-product-readonly-p0.js orbit360-platform/core/router.js | grep -E "insert:|update:|remove:|writeEnabled: true|writeAuthorized: true"
       - name: Commit source candidate
+        id: source
         shell: bash
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add orbit360-platform/core/queries.js orbit360-platform/modules/cliente360.js orbit360-platform/modules/configuracion.js
-          git commit -m "fix(i4a): close policy labels and financial read joins"
+          git add orbit360-platform/data/store-firestore-product-readonly-p0.js orbit360-platform/core/router.js
+          git commit -m "fix(i4a): preserve authoritative hydration and suppress redundant rerenders"
+          SOURCE_COMMIT=$(git rev-parse HEAD)
           git push origin HEAD:recovery/fase-a-clean-20260831
-          echo "PRODUCT_SOURCE_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_STEP_SUMMARY"
+          echo "source_commit=$SOURCE_COMMIT" >> "$GITHUB_OUTPUT"
+          echo "PRODUCT_SOURCE_COMMIT=$SOURCE_COMMIT" >> "$GITHUB_STEP_SUMMARY"
           echo "PRODUCT_SOURCE_TREE=$(git rev-parse HEAD^{tree})" >> "$GITHUB_STEP_SUMMARY"
+          echo "PRODUCTION_TOUCHED=false" >> "$GITHUB_STEP_SUMMARY"
+          echo "DATA_TOUCHED=false" >> "$GITHUB_STEP_SUMMARY"
+      - name: Advance release lock candidate and I3 pin atomically in control plane
+        shell: bash
+        env:
+          SOURCE_COMMIT: ${{ steps.source.outputs.source_commit }}
+        run: |
+          set -euo pipefail
+          git pull --ff-only origin recovery/fase-a-clean-20260831
+          python3 - <<'PY'
+          import json,os,re
+          from pathlib import Path
+          sha=os.environ['SOURCE_COMMIT']
+          if not re.fullmatch(r'[0-9a-f]{40}',sha): raise SystemExit('NEW_SOURCE_SHA_INVALID')
+          lp=Path('artifacts/orbit360-recovery/release-control/ACTIVE_RELEASE_LOCK.json')
+          lock=json.loads(lp.read_text(encoding='utf-8'))
+          lock['candidateSourceSha']=sha
+          lock['status']='CANDIDATE_SOURCE_PENDING_I3'
+          lock['activeGate']='I3_REBUILD_FOR_I4A'
+          lock.setdefault('evidence',{})['i4aState']='HOLD_PENDING_NEW_I3_AFTER_CAUSAL_SOURCE_FIX'
+          lp.write_text(json.dumps(lock,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
+          wp=Path('.github/workflows/gravicentra-recovery-i3-preview.yml')
+          text=wp.read_text(encoding='utf-8')
+          hits=re.findall(r'(?m)^  SOURCE_SHA: ([0-9a-f]{40})$',text)
+          if len(hits)!=1: raise SystemExit('I3_SOURCE_PIN_CARDINALITY_FAIL')
+          text=text.replace('  SOURCE_SHA: '+hits[0], '  SOURCE_SHA: '+sha, 1)
+          wp.write_text(text,encoding='utf-8')
+          print('RELEASE_CANDIDATE_ADVANCED='+sha)
+          PY
+          git diff --check
+          git add artifacts/orbit360-recovery/release-control/ACTIVE_RELEASE_LOCK.json .github/workflows/gravicentra-recovery-i3-preview.yml
+          git commit -m "control(i3): advance candidate to hydration causal fix"
+          git push origin HEAD:recovery/fase-a-clean-20260831
+          echo "I3_REBUILD_REQUIRED=true" >> "$GITHUB_STEP_SUMMARY"
           echo "PRODUCTION_TOUCHED=false" >> "$GITHUB_STEP_SUMMARY"
           echo "DATA_TOUCHED=false" >> "$GITHUB_STEP_SUMMARY"
