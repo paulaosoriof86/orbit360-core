@@ -11,7 +11,8 @@
   window.Orbit = window.Orbit || {};
 
   var VERSION = 'p0-product-m6-20260730.4';
-  var QUERY_FIELD_ALIASES = Object.freeze({ country: 'pais' });
+  var QUERY_FIELD_ALIASES = Object.freeze({ country: 'pais', advisorId: 'asesorId', teamId: 'equipoId' });
+  var RELATION_SCOPED_COLLECTIONS = Object.freeze({ recibosEsperados: true, carteraPrimas: true, cobros: true });
 
   function base() {
     return window.Orbit.tenantAccessPolicyEffectiveP0 || window.Orbit.tenantAccessPolicyP0 || null;
@@ -89,14 +90,21 @@
     };
   }
 
-  function translateQueryProposal(proposal) {
+  function translateQueryProposal(proposal, collection) {
     var out = Object.assign({}, proposal || {});
+    var relationScoped = RELATION_SCOPED_COLLECTIONS[String(collection || '')] === true;
     out.constraints = (Array.isArray(out.constraints) ? out.constraints : []).map(function (constraint) {
       var row = Object.assign({}, constraint || {});
-      if (QUERY_FIELD_ALIASES[row.field]) row.field = QUERY_FIELD_ALIASES[row.field];
+      if (relationScoped) {
+        if (row.field === 'country' || row.field === 'pais') row.field = '__relation_country__';
+        else if (row.field === 'advisorId' || row.field === 'asesorId') row.field = '__relation_advisor__';
+        else if (row.field === 'teamId' || row.field === 'equipoId') row.field = '__relation_team__';
+      } else if (QUERY_FIELD_ALIASES[row.field]) row.field = QUERY_FIELD_ALIASES[row.field];
       return row;
     });
     out.productPhysicalFieldAliasesApplied = true;
+    out.relationScopedCollection = relationScoped;
+    out.relationConstraintsFailClosed = relationScoped;
     return out;
   }
 
@@ -105,7 +113,7 @@
     if (!owner || typeof owner.queryConstraints !== 'function') {
       return { ok: false, writeAuthorized: false, collection: String(collection || ''), constraints: [], errors: ['politica_acceso_base_faltante'] };
     }
-    return translateQueryProposal(owner.queryConstraints(collection, canonicalMembership(membership), context));
+    return translateQueryProposal(owner.queryConstraints(collection, canonicalMembership(membership), context), collection);
   }
 
   function delegate(name) {

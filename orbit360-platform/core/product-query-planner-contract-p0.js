@@ -103,10 +103,10 @@
     }
 
     var scope = text(proposal && proposal.scope);
-    if (scope === 'own' && !constraints.some(function (item) { return item.field === 'advisorId' && item.op === '==' && item.value === normalizedMembership.advisorId; })) {
+    if (scope === 'own' && !constraints.some(function (item) { return (item.field === 'advisorId' || item.field === 'asesorId' || item.field === '__relation_advisor__') && item.op === '==' && item.value === normalizedMembership.advisorId; })) {
       errors.push('scope_own_sin_constraint_asesor');
     }
-    if (scope === 'team' && !constraints.some(function (item) { return item.field === 'teamId' && item.op === '==' && item.value === normalizedMembership.teamId; })) {
+    if (scope === 'team' && !constraints.some(function (item) { return (item.field === 'teamId' || item.field === 'equipoId' || item.field === '__relation_team__') && item.op === '==' && item.value === normalizedMembership.teamId; })) {
       errors.push('scope_team_sin_constraint_equipo');
     }
     if (scope === 'none' && !hasDeny) errors.push('scope_none_sin_deny');
@@ -122,14 +122,16 @@
       denied: hasDeny,
       constraints: constraints,
       errors: unique(errors),
-      indexHint: constraints.filter(function (item) { return item.field !== '__deny__'; }).map(function (item) {
+      indexHint: constraints.filter(function (item) { return item.field !== '__deny__' && item.field !== 'tenantId' && String(item.field || '').indexOf('__relation_') !== 0; }).map(function (item) {
         return { field: item.field, mode: item.op === 'array-contains' ? 'ARRAY_CONTAINS' : 'ASCENDING' };
       }),
       runtimeGuards: {
         requireTenantConstraint: true,
         rejectOpenQuery: true,
         maxInValues: MAX_IN_VALUES,
-        noClientSideTenantFiltering: true
+        noClientSideTenantFiltering: true,
+        tenantIsolationAuthority: 'canonical_path',
+        relationConstraintsFailClosed: true
       }
     };
   }
