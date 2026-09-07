@@ -11,6 +11,7 @@ const PROJECT='ays-orbit-360-lab';
 const TENANT='alianzas-soluciones';
 const REGION='us-central1';
 const FUNCTION='orbit360ProductInsurerCredentialCommand';
+const SERVICE=FUNCTION.toLowerCase();
 const PREVIEW=String(process.env.PREVIEW_URL||'').replace(/\/$/,'');
 const SOURCE=String(process.env.SOURCE_SHA||'');
 const BUILD=String(process.env.BUILD_ID||'');
@@ -26,7 +27,149 @@ function redact(v){return String(v==null?'':v).replace(/cred_[a-f0-9]{32}/gi,'cr
 async function activate(page,token){const x=await page.evaluate(async tok=>{const p=Orbit?.productRuntimeBrowserProvidersP0,c=await p.initialize();await c.modules.auth.signInWithCustomToken(c.auth,tok);return await Orbit.productAppP0.activate();},token);need(x?.started===true,'PRODUCT_APP_DID_NOT_START');await page.waitForFunction(()=>Orbit?.productAppP0?.status?.().started===true&&!document.body.classList.contains('pre-auth'),null,{timeout:12000});}
 async function setRole(page,target){const before=await page.evaluate(()=>({active:Orbit?.session?.rol?.()||'',assigned:Orbit?.session?.allowedRoles?.()||[]}));if(before.active===target)return;need(before.assigned.includes(target),'ROLE_NOT_ASSIGNED:'+target);need(await page.evaluate(r=>Orbit.session.set(r),target),'ROLE_SWITCH_REJECTED:'+target);await page.waitForTimeout(200);need(await page.evaluate(()=>Orbit?.session?.rol?.()||'')===target,'ROLE_SWITCH_NOT_EFFECTIVE:'+target);}
 async function go(page,hash,key){await page.evaluate(h=>{location.hash=h;},hash);await page.waitForFunction(k=>Orbit?.route?.key===k,key,{timeout:12000});await page.waitForTimeout(500);}
-async function policyBoundary(page){await go(page,'#/polizas','polizas');return await page.evaluate(()=>{const re=/entorno de validaci[oó]n/i;const label=p=>[p?.id,p?.numero,p?.nombre,p?.descripcion,p?.referencia].map(x=>String(x||'').trim()).filter(Boolean).join(' | ');const raw=Orbit?.store?.raw?.()?.polizas||[],all=Orbit?.store?.all?.('polizas')||[];const rowHits=[...document.querySelectorAll('tbody tr')].map((tr,index)=>({tr,index,text:tr.textContent||''})).filter(x=>re.test(x.text)).map(x=>({index:x.index,cellCount:x.tr.cells?.length||0,phraseCellIndexes:[...(x.tr.cells||[])].map((td,i)=>re.test(td.textContent||'')?i:-1).filter(i=>i>=0),hasInlineOnclick:!!x.tr.getAttribute('onclick')}));const textNodes=[];const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);let n;while((n=walker.nextNode())&&textNodes.length<20){if(!re.test(n.nodeValue||''))continue;const p=n.parentElement;textNodes.push({tag:p?.tagName||'',id:p?.id||'',className:String(p?.className||'').slice(0,160),insideTable:!!p?.closest('table'),insideTbody:!!p?.closest('tbody'),insideBanner:!!p?.closest('.banner,.module-banner,[class*="banner"]')});}const render=Orbit?.modules?.polizas?.render,src=typeof render==='function'?Function.prototype.toString.call(render):'';return{rawCount:raw.length,rawSynthetic:raw.map(label).filter(x=>re.test(x)).length,operationalCount:all.length,operationalSynthetic:all.map(label).filter(x=>re.test(x)).length,bodyPhraseCount:((document.body?.textContent||'').match(/entorno de validaci[oó]n/gi)||[]).length,tableRowPhraseCount:rowHits.length,rowHits,textNodes,render:{present:typeof render==='function',sourceLength:src.length,readsStoreAllPolizas:src.includes("S().all('polizas')"),writesHostInnerHtml:src.includes('host.innerHTML'),mentionsEntornoValidacion:re.test(src)},moduleKeys:Object.keys(Orbit?.modules||{}).filter(k=>/poliz/i.test(k)),polizaScripts:[...document.scripts].map(s=>s.src||'').filter(src=>/poliz|policy-receipts|crm-v1198/i.test(src)).map(src=>src.replace(location.origin,'')).slice(0,80)};});}
-async function cloudBoundary(sa){const out={metadata:null,logs:{queried:false,entries:[],error:''}};try{const auth=new GoogleAuth({credentials:sa,scopes:['https://www.googleapis.com/auth/cloud-platform.read-only','https://www.googleapis.com/auth/logging.read']});const client=await auth.getClient(),headers=await client.getRequestHeaders();const metaUrl=`https://cloudfunctions.googleapis.com/v2/projects/${PROJECT}/locations/${REGION}/functions/${FUNCTION}`;const r=await fetch(metaUrl,{headers});const j=await r.json().catch(()=>({}));out.metadata={httpStatus:r.status,name:String(j?.name||''),state:String(j?.state||''),environment:String(j?.environment||''),entryPoint:String(j?.buildConfig?.entryPoint||''),runtime:String(j?.buildConfig?.runtime||''),serviceAccountConfigured:!!j?.serviceConfig?.serviceAccountEmail,uriConfigured:!!j?.serviceConfig?.uri,revision:String(j?.serviceConfig?.revision||''),updateTime:String(j?.updateTime||''),error:redact(j?.error?.message||j?.message||'')};const since=new Date(Date.now()-4*60*60*1000).toISOString();const filter=`timestamp>=\"${since}\" AND (resource.type=\"cloud_run_revision\" OR resource.type=\"cloud_function\") AND (resource.labels.service_name=\"orbit360productinsurercredentialcommand\" OR resource.labels.function_name=\"${FUNCTION}\" OR SEARCH(\"${FUNCTION}\"))`;const lr=await fetch('https://logging.googleapis.com/v2/entries:list',{method:'POST',headers:{...headers,'Content-Type':'application/json'},body:JSON.stringify({resourceNames:[`projects/${PROJECT}`],filter,orderBy:'timestamp desc',pageSize:40})});const lj=await lr.json().catch(()=>({}));out.logs.queried=true;if(!lr.ok)out.logs.error=`HTTP_${lr.status}:`+redact(lj?.error?.message||'');else out.logs.entries=(lj.entries||[]).map(e=>({timestamp:String(e.timestamp||''),severity:String(e.severity||''),resourceType:String(e.resource?.type||''),service:String(e.resource?.labels?.service_name||e.resource?.labels?.function_name||''),revision:String(e.resource?.labels?.revision_name||''),message:redact(e.textPayload||e.jsonPayload?.message||e.jsonPayload?.error||e.protoPayload?.status?.message||'')})).filter(e=>e.message||['ERROR','CRITICAL','ALERT','EMERGENCY'].includes(e.severity)).slice(0,20);}catch(e){out.logs.error=redact(e?.message||e);}return out;}
-const sa=serviceAccount();const app=initializeApp({credential:cert(sa),projectId:PROJECT},'gravicentra-i4a-runtime-boundary-v2'),auth=getAuth(app),db=getFirestore(app);const evidence={schemaVersion:'gravicentra-i4a-runtime-boundary-v2',gate:'I4A',status:'BOUNDARY_DIAGNOSTIC_FAIL',sourceSha:SOURCE,buildId:BUILD,previewUrl:PREVIEW,productionTouched:false,dataTouched:false,writesExecuted:0,userIdentitiesRecorded:false,tokensRecorded:false,secretsRecorded:false,privilegedRole:'',policy:null,cloud:null,errors:[]};let browser,context;
-try{need(PREVIEW&&SOURCE&&BUILD,'I4A_BOUNDARY_ENV_INCOMPLETE');const memberships=await db.collection('tenants').doc(TENANT).collection('members').get(),listed=await auth.listUsers(1000),users=new Map(listed.users.map(u=>[u.uid,u])),pool=[];for(const doc of memberships.docs){const m=doc.data()||{},uid=clean(m.uid||doc.id),u=users.get(uid);if(!u||u.disabled||u.emailVerified!==true||!['active','activo'].includes(clean(m.status||m.estado).toLowerCase()))continue;const rs=roles(m);pool.push({uid,roles:rs,active:activeRole(m,rs)});}let selected=null,targetRole='';for(const r of PRIVILEGED){const exact=pool.find(x=>x.active===r&&x.roles.includes(r)),fallback=exact||pool.find(x=>x.roles.includes(r));if(fallback){selected=fallback;targetRole=r;break;}}need(selected&&targetRole,'I4A_NO_PRIVILEGED_ACTIVE_MEMBERSHIP');evidence.privilegedRole=targetRole;const token=await auth.createCustomToken(selected.uid,{gravicentraI4ARuntimeBoundaryReadOnly:true});browser=await chromium.launch({headless:true});context=await browser.newContext({viewport:{width:1440,height:1000}});const page=await context.newPage();page.setDefaultTimeout(12000);await page.goto(PREVIEW,{waitUntil:'domcontentloaded',timeout:20000});await page.waitForFunction(()=>!!Orbit?.productAppP0&&!!Orbit?.productRuntimeBrowserProvidersP0,null,{timeout:6000});await activate(page,token);await setRole(page,targetRole);evidence.policy=await policyBoundary(page);evidence.cloud=await cloudBoundary(sa);evidence.classification={policyPhraseIsTableRow:evidence.policy.tableRowPhraseCount>0,policyPhraseOnlyOutsideRows:evidence.policy.bodyPhraseCount>0&&evidence.policy.tableRowPhraseCount===0,policyStoreContainsPhrase:evidence.policy.rawSynthetic>0||evidence.policy.operationalSynthetic>0,effectivePolizasRenderReadsStore:evidence.policy.render.readsStoreAllPolizas===true,functionMetadataAvailable:evidence.cloud.metadata?.httpStatus===200,functionState:evidence.cloud.metadata?.state||''};evidence.status='BOUNDARY_DIAGNOSTIC_COMPLETE';}catch(e){evidence.errors.push(redact(e?.message||e));process.exitCode=1;}finally{if(context)await context.close().catch(()=>{});if(browser)await browser.close().catch(()=>{});await deleteApp(app).catch(()=>{});fs.mkdirSync(OUT,{recursive:true});fs.writeFileSync(path.join(OUT,'i4a-runtime-boundary.json'),JSON.stringify(evidence,null,2)+'\n');console.log('I4A_BOUNDARY_STATUS='+evidence.status);console.log('I4A_BOUNDARY_POLICY_TABLE_ROWS='+(evidence.policy?.tableRowPhraseCount??'NA'));console.log('I4A_BOUNDARY_POLICY_OUTSIDE_ROWS='+(evidence.classification?.policyPhraseOnlyOutsideRows===true?'YES':'NO'));console.log('I4A_BOUNDARY_FUNCTION_METADATA='+(evidence.classification?.functionMetadataAvailable===true?'PASS':'FAIL'));console.log('I4A_BOUNDARY_FUNCTION_STATE='+(evidence.classification?.functionState||'UNKNOWN'));console.log('I4A_BOUNDARY_WRITES=0');}
+
+async function policyBoundary(page){
+  await go(page,'#/polizas','polizas');
+  return await page.evaluate(async()=>{
+    const re=/entorno de validaci[oó]n/i;
+    const label=p=>[p?.id,p?.numero,p?.nombre,p?.descripcion,p?.referencia].map(x=>String(x||'').trim()).filter(Boolean).join(' | ');
+    const storeSnapshot=()=>{
+      let raw=[],all=[];
+      try{raw=Orbit?.store?.raw?.()?.polizas||[];}catch{}
+      try{all=Orbit?.store?.all?.('polizas')||[];}catch{}
+      const pack=rows=>({count:Array.isArray(rows)?rows.length:0,syntheticCount:(Array.isArray(rows)?rows:[]).map(label).filter(x=>re.test(x)).length,syntheticSample:(Array.isArray(rows)?rows:[]).map(label).filter(x=>re.test(x)).slice(0,4)});
+      return {raw:pack(raw),operational:pack(all)};
+    };
+    const domSnapshot=stage=>{
+      const rows=[...document.querySelectorAll('#host tbody tr')];
+      const hits=rows.map((tr,index)=>({tr,index,text:tr.textContent||''})).filter(x=>re.test(x.text)).map(x=>({index:x.index,cellCount:x.tr.cells?.length||0,phraseCellIndexes:[...(x.tr.cells||[])].map((td,i)=>re.test(td.textContent||'')?i:-1).filter(i=>i>=0),hasPolicyDetailHandler:!!x.tr.getAttribute('onclick'),rowText:String(x.text).replace(/\s+/g,' ').trim().slice(0,360)}));
+      return {stage,rowCount:rows.length,syntheticRowCount:hits.length,syntheticRows:hits,firstRows:rows.slice(0,4).map(tr=>String(tr.textContent||'').replace(/\s+/g,' ').trim().slice(0,220)),store:storeSnapshot()};
+    };
+    const mod=Orbit?.modules?.polizas||{};
+    const fn=f=>typeof f==='function'?Function.prototype.toString.call(f):'';
+    const chain={
+      current:fn(mod.render),
+      priorPolicyReceipts:fn(mod?.__policyReceiptsV1199?.render),
+      baseScopeOriginal:fn(mod?.__scopeV1198?.original),
+      accessWithScope:fn(Orbit?.access?.withScope),
+      accessScopedStore:fn(Orbit?.access?.scopedStore),
+      moduleKeys:Object.keys(mod)
+    };
+    const before=domSnapshot('before-stable-rerender');
+    let rerenderError='';
+    try{
+      const host=document.getElementById('host');
+      const out=mod.render?.(host);
+      if(out&&typeof out.then==='function')await out;
+    }catch(e){rerenderError=String(e?.message||e).slice(0,240);}
+    const immediate=domSnapshot('immediate-after-stable-rerender');
+    await new Promise(r=>setTimeout(r,80));
+    const after80=domSnapshot('after-80ms');
+    await new Promise(r=>setTimeout(r,520));
+    const after600=domSnapshot('after-600ms');
+    return {
+      route:Orbit?.route?.key||'',
+      currentUserRole:Orbit?.session?.rol?.()||'',
+      before,immediate,after80,after600,rerenderError,
+      renderChain:{
+        currentSourceLength:chain.current.length,
+        currentSource:chain.current.slice(0,1000),
+        priorPolicyReceiptsSourceLength:chain.priorPolicyReceipts.length,
+        priorPolicyReceiptsSource:chain.priorPolicyReceipts.slice(0,1200),
+        baseScopeOriginalSourceLength:chain.baseScopeOriginal.length,
+        baseScopeOriginalReadsStoreAllPolizas:chain.baseScopeOriginal.includes("S().all('polizas')")||chain.baseScopeOriginal.includes("all('polizas')"),
+        accessWithScopeSource:chain.accessWithScope.slice(0,1200),
+        accessScopedStoreSource:chain.accessScopedStore.slice(0,1800),
+        moduleKeys:chain.moduleKeys
+      },
+      scripts:[...document.scripts].map(s=>s.src||'').filter(src=>/poliz|policy-receipts|crm-v1198|access-scope/i.test(src)).map(src=>src.replace(location.origin,'')).slice(0,80)
+    };
+  });
+}
+
+async function cloudBoundary(sa){
+  const out={function:null,runService:null,error:''};
+  try{
+    const auth=new GoogleAuth({credentials:sa,scopes:['https://www.googleapis.com/auth/cloud-platform']});
+    const client=await auth.getClient(),headers=await client.getRequestHeaders();
+    const metaUrl=`https://cloudfunctions.googleapis.com/v2/projects/${PROJECT}/locations/${REGION}/functions/${FUNCTION}`;
+    const r=await fetch(metaUrl,{method:'GET',headers});
+    const j=await r.json().catch(()=>({}));
+    out.function={
+      httpStatus:r.status,
+      name:String(j?.name||''),
+      state:String(j?.state||''),
+      environment:String(j?.environment||''),
+      entryPoint:String(j?.buildConfig?.entryPoint||''),
+      runtime:String(j?.buildConfig?.runtime||''),
+      serviceAccountConfigured:!!j?.serviceConfig?.serviceAccountEmail,
+      uriConfigured:!!j?.serviceConfig?.uri,
+      updateTime:String(j?.updateTime||''),
+      error:redact(j?.error?.message||j?.message||'')
+    };
+    const runUrl=`https://run.googleapis.com/v2/projects/${PROJECT}/locations/${REGION}/services/${SERVICE}`;
+    const rr=await fetch(runUrl,{method:'GET',headers});
+    const rj=await rr.json().catch(()=>({}));
+    out.runService={
+      httpStatus:rr.status,
+      name:String(rj?.name||''),
+      latestReadyRevision:String(rj?.latestReadyRevision||''),
+      latestCreatedRevision:String(rj?.latestCreatedRevision||''),
+      generation:String(rj?.generation||''),
+      observedGeneration:String(rj?.observedGeneration||''),
+      createTime:String(rj?.createTime||''),
+      updateTime:String(rj?.updateTime||''),
+      uriConfigured:!!rj?.uri,
+      terminalConditionState:String((rj?.terminalCondition||{}).state||''),
+      error:redact(rj?.error?.message||rj?.message||'')
+    };
+  }catch(e){out.error=redact(e?.message||e);}
+  return out;
+}
+
+const sa=serviceAccount();
+const app=initializeApp({credential:cert(sa),projectId:PROJECT},'gravicentra-i4a-runtime-boundary-v3');
+const auth=getAuth(app),db=getFirestore(app);
+const evidence={schemaVersion:'gravicentra-i4a-runtime-boundary-v3',gate:'I4A',status:'BOUNDARY_DIAGNOSTIC_FAIL',sourceSha:SOURCE,buildId:BUILD,previewUrl:PREVIEW,productionTouched:false,dataTouched:false,writesExecuted:0,userIdentitiesRecorded:false,tokensRecorded:false,secretsRecorded:false,privilegedRole:'',policy:null,cloud:null,classification:null,errors:[]};
+let browser,context;
+try{
+  need(PREVIEW&&SOURCE&&BUILD,'I4A_BOUNDARY_ENV_INCOMPLETE');
+  const memberships=await db.collection('tenants').doc(TENANT).collection('members').get(),listed=await auth.listUsers(1000),users=new Map(listed.users.map(u=>[u.uid,u])),pool=[];
+  for(const doc of memberships.docs){const m=doc.data()||{},uid=clean(m.uid||doc.id),u=users.get(uid);if(!u||u.disabled||u.emailVerified!==true||!['active','activo'].includes(clean(m.status||m.estado).toLowerCase()))continue;const rs=roles(m);pool.push({uid,roles:rs,active:activeRole(m,rs)});}
+  let selected=null,targetRole='';
+  for(const r of PRIVILEGED){const exact=pool.find(x=>x.active===r&&x.roles.includes(r)),fallback=exact||pool.find(x=>x.roles.includes(r));if(fallback){selected=fallback;targetRole=r;break;}}
+  need(selected&&targetRole,'I4A_NO_PRIVILEGED_ACTIVE_MEMBERSHIP');
+  evidence.privilegedRole=targetRole;
+  const token=await auth.createCustomToken(selected.uid,{gravicentraI4ARuntimeBoundaryReadOnly:true});
+  browser=await chromium.launch({headless:true});context=await browser.newContext({viewport:{width:1440,height:1000}});const page=await context.newPage();page.setDefaultTimeout(12000);
+  await page.goto(PREVIEW,{waitUntil:'domcontentloaded',timeout:20000});await page.waitForFunction(()=>!!Orbit?.productAppP0&&!!Orbit?.productRuntimeBrowserProvidersP0,null,{timeout:6000});await activate(page,token);await setRole(page,targetRole);
+  evidence.policy=await policyBoundary(page);
+  evidence.cloud=await cloudBoundary(sa);
+  const p=evidence.policy,c=evidence.cloud;
+  const beforeSynthetic=p?.before?.syntheticRowCount||0,stableSynthetic=p?.after600?.syntheticRowCount||0;
+  evidence.classification={
+    policyInitialPhraseIsTableRow:beforeSynthetic>0,
+    policyStoreContainsPhraseBefore:(p?.before?.store?.raw?.syntheticCount||0)>0||(p?.before?.store?.operational?.syntheticCount||0)>0,
+    policyStableRerenderContainsPhrase:stableSynthetic>0,
+    policyStaleDomClearedByStableRerender:beforeSynthetic>0&&stableSynthetic===0&&((p?.after600?.store?.raw?.syntheticCount||0)===0)&&((p?.after600?.store?.operational?.syntheticCount||0)===0),
+    functionMetadataAvailable:c?.function?.httpStatus===200,
+    functionState:c?.function?.state||'',
+    functionEntryPoint:c?.function?.entryPoint||'',
+    runServiceMetadataAvailable:c?.runService?.httpStatus===200,
+    runLatestReadyRevision:c?.runService?.latestReadyRevision||''
+  };
+  evidence.status='BOUNDARY_DIAGNOSTIC_COMPLETE';
+}catch(e){evidence.errors.push(redact(e?.message||e));process.exitCode=1;}
+finally{
+  if(context)await context.close().catch(()=>{});if(browser)await browser.close().catch(()=>{});await deleteApp(app).catch(()=>{});
+  fs.mkdirSync(OUT,{recursive:true});fs.writeFileSync(path.join(OUT,'i4a-runtime-boundary.json'),JSON.stringify(evidence,null,2)+'\n');
+  console.log('I4A_BOUNDARY_STATUS='+evidence.status);
+  console.log('I4A_BOUNDARY_POLICY_BEFORE_ROWS='+(evidence.policy?.before?.syntheticRowCount??'NA'));
+  console.log('I4A_BOUNDARY_POLICY_AFTER_STABLE_RERENDER='+(evidence.policy?.after600?.syntheticRowCount??'NA'));
+  console.log('I4A_BOUNDARY_POLICY_STALE_DOM='+(evidence.classification?.policyStaleDomClearedByStableRerender===true?'YES':'NO'));
+  console.log('I4A_BOUNDARY_FUNCTION_METADATA='+(evidence.classification?.functionMetadataAvailable===true?'PASS':'FAIL'));
+  console.log('I4A_BOUNDARY_FUNCTION_STATE='+(evidence.classification?.functionState||'UNKNOWN'));
+  console.log('I4A_BOUNDARY_FUNCTION_ENTRYPOINT='+(evidence.classification?.functionEntryPoint||'UNKNOWN'));
+  console.log('I4A_BOUNDARY_RUN_REVISION='+(evidence.classification?.runLatestReadyRevision||'UNKNOWN'));
+  console.log('I4A_BOUNDARY_WRITES=0');
+}
