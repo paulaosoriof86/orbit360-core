@@ -14,7 +14,7 @@ function roles(m){const x=Array.isArray(m?.roles)?m.roles:Array.isArray(m?.roles
 function active(m,rs){return canon(m?.activeRole||m?.rolActivo||m?.defaultRole||m?.rolDefault||m?.roleDefault||rs[0]);}
 function sa(){for(const raw of [process.env.SA_DEFAULT,process.env.SA_ORBIT360_LAB,process.env.SA_ORBIT_360_LAB].filter(Boolean)){try{const x=JSON.parse(raw);if(x?.type==='service_account'&&x?.project_id===PROJECT&&x?.client_email&&x?.private_key)return x;}catch{}}throw new Error('SERVICE_ACCOUNT_UNAVAILABLE');}
 
-const app=initializeApp({credential:cert(sa()),projectId:PROJECT},'gravicentra-i4a-diag-v5'),auth=getAuth(app),db=getFirestore(app);
+const app=initializeApp({credential:cert(sa()),projectId:PROJECT},'gravicentra-i4a-diag-v6'),auth=getAuth(app),db=getFirestore(app);
 const ms=await db.collection('tenants').doc(TENANT).collection('members').get(),ul=await auth.listUsers(1000),users=new Map(ul.users.map(u=>[u.uid,u])),pool=[];
 for(const d of ms.docs){
   const m=d.data()||{},uid=clean(m.uid||d.id),u=users.get(uid),rs=roles(m);
@@ -24,9 +24,9 @@ for(const d of ms.docs){
 const target=pool.find(x=>x.active==='Dirección'&&x.roles.includes('Dirección'))||pool.find(x=>x.active==='SuperAdmin')||pool[0];
 fs.mkdirSync(OUT,{recursive:true});
 const ev={
-  schemaVersion:'gravicentra-i4a-bootstrap-diagnostic-v5',
+  schemaVersion:'gravicentra-i4a-bootstrap-diagnostic-v6',
   gate:'I4A',
-  purpose:'observe-startup-render-and-hydration-boundaries',
+  purpose:'observe-startup-render-hydration-and-main-thread-cost-boundaries',
   sourceSha:SOURCE,
   buildId:BUILD,
   previewUrl:PREVIEW,
@@ -90,13 +90,21 @@ async function one(browser,name){
           carteraPlan:sanitizePlan(qp.carteraPrimas||{})
         };
       };
+      const measure=(label,fn,repeats=1)=>{
+        const samples=[];let valueClass='';
+        for(let i=0;i<repeats;i++){
+          const t=performance.now();const v=fn();samples.push(round(performance.now()-t));
+          if(Array.isArray(v))valueClass='array:'+v.length;else if(v instanceof Map)valueClass='map:'+v.size;else valueClass=typeof v;
+        }
+        return {label,samplesMs:samples,maxMs:Math.max(...samples),valueClass};
+      };
 
       window.__timing={dispatch:[],sync:[]};
       const nativeDispatch=EventTarget.prototype.dispatchEvent;
       EventTarget.prototype.dispatchEvent=function(ev){
-        const tracked=ev&&['orbit:product-readonly-bootstrap','orbit:product-app','orbit:session','orbit:auth','orbit:store','hashchange'].includes(ev.type),phase=ev?.detail?.phase||'',t0=performance.now();
+        const tracked=ev&&['orbit:product-readonly-bootstrap','orbit:product-app','orbit:session','orbit:auth','orbit:store','hashchange'].includes(ev.type),phase=ev?.detail?.phase||'',collection=String(ev?.detail?.collection||''),t0=performance.now();
         try{return nativeDispatch.call(this,ev);}
-        finally{if(tracked)window.__timing.dispatch.push({type:ev.type,phase,ms:round(performance.now()-t0)});}
+        finally{if(tracked)window.__timing.dispatch.push({type:ev.type,phase,collection,ms:round(performance.now()-t0)});}
       };
       const old=Orbit.session,nativeSync=old.syncFromAuth;
       Orbit.session=Object.freeze(Object.assign({},old,{syncFromAuth:function(){const t=performance.now();try{return nativeSync.apply(old,arguments);}finally{window.__timing.sync.push({ms:round(performance.now()-t)});}}}));
@@ -108,11 +116,47 @@ async function one(browser,name){
       const activation={ok,error,durationMs:Math.round(performance.now()-started),timing:window.__timing,app:Orbit.productAppP0.status()};
       if(!ok)return {activation};
 
+      const perf={startedAtMs:round(performance.now()),emissions:[],clientRenders:[],heartbeats:[],atActivation:[],afterFinance:[],renderWrapped:false,listenerAttached:false};
+      const perfStart=performance.now();
+      try{
+        if(Orbit.store&&typeof Orbit.store.on==='function'){
+          Orbit.store.on('*',function(collection){perf.emissions.push({collection:String(collection||'*'),atMs:round(performance.now()-perfStart)});});
+          perf.listenerAttached=true;
+        }
+      }catch(e){perf.listenerError=String(e?.message||e);}
+      try{
+        const mod=Orbit.modules&&Orbit.modules.cliente360, nativeRender=mod&&mod.render;
+        if(mod&&typeof nativeRender==='function'){
+          mod.render=function(host){const t=performance.now();try{return nativeRender.apply(this,arguments);}finally{perf.clientRenders.push({atMs:round(performance.now()-perfStart),ms:round(performance.now()-t),route:String(Orbit?.route?.key||'')});}};
+          perf.renderWrapped=mod.render!==nativeRender;
+        }
+      }catch(e){perf.renderWrapError=String(e?.message||e);}
+      const timeCore=()=>[
+        measure('store.all(clientes)',()=>Orbit.store.all('clientes'),3),
+        measure('store.all(polizas)',()=>Orbit.store.all('polizas'),3),
+        measure('store.all(cobros)',()=>Orbit.store.all('cobros'),3),
+        measure('store.all(recibosEsperados)',()=>Orbit.store.all('recibosEsperados'),3),
+        measure('store.all(carteraPrimas)',()=>Orbit.store.all('carteraPrimas'),3),
+        measure('q.clientesResumenIndex',()=>Orbit.q.clientesResumenIndex(),3),
+        measure('q.carteraGlobal',()=>Orbit.q.carteraGlobal(),3)
+      ];
+      perf.atActivation=timeCore();
+
+      location.hash='#/cliente360';
+      const earlyDeadline=Date.now()+10000;
+      while(Date.now()<earlyDeadline){if(Orbit?.route?.key==='cliente360'&&document.querySelector('#host .page'))break;await delay(25);}
+      let hbRun=true;
+      const hbPromise=(async()=>{while(hbRun){const t=performance.now();await delay(20);const now=performance.now();perf.heartbeats.push({atMs:round(now-perfStart),delayMs:round(now-t)});}})();
+
       const hydration={atActivation:{counts:collectionCounts(),store:storeState()}};
       await delay(3000);
       hydration.after3s={counts:collectionCounts(),store:storeState()};
       await delay(5000);
       hydration.after8s={counts:collectionCounts(),store:storeState()};
+      hbRun=false;await hbPromise;
+      perf.afterFinance=timeCore();
+      perf.heartbeatSummary={count:perf.heartbeats.length,maxMs:perf.heartbeats.length?Math.max(...perf.heartbeats.map(x=>x.delayMs)):0,over1000:perf.heartbeats.filter(x=>x.delayMs>=1000).slice(0,20)};
+      perf.emissionCounts=perf.emissions.reduce((acc,x)=>(acc[x.collection]=(acc[x.collection]||0)+1,acc),{});
 
       location.hash='#/cliente360';
       const clientDeadline=Date.now()+10000;
@@ -169,7 +213,7 @@ async function one(browser,name){
         await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
         insurer.final=snap();
       }
-      return {activation,hydration,client,insurer};
+      return {activation,hydration,performanceDiscriminant:perf,client,insurer};
     },token);
     Object.assign(rec,out);
   }catch(e){
