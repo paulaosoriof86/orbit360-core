@@ -88,6 +88,14 @@ body.pre-auth #shell, body.pre-auth .topbar{filter:blur(0);}
   .lg-left{display:none}
 }
 
+/* I4A Login responsive causal fix — prevent nowrap eyebrow from expanding the form beyond narrow viewports. */
+@media(max-width:480px){
+  .lg-right{min-width:0;padding-left:18px;padding-right:18px}
+  .lg-card{min-width:0;max-width:100%}
+  .lg-box{max-width:100%}
+  .lg-box .lg-eyebrow{white-space:normal;max-width:100%;overflow-wrap:anywhere}
+}
+
 /* ---------- THEME PICKER POPOVER ---------- */
 .theme-pop{position:fixed;z-index:120;width:250px;background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);box-shadow:var(--sh-3);padding:14px}
 .theme-pop .tp-title{font-family:var(--f-display);font-weight:800;font-size:13px;margin-bottom:10px}
