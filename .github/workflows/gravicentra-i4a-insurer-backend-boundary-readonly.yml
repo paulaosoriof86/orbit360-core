@@ -1,0 +1,76 @@
+name: Gravicentra I4A Insurer Backend Boundary Readonly
+
+on:
+  push:
+    branches:
+      - recovery/fase-a-clean-20260831
+    paths:
+      - .github/workflows/gravicentra-i4a-insurer-backend-boundary-readonly.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  SOURCE_SHA: 0a20a0ee8939c8fe4d2b0904ddf5fda383363434
+  BUILD_ID: gi-i3-0a20a0ee8939-57f234755dc1
+
+jobs:
+  insurer-backend-boundary-readonly:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - name: Checkout Recovery evidence/source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install metadata auth dependency
+        shell: bash
+        run: npm install --no-save --ignore-scripts google-auth-library@10.3.0
+      - name: Prove exact insurer backend release boundary
+        env:
+          SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+          I4A_INSURER_BOUNDARY_DIR: ${{ runner.temp }}/gravicentra-i4a-insurer-boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$I4A_INSURER_BOUNDARY_DIR"
+          node tools/gravicentra-i4a-insurer-backend-boundary-readonly.mjs
+      - name: Publish sanitized boundary summary
+        if: always()
+        shell: bash
+        run: |
+          F="$RUNNER_TEMP/gravicentra-i4a-insurer-boundary/i4a-insurer-backend-boundary-readonly.json"
+          {
+            echo '## Gravicentra Insurance — I4A Aseguradoras backend boundary'
+            echo "- Source: \`$SOURCE_SHA\`"
+            echo "- Build: \`$BUILD_ID\`"
+            echo '- Production touched: false'
+            echo '- Data touched: false'
+            echo '- Function invocations: 0'
+            echo '- Writes executed: 0'
+            if [ -f "$F" ]; then
+              echo "- Decision: \`$(jq -r '.decision' "$F")\`"
+              echo "- Cloud metadata: \`$(jq -c '.cloud' "$F")\`"
+              echo "- Checks: \`$(jq -c '.checks' "$F")\`"
+            else
+              echo '- Decision: `NO_EVIDENCE_FAIL_CLOSED`'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Preserve insurer boundary evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i4a-insurer-boundary-${{ github.run_id }}
+          path: ${{ runner.temp }}/gravicentra-i4a-insurer-boundary
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 30
