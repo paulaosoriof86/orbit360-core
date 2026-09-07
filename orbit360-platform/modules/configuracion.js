@@ -560,7 +560,7 @@ Orbit.modules.configuracion = (function () {
   }
   function gate(el, action, label, reset){ var m=reason(label, reset); if(!m) return false; audit(action,m,'antes'); return true; }
   function scrub(root){
-    root=root||document.body;
+    root=root||document.querySelector('#cfg-body'); if(!root)return;
     var repl=[[/\bAuth\s*backend\b/gi,'acceso seguro'],[/\bbackend\b/gi,'canal seguro'],[/\bLAB\b/g,'entorno de validación'],[/\bFirebase\b/g,'servicio seguro'],[/\bFirestore\b/g,'servicio seguro'],[/\blocalStorage\b/g,'almacenamiento seguro'],[/\bmock\b/gi,'entorno de prueba'],[/\bdemo\b/gi,'entorno de prueba'],[/\bsmoke\b/gi,'validación'],[/\bcredenciales\b/gi,'referencias de conexión'],[/\bAPI key\b/gi,'referencia de conexión']];
     function clean(s){ repl.forEach(function(p){s=String(s).replace(p[0],p[1]);}); return s; }
     try{ var w=document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {acceptNode:function(n){var p=n.parentElement; return !p||/script|style|code|pre/i.test(p.tagName)||!n.nodeValue.trim()?NodeFilter.FILTER_REJECT:NodeFilter.FILTER_ACCEPT;}}), nodes=[]; while(w.nextNode()) nodes.push(w.currentNode); nodes.forEach(function(n){var x=clean(n.nodeValue); if(x!==n.nodeValue)n.nodeValue=x;}); root.querySelectorAll('[title],[placeholder],[aria-label]').forEach(function(el){['title','placeholder','aria-label'].forEach(function(a){var v=el.getAttribute(a); if(v){var x=clean(v); if(x!==v)el.setAttribute(a,x);}});}); }catch(e){}
@@ -586,8 +586,8 @@ Orbit.modules.configuracion = (function () {
     if(!gate(el,'cambiar_plan','cambiar plan',false)) return;
     if(approved) approved.add(el); setTimeout(function(){ try{el.dispatchEvent(new Event('change',{bubbles:true}));}catch(e){} },0);
   }, true);
-  setTimeout(function(){scrub(document.querySelector('#cfg-body')||document.body);},250);
-  setTimeout(function(){scrub(document.querySelector('#cfg-body')||document.body);},1000);
-  try{ new MutationObserver(function(){scrub(document.querySelector('#cfg-body')||document.body);}).observe(document.body,{childList:true,subtree:true}); }catch(e){}
+  setTimeout(function(){scrub(document.querySelector('#cfg-body'));},250);
+  setTimeout(function(){scrub(document.querySelector('#cfg-body'));},1000);
+  try{ new MutationObserver(function(){scrub(document.querySelector('#cfg-body'));}).observe(document.body,{childList:true,subtree:true}); }catch(e){}
 })();
 // ORBIT360 V1330 CONFIGURACION GATES PATCH END

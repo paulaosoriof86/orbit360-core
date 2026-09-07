@@ -18,8 +18,13 @@ Orbit.q = (function () {
 
   // ---- por cliente ----
   function polizasDe(cliId) { return S().where('polizas', p => p.clienteId === cliId); }
-  function recibosEsperadosDe(cliId) { return S().where('recibosEsperados', r => r.clienteId === cliId); }
-  function carteraPrimasDe(cliId) { return S().where('carteraPrimas', r => r.clienteId === cliId); }
+  function policyLinkedClientId(row) {
+    if (!row || row.polizaId == null) return null;
+    const policy = S().get('polizas', row.polizaId);
+    return policy && policy.clienteId != null ? policy.clienteId : null;
+  }
+  function recibosEsperadosDe(cliId) { return S().where('recibosEsperados', r => policyLinkedClientId(r) === cliId); }
+  function carteraPrimasDe(cliId) { return S().where('carteraPrimas', r => policyLinkedClientId(r) === cliId); }
   function cobrosDe(cliId) { return S().where('cobros', c => c.clienteId === cliId); }
   function comisionesDe(cliId) { return S().where('comisiones', c => c.clienteId === cliId); }
   function actividadesDe(cliId) {
@@ -67,7 +72,7 @@ Orbit.q = (function () {
     const cob = cobrosDe(cliId);
     const com = comisionesDe(cliId);
     const vigentes = pol.filter(p => p.estado === 'Vigente' || p.estado === 'Por renovar');
-    const primaAnual = vigentes.reduce((s, p) => s + amount(p.prima), 0);
+    const primaAnual = vigentes.reduce((s, p) => s + amount(p.primaTotal), 0);
     const cobrado = cob.filter(confirmedCobro).reduce((s, c) => s + amount(c.monto), 0);
     const pendiente = car.filter(r => portfolioOpen(r) && !portfolioIsOverdue(r)).reduce((s, r) => s + amount(r.monto != null ? r.monto : r.saldo), 0);
     const vencido = car.filter(portfolioIsOverdue).reduce((s, r) => s + amount(r.monto != null ? r.monto : r.saldo), 0);
@@ -97,15 +102,15 @@ Orbit.q = (function () {
     const cartera = S().all('carteraPrimas') || [];
     const cobros = S().all('cobros') || [];
     const comisiones = S().all('comisiones') || [];
-    const polByClient = new Map(), recByClient = new Map(), carByClient = new Map(), cobByClient = new Map(), comByClient = new Map();
+    const polByClient = new Map(), polById = new Map(), recByClient = new Map(), carByClient = new Map(), cobByClient = new Map(), comByClient = new Map();
     const add = (map, id, row) => {
       if (id == null) return;
       if (!map.has(id)) map.set(id, []);
       map.get(id).push(row);
     };
-    polizas.forEach(p => add(polByClient, p.clienteId, p));
-    recibos.forEach(r => add(recByClient, r.clienteId, r));
-    cartera.forEach(r => add(carByClient, r.clienteId, r));
+    polizas.forEach(p => { add(polByClient, p.clienteId, p); if (p && p.id != null) polById.set(p.id, p); });
+    recibos.forEach(r => { const p = r && polById.get(r.polizaId); if (p) add(recByClient, p.clienteId, r); });
+    cartera.forEach(r => { const p = r && polById.get(r.polizaId); if (p) add(carByClient, p.clienteId, r); });
     cobros.forEach(c => add(cobByClient, c.clienteId, c));
     comisiones.forEach(c => add(comByClient, c.clienteId, c));
 
@@ -118,7 +123,7 @@ Orbit.q = (function () {
       const cob = cobByClient.get(cli.id) || [];
       const com = comByClient.get(cli.id) || [];
       const vigentes = pol.filter(p => p.estado === 'Vigente' || p.estado === 'Por renovar');
-      const primaAnual = vigentes.reduce((s, p) => s + amount(p.prima), 0);
+      const primaAnual = vigentes.reduce((s, p) => s + amount(p.primaTotal), 0);
       const cobrado = cob.filter(confirmedCobro).reduce((s, c) => s + amount(c.monto), 0);
       const pendiente = car.filter(r => portfolioOpen(r) && !portfolioIsOverdue(r)).reduce((s, r) => s + amount(r.monto != null ? r.monto : r.saldo), 0);
       const vencido = car.filter(portfolioIsOverdue).reduce((s, r) => s + amount(r.monto != null ? r.monto : r.saldo), 0);
@@ -149,13 +154,22 @@ Orbit.q = (function () {
   const norm = (m, cur) => { const n = finite(m); if (n == null) return 0; if (paisActivo()) return n; return cur === 'COP' ? n / TC_COP_GTQ : n; };
   function clientIndex() { return new Map((S().all('clientes') || []).filter(c => c && c.id).map(c => [c.id, c])); }
   function rowPais(row, clients) { const cli = clients instanceof Map ? clients.get(row.clienteId) : S().get('clientes', row.clienteId); const p = paisActivo(); return !p || (cli && cli.pais === p) || row.pais === p; }
+  function policyLinkedRowPais(row, clients, policies) {
+    if (!row || row.polizaId == null) return false;
+    const policy = policies instanceof Map ? policies.get(row.polizaId) : S().get('polizas', row.polizaId);
+    if (!policy || policy.clienteId == null) return false;
+    const cli = clients instanceof Map ? clients.get(policy.clienteId) : S().get('clientes', policy.clienteId);
+    const p = paisActivo();
+    return !p || !!(cli && cli.pais === p);
+  }
   function polPais(p2, clients) { const cli = clients instanceof Map ? clients.get(p2.clienteId) : S().get('clientes', p2.clienteId); const p = paisActivo(); return !p || (cli && cli.pais === p); }
 
   /** Cartera Primas es la autoridad de pendiente/vencido; Cobros solo aporta recaudo confirmado. */
   function carteraGlobal() {
     const clients = clientIndex();
+    const policies = new Map((S().all('polizas') || []).filter(p => p && p.id != null).map(p => [p.id, p]));
     const cob = (S().all('cobros') || []).filter(c => rowPais(c, clients));
-    const car = (S().all('carteraPrimas') || []).filter(c => rowPais(c, clients));
+    const car = (S().all('carteraPrimas') || []).filter(c => policyLinkedRowPais(c, clients, policies));
     const alDia = cob.filter(confirmedCobro).reduce((s, c) => s + norm(c.monto, c.moneda), 0);
     const pend = car.filter(r => portfolioOpen(r) && !portfolioIsOverdue(r)).reduce((s, r) => s + norm(r.monto != null ? r.monto : r.saldo, r.moneda), 0);
     const venc = car.filter(portfolioIsOverdue).reduce((s, r) => s + norm(r.monto != null ? r.monto : r.saldo, r.moneda), 0);
@@ -164,7 +178,7 @@ Orbit.q = (function () {
   function primaVigenteGlobal() {
     const clients = clientIndex();
     return S().where('polizas', p => (p.estado === 'Vigente' || p.estado === 'Por renovar') && polPais(p, clients))
-      .reduce((s, p) => s + norm(p.prima, p.moneda), 0);
+      .reduce((s, p) => s + norm(p.primaTotal, p.moneda), 0);
   }
   function renovacionesProximas(dias) {
     dias = dias || 45;

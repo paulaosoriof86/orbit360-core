@@ -9,6 +9,7 @@ Orbit.modules = Orbit.modules || {};
 Orbit.modules.cliente360 = (function () {
   const U = Orbit.ui, q = Orbit.q, S = () => Orbit.store;
   const esRenovable = p => p && (p.estado === 'Vigente' || p.estado === 'Por renovar');
+  const policyTotal = p => U.finiteNumber(p && p.primaTotal);
 
   let host;
   let filtros = { q: '', pais: '', tipo: '', asesor: '', seg: '' };
@@ -98,7 +99,7 @@ Orbit.modules.cliente360 = (function () {
       const pol = policyByClient.get(c.id) || [];
       const cob = collectionByClient.get(c.id) || [];
       const vigentes = pol.filter(esRenovable);
-      const primaAnual = vigentes.reduce((s, p) => s + (U.finiteNumber(p.prima) || 0), 0);
+      const primaAnual = vigentes.reduce((s, p) => s + (policyTotal(p) || 0), 0);
       const pendiente = cob.filter(x => x.estado === 'Pendiente').reduce((s, x) => s + (U.finiteNumber(x.monto) || 0), 0);
       const vencido = cob.filter(x => x.estado === 'Vencido').reduce((s, x) => s + (U.finiteNumber(x.monto) || 0), 0);
       let salud = 70;
@@ -114,7 +115,9 @@ Orbit.modules.cliente360 = (function () {
       if (!esRenovable(p)) return s;
       const cli = clientById.get(p.clienteId);
       if (!cli) return s;
-      return s + (cli.moneda === 'COP' ? p.prima / 1000 : p.prima);
+      const total = policyTotal(p);
+      if (total == null) return s;
+      return s + (cli.moneda === 'COP' ? total / 1000 : total);
     }, 0);
     const activePolicyCount = policiesForList.filter(esRenovable).length;
     const totalPolicyCount = policiesForList.length;
@@ -369,7 +372,7 @@ Orbit.modules.cliente360 = (function () {
     const proxCobro = r.cob.filter(c => c.estado === 'Pendiente').sort((a, b) => String(a.vence||'').localeCompare(String(b.vence||'')))[0];
     // distribución por ramo
     const porRamo = {};
-    r.pol.filter(esRenovable).forEach(p => porRamo[p.ramo] = (porRamo[p.ramo] || 0) + p.prima);
+    r.pol.filter(esRenovable).forEach(p => porRamo[p.ramo] = (porRamo[p.ramo] || 0) + (policyTotal(p) || 0));
     const totalRamo = Object.values(porRamo).reduce((s, v) => s + v, 0) || 1;
     const ramoCols = ['#C5162E', '#1E2227', '#1f3a5f', '#1f8a4c', '#c9821b', '#6b4ea0', '#0f766e'];
 
@@ -430,7 +433,7 @@ Orbit.modules.cliente360 = (function () {
           <td><b>${p.ramo}</b><div class="muted" style="font-size:12px">${p.producto}</div></td>
           <td><span style="display:flex;align-items:center;gap:7px"><span class="dot-s" style="background:${asg ? asg.color : '#999'}"></span>${U.esc(asg ? asg.nombre : '—')}</span></td>
           <td>${p.forma}</td>
-          <td class="num">${U.money(p.prima, p.moneda)}</td>
+          <td class="num">${policyTotal(p) == null ? 'Pendiente de completar' : U.money(policyTotal(p), p.moneda)}</td>
           <td style="font-size:12.5px">${U.fmtDate(p.vigenciaInicio)}<div class="muted">→ ${U.fmtDate(p.vigenciaFin)}</div></td>
           <td>${U.estadoBadge(p.estado)}</td>
           <td style="text-align:right;color:var(--ink-3)">›</td>
