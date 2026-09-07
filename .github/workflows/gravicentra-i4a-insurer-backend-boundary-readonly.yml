@@ -6,6 +6,9 @@ on:
       - recovery/fase-a-clean-20260831
     paths:
       - .github/workflows/gravicentra-i4a-insurer-backend-boundary-readonly.yml
+      - tools/gravicentra-i4a-insurer-backend-boundary-readonly.mjs
+      - tools/gravicentra-release-lineage-guard.mjs
+      - artifacts/orbit360-recovery/release-control/ACTIVE_RELEASE_LOCK.json
   workflow_dispatch:
 
 permissions:
@@ -25,12 +28,15 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
-          fetch-depth: 1
+          fetch-depth: 0
           persist-credentials: false
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Verify certified release lock
+        shell: bash
+        run: node tools/gravicentra-release-lineage-guard.mjs --mode=certified
       - name: Install metadata auth dependency
         shell: bash
         run: npm install --no-save --ignore-scripts google-auth-library@10.3.0
