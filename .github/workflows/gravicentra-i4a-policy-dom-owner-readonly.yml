@@ -1,0 +1,73 @@
+name: Gravicentra I4A Policy DOM Owner Readonly
+
+on:
+  push:
+    branches:
+      - recovery/fase-a-clean-20260831
+    paths:
+      - .github/workflows/gravicentra-i4a-policy-dom-owner-readonly.yml
+      - tools/gravicentra-i4a-policy-dom-owner-diagnostic.mjs
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  SOURCE_SHA: 2c0f27707815b2bbe46b96cbb665d33e8b870bfe
+  BUILD_ID: gi-i3-2c0f27707815-57f234755dc1
+  PREVIEW_URL: https://ays-orbit-360-lab--gi-i3-34057920449-o3u7u4ao.web.app
+
+jobs:
+  policy-dom-owner-readonly:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install read-only diagnostic dependencies
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false playwright@1.55.0 firebase-admin@13.10.0 >/dev/null
+          npx playwright install --with-deps chromium >/dev/null
+      - name: Capture exact policy DOM write owner
+        env:
+          I4A_POLICY_OWNER_EVIDENCE_DIR: ${{ runner.temp }}/gravicentra-i4a-policy-dom-owner
+          SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+        run: node tools/gravicentra-i4a-policy-dom-owner-diagnostic.mjs
+      - name: Publish owner summary
+        if: always()
+        env:
+          EVIDENCE: ${{ runner.temp }}/gravicentra-i4a-policy-dom-owner/i4a-policy-dom-owner.json
+        run: |
+          set -euo pipefail
+          {
+            echo '## Gravicentra Insurance — I4A Pólizas DOM owner read-only'
+            echo "- Source under test: \`$SOURCE_SHA\`"
+            echo "- Build ID: \`$BUILD_ID\`"
+            if [ -f "$EVIDENCE" ]; then
+              echo "- Status: \`$(jq -r '.status' "$EVIDENCE")\`"
+              echo "- Initial synthetic rows: \`$(jq -r '.classification.initialSyntheticRows // -1' "$EVIDENCE")\`"
+              echo "- Immediate synthetic rows: \`$(jq -r '.classification.immediateSyntheticRows // -1' "$EVIDENCE")\`"
+              echo "- Delayed synthetic rows: \`$(jq -r '.classification.delayedSyntheticRows // -1' "$EVIDENCE")\`"
+              echo "- DOM write traces: \`$(jq -r '.classification.writeTraceCount // 0' "$EVIDENCE")\`"
+              echo "- Writes executed: \`$(jq -r '.writesExecuted' "$EVIDENCE")\`"
+            else
+              echo '- Status: `NO_EVIDENCE_FAIL_CLOSED`'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Preserve owner evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i4a-policy-dom-owner-${{ github.run_id }}
+          path: ${{ runner.temp }}/gravicentra-i4a-policy-dom-owner
+          if-no-files-found: error
+          retention-days: 30
