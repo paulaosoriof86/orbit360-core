@@ -2,10 +2,8 @@ name: Gravicentra I4A Causal Source Fix
 
 on:
   push:
-    branches:
-      - recovery/fase-a-clean-20260831
-    paths:
-      - .github/workflows/gravicentra-i4a-causal-source-fix.yml
+    branches: [recovery/fase-a-clean-20260831]
+    paths: [.github/workflows/gravicentra-i4a-causal-source-fix.yml]
   workflow_dispatch:
 
 permissions:
@@ -28,100 +26,47 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Verify authority branch and patch causal owners only
+      - name: Patch only physically closed causal owners
         shell: bash
         run: |
           set -euo pipefail
           test "${GITHUB_REF_NAME}" = "recovery/fase-a-clean-20260831"
           python3 - <<'PY'
           from pathlib import Path
-
-          def replace_exact(path, old, new, expected=1):
-              p=Path(path)
-              text=p.read_text(encoding='utf-8')
-              count=text.count(old)
-              if count != expected:
-                  raise SystemExit(f'PATCH_PRECONDITION_FAIL:{path}:expected={expected}:actual={count}:{old[:80]!r}')
+          def rx(path, old, new, expected=1):
+              p=Path(path); text=p.read_text(encoding='utf-8'); n=text.count(old)
+              if n!=expected: raise SystemExit(f'PATCH_PRECONDITION_FAIL:{path}:expected={expected}:actual={n}:{old[:90]!r}')
               p.write_text(text.replace(old,new),encoding='utf-8')
 
-          # 1) Pólizas: Configuración must never scrub the whole product DOM.
           cfg='orbit360-platform/modules/configuracion.js'
-          replace_exact(cfg,
-              "root=root||document.body;",
-              "root=root||document.querySelector('#cfg-body'); if(!root)return;")
-          replace_exact(cfg,
-              "setTimeout(function(){scrub(document.querySelector('#cfg-body')||document.body);},250);",
-              "setTimeout(function(){scrub(document.querySelector('#cfg-body'));},250);")
-          replace_exact(cfg,
-              "setTimeout(function(){scrub(document.querySelector('#cfg-body')||document.body);},1000);",
-              "setTimeout(function(){scrub(document.querySelector('#cfg-body'));},1000);")
-          replace_exact(cfg,
-              "try{ new MutationObserver(function(){scrub(document.querySelector('#cfg-body')||document.body);}).observe(document.body,{childList:true,subtree:true}); }catch(e){}",
-              "try{ new MutationObserver(function(){scrub(document.querySelector('#cfg-body'));}).observe(document.body,{childList:true,subtree:true}); }catch(e){}")
+          rx(cfg,"root=root||document.body;","root=root||document.querySelector('#cfg-body'); if(!root)return;")
+          rx(cfg,"setTimeout(function(){scrub(document.querySelector('#cfg-body')||document.body);},250);","setTimeout(function(){scrub(document.querySelector('#cfg-body'));},250);")
+          rx(cfg,"setTimeout(function(){scrub(document.querySelector('#cfg-body')||document.body);},1000);","setTimeout(function(){scrub(document.querySelector('#cfg-body'));},1000);")
+          rx(cfg,"try{ new MutationObserver(function(){scrub(document.querySelector('#cfg-body')||document.body);}).observe(document.body,{childList:true,subtree:true}); }catch(e){}","try{ new MutationObserver(function(){scrub(document.querySelector('#cfg-body'));}).observe(document.body,{childList:true,subtree:true}); }catch(e){}")
 
-          # 2) Cliente 360: canonical annual premium is primaTotal; no implicit p.prima fallback.
-          c360='orbit360-platform/modules/cliente360.js'
-          replace_exact(c360,
-              "  const esRenovable = p => p && (p.estado === 'Vigente' || p.estado === 'Por renovar');\n",
-              "  const esRenovable = p => p && (p.estado === 'Vigente' || p.estado === 'Por renovar');\n  const policyTotal = p => U.finiteNumber(p && p.primaTotal);\n")
-          replace_exact(c360,
-              "      const primaAnual = vigentes.reduce((s, p) => s + (U.finiteNumber(p.prima) || 0), 0);",
-              "      const primaAnual = vigentes.reduce((s, p) => s + (policyTotal(p) || 0), 0);")
-          replace_exact(c360,
-              "      return s + (cli.moneda === 'COP' ? p.prima / 1000 : p.prima);",
-              "      const total = policyTotal(p);\n      if (total == null) return s;\n      return s + (cli.moneda === 'COP' ? total / 1000 : total);")
-          replace_exact(c360,
-              "    r.pol.filter(esRenovable).forEach(p => porRamo[p.ramo] = (porRamo[p.ramo] || 0) + p.prima);",
-              "    r.pol.filter(esRenovable).forEach(p => porRamo[p.ramo] = (porRamo[p.ramo] || 0) + (policyTotal(p) || 0));")
-          replace_exact(c360,
-              "          <td class=\"num\">${U.money(p.prima, p.moneda)}</td>",
-              "          <td class=\"num\">${policyTotal(p) == null ? 'Pendiente de completar' : U.money(policyTotal(p), p.moneda)}</td>")
+          c='orbit360-platform/modules/cliente360.js'
+          rx(c,"  const esRenovable = p => p && (p.estado === 'Vigente' || p.estado === 'Por renovar');\n","  const esRenovable = p => p && (p.estado === 'Vigente' || p.estado === 'Por renovar');\n  const policyTotal = p => U.finiteNumber(p && p.primaTotal);\n")
+          rx(c,"      const primaAnual = vigentes.reduce((s, p) => s + (U.finiteNumber(p.prima) || 0), 0);","      const primaAnual = vigentes.reduce((s, p) => s + (policyTotal(p) || 0), 0);")
+          rx(c,"      return s + (cli.moneda === 'COP' ? p.prima / 1000 : p.prima);","      const total = policyTotal(p);\n      if (total == null) return s;\n      return s + (cli.moneda === 'COP' ? total / 1000 : total);")
+          rx(c,"    r.pol.filter(esRenovable).forEach(p => porRamo[p.ramo] = (porRamo[p.ramo] || 0) + p.prima);","    r.pol.filter(esRenovable).forEach(p => porRamo[p.ramo] = (porRamo[p.ramo] || 0) + (policyTotal(p) || 0));")
+          rx(c,"          <td class=\"num\">${U.money(p.prima, p.moneda)}</td>","          <td class=\"num\">${policyTotal(p) == null ? 'Pendiente de completar' : U.money(policyTotal(p), p.moneda)}</td>")
 
-          # 3) Queries: Recibos/Cartera join through policy; Cobros remains direct by clienteId.
           q='orbit360-platform/core/queries.js'
-          replace_exact(q,
-              "  function polizasDe(cliId) { return S().where('polizas', p => p.clienteId === cliId); }\n  function recibosEsperadosDe(cliId) { return S().where('recibosEsperados', r => r.clienteId === cliId); }\n  function carteraPrimasDe(cliId) { return S().where('carteraPrimas', r => r.clienteId === cliId); }",
-              "  function polizasDe(cliId) { return S().where('polizas', p => p.clienteId === cliId); }\n  function policyLinkedClientId(row) {\n    if (!row || row.polizaId == null) return null;\n    const policy = S().get('polizas', row.polizaId);\n    return policy && policy.clienteId != null ? policy.clienteId : null;\n  }\n  function recibosEsperadosDe(cliId) { return S().where('recibosEsperados', r => policyLinkedClientId(r) === cliId); }\n  function carteraPrimasDe(cliId) { return S().where('carteraPrimas', r => policyLinkedClientId(r) === cliId); }")
-          replace_exact(q,
-              "    const primaAnual = vigentes.reduce((s, p) => s + amount(p.prima), 0);",
-              "    const primaAnual = vigentes.reduce((s, p) => s + amount(p.primaTotal), 0);",
-              expected=1)
-          replace_exact(q,
-              "    const polByClient = new Map(), recByClient = new Map(), carByClient = new Map(), cobByClient = new Map(), comByClient = new Map();",
-              "    const polByClient = new Map(), polById = new Map(), recByClient = new Map(), carByClient = new Map(), cobByClient = new Map(), comByClient = new Map();")
-          replace_exact(q,
-              "    polizas.forEach(p => add(polByClient, p.clienteId, p));\n    recibos.forEach(r => add(recByClient, r.clienteId, r));\n    cartera.forEach(r => add(carByClient, r.clienteId, r));",
-              "    polizas.forEach(p => { add(polByClient, p.clienteId, p); if (p && p.id != null) polById.set(p.id, p); });\n    recibos.forEach(r => { const p = r && polById.get(r.polizaId); if (p) add(recByClient, p.clienteId, r); });\n    cartera.forEach(r => { const p = r && polById.get(r.polizaId); if (p) add(carByClient, p.clienteId, r); });")
-          replace_exact(q,
-              "      const primaAnual = vigentes.reduce((s, p) => s + amount(p.prima), 0);",
-              "      const primaAnual = vigentes.reduce((s, p) => s + amount(p.primaTotal), 0);",
-              expected=1)
-          replace_exact(q,
-              "  function rowPais(row, clients) { const cli = clients instanceof Map ? clients.get(row.clienteId) : S().get('clientes', row.clienteId); const p = paisActivo(); return !p || (cli && cli.pais === p) || row.pais === p; }\n  function polPais(p2, clients) {",
-              "  function rowPais(row, clients) { const cli = clients instanceof Map ? clients.get(row.clienteId) : S().get('clientes', row.clienteId); const p = paisActivo(); return !p || (cli && cli.pais === p) || row.pais === p; }\n  function policyLinkedRowPais(row, clients, policies) {\n    if (!row || row.polizaId == null) return false;\n    const policy = policies instanceof Map ? policies.get(row.polizaId) : S().get('polizas', row.polizaId);\n    if (!policy || policy.clienteId == null) return false;\n    const cli = clients instanceof Map ? clients.get(policy.clienteId) : S().get('clientes', policy.clienteId);\n    const p = paisActivo();\n    return !p || !!(cli && cli.pais === p);\n  }\n  function polPais(p2, clients) {")
-          replace_exact(q,
-              "    const clients = clientIndex();\n    const cob = (S().all('cobros') || []).filter(c => rowPais(c, clients));\n    const car = (S().all('carteraPrimas') || []).filter(c => rowPais(c, clients));",
-              "    const clients = clientIndex();\n    const policies = new Map((S().all('polizas') || []).filter(p => p && p.id != null).map(p => [p.id, p]));\n    const cob = (S().all('cobros') || []).filter(c => rowPais(c, clients));\n    const car = (S().all('carteraPrimas') || []).filter(c => policyLinkedRowPais(c, clients, policies));")
-          replace_exact(q,
-              "      .reduce((s, p) => s + norm(p.prima, p.moneda), 0);",
-              "      .reduce((s, p) => s + norm(p.primaTotal, p.moneda), 0);",
-              expected=1)
+          rx(q,"  function polizasDe(cliId) { return S().where('polizas', p => p.clienteId === cliId); }\n  function recibosEsperadosDe(cliId) { return S().where('recibosEsperados', r => r.clienteId === cliId); }\n  function carteraPrimasDe(cliId) { return S().where('carteraPrimas', r => r.clienteId === cliId); }","  function polizasDe(cliId) { return S().where('polizas', p => p.clienteId === cliId); }\n  function policyLinkedClientId(row) {\n    if (!row || row.polizaId == null) return null;\n    const policy = S().get('polizas', row.polizaId);\n    return policy && policy.clienteId != null ? policy.clienteId : null;\n  }\n  function recibosEsperadosDe(cliId) { return S().where('recibosEsperados', r => policyLinkedClientId(r) === cliId); }\n  function carteraPrimasDe(cliId) { return S().where('carteraPrimas', r => policyLinkedClientId(r) === cliId); }")
+          rx(q,"    const primaAnual = vigentes.reduce((s, p) => s + amount(p.prima), 0);","    const primaAnual = vigentes.reduce((s, p) => s + amount(p.primaTotal), 0);",expected=2)
+          rx(q,"    const polByClient = new Map(), recByClient = new Map(), carByClient = new Map(), cobByClient = new Map(), comByClient = new Map();","    const polByClient = new Map(), polById = new Map(), recByClient = new Map(), carByClient = new Map(), cobByClient = new Map(), comByClient = new Map();")
+          rx(q,"    polizas.forEach(p => add(polByClient, p.clienteId, p));\n    recibos.forEach(r => add(recByClient, r.clienteId, r));\n    cartera.forEach(r => add(carByClient, r.clienteId, r));","    polizas.forEach(p => { add(polByClient, p.clienteId, p); if (p && p.id != null) polById.set(p.id, p); });\n    recibos.forEach(r => { const p = r && polById.get(r.polizaId); if (p) add(recByClient, p.clienteId, r); });\n    cartera.forEach(r => { const p = r && polById.get(r.polizaId); if (p) add(carByClient, p.clienteId, r); });")
+          rx(q,"  function rowPais(row, clients) { const cli = clients instanceof Map ? clients.get(row.clienteId) : S().get('clientes', row.clienteId); const p = paisActivo(); return !p || (cli && cli.pais === p) || row.pais === p; }\n  function polPais(p2, clients) {","  function rowPais(row, clients) { const cli = clients instanceof Map ? clients.get(row.clienteId) : S().get('clientes', row.clienteId); const p = paisActivo(); return !p || (cli && cli.pais === p) || row.pais === p; }\n  function policyLinkedRowPais(row, clients, policies) {\n    if (!row || row.polizaId == null) return false;\n    const policy = policies instanceof Map ? policies.get(row.polizaId) : S().get('polizas', row.polizaId);\n    if (!policy || policy.clienteId == null) return false;\n    const cli = clients instanceof Map ? clients.get(policy.clienteId) : S().get('clientes', policy.clienteId);\n    const p = paisActivo();\n    return !p || !!(cli && cli.pais === p);\n  }\n  function polPais(p2, clients) {")
+          rx(q,"    const clients = clientIndex();\n    const cob = (S().all('cobros') || []).filter(c => rowPais(c, clients));\n    const car = (S().all('carteraPrimas') || []).filter(c => rowPais(c, clients));","    const clients = clientIndex();\n    const policies = new Map((S().all('polizas') || []).filter(p => p && p.id != null).map(p => [p.id, p]));\n    const cob = (S().all('cobros') || []).filter(c => rowPais(c, clients));\n    const car = (S().all('carteraPrimas') || []).filter(c => policyLinkedRowPais(c, clients, policies));")
+          rx(q,"      .reduce((s, p) => s + norm(p.prima, p.moneda), 0);","      .reduce((s, p) => s + norm(p.primaTotal, p.moneda), 0);")
 
-          # Fail closed against the causal regressions.
-          cfg_text=Path(cfg).read_text(encoding='utf-8')
-          q_text=Path(q).read_text(encoding='utf-8')
-          c_text=Path(c360).read_text(encoding='utf-8')
-          if "scrub(document.querySelector('#cfg-body')||document.body)" in cfg_text or "root=root||document.body" in cfg_text:
-              raise SystemExit('CONFIG_GLOBAL_SCRUB_STILL_PRESENT')
-          if "recibosEsperados', r => r.clienteId === cliId" in q_text or "carteraPrimas', r => r.clienteId === cliId" in q_text:
-              raise SystemExit('FINANCIAL_DIRECT_CLIENT_JOIN_STILL_PRESENT')
-          if "primaAnual = vigentes.reduce((s, p) => s + amount(p.prima)" in q_text:
-              raise SystemExit('QUERY_PRIMA_LEGACY_SEMANTIC_STILL_PRESENT')
-          if "const primaAnual = vigentes.reduce((s, p) => s + (U.finiteNumber(p.prima)" in c_text:
-              raise SystemExit('CLIENT360_PRIMA_LEGACY_SEMANTIC_STILL_PRESENT')
+          a=Path(cfg).read_text(encoding='utf-8'); b=Path(q).read_text(encoding='utf-8'); d=Path(c).read_text(encoding='utf-8')
+          if "root=root||document.body" in a or "#cfg-body')||document.body" in a: raise SystemExit('CONFIG_GLOBAL_SCRUB_STILL_PRESENT')
+          if "recibosEsperados', r => r.clienteId === cliId" in b or "carteraPrimas', r => r.clienteId === cliId" in b: raise SystemExit('FINANCIAL_DIRECT_CLIENT_JOIN_STILL_PRESENT')
+          if "primaAnual = vigentes.reduce((s, p) => s + amount(p.prima)" in b: raise SystemExit('QUERY_PRIMA_LEGACY_SEMANTIC_STILL_PRESENT')
+          if "const primaAnual = vigentes.reduce((s, p) => s + (U.finiteNumber(p.prima)" in d: raise SystemExit('CLIENT360_PRIMA_LEGACY_SEMANTIC_STILL_PRESENT')
           PY
-
-      - name: Validate patched source
+      - name: Validate exact source changes
         shell: bash
         run: |
           set -euo pipefail
@@ -129,16 +74,14 @@ jobs:
           node --check orbit360-platform/modules/cliente360.js
           node --check orbit360-platform/core/queries.js
           git diff --check
-          git diff -- orbit360-platform/modules/configuracion.js orbit360-platform/modules/cliente360.js orbit360-platform/core/queries.js
-
-      - name: Commit causal source fix to the authority branch
+          test "$(git diff --name-only | sort | tr '\n' ' ')" = "orbit360-platform/core/queries.js orbit360-platform/modules/cliente360.js orbit360-platform/modules/configuracion.js "
+      - name: Commit source candidate
         shell: bash
         run: |
           set -euo pipefail
-          test -n "$(git status --porcelain -- orbit360-platform/modules/configuracion.js orbit360-platform/modules/cliente360.js orbit360-platform/core/queries.js)"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add orbit360-platform/modules/configuracion.js orbit360-platform/modules/cliente360.js orbit360-platform/core/queries.js
+          git add orbit360-platform/core/queries.js orbit360-platform/modules/cliente360.js orbit360-platform/modules/configuracion.js
           git commit -m "fix(i4a): close policy labels and financial read joins"
           git push origin HEAD:recovery/fase-a-clean-20260831
           echo "PRODUCT_SOURCE_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_STEP_SUMMARY"
