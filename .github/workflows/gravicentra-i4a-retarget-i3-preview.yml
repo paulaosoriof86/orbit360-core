@@ -1,0 +1,49 @@
+name: Gravicentra I4A Retarget Immutable Preview
+
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths: [.github/workflows/gravicentra-i4a-retarget-i3-preview.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  retarget:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      NEW_SOURCE_SHA: 0a20a0ee8939c8fe4d2b0904ddf5fda383363434
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 10
+          persist-credentials: true
+      - name: Retarget immutable build to exact changed source
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import os,re
+          from pathlib import Path
+          p=Path('.github/workflows/gravicentra-recovery-i3-preview.yml')
+          text=p.read_text(encoding='utf-8')
+          old=re.findall(r'(?m)^  SOURCE_SHA: ([0-9a-f]{40})$',text)
+          if len(old)!=1: raise SystemExit('I3_SOURCE_SHA_CARDINALITY_FAIL')
+          new=os.environ['NEW_SOURCE_SHA']
+          if old[0]==new: raise SystemExit('I3_SOURCE_ALREADY_TARGETED')
+          text=text.replace('  SOURCE_SHA: '+old[0], '  SOURCE_SHA: '+new)
+          if text.count('  SOURCE_SHA: '+new)!=1: raise SystemExit('I3_SOURCE_RETARGET_FAIL')
+          p.write_text(text,encoding='utf-8')
+          print('I3_PREVIOUS_SOURCE_SHA='+old[0])
+          print('I3_NEW_SOURCE_SHA='+new)
+          PY
+          git diff --check
+          git diff -- .github/workflows/gravicentra-recovery-i3-preview.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/workflows/gravicentra-recovery-i3-preview.yml
+          git commit -m "ci(i4a): rebuild preview from causal source fix"
+          git push origin HEAD:recovery/fase-a-clean-20260831
