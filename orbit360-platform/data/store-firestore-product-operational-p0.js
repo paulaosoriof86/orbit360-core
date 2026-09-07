@@ -65,16 +65,20 @@
   function reconcile(collection){
     var cols=collection&&collection!=='*'?[collection]:Object.keys(pending);
     cols.forEach(function(c){
+      var pendingIds=Object.keys(pending[c]||{}), deletedIds=Object.keys(deleted[c]||{});
+      if(!pendingIds.length&&!deletedIds.length)return;
       var rows=base.all(c)||[], ids={};rows.forEach(function(r){var id=text(idOf(r));if(id)ids[id]=r;});
-      Object.keys(pending[c]||{}).forEach(function(id){if(ids[id])delete pending[c][id];});
-      Object.keys(deleted[c]||{}).forEach(function(id){if(!ids[id])delete deleted[c][id];});
+      pendingIds.forEach(function(id){if(ids[id])delete pending[c][id];});
+      deletedIds.forEach(function(id){if(!ids[id])delete deleted[c][id];});
     });
   }
   function mergedAll(collection){
+    var pendingIds=Object.keys(pending[collection]||{}), deletedIds=Object.keys(deleted[collection]||{});
+    if(!pendingIds.length&&!deletedIds.length)return base.all(collection)||[];
     var map={};
     (base.all(collection)||[]).forEach(function(row){var id=text(idOf(row));if(id)map[id]=clone(row);});
-    Object.keys(pending[collection]||{}).forEach(function(id){map[id]=clone(pending[collection][id]);});
-    Object.keys(deleted[collection]||{}).forEach(function(id){delete map[id];});
+    pendingIds.forEach(function(id){map[id]=clone(pending[collection][id]);});
+    deletedIds.forEach(function(id){delete map[id];});
     return Object.keys(map).map(function(id){return map[id];});
   }
   function get(collection,id){
