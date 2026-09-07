@@ -1,0 +1,79 @@
+name: Gravicentra I4A Financial Canonical Readonly
+
+on:
+  push:
+    branches:
+      - recovery/fase-a-clean-20260831
+    paths:
+      - .github/workflows/gravicentra-i4a-financial-canonical-readonly.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  PROJECT_ID: ays-orbit-360-lab
+  TENANT_ID: alianzas-soluciones
+  SOURCE_SHA: 0a20a0ee8939c8fe4d2b0904ddf5fda383363434
+  BUILD_ID: gi-i3-0a20a0ee8939-57f234755dc1
+
+jobs:
+  financial-canonical-readonly:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Firestore read dependency
+        run: npm install --no-save --ignore-scripts firebase-admin@13.4.0
+      - name: Read canonical financial collections
+        env:
+          SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+          OUT_DIR: ${{ runner.temp }}/gravicentra-i4a-financial-canonical
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$OUT_DIR"
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import {initializeApp,cert,deleteApp} from 'firebase-admin/app';
+          import {getFirestore} from 'firebase-admin/firestore';
+          const project=process.env.PROJECT_ID, tenant=process.env.TENANT_ID;
+          const clean=v=>String(v==null?'':v).trim();
+          function sa(){for(const raw of [process.env.SA_DEFAULT,process.env.SA_ORBIT360_LAB,process.env.SA_ORBIT_360_LAB].filter(Boolean)){try{const x=JSON.parse(raw);if(x?.type==='service_account'&&x?.project_id===project&&x?.client_email&&x?.private_key)return x;}catch{}}throw new Error('SERVICE_ACCOUNT_UNAVAILABLE');}
+          const app=initializeApp({credential:cert(sa()),projectId:project},'gi-i4a-financial-canonical');
+          const db=getFirestore(app); const ref=n=>db.collection('tenants').doc(tenant).collection('data').doc(n).collection('items');
+          const names=['polizas','recibosEsperados','carteraPrimas','cobros']; const rows={};
+          for(const n of names) rows[n]=(await ref(n).get()).docs.map(d=>({id:d.id,...d.data()}));
+          const policies=new Map(rows.polizas.map(p=>[clean(p.id),p]));
+          function shape(list){
+            let polizaIdPresent=0,clienteIdPresent=0,linkedPolicy=0,linkedClientId=0,missingPolicy=0;
+            const keys=new Map();
+            for(const r of list){
+              if(clean(r.polizaId))polizaIdPresent++;
+              if(clean(r.clienteId))clienteIdPresent++;
+              const p=clean(r.polizaId)?policies.get(clean(r.polizaId)):null;
+              if(p){linkedPolicy++;if(clean(p.clienteId))linkedClientId++;} else if(clean(r.polizaId))missingPolicy++;
+              Object.keys(r||{}).forEach(k=>keys.set(k,(keys.get(k)||0)+1));
+            }
+            return {total:list.length,polizaIdPresent,clienteIdPresent,linkedPolicy,linkedClientId,missingPolicy,topFields:[...keys.entries()].sort((a,b)=>b[1]-a[1]).slice(0,20).map(([field,count])=>({field,count}))};
+          }
+          const evidence={schemaVersion:'gravicentra-i4a-financial-canonical-readonly-v1',gate:'I4A',sourceSha:process.env.SOURCE_SHA,buildId:process.env.BUILD_ID,projectId:project,tenantId:tenant,productionTouched:false,dataTouched:false,writesExecuted:0,counts:Object.fromEntries(names.map(n=>[n,rows[n].length])),shape:{recibosEsperados:shape(rows.recibosEsperados),carteraPrimas:shape(rows.carteraPrimas),cobros:shape(rows.cobros)},decision:'',checks:{},errors:[]};
+          evidence.checks={canonicalReceiptsPresent:rows.recibosEsperados.length>0,canonicalPortfolioPresent:rows.carteraPrimas.length>0,receiptsUsePolicyRelation:rows.recibosEsperados.length>0&&evidence.shape.recibosEsperados.polizaIdPresent===rows.recibosEsperados.length,portfolioUsePolicyRelation:rows.carteraPrimas.length>0&&evidence.shape.carteraPrimas.polizaIdPresent===rows.carteraPrimas.length,receiptsLackDirectClient:evidence.shape.recibosEsperados.clienteIdPresent===0,portfolioLackDirectClient:evidence.shape.carteraPrimas.clienteIdPresent===0};
+          evidence.decision=(evidence.checks.canonicalReceiptsPresent||evidence.checks.canonicalPortfolioPresent)?'CANONICAL_DATA_PRESENT_BROWSER_MATERIALIZATION_GAP':'CANONICAL_COLLECTIONS_EMPTY';
+          fs.writeFileSync(process.env.OUT_DIR+'/financial-canonical-readonly.json',JSON.stringify(evidence,null,2)+'\n');
+          console.log('FINANCIAL_CANONICAL_DECISION='+evidence.decision);console.log('FINANCIAL_CANONICAL_COUNTS='+JSON.stringify(evidence.counts));console.log('FINANCIAL_CANONICAL_CHECKS='+JSON.stringify(evidence.checks));
+          await deleteApp(app);
+          NODE
+      - name: Preserve canonical financial evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i4a-financial-canonical-${{ github.run_id }}
+          path: ${{ runner.temp }}/gravicentra-i4a-financial-canonical
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 30
