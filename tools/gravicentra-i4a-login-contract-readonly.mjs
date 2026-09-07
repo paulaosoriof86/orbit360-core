@@ -14,7 +14,7 @@ if(!PREVIEW||!SOURCE||!BUILD)throw new Error('I4A_LOGIN_ENV_MISSING');
 const clean=v=>String(v==null?'':v).trim();
 function serviceAccount(){for(const raw of [process.env.SA_DEFAULT,process.env.SA_ORBIT360_LAB,process.env.SA_ORBIT_360_LAB].filter(Boolean)){try{const x=JSON.parse(raw);if(x?.type==='service_account'&&x?.project_id===PROJECT&&x?.client_email&&x?.private_key)return x;}catch{}}throw new Error('I4A_LOGIN_SERVICE_ACCOUNT_UNAVAILABLE');}
 function need(ok,code){if(!ok)throw new Error(code);}
-const evidence={schemaVersion:'gravicentra-i4a-login-contract-v1',gate:'I4A',module:'Login',status:'RUNNING',sourceSha:SOURCE,buildId:BUILD,previewUrl:PREVIEW,productionTouched:false,dataTouched:false,writesExecuted:0,userIdentitiesRecorded:false,tokensRecorded:false,secretsRecorded:false,checks:{},errors:[]};
+const evidence={schemaVersion:'gravicentra-i4a-login-contract-v2',gate:'I4A',module:'Login',status:'RUNNING',sourceSha:SOURCE,buildId:BUILD,previewUrl:PREVIEW,productionTouched:false,dataTouched:false,writesExecuted:0,userIdentitiesRecorded:false,tokensRecorded:false,secretsRecorded:false,checks:{},errors:[]};
 fs.mkdirSync(OUT,{recursive:true});
 const app=initializeApp({credential:cert(serviceAccount()),projectId:PROJECT},'gravicentra-i4a-login-contract');
 const adminAuth=getAuth(app),db=getFirestore(app);
@@ -33,18 +33,18 @@ try{
     const ctx=await browser.newContext({viewport:{width:vp.width,height:vp.height},serviceWorkers:'block'}),page=await ctx.newPage();
     const errs=[];page.on('pageerror',e=>errs.push(String(e?.message||e).slice(0,180)));page.on('console',m=>{if(m.type()==='error')errs.push(String(m.text()).slice(0,180));});
     await page.goto(PREVIEW,{waitUntil:'domcontentloaded',timeout:20000});await page.waitForSelector('#login-form',{state:'visible',timeout:5000});
-    const r=await page.evaluate(()=>{const form=document.querySelector('#login-form'),btn=form?.querySelector('button[type="submit"]'),fr=form?.getBoundingClientRect(),br=btn?.getBoundingClientRect();return{innerWidth,innerHeight,form:fr?{left:fr.left,right:fr.right,top:fr.top,bottom:fr.bottom,width:fr.width}:null,button:br?{left:br.left,right:br.right,top:br.top,bottom:br.bottom,width:br.width}:null,loginVisible:!!form&&getComputedStyle(form).display!=='none',horizontalOverflow:document.documentElement.scrollWidth>innerWidth+2};});
+    const r=await page.evaluate(()=>{const form=document.querySelector('#login-form'),btn=form?.querySelector('button[type="submit"]'),fr=form?.getBoundingClientRect(),br=btn?.getBoundingClientRect();return{innerWidth,innerHeight,form:fr?{left:fr.left,right:fr.right,top:fr.top,bottom:fr.bottom,width:fr.width}:null,button:br?{left:br.left,right:br.right,top:br.top,bottom:br.bottom,width:br.width}:null,loginVisible:!!form&&getComputedStyle(form).display!=='none',horizontalOverflow:document.documentElement.scrollWidth>innerWidth+2,scrollWidth:document.documentElement.scrollWidth};});
     const pass=r.loginVisible&&r.form&&r.form.left>=-1&&r.form.right<=r.innerWidth+1&&r.button&&r.button.left>=-1&&r.button.right<=r.innerWidth+1&&!r.horizontalOverflow&&errs.length===0;
-    responsive.push({...vp,...r,errorCount:errs.length,pass});await ctx.close();
+    responsive.push({...vp,...r,errorCount:errs.length,errors:errs,pass});await ctx.close();
   }
-  need(responsive.every(x=>x.pass),'LOGIN_RESPONSIVE_CONTRACT_FAIL');
   evidence.checks.responsive=responsive;
+  need(responsive.every(x=>x.pass),'LOGIN_RESPONSIVE_CONTRACT_FAIL');
 
   const ctx=await browser.newContext({viewport:{width:1440,height:1000},serviceWorkers:'block'}),page=await ctx.newPage();
   await page.goto(PREVIEW,{waitUntil:'domcontentloaded',timeout:20000});await page.waitForFunction(()=>!!Orbit?.productRuntimeBrowserProvidersP0&&!!Orbit?.productAppP0&&!!Orbit?.auth,null,{timeout:5000});
   const activated=await page.evaluate(async tok=>{const p=Orbit.productRuntimeBrowserProvidersP0,c=await p.initialize();await c.modules.auth.signInWithCustomToken(c.auth,tok);const out=await Orbit.productAppP0.activate();return{started:out?.started===true,currentUser:!!c.auth.currentUser,loginHidden:getComputedStyle(document.getElementById('login')).display==='none'||document.getElementById('login').classList.contains('hidden'),shellVisible:getComputedStyle(document.getElementById('shell')).display!=='none',route:Orbit?.route?.key||''};},token);
-  need(activated.started&&activated.currentUser&&activated.loginHidden&&activated.shellVisible,'LOGIN_AUTHENTICATED_ACTIVATION_FAIL');
   evidence.checks.activation=activated;
+  need(activated.started&&activated.currentUser&&activated.loginHidden&&activated.shellVisible,'LOGIN_AUTHENTICATED_ACTIVATION_FAIL');
 
   await page.reload({waitUntil:'domcontentloaded',timeout:20000});
   await page.waitForFunction(()=>!!Orbit?.productRuntimeBrowserProvidersP0&&!!Orbit?.productAppP0&&!!Orbit?.auth,null,{timeout:5000});
