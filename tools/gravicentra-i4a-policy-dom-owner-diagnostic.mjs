@@ -34,7 +34,7 @@ async function captureOwner(page){
     const traces=[];
     const trace=(op,target,value)=>{
       if(!re.test(String(value||'')))return;
-      traces.push({op,tag:target?.tagName||target?.nodeName||'',id:target?.id||'',className:String(target?.className||'').slice(0,180),value:String(value||'').replace(/\s+/g,' ').trim().slice(0,360),stack:String(new Error('GI_I4A_POLICY_DOM_WRITE').stack||'').split('\n').slice(0,14)});
+      traces.push({op,tag:target?.tagName||target?.nodeName||'',id:target?.id||'',className:String(target?.className||'').slice(0,180),value:String(value||'').replace(/\s+/g,' ').trim().slice(0,360),stack:String(new Error('GI_I4A_POLICY_DOM_WRITE').stack||'').split('\n').slice(0,16)});
     };
     const restores=[];
     const hookSetter=(proto,key)=>{
@@ -43,18 +43,30 @@ async function captureOwner(page){
       restores.push(()=>Object.defineProperty(proto,key,d));
     };
     hookSetter(Node.prototype,'textContent');
+    hookSetter(Node.prototype,'nodeValue');
     hookSetter(Element.prototype,'innerHTML');
     hookSetter(HTMLElement.prototype,'innerText');
-    const originalInsert=Element.prototype.insertAdjacentHTML;
-    if(typeof originalInsert==='function'){
-      Element.prototype.insertAdjacentHTML=function(position,text){trace('insertAdjacentHTML',this,text);return originalInsert.call(this,position,text);};
-      restores.push(()=>{Element.prototype.insertAdjacentHTML=originalInsert;});
-    }
-    const originalReplace=Element.prototype.replaceChildren;
-    if(typeof originalReplace==='function'){
-      Element.prototype.replaceChildren=function(...nodes){trace('replaceChildren',this,nodes.map(n=>n?.textContent||String(n||'')).join(' '));return originalReplace.apply(this,nodes);};
-      restores.push(()=>{Element.prototype.replaceChildren=originalReplace;});
-    }
+    hookSetter(CharacterData.prototype,'data');
+    const hookMethod=(proto,key,valueIndex=0)=>{
+      const original=proto?.[key];if(typeof original!=='function')return;
+      proto[key]=function(...args){trace(key,this,args[valueIndex]);return original.apply(this,args);};
+      restores.push(()=>{proto[key]=original;});
+    };
+    hookMethod(Element.prototype,'insertAdjacentHTML',1);
+    hookMethod(Element.prototype,'replaceChildren',0);
+    hookMethod(CharacterData.prototype,'replaceData',2);
+    hookMethod(CharacterData.prototype,'appendData',0);
+    hookMethod(CharacterData.prototype,'insertData',1);
+    const observer=new MutationObserver(list=>{
+      for(const m of list){
+        if(m.type==='characterData'&&re.test(String(m.target?.data||''))) trace('MutationObserver:characterData',m.target,m.target.data);
+        if(m.type==='childList'){
+          for(const n of m.addedNodes||[]){const t=String(n?.textContent||'');if(re.test(t))trace('MutationObserver:childList',n,t);}
+        }
+      }
+    });
+    observer.observe(document.getElementById('host'),{subtree:true,childList:true,characterData:true,characterDataOldValue:true});
+    restores.push(()=>observer.disconnect());
     const before=rowSnapshot('before');
     let renderError='';
     try{const host=document.getElementById('host'),out=Orbit?.modules?.polizas?.render?.(host);if(out&&typeof out.then==='function')await out;}catch(e){renderError=String(e?.message||e).slice(0,240);}
@@ -64,14 +76,14 @@ async function captureOwner(page){
     await new Promise(r=>setTimeout(r,500));
     const after660=rowSnapshot('after660');
     restores.reverse().forEach(fn=>{try{fn();}catch{}});
-    return {before,immediate,after160,after660,renderError,traces:traces.slice(0,40),scripts:[...document.scripts].map(s=>s.src||'').filter(Boolean).map(src=>src.replace(location.origin,'')).filter(src=>/poliz|policy-receipts|crm-v1198|detail-guard|projection|reference|validation/i.test(src)).slice(0,120)};
+    return {before,immediate,after160,after660,renderError,traces:traces.slice(0,60),scripts:[...document.scripts].map(s=>s.src||'').filter(Boolean).map(src=>src.replace(location.origin,'')).filter(src=>/poliz|policy-receipts|crm-v1198|detail-guard|projection|reference|validation/i.test(src)).slice(0,120)};
   });
 }
 
 const sa=serviceAccount();
 const app=initializeApp({credential:cert(sa),projectId:PROJECT},'gravicentra-i4a-policy-dom-owner');
 const auth=getAuth(app),db=getFirestore(app);
-const evidence={schemaVersion:'gravicentra-i4a-policy-dom-owner-v1',gate:'I4A',status:'OWNER_DIAGNOSTIC_FAIL',sourceSha:SOURCE,buildId:BUILD,previewUrl:PREVIEW,productionTouched:false,dataTouched:false,writesExecuted:0,secretsRecorded:false,privilegedRole:'',capture:null,classification:null,errors:[]};
+const evidence={schemaVersion:'gravicentra-i4a-policy-dom-owner-v2',gate:'I4A',status:'OWNER_DIAGNOSTIC_FAIL',sourceSha:SOURCE,buildId:BUILD,previewUrl:PREVIEW,productionTouched:false,dataTouched:false,writesExecuted:0,secretsRecorded:false,privilegedRole:'',capture:null,classification:null,errors:[]};
 let browser,context;
 try{
   need(PREVIEW&&SOURCE&&BUILD,'I4A_POLICY_OWNER_ENV_INCOMPLETE');
@@ -84,7 +96,7 @@ try{
   await page.goto(PREVIEW,{waitUntil:'domcontentloaded',timeout:20000});await page.waitForFunction(()=>!!Orbit?.productAppP0&&!!Orbit?.productRuntimeBrowserProvidersP0,null,{timeout:6000});await activate(page,token);await setRole(page,targetRole);
   evidence.capture=await captureOwner(page);
   const stacks=(evidence.capture?.traces||[]).flatMap(t=>t.stack||[]);
-  evidence.classification={initialSyntheticRows:evidence.capture?.before?.synthetic?.length||0,immediateSyntheticRows:evidence.capture?.immediate?.synthetic?.length||0,delayedSyntheticRows:evidence.capture?.after160?.synthetic?.length||0,writeTraceCount:evidence.capture?.traces?.length||0,sourceFrames:[...new Set(stacks.filter(x=>/https?:\/\//.test(x)).map(x=>x.trim()))].slice(0,20)};
+  evidence.classification={initialSyntheticRows:evidence.capture?.before?.synthetic?.length||0,immediateSyntheticRows:evidence.capture?.immediate?.synthetic?.length||0,delayedSyntheticRows:evidence.capture?.after160?.synthetic?.length||0,writeTraceCount:evidence.capture?.traces?.length||0,sourceFrames:[...new Set(stacks.filter(x=>/https?:\/\//.test(x)).map(x=>x.trim()))].slice(0,30)};
   evidence.status='OWNER_DIAGNOSTIC_COMPLETE';
 }catch(e){evidence.errors.push(String(e?.message||e).slice(0,500));process.exitCode=1;}
 finally{
