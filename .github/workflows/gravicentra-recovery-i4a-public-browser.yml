@@ -20,9 +20,9 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  SOURCE_SHA: 4dbf4f157b95f61ffa563ecd0cfba7303d7b55c7
-  BUILD_ID: gi-i3-4dbf4f157b95-57f234755dc1
-  PREVIEW_URL: https://ays-orbit-360-lab--gi-i3-34139734779-j3clvpf2.web.app
+  SOURCE_SHA: d551aa4a6554db8cf719afca34d4c77602a14f29
+  BUILD_ID: gi-i3-d551aa4a6554-57f234755dc1
+  PREVIEW_URL: https://ays-orbit-360-lab--gi-i3-34153005211-h6anqh95.web.app
 
 jobs:
   public-browser:
@@ -124,7 +124,7 @@ jobs:
           set -euo pipefail
           npm install --no-save --package-lock=false playwright@1.55.0 firebase-admin@13.10.0 >/dev/null
           npx playwright install --with-deps chromium >/dev/null
-      - name: Stabilize existing authenticated harness around deferred hydration
+      - name: Correct authenticated discriminants without changing certified product bytes
         shell: bash
         run: |
           set -euo pipefail
@@ -133,23 +133,27 @@ jobs:
           p=Path('tools/gravicentra-i4a-authenticated-browser-v2.mjs')
           s=p.read_text(encoding='utf-8')
           beat="async function beat(page){const vals=[];for(let i=0;i<3;i++){const t=Date.now();await page.evaluate(()=>new Promise(r=>setTimeout(r,20)));vals.push(Date.now()-t);}return {samplesMs:vals,maxMs:Math.max(...vals)};}"
-          helper=beat+"\nasync function waitOptionalFinance(page){await page.waitForFunction(()=>{const st=Orbit?.store?._productStatus?.()||{};const confirmed=Array.isArray(st.serverConfirmedCollections)?st.serverConfirmedCollections:[];return confirmed.includes('recibosEsperados')&&confirmed.includes('carteraPrimas')&&(Orbit?.store?.all?.('recibosEsperados')||[]).length>0&&(Orbit?.store?.all?.('carteraPrimas')||[]).length>0;},null,{timeout:12000});}"
+          helper=beat+"\nasync function waitFinanceReadModels(page){await page.waitForFunction(()=>{const st=Orbit?.store?._productStatus?.()||{};const confirmed=Array.isArray(st.serverConfirmedCollections)?st.serverConfirmedCollections:[];return confirmed.includes('recibosEsperados')&&confirmed.includes('carteraPrimas')&&(Orbit?.store?.all?.('recibosEsperados')||[]).length>0&&(Orbit?.store?.all?.('carteraPrimas')||[]).length>0;},null,{timeout:12000});}"
           if beat not in s: raise SystemExit('QA_PATCH_BEAT_ANCHOR_MISSING')
           s=s.replace(beat,helper,1)
           old="  const heartbeat=await beat(page);need(heartbeat.maxMs<1000,'CLIENTE360_EVENT_LOOP_BLOCKED');\n  return {routeMs,...state,heartbeat};"
-          new="  const transientHeartbeat=await beat(page);await waitOptionalFinance(page);const heartbeat=await beat(page);need(heartbeat.maxMs<1000,'CLIENTE360_EVENT_LOOP_BLOCKED_STABLE');\n  return {routeMs,...state,transientHeartbeat,heartbeat};"
+          new="  const transientHeartbeat=await beat(page);await page.waitForTimeout(600);const settledDiagnostics=await page.evaluate(()=>{const d=OrbitRuntimeDiagnostics?.cliente360?.list||{};return {renderSeq:d.renderSeq??null,totalMs:d.totalMs??null,renderedRows:d.renderedRows??null,totalRows:d.totalRows??null};});const heartbeat=await beat(page);need(transientHeartbeat.maxMs<1000,'CLIENTE360_EVENT_LOOP_BLOCKED_TRANSIENT:'+JSON.stringify({transientHeartbeat,initialDiagnostics:state.diagnostics,settledDiagnostics}));need(heartbeat.maxMs<1000,'CLIENTE360_EVENT_LOOP_BLOCKED_STABLE:'+JSON.stringify({heartbeat,settledDiagnostics}));\n  return {routeMs,...state,transientHeartbeat,settledDiagnostics,heartbeat};"
           if old not in s: raise SystemExit('QA_PATCH_CLIENTE_ANCHOR_MISSING')
           s=s.replace(old,new,1)
           old="  const heartbeat=await beat(page);need(heartbeat.maxMs<1000,'POLIZAS_EVENT_LOOP_BLOCKED');\n  return {routeMs,canonical:canonicalPolicy,...chain,dom,expectedPremiumText:expected,heartbeat};"
-          new="  const transientHeartbeat=await beat(page);await waitOptionalFinance(page);const heartbeat=await beat(page);need(heartbeat.maxMs<1000,'POLIZAS_EVENT_LOOP_BLOCKED_STABLE');\n  return {routeMs,canonical:canonicalPolicy,...chain,dom,expectedPremiumText:expected,transientHeartbeat,heartbeat};"
+          new="  const transientHeartbeat=await beat(page);await page.waitForTimeout(600);const heartbeat=await beat(page);need(transientHeartbeat.maxMs<1000,'POLIZAS_EVENT_LOOP_BLOCKED_TRANSIENT:'+JSON.stringify(transientHeartbeat));need(heartbeat.maxMs<1000,'POLIZAS_EVENT_LOOP_BLOCKED_STABLE:'+JSON.stringify(heartbeat));\n  return {routeMs,canonical:canonicalPolicy,...chain,dom,expectedPremiumText:expected,transientHeartbeat,heartbeat};"
           if old not in s: raise SystemExit('QA_PATCH_POLIZAS_ANCHOR_MISSING')
           s=s.replace(old,new,1)
           old="async function probeCobros(page){\n  const routeMs=await gotoRoute(page,'#/cobros',()=>Orbit?.route?.key==='cobros'&&!!document.querySelector('#host .page'),12000);\n  await page.waitForTimeout(160);"
-          new="async function probeCobros(page){\n  const routeMs=await gotoRoute(page,'#/cobros',()=>Orbit?.route?.key==='cobros'&&!!document.querySelector('#host .page'),12000);\n  await waitOptionalFinance(page);\n  await page.waitForTimeout(160);"
-          if old not in s: raise SystemExit('QA_PATCH_COBROS_ANCHOR_MISSING')
+          new="async function probeCobros(page){\n  const routeMs=await gotoRoute(page,'#/cobros',()=>Orbit?.route?.key==='cobros'&&!!document.querySelector('#host .page'),12000);\n  await waitFinanceReadModels(page);\n  await page.waitForTimeout(160);"
+          if old not in s: raise SystemExit('QA_PATCH_COBROS_ROUTE_ANCHOR_MISSING')
+          s=s.replace(old,new,1)
+          old="  need(!(state.base.carteraPrimas>state.base.cobros&&state.visibleRows<=Math.max(1,state.scoped.cobros)),'COBROS_READ_MODEL_EXCLUDES_CARTERA_PRIMAS');"
+          new="  need(state.visibleRows<=Math.max(1,state.scoped.cobros),'COBROS_VISIBLE_LIST_EXCEEDS_COBROS_SCOPE');"
+          if old not in s: raise SystemExit('QA_PATCH_COBROS_SEMANTICS_ANCHOR_MISSING')
           s=s.replace(old,new,1)
           p.write_text(s,encoding='utf-8')
-          print('I4A_AUTH_QA_DEFERRED_HYDRATION_PATCH=PASS')
+          print('I4A_AUTH_QA_SEMANTIC_SEPARATION_PATCH=PASS')
           PY
           node --check tools/gravicentra-i4a-authenticated-browser-v2.mjs
       - name: Execute sanitized runtime boundary diagnostic
