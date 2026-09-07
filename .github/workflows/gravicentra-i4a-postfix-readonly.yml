@@ -16,9 +16,9 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  PREVIEW_URL: https://ays-orbit-360-lab--gi-i3-34072755093-lezwsk5g.web.app
-  SOURCE_SHA: 0a20a0ee8939c8fe4d2b0904ddf5fda383363434
-  BUILD_ID: gi-i3-0a20a0ee8939-57f234755dc1
+  PREVIEW_URL: https://ays-orbit-360-lab--gi-i3-34139734779-j3clvpf2.web.app
+  SOURCE_SHA: 4dbf4f157b95f61ffa563ecd0cfba7303d7b55c7
+  BUILD_ID: gi-i3-4dbf4f157b95-57f234755dc1
 
 jobs:
   postfix-readonly:
