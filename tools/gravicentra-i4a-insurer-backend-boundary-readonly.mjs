@@ -6,6 +6,7 @@ import { GoogleAuth } from 'google-auth-library';
 const PROJECT='ays-orbit-360-lab';
 const REGION='us-central1';
 const FUNCTION='orbit360ProductInsurerCredentialCommand';
+const LEGACY_FUNCTIONS=['orbit360CredentialStatus','orbit360RevealInsurerCredential','orbit360CopyInsurerCredential'];
 const SOURCE=process.env.SOURCE_SHA||'';
 const BUILD=process.env.BUILD_ID||'';
 const OUT=process.env.I4A_INSURER_BOUNDARY_DIR||process.env.RUNNER_TEMP||process.cwd();
@@ -36,16 +37,23 @@ function workflowDeployInventory(){
   }
   return rows;
 }
+async function functionMetadata(name,headers){
+  const url=`https://cloudfunctions.googleapis.com/v2/projects/${PROJECT}/locations/${REGION}/functions/${name}`;
+  const res=await fetch(url,{headers});
+  const body=await safeJson(res);
+  return {httpStatus:res.status,exists:res.status===200,state:res.status===200?String(body.state||''):'',name:res.status===200?String(body.name||''):'',errorStatus:res.status===200?'':String(body?.error?.status||'')};
+}
 
 const evidence={
-  schemaVersion:'gravicentra-i4a-insurer-backend-boundary-readonly-v1',gate:'I4A',module:'Aseguradoras',
-  sourceSha:SOURCE,buildId:BUILD,projectId:PROJECT,region:REGION,functionName:FUNCTION,
+  schemaVersion:'gravicentra-i4a-insurer-backend-boundary-readonly-v2',gate:'I4A',module:'Aseguradoras',
+  sourceSha:SOURCE,buildId:BUILD,projectId:PROJECT,region:REGION,functionName:FUNCTION,legacyFunctionNames:LEGACY_FUNCTIONS,
   productionTouched:false,dataTouched:false,writesExecuted:0,functionInvocations:0,secretsRecorded:false,
-  sourceContract:{},cloud:{},workflowDeployInventory:[],decision:'UNRESOLVED',checks:{},errors:[]
+  sourceContract:{},cloud:{legacyFunctions:{}},workflowDeployInventory:[],decision:'UNRESOLVED',checks:{},errors:[]
 };
 try{
   need(SOURCE&&BUILD,'BOUNDARY_ENV_INCOMPLETE');
   const backend=read('functions/product-insurer-credentials.js');
+  const legacy=read('functions/index.js');
   const bootstrap=read('functions/bootstrap.js');
   const pkg=read('functions/package.json');
   const provider=read('orbit360-platform/core/product-insurer-credential-provider-p0.js');
@@ -60,7 +68,8 @@ try{
     frontendCallsRuntime:provider.includes('runtime().callFunction(CALLABLE'),
     frontendDirectFirestoreWritesFalse:provider.includes('directFirestoreWrites:false'),
     runtimeHttpsCallable:runtime.includes('httpsCallable(fx,name)'),
-    runtimeDefaultRegion:runtime.includes("region=String(region||'us-central1')")
+    runtimeDefaultRegion:runtime.includes("region=String(region||'us-central1')"),
+    legacyExports:LEGACY_FUNCTIONS.reduce((out,name)=>(out[name]=legacy.includes(`exports.${name} = onCall`)||legacy.includes(`exports.${name}=onCall`),out),{})
   };
   evidence.workflowDeployInventory=workflowDeployInventory();
   const recoveryBackendDeploy=evidence.workflowDeployInventory.filter(x=>x.recovery);
@@ -70,15 +79,15 @@ try{
   const client=await auth.getClient();
   const token=await client.getAccessToken();
   need(token?.token,'CLOUD_ACCESS_TOKEN_UNAVAILABLE');
-  const headers={Authorization:`Bearer ${token.token}`,'User-Agent':'Gravicentra-I4A-Readonly-Boundary/1.0'};
-  const functionUrl=`https://cloudfunctions.googleapis.com/v2/projects/${PROJECT}/locations/${REGION}/functions/${FUNCTION}`;
-  const fRes=await fetch(functionUrl,{headers});
-  const fBody=await safeJson(fRes);
-  evidence.cloud.functionMetadataHttpStatus=fRes.status;
-  evidence.cloud.functionMetadataExists=fRes.status===200;
-  evidence.cloud.functionMetadataState=fRes.status===200?String(fBody.state||''):'';
-  evidence.cloud.functionMetadataName=fRes.status===200?String(fBody.name||''):'';
-  evidence.cloud.functionMetadataErrorStatus=fRes.status===200?'':String(fBody?.error?.status||'');
+  const headers={Authorization:`Bearer ${token.token}`,'User-Agent':'Gravicentra-I4A-Readonly-Boundary/2.0'};
+
+  const exact=await functionMetadata(FUNCTION,headers);
+  evidence.cloud.functionMetadataHttpStatus=exact.httpStatus;
+  evidence.cloud.functionMetadataExists=exact.exists;
+  evidence.cloud.functionMetadataState=exact.state;
+  evidence.cloud.functionMetadataName=exact.name;
+  evidence.cloud.functionMetadataErrorStatus=exact.errorStatus;
+  for(const name of LEGACY_FUNCTIONS) evidence.cloud.legacyFunctions[name]=await functionMetadata(name,headers);
 
   const runName=FUNCTION.toLowerCase();
   const runUrl=`https://run.googleapis.com/v2/projects/${PROJECT}/locations/${REGION}/services/${runName}`;
@@ -88,6 +97,8 @@ try{
   evidence.cloud.cloudRunServiceExists=rRes.status===200;
   evidence.cloud.cloudRunServiceName=rRes.status===200?String(rBody.name||''):'';
 
+  const legacyAllSource=LEGACY_FUNCTIONS.every(name=>evidence.sourceContract.legacyExports[name]===true);
+  const legacyAllCloud=LEGACY_FUNCTIONS.every(name=>evidence.cloud.legacyFunctions[name]?.exists===true);
   evidence.checks={
     sourceExported:evidence.sourceContract.backendExportsCallable===true,
     sourceBootstrapped:evidence.sourceContract.bootstrapIncludesBackend===true&&evidence.sourceContract.packageChecksBackend===true,
@@ -96,13 +107,17 @@ try{
     backendWouldAuditCredentialUse:evidence.sourceContract.backendWritesAudit===true,
     cloudFunctionAbsent:evidence.cloud.functionMetadataHttpStatus===404,
     cloudRunServiceAbsent:evidence.cloud.cloudRunHttpStatus===404,
-    noRecoveryBackendPreviewDeployMechanism:recoveryBackendDeploy.length===0
+    noRecoveryBackendPreviewDeployMechanism:recoveryBackendDeploy.length===0,
+    legacyCallablesExistInSource:legacyAllSource,
+    legacyCallablesAllDeployed:legacyAllCloud
   };
   const required=['sourceExported','sourceBootstrapped','frontendWiredExactCallable','browserHasNoDirectFirestoreCredentialWrites','backendWouldAuditCredentialUse','cloudFunctionAbsent','noRecoveryBackendPreviewDeployMechanism'];
   const failed=required.filter(k=>evidence.checks[k]!==true);
   need(failed.length===0,'BOUNDARY_CHECK_FAILED:'+failed.join(','));
-  evidence.decision='BLOCKED_BACKEND_RELEASE_BOUNDARY';
-  evidence.reason='Exact product callable is wired in source but absent from Cloud; Recovery has no isolated backend Preview deploy mechanism. Deploying/invoking it before I5 would alter shared backend and credential operations write auditEvents.';
+  evidence.decision=legacyAllCloud?'LEGACY_BACKEND_REUSE_CANDIDATE_REQUIRES_CONTRACT_PROOF':'BLOCKED_BACKEND_RELEASE_BOUNDARY';
+  evidence.reason=legacyAllCloud
+    ? 'Exact product callable is absent from Cloud, but the three legacy secure callables are deployed. Reuse is not approved until their auth/role/data/audit contract is proven equivalent to the latest approved product contract.'
+    : 'Exact product callable is wired in source but absent from Cloud; the complete legacy secure callable set is not deployed; Recovery has no isolated backend Preview deploy mechanism. Deploying/invoking the product callable before I5 would alter the shared backend and credential operations write auditEvents.';
 }catch(e){
   evidence.errors.push(String(e?.message||e).slice(0,800));
   process.exitCode=1;
@@ -111,6 +126,7 @@ try{
   fs.writeFileSync(path.join(OUT,'i4a-insurer-backend-boundary-readonly.json'),JSON.stringify(evidence,null,2)+'\n');
   console.log('I4A_INSURER_BOUNDARY_DECISION='+evidence.decision);
   console.log('I4A_INSURER_BOUNDARY_CHECKS='+JSON.stringify(evidence.checks));
+  console.log('I4A_INSURER_LEGACY_CLOUD='+JSON.stringify(evidence.cloud.legacyFunctions||{}));
   console.log('I4A_INSURER_BOUNDARY_WRITES=0');
   console.log('I4A_INSURER_BOUNDARY_INVOCATIONS=0');
 }
