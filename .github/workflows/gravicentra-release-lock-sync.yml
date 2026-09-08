@@ -1,0 +1,107 @@
+name: Gravicentra Release Lock Sync
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - recovery/fase-a-clean-20260831
+    paths:
+      - artifacts/orbit360-recovery/release-control/ACTIVE_RELEASE_LOCK.json
+      - tools/gravicentra-release-lineage-guard.mjs
+      - .github/workflows/gravicentra-release-lock-sync.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: gravicentra-release-lock-sync-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  sync-release-control:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - name: Checkout Recovery control plane
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 50
+          persist-credentials: true
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Synchronize executor pins from the single release lock
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "recovery/fase-a-clean-20260831"
+          python3 - <<'PY'
+          import json,re
+          from pathlib import Path
+
+          lock_path=Path('artifacts/orbit360-recovery/release-control/ACTIVE_RELEASE_LOCK.json')
+          lock=json.loads(lock_path.read_text(encoding='utf-8'))
+          if lock.get('schemaVersion')!='gravicentra-recovery-active-release-lock-v1': raise SystemExit('RELEASE_LOCK_SCHEMA_INVALID')
+          if lock.get('branch')!='recovery/fase-a-clean-20260831': raise SystemExit('RELEASE_LOCK_BRANCH_INVALID')
+          candidate=str(lock.get('candidateSourceSha',''))
+          cert=lock.get('certified') or {}
+          certified=str(cert.get('sourceSha',''))
+          build=str(cert.get('buildId',''))
+          preview=str(cert.get('previewUrl',''))
+          if not re.fullmatch(r'[0-9a-f]{40}',candidate): raise SystemExit('CANDIDATE_SHA_INVALID')
+          if not re.fullmatch(r'[0-9a-f]{40}',certified): raise SystemExit('CERTIFIED_SHA_INVALID')
+          if not re.fullmatch(r'gi-i3-[0-9a-f]{12}-[0-9a-f]{12}',build): raise SystemExit('CERTIFIED_BUILD_INVALID')
+          if not re.fullmatch(r'https://[A-Za-z0-9._-]+\.web\.app',preview): raise SystemExit('CERTIFIED_PREVIEW_INVALID')
+          pending=candidate!=certified
+          if pending and lock.get('status')!='CANDIDATE_SOURCE_PENDING_I3': raise SystemExit('PENDING_STATUS_INVALID')
+
+          def replace_pin(path,key,value):
+              p=Path(path); text=p.read_text(encoding='utf-8')
+              rx=re.compile(r'(?m)^  '+re.escape(key)+r': .+$')
+              hits=rx.findall(text)
+              if len(hits)!=1: raise SystemExit(f'PIN_CARDINALITY_FAIL:{path}:{key}:{len(hits)}')
+              p.write_text(rx.sub('  '+key+': '+value,text),encoding='utf-8')
+
+          replace_pin('.github/workflows/gravicentra-recovery-i3-preview.yml','SOURCE_SHA',candidate)
+          replace_pin('.github/workflows/gravicentra-recovery-i4a-public-browser.yml','SOURCE_SHA',certified)
+          replace_pin('.github/workflows/gravicentra-recovery-i4a-public-browser.yml','BUILD_ID',build)
+          replace_pin('.github/workflows/gravicentra-recovery-i4a-public-browser.yml','PREVIEW_URL',preview)
+          replace_pin('.github/workflows/gravicentra-i4a-insurer-backend-boundary-readonly.yml','SOURCE_SHA',certified)
+          replace_pin('.github/workflows/gravicentra-i4a-insurer-backend-boundary-readonly.yml','BUILD_ID',build)
+          print('RELEASE_LOCK_SYNC_PENDING_I3='+str(pending).lower())
+          print('RELEASE_LOCK_SYNC_CANDIDATE='+candidate)
+          print('RELEASE_LOCK_SYNC_CERTIFIED='+certified)
+          PY
+
+      - name: Prove synchronized control plane fail-closed
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-release-lineage-guard.mjs --mode=control-plane
+          git diff --check
+          BAD=$(git diff --name-only | grep -Ev '^(\.github/workflows/gravicentra-recovery-i3-preview\.yml|\.github/workflows/gravicentra-recovery-i4a-public-browser\.yml|\.github/workflows/gravicentra-i4a-insurer-backend-boundary-readonly\.yml)$' || true)
+          test -z "$BAD" || { echo "UNEXPECTED_SYNC_FILE:$BAD" >&2; exit 1; }
+
+      - name: Commit synchronization only when pins changed
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet; then
+            echo 'RELEASE_LOCK_ALREADY_SYNCHRONIZED=true' >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/workflows/gravicentra-recovery-i3-preview.yml .github/workflows/gravicentra-recovery-i4a-public-browser.yml .github/workflows/gravicentra-i4a-insurer-backend-boundary-readonly.yml
+          git commit -m "chore(release): synchronize workflow pins from active release lock"
+          git push origin HEAD:recovery/fase-a-clean-20260831
+          {
+            echo 'RELEASE_LOCK_SYNCHRONIZED=true'
+            echo "SYNC_COMMIT=$(git rev-parse HEAD)"
+            echo 'PRODUCTION_TOUCHED=false'
+            echo 'DATA_TOUCHED=false'
+          } >> "$GITHUB_STEP_SUMMARY"
