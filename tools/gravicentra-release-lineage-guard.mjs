@@ -12,6 +12,7 @@ const need=(ok,code)=>{if(!ok)fail(code);};
 const git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
 const read=p=>fs.readFileSync(p,'utf8');
 
+need(['candidate','control-plane','certified'].includes(MODE),'RELEASE_GUARD_MODE_INVALID');
 need(LOCK.schemaVersion==='gravicentra-recovery-active-release-lock-v1','RELEASE_LOCK_SCHEMA_INVALID');
 need(LOCK.productBrand==='Gravicentra Insurance','RELEASE_LOCK_PRODUCT_INVALID');
 need(LOCK.branch==='recovery/fase-a-clean-20260831','RELEASE_LOCK_BRANCH_INVALID');
@@ -28,7 +29,17 @@ need(cert.dataTouched===false,'RELEASE_LOCK_DATA_TOUCHED');
 need(cert.sameArtifactPreviewToProductionRequired===true,'RELEASE_LOCK_SAME_ARTIFACT_RULE_MISSING');
 need(/^https:\/\/[A-Za-z0-9._-]+\.web\.app$/.test(String(cert.previewUrl||'')),'RELEASE_LOCK_PREVIEW_URL_INVALID');
 
-const source=MODE==='candidate'?String(LOCK.candidateSourceSha):String(cert.sourceSha);
+const candidate=String(LOCK.candidateSourceSha);
+const certified=String(cert.sourceSha);
+const pending=candidate!==certified;
+if(pending){
+  need(LOCK.status==='CANDIDATE_SOURCE_PENDING_I3','PENDING_I3_STATUS_MISMATCH');
+  need(String(LOCK.activeGate||'').startsWith('I3'),'PENDING_I3_ACTIVE_GATE_MISMATCH');
+}else{
+  need(LOCK.status!=='CANDIDATE_SOURCE_PENDING_I3','CERTIFIED_STATE_STILL_MARKED_PENDING_I3');
+}
+
+const source=MODE==='candidate'?candidate:certified;
 const current=git('rev-parse','HEAD');
 try{git('cat-file','-e',source+'^{commit}');}catch{fail('RELEASE_LOCK_SOURCE_COMMIT_NOT_AVAILABLE:'+source);}
 try{execFileSync('git',['merge-base','--is-ancestor',source,current],{stdio:'ignore'});}catch{fail('RELEASE_LOCK_SOURCE_NOT_ANCESTOR:'+source+':'+current);}
@@ -47,11 +58,11 @@ function validateControlPlane(){
   const i3='.github/workflows/gravicentra-recovery-i3-preview.yml';
   const i4a='.github/workflows/gravicentra-recovery-i4a-public-browser.yml';
   const insurer='.github/workflows/gravicentra-i4a-insurer-backend-boundary-readonly.yml';
-  need(exactEnvPin(i3,'SOURCE_SHA')===String(LOCK.candidateSourceSha),'I3_PIN_DESYNC_FROM_RELEASE_LOCK');
-  need(exactEnvPin(i4a,'SOURCE_SHA')===String(cert.sourceSha),'I4A_SOURCE_PIN_DESYNC_FROM_RELEASE_LOCK');
+  need(exactEnvPin(i3,'SOURCE_SHA')===candidate,'I3_PIN_DESYNC_FROM_RELEASE_LOCK');
+  need(exactEnvPin(i4a,'SOURCE_SHA')===certified,'I4A_SOURCE_PIN_DESYNC_FROM_RELEASE_LOCK');
   need(exactEnvPin(i4a,'BUILD_ID')===String(cert.buildId),'I4A_BUILD_PIN_DESYNC_FROM_RELEASE_LOCK');
   need(exactEnvPin(i4a,'PREVIEW_URL')===String(cert.previewUrl),'I4A_PREVIEW_PIN_DESYNC_FROM_RELEASE_LOCK');
-  need(exactEnvPin(insurer,'SOURCE_SHA')===String(cert.sourceSha),'INSURER_SOURCE_PIN_DESYNC_FROM_RELEASE_LOCK');
+  need(exactEnvPin(insurer,'SOURCE_SHA')===certified,'INSURER_SOURCE_PIN_DESYNC_FROM_RELEASE_LOCK');
   need(exactEnvPin(insurer,'BUILD_ID')===String(cert.buildId),'INSURER_BUILD_PIN_DESYNC_FROM_RELEASE_LOCK');
   const stale=read('.github/workflows/gravicentra-i4a-retarget-i3-preview.yml');
   need(!/NEW_SOURCE_SHA\s*:/.test(stale),'STALE_RETARGET_HARDCODE_STILL_PRESENT');
@@ -60,16 +71,23 @@ function validateControlPlane(){
 
 async function validatePreview(){
   const url=String(cert.previewUrl).replace(/\/$/,'')+'/__recovery__/build.json?releaseLock='+Date.now();
-  const res=await fetch(url,{headers:{'cache-control':'no-cache','accept-encoding':'identity','user-agent':'Gravicentra-Release-Lineage-Guard/1.0'}});
+  const res=await fetch(url,{headers:{'cache-control':'no-cache','accept-encoding':'identity','user-agent':'Gravicentra-Release-Lineage-Guard/2.0'}});
   need(res.ok,'RELEASE_LOCK_PREVIEW_MARKER_HTTP_'+res.status);
   const marker=await res.json();
   need(marker&&marker.sourceSha===cert.sourceSha,'RELEASE_LOCK_PREVIEW_SOURCE_MISMATCH');
   need(marker&&marker.buildId===cert.buildId,'RELEASE_LOCK_PREVIEW_BUILD_MISMATCH');
 }
 
-if(MODE==='control-plane') validateControlPlane();
-if(MODE==='certified'||MODE==='control-plane'){
-  need(String(LOCK.candidateSourceSha)===String(cert.sourceSha),'ACTIVE_I4A_BLOCKED_PENDING_NEW_I3_CERTIFICATION');
+if(MODE==='control-plane'){
+  validateControlPlane();
+  // A new candidate pending I3 is a valid transitional state: I3 must point to
+  // candidate while I4A remains pinned to the last certified immutable artifact.
+  // Do not collapse these two authorities until I3 readback certifies the candidate.
+  if(!pending) await validatePreview();
+}
+if(MODE==='certified'){
+  need(!pending,'ACTIVE_I4A_BLOCKED_PENDING_NEW_I3_CERTIFICATION');
+  validateControlPlane();
   await validatePreview();
 }
 
@@ -88,9 +106,12 @@ for(const [k,v] of Object.entries(exportsMap)){
 }
 console.log('GRAVICENTRA_RELEASE_LINEAGE_GUARD=PASS');
 console.log('MODE='+MODE);
+console.log('CANDIDATE_SOURCE_SHA='+candidate);
+console.log('CERTIFIED_SOURCE_SHA='+certified);
+console.log('PENDING_I3='+pending);
 console.log('SOURCE_SHA='+source);
 console.log('BUILD_ID='+cert.buildId);
 console.log('PREVIEW_URL='+cert.previewUrl);
-console.log('POST_CERTIFICATION_CHANGED_FILES='+changed.length);
+console.log('POST_SOURCE_CHANGED_FILES='+changed.length);
 console.log('PRODUCTION_TOUCHED=false');
 console.log('DATA_TOUCHED=false');
