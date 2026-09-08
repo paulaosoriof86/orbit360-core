@@ -39,7 +39,10 @@ if(pending){
   need(LOCK.status!=='CANDIDATE_SOURCE_PENDING_I3','CERTIFIED_STATE_STILL_MARKED_PENDING_I3');
 }
 
-const source=MODE==='candidate'?candidate:certified;
+// In the legitimate pending-I3 state, the candidate itself is approved source
+// awaiting immutable certification. Control-plane drift must therefore be measured
+// after the candidate, not from the previous certified source.
+const source=(MODE==='candidate'||(MODE==='control-plane'&&pending))?candidate:certified;
 const current=git('rev-parse','HEAD');
 try{git('cat-file','-e',source+'^{commit}');}catch{fail('RELEASE_LOCK_SOURCE_COMMIT_NOT_AVAILABLE:'+source);}
 try{execFileSync('git',['merge-base','--is-ancestor',source,current],{stdio:'ignore'});}catch{fail('RELEASE_LOCK_SOURCE_NOT_ANCESTOR:'+source+':'+current);}
@@ -71,7 +74,7 @@ function validateControlPlane(){
 
 async function validatePreview(){
   const url=String(cert.previewUrl).replace(/\/$/,'')+'/__recovery__/build.json?releaseLock='+Date.now();
-  const res=await fetch(url,{headers:{'cache-control':'no-cache','accept-encoding':'identity','user-agent':'Gravicentra-Release-Lineage-Guard/2.0'}});
+  const res=await fetch(url,{headers:{'cache-control':'no-cache','accept-encoding':'identity','user-agent':'Gravicentra-Release-Lineage-Guard/2.1'}});
   need(res.ok,'RELEASE_LOCK_PREVIEW_MARKER_HTTP_'+res.status);
   const marker=await res.json();
   need(marker&&marker.sourceSha===cert.sourceSha,'RELEASE_LOCK_PREVIEW_SOURCE_MISMATCH');
@@ -80,9 +83,6 @@ async function validatePreview(){
 
 if(MODE==='control-plane'){
   validateControlPlane();
-  // A new candidate pending I3 is a valid transitional state: I3 must point to
-  // candidate while I4A remains pinned to the last certified immutable artifact.
-  // Do not collapse these two authorities until I3 readback certifies the candidate.
   if(!pending) await validatePreview();
 }
 if(MODE==='certified'){
@@ -109,7 +109,7 @@ console.log('MODE='+MODE);
 console.log('CANDIDATE_SOURCE_SHA='+candidate);
 console.log('CERTIFIED_SOURCE_SHA='+certified);
 console.log('PENDING_I3='+pending);
-console.log('SOURCE_SHA='+source);
+console.log('DRIFT_BASE_SOURCE_SHA='+source);
 console.log('BUILD_ID='+cert.buildId);
 console.log('PREVIEW_URL='+cert.previewUrl);
 console.log('POST_SOURCE_CHANGED_FILES='+changed.length);
