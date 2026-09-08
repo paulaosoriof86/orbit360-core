@@ -3,9 +3,9 @@
   "productBrand": "Gravicentra Insurance",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
-  "activeGate": "I4A",
-  "status": "CERTIFIED_I3_ACTIVE_I4A",
-  "candidateSourceSha": "e43e4723b3c19402e3f1fb482f791bcbaeab77bc",
+  "activeGate": "I3_REBUILD_FOR_I4A",
+  "status": "CANDIDATE_SOURCE_PENDING_I3",
+  "candidateSourceSha": "fb09b03bc5e45a68e129237eae6e47f1023164dc",
   "certified": {
     "sourceSha": "e43e4723b3c19402e3f1fb482f791bcbaeab77bc",
     "buildId": "gi-i3-e43e4723b3c1-57f234755dc1",
@@ -22,7 +22,7 @@
     "previewUrl": "https://ays-orbit-360-lab--gi-i3-34158970067-a7c5qmjc.web.app",
     "readbackExact": true,
     "sameArtifactPreviewToProductionRequired": true,
-    "sourceMutatedAfterBuild": false,
+    "sourceMutatedAfterBuild": true,
     "productionTouched": false,
     "dataTouched": false
   },
@@ -41,9 +41,10 @@
     "artifacts/orbit360-recovery/release-control/"
   ],
   "evidence": {
-    "i3Conclusion": "success",
-    "i3Readback": "ARTIFACT_READBACK_EXACT_PASS",
-    "i4aState": "FAIL_IN_PROGRESS",
+    "i3Conclusion": "success_for_previous_candidate_only",
+    "i3Readback": "ARTIFACT_READBACK_EXACT_PASS_FOR_E43_ONLY",
+    "i4aState": "HOLD_PENDING_NEW_I3_AFTER_CAUSAL_SOURCE_FIX",
+    "causalSourceFix": "fb09b03bc5e45a68e129237eae6e47f1023164dc",
     "dataCutoff": "2026-07-31",
     "augustRefresh": "HOLD"
   }
