@@ -75,11 +75,13 @@ for(const name of gravicentraFiles){
   const text=read(`${WF}/${name}`);
   if(name!=='gravicentra-release-lock-sync.yml'){
     need(!text.includes('RECOVERY_STATE.json')&&!text.includes('ACTIVE_RELEASE_LOCK.json'),'GRAVICENTRA_WORKFLOW_SPLIT_AUTHORITY_CONSUMPTION:'+name);
+    need(!text.includes('gravicentra-release-lineage-guard.mjs'),'GRAVICENTRA_WORKFLOW_OLD_GUARD_REFERENCE:'+name);
   }else{
     need(text.includes('RECOVERY_STATE.json')&&text.includes('ACTIVE_RELEASE_LOCK.json'),'CENTRAL_TOMBSTONE_WATCH_MISSING');
+    need(text.includes('tools/gravicentra-release-lineage-guard.mjs'),'CENTRAL_OLD_GUARD_WATCH_MISSING');
     need(!text.includes('GRAVICENTRA_RECOVERY_STATE')&&!text.includes('GRAVICENTRA_RELEASE_LOCK'),'CENTRAL_TOMBSTONE_CONSUMPTION_FORBIDDEN');
+    need(!/node\s+tools\/gravicentra-release-lineage-guard\.mjs/.test(text),'CENTRAL_OLD_GUARD_EXECUTION_FORBIDDEN');
   }
-  need(!text.includes('gravicentra-release-lineage-guard.mjs'),'GRAVICENTRA_WORKFLOW_OLD_GUARD_REFERENCE:'+name);
 }
 
 console.log('GRAVICENTRA_MECHANISM_INVARIANT=PASS');
@@ -90,3 +92,4 @@ console.log('I4A_PUSH_TRIGGER=false');
 console.log('I4A_RUNTIME_SELF_PATCH=false');
 console.log('SPLIT_AUTHORITY_ACTIVE=false');
 console.log('TOMBSTONE_WATCH_ACTIVE=true');
+console.log('OLD_GUARD_WATCH_ACTIVE=true');
