@@ -16,8 +16,8 @@
     "capabilityCount": 15
   },
   "deprecatedMutableAuthorities": {
-    "artifacts/orbit360-recovery/release-control/RECOVERY_STATE.json": "COMPATIBILITY_ONLY_PENDING_V2_SWITCHOVER",
-    "artifacts/orbit360-recovery/release-control/ACTIVE_RELEASE_LOCK.json": "COMPATIBILITY_ONLY_PENDING_V2_SWITCHOVER"
+    "artifacts/orbit360-recovery/release-control/RECOVERY_STATE.json": "COMPATIBILITY_ONLY_PENDING_EXECUTOR_SWITCHOVER",
+    "artifacts/orbit360-recovery/release-control/ACTIVE_RELEASE_LOCK.json": "COMPATIBILITY_ONLY_PENDING_EXECUTOR_SWITCHOVER"
   },
   "gateState": {
     "lastFormallyCompletedIteration": 2,
@@ -94,7 +94,9 @@
     "frozenPlanMaterialized": true,
     "lineageLockMaterialized": true,
     "controlPlaneMaterialized": true,
-    "releaseGuardConsumesOnlyControlPlane": false,
+    "centralReleaseGuardConsumesOnlyControlPlane": true,
+    "centralGuardRunId": 34361975845,
+    "centralGuardConclusion": "success",
     "legacyStateAndReleaseLockDeprecated": false,
     "workflowReleaseHardcodesRemoved": false,
     "workflowFanoutRemoved": false,
@@ -102,5 +104,5 @@
     "evergreenProjectSourcePackagePrepared": false,
     "i3FormalSeal": false
   },
-  "nextAction": "SWITCH_RELEASE_GUARD_TO_CONTROL_PLANE_V2_AND_REMOVE_DUPLICATE_MUTABLE_AUTHORITY"
+  "nextAction": "MIGRATE_ACTIVE_EXECUTORS_TO_CONTROL_PLANE_V2_THEN_DEPRECATE_LEGACY_MUTABLE_FILES"
 }
