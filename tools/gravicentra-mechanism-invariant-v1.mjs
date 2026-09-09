@@ -12,9 +12,10 @@ const OLD_GUARD='tools/gravicentra-release-lineage-guard.mjs';
 const NEW_GUARD='tools/gravicentra-control-plane-guard-v2.mjs';
 const I3='.github/workflows/gravicentra-recovery-i3-preview-v2.yml';
 const I4A='.github/workflows/gravicentra-recovery-i4a-public-browser.yml';
+const CENTRAL='.github/workflows/gravicentra-release-lock-sync.yml';
 const HARNESS='tools/gravicentra-i4a-authenticated-browser-v2.mjs';
 
-for(const p of [CONTROL,STATE,LOCK,OLD_GUARD,NEW_GUARD,I3,I4A,HARNESS]) need(exists(p),'MECHANISM_REQUIRED_FILE_MISSING:'+p);
+for(const p of [CONTROL,STATE,LOCK,OLD_GUARD,NEW_GUARD,I3,I4A,CENTRAL,HARNESS]) need(exists(p),'MECHANISM_REQUIRED_FILE_MISSING:'+p);
 const c=json(CONTROL);
 need(c.mechanismRules?.singleMutableAuthority==='THIS_FILE','MECHANISM_SINGLE_MUTABLE_AUTHORITY_NOT_DECLARED');
 need(c.mechanismRules?.hardcodedReleaseIdentityInWorkflowsForbidden===true,'MECHANISM_HARDCODE_RULE_NOT_DECLARED');
@@ -72,7 +73,12 @@ need(i4aExecutors.length===1&&i4aExecutors[0]==='gravicentra-recovery-i4a-public
 const gravicentraFiles=names.filter(x=>x.startsWith('gravicentra-'));
 for(const name of gravicentraFiles){
   const text=read(`${WF}/${name}`);
-  need(!text.includes('RECOVERY_STATE.json')&&!text.includes('ACTIVE_RELEASE_LOCK.json'),'GRAVICENTRA_WORKFLOW_SPLIT_AUTHORITY_REFERENCE:'+name);
+  if(name!=='gravicentra-release-lock-sync.yml'){
+    need(!text.includes('RECOVERY_STATE.json')&&!text.includes('ACTIVE_RELEASE_LOCK.json'),'GRAVICENTRA_WORKFLOW_SPLIT_AUTHORITY_CONSUMPTION:'+name);
+  }else{
+    need(text.includes('RECOVERY_STATE.json')&&text.includes('ACTIVE_RELEASE_LOCK.json'),'CENTRAL_TOMBSTONE_WATCH_MISSING');
+    need(!text.includes('GRAVICENTRA_RECOVERY_STATE')&&!text.includes('GRAVICENTRA_RELEASE_LOCK'),'CENTRAL_TOMBSTONE_CONSUMPTION_FORBIDDEN');
+  }
   need(!text.includes('gravicentra-release-lineage-guard.mjs'),'GRAVICENTRA_WORKFLOW_OLD_GUARD_REFERENCE:'+name);
 }
 
@@ -83,3 +89,4 @@ console.log('I3_PUSH_TRIGGER=false');
 console.log('I4A_PUSH_TRIGGER=false');
 console.log('I4A_RUNTIME_SELF_PATCH=false');
 console.log('SPLIT_AUTHORITY_ACTIVE=false');
+console.log('TOMBSTONE_WATCH_ACTIVE=true');
