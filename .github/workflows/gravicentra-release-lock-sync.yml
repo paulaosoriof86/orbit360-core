@@ -6,6 +6,7 @@ on:
     branches:
       - recovery/fase-a-clean-20260831
     paths:
+      - artifacts/orbit360-recovery/release-control/RECOVERY_STATE.json
       - artifacts/orbit360-recovery/release-control/ACTIVE_RELEASE_LOCK.json
       - tools/gravicentra-release-lineage-guard.mjs
       - tools/gravicentra-i3-preview-v2-package.mjs
@@ -19,7 +20,7 @@ permissions:
 
 concurrency:
   group: gravicentra-release-lock-guard-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   verify-release-control:
@@ -35,19 +36,23 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Fail closed on any release-lock or executor desynchronization
+      - name: Fail closed on state, release-lock or executor desynchronization
         run: |
           set -euo pipefail
           test "$GITHUB_REF_NAME" = "recovery/fase-a-clean-20260831"
           node tools/gravicentra-release-lineage-guard.mjs --mode=control-plane
+          node --check tools/gravicentra-release-lineage-guard.mjs
+          node --check tools/gravicentra-i3-preview-v2-package.mjs
           git diff --exit-code
           {
-            echo '## Gravicentra Insurance — release control guard'
-            echo '- Authority: `ACTIVE_RELEASE_LOCK.json`'
+            echo '## Gravicentra Insurance — recovery control guard'
+            echo '- Live gate state: `RECOVERY_STATE.json`'
+            echo '- Release identity: `ACTIVE_RELEASE_LOCK.json`'
+            echo '- I3 candidate source: derived from lock, never hardcoded'
+            echo '- Shared backend mutation before I5: forbidden'
             echo '- Candidate/I3 mismatch: fail closed'
             echo '- Certified/I4A mismatch: fail closed'
-            echo '- Single I3 executor v2: required'
             echo '- Silent retarget: forbidden'
-            echo '- Production canonical backend touched: false'
+            echo '- Production touched: false'
             echo '- Data touched: false'
           } >> "$GITHUB_STEP_SUMMARY"

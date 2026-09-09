@@ -1,7 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { execFileSync } from 'node:child_process';
 
 const [sourceRoot, packageRoot, publicConfigPath] = process.argv.slice(2);
 if (!sourceRoot || !packageRoot || !publicConfigPath) throw new Error('USAGE: package.mjs <sourceRoot> <packageRoot> <publicConfigJson>');
@@ -61,9 +60,7 @@ function copyTree(src,dst){for(const e of fs.readdirSync(src,{withFileTypes:true
 copyTree(FUNCTIONS_SRC,BACKEND);
 for(const p of ['package.json','package-lock.json','bootstrap.js','product-active-role-contract.js','product-insurer-credentials.js']) if(!fs.existsSync(path.join(BACKEND,p)))throw new Error('BACKEND_REQUIRED_FILE_MISSING:'+p);
 const backendText=read(path.join(BACKEND,'product-insurer-credentials.js'));
-for(const token of ['orbit360ProductInsurerCredentialCommand=onCall','orbit360ProductInsurerCredentialCommandPreview=onCall',"const PREVIEW_REGION='us-east1'","request=>execute(request,'cloudlog')","request=>execute(request,'firestore')"]) if(!backendText.includes(token))throw new Error('BACKEND_CONTRACT_MISSING:'+token);
-execFileSync('npm',['ci','--ignore-scripts','--no-audit','--no-fund'],{cwd:BACKEND,stdio:['ignore','ignore','inherit']});
-if(!fs.existsSync(path.join(BACKEND,'node_modules/firebase-admin/app/package.json')))throw new Error('BACKEND_LOCKED_DEPENDENCIES_NOT_MATERIALIZED');
+for(const token of ['orbit360ProductInsurerCredentialCommand=onCall',"request=>execute(request,'firestore')"]) if(!backendText.includes(token))throw new Error('BACKEND_CONTRACT_MISSING:'+token);
 
 let raw=JSON.parse(read(publicConfigPath)); let result=raw&&raw.result||{}; let cfg=result.sdkConfig;
 if(!cfg&&typeof result.fileContents==='string'){const m=result.fileContents.match(/initializeApp\((\{.*?\})\)/s);if(m)cfg=JSON.parse(m[1]);}
@@ -77,10 +74,9 @@ const payload={enabled:true,environmentRef:'firebase-hosting-preview-i3',tenantH
 fs.writeFileSync(path.join(SITE,'product-runtime-config.js'),'/* Generated only inside the certified I3 artifact. Public Firebase Web config; no secrets. */\nwindow.__ORBIT360_PRODUCT_PUBLIC_CONFIG__ = Object.freeze('+JSON.stringify(payload)+');\n');
 fs.mkdirSync(path.join(SITE,'__recovery__'),{recursive:true});fs.writeFileSync(path.join(SITE,'__recovery__/build.json'),JSON.stringify({product:'Gravicentra Insurance',gate:'I3',sourceSha:SOURCE_SHA,buildId,environmentRef:'firebase-hosting-preview-i3'})+'\n');
 fs.writeFileSync(path.join(EVIDENCE,'public-config-descriptor.json'),JSON.stringify({projectId:cfg.projectId,authDomain:cfg.authDomain,appIdPresent:true,apiKeyPresent:true,storageBucketPresent:!!cfg.storageBucket,configSha256:cfgHash})+'\n');
-fs.writeFileSync(path.join(BUNDLE,'firebase.json'),JSON.stringify({hosting:{site:HOSTING_SITE,public:'site',ignore:['firebase.json','firebase.backend.json','backend/**','**/.*','**/node_modules/**'],rewrites:[{source:'**',destination:'/index.html'}]}})+'\n');
-fs.writeFileSync(path.join(BUNDLE,'firebase.backend.json'),JSON.stringify({functions:{source:'backend',runtime:'nodejs22',ignore:['node_modules','.git','firebase-debug.log','firebase-debug.*.log','*.local']}})+'\n');
+fs.writeFileSync(path.join(BUNDLE,'firebase.json'),JSON.stringify({hosting:{site:HOSTING_SITE,public:'site',ignore:['firebase.json','backend/**','**/.*','**/node_modules/**'],rewrites:[{source:'**',destination:'/index.html'}]}})+'\n');
 fs.writeFileSync(path.join(BUNDLE,'.firebaserc'),JSON.stringify({projects:{default:PROJECT_ID}})+'\n');
-function manifest(root,out){const files=[];const walk=d=>{for(const e of fs.readdirSync(d,{withFileTypes:true})){if(e.name==='node_modules')continue;const p=path.join(d,e.name);if(e.isDirectory())walk(p);else if(e.isFile())files.push(p);}};walk(root);files.sort();const rows=files.map(p=>crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex')+'  '+path.relative(root,p).split(path.sep).join('/'));const text=rows.join('\n')+'\n';fs.writeFileSync(out,text);return{count:rows.length,digest:crypto.createHash('sha256').update(text).digest('hex')};}
+function manifest(root,out){const files=[];const walk=d=>{for(const e of fs.readdirSync(d,{withFileTypes:true})){const p=path.join(d,e.name);if(e.isDirectory()&&e.name!=='node_modules')walk(p);else if(e.isFile())files.push(p);}};walk(root);files.sort();const rows=files.map(p=>crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex')+'  '+path.relative(root,p).split(path.sep).join('/'));const text=rows.join('\n')+'\n';fs.writeFileSync(out,text);return{count:rows.length,digest:crypto.createHash('sha256').update(text).digest('hex')};}
 const siteM=manifest(SITE,path.join(EVIDENCE,'site-manifest.sha256')); const backendM=manifest(BACKEND,path.join(EVIDENCE,'backend-manifest.sha256')); const bundleM=manifest(BUNDLE,path.join(EVIDENCE,'bundle-manifest.sha256'));
 const output={buildId,hostedFileCount:siteM.count,hostedPayloadDigest:siteM.digest,backendFileCount:backendM.count,backendSourceDigest:backendM.digest,bundleFileCount:bundleM.count,bundleDigest:bundleM.digest,reachableProductFiles:seen.size};
 fs.writeFileSync(path.join(EVIDENCE,'package-output.json'),JSON.stringify(output)+'\n'); console.log(JSON.stringify(output));

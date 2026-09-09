@@ -8,15 +8,14 @@
   "candidateSourceSha": "96f6962b8519a032c2f54b50d2796fa2545de1e4",
   "candidateTopology": {
     "reason": "ASEGURADORAS_CANONICAL_BACKEND_ABSENT_LEGACY_CONTRACT_REJECTED",
-    "previewCallable": "orbit360ProductInsurerCredentialCommandPreview",
-    "previewRegion": "us-east1",
-    "previewAudit": "cloudlog",
-    "previewOperationalWrites": false,
-    "previewImportEnabled": false,
     "productionCallable": "orbit360ProductInsurerCredentialCommand",
     "productionRegion": "us-central1",
     "productionBackendTouched": false,
-    "sameBackendSourcePackageRequired": true
+    "backendSourcePackageRequired": true,
+    "i3FunctionsDeployAllowed": false,
+    "i3SharedBackendMutationAllowed": false,
+    "i3BackendProof": "SOURCE_PACKAGE_AND_LOCKED_DEPENDENCY_PREFLIGHT_ONLY",
+    "i4aCredentialRuntimeBoundary": "OPEN_STRUCTURAL_BOUNDARY_PENDING_FORMAL_RESOLUTION"
   },
   "certified": {
     "sourceSha": "fb09b03bc5e45a68e129237eae6e47f1023164dc",
@@ -41,12 +40,13 @@
   "releaseRules": {
     "qaOnlyCommitsMayFollowCertifiedSource": true,
     "productSourceDriftInvalidatesCertifiedI3ForI4A": true,
-    "i3PinMustEqualCandidateSourceSha": true,
+    "i3MustDeriveCandidateFromThisLock": true,
     "i4aPinsMustEqualCertifiedRelease": true,
     "previewBuildMarkerMustMatchCertifiedRelease": true,
     "silentRetargetForbidden": true,
     "productionPromotionMustReuseCertifiedArtifact": true,
-    "productionBackendDeployBeforeI5Forbidden": true
+    "productionBackendDeployBeforeI5Forbidden": true,
+    "sharedBackendMutationBeforeI5Forbidden": true
   },
   "allowedPostCertificationControlPlanePrefixes": [
     ".github/workflows/gravicentra-",
@@ -63,6 +63,9 @@
     "legacyContractRunId": 34302070454,
     "legacyContractConclusion": "success",
     "legacyReuse": "REJECTED_CONTRACT_MISMATCH",
+    "latestI3PipelineRunId": 34305902437,
+    "latestI3PipelineConclusion": "failure",
+    "latestI3PipelineFailureClass": "PIPELINE_VALIDATOR",
     "writesExecuted": 0,
     "productionTouched": false,
     "dataTouched": false,

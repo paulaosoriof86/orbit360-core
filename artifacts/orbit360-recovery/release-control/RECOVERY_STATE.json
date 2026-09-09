@@ -1,0 +1,114 @@
+{
+  "schemaVersion": "orbit360-recovery-state-v1",
+  "stateId": "GRAVICENTRA-INSURANCE-FASE-A-CLEAN-RECOVERY",
+  "productBrand": "Gravicentra Insurance",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "forensicOriginSha": "9c95f31461f2eabe9804625b5659bee772f5602a",
+  "status": "ITERATION_3_IN_PROGRESS",
+  "lastCompletedIteration": 2,
+  "currentIteration": 3,
+  "activeGate": "I3_REMEDIATION_IMMUTABLE_PREVIEW",
+  "releaseAuthority": {
+    "path": "artifacts/orbit360-recovery/release-control/ACTIVE_RELEASE_LOCK.json",
+    "scope": "SOURCE_BUILD_ARTIFACT_PREVIEW_IDENTITY"
+  },
+  "normativeAuthority": {
+    "precedence": [
+      "02_ADDENDUM_PREVALENTE_FRONTERA_PROYECTO",
+      "THIS_LIVE_STATE",
+      "PLAN_MAESTRO_GRAVICENTRA_INSURANCE_V1_3",
+      "06_MANIFIESTO_CAPACIDADES_FASE_A",
+      "03_ADDENDUM_ANTI_DESCARRILAMIENTO",
+      "04_MATRIZ_MODULO_POR_MODULO_FASE_A",
+      "10_ADDENDUM_FORENSE_CONTINUIDAD_LINEAGE_CIERRE_FASE_A_20260903"
+    ],
+    "staticPackageManifest": "09_MANIFIESTO_SHA256.json",
+    "staticPackageIntegrity": "VERIFIED_2026-09-09",
+    "historicalSources": "CONTEXT_ONLY"
+  },
+  "staticSnapshotDisposition": {
+    "05_ESTADO_VIVO_RECOVERY_20260831": "SUPERSEDED_BY_EXECUTED_REALITY",
+    "04_MATRIZ_MODULO_POR_MODULO_FASE_A_20260831": "INITIAL_VALIDATION_TEMPLATE_NOT_LIVE_GATE_STATE",
+    "10_ADDENDUM_FORENSE_20260903_STATE_SNAPSHOT": "HISTORICAL_SNAPSHOT_RULES_REMAIN_AUTHORITATIVE"
+  },
+  "gates": {
+    "I0": {
+      "status": "PASS",
+      "evidence": "authority freeze"
+    },
+    "I1": {
+      "status": "PASS",
+      "evidence": "artifacts/orbit360-recovery/i1-lineage/I1_15_CAPABILITY_LINEAGE_CLOSURE_20260904.json",
+      "capabilitiesBound": 15
+    },
+    "I2": {
+      "status": "PASS_LATEST_CANDIDATE",
+      "latestRunId": 34304799588,
+      "latestRunConclusion": "success",
+      "sourceIdentity": "READ_FROM_ACTIVE_RELEASE_LOCK",
+      "historicalClosure": "artifacts/orbit360-recovery/i2-clean-source/I2_CLEAN_SOURCE_CLOSURE_20260906.json",
+      "historicalClosureDisposition": "SUPERSEDED_FOR_SOURCE_IDENTITY_BY_LATEST_I2_RUN_AND_RELEASE_LOCK"
+    },
+    "I3": {
+      "status": "IN_PROGRESS",
+      "lastFailedRunId": 34305902437,
+      "lastFailureClass": "PIPELINE_VALIDATOR",
+      "lastFailure": "BACKEND_LOCKED_DEPENDENCIES_NOT_MATERIALIZED_FALSE_NEGATIVE_PATH_CHECK",
+      "sharedBackendMutationAllowed": false
+    },
+    "I4A": {
+      "status": "BLOCKED_BY_I3",
+      "preservePriorEvidenceUnlessCausallyInvalidated": true
+    },
+    "I4B": {
+      "status": "PENDING"
+    },
+    "I5": {
+      "status": "PENDING",
+      "productionMutationAllowedOnlyHere": true
+    },
+    "I6": {
+      "status": "HOLD_UNTIL_PRODUCTION_ACCEPTED"
+    }
+  },
+  "activeDefects": [
+    {
+      "id": "GOV-STATE-SYNC-001",
+      "class": "RELEASE-COMPOSITION",
+      "status": "REMEDIATED_PENDING_GUARD_PASS",
+      "rootCause": "Operational state was duplicated across static snapshots, closure artifacts, lock and hardcoded workflow pins.",
+      "remediation": "This live state owns gate progression; ACTIVE_RELEASE_LOCK owns release identity; active I3 derives candidate from lock."
+    },
+    {
+      "id": "PIPE-I3-VALIDATOR-001",
+      "class": "PIPELINE-VALIDATOR",
+      "status": "REMEDIATED_PENDING_I3_RUN",
+      "rootCause": "I3 dependency validation used a physical path assertion instead of module resolution and was discovered only after Firebase auth.",
+      "remediation": "Run locked dependency preflight before Firebase auth; package creation is deterministic and does not install dependencies."
+    },
+    {
+      "id": "ASEG-BACKEND-FRONTIER-001",
+      "class": "RELEASE-COMPOSITION",
+      "status": "OPEN_STRUCTURAL_BOUNDARY",
+      "rootCause": "Aseguradoras latest-approved frontend requires canonical protected backend runtime, but shared backend mutation is forbidden before I5.",
+      "rule": "Do not solve by deploying any Preview or production Function in I3.",
+      "nextDecision": "Resolve I4A proof boundary formally after I3 Hosting artifact certification; do not mutate shared backend meanwhile."
+    },
+    {
+      "id": "PKG-METADATA-001",
+      "class": "PIPELINE-VALIDATOR",
+      "status": "OPEN_NON_CAUSAL_METADATA_DRIFT",
+      "finding": "functions/package.json version 1.6.0 while package-lock root version is 1.5.0",
+      "releaseImpact": "NOT_PROVEN_CAUSAL_TO_CURRENT_FAILURE",
+      "rule": "Do not change product source solely for this finding without causal or release-contract necessity."
+    }
+  ],
+  "productionAccepted": false,
+  "productionTouchedByRecovery": false,
+  "dataTouchedByRecovery": false,
+  "writesExecutedByCurrentRemediation": 0,
+  "dataCutoff": "2026-07-31",
+  "augustRefresh": "HOLD",
+  "nextAction": "RUN_I3_HOSTING_ONLY_FROM_ACTIVE_RELEASE_LOCK_AFTER_PIPELINE_PREFLIGHT; NO_FUNCTIONS_DEPLOY_BEFORE_I5"
+}

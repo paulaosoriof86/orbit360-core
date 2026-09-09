@@ -8,28 +8,26 @@ on:
     paths:
       - .github/workflows/gravicentra-recovery-i3-preview-v2.yml
       - tools/gravicentra-i3-preview-v2-package.mjs
+      - tools/gravicentra-release-lineage-guard.mjs
+      - artifacts/orbit360-recovery/release-control/RECOVERY_STATE.json
+      - artifacts/orbit360-recovery/release-control/ACTIVE_RELEASE_LOCK.json
 
 permissions:
   contents: read
 
 concurrency:
   group: gravicentra-recovery-i3-v2-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 env:
-  SOURCE_SHA: 96f6962b8519a032c2f54b50d2796fa2545de1e4
   PROJECT_ID: ays-orbit-360-lab
   HOSTING_SITE: ays-orbit-360-lab
   TENANT_HINT: alianzas-soluciones
-  PREVIEW_FUNCTION: orbit360ProductInsurerCredentialCommandPreview
-  PREVIEW_REGION: us-east1
-  PROD_FUNCTION: orbit360ProductInsurerCredentialCommand
-  PROD_REGION: us-central1
 
 jobs:
   immutable-preview:
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 25
     steps:
       - name: Checkout Recovery control plane
         uses: actions/checkout@v4
@@ -38,24 +36,60 @@ jobs:
           path: control
           fetch-depth: 50
           persist-credentials: false
+
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Fail closed against single release authority
+
+      - id: release
+        name: Fail closed against live state and single release authority
         working-directory: control
         run: |
           set -euo pipefail
           test "$GITHUB_REF_NAME" = "recovery/fase-a-clean-20260831"
           node tools/gravicentra-release-lineage-guard.mjs --mode=candidate
+
       - name: Checkout fixed Recovery product source
         uses: actions/checkout@v4
         with:
-          ref: ${{ env.SOURCE_SHA }}
+          ref: ${{ steps.release.outputs.source_sha }}
           path: source
           fetch-depth: 1
           persist-credentials: false
+
+      - name: Locked backend dependency preflight before Firebase access
+        run: |
+          set -euo pipefail
+          test "$(git -C source rev-parse HEAD)" = "${{ steps.release.outputs.source_sha }}"
+          ROOT="$RUNNER_TEMP/gravicentra-i3-backend-preflight"
+          rm -rf "$ROOT"
+          cp -R source/functions "$ROOT"
+          cd "$ROOT"
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const pkg=JSON.parse(fs.readFileSync('package.json','utf8'));
+          const lock=JSON.parse(fs.readFileSync('package-lock.json','utf8'));
+          const root=lock.packages&&lock.packages[''];
+          if(!root) throw new Error('BACKEND_LOCK_ROOT_MISSING');
+          if(pkg.name!==root.name) throw new Error('BACKEND_PACKAGE_NAME_LOCK_DRIFT');
+          if(String(pkg.engines&&pkg.engines.node)!==String(root.engines&&root.engines.node)) throw new Error('BACKEND_NODE_ENGINE_LOCK_DRIFT');
+          for(const [name,spec] of Object.entries(pkg.dependencies||{})){
+            if(!root.dependencies||root.dependencies[name]!==spec) throw new Error('BACKEND_DEPENDENCY_LOCK_DRIFT:'+name);
+          }
+          if(pkg.version!==root.version) console.warn('BACKEND_PACKAGE_VERSION_METADATA_DRIFT:'+pkg.version+':'+root.version);
+          NODE
+          npm ci --ignore-scripts --no-audit --no-fund
+          node - <<'NODE'
+          const {createRequire}=require('node:module');
+          const path=require('node:path');
+          const req=createRequire(path.join(process.cwd(),'package.json'));
+          for(const id of ['firebase-admin/app','firebase-functions/v2/https','@google-cloud/secret-manager']) req.resolve(id);
+          console.log('BACKEND_LOCKED_DEPENDENCY_RESOLUTION=PASS');
+          NODE
+          npm run check
+
       - id: auth
-        name: Prove credential access to existing Firebase
+        name: Prove credential access to existing Firebase Hosting
         env:
           SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
@@ -85,14 +119,16 @@ jobs:
             set -e
             if [ "$A" -eq 0 ] && [ "$B" -eq 0 ]; then SELECTED_NAME="$NAME"; SELECTED_FILE="$FILE"; SELECTED_OWNER="$OWNER"; break; fi
           done < "$ROOT/index.tsv"
-          test -n "$SELECTED_FILE" || { echo EXISTING_FIREBASE_ACCESS_NOT_PROVEN >&2; exit 42; }
+          test -n "$SELECTED_FILE" || { echo EXISTING_FIREBASE_HOSTING_ACCESS_NOT_PROVEN >&2; exit 42; }
           cp "$SELECTED_FILE" "$RUNNER_TEMP/gravicentra-i3-firebase-sa.json"; chmod 600 "$RUNNER_TEMP/gravicentra-i3-firebase-sa.json"
           echo "credential_source=$SELECTED_NAME" >> "$GITHUB_OUTPUT"
           echo "credential_file=$RUNNER_TEMP/gravicentra-i3-firebase-sa.json" >> "$GITHUB_OUTPUT"
           echo "credential_owner_project=$SELECTED_OWNER" >> "$GITHUB_OUTPUT"
+
       - id: build
         name: Materialize immutable frontend and backend source package
         env:
+          SOURCE_SHA: ${{ steps.release.outputs.source_sha }}
           GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.auth.outputs.credential_file }}
         run: |
           set -euo pipefail
@@ -120,46 +156,15 @@ jobs:
               for k,v in d.items():
                   key=''.join(('_'+c.lower() if c.isupper() else c) for c in k).lstrip('_'); f.write(f'{key}={v}\n')
           PY
-      - id: backend
-        name: Deploy isolated Preview callable only; canonical production callable remains absent
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.auth.outputs.credential_file }}
-        run: |
-          set -euo pipefail
-          npx --yes firebase-tools@14.10.1 functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/functions-before.json"
-          export FJSON="$RUNNER_TEMP/functions-before.json" TARGET="$PROD_FUNCTION" REGION="$PROD_REGION"
-          python3 - <<'PY'
-          import json,os
-          d=json.load(open(os.environ['FJSON'])); target=os.environ['TARGET']; region=os.environ['REGION']; hits=[]
-          def walk(v):
-              if isinstance(v,dict):
-                  s=json.dumps(v,sort_keys=True)
-                  if target in s: hits.append(s)
-                  for x in v.values(): walk(x)
-              elif isinstance(v,list):
-                  for x in v: walk(x)
-          walk(d)
-          if any(region in x for x in hits): raise SystemExit('PRODUCTION_CALLABLE_ALREADY_PRESENT_BEFORE_I5')
-          PY
-          cd "$RUNNER_TEMP/gravicentra-i3-release-package/bundle"
-          echo 'preview_backend_attempted=true' >> "$GITHUB_OUTPUT"
-          npx --yes firebase-tools@14.10.1 deploy --config firebase.backend.json --only "functions:$PREVIEW_FUNCTION" --project "$PROJECT_ID" --non-interactive --json 2>&1 | tee "$RUNNER_TEMP/backend-deploy.json"
-          npx --yes firebase-tools@14.10.1 functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/functions-after.json"
-          export FJSON="$RUNNER_TEMP/functions-after.json" PREVIEW="$PREVIEW_FUNCTION" PREGION="$PREVIEW_REGION" PROD="$PROD_FUNCTION" PRODREGION="$PROD_REGION"
-          python3 - <<'PY'
-          import json,os
-          d=json.load(open(os.environ['FJSON'])); s=json.dumps(d,sort_keys=True)
-          if os.environ['PREVIEW'] not in s or os.environ['PREGION'] not in s: raise SystemExit('PREVIEW_CALLABLE_NOT_LISTED_AFTER_DEPLOY')
-          if os.environ['PROD'] in s and os.environ['PRODREGION'] in s: raise SystemExit('PRODUCTION_CALLABLE_TOUCHED_BEFORE_I5')
-          PY
-          echo 'preview_backend_deployed=true' >> "$GITHUB_OUTPUT"
+
       - id: deploy
-        name: Deploy exact frontend bundle to Firebase Hosting Preview
+        name: Deploy exact frontend bundle to isolated Firebase Hosting Preview
         env:
           GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.auth.outputs.credential_file }}
         run: |
           set -euo pipefail
-          cd "$RUNNER_TEMP/gravicentra-i3-release-package/bundle"; CHANNEL_ID="gi-i3-${GITHUB_RUN_ID}"
+          cd "$RUNNER_TEMP/gravicentra-i3-release-package/bundle"
+          CHANNEL_ID="gi-i3-${GITHUB_RUN_ID}"
           npx --yes firebase-tools@14.10.1 hosting:channel:deploy "$CHANNEL_ID" --config firebase.json --project "$PROJECT_ID" --expires 7d --non-interactive --json > "$RUNNER_TEMP/hosting-deploy.json"
           export DEPLOY="$RUNNER_TEMP/hosting-deploy.json"
           PREVIEW_URL=$(python3 - <<'PY'
@@ -169,10 +174,13 @@ jobs:
           print(urls[-1])
           PY
           )
-          echo "channel_id=$CHANNEL_ID" >> "$GITHUB_OUTPUT"; echo "preview_url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
+          echo "channel_id=$CHANNEL_ID" >> "$GITHUB_OUTPUT"
+          echo "preview_url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
+
       - id: readback
         name: Read back every hosted byte from same Preview
         env:
+          SOURCE_SHA: ${{ steps.release.outputs.source_sha }}
           PREVIEW_URL: ${{ steps.deploy.outputs.preview_url }}
           EXPECTED_BUILD_ID: ${{ steps.build.outputs.build_id }}
           EXPECTED_DIGEST: ${{ steps.build.outputs.hosted_payload_digest }}
@@ -192,8 +200,10 @@ jobs:
           if marker.get('sourceSha')!=os.environ['SOURCE_SHA'] or marker.get('buildId')!=os.environ['EXPECTED_BUILD_ID']: raise SystemExit('PREVIEW_BUILD_MARKER_MISMATCH')
           print('PREVIEW_READBACK_EXACT_PASS='+str(len(rows))); open(os.environ['GITHUB_OUTPUT'],'a').write('readback_exact=true\n')
           PY
+
       - name: Seal I3 evidence
         env:
+          SOURCE_SHA: ${{ steps.release.outputs.source_sha }}
           PREVIEW_URL: ${{ steps.deploy.outputs.preview_url }}
           CHANNEL_ID: ${{ steps.deploy.outputs.channel_id }}
           BUILD_ID: ${{ steps.build.outputs.build_id }}
@@ -210,16 +220,25 @@ jobs:
           export EVIDENCE="$RUNNER_TEMP/gravicentra-i3-release-package/evidence/i3-evidence.json"
           python3 - <<'PY'
           import json,os
-          e={'schemaVersion':'gravicentra-recovery-i3-evidence-v2','status':'ARTIFACT_AND_PREVIEW_BACKEND_READBACK_EXACT_PASS','product':'Gravicentra Insurance','gate':'I3','sourceSha':os.environ['SOURCE_SHA'],'runnerCommit':os.environ['GITHUB_SHA'],'githubRunId':os.environ['GITHUB_RUN_ID'],'buildId':os.environ['BUILD_ID'],'firebaseProjectId':os.environ['PROJECT_ID'],'hostingSiteId':os.environ['HOSTING_SITE'],'hostedFileCount':int(os.environ['HOSTED_FILE_COUNT']),'hostedPayloadDigest':os.environ['HOSTED_PAYLOAD_DIGEST'],'backendFileCount':int(os.environ['BACKEND_FILE_COUNT']),'backendSourceDigest':os.environ['BACKEND_SOURCE_DIGEST'],'bundleFileCount':int(os.environ['BUNDLE_FILE_COUNT']),'bundleDigest':os.environ['BUNDLE_DIGEST'],'previewChannelId':os.environ['CHANNEL_ID'],'previewUrl':os.environ['PREVIEW_URL'],'previewBackendCallable':os.environ['PREVIEW_FUNCTION'],'previewBackendRegion':os.environ['PREVIEW_REGION'],'previewBackendAudit':'cloudlog','previewBackendOperationalWrites':False,'previewBackendImportEnabled':False,'productionBackendCallable':os.environ['PROD_FUNCTION'],'productionBackendRegion':os.environ['PROD_REGION'],'productionBackendTouched':False,'credentialSourceName':os.environ['CREDENTIAL_SOURCE'],'credentialOwnerProjectId':os.environ['CREDENTIAL_OWNER_PROJECT'],'sameFrontendArtifactPreviewToProductionRequired':True,'sameBackendSourcePackagePreviewToProductionRequired':True,'sourceMutatedAfterBuild':False,'productionTouched':False,'dataTouched':False,'writesExecuted':0,'readbackExact':True}
+          e={
+            'schemaVersion':'gravicentra-recovery-i3-evidence-v3',
+            'status':'ARTIFACT_READBACK_EXACT_PASS_BACKEND_SOURCE_PACKAGED',
+            'product':'Gravicentra Insurance','gate':'I3',
+            'sourceSha':os.environ['SOURCE_SHA'],'runnerCommit':os.environ['GITHUB_SHA'],'githubRunId':os.environ['GITHUB_RUN_ID'],
+            'buildId':os.environ['BUILD_ID'],'firebaseProjectId':os.environ['PROJECT_ID'],'hostingSiteId':os.environ['HOSTING_SITE'],
+            'hostedFileCount':int(os.environ['HOSTED_FILE_COUNT']),'hostedPayloadDigest':os.environ['HOSTED_PAYLOAD_DIGEST'],
+            'backendFileCount':int(os.environ['BACKEND_FILE_COUNT']),'backendSourceDigest':os.environ['BACKEND_SOURCE_DIGEST'],
+            'bundleFileCount':int(os.environ['BUNDLE_FILE_COUNT']),'bundleDigest':os.environ['BUNDLE_DIGEST'],
+            'previewChannelId':os.environ['CHANNEL_ID'],'previewUrl':os.environ['PREVIEW_URL'],
+            'backendDeploymentPerformedAtI3':False,'sharedBackendMutationPerformedAtI3':False,
+            'aseguradorasCredentialRuntimeAtPreview':'OPEN_STRUCTURAL_BOUNDARY_NOT_CERTIFIED_BY_I3',
+            'credentialSourceName':os.environ['CREDENTIAL_SOURCE'],'credentialOwnerProjectId':os.environ['CREDENTIAL_OWNER_PROJECT'],
+            'sameFrontendArtifactPreviewToProductionRequired':True,'sameBackendSourcePackageRequiredForI5':True,
+            'sourceMutatedAfterBuild':False,'productionTouched':False,'dataTouched':False,'writesExecuted':0,'readbackExact':True
+          }
           open(os.environ['EVIDENCE'],'w').write(json.dumps(e,sort_keys=True)+'\n')
           PY
-      - name: Roll back isolated Preview callable if I3 fails after backend deployment
-        if: ${{ failure() && steps.backend.outputs.preview_backend_attempted == 'true' }}
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.auth.outputs.credential_file }}
-        run: |
-          set -euo pipefail
-          npx --yes firebase-tools@14.10.1 functions:delete "$PREVIEW_FUNCTION" --region "$PREVIEW_REGION" --project "$PROJECT_ID" --force --non-interactive || true
+
       - uses: actions/upload-artifact@v4
         if: ${{ success() }}
         with:
@@ -229,12 +248,19 @@ jobs:
           compression-level: 0
           if-no-files-found: error
           retention-days: 30
+
       - name: Summary
         run: |
-          echo '## Gravicentra Insurance — I3 immutable Preview v2' >> "$GITHUB_STEP_SUMMARY"
-          echo "- Source: \`$SOURCE_SHA\`" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Build: \`${{ steps.build.outputs.build_id }}\`" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Preview backend: \`$PREVIEW_FUNCTION@$PREVIEW_REGION\`" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Preview: ${{ steps.deploy.outputs.preview_url }}" >> "$GITHUB_STEP_SUMMARY"
-          echo '- Production canonical backend touched: false' >> "$GITHUB_STEP_SUMMARY"
-          echo '- Operational data writes: 0' >> "$GITHUB_STEP_SUMMARY"
+          {
+            echo '## Gravicentra Insurance — I3 immutable Hosting Preview'
+            echo "- Source from ACTIVE_RELEASE_LOCK: \`${{ steps.release.outputs.source_sha }}\`"
+            echo "- Build: \`${{ steps.build.outputs.build_id }}\`"
+            echo "- Preview: ${{ steps.deploy.outputs.preview_url }}"
+            echo "- Hosted digest: \`${{ steps.build.outputs.hosted_payload_digest }}\`"
+            echo "- Backend source digest: \`${{ steps.build.outputs.backend_source_digest }}\`"
+            echo '- Functions deployed in I3: false'
+            echo '- Shared backend mutation: false'
+            echo '- Production touched: false'
+            echo '- Data touched: false'
+            echo '- Writes executed: 0'
+          } >> "$GITHUB_STEP_SUMMARY"
