@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "gravicentra-project-sources-evergreen-v2",
+  "productBrand": "Gravicentra Insurance",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "purpose": "Static Project Sources that do not contain mutable operational state.",
+  "files": [
+    {
+      "path": "artifacts/orbit360-recovery/project-sources-v2/00_DOCUMENTO_MAESTRO_EVERGREEN_V2.md",
+      "gitBlobSha": "abab28d2e9682ee493e0ffa6761d7b04025211b6"
+    },
+    {
+      "path": "artifacts/orbit360-recovery/project-sources-v2/01_ADDENDUM_PREVALENTE_GOBIERNO_SINCRONIZACION_V2.md",
+      "gitBlobSha": "39ebc5f6d3bce498b188046133f939ca3f405109"
+    },
+    {
+      "path": "artifacts/orbit360-recovery/project-sources-v2/02_MATRIZ_CRITERIOS_FASE_A_EVERGREEN_V2.md",
+      "gitBlobSha": "a623b5372a333aece250f68534855fd466465d5a"
+    },
+    {
+      "path": "artifacts/orbit360-recovery/project-sources-v2/03_LEEME_REANUDACION_Y_AUTORIDAD_V2.md",
+      "gitBlobSha": "dcfe5df16beef93aa765525559b67909e8ab8ae9"
+    }
+  ],
+  "operationalAuthority": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+  "lineageAuthority": "artifacts/orbit360-recovery/release-control/CAPABILITY_LINEAGE_LOCK.json",
+  "frozenExecutionPlan": "artifacts/orbit360-recovery/release-control/PLAN_TRABAJO_CONGELADO_V2.md",
+  "containsCurrentGate": false,
+  "containsCurrentHead": false,
+  "containsCurrentRunId": false,
+  "containsCurrentBuildId": false,
+  "containsCurrentPreviewUrl": false,
+  "containsMutablePassPendingState": false,
+  "replacementRule": "Historical Project source snapshots may remain archived for evidence but must not be treated as operational state after this package is adopted."
+}
