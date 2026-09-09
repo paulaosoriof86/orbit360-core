@@ -1,6 +1,6 @@
 {
   "schemaVersion": "gravicentra-i4a-preview-function-remediation-intent-v1",
-  "requestId": "I4A-PREVIEW-CREDENTIAL-RUNTIME-20260909-004",
+  "requestId": "I4A-PREVIEW-CREDENTIAL-RUNTIME-20260909-005",
   "nonAuthoritative": true,
   "gate": "I4A",
   "controlPlaneStatusExpected": "I4A_IN_PROGRESS",
@@ -9,9 +9,9 @@
   "targetFunction": "orbit360ProductInsurerCredentialCommandPreview",
   "targetRegion": "us-east1",
   "causalEvidenceRunId": 34390569565,
-  "previousAttemptRunIds": [34391999382, 34392220227, 34392529206],
+  "previousAttemptRunIds": [34391999382, 34392220227, 34392529206, 34409185603],
   "previousAttemptsFirebaseMutation": false,
-  "purpose": "Retry the same authorized Preview-only remediation after proving the previous deploy failure was Firebase Extensions discovery authorization. Select only an already-existing project credential that proves both Cloud Functions visibility and Firebase Extensions list visibility before any deploy. If no existing credential satisfies both checks, fail closed before Firebase mutation and classify the remaining boundary as IAM authorization. If one does, deploy only the missing certified Preview credential callable and read back exact function state while proving the canonical production callable unchanged. No Hosting, rules, operational-data or canonical production callable mutation is authorized.",
+  "purpose": "Retry the same authorized Preview-only remediation after proving all existing deploy credentials have Cloud Functions visibility but lack Firebase Extensions list permission, while the exact certified source has zero Firebase Extensions. Use only the versioned fail-closed workaround for the known firebase-tools@14.10.1 empty-extensions discovery defect, deploy only the missing certified Preview credential callable, and read back exact function state while proving the canonical production callable unchanged. No product-source, Hosting, rules, operational-data or canonical production callable mutation is authorized.",
   "productionMutationAuthorized": false,
   "operationalDataWritesAuthorized": false,
   "hostingMutationAuthorized": false
