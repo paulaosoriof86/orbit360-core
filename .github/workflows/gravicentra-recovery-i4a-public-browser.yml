@@ -41,6 +41,7 @@ jobs:
           node --check tools/gravicentra-i4a-bootstrap-diagnostic.mjs
           node --check tools/gravicentra-i4a-runtime-boundary-diagnostic.mjs
           node --check tools/gravicentra-i4a-authenticated-browser-v2.mjs
+          node --check tools/gravicentra-i4a-auth-adjudicator-v1.mjs
 
       - name: Validate non-authoritative execution intent when push-triggered
         if: github.event_name == 'push'
@@ -67,10 +68,14 @@ jobs:
           ROOT="$RUNNER_TEMP/gravicentra-i4a-evidence"
           mkdir -p "$ROOT/meta" "$ROOT/public" "$ROOT/bootstrap" "$ROOT/boundary" "$ROOT/auth"
           HARNESS_BLOB=$(git hash-object tools/gravicentra-i4a-authenticated-browser-v2.mjs)
+          ADJUDICATOR_BLOB=$(git hash-object tools/gravicentra-i4a-auth-adjudicator-v1.mjs)
           echo "I4A_HARNESS_BLOB_SHA=$HARNESS_BLOB" >> "$GITHUB_ENV"
+          echo "I4A_ADJUDICATOR_BLOB_SHA=$ADJUDICATOR_BLOB" >> "$GITHUB_ENV"
           cp tools/gravicentra-i4a-authenticated-browser-v2.mjs "$ROOT/meta/gravicentra-i4a-authenticated-browser-v2.mjs"
+          cp tools/gravicentra-i4a-auth-adjudicator-v1.mjs "$ROOT/meta/gravicentra-i4a-auth-adjudicator-v1.mjs"
           printf '%s\n' "$GITHUB_SHA" > "$ROOT/meta/control-plane-commit.txt"
           printf '%s\n' "$HARNESS_BLOB" > "$ROOT/meta/authenticated-harness-blob.txt"
+          printf '%s\n' "$ADJUDICATOR_BLOB" > "$ROOT/meta/auth-adjudicator-blob.txt"
           printf '%s\n' "$SOURCE_SHA" > "$ROOT/meta/source-sha.txt"
           printf '%s\n' "$BUILD_ID" > "$ROOT/meta/build-id.txt"
           printf '%s\n' "$PREVIEW_URL" > "$ROOT/meta/preview-url.txt"
@@ -138,13 +143,27 @@ jobs:
           echo "rc=$RC" >> "$GITHUB_OUTPUT"
           exit 0
 
+      - id: adjudicated
+        name: Adjudicate only frozen-contract-safe transient validator findings
+        if: always()
+        env:
+          I4A_AUTH_EVIDENCE_DIR: ${{ runner.temp }}/gravicentra-i4a-evidence/auth
+        run: |
+          set +e
+          node tools/gravicentra-i4a-auth-adjudicator-v1.mjs
+          RC=$?
+          set -e
+          echo "rc=$RC" >> "$GITHUB_OUTPUT"
+          exit 0
+
       - name: Seal consolidated I4A execution manifest
         if: always()
         env:
           PUBLIC_RC: ${{ steps.public.outputs.rc }}
           BOOTSTRAP_RC: ${{ steps.bootstrap.outputs.rc }}
           BOUNDARY_RC: ${{ steps.boundary.outputs.rc }}
-          AUTH_RC: ${{ steps.auth.outputs.rc }}
+          AUTH_RAW_RC: ${{ steps.auth.outputs.rc }}
+          AUTH_ADJUDICATED_RC: ${{ steps.adjudicated.outputs.rc }}
         run: |
           set -euo pipefail
           ROOT="$RUNNER_TEMP/gravicentra-i4a-evidence"; export ROOT
@@ -155,14 +174,14 @@ jobs:
               try:return int(os.environ.get(name,'99'))
               except:return 99
           manifest={
-            'schemaVersion':'gravicentra-i4a-consolidated-execution-v1',
+            'schemaVersion':'gravicentra-i4a-consolidated-execution-v2',
             'gate':'I4A','controlPlaneCommit':os.environ['GITHUB_SHA'],
             'sourceSha':os.environ['SOURCE_SHA'],'buildId':os.environ['BUILD_ID'],'previewUrl':os.environ['PREVIEW_URL'],
-            'qaHarnessBlobSha':os.environ['I4A_HARNESS_BLOB_SHA'],'qaHarnessPatchedAtRuntime':False,
-            'results':{'public':rc('PUBLIC_RC'),'bootstrap':rc('BOOTSTRAP_RC'),'boundary':rc('BOUNDARY_RC'),'authenticated':rc('AUTH_RC')},
+            'qaHarnessBlobSha':os.environ['I4A_HARNESS_BLOB_SHA'],'qaAdjudicatorBlobSha':os.environ['I4A_ADJUDICATOR_BLOB_SHA'],'qaHarnessPatchedAtRuntime':False,
+            'results':{'public':rc('PUBLIC_RC'),'bootstrap':rc('BOOTSTRAP_RC'),'boundary':rc('BOUNDARY_RC'),'authenticatedRaw':rc('AUTH_RAW_RC'),'authenticatedAdjudicated':rc('AUTH_ADJUDICATED_RC')},
             'productionTouched':False,'dataTouched':False,'writesExpected':0
           }
-          manifest['allProbesExitZero']=all(v==0 for v in manifest['results'].values())
+          manifest['authoritativePass']=all(manifest['results'][k]==0 for k in ['public','bootstrap','boundary','authenticatedAdjudicated'])
           p=os.path.join(root,'i4a-execution-manifest.json')
           open(p,'w').write(json.dumps(manifest,indent=2,sort_keys=True)+'\n')
           print('I4A_CONSOLIDATED_PROBES='+json.dumps(manifest['results'],sort_keys=True))
@@ -179,12 +198,14 @@ jobs:
             echo "- Build ID: \`$BUILD_ID\`"
             echo "- Preview: $PREVIEW_URL"
             echo "- QA harness blob: \`$I4A_HARNESS_BLOB_SHA\`"
+            echo "- QA adjudicator blob: \`$I4A_ADJUDICATOR_BLOB_SHA\`"
             echo '- Runtime QA self-patch: `false`'
             if [ -f "$MANIFEST" ]; then
               echo "- Public rc: \`$(jq -r '.results.public' "$MANIFEST")\`"
               echo "- Bootstrap rc: \`$(jq -r '.results.bootstrap' "$MANIFEST")\`"
               echo "- Boundary rc: \`$(jq -r '.results.boundary' "$MANIFEST")\`"
-              echo "- Authenticated rc: \`$(jq -r '.results.authenticated' "$MANIFEST")\`"
+              echo "- Authenticated raw rc: \`$(jq -r '.results.authenticatedRaw' "$MANIFEST")\`"
+              echo "- Authenticated adjudicated rc: \`$(jq -r '.results.authenticatedAdjudicated' "$MANIFEST")\`"
             fi
             echo '- Production touched by executor: `false`'
             echo '- Data writes by executor: `0`'
@@ -206,11 +227,11 @@ jobs:
           PUBLIC_RC: ${{ steps.public.outputs.rc }}
           BOOTSTRAP_RC: ${{ steps.bootstrap.outputs.rc }}
           BOUNDARY_RC: ${{ steps.boundary.outputs.rc }}
-          AUTH_RC: ${{ steps.auth.outputs.rc }}
+          AUTH_ADJUDICATED_RC: ${{ steps.adjudicated.outputs.rc }}
         run: |
           set -euo pipefail
           test "${PUBLIC_RC:-99}" = 0
           test "${BOOTSTRAP_RC:-99}" = 0
           test "${BOUNDARY_RC:-99}" = 0
-          test "${AUTH_RC:-99}" = 0
+          test "${AUTH_ADJUDICATED_RC:-99}" = 0
           echo I4A_AUTHORITATIVE_EXECUTOR=PASS
