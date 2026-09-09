@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "gravicentra-execution-intent-v1",
+  "requestId": "I4A-AUTHORITATIVE-20260909-001",
+  "nonAuthoritative": true,
+  "gate": "I4A",
+  "controlPlaneStatusExpected": "I4A_IN_PROGRESS",
+  "certifiedSourceSha": "96f6962b8519a032c2f54b50d2796fa2545de1e4",
+  "buildId": "gi-i3-96f6962b8519-57f234755dc1",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i3-34307974287-598g48lr.web.app",
+  "purpose": "Execute the single authoritative I4A read-only Preview QA executor and collect all probe evidence before any remediation.",
+  "productionMutationAuthorized": false,
+  "operationalDataWritesAuthorized": false
+}
