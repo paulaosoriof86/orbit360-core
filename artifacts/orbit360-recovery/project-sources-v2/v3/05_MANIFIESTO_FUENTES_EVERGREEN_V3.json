@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "gravicentra-project-sources-evergreen-v3",
+  "packageId": "GRAVICENTRA_PROJECT_SOURCES_EVERGREEN_V3",
+  "productBrand": "Gravicentra Insurance",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "purpose": "Static Project Sources containing permanent normative criteria only; mutable operational state remains in GitHub.",
+  "canonicalGitHubRoot": "artifacts/orbit360-recovery/project-sources-v2/v3",
+  "canonicalFiles": [
+    {
+      "path": "artifacts/orbit360-recovery/project-sources-v2/v3/00_DOCUMENTO_MAESTRO_EVERGREEN_V3.md",
+      "gitBlobSha": "02104f71e91f5b87b770c06076c0be73904a4e0e"
+    },
+    {
+      "path": "artifacts/orbit360-recovery/project-sources-v2/v3/01_ADDENDUM_GOBIERNO_SINCRONIZACION_Y_NOTIFICACION_V3.md",
+      "gitBlobSha": "52e8120c696a22520aa2a5629b1727bb185d4444"
+    },
+    {
+      "path": "artifacts/orbit360-recovery/project-sources-v2/v3/02_MATRIZ_CRITERIOS_FASE_A_EVERGREEN_V3.md",
+      "gitBlobSha": "ef7a98f0b0a7ac5c88a382dcb7593a5b81cea6fc"
+    },
+    {
+      "path": "artifacts/orbit360-recovery/project-sources-v2/v3/03_MANIFIESTO_CAPACIDADES_FASE_A_EVERGREEN_V3.json",
+      "gitBlobSha": "245636b29bd1e1dd6e28b79b01390a9983f3b0a8"
+    },
+    {
+      "path": "artifacts/orbit360-recovery/project-sources-v2/v3/04_LEEME_REANUDACION_Y_AUTORIDAD_V3.md",
+      "gitBlobSha": "805cffe8ccc3cf21cfca7cde0c471c3dfbed8e0d"
+    }
+  ],
+  "projectUploadFiles": [
+    {
+      "name": "00_DOCUMENTO_MAESTRO_EVERGREEN_V3.docx",
+      "sha256": "4d48e146b51c28f07a6d2bd5766d199d4ee1054799181d094859aaf7fd56c6f6",
+      "canonicalSource": "00_DOCUMENTO_MAESTRO_EVERGREEN_V3.md"
+    },
+    {
+      "name": "01_ADDENDUM_GOBIERNO_SINCRONIZACION_Y_NOTIFICACION_V3.md",
+      "sha256": "1f1d0b71c60bd7521ac15a9fbf1f9e34506b7651b1d1645f25ad72bb7b73676b"
+    },
+    {
+      "name": "02_MATRIZ_CRITERIOS_FASE_A_EVERGREEN_V3.md",
+      "sha256": "c3a0396bd12a321cd594215f83e5247e9e2d489fcf49b4dc473751fa0b12f58d"
+    },
+    {
+      "name": "03_MANIFIESTO_CAPACIDADES_FASE_A_EVERGREEN_V3.json",
+      "sha256": "30ddca56a8eb18dca0f8bd87a8cb0e45d7d45bda181d4a1eaf5a0f73d81e42c3"
+    },
+    {
+      "name": "04_LEEME_REANUDACION_Y_AUTORIDAD_V3.md",
+      "sha256": "cc9b90140ac3d0509447aaa2b4823e79d5d7cdbd7ff44a7e6c0ae628b47dba97"
+    }
+  ],
+  "manifestFile": "05_MANIFIESTO_FUENTES_EVERGREEN_V3.json",
+  "activeProjectSourceCount": 6,
+  "operationalAuthority": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+  "lineageAuthority": "artifacts/orbit360-recovery/release-control/CAPABILITY_LINEAGE_LOCK.json",
+  "capabilityStatusAuthority": "artifacts/orbit360-recovery/release-control/CAPABILITY_STATUS_LEDGER.json",
+  "frozenExecutionPlan": "artifacts/orbit360-recovery/release-control/PLAN_TRABAJO_CONGELADO_V2.md",
+  "frozenPlanInterpretationAddendum": "artifacts/orbit360-recovery/release-control/PLAN_TRABAJO_CONGELADO_V2_ADDENDUM_EVERGREEN_20260909.md",
+  "containsCurrentGate": false,
+  "containsCurrentHead": false,
+  "containsCurrentRunId": false,
+  "containsCurrentBuildId": false,
+  "containsCurrentPreviewUrl": false,
+  "containsMutablePassPendingState": false,
+  "replacementPolicy": {
+    "operationalStateChangeRequiresReplacement": false,
+    "normativePermanentChangeRequiresHigherVersion": true,
+    "controlPlaneFlag": "projectSources.staticSourceUpdateRequired",
+    "silentReplacementForbidden": true,
+    "notifyPaulaWithExactReplacementMap": true
+  },
+  "historicalPackagesRemainGitHubTraceOnly": true
+}
