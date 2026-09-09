@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "gravicentra-transition-g-executor-migration-v1",
+  "date": "2026-09-09",
+  "i3": {
+    "executor": ".github/workflows/gravicentra-recovery-i3-preview-v2.yml",
+    "dispatchOnly": true,
+    "controlPlaneGuardMode": "i3",
+    "automaticPushTriggerRemoved": true
+  },
+  "i4a": {
+    "executor": ".github/workflows/gravicentra-recovery-i4a-public-browser.yml",
+    "dispatchOnly": true,
+    "singleJob": true,
+    "controlPlaneGuardMode": "i4a",
+    "releaseIdentityDerivedFromControlPlane": true,
+    "runtimeSelfPatch": false,
+    "collectAllProbeEvidenceBeforeFail": true
+  },
+  "authenticatedHarness": {
+    "path": "tools/gravicentra-i4a-authenticated-browser-v2.mjs",
+    "committedEffectiveDiscriminants": true,
+    "oldSourceShaHardcodeRemoved": true
+  },
+  "productionTouched": false,
+  "dataTouched": false,
+  "writesExecuted": 0
+}
