@@ -1,0 +1,65 @@
+{
+  "schemaVersion": "gravicentra-approved-capability-manifest-evergreen-v3",
+  "manifestId": "GRAVICENTRA-INSURANCE-FASE-A-APPROVED-CAPABILITIES",
+  "productBrand": "Gravicentra Insurance",
+  "status": "STATIC_NORMATIVE_EVERGREEN",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "operationalAuthority": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+  "lineageAuthority": "artifacts/orbit360-recovery/release-control/CAPABILITY_LINEAGE_LOCK.json",
+  "capabilityStatusAuthority": "artifacts/orbit360-recovery/release-control/CAPABILITY_STATUS_LEDGER.json",
+  "rules": {
+    "latestApprovedEvidenceWins": true,
+    "latestRepositoryFileDoesNotAutomaticallyMeanApproved": true,
+    "lineageRediscoveryAfterI1ForbiddenWithoutCausalException": true,
+    "sameFrontendArtifactPreviewToProductionRequired": true,
+    "sameBackendSourcePackageForI5Required": true,
+    "legacyOverlayCompositionForbidden": true,
+    "readOnlyProductionCannotCloseWriteApprovedCapability": true,
+    "uiHidingAsSecurityControlForbidden": true,
+    "dataReimportForRuntimeOrCompositionDefectsForbidden": true,
+    "sourceChangeAfterBuildRequiresNewI2I3": true,
+    "passWithoutPhysicalEvidenceForbidden": true
+  },
+  "rolePolicy": {
+    "ASEGURADORAS_OPERATIONAL_DIRECTORY": {
+      "fullVisibilityRequired": [
+        "Operativo",
+        "Admin",
+        "AdminTenant",
+        "SuperAdmin",
+        "Dirección"
+      ],
+      "Asesor": "NOT_AUTHORIZED_UNLESS_EXPLICITLY_APPROVED_LATER",
+      "backendAuthorizationRequired": true,
+      "browserSecretPersistenceForbidden": true
+    }
+  },
+  "dataPolicy": {
+    "I0_I5_cutoff": "2026-07-31",
+    "augustRefreshPeriod": {
+      "from": "2026-08-01",
+      "to": "2026-08-31"
+    },
+    "augustRequiresProductionAccepted": true,
+    "firestoreOperationalSourcePreserved": true,
+    "driveDocumentRepositoryPreserved": true
+  },
+  "capabilities": [
+    "LOGIN_PRIMARY_RUNTIME",
+    "ROLE_SCOPE_RUNTIME",
+    "SINGLE_ENTRYPOINT_SHELL_ROUTER",
+    "STARTUP_PWA_PERFORMANCE",
+    "INICIO_PRIMARY_RUNTIME",
+    "CLIENTE360_PRIMARY_RUNTIME",
+    "VEHICULOS_PRIMARY_RUNTIME",
+    "CROSS_MODULE_RELATIONSHIPS",
+    "ASEGURADORAS_PRIMARY_RUNTIME",
+    "ASEGURADORAS_OPERATIONAL_DIRECTORY",
+    "OPS_PRIMARY_RUNTIME",
+    "LEADS_PRIMARY_RUNTIME",
+    "POLIZAS_PRIMARY_RUNTIME",
+    "RECIBOS_CARTERA_PRIMARY_RUNTIME",
+    "COBROS_PRIMARY_RUNTIME"
+  ]
+}
