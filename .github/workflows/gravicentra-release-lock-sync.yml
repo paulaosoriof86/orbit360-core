@@ -38,11 +38,11 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 8
     steps:
-      - name: Checkout Recovery control plane
+      - name: Checkout Recovery control plane with complete ancestry
         uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
-          fetch-depth: 50
+          fetch-depth: 0
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
@@ -68,6 +68,7 @@ jobs:
             echo '- Approved lineage authority: `CAPABILITY_LINEAGE_LOCK.json`'
             echo '- Frozen plan: `PLAN_TRABAJO_CONGELADO_V2.md`'
             echo '- Project Sources: evergreen manifest + blob integrity enforced'
+            echo '- Complete ancestry checkout: `fetch-depth: 0`'
             echo '- Split state/release authorities: deprecated and mechanically blocked'
             echo '- Conversations/snapshots as operational authority: forbidden'
             echo '- Release identity hardcodes in workflows: forbidden'
