@@ -9,10 +9,16 @@ on:
       - artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json
       - artifacts/orbit360-recovery/release-control/CAPABILITY_LINEAGE_LOCK.json
       - artifacts/orbit360-recovery/release-control/PLAN_TRABAJO_CONGELADO_V2.md
+      - artifacts/orbit360-recovery/release-control/RECOVERY_STATE.json
+      - artifacts/orbit360-recovery/release-control/ACTIVE_RELEASE_LOCK.json
       - tools/gravicentra-control-plane-guard-v2.mjs
+      - tools/gravicentra-mechanism-invariant-v1.mjs
+      - tools/gravicentra-release-lineage-guard.mjs
+      - tools/gravicentra-i4a-authenticated-browser-v2.mjs
       - .github/workflows/gravicentra-release-lock-sync.yml
+      - .github/workflows/gravicentra-recovery-i2-source-contract.yml
+      - .github/workflows/gravicentra-recovery-i3-preview-v2.yml
       - .github/workflows/gravicentra-recovery-i4a-public-browser.yml
-      - .github/workflows/gravicentra-i4a-insurer-backend-boundary-readonly.yml
 
 permissions:
   contents: read
@@ -35,20 +41,26 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Fail closed on canonical control-plane desynchronization
+      - name: Fail closed on canonical control-plane or mechanism desynchronization
         run: |
           set -euo pipefail
           test "$GITHUB_REF_NAME" = "recovery/fase-a-clean-20260831"
           node --check tools/gravicentra-control-plane-guard-v2.mjs
+          node --check tools/gravicentra-mechanism-invariant-v1.mjs
+          node --check tools/gravicentra-i4a-authenticated-browser-v2.mjs
           node tools/gravicentra-control-plane-guard-v2.mjs --mode=governance
+          node tools/gravicentra-mechanism-invariant-v1.mjs
           git diff --exit-code
           {
             echo '## Gravicentra Insurance — canonical control plane v2'
             echo '- Mutable operational authority: `CONTROL_PLANE.json` only'
             echo '- Approved lineage authority: `CAPABILITY_LINEAGE_LOCK.json`'
             echo '- Frozen plan: `PLAN_TRABAJO_CONGELADO_V2.md`'
+            echo '- Split state/release authorities: deprecated and mechanically blocked'
             echo '- Conversations/snapshots as operational authority: forbidden'
             echo '- Release identity hardcodes in workflows: forbidden'
+            echo '- I4A parallel executors: forbidden'
+            echo '- QA runtime self-patch: forbidden'
             echo '- Lineage rediscovery after I1: forbidden without causal exception'
             echo '- Product-source drift: fail closed'
             echo '- Production touched: false'
