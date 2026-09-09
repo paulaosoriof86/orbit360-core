@@ -100,7 +100,7 @@
     }
   },
   "i4aPreviewInfrastructureBoundary": {
-    "status": "POST_DEPLOY_READBACK_REQUIRED",
+    "status": "CAUSAL_REMEDIATION_READBACK_PASS",
     "authorizationScope": "PREVIEW_ONLY_SAME_FIREBASE_PROJECT",
     "targetFunction": "orbit360ProductInsurerCredentialCommandPreview",
     "targetRegion": "us-east1",
@@ -117,21 +117,38 @@
     "dataMutationAuthorized": false,
     "authorizationEvidenceRunId": 34390569565,
     "authorizationReason": "Exact Preview callable and Cloud Run service returned 404 while certified frontend routes I3 Preview hosts exclusively to this callable.",
-    "latestRemediation": {
+    "deploymentEvidence": {
       "runId": 34409694762,
-      "runAttempt": 1,
       "jobId": 102660977128,
-      "conclusion": "failure",
-      "failureClass": "FUNCTION_DEPLOYED_CLEANUP_POLICY_SETUP_FAILED_READBACK_PENDING",
-      "failureDetail": "Firebase CLI reported Functions successfully deployed, then exited 1 because it could not set up artifact cleanup policy in us-central1 and us-east1. Readback did not run because the deploy step conclusion was failure. Cleanup-policy mutation is not required for the certified Preview callable and was not authorized.",
+      "conclusion": "failure_after_function_deploy",
       "evidenceArtifactId": 10126788829,
       "evidenceArtifactDigest": "sha256:fde7731ad4fbb6d6fa4ac3468d460291ed02fcfc0d994e64e25da34b395556de",
       "targetCallableHttpBeforeDeploy": 404,
       "canonicalProductionCallableHttpBeforeDeploy": 404,
       "functionDeployReportedSuccessful": true,
       "cleanupPolicySetupFailed": true,
-      "cleanupPolicyMutationAuthorized": false,
-      "readbackPerformed": false,
+      "cleanupPolicyMutationAuthorized": false
+    },
+    "latestRemediation": {
+      "runId": 34410467076,
+      "runAttempt": 1,
+      "jobId": 102663434728,
+      "conclusion": "success",
+      "resultClass": "PREVIEW_CALLABLE_ACTIVE_EXACT_READBACK_PASS",
+      "evidenceArtifactId": 10127037210,
+      "evidenceArtifactDigest": "sha256:408d64eea2928f646722bbe759cff09c55e59a72bc3f3c555fd81e48f2645dc6",
+      "mode": "POST_DEPLOY_READBACK_ONLY",
+      "deployStep": "SKIPPED",
+      "targetCallableHttpBeforeReadback": 200,
+      "targetCallableHttpAfterReadback": 200,
+      "targetStateAfterReadback": "ACTIVE",
+      "targetEntryPointAfterReadback": "orbit360ProductInsurerCredentialCommandPreview",
+      "cloudRunHttpAfterReadback": 200,
+      "canonicalProductionCallableHttpBeforeReadback": 404,
+      "canonicalProductionCallableHttpAfterReadback": 404,
+      "canonicalProductionCallableUnchanged": true,
+      "readbackPerformed": true,
+      "operationalWrites": 0,
       "productSourceChangeRequired": false
     }
   },
@@ -188,5 +205,5 @@
     "evergreenProjectSourcePackageV3Prepared": true,
     "frozenPlanSnapshotInterpretationAddendumMaterialized": true
   },
-  "nextAction": "POST_DEPLOY_READBACK_ONLY_FOR_PREVIEW_CALLABLE_THEN_RETURN_TO_I4A_ASEGURADORAS_PROBE"
+  "nextAction": "RUN_I4A_ASEGURADORAS_AUTHENTICATED_PRIVILEGED_ROLE_PROBE_ON_CERTIFIED_PREVIEW"
 }
