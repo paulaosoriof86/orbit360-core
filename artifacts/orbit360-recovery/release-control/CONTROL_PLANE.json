@@ -1,0 +1,106 @@
+{
+  "schemaVersion": "gravicentra-control-plane-v2",
+  "controlPlaneId": "GRAVICENTRA-INSURANCE-FASE-A",
+  "status": "GOVERNANCE_SYNC_IN_PROGRESS",
+  "productBrand": "Gravicentra Insurance",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "forensicOriginSha": "9c95f31461f2eabe9804625b5659bee772f5602a",
+  "frozenPlan": {
+    "path": "artifacts/orbit360-recovery/release-control/PLAN_TRABAJO_CONGELADO_V2.md",
+    "status": "FROZEN"
+  },
+  "lineageAuthority": {
+    "path": "artifacts/orbit360-recovery/release-control/CAPABILITY_LINEAGE_LOCK.json",
+    "status": "FROZEN",
+    "capabilityCount": 15
+  },
+  "deprecatedMutableAuthorities": {
+    "artifacts/orbit360-recovery/release-control/RECOVERY_STATE.json": "COMPATIBILITY_ONLY_PENDING_V2_SWITCHOVER",
+    "artifacts/orbit360-recovery/release-control/ACTIVE_RELEASE_LOCK.json": "COMPATIBILITY_ONLY_PENDING_V2_SWITCHOVER"
+  },
+  "gateState": {
+    "lastFormallyCompletedIteration": 2,
+    "currentTransition": "GOVERNANCE_SYNC_PRE_I4A",
+    "nextFrozenIteration": "I4A",
+    "gates": {
+      "I0": {"status": "PASS"},
+      "I1": {"status": "PASS", "capabilitiesBound": 15},
+      "I2": {"status": "PASS_LATEST_CANDIDATE", "latestRunId": 34304799588, "sourceSha": "96f6962b8519a032c2f54b50d2796fa2545de1e4"},
+      "I3": {"status": "PHYSICAL_PASS_PENDING_GOVERNANCE_SEAL", "runId": 34307974287, "conclusion": "success"},
+      "I4A": {"status": "BLOCKED_BY_GOVERNANCE_SYNC"},
+      "I4B": {"status": "PENDING"},
+      "I5": {"status": "PENDING"},
+      "I6": {"status": "HOLD_UNTIL_PRODUCTION_ACCEPTED"}
+    }
+  },
+  "productionProgress": {
+    "formalPercent": 42.9,
+    "physicalEvidencePercentPendingSeal": 57.1,
+    "method": "7 frozen production gates I0,I1,I2,I3,I4A,I4B,I5; equal gate-completion accounting",
+    "iterationsRemainingAfterI3Seal": ["I4A", "I4B", "I5"]
+  },
+  "certifiedCandidate": {
+    "sourceSha": "96f6962b8519a032c2f54b50d2796fa2545de1e4",
+    "sourceTree": "59598a18c6befe13c317cd338754d81457548f76",
+    "i3RunId": 34307974287,
+    "i3Conclusion": "success",
+    "runnerCommit": "207fa50242b8462ae93cf6234626c383a9fcdd40",
+    "buildId": "gi-i3-96f6962b8519-57f234755dc1",
+    "artifactId": 10087355583,
+    "artifactName": "gravicentra-i3-34307974287",
+    "artifactArchiveDigest": "sha256:688768297142074ae987305eedf100db802cbbe85c3600db6d2263075e5e1860",
+    "previewChannelId": "gi-i3-34307974287",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i3-34307974287-598g48lr.web.app",
+    "hostedFileCount": 202,
+    "hostedPayloadDigest": "f1b91976a33279a38863f4465fef5d17c122886a21e41c1021e941355afa0ea4",
+    "backendFileCount": 17,
+    "backendSourceDigest": "b317ee5d6c7346bdb0abfa6bb71b5f246cd7647ed7272551065c2053f497f805",
+    "bundleFileCount": 221,
+    "bundleDigest": "45c6be9a3972f336676deeb71c2d6161998ddd4e3ceda3265c98f46c43525d55",
+    "readbackExact": true,
+    "readbackFileCount": 202,
+    "sameFrontendArtifactPreviewToProductionRequired": true,
+    "sameBackendSourcePackageRequiredForI5": true,
+    "sourceMutatedAfterBuild": false
+  },
+  "environmentState": {
+    "firebaseProjectId": "ays-orbit-360-lab",
+    "hostingSiteId": "ays-orbit-360-lab",
+    "i3FunctionsDeployed": false,
+    "i3SharedBackendMutation": false,
+    "productionAccepted": false,
+    "productionTouchedByRecovery": false,
+    "dataTouchedByRecovery": false,
+    "writesExecuted": 0,
+    "dataCutoff": "2026-07-31",
+    "augustRefresh": "HOLD"
+  },
+  "mechanismRules": {
+    "singleMutableAuthority": "THIS_FILE",
+    "hardcodedReleaseIdentityInWorkflowsForbidden": true,
+    "conversationAsOperationalAuthorityForbidden": true,
+    "staticSnapshotAsOperationalAuthorityForbidden": true,
+    "qaHarnessSelfPatchForbidden": true,
+    "oneGateExecutorAtATime": true,
+    "lineageRediscoveryAfterI1ForbiddenWithoutException": true,
+    "unaffectedCapabilityEvidencePreserved": true,
+    "sourceChangeAfterBuildRequiresNewI2I3": true,
+    "productionBackendBeforeI5Forbidden": true,
+    "augustBeforeProductionAcceptedForbidden": true,
+    "failClosedOnAuthorityMismatch": true
+  },
+  "governanceSyncChecklist": {
+    "frozenPlanMaterialized": true,
+    "lineageLockMaterialized": true,
+    "controlPlaneMaterialized": true,
+    "releaseGuardConsumesOnlyControlPlane": false,
+    "legacyStateAndReleaseLockDeprecated": false,
+    "workflowReleaseHardcodesRemoved": false,
+    "workflowFanoutRemoved": false,
+    "qaHarnessSelfPatchRemoved": false,
+    "evergreenProjectSourcePackagePrepared": false,
+    "i3FormalSeal": false
+  },
+  "nextAction": "SWITCH_RELEASE_GUARD_TO_CONTROL_PLANE_V2_AND_REMOVE_DUPLICATE_MUTABLE_AUTHORITY"
+}
