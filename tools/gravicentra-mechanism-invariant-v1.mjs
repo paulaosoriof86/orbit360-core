@@ -13,6 +13,7 @@ const NEW_GUARD='tools/gravicentra-control-plane-guard-v2.mjs';
 const I2='.github/workflows/gravicentra-recovery-i2-source-contract.yml';
 const I3='.github/workflows/gravicentra-recovery-i3-preview-v2.yml';
 const I4A='.github/workflows/gravicentra-recovery-i4a-public-browser.yml';
+const I4A_INTENT='artifacts/orbit360-recovery/release-control/I4A_EXECUTION_INTENT.json';
 const CENTRAL='.github/workflows/gravicentra-release-lock-sync.yml';
 const HARNESS='tools/gravicentra-i4a-authenticated-browser-v2.mjs';
 
@@ -55,7 +56,12 @@ need(!/^\s*PREVIEW_URL:\s*https:\/\//m.test(i3),'I3_HARDCODED_PREVIEW_FORBIDDEN'
 
 const i4a=read(I4A);
 need(i4a.includes('workflow_dispatch:'),'I4A_DISPATCH_TRIGGER_MISSING');
-need(!/\n\s*push\s*:/.test(i4a),'I4A_AUTOMATIC_PUSH_TRIGGER_FORBIDDEN');
+const scopedIntentTrigger="push:\n    branches:\n      - recovery/fase-a-clean-20260831\n    paths:\n      - "+I4A_INTENT;
+need(i4a.includes(scopedIntentTrigger),'I4A_SCOPED_INTENT_TRIGGER_MISSING');
+need((i4a.match(/\n\s*push\s*:/g)||[]).length===1,'I4A_MULTIPLE_PUSH_TRIGGERS_FORBIDDEN');
+need(i4a.includes('Validate non-authoritative execution intent when push-triggered'),'I4A_INTENT_VALIDATOR_MISSING');
+need(i4a.includes("x.nonAuthoritative===true"),'I4A_INTENT_NONAUTHORITATIVE_ASSERTION_MISSING');
+need(i4a.includes("x.certifiedSourceSha===process.env.SOURCE_SHA"),'I4A_INTENT_SOURCE_BINDING_MISSING');
 need(i4a.includes('gravicentra-control-plane-guard-v2.mjs --mode=i4a'),'I4A_CONTROL_PLANE_GUARD_MISSING');
 need(!i4a.includes('gravicentra-release-lineage-guard.mjs'),'I4A_OLD_GUARD_REFERENCE_FORBIDDEN');
 need(!i4a.includes('RECOVERY_STATE.json')&&!i4a.includes('ACTIVE_RELEASE_LOCK.json'),'I4A_SPLIT_AUTHORITY_REFERENCE_FORBIDDEN');
@@ -97,7 +103,7 @@ console.log('GRAVICENTRA_MECHANISM_INVARIANT=PASS');
 console.log('CANONICAL_MUTABLE_AUTHORITY='+CONTROL);
 console.log('I2_PUSH_TRIGGER=false');
 console.log('I3_PUSH_TRIGGER=false');
-console.log('I4A_PUSH_TRIGGER=false');
+console.log('I4A_TRIGGER=SCOPED_NONAUTHORITATIVE_INTENT_ONLY');
 console.log('I4A_EXECUTOR_COUNT='+i4aExecutors.length);
 console.log('I4A_RUNTIME_SELF_PATCH=false');
 console.log('SPLIT_AUTHORITY_ACTIVE=false');

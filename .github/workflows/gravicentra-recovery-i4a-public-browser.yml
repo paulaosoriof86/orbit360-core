@@ -2,6 +2,11 @@ name: Gravicentra Recovery I4A Authoritative Preview QA
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - recovery/fase-a-clean-20260831
+    paths:
+      - artifacts/orbit360-recovery/release-control/I4A_EXECUTION_INTENT.json
 
 permissions:
   contents: read
@@ -36,6 +41,25 @@ jobs:
           node --check tools/gravicentra-i4a-bootstrap-diagnostic.mjs
           node --check tools/gravicentra-i4a-runtime-boundary-diagnostic.mjs
           node --check tools/gravicentra-i4a-authenticated-browser-v2.mjs
+
+      - name: Validate non-authoritative execution intent when push-triggered
+        if: github.event_name == 'push'
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('fs');
+          const p='artifacts/orbit360-recovery/release-control/I4A_EXECUTION_INTENT.json';
+          const x=JSON.parse(fs.readFileSync(p,'utf8'));
+          const need=(ok,code)=>{if(!ok)throw new Error(code);};
+          need(x.schemaVersion==='gravicentra-execution-intent-v1','I4A_INTENT_SCHEMA_INVALID');
+          need(x.nonAuthoritative===true,'I4A_INTENT_MUST_BE_NON_AUTHORITATIVE');
+          need(x.gate==='I4A','I4A_INTENT_GATE_INVALID');
+          need(x.controlPlaneStatusExpected==='I4A_IN_PROGRESS','I4A_INTENT_CONTROL_STATUS_INVALID');
+          need(x.certifiedSourceSha===process.env.SOURCE_SHA,'I4A_INTENT_SOURCE_MISMATCH');
+          need(x.buildId===process.env.BUILD_ID,'I4A_INTENT_BUILD_MISMATCH');
+          need(x.previewUrl===process.env.PREVIEW_URL,'I4A_INTENT_PREVIEW_MISMATCH');
+          console.log('I4A_EXECUTION_INTENT=VALID_NON_AUTHORITATIVE_TRIGGER');
+          NODE
 
       - name: Seal committed QA harness identity
         run: |
@@ -125,7 +149,7 @@ jobs:
           set -euo pipefail
           ROOT="$RUNNER_TEMP/gravicentra-i4a-evidence"; export ROOT
           python3 - <<'PY'
-          import json,os,hashlib
+          import json,os
           root=os.environ['ROOT']
           def rc(name):
               try:return int(os.environ.get(name,'99'))
