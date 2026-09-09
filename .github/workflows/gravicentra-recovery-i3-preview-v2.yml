@@ -142,7 +142,8 @@ jobs:
           if any(region in x for x in hits): raise SystemExit('PRODUCTION_CALLABLE_ALREADY_PRESENT_BEFORE_I5')
           PY
           cd "$RUNNER_TEMP/gravicentra-i3-release-package/bundle"
-          npx --yes firebase-tools@14.10.1 deploy --config firebase.backend.json --only "functions:$PREVIEW_FUNCTION" --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/backend-deploy.json"
+          echo 'preview_backend_attempted=true' >> "$GITHUB_OUTPUT"
+          npx --yes firebase-tools@14.10.1 deploy --config firebase.backend.json --only "functions:$PREVIEW_FUNCTION" --project "$PROJECT_ID" --non-interactive --json 2>&1 | tee "$RUNNER_TEMP/backend-deploy.json"
           npx --yes firebase-tools@14.10.1 functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/functions-after.json"
           export FJSON="$RUNNER_TEMP/functions-after.json" PREVIEW="$PREVIEW_FUNCTION" PREGION="$PREVIEW_REGION" PROD="$PROD_FUNCTION" PRODREGION="$PROD_REGION"
           python3 - <<'PY'
@@ -213,7 +214,7 @@ jobs:
           open(os.environ['EVIDENCE'],'w').write(json.dumps(e,sort_keys=True)+'\n')
           PY
       - name: Roll back isolated Preview callable if I3 fails after backend deployment
-        if: ${{ failure() && steps.backend.outputs.preview_backend_deployed == 'true' }}
+        if: ${{ failure() && steps.backend.outputs.preview_backend_attempted == 'true' }}
         env:
           GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.auth.outputs.credential_file }}
         run: |
