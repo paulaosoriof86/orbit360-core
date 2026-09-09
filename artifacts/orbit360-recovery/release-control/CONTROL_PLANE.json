@@ -8,12 +8,30 @@
   "forensicOriginSha": "9c95f31461f2eabe9804625b5659bee772f5602a",
   "frozenPlan": {
     "path": "artifacts/orbit360-recovery/release-control/PLAN_TRABAJO_CONGELADO_V2.md",
-    "status": "FROZEN"
+    "status": "FROZEN",
+    "interpretationAddendumPath": "artifacts/orbit360-recovery/release-control/PLAN_TRABAJO_CONGELADO_V2_ADDENDUM_EVERGREEN_20260909.md"
   },
   "lineageAuthority": {
     "path": "artifacts/orbit360-recovery/release-control/CAPABILITY_LINEAGE_LOCK.json",
     "status": "FROZEN",
     "capabilityCount": 15
+  },
+  "capabilityStatusAuthority": {
+    "path": "artifacts/orbit360-recovery/release-control/CAPABILITY_STATUS_LEDGER.json",
+    "authorityType": "DERIVED_MUTABLE_STATUS_LEDGER",
+    "capabilityCount": 15,
+    "mayGovernGate": false,
+    "mayGovernReleaseIdentity": false
+  },
+  "projectSources": {
+    "activePackage": "GRAVICENTRA_PROJECT_SOURCES_EVERGREEN_V3",
+    "activeVersion": 3,
+    "canonicalRoot": "artifacts/orbit360-recovery/project-sources-v2/v3",
+    "manifestPath": "artifacts/orbit360-recovery/project-sources-v2/v3/05_MANIFIESTO_FUENTES_EVERGREEN_V3.json",
+    "staticSourceUpdateRequired": false,
+    "reason": null,
+    "operationalStateChangesDoNotRequireReplacement": true,
+    "notificationRequiredWhenFlagTrue": true
   },
   "deprecatedMutableAuthorities": {
     "artifacts/orbit360-recovery/release-control/RECOVERY_STATE.json": "DEPRECATED_NON_AUTHORITATIVE_TOMBSTONE",
@@ -98,7 +116,21 @@
     "productionHostingMutationAuthorized": false,
     "dataMutationAuthorized": false,
     "authorizationEvidenceRunId": 34390569565,
-    "authorizationReason": "Exact Preview callable and Cloud Run service returned 404 while certified frontend routes I3 Preview hosts exclusively to this callable."
+    "authorizationReason": "Exact Preview callable and Cloud Run service returned 404 while certified frontend routes I3 Preview hosts exclusively to this callable.",
+    "latestRemediation": {
+      "runId": 34392529206,
+      "runAttempt": 2,
+      "jobId": 102633673395,
+      "conclusion": "failure",
+      "failureClass": "ENVIRONMENT_AUTHZ_FIREBASE_EXTENSIONS_DISCOVERY_403",
+      "failureDetail": "Firebase CLI failed before deploy readback while querying Firebase Extensions API; caller lacked permission.",
+      "evidenceArtifactId": 10123582955,
+      "evidenceArtifactDigest": "sha256:cd0a1f577de3e6f42c9c61d1e8f23fd8fef44aca4f144df05a9b0aa9c3629d1a",
+      "targetCallableHttpBeforeDeploy": 404,
+      "canonicalProductionCallableHttpBeforeDeploy": 404,
+      "readbackPerformed": false,
+      "productSourceChangeRequired": false
+    }
   },
   "environmentState": {
     "firebaseProjectId": "ays-orbit-360-lab",
@@ -127,7 +159,10 @@
     "canonicalProductionBackendBeforeI5Forbidden": true,
     "previewOnlyBackendInI4ARequiresExplicitCausalAuthorization": true,
     "augustBeforeProductionAcceptedForbidden": true,
-    "failClosedOnAuthorityMismatch": true
+    "failClosedOnAuthorityMismatch": true,
+    "capabilityStatusLedgerMustMatchControlPlane": true,
+    "staticProjectSourcesMustRemainOperationalStateFree": true,
+    "staticSourceReplacementRequiresExplicitFlag": true
   },
   "governanceSyncChecklist": {
     "frozenPlanMaterialized": true,
@@ -145,7 +180,10 @@
     "i4aExecutorStateGated": true,
     "evergreenProjectSourcePackagePrepared": true,
     "evergreenProjectSourceIntegrityGuarded": true,
-    "i3FormalSeal": true
+    "i3FormalSeal": true,
+    "capabilityStatusLedgerMaterialized": true,
+    "evergreenProjectSourcePackageV3Prepared": true,
+    "frozenPlanSnapshotInterpretationAddendumMaterialized": true
   },
-  "nextAction": "DEPLOY_ONLY_CERTIFIED_PREVIEW_CREDENTIAL_CALLABLE_THEN_READBACK_AND_RETEST_ASEGURADORAS"
+  "nextAction": "REMEDIATE_PREVIEW_DEPLOY_AUTHZ_WITHOUT_PRODUCT_SOURCE_CHANGE_THEN_DEPLOY_ONLY_CERTIFIED_PREVIEW_CALLABLE_AND_READBACK"
 }
