@@ -45,10 +45,10 @@ async function functionMetadata(name,headers){
 }
 
 const evidence={
-  schemaVersion:'gravicentra-i4a-insurer-backend-boundary-readonly-v3',gate:'I4A',module:'Aseguradoras',
+  schemaVersion:'gravicentra-i4a-insurer-backend-boundary-readonly-v4',gate:'I4A',module:'Aseguradoras',
   sourceSha:SOURCE,buildId:BUILD,projectId:PROJECT,region:REGION,functionName:FUNCTION,legacyFunctionNames:LEGACY_FUNCTIONS,
   productionTouched:false,dataTouched:false,writesExecuted:0,functionInvocations:0,secretsRecorded:false,
-  sourceContract:{},cloud:{legacyFunctions:{}},workflowDeployInventory:[],decision:'UNRESOLVED',checks:{},errors:[]
+  sourceContract:{},contractComparison:{},cloud:{legacyFunctions:{}},workflowDeployInventory:[],decision:'UNRESOLVED',checks:{},errors:[]
 };
 try{
   need(SOURCE&&BUILD,'BOUNDARY_ENV_INCOMPLETE');
@@ -66,16 +66,38 @@ try{
   evidence.sourceContract={
     backendExportsCallable:backend.includes(`exports.${FUNCTION}=onCall`)||backend.includes(`exports.${FUNCTION} = onCall`),
     backendViewRoles:['direccion','superadmin','admin','admintenant','operativo'].every(r=>backend.includes(`'${r}'`)),
+    backendUsesProductActiveRoleContract:backend.includes("require('./product-active-role-contract')")&&backend.includes('resolveProductActiveRole('),
     backendWritesAudit:/collection\(['"]auditEvents['"]\)\.add\(/.test(backend),
     bootstrapIncludesBackend:bootstrap.includes("require('./product-insurer-credentials')"),
     packageChecksBackend:pkg.includes('product-insurer-credentials.js'),
     frontendCallableConstant:provider.includes(`const CALLABLE = '${FUNCTION}'`)||provider.includes(`const CALLABLE='${FUNCTION}'`),
     frontendCallsRuntime:provider.includes('runtime().callFunction(CALLABLE'),
+    frontendSendsOperation:provider.includes('operation,'),
+    frontendSendsTenantId:provider.includes('tenantId:tenantId()'),
+    frontendSendsActiveRole:provider.includes('activeRole:role'),
+    frontendSendsCredentialRef:provider.includes('credentialRef:r'),
+    frontendSendsInsurerId:provider.includes('insurerId'),
+    frontendSendsPortalId:/callFunction\(CALLABLE,[\s\S]{0,500}portalId/.test(provider),
+    frontendSendsField:/callFunction\(CALLABLE,[\s\S]{0,500}field/.test(provider),
     frontendDirectFirestoreWritesFalse:provider.includes('directFirestoreWrites:false'),
     runtimeHttpsCallable:runtime.includes('httpsCallable(fx,name)'),
     runtimeDefaultRegion:runtime.includes("region=String(region||'us-central1')"),
     legacyExports:LEGACY_FUNCTIONS.reduce((out,name)=>(out[name]=legacy.includes(`exports.${name} = onCall`)||legacy.includes(`exports.${name}=onCall`),out),{}),
-    legacyAuditWrites
+    legacyAuditWrites,
+    legacyHardcodedTenant:legacy.includes("const TENANT_ID = 'alianzas-soluciones'"),
+    legacyHardcodedIdentity:legacy.includes('EXPECTED_UID')&&legacy.includes('EXPECTED_EMAIL')&&legacy.includes('request.auth.uid !== EXPECTED_UID'),
+    legacyRevealRequiresPortalId:legacy.includes("const portalId = clean(input.portalId")&&legacy.includes('record.portalId !== portalId'),
+    legacyRevealCopyRequireField:legacy.includes("if (!['username', 'password'].includes(field))")
+  };
+  evidence.contractComparison={
+    productCallable:FUNCTION,
+    productBrowserPayload:['operation','tenantId','activeRole','credentialRef','insurerId'],
+    legacyRevealCopyAdditionalRequiredPayload:['portalId','field'],
+    productAuthorization:'active membership + requested assigned active role',
+    legacyAuthorization:'hardcoded LAB identity + tenant + assigned role/extra permission',
+    sameBrowserPayload:false,
+    sameAuthorizationContract:false,
+    directRetargetSafe:false
   };
   evidence.workflowDeployInventory=workflowDeployInventory();
   const recoveryBackendDeploy=evidence.workflowDeployInventory.filter(x=>x.recovery);
@@ -85,7 +107,7 @@ try{
   const client=await auth.getClient();
   const token=await client.getAccessToken();
   need(token?.token,'CLOUD_ACCESS_TOKEN_UNAVAILABLE');
-  const headers={Authorization:`Bearer ${token.token}`,'User-Agent':'Gravicentra-I4A-Readonly-Boundary/3.0'};
+  const headers={Authorization:`Bearer ${token.token}`,'User-Agent':'Gravicentra-I4A-Readonly-Boundary/4.0'};
 
   const exact=await functionMetadata(FUNCTION,headers);
   evidence.cloud.functionMetadataHttpStatus=exact.httpStatus;
@@ -106,10 +128,13 @@ try{
   const legacyAllSource=LEGACY_FUNCTIONS.every(name=>evidence.sourceContract.legacyExports[name]===true);
   const legacyAllCloud=LEGACY_FUNCTIONS.every(name=>evidence.cloud.legacyFunctions[name]?.exists===true&&evidence.cloud.legacyFunctions[name]?.state==='ACTIVE');
   const legacyAllAudit=LEGACY_FUNCTIONS.every(name=>evidence.sourceContract.legacyAuditWrites[name]===true);
+  const directLegacyMismatch=evidence.sourceContract.legacyHardcodedTenant===true&&evidence.sourceContract.legacyHardcodedIdentity===true&&evidence.sourceContract.legacyRevealRequiresPortalId===true&&evidence.sourceContract.legacyRevealCopyRequireField===true&&evidence.sourceContract.frontendSendsPortalId===false&&evidence.sourceContract.frontendSendsField===false;
   evidence.checks={
     sourceExported:evidence.sourceContract.backendExportsCallable===true,
     sourceBootstrapped:evidence.sourceContract.bootstrapIncludesBackend===true&&evidence.sourceContract.packageChecksBackend===true,
+    productAuthorizationContractPresent:evidence.sourceContract.backendUsesProductActiveRoleContract===true,
     frontendWiredExactCallable:evidence.sourceContract.frontendCallableConstant===true&&evidence.sourceContract.frontendCallsRuntime===true&&evidence.sourceContract.runtimeHttpsCallable===true&&evidence.sourceContract.runtimeDefaultRegion===true,
+    frontendProductPayloadComplete:evidence.sourceContract.frontendSendsOperation===true&&evidence.sourceContract.frontendSendsTenantId===true&&evidence.sourceContract.frontendSendsActiveRole===true&&evidence.sourceContract.frontendSendsCredentialRef===true&&evidence.sourceContract.frontendSendsInsurerId===true,
     browserHasNoDirectFirestoreCredentialWrites:evidence.sourceContract.frontendDirectFirestoreWritesFalse===true,
     backendWouldAuditCredentialUse:evidence.sourceContract.backendWritesAudit===true,
     cloudFunctionAbsent:evidence.cloud.functionMetadataHttpStatus===404,
@@ -118,13 +143,15 @@ try{
     legacyCallablesExistInSource:legacyAllSource,
     legacyCallablesAllDeployedActive:legacyAllCloud,
     legacyCallablesWouldWriteAudit:legacyAllAudit,
-    legacyInvocationBlockedByZeroWriteGate:legacyAllCloud&&legacyAllAudit&&evidence.functionInvocations===0&&evidence.writesExecuted===0&&evidence.dataTouched===false
+    legacyInvocationBlockedByZeroWriteGate:legacyAllCloud&&legacyAllAudit&&evidence.functionInvocations===0&&evidence.writesExecuted===0&&evidence.dataTouched===false,
+    legacyContractMismatchProven:directLegacyMismatch,
+    directLegacyRetargetRejected:directLegacyMismatch&&evidence.contractComparison.directRetargetSafe===false
   };
-  const required=['sourceExported','sourceBootstrapped','frontendWiredExactCallable','browserHasNoDirectFirestoreCredentialWrites','backendWouldAuditCredentialUse','cloudFunctionAbsent','cloudRunServiceAbsent','noRecoveryBackendPreviewDeployMechanism','legacyCallablesExistInSource','legacyCallablesAllDeployedActive','legacyCallablesWouldWriteAudit','legacyInvocationBlockedByZeroWriteGate'];
+  const required=['sourceExported','sourceBootstrapped','productAuthorizationContractPresent','frontendWiredExactCallable','frontendProductPayloadComplete','browserHasNoDirectFirestoreCredentialWrites','backendWouldAuditCredentialUse','cloudFunctionAbsent','cloudRunServiceAbsent','noRecoveryBackendPreviewDeployMechanism','legacyCallablesExistInSource','legacyCallablesAllDeployedActive','legacyCallablesWouldWriteAudit','legacyInvocationBlockedByZeroWriteGate','legacyContractMismatchProven','directLegacyRetargetRejected'];
   const failed=required.filter(k=>evidence.checks[k]!==true);
   need(failed.length===0,'BOUNDARY_CHECK_FAILED:'+failed.join(','));
-  evidence.decision='PRODUCT_CALLABLE_NOT_DEPLOYED_LEGACY_INVOCATION_BLOCKED_BY_ZERO_WRITE_GATE';
-  evidence.reason='The certified frontend is wired to orbit360ProductInsurerCredentialCommand, whose Cloud Functions and Cloud Run metadata are absent. The three legacy credential callables are deployed ACTIVE, but their source writes auditEvents on credential use. I4A requires zero writes, so invoking them here would violate the active gate and cannot prove contract equivalence. No backend deployment or product change is authorized by this probe.';
+  evidence.decision='PRODUCT_CALLABLE_NOT_DEPLOYED_LEGACY_CONTRACT_NOT_EQUIVALENT';
+  evidence.reason='The certified frontend is wired to orbit360ProductInsurerCredentialCommand, whose Cloud Functions and Cloud Run metadata are absent. The deployed legacy callables are not a drop-in replacement: reveal/copy require portalId and field that the certified browser provider does not send, and legacy authorization is restricted to a hardcoded LAB identity while the product contract uses active tenant membership plus assigned active role. Legacy calls also write auditEvents, so authenticated invocation is forbidden by the I4A zero-write gate. No direct retarget, backend deployment, product change, production touch, or data write is authorized by this probe.';
 }catch(e){
   evidence.errors.push(String(e?.message||e).slice(0,800));
   process.exitCode=1;
@@ -133,6 +160,7 @@ try{
   fs.writeFileSync(path.join(OUT,'i4a-insurer-backend-boundary-readonly.json'),JSON.stringify(evidence,null,2)+'\n');
   console.log('I4A_INSURER_BOUNDARY_DECISION='+evidence.decision);
   console.log('I4A_INSURER_BOUNDARY_CHECKS='+JSON.stringify(evidence.checks));
+  console.log('I4A_INSURER_CONTRACT_COMPARISON='+JSON.stringify(evidence.contractComparison||{}));
   console.log('I4A_INSURER_LEGACY_CLOUD='+JSON.stringify(evidence.cloud.legacyFunctions||{}));
   console.log('I4A_INSURER_BOUNDARY_WRITES=0');
   console.log('I4A_INSURER_BOUNDARY_INVOCATIONS=0');
