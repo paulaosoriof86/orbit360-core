@@ -65,11 +65,47 @@
     "sourceMutatedAfterBuild": false
   },
   "nextCandidate": null,
+  "i4aCausalFindings": {
+    "latestAuthoritativeRunId": 34390569565,
+    "cliente360TransientThresholdClassifiedAsValidatorOnly": true,
+    "aseguradoras": {
+      "status": "CAUSAL_RUNTIME_BOUNDARY_PROVEN",
+      "symptom": "ASEGURADORAS_PRIVILEGED_REF_MARKED_UNAVAILABLE",
+      "privilegedRolesAffected": ["Dirección", "SuperAdmin", "AdminTenant", "Operativo"],
+      "advisorCredentialRevealExpected": false,
+      "previewFunction": "orbit360ProductInsurerCredentialCommandPreview",
+      "region": "us-east1",
+      "cloudFunctionsHttpBeforeRemediation": 404,
+      "cloudRunHttpBeforeRemediation": 404,
+      "boundaryEvidenceRunId": 34390569565,
+      "productSourceChangeRequired": false
+    }
+  },
+  "i4aPreviewInfrastructureBoundary": {
+    "status": "AUTHORIZED_CAUSAL_REMEDIATION",
+    "authorizationScope": "PREVIEW_ONLY_SAME_FIREBASE_PROJECT",
+    "targetFunction": "orbit360ProductInsurerCredentialCommandPreview",
+    "targetRegion": "us-east1",
+    "certifiedSourceSha": "96f6962b8519a032c2f54b50d2796fa2545de1e4",
+    "certifiedBackendSourceDigest": "b317ee5d6c7346bdb0abfa6bb71b5f246cd7647ed7272551065c2053f497f805",
+    "requiredBackendEntrypoint": "functions/bootstrap.js",
+    "previewImportEnabled": false,
+    "operationalWritesAuthorized": false,
+    "hostingMutationAuthorized": false,
+    "firestoreRulesMutationAuthorized": false,
+    "storageRulesMutationAuthorized": false,
+    "canonicalProductionCallableMutationAuthorized": false,
+    "productionHostingMutationAuthorized": false,
+    "dataMutationAuthorized": false,
+    "authorizationEvidenceRunId": 34390569565,
+    "authorizationReason": "Exact Preview callable and Cloud Run service returned 404 while certified frontend routes I3 Preview hosts exclusively to this callable."
+  },
   "environmentState": {
     "firebaseProjectId": "ays-orbit-360-lab",
     "hostingSiteId": "ays-orbit-360-lab",
     "i3FunctionsDeployed": false,
     "i3SharedBackendMutation": false,
+    "previewOnlyInfrastructureTouchedByRecovery": false,
     "productionAccepted": false,
     "productionTouchedByRecovery": false,
     "dataTouchedByRecovery": false,
@@ -88,6 +124,8 @@
     "unaffectedCapabilityEvidencePreserved": true,
     "sourceChangeAfterBuildRequiresNewI2I3": true,
     "productionBackendBeforeI5Forbidden": true,
+    "canonicalProductionBackendBeforeI5Forbidden": true,
+    "previewOnlyBackendInI4ARequiresExplicitCausalAuthorization": true,
     "augustBeforeProductionAcceptedForbidden": true,
     "failClosedOnAuthorityMismatch": true
   },
@@ -109,5 +147,5 @@
     "evergreenProjectSourceIntegrityGuarded": true,
     "i3FormalSeal": true
   },
-  "nextAction": "EXECUTE_I4A_AUTHORITATIVE_PREVIEW_QA_ON_CERTIFIED_ARTIFACT"
+  "nextAction": "DEPLOY_ONLY_CERTIFIED_PREVIEW_CREDENTIAL_CALLABLE_THEN_READBACK_AND_RETEST_ASEGURADORAS"
 }
