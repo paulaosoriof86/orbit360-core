@@ -1,42 +1,53 @@
 name: Gravicentra Recovery I2 Source Contract
 
 on:
-  push:
-    branches:
-      - recovery/fase-a-clean-20260831
-    paths:
-      - 'functions/**'
-      - 'firebase.json'
-      - 'orbit360-platform/index.html'
-      - 'orbit360-platform/product-runtime-config.js'
-      - 'orbit360-platform/sw.js'
-      - 'orbit360-platform/core/pwa.js'
-      - 'orbit360-platform/core/product-app-p0.js'
-      - 'orbit360-platform/core/auth-product-runtime-p0.js'
-      - 'orbit360-platform/core/backend-product-readonly-bootstrap-p0.js'
-      - 'orbit360-platform/core/ops-leads-domain-client.js'
-      - 'orbit360-platform/core/cobros-reconciliation-domain-client.js'
-      - 'orbit360-platform/core/product-insurer-credential-provider-p0.js'
-      - 'orbit360-platform/data/store-firestore-product-readonly-p0.js'
-      - 'orbit360-platform/data/store-firestore-product-operational-p0.js'
-      - 'tools/orbit360-recovery-i2-*.mjs'
-      - '.github/workflows/gravicentra-recovery-i2-source-contract.yml'
   workflow_dispatch:
 
 permissions:
   contents: read
 
+concurrency:
+  group: gravicentra-recovery-i2-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   source-contract:
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Recovery control plane
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          path: control
+          fetch-depth: 50
+          persist-credentials: false
+
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Syntax check product server owners
+
+      - id: candidate
+        name: Resolve exact I2 candidate from CONTROL_PLANE
+        working-directory: control
         run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "recovery/fase-a-clean-20260831"
+          node tools/gravicentra-control-plane-guard-v2.mjs --mode=i2
+
+      - name: Checkout exact I2 candidate source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.candidate.outputs.source_sha }}
+          path: source
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Syntax check product server owners
+        working-directory: source
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "${{ steps.candidate.outputs.source_sha }}"
           node --check functions/product-active-role-contract.js
           node --check functions/cobros-ledger-contract.js
           node --check functions/product-operational-domain.js
@@ -44,13 +55,33 @@ jobs:
           node --check functions/product-insurer-credentials.js
           node --check functions/cobros-reconciliation-domain.js
           node --check functions/bootstrap.js
+
       - name: Active role fail-closed contract
+        working-directory: source
         run: node tools/orbit360-recovery-i2-product-active-role-contract-test.mjs
+
       - name: Cobros 10.10.2 exact ledger contract
+        working-directory: source
         run: node tools/orbit360-recovery-i2-cobros-10102-contract-test.mjs
+
       - name: Aseguradoras isolated Preview backend contract
+        working-directory: source
         run: node tools/orbit360-recovery-i2-insurer-preview-backend-contract-test.mjs
+
       - name: Composition startup and write boundary contract
+        working-directory: source
         run: node tools/orbit360-recovery-i2-composition-startup-write-boundary-test.mjs
+
       - name: Canonical product reachability closure
+        working-directory: source
         run: node tools/orbit360-recovery-i2-reachability-test.mjs
+
+      - name: Summary
+        run: |
+          {
+            echo '## Gravicentra Insurance — I2 source contract'
+            echo "- Candidate source from CONTROL_PLANE: \`${{ steps.candidate.outputs.source_sha }}\`"
+            echo '- Automatic product-path execution: `false`'
+            echo '- Production touched: `false`'
+            echo '- Data touched: `false`'
+          } >> "$GITHUB_STEP_SUMMARY"
