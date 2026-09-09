@@ -101,7 +101,9 @@ async function probeCobros(page){
   need(state.base.recibosEsperados>0,'RECIBOS_ESPERADOS_EMPTY');
   need(state.carteraGlobal&&typeof state.carteraGlobal==='object','COBROS_CARTERA_GLOBAL_UNAVAILABLE');
   need(!(state.base.carteraPrimas>state.base.cobros&&state.visibleRows<=Math.max(1,state.scoped.cobros)),'COBROS_READ_MODEL_EXCLUDES_CARTERA_PRIMAS');
-  const heartbeat=await beat(page);need(heartbeat.maxMs<1000,'COBROS_EVENT_LOOP_BLOCKED');
+  const heartbeat=await beat(page);
+  try{need(heartbeat.maxMs<1000,'COBROS_EVENT_LOOP_BLOCKED');}
+  catch(error){error.heartbeat={samples:Array.isArray(heartbeat.samples)?heartbeat.samples:[...(heartbeat.samplesMs||[])],maxMs:heartbeat.maxMs};throw error;}
   return {routeMs,...state,heartbeat};
 }
 
@@ -151,7 +153,7 @@ async function runCase(target,s,name,probe){
     rec.stage='role';rec.role=await setRole(page,target);rec.stage=name;
     rec.evidence=await deadline(probe(page),22000,'I4A_'+name.toUpperCase()+'_PROBE_TIMEOUT');
     rec.stage='telemetry';rec.telemetry=checkTelemetry(tel);rec.stage='complete';rec.pass=true;
-  }catch(e){rec.error=String(e?.message||e);ev.errors.push(target+':'+name+':'+rec.stage+':'+rec.error);}finally{if(context)await Promise.race([context.close().catch(()=>{}),new Promise(r=>setTimeout(r,3000))]);}
+  }catch(e){if(e?.heartbeat)rec.heartbeat=e.heartbeat;rec.error=String(e?.message||e);ev.errors.push(target+':'+name+':'+rec.stage+':'+rec.error);}finally{if(context)await Promise.race([context.close().catch(()=>{}),new Promise(r=>setTimeout(r,3000))]);}
   return rec;
 }
 try{
