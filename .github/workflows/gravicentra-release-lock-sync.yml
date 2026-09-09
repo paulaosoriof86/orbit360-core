@@ -8,8 +8,9 @@ on:
     paths:
       - artifacts/orbit360-recovery/release-control/ACTIVE_RELEASE_LOCK.json
       - tools/gravicentra-release-lineage-guard.mjs
+      - tools/gravicentra-i3-preview-v2-package.mjs
       - .github/workflows/gravicentra-release-lock-sync.yml
-      - .github/workflows/gravicentra-recovery-i3-preview.yml
+      - .github/workflows/gravicentra-recovery-i3-preview-v2.yml
       - .github/workflows/gravicentra-recovery-i4a-public-browser.yml
       - .github/workflows/gravicentra-i4a-insurer-backend-boundary-readonly.yml
 
@@ -31,14 +32,10 @@ jobs:
           ref: ${{ github.sha }}
           fetch-depth: 50
           persist-credentials: false
-
-      - name: Set up Node
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '22'
-
       - name: Fail closed on any release-lock or executor desynchronization
-        shell: bash
         run: |
           set -euo pipefail
           test "$GITHUB_REF_NAME" = "recovery/fase-a-clean-20260831"
@@ -49,8 +46,8 @@ jobs:
             echo '- Authority: `ACTIVE_RELEASE_LOCK.json`'
             echo '- Candidate/I3 mismatch: fail closed'
             echo '- Certified/I4A mismatch: fail closed'
+            echo '- Single I3 executor v2: required'
             echo '- Silent retarget: forbidden'
-            echo '- Workflow self-write: disabled (GitHub permission boundary)'
-            echo '- Production touched: false'
+            echo '- Production canonical backend touched: false'
             echo '- Data touched: false'
           } >> "$GITHUB_STEP_SUMMARY"

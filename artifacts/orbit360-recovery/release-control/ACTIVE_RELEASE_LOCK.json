@@ -3,9 +3,21 @@
   "productBrand": "Gravicentra Insurance",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
-  "activeGate": "I4A_MODULE_PREVIEW",
-  "status": "I3_CERTIFIED_I4A_ACTIVE",
-  "candidateSourceSha": "fb09b03bc5e45a68e129237eae6e47f1023164dc",
+  "activeGate": "I3_REMEDIATION_IMMUTABLE_PREVIEW",
+  "status": "CANDIDATE_SOURCE_PENDING_I3",
+  "candidateSourceSha": "96f6962b8519a032c2f54b50d2796fa2545de1e4",
+  "candidateTopology": {
+    "reason": "ASEGURADORAS_CANONICAL_BACKEND_ABSENT_LEGACY_CONTRACT_REJECTED",
+    "previewCallable": "orbit360ProductInsurerCredentialCommandPreview",
+    "previewRegion": "us-east1",
+    "previewAudit": "cloudlog",
+    "previewOperationalWrites": false,
+    "previewImportEnabled": false,
+    "productionCallable": "orbit360ProductInsurerCredentialCommand",
+    "productionRegion": "us-central1",
+    "productionBackendTouched": false,
+    "sameBackendSourcePackageRequired": true
+  },
   "certified": {
     "sourceSha": "fb09b03bc5e45a68e129237eae6e47f1023164dc",
     "buildId": "gi-i3-fb09b03bc5e4-57f234755dc1",
@@ -33,7 +45,8 @@
     "i4aPinsMustEqualCertifiedRelease": true,
     "previewBuildMarkerMustMatchCertifiedRelease": true,
     "silentRetargetForbidden": true,
-    "productionPromotionMustReuseCertifiedArtifact": true
+    "productionPromotionMustReuseCertifiedArtifact": true,
+    "productionBackendDeployBeforeI5Forbidden": true
   },
   "allowedPostCertificationControlPlanePrefixes": [
     ".github/workflows/gravicentra-",
@@ -41,11 +54,18 @@
     "artifacts/orbit360-recovery/release-control/"
   ],
   "evidence": {
-    "i3Conclusion": "success",
-    "i3Readback": "ARTIFACT_READBACK_EXACT_PASS",
-    "i4aState": "ACTIVE_ON_CERTIFIED_FB09",
-    "causalSourceFix": "fb09b03bc5e45a68e129237eae6e47f1023164dc",
-    "desynchronizationGuard": "ACTIVE_RELEASE_LOCK_PLUS_FAIL_CLOSED_LINEAGE_GUARD",
+    "previousI3Conclusion": "success",
+    "previousI3Readback": "ARTIFACT_READBACK_EXACT_PASS",
+    "previousI4aState": "FAIL_ASEGURADORAS_BACKEND_BOUNDARY",
+    "i2RemediationSourceSha": "96f6962b8519a032c2f54b50d2796fa2545de1e4",
+    "i2RunId": 34304799588,
+    "i2Conclusion": "success",
+    "legacyContractRunId": 34302070454,
+    "legacyContractConclusion": "success",
+    "legacyReuse": "REJECTED_CONTRACT_MISMATCH",
+    "writesExecuted": 0,
+    "productionTouched": false,
+    "dataTouched": false,
     "dataCutoff": "2026-07-31",
     "augustRefresh": "HOLD"
   }
