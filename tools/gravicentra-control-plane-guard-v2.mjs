@@ -90,7 +90,8 @@ try{execFileSync('git',['merge-base','--is-ancestor',driftSource,current],{stdio
 const allowedControlPrefixes=[
   '.github/workflows/gravicentra-',
   'tools/gravicentra-',
-  'artifacts/orbit360-recovery/release-control/'
+  'artifacts/orbit360-recovery/release-control/',
+  'artifacts/orbit360-recovery/project-sources-v2/'
 ];
 const changed=git('diff','--name-only',driftSource+'..'+current).split(/\r?\n/).filter(Boolean);
 const forbidden=changed.filter(p=>!allowedControlPrefixes.some(prefix=>p.startsWith(prefix)));
