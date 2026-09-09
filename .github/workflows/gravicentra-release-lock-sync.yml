@@ -1,4 +1,4 @@
-name: Gravicentra Release Lock Guard
+name: Gravicentra Control Plane Guard v2
 
 on:
   workflow_dispatch:
@@ -6,12 +6,11 @@ on:
     branches:
       - recovery/fase-a-clean-20260831
     paths:
-      - artifacts/orbit360-recovery/release-control/RECOVERY_STATE.json
-      - artifacts/orbit360-recovery/release-control/ACTIVE_RELEASE_LOCK.json
-      - tools/gravicentra-release-lineage-guard.mjs
-      - tools/gravicentra-i3-preview-v2-package.mjs
+      - artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json
+      - artifacts/orbit360-recovery/release-control/CAPABILITY_LINEAGE_LOCK.json
+      - artifacts/orbit360-recovery/release-control/PLAN_TRABAJO_CONGELADO_V2.md
+      - tools/gravicentra-control-plane-guard-v2.mjs
       - .github/workflows/gravicentra-release-lock-sync.yml
-      - .github/workflows/gravicentra-recovery-i3-preview-v2.yml
       - .github/workflows/gravicentra-recovery-i4a-public-browser.yml
       - .github/workflows/gravicentra-i4a-insurer-backend-boundary-readonly.yml
 
@@ -19,11 +18,11 @@ permissions:
   contents: read
 
 concurrency:
-  group: gravicentra-release-lock-guard-${{ github.ref }}
+  group: gravicentra-control-plane-v2-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  verify-release-control:
+  verify-control-plane:
     runs-on: ubuntu-24.04
     timeout-minutes: 8
     steps:
@@ -36,23 +35,22 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Fail closed on state, release-lock or executor desynchronization
+      - name: Fail closed on canonical control-plane desynchronization
         run: |
           set -euo pipefail
           test "$GITHUB_REF_NAME" = "recovery/fase-a-clean-20260831"
-          node tools/gravicentra-release-lineage-guard.mjs --mode=control-plane
-          node --check tools/gravicentra-release-lineage-guard.mjs
-          node --check tools/gravicentra-i3-preview-v2-package.mjs
+          node --check tools/gravicentra-control-plane-guard-v2.mjs
+          node tools/gravicentra-control-plane-guard-v2.mjs --mode=governance
           git diff --exit-code
           {
-            echo '## Gravicentra Insurance — recovery control guard'
-            echo '- Live gate state: `RECOVERY_STATE.json`'
-            echo '- Release identity: `ACTIVE_RELEASE_LOCK.json`'
-            echo '- I3 candidate source: derived from lock, never hardcoded'
-            echo '- Shared backend mutation before I5: forbidden'
-            echo '- Candidate/I3 mismatch: fail closed'
-            echo '- Certified/I4A mismatch: fail closed'
-            echo '- Silent retarget: forbidden'
+            echo '## Gravicentra Insurance — canonical control plane v2'
+            echo '- Mutable operational authority: `CONTROL_PLANE.json` only'
+            echo '- Approved lineage authority: `CAPABILITY_LINEAGE_LOCK.json`'
+            echo '- Frozen plan: `PLAN_TRABAJO_CONGELADO_V2.md`'
+            echo '- Conversations/snapshots as operational authority: forbidden'
+            echo '- Release identity hardcodes in workflows: forbidden'
+            echo '- Lineage rediscovery after I1: forbidden without causal exception'
+            echo '- Product-source drift: fail closed'
             echo '- Production touched: false'
             echo '- Data touched: false'
           } >> "$GITHUB_STEP_SUMMARY"
