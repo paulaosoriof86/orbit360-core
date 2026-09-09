@@ -100,7 +100,7 @@
     }
   },
   "i4aPreviewInfrastructureBoundary": {
-    "status": "AUTHORIZED_CAUSAL_REMEDIATION",
+    "status": "POST_DEPLOY_READBACK_REQUIRED",
     "authorizationScope": "PREVIEW_ONLY_SAME_FIREBASE_PROJECT",
     "targetFunction": "orbit360ProductInsurerCredentialCommandPreview",
     "targetRegion": "us-east1",
@@ -118,16 +118,19 @@
     "authorizationEvidenceRunId": 34390569565,
     "authorizationReason": "Exact Preview callable and Cloud Run service returned 404 while certified frontend routes I3 Preview hosts exclusively to this callable.",
     "latestRemediation": {
-      "runId": 34392529206,
-      "runAttempt": 2,
-      "jobId": 102633673395,
+      "runId": 34409694762,
+      "runAttempt": 1,
+      "jobId": 102660977128,
       "conclusion": "failure",
-      "failureClass": "ENVIRONMENT_AUTHZ_FIREBASE_EXTENSIONS_DISCOVERY_403",
-      "failureDetail": "Firebase CLI failed before deploy readback while querying Firebase Extensions API; caller lacked permission.",
-      "evidenceArtifactId": 10123582955,
-      "evidenceArtifactDigest": "sha256:cd0a1f577de3e6f42c9c61d1e8f23fd8fef44aca4f144df05a9b0aa9c3629d1a",
+      "failureClass": "FUNCTION_DEPLOYED_CLEANUP_POLICY_SETUP_FAILED_READBACK_PENDING",
+      "failureDetail": "Firebase CLI reported Functions successfully deployed, then exited 1 because it could not set up artifact cleanup policy in us-central1 and us-east1. Readback did not run because the deploy step conclusion was failure. Cleanup-policy mutation is not required for the certified Preview callable and was not authorized.",
+      "evidenceArtifactId": 10126788829,
+      "evidenceArtifactDigest": "sha256:fde7731ad4fbb6d6fa4ac3468d460291ed02fcfc0d994e64e25da34b395556de",
       "targetCallableHttpBeforeDeploy": 404,
       "canonicalProductionCallableHttpBeforeDeploy": 404,
+      "functionDeployReportedSuccessful": true,
+      "cleanupPolicySetupFailed": true,
+      "cleanupPolicyMutationAuthorized": false,
       "readbackPerformed": false,
       "productSourceChangeRequired": false
     }
@@ -137,7 +140,7 @@
     "hostingSiteId": "ays-orbit-360-lab",
     "i3FunctionsDeployed": false,
     "i3SharedBackendMutation": false,
-    "previewOnlyInfrastructureTouchedByRecovery": false,
+    "previewOnlyInfrastructureTouchedByRecovery": true,
     "productionAccepted": false,
     "productionTouchedByRecovery": false,
     "dataTouchedByRecovery": false,
@@ -185,5 +188,5 @@
     "evergreenProjectSourcePackageV3Prepared": true,
     "frozenPlanSnapshotInterpretationAddendumMaterialized": true
   },
-  "nextAction": "REMEDIATE_PREVIEW_DEPLOY_AUTHZ_WITHOUT_PRODUCT_SOURCE_CHANGE_THEN_DEPLOY_ONLY_CERTIFIED_PREVIEW_CALLABLE_AND_READBACK"
+  "nextAction": "POST_DEPLOY_READBACK_ONLY_FOR_PREVIEW_CALLABLE_THEN_RETURN_TO_I4A_ASEGURADORAS_PROBE"
 }
