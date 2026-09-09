@@ -45,7 +45,7 @@ async function functionMetadata(name,headers){
 }
 
 const evidence={
-  schemaVersion:'gravicentra-i4a-insurer-backend-boundary-readonly-v2',gate:'I4A',module:'Aseguradoras',
+  schemaVersion:'gravicentra-i4a-insurer-backend-boundary-readonly-v3',gate:'I4A',module:'Aseguradoras',
   sourceSha:SOURCE,buildId:BUILD,projectId:PROJECT,region:REGION,functionName:FUNCTION,legacyFunctionNames:LEGACY_FUNCTIONS,
   productionTouched:false,dataTouched:false,writesExecuted:0,functionInvocations:0,secretsRecorded:false,
   sourceContract:{},cloud:{legacyFunctions:{}},workflowDeployInventory:[],decision:'UNRESOLVED',checks:{},errors:[]
@@ -58,6 +58,11 @@ try{
   const pkg=read('functions/package.json');
   const provider=read('orbit360-platform/core/product-insurer-credential-provider-p0.js');
   const runtime=read('orbit360-platform/core/product-runtime-browser-providers-p0.js');
+  const legacyAuditWrites={
+    orbit360CredentialStatus:legacy.includes("audit('credential.status'"),
+    orbit360RevealInsurerCredential:legacy.includes("audit('credential.reveal'"),
+    orbit360CopyInsurerCredential:legacy.includes("audit('credential.copy'")
+  };
   evidence.sourceContract={
     backendExportsCallable:backend.includes(`exports.${FUNCTION}=onCall`)||backend.includes(`exports.${FUNCTION} = onCall`),
     backendViewRoles:['direccion','superadmin','admin','admintenant','operativo'].every(r=>backend.includes(`'${r}'`)),
@@ -69,7 +74,8 @@ try{
     frontendDirectFirestoreWritesFalse:provider.includes('directFirestoreWrites:false'),
     runtimeHttpsCallable:runtime.includes('httpsCallable(fx,name)'),
     runtimeDefaultRegion:runtime.includes("region=String(region||'us-central1')"),
-    legacyExports:LEGACY_FUNCTIONS.reduce((out,name)=>(out[name]=legacy.includes(`exports.${name} = onCall`)||legacy.includes(`exports.${name}=onCall`),out),{})
+    legacyExports:LEGACY_FUNCTIONS.reduce((out,name)=>(out[name]=legacy.includes(`exports.${name} = onCall`)||legacy.includes(`exports.${name}=onCall`),out),{}),
+    legacyAuditWrites
   };
   evidence.workflowDeployInventory=workflowDeployInventory();
   const recoveryBackendDeploy=evidence.workflowDeployInventory.filter(x=>x.recovery);
@@ -79,7 +85,7 @@ try{
   const client=await auth.getClient();
   const token=await client.getAccessToken();
   need(token?.token,'CLOUD_ACCESS_TOKEN_UNAVAILABLE');
-  const headers={Authorization:`Bearer ${token.token}`,'User-Agent':'Gravicentra-I4A-Readonly-Boundary/2.0'};
+  const headers={Authorization:`Bearer ${token.token}`,'User-Agent':'Gravicentra-I4A-Readonly-Boundary/3.0'};
 
   const exact=await functionMetadata(FUNCTION,headers);
   evidence.cloud.functionMetadataHttpStatus=exact.httpStatus;
@@ -98,7 +104,8 @@ try{
   evidence.cloud.cloudRunServiceName=rRes.status===200?String(rBody.name||''):'';
 
   const legacyAllSource=LEGACY_FUNCTIONS.every(name=>evidence.sourceContract.legacyExports[name]===true);
-  const legacyAllCloud=LEGACY_FUNCTIONS.every(name=>evidence.cloud.legacyFunctions[name]?.exists===true);
+  const legacyAllCloud=LEGACY_FUNCTIONS.every(name=>evidence.cloud.legacyFunctions[name]?.exists===true&&evidence.cloud.legacyFunctions[name]?.state==='ACTIVE');
+  const legacyAllAudit=LEGACY_FUNCTIONS.every(name=>evidence.sourceContract.legacyAuditWrites[name]===true);
   evidence.checks={
     sourceExported:evidence.sourceContract.backendExportsCallable===true,
     sourceBootstrapped:evidence.sourceContract.bootstrapIncludesBackend===true&&evidence.sourceContract.packageChecksBackend===true,
@@ -109,15 +116,15 @@ try{
     cloudRunServiceAbsent:evidence.cloud.cloudRunHttpStatus===404,
     noRecoveryBackendPreviewDeployMechanism:recoveryBackendDeploy.length===0,
     legacyCallablesExistInSource:legacyAllSource,
-    legacyCallablesAllDeployed:legacyAllCloud
+    legacyCallablesAllDeployedActive:legacyAllCloud,
+    legacyCallablesWouldWriteAudit:legacyAllAudit,
+    legacyInvocationBlockedByZeroWriteGate:legacyAllCloud&&legacyAllAudit&&evidence.functionInvocations===0&&evidence.writesExecuted===0&&evidence.dataTouched===false
   };
-  const required=['sourceExported','sourceBootstrapped','frontendWiredExactCallable','browserHasNoDirectFirestoreCredentialWrites','backendWouldAuditCredentialUse','cloudFunctionAbsent','noRecoveryBackendPreviewDeployMechanism'];
+  const required=['sourceExported','sourceBootstrapped','frontendWiredExactCallable','browserHasNoDirectFirestoreCredentialWrites','backendWouldAuditCredentialUse','cloudFunctionAbsent','cloudRunServiceAbsent','noRecoveryBackendPreviewDeployMechanism','legacyCallablesExistInSource','legacyCallablesAllDeployedActive','legacyCallablesWouldWriteAudit','legacyInvocationBlockedByZeroWriteGate'];
   const failed=required.filter(k=>evidence.checks[k]!==true);
   need(failed.length===0,'BOUNDARY_CHECK_FAILED:'+failed.join(','));
-  evidence.decision=legacyAllCloud?'LEGACY_BACKEND_REUSE_CANDIDATE_REQUIRES_CONTRACT_PROOF':'BLOCKED_BACKEND_RELEASE_BOUNDARY';
-  evidence.reason=legacyAllCloud
-    ? 'Exact product callable is absent from Cloud, but the three legacy secure callables are deployed. Reuse is not approved until their auth/role/data/audit contract is proven equivalent to the latest approved product contract.'
-    : 'Exact product callable is wired in source but absent from Cloud; the complete legacy secure callable set is not deployed; Recovery has no isolated backend Preview deploy mechanism. Deploying/invoking the product callable before I5 would alter the shared backend and credential operations write auditEvents.';
+  evidence.decision='PRODUCT_CALLABLE_NOT_DEPLOYED_LEGACY_INVOCATION_BLOCKED_BY_ZERO_WRITE_GATE';
+  evidence.reason='The certified frontend is wired to orbit360ProductInsurerCredentialCommand, whose Cloud Functions and Cloud Run metadata are absent. The three legacy credential callables are deployed ACTIVE, but their source writes auditEvents on credential use. I4A requires zero writes, so invoking them here would violate the active gate and cannot prove contract equivalence. No backend deployment or product change is authorized by this probe.';
 }catch(e){
   evidence.errors.push(String(e?.message||e).slice(0,800));
   process.exitCode=1;
