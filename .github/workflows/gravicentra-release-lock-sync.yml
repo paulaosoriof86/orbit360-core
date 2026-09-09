@@ -8,7 +8,9 @@ on:
     paths:
       - artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json
       - artifacts/orbit360-recovery/release-control/CAPABILITY_LINEAGE_LOCK.json
+      - artifacts/orbit360-recovery/release-control/CAPABILITY_STATUS_LEDGER.json
       - artifacts/orbit360-recovery/release-control/PLAN_TRABAJO_CONGELADO_V2.md
+      - artifacts/orbit360-recovery/release-control/PLAN_TRABAJO_CONGELADO_V2_ADDENDUM_EVERGREEN_20260909.md
       - artifacts/orbit360-recovery/release-control/RECOVERY_STATE.json
       - artifacts/orbit360-recovery/release-control/ACTIVE_RELEASE_LOCK.json
       - artifacts/orbit360-recovery/release-control/I4A_PREVIEW_FUNCTION_REMEDIATION_INTENT.json
@@ -66,8 +68,10 @@ jobs:
             echo '## Gravicentra Insurance — canonical control plane v2'
             echo '- Mutable operational authority: `CONTROL_PLANE.json` only'
             echo '- Approved lineage authority: `CAPABILITY_LINEAGE_LOCK.json`'
-            echo '- Frozen plan: `PLAN_TRABAJO_CONGELADO_V2.md`'
-            echo '- Project Sources: evergreen manifest + blob integrity enforced'
+            echo '- Capability status: derived ledger, release-bound, non-authoritative for gate/release identity'
+            echo '- Frozen plan: `PLAN_TRABAJO_CONGELADO_V2.md` + evergreen interpretation addendum'
+            echo '- Project Sources: active evergreen V3 manifest + Git blob integrity enforced'
+            echo '- Static Project Sources replacement: controlled by `projectSources.staticSourceUpdateRequired`'
             echo '- Complete ancestry checkout: `fetch-depth: 0`'
             echo '- Split state/release authorities: deprecated and mechanically blocked'
             echo '- Conversations/snapshots as operational authority: forbidden'
