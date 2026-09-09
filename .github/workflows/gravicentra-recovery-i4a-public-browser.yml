@@ -1,241 +1,192 @@
-name: Gravicentra Recovery I4A Browser QA
+name: Gravicentra Recovery I4A Authoritative Preview QA
 
 on:
-  push:
-    branches:
-      - recovery/fase-a-clean-20260831
-    paths:
-      - .github/workflows/gravicentra-recovery-i4a-public-browser.yml
-      - tools/gravicentra-i4a-public-browser.mjs
-      - tools/gravicentra-i4a-bootstrap-diagnostic.mjs
-      - tools/gravicentra-i4a-authenticated-browser-v2.mjs
-      - tools/gravicentra-i4a-runtime-boundary-diagnostic.mjs
-      - tools/gravicentra-release-lineage-guard.mjs
-      - artifacts/orbit360-recovery/release-control/ACTIVE_RELEASE_LOCK.json
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: gravicentra-recovery-i4a-browser-${{ github.ref }}
+  group: gravicentra-recovery-i4a-${{ github.ref }}
   cancel-in-progress: false
 
-env:
-  SOURCE_SHA: fb09b03bc5e45a68e129237eae6e47f1023164dc
-  BUILD_ID: gi-i3-fb09b03bc5e4-57f234755dc1
-  PREVIEW_URL: https://ays-orbit-360-lab--gi-i3-34176437680-cqj5jjki.web.app
-
 jobs:
-  public-browser:
+  i4a-authoritative:
     runs-on: ubuntu-24.04
-    timeout-minutes: 12
+    timeout-minutes: 45
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Recovery control plane and committed QA harness
+        uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
-          fetch-depth: 0
+          fetch-depth: 50
           persist-credentials: false
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-      - name: Verify certified release lock
-        run: node tools/gravicentra-release-lineage-guard.mjs --mode=certified
-      - name: Install Chromium QA dependency
-        run: |
-          set -euo pipefail
-          npm install --no-save --package-lock=false playwright@1.55.0 >/dev/null
-          npx playwright install --with-deps chromium >/dev/null
-      - name: Execute public browser smoke
-        env:
-          I4A_PUBLIC_EVIDENCE_DIR: ${{ runner.temp }}/gravicentra-i4a-public-evidence
-        run: node tools/gravicentra-i4a-public-browser.mjs
-      - name: Preserve public evidence
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: gravicentra-i4a-public-browser-${{ github.run_id }}
-          path: ${{ runner.temp }}/gravicentra-i4a-public-evidence
-          if-no-files-found: warn
-          retention-days: 30
 
-  bootstrap-diagnostic:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 18
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.sha }}
-          fetch-depth: 0
-          persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Verify certified release lock
-        run: node tools/gravicentra-release-lineage-guard.mjs --mode=certified
-      - name: Install diagnostic dependencies
-        run: |
-          set -euo pipefail
-          npm install --no-save --package-lock=false playwright@1.55.0 firebase-admin@13.10.0 >/dev/null
-          npx playwright install --with-deps chromium >/dev/null
-      - name: Execute sanitized role hydration diagnostic
-        env:
-          I4A_DIAG_EVIDENCE_DIR: ${{ runner.temp }}/gravicentra-i4a-bootstrap-diagnostic
-          SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-          SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
-          SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
-        run: node tools/gravicentra-i4a-bootstrap-diagnostic.mjs
-      - name: Publish diagnostic summary
-        if: always()
-        env:
-          EVIDENCE: ${{ runner.temp }}/gravicentra-i4a-bootstrap-diagnostic/i4a-bootstrap-diagnostic.json
-        run: |
-          set -euo pipefail
-          {
-            echo '## Gravicentra Insurance — I4A bootstrap diagnostic'
-            echo "- Source under test: \`$SOURCE_SHA\`"
-            echo "- Build ID: \`$BUILD_ID\`"
-            if [ -f "$EVIDENCE" ]; then
-              echo "- Cases diagnosed: \`$(jq -r '.cases | keys | join(",")' "$EVIDENCE")\`"
-              echo "- Writes executed: \`$(jq -r '.writesExecuted' "$EVIDENCE")\`"
-              echo "- Production touched: \`$(jq -r '.productionTouched' "$EVIDENCE")\`"
-              echo "- Data touched: \`$(jq -r '.dataTouched' "$EVIDENCE")\`"
-            else
-              echo '- Status: `NO_EVIDENCE_FAIL_CLOSED`'
-            fi
-          } >> "$GITHUB_STEP_SUMMARY"
-      - name: Preserve diagnostic evidence
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: gravicentra-i4a-bootstrap-diagnostic-${{ github.run_id }}
-          path: ${{ runner.temp }}/gravicentra-i4a-bootstrap-diagnostic
-          if-no-files-found: error
-          retention-days: 30
 
-  authenticated-browser:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 25
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.sha }}
-          fetch-depth: 0
-          persist-credentials: false
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-      - name: Verify certified release lock
-        run: node tools/gravicentra-release-lineage-guard.mjs --mode=certified
-      - name: Install authenticated QA dependencies
+      - id: release
+        name: Fail closed against canonical CONTROL_PLANE
         run: |
           set -euo pipefail
-          npm install --no-save --package-lock=false playwright@1.55.0 firebase-admin@13.10.0 >/dev/null
-          npx playwright install --with-deps chromium >/dev/null
-      - name: Correct authenticated discriminants without changing certified product bytes
-        shell: bash
-        run: |
-          set -euo pipefail
-          python3 - <<'PY'
-          from pathlib import Path
-          p=Path('tools/gravicentra-i4a-authenticated-browser-v2.mjs')
-          s=p.read_text(encoding='utf-8')
-          beat="async function beat(page){const vals=[];for(let i=0;i<3;i++){const t=Date.now();await page.evaluate(()=>new Promise(r=>setTimeout(r,20)));vals.push(Date.now()-t);}return {samplesMs:vals,maxMs:Math.max(...vals)};}"
-          helper=beat+"\nasync function waitFinanceReadModels(page){await page.waitForFunction(()=>{const st=Orbit?.store?._productStatus?.()||{};const confirmed=Array.isArray(st.serverConfirmedCollections)?st.serverConfirmedCollections:[];return confirmed.includes('recibosEsperados')&&confirmed.includes('carteraPrimas')&&(Orbit?.store?.all?.('recibosEsperados')||[]).length>0&&(Orbit?.store?.all?.('carteraPrimas')||[]).length>0;},null,{timeout:12000});}"
-          if beat not in s: raise SystemExit('QA_PATCH_BEAT_ANCHOR_MISSING')
-          s=s.replace(beat,helper,1)
-          old="  const heartbeat=await beat(page);need(heartbeat.maxMs<1000,'CLIENTE360_EVENT_LOOP_BLOCKED');\n  return {routeMs,...state,heartbeat};"
-          new="  const transientHeartbeat=await beat(page);await page.waitForTimeout(600);const settledDiagnostics=await page.evaluate(()=>{const d=OrbitRuntimeDiagnostics?.cliente360?.list||{};return {renderSeq:d.renderSeq??null,totalMs:d.totalMs??null,renderedRows:d.renderedRows??null,totalRows:d.totalRows??null};});const heartbeat=await beat(page);need(transientHeartbeat.maxMs<1000,'CLIENTE360_EVENT_LOOP_BLOCKED_TRANSIENT:'+JSON.stringify({transientHeartbeat,initialDiagnostics:state.diagnostics,settledDiagnostics}));need(heartbeat.maxMs<1000,'CLIENTE360_EVENT_LOOP_BLOCKED_STABLE:'+JSON.stringify({heartbeat,settledDiagnostics}));\n  return {routeMs,...state,transientHeartbeat,settledDiagnostics,heartbeat};"
-          if old not in s: raise SystemExit('QA_PATCH_CLIENTE_ANCHOR_MISSING')
-          s=s.replace(old,new,1)
-          old="  const heartbeat=await beat(page);need(heartbeat.maxMs<1000,'POLIZAS_EVENT_LOOP_BLOCKED');\n  return {routeMs,canonical:canonicalPolicy,...chain,dom,expectedPremiumText:expected,heartbeat};"
-          new="  const transientHeartbeat=await beat(page);await page.waitForTimeout(600);const heartbeat=await beat(page);need(transientHeartbeat.maxMs<1000,'POLIZAS_EVENT_LOOP_BLOCKED_TRANSIENT:'+JSON.stringify(transientHeartbeat));need(heartbeat.maxMs<1000,'POLIZAS_EVENT_LOOP_BLOCKED_STABLE:'+JSON.stringify(heartbeat));\n  return {routeMs,canonical:canonicalPolicy,...chain,dom,expectedPremiumText:expected,transientHeartbeat,heartbeat};"
-          if old not in s: raise SystemExit('QA_PATCH_POLIZAS_ANCHOR_MISSING')
-          s=s.replace(old,new,1)
-          old="async function probeCobros(page){\n  const routeMs=await gotoRoute(page,'#/cobros',()=>Orbit?.route?.key==='cobros'&&!!document.querySelector('#host .page'),12000);\n  await page.waitForTimeout(160);"
-          new="async function probeCobros(page){\n  const routeMs=await gotoRoute(page,'#/cobros',()=>Orbit?.route?.key==='cobros'&&!!document.querySelector('#host .page'),12000);\n  await waitFinanceReadModels(page);\n  await page.waitForTimeout(160);"
-          if old not in s: raise SystemExit('QA_PATCH_COBROS_ROUTE_ANCHOR_MISSING')
-          s=s.replace(old,new,1)
-          old="  need(!(state.base.carteraPrimas>state.base.cobros&&state.visibleRows<=Math.max(1,state.scoped.cobros)),'COBROS_READ_MODEL_EXCLUDES_CARTERA_PRIMAS');"
-          new="  need(state.visibleRows<=Math.max(1,state.scoped.cobros),'COBROS_VISIBLE_LIST_EXCEEDS_COBROS_SCOPE');"
-          if old not in s: raise SystemExit('QA_PATCH_COBROS_SEMANTICS_ANCHOR_MISSING')
-          s=s.replace(old,new,1)
-          p.write_text(s,encoding='utf-8')
-          print('I4A_AUTH_QA_SEMANTIC_SEPARATION_PATCH=PASS')
-          PY
+          test "$GITHUB_REF_NAME" = "recovery/fase-a-clean-20260831"
+          node tools/gravicentra-control-plane-guard-v2.mjs --mode=i4a
+          node --check tools/gravicentra-i4a-public-browser.mjs
+          node --check tools/gravicentra-i4a-bootstrap-diagnostic.mjs
+          node --check tools/gravicentra-i4a-runtime-boundary-diagnostic.mjs
           node --check tools/gravicentra-i4a-authenticated-browser-v2.mjs
-      - name: Execute sanitized runtime boundary diagnostic
+
+      - name: Seal committed QA harness identity
+        run: |
+          set -euo pipefail
+          ROOT="$RUNNER_TEMP/gravicentra-i4a-evidence"
+          mkdir -p "$ROOT/meta" "$ROOT/public" "$ROOT/bootstrap" "$ROOT/boundary" "$ROOT/auth"
+          HARNESS_BLOB=$(git hash-object tools/gravicentra-i4a-authenticated-browser-v2.mjs)
+          echo "I4A_HARNESS_BLOB_SHA=$HARNESS_BLOB" >> "$GITHUB_ENV"
+          cp tools/gravicentra-i4a-authenticated-browser-v2.mjs "$ROOT/meta/gravicentra-i4a-authenticated-browser-v2.mjs"
+          printf '%s\n' "$GITHUB_SHA" > "$ROOT/meta/control-plane-commit.txt"
+          printf '%s\n' "$HARNESS_BLOB" > "$ROOT/meta/authenticated-harness-blob.txt"
+          printf '%s\n' "$SOURCE_SHA" > "$ROOT/meta/source-sha.txt"
+          printf '%s\n' "$BUILD_ID" > "$ROOT/meta/build-id.txt"
+          printf '%s\n' "$PREVIEW_URL" > "$ROOT/meta/preview-url.txt"
+
+      - name: Install I4A dependencies once
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false playwright@1.55.0 firebase-admin@13.10.0 >/dev/null
+          npx playwright install --with-deps chromium >/dev/null
+
+      - id: public
+        name: Execute public Preview smoke without short-circuiting later evidence
         env:
-          I4A_BOUNDARY_EVIDENCE_DIR: ${{ runner.temp }}/gravicentra-i4a-boundary-evidence
+          I4A_PUBLIC_EVIDENCE_DIR: ${{ runner.temp }}/gravicentra-i4a-evidence/public
+        run: |
+          set +e
+          node tools/gravicentra-i4a-public-browser.mjs
+          RC=$?
+          set -e
+          echo "rc=$RC" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - id: bootstrap
+        name: Execute sanitized role hydration diagnostic
+        env:
+          I4A_DIAG_EVIDENCE_DIR: ${{ runner.temp }}/gravicentra-i4a-evidence/bootstrap
           SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
           SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
-        run: node tools/gravicentra-i4a-runtime-boundary-diagnostic.mjs
-      - name: Publish runtime boundary summary
-        if: always()
-        env:
-          EVIDENCE: ${{ runner.temp }}/gravicentra-i4a-boundary-evidence/i4a-runtime-boundary.json
         run: |
-          set -euo pipefail
-          {
-            echo '## Gravicentra Insurance — I4A runtime boundary diagnostic'
-            echo "- Source under test: \`$SOURCE_SHA\`"
-            echo "- Build ID: \`$BUILD_ID\`"
-            if [ -f "$EVIDENCE" ]; then
-              echo "- Status: \`$(jq -r '.status' "$EVIDENCE")\`"
-              echo "- Synthetic store stage: \`$(jq -r '.classification.firstSyntheticStoreStage // ""' "$EVIDENCE")\`"
-              echo "- Synthetic DOM stage: \`$(jq -r '.classification.firstSyntheticDomStage // ""' "$EVIDENCE")\`"
-              echo "- Mutation trace captured: \`$(jq -r '.classification.mutationTraceCaptured // false' "$EVIDENCE")\`"
-              echo "- Insurer backend callable: \`$(jq -r '.classification.insurerBackendCallableSucceeded // false' "$EVIDENCE")\`"
-              echo "- Insurer secure resource: \`$(jq -r '.classification.insurerSecureResourceSucceeded // false' "$EVIDENCE")\`"
-              echo "- Insurer UI reveal: \`$(jq -r '.classification.insurerUiRevealSucceeded // false' "$EVIDENCE")\`"
-              echo "- Insurer UI copy: \`$(jq -r '.classification.insurerUiCopyInvokedClipboard // false' "$EVIDENCE")\`"
-              echo "- Writes executed: \`$(jq -r '.writesExecuted' "$EVIDENCE")\`"
-            else
-              echo '- Status: `NO_EVIDENCE_FAIL_CLOSED`'
-            fi
-          } >> "$GITHUB_STEP_SUMMARY"
-      - name: Preserve runtime boundary evidence
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: gravicentra-i4a-runtime-boundary-${{ github.run_id }}
-          path: ${{ runner.temp }}/gravicentra-i4a-boundary-evidence
-          if-no-files-found: error
-          retention-days: 30
-      - name: Execute authenticated module discriminants
+          set +e
+          node tools/gravicentra-i4a-bootstrap-diagnostic.mjs
+          RC=$?
+          set -e
+          echo "rc=$RC" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - id: boundary
+        name: Execute sanitized runtime boundary diagnostic
         env:
-          I4A_AUTH_EVIDENCE_DIR: ${{ runner.temp }}/gravicentra-i4a-auth-evidence
+          I4A_BOUNDARY_EVIDENCE_DIR: ${{ runner.temp }}/gravicentra-i4a-evidence/boundary
           SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
           SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
-        run: node tools/gravicentra-i4a-authenticated-browser-v2.mjs
-      - name: Publish authenticated summary
+        run: |
+          set +e
+          node tools/gravicentra-i4a-runtime-boundary-diagnostic.mjs
+          RC=$?
+          set -e
+          echo "rc=$RC" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - id: auth
+        name: Execute committed authenticated module discriminants
+        env:
+          I4A_AUTH_EVIDENCE_DIR: ${{ runner.temp }}/gravicentra-i4a-evidence/auth
+          SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+        run: |
+          set +e
+          node tools/gravicentra-i4a-authenticated-browser-v2.mjs
+          RC=$?
+          set -e
+          echo "rc=$RC" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Seal consolidated I4A execution manifest
         if: always()
         env:
-          EVIDENCE: ${{ runner.temp }}/gravicentra-i4a-auth-evidence/i4a-authenticated-browser.json
+          PUBLIC_RC: ${{ steps.public.outputs.rc }}
+          BOOTSTRAP_RC: ${{ steps.bootstrap.outputs.rc }}
+          BOUNDARY_RC: ${{ steps.boundary.outputs.rc }}
+          AUTH_RC: ${{ steps.auth.outputs.rc }}
         run: |
           set -euo pipefail
+          ROOT="$RUNNER_TEMP/gravicentra-i4a-evidence"; export ROOT
+          python3 - <<'PY'
+          import json,os,hashlib
+          root=os.environ['ROOT']
+          def rc(name):
+              try:return int(os.environ.get(name,'99'))
+              except:return 99
+          manifest={
+            'schemaVersion':'gravicentra-i4a-consolidated-execution-v1',
+            'gate':'I4A','controlPlaneCommit':os.environ['GITHUB_SHA'],
+            'sourceSha':os.environ['SOURCE_SHA'],'buildId':os.environ['BUILD_ID'],'previewUrl':os.environ['PREVIEW_URL'],
+            'qaHarnessBlobSha':os.environ['I4A_HARNESS_BLOB_SHA'],'qaHarnessPatchedAtRuntime':False,
+            'results':{'public':rc('PUBLIC_RC'),'bootstrap':rc('BOOTSTRAP_RC'),'boundary':rc('BOUNDARY_RC'),'authenticated':rc('AUTH_RC')},
+            'productionTouched':False,'dataTouched':False,'writesExpected':0
+          }
+          manifest['allProbesExitZero']=all(v==0 for v in manifest['results'].values())
+          p=os.path.join(root,'i4a-execution-manifest.json')
+          open(p,'w').write(json.dumps(manifest,indent=2,sort_keys=True)+'\n')
+          print('I4A_CONSOLIDATED_PROBES='+json.dumps(manifest['results'],sort_keys=True))
+          PY
+
+      - name: Publish consolidated summary
+        if: always()
+        env:
+          MANIFEST: ${{ runner.temp }}/gravicentra-i4a-evidence/i4a-execution-manifest.json
+        run: |
           {
-            echo '## Gravicentra Insurance — I4A authenticated module QA'
-            echo "- Source under test: \`$SOURCE_SHA\`"
+            echo '## Gravicentra Insurance — I4A authoritative Preview QA'
+            echo "- Source from CONTROL_PLANE: \`$SOURCE_SHA\`"
             echo "- Build ID: \`$BUILD_ID\`"
-            if [ -f "$EVIDENCE" ]; then
-              echo "- Status: \`$(jq -r '.status' "$EVIDENCE")\`"
-              echo "- Available roles: \`$(jq -r '.coverage.availableRoles | join(",")' "$EVIDENCE")\`"
-              echo "- Passing roles: \`$(jq -r '[.roles|to_entries[]|select(.value.pass==true)|.key] | join(",")' "$EVIDENCE")\`"
-              echo "- Writes executed: \`$(jq -r '.writesExecuted' "$EVIDENCE")\`"
-              echo "- Production touched: \`$(jq -r '.productionTouched' "$EVIDENCE")\`"
-              echo "- Data touched: \`$(jq -r '.dataTouched' "$EVIDENCE")\`"
-            else
-              echo '- Status: `NO_EVIDENCE_FAIL_CLOSED`'
+            echo "- Preview: $PREVIEW_URL"
+            echo "- QA harness blob: \`$I4A_HARNESS_BLOB_SHA\`"
+            echo '- Runtime QA self-patch: `false`'
+            if [ -f "$MANIFEST" ]; then
+              echo "- Public rc: \`$(jq -r '.results.public' "$MANIFEST")\`"
+              echo "- Bootstrap rc: \`$(jq -r '.results.bootstrap' "$MANIFEST")\`"
+              echo "- Boundary rc: \`$(jq -r '.results.boundary' "$MANIFEST")\`"
+              echo "- Authenticated rc: \`$(jq -r '.results.authenticated' "$MANIFEST")\`"
             fi
+            echo '- Production touched by executor: `false`'
+            echo '- Data writes by executor: `0`'
           } >> "$GITHUB_STEP_SUMMARY"
-      - name: Preserve authenticated evidence
+
+      - name: Preserve all I4A evidence in one artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: gravicentra-i4a-authenticated-browser-${{ github.run_id }}
-          path: ${{ runner.temp }}/gravicentra-i4a-auth-evidence
+          name: gravicentra-i4a-authoritative-${{ github.run_id }}
+          path: ${{ runner.temp }}/gravicentra-i4a-evidence
+          include-hidden-files: true
           if-no-files-found: error
           retention-days: 30
+
+      - name: Fail closed only after all probe evidence was collected
+        if: always()
+        env:
+          PUBLIC_RC: ${{ steps.public.outputs.rc }}
+          BOOTSTRAP_RC: ${{ steps.bootstrap.outputs.rc }}
+          BOUNDARY_RC: ${{ steps.boundary.outputs.rc }}
+          AUTH_RC: ${{ steps.auth.outputs.rc }}
+        run: |
+          set -euo pipefail
+          test "${PUBLIC_RC:-99}" = 0
+          test "${BOOTSTRAP_RC:-99}" = 0
+          test "${BOUNDARY_RC:-99}" = 0
+          test "${AUTH_RC:-99}" = 0
+          echo I4A_AUTHORITATIVE_EXECUTOR=PASS
