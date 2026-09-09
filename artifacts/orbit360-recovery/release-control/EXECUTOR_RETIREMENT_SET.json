@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "gravicentra-executor-retirement-set-v1",
+  "date": "2026-09-09",
+  "authoritativeI4AExecutor": ".github/workflows/gravicentra-recovery-i4a-public-browser.yml",
+  "retire": [
+    ".github/workflows/gravicentra-i4a-causal-source-fix.yml",
+    ".github/workflows/gravicentra-i4a-financial-canonical-readonly.yml",
+    ".github/workflows/gravicentra-i4a-financial-hydration-causal-fix.yml",
+    ".github/workflows/gravicentra-i4a-financial-query-constraint-readonly.yml",
+    ".github/workflows/gravicentra-i4a-hydration-plan-readonly.yml",
+    ".github/workflows/gravicentra-i4a-insurer-backend-boundary-readonly.yml",
+    ".github/workflows/gravicentra-i4a-login-contract-readonly.yml",
+    ".github/workflows/gravicentra-i4a-login-responsive-causal-fix.yml",
+    ".github/workflows/gravicentra-i4a-policy-dom-owner-readonly.yml",
+    ".github/workflows/gravicentra-i4a-postfix-readonly.yml",
+    ".github/workflows/gravicentra-i4a-retarget-i3-preview.yml",
+    ".github/workflows/gravicentra-recovery-i4a-rootcause-readonly.yml"
+  ],
+  "evidencePreservedInGitHistory": true,
+  "restorationForOrdinaryBugForbidden": true
+}
