@@ -1,6 +1,6 @@
 {
   "schemaVersion": "gravicentra-i4a-preview-function-remediation-intent-v1",
-  "requestId": "I4A-PREVIEW-CREDENTIAL-RUNTIME-20260909-003",
+  "requestId": "I4A-PREVIEW-CREDENTIAL-RUNTIME-20260909-004",
   "nonAuthoritative": true,
   "gate": "I4A",
   "controlPlaneStatusExpected": "I4A_IN_PROGRESS",
@@ -9,9 +9,9 @@
   "targetFunction": "orbit360ProductInsurerCredentialCommandPreview",
   "targetRegion": "us-east1",
   "causalEvidenceRunId": 34390569565,
-  "previousAttemptRunIds": [34391999382, 34392220227],
+  "previousAttemptRunIds": [34391999382, 34392220227, 34392529206],
   "previousAttemptsFirebaseMutation": false,
-  "purpose": "Retry the same authorized Preview-only remediation after correcting only the Node 22-safe authenticated before/readback checker. Both prior attempts stopped before Firebase deploy. Deploy only the missing certified Preview credential callable proven absent by I4A run 34390569565, then read back exact function state and prove the canonical production callable unchanged. No Hosting, rules, operational-data or canonical production callable mutation is authorized.",
+  "purpose": "Retry the same authorized Preview-only remediation after proving the previous deploy failure was Firebase Extensions discovery authorization. Select only an already-existing project credential that proves both Cloud Functions visibility and Firebase Extensions list visibility before any deploy. If no existing credential satisfies both checks, fail closed before Firebase mutation and classify the remaining boundary as IAM authorization. If one does, deploy only the missing certified Preview credential callable and read back exact function state while proving the canonical production callable unchanged. No Hosting, rules, operational-data or canonical production callable mutation is authorized.",
   "productionMutationAuthorized": false,
   "operationalDataWritesAuthorized": false,
   "hostingMutationAuthorized": false
