@@ -3,7 +3,7 @@ import { execFileSync } from 'node:child_process';
 
 const CONTROL_PATH=process.env.GRAVICENTRA_CONTROL_PLANE||'artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json';
 const MODE=(process.argv.find(x=>x.startsWith('--mode='))||'--mode=governance').split('=')[1];
-const MODES=new Set(['governance','i4a','i4b','i5','certified']);
+const MODES=new Set(['governance','i3','i4a','i4b','i5','certified']);
 const SHA=/^[0-9a-f]{40}$/;
 const HEX64=/^[0-9a-f]{64}$/;
 const fail=code=>{throw new Error(code);};
@@ -87,6 +87,11 @@ const gates=gate.gates||{};
 if(MODE==='governance'){
   need(C.status==='GOVERNANCE_SYNC_IN_PROGRESS'||C.status==='I4A_IN_PROGRESS','GOVERNANCE_MODE_STATE_INVALID');
   need(gates.I3&&['PHYSICAL_PASS_PENDING_GOVERNANCE_SEAL','PASS'].includes(gates.I3.status),'GOVERNANCE_I3_STATE_INVALID');
+}
+if(MODE==='i3'){
+  need(C.status==='I3_IN_PROGRESS','I3_NOT_ACTIVE');
+  need(gates.I2&&String(gates.I2.status).startsWith('PASS'),'I3_BLOCKED_I2_NOT_PASS');
+  need(gates.I3&&['IN_PROGRESS','PHYSICAL_PASS_PENDING_GOVERNANCE_SEAL'].includes(gates.I3.status),'I3_GATE_STATE_INVALID');
 }
 if(MODE==='i4a'||MODE==='certified'){
   need(C.status==='I4A_IN_PROGRESS','I4A_NOT_ACTIVE');
