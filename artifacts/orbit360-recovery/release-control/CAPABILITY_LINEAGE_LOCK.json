@@ -1,0 +1,56 @@
+{
+  "schemaVersion": "gravicentra-capability-lineage-lock-v1",
+  "status": "FROZEN",
+  "productBrand": "Gravicentra Insurance",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "forensicOriginSha": "9c95f31461f2eabe9804625b5659bee772f5602a",
+  "sourceGate": "I1_LATEST_APPROVED_VERSION_LINEAGE",
+  "sourceGateDecision": "PASS",
+  "capabilityCount": 15,
+  "closure": {
+    "path": "artifacts/orbit360-recovery/i1-lineage/I1_15_CAPABILITY_LINEAGE_CLOSURE_20260904.json",
+    "blobSha": "702580d64c93f19d047865ecff55c45dd38fb825",
+    "schemaVersion": "orbit360-recovery-i1-capability-closure-v1",
+    "artifactId": "I1_15_CAPABILITY_LINEAGE_CLOSURE_20260904",
+    "decision": "PASS"
+  },
+  "capabilities": [
+    "LOGIN_PRIMARY_RUNTIME",
+    "ROLE_SCOPE_RUNTIME",
+    "SINGLE_ENTRYPOINT_SHELL_ROUTER",
+    "STARTUP_PWA_PERFORMANCE",
+    "INICIO_PRIMARY_RUNTIME",
+    "CLIENTE360_PRIMARY_RUNTIME",
+    "VEHICULOS_PRIMARY_RUNTIME",
+    "CROSS_MODULE_RELATIONSHIPS",
+    "ASEGURADORAS_PRIMARY_RUNTIME",
+    "ASEGURADORAS_OPERATIONAL_DIRECTORY",
+    "OPS_PRIMARY_RUNTIME",
+    "LEADS_PRIMARY_RUNTIME",
+    "POLIZAS_PRIMARY_RUNTIME",
+    "RECIBOS_CARTERA_PRIMARY_RUNTIME",
+    "COBROS_PRIMARY_RUNTIME"
+  ],
+  "rules": {
+    "latestApprovedSearchMustNotRepeatAfterI1Pass": true,
+    "historicalBaselinePlusOverlaysForbidden": true,
+    "newerFileDoesNotAutomaticallyOverrideApprovedLineage": true,
+    "runtimeFailureDoesNotReopenLineageByDefault": true,
+    "onlyCausalLineageExceptionMayChangeThisLock": true,
+    "lineageExceptionRequiresNewPhysicalEvidence": true,
+    "lineageExceptionRequiresAffectedCapabilityIds": true,
+    "lineageExceptionRequiresReasonAndBeforeAfterEvidence": true,
+    "unaffectedCapabilitiesRemainBound": true
+  },
+  "financialSemanticLocks": {
+    "recibosEsperadosDistinctFromCobros": true,
+    "carteraPrimasDistinctFromCobros": true,
+    "noFictionalCollectionRemap": true,
+    "noDataReimportForCompositionDefects": true
+  },
+  "releaseBindingRule": "I2-I5 consume this lock. They prove composition/runtime/release of the locked lineage; they do not rediscover approved lineage unless a LINEAGE_EXCEPTION is explicitly recorded and physically proven.",
+  "conversationAuthority": false,
+  "prBodyAuthority": false,
+  "snapshotAuthority": false
+}
