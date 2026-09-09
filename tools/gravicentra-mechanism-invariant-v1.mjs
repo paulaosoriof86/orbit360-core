@@ -10,12 +10,13 @@ const STATE='artifacts/orbit360-recovery/release-control/RECOVERY_STATE.json';
 const LOCK='artifacts/orbit360-recovery/release-control/ACTIVE_RELEASE_LOCK.json';
 const OLD_GUARD='tools/gravicentra-release-lineage-guard.mjs';
 const NEW_GUARD='tools/gravicentra-control-plane-guard-v2.mjs';
+const I2='.github/workflows/gravicentra-recovery-i2-source-contract.yml';
 const I3='.github/workflows/gravicentra-recovery-i3-preview-v2.yml';
 const I4A='.github/workflows/gravicentra-recovery-i4a-public-browser.yml';
 const CENTRAL='.github/workflows/gravicentra-release-lock-sync.yml';
 const HARNESS='tools/gravicentra-i4a-authenticated-browser-v2.mjs';
 
-for(const p of [CONTROL,STATE,LOCK,OLD_GUARD,NEW_GUARD,I3,I4A,CENTRAL,HARNESS]) need(exists(p),'MECHANISM_REQUIRED_FILE_MISSING:'+p);
+for(const p of [CONTROL,STATE,LOCK,OLD_GUARD,NEW_GUARD,I2,I3,I4A,CENTRAL,HARNESS]) need(exists(p),'MECHANISM_REQUIRED_FILE_MISSING:'+p);
 const c=json(CONTROL);
 need(c.mechanismRules?.singleMutableAuthority==='THIS_FILE','MECHANISM_SINGLE_MUTABLE_AUTHORITY_NOT_DECLARED');
 need(c.mechanismRules?.hardcodedReleaseIdentityInWorkflowsForbidden===true,'MECHANISM_HARDCODE_RULE_NOT_DECLARED');
@@ -33,6 +34,14 @@ const oldGuard=read(OLD_GUARD);
 need(oldGuard.includes('DEPRECATED_RELEASE_LINEAGE_GUARD'),'OLD_GUARD_NOT_FAIL_CLOSED');
 need(!oldGuard.includes('ACTIVE_RELEASE_LOCK.json'),'OLD_GUARD_STILL_CONSUMES_RELEASE_LOCK');
 need(!oldGuard.includes('RECOVERY_STATE.json'),'OLD_GUARD_STILL_CONSUMES_RECOVERY_STATE');
+
+const i2=read(I2);
+need(i2.includes('workflow_dispatch:'),'I2_DISPATCH_TRIGGER_MISSING');
+need(!/\n\s*push\s*:/.test(i2),'I2_AUTOMATIC_PUSH_TRIGGER_FORBIDDEN');
+need(i2.includes('gravicentra-control-plane-guard-v2.mjs --mode=i2'),'I2_CONTROL_PLANE_GUARD_MISSING');
+need(i2.includes('ref: ${{ steps.candidate.outputs.source_sha }}'),'I2_EXACT_CANDIDATE_CHECKOUT_MISSING');
+need(!i2.includes('gravicentra-release-lineage-guard.mjs'),'I2_OLD_GUARD_REFERENCE_FORBIDDEN');
+need(!i2.includes('RECOVERY_STATE.json')&&!i2.includes('ACTIVE_RELEASE_LOCK.json'),'I2_SPLIT_AUTHORITY_REFERENCE_FORBIDDEN');
 
 const i3=read(I3);
 need(i3.includes('workflow_dispatch:'),'I3_DISPATCH_TRIGGER_MISSING');
@@ -86,9 +95,10 @@ for(const name of gravicentraFiles){
 
 console.log('GRAVICENTRA_MECHANISM_INVARIANT=PASS');
 console.log('CANONICAL_MUTABLE_AUTHORITY='+CONTROL);
-console.log('I4A_EXECUTOR_COUNT='+i4aExecutors.length);
+console.log('I2_PUSH_TRIGGER=false');
 console.log('I3_PUSH_TRIGGER=false');
 console.log('I4A_PUSH_TRIGGER=false');
+console.log('I4A_EXECUTOR_COUNT='+i4aExecutors.length);
 console.log('I4A_RUNTIME_SELF_PATCH=false');
 console.log('SPLIT_AUTHORITY_ACTIVE=false');
 console.log('TOMBSTONE_WATCH_ACTIVE=true');
