@@ -5,11 +5,12 @@ const INTENT='artifacts/orbit360-recovery/release-control/I4A_PREVIEW_FUNCTION_R
 const need=(ok,code)=>{if(!ok)throw new Error(code);};
 const read=p=>JSON.parse(fs.readFileSync(p,'utf8'));
 const C=read(CONTROL), I=read(INTENT), B=C.i4aPreviewInfrastructureBoundary||{}, R=C.certifiedCandidate||{}, A=C.i4aCausalFindings?.aseguradoras||{};
+const mode=String(I.mode||'DEPLOY_IF_ABSENT');
 
 need(C.status==='I4A_IN_PROGRESS','PREVIEW_REMEDIATION_I4A_NOT_ACTIVE');
 need(C.gateState?.gates?.I3?.status==='PASS','PREVIEW_REMEDIATION_I3_NOT_PASS');
 need(C.gateState?.gates?.I4A?.status==='IN_PROGRESS','PREVIEW_REMEDIATION_I4A_GATE_INVALID');
-need(B.status==='AUTHORIZED_CAUSAL_REMEDIATION','PREVIEW_REMEDIATION_NOT_AUTHORIZED');
+need(['DEPLOY_IF_ABSENT','POST_DEPLOY_READBACK_ONLY'].includes(mode),'PREVIEW_REMEDIATION_MODE_INVALID');
 need(B.authorizationScope==='PREVIEW_ONLY_SAME_FIREBASE_PROJECT','PREVIEW_REMEDIATION_SCOPE_INVALID');
 need(B.targetFunction==='orbit360ProductInsurerCredentialCommandPreview','PREVIEW_REMEDIATION_TARGET_INVALID');
 need(B.targetRegion==='us-east1','PREVIEW_REMEDIATION_REGION_INVALID');
@@ -24,7 +25,18 @@ need(A.productSourceChangeRequired===false,'PREVIEW_REMEDIATION_PRODUCT_SOURCE_C
 need(C.environmentState?.productionTouchedByRecovery===false,'PREVIEW_REMEDIATION_PRODUCTION_ALREADY_TOUCHED');
 need(C.environmentState?.dataTouchedByRecovery===false,'PREVIEW_REMEDIATION_DATA_ALREADY_TOUCHED');
 need(C.environmentState?.writesExecuted===0,'PREVIEW_REMEDIATION_WRITES_ALREADY_NONZERO');
-need(C.environmentState?.previewOnlyInfrastructureTouchedByRecovery===false,'PREVIEW_REMEDIATION_ALREADY_EXECUTED');
+
+if(mode==='DEPLOY_IF_ABSENT'){
+  need(B.status==='AUTHORIZED_CAUSAL_REMEDIATION','PREVIEW_REMEDIATION_NOT_AUTHORIZED');
+  need(C.environmentState?.previewOnlyInfrastructureTouchedByRecovery===false,'PREVIEW_REMEDIATION_ALREADY_EXECUTED');
+}
+if(mode==='POST_DEPLOY_READBACK_ONLY'){
+  need(B.status==='POST_DEPLOY_READBACK_REQUIRED','PREVIEW_REMEDIATION_READBACK_STATE_NOT_AUTHORIZED');
+  need(C.environmentState?.previewOnlyInfrastructureTouchedByRecovery===true,'PREVIEW_REMEDIATION_READBACK_REQUIRES_PREVIEW_MUTATION');
+  need(B.latestRemediation?.functionDeployReportedSuccessful===true,'PREVIEW_REMEDIATION_DEPLOY_SUCCESS_NOT_RECORDED');
+  need(B.latestRemediation?.readbackPerformed===false,'PREVIEW_REMEDIATION_READBACK_ALREADY_RECORDED');
+  need(Number(I.causalDeployEvidenceRunId)===Number(B.latestRemediation?.runId),'PREVIEW_REMEDIATION_READBACK_CAUSAL_RUN_MISMATCH');
+}
 
 need(I.schemaVersion==='gravicentra-i4a-preview-function-remediation-intent-v1','PREVIEW_REMEDIATION_INTENT_SCHEMA_INVALID');
 need(I.nonAuthoritative===true,'PREVIEW_REMEDIATION_INTENT_MUST_BE_NONAUTHORITATIVE');
@@ -41,7 +53,10 @@ for(const [k,v] of Object.entries({SOURCE_SHA:R.sourceSha,BACKEND_SOURCE_DIGEST:
   if(process.env.GITHUB_ENV)fs.appendFileSync(process.env.GITHUB_ENV,`${k}=${v}\n`);
   if(process.env.GITHUB_OUTPUT)fs.appendFileSync(process.env.GITHUB_OUTPUT,`${k.toLowerCase()}=${v}\n`);
 }
+if(process.env.GITHUB_ENV)fs.appendFileSync(process.env.GITHUB_ENV,`REMEDIATION_MODE=${mode}\n`);
+if(process.env.GITHUB_OUTPUT)fs.appendFileSync(process.env.GITHUB_OUTPUT,`remediation_mode=${mode}\n`);
 console.log('GRAVICENTRA_I4A_PREVIEW_FUNCTION_REMEDIATION_GUARD=PASS');
+console.log('MODE='+mode);
 console.log('TARGET='+B.targetFunction+'@'+B.targetRegion);
 console.log('SOURCE_SHA='+R.sourceSha);
 console.log('BACKEND_SOURCE_DIGEST='+R.backendSourceDigest);
