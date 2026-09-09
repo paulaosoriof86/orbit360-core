@@ -3,7 +3,7 @@ import { execFileSync } from 'node:child_process';
 
 const CONTROL_PATH=process.env.GRAVICENTRA_CONTROL_PLANE||'artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json';
 const MODE=(process.argv.find(x=>x.startsWith('--mode='))||'--mode=governance').split('=')[1];
-const MODES=new Set(['governance','i3','i4a','i4b','i5','certified']);
+const MODES=new Set(['governance','i2','i3','i4a','i4b','i5','certified']);
 const SHA=/^[0-9a-f]{40}$/;
 const HEX64=/^[0-9a-f]{64}$/;
 const fail=code=>{throw new Error(code);};
@@ -66,27 +66,45 @@ need(/^https:\/\/[A-Za-z0-9._-]+\.web\.app$/.test(String(R.previewUrl||'')),'CON
 need(R.sameFrontendArtifactPreviewToProductionRequired===true,'CONTROL_PLANE_SAME_FRONTEND_ARTIFACT_RULE_MISSING');
 need(R.sameBackendSourcePackageRequiredForI5===true,'CONTROL_PLANE_SAME_BACKEND_PACKAGE_RULE_MISSING');
 need(R.sourceMutatedAfterBuild===false,'CONTROL_PLANE_SOURCE_MUTATED_AFTER_BUILD');
-
 try{git('cat-file','-e',R.sourceSha+'^{commit}');}catch{fail('CONTROL_PLANE_SOURCE_COMMIT_NOT_AVAILABLE');}
 const sourceTree=git('show','-s','--format=%T',R.sourceSha);
 need(sourceTree===R.sourceTree,'CONTROL_PLANE_SOURCE_TREE_MISMATCH:'+sourceTree);
-const current=git('rev-parse','HEAD');
-try{execFileSync('git',['merge-base','--is-ancestor',R.sourceSha,current],{stdio:'ignore'});}catch{fail('CONTROL_PLANE_SOURCE_NOT_ANCESTOR');}
 
+const gate=C.gateState||{};
+const gates=gate.gates||{};
+const N=C.nextCandidate==null?null:C.nextCandidate;
+const i2Lifecycle=C.status==='I2_IN_PROGRESS'||MODE==='i2';
+if(i2Lifecycle){
+  need(N&&typeof N==='object','I2_NEXT_CANDIDATE_MISSING');
+  need(SHA.test(String(N.sourceSha||'')),'I2_NEXT_CANDIDATE_SHA_INVALID');
+  need(SHA.test(String(N.sourceTree||'')),'I2_NEXT_CANDIDATE_TREE_INVALID');
+  need(N.sourceSha!==R.sourceSha,'I2_NEXT_CANDIDATE_MUST_DIFFER_FROM_CERTIFIED');
+  try{git('cat-file','-e',N.sourceSha+'^{commit}');}catch{fail('I2_NEXT_CANDIDATE_COMMIT_NOT_AVAILABLE');}
+  const nTree=git('show','-s','--format=%T',N.sourceSha);
+  need(nTree===N.sourceTree,'I2_NEXT_CANDIDATE_TREE_MISMATCH:'+nTree);
+}
+
+const current=git('rev-parse','HEAD');
+const driftSource=i2Lifecycle?String(N.sourceSha):String(R.sourceSha);
+try{execFileSync('git',['merge-base','--is-ancestor',driftSource,current],{stdio:'ignore'});}catch{fail('CONTROL_PLANE_DRIFT_SOURCE_NOT_ANCESTOR:'+driftSource);}
 const allowedControlPrefixes=[
   '.github/workflows/gravicentra-',
   'tools/gravicentra-',
   'artifacts/orbit360-recovery/release-control/'
 ];
-const changed=git('diff','--name-only',R.sourceSha+'..'+current).split(/\r?\n/).filter(Boolean);
+const changed=git('diff','--name-only',driftSource+'..'+current).split(/\r?\n/).filter(Boolean);
 const forbidden=changed.filter(p=>!allowedControlPrefixes.some(prefix=>p.startsWith(prefix)));
 need(forbidden.length===0,'CONTROL_PLANE_PRODUCT_SOURCE_DRIFT:'+forbidden.slice(0,20).join(','));
 
-const gate=C.gateState||{};
-const gates=gate.gates||{};
 if(MODE==='governance'){
-  need(C.status==='GOVERNANCE_SYNC_IN_PROGRESS'||C.status==='I4A_IN_PROGRESS','GOVERNANCE_MODE_STATE_INVALID');
-  need(gates.I3&&['PHYSICAL_PASS_PENDING_GOVERNANCE_SEAL','PASS'].includes(gates.I3.status),'GOVERNANCE_I3_STATE_INVALID');
+  need(['GOVERNANCE_SYNC_IN_PROGRESS','I2_IN_PROGRESS','I4A_IN_PROGRESS','I4B_IN_PROGRESS','I5_IN_PROGRESS'].includes(C.status),'GOVERNANCE_MODE_STATE_INVALID');
+  if(C.status==='GOVERNANCE_SYNC_IN_PROGRESS') need(gates.I3&&['PHYSICAL_PASS_PENDING_GOVERNANCE_SEAL','PASS'].includes(gates.I3.status),'GOVERNANCE_I3_STATE_INVALID');
+  if(C.status==='I2_IN_PROGRESS') need(gates.I2&&gates.I2.status==='IN_PROGRESS','GOVERNANCE_I2_STATE_INVALID');
+}
+if(MODE==='i2'){
+  need(C.status==='I2_IN_PROGRESS','I2_NOT_ACTIVE');
+  need(gates.I1&&String(gates.I1.status).startsWith('PASS'),'I2_BLOCKED_I1_NOT_PASS');
+  need(gates.I2&&gates.I2.status==='IN_PROGRESS','I2_GATE_STATE_INVALID');
 }
 if(MODE==='i3'){
   need(C.status==='I3_IN_PROGRESS','I3_NOT_ACTIVE');
@@ -107,16 +125,18 @@ if(MODE==='i5'){
   need(gates.I4B&&gates.I4B.status==='PASS','I5_BLOCKED_I4B_NOT_PASS');
 }
 
-const exportsMap={
-  SOURCE_SHA:String(R.sourceSha),
-  BUILD_ID:String(R.buildId),
-  PREVIEW_URL:String(R.previewUrl),
-  HOSTED_PAYLOAD_DIGEST:String(R.hostedPayloadDigest),
-  BACKEND_SOURCE_DIGEST:String(R.backendSourceDigest),
-  BUNDLE_DIGEST:String(R.bundleDigest),
-  I3_RUN_ID:String(R.i3RunId),
-  I3_ARTIFACT_ID:String(R.artifactId)
-};
+const exportsMap=MODE==='i2'
+  ? {SOURCE_SHA:String(N.sourceSha)}
+  : {
+      SOURCE_SHA:String(R.sourceSha),
+      BUILD_ID:String(R.buildId),
+      PREVIEW_URL:String(R.previewUrl),
+      HOSTED_PAYLOAD_DIGEST:String(R.hostedPayloadDigest),
+      BACKEND_SOURCE_DIGEST:String(R.backendSourceDigest),
+      BUNDLE_DIGEST:String(R.bundleDigest),
+      I3_RUN_ID:String(R.i3RunId),
+      I3_ARTIFACT_ID:String(R.artifactId)
+    };
 for(const [k,v] of Object.entries(exportsMap)){
   if(process.env.GITHUB_ENV)fs.appendFileSync(process.env.GITHUB_ENV,`${k}=${v}\n`);
   if(process.env.GITHUB_OUTPUT)fs.appendFileSync(process.env.GITHUB_OUTPUT,`${k.toLowerCase()}=${v}\n`);
@@ -127,10 +147,13 @@ console.log('MODE='+MODE);
 console.log('CONTROL_STATUS='+C.status);
 console.log('CURRENT_TRANSITION='+(gate.currentTransition||''));
 console.log('NEXT_FROZEN_ITERATION='+(gate.nextFrozenIteration||''));
-console.log('SOURCE_SHA='+R.sourceSha);
-console.log('BUILD_ID='+R.buildId);
-console.log('I3_RUN_ID='+R.i3RunId);
-console.log('ARTIFACT_ID='+R.artifactId);
+console.log('SOURCE_SHA='+(MODE==='i2'?N.sourceSha:R.sourceSha));
+if(MODE!=='i2'){
+  console.log('BUILD_ID='+R.buildId);
+  console.log('I3_RUN_ID='+R.i3RunId);
+  console.log('ARTIFACT_ID='+R.artifactId);
+}
+console.log('DRIFT_BASE_SOURCE_SHA='+driftSource);
 console.log('POST_SOURCE_CHANGED_FILES='+changed.length);
 console.log('PRODUCT_SOURCE_DRIFT=false');
 console.log('PRODUCTION_TOUCHED=false');
