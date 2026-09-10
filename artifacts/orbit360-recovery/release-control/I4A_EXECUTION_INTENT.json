@@ -1,13 +1,13 @@
 {
   "schemaVersion": "gravicentra-execution-intent-v1",
-  "requestId": "I4A-AUTHORITATIVE-20260910-010-CREDENTIAL-COMPOSITION-VALIDATOR-REBIND",
+  "requestId": "I4A-AUTHORITATIVE-20260910-011-QA-FALSE-GATE-CORRECTION",
   "nonAuthoritative": true,
   "gate": "I4A",
   "controlPlaneStatusExpected": "I4A_IN_PROGRESS",
   "certifiedSourceSha": "10408e3d777ff8934b850c9f61d431dfed3afc2e",
   "buildId": "gi-i3-10408e3d777f-57f234755dc1",
   "previewUrl": "https://ays-orbit-360-lab--gi-i3-34437131024-v9pvtkbk.web.app",
-  "purpose": "Re-run the exact I3-certified credential-audit successor after correcting only the committed targeted QA expectation that was stale against the certified Aseguradoras compositionRevision. Do not change product source or artifact. Require ordinary ephemeral legal-gate traversal, privileged reveal/copy/re-hide for every credentialRef-bearing portal, secure credential.copy, bank copy, Asesor restriction, zero operational-write delta, and preserved authenticated Cliente 360/Polizas/Cobros/Aseguradoras discriminants. This run remains causal evidence inside I4A and must not by itself close capabilities whose complete Phase A Preview acceptance evidence is not yet materialized.",
+  "purpose": "Re-run the exact I3-certified successor after QA-only correction of two proven stale/nondeterministic validator assumptions in the committed authenticated harness: bind Aseguradoras to the certified 20260909.1-server-owned-credential-copy composition revision and treat the transient Polizas heartbeat as diagnostic while retaining the stable responsiveness fail-closed check. Product source, artifact, Preview, backend package and operational data remain unchanged. Require authenticated Cliente 360/Polizas/Cobros/Aseguradoras discriminants, targeted privileged Aseguradoras reveal/copy/re-hide, Asesor restriction, zero operational-write delta, exact release identity and consolidated evidence. This execution does not by itself close unmaterialized Phase A capabilities.",
   "productionMutationAuthorized": false,
   "operationalDataWritesAuthorized": false
 }
