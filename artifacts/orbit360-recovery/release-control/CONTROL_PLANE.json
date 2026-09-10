@@ -54,7 +54,22 @@
         "status": "IN_PROGRESS",
         "previousRunId": 34307974287,
         "previousConclusion": "success",
-        "successorSourceSha": "1e6a6ca3d259d0e5e644f716a2f71c6e0107efc4"
+        "successorSourceSha": "1e6a6ca3d259d0e5e644f716a2f71c6e0107efc4",
+        "latestAttempt": {
+          "runId": 34420928503,
+          "jobId": 102695956723,
+          "conclusion": "failure_before_build_and_deploy",
+          "resultClass": "I3_EXECUTOR_PACKAGE_PREP_PATH_READ_METHOD_ERROR",
+          "sourceBindingProven": true,
+          "resolvedSourceSha": "1e6a6ca3d259d0e5e644f716a2f71c6e0107efc4",
+          "firebaseHostingAccessProven": true,
+          "immutablePackageMaterialized": false,
+          "previewDeployed": false,
+          "readbackPerformed": false,
+          "productSourceChangeRequired": false,
+          "executorFixCommit": "bf964736f2f7d87d64e7a39e3f5c30f28946e955",
+          "executorFix": "Path(os.environ['APPS']).read() replaced by Path(os.environ['APPS']).read_text()"
+        }
       },
       "I4A": {"status": "BLOCKED_BY_SUCCESSOR_I3_RECERTIFICATION"},
       "I4B": {"status": "PENDING"},
@@ -206,20 +221,27 @@
     "centralGuardBroadGravicentraWatch": true
   },
   "mechanismCorrection20260909": {
-    "status": "CENTRAL_GUARD_AND_I2_PHYSICAL_PASS_I3_RUNTIME_PROOF_PENDING",
+    "status": "SOURCE_BINDING_PHYSICAL_PASS_PACKAGE_EXECUTOR_FIX_RERUN_PENDING",
     "rootCauseClass": "RELEASE_EXECUTOR_DESYNCHRONIZATION_RISK",
-    "centralGuardRunId": 34420740721,
+    "centralGuardRunId": 34420928260,
     "centralGuardConclusion": "success",
     "i2RunId": 34420740707,
     "i2Conclusion": "success",
+    "i3FirstSuccessorAttemptRunId": 34420928503,
+    "i3FirstSuccessorAttemptConclusion": "failure_before_build_and_deploy",
+    "i3SuccessorSourceBindingProven": true,
+    "i3ExecutorFailureClass": "I3_EXECUTOR_PACKAGE_PREP_PATH_READ_METHOD_ERROR",
+    "i3ExecutorFixCommit": "bf964736f2f7d87d64e7a39e3f5c30f28946e955",
     "fixes": [
       "I2 and I3 control checkouts use complete ancestry",
       "I2 and I3 execute from exact scoped non-authoritative intents with manual dispatch only as explicit escape",
       "I3 consumes nextCandidate during successor lifecycle rather than the previous certifiedCandidate",
       "central guard watches broad Gravicentra workflow/tool/release-control/project-source paths",
-      "temporary Aseguradoras diagnostic workflow removed from active executor set"
+      "temporary Aseguradoras diagnostic workflow removed from active executor set",
+      "I3 package-prep Python Path reader corrected from read() to read_text() after physical failure"
     ],
     "documentationPath": "artifacts/orbit360-recovery/release-control/I4A_ASEGURADORAS_ROOT_CAUSE_AND_MECHANISM_CORRECTION_20260909.md",
+    "i3ExecutorEvidencePath": "artifacts/orbit360-recovery/release-control/I3_SUCCESSOR_EXECUTOR_FAILURE_AND_RERUN_20260909.md",
     "projectSourcesReplacementRequired": false
   },
   "governanceSyncChecklist": {
@@ -227,7 +249,7 @@
     "lineageLockMaterialized": true,
     "controlPlaneMaterialized": true,
     "centralReleaseGuardConsumesOnlyControlPlane": true,
-    "centralGuardRunId": 34420740721,
+    "centralGuardRunId": 34420928260,
     "centralGuardConclusion": "success",
     "legacyStateAndReleaseLockDeprecated": true,
     "workflowReleaseHardcodesRemoved": true,
@@ -243,7 +265,9 @@
     "successorI2I3IntentMechanismMaterialized": true,
     "successorI2PhysicalPass": true,
     "i3NextCandidateBindingMaterialized": true,
-    "centralBroadWatchMaterialized": true
+    "i3NextCandidateBindingPhysicalPass": true,
+    "centralBroadWatchMaterialized": true,
+    "i3PackagePrepExecutorFixMaterialized": true
   },
-  "nextAction": "RUN_I3_SUCCESSOR_IMMUTABLE_PREVIEW_VIA_SCOPED_INTENT_AND_VERIFY_EXACT_SOURCE_READBACK"
+  "nextAction": "RERUN_I3_SAME_SUCCESSOR_AFTER_EXECUTOR_ONLY_PATH_READ_FIX_AND_REQUIRE_EXACT_PREVIEW_READBACK"
 }
