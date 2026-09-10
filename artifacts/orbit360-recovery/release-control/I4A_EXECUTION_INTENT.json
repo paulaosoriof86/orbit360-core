@@ -1,13 +1,13 @@
 {
   "schemaVersion": "gravicentra-execution-intent-v1",
-  "requestId": "I4A-AUTHORITATIVE-20260909-007-TARGETED-CREDENTIAL-VALIDATOR",
+  "requestId": "I4A-AUTHORITATIVE-20260909-008-TARGETED-CREDENTIAL-UI-EVIDENCE",
   "nonAuthoritative": true,
   "gate": "I4A",
   "controlPlaneStatusExpected": "I4A_IN_PROGRESS",
   "certifiedSourceSha": "1e6a6ca3d259d0e5e644f716a2f71c6e0107efc4",
   "buildId": "gi-i3-1e6a6ca3d259-57f234755dc1",
   "previewUrl": "https://ays-orbit-360-lab--gi-i3-34423252469-ybf4i1dw.web.app",
-  "purpose": "Re-run authoritative I4A with the committed per-portal credentialRef validator correction. Require each credential-bearing portal to prove privileged reveal, secure copy, temporary re-hide and advisor restriction while allowing non-credential portals to remain unavailable. Preserve the exact certified source, build, Preview, production and operational data state.",
+  "purpose": "Re-run authoritative I4A after integrating the committed targeted Aseguradoras credential UI discriminant and V8-compatible adjudicator. Require the same certified source/build/Preview identity, normal legal-gate UI traversal in an ephemeral browser context, privileged reveal/copy/re-hide for every credentialRef-bearing portal, advisor restriction, operational directory evidence, and zero operational writes. Do not mutate product source, certified artifact, production, or operational data.",
   "productionMutationAuthorized": false,
   "operationalDataWritesAuthorized": false
 }
