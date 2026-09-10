@@ -2,12 +2,12 @@
 
 Fecha: 2026-09-09  
 Rama rectora: `recovery/fase-a-clean-20260831`  
-Alcance: I4A -> retorno causal a I2/I3.  
+Alcance: I4A -> retorno causal a I2/I3 -> regreso a I4A.  
 Naturaleza: evidencia operativa mutable; no sustituye las Fuentes Evergreen V3 ni el Control Plane.
 
 ## 1. Estado previo que se conserva
 
-La release I3 anterior permanece como evidencia física certificada mientras se recertifica el sucesor. No se parchea su artifact y no se modifica producción.
+La release I3 anterior permaneció como evidencia física certificada mientras se recertificó el sucesor. No se parcheó su artifact y no se modificó producción.
 
 - Source certificado anterior: `96f6962b8519a032c2f54b50d2796fa2545de1e4`.
 - Build anterior: `gi-i3-96f6962b8519-57f234755dc1`.
@@ -29,7 +29,7 @@ El I4A posterior dejó Aseguradoras como único fallo funcional relevante del pr
 3. El contrato físico `orbit360-platform/core/product-tenant-runtime-context-bridge-p0.js` exporta `Orbit.productTenantRuntimeContextP0` con `status()` y `resolveTenant()`.
 4. El provider `orbit360-platform/core/product-insurer-credential-provider-p0.js` intentaba consultar `Orbit.productTenantRuntimeContextBridgeP0.context()`, objeto que el bridge cargado no exporta.
 
-Conclusión causal: el backend, Secret Manager, IAM, roles y el `credentialRef` no son la causa del fallo observado. El defecto está en el resolver de tenant del provider frontend de Aseguradoras.
+Conclusión causal: backend, Secret Manager, IAM, roles y `credentialRef` no eran la causa. El defecto estaba en el resolver de tenant del provider frontend de Aseguradoras.
 
 ## 3. Sucesor mínimo
 
@@ -37,7 +37,6 @@ Se creó el source sucesor físico:
 
 - Source SHA: `1e6a6ca3d259d0e5e644f716a2f71c6e0107efc4`.
 - Tree SHA: `d6e6857c9cd48d20db6000db02cbba3a00f26018`.
-- Parent: `d1009f4af146dcf8fd0d10ace15abe6b2d083825`.
 
 Su diff causal contiene exactamente dos archivos:
 
@@ -46,69 +45,111 @@ Su diff causal contiene exactamente dos archivos:
 
 No cambia `index.html`, service worker, backend, Firestore, reglas, Storage ni datos.
 
-## 4. Por qué vuelve a I2/I3
+## 4. Por qué volvió a I2/I3
 
-La regla congelada se mantiene: cualquier cambio de source posterior a un build I3 certificado genera source SHA nuevo y obliga nueva recertificación I2 -> I3 -> Preview -> I4A. El artifact certificado anterior no se modifica.
+La regla congelada se mantuvo: un cambio de source posterior a un build I3 certificado genera source SHA nuevo y obliga recertificación I2 -> I3 -> Preview -> I4A. El artifact certificado anterior no se modifica.
 
-No se reabre I1 ni se rediscover lineage. Las 15 capabilities siguen vinculadas por `CAPABILITY_LINEAGE_LOCK.json` y la evidencia no afectada se preserva.
+Esto no fue una desincronización ni una reapertura de I1. Fue la recertificación obligatoria del único cambio causal de producto hallado dentro de I4A. Las 15 capabilities siguieron vinculadas por `CAPABILITY_LINEAGE_LOCK.json` y la evidencia no afectada se preservó.
 
-## 5. Defectos de mecanismo detectados y corrección
+## 5. Defectos de mecanismo detectados y corregidos
 
-La investigación descubrió riesgos de desincronización del executor que no deben repetirse:
+Durante esa recertificación se encontraron riesgos del executor:
 
-- I2 e I3 usaban checkout de control con `fetch-depth: 50`, insuficiente para garantizar ancestry completa.
-- I2/I3 dependían de ejecución manual aunque ya existe un patrón más seguro de intent exacto y no autoritativo.
-- El guard en modo I3 exportaba `certifiedCandidate`, lo que podía reconstruir la release anterior durante una recertificación de sucesor.
-- El guard central vigilaba una lista cerrada de workflows/tools, de modo que un instrumento diagnóstico nuevo podía quedar fuera de la vigilancia inmediata.
-- El workflow diagnóstico temporal de Aseguradoras debía dejar de existir como executor activo al cumplir su función.
+- I2 e I3 usaban checkout de control con `fetch-depth: 50`.
+- I2/I3 dependían de ejecución manual aun existiendo intents exactos.
+- I3 podía consumir `certifiedCandidate` anterior en lugar del `nextCandidate`.
+- El guard central vigilaba una lista cerrada de workflows/tools.
+- El workflow diagnóstico temporal podía permanecer como executor adicional.
 
-Corrección materializada para el sucesor:
+Corrección materializada:
 
-- `CONTROL_PLANE.json` continúa como única autoridad mutable.
-- I2 e I3 aceptan únicamente su `I*_EXECUTION_INTENT.json` exacto como trigger automático; `workflow_dispatch` se conserva solo como escape explícito.
-- Los intents son no autoritativos y deben coincidir con `nextCandidate.sourceSha/sourceTree` y con el estado del Control Plane.
-- Los checkouts de control I2/I3 usan `fetch-depth: 0`.
-- Durante `I2_IN_PROGRESS` o `I3_IN_PROGRESS`, el guard exige y exporta `nextCandidate`; I3 no puede consumir la release anterior.
-- El guard central vigila por glob todos los workflows `gravicentra-*`, tools `gravicentra-*`, todo `release-control/**` y las fuentes V3.
-- Sigue prohibido el fan-out por cambios generales de producto.
-- Sigue prohibido el self-patch del harness QA.
-- El diagnóstico temporal se retira del árbol activo; sus runs permanecen como evidencia.
+- `CONTROL_PLANE.json` es la única autoridad mutable.
+- I2 e I3 aceptan su `I*_EXECUTION_INTENT.json` exacto como trigger automático; `workflow_dispatch` queda como escape explícito.
+- Los intents son no autoritativos y deben coincidir con source/tree y estado del Control Plane.
+- Checkouts de control I2/I3 usan `fetch-depth: 0`.
+- En ciclo sucesor, I3 consume `nextCandidate`, no la release anterior.
+- El guard central vigila workflows `gravicentra-*`, tools `gravicentra-*`, `release-control/**` y fuentes V3.
+- Sigue prohibido fan-out por cambios generales, self-patch del harness y executors I4A paralelos.
+- El diagnóstico temporal fue retirado del árbol activo; sus runs permanecen como evidencia.
 
 ## 6. Documentación y Fuentes Evergreen V3
 
 Las seis Fuentes Evergreen V3 no requieren reemplazo por este cambio. Sus reglas ya ordenan un solo Control Plane, executors state-gated, ausencia de hardcodes, guard central, recertificación I2/I3 ante cambio de source, preservación de lineage y actualización de fuentes estáticas solo ante cambios normativos permanentes.
 
-Por eso `projectSources.staticSourceUpdateRequired` permanece `false`. La información mutable de este incidente y de su sucesor vive en `CONTROL_PLANE.json`, `CAPABILITY_STATUS_LEDGER.json`, este registro y la evidencia física de GitHub Actions.
+`projectSources.staticSourceUpdateRequired` permanece `false`. La información mutable de este incidente vive en `CONTROL_PLANE.json`, `CAPABILITY_STATUS_LEDGER.json`, este registro y la evidencia física de GitHub Actions.
 
-## 7. Prueba física del mecanismo corregido
-
-La corrección no se consideró válida solo por estar escrita. Se ejecutó sobre el mismo HEAD y quedó probada físicamente:
+## 7. Prueba física inicial del mecanismo corregido
 
 - Guard central run `34420740721`: SUCCESS.
 - I2 del sucesor run `34420740707`: SUCCESS completo.
-- En I3 run `34420928503`, el intent exacto, el guard y el checkout del sucesor terminaron SUCCESS y el propio log registró `SOURCE_SHA=1e6a6ca3d259d0e5e644f716a2f71c6e0107efc4`.
-- El acceso al Firebase Hosting existente también pasó antes de cualquier build/deploy.
+- I3 run `34420928503`: intent exacto, guard y checkout del sucesor SUCCESS; el log registró `SOURCE_SHA=1e6a6ca3d259d0e5e644f716a2f71c6e0107efc4`.
+- Acceso a Firebase Hosting existente: PASS antes de cualquier build/deploy.
 
-Esto prueba que el mecanismo de autoridad/lineage ya no reconstruye el `certifiedCandidate` anterior cuando existe un `nextCandidate` causal.
+Esto probó que el mecanismo de autoridad/lineage ya no reconstruía el `certifiedCandidate` anterior cuando existía un `nextCandidate` causal.
 
 ## 8. Fallo del primer I3 sucesor y clasificación
 
-El run `34420928503` no cerró I3. Falló antes de materializar el paquete y antes de desplegar Preview por un defecto del executor: el bloque Python usó `Path(...).read()`, método inexistente para `pathlib.Path`.
+El run `34420928503` falló antes de materializar el paquete y antes de desplegar Preview por un defecto del executor: `Path(...).read()` no existe para `pathlib.Path`.
 
 Clasificación: `I3_EXECUTOR_PACKAGE_PREP_PATH_READ_METHOD_ERROR`.
 
-El error exacto fue `AttributeError: 'PosixPath' object has no attribute 'read'`. El fix quedó materializado en commit `bf964736f2f7d87d64e7a39e3f5c30f28946e955`, cambiando únicamente `read()` por `read_text()` en `.github/workflows/gravicentra-recovery-i3-preview-v2.yml`.
+El fix quedó en commit `bf964736f2f7d87d64e7a39e3f5c30f28946e955`, cambiando únicamente `read()` por `read_text()` en `.github/workflows/gravicentra-recovery-i3-preview-v2.yml`.
 
-No se generó un nuevo source de producto, no se alteró `1e6a6ca3...`, no se desplegó Preview, no se tocó producción y no hubo writes operativos.
-
-El detalle operativo queda además en `I3_SUCCESSOR_EXECUTOR_FAILURE_AND_RERUN_20260909.md`.
+No se generó otro source de producto. El mismo `1e6a6ca3...` se preservó. El fallo del executor se resolvió dentro de I3.
 
 ## 9. Reintento controlado I3-R2
 
-El reintento usa el mismo source y tree ya aprobados en I2:
+El reintento usó exactamente el mismo source y tree ya aprobados en I2:
 
 - Source: `1e6a6ca3d259d0e5e644f716a2f71c6e0107efc4`.
 - Tree: `d6e6857c9cd48d20db6000db02cbba3a00f26018`.
 - Intent: `I3-SUCCESSOR-ASEGURADORAS-TENANT-RUNTIME-20260909-R2`.
 
-El reintento no puede declararse PASS hasta demostrar materialización de paquete, Hosting Preview aislado, readback byte-a-byte exacto y evidencia sellada. Si vuelve a fallar por executor, se corrige dentro de I3; no se abre una iteración nueva ni se modifica producto sin causa nueva probada.
+## 10. Cierre físico I3 del sucesor
+
+El reintento final fue run `34423252469` y cerró SUCCESS de extremo a extremo:
+
+- intent no autoritativo exacto: PASS;
+- Control Plane guard: PASS;
+- checkout del sucesor exacto: PASS;
+- preflight de dependencias: PASS;
+- paquete frontend/backend inmutable: PASS;
+- Hosting Preview aislado: PASS;
+- readback exacto: `202/202` archivos;
+- source: `1e6a6ca3d259d0e5e644f716a2f71c6e0107efc4`;
+- build: `gi-i3-1e6a6ca3d259-57f234755dc1`;
+- Preview: `https://ays-orbit-360-lab--gi-i3-34423252469-ybf4i1dw.web.app`;
+- artifact: `10131707259`;
+- artifact digest: `sha256:6a5975b3fd1e02332989fb91d4e723153b981af839d27227721a0bf2986a804f`;
+- hosted payload digest: `7c47fe1b87e4f6ee3cea571d406d60f4de14ea5fddd7cdec3867c01ab852eb37`;
+- backend source digest: `b317ee5d6c7346bdb0abfa6bb71b5f246cd7647ed7272551065c2053f497f805`;
+- producción tocada: false;
+- datos tocados: false;
+- writes operativos: 0.
+
+El guard central del mismo HEAD fue run `34423252383`: SUCCESS.
+
+Por tanto I3 del sucesor está físicamente recertificado y el gate activo retorna a I4A.
+
+## 11. Freeze del mecanismo
+
+A partir de este cierre, el mecanismo operativo vigente queda identificado como `GRAVICENTRA_RECOVERY_MECHANISM_V3_20260909` y estado `FROZEN` en `CONTROL_PLANE.json`.
+
+La regla de no-retroceso queda explícita: I2/I3 solo vuelven a activarse si aparece un source de producto nuevo distinto del certificado y existe una causa reproducible que exige ese cambio. Un fallo de executor, QA sin cambio de source, documentación, IAM, cuotas o conversación no autoriza por sí mismo volver a I2/I3.
+
+Las capacidades no afectadas conservan su lineage y evidencia. Los bugs se resuelven dentro del gate activo. No se crean iteraciones o metodologías paralelas.
+
+El detalle rector del freeze queda materializado en `artifacts/orbit360-recovery/release-control/MECHANISM_FREEZE_V3_20260909.md`.
+
+## 12. Estado de salida
+
+- I0: PASS.
+- I1: PASS.
+- I2 sucesor: PASS, run `34420740707`.
+- I3 sucesor: PASS, run `34423252469`.
+- I4A: IN_PROGRESS.
+- I4B: PENDING.
+- I5: PENDING.
+- Porcentaje certificado hacia producción: 57.1%.
+
+Siguiente acción única: ejecutar I4A autoritativo sobre el Preview certificado del sucesor y cerrar solo la evidencia faltante, sin reabrir capacidades no afectadas.
