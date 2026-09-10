@@ -1,7 +1,7 @@
 {
   "schemaVersion": "gravicentra-control-plane-v2",
   "controlPlaneId": "GRAVICENTRA-INSURANCE-FASE-A",
-  "status": "I4A_IN_PROGRESS",
+  "status": "I2_IN_PROGRESS",
   "productBrand": "Gravicentra Insurance",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -39,14 +39,25 @@
   },
   "gateState": {
     "lastFormallyCompletedIteration": 3,
-    "currentTransition": "I4A_LATEST_APPROVED_VERSION_PREVIEW_ACCEPTANCE",
-    "nextFrozenIteration": "I4A",
+    "currentTransition": "I2_SUCCESSOR_RECERTIFICATION_AFTER_I4A_CREDENTIAL_AUDIT_SOURCE_DEFECT",
+    "nextFrozenIteration": "I2",
     "gates": {
       "I0": {"status": "PASS"},
       "I1": {"status": "PASS", "capabilitiesBound": 15},
-      "I2": {"status": "PASS_LATEST_CANDIDATE", "latestRunId": 34420740707, "sourceSha": "1e6a6ca3d259d0e5e644f716a2f71c6e0107efc4", "conclusion": "success"},
-      "I3": {"status": "PASS", "latestRunId": 34423252469, "conclusion": "success", "sourceSha": "1e6a6ca3d259d0e5e644f716a2f71c6e0107efc4", "artifactId": 10131707259, "readbackExact": true},
-      "I4A": {"status": "IN_PROGRESS", "previousAuthoritativeRunId": 34410886776},
+      "I2": {
+        "status": "IN_PROGRESS",
+        "previousCertifiedRunId": 34420740707,
+        "previousCertifiedSourceSha": "1e6a6ca3d259d0e5e644f716a2f71c6e0107efc4"
+      },
+      "I3": {
+        "status": "PREVIOUS_CANDIDATE_PASS_SUPERSEDED_PENDING_SUCCESSOR_RECERTIFICATION",
+        "previousRunId": 34423252469,
+        "previousConclusion": "success"
+      },
+      "I4A": {
+        "status": "BLOCKED_BY_SUCCESSOR_I2_I3_RECERTIFICATION",
+        "failedRunId": 34430190710
+      },
       "I4B": {"status": "PENDING"},
       "I5": {"status": "PENDING"},
       "I6": {"status": "HOLD_UNTIL_PRODUCTION_ACCEPTED"}
@@ -55,7 +66,7 @@
   "productionProgress": {
     "formalPercent": 57.1,
     "certifiedPhysicalPercent": 57.1,
-    "method": "7 frozen production gates I0,I1,I2,I3,I4A,I4B,I5; equal gate-completion accounting; 4 of 7 gates are physically certified on the current candidate",
+    "method": "7 frozen production gates I0,I1,I2,I3,I4A,I4B,I5; equal gate-completion accounting; prior I2/I3 physical certification remains evidence while successor recertification is in progress",
     "iterationsRemaining": ["I4A", "I4B", "I5"]
   },
   "certifiedCandidate": {
@@ -88,15 +99,40 @@
     "buildId": "gi-i3-96f6962b8519-57f234755dc1",
     "reasonSuperseded": "I4A causal Aseguradoras tenant-runtime source defect required a minimal successor and mandatory I2/I3 recertification."
   },
-  "nextCandidate": null,
+  "nextCandidate": {
+    "sourceSha": "10408e3d777ff8934b850c9f61d431dfed3afc2e",
+    "sourceTree": "8ce1857472f62e11c788031d57664ced2986b244",
+    "reason": "I4A run 34430190710 proved a credential client-audit durable-write path while the credential callable already owns authoritative audit; the successor also routes secure copy through credential.copy and composes the corrected blobs in the canonical entrypoint.",
+    "rootCauseCode": "I4A_CREDENTIAL_CLIENT_AUDIT_DURABLE_WRITE_PATH",
+    "rootCauseEvidencePath": "artifacts/orbit360-recovery/release-control/I4A_ASEGURADORAS_UI_AUDIT_SIDE_EFFECT_ROOT_CAUSE_20260909.md",
+    "changeScope": [
+      "orbit360-platform/core/backend-resource-contracts.js",
+      "orbit360-platform/core/product-insurer-credential-provider-p0.js",
+      "orbit360-platform/core/client-insurer-operational-directory-owner-v20260722.js",
+      "orbit360-platform/index.html",
+      "tools/orbit360-recovery-i2-insurer-preview-backend-contract-test.mjs"
+    ],
+    "lineageRediscoveryPerformed": false,
+    "unaffectedCapabilityEvidencePreserved": true,
+    "requiresI2I3Recertification": true,
+    "productionMutationAuthorized": false,
+    "dataMutationAuthorized": false,
+    "firebaseMutationAuthorized": false
+  },
   "i4aCausalFindings": {
-    "latestAuthoritativeRunId": 34410886776,
+    "latestAuthoritativeRunId": 34430190710,
     "cliente360TransientThresholdClassifiedAsValidatorOnly": true,
     "polizasFiveRolesProbePass": true,
     "cobrosFiveRolesProbePass": true,
     "aseguradoras": {
-      "status": "SUCCESSOR_I3_PASS_I4A_RETEST_REQUIRED",
-      "symptom": "ASEGURADORAS_PRIVILEGED_REF_MARKED_UNAVAILABLE",
+      "status": "PRODUCT_SOURCE_DEFECT_PROVEN_SUCCESSOR_REQUIRES_I2_I3",
+      "previousSymptom": "ASEGURADORAS_PRIVILEGED_REF_MARKED_UNAVAILABLE",
+      "latestFailedRunId": 34430190710,
+      "latestEvidenceArtifactId": 10134326528,
+      "latestEvidenceArtifactDigest": "sha256:f21b61bfa460f7924104407f19bcadd0cc42a01dda88a6d745ff661be3c35e11",
+      "latestRootCauseCode": "I4A_CREDENTIAL_CLIENT_AUDIT_DURABLE_WRITE_PATH",
+      "latestRootCause": "Credential reveal/copy invoked a browser-side secureResources.audit fallback that could route from rejected auditLog into durable actividades even though the backend callable already owns credential audit.",
+      "rootCauseEvidencePath": "artifacts/orbit360-recovery/release-control/I4A_ASEGURADORAS_UI_AUDIT_SIDE_EFFECT_ROOT_CAUSE_20260909.md",
       "privilegedRolesAffected": ["Dirección", "SuperAdmin", "AdminTenant", "Operativo"],
       "advisorCredentialRevealExpected": false,
       "previewFunction": "orbit360ProductInsurerCredentialCommandPreview",
@@ -106,17 +142,14 @@
       "backendProviderDiscriminantRunId": 34416753493,
       "directBackendStatusAvailable": true,
       "directBackendRevealSucceededWithoutSecretLogging": true,
-      "secureResourcesWrapperRevealFailedOnSupersededCandidate": true,
-      "rootCause": "product-insurer-credential-provider-p0.js referenced Orbit.productTenantRuntimeContextBridgeP0.context(), but the loaded bridge exports Orbit.productTenantRuntimeContextP0 with status()/resolveTenant().",
+      "previousTenantRuntimeRootCause": "product-insurer-credential-provider-p0.js referenced Orbit.productTenantRuntimeContextBridgeP0.context(), but the loaded bridge exports Orbit.productTenantRuntimeContextP0 with status()/resolveTenant().",
       "canonicalTenantRuntimeFile": "orbit360-platform/core/product-tenant-runtime-context-bridge-p0.js",
       "canonicalTenantRuntimeExport": "Orbit.productTenantRuntimeContextP0",
+      "serverAuditAuthority": "functions/product-insurer-credentials.js",
       "productSourceChangeRequired": true,
-      "successorSourceSha": "1e6a6ca3d259d0e5e644f716a2f71c6e0107efc4",
-      "successorI2RunId": 34420740707,
-      "successorI2Conclusion": "success",
-      "successorI3RunId": 34423252469,
-      "successorI3Conclusion": "success",
-      "nextRequiredProof": "I4A authenticated privileged-role reveal on successor Preview"
+      "successorSourceSha": "10408e3d777ff8934b850c9f61d431dfed3afc2e",
+      "successorSourceTree": "8ce1857472f62e11c788031d57664ced2986b244",
+      "nextRequiredProof": "I2 successor source contract on exact nextCandidate"
     }
   },
   "i4aPreviewInfrastructureBoundary": {
@@ -261,5 +294,5 @@
     "mechanismFrozen": true,
     "mechanismFreezeEnforced": true
   },
-  "nextAction": "EXECUTE_I4A_AUTHORITATIVE_ON_CERTIFIED_SUCCESSOR_PREVIEW_NO_REOPEN_UNAFFECTED_CAPABILITIES"
+  "nextAction": "RUN_I2_SUCCESSOR_SOURCE_CONTRACT_VIA_SCOPED_INTENT_THEN_ADVANCE_ONLY_ON_PHYSICAL_PASS"
 }
