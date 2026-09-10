@@ -1,13 +1,13 @@
 {
   "schemaVersion": "gravicentra-execution-intent-v1",
-  "requestId": "I4A-AUTHORITATIVE-20260910-013-NUMBERED-BANK-PHYSICAL-EVIDENCE",
+  "requestId": "I4A-AUTHORITATIVE-20260910-014-RESIDUAL-CAPABILITY-SWEEP",
   "nonAuthoritative": true,
   "gate": "I4A",
   "controlPlaneStatusExpected": "I4A_IN_PROGRESS",
   "certifiedSourceSha": "10408e3d777ff8934b850c9f61d431dfed3afc2e",
   "buildId": "gi-i3-10408e3d777f-57f234755dc1",
   "previewUrl": "https://ays-orbit-360-lab--gi-i3-34437131024-v9pvtkbk.web.app",
-  "purpose": "Re-run the exact I3-certified Preview with committed QA-only Aseguradoras selector correction. The targeted discriminant must prioritize a real insurer whose bank account exposes numero, numeroCuenta or accountNumber; if no numbered account exists it must preserve numberBearing=0 and fail closed. Privileged roles must physically prove visible numbered bank data and enabled copy action, plus credentialRef reveal/copy/re-hide and secure audit; Asesor must remain restricted. Preserve ordinary legal-gate UI, stable UI, zero operational-write delta, exact release identity and all non-invalidated evidence. Product source, artifact, Preview, backend package and operational data remain unchanged. This execution cannot authorize I4B or production by itself.",
+  "purpose": "Run one residual read-only I4A sweep on the exact I3-certified Preview to materialize physical evidence for Login/session/reload, role-scoped shell/router/navigation, Inicio, Ops, Leads, Vehiculos, canonical Cliente-Poliza-Vehiculo relationships, distinct Recibos Esperados/Cartera Primas runtime data, and responsive shell. Preserve all non-invalidated Cliente360/Polizas/Cobros/Aseguradoras evidence. Safe UI actions may open and close pre-commit modals only; no create/confirm/payment/management mutation is authorized. Product source, artifact, Preview, backend package, production and operational data remain unchanged. Any residual product defect must fail closed and return through the frozen recovery gate sequence; this intent cannot authorize I4B or production by itself.",
   "productionMutationAuthorized": false,
   "operationalDataWritesAuthorized": false
 }

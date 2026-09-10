@@ -43,6 +43,7 @@ jobs:
           node --check tools/gravicentra-i4a-authenticated-browser-v2.mjs
           node --check tools/gravicentra-i4a-aseguradoras-credential-ui-v1.mjs
           node --check tools/gravicentra-i4a-auth-adjudicator-v1.mjs
+          node --check tools/gravicentra-i4a-residual-capabilities-v1.mjs
 
       - name: Validate non-authoritative execution intent when push-triggered
         if: github.event_name == 'push'
@@ -67,20 +68,24 @@ jobs:
         run: |
           set -euo pipefail
           ROOT="$RUNNER_TEMP/gravicentra-i4a-evidence"
-          mkdir -p "$ROOT/meta" "$ROOT/public" "$ROOT/bootstrap" "$ROOT/boundary" "$ROOT/auth"
+          mkdir -p "$ROOT/meta" "$ROOT/public" "$ROOT/bootstrap" "$ROOT/boundary" "$ROOT/auth" "$ROOT/residual"
           HARNESS_BLOB=$(git hash-object tools/gravicentra-i4a-authenticated-browser-v2.mjs)
           ASEGURADORAS_UI_BLOB=$(git hash-object tools/gravicentra-i4a-aseguradoras-credential-ui-v1.mjs)
           ADJUDICATOR_BLOB=$(git hash-object tools/gravicentra-i4a-auth-adjudicator-v1.mjs)
+          RESIDUAL_BLOB=$(git hash-object tools/gravicentra-i4a-residual-capabilities-v1.mjs)
           echo "I4A_HARNESS_BLOB_SHA=$HARNESS_BLOB" >> "$GITHUB_ENV"
           echo "I4A_ASEGURADORAS_UI_BLOB_SHA=$ASEGURADORAS_UI_BLOB" >> "$GITHUB_ENV"
           echo "I4A_ADJUDICATOR_BLOB_SHA=$ADJUDICATOR_BLOB" >> "$GITHUB_ENV"
+          echo "I4A_RESIDUAL_BLOB_SHA=$RESIDUAL_BLOB" >> "$GITHUB_ENV"
           cp tools/gravicentra-i4a-authenticated-browser-v2.mjs "$ROOT/meta/gravicentra-i4a-authenticated-browser-v2.mjs"
           cp tools/gravicentra-i4a-aseguradoras-credential-ui-v1.mjs "$ROOT/meta/gravicentra-i4a-aseguradoras-credential-ui-v1.mjs"
           cp tools/gravicentra-i4a-auth-adjudicator-v1.mjs "$ROOT/meta/gravicentra-i4a-auth-adjudicator-v1.mjs"
+          cp tools/gravicentra-i4a-residual-capabilities-v1.mjs "$ROOT/meta/gravicentra-i4a-residual-capabilities-v1.mjs"
           printf '%s\n' "$GITHUB_SHA" > "$ROOT/meta/control-plane-commit.txt"
           printf '%s\n' "$HARNESS_BLOB" > "$ROOT/meta/authenticated-harness-blob.txt"
           printf '%s\n' "$ASEGURADORAS_UI_BLOB" > "$ROOT/meta/aseguradoras-ui-harness-blob.txt"
           printf '%s\n' "$ADJUDICATOR_BLOB" > "$ROOT/meta/auth-adjudicator-blob.txt"
+          printf '%s\n' "$RESIDUAL_BLOB" > "$ROOT/meta/residual-capability-harness-blob.txt"
           printf '%s\n' "$SOURCE_SHA" > "$ROOT/meta/source-sha.txt"
           printf '%s\n' "$BUILD_ID" > "$ROOT/meta/build-id.txt"
           printf '%s\n' "$PREVIEW_URL" > "$ROOT/meta/preview-url.txt"
@@ -177,6 +182,22 @@ jobs:
           echo "rc=$RC" >> "$GITHUB_OUTPUT"
           exit 0
 
+      - id: residual
+        name: Execute committed residual capability acceptance sweep
+        if: always()
+        env:
+          I4A_RESIDUAL_EVIDENCE_DIR: ${{ runner.temp }}/gravicentra-i4a-evidence/residual
+          SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+        run: |
+          set +e
+          node tools/gravicentra-i4a-residual-capabilities-v1.mjs
+          RC=$?
+          set -e
+          echo "rc=$RC" >> "$GITHUB_OUTPUT"
+          exit 0
+
       - name: Seal consolidated I4A execution manifest
         if: always()
         env:
@@ -186,6 +207,7 @@ jobs:
           AUTH_RAW_RC: ${{ steps.auth.outputs.rc }}
           ASEGURADORAS_UI_RC: ${{ steps.aseguradoras_ui.outputs.rc }}
           AUTH_ADJUDICATED_RC: ${{ steps.adjudicated.outputs.rc }}
+          RESIDUAL_RC: ${{ steps.residual.outputs.rc }}
         run: |
           set -euo pipefail
           ROOT="$RUNNER_TEMP/gravicentra-i4a-evidence"; export ROOT
@@ -196,16 +218,15 @@ jobs:
               try:return int(os.environ.get(name,'99'))
               except:return 99
           manifest={
-            'schemaVersion':'gravicentra-i4a-consolidated-execution-v3',
+            'schemaVersion':'gravicentra-i4a-consolidated-execution-v4-residual',
             'gate':'I4A','controlPlaneCommit':os.environ['GITHUB_SHA'],
             'sourceSha':os.environ['SOURCE_SHA'],'buildId':os.environ['BUILD_ID'],'previewUrl':os.environ['PREVIEW_URL'],
-            'qaHarnessBlobSha':os.environ['I4A_HARNESS_BLOB_SHA'],'qaAseguradorasUiBlobSha':os.environ['I4A_ASEGURADORAS_UI_BLOB_SHA'],'qaAdjudicatorBlobSha':os.environ['I4A_ADJUDICATOR_BLOB_SHA'],'qaHarnessPatchedAtRuntime':False,
-            'results':{'public':rc('PUBLIC_RC'),'bootstrap':rc('BOOTSTRAP_RC'),'boundary':rc('BOUNDARY_RC'),'authenticatedRaw':rc('AUTH_RAW_RC'),'aseguradorasTargetedUi':rc('ASEGURADORAS_UI_RC'),'authenticatedAdjudicated':rc('AUTH_ADJUDICATED_RC')},
+            'qaHarnessBlobSha':os.environ['I4A_HARNESS_BLOB_SHA'],'qaAseguradorasUiBlobSha':os.environ['I4A_ASEGURADORAS_UI_BLOB_SHA'],'qaAdjudicatorBlobSha':os.environ['I4A_ADJUDICATOR_BLOB_SHA'],'qaResidualCapabilityBlobSha':os.environ['I4A_RESIDUAL_BLOB_SHA'],'qaHarnessPatchedAtRuntime':False,
+            'results':{'public':rc('PUBLIC_RC'),'bootstrap':rc('BOOTSTRAP_RC'),'boundary':rc('BOUNDARY_RC'),'authenticatedRaw':rc('AUTH_RAW_RC'),'aseguradorasTargetedUi':rc('ASEGURADORAS_UI_RC'),'authenticatedAdjudicated':rc('AUTH_ADJUDICATED_RC'),'residualCapabilities':rc('RESIDUAL_RC')},
             'productionTouched':False,'dataTouched':False,'writesExpected':0
           }
-          manifest['authoritativePass']=all(manifest['results'][k]==0 for k in ['public','bootstrap','boundary','aseguradorasTargetedUi','authenticatedAdjudicated'])
-          p=os.path.join(root,'i4a-execution-manifest.json')
-          open(p,'w').write(json.dumps(manifest,indent=2,sort_keys=True)+'\n')
+          manifest['authoritativePass']=all(manifest['results'][k]==0 for k in ['public','bootstrap','boundary','aseguradorasTargetedUi','authenticatedAdjudicated','residualCapabilities'])
+          open(os.path.join(root,'i4a-execution-manifest.json'),'w').write(json.dumps(manifest,indent=2,sort_keys=True)+'\n')
           print('I4A_CONSOLIDATED_PROBES='+json.dumps(manifest['results'],sort_keys=True))
           PY
 
@@ -222,6 +243,7 @@ jobs:
             echo "- QA harness blob: \`$I4A_HARNESS_BLOB_SHA\`"
             echo "- Aseguradoras UI harness blob: \`$I4A_ASEGURADORAS_UI_BLOB_SHA\`"
             echo "- QA adjudicator blob: \`$I4A_ADJUDICATOR_BLOB_SHA\`"
+            echo "- Residual capability harness blob: \`$I4A_RESIDUAL_BLOB_SHA\`"
             echo '- Runtime QA self-patch: `false`'
             if [ -f "$MANIFEST" ]; then
               echo "- Public rc: \`$(jq -r '.results.public' "$MANIFEST")\`"
@@ -230,6 +252,7 @@ jobs:
               echo "- Authenticated raw rc: \`$(jq -r '.results.authenticatedRaw' "$MANIFEST")\`"
               echo "- Aseguradoras targeted UI rc: \`$(jq -r '.results.aseguradorasTargetedUi' "$MANIFEST")\`"
               echo "- Authenticated adjudicated rc: \`$(jq -r '.results.authenticatedAdjudicated' "$MANIFEST")\`"
+              echo "- Residual capabilities rc: \`$(jq -r '.results.residualCapabilities' "$MANIFEST")\`"
             fi
             echo '- Production touched by executor: `false`'
             echo '- Operational data writes by executor: `0`'
@@ -253,6 +276,7 @@ jobs:
           BOUNDARY_RC: ${{ steps.boundary.outputs.rc }}
           ASEGURADORAS_UI_RC: ${{ steps.aseguradoras_ui.outputs.rc }}
           AUTH_ADJUDICATED_RC: ${{ steps.adjudicated.outputs.rc }}
+          RESIDUAL_RC: ${{ steps.residual.outputs.rc }}
         run: |
           set -euo pipefail
           test "${PUBLIC_RC:-99}" = 0
@@ -260,4 +284,5 @@ jobs:
           test "${BOUNDARY_RC:-99}" = 0
           test "${ASEGURADORAS_UI_RC:-99}" = 0
           test "${AUTH_ADJUDICATED_RC:-99}" = 0
+          test "${RESIDUAL_RC:-99}" = 0
           echo I4A_AUTHORITATIVE_EXECUTOR=PASS
