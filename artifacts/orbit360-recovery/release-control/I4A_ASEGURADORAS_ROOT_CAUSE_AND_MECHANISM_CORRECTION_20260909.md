@@ -80,15 +80,35 @@ Las seis Fuentes Evergreen V3 no requieren reemplazo por este cambio. Sus reglas
 
 Por eso `projectSources.staticSourceUpdateRequired` permanece `false`. La información mutable de este incidente y de su sucesor vive en `CONTROL_PLANE.json`, `CAPABILITY_STATUS_LEDGER.json`, este registro y la evidencia física de GitHub Actions.
 
-## 7. Gate de cierre del mecanismo
+## 7. Prueba física del mecanismo corregido
 
-La corrección del mecanismo no puede declararse PASS por estar escrita. Requiere que el HEAD que contiene el conjunto completo pase simultáneamente:
+La corrección no se consideró válida solo por estar escrita. Se ejecutó sobre el mismo HEAD y quedó probada físicamente:
 
-- `gravicentra-control-plane-guard-v2.mjs --mode=governance`;
-- `gravicentra-mechanism-invariant-v1.mjs`;
-- `gravicentra-evergreen-sources-invariant-v1.mjs`;
-- invariants de remediation preservados;
-- `git diff --exit-code`;
-- I2 del source sucesor mediante el intent exacto.
+- Guard central run `34420740721`: SUCCESS.
+- I2 del sucesor run `34420740707`: SUCCESS completo.
+- En I3 run `34420928503`, el intent exacto, el guard y el checkout del sucesor terminaron SUCCESS y el propio log registró `SOURCE_SHA=1e6a6ca3d259d0e5e644f716a2f71c6e0107efc4`.
+- El acceso al Firebase Hosting existente también pasó antes de cualquier build/deploy.
 
-Solo después de esos readbacks físicos podrá cambiarse este mecanismo de `MATERIALIZED_PENDING_CENTRAL_GUARD_READBACK` a confirmado y avanzar I2 -> I3.
+Esto prueba que el mecanismo de autoridad/lineage ya no reconstruye el `certifiedCandidate` anterior cuando existe un `nextCandidate` causal.
+
+## 8. Fallo del primer I3 sucesor y clasificación
+
+El run `34420928503` no cerró I3. Falló antes de materializar el paquete y antes de desplegar Preview por un defecto del executor: el bloque Python usó `Path(...).read()`, método inexistente para `pathlib.Path`.
+
+Clasificación: `I3_EXECUTOR_PACKAGE_PREP_PATH_READ_METHOD_ERROR`.
+
+El error exacto fue `AttributeError: 'PosixPath' object has no attribute 'read'`. El fix quedó materializado en commit `bf964736f2f7d87d64e7a39e3f5c30f28946e955`, cambiando únicamente `read()` por `read_text()` en `.github/workflows/gravicentra-recovery-i3-preview-v2.yml`.
+
+No se generó un nuevo source de producto, no se alteró `1e6a6ca3...`, no se desplegó Preview, no se tocó producción y no hubo writes operativos.
+
+El detalle operativo queda además en `I3_SUCCESSOR_EXECUTOR_FAILURE_AND_RERUN_20260909.md`.
+
+## 9. Reintento controlado I3-R2
+
+El reintento usa el mismo source y tree ya aprobados en I2:
+
+- Source: `1e6a6ca3d259d0e5e644f716a2f71c6e0107efc4`.
+- Tree: `d6e6857c9cd48d20db6000db02cbba3a00f26018`.
+- Intent: `I3-SUCCESSOR-ASEGURADORAS-TENANT-RUNTIME-20260909-R2`.
+
+El reintento no puede declararse PASS hasta demostrar materialización de paquete, Hosting Preview aislado, readback byte-a-byte exacto y evidencia sellada. Si vuelve a fallar por executor, se corrige dentro de I3; no se abre una iteración nueva ni se modifica producto sin causa nueva probada.

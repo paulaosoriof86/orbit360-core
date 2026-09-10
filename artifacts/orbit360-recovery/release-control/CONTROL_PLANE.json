@@ -69,7 +69,9 @@
           "productSourceChangeRequired": false,
           "executorFixCommit": "bf964736f2f7d87d64e7a39e3f5c30f28946e955",
           "executorFix": "Path(os.environ['APPS']).read() replaced by Path(os.environ['APPS']).read_text()"
-        }
+        },
+        "rerunIntentId": "I3-SUCCESSOR-ASEGURADORAS-TENANT-RUNTIME-20260909-R2",
+        "rerunSourceSha": "1e6a6ca3d259d0e5e644f716a2f71c6e0107efc4"
       },
       "I4A": {"status": "BLOCKED_BY_SUCCESSOR_I3_RECERTIFICATION"},
       "I4B": {"status": "PENDING"},
@@ -221,9 +223,9 @@
     "centralGuardBroadGravicentraWatch": true
   },
   "mechanismCorrection20260909": {
-    "status": "SOURCE_BINDING_PHYSICAL_PASS_PACKAGE_EXECUTOR_FIX_RERUN_PENDING",
+    "status": "I3_EXECUTOR_FIXED_RERUN_INTENT_MATERIALIZED_PENDING_PHYSICAL_I3_PASS",
     "rootCauseClass": "RELEASE_EXECUTOR_DESYNCHRONIZATION_RISK",
-    "centralGuardRunId": 34420928260,
+    "centralGuardRunId": 34421288689,
     "centralGuardConclusion": "success",
     "i2RunId": 34420740707,
     "i2Conclusion": "success",
@@ -232,6 +234,7 @@
     "i3SuccessorSourceBindingProven": true,
     "i3ExecutorFailureClass": "I3_EXECUTOR_PACKAGE_PREP_PATH_READ_METHOD_ERROR",
     "i3ExecutorFixCommit": "bf964736f2f7d87d64e7a39e3f5c30f28946e955",
+    "i3RerunIntentId": "I3-SUCCESSOR-ASEGURADORAS-TENANT-RUNTIME-20260909-R2",
     "fixes": [
       "I2 and I3 control checkouts use complete ancestry",
       "I2 and I3 execute from exact scoped non-authoritative intents with manual dispatch only as explicit escape",
@@ -249,7 +252,7 @@
     "lineageLockMaterialized": true,
     "controlPlaneMaterialized": true,
     "centralReleaseGuardConsumesOnlyControlPlane": true,
-    "centralGuardRunId": 34420928260,
+    "centralGuardRunId": 34421288689,
     "centralGuardConclusion": "success",
     "legacyStateAndReleaseLockDeprecated": true,
     "workflowReleaseHardcodesRemoved": true,
@@ -267,7 +270,9 @@
     "i3NextCandidateBindingMaterialized": true,
     "i3NextCandidateBindingPhysicalPass": true,
     "centralBroadWatchMaterialized": true,
-    "i3PackagePrepExecutorFixMaterialized": true
+    "i3PackagePrepExecutorFixMaterialized": true,
+    "i3ExecutorEvidenceMaterialized": true,
+    "i3RerunIntentMaterialized": true
   },
-  "nextAction": "RERUN_I3_SAME_SUCCESSOR_AFTER_EXECUTOR_ONLY_PATH_READ_FIX_AND_REQUIRE_EXACT_PREVIEW_READBACK"
+  "nextAction": "EXECUTE_I3_R2_SAME_SUCCESSOR_AND_REQUIRE_IMMUTABLE_PREVIEW_PLUS_EXACT_READBACK"
 }
