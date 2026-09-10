@@ -5,7 +5,7 @@
   window.Orbit = window.Orbit || {};
   var Orbit = window.Orbit;
   var VERSION = '20260829.1';
-  var COMPOSITION_REVISION = '20260902.1-predecessor-row-reclaim';
+  var COMPOSITION_REVISION = '20260909.1-server-owned-credential-copy';
   if (Orbit.clientInsurerOperationalDirectoryOwnerV20260722 && Orbit.clientInsurerOperationalDirectoryOwnerV20260722.version === VERSION) return;
 
   function clean(value) { return String(value == null ? '' : value).trim(); }
@@ -90,6 +90,17 @@
       return { ok:false, message:'Contraseña no disponible.' };
     }
     return await Orbit.secureResources.revealCredential(ref, { module:'aseguradoras', insurerId:insurer.id, portalIndex:index });
+  }
+  async function resolveCredentialForCopy(portal, insurer, index) {
+    if (!credentialAccessAllowed()) return { ok:false, message:'Acceso restringido para el rol activo.' };
+    var inline = inlineCredential(portal);
+    if (inline) return { ok:true, value:inline, source:'record' };
+    var ref = clean(portal && portal.credentialRef);
+    var state = credentialState(portal);
+    if (!ref || state.copyAvailable !== true || !Orbit.secureResources || typeof Orbit.secureResources.copyCredential !== 'function') {
+      return { ok:false, message:'Contraseña no disponible para copia segura.' };
+    }
+    return await Orbit.secureResources.copyCredential(ref, { module:'aseguradoras', insurerId:insurer.id, portalIndex:index });
   }
   async function copyText(value) {
     try {
@@ -176,7 +187,9 @@
       var index = Number((reveal || credentialCopy).dataset[reveal ? 'odCredentialReveal' : 'odCredentialCopy']);
       var portal = insurer && insurer.portales && insurer.portales[index];
       var user = portalUser(portal);
-      var out = await resolveCredential(portal, insurer, index);
+      var out = reveal
+        ? await resolveCredential(portal, insurer, index)
+        : await resolveCredentialForCopy(portal, insurer, index);
       if (!out || out.ok === false || !clean(out.value)) { toast(out && out.message || 'Contraseña no disponible.'); return; }
       if (reveal) {
         var secret = reveal.closest('.od-credential-box') && reveal.closest('.od-credential-box').querySelector('[data-od-credential-secret]');
