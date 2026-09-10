@@ -1,13 +1,13 @@
 {
   "schemaVersion": "gravicentra-execution-intent-v1",
-  "requestId": "I4A-AUTHORITATIVE-20260909-008-TARGETED-CREDENTIAL-UI-EVIDENCE",
+  "requestId": "I4A-AUTHORITATIVE-20260909-009-CREDENTIAL-AUDIT-SUCCESSOR",
   "nonAuthoritative": true,
   "gate": "I4A",
   "controlPlaneStatusExpected": "I4A_IN_PROGRESS",
-  "certifiedSourceSha": "1e6a6ca3d259d0e5e644f716a2f71c6e0107efc4",
-  "buildId": "gi-i3-1e6a6ca3d259-57f234755dc1",
-  "previewUrl": "https://ays-orbit-360-lab--gi-i3-34423252469-ybf4i1dw.web.app",
-  "purpose": "Re-run authoritative I4A after integrating the committed targeted Aseguradoras credential UI discriminant and V8-compatible adjudicator. Require the same certified source/build/Preview identity, normal legal-gate UI traversal in an ephemeral browser context, privileged reveal/copy/re-hide for every credentialRef-bearing portal, advisor restriction, operational directory evidence, and zero operational writes. Do not mutate product source, certified artifact, production, or operational data.",
+  "certifiedSourceSha": "10408e3d777ff8934b850c9f61d431dfed3afc2e",
+  "buildId": "gi-i3-10408e3d777f-57f234755dc1",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i3-34437131024-v9pvtkbk.web.app",
+  "purpose": "Validate the physically I3-certified credential-audit successor without changing product source or artifact. Require ordinary ephemeral legal-gate traversal, privileged reveal/copy/re-hide for every credentialRef-bearing portal, secure copy via credential.copy, bank copy, Asesor restriction, zero operational-write delta, and preserved authenticated Cliente 360/Polizas/Cobros/Aseguradoras discriminants. This run is causal evidence inside I4A and must not by itself close untested Phase A capabilities.",
   "productionMutationAuthorized": false,
   "operationalDataWritesAuthorized": false
 }
