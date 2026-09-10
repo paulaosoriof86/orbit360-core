@@ -1,7 +1,7 @@
 {
   "schemaVersion": "gravicentra-control-plane-v2",
   "controlPlaneId": "GRAVICENTRA-INSURANCE-FASE-A",
-  "status": "I2_IN_PROGRESS",
+  "status": "I3_IN_PROGRESS",
   "productBrand": "Gravicentra Insurance",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -39,23 +39,26 @@
   },
   "gateState": {
     "lastFormallyCompletedIteration": 3,
-    "currentTransition": "I2_SUCCESSOR_RECERTIFICATION_AFTER_I4A_CREDENTIAL_AUDIT_SOURCE_DEFECT",
-    "nextFrozenIteration": "I2",
+    "currentTransition": "I3_SUCCESSOR_IMMUTABLE_PREVIEW_RECERTIFICATION_AFTER_CREDENTIAL_AUDIT_FIX",
+    "nextFrozenIteration": "I3",
     "gates": {
       "I0": {"status": "PASS"},
       "I1": {"status": "PASS", "capabilitiesBound": 15},
       "I2": {
-        "status": "IN_PROGRESS",
-        "previousCertifiedRunId": 34420740707,
-        "previousCertifiedSourceSha": "1e6a6ca3d259d0e5e644f716a2f71c6e0107efc4"
+        "status": "PASS_LATEST_CANDIDATE",
+        "latestRunId": 34436885351,
+        "sourceSha": "10408e3d777ff8934b850c9f61d431dfed3afc2e",
+        "sourceTree": "8ce1857472f62e11c788031d57664ced2986b244",
+        "conclusion": "success"
       },
       "I3": {
-        "status": "PREVIOUS_CANDIDATE_PASS_SUPERSEDED_PENDING_SUCCESSOR_RECERTIFICATION",
+        "status": "IN_PROGRESS",
         "previousRunId": 34423252469,
-        "previousConclusion": "success"
+        "previousConclusion": "success",
+        "successorSourceSha": "10408e3d777ff8934b850c9f61d431dfed3afc2e"
       },
       "I4A": {
-        "status": "BLOCKED_BY_SUCCESSOR_I2_I3_RECERTIFICATION",
+        "status": "BLOCKED_BY_SUCCESSOR_I3_RECERTIFICATION",
         "failedRunId": 34430190710
       },
       "I4B": {"status": "PENDING"},
@@ -66,7 +69,7 @@
   "productionProgress": {
     "formalPercent": 57.1,
     "certifiedPhysicalPercent": 57.1,
-    "method": "7 frozen production gates I0,I1,I2,I3,I4A,I4B,I5; equal gate-completion accounting; prior I2/I3 physical certification remains evidence while successor recertification is in progress",
+    "method": "7 frozen production gates I0,I1,I2,I3,I4A,I4B,I5; equal gate-completion accounting; prior I3 physical certification remains evidence while successor I3 recertification is in progress",
     "iterationsRemaining": ["I4A", "I4B", "I5"]
   },
   "certifiedCandidate": {
@@ -115,6 +118,8 @@
     "lineageRediscoveryPerformed": false,
     "unaffectedCapabilityEvidencePreserved": true,
     "requiresI2I3Recertification": true,
+    "i2RunId": 34436885351,
+    "i2Conclusion": "success",
     "productionMutationAuthorized": false,
     "dataMutationAuthorized": false,
     "firebaseMutationAuthorized": false
@@ -125,7 +130,7 @@
     "polizasFiveRolesProbePass": true,
     "cobrosFiveRolesProbePass": true,
     "aseguradoras": {
-      "status": "PRODUCT_SOURCE_DEFECT_PROVEN_SUCCESSOR_REQUIRES_I2_I3",
+      "status": "PRODUCT_SOURCE_DEFECT_PROVEN_SUCCESSOR_I2_PASS_I3_PENDING",
       "previousSymptom": "ASEGURADORAS_PRIVILEGED_REF_MARKED_UNAVAILABLE",
       "latestFailedRunId": 34430190710,
       "latestEvidenceArtifactId": 10134326528,
@@ -149,7 +154,9 @@
       "productSourceChangeRequired": true,
       "successorSourceSha": "10408e3d777ff8934b850c9f61d431dfed3afc2e",
       "successorSourceTree": "8ce1857472f62e11c788031d57664ced2986b244",
-      "nextRequiredProof": "I2 successor source contract on exact nextCandidate"
+      "successorI2RunId": 34436885351,
+      "successorI2Conclusion": "success",
+      "nextRequiredProof": "I3 immutable build, isolated Preview and exact byte readback on successor source"
     }
   },
   "i4aPreviewInfrastructureBoundary": {
@@ -285,6 +292,8 @@
     "frozenPlanSnapshotInterpretationAddendumMaterialized": true,
     "successorI2I3IntentMechanismMaterialized": true,
     "successorI2PhysicalPass": true,
+    "latestCausalI2RunId": 34436885351,
+    "latestCausalI2Conclusion": "success",
     "i3NextCandidateBindingMaterialized": true,
     "i3NextCandidateBindingPhysicalPass": true,
     "centralBroadWatchMaterialized": true,
@@ -294,5 +303,5 @@
     "mechanismFrozen": true,
     "mechanismFreezeEnforced": true
   },
-  "nextAction": "RUN_I2_SUCCESSOR_SOURCE_CONTRACT_VIA_SCOPED_INTENT_THEN_ADVANCE_ONLY_ON_PHYSICAL_PASS"
+  "nextAction": "RUN_I3_SUCCESSOR_IMMUTABLE_PREVIEW_VIA_SCOPED_INTENT_AND_VERIFY_EXACT_SOURCE_READBACK"
 }
