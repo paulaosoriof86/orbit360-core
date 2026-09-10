@@ -2,6 +2,11 @@ name: Gravicentra Recovery I2 Source Contract
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - recovery/fase-a-clean-20260831
+    paths:
+      - artifacts/orbit360-recovery/release-control/I2_EXECUTION_INTENT.json
 
 permissions:
   contents: read
@@ -15,17 +20,37 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 8
     steps:
-      - name: Checkout Recovery control plane
+      - name: Checkout Recovery control plane with complete ancestry
         uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
           path: control
-          fetch-depth: 50
+          fetch-depth: 0
           persist-credentials: false
 
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+
+      - name: Validate exact non-authoritative I2 intent when push-triggered
+        if: ${{ github.event_name == 'push' }}
+        working-directory: control
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const c=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json','utf8'));
+          const x=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I2_EXECUTION_INTENT.json','utf8'));
+          const need=(ok,code)=>{if(!ok)throw new Error(code)};
+          need(x.schemaVersion==='gravicentra-i2-execution-intent-v1','I2_INTENT_SCHEMA_INVALID');
+          need(x.nonAuthoritative===true,'I2_INTENT_MUST_BE_NON_AUTHORITATIVE');
+          need(x.gate==='I2','I2_INTENT_GATE_INVALID');
+          need(c.status==='I2_IN_PROGRESS','I2_INTENT_CONTROL_STATUS_INVALID');
+          need(c.nextCandidate&&x.sourceSha===c.nextCandidate.sourceSha,'I2_INTENT_SOURCE_MISMATCH');
+          need(x.sourceTree===c.nextCandidate.sourceTree,'I2_INTENT_TREE_MISMATCH');
+          need(x.productionMutationAuthorized===false&&x.dataMutationAuthorized===false&&x.firebaseMutationAuthorized===false,'I2_INTENT_MUTATION_BOUNDARY_INVALID');
+          console.log('GRAVICENTRA_I2_SCOPED_INTENT=PASS');
+          NODE
 
       - id: candidate
         name: Resolve exact I2 candidate from CONTROL_PLANE
@@ -55,6 +80,7 @@ jobs:
           node --check functions/product-insurer-credentials.js
           node --check functions/cobros-reconciliation-domain.js
           node --check functions/bootstrap.js
+          node --check orbit360-platform/core/product-insurer-credential-provider-p0.js
 
       - name: Active role fail-closed contract
         working-directory: source
@@ -64,7 +90,7 @@ jobs:
         working-directory: source
         run: node tools/orbit360-recovery-i2-cobros-10102-contract-test.mjs
 
-      - name: Aseguradoras isolated Preview backend contract
+      - name: Aseguradoras isolated Preview backend and tenant runtime contract
         working-directory: source
         run: node tools/orbit360-recovery-i2-insurer-preview-backend-contract-test.mjs
 
@@ -81,7 +107,9 @@ jobs:
           {
             echo '## Gravicentra Insurance — I2 source contract'
             echo "- Candidate source from CONTROL_PLANE: \`${{ steps.candidate.outputs.source_sha }}\`"
-            echo '- Automatic product-path execution: `false`'
+            echo '- Trigger: exact scoped non-authoritative intent or explicit manual escape'
+            echo '- Automatic product-path fan-out: `false`'
             echo '- Production touched: `false`'
             echo '- Data touched: `false`'
+            echo '- Firebase mutation: `false`'
           } >> "$GITHUB_STEP_SUMMARY"

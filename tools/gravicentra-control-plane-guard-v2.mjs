@@ -29,6 +29,7 @@ need(C.mechanismRules.staticSnapshotAsOperationalAuthorityForbidden===true,'CONT
 need(C.mechanismRules.qaHarnessSelfPatchForbidden===true,'CONTROL_PLANE_QA_PATCH_RULE_MISSING');
 need(C.mechanismRules.oneGateExecutorAtATime===true,'CONTROL_PLANE_SINGLE_EXECUTOR_RULE_MISSING');
 need(C.mechanismRules.lineageRediscoveryAfterI1ForbiddenWithoutException===true,'CONTROL_PLANE_LINEAGE_REDISCOVERY_RULE_MISSING');
+need(C.mechanismRules.sourceChangeAfterBuildRequiresNewI2I3===true,'CONTROL_PLANE_SUCCESSOR_RECERTIFICATION_RULE_MISSING');
 need(C.environmentState&&C.environmentState.productionAccepted===false,'CONTROL_PLANE_PRODUCTION_ALREADY_ACCEPTED');
 need(C.environmentState.productionTouchedByRecovery===false,'CONTROL_PLANE_PRODUCTION_TOUCHED');
 need(C.environmentState.dataTouchedByRecovery===false,'CONTROL_PLANE_DATA_TOUCHED');
@@ -48,9 +49,9 @@ need(L.rules.onlyCausalLineageExceptionMayChangeThisLock===true,'LINEAGE_LOCK_EX
 const closure=L.closure||{};
 need(SHA.test(String(closure.blobSha||'')),'LINEAGE_CLOSURE_BLOB_INVALID');
 need(exists(closure.path),'LINEAGE_CLOSURE_FILE_MISSING');
-const actualClosureBlob=git('hash-object',closure.path);
-need(actualClosureBlob===closure.blobSha,'LINEAGE_CLOSURE_BLOB_DRIFT:'+actualClosureBlob);
+need(git('hash-object',closure.path)===closure.blobSha,'LINEAGE_CLOSURE_BLOB_DRIFT');
 
+// The last I3-certified release remains immutable evidence until a successor I3 is sealed.
 const R=C.certifiedCandidate||{};
 need(SHA.test(String(R.sourceSha||'')),'CONTROL_PLANE_SOURCE_SHA_INVALID');
 need(SHA.test(String(R.sourceTree||'')),'CONTROL_PLANE_SOURCE_TREE_INVALID');
@@ -67,25 +68,23 @@ need(R.sameFrontendArtifactPreviewToProductionRequired===true,'CONTROL_PLANE_SAM
 need(R.sameBackendSourcePackageRequiredForI5===true,'CONTROL_PLANE_SAME_BACKEND_PACKAGE_RULE_MISSING');
 need(R.sourceMutatedAfterBuild===false,'CONTROL_PLANE_SOURCE_MUTATED_AFTER_BUILD');
 try{git('cat-file','-e',R.sourceSha+'^{commit}');}catch{fail('CONTROL_PLANE_SOURCE_COMMIT_NOT_AVAILABLE');}
-const sourceTree=git('show','-s','--format=%T',R.sourceSha);
-need(sourceTree===R.sourceTree,'CONTROL_PLANE_SOURCE_TREE_MISMATCH:'+sourceTree);
+need(git('show','-s','--format=%T',R.sourceSha)===R.sourceTree,'CONTROL_PLANE_SOURCE_TREE_MISMATCH');
 
 const gate=C.gateState||{};
 const gates=gate.gates||{};
 const N=C.nextCandidate==null?null:C.nextCandidate;
-const i2Lifecycle=C.status==='I2_IN_PROGRESS'||MODE==='i2';
-if(i2Lifecycle){
-  need(N&&typeof N==='object','I2_NEXT_CANDIDATE_MISSING');
-  need(SHA.test(String(N.sourceSha||'')),'I2_NEXT_CANDIDATE_SHA_INVALID');
-  need(SHA.test(String(N.sourceTree||'')),'I2_NEXT_CANDIDATE_TREE_INVALID');
-  need(N.sourceSha!==R.sourceSha,'I2_NEXT_CANDIDATE_MUST_DIFFER_FROM_CERTIFIED');
-  try{git('cat-file','-e',N.sourceSha+'^{commit}');}catch{fail('I2_NEXT_CANDIDATE_COMMIT_NOT_AVAILABLE');}
-  const nTree=git('show','-s','--format=%T',N.sourceSha);
-  need(nTree===N.sourceTree,'I2_NEXT_CANDIDATE_TREE_MISMATCH:'+nTree);
+const successorLifecycle=['I2_IN_PROGRESS','I3_IN_PROGRESS'].includes(C.status)||MODE==='i2'||MODE==='i3';
+if(successorLifecycle){
+  need(N&&typeof N==='object','SUCCESSOR_NEXT_CANDIDATE_MISSING');
+  need(SHA.test(String(N.sourceSha||'')),'SUCCESSOR_CANDIDATE_SHA_INVALID');
+  need(SHA.test(String(N.sourceTree||'')),'SUCCESSOR_CANDIDATE_TREE_INVALID');
+  need(N.sourceSha!==R.sourceSha,'SUCCESSOR_CANDIDATE_MUST_DIFFER_FROM_CERTIFIED');
+  try{git('cat-file','-e',N.sourceSha+'^{commit}');}catch{fail('SUCCESSOR_CANDIDATE_COMMIT_NOT_AVAILABLE');}
+  need(git('show','-s','--format=%T',N.sourceSha)===N.sourceTree,'SUCCESSOR_CANDIDATE_TREE_MISMATCH');
 }
 
 const current=git('rev-parse','HEAD');
-const driftSource=i2Lifecycle?String(N.sourceSha):String(R.sourceSha);
+const driftSource=successorLifecycle?String(N.sourceSha):String(R.sourceSha);
 try{execFileSync('git',['merge-base','--is-ancestor',driftSource,current],{stdio:'ignore'});}catch{fail('CONTROL_PLANE_DRIFT_SOURCE_NOT_ANCESTOR:'+driftSource);}
 const allowedControlPrefixes=[
   '.github/workflows/gravicentra-',
@@ -98,9 +97,9 @@ const forbidden=changed.filter(p=>!allowedControlPrefixes.some(prefix=>p.startsW
 need(forbidden.length===0,'CONTROL_PLANE_PRODUCT_SOURCE_DRIFT:'+forbidden.slice(0,20).join(','));
 
 if(MODE==='governance'){
-  need(['GOVERNANCE_SYNC_IN_PROGRESS','I2_IN_PROGRESS','I4A_IN_PROGRESS','I4B_IN_PROGRESS','I5_IN_PROGRESS'].includes(C.status),'GOVERNANCE_MODE_STATE_INVALID');
-  if(C.status==='GOVERNANCE_SYNC_IN_PROGRESS') need(gates.I3&&['PHYSICAL_PASS_PENDING_GOVERNANCE_SEAL','PASS'].includes(gates.I3.status),'GOVERNANCE_I3_STATE_INVALID');
+  need(['GOVERNANCE_SYNC_IN_PROGRESS','I2_IN_PROGRESS','I3_IN_PROGRESS','I4A_IN_PROGRESS','I4B_IN_PROGRESS','I5_IN_PROGRESS'].includes(C.status),'GOVERNANCE_MODE_STATE_INVALID');
   if(C.status==='I2_IN_PROGRESS') need(gates.I2&&gates.I2.status==='IN_PROGRESS','GOVERNANCE_I2_STATE_INVALID');
+  if(C.status==='I3_IN_PROGRESS') need(gates.I3&&gates.I3.status==='IN_PROGRESS','GOVERNANCE_I3_STATE_INVALID');
 }
 if(MODE==='i2'){
   need(C.status==='I2_IN_PROGRESS','I2_NOT_ACTIVE');
@@ -126,7 +125,8 @@ if(MODE==='i5'){
   need(gates.I4B&&gates.I4B.status==='PASS','I5_BLOCKED_I4B_NOT_PASS');
 }
 
-const exportsMap=MODE==='i2'
+const successorMode=MODE==='i2'||MODE==='i3';
+const exportsMap=successorMode
   ? {SOURCE_SHA:String(N.sourceSha)}
   : {
       SOURCE_SHA:String(R.sourceSha),
@@ -148,8 +148,9 @@ console.log('MODE='+MODE);
 console.log('CONTROL_STATUS='+C.status);
 console.log('CURRENT_TRANSITION='+(gate.currentTransition||''));
 console.log('NEXT_FROZEN_ITERATION='+(gate.nextFrozenIteration||''));
-console.log('SOURCE_SHA='+(MODE==='i2'?N.sourceSha:R.sourceSha));
-if(MODE!=='i2'){
+console.log('SOURCE_SHA='+(successorMode?N.sourceSha:R.sourceSha));
+console.log('SUCCESSOR_LIFECYCLE='+successorLifecycle);
+if(!successorMode){
   console.log('BUILD_ID='+R.buildId);
   console.log('I3_RUN_ID='+R.i3RunId);
   console.log('ARTIFACT_ID='+R.artifactId);

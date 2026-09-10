@@ -1,7 +1,7 @@
 {
   "schemaVersion": "gravicentra-control-plane-v2",
   "controlPlaneId": "GRAVICENTRA-INSURANCE-FASE-A",
-  "status": "I4A_IN_PROGRESS",
+  "status": "I2_IN_PROGRESS",
   "productBrand": "Gravicentra Insurance",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -39,14 +39,22 @@
   },
   "gateState": {
     "lastFormallyCompletedIteration": 3,
-    "currentTransition": "I4A_INDIVIDUAL_PREVIEW_QA",
-    "nextFrozenIteration": "I4A",
+    "currentTransition": "I2_SUCCESSOR_RECERTIFICATION_AFTER_I4A_CAUSAL_SOURCE_DEFECT",
+    "nextFrozenIteration": "I2",
     "gates": {
       "I0": {"status": "PASS"},
       "I1": {"status": "PASS", "capabilitiesBound": 15},
-      "I2": {"status": "PASS_LATEST_CANDIDATE", "latestRunId": 34304799588, "sourceSha": "96f6962b8519a032c2f54b50d2796fa2545de1e4"},
-      "I3": {"status": "PASS", "runId": 34307974287, "conclusion": "success", "governanceSealGuardRunId": 34376095720},
-      "I4A": {"status": "IN_PROGRESS"},
+      "I2": {
+        "status": "IN_PROGRESS",
+        "previousCertifiedRunId": 34304799588,
+        "previousCertifiedSourceSha": "96f6962b8519a032c2f54b50d2796fa2545de1e4"
+      },
+      "I3": {
+        "status": "PREVIOUS_CANDIDATE_PASS_SUPERSEDED_PENDING_SUCCESSOR_RECERTIFICATION",
+        "previousRunId": 34307974287,
+        "previousConclusion": "success"
+      },
+      "I4A": {"status": "BLOCKED_BY_SUCCESSOR_I2_I3_RECERTIFICATION"},
       "I4B": {"status": "PENDING"},
       "I5": {"status": "PENDING"},
       "I6": {"status": "HOLD_UNTIL_PRODUCTION_ACCEPTED"}
@@ -55,7 +63,7 @@
   "productionProgress": {
     "formalPercent": 57.1,
     "certifiedPhysicalPercent": 57.1,
-    "method": "7 frozen production gates I0,I1,I2,I3,I4A,I4B,I5; equal gate-completion accounting",
+    "method": "7 frozen production gates I0,I1,I2,I3,I4A,I4B,I5; equal gate-completion accounting; prior I2/I3 physical certification remains evidence while successor recertification is in progress",
     "iterationsRemaining": ["I4A", "I4B", "I5"]
   },
   "certifiedCandidate": {
@@ -82,21 +90,42 @@
     "sameBackendSourcePackageRequiredForI5": true,
     "sourceMutatedAfterBuild": false
   },
-  "nextCandidate": null,
+  "nextCandidate": {
+    "sourceSha": "1e6a6ca3d259d0e5e644f716a2f71c6e0107efc4",
+    "sourceTree": "d6e6857c9cd48d20db6000db02cbba3a00f26018",
+    "reason": "I4A proved that the insurer credential wrapper used a non-existent tenant runtime symbol while the direct Preview callable succeeded for the same credentialRef.",
+    "changeScope": [
+      "orbit360-platform/core/product-insurer-credential-provider-p0.js",
+      "tools/orbit360-recovery-i2-insurer-preview-backend-contract-test.mjs"
+    ],
+    "lineageRediscoveryPerformed": false,
+    "requiresI2I3Recertification": true,
+    "productionMutationAuthorized": false,
+    "dataMutationAuthorized": false
+  },
   "i4aCausalFindings": {
-    "latestAuthoritativeRunId": 34390569565,
+    "latestAuthoritativeRunId": 34410886776,
     "cliente360TransientThresholdClassifiedAsValidatorOnly": true,
+    "polizasFiveRolesProbePass": true,
+    "cobrosFiveRolesProbePass": true,
     "aseguradoras": {
-      "status": "CAUSAL_RUNTIME_BOUNDARY_PROVEN",
+      "status": "PRODUCT_SOURCE_DEFECT_PROVEN",
       "symptom": "ASEGURADORAS_PRIVILEGED_REF_MARKED_UNAVAILABLE",
       "privilegedRolesAffected": ["Dirección", "SuperAdmin", "AdminTenant", "Operativo"],
       "advisorCredentialRevealExpected": false,
       "previewFunction": "orbit360ProductInsurerCredentialCommandPreview",
       "region": "us-east1",
-      "cloudFunctionsHttpBeforeRemediation": 404,
-      "cloudRunHttpBeforeRemediation": 404,
-      "boundaryEvidenceRunId": 34390569565,
-      "productSourceChangeRequired": false
+      "previewCallableActiveReadbackRunId": 34410467076,
+      "providerRefDiagnosticRunId": 34416486645,
+      "backendProviderDiscriminantRunId": 34416753493,
+      "directBackendStatusAvailable": true,
+      "directBackendRevealSucceededWithoutSecretLogging": true,
+      "secureResourcesWrapperRevealFailed": true,
+      "rootCause": "product-insurer-credential-provider-p0.js referenced Orbit.productTenantRuntimeContextBridgeP0.context(), but the loaded bridge exports Orbit.productTenantRuntimeContextP0 with status()/resolveTenant().",
+      "canonicalTenantRuntimeFile": "orbit360-platform/core/product-tenant-runtime-context-bridge-p0.js",
+      "canonicalTenantRuntimeExport": "Orbit.productTenantRuntimeContextP0",
+      "productSourceChangeRequired": true,
+      "successorSourceSha": "1e6a6ca3d259d0e5e644f716a2f71c6e0107efc4"
     }
   },
   "i4aPreviewInfrastructureBoundary": {
@@ -116,19 +145,6 @@
     "productionHostingMutationAuthorized": false,
     "dataMutationAuthorized": false,
     "authorizationEvidenceRunId": 34390569565,
-    "authorizationReason": "Exact Preview callable and Cloud Run service returned 404 while certified frontend routes I3 Preview hosts exclusively to this callable.",
-    "deploymentEvidence": {
-      "runId": 34409694762,
-      "jobId": 102660977128,
-      "conclusion": "failure_after_function_deploy",
-      "evidenceArtifactId": 10126788829,
-      "evidenceArtifactDigest": "sha256:fde7731ad4fbb6d6fa4ac3468d460291ed02fcfc0d994e64e25da34b395556de",
-      "targetCallableHttpBeforeDeploy": 404,
-      "canonicalProductionCallableHttpBeforeDeploy": 404,
-      "functionDeployReportedSuccessful": true,
-      "cleanupPolicySetupFailed": true,
-      "cleanupPolicyMutationAuthorized": false
-    },
     "latestRemediation": {
       "runId": 34410467076,
       "runAttempt": 1,
@@ -138,13 +154,8 @@
       "evidenceArtifactId": 10127037210,
       "evidenceArtifactDigest": "sha256:408d64eea2928f646722bbe759cff09c55e59a72bc3f3c555fd81e48f2645dc6",
       "mode": "POST_DEPLOY_READBACK_ONLY",
-      "deployStep": "SKIPPED",
-      "targetCallableHttpBeforeReadback": 200,
       "targetCallableHttpAfterReadback": 200,
       "targetStateAfterReadback": "ACTIVE",
-      "targetEntryPointAfterReadback": "orbit360ProductInsurerCredentialCommandPreview",
-      "cloudRunHttpAfterReadback": 200,
-      "canonicalProductionCallableHttpBeforeReadback": 404,
       "canonicalProductionCallableHttpAfterReadback": 404,
       "canonicalProductionCallableUnchanged": true,
       "readbackPerformed": true,
@@ -182,15 +193,30 @@
     "failClosedOnAuthorityMismatch": true,
     "capabilityStatusLedgerMustMatchControlPlane": true,
     "staticProjectSourcesMustRemainOperationalStateFree": true,
-    "staticSourceReplacementRequiresExplicitFlag": true
+    "staticSourceReplacementRequiresExplicitFlag": true,
+    "i2I3ScopedIntentExecution": true,
+    "completeAncestryForControlCheckouts": true,
+    "i3MustConsumeNextCandidateDuringSuccessorLifecycle": true,
+    "centralGuardBroadGravicentraWatch": true
+  },
+  "mechanismCorrection20260909": {
+    "status": "MATERIALIZED_PENDING_CENTRAL_GUARD_READBACK",
+    "rootCauseClass": "RELEASE_EXECUTOR_DESYNCHRONIZATION_RISK",
+    "fixes": [
+      "I2 and I3 control checkouts use complete ancestry",
+      "I2 and I3 execute from exact scoped non-authoritative intents with manual dispatch only as explicit escape",
+      "I3 consumes nextCandidate during successor lifecycle rather than the previous certifiedCandidate",
+      "central guard watches broad Gravicentra workflow/tool/release-control/project-source paths",
+      "temporary Aseguradoras diagnostic workflow removed from active executor set"
+    ],
+    "documentationPath": "artifacts/orbit360-recovery/release-control/I4A_ASEGURADORAS_ROOT_CAUSE_AND_MECHANISM_CORRECTION_20260909.md",
+    "projectSourcesReplacementRequired": false
   },
   "governanceSyncChecklist": {
     "frozenPlanMaterialized": true,
     "lineageLockMaterialized": true,
     "controlPlaneMaterialized": true,
     "centralReleaseGuardConsumesOnlyControlPlane": true,
-    "centralGuardRunId": 34376095720,
-    "centralGuardConclusion": "success",
     "legacyStateAndReleaseLockDeprecated": true,
     "workflowReleaseHardcodesRemoved": true,
     "workflowFanoutRemoved": true,
@@ -198,12 +224,13 @@
     "i2ExecutorStateGated": true,
     "i3ExecutorStateGated": true,
     "i4aExecutorStateGated": true,
-    "evergreenProjectSourcePackagePrepared": true,
-    "evergreenProjectSourceIntegrityGuarded": true,
-    "i3FormalSeal": true,
-    "capabilityStatusLedgerMaterialized": true,
     "evergreenProjectSourcePackageV3Prepared": true,
-    "frozenPlanSnapshotInterpretationAddendumMaterialized": true
+    "evergreenProjectSourceIntegrityGuarded": true,
+    "capabilityStatusLedgerMaterialized": true,
+    "frozenPlanSnapshotInterpretationAddendumMaterialized": true,
+    "successorI2I3IntentMechanismMaterialized": true,
+    "i3NextCandidateBindingMaterialized": true,
+    "centralBroadWatchMaterialized": true
   },
-  "nextAction": "RUN_I4A_ASEGURADORAS_AUTHENTICATED_PRIVILEGED_ROLE_PROBE_ON_CERTIFIED_PREVIEW"
+  "nextAction": "RUN_I2_SUCCESSOR_SOURCE_CONTRACT_VIA_SCOPED_INTENT_THEN_ADVANCE_ONLY_ON_PHYSICAL_PASS"
 }

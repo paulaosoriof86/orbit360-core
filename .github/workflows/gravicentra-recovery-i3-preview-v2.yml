@@ -1,7 +1,12 @@
-name: Gravicentra Recovery I3 Immutable Preview v3
+name: Gravicentra Recovery I3 Immutable Preview v4
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - recovery/fase-a-clean-20260831
+    paths:
+      - artifacts/orbit360-recovery/release-control/I3_EXECUTION_INTENT.json
 
 permissions:
   contents: read
@@ -20,17 +25,37 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     steps:
-      - name: Checkout Recovery control plane
+      - name: Checkout Recovery control plane with complete ancestry
         uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
           path: control
-          fetch-depth: 50
+          fetch-depth: 0
           persist-credentials: false
 
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+
+      - name: Validate exact non-authoritative I3 intent when push-triggered
+        if: ${{ github.event_name == 'push' }}
+        working-directory: control
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const c=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json','utf8'));
+          const x=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I3_EXECUTION_INTENT.json','utf8'));
+          const need=(ok,code)=>{if(!ok)throw new Error(code)};
+          need(x.schemaVersion==='gravicentra-i3-execution-intent-v1','I3_INTENT_SCHEMA_INVALID');
+          need(x.nonAuthoritative===true,'I3_INTENT_MUST_BE_NON_AUTHORITATIVE');
+          need(x.gate==='I3','I3_INTENT_GATE_INVALID');
+          need(c.status==='I3_IN_PROGRESS','I3_INTENT_CONTROL_STATUS_INVALID');
+          need(c.nextCandidate&&x.sourceSha===c.nextCandidate.sourceSha,'I3_INTENT_SOURCE_MISMATCH');
+          need(x.sourceTree===c.nextCandidate.sourceTree,'I3_INTENT_TREE_MISMATCH');
+          need(x.productionMutationAuthorized===false&&x.dataMutationAuthorized===false,'I3_INTENT_MUTATION_BOUNDARY_INVALID');
+          console.log('GRAVICENTRA_I3_SCOPED_INTENT=PASS');
+          NODE
 
       - id: release
         name: Fail closed against canonical control plane
@@ -40,7 +65,7 @@ jobs:
           test "$GITHUB_REF_NAME" = "recovery/fase-a-clean-20260831"
           node tools/gravicentra-control-plane-guard-v2.mjs --mode=i3
 
-      - name: Checkout fixed Recovery product source
+      - name: Checkout exact successor Recovery product source
         uses: actions/checkout@v4
         with:
           ref: ${{ steps.release.outputs.source_sha }}
@@ -129,7 +154,7 @@ jobs:
           APP_ID=$(python3 - <<'PY'
           import json,os
           from pathlib import Path
-          d=json.loads(Path(os.environ['APPS']).read_text()); a=d.get('result') if isinstance(d,dict) else None
+          d=json.loads(Path(os.environ['APPS']).read()); a=d.get('result') if isinstance(d,dict) else None
           if not isinstance(a,list): raise SystemExit('FIREBASE_WEB_APP_LIST_INVALID')
           web=[x for x in a if str(x.get('platform','')).upper() in ('WEB','PLATFORM_WEB','')]
           if len(web)!=1: raise SystemExit('FIREBASE_WEB_APP_CARDINALITY_NOT_ONE:'+str(len(web)))
@@ -182,7 +207,7 @@ jobs:
           import hashlib,json,os,urllib.parse,urllib.request
           rows=[tuple(x.split('  ',1)) for x in open(os.environ['MANIFEST']).read().splitlines() if x.strip()]; base=os.environ['PREVIEW_URL'].rstrip('/'); bad=[]
           for expected,rel in rows:
-              req=urllib.request.Request(base+'/'+urllib.parse.quote(rel,safe='/')+'?readback='+os.environ['EXPECTED_DIGEST'][:16],headers={'Accept-Encoding':'identity','Cache-Control':'no-cache','User-Agent':'Gravicentra-I3-v3'})
+              req=urllib.request.Request(base+'/'+urllib.parse.quote(rel,safe='/')+'?readback='+os.environ['EXPECTED_DIGEST'][:16],headers={'Accept-Encoding':'identity','Cache-Control':'no-cache','User-Agent':'Gravicentra-I3-v4'})
               with urllib.request.urlopen(req,timeout=30) as r: body=r.read()
               actual=hashlib.sha256(body).hexdigest()
               if actual!=expected: bad.append((rel,expected,actual))
@@ -211,7 +236,7 @@ jobs:
           export EVIDENCE="$RUNNER_TEMP/gravicentra-i3-release-package/evidence/i3-evidence.json"
           python3 - <<'PY'
           import json,os
-          e={'schemaVersion':'gravicentra-recovery-i3-evidence-v3','status':'ARTIFACT_READBACK_EXACT_PASS_BACKEND_SOURCE_PACKAGED','product':'Gravicentra Insurance','gate':'I3','sourceSha':os.environ['SOURCE_SHA'],'runnerCommit':os.environ['GITHUB_SHA'],'githubRunId':os.environ['GITHUB_RUN_ID'],'buildId':os.environ['BUILD_ID'],'firebaseProjectId':os.environ['PROJECT_ID'],'hostingSiteId':os.environ['HOSTING_SITE'],'hostedFileCount':int(os.environ['HOSTED_FILE_COUNT']),'hostedPayloadDigest':os.environ['HOSTED_PAYLOAD_DIGEST'],'backendFileCount':int(os.environ['BACKEND_FILE_COUNT']),'backendSourceDigest':os.environ['BACKEND_SOURCE_DIGEST'],'bundleFileCount':int(os.environ['BUNDLE_FILE_COUNT']),'bundleDigest':os.environ['BUNDLE_DIGEST'],'previewChannelId':os.environ['CHANNEL_ID'],'previewUrl':os.environ['PREVIEW_URL'],'backendDeploymentPerformedAtI3':False,'sharedBackendMutationPerformedAtI3':False,'aseguradorasCredentialRuntimeAtPreview':'OPEN_STRUCTURAL_BOUNDARY_NOT_CERTIFIED_BY_I3','credentialSourceName':os.environ['CREDENTIAL_SOURCE'],'credentialOwnerProjectId':os.environ['CREDENTIAL_OWNER_PROJECT'],'sameFrontendArtifactPreviewToProductionRequired':True,'sameBackendSourcePackageRequiredForI5':True,'sourceMutatedAfterBuild':False,'productionTouched':False,'dataTouched':False,'writesExecuted':0,'readbackExact':True}
+          e={'schemaVersion':'gravicentra-recovery-i3-evidence-v4','status':'ARTIFACT_READBACK_EXACT_PASS_BACKEND_SOURCE_PACKAGED','product':'Gravicentra Insurance','gate':'I3','sourceSha':os.environ['SOURCE_SHA'],'runnerCommit':os.environ['GITHUB_SHA'],'githubRunId':os.environ['GITHUB_RUN_ID'],'buildId':os.environ['BUILD_ID'],'firebaseProjectId':os.environ['PROJECT_ID'],'hostingSiteId':os.environ['HOSTING_SITE'],'hostedFileCount':int(os.environ['HOSTED_FILE_COUNT']),'hostedPayloadDigest':os.environ['HOSTED_PAYLOAD_DIGEST'],'backendFileCount':int(os.environ['BACKEND_FILE_COUNT']),'backendSourceDigest':os.environ['BACKEND_SOURCE_DIGEST'],'bundleFileCount':int(os.environ['BUNDLE_FILE_COUNT']),'bundleDigest':os.environ['BUNDLE_DIGEST'],'previewChannelId':os.environ['CHANNEL_ID'],'previewUrl':os.environ['PREVIEW_URL'],'backendDeploymentPerformedAtI3':False,'sharedBackendMutationPerformedAtI3':False,'aseguradorasCredentialRuntimeAtPreview':'REQUIRES_I4A_AUTHENTICATED_ACCEPTANCE','credentialSourceName':os.environ['CREDENTIAL_SOURCE'],'credentialOwnerProjectId':os.environ['CREDENTIAL_OWNER_PROJECT'],'sameFrontendArtifactPreviewToProductionRequired':True,'sameBackendSourcePackageRequiredForI5':True,'sourceMutatedAfterBuild':False,'productionTouched':False,'dataTouched':False,'writesExecuted':0,'readbackExact':True}
           open(os.environ['EVIDENCE'],'w').write(json.dumps(e,sort_keys=True)+'\n')
           PY
 
@@ -229,11 +254,12 @@ jobs:
         run: |
           {
             echo '## Gravicentra Insurance — I3 immutable Hosting Preview'
-            echo "- Source from CONTROL_PLANE: \`${{ steps.release.outputs.source_sha }}\`"
+            echo "- Source from CONTROL_PLANE nextCandidate: \`${{ steps.release.outputs.source_sha }}\`"
             echo "- Build: \`${{ steps.build.outputs.build_id }}\`"
             echo "- Preview: ${{ steps.deploy.outputs.preview_url }}"
             echo "- Hosted digest: \`${{ steps.build.outputs.hosted_payload_digest }}\`"
             echo "- Backend source digest: \`${{ steps.build.outputs.backend_source_digest }}\`"
+            echo '- Trigger: exact scoped non-authoritative intent or explicit manual escape'
             echo '- Functions deployed in I3: false'
             echo '- Shared backend mutation: false'
             echo '- Production touched: false'

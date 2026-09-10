@@ -15,40 +15,42 @@
     "artifactArchiveDigest": "sha256:688768297142074ae987305eedf100db802cbbe85c3600db6d2263075e5e1860",
     "previewChannelId": "gi-i3-34307974287"
   },
+  "successorCandidate": {
+    "sourceSha": "1e6a6ca3d259d0e5e644f716a2f71c6e0107efc4",
+    "sourceTree": "d6e6857c9cd48d20db6000db02cbba3a00f26018",
+    "status": "I2_RECERTIFICATION_PENDING_PHYSICAL_PASS",
+    "reason": "Aseguradoras provider tenant runtime resolver correction",
+    "doesNotReopenUnaffectedLineage": true
+  },
   "materializedFromEvidenceThrough": {
-    "i4aAuthoritativeRunId": 34390569565,
-    "i4aAuthoritativeArtifactId": 10119620329,
-    "i4aAuthoritativeArtifactDigest": "sha256:58c7fe2ea4c924d0e2cd0ad4a8cbf732c06ba4e4d50c9d7cc81d090652ee182e",
-    "previewRemediationRunId": 34392529206,
-    "previewRemediationRunAttempt": 2,
-    "previewRemediationJobId": 102633673395,
-    "previewRemediationConclusion": "failure",
-    "previewRemediationFailureClass": "ENVIRONMENT_AUTHZ_FIREBASE_EXTENSIONS_DISCOVERY_403",
-    "previewRemediationEvidenceArtifactId": 10123582955,
-    "previewRemediationEvidenceArtifactDigest": "sha256:cd0a1f577de3e6f42c9c61d1e8f23fd8fef44aca4f144df05a9b0aa9c3629d1a"
+    "i4aLatestAuthoritativeRunId": 34410886776,
+    "previewCallableReadbackRunId": 34410467076,
+    "providerRefDiagnosticRunId": 34416486645,
+    "backendProviderDiscriminantRunId": 34416753493,
+    "backendProviderDiscriminantConclusion": "DIRECT_BACKEND_PASS_WRAPPER_FAIL_SOURCE_DEFECT_PROVEN"
   },
   "semantics": {
     "EVIDENCE_IMPORT_PENDING_NO_REOPEN": "Existing evidence may exist and remains preserved; this ledger has not yet materialized it. This is not FAIL and does not authorize retest.",
     "PARTIAL_PROBE_PASS_NOT_CLOSED": "Latest evidence contains successful discriminant probes but does not by itself satisfy the complete capability acceptance contract.",
-    "BLOCKED_CAUSAL_RUNTIME_BOUNDARY": "A causal runtime/environment boundary prevents capability closure.",
+    "BLOCKED_CAUSAL_RUNTIME_BOUNDARY": "A proven causal runtime, source-composition or environment boundary prevents capability closure; only the causal boundary may be remediated.",
     "OPEN_RETEST_TRANSIENT_VALIDATOR": "A transient validator finding remains to be discriminated; product defect is not proven.",
     "NOT_STARTED_I5_BLOCKED": "Live acceptance cannot begin before I5."
   },
   "capabilities": [
     {"id":"LOGIN_PRIMARY_RUNTIME","lineageStatus":"FROZEN","previewAcceptance":{"status":"EVIDENCE_IMPORT_PENDING_NO_REOPEN","evidence":[]},"liveAcceptance":{"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}},
     {"id":"ROLE_SCOPE_RUNTIME","lineageStatus":"FROZEN","previewAcceptance":{"status":"EVIDENCE_IMPORT_PENDING_NO_REOPEN","evidence":[]},"liveAcceptance":{"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}},
-    {"id":"SINGLE_ENTRYPOINT_SHELL_ROUTER","lineageStatus":"FROZEN","previewAcceptance":{"status":"PARTIAL_PROBE_PASS_NOT_CLOSED","evidence":[{"runId":34390569565,"evidence":"PUBLIC_BROWSER_PASS; canonical index true; build exact true"}]},"liveAcceptance":{"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}},
-    {"id":"STARTUP_PWA_PERFORMANCE","lineageStatus":"FROZEN","previewAcceptance":{"status":"PARTIAL_PROBE_PASS_NOT_CLOSED","evidence":[{"runId":34390569565,"evidence":"public browser login visible <1s; serviceWorkerBlocking=false"}]},"liveAcceptance":{"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}},
+    {"id":"SINGLE_ENTRYPOINT_SHELL_ROUTER","lineageStatus":"FROZEN","previewAcceptance":{"status":"PARTIAL_PROBE_PASS_NOT_CLOSED","evidence":[{"runId":34410886776,"evidence":"canonical index and exact build preserved in latest I4A execution"}]},"liveAcceptance":{"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}},
+    {"id":"STARTUP_PWA_PERFORMANCE","lineageStatus":"FROZEN","previewAcceptance":{"status":"PARTIAL_PROBE_PASS_NOT_CLOSED","evidence":[{"runId":34410886776,"evidence":"startup discriminants preserved; no causal startup regression proven"}]},"liveAcceptance":{"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}},
     {"id":"INICIO_PRIMARY_RUNTIME","lineageStatus":"FROZEN","previewAcceptance":{"status":"EVIDENCE_IMPORT_PENDING_NO_REOPEN","evidence":[]},"liveAcceptance":{"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}},
-    {"id":"CLIENTE360_PRIMARY_RUNTIME","lineageStatus":"FROZEN","previewAcceptance":{"status":"PARTIAL_PROBE_PASS_NOT_CLOSED","evidence":[{"runId":34390569565,"evidence":"authenticated adjudicated probe pass for Dirección, SuperAdmin, AdminTenant, Operativo, Asesor; transient heartbeat reclassified validator-only under exact criteria"}]},"liveAcceptance":{"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}},
+    {"id":"CLIENTE360_PRIMARY_RUNTIME","lineageStatus":"FROZEN","previewAcceptance":{"status":"PARTIAL_PROBE_PASS_NOT_CLOSED","evidence":[{"runId":34410886776,"evidence":"authenticated role probe adjudicated pass; transient heartbeat classified validator-only"}]},"liveAcceptance":{"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}},
     {"id":"VEHICULOS_PRIMARY_RUNTIME","lineageStatus":"FROZEN","previewAcceptance":{"status":"EVIDENCE_IMPORT_PENDING_NO_REOPEN","evidence":[]},"liveAcceptance":{"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}},
     {"id":"CROSS_MODULE_RELATIONSHIPS","lineageStatus":"FROZEN","previewAcceptance":{"status":"EVIDENCE_IMPORT_PENDING_NO_REOPEN","evidence":[]},"liveAcceptance":{"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}},
-    {"id":"ASEGURADORAS_PRIMARY_RUNTIME","lineageStatus":"FROZEN","previewAcceptance":{"status":"BLOCKED_CAUSAL_RUNTIME_BOUNDARY","evidence":[{"runId":34390569565,"evidence":"privileged credentialRef marked unavailable; exact Preview callable Cloud Functions/Cloud Run 404"},{"runId":34392529206,"attempt":2,"evidence":"Preview-only deploy failed before readback with Firebase Extensions discovery 403; target/canonical were 404 before deploy"}]},"liveAcceptance":{"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}},
-    {"id":"ASEGURADORAS_OPERATIONAL_DIRECTORY","lineageStatus":"FROZEN","previewAcceptance":{"status":"BLOCKED_CAUSAL_RUNTIME_BOUNDARY","evidence":[{"runId":34390569565,"evidence":"Dirección/SuperAdmin/AdminTenant/Operativo blocked; Asesor correctly not entitled to reveal"},{"runId":34392529206,"attempt":2,"evidence":"Preview-only deploy failed before readback with Firebase Extensions discovery 403"}]},"liveAcceptance":{"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}},
+    {"id":"ASEGURADORAS_PRIMARY_RUNTIME","lineageStatus":"FROZEN","previewAcceptance":{"status":"BLOCKED_CAUSAL_RUNTIME_BOUNDARY","evidence":[{"runId":34410467076,"evidence":"isolated Preview callable active with exact readback; canonical production callable unchanged"},{"runId":34416486645,"evidence":"credentialRef valid and locally available, but secure provider reveal failed for all privileged roles"},{"runId":34416753493,"evidence":"same ref direct backend status/reveal PASS while secureResources wrapper reveal FAIL; frontend provider source defect proven"},{"sourceSha":"1e6a6ca3d259d0e5e644f716a2f71c6e0107efc4","evidence":"minimal successor created; I2/I3 recertification required before I4A resumes"}]},"liveAcceptance":{"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}},
+    {"id":"ASEGURADORAS_OPERATIONAL_DIRECTORY","lineageStatus":"FROZEN","previewAcceptance":{"status":"BLOCKED_CAUSAL_RUNTIME_BOUNDARY","evidence":[{"runId":34410886776,"evidence":"only remaining functional failure is privileged secure reveal; Asesor remains correctly restricted"},{"runId":34416753493,"evidence":"direct backend PASS isolates failure to provider tenant resolver"},{"sourceSha":"1e6a6ca3d259d0e5e644f716a2f71c6e0107efc4","evidence":"successor changes provider resolver plus I2 regression assertion only"}]},"liveAcceptance":{"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}},
     {"id":"OPS_PRIMARY_RUNTIME","lineageStatus":"FROZEN","previewAcceptance":{"status":"EVIDENCE_IMPORT_PENDING_NO_REOPEN","evidence":[]},"liveAcceptance":{"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}},
     {"id":"LEADS_PRIMARY_RUNTIME","lineageStatus":"FROZEN","previewAcceptance":{"status":"EVIDENCE_IMPORT_PENDING_NO_REOPEN","evidence":[]},"liveAcceptance":{"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}},
-    {"id":"POLIZAS_PRIMARY_RUNTIME","lineageStatus":"FROZEN","previewAcceptance":{"status":"OPEN_RETEST_TRANSIENT_VALIDATOR","evidence":[{"runId":34390569565,"evidence":"Dirección/SuperAdmin/AdminTenant probe pass; Operativo and Asesor transient heartbeat just above 1000ms; no synthetic policy rows in boundary diagnostic"}]},"liveAcceptance":{"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}},
+    {"id":"POLIZAS_PRIMARY_RUNTIME","lineageStatus":"FROZEN","previewAcceptance":{"status":"PARTIAL_PROBE_PASS_NOT_CLOSED","evidence":[{"runId":34410886776,"evidence":"latest authenticated I4A probe passed all five tested roles; no synthetic policy-row source defect established"}]},"liveAcceptance":{"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}},
     {"id":"RECIBOS_CARTERA_PRIMARY_RUNTIME","lineageStatus":"FROZEN","previewAcceptance":{"status":"EVIDENCE_IMPORT_PENDING_NO_REOPEN","evidence":[]},"liveAcceptance":{"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}},
-    {"id":"COBROS_PRIMARY_RUNTIME","lineageStatus":"FROZEN","previewAcceptance":{"status":"PARTIAL_PROBE_PASS_NOT_CLOSED","evidence":[{"runId":34390569565,"evidence":"authenticated probe pass for all five tested roles"}]},"liveAcceptance":{"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}}
+    {"id":"COBROS_PRIMARY_RUNTIME","lineageStatus":"FROZEN","previewAcceptance":{"status":"PARTIAL_PROBE_PASS_NOT_CLOSED","evidence":[{"runId":34410886776,"evidence":"authenticated probe passed all five tested roles"}]},"liveAcceptance":{"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}}
   ]
 }

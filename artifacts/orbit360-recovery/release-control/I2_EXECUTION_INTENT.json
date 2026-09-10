@@ -1,0 +1,14 @@
+{
+  "schemaVersion": "gravicentra-i2-execution-intent-v1",
+  "intentId": "I2-SUCCESSOR-ASEGURADORAS-TENANT-RUNTIME-20260909",
+  "nonAuthoritative": true,
+  "gate": "I2",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceSha": "1e6a6ca3d259d0e5e644f716a2f71c6e0107efc4",
+  "sourceTree": "d6e6857c9cd48d20db6000db02cbba3a00f26018",
+  "reason": "Recertify the minimal Aseguradoras tenant-runtime resolver correction after I4A direct-backend/provider discriminant proved a frontend source defect.",
+  "productionMutationAuthorized": false,
+  "dataMutationAuthorized": false,
+  "firebaseMutationAuthorized": false,
+  "writesAuthorized": false
+}
