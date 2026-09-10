@@ -30,6 +30,13 @@ Orbit.secureResources = (function () {
     return Object.assign({ tenantId, asesorId, actor: actor(), rolActivo: role() }, extra || {});
   }
 
+  function credentialAuditIsServerOwned(action) {
+    if (!/^credential\./.test(String(action || ''))) return false;
+    try {
+      return !!(Orbit.productInsurerCredentialProviderP0 && Orbit.productInsurerCredentialProviderP0.serverAuditAuthoritative === true);
+    } catch (e) { return false; }
+  }
+
   function audit(action, target, result, detail) {
     const row = {
       id: 'secres_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
@@ -41,15 +48,20 @@ Orbit.secureResources = (function () {
       actor: actor(),
       detail: Object.assign({}, detail || {})
     };
-    try {
-      if (Orbit.store && Orbit.store.insert) Orbit.store.insert('auditLog', row);
-    } catch (e) {
+    // Product insurer credential access is already audited by the server-owned callable.
+    // Do not duplicate that audit through Orbit.store: in Preview it must remain cloudlog-only,
+    // and in production the callable persists the canonical auditEvents record.
+    if (!credentialAuditIsServerOwned(action)) {
       try {
-        if (Orbit.store && Orbit.store.insert) Orbit.store.insert('actividades', {
-          id: row.id, tipo: 'admin', icon: '🔐', fecha: row.ts.slice(0, 10),
-          titulo: 'Acceso a recurso seguro', detalle: action + ' · ' + result
-        });
-      } catch (ignore) {}
+        if (Orbit.store && Orbit.store.insert) Orbit.store.insert('auditLog', row);
+      } catch (e) {
+        try {
+          if (Orbit.store && Orbit.store.insert) Orbit.store.insert('actividades', {
+            id: row.id, tipo: 'admin', icon: '🔐', fecha: row.ts.slice(0, 10),
+            titulo: 'Acceso a recurso seguro', detalle: action + ' · ' + result
+          });
+        } catch (ignore) {}
+      }
     }
     try { document.dispatchEvent(new CustomEvent('orbit:secure-resource-audit', { detail: row })); } catch (e) {}
     return row;
