@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "gravicentra-i3-execution-intent-v1",
+  "intentId": "I3-SUCCESSOR-ASEGURADORAS-TENANT-RUNTIME-20260909",
+  "nonAuthoritative": true,
+  "gate": "I3",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceSha": "1e6a6ca3d259d0e5e644f716a2f71c6e0107efc4",
+  "sourceTree": "d6e6857c9cd48d20db6000db02cbba3a00f26018",
+  "reason": "Build once and deploy an immutable isolated Hosting Preview from the exact I2-passed successor source.",
+  "productionMutationAuthorized": false,
+  "dataMutationAuthorized": false,
+  "writesAuthorized": false
+}

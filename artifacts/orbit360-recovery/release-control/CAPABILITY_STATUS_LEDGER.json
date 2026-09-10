@@ -18,7 +18,9 @@
   "successorCandidate": {
     "sourceSha": "1e6a6ca3d259d0e5e644f716a2f71c6e0107efc4",
     "sourceTree": "d6e6857c9cd48d20db6000db02cbba3a00f26018",
-    "status": "I2_RECERTIFICATION_PENDING_PHYSICAL_PASS",
+    "status": "I2_PASS_I3_RECERTIFICATION_IN_PROGRESS",
+    "i2RunId": 34420740707,
+    "i2Conclusion": "success",
     "reason": "Aseguradoras provider tenant runtime resolver correction",
     "doesNotReopenUnaffectedLineage": true
   },
@@ -27,7 +29,11 @@
     "previewCallableReadbackRunId": 34410467076,
     "providerRefDiagnosticRunId": 34416486645,
     "backendProviderDiscriminantRunId": 34416753493,
-    "backendProviderDiscriminantConclusion": "DIRECT_BACKEND_PASS_WRAPPER_FAIL_SOURCE_DEFECT_PROVEN"
+    "backendProviderDiscriminantConclusion": "DIRECT_BACKEND_PASS_WRAPPER_FAIL_SOURCE_DEFECT_PROVEN",
+    "successorI2RunId": 34420740707,
+    "successorI2Conclusion": "success",
+    "mechanismCentralGuardRunId": 34420740721,
+    "mechanismCentralGuardConclusion": "success"
   },
   "semantics": {
     "EVIDENCE_IMPORT_PENDING_NO_REOPEN": "Existing evidence may exist and remains preserved; this ledger has not yet materialized it. This is not FAIL and does not authorize retest.",
@@ -45,8 +51,8 @@
     {"id":"CLIENTE360_PRIMARY_RUNTIME","lineageStatus":"FROZEN","previewAcceptance":{"status":"PARTIAL_PROBE_PASS_NOT_CLOSED","evidence":[{"runId":34410886776,"evidence":"authenticated role probe adjudicated pass; transient heartbeat classified validator-only"}]},"liveAcceptance":{"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}},
     {"id":"VEHICULOS_PRIMARY_RUNTIME","lineageStatus":"FROZEN","previewAcceptance":{"status":"EVIDENCE_IMPORT_PENDING_NO_REOPEN","evidence":[]},"liveAcceptance":{"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}},
     {"id":"CROSS_MODULE_RELATIONSHIPS","lineageStatus":"FROZEN","previewAcceptance":{"status":"EVIDENCE_IMPORT_PENDING_NO_REOPEN","evidence":[]},"liveAcceptance":{"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}},
-    {"id":"ASEGURADORAS_PRIMARY_RUNTIME","lineageStatus":"FROZEN","previewAcceptance":{"status":"BLOCKED_CAUSAL_RUNTIME_BOUNDARY","evidence":[{"runId":34410467076,"evidence":"isolated Preview callable active with exact readback; canonical production callable unchanged"},{"runId":34416486645,"evidence":"credentialRef valid and locally available, but secure provider reveal failed for all privileged roles"},{"runId":34416753493,"evidence":"same ref direct backend status/reveal PASS while secureResources wrapper reveal FAIL; frontend provider source defect proven"},{"sourceSha":"1e6a6ca3d259d0e5e644f716a2f71c6e0107efc4","evidence":"minimal successor created; I2/I3 recertification required before I4A resumes"}]},"liveAcceptance":{"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}},
-    {"id":"ASEGURADORAS_OPERATIONAL_DIRECTORY","lineageStatus":"FROZEN","previewAcceptance":{"status":"BLOCKED_CAUSAL_RUNTIME_BOUNDARY","evidence":[{"runId":34410886776,"evidence":"only remaining functional failure is privileged secure reveal; Asesor remains correctly restricted"},{"runId":34416753493,"evidence":"direct backend PASS isolates failure to provider tenant resolver"},{"sourceSha":"1e6a6ca3d259d0e5e644f716a2f71c6e0107efc4","evidence":"successor changes provider resolver plus I2 regression assertion only"}]},"liveAcceptance":{"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}},
+    {"id":"ASEGURADORAS_PRIMARY_RUNTIME","lineageStatus":"FROZEN","previewAcceptance":{"status":"BLOCKED_CAUSAL_RUNTIME_BOUNDARY","evidence":[{"runId":34410467076,"evidence":"isolated Preview callable active with exact readback; canonical production callable unchanged"},{"runId":34416486645,"evidence":"credentialRef valid and locally available, but secure provider reveal failed for all privileged roles"},{"runId":34416753493,"evidence":"same ref direct backend status/reveal PASS while secureResources wrapper reveal FAIL; frontend provider source defect proven"},{"sourceSha":"1e6a6ca3d259d0e5e644f716a2f71c6e0107efc4","runId":34420740707,"evidence":"minimal successor I2 source contract PASS; immutable I3 Preview recertification in progress"}]},"liveAcceptance":{"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}},
+    {"id":"ASEGURADORAS_OPERATIONAL_DIRECTORY","lineageStatus":"FROZEN","previewAcceptance":{"status":"BLOCKED_CAUSAL_RUNTIME_BOUNDARY","evidence":[{"runId":34410886776,"evidence":"only remaining functional failure is privileged secure reveal; Asesor remains correctly restricted"},{"runId":34416753493,"evidence":"direct backend PASS isolates failure to provider tenant resolver"},{"sourceSha":"1e6a6ca3d259d0e5e644f716a2f71c6e0107efc4","runId":34420740707,"evidence":"successor tenant-runtime regression and I2 source contract PASS; I3 pending"}]},"liveAcceptance":{"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}},
     {"id":"OPS_PRIMARY_RUNTIME","lineageStatus":"FROZEN","previewAcceptance":{"status":"EVIDENCE_IMPORT_PENDING_NO_REOPEN","evidence":[]},"liveAcceptance":{"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}},
     {"id":"LEADS_PRIMARY_RUNTIME","lineageStatus":"FROZEN","previewAcceptance":{"status":"EVIDENCE_IMPORT_PENDING_NO_REOPEN","evidence":[]},"liveAcceptance":{"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}},
     {"id":"POLIZAS_PRIMARY_RUNTIME","lineageStatus":"FROZEN","previewAcceptance":{"status":"PARTIAL_PROBE_PASS_NOT_CLOSED","evidence":[{"runId":34410886776,"evidence":"latest authenticated I4A probe passed all five tested roles; no synthetic policy-row source defect established"}]},"liveAcceptance":{"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}},

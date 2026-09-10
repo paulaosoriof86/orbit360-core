@@ -1,7 +1,7 @@
 {
   "schemaVersion": "gravicentra-control-plane-v2",
   "controlPlaneId": "GRAVICENTRA-INSURANCE-FASE-A",
-  "status": "I2_IN_PROGRESS",
+  "status": "I3_IN_PROGRESS",
   "productBrand": "Gravicentra Insurance",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -39,22 +39,24 @@
   },
   "gateState": {
     "lastFormallyCompletedIteration": 3,
-    "currentTransition": "I2_SUCCESSOR_RECERTIFICATION_AFTER_I4A_CAUSAL_SOURCE_DEFECT",
-    "nextFrozenIteration": "I2",
+    "currentTransition": "I3_SUCCESSOR_IMMUTABLE_PREVIEW_RECERTIFICATION",
+    "nextFrozenIteration": "I3",
     "gates": {
       "I0": {"status": "PASS"},
       "I1": {"status": "PASS", "capabilitiesBound": 15},
       "I2": {
-        "status": "IN_PROGRESS",
-        "previousCertifiedRunId": 34304799588,
-        "previousCertifiedSourceSha": "96f6962b8519a032c2f54b50d2796fa2545de1e4"
+        "status": "PASS_LATEST_CANDIDATE",
+        "latestRunId": 34420740707,
+        "sourceSha": "1e6a6ca3d259d0e5e644f716a2f71c6e0107efc4",
+        "conclusion": "success"
       },
       "I3": {
-        "status": "PREVIOUS_CANDIDATE_PASS_SUPERSEDED_PENDING_SUCCESSOR_RECERTIFICATION",
+        "status": "IN_PROGRESS",
         "previousRunId": 34307974287,
-        "previousConclusion": "success"
+        "previousConclusion": "success",
+        "successorSourceSha": "1e6a6ca3d259d0e5e644f716a2f71c6e0107efc4"
       },
-      "I4A": {"status": "BLOCKED_BY_SUCCESSOR_I2_I3_RECERTIFICATION"},
+      "I4A": {"status": "BLOCKED_BY_SUCCESSOR_I3_RECERTIFICATION"},
       "I4B": {"status": "PENDING"},
       "I5": {"status": "PENDING"},
       "I6": {"status": "HOLD_UNTIL_PRODUCTION_ACCEPTED"}
@@ -63,7 +65,7 @@
   "productionProgress": {
     "formalPercent": 57.1,
     "certifiedPhysicalPercent": 57.1,
-    "method": "7 frozen production gates I0,I1,I2,I3,I4A,I4B,I5; equal gate-completion accounting; prior I2/I3 physical certification remains evidence while successor recertification is in progress",
+    "method": "7 frozen production gates I0,I1,I2,I3,I4A,I4B,I5; equal gate-completion accounting; prior I3 physical certification remains evidence while successor I3 recertification is in progress",
     "iterationsRemaining": ["I4A", "I4B", "I5"]
   },
   "certifiedCandidate": {
@@ -100,6 +102,8 @@
     ],
     "lineageRediscoveryPerformed": false,
     "requiresI2I3Recertification": true,
+    "i2RunId": 34420740707,
+    "i2Conclusion": "success",
     "productionMutationAuthorized": false,
     "dataMutationAuthorized": false
   },
@@ -109,7 +113,7 @@
     "polizasFiveRolesProbePass": true,
     "cobrosFiveRolesProbePass": true,
     "aseguradoras": {
-      "status": "PRODUCT_SOURCE_DEFECT_PROVEN",
+      "status": "PRODUCT_SOURCE_DEFECT_PROVEN_SUCCESSOR_I2_PASS_I3_PENDING",
       "symptom": "ASEGURADORAS_PRIVILEGED_REF_MARKED_UNAVAILABLE",
       "privilegedRolesAffected": ["Dirección", "SuperAdmin", "AdminTenant", "Operativo"],
       "advisorCredentialRevealExpected": false,
@@ -125,7 +129,9 @@
       "canonicalTenantRuntimeFile": "orbit360-platform/core/product-tenant-runtime-context-bridge-p0.js",
       "canonicalTenantRuntimeExport": "Orbit.productTenantRuntimeContextP0",
       "productSourceChangeRequired": true,
-      "successorSourceSha": "1e6a6ca3d259d0e5e644f716a2f71c6e0107efc4"
+      "successorSourceSha": "1e6a6ca3d259d0e5e644f716a2f71c6e0107efc4",
+      "successorI2RunId": 34420740707,
+      "successorI2Conclusion": "success"
     }
   },
   "i4aPreviewInfrastructureBoundary": {
@@ -200,8 +206,12 @@
     "centralGuardBroadGravicentraWatch": true
   },
   "mechanismCorrection20260909": {
-    "status": "MATERIALIZED_PENDING_CENTRAL_GUARD_READBACK",
+    "status": "CENTRAL_GUARD_AND_I2_PHYSICAL_PASS_I3_RUNTIME_PROOF_PENDING",
     "rootCauseClass": "RELEASE_EXECUTOR_DESYNCHRONIZATION_RISK",
+    "centralGuardRunId": 34420740721,
+    "centralGuardConclusion": "success",
+    "i2RunId": 34420740707,
+    "i2Conclusion": "success",
     "fixes": [
       "I2 and I3 control checkouts use complete ancestry",
       "I2 and I3 execute from exact scoped non-authoritative intents with manual dispatch only as explicit escape",
@@ -217,6 +227,8 @@
     "lineageLockMaterialized": true,
     "controlPlaneMaterialized": true,
     "centralReleaseGuardConsumesOnlyControlPlane": true,
+    "centralGuardRunId": 34420740721,
+    "centralGuardConclusion": "success",
     "legacyStateAndReleaseLockDeprecated": true,
     "workflowReleaseHardcodesRemoved": true,
     "workflowFanoutRemoved": true,
@@ -229,8 +241,9 @@
     "capabilityStatusLedgerMaterialized": true,
     "frozenPlanSnapshotInterpretationAddendumMaterialized": true,
     "successorI2I3IntentMechanismMaterialized": true,
+    "successorI2PhysicalPass": true,
     "i3NextCandidateBindingMaterialized": true,
     "centralBroadWatchMaterialized": true
   },
-  "nextAction": "RUN_I2_SUCCESSOR_SOURCE_CONTRACT_VIA_SCOPED_INTENT_THEN_ADVANCE_ONLY_ON_PHYSICAL_PASS"
+  "nextAction": "RUN_I3_SUCCESSOR_IMMUTABLE_PREVIEW_VIA_SCOPED_INTENT_AND_VERIFY_EXACT_SOURCE_READBACK"
 }
