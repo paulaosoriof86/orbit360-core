@@ -19,7 +19,7 @@ function parseTransient(error) {
 
 need(fs.existsSync(input), 'I4A_AUTH_EVIDENCE_MISSING');
 const ev = JSON.parse(fs.readFileSync(input, 'utf8'));
-need(ev?.schemaVersion === 'gravicentra-i4a-authenticated-browser-v7-transverse-committed-harness', 'I4A_AUTH_SCHEMA_UNEXPECTED');
+need(ev?.schemaVersion === 'gravicentra-i4a-authenticated-browser-v8-targeted-credential-contract', 'I4A_AUTH_SCHEMA_UNEXPECTED');
 need(ev?.qaHarnessPatchedAtRuntime === false, 'I4A_AUTH_RUNTIME_PATCH_FORBIDDEN');
 need(ev?.productionTouched === false && ev?.dataTouched === false && ev?.writesExecuted === 0, 'I4A_AUTH_SIDE_EFFECT_BOUNDARY_BROKEN');
 
