@@ -1,12 +1,12 @@
 {
   "schemaVersion": "gravicentra-i3-execution-intent-v1",
-  "intentId": "I3-SUCCESSOR-ASEGURADORAS-TENANT-RUNTIME-20260909-R2",
+  "intentId": "I3-SUCCESSOR-ASEGURADORAS-CREDENTIAL-AUDIT-20260909",
   "nonAuthoritative": true,
   "gate": "I3",
   "branch": "recovery/fase-a-clean-20260831",
-  "sourceSha": "1e6a6ca3d259d0e5e644f716a2f71c6e0107efc4",
-  "sourceTree": "d6e6857c9cd48d20db6000db02cbba3a00f26018",
-  "reason": "Retry the same I2-passed successor after the executor-only Path.read_text correction; build once, deploy isolated Hosting Preview and require exact byte readback.",
+  "sourceSha": "10408e3d777ff8934b850c9f61d431dfed3afc2e",
+  "sourceTree": "8ce1857472f62e11c788031d57664ced2986b244",
+  "reason": "Build the I2-passed credential-audit/copy successor exactly once, deploy the immutable frontend bundle only to isolated Hosting Preview and require exact byte readback; preserve the previous certified candidate until physical I3 PASS.",
   "productionMutationAuthorized": false,
   "dataMutationAuthorized": false,
   "writesAuthorized": false
