@@ -4,7 +4,7 @@
    - No direct Firestore writes.
    - No LAB callable/provider reuse.
    - No secret persistence/cache/logging in browser.
-   - Backend callable remains authoritative for membership, role and vault.
+   - Backend callable remains authoritative for membership, role, vault and credential audit.
    - Preview channels use the isolated no-data-write callable; production uses canonical.
    ============================================================ */
 (function () {
@@ -12,7 +12,7 @@
   window.Orbit = window.Orbit || {};
   if (Orbit.productInsurerCredentialProviderP0) return;
 
-  const VERSION = 'gravicentra-product-insurer-credential-provider-p0-v3';
+  const VERSION = 'gravicentra-product-insurer-credential-provider-p0-v4';
   const PROD_CALLABLE = 'orbit360ProductInsurerCredentialCommand';
   const PROD_REGION = 'us-central1';
   const PREVIEW_CALLABLE = 'orbit360ProductInsurerCredentialCommandPreview';
@@ -143,11 +143,12 @@
     persistentSecrets:false,
     browserSecretCache:false,
     directFirestoreWrites:false,
+    serverAuditAuthoritative:true,
     status:function () {
       let secure = {};
       try { secure = Orbit.secureResources.selfTest ? Orbit.secureResources.selfTest() : {}; } catch (e) {}
       const endpoint = callableTarget();
-      return { version:VERSION, providerRegistered:secure.credentialProvider === true, callable:endpoint.callable, region:endpoint.region, preview:endpoint.preview, persistentSecrets:false, browserSecretCache:false, directFirestoreWrites:false };
+      return { version:VERSION, providerRegistered:secure.credentialProvider === true, callable:endpoint.callable, region:endpoint.region, preview:endpoint.preview, persistentSecrets:false, browserSecretCache:false, directFirestoreWrites:false, serverAuditAuthoritative:true };
     }
   });
 })();
