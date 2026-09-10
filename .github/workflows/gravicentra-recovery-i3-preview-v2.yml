@@ -154,7 +154,7 @@ jobs:
           APP_ID=$(python3 - <<'PY'
           import json,os
           from pathlib import Path
-          d=json.loads(Path(os.environ['APPS']).read()); a=d.get('result') if isinstance(d,dict) else None
+          d=json.loads(Path(os.environ['APPS']).read_text()); a=d.get('result') if isinstance(d,dict) else None
           if not isinstance(a,list): raise SystemExit('FIREBASE_WEB_APP_LIST_INVALID')
           web=[x for x in a if str(x.get('platform','')).upper() in ('WEB','PLATFORM_WEB','')]
           if len(web)!=1: raise SystemExit('FIREBASE_WEB_APP_CARDINALITY_NOT_ONE:'+str(len(web)))
