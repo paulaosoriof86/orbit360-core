@@ -18,8 +18,10 @@ const I3_INTENT='artifacts/orbit360-recovery/release-control/I3_EXECUTION_INTENT
 const I4A_INTENT='artifacts/orbit360-recovery/release-control/I4A_EXECUTION_INTENT.json';
 const CENTRAL='.github/workflows/gravicentra-release-lock-sync.yml';
 const HARNESS='tools/gravicentra-i4a-authenticated-browser-v2.mjs';
+const FREEZE='artifacts/orbit360-recovery/release-control/MECHANISM_FREEZE_V3_20260909.md';
+const FREEZE_VERSION='GRAVICENTRA_RECOVERY_MECHANISM_V3_20260909';
 
-for(const p of [CONTROL,STATE,LOCK,OLD_GUARD,NEW_GUARD,I2,I3,I4A,CENTRAL,HARNESS]) need(exists(p),'MECHANISM_REQUIRED_FILE_MISSING:'+p);
+for(const p of [CONTROL,STATE,LOCK,OLD_GUARD,NEW_GUARD,I2,I3,I4A,CENTRAL,HARNESS,FREEZE]) need(exists(p),'MECHANISM_REQUIRED_FILE_MISSING:'+p);
 const c=json(CONTROL);
 need(c.mechanismRules?.singleMutableAuthority==='THIS_FILE','MECHANISM_SINGLE_MUTABLE_AUTHORITY_NOT_DECLARED');
 need(c.mechanismRules?.hardcodedReleaseIdentityInWorkflowsForbidden===true,'MECHANISM_HARDCODE_RULE_NOT_DECLARED');
@@ -29,6 +31,21 @@ need(c.mechanismRules?.i2I3ScopedIntentExecution===true,'MECHANISM_I2_I3_SCOPED_
 need(c.mechanismRules?.completeAncestryForControlCheckouts===true,'MECHANISM_COMPLETE_ANCESTRY_RULE_NOT_DECLARED');
 need(c.mechanismRules?.i3MustConsumeNextCandidateDuringSuccessorLifecycle===true,'MECHANISM_I3_SUCCESSOR_RULE_NOT_DECLARED');
 need(c.mechanismRules?.centralGuardBroadGravicentraWatch===true,'MECHANISM_CENTRAL_BROAD_WATCH_RULE_NOT_DECLARED');
+
+const freeze=c.mechanismFreeze||{};
+need(freeze.version===FREEZE_VERSION,'MECHANISM_FREEZE_VERSION_DRIFT');
+need(freeze.status==='FROZEN','MECHANISM_NOT_FROZEN');
+need(freeze.reentryI2I3OnlyOnProvenProductSourceChange===true,'MECHANISM_REENTRY_RULE_NOT_FROZEN');
+need(freeze.executorFailureDoesNotAuthorizeReentry===true,'MECHANISM_EXECUTOR_FAILURE_REENTRY_FORBIDDEN_RULE_MISSING');
+need(freeze.qaFailureWithoutProductSourceChangeDoesNotAuthorizeReentry===true,'MECHANISM_QA_REENTRY_RULE_MISSING');
+need(freeze.documentationDriftDoesNotAuthorizeReentry===true,'MECHANISM_DOC_REENTRY_RULE_MISSING');
+need(freeze.conversationDoesNotAuthorizeReentry===true,'MECHANISM_CHAT_REENTRY_RULE_MISSING');
+need(freeze.unaffectedCapabilityEvidenceMustBePreserved===true,'MECHANISM_EVIDENCE_PRESERVATION_RULE_MISSING');
+need(freeze.newMethodologyOrIterationForbidden===true,'MECHANISM_PARALLEL_METHOD_RULE_MISSING');
+need(freeze.documentationPath===FREEZE,'MECHANISM_FREEZE_DOCUMENT_POINTER_DRIFT');
+const freezeText=read(FREEZE);
+need(freezeText.includes('Estado: `FROZEN`'),'MECHANISM_FREEZE_DOCUMENT_STATUS_MISSING');
+need(freezeText.includes('I2 e I3 solo pueden reactivarse después de I3 cuando exista un cambio real de source de producto'),'MECHANISM_FREEZE_DOCUMENT_REENTRY_RULE_MISSING');
 
 for(const p of [STATE,LOCK]){
   const d=json(p);
@@ -70,6 +87,7 @@ const guard=read(NEW_GUARD);
 need(guard.includes("const successorMode=MODE==='i2'||MODE==='i3'"),'CONTROL_GUARD_I3_SUCCESSOR_MODE_MISSING');
 need(guard.includes("? {SOURCE_SHA:String(N.sourceSha)}"),'CONTROL_GUARD_I3_NEXT_CANDIDATE_EXPORT_MISSING');
 need(guard.includes("['I2_IN_PROGRESS','I3_IN_PROGRESS'].includes(C.status)"),'CONTROL_GUARD_SUCCESSOR_LIFECYCLE_MISSING');
+need(guard.includes("need(N.sourceSha!==R.sourceSha,'SUCCESSOR_CANDIDATE_MUST_DIFFER_FROM_CERTIFIED')"),'CONTROL_GUARD_REENTRY_REQUIRES_NEW_SOURCE_MISSING');
 
 const i4a=read(I4A);
 need(i4a.includes('workflow_dispatch:'),'I4A_DISPATCH_TRIGGER_MISSING');
@@ -114,9 +132,12 @@ for(const name of gravicentraFiles){
 }
 
 console.log('GRAVICENTRA_MECHANISM_INVARIANT=PASS');
+console.log('MECHANISM_FREEZE_VERSION='+FREEZE_VERSION);
+console.log('MECHANISM_FREEZE_STATUS='+freeze.status);
 console.log('CANONICAL_MUTABLE_AUTHORITY='+CONTROL);
 console.log('I2_TRIGGER=SCOPED_NONAUTHORITATIVE_INTENT_OR_MANUAL_ESCAPE');
 console.log('I3_TRIGGER=SCOPED_NONAUTHORITATIVE_INTENT_OR_MANUAL_ESCAPE');
+console.log('I2_I3_REENTRY_REQUIRES_DIFFERENT_SOURCE=true');
 console.log('I3_SUCCESSOR_SOURCE=NEXT_CANDIDATE');
 console.log('CONTROL_CHECKOUT_ANCESTRY=COMPLETE');
 console.log('CENTRAL_GUARD_WATCH=BROAD_GRAVICENTRA');
