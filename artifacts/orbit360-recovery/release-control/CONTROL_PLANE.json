@@ -1,7 +1,7 @@
 {
   "schemaVersion": "gravicentra-control-plane-v2",
   "controlPlaneId": "GRAVICENTRA-INSURANCE-FASE-A",
-  "status": "I3_IN_PROGRESS",
+  "status": "I4A_IN_PROGRESS",
   "productBrand": "Gravicentra Insurance",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -39,28 +39,14 @@
   },
   "gateState": {
     "lastFormallyCompletedIteration": 3,
-    "currentTransition": "I3_SUCCESSOR_IMMUTABLE_PREVIEW_RECERTIFICATION_AFTER_CREDENTIAL_AUDIT_FIX",
-    "nextFrozenIteration": "I3",
+    "currentTransition": "I4A_LATEST_APPROVED_VERSION_PREVIEW_ACCEPTANCE_CREDENTIAL_AUDIT_SUCCESSOR",
+    "nextFrozenIteration": "I4A",
     "gates": {
       "I0": {"status": "PASS"},
       "I1": {"status": "PASS", "capabilitiesBound": 15},
-      "I2": {
-        "status": "PASS_LATEST_CANDIDATE",
-        "latestRunId": 34436885351,
-        "sourceSha": "10408e3d777ff8934b850c9f61d431dfed3afc2e",
-        "sourceTree": "8ce1857472f62e11c788031d57664ced2986b244",
-        "conclusion": "success"
-      },
-      "I3": {
-        "status": "IN_PROGRESS",
-        "previousRunId": 34423252469,
-        "previousConclusion": "success",
-        "successorSourceSha": "10408e3d777ff8934b850c9f61d431dfed3afc2e"
-      },
-      "I4A": {
-        "status": "BLOCKED_BY_SUCCESSOR_I3_RECERTIFICATION",
-        "failedRunId": 34430190710
-      },
+      "I2": {"status": "PASS_LATEST_CANDIDATE", "latestRunId": 34436885351, "sourceSha": "10408e3d777ff8934b850c9f61d431dfed3afc2e", "conclusion": "success"},
+      "I3": {"status": "PASS", "latestRunId": 34437131024, "conclusion": "success", "sourceSha": "10408e3d777ff8934b850c9f61d431dfed3afc2e", "artifactId": 10136593042, "readbackExact": true},
+      "I4A": {"status": "IN_PROGRESS", "previousAuthoritativeRunId": 34430190710},
       "I4B": {"status": "PENDING"},
       "I5": {"status": "PENDING"},
       "I6": {"status": "HOLD_UNTIL_PRODUCTION_ACCEPTED"}
@@ -69,27 +55,27 @@
   "productionProgress": {
     "formalPercent": 57.1,
     "certifiedPhysicalPercent": 57.1,
-    "method": "7 frozen production gates I0,I1,I2,I3,I4A,I4B,I5; equal gate-completion accounting; prior I3 physical certification remains evidence while successor I3 recertification is in progress",
+    "method": "7 frozen production gates I0,I1,I2,I3,I4A,I4B,I5; equal gate-completion accounting; 4 of 7 gates are physically certified on the current candidate",
     "iterationsRemaining": ["I4A", "I4B", "I5"]
   },
   "certifiedCandidate": {
-    "sourceSha": "1e6a6ca3d259d0e5e644f716a2f71c6e0107efc4",
-    "sourceTree": "d6e6857c9cd48d20db6000db02cbba3a00f26018",
-    "i3RunId": 34423252469,
+    "sourceSha": "10408e3d777ff8934b850c9f61d431dfed3afc2e",
+    "sourceTree": "8ce1857472f62e11c788031d57664ced2986b244",
+    "i3RunId": 34437131024,
     "i3Conclusion": "success",
-    "runnerCommit": "ded1a41b66717037961008293d30a79355e4f33a",
-    "buildId": "gi-i3-1e6a6ca3d259-57f234755dc1",
-    "artifactId": 10131707259,
-    "artifactName": "gravicentra-i3-34423252469",
-    "artifactArchiveDigest": "sha256:6a5975b3fd1e02332989fb91d4e723153b981af839d27227721a0bf2986a804f",
-    "previewChannelId": "gi-i3-34423252469",
-    "previewUrl": "https://ays-orbit-360-lab--gi-i3-34423252469-ybf4i1dw.web.app",
+    "runnerCommit": "49fb87ffad80d9326ff77a7fd1faa84a52d5ab6c",
+    "buildId": "gi-i3-10408e3d777f-57f234755dc1",
+    "artifactId": 10136593042,
+    "artifactName": "gravicentra-i3-34437131024",
+    "artifactArchiveDigest": "sha256:ed4be22c76957f6f232ff808b0fece428e48a727d0bb0370581260194d023729",
+    "previewChannelId": "gi-i3-34437131024",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i3-34437131024-v9pvtkbk.web.app",
     "hostedFileCount": 202,
-    "hostedPayloadDigest": "7c47fe1b87e4f6ee3cea571d406d60f4de14ea5fddd7cdec3867c01ab852eb37",
+    "hostedPayloadDigest": "7ec26a19486615a82b5acb579bf6c29a253a8980c129758c2e45e93e15af3650",
     "backendFileCount": 17,
     "backendSourceDigest": "b317ee5d6c7346bdb0abfa6bb71b5f246cd7647ed7272551065c2053f497f805",
     "bundleFileCount": 221,
-    "bundleDigest": "bf93f7824187b188a053a163158c799da5e407efd17320030faf55af5e39e3ab",
+    "bundleDigest": "925a484bedf5eda4d62766dc587c7a8d0c2f0d3dde81b1091c5e68026cae4fa6",
     "readbackExact": true,
     "readbackFileCount": 202,
     "sameFrontendArtifactPreviewToProductionRequired": true,
@@ -97,40 +83,19 @@
     "sourceMutatedAfterBuild": false
   },
   "supersededCertifiedCandidate": {
-    "sourceSha": "96f6962b8519a032c2f54b50d2796fa2545de1e4",
-    "i3RunId": 34307974287,
-    "buildId": "gi-i3-96f6962b8519-57f234755dc1",
-    "reasonSuperseded": "I4A causal Aseguradoras tenant-runtime source defect required a minimal successor and mandatory I2/I3 recertification."
+    "sourceSha": "1e6a6ca3d259d0e5e644f716a2f71c6e0107efc4",
+    "i3RunId": 34423252469,
+    "buildId": "gi-i3-1e6a6ca3d259-57f234755dc1",
+    "reasonSuperseded": "I4A run 34430190710 proved a credential client-audit durable-write path and copy/reveal semantic defect; minimal successor 10408e3d passed I2 and I3 exact readback."
   },
-  "nextCandidate": {
-    "sourceSha": "10408e3d777ff8934b850c9f61d431dfed3afc2e",
-    "sourceTree": "8ce1857472f62e11c788031d57664ced2986b244",
-    "reason": "I4A run 34430190710 proved a credential client-audit durable-write path while the credential callable already owns authoritative audit; the successor also routes secure copy through credential.copy and composes the corrected blobs in the canonical entrypoint.",
-    "rootCauseCode": "I4A_CREDENTIAL_CLIENT_AUDIT_DURABLE_WRITE_PATH",
-    "rootCauseEvidencePath": "artifacts/orbit360-recovery/release-control/I4A_ASEGURADORAS_UI_AUDIT_SIDE_EFFECT_ROOT_CAUSE_20260909.md",
-    "changeScope": [
-      "orbit360-platform/core/backend-resource-contracts.js",
-      "orbit360-platform/core/product-insurer-credential-provider-p0.js",
-      "orbit360-platform/core/client-insurer-operational-directory-owner-v20260722.js",
-      "orbit360-platform/index.html",
-      "tools/orbit360-recovery-i2-insurer-preview-backend-contract-test.mjs"
-    ],
-    "lineageRediscoveryPerformed": false,
-    "unaffectedCapabilityEvidencePreserved": true,
-    "requiresI2I3Recertification": true,
-    "i2RunId": 34436885351,
-    "i2Conclusion": "success",
-    "productionMutationAuthorized": false,
-    "dataMutationAuthorized": false,
-    "firebaseMutationAuthorized": false
-  },
+  "nextCandidate": null,
   "i4aCausalFindings": {
     "latestAuthoritativeRunId": 34430190710,
     "cliente360TransientThresholdClassifiedAsValidatorOnly": true,
     "polizasFiveRolesProbePass": true,
     "cobrosFiveRolesProbePass": true,
     "aseguradoras": {
-      "status": "PRODUCT_SOURCE_DEFECT_PROVEN_SUCCESSOR_I2_PASS_I3_PENDING",
+      "status": "SUCCESSOR_I3_PASS_I4A_RETEST_REQUIRED",
       "previousSymptom": "ASEGURADORAS_PRIVILEGED_REF_MARKED_UNAVAILABLE",
       "latestFailedRunId": 34430190710,
       "latestEvidenceArtifactId": 10134326528,
@@ -156,7 +121,10 @@
       "successorSourceTree": "8ce1857472f62e11c788031d57664ced2986b244",
       "successorI2RunId": 34436885351,
       "successorI2Conclusion": "success",
-      "nextRequiredProof": "I3 immutable build, isolated Preview and exact byte readback on successor source"
+      "successorI3RunId": 34437131024,
+      "successorI3Conclusion": "success",
+      "successorI3ArtifactId": 10136593042,
+      "nextRequiredProof": "I4A authenticated privileged-role reveal/copy and zero operational-write proof on successor Preview"
     }
   },
   "i4aPreviewInfrastructureBoundary": {
@@ -300,8 +268,11 @@
     "i3PackagePrepExecutorFixMaterialized": true,
     "i3ExecutorEvidenceMaterialized": true,
     "i3SuccessorPhysicalPass": true,
+    "latestCausalI3RunId": 34437131024,
+    "latestCausalI3Conclusion": "success",
+    "latestCausalI3ReadbackExact": true,
     "mechanismFrozen": true,
     "mechanismFreezeEnforced": true
   },
-  "nextAction": "RUN_I3_SUCCESSOR_IMMUTABLE_PREVIEW_VIA_SCOPED_INTENT_AND_VERIFY_EXACT_SOURCE_READBACK"
+  "nextAction": "CORRECT_COMMITTED_I4A_VALIDATOR_THEN_RUN_I4A_ON_CERTIFIED_SUCCESSOR_PREVIEW"
 }
