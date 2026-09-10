@@ -12,7 +12,7 @@
   window.Orbit = window.Orbit || {};
   if (Orbit.productInsurerCredentialProviderP0) return;
 
-  const VERSION = 'gravicentra-product-insurer-credential-provider-p0-v2';
+  const VERSION = 'gravicentra-product-insurer-credential-provider-p0-v3';
   const PROD_CALLABLE = 'orbit360ProductInsurerCredentialCommand';
   const PROD_REGION = 'us-central1';
   const PREVIEW_CALLABLE = 'orbit360ProductInsurerCredentialCommandPreview';
@@ -43,8 +43,9 @@
     }
     if (!id) {
       try {
-        const c = Orbit.productTenantRuntimeContextBridgeP0 && Orbit.productTenantRuntimeContextBridgeP0.context ? Orbit.productTenantRuntimeContextBridgeP0.context() : null;
-        id = text(c && (c.tenantId || c.tenant), 63);
+        const bridge = Orbit.productTenantRuntimeContextP0;
+        const c = bridge && typeof bridge.status === 'function' ? bridge.status() : null;
+        id = text(c && c.ready === true && c.tenantId, 63);
       } catch (e) {}
     }
     if (!/^[a-z0-9][a-z0-9-]{1,61}[a-z0-9]$/.test(id)) throw new Error('PRODUCT_TENANT_CONTEXT_UNAVAILABLE');

@@ -4,6 +4,7 @@ const read=p=>fs.readFileSync(p,'utf8');
 const need=(ok,code)=>{if(!ok)throw new Error(code);};
 const backend=read('functions/product-insurer-credentials.js');
 const provider=read('orbit360-platform/core/product-insurer-credential-provider-p0.js');
+const tenantRuntime=read('orbit360-platform/core/product-tenant-runtime-context-bridge-p0.js');
 
 need(backend.includes("const REGION='us-central1'"),'PROD_REGION_NOT_PINNED');
 need(backend.includes("const PREVIEW_REGION='us-east1'"),'PREVIEW_REGION_NOT_PINNED');
@@ -24,7 +25,17 @@ need(provider.includes("? { callable: PREVIEW_CALLABLE, region: PREVIEW_REGION, 
 need(provider.includes('runtime().callFunction(endpoint.callable') && provider.includes('}, endpoint.region);'),'PROVIDER_REGION_NOT_BOUND_TO_TARGET');
 need(provider.includes('directFirestoreWrites:false'),'BROWSER_DIRECT_WRITE_BOUNDARY_REGRESSED');
 
+// Regression: provider must consume the object actually exported by the authenticated tenant runtime bridge.
+need(tenantRuntime.includes('window.Orbit.productTenantRuntimeContextP0=Object.freeze'),'TENANT_RUNTIME_CANONICAL_EXPORT_MISSING');
+need(tenantRuntime.includes('status:status'),'TENANT_RUNTIME_STATUS_API_MISSING');
+need(provider.includes('Orbit.productTenantRuntimeContextP0'),'PROVIDER_CANONICAL_TENANT_RUNTIME_MISSING');
+need(provider.includes("typeof bridge.status === 'function' ? bridge.status() : null"),'PROVIDER_CANONICAL_TENANT_STATUS_NOT_USED');
+need(provider.includes('c && c.ready === true && c.tenantId'),'PROVIDER_TENANT_READY_CONTEXT_NOT_REQUIRED');
+need(!provider.includes('productTenantRuntimeContextBridgeP0'),'PROVIDER_STALE_NONEXISTENT_TENANT_SYMBOL_REINTRODUCED');
+need(!provider.includes('window.location.search')&&!provider.includes('URLSearchParams'),'PROVIDER_URL_TENANT_FALLBACK_FORBIDDEN');
+
 console.log('GRAVICENTRA_I2_INSURER_PREVIEW_BACKEND_CONTRACT=PASS');
 console.log('PREVIEW_BACKEND=orbit360ProductInsurerCredentialCommandPreview@us-east1');
 console.log('PRODUCTION_BACKEND=orbit360ProductInsurerCredentialCommand@us-central1');
+console.log('TENANT_RUNTIME=Orbit.productTenantRuntimeContextP0.status');
 console.log('PREVIEW_OPERATIONAL_WRITES=false');
