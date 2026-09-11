@@ -26,7 +26,7 @@
   },
   "latestObservedAuthoritativeRunId": 34548315048,
   "stateSealPending": true,
-  "stateSealPendingReason": "CAPABILITY_MATRIX_RECONCILIATION_REQUIRED_BEFORE_I4A_GATE_SEAL",
+  "stateSealPendingReason": "PERSISTENCE_RELOAD_READMODELS_AND_CAPABILITY_MATRIX_RECONCILIATION_REQUIRED_BEFORE_I4A_GATE_SEAL",
   "proofs": [
     {
       "status": "PASS",
@@ -135,8 +135,14 @@
     {
       "status": "OPEN",
       "contractVersion": "I4A_CAPABILITY_MATRIX_RECONCILIATION_V1",
-      "reason": "Reconcile the 15 capability acceptance contracts from sealed same-release evidence before atomic I4A gate seal. This proof is documentary/evidence adjudication only and does not authorize browser reruns or product changes.",
+      "reason": "Reconcile the 15 capability acceptance contracts from sealed same-release evidence before atomic I4A gate seal. This proof remains open until the targeted persistence/reload read-model proof closes the only evidence gap identified by the frozen matrix precheck.",
       "proofId": "CAPABILITY_MATRIX_RECONCILIATION"
+    },
+    {
+      "status": "OPEN",
+      "contractVersion": "I4A_PERSISTENCE_RELOAD_READMODELS_V1",
+      "reason": "Frozen matrix precheck found that current same-release evidence proves UI/scopes/actions/write-contract boundaries but does not yet physically prove persisted record identity survives route reload for Cliente360/Vehiculos, Ops/Leads shared records, Polizas golden invariant and financial read-models. This proof is read-only and performs zero operational writes; actual mutation before/after remains reserved for I5.",
+      "proofId": "PERSISTENCE_RELOAD_READMODELS"
     }
   ],
   "causalInvalidations": []
