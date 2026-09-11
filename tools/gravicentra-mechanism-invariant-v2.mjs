@@ -9,6 +9,7 @@ const cp=json(`${root}/CONTROL_PLANE.json`);
 const reg=json(`${root}/I4A_PROOF_REGISTRY.json`);
 const freeze=read(`${root}/MECHANISM_FREEZE_V4_20260910.md`);
 const central=read('.github/workflows/gravicentra-release-lock-sync.yml');
+const canonicalPreflight='tools/gravicentra-governance-preflight-v1.mjs';
 
 const executors={
   I2:'.github/workflows/gravicentra-recovery-i2-source-contract.yml',
@@ -28,6 +29,7 @@ need(freeze.includes('Estado: `FROZEN`')&&freeze.includes('PASS es monotónico')
 need(reg.schemaVersion==='gravicentra-i4a-proof-registry-v1','V5_REGISTRY_SCHEMA_INVALID');
 need(reg.authorityType==='DERIVED_MONOTONIC_EVIDENCE_REGISTRY'&&reg.mayGovernGate===false&&reg.mayGovernReleaseIdentity===false,'V5_REGISTRY_AUTHORITY_LEAK');
 for(const k of ['passIsMonotonicWithinRelease','passReexecutionForbiddenWithoutCausalInvalidation','validatorFailureCannotInvalidatePriorPass','qaOnlyChangeCannotInvalidatePriorPass','conversationCannotInvalidatePriorPass','causalInvalidationRequiresProductSourceDelta','openProofsOnlyExecution','gateSealRequiresAtomicControlPlaneLedgerRegistryCommit']) need(reg.policy?.[k]===true,'V5_POLICY_MISSING:'+k);
+need(exists(canonicalPreflight),'V5_CANONICAL_PREFLIGHT_MISSING');
 
 for(const gate of ['I2','I3','I4A']) need(exists(executors[gate]),'V5_EXECUTOR_MISSING:'+gate);
 const i2=read(executors.I2), i3=read(executors.I3), i4a=read(executors.I4A);
@@ -42,7 +44,7 @@ if(activeGate){
   const p=executors[activeGate];
   need(exists(p),'V5_ACTIVE_GATE_EXECUTOR_MISSING:'+activeGate+':'+p);
   const wf=read(p);
-  need(wf.includes('gravicentra-control-plane-guard-v2.mjs --mode='+activeGate.toLowerCase()),'V5_ACTIVE_GATE_NOT_STATE_GATED:'+activeGate);
+  need(wf.includes(`gravicentra-governance-preflight-v1.mjs --mode=${activeGate.toLowerCase()}`),'V5_ACTIVE_GATE_CANONICAL_PREFLIGHT_MISSING:'+activeGate);
   need(wf.includes('fetch-depth: 0'),'V5_ACTIVE_GATE_SHALLOW_CHECKOUT:'+activeGate);
   if(activeGate==='I4B'){
     for(const marker of ['I4B_IN_PROGRESS','gravicentra-i4b-transversal-v1.mjs','productionTouched','dataTouched','writesExecuted']) need(wf.includes(marker),'V5_I4B_EXECUTOR_MARKER_MISSING:'+marker);
@@ -62,16 +64,17 @@ for(const gate of ['i2','i3','i4a','i4b','i5']){
   if(gate==='i5'&&activeGate==='I5') need(candidates.length===1&&candidates[0]==='gravicentra-recovery-i5-production.yml','V5_PARALLEL_I5_EXECUTOR:'+candidates.join(','));
 }
 
-for(const marker of ['Gravicentra Control Plane Guard v4','gravicentra-i4a-proof-registry-guard-v1.mjs']) need(central.includes(marker),'V5_CENTRAL_GUARD_MISSING:'+marker);
-need(central.includes('gravicentra-mechanism-invariant-v1.mjs')||central.includes('gravicentra-mechanism-invariant-v2.mjs'),'V5_CENTRAL_INVARIANT_MISSING');
+need(central.includes('Gravicentra Control Plane Guard v5'),'V5_CENTRAL_GUARD_VERSION_MISSING');
+need(central.includes('gravicentra-governance-preflight-v1.mjs --mode=governance'),'V5_CENTRAL_CANONICAL_PREFLIGHT_MISSING');
 
 const next=cp.gateState?.nextFrozenIteration||'';
 need(!activeGate||next===activeGate,'V5_CONTROL_GATE_EXECUTOR_GATE_DIVERGENCE:'+String(activeGate)+':'+String(next));
 
 console.log('GRAVICENTRA_MECHANISM_INVARIANT=PASS');
-console.log('MECHANISM_INVARIANT_VERSION=V2');
+console.log('MECHANISM_INVARIANT_VERSION=V2_CANONICAL_PREFLIGHT');
 console.log('ACTIVE_GATE='+(activeGate||'NONE'));
 console.log('ACTIVE_EXECUTOR='+(activeGate?executors[activeGate]:'NONE'));
+console.log('CANONICAL_PREFLIGHT='+canonicalPreflight);
 console.log('CONTROL_NEXT_FROZEN_ITERATION='+next);
 console.log('PRODUCT_SOURCE_MUTATION=false');
 console.log('PRODUCTION_TOUCHED=false');

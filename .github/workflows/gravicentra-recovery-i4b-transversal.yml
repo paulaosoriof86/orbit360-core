@@ -32,13 +32,13 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Fail closed on I4B authority and executor invariant
+      - name: Fail closed on canonical governance plus I4B authority on the same HEAD
         run: |
           set -euo pipefail
           test "$GITHUB_REF_NAME" = "recovery/fase-a-clean-20260831"
           test "$(jq -r '.status' artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json)" = "I4B_IN_PROGRESS"
-          node tools/gravicentra-mechanism-invariant-v2.mjs
-          node tools/gravicentra-control-plane-guard-v2.mjs --mode=i4b
+          node --check tools/gravicentra-governance-preflight-v1.mjs
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i4b
           node --check tools/gravicentra-i4b-transversal-v1.mjs
 
       - name: Install I4B browser dependencies

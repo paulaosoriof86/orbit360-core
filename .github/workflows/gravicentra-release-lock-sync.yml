@@ -1,4 +1,4 @@
-name: Gravicentra Control Plane Guard v4
+name: Gravicentra Control Plane Guard v5
 
 on:
   workflow_dispatch:
@@ -15,7 +15,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: gravicentra-control-plane-v4-${{ github.ref }}
+  group: gravicentra-control-plane-v5-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -32,34 +32,25 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Fail closed on canonical authority, monotonic evidence, mechanism or documentation desynchronization
+      - name: Fail closed through canonical shared governance preflight
         run: |
           set -euo pipefail
           test "$GITHUB_REF_NAME" = "recovery/fase-a-clean-20260831"
-          node --check tools/gravicentra-control-plane-guard-v2.mjs
-          node --check tools/gravicentra-mechanism-invariant-v2.mjs
-          node --check tools/gravicentra-evergreen-sources-invariant-v1.mjs
-          node --check tools/gravicentra-i4a-proof-registry-guard-v1.mjs
-          node --check tools/gravicentra-i4a-preview-function-remediation-guard-v1.mjs
-          node --check tools/gravicentra-i4a-preview-remediation-invariant-v1.mjs
-          node tools/gravicentra-control-plane-guard-v2.mjs --mode=governance
-          node tools/gravicentra-i4a-proof-registry-guard-v1.mjs
-          node tools/gravicentra-mechanism-invariant-v2.mjs
-          node tools/gravicentra-evergreen-sources-invariant-v1.mjs
-          node tools/gravicentra-i4a-preview-remediation-invariant-v1.mjs
-          git diff --exit-code
+          node --check tools/gravicentra-governance-preflight-v1.mjs
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=governance
           {
-            echo '## Gravicentra Insurance — canonical control plane v4'
+            echo '## Gravicentra Insurance — canonical control plane v5'
             echo '- Mutable operational authority: `CONTROL_PLANE.json` only'
+            echo '- Canonical governance preflight: `tools/gravicentra-governance-preflight-v1.mjs`'
+            echo '- Central guard and active gate executor consume the SAME preflight on the SAME HEAD'
             echo '- Approved lineage authority: `CAPABILITY_LINEAGE_LOCK.json`'
             echo '- Capability status: derived ledger, release-bound, non-authoritative for gate/release identity'
             echo '- Active gate MUST have one physical state-gated executor before the Control Plane can remain valid'
-            echo '- Gate transition and execution plane are now mechanically coupled for I2/I3/I4A/I4B/I5'
+            echo '- Gate transition and execution plane are mechanically coupled for the active gate'
             echo '- I4A proof registry: derived monotonic receipts; cannot govern gate/release identity'
             echo '- PASS evidence: monotonic within the certified release; causal source delta required to invalidate'
             echo '- I4A execution: `OPEN_PROOFS_ONLY`; sealed PASS proofs cannot be rerun accidentally'
-            echo '- I4A gate seal: atomic Control Plane + capability ledger + proof registry commit'
-            echo '- Frozen plan: `PLAN_TRABAJO_CONGELADO_V2.md` + evergreen interpretation addendum'
+            echo '- I4A gate seal: historical atomic Control Plane + capability ledger + proof registry commit'
             echo '- Evidence accumulation freeze: `MECHANISM_FREEZE_V4_20260910.md`'
             echo '- Project Sources: active evergreen V3 manifest + Git blob integrity enforced'
             echo '- I2/I3 re-entry: only on proven product source change'
