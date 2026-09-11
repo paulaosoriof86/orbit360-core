@@ -13,7 +13,7 @@ const central=read('.github/workflows/gravicentra-release-lock-sync.yml');
 need(cp.mechanismRules?.singleMutableAuthority==='THIS_FILE','V4_SINGLE_AUTHORITY_MISSING');
 need(cp.mechanismFreeze?.status==='FROZEN','V4_V3_BASE_NOT_FROZEN');
 need(cp.mechanismFreeze?.reentryI2I3OnlyOnProvenProductSourceChange===true,'V4_I2I3_REENTRY_RULE_MISSING');
-need(freeze.includes('Estado: `FROZEN`')&&freeze.includes('PASS es monotónico')&&freeze.includes('OPEN_PROOFS_ONLY')&&freeze.includes('commit atómico'),'V4_FREEZE_CONTRACT_MISSING');
+need(freeze.includes('Estado: `FROZEN`')&&freeze.includes('PASS es monotónico')&&freeze.includes('executionScope.proofIds')&&freeze.includes('commit atómico'),'V4_FREEZE_CONTRACT_MISSING');
 need(reg.schemaVersion==='gravicentra-i4a-proof-registry-v1','V4_REGISTRY_SCHEMA_INVALID');
 need(reg.authorityType==='DERIVED_MONOTONIC_EVIDENCE_REGISTRY'&&reg.mayGovernGate===false&&reg.mayGovernReleaseIdentity===false,'V4_REGISTRY_AUTHORITY_LEAK');
 for(const k of ['passIsMonotonicWithinRelease','passReexecutionForbiddenWithoutCausalInvalidation','validatorFailureCannotInvalidatePriorPass','qaOnlyChangeCannotInvalidatePriorPass','conversationCannotInvalidatePriorPass','causalInvalidationRequiresProductSourceDelta','openProofsOnlyExecution','gateSealRequiresAtomicControlPlaneLedgerRegistryCommit']) need(reg.policy?.[k]===true,'V4_POLICY_MISSING:'+k);
