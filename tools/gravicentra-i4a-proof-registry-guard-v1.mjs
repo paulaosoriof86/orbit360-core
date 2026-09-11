@@ -131,7 +131,10 @@ function findHistoricalI4ASealCommit(){
       const cur=JSON.parse(execFileSync('git',['show',`${h}:${CONTROL}`],{encoding:'utf8'}));
       if(cur?.gateState?.gates?.I4A?.status!=='PASS')continue;
       let prevStatus='MISSING';
-      try{const prev=JSON.parse(execFileSync('git',['show',`${h}^:${CONTROL}`],{encoding:'utf8',stdio:['ignore','pipe','ignore']});prevStatus=prev?.gateState?.gates?.I4A?.status||'MISSING';}catch{}
+      try{
+        const prev=JSON.parse(execFileSync('git',['show',`${h}^:${CONTROL}`],{encoding:'utf8',stdio:['ignore','pipe','ignore']}));
+        prevStatus=prev?.gateState?.gates?.I4A?.status||'MISSING';
+      }catch{}
       if(prevStatus!=='PASS')return h;
     }catch{}
   }
