@@ -1,7 +1,7 @@
 {
   "schemaVersion": "gravicentra-control-plane-v2",
   "controlPlaneId": "GRAVICENTRA-INSURANCE-FASE-A",
-  "status": "I4A_IN_PROGRESS",
+  "status": "I2_IN_PROGRESS",
   "productBrand": "Gravicentra Insurance",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -39,14 +39,14 @@
   },
   "gateState": {
     "lastFormallyCompletedIteration": 3,
-    "currentTransition": "I4A_LOGIN_SESSION_RELOAD_SUCCESSOR_PREVIEW_ACCEPTANCE",
-    "nextFrozenIteration": "I4A",
+    "currentTransition": "I2_NEGOCIOS_LEADS_POLICY_SUCCESSOR_RECERTIFICATION",
+    "nextFrozenIteration": "I2",
     "gates": {
       "I0": {"status": "PASS"},
       "I1": {"status": "PASS", "capabilitiesBound": 15},
-      "I2": {"status": "PASS_LATEST_CANDIDATE", "latestRunId": 34545028278, "sourceSha": "73674c5f0a0b28ed5b0df65e0c6e182345851375", "conclusion": "success"},
+      "I2": {"status": "IN_PROGRESS", "previousRunId": 34545028278, "previousSourceSha": "73674c5f0a0b28ed5b0df65e0c6e182345851375", "reason": "I4A run 34555949312 proved that authoritative Firestore contains a negocio while the certified Preview never server-confirms negocios. The certified effective tenant policy has no negocios collection mapping, so the product query planner fail-closes the deferred collection before hydration."},
       "I3": {"status": "PASS", "latestRunId": 34545182877, "conclusion": "success", "sourceSha": "73674c5f0a0b28ed5b0df65e0c6e182345851375", "artifactId": 10178773368, "readbackExact": true},
-      "I4A": {"status": "IN_PROGRESS", "previousAuthoritativeRunId": 34430190710, "latestAuthoritativeRunId": 34543599232, "nextRequiredProof": "LOGIN_SESSION_RELOAD_ON_CERTIFIED_SUCCESSOR_PREVIEW"},
+      "I4A": {"status": "IN_PROGRESS", "previousAuthoritativeRunId": 34430190710, "latestAuthoritativeRunId": 34555949312, "blockedBy": "NEGOCIOS_LEADS_POLICY_SUCCESSOR_RECERTIFICATION", "nextRequiredProof": "PERSISTENCE_RELOAD_READMODELS_LEADS_ON_CERTIFIED_SUCCESSOR_PREVIEW"},
       "I4B": {"status": "PENDING"},
       "I5": {"status": "PENDING"},
       "I6": {"status": "HOLD_UNTIL_PRODUCTION_ACCEPTED"}
@@ -55,7 +55,7 @@
   "productionProgress": {
     "formalPercent": 57.1,
     "certifiedPhysicalPercent": 57.1,
-    "method": "7 frozen production gates I0,I1,I2,I3,I4A,I4B,I5; equal gate-completion accounting; 4 of 7 gates are physically certified on the current candidate",
+    "method": "7 frozen production gates I0,I1,I2,I3,I4A,I4B,I5; equal gate-completion accounting; 4 of 7 gates remain physically certified on the current certified candidate while the causal negocios/Leads policy successor is recertified through I2/I3",
     "iterationsRemaining": ["I4A", "I4B", "I5"]
   },
   "certifiedCandidate": {
@@ -88,14 +88,24 @@
     "buildId": "gi-i3-10408e3d777f-57f234755dc1",
     "reasonSuperseded": "I4A run 34543599232 reproduced the frozen Login sign-in/session/reload contract failure across all five roles; minimal Auth/Firebase-persistence successor 73674c5f passed I2 and I3 exact readback."
   },
-  "nextCandidate": null,
+  "nextCandidate": {
+    "sourceSha": "16f174d087024085eff18079c486f717ef98d691",
+    "sourceTree": "2300811d98dc047f4ffe4c0ec16b0452da3ed01a",
+    "parentCertifiedSourceSha": "73674c5f0a0b28ed5b0df65e0c6e182345851375",
+    "causalRunId": 34555949312,
+    "cause": "NEGOCIOS_COLLECTION_POLICY_MISSING_FROM_EFFECTIVE_PRODUCT_ACCESS",
+    "allowedProductFiles": ["orbit360-platform/core/tenant-access-policy-effective-p0.js"],
+    "doesNotReopenUnaffectedCapabilityEvidence": true,
+    "productionMutationAuthorized": false,
+    "dataMutationAuthorized": false
+  },
   "i4aCausalFindings": {
-    "latestAuthoritativeRunId": 34543599232,
+    "latestAuthoritativeRunId": 34555949312,
     "cliente360TransientThresholdClassifiedAsValidatorOnly": true,
     "polizasFiveRolesProbePass": true,
     "cobrosFiveRolesProbePass": true,
     "loginSessionReload": {
-      "status": "SUCCESSOR_I3_PASS_I4A_RETEST_REQUIRED",
+      "status": "SUCCESSOR_I3_PASS_I4A_PROOF_PRESERVED",
       "failedRunId": 34543599232,
       "failureCode": "RESIDUAL_FIREBASE_SESSION_NOT_PERSISTED",
       "rolesAffected": ["Dirección", "SuperAdmin", "AdminTenant", "Operativo", "Asesor"],
@@ -117,10 +127,30 @@
       "successorBuildId": "gi-i3-73674c5f0a0b-57f234755dc1",
       "successorPreviewUrl": "https://ays-orbit-360-lab--gi-i3-34545182877-03clhzs0.web.app",
       "successorHostedPayloadDigest": "e2ffb1c440e1d17c76005979846ba8aa1757fc4056985f1f1dfe409f17180b70",
-      "nextRequiredProof": "I4A physical sign-in/session/reload on exact successor Preview across required roles"
+      "nextRequiredProof": "Preserve physical Login session/reload proof; no causal reopening by negocios policy successor"
+    },
+    "leadsPersistenceReload": {
+      "status": "SOURCE_SUCCESSOR_REQUIRED_I2_I3",
+      "failedRunId": 34555949312,
+      "failureCode": "PERSISTENCE_STAGE_TIMEOUT_LEADS_NEGOCIOS_NOT_SERVER_CONFIRMED",
+      "contractRequirement": "Leads and Ops project the same negocio by canonical stage; persistence/reload must preserve authoritative read-models",
+      "directAuthorityNegociosCount": 1,
+      "directAuthorityGestionesCount": 1,
+      "certifiedPreviewNegociosCount": 0,
+      "certifiedPreviewGestionesCount": 1,
+      "rootCause": "The certified base access policy has no negocios collection mapping. Effective product queryConstraints therefore returns an invalid collection policy to the product query planner, which fail-closes negocios before Firestore attachment. negocios is deferred/optional, so requiredMissing and requiredFailed remain empty while Leads stays empty.",
+      "successorSourceSha": "16f174d087024085eff18079c486f717ef98d691",
+      "successorSourceTree": "2300811d98dc047f4ffe4c0ec16b0452da3ed01a",
+      "filesChanged": ["orbit360-platform/core/tenant-access-policy-effective-p0.js"],
+      "policyAdded": {"collection": "negocios", "module": "leads", "scoped": true, "advisorRead": true, "advisorWrite": false},
+      "unaffectedEvidencePreserved": true,
+      "productionTouched": false,
+      "dataTouched": false,
+      "writesExecuted": 0,
+      "nextRequiredProof": "I2 exact source contract then I3 immutable Preview exact readback then return only to the Leads persistence/reload residual in I4A"
     },
     "aseguradoras": {
-      "status": "I4A_TARGETED_ROLE_PROOF_PRESERVED_UNAFFECTED_BY_AUTH_SUCCESSOR",
+      "status": "I4A_TARGETED_ROLE_PROOF_PRESERVED_UNAFFECTED_BY_POLICY_SUCCESSOR",
       "previousSymptom": "ASEGURADORAS_PRIVILEGED_REF_MARKED_UNAVAILABLE",
       "latestFailedRunId": 34430190710,
       "latestTargetedPassRunId": 34543599232,
@@ -145,8 +175,8 @@
       "previousSuccessorSourceSha": "10408e3d777ff8934b850c9f61d431dfed3afc2e",
       "previousSuccessorI2RunId": 34436885351,
       "previousSuccessorI3RunId": 34437131024,
-      "preservationReason": "The Login successor changes only the Firebase browser provider and Auth session owner; Aseguradoras credential provider, directory owners, callable backend package and backend digest are unchanged.",
-      "nextRequiredProof": "No causal Aseguradoras reopening; preserve targeted role evidence while I4A executor validates the certified successor as a whole."
+      "preservationReason": "The negocios successor changes only the effective collection-policy override for negocios; Aseguradoras credential provider, directory owners, bank-account override, callable backend package and backend digest are unchanged.",
+      "nextRequiredProof": "No causal Aseguradoras reopening; preserve targeted role evidence."
     }
   },
   "i4aPreviewInfrastructureBoundary": {
@@ -296,5 +326,5 @@
     "mechanismFrozen": true,
     "mechanismFreezeEnforced": true
   },
-  "nextAction": "RUN_I4A_ON_CERTIFIED_LOGIN_SESSION_RELOAD_SUCCESSOR_PREVIEW"
+  "nextAction": "RUN_I2_ON_NEGOCIOS_LEADS_POLICY_SUCCESSOR_THEN_I3_SAME_SOURCE"
 }
