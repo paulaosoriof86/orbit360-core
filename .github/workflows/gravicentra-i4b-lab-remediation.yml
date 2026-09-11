@@ -1,0 +1,88 @@
+name: Gravicentra I4B LAB Residue Remediation
+
+on:
+  push:
+    branches:
+      - recovery/fase-a-clean-20260831
+    paths:
+      - .github/workflows/gravicentra-i4b-lab-remediation.yml
+      - tools/gravicentra-i4b-lab-remediation-v1.mjs
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gravicentra-i4b-lab-remediation-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  remediate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - name: Checkout authoritative Recovery tree
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Fail closed on I4B authority and remediation syntax
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "recovery/fase-a-clean-20260831"
+          test "$(jq -r '.status' artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json)" = "I4B_IN_PROGRESS"
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i4b
+          node --check tools/gravicentra-i4b-lab-remediation-v1.mjs
+
+      - name: Install Firebase Admin only
+        run: npm install --no-save --package-lock=false firebase-admin@13.10.0 >/dev/null
+
+      - id: remediation
+        name: Inventory, backup, delete exact LAB residues, verify, auto-rollback on failure
+        env:
+          I4B_REMEDIATION_EVIDENCE_DIR: ${{ runner.temp }}/gravicentra-i4b-remediation
+          SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+          SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+        run: |
+          set +e
+          mkdir -p "$I4B_REMEDIATION_EVIDENCE_DIR"
+          node tools/gravicentra-i4b-lab-remediation-v1.mjs
+          RC=$?
+          set -e
+          echo "remediation_rc=$RC" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Preserve before-after-remediation evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i4b-lab-remediation-${{ github.run_id }}
+          path: ${{ runner.temp }}/gravicentra-i4b-remediation
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Adjudicate exact remediation
+        if: always()
+        env:
+          EVIDENCE: ${{ runner.temp }}/gravicentra-i4b-remediation/i4b-lab-remediation-v1.json
+        run: |
+          set -euo pipefail
+          test -f "$EVIDENCE"
+          test "$(jq -r '.schemaVersion' "$EVIDENCE")" = "gravicentra-i4b-lab-remediation-v1"
+          test "$(jq -r '.gate' "$EVIDENCE")" = "I4B"
+          test "$(jq -r '.status' "$EVIDENCE")" = "PASS"
+          test "$(jq -r '.productionHostingTouched' "$EVIDENCE")" = "false"
+          test "$(jq -r '.before | length' "$EVIDENCE")" = "4"
+          test "$(jq -r '.deleted | length' "$EVIDENCE")" = "4"
+          test "$(jq -r '.writesExecuted' "$EVIDENCE")" = "4"
+          test "$(jq -r '.dataTouched' "$EVIDENCE")" = "true"
+          test "$(jq -r '.rollbackExecuted' "$EVIDENCE")" = "false"
+          test "$(jq -r '[.after[] | select(.exists==true)] | length' "$EVIDENCE")" = "0"
+          echo I4B_LAB_REMEDIATION=PHYSICAL_PASS
