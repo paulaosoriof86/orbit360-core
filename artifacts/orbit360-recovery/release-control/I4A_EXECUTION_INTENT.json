@@ -1,13 +1,28 @@
 {
-  "schemaVersion": "gravicentra-execution-intent-v1",
-  "requestId": "I4A-AUTHORITATIVE-20260910-017-CAUSAL-RELOAD-CLOSURE",
+  "schemaVersion": "gravicentra-execution-intent-v2",
+  "requestId": "I4A-20260910-018-PERSISTENCE-RELOAD-READMODELS-ONLY",
   "nonAuthoritative": true,
   "gate": "I4A",
   "controlPlaneStatusExpected": "I4A_IN_PROGRESS",
   "certifiedSourceSha": "73674c5f0a0b28ed5b0df65e0c6e182345851375",
   "buildId": "gi-i3-73674c5f0a0b-57f234755dc1",
   "previewUrl": "https://ays-orbit-360-lab--gi-i3-34545182877-03clhzs0.web.app",
-  "purpose": "Close only the proven remaining I4A Login/session/reload residual on the exact same certified source, build and Preview. Preserve the same-release successful capability checks already collected in authoritative run 34545473273. Re-execute authenticated_session_reload for Direccion, SuperAdmin, AdminTenant, Operativo and Asesor using a synchronous Playwright readiness predicate with a 23000 ms observation bound, longer than the product bootstrap internal 20000 ms snapshot bound, and without manually invoking product activation after reload. No product source change is authorized; I2/I3 re-entry is forbidden for this QA-only correction. Production, backend package, operational data and writes remain unchanged and writes expected are zero. A genuine reproducible product failure must fail closed; a PASS may close I4A only after evidence, ledger/control-plane synchronization and post-guard all agree.",
+  "purpose": "Execute only the read-only persistence/reload proof identified by the frozen capability-matrix precheck. Verify persisted record identity and canonical relationships survive natural route reload for Cliente360/Vehiculos, the same Ops/Leads business record, Polizas golden AUTO39012, and Recibos/Cartera/Cobros read-models on the exact certified Preview. Preserve every sealed PASS. Perform zero operational writes, no product mutation, no production mutation and no data mutation. Actual controlled mutation before/after remains reserved for I5.",
+  "executionScope": {
+    "mode": "OPEN_PROOFS_ONLY",
+    "proofIds": ["PERSISTENCE_RELOAD_READMODELS"],
+    "preserveProofIds": [
+      "PUBLIC_PREVIEW_SMOKE",
+      "BOOTSTRAP_HYDRATION",
+      "RUNTIME_BOUNDARY",
+      "ASEGURADORAS_TARGETED_ROLE_UI",
+      "AUTHENTICATED_MODULE_ADJUDICATED",
+      "LOGIN_SESSION_RELOAD"
+    ]
+  },
+  "productSourceMutationAuthorized": false,
   "productionMutationAuthorized": false,
-  "operationalDataWritesAuthorized": false
+  "operationalDataWritesAuthorized": false,
+  "dataMutationAuthorized": false,
+  "gatePassClaimed": false
 }
