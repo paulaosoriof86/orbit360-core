@@ -105,7 +105,10 @@ if(parentRegistry){
   }
 }
 
-if(i.schemaVersion==='gravicentra-execution-intent-v2'){
+// Execution intents are only active while I4A itself is open. After an atomic I4A PASS seal,
+// CONTROL_PLANE is authoritative and the last non-authoritative intent becomes inert; validating
+// it as executable would incorrectly require reopening a proof that the same seal just closed.
+if(i.schemaVersion==='gravicentra-execution-intent-v2'&&c.gateState?.gates?.I4A?.status!=='PASS'){
   need(i.nonAuthoritative===true&&i.gate==='I4A','I4A_INTENT_V2_IDENTITY_INVALID');
   need(i.certifiedSourceSha===b.sourceSha&&i.buildId===b.buildId&&i.previewUrl===b.previewUrl,'I4A_INTENT_V2_RELEASE_MISMATCH');
   need(i.productSourceMutationAuthorized===false,'I4A_INTENT_V2_PRODUCT_MUTATION_FORBIDDEN');
