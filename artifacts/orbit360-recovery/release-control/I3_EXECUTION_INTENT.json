@@ -1,12 +1,12 @@
 {
   "schemaVersion": "gravicentra-i3-execution-intent-v1",
-  "intentId": "I3-SUCCESSOR-LOGIN-SESSION-RELOAD-20260910",
+  "intentId": "I3-SUCCESSOR-NEGOCIOS-LEADS-POLICY-20260910",
   "nonAuthoritative": true,
   "gate": "I3",
   "branch": "recovery/fase-a-clean-20260831",
-  "sourceSha": "73674c5f0a0b28ed5b0df65e0c6e182345851375",
-  "sourceTree": "5aa5f8285fe67ec1a5afb8a2aa2b144104f2205e",
-  "reason": "Build exactly once the I2-passed Login/session/reload successor, deploy the immutable frontend bundle only to an isolated Hosting Preview and require exact byte readback. Preserve all unaffected I4A evidence and the previous certified candidate until physical I3 PASS.",
+  "sourceSha": "16f174d087024085eff18079c486f717ef98d691",
+  "sourceTree": "2300811d98dc047f4ffe4c0ec16b0452da3ed01a",
+  "reason": "Build exactly once the I2-passed negocios/Leads access-policy successor, deploy the immutable frontend bundle only to an isolated Hosting Preview and require exact byte readback. Preserve all unaffected I4A evidence and the previous certified candidate until physical I3 PASS.",
   "productionMutationAuthorized": false,
   "dataMutationAuthorized": false,
   "writesAuthorized": false
