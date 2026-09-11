@@ -1,13 +1,13 @@
 {
   "schemaVersion": "gravicentra-execution-intent-v2",
-  "requestId": "I4A-20260910-019-PERSISTENCE-RELOAD-EVIDENCE-SPECIFIC",
+  "requestId": "I4A-20260910-020-PERSISTENCE-AUTHORITATIVE-OPS-LEADS",
   "nonAuthoritative": true,
   "gate": "I4A",
   "controlPlaneStatusExpected": "I4A_IN_PROGRESS",
   "certifiedSourceSha": "73674c5f0a0b28ed5b0df65e0c6e182345851375",
   "buildId": "gi-i3-73674c5f0a0b-57f234755dc1",
   "previewUrl": "https://ays-orbit-360-lab--gi-i3-34545182877-03clhzs0.web.app",
-  "purpose": "Execute only PERSISTENCE_RELOAD_READMODELS after the QA-only evidence-specific wait correction. Required/bootstrap collections remain authoritative-server confirmed. Vehiculos and financial read-models require their own server-confirmed evidence. Ops and Leads require the same real negocio record to render and preserve identity/state across natural reload on their active routes, without making the unrelated global deferred-collection state a prerequisite. Preserve every sealed PASS. Perform zero operational writes, no product mutation, no production mutation and no data mutation. Actual controlled mutation before/after remains reserved for I5.",
+  "purpose": "Execute only PERSISTENCE_RELOAD_READMODELS after binding Ops and Leads persistence evidence to direct authoritative Firestore reads at the exact certified tenant data paths. Ops must preserve a real persisted gestion when one exists. Leads may pass an empty-state persistence check only when the authoritative negocios collection count is exactly zero; otherwise a real negocio must load and preserve identity/state. Preserve all sealed PASS proofs. Perform zero operational writes, no product mutation, no production mutation and no data mutation. Actual controlled mutation before/after remains reserved for I5.",
   "executionScope": {
     "mode": "OPEN_PROOFS_ONLY",
     "proofIds": ["PERSISTENCE_RELOAD_READMODELS"],
