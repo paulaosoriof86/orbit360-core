@@ -7,8 +7,7 @@ on:
       - recovery/fase-a-clean-20260831
     paths:
       - .github/workflows/gravicentra-recovery-i4b-transversal.yml
-      - tools/gravicentra-i4b-transversal-v1.mjs
-      - tools/gravicentra-i4b-relationship-diagnostic-v1.mjs
+      - tools/gravicentra-i4b-transversal-v2.mjs
 
 permissions:
   contents: read
@@ -40,8 +39,7 @@ jobs:
           test "$(jq -r '.status' artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json)" = "I4B_IN_PROGRESS"
           node --check tools/gravicentra-governance-preflight-v1.mjs
           node tools/gravicentra-governance-preflight-v1.mjs --mode=i4b
-          node --check tools/gravicentra-i4b-transversal-v1.mjs
-          node --check tools/gravicentra-i4b-relationship-diagnostic-v1.mjs
+          node --check tools/gravicentra-i4b-transversal-v2.mjs
 
       - name: Install I4B browser dependencies
         run: |
@@ -49,59 +47,31 @@ jobs:
           npm install --no-save --package-lock=false playwright@1.55.0 firebase-admin@13.10.0 >/dev/null
           npx playwright install --with-deps chromium >/dev/null
 
-      - name: Diagnose relationship exceptions without mutating product or data
+      - id: matrix
+        name: Execute complete fail-at-end role x viewport x module relationship matrix
         env:
           I4B_EVIDENCE_DIR: ${{ runner.temp }}/gravicentra-i4b-evidence
           SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
           SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
         run: |
-          set -euo pipefail
+          set +e
           mkdir -p "$I4B_EVIDENCE_DIR"
-          node tools/gravicentra-i4b-relationship-diagnostic-v1.mjs
-          test -f "$I4B_EVIDENCE_DIR/i4b-relationship-diagnostic.json"
-          test "$(jq -r '.productionTouched' "$I4B_EVIDENCE_DIR/i4b-relationship-diagnostic.json")" = "false"
-          test "$(jq -r '.dataTouched' "$I4B_EVIDENCE_DIR/i4b-relationship-diagnostic.json")" = "false"
-          test "$(jq -r '.writesExecuted' "$I4B_EVIDENCE_DIR/i4b-relationship-diagnostic.json")" = "0"
+          node tools/gravicentra-i4b-transversal-v2.mjs
+          RC=$?
+          set -e
+          echo "matrix_rc=$RC" >> "$GITHUB_OUTPUT"
+          echo "I4B_MATRIX_EXECUTION_RC=$RC"
+          exit 0
 
-      - name: Execute role x viewport x module and relationship matrix
-        env:
-          I4B_EVIDENCE_DIR: ${{ runner.temp }}/gravicentra-i4b-evidence
-          SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-          SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
-          SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
-        run: |
-          set -euo pipefail
-          mkdir -p "$I4B_EVIDENCE_DIR"
-          node tools/gravicentra-i4b-transversal-v1.mjs
-
-      - name: Fail closed on physical I4B matrix evidence
-        env:
-          EVIDENCE: ${{ runner.temp }}/gravicentra-i4b-evidence/i4b-transversal-matrix.json
-        run: |
-          set -euo pipefail
-          test -f "$EVIDENCE"
-          test "$(jq -r '.gate' "$EVIDENCE")" = "I4B"
-          test "$(jq -r '.status' "$EVIDENCE")" = "I4B_MATRIX_PASS"
-          test "$(jq -r '.expectedContextCount' "$EVIDENCE")" = "15"
-          test "$(jq -r '.contextsPass' "$EVIDENCE")" = "15"
-          test "$(jq -r '.contextsFail' "$EVIDENCE")" = "0"
-          test "$(jq -r '.productionTouched' "$EVIDENCE")" = "false"
-          test "$(jq -r '.dataTouched' "$EVIDENCE")" = "false"
-          test "$(jq -r '.writesExecuted' "$EVIDENCE")" = "0"
-          test "$(jq -r '.sourceSha' "$EVIDENCE")" = "$SOURCE_SHA"
-          test "$(jq -r '.buildId' "$EVIDENCE")" = "$BUILD_ID"
-          test "$(jq -r '.previewUrl' "$EVIDENCE")" = "$PREVIEW_URL"
-          echo I4B_TRANSVERSAL_MATRIX=PHYSICAL_PASS_PENDING_GOVERNANCE_SEAL
-
-      - name: Preserve I4B evidence artifact
+      - name: Preserve complete I4B evidence before adjudication
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: gravicentra-i4b-transversal-${{ github.run_id }}
           path: ${{ runner.temp }}/gravicentra-i4b-evidence
           include-hidden-files: true
-          if-no-files-found: warn
+          if-no-files-found: error
           retention-days: 30
 
       - name: Assert no deployment path exists in I4B executor
@@ -112,3 +82,26 @@ jobs:
           echo productionTouched=false
           echo dataTouched=false
           echo writesExecuted=0
+
+      - name: Fail closed once after all independent I4B checks were collected
+        if: always()
+        env:
+          EVIDENCE: ${{ runner.temp }}/gravicentra-i4b-evidence/i4b-transversal-matrix-v2.json
+        run: |
+          set -euo pipefail
+          test -f "$EVIDENCE"
+          test "$(jq -r '.schemaVersion' "$EVIDENCE")" = "gravicentra-i4b-transversal-matrix-v2"
+          test "$(jq -r '.gate' "$EVIDENCE")" = "I4B"
+          test "$(jq -r '.failAtEnd' "$EVIDENCE")" = "true"
+          test "$(jq -r '.expectedContextCount' "$EVIDENCE")" = "15"
+          test "$(jq -r '.productionTouched' "$EVIDENCE")" = "false"
+          test "$(jq -r '.dataTouched' "$EVIDENCE")" = "false"
+          test "$(jq -r '.writesExecuted' "$EVIDENCE")" = "0"
+          test "$(jq -r '.sourceSha' "$EVIDENCE")" = "$SOURCE_SHA"
+          test "$(jq -r '.buildId' "$EVIDENCE")" = "$BUILD_ID"
+          test "$(jq -r '.previewUrl' "$EVIDENCE")" = "$PREVIEW_URL"
+          test "$(jq -r '.status' "$EVIDENCE")" = "I4B_MATRIX_PASS"
+          test "$(jq -r '.contextsPass' "$EVIDENCE")" = "15"
+          test "$(jq -r '.contextsFail' "$EVIDENCE")" = "0"
+          test "$(jq -r '.uniqueFailures | length' "$EVIDENCE")" = "0"
+          echo I4B_TRANSVERSAL_MATRIX=PHYSICAL_PASS_PENDING_GOVERNANCE_SEAL
