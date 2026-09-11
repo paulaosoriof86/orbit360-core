@@ -86,15 +86,20 @@ jobs:
           test "$(jq -r '.status' "$EVIDENCE")" = "PASS"
           test "$(jq -r '.productionHostingTouched' "$EVIDENCE")" = "false"
           test "$(jq -r '.rollbackExecuted' "$EVIDENCE")" = "false"
+          test "$(jq -r '.provenance.seed' "$EVIDENCE")" = "seed_ficticio_lab"
+          test "$(jq -r '.provenance.loadedBy' "$EVIDENCE")" = "woJlxR1iFEeiQZvTscPj4qQ5Qc73"
+          test "$(jq -r '.provenance.createTime' "$EVIDENCE")" = "2026-07-01T05:00:00.622Z"
           WRITES="$(jq -r '.writesExecuted' "$EVIDENCE")"
-          test "$WRITES" = "0" -o "$WRITES" = "4"
-          if test "$WRITES" = "4"; then
-            test "$(jq -r '.before | length' "$EVIDENCE")" = "4"
-            test "$(jq -r '.deleted | length' "$EVIDENCE")" = "4"
+          test "$WRITES" = "0" -o "$WRITES" = "14"
+          if test "$WRITES" = "14"; then
+            test "$(jq -r '.before | length' "$EVIDENCE")" = "14"
+            test "$(jq -r '.deleted | length' "$EVIDENCE")" = "14"
             test "$(jq -r '.dataTouched' "$EVIDENCE")" = "true"
             test "$(jq -r '[.after[] | select(.exists==true)] | length' "$EVIDENCE")" = "0"
           else
             test "$(jq -r '.alreadyClean' "$EVIDENCE")" = "true"
+            test "$(jq -r '.before | length' "$EVIDENCE")" = "0"
+            test "$(jq -r '.deleted | length' "$EVIDENCE")" = "0"
             test "$(jq -r '.dataTouched' "$EVIDENCE")" = "false"
           fi
           echo I4B_LAB_REMEDIATION=PHYSICAL_PASS
