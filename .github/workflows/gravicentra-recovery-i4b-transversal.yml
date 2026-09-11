@@ -8,6 +8,7 @@ on:
     paths:
       - .github/workflows/gravicentra-recovery-i4b-transversal.yml
       - tools/gravicentra-i4b-transversal-v2.mjs
+      - tools/gravicentra-i4b-lab-remediation-v1.mjs
 
 permissions:
   contents: read
@@ -39,6 +40,7 @@ jobs:
           test "$(jq -r '.status' artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json)" = "I4B_IN_PROGRESS"
           node --check tools/gravicentra-governance-preflight-v1.mjs
           node tools/gravicentra-governance-preflight-v1.mjs --mode=i4b
+          node --check tools/gravicentra-i4b-lab-remediation-v1.mjs
           node --check tools/gravicentra-i4b-transversal-v2.mjs
 
       - name: Install I4B browser dependencies
@@ -46,6 +48,56 @@ jobs:
           set -euo pipefail
           npm install --no-save --package-lock=false playwright@1.55.0 firebase-admin@13.10.0 >/dev/null
           npx playwright install --with-deps chromium >/dev/null
+
+      - id: remediation
+        name: Guarded one-time LAB inventory, backup, cleanup and verification
+        env:
+          I4B_REMEDIATION_EVIDENCE_DIR: ${{ runner.temp }}/gravicentra-i4b-remediation
+          SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+          SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+        run: |
+          set +e
+          mkdir -p "$I4B_REMEDIATION_EVIDENCE_DIR"
+          node tools/gravicentra-i4b-lab-remediation-v1.mjs
+          RC=$?
+          set -e
+          echo "remediation_rc=$RC" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Preserve LAB remediation before-after evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i4b-lab-remediation-${{ github.run_id }}
+          path: ${{ runner.temp }}/gravicentra-i4b-remediation
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Fail closed if LAB remediation did not prove exact safe state
+        env:
+          EVIDENCE: ${{ runner.temp }}/gravicentra-i4b-remediation/i4b-lab-remediation-v1.json
+        run: |
+          set -euo pipefail
+          test -f "$EVIDENCE"
+          test "$(jq -r '.schemaVersion' "$EVIDENCE")" = "gravicentra-i4b-lab-remediation-v1"
+          test "$(jq -r '.gate' "$EVIDENCE")" = "I4B"
+          test "$(jq -r '.status' "$EVIDENCE")" = "PASS"
+          test "$(jq -r '.productionHostingTouched' "$EVIDENCE")" = "false"
+          test "$(jq -r '.rollbackExecuted' "$EVIDENCE")" = "false"
+          WRITES="$(jq -r '.writesExecuted' "$EVIDENCE")"
+          test "$WRITES" = "0" -o "$WRITES" = "4"
+          if test "$WRITES" = "4"; then
+            test "$(jq -r '.before | length' "$EVIDENCE")" = "4"
+            test "$(jq -r '.deleted | length' "$EVIDENCE")" = "4"
+            test "$(jq -r '.dataTouched' "$EVIDENCE")" = "true"
+            test "$(jq -r '[.after[] | select(.exists==true)] | length' "$EVIDENCE")" = "0"
+          else
+            test "$(jq -r '.alreadyClean' "$EVIDENCE")" = "true"
+            test "$(jq -r '.dataTouched' "$EVIDENCE")" = "false"
+          fi
+          echo I4B_LAB_REMEDIATION=PHYSICAL_PASS
 
       - id: matrix
         name: Execute complete fail-at-end role x viewport x module relationship matrix
@@ -74,12 +126,14 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
-      - name: Assert no deployment path exists in I4B executor
+      - name: Assert no deployment path exists and matrix stage is read-only
         if: always()
         run: |
           set -euo pipefail
           ! grep -Eiq 'firebase[.]cmd[[:space:]]+deploy|firebase[[:space:]]+deploy' .github/workflows/gravicentra-recovery-i4b-transversal.yml
           echo productionTouched=false
+          echo matrixDataTouched=false
+          echo matrixWritesExecuted=0
           echo dataTouched=false
           echo writesExecuted=0
 
