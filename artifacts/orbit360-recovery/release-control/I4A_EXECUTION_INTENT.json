@@ -1,6 +1,6 @@
 {
   "schemaVersion": "gravicentra-execution-intent-v2",
-  "requestId": "I4A-20260910-021-LEADS-NEGOCIOS-SUCCESSOR-ACCEPTANCE",
+  "requestId": "I4A-20260910-022-LEADS-NEGOCIOS-SUCCESSOR-ACCEPTANCE",
   "nonAuthoritative": true,
   "gate": "I4A",
   "controlPlaneStatusExpected": "I4A_IN_PROGRESS",
