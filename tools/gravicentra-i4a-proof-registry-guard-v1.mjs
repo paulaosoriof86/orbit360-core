@@ -105,9 +105,8 @@ if(parentRegistry){
   }
 }
 
-// Execution intents are only active while I4A itself is open. After an atomic I4A PASS seal,
-// CONTROL_PLANE is authoritative and the last non-authoritative intent becomes inert; validating
-// it as executable would incorrectly require reopening a proof that the same seal just closed.
+// Execution intents are active only while I4A itself is open. Once I4A is sealed,
+// the last non-authoritative intent is inert and must never reopen a PASS proof.
 if(i.schemaVersion==='gravicentra-execution-intent-v2'&&c.gateState?.gates?.I4A?.status!=='PASS'){
   need(i.nonAuthoritative===true&&i.gate==='I4A','I4A_INTENT_V2_IDENTITY_INVALID');
   need(i.certifiedSourceSha===b.sourceSha&&i.buildId===b.buildId&&i.previewUrl===b.previewUrl,'I4A_INTENT_V2_RELEASE_MISMATCH');
@@ -124,12 +123,31 @@ if(i.schemaVersion==='gravicentra-execution-intent-v2'&&c.gateState?.gates?.I4A?
   for(const p of proofs.filter(x=>x.status==='PASS'))need(preserved.has(p.proofId),'I4A_INTENT_V2_OMITS_PRESERVED_PASS:'+p.proofId);
 }
 
+function findHistoricalI4ASealCommit(){
+  let commits=[];
+  try{commits=execFileSync('git',['log','--format=%H','--',CONTROL],{encoding:'utf8'}).trim().split(/\n+/).filter(Boolean);}catch{}
+  for(const h of commits){
+    try{
+      const cur=JSON.parse(execFileSync('git',['show',`${h}:${CONTROL}`],{encoding:'utf8'}));
+      if(cur?.gateState?.gates?.I4A?.status!=='PASS')continue;
+      let prevStatus='MISSING';
+      try{const prev=JSON.parse(execFileSync('git',['show',`${h}^:${CONTROL}`],{encoding:'utf8',stdio:['ignore','pipe','ignore']});prevStatus=prev?.gateState?.gates?.I4A?.status||'MISSING';}catch{}
+      if(prevStatus!=='PASS')return h;
+    }catch{}
+  }
+  return null;
+}
+
 const open=proofs.filter(p=>p.status==='OPEN').map(p=>p.proofId);
+let historicalSealCommit=null;
 if(c.gateState?.gates?.I4A?.status==='PASS'){
   need(open.length===0,'I4A_GATE_PASS_WITH_OPEN_PROOFS:'+open.join(','));
   need(r.stateSealPending===false,'I4A_GATE_PASS_WITH_PENDING_STATE_SEAL');
-  let changed=[];try{changed=execFileSync('git',['diff-tree','--no-commit-id','--name-only','-r','HEAD'],{encoding:'utf8'}).trim().split(/\n+/).filter(Boolean);}catch{}
-  for(const p of [CONTROL,LEDGER,REGISTRY])need(changed.includes(p),'I4A_GATE_SEAL_NOT_ATOMIC_MISSING:'+p);
+  historicalSealCommit=findHistoricalI4ASealCommit();
+  need(!!historicalSealCommit,'I4A_HISTORICAL_GATE_SEAL_COMMIT_NOT_FOUND');
+  let changed=[];
+  try{changed=execFileSync('git',['show','--pretty=','--name-only',historicalSealCommit],{encoding:'utf8'}).trim().split(/\n+/).filter(Boolean);}catch{}
+  for(const p of [CONTROL,LEDGER,REGISTRY])need(changed.includes(p),'I4A_HISTORICAL_GATE_SEAL_NOT_ATOMIC_MISSING:'+p);
 }else{
   need(c.gateState?.gates?.I4A?.status==='IN_PROGRESS','I4A_PROOF_REGISTRY_ACTIVE_OUTSIDE_I4A');
 }
@@ -139,3 +157,4 @@ console.log('I4A_PROOF_PASS_COUNT='+proofs.filter(p=>p.status==='PASS').length);
 console.log('I4A_PROOF_OPEN='+open.join(','));
 console.log('I4A_STATE_SEAL_PENDING='+String(r.stateSealPending===true));
 console.log('I4A_RELEASE_TRANSITION_COUNT='+transitions.length);
+console.log('I4A_HISTORICAL_SEAL_COMMIT='+(historicalSealCommit||'OPEN'));
