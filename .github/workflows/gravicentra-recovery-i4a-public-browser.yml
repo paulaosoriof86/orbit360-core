@@ -46,6 +46,7 @@ jobs:
           node --check tools/gravicentra-i4a-aseguradoras-credential-ui-v1.mjs
           node --check tools/gravicentra-i4a-auth-adjudicator-v1.mjs
           node --check tools/gravicentra-i4a-residual-capabilities-v1.mjs
+          node --check tools/gravicentra-i4a-persistence-reload-v1.mjs
 
       - id: intent
         name: Validate machine-readable open-proof execution scope
@@ -69,7 +70,7 @@ jobs:
           const requested=[...new Set(x.executionScope.proofIds||[])];
           const preserved=[...new Set(x.executionScope.preserveProofIds||[])];
           need(requested.length>0,'I4A_EMPTY_PROOF_SCOPE');
-          const supported=new Set(['PUBLIC_PREVIEW_SMOKE','BOOTSTRAP_HYDRATION','RUNTIME_BOUNDARY','AUTHENTICATED_MODULE_ADJUDICATED','ASEGURADORAS_TARGETED_ROLE_UI','LOGIN_SESSION_RELOAD']);
+          const supported=new Set(['PUBLIC_PREVIEW_SMOKE','BOOTSTRAP_HYDRATION','RUNTIME_BOUNDARY','AUTHENTICATED_MODULE_ADJUDICATED','ASEGURADORAS_TARGETED_ROLE_UI','LOGIN_SESSION_RELOAD','PERSISTENCE_RELOAD_READMODELS']);
           for(const id of requested)need(supported.has(id),'I4A_BROWSER_PROOF_UNSUPPORTED:'+id);
           const proofs=new Map((r.proofs||[]).map(q=>[q.proofId,q]));
           for(const id of requested){const q=proofs.get(id);need(q,'I4A_PROOF_UNKNOWN:'+id);need(q.status==='OPEN'||q.causallyInvalidated===true,'I4A_PASS_REEXECUTION_FORBIDDEN:'+id);}
@@ -93,7 +94,7 @@ jobs:
         run: |
           set -euo pipefail
           ROOT="$RUNNER_TEMP/gravicentra-i4a-evidence"
-          mkdir -p "$ROOT/meta" "$ROOT/public" "$ROOT/bootstrap" "$ROOT/boundary" "$ROOT/auth" "$ROOT/residual"
+          mkdir -p "$ROOT/meta" "$ROOT/public" "$ROOT/bootstrap" "$ROOT/boundary" "$ROOT/auth" "$ROOT/residual" "$ROOT/persistence"
           printf '%s\n' "$GITHUB_SHA" > "$ROOT/meta/control-plane-commit.txt"
           printf '%s\n' "$SOURCE_SHA" > "$ROOT/meta/source-sha.txt"
           printf '%s\n' "$BUILD_ID" > "$ROOT/meta/build-id.txt"
@@ -249,6 +250,28 @@ jobs:
           echo "outcome=$OUTCOME" >> "$GITHUB_OUTPUT"
           exit 0
 
+      - id: persistence
+        name: Execute PERSISTENCE_RELOAD_READMODELS only when requested
+        env:
+          I4A_PERSISTENCE_EVIDENCE_DIR: ${{ runner.temp }}/gravicentra-i4a-evidence/persistence
+          SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+          SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+        run: |
+          set +e
+          if [[ ",${PROOF_IDS}," == *",PERSISTENCE_RELOAD_READMODELS,"* ]]; then
+            node tools/gravicentra-i4a-persistence-reload-v1.mjs
+            RC=$?
+            OUTCOME=executed
+          else
+            RC=0
+            OUTCOME=preserved
+          fi
+          set -e
+          echo "rc=$RC" >> "$GITHUB_OUTPUT"
+          echo "outcome=$OUTCOME" >> "$GITHUB_OUTPUT"
+          exit 0
+
       - name: Seal scoped I4A execution manifest
         if: always()
         env:
@@ -266,6 +289,8 @@ jobs:
           AUTH_ADJUDICATED_OUTCOME: ${{ steps.adjudicated.outputs.outcome }}
           RESIDUAL_RC: ${{ steps.residual.outputs.rc }}
           RESIDUAL_OUTCOME: ${{ steps.residual.outputs.outcome }}
+          PERSISTENCE_RC: ${{ steps.persistence.outputs.rc }}
+          PERSISTENCE_OUTCOME: ${{ steps.persistence.outputs.outcome }}
         run: |
           set -euo pipefail
           ROOT="$RUNNER_TEMP/gravicentra-i4a-evidence"; export ROOT
@@ -285,11 +310,12 @@ jobs:
             'AUTHENTICATED_MODULE_RAW_DEPENDENCY':{'rc':rc('AUTH_RAW_RC'),'outcome':outcome('AUTH_RAW_OUTCOME')},
             'ASEGURADORAS_TARGETED_ROLE_UI':{'rc':rc('ASEGURADORAS_UI_RC'),'outcome':outcome('ASEGURADORAS_UI_OUTCOME')},
             'AUTHENTICATED_MODULE_ADJUDICATED':{'rc':rc('AUTH_ADJUDICATED_RC'),'outcome':outcome('AUTH_ADJUDICATED_OUTCOME')},
-            'LOGIN_SESSION_RELOAD':{'rc':rc('RESIDUAL_RC'),'outcome':outcome('RESIDUAL_OUTCOME')}
+            'LOGIN_SESSION_RELOAD':{'rc':rc('RESIDUAL_RC'),'outcome':outcome('RESIDUAL_OUTCOME')},
+            'PERSISTENCE_RELOAD_READMODELS':{'rc':rc('PERSISTENCE_RC'),'outcome':outcome('PERSISTENCE_OUTCOME')}
           }
           execution_pass=all(results[x]['rc']==0 for x in requested)
           manifest={
-            'schemaVersion':'gravicentra-i4a-scoped-proof-execution-v5',
+            'schemaVersion':'gravicentra-i4a-scoped-proof-execution-v6',
             'gate':'I4A','controlPlaneCommit':os.environ['GITHUB_SHA'],
             'sourceSha':os.environ['SOURCE_SHA'],'buildId':os.environ['BUILD_ID'],'previewUrl':os.environ['PREVIEW_URL'],
             'executionScope':'OPEN_PROOFS_ONLY','requestedProofIds':requested,'preserveProofIds':preserve,
