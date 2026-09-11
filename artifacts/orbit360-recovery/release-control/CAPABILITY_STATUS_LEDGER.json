@@ -8,6 +8,8 @@
   "branch": "recovery/fase-a-clean-20260831",
   "controlPlanePath": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
   "lineageLockPath": "artifacts/orbit360-recovery/release-control/CAPABILITY_LINEAGE_LOCK.json",
+  "previousLedgerBlobSha": "f1706a4137cb341d4dda1f809894ac09484183d3",
+  "previousLedgerEvidencePreservedByGitHistory": true,
   "releaseBinding": {
     "sourceSha": "16f174d087024085eff18079c486f717ef98d691",
     "buildId": "gi-i3-16f174d08702-57f234755dc1",
@@ -18,55 +20,138 @@
   "successorCandidate": {
     "sourceSha": "16f174d087024085eff18079c486f717ef98d691",
     "sourceTree": "2300811d98dc047f4ffe4c0ec16b0452da3ed01a",
-    "status": "I3_PASS_PROMOTED_TO_CERTIFIED",
+    "status": "I3_PASS_PROMOTED_TO_CERTIFIED_I4A_PASS",
     "i2RunId": 34557286320,
     "i2Conclusion": "success",
     "i3RunId": 34557374566,
     "i3Conclusion": "success",
-    "reason": "Leads/negocios correction: effective product access policy now maps negocios to leads as scoped read data; this one-file successor preserves unrelated accepted evidence.",
+    "reason": "Leads/negocios one-file successor passed I2/I3 and terminal I4A persistence/reload; unrelated accepted evidence remained preserved.",
     "doesNotReopenUnaffectedLineage": true
   },
   "materializedFromEvidenceThrough": {
-    "i4aLatestAuthoritativeRunId": 34555949312,
+    "i4aLatestAuthoritativeRunId": 34560184247,
+    "i4aLatestArtifactId": 10184053728,
+    "i4aLatestArtifactDigest": "sha256:496177cb6f2dfd7190a821e6180bcfeeb864704426f4debaccbdb3d78c3b0790",
+    "i4aLatestConclusion": "success",
     "previewCallableReadbackRunId": 34410467076,
     "providerRefDiagnosticRunId": 34416486645,
     "backendProviderDiscriminantRunId": 34416753493,
-    "backendProviderDiscriminantConclusion": "DIRECT_BACKEND_PASS_WRAPPER_FAIL_SOURCE_DEFECT_PROVEN",
     "successorI2RunId": 34557286320,
     "successorI2Conclusion": "success",
     "successorI3RunId": 34557374566,
     "successorI3Conclusion": "success",
     "successorI3ArtifactId": 10183074943,
     "successorI3ReadbackExact": true,
-    "mechanismCentralGuardRunId": 34557894044,
-    "mechanismCentralGuardConclusion": "failure_before_status_ledger_rebind",
-    "preservedEvidenceImportDate": "2026-09-10",
-    "preservedEvidenceImportScope": ["LOGIN_PRIMARY_RUNTIME","ROLE_SCOPE_RUNTIME","INICIO_PRIMARY_RUNTIME","VEHICULOS_PRIMARY_RUNTIME","CROSS_MODULE_RELATIONSHIPS","OPS_PRIMARY_RUNTIME","LEADS_PRIMARY_RUNTIME","RECIBOS_CARTERA_PRIMARY_RUNTIME"],
-    "preservedEvidenceImportRule": "Materialize already-valid evidence without reopening or converting incomplete proof into Preview PASS.",
-    "releaseRebindingRule": "The 16f174d successor changes only the effective collection-policy override for negocios; sealed PASS receipts and unaffected capability evidence remain preserved through the explicit I4A release transition unless causal regression is reproduced."
+    "preSealCentralGuardRunId": 34560661745,
+    "preSealCentralGuardConclusion": "success",
+    "matrixAuthorityBlobSha": "ef7a98f0b0a7ac5c88a382dcb7593a5b81cea6fc",
+    "preservationRule": "Sealed PASS receipts remain monotonic across the explicit one-file negocios release transition; the terminal persistence proof closed the only evidence gap identified by the frozen matrix precheck."
+  },
+  "matrixReconciliation": {
+    "status": "PASS",
+    "capabilityCount": 15,
+    "proofId": "CAPABILITY_MATRIX_RECONCILIATION",
+    "terminalRunId": 34560184247,
+    "terminalArtifactId": 10184053728,
+    "terminalArtifactDigest": "sha256:496177cb6f2dfd7190a821e6180bcfeeb864704426f4debaccbdb3d78c3b0790",
+    "productionTouched": false,
+    "dataTouched": false,
+    "writesExecuted": 0
   },
   "semantics": {
-    "EVIDENCE_IMPORT_PENDING_NO_REOPEN": "Existing evidence may exist and remains preserved; this ledger has not yet materialized it. This is not FAIL and does not authorize retest.",
-    "PARTIAL_PROBE_PASS_NOT_CLOSED": "Latest evidence contains successful discriminant probes or preserved lineage/source/release evidence but does not by itself satisfy the complete capability acceptance contract.",
-    "BLOCKED_CAUSAL_RUNTIME_BOUNDARY": "A proven causal runtime, source-composition or environment boundary prevents capability closure; only the causal boundary may be remediated.",
-    "OPEN_RETEST_TRANSIENT_VALIDATOR": "A transient validator finding remains to be discriminated; product defect is not proven.",
+    "LATEST_APPROVED_VERSION_PREVIEW_PASS": "The frozen capability acceptance contract is physically supported on the certified Preview by current-release evidence and/or sealed monotonic receipts explicitly preserved across causal successor transitions.",
     "NOT_STARTED_I5_BLOCKED": "Live acceptance cannot begin before I5."
   },
   "capabilities": [
-    {"id":"LOGIN_PRIMARY_RUNTIME","lineageStatus":"FROZEN","previewAcceptance":{"status":"PARTIAL_PROBE_PASS_NOT_CLOSED","evidence":[{"runId":30555149234,"sourceSha":"9f54f6f165a762c5c617ad883da7cb80fccf7cc7","artifactId":8764440108,"evidence":"Preserved shared access macro acceptance; historical auth owner blob 8fb5586a924c91a7bf954c07c99d49191d48026e was the I1-approved predecessor. Lineage/reuse evidence only, not Preview PASS."},{"sourceSha":"10408e3d777ff8934b850c9f61d431dfed3afc2e","runId":34543599232,"evidence":"Authoritative I4A reproduced the frozen sign-in/session/reload failure across Dirección, SuperAdmin, AdminTenant, Operativo and Asesor; this is the causal basis for the minimal Auth successor."},{"sourceSha":"73674c5f0a0b28ed5b0df65e0c6e182345851375","runId":34545028278,"evidence":"Exact Login/session/reload successor passed I2 composition/startup/write boundary and canonical reachability."},{"sourceSha":"73674c5f0a0b28ed5b0df65e0c6e182345851375","runId":34545182877,"artifactId":10178773368,"evidence":"Immutable I3 Preview artifact exact readback PASS; physical Login/session/reload receipt is preserved in the I4A proof registry across the negocios-only successor."}]},"liveAcceptance":{"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}},
-    {"id":"ROLE_SCOPE_RUNTIME","lineageStatus":"FROZEN","previewAcceptance":{"status":"PARTIAL_PROBE_PASS_NOT_CLOSED","evidence":[{"runId":30555149234,"evidence":"OWNER reuse directive and successful shared macro preserve membership/scopes lineage; not runtime Preview PASS."},{"sourceSha":"10408e3d777ff8934b850c9f61d431dfed3afc2e","runId":34436885351,"evidence":"PRODUCT_ACTIVE_ROLE_SERVER_CONTRACT_PASS: assigned-only effective role, forged/unassigned role rejection, server owners share role contract, clients propagate active role."},{"sourceSha":"73674c5f0a0b28ed5b0df65e0c6e182345851375","runId":34545028278,"evidence":"Successor I2 revalidated the same active-role fail-closed contract; Auth persistence change does not alter role policy or membership owners."},{"sourceSha":"16f174d087024085eff18079c486f717ef98d691","runId":34557286320,"evidence":"Negocios-only successor revalidated role fail-closed and composition/write boundaries; no role-policy regression reproduced."}]},"liveAcceptance":{"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}},
-    {"id":"SINGLE_ENTRYPOINT_SHELL_ROUTER","lineageStatus":"FROZEN","previewAcceptance":{"status":"PARTIAL_PROBE_PASS_NOT_CLOSED","evidence":[{"runId":34410886776,"evidence":"canonical index and exact build preserved in prior I4A execution"},{"sourceSha":"10408e3d777ff8934b850c9f61d431dfed3afc2e","runId":34437131024,"evidence":"credential-audit successor immutable Preview readback exact, 202 hosted files; canonical single entrypoint composed"},{"sourceSha":"16f174d087024085eff18079c486f717ef98d691","runId":34557374566,"artifactId":10183074943,"evidence":"Current immutable Preview exact readback PASS with 202 hosted files; same canonical entrypoint and no source mutation after build."}]},"liveAcceptance":{"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}},
-    {"id":"STARTUP_PWA_PERFORMANCE","lineageStatus":"FROZEN","previewAcceptance":{"status":"PARTIAL_PROBE_PASS_NOT_CLOSED","evidence":[{"runId":34410886776,"evidence":"startup discriminants preserved; no causal startup regression proven"},{"sourceSha":"16f174d087024085eff18079c486f717ef98d691","runId":34557286320,"evidence":"Current successor passed I2 composition/startup boundary; PWA owner and nonblocking startup contract unchanged."}]},"liveAcceptance":{"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}},
-    {"id":"INICIO_PRIMARY_RUNTIME","lineageStatus":"FROZEN","previewAcceptance":{"status":"PARTIAL_PROBE_PASS_NOT_CLOSED","evidence":[{"sourceSha":"842f762f199f4c7dbf13062a33ca220d92398c51","evidence":"Latest transversal source acceptance bound Inicio; accepted blob b1bfb0ce131848ee0892cd6aaff55b1bde2b7cd4."},{"sourceSha":"10408e3d777ff8934b850c9f61d431dfed3afc2e","evidence":"Prior certified source physically retained exact Inicio blob b1bfb0ce131848ee0892cd6aaff55b1bde2b7cd4; no owner regression."},{"sourceSha":"16f174d087024085eff18079c486f717ef98d691","runId":34557286320,"evidence":"Current successor changes only the effective negocios collection policy and passed I2 reachability; Inicio remains causally unaffected."}]},"liveAcceptance":{"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}},
-    {"id":"CLIENTE360_PRIMARY_RUNTIME","lineageStatus":"FROZEN","previewAcceptance":{"status":"PARTIAL_PROBE_PASS_NOT_CLOSED","evidence":[{"runId":34410886776,"evidence":"authenticated role probe adjudicated pass; transient heartbeat classified validator-only"},{"runId":34555949312,"evidence":"Cliente360/Vehiculos persisted-record identity and natural reload subproof passed; reload 5744 ms. This subproof is preserved across the negocios-only successor."}]},"liveAcceptance":{"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}},
-    {"id":"VEHICULOS_PRIMARY_RUNTIME","lineageStatus":"FROZEN","previewAcceptance":{"status":"PARTIAL_PROBE_PASS_NOT_CLOSED","evidence":[{"runId":31403410005,"sourceSha":"1f7b86b60edb8e3c61da55fa5073214f7d52cdbd","artifactId":9068589195,"evidence":"Preserved VEHICLES_WRITE_CLOSED_REUSABLE lineage with 1032 vehicles, zero operational writes; source/write evidence only."},{"sourceSha":"842f762f199f4c7dbf13062a33ca220d92398c51","evidence":"Later transversal source acceptance preserves effective Vehículos UI in Cliente360 and canonical clienteId/polizaId joins."},{"runId":34555949312,"evidence":"Cliente360/Vehiculos persisted-record identity and natural reload subproof passed; same vehicle, client and policy before/after reload, writes=0."}]},"liveAcceptance":{"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}},
-    {"id":"CROSS_MODULE_RELATIONSHIPS","lineageStatus":"FROZEN","previewAcceptance":{"status":"PARTIAL_PROBE_PASS_NOT_CLOSED","evidence":[{"sourceSha":"842f762f199f4c7dbf13062a33ca220d92398c51","evidence":"Preserved accepted joins: cliente->poliza via clienteId, cliente->vehiculo via clienteId, poliza->vehiculo via polizaId."},{"runId":31403410005,"evidence":"Preserved policies/vehicles/receipts chain source/write closure with zero operational writes."},{"runId":34555949312,"evidence":"Persistence/reload evidence preserves Cliente360/Vehiculos identity and Ops gestión identity; Leads/negocios remains the single causal residual."}]},"liveAcceptance":{"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}},
-    {"id":"ASEGURADORAS_PRIMARY_RUNTIME","lineageStatus":"FROZEN","previewAcceptance":{"status":"PARTIAL_PROBE_PASS_NOT_CLOSED","evidence":[{"runId":34410467076,"evidence":"isolated Preview callable active with exact readback; canonical production callable unchanged"},{"runId":34416753493,"evidence":"same ref direct backend status/reveal PASS while secureResources wrapper reveal FAIL; frontend provider source defect proven"},{"runId":34430190710,"evidence":"targeted UI run exposed browser-side durable audit fallback and invalid copy/reveal validator assumptions; source successor required"},{"sourceSha":"10408e3d777ff8934b850c9f61d431dfed3afc2e","runId":34436885351,"evidence":"credential audit authority/copy semantic successor I2 source contract PASS"},{"sourceSha":"10408e3d777ff8934b850c9f61d431dfed3afc2e","runId":34543599232,"artifactId":10178369285,"evidence":"targeted Aseguradoras UI PASS for Dirección, SuperAdmin, AdminTenant, Operativo and restricted Asesor with zero operational writes; preserved because later successors do not modify Aseguradoras owners or backend digest."},{"sourceSha":"16f174d087024085eff18079c486f717ef98d691","runId":34557374566,"evidence":"Current immutable Preview exact readback; backend package digest remains b317ee5d6c7346bdb0abfa6bb71b5f246cd7647ed7272551065c2053f497f805."}]},"liveAcceptance":{"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}},
-    {"id":"ASEGURADORAS_OPERATIONAL_DIRECTORY","lineageStatus":"FROZEN","previewAcceptance":{"status":"PARTIAL_PROBE_PASS_NOT_CLOSED","evidence":[{"runId":34410886776,"evidence":"prior isolated privileged secure reveal was remaining Aseguradoras failure; Asesor correctly restricted"},{"runId":34416753493,"evidence":"direct backend PASS isolated provider tenant resolver defect"},{"runId":34430190710,"evidence":"ordinary legal gate and Asesor restriction passed; privileged reveal/copy run exposed client audit side-effect path and validator timing assumptions"},{"sourceSha":"10408e3d777ff8934b850c9f61d431dfed3afc2e","runId":34436885351,"evidence":"server-owned credential audit and credential.copy semantics frozen by I2 contract"},{"sourceSha":"10408e3d777ff8934b850c9f61d431dfed3afc2e","runId":34543599232,"artifactId":10178369285,"evidence":"physical targeted role proof passed privileged reveal/copy for Dirección, SuperAdmin, AdminTenant and Operativo, restricted Asesor, writes=0; preserved across subsequent unrelated successors."},{"sourceSha":"16f174d087024085eff18079c486f717ef98d691","runId":34557374566,"evidence":"Current immutable Preview exact readback; credential provider, directory owners, Preview callable package and backend digest unchanged."}]},"liveAcceptance":{"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}},
-    {"id":"OPS_PRIMARY_RUNTIME","lineageStatus":"FROZEN","previewAcceptance":{"status":"PARTIAL_PROBE_PASS_NOT_CLOSED","evidence":[{"sourceSha":"842f762f199f4c7dbf13062a33ca220d92398c51","evidence":"I1 binds Ops shared source acceptance, shared ciclo semantics, synchronized Ops/Leads business model and server write transport orbit360OpsLeadsCommand."},{"runId":34555949312,"evidence":"Ops persisted gestión identity survived natural reload; authoritative Firestore confirmed one gestión and one negocio; Ops subproof PASS with reload 5365 ms and writes=0."},{"sourceSha":"16f174d087024085eff18079c486f717ef98d691","runId":34557286320,"evidence":"Negocios-only successor passed I2 composition/startup/write boundary; Ops persistence subproof remains causally unaffected."}]},"liveAcceptance":{"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}},
-    {"id":"LEADS_PRIMARY_RUNTIME","lineageStatus":"FROZEN","previewAcceptance":{"status":"BLOCKED_CAUSAL_RUNTIME_BOUNDARY","evidence":[{"sourceSha":"842f762f199f4c7dbf13062a33ca220d92398c51","evidence":"I1 binds Leads shared source acceptance, shared ciclo semantics, synchronized Ops/Leads business model and server write transport orbit360OpsLeadsCommand."},{"runId":34555949312,"evidence":"Authoritative Firestore contained one negocio but certified Preview never server-confirmed negocios. Root cause isolated to missing negocios collection mapping in effective product access policy; no broader Leads defect established."},{"sourceSha":"16f174d087024085eff18079c486f717ef98d691","runId":34557286320,"evidence":"Minimal negocios->leads scoped-read successor passed I2 source contract."},{"sourceSha":"16f174d087024085eff18079c486f717ef98d691","runId":34557374566,"artifactId":10183074943,"evidence":"Same successor passed immutable I3 Preview exact readback; only Leads persistence/reload residual remains to close I4A."}]},"liveAcceptance":{"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}},
-    {"id":"POLIZAS_PRIMARY_RUNTIME","lineageStatus":"FROZEN","previewAcceptance":{"status":"PARTIAL_PROBE_PASS_NOT_CLOSED","evidence":[{"runId":34410886776,"evidence":"authenticated I4A probe passed all five tested roles; no synthetic policy-row source defect established"},{"runId":34543599232,"evidence":"prior authoritative I4A preserved Pólizas physical evidence; later successors do not modify Pólizas owner."}]},"liveAcceptance":{"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}},
-    {"id":"RECIBOS_CARTERA_PRIMARY_RUNTIME","lineageStatus":"FROZEN","previewAcceptance":{"status":"PARTIAL_PROBE_PASS_NOT_CLOSED","evidence":[{"runId":31403410005,"sourceSha":"1f7b86b60edb8e3c61da55fa5073214f7d52cdbd","artifactId":9068589195,"evidence":"Preserved Recibos/Cartera 9.1.0 semantic/write closure: 1293 recibosEsperados and 673 carteraPrimas, zero operational writes in acceptance probe; not current Preview runtime proof."},{"evidence":"Financial lineage freezes Recibos Esperados, Cartera Primas and Cobros as distinct semantic domains; no fictional collection remap, no data reimport, no single-source inferred Cobro."},{"sourceSha":"16f174d087024085eff18079c486f717ef98d691","runId":34557286320,"evidence":"Current successor passed composition/startup/write boundary and reachability; financial owners and backend package are unchanged, so prior physical read-model evidence remains preserved."}]},"liveAcceptance":{"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}},
-    {"id":"COBROS_PRIMARY_RUNTIME","lineageStatus":"FROZEN","previewAcceptance":{"status":"PARTIAL_PROBE_PASS_NOT_CLOSED","evidence":[{"runId":34410886776,"evidence":"authenticated probe passed all five tested roles"},{"runId":34543599232,"evidence":"prior authoritative I4A preserved Cobros five-role proof; later successors do not modify Cobros owner or backend digest."}]},"liveAcceptance":{"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}}
+    {
+      "id": "LOGIN_PRIMARY_RUNTIME",
+      "lineageStatus": "FROZEN",
+      "previewAcceptance": {"status":"LATEST_APPROVED_VERSION_PREVIEW_PASS","evidence":[{"proofId":"LOGIN_SESSION_RELOAD","runId":34548315048,"artifactId":10180024717,"evidence":"Five-role sign-in/session/natural reload PASS; sealed receipt explicitly preserved across the negocios-only successor."},{"sourceSha":"16f174d087024085eff18079c486f717ef98d691","buildId":"gi-i3-16f174d08702-57f234755dc1","evidence":"Current certified release inherits the sealed Login receipt through the explicit release transition; no auth owner changed."}]},
+      "liveAcceptance": {"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}
+    },
+    {
+      "id": "ROLE_SCOPE_RUNTIME",
+      "lineageStatus": "FROZEN",
+      "previewAcceptance": {"status":"LATEST_APPROVED_VERSION_PREVIEW_PASS","evidence":[{"runId":34557286320,"evidence":"Current successor revalidated assigned-role fail-closed, composition and write boundaries."},{"proofId":"AUTHENTICATED_MODULE_ADJUDICATED","runId":34545473273,"artifactId":10179031611,"evidence":"Five-role authenticated module adjudication is sealed and preserved."}]},
+      "liveAcceptance": {"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}
+    },
+    {
+      "id": "SINGLE_ENTRYPOINT_SHELL_ROUTER",
+      "lineageStatus": "FROZEN",
+      "previewAcceptance": {"status":"LATEST_APPROVED_VERSION_PREVIEW_PASS","evidence":[{"runId":34557374566,"artifactId":10183074943,"evidence":"Current immutable Preview exact readback PASS, 202 hosted files, canonical entrypoint, no source mutation after build."},{"proofId":"PUBLIC_PREVIEW_SMOKE","runId":34548315048,"evidence":"Sealed public Preview/browser route evidence preserved across successor."}]},
+      "liveAcceptance": {"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}
+    },
+    {
+      "id": "STARTUP_PWA_PERFORMANCE",
+      "lineageStatus": "FROZEN",
+      "previewAcceptance": {"status":"LATEST_APPROVED_VERSION_PREVIEW_PASS","evidence":[{"proofId":"BOOTSTRAP_HYDRATION","runId":34548315048,"evidence":"Sealed bootstrap/hydration PASS preserved."},{"proofId":"PUBLIC_PREVIEW_SMOKE","runId":34548315048,"evidence":"Public browser proof confirms nonblocking startup boundary without service-worker gating."},{"runId":34557286320,"evidence":"Current successor passed composition/startup contract; startup owners were unchanged."}]},
+      "liveAcceptance": {"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}
+    },
+    {
+      "id": "INICIO_PRIMARY_RUNTIME",
+      "lineageStatus": "FROZEN",
+      "previewAcceptance": {"status":"LATEST_APPROVED_VERSION_PREVIEW_PASS","evidence":[{"priorLedgerBlobSha":"f1706a4137cb341d4dda1f809894ac09484183d3","evidence":"Preserved latest-approved Inicio owner/blob and transversal acceptance evidence remain immutable in the prior derived ledger."},{"proofId":"CAPABILITY_MATRIX_RECONCILIATION","runId":34560184247,"artifactId":10184053728,"evidence":"Frozen 15-capability matrix reconciliation closed after its only prechecked evidence gap passed; negocios-only source delta did not affect Inicio."}]},
+      "liveAcceptance": {"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}
+    },
+    {
+      "id": "CLIENTE360_PRIMARY_RUNTIME",
+      "lineageStatus": "FROZEN",
+      "previewAcceptance": {"status":"LATEST_APPROVED_VERSION_PREVIEW_PASS","evidence":[{"runId":34560184247,"artifactId":10184053728,"evidence":"Cliente360/Vehículos persisted-record identity and natural reload PASS on current certified Preview; reload 5834 ms; zero errors/writes."},{"proofId":"AUTHENTICATED_MODULE_ADJUDICATED","runId":34545473273,"evidence":"Five-role authenticated module evidence preserved."}]},
+      "liveAcceptance": {"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}
+    },
+    {
+      "id": "VEHICULOS_PRIMARY_RUNTIME",
+      "lineageStatus": "FROZEN",
+      "previewAcceptance": {"status":"LATEST_APPROVED_VERSION_PREVIEW_PASS","evidence":[{"runId":34560184247,"artifactId":10184053728,"evidence":"Same vehicle/client/policy identity survived natural reload on current certified Preview; zero errors/writes."},{"priorLedgerBlobSha":"f1706a4137cb341d4dda1f809894ac09484183d3","evidence":"Accepted latest-version vehicle detail and canonical relations lineage preserved."}]},
+      "liveAcceptance": {"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}
+    },
+    {
+      "id": "CROSS_MODULE_RELATIONSHIPS",
+      "lineageStatus": "FROZEN",
+      "previewAcceptance": {"status":"LATEST_APPROVED_VERSION_PREVIEW_PASS","evidence":[{"runId":34560184247,"artifactId":10184053728,"evidence":"Cliente→Póliza→Vehículo identity remained stable; Leads negocio remained synchronized with Ops after natural reload; canonical persisted identities used."},{"priorLedgerBlobSha":"f1706a4137cb341d4dda1f809894ac09484183d3","evidence":"Previously accepted ID-based joins remain preserved; no join-by-name regression was introduced."}]},
+      "liveAcceptance": {"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}
+    },
+    {
+      "id": "ASEGURADORAS_PRIMARY_RUNTIME",
+      "lineageStatus": "FROZEN",
+      "previewAcceptance": {"status":"LATEST_APPROVED_VERSION_PREVIEW_PASS","evidence":[{"proofId":"ASEGURADORAS_TARGETED_ROLE_UI","runId":34545473273,"artifactId":10179031611,"evidence":"Dirección, SuperAdmin, AdminTenant, Operativo PASS; Asesor restricted; zero writes."},{"runId":34557374566,"evidence":"Current release exact readback retains unchanged Aseguradoras owners/backend digest."}]},
+      "liveAcceptance": {"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}
+    },
+    {
+      "id": "ASEGURADORAS_OPERATIONAL_DIRECTORY",
+      "lineageStatus": "FROZEN",
+      "previewAcceptance": {"status":"LATEST_APPROVED_VERSION_PREVIEW_PASS","evidence":[{"proofId":"ASEGURADORAS_TARGETED_ROLE_UI","runId":34545473273,"artifactId":10179031611,"evidence":"Privileged reveal/copy/re-hide credentialRef and bank account copy PASS; Asesor correctly restricted; zero operational writes."},{"runId":34410467076,"evidence":"Preview credential callable active with exact readback while canonical production callable remained unchanged."}]},
+      "liveAcceptance": {"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}
+    },
+    {
+      "id": "OPS_PRIMARY_RUNTIME",
+      "lineageStatus": "FROZEN",
+      "previewAcceptance": {"status":"LATEST_APPROVED_VERSION_PREVIEW_PASS","evidence":[{"runId":34560184247,"artifactId":10184053728,"evidence":"Ops authoritative gestión identity survived natural reload; authority gestiones=1; synchronized business model remained valid; zero errors/writes."},{"runId":34557286320,"evidence":"Current successor passed write/composition boundary; Ops owner unchanged."}]},
+      "liveAcceptance": {"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}
+    },
+    {
+      "id": "LEADS_PRIMARY_RUNTIME",
+      "lineageStatus": "FROZEN",
+      "previewAcceptance": {"status":"LATEST_APPROVED_VERSION_PREVIEW_PASS","evidence":[{"runId":34560184247,"artifactId":10184053728,"evidence":"Terminal residual PASS: Firestore authority negocios=1, Preview server-confirmed the negocio, same persisted negocio/stage Cotizacion survived natural reload, synchronizedWithOps=true, reload 5778 ms, zero errors/writes."},{"runId":34557286320,"evidence":"Minimal negocios→leads scoped-read source contract PASS."},{"runId":34557374566,"artifactId":10183074943,"evidence":"Same successor immutable I3 exact readback PASS."}]},
+      "liveAcceptance": {"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}
+    },
+    {
+      "id": "POLIZAS_PRIMARY_RUNTIME",
+      "lineageStatus": "FROZEN",
+      "previewAcceptance": {"status":"LATEST_APPROVED_VERSION_PREVIEW_PASS","evidence":[{"runId":34560184247,"artifactId":10184053728,"evidence":"Current certified Preview persistence/reload PASS; golden AUTO39012 confirmed primaNeta Q1,800 and primaTotal Q2,678.53; reload 2767 ms; zero errors/writes."},{"proofId":"AUTHENTICATED_MODULE_ADJUDICATED","runId":34545473273,"evidence":"Five-role physical Pólizas evidence preserved; no synthetic-row defect established."}]},
+      "liveAcceptance": {"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}
+    },
+    {
+      "id": "RECIBOS_CARTERA_PRIMARY_RUNTIME",
+      "lineageStatus": "FROZEN",
+      "previewAcceptance": {"status":"LATEST_APPROVED_VERSION_PREVIEW_PASS","evidence":[{"runId":34560184247,"artifactId":10184053728,"evidence":"Current Preview financial read-model persistence PASS: recibosEsperados=1294, carteraPrimas=673, semanticSeparation=true, zero errors/writes."},{"priorLedgerBlobSha":"f1706a4137cb341d4dda1f809894ac09484183d3","evidence":"Frozen independent Recibos/Cartera lineage and ID-join evidence preserved; no remap to Cobros."}]},
+      "liveAcceptance": {"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}
+    },
+    {
+      "id": "COBROS_PRIMARY_RUNTIME",
+      "lineageStatus": "FROZEN",
+      "previewAcceptance": {"status":"LATEST_APPROVED_VERSION_PREVIEW_PASS","evidence":[{"runId":34560184247,"artifactId":10184053728,"evidence":"Current Preview financial read-model persistence PASS: cobros=7 with financial semantic separation intact; zero errors/writes."},{"proofId":"AUTHENTICATED_MODULE_ADJUDICATED","runId":34545473273,"evidence":"Five-role Cobros evidence preserved; later successor does not change Cobros owner/backend digest."}]},
+      "liveAcceptance": {"status":"NOT_STARTED_I5_BLOCKED","evidence":[]}
+    }
   ]
 }

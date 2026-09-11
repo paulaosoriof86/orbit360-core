@@ -1,7 +1,7 @@
 {
   "schemaVersion": "gravicentra-control-plane-v2",
   "controlPlaneId": "GRAVICENTRA-INSURANCE-FASE-A",
-  "status": "I4A_IN_PROGRESS",
+  "status": "I4B_IN_PROGRESS",
   "productBrand": "Gravicentra Insurance",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -38,25 +38,25 @@
     "artifacts/orbit360-recovery/release-control/ACTIVE_RELEASE_LOCK.json": "DEPRECATED_NON_AUTHORITATIVE_TOMBSTONE"
   },
   "gateState": {
-    "lastFormallyCompletedIteration": 3,
-    "currentTransition": "I4A_NEGOCIOS_LEADS_POLICY_SUCCESSOR_PREVIEW_ACCEPTANCE",
-    "nextFrozenIteration": "I4A",
+    "lastFormallyCompletedIteration": 4,
+    "currentTransition": "I4B_TRANSVERSAL_MODULE_ROLE_VIEWPORT_RELATIONSHIP_MATRIX",
+    "nextFrozenIteration": "I4B",
     "gates": {
       "I0": {"status": "PASS"},
       "I1": {"status": "PASS", "capabilitiesBound": 15},
       "I2": {"status": "PASS_LATEST_CANDIDATE", "latestRunId": 34557286320, "sourceSha": "16f174d087024085eff18079c486f717ef98d691", "conclusion": "success"},
       "I3": {"status": "PASS", "latestRunId": 34557374566, "conclusion": "success", "sourceSha": "16f174d087024085eff18079c486f717ef98d691", "artifactId": 10183074943, "readbackExact": true},
-      "I4A": {"status": "IN_PROGRESS", "previousAuthoritativeRunId": 34430190710, "latestAuthoritativeRunId": 34555949312, "nextRequiredProof": "PERSISTENCE_RELOAD_READMODELS_LEADS_ON_CERTIFIED_SUCCESSOR_PREVIEW"},
-      "I4B": {"status": "PENDING"},
+      "I4A": {"status": "PASS", "previousAuthoritativeRunId": 34555949312, "latestAuthoritativeRunId": 34560184247, "latestArtifactId": 10184053728, "latestArtifactDigest": "sha256:496177cb6f2dfd7190a821e6180bcfeeb864704426f4debaccbdb3d78c3b0790", "proofCount": 8, "capabilityCount": 15, "writesExecuted": 0},
+      "I4B": {"status": "IN_PROGRESS"},
       "I5": {"status": "PENDING"},
       "I6": {"status": "HOLD_UNTIL_PRODUCTION_ACCEPTED"}
     }
   },
   "productionProgress": {
-    "formalPercent": 57.1,
-    "certifiedPhysicalPercent": 57.1,
-    "method": "7 frozen production gates I0,I1,I2,I3,I4A,I4B,I5; equal gate-completion accounting; 4 of 7 gates are physically certified on the current candidate",
-    "iterationsRemaining": ["I4A", "I4B", "I5"]
+    "formalPercent": 71.4,
+    "certifiedPhysicalPercent": 71.4,
+    "method": "7 frozen production gates I0,I1,I2,I3,I4A,I4B,I5; equal gate-completion accounting; 5 of 7 gates are physically certified on the current candidate",
+    "iterationsRemaining": ["I4B", "I5"]
   },
   "certifiedCandidate": {
     "sourceSha": "16f174d087024085eff18079c486f717ef98d691",
@@ -90,7 +90,7 @@
   },
   "nextCandidate": null,
   "i4aCausalFindings": {
-    "latestAuthoritativeRunId": 34555949312,
+    "latestAuthoritativeRunId": 34560184247,
     "cliente360TransientThresholdClassifiedAsValidatorOnly": true,
     "polizasFiveRolesProbePass": true,
     "cobrosFiveRolesProbePass": true,
@@ -120,15 +120,11 @@
       "nextRequiredProof": "Preserve physical Login session/reload proof; no causal reopening by negocios policy successor"
     },
     "leadsPersistenceReload": {
-      "status": "SUCCESSOR_I3_PASS_I4A_RETEST_REQUIRED",
+      "status": "I4A_PERSISTENCE_RELOAD_PASS",
       "failedRunId": 34555949312,
       "failureCode": "PERSISTENCE_STAGE_TIMEOUT_LEADS_NEGOCIOS_NOT_SERVER_CONFIRMED",
       "contractRequirement": "Leads and Ops project the same negocio by canonical stage; persistence/reload must preserve authoritative read-models",
-      "directAuthorityNegociosCount": 1,
-      "directAuthorityGestionesCount": 1,
-      "certifiedPreviewNegociosCount": 0,
-      "certifiedPreviewGestionesCount": 1,
-      "rootCause": "The certified base access policy has no negocios collection mapping. Effective product queryConstraints therefore returns an invalid collection policy to the product query planner, which fail-closes negocios before Firestore attachment. negocios is deferred/optional, so requiredMissing and requiredFailed remain empty while Leads stays empty.",
+      "rootCause": "The prior certified base access policy had no negocios collection mapping. The minimal successor added negocios -> leads scoped read policy.",
       "successorSourceSha": "16f174d087024085eff18079c486f717ef98d691",
       "successorSourceTree": "2300811d98dc047f4ffe4c0ec16b0452da3ed01a",
       "filesChanged": ["orbit360-platform/core/tenant-access-policy-effective-p0.js"],
@@ -145,7 +141,19 @@
       "successorBuildId": "gi-i3-16f174d08702-57f234755dc1",
       "successorPreviewUrl": "https://ays-orbit-360-lab--gi-i3-34557374566-txpy1cuy.web.app",
       "successorHostedPayloadDigest": "a7c16bda2fa3327b3a1e2b49c53f7143d6538f5970e1a95a017ac4718fdb4df1",
-      "nextRequiredProof": "Retest only the Leads persistence/reload residual on the certified successor Preview; preserve Cliente360/Vehículos and Ops persistence subproofs from run 34555949312."
+      "passRunId": 34560184247,
+      "passArtifactId": 10184053728,
+      "passArtifactDigest": "sha256:496177cb6f2dfd7190a821e6180bcfeeb864704426f4debaccbdb3d78c3b0790",
+      "directAuthorityNegociosCount": 1,
+      "directAuthorityGestionesCount": 1,
+      "samePersistedLeadAfterReload": true,
+      "synchronizedWithOps": true,
+      "reloadMs": 5778,
+      "consoleErrors": 0,
+      "pageErrors": 0,
+      "sameOriginRequestFailures": 0,
+      "sameOriginHttpErrors": 0,
+      "nextRequiredProof": null
     },
     "aseguradoras": {
       "status": "I4A_TARGETED_ROLE_PROOF_PRESERVED_UNAFFECTED_BY_POLICY_SUCCESSOR",
@@ -176,6 +184,19 @@
       "preservationReason": "The negocios successor changes only the effective collection-policy override for negocios; Aseguradoras credential provider, directory owners, bank-account override, callable backend package and backend digest are unchanged.",
       "nextRequiredProof": "No causal Aseguradoras reopening; preserve targeted role evidence."
     }
+  },
+  "i4aGateSeal": {
+    "status": "PASS",
+    "terminalRunId": 34560184247,
+    "terminalArtifactId": 10184053728,
+    "terminalArtifactDigest": "sha256:496177cb6f2dfd7190a821e6180bcfeeb864704426f4debaccbdb3d78c3b0790",
+    "proofRegistryPassCount": 8,
+    "proofRegistryOpenCount": 0,
+    "capabilityPreviewPassCount": 15,
+    "matrixBlobSha": "ef7a98f0b0a7ac5c88a382dcb7593a5b81cea6fc",
+    "productionTouched": false,
+    "dataTouched": false,
+    "writesExecuted": 0
   },
   "i4aPreviewInfrastructureBoundary": {
     "status": "CAUSAL_REMEDIATION_READBACK_PASS",
@@ -295,7 +316,7 @@
     "lineageLockMaterialized": true,
     "controlPlaneMaterialized": true,
     "centralReleaseGuardConsumesOnlyControlPlane": true,
-    "centralGuardRunId": 34545182846,
+    "centralGuardRunId": 34560661745,
     "centralGuardConclusion": "success",
     "legacyStateAndReleaseLockDeprecated": true,
     "workflowReleaseHardcodesRemoved": true,
@@ -322,7 +343,12 @@
     "latestCausalI3Conclusion": "success",
     "latestCausalI3ReadbackExact": true,
     "mechanismFrozen": true,
-    "mechanismFreezeEnforced": true
+    "mechanismFreezeEnforced": true,
+    "i4aMonotonicProofRegistryMaterialized": true,
+    "i4aTerminalPersistenceRunId": 34560184247,
+    "i4aTerminalPersistenceConclusion": "success",
+    "i4aCapabilityMatrixReconciled": true,
+    "i4aAtomicSealPrepared": true
   },
-  "nextAction": "RUN_I4A_LEADS_PERSISTENCE_RELOAD_RESIDUAL_ON_CERTIFIED_NEGOCIOS_POLICY_SUCCESSOR_PREVIEW"
+  "nextAction": "EXECUTE_I4B_TRANSVERSAL_MATRIX_ON_SAME_CERTIFIED_ARTIFACT_WITHOUT_REOPENING_I4A"
 }
