@@ -30,8 +30,8 @@ function marker(d,id){
 
 const evidence={
   schemaVersion:'gravicentra-i4b-lab-remediation-v1',gate:'I4B',projectId:PROJECT,tenant:TENANT,
-  status:'STARTED',productionHostingTouched:false,before:[],expected:[...EXPECTED.keys()],deleted:[],after:[],
-  writesExecuted:0,dataTouched:false,rollbackExecuted:false,rollbackWrites:0,error:null
+  status:'STARTED',productionHostingTouched:false,before:[],expected:[...EXPECTED.keys()].sort(),deleted:[],after:[],
+  alreadyClean:false,writesExecuted:0,dataTouched:false,rollbackExecuted:false,rollbackWrites:0,error:null
 };
 let app;
 try{
@@ -50,21 +50,25 @@ try{
   evidence.before.sort((a,b)=>a.key.localeCompare(b.key));
   const actual=evidence.before.map(x=>x.key);
   const expected=[...EXPECTED.keys()].sort();
-  need(JSON.stringify(actual)===JSON.stringify(expected),'I4B_REMEDIATION_UNEXPECTED_LAB_INVENTORY:'+actual.join(','));
-  for(const row of evidence.before)need(row.origen===EXPECTED.get(row.key),'I4B_REMEDIATION_ORIGIN_MISMATCH:'+row.key+':'+row.origen);
+  if(actual.length===0){
+    evidence.alreadyClean=true;
+  }else{
+    need(JSON.stringify(actual)===JSON.stringify(expected),'I4B_REMEDIATION_UNEXPECTED_LAB_INVENTORY:'+actual.join(','));
+    for(const row of evidence.before)need(row.origen===EXPECTED.get(row.key),'I4B_REMEDIATION_ORIGIN_MISMATCH:'+row.key+':'+row.origen);
 
-  const refs=evidence.before.map(row=>dataRoot.doc(row.collection).collection('items').doc(row.id));
-  const batch=db.batch();
-  refs.forEach(ref=>batch.delete(ref));
-  await batch.commit();
-  evidence.deleted=[...actual];
-  evidence.writesExecuted=refs.length;
-  evidence.dataTouched=refs.length>0;
+    const refs=evidence.before.map(row=>dataRoot.doc(row.collection).collection('items').doc(row.id));
+    const batch=db.batch();
+    refs.forEach(ref=>batch.delete(ref));
+    await batch.commit();
+    evidence.deleted=[...actual];
+    evidence.writesExecuted=refs.length;
+    evidence.dataTouched=refs.length>0;
 
-  const verification=await Promise.all(refs.map(async(ref,i)=>({key:actual[i],exists:(await ref.get()).exists})));
-  evidence.after=verification;
-  const remaining=verification.filter(x=>x.exists);
-  if(remaining.length)throw new Error('I4B_REMEDIATION_VERIFY_DELETE_FAILED:'+remaining.map(x=>x.key).join(','));
+    const verification=await Promise.all(refs.map(async(ref,i)=>({key:actual[i],exists:(await ref.get()).exists})));
+    evidence.after=verification;
+    const remaining=verification.filter(x=>x.exists);
+    if(remaining.length)throw new Error('I4B_REMEDIATION_VERIFY_DELETE_FAILED:'+remaining.map(x=>x.key).join(','));
+  }
 
   const postUnexpected=[];
   const collectionDocsAfter=await dataRoot.listDocuments();
@@ -94,5 +98,6 @@ try{
   console.log('I4B_LAB_REMEDIATION_STATUS='+evidence.status);
   console.log('I4B_LAB_REMEDIATION_BEFORE='+evidence.before.length);
   console.log('I4B_LAB_REMEDIATION_WRITES='+evidence.writesExecuted);
+  console.log('I4B_LAB_REMEDIATION_ALREADY_CLEAN='+evidence.alreadyClean);
   console.log('I4B_LAB_REMEDIATION_ROLLBACK='+evidence.rollbackExecuted);
 }
