@@ -10,7 +10,10 @@
 
   window.Orbit = window.Orbit || {};
 
-  var VERSION = 'p0-effective-20260714';
+  var VERSION = 'p0-effective-20260910.1';
+  var PRODUCT_COLLECTION_POLICY_OVERRIDE = Object.freeze({
+    negocios: { module: 'leads', scoped: true, advisorRead: true, advisorWrite: false }
+  });
 
   function text(value) {
     return String(value == null ? '' : value).trim();
@@ -33,6 +36,7 @@
     var bank = bankPolicy();
     return Object.assign(
       {},
+      PRODUCT_COLLECTION_POLICY_OVERRIDE,
       bank && bank.COLLECTION_POLICY_OVERRIDE || {},
       extra && typeof extra === 'object' ? extra : {}
     );
