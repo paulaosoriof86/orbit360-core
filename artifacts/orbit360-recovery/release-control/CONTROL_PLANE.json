@@ -1,7 +1,7 @@
 {
   "schemaVersion": "gravicentra-control-plane-v2",
   "controlPlaneId": "GRAVICENTRA-INSURANCE-FASE-A",
-  "status": "I2_IN_PROGRESS",
+  "status": "I3_IN_PROGRESS",
   "productBrand": "Gravicentra Insurance",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -39,13 +39,13 @@
   },
   "gateState": {
     "lastFormallyCompletedIteration": 3,
-    "currentTransition": "I2_NEGOCIOS_LEADS_POLICY_SUCCESSOR_RECERTIFICATION",
-    "nextFrozenIteration": "I2",
+    "currentTransition": "I3_NEGOCIOS_LEADS_POLICY_SUCCESSOR_IMMUTABLE_PREVIEW",
+    "nextFrozenIteration": "I3",
     "gates": {
       "I0": {"status": "PASS"},
       "I1": {"status": "PASS", "capabilitiesBound": 15},
-      "I2": {"status": "IN_PROGRESS", "previousRunId": 34545028278, "previousSourceSha": "73674c5f0a0b28ed5b0df65e0c6e182345851375", "reason": "I4A run 34555949312 proved that authoritative Firestore contains a negocio while the certified Preview never server-confirms negocios. The certified effective tenant policy has no negocios collection mapping, so the product query planner fail-closes the deferred collection before hydration."},
-      "I3": {"status": "PASS", "latestRunId": 34545182877, "conclusion": "success", "sourceSha": "73674c5f0a0b28ed5b0df65e0c6e182345851375", "artifactId": 10178773368, "readbackExact": true},
+      "I2": {"status": "PASS_LATEST_CANDIDATE", "latestRunId": 34557286320, "sourceSha": "16f174d087024085eff18079c486f717ef98d691", "conclusion": "success"},
+      "I3": {"status": "IN_PROGRESS", "previousRunId": 34545182877, "previousSourceSha": "73674c5f0a0b28ed5b0df65e0c6e182345851375", "reason": "I2 successor 16f174d08702 passed the exact source contract in run 34557286320; build and read back one immutable Preview from the same source."},
       "I4A": {"status": "IN_PROGRESS", "previousAuthoritativeRunId": 34430190710, "latestAuthoritativeRunId": 34555949312, "blockedBy": "NEGOCIOS_LEADS_POLICY_SUCCESSOR_RECERTIFICATION", "nextRequiredProof": "PERSISTENCE_RELOAD_READMODELS_LEADS_ON_CERTIFIED_SUCCESSOR_PREVIEW"},
       "I4B": {"status": "PENDING"},
       "I5": {"status": "PENDING"},
@@ -55,7 +55,7 @@
   "productionProgress": {
     "formalPercent": 57.1,
     "certifiedPhysicalPercent": 57.1,
-    "method": "7 frozen production gates I0,I1,I2,I3,I4A,I4B,I5; equal gate-completion accounting; 4 of 7 gates remain physically certified on the current certified candidate while the causal negocios/Leads policy successor is recertified through I2/I3",
+    "method": "7 frozen production gates I0,I1,I2,I3,I4A,I4B,I5; equal gate-completion accounting; 4 of 7 gates remain physically certified on the current certified candidate while the causal negocios/Leads policy successor is recertified through I3",
     "iterationsRemaining": ["I4A", "I4B", "I5"]
   },
   "certifiedCandidate": {
@@ -130,7 +130,7 @@
       "nextRequiredProof": "Preserve physical Login session/reload proof; no causal reopening by negocios policy successor"
     },
     "leadsPersistenceReload": {
-      "status": "SOURCE_SUCCESSOR_REQUIRED_I2_I3",
+      "status": "SUCCESSOR_I2_PASS_I3_REQUIRED",
       "failedRunId": 34555949312,
       "failureCode": "PERSISTENCE_STAGE_TIMEOUT_LEADS_NEGOCIOS_NOT_SERVER_CONFIRMED",
       "contractRequirement": "Leads and Ops project the same negocio by canonical stage; persistence/reload must preserve authoritative read-models",
@@ -147,7 +147,9 @@
       "productionTouched": false,
       "dataTouched": false,
       "writesExecuted": 0,
-      "nextRequiredProof": "I2 exact source contract then I3 immutable Preview exact readback then return only to the Leads persistence/reload residual in I4A"
+      "successorI2RunId": 34557286320,
+      "successorI2Conclusion": "success",
+      "nextRequiredProof": "I3 immutable Preview exact readback on source 16f174d08702, then return only to the Leads persistence/reload residual in I4A"
     },
     "aseguradoras": {
       "status": "I4A_TARGETED_ROLE_PROOF_PRESERVED_UNAFFECTED_BY_POLICY_SUCCESSOR",
@@ -312,7 +314,7 @@
     "frozenPlanSnapshotInterpretationAddendumMaterialized": true,
     "successorI2I3IntentMechanismMaterialized": true,
     "successorI2PhysicalPass": true,
-    "latestCausalI2RunId": 34545028278,
+    "latestCausalI2RunId": 34557286320,
     "latestCausalI2Conclusion": "success",
     "i3NextCandidateBindingMaterialized": true,
     "i3NextCandidateBindingPhysicalPass": true,
@@ -326,5 +328,5 @@
     "mechanismFrozen": true,
     "mechanismFreezeEnforced": true
   },
-  "nextAction": "RUN_I2_ON_NEGOCIOS_LEADS_POLICY_SUCCESSOR_THEN_I3_SAME_SOURCE"
+  "nextAction": "RUN_I3_IMMUTABLE_PREVIEW_ON_EXACT_NEGOCIOS_LEADS_POLICY_SUCCESSOR"
 }
