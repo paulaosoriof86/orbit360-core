@@ -1,0 +1,57 @@
+{
+  "schemaVersion": "gravicentra-i4a-capability-matrix-reconciliation-precheck-v1",
+  "gate": "I4A",
+  "decision": "TARGETED_PROOF_REQUIRED_BEFORE_GATE_SEAL",
+  "releaseBinding": {
+    "sourceSha": "73674c5f0a0b28ed5b0df65e0c6e182345851375",
+    "buildId": "gi-i3-73674c5f0a0b-57f234755dc1",
+    "artifactId": 10178773368,
+    "previewUrl": "https://ays-orbit-360-lab--gi-i3-34545182877-03clhzs0.web.app"
+  },
+  "authority": {
+    "lineageLock": "artifacts/orbit360-recovery/release-control/CAPABILITY_LINEAGE_LOCK.json",
+    "criteriaMatrix": "artifacts/orbit360-recovery/project-sources-v2/v3/02_MATRIZ_CRITERIOS_FASE_A_EVERGREEN_V3.md",
+    "plan": "artifacts/orbit360-recovery/release-control/PLAN_TRABAJO_CONGELADO_V2.md"
+  },
+  "sealedEvidence": {
+    "i2RunId": 34545028278,
+    "i3RunId": 34545182877,
+    "i4aRoleAndModuleRunId": 34545473273,
+    "i4aReloadRunId": 34548315048,
+    "mechanismV4GuardRunId": 34551570136
+  },
+  "capabilityCount": 15,
+  "reopenedCapabilities": [],
+  "preservedCapabilities": [
+    "LOGIN_PRIMARY_RUNTIME",
+    "ROLE_SCOPE_RUNTIME",
+    "SINGLE_ENTRYPOINT_SHELL_ROUTER",
+    "STARTUP_PWA_PERFORMANCE",
+    "INICIO_PRIMARY_RUNTIME",
+    "ASEGURADORAS_PRIMARY_RUNTIME",
+    "ASEGURADORAS_OPERATIONAL_DIRECTORY"
+  ],
+  "capabilitiesRequiringOnlyAdditionalReadOnlyPersistenceEvidence": [
+    "CLIENTE360_PRIMARY_RUNTIME",
+    "VEHICULOS_PRIMARY_RUNTIME",
+    "CROSS_MODULE_RELATIONSHIPS",
+    "OPS_PRIMARY_RUNTIME",
+    "LEADS_PRIMARY_RUNTIME",
+    "POLIZAS_PRIMARY_RUNTIME",
+    "RECIBOS_CARTERA_PRIMARY_RUNTIME",
+    "COBROS_PRIMARY_RUNTIME"
+  ],
+  "evidenceGap": {
+    "proofId": "PERSISTENCE_RELOAD_READMODELS",
+    "class": "MISSING_PHYSICAL_PERSISTED_IDENTITY_AFTER_ROUTE_RELOAD",
+    "whyNotAlreadyClosed": "The sealed I4A residual run proves route/scope/UI/actions and the Login proof proves session reload, while I2 proves write-callable/transport contracts. The frozen matrix additionally names persistence/reload for mature modules. No write may be credited from source inspection alone, so the remaining gap is closed by read-only persisted-record identity across reload on the same Preview.",
+    "writesRequiredAtI4A": false,
+    "writesReservedForI5": true,
+    "productSourceChangeRequired": false,
+    "i2I3ReentryAuthorized": false
+  },
+  "productionTouched": false,
+  "dataTouched": false,
+  "writesExecuted": 0,
+  "nextAction": "RUN_ONLY_PERSISTENCE_RELOAD_READMODELS"
+}
