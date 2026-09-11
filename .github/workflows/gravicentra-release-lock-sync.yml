@@ -37,14 +37,14 @@ jobs:
           set -euo pipefail
           test "$GITHUB_REF_NAME" = "recovery/fase-a-clean-20260831"
           node --check tools/gravicentra-control-plane-guard-v2.mjs
-          node --check tools/gravicentra-mechanism-invariant-v1.mjs
+          node --check tools/gravicentra-mechanism-invariant-v2.mjs
           node --check tools/gravicentra-evergreen-sources-invariant-v1.mjs
           node --check tools/gravicentra-i4a-proof-registry-guard-v1.mjs
           node --check tools/gravicentra-i4a-preview-function-remediation-guard-v1.mjs
           node --check tools/gravicentra-i4a-preview-remediation-invariant-v1.mjs
           node tools/gravicentra-control-plane-guard-v2.mjs --mode=governance
           node tools/gravicentra-i4a-proof-registry-guard-v1.mjs
-          node tools/gravicentra-mechanism-invariant-v1.mjs
+          node tools/gravicentra-mechanism-invariant-v2.mjs
           node tools/gravicentra-evergreen-sources-invariant-v1.mjs
           node tools/gravicentra-i4a-preview-remediation-invariant-v1.mjs
           git diff --exit-code
@@ -53,6 +53,8 @@ jobs:
             echo '- Mutable operational authority: `CONTROL_PLANE.json` only'
             echo '- Approved lineage authority: `CAPABILITY_LINEAGE_LOCK.json`'
             echo '- Capability status: derived ledger, release-bound, non-authoritative for gate/release identity'
+            echo '- Active gate MUST have one physical state-gated executor before the Control Plane can remain valid'
+            echo '- Gate transition and execution plane are now mechanically coupled for I2/I3/I4A/I4B/I5'
             echo '- I4A proof registry: derived monotonic receipts; cannot govern gate/release identity'
             echo '- PASS evidence: monotonic within the certified release; causal source delta required to invalidate'
             echo '- I4A execution: `OPEN_PROOFS_ONLY`; sealed PASS proofs cannot be rerun accidentally'
