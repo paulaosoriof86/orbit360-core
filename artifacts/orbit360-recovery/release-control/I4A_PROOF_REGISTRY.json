@@ -7,13 +7,39 @@
   "controlPlanePath": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
   "capabilityStatusLedgerPath": "artifacts/orbit360-recovery/release-control/CAPABILITY_STATUS_LEDGER.json",
   "releaseBinding": {
-    "sourceSha": "73674c5f0a0b28ed5b0df65e0c6e182345851375",
-    "buildId": "gi-i3-73674c5f0a0b-57f234755dc1",
-    "artifactId": 10178773368,
-    "previewUrl": "https://ays-orbit-360-lab--gi-i3-34545182877-03clhzs0.web.app",
-    "hostedPayloadDigest": "e2ffb1c440e1d17c76005979846ba8aa1757fc4056985f1f1dfe409f17180b70",
+    "sourceSha": "16f174d087024085eff18079c486f717ef98d691",
+    "buildId": "gi-i3-16f174d08702-57f234755dc1",
+    "artifactId": 10183074943,
+    "previewUrl": "https://ays-orbit-360-lab--gi-i3-34557374566-txpy1cuy.web.app",
+    "hostedPayloadDigest": "a7c16bda2fa3327b3a1e2b49c53f7143d6538f5970e1a95a017ac4718fdb4df1",
     "backendSourceDigest": "b317ee5d6c7346bdb0abfa6bb71b5f246cd7647ed7272551065c2053f497f805"
   },
+  "releaseTransitions": [
+    {
+      "status": "ACTIVE",
+      "productSourceDelta": true,
+      "fromSourceSha": "73674c5f0a0b28ed5b0df65e0c6e182345851375",
+      "fromBuildId": "gi-i3-73674c5f0a0b-57f234755dc1",
+      "toSourceSha": "16f174d087024085eff18079c486f717ef98d691",
+      "toBuildId": "gi-i3-16f174d08702-57f234755dc1",
+      "changedProductFiles": [
+        "orbit360-platform/core/tenant-access-policy-effective-p0.js"
+      ],
+      "causalEvidence": "I4A run 34555949312 proved the only open causal defect was negocios not attaching because the certified effective access policy omitted that collection. Successor 16f174d08702 adds only negocios -> leads scoped read policy and passed I2 run 34557286320 plus exact I3 readback run 34557374566. Existing sealed PASS proof contracts were not causally invalidated by this one-file delta.",
+      "preservedPassProofIds": [
+        "PUBLIC_PREVIEW_SMOKE",
+        "BOOTSTRAP_HYDRATION",
+        "RUNTIME_BOUNDARY",
+        "ASEGURADORAS_TARGETED_ROLE_UI",
+        "AUTHENTICATED_MODULE_ADJUDICATED",
+        "LOGIN_SESSION_RELOAD"
+      ],
+      "affectedOpenProofIds": [
+        "PERSISTENCE_RELOAD_READMODELS",
+        "CAPABILITY_MATRIX_RECONCILIATION"
+      ]
+    }
+  ],
   "policy": {
     "passIsMonotonicWithinRelease": true,
     "passReexecutionForbiddenWithoutCausalInvalidation": true,
@@ -24,7 +50,7 @@
     "openProofsOnlyExecution": true,
     "gateSealRequiresAtomicControlPlaneLedgerRegistryCommit": true
   },
-  "latestObservedAuthoritativeRunId": 34548315048,
+  "latestObservedAuthoritativeRunId": 34555949312,
   "stateSealPending": true,
   "stateSealPendingReason": "PERSISTENCE_RELOAD_READMODELS_AND_CAPABILITY_MATRIX_RECONCILIATION_REQUIRED_BEFORE_I4A_GATE_SEAL",
   "proofs": [
@@ -135,13 +161,13 @@
     {
       "status": "OPEN",
       "contractVersion": "I4A_CAPABILITY_MATRIX_RECONCILIATION_V1",
-      "reason": "Reconcile the 15 capability acceptance contracts from sealed same-release evidence before atomic I4A gate seal. This proof remains open until the targeted persistence/reload read-model proof closes the only evidence gap identified by the frozen matrix precheck.",
+      "reason": "Reconcile the 15 capability acceptance contracts from sealed evidence plus explicit cross-release preservation before atomic I4A gate seal. This proof remains open until the targeted persistence/reload read-model proof closes the only evidence gap identified by the frozen matrix precheck.",
       "proofId": "CAPABILITY_MATRIX_RECONCILIATION"
     },
     {
       "status": "OPEN",
       "contractVersion": "I4A_PERSISTENCE_RELOAD_READMODELS_V1",
-      "reason": "Frozen matrix precheck found that current same-release evidence proves UI/scopes/actions/write-contract boundaries but does not yet physically prove persisted record identity survives route reload for Cliente360/Vehiculos, Ops/Leads shared records, Polizas golden invariant and financial read-models. This proof is read-only and performs zero operational writes; actual mutation before/after remains reserved for I5.",
+      "reason": "The remaining causal gap is Leads -> negocios on the certified successor Preview. Cliente360/Vehiculos and Ops persistence subproofs already passed in run 34555949312 and remain preserved. The proof is read-only and performs zero operational writes; actual mutation before/after remains reserved for I5.",
       "proofId": "PERSISTENCE_RELOAD_READMODELS"
     }
   ],
