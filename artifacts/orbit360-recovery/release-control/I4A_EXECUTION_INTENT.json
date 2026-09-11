@@ -1,13 +1,13 @@
 {
   "schemaVersion": "gravicentra-execution-intent-v1",
-  "requestId": "I4A-AUTHORITATIVE-20260910-016-LOGIN-SESSION-RELOAD-SUCCESSOR",
+  "requestId": "I4A-AUTHORITATIVE-20260910-017-CAUSAL-RELOAD-CLOSURE",
   "nonAuthoritative": true,
   "gate": "I4A",
   "controlPlaneStatusExpected": "I4A_IN_PROGRESS",
   "certifiedSourceSha": "73674c5f0a0b28ed5b0df65e0c6e182345851375",
   "buildId": "gi-i3-73674c5f0a0b-57f234755dc1",
   "previewUrl": "https://ays-orbit-360-lab--gi-i3-34545182877-03clhzs0.web.app",
-  "purpose": "Execute authoritative read-only I4A acceptance on the exact I3-certified Login/session/reload successor Preview. The causal proof is natural Firebase browser-local session restoration and automatic product reactivation after reload without manual activation. Preserve every non-causally-invalidated capability proof from run 34543599232, including targeted Aseguradoras privileged reveal/copy and advisor restriction, while allowing the consolidated executor to detect any real regression on the new certified Preview. Product source, immutable artifact, backend package, production and operational data must remain unchanged; operational writes expected are zero. Any reproducible residual defect must fail closed; this intent cannot authorize I4B or production by itself.",
+  "purpose": "Close only the proven remaining I4A Login/session/reload residual on the exact same certified source, build and Preview. Preserve the same-release successful capability checks already collected in authoritative run 34545473273. Re-execute authenticated_session_reload for Direccion, SuperAdmin, AdminTenant, Operativo and Asesor using a synchronous Playwright readiness predicate with a 23000 ms observation bound, longer than the product bootstrap internal 20000 ms snapshot bound, and without manually invoking product activation after reload. No product source change is authorized; I2/I3 re-entry is forbidden for this QA-only correction. Production, backend package, operational data and writes remain unchanged and writes expected are zero. A genuine reproducible product failure must fail closed; a PASS may close I4A only after evidence, ledger/control-plane synchronization and post-guard all agree.",
   "productionMutationAuthorized": false,
   "operationalDataWritesAuthorized": false
 }
