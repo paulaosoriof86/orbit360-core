@@ -1,0 +1,143 @@
+{
+  "schemaVersion": "gravicentra-i4a-proof-registry-v1",
+  "registryId": "GRAVICENTRA-INSURANCE-I4A-PROOF-REGISTRY",
+  "authorityType": "DERIVED_MONOTONIC_EVIDENCE_REGISTRY",
+  "mayGovernGate": false,
+  "mayGovernReleaseIdentity": false,
+  "controlPlanePath": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+  "capabilityStatusLedgerPath": "artifacts/orbit360-recovery/release-control/CAPABILITY_STATUS_LEDGER.json",
+  "releaseBinding": {
+    "sourceSha": "73674c5f0a0b28ed5b0df65e0c6e182345851375",
+    "buildId": "gi-i3-73674c5f0a0b-57f234755dc1",
+    "artifactId": 10178773368,
+    "previewUrl": "https://ays-orbit-360-lab--gi-i3-34545182877-03clhzs0.web.app",
+    "hostedPayloadDigest": "e2ffb1c440e1d17c76005979846ba8aa1757fc4056985f1f1dfe409f17180b70",
+    "backendSourceDigest": "b317ee5d6c7346bdb0abfa6bb71b5f246cd7647ed7272551065c2053f497f805"
+  },
+  "policy": {
+    "passIsMonotonicWithinRelease": true,
+    "passReexecutionForbiddenWithoutCausalInvalidation": true,
+    "validatorFailureCannotInvalidatePriorPass": true,
+    "qaOnlyChangeCannotInvalidatePriorPass": true,
+    "conversationCannotInvalidatePriorPass": true,
+    "causalInvalidationRequiresProductSourceDelta": true,
+    "openProofsOnlyExecution": true,
+    "gateSealRequiresAtomicControlPlaneLedgerRegistryCommit": true
+  },
+  "latestObservedAuthoritativeRunId": 34548315048,
+  "stateSealPending": true,
+  "stateSealPendingReason": "CAPABILITY_MATRIX_RECONCILIATION_REQUIRED_BEFORE_I4A_GATE_SEAL",
+  "proofs": [
+    {
+      "status": "PASS",
+      "contractVersion": "I4A_PUBLIC_PREVIEW_SMOKE_V1",
+      "receipt": {
+        "runId": 34548315048,
+        "artifactId": 10180024717,
+        "artifactDigest": "sha256:3e04b799083f9df837e7a1940615af244c2d8e0ee40b1aef7072bdfde5bd4682",
+        "sourceSha": "73674c5f0a0b28ed5b0df65e0c6e182345851375",
+        "buildId": "gi-i3-73674c5f0a0b-57f234755dc1",
+        "result": "PUBLIC_BROWSER_PASS"
+      },
+      "proofId": "PUBLIC_PREVIEW_SMOKE"
+    },
+    {
+      "status": "PASS",
+      "contractVersion": "I4A_BOOTSTRAP_HYDRATION_V6",
+      "receipt": {
+        "runId": 34548315048,
+        "artifactId": 10180024717,
+        "artifactDigest": "sha256:3e04b799083f9df837e7a1940615af244c2d8e0ee40b1aef7072bdfde5bd4682",
+        "sourceSha": "73674c5f0a0b28ed5b0df65e0c6e182345851375",
+        "buildId": "gi-i3-73674c5f0a0b-57f234755dc1",
+        "result": "PASS"
+      },
+      "proofId": "BOOTSTRAP_HYDRATION"
+    },
+    {
+      "status": "PASS",
+      "contractVersion": "I4A_RUNTIME_BOUNDARY_V1",
+      "receipt": {
+        "runId": 34548315048,
+        "artifactId": 10180024717,
+        "artifactDigest": "sha256:3e04b799083f9df837e7a1940615af244c2d8e0ee40b1aef7072bdfde5bd4682",
+        "sourceSha": "73674c5f0a0b28ed5b0df65e0c6e182345851375",
+        "buildId": "gi-i3-73674c5f0a0b-57f234755dc1",
+        "result": "BOUNDARY_DIAGNOSTIC_COMPLETE",
+        "writes": 0
+      },
+      "proofId": "RUNTIME_BOUNDARY"
+    },
+    {
+      "status": "PASS",
+      "contractVersion": "I4A_ASEGURADORAS_CREDENTIAL_UI_V1",
+      "harnessBlobSha": "a026524efb4169c339f439741fed59bf78c654ce",
+      "receipt": {
+        "runId": 34545473273,
+        "artifactId": 10179031611,
+        "artifactDigest": "sha256:d8efac61a213773541f1eb38d4f581f6bfc7e33bf6489ab5ec6690e7ac69aa7d",
+        "sourceSha": "73674c5f0a0b28ed5b0df65e0c6e182345851375",
+        "buildId": "gi-i3-73674c5f0a0b-57f234755dc1",
+        "result": "PASS",
+        "rolesPassed": [
+          "Dirección",
+          "SuperAdmin",
+          "AdminTenant",
+          "Operativo",
+          "Asesor"
+        ],
+        "writes": 0
+      },
+      "proofId": "ASEGURADORAS_TARGETED_ROLE_UI"
+    },
+    {
+      "status": "PASS",
+      "contractVersion": "I4A_AUTH_ADJUDICATOR_V1",
+      "harnessBlobSha": "20567311798b772922e9f276753ea8c23a53870f",
+      "receipt": {
+        "runId": 34545473273,
+        "artifactId": 10179031611,
+        "artifactDigest": "sha256:d8efac61a213773541f1eb38d4f581f6bfc7e33bf6489ab5ec6690e7ac69aa7d",
+        "sourceSha": "73674c5f0a0b28ed5b0df65e0c6e182345851375",
+        "buildId": "gi-i3-73674c5f0a0b-57f234755dc1",
+        "result": "PASS",
+        "targetedReplacements": [
+          "Dirección@aseguradoras",
+          "SuperAdmin@aseguradoras",
+          "AdminTenant@aseguradoras"
+        ]
+      },
+      "proofId": "AUTHENTICATED_MODULE_ADJUDICATED"
+    },
+    {
+      "status": "PASS",
+      "contractVersion": "I4A_LOGIN_SESSION_RELOAD_V2_SYNCHRONOUS_WAIT",
+      "harnessBlobSha": "6c16e19435182accb813bbe89731a5c1e458609f",
+      "implementationBlobSha": "da2d34d2d9d1d87980d171bae27511ce23a53cfb",
+      "receipt": {
+        "runId": 34548315048,
+        "artifactId": 10180024717,
+        "artifactDigest": "sha256:3e04b799083f9df837e7a1940615af244c2d8e0ee40b1aef7072bdfde5bd4682",
+        "sourceSha": "73674c5f0a0b28ed5b0df65e0c6e182345851375",
+        "buildId": "gi-i3-73674c5f0a0b-57f234755dc1",
+        "result": "PASS",
+        "rolesPassed": [
+          "Dirección",
+          "SuperAdmin",
+          "AdminTenant",
+          "Operativo",
+          "Asesor"
+        ],
+        "writes": 0
+      },
+      "proofId": "LOGIN_SESSION_RELOAD"
+    },
+    {
+      "status": "OPEN",
+      "contractVersion": "I4A_CAPABILITY_MATRIX_RECONCILIATION_V1",
+      "reason": "Reconcile the 15 capability acceptance contracts from sealed same-release evidence before atomic I4A gate seal. This proof is documentary/evidence adjudication only and does not authorize browser reruns or product changes.",
+      "proofId": "CAPABILITY_MATRIX_RECONCILIATION"
+    }
+  ],
+  "causalInvalidations": []
+}

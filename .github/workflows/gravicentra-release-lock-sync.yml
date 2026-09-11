@@ -1,4 +1,4 @@
-name: Gravicentra Control Plane Guard v3
+name: Gravicentra Control Plane Guard v4
 
 on:
   workflow_dispatch:
@@ -15,7 +15,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: gravicentra-control-plane-v3-${{ github.ref }}
+  group: gravicentra-control-plane-v4-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -32,40 +32,37 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Fail closed on canonical control-plane, mechanism or documentation desynchronization
+      - name: Fail closed on canonical authority, monotonic evidence, mechanism or documentation desynchronization
         run: |
           set -euo pipefail
           test "$GITHUB_REF_NAME" = "recovery/fase-a-clean-20260831"
           node --check tools/gravicentra-control-plane-guard-v2.mjs
           node --check tools/gravicentra-mechanism-invariant-v1.mjs
           node --check tools/gravicentra-evergreen-sources-invariant-v1.mjs
-          node --check tools/gravicentra-i4a-authenticated-browser-v2.mjs
+          node --check tools/gravicentra-i4a-proof-registry-guard-v1.mjs
           node --check tools/gravicentra-i4a-preview-function-remediation-guard-v1.mjs
           node --check tools/gravicentra-i4a-preview-remediation-invariant-v1.mjs
           node tools/gravicentra-control-plane-guard-v2.mjs --mode=governance
+          node tools/gravicentra-i4a-proof-registry-guard-v1.mjs
           node tools/gravicentra-mechanism-invariant-v1.mjs
           node tools/gravicentra-evergreen-sources-invariant-v1.mjs
           node tools/gravicentra-i4a-preview-remediation-invariant-v1.mjs
           git diff --exit-code
           {
-            echo '## Gravicentra Insurance — canonical control plane v3'
+            echo '## Gravicentra Insurance — canonical control plane v4'
             echo '- Mutable operational authority: `CONTROL_PLANE.json` only'
             echo '- Approved lineage authority: `CAPABILITY_LINEAGE_LOCK.json`'
             echo '- Capability status: derived ledger, release-bound, non-authoritative for gate/release identity'
+            echo '- I4A proof registry: derived monotonic receipts; cannot govern gate/release identity'
+            echo '- PASS evidence: monotonic within the certified release; causal source delta required to invalidate'
+            echo '- I4A execution: `OPEN_PROOFS_ONLY`; sealed PASS proofs cannot be rerun accidentally'
+            echo '- I4A gate seal: atomic Control Plane + capability ledger + proof registry commit'
             echo '- Frozen plan: `PLAN_TRABAJO_CONGELADO_V2.md` + evergreen interpretation addendum'
+            echo '- Evidence accumulation freeze: `MECHANISM_FREEZE_V4_20260910.md`'
             echo '- Project Sources: active evergreen V3 manifest + Git blob integrity enforced'
-            echo '- Static Project Sources replacement: controlled by `projectSources.staticSourceUpdateRequired`'
-            echo '- Complete ancestry checkout: `fetch-depth: 0` for control-plane executors'
-            echo '- Gate executors I2/I3: state-gated, exact scoped non-authoritative intent; manual dispatch retained only as explicit escape'
-            echo '- Gate executor I4A: state-gated exact scoped intent; no parallel diagnostic executor'
-            echo '- Central guard watch: broad Gravicentra workflows/tools/release-control/project-sources paths'
-            echo '- I3 successor source: `nextCandidate`, never previous `certifiedCandidate` during successor recertification'
-            echo '- Split state/release authorities: deprecated and mechanically blocked'
+            echo '- I2/I3 re-entry: only on proven product source change'
             echo '- Conversations/snapshots as operational authority: forbidden'
-            echo '- Release identity hardcodes in workflows: forbidden'
             echo '- QA runtime self-patch: forbidden'
-            echo '- Lineage rediscovery after I1: forbidden without causal exception'
-            echo '- Product-source drift: fail closed'
             echo '- Production touched: false'
             echo '- Data touched: false'
           } >> "$GITHUB_STEP_SUMMARY"
