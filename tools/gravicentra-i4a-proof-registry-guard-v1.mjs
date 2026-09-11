@@ -24,6 +24,42 @@ need(b.hostedPayloadDigest===cc.hostedPayloadDigest,'I4A_PROOF_HOSTED_DIGEST_MIS
 need(b.backendSourceDigest===cc.backendSourceDigest,'I4A_PROOF_BACKEND_DIGEST_MISMATCH');
 const policy=r.policy||{};
 for(const k of ['passIsMonotonicWithinRelease','passReexecutionForbiddenWithoutCausalInvalidation','validatorFailureCannotInvalidatePriorPass','qaOnlyChangeCannotInvalidatePriorPass','conversationCannotInvalidatePriorPass','causalInvalidationRequiresProductSourceDelta','openProofsOnlyExecution','gateSealRequiresAtomicControlPlaneLedgerRegistryCommit'])need(policy[k]===true,'I4A_PROOF_POLICY_MISSING:'+k);
+
+const transitions=Array.isArray(r.releaseTransitions)?r.releaseTransitions:[];
+for(const t of transitions){
+  need(t&&['ACTIVE','SEALED'].includes(t.status),'I4A_RELEASE_TRANSITION_STATUS_INVALID');
+  need(t.productSourceDelta===true,'I4A_RELEASE_TRANSITION_REQUIRES_PRODUCT_DELTA');
+  need(/^[0-9a-f]{40}$/.test(String(t.fromSourceSha||''))&&/^[0-9a-f]{40}$/.test(String(t.toSourceSha||''))&&t.fromSourceSha!==t.toSourceSha,'I4A_RELEASE_TRANSITION_SOURCE_INVALID');
+  need(typeof t.fromBuildId==='string'&&t.fromBuildId.length>8&&typeof t.toBuildId==='string'&&t.toBuildId.length>8&&t.fromBuildId!==t.toBuildId,'I4A_RELEASE_TRANSITION_BUILD_INVALID');
+  need(Array.isArray(t.changedProductFiles)&&t.changedProductFiles.length>0,'I4A_RELEASE_TRANSITION_FILES_MISSING');
+  need(typeof t.causalEvidence==='string'&&t.causalEvidence.length>12,'I4A_RELEASE_TRANSITION_CAUSAL_EVIDENCE_MISSING');
+  need(Array.isArray(t.preservedPassProofIds),'I4A_RELEASE_TRANSITION_PRESERVED_LIST_MISSING');
+  need(Array.isArray(t.affectedOpenProofIds),'I4A_RELEASE_TRANSITION_AFFECTED_OPEN_LIST_MISSING');
+  const affected=new Set(t.affectedOpenProofIds);
+  for(const id of t.preservedPassProofIds)need(!affected.has(id),'I4A_RELEASE_TRANSITION_PROOF_BOTH_PRESERVED_AND_AFFECTED:'+id);
+}
+
+function passReceiptReachesCurrent(proofId,receipt){
+  const startSource=String(receipt?.sourceSha||'');
+  const startBuild=String(receipt?.buildId||'');
+  if(startSource===b.sourceSha&&startBuild===b.buildId)return true;
+  const queue=[{sourceSha:startSource,buildId:startBuild}];
+  const seen=new Set();
+  while(queue.length){
+    const node=queue.shift();
+    const key=node.sourceSha+'|'+node.buildId;
+    if(seen.has(key))continue;
+    seen.add(key);
+    for(const t of transitions){
+      if(t.fromSourceSha!==node.sourceSha||t.fromBuildId!==node.buildId)continue;
+      if(!t.preservedPassProofIds.includes(proofId))continue;
+      if(t.toSourceSha===b.sourceSha&&t.toBuildId===b.buildId)return true;
+      queue.push({sourceSha:t.toSourceSha,buildId:t.toBuildId});
+    }
+  }
+  return false;
+}
+
 const proofs=Array.isArray(r.proofs)?r.proofs:[];
 need(proofs.length>0,'I4A_PROOF_REGISTRY_EMPTY');
 const byId=new Map();
@@ -36,8 +72,7 @@ for(const p of proofs){
     need(Number.isInteger(Number(x.runId))&&Number(x.runId)>0,'I4A_PASS_RUN_MISSING:'+p.proofId);
     need(Number.isInteger(Number(x.artifactId))&&Number(x.artifactId)>0,'I4A_PASS_ARTIFACT_MISSING:'+p.proofId);
     need(/^sha256:[0-9a-f]{64}$/.test(String(x.artifactDigest||'')),'I4A_PASS_DIGEST_INVALID:'+p.proofId);
-    need(x.sourceSha===b.sourceSha,'I4A_PASS_SOURCE_MISMATCH:'+p.proofId);
-    need(x.buildId===b.buildId,'I4A_PASS_BUILD_MISMATCH:'+p.proofId);
+    need(passReceiptReachesCurrent(p.proofId,x),'I4A_PASS_RELEASE_INHERITANCE_MISSING:'+p.proofId);
     need(typeof p.contractVersion==='string'&&p.contractVersion.length>3,'I4A_PASS_CONTRACT_VERSION_MISSING:'+p.proofId);
   }
 }
@@ -55,14 +90,17 @@ try{
   const raw=execFileSync('git',['show',`HEAD^:${REGISTRY}`],{encoding:'utf8',stdio:['ignore','pipe','ignore']});
   parentRegistry=JSON.parse(raw);
 }catch{}
-if(parentRegistry?.releaseBinding?.sourceSha===b.sourceSha){
+if(parentRegistry){
   const prev=new Map((parentRegistry.proofs||[]).map(p=>[p.proofId,p]));
+  const sameRelease=parentRegistry?.releaseBinding?.sourceSha===b.sourceSha&&parentRegistry?.releaseBinding?.buildId===b.buildId;
   for(const p of proofs){
     const old=prev.get(p.proofId);
-    if(old?.status==='PASS'){
-      const inv=activeInvalidation(p.proofId);
-      need(p.status==='PASS'||!!inv,'I4A_MONOTONIC_PASS_REOPEN_FORBIDDEN:'+p.proofId);
-      if(p.status==='PASS')need(JSON.stringify(p)===JSON.stringify(old),'I4A_SEALED_PASS_RECEIPT_MUTATED:'+p.proofId);
+    if(old?.status!=='PASS')continue;
+    const inv=activeInvalidation(p.proofId);
+    need(p.status==='PASS'||!!inv,'I4A_MONOTONIC_PASS_REOPEN_FORBIDDEN:'+p.proofId);
+    if(p.status==='PASS'){
+      need(JSON.stringify(p)===JSON.stringify(old),'I4A_SEALED_PASS_RECEIPT_MUTATED:'+p.proofId);
+      if(!sameRelease)need(passReceiptReachesCurrent(p.proofId,p.receipt),'I4A_CROSS_RELEASE_PASS_NOT_EXPLICITLY_PRESERVED:'+p.proofId);
     }
   }
 }
@@ -97,3 +135,4 @@ console.log('I4A_PROOF_RELEASE_SOURCE='+b.sourceSha);
 console.log('I4A_PROOF_PASS_COUNT='+proofs.filter(p=>p.status==='PASS').length);
 console.log('I4A_PROOF_OPEN='+open.join(','));
 console.log('I4A_STATE_SEAL_PENDING='+String(r.stateSealPending===true));
+console.log('I4A_RELEASE_TRANSITION_COUNT='+transitions.length);
