@@ -8,6 +8,7 @@ on:
     paths:
       - .github/workflows/gravicentra-recovery-i4b-transversal.yml
       - tools/gravicentra-i4b-transversal-v1.mjs
+      - tools/gravicentra-i4b-relationship-diagnostic-v1.mjs
 
 permissions:
   contents: read
@@ -40,12 +41,28 @@ jobs:
           node --check tools/gravicentra-governance-preflight-v1.mjs
           node tools/gravicentra-governance-preflight-v1.mjs --mode=i4b
           node --check tools/gravicentra-i4b-transversal-v1.mjs
+          node --check tools/gravicentra-i4b-relationship-diagnostic-v1.mjs
 
       - name: Install I4B browser dependencies
         run: |
           set -euo pipefail
           npm install --no-save --package-lock=false playwright@1.55.0 firebase-admin@13.10.0 >/dev/null
           npx playwright install --with-deps chromium >/dev/null
+
+      - name: Diagnose relationship exceptions without mutating product or data
+        env:
+          I4B_EVIDENCE_DIR: ${{ runner.temp }}/gravicentra-i4b-evidence
+          SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+          SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$I4B_EVIDENCE_DIR"
+          node tools/gravicentra-i4b-relationship-diagnostic-v1.mjs
+          test -f "$I4B_EVIDENCE_DIR/i4b-relationship-diagnostic.json"
+          test "$(jq -r '.productionTouched' "$I4B_EVIDENCE_DIR/i4b-relationship-diagnostic.json")" = "false"
+          test "$(jq -r '.dataTouched' "$I4B_EVIDENCE_DIR/i4b-relationship-diagnostic.json")" = "false"
+          test "$(jq -r '.writesExecuted' "$I4B_EVIDENCE_DIR/i4b-relationship-diagnostic.json")" = "0"
 
       - name: Execute role x viewport x module and relationship matrix
         env:

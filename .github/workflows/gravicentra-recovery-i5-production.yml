@@ -1,0 +1,137 @@
+name: Gravicentra Recovery I5 Production Promotion
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - recovery/fase-a-clean-20260831
+    paths:
+      - artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json
+      - artifacts/orbit360-recovery/release-control/I5_EXECUTION_INTENT.json
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: gravicentra-recovery-i5-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  PROJECT_ID: ays-orbit-360-lab
+  HOSTING_SITE: ays-orbit-360-lab
+  PRODUCTION_URL: https://ays-orbit-360-lab.web.app
+
+jobs:
+  i5-authoritative:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 55
+    steps:
+      - name: Checkout authoritative Recovery control plane
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - id: release
+        name: Fail closed on I5 authority and exact I3 artifact identity
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "recovery/fase-a-clean-20260831"
+          node --check tools/gravicentra-governance-preflight-v1.mjs
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i5
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const c=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json','utf8'));
+          const need=(ok,code)=>{if(!ok)throw new Error(code)};
+          need(c.status==='I5_IN_PROGRESS','I5_CONTROL_STATUS_INVALID');
+          const x=c.certifiedCandidate||{};
+          need(x.sameFrontendArtifactPreviewToProductionRequired===true,'I5_SAME_FRONTEND_ARTIFACT_RULE_MISSING');
+          need(x.sameBackendSourcePackageRequiredForI5===true,'I5_SAME_BACKEND_PACKAGE_RULE_MISSING');
+          need(x.sourceMutatedAfterBuild===false,'I5_SOURCE_MUTATED_AFTER_BUILD');
+          need(Number.isInteger(Number(x.artifactId))&&Number(x.artifactId)>0,'I5_I3_ARTIFACT_ID_INVALID');
+          need(Number.isInteger(Number(x.i3RunId))&&Number(x.i3RunId)>0,'I5_I3_RUN_ID_INVALID');
+          need(typeof x.artifactName==='string'&&x.artifactName.length>8,'I5_I3_ARTIFACT_NAME_INVALID');
+          need(/^sha256:[0-9a-f]{64}$/.test(String(x.artifactArchiveDigest||'')),'I5_I3_ARTIFACT_ARCHIVE_DIGEST_INVALID');
+          need(/^[0-9a-f]{64}$/.test(String(x.hostedPayloadDigest||'')),'I5_HOSTED_PAYLOAD_DIGEST_INVALID');
+          const a=c.i5Execution||{};
+          const deploy=a.productionDeployAuthorized===true;
+          const writes=a.controlledWritesAuthorized===true;
+          if(deploy){
+            need(writes===true,'I5_DEPLOY_REQUIRES_CONTROLLED_WRITES_AUTHORIZATION');
+            need(a.rollbackPrepared===true,'I5_DEPLOY_REQUIRES_ROLLBACK_PREPARED');
+            need(fs.existsSync('artifacts/orbit360-recovery/release-control/I5_EXECUTION_INTENT.json'),'I5_DEPLOY_REQUIRES_EXECUTION_INTENT');
+            need(fs.existsSync('tools/gravicentra-i5-controlled-writes-v1.mjs'),'I5_DEPLOY_REQUIRES_CONTROLLED_WRITE_HARNESS');
+          }
+          const env={
+            SOURCE_SHA:x.sourceSha,BUILD_ID:x.buildId,I3_RUN_ID:String(x.i3RunId),I3_ARTIFACT_ID:String(x.artifactId),
+            I3_ARTIFACT_NAME:x.artifactName,EXPECTED_ARTIFACT_ARCHIVE_DIGEST:x.artifactArchiveDigest,
+            EXPECTED_HOSTED_PAYLOAD_DIGEST:x.hostedPayloadDigest,EXPECTED_BACKEND_SOURCE_DIGEST:x.backendSourceDigest,
+            PREVIEW_CHANNEL_ID:x.previewChannelId,PREVIEW_URL:x.previewUrl,
+            I5_PRODUCTION_DEPLOY_AUTHORIZED:String(deploy),I5_CONTROLLED_WRITES_AUTHORIZED:String(writes)
+          };
+          for(const [k,v] of Object.entries(env))fs.appendFileSync(process.env.GITHUB_ENV,`${k}=${v}\n`);
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,`deploy_authorized=${deploy}\n`);
+          console.log('I3_ARTIFACT_ID='+x.artifactId);
+          console.log('sameFrontendArtifactPreviewToProductionRequired=true');
+          console.log('I5_PRODUCTION_DEPLOY_AUTHORIZED='+deploy);
+          NODE
+
+      - name: Download exact certified I3 artifact without rebuilding
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.I3_ARTIFACT_NAME }}
+          path: ${{ runner.temp }}/gravicentra-i5-certified-artifact
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          run-id: ${{ env.I3_RUN_ID }}
+
+      - name: Verify certified artifact identity and package digests
+        run: |
+          set -euo pipefail
+          ROOT="$RUNNER_TEMP/gravicentra-i5-certified-artifact"
+          EVIDENCE=$(find "$ROOT" -type f -name i3-evidence.json -print -quit)
+          MANIFEST=$(find "$ROOT" -type f -name site-manifest.sha256 -print -quit)
+          BUNDLE=$(find "$ROOT" -type d -name bundle -print -quit)
+          test -n "$EVIDENCE" -a -n "$MANIFEST" -a -n "$BUNDLE"
+          test "$(jq -r '.sourceSha' "$EVIDENCE")" = "$SOURCE_SHA"
+          test "$(jq -r '.buildId' "$EVIDENCE")" = "$BUILD_ID"
+          test "$(jq -r '.hostedPayloadDigest' "$EVIDENCE")" = "$EXPECTED_HOSTED_PAYLOAD_DIGEST"
+          test "$(jq -r '.backendSourceDigest' "$EVIDENCE")" = "$EXPECTED_BACKEND_SOURCE_DIGEST"
+          test "$(jq -r '.sameFrontendArtifactPreviewToProductionRequired' "$EVIDENCE")" = "true"
+          test "$(jq -r '.sameBackendSourcePackageRequiredForI5' "$EVIDENCE")" = "true"
+          test "$(jq -r '.sourceMutatedAfterBuild' "$EVIDENCE")" = "false"
+          test -f "$BUNDLE/firebase.json"
+          echo I5_CERTIFIED_ARTIFACT_PREDEPLOY_READINESS=PASS
+          echo I5_NO_REBUILD=true
+
+      - name: Stop safely until explicit I5 production authorization exists
+        if: ${{ steps.release.outputs.deploy_authorized != 'true' }}
+        run: |
+          set -euo pipefail
+          echo I5_STATE_GATED_EXECUTOR=READY
+          echo productionTouched=false
+          echo dataTouched=false
+          echo writesExecuted=0
+          echo augustDataTouched=false
+
+      - name: Validate production package prerequisites before any mutation
+        if: ${{ steps.release.outputs.deploy_authorized == 'true' }}
+        run: |
+          set -euo pipefail
+          test "$I5_CONTROLLED_WRITES_AUTHORIZED" = "true"
+          node --check tools/gravicentra-i5-controlled-writes-v1.mjs
+          test -f artifacts/orbit360-recovery/release-control/I5_EXECUTION_INTENT.json
+          echo I5_PREDEPLOY_FAIL_CLOSED_PREREQUISITES=PASS
+
+      - name: Production deployment remains unreachable unless all I5 prerequisites are present
+        if: ${{ steps.release.outputs.deploy_authorized == 'true' }}
+        run: |
+          set -euo pipefail
+          echo 'I5 production mutation path is deliberately fail-closed until the frozen live-test/write/rollback harness is materialized and validated.' >&2
+          exit 86

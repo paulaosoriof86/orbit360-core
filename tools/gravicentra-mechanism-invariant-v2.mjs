@@ -55,13 +55,28 @@ if(activeGate){
   }
 }
 
+let i5SuccessorReady=false;
+if(activeGate==='I4B'||activeGate==='I5'){
+  need(exists(executors.I5),'V5_I5_SUCCESSOR_EXECUTOR_MISSING');
+  const i5=read(executors.I5);
+  for(const marker of [
+    'I5_IN_PROGRESS','fetch-depth: 0','gravicentra-governance-preflight-v1.mjs --mode=i5',
+    'I3_ARTIFACT_ID','actions/download-artifact@v4','sameFrontendArtifactPreviewToProductionRequired',
+    'sameBackendSourcePackageRequiredForI5','sourceMutatedAfterBuild','productionDeployAuthorized',
+    'controlledWritesAuthorized','rollbackPrepared','I5_NO_REBUILD=true'
+  ]) need(i5.includes(marker),'V5_I5_SUCCESSOR_READINESS_MARKER_MISSING:'+marker);
+  need(i5.includes('artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json'),'V5_I5_SUCCESSOR_NOT_CONTROL_PLANE_TRIGGERED');
+  need(!/npm\s+(?:run\s+)?build|vite\s+build|webpack\s+--mode\s+production/i.test(i5),'V5_I5_REBUILD_PATH_FORBIDDEN');
+  i5SuccessorReady=true;
+}
+
 const names=fs.readdirSync('.github/workflows').filter(x=>x.endsWith('.yml')||x.endsWith('.yaml'));
 for(const gate of ['i2','i3','i4a','i4b','i5']){
   const rx=new RegExp(`(?:^|-)${gate}(?:-|\\.)`,'i');
   const candidates=names.filter(x=>x.startsWith('gravicentra-')&&rx.test(x));
   if(gate==='i4a') need(candidates.length===1&&candidates[0]==='gravicentra-recovery-i4a-public-browser.yml','V5_PARALLEL_I4A_EXECUTOR:'+candidates.join(','));
   if(gate==='i4b'&&activeGate==='I4B') need(candidates.length===1&&candidates[0]==='gravicentra-recovery-i4b-transversal.yml','V5_PARALLEL_I4B_EXECUTOR:'+candidates.join(','));
-  if(gate==='i5'&&activeGate==='I5') need(candidates.length===1&&candidates[0]==='gravicentra-recovery-i5-production.yml','V5_PARALLEL_I5_EXECUTOR:'+candidates.join(','));
+  if(gate==='i5'&&(activeGate==='I4B'||activeGate==='I5')) need(candidates.length===1&&candidates[0]==='gravicentra-recovery-i5-production.yml','V5_PARALLEL_I5_EXECUTOR:'+candidates.join(','));
 }
 
 need(central.includes('Gravicentra Control Plane Guard v5'),'V5_CENTRAL_GUARD_VERSION_MISSING');
@@ -71,11 +86,12 @@ const next=cp.gateState?.nextFrozenIteration||'';
 need(!activeGate||next===activeGate,'V5_CONTROL_GATE_EXECUTOR_GATE_DIVERGENCE:'+String(activeGate)+':'+String(next));
 
 console.log('GRAVICENTRA_MECHANISM_INVARIANT=PASS');
-console.log('MECHANISM_INVARIANT_VERSION=V2_CANONICAL_PREFLIGHT');
+console.log('MECHANISM_INVARIANT_VERSION=V2_CANONICAL_PREFLIGHT_SUCCESSOR_READY');
 console.log('ACTIVE_GATE='+(activeGate||'NONE'));
 console.log('ACTIVE_EXECUTOR='+(activeGate?executors[activeGate]:'NONE'));
 console.log('CANONICAL_PREFLIGHT='+canonicalPreflight);
 console.log('CONTROL_NEXT_FROZEN_ITERATION='+next);
+console.log('I5_SUCCESSOR_READY='+String(i5SuccessorReady));
 console.log('PRODUCT_SOURCE_MUTATION=false');
 console.log('PRODUCTION_TOUCHED=false');
 console.log('DATA_TOUCHED=false');
