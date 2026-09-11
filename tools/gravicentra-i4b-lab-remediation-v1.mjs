@@ -7,11 +7,24 @@ import { getFirestore } from 'firebase-admin/firestore';
 const PROJECT='ays-orbit-360-lab';
 const TENANT='alianzas-soluciones';
 const OUT=process.env.I4B_REMEDIATION_EVIDENCE_DIR||process.env.RUNNER_TEMP||process.cwd();
-const EXPECTED=new Map([
-  ['polizas/lab_poliza_auto_gt','seed_ficticio_lab'],
-  ['polizas/lab_poliza_hogar_co','seed_ficticio_lab'],
-  ['vehiculos/lab_vehiculo_gt_001','seed_ficticio_lab'],
-  ['negocios/lab_negocio_gt_001','seed_ficticio_lab'],
+const SEED='seed_ficticio_lab';
+const LOADED_BY='woJlxR1iFEeiQZvTscPj4qQ5Qc73';
+const CREATE_TIME='2026-07-01T05:00:00.622Z';
+const EXPECTED=new Set([
+  'actividades/lab_actividad_gt_001',
+  'asesores/lab_asesor_diego',
+  'asesores/lab_asesor_paula',
+  'cobros/lab_cobro_auto_gt_001',
+  'cobros/lab_cobro_hogar_co_001',
+  'comisiones/lab_comision_gt_001',
+  'finmovs/lab_finmov_gt_001',
+  'gestiones/lab_gestion_gt_001',
+  'metas/lab_meta_gt_202607',
+  'negocios/lab_negocio_gt_001',
+  'polizas/lab_poliza_auto_gt',
+  'polizas/lab_poliza_hogar_co',
+  'reclamos/lab_reclamo_gt_001',
+  'vehiculos/lab_vehiculo_gt_001',
 ]);
 const clean=v=>String(v==null?'':v).trim();
 const iso=t=>{try{return t?.toDate?.().toISOString?.()||null}catch{return null}};
@@ -24,14 +37,16 @@ function serviceAccount(){
 }
 function marker(d,id){
   const origin=clean(d?.origen);
+  const seed=clean(d?._seed);
   const qa=clean(d?.qaMarker||d?.qa_marker||d?.marker);
-  return /^lab_/i.test(id)||origin==='seed_ficticio_lab'||/^qa[_-]/i.test(qa)||/seed_ficticio_lab/i.test(qa);
+  return /^lab_/i.test(id)||origin===SEED||seed===SEED||/^qa[_-]/i.test(qa)||/seed_ficticio_lab/i.test(qa);
 }
 
 const evidence={
   schemaVersion:'gravicentra-i4b-lab-remediation-v1',gate:'I4B',projectId:PROJECT,tenant:TENANT,
-  status:'STARTED',productionHostingTouched:false,before:[],expected:[...EXPECTED.keys()].sort(),deleted:[],after:[],
-  alreadyClean:false,writesExecuted:0,dataTouched:false,rollbackExecuted:false,rollbackWrites:0,error:null
+  status:'STARTED',productionHostingTouched:false,before:[],expected:[...EXPECTED].sort(),deleted:[],after:[],
+  provenance:{seed:SEED,loadedBy:LOADED_BY,createTime:CREATE_TIME},alreadyClean:false,writesExecuted:0,dataTouched:false,
+  rollbackExecuted:false,rollbackWrites:0,error:null
 };
 let app;
 try{
@@ -44,17 +59,22 @@ try{
     for(const doc of snap.docs){
       const d=doc.data()||{};
       if(!marker(d,doc.id))continue;
-      evidence.before.push({key:`${cdoc.id}/${doc.id}`,collection:cdoc.id,id:doc.id,origen:clean(d.origen),qaMarker:clean(d.qaMarker||d.qa_marker||d.marker),createTime:iso(doc.createTime),updateTime:iso(doc.updateTime),data:d});
+      evidence.before.push({key:`${cdoc.id}/${doc.id}`,collection:cdoc.id,id:doc.id,origen:clean(d.origen),seed:clean(d._seed),loadedBy:clean(d._loadedBy),loadedAt:clean(d._loadedAt),qaMarker:clean(d.qaMarker||d.qa_marker||d.marker),createTime:iso(doc.createTime),updateTime:iso(doc.updateTime),data:d});
     }
   }
   evidence.before.sort((a,b)=>a.key.localeCompare(b.key));
   const actual=evidence.before.map(x=>x.key);
-  const expected=[...EXPECTED.keys()].sort();
+  const expected=[...EXPECTED].sort();
   if(actual.length===0){
     evidence.alreadyClean=true;
   }else{
     need(JSON.stringify(actual)===JSON.stringify(expected),'I4B_REMEDIATION_UNEXPECTED_LAB_INVENTORY:'+actual.join(','));
-    for(const row of evidence.before)need(row.origen===EXPECTED.get(row.key),'I4B_REMEDIATION_ORIGIN_MISMATCH:'+row.key+':'+row.origen);
+    for(const row of evidence.before){
+      need(row.origen===SEED,'I4B_REMEDIATION_ORIGIN_MISMATCH:'+row.key+':'+row.origen);
+      need(row.seed===SEED,'I4B_REMEDIATION_SEED_MISMATCH:'+row.key+':'+row.seed);
+      need(row.loadedBy===LOADED_BY,'I4B_REMEDIATION_LOADER_MISMATCH:'+row.key+':'+row.loadedBy);
+      need(row.createTime===CREATE_TIME,'I4B_REMEDIATION_CREATE_TIME_MISMATCH:'+row.key+':'+row.createTime);
+    }
 
     const refs=evidence.before.map(row=>dataRoot.doc(row.collection).collection('items').doc(row.id));
     const batch=db.batch();
