@@ -7,7 +7,7 @@
   'use strict';
   window.Orbit=window.Orbit||{};
   var provider=function(){return window.Orbit.productRuntimeBrowserProvidersP0;};
-  var rawUser=null;
+  var rawUser=null,restorePromise=null;
   function productUser(){return window.Orbit.auth&&window.Orbit.auth.productUser?window.Orbit.auth.productUser:null;}
   function user(){var p=productUser();if(p)return p;if(!rawUser)return null;return{nombre:rawUser.displayName||rawUser.email||'Usuario',email:rawUser.email||'',uid:rawUser.uid||'',rol:'',tipo:'interno',backend:'product'};}
   function initials(value){var text=String(value||'').trim();if(!text)return'U';if(text.indexOf('@')>0)text=text.split('@')[0].replace(/[._-]+/g,' ');return text.split(/\s+/).filter(Boolean).slice(0,2).map(function(x){return x.charAt(0).toUpperCase();}).join('')||'U';}
@@ -17,11 +17,22 @@
   function showLogin(){var lg=document.getElementById('login');if(lg){lg.style.display='';lg.classList.remove('hidden');}document.body.classList.add('pre-auth');}
   function showApp(){paintIdentity();var lg=document.getElementById('login');if(lg){lg.classList.add('hidden');setTimeout(function(){lg.style.display='none';},300);}document.body.classList.remove('pre-auth');setTimeout(function(){var u=user()||{};var tipo=u.tipo==='socio'?'socio':'interno';var scopeId='user:'+(u.email||u.uid||'product');if(Orbit.legal&&Orbit.legal.gate)Orbit.legal.gate(tipo,scopeId);},350);}
   function friendly(){return 'No fue posible iniciar sesión. Verifica tu usuario y contraseña e intenta nuevamente.';}
+  function restore(p){
+    if(restorePromise)return restorePromise;
+    restorePromise=Promise.resolve().then(function(){return p.initialUser?p.initialUser():null;}).then(function(existing){
+      if(!existing)return null;
+      rawUser=existing;
+      if(rawUser.emailVerified!==true)return Promise.resolve(p.signOut?p.signOut():null).catch(function(){}).then(function(){rawUser=null;return null;});
+      if(!Orbit.productAppP0||typeof Orbit.productAppP0.activate!=='function')throw new Error('PRODUCT_APP_OWNER_MISSING');
+      return Orbit.productAppP0.activate();
+    }).catch(function(){rawUser=null;paintError('El acceso todavía no está disponible.');return null;});
+    return restorePromise;
+  }
   function init(){
     showLogin();
     var p=provider();
     if(!p||!p.enabled||!p.enabled()){paintError('El acceso todavía no está habilitado.');return;}
-    p.initialize().catch(function(){paintError('El acceso todavía no está disponible.');});
+    p.initialize().then(function(){return restore(p);}).catch(function(){paintError('El acceso todavía no está disponible.');});
     var form=document.getElementById('login-form');
     if(!form||form.dataset.productBound==='1')return;
     form.dataset.productBound='1';
@@ -33,5 +44,5 @@
     });
   }
   function logout(){var p=provider();return Promise.resolve(p&&p.signOut?p.signOut():null).catch(function(){}).then(function(){rawUser=null;location.reload();});}
-  window.Orbit.auth={VERSION:'product-p0-m6-20260730.2',init:init,user:user,authed:function(){return!!user();},login:function(){return user();},logout:logout,showLogin:showLogin,showApp:showApp,paintIdentity:paintIdentity,productUser:null,writeAuthorized:false,noLocalSession:true};
+  window.Orbit.auth={VERSION:'product-p0-session-reload-20260910.1',init:init,user:user,authed:function(){return!!user();},login:function(){return user();},logout:logout,showLogin:showLogin,showApp:showApp,paintIdentity:paintIdentity,productUser:null,writeAuthorized:false,noLocalSession:true,sessionPersistence:'firebase-browser-local'};
 })();
