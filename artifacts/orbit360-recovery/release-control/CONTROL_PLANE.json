@@ -1,7 +1,7 @@
 {
   "schemaVersion": "gravicentra-control-plane-v2",
   "controlPlaneId": "GRAVICENTRA-INSURANCE-FASE-A",
-  "status": "I2_IN_PROGRESS",
+  "status": "I3_IN_PROGRESS",
   "productBrand": "Gravicentra Insurance",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -39,13 +39,13 @@
   },
   "gateState": {
     "lastFormallyCompletedIteration": 3,
-    "currentTransition": "I2_LOGIN_SESSION_RELOAD_SUCCESSOR_RECERTIFICATION",
-    "nextFrozenIteration": "I2",
+    "currentTransition": "I3_LOGIN_SESSION_RELOAD_SUCCESSOR_IMMUTABLE_PREVIEW",
+    "nextFrozenIteration": "I3",
     "gates": {
       "I0": {"status": "PASS"},
       "I1": {"status": "PASS", "capabilitiesBound": 15},
-      "I2": {"status": "IN_PROGRESS", "previousRunId": 34436885351, "previousSourceSha": "10408e3d777ff8934b850c9f61d431dfed3afc2e", "reason": "I4A run 34543599232 reproduced Login sign-in/session/reload failure across all five roles; source owner lacks automatic verified-session restoration after reload."},
-      "I3": {"status": "PASS", "latestRunId": 34437131024, "conclusion": "success", "sourceSha": "10408e3d777ff8934b850c9f61d431dfed3afc2e", "artifactId": 10136593042, "readbackExact": true},
+      "I2": {"status": "PASS_LATEST_CANDIDATE", "latestRunId": 34545028278, "sourceSha": "73674c5f0a0b28ed5b0df65e0c6e182345851375", "conclusion": "success"},
+      "I3": {"status": "IN_PROGRESS", "previousRunId": 34437131024, "previousSourceSha": "10408e3d777ff8934b850c9f61d431dfed3afc2e", "reason": "I2 successor 73674c5f passed exact source contract in run 34545028278; build immutable successor Preview from same source."},
       "I4A": {"status": "IN_PROGRESS", "previousAuthoritativeRunId": 34430190710, "latestAuthoritativeRunId": 34543599232, "blockedBy": "LOGIN_SESSION_RELOAD_SUCCESSOR_RECERTIFICATION"},
       "I4B": {"status": "PENDING"},
       "I5": {"status": "PENDING"},
@@ -94,10 +94,7 @@
     "parentCertifiedSourceSha": "10408e3d777ff8934b850c9f61d431dfed3afc2e",
     "causalRunId": 34543599232,
     "cause": "LOGIN_SESSION_RELOAD_NOT_RESTORED",
-    "allowedProductFiles": [
-      "orbit360-platform/core/product-runtime-browser-providers-p0.js",
-      "orbit360-platform/core/auth-product-runtime-p0.js"
-    ],
+    "allowedProductFiles": ["orbit360-platform/core/product-runtime-browser-providers-p0.js", "orbit360-platform/core/auth-product-runtime-p0.js"],
     "doesNotReopenUnaffectedCapabilityEvidence": true,
     "productionMutationAuthorized": false,
     "dataMutationAuthorized": false
@@ -108,7 +105,7 @@
     "polizasFiveRolesProbePass": true,
     "cobrosFiveRolesProbePass": true,
     "loginSessionReload": {
-      "status": "SOURCE_SUCCESSOR_REQUIRED_I2_I3",
+      "status": "SUCCESSOR_I2_PASS_I3_REQUIRED",
       "failedRunId": 34543599232,
       "failureCode": "RESIDUAL_FIREBASE_SESSION_NOT_PERSISTED",
       "rolesAffected": ["Dirección", "SuperAdmin", "AdminTenant", "Operativo", "Asesor"],
@@ -122,7 +119,9 @@
       "productionTouched": false,
       "dataTouched": false,
       "writesExecuted": 0,
-      "nextRequiredProof": "I2 exact source contract then I3 immutable Preview exact readback then return to I4A Login session/reload residual proof"
+      "nextRequiredProof": "I3 immutable Preview exact readback on source 73674c5f then return to I4A Login session/reload residual proof",
+      "successorI2RunId": 34545028278,
+      "successorI2Conclusion": "success"
     },
     "aseguradoras": {
       "status": "SUCCESSOR_I3_PASS_I4A_RETEST_REQUIRED",
@@ -257,15 +256,7 @@
     "i3SuccessorRunId": 34423252469,
     "i3SuccessorConclusion": "success",
     "i3SuccessorReadbackExact": true,
-    "fixes": [
-      "I2 and I3 control checkouts use complete ancestry",
-      "I2 and I3 execute from exact scoped non-authoritative intents with manual dispatch only as explicit escape",
-      "I3 consumes nextCandidate during successor lifecycle rather than the previous certifiedCandidate",
-      "central guard watches broad Gravicentra workflow/tool/release-control/project-source paths",
-      "temporary Aseguradoras diagnostic workflow removed from active executor set",
-      "I3 package-prep Python Path reader corrected from read() to read_text() after physical failure",
-      "I2/I3 re-entry is mechanically blocked unless a new product source change is causally proven"
-    ],
+    "fixes": ["I2 and I3 control checkouts use complete ancestry", "I2 and I3 execute from exact scoped non-authoritative intents with manual dispatch only as explicit escape", "I3 consumes nextCandidate during successor lifecycle rather than the previous certifiedCandidate", "central guard watches broad Gravicentra workflow/tool/release-control/project-source paths", "temporary Aseguradoras diagnostic workflow removed from active executor set", "I3 package-prep Python Path reader corrected from read() to read_text() after physical failure", "I2/I3 re-entry is mechanically blocked unless a new product source change is causally proven"],
     "documentationPath": "artifacts/orbit360-recovery/release-control/I4A_ASEGURADORAS_ROOT_CAUSE_AND_MECHANISM_CORRECTION_20260909.md",
     "mechanismFreezePath": "artifacts/orbit360-recovery/release-control/MECHANISM_FREEZE_V3_20260909.md",
     "projectSourcesReplacementRequired": false
@@ -290,7 +281,7 @@
     "frozenPlanSnapshotInterpretationAddendumMaterialized": true,
     "successorI2I3IntentMechanismMaterialized": true,
     "successorI2PhysicalPass": true,
-    "latestCausalI2RunId": 34436885351,
+    "latestCausalI2RunId": 34545028278,
     "latestCausalI2Conclusion": "success",
     "i3NextCandidateBindingMaterialized": true,
     "i3NextCandidateBindingPhysicalPass": true,
@@ -304,5 +295,5 @@
     "mechanismFrozen": true,
     "mechanismFreezeEnforced": true
   },
-  "nextAction": "RUN_I2_ON_LOGIN_SESSION_RELOAD_SUCCESSOR_THEN_I3_SAME_SOURCE"
+  "nextAction": "RUN_I3_IMMUTABLE_PREVIEW_ON_EXACT_LOGIN_SESSION_RELOAD_SUCCESSOR"
 }
