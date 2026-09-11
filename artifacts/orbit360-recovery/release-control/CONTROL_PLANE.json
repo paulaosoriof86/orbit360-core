@@ -1,7 +1,7 @@
 {
   "schemaVersion": "gravicentra-control-plane-v2",
   "controlPlaneId": "GRAVICENTRA-INSURANCE-FASE-A",
-  "status": "I4A_IN_PROGRESS",
+  "status": "I2_IN_PROGRESS",
   "productBrand": "Gravicentra Insurance",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -39,14 +39,14 @@
   },
   "gateState": {
     "lastFormallyCompletedIteration": 3,
-    "currentTransition": "I4A_LATEST_APPROVED_VERSION_PREVIEW_ACCEPTANCE_CREDENTIAL_AUDIT_SUCCESSOR",
-    "nextFrozenIteration": "I4A",
+    "currentTransition": "I2_LOGIN_SESSION_RELOAD_SUCCESSOR_RECERTIFICATION",
+    "nextFrozenIteration": "I2",
     "gates": {
       "I0": {"status": "PASS"},
       "I1": {"status": "PASS", "capabilitiesBound": 15},
-      "I2": {"status": "PASS_LATEST_CANDIDATE", "latestRunId": 34436885351, "sourceSha": "10408e3d777ff8934b850c9f61d431dfed3afc2e", "conclusion": "success"},
+      "I2": {"status": "IN_PROGRESS", "previousRunId": 34436885351, "previousSourceSha": "10408e3d777ff8934b850c9f61d431dfed3afc2e", "reason": "I4A run 34543599232 reproduced Login sign-in/session/reload failure across all five roles; source owner lacks automatic verified-session restoration after reload."},
       "I3": {"status": "PASS", "latestRunId": 34437131024, "conclusion": "success", "sourceSha": "10408e3d777ff8934b850c9f61d431dfed3afc2e", "artifactId": 10136593042, "readbackExact": true},
-      "I4A": {"status": "IN_PROGRESS", "previousAuthoritativeRunId": 34430190710},
+      "I4A": {"status": "IN_PROGRESS", "previousAuthoritativeRunId": 34430190710, "latestAuthoritativeRunId": 34543599232, "blockedBy": "LOGIN_SESSION_RELOAD_SUCCESSOR_RECERTIFICATION"},
       "I4B": {"status": "PENDING"},
       "I5": {"status": "PENDING"},
       "I6": {"status": "HOLD_UNTIL_PRODUCTION_ACCEPTED"}
@@ -55,7 +55,7 @@
   "productionProgress": {
     "formalPercent": 57.1,
     "certifiedPhysicalPercent": 57.1,
-    "method": "7 frozen production gates I0,I1,I2,I3,I4A,I4B,I5; equal gate-completion accounting; 4 of 7 gates are physically certified on the current candidate",
+    "method": "7 frozen production gates I0,I1,I2,I3,I4A,I4B,I5; equal gate-completion accounting; 4 of 7 gates are physically certified on the current certified candidate while the causal Login successor is recertified through I2/I3",
     "iterationsRemaining": ["I4A", "I4B", "I5"]
   },
   "certifiedCandidate": {
@@ -88,12 +88,42 @@
     "buildId": "gi-i3-1e6a6ca3d259-57f234755dc1",
     "reasonSuperseded": "I4A run 34430190710 proved a credential client-audit durable-write path and copy/reveal semantic defect; minimal successor 10408e3d passed I2 and I3 exact readback."
   },
-  "nextCandidate": null,
+  "nextCandidate": {
+    "sourceSha": "73674c5f0a0b28ed5b0df65e0c6e182345851375",
+    "sourceTree": "5aa5f8285fe67ec1a5afb8a2aa2b144104f2205e",
+    "parentCertifiedSourceSha": "10408e3d777ff8934b850c9f61d431dfed3afc2e",
+    "causalRunId": 34543599232,
+    "cause": "LOGIN_SESSION_RELOAD_NOT_RESTORED",
+    "allowedProductFiles": [
+      "orbit360-platform/core/product-runtime-browser-providers-p0.js",
+      "orbit360-platform/core/auth-product-runtime-p0.js"
+    ],
+    "doesNotReopenUnaffectedCapabilityEvidence": true,
+    "productionMutationAuthorized": false,
+    "dataMutationAuthorized": false
+  },
   "i4aCausalFindings": {
-    "latestAuthoritativeRunId": 34430190710,
+    "latestAuthoritativeRunId": 34543599232,
     "cliente360TransientThresholdClassifiedAsValidatorOnly": true,
     "polizasFiveRolesProbePass": true,
     "cobrosFiveRolesProbePass": true,
+    "loginSessionReload": {
+      "status": "SOURCE_SUCCESSOR_REQUIRED_I2_I3",
+      "failedRunId": 34543599232,
+      "failureCode": "RESIDUAL_FIREBASE_SESSION_NOT_PERSISTED",
+      "rolesAffected": ["Dirección", "SuperAdmin", "AdminTenant", "Operativo", "Asesor"],
+      "contractAuthority": "project-sources-v2/v3/02_MATRIZ_CRITERIOS_FASE_A_EVERGREEN_V3.md",
+      "contractRequirement": "Login sign-in/session/reload and Shell/router reload",
+      "rootCause": "The certified auth owner always renders Login during init and activates product only after a new credential submit; it does not restore and reactivate an existing verified Firebase session after reload. Browser provider persistence was also implicit rather than fixed to browserLocalPersistence.",
+      "successorSourceSha": "73674c5f0a0b28ed5b0df65e0c6e182345851375",
+      "successorSourceTree": "5aa5f8285fe67ec1a5afb8a2aa2b144104f2205e",
+      "filesChanged": ["orbit360-platform/core/product-runtime-browser-providers-p0.js", "orbit360-platform/core/auth-product-runtime-p0.js"],
+      "unaffectedEvidencePreserved": true,
+      "productionTouched": false,
+      "dataTouched": false,
+      "writesExecuted": 0,
+      "nextRequiredProof": "I2 exact source contract then I3 immutable Preview exact readback then return to I4A Login session/reload residual proof"
+    },
     "aseguradoras": {
       "status": "SUCCESSOR_I3_PASS_I4A_RETEST_REQUIRED",
       "previousSymptom": "ASEGURADORAS_PRIVILEGED_REF_MARKED_UNAVAILABLE",
@@ -274,5 +304,5 @@
     "mechanismFrozen": true,
     "mechanismFreezeEnforced": true
   },
-  "nextAction": "CORRECT_COMMITTED_I4A_VALIDATOR_THEN_RUN_I4A_ON_CERTIFIED_SUCCESSOR_PREVIEW"
+  "nextAction": "RUN_I2_ON_LOGIN_SESSION_RELOAD_SUCCESSOR_THEN_I3_SAME_SOURCE"
 }
