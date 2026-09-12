@@ -41,7 +41,7 @@
     },
     "liveAcceptance": {
       "publicLoginStartupShell": "reuse frozen I4A public browser harness against production URL",
-      "authenticatedModuleProofs": "reuse frozen I4A authenticated browser harness against production URL",
+      "authenticatedModuleProofs": "reuse I4A authenticated browser harness against production URL with the previously certified targeted Aseguradoras credential timing semantics; QA harness blob 0645db69ebd9997d5aea6f0965559e386d57a434",
       "transversalMatrix": "reuse frozen I4B role x viewport x module relationship harness against production URL",
       "controlledWrite": "synthetic operational insurer roundtrip",
       "postWriteIntegrity": "rerun frozen I4B transversal matrix after cleanup",
