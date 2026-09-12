@@ -10,6 +10,7 @@ on:
       - artifacts/orbit360-recovery/release-control/I5_EXECUTION_INTENT.json
       - tools/gravicentra-i5-controlled-writes-v1.mjs
       - tools/gravicentra-i5-residual-cleanup-v1.mjs
+      - tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs
       - .github/workflows/gravicentra-recovery-i5-production.yml
 
 permissions:
@@ -117,6 +118,18 @@ jobs:
           echo "I5_BACKEND_MANIFEST=$BACKEND_MANIFEST" >> "$GITHUB_ENV"
           echo I5_CERTIFIED_ARTIFACT_PREDEPLOY_READINESS=PASS
           echo I5_NO_REBUILD=true
+
+      - name: Prepare pinned Firebase CLI with fail-closed empty-Extensions workaround
+        run: |
+          set -euo pipefail
+          CLI_ROOT="$RUNNER_TEMP/firebase-cli-14.10.1"
+          npm install --prefix "$CLI_ROOT" --ignore-scripts --no-audit --no-fund firebase-tools@14.10.1
+          node tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs "$CLI_ROOT"
+          CLI_BIN="$CLI_ROOT/node_modules/firebase-tools/lib/bin/firebase.js"
+          test -f "$CLI_BIN"
+          test "$(node "$CLI_BIN" --version)" = "14.10.1"
+          echo "FIREBASE_CLI_BIN=$CLI_BIN" >> "$GITHUB_ENV"
+          echo I5_PINNED_FIREBASE_CLI_WORKAROUND=PASS
 
       - id: auth
         name: Prove read-only access to current Firebase production topology
@@ -261,7 +274,7 @@ jobs:
           (cd "$ROOT/backend" && npm ci --ignore-scripts --no-audit --no-fund)
           ONLY=$(printf '%s' "$I5_FUNCTION_TARGETS" | sed 's/,/,functions:/g')
           ONLY="functions:$ONLY"
-          npx --yes firebase-tools@14.10.1 deploy --only "$ONLY" --config "$ROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
+          node "$FIREBASE_CLI_BIN" deploy --only "$ONLY" --config "$ROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
           echo I5_CANONICAL_BACKEND_SELECTIVE_DEPLOY=COMPLETE
 
       - name: Verify new backend targets and preserve every preexisting Function
