@@ -1,5 +1,4 @@
 import fs from 'node:fs';
-import os from 'node:os';
 import path from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
@@ -65,7 +64,7 @@ const flagNew = "qaHarnessPatchedAtRuntime:true,qaHarnessPatchId:'I5_CREDENTIAL_
 need(source.split(flagOld).length === 2, 'I5_AUTH_HARNESS_PATCH_FLAG_DRIFT');
 source = source.replace(flagOld, flagNew);
 
-const tempPath = path.join(os.tmpdir(), `gravicentra-i5-auth-hardened-${process.pid}.mjs`);
+const tempPath = path.join(here, `.gravicentra-i5-auth-hardened-${process.pid}.mjs`);
 fs.writeFileSync(tempPath, source, 'utf8');
 try {
   const check = spawnSync(process.execPath, ['--check', tempPath], { stdio: 'inherit', env: process.env });
