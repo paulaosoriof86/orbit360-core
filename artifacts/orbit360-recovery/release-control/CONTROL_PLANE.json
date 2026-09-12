@@ -226,9 +226,16 @@
   "i5Execution": {
     "productionDeployAuthorized": false,
     "controlledWritesAuthorized": false,
-    "rollbackPrepared": false,
+    "rollbackPrepared": true,
     "readinessOnly": true,
-    "noRebuild": true
+    "noRebuild": true,
+    "readinessStatus": "PASS",
+    "readinessRunId": 34721691341,
+    "readinessArtifactId": 10307065047,
+    "readinessArtifactDigest": "sha256:0c281a5489d7c0333d159703416d9f27f1a30461855090fc462aed03509f00f1",
+    "preexistingProductionFunctionCount": 14,
+    "targetFunctionsAbsentBeforePromotion": true,
+    "certifiedPreviewChannelAvailable": true
   },
   "governanceSyncChecklist": {
     "frozenPlanMaterialized": true,
@@ -275,7 +282,9 @@
     "i4bMatrixPass": true,
     "i4bLabResidueGuarded": true,
     "i4bGateSealed": true,
-    "i5SuccessorExecutorReady": true
+    "i5SuccessorExecutorReady": true,
+    "i5RollbackPreparedPhysicalPass": true,
+    "i5ReadinessRunId": 34721691341
   },
-  "nextAction": "I5_READINESS_ON_EXACT_I3_ARTIFACT_THEN_REQUIRE_EXPLICIT_PRODUCTION_DEPLOY_AND_CONTROLLED_WRITE_AUTHORIZATION"
+  "nextAction": "I5_REQUIRE_EXPLICIT_PRODUCTION_DEPLOY_AND_CONTROLLED_WRITE_AUTHORIZATION"
 }
