@@ -17,6 +17,44 @@
     "hostedPayloadDigest": "a7c16bda2fa3327b3a1e2b49c53f7143d6538f5970e1a95a017ac4718fdb4df1",
     "backendSourceDigest": "b317ee5d6c7346bdb0abfa6bb71b5f246cd7647ed7272551065c2053f497f805"
   },
+  "promotionPlan": {
+    "frontend": {
+      "mode": "firebase_hosting_clone_same_site_certified_preview_to_live",
+      "sourceChannel": "gi-i3-34557374566",
+      "targetChannel": "live",
+      "rebuildForbidden": true,
+      "productionReadbackRequired": true
+    },
+    "backend": {
+      "mode": "selective_new_function_exports_from_exact_i3_backend_package",
+      "precondition": "all targets physically absent from production before promotion",
+      "targets": [
+        "orbit360ProductOperationalCommand",
+        "orbit360ProductInsurerCredentialCommand",
+        "orbit360OpsLeadsCommand",
+        "orbit360CobrosReconciliationCommand",
+        "orbit360GetAdvisorOpsInbox",
+        "orbit360TenantDomainConfig"
+      ],
+      "preserveAllPreexistingFunctions": true,
+      "deployLegacyExportsForbidden": true
+    },
+    "liveAcceptance": {
+      "publicLoginStartupShell": "reuse frozen I4A public browser harness against production URL",
+      "authenticatedModuleProofs": "reuse frozen I4A authenticated browser harness against production URL",
+      "transversalMatrix": "reuse frozen I4B role x viewport x module relationship harness against production URL",
+      "controlledWrite": "synthetic operational insurer roundtrip",
+      "postWriteIntegrity": "rerun frozen I4B transversal matrix after cleanup",
+      "passRequiresExactBuildMarkerAndHostedByteReadback": true
+    }
+  },
+  "rollbackPlan": {
+    "frontend": "before promotion clone current live version to a run-scoped rollback channel; on any failure clone that rollback channel back to live",
+    "backend": "because all six targets are proven absent before promotion, delete only those six newly deployed targets on rollback; preserve all preexisting functions",
+    "data": "before backend removal, if the controlled-write evidence identifies a residual synthetic insurer, execute same-owner atomic audit plus remove through orbit360ProductOperationalCommand",
+    "persistentAuditIsNotRollbackResidue": true,
+    "augustDataMustRemainUntouched": true
+  },
   "controlledWrite": {
     "scenario": "synthetic_operational_insurer_roundtrip",
     "collection": "aseguradoras",
