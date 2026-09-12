@@ -1,0 +1,56 @@
+{
+  "schemaVersion": "gravicentra-i5-execution-intent-v1",
+  "gate": "I5",
+  "status": "MATERIALIZED_NOT_AUTHORIZED",
+  "authority": {
+    "controlPlane": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+    "authorizationSource": "CONTROL_PLANE.i5Execution at runtime",
+    "doesNotAuthorizeDeployment": true,
+    "doesNotAuthorizeWrites": true
+  },
+  "releaseBinding": {
+    "sourceSha": "16f174d087024085eff18079c486f717ef98d691",
+    "sourceTree": "2300811d98dc047f4ffe4c0ec16b0452da3ed01a",
+    "buildId": "gi-i3-16f174d08702-57f234755dc1",
+    "artifactId": 10183074943,
+    "artifactArchiveDigest": "sha256:8b590a8a38aebca1e51128d2be503cc3fa544a54ca37ff75f52a45551661c678",
+    "hostedPayloadDigest": "a7c16bda2fa3327b3a1e2b49c53f7143d6538f5970e1a95a017ac4718fdb4df1",
+    "backendSourceDigest": "b317ee5d6c7346bdb0abfa6bb71b5f246cd7647ed7272551065c2053f497f805"
+  },
+  "controlledWrite": {
+    "scenario": "synthetic_operational_insurer_roundtrip",
+    "collection": "aseguradoras",
+    "createPath": "approved UI -> Orbit.store product operational facade -> orbit360ProductOperationalCommand",
+    "readback": "server persistence + product reload",
+    "cleanupMode": "same_server_owner_atomic_audit_plus_remove",
+    "cleanupReason": "The approved UI delete helper attempts auditoriaAsegExterna through Orbit.store, while the certified product facade does not expose that audit collection. I5 therefore must not claim that UI helper as the controlled cleanup path. Cleanup is an atomic insert-only external audit plus insurer remove through the same authoritative server owner.",
+    "finalProof": "server absence + product reload absence",
+    "expectedPersistentAudit": [
+      "tenants/{tenant}/operationalRequests/{requestId}",
+      "tenants/{tenant}/operationalEvents/{eventId}",
+      "tenants/{tenant}/data/auditoriaAsegExterna/items/{auditId}"
+    ],
+    "forbiddenEffects": [
+      "notificationOutbox entries linked to the synthetic insurer",
+      "workflow events or requests linked to the synthetic insurer",
+      "external integration events linked to the synthetic insurer",
+      "financial records linked to the synthetic insurer",
+      "business relationships linked to the synthetic insurer",
+      "credential or Secret Manager mutation",
+      "persistent secret material"
+    ]
+  },
+  "executionGuards": {
+    "explicitExecuteFlagRequired": true,
+    "executionNonceRequired": true,
+    "productionDeployAuthorizedFromControlPlaneRequired": true,
+    "controlledWritesAuthorizedFromControlPlaneRequired": true,
+    "rollbackPreparedFromControlPlaneRequired": true,
+    "sameCertifiedArtifactRequired": true,
+    "sameBackendSourcePackageRequired": true,
+    "noRebuild": true,
+    "augustDataForbidden": true
+  },
+  "executionNonce": "GI-I5-CONTROLLED-WRITE-V1",
+  "effectOfThisFile": "INTENT_ONLY_NO_DEPLOY_NO_WRITE_NO_PRODUCTION_MUTATION"
+}
