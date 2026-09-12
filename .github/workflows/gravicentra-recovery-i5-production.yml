@@ -9,6 +9,7 @@ on:
       - artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json
       - artifacts/orbit360-recovery/release-control/I5_EXECUTION_INTENT.json
       - tools/gravicentra-i5-controlled-writes-v1.mjs
+      - tools/gravicentra-i5-residual-cleanup-v1.mjs
       - .github/workflows/gravicentra-recovery-i5-production.yml
 
 permissions:
@@ -27,7 +28,7 @@ env:
 jobs:
   i5-authoritative:
     runs-on: ubuntu-24.04
-    timeout-minutes: 55
+    timeout-minutes: 75
     steps:
       - name: Checkout authoritative Recovery control plane
         uses: actions/checkout@v4
@@ -50,8 +51,10 @@ jobs:
           node - <<'NODE'
           const fs=require('node:fs');
           const c=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json','utf8'));
+          const intent=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I5_EXECUTION_INTENT.json','utf8'));
           const need=(ok,code)=>{if(!ok)throw new Error(code)};
           need(c.status==='I5_IN_PROGRESS','I5_CONTROL_STATUS_INVALID');
+          need(intent.schemaVersion==='gravicentra-i5-execution-intent-v1'&&intent.gate==='I5','I5_EXECUTION_INTENT_INVALID');
           const x=c.certifiedCandidate||{};
           need(x.sameFrontendArtifactPreviewToProductionRequired===true,'I5_SAME_FRONTEND_ARTIFACT_RULE_MISSING');
           need(x.sameBackendSourcePackageRequiredForI5===true,'I5_SAME_BACKEND_PACKAGE_RULE_MISSING');
@@ -61,22 +64,20 @@ jobs:
           need(typeof x.artifactName==='string'&&x.artifactName.length>8,'I5_I3_ARTIFACT_NAME_INVALID');
           need(/^sha256:[0-9a-f]{64}$/.test(String(x.artifactArchiveDigest||'')),'I5_I3_ARTIFACT_ARCHIVE_DIGEST_INVALID');
           need(/^[0-9a-f]{64}$/.test(String(x.hostedPayloadDigest||'')),'I5_HOSTED_PAYLOAD_DIGEST_INVALID');
+          need(intent.releaseBinding?.sourceSha===x.sourceSha&&intent.releaseBinding?.buildId===x.buildId,'I5_INTENT_RELEASE_BINDING_MISMATCH');
+          need(Number(intent.releaseBinding?.artifactId)===Number(x.artifactId),'I5_INTENT_ARTIFACT_MISMATCH');
+          const targets=intent.promotionPlan?.backend?.targets||[];
+          need(targets.length===6&&new Set(targets).size===6,'I5_BACKEND_TARGET_SET_INVALID');
           const a=c.i5Execution||{};
           const deploy=a.productionDeployAuthorized===true;
           const writes=a.controlledWritesAuthorized===true;
           if(deploy){
             need(writes===true,'I5_DEPLOY_REQUIRES_CONTROLLED_WRITES_AUTHORIZATION');
             need(a.rollbackPrepared===true,'I5_DEPLOY_REQUIRES_ROLLBACK_PREPARED');
-            need(fs.existsSync('artifacts/orbit360-recovery/release-control/I5_EXECUTION_INTENT.json'),'I5_DEPLOY_REQUIRES_EXECUTION_INTENT');
             need(fs.existsSync('tools/gravicentra-i5-controlled-writes-v1.mjs'),'I5_DEPLOY_REQUIRES_CONTROLLED_WRITE_HARNESS');
+            need(fs.existsSync('tools/gravicentra-i5-residual-cleanup-v1.mjs'),'I5_DEPLOY_REQUIRES_RESIDUAL_CLEANUP_HARNESS');
           }
-          const env={
-            SOURCE_SHA:x.sourceSha,BUILD_ID:x.buildId,I3_RUN_ID:String(x.i3RunId),I3_ARTIFACT_ID:String(x.artifactId),
-            I3_ARTIFACT_NAME:x.artifactName,EXPECTED_ARTIFACT_ARCHIVE_DIGEST:x.artifactArchiveDigest,
-            EXPECTED_HOSTED_PAYLOAD_DIGEST:x.hostedPayloadDigest,EXPECTED_BACKEND_SOURCE_DIGEST:x.backendSourceDigest,
-            PREVIEW_CHANNEL_ID:x.previewChannelId,PREVIEW_URL:x.previewUrl,
-            I5_PRODUCTION_DEPLOY_AUTHORIZED:String(deploy),I5_CONTROLLED_WRITES_AUTHORIZED:String(writes)
-          };
+          const env={SOURCE_SHA:x.sourceSha,BUILD_ID:x.buildId,I3_RUN_ID:String(x.i3RunId),I3_ARTIFACT_ID:String(x.artifactId),I3_ARTIFACT_NAME:x.artifactName,EXPECTED_ARTIFACT_ARCHIVE_DIGEST:x.artifactArchiveDigest,EXPECTED_HOSTED_PAYLOAD_DIGEST:x.hostedPayloadDigest,EXPECTED_BACKEND_SOURCE_DIGEST:x.backendSourceDigest,PREVIEW_CHANNEL_ID:x.previewChannelId,PREVIEW_URL:x.previewUrl,I5_PRODUCTION_DEPLOY_AUTHORIZED:String(deploy),I5_CONTROLLED_WRITES_AUTHORIZED:String(writes),I5_FUNCTION_TARGETS:targets.join(',')};
           for(const [k,v] of Object.entries(env))fs.appendFileSync(process.env.GITHUB_ENV,`${k}=${v}\n`);
           fs.appendFileSync(process.env.GITHUB_OUTPUT,`deploy_authorized=${deploy}\n`);
           console.log('I3_ARTIFACT_ID='+x.artifactId);
@@ -99,8 +100,9 @@ jobs:
           ROOT="$RUNNER_TEMP/gravicentra-i5-certified-artifact"
           EVIDENCE=$(find "$ROOT" -type f -name i3-evidence.json -print -quit)
           MANIFEST=$(find "$ROOT" -type f -name site-manifest.sha256 -print -quit)
+          BACKEND_MANIFEST=$(find "$ROOT" -type f -name backend-manifest.sha256 -print -quit)
           BUNDLE=$(find "$ROOT" -type d -name bundle -print -quit)
-          test -n "$EVIDENCE" -a -n "$MANIFEST" -a -n "$BUNDLE"
+          test -n "$EVIDENCE" -a -n "$MANIFEST" -a -n "$BACKEND_MANIFEST" -a -n "$BUNDLE"
           test "$(jq -r '.sourceSha' "$EVIDENCE")" = "$SOURCE_SHA"
           test "$(jq -r '.buildId' "$EVIDENCE")" = "$BUILD_ID"
           test "$(jq -r '.hostedPayloadDigest' "$EVIDENCE")" = "$EXPECTED_HOSTED_PAYLOAD_DIGEST"
@@ -108,8 +110,11 @@ jobs:
           test "$(jq -r '.sameFrontendArtifactPreviewToProductionRequired' "$EVIDENCE")" = "true"
           test "$(jq -r '.sameBackendSourcePackageRequiredForI5' "$EVIDENCE")" = "true"
           test "$(jq -r '.sourceMutatedAfterBuild' "$EVIDENCE")" = "false"
-          test -f "$BUNDLE/firebase.json"
+          test -f "$BUNDLE/firebase.json" -a -f "$BUNDLE/backend/bootstrap.js" -a -f "$BUNDLE/backend/package.json"
+          (cd "$BUNDLE/backend" && sha256sum -c "$BACKEND_MANIFEST")
           echo "I5_BUNDLE=$BUNDLE" >> "$GITHUB_ENV"
+          echo "I5_SITE_MANIFEST=$MANIFEST" >> "$GITHUB_ENV"
+          echo "I5_BACKEND_MANIFEST=$BACKEND_MANIFEST" >> "$GITHUB_ENV"
           echo I5_CERTIFIED_ARTIFACT_PREDEPLOY_READINESS=PASS
           echo I5_NO_REBUILD=true
 
@@ -155,61 +160,325 @@ jobs:
       - name: Capture sanitized production backend topology without mutation
         env:
           FUNCTIONS_RAW: ${{ runner.temp }}/gravicentra-i5-auth/functions-selected.json
-          TOPOLOGY_OUT: ${{ runner.temp }}/i5-production-topology-readonly.json
+          TOPOLOGY_OUT: ${{ runner.temp }}/gravicentra-i5-evidence/i5-production-topology-readonly.json
         run: |
           set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/gravicentra-i5-evidence"
           node - <<'NODE'
           const fs=require('node:fs');
           const raw=JSON.parse(fs.readFileSync(process.env.FUNCTIONS_RAW,'utf8'));
           const rows=Array.isArray(raw.result)?raw.result:Array.isArray(raw)?raw:[];
-          const pick=x=>({
-            id:String(x.id||x.name||x.entryPoint||''),
-            entryPoint:String(x.entryPoint||x.id||''),
-            region:Array.isArray(x.region)?x.region.map(String):String(x.region||''),
-            platform:String(x.platform||x.environment||''),
-            runtime:String(x.runtime||''),
-            state:String(x.state||x.status||'')
-          });
+          const pick=x=>({id:String(x.id||x.name||x.entryPoint||''),entryPoint:String(x.entryPoint||x.id||''),region:Array.isArray(x.region)?x.region.map(String):String(x.region||''),platform:String(x.platform||x.environment||''),runtime:String(x.runtime||''),state:String(x.state||x.status||'')});
           const functions=rows.map(pick).sort((a,b)=>a.id.localeCompare(b.id));
           const names=new Set(functions.flatMap(x=>[x.id,x.entryPoint]).filter(Boolean));
-          const targets=['orbit360ProductOperationalCommand','orbit360ProductInsurerCredentialCommand','orbit360OpsLeadsCommand','orbit360CobrosReconciliationCommand','orbit360GetAdvisorOpsInbox','orbit360TenantDomainConfig'];
+          const targets=String(process.env.I5_FUNCTION_TARGETS||'').split(',').filter(Boolean);
           const presence=Object.fromEntries(targets.map(x=>[x,names.has(x)]));
-          const out={schemaVersion:'gravicentra-i5-production-topology-readonly-v1',gate:'I5',readOnly:true,projectId:process.env.PROJECT_ID,sourceSha:process.env.SOURCE_SHA,buildId:process.env.BUILD_ID,functionCount:functions.length,targetPresence:presence,functions};
+          const out={schemaVersion:'gravicentra-i5-production-topology-readonly-v2',gate:'I5',readOnly:true,projectId:process.env.PROJECT_ID,sourceSha:process.env.SOURCE_SHA,buildId:process.env.BUILD_ID,functionCount:functions.length,targetPresence:presence,functions};
           fs.writeFileSync(process.env.TOPOLOGY_OUT,JSON.stringify(out,null,2)+'\n');
           console.log('I5_PRODUCTION_FUNCTION_COUNT='+functions.length);
           console.log('I5_TARGET_FUNCTION_PRESENCE='+JSON.stringify(presence));
           NODE
 
-      - uses: actions/upload-artifact@v4
-        with:
-          name: gravicentra-i5-readonly-topology-${{ github.run_id }}
-          path: ${{ runner.temp }}/i5-production-topology-readonly.json
-          if-no-files-found: error
-          retention-days: 30
+      - id: readiness
+        name: Prove promotion and rollback plan without production mutation
+        env:
+          TOPOLOGY: ${{ runner.temp }}/gravicentra-i5-evidence/i5-production-topology-readonly.json
+          READINESS: ${{ runner.temp }}/gravicentra-i5-evidence/i5-promotion-rollback-readiness.json
+        run: |
+          set -euo pipefail
+          node --check tools/gravicentra-i5-controlled-writes-v1.mjs
+          node --check tools/gravicentra-i5-residual-cleanup-v1.mjs
+          node --check tools/gravicentra-i4a-public-browser.mjs
+          node --check tools/gravicentra-i4a-authenticated-browser-v2.mjs
+          node --check tools/gravicentra-i4b-transversal-v2.mjs
+          npx --yes firebase-tools@14.10.1 hosting:channel:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/i5-channels.json"
+          grep -Fq "$PREVIEW_CHANNEL_ID" "$RUNNER_TEMP/i5-channels.json"
+          node - <<'NODE'
+          const fs=require('node:fs'),path=require('node:path');
+          const topo=JSON.parse(fs.readFileSync(process.env.TOPOLOGY,'utf8'));
+          const intent=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I5_EXECUTION_INTENT.json','utf8'));
+          const targets=intent.promotionPlan.backend.targets;
+          const need=(ok,code)=>{if(!ok)throw new Error(code)};
+          need(targets.every(x=>topo.targetPresence[x]===false),'I5_TARGET_FUNCTION_ALREADY_PRESENT');
+          const bundle=process.env.I5_BUNDLE,backend=path.join(bundle,'backend');
+          const pkg=JSON.parse(fs.readFileSync(path.join(backend,'package.json'),'utf8'));
+          need(pkg.main==='bootstrap.js','I5_BACKEND_MAIN_NOT_BOOTSTRAP');
+          const bootstrap=fs.readFileSync(path.join(backend,'bootstrap.js'),'utf8');
+          for(const required of ['./tenant-domain-config','./product-ops-leads-domain','./ops-advisor-inbox','./cobros-reconciliation-domain','./product-operational-domain','./product-insurer-credentials'])need(bootstrap.includes(`require('${required}')`),'I5_BOOTSTRAP_OWNER_MISSING:'+required);
+          const files={'orbit360ProductOperationalCommand':'product-operational-domain.js','orbit360ProductInsurerCredentialCommand':'product-insurer-credentials.js','orbit360OpsLeadsCommand':'product-ops-leads-domain.js','orbit360CobrosReconciliationCommand':'cobros-reconciliation-domain.js','orbit360GetAdvisorOpsInbox':'ops-advisor-inbox.js','orbit360TenantDomainConfig':'tenant-domain-config.js'};
+          for(const [fn,file] of Object.entries(files))need(fs.readFileSync(path.join(backend,file),'utf8').includes(`exports.${fn}`),'I5_CERTIFIED_EXPORT_MISSING:'+fn);
+          const out={schemaVersion:'gravicentra-i5-promotion-rollback-readiness-v1',gate:'I5',status:'PASS',productionMutationPerformed:false,dataMutationPerformed:false,writesExecuted:0,sourceSha:process.env.SOURCE_SHA,buildId:process.env.BUILD_ID,previewChannelId:process.env.PREVIEW_CHANNEL_ID,frontendPromotion:'clone certified preview to live',frontendRollback:'clone pre-promotion live to run-scoped channel then restore same version',backendTargets:targets,backendPrecondition:'all absent',preexistingFunctionCount:topo.functionCount,backendRollback:'delete only six newly deployed targets',residualDataCleanup:'same-server-owner before backend removal',liveQa:['public-login-startup-shell','authenticated-module-probes','role-viewport-module-relationships','controlled-synthetic-write','post-write-integrity'],augustDataTouched:false};
+          fs.writeFileSync(process.env.READINESS,JSON.stringify(out,null,2)+'\n');
+          NODE
+          echo "rollback_plan_ready=true" >> "$GITHUB_OUTPUT"
+          echo I5_PROMOTION_ROLLBACK_READINESS=PASS
 
       - name: Stop safely until explicit I5 production authorization exists
         if: ${{ steps.release.outputs.deploy_authorized != 'true' }}
         run: |
           set -euo pipefail
+          test "${{ steps.readiness.outputs.rollback_plan_ready }}" = "true"
           echo I5_STATE_GATED_EXECUTOR=READY
           echo I5_PRODUCTION_TOPOLOGY_READONLY=CAPTURED
+          echo I5_ROLLBACK_PLAN=PHYSICALLY_MATERIALIZED_READINESS_PASS
           echo productionTouched=false
           echo dataTouched=false
           echo writesExecuted=0
           echo augustDataTouched=false
 
-      - name: Validate production package prerequisites before any mutation
+      - name: Validate authorized production package prerequisites before mutation
         if: ${{ steps.release.outputs.deploy_authorized == 'true' }}
         run: |
           set -euo pipefail
           test "$I5_CONTROLLED_WRITES_AUTHORIZED" = "true"
-          node --check tools/gravicentra-i5-controlled-writes-v1.mjs
-          test -f artifacts/orbit360-recovery/release-control/I5_EXECUTION_INTENT.json
+          test "${{ steps.readiness.outputs.rollback_plan_ready }}" = "true"
+          test "$(jq -r '.i5Execution.rollbackPrepared' artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json)" = "true"
           echo I5_PREDEPLOY_FAIL_CLOSED_PREREQUISITES=PASS
 
-      - name: Production deployment remains unreachable unless all I5 prerequisites are present
+      - id: rollback_snapshot
+        name: Preserve exact pre-I5 live Hosting version in run-scoped rollback channel
         if: ${{ steps.release.outputs.deploy_authorized == 'true' }}
         run: |
           set -euo pipefail
-          echo 'I5 production mutation path remains fail-closed until rollback is derived from the captured live topology and validated.' >&2
-          exit 86
+          RB="gi-i5-rb-${GITHUB_RUN_ID}"
+          npx --yes firebase-tools@14.10.1 hosting:clone "$HOSTING_SITE:live" "$HOSTING_SITE:$RB" --project "$PROJECT_ID" --non-interactive > "$RUNNER_TEMP/i5-hosting-rollback-snapshot.log"
+          echo "rollback_channel=$RB" >> "$GITHUB_OUTPUT"
+          echo "I5_ROLLBACK_CHANNEL_ID=$RB" >> "$GITHUB_ENV"
+          echo I5_PREVIOUS_LIVE_VERSION_SNAPSHOTTED=true
+
+      - id: backend_deploy
+        name: Deploy only six canonical new Functions from exact certified I3 backend package
+        if: ${{ steps.release.outputs.deploy_authorized == 'true' }}
+        run: |
+          set -euo pipefail
+          ROOT="$RUNNER_TEMP/gravicentra-i5-functions"
+          rm -rf "$ROOT"; mkdir -p "$ROOT"
+          cp -a "$I5_BUNDLE/backend" "$ROOT/backend"
+          (cd "$ROOT/backend" && sha256sum -c "$I5_BACKEND_MANIFEST")
+          cat > "$ROOT/firebase.json" <<'JSON'
+          {"functions":{"source":"backend"}}
+          JSON
+          (cd "$ROOT/backend" && npm ci --ignore-scripts --no-audit --no-fund)
+          ONLY=$(printf '%s' "$I5_FUNCTION_TARGETS" | sed 's/,/,functions:/g')
+          ONLY="functions:$ONLY"
+          npx --yes firebase-tools@14.10.1 deploy --only "$ONLY" --config "$ROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
+          echo I5_CANONICAL_BACKEND_SELECTIVE_DEPLOY=COMPLETE
+
+      - name: Verify new backend targets and preserve every preexisting Function
+        if: ${{ steps.release.outputs.deploy_authorized == 'true' }}
+        env:
+          BEFORE: ${{ runner.temp }}/gravicentra-i5-evidence/i5-production-topology-readonly.json
+          AFTER: ${{ runner.temp }}/gravicentra-i5-evidence/i5-production-topology-after-backend.json
+        run: |
+          set -euo pipefail
+          npx --yes firebase-tools@14.10.1 functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/i5-functions-after.json"
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const before=JSON.parse(fs.readFileSync(process.env.BEFORE,'utf8'));
+          const raw=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/i5-functions-after.json','utf8'));
+          const rows=Array.isArray(raw.result)?raw.result:Array.isArray(raw)?raw:[];
+          const functions=rows.map(x=>({id:String(x.id||x.name||x.entryPoint||''),entryPoint:String(x.entryPoint||x.id||''),region:Array.isArray(x.region)?x.region.map(String):String(x.region||''),state:String(x.state||x.status||'')}));
+          const names=new Set(functions.flatMap(x=>[x.id,x.entryPoint]).filter(Boolean));
+          const targets=String(process.env.I5_FUNCTION_TARGETS).split(',').filter(Boolean);
+          const need=(ok,code)=>{if(!ok)throw new Error(code)};
+          need(targets.every(x=>names.has(x)),'I5_TARGET_FUNCTION_NOT_DEPLOYED');
+          const old=before.functions.map(x=>x.entryPoint||x.id).filter(Boolean);
+          need(old.every(x=>names.has(x)),'I5_PREEXISTING_FUNCTION_LOST');
+          fs.writeFileSync(process.env.AFTER,JSON.stringify({schemaVersion:'gravicentra-i5-production-topology-after-backend-v1',gate:'I5',status:'PASS',functionCount:functions.length,preexistingPreserved:true,targetPresence:Object.fromEntries(targets.map(x=>[x,names.has(x)])),functions},null,2)+'\n');
+          NODE
+          echo I5_BACKEND_TOPOLOGY_POSTDEPLOY=PASS
+
+      - name: Promote exact certified I3 Hosting version to live by same-site clone
+        if: ${{ steps.release.outputs.deploy_authorized == 'true' }}
+        run: |
+          set -euo pipefail
+          npx --yes firebase-tools@14.10.1 hosting:clone "$HOSTING_SITE:$PREVIEW_CHANNEL_ID" "$HOSTING_SITE:live" --project "$PROJECT_ID" --non-interactive > "$RUNNER_TEMP/i5-hosting-promotion.log"
+          echo I5_FRONTEND_SAME_CERTIFIED_VERSION_PROMOTED=true
+
+      - name: Read back every certified hosted byte from production
+        if: ${{ steps.release.outputs.deploy_authorized == 'true' }}
+        env:
+          READBACK_OUT: ${{ runner.temp }}/gravicentra-i5-evidence/i5-production-hosted-readback.json
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib,json,os,urllib.parse,urllib.request
+          rows=[tuple(x.split('  ',1)) for x in open(os.environ['I5_SITE_MANIFEST']).read().splitlines() if x.strip()]
+          base=os.environ['PRODUCTION_URL'].rstrip('/'); bad=[]
+          for expected,rel in rows:
+              req=urllib.request.Request(base+'/'+urllib.parse.quote(rel,safe='/')+'?i5readback='+os.environ['EXPECTED_HOSTED_PAYLOAD_DIGEST'][:16],headers={'Accept-Encoding':'identity','Cache-Control':'no-cache','User-Agent':'Gravicentra-I5'})
+              with urllib.request.urlopen(req,timeout=30) as r: body=r.read()
+              actual=hashlib.sha256(body).hexdigest()
+              if actual!=expected: bad.append((rel,expected,actual))
+          if bad: raise SystemExit('I5_PRODUCTION_BYTE_READBACK_MISMATCH:'+json.dumps(bad[:5]))
+          with urllib.request.urlopen(urllib.request.Request(base+'/__recovery__/build.json?i5=1',headers={'Cache-Control':'no-cache'}),timeout=30) as r: marker=json.loads(r.read())
+          if marker.get('sourceSha')!=os.environ['SOURCE_SHA'] or marker.get('buildId')!=os.environ['BUILD_ID']: raise SystemExit('I5_PRODUCTION_BUILD_MARKER_MISMATCH')
+          out={'schemaVersion':'gravicentra-i5-production-hosted-readback-v1','gate':'I5','status':'PASS','sourceSha':os.environ['SOURCE_SHA'],'buildId':os.environ['BUILD_ID'],'hostedPayloadDigest':os.environ['EXPECTED_HOSTED_PAYLOAD_DIGEST'],'readbackExact':True,'fileCount':len(rows),'productionUrl':base}
+          open(os.environ['READBACK_OUT'],'w').write(json.dumps(out,indent=2)+'\n')
+          print('I5_PRODUCTION_READBACK_EXACT_PASS='+str(len(rows)))
+          PY
+
+      - name: Install LIVE browser QA dependencies
+        if: ${{ steps.release.outputs.deploy_authorized == 'true' }}
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false playwright@1.55.0 firebase-admin@13.10.0 >/dev/null
+          npx playwright install --with-deps chromium >/dev/null
+
+      - name: LIVE public login startup shell proof
+        if: ${{ steps.release.outputs.deploy_authorized == 'true' }}
+        env:
+          PREVIEW_URL: ${{ env.PRODUCTION_URL }}
+          I4A_PUBLIC_EVIDENCE_DIR: ${{ runner.temp }}/gravicentra-i5-evidence/live-public
+        run: node tools/gravicentra-i4a-public-browser.mjs
+
+      - name: LIVE authenticated module-by-module proof
+        if: ${{ steps.release.outputs.deploy_authorized == 'true' }}
+        env:
+          PREVIEW_URL: ${{ env.PRODUCTION_URL }}
+          I4A_AUTH_EVIDENCE_DIR: ${{ runner.temp }}/gravicentra-i5-evidence/live-auth
+          SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+        run: node tools/gravicentra-i4a-authenticated-browser-v2.mjs
+
+      - name: LIVE transversal role x viewport x module relationship proof before writes
+        if: ${{ steps.release.outputs.deploy_authorized == 'true' }}
+        env:
+          PREVIEW_URL: ${{ env.PRODUCTION_URL }}
+          I4B_EVIDENCE_DIR: ${{ runner.temp }}/gravicentra-i5-evidence/live-matrix-before-write
+          SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+        run: node tools/gravicentra-i4b-transversal-v2.mjs
+
+      - name: Adjudicate LIVE read-only acceptance before controlled write
+        if: ${{ steps.release.outputs.deploy_authorized == 'true' }}
+        run: |
+          set -euo pipefail
+          test "$(jq -r '.status' "$RUNNER_TEMP/gravicentra-i5-evidence/live-public/i4a-public-browser.json")" = "PUBLIC_BROWSER_PASS"
+          test "$(jq -r '.status' "$RUNNER_TEMP/gravicentra-i5-evidence/live-auth/i4a-authenticated-browser.json")" = "AUTH_BROWSER_PASS"
+          test "$(jq -r '.status' "$RUNNER_TEMP/gravicentra-i5-evidence/live-matrix-before-write/i4b-transversal-matrix-v2.json")" = "I4B_MATRIX_PASS"
+          test "$(jq -r '.contextsPass' "$RUNNER_TEMP/gravicentra-i5-evidence/live-matrix-before-write/i4b-transversal-matrix-v2.json")" = "15"
+          test "$(jq -r '.contextsFail' "$RUNNER_TEMP/gravicentra-i5-evidence/live-matrix-before-write/i4b-transversal-matrix-v2.json")" = "0"
+          echo I5_LIVE_READONLY_ACCEPTANCE_BEFORE_WRITE=PASS
+
+      - name: Execute the single approved controlled synthetic write roundtrip
+        if: ${{ steps.release.outputs.deploy_authorized == 'true' }}
+        env:
+          I5_EVIDENCE_DIR: ${{ runner.temp }}/gravicentra-i5-evidence/controlled-write
+          I5_EXECUTION_NONCE: GI-I5-CONTROLLED-WRITE-V1
+          SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+        run: node tools/gravicentra-i5-controlled-writes-v1.mjs --execute
+
+      - name: LIVE transversal integrity proof after controlled write cleanup
+        if: ${{ steps.release.outputs.deploy_authorized == 'true' }}
+        env:
+          PREVIEW_URL: ${{ env.PRODUCTION_URL }}
+          I4B_EVIDENCE_DIR: ${{ runner.temp }}/gravicentra-i5-evidence/live-matrix-after-write
+          SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+        run: node tools/gravicentra-i4b-transversal-v2.mjs
+
+      - name: Seal physical I5 LIVE acceptance evidence
+        if: ${{ steps.release.outputs.deploy_authorized == 'true' }}
+        env:
+          OUT: ${{ runner.temp }}/gravicentra-i5-evidence/i5-live-acceptance.json
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('node:fs'),p=process.env.RUNNER_TEMP+'/gravicentra-i5-evidence/';
+          const read=x=>JSON.parse(fs.readFileSync(p+x,'utf8')),need=(ok,c)=>{if(!ok)throw new Error(c)};
+          const hosted=read('i5-production-hosted-readback.json');
+          const pub=read('live-public/i4a-public-browser.json');
+          const auth=read('live-auth/i4a-authenticated-browser.json');
+          const before=read('live-matrix-before-write/i4b-transversal-matrix-v2.json');
+          const cw=read('controlled-write/i5-controlled-writes.json');
+          const after=read('live-matrix-after-write/i4b-transversal-matrix-v2.json');
+          need(hosted.status==='PASS'&&hosted.readbackExact===true,'I5_HOSTED_READBACK_NOT_PASS');
+          need(pub.status==='PUBLIC_BROWSER_PASS','I5_PUBLIC_NOT_PASS');
+          need(auth.status==='AUTH_BROWSER_PASS','I5_AUTH_MODULES_NOT_PASS');
+          need(before.status==='I4B_MATRIX_PASS'&&before.contextsPass===15&&before.contextsFail===0,'I5_MATRIX_BEFORE_NOT_PASS');
+          need(cw.status==='PASS'&&cw.readbackReload===true&&cw.finalAbsenceReload===true&&cw.writesExecuted===3,'I5_CONTROLLED_WRITE_NOT_PASS');
+          need(cw.expectedPersistentAudit?.externalAudit===true&&cw.expectedPersistentAudit?.operationalRequest===true&&cw.expectedPersistentAudit?.operationalEvent===true,'I5_CONTROLLED_AUDIT_NOT_PASS');
+          need(after.status==='I4B_MATRIX_PASS'&&after.contextsPass===15&&after.contextsFail===0,'I5_MATRIX_AFTER_NOT_PASS');
+          const out={schemaVersion:'gravicentra-i5-live-acceptance-v1',gate:'I5',status:'I5_LIVE_ACCEPTANCE_PASS',sourceSha:process.env.SOURCE_SHA,buildId:process.env.BUILD_ID,artifactId:Number(process.env.I3_ARTIFACT_ID),sameCertifiedFrontend:true,sameCertifiedBackendPackage:true,productionReadbackExact:true,publicLoginStartupShell:true,authenticatedModuleProof:true,transversalBeforeWrite:true,controlledWritePass:true,controlledWritesExecuted:cw.writesExecuted,syntheticFinalAbsent:true,persistentAudit:cw.expectedPersistentAudit,transversalAfterWrite:true,augustDataTouched:false,productionAcceptedPendingGovernanceSeal:true};
+          fs.writeFileSync(process.env.OUT,JSON.stringify(out,null,2)+'\n');
+          console.log('I5_LIVE_ACCEPTANCE=PHYSICAL_PASS_PENDING_GOVERNANCE_SEAL');
+          NODE
+
+      - name: Emergency same-owner cleanup of any residual synthetic insurer before rollback
+        if: ${{ failure() && steps.release.outputs.deploy_authorized == 'true' }}
+        env:
+          I5_CONTROLLED_WRITE_EVIDENCE: ${{ runner.temp }}/gravicentra-i5-evidence/controlled-write/i5-controlled-writes.json
+          I5_RESIDUAL_CLEANUP_EVIDENCE_DIR: ${{ runner.temp }}/gravicentra-i5-evidence/rollback-cleanup
+          I5_EMERGENCY_CLEANUP_AUTHORIZED: 'true'
+          SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$I5_RESIDUAL_CLEANUP_EVIDENCE_DIR"
+          if test -f "$I5_CONTROLLED_WRITE_EVIDENCE"; then
+            node tools/gravicentra-i5-residual-cleanup-v1.mjs --execute
+          else
+            printf '%s\n' '{"schemaVersion":"gravicentra-i5-residual-cleanup-v1","gate":"I5","status":"NO_CONTROLLED_WRITE_EVIDENCE","cleanupExecuted":false,"finalAbsent":true}' > "$I5_RESIDUAL_CLEANUP_EVIDENCE_DIR/i5-residual-cleanup.json"
+          fi
+
+      - name: Automatic Hosting and backend rollback on any authorized I5 failure
+        if: ${{ failure() && steps.release.outputs.deploy_authorized == 'true' }}
+        env:
+          CLEANUP: ${{ runner.temp }}/gravicentra-i5-evidence/rollback-cleanup/i5-residual-cleanup.json
+          ROLLBACK_OUT: ${{ runner.temp }}/gravicentra-i5-evidence/i5-automatic-rollback.json
+        run: |
+          set -euo pipefail
+          if test -f "$CLEANUP"; then test "$(jq -r '.finalAbsent' "$CLEANUP")" = "true"; fi
+          RESTORED=false
+          if test -n "${I5_ROLLBACK_CHANNEL_ID:-}"; then
+            npx --yes firebase-tools@14.10.1 hosting:clone "$HOSTING_SITE:$I5_ROLLBACK_CHANNEL_ID" "$HOSTING_SITE:live" --project "$PROJECT_ID" --non-interactive > "$RUNNER_TEMP/i5-hosting-rollback.log"
+            RESTORED=true
+          fi
+          npx --yes firebase-tools@14.10.1 functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/i5-functions-rollback-before.json"
+          node - <<'NODE' > "$RUNNER_TEMP/i5-targets-present.txt"
+          const fs=require('node:fs'),raw=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/i5-functions-rollback-before.json','utf8'));
+          const rows=Array.isArray(raw.result)?raw.result:Array.isArray(raw)?raw:[],names=new Set(rows.flatMap(x=>[String(x.entryPoint||''),String(x.id||x.name||'')]));
+          for(const x of String(process.env.I5_FUNCTION_TARGETS).split(',').filter(Boolean))if(names.has(x))console.log(x);
+          NODE
+          while IFS= read -r FN; do test -z "$FN" || npx --yes firebase-tools@14.10.1 functions:delete "$FN" --region us-central1 --project "$PROJECT_ID" --force; done < "$RUNNER_TEMP/i5-targets-present.txt"
+          npx --yes firebase-tools@14.10.1 functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/i5-functions-rollback-after.json"
+          export RESTORED ROLLBACK_OUT
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const raw=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/i5-functions-rollback-after.json','utf8'));
+          const rows=Array.isArray(raw.result)?raw.result:Array.isArray(raw)?raw:[],names=new Set(rows.flatMap(x=>[String(x.entryPoint||''),String(x.id||x.name||'')]));
+          const targets=String(process.env.I5_FUNCTION_TARGETS).split(',').filter(Boolean),remaining=targets.filter(x=>names.has(x));
+          if(remaining.length)throw new Error('I5_ROLLBACK_TARGET_FUNCTIONS_REMAIN:'+remaining.join(','));
+          fs.writeFileSync(process.env.ROLLBACK_OUT,JSON.stringify({schemaVersion:'gravicentra-i5-automatic-rollback-v1',gate:'I5',status:'PASS',hostingPreviousLiveRestored:process.env.RESTORED==='true',newBackendTargetsRemoved:true,targetFunctionsRemaining:remaining,augustDataTouched:false},null,2)+'\n');
+          console.log('I5_AUTOMATIC_ROLLBACK=PASS');
+          NODE
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gravicentra-i5-evidence-${{ github.run_id }}
+          path: ${{ runner.temp }}/gravicentra-i5-evidence
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: I5 executor summary
+        if: always()
+        run: |
+          {
+            echo '## Gravicentra Insurance — I5 production executor'
+            echo "- Certified source: \`$SOURCE_SHA\`"
+            echo "- Certified build: \`$BUILD_ID\`"
+            echo "- Certified artifact: \`$I3_ARTIFACT_ID\`"
+            echo "- Production authorization: \`$I5_PRODUCTION_DEPLOY_AUTHORIZED\`"
+            echo "- Controlled writes authorization: \`$I5_CONTROLLED_WRITES_AUTHORIZED\`"
+            if test -f "$RUNNER_TEMP/gravicentra-i5-evidence/i5-live-acceptance.json"; then echo "- LIVE acceptance: \`$(jq -r '.status' "$RUNNER_TEMP/gravicentra-i5-evidence/i5-live-acceptance.json")\`"; fi
+            if test -f "$RUNNER_TEMP/gravicentra-i5-evidence/i5-automatic-rollback.json"; then echo "- Rollback: \`$(jq -r '.status' "$RUNNER_TEMP/gravicentra-i5-evidence/i5-automatic-rollback.json")\`"; fi
+          } >> "$GITHUB_STEP_SUMMARY"
