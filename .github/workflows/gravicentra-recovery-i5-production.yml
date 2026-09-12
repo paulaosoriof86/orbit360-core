@@ -8,6 +8,8 @@ on:
     paths:
       - artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json
       - artifacts/orbit360-recovery/release-control/I5_EXECUTION_INTENT.json
+      - tools/gravicentra-i5-controlled-writes-v1.mjs
+      - .github/workflows/gravicentra-recovery-i5-production.yml
 
 permissions:
   contents: read
@@ -107,14 +109,90 @@ jobs:
           test "$(jq -r '.sameBackendSourcePackageRequiredForI5' "$EVIDENCE")" = "true"
           test "$(jq -r '.sourceMutatedAfterBuild' "$EVIDENCE")" = "false"
           test -f "$BUNDLE/firebase.json"
+          echo "I5_BUNDLE=$BUNDLE" >> "$GITHUB_ENV"
           echo I5_CERTIFIED_ARTIFACT_PREDEPLOY_READINESS=PASS
           echo I5_NO_REBUILD=true
+
+      - id: auth
+        name: Prove read-only access to current Firebase production topology
+        env:
+          SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+        run: |
+          set -euo pipefail
+          ROOT="$RUNNER_TEMP/gravicentra-i5-auth"; mkdir -p "$ROOT"; export ROOT
+          python3 - <<'PY'
+          import json,os
+          from pathlib import Path
+          candidates=[('FIREBASE_SERVICE_ACCOUNT',os.environ.get('SA_DEFAULT','')),('FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB',os.environ.get('SA_ORBIT360_LAB','')),('FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB',os.environ.get('SA_ORBIT_360_LAB',''))]
+          rows=[]
+          for i,(name,raw) in enumerate(candidates):
+              if not raw.strip(): continue
+              try: data=json.loads(raw)
+              except Exception: continue
+              if data.get('type')!='service_account' or not data.get('client_email') or not data.get('private_key'): continue
+              p=Path(os.environ['ROOT'])/f'{i}.json'; p.write_text(json.dumps(data)); p.chmod(0o600); rows.append((name,str(p),str(data.get('project_id',''))))
+          if not rows: raise SystemExit('NO_EXISTING_WELL_FORMED_SERVICE_ACCOUNT')
+          (Path(os.environ['ROOT'])/'index.tsv').write_text('\n'.join('\t'.join(x) for x in rows)+'\n')
+          PY
+          SELECTED_NAME=''; SELECTED_FILE=''; SELECTED_OWNER=''
+          while IFS=$'\t' read -r NAME FILE OWNER; do
+            set +e
+            GOOGLE_APPLICATION_CREDENTIALS="$FILE" npx --yes firebase-tools@14.10.1 apps:list WEB --project "$PROJECT_ID" --non-interactive --json >/dev/null 2>&1; A=$?
+            GOOGLE_APPLICATION_CREDENTIALS="$FILE" npx --yes firebase-tools@14.10.1 hosting:sites:get "$HOSTING_SITE" --project "$PROJECT_ID" --non-interactive --json >/dev/null 2>&1; B=$?
+            GOOGLE_APPLICATION_CREDENTIALS="$FILE" npx --yes firebase-tools@14.10.1 functions:list --project "$PROJECT_ID" --non-interactive --json > "$ROOT/functions-$NAME.json" 2>/dev/null; C=$?
+            set -e
+            if [ "$A" -eq 0 ] && [ "$B" -eq 0 ] && [ "$C" -eq 0 ]; then SELECTED_NAME="$NAME"; SELECTED_FILE="$FILE"; SELECTED_OWNER="$OWNER"; cp "$ROOT/functions-$NAME.json" "$ROOT/functions-selected.json"; break; fi
+          done < "$ROOT/index.tsv"
+          test -n "$SELECTED_FILE" || { echo EXISTING_FIREBASE_PRODUCTION_READ_ACCESS_NOT_PROVEN >&2; exit 42; }
+          cp "$SELECTED_FILE" "$RUNNER_TEMP/gravicentra-i5-firebase-sa.json"; chmod 600 "$RUNNER_TEMP/gravicentra-i5-firebase-sa.json"
+          echo "credential_source=$SELECTED_NAME" >> "$GITHUB_OUTPUT"
+          echo "credential_file=$RUNNER_TEMP/gravicentra-i5-firebase-sa.json" >> "$GITHUB_OUTPUT"
+          echo "credential_owner_project=$SELECTED_OWNER" >> "$GITHUB_OUTPUT"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/gravicentra-i5-firebase-sa.json" >> "$GITHUB_ENV"
+
+      - name: Capture sanitized production backend topology without mutation
+        env:
+          FUNCTIONS_RAW: ${{ runner.temp }}/gravicentra-i5-auth/functions-selected.json
+          TOPOLOGY_OUT: ${{ runner.temp }}/i5-production-topology-readonly.json
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const raw=JSON.parse(fs.readFileSync(process.env.FUNCTIONS_RAW,'utf8'));
+          const rows=Array.isArray(raw.result)?raw.result:Array.isArray(raw)?raw:[];
+          const pick=x=>({
+            id:String(x.id||x.name||x.entryPoint||''),
+            entryPoint:String(x.entryPoint||x.id||''),
+            region:Array.isArray(x.region)?x.region.map(String):String(x.region||''),
+            platform:String(x.platform||x.environment||''),
+            runtime:String(x.runtime||''),
+            state:String(x.state||x.status||'')
+          });
+          const functions=rows.map(pick).sort((a,b)=>a.id.localeCompare(b.id));
+          const names=new Set(functions.flatMap(x=>[x.id,x.entryPoint]).filter(Boolean));
+          const targets=['orbit360ProductOperationalCommand','orbit360ProductInsurerCredentialCommand','orbit360OpsLeadsCommand','orbit360CobrosReconciliationCommand','orbit360GetAdvisorOpsInbox','orbit360TenantDomainConfig'];
+          const presence=Object.fromEntries(targets.map(x=>[x,names.has(x)]));
+          const out={schemaVersion:'gravicentra-i5-production-topology-readonly-v1',gate:'I5',readOnly:true,projectId:process.env.PROJECT_ID,sourceSha:process.env.SOURCE_SHA,buildId:process.env.BUILD_ID,functionCount:functions.length,targetPresence:presence,functions};
+          fs.writeFileSync(process.env.TOPOLOGY_OUT,JSON.stringify(out,null,2)+'\n');
+          console.log('I5_PRODUCTION_FUNCTION_COUNT='+functions.length);
+          console.log('I5_TARGET_FUNCTION_PRESENCE='+JSON.stringify(presence));
+          NODE
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i5-readonly-topology-${{ github.run_id }}
+          path: ${{ runner.temp }}/i5-production-topology-readonly.json
+          if-no-files-found: error
+          retention-days: 30
 
       - name: Stop safely until explicit I5 production authorization exists
         if: ${{ steps.release.outputs.deploy_authorized != 'true' }}
         run: |
           set -euo pipefail
           echo I5_STATE_GATED_EXECUTOR=READY
+          echo I5_PRODUCTION_TOPOLOGY_READONLY=CAPTURED
           echo productionTouched=false
           echo dataTouched=false
           echo writesExecuted=0
@@ -133,5 +211,5 @@ jobs:
         if: ${{ steps.release.outputs.deploy_authorized == 'true' }}
         run: |
           set -euo pipefail
-          echo 'I5 production mutation path is deliberately fail-closed until the frozen live-test/write/rollback harness is materialized and validated.' >&2
+          echo 'I5 production mutation path remains fail-closed until rollback is derived from the captured live topology and validated.' >&2
           exit 86
