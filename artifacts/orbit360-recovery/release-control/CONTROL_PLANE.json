@@ -224,10 +224,10 @@
     "projectSourcesReplacementRequired": false
   },
   "i5Execution": {
-    "productionDeployAuthorized": false,
-    "controlledWritesAuthorized": false,
+    "productionDeployAuthorized": true,
+    "controlledWritesAuthorized": true,
     "rollbackPrepared": true,
-    "readinessOnly": true,
+    "readinessOnly": false,
     "noRebuild": true,
     "readinessStatus": "PASS",
     "readinessRunId": 34721691341,
@@ -286,5 +286,5 @@
     "i5RollbackPreparedPhysicalPass": true,
     "i5ReadinessRunId": 34721691341
   },
-  "nextAction": "I5_REQUIRE_EXPLICIT_PRODUCTION_DEPLOY_AND_CONTROLLED_WRITE_AUTHORIZATION"
+  "nextAction": "I5_EXECUTE_AUTHORIZED_PROMOTION_AND_COMPLETE_LIVE_ACCEPTANCE_BEFORE_HUMAN_VISUALIZATION"
 }
