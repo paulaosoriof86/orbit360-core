@@ -1,4 +1,5 @@
 name: Gravicentra Recovery I5 Production Promotion
+# I5_NO_REBUILD=true
 on:
   workflow_dispatch:
   push:
