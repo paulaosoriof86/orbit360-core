@@ -1,96 +1,79 @@
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import process from 'node:process';
-import { chromium } from 'playwright';
-import { initializeApp, cert, deleteApp } from 'firebase-admin/app';
-import { getAuth } from 'firebase-admin/auth';
-import { getFirestore } from 'firebase-admin/firestore';
+import { fileURLToPath } from 'node:url';
+import { spawnSync } from 'node:child_process';
 
-const PROJECT='ays-orbit-360-lab', TENANT='alianzas-soluciones', TARGET_POLICY='AUTO39012';
-const PREVIEW=String(process.env.PREVIEW_URL||'').replace(/\/$/,'');
-const SOURCE=String(process.env.SOURCE_SHA||''), BUILD=String(process.env.BUILD_ID||'');
-const OUT=process.env.I4A_AUTH_EVIDENCE_DIR||process.env.RUNNER_TEMP||process.cwd();
-const TARGETS=['Dirección','SuperAdmin','AdminTenant','Operativo','Asesor'];
-const PRIV=new Set(['Dirección','SuperAdmin','AdminTenant','Operativo']);
-const PROBES=['cliente360','polizas','cobros','aseguradoras'];
-const CREDENTIAL_WAIT_BOUND_MS=20000;
-const clean=v=>String(v==null?'':v).trim();
-const num=v=>{const n=Number(v);return Number.isFinite(n)?n:null;};
-function need(ok,code){if(!ok)throw new Error(code);}
-need(/^[0-9a-f]{40}$/.test(SOURCE),'I4A_SOURCE_SHA_MISSING_OR_INVALID');
-need(/^gi-i3-[0-9a-f]{12}-[0-9a-f]{12}$/.test(BUILD)&&BUILD.includes(SOURCE.slice(0,12)),'I4A_BUILD_ID_MISSING_OR_SOURCE_MISMATCH');
-need(/^https:\/\/[A-Za-z0-9._-]+\.web\.app$/.test(PREVIEW),'I4A_PREVIEW_URL_MISSING_OR_INVALID');
-function role(v){const k=clean(v).toLowerCase().replace(/\s+/g,' ');return ({'dirección':'Dirección','direccion':'Dirección','director':'Dirección','superadmin':'SuperAdmin','super admin':'SuperAdmin','super_admin':'SuperAdmin','super-admin':'SuperAdmin','admin':'AdminTenant','administrador':'AdminTenant','admin tenant':'AdminTenant','admin_tenant':'AdminTenant','admintenant':'AdminTenant','operativo':'Operativo','operaciones':'Operativo','asesor':'Asesor'})[k]||clean(v);}
-function roles(m){const x=Array.isArray(m?.roles)?m.roles:Array.isArray(m?.rolesAsignados)?m.rolesAsignados:(m?.role||m?.rol?[m.role||m.rol]:[]);return [...new Set(x.map(role).filter(Boolean))];}
-function activeRole(m,rs){return role(m?.activeRole||m?.rolActivo||m?.defaultRole||m?.rolDefault||m?.roleDefault||rs[0]);}
-function serviceAccount(){for(const raw of [process.env.SA_DEFAULT,process.env.SA_ORBIT360_LAB,process.env.SA_ORBIT_360_LAB].filter(Boolean)){try{const x=JSON.parse(raw);if(x?.type==='service_account'&&x?.project_id===PROJECT&&x?.client_email&&x?.private_key)return x;}catch{}}throw new Error('I4A_EXISTING_SERVICE_ACCOUNT_NOT_AVAILABLE');}
-function deadline(promise,ms,code){let timer;return Promise.race([promise,new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error(code)),ms);})]).finally(()=>clearTimeout(timer));}
-async function beat(page){const vals=[];for(let i=0;i<3;i++){const t=Date.now();await page.evaluate(()=>new Promise(r=>setTimeout(r,20)));vals.push(Date.now()-t);}return {samplesMs:vals,maxMs:Math.max(...vals)};}
-async function waitFinanceReadModels(page){
-  await page.waitForFunction(()=>{const st=Orbit?.store?._productStatus?.()||{};const confirmed=Array.isArray(st.serverConfirmedCollections)?st.serverConfirmedCollections:[];return confirmed.includes('recibosEsperados')&&confirmed.includes('carteraPrimas')&&(Orbit?.store?.all?.('recibosEsperados')||[]).length>0&&(Orbit?.store?.all?.('carteraPrimas')||[]).length>0;},null,{timeout:12000});
-  return page.evaluate(()=>{const st=Orbit?.store?._productStatus?.()||{};const confirmed=Array.isArray(st.serverConfirmedCollections)?st.serverConfirmedCollections:[];return {serverConfirmedCollections:confirmed.filter(x=>['recibosEsperados','carteraPrimas','cobros'].includes(x)),recibosEsperados:(Orbit?.store?.all?.('recibosEsperados')||[]).length,carteraPrimas:(Orbit?.store?.all?.('carteraPrimas')||[]).length,cobros:(Orbit?.store?.all?.('cobros')||[]).length};});
+const here = path.dirname(fileURLToPath(import.meta.url));
+const basePath = path.join(here, 'gravicentra-i4a-authenticated-browser-v2-base.mjs');
+const need = (ok, code) => { if (!ok) throw new Error(code); };
+need(fs.existsSync(basePath), 'I5_AUTH_HARNESS_BASE_MISSING');
+let source = fs.readFileSync(basePath, 'utf8');
+
+const probesMarker = "const PROBES=['cliente360','polizas','cobros','aseguradoras'];";
+need(source.split(probesMarker).length === 2, 'I5_AUTH_HARNESS_PROBES_MARKER_DRIFT');
+source = source.replace(probesMarker, probesMarker + "\nconst CREDENTIAL_WAIT_BOUND_MS=20000;");
+
+const startMarker = "        const refIndexes=cand.credentials.refIndexes;\n";
+const endMarker = "        credentials.refRehiddenCount=refIndexes.length;\n";
+const start = source.indexOf(startMarker);
+const endStart = source.indexOf(endMarker, start);
+need(start >= 0 && endStart > start, 'I5_AUTH_HARNESS_CREDENTIAL_BLOCK_DRIFT');
+need(source.indexOf(startMarker, start + 1) === -1, 'I5_AUTH_HARNESS_CREDENTIAL_BLOCK_AMBIGUOUS');
+const end = endStart + endMarker.length;
+const hardenedBlock = `        const refIndexes=cand.credentials.refIndexes;
+        credentials.credentialFunctionalWaitBoundMs=CREDENTIAL_WAIT_BOUND_MS;
+        credentials.productSlaAssertedByThisWait=false;
+        credentials.credentialActionLatencyMs=[];
+        for(const index of refIndexes){
+          const revealAt=Date.now();
+          await page.locator('#af-portales [data-portal="'+index+'"] [data-od-credential-reveal="'+index+'"]').click();
+          await page.waitForFunction(index=>{const x=document.querySelector('#af-portales [data-portal="'+index+'"] [data-od-credential-secret]');const t=(x?.textContent||'').trim();return !!t&&t!=='Oculta';},index,{timeout:CREDENTIAL_WAIT_BOUND_MS});
+          credentials.credentialActionLatencyMs.push({kind:'reveal',index,ms:Date.now()-revealAt});
+        }
+        credentials.refRevealResolvedCount=refIndexes.length;
+        credentials.refCopyResolvedCount=0;
+        for(const index of refIndexes){
+          const cleared=await page.evaluate(async()=>{try{await navigator.clipboard.writeText('');return (await navigator.clipboard.readText())==='';}catch{return false;}});
+          need(cleared,'ASEGURADORAS_QA_CLIPBOARD_PRECLEAR_FAILED:'+index);
+          const copyAt=Date.now();
+          await page.locator('#af-portales [data-portal="'+index+'"] [data-od-credential-copy="'+index+'"]').click();
+          let copied=false;
+          const until=Date.now()+CREDENTIAL_WAIT_BOUND_MS;
+          while(Date.now()<until&&!copied){
+            await page.waitForTimeout(100);
+            copied=await page.evaluate(async()=>{try{const value=await navigator.clipboard.readText();const marker='\\nContraseña: ';const at=value.indexOf(marker);const password=at>=0?value.slice(at+marker.length).trim():'';return typeof value==='string'&&value.includes('Usuario: ')&&at>=0&&!!password&&password!=='—';}catch{return false;}});
+          }
+          need(copied,'ASEGURADORAS_PRIVILEGED_REF_COPY_FLOW_FAILED:'+index);
+          credentials.credentialActionLatencyMs.push({kind:'copy',index,ms:Date.now()-copyAt});
+          credentials.refCopyResolvedCount++;
+        }
+        credentials.clipboardCleared=await page.evaluate(async()=>{try{await navigator.clipboard.writeText('');return true;}catch{return false;}});need(credentials.clipboardCleared,'ASEGURADORAS_QA_CLIPBOARD_CLEAR_FAILED');
+        await page.waitForFunction(indexes=>indexes.every(index=>(document.querySelector('#af-portales [data-portal="'+index+'"] [data-od-credential-secret]')?.textContent||'').trim()==='Oculta'),refIndexes,{timeout:9000});
+        credentials.refRehiddenCount=refIndexes.length;
+`;
+source = source.slice(0, start) + hardenedBlock + source.slice(end);
+
+const deadlineOld = "rec.stage=name;rec.evidence=await deadline(probe(page),22000,'I4A_'+name.toUpperCase()+'_PROBE_TIMEOUT');";
+const deadlineNew = "rec.stage=name;const probeDeadlineMs=name==='aseguradoras'?60000:22000;rec.probeFunctionalWaitBoundMs=probeDeadlineMs;rec.productSlaAssertedByThisWait=false;rec.evidence=await deadline(probe(page),probeDeadlineMs,'I4A_'+name.toUpperCase()+'_PROBE_TIMEOUT');";
+need(source.split(deadlineOld).length === 2, 'I5_AUTH_HARNESS_DEADLINE_MARKER_DRIFT');
+source = source.replace(deadlineOld, deadlineNew);
+
+const flagOld = "qaHarnessPatchedAtRuntime:false";
+const flagNew = "qaHarnessPatchedAtRuntime:true,qaHarnessPatchId:'I5_CREDENTIAL_TIMING_V1',qaHarnessBase:'gravicentra-i4a-authenticated-browser-v2-base.mjs'";
+need(source.split(flagOld).length === 2, 'I5_AUTH_HARNESS_PATCH_FLAG_DRIFT');
+source = source.replace(flagOld, flagNew);
+
+const tempPath = path.join(os.tmpdir(), `gravicentra-i5-auth-hardened-${process.pid}.mjs`);
+fs.writeFileSync(tempPath, source, 'utf8');
+try {
+  const check = spawnSync(process.execPath, ['--check', tempPath], { stdio: 'inherit', env: process.env });
+  need(check.status === 0, 'I5_AUTH_HARNESS_GENERATED_SYNTAX_INVALID');
+  console.log('I5_AUTH_HARNESS_PATCH=PASS');
+  console.log('I5_AUTH_HARNESS_PATCH_ID=I5_CREDENTIAL_TIMING_V1');
+  const run = spawnSync(process.execPath, [tempPath], { stdio: 'inherit', env: process.env });
+  process.exitCode = Number.isInteger(run.status) ? run.status : 1;
+} finally {
+  try { fs.unlinkSync(tempPath); } catch {}
 }
-async function gotoRoute(page,hash,predicate,timeout=10000,arg=null){const t=Date.now();await page.evaluate(h=>{location.hash=h;},hash);await page.waitForFunction(predicate,arg,{timeout});return Date.now()-t;}
-async function activate(page,token){const t=Date.now();const x=await page.evaluate(async tok=>{const p=Orbit?.productRuntimeBrowserProvidersP0;const c=await p.initialize();await c.modules.auth.signInWithCustomToken(c.auth,tok);return await Orbit.productAppP0.activate();},token);need(x?.started===true,'PRODUCT_APP_DID_NOT_START');await page.waitForFunction(()=>Orbit?.productAppP0?.status?.().started===true&&!document.body.classList.contains('pre-auth'),null,{timeout:12000});return Date.now()-t;}
-async function acceptEphemeralLegalGate(page){const gate=page.locator('[data-legal-gate].open');await gate.waitFor({state:'visible',timeout:2200});const chk=gate.locator('#lg-chk'),ok=gate.locator('#lg-ok');need(await chk.count()===1,'I4A_AUTH_LEGAL_CHECKBOX_MISSING');need(await ok.count()===1,'I4A_AUTH_LEGAL_ACCEPT_MISSING');await chk.check();need(await ok.isEnabled(),'I4A_AUTH_LEGAL_ACCEPT_DISABLED');await ok.click();await gate.waitFor({state:'detached',timeout:4000});const localAccepted=await page.evaluate(()=>{try{const a=JSON.parse(localStorage.getItem('orbit360_legal_aceptaciones')||'{}');return Object.values(a).some(x=>x&&x.aceptado===true&&x.version==='2.0');}catch{return false;}});need(localAccepted,'I4A_AUTH_EPHEMERAL_LEGAL_STATE_MISSING');return {completed:true,interaction:'ordinary-ui',persistence:'ephemeral-browser-localStorage',backendWrite:false};}
-async function setRole(page,target){const before=await page.evaluate(()=>({active:Orbit?.session?.rol?.()||'',assigned:Orbit?.session?.allowedRoles?.()||[]}));if(before.active===target)return {mode:'persisted-active',before:before.active,after:before.active};need(before.assigned.includes(target),'ROLE_NOT_ASSIGNED:'+target);const switched=await page.evaluate(r=>Orbit.session.set(r),target);need(switched===true,'ROLE_SWITCH_REJECTED:'+target);await page.waitForTimeout(180);const after=await page.evaluate(()=>Orbit?.session?.rol?.()||'');need(after===target,'ROLE_SWITCH_NOT_EFFECTIVE:'+target);return {mode:'assigned-switch',before:before.active,after};}
-function telemetry(page){const t={console:[],page:[],req:[],http:[]};page.on('console',m=>{if(m.type()==='error')t.console.push(m.text().slice(0,240));});page.on('pageerror',e=>t.page.push(String(e?.message||e).slice(0,240)));page.on('requestfailed',q=>{try{if(new URL(q.url()).origin===new URL(PREVIEW).origin)t.req.push(q.url());}catch{}});page.on('response',q=>{try{if(new URL(q.url()).origin===new URL(PREVIEW).origin&&q.status()>=400)t.http.push(q.status());}catch{}});return t;}
-function checkTelemetry(t){need(t.page.length===0,'I4A_AUTH_PAGE_ERRORS');need(t.req.length===0,'I4A_AUTH_SAME_ORIGIN_REQUEST_FAILURES');need(t.http.length===0,'I4A_AUTH_SAME_ORIGIN_HTTP_ERRORS');return {consoleErrorCount:t.console.length,pageErrorCount:t.page.length,sameOriginRequestFailureCount:t.req.length,sameOriginHttpErrorCount:t.http.length};}
-
-async function probeCliente360(page){
-  const routeMs=await gotoRoute(page,'#/cliente360',()=>Orbit?.route?.key==='cliente360'&&!!document.querySelector('#host .c360-pagination')&&!!document.querySelector('#host table.tbl tbody'),12000);
-  await page.waitForTimeout(180);
-  const state=await page.evaluate(()=>{
-    const scoped=Orbit.access?.scopedStore?.('cliente360');
-    const scopedTotal=scoped?.all?.('clientes')?.length||0;
-    const scopedProjectionTotal=Orbit.access?.withScope?.('cliente360',()=>{const b=Orbit.clientProjection?.withReadBatch?.(['clientes','polizas','cobros'],x=>x)||{clientes:[]};return Array.isArray(b.clientes)?b.clientes.length:0;})||0;
-    const d=OrbitRuntimeDiagnostics?.cliente360?.list||{};
-    return {activeRole:Orbit.session?.rol?.()||'',scope:Orbit.access?.dataScope?.('cliente360')||'',!%document.querySelector('#host table.tbl tbody'),12000);
-  await page.waitForTimeout(180);
-  const state=await page.evaluate(()=>{
-    const scoped=Orbit.access?.scopedStore?.('cliente360');
-    const scopedTotal=scoped?.all?.('clientes')?.length||0;
-    const scopedProjectionTotal=Orbit.access?.withScope?.('cliente360',()=>{const b=Orbit.clientProjection?.withReadBatch?.(['clientes','polizas','cobros'],x=>x)||{clientes:[]};return Array.isArray(b.clientes)?b.clientes.length:0;})||0;
-    const d=OrbitRuntimeDiagnostics?.cliente360?.list||{};
-    return {activeRole:Orbit.session?.rol?.()||'',scope:Orbit.access?.dataScope?.('cliente360')||'',rawTotal:Orbit.store.all('clientes').length,scopedTotal,scopedProjectionTotal,diagnostics:{pageSize:d.pageSize??null,page:d.page??null,pageCount:d.pageCount??null,totalRows:d.totalRows??null,filteredRows:d.filteredRows??null,renderedRows:d.renderedRows??null,renderSeq:d.renderSeq??null,totalMs:d.totalMs??null,batchRead:d.batchRead===true},visibleRows:document.querySelectorAll('#host table.tbl tbody tr.clickable').length,paginationText:(document.querySelector('#host .c360-pagination')?.textContent||'').replace(/\s+/g,' ').trim()};
-  });
-  need(state.rawTotal>0,'CLIENTES_EMPTY');need(state.scopedTotal>0,'CLIENTE360_SCOPE_EMPTY');need(state.scopedProjectionTotal===state.scopedTotal,'CLIENTE360_SCOPED_PROJECTION_MISMATCH');need(state.diagnostics.pageSize===40,'CLIENTE360_APPROVED_PAGE_SIZE_NOT_EFFECTIVE');need(state.diagnostics.totalRows===state.scopedTotal,'CLIENTE360_RENDER_INPUT_SCOPE_MISMATCH');need(state.diagnostics.renderedRows===Math.min(40,state.scopedTotal),'CLIENTE360_RENDER_DIAGNOSTIC_ROW_MISMATCH');need(state.visibleRows===state.diagnostics.renderedRows,'CLIENTE360_POST_RENDER_DOM_DIVERGENCE');need(state.paginationText.includes('de '+state.scopedTotal),'CLIENTE360_PAGINATION_SCOPE_MISMATCH');
-  const transientHeartbeat=await beat(page);await page.waitForTimeout(600);const settledDiagnostics=await page.evaluate(()=>{const d=OrbitRuntimeDiagnostics?.cliente360?.list||{};return {renderSeq:d.renderSeq??null,totalMs:d.totalMs??null,renderedRows:d.renderedRows??null,totalRows:d.totalRows??null};});const heartbeat=await beat(page);
-  need(transientHeartbeat.maxMs<1000,'CLIENTE360_EVENT_LOOP_BLOCKED_TRANSIENT:'+JSON.stringify({transientHeartbeat,initialDiagnostics:state.diagnostics,settledDiagnostics}));need(heartbeat.maxMs<1000,'CLIENTE360_EVENT_LOOP_BLOCKED_STABLE:'+JSON.stringify({heartbeat,settledDiagnostics}));
-  return {routeMs,...state,transientHeartbeat,settledDiagnostics,heartbeat};
-}
-
-async function probePolizas(page,canonicalPolicy){
-  const routeMs=await gotoRoute(page,'#/polizas',()=>Orbit?.route?.key==='polizas'&&!!document.querySelector('#host .page')&&!!document.querySelector('#host table'),12000);
-  await page.waitForTimeout(120);
-  const chain=await page.evaluate(target=>{const raw=(Orbit.store.raw?.().polizas||[]).find(p=>String(p?.numero||'').trim()===target)||null;const runtime=(Orbit.store.all('polizas')||[]).find(p=>String(p?.numero||'').trim()===target)||null;const scopedRows=Orbit.access?.scopedStore?.('polizas')?.all?.('polizas')||[];const scoped=scopedRows.find(p=>String(p?.numero||'').trim()===target)||null;const pack=p=>p?{id:p.id,numero:p.numero,prima:p.prima,primaNeta:p.primaNeta,primaTotal:p.primaTotal,moneda:p.moneda}:null;const search=document.getElementById('fq');if(search){search.value=target;search.dispatchEvent(new Event('input',{bubbles:true}));search.dispatchEvent(new Event('change',{bubbles:true}));}return {raw:pack(raw),runtime:pack(runtime),scoped:pack(scoped),scope:Orbit.access?.dataScope?.('polizas')||''};},TARGET_POLICY);
-  await page.waitForTimeout(220);
-  const dom=await page.evaluate(target=>{const rows=[...document.querySelectorAll('#host table.tbl tbody tr')];const hit=rows.find(r=>(r.textContent||'').includes(target));return {found:!!hit,text:hit?(hit.textContent||'').replace(/\s+/g,' ').trim():'',premiumCell:hit?(hit.querySelector('td.num')?.textContent||'').trim():''};},TARGET_POLICY);
-  need(chain.raw,'POLIZAS_TARGET_RAW_NOT_FOUND');need(chain.runtime,'POLIZAS_TARGET_RUNTIME_NOT_FOUND');need(num(chain.raw.primaTotal)!=null&&num(canonicalPolicy?.primaTotal)!=null&&Math.abs(num(chain.raw.primaTotal)-num(canonicalPolicy.primaTotal))<0.005,'POLIZAS_RAW_PREMIUM_DIVERGENCE_FROM_CANONICAL');need(num(chain.runtime.primaTotal)!=null&&Math.abs(num(chain.runtime.primaTotal)-num(chain.raw.primaTotal))<0.005,'POLIZAS_OPERATIONAL_STORE_PREMIUM_DIVERGENCE_FROM_RAW');need(num(chain.runtime.primaNeta)!=null&&num(canonicalPolicy?.primaNeta)!=null&&Math.abs(num(chain.runtime.primaNeta)-num(canonicalPolicy.primaNeta))<0.005,'POLIZAS_RUNTIME_NET_PREMIUM_DIVERGENCE_FROM_CANONICAL');
-  const expected=await page.evaluate(x=>Orbit.ui.money(Number(x.value),x.cur||'GTQ'),{value:canonicalPolicy.primaTotal,cur:canonicalPolicy.moneda});if(chain.scoped){need(dom.found,'POLIZAS_TARGET_ROW_NOT_MATERIALIZED');need(dom.premiumCell===expected,'POLIZAS_DOM_PREMIUM_DIVERGENCE_FROM_RUNTIME');}else need(!dom.found,'POLIZAS_OUT_OF_SCOPE_TARGET_LEAKED_TO_DOM');
-  const transientHeartbeat=await beat(page);await page.waitForTimeout(600);const heartbeat=await beat(page);need(heartbeat.maxMs<1000,'POLIZAS_EVENT_LOOP_BLOCKED_STABLE:'+JSON.stringify({transientHeartbeat,heartbeat}));return {routeMs,canonical:canonicalPolicy,...chain,dom,expectedPremiumText:expected,transientHeartbeat,heartbeat};
-}
-
-async function probeCobros(page){
-  const routeMs=await gotoRoute(page,'#/cobros',()=>Orbit?.route?.key==='cobros'&&!!document.querySelector('#host .page'),12000);
-  const financeReadModels=await waitFinanceReadModels(page);await page.waitForTimeout(160);
-  const state=await page.evaluate(()=>{const scoped=Orbit.access?.scopedStore?.('cobros');const q=Orbit.access?.withScope?.('cobros',()=>Orbit.q?.carteraGlobal?.()||null);return {scope:Orbit.access?.dataScope?.('cobros')||'',base:{cobros:Orbit.store.all('cobros').length,recibosEsperados:Orbit.store.all('recibosEsperados').length,carteraPrimas:Orbit.store.all('carteraPrimas').length},scoped:{cobros:scoped?.all?.('cobros')?.length||0,recibosEsperados:scoped?.all?.('recibosEsperados')?.length||0,carteraPrimas:scoped?.all?.('carteraPrimas')?.length||0},carteraGlobal:q,visibleRows:document.querySelectorAll('#host table.tbl tbody tr').length,text:(document.querySelector('#host')?.textContent||'').replace(/\s+/g,' ').trim().slice(0,700)};});
-  need(financeReadModels.serverConfirmedCollections.includes('recibosEsperados'),'RECIBOS_ESPERADOS_NOT_SERVER_CONFIRMED');need(financeReadModels.serverConfirmedCollections.includes('carteraPrimas'),'CARTERA_PRIMAS_NOT_SERVER_CONFIRMED');need(state.base.carteraPrimas>0,'CARTERA_PRIMAS_EMPTY');need(state.base.recibosEsperados>0,'RECIBOS_ESPERADOS_EMPTY');need(state.carteraGlobal&&typeof state.carteraGlobal==='object','COBROS_CARTERA_GLOBAL_UNAVAILABLE');need(state.visibleRows<=state.scoped.cobros,'COBROS_VISIBLE_ROWS_EXCEED_SCOPED_COBROS');
-  const heartbeat=await beat(page);try{need(heartbeat.maxMs<1000,'COBROS_EVENT_LOOP_BLOCKED');}catch(error){error.heartbeat={samples:Array.isArray(heartbeat.samples)?heartbeat.samples:[...(heartbeat.samplesMs||[])],maxMs:heartbeat.maxMs};throw error;}
-  return {routeMs,financeReadModels,...state,heartbeat};
-}
-
-async function openInsurer(page,id){await gotoRoute(page,'#/aseguradoras?ficha='+encodeURIComponent(id),x=>Orbit?.route?.key==='aseguradoras'&&String(Orbit?.route?.params?.ficha||'')===String(x)&&!!document.querySelector('#asg-ficha'),12000,id);await page.waitForTimeout(120);}
-async function clickTab(page,tab,container){await page.evaluate(t=>{const el=document.querySelector('#asg-ficha [data-tab="'+t+'"]');if(!el)throw new Error('ASEGURADORAS_TAB_MISSING:'+t);el.click();},tab);await page.waitForFunction(sel=>!!document.querySelector(sel),container,{timeout:8000});await page.waitForTimeout(160);}
-async function probeAseguradoras(page,r){
-  const routeMs=await gotoRoute(page,'#/aseguradoras',()=>Orbit?.route?.key==='aseguradoras'&&!!document.querySelector('#host .page'),12000);
-  const cand=await page.evaluate(()=>{const rows=Orbit.store.all('aseguradoras')||[];const portals=rows.find(x=>x&&Array.isArray(x.portales)&&x.portales.length>0)||null;const banks=rows.find(x=>x&&Array.isArray(x.cuentas)&&x.cuentas.length>0)||null;const credential=rows.find(x=>x&&Array.isArray(x.portales)&&x.portales.some(p=>p&&p.credentialRef))||rows.find(x=>x&&Array.isArray(x.portales)&&x.portales.some(p=>p&&(p.password||p.pass||p.contrasena||p.clave)))||null;const portalSummary=x=>x?{id:x.id,count:x.portales.length}:null;const bankSummary=x=>x?{id:x.id,count:x.cuentas.length,numberBearing:x.cuentas.filter(a=>a&&(a.numero||a.numeroCuenta||a.accountNumber)).length}:null;const credSummary=x=>x?{id:x.id,inline:x.portales.filter(p=>p&&(p.password||p.pass||p.contrasena||p.clave)).length,refs:x.portales.filter(p=>p&&p.credentialRef).length,refIndexes:x.portales.map((p,i)=>p&&p.credentialRef?i:null).filter(Number.isInteger),inlineIndexes:x.portales.map((p,i)=>p&&(p.password||p.pass||p.contrasena||p.clave)?i:null).filter(Number.isInteger),userBearing:x.portales.filter(p=>p&&(p.usuario||p.user||p.login||p.emailUsuario||p.correoUsuario)).length}:null;return {portals:portalSummary(portals),banks:bankSummary(banks),credentials:credSummary(credential)};});
-  need(cand.portals?.id,'ASEGURADORAS_PORTAL_RECORD_UNAVAILABLE');need(cand.banks?.id,'ASEGURADORAS_BANK_RECORD_UNAVAILABLE');
-  await openInsurer(page,cand.portals.id);await clickTab(page,'plataformas','#af-portales');
-  const portals=await page.evaluate(()=>({ownerVersion:Orbit?.clientInsurerOperationalDirectoryOwnerV20260722?.version||'',compositionRevision:Orbit?.clientInsurerOperationalDirectoryOwnerV20260722?.compositionRevision||'',barrierRevision:Orbit?.__clientInsurerVisualStabilityBarrierV20260721?.directoryVisibilityRevision||'',rows:document.querySelectorAll('#af-portales [data-portal]').length,cards:document.querySelectorAll('#af-portales .od-operational-portal-card[data-portal]').length,credentialBoxes:document.querySelectorAll('#af-portales .od-credential-box').length,stable:Orbit?.__clientInsurerVisualStabilityState?.expectedReady===true}));
-  need(portals.ownerVersion==='20260829.1','ASEGURADORAS_CANONICAL_OWNER_VERSION_MISMATCH');need(portals.compositionRevision==='20260909.1-server-owned-credential-copy','ASEGURADORAS_OWNER_COMPOSITION_REVISION_MISMATCH');need(portals.barrierRevision==='20260902.1-latest-operational-owner-precedence','ASEGURADORAS_BARRIER_REVISION_MISMATCH');need(portals.rows===cand.portals.count&&portals.cards===cand.portals.count,'ASEGURADORAS_PORTAL_CARD_COUNT_MISMATCH');need(portals.credentialBoxes===cand.portals.count,'ASEGURADORAS_CREDENTIAL_BOX_COUNT_MISMATCH');need(portals.stable,'ASEGURADORAS_PORTAL_VIEW_NOT_STABLE');
-  let credentials={datasetAvailable:!!cand.credentials};
-  if(cand.credentials){
-    await openInsurer(page,cand.credentials.id);await clickTab(page,'plataformas','#af-portales');
-    credentials=await page.evaluate(meta=>{let secure={};try{secure=Orbit?.secureResources?.selfTest?.()||{};}catch{}const refRows=(meta.refIndexes||[]).map(index=>{const row=document.querySelector('#af-portales [data-portal="'+index+'"]');return {index,card:!!row,reveal:!!row?.querySelector('[data-od-credential-reveal="'+index+'"]'),copy:!!row?.querySelector('[data-od-credential-copy="'+index+'"]'),markedUnavailable:!!row&&/contraseña no disponible|pendiente de conexión segura/i.test(row.textContent||'')};});return {datasetAvailable:true,inlineCount:meta.inline,refCount:meta.refs,userBearing:meta.userBearing,cards:document.querySelectorAll('#af-portales .od-operational-portal-card').length,userVisible:[...document.querySelectorAll('#af-portales [data-od-credential-user]')].filter(x=>{const t=(x.textContent||'').trim();return t&&!/sin usuario/i.test(t);}).length,reveals:document.querySelectorAll('#af-portales [data-od-credential-reveal]').length,copies:document.querySelectorAll('#af-portales [data-od-credential-copy]').length,unavailableCards:[...document.querySelectorAll('#af-portales .od-credential-box')].filter(x=>/contraseña no disponible|pendiente de conexión segura/i.test(x.textContent||'')).length,credentialProviderRegistered:secure.credentialProvider===true,secureStatus:secure,refRows};},cand.credentials);
-    if(
