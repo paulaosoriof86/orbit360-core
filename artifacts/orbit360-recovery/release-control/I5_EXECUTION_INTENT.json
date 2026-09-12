@@ -41,7 +41,7 @@
     },
     "liveAcceptance": {
       "publicLoginStartupShell": "reuse frozen I4A public browser harness against production URL",
-      "authenticatedModuleProofs": "reuse exact I4A authenticated harness base blob 3b479d87439218fe59d4de9429e641df504e9881 through fail-closed QA wrapper commit 16cf66faf0489a925a06b753ccc141278ace5f17; wrapper restores previously certified targeted Aseguradoras credential timing/polling semantics without product or artifact mutation",
+      "authenticatedModuleProofs": "reuse exact I4A authenticated harness base blob 3b479d87439218fe59d4de9429e641df504e9881 through fail-closed repo-scoped QA wrapper commit 2f4372da9b69a27665bc3edf4d5aa7178cd8602f; wrapper restores previously certified targeted Aseguradoras credential timing/polling semantics without product or artifact mutation and resolves runtime dependencies from repository module scope",
       "transversalMatrix": "reuse frozen I4B role x viewport x module relationship harness against production URL",
       "controlledWrite": "synthetic operational insurer roundtrip",
       "postWriteIntegrity": "rerun frozen I4B transversal matrix after cleanup",
