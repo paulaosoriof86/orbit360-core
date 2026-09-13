@@ -1,7 +1,7 @@
 {
   "schemaVersion": "gravicentra-control-plane-v2",
   "controlPlaneId": "GRAVICENTRA-INSURANCE-FASE-A",
-  "status": "I5_IN_PROGRESS",
+  "status": "PRODUCTION_ACCEPTED",
   "productBrand": "Gravicentra Insurance",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -21,7 +21,8 @@
     "authorityType": "DERIVED_MUTABLE_STATUS_LEDGER",
     "capabilityCount": 15,
     "mayGovernGate": false,
-    "mayGovernReleaseIdentity": false
+    "mayGovernReleaseIdentity": false,
+    "latestBlobSha": "431bb36f3ddf12b0585a99a54f228d0ee913b584"
   },
   "projectSources": {
     "activePackage": "GRAVICENTRA_PROJECT_SOURCES_EVERGREEN_V3",
@@ -38,10 +39,10 @@
     "artifacts/orbit360-recovery/release-control/ACTIVE_RELEASE_LOCK.json": "DEPRECATED_NON_AUTHORITATIVE_TOMBSTONE"
   },
   "gateState": {
-    "lastFormallyCompletedIteration": 4,
-    "lastFormallyCompletedGate": "I4B",
-    "currentTransition": "I5_PROMOTE_SAME_ARTIFACT_AND_LIVE_ACCEPTANCE",
-    "nextFrozenIteration": "I5",
+    "lastFormallyCompletedIteration": 5,
+    "lastFormallyCompletedGate": "I5",
+    "currentTransition": "I6_REFRESH_AUGUST_AND_ENTER_POSTPRODUCTION",
+    "nextFrozenIteration": "I6",
     "gates": {
       "I0": {"status": "PASS"},
       "I1": {"status": "PASS", "capabilitiesBound": 15},
@@ -49,15 +50,15 @@
       "I3": {"status": "PASS", "latestRunId": 34557374566, "conclusion": "success", "sourceSha": "16f174d087024085eff18079c486f717ef98d691", "artifactId": 10183074943, "readbackExact": true},
       "I4A": {"status": "PASS", "previousAuthoritativeRunId": 34555949312, "latestAuthoritativeRunId": 34560184247, "latestArtifactId": 10184053728, "latestArtifactDigest": "sha256:496177cb6f2dfd7190a821e6180bcfeeb864704426f4debaccbdb3d78c3b0790", "proofCount": 8, "capabilityCount": 15, "writesExecuted": 0},
       "I4B": {"status": "PASS", "latestAuthoritativeRunId": 34651451745, "matrixArtifactId": 10283923191, "matrixArtifactDigest": "sha256:f8c48d460de00407522ba63038cd1a429e4dd65545b4599c61e318a7a673f7c1", "remediationArtifactId": 10283817885, "remediationArtifactDigest": "sha256:f304ef3dc0856477648bff94b34080af181ac1603262fc4027a627e212e08d1b", "contextsPass": 15, "contextsFail": 0, "uniqueFailures": 0},
-      "I5": {"status": "IN_PROGRESS"},
-      "I6": {"status": "HOLD_UNTIL_PRODUCTION_ACCEPTED"}
+      "I5": {"status": "PASS", "latestAuthoritativeRunId": 34733712152, "runAttempt": 2, "conclusion": "success", "evidenceArtifactId": 10311055390, "evidenceArtifactDigest": "sha256:5aad2082722a0c8eedcc3d2b6d48c702c1fab8ad3d57815f4bf5382963747ceb", "preWriteContextsPass": 15, "preWriteContextsFail": 0, "controlledWritesExecuted": 3, "syntheticFinalAbsent": true, "postWriteContextsPass": 15, "postWriteContextsFail": 0},
+      "I6": {"status": "HOLD_PENDING_EXPLICIT_AUTHORIZATION"}
     }
   },
   "productionProgress": {
-    "formalPercent": 85.7,
-    "certifiedPhysicalPercent": 85.7,
-    "method": "7 frozen production gates I0,I1,I2,I3,I4A,I4B,I5; equal gate-completion accounting; 6 of 7 gates are physically certified on the current candidate",
-    "iterationsRemaining": ["I5"]
+    "formalPercent": 100,
+    "certifiedPhysicalPercent": 100,
+    "method": "7 frozen production gates I0,I1,I2,I3,I4A,I4B,I5; equal gate-completion accounting; 7 of 7 gates are physically certified and formally sealed on the current candidate",
+    "iterationsRemaining": []
   },
   "certifiedCandidate": {
     "sourceSha": "16f174d087024085eff18079c486f717ef98d691",
@@ -143,16 +144,50 @@
     "rollbackExecuted": false,
     "prevention": "I4B executor performs exact guarded LAB inventory/remediation before the read-only transversal matrix and fails closed unless provenance and post-state match the frozen contract."
   },
+  "i5GateSeal": {
+    "status": "PASS",
+    "terminalRunId": 34733712152,
+    "terminalRunAttempt": 2,
+    "terminalHeadSha": "e0b58e2c2e6cedd33217bad153d20f68edea212a",
+    "evidenceArtifactId": 10311055390,
+    "evidenceArtifactDigest": "sha256:5aad2082722a0c8eedcc3d2b6d48c702c1fab8ad3d57815f4bf5382963747ceb",
+    "sameCertifiedSourceSha": "16f174d087024085eff18079c486f717ef98d691",
+    "sameCertifiedBuildId": "gi-i3-16f174d08702-57f234755dc1",
+    "sameCertifiedArtifactId": 10183074943,
+    "productionReadbackExact": true,
+    "hostedReadbackFileCount": 202,
+    "preWriteContextsPass": 15,
+    "preWriteContextsFail": 0,
+    "postWriteContextsPass": 15,
+    "postWriteContextsFail": 0,
+    "controlledWritesExecuted": 3,
+    "syntheticFinalAbsent": true,
+    "augustDataTouched": false,
+    "terminalAttemptRollbackExecuted": false,
+    "priorFailedAttemptRollbackPass": true,
+    "liveAcceptanceFileSha256": "d7e00c7faf52a662229be0e53389c6e1d9c3037f2bc520df6728920074854667",
+    "productionReadbackFileSha256": "f0915a94d5fa57d335d73bac7617e1c5c074d109969cbd3f09210edfd80b85e4",
+    "controlledWriteFileSha256": "8f0738cbcc7f86a53aaaeff27e62530bbdac738aabe9ba13d21eaf586c26c973",
+    "preWriteMatrixFileSha256": "4d11e41810322913eee18b66a7c4493b0211595231112b4de65d34d5465f5c8e",
+    "postWriteMatrixFileSha256": "f58f162330e770dee733bbb8fd8f0de614c3486834c1a5eff6363643fa03a960",
+    "liveAuthFileSha256": "317b791277748e9fe2d55b3104d5f26fbb9610e045d229fc7b4f1837fcdb9439",
+    "livePublicFileSha256": "6405649d66459f467489c1813360454a353ff9f5350f38d642c18bdbb5749bbb",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I5_GATE_SEAL_20260912.json",
+    "receiptBlobSha": "f8a1c375d5088453545514e584e99e0ad78491c2"
+  },
   "environmentState": {
     "firebaseProjectId": "ays-orbit-360-lab",
     "hostingSiteId": "ays-orbit-360-lab",
     "i3FunctionsDeployed": false,
     "i3SharedBackendMutation": false,
     "previewOnlyInfrastructureTouchedByRecovery": true,
-    "productionAccepted": false,
-    "productionTouchedByRecovery": false,
-    "dataTouchedByRecovery": false,
-    "writesExecuted": 0,
+    "productionAccepted": true,
+    "productionTouchedByRecovery": true,
+    "dataTouchedByRecovery": true,
+    "writesExecuted": 3,
+    "i5FrontendPromoted": true,
+    "i5BackendTargetsPromoted": 6,
+    "i5SyntheticFinalAbsent": true,
     "dataCutoff": "2026-07-31",
     "augustRefresh": "HOLD"
   },
@@ -177,7 +212,9 @@
     "i2I3ScopedIntentExecution": true,
     "completeAncestryForControlCheckouts": true,
     "i3MustConsumeNextCandidateDuringSuccessorLifecycle": true,
-    "centralGuardBroadGravicentraWatch": true
+    "centralGuardBroadGravicentraWatch": true,
+    "i5ReexecutionAfterProductionAcceptanceForbiddenWithoutCausalInvalidation": true,
+    "i6RequiresExplicitAuthorization": true
   },
   "mechanismFreeze": {
     "version": "GRAVICENTRA_RECOVERY_MECHANISM_V3_20260909",
@@ -193,8 +230,15 @@
     "conversationDoesNotAuthorizeReentry": true,
     "unaffectedCapabilityEvidenceMustBePreserved": true,
     "newMethodologyOrIterationForbidden": true,
-    "enforcedBy": "tools/gravicentra-control-plane-guard-v2.mjs + tools/gravicentra-mechanism-invariant-v2.mjs",
+    "enforcedBy": "tools/gravicentra-governance-preflight-v1.mjs + tools/gravicentra-mechanism-invariant-v2.mjs",
     "documentationPath": "artifacts/orbit360-recovery/release-control/MECHANISM_FREEZE_V3_20260909.md"
+  },
+  "postI5Governance": {
+    "status": "FROZEN",
+    "addendumPath": "artifacts/orbit360-recovery/release-control/MECHANISM_FREEZE_V5_POST_I5_20260912.md",
+    "guardPath": "tools/gravicentra-post-i5-control-plane-guard-v1.mjs",
+    "preI5GuardPreserved": "tools/gravicentra-control-plane-guard-v2.mjs",
+    "physicalEvidencePrecededFormalSeal": true
   },
   "mechanismCorrection20260909": {
     "status": "FROZEN_PHYSICAL_END_TO_END_PASS",
@@ -224,8 +268,8 @@
     "projectSourcesReplacementRequired": false
   },
   "i5Execution": {
-    "productionDeployAuthorized": true,
-    "controlledWritesAuthorized": true,
+    "productionDeployAuthorized": false,
+    "controlledWritesAuthorized": false,
     "rollbackPrepared": true,
     "readinessOnly": false,
     "noRebuild": true,
@@ -235,7 +279,23 @@
     "readinessArtifactDigest": "sha256:0c281a5489d7c0333d159703416d9f27f1a30461855090fc462aed03509f00f1",
     "preexistingProductionFunctionCount": 14,
     "targetFunctionsAbsentBeforePromotion": true,
-    "certifiedPreviewChannelAvailable": true
+    "certifiedPreviewChannelAvailable": true,
+    "closed": true,
+    "closedByRunId": 34733712152,
+    "closedByRunAttempt": 2
+  },
+  "i6Execution": {
+    "authorized": false,
+    "dryRunPrepared": false,
+    "dataMutationAuthorized": false,
+    "periodStart": "2026-08-01",
+    "periodEnd": "2026-08-31",
+    "requiresDryRun": true,
+    "requiresDiff": true,
+    "requiresDeduplication": true,
+    "requiresExplicitAuthorization": true,
+    "requiresAudit": true,
+    "requiresRollback": true
   },
   "governanceSyncChecklist": {
     "frozenPlanMaterialized": true,
@@ -284,7 +344,15 @@
     "i4bGateSealed": true,
     "i5SuccessorExecutorReady": true,
     "i5RollbackPreparedPhysicalPass": true,
-    "i5ReadinessRunId": 34721691341
+    "i5ReadinessRunId": 34721691341,
+    "i5TerminalRunId": 34733712152,
+    "i5TerminalRunAttempt": 2,
+    "i5TerminalConclusion": "success",
+    "i5PhysicalLiveAcceptancePass": true,
+    "i5CapabilityLivePassMaterialized": true,
+    "i5GateSealReceiptMaterialized": true,
+    "postI5GuardMaterialized": true,
+    "postI5CentralGuardValidationRequired": true
   },
-  "nextAction": "I5_EXECUTE_AUTHORIZED_PROMOTION_AND_COMPLETE_LIVE_ACCEPTANCE_BEFORE_HUMAN_VISUALIZATION"
+  "nextAction": "I6_PREPARE_DRY_RUN_DIFF_DEDUP_ROLLBACK_PLAN_AND_REQUEST_EXPLICIT_AUTHORIZATION_BEFORE_AUGUST_MUTATION"
 }
