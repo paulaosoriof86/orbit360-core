@@ -38,24 +38,32 @@ jobs:
           test "$GITHUB_REF_NAME" = "recovery/fase-a-clean-20260831"
           node --check tools/gravicentra-governance-preflight-v1.mjs
           node tools/gravicentra-governance-preflight-v1.mjs --mode=governance
-          {
-            echo '## Gravicentra Insurance — canonical control plane v5'
-            echo '- Mutable operational authority: `CONTROL_PLANE.json` only'
-            echo '- Canonical governance preflight: `tools/gravicentra-governance-preflight-v1.mjs`'
-            echo '- Central guard and active gate executor consume the SAME preflight on the SAME HEAD'
-            echo '- Approved lineage authority: `CAPABILITY_LINEAGE_LOCK.json`'
-            echo '- Capability status: derived ledger, release-bound, non-authoritative for gate/release identity'
-            echo '- Active gate MUST have one physical state-gated executor before the Control Plane can remain valid'
-            echo '- Gate transition and execution plane are mechanically coupled for the active gate'
-            echo '- I4A proof registry: derived monotonic receipts; cannot govern gate/release identity'
-            echo '- PASS evidence: monotonic within the certified release; causal source delta required to invalidate'
-            echo '- I4A execution: `OPEN_PROOFS_ONLY`; sealed PASS proofs cannot be rerun accidentally'
-            echo '- I4A gate seal: historical atomic Control Plane + capability ledger + proof registry commit'
-            echo '- Evidence accumulation freeze: `MECHANISM_FREEZE_V4_20260910.md`'
-            echo '- Project Sources: active evergreen V3 manifest + Git blob integrity enforced'
-            echo '- I2/I3 re-entry: only on proven product source change'
-            echo '- Conversations/snapshots as operational authority: forbidden'
-            echo '- QA runtime self-patch: forbidden'
-            echo '- Production touched: false'
-            echo '- Data touched: false'
-          } >> "$GITHUB_STEP_SUMMARY"
+          node - <<'NODE' >> "$GITHUB_STEP_SUMMARY"
+          const fs=require('node:fs');
+          const c=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json','utf8'));
+          const accepted=c.environmentState?.productionAccepted===true;
+          console.log('## Gravicentra Insurance — canonical control plane v5');
+          console.log('- Mutable operational authority: `CONTROL_PLANE.json` only');
+          console.log('- Canonical governance preflight: `tools/gravicentra-governance-preflight-v1.mjs`');
+          console.log('- Central guard and active gate executor consume the SAME preflight on the SAME HEAD');
+          console.log('- Approved lineage authority: `CAPABILITY_LINEAGE_LOCK.json`');
+          console.log('- Capability status: derived ledger, release-bound, non-authoritative for gate/release identity');
+          console.log('- Active gate MUST have one physical state-gated executor before the Control Plane can remain valid');
+          console.log('- Gate transition and execution plane are mechanically coupled for the active gate');
+          console.log('- I4A proof registry: derived monotonic receipts; cannot govern gate/release identity');
+          console.log('- PASS evidence: monotonic within the certified release; causal source delta required to invalidate');
+          console.log('- I4A execution: `OPEN_PROOFS_ONLY`; sealed PASS proofs cannot be rerun accidentally');
+          console.log('- I4A gate seal: historical atomic Control Plane + capability ledger + proof registry commit');
+          console.log('- Evidence accumulation freeze: `MECHANISM_FREEZE_V4_20260910.md`');
+          console.log('- Post-I5 seal contract: `MECHANISM_FREEZE_V5_POST_I5_20260912.md`');
+          console.log('- Project Sources: active evergreen V3 manifest + Git blob integrity enforced');
+          console.log('- I2/I3 re-entry: only on proven product source change');
+          console.log('- Conversations/snapshots as operational authority: forbidden');
+          console.log('- QA runtime self-patch: forbidden');
+          console.log(`- Control status: ${c.status}`);
+          console.log(`- Production accepted: ${accepted}`);
+          console.log(`- Production touched by recovery: ${c.environmentState?.productionTouchedByRecovery===true}`);
+          console.log(`- Controlled data touched by I5: ${c.environmentState?.dataTouchedByRecovery===true}`);
+          console.log(`- August refresh: ${c.environmentState?.augustRefresh||''}`);
+          console.log(`- Next frozen iteration: ${c.gateState?.nextFrozenIteration||''}`);
+          NODE
