@@ -12,6 +12,7 @@ on:
       - tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs
       - tools/gravicentra-i4a-authenticated-browser-v2.mjs
       - tools/gravicentra-i4a-authenticated-browser-v2-base.mjs
+      - tools/gravicentra-i4b-transversal-v2.mjs
       - .github/workflows/gravicentra-recovery-i5-production.yml
 permissions: {contents: read, actions: read}
 concurrency:
@@ -87,7 +88,7 @@ jobs:
           node "$CLI" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/base.json";export BASE="$RUNNER_TEMP/base.json";node - <<'NODE'
           const fs=require('fs'),r=JSON.parse(fs.readFileSync(process.env.BASE)),a=Array.isArray(r.result)?r.result:r,n=new Set(a.flatMap(x=>[x.entryPoint,x.id||x.name].map(String)));if(a.length!==14||process.env.I5_FUNCTION_TARGETS.split(',').some(x=>n.has(x)))throw Error('BASELINE_NOT_RECOVERED');
           NODE
-          node "$CLI" hosting:channel:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/ch2.json";grep -Fq "$PREVIEW_CHANNEL_ID" "$RUNNER_TEMP/ch2.json";node --check tools/gravicentra-i5-controlled-writes-v1.mjs;node --check tools/gravicentra-i5-residual-cleanup-v1.mjs;node --check tools/gravicentra-i4a-authenticated-browser-v2.mjs
+          node "$CLI" hosting:channel:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/ch2.json";grep -Fq "$PREVIEW_CHANNEL_ID" "$RUNNER_TEMP/ch2.json";node --check tools/gravicentra-i5-controlled-writes-v1.mjs;node --check tools/gravicentra-i5-residual-cleanup-v1.mjs;node --check tools/gravicentra-i4a-authenticated-browser-v2.mjs;node --check tools/gravicentra-i4b-transversal-v2.mjs
           RB="gi-i5-rb-${GITHUB_RUN_ID}";node "$CLI" hosting:clone "$HOSTING_SITE:live" "$HOSTING_SITE:$RB" --project "$PROJECT_ID" --non-interactive;echo "I5_ROLLBACK_CHANNEL_ID=$RB" >> "$GITHUB_ENV"
           FROOT="$RUNNER_TEMP/functions";mkdir -p "$FROOT";cp -a "$B/backend" "$FROOT/backend";(cd "$FROOT/backend"&&sha256sum -c "$BM"&&npm ci --ignore-scripts --no-audit --no-fund >/dev/null);echo '{"functions":{"source":"backend"}}' > "$FROOT/firebase.json";ONLY="functions:$(echo "$I5_FUNCTION_TARGETS"|sed 's/,/,functions:/g')";node "$CLI" deploy --only "$ONLY" --config "$FROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
           node "$CLI" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/after.json";export AFTER="$RUNNER_TEMP/after.json";node - <<'NODE'
