@@ -61,7 +61,7 @@ const auth=getAuth(app),db=getFirestore(app);
 const members=await db.collection('tenants').doc(TENANT).collection('members').get(),listed=await auth.listUsers(1000),users=new Map(listed.users.map(u=>[u.uid,u])),pool=[];
 for(const d of members.docs){const m=d.data()||{},uid=clean(m.uid||d.id),u=users.get(uid);if(!u||u.disabled||u.emailVerified!==true||!['active','activo'].includes(clean(m.status||m.estado).toLowerCase()))continue;const rs=rolesOf(m);pool.push({uid,roles:rs,active:activeRole(m,rs)});}
 const selected=new Map();for(const r of ROLES){const x=pool.find(v=>v.active===r&&v.roles.includes(r))||pool.find(v=>v.roles.includes(r));if(x)selected.set(r,x);}need(selected.size===ROLES.length,'I4B_REQUIRED_ROLE_MEMBERSHIP_MISSING');
-const ev={schemaVersion:'gravicentra-i4b-transversal-matrix-v2',gate:'I4B',status:'I4B_MATRIX_FAIL',sourceSha:SOURCE,buildId:BUILD,previewUrl:PREVIEW,expectedContextCount:15,contextsPass:0,contextsFail:0,productionTouched:false,dataTouched:false,writesExecuted:0,failAtEnd:true,executionModel:'one_authenticated_session_per_role_three_viewports',roleSessionCount:5,cases:[],uniqueFailures:[]};
+const ev={schemaVersion:'gravicentra-i4b-transversal-matrix-v2',gate:'I4B',status:'I4B_MATRIX_FAIL',sourceSha:SOURCE,buildId:BUILD,previewUrl:PREVIEW,expectedContextCount:15,contextsPass:0,contextsFail:0,productionTouched:false,dataTouched:false,writesExecuted:0,failAtEnd:true,executionModel:'one_authenticated_session_per_role_three_viewports',roleSessionCount:5,readModelGateOrder:'after_routes_preserves_sealed_i4b_semantics',cases:[],uniqueFailures:[]};
 let browser;
 try{
   browser=await chromium.launch({headless:true});
@@ -74,7 +74,6 @@ try{
       await page.goto(PREVIEW,{waitUntil:'domcontentloaded',timeout:20000});
       await page.waitForFunction(()=>!!Orbit?.productAppP0&&!!Orbit?.productRuntimeBrowserProvidersP0,null,{timeout:6000});
       await activate(page,token);await acceptLegal(page);await setRole(page,role);
-      roleReadModels=await waitReadModels(page);
     }catch(e){roleBootstrapError=String(e?.message||e);}
     for(const vp of VIEWPORTS){
       const rec={role,viewport:vp.id,pass:false,failures:[],checks:[],routes:{},roleSessionReused:true};
@@ -84,7 +83,8 @@ try{
         rec.checks.push({code:'LOAD',pass:true},{code:'ACTIVATE',pass:true},{code:'LEGAL',pass:true},{code:'ROLE',pass:true});
         await page.setViewportSize({width:vp.width,height:vp.height});await page.waitForTimeout(120);
         for(const [key,hash] of ROUTES){const r=await check(rec,'ROUTE_'+key.toUpperCase(),()=>routeProbe(page,key,hash));if(r)rec.routes[key]=r;}
-        rec.readModels=JSON.parse(JSON.stringify(roleReadModels));rec.checks.push({code:'READ_MODELS',pass:true});
+        if(roleReadModels){rec.readModels=JSON.parse(JSON.stringify(roleReadModels));rec.checks.push({code:'READ_MODELS',pass:true,reused:true});}
+        else{rec.readModels=await check(rec,'READ_MODELS',()=>waitReadModels(page));if(rec.readModels)roleReadModels=JSON.parse(JSON.stringify(rec.readModels));}
         if(rec.readModels){if(rec.readModels.recibosEsperados<=0)addFail(rec,'I4B_RECIBOS_ESPERADOS_EMPTY');if(rec.readModels.carteraPrimas<=0)addFail(rec,'I4B_CARTERA_PRIMAS_EMPTY');if(rec.readModels.vehiculos<=0)addFail(rec,'I4B_VEHICULOS_EMPTY');}
         rec.relationships=await check(rec,'RELATIONSHIP_PROBE',()=>relationshipProbe(page));
         if(rec.relationships){const o=rec.relationships.orphans,w=rec.relationships.workflow;if(o.operationalPolicyClient.length)addFail(rec,'I4B_OPERATIONAL_CLIENTE_POLIZA_ORPHANS',String(o.operationalPolicyClient.length));if(o.operationalVehicleClient.length)addFail(rec,'I4B_OPERATIONAL_CLIENTE_VEHICULO_ORPHANS',String(o.operationalVehicleClient.length));if(o.operationalVehiclePolicy.length)addFail(rec,'I4B_OPERATIONAL_POLIZA_VEHICULO_ORPHANS',String(o.operationalVehiclePolicy.length));if(o.labPolicies.length||o.labVehicles.length)addFail(rec,'I4B_LAB_RESIDUALS_IN_PRODUCT_STORE',`${o.labPolicies.length}/${o.labVehicles.length}`);for(const n of w.raw){if(!CANONICAL_STAGES.has(n.etapa))addFail(rec,'I4B_NEGOCIO_NONCANONICAL_STAGE',n.id+':'+n.etapa);}const lset=new Set(w.leadsBoardIds),oset=new Set(w.opsBoardIds);for(const n of w.scopedLeads){if(CANONICAL_STAGES.has(n.etapa)&&!lset.has(n.id))addFail(rec,'I4B_LEADS_PROJECTION_MISSING',n.id+':'+n.etapa);}for(const n of w.scopedOps){if(!CANONICAL_STAGES.has(n.etapa))continue;const expected=OPS_STAGES.has(n.etapa);if(expected&&!oset.has(n.id))addFail(rec,'I4B_OPS_PROJECTION_MISSING',n.id+':'+n.etapa);if(!expected&&oset.has(n.id))addFail(rec,'I4B_OPS_PROJECTION_UNEXPECTED',n.id+':'+n.etapa);}}
