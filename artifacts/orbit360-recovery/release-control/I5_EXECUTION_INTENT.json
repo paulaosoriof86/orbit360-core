@@ -41,10 +41,10 @@
     },
     "liveAcceptance": {
       "publicLoginStartupShell": "reuse frozen I4A public browser harness against production URL",
-      "authenticatedModuleProofs": "reuse exact I4A authenticated harness base blob 3b479d87439218fe59d4de9429e641df504e9881 through fail-closed repo-scoped QA wrapper commit 2f4372da9b69a27665bc3edf4d5aa7178cd8602f; wrapper restores previously certified targeted Aseguradoras credential timing/polling semantics without product or artifact mutation and resolves runtime dependencies from repository module scope",
-      "transversalMatrix": "reuse frozen I4B role x viewport x module relationship harness against production URL",
+      "authenticatedModuleProofs": "execute the versioned repository harness tools/gravicentra-i5-credential-live-v1.mjs through tools/gravicentra-i4a-authenticated-browser-v2.mjs; runtime harness self-patching is forbidden",
+      "transversalMatrix": "execute versioned tools/gravicentra-i4b-transversal-v2.mjs against production URL; read-model readiness is store-event-driven, fails immediately on snapshot error or denied collection, and uses a QA-only safety bound that does not assert a product SLA",
       "controlledWrite": "synthetic operational insurer roundtrip",
-      "postWriteIntegrity": "rerun frozen I4B transversal matrix after cleanup",
+      "postWriteIntegrity": "rerun the same versioned I4B transversal matrix after cleanup",
       "passRequiresExactBuildMarkerAndHostedByteReadback": true
     }
   },
@@ -61,7 +61,7 @@
     "createPath": "approved UI -> Orbit.store product operational facade -> orbit360ProductOperationalCommand",
     "readback": "server persistence + product reload",
     "cleanupMode": "same_server_owner_atomic_audit_plus_remove",
-    "cleanupReason": "The approved UI delete helper attempts auditoriaAsegExterna through Orbit.store, while the certified product facade does not expose that audit collection. I5 therefore must not claim that UI helper as the controlled cleanup path. Cleanup is an atomic insert-only external audit plus insurer remove through the same authoritative server owner.",
+    "cleanupReason": "The approved UI delete helper attempts auditoriaAsegExterna through Orbit.store, while the certified product facade does not expose that audit collection. I5 therefore must not claim that UI helper as the controlled cleanup path. Cleanup is an atomic insurer remove plus insert-only external audit through the same authoritative server owner.",
     "finalProof": "server absence + product reload absence",
     "expectedPersistentAudit": [
       "tenants/{tenant}/operationalRequests/{requestId}",
@@ -77,6 +77,17 @@
       "credential or Secret Manager mutation",
       "persistent secret material"
     ]
+  },
+  "latestRetryBinding": {
+    "reason": "I5 run 34728575399 passed promotion, public/auth LIVE, pre-write matrix and controlled write but its post-write matrix had one Operativo-mobile READ_MODELS readiness timeout while all subsequent route, relationship, Aseguradoras and telemetry checks in that context passed; automatic cleanup and rollback passed.",
+    "failedRunId": 34728575399,
+    "failedRunArtifactId": 10308772790,
+    "failedRunArtifactDigest": "sha256:95eb744446e1445ff131344962a594310774b7a7f3e7e4ab55b8fbf2050ef228",
+    "qaHarnessCommit": "64bde121cf3d72fc194af152a839cc1b72b68c51",
+    "transversalHarnessBlobSha": "6b0b0b66e49b8bb4a2c00e41f9426e6ca35f59f1",
+    "productSourceChanged": false,
+    "artifactChanged": false,
+    "rebuildRequired": false
   },
   "executionGuards": {
     "explicitExecuteFlagRequired": true,
