@@ -1,7 +1,7 @@
 {
   "schemaVersion": "gravicentra-i5-execution-intent-v1",
   "gate": "I5",
-  "status": "MATERIALIZED_NOT_AUTHORIZED",
+  "status": "CONSUMED_CLOSED",
   "authority": {
     "controlPlane": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
     "authorizationSource": "CONTROL_PLANE.i5Execution at runtime",
@@ -89,6 +89,21 @@
     "artifactChanged": false,
     "rebuildRequired": false
   },
+  "terminalAcceptance": {
+    "runId": 34733712152,
+    "runAttempt": 2,
+    "conclusion": "success",
+    "headSha": "e0b58e2c2e6cedd33217bad153d20f68edea212a",
+    "evidenceArtifactId": 10311055390,
+    "evidenceArtifactDigest": "sha256:5aad2082722a0c8eedcc3d2b6d48c702c1fab8ad3d57815f4bf5382963747ceb",
+    "productionReadbackExact": true,
+    "preWriteContextsPass": 15,
+    "controlledWritesExecuted": 3,
+    "syntheticFinalAbsent": true,
+    "postWriteContextsPass": 15,
+    "augustDataTouched": false,
+    "gateSealReceipt": "artifacts/orbit360-recovery/release-control/I5_GATE_SEAL_20260912.json"
+  },
   "executionGuards": {
     "explicitExecuteFlagRequired": true,
     "executionNonceRequired": true,
@@ -101,5 +116,5 @@
     "augustDataForbidden": true
   },
   "executionNonce": "GI-I5-CONTROLLED-WRITE-V1",
-  "effectOfThisFile": "INTENT_ONLY_NO_DEPLOY_NO_WRITE_NO_PRODUCTION_MUTATION"
+  "effectOfThisFile": "CONSUMED_HISTORICAL_INTENT_ONLY; NO_LONGER_AUTHORIZES_DEPLOY_OR_WRITE"
 }
