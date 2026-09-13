@@ -7,6 +7,7 @@ on:
     paths:
       - '.github/workflows/gravicentra-live-readonly-verification.yml'
       - 'tools/gravicentra-live-readonly-verification-v1.mjs'
+      - 'tools/gravicentra-i5-credential-live-v1.mjs'
   workflow_dispatch:
 
 permissions:
@@ -62,7 +63,7 @@ jobs:
         run: |
           set -u
           E="$RUNNER_TEMP/gravicentra-live-readonly-verification"
-          mkdir -p "$E/public" "$E/matrix" "$E/aseguradoras"
+          mkdir -p "$E/public" "$E/matrix" "$E/aseguradoras" "$E/aseguradoras-role-contract"
           set +e
           I4A_PUBLIC_EVIDENCE_DIR="$E/public" node tools/gravicentra-i4a-public-browser.mjs
           PUBLIC_RC=$?
@@ -70,11 +71,14 @@ jobs:
           MATRIX_RC=$?
           GI_LIVE_VERIFY_EVIDENCE_DIR="$E/aseguradoras" node tools/gravicentra-live-readonly-verification-v1.mjs
           ASEG_RC=$?
+          I4A_AUTH_EVIDENCE_DIR="$E/aseguradoras-role-contract" node tools/gravicentra-i4a-authenticated-browser-v2.mjs
+          ASEG_ROLE_RC=$?
           set -e
-          printf '{"schemaVersion":"gravicentra-live-readonly-summary-v1","sourceSha":"%s","buildId":"%s","productionUrl":"%s","publicRc":%s,"matrixRc":%s,"aseguradorasRc":%s,"operationalWritesExecuted":0,"augustDataTouched":false}\n' "$SOURCE_SHA" "$BUILD_ID" "$PRODUCTION_URL" "$PUBLIC_RC" "$MATRIX_RC" "$ASEG_RC" > "$E/summary.json"
+          printf '{"schemaVersion":"gravicentra-live-readonly-summary-v2","sourceSha":"%s","buildId":"%s","productionUrl":"%s","publicRc":%s,"matrixRc":%s,"aseguradorasRc":%s,"aseguradorasRoleContractRc":%s,"operationalWritesExecuted":0,"augustDataTouched":false}\n' "$SOURCE_SHA" "$BUILD_ID" "$PRODUCTION_URL" "$PUBLIC_RC" "$MATRIX_RC" "$ASEG_RC" "$ASEG_ROLE_RC" > "$E/summary.json"
           test "$PUBLIC_RC" -eq 0
           test "$MATRIX_RC" -eq 0
           test "$ASEG_RC" -eq 0
+          test "$ASEG_ROLE_RC" -eq 0
 
       - name: Upload verification evidence
         if: always()
