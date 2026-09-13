@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "gravicentra-i5-gate-seal-v1",
+  "gate": "I5",
+  "status": "PASS",
+  "terminalRunId": 34733712152,
+  "terminalRunAttempt": 2,
+  "terminalRunConclusion": "success",
+  "terminalHeadSha": "e0b58e2c2e6cedd33217bad153d20f68edea212a",
+  "sourceSha": "16f174d087024085eff18079c486f717ef98d691",
+  "buildId": "gi-i3-16f174d08702-57f234755dc1",
+  "artifactId": 10183074943,
+  "evidenceArtifactId": 10311055390,
+  "evidenceArtifactDigest": "sha256:5aad2082722a0c8eedcc3d2b6d48c702c1fab8ad3d57815f4bf5382963747ceb",
+  "productionReadback": {
+    "status": "PASS",
+    "exact": true,
+    "fileCount": 202,
+    "evidenceSha256": "f0915a94d5fa57d335d73bac7617e1c5c074d109969cbd3f09210edfd80b85e4"
+  },
+  "livePublic": {
+    "status": "PUBLIC_BROWSER_PASS",
+    "evidenceSha256": "6405649d66459f467489c1813360454a353ff9f5350f38d642c18bdbb5749bbb"
+  },
+  "liveAuthenticated": {
+    "status": "AUTH_BROWSER_PASS",
+    "roles": ["Dirección", "SuperAdmin", "AdminTenant", "Operativo", "Asesor"],
+    "evidenceSha256": "317b791277748e9fe2d55b3104d5f26fbb9610e045d229fc7b4f1837fcdb9439"
+  },
+  "transversalBeforeWrite": {
+    "status": "I4B_MATRIX_PASS",
+    "contextsPass": 15,
+    "contextsFail": 0,
+    "uniqueFailures": 0,
+    "evidenceSha256": "4d11e41810322913eee18b66a7c4493b0211595231112b4de65d34d5465f5c8e"
+  },
+  "controlledWrite": {
+    "status": "PASS",
+    "writesExecuted": 3,
+    "syntheticFinalAbsent": true,
+    "productionTouched": true,
+    "dataTouched": true,
+    "unexpectedSideEffects": false,
+    "secretMaterial": false,
+    "pageErrors": 0,
+    "evidenceSha256": "8f0738cbcc7f86a53aaaeff27e62530bbdac738aabe9ba13d21eaf586c26c973"
+  },
+  "transversalAfterWriteCleanup": {
+    "status": "I4B_MATRIX_PASS",
+    "contextsPass": 15,
+    "contextsFail": 0,
+    "uniqueFailures": 0,
+    "evidenceSha256": "f58f162330e770dee733bbb8fd8f0de614c3486834c1a5eff6363643fa03a960"
+  },
+  "liveAcceptance": {
+    "status": "I5_LIVE_ACCEPTANCE_PASS",
+    "productionReadbackExact": true,
+    "controlledWritesExecuted": 3,
+    "syntheticFinalAbsent": true,
+    "augustDataTouched": false,
+    "evidenceSha256": "d7e00c7faf52a662229be0e53389c6e1d9c3037f2bc520df6728920074854667"
+  },
+  "priorAttemptRecovery": {
+    "sameRunId": 34733712152,
+    "failedAttempt": 1,
+    "failureStage": "post-promotion hosted readback before LIVE QA",
+    "controlledWritesExecuted": 0,
+    "automaticRollback": "PASS",
+    "productSourceChanged": false,
+    "artifactChanged": false
+  },
+  "terminalAttemptRollbackExecuted": false,
+  "augustDataTouched": false,
+  "productionAcceptedPendingGovernanceSealAtPhysicalRun": true,
+  "effect": "PHYSICAL_I5_PASS_RECEIPT; formal production acceptance requires CONTROL_PLANE and capability ledger synchronization plus central governance readback"
+}
