@@ -46,6 +46,16 @@
     "cellDiffCount": 24,
     "note": "The MAPFRE deletion compacts subsequent bank rows, accounting for most changed cells; no credential diff was introduced."
   },
+  "sourceIntegrityReadOnly": {
+    "insurerSheetCount": 14,
+    "duplicateBrokerCodesDetected": 0,
+    "duplicateBankAccountsWithinSameInsurerDetected": 0,
+    "incompleteBrokerCodes": ["ÓLE"],
+    "repeatedContactEmailsWithinSameInsurerCount": 10,
+    "repeatedContactEmailsDisposition": "REVIEW_AS_SHARED_ALIAS_OR_INTENTIONAL_REUSE_DURING_I6_2_DRY_RUN",
+    "automaticMergeByEmailForbidden": true,
+    "note": "Repeated contact emails are not treated as errors or duplicates without comparing role/name semantics and the current Firestore record."
+  },
   "newAcceptanceCriteria": {
     "i6_1InsurerLogoUpload": {
       "decision": "IN_SCOPE_FASE_A_POSTSALIDA",
