@@ -35,7 +35,7 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Bind exact accepted production release
+      - name: Bind exact accepted production release and I6.0 read-only baseline state
         shell: bash
         run: |
           set -euo pipefail
@@ -44,12 +44,18 @@ jobs:
           const fs=require('node:fs');
           const c=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json','utf8'));
           if(c.status!=='PRODUCTION_ACCEPTED'||c.environmentState?.productionAccepted!==true) throw new Error('LIVE_VERIFY_REQUIRES_PRODUCTION_ACCEPTED');
-          if(c.gateState?.gates?.I6?.status!=='HOLD_PENDING_EXPLICIT_AUTHORIZATION') throw new Error('LIVE_VERIFY_REQUIRES_I6_HOLD');
+          const i6=c.gateState?.gates?.I6||{};
+          const hold=i6.status==='HOLD_PENDING_EXPLICIT_AUTHORIZATION';
+          const baseline=i6.status==='IN_PROGRESS_I6_0_BASELINE'&&i6.activeSubgate==='I6.0'&&c.i6Execution?.authorized===true&&c.i6Execution?.dataMutationAuthorized===false&&c.i6Execution?.sourceDataApplyAuthorized===false;
+          if(!hold&&!baseline) throw new Error('LIVE_VERIFY_REQUIRES_I6_HOLD_OR_READONLY_BASELINE');
           const r=c.certifiedCandidate||{};
           if(!r.sourceSha||!r.buildId||!r.artifactId) throw new Error('LIVE_VERIFY_RELEASE_BINDING_MISSING');
-          const env={SOURCE_SHA:r.sourceSha,BUILD_ID:r.buildId,PREVIEW_URL:process.env.PRODUCTION_URL};
+          const env={SOURCE_SHA:r.sourceSha,BUILD_ID:r.buildId,PREVIEW_URL:process.env.PRODUCTION_URL,I6_BASELINE_ACTIVE:baseline?'true':'false'};
           for(const [k,v] of Object.entries(env)) fs.appendFileSync(process.env.GITHUB_ENV,`${k}=${v}\n`);
           NODE
+          if grep -q '^I6_BASELINE_ACTIVE=true$' "$GITHUB_ENV"; then
+            node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          fi
 
       - name: Install LIVE QA dependencies
         shell: bash
@@ -74,7 +80,7 @@ jobs:
           I4A_AUTH_EVIDENCE_DIR="$E/aseguradoras-role-contract" node tools/gravicentra-i4a-authenticated-browser-v2.mjs
           ASEG_ROLE_RC=$?
           set -e
-          printf '{"schemaVersion":"gravicentra-live-readonly-summary-v2","sourceSha":"%s","buildId":"%s","productionUrl":"%s","publicRc":%s,"matrixRc":%s,"aseguradorasRc":%s,"aseguradorasRoleContractRc":%s,"operationalWritesExecuted":0,"augustDataTouched":false}\n' "$SOURCE_SHA" "$BUILD_ID" "$PRODUCTION_URL" "$PUBLIC_RC" "$MATRIX_RC" "$ASEG_RC" "$ASEG_ROLE_RC" > "$E/summary.json"
+          printf '{"schemaVersion":"gravicentra-live-readonly-summary-v3","sourceSha":"%s","buildId":"%s","productionUrl":"%s","i6BaselineActive":%s,"publicRc":%s,"matrixRc":%s,"aseguradorasRc":%s,"aseguradorasRoleContractRc":%s,"operationalWritesExecuted":0,"augustDataTouched":false}\n' "$SOURCE_SHA" "$BUILD_ID" "$PRODUCTION_URL" "$I6_BASELINE_ACTIVE" "$PUBLIC_RC" "$MATRIX_RC" "$ASEG_RC" "$ASEG_ROLE_RC" > "$E/summary.json"
           test "$PUBLIC_RC" -eq 0
           test "$MATRIX_RC" -eq 0
           test "$ASEG_RC" -eq 0
