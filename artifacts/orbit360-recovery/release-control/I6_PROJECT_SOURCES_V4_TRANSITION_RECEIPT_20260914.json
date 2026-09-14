@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "gravicentra-i6-project-sources-v4-transition-receipt-v1",
+  "status": "PASS",
+  "productBrand": "Gravicentra Insurance",
+  "operationalAuthority": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+  "authorizationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_EXPLICIT_AUTHORIZATION_RECEIPT_20260914.json",
+  "fromPackage": "GRAVICENTRA_PROJECT_SOURCES_EVERGREEN_V3",
+  "toPackage": "GRAVICENTRA_PROJECT_SOURCES_EVERGREEN_V4",
+  "compositionModel": "IMMUTABLE_RETAINED_V3_PLUS_V4_ADDENDUM",
+  "retainedSourceCount": 5,
+  "addedSourceCount": 1,
+  "projectSourceUserAction": "KEEP_5_EXISTING_V3_SOURCES_AND_ADD_ONLY_V4_I6_ADDENDUM",
+  "i6OpenedSubgate": "I6.0",
+  "dataMutationAuthorized": false,
+  "augustRefreshAuthorized": false,
+  "operationalWritesExecuted": 0,
+  "augustDataTouched": false
+}

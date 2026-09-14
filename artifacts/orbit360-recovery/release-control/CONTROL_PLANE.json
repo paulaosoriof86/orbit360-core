@@ -25,16 +25,23 @@
     "latestBlobSha": "431bb36f3ddf12b0585a99a54f228d0ee913b584"
   },
   "projectSources": {
-    "activePackage": "GRAVICENTRA_PROJECT_SOURCES_EVERGREEN_V3",
-    "activeVersion": 3,
-    "canonicalRoot": "artifacts/orbit360-recovery/project-sources-v2/v3",
-    "manifestPath": "artifacts/orbit360-recovery/project-sources-v2/v3/05_MANIFIESTO_FUENTES_EVERGREEN_V3.json",
-    "staticSourceUpdateRequired": true,
-    "reason": "Permanent postproduction rule change: Fase A Post-Salida I6 requires Evergreen V4 composed of the five immutable V3 sources plus the I6 addendum.",
+    "activePackage": "GRAVICENTRA_PROJECT_SOURCES_EVERGREEN_V4",
+    "activeVersion": 4,
+    "canonicalRoot": "artifacts/orbit360-recovery/project-sources-v2/v4",
+    "manifestPath": "artifacts/orbit360-recovery/project-sources-v2/v4/05_MANIFIESTO_FUENTES_EVERGREEN_V4.json",
+    "staticSourceUpdateRequired": false,
+    "reason": null,
     "operationalStateChangesDoNotRequireReplacement": true,
     "notificationRequiredWhenFlagTrue": true,
-    "pendingPackage": "GRAVICENTRA_PROJECT_SOURCES_EVERGREEN_V4",
-    "pendingManifestPath": "artifacts/orbit360-recovery/project-sources-v2/v4/05_MANIFIESTO_FUENTES_EVERGREEN_V4.json"
+    "compositionModel": "IMMUTABLE_RETAINED_V3_PLUS_V4_ADDENDUM",
+    "retainedPreviousSources": 5,
+    "addedSources": 1,
+    "lastTransition": {
+      "fromPackage": "GRAVICENTRA_PROJECT_SOURCES_EVERGREEN_V3",
+      "toPackage": "GRAVICENTRA_PROJECT_SOURCES_EVERGREEN_V4",
+      "cause": "Permanent postproduction rule change: Fase A Post-Salida I6 requires Evergreen V4 composed of the five immutable V3 sources plus the I6 addendum.",
+      "userAction": "KEEP_5_EXISTING_V3_SOURCES_AND_ADD_ONLY_V4_I6_ADDENDUM"
+    }
   },
   "deprecatedMutableAuthorities": {
     "artifacts/orbit360-recovery/release-control/RECOVERY_STATE.json": "DEPRECATED_NON_AUTHORITATIVE_TOMBSTONE",
@@ -43,7 +50,7 @@
   "gateState": {
     "lastFormallyCompletedIteration": 5,
     "lastFormallyCompletedGate": "I5",
-    "currentTransition": "I6_REFRESH_AUGUST_AND_ENTER_POSTPRODUCTION",
+    "currentTransition": "I6_POSTSALIDA_COMPLETION_AND_CONTROLLED_REFRESH",
     "nextFrozenIteration": "I6",
     "gates": {
       "I0": {
@@ -103,7 +110,9 @@
         "postWriteContextsFail": 0
       },
       "I6": {
-        "status": "HOLD_PENDING_EXPLICIT_AUTHORIZATION"
+        "status": "IN_PROGRESS_I6_0_BASELINE",
+        "activeSubgate": "I6.0",
+        "dataMutationAuthorized": false
       }
     }
   },
@@ -291,7 +300,9 @@
     "addendumPath": "artifacts/orbit360-recovery/release-control/MECHANISM_FREEZE_V5_POST_I5_20260912.md",
     "guardPath": "tools/gravicentra-post-i5-control-plane-guard-v1.mjs",
     "preI5GuardPreserved": "tools/gravicentra-control-plane-guard-v2.mjs",
-    "physicalEvidencePrecededFormalSeal": true
+    "physicalEvidencePrecededFormalSeal": true,
+    "i6GuardPath": "tools/gravicentra-i6-control-plane-guard-v1.mjs",
+    "i6ExecutorPath": ".github/workflows/gravicentra-recovery-i6-postsalida.yml"
   },
   "mechanismCorrection20260909": {
     "status": "FROZEN_PHYSICAL_END_TO_END_PASS",
@@ -338,7 +349,7 @@
     "closedByRunAttempt": 2
   },
   "i6Execution": {
-    "authorized": false,
+    "authorized": true,
     "dryRunPrepared": false,
     "dataMutationAuthorized": false,
     "periodStart": "2026-08-01",
@@ -348,7 +359,13 @@
     "requiresDeduplication": true,
     "requiresExplicitAuthorization": true,
     "requiresAudit": true,
-    "requiresRollback": true
+    "requiresRollback": true,
+    "authorizedAt": "2026-09-14T08:57:00-06:00",
+    "authorizationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_EXPLICIT_AUTHORIZATION_RECEIPT_20260914.json",
+    "activeSubgate": "I6.0",
+    "productMutationAuthorized": false,
+    "sourceDataApplyAuthorized": false,
+    "perBlockApplyRequiresExplicitAuthorization": true
   },
   "governanceSyncChecklist": {
     "frozenPlanMaterialized": true,
@@ -405,7 +422,12 @@
     "i5CapabilityLivePassMaterialized": true,
     "i5GateSealReceiptMaterialized": true,
     "postI5GuardMaterialized": true,
-    "postI5CentralGuardValidationRequired": true
+    "postI5CentralGuardValidationRequired": true,
+    "evergreenProjectSourcePackageV4Prepared": true,
+    "evergreenProjectSourceV4CompositionPinned": true,
+    "evergreenProjectSourceV4TransitionRecorded": true,
+    "i6ExecutorStateGated": true,
+    "i6AuthorizationReceiptMaterialized": true
   },
-  "nextAction": "PROJECT_SOURCES_V4_REQUIRED_FLAG_RECORDED_THEN_ACTIVATE_V4_AND_I6_0"
+  "nextAction": "I6_0_READONLY_BASELINE_SNAPSHOT_ROLLBACK_AND_INVENTORY"
 }
