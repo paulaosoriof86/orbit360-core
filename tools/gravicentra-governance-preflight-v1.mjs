@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import {spawnSync} from 'node:child_process';
 
-const allowedModes=new Set(['governance','i2','i3','i4a','i4b','i5','certified']);
+const allowedModes=new Set(['governance','i2','i3','i4a','i4b','i5','i6','certified']);
 const arg=process.argv.find(x=>x.startsWith('--mode='));
 const mode=arg?arg.slice('--mode='.length):'governance';
 if(!allowedModes.has(mode)) throw new Error('GRAVICENTRA_PREFLIGHT_MODE_INVALID:'+mode);
@@ -16,35 +16,48 @@ const node=process.execPath;
 const controlPath='artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json';
 const control=JSON.parse(fs.readFileSync(controlPath,'utf8'));
 const postI5=control.status==='PRODUCTION_ACCEPTED'||control.environmentState?.productionAccepted===true;
+const i6Status=String(control.gateState?.gates?.I6?.status||'');
+const i6Active=control.i6Execution?.authorized===true||(!['','HOLD_PENDING_EXPLICIT_AUTHORIZATION'].includes(i6Status));
 const preI5Guard='tools/gravicentra-control-plane-guard-v2.mjs';
 const postI5Guard='tools/gravicentra-post-i5-control-plane-guard-v1.mjs';
-const activeGuard=postI5?postI5Guard:preI5Guard;
+const i6Guard='tools/gravicentra-i6-control-plane-guard-v1.mjs';
+const activeGuard=i6Active?i6Guard:(postI5?postI5Guard:preI5Guard);
+const evergreenGuard='tools/gravicentra-evergreen-sources-invariant-v2.mjs';
 const syntaxTargets=[
   preI5Guard,
   postI5Guard,
+  i6Guard,
   'tools/gravicentra-mechanism-invariant-v2.mjs',
-  'tools/gravicentra-evergreen-sources-invariant-v1.mjs',
+  evergreenGuard,
   'tools/gravicentra-i4a-proof-registry-guard-v1.mjs',
   'tools/gravicentra-i4a-preview-function-remediation-guard-v1.mjs',
   'tools/gravicentra-i4a-preview-remediation-invariant-v1.mjs'
 ];
 for(const p of syntaxTargets) run(node,['--check',p]);
 
+if(i6Active&&['i2','i3','i4a','i4b','i5'].includes(mode)) throw new Error('GRAVICENTRA_PRIOR_GATE_REENTRY_BLOCKED_DURING_I6:'+mode);
 run(node,[activeGuard,'--mode=governance']);
 run(node,['tools/gravicentra-i4a-proof-registry-guard-v1.mjs']);
 run(node,['tools/gravicentra-mechanism-invariant-v2.mjs']);
-run(node,['tools/gravicentra-evergreen-sources-invariant-v1.mjs']);
+run(node,[evergreenGuard]);
 run(node,['tools/gravicentra-i4a-preview-remediation-invariant-v1.mjs']);
-if(mode!=='governance') run(node,[activeGuard,'--mode='+mode]);
+if(mode==='i6'){
+  if(!i6Active) throw new Error('GRAVICENTRA_I6_MODE_BEFORE_I6_ACTIVE');
+  run(node,[activeGuard,'--mode=i6']);
+}else if(mode!=='governance'&&mode!=='certified'){
+  run(node,[activeGuard,'--mode='+mode]);
+}
 run('git',['diff','--exit-code']);
 
 console.log('GRAVICENTRA_GOVERNANCE_PREFLIGHT=PASS');
 console.log('PREFLIGHT_MODE='+mode);
 console.log('CONTROL_STATUS='+control.status);
 console.log('ACTIVE_CONTROL_GUARD='+activeGuard);
+console.log('I6_ACTIVE='+String(i6Active));
 console.log('SAME_HEAD_GOVERNANCE_AND_GATE_GUARD=true');
 console.log('PRODUCT_SOURCE_MUTATION=false');
 console.log('PRODUCTION_ACCEPTED='+String(control.environmentState?.productionAccepted===true));
 console.log('PRODUCTION_TOUCHED='+String(control.environmentState?.productionTouchedByRecovery===true));
 console.log('CONTROLLED_DATA_TOUCHED='+String(control.environmentState?.dataTouchedByRecovery===true));
 console.log('AUGUST_REFRESH='+String(control.environmentState?.augustRefresh||''));
+console.log('PROJECT_SOURCES='+String(control.projectSources?.activePackage||''));
