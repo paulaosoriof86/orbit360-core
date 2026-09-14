@@ -17,9 +17,10 @@ const ps=c.projectSources||{};
 need(typeof ps.manifestPath==='string'&&ps.manifestPath.length>0,'EVERGREEN_ACTIVE_MANIFEST_MISSING');
 need(fs.existsSync(ps.manifestPath),'EVERGREEN_ACTIVE_MANIFEST_FILE_MISSING:'+ps.manifestPath);
 const m=json(ps.manifestPath);
+const inferredVersion=Number(m.version??((String(m.schemaVersion||'').match(/v(\d+)$/)||[])[1]));
 
 need(m.packageId===ps.activePackage,'EVERGREEN_CONTROL_PACKAGE_MISMATCH');
-need(Number(m.version)===Number(ps.activeVersion),'EVERGREEN_CONTROL_VERSION_MISMATCH');
+need(Number.isInteger(inferredVersion)&&inferredVersion===Number(ps.activeVersion),'EVERGREEN_CONTROL_VERSION_MISMATCH');
 need(m.operationalAuthority===CONTROL,'EVERGREEN_OPERATIONAL_AUTHORITY_DRIFT');
 need(m.lineageAuthority===LINEAGE,'EVERGREEN_LINEAGE_AUTHORITY_DRIFT');
 need(m.capabilityStatusAuthority===STATUS,'EVERGREEN_STATUS_AUTHORITY_DRIFT');
@@ -46,7 +47,7 @@ need(typeof ps.staticSourceUpdateRequired==='boolean','EVERGREEN_UPDATE_FLAG_MIS
 if(ps.staticSourceUpdateRequired===false) need(ps.reason==null,'EVERGREEN_FALSE_FLAG_REASON_MUST_BE_NULL');
 if(ps.staticSourceUpdateRequired===true) need(typeof ps.reason==='string'&&ps.reason.length>0,'EVERGREEN_TRUE_FLAG_REASON_REQUIRED');
 
-if(Number(m.version)===4){
+if(inferredVersion===4){
   need(m.schemaVersion==='gravicentra-project-sources-evergreen-v4','EVERGREEN_V4_SCHEMA_INVALID');
   need(m.compositionModel==='IMMUTABLE_RETAINED_V3_PLUS_V4_ADDENDUM','EVERGREEN_V4_COMPOSITION_INVALID');
   need(m.canonicalFiles.length===6,'EVERGREEN_V4_CANONICAL_FILE_COUNT_INVALID');
@@ -90,7 +91,7 @@ for(const x of s.capabilities){
 need(capabilitySeen.size===lineageIds.size,'CAPABILITY_STATUS_LINEAGE_COVERAGE_MISMATCH');
 console.log('GRAVICENTRA_EVERGREEN_SOURCES_INVARIANT_V2=PASS');
 console.log('ACTIVE_PACKAGE='+m.packageId);
-console.log('ACTIVE_VERSION='+m.version);
+console.log('ACTIVE_VERSION='+inferredVersion);
 console.log('EVERGREEN_FILE_COUNT='+m.canonicalFiles.length);
 console.log('CAPABILITY_STATUS_LEDGER_INVARIANT=PASS');
 console.log('CAPABILITY_COUNT='+capabilitySeen.size);
