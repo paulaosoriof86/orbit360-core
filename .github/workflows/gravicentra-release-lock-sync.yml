@@ -56,7 +56,7 @@ jobs:
           console.log('- I4A gate seal: historical atomic Control Plane + capability ledger + proof registry commit');
           console.log('- Evidence accumulation freeze: `MECHANISM_FREEZE_V4_20260910.md`');
           console.log('- Post-I5 seal contract: `MECHANISM_FREEZE_V5_POST_I5_20260912.md`');
-          console.log('- Project Sources: active evergreen V3 manifest + Git blob integrity enforced');
+          console.log(`- Project Sources: ${c.projectSources?.activePackage||''} (v${c.projectSources?.activeVersion||''}) with Git blob integrity enforced`);
           console.log('- I2/I3 re-entry: only on proven product source change');
           console.log('- Conversations/snapshots as operational authority: forbidden');
           console.log('- QA runtime self-patch: forbidden');
@@ -65,5 +65,8 @@ jobs:
           console.log(`- Production touched by recovery: ${c.environmentState?.productionTouchedByRecovery===true}`);
           console.log(`- Controlled data touched by I5: ${c.environmentState?.dataTouchedByRecovery===true}`);
           console.log(`- August refresh: ${c.environmentState?.augustRefresh||''}`);
+          console.log(`- I6 status: ${c.gateState?.gates?.I6?.status||''}`);
+          console.log(`- I6 authorized: ${c.i6Execution?.authorized===true}`);
+          console.log(`- Static source update required: ${c.projectSources?.staticSourceUpdateRequired===true}`);
           console.log(`- Next frozen iteration: ${c.gateState?.nextFrozenIteration||''}`);
           NODE
