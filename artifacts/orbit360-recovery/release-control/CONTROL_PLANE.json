@@ -29,10 +29,12 @@
     "activeVersion": 3,
     "canonicalRoot": "artifacts/orbit360-recovery/project-sources-v2/v3",
     "manifestPath": "artifacts/orbit360-recovery/project-sources-v2/v3/05_MANIFIESTO_FUENTES_EVERGREEN_V3.json",
-    "staticSourceUpdateRequired": false,
-    "reason": null,
+    "staticSourceUpdateRequired": true,
+    "reason": "Permanent postproduction rule change: Fase A Post-Salida I6 requires Evergreen V4 composed of the five immutable V3 sources plus the I6 addendum.",
     "operationalStateChangesDoNotRequireReplacement": true,
-    "notificationRequiredWhenFlagTrue": true
+    "notificationRequiredWhenFlagTrue": true,
+    "pendingPackage": "GRAVICENTRA_PROJECT_SOURCES_EVERGREEN_V4",
+    "pendingManifestPath": "artifacts/orbit360-recovery/project-sources-v2/v4/05_MANIFIESTO_FUENTES_EVERGREEN_V4.json"
   },
   "deprecatedMutableAuthorities": {
     "artifacts/orbit360-recovery/release-control/RECOVERY_STATE.json": "DEPRECATED_NON_AUTHORITATIVE_TOMBSTONE",
@@ -44,14 +46,65 @@
     "currentTransition": "I6_REFRESH_AUGUST_AND_ENTER_POSTPRODUCTION",
     "nextFrozenIteration": "I6",
     "gates": {
-      "I0": {"status": "PASS"},
-      "I1": {"status": "PASS", "capabilitiesBound": 15},
-      "I2": {"status": "PASS_LATEST_CANDIDATE", "latestRunId": 34557286320, "sourceSha": "16f174d087024085eff18079c486f717ef98d691", "conclusion": "success"},
-      "I3": {"status": "PASS", "latestRunId": 34557374566, "conclusion": "success", "sourceSha": "16f174d087024085eff18079c486f717ef98d691", "artifactId": 10183074943, "readbackExact": true},
-      "I4A": {"status": "PASS", "previousAuthoritativeRunId": 34555949312, "latestAuthoritativeRunId": 34560184247, "latestArtifactId": 10184053728, "latestArtifactDigest": "sha256:496177cb6f2dfd7190a821e6180bcfeeb864704426f4debaccbdb3d78c3b0790", "proofCount": 8, "capabilityCount": 15, "writesExecuted": 0},
-      "I4B": {"status": "PASS", "latestAuthoritativeRunId": 34651451745, "matrixArtifactId": 10283923191, "matrixArtifactDigest": "sha256:f8c48d460de00407522ba63038cd1a429e4dd65545b4599c61e318a7a673f7c1", "remediationArtifactId": 10283817885, "remediationArtifactDigest": "sha256:f304ef3dc0856477648bff94b34080af181ac1603262fc4027a627e212e08d1b", "contextsPass": 15, "contextsFail": 0, "uniqueFailures": 0},
-      "I5": {"status": "PASS", "latestAuthoritativeRunId": 34733712152, "runAttempt": 2, "conclusion": "success", "evidenceArtifactId": 10311055390, "evidenceArtifactDigest": "sha256:5aad2082722a0c8eedcc3d2b6d48c702c1fab8ad3d57815f4bf5382963747ceb", "preWriteContextsPass": 15, "preWriteContextsFail": 0, "controlledWritesExecuted": 3, "syntheticFinalAbsent": true, "postWriteContextsPass": 15, "postWriteContextsFail": 0},
-      "I6": {"status": "HOLD_PENDING_EXPLICIT_AUTHORIZATION"}
+      "I0": {
+        "status": "PASS"
+      },
+      "I1": {
+        "status": "PASS",
+        "capabilitiesBound": 15
+      },
+      "I2": {
+        "status": "PASS_LATEST_CANDIDATE",
+        "latestRunId": 34557286320,
+        "sourceSha": "16f174d087024085eff18079c486f717ef98d691",
+        "conclusion": "success"
+      },
+      "I3": {
+        "status": "PASS",
+        "latestRunId": 34557374566,
+        "conclusion": "success",
+        "sourceSha": "16f174d087024085eff18079c486f717ef98d691",
+        "artifactId": 10183074943,
+        "readbackExact": true
+      },
+      "I4A": {
+        "status": "PASS",
+        "previousAuthoritativeRunId": 34555949312,
+        "latestAuthoritativeRunId": 34560184247,
+        "latestArtifactId": 10184053728,
+        "latestArtifactDigest": "sha256:496177cb6f2dfd7190a821e6180bcfeeb864704426f4debaccbdb3d78c3b0790",
+        "proofCount": 8,
+        "capabilityCount": 15,
+        "writesExecuted": 0
+      },
+      "I4B": {
+        "status": "PASS",
+        "latestAuthoritativeRunId": 34651451745,
+        "matrixArtifactId": 10283923191,
+        "matrixArtifactDigest": "sha256:f8c48d460de00407522ba63038cd1a429e4dd65545b4599c61e318a7a673f7c1",
+        "remediationArtifactId": 10283817885,
+        "remediationArtifactDigest": "sha256:f304ef3dc0856477648bff94b34080af181ac1603262fc4027a627e212e08d1b",
+        "contextsPass": 15,
+        "contextsFail": 0,
+        "uniqueFailures": 0
+      },
+      "I5": {
+        "status": "PASS",
+        "latestAuthoritativeRunId": 34733712152,
+        "runAttempt": 2,
+        "conclusion": "success",
+        "evidenceArtifactId": 10311055390,
+        "evidenceArtifactDigest": "sha256:5aad2082722a0c8eedcc3d2b6d48c702c1fab8ad3d57815f4bf5382963747ceb",
+        "preWriteContextsPass": 15,
+        "preWriteContextsFail": 0,
+        "controlledWritesExecuted": 3,
+        "syntheticFinalAbsent": true,
+        "postWriteContextsPass": 15,
+        "postWriteContextsFail": 0
+      },
+      "I6": {
+        "status": "HOLD_PENDING_EXPLICIT_AUTHORIZATION"
+      }
     }
   },
   "productionProgress": {
@@ -354,5 +407,5 @@
     "postI5GuardMaterialized": true,
     "postI5CentralGuardValidationRequired": true
   },
-  "nextAction": "I6_PREPARE_DRY_RUN_DIFF_DEDUP_ROLLBACK_PLAN_AND_REQUEST_EXPLICIT_AUTHORIZATION_BEFORE_AUGUST_MUTATION"
+  "nextAction": "PROJECT_SOURCES_V4_REQUIRED_FLAG_RECORDED_THEN_ACTIVATE_V4_AND_I6_0"
 }
