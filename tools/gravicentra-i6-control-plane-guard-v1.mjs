@@ -43,8 +43,9 @@ need(C.i6Execution?.sourceDataApplyAuthorized===false,'I6_SOURCE_APPLY_MUST_BE_F
 need(C.i6Execution?.requiresDryRun===true&&C.i6Execution?.requiresDiff===true&&C.i6Execution?.requiresDeduplication===true,'I6_DRYRUN_CONTRACT_INVALID');
 need(C.i6Execution?.requiresAudit===true&&C.i6Execution?.requiresRollback===true,'I6_AUDIT_ROLLBACK_CONTRACT_INVALID');
 need(A.schemaVersion==='gravicentra-i6-explicit-authorization-receipt-v1','I6_AUTH_RECEIPT_SCHEMA_INVALID');
-need(A.authorization==='AUTHORIZED_I6_PHASE_A_POST_EXIT','I6_AUTH_RECEIPT_DECISION_INVALID');
-need(A.dataMutationAuthorized===false&&A.augustRefreshAuthorized===false,'I6_AUTH_RECEIPT_OVERREACH');
+need(A.authorization?.decision==='AUTHORIZED_BY_OWNER','I6_AUTH_RECEIPT_DECISION_INVALID');
+need(A.authorization?.dataMutationAuthorized===false&&A.authorization?.augustRefreshApplyAuthorized===false,'I6_AUTH_RECEIPT_OVERREACH');
+need(A.authorization?.perBlockApplyStillRequiresExplicitAuthorizationAfterDryRun===true,'I6_PER_BLOCK_AUTH_CONTRACT_MISSING');
 
 need(C.projectSources?.activePackage==='GRAVICENTRA_PROJECT_SOURCES_EVERGREEN_V4','I6_PROJECT_SOURCES_NOT_V4');
 need(C.projectSources?.activeVersion===4,'I6_PROJECT_SOURCES_VERSION_INVALID');
