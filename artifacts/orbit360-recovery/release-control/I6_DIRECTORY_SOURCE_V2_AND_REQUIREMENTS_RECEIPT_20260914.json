@@ -1,0 +1,81 @@
+{
+  "schemaVersion": "gravicentra-i6-directory-source-v2-requirements-receipt-v1",
+  "status": "RECORDED_READONLY_INPUT_AND_REQUIREMENTS",
+  "productBrand": "Gravicentra Insurance",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "operationalAuthority": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+  "activeGateExpected": "I6.0",
+  "source": {
+    "logicalName": "Directorio Aseguradoras Guatemala 2026",
+    "version": 2,
+    "sha256": "f2e57fa72ff1b94b110b5037038c6c47fbc727c513f9eebd2348d7f4f2244083",
+    "bytes": 444455,
+    "supersedesSha256": "89bdf4db76a566d805f72eb1895e2669bceb37dceb9bf80bc3b1c22a8a6847c5",
+    "sourceOfRecordForFutureI6_2DryRun": true,
+    "operationalWritesExecuted": 0,
+    "credentialsPersistedInRepository": false,
+    "credentialsMayBePrintedInEvidence": false
+  },
+  "workbookScope": {
+    "insurerSheets": [
+      "EL ROBLE",
+      "MAPFRE SEGUROS",
+      "GENERAL",
+      "G&T SEGUROS",
+      "COLUMNA",
+      "LA CEIBA",
+      "GUATEMALTECA",
+      "UNIVERSALES",
+      "RURAL",
+      "BAM",
+      "BANTRAB",
+      "FICOHSA",
+      "PRIVANZA",
+      "ÓLE"
+    ],
+    "excludedAuxiliarySheets": ["ÍNDICE", "📋 DIAGNÓSTICO", "T&A", "Tech"],
+    "excludedSheetsMustNeverBeImportedAsInsurers": true
+  },
+  "verifiedCorrectionsAgainstSupersededWorkbook": {
+    "onlyIntendedChangesDetected": true,
+    "ruralBrokerCode": "161",
+    "privanzaBrokerCodePreserved": "2-1727",
+    "mapfreConflictingBankRowsRemoved": true,
+    "otherInsurerSheetsChanged": false,
+    "cellDiffCount": 24,
+    "note": "The MAPFRE deletion compacts subsequent bank rows, accounting for most changed cells; no credential diff was introduced."
+  },
+  "newAcceptanceCriteria": {
+    "i6_1InsurerLogoUpload": {
+      "decision": "IN_SCOPE_FASE_A_POSTSALIDA",
+      "module": "Aseguradoras",
+      "requirement": "Each insurer record must allow an authorized user to upload or replace the insurer logo and persist it so the current logo renders in the insurer card/detail after reload.",
+      "security": "Logo upload permission must follow the authorized Aseguradoras write scope; it must not broaden credential visibility.",
+      "acceptance": [
+        "upload supported image",
+        "persist storage/reference",
+        "render in insurer card/detail",
+        "reload persistence",
+        "replace without orphaning active reference",
+        "unauthorized role blocked"
+      ]
+    },
+    "phaseBAdministrativeDirectory": {
+      "decision": "DEFERRED_TO_PHASE_B",
+      "workingName": "Directorio Administrativo",
+      "requirement": "Provide a separate area for non-insurer administrative passwords, credentials and accesses.",
+      "visibility": "SUPERADMIN_ONLY",
+      "mustNotBeMixedIntoInsurerDirectory": true,
+      "mustNotBeImplementedDuringI6": true
+    }
+  },
+  "governance": {
+    "thisReceiptIsNotAnEvergreenProjectSource": true,
+    "doesNotRequireEvergreenVersionChange": true,
+    "reason": "Records mutable implementation scope/input binding under the already-active I6 post-exit contract; it does not change governance authority or release methodology.",
+    "dataMutationAuthorized": false,
+    "augustRefreshAuthorized": false,
+    "perBlockApplyAuthorizationStillRequired": true
+  }
+}
