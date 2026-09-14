@@ -1,0 +1,125 @@
+name: Gravicentra I6 Post-Salida
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - recovery/fase-a-clean-20260831
+    paths:
+      - '.github/workflows/gravicentra-recovery-i6-postsalida.yml'
+      - 'tools/gravicentra-i6-transition-v1.mjs'
+      - 'tools/gravicentra-i6-control-plane-guard-v1.mjs'
+      - 'artifacts/orbit360-recovery/release-control/I6_EXPLICIT_AUTHORIZATION_RECEIPT_20260914.json'
+      - 'artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json'
+      - 'artifacts/orbit360-recovery/project-sources-v2/v4/**'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: gravicentra-i6-postsalida-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  i6-state-transition:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout canonical Recovery branch with complete ancestry
+        uses: actions/checkout@v4
+        with:
+          ref: recovery/fase-a-clean-20260831
+          fetch-depth: 0
+          persist-credentials: true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify pre-transition authority
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=governance
+
+      - name: Execute state-gated I6 transition only
+        id: transition
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/gravicentra-i6-transition-v1.mjs
+          node tools/gravicentra-i6-transition-v1.mjs | tee "$RUNNER_TEMP/i6-transition.txt"
+          PHASE="$(sed -n 's/^TRANSITION_PHASE=//p' "$RUNNER_TEMP/i6-transition.txt" | tail -1)"
+          test -n "$PHASE"
+          echo "phase=$PHASE" >> "$GITHUB_OUTPUT"
+
+      - name: Commit governance transition locally
+        if: steps.transition.outputs.phase != 'NOOP_ALREADY_ACTIVE'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "gravicentra-governance-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json
+          if test -f artifacts/orbit360-recovery/release-control/I6_PROJECT_SOURCES_V4_TRANSITION_RECEIPT_20260914.json; then
+            git add artifacts/orbit360-recovery/release-control/I6_PROJECT_SOURCES_V4_TRANSITION_RECEIPT_20260914.json
+          fi
+          if test "${{ steps.transition.outputs.phase }}" = "MARK_V4_REQUIRED"; then
+            git commit -m "governance(project-sources): record required Evergreen V4 transition"
+          else
+            git commit -m "governance(i6): activate Evergreen V4 and I6.0 baseline"
+          fi
+
+      - name: Validate resulting local commit before publication
+        if: steps.transition.outputs.phase != 'NOOP_ALREADY_ACTIVE'
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=governance
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const c=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json','utf8'));
+          if(c.i6Execution?.authorized===true){
+            if(c.gateState?.gates?.I6?.status!=='IN_PROGRESS_I6_0_BASELINE') throw new Error('I6_0_BASELINE_STATUS_MISMATCH');
+          }
+          NODE
+          if node -e "const c=require('./artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json');process.exit(c.i6Execution?.authorized===true?0:1)"; then
+            node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          fi
+
+      - name: Publish validated governance-only transition
+        if: steps.transition.outputs.phase != 'NOOP_ALREADY_ACTIVE'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git push origin HEAD:recovery/fase-a-clean-20260831
+
+      - name: Record read-only execution summary
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/i6-governance"
+          node - <<'NODE' > "$RUNNER_TEMP/i6-governance/summary.json"
+          const fs=require('node:fs');
+          const c=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json','utf8'));
+          console.log(JSON.stringify({
+            schemaVersion:'gravicentra-i6-governance-transition-summary-v1',
+            i6Status:c.gateState?.gates?.I6?.status||'',
+            activeSubgate:c.gateState?.gates?.I6?.activeSubgate||'',
+            activeProjectSources:c.projectSources?.activePackage||'',
+            staticSourceUpdateRequired:c.projectSources?.staticSourceUpdateRequired===true,
+            dataMutationAuthorized:c.i6Execution?.dataMutationAuthorized===true,
+            sourceDataApplyAuthorized:c.i6Execution?.sourceDataApplyAuthorized===true,
+            operationalWritesExecuted: 0,
+            augustDataTouched: false
+          },null,2));
+          NODE
+
+      - name: Upload governance evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i6-governance-${{ github.run_id }}
+          path: ${{ runner.temp }}/i6-governance
+          if-no-files-found: error
+          retention-days: 90
