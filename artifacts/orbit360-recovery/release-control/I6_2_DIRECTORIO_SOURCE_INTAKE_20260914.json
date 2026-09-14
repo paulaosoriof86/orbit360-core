@@ -1,0 +1,90 @@
+{
+  "schemaVersion": "gravicentra-i6-directorio-source-intake-v1",
+  "status": "READONLY_PREP_ONLY_NOT_GATE_OPENED",
+  "productBrand": "Gravicentra Insurance",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "activeGateAtIntake": "I6.0",
+  "targetFutureBlock": "I6.2_DIRECTORIO",
+  "source": {
+    "uploadedName": "Directorio Aseguradoras Guatemala 2026 (1).xlsx",
+    "sha256": "89bdf4db76a566d805f72eb1895e2669bceb37dceb9bf80bc3b1c22a8a6847c5",
+    "byteSize": 383845,
+    "country": "Guatemala",
+    "containsRestrictedCredentials": true,
+    "credentialValuesPersistedInThisReceipt": false,
+    "credentialValuesAllowedInLogsOrEvidence": false
+  },
+  "workbookStructure": {
+    "sheetCount": 18,
+    "insurerDetailSheetCount": 14,
+    "insurerDetailSheets": [
+      "EL ROBLE",
+      "MAPFRE SEGUROS",
+      "GENERAL",
+      "G&T SEGUROS",
+      "COLUMNA",
+      "LA CEIBA",
+      "GUATEMALTECA",
+      "UNIVERSALES",
+      "RURAL",
+      "BAM",
+      "BANTRAB",
+      "FICOHSA",
+      "PRIVANZA",
+      "ÓLE"
+    ],
+    "excludedFromInsurerImport": ["ÍNDICE", "📋 DIAGNÓSTICO", "T&A", "Tech"],
+    "sourceOfRecordWithinWorkbook": "INSURER_DETAIL_TABS",
+    "diagnosticSheetAuthority": "INFORMATIONAL_ONLY_STALE_AGAINST_DETAIL_TABS"
+  },
+  "safeCounts": {
+    "insurers": 14,
+    "contactRows": 161,
+    "onlineSystemAccessRows": 40,
+    "accessRowsWithUserPresent": 13,
+    "accessRowsWithPasswordPresent": 13,
+    "bankOrPaymentRows": 76
+  },
+  "sourceOnlyReviewFlags": {
+    "duplicateIntermediaryCode": {
+      "code": "2-1727",
+      "insurerSheets": ["RURAL", "PRIVANZA"],
+      "disposition": "CONFLICT_REVIEW_REQUIRED_BEFORE_APPLY"
+    },
+    "repeatedContactEmailInstancesWithinSameInsurer": 9,
+    "repeatedContactEmailDisposition": "CLASSIFY_SHARED_ALIAS_VS_DUPLICATE_BEFORE_APPLY",
+    "repeatedBankAccountValueWithinInsurer": {
+      "insurerSheet": "MAPFRE SEGUROS",
+      "accountValueRedacted": true,
+      "assignedToDifferentlyNamedBankRows": true,
+      "disposition": "CONFLICT_REVIEW_REQUIRED_BEFORE_APPLY"
+    },
+    "generalFieldGaps": {
+      "LA CEIBA": ["WhatsApp"],
+      "RURAL": ["NIT", "address", "WhatsApp", "app"],
+      "BAM": ["NIT", "address", "WhatsApp", "app"],
+      "BANTRAB": ["NIT", "address", "app"],
+      "FICOHSA": ["NIT", "address", "office", "emergency", "WhatsApp", "app"],
+      "PRIVANZA": ["NIT", "address", "emergency", "WhatsApp", "app", "web"],
+      "ÓLE": ["code", "NIT", "address", "office", "emergency", "WhatsApp", "app", "web"]
+    }
+  },
+  "comparisonState": {
+    "comparedAgainstCurrentFirestore": false,
+    "dryRunPrepared": false,
+    "creates": null,
+    "updates": null,
+    "noOps": null,
+    "possibleDuplicates": null,
+    "conflicts": null
+  },
+  "authorization": {
+    "readOnlyAnalysisAuthorized": true,
+    "dataMutationAuthorized": false,
+    "applyAuthorized": false,
+    "mustWaitForI6_0_And_I6_1_Per_Frozen_Order": true,
+    "perBlockApplyRequiresExplicitAuthorizationAfterDryRun": true
+  },
+  "nextUse": "Preserve this hash and source-only classification. When I6.2 becomes the active block, compare the insurer detail tabs against the authoritative Firestore directory and produce a redacted dry-run before any write."
+}
