@@ -12,67 +12,81 @@ const postI5Freeze=exists(`${root}/MECHANISM_FREEZE_V5_POST_I5_20260912.md`)?rea
 const central=read('.github/workflows/gravicentra-release-lock-sync.yml');
 const canonicalPreflight='tools/gravicentra-governance-preflight-v1.mjs';
 
-const executors={I2:'.github/workflows/gravicentra-recovery-i2-source-contract.yml',I3:'.github/workflows/gravicentra-recovery-i3-preview-v2.yml',I4A:'.github/workflows/gravicentra-recovery-i4a-public-browser.yml',I4B:'.github/workflows/gravicentra-recovery-i4b-transversal.yml',I5:'.github/workflows/gravicentra-recovery-i5-production.yml'};
+const executors={I2:'.github/workflows/gravicentra-recovery-i2-source-contract.yml',I3:'.github/workflows/gravicentra-recovery-i3-preview-v2.yml',I4A:'.github/workflows/gravicentra-recovery-i4a-public-browser.yml',I4B:'.github/workflows/gravicentra-recovery-i4b-transversal.yml',I5:'.github/workflows/gravicentra-recovery-i5-production.yml',I6:'.github/workflows/gravicentra-recovery-i6-postsalida.yml'};
 const statusToGate={I2_IN_PROGRESS:'I2',I3_IN_PROGRESS:'I3',I4A_IN_PROGRESS:'I4A',I4B_IN_PROGRESS:'I4B',I5_IN_PROGRESS:'I5'};
 
-need(cp.mechanismRules?.singleMutableAuthority==='THIS_FILE','V5_SINGLE_AUTHORITY_MISSING');
-need(cp.mechanismFreeze?.status==='FROZEN','V5_V3_BASE_NOT_FROZEN');
-need(cp.mechanismFreeze?.reentryI2I3OnlyOnProvenProductSourceChange===true,'V5_I2I3_REENTRY_RULE_MISSING');
-need(freeze.includes('Estado: `FROZEN`')&&freeze.includes('PASS es monotónico')&&freeze.includes('executionScope.proofIds')&&freeze.includes('commit atómico'),'V5_FREEZE_CONTRACT_MISSING');
-need(reg.schemaVersion==='gravicentra-i4a-proof-registry-v1','V5_REGISTRY_SCHEMA_INVALID');
-need(reg.authorityType==='DERIVED_MONOTONIC_EVIDENCE_REGISTRY'&&reg.mayGovernGate===false&&reg.mayGovernReleaseIdentity===false,'V5_REGISTRY_AUTHORITY_LEAK');
-for(const k of ['passIsMonotonicWithinRelease','passReexecutionForbiddenWithoutCausalInvalidation','validatorFailureCannotInvalidatePriorPass','qaOnlyChangeCannotInvalidatePriorPass','conversationCannotInvalidatePriorPass','causalInvalidationRequiresProductSourceDelta','openProofsOnlyExecution','gateSealRequiresAtomicControlPlaneLedgerRegistryCommit'])need(reg.policy?.[k]===true,'V5_POLICY_MISSING:'+k);
-need(exists(canonicalPreflight),'V5_CANONICAL_PREFLIGHT_MISSING');
+need(cp.mechanismRules?.singleMutableAuthority==='THIS_FILE','V6_SINGLE_AUTHORITY_MISSING');
+need(cp.mechanismFreeze?.status==='FROZEN','V6_V3_BASE_NOT_FROZEN');
+need(cp.mechanismFreeze?.reentryI2I3OnlyOnProvenProductSourceChange===true,'V6_I2I3_REENTRY_RULE_MISSING');
+need(freeze.includes('Estado: `FROZEN`')&&freeze.includes('PASS es monotónico')&&freeze.includes('executionScope.proofIds')&&freeze.includes('commit atómico'),'V6_FREEZE_CONTRACT_MISSING');
+need(reg.schemaVersion==='gravicentra-i4a-proof-registry-v1','V6_REGISTRY_SCHEMA_INVALID');
+need(reg.authorityType==='DERIVED_MONOTONIC_EVIDENCE_REGISTRY'&&reg.mayGovernGate===false&&reg.mayGovernReleaseIdentity===false,'V6_REGISTRY_AUTHORITY_LEAK');
+for(const k of ['passIsMonotonicWithinRelease','passReexecutionForbiddenWithoutCausalInvalidation','validatorFailureCannotInvalidatePriorPass','qaOnlyChangeCannotInvalidatePriorPass','conversationCannotInvalidatePriorPass','causalInvalidationRequiresProductSourceDelta','openProofsOnlyExecution','gateSealRequiresAtomicControlPlaneLedgerRegistryCommit'])need(reg.policy?.[k]===true,'V6_POLICY_MISSING:'+k);
+need(exists(canonicalPreflight),'V6_CANONICAL_PREFLIGHT_MISSING');
 
-for(const gate of ['I2','I3','I4A'])need(exists(executors[gate]),'V5_EXECUTOR_MISSING:'+gate);
+for(const gate of ['I2','I3','I4A'])need(exists(executors[gate]),'V6_EXECUTOR_MISSING:'+gate);
 const i2=read(executors.I2),i3=read(executors.I3),i4a=read(executors.I4A);
-for(const wf of [i2,i3])need(wf.includes('fetch-depth: 0')&&wf.includes('gravicentra-control-plane-guard-v2.mjs'),'V5_I2I3_EXECUTOR_DRIFT');
-need(!/^\s*SOURCE_SHA:\s*[0-9a-f]{40}\s*$/m.test(i2+i3+i4a),'V5_HARDCODED_SOURCE_FORBIDDEN');
-need(i4a.includes('gravicentra-i4a-proof-registry-guard-v1.mjs'),'V5_I4A_PROOF_GUARD_MISSING');
-for(const marker of ['gravicentra-execution-intent-v2','OPEN_PROOFS_ONLY','proofIds','preserveProofIds','I4A_PASS_REEXECUTION_FORBIDDEN','gatePassClaimed'])need(i4a.includes(marker),'V5_I4A_SCOPE_MARKER_MISSING:'+marker);
-need(!i4a.includes('authoritativePass')&&!i4a.includes('Fail closed only after all probe evidence was collected'),'V5_MONOLITHIC_I4A_REINTRODUCED');
+for(const wf of [i2,i3])need(wf.includes('fetch-depth: 0')&&wf.includes('gravicentra-control-plane-guard-v2.mjs'),'V6_I2I3_EXECUTOR_DRIFT');
+need(!/^\s*SOURCE_SHA:\s*[0-9a-f]{40}\s*$/m.test(i2+i3+i4a),'V6_HARDCODED_SOURCE_FORBIDDEN');
+need(i4a.includes('gravicentra-i4a-proof-registry-guard-v1.mjs'),'V6_I4A_PROOF_GUARD_MISSING');
+for(const marker of ['gravicentra-execution-intent-v2','OPEN_PROOFS_ONLY','proofIds','preserveProofIds','I4A_PASS_REEXECUTION_FORBIDDEN','gatePassClaimed'])need(i4a.includes(marker),'V6_I4A_SCOPE_MARKER_MISSING:'+marker);
+need(!i4a.includes('authoritativePass')&&!i4a.includes('Fail closed only after all probe evidence was collected'),'V6_MONOLITHIC_I4A_REINTRODUCED');
 
-const activeGate=statusToGate[cp.status]||null;
+const i6Status=String(cp.gateState?.gates?.I6?.status||'');
+const i6Active=cp.i6Execution?.authorized===true||(!['','HOLD_PENDING_EXPLICIT_AUTHORIZATION'].includes(i6Status));
+const activeGate=i6Active?'I6':(statusToGate[cp.status]||null);
 if(activeGate){
-  const p=executors[activeGate];need(exists(p),'V5_ACTIVE_GATE_EXECUTOR_MISSING:'+activeGate+':'+p);const wf=read(p);
-  need(wf.includes(`gravicentra-governance-preflight-v1.mjs --mode=${activeGate.toLowerCase()}`),'V5_ACTIVE_GATE_CANONICAL_PREFLIGHT_MISSING:'+activeGate);
-  need(wf.includes('fetch-depth: 0'),'V5_ACTIVE_GATE_SHALLOW_CHECKOUT:'+activeGate);
+  const p=executors[activeGate];need(exists(p),'V6_ACTIVE_GATE_EXECUTOR_MISSING:'+activeGate+':'+p);const wf=read(p);
+  need(wf.includes(`gravicentra-governance-preflight-v1.mjs --mode=${activeGate.toLowerCase()}`),'V6_ACTIVE_GATE_CANONICAL_PREFLIGHT_MISSING:'+activeGate);
+  need(wf.includes('fetch-depth: 0'),'V6_ACTIVE_GATE_SHALLOW_CHECKOUT:'+activeGate);
   if(activeGate==='I4B'){
-    for(const marker of ['I4B_IN_PROGRESS','gravicentra-i4b-transversal-v2.mjs','failAtEnd','Preserve complete I4B evidence before adjudication','productionTouched','dataTouched','writesExecuted'])need(wf.includes(marker),'V5_I4B_EXECUTOR_MARKER_MISSING:'+marker);
-    need(exists('tools/gravicentra-i4b-transversal-v2.mjs'),'V5_I4B_V2_HARNESS_MISSING');
+    for(const marker of ['I4B_IN_PROGRESS','gravicentra-i4b-transversal-v2.mjs','failAtEnd','Preserve complete I4B evidence before adjudication','productionTouched','dataTouched','writesExecuted'])need(wf.includes(marker),'V6_I4B_EXECUTOR_MARKER_MISSING:'+marker);
+    need(exists('tools/gravicentra-i4b-transversal-v2.mjs'),'V6_I4B_V2_HARNESS_MISSING');
     const h=read('tools/gravicentra-i4b-transversal-v2.mjs');
-    for(const marker of ['I4B_MATRIX_FAIL','failAtEnd:true','uniqueFailures','I4B_LAB_RESIDUALS_IN_PRODUCT_STORE','I4B_NEGOCIO_NONCANONICAL_STAGE'])need(h.includes(marker),'V5_I4B_FAIL_AT_END_HARNESS_DRIFT:'+marker);
-    need(!/firebase\s+deploy|firebase\.cmd\s+deploy/i.test(wf),'V5_I4B_DEPLOY_FORBIDDEN');
+    for(const marker of ['I4B_MATRIX_FAIL','failAtEnd:true','uniqueFailures','I4B_LAB_RESIDUALS_IN_PRODUCT_STORE','I4B_NEGOCIO_NONCANONICAL_STAGE'])need(h.includes(marker),'V6_I4B_FAIL_AT_END_HARNESS_DRIFT:'+marker);
+    need(!/firebase\s+deploy|firebase\.cmd\s+deploy/i.test(wf),'V6_I4B_DEPLOY_FORBIDDEN');
   }
-  if(activeGate==='I5')for(const marker of ['I5_IN_PROGRESS','I3_ARTIFACT_ID','sameFrontendArtifactPreviewToProductionRequired'])need(wf.includes(marker),'V5_I5_EXECUTOR_MARKER_MISSING:'+marker);
+  if(activeGate==='I5')for(const marker of ['I5_IN_PROGRESS','I3_ARTIFACT_ID','sameFrontendArtifactPreviewToProductionRequired'])need(wf.includes(marker),'V6_I5_EXECUTOR_MARKER_MISSING:'+marker);
+  if(activeGate==='I6'){
+    for(const marker of ['IN_PROGRESS_I6_0_BASELINE','I6_0_BASELINE','dataMutationAuthorized','sourceDataApplyAuthorized','operationalWritesExecuted: 0','augustDataTouched: false'])need(wf.includes(marker),'V6_I6_EXECUTOR_MARKER_MISSING:'+marker);
+    need(wf.includes('tools/gravicentra-i6-control-plane-guard-v1.mjs')||wf.includes('gravicentra-governance-preflight-v1.mjs --mode=i6'),'V6_I6_GUARD_MISSING');
+  }
 }
 
 let i5SuccessorReady=false;
 if(activeGate==='I4B'||activeGate==='I5'){
-  need(exists(executors.I5),'V5_I5_SUCCESSOR_EXECUTOR_MISSING');const i5=read(executors.I5);
-  for(const marker of ['I5_IN_PROGRESS','fetch-depth: 0','gravicentra-governance-preflight-v1.mjs --mode=i5','I3_ARTIFACT_ID','actions/download-artifact@v4','sameFrontendArtifactPreviewToProductionRequired','sameBackendSourcePackageRequiredForI5','sourceMutatedAfterBuild','productionDeployAuthorized','controlledWritesAuthorized','rollbackPrepared','I5_NO_REBUILD=true'])need(i5.includes(marker),'V5_I5_SUCCESSOR_READINESS_MARKER_MISSING:'+marker);
-  need(i5.includes('artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json'),'V5_I5_SUCCESSOR_NOT_CONTROL_PLANE_TRIGGERED');
-  need(!/npm\s+(?:run\s+)?build|vite\s+build|webpack\s+--mode\s+production/i.test(i5),'V5_I5_REBUILD_PATH_FORBIDDEN');i5SuccessorReady=true;
+  need(exists(executors.I5),'V6_I5_SUCCESSOR_EXECUTOR_MISSING');const i5=read(executors.I5);
+  for(const marker of ['I5_IN_PROGRESS','fetch-depth: 0','gravicentra-governance-preflight-v1.mjs --mode=i5','I3_ARTIFACT_ID','actions/download-artifact@v4','sameFrontendArtifactPreviewToProductionRequired','sameBackendSourcePackageRequiredForI5','sourceMutatedAfterBuild','productionDeployAuthorized','controlledWritesAuthorized','rollbackPrepared','I5_NO_REBUILD=true'])need(i5.includes(marker),'V6_I5_SUCCESSOR_READINESS_MARKER_MISSING:'+marker);
+  need(i5.includes('artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json'),'V6_I5_SUCCESSOR_NOT_CONTROL_PLANE_TRIGGERED');
+  need(!/npm\s+(?:run\s+)?build|vite\s+build|webpack\s+--mode\s+production/i.test(i5),'V6_I5_REBUILD_PATH_FORBIDDEN');i5SuccessorReady=true;
 }
 
 if(cp.status==='PRODUCTION_ACCEPTED'){
-  need(activeGate===null,'V5_POST_I5_ACTIVE_GATE_FORBIDDEN');
-  need(postI5Freeze.includes('Estado: `FROZEN`')&&postI5Freeze.includes('PRODUCTION_ACCEPTED'),'V5_POST_I5_FREEZE_MISSING');
-  need(cp.environmentState?.productionAccepted===true,'V5_POST_I5_ACCEPTANCE_FLAG_MISSING');
-  need(cp.gateState?.gates?.I5?.status==='PASS','V5_POST_I5_GATE_NOT_PASS');
-  need(cp.gateState?.nextFrozenIteration==='I6','V5_POST_I5_NEXT_NOT_I6');
-  need(cp.gateState?.gates?.I6?.status==='HOLD_PENDING_EXPLICIT_AUTHORIZATION','V5_POST_I5_I6_NOT_HOLD');
-  need(cp.i5Execution?.closed===true&&!cp.i5Execution?.productionDeployAuthorized&&!cp.i5Execution?.controlledWritesAuthorized,'V5_POST_I5_EXECUTION_STILL_OPEN');
-  need(cp.i6Execution?.authorized===false,'V5_POST_I5_I6_UNEXPECTEDLY_AUTHORIZED');
+  need(postI5Freeze.includes('Estado: `FROZEN`')&&postI5Freeze.includes('PRODUCTION_ACCEPTED'),'V6_POST_I5_FREEZE_MISSING');
+  need(cp.environmentState?.productionAccepted===true,'V6_POST_I5_ACCEPTANCE_FLAG_MISSING');
+  need(cp.gateState?.gates?.I5?.status==='PASS','V6_POST_I5_GATE_NOT_PASS');
+  need(cp.gateState?.nextFrozenIteration==='I6','V6_POST_I5_NEXT_NOT_I6');
+  need(cp.i5Execution?.closed===true&&!cp.i5Execution?.productionDeployAuthorized&&!cp.i5Execution?.controlledWritesAuthorized,'V6_POST_I5_EXECUTION_STILL_OPEN');
+  if(i6Active){
+    need(activeGate==='I6','V6_I6_ACTIVE_GATE_BINDING_INVALID');
+    need(cp.gateState?.gates?.I6?.status==='IN_PROGRESS_I6_0_BASELINE','V6_I6_ACTIVE_STATUS_INVALID');
+    need(cp.i6Execution?.authorized===true,'V6_I6_ACTIVE_AUTH_MISSING');
+    need(cp.i6Execution?.dataMutationAuthorized===false&&cp.i6Execution?.sourceDataApplyAuthorized===false,'V6_I6_ACTIVE_WRITE_AUTH_FORBIDDEN');
+    need(cp.environmentState?.augustRefresh==='HOLD','V6_I6_ACTIVE_AUGUST_MUST_HOLD');
+  }else{
+    need(activeGate===null,'V6_POST_I5_ACTIVE_GATE_FORBIDDEN');
+    need(cp.gateState?.gates?.I6?.status==='HOLD_PENDING_EXPLICIT_AUTHORIZATION','V6_POST_I5_I6_NOT_HOLD');
+    need(cp.i6Execution?.authorized===false,'V6_POST_I5_I6_UNEXPECTEDLY_AUTHORIZED');
+  }
 }
 
 const names=fs.readdirSync('.github/workflows').filter(x=>x.endsWith('.yml')||x.endsWith('.yaml'));
-for(const gate of ['i2','i3','i4a','i4b','i5']){const rx=new RegExp(`(?:^|-)${gate}(?:-|\\.)`,'i'),candidates=names.filter(x=>x.startsWith('gravicentra-')&&rx.test(x));if(gate==='i4a')need(candidates.length===1&&candidates[0]==='gravicentra-recovery-i4a-public-browser.yml','V5_PARALLEL_I4A_EXECUTOR:'+candidates.join(','));if(gate==='i4b'&&activeGate==='I4B')need(candidates.length===1&&candidates[0]==='gravicentra-recovery-i4b-transversal.yml','V5_PARALLEL_I4B_EXECUTOR:'+candidates.join(','));if(gate==='i5'&&(activeGate==='I4B'||activeGate==='I5'))need(candidates.length===1&&candidates[0]==='gravicentra-recovery-i5-production.yml','V5_PARALLEL_I5_EXECUTOR:'+candidates.join(','));}
-need(central.includes('Gravicentra Control Plane Guard v5'),'V5_CENTRAL_GUARD_VERSION_MISSING');
-need(central.includes('gravicentra-governance-preflight-v1.mjs --mode=governance'),'V5_CENTRAL_CANONICAL_PREFLIGHT_MISSING');
-const next=cp.gateState?.nextFrozenIteration||'';need(!activeGate||next===activeGate,'V5_CONTROL_GATE_EXECUTOR_GATE_DIVERGENCE:'+String(activeGate)+':'+String(next));
+for(const gate of ['i2','i3','i4a','i4b','i5','i6']){const rx=new RegExp(`(?:^|-)${gate}(?:-|\\.)`,'i'),candidates=names.filter(x=>x.startsWith('gravicentra-')&&rx.test(x));if(gate==='i4a')need(candidates.length===1&&candidates[0]==='gravicentra-recovery-i4a-public-browser.yml','V6_PARALLEL_I4A_EXECUTOR:'+candidates.join(','));if(gate==='i4b'&&activeGate==='I4B')need(candidates.length===1&&candidates[0]==='gravicentra-recovery-i4b-transversal.yml','V6_PARALLEL_I4B_EXECUTOR:'+candidates.join(','));if(gate==='i5'&&(activeGate==='I4B'||activeGate==='I5'))need(candidates.length===1&&candidates[0]==='gravicentra-recovery-i5-production.yml','V6_PARALLEL_I5_EXECUTOR:'+candidates.join(','));if(gate==='i6'&&activeGate==='I6')need(candidates.length===1&&candidates[0]==='gravicentra-recovery-i6-postsalida.yml','V6_PARALLEL_I6_EXECUTOR:'+candidates.join(','));}
+need(central.includes('Gravicentra Control Plane Guard v5'),'V6_CENTRAL_GUARD_VERSION_MISSING');
+need(central.includes('gravicentra-governance-preflight-v1.mjs --mode=governance'),'V6_CENTRAL_CANONICAL_PREFLIGHT_MISSING');
+const next=cp.gateState?.nextFrozenIteration||'';need(!activeGate||next===activeGate,'V6_CONTROL_GATE_EXECUTOR_GATE_DIVERGENCE:'+String(activeGate)+':'+String(next));
 console.log('GRAVICENTRA_MECHANISM_INVARIANT=PASS');
-console.log('MECHANISM_INVARIANT_VERSION=V2_FAIL_AT_END_SUCCESSOR_READY_POST_I5_AWARE');
+console.log('MECHANISM_INVARIANT_VERSION=V2_FAIL_AT_END_SUCCESSOR_READY_POST_I5_I6_AWARE');
 console.log('ACTIVE_GATE='+(activeGate||'NONE'));
 console.log('ACTIVE_EXECUTOR='+(activeGate?executors[activeGate]:'NONE'));
 console.log('CANONICAL_PREFLIGHT='+canonicalPreflight);
