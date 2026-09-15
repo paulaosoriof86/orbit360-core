@@ -1,11 +1,11 @@
 /* Orbit 360 · Owner canónico del directorio operativo de Aseguradoras · 2026-07-22
-   Usuario visible. Contraseña con revelado temporal. Cuenta visible y copia directa. */
+   Usuario visible. Contraseña con revelado temporal y copia directa. Cuenta visible y copia directa. */
 (function () {
   'use strict';
   window.Orbit = window.Orbit || {};
   var Orbit = window.Orbit;
-  var VERSION = '20260829.1';
-  var COMPOSITION_REVISION = '20260909.1-server-owned-credential-copy';
+  var VERSION = '20260915.1';
+  var COMPOSITION_REVISION = '20260915.1-i6-1-direct-password-copy';
   if (Orbit.clientInsurerOperationalDirectoryOwnerV20260722 && Orbit.clientInsurerOperationalDirectoryOwnerV20260722.version === VERSION) return;
 
   function clean(value) { return String(value == null ? '' : value).trim(); }
@@ -142,7 +142,8 @@
       '<div class="m1-credential-row"><span class="m1-read-label">Contraseña</span><div class="m1-credential-value m1-credential-secret" data-od-credential-secret aria-live="polite">Oculta</div></div>' +
       '<div class="m1-contact-actions">' +
         (canReveal ? '<button class="btn ghost sm" type="button" data-od-credential-reveal="' + index + '">Ver temporalmente</button>' : '<button class="btn ghost sm" type="button" disabled>' + (state.allowed ? 'Contraseña no disponible' : 'Acceso restringido') + '</button>') +
-        (canCopy ? '<button class="btn ghost sm" type="button" data-od-credential-copy="' + index + '">Copiar acceso seguro</button>' : '') +
+        (canCopy ? '<button class="btn ghost sm" type="button" data-od-password-copy="' + index + '">Copiar contraseña</button>' : '') +
+        (canCopy ? '<button class="btn ghost sm" type="button" data-od-credential-copy="' + index + '">Copiar credenciales</button>' : '') +
       '</div></div>' +
       (url ? '<div class="m1-contact-actions"><a class="btn primary sm" href="' + esc(safeUrl(url)) + '" target="_blank" rel="noopener">Abrir plataforma</a></div>' : '');
   }
@@ -172,7 +173,7 @@
     root.querySelectorAll('#af-portales [data-portal]').forEach(function (row) { renderPortalRow(row, insurer, Number(row.dataset.portal)); });
     root.querySelectorAll('#af-cuentas [data-cta]').forEach(function (row) { renderBankRow(row, insurer, Number(row.dataset.cta)); });
     var portalsNote = root.querySelector('#af-portales') && root.querySelector('#af-portales').parentElement.querySelector('.cfg-note');
-    if (portalsNote) portalsNote.innerHTML = '<b>Directorio operativo:</b> el usuario permanece visible. La contraseña se revela temporalmente según rol y vuelve a Oculta.';
+    if (portalsNote) portalsNote.innerHTML = '<b>Directorio operativo:</b> el usuario permanece visible. La contraseña se revela temporalmente según rol y puede copiarse sola o junto con el usuario.';
     var accountsSection = root.querySelector('#af-cuentas') && root.querySelector('#af-cuentas').parentElement;
     var accountsNote = accountsSection && accountsSection.querySelector('.cfg-note');
     if (accountsNote) accountsNote.innerHTML = '<b>Directorio operativo:</b> el número de cuenta permanece visible y se copia directamente con banco, tipo, moneda y titular.';
@@ -180,11 +181,14 @@
   }
   async function onClick(event) {
     var reveal = event.target.closest('[data-od-credential-reveal]');
+    var passwordCopy = event.target.closest('[data-od-password-copy]');
     var credentialCopy = event.target.closest('[data-od-credential-copy]');
-    if (reveal || credentialCopy) {
+    if (reveal || passwordCopy || credentialCopy) {
       event.preventDefault(); event.stopPropagation();
       var insurer = currentInsurer();
-      var index = Number((reveal || credentialCopy).dataset[reveal ? 'odCredentialReveal' : 'odCredentialCopy']);
+      var trigger = reveal || passwordCopy || credentialCopy;
+      var key = reveal ? 'odCredentialReveal' : (passwordCopy ? 'odPasswordCopy' : 'odCredentialCopy');
+      var index = Number(trigger.dataset[key]);
       var portal = insurer && insurer.portales && insurer.portales[index];
       var user = portalUser(portal);
       var out = reveal
@@ -198,9 +202,12 @@
           setTimeout(function () { secret.textContent = 'Oculta'; }, out.expiresInMs || 6000);
         }
         toast('Contraseña visible temporalmente');
+      } else if (passwordCopy) {
+        var passwordCopied = await copyText(out.value);
+        toast(passwordCopied ? 'Contraseña copiada' : 'No fue posible copiar la contraseña');
       } else {
         var copied = await copyText(['Usuario: ' + (user || '—'), 'Contraseña: ' + out.value].join('\n'));
-        toast(copied ? 'Acceso copiado de forma segura' : 'No fue posible copiar el acceso');
+        toast(copied ? 'Credenciales copiadas de forma segura' : 'No fue posible copiar las credenciales');
       }
       return;
     }
@@ -239,6 +246,8 @@
     supersedesBankAndPortalSectionsOf: 'client-insurer-visual-contract-v20260720',
     usernameOperationalVisible: true,
     passwordProtectedTemporaryReveal: true,
+    passwordCopyDirect: true,
+    credentialCopyCombined: true,
     credentialRecordFallbackForAuthorizedRoles: true,
     credentialProviderFallbackPreserved: true,
     bankNumberOperationalVisible: true,
