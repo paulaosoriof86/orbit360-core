@@ -15,5 +15,6 @@
   "artifactName": "gravicentra-i6-1-35015830993",
   "artifactArchiveDigest": "sha256:5dd5ac8e483a500e6873f23e5585a66ef9ee9374a0d5a2fbbfce6066bdc00472",
   "productionMutationAuthorized": false,
-  "dataMutationAuthorized": false
+  "dataMutationAuthorized": false,
+  "retryReason": "SAME_EVIDENCE_GUARD_TRANSITION_COMPATIBILITY_FIX_ONLY"
 }
