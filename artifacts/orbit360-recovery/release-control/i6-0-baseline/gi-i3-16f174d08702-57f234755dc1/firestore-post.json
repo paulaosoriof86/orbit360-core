@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "gravicentra-i6-0-firestore-inventory-v1",
+  "phase": "POST",
+  "capturedAt": "2026-09-15T16:59:51.935Z",
+  "projectId": "ays-orbit-360-lab",
+  "rootCollectionCount": 2,
+  "collectionGroups": 2,
+  "totalDocuments": 0,
+  "maxDepth": 0,
+  "collectionCounts": {
+    "tenantId": 0,
+    "tenants": 0
+  },
+  "relationshipIndicators": {},
+  "documentFingerprints": [],
+  "baselineFingerprint": "5562dd013fca49bf9ec553dad2a502cf4e1fb780d81aa16144fb06862d23aad3",
+  "operationalReadsExecuted": 3,
+  "operationalWritesExecuted": 0,
+  "sourceDataApplyOperations": 0,
+  "evidenceContainsRawDocumentValues": false,
+  "evidenceContainsRawDocumentIds": false
+}

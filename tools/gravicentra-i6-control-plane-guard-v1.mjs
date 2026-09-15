@@ -30,12 +30,13 @@ for(const k of ['I0','I1','I2','I3','I4A','I4B','I5']) need(String(g[k]?.status|
 need(G.lastFormallyCompletedIteration===5,'I6_LAST_COMPLETED_ITERATION_INVALID');
 need(G.lastFormallyCompletedGate==='I5','I6_LAST_COMPLETED_GATE_INVALID');
 need(G.nextFrozenIteration==='I6','I6_NEXT_ITERATION_INVALID');
-need(g.I6?.status==='IN_PROGRESS_I6_0_BASELINE','I6_GATE_NOT_BASELINE_ACTIVE');
-need(g.I6?.activeSubgate==='I6.0','I6_ACTIVE_SUBGATE_INVALID');
+const activeI60=g.I6?.status==='IN_PROGRESS_I6_0_BASELINE'&&g.I6?.activeSubgate==='I6.0';
+const frozenI60=g.I6?.status==='I6_0_BASELINE_FROZEN'&&g.I6?.activeSubgate==='I6.1';
+need(activeI60||frozenI60,'I6_GATE_STATE_INVALID');
 
 need(C.i6Execution?.authorized===true,'I6_NOT_AUTHORIZED');
 need(C.i6Execution?.authorizationReceiptPath===AUTH_RECEIPT,'I6_AUTH_RECEIPT_PATH_MISMATCH');
-need(C.i6Execution?.activeSubgate==='I6.0','I6_EXECUTION_SUBGATE_INVALID');
+need((activeI60&&C.i6Execution?.activeSubgate==='I6.0')||(frozenI60&&C.i6Execution?.activeSubgate==='I6.1'),'I6_EXECUTION_SUBGATE_INVALID');
 need(C.i6Execution?.dryRunPrepared===false,'I6_DRYRUN_MUST_START_FALSE');
 need(C.i6Execution?.dataMutationAuthorized===false,'I6_DATA_MUTATION_MUST_BE_FALSE');
 need(C.i6Execution?.productMutationAuthorized===false,'I6_PRODUCT_MUTATION_MUST_BE_FALSE');
@@ -63,6 +64,17 @@ need(Array.isArray(S.capabilities)&&S.capabilities.length===15,'I6_LEDGER_COUNT_
 need(S.capabilities.every(x=>x.liveAcceptance?.status==='LATEST_APPROVED_VERSION_LIVE_PASS'),'I6_PRIOR_LIVE_PASS_NOT_PRESERVED');
 need(S.releaseBinding?.sourceSha===R.sourceSha&&S.releaseBinding?.buildId===R.buildId&&Number(S.releaseBinding?.artifactId)===Number(R.artifactId),'I6_LEDGER_RELEASE_BINDING_MISMATCH');
 
+// I6_0_MATERIAL_FREEZE_GUARD_V1
+if(frozenI60){
+ const seal=C.i6BaselineSeal||{},p=C.postproductionExitProgress||{},root=seal.evidenceRoot,sh=f=>execFileSync('sha256sum',[f],{encoding:'utf8'}).trim().split(/\s+/)[0];
+ need(G.lastFormallyCompletedMiniGate==='I6.0'&&p.formalPercent===10&&p.frozenMiniGates===1&&p.totalMiniGates===10&&p.lastFrozenMiniGate==='I6.0'&&p.activeMiniGate==='I6.1','I6_0_PROGRESS_INVALID');
+ need(C.nextAction==='I6_1_FUNCTIONAL_CLOSURE'&&seal.status==='I6_0_BASELINE_FROZEN'&&seal.executorPath==='.github/workflows/gravicentra-material-baseline-freeze.yml'&&C.postI5Governance?.i6ExecutorPath==='.github/workflows/gravicentra-material-baseline-freeze.yml','I6_0_EXECUTOR_OR_NEXT_INVALID');
+ need(seal.sourceSha===R.sourceSha&&seal.sourceTree===R.sourceTree&&seal.buildId===R.buildId&&Number(seal.artifactId)===Number(R.artifactId)&&seal.artifactArchiveDigest===R.artifactArchiveDigest,'I6_0_RELEASE_BINDING_MISMATCH');
+ const z=root+'/zero-writes.json',sn=root+'/snapshot-readback.json',rb=root+'/rollback.json',integ=root+'/integrity.json',arc=root+'/rollback/accepted-i3-actions-artifact.zip';for(const f of [z,sn,rb,integ,arc])need(exists(f),'I6_0_EVIDENCE_MISSING:'+f);
+ need(sh(z)===seal.zeroWritesSha256&&sh(sn)===seal.snapshotReadbackSha256&&sh(rb)===seal.rollbackReceiptSha256&&sh(integ)===seal.integritySha256&&sh(arc)===seal.rollbackArchiveSha256,'I6_0_EVIDENCE_HASH_DRIFT');
+ const Z=readJson(z),SN=readJson(sn),RB=readJson(rb),IN=readJson(integ);need(Z.status==='PASS'&&Z.operationalWritesExecuted===0&&Z.firestoreStateStable===true,'I6_0_ZERO_WRITES_INVALID');need(SN.status==='PASS'&&SN.firestoreStableDuringExecutor===true&&SN.productionHostedReadbackExact===true,'I6_0_SNAPSHOT_INVALID');need(RB.status==='MATERIAL_ROLLBACK_PACKAGE_READY'&&RB.rollbackArchiveMatchesCertifiedArtifact===true&&seal.rollbackArchiveSha256===String(R.artifactArchiveDigest).replace(/^sha256:/,''),'I6_0_ROLLBACK_INVALID');need(IN.status==='PASS'&&IN.releaseBindingCoherent===true&&IN.rollbackArchiveMatchesCertifiedArtifact===true&&IN.operationalWritesExecuted===0,'I6_0_INTEGRITY_INVALID');for(const [rel,h] of Object.entries(IN.evidenceHashesSha256||{}))need(exists(root+'/'+rel)&&sh(root+'/'+rel)===h,'I6_0_INTEGRITY_MEMBER_DRIFT:'+rel);
+ if(seal.postGuardPass===true){need(exists(seal.postGuardReceiptPath)&&sh(seal.postGuardReceiptPath)===seal.postGuardReceiptSha256,'I6_0_POST_GUARD_RECEIPT_INVALID');need(readJson(seal.postGuardReceiptPath).status==='PASS','I6_0_POST_GUARD_NOT_PASS');}
+}
 const current=git('rev-parse','HEAD');
 try{execFileSync('git',['merge-base','--is-ancestor',R.sourceSha,current],{stdio:'ignore'});}catch{throw new Error('I6_CERTIFIED_SOURCE_NOT_ANCESTOR');}
 const allowedPrefixes=['.github/workflows/gravicentra-','tools/gravicentra-','artifacts/orbit360-recovery/release-control/','artifacts/orbit360-recovery/project-sources-v2/'];

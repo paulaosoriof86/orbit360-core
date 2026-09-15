@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "gravicentra-i6-0-zero-writes-proof-v1",
+  "status": "PASS",
+  "capturedAt": "2026-09-15T16:59:51.936Z",
+  "executor": ".github/workflows/gravicentra-material-baseline-freeze.yml",
+  "materialTool": "tools/gravicentra-i6-0-material-executor-v1.mjs",
+  "runner": ".github/workflows/gravicentra-material-baseline-freeze.yml",
+  "runId": 34998390973,
+  "dataMutationAuthorized": false,
+  "productMutationAuthorized": false,
+  "sourceDataApplyAuthorized": false,
+  "firestorePreFingerprint": "5562dd013fca49bf9ec553dad2a502cf4e1fb780d81aa16144fb06862d23aad3",
+  "firestorePostFingerprint": "5562dd013fca49bf9ec553dad2a502cf4e1fb780d81aa16144fb06862d23aad3",
+  "firestoreStateStable": true,
+  "firestoreCreateOperations": 0,
+  "firestoreUpdateOperations": 0,
+  "firestoreDeleteOperations": 0,
+  "firestoreCommitOperations": 0,
+  "hostingDeployOperations": 0,
+  "providerMutationCalls": 0,
+  "sourceDataApplyOperations": 0,
+  "operationalWritesExecuted": 0
+}
