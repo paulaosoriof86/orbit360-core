@@ -12,13 +12,19 @@
   window.Orbit = window.Orbit || {};
   if (Orbit.productInsurerCredentialProviderP0) return;
 
-  const VERSION = 'gravicentra-product-insurer-credential-provider-p0-v5';
+  const VERSION = 'gravicentra-product-insurer-credential-provider-p0-v6';
   const PROD_CALLABLE = 'orbit360ProductInsurerCredentialCommand';
   const PROD_REGION = 'us-central1';
   const PREVIEW_CALLABLE = 'orbit360ProductInsurerCredentialCommandPreview';
   const PREVIEW_REGION = 'us-east1';
   const REF_RE = /^cred_[a-f0-9]{32}$/;
   const text = (v, max) => String(v == null ? '' : v).trim().slice(0, max || 800);
+
+  function passwordOnly(value) {
+    const raw = String(value == null ? '' : value).trim();
+    const legacy = raw.match(/^Usuario:\s*[\s\S]*?\r?\nContrase(?:ñ|n)a:\s*([\s\S]*)$/i);
+    return text(legacy ? legacy[1] : raw, 512);
+  }
 
   function runtime() {
     const r = Orbit.productRuntimeBrowserProvidersP0;
@@ -124,8 +130,9 @@
       insurerId
     }, endpoint.region);
     const out = result && result.data ? result.data : (result || {});
-    if (!out || out.ok !== true || typeof out.value !== 'string') return { ok:false, status:text(out && out.status, 80) || 'no_disponible', message:'No fue posible recuperar el acceso' };
-    return { ok:true, status:'disponible', value:out.value, expiresInMs:Number(out.expiresInMs) || 6000, containsSecrets:true };
+    const value = out && out.ok === true ? passwordOnly(out.value) : '';
+    if (!out || out.ok !== true || !value) return { ok:false, status:text(out && out.status, 80) || 'no_disponible', message:'No fue posible recuperar el acceso' };
+    return { ok:true, status:'disponible', value, expiresInMs:Number(out.expiresInMs) || 6000, containsSecrets:true };
   }
 
   const provider = Object.freeze({
@@ -142,13 +149,14 @@
     providerRegistered:true,
     persistentSecrets:false,
     browserSecretCache:false,
+    legacyCredentialEnvelopeNormalization:true,
     directFirestoreWrites:false,
     serverAuditAuthoritative:true,
     status:function () {
       let secure = {};
       try { secure = Orbit.secureResources.selfTest ? Orbit.secureResources.selfTest() : {}; } catch (e) {}
       const endpoint = callableTarget();
-      return { version:VERSION, providerRegistered:secure.credentialProvider === true, callable:endpoint.callable, region:endpoint.region, preview:endpoint.preview, persistentSecrets:false, browserSecretCache:false, directFirestoreWrites:false, serverAuditAuthoritative:true };
+      return { version:VERSION, providerRegistered:secure.credentialProvider === true, callable:endpoint.callable, region:endpoint.region, preview:endpoint.preview, persistentSecrets:false, browserSecretCache:false, legacyCredentialEnvelopeNormalization:true, directFirestoreWrites:false, serverAuditAuthoritative:true };
     }
   });
 })();
