@@ -6,6 +6,7 @@ on:
       - recovery/fase-a-clean-20260831
     paths:
       - orbit360-platform/core/client-insurer-operational-directory-owner-v20260722.js
+      - orbit360-platform/core/product-insurer-credential-provider-p0.js
   workflow_dispatch:
 
 permissions:
@@ -21,6 +22,7 @@ env:
   TENANT_HINT: alianzas-soluciones
   BASELINE_SOURCE_SHA: 16f174d087024085eff18079c486f717ef98d691
   OWNER_FILE: orbit360-platform/core/client-insurer-operational-directory-owner-v20260722.js
+  PROVIDER_FILE: orbit360-platform/core/product-insurer-credential-provider-p0.js
 
 jobs:
   immutable-preview:
@@ -56,31 +58,37 @@ jobs:
           need(C.gateState?.gates?.I6?.dataMutationAuthorized===false,'I61_DATA_MUTATION_MUST_BE_FALSE');
           const changed=cp.execFileSync('git',['diff','--name-only',process.env.BASELINE_SOURCE_SHA+'..HEAD'],{encoding:'utf8'}).trim().split(/\r?\n/).filter(Boolean);
           const allowedGovernance=['.github/workflows/gravicentra-','tools/gravicentra-','artifacts/orbit360-recovery/release-control/','artifacts/orbit360-recovery/project-sources-v2/'];
-          const product=changed.filter(p=>!allowedGovernance.some(x=>p.startsWith(x)));
-          need(product.length===1&&product[0]===process.env.OWNER_FILE,'I61_PRODUCT_SCOPE_DRIFT:'+product.join(','));
+          const product=changed.filter(p=>!allowedGovernance.some(x=>p.startsWith(x))).sort();
+          const expected=[process.env.OWNER_FILE,process.env.PROVIDER_FILE].sort();
+          need(product.length===expected.length&&product.every((p,i)=>p===expected[i]),'I61_PRODUCT_SCOPE_DRIFT:'+product.join(','));
           console.log('I61_AUTHORITY_AND_SCOPE=PASS');
-          console.log('I61_PRODUCT_FILES_CHANGED=1');
+          console.log('I61_PRODUCT_FILES_CHANGED=2');
           console.log('PRODUCTION_TOUCHED=false');
           console.log('OPERATIONAL_DATA_TOUCHED=false');
           NODE
 
-      - name: Prove direct password-copy contract and preserve credential-copy contract
+      - name: Prove password-copy and Preview callable contracts
         run: |
           set -euo pipefail
           node --check "$OWNER_FILE"
+          node --check "$PROVIDER_FILE"
           node - <<'NODE'
           const fs=require('node:fs');
-          const t=fs.readFileSync(process.env.OWNER_FILE,'utf8');
+          const owner=fs.readFileSync(process.env.OWNER_FILE,'utf8');
+          const provider=fs.readFileSync(process.env.PROVIDER_FILE,'utf8');
           const need=(x,c)=>{if(!x)throw new Error(c)};
-          need(t.includes('data-od-password-copy'),'I61_PASSWORD_COPY_CONTROL_MISSING');
-          need(t.includes('Copiar contraseña'),'I61_PASSWORD_COPY_LABEL_MISSING');
-          need(t.includes('Copiar credenciales'),'I61_CREDENTIAL_COPY_LABEL_MISSING');
-          need(t.includes("await copyText(out.value)"),'I61_PASSWORD_COPY_NOT_PASSWORD_ONLY');
-          need(t.includes("['Usuario: ' + (user || '—'), 'Contraseña: ' + out.value]"),'I61_CREDENTIAL_COPY_FORMAT_MISSING');
-          need(t.includes('data-od-credential-reveal'),'I61_REVEAL_REGRESSION');
-          need(t.includes('data-od-bank-copy-all'),'I61_BANK_COPY_REGRESSION');
-          need(t.includes('writesStore: false'),'I61_OWNER_WRITE_BOUNDARY_REGRESSION');
-          console.log('I61_PASSWORD_COPY_SOURCE_CONTRACT=PASS');
+          need(owner.includes('data-od-password-copy'),'I61_PASSWORD_COPY_CONTROL_MISSING');
+          need(owner.includes('Copiar contraseña'),'I61_PASSWORD_COPY_LABEL_MISSING');
+          need(owner.includes('Copiar credenciales'),'I61_CREDENTIAL_COPY_LABEL_MISSING');
+          need(owner.includes("await copyText(out.value)"),'I61_PASSWORD_COPY_NOT_PASSWORD_ONLY');
+          need(owner.includes("['Usuario: ' + (user || '—'), 'Contraseña: ' + out.value]"),'I61_CREDENTIAL_COPY_FORMAT_MISSING');
+          need(owner.includes('data-od-credential-reveal'),'I61_REVEAL_REGRESSION');
+          need(owner.includes('data-od-bank-copy-all'),'I61_BANK_COPY_REGRESSION');
+          need(owner.includes('writesStore: false'),'I61_OWNER_WRITE_BOUNDARY_REGRESSION');
+          need(provider.includes('gi-i(?:3|61)-'),'I61_PREVIEW_HOST_MATCHER_NOT_SUCCESSOR_AWARE');
+          need(provider.includes("orbit360ProductInsurerCredentialCommandPreview"),'I61_PREVIEW_CALLABLE_MISSING');
+          need(provider.includes("directFirestoreWrites:false"),'I61_PROVIDER_WRITE_BOUNDARY_REGRESSION');
+          console.log('I61_SOURCE_CONTRACTS=PASS');
           NODE
 
       - name: Resolve existing Firebase Preview credential
@@ -206,7 +214,7 @@ jobs:
           export EVIDENCE="$RUNNER_TEMP/i61-package/evidence/i6-1-preview-evidence.json"
           python3 - <<'PY'
           import json,os
-          e={'schemaVersion':'gravicentra-i6-1-successor-preview-evidence-v1','status':'I6_1_PRODUCT_SUCCESSOR_PREVIEW_TECHNICAL_PASS','product':'Gravicentra Insurance','gate':'I6.1','sourceSha':os.environ['SOURCE_SHA'],'runnerCommit':os.environ['GITHUB_SHA'],'githubRunId':os.environ['GITHUB_RUN_ID'],'buildId':os.environ['BUILD_ID'],'previewChannelId':os.environ['CHANNEL_ID'],'previewUrl':os.environ['PREVIEW_URL'],'hostedFileCount':int(os.environ['HOSTED_FILE_COUNT']),'hostedPayloadDigest':os.environ['HOSTED_PAYLOAD_DIGEST'],'bundleDigest':os.environ['BUNDLE_DIGEST'],'directPasswordCopyContract':True,'credentialCopyPreserved':True,'productionTouched':False,'operationalDataTouched':False,'operationalWritesExecuted':0,'sourceDataApplyExecuted':False,'augustDataTouched':False,'readbackExact':True,'requiresAuthenticatedHumanFunctionalAcceptanceBeforeI6_1PreviewGateSeal':True}
+          e={'schemaVersion':'gravicentra-i6-1-successor-preview-evidence-v1','status':'I6_1_PRODUCT_SUCCESSOR_PREVIEW_TECHNICAL_PASS','product':'Gravicentra Insurance','gate':'I6.1','sourceSha':os.environ['SOURCE_SHA'],'runnerCommit':os.environ['GITHUB_SHA'],'githubRunId':os.environ['GITHUB_RUN_ID'],'buildId':os.environ['BUILD_ID'],'previewChannelId':os.environ['CHANNEL_ID'],'previewUrl':os.environ['PREVIEW_URL'],'hostedFileCount':int(os.environ['HOSTED_FILE_COUNT']),'hostedPayloadDigest':os.environ['HOSTED_PAYLOAD_DIGEST'],'bundleDigest':os.environ['BUNDLE_DIGEST'],'directPasswordCopyContract':True,'credentialCopyPreserved':True,'previewCredentialCallableRoutePass':True,'productSourceFilesChanged':2,'productionTouched':False,'operationalDataTouched':False,'operationalWritesExecuted':0,'sourceDataApplyExecuted':False,'augustDataTouched':False,'readbackExact':True,'requiresAuthenticatedHumanFunctionalAcceptanceBeforeI6_1PreviewGateSeal':True}
           open(os.environ['EVIDENCE'],'w').write(json.dumps(e,sort_keys=True)+'\n')
           PY
 
@@ -228,6 +236,7 @@ jobs:
             echo "- Preview: ${{ steps.deploy.outputs.preview_url }}"
             echo "- Hosted digest: \`${{ steps.build.outputs.hosted_payload_digest }}\`"
             echo '- Direct password copy source contract: PASS'
+            echo '- Preview credential callable route: PASS'
             echo '- Exact Preview byte readback: PASS'
             echo '- Production touched: false'
             echo '- Operational data writes: 0'
