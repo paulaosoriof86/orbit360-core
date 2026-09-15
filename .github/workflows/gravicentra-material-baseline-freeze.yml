@@ -1,0 +1,68 @@
+name: Gravicentra Material Baseline Freeze
+
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths: ['.github/workflows/gravicentra-material-baseline-freeze.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: gravicentra-i6-0-material
+  cancel-in-progress: false
+
+env:
+  FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+  FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+  FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+  GITHUB_TOKEN: ${{ github.token }}
+
+jobs:
+  i6-0:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: recovery/fase-a-clean-20260831
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      # Material I6 markers: IN_PROGRESS_I6_0_BASELINE I6_0_BASELINE dataMutationAuthorized sourceDataApplyAuthorized operationalWritesExecuted: 0 augustDataTouched: false
+      - name: Gate exact I6.0 state
+        run: node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+      - name: Install read-only inventory dependency
+        run: npm install --no-save --package-lock=false firebase-admin@13.10.0 >/dev/null
+      - name: Materialize I6.0 inventory, readback, rollback, integrity and zero-writes evidence
+        run: node tools/gravicentra-i6-0-material-executor-v1.mjs --prepare
+      - name: Commit candidate freeze and prove post-transition guard
+        run: |
+          set -euo pipefail
+          git config user.name gravicentra-i6-0-bot
+          git config user.email actions@users.noreply.github.com
+          git add tools/gravicentra-i6-control-plane-guard-v1.mjs tools/gravicentra-mechanism-invariant-v2.mjs artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json artifacts/orbit360-recovery/release-control/i6-0-baseline
+          git commit -m "recovery(i6.0): freeze material baseline and rollback [run ${GITHUB_RUN_ID}]"
+          node tools/gravicentra-i6-control-plane-guard-v1.mjs --mode=i6 | tee "$RUNNER_TEMP/i6-0-post-guard.txt"
+          node tools/gravicentra-i6-0-material-executor-v1.mjs --seal-guard "$RUNNER_TEMP/i6-0-post-guard.txt"
+          git add artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json artifacts/orbit360-recovery/release-control/i6-0-baseline
+          git commit --amend --no-edit
+          node tools/gravicentra-i6-control-plane-guard-v1.mjs --mode=i6
+          node tools/gravicentra-mechanism-invariant-v2.mjs
+          node tools/gravicentra-evergreen-sources-invariant-v2.mjs
+          git diff --exit-code
+          git push origin HEAD:recovery/fase-a-clean-20260831
+      - name: Upload execution evidence copy
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i6-0-material-${{ github.run_id }}
+          path: |
+            artifacts/orbit360-recovery/release-control/i6-0-baseline
+            ${{ runner.temp }}/i6-0-post-guard.txt
+          if-no-files-found: warn
+          retention-days: 90
