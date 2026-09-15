@@ -1,0 +1,424 @@
+name: Gravicentra I6.0 Baseline Freeze
+
+on:
+  push:
+    branches:
+      - recovery/fase-a-clean-20260831
+    paths:
+      - '.github/workflows/gravicentra-i6-0-baseline-freeze.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: gravicentra-i6-0-baseline-freeze-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  PROJECT_ID: ays-orbit-360-lab
+  HOSTING_SITE: ays-orbit-360-lab
+  PRODUCTION_URL: https://ays-orbit-360-lab.web.app
+  TENANT_ID: alianzas-soluciones
+  CONTROL_PLANE: artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json
+  DISCIPLINE_LOCK: artifacts/orbit360-recovery/release-control/I6_EXECUTION_DISCIPLINE_LOCK_20260915.json
+  EXECUTOR_PATH: .github/workflows/gravicentra-i6-0-baseline-freeze.yml
+  RECEIPT_PATH: artifacts/orbit360-recovery/release-control/I6_0_BASELINE_FREEZE_RECEIPT_20260915.json
+  SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+  SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+  SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+
+jobs:
+  i6-0-authoritative:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - name: Checkout exact canonical event commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: State gate and exact release binding
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "recovery/fase-a-clean-20260831"
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=governance
+          node tools/gravicentra-i6-control-plane-guard-v1.mjs --mode=i6
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const c=JSON.parse(fs.readFileSync(process.env.CONTROL_PLANE,'utf8'));
+          const d=JSON.parse(fs.readFileSync(process.env.DISCIPLINE_LOCK,'utf8'));
+          const need=(x,m)=>{if(!x)throw new Error(m)};
+          need(d.status==='FROZEN_STATE_FREE_EXECUTION_DISCIPLINE','I6_0_DISCIPLINE_NOT_FROZEN');
+          need(d.rules?.some(x=>x.id==='ONE_AUTHORITATIVE_EXECUTOR'),'I6_0_ONE_EXECUTOR_RULE_MISSING');
+          need(d.i6_0TerminalRule?.operationalDataWritesAllowed===false,'I6_0_WRITE_RULE_INVALID');
+          need(c.gateState?.gates?.I6?.status==='IN_PROGRESS_I6_0_BASELINE','I6_0_NOT_ACTIVE');
+          need(c.gateState?.gates?.I6?.activeSubgate==='I6.0','I6_0_SUBGATE_MISMATCH');
+          need(c.i6Execution?.authorized===true,'I6_0_NOT_AUTHORIZED');
+          need(c.i6Execution?.dataMutationAuthorized===false,'I6_0_DATA_WRITE_AUTH_OPEN');
+          need(c.i6Execution?.productMutationAuthorized===false,'I6_0_PRODUCT_WRITE_AUTH_OPEN');
+          need(c.i6Execution?.sourceDataApplyAuthorized===false,'I6_0_APPLY_AUTH_OPEN');
+          const r=c.certifiedCandidate||{}, s=c.i5GateSeal||{};
+          need(r.sourceSha&&r.buildId&&r.artifactId&&r.artifactArchiveDigest,'I6_0_RELEASE_BINDING_INCOMPLETE');
+          need(s.status==='PASS'&&s.evidenceArtifactId&&s.evidenceArtifactDigest,'I6_0_I5_SEAL_INCOMPLETE');
+          const out={
+            SOURCE_SHA:r.sourceSha,
+            SOURCE_TREE:r.sourceTree,
+            BUILD_ID:r.buildId,
+            I3_RUN_ID:String(r.i3RunId),
+            I3_ARTIFACT_ID:String(r.artifactId),
+            I3_ARTIFACT_DIGEST:r.artifactArchiveDigest,
+            HOSTED_PAYLOAD_DIGEST:r.hostedPayloadDigest,
+            BACKEND_SOURCE_DIGEST:r.backendSourceDigest,
+            I5_RUN_ID:String(s.terminalRunId),
+            I5_ARTIFACT_ID:String(s.evidenceArtifactId),
+            I5_ARTIFACT_DIGEST:s.evidenceArtifactDigest
+          };
+          for(const [k,v] of Object.entries(out)) fs.appendFileSync(process.env.GITHUB_ENV,`${k}=${v}\n`);
+          NODE
+          echo "EXECUTOR_BLOB_SHA=$(git hash-object "$EXECUTOR_PATH")" >> "$GITHUB_ENV"
+
+      - name: Materialize exact certified rollback artifacts
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          E="$RUNNER_TEMP/i6-0-evidence"
+          X="$RUNNER_TEMP/i6-0-extracted"
+          mkdir -p "$E/rollback" "$E/snapshot" "$E/inventory" "$E/integrity" "$X/i3" "$X/i5"
+          echo "I6_0_EVIDENCE=$E" >> "$GITHUB_ENV"
+          echo "I6_0_EXTRACTED=$X" >> "$GITHUB_ENV"
+
+          curl -fsSL \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/artifacts/$I3_ARTIFACT_ID/zip" \
+            -o "$E/rollback/certified-i3-artifact.zip"
+          curl -fsSL \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/artifacts/$I5_ARTIFACT_ID/zip" \
+            -o "$E/rollback/i5-live-acceptance-evidence.zip"
+
+          GOT_I3="sha256:$(sha256sum "$E/rollback/certified-i3-artifact.zip" | awk '{print $1}')"
+          GOT_I5="sha256:$(sha256sum "$E/rollback/i5-live-acceptance-evidence.zip" | awk '{print $1}')"
+          test "$GOT_I3" = "$I3_ARTIFACT_DIGEST"
+          test "$GOT_I5" = "$I5_ARTIFACT_DIGEST"
+
+          unzip -q "$E/rollback/certified-i3-artifact.zip" -d "$X/i3"
+          unzip -q "$E/rollback/i5-live-acceptance-evidence.zip" -d "$X/i5"
+          (cd "$X/i3/bundle/site" && sha256sum -c ../../evidence/site-manifest.sha256 >/dev/null)
+          (cd "$X/i3/bundle/backend" && sha256sum -c ../../evidence/backend-manifest.sha256 >/dev/null)
+
+          export I3_EV="$X/i3/evidence/i3-evidence.json" I5_EV="$X/i5/i5-live-acceptance.json"
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const need=(x,m)=>{if(!x)throw new Error(m)};
+          const i3=JSON.parse(fs.readFileSync(process.env.I3_EV,'utf8'));
+          const i5=JSON.parse(fs.readFileSync(process.env.I5_EV,'utf8'));
+          need(i3.sourceSha===process.env.SOURCE_SHA,'I6_0_I3_SOURCE_MISMATCH');
+          need(i3.buildId===process.env.BUILD_ID,'I6_0_I3_BUILD_MISMATCH');
+          need(i3.hostedPayloadDigest===process.env.HOSTED_PAYLOAD_DIGEST,'I6_0_I3_HOSTED_DIGEST_MISMATCH');
+          need(i3.backendSourceDigest===process.env.BACKEND_SOURCE_DIGEST,'I6_0_I3_BACKEND_DIGEST_MISMATCH');
+          need(i3.readbackExact===true,'I6_0_I3_READBACK_NOT_EXACT');
+          need(i5.status==='I5_LIVE_ACCEPTANCE_PASS','I6_0_I5_ACCEPTANCE_NOT_PASS');
+          need(i5.sourceSha===process.env.SOURCE_SHA&&i5.buildId===process.env.BUILD_ID,'I6_0_I5_RELEASE_MISMATCH');
+          need(Number(i5.artifactId)===Number(process.env.I3_ARTIFACT_ID),'I6_0_I5_ARTIFACT_MISMATCH');
+          need(i5.productionReadbackExact===true,'I6_0_I5_PRODUCTION_READBACK_NOT_EXACT');
+          need(i5.augustDataTouched===false,'I6_0_I5_AUGUST_TOUCHED');
+          NODE
+
+      - name: Fresh production hosted-byte readback
+        shell: bash
+        run: |
+          set -euo pipefail
+          export SITE_MANIFEST="$I6_0_EXTRACTED/i3/evidence/site-manifest.sha256"
+          python3 - <<'PY'
+          import concurrent.futures,hashlib,json,os,urllib.parse,urllib.request
+          manifest=os.environ['SITE_MANIFEST']; base=os.environ['PRODUCTION_URL'].rstrip('/')
+          rows=[]
+          for line in open(manifest,encoding='utf-8'):
+            line=line.rstrip('\n')
+            if not line: continue
+            want,rel=line.split('  ',1); rows.append((want,rel))
+          def probe(row):
+            want,rel=row
+            url=base+'/'+urllib.parse.quote(rel,safe='/')+'?i60='+os.environ['HOSTED_PAYLOAD_DIGEST'][:12]
+            req=urllib.request.Request(url,headers={'Accept-Encoding':'identity','Cache-Control':'no-cache'})
+            try:
+              with urllib.request.urlopen(req,timeout=30) as r:
+                body=r.read(); got=hashlib.sha256(body).hexdigest(); status=getattr(r,'status',200)
+              return {'path':rel,'status':status,'expectedSha256':want,'actualSha256':got,'match':got==want}
+            except Exception as e:
+              return {'path':rel,'status':None,'expectedSha256':want,'actualSha256':None,'match':False,'error':str(e)[:240]}
+          with concurrent.futures.ThreadPoolExecutor(max_workers=12) as ex:
+            result=list(ex.map(probe,rows))
+          bad=[x for x in result if not x['match']]
+          out={
+            'schemaVersion':'gravicentra-i6-0-hosting-readback-v1',
+            'status':'PASS' if not bad else 'FAIL',
+            'productionUrl':base,
+            'sourceSha':os.environ['SOURCE_SHA'],
+            'buildId':os.environ['BUILD_ID'],
+            'artifactId':int(os.environ['I3_ARTIFACT_ID']),
+            'hostedPayloadDigest':os.environ['HOSTED_PAYLOAD_DIGEST'],
+            'fileCount':len(rows),
+            'readbackExact':not bad,
+            'failureCount':len(bad),
+            'failures':bad[:20],
+            'operationalWritesExecuted':0,
+            'augustDataTouched':False
+          }
+          p=os.path.join(os.environ['I6_0_EVIDENCE'],'snapshot','hosting-readback.json')
+          open(p,'w',encoding='utf-8').write(json.dumps(out,indent=2,sort_keys=True)+'\n')
+          if bad: raise SystemExit('I6_0_HOSTING_READBACK_MISMATCH:'+str(len(bad)))
+          PY
+
+      - name: Read-only Firestore, Auth and relationship inventory
+        shell: bash
+        run: |
+          set -euo pipefail
+          NROOT="$RUNNER_TEMP/i6-node"
+          mkdir -p "$NROOT"
+          npm install --prefix "$NROOT" --ignore-scripts --no-audit --no-fund firebase-admin@13.10.0 >/dev/null
+          export NROOT NODE_PATH="$NROOT/node_modules"
+          node - <<'NODE'
+          const fs=require('node:fs'), path=require('node:path');
+          const {initializeApp,cert,deleteApp}=require('firebase-admin/app');
+          const {getFirestore}=require('firebase-admin/firestore');
+          const {getAuth}=require('firebase-admin/auth');
+          const need=(x,m)=>{if(!x)throw new Error(m)};
+          function serviceAccount(){
+            for(const raw of [process.env.SA_DEFAULT,process.env.SA_ORBIT360_LAB,process.env.SA_ORBIT_360_LAB].filter(Boolean)){
+              try{const x=JSON.parse(raw);if(x?.type==='service_account'&&x?.project_id===process.env.PROJECT_ID&&x?.private_key)return x}catch{}
+            }
+            throw new Error('I6_0_SERVICE_ACCOUNT_UNAVAILABLE');
+          }
+          const app=initializeApp({credential:cert(serviceAccount()),projectId:process.env.PROJECT_ID},'gravicentra-i6-0-readonly');
+          const db=getFirestore(app), auth=getAuth(app), tenant=db.collection('tenants').doc(process.env.TENANT_ID);
+          async function count(q){const s=await q.count().get();return Number(s.data().count||0)}
+          async function collDocs(name){
+            const direct=tenant.collection(name), nested=tenant.collection('data').doc(name).collection('items');
+            const [ds,ns]=await Promise.all([direct.get(),nested.get()]);
+            const out=[];
+            for(const [kind,snap] of [['direct',ds],['data_items',ns]]) for(const d of snap.docs) out.push({kind,id:d.id,data:d.data()||{}});
+            return out;
+          }
+          const rootCols=await tenant.listCollections();
+          const rootCounts={};
+          for(const c of rootCols.sort((a,b)=>a.id.localeCompare(b.id))) rootCounts[c.id]=await count(c);
+          const dataDocs=await tenant.collection('data').get();
+          const dataItemCounts={};
+          for(const d of dataDocs.docs.sort((a,b)=>a.id.localeCompare(b.id))) dataItemCounts[d.id]=await count(d.ref.collection('items'));
+
+          let authCount=0, disabled=0, verified=0, token;
+          do{const page=await auth.listUsers(1000,token);for(const u of page.users){authCount++;if(u.disabled)disabled++;if(u.emailVerified)verified++;}token=page.pageToken;}while(token);
+          const members=await tenant.collection('members').get();
+          const roleCounts={};
+          for(const d of members.docs){const m=d.data()||{},rs=Array.isArray(m.roles)?m.roles:Array.isArray(m.rolesAsignados)?m.roles:[m.role||m.rol].filter(Boolean);for(const r of rs){const k=String(r);roleCounts[k]=(roleCounts[k]||0)+1}}
+
+          const names=['clientes','polizas','vehiculos','recibosEsperados','carteraPrimas','cobros','negocios','aseguradoras','comisiones','reclamos','gestiones'];
+          const docs={}; for(const n of names) docs[n]=await collDocs(n);
+          const idset=n=>new Set(docs[n].map(x=>x.id));
+          const edges=[
+            ['polizas','clienteId','clientes'],
+            ['vehiculos','clienteId','clientes'],['vehiculos','polizaId','polizas'],
+            ['recibosEsperados','clienteId','clientes'],['recibosEsperados','polizaId','polizas'],
+            ['carteraPrimas','clienteId','clientes'],['carteraPrimas','polizaId','polizas'],
+            ['cobros','clienteId','clientes'],['cobros','polizaId','polizas'],['cobros','reciboId','recibosEsperados'],
+            ['negocios','clienteId','clientes'],['negocios','polizaId','polizas'],
+            ['comisiones','clienteId','clientes'],['comisiones','polizaId','polizas']
+          ];
+          const relations=[];
+          for(const [from,field,to] of edges){const target=idset(to);let refs=0,missing=0;for(const d of docs[from]){const v=d.data?.[field];if(v==null||String(v).trim()==='')continue;refs++;if(!target.has(String(v)))missing++;}relations.push({from,field,to,refs,missing});}
+          const operationalCounts={};for(const n of names) operationalCounts[n]={total:docs[n].length,direct:docs[n].filter(x=>x.kind==='direct').length,dataItems:docs[n].filter(x=>x.kind==='data_items').length};
+          const orphanTotal=relations.reduce((n,x)=>n+x.missing,0);
+          const out={
+            schemaVersion:'gravicentra-i6-0-operational-inventory-v1',status:'PASS',projectId:process.env.PROJECT_ID,tenantId:process.env.TENANT_ID,
+            releaseIdentity:{sourceSha:process.env.SOURCE_SHA,buildId:process.env.BUILD_ID,artifactId:Number(process.env.I3_ARTIFACT_ID)},
+            snapshotType:'READ_ONLY_CURRENT_PRODUCTION_BASELINE',capturedAt:new Date().toISOString(),
+            rootCollectionCounts:rootCounts,dataItemCounts,phaseAOperationalCounts:operationalCounts,
+            auth:{users:authCount,disabled,emailVerified:verified},members:{count:members.size,roleCounts},
+            relationships:{checks:relations,missingReferenceCount:orphanTotal},
+            sensitiveValuesRecorded:false,operationalWritesExecuted:0,augustDataTouched:false
+          };
+          fs.writeFileSync(path.join(process.env.I6_0_EVIDENCE,'inventory','production-inventory.json'),JSON.stringify(out,null,2)+'\n');
+          const backlog={
+            schemaVersion:'gravicentra-i6-0-postexit-backlog-v1',source:'Evergreen V4 section I6.1 + current baseline relationship inventory',
+            fixedNextGate:'I6.1',items:[
+              'session/reload','direct password copy','user create/invite/edit and roles','real commission calculation and visibility','global receipts','undefined and inconsistencies','policy visual hierarchy','scrollbar and favicon/PWA','Academia by role','History','CRUD/synchronization Ops Leads Cliente360 Polizas Cobros Smart Importer'
+            ],
+            observedBaseline:{missingRelationshipReferences:orphanTotal},operationalWritesExecuted:0
+          };
+          fs.writeFileSync(path.join(process.env.I6_0_EVIDENCE,'inventory','postexit-backlog.json'),JSON.stringify(backlog,null,2)+'\n');
+          deleteApp(app).catch(()=>{});
+          NODE
+
+      - name: Read-only deployed function surface inventory
+        shell: bash
+        run: |
+          set -euo pipefail
+          CROOT="$RUNNER_TEMP/firebase-cli"
+          npm install --prefix "$CROOT" --ignore-scripts --no-audit --no-fund firebase-tools@14.10.1 >/dev/null
+          A="$RUNNER_TEMP/i6-auth"; mkdir -p "$A"; export A
+          python3 - <<'PY'
+          import json,os,pathlib
+          rows=[]
+          for i,k in enumerate(['SA_DEFAULT','SA_ORBIT360_LAB','SA_ORBIT_360_LAB']):
+            try:d=json.loads(os.environ.get(k,''))
+            except:continue
+            if d.get('type')=='service_account' and d.get('project_id')==os.environ['PROJECT_ID'] and d.get('private_key'):
+              p=pathlib.Path(os.environ['A'])/f'{i}.json';p.write_text(json.dumps(d));p.chmod(0o600);rows.append(str(p))
+          if not rows:raise SystemExit('I6_0_NO_SERVICE_ACCOUNT')
+          pathlib.Path(os.environ['A']+'/files').write_text('\n'.join(rows)+'\n')
+          PY
+          CLI="$CROOT/node_modules/firebase-tools/lib/bin/firebase.js"
+          SEL=''
+          while read -r F; do
+            if GOOGLE_APPLICATION_CREDENTIALS="$F" node "$CLI" functions:list --project "$PROJECT_ID" --non-interactive --json >/dev/null 2>&1; then SEL="$F"; break; fi
+          done < "$A/files"
+          test -n "$SEL"
+          export GOOGLE_APPLICATION_CREDENTIALS="$SEL"
+          node "$CLI" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/functions.json"
+          export FUNCTIONS_JSON="$RUNNER_TEMP/functions.json"
+          node - <<'NODE'
+          const fs=require('node:fs'),path=require('node:path');
+          const raw=JSON.parse(fs.readFileSync(process.env.FUNCTIONS_JSON,'utf8'));
+          const a=Array.isArray(raw.result)?raw.result:(Array.isArray(raw)?raw:[]);
+          const rows=a.map(x=>({name:String(x.entryPoint||x.id||x.name||''),region:String(x.region||x.regionId||''),runtime:String(x.runtime||x.platform||'')})).filter(x=>x.name).sort((x,y)=>x.name.localeCompare(y.name));
+          const targets=['orbit360ProductOperationalCommand','orbit360ProductInsurerCredentialCommand','orbit360OpsLeadsCommand','orbit360CobrosReconciliationCommand','orbit360GetAdvisorOpsInbox','orbit360TenantDomainConfig'];
+          const names=new Set(rows.map(x=>x.name));const missing=targets.filter(x=>!names.has(x));
+          const out={schemaVersion:'gravicentra-i6-0-functions-inventory-v1',status:missing.length?'FAIL':'PASS',projectId:process.env.PROJECT_ID,total:rows.length,functions:rows,certifiedI5Targets:targets,missingCertifiedTargets:missing,operationalWritesExecuted:0};
+          fs.writeFileSync(path.join(process.env.I6_0_EVIDENCE,'inventory','functions-inventory.json'),JSON.stringify(out,null,2)+'\n');
+          if(missing.length)throw new Error('I6_0_CERTIFIED_FUNCTION_TARGET_MISSING:'+missing.join(','));
+          NODE
+
+      - name: Materialize rollback plan, zero-write proof and integrity manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          export I5_INTENT="artifacts/orbit360-recovery/release-control/I5_EXECUTION_INTENT.json"
+          node - <<'NODE'
+          const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
+          const c=JSON.parse(fs.readFileSync(process.env.CONTROL_PLANE,'utf8'));
+          const i=JSON.parse(fs.readFileSync(process.env.I5_INTENT,'utf8'));
+          const E=process.env.I6_0_EVIDENCE;
+          const hash=p=>crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex');
+          const rollback={
+            schemaVersion:'gravicentra-i6-0-rollback-package-v1',status:'MATERIALIZED',releaseIdentity:{sourceSha:process.env.SOURCE_SHA,sourceTree:process.env.SOURCE_TREE,buildId:process.env.BUILD_ID,artifactId:Number(process.env.I3_ARTIFACT_ID),artifactArchiveDigest:process.env.I3_ARTIFACT_DIGEST,hostedPayloadDigest:process.env.HOSTED_PAYLOAD_DIGEST,backendSourceDigest:process.env.BACKEND_SOURCE_DIGEST},
+            material:{certifiedArtifact:'rollback/certified-i3-artifact.zip',certifiedArtifactSha256:hash(path.join(E,'rollback','certified-i3-artifact.zip')),i5AcceptanceEvidence:'rollback/i5-live-acceptance-evidence.zip',i5AcceptanceEvidenceSha256:hash(path.join(E,'rollback','i5-live-acceptance-evidence.zip'))},
+            restoreContract:{frontend:'extract certified artifact and restore exact bundle/site bytes to the canonical Firebase Hosting site; rebuild is forbidden; verify every file against evidence/site-manifest.sha256 and production readback',backend:'extract exact bundle/backend package and restore only the certified I5 target functions; verify evidence/backend-manifest.sha256 before deploy',backendTargets:i.promotionPlan.backend.targets,preservePreexistingFunctions:true,data:'no baseline data rewrite is part of release rollback; operational data restoration requires its own governed snapshot/receipt'},
+            productionBaseline:c.status,augustDataTouched:false,operationalWritesExecuted:0
+          };
+          fs.writeFileSync(path.join(E,'rollback','rollback-plan.json'),JSON.stringify(rollback,null,2)+'\n');
+          const zero={schemaVersion:'gravicentra-i6-0-zero-writes-proof-v1',status:'PASS',executorPath:process.env.EXECUTOR_PATH,executorBlobSha:process.env.EXECUTOR_BLOB_SHA,releaseIdentity:{sourceSha:process.env.SOURCE_SHA,buildId:process.env.BUILD_ID,artifactId:Number(process.env.I3_ARTIFACT_ID)},operationalWritesExecuted:0,firestoreWritesExecuted:0,authWritesExecuted:0,hostingWritesExecuted:0,functionWritesExecuted:0,sourceDataApplyWritesExecuted:0,productMutationsExecuted:0,augustDataTouched:false,evidenceFilesystemWritesOnly:true,readOnlyExternalOperations:['GitHub artifact GET','Firebase Auth listUsers','Firestore listCollections/get/count','Firebase functions:list','HTTPS GET production hosted bytes'],forbiddenMutationOperationsInvoked:[]};
+          fs.writeFileSync(path.join(E,'zero-writes.json'),JSON.stringify(zero,null,2)+'\n');
+          NODE
+
+          node - <<'NODE'
+          const fs=require('node:fs'),path=require('node:path');
+          const E=process.env.I6_0_EVIDENCE,need=(x,m)=>{if(!x)throw new Error(m)},j=p=>JSON.parse(fs.readFileSync(path.join(E,p),'utf8'));
+          const h=j('snapshot/hosting-readback.json'),inv=j('inventory/production-inventory.json'),fun=j('inventory/functions-inventory.json'),rb=j('rollback/rollback-plan.json'),z=j('zero-writes.json');
+          for(const x of [h,inv,rb,z]) need(x.releaseIdentity?.sourceSha===process.env.SOURCE_SHA&&x.releaseIdentity?.buildId===process.env.BUILD_ID&&Number(x.releaseIdentity?.artifactId)===Number(process.env.I3_ARTIFACT_ID),'I6_0_EVIDENCE_RELEASE_IDENTITY_MISMATCH');
+          need(h.status==='PASS'&&h.readbackExact===true&&h.fileCount>0,'I6_0_HOSTING_READBACK_INVALID');
+          need(inv.status==='PASS'&&inv.operationalWritesExecuted===0,'I6_0_INVENTORY_INVALID');
+          need(fun.status==='PASS'&&fun.operationalWritesExecuted===0&&fun.missingCertifiedTargets.length===0,'I6_0_FUNCTION_INVENTORY_INVALID');
+          need(rb.status==='MATERIALIZED'&&rb.material?.certifiedArtifactSha256===process.env.I3_ARTIFACT_DIGEST.replace(/^sha256:/,''),'I6_0_ROLLBACK_INVALID');
+          need(z.status==='PASS'&&z.operationalWritesExecuted===0&&z.augustDataTouched===false&&z.forbiddenMutationOperationsInvoked.length===0,'I6_0_ZERO_WRITES_INVALID');
+          const out={schemaVersion:'gravicentra-i6-0-adjudication-v1',gate:'I6.0',status:'I6_0_BASELINE_EVIDENCE_PASS',releaseIdentity:{sourceSha:process.env.SOURCE_SHA,sourceTree:process.env.SOURCE_TREE,buildId:process.env.BUILD_ID,artifactId:Number(process.env.I3_ARTIFACT_ID),artifactArchiveDigest:process.env.I3_ARTIFACT_DIGEST,hostedPayloadDigest:process.env.HOSTED_PAYLOAD_DIGEST,backendSourceDigest:process.env.BACKEND_SOURCE_DIGEST},inventoryMaterialized:true,snapshotReadbackExact:true,rollbackMaterialized:true,integrityPrepared:true,operationalWritesExecuted:0,augustDataTouched:false,nextState:'I6_0_BASELINE_FROZEN'};
+          fs.writeFileSync(path.join(E,'i6-0-adjudication.json'),JSON.stringify(out,null,2)+'\n');
+          NODE
+
+          (
+            cd "$I6_0_EVIDENCE"
+            find . -type f ! -path './integrity/MANIFEST.sha256' -print0 | sort -z | xargs -0 sha256sum > integrity/MANIFEST.sha256
+            sha256sum -c integrity/MANIFEST.sha256 >/dev/null
+          )
+
+      - name: Upload immutable I6.0 material evidence
+        id: upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i6-0-baseline-${{ github.run_id }}
+          path: ${{ env.I6_0_EVIDENCE }}
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Seal I6.0 in Control Plane only after material PASS
+        shell: bash
+        env:
+          I6_ARTIFACT_ID: ${{ steps.upload.outputs.artifact-id }}
+          I6_ARTIFACT_DIGEST: ${{ steps.upload.outputs.artifact-digest }}
+        run: |
+          set -euo pipefail
+          test -n "$I6_ARTIFACT_ID"
+          test -n "$I6_ARTIFACT_DIGEST"
+          test "$(jq -r .status "$I6_0_EVIDENCE/i6-0-adjudication.json")" = "I6_0_BASELINE_EVIDENCE_PASS"
+          test "$(jq -r .operationalWritesExecuted "$I6_0_EVIDENCE/zero-writes.json")" = "0"
+
+          git fetch origin recovery/fase-a-clean-20260831
+          test "$(git rev-parse origin/recovery/fase-a-clean-20260831)" = "$GITHUB_SHA"
+
+          export ADJ="$I6_0_EVIDENCE/i6-0-adjudication.json" MANIFEST="$I6_0_EVIDENCE/integrity/MANIFEST.sha256"
+          node - <<'NODE'
+          const fs=require('node:fs'),crypto=require('node:crypto');
+          const need=(x,m)=>{if(!x)throw new Error(m)},hash=p=>crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex');
+          const cp=JSON.parse(fs.readFileSync(process.env.CONTROL_PLANE,'utf8'));
+          const adj=JSON.parse(fs.readFileSync(process.env.ADJ,'utf8'));
+          need(cp.gateState?.gates?.I6?.status==='IN_PROGRESS_I6_0_BASELINE','I6_0_SEAL_STATE_CHANGED');
+          need(cp.i6Execution?.dataMutationAuthorized===false&&cp.i6Execution?.sourceDataApplyAuthorized===false&&cp.i6Execution?.productMutationAuthorized===false,'I6_0_SEAL_MUTATION_AUTH_CHANGED');
+          need(adj.status==='I6_0_BASELINE_EVIDENCE_PASS'&&adj.operationalWritesExecuted===0,'I6_0_SEAL_ADJUDICATION_INVALID');
+          const receipt={schemaVersion:'gravicentra-i6-0-baseline-freeze-receipt-v1',gate:'I6.0',status:'I6_0_BASELINE_FROZEN',runId:Number(process.env.GITHUB_RUN_ID),headSha:process.env.GITHUB_SHA,executorPath:process.env.EXECUTOR_PATH,executorBlobSha:process.env.EXECUTOR_BLOB_SHA,evidenceArtifactId:Number(process.env.I6_ARTIFACT_ID),evidenceArtifactDigest:process.env.I6_ARTIFACT_DIGEST,evidenceManifestSha256:hash(process.env.MANIFEST),adjudicationSha256:hash(process.env.ADJ),releaseIdentity:adj.releaseIdentity,inventoryMaterialized:true,snapshotReadbackExact:true,rollbackMaterialized:true,integrityPass:true,operationalWritesExecuted:0,augustDataTouched:false,productMutationExecuted:false,nextGate:'I6.1'};
+          fs.writeFileSync(process.env.RECEIPT_PATH,JSON.stringify(receipt,null,2)+'\n');
+          cp.gateState.gates.I6.status='I6_0_BASELINE_FROZEN';
+          cp.gateState.gates.I6.activeSubgate='I6.1';
+          cp.gateState.currentTransition='I6_1_FUNCTIONAL_CLOSURE';
+          cp.i6Execution.activeSubgate='I6.1';
+          cp.i6_0GateSeal={status:'PASS',runId:receipt.runId,headSha:receipt.headSha,evidenceArtifactId:receipt.evidenceArtifactId,evidenceArtifactDigest:receipt.evidenceArtifactDigest,evidenceManifestSha256:receipt.evidenceManifestSha256,adjudicationSha256:receipt.adjudicationSha256,sameCertifiedSourceSha:receipt.releaseIdentity.sourceSha,sameCertifiedBuildId:receipt.releaseIdentity.buildId,sameCertifiedArtifactId:receipt.releaseIdentity.artifactId,inventoryMaterialized:true,snapshotReadbackExact:true,rollbackMaterialized:true,integrityPass:true,operationalWritesExecuted:0,augustDataTouched:false,receiptPath:process.env.RECEIPT_PATH};
+          cp.postProductionProgress={formalPercent:10,frozenMiniGates:1,totalMiniGates:10,lastFrozenGate:'I6.0',activeGate:'I6.1',partialMiniGateCredit:false};
+          cp.postI5Governance={...(cp.postI5Governance||{}),i6_0ExecutorPath:process.env.EXECUTOR_PATH};
+          cp.governanceSyncChecklist={...(cp.governanceSyncChecklist||{}),i6_0MaterialExecutorReady:true,i6_0PhysicalPass:true,i6_0BaselineFrozen:true};
+          cp.nextAction='I6_1_FUNCTIONAL_CLOSURE';
+          fs.writeFileSync(process.env.CONTROL_PLANE,JSON.stringify(cp,null,2)+'\n');
+          NODE
+
+          node - <<'NODE'
+          const fs=require('node:fs'),cp=JSON.parse(fs.readFileSync(process.env.CONTROL_PLANE,'utf8')),r=JSON.parse(fs.readFileSync(process.env.RECEIPT_PATH,'utf8')),need=(x,m)=>{if(!x)throw new Error(m)};
+          need(cp.status==='PRODUCTION_ACCEPTED','I6_0_POST_GUARD_PRODUCTION_STATUS_DRIFT');
+          need(cp.gateState?.gates?.I6?.status==='I6_0_BASELINE_FROZEN','I6_0_POST_GUARD_GATE_NOT_FROZEN');
+          need(cp.gateState?.gates?.I6?.activeSubgate==='I6.1'&&cp.i6Execution?.activeSubgate==='I6.1','I6_0_POST_GUARD_NEXT_GATE_NOT_OPEN');
+          need(cp.i6Execution?.dataMutationAuthorized===false&&cp.i6Execution?.sourceDataApplyAuthorized===false&&cp.i6Execution?.productMutationAuthorized===false,'I6_0_POST_GUARD_MUTATION_AUTH_DRIFT');
+          need(cp.postProductionProgress?.formalPercent===10&&cp.postProductionProgress?.frozenMiniGates===1,'I6_0_POST_GUARD_PROGRESS_INVALID');
+          need(r.status==='I6_0_BASELINE_FROZEN'&&r.operationalWritesExecuted===0&&r.integrityPass===true,'I6_0_POST_GUARD_RECEIPT_INVALID');
+          need(cp.certifiedCandidate?.sourceSha===r.releaseIdentity?.sourceSha&&cp.certifiedCandidate?.buildId===r.releaseIdentity?.buildId&&Number(cp.certifiedCandidate?.artifactId)===Number(r.releaseIdentity?.artifactId),'I6_0_POST_GUARD_RELEASE_DRIFT');
+          NODE
+
+          ACTUAL="$(git diff --name-only | sort)"
+          EXPECTED="$(printf '%s\n%s\n' "$CONTROL_PLANE" "$RECEIPT_PATH" | sort)"
+          test "$ACTUAL" = "$EXPECTED" || {
+            echo "Unexpected local changes:"; printf '%s\n' "$ACTUAL"; exit 1;
+          }
+          git config user.name "gravicentra-governance-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add "$CONTROL_PLANE" "$RECEIPT_PATH"
+          git commit -m "governance(i6.0): freeze production baseline and rollback"
+          git push origin HEAD:recovery/fase-a-clean-20260831
+
+          git fetch origin recovery/fase-a-clean-20260831
+          test "$(git rev-parse HEAD)" = "$(git rev-parse origin/recovery/fase-a-clean-20260831)"
+          FORBIDDEN="$(git diff --name-only "$SOURCE_SHA"..HEAD | grep -Ev '^(\.github/workflows/gravicentra-|tools/gravicentra-|artifacts/orbit360-recovery/release-control/|artifacts/orbit360-recovery/project-sources-v2/)' || true)"
+          test -z "$FORBIDDEN"
+          echo "I6_0_FINAL_STATUS=I6_0_BASELINE_FROZEN"
+          echo "I6_0_FORMAL_PROGRESS=10%"
+          echo "I6_0_OPERATIONAL_WRITES_EXECUTED=0"
+          echo "I6_0_NEXT_GATE=I6.1"
