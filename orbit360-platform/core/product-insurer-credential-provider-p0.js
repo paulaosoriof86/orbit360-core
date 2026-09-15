@@ -12,7 +12,7 @@
   window.Orbit = window.Orbit || {};
   if (Orbit.productInsurerCredentialProviderP0) return;
 
-  const VERSION = 'gravicentra-product-insurer-credential-provider-p0-v4';
+  const VERSION = 'gravicentra-product-insurer-credential-provider-p0-v5';
   const PROD_CALLABLE = 'orbit360ProductInsurerCredentialCommand';
   const PROD_REGION = 'us-central1';
   const PREVIEW_CALLABLE = 'orbit360ProductInsurerCredentialCommandPreview';
@@ -59,7 +59,7 @@
   function isCertifiedPreviewHost() {
     let host = '';
     try { host = text(window.location && window.location.hostname, 255).toLowerCase(); } catch (e) {}
-    return /^ays-orbit-360-lab--gi-i3-[a-z0-9-]+\.web\.app$/.test(host);
+    return /^ays-orbit-360-lab--gi-i(?:3|61)-[a-z0-9-]+\.web\.app$/.test(host);
   }
 
   function callableTarget() {
