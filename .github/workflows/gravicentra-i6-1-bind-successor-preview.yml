@@ -1,0 +1,136 @@
+name: Gravicentra I6.1 Bind Successor Preview
+
+on:
+  push:
+    branches:
+      - recovery/fase-a-clean-20260831
+    paths:
+      - artifacts/orbit360-recovery/release-control/I6_1_SUCCESSOR_PREVIEW_BIND_INTENT.json
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: gravicentra-i6-1-governance-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  bind:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: recovery/fase-a-clean-20260831
+          fetch-depth: 0
+          persist-credentials: true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify exact successful Preview run and artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('node:fs'),https=require('node:https');
+          const intent=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_1_SUCCESSOR_PREVIEW_BIND_INTENT.json','utf8'));
+          const need=(x,c)=>{if(!x)throw new Error(c)};
+          need(intent.schemaVersion==='gravicentra-i6-1-successor-preview-bind-intent-v1','I61_BIND_INTENT_SCHEMA_INVALID');
+          need(intent.nonAuthoritative===true&&intent.gate==='I6.1','I61_BIND_INTENT_SCOPE_INVALID');
+          need(intent.productionMutationAuthorized===false&&intent.dataMutationAuthorized===false,'I61_BIND_MUTATION_BOUNDARY_INVALID');
+          const get=url=>new Promise((resolve,reject)=>{https.get(url,{headers:{Authorization:'Bearer '+process.env.GH_TOKEN,'User-Agent':'Gravicentra-I6.1','X-GitHub-Api-Version':'2022-11-28'}},r=>{let b='';r.on('data',d=>b+=d);r.on('end',()=>r.statusCode>=200&&r.statusCode<300?resolve(JSON.parse(b)):reject(new Error('GITHUB_HTTP_'+r.statusCode)));}).on('error',reject)});
+          (async()=>{
+            const run=await get('https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/runs/'+intent.runId);
+            need(run.name==='Gravicentra I6.1 Functional Successor Preview','I61_BIND_RUN_NAME_INVALID');
+            need(run.status==='completed'&&run.conclusion==='success','I61_BIND_RUN_NOT_SUCCESS');
+            need(run.head_sha===intent.sourceSha,'I61_BIND_RUN_SOURCE_MISMATCH');
+            const arts=await get('https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/runs/'+intent.runId+'/artifacts?per_page=100');
+            const a=(arts.artifacts||[]).find(x=>x.id===intent.artifactId&&x.name===intent.artifactName);
+            need(a&&!a.expired,'I61_BIND_ARTIFACT_MISSING');
+            need(a.digest===intent.artifactArchiveDigest,'I61_BIND_ARTIFACT_DIGEST_MISMATCH');
+            console.log('I61_SUCCESSOR_PREVIEW_REMOTE_EVIDENCE=PASS');
+          })().catch(e=>{console.error(e.message);process.exit(1)});
+          NODE
+
+      - name: Bind successor to canonical control plane and make I6 guard successor-aware
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const cpPath='artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json';
+          const intentPath='artifacts/orbit360-recovery/release-control/I6_1_SUCCESSOR_PREVIEW_BIND_INTENT.json';
+          const guardPath='tools/gravicentra-i6-control-plane-guard-v1.mjs';
+          const receiptPath='artifacts/orbit360-recovery/release-control/I6_1_SUCCESSOR_PREVIEW_TECHNICAL_PASS_20260915.json';
+          const C=JSON.parse(fs.readFileSync(cpPath,'utf8')); const I=JSON.parse(fs.readFileSync(intentPath,'utf8'));
+          const need=(x,c)=>{if(!x)throw new Error(c)};
+          need(C.status==='PRODUCTION_ACCEPTED','I61_BIND_PRODUCTION_STATUS_INVALID');
+          need(C.gateState?.gates?.I6?.status==='I6_0_BASELINE_FROZEN'&&C.gateState?.gates?.I6?.activeSubgate==='I6.1','I61_BIND_GATE_INVALID');
+          need(C.certifiedCandidate?.sourceSha===I.parentCertifiedSourceSha,'I61_BIND_PARENT_RELEASE_MISMATCH');
+          C.nextCandidate={
+            gate:'I6.1',
+            status:'PREVIEW_TECHNICAL_PASS_AWAITING_AUTHENTICATED_HUMAN_ACCEPTANCE',
+            sourceSha:I.sourceSha,
+            sourceTree:I.sourceTree,
+            parentCertifiedSourceSha:I.parentCertifiedSourceSha,
+            allowedProductFiles:['orbit360-platform/core/client-insurer-operational-directory-owner-v20260722.js'],
+            buildId:I.buildId,
+            previewUrl:I.previewUrl,
+            hostedPayloadDigest:I.hostedPayloadDigest,
+            bundleDigest:I.bundleDigest,
+            runId:I.runId,
+            artifactId:I.artifactId,
+            artifactName:I.artifactName,
+            artifactArchiveDigest:I.artifactArchiveDigest,
+            readbackExact:true,
+            readbackFileCount:I.readbackFileCount,
+            productionMutationAuthorized:false,
+            dataMutationAuthorized:false,
+            augustDataTouched:false
+          };
+          C.i61SuccessorPreview={
+            status:'TECHNICAL_PASS_AWAITING_AUTHENTICATED_HUMAN_ACCEPTANCE',
+            rootCauseClosed:'DIRECT_PASSWORD_COPY_CONTROL_MISSING',
+            directPasswordCopyContract:true,
+            combinedCredentialCopyPreserved:true,
+            sourceScopeFileCount:1,
+            sourceSha:I.sourceSha,
+            buildId:I.buildId,
+            previewUrl:I.previewUrl,
+            hostedPayloadDigest:I.hostedPayloadDigest,
+            readbackExact:true,
+            readbackFileCount:I.readbackFileCount,
+            runId:I.runId,
+            artifactId:I.artifactId,
+            productionTouched:false,
+            operationalWritesExecuted:0,
+            augustDataTouched:false,
+            nextRequiredProof:'AUTHENTICATED_HUMAN_PREVIEW_ACCEPTANCE_BEFORE_I6_1_GATE_SEAL'
+          };
+          C.nextAction='I6_1_AUTHENTICATED_HUMAN_PREVIEW_ACCEPTANCE';
+          fs.writeFileSync(cpPath,JSON.stringify(C,null,2)+'\n');
+          const receipt={schemaVersion:'gravicentra-i6-1-successor-preview-technical-pass-v1',status:'TECHNICAL_PASS_AWAITING_AUTHENTICATED_HUMAN_ACCEPTANCE',product:'Gravicentra Insurance',gate:'I6.1',sourceSha:I.sourceSha,buildId:I.buildId,previewUrl:I.previewUrl,hostedPayloadDigest:I.hostedPayloadDigest,bundleDigest:I.bundleDigest,runId:I.runId,artifactId:I.artifactId,artifactName:I.artifactName,artifactArchiveDigest:I.artifactArchiveDigest,readbackExact:true,readbackFileCount:I.readbackFileCount,directPasswordCopyContract:true,combinedCredentialCopyPreserved:true,productionTouched:false,operationalWritesExecuted:0,augustDataTouched:false,nextRequiredProof:'AUTHENTICATED_HUMAN_PREVIEW_ACCEPTANCE_BEFORE_I6_1_GATE_SEAL'};
+          fs.writeFileSync(receiptPath,JSON.stringify(receipt,null,2)+'\n');
+          let g=fs.readFileSync(guardPath,'utf8');
+          const old="const forbidden=changed.filter(p=>!allowedPrefixes.some(prefix=>p.startsWith(prefix)));\nneed(forbidden.length===0,'I6_PRODUCT_SOURCE_DRIFT_BEFORE_I6_1:'+forbidden.slice(0,20).join(','));";
+          const neu="const successor=C.nextCandidate&&C.nextCandidate.gate==='I6.1'?C.nextCandidate:null;\nconst allowedSuccessorProduct=new Set(successor&&Array.isArray(successor.allowedProductFiles)?successor.allowedProductFiles:[]);\nconst forbidden=changed.filter(p=>!allowedPrefixes.some(prefix=>p.startsWith(prefix))&&!allowedSuccessorProduct.has(p));\nneed(forbidden.length===0,'I6_PRODUCT_SOURCE_DRIFT_OUTSIDE_BOUND_SUCCESSOR:'+forbidden.slice(0,20).join(','));\nif(successor){\n need(frozenI60,'I6_1_SUCCESSOR_OUTSIDE_ACTIVE_SUBGATE');\n need(/^[0-9a-f]{40}$/.test(String(successor.sourceSha||'')),'I6_1_SUCCESSOR_SHA_INVALID');\n need(successor.parentCertifiedSourceSha===R.sourceSha,'I6_1_SUCCESSOR_PARENT_MISMATCH');\n need(successor.status==='PREVIEW_TECHNICAL_PASS_AWAITING_AUTHENTICATED_HUMAN_ACCEPTANCE','I6_1_SUCCESSOR_STATUS_INVALID');\n need(successor.readbackExact===true&&Number(successor.readbackFileCount)>0,'I6_1_SUCCESSOR_READBACK_INVALID');\n try{execFileSync('git',['merge-base','--is-ancestor',successor.sourceSha,current],{stdio:'ignore'});}catch{throw new Error('I6_1_SUCCESSOR_NOT_ANCESTOR');}\n}";
+          need(g.includes(old),'I61_GUARD_PATCH_TARGET_NOT_FOUND');
+          g=g.replace(old,neu); fs.writeFileSync(guardPath,g);
+          NODE
+          node --check tools/gravicentra-i6-control-plane-guard-v1.mjs
+          node tools/gravicentra-i6-control-plane-guard-v1.mjs --mode=i6
+
+      - name: Commit canonical I6.1 Preview binding
+        run: |
+          set -euo pipefail
+          git config user.name gravicentra-i6-1-bot
+          git config user.email actions@users.noreply.github.com
+          git add artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json \
+                  artifacts/orbit360-recovery/release-control/I6_1_SUCCESSOR_PREVIEW_TECHNICAL_PASS_20260915.json \
+                  tools/gravicentra-i6-control-plane-guard-v1.mjs
+          git diff --cached --quiet && { echo I61_BIND_NO_CHANGES >&2; exit 1; }
+          git commit -m "governance(i6.1): bind successor Preview technical pass [run 35015830993]"
+          git push origin HEAD:recovery/fase-a-clean-20260831
