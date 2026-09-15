@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "gravicentra-i6-1-successor-preview-technical-pass-v1",
+  "status": "TECHNICAL_PASS_AWAITING_AUTHENTICATED_HUMAN_ACCEPTANCE",
+  "product": "Gravicentra Insurance",
+  "gate": "I6.1",
+  "sourceSha": "e46ef17083559a5b8991c149eca9c1740263bc14",
+  "buildId": "gi-i61-e46ef1708355-57f234755dc1",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i61-35015830993-rx9ktzms.web.app",
+  "hostedPayloadDigest": "adabb21accc0a377d059c72331d501c0eb7eb582faa11b28c1e44d455fe4b507",
+  "bundleDigest": "9d0e79fb97e3f4b486e1ef4e5609f276af33a7080613a7e431495b1a1fcbb901",
+  "runId": 35015830993,
+  "artifactId": 10415208915,
+  "artifactName": "gravicentra-i6-1-35015830993",
+  "artifactArchiveDigest": "sha256:5dd5ac8e483a500e6873f23e5585a66ef9ee9374a0d5a2fbbfce6066bdc00472",
+  "readbackExact": true,
+  "readbackFileCount": 202,
+  "directPasswordCopyContract": true,
+  "combinedCredentialCopyPreserved": true,
+  "productionTouched": false,
+  "operationalWritesExecuted": 0,
+  "augustDataTouched": false,
+  "nextRequiredProof": "AUTHENTICATED_HUMAN_PREVIEW_ACCEPTANCE_BEFORE_I6_1_GATE_SEAL"
+}

@@ -154,7 +154,29 @@
     "buildId": "gi-i3-73674c5f0a0b-57f234755dc1",
     "reasonSuperseded": "I4A run 34555949312 proved that authoritative Firestore contains one negocio while the certified Preview never server-confirms negocios because the effective product access policy omitted that collection; minimal successor 16f174d08702 passed I2 and I3 exact readback."
   },
-  "nextCandidate": null,
+  "nextCandidate": {
+    "gate": "I6.1",
+    "status": "PREVIEW_TECHNICAL_PASS_AWAITING_AUTHENTICATED_HUMAN_ACCEPTANCE",
+    "sourceSha": "e46ef17083559a5b8991c149eca9c1740263bc14",
+    "sourceTree": "86e873a807c96f0d799eaaffe4969bd4768b4b9b",
+    "parentCertifiedSourceSha": "16f174d087024085eff18079c486f717ef98d691",
+    "allowedProductFiles": [
+      "orbit360-platform/core/client-insurer-operational-directory-owner-v20260722.js"
+    ],
+    "buildId": "gi-i61-e46ef1708355-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i61-35015830993-rx9ktzms.web.app",
+    "hostedPayloadDigest": "adabb21accc0a377d059c72331d501c0eb7eb582faa11b28c1e44d455fe4b507",
+    "bundleDigest": "9d0e79fb97e3f4b486e1ef4e5609f276af33a7080613a7e431495b1a1fcbb901",
+    "runId": 35015830993,
+    "artifactId": 10415208915,
+    "artifactName": "gravicentra-i6-1-35015830993",
+    "artifactArchiveDigest": "sha256:5dd5ac8e483a500e6873f23e5585a66ef9ee9374a0d5a2fbbfce6066bdc00472",
+    "readbackExact": true,
+    "readbackFileCount": 202,
+    "productionMutationAuthorized": false,
+    "dataMutationAuthorized": false,
+    "augustDataTouched": false
+  },
   "i4aGateSeal": {
     "status": "PASS",
     "terminalRunId": 34560184247,
@@ -439,7 +461,7 @@
     "i6ExecutorStateGated": true,
     "i6AuthorizationReceiptMaterialized": true
   },
-  "nextAction": "I6_1_FUNCTIONAL_CLOSURE",
+  "nextAction": "I6_1_AUTHENTICATED_HUMAN_PREVIEW_ACCEPTANCE",
   "postproductionExitProgress": {
     "formalPercent": 10,
     "frozenMiniGates": 1,
@@ -472,5 +494,24 @@
     "postGuardPass": true,
     "postGuardReceiptPath": "artifacts/orbit360-recovery/release-control/i6-0-baseline/gi-i3-16f174d08702-57f234755dc1/post-guard-receipt.json",
     "postGuardReceiptSha256": "e7593c29633b74ddfe39f3235bd35deee95bc54619a595714b8ed1e6dade1f9f"
+  },
+  "i61SuccessorPreview": {
+    "status": "TECHNICAL_PASS_AWAITING_AUTHENTICATED_HUMAN_ACCEPTANCE",
+    "rootCauseClosed": "DIRECT_PASSWORD_COPY_CONTROL_MISSING",
+    "directPasswordCopyContract": true,
+    "combinedCredentialCopyPreserved": true,
+    "sourceScopeFileCount": 1,
+    "sourceSha": "e46ef17083559a5b8991c149eca9c1740263bc14",
+    "buildId": "gi-i61-e46ef1708355-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i61-35015830993-rx9ktzms.web.app",
+    "hostedPayloadDigest": "adabb21accc0a377d059c72331d501c0eb7eb582faa11b28c1e44d455fe4b507",
+    "readbackExact": true,
+    "readbackFileCount": 202,
+    "runId": 35015830993,
+    "artifactId": 10415208915,
+    "productionTouched": false,
+    "operationalWritesExecuted": 0,
+    "augustDataTouched": false,
+    "nextRequiredProof": "AUTHENTICATED_HUMAN_PREVIEW_ACCEPTANCE_BEFORE_I6_1_GATE_SEAL"
   }
 }
