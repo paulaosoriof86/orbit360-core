@@ -1,0 +1,97 @@
+{
+  "schemaVersion": "1.0.0",
+  "documentId": "I6_EXECUTION_DISCIPLINE_LOCK_20260915",
+  "status": "FROZEN_STATE_FREE_EXECUTION_DISCIPLINE",
+  "effectiveDate": "2026-09-15",
+  "brand": "Gravicentra Insurance",
+  "repository": "paulaosoriof86/orbit360-core",
+  "canonicalBranch": "recovery/fase-a-clean-20260831",
+  "purpose": "Prevent diagnostic loops and force material forward progress through the already-frozen I6 postproduction sequence without changing Evergreen semantics or duplicating runtime state.",
+  "authorityReferences": [
+    "artifacts/orbit360-recovery/project-sources-v2/v4/06_ADDENDUM_FASE_A_POSTSALIDA_I6_EVERGREEN_V4.md",
+    "artifacts/orbit360-recovery/release-control/I6_POSTSALIDA_PLAN_LOCK_20260914.json",
+    "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+    "artifacts/orbit360-recovery/project-sources-v2/v3/04_LEEME_REANUDACION_Y_AUTORIDAD_V3.md",
+    "artifacts/orbit360-recovery/project-sources-v2/v3/01_ADDENDUM_GOBIERNO_SINCRONIZACION_Y_NOTIFICACION_V3.md"
+  ],
+  "changesEvergreenSemantics": false,
+  "changesFrozenI6Order": false,
+  "duplicatesRuntimeState": false,
+  "createsNewIteration": false,
+  "rules": [
+    {
+      "id": "WIP_ONE_GATE",
+      "text": "Exactly one I6 mini-gate may be operationally active. The next mini-gate cannot open until the current mini-gate reaches its required mini-freeze or an exact HOLD dependency is recorded."
+    },
+    {
+      "id": "MATERIAL_OUTPUT_REQUIRED",
+      "text": "A review, green governance workflow, state reconfirmation, elapsed time or repeated diagnostic is not progress. Each mini-gate must produce its required material evidence and state transition."
+    },
+    {
+      "id": "NO_REPEAT_DISCRIMINANT_WITHOUT_CAUSAL_CHANGE",
+      "text": "A discriminant already executed may not be repeated unless source, artifact, configuration, permissions, dataset, snapshot, harness or another causal input relevant to that discriminant has changed."
+    },
+    {
+      "id": "OUTCOMES_ONLY_PASS_FIX_HOLD",
+      "text": "Every execution cut resolves to PASS, FIX or HOLD. PASS requires proof. FIX requires a reproducible defect, isolated cause, bounded correction and causal regression. HOLD requires one exact blocking dependency."
+    },
+    {
+      "id": "REUSE_VALID_PASS",
+      "text": "Previously accepted PASS evidence remains reusable while its release identity and relevant causal inputs remain unchanged. A PASS capability is reopened only by reproducible causal regression or a governed lineage exception."
+    },
+    {
+      "id": "ONE_AUTHORITATIVE_EXECUTOR",
+      "text": "Each mini-gate uses one authoritative executor path. No one-shot branch, parallel methodology or replacement workflow is created to work around a failure inside the active gate."
+    },
+    {
+      "id": "HUMAN_INTERVENTION_BOUNDARY",
+      "text": "Paula participates only where human action is materially required: visual/legal acceptance, an exact APPLY authorization, or a business conflict that cannot be adjudicated mechanically. No local/manual command is requested unless technically unavoidable."
+    },
+    {
+      "id": "TRACEABLE_IDEMPOTENT_WRITES",
+      "text": "Every authorized operational write follows diff -> authorization -> controlled apply -> before/after receipt -> readback/integrity. A partial failure never authorizes blind re-import or duplicate application."
+    },
+    {
+      "id": "DELIVERABLE_BASED_PROGRESS",
+      "text": "Postproduction exit progress is measured only by frozen I6 mini-gates, not by hours, diagnostic rounds, commits or workflows executed."
+    }
+  ],
+  "rootCauseClosure": [
+    "reproducible symptom",
+    "violated invariant",
+    "minimum discriminant",
+    "root cause and owning layer",
+    "bounded FIX",
+    "same discriminant",
+    "causal regression",
+    "close"
+  ],
+  "progressAccounting": {
+    "denominator": 10,
+    "miniGates": ["I6.0", "I6.1", "I6.2", "I6.3", "I6.4", "I6.5", "I6.6", "I6.7", "I6.8", "I6.9"],
+    "formalExitPercentFormula": "frozenMiniGates / 10 * 100",
+    "partialMiniGateCreditInFormalPercent": false,
+    "withinGateMaterialOutputTallyAllowed": true,
+    "requiredIterationReport": [
+      "what materially advanced",
+      "formal postproduction exit percentage",
+      "what follows next"
+    ]
+  },
+  "i6_0TerminalRule": {
+    "allowedTerminalResults": ["I6_0_BASELINE_FROZEN", "HOLD_EXACT_DEPENDENCY"],
+    "forbiddenAsProgress": [
+      "I6.0 is still active",
+      "governance workflow is green",
+      "state was reconfirmed",
+      "operational writes are zero without baseline evidence"
+    ],
+    "operationalDataWritesAllowed": false
+  },
+  "supersedes": [],
+  "notes": [
+    "This lock is execution discipline only; the Evergreen V4 addendum remains the governing definition of I6.",
+    "CONTROL_PLANE.json remains the sole persistent runtime state authority.",
+    "I6_POSTSALIDA_PLAN_LOCK_20260914.json remains state-free and its frozen sequence is unchanged."
+  ]
+}
