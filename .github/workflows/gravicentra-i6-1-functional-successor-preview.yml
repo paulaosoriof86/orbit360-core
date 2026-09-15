@@ -1,0 +1,236 @@
+name: Gravicentra I6.1 Functional Successor Preview
+
+on:
+  push:
+    branches:
+      - recovery/fase-a-clean-20260831
+    paths:
+      - orbit360-platform/core/client-insurer-operational-directory-owner-v20260722.js
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gravicentra-i6-1-functional-successor-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  PROJECT_ID: ays-orbit-360-lab
+  HOSTING_SITE: ays-orbit-360-lab
+  TENANT_HINT: alianzas-soluciones
+  BASELINE_SOURCE_SHA: 16f174d087024085eff18079c486f717ef98d691
+  OWNER_FILE: orbit360-platform/core/client-insurer-operational-directory-owner-v20260722.js
+
+jobs:
+  immutable-preview:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - name: Checkout exact I6.1 successor commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Fail closed on I6.1 authority and source scope
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "recovery/fase-a-clean-20260831"
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          node - <<'NODE'
+          const fs=require('node:fs'),cp=require('node:child_process');
+          const C=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json','utf8'));
+          const need=(x,c)=>{if(!x)throw new Error(c)};
+          need(C.status==='PRODUCTION_ACCEPTED','I61_PRODUCTION_BASELINE_NOT_ACCEPTED');
+          need(C.gateState?.gates?.I6?.status==='I6_0_BASELINE_FROZEN','I61_I60_NOT_FROZEN');
+          need(C.gateState?.gates?.I6?.activeSubgate==='I6.1','I61_NOT_ACTIVE');
+          need(C.gateState?.lastFormallyCompletedMiniGate==='I6.0','I61_PREDECESSOR_NOT_FROZEN');
+          need(C.certifiedCandidate?.sourceSha===process.env.BASELINE_SOURCE_SHA,'I61_BASELINE_SOURCE_DRIFT');
+          need(C.environmentState?.augustRefresh==='HOLD','I61_AUGUST_NOT_HOLD');
+          need(C.gateState?.gates?.I6?.dataMutationAuthorized===false,'I61_DATA_MUTATION_MUST_BE_FALSE');
+          const changed=cp.execFileSync('git',['diff','--name-only',process.env.BASELINE_SOURCE_SHA+'..HEAD'],{encoding:'utf8'}).trim().split(/\r?\n/).filter(Boolean);
+          const allowedGovernance=['.github/workflows/gravicentra-','tools/gravicentra-','artifacts/orbit360-recovery/release-control/','artifacts/orbit360-recovery/project-sources-v2/'];
+          const product=changed.filter(p=>!allowedGovernance.some(x=>p.startsWith(x)));
+          need(product.length===1&&product[0]===process.env.OWNER_FILE,'I61_PRODUCT_SCOPE_DRIFT:'+product.join(','));
+          console.log('I61_AUTHORITY_AND_SCOPE=PASS');
+          console.log('I61_PRODUCT_FILES_CHANGED=1');
+          console.log('PRODUCTION_TOUCHED=false');
+          console.log('OPERATIONAL_DATA_TOUCHED=false');
+          NODE
+
+      - name: Prove direct password-copy contract and preserve credential-copy contract
+        run: |
+          set -euo pipefail
+          node --check "$OWNER_FILE"
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const t=fs.readFileSync(process.env.OWNER_FILE,'utf8');
+          const need=(x,c)=>{if(!x)throw new Error(c)};
+          need(t.includes('data-od-password-copy'),'I61_PASSWORD_COPY_CONTROL_MISSING');
+          need(t.includes('Copiar contraseña'),'I61_PASSWORD_COPY_LABEL_MISSING');
+          need(t.includes('Copiar credenciales'),'I61_CREDENTIAL_COPY_LABEL_MISSING');
+          need(t.includes("await copyText(out.value)"),'I61_PASSWORD_COPY_NOT_PASSWORD_ONLY');
+          need(t.includes("['Usuario: ' + (user || '—'), 'Contraseña: ' + out.value]"),'I61_CREDENTIAL_COPY_FORMAT_MISSING');
+          need(t.includes('data-od-credential-reveal'),'I61_REVEAL_REGRESSION');
+          need(t.includes('data-od-bank-copy-all'),'I61_BANK_COPY_REGRESSION');
+          need(t.includes('writesStore: false'),'I61_OWNER_WRITE_BOUNDARY_REGRESSION');
+          console.log('I61_PASSWORD_COPY_SOURCE_CONTRACT=PASS');
+          NODE
+
+      - name: Resolve existing Firebase Preview credential
+        id: auth
+        env:
+          SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+        run: |
+          set -euo pipefail
+          ROOT="$RUNNER_TEMP/i61-auth"; mkdir -p "$ROOT"; export ROOT
+          python3 - <<'PY'
+          import json,os
+          from pathlib import Path
+          rows=[]
+          for i,(name,raw) in enumerate([('FIREBASE_SERVICE_ACCOUNT',os.environ.get('SA_DEFAULT','')),('FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB',os.environ.get('SA_ORBIT360_LAB','')),('FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB',os.environ.get('SA_ORBIT_360_LAB',''))]):
+              if not raw.strip(): continue
+              try: d=json.loads(raw)
+              except Exception: continue
+              if d.get('type')!='service_account' or not d.get('client_email') or not d.get('private_key'): continue
+              p=Path(os.environ['ROOT'])/f'{i}.json'; p.write_text(json.dumps(d)); p.chmod(0o600); rows.append((name,str(p)))
+          if not rows: raise SystemExit('I61_NO_WELL_FORMED_SERVICE_ACCOUNT')
+          (Path(os.environ['ROOT'])/'index.tsv').write_text('\n'.join('\t'.join(x) for x in rows)+'\n')
+          PY
+          SELECTED=''
+          while IFS=$'\t' read -r NAME FILE; do
+            set +e
+            GOOGLE_APPLICATION_CREDENTIALS="$FILE" npx --yes firebase-tools@14.10.1 hosting:sites:get "$HOSTING_SITE" --project "$PROJECT_ID" --non-interactive --json >/dev/null 2>&1; RC=$?
+            set -e
+            if [ "$RC" -eq 0 ]; then SELECTED="$FILE"; break; fi
+          done < "$ROOT/index.tsv"
+          test -n "$SELECTED" || { echo I61_FIREBASE_PREVIEW_ACCESS_NOT_PROVEN >&2; exit 42; }
+          cp "$SELECTED" "$RUNNER_TEMP/i61-sa.json"; chmod 600 "$RUNNER_TEMP/i61-sa.json"
+          echo "credential_file=$RUNNER_TEMP/i61-sa.json" >> "$GITHUB_OUTPUT"
+
+      - name: Materialize immutable I6.1 package
+        id: build
+        env:
+          SOURCE_SHA: ${{ github.sha }}
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.auth.outputs.credential_file }}
+        run: |
+          set -euo pipefail
+          npx --yes firebase-tools@14.10.1 apps:list WEB --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/apps.json"
+          export APPS="$RUNNER_TEMP/apps.json"
+          APP_ID=$(python3 - <<'PY'
+          import json,os
+          d=json.load(open(os.environ['APPS'])); a=d.get('result') if isinstance(d,dict) else None
+          if not isinstance(a,list): raise SystemExit('I61_FIREBASE_WEB_APP_LIST_INVALID')
+          web=[x for x in a if str(x.get('platform','')).upper() in ('WEB','PLATFORM_WEB','')]
+          if len(web)!=1: raise SystemExit('I61_FIREBASE_WEB_APP_CARDINALITY_NOT_ONE:'+str(len(web)))
+          print(web[0].get('appId',''))
+          PY
+          )
+          test -n "$APP_ID"
+          npx --yes firebase-tools@14.10.1 apps:sdkconfig WEB "$APP_ID" --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/public-config.json"
+          node tools/gravicentra-i6-1-preview-package.mjs . "$RUNNER_TEMP/i61-package" "$RUNNER_TEMP/public-config.json" > "$RUNNER_TEMP/package-output.json"
+          export OUT="$RUNNER_TEMP/package-output.json"
+          python3 - <<'PY'
+          import json,os
+          d=json.load(open(os.environ['OUT']))
+          with open(os.environ['GITHUB_OUTPUT'],'a') as f:
+              for k,v in d.items():
+                  key=''.join(('_'+c.lower() if c.isupper() else c) for c in k).lstrip('_'); f.write(f'{key}={v}\n')
+          PY
+
+      - name: Deploy exact frontend only to isolated Preview
+        id: deploy
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.auth.outputs.credential_file }}
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/i61-package/bundle"
+          CHANNEL_ID="gi-i61-${GITHUB_RUN_ID}"
+          npx --yes firebase-tools@14.10.1 hosting:channel:deploy "$CHANNEL_ID" --config firebase.json --project "$PROJECT_ID" --expires 7d --non-interactive --json > "$RUNNER_TEMP/deploy.json"
+          export DEPLOY="$RUNNER_TEMP/deploy.json"
+          PREVIEW_URL=$(python3 - <<'PY'
+          import os,re
+          raw=open(os.environ['DEPLOY']).read(); prod='https://'+os.environ['HOSTING_SITE']+'.web.app'
+          urls=[u.rstrip('/') for u in re.findall(r'https://[A-Za-z0-9._-]+\.web\.app',raw) if u.rstrip('/')!=prod]
+          if not urls: raise SystemExit('I61_PREVIEW_URL_NOT_FOUND')
+          print(urls[-1])
+          PY
+          )
+          echo "channel_id=$CHANNEL_ID" >> "$GITHUB_OUTPUT"
+          echo "preview_url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
+
+      - name: Read back every hosted byte from same Preview
+        id: readback
+        env:
+          SOURCE_SHA: ${{ github.sha }}
+          PREVIEW_URL: ${{ steps.deploy.outputs.preview_url }}
+          EXPECTED_BUILD_ID: ${{ steps.build.outputs.build_id }}
+          EXPECTED_DIGEST: ${{ steps.build.outputs.hosted_payload_digest }}
+        run: |
+          set -euo pipefail
+          export MANIFEST="$RUNNER_TEMP/i61-package/evidence/site-manifest.sha256"
+          python3 - <<'PY'
+          import hashlib,json,os,urllib.parse,urllib.request
+          rows=[tuple(x.split('  ',1)) for x in open(os.environ['MANIFEST']).read().splitlines() if x.strip()]
+          base=os.environ['PREVIEW_URL'].rstrip('/'); bad=[]
+          for expected,rel in rows:
+              req=urllib.request.Request(base+'/'+urllib.parse.quote(rel,safe='/')+'?readback='+os.environ['EXPECTED_DIGEST'][:16],headers={'Accept-Encoding':'identity','Cache-Control':'no-cache','User-Agent':'Gravicentra-I6.1'})
+              with urllib.request.urlopen(req,timeout=30) as r: body=r.read()
+              actual=hashlib.sha256(body).hexdigest()
+              if actual!=expected: bad.append((rel,expected,actual))
+          if bad: raise SystemExit('I61_PREVIEW_BYTE_READBACK_MISMATCH:'+json.dumps(bad[:5]))
+          with urllib.request.urlopen(urllib.request.Request(base+'/__recovery__/build.json?marker=1',headers={'Cache-Control':'no-cache'}),timeout=30) as r: marker=json.loads(r.read())
+          if marker.get('sourceSha')!=os.environ['SOURCE_SHA'] or marker.get('buildId')!=os.environ['EXPECTED_BUILD_ID'] or marker.get('gate')!='I6.1': raise SystemExit('I61_PREVIEW_BUILD_MARKER_MISMATCH')
+          print('I61_PREVIEW_READBACK_EXACT_PASS='+str(len(rows)))
+          PY
+
+      - name: Seal read-only I6.1 Preview evidence
+        env:
+          SOURCE_SHA: ${{ github.sha }}
+          PREVIEW_URL: ${{ steps.deploy.outputs.preview_url }}
+          CHANNEL_ID: ${{ steps.deploy.outputs.channel_id }}
+          BUILD_ID: ${{ steps.build.outputs.build_id }}
+          HOSTED_FILE_COUNT: ${{ steps.build.outputs.hosted_file_count }}
+          HOSTED_PAYLOAD_DIGEST: ${{ steps.build.outputs.hosted_payload_digest }}
+          BUNDLE_DIGEST: ${{ steps.build.outputs.bundle_digest }}
+        run: |
+          set -euo pipefail
+          export EVIDENCE="$RUNNER_TEMP/i61-package/evidence/i6-1-preview-evidence.json"
+          python3 - <<'PY'
+          import json,os
+          e={'schemaVersion':'gravicentra-i6-1-successor-preview-evidence-v1','status':'I6_1_PRODUCT_SUCCESSOR_PREVIEW_TECHNICAL_PASS','product':'Gravicentra Insurance','gate':'I6.1','sourceSha':os.environ['SOURCE_SHA'],'runnerCommit':os.environ['GITHUB_SHA'],'githubRunId':os.environ['GITHUB_RUN_ID'],'buildId':os.environ['BUILD_ID'],'previewChannelId':os.environ['CHANNEL_ID'],'previewUrl':os.environ['PREVIEW_URL'],'hostedFileCount':int(os.environ['HOSTED_FILE_COUNT']),'hostedPayloadDigest':os.environ['HOSTED_PAYLOAD_DIGEST'],'bundleDigest':os.environ['BUNDLE_DIGEST'],'directPasswordCopyContract':True,'credentialCopyPreserved':True,'productionTouched':False,'operationalDataTouched':False,'operationalWritesExecuted':0,'sourceDataApplyExecuted':False,'augustDataTouched':False,'readbackExact':True,'requiresAuthenticatedHumanFunctionalAcceptanceBeforeI6_1PreviewGateSeal':True}
+          open(os.environ['EVIDENCE'],'w').write(json.dumps(e,sort_keys=True)+'\n')
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i6-1-${{ github.run_id }}
+          path: ${{ runner.temp }}/i61-package
+          include-hidden-files: true
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Summary
+        run: |
+          {
+            echo '## Gravicentra Insurance — I6.1 successor Preview'
+            echo "- Source: \`${GITHUB_SHA}\`"
+            echo "- Build: \`${{ steps.build.outputs.build_id }}\`"
+            echo "- Preview: ${{ steps.deploy.outputs.preview_url }}"
+            echo "- Hosted digest: \`${{ steps.build.outputs.hosted_payload_digest }}\`"
+            echo '- Direct password copy source contract: PASS'
+            echo '- Exact Preview byte readback: PASS'
+            echo '- Production touched: false'
+            echo '- Operational data writes: 0'
+            echo '- August data touched: false'
+            echo '- Human/authenticated functional acceptance still required before I6.1 Preview gate seal.'
+          } >> "$GITHUB_STEP_SUMMARY"
