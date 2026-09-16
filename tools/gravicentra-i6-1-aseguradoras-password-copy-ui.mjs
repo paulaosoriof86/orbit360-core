@@ -39,7 +39,20 @@ async function auditObservation(page){return await page.evaluate(()=>Array.isArr
 async function clearClipboard(page){const ok=await page.evaluate(async()=>{try{await navigator.clipboard.writeText('');return true;}catch{return false;}});need(ok,'I61_INSURER_UI_CLIPBOARD_CLEAR_FAILED');}
 async function readClipboard(page){return await page.evaluate(async()=>{try{return await navigator.clipboard.readText();}catch{return ''}});}
 async function waitPasswordClipboard(page){await page.waitForFunction(async()=>{try{const v=await navigator.clipboard.readText();return typeof v==='string'&&v.trim().length>0&&!v.includes('Usuario: ')&&!v.includes('\nContraseña: ');}catch{return false;}},null,{timeout:CREDENTIAL_WAIT_BOUND_MS});return await readClipboard(page);}
-async function waitCredentialClipboard(page){await page.waitForFunction(async()=>{try{const v=await navigator.clipboard.readText();const marker='\nContraseña: ';const at=v.indexOf(marker);const pwd=at>=0?v.slice(at+marker.length).trim():'';return typeof v==='string'&&v.includes('Usuario: ')&&at>=0&&!!pwd&&pwd!=='—';}catch{return false;}},null,{timeout:CREDENTIAL_WAIT_BOUND_MS});return await readClipboard(page);}
+async function waitCredentialClipboard(page){
+  const h=await page.waitForFunction(async()=>{
+    try{
+      const v=await navigator.clipboard.readText();
+      const marker='\nContraseña: ';
+      const at=v.indexOf(marker);
+      const pwd=at>=0?v.slice(at+marker.length).trim():'';
+      return typeof v==='string'&&v.includes('Usuario: ')&&at>=0&&!!pwd&&pwd!=='—'?v:false;
+    }catch{return false;}
+  },null,{timeout:CREDENTIAL_WAIT_BOUND_MS});
+  const value=await h.jsonValue();
+  await h.dispose();
+  return String(value||'');
+}
 async function waitBankClipboard(page){await page.waitForFunction(async()=>{try{const v=await navigator.clipboard.readText();return typeof v==='string'&&v.includes('Banco: ')&&v.includes('\nCuenta: ')&&v.includes('\nMoneda: ')&&v.includes('\nTitular: ');}catch{return false;}},null,{timeout:CREDENTIAL_WAIT_BOUND_MS});}
 
 async function installClipboardTrace(page){
@@ -123,7 +136,7 @@ async function probe(page,target){
     for(const row of state.refRows){need(row.card,'I61_INSURER_UI_REF_CARD_MISSING:'+row.index);need(row.reveal,'I61_INSURER_UI_REF_REVEAL_MISSING:'+row.index);need(row.passwordCopy,'I61_INSURER_UI_REF_PASSWORD_COPY_MISSING:'+row.index);need(row.credentialCopy,'I61_INSURER_UI_REF_CREDENTIAL_COPY_MISSING:'+row.index);need(!row.unavailable,'I61_INSURER_UI_REF_MARKED_UNAVAILABLE:'+row.index);}
     for(const index of candidate.refIndexes){await page.locator('#af-portales [data-portal="'+index+'"] [data-od-credential-reveal="'+index+'"]').click();await page.waitForFunction(i=>{const t=(document.querySelector('#af-portales [data-portal="'+i+'"] [data-od-credential-secret]')?.textContent||'').trim();return !!t&&t!=='Oculta';},index,{timeout:CREDENTIAL_WAIT_BOUND_MS});revealResolved++;}
     for(const index of candidate.refIndexes){await clearClipboard(page);await resetClipboardTrace(page);await page.locator('#af-portales [data-portal="'+index+'"] [data-od-password-copy="'+index+'"]').click();const proof=await observePasswordClipboard(page,index);passwordCopyTrace.push(proof);need(proof.handlerOrigin==='password-copy-control','I61_PASSWORD_COPY_HANDLER_NOT_OBSERVED');need(proof.logicalWriteCount>0,'I61_PASSWORD_COPY_WRITER_NOT_OBSERVED');need(proof.final.nonEmpty&&proof.final.matchesVisibleSecret&&!proof.final.hasUsuario&&!proof.final.hasPasswordMarker,'I61_PASSWORD_COPY_NOT_PASSWORD_ONLY');passwordCopyResolved++;}
-    for(const index of candidate.refIndexes){await clearClipboard(page);await page.locator('#af-portales [data-portal="'+index+'"] [data-od-credential-copy="'+index+'"]').click();const v=await waitCredentialClipboard(page);need(v.includes('Usuario: ')&&v.includes('\nContraseña: '),'I61_CREDENTIAL_COPY_FORMAT_INVALID');credentialCopyResolved++;}
+    for(const index of candidate.refIndexes){await clearClipboard(page);await page.locator('#af-portales [data-portal="'+index+'"] [data-od-credential-copy="'+index+'"]').click();await waitCredentialClipboard(page);credentialCopyResolved++;}
     await clearClipboard(page);
     await page.waitForFunction(indexes=>indexes.every(i=>(document.querySelector('#af-portales [data-portal="'+i+'"] [data-od-credential-secret]')?.textContent||'').trim()==='Oculta'),candidate.refIndexes,{timeout:9000});rehidden=candidate.refIndexes.length;
   }
