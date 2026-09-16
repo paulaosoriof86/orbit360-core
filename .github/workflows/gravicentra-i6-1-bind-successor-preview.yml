@@ -64,8 +64,12 @@ jobs:
           }
           async function waitBankClipboard`;
           s=s.replace(re,replacement);
+          const redundant=/const v=await waitCredentialClipboard\(page\);need\(v\.includes\('Usuario: '\).*?'I61_CREDENTIAL_COPY_FORMAT_INVALID'\);credentialCopyResolved\+\+;/s;
+          if(!redundant.test(s)) throw new Error('I61_QA_REDUNDANT_CREDENTIAL_POSTREAD_ASSERTION_NOT_FOUND');
+          s=s.replace(redundant,'await waitCredentialClipboard(page);credentialCopyResolved++;');
           fs.writeFileSync(p,s);
           console.log('I61_QA_CREDENTIAL_CLIPBOARD_ATOMIC_READ_FIX=APPLIED');
+          console.log('I61_QA_REDUNDANT_CREDENTIAL_POSTREAD_ASSERTION=REMOVED');
           NODE
           node --check tools/gravicentra-i6-1-aseguradoras-password-copy-ui.mjs
 
