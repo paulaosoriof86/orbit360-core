@@ -1,0 +1,86 @@
+{
+  "schemaVersion": "gravicentra-project-sources-evergreen-v5",
+  "packageId": "GRAVICENTRA_PROJECT_SOURCES_EVERGREEN_V5",
+  "version": 5,
+  "status": "STATIC_NORMATIVE_EVERGREEN",
+  "productBrand": "Gravicentra Insurance",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "operationalAuthority": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+  "lineageAuthority": "artifacts/orbit360-recovery/release-control/CAPABILITY_LINEAGE_LOCK.json",
+  "capabilityStatusAuthority": "artifacts/orbit360-recovery/release-control/CAPABILITY_STATUS_LEDGER.json",
+  "frozenExecutionPlan": "artifacts/orbit360-recovery/release-control/PLAN_TRABAJO_CONGELADO_V2.md",
+  "frozenPlanInterpretationAddendum": "artifacts/orbit360-recovery/release-control/PLAN_TRABAJO_CONGELADO_V2_ADDENDUM_EVERGREEN_20260909.md",
+  "compositionModel": "IMMUTABLE_RETAINED_V4_PLUS_V5_ADDENDUM",
+  "containsCurrentGate": false,
+  "containsCurrentHead": false,
+  "containsCurrentRunId": false,
+  "containsCurrentBuildId": false,
+  "containsCurrentPreviewUrl": false,
+  "containsMutablePassPendingState": false,
+  "canonicalFiles": [
+    {
+      "path": "artifacts/orbit360-recovery/project-sources-v2/v3/00_DOCUMENTO_MAESTRO_EVERGREEN_V3.md",
+      "gitBlobSha": "02104f71e91f5b87b770c06076c0be73904a4e0e",
+      "disposition": "RETAIN_UNCHANGED"
+    },
+    {
+      "path": "artifacts/orbit360-recovery/project-sources-v2/v3/01_ADDENDUM_GOBIERNO_SINCRONIZACION_Y_NOTIFICACION_V3.md",
+      "gitBlobSha": "52e8120c696a22520aa2a5629b1727bb185d4444",
+      "disposition": "RETAIN_UNCHANGED"
+    },
+    {
+      "path": "artifacts/orbit360-recovery/project-sources-v2/v3/02_MATRIZ_CRITERIOS_FASE_A_EVERGREEN_V3.md",
+      "gitBlobSha": "ef7a98f0b0a7ac5c88a382dcb7593a5b81cea6fc",
+      "disposition": "RETAIN_UNCHANGED"
+    },
+    {
+      "path": "artifacts/orbit360-recovery/project-sources-v2/v3/03_MANIFIESTO_CAPACIDADES_FASE_A_EVERGREEN_V3.json",
+      "gitBlobSha": "245636b29bd1e1dd6e28b79b01390a9983f3b0a8",
+      "disposition": "RETAIN_UNCHANGED"
+    },
+    {
+      "path": "artifacts/orbit360-recovery/project-sources-v2/v3/04_LEEME_REANUDACION_Y_AUTORIDAD_V3.md",
+      "gitBlobSha": "805cffe8ccc3cf21cfca7cde0c471c3dfbed8e0d",
+      "disposition": "RETAIN_UNCHANGED"
+    },
+    {
+      "path": "artifacts/orbit360-recovery/project-sources-v2/v4/06_ADDENDUM_FASE_A_POSTSALIDA_I6_EVERGREEN_V4.md",
+      "gitBlobSha": "4bcb87748e3fa425a5870238572c56e399bc01ac",
+      "disposition": "RETAIN_UNCHANGED"
+    },
+    {
+      "path": "artifacts/orbit360-recovery/project-sources-v2/v5/07_ADDENDUM_ACTUALIZACION_INCREMENTAL_DELTA_EVERGREEN_V5_2026-09-16.md",
+      "gitBlobSha": "637556b30de4dc346ef55e284c83175fabb921b8",
+      "disposition": "ADD_AS_SEVENTH_SOURCE"
+    }
+  ],
+  "projectSourceUserAction": {
+    "remove": [],
+    "keep": [
+      "00_DOCUMENTO_MAESTRO_EVERGREEN_V3.md",
+      "01_ADDENDUM_GOBIERNO_SINCRONIZACION_Y_NOTIFICACION_V3.md",
+      "02_MATRIZ_CRITERIOS_FASE_A_EVERGREEN_V3.md",
+      "03_MANIFIESTO_CAPACIDADES_FASE_A_EVERGREEN_V3.json",
+      "04_LEEME_REANUDACION_Y_AUTORIDAD_V3.md",
+      "06_ADDENDUM_FASE_A_POSTSALIDA_I6_EVERGREEN_V4.md"
+    ],
+    "add": [
+      "07_ADDENDUM_ACTUALIZACION_INCREMENTAL_DELTA_EVERGREEN_V5_2026-09-16.md"
+    ],
+    "resultingSourceCount": 7
+  },
+  "replacementPolicy": {
+    "operationalStateChangeRequiresReplacement": false,
+    "normativePermanentChangeRequiresHigherVersion": true,
+    "controlPlaneFlag": "projectSources.staticSourceUpdateRequired"
+  },
+  "synchronizationContract": {
+    "singleMutableOperationalAuthority": "CONTROL_PLANE.json",
+    "manifestPinsEveryStaticSourceByGitBlobSha": true,
+    "retainedFilesAreNotCopiedOrRewritten": true,
+    "sourcePackageMayChangeOnlyForPermanentNormativeChange": true,
+    "guardMustFailClosedOnBlobDriftOrPackageMismatch": true,
+    "conversationCannotOverridePackage": true
+  }
+}
