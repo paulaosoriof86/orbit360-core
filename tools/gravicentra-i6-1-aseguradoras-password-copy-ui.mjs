@@ -42,9 +42,71 @@ async function waitPasswordClipboard(page){await page.waitForFunction(async()=>{
 async function waitCredentialClipboard(page){await page.waitForFunction(async()=>{try{const v=await navigator.clipboard.readText();const marker='\nContraseña: ';const at=v.indexOf(marker);const pwd=at>=0?v.slice(at+marker.length).trim():'';return typeof v==='string'&&v.includes('Usuario: ')&&at>=0&&!!pwd&&pwd!=='—';}catch{return false;}},null,{timeout:CREDENTIAL_WAIT_BOUND_MS});return await readClipboard(page);}
 async function waitBankClipboard(page){await page.waitForFunction(async()=>{try{const v=await navigator.clipboard.readText();return typeof v==='string'&&v.includes('Banco: ')&&v.includes('\nCuenta: ')&&v.includes('\nMoneda: ')&&v.includes('\nTitular: ');}catch{return false;}},null,{timeout:CREDENTIAL_WAIT_BOUND_MS});}
 
+async function installClipboardTrace(page){
+  return await page.evaluate(()=>{
+    const meta=v=>{const s=String(v==null?'':v);return {length:s.length,nonEmpty:s.trim().length>0,hasUsuario:s.includes('Usuario: '),hasPasswordMarker:s.includes('\nContraseña: '),hasNewline:s.includes('\n')};};
+    const state={events:[],nextLogical:0,activeLogical:null,startedAt:performance.now(),vaultWrapped:false,navigatorWrapped:false};
+    window.__gravicentraI61ClipboardTraceState=state;
+    const elapsed=()=>Number((performance.now()-state.startedAt).toFixed(3));
+    const push=(kind,origin,value,extra={})=>state.events.push({seq:state.events.length+1,tMs:elapsed(),kind,origin,logicalWriteId:state.activeLogical,...meta(value),...extra});
+    const clip=navigator.clipboard;
+    if(clip&&typeof clip.writeText==='function'){
+      const originalNavigator=clip.writeText.bind(clip);
+      const wrappedNavigator=async value=>{
+        const inherited=state.activeLogical!=null;
+        if(!inherited)state.activeLogical=++state.nextLogical;
+        const logicalId=state.activeLogical;
+        push('writer','navigator.clipboard.writeText',value,{delegatedFromVault:inherited,handlerOwnerOnStack:String(new Error().stack||'').includes('client-insurer-operational-directory-owner-v20260722.js')});
+        try{return await originalNavigator(value);}finally{if(!inherited&&state.activeLogical===logicalId)state.activeLogical=null;}
+      };
+      try{Object.defineProperty(clip,'writeText',{configurable:true,writable:true,value:wrappedNavigator});state.navigatorWrapped=clip.writeText===wrappedNavigator;}catch{}
+    }
+    if(Orbit?.vault&&typeof Orbit.vault.copyText==='function'){
+      const originalVault=Orbit.vault.copyText.bind(Orbit.vault);
+      const wrappedVault=async value=>{
+        const previous=state.activeLogical;
+        const logicalId=++state.nextLogical;
+        state.activeLogical=logicalId;
+        const eventIndex=state.events.length;
+        push('writer','Orbit.vault.copyText',value,{delegatesToNavigator:false,handlerOwnerOnStack:String(new Error().stack||'').includes('client-insurer-operational-directory-owner-v20260722.js')});
+        try{return await originalVault(value);}finally{
+          const delegated=state.events.some((e,i)=>i>eventIndex&&e.logicalWriteId===logicalId&&e.origin==='navigator.clipboard.writeText');
+          if(state.events[eventIndex])state.events[eventIndex].delegatesToNavigator=delegated;
+          state.activeLogical=previous;
+        }
+      };
+      try{Orbit.vault.copyText=wrappedVault;state.vaultWrapped=Orbit.vault.copyText===wrappedVault;}catch{}
+    }
+    document.addEventListener('click',e=>{
+      const password=e.target?.closest?.('[data-od-password-copy]');
+      const credentials=e.target?.closest?.('[data-od-credential-copy]');
+      if(!password&&!credentials)return;
+      state.events.push({seq:state.events.length+1,tMs:elapsed(),kind:'handler-trigger',origin:password?'password-copy-control':'credential-copy-control',logicalWriteId:null,length:0,nonEmpty:false,hasUsuario:false,hasPasswordMarker:false,hasNewline:false});
+    },true);
+    return {vaultWrapped:state.vaultWrapped,navigatorWrapped:state.navigatorWrapped};
+  });
+}
+async function resetClipboardTrace(page){await page.evaluate(()=>{const s=window.__gravicentraI61ClipboardTraceState;if(!s)return;s.events=[];s.nextLogical=0;s.activeLogical=null;s.startedAt=performance.now();window.__gravicentraI61LastClipboardProof=null;});}
+async function observePasswordClipboard(page,index){
+  return await page.evaluate(async i=>{
+    await new Promise(r=>setTimeout(r,900));
+    let value='';try{value=await navigator.clipboard.readText();}catch{}
+    const secret=(document.querySelector('#af-portales [data-portal="'+i+'"] [data-od-credential-secret]')?.textContent||'').trim();
+    const s=window.__gravicentraI61ClipboardTraceState||{events:[]};
+    const events=(s.events||[]).map(e=>({seq:Number(e.seq)||0,tMs:Number(e.tMs)||0,kind:String(e.kind||''),origin:String(e.origin||''),logicalWriteId:e.logicalWriteId==null?null:Number(e.logicalWriteId),length:Number(e.length)||0,nonEmpty:e.nonEmpty===true,hasUsuario:e.hasUsuario===true,hasPasswordMarker:e.hasPasswordMarker===true,hasNewline:e.hasNewline===true,delegatedFromVault:e.delegatedFromVault===true,delegatesToNavigator:e.delegatesToNavigator===true,handlerOwnerOnStack:e.handlerOwnerOnStack===true}));
+    const logicalIds=[...new Set(events.filter(e=>e.kind==='writer'&&e.logicalWriteId!=null).map(e=>e.logicalWriteId))];
+    const lastWriter=[...events].reverse().find(e=>e.kind==='writer')||null;
+    const final={length:value.length,nonEmpty:value.trim().length>0,hasUsuario:value.includes('Usuario: '),hasPasswordMarker:value.includes('\nContraseña: '),hasNewline:value.includes('\n'),matchesVisibleSecret:!!secret&&secret!=='Oculta'&&value===secret};
+    const proof={handlerOrigin:events.some(e=>e.kind==='handler-trigger'&&e.origin==='password-copy-control')?'password-copy-control':null,writerOrigin:lastWriter?.origin||null,logicalWriteCount:logicalIds.length,secondLogicalWrite:logicalIds.length>1,vaultToNavigatorDelegation:events.some(e=>e.origin==='Orbit.vault.copyText'&&e.delegatesToNavigator===true),ownerOnWriterStack:events.some(e=>e.kind==='writer'&&e.handlerOwnerOnStack===true),events,final};
+    window.__gravicentraI61LastClipboardProof=proof;
+    return proof;
+  },index);
+}
+
 async function probe(page,target){
   const writeBefore=await operationalWriteState(page);need(writeBefore.pending===0,'I61_INSURER_UI_PREEXISTING_PENDING_OPERATIONAL_WRITE');
   await installAuditObserver(page);
+  const clipboardTraceInstallation=await installClipboardTrace(page);
   const candidates=await page.evaluate(()=>{const rows=Orbit.store.all('aseguradoras')||[];const credential=rows.find(a=>a&&Array.isArray(a.portales)&&a.portales.some(p=>p&&p.credentialRef))||null;const hasNumber=a=>a&&Array.isArray(a.cuentas)&&a.cuentas.some(c=>c&&(c.numero||c.numeroCuenta||c.accountNumber));const banks=rows.find(hasNumber)||rows.find(a=>a&&Array.isArray(a.cuentas)&&a.cuentas.length>0)||null;return {credential:credential?{id:credential.id,portalCount:credential.portales.length,refIndexes:credential.portales.map((p,i)=>p&&p.credentialRef?i:null).filter(Number.isInteger),userBearing:credential.portales.filter(p=>p&&(p.usuario||p.user||p.login||p.emailUsuario||p.correoUsuario)).length}:null,banks:banks?{id:banks.id,count:banks.cuentas.length,numberBearing:banks.cuentas.filter(a=>a&&(a.numero||a.numeroCuenta||a.accountNumber)).length}:null};});
   need(candidates.credential?.id&&candidates.credential.refIndexes.length>0,'I61_INSURER_UI_CREDENTIAL_DATASET_UNAVAILABLE');need(candidates.banks?.id,'I61_INSURER_UI_BANK_DATASET_UNAVAILABLE');need(candidates.banks.numberBearing>0,'I61_INSURER_UI_NUMBER_BEARING_BANK_DATASET_UNAVAILABLE');
   const candidate=candidates.credential;
@@ -53,13 +115,14 @@ async function probe(page,target){
   need(state.ownerVersion==='20260915.1','I61_INSURER_UI_OWNER_VERSION_MISMATCH');need(state.compositionRevision==='20260915.1-i6-1-direct-password-copy','I61_INSURER_UI_OWNER_COMPOSITION_MISMATCH');need(state.barrierRevision==='20260902.1-latest-operational-owner-precedence','I61_INSURER_UI_BARRIER_MISMATCH');need(state.rows===candidate.portalCount&&state.cards===candidate.portalCount,'I61_INSURER_UI_PORTAL_CARD_COUNT_MISMATCH');need(state.credentialBoxes===candidate.portalCount,'I61_INSURER_UI_CREDENTIAL_BOX_COUNT_MISMATCH');need(state.stable,'I61_INSURER_UI_VIEW_NOT_STABLE');if(candidate.userBearing>0&&PRIV.has(target))need(state.userVisible>0,'I61_INSURER_UI_USERNAME_NOT_VISIBLE');
 
   let revealResolved=0,passwordCopyResolved=0,credentialCopyResolved=0,rehidden=0,advisorRestricted=false,bankCopyResolved=false;
+  const passwordCopyTrace=[];
   if(target==='Asesor'){
     need(state.allRevealCount===0,'I61_INSURER_UI_ADVISOR_REVEAL_EXPOSED');need(state.allPasswordCopyCount===0,'I61_INSURER_UI_ADVISOR_PASSWORD_COPY_EXPOSED');need(state.allCredentialCopyCount===0,'I61_INSURER_UI_ADVISOR_CREDENTIAL_COPY_EXPOSED');advisorRestricted=true;
   }else{
     need(PRIV.has(target),'I61_INSURER_UI_ROLE_CLASS_UNEXPECTED');need(state.providerRegistered,'I61_INSURER_UI_PROVIDER_NOT_REGISTERED');
     for(const row of state.refRows){need(row.card,'I61_INSURER_UI_REF_CARD_MISSING:'+row.index);need(row.reveal,'I61_INSURER_UI_REF_REVEAL_MISSING:'+row.index);need(row.passwordCopy,'I61_INSURER_UI_REF_PASSWORD_COPY_MISSING:'+row.index);need(row.credentialCopy,'I61_INSURER_UI_REF_CREDENTIAL_COPY_MISSING:'+row.index);need(!row.unavailable,'I61_INSURER_UI_REF_MARKED_UNAVAILABLE:'+row.index);}
     for(const index of candidate.refIndexes){await page.locator('#af-portales [data-portal="'+index+'"] [data-od-credential-reveal="'+index+'"]').click();await page.waitForFunction(i=>{const t=(document.querySelector('#af-portales [data-portal="'+i+'"] [data-od-credential-secret]')?.textContent||'').trim();return !!t&&t!=='Oculta';},index,{timeout:CREDENTIAL_WAIT_BOUND_MS});revealResolved++;}
-    for(const index of candidate.refIndexes){await clearClipboard(page);await page.locator('#af-portales [data-portal="'+index+'"] [data-od-password-copy="'+index+'"]').click();const v=await waitPasswordClipboard(page);need(v.trim().length>0&&!v.includes('Usuario: '),'I61_PASSWORD_COPY_NOT_PASSWORD_ONLY');passwordCopyResolved++;}
+    for(const index of candidate.refIndexes){await clearClipboard(page);await resetClipboardTrace(page);await page.locator('#af-portales [data-portal="'+index+'"] [data-od-password-copy="'+index+'"]').click();const proof=await observePasswordClipboard(page,index);passwordCopyTrace.push(proof);need(proof.handlerOrigin==='password-copy-control','I61_PASSWORD_COPY_HANDLER_NOT_OBSERVED');need(proof.logicalWriteCount>0,'I61_PASSWORD_COPY_WRITER_NOT_OBSERVED');need(proof.final.nonEmpty&&proof.final.matchesVisibleSecret&&!proof.final.hasUsuario&&!proof.final.hasPasswordMarker,'I61_PASSWORD_COPY_NOT_PASSWORD_ONLY');passwordCopyResolved++;}
     for(const index of candidate.refIndexes){await clearClipboard(page);await page.locator('#af-portales [data-portal="'+index+'"] [data-od-credential-copy="'+index+'"]').click();const v=await waitCredentialClipboard(page);need(v.includes('Usuario: ')&&v.includes('\nContraseña: '),'I61_CREDENTIAL_COPY_FORMAT_INVALID');credentialCopyResolved++;}
     await clearClipboard(page);
     await page.waitForFunction(indexes=>indexes.every(i=>(document.querySelector('#af-portales [data-portal="'+i+'"] [data-od-credential-secret]')?.textContent||'').trim()==='Oculta'),candidate.refIndexes,{timeout:9000});rehidden=candidate.refIndexes.length;
@@ -77,7 +140,7 @@ async function probe(page,target){
     need(revealAudits.length===candidate.refIndexes.length,'I61_INSURER_UI_REVEAL_AUDIT_COUNT_MISMATCH');need(copyAudits.length===candidate.refIndexes.length*2,'I61_INSURER_UI_COPY_AUDIT_COUNT_MISMATCH');need(revealAudits.every(x=>x.result==='ok'),'I61_INSURER_UI_REVEAL_AUDIT_NOT_OK');need(copyAudits.every(x=>x.result==='ok'),'I61_INSURER_UI_COPY_AUDIT_NOT_OK');
   }else need(audits.filter(x=>/^credential\./.test(x.action)).length===0,'I61_INSURER_UI_ADVISOR_CREDENTIAL_AUDIT_UNEXPECTED');
   const writeAfter=await operationalWriteState(page);const delta=writeDelta(writeBefore,writeAfter);need(delta.pending===0&&delta.committed===0&&delta.failed===0,'I61_INSURER_UI_OPERATIONAL_WRITE_DELTA_NONZERO');
-  return {credentialCandidate:{portalCount:candidate.portalCount,refCount:candidate.refIndexes.length,userBearing:candidate.userBearing},state,banks,revealResolvedCount:revealResolved,passwordCopyResolvedCount:passwordCopyResolved,credentialCopyResolvedCount:credentialCopyResolved,rehiddenCount:rehidden,advisorRestricted,bankCopyResolved,secureAuditObservation:{credentialRevealCount:audits.filter(x=>x.action==='credential.reveal').length,credentialCopyCount:audits.filter(x=>x.action==='credential.copy').length},operationalWriteProof:{before:writeBefore,after:writeAfter,delta,pass:true}};
+  return {credentialCandidate:{portalCount:candidate.portalCount,refCount:candidate.refIndexes.length,userBearing:candidate.userBearing},state,banks,revealResolvedCount:revealResolved,passwordCopyResolvedCount:passwordCopyResolved,credentialCopyResolvedCount:credentialCopyResolved,rehiddenCount:rehidden,advisorRestricted,bankCopyResolved,clipboardTrace:{installation:clipboardTraceInstallation,passwordCopies:passwordCopyTrace},secureAuditObservation:{credentialRevealCount:audits.filter(x=>x.action==='credential.reveal').length,credentialCopyCount:audits.filter(x=>x.action==='credential.copy').length},operationalWriteProof:{before:writeBefore,after:writeAfter,delta,pass:true}};
 }
 
 const app=initializeApp({credential:cert(serviceAccount()),projectId:PROJECT},'gravicentra-i6-1-insurer-ui');
@@ -86,11 +149,11 @@ const members=await db.collection('tenants').doc(TENANT).collection('members').g
 const pool=[];for(const doc of members.docs){const m=doc.data()||{},uid=clean(m.uid||doc.id),u=users.get(uid);if(!u||u.disabled||u.emailVerified!==true||!['active','activo'].includes(clean(m.status||m.estado).toLowerCase()))continue;const rs=roles(m);pool.push({uid,roles:rs,active:activeRole(m,rs)});}
 const selected=new Map();for(const target of TARGETS){const exact=pool.find(x=>x.active===target&&x.roles.includes(target));const fallback=exact||pool.find(x=>x.roles.includes(target));if(fallback)selected.set(target,{...fallback,selectionMode:exact?'persisted-active':'assigned-role'});}
 fs.mkdirSync(OUT,{recursive:true});
-const ev={schemaVersion:'gravicentra-i6-1-aseguradoras-password-copy-ui-v1',gate:'I6.1',status:'FAIL',sourceSha:SOURCE,buildId:BUILD,previewUrl:PREVIEW,productionTouched:false,dataTouched:false,operationalWritesExecuted:null,userIdentitiesRecorded:false,tokensRecorded:false,secretsRecorded:false,roles:{},errors:[]};
+const ev={schemaVersion:'gravicentra-i6-1-aseguradoras-password-copy-ui-v2-safe-trace',gate:'I6.1',status:'FAIL',sourceSha:SOURCE,buildId:BUILD,previewUrl:PREVIEW,productionTouched:false,dataTouched:false,operationalWritesExecuted:null,userIdentitiesRecorded:false,tokensRecorded:false,secretsRecorded:false,clipboardContentsRecorded:false,roles:{},errors:[]};
 let browser;
 try{
   need(selected.size===TARGETS.length,'I61_INSURER_UI_REQUIRED_ROLES_UNAVAILABLE');browser=await chromium.launch({headless:true});
-  for(const target of TARGETS){const s=selected.get(target),rec={pass:false,selectionMode:s.selectionMode};let context;try{const token=await auth.createCustomToken(s.uid,{gravicentraI61ReadOnly:true});context=await browser.newContext({viewport:{width:1440,height:1000},permissions:['clipboard-read','clipboard-write']});const page=await context.newPage();page.setDefaultTimeout(12000);const tel=telemetry(page);await page.goto(PREVIEW,{waitUntil:'domcontentloaded',timeout:20000});await page.waitForFunction(()=>!!Orbit?.productAppP0&&!!Orbit?.productRuntimeBrowserProvidersP0,null,{timeout:5000});await activate(page,token);rec.legalGate=await acceptEphemeralLegalGate(page);rec.roleMode=await setRole(page,target);rec.evidence=await probe(page,target);rec.telemetry=checkTelemetry(tel);await page.screenshot({path:path.join(OUT,'aseguradoras-'+target.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase()+'.png'),fullPage:true});rec.pass=true;}catch(e){rec.error=String(e?.message||e);ev.errors.push(target+':'+rec.error);}finally{if(context)await context.close().catch(()=>{});}ev.roles[target]=rec;}
+  for(const target of TARGETS){const s=selected.get(target),rec={pass:false,selectionMode:s.selectionMode};let context,page;try{const token=await auth.createCustomToken(s.uid,{gravicentraI61ReadOnly:true});context=await browser.newContext({viewport:{width:1440,height:1000},permissions:['clipboard-read','clipboard-write']});page=await context.newPage();page.setDefaultTimeout(12000);const tel=telemetry(page);await page.goto(PREVIEW,{waitUntil:'domcontentloaded',timeout:20000});await page.waitForFunction(()=>!!Orbit?.productAppP0&&!!Orbit?.productRuntimeBrowserProvidersP0,null,{timeout:5000});await activate(page,token);rec.legalGate=await acceptEphemeralLegalGate(page);rec.roleMode=await setRole(page,target);rec.evidence=await probe(page,target);rec.telemetry=checkTelemetry(tel);await page.screenshot({path:path.join(OUT,'aseguradoras-'+target.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase()+'.png'),fullPage:true});rec.pass=true;}catch(e){rec.error=String(e?.message||e);if(page)try{rec.clipboardTrace=await page.evaluate(()=>window.__gravicentraI61LastClipboardProof||null);}catch{}ev.errors.push(target+':'+rec.error);}finally{if(context)await context.close().catch(()=>{});}ev.roles[target]=rec;}
   const deltas=TARGETS.map(r=>ev.roles[r]?.evidence?.operationalWriteProof?.delta).filter(Boolean);ev.operationalWritesExecuted=deltas.reduce((n,d)=>n+Math.max(0,Number(d.committed)||0),0);ev.operationalWriteAttemptsObserved=deltas.reduce((n,d)=>n+Math.max(0,Number(d.committed)||0)+Math.max(0,Number(d.failed)||0)+Math.max(0,Number(d.pending)||0),0);ev.status=TARGETS.every(r=>ev.roles[r]?.pass===true)&&ev.operationalWritesExecuted===0&&ev.operationalWriteAttemptsObserved===0?'PASS':'FAIL';if(ev.status!=='PASS')process.exitCode=1;
 }catch(e){ev.errors.push(String(e?.message||e));process.exitCode=1;}
 finally{if(browser)await browser.close().catch(()=>{});await deleteApp(app).catch(()=>{});fs.writeFileSync(path.join(OUT,'i6-1-aseguradoras-password-copy-ui.json'),JSON.stringify(ev,null,2)+'\n');console.log('I61_ASEGURADORAS_PASSWORD_COPY_UI='+ev.status);console.log('I61_ROLE_PASS='+Object.entries(ev.roles).filter(([,x])=>x.pass).map(([r])=>r).join(','));console.log('I61_ROLE_FAIL='+Object.entries(ev.roles).filter(([,x])=>!x.pass).map(([r])=>r).join(','));console.log('I61_OPERATIONAL_WRITES='+(ev.operationalWritesExecuted==null?'unproven':ev.operationalWritesExecuted));}
