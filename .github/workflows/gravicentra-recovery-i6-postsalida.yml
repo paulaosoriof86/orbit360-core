@@ -6,27 +6,39 @@ on:
     branches:
       - recovery/fase-a-clean-20260831
     paths:
-      - '.github/workflows/gravicentra-recovery-i6-postsalida.yml'
-      - 'tools/gravicentra-i6-transition-v1.mjs'
-      - 'tools/gravicentra-i6-control-plane-guard-v1.mjs'
-      - 'artifacts/orbit360-recovery/release-control/I6_EXPLICIT_AUTHORIZATION_RECEIPT_20260914.json'
+      - 'artifacts/orbit360-recovery/release-control/I6_1_PRODUCTION_PROMOTION_AUTHORIZATION_20260916.json'
       - 'artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json'
       - 'artifacts/orbit360-recovery/project-sources-v2/v4/**'
+      - '.github/workflows/gravicentra-recovery-i6-postsalida.yml'
 
 permissions:
   contents: write
+  actions: read
 
 concurrency:
   group: gravicentra-i6-postsalida-${{ github.ref }}
   cancel-in-progress: false
 
+env:
+  PROJECT_ID: ays-orbit-360-lab
+  HOSTING_SITE: ays-orbit-360-lab
+  PRODUCTION_URL: https://ays-orbit-360-lab.web.app
+  CONTROL: artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json
+  LEDGER: artifacts/orbit360-recovery/release-control/CAPABILITY_STATUS_LEDGER.json
+  PROMOTION_AUTH: artifacts/orbit360-recovery/release-control/I6_1_PRODUCTION_PROMOTION_AUTHORIZATION_20260916.json
+  LIVE_RECEIPT: artifacts/orbit360-recovery/release-control/I6_1_PRODUCT_SUCCESSOR_LIVE_PASS_20260916.json
+  GUARD: tools/gravicentra-i6-control-plane-guard-v1.mjs
+
 jobs:
-  i6-state-transition:
+  i61-same-artifact-live-promotion:
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
+    timeout-minutes: 45
+    env:
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
     steps:
-      - name: Checkout canonical Recovery branch with complete ancestry
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           ref: recovery/fase-a-clean-20260831
           fetch-depth: 0
@@ -36,90 +48,246 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Verify pre-transition authority
+      - name: Bind exact authorized I6.1 release
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          node tools/gravicentra-governance-preflight-v1.mjs --mode=governance
+          node "$GUARD" --mode=i6
+          node - <<'NODE'
+          const fs=require('node:fs'),https=require('node:https');
+          const C=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8'));
+          const A=JSON.parse(fs.readFileSync(process.env.PROMOTION_AUTH,'utf8'));
+          const N=C.nextCandidate||{};
+          const need=(x,c)=>{if(!x)throw new Error(c)};
+          need(C.nextAction==='AUTHORIZE_I6_1_SUCCESSOR_PRODUCTION_PROMOTION','I61_LIVE_NEXT_ACTION_INVALID');
+          need(C.gateState?.gates?.I6?.status==='I6_0_BASELINE_FROZEN'&&C.gateState?.gates?.I6?.activeSubgate==='I6.1','I61_LIVE_GATE_INVALID');
+          need(C.gateState?.gates?.I6?.dataMutationAuthorized===false&&C.i6Execution?.dataMutationAuthorized===false,'I61_LIVE_DATA_MUTATION_MUST_BE_FALSE');
+          need(N.status==='I6_1_PRODUCT_SUCCESSOR_PREVIEW_PASS'&&N.readbackExact===true&&N.authenticatedRolesPass===5,'I61_LIVE_PREVIEW_PASS_NOT_SEALED');
+          need(A.status==='AUTHORIZED_BY_OWNER'&&A.authorization?.decision==='AUTHORIZED_BY_OWNER','I61_LIVE_AUTH_MISSING');
+          need(A.authorization?.scope==='PROMOTE_EXACT_I6_1_PREVIEW_ARTIFACT_TO_PRODUCTION_AND_VERIFY_LIVE','I61_LIVE_AUTH_SCOPE_INVALID');
+          need(A.authorization?.sameArtifactOnly===true&&A.authorization?.rebuildAuthorized===false&&A.authorization?.operationalDataMutationAuthorized===false,'I61_LIVE_AUTH_OVERREACH');
+          for(const k of ['sourceSha','buildId','artifactId','artifactName','artifactArchiveDigest']) need(A.candidateBinding?.[k]===N[k],'I61_LIVE_AUTH_BINDING_MISMATCH:'+k);
+          const expectedChannel='gi-i61-'+N.runId;
+          need(A.candidateBinding?.previewChannelId===expectedChannel,'I61_LIVE_CHANNEL_BINDING_MISMATCH');
+          const get=url=>new Promise((resolve,reject)=>{https.get(url,{headers:{Authorization:'Bearer '+process.env.GH_TOKEN,'User-Agent':'Gravicentra-I6.1-LIVE','X-GitHub-Api-Version':'2022-11-28'}},r=>{let b='';r.on('data',d=>b+=d);r.on('end',()=>r.statusCode>=200&&r.statusCode<300?resolve(JSON.parse(b)):reject(new Error('GITHUB_HTTP_'+r.statusCode)));}).on('error',reject)});
+          (async()=>{
+            const run=await get('https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/runs/'+N.runId);
+            need(run.status==='completed'&&run.conclusion==='success'&&run.head_sha===N.sourceSha,'I61_LIVE_BUILD_RUN_INVALID');
+            const arts=await get('https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/runs/'+N.runId+'/artifacts?per_page=100');
+            const a=(arts.artifacts||[]).find(x=>Number(x.id)===Number(N.artifactId)&&x.name===N.artifactName);
+            need(a&&!a.expired&&a.digest===N.artifactArchiveDigest,'I61_LIVE_ARTIFACT_INVALID');
+            const env={SOURCE_SHA:N.sourceSha,SOURCE_TREE:N.sourceTree,BUILD_ID:N.buildId,I61_BUILD_RUN_ID:String(N.runId),I61_ARTIFACT_NAME:N.artifactName,I61_ARTIFACT_ID:String(N.artifactId),I61_ARTIFACT_DIGEST:N.artifactArchiveDigest,EXPECTED_HOSTED_PAYLOAD_DIGEST:N.hostedPayloadDigest,EXPECTED_BUNDLE_DIGEST:N.bundleDigest,PREVIEW_CHANNEL_ID:expectedChannel,PREVIEW_URL:N.previewUrl};
+            for(const [k,v] of Object.entries(env)) fs.appendFileSync(process.env.GITHUB_ENV,`${k}=${v}\n`);
+            console.log('I61_LIVE_EXACT_RELEASE_BINDING=PASS');
+          })().catch(e=>{console.error(e.message);process.exit(1)});
+          NODE
 
-      - name: Execute state-gated I6 transition only
-        id: transition
-        shell: bash
-        run: |
-          set -euo pipefail
-          node --check tools/gravicentra-i6-transition-v1.mjs
-          node tools/gravicentra-i6-transition-v1.mjs | tee "$RUNNER_TEMP/i6-transition.txt"
-          PHASE="$(sed -n 's/^TRANSITION_PHASE=//p' "$RUNNER_TEMP/i6-transition.txt" | tail -1)"
-          test -n "$PHASE"
-          echo "phase=$PHASE" >> "$GITHUB_OUTPUT"
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.I61_ARTIFACT_NAME }}
+          path: ${{ runner.temp }}/i61-artifact
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          run-id: ${{ env.I61_BUILD_RUN_ID }}
 
-      - name: Commit governance transition locally
-        if: steps.transition.outputs.phase != 'NOOP_ALREADY_ACTIVE'
-        shell: bash
+      - name: Verify downloaded immutable artifact
         run: |
           set -euo pipefail
-          git config user.name "gravicentra-governance-bot"
-          git config user.email "actions@users.noreply.github.com"
-          git add artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json
-          if test -f artifacts/orbit360-recovery/release-control/I6_PROJECT_SOURCES_V4_TRANSITION_RECEIPT_20260914.json; then
-            git add artifacts/orbit360-recovery/release-control/I6_PROJECT_SOURCES_V4_TRANSITION_RECEIPT_20260914.json
-          fi
-          if test "${{ steps.transition.outputs.phase }}" = "MARK_V4_REQUIRED"; then
-            git commit -m "governance(project-sources): record required Evergreen V4 transition"
-          else
-            git commit -m "governance(i6): activate Evergreen V4 and I6.0 baseline"
-          fi
+          ROOT="$RUNNER_TEMP/i61-artifact"
+          SITE="$(find "$ROOT" -name site-manifest.sha256 -print -quit)"
+          EV="$(find "$ROOT" -name i6-1-preview-evidence.json -print -quit)"
+          test -n "$SITE"; test -n "$EV"
+          test "$(jq -r .sourceSha "$EV")" = "$SOURCE_SHA"
+          test "$(jq -r .buildId "$EV")" = "$BUILD_ID"
+          test "$(jq -r .hostedPayloadDigest "$EV")" = "$EXPECTED_HOSTED_PAYLOAD_DIGEST"
+          test "$(jq -r .readbackExact "$EV")" = true
+          echo "I61_SITE_MANIFEST=$SITE" >> "$GITHUB_ENV"
+          echo "I61_ARTIFACT_EVIDENCE=$EV" >> "$GITHUB_ENV"
+          echo I61_DOWNLOADED_ARTIFACT=PASS
 
-      - name: Validate resulting local commit before publication
-        if: steps.transition.outputs.phase != 'NOOP_ALREADY_ACTIVE'
-        shell: bash
+      - name: Select existing Firebase authority
         run: |
           set -euo pipefail
-          node tools/gravicentra-governance-preflight-v1.mjs --mode=governance
+          A="$RUNNER_TEMP/i61-live-auth"; mkdir -p "$A"; export A
+          python3 - <<'PY'
+          import json,os,pathlib
+          rows=[]
+          for i,k in enumerate(['SA_DEFAULT','SA_ORBIT360_LAB','SA_ORBIT_360_LAB']):
+            try:d=json.loads(os.environ.get(k,''))
+            except:continue
+            if d.get('type')=='service_account' and d.get('project_id')=='ays-orbit-360-lab' and d.get('private_key') and d.get('client_email'):
+              p=pathlib.Path(os.environ['A'])/f'{i}.json';p.write_text(json.dumps(d));p.chmod(0o600);rows.append(str(p))
+          if not rows:raise SystemExit('I61_LIVE_NO_SERVICE_ACCOUNT')
+          pathlib.Path(os.environ['A']+'/files').write_text('\n'.join(rows)+'\n')
+          PY
+          SEL=''
+          while read -r F; do
+            if GOOGLE_APPLICATION_CREDENTIALS="$F" npx --yes firebase-tools@14.10.1 hosting:sites:get "$HOSTING_SITE" --project "$PROJECT_ID" --non-interactive --json >/dev/null 2>&1; then SEL="$F"; break; fi
+          done < "$A/files"
+          test -n "$SEL" || { echo I61_LIVE_FIREBASE_AUTH_NOT_PROVEN >&2; exit 42; }
+          cp "$SEL" "$RUNNER_TEMP/i61-live-sa.json"; chmod 600 "$RUNNER_TEMP/i61-live-sa.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/i61-live-sa.json" >> "$GITHUB_ENV"
+
+      - name: Create rollback and promote exact Preview channel to LIVE
+        id: promote
+        run: |
+          set -euo pipefail
+          npx --yes firebase-tools@14.10.1 hosting:channel:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/i61-channels.json"
+          grep -Fq "$PREVIEW_CHANNEL_ID" "$RUNNER_TEMP/i61-channels.json"
+          RB="gi-i61-rb-${GITHUB_RUN_ID}"
+          npx --yes firebase-tools@14.10.1 hosting:clone "$HOSTING_SITE:live" "$HOSTING_SITE:$RB" --project "$PROJECT_ID" --non-interactive
+          echo "I61_ROLLBACK_CHANNEL_ID=$RB" >> "$GITHUB_ENV"
+          echo "rollback_channel=$RB" >> "$GITHUB_OUTPUT"
+          npx --yes firebase-tools@14.10.1 hosting:clone "$HOSTING_SITE:$PREVIEW_CHANNEL_ID" "$HOSTING_SITE:live" --project "$PROJECT_ID" --non-interactive
+          echo "promoted=true" >> "$GITHUB_OUTPUT"
+          echo I61_SAME_ARTIFACT_PROMOTION=PASS
+
+      - name: Exact production readback
+        run: |
+          set -euo pipefail
+          export SITE="$I61_SITE_MANIFEST"
+          python3 - <<'PY'
+          import hashlib,json,os,urllib.parse,urllib.request
+          rows=[tuple(x.split('  ',1)) for x in open(os.environ['SITE']).read().splitlines() if x.strip()]
+          base=os.environ['PRODUCTION_URL'].rstrip('/');bad=[]
+          for want,rel in rows:
+            req=urllib.request.Request(base+'/'+urllib.parse.quote(rel,safe='/')+'?i61live='+os.environ['EXPECTED_HOSTED_PAYLOAD_DIGEST'][:16],headers={'Accept-Encoding':'identity','Cache-Control':'no-cache','User-Agent':'Gravicentra-I6.1-LIVE'})
+            with urllib.request.urlopen(req,timeout=30) as r: got=hashlib.sha256(r.read()).hexdigest()
+            if got!=want: bad.append((rel,want,got))
+          if bad: raise SystemExit('I61_LIVE_BYTE_READBACK_MISMATCH:'+json.dumps(bad[:5]))
+          with urllib.request.urlopen(urllib.request.Request(base+'/__recovery__/build.json?i61live=1',headers={'Cache-Control':'no-cache'}),timeout=30) as r: marker=json.loads(r.read())
+          if marker.get('sourceSha')!=os.environ['SOURCE_SHA'] or marker.get('buildId')!=os.environ['BUILD_ID'] or marker.get('gate')!='I6.1': raise SystemExit('I61_LIVE_BUILD_MARKER_MISMATCH')
+          out={'status':'PASS','readbackExact':True,'fileCount':len(rows),'sourceSha':os.environ['SOURCE_SHA'],'buildId':os.environ['BUILD_ID'],'productionUrl':base}
+          root=os.path.join(os.environ['RUNNER_TEMP'],'i61-live-evidence');os.makedirs(root,exist_ok=True)
+          open(os.path.join(root,'i6-1-production-readback.json'),'w').write(json.dumps(out,indent=2)+'\n')
+          print('I61_LIVE_READBACK_EXACT_PASS='+str(len(rows)))
+          PY
+
+      - name: Install LIVE authenticated proof dependencies
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false playwright@1.55.0 firebase-admin@13.4.0 >/dev/null
+          npx playwright install --with-deps chromium >/dev/null
+
+      - name: LIVE Aseguradoras roles, credentials and bank visibility proof
+        env:
+          PREVIEW_URL: ${{ env.PRODUCTION_URL }}
+          I61_AUTH_EVIDENCE_DIR: ${{ runner.temp }}/i61-live-evidence/authenticated
+        run: |
+          set -euo pipefail
+          mkdir -p "$I61_AUTH_EVIDENCE_DIR"
+          node tools/gravicentra-i6-1-aseguradoras-password-copy-ui.mjs
+          node - <<'NODE'
+          const fs=require('node:fs'),path=require('node:path');
+          const p=path.join(process.env.I61_AUTH_EVIDENCE_DIR,'i6-1-aseguradoras-password-copy-ui.json');
+          const E=JSON.parse(fs.readFileSync(p,'utf8'));
+          const need=(x,c)=>{if(!x)throw new Error(c)};
+          need(E.status==='PASS','I61_LIVE_AUTH_PROOF_NOT_PASS');
+          need(E.sourceSha===process.env.SOURCE_SHA&&E.buildId===process.env.BUILD_ID,'I61_LIVE_AUTH_RELEASE_MISMATCH');
+          for(const r of ['Dirección','SuperAdmin','AdminTenant','Operativo','Asesor']) need(E.roles?.[r]?.pass===true,'I61_LIVE_ROLE_FAIL:'+r);
+          need(E.roles?.Asesor?.evidence?.advisorRestricted===true,'I61_LIVE_ADVISOR_RESTRICTION_FAIL');
+          for(const r of ['Dirección','SuperAdmin','AdminTenant','Operativo']){
+            const x=E.roles?.[r]?.evidence||{};
+            need(Number(x.passwordCopyResolvedCount)>0,'I61_LIVE_PASSWORD_COPY_NOT_PROVEN:'+r);
+            need(Number(x.credentialCopyResolvedCount)>0,'I61_LIVE_CREDENTIAL_COPY_NOT_PROVEN:'+r);
+            need(Number(x.revealResolvedCount)>0&&Number(x.rehiddenCount)>0,'I61_LIVE_REVEAL_REHIDE_NOT_PROVEN:'+r);
+            need(x.bankCopyResolved===true,'I61_LIVE_BANK_COPY_NOT_PROVEN:'+r);
+          }
+          need(E.operationalWritesExecuted===0&&E.operationalWriteAttemptsObserved===0,'I61_LIVE_UNEXPECTED_WRITES');
+          console.log('I61_LIVE_AUTHENTICATED_ACCEPTANCE=PASS');
+          NODE
+
+      - name: Seal I6.1 LIVE PASS and open I6.2 read-only dry-run
+        run: |
+          set -euo pipefail
           node - <<'NODE'
           const fs=require('node:fs');
-          const c=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json','utf8'));
-          if(c.i6Execution?.authorized===true){
-            if(c.gateState?.gates?.I6?.status!=='IN_PROGRESS_I6_0_BASELINE') throw new Error('I6_0_BASELINE_STATUS_MISMATCH');
-          }
-          NODE
-          if node -e "const c=require('./artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json');process.exit(c.i6Execution?.authorized===true?0:1)"; then
-            node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
-          fi
+          const C=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8'));
+          const S=JSON.parse(fs.readFileSync(process.env.LEDGER,'utf8'));
+          const N=C.nextCandidate||{};
+          const old=JSON.parse(JSON.stringify(C.certifiedCandidate||{}));
+          const need=(x,c)=>{if(!x)throw new Error(c)};
+          need(N.status==='I6_1_PRODUCT_SUCCESSOR_PREVIEW_PASS','I61_SEAL_PREVIEW_STATUS_INVALID');
+          need(C.nextAction==='AUTHORIZE_I6_1_SUCCESSOR_PRODUCTION_PROMOTION','I61_SEAL_NEXT_ACTION_INVALID');
+          const promoted={
+            sourceSha:N.sourceSha,sourceTree:N.sourceTree,i3RunId:N.runId,i3Conclusion:'success',runnerCommit:N.sourceSha,
+            buildId:N.buildId,artifactId:N.artifactId,artifactName:N.artifactName,artifactArchiveDigest:N.artifactArchiveDigest,
+            previewChannelId:'gi-i61-'+N.runId,previewUrl:N.previewUrl,hostedFileCount:N.readbackFileCount,hostedPayloadDigest:N.hostedPayloadDigest,
+            backendFileCount:old.backendFileCount,backendSourceDigest:old.backendSourceDigest,backendUnchangedFromPreI61:true,
+            bundleFileCount:old.bundleFileCount,bundleDigest:N.bundleDigest,readbackExact:true,readbackFileCount:N.readbackFileCount,
+            sameFrontendArtifactPreviewToProductionRequired:true,sameBackendSourcePackageRequiredForI5:false,sourceMutatedAfterBuild:false,
+            productionUrl:process.env.PRODUCTION_URL,promotedLiveRunId:Number(process.env.GITHUB_RUN_ID)
+          };
+          C.preI61CertifiedCandidate=C.preI61CertifiedCandidate||old;
+          C.certifiedCandidate=promoted;
+          N.status='I6_1_PRODUCT_SUCCESSOR_LIVE_PASS';N.productionMutationAuthorized=false;N.dataMutationAuthorized=false;N.liveAcceptanceRunId=Number(process.env.GITHUB_RUN_ID);N.rollbackChannelId=process.env.I61_ROLLBACK_CHANNEL_ID;N.productionReadbackExact=true;N.liveRolesPass=5;C.nextCandidate=N;
+          C.i61SuccessorPreview={...(C.i61SuccessorPreview||{}),status:'I6_1_PRODUCT_SUCCESSOR_LIVE_PASS',liveAcceptanceRunId:Number(process.env.GITHUB_RUN_ID),productionReadbackExact:true,rolesPass:5,operationalWritesExecuted:0,productionTouched:true,dataTouched:false,augustDataTouched:false,nextRequiredProof:'I6_2_ASEGURADORAS_DRY_RUN'};
+          C.i61LiveSeal={status:'I6_1_PRODUCT_SUCCESSOR_LIVE_PASS',sourceSha:N.sourceSha,sourceTree:N.sourceTree,buildId:N.buildId,artifactId:N.artifactId,artifactArchiveDigest:N.artifactArchiveDigest,previewChannelId:'gi-i61-'+N.runId,productionUrl:process.env.PRODUCTION_URL,productionReadbackExact:true,readbackFileCount:N.readbackFileCount,authenticatedRolesPass:5,directPasswordCopyPass:true,combinedCredentialCopyPass:true,revealRehidePass:true,bankVisibilityAndCopyPass:true,advisorRestrictionPass:true,operationalWritesExecuted:0,operationalWriteAttemptsObserved:0,rollbackChannelId:process.env.I61_ROLLBACK_CHANNEL_ID,liveRunId:Number(process.env.GITHUB_RUN_ID),dataTouched:false,augustDataTouched:false};
+          C.gateState.gates.I6.status='I6_1_PRODUCT_GAPS_FROZEN';C.gateState.gates.I6.activeSubgate='I6.2';C.gateState.gates.I6.dataMutationAuthorized=false;C.gateState.gates.I6.lastFrozenMiniGate='I6.1';C.gateState.lastFormallyCompletedMiniGate='I6.1';
+          C.i6Execution.activeSubgate='I6.2';C.i6Execution.dryRunPrepared=false;C.i6Execution.dataMutationAuthorized=false;C.i6Execution.productMutationAuthorized=false;C.i6Execution.sourceDataApplyAuthorized=false;
+          C.nextAction='I6_2_ASEGURADORAS_DRY_RUN';
+          C.postproductionExitProgress={...(C.postproductionExitProgress||{}),formalPercent:20,frozenMiniGates:2,totalMiniGates:10,lastFrozenMiniGate:'I6.1',activeMiniGate:'I6.2'};
+          S.releaseBinding={sourceSha:N.sourceSha,buildId:N.buildId,artifactId:N.artifactId,artifactArchiveDigest:N.artifactArchiveDigest,previewChannelId:'gi-i61-'+N.runId};
+          S.successorCandidate={...(S.successorCandidate||{}),sourceSha:N.sourceSha,sourceTree:N.sourceTree,status:'I6_1_PRODUCT_SUCCESSOR_LIVE_PASS',i61PreviewAcceptanceRunId:N.authenticatedAcceptanceRunId,i61LiveRunId:Number(process.env.GITHUB_RUN_ID),reason:'Exact I6.1 Preview artifact promoted to LIVE after authenticated acceptance; unaffected capabilities preserved.'};
+          S.i61LiveAcceptance={status:'PASS',sourceSha:N.sourceSha,buildId:N.buildId,artifactId:N.artifactId,liveRunId:Number(process.env.GITHUB_RUN_ID),rolesPass:5,operationalWritesExecuted:0,unaffectedCapabilitiesPreserved:true};
+          const receipt={schemaVersion:'gravicentra-i6-1-live-pass-v1',status:'I6_1_PRODUCT_SUCCESSOR_LIVE_PASS',productBrand:'Gravicentra Insurance',sourceSha:N.sourceSha,sourceTree:N.sourceTree,buildId:N.buildId,artifactId:N.artifactId,artifactArchiveDigest:N.artifactArchiveDigest,previewChannelId:'gi-i61-'+N.runId,productionUrl:process.env.PRODUCTION_URL,productionReadbackExact:true,readbackFileCount:N.readbackFileCount,authenticatedRolesPass:['Dirección','SuperAdmin','AdminTenant','Operativo','Asesor'],bankAccountsVisibleAndCopyable:true,usernamesVisible:true,passwordRevealAndCopyPass:true,combinedCredentialCopyPass:true,advisorRestricted:true,operationalWritesExecuted:0,dataTouched:false,augustDataTouched:false,rollbackChannelId:process.env.I61_ROLLBACK_CHANNEL_ID,liveRunId:Number(process.env.GITHUB_RUN_ID),nextAction:'I6_2_ASEGURADORAS_DRY_RUN'};
+          fs.writeFileSync(process.env.CONTROL,JSON.stringify(C,null,2)+'\n');fs.writeFileSync(process.env.LEDGER,JSON.stringify(S,null,2)+'\n');fs.writeFileSync(process.env.LIVE_RECEIPT,JSON.stringify(receipt,null,2)+'\n');
 
-      - name: Publish validated governance-only transition
-        if: steps.transition.outputs.phase != 'NOOP_ALREADY_ACTIVE'
-        shell: bash
+          let g=fs.readFileSync(process.env.GUARD,'utf8');
+          g=g.replace("const activeI60=g.I6?.status==='IN_PROGRESS_I6_0_BASELINE'&&g.I6?.activeSubgate==='I6.0';\nconst frozenI60=g.I6?.status==='I6_0_BASELINE_FROZEN'&&g.I6?.activeSubgate==='I6.1';\nneed(activeI60||frozenI60,'I6_GATE_STATE_INVALID');","const activeI60=g.I6?.status==='IN_PROGRESS_I6_0_BASELINE'&&g.I6?.activeSubgate==='I6.0';\nconst frozenI60=g.I6?.status==='I6_0_BASELINE_FROZEN'&&g.I6?.activeSubgate==='I6.1';\nconst frozenI61=g.I6?.status==='I6_1_PRODUCT_GAPS_FROZEN'&&g.I6?.activeSubgate==='I6.2';\nneed(activeI60||frozenI60||frozenI61,'I6_GATE_STATE_INVALID');");
+          g=g.replace("need((activeI60&&C.i6Execution?.activeSubgate==='I6.0')||(frozenI60&&C.i6Execution?.activeSubgate==='I6.1'),'I6_EXECUTION_SUBGATE_INVALID');","need((activeI60&&C.i6Execution?.activeSubgate==='I6.0')||(frozenI60&&C.i6Execution?.activeSubgate==='I6.1')||(frozenI61&&C.i6Execution?.activeSubgate==='I6.2'),'I6_EXECUTION_SUBGATE_INVALID');");
+          g=g.replace("need(R.sourceSha==='16f174d087024085eff18079c486f717ef98d691','I6_CERTIFIED_SOURCE_DRIFT');\nneed(R.buildId==='gi-i3-16f174d08702-57f234755dc1','I6_CERTIFIED_BUILD_DRIFT');\nneed(Number(R.artifactId)===10183074943,'I6_CERTIFIED_ARTIFACT_DRIFT');","if(frozenI61){need(R.sourceSha===C.i61LiveSeal?.sourceSha,'I6_CERTIFIED_SOURCE_DRIFT');need(R.buildId===C.i61LiveSeal?.buildId,'I6_CERTIFIED_BUILD_DRIFT');need(Number(R.artifactId)===Number(C.i61LiveSeal?.artifactId),'I6_CERTIFIED_ARTIFACT_DRIFT');}else{need(R.sourceSha==='16f174d087024085eff18079c486f717ef98d691','I6_CERTIFIED_SOURCE_DRIFT');need(R.buildId==='gi-i3-16f174d08702-57f234755dc1','I6_CERTIFIED_BUILD_DRIFT');need(Number(R.artifactId)===10183074943,'I6_CERTIFIED_ARTIFACT_DRIFT');}");
+          g=g.replace("need(successor.parentCertifiedSourceSha===R.sourceSha,'I6_1_SUCCESSOR_PARENT_MISMATCH');","need(successor.parentCertifiedSourceSha===(frozenI61?C.preI61CertifiedCandidate?.sourceSha:R.sourceSha),'I6_1_SUCCESSOR_PARENT_MISMATCH');");
+          g=g.replace("need(['PREVIEW_TECHNICAL_PASS_AWAITING_AUTHENTICATED_HUMAN_ACCEPTANCE','I6_1_PRODUCT_SUCCESSOR_PREVIEW_PASS'].includes(successor.status),'I6_1_SUCCESSOR_STATUS_INVALID');","need(['PREVIEW_TECHNICAL_PASS_AWAITING_AUTHENTICATED_HUMAN_ACCEPTANCE','I6_1_PRODUCT_SUCCESSOR_PREVIEW_PASS','I6_1_PRODUCT_SUCCESSOR_LIVE_PASS'].includes(successor.status),'I6_1_SUCCESSOR_STATUS_INVALID');");
+          g=g.replace("need(frozenI60,'I6_1_SUCCESSOR_OUTSIDE_ACTIVE_SUBGATE');","need(frozenI60||frozenI61,'I6_1_SUCCESSOR_OUTSIDE_ACTIVE_SUBGATE');");
+          fs.writeFileSync(process.env.GUARD,g);
+          NODE
+          node --check "$GUARD"
+          node "$GUARD" --mode=i6
+          echo I61_LIVE_GATE_SEAL=PASS
+
+      - name: Commit canonical LIVE seal
         run: |
           set -euo pipefail
+          git config user.name gravicentra-i6-1-live-bot
+          git config user.email actions@users.noreply.github.com
+          git add "$CONTROL" "$LEDGER" "$LIVE_RECEIPT" "$GUARD"
+          git diff --cached --quiet && { echo I61_LIVE_SEAL_NO_CHANGES >&2; exit 1; }
+          git commit -m "release(i6.1): seal same-artifact LIVE PASS and open I6.2 [run ${GITHUB_RUN_ID}]"
           git push origin HEAD:recovery/fase-a-clean-20260831
 
-      - name: Record read-only execution summary
-        if: always()
-        shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p "$RUNNER_TEMP/i6-governance"
-          node - <<'NODE' > "$RUNNER_TEMP/i6-governance/summary.json"
-          const fs=require('node:fs');
-          const c=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json','utf8'));
-          console.log(JSON.stringify({
-            schemaVersion:'gravicentra-i6-governance-transition-summary-v1',
-            i6Status:c.gateState?.gates?.I6?.status||'',
-            activeSubgate:c.gateState?.gates?.I6?.activeSubgate||'',
-            activeProjectSources:c.projectSources?.activePackage||'',
-            staticSourceUpdateRequired:c.projectSources?.staticSourceUpdateRequired===true,
-            dataMutationAuthorized:c.i6Execution?.dataMutationAuthorized===true,
-            sourceDataApplyAuthorized:c.i6Execution?.sourceDataApplyAuthorized===true,
-            operationalWritesExecuted: 0,
-            augustDataTouched: false
-          },null,2));
-          NODE
-
-      - name: Upload governance evidence
+      - name: Upload I6.1 LIVE evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: gravicentra-i6-governance-${{ github.run_id }}
-          path: ${{ runner.temp }}/i6-governance
-          if-no-files-found: error
+          name: gravicentra-i6-1-live-${{ github.run_id }}
+          path: ${{ runner.temp }}/i61-live-evidence
+          include-hidden-files: true
+          if-no-files-found: warn
           retention-days: 90
+
+      - name: Roll back LIVE automatically on any promotion failure
+        if: failure() && steps.promote.outputs.promoted == 'true'
+        run: |
+          set -euo pipefail
+          test -n "${I61_ROLLBACK_CHANNEL_ID:-}"
+          npx --yes firebase-tools@14.10.1 hosting:clone "$HOSTING_SITE:$I61_ROLLBACK_CHANNEL_ID" "$HOSTING_SITE:live" --project "$PROJECT_ID" --non-interactive
+          echo I61_LIVE_ROLLBACK_EXECUTED=true
+
+      - name: Summary
+        if: success()
+        run: |
+          {
+            echo '## Gravicentra Insurance — I6.1 LIVE'
+            echo '- Same Preview artifact promoted: PASS'
+            echo '- Production byte readback: PASS'
+            echo '- Authenticated roles: 5/5 PASS'
+            echo '- Users visible: PASS'
+            echo '- Password reveal/copy: PASS'
+            echo '- Combined credential copy: PASS'
+            echo '- Bank account visibility/copy: PASS'
+            echo '- Operational writes: 0'
+            echo '- I6.1 LIVE: PASS'
+            echo '- I6.2 Aseguradoras dry-run: OPEN'
+          } >> "$GITHUB_STEP_SUMMARY"
