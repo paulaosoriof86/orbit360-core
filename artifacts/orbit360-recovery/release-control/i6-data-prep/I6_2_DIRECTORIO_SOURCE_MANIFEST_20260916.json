@@ -1,0 +1,43 @@
+{
+  "schemaVersion": "gravicentra-i6-2-source-prep-manifest-v1",
+  "status": "SOURCE_PREP_ONLY_NON_AUTHORITATIVE",
+  "date": "2026-09-16",
+  "product": "Gravicentra Insurance",
+  "futureGate": "I6.2",
+  "activeGateRemains": "I6.1",
+  "sourceFileName": "Directorio Aseguradoras Guatemala 2026 (2)(1).xlsx",
+  "sourceFileSha256": "f2e57fa72ff1b94b110b5037038c6c47fbc727c513f9eebd2348d7f4f2244083",
+  "preparationBoundary": {
+    "controlPlaneTransitionExecuted": false,
+    "firestoreReadExecuted": false,
+    "firestoreWriteExecuted": false,
+    "sourceDataApplyExecuted": false,
+    "productionDeploymentExecuted": false,
+    "formalProgressCredit": false
+  },
+  "includedInsurerSheets": [
+    {"sheet":"EL ROBLE","usedRange":"A1:H57"},
+    {"sheet":"MAPFRE SEGUROS","usedRange":"A1:H50"},
+    {"sheet":"GENERAL","usedRange":"A1:H46"},
+    {"sheet":"G&T SEGUROS","usedRange":"A1:H51"},
+    {"sheet":"COLUMNA","usedRange":"A1:H39"},
+    {"sheet":"LA CEIBA","usedRange":"A1:H45"},
+    {"sheet":"GUATEMALTECA","usedRange":"A1:H35"},
+    {"sheet":"UNIVERSALES","usedRange":"A1:J55"},
+    {"sheet":"RURAL","usedRange":"A1:H30"},
+    {"sheet":"BAM","usedRange":"A1:H41"},
+    {"sheet":"BANTRAB","usedRange":"A1:H27"},
+    {"sheet":"FICOHSA","usedRange":"A1:H41"},
+    {"sheet":"PRIVANZA","usedRange":"A1:H32"},
+    {"sheet":"ÓLE","usedRange":"A1:H29"}
+  ],
+  "excludedSheets": [
+    "ÍNDICE",
+    "📋 DIAGNÓSTICO",
+    "T&A",
+    "Tech"
+  ],
+  "includedInsurerSheetCount": 14,
+  "nextUse": "When I6.1 is frozen PASS and I6.2 formally opens, this exact hashed source may be used to drive the authoritative Firestore current-state diff/dedup dry-run without re-discovering workbook scope.",
+  "credentialsExposure": "NONE_IN_THIS_MANIFEST"
+}
