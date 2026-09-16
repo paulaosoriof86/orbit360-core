@@ -1,0 +1,32 @@
+{
+  "schemaVersion": "gravicentra-i6-1-live-pass-v1",
+  "status": "I6_1_PRODUCT_SUCCESSOR_LIVE_PASS",
+  "productBrand": "Gravicentra Insurance",
+  "sourceSha": "03b03690b5583442dd448e954fb66c3c78648fb3",
+  "sourceTree": "c11d4c49670f73e7b72229f319466f73dfa58f04",
+  "buildId": "gi-i61-03b03690b558-57f234755dc1",
+  "artifactId": 10422922481,
+  "artifactArchiveDigest": "sha256:a7107ef0cc61d41e7e69146186b5c3b7b9c7d0b015e17e6a9dc43722ab4a6f1f",
+  "previewChannelId": "gi-i61-35034732459",
+  "productionUrl": "https://ays-orbit-360-lab.web.app",
+  "productionReadbackExact": true,
+  "readbackFileCount": 202,
+  "authenticatedRolesPass": [
+    "Dirección",
+    "SuperAdmin",
+    "AdminTenant",
+    "Operativo",
+    "Asesor"
+  ],
+  "bankAccountsVisibleAndCopyable": true,
+  "usernamesVisible": true,
+  "passwordRevealAndCopyPass": true,
+  "combinedCredentialCopyPass": true,
+  "advisorRestricted": true,
+  "operationalWritesExecuted": 0,
+  "dataTouched": false,
+  "augustDataTouched": false,
+  "rollbackChannelId": "gi-i61-rb-35136211332",
+  "liveRunId": 35136211332,
+  "nextAction": "I6_2_ASEGURADORAS_DRY_RUN"
+}

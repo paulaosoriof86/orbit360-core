@@ -32,11 +32,12 @@ need(G.lastFormallyCompletedGate==='I5','I6_LAST_COMPLETED_GATE_INVALID');
 need(G.nextFrozenIteration==='I6','I6_NEXT_ITERATION_INVALID');
 const activeI60=g.I6?.status==='IN_PROGRESS_I6_0_BASELINE'&&g.I6?.activeSubgate==='I6.0';
 const frozenI60=g.I6?.status==='I6_0_BASELINE_FROZEN'&&g.I6?.activeSubgate==='I6.1';
-need(activeI60||frozenI60,'I6_GATE_STATE_INVALID');
+const frozenI61=g.I6?.status==='I6_1_PRODUCT_GAPS_FROZEN'&&g.I6?.activeSubgate==='I6.2';
+need(activeI60||frozenI60||frozenI61,'I6_GATE_STATE_INVALID');
 
 need(C.i6Execution?.authorized===true,'I6_NOT_AUTHORIZED');
 need(C.i6Execution?.authorizationReceiptPath===AUTH_RECEIPT,'I6_AUTH_RECEIPT_PATH_MISMATCH');
-need((activeI60&&C.i6Execution?.activeSubgate==='I6.0')||(frozenI60&&C.i6Execution?.activeSubgate==='I6.1'),'I6_EXECUTION_SUBGATE_INVALID');
+need((activeI60&&C.i6Execution?.activeSubgate==='I6.0')||(frozenI60&&C.i6Execution?.activeSubgate==='I6.1')||(frozenI61&&C.i6Execution?.activeSubgate==='I6.2'),'I6_EXECUTION_SUBGATE_INVALID');
 need(C.i6Execution?.dryRunPrepared===false,'I6_DRYRUN_MUST_START_FALSE');
 need(C.i6Execution?.dataMutationAuthorized===false,'I6_DATA_MUTATION_MUST_BE_FALSE');
 need(C.i6Execution?.productMutationAuthorized===false,'I6_PRODUCT_MUTATION_MUST_BE_FALSE');
@@ -56,9 +57,7 @@ need(C.projectSources?.reason==null,'I6_PROJECT_SOURCE_UPDATE_REASON_MUST_BE_NUL
 need(M.packageId===C.projectSources.activePackage&&M.version===4,'I6_V4_MANIFEST_BINDING_INVALID');
 
 const R=C.certifiedCandidate||{};
-need(R.sourceSha==='16f174d087024085eff18079c486f717ef98d691','I6_CERTIFIED_SOURCE_DRIFT');
-need(R.buildId==='gi-i3-16f174d08702-57f234755dc1','I6_CERTIFIED_BUILD_DRIFT');
-need(Number(R.artifactId)===10183074943,'I6_CERTIFIED_ARTIFACT_DRIFT');
+if(frozenI61){need(R.sourceSha===C.i61LiveSeal?.sourceSha,'I6_CERTIFIED_SOURCE_DRIFT');need(R.buildId===C.i61LiveSeal?.buildId,'I6_CERTIFIED_BUILD_DRIFT');need(Number(R.artifactId)===Number(C.i61LiveSeal?.artifactId),'I6_CERTIFIED_ARTIFACT_DRIFT');}else{need(R.sourceSha==='16f174d087024085eff18079c486f717ef98d691','I6_CERTIFIED_SOURCE_DRIFT');need(R.buildId==='gi-i3-16f174d08702-57f234755dc1','I6_CERTIFIED_BUILD_DRIFT');need(Number(R.artifactId)===10183074943,'I6_CERTIFIED_ARTIFACT_DRIFT');}
 need(S.schemaVersion==='gravicentra-capability-status-ledger-v1','I6_LEDGER_SCHEMA_INVALID');
 need(Array.isArray(S.capabilities)&&S.capabilities.length===15,'I6_LEDGER_COUNT_INVALID');
 need(S.capabilities.every(x=>x.liveAcceptance?.status==='LATEST_APPROVED_VERSION_LIVE_PASS'),'I6_PRIOR_LIVE_PASS_NOT_PRESERVED');
@@ -84,10 +83,10 @@ const allowedSuccessorProduct=new Set(successor&&Array.isArray(successor.allowed
 const forbidden=changed.filter(p=>!allowedPrefixes.some(prefix=>p.startsWith(prefix))&&!allowedSuccessorProduct.has(p));
 need(forbidden.length===0,'I6_PRODUCT_SOURCE_DRIFT_OUTSIDE_BOUND_SUCCESSOR:'+forbidden.slice(0,20).join(','));
 if(successor){
- need(frozenI60,'I6_1_SUCCESSOR_OUTSIDE_ACTIVE_SUBGATE');
+ need(frozenI60||frozenI61,'I6_1_SUCCESSOR_OUTSIDE_ACTIVE_SUBGATE');
  need(/^[0-9a-f]{40}$/.test(String(successor.sourceSha||'')),'I6_1_SUCCESSOR_SHA_INVALID');
- need(successor.parentCertifiedSourceSha===R.sourceSha,'I6_1_SUCCESSOR_PARENT_MISMATCH');
- need(['PREVIEW_TECHNICAL_PASS_AWAITING_AUTHENTICATED_HUMAN_ACCEPTANCE','I6_1_PRODUCT_SUCCESSOR_PREVIEW_PASS'].includes(successor.status),'I6_1_SUCCESSOR_STATUS_INVALID');
+ need(successor.parentCertifiedSourceSha===(frozenI61?C.preI61CertifiedCandidate?.sourceSha:R.sourceSha),'I6_1_SUCCESSOR_PARENT_MISMATCH');
+ need(['PREVIEW_TECHNICAL_PASS_AWAITING_AUTHENTICATED_HUMAN_ACCEPTANCE','I6_1_PRODUCT_SUCCESSOR_PREVIEW_PASS','I6_1_PRODUCT_SUCCESSOR_LIVE_PASS'].includes(successor.status),'I6_1_SUCCESSOR_STATUS_INVALID');
  need(successor.readbackExact===true&&Number(successor.readbackFileCount)>0,'I6_1_SUCCESSOR_READBACK_INVALID');
  try{execFileSync('git',['merge-base','--is-ancestor',successor.sourceSha,current],{stdio:'ignore'});}catch{throw new Error('I6_1_SUCCESSOR_NOT_ANCESTOR');}
 }
