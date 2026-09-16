@@ -1,0 +1,36 @@
+{
+  "schemaVersion": "gravicentra-i6-1-production-promotion-authorization-v1",
+  "status": "AUTHORIZED_BY_OWNER",
+  "productBrand": "Gravicentra Insurance",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "gate": "I6.1",
+  "authorization": {
+    "authorizedAtDate": "2026-09-16",
+    "decision": "AUTHORIZED_BY_OWNER",
+    "scope": "PROMOTE_EXACT_I6_1_PREVIEW_ARTIFACT_TO_PRODUCTION_AND_VERIFY_LIVE",
+    "userIntent": "Update Gravicentra Insurance quickly and leave the approved Aseguradoras directory behavior visible and usable after update.",
+    "sameArtifactOnly": true,
+    "rebuildAuthorized": false,
+    "productSourceMutationAuthorized": false,
+    "operationalDataMutationAuthorized": false,
+    "augustDataApplyAuthorized": false,
+    "perBlockDataApplyStillRequiresDryRunDiffAndExplicitAuthorization": true
+  },
+  "candidateBinding": {
+    "sourceSha": "03b03690b5583442dd448e954fb66c3c78648fb3",
+    "buildId": "gi-i61-03b03690b558-57f234755dc1",
+    "artifactId": 10422922481,
+    "artifactName": "gravicentra-i6-1-35034732459",
+    "artifactArchiveDigest": "sha256:a7107ef0cc61d41e7e69146186b5c3b7b9c7d0b015e17e6a9dc43722ab4a6f1f",
+    "previewChannelId": "gi-i61-35034732459",
+    "previewAcceptanceRunId": 35135474964
+  },
+  "governance": {
+    "controlPlaneMustStillAuthorizeExactStateBeforePromotion": true,
+    "rollbackBeforePromotionRequired": true,
+    "exactProductionReadbackRequired": true,
+    "authenticatedLiveAcceptanceRequired": true,
+    "i6_2MayOpenOnlyAfterI6_1LivePass": true
+  }
+}
