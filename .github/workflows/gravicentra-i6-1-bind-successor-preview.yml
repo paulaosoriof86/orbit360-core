@@ -39,6 +39,36 @@ jobs:
         with:
           node-version: '22'
 
+      - name: Fix QA credential clipboard read race only
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const p='tools/gravicentra-i6-1-aseguradoras-password-copy-ui.mjs';
+          let s=fs.readFileSync(p,'utf8');
+          const re=/async function waitCredentialClipboard\(page\)\{.*?\nasync function waitBankClipboard/s;
+          if(!re.test(s)) throw new Error('I61_QA_CREDENTIAL_WAIT_FUNCTION_NOT_FOUND');
+          const replacement=`async function waitCredentialClipboard(page){
+            const h=await page.waitForFunction(async()=>{
+              try{
+                const v=await navigator.clipboard.readText();
+                const marker='\\nContraseña: ';
+                const at=v.indexOf(marker);
+                const pwd=at>=0?v.slice(at+marker.length).trim():'';
+                return typeof v==='string'&&v.includes('Usuario: ')&&at>=0&&!!pwd&&pwd!=='—'?v:false;
+              }catch{return false;}
+            },null,{timeout:CREDENTIAL_WAIT_BOUND_MS});
+            const value=await h.jsonValue();
+            await h.dispose();
+            return String(value||'');
+          }
+          async function waitBankClipboard`;
+          s=s.replace(re,replacement);
+          fs.writeFileSync(p,s);
+          console.log('I61_QA_CREDENTIAL_CLIPBOARD_ATOMIC_READ_FIX=APPLIED');
+          NODE
+          node --check tools/gravicentra-i6-1-aseguradoras-password-copy-ui.mjs
+
       - name: Bind exact successful causal successor Preview in working tree
         env:
           GH_TOKEN: ${{ github.token }}
@@ -178,7 +208,7 @@ jobs:
           set -euo pipefail
           git config user.name gravicentra-i6-1-bot
           git config user.email actions@users.noreply.github.com
-          git add "$CONTROL" "$TECH_RECEIPT" "$EVIDENCE_FILE" "$GUARD"
+          git add "$CONTROL" "$TECH_RECEIPT" "$EVIDENCE_FILE" "$GUARD" tools/gravicentra-i6-1-aseguradoras-password-copy-ui.mjs
           git diff --cached --quiet && { echo I61_ACCEPT_NO_CHANGES >&2; exit 1; }
           git commit -m "qa(i6.1): seal causal successor Preview PASS [run ${GITHUB_RUN_ID}]"
           git push origin HEAD:recovery/fase-a-clean-20260831
