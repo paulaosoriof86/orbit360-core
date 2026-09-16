@@ -78,6 +78,19 @@ jobs:
           NODE
           node "$GUARD" --mode=i6
 
+      - name: Persist exact technical candidate binding before functional acceptance
+        run: |
+          set -euo pipefail
+          git config user.name gravicentra-i6-1-bot
+          git config user.email actions@users.noreply.github.com
+          git add "$CONTROL" "$TECH_RECEIPT"
+          if ! git diff --cached --quiet; then
+            git commit -m "qa(i6.1): bind exact technical successor before acceptance [run ${GITHUB_RUN_ID}]"
+            git push origin HEAD:recovery/fase-a-clean-20260831
+          else
+            echo I61_TECHNICAL_BINDING_ALREADY_CANONICAL
+          fi
+
       - name: Install isolated browser proof dependencies
         run: |
           set -euo pipefail
