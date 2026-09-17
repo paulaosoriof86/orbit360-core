@@ -1,5 +1,5 @@
 {
-  "schema": "GRAVICENTRA_DATA_UPDATE_MECHANISM_REGISTRY_V1",
+  "schema": "GRAVICENTRA_DATA_UPDATE_MECHANISM_REGISTRY_V2",
   "status": "FROZEN_OPERATIONAL_REGISTRY",
   "date": "2026-09-17",
   "authorityRole": "DERIVED_OPERATIONAL_REGISTRY_NOT_LINEAGE_AUTHORITY",
@@ -10,7 +10,8 @@
   "operatingPlan": "artifacts/orbit360-recovery/release-control/POSTPROD_DATA_UPDATE_OPERATING_PLAN_LOCK_20260917.json",
   "rules": {
     "neverInventWritePath": true,
-    "verifyApprovedMechanismAtModuleStart": true,
+    "reusePreviouslyApprovedMechanismBeforeAnyRediscovery": true,
+    "rediscoveryAllowedOnlyOnConcreteReproducibleDrift": true,
     "requestCurrentSourceBeforeEveryNewModule": true,
     "freezeEachSuccessfulRunWithEvidence": true,
     "liveVisibilityRequiredForClosure": true
@@ -20,44 +21,75 @@
       "capability": "ASEGURADORAS_OPERATIONAL_DIRECTORY",
       "approvedLineagePointer": "artifacts/orbit360-recovery/release-control/CAPABILITY_LINEAGE_LOCK.json",
       "knownOwner": "orbit360-platform/modules/aseguradoras.js",
-      "uiEntrypoint": "Orbit.importa.open(\"directorio-aseguradoras\")",
-      "uiEntrypointEvidence": "SOURCE_PRESENT",
-      "mechanismStatus": "ENTRYPOINT_PRESENT_IMPLEMENTATION_NOT_YET_CERTIFIED_LIVE",
+      "approvedWriteChain": "approved_ui -> Orbit.store (product operational facade) -> orbit360ProductOperationalCommand -> operational collection",
+      "operationalCollection": "aseguradoras",
+      "approvedWriteEvidence": [
+        "artifacts/orbit360-recovery/release-control/I5_EXECUTION_INTENT.json",
+        "artifacts/orbit360-recovery/release-control/CAPABILITY_STATUS_LEDGER.json",
+        "artifacts/orbit360-recovery/release-control/I4A_ASEGURADORAS_ROOT_CAUSE_AND_MECHANISM_CORRECTION_20260909.md",
+        "artifacts/orbit360-recovery/release-control/MECHANISM_FREEZE_V5_POST_I5_20260912.md"
+      ],
+      "approvedEvidenceConclusion": "I5 proved controlled LIVE Aseguradoras write through the product operational facade and cloud command with server readback, reload, cleanup and final absence. This mechanism is reused; it is not rediscovered from scratch unless concrete reproducible drift invalidates it.",
+      "directoryCredentialBoundary": "Credential values were not mutated by the I5 controlled write. Current I6.2 must preserve the already-approved credential/provider security boundary and must not overwrite or expose untouched secrets merely to refresh directory fields.",
+      "importerEntrypoint": "Orbit.importa.open(\"directorio-aseguradoras\")",
+      "importerRoleInI6_2": "AUXILIARY_SOURCE_PREPARATION_ONLY_NOT_WRITE_AUTHORITY",
+      "importerLimitation": "The existing directory importer contract does not by itself certify complete mutation of portals/accounts/credential-bearing directory data. I6.2 therefore reuses the approved operational write chain instead of redesigning or promoting the importer.",
+      "importerEvolutionPointer": "artifacts/orbit360-recovery/release-control/PHASE_B_WORK_PLAN_LOCK_20260917.json#B-DATA-IMPORTER-01",
+      "mechanismStatus": "APPROVED_WRITE_MECHANISM_REUSE_REQUIRED",
       "sourceRequiredBeforeStart": true,
       "sourceState": "CURRENT_SOURCE_ALREADY_SUPPLIED_AND_REPINNED_FOR_ACTIVE_RUN",
       "activeSourceIntake": "artifacts/orbit360-recovery/release-control/I6_2_DIRECTORIO_SOURCE_INTAKE_20260917.json",
-      "liveClosure": "READBACK_PASS_THEN_USER_REFRESH_MUST_SHOW_UPDATED_DATA",
-      "doNotClaimImporterPreferredUntil": "WRITE_CONTRACT_AND_CONTROLLED_LIVE_PERSISTENCE_PROOF_PASS"
+      "currentGate": "I6.2",
+      "nextMaterialStep": "LIVE_READBACK_THEN_DETERMINISTIC_DIFF_AGAINST_PINNED_SOURCE_USING_APPROVED_WRITE_CHAIN",
+      "liveClosure": "READBACK_AND_INTEGRITY_PASS_THEN_USER_REFRESH_MUST_SHOW_UPDATED_DATA",
+      "doNotRediscoverUnless": "CONCRETE_REPRODUCIBLE_DRIFT_OR_APPROVED_CHAIN_FAILURE"
     },
     "CLIENTES": {
+      "gate": "I6.3",
       "sourceRequiredBeforeStart": true,
       "sourceState": "WAITING_FOR_PAULA_SOURCE",
-      "mechanism": "TO_BE_VERIFIED_FROM_APPROVED_CODE_AT_MODULE_START",
+      "mechanism": "REUSE_APPROVED_EXISTING_WRITE_CONTRACT_FROM_LINEAGE_AND_ACCEPTANCE_EVIDENCE; LOCATE POINTERS ONLY, DO_NOT REDISCOVER ARCHITECTURE",
       "liveClosure": "READBACK_PASS_THEN_USER_REFRESH_MUST_SHOW_UPDATED_DATA"
     },
-    "POLIZAS": {
+    "POLIZAS_RIESGOS_VEHICULOS": {
+      "gate": "I6.4",
       "sourceRequiredBeforeStart": true,
       "sourceState": "WAITING_FOR_PAULA_SOURCE",
-      "mechanism": "TO_BE_VERIFIED_FROM_APPROVED_CODE_AT_MODULE_START",
-      "liveClosure": "READBACK_PASS_THEN_USER_REFRESH_MUST_SHOW_UPDATED_DATA"
-    },
-    "VEHICULOS": {
-      "sourceRequiredBeforeStart": true,
-      "sourceState": "WAITING_FOR_PAULA_SOURCE",
-      "mechanism": "TO_BE_VERIFIED_FROM_APPROVED_CODE_AT_MODULE_START",
+      "mechanism": "REUSE_APPROVED_EXISTING_WRITE_CONTRACT_FROM_LINEAGE_AND_ACCEPTANCE_EVIDENCE; LOCATE POINTERS ONLY, DO_NOT REDISCOVER ARCHITECTURE",
       "liveClosure": "READBACK_PASS_THEN_USER_REFRESH_MUST_SHOW_UPDATED_DATA"
     },
     "RECIBOS_CARTERA": {
+      "gate": "I6.5",
       "sourceRequiredBeforeStart": true,
       "sourceState": "WAITING_FOR_PAULA_SOURCE",
-      "mechanism": "TO_BE_VERIFIED_FROM_APPROVED_CODE_AT_MODULE_START",
+      "mechanism": "REUSE_APPROVED_EXISTING_WRITE_CONTRACT_FROM_LINEAGE_AND_ACCEPTANCE_EVIDENCE; LOCATE POINTERS ONLY, DO_NOT REDISCOVER_ARCHITECTURE",
       "liveClosure": "READBACK_PASS_THEN_USER_REFRESH_MUST_SHOW_UPDATED_DATA"
     },
-    "COBROS": {
+    "COBROS_CONCILIACION": {
+      "gate": "I6.6",
       "sourceRequiredBeforeStart": true,
       "sourceState": "WAITING_FOR_PAULA_SOURCE",
-      "mechanism": "TO_BE_VERIFIED_FROM_APPROVED_CODE_AT_MODULE_START",
+      "mechanism": "REUSE_APPROVED_EXISTING_WRITE_CONTRACT_FROM_LINEAGE_AND_ACCEPTANCE_EVIDENCE; LOCATE POINTERS ONLY, DO_NOT REDISCOVER_ARCHITECTURE",
       "liveClosure": "READBACK_PASS_THEN_USER_REFRESH_MUST_SHOW_UPDATED_DATA"
+    },
+    "COMISIONES_LIQUIDACIONES": {
+      "gate": "I6.7",
+      "sourceRequiredBeforeStart": true,
+      "sourceState": "WAITING_FOR_PAULA_SOURCE_OR_REUSE_ALREADY_PINNED_PLANILLAS_BY_LINEAGE_WHEN_AUTHORIZED",
+      "mechanism": "REUSE_APPROVED_EXISTING_WRITE_CONTRACT_AND_COMMISSION_ENGINE; NO_BLIND_REIMPORT",
+      "liveClosure": "READBACK_PASS_THEN_USER_REFRESH_MUST_SHOW_UPDATED_DATA"
+    },
+    "I6_8_ENABLEMENT_HISTORY_TRAINING": {
+      "gate": "I6.8",
+      "sourceRequiredBeforeStart": false,
+      "mechanism": "VALIDATE_EXISTING_APPROVED_RUNTIME_AND_PROVENANCE; NO_GENERAL_REIMPLEMENTATION",
+      "liveClosure": "LIVE_ROLE_AND_HISTORY_ACCEPTANCE_PASS"
+    },
+    "I6_9_FINAL_ACCEPTANCE": {
+      "gate": "I6.9",
+      "sourceRequiredBeforeStart": false,
+      "mechanism": "FINAL_TRANSVERSAL_ACCEPTANCE_ON_FROZEN_POSTPRODUCTION_STATE",
+      "liveClosure": "FASE_A_POSTSALIDA_PRODUCTION_ACCEPTED"
     }
   }
 }
