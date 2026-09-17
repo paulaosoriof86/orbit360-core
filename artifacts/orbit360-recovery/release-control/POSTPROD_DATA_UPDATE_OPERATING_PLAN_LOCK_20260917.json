@@ -1,0 +1,74 @@
+{
+  "schema": "GRAVICENTRA_POSTPROD_DATA_UPDATE_OPERATING_PLAN_LOCK_V1",
+  "status": "FROZEN_ACTIVE",
+  "date": "2026-09-17",
+  "productBrand": "Gravicentra Insurance",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "purpose": "Freeze the ordinary post-production DATA_UPDATE execution method so that execution does not depend on conversation context.",
+  "governingAuthority": {
+    "packageId": "GRAVICENTRA_PROJECT_SOURCES_EVERGREEN_V5",
+    "manifestPath": "artifacts/orbit360-recovery/project-sources-v2/v5/08_MANIFIESTO_FUENTES_EVERGREEN_V5.json",
+    "manifestBlobSha": "d1a0cc69ded3d38911e5e5504360228d7bcc05e1",
+    "deltaAddendumPath": "artifacts/orbit360-recovery/project-sources-v2/v5/07_ADDENDUM_ACTUALIZACION_INCREMENTAL_DELTA_EVERGREEN_V5_2026-09-16.md",
+    "deltaAddendumBlobSha": "637556b30de4dc346ef55e284c83175fabb921b8"
+  },
+  "lineageAuthority": "artifacts/orbit360-recovery/release-control/CAPABILITY_LINEAGE_LOCK.json",
+  "capabilityStatusAuthority": "artifacts/orbit360-recovery/release-control/CAPABILITY_STATUS_LEDGER.json",
+  "scope": "I6_POSTPRODUCTION_DATA_REFRESH",
+  "executionClass": "DATA_UPDATE_DELTA_FIRST",
+  "hardRules": {
+    "doNotReopenFaseAWithoutCausalRegression": true,
+    "doNotRebuildForPureDataUpdate": true,
+    "doNotRedeployForPureDataUpdate": true,
+    "doNotCreateParallelImporter": true,
+    "doNotReimportToFixVisibility": true,
+    "doNotReusePreviousModuleSourceAsCurrent": true,
+    "doNotAdvanceWithoutModuleClosure": true,
+    "maximumNormalCyclesPerModule": 2
+  },
+  "moduleProtocol": [
+    "REQUEST_CURRENT_SOURCE_FROM_PAULA_BEFORE_NEW_MODULE",
+    "PIN_SOURCE_IDENTITY_AND_HASH",
+    "VERIFY_APPROVED_UPDATE_MECHANISM_OR_WRITE_CONTRACT",
+    "LIVE_READBACK_CURRENT_STATE",
+    "DETERMINISTIC_DIFF",
+    "APPLY_DETERMINISTIC_DELTA_ONLY",
+    "ISOLATE_AMBIGUOUS_CASES_WITHOUT_BLOCKING_DETERMINISTIC_ROWS",
+    "READBACK_AND_INTEGRITY",
+    "USER_VISUAL_REFRESH_CHECK",
+    "MINI_FREEZE",
+    "NEXT_MODULE_ONLY_AFTER_CLOSE"
+  ],
+  "sourceIntakeContract": {
+    "beforeEveryNewModule": "ASK_PAULA_FOR_THE_CURRENT_SOURCE_FILE_OR_CURRENT_INFORMATION",
+    "pinBeforeWrite": true,
+    "recordFilename": true,
+    "recordCryptographicHash": true,
+    "recordSizeWhenFileBased": true,
+    "currentModuleException": "Aseguradoras/Directorio source is already supplied in the active workstream and must be repinned; do not ask again unless the supplied source changes."
+  },
+  "visualClosureContract": {
+    "pureDataUpdateExpectedBehavior": "After successful LIVE write/readback, refreshing the production Orbit Central/Gravicentra URL must display the updated data without build or deploy.",
+    "technicalCheckpointBeforeUserRefresh": "DATA_UPDATE_APPLIED_READBACK_PASS_PENDING_USER_VISUAL",
+    "userAction": "Paula refreshes the production URL after the module is reported technically complete.",
+    "successCheckpoint": "LIVE_VISUAL_CONFIRMED",
+    "ifNotVisible": [
+      "STOP_MODULE_CLOSURE",
+      "DO_NOT_REIMPORT",
+      "CLASSIFY_READ_PATH_HYDRATION_CACHE_ROUTING_DISPLAY_OR_CODE_DEFECT",
+      "FIX_CAUSAL_LAYER_ONLY",
+      "REPEAT_READBACK_AND_VISUAL_CHECK"
+    ]
+  },
+  "mechanismDecisionRule": {
+    "preferExistingApprovedPlatformImporterWhen": "Its read/write contract is verified for the target entity and a controlled LIVE proof confirms persistence and readback.",
+    "otherwise": "Use the already-approved deterministic update mechanism/write contract; do not invent a new importer.",
+    "codeChangeEscalation": "If a CODE_DEFECT requires source modification, exit pure DATA_UPDATE and apply immutable build/same-artifact release discipline."
+  },
+  "resumeContract": {
+    "sourceOfTruth": "CONTROL_PLANE.json plus this lock plus DATA_UPDATE_MECHANISM_REGISTRY.json",
+    "conversationMayOverride": false,
+    "firstActionOnResume": "Read active module and its source intake; execute only the first incomplete protocol step."
+  }
+}
