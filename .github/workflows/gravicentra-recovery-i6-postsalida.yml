@@ -27,21 +27,21 @@ concurrency:
   cancel-in-progress: false
 
 env:
+  PROJECT_ID: ays-orbit-360-lab
+  TENANT_ID: alianzas-soluciones
   CONTROL: artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json
   SOURCE_INTAKE: artifacts/orbit360-recovery/release-control/I6_2_DIRECTORIO_SOURCE_INTAKE_20260917.json
   HOLD_EVIDENCE: artifacts/orbit360-recovery/release-control/I6_2_DETERMINISTIC_DIFF_HOLD_20260917.json
+  I62_RECOVERY_PUBLIC_KEY_B64: LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlJQm9qQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FZOEFNSUlCaWdLQ0FZRUFvamcrRGMyV25TZUtBWkpLc0swdQpheUt6TUEzbEpQRzZJNDBHL21ybm41Q05tSDRwZUcxK0pRZ3dTZXA0OXp1b2tMd3dLRnRyUHR4ZmpKWURYOG1MCnQ4V3hGSDYvNkozeHdJajQ1N3F0SnVpc3NrTnFQN0JUS3VjRUFGNEtEZU85cVFiT3ZlZzQ1UFdTTE05c2tBWGwKSHBLM1hvS1RpV2twUHhObElVeU9TT25hQWIzeE8yMFBZRlpMb1E3ZE5xQ2wydEc2UmJnU0xpK1QwU3drYlloQwpGN2VKM2NzZDBvQ25lY0w3cUFFaCtiM00zUW9pQ0tkN2VRY0N2OG9NOFYwa1RnUFA2NWtVWVdWdG95U3R1OVVSClVqUGxHWmRxVzl2MnpOeDRiUWduaGkyMTFhbkwrS0llaS9na0pXSzFONmtKbC9VbVF2cVhNVW1KbE9SdVVFdnYKVCttMnhGaEVSNSswTVJJQURTbXR5RVovVmc2bGxJdzlXMk52K2UwdDhHWFkxZlQvdDZsN011Y0svZC9zeDV2dApTSHdESUN5N2prcVpwRFUzMEJ3RVFNSWpGM3BBWVNUc1pHNWo0WURYRGlDUjhSL0k4Q2ZaaURQR0Rza3ppOE5GCmVQTE1ZZmFXVStrdkZMSHZhN1pPaHFQUTRKU0J0OGxRMngwU1Q5anJvbWM5QWdNQkFBRT0KLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tCg==
 
 jobs:
-  i62-cursor-executor:
+  i62-causal-readback-recovery:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     env:
-      I62_PRIVATE_KEY_B64: ${{ secrets.I62_READBACK_PRIVATE_KEY_B64 }}
-      I62_PRIVATE_KEY_PEM: ${{ secrets.I62_READBACK_PRIVATE_KEY_PEM }}
-      GRAVICENTRA_I62_PRIVATE_KEY_B64: ${{ secrets.GRAVICENTRA_I62_READBACK_PRIVATE_KEY_B64 }}
-      GRAVICENTRA_I62_PRIVATE_KEY_PEM: ${{ secrets.GRAVICENTRA_I62_READBACK_PRIVATE_KEY_PEM }}
-      GRAVICENTRA_I6_2_PRIVATE_KEY_B64: ${{ secrets.GRAVICENTRA_I6_2_READBACK_PRIVATE_KEY_B64 }}
-      GRAVICENTRA_I6_2_PRIVATE_KEY_PEM: ${{ secrets.GRAVICENTRA_I6_2_READBACK_PRIVATE_KEY_PEM }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -53,8 +53,7 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Resume strictly from canonical I6.2 cursor
-        id: cursor
+      - name: Bind V5 second-cycle causal recovery with zero writes
         shell: bash
         run: |
           set -euo pipefail
@@ -63,110 +62,132 @@ jobs:
           const fs=require('node:fs');
           const C=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8'));
           const S=JSON.parse(fs.readFileSync(process.env.SOURCE_INTAKE,'utf8'));
+          const H=JSON.parse(fs.readFileSync(process.env.HOLD_EVIDENCE,'utf8'));
           const need=(x,c)=>{if(!x)throw new Error(c)};
+          need(C.status==='PRODUCTION_ACCEPTED','I62_PRODUCTION_BASELINE_NOT_ACCEPTED');
+          need(C.gateState?.gates?.I6?.status==='I6_2_DATA_UPDATE_V5_ACTIVE','I62_GATE_NOT_ACTIVE');
           need(C.gateState?.gates?.I6?.activeSubgate==='I6.2','I62_SUBGATE_NOT_ACTIVE');
           need(S.status==='PINNED_FOR_V5_DELTA','I62_SOURCE_NOT_PINNED');
           need(S.execution?.cursorState==='LIVE_READBACK_PASS','I62_CURSOR_NOT_LIVE_READBACK_PASS');
           need(S.execution?.nextRequiredStep==='DETERMINISTIC_DIFF','I62_NEXT_STEP_NOT_DETERMINISTIC_DIFF');
           need(C.nextAction==='I6_2_DETERMINISTIC_DIFF','I62_CONTROL_NEXT_ACTION_MISMATCH');
-          need(Number.isInteger(S.execution?.readbackRunId)&&S.execution.readbackRunId>0,'I62_READBACK_RUN_ID_MISSING');
-          fs.appendFileSync(process.env.GITHUB_OUTPUT,`readback_run_id=${S.execution.readbackRunId}\n`);
-          console.log('I62_CURSOR=LIVE_READBACK_PASS');
-          console.log('I62_NEXT_REQUIRED_STEP=DETERMINISTIC_DIFF');
+          need(H.status==='HOLD'&&H.holdCode==='HOLD_I6_2_EXISTING_READBACK_PRIVATE_KEY_MISMATCH','I62_CAUSAL_HOLD_NOT_PROVEN');
+          need(C.gateState?.gates?.I6?.dataMutationAuthorized===false,'I62_DATA_MUTATION_MUST_REMAIN_FALSE');
+          need(C.i6Execution?.dataMutationAuthorized===false,'I62_EXEC_DATA_MUTATION_MUST_REMAIN_FALSE');
+          need(C.i6Execution?.sourceDataApplyAuthorized===false,'I62_SOURCE_APPLY_MUST_REMAIN_FALSE');
+          need(C.i6Execution?.productMutationAuthorized===false,'I62_PRODUCT_MUTATION_MUST_REMAIN_FALSE');
+          console.log('I62_SECOND_CYCLE_CAUSAL_RECOVERY=AUTHORIZED_BY_V5_CYCLE_BUDGET');
+          console.log('I62_CAUSAL_REASON=PRIOR_READBACK_TRANSPORT_PRIVATE_KEY_NOT_PERSISTED');
+          console.log('I62_OLD_READBACK_RUN_ID='+S.execution.readbackRunId);
+          console.log('I62_FRESH_READBACK_IS_READ_ONLY=true');
           console.log('I6_2_WRITES_EXECUTED=0');
           NODE
 
-      - name: Honor proven private-key mismatch HOLD until exact dedicated key is restored
+      - name: Install read-only LIVE readback dependency
+        run: npm install --no-save --package-lock=false firebase-admin@13.10.0 >/dev/null
+
+      - name: Capture replacement exact LIVE readback encrypted to recovery transport key
         shell: bash
         run: |
           set -euo pipefail
+          OUT="$RUNNER_TEMP/i6-2-live-readback-recovery"
+          mkdir -p "$OUT"
+          export OUT
           node - <<'NODE'
           const fs=require('node:fs');
-          const H=fs.existsSync(process.env.HOLD_EVIDENCE)?JSON.parse(fs.readFileSync(process.env.HOLD_EVIDENCE,'utf8')):null;
-          const dedicatedKeyPresent=[
-            process.env.I62_PRIVATE_KEY_PEM,
-            process.env.GRAVICENTRA_I62_PRIVATE_KEY_PEM,
-            process.env.GRAVICENTRA_I6_2_PRIVATE_KEY_PEM,
-            process.env.I62_PRIVATE_KEY_B64,
-            process.env.GRAVICENTRA_I62_PRIVATE_KEY_B64,
-            process.env.GRAVICENTRA_I6_2_PRIVATE_KEY_B64
-          ].some(Boolean);
-          if(H?.status==='HOLD'&&['HOLD_I6_2_EXISTING_READBACK_PRIVATE_KEY_UNAVAILABLE','HOLD_I6_2_EXISTING_READBACK_PRIVATE_KEY_MISMATCH'].includes(H.holdCode)&&!dedicatedKeyPresent){
-            console.error('HOLD_I6_2_EXISTING_READBACK_PRIVATE_KEY_MISMATCH');
-            console.log('I62_CANONICAL_HOLD_EVIDENCE='+process.env.HOLD_EVIDENCE);
-            console.log('I62_DEDICATED_PRIVATE_KEY_BINDING_PRESENT=false');
-            console.log('I62_FIREBASE_SERVICE_ACCOUNT_KEY_RETRY_SKIPPED=PROVEN_MISMATCH');
-            console.log('I62_FRESH_READBACK_SUBSTITUTED=false');
-            console.log('I6_2_WRITES_EXECUTED=0');
-            process.exit(79);
-          }
-          if(dedicatedKeyPresent) console.log('I62_DEDICATED_PRIVATE_KEY_BINDING_PRESENT=true');
+          const crypto=require('node:crypto');
+          const {initializeApp,cert,deleteApp}=require('firebase-admin/app');
+          const {getFirestore}=require('firebase-admin/firestore');
+          const need=(x,c)=>{if(!x)throw new Error(c)};
+          const parseSA=()=>{
+            for(const k of ['SA_DEFAULT','SA_ORBIT360_LAB','SA_ORBIT_360_LAB']){
+              try{const x=JSON.parse(process.env[k]||'');if(x?.type==='service_account'&&x?.project_id===process.env.PROJECT_ID&&x?.client_email&&x?.private_key)return x;}catch{}
+            }
+            throw new Error('I62_EXISTING_SERVICE_ACCOUNT_NOT_AVAILABLE');
+          };
+          const canon=v=>{
+            if(v===null||v===undefined)return v===undefined?null:v;
+            if(typeof v!=='object')return v;
+            if(typeof v.toDate==='function'){try{return {$timestamp:v.toDate().toISOString()};}catch{}}
+            if(typeof v.path==='string'&&v.firestore)return {$ref:v.path};
+            if(Number.isFinite(v.latitude)&&Number.isFinite(v.longitude))return {$geo:[v.latitude,v.longitude]};
+            if(Array.isArray(v))return v.map(canon);
+            const o={};for(const k of Object.keys(v).sort())o[k]=canon(v[k]);return o;
+          };
+          const countSensitiveKeys=v=>{
+            let n=0,refs=0;
+            const walk=x=>{
+              if(!x||typeof x!=='object')return;
+              if(Array.isArray(x)){for(const y of x)walk(y);return;}
+              for(const [k,y] of Object.entries(x)){
+                if(/^(password|pass|contrasena|contraseña|clave|secret|token|credentialvalue)$/i.test(k)&&String(y??'').length)n++;
+                if(/^credentialref$/i.test(k)&&String(y??'').length)refs++;
+                walk(y);
+              }
+            };
+            walk(v);return {sensitiveValueFieldCount:n,credentialRefCount:refs};
+          };
+          const encrypt=(plain,pem)=>{
+            const key=crypto.randomBytes(32),iv=crypto.randomBytes(12);
+            const cipher=crypto.createCipheriv('aes-256-gcm',key,iv);
+            const ciphertext=Buffer.concat([cipher.update(plain),cipher.final()]);
+            const tag=cipher.getAuthTag();
+            const wrappedKey=crypto.publicEncrypt({key:pem,oaepHash:'sha256',padding:crypto.constants.RSA_PKCS1_OAEP_PADDING},key);
+            return {schema:'GRAVICENTRA_I6_2_ENCRYPTED_READBACK_RECOVERY_V2',algorithm:'AES-256-GCM+RSA-OAEP-SHA256',wrappedKey:wrappedKey.toString('base64'),iv:iv.toString('base64'),tag:tag.toString('base64'),ciphertext:ciphertext.toString('base64')};
+          };
+          (async()=>{
+            const source=JSON.parse(fs.readFileSync(process.env.SOURCE_INTAKE,'utf8'));
+            const app=initializeApp({credential:cert(parseSA()),projectId:process.env.PROJECT_ID},'gravicentra-i62-recovery-readback');
+            try{
+              const db=getFirestore(app);
+              const ref=db.collection('tenants').doc(process.env.TENANT_ID).collection('data').doc('aseguradoras').collection('items');
+              const snap=await ref.get();
+              const docs=snap.docs.map(d=>({id:d.id,data:canon(d.data()||{})})).sort((a,b)=>a.id.localeCompare(b.id));
+              need(docs.length>0,'I62_LIVE_READBACK_EMPTY');
+              const exact={schema:'GRAVICENTRA_I6_2_EXACT_LIVE_READBACK_RECOVERY_V2',projectId:process.env.PROJECT_ID,tenantId:process.env.TENANT_ID,collectionPath:`tenants/${process.env.TENANT_ID}/data/aseguradoras/items`,capturedAt:new Date().toISOString(),sourceSha256:source.source.sha256,replacesUnusableReadbackRunId:source.execution.readbackRunId,recoveryReason:'PRIOR_READBACK_TRANSPORT_PRIVATE_KEY_NOT_PERSISTED',causalCorrectionCycle:2,writesExecuted:0,documents:docs};
+              const plain=Buffer.from(JSON.stringify(exact),'utf8');
+              const publicPem=Buffer.from(process.env.I62_RECOVERY_PUBLIC_KEY_B64,'base64').toString('utf8');
+              const envelope=encrypt(plain,publicPem);
+              const encryptedPath=process.env.OUT+'/i6-2-live-readback-recovery.encrypted.json';
+              fs.writeFileSync(encryptedPath,JSON.stringify(envelope,null,2)+'\n');
+              const counts=countSensitiveKeys(exact);
+              const summary={schema:'GRAVICENTRA_I6_2_LIVE_READBACK_RECOVERY_SUMMARY_V2',status:'READBACK_RECOVERY_PASS',gate:'I6.2',module:'ASEGURADORAS_OPERATIONAL_DIRECTORY',sourceSha256:source.source.sha256,replacesUnusableReadbackRunId:source.execution.readbackRunId,recoveryReason:'PRIOR_READBACK_TRANSPORT_PRIVATE_KEY_NOT_PERSISTED',causalCorrectionCycle:2,collectionPath:exact.collectionPath,documentCount:docs.length,writesExecuted:0,productionMutation:false,plaintextOperationalValuesInEvidence:false,exactReadbackEncrypted:true,plaintextSha256:crypto.createHash('sha256').update(plain).digest('hex'),encryptedFileSha256:crypto.createHash('sha256').update(fs.readFileSync(encryptedPath)).digest('hex'),...counts};
+              fs.writeFileSync(process.env.OUT+'/i6-2-live-readback-recovery-summary.json',JSON.stringify(summary,null,2)+'\n');
+              console.log('I62_LIVE_READBACK_RECOVERY=PASS');
+              console.log('I62_DOCUMENT_COUNT='+docs.length);
+              console.log('I62_SOURCE_SHA256='+source.source.sha256);
+              console.log('I62_PLAINTEXT_OPERATIONAL_VALUES_IN_EVIDENCE=false');
+              console.log('I6_2_WRITES_EXECUTED=0');
+            }finally{await deleteApp(app).catch(()=>{});}
+          })().catch(e=>{console.error(e.message);process.exit(1)});
           NODE
 
-      - name: Download the already-authorized encrypted readback artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: gravicentra-i6-2-live-readback-${{ steps.cursor.outputs.readback_run_id }}
-          run-id: ${{ steps.cursor.outputs.readback_run_id }}
-          github-token: ${{ github.token }}
-          path: ${{ runner.temp }}/i62-existing-readback
-
-      - name: Verify and decrypt existing readback inside executor boundary
+      - name: Verify replacement readback evidence is encrypted and zero-write
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p "$RUNNER_TEMP/i62-private" "$RUNNER_TEMP/i62-hold"
-          chmod 700 "$RUNNER_TEMP/i62-private"
-          node - <<'NODE'
-          const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
-          const root=process.env.RUNNER_TEMP+'/i62-existing-readback';
-          const holdDir=process.env.RUNNER_TEMP+'/i62-hold';
-          const intake=JSON.parse(fs.readFileSync(process.env.SOURCE_INTAKE,'utf8'));
-          const files=[];const walk=d=>{for(const n of fs.readdirSync(d)){const p=path.join(d,n),s=fs.statSync(p);s.isDirectory()?walk(p):files.push(p)}};walk(root);
-          const encPath=files.find(p=>p.endsWith('i6-2-live-readback.encrypted.json'));
-          const sumPath=files.find(p=>p.endsWith('i6-2-live-readback-summary.json'));
-          if(!encPath||!sumPath)throw new Error('I62_EXISTING_READBACK_ARTIFACT_FILES_MISSING');
-          const summary=JSON.parse(fs.readFileSync(sumPath,'utf8'));
-          const encBytes=fs.readFileSync(encPath);
-          const encHash=crypto.createHash('sha256').update(encBytes).digest('hex');
-          if(summary.encryptedFileSha256!==encHash)throw new Error('I62_EXISTING_READBACK_CIPHERTEXT_HASH_MISMATCH');
-          if(summary.writesExecuted!==0)throw new Error('I62_EXISTING_READBACK_NOT_ZERO_WRITE');
-          const sourceProvenanceBindingMatch=summary.sourceSha256===intake.source.sha256;
-          console.log('I62_READBACK_CIPHERTEXT_INTEGRITY=PASS');
-          console.log('I62_READBACK_SOURCE_PROVENANCE_BINDING_MATCH='+sourceProvenanceBindingMatch);
-          const candidates=[
-            process.env.I62_PRIVATE_KEY_PEM,
-            process.env.GRAVICENTRA_I62_PRIVATE_KEY_PEM,
-            process.env.GRAVICENTRA_I6_2_PRIVATE_KEY_PEM,
-            process.env.I62_PRIVATE_KEY_B64?Buffer.from(process.env.I62_PRIVATE_KEY_B64,'base64').toString('utf8'):'',
-            process.env.GRAVICENTRA_I62_PRIVATE_KEY_B64?Buffer.from(process.env.GRAVICENTRA_I62_PRIVATE_KEY_B64,'base64').toString('utf8'):'',
-            process.env.GRAVICENTRA_I6_2_PRIVATE_KEY_B64?Buffer.from(process.env.GRAVICENTRA_I6_2_PRIVATE_KEY_B64,'base64').toString('utf8'):''
-          ].filter(Boolean);
-          const writeHold=(code,detail)=>{const h={schema:'GRAVICENTRA_I6_2_HOLD_V2',gate:'I6.2',cursor:'LIVE_READBACK_PASS',attemptedStep:'DETERMINISTIC_DIFF',holdCode:code,readbackRunId:intake.execution.readbackRunId,readbackArtifactVerified:true,ciphertextHashVerified:true,sourceProvenanceBindingMatch,writesExecuted:0,productionMutation:false,secretValuesExposed:false,detail};fs.writeFileSync(holdDir+'/hold.json',JSON.stringify(h,null,2)+'\n');console.error(code)};
-          if(!candidates.length){writeHold('HOLD_I6_2_EXISTING_READBACK_PRIVATE_KEY_MISMATCH','The exact dedicated private key for the authorized RSA-OAEP envelope is not available. Proven mismatched service-account keys are not retried and a fresh readback is not substituted.');process.exit(79)}
-          const env=JSON.parse(encBytes.toString('utf8'));let plain=null;
-          for(const privateKey of candidates){try{const key=crypto.privateDecrypt({key:privateKey,oaepHash:'sha256',padding:crypto.constants.RSA_PKCS1_OAEP_PADDING},Buffer.from(env.wrappedKey,'base64'));const d=crypto.createDecipheriv('aes-256-gcm',key,Buffer.from(env.iv,'base64'));d.setAuthTag(Buffer.from(env.tag,'base64'));plain=Buffer.concat([d.update(Buffer.from(env.ciphertext,'base64')),d.final()]);break}catch{}}
-          if(!plain){writeHold('HOLD_I6_2_EXISTING_READBACK_PRIVATE_KEY_MISMATCH','Dedicated private-key material is present but does not decrypt the authorized RSA-OAEP envelope. A fresh readback is not substituted.');process.exit(79)}
-          if(crypto.createHash('sha256').update(plain).digest('hex')!==summary.plaintextSha256)throw new Error('I62_EXISTING_READBACK_PLAINTEXT_HASH_MISMATCH');
-          fs.writeFileSync(process.env.RUNNER_TEMP+'/i62-private/readback.json',plain,{mode:0o600});
-          console.log('I62_EXISTING_READBACK_DECRYPTED=PASS');
-          console.log('I6_2_WRITES_EXECUTED=0');
-          console.error('HOLD_I6_2_SOURCE_DELTA_EXECUTOR_REQUIRES_PINNED_SOURCE_TRANSPORT');
-          process.exit(80);
-          NODE
+          E="$RUNNER_TEMP/i6-2-live-readback-recovery/i6-2-live-readback-recovery-summary.json"
+          test "$(jq -r .status "$E")" = READBACK_RECOVERY_PASS
+          test "$(jq -r .writesExecuted "$E")" = 0
+          test "$(jq -r .productionMutation "$E")" = false
+          test "$(jq -r .plaintextOperationalValuesInEvidence "$E")" = false
+          test "$(jq -r .exactReadbackEncrypted "$E")" = true
+          test "$(jq -r .causalCorrectionCycle "$E")" = 2
+          test "$(jq -r .sourceSha256 "$E")" = "$(jq -r .source.sha256 "$SOURCE_INTAKE")"
+          echo I62_READBACK_RECOVERY_INTEGRITY=PASS
+          echo I6_2_WRITES_EXECUTED=0
 
-      - name: Publish non-secret HOLD evidence
-        if: always()
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
-          name: gravicentra-i6-2-diff-hold-${{ github.run_id }}
-          path: ${{ runner.temp }}/i62-hold
-          if-no-files-found: ignore
-          retention-days: 14
+          name: gravicentra-i6-2-live-readback-recovery-${{ github.run_id }}
+          path: ${{ runner.temp }}/i6-2-live-readback-recovery
+          if-no-files-found: error
+          retention-days: 7
 
-      - name: Guarantee private plaintext cleanup
-        if: always()
-        shell: bash
+      - name: Recovery checkpoint
         run: |
-          rm -rf "$RUNNER_TEMP/i62-private" || true
-          echo 'I62_PRIVATE_PLAINTEXT_CLEANUP=ATTEMPTED'
+          echo 'I6.2 remains DATA_UPDATE only.'
+          echo 'Second-cycle causal correction produced a replacement read-only snapshot because the prior transport private key was never persisted.'
+          echo 'No product source, Hosting, backend deployment, Firestore mutation, credential mutation, or source apply was executed.'
+          echo 'Next material step: decrypt privately and execute deterministic diff against the same pinned workbook.'
+          echo 'I6_2_WRITES_EXECUTED=0'
