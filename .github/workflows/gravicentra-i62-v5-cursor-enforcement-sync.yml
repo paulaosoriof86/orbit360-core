@@ -37,18 +37,18 @@ jobs:
           let g=fs.readFileSync(guardPath,'utf8');
           const oldMutation=`need(C.i6Execution?.dryRunPrepared===false,'I6_DRYRUN_PREPARED_STATE_INVALID');\nneed(C.i6Execution?.dataMutationAuthorized===false,'I6_DATA_MUTATION_MUST_BE_FALSE_BEFORE_VERIFIED_MECHANISM');\nneed(C.i6Execution?.productMutationAuthorized===false,'I6_PRODUCT_MUTATION_MUST_BE_FALSE');\nneed(C.i6Execution?.sourceDataApplyAuthorized===false,'I6_SOURCE_APPLY_MUST_BE_FALSE_BEFORE_VERIFIED_MECHANISM');`;
           const newMutation=`need(C.i6Execution?.dryRunPrepared===false,'I6_DRYRUN_PREPARED_STATE_INVALID');\nconst dataUpdateCursor=SRC.execution?.cursorState||'SOURCE_PINNED';\nconst postDiffCursor=['DETERMINISTIC_DIFF_READY','DETERMINISTIC_APPLY_DONE','POST_WRITE_READBACK_INTEGRITY_PASS','PENDING_USER_VISUAL','LIVE_PASS'].includes(dataUpdateCursor);\nneed(postDiffCursor||C.i6Execution?.dataMutationAuthorized===false,'I6_DATA_MUTATION_AUTHORIZED_TOO_EARLY');\nneed(C.i6Execution?.productMutationAuthorized===false,'I6_PRODUCT_MUTATION_MUST_BE_FALSE');\nneed(postDiffCursor||C.i6Execution?.sourceDataApplyAuthorized===false,'I6_SOURCE_APPLY_AUTHORIZED_TOO_EARLY');`;
-          if(!g.includes(oldMutation)) throw new Error('OLD_MUTATION_GUARD_NOT_FOUND');
-          g=g.replace(oldMutation,newMutation);
+          if(g.includes(oldMutation)) g=g.replace(oldMutation,newMutation);
+          else if(!g.includes("const dataUpdateCursor=SRC.execution?.cursorState||'SOURCE_PINNED';")) throw new Error('MUTATION_GUARD_STATE_UNKNOWN');
 
           const oldSource=`  need(SRC.status==='PINNED_FOR_V5_DELTA'&&SRC.execution?.writeApplied===false&&SRC.execution?.nextRequiredStep==='VERIFY_APPROVED_UPDATE_MECHANISM_OR_WRITE_CONTRACT','I6_V5_ACTIVE_SOURCE_STATE_INVALID');`;
           const newSource=`  const cursorNext={\n    SOURCE_PINNED:'LIVE_READBACK_CURRENT_STATE',\n    LIVE_READBACK_PASS:'DETERMINISTIC_DIFF',\n    DETERMINISTIC_DIFF_READY:'APPLY_DETERMINISTIC_DELTA_ONLY',\n    DETERMINISTIC_APPLY_DONE:'POST_WRITE_READBACK_AND_INTEGRITY',\n    POST_WRITE_READBACK_INTEGRITY_PASS:'USER_VISUAL_REFRESH_CHECK',\n    PENDING_USER_VISUAL:'USER_VISUAL_REFRESH_CHECK',\n    LIVE_PASS:'NEXT_MODULE'\n  };\n  need(SRC.status==='PINNED_FOR_V5_DELTA'&&Object.prototype.hasOwnProperty.call(cursorNext,dataUpdateCursor),'I6_V5_ACTIVE_SOURCE_CURSOR_INVALID');\n  need(SRC.execution?.nextRequiredStep===cursorNext[dataUpdateCursor],'I6_V5_ACTIVE_SOURCE_NEXT_STEP_INVALID');\n  need(C.postproductionDataUpdateControl?.executionCursor===dataUpdateCursor,'I6_V5_CONTROL_CURSOR_MISMATCH');\n  need(C.postproductionDataUpdateControl?.nextRequiredStep===SRC.execution?.nextRequiredStep,'I6_V5_CONTROL_NEXT_STEP_MISMATCH');`;
-          if(!g.includes(oldSource)) throw new Error('OLD_SOURCE_STATE_GUARD_NOT_FOUND');
-          g=g.replace(oldSource,newSource);
+          if(g.includes(oldSource)) g=g.replace(oldSource,newSource);
+          else if(!g.includes('const cursorNext={')) throw new Error('SOURCE_CURSOR_GUARD_STATE_UNKNOWN');
 
           const oldNext=`  need(C.nextAction==='I6_2_VERIFY_APPROVED_UPDATE_MECHANISM_OR_WRITE_CONTRACT','I6_V5_NEXT_ACTION_INVALID');`;
           const newNext=`  const controlNextByCursor={\n    SOURCE_PINNED:'I6_2_LIVE_READBACK_CURRENT_STATE',\n    LIVE_READBACK_PASS:'I6_2_DETERMINISTIC_DIFF',\n    DETERMINISTIC_DIFF_READY:'I6_2_APPLY_DETERMINISTIC_DELTA',\n    DETERMINISTIC_APPLY_DONE:'I6_2_POST_WRITE_READBACK_INTEGRITY',\n    POST_WRITE_READBACK_INTEGRITY_PASS:'I6_2_USER_VISUAL_REFRESH_CHECK',\n    PENDING_USER_VISUAL:'I6_2_USER_VISUAL_REFRESH_CHECK',\n    LIVE_PASS:'I6_3_REQUEST_CURRENT_SOURCE'\n  };\n  need(C.nextAction===controlNextByCursor[dataUpdateCursor],'I6_V5_NEXT_ACTION_INVALID');`;
-          if(!g.includes(oldNext)) throw new Error('OLD_NEXT_ACTION_GUARD_NOT_FOUND');
-          g=g.replace(oldNext,newNext);
+          if(g.includes(oldNext)) g=g.replace(oldNext,newNext);
+          else if(!g.includes('const controlNextByCursor={')) throw new Error('NEXT_ACTION_GUARD_STATE_UNKNOWN');
           fs.writeFileSync(guardPath,g);
 
           const C=JSON.parse(fs.readFileSync(controlPath,'utf8'));
@@ -67,16 +67,12 @@ jobs:
           fs.writeFileSync(controlPath,JSON.stringify(C,null,2)+'\n');
           NODE
 
-          node --check tools/gravicentra-i6-control-plane-guard-v1.mjs
-          node tools/gravicentra-governance-preflight-v1.mjs --mode=governance
-
-      - name: Commit enforcement and remove one-time helper
-        shell: bash
-        run: |
-          set -euo pipefail
           git config user.name 'paulaosoriof86'
           git config user.email 'paula.osorio.f86@gmail.com'
           git rm .github/workflows/gravicentra-i62-v5-cursor-enforcement-sync.yml
           git add tools/gravicentra-i6-control-plane-guard-v1.mjs artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json
           git commit -m 'ops: enforce Evergreen V5 cursor state machine'
+
+          node --check tools/gravicentra-i6-control-plane-guard-v1.mjs
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=governance
           git push origin HEAD:recovery/fase-a-clean-20260831
