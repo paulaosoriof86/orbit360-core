@@ -45,9 +45,11 @@ need(C.i6Execution?.authorized===true,'I6_NOT_AUTHORIZED');
 need(C.i6Execution?.authorizationReceiptPath===AUTH_RECEIPT,'I6_AUTH_RECEIPT_PATH_MISMATCH');
 need((activeI60&&C.i6Execution?.activeSubgate==='I6.0')||(frozenI60&&C.i6Execution?.activeSubgate==='I6.1')||((frozenI61||activeI62V5)&&C.i6Execution?.activeSubgate==='I6.2'),'I6_EXECUTION_SUBGATE_INVALID');
 need(C.i6Execution?.dryRunPrepared===false,'I6_DRYRUN_PREPARED_STATE_INVALID');
-need(C.i6Execution?.dataMutationAuthorized===false,'I6_DATA_MUTATION_MUST_BE_FALSE_BEFORE_VERIFIED_MECHANISM');
+const dataUpdateCursor=SRC.execution?.cursorState||'SOURCE_PINNED';
+const postDiffCursor=['DETERMINISTIC_DIFF_READY','DETERMINISTIC_APPLY_DONE','POST_WRITE_READBACK_INTEGRITY_PASS','PENDING_USER_VISUAL','LIVE_PASS'].includes(dataUpdateCursor);
+need(postDiffCursor||C.i6Execution?.dataMutationAuthorized===false,'I6_DATA_MUTATION_AUTHORIZED_TOO_EARLY');
 need(C.i6Execution?.productMutationAuthorized===false,'I6_PRODUCT_MUTATION_MUST_BE_FALSE');
-need(C.i6Execution?.sourceDataApplyAuthorized===false,'I6_SOURCE_APPLY_MUST_BE_FALSE_BEFORE_VERIFIED_MECHANISM');
+need(postDiffCursor||C.i6Execution?.sourceDataApplyAuthorized===false,'I6_SOURCE_APPLY_AUTHORIZED_TOO_EARLY');
 need(C.i6Execution?.requiresDiff===true&&C.i6Execution?.requiresDeduplication===true,'I6_DIFF_DEDUP_CONTRACT_INVALID');
 need(C.i6Execution?.requiresAudit===true&&C.i6Execution?.requiresRollback===true,'I6_AUDIT_ROLLBACK_CONTRACT_INVALID');
 need(A.schemaVersion==='gravicentra-i6-explicit-authorization-receipt-v1','I6_AUTH_RECEIPT_SCHEMA_INVALID');
@@ -75,7 +77,19 @@ if(activeI62V5){
   need(P.status==='FROZEN_ACTIVE'&&P.resumeContract?.conversationMayOverride===false,'I6_V5_OPERATING_PLAN_INVALID');
   need(D.status==='FROZEN_ACTIVE_V5_DATA_UPDATE_DISCIPLINE'&&D.dataUpdateDiscipline?.askPaulaForCurrentSourceBeforeEachNewModule===true,'I6_V5_DISCIPLINE_INVALID');
   need(RGT.status==='FROZEN_OPERATIONAL_REGISTRY'&&RGT.rules?.neverInventWritePath===true,'I6_V5_REGISTRY_INVALID');
-  need(SRC.status==='PINNED_FOR_V5_DELTA'&&SRC.execution?.writeApplied===false&&SRC.execution?.nextRequiredStep==='VERIFY_APPROVED_UPDATE_MECHANISM_OR_WRITE_CONTRACT','I6_V5_ACTIVE_SOURCE_STATE_INVALID');
+  const cursorNext={
+    SOURCE_PINNED:'LIVE_READBACK_CURRENT_STATE',
+    LIVE_READBACK_PASS:'DETERMINISTIC_DIFF',
+    DETERMINISTIC_DIFF_READY:'APPLY_DETERMINISTIC_DELTA_ONLY',
+    DETERMINISTIC_APPLY_DONE:'POST_WRITE_READBACK_AND_INTEGRITY',
+    POST_WRITE_READBACK_INTEGRITY_PASS:'USER_VISUAL_REFRESH_CHECK',
+    PENDING_USER_VISUAL:'USER_VISUAL_REFRESH_CHECK',
+    LIVE_PASS:'NEXT_MODULE'
+  };
+  need(SRC.status==='PINNED_FOR_V5_DELTA'&&Object.prototype.hasOwnProperty.call(cursorNext,dataUpdateCursor),'I6_V5_ACTIVE_SOURCE_CURSOR_INVALID');
+  need(SRC.execution?.nextRequiredStep===cursorNext[dataUpdateCursor],'I6_V5_ACTIVE_SOURCE_NEXT_STEP_INVALID');
+  need(C.postproductionDataUpdateControl?.executionCursor===dataUpdateCursor,'I6_V5_CONTROL_CURSOR_MISMATCH');
+  need(C.postproductionDataUpdateControl?.nextRequiredStep===SRC.execution?.nextRequiredStep,'I6_V5_CONTROL_NEXT_STEP_MISMATCH');
   for(const [pathKey,blobKey,expectedPath] of [
     ['operatingPlanPath','operatingPlanBlobSha',DATA_UPDATE_PLAN],
     ['executionDisciplinePath','executionDisciplineBlobSha',DATA_UPDATE_DISCIPLINE],
@@ -85,7 +99,16 @@ if(activeI62V5){
     need(C.i6Execution?.[pathKey]===expectedPath,'I6_V5_CONTROL_PATH_MISMATCH:'+pathKey);
     need(git('hash-object',expectedPath)===C.i6Execution?.[blobKey],'I6_V5_CONTROL_BLOB_DRIFT:'+blobKey);
   }
-  need(C.nextAction==='I6_2_VERIFY_APPROVED_UPDATE_MECHANISM_OR_WRITE_CONTRACT','I6_V5_NEXT_ACTION_INVALID');
+  const controlNextByCursor={
+    SOURCE_PINNED:'I6_2_LIVE_READBACK_CURRENT_STATE',
+    LIVE_READBACK_PASS:'I6_2_DETERMINISTIC_DIFF',
+    DETERMINISTIC_DIFF_READY:'I6_2_APPLY_DETERMINISTIC_DELTA',
+    DETERMINISTIC_APPLY_DONE:'I6_2_POST_WRITE_READBACK_INTEGRITY',
+    POST_WRITE_READBACK_INTEGRITY_PASS:'I6_2_USER_VISUAL_REFRESH_CHECK',
+    PENDING_USER_VISUAL:'I6_2_USER_VISUAL_REFRESH_CHECK',
+    LIVE_PASS:'I6_3_REQUEST_CURRENT_SOURCE'
+  };
+  need(C.nextAction===controlNextByCursor[dataUpdateCursor],'I6_V5_NEXT_ACTION_INVALID');
   need(G.lastFormallyCompletedMiniGate==='I6.1','I6_V5_LAST_MINIGATE_INVALID');
 }
 
