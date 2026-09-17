@@ -1,5 +1,5 @@
 {
-  "schema": "GRAVICENTRA_I6_DATA_UPDATE_EXECUTION_DISCIPLINE_LOCK_V1",
+  "schema": "GRAVICENTRA_I6_DATA_UPDATE_EXECUTION_DISCIPLINE_LOCK_V2",
   "status": "FROZEN_ACTIVE_V5_DATA_UPDATE_DISCIPLINE",
   "date": "2026-09-17",
   "productBrand": "Gravicentra Insurance",
@@ -7,7 +7,7 @@
   "branch": "recovery/fase-a-clean-20260831",
   "supersessionScope": {
     "historicalLockRetained": "artifacts/orbit360-recovery/release-control/I6_EXECUTION_DISCIPLINE_LOCK_20260915.json",
-    "supersedesOnly": "Ordinary deterministic DATA_UPDATE execution sequence and repeated conversational apply-authorization semantics where Evergreen V5 applies.",
+    "supersedesOnly": "Ordinary deterministic DATA_UPDATE execution sequence, resume behavior, timeout recovery and repeated conversational apply-authorization semantics where Evergreen V5 applies.",
     "doesNotSupersede": [
       "Fase A lineage",
       "immutable build discipline for code changes",
@@ -49,6 +49,38 @@
     "userVisualRefreshRequiredForModuleClosure": true,
     "nextModuleBlockedUntilCurrentModuleClosed": true
   },
+  "executionCursorEnforcement": {
+    "cursorAuthority": "The active module source-intake execution object is the canonical resume cursor for ordinary DATA_UPDATE work.",
+    "allowedStatesInOrder": [
+      "SOURCE_PINNED",
+      "LIVE_READBACK_PASS",
+      "DETERMINISTIC_DIFF_READY",
+      "DETERMINISTIC_APPLY_DONE",
+      "POST_WRITE_READBACK_INTEGRITY_PASS",
+      "PENDING_USER_VISUAL",
+      "LIVE_PASS"
+    ],
+    "resumeBehavior": "On every continuation or timeout recovery, read the active module source intake and execute its nextRequiredStep. Do not repeat any prior state that already has material evidence unless a concrete reproducible drift invalidates that evidence.",
+    "timeoutRecovery": "A timeout or interrupted message never resets the module. Resume from the last physically evidenced cursor state and continue forward only.",
+    "noPlanOnlyStopWhenExecutable": true,
+    "checkpointRule": "After each material step, update the active module source-intake execution object with state, evidence pointer, writes count and nextRequiredStep. Do not create a new methodology or parallel checkpoint system.",
+    "forbiddenBacktrackingWithoutCausalDrift": [
+      "GENERAL_REDIAGNOSIS",
+      "FULL_LINEAGE_REBUILD",
+      "APPROVED_MECHANISM_REDISCOVERY",
+      "IMPORTER_REDESIGN",
+      "PRODUCT_REBUILD_FOR_DATA_ONLY_CHANGE",
+      "REPEAT_LIVE_READBACK_ALREADY_PASS",
+      "REPEAT_SOURCE_DISCOVERY_WHEN_CURRENT_SOURCE_ALREADY_PINNED"
+    ],
+    "cycleBudget": {
+      "normalCycles": 1,
+      "maximumCycles": 2,
+      "secondCycleAllowedOnlyFor": "A concrete causal correction or isolated ambiguity resolution.",
+      "afterMaximumCycles": "Either close the module or record a precise HOLD. Further broad diagnosis is forbidden."
+    },
+    "evidenceMinimality": "Intermediate analysis is not a gate. Canonize only source identity, material cursor transitions, deterministic diff/apply/readback evidence, precise HOLDs and terminal closure."
+  },
   "visualFailureDiscipline": {
     "reimportForbidden": true,
     "classifyPossibleCause": [
@@ -66,7 +98,8 @@
   "importerRule": {
     "existingPlatformImporterPreferredOnlyAfter": "Its target-specific contract and controlled LIVE persistence/readback are proven.",
     "entrypointAloneIsNotCertification": true,
-    "parallelImporterForbidden": true
+    "parallelImporterForbidden": true,
+    "phaseBImporterWorkMustNotBlockPhaseADataUpdate": true
   },
-  "resumeRule": "On every continuation, read CONTROL_PLANE, this lock, the operating plan, registry, and active module source intake; execute only the first incomplete material step. Conversation text is context, not authority."
+  "resumeRule": "On every continuation, read CONTROL_PLANE, this lock, the operating plan, registry, and active module source intake; then execute only the source-intake nextRequiredStep. Conversation text is context, not authority, and interrupted responses do not reset progress."
 }
