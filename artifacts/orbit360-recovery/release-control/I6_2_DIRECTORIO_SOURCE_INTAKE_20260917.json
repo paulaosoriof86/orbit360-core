@@ -1,0 +1,28 @@
+{
+  "schema": "GRAVICENTRA_I6_2_DIRECTORIO_SOURCE_INTAKE_V2",
+  "status": "PINNED_FOR_V5_DELTA",
+  "date": "2026-09-17",
+  "productBrand": "Gravicentra Insurance",
+  "module": "ASEGURADORAS_OPERATIONAL_DIRECTORY",
+  "source": {
+    "filename": "Directorio Aseguradoras Guatemala 2026 (2)(1).xlsx",
+    "sha256": "f2e57fa710322b60552070148c5b09bcf6ba9a74ed7d863afff5af4ef2244083",
+    "bytes": 444455,
+    "sourceType": "USER_SUPPLIED_CURRENT_WORKBOOK"
+  },
+  "supersedesForActiveRun": "artifacts/orbit360-recovery/release-control/I6_2_DIRECTORIO_SOURCE_INTAKE_20260914.json",
+  "historicalPriorIntakeRetained": true,
+  "reason": "The current supplied workbook is not byte-identical to the previously pinned source and therefore must be treated as the active current source under Evergreen V5.",
+  "execution": {
+    "method": "DATA_UPDATE_DELTA_FIRST",
+    "writeApplied": false,
+    "readbackPassed": false,
+    "liveVisualConfirmed": false,
+    "nextRequiredStep": "VERIFY_APPROVED_UPDATE_MECHANISM_OR_WRITE_CONTRACT"
+  },
+  "guards": {
+    "doNotUsePriorHashAsCurrent": true,
+    "doNotWriteBeforeMechanismVerification": true,
+    "doNotClaimPassBeforeReadbackAndLiveVisualConfirmation": true
+  }
+}
