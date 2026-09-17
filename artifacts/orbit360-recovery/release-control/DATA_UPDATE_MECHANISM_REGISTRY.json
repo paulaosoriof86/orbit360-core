@@ -1,0 +1,63 @@
+{
+  "schema": "GRAVICENTRA_DATA_UPDATE_MECHANISM_REGISTRY_V1",
+  "status": "FROZEN_OPERATIONAL_REGISTRY",
+  "date": "2026-09-17",
+  "authorityRole": "DERIVED_OPERATIONAL_REGISTRY_NOT_LINEAGE_AUTHORITY",
+  "productBrand": "Gravicentra Insurance",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "lineageAuthority": "artifacts/orbit360-recovery/release-control/CAPABILITY_LINEAGE_LOCK.json",
+  "operatingPlan": "artifacts/orbit360-recovery/release-control/POSTPROD_DATA_UPDATE_OPERATING_PLAN_LOCK_20260917.json",
+  "rules": {
+    "neverInventWritePath": true,
+    "verifyApprovedMechanismAtModuleStart": true,
+    "requestCurrentSourceBeforeEveryNewModule": true,
+    "freezeEachSuccessfulRunWithEvidence": true,
+    "liveVisibilityRequiredForClosure": true
+  },
+  "modules": {
+    "ASEGURADORAS_OPERATIONAL_DIRECTORY": {
+      "capability": "ASEGURADORAS_OPERATIONAL_DIRECTORY",
+      "approvedLineagePointer": "artifacts/orbit360-recovery/release-control/CAPABILITY_LINEAGE_LOCK.json",
+      "knownOwner": "orbit360-platform/modules/aseguradoras.js",
+      "uiEntrypoint": "Orbit.importa.open(\"directorio-aseguradoras\")",
+      "uiEntrypointEvidence": "SOURCE_PRESENT",
+      "mechanismStatus": "ENTRYPOINT_PRESENT_IMPLEMENTATION_NOT_YET_CERTIFIED_LIVE",
+      "sourceRequiredBeforeStart": true,
+      "sourceState": "CURRENT_SOURCE_ALREADY_SUPPLIED_AND_REPINNED_FOR_ACTIVE_RUN",
+      "activeSourceIntake": "artifacts/orbit360-recovery/release-control/I6_2_DIRECTORIO_SOURCE_INTAKE_20260917.json",
+      "liveClosure": "READBACK_PASS_THEN_USER_REFRESH_MUST_SHOW_UPDATED_DATA",
+      "doNotClaimImporterPreferredUntil": "WRITE_CONTRACT_AND_CONTROLLED_LIVE_PERSISTENCE_PROOF_PASS"
+    },
+    "CLIENTES": {
+      "sourceRequiredBeforeStart": true,
+      "sourceState": "WAITING_FOR_PAULA_SOURCE",
+      "mechanism": "TO_BE_VERIFIED_FROM_APPROVED_CODE_AT_MODULE_START",
+      "liveClosure": "READBACK_PASS_THEN_USER_REFRESH_MUST_SHOW_UPDATED_DATA"
+    },
+    "POLIZAS": {
+      "sourceRequiredBeforeStart": true,
+      "sourceState": "WAITING_FOR_PAULA_SOURCE",
+      "mechanism": "TO_BE_VERIFIED_FROM_APPROVED_CODE_AT_MODULE_START",
+      "liveClosure": "READBACK_PASS_THEN_USER_REFRESH_MUST_SHOW_UPDATED_DATA"
+    },
+    "VEHICULOS": {
+      "sourceRequiredBeforeStart": true,
+      "sourceState": "WAITING_FOR_PAULA_SOURCE",
+      "mechanism": "TO_BE_VERIFIED_FROM_APPROVED_CODE_AT_MODULE_START",
+      "liveClosure": "READBACK_PASS_THEN_USER_REFRESH_MUST_SHOW_UPDATED_DATA"
+    },
+    "RECIBOS_CARTERA": {
+      "sourceRequiredBeforeStart": true,
+      "sourceState": "WAITING_FOR_PAULA_SOURCE",
+      "mechanism": "TO_BE_VERIFIED_FROM_APPROVED_CODE_AT_MODULE_START",
+      "liveClosure": "READBACK_PASS_THEN_USER_REFRESH_MUST_SHOW_UPDATED_DATA"
+    },
+    "COBROS": {
+      "sourceRequiredBeforeStart": true,
+      "sourceState": "WAITING_FOR_PAULA_SOURCE",
+      "mechanism": "TO_BE_VERIFIED_FROM_APPROVED_CODE_AT_MODULE_START",
+      "liveClosure": "READBACK_PASS_THEN_USER_REFRESH_MUST_SHOW_UPDATED_DATA"
+    }
+  }
+}
