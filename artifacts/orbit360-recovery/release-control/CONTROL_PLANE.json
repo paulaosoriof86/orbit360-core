@@ -25,22 +25,25 @@
     "latestBlobSha": "431bb36f3ddf12b0585a99a54f228d0ee913b584"
   },
   "projectSources": {
-    "activePackage": "GRAVICENTRA_PROJECT_SOURCES_EVERGREEN_V4",
-    "activeVersion": 4,
-    "canonicalRoot": "artifacts/orbit360-recovery/project-sources-v2/v4",
-    "manifestPath": "artifacts/orbit360-recovery/project-sources-v2/v4/05_MANIFIESTO_FUENTES_EVERGREEN_V4.json",
+    "activePackage": "GRAVICENTRA_PROJECT_SOURCES_EVERGREEN_V5",
+    "activeVersion": 5,
+    "canonicalRoot": "artifacts/orbit360-recovery/project-sources-v2/v5",
+    "manifestPath": "artifacts/orbit360-recovery/project-sources-v2/v5/08_MANIFIESTO_FUENTES_EVERGREEN_V5.json",
+    "manifestBlobSha": "d1a0cc69ded3d38911e5e5504360228d7bcc05e1",
+    "deltaAddendumPath": "artifacts/orbit360-recovery/project-sources-v2/v5/07_ADDENDUM_ACTUALIZACION_INCREMENTAL_DELTA_EVERGREEN_V5_2026-09-16.md",
+    "deltaAddendumBlobSha": "637556b30de4dc346ef55e284c83175fabb921b8",
     "staticSourceUpdateRequired": false,
     "reason": null,
     "operationalStateChangesDoNotRequireReplacement": true,
     "notificationRequiredWhenFlagTrue": true,
-    "compositionModel": "IMMUTABLE_RETAINED_V3_PLUS_V4_ADDENDUM",
-    "retainedPreviousSources": 5,
+    "compositionModel": "IMMUTABLE_RETAINED_V4_PLUS_V5_ADDENDUM",
+    "retainedPreviousSources": 6,
     "addedSources": 1,
     "lastTransition": {
-      "fromPackage": "GRAVICENTRA_PROJECT_SOURCES_EVERGREEN_V3",
-      "toPackage": "GRAVICENTRA_PROJECT_SOURCES_EVERGREEN_V4",
-      "cause": "Permanent postproduction rule change: Fase A Post-Salida I6 requires Evergreen V4 composed of the five immutable V3 sources plus the I6 addendum.",
-      "userAction": "KEEP_5_EXISTING_V3_SOURCES_AND_ADD_ONLY_V4_I6_ADDENDUM"
+      "fromPackage": "GRAVICENTRA_PROJECT_SOURCES_EVERGREEN_V4",
+      "toPackage": "GRAVICENTRA_PROJECT_SOURCES_EVERGREEN_V5",
+      "cause": "Permanent postproduction method correction: ordinary operational refresh is incremental DATA_UPDATE delta-first work, not a new implementation or release unless source code changes.",
+      "userAction": "KEEP_6_EXISTING_SOURCES_AND_ADD_ONLY_V5_INCREMENTAL_DELTA_ADDENDUM"
     }
   },
   "deprecatedMutableAuthorities": {
@@ -110,7 +113,7 @@
         "postWriteContextsFail": 0
       },
       "I6": {
-        "status": "I6_1_PRODUCT_GAPS_FROZEN",
+        "status": "I6_2_DATA_UPDATE_V5_ACTIVE",
         "activeSubgate": "I6.2",
         "dataMutationAuthorized": false,
         "lastFrozenMiniGate": "I6.1"
@@ -311,7 +314,11 @@
     "i3MustConsumeNextCandidateDuringSuccessorLifecycle": true,
     "centralGuardBroadGravicentraWatch": true,
     "i5ReexecutionAfterProductionAcceptanceForbiddenWithoutCausalInvalidation": true,
-    "i6RequiresExplicitAuthorization": true
+    "i6RequiresExplicitAuthorization": true,
+    "i6DeterministicDataUpdateUsesV5ScopedAuthorization": true,
+    "newModuleSourceRequestRequired": true,
+    "moduleLiveVisualClosureRequired": true,
+    "reimportForVisibilityFailureForbidden": true
   },
   "mechanismFreeze": {
     "version": "GRAVICENTRA_RECOVERY_MECHANISM_V3_20260909",
@@ -389,7 +396,7 @@
     "dataMutationAuthorized": false,
     "periodStart": "2026-08-01",
     "periodEnd": "2026-08-31",
-    "requiresDryRun": true,
+    "requiresDryRun": false,
     "requiresDiff": true,
     "requiresDeduplication": true,
     "requiresExplicitAuthorization": true,
@@ -400,7 +407,18 @@
     "activeSubgate": "I6.2",
     "productMutationAuthorized": false,
     "sourceDataApplyAuthorized": false,
-    "perBlockApplyRequiresExplicitAuthorization": true,
+    "perBlockApplyRequiresExplicitAuthorization": false,
+    "dataUpdateMode": "EVERGREEN_V5_DELTA_FIRST",
+    "operatingPlanPath": "artifacts/orbit360-recovery/release-control/POSTPROD_DATA_UPDATE_OPERATING_PLAN_LOCK_20260917.json",
+    "operatingPlanBlobSha": "860c73d457c1333bf9c341d91e67d4d0949cd914",
+    "executionDisciplinePath": "artifacts/orbit360-recovery/release-control/I6_DATA_UPDATE_EXECUTION_DISCIPLINE_LOCK_20260917.json",
+    "executionDisciplineBlobSha": "ff9f8822193d9ae82ba823634d8a04bd616dd879",
+    "mechanismRegistryPath": "artifacts/orbit360-recovery/release-control/DATA_UPDATE_MECHANISM_REGISTRY.json",
+    "mechanismRegistryBlobSha": "f673d61d901d82e92679285fac16f1ebb38c0250",
+    "activeSourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_2_DIRECTORIO_SOURCE_INTAKE_20260917.json",
+    "activeSourceIntakeBlobSha": "039410c09c6b51cca0d08d6e499986aa58a70bc5",
+    "activeModule": "ASEGURADORAS_OPERATIONAL_DIRECTORY",
+    "activeModuleStatus": "SOURCE_PINNED_PENDING_WRITE_MECHANISM_VERIFICATION",
     "i6_0": {
       "status": "I6_0_BASELINE_FROZEN",
       "executorPath": ".github/workflows/gravicentra-material-baseline-freeze.yml",
@@ -409,6 +427,26 @@
       "evidenceRoot": "artifacts/orbit360-recovery/release-control/i6-0-baseline/gi-i3-16f174d08702-57f234755dc1",
       "operationalWritesExecuted": 0
     }
+  },
+  "postproductionDataUpdateControl": {
+    "status": "FROZEN_ACTIVE",
+    "class": "DATA_UPDATE",
+    "operatingPlanPath": "artifacts/orbit360-recovery/release-control/POSTPROD_DATA_UPDATE_OPERATING_PLAN_LOCK_20260917.json",
+    "operatingPlanBlobSha": "860c73d457c1333bf9c341d91e67d4d0949cd914",
+    "executionDisciplinePath": "artifacts/orbit360-recovery/release-control/I6_DATA_UPDATE_EXECUTION_DISCIPLINE_LOCK_20260917.json",
+    "executionDisciplineBlobSha": "ff9f8822193d9ae82ba823634d8a04bd616dd879",
+    "mechanismRegistryPath": "artifacts/orbit360-recovery/release-control/DATA_UPDATE_MECHANISM_REGISTRY.json",
+    "mechanismRegistryBlobSha": "f673d61d901d82e92679285fac16f1ebb38c0250",
+    "activeModule": "ASEGURADORAS_OPERATIONAL_DIRECTORY",
+    "activeSourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_2_DIRECTORIO_SOURCE_INTAKE_20260917.json",
+    "activeSourceIntakeBlobSha": "039410c09c6b51cca0d08d6e499986aa58a70bc5",
+    "sourceSha256": "f2e57fa710322b60552070148c5b09bcf6ba9a74ed7d863afff5af4ef2244083",
+    "conversationAsAuthority": false,
+    "requestCurrentSourceBeforeEveryNewModule": true,
+    "liveVisualRefreshRequiredForClosure": true,
+    "pureDataUpdateRequiresBuildOrDeploy": false,
+    "reimportForVisibilityFailureForbidden": true,
+    "nextRequiredStep": "VERIFY_APPROVED_UPDATE_MECHANISM_OR_WRITE_CONTRACT"
   },
   "governanceSyncChecklist": {
     "frozenPlanMaterialized": true,
@@ -469,10 +507,17 @@
     "evergreenProjectSourcePackageV4Prepared": true,
     "evergreenProjectSourceV4CompositionPinned": true,
     "evergreenProjectSourceV4TransitionRecorded": true,
+    "evergreenProjectSourcePackageV5Prepared": true,
+    "evergreenProjectSourceV5CompositionPinned": true,
+    "evergreenProjectSourceV5TransitionRecorded": true,
+    "postprodDataUpdateOperatingPlanMaterialized": true,
+    "dataUpdateMechanismRegistryMaterialized": true,
+    "i6DataUpdateExecutionDisciplineMaterialized": true,
+    "i62CurrentSourceRepinned": true,
     "i6ExecutorStateGated": true,
     "i6AuthorizationReceiptMaterialized": true
   },
-  "nextAction": "I6_2_ASEGURADORAS_DRY_RUN",
+  "nextAction": "I6_2_VERIFY_APPROVED_UPDATE_MECHANISM_OR_WRITE_CONTRACT",
   "postproductionExitProgress": {
     "formalPercent": 20,
     "frozenMiniGates": 2,
