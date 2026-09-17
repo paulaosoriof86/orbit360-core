@@ -1,0 +1,31 @@
+{
+  "schema": "GRAVICENTRA_I6_2_DETERMINISTIC_DIFF_HOLD_V1",
+  "date": "2026-09-17",
+  "gate": "I6.2",
+  "module": "ASEGURADORAS_OPERATIONAL_DIRECTORY",
+  "cursorAtHold": "LIVE_READBACK_PASS",
+  "attemptedStep": "DETERMINISTIC_DIFF",
+  "status": "HOLD",
+  "holdCode": "HOLD_I6_2_EXISTING_READBACK_PRIVATE_KEY_UNAVAILABLE",
+  "sourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_2_DIRECTORIO_SOURCE_INTAKE_20260917.json",
+  "sourceSha256": "f2e57fa72ff1b94b110b5037038c6c47fbc727c513f9eebd2348d7f4f2244083",
+  "authorizedReadbackRunId": 35230577501,
+  "holdRunId": 35263610078,
+  "holdArtifactId": 10516285433,
+  "holdArtifactDigest": "sha256:8a83ba348cbbccc2994b6201f9637d0e49a7c22e60a4435bd2963cb395646ae5",
+  "checks": {
+    "governancePreflight": "PASS",
+    "authorizedReadbackArtifactDownloaded": true,
+    "readbackCiphertextIntegrity": "PASS",
+    "readbackSourceProvenanceBindingMatch": false,
+    "privateKeyAvailableInsideExecutor": false,
+    "freshReadbackSubstituted": false,
+    "writesExecuted": 0,
+    "productionDataMutation": false,
+    "secretValuesExposed": false
+  },
+  "blockingReason": "The already-authorized I6.2 readback is encrypted with RSA-OAEP. The canonical executor can retrieve and verify the ciphertext, but no matching private-key material is available to it. Continuing DETERMINISTIC_DIFF would require either the corresponding private key inside the secure executor boundary or a forbidden replacement of the already-passed initial readback.",
+  "resumeCondition": "Restore the matching private key for the authorized readback inside the secure GitHub Actions executor boundary, then rerun the same canonical I6 Post-Salida executor from LIVE_READBACK_PASS. Do not repeat the initial Firestore readback.",
+  "nonBlockingObservation": "The sourceSha256 stored in the historical readback summary differs from the currently pinned source fingerprint. This was recorded as provenance metadata and is not the blocking cause because the user-supplied current workbook remains pinned and no alternative physical source was introduced.",
+  "nextAllowedAction": "RESTORE_EXISTING_READBACK_PRIVATE_KEY_IN_SECURE_EXECUTOR_BOUNDARY"
+}
