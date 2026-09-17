@@ -1,0 +1,72 @@
+{
+  "schema": "GRAVICENTRA_I6_DATA_UPDATE_EXECUTION_DISCIPLINE_LOCK_V1",
+  "status": "FROZEN_ACTIVE_V5_DATA_UPDATE_DISCIPLINE",
+  "date": "2026-09-17",
+  "productBrand": "Gravicentra Insurance",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "supersessionScope": {
+    "historicalLockRetained": "artifacts/orbit360-recovery/release-control/I6_EXECUTION_DISCIPLINE_LOCK_20260915.json",
+    "supersedesOnly": "Ordinary deterministic DATA_UPDATE execution sequence and repeated conversational apply-authorization semantics where Evergreen V5 applies.",
+    "doesNotSupersede": [
+      "Fase A lineage",
+      "immutable build discipline for code changes",
+      "same-artifact preview/production rule",
+      "fail-closed integrity rules",
+      "approved capability semantics"
+    ]
+  },
+  "authority": {
+    "evergreenPackage": "GRAVICENTRA_PROJECT_SOURCES_EVERGREEN_V5",
+    "manifestPath": "artifacts/orbit360-recovery/project-sources-v2/v5/08_MANIFIESTO_FUENTES_EVERGREEN_V5.json",
+    "manifestBlobSha": "d1a0cc69ded3d38911e5e5504360228d7bcc05e1",
+    "operatingPlan": "artifacts/orbit360-recovery/release-control/POSTPROD_DATA_UPDATE_OPERATING_PLAN_LOCK_20260917.json",
+    "mechanismRegistry": "artifacts/orbit360-recovery/release-control/DATA_UPDATE_MECHANISM_REGISTRY.json"
+  },
+  "classification": {
+    "DATA_UPDATE": "Data-only deterministic delta using an approved existing write mechanism; no source/build/deploy change.",
+    "CODE_DEFECT": "A causal product defect requiring source change and release discipline.",
+    "RELEASE_DEPLOY": "Promotion/deploy activity governed by immutable artifact rules."
+  },
+  "dataUpdateDiscipline": {
+    "askPaulaForCurrentSourceBeforeEachNewModule": true,
+    "pinSourceBeforeDiffOrWrite": true,
+    "performLiveReadbackBeforeDiff": true,
+    "applyOnlyDeterministicDelta": true,
+    "isolateAmbiguousCases": true,
+    "ambiguousCasesDoNotBlockDeterministicRows": true,
+    "repeatedConversationalAuthorizationForEachDeterministicApply": false,
+    "applyPrerequisites": [
+      "Evergreen V5 active in CONTROL_PLANE",
+      "current source pinned",
+      "approved write mechanism or write contract verified",
+      "deterministic diff available",
+      "rollback/audit evidence available where applicable"
+    ],
+    "maximumNormalCyclesPerModule": 2,
+    "readbackRequiredAfterWrite": true,
+    "integrityRequiredAfterWrite": true,
+    "userVisualRefreshRequiredForModuleClosure": true,
+    "nextModuleBlockedUntilCurrentModuleClosed": true
+  },
+  "visualFailureDiscipline": {
+    "reimportForbidden": true,
+    "classifyPossibleCause": [
+      "READ_PATH",
+      "HYDRATION",
+      "CACHE",
+      "ROUTING",
+      "DISPLAY_COMPOSITION",
+      "PERMISSIONS",
+      "CODE_DEFECT"
+    ],
+    "fixCausalLayerOnly": true,
+    "requireNewBuildOnlyIfSourceChanges": true
+  },
+  "importerRule": {
+    "existingPlatformImporterPreferredOnlyAfter": "Its target-specific contract and controlled LIVE persistence/readback are proven.",
+    "entrypointAloneIsNotCertification": true,
+    "parallelImporterForbidden": true
+  },
+  "resumeRule": "On every continuation, read CONTROL_PLANE, this lock, the operating plan, registry, and active module source intake; execute only the first incomplete material step. Conversation text is context, not authority."
+}
