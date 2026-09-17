@@ -6,7 +6,11 @@ const STATUS_LEDGER='artifacts/orbit360-recovery/release-control/CAPABILITY_STAT
 const AUTH_RECEIPT='artifacts/orbit360-recovery/release-control/I6_EXPLICIT_AUTHORIZATION_RECEIPT_20260914.json';
 const I6_ADDENDUM='artifacts/orbit360-recovery/release-control/FASE_A_POSTSALIDA_I6_ADDENDUM_20260914.md';
 const I6_PLAN_LOCK='artifacts/orbit360-recovery/release-control/I6_POSTSALIDA_PLAN_LOCK_20260914.json';
-const V4_MANIFEST='artifacts/orbit360-recovery/project-sources-v2/v4/05_MANIFIESTO_FUENTES_EVERGREEN_V4.json';
+const V5_MANIFEST='artifacts/orbit360-recovery/project-sources-v2/v5/08_MANIFIESTO_FUENTES_EVERGREEN_V5.json';
+const DATA_UPDATE_PLAN='artifacts/orbit360-recovery/release-control/POSTPROD_DATA_UPDATE_OPERATING_PLAN_LOCK_20260917.json';
+const DATA_UPDATE_DISCIPLINE='artifacts/orbit360-recovery/release-control/I6_DATA_UPDATE_EXECUTION_DISCIPLINE_LOCK_20260917.json';
+const DATA_UPDATE_REGISTRY='artifacts/orbit360-recovery/release-control/DATA_UPDATE_MECHANISM_REGISTRY.json';
+const ACTIVE_SOURCE_INTAKE='artifacts/orbit360-recovery/release-control/I6_2_DIRECTORIO_SOURCE_INTAKE_20260917.json';
 const MODE=(process.argv.find(x=>x.startsWith('--mode='))||'--mode=governance').split('=')[1];
 const need=(ok,code)=>{if(!ok)throw new Error(code);};
 const readJson=p=>JSON.parse(fs.readFileSync(p,'utf8'));
@@ -14,8 +18,9 @@ const git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
 const exists=p=>fs.existsSync(p);
 
 need(MODE==='governance'||MODE==='i6','I6_GUARD_MODE_INVALID:'+MODE);
-for(const p of [CONTROL,STATUS_LEDGER,AUTH_RECEIPT,I6_ADDENDUM,I6_PLAN_LOCK,V4_MANIFEST]) need(exists(p),'I6_REQUIRED_FILE_MISSING:'+p);
-const C=readJson(CONTROL),S=readJson(STATUS_LEDGER),A=readJson(AUTH_RECEIPT),M=readJson(V4_MANIFEST);
+for(const p of [CONTROL,STATUS_LEDGER,AUTH_RECEIPT,I6_ADDENDUM,I6_PLAN_LOCK,V5_MANIFEST,DATA_UPDATE_PLAN,DATA_UPDATE_DISCIPLINE,DATA_UPDATE_REGISTRY,ACTIVE_SOURCE_INTAKE]) need(exists(p),'I6_REQUIRED_FILE_MISSING:'+p);
+const C=readJson(CONTROL),S=readJson(STATUS_LEDGER),A=readJson(AUTH_RECEIPT),M=readJson(V5_MANIFEST);
+const P=readJson(DATA_UPDATE_PLAN),D=readJson(DATA_UPDATE_DISCIPLINE),RGT=readJson(DATA_UPDATE_REGISTRY),SRC=readJson(ACTIVE_SOURCE_INTAKE);
 need(C.schemaVersion==='gravicentra-control-plane-v2','I6_CONTROL_SCHEMA_INVALID');
 need(C.controlPlaneId==='GRAVICENTRA-INSURANCE-FASE-A','I6_CONTROL_ID_INVALID');
 need(C.repository==='paulaosoriof86/orbit360-core','I6_REPOSITORY_INVALID');
@@ -33,31 +38,59 @@ need(G.nextFrozenIteration==='I6','I6_NEXT_ITERATION_INVALID');
 const activeI60=g.I6?.status==='IN_PROGRESS_I6_0_BASELINE'&&g.I6?.activeSubgate==='I6.0';
 const frozenI60=g.I6?.status==='I6_0_BASELINE_FROZEN'&&g.I6?.activeSubgate==='I6.1';
 const frozenI61=g.I6?.status==='I6_1_PRODUCT_GAPS_FROZEN'&&g.I6?.activeSubgate==='I6.2';
-need(activeI60||frozenI60||frozenI61,'I6_GATE_STATE_INVALID');
+const activeI62V5=g.I6?.status==='I6_2_DATA_UPDATE_V5_ACTIVE'&&g.I6?.activeSubgate==='I6.2';
+need(activeI60||frozenI60||frozenI61||activeI62V5,'I6_GATE_STATE_INVALID');
 
 need(C.i6Execution?.authorized===true,'I6_NOT_AUTHORIZED');
 need(C.i6Execution?.authorizationReceiptPath===AUTH_RECEIPT,'I6_AUTH_RECEIPT_PATH_MISMATCH');
-need((activeI60&&C.i6Execution?.activeSubgate==='I6.0')||(frozenI60&&C.i6Execution?.activeSubgate==='I6.1')||(frozenI61&&C.i6Execution?.activeSubgate==='I6.2'),'I6_EXECUTION_SUBGATE_INVALID');
-need(C.i6Execution?.dryRunPrepared===false,'I6_DRYRUN_MUST_START_FALSE');
-need(C.i6Execution?.dataMutationAuthorized===false,'I6_DATA_MUTATION_MUST_BE_FALSE');
+need((activeI60&&C.i6Execution?.activeSubgate==='I6.0')||(frozenI60&&C.i6Execution?.activeSubgate==='I6.1')||((frozenI61||activeI62V5)&&C.i6Execution?.activeSubgate==='I6.2'),'I6_EXECUTION_SUBGATE_INVALID');
+need(C.i6Execution?.dryRunPrepared===false,'I6_DRYRUN_PREPARED_STATE_INVALID');
+need(C.i6Execution?.dataMutationAuthorized===false,'I6_DATA_MUTATION_MUST_BE_FALSE_BEFORE_VERIFIED_MECHANISM');
 need(C.i6Execution?.productMutationAuthorized===false,'I6_PRODUCT_MUTATION_MUST_BE_FALSE');
-need(C.i6Execution?.sourceDataApplyAuthorized===false,'I6_SOURCE_APPLY_MUST_BE_FALSE');
-need(C.i6Execution?.requiresDryRun===true&&C.i6Execution?.requiresDiff===true&&C.i6Execution?.requiresDeduplication===true,'I6_DRYRUN_CONTRACT_INVALID');
+need(C.i6Execution?.sourceDataApplyAuthorized===false,'I6_SOURCE_APPLY_MUST_BE_FALSE_BEFORE_VERIFIED_MECHANISM');
+need(C.i6Execution?.requiresDiff===true&&C.i6Execution?.requiresDeduplication===true,'I6_DIFF_DEDUP_CONTRACT_INVALID');
 need(C.i6Execution?.requiresAudit===true&&C.i6Execution?.requiresRollback===true,'I6_AUDIT_ROLLBACK_CONTRACT_INVALID');
 need(A.schemaVersion==='gravicentra-i6-explicit-authorization-receipt-v1','I6_AUTH_RECEIPT_SCHEMA_INVALID');
 need(A.authorization?.decision==='AUTHORIZED_BY_OWNER','I6_AUTH_RECEIPT_DECISION_INVALID');
 need(A.authorization?.dataMutationAuthorized===false&&A.authorization?.augustRefreshApplyAuthorized===false,'I6_AUTH_RECEIPT_OVERREACH');
-need(A.authorization?.perBlockApplyStillRequiresExplicitAuthorizationAfterDryRun===true,'I6_PER_BLOCK_AUTH_CONTRACT_MISSING');
 
-need(C.projectSources?.activePackage==='GRAVICENTRA_PROJECT_SOURCES_EVERGREEN_V4','I6_PROJECT_SOURCES_NOT_V4');
-need(C.projectSources?.activeVersion===4,'I6_PROJECT_SOURCES_VERSION_INVALID');
-need(C.projectSources?.manifestPath===V4_MANIFEST,'I6_PROJECT_SOURCES_MANIFEST_INVALID');
+need(C.projectSources?.activePackage==='GRAVICENTRA_PROJECT_SOURCES_EVERGREEN_V5','I6_PROJECT_SOURCES_NOT_V5');
+need(C.projectSources?.activeVersion===5,'I6_PROJECT_SOURCES_VERSION_INVALID');
+need(C.projectSources?.manifestPath===V5_MANIFEST,'I6_PROJECT_SOURCES_MANIFEST_INVALID');
 need(C.projectSources?.staticSourceUpdateRequired===false,'I6_PROJECT_SOURCE_UPDATE_FLAG_MUST_BE_CLOSED');
 need(C.projectSources?.reason==null,'I6_PROJECT_SOURCE_UPDATE_REASON_MUST_BE_NULL');
-need(M.packageId===C.projectSources.activePackage&&M.version===4,'I6_V4_MANIFEST_BINDING_INVALID');
+need(M.packageId===C.projectSources.activePackage&&M.version===5,'I6_V5_MANIFEST_BINDING_INVALID');
+need(git('hash-object',V5_MANIFEST)===C.projectSources.manifestBlobSha,'I6_V5_MANIFEST_BLOB_DRIFT');
+
+if(activeI62V5){
+  need(C.i6Execution?.requiresDryRun===false,'I6_V5_DRYRUN_MUST_NOT_BE_MANDATORY');
+  need(C.i6Execution?.perBlockApplyRequiresExplicitAuthorization===false,'I6_V5_PER_BLOCK_AUTH_MUST_BE_FALSE');
+  need(C.i6Execution?.dataUpdateMode==='EVERGREEN_V5_DELTA_FIRST','I6_V5_DATA_UPDATE_MODE_INVALID');
+  need(C.postproductionDataUpdateControl?.status==='FROZEN_ACTIVE','I6_V5_POSTPROD_CONTROL_NOT_FROZEN');
+  need(C.postproductionDataUpdateControl?.conversationAsAuthority===false,'I6_V5_CONVERSATION_AUTHORITY_FORBIDDEN');
+  need(C.postproductionDataUpdateControl?.requestCurrentSourceBeforeEveryNewModule===true,'I6_V5_SOURCE_REQUEST_RULE_MISSING');
+  need(C.postproductionDataUpdateControl?.liveVisualRefreshRequiredForClosure===true,'I6_V5_LIVE_VISUAL_RULE_MISSING');
+  need(C.postproductionDataUpdateControl?.pureDataUpdateRequiresBuildOrDeploy===false,'I6_V5_PURE_DATA_RELEASE_RULE_INVALID');
+  need(C.postproductionDataUpdateControl?.reimportForVisibilityFailureForbidden===true,'I6_V5_REIMPORT_VISIBILITY_RULE_MISSING');
+  need(P.status==='FROZEN_ACTIVE'&&P.resumeContract?.conversationMayOverride===false,'I6_V5_OPERATING_PLAN_INVALID');
+  need(D.status==='FROZEN_ACTIVE_V5_DATA_UPDATE_DISCIPLINE'&&D.dataUpdateDiscipline?.askPaulaForCurrentSourceBeforeEachNewModule===true,'I6_V5_DISCIPLINE_INVALID');
+  need(RGT.status==='FROZEN_OPERATIONAL_REGISTRY'&&RGT.rules?.neverInventWritePath===true,'I6_V5_REGISTRY_INVALID');
+  need(SRC.status==='PINNED_FOR_V5_DELTA'&&SRC.execution?.writeApplied===false&&SRC.execution?.nextRequiredStep==='VERIFY_APPROVED_UPDATE_MECHANISM_OR_WRITE_CONTRACT','I6_V5_ACTIVE_SOURCE_STATE_INVALID');
+  for(const [pathKey,blobKey,expectedPath] of [
+    ['operatingPlanPath','operatingPlanBlobSha',DATA_UPDATE_PLAN],
+    ['executionDisciplinePath','executionDisciplineBlobSha',DATA_UPDATE_DISCIPLINE],
+    ['mechanismRegistryPath','mechanismRegistryBlobSha',DATA_UPDATE_REGISTRY],
+    ['activeSourceIntakePath','activeSourceIntakeBlobSha',ACTIVE_SOURCE_INTAKE]
+  ]){
+    need(C.i6Execution?.[pathKey]===expectedPath,'I6_V5_CONTROL_PATH_MISMATCH:'+pathKey);
+    need(git('hash-object',expectedPath)===C.i6Execution?.[blobKey],'I6_V5_CONTROL_BLOB_DRIFT:'+blobKey);
+  }
+  need(C.nextAction==='I6_2_VERIFY_APPROVED_UPDATE_MECHANISM_OR_WRITE_CONTRACT','I6_V5_NEXT_ACTION_INVALID');
+  need(G.lastFormallyCompletedMiniGate==='I6.1','I6_V5_LAST_MINIGATE_INVALID');
+}
 
 const R=C.certifiedCandidate||{};
-if(frozenI61){need(R.sourceSha===C.i61LiveSeal?.sourceSha,'I6_CERTIFIED_SOURCE_DRIFT');need(R.buildId===C.i61LiveSeal?.buildId,'I6_CERTIFIED_BUILD_DRIFT');need(Number(R.artifactId)===Number(C.i61LiveSeal?.artifactId),'I6_CERTIFIED_ARTIFACT_DRIFT');}else{need(R.sourceSha==='16f174d087024085eff18079c486f717ef98d691','I6_CERTIFIED_SOURCE_DRIFT');need(R.buildId==='gi-i3-16f174d08702-57f234755dc1','I6_CERTIFIED_BUILD_DRIFT');need(Number(R.artifactId)===10183074943,'I6_CERTIFIED_ARTIFACT_DRIFT');}
+if(frozenI61||activeI62V5){need(R.sourceSha===C.i61LiveSeal?.sourceSha,'I6_CERTIFIED_SOURCE_DRIFT');need(R.buildId===C.i61LiveSeal?.buildId,'I6_CERTIFIED_BUILD_DRIFT');need(Number(R.artifactId)===Number(C.i61LiveSeal?.artifactId),'I6_CERTIFIED_ARTIFACT_DRIFT');}else{need(R.sourceSha==='16f174d087024085eff18079c486f717ef98d691','I6_CERTIFIED_SOURCE_DRIFT');need(R.buildId==='gi-i3-16f174d08702-57f234755dc1','I6_CERTIFIED_BUILD_DRIFT');need(Number(R.artifactId)===10183074943,'I6_CERTIFIED_ARTIFACT_DRIFT');}
 need(S.schemaVersion==='gravicentra-capability-status-ledger-v1','I6_LEDGER_SCHEMA_INVALID');
 need(Array.isArray(S.capabilities)&&S.capabilities.length===15,'I6_LEDGER_COUNT_INVALID');
 need(S.capabilities.every(x=>x.liveAcceptance?.status==='LATEST_APPROVED_VERSION_LIVE_PASS'),'I6_PRIOR_LIVE_PASS_NOT_PRESERVED');
@@ -83,9 +116,9 @@ const allowedSuccessorProduct=new Set(successor&&Array.isArray(successor.allowed
 const forbidden=changed.filter(p=>!allowedPrefixes.some(prefix=>p.startsWith(prefix))&&!allowedSuccessorProduct.has(p));
 need(forbidden.length===0,'I6_PRODUCT_SOURCE_DRIFT_OUTSIDE_BOUND_SUCCESSOR:'+forbidden.slice(0,20).join(','));
 if(successor){
- need(frozenI60||frozenI61,'I6_1_SUCCESSOR_OUTSIDE_ACTIVE_SUBGATE');
+ need(frozenI60||frozenI61||activeI62V5,'I6_1_SUCCESSOR_OUTSIDE_ACTIVE_SUBGATE');
  need(/^[0-9a-f]{40}$/.test(String(successor.sourceSha||'')),'I6_1_SUCCESSOR_SHA_INVALID');
- need(successor.parentCertifiedSourceSha===(frozenI61?C.preI61CertifiedCandidate?.sourceSha:R.sourceSha),'I6_1_SUCCESSOR_PARENT_MISMATCH');
+ need(successor.parentCertifiedSourceSha===(frozenI61||activeI62V5?C.preI61CertifiedCandidate?.sourceSha:R.sourceSha),'I6_1_SUCCESSOR_PARENT_MISMATCH');
  need(['PREVIEW_TECHNICAL_PASS_AWAITING_AUTHENTICATED_HUMAN_ACCEPTANCE','I6_1_PRODUCT_SUCCESSOR_PREVIEW_PASS','I6_1_PRODUCT_SUCCESSOR_LIVE_PASS'].includes(successor.status),'I6_1_SUCCESSOR_STATUS_INVALID');
  need(successor.readbackExact===true&&Number(successor.readbackFileCount)>0,'I6_1_SUCCESSOR_READBACK_INVALID');
  try{execFileSync('git',['merge-base','--is-ancestor',successor.sourceSha,current],{stdio:'ignore'});}catch{throw new Error('I6_1_SUCCESSOR_NOT_ANCESTOR');}
@@ -96,7 +129,8 @@ console.log('CONTROL_STATUS='+C.status);
 console.log('I6_GATE='+g.I6.status);
 console.log('I6_SUBGATE='+g.I6.activeSubgate);
 console.log('I6_AUTHORIZED=true');
-console.log('DATA_MUTATION_AUTHORIZED=false');
-console.log('AUGUST_REFRESH=HOLD');
+console.log('DATA_MUTATION_AUTHORIZED='+String(C.i6Execution.dataMutationAuthorized===true));
+console.log('AUGUST_REFRESH='+C.environmentState.augustRefresh);
 console.log('PROJECT_SOURCES='+C.projectSources.activePackage);
+console.log('DATA_UPDATE_MODE='+String(C.i6Execution.dataUpdateMode||''));
 console.log('PRODUCT_SOURCE_DRIFT=false');
