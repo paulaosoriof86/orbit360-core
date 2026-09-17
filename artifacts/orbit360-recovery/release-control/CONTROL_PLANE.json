@@ -440,13 +440,14 @@
     "activeModule": "ASEGURADORAS_OPERATIONAL_DIRECTORY",
     "activeSourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_2_DIRECTORIO_SOURCE_INTAKE_20260917.json",
     "activeSourceIntakeBlobSha": "039410c09c6b51cca0d08d6e499986aa58a70bc5",
-    "sourceSha256": "f2e57fa710322b60552070148c5b09bcf6ba9a74ed7d863afff5af4ef2244083",
+    "sourceSha256": "f2e57fa72ff1b94b110b5037038c6c47fbc727c513f9eebd2348d7f4f2244083",
     "conversationAsAuthority": false,
     "requestCurrentSourceBeforeEveryNewModule": true,
     "liveVisualRefreshRequiredForClosure": true,
     "pureDataUpdateRequiresBuildOrDeploy": false,
     "reimportForVisibilityFailureForbidden": true,
-    "nextRequiredStep": "VERIFY_APPROVED_UPDATE_MECHANISM_OR_WRITE_CONTRACT"
+    "nextRequiredStep": "DETERMINISTIC_DIFF",
+    "executionCursor": "LIVE_READBACK_PASS"
   },
   "governanceSyncChecklist": {
     "frozenPlanMaterialized": true,

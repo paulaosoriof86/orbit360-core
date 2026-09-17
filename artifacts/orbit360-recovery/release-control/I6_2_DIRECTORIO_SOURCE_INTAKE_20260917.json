@@ -1,28 +1,34 @@
 {
-  "schema": "GRAVICENTRA_I6_2_DIRECTORIO_SOURCE_INTAKE_V2",
+  "schema": "GRAVICENTRA_I6_2_DIRECTORIO_SOURCE_INTAKE_V3",
   "status": "PINNED_FOR_V5_DELTA",
   "date": "2026-09-17",
   "productBrand": "Gravicentra Insurance",
   "module": "ASEGURADORAS_OPERATIONAL_DIRECTORY",
   "source": {
     "filename": "Directorio Aseguradoras Guatemala 2026 (2)(1).xlsx",
-    "sha256": "f2e57fa710322b60552070148c5b09bcf6ba9a74ed7d863afff5af4ef2244083",
+    "sha256": "f2e57fa72ff1b94b110b5037038c6c47fbc727c513f9eebd2348d7f4f2244083",
     "bytes": 444455,
     "sourceType": "USER_SUPPLIED_CURRENT_WORKBOOK"
   },
   "supersedesForActiveRun": "artifacts/orbit360-recovery/release-control/I6_2_DIRECTORIO_SOURCE_INTAKE_20260914.json",
   "historicalPriorIntakeRetained": true,
-  "reason": "The current supplied workbook is not byte-identical to the previously pinned source and therefore must be treated as the active current source under Evergreen V5.",
+  "reason": "Current user-supplied workbook physically fingerprinted in the active execution environment and canonically repinned for Evergreen V5 delta-first execution.",
   "execution": {
     "method": "DATA_UPDATE_DELTA_FIRST",
+    "cursorState": "LIVE_READBACK_PASS",
     "writeApplied": false,
-    "readbackPassed": false,
+    "readbackPassed": true,
+    "readbackRunId": 35230577501,
+    "readbackDocumentCount": 30,
+    "readbackWritesExecuted": 0,
     "liveVisualConfirmed": false,
-    "nextRequiredStep": "VERIFY_APPROVED_UPDATE_MECHANISM_OR_WRITE_CONTRACT"
+    "nextRequiredStep": "DETERMINISTIC_DIFF"
   },
   "guards": {
     "doNotUsePriorHashAsCurrent": true,
-    "doNotWriteBeforeMechanismVerification": true,
-    "doNotClaimPassBeforeReadbackAndLiveVisualConfirmation": true
+    "approvedWriteMechanismAlreadyVerified": true,
+    "doNotRepeatReadbackWithoutConcreteDrift": true,
+    "doNotRediscoverMechanismWithoutConcreteDrift": true,
+    "doNotClaimPassBeforeWriteReadbackIntegrityAndLiveVisualConfirmation": true
   }
 }

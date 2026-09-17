@@ -37,12 +37,18 @@
       "importerEvolutionPointer": "artifacts/orbit360-recovery/release-control/PHASE_B_WORK_PLAN_LOCK_20260917.json#B-DATA-IMPORTER-01",
       "mechanismStatus": "APPROVED_WRITE_MECHANISM_REUSE_REQUIRED",
       "sourceRequiredBeforeStart": true,
-      "sourceState": "CURRENT_SOURCE_ALREADY_SUPPLIED_AND_REPINNED_FOR_ACTIVE_RUN",
+      "sourceState": "CURRENT_SOURCE_REPINNED_AND_LIVE_READBACK_PASS",
       "activeSourceIntake": "artifacts/orbit360-recovery/release-control/I6_2_DIRECTORIO_SOURCE_INTAKE_20260917.json",
       "currentGate": "I6.2",
-      "nextMaterialStep": "LIVE_READBACK_THEN_DETERMINISTIC_DIFF_AGAINST_PINNED_SOURCE_USING_APPROVED_WRITE_CHAIN",
+      "nextMaterialStep": "DETERMINISTIC_DIFF_AGAINST_CURRENT_PINNED_SOURCE_USING_APPROVED_WRITE_CHAIN",
       "liveClosure": "READBACK_AND_INTEGRITY_PASS_THEN_USER_REFRESH_MUST_SHOW_UPDATED_DATA",
-      "doNotRediscoverUnless": "CONCRETE_REPRODUCIBLE_DRIFT_OR_APPROVED_CHAIN_FAILURE"
+      "doNotRediscoverUnless": "CONCRETE_REPRODUCIBLE_DRIFT_OR_APPROVED_CHAIN_FAILURE",
+      "resumeCursor": "LIVE_READBACK_PASS",
+      "doNotRepeat": [
+        "LIVE_READBACK_ALREADY_PASS",
+        "APPROVED_WRITE_MECHANISM_VERIFICATION_ALREADY_PASS",
+        "GENERAL_LINEAGE_OR_ARCHITECTURE_DIAGNOSIS"
+      ]
     },
     "CLIENTES": {
       "gate": "I6.3",
