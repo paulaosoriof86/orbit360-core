@@ -14,8 +14,6 @@ on:
       - recovery/fase-a-clean-20260831
     paths:
       - '.github/workflows/gravicentra-recovery-i6-postsalida.yml'
-      - 'artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json'
-      - 'artifacts/orbit360-recovery/release-control/I6_2_DIRECTORIO_SOURCE_INTAKE_20260917.json'
 
 permissions:
   contents: read
@@ -26,7 +24,7 @@ env:
   TENANT_ID: alianzas-soluciones
   CONTROL: artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json
   SOURCE_INTAKE: artifacts/orbit360-recovery/release-control/I6_2_DIRECTORIO_SOURCE_INTAKE_20260917.json
-  SESSION_PUBLIC_KEY_B64: LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlJQm9qQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FZOEFNSUlCaWdLQ0FZRUFxaTR6ZW14cFBGWnhtQzY5SUpSTQo2VGorWTdudnJGT0ZicjFlL0xSYkF1azkzU1Y4cno5dDdPSnJ0VUwwTFhWMkZ6SmpWL1dwOVZZWVE0ZUIycTdnCmphRGV3Rng5eU10MG1lNlRCVjNQVVg1dlM2c2taVWpOOWJHN3dPOUJ3UEp1TTdiSUNmZmdjZXhlL1BrUkdhZHIKK2ZmMUk0U0Evdys5SXBzSTM3RC9NcFNXWXhVYTVXVStPQkVvZjl4WUVQSEluaHlsUU9aR3BTMDRwbFZFWXJ2bApMdUN1RnJnR1BjdkhDem1udXlmVTVORTh2MWx4aDBoWlFHSTQ5RzhZTU1PeUR1N1NudUdZNFFVQjg1ZzAyZ0l0CmRnWEFuZEtRRTZGZTZkY3JuNVluTW5MWFhIc2JWYkpCcW1mQkNIakJaWFJjWEtua0Fqbk52RmRkaWZoTVExaG0KSis3M1BRV3E0RlBMVTFnTUg2YXFGeGdJdWczejhPdElVMkI4aUNFR1JNdzhubHF6ak9mZUI1LzlCNlF0S0lqRwpxOERDTzZHaWkwU0F5eUN3UGE4amNUdzFSL0RFdERIU2h1NkdYRW03ZDU3dit4ZDIyTkVuN1E5MGJXQ2FaSG9NCkJlUVgycktDS082bEkrdGt0RmFZb2RYTzFtZFpTanVPTU1xSkZOa1Ntc0lkQWdNQkFBRT0KLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tCg==
+  SESSION_PUBLIC_KEY_B64: LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlJQm9qQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FZOEFNSUlCaWdLQ0FZRUFxaTR6ZW14cFBGWnhtQzY5SUpSTQo2VGorWTdudnJGT0ZicjFlL0xSYkF1azkzU1Y4cno5dDdPSnJ0VUwwTFhWMkZ6SmpWL1dwOVZZWVE0ZUIycTdnCmphRGV3Rng5eU10MG1lNlRCVjNQVVg1dlM2c2taVWpOOWJHN3dPOUJ3UEp1TTdiSUNmZmdjZXhlL1ArUkdhZHIKK2ZmMUk0U0Evdys5SXBzSTM3RC9NcFNXWXhVYTVXVStPQkVvZjl4WUVQSEluaHlsUU9aR3BTMDRwbFZFWXJ2bApMdUN1RnJnR1BjdkhDem1udXlmVTVORTh2MWx4aDBoWlFHSTQ5RzhZTU1PeUR1N1NudUdZNFFVQjg1ZzAyZ0l0CmRnWEFuZEtRRTZGZTZkY3JuNVluTW5MWFhIc2JWYkpCcW1mQkNIakJaWFJjWEtua0Fqbk52RmRkaWZoTVExaG0KSis3M1BRV3E0RlBMVTFnTUg2YXFGeGdJdWczejhPdElVMkI4aUNFR1JNdzhubHF6ak9mZUI1LzlCNlF0S0lqRwpxOERDTzZHaWkwU0F5eUN3UGE4amNUdzFSL0RFdERIU2h1NkdYRW03ZDU3dit4ZDIyTkVuN1E5MGJXQ2FaSG9NCkJlUVgycktDS082bEkrdGt0RmFZb2RYTzFtZFpTanVPTU1xSkZOa1Ntc0lkQWdNQkFBRT0KLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tCg==
 
 jobs:
   i62-private-diff-snapshot:
@@ -75,36 +73,28 @@ jobs:
           mkdir -p "$OUT"
           export OUT
           node - <<'NODE'
-          const fs=require('node:fs');
-          const crypto=require('node:crypto');
+          const fs=require('node:fs'),crypto=require('node:crypto');
           const {initializeApp,cert,deleteApp}=require('firebase-admin/app');
           const {getFirestore}=require('firebase-admin/firestore');
           const {SecretManagerServiceClient}=require('@google-cloud/secret-manager');
           const parseSA=()=>{for(const k of ['SA_DEFAULT','SA_ORBIT360_LAB','SA_ORBIT_360_LAB']){try{const x=JSON.parse(process.env[k]||'');if(x?.type==='service_account'&&x?.project_id===process.env.PROJECT_ID&&x?.client_email&&x?.private_key)return x;}catch{}}throw new Error('I62_SERVICE_ACCOUNT_NOT_AVAILABLE');};
-          const canon=v=>{if(v===null||v===undefined)return v===undefined?null:v;if(typeof v!=='object')return v;if(typeof v.toDate==='function'){try{return {$timestamp:v.toDate().toISOString()};}catch{}}if(typeof v.path==='string'&&v.firestore)return {$ref:v.path};if(Number.isFinite(v.latitude)&&Number.isFinite(v.longitude))return {$geo:[v.latitude,v.longitude]};if(Array.isArray(v))return v.map(canon);const o={};for(const k of Object.keys(v).sort())o[k]=canon(v[k]);return o;};
-          const encrypt=(plain,pem)=>{const key=crypto.randomBytes(32),iv=crypto.randomBytes(12);const cipher=crypto.createCipheriv('aes-256-gcm',key,iv);const ciphertext=Buffer.concat([cipher.update(plain),cipher.final()]);const tag=cipher.getAuthTag();const wrappedKey=crypto.publicEncrypt({key:pem,oaepHash:'sha256',padding:crypto.constants.RSA_PKCS1_OAEP_PADDING},key);return{schema:'GRAVICENTRA_I6_2_SESSION_ENVELOPE_V1',algorithm:'AES-256-GCM+RSA-OAEP-SHA256',wrappedKey:wrappedKey.toString('base64'),iv:iv.toString('base64'),tag:tag.toString('base64'),ciphertext:ciphertext.toString('base64')};};
+          const canon=v=>{if(v===null||v===undefined)return v===undefined?null:v;if(typeof v!=='object')return v;if(typeof v.toDate==='function'){try{return {$timestamp:v.toDate().toISOString()};}catch{}}if(Array.isArray(v))return v.map(canon);const o={};for(const k of Object.keys(v).sort())o[k]=canon(v[k]);return o;};
+          const encrypt=(plain,pem)=>{const key=crypto.randomBytes(32),iv=crypto.randomBytes(12),c=crypto.createCipheriv('aes-256-gcm',key,iv),ct=Buffer.concat([c.update(plain),c.final()]),tag=c.getAuthTag(),wk=crypto.publicEncrypt({key:pem,oaepHash:'sha256',padding:crypto.constants.RSA_PKCS1_OAEP_PADDING},key);return{schema:'GRAVICENTRA_I6_2_SESSION_ENVELOPE_V1',algorithm:'AES-256-GCM+RSA-OAEP-SHA256',wrappedKey:wk.toString('base64'),iv:iv.toString('base64'),tag:tag.toString('base64'),ciphertext:ct.toString('base64')};};
           (async()=>{
-            const sa=parseSA();
-            const source=JSON.parse(fs.readFileSync(process.env.SOURCE_INTAKE,'utf8'));
+            const sa=parseSA(),source=JSON.parse(fs.readFileSync(process.env.SOURCE_INTAKE,'utf8'));
             const app=initializeApp({credential:cert(sa),projectId:process.env.PROJECT_ID},'i62-private-diff-snapshot');
             try{
-              const db=getFirestore(app);
-              const ref=db.collection('tenants').doc(process.env.TENANT_ID).collection('data').doc('aseguradoras').collection('items');
-              const snap=await ref.get();
+              const db=getFirestore(app),ref=db.collection('tenants').doc(process.env.TENANT_ID).collection('data').doc('aseguradoras').collection('items'),snap=await ref.get();
               const documents=snap.docs.map(d=>({id:d.id,data:canon(d.data()||{})})).sort((a,b)=>a.id.localeCompare(b.id));
               if(!documents.length)throw new Error('I62_LIVE_DIRECTORY_EMPTY');
               const sm=new SecretManagerServiceClient({credentials:{client_email:sa.client_email,private_key:sa.private_key},projectId:sa.project_id});
-              const secretName=`projects/${process.env.PROJECT_ID}/secrets/orbit360-insurer-credentials-${process.env.TENANT_ID}/versions/latest`;
-              const [ver]=await sm.accessSecretVersion({name:secretName});
+              const [ver]=await sm.accessSecretVersion({name:`projects/${process.env.PROJECT_ID}/secrets/orbit360-insurer-credentials-${process.env.TENANT_ID}/versions/latest`});
               const raw=ver?.payload?.data?Buffer.from(ver.payload.data).toString('utf8'):'';
               const vault=raw?JSON.parse(raw):{records:{}};
               const exact={schema:'GRAVICENTRA_I6_2_PRIVATE_DIFF_SNAPSHOT_V1',capturedAt:new Date().toISOString(),projectId:process.env.PROJECT_ID,tenantId:process.env.TENANT_ID,sourceSha256:source.source.sha256,writesExecuted:0,documents,credentialVault:{schemaVersion:vault.schemaVersion||null,tenantId:vault.tenantId||process.env.TENANT_ID,records:vault.records&&typeof vault.records==='object'?vault.records:{}}};
-              const plain=Buffer.from(JSON.stringify(exact),'utf8');
-              const pem=Buffer.from(process.env.SESSION_PUBLIC_KEY_B64,'base64').toString('utf8');
-              const envelope=encrypt(plain,pem);
-              const ep=process.env.OUT+'/live-private-snapshot.encrypted.json';
+              const plain=Buffer.from(JSON.stringify(exact),'utf8'),pem=Buffer.from(process.env.SESSION_PUBLIC_KEY_B64,'base64').toString('utf8'),envelope=encrypt(plain,pem),ep=process.env.OUT+'/live-private-snapshot.encrypted.json';
               fs.writeFileSync(ep,JSON.stringify(envelope)+'\n');
-              const summary={schema:'GRAVICENTRA_I6_2_PRIVATE_DIFF_SNAPSHOT_SUMMARY_V1',status:'PASS',gate:'I6.2',documentCount:documents.length,credentialRecordCount:Object.keys(exact.credentialVault.records).length,writesExecuted:0,productionMutation:false,plaintextOperationalValuesInEvidence:false,sourceSha256:source.source.sha256,plaintextSha256:crypto.createHash('sha256').update(plain).digest('hex'),encryptedSha256:crypto.createHash('sha256').update(fs.readFileSync(ep)).digest('hex')};
+              const summary={schema:'GRAVICENTRA_I6_2_PRIVATE_DIFF_SNAPSHOT_SUMMARY_V1',status:'PASS',gate:'I6.2',documentCount:documents.length,credentialRecordCount:Object.keys(exact.credentialVault.records).length,writesExecuted:0,productionMutation:false,plaintextOperationalValuesInEvidence:false,sourceSha256:source.source.sha256,plaintextSha256:crypto.createHash('sha256').update(plain).digest('hex'),encryptedSha256:crypto.createHash('sha256').update(fs.readFileSync(ep)).digest('hex'),sessionPublicKeyFingerprint:crypto.createHash('sha256').update(pem).digest('hex')};
               fs.writeFileSync(process.env.OUT+'/summary.json',JSON.stringify(summary,null,2)+'\n');
               console.log('I62_PRIVATE_DIFF_SNAPSHOT=PASS');
               console.log('I62_DOCUMENT_COUNT='+documents.length);
