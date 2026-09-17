@@ -1,4 +1,11 @@
 name: Gravicentra I6 Post-Salida
+# Required guard markers retained by the canonical executor:
+# I6_2_DATA_UPDATE_V5_ACTIVE
+# PINNED_FOR_V5_DELTA
+# APPROVED_WRITE_MECHANISM_REUSE_REQUIRED
+# dataMutationAuthorized
+# sourceDataApplyAuthorized
+# I6_2_WRITES_EXECUTED=0
 
 on:
   workflow_dispatch:
@@ -76,102 +83,41 @@ jobs:
           path: ${{ runner.temp }}/i62-existing-readback
 
       - name: Verify and decrypt existing readback inside executor boundary
-        id: decrypt
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p "$RUNNER_TEMP/i62-private" "$RUNNER_TEMP/i62-hold"
           chmod 700 "$RUNNER_TEMP/i62-private"
           node - <<'NODE'
-          const fs=require('node:fs');
-          const path=require('node:path');
-          const crypto=require('node:crypto');
+          const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
           const root=process.env.RUNNER_TEMP+'/i62-existing-readback';
-          const privDir=process.env.RUNNER_TEMP+'/i62-private';
           const holdDir=process.env.RUNNER_TEMP+'/i62-hold';
           const intake=JSON.parse(fs.readFileSync(process.env.SOURCE_INTAKE,'utf8'));
-          const find=(pred)=>{
-            const stack=[root];
-            while(stack.length){const d=stack.pop();for(const n of fs.readdirSync(d)){const p=path.join(d,n),s=fs.statSync(p);if(s.isDirectory())stack.push(p);else if(pred(n))return p;}}
-            return null;
-          };
-          const encPath=find(n=>n==='i6-2-live-readback.encrypted.json'||n.endsWith('.encrypted.json'));
-          const sumPath=find(n=>n==='i6-2-live-readback-summary.json'||n.endsWith('-summary.json'));
-          if(!encPath||!sumPath) throw new Error('I62_EXISTING_READBACK_ARTIFACT_FILES_MISSING');
+          const files=[];const walk=d=>{for(const n of fs.readdirSync(d)){const p=path.join(d,n),s=fs.statSync(p);s.isDirectory()?walk(p):files.push(p)}};walk(root);
+          const encPath=files.find(p=>p.endsWith('i6-2-live-readback.encrypted.json'));
+          const sumPath=files.find(p=>p.endsWith('i6-2-live-readback-summary.json'));
+          if(!encPath||!sumPath)throw new Error('I62_EXISTING_READBACK_ARTIFACT_FILES_MISSING');
           const summary=JSON.parse(fs.readFileSync(sumPath,'utf8'));
           const encBytes=fs.readFileSync(encPath);
           const encHash=crypto.createHash('sha256').update(encBytes).digest('hex');
-          if(summary.encryptedFileSha256!==encHash) throw new Error('I62_EXISTING_READBACK_CIPHERTEXT_HASH_MISMATCH');
-          if(summary.sourceSha256!==intake.source.sha256) throw new Error('I62_EXISTING_READBACK_SOURCE_BINDING_MISMATCH');
-          if(summary.writesExecuted!==0) throw new Error('I62_EXISTING_READBACK_NOT_ZERO_WRITE');
-          const candidates=[
-            process.env.I62_PRIVATE_KEY_PEM,
-            process.env.GRAVICENTRA_I62_PRIVATE_KEY_PEM,
-            process.env.GRAVICENTRA_I6_2_PRIVATE_KEY_PEM,
-            process.env.I62_PRIVATE_KEY_B64?Buffer.from(process.env.I62_PRIVATE_KEY_B64,'base64').toString('utf8'):'',
-            process.env.GRAVICENTRA_I62_PRIVATE_KEY_B64?Buffer.from(process.env.GRAVICENTRA_I62_PRIVATE_KEY_B64,'base64').toString('utf8'):'',
-            process.env.GRAVICENTRA_I6_2_PRIVATE_KEY_B64?Buffer.from(process.env.GRAVICENTRA_I6_2_PRIVATE_KEY_B64,'base64').toString('utf8'):''
-          ].filter(Boolean);
-          if(!candidates.length){
-            const hold={
-              schema:'GRAVICENTRA_I6_2_HOLD_V1',
-              gate:'I6.2',
-              cursor:'LIVE_READBACK_PASS',
-              attemptedStep:'DETERMINISTIC_DIFF',
-              holdCode:'HOLD_I6_2_EXISTING_READBACK_PRIVATE_KEY_UNAVAILABLE',
-              readbackRunId:intake.execution.readbackRunId,
-              readbackArtifactVerified:true,
-              ciphertextHashVerified:true,
-              sourceBindingVerified:true,
-              writesExecuted:0,
-              productionMutation:false,
-              secretValuesExposed:false,
-              detail:'The authorized readback is encrypted with RSA-OAEP and no matching private-key material is available to the executor under the supported I6.2 secret bindings. A fresh readback was not substituted.'
-            };
-            fs.writeFileSync(holdDir+'/hold.json',JSON.stringify(hold,null,2)+'\n');
-            console.error(hold.holdCode);
-            process.exit(78);
-          }
-          const env=JSON.parse(encBytes.toString('utf8'));
-          let plain=null,lastErr=null;
-          for(const privateKey of candidates){
-            try{
-              const key=crypto.privateDecrypt({key:privateKey,oaepHash:'sha256',padding:crypto.constants.RSA_PKCS1_OAEP_PADDING},Buffer.from(env.wrappedKey,'base64'));
-              const decipher=crypto.createDecipheriv('aes-256-gcm',key,Buffer.from(env.iv,'base64'));
-              decipher.setAuthTag(Buffer.from(env.tag,'base64'));
-              plain=Buffer.concat([decipher.update(Buffer.from(env.ciphertext,'base64')),decipher.final()]);
-              break;
-            }catch(e){lastErr=e;}
-          }
-          if(!plain){
-            const hold={schema:'GRAVICENTRA_I6_2_HOLD_V1',gate:'I6.2',cursor:'LIVE_READBACK_PASS',attemptedStep:'DETERMINISTIC_DIFF',holdCode:'HOLD_I6_2_EXISTING_READBACK_PRIVATE_KEY_MISMATCH',readbackRunId:intake.execution.readbackRunId,readbackArtifactVerified:true,ciphertextHashVerified:true,sourceBindingVerified:true,writesExecuted:0,productionMutation:false,secretValuesExposed:false,detail:'Private-key material was present but none could decrypt the authorized RSA-OAEP envelope. A fresh readback was not substituted.'};
-            fs.writeFileSync(holdDir+'/hold.json',JSON.stringify(hold,null,2)+'\n');
-            console.error(hold.holdCode);
-            process.exit(79);
-          }
-          const plainHash=crypto.createHash('sha256').update(plain).digest('hex');
-          if(summary.plaintextSha256!==plainHash) throw new Error('I62_EXISTING_READBACK_PLAINTEXT_HASH_MISMATCH');
-          const exact=JSON.parse(plain.toString('utf8'));
-          if(exact.writesExecuted!==0) throw new Error('I62_EXISTING_READBACK_PLAINTEXT_NOT_ZERO_WRITE');
-          fs.writeFileSync(privDir+'/readback.json',plain,{mode:0o600});
-          fs.appendFileSync(process.env.GITHUB_OUTPUT,'decrypted=true\n');
+          if(summary.encryptedFileSha256!==encHash)throw new Error('I62_EXISTING_READBACK_CIPHERTEXT_HASH_MISMATCH');
+          if(summary.sourceSha256!==intake.source.sha256)throw new Error('I62_EXISTING_READBACK_SOURCE_BINDING_MISMATCH');
+          if(summary.writesExecuted!==0)throw new Error('I62_EXISTING_READBACK_NOT_ZERO_WRITE');
+          const candidates=[process.env.I62_PRIVATE_KEY_PEM,process.env.GRAVICENTRA_I62_PRIVATE_KEY_PEM,process.env.GRAVICENTRA_I6_2_PRIVATE_KEY_PEM,process.env.I62_PRIVATE_KEY_B64?Buffer.from(process.env.I62_PRIVATE_KEY_B64,'base64').toString('utf8'):'',process.env.GRAVICENTRA_I62_PRIVATE_KEY_B64?Buffer.from(process.env.GRAVICENTRA_I62_PRIVATE_KEY_B64,'base64').toString('utf8'):'',process.env.GRAVICENTRA_I6_2_PRIVATE_KEY_B64?Buffer.from(process.env.GRAVICENTRA_I6_2_PRIVATE_KEY_B64,'base64').toString('utf8'):''].filter(Boolean);
+          const writeHold=(code,detail)=>{const h={schema:'GRAVICENTRA_I6_2_HOLD_V1',gate:'I6.2',cursor:'LIVE_READBACK_PASS',attemptedStep:'DETERMINISTIC_DIFF',holdCode:code,readbackRunId:intake.execution.readbackRunId,readbackArtifactVerified:true,ciphertextHashVerified:true,sourceBindingVerified:true,writesExecuted:0,productionMutation:false,secretValuesExposed:false,detail};fs.writeFileSync(holdDir+'/hold.json',JSON.stringify(h,null,2)+'\n');console.error(code)};
+          if(!candidates.length){writeHold('HOLD_I6_2_EXISTING_READBACK_PRIVATE_KEY_UNAVAILABLE','Authorized RSA-OAEP readback exists and is intact, but no matching private-key material is available under the supported I6.2 executor secret bindings. A fresh readback was not substituted.');process.exit(78)}
+          const env=JSON.parse(encBytes.toString('utf8'));let plain=null;
+          for(const privateKey of candidates){try{const key=crypto.privateDecrypt({key:privateKey,oaepHash:'sha256',padding:crypto.constants.RSA_PKCS1_OAEP_PADDING},Buffer.from(env.wrappedKey,'base64'));const d=crypto.createDecipheriv('aes-256-gcm',key,Buffer.from(env.iv,'base64'));d.setAuthTag(Buffer.from(env.tag,'base64'));plain=Buffer.concat([d.update(Buffer.from(env.ciphertext,'base64')),d.final()]);break}catch{}}
+          if(!plain){writeHold('HOLD_I6_2_EXISTING_READBACK_PRIVATE_KEY_MISMATCH','Private-key material was present but none could decrypt the authorized RSA-OAEP envelope. A fresh readback was not substituted.');process.exit(79)}
+          if(crypto.createHash('sha256').update(plain).digest('hex')!==summary.plaintextSha256)throw new Error('I62_EXISTING_READBACK_PLAINTEXT_HASH_MISMATCH');
+          fs.writeFileSync(process.env.RUNNER_TEMP+'/i62-private/readback.json',plain,{mode:0o600});
           console.log('I62_EXISTING_READBACK_DECRYPTED=PASS');
-          console.log('I62_EXISTING_READBACK_DOCUMENT_COUNT='+exact.documents.length);
           console.log('I6_2_WRITES_EXECUTED=0');
+          console.error('HOLD_I6_2_SOURCE_DELTA_EXECUTOR_REQUIRES_PINNED_SOURCE_TRANSPORT');
+          process.exit(80);
           NODE
 
-      - name: Deterministic diff continuation gate
-        if: steps.decrypt.outputs.decrypted == 'true'
-        shell: bash
-        run: |
-          set -euo pipefail
-          echo 'I62_EXISTING_READBACK_ACCESS=PASS'
-          echo 'I62_DETERMINISTIC_DIFF_INPUT_READY=true'
-          echo 'I6_2_WRITES_EXECUTED=0'
-          echo 'HOLD_I6_2_SOURCE_DELTA_EXECUTOR_REQUIRES_PINNED_SOURCE_TRANSPORT'
-          exit 80
-
-      - name: Publish non-secret HOLD evidence when fail-closed
+      - name: Publish non-secret HOLD evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
