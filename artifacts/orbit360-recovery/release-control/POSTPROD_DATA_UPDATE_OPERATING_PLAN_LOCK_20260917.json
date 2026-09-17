@@ -1,22 +1,48 @@
 {
-  "schema": "GRAVICENTRA_POSTPROD_DATA_UPDATE_OPERATING_PLAN_LOCK_V1",
+  "schema": "GRAVICENTRA_POSTPROD_DATA_UPDATE_OPERATING_PLAN_LOCK_V2",
   "status": "FROZEN_ACTIVE",
   "date": "2026-09-17",
   "productBrand": "Gravicentra Insurance",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
-  "purpose": "Freeze the ordinary post-production DATA_UPDATE execution method so that execution does not depend on conversation context.",
+  "purpose": "Freeze the Phase A post-production I6 plan and ordinary DATA_UPDATE execution method so execution and progress do not depend on conversation context.",
   "governingAuthority": {
     "packageId": "GRAVICENTRA_PROJECT_SOURCES_EVERGREEN_V5",
     "manifestPath": "artifacts/orbit360-recovery/project-sources-v2/v5/08_MANIFIESTO_FUENTES_EVERGREEN_V5.json",
     "manifestBlobSha": "d1a0cc69ded3d38911e5e5504360228d7bcc05e1",
+    "retainedI6GateOrderSource": "artifacts/orbit360-recovery/project-sources-v2/v4/06_ADDENDUM_FASE_A_POSTSALIDA_I6_EVERGREEN_V4.md",
     "deltaAddendumPath": "artifacts/orbit360-recovery/project-sources-v2/v5/07_ADDENDUM_ACTUALIZACION_INCREMENTAL_DELTA_EVERGREEN_V5_2026-09-16.md",
-    "deltaAddendumBlobSha": "637556b30de4dc346ef55e284c83175fabb921b8"
+    "deltaAddendumBlobSha": "637556b30de4dc346ef55e284c83175fabb921b8",
+    "interpretation": "Evergreen V5 changes the ordinary DATA_UPDATE cadence to delta-first execution; it does not cancel the retained I6.0-I6.9 gate order."
   },
   "lineageAuthority": "artifacts/orbit360-recovery/release-control/CAPABILITY_LINEAGE_LOCK.json",
   "capabilityStatusAuthority": "artifacts/orbit360-recovery/release-control/CAPABILITY_STATUS_LEDGER.json",
-  "scope": "I6_POSTPRODUCTION_DATA_REFRESH",
+  "scope": "I6_POSTPRODUCTION_COMPLETION_AND_CONTROLLED_REFRESH",
   "executionClass": "DATA_UPDATE_DELTA_FIRST",
+  "formalGatePlan": [
+    {"gate":"I6.0","name":"Baseline y rollback","terminalState":"I6_0_BASELINE_FROZEN","status":"CLOSED"},
+    {"gate":"I6.1","name":"Cierre funcional","terminalState":"I6_1_PRODUCT_SUCCESSOR_LIVE_PASS","status":"CLOSED"},
+    {"gate":"I6.2","name":"Directorio / Aseguradoras","terminalState":"I6_2_DIRECTORIO_LIVE_PASS","status":"ACTIVE"},
+    {"gate":"I6.3","name":"Clientes","terminalState":"I6_3_CLIENTES_LIVE_PASS","status":"PENDING"},
+    {"gate":"I6.4","name":"Pólizas, renovaciones, vehículos y riesgos","terminalState":"I6_4_POLIZAS_RIESGOS_LIVE_PASS","status":"PENDING"},
+    {"gate":"I6.5","name":"Recibos","terminalState":"I6_5_RECIBOS_COMPLETE_LIVE_PASS","status":"PENDING"},
+    {"gate":"I6.6","name":"Cobros y conciliación","terminalState":"I6_6_COBROS_CONCILIADOS_LIVE_PASS","status":"PENDING"},
+    {"gate":"I6.7","name":"Comisiones y liquidaciones","terminalState":"I6_7_COMISIONES_LIVE_PASS","status":"PENDING"},
+    {"gate":"I6.8","name":"Historial, Academia y habilitación gradual","terminalState":"I6_8_ENABLEMENT_TRAINING_HISTORY_LIVE_PASS","status":"PENDING"},
+    {"gate":"I6.9","name":"Aceptación final y HostDime","terminalState":"FASE_A_POSTSALIDA_PRODUCTION_ACCEPTED","status":"PENDING"}
+  ],
+  "progressPolicy": {
+    "totalFormalPostproductionGates": 10,
+    "closedFormalPostproductionGates": 2,
+    "formalPostproductionPercent": 20,
+    "calculation": "closed formal I6 mini-gates / 10 * 100",
+    "reportAtEveryIteration": true,
+    "activityDoesNotCountAsPercent": true,
+    "gatePartialWorkDoesNotIncreaseFormalPercent": true,
+    "nextFormalPercentAfterI6_2Closure": 30,
+    "productionReleaseI0_I5Percent": 100,
+    "note": "The 100% production release acceptance for I0-I5 and the 20% Phase A post-production I6 completion are separate metrics."
+  },
   "hardRules": {
     "doNotReopenFaseAWithoutCausalRegression": true,
     "doNotRebuildForPureDataUpdate": true,
@@ -25,12 +51,13 @@
     "doNotReimportToFixVisibility": true,
     "doNotReusePreviousModuleSourceAsCurrent": true,
     "doNotAdvanceWithoutModuleClosure": true,
+    "doNotRediscoverApprovedMechanismWithoutConcreteDrift": true,
     "maximumNormalCyclesPerModule": 2
   },
   "moduleProtocol": [
     "REQUEST_CURRENT_SOURCE_FROM_PAULA_BEFORE_NEW_MODULE",
     "PIN_SOURCE_IDENTITY_AND_HASH",
-    "VERIFY_APPROVED_UPDATE_MECHANISM_OR_WRITE_CONTRACT",
+    "LOCATE_AND_REUSE_ALREADY_APPROVED_UPDATE_MECHANISM_FROM_FROZEN_EVIDENCE",
     "LIVE_READBACK_CURRENT_STATE",
     "DETERMINISTIC_DIFF",
     "APPLY_DETERMINISTIC_DELTA_ONLY",
@@ -46,7 +73,7 @@
     "recordFilename": true,
     "recordCryptographicHash": true,
     "recordSizeWhenFileBased": true,
-    "currentModuleException": "Aseguradoras/Directorio source is already supplied in the active workstream and must be repinned; do not ask again unless the supplied source changes."
+    "currentModuleException": "Aseguradoras/Directorio source is already supplied in the active workstream and must not be requested again unless Paula replaces it."
   },
   "visualClosureContract": {
     "pureDataUpdateExpectedBehavior": "After successful LIVE write/readback, refreshing the production Orbit Central/Gravicentra URL must display the updated data without build or deploy.",
@@ -62,13 +89,17 @@
     ]
   },
   "mechanismDecisionRule": {
-    "preferExistingApprovedPlatformImporterWhen": "Its read/write contract is verified for the target entity and a controlled LIVE proof confirms persistence and readback.",
-    "otherwise": "Use the already-approved deterministic update mechanism/write contract; do not invent a new importer.",
+    "firstChoice": "Reuse the already-approved operational write chain evidenced by lineage/acceptance; locating its evidence is not a new diagnosis.",
+    "rediscoveryAllowedOnlyWhen": "Concrete reproducible drift or failure proves the frozen mechanism is no longer valid.",
+    "importerInPhaseA": "Existing importer may assist source preparation only when its exact contract fits; it does not replace the approved write authority merely because an entrypoint exists.",
+    "importerEvolution": "Deferred to the frozen Phase B work item B-DATA-IMPORTER-01; it must not block I6 Phase A closure.",
     "codeChangeEscalation": "If a CODE_DEFECT requires source modification, exit pure DATA_UPDATE and apply immutable build/same-artifact release discipline."
   },
+  "phaseBPointer": "artifacts/orbit360-recovery/release-control/PHASE_B_WORK_PLAN_LOCK_20260917.json",
   "resumeContract": {
     "sourceOfTruth": "CONTROL_PLANE.json plus this lock plus DATA_UPDATE_MECHANISM_REGISTRY.json",
     "conversationMayOverride": false,
-    "firstActionOnResume": "Read active module and its source intake; execute only the first incomplete protocol step."
+    "firstActionOnResume": "Read active module and its source intake; execute only the first incomplete protocol step.",
+    "progressOnResume": "Recalculate formal postproduction percent from physically closed I6.0-I6.9 gates; never infer progress from chat activity."
   }
 }
