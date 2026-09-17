@@ -16,12 +16,16 @@ need(r.schemaVersion==='gravicentra-i4a-proof-registry-v1','I4A_PROOF_REGISTRY_S
 need(r.authorityType==='DERIVED_MONOTONIC_EVIDENCE_REGISTRY','I4A_PROOF_REGISTRY_AUTHORITY_INVALID');
 need(r.mayGovernGate===false&&r.mayGovernReleaseIdentity===false,'I4A_PROOF_REGISTRY_MUST_NOT_GOVERN_RELEASE');
 const b=r.releaseBinding||{},cc=c.certifiedCandidate||{};
-need(b.sourceSha===cc.sourceSha,'I4A_PROOF_RELEASE_SOURCE_MISMATCH');
-need(b.buildId===cc.buildId,'I4A_PROOF_RELEASE_BUILD_MISMATCH');
-need(Number(b.artifactId)===Number(cc.artifactId),'I4A_PROOF_RELEASE_ARTIFACT_MISMATCH');
-need(b.previewUrl===cc.previewUrl,'I4A_PROOF_RELEASE_PREVIEW_MISMATCH');
-need(b.hostedPayloadDigest===cc.hostedPayloadDigest,'I4A_PROOF_HOSTED_DIGEST_MISMATCH');
-need(b.backendSourceDigest===cc.backendSourceDigest,'I4A_PROOF_BACKEND_DIGEST_MISMATCH');
+// I4A is sealed historical evidence. After the separately-certified I6.1 product successor
+// is promoted, the I4A registry remains bound to the pre-I6.1 certified release rather
+// than being rewritten to impersonate the newer production release.
+const i4aReleaseAuthority=c.preI61CertifiedCandidate||cc;
+need(b.sourceSha===i4aReleaseAuthority.sourceSha,'I4A_PROOF_RELEASE_SOURCE_MISMATCH');
+need(b.buildId===i4aReleaseAuthority.buildId,'I4A_PROOF_RELEASE_BUILD_MISMATCH');
+need(Number(b.artifactId)===Number(i4aReleaseAuthority.artifactId),'I4A_PROOF_RELEASE_ARTIFACT_MISMATCH');
+need(b.previewUrl===i4aReleaseAuthority.previewUrl,'I4A_PROOF_RELEASE_PREVIEW_MISMATCH');
+need(b.hostedPayloadDigest===i4aReleaseAuthority.hostedPayloadDigest,'I4A_PROOF_HOSTED_DIGEST_MISMATCH');
+need(b.backendSourceDigest===i4aReleaseAuthority.backendSourceDigest,'I4A_PROOF_BACKEND_DIGEST_MISMATCH');
 const policy=r.policy||{};
 for(const k of ['passIsMonotonicWithinRelease','passReexecutionForbiddenWithoutCausalInvalidation','validatorFailureCannotInvalidatePriorPass','qaOnlyChangeCannotInvalidatePriorPass','conversationCannotInvalidatePriorPass','causalInvalidationRequiresProductSourceDelta','openProofsOnlyExecution','gateSealRequiresAtomicControlPlaneLedgerRegistryCommit'])need(policy[k]===true,'I4A_PROOF_POLICY_MISSING:'+k);
 
