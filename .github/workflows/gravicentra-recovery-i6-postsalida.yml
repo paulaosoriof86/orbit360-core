@@ -28,6 +28,7 @@ concurrency:
 env:
   CONTROL: artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json
   SOURCE_INTAKE: artifacts/orbit360-recovery/release-control/I6_2_DIRECTORIO_SOURCE_INTAKE_20260917.json
+  HOLD_EVIDENCE: artifacts/orbit360-recovery/release-control/I6_2_DETERMINISTIC_DIFF_HOLD_20260917.json
 
 jobs:
   i62-cursor-executor:
@@ -72,6 +73,32 @@ jobs:
           console.log('I62_CURSOR=LIVE_READBACK_PASS');
           console.log('I62_NEXT_REQUIRED_STEP=DETERMINISTIC_DIFF');
           console.log('I6_2_WRITES_EXECUTED=0');
+          NODE
+
+      - name: Honor canonical deterministic-diff HOLD until secure key is restored
+        shell: bash
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('node:fs');
+          if(!fs.existsSync(process.env.HOLD_EVIDENCE)) process.exit(0);
+          const H=JSON.parse(fs.readFileSync(process.env.HOLD_EVIDENCE,'utf8'));
+          const keyPresent=[
+            process.env.I62_PRIVATE_KEY_PEM,
+            process.env.GRAVICENTRA_I62_PRIVATE_KEY_PEM,
+            process.env.GRAVICENTRA_I6_2_PRIVATE_KEY_PEM,
+            process.env.I62_PRIVATE_KEY_B64,
+            process.env.GRAVICENTRA_I62_PRIVATE_KEY_B64,
+            process.env.GRAVICENTRA_I6_2_PRIVATE_KEY_B64
+          ].some(Boolean);
+          if(H.status==='HOLD'&&H.holdCode==='HOLD_I6_2_EXISTING_READBACK_PRIVATE_KEY_UNAVAILABLE'&&!keyPresent){
+            console.error('HOLD_I6_2_EXISTING_READBACK_PRIVATE_KEY_UNAVAILABLE');
+            console.log('I62_CANONICAL_HOLD_EVIDENCE='+process.env.HOLD_EVIDENCE);
+            console.log('I62_FRESH_READBACK_SUBSTITUTED=false');
+            console.log('I6_2_WRITES_EXECUTED=0');
+            process.exit(78);
+          }
+          if(keyPresent) console.log('I62_PRIVATE_KEY_BINDING_PRESENT_RESUME_EXISTING_READBACK=true');
           NODE
 
       - name: Download the already-authorized encrypted readback artifact
