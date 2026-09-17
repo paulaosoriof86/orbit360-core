@@ -1,4 +1,5 @@
 name: Gravicentra I6 Post-Salida
+# I6_2_EXECUTOR_RETRIGGER_AFTER_GUARD_PASS=true
 
 on:
   workflow_dispatch:
