@@ -1,0 +1,48 @@
+{
+  "schema": "GRAVICENTRA_PHASE_B_WORK_PLAN_LOCK_V1",
+  "status": "FROZEN_BACKLOG_NOT_ACTIVE",
+  "date": "2026-09-17",
+  "materializedAt": "2026-09-18",
+  "productBrand": "Gravicentra Insurance",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "purpose": "Materialize the Phase B pointer already referenced by the frozen postproduction operating plan without inventing unproven backlog.",
+  "entryCondition": "I6.9 / FASE_A_POSTSALIDA_PRODUCTION_ACCEPTED must be physically closed before Phase B starts.",
+  "sourceBasis": [
+    "POSTPROD_DATA_UPDATE_OPERATING_PLAN_LOCK_20260917.json explicitly defers importer evolution to B-DATA-IMPORTER-01.",
+    "DATA_UPDATE_MECHANISM_REGISTRY.json points importer evolution to B-DATA-IMPORTER-01.",
+    "Evergreen V4 explicitly defers personal email integration per user to Phase B.",
+    "Evergreen V4 allows further Finance evolution to Phase B when it is not required to close the operational Phase A path."
+  ],
+  "workItems": [
+    {
+      "id": "B-DATA-IMPORTER-01",
+      "status": "BACKLOG_FROZEN",
+      "decision": "Evolve the existing importer into a target-specific controlled operational import mechanism only after Phase A closure. Reuse canonical write contracts; do not create a parallel importer during I6.",
+      "mustPreserve": [
+        "delta-first updates",
+        "deterministic diff",
+        "idempotency",
+        "provenance",
+        "rollback",
+        "canonical collection paths",
+        "role/security boundaries"
+      ]
+    },
+    {
+      "id": "B-INTEGRATION-MAIL-01",
+      "status": "BACKLOG_FROZEN",
+      "decision": "Integrate each user's personal email only in Phase B; it must not block I6 Phase A closure."
+    },
+    {
+      "id": "B-FINANCE-EVOLUTION-01",
+      "status": "BACKLOG_FROZEN_CONDITIONAL",
+      "decision": "If company Finance is not fully enabled by I6.8, preserve it safely and move its further evolution to Phase B without blocking CRM/Cliente360/Recibos/Cobros."
+    }
+  ],
+  "nonGoals": [
+    "No Phase B execution while any I6 gate is open.",
+    "No second repository, Firebase project, branch, importer or release methodology.",
+    "No inference of additional Phase B items from conversation memory; additions require explicit physical evidence or later approved addendum."
+  ]
+}

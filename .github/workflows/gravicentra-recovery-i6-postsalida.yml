@@ -885,6 +885,87 @@ jobs:
           echo I65_AUTOMATIC_ROLLBACK=PASS
 
 
+  i65-live-readback:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      I65_SOURCE_INTAKE: artifacts/orbit360-recovery/release-control/I6_5_RECIBOS_CARTERA_SOURCE_INTAKE_20260918.json
+      I65_REGISTRY: artifacts/orbit360-recovery/release-control/DATA_UPDATE_MECHANISM_REGISTRY.json
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Resolve I6.5 readback applicability
+        id: i65read
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          node - <<'NODE'
+          const fs=require('node:fs'),c=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8')),s=JSON.parse(fs.readFileSync(process.env.I65_SOURCE_INTAKE,'utf8'));
+          const ok=c.gateState?.gates?.I6?.activeSubgate==='I6.5' && c.nextAction==='I6_5_LIVE_READBACK_CURRENT_STATE' && c.i65SyncCodeDefect?.status==='I6_5_SYNC_CODE_DEFECT_SUCCESSOR_LIVE_PASS' && s.execution?.cursorState==='SOURCE_PINNED';
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(ok?'true':'false')+'\n');
+          console.log('I65_READBACK_APPLICABLE='+(ok?'true':'false'));
+          NODE
+      - name: Install readback dependency
+        if: steps.i65read.outputs.run == 'true'
+        run: npm install --no-save --package-lock=false firebase-admin@13.4.0 >/dev/null
+      - name: Read canonical and legacy LIVE receipt namespaces
+        if: steps.i65read.outputs.run == 'true'
+        env:
+          I65_READBACK_DIR: ${{ runner.temp }}/i65-readback
+        run: node tools/gravicentra-i6-5-live-readback.mjs
+      - name: Upload I6.5 dual-path readback evidence
+        if: steps.i65read.outputs.run == 'true'
+        id: i65readart
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i6-5-live-readback-${{ github.run_id }}
+          path: ${{ runner.temp }}/i65-readback/*
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 7
+      - name: Seal I6.5 LIVE readback cursor
+        if: steps.i65read.outputs.run == 'true'
+        env:
+          READBACK_ARTIFACT_ID: ${{ steps.i65readart.outputs.artifact-id }}
+          READBACK_ARTIFACT_DIGEST: ${{ steps.i65readart.outputs.artifact-digest }}
+        run: |
+          set -euo pipefail
+          git fetch origin recovery/fase-a-clean-20260831
+          git reset --hard origin/recovery/fase-a-clean-20260831
+          export I65_EVIDENCE="$RUNNER_TEMP/i65-readback/i65-dual-path-live-readback.json"
+          node - <<'NODE'
+          const fs=require('node:fs'),{execFileSync}=require('node:child_process');
+          const C=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8')),S=JSON.parse(fs.readFileSync(process.env.I65_SOURCE_INTAKE,'utf8')),R=JSON.parse(fs.readFileSync(process.env.I65_REGISTRY,'utf8')),E=JSON.parse(fs.readFileSync(process.env.I65_EVIDENCE,'utf8'));
+          if(C.nextAction!=='I6_5_LIVE_READBACK_CURRENT_STATE'||S.execution?.cursorState!=='SOURCE_PINNED')throw new Error('I65_CURSOR_CHANGED_DURING_READBACK');
+          if(E.status!=='PASS'||E.writes!==0||E.operationalWrites!==0||Number(E.canonical?.polizas?.count||0)!==1414)throw new Error('I65_READBACK_EVIDENCE_INVALID');
+          S.execution.cursorState='LIVE_READBACK_PASS';S.execution.readbackPassed=true;S.execution.readbackRunId=Number(process.env.GITHUB_RUN_ID);S.execution.readbackArtifactId=Number(process.env.READBACK_ARTIFACT_ID);S.execution.readbackArtifactDigest=process.env.READBACK_ARTIFACT_DIGEST;
+          S.execution.canonicalLiveCounts=Object.fromEntries(Object.entries(E.canonical||{}).map(([k,v])=>[k,v.count]));S.execution.legacyLiveCounts=Object.fromEntries(Object.entries(E.legacy||{}).map(([k,v])=>[k,v.count]));S.execution.pathState=E.pathState;S.execution.relationshipBaseline=E.relationships||{};S.execution.nextRequiredStep='DETERMINISTIC_DIFF';
+          fs.writeFileSync(process.env.I65_SOURCE_INTAKE,JSON.stringify(S,null,2)+'\n');
+          R.modules.RECIBOS_CARTERA.sourceState='CURRENT_SOURCE_PINNED_LIVE_READBACK_PASS';R.modules.RECIBOS_CARTERA.resumeCursor='LIVE_READBACK_PASS';R.modules.RECIBOS_CARTERA.nextMaterialStep='DETERMINISTIC_DIFF';R.modules.RECIBOS_CARTERA.dataWritesAuthorized=false;R.modules.RECIBOS_CARTERA.cobrosWritesAuthorized=false;R.modules.RECIBOS_CARTERA.liveReadback={runId:Number(process.env.GITHUB_RUN_ID),artifactId:Number(process.env.READBACK_ARTIFACT_ID),artifactDigest:process.env.READBACK_ARTIFACT_DIGEST,pathState:E.pathState,canonicalCounts:S.execution.canonicalLiveCounts,legacyCounts:S.execution.legacyLiveCounts,relationships:E.relationships,writes:0};
+          fs.writeFileSync(process.env.I65_REGISTRY,JSON.stringify(R,null,2)+'\n');
+          const sourceBlob=execFileSync('git',['hash-object',process.env.I65_SOURCE_INTAKE],{encoding:'utf8'}).trim(),registryBlob=execFileSync('git',['hash-object',process.env.I65_REGISTRY],{encoding:'utf8'}).trim();
+          C.i6Execution.activeSourceIntakeBlobSha=sourceBlob;C.postproductionDataUpdateControl.activeSourceIntakeBlobSha=sourceBlob;C.i6Execution.mechanismRegistryBlobSha=registryBlob;C.postproductionDataUpdateControl.mechanismRegistryBlobSha=registryBlob;C.i6Execution.activeModuleStatus='LIVE_READBACK_PASS';C.i6Execution.dataMutationAuthorized=false;C.i6Execution.sourceDataApplyAuthorized=false;
+          C.i6Execution.i6_5={...(C.i6Execution.i6_5||{}),status:'LIVE_READBACK_PASS',readbackRunId:Number(process.env.GITHUB_RUN_ID),readbackArtifactId:Number(process.env.READBACK_ARTIFACT_ID),readbackArtifactDigest:process.env.READBACK_ARTIFACT_DIGEST,canonicalLiveCounts:S.execution.canonicalLiveCounts,legacyLiveCounts:S.execution.legacyLiveCounts,pathState:E.pathState,relationshipBaseline:E.relationships,writes:0,nextRequiredStep:'DETERMINISTIC_DIFF'};
+          C.postproductionDataUpdateControl.executionCursor='LIVE_READBACK_PASS';C.postproductionDataUpdateControl.nextRequiredStep='DETERMINISTIC_DIFF';C.gateState.gates.I6.status='I6_5_RECIBOS_CARTERA_LIVE_READBACK_PASS_DIFF_PENDING';C.nextAction='I6_5_DETERMINISTIC_DIFF';C.i65MiniClosurePlan={...(C.i65MiniClosurePlan||{}),blockBStatus:'READ_PATH_AND_DUAL_PATH_LIVE_READBACK_PASS',nextMaterialCursor:'DETERMINISTIC_DIFF'};
+          fs.writeFileSync(process.env.CONTROL,JSON.stringify(C,null,2)+'\n');
+          NODE
+          git config user.name "gravicentra-governance-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add "$CONTROL" "$I65_SOURCE_INTAKE" "$I65_REGISTRY"
+          git commit -m "recovery(i6.5): freeze dual-path LIVE receipt readback"
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          git push origin HEAD:recovery/fase-a-clean-20260831
+
+
   i63-readonly-completeness-audit:
     runs-on: ubuntu-24.04
     timeout-minutes: 15

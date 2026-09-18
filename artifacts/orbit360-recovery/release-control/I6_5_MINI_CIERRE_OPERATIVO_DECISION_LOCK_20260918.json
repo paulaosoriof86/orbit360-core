@@ -1,0 +1,151 @@
+{
+  "schema": "GRAVICENTRA_I6_5_MINI_CIERRE_OPERATIVO_DECISION_LOCK_V1",
+  "status": "FROZEN_ACTIVE",
+  "date": "2026-09-18",
+  "productBrand": "Gravicentra Insurance",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "frozenFromHead": "bb940461f1ec39469d1778bd2f9d875573ad300f",
+  "authority": {
+    "controlPlane": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+    "frozenPlan": "artifacts/orbit360-recovery/release-control/PLAN_TRABAJO_CONGELADO_V2.md",
+    "operatingPlan": "artifacts/orbit360-recovery/release-control/POSTPROD_DATA_UPDATE_OPERATING_PLAN_LOCK_20260917.json",
+    "executionDiscipline": "artifacts/orbit360-recovery/release-control/I6_DATA_UPDATE_EXECUTION_DISCIPLINE_LOCK_20260917.json",
+    "mechanismRegistry": "artifacts/orbit360-recovery/release-control/DATA_UPDATE_MECHANISM_REGISTRY.json",
+    "sourceIntake": "artifacts/orbit360-recovery/release-control/I6_5_RECIBOS_CARTERA_SOURCE_INTAKE_20260918.json"
+  },
+  "currentState": {
+    "formalPostproductionProgressPercent": 50,
+    "lastFrozenMiniGate": "I6.4",
+    "activeMiniGate": "I6.5",
+    "i64": "FROZEN_LIVE_PASS_PAULA_ACCEPTED",
+    "insurerPasswordCopy": "FROZEN_RESOLVED",
+    "i65Source": "PINNED",
+    "i65SyncCodeDefect": "I6_5_SYNC_CODE_DEFECT_SUCCESSOR_LIVE_PASS",
+    "certifiedSourceSha": "ccd014bc52238991b92bbff3c2aac7a71aac71ab",
+    "certifiedBuildId": "gi-i65-ccd014bc5223-57f234755dc1",
+    "certifiedArtifactId": 10561387342,
+    "operationalWritesDuringSyncFix": 0,
+    "nextMaterialCursor": "LIVE_READBACK_CURRENT_STATE"
+  },
+  "canonicalSemantics": {
+    "receipts": {
+      "collection": "recibosEsperados",
+      "meaning": "contractual expected installment/receipt"
+    },
+    "portfolio": {
+      "collection": "carteraPrimas",
+      "meaning": "premium portfolio state derived from valid receipt obligations"
+    },
+    "confirmedCollections": {
+      "collection": "cobros",
+      "meaning": "confirmed/evidenced payment collection only"
+    },
+    "fusionForbidden": true
+  },
+  "pathAuthorityFinding": {
+    "status": "REQUIRES_DUAL_PATH_LIVE_READBACK_BEFORE_ANY_I65_WRITE",
+    "currentProductCanonical": {
+      "receipts": "tenants/{tenantId}/data/recibosEsperados/items",
+      "portfolio": "tenants/{tenantId}/data/carteraPrimas/items"
+    },
+    "historicalAcceptedWritePath": {
+      "receipts": "tenantId/{tenantId}/recibosEsperados",
+      "portfolio": "tenantId/{tenantId}/carteraPrimas"
+    },
+    "evidence": "Historical accepted 9.1.0 writer targets tenantId/{tenant}; current V920 bridge requires tenant canonical data paths. The successor UI proof observed 0/0, so direct LIVE readback of both namespaces is mandatory before diff or write.",
+    "decision": "DO_NOT_REBIND_UI_TO_LEGACY. Preserve historical rows as evidence and reconcile them into the current canonical universe through the I6.5 deterministic diff."
+  },
+  "blocks": {
+    "A": {
+      "name": "PENDIENTES_OPERATIVOS_PEQUENOS",
+      "status": "OPEN_BUT_MUST_NOT_CONTAMINATE_I65_BASELINE",
+      "work": [
+        "A1_CREATE_AND_AUTHENTICATE_SAMUEL_AND_RETEST_CARLOS",
+        "A2_NEW_POLICY_END_TO_END_FROM_EXISTING_PLATFORM_FORM",
+        "A3_REAL_RENEWAL_FLOW_WITH_HISTORY_PRESERVED",
+        "A4_FAVICON_AND_LOGIN_LOGO_SMALL_UI_FIXES"
+      ],
+      "executionBoundary": "Analysis/preparation may run in parallel. LIVE writes that change policies, receipts, users or product source must use isolated controlled fixtures/rollback or wait until the I6.5 current-state/diff baseline is frozen. Do not contaminate receipt counts before I6.5 reconciliation."
+    },
+    "B": {
+      "name": "READ_PATH_COMPOSITION_RECIBOS_CARTERA",
+      "status": "CODE_OWNER_FIX_LIVE_PASS_DUAL_PATH_READBACK_PENDING",
+      "completed": [
+        "V920_CANONICAL_VISUAL_OWNER_PACKAGED",
+        "POLICY_RECEIPT_DETAIL_BOUND_TO_PACKAGED_OWNER",
+        "CLIENTE360_RECEIPT_SURFACE_BOUND_TO_CANONICAL_OWNER",
+        "SAME_ARTIFACT_PREVIEW_TO_LIVE",
+        "ZERO_OPERATIONAL_WRITES",
+        "I64_SENTINELS_PRESERVED"
+      ],
+      "pending": [
+        "DIRECT_FIRESTORE_DUAL_PATH_LIVE_READBACK",
+        "FREEZE_CURRENT_STATE_BEFORE_DIFF"
+      ]
+    },
+    "C": {
+      "name": "RECIBOS_CARTERA_RECONCILIACION_Y_CARGA",
+      "status": "BLOCKED_UNTIL_BLOCK_B_LIVE_READBACK_PASS",
+      "sequence": [
+        "TOTAL_INGEST",
+        "NORMALIZE",
+        "CROSS_RECONCILE",
+        "CANONICAL_UNIVERSE_BY_POLICY",
+        "DRY_RUN",
+        "DETERMINISTIC_DIFF",
+        "REVIEW",
+        "APPLY_RECEIPTS_PORTFOLIO_ONLY",
+        "READBACK",
+        "FUNCTIONAL"
+      ],
+      "sourceRule": "All pinned source files are complementary; no file is presumed complete alone.",
+      "i65WriteBoundary": {
+        "allowedAfterDeterministicDiff": [
+          "recibosEsperados",
+          "carteraPrimas"
+        ],
+        "readOnlyEvidence": [
+          "cobros",
+          "legacy receipt/portfolio namespaces",
+          "polizas",
+          "clientes",
+          "aseguradoras",
+          "vehiculos"
+        ],
+        "forbidden": [
+          "cobros writes",
+          "finmovs writes",
+          "policy rewrites",
+          "client rewrites",
+          "insurer rewrites",
+          "vehicle rewrites",
+          "delete by source absence",
+          "blind reimport"
+        ]
+      },
+      "cobrosDecision": "Payment evidence is reconciled and retained as provenance in I6.5, but confirmed cobro creation/materialization remains I6.6 under its separate accepted contract. A receipt obligation never becomes a cobro merely because it should exist."
+    },
+    "D": {
+      "name": "E2E_OX_LEADS_CLIENTE360_POLIZAS_PAGOS_NOTIFICACIONES",
+      "status": "PENDING_REUSE_ONLY",
+      "rule": "Recover and test approved flows; do not redesign OX/Leads. Payment-dependent E2E closes after the relevant I6.6 cobro state exists; non-payment flows may be tested earlier only when they do not disturb I6.5 baseline."
+    }
+  },
+  "derivedDecisions": [
+    "The four-block mini plan supplements but does not replace or reorder formal I6.0-I6.9.",
+    "B is the first material incomplete block because its code defect is already LIVE PASS and only current-state dual-path readback remains before C.",
+    "The 0/0 successor UI count is not accepted as proof that historical receipts disappeared; it triggers direct dual-path readback before writes.",
+    "I6.5 does not write cobros. Cobros and payment reconciliation materialization remain I6.6.",
+    "A bugs remain inside Block A and D bugs inside Block D; no new top-level blocks are created.",
+    "Any product-source change uses immutable build Preview to same-artifact LIVE; pure data deltas do not rebuild.",
+    "After every material step, CONTROL_PLANE plus source-intake cursor is updated; conversation continuity is never required."
+  ],
+  "stopConditions": [
+    "destructive operation",
+    "non-deterministic data write",
+    "new business rule not already frozen",
+    "parallel infrastructure",
+    "genuinely new human decision"
+  ]
+}
