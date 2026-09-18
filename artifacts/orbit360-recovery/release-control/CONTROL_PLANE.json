@@ -113,7 +113,7 @@
         "postWriteContextsFail": 0
       },
       "I6": {
-        "status": "I6_3_WAITING_FOR_CURRENT_SOURCE",
+        "status": "I6_3_DATA_UPDATE_V5_ACTIVE",
         "activeSubgate": "I6.3",
         "dataMutationAuthorized": false,
         "lastFrozenMiniGate": "I6.2"
@@ -414,11 +414,11 @@
     "executionDisciplinePath": "artifacts/orbit360-recovery/release-control/I6_DATA_UPDATE_EXECUTION_DISCIPLINE_LOCK_20260917.json",
     "executionDisciplineBlobSha": "7af17759086da336dbf755d72ad85692f892b71b",
     "mechanismRegistryPath": "artifacts/orbit360-recovery/release-control/DATA_UPDATE_MECHANISM_REGISTRY.json",
-    "mechanismRegistryBlobSha": "052e793657f1e54525d6d1d4d65e49ae9dd7af7b",
-    "activeSourceIntakePath": null,
-    "activeSourceIntakeBlobSha": null,
+    "mechanismRegistryBlobSha": "4f9c0d1726ea07aeb157018cc525dea87aa8c5de",
+    "activeSourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_3_CLIENTES_SOURCE_INTAKE_20260918.json",
+    "activeSourceIntakeBlobSha": "6ed7c93161da270d83e7134a4acf134b9a58c83c",
     "activeModule": "CLIENTES",
-    "activeModuleStatus": "WAITING_FOR_PAULA_SOURCE",
+    "activeModuleStatus": "SOURCE_PINNED",
     "i6_0": {
       "status": "I6_0_BASELINE_FROZEN",
       "executorPath": ".github/workflows/gravicentra-material-baseline-freeze.yml",
@@ -452,18 +452,18 @@
     "executionDisciplinePath": "artifacts/orbit360-recovery/release-control/I6_DATA_UPDATE_EXECUTION_DISCIPLINE_LOCK_20260917.json",
     "executionDisciplineBlobSha": "7af17759086da336dbf755d72ad85692f892b71b",
     "mechanismRegistryPath": "artifacts/orbit360-recovery/release-control/DATA_UPDATE_MECHANISM_REGISTRY.json",
-    "mechanismRegistryBlobSha": "052e793657f1e54525d6d1d4d65e49ae9dd7af7b",
+    "mechanismRegistryBlobSha": "4f9c0d1726ea07aeb157018cc525dea87aa8c5de",
     "activeModule": "CLIENTES",
-    "activeSourceIntakePath": null,
-    "activeSourceIntakeBlobSha": null,
-    "sourceSha256": null,
+    "activeSourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_3_CLIENTES_SOURCE_INTAKE_20260918.json",
+    "activeSourceIntakeBlobSha": "6ed7c93161da270d83e7134a4acf134b9a58c83c",
+    "sourceSha256": "4f0a1307605ad5dcc947355dbbc98a50b510358e5f6a9835b75d02e45f5a8c7c",
     "conversationAsAuthority": false,
     "requestCurrentSourceBeforeEveryNewModule": true,
     "liveVisualRefreshRequiredForClosure": true,
     "pureDataUpdateRequiresBuildOrDeploy": false,
     "reimportForVisibilityFailureForbidden": true,
-    "nextRequiredStep": "REQUEST_CURRENT_SOURCE_FROM_PAULA",
-    "executionCursor": "WAITING_FOR_SOURCE"
+    "nextRequiredStep": "LIVE_READBACK_CURRENT_STATE",
+    "executionCursor": "SOURCE_PINNED"
   },
   "governanceSyncChecklist": {
     "frozenPlanMaterialized": true,
@@ -535,9 +535,10 @@
     "i6AuthorizationReceiptMaterialized": true,
     "i62DirectoryLivePass": true,
     "i62TerminalReceiptMaterialized": true,
-    "i6ModuleHandoffDisciplineMaterialized": true
+    "i6ModuleHandoffDisciplineMaterialized": true,
+    "i63CurrentSourcePinned": true
   },
-  "nextAction": "I6_3_REQUEST_CURRENT_CLIENTES_SOURCE",
+  "nextAction": "I6_3_LIVE_READBACK_CURRENT_STATE",
   "postproductionExitProgress": {
     "formalPercent": 30,
     "frozenMiniGates": 3,
@@ -659,9 +660,11 @@
     "current": {
       "technicalModule": "I6.2 Aseguradoras",
       "technicalStatus": "I6_2_DIRECTORIO_LIVE_PASS",
-      "paulaVisualAcceptance": "PENDING",
+      "paulaVisualAcceptance": "ACCEPTED",
+      "paulaVisualAcceptedAt": "2026-09-17T22:09:00-06:00",
       "nextModule": "I6.3 Clientes",
-      "nextSourceRequestBlocked": true
+      "nextSourceRequestBlocked": false,
+      "nextSource": "PINNED"
     },
     "guardCompatibleStateNote": "I6.3 remains mechanically prepared, but conversational/source intake is blocked by this handoff control until Paula explicitly validates I6.2 LIVE."
   }

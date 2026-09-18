@@ -53,9 +53,12 @@
     "CLIENTES": {
       "gate": "I6.3",
       "sourceRequiredBeforeStart": true,
-      "sourceState": "WAITING_FOR_PAULA_SOURCE",
+      "sourceState": "CURRENT_SOURCE_PINNED",
       "mechanism": "REUSE_APPROVED_EXISTING_WRITE_CONTRACT_FROM_LINEAGE_AND_ACCEPTANCE_EVIDENCE; LOCATE POINTERS ONLY, DO_NOT REDISCOVER ARCHITECTURE",
-      "liveClosure": "READBACK_PASS_THEN_USER_REFRESH_MUST_SHOW_UPDATED_DATA"
+      "liveClosure": "READBACK_PASS_THEN_USER_REFRESH_MUST_SHOW_UPDATED_DATA",
+      "sourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_3_CLIENTES_SOURCE_INTAKE_20260918.json",
+      "sourceSha256": "4f0a1307605ad5dcc947355dbbc98a50b510358e5f6a9835b75d02e45f5a8c7c",
+      "currentSourceRecords": 450
     },
     "POLIZAS_RIESGOS_VEHICULOS": {
       "gate": "I6.4",

@@ -1,0 +1,61 @@
+{
+  "schema": "GRAVICENTRA_I6_3_CLIENTES_SOURCE_INTAKE_V1",
+  "status": "PINNED_FOR_V5_DELTA",
+  "date": "2026-09-17",
+  "productBrand": "Gravicentra Insurance",
+  "module": "CLIENTES",
+  "source": {
+    "filename": "Contratantes Datos de Contacto 2026-09-17-220726.xlsx",
+    "sha256": "4f0a1307605ad5dcc947355dbbc98a50b510358e5f6a9835b75d02e45f5a8c7c",
+    "bytes": 55762,
+    "sourceType": "USER_SUPPLIED_CURRENT_WORKBOOK",
+    "committedToRepository": false
+  },
+  "coverage": {
+    "sheet": "Worksheet",
+    "range": "A1:AC451",
+    "records": 450,
+    "columns": 29,
+    "minFechaAlta": "2021-06-03",
+    "maxFechaAlta": "2026-09-14",
+    "tipoPersona": {
+      "Fisica": 427,
+      "Juridica": 23
+    },
+    "estatusAsegurado": {
+      "Nuevo": 443,
+      "Activo": 5,
+      "Inactivo": 1,
+      "Prospectos": 1
+    },
+    "vendedorVacio": 29
+  },
+  "temporalScope": {
+    "report": "Datos de Contacto del Contratante",
+    "reportType": "Fecha alta",
+    "requestedFrom": "EARLIEST_AVAILABLE",
+    "requestedThrough": "2026-09-17",
+    "actualMinFechaAlta": "2021-06-03",
+    "actualMaxFechaAlta": "2026-09-14",
+    "groupsFiltered": false,
+    "subgroupsFiltered": false,
+    "statusFiltered": false,
+    "interpretation": "CURRENT_COMPLETE_MASTER_FOR_INCREMENTAL_DIFF_NOT_RECENT-ONLY_EXPORT"
+  },
+  "execution": {
+    "method": "DATA_UPDATE_DELTA_FIRST",
+    "cursorState": "SOURCE_PINNED",
+    "writeApplied": false,
+    "readbackPassed": false,
+    "liveVisualConfirmed": false,
+    "nextRequiredStep": "LIVE_READBACK_CURRENT_STATE"
+  },
+  "guards": {
+    "doNotCommitPIIWorkbook": true,
+    "doNotUseHistoricalDriveFileAsCurrent": true,
+    "noDeleteByAbsence": true,
+    "isolateAmbiguousWithoutBlockingDeterministicRows": true,
+    "approvedWriteContractReuseRequired": true,
+    "userVisualRequiredBeforeNextModule": true
+  }
+}
