@@ -19,12 +19,17 @@
   var buildFreshness = window.OrbitPwaBuildFreshness = { runtimeBuild: RUNTIME_BUILD, serverBuild: '', status: 'idle', checks: 0, lastReason: '' };
   function reloadForBuild(targetBuild) {
     try {
-      var key = 'orbit360-build-reload-target';
-      if (sessionStorage.getItem(key) === targetBuild) return;
+      var key = 'orbit360-build-reload-target', retryKey = 'orbit360-build-reload-retries';
+      var u = new URL(window.location.href), marker = u.searchParams.get('orbitBuild') || '';
+      var retries = Number(sessionStorage.getItem(retryKey) || 0);
       sessionStorage.setItem(key, targetBuild);
-      var u = new URL(window.location.href);
-      u.searchParams.set('orbitBuild', targetBuild);
-      window.location.replace(u.href);
+      if (marker !== targetBuild) {
+        sessionStorage.setItem(retryKey, '0'); u.searchParams.set('orbitBuild', targetBuild); u.searchParams.set('orbitFresh', String(Date.now())); window.location.replace(u.href); return;
+      }
+      if (retries < 2) {
+        sessionStorage.setItem(retryKey, String(retries + 1)); u.searchParams.set('orbitFresh', String(Date.now())); window.location.replace(u.href); return;
+      }
+      buildFreshness.status = 'stale-reload-exhausted';
     } catch (e) { window.location.reload(); }
   }
   function checkBuildFreshness(reason) {
@@ -44,7 +49,7 @@
         }
         if (serverBuild === RUNTIME_BUILD) {
           buildFreshness.status = 'current';
-          try { sessionStorage.removeItem('orbit360-build-reload-target'); } catch (e) {}
+          try { sessionStorage.removeItem('orbit360-build-reload-target'); sessionStorage.removeItem('orbit360-build-reload-retries'); } catch (e) {}
           return buildFreshness;
         }
         buildFreshness.status = 'unverified';
