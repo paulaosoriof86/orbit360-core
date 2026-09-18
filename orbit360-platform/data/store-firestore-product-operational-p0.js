@@ -26,7 +26,9 @@
     reclamos:'siniestros',
     cancelaciones:'cancelaciones',
     comisiones:'comisiones',
-    actividades:'cliente360'
+    actividades:'cliente360',
+    asesores:'equipo',
+    auditoria:'equipo'
   });
 
   function text(v){return String(v==null?'':v).trim();}
@@ -181,6 +183,26 @@
     callDurable('remove',collection,id,null,prior).catch(function(){});
     return true;
   }
+  function insertDurable(collection,payload){
+    var row=clone(payload)||{},m=member();
+    if(!row.id)row.id=collection+'_'+Date.now()+'_'+Math.random().toString(36).slice(2,8);
+    row.tenantId=text(m.tenantId);row.createdAt=row.createdAt||new Date().toISOString();row.updatedAt=new Date().toISOString();row.ownerUid=row.ownerUid||text(m.uid);row.ownerEmail=row.ownerEmail||text(m.email);
+    authorize(collection,'insert',row);pendingBucket(collection)[row.id]=clone(row);delete deletedBucket(collection)[row.id];emit(collection);
+    return callDurable('insert',collection,row.id,row,null).then(function(){return clone(row);});
+  }
+  function updateDurable(collection,id,patch){
+    id=text(id);if(!id)error('PRODUCT_WRITE_ID_REQUIRED');
+    var prior=get(collection,id);if(!prior)error('PRODUCT_WRITE_RECORD_NOT_FOUND');
+    var m=member(),row=Object.assign({},prior,clone(patch)||{},{id:id,tenantId:text(m.tenantId),updatedAt:new Date().toISOString(),updatedByUid:text(m.uid),updatedByEmail:text(m.email)});
+    authorize(collection,'update',row);pendingBucket(collection)[id]=clone(row);delete deletedBucket(collection)[id];emit(collection);
+    return callDurable('update',collection,id,row,prior).then(function(){return clone(row);});
+  }
+  function removeDurable(collection,id){
+    id=text(id);if(!id)error('PRODUCT_WRITE_ID_REQUIRED');
+    var prior=get(collection,id);if(!prior)error('PRODUCT_WRITE_RECORD_NOT_FOUND');
+    authorize(collection,'remove',prior);deletedBucket(collection)[id]=true;delete pendingBucket(collection)[id];emit(collection);
+    return callDurable('remove',collection,id,null,prior).then(function(){return true;});
+  }
   function status(){
     var bs=base&&typeof base._productStatus==='function'?base._productStatus():{};
     return Object.assign({},state,{ready:installed===true&&bs.ready===true&&bs.status==='ready-read-only',readAuthority:'store-firestore-product-readonly-p0',writeAuthority:'product-operational-write-p0',writeTransport:'firebase-functions',generalCommand:GENERAL_COMMAND,workflowCommand:WORKFLOW_COMMAND,browserFirestoreWriteAuthorized:false,workflowSemanticOwner:true,urlTenantAllowed:false,labModeAllowed:false,seedFallback:false,localStorageBusinessPersistence:false,noFallback:true});
@@ -197,6 +219,7 @@
     if(typeof base.on==='function')base.on('*',function(changed){reconcile(changed);emit(changed);});
     facade={
       all:mergedAll,get:get,where:where,find:find,insert:insert,update:update,remove:remove,
+      insertDurable:insertDurable,updateDurable:updateDurable,removeDurable:removeDurable,
       on:function(collection,callback){if(typeof collection==='function'){callback=collection;}if(typeof callback!=='function')return function(){};listeners.push(callback);return function(){listeners=listeners.filter(function(x){return x!==callback;});};},
       subscribe:function(collection,callback){return facade.on(collection,callback);},
       _subscribe:function(collection,callback){return facade.on(collection,callback);},

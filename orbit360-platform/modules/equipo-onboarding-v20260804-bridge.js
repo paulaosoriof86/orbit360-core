@@ -196,45 +196,21 @@
   };
 
   document.addEventListener('click', event => {
-    const save = event.target && event.target.closest && event.target.closest('#eu-ok');
-    if (!save) return;
-    const drawer = document.getElementById('eq-edit');
-    if (!drawer) return;
-    const before = editingId ? store().get('asesores', editingId) || {} : {};
-    const after = formData(drawer);
-    const sync = !!drawer.querySelector('#eu-sync-access')?.checked;
-    if (!confirmScopeOpening(before, after)) {
-      event.preventDefault();
-      event.stopImmediatePropagation();
-      return;
-    }
-    pendingSave = {
-      advisorId: editingId || stableId(after.nombre),
-      before,
-      after,
-      sync,
-      operation: operationFor(before, after, sync),
-      reason: editingId ? 'Sincronización posterior a cambio guardado en Equipo' : 'Alta de acceso desde Equipo'
-    };
-    setTimeout(async () => {
-      const saved = pendingSave;
-      pendingSave = null;
-      if (!saved || document.getElementById('eq-edit')) return;
-      const current = store().get('asesores', saved.advisorId) || saved.after;
-      if (!saved.operation || !Orbit.userOnboarding.available()) return;
-      try {
-        await executeAccess({
-          advisorId: saved.advisorId,
-          before: saved.before,
-          after: current,
-          operation: saved.operation,
-          reason: saved.reason
-        });
-      } catch (error) {
-        toast(Orbit.userOnboarding.message(error));
-      }
-    }, 0);
+    const save = event.target && event.target.closest && event.target.closest('#eu-ok'); if (!save) return;
+    const drawer = document.getElementById('eq-edit'); if (!drawer) return;
+    const before = editingId ? store().get('asesores', editingId) || {} : {}, after = formData(drawer), sync = !!drawer.querySelector('#eu-sync-access')?.checked;
+    if (!confirmScopeOpening(before, after)) { event.preventDefault(); event.stopImmediatePropagation(); return; }
+    pendingSave = { advisorId: editingId || stableId(after.nombre), before, after, sync, operation: operationFor(before, after, sync), reason: editingId ? 'Sincronización posterior a cambio confirmado en Equipo' : 'Alta de acceso desde Equipo' };
   }, true);
+
+  document.addEventListener('orbit:equipo:save-committed', async event => {
+    const saved = pendingSave; pendingSave = null; if (!saved) return;
+    const committedId = text(event && event.detail && event.detail.advisorId); if (committedId && committedId !== saved.advisorId) return;
+    const current = store().get('asesores', saved.advisorId) || saved.after;
+    if (!saved.operation || !Orbit.userOnboarding.available()) return;
+    try { await executeAccess({ advisorId: saved.advisorId, before: saved.before, after: current, operation: saved.operation, reason: saved.reason }); }
+    catch (error) { toast(Orbit.userOnboarding.message(error)); }
+  });
 
   document.addEventListener('orbit:store', () => {
     const host = document.getElementById('host') || document.getElementById('mod-host');

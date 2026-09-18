@@ -90,8 +90,12 @@ Orbit.modules.equipo = (function () {
       tenantId: (OrbitBackend && (OrbitBackend.tenantId || OrbitBackend.tenant)) || 'tenant_actual',
       before: before || null, after: after || null
     };
-    try { S().insert('auditoria', entry); } catch (e) {}
-    return entry;
+    try {
+      const st = S();
+      if (st && st.__productOperationalWriteP0 === true && typeof st.insertDurable === 'function') return st.insertDurable('auditoria', entry).then(() => entry);
+      st.insert('auditoria', entry);
+    } catch (e) { return Promise.reject(e); }
+    return Promise.resolve(entry);
   }
   function toast(text) {
     if (U.toast) return U.toast(text);
@@ -387,49 +391,39 @@ Orbit.modules.equipo = (function () {
     $('#eu-reset-mod').addEventListener('click', () => { modulesTouched = false; refreshModuleHints(true); markDirty(); });
     refreshRoleDefault(); refreshCountryDefault(); refreshModuleHints(false);
 
-    $('#eu-ok').addEventListener('click', () => {
-      const nombre = $('#eu-nombre').value.trim();
-      const roles = selectedRoles();
-      const paises = selectedCountries();
+    $('#eu-ok').addEventListener('click', async () => {
+      const saveButton = $('#eu-ok'); if (saveButton.dataset.busy === '1') return;
+      const nombre = $('#eu-nombre').value.trim(), roles = selectedRoles(), paises = selectedCountries();
       if (!nombre) return alert('Indica el nombre del usuario.');
       if (!roles.length) return alert('Selecciona al menos un rol.');
       if (!paises.length) return alert('Selecciona al menos un país autorizado.');
-      const rolDefault = $('#eu-role-default').value;
-      const paisDefault = $('#eu-pais-default').value;
+      const rolDefault = $('#eu-role-default').value, paisDefault = $('#eu-pais-default').value;
       if (!roles.includes(rolDefault)) return alert('El rol predeterminado debe estar entre los roles seleccionados.');
       if (!paises.includes(paisDefault)) return alert('El país predeterminado debe estar entre los países seleccionados.');
-      const selectedMods = $$('.eu-mod:checked').map(c => c.value);
-      const base = baseModules(roles);
-      const modulosExtra = selectedMods.filter(m => !base.includes(m));
-      const modulosRestringidos = base.filter(m => !selectedMods.includes(m));
-      const data = {
-        nombre, telefono: $('#eu-tel').value.trim(), email: $('#eu-email').value.trim(), color: $('#eu-color').value,
-        roles, rol: rolDefault, rolDefault, scopeDatos: $('#eu-scope').value,
-        paises, pais: paisDefault, paisDefault,
-        modulosExtra, modulosRestringidos, modulosOverride: selectedMods,
-        inactivo: $('#eu-inact').checked, estado: $('#eu-inact').checked ? 'inactivo' : 'activo', activo: !$('#eu-inact').checked,
-        updatedAt: new Date().toISOString()
-      };
-      const after = userSnapshot(data);
-      let motivo = 'Alta manual desde Equipo';
-      if (id && sensitiveChanged(before, after)) {
-        motivo = window.prompt('Motivo del cambio de roles, permisos, países, alcance o estado:') || '';
-        if (motivo.trim().length < 5) return alert('Indica un motivo claro de al menos 5 caracteres.');
+      const selectedMods = $$('.eu-mod:checked').map(c => c.value), base = baseModules(roles);
+      const data = { nombre, telefono: $('#eu-tel').value.trim(), email: $('#eu-email').value.trim().toLowerCase(), color: $('#eu-color').value,
+        roles, rol: rolDefault, rolDefault, scopeDatos: $('#eu-scope').value, paises, pais: paisDefault, paisDefault,
+        modulosExtra: selectedMods.filter(m => !base.includes(m)), modulosRestringidos: base.filter(m => !selectedMods.includes(m)), modulosOverride: selectedMods,
+        inactivo: $('#eu-inact').checked, estado: $('#eu-inact').checked ? 'inactivo' : 'activo', activo: !$('#eu-inact').checked, updatedAt: new Date().toISOString() };
+      const after = userSnapshot(data); let motivo = 'Alta manual desde Equipo';
+      if (id && sensitiveChanged(before, after)) { motivo = window.prompt('Motivo del cambio de roles, permisos, países, alcance o estado:') || ''; if (motivo.trim().length < 5) return alert('Indica un motivo claro de al menos 5 caracteres.'); }
+      const advisorId = id || nextStableId(nombre);
+      if (!id) { data.id = advisorId; data.iniciales = nombre.split(' ').map(x => x[0]).slice(0, 2).join('').toUpperCase(); data.comModo = 'comision'; data.shareCom = 50; data.accessProvisioned = false; data.invitacionEstado = 'pendiente_habilitacion'; data.createdAt = new Date().toISOString(); }
+      const st = S(); saveButton.dataset.busy = '1'; saveButton.disabled = true; saveButton.textContent = 'Guardando…';
+      try {
+        if (st && st.__productOperationalWriteP0 === true) {
+          if (id) { if (typeof st.updateDurable !== 'function') throw new Error('PRODUCT_TEAM_DURABLE_UPDATE_MISSING'); await st.updateDurable('asesores', advisorId, data); }
+          else { if (typeof st.insertDurable !== 'function') throw new Error('PRODUCT_TEAM_DURABLE_INSERT_MISSING'); await st.insertDurable('asesores', data); }
+        } else { if (id) st.update('asesores', advisorId, data); else st.insert('asesores', data); }
+        await audit(id ? 'editar_usuario' : 'crear_usuario', id ? (motivo || 'Actualización de datos de contacto') : motivo, id ? before : null, userSnapshot(data));
+        document.dispatchEvent(new CustomEvent('orbit:equipo:save-committed', { detail: { advisorId, created: !id, syncRequested: !!back.querySelector('#eu-sync-access')?.checked } }));
+        toast(id ? '✓ Usuario actualizado y confirmado' : '✓ Usuario creado y confirmado');
+        dirty = false; close(true); render(document.getElementById('host') || document.getElementById('mod-host'));
+      } catch (error) {
+        saveButton.dataset.busy = '0'; saveButton.disabled = false; saveButton.textContent = 'Guardar';
+        toast('No fue posible guardar el usuario. No se confirmó persistencia en el servidor.');
+        try { console.warn('[Orbit Equipo] USER_SAVE_FAILED', error && (error.code || error.message) || error); } catch (e) {}
       }
-      if (id) {
-        S().update('asesores', id, data);
-        audit('editar_usuario', motivo || 'Actualización de datos de contacto', before, after);
-        toast('✓ Usuario actualizado');
-      } else {
-        data.id = nextStableId(nombre);
-        data.iniciales = nombre.split(' ').map(x => x[0]).slice(0, 2).join('').toUpperCase();
-        data.comModo = 'comision'; data.shareCom = 50;
-        data.accessProvisioned = false; data.invitacionEstado = 'pendiente_habilitacion'; data.createdAt = new Date().toISOString();
-        S().insert('asesores', data);
-        audit('crear_usuario', motivo, null, userSnapshot(data));
-        toast('✓ Usuario creado · acceso e invitación pendientes');
-      }
-      dirty = false; close(true); render(document.getElementById('host') || document.getElementById('mod-host'));
     });
   }
 
