@@ -415,9 +415,9 @@
     "mechanismRegistryPath": "artifacts/orbit360-recovery/release-control/DATA_UPDATE_MECHANISM_REGISTRY.json",
     "mechanismRegistryBlobSha": "7b762c92b7babc88c7d2942041c66aadd1e8a471",
     "activeSourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_4_POLIZAS_RIESGOS_SOURCE_INTAKE_20260918.json",
-    "activeSourceIntakeBlobSha": "f23567ea5486c3195ec8f6fbd788e929f7479996",
+    "activeSourceIntakeBlobSha": "8b9f9b550675329bed9a45c1b12295a6a7efdf8a",
     "activeModule": "POLIZAS_RIESGOS_VEHICULOS",
-    "activeModuleStatus": "POST_WRITE_READBACK_INTEGRITY_PASS",
+    "activeModuleStatus": "POST_WRITE_READBACK_INTEGRITY_PASS_CODE_FIX_PENDING",
     "i6_0": {
       "status": "I6_0_BASELINE_FROZEN",
       "executorPath": ".github/workflows/gravicentra-material-baseline-freeze.yml",
@@ -534,7 +534,9 @@
       "visualCorrectionArtifactDigest": "73f0faf00ea1833b9cf39e5625cef58e6569ed846bb21cb552ccf99b2475ed32",
       "visualCorrectionWrites": 320,
       "domiciliadoRemaining": 0,
-      "countryCurrencyMismatchesRemaining": 0
+      "countryCurrencyMismatchesRemaining": 0,
+      "codeFindingsStatus": "PENDING_CAUSAL_CODE_FIX_BEFORE_I6_4_VISUAL_ACCEPTANCE",
+      "codeFindingsPath": "artifacts/orbit360-recovery/release-control/I6_4_VISUAL_CODE_FINDINGS_20260918.json"
     }
   },
   "postproductionDataUpdateControl": {
@@ -548,7 +550,7 @@
     "mechanismRegistryBlobSha": "7b762c92b7babc88c7d2942041c66aadd1e8a471",
     "activeModule": "POLIZAS_RIESGOS_VEHICULOS",
     "activeSourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_4_POLIZAS_RIESGOS_SOURCE_INTAKE_20260918.json",
-    "activeSourceIntakeBlobSha": "f23567ea5486c3195ec8f6fbd788e929f7479996",
+    "activeSourceIntakeBlobSha": "8b9f9b550675329bed9a45c1b12295a6a7efdf8a",
     "sourceSha256": "7130ed56467da438f5c6e2823ede65f73d6356de63de94e19da30f3aed26c68f",
     "conversationAsAuthority": false,
     "requestCurrentSourceBeforeEveryNewModule": true,
@@ -964,5 +966,18 @@
       "explicitUsdPreserved": true
     },
     "rollbackExecuted": false
+  },
+  "i64CodeFindings": {
+    "status": "PENDING_CAUSAL_CODE_FIX_BEFORE_I6_4_VISUAL_ACCEPTANCE",
+    "path": "artifacts/orbit360-recovery/release-control/I6_4_VISUAL_CODE_FINDINGS_20260918.json",
+    "blockingFindings": [
+      "POLIZAS_KPI_MULTI_CURRENCY_COMPOSITION",
+      "POLIZAS_RENEWALS_45D_SEMANTICS",
+      "POLIZAS_HISTORICAL_NO_CARTERA_UNDERCOUNT",
+      "POLICY_RENEWABLE_UNKNOWN_DISPLAYED_FALSE"
+    ],
+    "deferredFinancialFinding": "RECEIPT_CALENDAR_RECONCILIATION_DEFERRED",
+    "dataReimportForbidden": true,
+    "sourceChangeRequiresImmutableBuild": true
   }
 }

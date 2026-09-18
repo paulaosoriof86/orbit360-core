@@ -1,0 +1,88 @@
+{
+  "schema": "GRAVICENTRA_I6_4_VISUAL_CODE_FINDINGS_V1",
+  "status": "PENDING_CAUSAL_CODE_FIX_BEFORE_I6_4_VISUAL_ACCEPTANCE",
+  "date": "2026-09-18",
+  "gate": "I6.4",
+  "module": "POLIZAS_RIESGOS_VEHICULOS",
+  "classification": "CODE_DEFECTS_FROM_LIVE_VISUAL_REVIEW",
+  "sourceMutationRequired": false,
+  "dataReimportForbidden": true,
+  "findings": [
+    {
+      "id": "POLIZAS_KPI_MULTI_CURRENCY_COMPOSITION",
+      "owner": "orbit360-platform/modules/polizas.js",
+      "evidence": "The global Polizas KPI computes primaVig with q.norm(...) and renders a single Orbit.q.monedaPais() amount while Todos los países is selected.",
+      "problem": "GTQ and COP are being normalized/summed into one displayed amount, contrary to the frozen business rule already implemented in Cliente360.",
+      "requiredBehavior": "Render Prima neta vigente separated by currency. Do not sum GTQ and COP. Preserve genuine USD separately when present.",
+      "liveReferenceAsOf20260918": {
+        "activePolicies": 221,
+        "GTQ": {
+          "count": 194,
+          "primaNeta": 627418.64
+        },
+        "COP": {
+          "count": 27,
+          "primaNeta": 175456570.26
+        }
+      },
+      "hardcodeForbidden": true
+    },
+    {
+      "id": "POLIZAS_RENEWALS_45D_SEMANTICS",
+      "owner": "orbit360-platform/modules/polizas.js",
+      "evidence": "The KPI labeled Por renovar ≤45 d currently counts only policies whose estado literal is Por renovar.",
+      "problem": "The label is temporal but the implementation is state-only. Current LIVE policy terms contain 10 active policies ending in 0..45 days while literal Por renovar count is 0.",
+      "requiredBehavior": "Compute the KPI deterministically from active/renewable policy term end dates using the same temporal semantics as Cliente360/Renovaciones.",
+      "liveReferenceAsOf20260918": {
+        "literalPorRenovar": 0,
+        "activeWithin45Days": 10
+      },
+      "hardcodeForbidden": true
+    },
+    {
+      "id": "POLIZAS_HISTORICAL_NO_CARTERA_UNDERCOUNT",
+      "owner": "orbit360-platform/modules/polizas.js",
+      "evidence": "The Histórico / sin cartera KPI counts Cancelada/Vencida/Anulada/Rechazada only.",
+      "problem": "Historical renewed editions and other canonical non-current statuses are omitted.",
+      "liveReferenceAsOf20260918": {
+        "Renovada": 566,
+        "Cancelada": 489,
+        "Histórica": 125,
+        "No Renovada": 10,
+        "Reexpedida": 1,
+        "Vigente": 221,
+        "Vigente futura": 2
+      },
+      "requiredBehavior": "Define historical/no-cartera from canonical operational semantics, including prior renewed editions and other non-current terminal/history states; do not equate historical only with cancellation statuses.",
+      "referenceNonCurrentHistoricalCountExcludingFuture": 1191,
+      "hardcodeForbidden": true
+    },
+    {
+      "id": "POLICY_RENEWABLE_UNKNOWN_DISPLAYED_FALSE",
+      "owners": [
+        "orbit360-platform/modules/cliente360.js",
+        "orbit360-platform/modules/polizas.js"
+      ],
+      "evidence": "AUTO-490658 historical renewed edition is visibly Renovada but detail renders Renovación: No renovable because missing/falsy renovable is treated as explicit false.",
+      "problem": "Unknown/missing renewability must not be rendered as a factual No renovable.",
+      "requiredBehavior": "Use tri-state semantics: explicit true=Renovable, explicit false with evidence=No renovable, missing/unknown=Pendiente de validar. Historical renewal lineage must remain visible."
+    },
+    {
+      "id": "RECEIPT_CALENDAR_RECONCILIATION_DEFERRED",
+      "classification": "NOT_I6_4_DATA_REIMPORT",
+      "evidence": "Policy 225116618 visibly shows prima total GTQ 2,436 versus receipt-calendar total GTQ 4,772.16.",
+      "requiredBehavior": "Do not repair by policy reimport or synthetic receipt generation. Reconcile in I6.5/I6.6 using current cobranza/account statements and later commission evidence under the frozen receipt rules.",
+      "blocksI64DataSeal": false,
+      "blocksFinalFinancialAcceptance": true
+    }
+  ],
+  "closureRule": "I6.4 MUST NOT BE SEALED LIVE_PASS UNTIL blocking code findings are fixed through immutable build -> isolated Preview -> exact readback -> same artifact LIVE -> functional proof -> Paula visual acceptance.",
+  "dataStateAtFinding": {
+    "policies": 1414,
+    "vehicles": 1063,
+    "clientsPhysical": 442,
+    "clientsCanonicalActive": 439,
+    "policyClientMissing": 0,
+    "vehiclePolicyMissing": 0
+  }
+}

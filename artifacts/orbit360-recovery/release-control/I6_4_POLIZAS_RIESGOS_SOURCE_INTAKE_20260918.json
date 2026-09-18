@@ -367,6 +367,12 @@
         "pais": 2,
         "moneda": 2
       }
+    },
+    "i64CodeFindings": {
+      "status": "PENDING_CAUSAL_CODE_FIX_BEFORE_I6_4_VISUAL_ACCEPTANCE",
+      "path": "artifacts/orbit360-recovery/release-control/I6_4_VISUAL_CODE_FINDINGS_20260918.json",
+      "nextRequiredDiscipline": "CODE_DEFECT_SOURCE_FIX_WITH_IMMUTABLE_BUILD_SAME_ARTIFACT_PREVIEW_TO_LIVE",
+      "reimportForbidden": true
     }
   }
 }
