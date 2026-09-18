@@ -1714,6 +1714,752 @@ jobs:
           git push origin HEAD:recovery/fase-a-clean-20260831
 
 
+  i65-operational-closure-successor:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    env:
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SOURCE_INTAKE: artifacts/orbit360-recovery/release-control/I6_5_RECIBOS_CARTERA_SOURCE_INTAKE_20260918.json
+      REGISTRY: artifacts/orbit360-recovery/release-control/DATA_UPDATE_MECHANISM_REGISTRY.json
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Gate and causal boundary
+        id: mode
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "recovery/fase-a-clean-20260831"
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const c=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8')),d=c.i65OperationalClosureDefect||{};
+          const mode=d.status==='I6_5_OPERATIONAL_CLOSURE_CODE_DEFECT_CANDIDATE_PENDING_BUILD'?'release':'noop';
+          if(mode==='release'){
+            if(c.nextAction!=='I6_5_OPERATIONAL_CLOSURE_SUCCESSOR_RELEASE')throw new Error('I65_OPERATIONAL_RELEASE_ACTION_INVALID');
+            if(c.i6Execution?.productMutationAuthorized!==true)throw new Error('I65_OPERATIONAL_PRODUCT_AUTH_MISSING');
+            if(d.classification!=='CODE_DEFECT'||d.dataMutationAuthorized!==false||d.reimportAuthorized!==false||d.cobrosWritesAuthorized!==false)throw new Error('I65_OPERATIONAL_BOUNDARY_INVALID');
+            if(c.postproductionDataUpdateControl?.executionCursor!=='POST_WRITE_READBACK_INTEGRITY_PASS')throw new Error('I65_OPERATIONAL_CURSOR_INVALID');
+          }
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'mode='+mode+'\n');
+          console.log('I65_OPERATIONAL_MODE='+mode);
+          NODE
+
+      - name: Assert LIVE equals latest certified candidate
+        env:
+          LIVE_BINDING_ATTEMPTS: 12
+        run: node tools/gravicentra-certified-live-binding-check.mjs
+
+      - name: No-op after technical seal
+        if: steps.mode.outputs.mode == 'noop'
+        run: node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+
+      - name: Source contracts
+        if: steps.mode.outputs.mode == 'release'
+        run: |
+          set -euo pipefail
+          node --check orbit360-platform/core/policy-receipts-engine.js
+          node --check orbit360-platform/modules/cliente360.js
+          node --check orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js
+          node --check orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js
+          node --check orbit360-platform/core/pwa.js
+          node --check tools/gravicentra-i6-5-policy-flow-contract.mjs
+          node --check tools/gravicentra-i6-5-operational-closure-functional.mjs
+          node tools/gravicentra-i6-5-policy-flow-contract.mjs
+          grep -Fq "cobros-cartera-i65-closure-bridge.js?v=20260918-i65c" orbit360-platform/index.html
+          grep -Fq "orbit360-build-reload-retries" orbit360-platform/core/pwa.js
+          grep -Fq "Cargando recibos y cartera" orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js
+          grep -Fq "function syncPortfolio" orbit360-platform/core/policy-receipts-engine.js
+
+
+      - name: Install runtime proof dependencies
+        if: steps.mode.outputs.mode == 'release'
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false playwright@1.55.0 firebase-admin@13.4.0 >/dev/null
+          npx playwright install --with-deps chromium >/dev/null
+
+      - name: Select existing Firebase authority
+        if: steps.mode.outputs.mode == 'release'
+        run: |
+          set -euo pipefail
+          ROOT="$RUNNER_TEMP/i65-auth"; mkdir -p "$ROOT"; export ROOT
+          python3 - <<'PY'
+          import json,os,pathlib
+          rows=[]
+          for i,k in enumerate(['SA_DEFAULT','SA_ORBIT360_LAB','SA_ORBIT_360_LAB']):
+              try:d=json.loads(os.environ.get(k,''))
+              except:continue
+              if d.get('type')=='service_account' and d.get('project_id')=='ays-orbit-360-lab' and d.get('private_key') and d.get('client_email'):
+                  p=pathlib.Path(os.environ['ROOT'])/f'{i}.json';p.write_text(json.dumps(d));p.chmod(0o600);rows.append(str(p))
+          if not rows:raise SystemExit('I65_NO_SERVICE_ACCOUNT')
+          pathlib.Path(os.environ['ROOT']+'/files').write_text('\n'.join(rows)+'\n')
+          PY
+          SEL=''
+          while read -r F; do
+            if GOOGLE_APPLICATION_CREDENTIALS="$F" npx --yes firebase-tools@14.10.1 hosting:sites:get "$HOSTING_SITE" --project "$PROJECT_ID" --non-interactive --json >/dev/null 2>&1; then SEL="$F"; break; fi
+          done < "$ROOT/files"
+          test -n "$SEL" || { echo I65_FIREBASE_AUTH_NOT_PROVEN >&2; exit 42; }
+          cp "$SEL" "$RUNNER_TEMP/i65-sa.json"
+          chmod 600 "$RUNNER_TEMP/i65-sa.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/i65-sa.json" >> "$GITHUB_ENV"
+
+      - name: Materialize immutable package once
+        if: steps.mode.outputs.mode == 'release'
+        id: build
+        run: |
+          set -euo pipefail
+          npx --yes firebase-tools@14.10.1 apps:list WEB --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/apps.json"
+          export APPS="$RUNNER_TEMP/apps.json"
+          APP_ID=$(python3 - <<'PY'
+          import json,os
+          d=json.load(open(os.environ['APPS']));a=d.get('result') if isinstance(d,dict) else None
+          if not isinstance(a,list):raise SystemExit('I65_WEB_APP_LIST_INVALID')
+          web=[x for x in a if str(x.get('platform','')).upper() in ('WEB','PLATFORM_WEB','')]
+          if len(web)!=1:raise SystemExit('I65_WEB_APP_CARDINALITY:'+str(len(web)))
+          print(web[0].get('appId',''))
+          PY
+          )
+          test -n "$APP_ID"
+          npx --yes firebase-tools@14.10.1 apps:sdkconfig WEB "$APP_ID" --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/public-config.json"
+          export SOURCE_SHA="$GITHUB_SHA"
+          export RELEASE_GATE="I6.5"
+          export BUILD_PREFIX="gi-i65"
+          export ENVIRONMENT_REF="firebase-hosting-preview-i6-5-operational-closure"
+          node tools/gravicentra-i6-1-preview-package.mjs . "$RUNNER_TEMP/i65-package" "$RUNNER_TEMP/public-config.json" > "$RUNNER_TEMP/package-output.json"
+          cat "$RUNNER_TEMP/package-output.json"
+          BUILD_ID=$(node -e "const d=require(process.env.RUNNER_TEMP+'/package-output.json');process.stdout.write(d.buildId)")
+          grep -Fq "var RUNTIME_BUILD = '$BUILD_ID';" "$RUNNER_TEMP/i65-package/bundle/site/core/pwa.js"
+          grep -Fq "var BUILD = '$BUILD_ID';" "$RUNNER_TEMP/i65-package/bundle/site/sw.js"
+          grep -Fq "var CACHE = 'orbit360-$BUILD_ID';" "$RUNNER_TEMP/i65-package/bundle/site/sw.js"
+          export I65_FIREBASE_JSON="$RUNNER_TEMP/i65-package/bundle/firebase.json"
+          python3 - <<'PY'
+          import json,os
+          d=json.load(open(os.environ['I65_FIREBASE_JSON']))
+          hs=d.get('hosting',{}).get('headers',[])
+          by={x.get('source'):x.get('headers',[]) for x in hs}
+          for src in ['/index.html','/product-runtime-config.js','/__recovery__/build.json','/sw.js']:
+              vals=' '.join(h.get('value','') for h in by.get(src,[]))
+              if 'no-store' not in vals or 'must-revalidate' not in vals: raise SystemExit('I65_FRESHNESS_HEADER_MISSING:'+src)
+          PY
+          node - <<'NODE'
+          const fs=require('node:fs'),d=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/package-output.json','utf8'));
+          const m={build_id:d.buildId,hosted_file_count:d.hostedFileCount,hosted_payload_digest:d.hostedPayloadDigest,backend_file_count:d.backendFileCount,backend_source_digest:d.backendSourceDigest,bundle_file_count:d.bundleFileCount,bundle_digest:d.bundleDigest};
+          for(const [k,v] of Object.entries(m))fs.appendFileSync(process.env.GITHUB_OUTPUT,k+'='+v+'\n');
+          NODE
+
+      - name: Deploy exact package to isolated Preview
+        if: steps.mode.outputs.mode == 'release'
+        id: preview
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/i65-package/bundle"
+          npx --yes firebase-tools@14.10.1 hosting:channel:list --site "$HOSTING_SITE" --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/i65-preview-channels.json"
+          export CHANNELS_JSON="$RUNNER_TEMP/i65-preview-channels.json"
+          node - <<'NODE' > "$RUNNER_TEMP/i65-preview-channel-candidates.txt"
+          const fs=require('node:fs'),d=JSON.parse(fs.readFileSync(process.env.CHANNELS_JSON,'utf8')),ids=new Set();
+          function walk(v,k){
+            if(v==null)return;
+            if(typeof v==='string'){
+              const m=v.match(/\/channels\/([^/]+)$/);if(m)ids.add(m[1]);
+              if((k==='channelId'||k==='id')&&/^[a-z0-9-]+$/i.test(v)&&v!=='live')ids.add(v);
+              return;
+            }
+            if(Array.isArray(v)){for(const x of v)walk(x,'');return;}
+            if(typeof v==='object')for(const [kk,x] of Object.entries(v))walk(x,kk);
+          }
+          walk(d,'');
+          for(const id of [...ids].filter(x=>x&&x!=='live').sort())console.log(id);
+          NODE
+          CHANNEL_ID=''
+          while IFS= read -r CANDIDATE; do
+            test -n "$CANDIDATE" || continue
+            if ! git grep -F -q -- "$CANDIDATE"; then
+              CHANNEL_ID="$CANDIDATE"
+              break
+            fi
+          done < "$RUNNER_TEMP/i65-preview-channel-candidates.txt"
+          test -n "$CHANNEL_ID" || { echo I65_NO_UNREFERENCED_PREVIEW_CHANNEL_AVAILABLE >&2; cat "$RUNNER_TEMP/i65-preview-channel-candidates.txt" >&2; exit 44; }
+          echo "I65_REUSING_UNREFERENCED_PREVIEW_CHANNEL=$CHANNEL_ID"
+          set +e
+          npx --yes firebase-tools@14.10.1 hosting:channel:deploy "$CHANNEL_ID" --config firebase.json --project "$PROJECT_ID" --expires 7d --non-interactive --json > "$RUNNER_TEMP/preview.json" 2> "$RUNNER_TEMP/preview.err"
+          RC=$?
+          set -e
+          if [ "$RC" -ne 0 ]; then
+            echo "I65_PREVIEW_DEPLOY_FAILED_RC=$RC" >&2
+            test ! -s "$RUNNER_TEMP/preview.err" || cat "$RUNNER_TEMP/preview.err" >&2
+            test ! -s "$RUNNER_TEMP/preview.json" || cat "$RUNNER_TEMP/preview.json" >&2
+            exit "$RC"
+          fi
+          export DEPLOY="$RUNNER_TEMP/preview.json"
+          PREVIEW_URL=$(python3 - <<'PY'
+          import os,re
+          raw=open(os.environ['DEPLOY']).read();prod='https://'+os.environ['HOSTING_SITE']+'.web.app'
+          urls=[u.rstrip('/') for u in re.findall(r'https://[A-Za-z0-9._-]+\.web\.app',raw) if u.rstrip('/')!=prod]
+          if not urls:raise SystemExit('I65_PREVIEW_URL_NOT_FOUND')
+          print(urls[-1])
+          PY
+          )
+          echo "channel_id=$CHANNEL_ID" >> "$GITHUB_OUTPUT"
+          echo "preview_url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
+
+      - name: Exact Preview readback
+        if: steps.mode.outputs.mode == 'release'
+        env:
+          TARGET_URL: ${{ steps.preview.outputs.preview_url }}
+          EXPECTED_BUILD_ID: ${{ steps.build.outputs.build_id }}
+          EXPECTED_DIGEST: ${{ steps.build.outputs.hosted_payload_digest }}
+        run: |
+          set -euo pipefail
+          export MANIFEST="$RUNNER_TEMP/i65-package/evidence/site-manifest.sha256"
+          python3 - <<'PY'
+          import hashlib,json,os,time,urllib.error,urllib.parse,urllib.request
+          rows=[tuple(x.split('  ',1)) for x in open(os.environ['MANIFEST']).read().splitlines() if x.strip()]
+          base=os.environ['TARGET_URL'].rstrip('/')
+          last_bad=[];last_marker=None
+          def read_once(req):
+              with urllib.request.urlopen(req,timeout=30) as r:return r.read()
+          for attempt in range(1,9):
+              bad=[];stamp=str(attempt)+'-'+str(int(time.time()))
+              for want,rel in rows:
+                  try:
+                      req=urllib.request.Request(base+'/'+urllib.parse.quote(rel,safe='/')+'?i65='+os.environ['EXPECTED_DIGEST'][:16]+'-'+stamp,headers={'Accept-Encoding':'identity','Cache-Control':'no-cache, no-store','Pragma':'no-cache'})
+                      got=hashlib.sha256(read_once(req)).hexdigest()
+                  except (urllib.error.HTTPError,urllib.error.URLError) as e:
+                      got='HTTP_ERROR:'+type(e).__name__
+                  if got!=want:bad.append((rel,want,got))
+              marker=None
+              try:
+                  marker=json.loads(read_once(urllib.request.Request(base+'/__recovery__/build.json?i65='+stamp,headers={'Cache-Control':'no-cache, no-store','Pragma':'no-cache'})))
+              except Exception as e:
+                  marker={'error':type(e).__name__}
+              marker_ok=marker.get('sourceSha')==os.environ['GITHUB_SHA'] and marker.get('buildId')==os.environ['EXPECTED_BUILD_ID'] and marker.get('gate')=='I6.5'
+              if not bad and marker_ok:
+                  print('I65_PREVIEW_READBACK='+str(len(rows)))
+                  print('I65_PREVIEW_PROPAGATION_ATTEMPT='+str(attempt))
+                  break
+              last_bad=bad;last_marker=marker
+              if attempt<8:time.sleep(3)
+          else:
+              raise SystemExit('I65_PREVIEW_READBACK_MISMATCH:'+json.dumps({'bad':last_bad[:3],'marker':last_marker},ensure_ascii=False))
+          PY
+
+      - name: Preview I6.5 operational closure proof
+        if: steps.mode.outputs.mode == 'release'
+        env:
+          TARGET_URL: ${{ steps.preview.outputs.preview_url }}
+          EXPECTED_SOURCE_SHA: ${{ github.sha }}
+          EXPECTED_BUILD_ID: ${{ steps.build.outputs.build_id }}
+          I65_CLOSURE_STAGE: preview
+          I65_CLOSURE_FILE: ${{ runner.temp }}/i65-package/evidence/i65-operational-closure-preview-functional.json
+        run: node tools/gravicentra-i6-5-operational-closure-functional.mjs
+
+      - name: Upload immutable build artifact before promotion
+        if: steps.mode.outputs.mode == 'release'
+        id: buildart
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i6-5-operational-closure-build-${{ github.run_id }}
+          path: ${{ runner.temp }}/i65-package
+          include-hidden-files: true
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Bind rollback to previous certified artifact and promote exact Preview channel
+        if: steps.mode.outputs.mode == 'release'
+        id: promote
+        run: |
+          set -euo pipefail
+          RB=$(node -e "const c=require('./'+process.env.CONTROL);process.stdout.write(String(c.certifiedCandidate?.previewChannelId||''))")
+          test -n "$RB" || { echo I65_PREVIOUS_CERTIFIED_PREVIEW_CHANNEL_MISSING >&2; exit 43; }
+          echo "rollback_channel=$RB" >> "$GITHUB_OUTPUT"
+          npx --yes firebase-tools@14.10.1 hosting:channel:list --site "$HOSTING_SITE" --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/i65-channels.json"
+          export RB
+          node - <<'NODE'
+          const fs=require('node:fs'),d=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/i65-channels.json','utf8'));
+          const raw=JSON.stringify(d);
+          if(!raw.includes(process.env.RB))throw new Error('I65_PREVIOUS_CERTIFIED_PREVIEW_CHANNEL_NOT_FOUND');
+          NODE
+          npx --yes firebase-tools@14.10.1 hosting:clone "$HOSTING_SITE:${{ steps.preview.outputs.channel_id }}" "$HOSTING_SITE:live" --project "$PROJECT_ID" --non-interactive
+          echo "promoted=true" >> "$GITHUB_OUTPUT"
+          echo I65_SAME_ARTIFACT_PROMOTION=PASS
+
+      - name: Exact LIVE readback
+        if: steps.mode.outputs.mode == 'release'
+        env:
+          TARGET_URL: ${{ env.PRODUCTION_URL }}
+          EXPECTED_BUILD_ID: ${{ steps.build.outputs.build_id }}
+          EXPECTED_DIGEST: ${{ steps.build.outputs.hosted_payload_digest }}
+        run: |
+          set -euo pipefail
+          export MANIFEST="$RUNNER_TEMP/i65-package/evidence/site-manifest.sha256"
+          python3 - <<'PY'
+          import hashlib,json,os,time,urllib.parse,urllib.request
+          rows=[tuple(x.split('  ',1)) for x in open(os.environ['MANIFEST']).read().splitlines() if x.strip()]
+          base=os.environ['TARGET_URL'].rstrip('/')
+          last_bad=[];last_marker=None
+          for attempt in range(1,13):
+              bad=[]
+              stamp=str(attempt)+'-'+str(int(time.time()))
+              for want,rel in rows:
+                  try:
+                      req=urllib.request.Request(base+'/'+urllib.parse.quote(rel,safe='/')+'?i65live='+os.environ['EXPECTED_DIGEST'][:16]+'-'+stamp,headers={'Accept-Encoding':'identity','Cache-Control':'no-cache, no-store','Pragma':'no-cache'})
+                      with urllib.request.urlopen(req,timeout=30) as rr:got=hashlib.sha256(rr.read()).hexdigest()
+                  except Exception as e:
+                      got='HTTP_ERROR:'+type(e).__name__
+                  if got!=want:bad.append((rel,want,got))
+              marker=None
+              try:
+                  with urllib.request.urlopen(urllib.request.Request(base+'/__recovery__/build.json?i65live='+stamp,headers={'Cache-Control':'no-cache, no-store','Pragma':'no-cache'}),timeout=30) as rr:marker=json.loads(rr.read())
+              except Exception as e:
+                  marker={'error':type(e).__name__}
+              marker_ok=marker.get('sourceSha')==os.environ['GITHUB_SHA'] and marker.get('buildId')==os.environ['EXPECTED_BUILD_ID'] and marker.get('gate')=='I6.5'
+              if not bad and marker_ok:
+                  print('I65_LIVE_READBACK='+str(len(rows)))
+                  print('I65_LIVE_PROPAGATION_ATTEMPT='+str(attempt))
+                  break
+              last_bad=bad;last_marker=marker
+              if attempt<12:time.sleep(5)
+          else:
+              raise SystemExit('I65_LIVE_READBACK_MISMATCH:'+json.dumps({'bad':last_bad[:3],'marker':last_marker},ensure_ascii=False))
+          PY
+
+      - name: LIVE I6.5 operational closure proof
+        if: steps.mode.outputs.mode == 'release'
+        env:
+          TARGET_URL: ${{ env.PRODUCTION_URL }}
+          EXPECTED_SOURCE_SHA: ${{ github.sha }}
+          EXPECTED_BUILD_ID: ${{ steps.build.outputs.build_id }}
+          I65_CLOSURE_STAGE: live
+          I65_CLOSURE_FILE: ${{ runner.temp }}/i65-live-operational-closure.json
+        run: node tools/gravicentra-i6-5-operational-closure-functional.mjs
+
+      - name: Upload LIVE evidence
+        if: steps.mode.outputs.mode == 'release'
+        id: liveart
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i6-5-operational-closure-live-evidence-${{ github.run_id }}
+          path: ${{ runner.temp }}/i65-live-operational-closure.json
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Seal I6.5 operational closure successor LIVE
+        if: steps.mode.outputs.mode == 'release'
+        env:
+          BUILD_ID: ${{ steps.build.outputs.build_id }}
+          HOSTED_FILE_COUNT: ${{ steps.build.outputs.hosted_file_count }}
+          HOSTED_PAYLOAD_DIGEST: ${{ steps.build.outputs.hosted_payload_digest }}
+          BACKEND_FILE_COUNT: ${{ steps.build.outputs.backend_file_count }}
+          BACKEND_SOURCE_DIGEST: ${{ steps.build.outputs.backend_source_digest }}
+          BUNDLE_FILE_COUNT: ${{ steps.build.outputs.bundle_file_count }}
+          BUNDLE_DIGEST: ${{ steps.build.outputs.bundle_digest }}
+          PREVIEW_CHANNEL_ID: ${{ steps.preview.outputs.channel_id }}
+          PREVIEW_URL: ${{ steps.preview.outputs.preview_url }}
+          ROLLBACK_CHANNEL_ID: ${{ steps.promote.outputs.rollback_channel }}
+          ARTIFACT_ID: ${{ steps.buildart.outputs.artifact-id }}
+          ARTIFACT_DIGEST: ${{ steps.buildart.outputs.artifact-digest }}
+          LIVE_EVIDENCE_ARTIFACT_ID: ${{ steps.liveart.outputs.artifact-id }}
+          LIVE_EVIDENCE_ARTIFACT_DIGEST: ${{ steps.liveart.outputs.artifact-digest }}
+          CLOSURE_RECEIPT: artifacts/orbit360-recovery/release-control/I6_5_OPERATIONAL_CLOSURE_LIVE_PASS_20260918.json
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('node:fs'),cp=require('node:child_process');
+          const C=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8')),L=JSON.parse(fs.readFileSync(process.env.LEDGER,'utf8'));
+          const live=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/i65-live-operational-closure.json','utf8')),d=C.i65OperationalClosureDefect||{};
+          if(d.status!=='I6_5_OPERATIONAL_CLOSURE_CODE_DEFECT_CANDIDATE_PENDING_BUILD')throw new Error('I65_OPERATIONAL_SEAL_STATE_INVALID');
+          if(live.status!=='PASS'||live.writes!==0||live.counts?.polizas!==1414||live.counts?.recibosEsperados!==1842||live.counts?.carteraPrimas!==1283||live.counts?.cobros!==5)throw new Error('I65_OPERATIONAL_LIVE_PROOF_INVALID');
+          if(live.global?.cartera!==1283||live.global?.cobros!==5||live.global?.rows<=5)throw new Error('I65_OPERATIONAL_GLOBAL_VIEW_INVALID');
+          if(live.publicUi?.placeholder==='🏢'||live.publicUi?.brandMark!==true||live.publicUi?.favicon!==true)throw new Error('I65_OPERATIONAL_BRAND_INVALID');
+          const old=JSON.parse(JSON.stringify(C.certifiedCandidate||{}));
+          if(old.sourceSha!==d.previousCertifiedSourceSha||old.buildId!==d.previousCertifiedBuildId||Number(old.artifactId)!==Number(d.previousCertifiedArtifactId))throw new Error('I65_OPERATIONAL_PARENT_DRIFT');
+          const release={sourceSha:process.env.GITHUB_SHA,sourceTree:cp.execFileSync('git',['rev-parse','HEAD^{tree}'],{encoding:'utf8'}).trim(),i3RunId:Number(process.env.GITHUB_RUN_ID),i3Conclusion:'success',runnerCommit:process.env.GITHUB_SHA,buildId:process.env.BUILD_ID,artifactId:Number(process.env.ARTIFACT_ID),artifactName:'gravicentra-i6-5-operational-closure-build-'+process.env.GITHUB_RUN_ID,artifactArchiveDigest:process.env.ARTIFACT_DIGEST,previewChannelId:process.env.PREVIEW_CHANNEL_ID,previewUrl:process.env.PREVIEW_URL,hostedFileCount:Number(process.env.HOSTED_FILE_COUNT),hostedPayloadDigest:process.env.HOSTED_PAYLOAD_DIGEST,backendFileCount:Number(process.env.BACKEND_FILE_COUNT),backendSourceDigest:process.env.BACKEND_SOURCE_DIGEST,bundleFileCount:Number(process.env.BUNDLE_FILE_COUNT),bundleDigest:process.env.BUNDLE_DIGEST,readbackExact:true,readbackFileCount:Number(process.env.HOSTED_FILE_COUNT),sameFrontendArtifactPreviewToProductionRequired:true,sameBackendSourcePackageRequiredForI5:false,sourceMutatedAfterBuild:false,productionUrl:process.env.PRODUCTION_URL,promotedLiveRunId:Number(process.env.GITHUB_RUN_ID)};
+          C.preI65OperationalClosureCertifiedCandidate=old;C.certifiedCandidate=release;
+          C.i65OperationalClosureDefect={...d,status:'I6_5_OPERATIONAL_CLOSURE_CODE_DEFECT_SUCCESSOR_LIVE_PASS',sourceSha:release.sourceSha,sourceTree:release.sourceTree,buildId:release.buildId,artifactId:release.artifactId,artifactDigest:release.artifactArchiveDigest,previewChannelId:release.previewChannelId,previewUrl:release.previewUrl,liveRunId:Number(process.env.GITHUB_RUN_ID),productionUrl:process.env.PRODUCTION_URL,productionReadbackExact:true,functionalPass:true,globalPortfolioCount:live.global.cartera,globalCobrosCount:live.global.cobros,loginBrandPass:true,faviconPass:true,clientReceiptLoadingPass:true,policyFlowContractPass:true,rollbackChannelId:process.env.ROLLBACK_CHANNEL_ID,liveEvidenceArtifactId:Number(process.env.LIVE_EVIDENCE_ARTIFACT_ID),liveEvidenceArtifactDigest:process.env.LIVE_EVIDENCE_ARTIFACT_DIGEST,operationalWrites:0,dataMutationAuthorized:false,reimportAuthorized:false,cobrosWritesAuthorized:false,nextRequiredStep:'I6_5_USER_VISUAL_REFRESH_CHECK'};
+          C.i6Execution.productMutationAuthorized=false;C.i6Execution.dataMutationAuthorized=false;C.i6Execution.sourceDataApplyAuthorized=false;
+          C.i6Execution.i6_5={...(C.i6Execution.i6_5||{}),status:'POST_WRITE_READBACK_INTEGRITY_PASS',operationalClosureStatus:'I6_5_OPERATIONAL_CLOSURE_CODE_DEFECT_SUCCESSOR_LIVE_PASS',writes:2227,nextRequiredStep:'USER_VISUAL_REFRESH_CHECK'};
+          C.postproductionDataUpdateControl.executionCursor='POST_WRITE_READBACK_INTEGRITY_PASS';C.postproductionDataUpdateControl.nextRequiredStep='USER_VISUAL_REFRESH_CHECK';C.nextAction='I6_5_USER_VISUAL_REFRESH_CHECK';
+          C.i65MiniClosurePlan={...(C.i65MiniClosurePlan||{}),blockAStatus:'A1_EMAIL_VERIFICATION_PENDING_A2_A3_A4_PRODUCT_FIX_LIVE_PASS',blockBStatus:'READ_PATH_HYDRATION_LIVE_PASS',blockCStatus:'TECHNICAL_PASS_PENDING_USER_VISUAL',nextMaterialCursor:'USER_VISUAL_REFRESH_CHECK',operationalClosureReceiptPath:process.env.CLOSURE_RECEIPT};
+          const receipt={schema:'GRAVICENTRA_I6_5_OPERATIONAL_CLOSURE_LIVE_PASS_V1',status:'LIVE_PASS_PENDING_FINAL_PAULA_VISUAL',date:'2026-09-18',sourceSha:release.sourceSha,buildId:release.buildId,artifactId:release.artifactId,runId:Number(process.env.GITHUB_RUN_ID),globalPortfolioCount:live.global.cartera,globalCobrosCount:live.global.cobros,loginBrandPass:true,faviconPass:true,clientReceiptLoadingPass:true,policyFlowContractPass:true,dataWrites:0,semanticBoundary:'recibosEsperados+carteraPrimas separate from cobros',userAccess:{samuel:'PROVISIONED_ACTIVE_MEMBERSHIP_EMAIL_VERIFICATION_PENDING',carlos:'PROVISIONED_ACTIVE_MEMBERSHIP_EMAIL_VERIFICATION_PENDING'},nextRequiredStep:'PAULA_VISUAL_REFRESH_ON_CURRENT_BUILD'};
+          fs.writeFileSync(process.env.CLOSURE_RECEIPT,JSON.stringify(receipt,null,2)+'\n');
+          L.releaseBinding={sourceSha:release.sourceSha,buildId:release.buildId,artifactId:release.artifactId,artifactArchiveDigest:release.artifactArchiveDigest,previewChannelId:release.previewChannelId};
+          L.i65OperationalClosureAcceptance={status:'LIVE_PASS_PENDING_FINAL_PAULA_VISUAL',sourceSha:release.sourceSha,buildId:release.buildId,artifactId:release.artifactId,liveRunId:Number(process.env.GITHUB_RUN_ID),globalPortfolioCount:live.global.cartera,globalCobrosCount:live.global.cobros,dataWrites:0};
+          fs.writeFileSync(process.env.LEDGER,JSON.stringify(L,null,2)+'\n');
+          C.capabilityStatusAuthority.latestBlobSha=cp.execFileSync('git',['hash-object',process.env.LEDGER],{encoding:'utf8'}).trim();
+          fs.writeFileSync(process.env.CONTROL,JSON.stringify(C,null,2)+'\n');
+          NODE
+          git config user.name "gravicentra-governance-bot"; git config user.email "actions@users.noreply.github.com"
+          git add "$CONTROL" "$LEDGER" "$CLOSURE_RECEIPT"
+          git commit -m "recovery(i6.5): freeze operational closure successor LIVE"
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          git push origin HEAD:recovery/fase-a-clean-20260831
+
+      - name: Roll back LIVE on post-promotion failure
+        if: failure() && steps.promote.outputs.promoted == 'true'
+        run: |
+          set -euo pipefail
+          npx --yes firebase-tools@14.10.1 hosting:clone "$HOSTING_SITE:${{ steps.promote.outputs.rollback_channel }}" "$HOSTING_SITE:live" --project "$PROJECT_ID" --non-interactive
+          echo I65_AUTOMATIC_ROLLBACK=PASS
+
+
+  i65-hydration-diagnostic:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Resolve I6.5 hydration diagnostic applicability
+        id: hyd
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          node - <<'NODE'
+          const fs=require('node:fs'),c=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8'));
+          const ok=c.gateState?.gates?.I6?.activeSubgate==='I6.5'&&c.nextAction==='I6_5_HYDRATION_DIAGNOSTIC'&&c.i65HydrationDefect?.status==='I6_5_HYDRATION_DIAGNOSTIC_PENDING';
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(ok?'true':'false')+'\n');console.log('I65_HYDRATION_APPLICABLE='+(ok?'true':'false'));
+          NODE
+      - name: Install hydration diagnostic dependencies
+        if: steps.hyd.outputs.run == 'true'
+        run: |
+          npm install --no-save --package-lock=false playwright@1.55.0 firebase-admin@13.4.0 >/dev/null
+          npx playwright install --with-deps chromium >/dev/null
+      - name: Diagnose LIVE product hydration without writes
+        if: steps.hyd.outputs.run == 'true'
+        env:
+          TARGET_URL: https://ays-orbit-360-lab.web.app
+          I65_HYDRATION_DIR: ${{ runner.temp }}/i65-hydration
+        run: node tools/gravicentra-i6-5-hydration-diagnostic.mjs
+      - name: Upload hydration diagnostic evidence
+        if: steps.hyd.outputs.run == 'true'
+        id: hydart
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i6-5-hydration-diagnostic-${{ github.run_id }}
+          path: ${{ runner.temp }}/i65-hydration/*
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 7
+      - name: Freeze hydration diagnosis
+        if: steps.hyd.outputs.run == 'true'
+        env:
+          HYD_ARTIFACT_ID: ${{ steps.hydart.outputs.artifact-id }}
+          HYD_ARTIFACT_DIGEST: ${{ steps.hydart.outputs.artifact-digest }}
+        run: |
+          set -euo pipefail
+          git fetch origin recovery/fase-a-clean-20260831
+          git reset --hard origin/recovery/fase-a-clean-20260831
+          export HYD_EVIDENCE="$RUNNER_TEMP/i65-hydration/i65-hydration-diagnostic.json"
+          node - <<'NODE'
+          const fs=require('node:fs'),C=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8')),E=JSON.parse(fs.readFileSync(process.env.HYD_EVIDENCE,'utf8'));
+          if(C.i65HydrationDefect?.status!=='I6_5_HYDRATION_DIAGNOSTIC_PENDING'||C.nextAction!=='I6_5_HYDRATION_DIAGNOSTIC')throw new Error('I65_HYDRATION_CURSOR_CHANGED');
+          if(E.status!=='PASS'||E.writes!==0||E.operationalWrites!==0)throw new Error('I65_HYDRATION_EVIDENCE_INVALID');
+          C.i65HydrationDefect={...C.i65HydrationDefect,status:'I6_5_HYDRATION_DIAGNOSTIC_PASS',diagnosticRunId:Number(process.env.GITHUB_RUN_ID),diagnosticArtifactId:Number(process.env.HYD_ARTIFACT_ID),diagnosticArtifactDigest:process.env.HYD_ARTIFACT_DIGEST,diagnosis:E.diagnosis,directCounts:E.direct,runtimeSummary:E.runtime,dataMutationAuthorized:false,cobrosWritesAuthorized:false,reimportAuthorized:false,productMutationAuthorized:false,nextRequiredStep:'I6_5_HYDRATION_CODE_FIX'};
+          C.i65MiniClosurePlan.blockBStatus='HYDRATION_DIAGNOSTIC_PASS_CODE_FIX_PENDING';C.i65MiniClosurePlan.blockCStatus='BLOCKED_ON_BLOCK_B_HYDRATION_FIX';C.i65MiniClosurePlan.nextMaterialCursor='HYDRATION_CODE_FIX';
+          C.nextAction='I6_5_HYDRATION_CODE_FIX';C.i6Execution.dataMutationAuthorized=false;C.i6Execution.sourceDataApplyAuthorized=false;C.i6Execution.productMutationAuthorized=false;
+          fs.writeFileSync(process.env.CONTROL,JSON.stringify(C,null,2)+'\n');
+          NODE
+          git config user.name "gravicentra-governance-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add "$CONTROL"
+          git commit -m "recovery(i6.5): freeze LIVE hydration diagnosis"
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          git push origin HEAD:recovery/fase-a-clean-20260831
+
+
+  i65-apply-public-key:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      I65_APPLY_PUBLIC_KEY: artifacts/orbit360-recovery/release-control/I6_5_APPLY_PUBLIC_KEY_20260918.pem
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Resolve I6.5 apply key applicability
+        id: key
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          node - <<'NODE'
+          const fs=require('node:fs'),c=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8'));
+          const ok=c.nextAction==='I6_5_APPLY_DETERMINISTIC_DELTA'&&c.i65ApplyPayload?.status==='PUBLIC_KEY_PENDING'&&c.i65DeterministicDiff?.status==='DETERMINISTIC_DIFF_READY';
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(ok?'true':'false')+'\n');
+          NODE
+      - name: Derive public encryption key from existing Firebase authority
+        if: steps.key.outputs.run == 'true'
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('node:fs'),crypto=require('node:crypto');let sa=null;
+          for(const k of ['SA_DEFAULT','SA_ORBIT360_LAB','SA_ORBIT_360_LAB']){try{const x=JSON.parse(process.env[k]||'');if(x?.type==='service_account'&&x?.project_id==='ays-orbit-360-lab'&&x?.private_key){sa=x;break;}}catch{}}
+          if(!sa)throw new Error('I65_APPLY_SERVICE_ACCOUNT_NOT_FOUND');
+          fs.writeFileSync(process.env.I65_APPLY_PUBLIC_KEY,crypto.createPublicKey(sa.private_key).export({type:'spki',format:'pem'}).toString());
+          NODE
+      - name: Freeze apply public key pointer
+        if: steps.key.outputs.run == 'true'
+        run: |
+          set -euo pipefail
+          git fetch origin recovery/fase-a-clean-20260831
+          git reset --hard origin/recovery/fase-a-clean-20260831
+          test -s "$I65_APPLY_PUBLIC_KEY"
+          export PUB_SHA=$(sha256sum "$I65_APPLY_PUBLIC_KEY" | awk '{print $1}')
+          node - <<'NODE'
+          const fs=require('node:fs'),C=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8'));
+          if(C.i65ApplyPayload?.status!=='PUBLIC_KEY_PENDING'||C.nextAction!=='I6_5_APPLY_DETERMINISTIC_DELTA')throw new Error('I65_APPLY_KEY_CURSOR_CHANGED');
+          C.i65ApplyPayload={...C.i65ApplyPayload,status:'PUBLIC_KEY_READY',publicKeySha256:process.env.PUB_SHA,publicKeyRunId:Number(process.env.GITHUB_RUN_ID),dataWritesAuthorized:false,nextRequiredStep:'ENCRYPT_PRIVATE_APPLY_PAYLOAD'};
+          fs.writeFileSync(process.env.CONTROL,JSON.stringify(C,null,2)+'\n');
+          NODE
+          git config user.name "gravicentra-governance-bot"; git config user.email "actions@users.noreply.github.com"
+          git add "$CONTROL" "$I65_APPLY_PUBLIC_KEY"
+          git commit -m "recovery(i6.5): freeze apply encryption public key"
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          git push origin HEAD:recovery/fase-a-clean-20260831
+
+
+  i65-deterministic-apply:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      I65_SOURCE_INTAKE: artifacts/orbit360-recovery/release-control/I6_5_RECIBOS_CARTERA_SOURCE_INTAKE_20260918.json
+      I65_DIFF: artifacts/orbit360-recovery/release-control/I6_5_DETERMINISTIC_DIFF_20260918.json
+      I65_APPLY_ENCRYPTED: artifacts/orbit360-recovery/release-control/I6_5_DETERMINISTIC_APPLY_PAYLOAD_20260918.enc.json
+      I65_REGISTRY: artifacts/orbit360-recovery/release-control/DATA_UPDATE_MECHANISM_REGISTRY.json
+      I65_TECH_RECEIPT: artifacts/orbit360-recovery/release-control/I6_5_RECIBOS_CARTERA_TECHNICAL_PASS_20260918.json
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Resolve I6.5 deterministic apply applicability
+        id: i65apply
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          node - <<'NODE'
+          const fs=require('node:fs'),c=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8')),s=JSON.parse(fs.readFileSync(process.env.I65_SOURCE_INTAKE,'utf8')),d=JSON.parse(fs.readFileSync(process.env.I65_DIFF,'utf8'));
+          const ok=c.gateState?.gates?.I6?.activeSubgate==='I6.5'&&c.nextAction==='I6_5_APPLY_DETERMINISTIC_DELTA'&&s.execution?.cursorState==='DETERMINISTIC_DIFF_READY'&&d.status==='DETERMINISTIC_DIFF_READY'&&c.i65ApplyPayload?.status==='ENCRYPTED_PAYLOAD_READY'&&c.i65DeterministicApply?.status==='AUTHORIZED_PENDING_APPLY'&&c.i65DeterministicApply?.userAuthorized===true;
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(ok?'true':'false')+'\n');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'cert_source='+(c.certifiedCandidate?.sourceSha||'')+'\n');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'cert_build='+(c.certifiedCandidate?.buildId||'')+'\n');
+          console.log('I65_APPLY_APPLICABLE='+(ok?'true':'false'));
+          NODE
+      - name: Install apply and authenticated functional dependencies
+        if: steps.i65apply.outputs.run == 'true'
+        run: |
+          npm install --no-save --package-lock=false playwright@1.55.0 firebase-admin@13.4.0 >/dev/null
+          npx playwright install --with-deps chromium >/dev/null
+      - name: Apply exact deterministic Recibos/Cartera delta
+        if: steps.i65apply.outputs.run == 'true'
+        env:
+          I65_APPLY_RESULT_FILE: ${{ runner.temp }}/i65-apply-result.json
+          I65_EXACT_ROLLBACK_FILE: ${{ runner.temp }}/i65-exact-rollback.private.json
+        run: node tools/gravicentra-i6-5-deterministic-apply.mjs --mode=apply
+      - name: Authenticated LIVE functional readback after apply
+        if: steps.i65apply.outputs.run == 'true'
+        env:
+          TARGET_URL: https://ays-orbit-360-lab.web.app
+          EXPECTED_SOURCE_SHA: ${{ steps.i65apply.outputs.cert_source }}
+          EXPECTED_BUILD_ID: ${{ steps.i65apply.outputs.cert_build }}
+          I65_PROOF_STAGE: postwrite
+          I65_PROOF_FILE: ${{ runner.temp }}/i65-postwrite-functional.json
+        run: node tools/gravicentra-i6-5-sync-functional.mjs
+      - name: Upload sanitized I6.5 apply evidence
+        if: ${{ steps.i65apply.outputs.run == 'true' && always() }}
+        id: i65applyart
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i6-5-apply-readback-integrity-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/i65-apply-result.json
+            ${{ runner.temp }}/i65-postwrite-functional.json
+          compression-level: 0
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Seal I6.5 technical pass pending Paula visual acceptance
+        if: ${{ steps.i65apply.outputs.run == 'true' && success() }}
+        env:
+          APPLY_ARTIFACT_ID: ${{ steps.i65applyart.outputs.artifact-id }}
+          APPLY_ARTIFACT_DIGEST: ${{ steps.i65applyart.outputs.artifact-digest }}
+          APPLY_RESULT: ${{ runner.temp }}/i65-apply-result.json
+          FUNCTIONAL_RESULT: ${{ runner.temp }}/i65-postwrite-functional.json
+        run: |
+          set -euo pipefail
+          git fetch origin recovery/fase-a-clean-20260831
+          git reset --hard origin/recovery/fase-a-clean-20260831
+          node - <<'NODE'
+          const fs=require('node:fs'),{execFileSync}=require('node:child_process');
+          const C=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8')),S=JSON.parse(fs.readFileSync(process.env.I65_SOURCE_INTAKE,'utf8')),R=JSON.parse(fs.readFileSync(process.env.I65_REGISTRY,'utf8')),L=JSON.parse(fs.readFileSync(process.env.LEDGER,'utf8')),A=JSON.parse(fs.readFileSync(process.env.APPLY_RESULT,'utf8')),F=JSON.parse(fs.readFileSync(process.env.FUNCTIONAL_RESULT,'utf8'));
+          if(A.status!=='PASS'||A.writes!==2227||A.rollbackExecuted!==false||A.forbiddenUnchanged!==true||A.legacyUnchanged!==true||A.unrelatedAllowedDocsUnchanged!==true||A.relationships?.total!==0)throw new Error('I65_APPLY_EVIDENCE_INVALID');
+          if(A.countsAfter?.recibosEsperados!==1842||A.countsAfter?.carteraPrimas!==1283||A.countsAfter?.polizas!==1414||A.countsAfter?.clientes!==442||A.countsAfter?.aseguradoras!==31||A.countsAfter?.vehiculos!==1063||A.countsAfter?.cobros!==5||A.countsAfter?.finmovs!==0||A.countsAfter?.renovaciones!==0)throw new Error('I65_POSTWRITE_COUNTS_INVALID');
+          if(F.status!=='PASS'||F.counts?.recibosEsperados!==1842||F.counts?.carteraPrimas!==1283||F.directCounts?.recibosEsperados!==1842||F.directCounts?.carteraPrimas!==1283||F.i64Sentinels?.policies!==1414||F.i64Sentinels?.renewals!==11||F.i64Sentinels?.historical!==1191||F.writes!==0)throw new Error('I65_FUNCTIONAL_POSTWRITE_INVALID');
+          const art={runId:Number(process.env.GITHUB_RUN_ID),artifactId:Number(process.env.APPLY_ARTIFACT_ID),artifactDigest:process.env.APPLY_ARTIFACT_DIGEST};
+          S.execution.cursorState='POST_WRITE_READBACK_INTEGRITY_PASS';S.execution.writeApplied=true;S.execution.writes=2227;S.execution.applyRunId=art.runId;S.execution.applyArtifactId=art.artifactId;S.execution.applyArtifactDigest=art.artifactDigest;
+          S.execution.appliedCounts={receiptInserts:548,receiptUpdates:798,receiptDeletes:0,portfolioInserts:634,portfolioUpdates:223,portfolioDeletes:24,operationalWrites:2227,holds:36};
+          S.execution.liveCountsAfter={polizas:1414,clientes:442,aseguradoras:31,vehiculos:1063,recibosEsperados:1842,carteraPrimas:1283,cobros:5,finmovs:0,renovaciones:0};
+          S.execution.postWriteReadbackPassed=true;S.execution.integrityPassed=true;S.execution.functionalPassed=true;S.execution.legacyNamespaceUnchanged=true;S.execution.nextRequiredStep='USER_VISUAL_REFRESH_CHECK';
+          fs.writeFileSync(process.env.I65_SOURCE_INTAKE,JSON.stringify(S,null,2)+'\n');
+
+          R.modules.RECIBOS_CARTERA.resumeCursor='POST_WRITE_READBACK_INTEGRITY_PASS';R.modules.RECIBOS_CARTERA.nextMaterialStep='USER_VISUAL_REFRESH_CHECK';R.modules.RECIBOS_CARTERA.dataWritesAuthorized=false;R.modules.RECIBOS_CARTERA.cobrosWritesAuthorized=false;
+          R.modules.RECIBOS_CARTERA.technicalApply={status:'PASS_PENDING_USER_VISUAL',...art,writes:2227,receiptCount:1842,portfolioCount:1283,cobrosCount:5,holds:36,legacyNamespaceUnchanged:true,forbiddenCollectionsUnchanged:true,relationshipErrors:0};
+          fs.writeFileSync(process.env.I65_REGISTRY,JSON.stringify(R,null,2)+'\n');
+
+          L.i65DataUpdateTechnicalAcceptance={status:'PASS_PENDING_PAULA_VISUAL',...art,sourceBundleSha256:S.sourceBundle.sha256,deterministicDiffSha256:'c1cf6d0c62d4dd30bfa80c70abfa7a8751e58630c2ffcc3484e5544d76e55749',writes:2227,receiptCount:1842,portfolioCount:1283,cobrosCount:5,holds:36,legacyNamespaceUnchanged:true,forbiddenCollectionsUnchanged:true,relationshipErrors:0,functionalPass:true,i64SentinelsPreserved:true};
+          fs.writeFileSync(process.env.LEDGER,JSON.stringify(L,null,2)+'\n');
+
+          const receipt={schema:'GRAVICENTRA_I6_5_RECIBOS_CARTERA_TECHNICAL_PASS_V1',status:'PASS_PENDING_PAULA_VISUAL',date:'2026-09-18',gate:'I6.5',module:'RECIBOS_CARTERA',...art,sourceBundleSha256:S.sourceBundle.sha256,deterministicDiffSha256:'c1cf6d0c62d4dd30bfa80c70abfa7a8751e58630c2ffcc3484e5544d76e55749',applied:{receiptInserts:548,receiptUpdates:798,receiptDeletes:0,portfolioInserts:634,portfolioUpdates:223,portfolioDeletesPositivePaymentEvidenceOnly:24,totalWrites:2227,holds:36},liveCounts:S.execution.liveCountsAfter,integrity:{relationshipErrors:0,forbiddenCollectionsUnchanged:true,legacyNamespaceUnchanged:true,unrelatedAllowedDocsUnchanged:true},functional:{status:'PASS',receiptCount:1842,portfolioCount:1283,i64SentinelsPreserved:true},cobrosWrites:0,finmovWrites:0,rollbackExecuted:false,nextRequiredStep:'PAULA_LIVE_VISUAL_VALIDATION'};
+          fs.writeFileSync(process.env.I65_TECH_RECEIPT,JSON.stringify(receipt,null,2)+'\n');
+
+          const sourceBlob=execFileSync('git',['hash-object',process.env.I65_SOURCE_INTAKE],{encoding:'utf8'}).trim(),registryBlob=execFileSync('git',['hash-object',process.env.I65_REGISTRY],{encoding:'utf8'}).trim(),ledgerBlob=execFileSync('git',['hash-object',process.env.LEDGER],{encoding:'utf8'}).trim();
+          C.i6Execution.activeSourceIntakeBlobSha=sourceBlob;C.postproductionDataUpdateControl.activeSourceIntakeBlobSha=sourceBlob;C.i6Execution.mechanismRegistryBlobSha=registryBlob;C.postproductionDataUpdateControl.mechanismRegistryBlobSha=registryBlob;C.capabilityStatusAuthority.latestBlobSha=ledgerBlob;
+          C.i6Execution.activeModuleStatus='POST_WRITE_READBACK_INTEGRITY_PASS';C.i6Execution.dataMutationAuthorized=false;C.i6Execution.sourceDataApplyAuthorized=false;C.gateState.gates.I6.dataMutationAuthorized=false;
+          C.i6Execution.i6_5={...(C.i6Execution.i6_5||{}),status:'POST_WRITE_READBACK_INTEGRITY_PASS',writeApplied:true,writes:2227,applyRunId:art.runId,applyArtifactId:art.artifactId,applyArtifactDigest:art.artifactDigest,liveCountsAfter:S.execution.liveCountsAfter,readbackPassed:true,integrityPassed:true,functionalPassed:true,legacyNamespaceUnchanged:true,paulaVisualAcceptance:'PENDING',nextRequiredStep:'USER_VISUAL_REFRESH_CHECK'};
+          C.i65DeterministicApply={...(C.i65DeterministicApply||{}),status:'TECHNICAL_PASS_PENDING_USER_VISUAL',userAuthorized:false,...art,writes:2227,receiptCount:1842,portfolioCount:1283,cobrosCount:5,legacyNamespaceUnchanged:true,forbiddenCollectionsUnchanged:true,relationshipErrors:0,rollbackExecuted:false,nextRequiredStep:'PAULA_LIVE_VISUAL_VALIDATION'};
+          C.i65ApplyPayload={...(C.i65ApplyPayload||{}),status:'CONSUMED_TECHNICAL_PASS',narrowApplyAuthorized:false,dataWritesAuthorized:false,consumedRunId:art.runId,nextRequiredStep:'PAULA_LIVE_VISUAL_VALIDATION'};
+          C.postproductionDataUpdateControl.executionCursor='POST_WRITE_READBACK_INTEGRITY_PASS';C.postproductionDataUpdateControl.nextRequiredStep='USER_VISUAL_REFRESH_CHECK';C.nextAction='I6_5_USER_VISUAL_REFRESH_CHECK';
+          C.i65MiniClosurePlan={...(C.i65MiniClosurePlan||{}),blockCStatus:'TECHNICAL_PASS_PENDING_USER_VISUAL',nextMaterialCursor:'USER_VISUAL_REFRESH_CHECK',blockCTechnicalReceiptPath:process.env.I65_TECH_RECEIPT};
+          fs.writeFileSync(process.env.CONTROL,JSON.stringify(C,null,2)+'\n');
+          NODE
+          git config user.name "gravicentra-governance-bot"; git config user.email "actions@users.noreply.github.com"
+          git add "$CONTROL" "$I65_SOURCE_INTAKE" "$I65_REGISTRY" "$LEDGER" "$I65_TECH_RECEIPT"
+          git commit -m "recovery(i6.5): seal Recibos/Cartera technical pass"
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          git push origin HEAD:recovery/fase-a-clean-20260831
+      - name: Exact rollback if any post-apply step fails
+        if: ${{ steps.i65apply.outputs.run == 'true' && failure() }}
+        env:
+          I65_APPLY_RESULT_FILE: ${{ runner.temp }}/i65-rollback-result.json
+          I65_EXACT_ROLLBACK_FILE: ${{ runner.temp }}/i65-exact-rollback.private.json
+        run: |
+          set -euo pipefail
+          if [ ! -f "$I65_EXACT_ROLLBACK_FILE" ]; then
+            echo I65_NO_WRITES_ROLLBACK_NOT_REQUIRED
+            exit 0
+          fi
+          if [ -f "$RUNNER_TEMP/i65-apply-result.json" ] && node -e "const x=require(process.env.RUNNER_TEMP+'/i65-apply-result.json');process.exit(x.rollbackExecuted===true&&x.rollbackStatus==='PASS'?0:1)"; then
+            echo I65_ROLLBACK_ALREADY_PASS
+          else
+            node tools/gravicentra-i6-5-deterministic-apply.mjs --mode=rollback
+          fi
+      - name: Upload rollback evidence on failure
+        if: ${{ steps.i65apply.outputs.run == 'true' && failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i6-5-rollback-${{ github.run_id }}
+          path: ${{ runner.temp }}/i65-rollback-result.json
+          compression-level: 0
+          if-no-files-found: warn
+          retention-days: 30
+
+
+  i65-encrypted-diff-snapshot:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Resolve I6.5 encrypted diff snapshot applicability
+        id: snap
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          node - <<'NODE'
+          const fs=require('node:fs'),c=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8')),s=c.i65DeterministicDiffSnapshot||{};
+          const ok=c.nextAction==='I6_5_DETERMINISTIC_DIFF'&&c.i65MiniClosurePlan?.blockBStatus==='READ_PATH_HYDRATION_LIVE_PASS'&&s.status==='ENCRYPTED_LIVE_SNAPSHOT_PENDING'&&c.i6Execution?.dataMutationAuthorized===false&&c.i6Execution?.sourceDataApplyAuthorized===false;
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(ok?'true':'false')+'\n');
+          console.log('I65_DIFF_SNAPSHOT_APPLICABLE='+(ok?'true':'false'));
+          NODE
+      - name: Install encrypted snapshot dependency
+        if: steps.snap.outputs.run == 'true'
+        run: npm install --no-save --package-lock=false firebase-admin@13.4.0 >/dev/null
+      - name: Build encrypted LIVE baseline with zero writes
+        if: steps.snap.outputs.run == 'true'
+        env:
+          I65_DIFF_SNAPSHOT_FILE: ${{ runner.temp }}/i65-diff-live-snapshot.enc.json
+          I65_DIFF_PUBLIC_KEY: artifacts/orbit360-recovery/release-control/I6_5_DIFF_SNAPSHOT_PUBLIC_KEY_20260918.pem
+        run: node tools/gravicentra-i6-5-encrypted-live-snapshot.mjs
+      - name: Upload encrypted LIVE baseline
+        if: steps.snap.outputs.run == 'true'
+        id: snapart
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i6-5-encrypted-diff-live-snapshot-${{ github.run_id }}
+          path: ${{ runner.temp }}/i65-diff-live-snapshot.enc.json
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 1
+      - name: Freeze encrypted snapshot pointer
+        if: steps.snap.outputs.run == 'true'
+        env:
+          SNAP_ARTIFACT_ID: ${{ steps.snapart.outputs.artifact-id }}
+          SNAP_ARTIFACT_DIGEST: ${{ steps.snapart.outputs.artifact-digest }}
+          SNAP_FILE: ${{ runner.temp }}/i65-diff-live-snapshot.enc.json
+        run: |
+          set -euo pipefail
+          git fetch origin recovery/fase-a-clean-20260831
+          git reset --hard origin/recovery/fase-a-clean-20260831
+          node - <<'NODE'
+          const fs=require('node:fs'),C=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8')),E=JSON.parse(fs.readFileSync(process.env.SNAP_FILE,'utf8'));
+          const s=C.i65DeterministicDiffSnapshot||{};
+          if(s.status!=='ENCRYPTED_LIVE_SNAPSHOT_PENDING'||C.nextAction!=='I6_5_DETERMINISTIC_DIFF')throw new Error('I65_DIFF_SNAPSHOT_CURSOR_CHANGED');
+          if(E.encrypted!==true||E.writes!==0||E.operationalWrites!==0)throw new Error('I65_DIFF_SNAPSHOT_ENVELOPE_INVALID');
+          C.i65DeterministicDiffSnapshot={...s,status:'ENCRYPTED_LIVE_SNAPSHOT_READY',runId:Number(process.env.GITHUB_RUN_ID),artifactId:Number(process.env.SNAP_ARTIFACT_ID),artifactDigest:process.env.SNAP_ARTIFACT_DIGEST,plaintextSha256:E.plaintextSha256,compressedSha256:E.compressedSha256,sourceHeadSha:E.sourceHeadSha,counts:E.counts,writes:0,nextRequiredStep:'LOCAL_DECRYPT_AND_DETERMINISTIC_DIFF'};
+          fs.writeFileSync(process.env.CONTROL,JSON.stringify(C,null,2)+'\n');
+          NODE
+          git config user.name "gravicentra-governance-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add "$CONTROL"
+          git commit -m "recovery(i6.5): freeze encrypted LIVE diff snapshot"
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          git push origin HEAD:recovery/fase-a-clean-20260831
+
+
   i65-operational-closure-diagnostic:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
