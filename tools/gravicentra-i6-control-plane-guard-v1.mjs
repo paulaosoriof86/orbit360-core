@@ -258,10 +258,11 @@ if(i63DefectPending||i63DefectLive){
 if(i64DefectPending||i64DefectLive){
  need(i64CodeDefect.classification==='CODE_DEFECT','I6_4_DEFECT_CLASS_INVALID');
  need(i64CodeDefect.parentCertifiedSourceSha===C.preI64CertifiedCandidate?.sourceSha||i64CodeDefect.parentCertifiedSourceSha===C.certifiedCandidate?.sourceSha,'I6_4_DEFECT_PARENT_INVALID');
- need(Array.isArray(i64CodeDefect.allowedProductFiles)&&i64CodeDefect.allowedProductFiles.length===3,'I6_4_DEFECT_SCOPE_INVALID');
+ need(Array.isArray(i64CodeDefect.allowedProductFiles)&&i64CodeDefect.allowedProductFiles.length===4,'I6_4_DEFECT_SCOPE_INVALID');
  need(i64CodeDefect.allowedProductFiles.includes('orbit360-platform/modules/polizas.js'),'I6_4_DEFECT_POLIZAS_OWNER_MISSING');
  need(i64CodeDefect.allowedProductFiles.includes('orbit360-platform/modules/cliente360.js'),'I6_4_DEFECT_CLIENTE360_OWNER_MISSING');
  need(i64CodeDefect.allowedProductFiles.includes('orbit360-platform/modules/policy-receipts-v1199-bridge.js'),'I6_4_DEFECT_RUNTIME_BRIDGE_OWNER_MISSING');
+ need(i64CodeDefect.allowedProductFiles.includes('orbit360-platform/modules/policy-receipts-v1199-detail-guard.js'),'I6_4_DEFECT_DETAIL_GUARD_OWNER_MISSING');
  need(i64CodeDefect.reimportAuthorized===false&&i64CodeDefect.dataMutationAuthorized===false,'I6_4_DEFECT_DATA_BOUNDARY_INVALID');
  if(i64DefectLive){need(/^[0-9a-f]{40}$/.test(String(i64CodeDefect.sourceSha||'')),'I6_4_DEFECT_SOURCE_INVALID');need(i64CodeDefect.productionReadbackExact===true&&i64CodeDefect.functionalPass===true,'I6_4_DEFECT_LIVE_PROOF_INVALID');}
 }
