@@ -18,6 +18,8 @@ on:
       - 'tools/gravicentra-i6-3-client-completeness-audit.mjs'
       - 'tools/gravicentra-i6-3-identity-merge-executor.mjs'
       - 'tools/gravicentra-i6-4-live-readback.mjs'
+      - 'tools/gravicentra-i6-4-visual-correction.mjs'
+      - 'artifacts/orbit360-recovery/release-control/I6_4_VISUAL_CORRECTION_LOCK_20260918.json'
       - 'tools/gravicentra-i6-4-diff-snapshot.mjs'
       - 'tools/gravicentra-i6-4-delta-executor.mjs'
       - 'artifacts/orbit360-recovery/release-control/I6_4_DETERMINISTIC_DIFF_20260918.json'
@@ -892,5 +894,125 @@ jobs:
           git config user.email "actions@users.noreply.github.com"
           git add "$CONTROL" "$I64_SOURCE_INTAKE"
           git commit -m "recovery(i6.4): seal policy-risk delta technical pass"
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          git push origin HEAD:recovery/fase-a-clean-20260831
+
+
+  i64-visual-correction:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      I64_SOURCE_INTAKE: artifacts/orbit360-recovery/release-control/I6_4_POLIZAS_RIESGOS_SOURCE_INTAKE_20260918.json
+      I64_CORRECTION_LOCK: artifacts/orbit360-recovery/release-control/I6_4_VISUAL_CORRECTION_LOCK_20260918.json
+      I64_REGISTRY: artifacts/orbit360-recovery/release-control/DATA_UPDATE_MECHANISM_REGISTRY.json
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Resolve I6.4 visual correction applicability
+        id: corr
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const c=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8'));
+          const s=JSON.parse(fs.readFileSync(process.env.I64_SOURCE_INTAKE,'utf8'));
+          const l=JSON.parse(fs.readFileSync(process.env.I64_CORRECTION_LOCK,'utf8'));
+          const ok=c.gateState?.gates?.I6?.activeSubgate==='I6.4' &&
+            c.i64VisualCorrection?.status==='AUTHORIZED_PENDING_APPLY' &&
+            c.i64VisualCorrection?.userAuthorized===true &&
+            c.i6Execution?.dataMutationAuthorized===true &&
+            s.execution?.cursorState==='POST_WRITE_READBACK_INTEGRITY_PASS' &&
+            l.status==='AUTHORIZED_PENDING_APPLY';
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(ok?'true':'false')+'\n');
+          console.log('I64_VISUAL_CORRECTION_APPLICABLE='+(ok?'true':'false'));
+          NODE
+      - name: Install visual correction proof dependencies
+        if: steps.corr.outputs.run == 'true'
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false playwright@1.55.0 firebase-admin@13.4.0 >/dev/null
+          npx playwright install --with-deps chromium >/dev/null
+      - name: Apply causal visual correction with LIVE readback
+        if: steps.corr.outputs.run == 'true'
+        env:
+          I64_CORRECTION_EVIDENCE_FILE: ${{ runner.temp }}/i64-visual-correction.json
+        run: node tools/gravicentra-i6-4-visual-correction.mjs
+      - name: Upload I6.4 visual correction evidence
+        if: ${{ steps.corr.outputs.run == 'true' && always() }}
+        id: corrart
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i6-4-visual-correction-${{ github.run_id }}
+          path: ${{ runner.temp }}/i64-visual-correction.json
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 30
+      - name: Seal I6.4 visual correction pending Paula acceptance
+        if: ${{ steps.corr.outputs.run == 'true' && success() }}
+        env:
+          CORR_ARTIFACT_ID: ${{ steps.corrart.outputs.artifact-id }}
+          CORR_ARTIFACT_DIGEST: ${{ steps.corrart.outputs.artifact-digest }}
+        run: |
+          set -euo pipefail
+          git fetch origin recovery/fase-a-clean-20260831
+          git reset --hard origin/recovery/fase-a-clean-20260831
+          export I64_CORR_EVIDENCE="$RUNNER_TEMP/i64-visual-correction.json"
+          node - <<'NODE'
+          const fs=require('node:fs'),{execFileSync}=require('node:child_process');
+          const C=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8'));
+          const S=JSON.parse(fs.readFileSync(process.env.I64_SOURCE_INTAKE,'utf8'));
+          const L=JSON.parse(fs.readFileSync(process.env.I64_CORRECTION_LOCK,'utf8'));
+          const R=JSON.parse(fs.readFileSync(process.env.I64_REGISTRY,'utf8'));
+          const E=JSON.parse(fs.readFileSync(process.env.I64_CORR_EVIDENCE,'utf8'));
+          if(E.status!=='PASS'||E.writes!==320||E.batchesCommitted!==4||E.domiciliado?.policiesAfter!==0||E.countryCurrency?.afterMismatches!==0||E.nonPolicyCollectionsUnchanged!==true||E.functional?.status!=='PASS'||E.rollback?.executed===true)throw new Error('I64_VISUAL_CORRECTION_EVIDENCE_INVALID');
+          const artifact={runId:Number(process.env.GITHUB_RUN_ID),artifactId:Number(process.env.CORR_ARTIFACT_ID),artifactDigest:process.env.CORR_ARTIFACT_DIGEST};
+          C.i64VisualCorrection={...(C.i64VisualCorrection||{}),status:'APPLIED_READBACK_INTEGRITY_FUNCTIONAL_PASS',...artifact,writes:E.writes,fieldChanges:E.fieldChanges,domiciliado:E.domiciliado,countryCurrency:E.countryCurrency,rollbackExecuted:false};
+          C.i6Execution.dataMutationAuthorized=false;
+          C.gateState.gates.I6.dataMutationAuthorized=false;
+          C.i6Execution.activeModuleStatus='POST_WRITE_READBACK_INTEGRITY_PASS';
+          C.i6Execution.i6_4={...(C.i6Execution.i6_4||{}),visualCorrectionStatus:'APPLIED_READBACK_INTEGRITY_FUNCTIONAL_PASS',visualCorrectionRunId:artifact.runId,visualCorrectionArtifactId:artifact.artifactId,visualCorrectionArtifactDigest:artifact.artifactDigest,visualCorrectionWrites:E.writes,domiciliadoRemaining:0,countryCurrencyMismatchesRemaining:0,paulaVisualAcceptance:'PENDING'};
+          C.nextAction='I6_4_USER_VISUAL_REFRESH_CHECK';
+          C.postproductionDataUpdateControl.executionCursor='POST_WRITE_READBACK_INTEGRITY_PASS';
+          C.postproductionDataUpdateControl.nextRequiredStep='USER_VISUAL_REFRESH_CHECK';
+
+          S.businessRuleCorrections.i64VisualCorrection={...(S.businessRuleCorrections.i64VisualCorrection||{}),status:'APPLIED_READBACK_INTEGRITY_FUNCTIONAL_PASS',...artifact,writes:E.writes,fieldChanges:E.fieldChanges};
+          S.execution.visualCorrectionStatus='APPLIED_READBACK_INTEGRITY_FUNCTIONAL_PASS';
+          S.execution.visualCorrectionRunId=artifact.runId;
+          S.execution.visualCorrectionArtifactId=artifact.artifactId;
+          S.execution.visualCorrectionArtifactDigest=artifact.artifactDigest;
+          S.execution.visualCorrectionWrites=E.writes;
+          S.execution.nextRequiredStep='USER_VISUAL_REFRESH_CHECK';
+
+          L.status='APPLIED_READBACK_INTEGRITY_FUNCTIONAL_PASS';
+          L.evidence=artifact;
+          L.result={writes:E.writes,fieldChanges:E.fieldChanges,domiciliado:E.domiciliado,countryCurrency:E.countryCurrency,nonPolicyCollectionsUnchanged:E.nonPolicyCollectionsUnchanged,relations:E.relations,functional:E.functional};
+
+          R.modules.POLIZAS_RIESGOS_VEHICULOS.businessRuleCorrection={...(R.modules.POLIZAS_RIESGOS_VEHICULOS.businessRuleCorrection||{}),status:'APPLIED_READBACK_INTEGRITY_FUNCTIONAL_PASS',effective:true,...artifact,writes:E.writes,domiciliadoRemaining:0,countryCurrencyMismatchesRemaining:0};
+
+          fs.writeFileSync(process.env.I64_SOURCE_INTAKE,JSON.stringify(S,null,2)+'\n');
+          fs.writeFileSync(process.env.I64_CORRECTION_LOCK,JSON.stringify(L,null,2)+'\n');
+          fs.writeFileSync(process.env.I64_REGISTRY,JSON.stringify(R,null,2)+'\n');
+          const sourceBlob=execFileSync('git',['hash-object',process.env.I64_SOURCE_INTAKE],{encoding:'utf8'}).trim();
+          const registryBlob=execFileSync('git',['hash-object',process.env.I64_REGISTRY],{encoding:'utf8'}).trim();
+          C.i6Execution.activeSourceIntakeBlobSha=sourceBlob;
+          C.postproductionDataUpdateControl.activeSourceIntakeBlobSha=sourceBlob;
+          C.i6Execution.mechanismRegistryBlobSha=registryBlob;
+          C.postproductionDataUpdateControl.mechanismRegistryBlobSha=registryBlob;
+          fs.writeFileSync(process.env.CONTROL,JSON.stringify(C,null,2)+'\n');
+          NODE
+          git config user.name "gravicentra-governance-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add "$CONTROL" "$I64_SOURCE_INTAKE" "$I64_CORRECTION_LOCK" "$I64_REGISTRY"
+          git commit -m "recovery(i6.4): seal causal country currency and payment normalization"
           node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
           git push origin HEAD:recovery/fase-a-clean-20260831

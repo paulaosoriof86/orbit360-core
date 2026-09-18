@@ -320,7 +320,9 @@
     },
     "postWriteReadbackPassed": true,
     "integrityPassed": true,
-    "functionalPassed": true
+    "functionalPassed": true,
+    "visualCorrectionCycle": 2,
+    "visualCorrectionStatus": "AUTHORIZED_PENDING_APPLY"
   },
   "guards": {
     "doNotCommitPIISourceFiles": true,
@@ -331,5 +333,26 @@
     "preserveIdentityAliases": true,
     "writeContractReuseRequired": true,
     "userVisualRequiredBeforeClosure": true
+  },
+  "businessRuleCorrections": {
+    "i64VisualCorrection": {
+      "status": "AUTHORIZED_PENDING_APPLY",
+      "lockPath": "artifacts/orbit360-recovery/release-control/I6_4_VISUAL_CORRECTION_LOCK_20260918.json",
+      "classification": "SECOND_CYCLE_CAUSAL_DATA_CORRECTION",
+      "userAuthorized": true,
+      "paymentNormalization": {
+        "from": "Domiciliado",
+        "to": "Transferencia",
+        "scope": "formaPago OR conductoPago",
+        "expectedPolicies": 319
+      },
+      "countryCurrency": {
+        "deterministicCorrections": 2,
+        "rule": "INSURER_AND_CANONICAL_CLIENT_EVIDENCE_OVERRIDE_CONTRADICTORY_SOURCE_DIVISA; PRESERVE_GENUINE_USD",
+        "mayraPolicyId": "pol_6fc005003a2ba6d52bdba67188ed",
+        "axaSiblingPolicyId": "pol_dda1a827b1c4443567870abeee8e"
+      },
+      "receiptsAndCartera": "NO_WRITES_IN_I6_4; FROZEN_RECONCILIATION_RULES_APPLY_FROM_I6_5_WITH_NEW_COBRANZA_AND_COMMISSION_EVIDENCE"
+    }
   }
 }

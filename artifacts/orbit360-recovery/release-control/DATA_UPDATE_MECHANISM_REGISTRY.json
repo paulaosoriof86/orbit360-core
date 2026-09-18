@@ -115,7 +115,27 @@
       "supplementRule": "SUPPLEMENTS_ENRICH_MATCHING_PRIMARY_POLICY_EDITIONS; NO_POLICY_INSERT_FROM_SUPPLEMENT_ONLY",
       "currentGate": "I6.4",
       "nextMaterialStep": "LIVE_READBACK_CURRENT_STATE",
-      "resumeCursor": "SOURCE_PINNED"
+      "resumeCursor": "SOURCE_PINNED",
+      "businessRuleCorrection": {
+        "status": "AUTHORIZED_PENDING_APPLY",
+        "lockPath": "artifacts/orbit360-recovery/release-control/I6_4_VISUAL_CORRECTION_LOCK_20260918.json",
+        "cycle": 2,
+        "domicilioLegacyNormalization": "Domiciliado -> Transferencia",
+        "countryCurrencyEvidencePriority": [
+          "insurer country",
+          "canonical client country",
+          "phone/address/current client evidence",
+          "same-client insurer continuity",
+          "source Divisa"
+        ],
+        "preserveExplicitUsd": true,
+        "receiptReconciliationDeferredTo": [
+          "I6.5",
+          "I6.6",
+          "I6.7"
+        ],
+        "reimport": false
+      }
     },
     "RECIBOS_CARTERA": {
       "gate": "I6.5",

@@ -1,0 +1,112 @@
+{
+  "schema": "GRAVICENTRA_I6_4_VISUAL_CORRECTION_LOCK_V1",
+  "status": "AUTHORIZED_PENDING_APPLY",
+  "date": "2026-09-18",
+  "gate": "I6.4",
+  "module": "POLIZAS_RIESGOS_VEHICULOS",
+  "classification": "SECOND_CYCLE_CAUSAL_DATA_CORRECTION",
+  "authorizedBy": "Paula",
+  "userAuthorized": true,
+  "reason": [
+    "LIVE visual review detected a source contradiction that regressed Mayra Karina Garcia Fernandez policy UTO-1000001645 from GT/GTQ to CO/COP despite canonical client country GT and insurer Ficohsa GT.",
+    "LIVE visual review confirmed legacy payment method Domiciliado must be normalized to Transferencia; Domiciliado is no longer an operative payment method."
+  ],
+  "frozenBusinessRules": {
+    "countryCurrency": {
+      "rule": "Do not blindly trust source Divisa when it contradicts stronger market identity evidence.",
+      "evidencePriority": [
+        "insurer country and insurer identity",
+        "canonical client country",
+        "client phone/address and other current client evidence",
+        "same-client same-insurer policy continuity",
+        "source Divisa"
+      ],
+      "guatemala": "GT policies use GTQ unless a genuine explicit USD contract is evidenced.",
+      "colombia": "CO policies use COP unless a genuine explicit USD contract is evidenced.",
+      "explicitUsd": "Preserve genuine explicit USD policies; do not normalize USD merely from country.",
+      "deterministicCorrections": [
+        {
+          "policyId": "pol_6fc005003a2ba6d52bdba67188ed",
+          "expectedInsurerId": "gt-seguros-ficohsa",
+          "expectedClientId": "cli_siga_3c96785d46080aa47e",
+          "from": {
+            "pais": "CO",
+            "moneda": "COP"
+          },
+          "to": {
+            "pais": "GT",
+            "moneda": "GTQ"
+          },
+          "reason": "INSURER_GT_AND_CANONICAL_CLIENT_GT_OVERRIDE_CONTRADICTORY_SOURCE_DIVISA"
+        },
+        {
+          "policyId": "pol_dda1a827b1c4443567870abeee8e",
+          "expectedInsurerId": "co-axa-colpatria",
+          "expectedClientId": "cli_siga_5e987d972fbd309c7217",
+          "from": {
+            "pais": "GT",
+            "moneda": "GTQ"
+          },
+          "to": {
+            "pais": "CO",
+            "moneda": "COP"
+          },
+          "reason": "CO_INSURER_PLUS_SAME_CLIENT_POLICY_CONTINUITY"
+        }
+      ]
+    },
+    "paymentMethod": {
+      "legacyValue": "Domiciliado",
+      "canonicalReplacement": "Transferencia",
+      "scope": "ALL_LIVE_POLICIES_WHERE_formaPago_OR_conductoPago_EQUALS_DOMICILIADO",
+      "preserve": [
+        "frecuencia",
+        "prima",
+        "estado",
+        "vigencia",
+        "client and insurer links",
+        "receipts/cartera/cobros/commissions"
+      ],
+      "expectedPolicies": 319,
+      "expectedFormaPagoChanges": 170,
+      "expectedConductoPagoChanges": 319
+    },
+    "receiptsAndCartera": {
+      "status": "FROZEN_FOR_NEXT_GATES_NOT_APPLIED_IN_I6_4",
+      "noReceiptWritesInI64": true,
+      "noCarteraWritesInI64": true,
+      "rules": [
+        "Cancelled, historical, renewed-previous-edition, expired or otherwise non-current policies must not receive synthetic pending receipts merely from payment frequency.",
+        "For historical/non-current policies, only receipts actually evidenced as collected may be materialized; they must not create current cartera.",
+        "Insurer account statements/current insurer cartera are primary evidence for whether an obligation remains open at the insurer.",
+        "Commission settlement sheets are payment evidence. When a later sequential installment is evidenced as paid, earlier installments in the same regular sequence may be classified paid/collected only when the source chain supports monotonic sequencing and there is no contrary evidence.",
+        "For an active policy with periodic payments, once the last evidenced paid installment is established, future contractual installments after that point may become pending cartera through policy end, subject to insurer-account evidence and no contradictory cancellation/termination evidence.",
+        "Do not infer historical arrears from frequency alone.",
+        "Receipts, cartera and reconciliation must be handled in I6.5/I6.6 using the current source files Paula will provide; commissions corroboration belongs to I6.7."
+      ],
+      "pendingEvidenceSources": [
+        "insurer cobranza/account-statement Excel files",
+        "commission settlement/planilla Excel files",
+        "current policy contract/term data already frozen in I6.4"
+      ]
+    }
+  },
+  "applyContract": {
+    "expectedLivePolicyCountBefore": 1414,
+    "expectedLiveVehicleCountBefore": 1063,
+    "expectedCanonicalClients": 439,
+    "expectedDomiciliadoPolicies": 319,
+    "expectedUniquePolicyWrites": 320,
+    "expectedCountryCurrencyCorrections": 2,
+    "expectedDeletes": 0,
+    "writePath": "orbit360ProductOperationalCommand",
+    "rollbackRequired": true,
+    "reimportAuthorized": false,
+    "receiptsWritesAuthorized": false,
+    "carteraWritesAuthorized": false,
+    "cobrosWritesAuthorized": false,
+    "commissionWritesAuthorized": false,
+    "sourceRebuildAuthorized": false
+  },
+  "closure": "POST_WRITE_READBACK_INTEGRITY_PASS_THEN_PAULA_VISUAL_ACCEPTANCE"
+}
