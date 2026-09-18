@@ -148,7 +148,7 @@
   },
   "execution": {
     "method": "DATA_UPDATE_DELTA_FIRST",
-    "cursorState": "POST_WRITE_READBACK_INTEGRITY_PASS",
+    "cursorState": "PENDING_USER_VISUAL",
     "writeApplied": true,
     "readbackPassed": true,
     "deterministicDiffReady": true,
@@ -326,7 +326,20 @@
     "visualCorrectionRunId": 35342948207,
     "visualCorrectionArtifactId": 10545429790,
     "visualCorrectionArtifactDigest": "73f0faf00ea1833b9cf39e5625cef58e6569ed846bb21cb552ccf99b2475ed32",
-    "visualCorrectionWrites": 320
+    "visualCorrectionWrites": 320,
+    "liveVisualConfirmed": false,
+    "codeDefect": {
+      "status": "TECHNICAL_LIVE_PASS_PENDING_PAULA_VISUAL",
+      "releaseRunId": 35364888190,
+      "policyCount": 1414,
+      "kpiAmounts": {
+        "GTQ": 627419,
+        "COP": 175456570
+      },
+      "renewals45Count": 11,
+      "historicalNoPortfolioCount": 1191,
+      "renewabilityUnknownDisplay": "Renovabilidad pendiente de validar"
+    }
   },
   "guards": {
     "doNotCommitPIISourceFiles": true,

@@ -11,11 +11,11 @@
   "previousLedgerBlobSha": "09c98a60b3221da29931ea32611fcf528c7f8af7",
   "previousLedgerEvidencePreservedByGitHistory": true,
   "releaseBinding": {
-    "sourceSha": "9fff255410675c6dbf319ddf1d684b663420bae0",
-    "buildId": "gi-i63-9fff25541067-57f234755dc1",
-    "artifactId": 10536783955,
-    "artifactArchiveDigest": "065f0841c37ffeb335521f0532ddace2d1000f2fad83be5b9d376a4e6dd7114a",
-    "previewChannelId": "gi-i63-35321985423"
+    "sourceSha": "8bf2642d767e86718b559e1a3d2bdb178d34eacd",
+    "buildId": "gi-i64-8bf2642d767e-57f234755dc1",
+    "artifactId": 10555384684,
+    "artifactArchiveDigest": "d33b1947830f6f28891c3566b0bde78c8996ebe88cd4d1775ba6ab5d54b28693",
+    "previewChannelId": "gi-i64-35364888190"
   },
   "successorCandidate": {
     "sourceSha": "03b03690b5583442dd448e954fb66c3c78648fb3",
@@ -521,6 +521,12 @@
             "artifactId": 10311055390,
             "artifactDigest": "sha256:5aad2082722a0c8eedcc3d2b6d48c702c1fab8ad3d57815f4bf5382963747ceb",
             "evidence": "Pólizas route, read model and relationship checks passed in both terminal LIVE matrices."
+          },
+          {
+            "runId": 35364888190,
+            "artifactId": 10555384684,
+            "artifactDigest": "d33b1947830f6f28891c3566b0bde78c8996ebe88cd4d1775ba6ab5d54b28693",
+            "evidence": "I6.4 causal successor technical LIVE proof: policy KPIs separated by currency, temporal 45-day renewals, complete historical/no-portfolio semantics, and tri-state renewability display. Paula visual acceptance pending."
           }
         ]
       }
@@ -607,6 +613,21 @@
     "cliente360Clients": 442,
     "controlSamples": 5,
     "kpi": "PRIMA_NETA_VIGENTE_BY_CURRENCY",
+    "unaffectedCapabilitiesPreserved": true
+  },
+  "i64LiveAcceptance": {
+    "status": "TECHNICAL_LIVE_PASS_PENDING_PAULA_VISUAL",
+    "sourceSha": "8bf2642d767e86718b559e1a3d2bdb178d34eacd",
+    "buildId": "gi-i64-8bf2642d767e-57f234755dc1",
+    "artifactId": 10555384684,
+    "liveRunId": 35364888190,
+    "policies": 1414,
+    "kpis": [
+      "PRIMA_NETA_VIGENTE_BY_CURRENCY",
+      "RENEWALS_45D",
+      "HISTORICAL_NO_PORTFOLIO"
+    ],
+    "renewabilityTriState": true,
     "unaffectedCapabilitiesPreserved": true
   }
 }
