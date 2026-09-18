@@ -1,6 +1,6 @@
 {
   "schema": "GRAVICENTRA_I6_2_DIRECTORIO_SOURCE_INTAKE_V3",
-  "status": "PINNED_FOR_V5_DELTA",
+  "status": "I6_2_DIRECTORIO_LIVE_PASS",
   "date": "2026-09-17",
   "productBrand": "Gravicentra Insurance",
   "module": "ASEGURADORAS_OPERATIONAL_DIRECTORY",
@@ -15,14 +15,20 @@
   "reason": "Current user-supplied workbook physically fingerprinted in the active execution environment and canonically repinned for Evergreen V5 delta-first execution.",
   "execution": {
     "method": "DATA_UPDATE_DELTA_FIRST",
-    "cursorState": "LIVE_READBACK_PASS",
-    "writeApplied": false,
+    "cursorState": "LIVE_PASS",
+    "writeApplied": true,
+    "applyRunId": 35300186514,
+    "operationalMutations": 14,
+    "credentialUpdates": 3,
     "readbackPassed": true,
-    "readbackRunId": 35230577501,
-    "readbackDocumentCount": 30,
-    "readbackWritesExecuted": 0,
-    "liveVisualConfirmed": false,
-    "nextRequiredStep": "DETERMINISTIC_DIFF"
+    "readbackRunId": 35300186514,
+    "readbackDocumentCount": 31,
+    "readbackWritesExecuted": 17,
+    "liveVisualConfirmed": true,
+    "roleRegressionRunId": 35300483580,
+    "sealRunId": 35300781558,
+    "evidenceReceipt": "artifacts/orbit360-recovery/release-control/I6_2_DIRECTORIO_LIVE_PASS_20260918.json",
+    "nextRequiredStep": "MODULE_CLOSED"
   },
   "guards": {
     "doNotUsePriorHashAsCurrent": true,
