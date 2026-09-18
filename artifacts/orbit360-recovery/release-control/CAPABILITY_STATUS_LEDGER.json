@@ -622,18 +622,36 @@
     "unaffectedCapabilitiesPreserved": true
   },
   "i64LiveAcceptance": {
-    "status": "TECHNICAL_LIVE_PASS_PENDING_PAULA_VISUAL",
+    "status": "I6_4_POLIZAS_RIESGOS_LIVE_PASS",
     "sourceSha": "8838aa98abf8573064f8e160389cf6f1c554bdc1",
     "buildId": "gi-i64-8838aa98abf8-57f234755dc1",
     "artifactId": 10556619616,
     "liveRunId": 35368653501,
     "policies": 1414,
+    "vehicles": 1063,
     "kpis": [
       "PRIMA_NETA_VIGENTE_BY_CURRENCY",
       "RENEWALS_45D",
       "HISTORICAL_NO_PORTFOLIO"
     ],
     "renewabilityTriState": true,
-    "unaffectedCapabilitiesPreserved": true
+    "buildBoundAssets": true,
+    "pwaBuildFreshnessFence": true,
+    "unaffectedCapabilitiesPreserved": true,
+    "humanAcceptance": {
+      "status": "ACCEPTED",
+      "acceptedBy": "Paula",
+      "acceptedAt": "2026-09-18T10:49:56-06:00"
+    },
+    "closureReceiptPath": "artifacts/orbit360-recovery/release-control/I6_4_POLIZAS_RIESGOS_LIVE_PASS_20260918.json",
+    "frozen": true,
+    "reopenOnlyOn": "CONCRETE_REPRODUCIBLE_CAUSAL_REGRESSION"
+  },
+  "i65SourceIntake": {
+    "status": "SOURCE_PINNED_SYNC_PREFLIGHT_BLOCK",
+    "sourceBundleSha256": "f445e2f4a20b9eb7a526bda8896472dab9e7ac4617b3c5d8124a939a0dee0e6a",
+    "sourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_5_RECIBOS_CARTERA_SOURCE_INTAKE_20260918.json",
+    "syncPreflightPath": "artifacts/orbit360-recovery/release-control/I6_5_SYNC_COMPOSITION_PREFLIGHT_20260918.json",
+    "writes": 0
   }
 }
