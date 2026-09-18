@@ -52,7 +52,7 @@ function decryptPayload(envelope,privateKey){
   return JSON.parse(plain.toString('utf8'));
 }
 function rolesOf(m){
-  return [...new Set([].concat(m?.roles||[],m?.rolesAsignados||[],m?.assignedRoles||[],m?.role||[],m?.rol||[],m?.rolDefault||[]).map(clean).filter(Boolean))];
+  return [...new Set([].concat(m?.roles||[],m?.rolesAsignados||[],m?.assignedRoles||[],m?.rolesDisponibles||[],m?.role||[],m?.rol||[],m?.rolDefault||[]).map(v=>clean(v)).filter(Boolean))];
 }
 async function selectManager(db,auth){
   const snap=await db.collection('tenants').doc(TENANT).collection('members').get();
