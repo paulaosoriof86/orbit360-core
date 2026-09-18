@@ -11,6 +11,9 @@ on:
       - 'artifacts/orbit360-recovery/release-control/I6_4_POLIZAS_RIESGOS_SOURCE_INTAKE_20260918.json'
       - 'artifacts/orbit360-recovery/release-control/I6_5_RECIBOS_CARTERA_SOURCE_INTAKE_20260918.json'
       - 'artifacts/orbit360-recovery/release-control/I6_5_SYNC_COMPOSITION_PREFLIGHT_20260918.json'
+      - 'tools/gravicentra-i6-5-deterministic-apply.mjs'
+      - 'artifacts/orbit360-recovery/release-control/I6_5_DETERMINISTIC_APPLY_AUTH_LOCK_20260918.json'
+      - 'artifacts/orbit360-recovery/release-control/I6_5_DETERMINISTIC_APPLY_PAYLOAD_20260918.enc.json'
       - 'tools/gravicentra-i6-5-sync-contract.mjs'
       - 'tools/gravicentra-i6-5-sync-functional.mjs'
       - 'orbit360-platform/index.html'
@@ -1495,6 +1498,144 @@ jobs:
           git commit -m "recovery(i6.5): freeze apply encryption public key"
           node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
           git push origin HEAD:recovery/fase-a-clean-20260831
+
+
+  i65-deterministic-apply:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      I65_SOURCE_INTAKE: artifacts/orbit360-recovery/release-control/I6_5_RECIBOS_CARTERA_SOURCE_INTAKE_20260918.json
+      I65_DIFF: artifacts/orbit360-recovery/release-control/I6_5_DETERMINISTIC_DIFF_20260918.json
+      I65_APPLY_ENCRYPTED: artifacts/orbit360-recovery/release-control/I6_5_DETERMINISTIC_APPLY_PAYLOAD_20260918.enc.json
+      I65_REGISTRY: artifacts/orbit360-recovery/release-control/DATA_UPDATE_MECHANISM_REGISTRY.json
+      I65_TECH_RECEIPT: artifacts/orbit360-recovery/release-control/I6_5_RECIBOS_CARTERA_TECHNICAL_PASS_20260918.json
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Resolve I6.5 deterministic apply applicability
+        id: i65apply
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          node - <<'NODE'
+          const fs=require('node:fs'),c=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8')),s=JSON.parse(fs.readFileSync(process.env.I65_SOURCE_INTAKE,'utf8')),d=JSON.parse(fs.readFileSync(process.env.I65_DIFF,'utf8'));
+          const ok=c.gateState?.gates?.I6?.activeSubgate==='I6.5'&&c.nextAction==='I6_5_APPLY_DETERMINISTIC_DELTA'&&s.execution?.cursorState==='DETERMINISTIC_DIFF_READY'&&d.status==='DETERMINISTIC_DIFF_READY'&&c.i65ApplyPayload?.status==='ENCRYPTED_PAYLOAD_READY'&&c.i65DeterministicApply?.status==='AUTHORIZED_PENDING_APPLY'&&c.i65DeterministicApply?.userAuthorized===true;
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(ok?'true':'false')+'\n');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'cert_source='+(c.certifiedCandidate?.sourceSha||'')+'\n');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'cert_build='+(c.certifiedCandidate?.buildId||'')+'\n');
+          console.log('I65_APPLY_APPLICABLE='+(ok?'true':'false'));
+          NODE
+      - name: Install apply and authenticated functional dependencies
+        if: steps.i65apply.outputs.run == 'true'
+        run: |
+          npm install --no-save --package-lock=false playwright@1.55.0 firebase-admin@13.4.0 >/dev/null
+          npx playwright install --with-deps chromium >/dev/null
+      - name: Apply exact deterministic Recibos/Cartera delta
+        if: steps.i65apply.outputs.run == 'true'
+        env:
+          I65_APPLY_RESULT_FILE: ${{ runner.temp }}/i65-apply-result.json
+          I65_EXACT_ROLLBACK_FILE: ${{ runner.temp }}/i65-exact-rollback.private.json
+        run: node tools/gravicentra-i6-5-deterministic-apply.mjs --mode=apply
+      - name: Authenticated LIVE functional readback after apply
+        if: steps.i65apply.outputs.run == 'true'
+        env:
+          TARGET_URL: https://ays-orbit-360-lab.web.app
+          EXPECTED_SOURCE_SHA: ${{ steps.i65apply.outputs.cert_source }}
+          EXPECTED_BUILD_ID: ${{ steps.i65apply.outputs.cert_build }}
+          I65_PROOF_STAGE: postwrite
+          I65_PROOF_FILE: ${{ runner.temp }}/i65-postwrite-functional.json
+        run: node tools/gravicentra-i6-5-sync-functional.mjs
+      - name: Upload sanitized I6.5 apply evidence
+        if: ${{ steps.i65apply.outputs.run == 'true' && always() }}
+        id: i65applyart
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i6-5-apply-readback-integrity-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/i65-apply-result.json
+            ${{ runner.temp }}/i65-postwrite-functional.json
+          compression-level: 0
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Seal I6.5 technical pass pending Paula visual acceptance
+        if: ${{ steps.i65apply.outputs.run == 'true' && success() }}
+        env:
+          APPLY_ARTIFACT_ID: ${{ steps.i65applyart.outputs.artifact-id }}
+          APPLY_ARTIFACT_DIGEST: ${{ steps.i65applyart.outputs.artifact-digest }}
+          APPLY_RESULT: ${{ runner.temp }}/i65-apply-result.json
+          FUNCTIONAL_RESULT: ${{ runner.temp }}/i65-postwrite-functional.json
+        run: |
+          set -euo pipefail
+          git fetch origin recovery/fase-a-clean-20260831
+          git reset --hard origin/recovery/fase-a-clean-20260831
+          node - <<'NODE'
+          const fs=require('node:fs'),{execFileSync}=require('node:child_process');
+          const C=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8')),S=JSON.parse(fs.readFileSync(process.env.I65_SOURCE_INTAKE,'utf8')),R=JSON.parse(fs.readFileSync(process.env.I65_REGISTRY,'utf8')),L=JSON.parse(fs.readFileSync(process.env.LEDGER,'utf8')),A=JSON.parse(fs.readFileSync(process.env.APPLY_RESULT,'utf8')),F=JSON.parse(fs.readFileSync(process.env.FUNCTIONAL_RESULT,'utf8'));
+          if(A.status!=='PASS'||A.writes!==2227||A.rollbackExecuted!==false||A.forbiddenUnchanged!==true||A.legacyUnchanged!==true||A.unrelatedAllowedDocsUnchanged!==true||A.relationships?.total!==0)throw new Error('I65_APPLY_EVIDENCE_INVALID');
+          if(A.countsAfter?.recibosEsperados!==1842||A.countsAfter?.carteraPrimas!==1283||A.countsAfter?.polizas!==1414||A.countsAfter?.clientes!==442||A.countsAfter?.aseguradoras!==31||A.countsAfter?.vehiculos!==1063||A.countsAfter?.cobros!==5||A.countsAfter?.finmovs!==0||A.countsAfter?.renovaciones!==0)throw new Error('I65_POSTWRITE_COUNTS_INVALID');
+          if(F.status!=='PASS'||F.counts?.recibosEsperados!==1842||F.counts?.carteraPrimas!==1283||F.directCounts?.recibosEsperados!==1842||F.directCounts?.carteraPrimas!==1283||F.i64Sentinels?.policies!==1414||F.i64Sentinels?.renewals!==11||F.i64Sentinels?.historical!==1191||F.writes!==0)throw new Error('I65_FUNCTIONAL_POSTWRITE_INVALID');
+          const art={runId:Number(process.env.GITHUB_RUN_ID),artifactId:Number(process.env.APPLY_ARTIFACT_ID),artifactDigest:process.env.APPLY_ARTIFACT_DIGEST};
+          S.execution.cursorState='POST_WRITE_READBACK_INTEGRITY_PASS';S.execution.writeApplied=true;S.execution.writes=2227;S.execution.applyRunId=art.runId;S.execution.applyArtifactId=art.artifactId;S.execution.applyArtifactDigest=art.artifactDigest;
+          S.execution.appliedCounts={receiptInserts:548,receiptUpdates:798,receiptDeletes:0,portfolioInserts:634,portfolioUpdates:223,portfolioDeletes:24,operationalWrites:2227,holds:36};
+          S.execution.liveCountsAfter={polizas:1414,clientes:442,aseguradoras:31,vehiculos:1063,recibosEsperados:1842,carteraPrimas:1283,cobros:5,finmovs:0,renovaciones:0};
+          S.execution.postWriteReadbackPassed=true;S.execution.integrityPassed=true;S.execution.functionalPassed=true;S.execution.legacyNamespaceUnchanged=true;S.execution.nextRequiredStep='USER_VISUAL_REFRESH_CHECK';
+          fs.writeFileSync(process.env.I65_SOURCE_INTAKE,JSON.stringify(S,null,2)+'\n');
+
+          R.modules.RECIBOS_CARTERA.resumeCursor='POST_WRITE_READBACK_INTEGRITY_PASS';R.modules.RECIBOS_CARTERA.nextMaterialStep='USER_VISUAL_REFRESH_CHECK';R.modules.RECIBOS_CARTERA.dataWritesAuthorized=false;R.modules.RECIBOS_CARTERA.cobrosWritesAuthorized=false;
+          R.modules.RECIBOS_CARTERA.technicalApply={status:'PASS_PENDING_USER_VISUAL',...art,writes:2227,receiptCount:1842,portfolioCount:1283,cobrosCount:5,holds:36,legacyNamespaceUnchanged:true,forbiddenCollectionsUnchanged:true,relationshipErrors:0};
+          fs.writeFileSync(process.env.I65_REGISTRY,JSON.stringify(R,null,2)+'\n');
+
+          L.i65DataUpdateTechnicalAcceptance={status:'PASS_PENDING_PAULA_VISUAL',...art,sourceBundleSha256:S.sourceBundle.sha256,deterministicDiffSha256:'c1cf6d0c62d4dd30bfa80c70abfa7a8751e58630c2ffcc3484e5544d76e55749',writes:2227,receiptCount:1842,portfolioCount:1283,cobrosCount:5,holds:36,legacyNamespaceUnchanged:true,forbiddenCollectionsUnchanged:true,relationshipErrors:0,functionalPass:true,i64SentinelsPreserved:true};
+          fs.writeFileSync(process.env.LEDGER,JSON.stringify(L,null,2)+'\n');
+
+          const receipt={schema:'GRAVICENTRA_I6_5_RECIBOS_CARTERA_TECHNICAL_PASS_V1',status:'PASS_PENDING_PAULA_VISUAL',date:'2026-09-18',gate:'I6.5',module:'RECIBOS_CARTERA',...art,sourceBundleSha256:S.sourceBundle.sha256,deterministicDiffSha256:'c1cf6d0c62d4dd30bfa80c70abfa7a8751e58630c2ffcc3484e5544d76e55749',applied:{receiptInserts:548,receiptUpdates:798,receiptDeletes:0,portfolioInserts:634,portfolioUpdates:223,portfolioDeletesPositivePaymentEvidenceOnly:24,totalWrites:2227,holds:36},liveCounts:S.execution.liveCountsAfter,integrity:{relationshipErrors:0,forbiddenCollectionsUnchanged:true,legacyNamespaceUnchanged:true,unrelatedAllowedDocsUnchanged:true},functional:{status:'PASS',receiptCount:1842,portfolioCount:1283,i64SentinelsPreserved:true},cobrosWrites:0,finmovWrites:0,rollbackExecuted:false,nextRequiredStep:'PAULA_LIVE_VISUAL_VALIDATION'};
+          fs.writeFileSync(process.env.I65_TECH_RECEIPT,JSON.stringify(receipt,null,2)+'\n');
+
+          const sourceBlob=execFileSync('git',['hash-object',process.env.I65_SOURCE_INTAKE],{encoding:'utf8'}).trim(),registryBlob=execFileSync('git',['hash-object',process.env.I65_REGISTRY],{encoding:'utf8'}).trim(),ledgerBlob=execFileSync('git',['hash-object',process.env.LEDGER],{encoding:'utf8'}).trim();
+          C.i6Execution.activeSourceIntakeBlobSha=sourceBlob;C.postproductionDataUpdateControl.activeSourceIntakeBlobSha=sourceBlob;C.i6Execution.mechanismRegistryBlobSha=registryBlob;C.postproductionDataUpdateControl.mechanismRegistryBlobSha=registryBlob;C.capabilityStatusAuthority.latestBlobSha=ledgerBlob;
+          C.i6Execution.activeModuleStatus='POST_WRITE_READBACK_INTEGRITY_PASS';C.i6Execution.dataMutationAuthorized=false;C.i6Execution.sourceDataApplyAuthorized=false;C.gateState.gates.I6.dataMutationAuthorized=false;
+          C.i6Execution.i6_5={...(C.i6Execution.i6_5||{}),status:'POST_WRITE_READBACK_INTEGRITY_PASS',writeApplied:true,writes:2227,applyRunId:art.runId,applyArtifactId:art.artifactId,applyArtifactDigest:art.artifactDigest,liveCountsAfter:S.execution.liveCountsAfter,readbackPassed:true,integrityPassed:true,functionalPassed:true,legacyNamespaceUnchanged:true,paulaVisualAcceptance:'PENDING',nextRequiredStep:'USER_VISUAL_REFRESH_CHECK'};
+          C.i65DeterministicApply={...(C.i65DeterministicApply||{}),status:'TECHNICAL_PASS_PENDING_USER_VISUAL',userAuthorized:false,...art,writes:2227,receiptCount:1842,portfolioCount:1283,cobrosCount:5,legacyNamespaceUnchanged:true,forbiddenCollectionsUnchanged:true,relationshipErrors:0,rollbackExecuted:false,nextRequiredStep:'PAULA_LIVE_VISUAL_VALIDATION'};
+          C.i65ApplyPayload={...(C.i65ApplyPayload||{}),status:'CONSUMED_TECHNICAL_PASS',narrowApplyAuthorized:false,dataWritesAuthorized:false,consumedRunId:art.runId,nextRequiredStep:'PAULA_LIVE_VISUAL_VALIDATION'};
+          C.postproductionDataUpdateControl.executionCursor='POST_WRITE_READBACK_INTEGRITY_PASS';C.postproductionDataUpdateControl.nextRequiredStep='USER_VISUAL_REFRESH_CHECK';C.nextAction='I6_5_USER_VISUAL_REFRESH_CHECK';
+          C.i65MiniClosurePlan={...(C.i65MiniClosurePlan||{}),blockCStatus:'TECHNICAL_PASS_PENDING_USER_VISUAL',nextMaterialCursor:'USER_VISUAL_REFRESH_CHECK',blockCTechnicalReceiptPath:process.env.I65_TECH_RECEIPT};
+          fs.writeFileSync(process.env.CONTROL,JSON.stringify(C,null,2)+'\n');
+          NODE
+          git config user.name "gravicentra-governance-bot"; git config user.email "actions@users.noreply.github.com"
+          git add "$CONTROL" "$I65_SOURCE_INTAKE" "$I65_REGISTRY" "$LEDGER" "$I65_TECH_RECEIPT"
+          git commit -m "recovery(i6.5): seal Recibos/Cartera technical pass"
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          git push origin HEAD:recovery/fase-a-clean-20260831
+      - name: Exact rollback if any post-apply step fails
+        if: ${{ steps.i65apply.outputs.run == 'true' && failure() }}
+        env:
+          I65_APPLY_RESULT_FILE: ${{ runner.temp }}/i65-rollback-result.json
+          I65_EXACT_ROLLBACK_FILE: ${{ runner.temp }}/i65-exact-rollback.private.json
+        run: |
+          set -euo pipefail
+          if [ -f "$RUNNER_TEMP/i65-apply-result.json" ] && node -e "const x=require(process.env.RUNNER_TEMP+'/i65-apply-result.json');process.exit(x.rollbackExecuted===true&&x.rollbackStatus==='PASS'?0:1)"; then
+            echo I65_ROLLBACK_ALREADY_PASS
+          else
+            node tools/gravicentra-i6-5-deterministic-apply.mjs --mode=rollback
+          fi
+      - name: Upload rollback evidence on failure
+        if: ${{ steps.i65apply.outputs.run == 'true' && failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i6-5-rollback-${{ github.run_id }}
+          path: ${{ runner.temp }}/i65-rollback-result.json
+          compression-level: 0
+          if-no-files-found: warn
+          retention-days: 30
 
 
   i65-encrypted-diff-snapshot:

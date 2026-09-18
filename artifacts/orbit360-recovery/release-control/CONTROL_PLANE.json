@@ -1330,7 +1330,7 @@
     "frozenAtHead": "bb940461f1ec39469d1778bd2f9d875573ad300f",
     "blockAStatus": "OPEN_BUT_MUST_NOT_CONTAMINATE_I65_BASELINE",
     "blockBStatus": "READ_PATH_HYDRATION_LIVE_PASS",
-    "blockCStatus": "DETERMINISTIC_DIFF_READY",
+    "blockCStatus": "AUTHORIZED_DETERMINISTIC_APPLY_PENDING",
     "blockDStatus": "PENDING_REUSE_ONLY",
     "cobrosWritesDuringI65": false,
     "nextMaterialCursor": "APPLY_DETERMINISTIC_DELTA_ONLY",
@@ -1648,7 +1648,7 @@
     "cobrosWritesAuthorized": false
   },
   "i65ApplyPayload": {
-    "status": "PUBLIC_KEY_READY",
+    "status": "ENCRYPTED_PAYLOAD_READY",
     "publicKeyPath": "artifacts/orbit360-recovery/release-control/I6_5_APPLY_PUBLIC_KEY_20260918.pem",
     "privatePayloadPlaintextSha256": "44f642b4f9390ef686b84564362af94f533bc52d70e871f93f76e18e7b1738ff",
     "encryptedPayloadPath": "artifacts/orbit360-recovery/release-control/I6_5_DETERMINISTIC_APPLY_PAYLOAD_20260918.enc.json",
@@ -1656,6 +1656,33 @@
     "dataWritesAuthorized": false,
     "publicKeySha256": "342371840986ee008bdef3ee9523fe9e52509d12a654ac1d4c0fa6b3cb781579",
     "publicKeyRunId": 35392025304,
-    "nextRequiredStep": "ENCRYPT_PRIVATE_APPLY_PAYLOAD"
+    "nextRequiredStep": "APPLY_DETERMINISTIC_DELTA_ONLY",
+    "encryptedPayloadSha256": "8e11afa187742ed9d5301ca2074467c27346f3fd486e903686735439eb6702da",
+    "encryptedPayloadBlobSha": "109a93d9974da83c5a64717e88ec3e000251c931",
+    "narrowApplyAuthorized": true
+  },
+  "i65DeterministicApply": {
+    "status": "AUTHORIZED_PENDING_APPLY",
+    "authorizationLockPath": "artifacts/orbit360-recovery/release-control/I6_5_DETERMINISTIC_APPLY_AUTH_LOCK_20260918.json",
+    "authorizationLockBlobSha": "55f92586e8235f46acdac7e240ad682b4570445a",
+    "userAuthorized": true,
+    "conversationDependent": false,
+    "encryptedPayloadPath": "artifacts/orbit360-recovery/release-control/I6_5_DETERMINISTIC_APPLY_PAYLOAD_20260918.enc.json",
+    "encryptedPayloadBlobSha": "109a93d9974da83c5a64717e88ec3e000251c931",
+    "encryptedPayloadSha256": "8e11afa187742ed9d5301ca2074467c27346f3fd486e903686735439eb6702da",
+    "deterministicDiffPath": "artifacts/orbit360-recovery/release-control/I6_5_DETERMINISTIC_DIFF_20260918.json",
+    "deterministicDiffBlobSha": "7865879a4207de6a067e238e04818c0e58a3d774",
+    "deterministicDiffSha256": "c1cf6d0c62d4dd30bfa80c70abfa7a8751e58630c2ffcc3484e5544d76e55749",
+    "expectedOperationalWrites": 2227,
+    "allowedCanonicalCollections": [
+      "recibosEsperados",
+      "carteraPrimas"
+    ],
+    "legacyWritesAuthorized": false,
+    "cobrosWritesAuthorized": false,
+    "broadDataMutationAuthorized": false,
+    "rollbackRequired": true,
+    "userVisualAcceptanceRequiredForClosure": true,
+    "nextRequiredStep": "APPLY_DETERMINISTIC_DELTA_ONLY"
   }
 }

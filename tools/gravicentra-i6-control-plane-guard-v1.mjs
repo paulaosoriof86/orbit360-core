@@ -20,6 +20,9 @@ const I65_SOURCE='artifacts/orbit360-recovery/release-control/I6_5_RECIBOS_CARTE
 const I65_MINI='artifacts/orbit360-recovery/release-control/I6_5_MINI_CIERRE_OPERATIVO_DECISION_LOCK_20260918.json';
 const I65_ANTI_DRIFT='artifacts/orbit360-recovery/release-control/I6_5_CONTINUITY_ANTI_DRIFT_LOCK_20260918.json';
 const I65_SYNC='artifacts/orbit360-recovery/release-control/I6_5_SYNC_COMPOSITION_PREFLIGHT_20260918.json';
+const I65_DIFF='artifacts/orbit360-recovery/release-control/I6_5_DETERMINISTIC_DIFF_20260918.json';
+const I65_APPLY_ENC='artifacts/orbit360-recovery/release-control/I6_5_DETERMINISTIC_APPLY_PAYLOAD_20260918.enc.json';
+const I65_APPLY_AUTH='artifacts/orbit360-recovery/release-control/I6_5_DETERMINISTIC_APPLY_AUTH_LOCK_20260918.json';
 const MODE=(process.argv.find(x=>x.startsWith('--mode='))||'--mode=governance').split('=')[1];
 const need=(ok,code)=>{if(!ok)throw new Error(code);};
 const readJson=p=>JSON.parse(fs.readFileSync(p,'utf8'));
@@ -272,6 +275,22 @@ if(activeI65){
   need(RGT.modules?.RECIBOS_CARTERA?.sourceIntakePath===I65_SOURCE,'I6_5_REGISTRY_SOURCE_PATH_INVALID');
   need(R64.status==='I6_4_POLIZAS_RIESGOS_LIVE_PASS'&&R64.humanAcceptance?.status==='ACCEPTED'&&seal.status==='I6_4_POLIZAS_RIESGOS_LIVE_PASS','I6_4_ACCEPTANCE_NOT_FROZEN');
   need(SYNC5.status==='BLOCKING_CAUSAL_DESYNC_FOUND_BEFORE_DATA_WRITE'&&SYNC5.decision==='FAIL_CLOSED_NO_I6_5_DATA_WRITES'&&Number(SYNC5.operationalWrites)===0,'I6_5_SYNC_PREFLIGHT_INVALID');
+  const DA=C.i65DeterministicApply||{};
+  if(['DETERMINISTIC_DIFF_READY','DETERMINISTIC_APPLY_DONE','POST_WRITE_READBACK_INTEGRITY_PASS','PENDING_USER_VISUAL','LIVE_PASS'].includes(cursor)){
+    need(exists(I65_DIFF)&&git('hash-object',I65_DIFF)===DA.deterministicDiffBlobSha&&DA.deterministicDiffSha256==='c1cf6d0c62d4dd30bfa80c70abfa7a8751e58630c2ffcc3484e5544d76e55749','I6_5_APPLY_DIFF_BINDING_INVALID');
+    need(exists(I65_APPLY_ENC)&&git('hash-object',I65_APPLY_ENC)===DA.encryptedPayloadBlobSha&&C.i65ApplyPayload?.encryptedPayloadBlobSha===DA.encryptedPayloadBlobSha,'I6_5_APPLY_ENCRYPTED_PAYLOAD_BINDING_INVALID');
+    need(DA.expectedOperationalWrites===2227&&DA.legacyWritesAuthorized===false&&DA.cobrosWritesAuthorized===false&&DA.broadDataMutationAuthorized===false&&DA.rollbackRequired===true,'I6_5_APPLY_SCOPE_INVALID');
+    need(Array.isArray(DA.allowedCanonicalCollections)&&DA.allowedCanonicalCollections.length===2&&DA.allowedCanonicalCollections.includes('recibosEsperados')&&DA.allowedCanonicalCollections.includes('carteraPrimas'),'I6_5_APPLY_ALLOWED_COLLECTIONS_INVALID');
+    if(cursor==='DETERMINISTIC_DIFF_READY'){
+      need(DA.status==='AUTHORIZED_PENDING_APPLY'&&DA.userAuthorized===true&&DA.conversationDependent===false,'I6_5_APPLY_AUTH_STATE_INVALID');
+      need(exists(I65_APPLY_AUTH)&&git('hash-object',I65_APPLY_AUTH)===DA.authorizationLockBlobSha,'I6_5_APPLY_AUTH_LOCK_DRIFT');
+      const AL=readJson(I65_APPLY_AUTH);need(AL.status==='AUTHORIZED_PENDING_APPLY'&&AL.userAuthorized===true&&AL.conversationDependent===false&&AL.scope?.operationalWrites===2227&&AL.scope?.legacyWritesAuthorized===false,'I6_5_APPLY_AUTH_LOCK_INVALID');
+      need(C.i65ApplyPayload?.status==='ENCRYPTED_PAYLOAD_READY'&&C.i65ApplyPayload?.narrowApplyAuthorized===true&&C.i65ApplyPayload?.dataWritesAuthorized===false,'I6_5_APPLY_PAYLOAD_STATE_INVALID');
+    }else{
+      need(['TECHNICAL_PASS_PENDING_USER_VISUAL','LIVE_PASS'].includes(DA.status),'I6_5_APPLY_POSTWRITE_STATE_INVALID');
+      need(DA.userAuthorized===false,'I6_5_APPLY_POSTWRITE_AUTH_NOT_REVOKED');
+    }
+  }
   if(i65HydrationDiagnosticPending||i65HydrationDiagnosticPass||i65HydrationDefectPending||i65HydrationDefectLive){
     need(i65HydrationDefect.classification==='CODE_DEFECT'&&i65HydrationDefect.dataMutationAuthorized===false&&i65HydrationDefect.cobrosWritesAuthorized===false&&i65HydrationDefect.reimportAuthorized===false,'I6_5_HYDRATION_BOUNDARY_INVALID');
     if(i65HydrationDiagnosticPending||i65HydrationDiagnosticPass||i65HydrationDefectPending)need(cursor==='LIVE_READBACK_PASS','I6_5_HYDRATION_CURSOR_INVALID');

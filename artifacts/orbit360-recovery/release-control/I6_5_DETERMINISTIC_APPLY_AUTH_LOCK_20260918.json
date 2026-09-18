@@ -1,0 +1,75 @@
+{
+  "schema": "GRAVICENTRA_I6_5_DETERMINISTIC_APPLY_AUTH_LOCK_V1",
+  "status": "AUTHORIZED_PENDING_APPLY",
+  "date": "2026-09-18",
+  "gate": "I6.5",
+  "module": "RECIBOS_CARTERA",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "authorizedFromHead": "520327571a52254597e8a7b06da9513243fb4980",
+  "authorizationBasis": "OWNER_CONTINUE_CURRENT_I6_5_EXECUTION_20260918",
+  "conversationDependent": false,
+  "userAuthorized": true,
+  "repeatedConversationalAuthorizationRequired": false,
+  "sourceBundleSha256": "f445e2f4a20b9eb7a526bda8896472dab9e7ac4617b3c5d8124a939a0dee0e6a",
+  "deterministicDiff": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_DETERMINISTIC_DIFF_20260918.json",
+    "blobSha": "7865879a4207de6a067e238e04818c0e58a3d774",
+    "sha256": "c1cf6d0c62d4dd30bfa80c70abfa7a8751e58630c2ffcc3484e5544d76e55749"
+  },
+  "encryptedPayload": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_DETERMINISTIC_APPLY_PAYLOAD_20260918.enc.json",
+    "blobSha": "109a93d9974da83c5a64717e88ec3e000251c931",
+    "sha256": "8e11afa187742ed9d5301ca2074467c27346f3fd486e903686735439eb6702da",
+    "plaintextSha256": "44f642b4f9390ef686b84564362af94f533bc52d70e871f93f76e18e7b1738ff",
+    "repositoryPlaintextForbidden": true
+  },
+  "scope": {
+    "operationalWrites": 2227,
+    "receipts": {
+      "inserts": 548,
+      "updates": 798,
+      "deletes": 0,
+      "targetCount": 1842
+    },
+    "portfolio": {
+      "inserts": 634,
+      "updates": 223,
+      "deletes": 24,
+      "targetCount": 1283,
+      "deleteRule": "POSITIVE_PAYMENT_EVIDENCE_ONLY_NEVER_SOURCE_ABSENCE"
+    },
+    "holds": 36,
+    "allowedCanonicalCollections": [
+      "recibosEsperados",
+      "carteraPrimas"
+    ],
+    "legacyWritesAuthorized": false,
+    "forbiddenCollections": [
+      "polizas",
+      "clientes",
+      "aseguradoras",
+      "vehiculos",
+      "cobros",
+      "finmovs",
+      "renovaciones"
+    ]
+  },
+  "invariants": {
+    "noDeleteBySourceAbsence": true,
+    "paymentEvidenceDoesNotCreateCobro": true,
+    "cobrosWrites": 0,
+    "finmovWrites": 0,
+    "policyWrites": 0,
+    "clientWrites": 0,
+    "insurerWrites": 0,
+    "vehicleWrites": 0,
+    "legacyNamespacesFrozenEvidenceOnly": true,
+    "rollbackRequired": true,
+    "postWriteReadbackRequired": true,
+    "integrityRequired": true,
+    "authenticatedLiveFunctionalRequired": true,
+    "userVisualAcceptanceRequiredForClosure": true
+  },
+  "nextRequiredStep": "APPLY_DETERMINISTIC_DELTA_ONLY"
+}
