@@ -1,0 +1,66 @@
+{
+  "schema": "GRAVICENTRA_I6_2_DIRECTORIO_LIVE_PASS_V1",
+  "gate": "I6.2",
+  "module": "ASEGURADORAS_OPERATIONAL_DIRECTORY",
+  "status": "I6_2_DIRECTORIO_LIVE_PASS",
+  "source": {
+    "sha256": "f2e57fa72ff1b94b110b5037038c6c47fbc727c513f9eebd2348d7f4f2244083",
+    "insurers": 14,
+    "updates": 13,
+    "inserts": 1,
+    "deletes": 0,
+    "contacts": 161,
+    "platforms": 39,
+    "bankAccounts": 72
+  },
+  "execution": {
+    "applyRunId": 35300186514,
+    "roleRegressionRunId": 35300483580,
+    "sealRunId": 35300781558,
+    "finalArtifactId": 10530395395,
+    "finalArtifactDigest": "sha256:8b8e809054bc3fd8b38462fab9738c4dda5c1840ec1391e71389f5ffb80dc9ef",
+    "operationalMutations": 14,
+    "credentialUpdates": 3,
+    "rollbackExecuted": false
+  },
+  "readback": {
+    "status": "PASS",
+    "documentCount": 31,
+    "operationalRowsMatched": 14,
+    "credentialRowsMatchedByHash": 3,
+    "unrelatedRowsUnchanged": 17,
+    "newInsurerPresent": true,
+    "secretMaterialInOperationalDocs": false
+  },
+  "functional": {
+    "status": "PASS",
+    "directoryLoads": true,
+    "newInsurerVisible": true,
+    "usernamesVisible": true,
+    "platformsVisible": true,
+    "bankAccountsVisible": true,
+    "passwordRevealMatchedByHash": true,
+    "passwordCopyMatchedByHash": true,
+    "http404": 0,
+    "pageErrors": 0
+  },
+  "roleRegression": {
+    "status": "PASS",
+    "roles": [
+      "Dirección",
+      "SuperAdmin",
+      "AdminTenant",
+      "Operativo",
+      "Asesor"
+    ],
+    "directionInsurersCovered": 31,
+    "credentialReferencesExercised": 16,
+    "revealsMaterialized": 16,
+    "copiesMaterialized": 16,
+    "advisorRestricted": true
+  },
+  "containsSecrets": false,
+  "nextGate": "I6.3",
+  "nextModule": "CLIENTES",
+  "i63Executed": false
+}
