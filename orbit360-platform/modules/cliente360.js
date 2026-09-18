@@ -228,7 +228,7 @@ Orbit.modules.cliente360 = (function () {
 
   function liveFilter() {
     // re-render manteniendo el input enfocado
-    const active = document.activeElement; const val = active ? active.value : '';
+    const active = document.activeElement; const val = active && typeof active.value === 'string' ? active.value : (filtros.q || '');
     listPage = 1;
     lista();
     const qi = document.getElementById('f-q');

@@ -113,7 +113,8 @@ try{
       planHasValidation:JSON.stringify(plan).includes('REQUIERE_VALIDACION'),
       controlsHydrated:ids.filter(id=>!!Orbit.store.get('clientes',id)).length,
       unresolvedVisible:all.filter(c=>String(c.pais||c.country||'').toUpperCase()==='REQUIERE_VALIDACION').length,
-      label,foot,amounts,amountsMatch
+      label,foot,amounts,amountsMatch,
+      nameTextTransform:(()=>{const el=document.querySelector('.c360-client-name');return el?getComputedStyle(el).textTransform:'';})()
     };
   },controlIds);
   need(ui.rawCount===442&&ui.totalRows===442,'I63_PROOF_UI_COUNT_MISMATCH');
@@ -122,7 +123,8 @@ try{
   need(ui.scope==='all','I63_PROOF_MANAGER_SCOPE_NOT_ALL');
   need(ui.planHasValidation===true,'I63_PROOF_QUERY_PLAN_DROPS_VALIDATION');
   need(/^Prima neta vigente$/i.test(ui.label)&&/separada por moneda/i.test(ui.foot)&&ui.amountsMatch,'I63_PROOF_KPI_CANONICAL');
-  ev.ui={runtimeVisibleClientCount:ui.rawCount,diagnosticTotalRows:ui.totalRows,renderedRows:ui.renderedRows,controlSamplesHydrated:ui.controlsHydrated,unresolvedCountryVisible:ui.unresolvedVisible,queryPlanIncludesValidation:true,actorRole:actor.role,scope:ui.scope};
+  need(ui.nameTextTransform==='uppercase','I63_PROOF_CLIENT_NAME_CASE_NOT_UPPERCASE');
+  ev.ui={runtimeVisibleClientCount:ui.rawCount,diagnosticTotalRows:ui.totalRows,renderedRows:ui.renderedRows,controlSamplesHydrated:ui.controlsHydrated,unresolvedCountryVisible:ui.unresolvedVisible,queryPlanIncludesValidation:true,actorRole:actor.role,scope:ui.scope,clientNameDisplay:'UPPERCASE'};
   ev.kpi={status:'PASS',label:'Prima neta vigente',separatedByCurrency:true,amounts:ui.amounts};
 
   let searched=0;
