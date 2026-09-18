@@ -113,13 +113,13 @@
         "postWriteContextsFail": 0
       },
       "I6": {
-        "status": "I6_3_DATA_UPDATE_V5_ACTIVE",
-        "activeSubgate": "I6.3",
+        "status": "I6_4_DATA_UPDATE_V5_ACTIVE",
+        "activeSubgate": "I6.4",
         "dataMutationAuthorized": false,
-        "lastFrozenMiniGate": "I6.2"
+        "lastFrozenMiniGate": "I6.3"
       }
     },
-    "lastFormallyCompletedMiniGate": "I6.2"
+    "lastFormallyCompletedMiniGate": "I6.3"
   },
   "productionProgress": {
     "formalPercent": 100,
@@ -403,7 +403,7 @@
     "requiresRollback": true,
     "authorizedAt": "2026-09-14T08:57:00-06:00",
     "authorizationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_EXPLICIT_AUTHORIZATION_RECEIPT_20260914.json",
-    "activeSubgate": "I6.3",
+    "activeSubgate": "I6.4",
     "productMutationAuthorized": false,
     "sourceDataApplyAuthorized": false,
     "perBlockApplyRequiresExplicitAuthorization": false,
@@ -413,11 +413,11 @@
     "executionDisciplinePath": "artifacts/orbit360-recovery/release-control/I6_DATA_UPDATE_EXECUTION_DISCIPLINE_LOCK_20260917.json",
     "executionDisciplineBlobSha": "7af17759086da336dbf755d72ad85692f892b71b",
     "mechanismRegistryPath": "artifacts/orbit360-recovery/release-control/DATA_UPDATE_MECHANISM_REGISTRY.json",
-    "mechanismRegistryBlobSha": "b655d64b00af01f0cdbf632db769f22dccaebead",
-    "activeSourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_3_CLIENTES_SOURCE_INTAKE_20260918.json",
-    "activeSourceIntakeBlobSha": "515f10f38a62a61668637d9472f9b8f3c3edbc23",
-    "activeModule": "CLIENTES",
-    "activeModuleStatus": "PENDING_USER_VISUAL",
+    "mechanismRegistryBlobSha": "785a71f234d372db3fd23e16aa6800e1c1a62041",
+    "activeSourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_4_POLIZAS_RIESGOS_SOURCE_INTAKE_20260918.json",
+    "activeSourceIntakeBlobSha": "906d17af0c9f5e6ade2d14bb52e0a9cd514d2d5a",
+    "activeModule": "POLIZAS_RIESGOS_VEHICULOS",
+    "activeModuleStatus": "SOURCE_PINNED",
     "i6_0": {
       "status": "I6_0_BASELINE_FROZEN",
       "executorPath": ".github/workflows/gravicentra-material-baseline-freeze.yml",
@@ -441,6 +441,25 @@
       "receiptBlobSha": "31d80a90286d492026be7c60f1074b3d7a07a976",
       "artifactId": 10530395395,
       "artifactDigest": "sha256:8b8e809054bc3fd8b38462fab9738c4dda5c1840ec1391e71389f5ffb80dc9ef"
+    },
+    "i6_3": {
+      "status": "I6_3_CLIENTES_LIVE_PASS",
+      "closed": true,
+      "sourceSha256": "4f0a1307605ad5dcc947355dbbc98a50b510358e5f6a9835b75d02e45f5a8c7c",
+      "applyRunId": 35308586373,
+      "identityMergeRunId": 35323647660,
+      "updates": 300,
+      "inserts": 12,
+      "unchanged": 130,
+      "deletes": 0,
+      "backendDocumentsIncludingTombstones": 442,
+      "activeCanonicalClients": 439,
+      "tombstones": 3,
+      "readback": "PASS",
+      "functional": "PASS",
+      "paulaVisualAcceptance": "ACCEPTED",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_3_CLIENTES_LIVE_PASS_20260918.json",
+      "receiptBlobSha": "c4ceccd2b69d0b07b547974b690b8232864c8d75"
     }
   },
   "postproductionDataUpdateControl": {
@@ -451,18 +470,18 @@
     "executionDisciplinePath": "artifacts/orbit360-recovery/release-control/I6_DATA_UPDATE_EXECUTION_DISCIPLINE_LOCK_20260917.json",
     "executionDisciplineBlobSha": "7af17759086da336dbf755d72ad85692f892b71b",
     "mechanismRegistryPath": "artifacts/orbit360-recovery/release-control/DATA_UPDATE_MECHANISM_REGISTRY.json",
-    "mechanismRegistryBlobSha": "b655d64b00af01f0cdbf632db769f22dccaebead",
-    "activeModule": "CLIENTES",
-    "activeSourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_3_CLIENTES_SOURCE_INTAKE_20260918.json",
-    "activeSourceIntakeBlobSha": "515f10f38a62a61668637d9472f9b8f3c3edbc23",
-    "sourceSha256": "4f0a1307605ad5dcc947355dbbc98a50b510358e5f6a9835b75d02e45f5a8c7c",
+    "mechanismRegistryBlobSha": "785a71f234d372db3fd23e16aa6800e1c1a62041",
+    "activeModule": "POLIZAS_RIESGOS_VEHICULOS",
+    "activeSourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_4_POLIZAS_RIESGOS_SOURCE_INTAKE_20260918.json",
+    "activeSourceIntakeBlobSha": "906d17af0c9f5e6ade2d14bb52e0a9cd514d2d5a",
+    "sourceSha256": "7130ed56467da438f5c6e2823ede65f73d6356de63de94e19da30f3aed26c68f",
     "conversationAsAuthority": false,
     "requestCurrentSourceBeforeEveryNewModule": true,
     "liveVisualRefreshRequiredForClosure": true,
     "pureDataUpdateRequiresBuildOrDeploy": false,
     "reimportForVisibilityFailureForbidden": true,
-    "nextRequiredStep": "USER_VISUAL_REFRESH_CHECK",
-    "executionCursor": "PENDING_USER_VISUAL"
+    "nextRequiredStep": "LIVE_READBACK_CURRENT_STATE",
+    "executionCursor": "SOURCE_PINNED"
   },
   "governanceSyncChecklist": {
     "frozenPlanMaterialized": true,
@@ -539,13 +558,13 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_3_USER_VISUAL_REFRESH_CHECK",
+  "nextAction": "I6_4_LIVE_READBACK_CURRENT_STATE",
   "postproductionExitProgress": {
-    "formalPercent": 30,
-    "frozenMiniGates": 3,
+    "formalPercent": 40,
+    "frozenMiniGates": 4,
     "totalMiniGates": 10,
-    "lastFrozenMiniGate": "I6.2",
-    "activeMiniGate": "I6.3",
+    "lastFrozenMiniGate": "I6.3",
+    "activeMiniGate": "I6.4",
     "method": "frozenMiniGates / 10 * 100; no partial mini-gate credit"
   },
   "i6BaselineSeal": {
@@ -659,15 +678,15 @@
     "mandatoryPaulaVisualAcceptanceBeforeNextSource": true,
     "assistantDefinesNextModuleInformationAndTemporalScope": true,
     "current": {
-      "technicalModule": "I6.2 Aseguradoras",
-      "technicalStatus": "I6_2_DIRECTORIO_LIVE_PASS",
+      "technicalModule": "I6.3 Clientes",
+      "technicalStatus": "I6_3_CLIENTES_LIVE_PASS",
       "paulaVisualAcceptance": "ACCEPTED",
-      "paulaVisualAcceptedAt": "2026-09-17T22:09:00-06:00",
-      "nextModule": "I6.3 Clientes",
+      "paulaVisualAcceptedAt": "2026-09-18T02:27:00-06:00",
+      "nextModule": "I6.4 Pólizas/Renovaciones/Vehículos/Riesgos",
       "nextSourceRequestBlocked": false,
       "nextSource": "PINNED"
     },
-    "guardCompatibleStateNote": "I6.3 remains mechanically prepared, but conversational/source intake is blocked by this handoff control until Paula explicitly validates I6.2 LIVE."
+    "guardCompatibleStateNote": "I6.3 is formally sealed after Paula visual acceptance; I6.4 current complementary source bundle is pinned and may execute only its next material cursor."
   },
   "i63CodeDefect": {
     "classification": "CODE_DEFECT",

@@ -53,7 +53,7 @@
     "CLIENTES": {
       "gate": "I6.3",
       "sourceRequiredBeforeStart": true,
-      "sourceState": "CURRENT_SOURCE_PINNED",
+      "sourceState": "I6_3_CLIENTES_LIVE_PASS",
       "mechanism": "REUSE_APPROVED_EXISTING_WRITE_CONTRACT_FROM_LINEAGE_AND_ACCEPTANCE_EVIDENCE; LOCATE POINTERS ONLY, DO_NOT REDISCOVER ARCHITECTURE",
       "liveClosure": "READBACK_PASS_THEN_USER_REFRESH_MUST_SHOW_UPDATED_DATA",
       "sourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_3_CLIENTES_SOURCE_INTAKE_20260918.json",
@@ -90,14 +90,32 @@
         "backendDocumentsIncludingTombstones": 442,
         "invariant": "MERGED_TOMBSTONES_MUST_NEVER_BE_REACTIVATED_AS_NEW_CLIENTS",
         "relationRule": "ALL_NEW_RELATIONS_MUST_TARGET_CANONICAL_CLIENT_ID"
-      }
+      },
+      "liveClosureStatus": "I6_3_CLIENTES_LIVE_PASS",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_3_CLIENTES_LIVE_PASS_20260918.json",
+      "receiptBlobSha": "c4ceccd2b69d0b07b547974b690b8232864c8d75",
+      "finalActiveCanonicalClients": 439
     },
     "POLIZAS_RIESGOS_VEHICULOS": {
       "gate": "I6.4",
       "sourceRequiredBeforeStart": true,
-      "sourceState": "WAITING_FOR_PAULA_SOURCE",
+      "sourceState": "CURRENT_SOURCE_PINNED",
       "mechanism": "REUSE_APPROVED_EXISTING_WRITE_CONTRACT_FROM_LINEAGE_AND_ACCEPTANCE_EVIDENCE; LOCATE POINTERS ONLY, DO_NOT REDISCOVER ARCHITECTURE",
-      "liveClosure": "READBACK_PASS_THEN_USER_REFRESH_MUST_SHOW_UPDATED_DATA"
+      "liveClosure": "READBACK_PASS_THEN_USER_REFRESH_MUST_SHOW_UPDATED_DATA",
+      "sourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_4_POLIZAS_RIESGOS_SOURCE_INTAKE_20260918.json",
+      "sourceBundleSha256": "7130ed56467da438f5c6e2823ede65f73d6356de63de94e19da30f3aed26c68f",
+      "temporalScope": {
+        "from": "2025-01-01",
+        "through": "2026-09-17",
+        "renewalHorizonThrough": "2026-10-31"
+      },
+      "primaryKey": "tenant/country + insurer + policyNumber",
+      "editionKey": "primaryKey + vigenciaStart when insurer reuses policy number",
+      "clientAliasRule": "RESOLVE_ALIAS_TO_CANONICAL_BEFORE_POLICY_LINK",
+      "supplementRule": "SUPPLEMENTS_ENRICH_MATCHING_PRIMARY_POLICY_EDITIONS; NO_POLICY_INSERT_FROM_SUPPLEMENT_ONLY",
+      "currentGate": "I6.4",
+      "nextMaterialStep": "LIVE_READBACK_CURRENT_STATE",
+      "resumeCursor": "SOURCE_PINNED"
     },
     "RECIBOS_CARTERA": {
       "gate": "I6.5",

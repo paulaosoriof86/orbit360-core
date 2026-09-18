@@ -1,6 +1,6 @@
 {
   "schema": "GRAVICENTRA_I6_3_CLIENTES_SOURCE_INTAKE_V1",
-  "status": "PINNED_FOR_V5_DELTA",
+  "status": "I6_3_CLIENTES_LIVE_PASS",
   "date": "2026-09-17",
   "productBrand": "Gravicentra Insurance",
   "module": "CLIENTES",
@@ -44,11 +44,11 @@
   },
   "execution": {
     "method": "DATA_UPDATE_DELTA_FIRST",
-    "cursorState": "PENDING_USER_VISUAL",
+    "cursorState": "LIVE_PASS",
     "writeApplied": true,
     "readbackPassed": true,
-    "liveVisualConfirmed": false,
-    "nextRequiredStep": "USER_VISUAL_REFRESH_CHECK",
+    "liveVisualConfirmed": true,
+    "nextRequiredStep": "MODULE_CLOSED",
     "readbackRunId": 35306248860,
     "readbackDocumentCount": 430,
     "readbackWritesExecuted": 0,
@@ -198,7 +198,13 @@
       "rollbackExecuted": false,
       "aliasRegistryRule": "RESOLVE_ALIAS_TO_CANONICAL_BEFORE_FUTURE_DIFF"
     },
-    "canonicalEntitiesAfterIdentityMerge": 439
+    "canonicalEntitiesAfterIdentityMerge": 439,
+    "liveVisualAcceptedAt": "2026-09-18T02:27:00-06:00",
+    "finalActiveCanonicalClients": 439,
+    "finalBackendDocumentsIncludingTombstones": 442,
+    "finalGate": "I6_3_CLIENTES_LIVE_PASS",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_3_CLIENTES_LIVE_PASS_20260918.json",
+    "receiptBlobSha": "c4ceccd2b69d0b07b547974b690b8232864c8d75"
   },
   "guards": {
     "doNotCommitPIIWorkbook": true,

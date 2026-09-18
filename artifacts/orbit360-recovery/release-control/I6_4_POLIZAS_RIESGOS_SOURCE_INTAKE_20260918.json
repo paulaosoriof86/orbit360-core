@@ -1,0 +1,167 @@
+{
+  "schema": "GRAVICENTRA_I6_4_POLIZAS_RIESGOS_SOURCE_INTAKE_V1",
+  "status": "PINNED_FOR_V5_DELTA",
+  "date": "2026-09-18",
+  "productBrand": "Gravicentra Insurance",
+  "module": "POLIZAS_RIESGOS_VEHICULOS",
+  "sourceBundle": {
+    "sha256": "7130ed56467da438f5c6e2823ede65f73d6356de63de94e19da30f3aed26c68f",
+    "sourceType": "USER_SUPPLIED_CURRENT_COMPLEMENTARY_REPORT_SET",
+    "committedToRepository": false,
+    "files": [
+      {
+        "role": "PRIMARY_POLICY_UNIVERSE",
+        "filename": "Polizas (16)(2).xlsx",
+        "sha256": "e68bfd576b28b01d2839d8c3a22e547d8905f1eaeb84d1d7ffc3a0082960c2a7",
+        "bytes": 154232,
+        "sheet": "Worksheet",
+        "range": "A1:AL540",
+        "headerRow": 10,
+        "dataRows": 530,
+        "columns": 38
+      },
+      {
+        "role": "CANCELLATION_SUPPLEMENT",
+        "filename": "Polizas (17)(2).xlsx",
+        "sha256": "fc00546ca8231f0fafd7f54d5415f152ee58ace21b6c1216e15932ceaf3fdbef",
+        "bytes": 115321,
+        "sheet": "Worksheet",
+        "range": "A1:AL215",
+        "headerRow": 10,
+        "dataRows": 205,
+        "columns": 38
+      },
+      {
+        "role": "RENEWAL_SUPPLEMENT",
+        "filename": "Renovaciones (13)(2).xlsx",
+        "sha256": "1505902788fb6e71d56cb751d64cd721f6d1930d0c90bcfd890c1a129b5041f3",
+        "bytes": 87481,
+        "sheet": "Worksheet",
+        "range": "A1:AG35",
+        "headerRow": 12,
+        "dataRows": 23,
+        "columns": 33
+      },
+      {
+        "role": "VEHICLE_RISK_SUPPLEMENT",
+        "filename": "Auto (4)(2).xlsx",
+        "sha256": "f84fb8b74e38d83c31b8a739b2c09c1092f6e8138eaffc8741947ac81d8417b2",
+        "bytes": 138398,
+        "sheet": "Worksheet",
+        "range": "A1:AD406",
+        "headerRow": 10,
+        "dataRows": 396,
+        "columns": 30
+      },
+      {
+        "role": "FINANCIAL_EMISSION_CROSSCHECK_CANONICAL",
+        "filename": "reporte_total_emitido2026-09-18 01-55(2).xls",
+        "sha256": "102a9d61f7e685374149986961a92dfb7521fd9f61783a8f38191250369a2682",
+        "bytes": 221696,
+        "format": "BIFF8_XLS",
+        "unicodeStringsFingerprintSha256": "b7cc4dce2b589fce18e7d813ee3db1bc786766609e12527a5199c3c0edd61d35"
+      },
+      {
+        "role": "FINANCIAL_EMISSION_CROSSCHECK_REDUNDANT",
+        "filename": "reporte_total_emitido2026-09-18 01-54(2).xls",
+        "sha256": "6ac79a09add7741ac64dbcabeefd3e1f47593619eaae44ab33788cb363d7d3ed",
+        "bytes": 221696,
+        "format": "BIFF8_XLS",
+        "unicodeStringsFingerprintSha256": "b7cc4dce2b589fce18e7d813ee3db1bc786766609e12527a5199c3c0edd61d35",
+        "doubleCountForbidden": true
+      }
+    ]
+  },
+  "coverage": {
+    "primaryPolicies": {
+      "rows": 530,
+      "uniquePolicyKeys": 426,
+      "uniquePolicyEditions": 528,
+      "vigenciaMin": "2025-01-01",
+      "vigenciaMax": "2026-09-17",
+      "statuses": {
+        "Renovada": 128,
+        "Cancelada": 116,
+        "Terminada": 40,
+        "Vencida": 118,
+        "No Renovada": 4,
+        "Vigente": 124
+      },
+      "currencies": {
+        "GTQ": 468,
+        "COP": 57
+      },
+      "uniqueClientNames": 238,
+      "unmatchedAgainstPinnedClientMasterByNormalizedName": 0
+    },
+    "cancellationSupplement": {
+      "rows": 205,
+      "uniquePolicyKeys": 204,
+      "allStatus": "Cancelada",
+      "overlapPrimaryKeys": 117,
+      "onlyOutsidePrimaryKeys": 87,
+      "onlyOutsidePrimaryInterpretation": "PRE_2025_REFERENCE_ONLY"
+    },
+    "renewalSupplement": {
+      "rows": 23,
+      "overlapPrimaryKeys": 23,
+      "outsidePrimaryKeys": 0,
+      "reportRange": "2025-01-01/2026-10-31"
+    },
+    "vehicleRiskSupplement": {
+      "rows": 396,
+      "uniqueRiskEditions": 396,
+      "policyEditionsOverlappingPrimary": 378,
+      "policyEditionsOutsidePrimary": 10,
+      "outsidePrimaryRule": "DO_NOT_CREATE_POLICY_FROM_RISK_ONLY_SOURCE"
+    },
+    "primaryDuplicateEditionConflict": {
+      "count": 1,
+      "policy": "91-8327655",
+      "insurer": "El Roble",
+      "vigencia": "2025-01-20",
+      "rule": "ISOLATE_FOR_DETERMINISTIC_CONFLICT_RESOLUTION"
+    }
+  },
+  "temporalScope": {
+    "authoritativePrimaryFrom": "2025-01-01",
+    "authoritativePrimaryThrough": "2026-09-17",
+    "renewalHorizonThrough": "2026-10-31",
+    "interpretation": "PRIMARY_POLICY_UNIVERSE_CONTROLS_INSERT_UPDATE_SCOPE; SUPPLEMENTS_ENRICH_MATCHING_IN_SCOPE_EDITIONS; PRE_2025_AND_POST_CUTOFF_ROWS_ARE_REFERENCE_ONLY_UNLESS_REQUIRED_TO_LINK_A_RENEWAL_CHAIN_AND_PROVEN"
+  },
+  "entityContract": {
+    "primaryKey": "tenant/country + insurer + policyNumber",
+    "editionKey": "primaryKey + vigenciaStart when insurer reuses policy number across terms",
+    "renewalRule": "LINK_TO_PREVIOUS_EDITION_DO_NOT_OVERWRITE_HISTORY",
+    "vehicleRiskRule": "LINK_RISK_TO_EXACT_POLICY_EDITION; DO_NOT_CREATE_POLICY_FROM_AUTO_ONLY_ROW",
+    "cancellationRule": "USE_CANCELLED_REPORT_TO_ENRICH_MATCHING_POLICY_STATUS/CANCELLATION_DATE; NO_DOUBLE_INSERT",
+    "xlsEmissionRule": "FINANCIAL_CROSSCHECK_ONLY; TWO XLS EXPORTS WITH SAME EXTRACTED_CONTENT_FINGERPRINT_MUST_NOT_BE_DOUBLE_COUNTED"
+  },
+  "clientComplement": {
+    "enabled": true,
+    "pinnedClientGate": "I6_3_CLIENTES_LIVE_PASS",
+    "activeCanonicalClients": 439,
+    "aliasRegistryRequired": true,
+    "rule": "RESOLVE_CLIENT_ALIAS_TO_CANONICAL_BEFORE_POLICY_LINK; EXISTING NONBLANK CLIENT MASTER FIELDS ARE NOT OVERWRITTEN BY POLICY REPORTS; ONLY DETERMINISTIC SINGLE-VALUE MISSING-FIELD ENRICHMENT OR REQUIRED NEW CLIENT CREATION AFTER IDENTITY CHECK",
+    "sourceMasterCrosscheck": "ALL_238_PRIMARY_POLICY_CLIENT_NAMES_MATCH_PINNED_CLIENT_MASTER_BY_NORMALIZED_NAME",
+    "currentPreliminaryClientEnrichmentDelta": "NONE_DETECTED_FOR_PHONE_WHATSAPP_EMAIL_DOCUMENT_ON_PRIMARY_POLICY_SOURCE"
+  },
+  "execution": {
+    "method": "DATA_UPDATE_DELTA_FIRST",
+    "cursorState": "SOURCE_PINNED",
+    "writeApplied": false,
+    "readbackPassed": false,
+    "deterministicDiffReady": false,
+    "nextRequiredStep": "LIVE_READBACK_CURRENT_STATE"
+  },
+  "guards": {
+    "doNotCommitPIISourceFiles": true,
+    "noDeleteByAbsence": true,
+    "noBlindReimport": true,
+    "noPolicyInsertFromSupplementOnly": true,
+    "preserveClientI63Pass": true,
+    "preserveIdentityAliases": true,
+    "writeContractReuseRequired": true,
+    "userVisualRequiredBeforeClosure": true
+  }
+}

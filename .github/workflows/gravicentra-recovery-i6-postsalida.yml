@@ -8,6 +8,8 @@ on:
     paths:
       - 'artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json'
       - 'artifacts/orbit360-recovery/release-control/I6_3_CLIENTES_SOURCE_INTAKE_20260918.json'
+      - 'artifacts/orbit360-recovery/release-control/I6_4_POLIZAS_RIESGOS_SOURCE_INTAKE_20260918.json'
+      - 'artifacts/orbit360-recovery/release-control/I6_3_CLIENTES_LIVE_PASS_20260918.json'
       - 'tools/gravicentra-i6-control-plane-guard-v1.mjs'
       - 'tools/gravicentra-i6-1-preview-package.mjs'
       - 'tools/gravicentra-i6-3-clientes-postwrite-functional.mjs'
@@ -15,6 +17,7 @@ on:
       - 'tools/gravicentra-i6-3-contact-sample-readonly.mjs'
       - 'tools/gravicentra-i6-3-client-completeness-audit.mjs'
       - 'tools/gravicentra-i6-3-identity-merge-executor.mjs'
+      - 'tools/gravicentra-i6-4-live-readback.mjs'
       - 'tools/gravicentra-certified-live-binding-check.mjs'
       - 'orbit360-platform/core/tenant-access-policy-contract-p0.js'
       - 'orbit360-platform/core/access-scope.js'
@@ -613,5 +616,97 @@ jobs:
           git config user.email "actions@users.noreply.github.com"
           git add "$CONTROL" "$SOURCE_INTAKE" "$REGISTRY"
           git commit -m "recovery(i6.3): seal controlled client identity merges"
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          git push origin HEAD:recovery/fase-a-clean-20260831
+
+
+  i64-live-readback:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      I64_SOURCE_INTAKE: artifacts/orbit360-recovery/release-control/I6_4_POLIZAS_RIESGOS_SOURCE_INTAKE_20260918.json
+      I64_RECEIPT: artifacts/orbit360-recovery/release-control/I6_3_CLIENTES_LIVE_PASS_20260918.json
+      I64_REGISTRY: artifacts/orbit360-recovery/release-control/DATA_UPDATE_MECHANISM_REGISTRY.json
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Resolve I6.4 readback applicability
+        id: i64
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          node - <<'NODE'
+          const fs=require('node:fs'),c=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8'));
+          const ok=c.gateState?.gates?.I6?.activeSubgate==='I6.4'&&c.nextAction==='I6_4_LIVE_READBACK_CURRENT_STATE';
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(ok?'true':'false')+'\n');
+          console.log('I64_READBACK_APPLICABLE='+(ok?'true':'false'));
+          NODE
+      - name: Install readback dependency
+        if: steps.i64.outputs.run == 'true'
+        run: npm install --no-save --package-lock=false firebase-admin@13.4.0 >/dev/null
+      - name: Read LIVE policies risks and relationships
+        if: steps.i64.outputs.run == 'true'
+        env:
+          I64_READBACK_DIR: ${{ runner.temp }}/i64-readback
+        run: node tools/gravicentra-i6-4-live-readback.mjs
+      - name: Upload I6.4 readback evidence and encryption public key
+        if: steps.i64.outputs.run == 'true'
+        id: readbackart
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i6-4-live-readback-${{ github.run_id }}
+          path: ${{ runner.temp }}/i64-readback/*
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 7
+      - name: Seal I6.4 LIVE readback cursor
+        if: steps.i64.outputs.run == 'true'
+        env:
+          READBACK_ARTIFACT_ID: ${{ steps.readbackart.outputs.artifact-id }}
+          READBACK_ARTIFACT_DIGEST: ${{ steps.readbackart.outputs.artifact-digest }}
+        run: |
+          set -euo pipefail
+          git fetch origin recovery/fase-a-clean-20260831
+          git reset --hard origin/recovery/fase-a-clean-20260831
+          export I64_EVIDENCE="$RUNNER_TEMP/i64-readback/i64-live-readback.json"
+          node - <<'NODE'
+          const fs=require('node:fs'),{execFileSync}=require('node:child_process');
+          const C=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8'));
+          const S=JSON.parse(fs.readFileSync(process.env.I64_SOURCE_INTAKE,'utf8'));
+          const E=JSON.parse(fs.readFileSync(process.env.I64_EVIDENCE,'utf8'));
+          if(E.status!=='PASS'||E.writes!==0||Number(E.collections?.polizas?.count||0)<=0)throw new Error('I64_READBACK_EVIDENCE_INVALID');
+          S.execution.cursorState='LIVE_READBACK_PASS';
+          S.execution.readbackPassed=true;
+          S.execution.readbackRunId=Number(process.env.GITHUB_RUN_ID);
+          S.execution.readbackArtifactId=Number(process.env.READBACK_ARTIFACT_ID);
+          S.execution.readbackArtifactDigest=process.env.READBACK_ARTIFACT_DIGEST;
+          S.execution.liveCounts=Object.fromEntries(Object.entries(E.collections||{}).map(([k,v])=>[k,v.count]));
+          S.execution.relationshipBaseline=E.relationships||{};
+          S.execution.publicKeySha256=E.publicKeySha256;
+          S.execution.nextRequiredStep='DETERMINISTIC_DIFF';
+          fs.writeFileSync(process.env.I64_SOURCE_INTAKE,JSON.stringify(S,null,2)+'\n');
+          const sourceBlob=execFileSync('git',['hash-object',process.env.I64_SOURCE_INTAKE],{encoding:'utf8'}).trim();
+          C.i6Execution.activeSourceIntakeBlobSha=sourceBlob;
+          C.i6Execution.activeModuleStatus='LIVE_READBACK_PASS';
+          C.postproductionDataUpdateControl.activeSourceIntakeBlobSha=sourceBlob;
+          C.postproductionDataUpdateControl.executionCursor='LIVE_READBACK_PASS';
+          C.postproductionDataUpdateControl.nextRequiredStep='DETERMINISTIC_DIFF';
+          C.nextAction='I6_4_DETERMINISTIC_DIFF';
+          C.i6Execution.i6_4={status:'LIVE_READBACK_PASS',readbackRunId:Number(process.env.GITHUB_RUN_ID),readbackArtifactId:Number(process.env.READBACK_ARTIFACT_ID),readbackArtifactDigest:process.env.READBACK_ARTIFACT_DIGEST,writesExecuted:0,liveCounts:S.execution.liveCounts,relationshipBaseline:S.execution.relationshipBaseline,publicKeySha256:E.publicKeySha256};
+          fs.writeFileSync(process.env.CONTROL,JSON.stringify(C,null,2)+'\n');
+          NODE
+          git config user.name "gravicentra-governance-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add "$CONTROL" "$I64_SOURCE_INTAKE"
+          git commit -m "recovery(i6.4): freeze LIVE policy-risk readback"
           node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
           git push origin HEAD:recovery/fase-a-clean-20260831

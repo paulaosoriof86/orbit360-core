@@ -1,0 +1,55 @@
+{
+  "schema": "GRAVICENTRA_I6_3_CLIENTES_LIVE_PASS_V1",
+  "gate": "I6.3",
+  "module": "CLIENTES",
+  "status": "I6_3_CLIENTES_LIVE_PASS",
+  "source": {
+    "sha256": "4f0a1307605ad5dcc947355dbbc98a50b510358e5f6a9835b75d02e45f5a8c7c",
+    "sourceRows": 450,
+    "sourceUniqueEntities": 442
+  },
+  "execution": {
+    "applyRunId": 35308586373,
+    "updates": 300,
+    "inserts": 12,
+    "unchanged": 130,
+    "deletes": 0,
+    "duplicateExtraRows": 8,
+    "ambiguousFieldsPreserved": 3,
+    "identityMergeRunId": 35323647660,
+    "identityMergeEvidenceArtifactId": 10538770252,
+    "identityMergeWrites": 6,
+    "identityMerges": 3,
+    "rollbackExecuted": false
+  },
+  "readback": {
+    "status": "PASS",
+    "backendDocumentsIncludingTombstones": 442,
+    "activeCanonicalClients": 439,
+    "tombstones": 3
+  },
+  "functional": {
+    "status": "PASS",
+    "cliente360VisibleClients": 439,
+    "controlSamplesVisible": 5,
+    "contactProjection": "PASS",
+    "namesUppercase": "PASS",
+    "kpi": {
+      "label": "PRIMA NETA VIGENTE",
+      "separatedByCurrency": true,
+      "GTQ": 652832,
+      "COP": 85871878
+    },
+    "http404": 0,
+    "pageErrors": 0
+  },
+  "humanAcceptance": {
+    "status": "ACCEPTED",
+    "acceptedBy": "Paula",
+    "acceptedAt": "2026-09-18T02:27:00-06:00",
+    "evidence": "User visually confirmed 439 clients and single canonical records for JOSUÉ HUMBERTO AGUILAR LUNA, HELEN GURLY GRIFFITHS GODOY and WILLIAM REYNOSO IXCOY; Mónica contact projection confirmed."
+  },
+  "containsSecrets": false,
+  "nextGate": "I6.4",
+  "nextModule": "POLIZAS_RIESGOS_VEHICULOS"
+}
