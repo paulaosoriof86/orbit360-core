@@ -1,4 +1,5 @@
 name: Gravicentra I6 Post-Salida
+# I6.5 operational closure proof lineage trigger: policy-linked client resolution
 
 on:
   workflow_dispatch:
