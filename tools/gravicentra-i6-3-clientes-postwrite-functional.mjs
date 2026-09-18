@@ -76,7 +76,7 @@ try{
   browser=await chromium.launch({headless:true});
   const page=await browser.newPage({viewport:{width:1440,height:1000}});
   const pageErrors=[],http404=[];
-  page.on('pageerror',e=>pageErrors.push(clean(e?.message||e,180)));
+  page.on('pageerror',e=>pageErrors.push(clean(e?.stack||e?.message||e,1200)));
   page.on('response',r=>{if(r.status()===404&&r.url().startsWith(TARGET))http404.push(new URL(r.url()).pathname);});
   await activate(page,auth,actor);
 
