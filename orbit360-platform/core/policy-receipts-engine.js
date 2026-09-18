@@ -295,6 +295,51 @@ Orbit.policyReceipts = (function () {
     return result;
   }
 
+  function portfolioId(receiptIdValue) { return 'car_' + clean(receiptIdValue); }
+  function portfolioState(receipt) {
+    const due = clean(receipt && (receipt.fechaLimite || receipt.vence || receipt.fechaVencimiento));
+    const overdue = !!due && due < today();
+    return { estado: overdue ? 'Vencido' : 'Pendiente', estadoOperativo: overdue ? 'pendiente_vencido' : 'futuro_pendiente', exigibilidad: overdue ? 'exigible' : 'futura' };
+  }
+  function syncPortfolio(policy, opts) {
+    opts = opts || {};
+    const opId = opts.operationId || policy.operationId || operationId('car');
+    const receipts = (S().where('recibosEsperados', r => r.polizaId === policy.id) || []).filter(r => norm(r.estado) !== 'anulado');
+    const existing = (S().where('carteraPrimas', r => r.polizaId === policy.id) || []).slice();
+    const byReceipt = new Map(existing.filter(x => clean(x.reciboId)).map(x => [clean(x.reciboId), x]));
+    const keep = new Set(), result = { inserted: [], updated: [], closed: [], expected: 0, operationId: opId, collection: 'carteraPrimas' };
+    receipts.forEach(receipt => {
+      const prior = byReceipt.get(clean(receipt.id));
+      if (isPaidReceipt(receipt) || !isActiveState(policy.estado) || receipt.carteraActiva === false) {
+        if (prior && prior.carteraActiva !== false) {
+          S().update('carteraPrimas', prior.id, { carteraActiva: false, estado: 'Cerrada', estadoOperativo: 'cerrado_sin_saldo', exigibilidad: 'cerrada', operationId: opId, actualizado: now() });
+          result.closed.push(prior.id);
+        }
+        return;
+      }
+      const st = portfolioState(receipt), id = prior ? prior.id : portfolioId(receipt.id);
+      const row = Object.assign({}, prior || {}, {
+        id, tenantId: policy.tenantId, polizaId: policy.id, reciboId: receipt.id, clienteId: policy.clienteId,
+        asesorId: policy.asesorId, aseguradoraId: policy.aseguradoraId, pais: policy.pais, moneda: policy.moneda,
+        secuencia: receipt.secuencia, cuota: receipt.cuota, monto: receipt.monto, montoTotal: receipt.montoTotal,
+        primaTotal: receipt.montoTotal || receipt.monto, vence: receipt.vence, fechaLimite: receipt.fechaLimite || receipt.vence,
+        fechaVencimiento: receipt.fechaLimite || receipt.vence, estado: st.estado, estadoOperativo: st.estadoOperativo,
+        exigibilidad: st.exigibilidad, carteraTipo: 'cartera_activa', historicalExigible: false, carteraActiva: true,
+        fuente: receipt.fuente || policy.fuente, operationId: opId, actualizado: now()
+      });
+      if (!prior) {
+        row.creado = now(); row.saldoConciliado = false; row.estadoConciliacionSaldo = 'pendiente_conciliacion'; row.requiereValidacion = false;
+        S().insert('carteraPrimas', row); result.inserted.push(id);
+      } else { S().update('carteraPrimas', id, row); result.updated.push(id); }
+      keep.add(id); result.expected += 1;
+    });
+    existing.filter(x => !keep.has(x.id) && x.carteraActiva !== false).forEach(x => {
+      S().update('carteraPrimas', x.id, { carteraActiva: false, estado: 'Cerrada', estadoOperativo: isActiveState(policy.estado) ? 'cerrado_plan_reemplazado' : 'cerrado_poliza_no_activa', exigibilidad: 'cerrada', operationId: opId, actualizado: now() });
+      result.closed.push(x.id);
+    });
+    return result;
+  }
+
   function updateClientState(clientId) {
     if (!clientId || !A() || !A().deriveClientState) return null;
     const c = S().get('clientes', clientId);
@@ -340,10 +385,11 @@ Orbit.policyReceipts = (function () {
         S().insert('vehiculos', vehicle);
       }
       const receipts = syncReceipts(prepared, { operationId: opId });
+      const portfolio = syncPortfolio(prepared, { operationId: opId });
       updateClientState(prepared.clienteId);
       recordActivity(prepared, 'Póliza creada: ' + prepared.numero, prepared.ramo + ' · ' + prepared.moneda + ' ' + prepared.primaTotal, opId);
-      if (A() && A().audit) A().audit('crear_con_recibos', 'polizas', prepared.id, null, prepared, options.motivo || 'Alta operativa de póliza', { operacionId: opId, recibos: receipts });
-      return { ok: true, policy: prepared, receipts, vehicle, warnings: check.warnings, operationId: opId };
+      if (A() && A().audit) A().audit('crear_con_recibos', 'polizas', prepared.id, null, prepared, options.motivo || 'Alta operativa de póliza', { operacionId: opId, recibos: receipts, cartera: portfolio });
+      return { ok: true, policy: prepared, receipts, portfolio, vehicle, warnings: check.warnings, operationId: opId };
     } catch (error) {
       try { S().update('polizas', prepared.id, { estado: 'Requiere validación', requiereValidacion: true, operacionError: String(error && (error.message || error)), operationId: opId }); } catch (ignore) {}
       return { ok: false, errors: ['operacion_incompleta'], error: String(error && (error.message || error)), policy: prepared, operationId: opId };
@@ -379,11 +425,12 @@ Orbit.policyReceipts = (function () {
     try {
       S().update('polizas', id, merged);
       const receipts = syncReceipts(merged, { operationId: opId });
+      const portfolio = syncPortfolio(merged, { operationId: opId });
       updateClientState(before.clienteId);
       updateClientState(merged.clienteId);
       recordActivity(merged, 'Póliza actualizada: ' + merged.numero, options.motivo || 'Actualización operativa', opId);
-      if (A() && A().audit) A().audit('actualizar_con_recibos', 'polizas', id, before, merged, options.motivo, { operacionId: opId, recibos: receipts, camposCriticos: changedCritical });
-      return { ok: true, policy: merged, receipts, warnings: check.warnings, operationId: opId };
+      if (A() && A().audit) A().audit('actualizar_con_recibos', 'polizas', id, before, merged, options.motivo, { operacionId: opId, recibos: receipts, cartera: portfolio, camposCriticos: changedCritical });
+      return { ok: true, policy: merged, receipts, portfolio, warnings: check.warnings, operationId: opId };
     } catch (error) {
       try { S().update('polizas', id, Object.assign({}, before, { operacionError: String(error && (error.message || error)), operationId: opId })); } catch (ignore) {}
       return { ok: false, errors: ['operacion_incompleta'], error: String(error && (error.message || error)), operationId: opId };
@@ -408,7 +455,7 @@ Orbit.policyReceipts = (function () {
 
   return {
     ACTIVE, isActiveState, isPaidReceipt, canManagePolicies, canApplyPayments,
-    canonicalPolicyKey, policyVersionKey, validatePolicy, preparePolicy, expectedReceipts, syncReceipts,
+    canonicalPolicyKey, policyVersionKey, validatePolicy, preparePolicy, expectedReceipts, syncReceipts, syncPortfolio,
     createPolicy, updatePolicy, applyPayment, createReconciliationProposal, updateClientState,
     receiptId, sequenceOf
   };

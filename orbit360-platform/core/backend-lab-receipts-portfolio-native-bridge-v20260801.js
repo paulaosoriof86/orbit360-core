@@ -179,6 +179,9 @@
 
   function renderReceipts(cid){
     var body=document.getElementById('c360-body');if(!body||!Orbit.q||!Orbit.q.recibosEsperadosDe)return;
+    var ps=Orbit.store&&typeof Orbit.store._productStatus==='function'?Orbit.store._productStatus():{},confirmed=ps.serverConfirmedCollections||[];
+    if(confirmed.indexOf('recibosEsperados')<0||confirmed.indexOf('carteraPrimas')<0){body.setAttribute('data-rp-native-owner','v920');body.setAttribute('data-rp-loading','1');body.innerHTML='<div class="card pad"><b>Cargando recibos y cartera…</b><div class="muted" style="margin-top:5px">Validando el calendario y la cartera en la fuente canónica.</div></div>';return;}
+    body.removeAttribute('data-rp-loading');
     var receipts=Orbit.q.recibosEsperadosDe(cid).slice().sort(function(a,b){return dueDate(a).localeCompare(dueDate(b));});
     var portfolio=Orbit.q.carteraPrimasDe(cid),byReceipt={};portfolio.forEach(function(x){byReceipt[x.reciboId]=x;});
     body.setAttribute('data-rp-native-owner','v920');
