@@ -1648,11 +1648,14 @@
     "cobrosWritesAuthorized": false
   },
   "i65ApplyPayload": {
-    "status": "PUBLIC_KEY_PENDING",
+    "status": "PUBLIC_KEY_READY",
     "publicKeyPath": "artifacts/orbit360-recovery/release-control/I6_5_APPLY_PUBLIC_KEY_20260918.pem",
     "privatePayloadPlaintextSha256": "44f642b4f9390ef686b84564362af94f533bc52d70e871f93f76e18e7b1738ff",
     "encryptedPayloadPath": "artifacts/orbit360-recovery/release-control/I6_5_DETERMINISTIC_APPLY_PAYLOAD_20260918.enc.json",
     "repositoryPlaintextForbidden": true,
-    "dataWritesAuthorized": false
+    "dataWritesAuthorized": false,
+    "publicKeySha256": "342371840986ee008bdef3ee9523fe9e52509d12a654ac1d4c0fa6b3cb781579",
+    "publicKeyRunId": 35392025304,
+    "nextRequiredStep": "ENCRYPT_PRIVATE_APPLY_PAYLOAD"
   }
 }
