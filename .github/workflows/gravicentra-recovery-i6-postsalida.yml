@@ -259,17 +259,34 @@ jobs:
           set -euo pipefail
           export MANIFEST="$RUNNER_TEMP/i63-package/evidence/site-manifest.sha256"
           python3 - <<'PY'
-          import hashlib,json,os,urllib.parse,urllib.request
+          import hashlib,json,os,time,urllib.parse,urllib.request
           rows=[tuple(x.split('  ',1)) for x in open(os.environ['MANIFEST']).read().splitlines() if x.strip()]
-          base=os.environ['TARGET_URL'].rstrip('/');bad=[]
-          for want,rel in rows:
-              req=urllib.request.Request(base+'/'+urllib.parse.quote(rel,safe='/')+'?i63live='+os.environ['EXPECTED_DIGEST'][:16],headers={'Accept-Encoding':'identity','Cache-Control':'no-cache'})
-              with urllib.request.urlopen(req,timeout=30) as r:got=hashlib.sha256(r.read()).hexdigest()
-              if got!=want:bad.append((rel,want,got))
-          if bad:raise SystemExit('I63_LIVE_READBACK_MISMATCH:'+json.dumps(bad[:3]))
-          with urllib.request.urlopen(urllib.request.Request(base+'/__recovery__/build.json?i63live=1',headers={'Cache-Control':'no-cache'}),timeout=30) as r:m=json.loads(r.read())
-          if m.get('sourceSha')!=os.environ['GITHUB_SHA'] or m.get('buildId')!=os.environ['EXPECTED_BUILD_ID'] or m.get('gate')!='I6.3':raise SystemExit('I63_LIVE_MARKER_MISMATCH')
-          print('I63_LIVE_READBACK='+str(len(rows)))
+          base=os.environ['TARGET_URL'].rstrip('/')
+          last_bad=[];last_marker=None
+          for attempt in range(1,13):
+              bad=[]
+              stamp=str(attempt)+'-'+str(int(time.time()))
+              for want,rel in rows:
+                  try:
+                      req=urllib.request.Request(base+'/'+urllib.parse.quote(rel,safe='/')+'?i63live='+os.environ['EXPECTED_DIGEST'][:16]+'-'+stamp,headers={'Accept-Encoding':'identity','Cache-Control':'no-cache, no-store','Pragma':'no-cache'})
+                      with urllib.request.urlopen(req,timeout=30) as rr:got=hashlib.sha256(rr.read()).hexdigest()
+                  except Exception as e:
+                      got='HTTP_ERROR:'+type(e).__name__
+                  if got!=want:bad.append((rel,want,got))
+              marker=None
+              try:
+                  with urllib.request.urlopen(urllib.request.Request(base+'/__recovery__/build.json?i63live='+stamp,headers={'Cache-Control':'no-cache, no-store','Pragma':'no-cache'}),timeout=30) as rr:marker=json.loads(rr.read())
+              except Exception as e:
+                  marker={'error':type(e).__name__}
+              marker_ok=marker.get('sourceSha')==os.environ['GITHUB_SHA'] and marker.get('buildId')==os.environ['EXPECTED_BUILD_ID'] and marker.get('gate')=='I6.3'
+              if not bad and marker_ok:
+                  print('I63_LIVE_READBACK='+str(len(rows)))
+                  print('I63_LIVE_PROPAGATION_ATTEMPT='+str(attempt))
+                  break
+              last_bad=bad;last_marker=marker
+              if attempt<12:time.sleep(5)
+          else:
+              raise SystemExit('I63_LIVE_READBACK_MISMATCH:'+json.dumps({'bad':last_bad[:3],'marker':last_marker},ensure_ascii=False))
           PY
 
       - name: LIVE Cliente360 proof
