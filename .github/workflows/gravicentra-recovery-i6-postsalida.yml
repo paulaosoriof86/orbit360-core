@@ -691,14 +691,21 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
-      - name: Create rollback and promote exact Preview channel
+      - name: Bind rollback to previous certified artifact and promote exact Preview channel
         if: steps.mode.outputs.mode == 'release'
         id: promote
         run: |
           set -euo pipefail
-          RB="gi-i65-rb-$GITHUB_RUN_ID"
-          npx --yes firebase-tools@14.10.1 hosting:clone "$HOSTING_SITE:live" "$HOSTING_SITE:$RB" --project "$PROJECT_ID" --non-interactive
+          RB=$(node -e "const c=require('./'+process.env.CONTROL);process.stdout.write(String(c.certifiedCandidate?.previewChannelId||''))")
+          test -n "$RB" || { echo I65_PREVIOUS_CERTIFIED_PREVIEW_CHANNEL_MISSING >&2; exit 43; }
           echo "rollback_channel=$RB" >> "$GITHUB_OUTPUT"
+          npx --yes firebase-tools@14.10.1 hosting:channel:list --site "$HOSTING_SITE" --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/i65-channels.json"
+          export RB
+          node - <<'NODE'
+          const fs=require('node:fs'),d=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/i65-channels.json','utf8'));
+          const raw=JSON.stringify(d);
+          if(!raw.includes(process.env.RB))throw new Error('I65_PREVIOUS_CERTIFIED_PREVIEW_CHANNEL_NOT_FOUND');
+          NODE
           npx --yes firebase-tools@14.10.1 hosting:clone "$HOSTING_SITE:${{ steps.preview.outputs.channel_id }}" "$HOSTING_SITE:live" --project "$PROJECT_ID" --non-interactive
           echo "promoted=true" >> "$GITHUB_OUTPUT"
           echo I65_SAME_ARTIFACT_PROMOTION=PASS
