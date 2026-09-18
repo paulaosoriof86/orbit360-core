@@ -1449,9 +1449,13 @@ jobs:
       I65_APPLY_PUBLIC_KEY: artifacts/orbit360-recovery/release-control/I6_5_APPLY_PUBLIC_KEY_20260918.pem
     steps:
       - uses: actions/checkout@v4
-        with: {ref: ${{ github.sha }}, fetch-depth: 0, persist-credentials: true}
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: true
       - uses: actions/setup-node@v4
-        with: {node-version: '22'}
+        with:
+          node-version: '22'
       - name: Resolve I6.5 apply key applicability
         id: key
         run: |
