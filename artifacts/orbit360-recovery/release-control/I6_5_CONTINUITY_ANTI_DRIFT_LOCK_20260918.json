@@ -8,7 +8,7 @@
     "controlPlane": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
     "microplan": {
       "path": "artifacts/orbit360-recovery/release-control/I6_5_MINI_CIERRE_OPERATIVO_DECISION_LOCK_20260918.json",
-      "blobSha": "2f1128dfbdedcbd8c4d0b316602f2f316aa8c514",
+      "blobSha": "67c6eaa0555e9654a5b4ebbaf6e663c6884f18f3",
       "status": "FROZEN_ACTIVE"
     },
     "phaseB": {
@@ -24,7 +24,7 @@
     },
     "selfAdministration": {
       "path": "artifacts/orbit360-recovery/release-control/I6_5_BLOCK_A_D_SELF_ADMINISTRATION_LOCK_20260918.json",
-      "blobSha": "584c7945fed8dda48abc3bc6fb30f09218e23727",
+      "blobSha": "f7609f2c2159c0a712166d5dd40031a0a90f54e5",
       "status": "FROZEN_ACTIVE"
     }
   },
@@ -39,7 +39,9 @@
     "Every pure data step must bind pinned source SHA, current LIVE readback, deterministic diff, exact allowed collections, write counts, post-write readback, and rollback evidence.",
     "Recibos Esperados, Cartera Primas and Cobros remain semantically separate. No payment/cobro may be inferred from schedule, balance disappearance, commission evidence, one-source evidence, proposal, HOLD, or frequency alone.",
     "Only the source-intake execution subtree and explicit repin evidence may evolve during I6.5. sourceBundle, coverage, temporalScope, sourcePrecedence and invariants are frozen and must deep-match this anti-drift lock on every executor run.",
-    "The A/D self-administration lock is mandatory continuity authority. User/client/policy/insurer persistence and transversal workflow closure cannot be omitted because a chat ends or a new visual finding appears."
+    "The A/D self-administration lock is mandatory continuity authority. User/client/policy/insurer persistence and transversal workflow closure cannot be omitted because a chat ends or a new visual finding appears.",
+    "A1/A4 corrections are nested mandatory micro-corrections and may not be dropped after I6.5 data technical pass.",
+    "Tenant branding and Equipo self-administration owners are part of structural A/D continuity; a future visual finding may refine them but not remove them."
   ],
   "sourceComplementarity": {
     "schedule": [
@@ -70,8 +72,8 @@
   "currentCursor": {
     "gate": "I6.5",
     "lastFrozenMiniGate": "I6.4",
-    "structuralBlock": "B",
-    "controlPlaneNextAction": "I6_5_HYDRATION_CODE_DEFECT_SUCCESSOR_RELEASE",
+    "structuralBlock": "A/D",
+    "controlPlaneNextAction": "I6_5_OPERATIONAL_CLOSURE_SUCCESSOR_RELEASE",
     "dataMutationAuthorized": false,
     "sourceDataApplyAuthorized": false
   },

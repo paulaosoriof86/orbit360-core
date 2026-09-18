@@ -97,6 +97,18 @@ Orbit.modules.equipo = (function () {
     } catch (e) { return Promise.reject(e); }
     return Promise.resolve(entry);
   }
+  async function canonicalAdvisorReadback(advisorId, expected) {
+    const p=Orbit.productRuntimeBrowserProvidersP0, u=Orbit.auth&&Orbit.auth.productUser||{};
+    if(!p||typeof p.initialize!=='function'||!u.tenantId) throw new Error('EQUIPO_CANONICAL_READBACK_OWNER_MISSING');
+    const ctx=await p.initialize(), m=ctx.modules&&ctx.modules.store;
+    if(!m||!ctx.db||typeof m.doc!=='function') throw new Error('EQUIPO_CANONICAL_READBACK_FIRESTORE_MISSING');
+    const ref=m.doc(ctx.db,'tenants/'+u.tenantId+'/data/asesores/items/'+advisorId);
+    const getter=typeof m.getDocFromServer==='function'?m.getDocFromServer:m.getDoc;
+    const snap=await getter(ref); if(!snap||!snap.exists()) throw new Error('EQUIPO_CANONICAL_READBACK_NOT_FOUND');
+    const row=snap.data()||{}, eq=(a,b)=>JSON.stringify([].concat(a||[]).map(String).sort())===JSON.stringify([].concat(b||[]).map(String).sort());
+    if(String(row.nombre||'')!==String(expected.nombre||'')||String(row.email||'').toLowerCase()!==String(expected.email||'').toLowerCase()||!eq(row.roles,expected.roles)||!eq(row.paises,expected.paises)||String(row.rolDefault||'')!==String(expected.rolDefault||'')||String(row.scopeDatos||'')!==String(expected.scopeDatos||'')) throw new Error('EQUIPO_CANONICAL_READBACK_MISMATCH');
+    return row;
+  }
   function toast(text) {
     if (U.toast) return U.toast(text);
     const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = text;
@@ -414,14 +426,16 @@ Orbit.modules.equipo = (function () {
         if (st && st.__productOperationalWriteP0 === true) {
           if (id) { if (typeof st.updateDurable !== 'function') throw new Error('PRODUCT_TEAM_DURABLE_UPDATE_MISSING'); await st.updateDurable('asesores', advisorId, data); }
           else { if (typeof st.insertDurable !== 'function') throw new Error('PRODUCT_TEAM_DURABLE_INSERT_MISSING'); await st.insertDurable('asesores', data); }
-        } else { if (id) st.update('asesores', advisorId, data); else st.insert('asesores', data); }
+          await canonicalAdvisorReadback(advisorId, data);
+        } else { throw new Error('PRODUCT_TEAM_SERVER_WRITE_REQUIRED'); }
         await audit(id ? 'editar_usuario' : 'crear_usuario', id ? (motivo || 'Actualización de datos de contacto') : motivo, id ? before : null, userSnapshot(data));
         document.dispatchEvent(new CustomEvent('orbit:equipo:save-committed', { detail: { advisorId, created: !id, syncRequested: !!back.querySelector('#eu-sync-access')?.checked } }));
         toast(id ? '✓ Usuario actualizado y confirmado' : '✓ Usuario creado y confirmado');
         dirty = false; close(true); render(document.getElementById('host') || document.getElementById('mod-host'));
       } catch (error) {
         saveButton.dataset.busy = '0'; saveButton.disabled = false; saveButton.textContent = 'Guardar';
-        toast('No fue posible guardar el usuario. No se confirmó persistencia en el servidor.');
+        const code=String(error&&error.code||error&&error.message||'EQUIPO_SAVE_FAILED').replace(/^functions\//,'');
+        toast('No fue posible guardar: '+code);
         try { console.warn('[Orbit Equipo] USER_SAVE_FAILED', error && (error.code || error.message) || error); } catch (e) {}
       }
     });

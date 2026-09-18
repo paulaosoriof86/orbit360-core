@@ -60,7 +60,7 @@
   "blocks": {
     "A": {
       "name": "PENDIENTES_OPERATIVOS_PEQUENOS",
-      "status": "SELF_ADMIN_PERSISTENCE_CLOSURE_ACTIVE",
+      "status": "OPEN_EXECUTION_FROZEN_NOT_OPTIONAL",
       "work": [
         "A1_TEAM_SELF_ADMIN_CREATE_EDIT_PERSIST_AUTH_MEMBERSHIP",
         "A2_CLIENT_SELF_ADMIN_CREATE_EDIT_PERSIST",
@@ -68,7 +68,9 @@
         "A4_INSURER_EDIT_PERSIST_LOGIN_LOGO_FAVICON_BUILD_FRESHNESS"
       ],
       "executionBoundary": "Closure checks/minifixes only. No hardcoded identities. Save is PASS only after protected server commit and canonical readback.",
-      "selfAdministrationLock": "artifacts/orbit360-recovery/release-control/I6_5_BLOCK_A_D_SELF_ADMINISTRATION_LOCK_20260918.json"
+      "selfAdministrationLock": "artifacts/orbit360-recovery/release-control/I6_5_BLOCK_A_D_SELF_ADMINISTRATION_LOCK_20260918.json",
+      "runtimeCompositionFinding": "TEAM_ONBOARDING_OWNERS_EXIST_BUT_ENTRYPOINT_WAS_NOT_LOADING_THEM; FIX NESTED IN A1.",
+      "brandingFinding": "LOGIN_PREAUTH_USED_PLATFORM_BRAND_WHERE_TENANT_BRAND_IS_REQUIRED; favicon must use user-approved Alianzas bolita."
     },
     "B": {
       "name": "READ_PATH_COMPOSITION_RECIBOS_CARTERA",
@@ -130,7 +132,7 @@
     },
     "D": {
       "name": "E2E_OX_LEADS_CLIENTE360_POLIZAS_PAGOS_NOTIFICACIONES",
-      "status": "TRANSVERSAL_SELF_ADMIN_E2E_FROZEN_PENDING_EXECUTION",
+      "status": "PENDING_REUSE_ONLY_FROZEN_SELF_ADMIN_E2E",
       "rule": "Reuse approved Ops/Leads/Cliente360/Portal/Payments/Notifications/Automation owners. Payment durable closure continues in I6.6; no parallel persistence owner or optimistic-only success.",
       "selfAdministrationLock": "artifacts/orbit360-recovery/release-control/I6_5_BLOCK_A_D_SELF_ADMINISTRATION_LOCK_20260918.json"
     }
@@ -145,7 +147,11 @@
     "After every material step, CONTROL_PLANE plus source-intake cursor is updated; conversation continuity is never required.",
     "Self-administration of users, clients, policies and insurers is mandatory closure nested in A/D and cannot be dropped by later visual findings.",
     "Samuel/Carlos are operational examples only; no named person is a product-source authority or hardcoded requirement.",
-    "Critical self-admin saves await protected backend commit; multi-collection policy changes require an atomic server-owned contract."
+    "Critical self-admin saves await protected backend commit; multi-collection policy changes require an atomic server-owned contract.",
+    "A1 and A4 remain mandatory even after I6.5 data technical pass; they cannot be skipped by user visual acceptance.",
+    "Team identities are data, never source code. Product entrypoint must load generic onboarding owners; no person identity may be hardcoded.",
+    "Login pre-auth branding is selected by tenant configuration. Gravicentra is platform identity; Alianzas & Soluciones is the tenant identity.",
+    "Operational create/edit acceptance requires backend commit and canonical readback; optimistic UI is insufficient."
   ],
   "stopConditions": [
     "destructive operation",

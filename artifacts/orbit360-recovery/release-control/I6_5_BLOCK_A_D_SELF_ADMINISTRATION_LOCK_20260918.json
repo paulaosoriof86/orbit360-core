@@ -79,5 +79,42 @@
     "new top-level recovery blocks",
     "reimport as UI fix"
   ],
-  "parentMicroplanBlobSha": "2f1128dfbdedcbd8c4d0b316602f2f316aa8c514"
+  "parentMicroplanBlobSha": "67c6eaa0555e9654a5b4ebbaf6e663c6884f18f3",
+  "runtimeCompositionFinding": {
+    "status": "CAUSAL_DESYNC_FROZEN",
+    "teamModuleVisible": true,
+    "durableAdvisorSaveOwner": "orbit360ProductOperationalCommand",
+    "userOnboardingSourceExists": true,
+    "onboardingBridgeSourceExists": true,
+    "entrypointBeforeFix": {
+      "coreUserOnboardingLoaded": false,
+      "equipoOnboardingBridgeLoaded": false
+    },
+    "decision": "LOAD_EXISTING_OWNERS_IN_PRODUCT_ENTRYPOINT_NO_PARALLEL_BACKEND_NO_HARDCODED_PEOPLE",
+    "canonicalSaveProof": "DURABLE_COMMIT_PLUS_DIRECT_CANONICAL_FIRESTORE_READBACK_REQUIRED"
+  },
+  "branding": {
+    "status": "TENANT_PUBLIC_BRAND_FIX_PENDING_RELEASE",
+    "tenantId": "alianzas-soluciones",
+    "displayName": "Alianzas & Soluciones",
+    "legalName": "Alianzas & Soluciones Corredores de Seguros",
+    "loginMustShowTenant": true,
+    "faviconMustUse": "USER_APPROVED_LOGO_BOLITA_2025",
+    "platformBrandMayRemain": "Gravicentra Insurance",
+    "implementation": "PUBLIC_TENANT_BRANDING_INDEX_SELECTED_BY_MATERIALIZED_TENANT_HINT"
+  },
+  "executionOrderAfterCurrentFix": [
+    "A1_TEAM_SELF_ADMIN_CREATE_EDIT_PERSIST_ACCESS_PROVISIONING_PROOF",
+    "A4_TENANT_LOGIN_BRAND_AND_FAVICON",
+    "A2_CLIENT_CREATE_EDIT_PERSIST_AND_INSURER_EDIT_PERSIST",
+    "A3_POLICY_CREATE_EDIT_ATOMIC_POLICY_RECEIPTS_PORTFOLIO_ZERO_AUTO_COBRO",
+    "D1_I6_6_PAYMENTS_COBROS_RECONCILIATION",
+    "D2_OPS_LEADS_EXISTING_WORKFLOWS_E2E",
+    "D3_CLIENTE360_PORTAL_CLIENT_CANONICAL_SYNC_E2E",
+    "D4_NOTIFICATIONS_AUTOMATIONS_AFTER_COMMITTED_DOMAIN_EVENTS"
+  ],
+  "conversationDependent": false,
+  "noHardcodedIdentities": true,
+  "backendCommitRequired": true,
+  "canonicalReadbackRequired": true
 }

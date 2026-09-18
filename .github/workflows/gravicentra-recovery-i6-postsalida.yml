@@ -1787,6 +1787,15 @@ jobs:
           grep -Fq "cobros-cartera-i65-closure-bridge.js?v=20260918-i65c" orbit360-platform/index.html
           grep -Fq "orbit360-build-reload-retries" orbit360-platform/core/pwa.js
           grep -Fq "Cargando recibos y cartera" orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js
+          node --check orbit360-platform/data/tenant-public-branding-index.js
+          node --check orbit360-platform/core/public-tenant-branding.js
+          grep -Fq "tenant-public-branding-index.js" orbit360-platform/index.html
+          grep -Fq "core/user-onboarding.js" orbit360-platform/index.html
+          grep -Fq "equipo-onboarding-v20260804-bridge.js" orbit360-platform/index.html
+          grep -Fq "Alianzas & Soluciones" orbit360-platform/data/tenant-public-branding-index.js
+          grep -Fq "user-approved-logo-bolita-2025" orbit360-platform/data/tenant-public-branding-index.js
+          test -s orbit360-platform/assets/tenant/alianzas-soluciones/logo-bolita-96.png
+          grep -Fq "canonicalAdvisorReadback" orbit360-platform/modules/equipo.js
           grep -Fq "function syncPortfolio" orbit360-platform/core/policy-receipts-engine.js
           grep -Fq "rawUser.emailVerified!==true" orbit360-platform/core/auth-product-runtime-p0.js
           grep -Fq "ACCOUNT_NOT_READY" orbit360-platform/core/auth-product-runtime-p0.js
@@ -2103,7 +2112,7 @@ jobs:
           C.i6Execution.i6_5={...(C.i6Execution.i6_5||{}),status:'POST_WRITE_READBACK_INTEGRITY_PASS',operationalClosureStatus:'I6_5_OPERATIONAL_CLOSURE_CODE_DEFECT_SUCCESSOR_LIVE_PASS',writes:2227,nextRequiredStep:'USER_VISUAL_REFRESH_CHECK'};
           C.postproductionDataUpdateControl.executionCursor='POST_WRITE_READBACK_INTEGRITY_PASS';C.postproductionDataUpdateControl.nextRequiredStep='USER_VISUAL_REFRESH_CHECK';C.nextAction='I6_5_USER_VISUAL_REFRESH_CHECK';
           C.i65MiniClosurePlan={...(C.i65MiniClosurePlan||{}),blockAStatus:'A1_EMAIL_VERIFICATION_PENDING_A2_A3_A4_PRODUCT_FIX_LIVE_PASS',blockBStatus:'READ_PATH_HYDRATION_LIVE_PASS',blockCStatus:'TECHNICAL_PASS_PENDING_USER_VISUAL',nextMaterialCursor:'USER_VISUAL_REFRESH_CHECK',operationalClosureReceiptPath:process.env.CLOSURE_RECEIPT};
-          const receipt={schema:'GRAVICENTRA_I6_5_OPERATIONAL_CLOSURE_LIVE_PASS_V1',status:'LIVE_PASS_PENDING_FINAL_PAULA_VISUAL',date:'2026-09-18',sourceSha:release.sourceSha,buildId:release.buildId,artifactId:release.artifactId,runId:Number(process.env.GITHUB_RUN_ID),globalPortfolioCount:live.global.cartera,globalCobrosCount:live.global.cobros,loginBrandPass:true,faviconPass:true,clientReceiptLoadingPass:true,policyFlowContractPass:true,dataWrites:0,semanticBoundary:'recibosEsperados+carteraPrimas separate from cobros',userAccess:{samuel:'PROVISIONED_ACTIVE_MEMBERSHIP_EMAIL_VERIFICATION_PENDING',carlos:'PROVISIONED_ACTIVE_MEMBERSHIP_EMAIL_VERIFICATION_PENDING'},nextRequiredStep:'PAULA_VISUAL_REFRESH_ON_CURRENT_BUILD'};
+          const receipt={schema:'GRAVICENTRA_I6_5_OPERATIONAL_CLOSURE_LIVE_PASS_V1',status:'LIVE_PASS_PENDING_FINAL_PAULA_VISUAL',date:'2026-09-18',sourceSha:release.sourceSha,buildId:release.buildId,artifactId:release.artifactId,runId:Number(process.env.GITHUB_RUN_ID),globalPortfolioCount:live.global.cartera,globalCobrosCount:live.global.cobros,loginBrandPass:true,faviconPass:true,clientReceiptLoadingPass:true,policyFlowContractPass:true,dataWrites:0,semanticBoundary:'recibosEsperados+carteraPrimas separate from cobros',selfAdministration:{identityPolicy:'NO_HARDCODED_IDENTITIES',teamModule:'PLATFORM_MANAGED',backendCommitRequired:true,canonicalReadbackRequired:true},nextRequiredStep:'PAULA_VISUAL_REFRESH_ON_CURRENT_BUILD'};
           fs.writeFileSync(process.env.CLOSURE_RECEIPT,JSON.stringify(receipt,null,2)+'\n');
           L.releaseBinding={sourceSha:release.sourceSha,buildId:release.buildId,artifactId:release.artifactId,artifactArchiveDigest:release.artifactArchiveDigest,previewChannelId:release.previewChannelId};
           L.i65OperationalClosureAcceptance={status:'LIVE_PASS_PENDING_FINAL_PAULA_VISUAL',sourceSha:release.sourceSha,buildId:release.buildId,artifactId:release.artifactId,liveRunId:Number(process.env.GITHUB_RUN_ID),globalPortfolioCount:live.global.cartera,globalCobrosCount:live.global.cobros,dataWrites:0};

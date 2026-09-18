@@ -216,4 +216,5 @@
     const host = document.getElementById('host') || document.getElementById('mod-host');
     if (host) decorateTable(host);
   });
+  window.Orbit.equipoOnboardingBridgeV20260804=Object.freeze({VERSION:'20260918.1',loaded:true,identityAgnostic:true,backendOwned:true,noHardcodedIdentities:true});
 })();
