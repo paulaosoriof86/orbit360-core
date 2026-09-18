@@ -415,9 +415,9 @@
     "mechanismRegistryPath": "artifacts/orbit360-recovery/release-control/DATA_UPDATE_MECHANISM_REGISTRY.json",
     "mechanismRegistryBlobSha": "785a71f234d372db3fd23e16aa6800e1c1a62041",
     "activeSourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_4_POLIZAS_RIESGOS_SOURCE_INTAKE_20260918.json",
-    "activeSourceIntakeBlobSha": "906d17af0c9f5e6ade2d14bb52e0a9cd514d2d5a",
+    "activeSourceIntakeBlobSha": "ec14feb7c9acf62189b7327b233e21f4e291757b",
     "activeModule": "POLIZAS_RIESGOS_VEHICULOS",
-    "activeModuleStatus": "SOURCE_PINNED",
+    "activeModuleStatus": "LIVE_READBACK_PASS",
     "i6_0": {
       "status": "I6_0_BASELINE_FROZEN",
       "executorPath": ".github/workflows/gravicentra-material-baseline-freeze.yml",
@@ -460,6 +460,27 @@
       "paulaVisualAcceptance": "ACCEPTED",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_3_CLIENTES_LIVE_PASS_20260918.json",
       "receiptBlobSha": "c4ceccd2b69d0b07b547974b690b8232864c8d75"
+    },
+    "i6_4": {
+      "status": "LIVE_READBACK_PASS",
+      "readbackRunId": 35325748631,
+      "readbackArtifactId": 10539073435,
+      "readbackArtifactDigest": "00489c6e2673aed0eabdd7f406e9e2c2e41dd2fb9b0fb3f034f16a65bef761cf",
+      "writesExecuted": 0,
+      "liveCounts": {
+        "clientes": 442,
+        "polizas": 1373,
+        "vehiculos": 1032,
+        "renovaciones": 0
+      },
+      "relationshipBaseline": {
+        "policyClientMissing": 0,
+        "policyClientTombstone": 0,
+        "vehiclePolicyMissing": 0,
+        "vehicleClientMissing": 0,
+        "vehicleClientTombstone": 0
+      },
+      "publicKeySha256": "342371840986ee008bdef3ee9523fe9e52509d12a654ac1d4c0fa6b3cb781579"
     }
   },
   "postproductionDataUpdateControl": {
@@ -473,15 +494,15 @@
     "mechanismRegistryBlobSha": "785a71f234d372db3fd23e16aa6800e1c1a62041",
     "activeModule": "POLIZAS_RIESGOS_VEHICULOS",
     "activeSourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_4_POLIZAS_RIESGOS_SOURCE_INTAKE_20260918.json",
-    "activeSourceIntakeBlobSha": "906d17af0c9f5e6ade2d14bb52e0a9cd514d2d5a",
+    "activeSourceIntakeBlobSha": "ec14feb7c9acf62189b7327b233e21f4e291757b",
     "sourceSha256": "7130ed56467da438f5c6e2823ede65f73d6356de63de94e19da30f3aed26c68f",
     "conversationAsAuthority": false,
     "requestCurrentSourceBeforeEveryNewModule": true,
     "liveVisualRefreshRequiredForClosure": true,
     "pureDataUpdateRequiresBuildOrDeploy": false,
     "reimportForVisibilityFailureForbidden": true,
-    "nextRequiredStep": "LIVE_READBACK_CURRENT_STATE",
-    "executionCursor": "SOURCE_PINNED"
+    "nextRequiredStep": "DETERMINISTIC_DIFF",
+    "executionCursor": "LIVE_READBACK_PASS"
   },
   "governanceSyncChecklist": {
     "frozenPlanMaterialized": true,
@@ -558,7 +579,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_4_LIVE_READBACK_CURRENT_STATE",
+  "nextAction": "I6_4_DETERMINISTIC_DIFF",
   "postproductionExitProgress": {
     "formalPercent": 40,
     "frozenMiniGates": 4,

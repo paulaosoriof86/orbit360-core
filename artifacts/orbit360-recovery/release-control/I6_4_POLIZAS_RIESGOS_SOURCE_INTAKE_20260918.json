@@ -148,11 +148,28 @@
   },
   "execution": {
     "method": "DATA_UPDATE_DELTA_FIRST",
-    "cursorState": "SOURCE_PINNED",
+    "cursorState": "LIVE_READBACK_PASS",
     "writeApplied": false,
-    "readbackPassed": false,
+    "readbackPassed": true,
     "deterministicDiffReady": false,
-    "nextRequiredStep": "LIVE_READBACK_CURRENT_STATE"
+    "nextRequiredStep": "DETERMINISTIC_DIFF",
+    "readbackRunId": 35325748631,
+    "readbackArtifactId": 10539073435,
+    "readbackArtifactDigest": "00489c6e2673aed0eabdd7f406e9e2c2e41dd2fb9b0fb3f034f16a65bef761cf",
+    "liveCounts": {
+      "clientes": 442,
+      "polizas": 1373,
+      "vehiculos": 1032,
+      "renovaciones": 0
+    },
+    "relationshipBaseline": {
+      "policyClientMissing": 0,
+      "policyClientTombstone": 0,
+      "vehiclePolicyMissing": 0,
+      "vehicleClientMissing": 0,
+      "vehicleClientTombstone": 0
+    },
+    "publicKeySha256": "342371840986ee008bdef3ee9523fe9e52509d12a654ac1d4c0fa6b3cb781579"
   },
   "guards": {
     "doNotCommitPIISourceFiles": true,
