@@ -151,6 +151,39 @@
       "backendCount": 442,
       "readback": true,
       "rollbackExecuted": false
+    },
+    "identityMerge": {
+      "status": "AUTHORIZED_PENDING_APPLY",
+      "authorizedByPaulaAt": "2026-09-18T02:09:00-06:00",
+      "userAuthorized": true,
+      "groups": [
+        {
+          "key": "jose_josue",
+          "canonicalId": "cli_pol_708e0722dd105a47b1e6c668e1b6",
+          "duplicateId": "cli_siga_0590abeade9fe33a171a",
+          "canonicalName": "JOSUÉ HUMBERTO AGUILAR LUNA"
+        },
+        {
+          "key": "helen_hellen",
+          "canonicalId": "cli_pol_2dafec0234c5f197e5d6ea1c915f",
+          "duplicateId": "cli_siga_aaec96ed37bc520a19bc",
+          "canonicalName": "HELEN GURLY GRIFFITHS GODOY"
+        },
+        {
+          "key": "william_wiliam",
+          "canonicalId": "cli_pol_5c9ec2fdb3804280cf60297eb6c0",
+          "duplicateId": "cli_siga_8874655e33581f7fa24d",
+          "canonicalName": "WILLIAM REYNOSO IXCOY"
+        }
+      ],
+      "strategy": "CANONICAL_ENRICHMENT_PLUS_TOMBSTONE_NO_PHYSICAL_DELETE",
+      "expectedBackendDocuments": 442,
+      "expectedActiveClientsAfter": 439,
+      "expectedTombstones": 3,
+      "writePath": "orbit360ProductOperationalCommand",
+      "relationsMustRemainOnCanonical": true,
+      "futureDiffMustHonorAliases": true,
+      "reimport": false
     }
   },
   "guards": {

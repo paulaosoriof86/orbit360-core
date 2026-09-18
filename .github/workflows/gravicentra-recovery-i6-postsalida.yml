@@ -14,6 +14,7 @@ on:
       - 'tools/gravicentra-i6-3-client-name-case.mjs'
       - 'tools/gravicentra-i6-3-contact-sample-readonly.mjs'
       - 'tools/gravicentra-i6-3-client-completeness-audit.mjs'
+      - 'tools/gravicentra-i6-3-identity-merge-executor.mjs'
       - 'tools/gravicentra-certified-live-binding-check.mjs'
       - 'orbit360-platform/core/tenant-access-policy-contract-p0.js'
       - 'orbit360-platform/core/access-scope.js'
@@ -481,3 +482,132 @@ jobs:
           compression-level: 0
           if-no-files-found: error
           retention-days: 7
+
+
+  i63-identity-merge:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      CONTROL: artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json
+      SOURCE_INTAKE: artifacts/orbit360-recovery/release-control/I6_3_CLIENTES_SOURCE_INTAKE_20260918.json
+      REGISTRY: artifacts/orbit360-recovery/release-control/DATA_UPDATE_MECHANISM_REGISTRY.json
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Resolve identity-merge applicability
+        id: merge
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('node:fs'),c=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8')),m=c.i63IdentityMerge||{};
+          const ok=m.status==='AUTHORIZED_PENDING_APPLY';
+          if(ok){
+            if(c.i6Execution?.dataMutationAuthorized!==true||c.gateState?.gates?.I6?.dataMutationAuthorized!==true)throw new Error('I63_MERGE_AUTH_INVALID');
+            if(!m.userAuthorized||m.physicalDeleteAuthorized!==false||m.reimportAuthorized!==false||m.writePath!=='orbit360ProductOperationalCommand')throw new Error('I63_MERGE_BOUNDARY_INVALID');
+          }
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(ok?'true':'false')+'\n');
+          console.log('I63_IDENTITY_MERGE_APPLICABLE='+(ok?'true':'false'));
+          NODE
+      - name: Install merge proof dependencies
+        if: steps.merge.outputs.run == 'true'
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false playwright@1.55.0 firebase-admin@13.4.0 >/dev/null
+          npx playwright install --with-deps chromium >/dev/null
+      - name: Apply controlled identity merges
+        if: steps.merge.outputs.run == 'true'
+        env:
+          I63_IDENTITY_MERGE_EVIDENCE_FILE: ${{ runner.temp }}/i63-identity-merge.json
+        run: node tools/gravicentra-i6-3-identity-merge-executor.mjs
+      - name: Upload identity merge evidence
+        if: steps.merge.outputs.run == 'true'
+        id: mergeart
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i6-3-identity-merge-${{ github.run_id }}
+          path: ${{ runner.temp }}/i63-identity-merge.json
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 30
+      - name: Seal identity merge and alias rule
+        if: steps.merge.outputs.run == 'true'
+        env:
+          MERGE_ARTIFACT_ID: ${{ steps.mergeart.outputs.artifact-id }}
+          MERGE_ARTIFACT_DIGEST: ${{ steps.mergeart.outputs.artifact-digest }}
+        run: |
+          set -euo pipefail
+          git fetch origin recovery/fase-a-clean-20260831
+          git reset --hard origin/recovery/fase-a-clean-20260831
+          export MERGE_EVIDENCE="$RUNNER_TEMP/i63-identity-merge.json"
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const C=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8'));
+          const S=JSON.parse(fs.readFileSync(process.env.SOURCE_INTAKE,'utf8'));
+          const R=JSON.parse(fs.readFileSync(process.env.REGISTRY,'utf8'));
+          const E=JSON.parse(fs.readFileSync(process.env.MERGE_EVIDENCE,'utf8'));
+          if(E.status!=='PASS'||E.backendBefore!==442||E.backendAfter!==442||E.activeCanonicalAfter!==439||E.tombstonesAfter!==3||E.uiVisibleAfter!==439||E.writes!==6)throw new Error('I63_MERGE_EVIDENCE_INVALID');
+          const seal={
+            ...(C.i63IdentityMerge||{}),
+            status:'APPLIED_READBACK_PASS',
+            applyRunId:Number(process.env.GITHUB_RUN_ID),
+            evidenceArtifactId:Number(process.env.MERGE_ARTIFACT_ID),
+            evidenceArtifactDigest:process.env.MERGE_ARTIFACT_DIGEST,
+            writes:E.writes,relationsMoved:E.relationsMoved,
+            backendDocuments:E.backendAfter,activeClients:E.activeCanonicalAfter,tombstones:E.tombstonesAfter,uiVisible:E.uiVisibleAfter,
+            rollbackExecuted:E.rollback?.executed===true,rollbackStatus:E.rollback?.status||'NOT_NEEDED'
+          };
+          C.i63IdentityMerge=seal;
+          C.i6Execution.dataMutationAuthorized=false;
+          C.gateState.gates.I6.dataMutationAuthorized=false;
+          C.i6Execution.activeModuleStatus='PENDING_USER_VISUAL';
+          C.nextAction='I6_3_USER_VISUAL_REFRESH_CHECK';
+          C.postproductionDataUpdateControl.executionCursor='PENDING_USER_VISUAL';
+          C.postproductionDataUpdateControl.nextRequiredStep='USER_VISUAL_REFRESH_CHECK';
+
+          S.execution.identityMerge={
+            ...(S.execution.identityMerge||{}),
+            status:'APPLIED_READBACK_PASS',
+            applyRunId:Number(process.env.GITHUB_RUN_ID),
+            evidenceArtifactId:Number(process.env.MERGE_ARTIFACT_ID),
+            evidenceArtifactDigest:process.env.MERGE_ARTIFACT_DIGEST,
+            writes:E.writes,relationsMoved:E.relationsMoved,
+            backendDocuments:E.backendAfter,activeClients:E.activeCanonicalAfter,tombstones:E.tombstonesAfter,uiVisible:E.uiVisibleAfter,
+            rollbackExecuted:E.rollback?.executed===true
+          };
+          S.execution.cursorState='PENDING_USER_VISUAL';
+          S.execution.nextRequiredStep='USER_VISUAL_REFRESH_CHECK';
+
+          R.modules.CLIENTES.identityMergeControl={
+            ...(R.modules.CLIENTES.identityMergeControl||{}),
+            status:'APPLIED_READBACK_PASS',
+            effectiveAfterEvidencePass:true,
+            applyRunId:Number(process.env.GITHUB_RUN_ID),
+            activeClientsAfterMerge:439,
+            backendDocumentsIncludingTombstones:442,
+            futureDeterministicDiffRule:'RESOLVE_ALIAS_CLIENT_ID_TO_CANONICAL_BEFORE_INSERT_OR_UPDATE',
+            invariant:'MERGED_TOMBSTONES_MUST_NEVER_BE_REACTIVATED_AS_NEW_CLIENTS'
+          };
+          fs.writeFileSync(process.env.SOURCE_INTAKE,JSON.stringify(S,null,2)+'\n');
+          fs.writeFileSync(process.env.REGISTRY,JSON.stringify(R,null,2)+'\n');
+          const {execFileSync}=require('node:child_process');
+          const sourceBlob=execFileSync('git',['hash-object',process.env.SOURCE_INTAKE],{encoding:'utf8'}).trim();
+          C.i6Execution.activeSourceIntakeBlobSha=sourceBlob;
+          C.postproductionDataUpdateControl.activeSourceIntakeBlobSha=sourceBlob;
+          C.i63IdentityMerge.aliasRegistryBlobSha=execFileSync('git',['hash-object',process.env.REGISTRY],{encoding:'utf8'}).trim();
+          fs.writeFileSync(process.env.CONTROL,JSON.stringify(C,null,2)+'\n');
+          NODE
+          git config user.name "gravicentra-governance-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add "$CONTROL" "$SOURCE_INTAKE" "$REGISTRY"
+          git commit -m "recovery(i6.3): seal controlled client identity merges"
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          git push origin HEAD:recovery/fase-a-clean-20260831

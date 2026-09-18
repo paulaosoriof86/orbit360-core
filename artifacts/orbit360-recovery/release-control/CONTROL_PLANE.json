@@ -115,7 +115,7 @@
       "I6": {
         "status": "I6_3_DATA_UPDATE_V5_ACTIVE",
         "activeSubgate": "I6.3",
-        "dataMutationAuthorized": false,
+        "dataMutationAuthorized": true,
         "lastFrozenMiniGate": "I6.2"
       }
     },
@@ -392,7 +392,7 @@
   "i6Execution": {
     "authorized": true,
     "dryRunPrepared": false,
-    "dataMutationAuthorized": false,
+    "dataMutationAuthorized": true,
     "periodStart": "2026-08-01",
     "periodEnd": "2026-08-31",
     "requiresDryRun": false,
@@ -415,7 +415,7 @@
     "mechanismRegistryPath": "artifacts/orbit360-recovery/release-control/DATA_UPDATE_MECHANISM_REGISTRY.json",
     "mechanismRegistryBlobSha": "4f9c0d1726ea07aeb157018cc525dea87aa8c5de",
     "activeSourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_3_CLIENTES_SOURCE_INTAKE_20260918.json",
-    "activeSourceIntakeBlobSha": "4f7ac8e545c36c07906fd6d3acfb2cd117526dc9",
+    "activeSourceIntakeBlobSha": "6413d725aef2a41a966c387fb7f8a89795da6f39",
     "activeModule": "CLIENTES",
     "activeModuleStatus": "PENDING_USER_VISUAL",
     "i6_0": {
@@ -454,7 +454,7 @@
     "mechanismRegistryBlobSha": "4f9c0d1726ea07aeb157018cc525dea87aa8c5de",
     "activeModule": "CLIENTES",
     "activeSourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_3_CLIENTES_SOURCE_INTAKE_20260918.json",
-    "activeSourceIntakeBlobSha": "4f7ac8e545c36c07906fd6d3acfb2cd117526dc9",
+    "activeSourceIntakeBlobSha": "6413d725aef2a41a966c387fb7f8a89795da6f39",
     "sourceSha256": "4f0a1307605ad5dcc947355dbbc98a50b510358e5f6a9835b75d02e45f5a8c7c",
     "conversationAsAuthority": false,
     "requestCurrentSourceBeforeEveryNewModule": true,
@@ -774,5 +774,41 @@
     ],
     "staleArtifactFallbackForbidden": true,
     "i5PushAutotriggerDisabledAfterProductionAcceptance": true
+  },
+  "i63IdentityMerge": {
+    "status": "AUTHORIZED_PENDING_APPLY",
+    "userAuthorized": true,
+    "authorizedByPaulaAt": "2026-09-18T02:09:00-06:00",
+    "groups": [
+      {
+        "key": "jose_josue",
+        "canonicalId": "cli_pol_708e0722dd105a47b1e6c668e1b6",
+        "duplicateId": "cli_siga_0590abeade9fe33a171a",
+        "canonicalName": "JOSUÉ HUMBERTO AGUILAR LUNA"
+      },
+      {
+        "key": "helen_hellen",
+        "canonicalId": "cli_pol_2dafec0234c5f197e5d6ea1c915f",
+        "duplicateId": "cli_siga_aaec96ed37bc520a19bc",
+        "canonicalName": "HELEN GURLY GRIFFITHS GODOY"
+      },
+      {
+        "key": "william_wiliam",
+        "canonicalId": "cli_pol_5c9ec2fdb3804280cf60297eb6c0",
+        "duplicateId": "cli_siga_8874655e33581f7fa24d",
+        "canonicalName": "WILLIAM REYNOSO IXCOY"
+      }
+    ],
+    "expectedWrites": 6,
+    "expectedRelationsMoved": 0,
+    "expectedBackendDocuments": 442,
+    "expectedActiveClientsAfter": 439,
+    "expectedTombstones": 3,
+    "writePath": "orbit360ProductOperationalCommand",
+    "physicalDeleteAuthorized": false,
+    "reimportAuthorized": false,
+    "unrelatedFieldsAuthorized": false,
+    "rollbackRequired": true,
+    "aliasRegistryRequired": true
   }
 }

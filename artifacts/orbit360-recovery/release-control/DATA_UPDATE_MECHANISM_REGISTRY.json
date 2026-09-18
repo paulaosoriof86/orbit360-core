@@ -58,7 +58,32 @@
       "liveClosure": "READBACK_PASS_THEN_USER_REFRESH_MUST_SHOW_UPDATED_DATA",
       "sourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_3_CLIENTES_SOURCE_INTAKE_20260918.json",
       "sourceSha256": "4f0a1307605ad5dcc947355dbbc98a50b510358e5f6a9835b75d02e45f5a8c7c",
-      "currentSourceRecords": 450
+      "currentSourceRecords": 450,
+      "identityMergeControl": {
+        "status": "AUTHORIZED_PENDING_APPLY",
+        "aliases": [
+          {
+            "aliasClientId": "cli_siga_0590abeade9fe33a171a",
+            "canonicalClientId": "cli_pol_708e0722dd105a47b1e6c668e1b6",
+            "canonicalName": "JOSUÉ HUMBERTO AGUILAR LUNA"
+          },
+          {
+            "aliasClientId": "cli_siga_aaec96ed37bc520a19bc",
+            "canonicalClientId": "cli_pol_2dafec0234c5f197e5d6ea1c915f",
+            "canonicalName": "HELEN GURLY GRIFFITHS GODOY"
+          },
+          {
+            "aliasClientId": "cli_siga_8874655e33581f7fa24d",
+            "canonicalClientId": "cli_pol_5c9ec2fdb3804280cf60297eb6c0",
+            "canonicalName": "WILLIAM REYNOSO IXCOY"
+          }
+        ],
+        "futureDeterministicDiffRule": "RESOLVE_ALIAS_CLIENT_ID_TO_CANONICAL_BEFORE_INSERT_OR_UPDATE",
+        "physicalDeleteForbidden": true,
+        "tombstoneStrategy": true,
+        "sourceRowsMayContainHistoricalAlias": true,
+        "effectiveAfterEvidencePass": false
+      }
     },
     "POLIZAS_RIESGOS_VEHICULOS": {
       "gate": "I6.4",

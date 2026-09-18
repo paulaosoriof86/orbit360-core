@@ -57,11 +57,20 @@ const i63DefectPending=activeI63V5&&i63CodeDefect.status==='I6_3_CODE_DEFECT_CAN
 const i63DefectLive=activeI63V5&&String(i63CodeDefect.status||'').startsWith('I6_3_CODE_DEFECT_SUCCESSOR_LIVE_PASS');
 const i63NameCase=C.i63NameCaseNormalization||{};
 const i63NameCasePending=activeI63V5&&i63NameCase.status==='AUTHORIZED_PENDING_APPLY';
-need(i63NameCasePending?C.i6Execution?.dataMutationAuthorized===true:C.i6Execution?.dataMutationAuthorized===false,'I6_3_NAME_CASE_DATA_AUTH_INVALID');
-need(i63NameCasePending?g.I6?.dataMutationAuthorized===true:g.I6?.dataMutationAuthorized===false,'I6_3_NAME_CASE_GATE_AUTH_INVALID');
+const i63IdentityMerge=C.i63IdentityMerge||{};
+const i63IdentityMergePending=activeI63V5&&i63IdentityMerge.status==='AUTHORIZED_PENDING_APPLY';
+const i63DataCorrectionPending=i63NameCasePending||i63IdentityMergePending;
+need(!(i63NameCasePending&&i63IdentityMergePending),'I6_3_MULTIPLE_DATA_CORRECTIONS_FORBIDDEN');
+need(i63DataCorrectionPending?C.i6Execution?.dataMutationAuthorized===true:C.i6Execution?.dataMutationAuthorized===false,'I6_3_DATA_CORRECTION_AUTH_INVALID');
+need(i63DataCorrectionPending?g.I6?.dataMutationAuthorized===true:g.I6?.dataMutationAuthorized===false,'I6_3_DATA_CORRECTION_GATE_AUTH_INVALID');
 if(i63NameCasePending){
  need(i63NameCase.userAuthorized===true&&Number(i63NameCase.targetCount)===12&&i63NameCase.field==='nombre'&&i63NameCase.transform==='UPPERCASE_ONLY','I6_3_NAME_CASE_SCOPE_INVALID');
  need(i63NameCase.writePath==='orbit360ProductOperationalCommand'&&i63NameCase.reimportAuthorized===false&&i63NameCase.deletesAuthorized===false&&i63NameCase.unrelatedFieldsAuthorized===false,'I6_3_NAME_CASE_BOUNDARY_INVALID');
+}
+if(i63IdentityMergePending){
+ need(i63IdentityMerge.userAuthorized===true&&Array.isArray(i63IdentityMerge.groups)&&i63IdentityMerge.groups.length===3,'I6_3_IDENTITY_MERGE_SCOPE_INVALID');
+ need(Number(i63IdentityMerge.expectedWrites)===6&&Number(i63IdentityMerge.expectedActiveClientsAfter)===439&&Number(i63IdentityMerge.expectedTombstones)===3,'I6_3_IDENTITY_MERGE_COUNTS_INVALID');
+ need(i63IdentityMerge.writePath==='orbit360ProductOperationalCommand'&&i63IdentityMerge.physicalDeleteAuthorized===false&&i63IdentityMerge.reimportAuthorized===false&&i63IdentityMerge.unrelatedFieldsAuthorized===false&&i63IdentityMerge.rollbackRequired===true,'I6_3_IDENTITY_MERGE_BOUNDARY_INVALID');
 }
 need(i63DefectPending?C.i6Execution?.productMutationAuthorized===true:C.i6Execution?.productMutationAuthorized===false,'I6_PRODUCT_MUTATION_AUTH_STATE_INVALID');
 need(postDiffCursor||C.i6Execution?.sourceDataApplyAuthorized===false,'I6_SOURCE_APPLY_AUTHORIZED_TOO_EARLY');
