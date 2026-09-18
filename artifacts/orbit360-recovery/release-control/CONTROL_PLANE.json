@@ -1049,10 +1049,10 @@
     ],
     "detailGuardScopeAuthorizedByPaula": true,
     "detailGuardScopeAuthorizedAt": "2026-09-18T09:28:00-06:00",
-    "latestFailedPreviewRunId": 35364152724,
-    "latestFailedPreviewBuildId": "gi-i64-e36085700a66-57f234755dc1",
-    "latestFailedPreviewUrl": "https://ays-orbit-360-lab--gi-i64-35364152724-70q2g921.web.app",
-    "latestFailedPreviewHostedPayloadDigest": "8b10a1057c7cd8b0ccc875c8da1c051356de8f620e46f8bbc1e1bb0601a41038",
+    "latestFailedPreviewRunId": 35364624230,
+    "latestFailedPreviewBuildId": "gi-i64-c204d11c80c7-57f234755dc1",
+    "latestFailedPreviewUrl": "https://ays-orbit-360-lab--gi-i64-35364624230-k13s9al8.web.app",
+    "latestFailedPreviewHostedPayloadDigest": "55031d31165ba9c0b5efa520d6de3fe959a532efcbb0bbef88d2f8e791e8e477",
     "latestFailedPreviewReadbackExact": true,
     "latestFailedPreviewAssertion": "I64_RENEWABILITY_UNKNOWN_DISPLAY:Renovabilidad pendiente de revisión/conciliación",
     "latestFailedPreviewPromotedToLive": false,
@@ -1066,6 +1066,14 @@
       "productOwnerModified": "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
       "outOfScopePortalOwnerModified": false,
       "mitigation": "Render the canonical renewability sentence across adjacent text nodes so visible wording remains exactly 'Renovabilidad pendiente de validar' without invoking the unrelated generic portal rewrite."
+    },
+    "latestExecutorFailure": {
+      "classification": "PREVIEW_CHANNEL_SETTLE_404_BEFORE_EXACT_READBACK",
+      "failedRunId": 35364624230,
+      "productSourceFailure": false,
+      "previewDeployStepPassed": true,
+      "exactReadbackReached": true,
+      "remediation": "Add bounded retry only for transient preview propagation HTTP/network failures; exact digest comparison remains unchanged."
     }
   }
 }

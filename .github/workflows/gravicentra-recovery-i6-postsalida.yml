@@ -224,15 +224,28 @@ jobs:
           set -euo pipefail
           export MANIFEST="$RUNNER_TEMP/i64-package/evidence/site-manifest.sha256"
           python3 - <<'PY'
-          import hashlib,json,os,urllib.parse,urllib.request
+          import hashlib,json,os,time,urllib.error,urllib.parse,urllib.request
           rows=[tuple(x.split('  ',1)) for x in open(os.environ['MANIFEST']).read().splitlines() if x.strip()]
           base=os.environ['TARGET_URL'].rstrip('/');bad=[]
+          def read_with_preview_settle(req, attempts=8):
+              last=None
+              for n in range(attempts):
+                  try:
+                      with urllib.request.urlopen(req,timeout=30) as r:return r.read()
+                  except urllib.error.HTTPError as e:
+                      last=e
+                      if e.code not in (404,429,500,502,503,504) or n==attempts-1:raise
+                  except urllib.error.URLError as e:
+                      last=e
+                      if n==attempts-1:raise
+                  time.sleep(2)
+              raise last
           for want,rel in rows:
               req=urllib.request.Request(base+'/'+urllib.parse.quote(rel,safe='/')+'?i64='+os.environ['EXPECTED_DIGEST'][:16],headers={'Accept-Encoding':'identity','Cache-Control':'no-cache'})
-              with urllib.request.urlopen(req,timeout=30) as r:got=hashlib.sha256(r.read()).hexdigest()
+              got=hashlib.sha256(read_with_preview_settle(req)).hexdigest()
               if got!=want:bad.append((rel,want,got))
           if bad:raise SystemExit('I64_PREVIEW_READBACK_MISMATCH:'+json.dumps(bad[:3]))
-          with urllib.request.urlopen(urllib.request.Request(base+'/__recovery__/build.json?i64=1',headers={'Cache-Control':'no-cache'}),timeout=30) as r:m=json.loads(r.read())
+          m=json.loads(read_with_preview_settle(urllib.request.Request(base+'/__recovery__/build.json?i64=1',headers={'Cache-Control':'no-cache'})))
           if m.get('sourceSha')!=os.environ['GITHUB_SHA'] or m.get('buildId')!=os.environ['EXPECTED_BUILD_ID'] or m.get('gate')!='I6.4':raise SystemExit('I64_PREVIEW_MARKER_MISMATCH')
           print('I64_PREVIEW_READBACK='+str(len(rows)))
           PY
