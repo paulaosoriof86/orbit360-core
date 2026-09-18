@@ -120,6 +120,24 @@ jobs:
           chmod 600 "$RUNNER_TEMP/i63-sa.json"
           echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/i63-sa.json" >> "$GITHUB_ENV"
 
+      - name: Normalize 12 newly inserted client names to historical uppercase convention
+        if: steps.mode.outputs.mode == 'release'
+        env:
+          I63_CASE_EVIDENCE_FILE: ${{ runner.temp }}/i63-name-case.json
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-i6-3-client-name-case.mjs
+
+      - name: Upload name-case readback evidence
+        if: steps.mode.outputs.mode == 'release'
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i6-3-name-case-${{ github.run_id }}
+          path: ${{ runner.temp }}/i63-name-case.json
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 30
+
       - name: Materialize immutable package once
         if: steps.mode.outputs.mode == 'release'
         id: build

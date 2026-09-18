@@ -162,7 +162,7 @@ try{
   need(pageErrors.length===0,'I63_PROOF_PAGE_ERRORS');
   need(http404.length===0,'I63_PROOF_HTTP404');
   ev.ui.pageErrors=0;ev.ui.http404=0;ev.status='PASS';
-}catch(e){ev.errors.push(clean(e?.message||e,220));process.exitCode=1;}
+}catch(e){ev.errors.push(clean(e?.message||e,220));console.error('I63_PROOF_ERROR='+clean(e?.message||e,220));process.exitCode=1;}
 finally{
   if(browser)await browser.close().catch(()=>{});
   await deleteApp(app).catch(()=>{});

@@ -121,6 +121,16 @@
         "controlSamplesVisible": 5,
         "kpi": "PRIMA_NETA_VIGENTE_SEPARADA_POR_MONEDA"
       }
+    },
+    "nameCaseNormalization": {
+      "status": "AUTHORIZED_PENDING_APPLY",
+      "scope": "TWELVE_I6_3_INSERTS_NAME_FIELD_ONLY",
+      "targetCount": 12,
+      "transform": "UPPERCASE_PRESERVE_CHARACTERS_AND_ACCENTS",
+      "reimport": false,
+      "deletes": 0,
+      "otherFields": false,
+      "authorizedByPaulaAt": "2026-09-18T00:40:00-06:00"
     }
   },
   "guards": {

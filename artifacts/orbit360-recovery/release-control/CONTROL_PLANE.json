@@ -115,7 +115,7 @@
       "I6": {
         "status": "I6_3_DATA_UPDATE_V5_ACTIVE",
         "activeSubgate": "I6.3",
-        "dataMutationAuthorized": false,
+        "dataMutationAuthorized": true,
         "lastFrozenMiniGate": "I6.2"
       }
     },
@@ -393,7 +393,7 @@
   "i6Execution": {
     "authorized": true,
     "dryRunPrepared": false,
-    "dataMutationAuthorized": false,
+    "dataMutationAuthorized": true,
     "periodStart": "2026-08-01",
     "periodEnd": "2026-08-31",
     "requiresDryRun": false,
@@ -416,7 +416,7 @@
     "mechanismRegistryPath": "artifacts/orbit360-recovery/release-control/DATA_UPDATE_MECHANISM_REGISTRY.json",
     "mechanismRegistryBlobSha": "4f9c0d1726ea07aeb157018cc525dea87aa8c5de",
     "activeSourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_3_CLIENTES_SOURCE_INTAKE_20260918.json",
-    "activeSourceIntakeBlobSha": "6213e08e6e12f8f3a14f6ba26959c8b506dd59aa",
+    "activeSourceIntakeBlobSha": "dcb0fb0b88082e4861d199860a4008f82a3b2ad5",
     "activeModule": "CLIENTES",
     "activeModuleStatus": "CODE_DEFECT_SUCCESSOR_RELEASE_IN_PROGRESS",
     "i6_0": {
@@ -455,7 +455,7 @@
     "mechanismRegistryBlobSha": "4f9c0d1726ea07aeb157018cc525dea87aa8c5de",
     "activeModule": "CLIENTES",
     "activeSourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_3_CLIENTES_SOURCE_INTAKE_20260918.json",
-    "activeSourceIntakeBlobSha": "6213e08e6e12f8f3a14f6ba26959c8b506dd59aa",
+    "activeSourceIntakeBlobSha": "dcb0fb0b88082e4861d199860a4008f82a3b2ad5",
     "sourceSha256": "4f0a1307605ad5dcc947355dbbc98a50b510358e5f6a9835b75d02e45f5a8c7c",
     "conversationAsAuthority": false,
     "requestCurrentSourceBeforeEveryNewModule": true,
@@ -688,5 +688,18 @@
     "reimportAuthorized": false,
     "sameArtifactPreviewToProductionRequired": true,
     "paulaVisualAcceptanceRequired": true
+  },
+  "i63NameCaseNormalization": {
+    "status": "AUTHORIZED_PENDING_APPLY",
+    "userAuthorized": true,
+    "targetCount": 12,
+    "field": "nombre",
+    "transform": "UPPERCASE_ONLY",
+    "sourceOfTargetIds": "I6_3_DETERMINISTIC_DELTA_INSERT_SET",
+    "writePath": "orbit360ProductOperationalCommand",
+    "reimportAuthorized": false,
+    "deletesAuthorized": false,
+    "unrelatedFieldsAuthorized": false,
+    "rollbackRequired": true
   }
 }
