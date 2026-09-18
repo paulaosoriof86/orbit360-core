@@ -115,7 +115,7 @@
       "I6": {
         "status": "I6_4_DATA_UPDATE_V5_ACTIVE",
         "activeSubgate": "I6.4",
-        "dataMutationAuthorized": true,
+        "dataMutationAuthorized": false,
         "lastFrozenMiniGate": "I6.3"
       }
     },
@@ -392,7 +392,7 @@
   "i6Execution": {
     "authorized": true,
     "dryRunPrepared": false,
-    "dataMutationAuthorized": true,
+    "dataMutationAuthorized": false,
     "periodStart": "2026-08-01",
     "periodEnd": "2026-08-31",
     "requiresDryRun": false,
@@ -413,11 +413,11 @@
     "executionDisciplinePath": "artifacts/orbit360-recovery/release-control/I6_DATA_UPDATE_EXECUTION_DISCIPLINE_LOCK_20260917.json",
     "executionDisciplineBlobSha": "7af17759086da336dbf755d72ad85692f892b71b",
     "mechanismRegistryPath": "artifacts/orbit360-recovery/release-control/DATA_UPDATE_MECHANISM_REGISTRY.json",
-    "mechanismRegistryBlobSha": "8b86ea0ee56f9b501b7085017eec41fd3a091fb0",
+    "mechanismRegistryBlobSha": "7b762c92b7babc88c7d2942041c66aadd1e8a471",
     "activeSourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_4_POLIZAS_RIESGOS_SOURCE_INTAKE_20260918.json",
-    "activeSourceIntakeBlobSha": "48d11d755f9c452435a0603ab5ebaa8723386039",
+    "activeSourceIntakeBlobSha": "f23567ea5486c3195ec8f6fbd788e929f7479996",
     "activeModule": "POLIZAS_RIESGOS_VEHICULOS",
-    "activeModuleStatus": "POST_WRITE_READBACK_INTEGRITY_PASS_VISUAL_CORRECTION_PENDING",
+    "activeModuleStatus": "POST_WRITE_READBACK_INTEGRITY_PASS",
     "i6_0": {
       "status": "I6_0_BASELINE_FROZEN",
       "executorPath": ".github/workflows/gravicentra-material-baseline-freeze.yml",
@@ -527,7 +527,14 @@
       "integrityPassed": true,
       "functionalPassed": true,
       "rollbackExecuted": false,
-      "paulaVisualAcceptance": "PENDING"
+      "paulaVisualAcceptance": "PENDING",
+      "visualCorrectionStatus": "APPLIED_READBACK_INTEGRITY_FUNCTIONAL_PASS",
+      "visualCorrectionRunId": 35342948207,
+      "visualCorrectionArtifactId": 10545429790,
+      "visualCorrectionArtifactDigest": "73f0faf00ea1833b9cf39e5625cef58e6569ed846bb21cb552ccf99b2475ed32",
+      "visualCorrectionWrites": 320,
+      "domiciliadoRemaining": 0,
+      "countryCurrencyMismatchesRemaining": 0
     }
   },
   "postproductionDataUpdateControl": {
@@ -538,10 +545,10 @@
     "executionDisciplinePath": "artifacts/orbit360-recovery/release-control/I6_DATA_UPDATE_EXECUTION_DISCIPLINE_LOCK_20260917.json",
     "executionDisciplineBlobSha": "7af17759086da336dbf755d72ad85692f892b71b",
     "mechanismRegistryPath": "artifacts/orbit360-recovery/release-control/DATA_UPDATE_MECHANISM_REGISTRY.json",
-    "mechanismRegistryBlobSha": "8b86ea0ee56f9b501b7085017eec41fd3a091fb0",
+    "mechanismRegistryBlobSha": "7b762c92b7babc88c7d2942041c66aadd1e8a471",
     "activeModule": "POLIZAS_RIESGOS_VEHICULOS",
     "activeSourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_4_POLIZAS_RIESGOS_SOURCE_INTAKE_20260918.json",
-    "activeSourceIntakeBlobSha": "48d11d755f9c452435a0603ab5ebaa8723386039",
+    "activeSourceIntakeBlobSha": "f23567ea5486c3195ec8f6fbd788e929f7479996",
     "sourceSha256": "7130ed56467da438f5c6e2823ede65f73d6356de63de94e19da30f3aed26c68f",
     "conversationAsAuthority": false,
     "requestCurrentSourceBeforeEveryNewModule": true,
@@ -913,7 +920,7 @@
     "aliasRegistryBlobSha": "b655d64b00af01f0cdbf632db769f22dccaebead"
   },
   "i64VisualCorrection": {
-    "status": "AUTHORIZED_PENDING_APPLY",
+    "status": "APPLIED_READBACK_INTEGRITY_FUNCTIONAL_PASS",
     "userAuthorized": true,
     "authorizedAt": "2026-09-18T05:53:00-06:00",
     "classification": "SECOND_CYCLE_CAUSAL_DATA_CORRECTION",
@@ -932,6 +939,30 @@
     "carteraWritesAuthorized": false,
     "cobrosWritesAuthorized": false,
     "commissionWritesAuthorized": false,
-    "rollbackRequired": true
+    "rollbackRequired": true,
+    "runId": 35342948207,
+    "artifactId": 10545429790,
+    "artifactDigest": "73f0faf00ea1833b9cf39e5625cef58e6569ed846bb21cb552ccf99b2475ed32",
+    "writes": 320,
+    "fieldChanges": {
+      "formaPago": 170,
+      "conductoPago": 319,
+      "pais": 2,
+      "moneda": 2
+    },
+    "domiciliado": {
+      "policiesBefore": 319,
+      "formaPagoBefore": 170,
+      "conductoPagoBefore": 319,
+      "policiesAfter": 0,
+      "canonicalReplacement": "Transferencia"
+    },
+    "countryCurrency": {
+      "beforeMismatches": 2,
+      "afterMismatches": 0,
+      "corrections": 2,
+      "explicitUsdPreserved": true
+    },
+    "rollbackExecuted": false
   }
 }

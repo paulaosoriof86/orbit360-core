@@ -1,6 +1,6 @@
 {
   "schema": "GRAVICENTRA_I6_4_VISUAL_CORRECTION_LOCK_V1",
-  "status": "AUTHORIZED_PENDING_APPLY",
+  "status": "APPLIED_READBACK_INTEGRITY_FUNCTIONAL_PASS",
   "date": "2026-09-18",
   "gate": "I6.4",
   "module": "POLIZAS_RIESGOS_VEHICULOS",
@@ -108,5 +108,52 @@
     "commissionWritesAuthorized": false,
     "sourceRebuildAuthorized": false
   },
-  "closure": "POST_WRITE_READBACK_INTEGRITY_PASS_THEN_PAULA_VISUAL_ACCEPTANCE"
+  "closure": "POST_WRITE_READBACK_INTEGRITY_PASS_THEN_PAULA_VISUAL_ACCEPTANCE",
+  "evidence": {
+    "runId": 35342948207,
+    "artifactId": 10545429790,
+    "artifactDigest": "73f0faf00ea1833b9cf39e5625cef58e6569ed846bb21cb552ccf99b2475ed32"
+  },
+  "result": {
+    "writes": 320,
+    "fieldChanges": {
+      "formaPago": 170,
+      "conductoPago": 319,
+      "pais": 2,
+      "moneda": 2
+    },
+    "domiciliado": {
+      "policiesBefore": 319,
+      "formaPagoBefore": 170,
+      "conductoPagoBefore": 319,
+      "policiesAfter": 0,
+      "canonicalReplacement": "Transferencia"
+    },
+    "countryCurrency": {
+      "beforeMismatches": 2,
+      "afterMismatches": 0,
+      "corrections": 2,
+      "explicitUsdPreserved": true
+    },
+    "nonPolicyCollectionsUnchanged": true,
+    "relations": {
+      "policyClientMissing": 0,
+      "policyClientTombstone": 0,
+      "vehiclePolicyMissing": 0,
+      "vehicleClientMissing": 0,
+      "vehicleClientTombstone": 0,
+      "canonicalClients": 439
+    },
+    "functional": {
+      "status": "PASS",
+      "polizasRouteLoads": true,
+      "runtimePolicyCount": 1414,
+      "mayraGTQ": true,
+      "adrianaCOP": true,
+      "noDomiciliado": true,
+      "pageErrors": 0,
+      "http404": 0,
+      "actorRole": "Dirección"
+    }
+  }
 }

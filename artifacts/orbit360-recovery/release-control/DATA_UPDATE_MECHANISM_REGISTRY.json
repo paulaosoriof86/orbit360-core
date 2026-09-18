@@ -117,7 +117,7 @@
       "nextMaterialStep": "LIVE_READBACK_CURRENT_STATE",
       "resumeCursor": "SOURCE_PINNED",
       "businessRuleCorrection": {
-        "status": "AUTHORIZED_PENDING_APPLY",
+        "status": "APPLIED_READBACK_INTEGRITY_FUNCTIONAL_PASS",
         "lockPath": "artifacts/orbit360-recovery/release-control/I6_4_VISUAL_CORRECTION_LOCK_20260918.json",
         "cycle": 2,
         "domicilioLegacyNormalization": "Domiciliado -> Transferencia",
@@ -134,7 +134,14 @@
           "I6.6",
           "I6.7"
         ],
-        "reimport": false
+        "reimport": false,
+        "effective": true,
+        "runId": 35342948207,
+        "artifactId": 10545429790,
+        "artifactDigest": "73f0faf00ea1833b9cf39e5625cef58e6569ed846bb21cb552ccf99b2475ed32",
+        "writes": 320,
+        "domiciliadoRemaining": 0,
+        "countryCurrencyMismatchesRemaining": 0
       }
     },
     "RECIBOS_CARTERA": {

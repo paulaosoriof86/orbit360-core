@@ -322,7 +322,11 @@
     "integrityPassed": true,
     "functionalPassed": true,
     "visualCorrectionCycle": 2,
-    "visualCorrectionStatus": "AUTHORIZED_PENDING_APPLY"
+    "visualCorrectionStatus": "APPLIED_READBACK_INTEGRITY_FUNCTIONAL_PASS",
+    "visualCorrectionRunId": 35342948207,
+    "visualCorrectionArtifactId": 10545429790,
+    "visualCorrectionArtifactDigest": "73f0faf00ea1833b9cf39e5625cef58e6569ed846bb21cb552ccf99b2475ed32",
+    "visualCorrectionWrites": 320
   },
   "guards": {
     "doNotCommitPIISourceFiles": true,
@@ -336,7 +340,7 @@
   },
   "businessRuleCorrections": {
     "i64VisualCorrection": {
-      "status": "AUTHORIZED_PENDING_APPLY",
+      "status": "APPLIED_READBACK_INTEGRITY_FUNCTIONAL_PASS",
       "lockPath": "artifacts/orbit360-recovery/release-control/I6_4_VISUAL_CORRECTION_LOCK_20260918.json",
       "classification": "SECOND_CYCLE_CAUSAL_DATA_CORRECTION",
       "userAuthorized": true,
@@ -352,7 +356,17 @@
         "mayraPolicyId": "pol_6fc005003a2ba6d52bdba67188ed",
         "axaSiblingPolicyId": "pol_dda1a827b1c4443567870abeee8e"
       },
-      "receiptsAndCartera": "NO_WRITES_IN_I6_4; FROZEN_RECONCILIATION_RULES_APPLY_FROM_I6_5_WITH_NEW_COBRANZA_AND_COMMISSION_EVIDENCE"
+      "receiptsAndCartera": "NO_WRITES_IN_I6_4; FROZEN_RECONCILIATION_RULES_APPLY_FROM_I6_5_WITH_NEW_COBRANZA_AND_COMMISSION_EVIDENCE",
+      "runId": 35342948207,
+      "artifactId": 10545429790,
+      "artifactDigest": "73f0faf00ea1833b9cf39e5625cef58e6569ed846bb21cb552ccf99b2475ed32",
+      "writes": 320,
+      "fieldChanges": {
+        "formaPago": 170,
+        "conductoPago": 319,
+        "pais": 2,
+        "moneda": 2
+      }
     }
   }
 }
