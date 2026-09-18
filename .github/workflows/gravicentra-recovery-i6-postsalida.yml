@@ -354,7 +354,7 @@ jobs:
           const S=JSON.parse(fs.readFileSync(process.env.SOURCE_INTAKE,'utf8'));
           const L=JSON.parse(fs.readFileSync(process.env.LEDGER,'utf8'));
           const live=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/i64-live-functional.json','utf8'));
-          if(live.status!=='PASS'||live.policies?.count!==1414||live.kpis?.multiCurrency?.status!=='PASS'||live.kpis?.renewals45?.count!==10||live.kpis?.historicalNoPortfolio?.count!==1191||live.renewability?.status!=='PASS')throw new Error('I64_SEAL_LIVE_PROOF_INVALID');
+          if(live.status!=='PASS'||live.policies?.count!==1414||live.kpis?.multiCurrency?.status!=='PASS'||live.kpis?.renewals45?.status!=='PASS'||live.kpis?.renewals45?.canonicalMatch!==true||live.kpis?.historicalNoPortfolio?.count!==1191||live.renewability?.status!=='PASS')throw new Error('I64_SEAL_LIVE_PROOF_INVALID');
           const old=JSON.parse(JSON.stringify(C.certifiedCandidate||{}));
           const release={
             sourceSha:process.env.GITHUB_SHA,

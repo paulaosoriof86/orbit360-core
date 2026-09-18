@@ -39,15 +39,15 @@ try{
     const cards=[...document.querySelectorAll('.kpi-row .kpi')];
     const card=label=>{const x=cards.find(k=>(k.querySelector('.k-label')?.textContent||'').trim()===label);return{label:(x?.querySelector('.k-label')?.textContent||'').trim(),value:(x?.querySelector('.k-val')?.textContent||'').replace(/\s+/g,' ').trim(),foot:(x?.querySelector('.k-foot')?.textContent||'').replace(/\s+/g,' ').trim()};};
     const totals=metrics.premiumByCurrency(all),rounded=Object.fromEntries(Object.entries(totals).map(([k,v])=>[k,Math.round(v)]));
-    const renewalCount=all.filter(metrics.isRenewalWithin45Days).length,historicalCount=all.filter(metrics.isHistoricalNoPortfolio).length;
+    const renewalCount=all.filter(metrics.isRenewalWithin45Days).length,canonicalRenewalCount=Orbit.q.renovacionesProximas(45).length,historicalCount=all.filter(metrics.isHistoricalNoPortfolio).length;
     const target=all.find(p=>String(p.numero||'').trim()==='AUTO-490658');
-    return{count:all.length,rounded,renewalCount,historicalCount,targetId:target?.id||'',targetState:target?metrics.renewabilityState(target):'',premium:card('Prima neta vigente'),renewals:card('Por renovar ≤45 d'),historical:card('Histórico / sin cartera')};
+    return{count:all.length,rounded,renewalCount,canonicalRenewalCount,historicalCount,targetId:target?.id||'',targetState:target?metrics.renewabilityState(target):'',premium:card('Prima neta vigente'),renewals:card('Por renovar ≤45 d'),historical:card('Histórico / sin cartera')};
   });
   need(result.count===1414,'I64_POLICY_COUNT');
   need(Object.keys(result.rounded).includes('GTQ')&&Object.keys(result.rounded).includes('COP'),'I64_CURRENCIES_MISSING');
   need(Object.entries(result.rounded).every(([cur,n])=>result.premium.value.includes(cur)&&result.premium.value.includes(Number(n).toLocaleString('es-GT',{maximumFractionDigits:0}))),'I64_PREMIUM_KPI_VALUES');
   need(/no se suman GTQ y COP/i.test(result.premium.foot),'I64_PREMIUM_KPI_FOOT');
-  need(result.renewalCount===10&&Number(result.renewals.value)===result.renewalCount,'I64_RENEWALS_KPI');
+  need(result.renewalCount===result.canonicalRenewalCount&&Number(result.renewals.value)===result.renewalCount,'I64_RENEWALS_KPI:'+JSON.stringify({computed:result.renewalCount,canonical:result.canonicalRenewalCount,displayed:result.renewals.value}));
   need(result.historicalCount===1191&&Number(result.historical.value)===result.historicalCount,'I64_HISTORICAL_KPI');
   need(result.targetId&&result.targetState==='UNKNOWN','I64_RENEWABILITY_TARGET');
   await page.evaluate(id=>Orbit.modules.cliente360.verPoliza(id),result.targetId);
@@ -56,7 +56,7 @@ try{
   need(/Renovabilidad pendiente de validar/i.test(drawer)&&!/No renovable/i.test(drawer),'I64_RENEWABILITY_UNKNOWN_DISPLAY');
   need(pageErrors.length===0,'I64_PROOF_PAGE_ERRORS');need(http404.length===0,'I64_PROOF_HTTP404');
   ev.policies={count:result.count,actorRole:actor.role};
-  ev.kpis={multiCurrency:{status:'PASS',amounts:result.rounded},renewals45:{status:'PASS',count:result.renewalCount},historicalNoPortfolio:{status:'PASS',count:result.historicalCount}};
+  ev.kpis={multiCurrency:{status:'PASS',amounts:result.rounded},renewals45:{status:'PASS',count:result.renewalCount,canonicalCount:result.canonicalRenewalCount,canonicalMatch:true},historicalNoPortfolio:{status:'PASS',count:result.historicalCount}};
   ev.renewability={status:'PASS',policyNumber:'AUTO-490658',sourceState:'UNKNOWN',display:'Renovabilidad pendiente de validar'};
   ev.status='PASS';
 }catch(e){ev.errors.push(clean(e?.message||e,220));console.error('I64_PROOF_ERROR='+clean(e?.message||e,220));process.exitCode=1;}
