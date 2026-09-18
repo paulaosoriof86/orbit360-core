@@ -11,6 +11,8 @@ const norm=v=>clean(v,400).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLow
 const normPolicy=v=>clean(v,180).toUpperCase().replace(/[–—−‑]/g,'-').replace(/\s+/g,'');
 const normPlate=v=>clean(v,100).toUpperCase().replace(/[–—−‑]/g,'-').replace(/[^A-Z0-9]/g,'');
 const sha=v=>crypto.createHash('sha256').update(String(v??''),'utf8').digest('hex');
+const stable=v=>{if(v===undefined)return null;if(v===null||typeof v!=='object')return v;if(typeof v.toDate==='function'){try{return{$timestamp:v.toDate().toISOString()};}catch{}}if(Array.isArray(v))return v.map(stable);const o={};for(const k of Object.keys(v).sort())o[k]=stable(v[k]);return o;};
+const digest=v=>sha(JSON.stringify(stable(v)));
 const need=(x,c)=>{if(!x)throw new Error(c);};
 function serviceAccount(){for(const k of ['SA_DEFAULT','SA_ORBIT360_LAB','SA_ORBIT_360_LAB']){try{const x=JSON.parse(process.env[k]||'');if(x?.type==='service_account'&&x?.project_id===PROJECT&&x?.client_email&&x?.private_key)return x;}catch{}}throw new Error('I64_DIFF_SERVICE_ACCOUNT');}
 function col(db,n){return db.collection('tenants').doc(TENANT).collection('data').doc(n).collection('items');}
@@ -29,7 +31,7 @@ try{
   const members=await db.collection('tenants').doc(TENANT).collection('members').get();
   out.collections.members=members.docs.map(d=>{const x=d.data()||{};return{id:d.id,uid:clean(x.uid||d.id,256),asesorId:clean(x.asesorId,256),nameHash:sha(norm(first(x,['nombre','name','displayName']))),roles:[].concat(x.roles||[],x.rolesAsignados||[],x.role||[],x.rol||[]).map(v=>clean(v,80)).filter(Boolean),active:x.activo!==false&&x.active!==false};});
   out.collections.polizas=snaps.polizas.docs.map(d=>{const x=d.data()||{};return{
-    id:d.id,numeroHash:sha(normPolicy(first(x,['numero','poliza','numeroPoliza']))),
+    id:d.id,docSha256:digest(x),numeroHash:sha(normPolicy(first(x,['numero','poliza','numeroPoliza']))),
     numeroNormHash:sha(norm(first(x,['numero','poliza','numeroPoliza']))),
     clienteId:clean(x.clienteId,256),aseguradoraId:clean(x.aseguradoraId,256),asesorId:clean(x.asesorId,256),
     vigenciaIni:dateVal(x,['vigenciaIni','vigenciaInicio','fechaInicio','desde']),vigenciaFin:dateVal(x,['vigenciaFin','vigenciaFinal','fechaFin','hasta','vencimiento']),
@@ -43,7 +45,7 @@ try{
     requiereValidacion:x.requiereValidacion===true,sourceRef:clean(x.sourceRef,300),numeroFila:x._numeroFila??null
   };});
   out.collections.vehiculos=snaps.vehiculos.docs.map(d=>{const x=d.data()||{};return{
-    id:d.id,polizaId:clean(x.polizaId,256),clienteId:clean(x.clienteId,256),
+    id:d.id,docSha256:digest(x),polizaId:clean(x.polizaId,256),clienteId:clean(x.clienteId,256),
     placaHash:sha(normPlate(first(x,['placa','placaNormalizada','placaFuente']))),vinHash:sha(norm(first(x,['vin','numeroSerie','numeroSerieAuto']))),
     inciso:clean(x.inciso,80),marca:clean(x.marca,120),linea:clean(first(x,['linea','tipo']),160),tipo:clean(x.tipo,160),
     modelo:clean(first(x,['modelo','anio']),50),motorHash:sha(norm(first(x,['motor']))),
