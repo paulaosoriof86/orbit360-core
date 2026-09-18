@@ -158,10 +158,18 @@ try{
   const ui=await page.evaluate(()=>({total:window.OrbitRuntimeDiagnostics?.cliente360?.list?.totalRows||0,kpi:(document.querySelector('.kpi-row .kpi .k-val')?.textContent||'').trim()}));
   evidence.uiVisibleAfter=ui.total;need(ui.total===439,'I63_MERGE_UI_ACTIVE_COUNT');
   for(const group of GROUPS){
-    await page.evaluate(id=>{location.hash='#/cliente360?c='+encodeURIComponent(id);},group.duplicateId);
-    await page.waitForFunction(id=>location.hash.includes(encodeURIComponent(id)),group.canonicalId,{timeout:8000});
-    const redirected=await page.evaluate(id=>location.hash.includes(encodeURIComponent(id)),group.canonicalId);
-    need(redirected,'I63_MERGE_REDIRECT_FAIL:'+group.key);
+    await page.evaluate(()=>{location.hash='#/cliente360';});
+    await page.waitForSelector('#f-q',{timeout:8000});
+    const search=await page.evaluate(group=>{
+      const q=document.getElementById('f-q'); if(!q)return{canonical:false,duplicate:false};
+      q.value=group.canonicalName; q.dispatchEvent(new Event('input',{bubbles:true}));
+      const rows=[...document.querySelectorAll('tbody tr.clickable')];
+      return{
+        canonical:rows.some(tr=>(tr.getAttribute('onclick')||'').includes('?c='+group.canonicalId)),
+        duplicate:rows.some(tr=>(tr.getAttribute('onclick')||'').includes('?c='+group.duplicateId))
+      };
+    },group);
+    need(search.canonical===true&&!search.duplicate,'I63_MERGE_UI_CANONICAL_VISIBILITY_FAIL:'+group.key);
   }
   await page.close();
   evidence.status='PASS';

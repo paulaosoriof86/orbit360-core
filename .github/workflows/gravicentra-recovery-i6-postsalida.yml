@@ -461,7 +461,8 @@ jobs:
           set -euo pipefail
           node - <<'NODE'
           const fs=require('node:fs'),c=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8'));
-          const ok=c.gateState?.gates?.I6?.activeSubgate==='I6.3' && ['I6_3_USER_VISUAL_REFRESH_CHECK','I6_3_CODE_DEFECT_SUCCESSOR_RELEASE'].includes(c.nextAction);
+          const merged=c.i63IdentityMerge?.status==='APPLIED_READBACK_PASS';
+          const ok=!merged && c.gateState?.gates?.I6?.activeSubgate==='I6.3' && ['I6_3_USER_VISUAL_REFRESH_CHECK','I6_3_CODE_DEFECT_SUCCESSOR_RELEASE'].includes(c.nextAction);
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(ok?'true':'false')+'\n');
           console.log('I63_AUDIT_APPLICABLE='+(ok?'true':'false'));
           NODE
