@@ -115,7 +115,7 @@
       "I6": {
         "status": "I6_3_DATA_UPDATE_V5_ACTIVE",
         "activeSubgate": "I6.3",
-        "dataMutationAuthorized": true,
+        "dataMutationAuthorized": false,
         "lastFrozenMiniGate": "I6.2"
       }
     },
@@ -392,7 +392,7 @@
   "i6Execution": {
     "authorized": true,
     "dryRunPrepared": false,
-    "dataMutationAuthorized": true,
+    "dataMutationAuthorized": false,
     "periodStart": "2026-08-01",
     "periodEnd": "2026-08-31",
     "requiresDryRun": false,
@@ -413,9 +413,9 @@
     "executionDisciplinePath": "artifacts/orbit360-recovery/release-control/I6_DATA_UPDATE_EXECUTION_DISCIPLINE_LOCK_20260917.json",
     "executionDisciplineBlobSha": "7af17759086da336dbf755d72ad85692f892b71b",
     "mechanismRegistryPath": "artifacts/orbit360-recovery/release-control/DATA_UPDATE_MECHANISM_REGISTRY.json",
-    "mechanismRegistryBlobSha": "ffb8d19e16a54fe85150ef23c9cb29ca53eecac3",
+    "mechanismRegistryBlobSha": "b655d64b00af01f0cdbf632db769f22dccaebead",
     "activeSourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_3_CLIENTES_SOURCE_INTAKE_20260918.json",
-    "activeSourceIntakeBlobSha": "6413d725aef2a41a966c387fb7f8a89795da6f39",
+    "activeSourceIntakeBlobSha": "515f10f38a62a61668637d9472f9b8f3c3edbc23",
     "activeModule": "CLIENTES",
     "activeModuleStatus": "PENDING_USER_VISUAL",
     "i6_0": {
@@ -451,10 +451,10 @@
     "executionDisciplinePath": "artifacts/orbit360-recovery/release-control/I6_DATA_UPDATE_EXECUTION_DISCIPLINE_LOCK_20260917.json",
     "executionDisciplineBlobSha": "7af17759086da336dbf755d72ad85692f892b71b",
     "mechanismRegistryPath": "artifacts/orbit360-recovery/release-control/DATA_UPDATE_MECHANISM_REGISTRY.json",
-    "mechanismRegistryBlobSha": "ffb8d19e16a54fe85150ef23c9cb29ca53eecac3",
+    "mechanismRegistryBlobSha": "b655d64b00af01f0cdbf632db769f22dccaebead",
     "activeModule": "CLIENTES",
     "activeSourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_3_CLIENTES_SOURCE_INTAKE_20260918.json",
-    "activeSourceIntakeBlobSha": "6413d725aef2a41a966c387fb7f8a89795da6f39",
+    "activeSourceIntakeBlobSha": "515f10f38a62a61668637d9472f9b8f3c3edbc23",
     "sourceSha256": "4f0a1307605ad5dcc947355dbbc98a50b510358e5f6a9835b75d02e45f5a8c7c",
     "conversationAsAuthority": false,
     "requestCurrentSourceBeforeEveryNewModule": true,
@@ -712,7 +712,9 @@
     "releaseFreshnessFenceRequired": true,
     "previousCertifiedSourceSha": "4f1194caab311aa25b6c6f5ce297db962953c0c2",
     "previousCertifiedBuildId": "gi-i63-4f1194caab31-57f234755dc1",
-    "previousCertifiedArtifactId": 10537380037
+    "previousCertifiedArtifactId": 10537380037,
+    "postIdentityMergeRuntimeVisible": 439,
+    "postIdentityMergeBackendDocuments": 442
   },
   "i63NameCaseNormalization": {
     "status": "APPLIED_READBACK_PASS",
@@ -776,7 +778,7 @@
     "i5PushAutotriggerDisabledAfterProductionAcceptance": true
   },
   "i63IdentityMerge": {
-    "status": "AUTHORIZED_PENDING_APPLY",
+    "status": "APPLIED_READBACK_PASS",
     "userAuthorized": true,
     "authorizedByPaulaAt": "2026-09-18T02:09:00-06:00",
     "groups": [
@@ -809,6 +811,18 @@
     "reimportAuthorized": false,
     "unrelatedFieldsAuthorized": false,
     "rollbackRequired": true,
-    "aliasRegistryRequired": true
+    "aliasRegistryRequired": true,
+    "applyRunId": 35323647660,
+    "evidenceArtifactId": 10538770252,
+    "evidenceArtifactDigest": "sha256:8c47da67cc31d0d8c5023f086f3e76ebd26c38a7a9a18f4abc9f77e3d664dfd0",
+    "writes": 6,
+    "relationsMoved": 0,
+    "backendDocuments": 442,
+    "activeClients": 439,
+    "tombstones": 3,
+    "uiVisible": 439,
+    "rollbackExecuted": false,
+    "rollbackStatus": "NOT_NEEDED",
+    "aliasRegistryBlobSha": "b655d64b00af01f0cdbf632db769f22dccaebead"
   }
 }

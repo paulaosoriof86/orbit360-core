@@ -117,13 +117,15 @@
       ],
       "expectedAfterFix": {
         "backendDocuments": 442,
-        "cliente360VisibleClients": 442,
+        "cliente360VisibleClients": 439,
         "controlSamplesVisible": 5,
         "kpi": "PRIMA_NETA_VIGENTE_SEPARADA_POR_MONEDA",
         "contactAliasProjection": "WHATSAPP_TO_PHONE_AND_EMAIL_VISIBLE",
         "releaseFreshness": "BUILD_SCOPED_SW_CACHE_AND_NO_CACHE_BOOTSTRAP",
         "mergedIdentityTombstones": "HIDDEN_AND_REDIRECT_TO_CANONICAL",
-        "runtimeAuthority": "CERTIFIED_CANDIDATE_LIVE_BINDING"
+        "runtimeAuthority": "CERTIFIED_CANDIDATE_LIVE_BINDING",
+        "backendDocumentsIncludingTombstones": 442,
+        "canonicalIdentityMerges": 3
       },
       "releaseRunId": 35321985423,
       "runtimeVisibleAfterFix": 442,
@@ -153,7 +155,7 @@
       "rollbackExecuted": false
     },
     "identityMerge": {
-      "status": "AUTHORIZED_PENDING_APPLY",
+      "status": "APPLIED_READBACK_PASS",
       "authorizedByPaulaAt": "2026-09-18T02:09:00-06:00",
       "userAuthorized": true,
       "groups": [
@@ -183,8 +185,20 @@
       "writePath": "orbit360ProductOperationalCommand",
       "relationsMustRemainOnCanonical": true,
       "futureDiffMustHonorAliases": true,
-      "reimport": false
-    }
+      "reimport": false,
+      "applyRunId": 35323647660,
+      "evidenceArtifactId": 10538770252,
+      "evidenceArtifactDigest": "sha256:8c47da67cc31d0d8c5023f086f3e76ebd26c38a7a9a18f4abc9f77e3d664dfd0",
+      "writes": 6,
+      "relationsMoved": 0,
+      "backendDocuments": 442,
+      "activeClients": 439,
+      "tombstones": 3,
+      "uiVisible": 439,
+      "rollbackExecuted": false,
+      "aliasRegistryRule": "RESOLVE_ALIAS_TO_CANONICAL_BEFORE_FUTURE_DIFF"
+    },
+    "canonicalEntitiesAfterIdentityMerge": 439
   },
   "guards": {
     "doNotCommitPIIWorkbook": true,

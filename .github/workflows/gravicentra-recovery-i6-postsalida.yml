@@ -603,7 +603,10 @@ jobs:
           const sourceBlob=execFileSync('git',['hash-object',process.env.SOURCE_INTAKE],{encoding:'utf8'}).trim();
           C.i6Execution.activeSourceIntakeBlobSha=sourceBlob;
           C.postproductionDataUpdateControl.activeSourceIntakeBlobSha=sourceBlob;
-          C.i63IdentityMerge.aliasRegistryBlobSha=execFileSync('git',['hash-object',process.env.REGISTRY],{encoding:'utf8'}).trim();
+          const registryBlob=execFileSync('git',['hash-object',process.env.REGISTRY],{encoding:'utf8'}).trim();
+          C.i63IdentityMerge.aliasRegistryBlobSha=registryBlob;
+          C.i6Execution.mechanismRegistryBlobSha=registryBlob;
+          C.postproductionDataUpdateControl.mechanismRegistryBlobSha=registryBlob;
           fs.writeFileSync(process.env.CONTROL,JSON.stringify(C,null,2)+'\n');
           NODE
           git config user.name "gravicentra-governance-bot"

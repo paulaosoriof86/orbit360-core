@@ -60,7 +60,7 @@
       "sourceSha256": "4f0a1307605ad5dcc947355dbbc98a50b510358e5f6a9835b75d02e45f5a8c7c",
       "currentSourceRecords": 450,
       "identityMergeControl": {
-        "status": "AUTHORIZED_PENDING_APPLY",
+        "status": "APPLIED_READBACK_PASS",
         "aliases": [
           {
             "aliasClientId": "cli_siga_0590abeade9fe33a171a",
@@ -82,7 +82,14 @@
         "physicalDeleteForbidden": true,
         "tombstoneStrategy": true,
         "sourceRowsMayContainHistoricalAlias": true,
-        "effectiveAfterEvidencePass": false
+        "effectiveAfterEvidencePass": true,
+        "applyRunId": 35323647660,
+        "evidenceArtifactId": 10538770252,
+        "evidenceArtifactDigest": "sha256:8c47da67cc31d0d8c5023f086f3e76ebd26c38a7a9a18f4abc9f77e3d664dfd0",
+        "activeClientsAfterMerge": 439,
+        "backendDocumentsIncludingTombstones": 442,
+        "invariant": "MERGED_TOMBSTONES_MUST_NEVER_BE_REACTIVATED_AS_NEW_CLIENTS",
+        "relationRule": "ALL_NEW_RELATIONS_MUST_TARGET_CANONICAL_CLIENT_ID"
       }
     },
     "POLIZAS_RIESGOS_VEHICULOS": {
