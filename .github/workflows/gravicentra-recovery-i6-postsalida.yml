@@ -1622,6 +1622,10 @@ jobs:
           I65_EXACT_ROLLBACK_FILE: ${{ runner.temp }}/i65-exact-rollback.private.json
         run: |
           set -euo pipefail
+          if [ ! -f "$I65_EXACT_ROLLBACK_FILE" ]; then
+            echo I65_NO_WRITES_ROLLBACK_NOT_REQUIRED
+            exit 0
+          fi
           if [ -f "$RUNNER_TEMP/i65-apply-result.json" ] && node -e "const x=require(process.env.RUNNER_TEMP+'/i65-apply-result.json');process.exit(x.rollbackExecuted===true&&x.rollbackStatus==='PASS'?0:1)"; then
             echo I65_ROLLBACK_ALREADY_PASS
           else

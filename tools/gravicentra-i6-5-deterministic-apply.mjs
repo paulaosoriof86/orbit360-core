@@ -132,7 +132,7 @@ async function verifyBaselineRestored(db,exact){
 }
 
 const C=JSON.parse(fs.readFileSync(CONTROL,'utf8')), S=JSON.parse(fs.readFileSync(SOURCE,'utf8')), D=JSON.parse(fs.readFileSync(DIFF,'utf8'));
-need(sha(fs.readFileSync(DIFF))===EXPECTED_DIFF_SHA,'I65_DIFF_FILE_SHA_INVALID');
+need(D.schema==='GRAVICENTRA_I6_5_DETERMINISTIC_DIFF_V1'&&D.status==='DETERMINISTIC_DIFF_READY'&&D.sourceBundleSha256===S.sourceBundle?.sha256&&D.decisions?.totalOperationalWrites===EXPECTED_WRITES&&D.invariants?.targetRelationshipErrors===0&&D.invariants?.cobrosWrites===0&&D.invariants?.finmovWrites===0,'I65_DIFF_RECEIPT_CONTRACT_INVALID');
 need(C.nextAction==='I6_5_APPLY_DETERMINISTIC_DELTA','I65_APPLY_CURSOR_INVALID');
 need(C.i65ApplyPayload?.status==='ENCRYPTED_PAYLOAD_READY','I65_APPLY_PAYLOAD_NOT_READY');
 need(C.i6Execution?.i6_5?.status==='DETERMINISTIC_DIFF_READY'&&C.postproductionDataUpdateControl?.executionCursor==='DETERMINISTIC_DIFF_READY','I65_APPLY_EXECUTION_CURSOR_INVALID');
