@@ -167,6 +167,20 @@ jobs:
           export ENVIRONMENT_REF="firebase-hosting-preview-i6-3"
           node tools/gravicentra-i6-1-preview-package.mjs . "$RUNNER_TEMP/i63-package" "$RUNNER_TEMP/public-config.json" > "$RUNNER_TEMP/package-output.json"
           cat "$RUNNER_TEMP/package-output.json"
+          BUILD_ID=$(node -e "const d=require(process.env.RUNNER_TEMP+'/package-output.json');process.stdout.write(d.buildId)")
+          grep -Fq "var RUNTIME_BUILD = '$BUILD_ID';" "$RUNNER_TEMP/i63-package/bundle/site/core/pwa.js"
+          grep -Fq "var BUILD = '$BUILD_ID';" "$RUNNER_TEMP/i63-package/bundle/site/sw.js"
+          grep -Fq "var CACHE = 'orbit360-$BUILD_ID';" "$RUNNER_TEMP/i63-package/bundle/site/sw.js"
+          export I63_FIREBASE_JSON="$RUNNER_TEMP/i63-package/bundle/firebase.json"
+          python3 - <<'PY'
+          import json,os
+          d=json.load(open(os.environ['I63_FIREBASE_JSON']))
+          hs=d.get('hosting',{}).get('headers',[])
+          by={x.get('source'):x.get('headers',[]) for x in hs}
+          for src in ['/index.html','/product-runtime-config.js','/__recovery__/build.json','/sw.js']:
+              vals=' '.join(h.get('value','') for h in by.get(src,[]))
+              if 'no-store' not in vals or 'must-revalidate' not in vals: raise SystemExit('I63_FRESHNESS_HEADER_MISSING:'+src)
+          PY
           node - <<'NODE'
           const fs=require('node:fs'),d=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/package-output.json','utf8'));
           const m={build_id:d.buildId,hosted_file_count:d.hostedFileCount,hosted_payload_digest:d.hostedPayloadDigest,backend_file_count:d.backendFileCount,backend_source_digest:d.backendSourceDigest,bundle_file_count:d.bundleFileCount,bundle_digest:d.bundleDigest};

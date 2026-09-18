@@ -109,17 +109,19 @@
     "technicalFunctionalDiscrepancy": "READ_PATH_COUNTRY_VALIDATION_AND_KPI_COMPOSITION_CODE_DEFECT",
     "codeDefect": {
       "classification": "CODE_DEFECT",
-      "status": "TECHNICAL_LIVE_PASS_PENDING_PAULA_VISUAL",
+      "status": "BLOCKING_VISUAL_ACCEPTANCE",
       "reimportForbidden": true,
       "causes": [
-        "CLIENTES_REQUIERE_VALIDACION_EXCLUDED_BY_COUNTRY_QUERY_AND_SCOPE_FILTER",
-        "CLIENTE360_BASE_KPI_MIXED_CURRENCIES_AND_WAS_REPATCHED_ASYNCHRONOUSLY"
+        "CLIENTE360_DETAIL_RAW_CLIENT_BYPASSES_CONTACT_ALIAS_PROJECTION",
+        "PWA_SW_CACHE_NAMESPACE_STATIC_ACROSS_CERTIFIED_BUILDS"
       ],
       "expectedAfterFix": {
         "backendDocuments": 442,
         "cliente360VisibleClients": 442,
         "controlSamplesVisible": 5,
-        "kpi": "PRIMA_NETA_VIGENTE_SEPARADA_POR_MONEDA"
+        "kpi": "PRIMA_NETA_VIGENTE_SEPARADA_POR_MONEDA",
+        "contactAliasProjection": "WHATSAPP_TO_PHONE_AND_EMAIL_VISIBLE",
+        "releaseFreshness": "BUILD_SCOPED_SW_CACHE_AND_NO_CACHE_BOOTSTRAP"
       },
       "releaseRunId": 35318710856,
       "runtimeVisibleAfterFix": 442,

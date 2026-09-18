@@ -74,7 +74,35 @@ const payload={enabled:true,environmentRef:ENVIRONMENT_REF,tenantHint:TENANT_HIN
 fs.writeFileSync(path.join(SITE,'product-runtime-config.js'),'/* Generated only inside the certified I6.1 successor artifact. Public Firebase Web config; no secrets. */\nwindow.__ORBIT360_PRODUCT_PUBLIC_CONFIG__ = Object.freeze('+JSON.stringify(payload)+');\n');
 fs.mkdirSync(path.join(SITE,'__recovery__'),{recursive:true});fs.writeFileSync(path.join(SITE,'__recovery__/build.json'),JSON.stringify({product:'Gravicentra Insurance',gate:RELEASE_GATE,sourceSha:SOURCE_SHA,buildId,environmentRef:ENVIRONMENT_REF})+'\n');
 fs.writeFileSync(path.join(EVIDENCE,'public-config-descriptor.json'),JSON.stringify({projectId:cfg.projectId,authDomain:cfg.authDomain,appIdPresent:true,apiKeyPresent:true,storageBucketPresent:!!cfg.storageBucket,configSha256:cfgHash})+'\n');
-fs.writeFileSync(path.join(BUNDLE,'firebase.json'),JSON.stringify({hosting:{site:HOSTING_SITE,public:'site',ignore:['firebase.json','backend/**','**/.*','**/node_modules/**'],rewrites:[{source:'**',destination:'/index.html'}]}})+'\n');
+
+function pinReleaseRuntime(rel,replacements){
+  const target=path.join(SITE,rel);
+  let text=read(target);
+  for(const [pattern,value,label] of replacements){
+    if(!pattern.test(text)) throw new Error('RELEASE_RUNTIME_PIN_PATTERN_MISSING:'+rel+':'+label);
+    text=text.replace(pattern,value);
+  }
+  fs.writeFileSync(target,text);
+}
+pinReleaseRuntime('core/pwa.js',[
+  [/var RUNTIME_BUILD = '[^']+';/, "var RUNTIME_BUILD = '"+buildId+"';",'pwa-build'],
+  [/var CRITICAL_RELEASE = '[^']+';/, "var CRITICAL_RELEASE = '"+buildId+"';",'pwa-critical']
+]);
+pinReleaseRuntime('sw.js',[
+  [/var CACHE = '[^']+';/, "var CACHE = 'orbit360-"+buildId+"';",'sw-cache'],
+  [/var BUILD = '[^']+';/, "var BUILD = '"+buildId+"';",'sw-build'],
+  [/var CRITICAL_RELEASE = '[^']+';/, "var CRITICAL_RELEASE = '"+buildId+"';",'sw-critical']
+]);
+
+const freshnessHeaders=[
+  {source:'/index.html',headers:[{key:'Cache-Control',value:'no-cache, no-store, must-revalidate, max-age=0'}]},
+  {source:'/product-runtime-config.js',headers:[{key:'Cache-Control',value:'no-cache, no-store, must-revalidate, max-age=0'}]},
+  {source:'/__recovery__/build.json',headers:[{key:'Cache-Control',value:'no-cache, no-store, must-revalidate, max-age=0'}]},
+  {source:'/sw.js',headers:[{key:'Cache-Control',value:'no-cache, no-store, must-revalidate, max-age=0'}]},
+  {source:'**/*.js',headers:[{key:'Cache-Control',value:'no-cache, must-revalidate, max-age=0'}]},
+  {source:'**/*.css',headers:[{key:'Cache-Control',value:'no-cache, must-revalidate, max-age=0'}]}
+];
+fs.writeFileSync(path.join(BUNDLE,'firebase.json'),JSON.stringify({hosting:{site:HOSTING_SITE,public:'site',ignore:['firebase.json','backend/**','**/.*','**/node_modules/**'],headers:freshnessHeaders,rewrites:[{source:'**',destination:'/index.html'}]}})+'\n');
 fs.writeFileSync(path.join(BUNDLE,'.firebaserc'),JSON.stringify({projects:{default:PROJECT_ID}})+'\n');
 function manifest(root,out){const files=[];const walk=d=>{for(const e of fs.readdirSync(d,{withFileTypes:true})){const p=path.join(d,e.name);if(e.isDirectory()&&e.name!=='node_modules')walk(p);else if(e.isFile())files.push(p);}};walk(root);files.sort();const rows=files.map(p=>crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex')+'  '+path.relative(root,p).split(path.sep).join('/'));const text=rows.join('\n')+'\n';fs.writeFileSync(out,text);return{count:rows.length,digest:crypto.createHash('sha256').update(text).digest('hex')};}
 const siteM=manifest(SITE,path.join(EVIDENCE,'site-manifest.sha256')); const backendM=manifest(BACKEND,path.join(EVIDENCE,'backend-manifest.sha256')); const bundleM=manifest(BUNDLE,path.join(EVIDENCE,'bundle-manifest.sha256'));

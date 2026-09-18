@@ -244,7 +244,11 @@ Orbit.modules.cliente360 = (function () {
      ========================================================= */
   function detalle(cid) {
     const r = q.clienteResumen(cid);
-    const c = r.cli, ase = q.asesor(c.asesorId);
+    const rawClient = r.cli;
+    const c = Orbit.clientProjection && typeof Orbit.clientProjection.project === 'function'
+      ? Orbit.clientProjection.project(rawClient, { policyClientIds: new Set((r.pol || []).map(p => String(p && p.clienteId || '')).filter(Boolean)) })
+      : rawClient;
+    const ase = q.asesor(c.asesorId);
     const tabs = [
       ['resumen', 'Resumen', '📊'], ['polizas', 'Pólizas', '📑'], ['vehiculos', 'Vehículos', '🚗'], ['cobros', 'Cobros', '💳'],
       ['recibos', 'Recibos y pagos', '🧾'], ['renovaciones', 'Renovaciones', '🔄'], ['siniestros', 'Siniestros', '🚨'], ['comisiones', 'Comisiones', '💼'], ['correos', 'Correos', '✉'], ['historial', 'Historial', '📝']

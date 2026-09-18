@@ -404,7 +404,7 @@
     "authorizedAt": "2026-09-14T08:57:00-06:00",
     "authorizationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_EXPLICIT_AUTHORIZATION_RECEIPT_20260914.json",
     "activeSubgate": "I6.3",
-    "productMutationAuthorized": false,
+    "productMutationAuthorized": true,
     "sourceDataApplyAuthorized": false,
     "perBlockApplyRequiresExplicitAuthorization": false,
     "dataUpdateMode": "EVERGREEN_V5_DELTA_FIRST",
@@ -415,9 +415,9 @@
     "mechanismRegistryPath": "artifacts/orbit360-recovery/release-control/DATA_UPDATE_MECHANISM_REGISTRY.json",
     "mechanismRegistryBlobSha": "4f9c0d1726ea07aeb157018cc525dea87aa8c5de",
     "activeSourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_3_CLIENTES_SOURCE_INTAKE_20260918.json",
-    "activeSourceIntakeBlobSha": "703d65f40c4872b91fa2dbf30799b108599018f4",
+    "activeSourceIntakeBlobSha": "5779fcb21a29ffa041f80e9fc9507bbcacf05c96",
     "activeModule": "CLIENTES",
-    "activeModuleStatus": "PENDING_USER_VISUAL",
+    "activeModuleStatus": "CODE_DEFECT_SUCCESSOR_RELEASE_IN_PROGRESS",
     "i6_0": {
       "status": "I6_0_BASELINE_FROZEN",
       "executorPath": ".github/workflows/gravicentra-material-baseline-freeze.yml",
@@ -454,7 +454,7 @@
     "mechanismRegistryBlobSha": "4f9c0d1726ea07aeb157018cc525dea87aa8c5de",
     "activeModule": "CLIENTES",
     "activeSourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_3_CLIENTES_SOURCE_INTAKE_20260918.json",
-    "activeSourceIntakeBlobSha": "703d65f40c4872b91fa2dbf30799b108599018f4",
+    "activeSourceIntakeBlobSha": "5779fcb21a29ffa041f80e9fc9507bbcacf05c96",
     "sourceSha256": "4f0a1307605ad5dcc947355dbbc98a50b510358e5f6a9835b75d02e45f5a8c7c",
     "conversationAsAuthority": false,
     "requestCurrentSourceBeforeEveryNewModule": true,
@@ -539,7 +539,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_3_USER_VISUAL_REFRESH_CHECK",
+  "nextAction": "I6_3_CODE_DEFECT_SUCCESSOR_RELEASE",
   "postproductionExitProgress": {
     "formalPercent": 30,
     "frozenMiniGates": 3,
@@ -671,8 +671,8 @@
   },
   "i63CodeDefect": {
     "classification": "CODE_DEFECT",
-    "status": "I6_3_CODE_DEFECT_SUCCESSOR_LIVE_PASS_PENDING_PAULA_VISUAL",
-    "cause": "Backend readback is 442 while authorized Cliente360 runtime is 436 because country-constrained hydration excludes REQUIERE_VALIDACION; base KPI separately renders a mixed-currency Prima vigente before an async bridge repairs it.",
+    "status": "I6_3_CODE_DEFECT_CANDIDATE_PENDING_BUILD",
+    "cause": "Cliente360 detail used raw client instead of canonical contact aliases, so WhatsApp-only records could render without phone; release packaging also used a static PWA/service-worker cache namespace, allowing a previous certified artifact to remain visible during propagation/cached fallback.",
     "parentCertifiedSourceSha": "03b03690b5583442dd448e954fb66c3c78648fb3",
     "applyEvidenceRunId": 35308586373,
     "applyArtifactId": 10532811723,
@@ -707,7 +707,9 @@
     },
     "rollbackChannelId": "gi-i63-rb-35318710856",
     "liveEvidenceArtifactId": 10536386425,
-    "liveEvidenceArtifactDigest": "2d794dfa8128194a431b86db55d17d73ed50e3f6201e7a41cf845f668aea2f45"
+    "liveEvidenceArtifactDigest": "2d794dfa8128194a431b86db55d17d73ed50e3f6201e7a41cf845f668aea2f45",
+    "contactProjectionFixRequired": true,
+    "releaseFreshnessFenceRequired": true
   },
   "i63NameCaseNormalization": {
     "status": "APPLIED_READBACK_PASS",

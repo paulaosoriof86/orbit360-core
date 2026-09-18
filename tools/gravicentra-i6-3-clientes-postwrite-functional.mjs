@@ -155,6 +155,26 @@ try{
   need(fc.type&&fc.country&&fc.advisor,'I63_PROOF_FILTER_CONTROLS');
   ev.filters={...ev.filters,...fc};
 
+  const contactAlias=await page.evaluate(()=>{
+    const raw=(Orbit.store.all('clientes')||[]).find(c=>c&&String(c.whatsapp||'').trim()&&!String(c.telefono||'').trim()&&String(c.email||c.correo||'').trim());
+    if(!raw)return{ok:false};
+    const projected=Orbit.clientProjection?.project?Orbit.clientProjection.project(raw):raw;
+    return{ok:String(projected.telefono||'').trim()===String(raw.whatsapp||'').trim()&&String(projected.email||'').trim()===String(raw.email||raw.correo||'').trim(),id:raw.id};
+  });
+  need(contactAlias.ok&&contactAlias.id,'I63_PROOF_CONTACT_ALIAS_PROJECTION');
+  await page.evaluate(cid=>{location.hash='#/cliente360?c='+encodeURIComponent(cid);},contactAlias.id);
+  await page.waitForFunction(cid=>Orbit?.route?.key==='cliente360'&&location.hash.includes(encodeURIComponent(cid)),contactAlias.id,{timeout:12000});
+  const contactVisible=await page.evaluate(cid=>{
+    const raw=Orbit.store.get('clientes',cid)||{};
+    const phone=String(raw.whatsapp||'').replace(/\D/g,'');
+    const email=String(raw.email||raw.correo||'').trim().toLowerCase();
+    const text=(document.querySelector('.fh-contact')?.textContent||'').replace(/\s+/g,' ').toLowerCase().replace(/\D/g,' ');
+    const html=(document.querySelector('.fh-contact')?.textContent||'').toLowerCase();
+    return{phone:phone&&html.replace(/\D/g,'').includes(phone),email:email&&html.includes(email)};
+  },contactAlias.id);
+  need(contactVisible.phone&&contactVisible.email,'I63_PROOF_CONTACT_ALIAS_NOT_VISIBLE');
+  ev.ui.contactAliasProjection='PASS';
+
   const rel=await page.evaluate(()=>{const p=(Orbit.store.all('polizas')||[]).find(x=>x&&x.clienteId&&Orbit.store.get('clientes',x.clienteId));return p?{ok:true,cid:p.clienteId}:{ok:false};});
   need(rel.ok,'I63_PROOF_RELATION_SAMPLE');
   await page.evaluate(cid=>{location.hash='#/cliente360?c='+encodeURIComponent(cid)+'&t=polizas';},rel.cid);
