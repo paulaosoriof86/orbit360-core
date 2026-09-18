@@ -11,11 +11,11 @@
   "previousLedgerBlobSha": "09c98a60b3221da29931ea32611fcf528c7f8af7",
   "previousLedgerEvidencePreservedByGitHistory": true,
   "releaseBinding": {
-    "sourceSha": "4f1194caab311aa25b6c6f5ce297db962953c0c2",
-    "buildId": "gi-i63-4f1194caab31-57f234755dc1",
-    "artifactId": 10537380037,
-    "artifactArchiveDigest": "ff210cfe7c1862a482da58c623740db58faad19ea913dc8a1355a8435e929649",
-    "previewChannelId": "gi-i63-35320527779"
+    "sourceSha": "9fff255410675c6dbf319ddf1d684b663420bae0",
+    "buildId": "gi-i63-9fff25541067-57f234755dc1",
+    "artifactId": 10536783955,
+    "artifactArchiveDigest": "065f0841c37ffeb335521f0532ddace2d1000f2fad83be5b9d376a4e6dd7114a",
+    "previewChannelId": "gi-i63-35321985423"
   },
   "successorCandidate": {
     "sourceSha": "03b03690b5583442dd448e954fb66c3c78648fb3",
@@ -296,6 +296,12 @@
             "runId": 35320527779,
             "artifactId": 10537380037,
             "artifactDigest": "ff210cfe7c1862a482da58c623740db58faad19ea913dc8a1355a8435e929649",
+            "evidence": "I6.3 causal successor technical LIVE proof: backend/runtime 442; five control inserts hydrated/searchable; unresolved-country clients visible; net premium separated by currency. Paula visual acceptance pending."
+          },
+          {
+            "runId": 35321985423,
+            "artifactId": 10536783955,
+            "artifactDigest": "065f0841c37ffeb335521f0532ddace2d1000f2fad83be5b9d376a4e6dd7114a",
             "evidence": "I6.3 causal successor technical LIVE proof: backend/runtime 442; five control inserts hydrated/searchable; unresolved-country clients visible; net premium separated by currency. Paula visual acceptance pending."
           }
         ]
@@ -593,10 +599,10 @@
   },
   "i63LiveAcceptance": {
     "status": "TECHNICAL_LIVE_PASS_PENDING_PAULA_VISUAL",
-    "sourceSha": "4f1194caab311aa25b6c6f5ce297db962953c0c2",
-    "buildId": "gi-i63-4f1194caab31-57f234755dc1",
-    "artifactId": 10537380037,
-    "liveRunId": 35320527779,
+    "sourceSha": "9fff255410675c6dbf319ddf1d684b663420bae0",
+    "buildId": "gi-i63-9fff25541067-57f234755dc1",
+    "artifactId": 10536783955,
+    "liveRunId": 35321985423,
     "backendClients": 442,
     "cliente360Clients": 442,
     "controlSamples": 5,

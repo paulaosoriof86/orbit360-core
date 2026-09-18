@@ -109,7 +109,7 @@
     "technicalFunctionalDiscrepancy": "READ_PATH_COUNTRY_VALIDATION_AND_KPI_COMPOSITION_CODE_DEFECT",
     "codeDefect": {
       "classification": "CODE_DEFECT",
-      "status": "BLOCKING_VISUAL_ACCEPTANCE",
+      "status": "TECHNICAL_LIVE_PASS_PENDING_PAULA_VISUAL",
       "reimportForbidden": true,
       "causes": [
         "IDENTITY_MERGE_TOMBSTONES_MUST_BE_HIDDEN_FROM_ACTIVE_CLIENT_PROJECTION",
@@ -125,7 +125,7 @@
         "mergedIdentityTombstones": "HIDDEN_AND_REDIRECT_TO_CANONICAL",
         "runtimeAuthority": "CERTIFIED_CANDIDATE_LIVE_BINDING"
       },
-      "releaseRunId": 35320527779,
+      "releaseRunId": 35321985423,
       "runtimeVisibleAfterFix": 442,
       "controlSamplesVisible": 5,
       "kpiAmounts": {
