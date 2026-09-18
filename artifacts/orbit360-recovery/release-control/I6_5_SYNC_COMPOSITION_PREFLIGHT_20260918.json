@@ -1,0 +1,40 @@
+{
+  "schema": "GRAVICENTRA_I6_5_SYNC_COMPOSITION_PREFLIGHT_V1",
+  "status": "BLOCKING_CAUSAL_DESYNC_FOUND_BEFORE_DATA_WRITE",
+  "date": "2026-09-18",
+  "gate": "I6.5",
+  "module": "RECIBOS_CARTERA",
+  "certifiedI64Build": {
+    "sourceSha": "8838aa98abf8573064f8e160389cf6f1c554bdc1",
+    "buildId": "gi-i64-8838aa98abf8-57f234755dc1",
+    "artifactId": 10556619616
+  },
+  "passes": [
+    "queries.js uses recibosEsperados and carteraPrimas as receipt/portfolio authorities; carteraGlobal derives pending/overdue from carteraPrimas and confirmed collection from cobros.",
+    "Hydration contracts require recibosEsperados/carteraPrimas for Cliente360 and recibosEsperados for Polizas.",
+    "importa-write-p0 allows receipt/portfolio evidence collections and hard-blocks direct cobros/finmov writes.",
+    "importa-cartera-p0 separates receipts/cartera from cobros and states that one source never creates a cobro.",
+    "I6.4 immutable build asset binding and PWA freshness fence remain active."
+  ],
+  "blockers": [
+    {
+      "id": "I65_RECEIPT_DETAIL_OWNER_MISSING_FROM_CERTIFIED_ARTIFACT",
+      "evidence": "Certified artifact 10556619616 contains calls to Orbit.receiptsPortfolioProjectionV910.openReceiptDetail in polizas.js and policy-receipts-v1199-detail-guard.js, but no implementation of receiptsPortfolioProjectionV910/V920 is packaged and backend-lab-receipts-portfolio-native-bridge-v20260801.js is absent.",
+      "impact": "Receipt detail clicks can fail and product visuals can diverge from canonical recibosEsperados/carteraPrimas."
+    },
+    {
+      "id": "I65_CLIENTE360_LEGACY_RECEIPTS_SURFACE_NEEDS_CANONICAL_PROJECTION",
+      "evidence": "cliente360.js legacy receipt/payment surfaces read cobros, while the canonical receipts/portfolio visual bridge exists in source but is absent from the certified artifact.",
+      "impact": "Correct I6.5 writes could become invisible or appear inconsistent, recreating the same class of desynchronization already seen in I6.4."
+    }
+  ],
+  "decision": "FAIL_CLOSED_NO_I6_5_DATA_WRITES",
+  "requiredFix": [
+    "Package and load the latest canonical read-only receipts/portfolio visual bridge.",
+    "Bind policy receipt-detail links to that packaged owner without an unresolved V910-only dependency.",
+    "Prove exactly one receipt/cartera visual owner after hydration and rerender.",
+    "Prove Cliente360 Recibos, policy receipt detail and queries.js read identical recibosEsperados/carteraPrimas counts.",
+    "Use one immutable build from Preview to LIVE; zero operational data writes during this code fix."
+  ],
+  "operationalWrites": 0
+}
