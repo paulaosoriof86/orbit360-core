@@ -59,6 +59,21 @@ jobs:
         run: |
           npm install --no-save --package-lock=false firebase-admin@13.10.0 @google-cloud/secret-manager@6.1.0 playwright@1.55.0 >/dev/null
           npx playwright install --with-deps chromium >/dev/null
+      - name: Diagnose privileged actor availability safely
+        shell: bash
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const {initializeApp,cert,deleteApp}=require('firebase-admin/app');
+          const {getAuth}=require('firebase-admin/auth');
+          const {getFirestore}=require('firebase-admin/firestore');
+          const clean=v=>String(v==null?'':v).trim();
+          const canon=v=>{const k=clean(v).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');return ({direccion:'direccion',superadmin:'superadmin',super_admin:'super_admin',admintenant:'admintenant',admin_tenant:'admin_tenant',admin:'admin',operativo:'operativo'})[k]||k;};
+          const roles=m=>[...new Set([].concat(m?.roles||[],m?.rolesAsignados||[],m?.assignedRoles||[],m?.rolesDisponibles||[],m?.role||[],m?.rol||[],m?.defaultRole||[],m?.rolDefault||[],m?.roleDefault||[]).map(canon).filter(Boolean))];
+          const sa=(()=>{for(const k of ['SA_DEFAULT','SA_ORBIT360_LAB','SA_ORBIT_360_LAB']){try{const x=JSON.parse(process.env[k]||'');if(x?.type==='service_account'&&x?.project_id===process.env.PROJECT_ID&&x?.client_email&&x?.private_key)return x;}catch{}}throw Error('NO_SA')})();
+          const app=initializeApp({credential:cert(sa),projectId:process.env.PROJECT_ID},'i62-actor-diagnostic');
+          (async()=>{try{const db=getFirestore(app),auth=getAuth(app),snap=await db.collection('tenants').doc(process.env.TENANT_ID).collection('members').get(),listed=await auth.listUsers(1000),users=new Map(listed.users.map(u=>[u.uid,u]));const out={activeMembers:0,privilegedMembers:0,privilegedAuthUsers:0,privilegedEnabled:0,privilegedVerified:0,roles:{}};for(const d of snap.docs){const m=d.data()||{},state=canon(m.status||m.estado||'active');if(m.active===false||m.activo===false||['inactive','inactivo','blocked','bloqueado','suspended','suspendido'].includes(state))continue;out.activeMembers++;const rs=roles(m),priv=rs.filter(r=>['direccion','superadmin','super_admin','admintenant','admin_tenant','admin','operativo'].includes(r));if(!priv.length)continue;out.privilegedMembers++;for(const r of priv)out.roles[r]=(out.roles[r]||0)+1;const uid=clean(m.uid||d.id),u=users.get(uid);if(u){out.privilegedAuthUsers++;if(!u.disabled)out.privilegedEnabled++;if(!u.disabled&&u.emailVerified===true)out.privilegedVerified++;}}console.log('I62_ACTOR_DIAGNOSTIC='+JSON.stringify(out));}finally{await deleteApp(app).catch(()=>{});}})().catch(e=>{console.error(e.message);process.exit(1)});
+          NODE
       - name: Apply deterministic delta, read back and prove updated values
         env:
           I62_EVIDENCE_DIR: ${{ runner.temp }}/gravicentra-i62-evidence
