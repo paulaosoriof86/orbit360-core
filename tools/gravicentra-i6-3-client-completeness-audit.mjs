@@ -37,6 +37,29 @@ try{
   }
   out.duplicateExactNameGroups=[...nameGroups.entries()].filter(([,v])=>v.length>1).map(([key,rows])=>({key,count:rows.length,rows}));
   out.duplicateStrongPhoneGroups=[...phoneGroups.entries()].filter(([,v])=>v.length>1).map(([phone,rows])=>({phone,count:rows.length,rows}));
+  const identityCandidateGroups=[
+    {key:'jose_josue',ids:['cli_pol_708e0722dd105a47b1e6c668e1b6','cli_siga_0590abeade9fe33a171a']},
+    {key:'helen_hellen',ids:['cli_pol_2dafec0234c5f197e5d6ea1c915f','cli_siga_aaec96ed37bc520a19bc']},
+    {key:'william_wiliam',ids:['cli_pol_5c9ec2fdb3804280cf60297eb6c0','cli_siga_8874655e33581f7fa24d']}
+  ];
+  out.identityCandidateGroups=[];
+  const relationCollectionsAudit=['polizas','vehiculos','cobros','comisiones','cancelaciones','actividades','renovaciones','siniestros'];
+  for(const group of identityCandidateGroups){
+    const rows=[];
+    for(const id of group.ids){
+      const row=byId.get(id)||{};
+      const relations={};
+      for(const collection of relationCollectionsAudit){
+        const rs=await db.collection('tenants').doc(TENANT).collection('data').doc(collection).collection('items').where('clienteId','==',id).get();
+        relations[collection]=rs.size;
+      }
+      const selected={};
+      for(const k of ['nombre','nombreCompleto','razonSocial','numeroDocumento','identificacion','email','correo','telefono','whatsapp','telefonoAlterno','contactoPrincipal','direccion','zonaSectorBarrio','ciudadMunicipio','departamentoProvincia','pais','tipoPersona','sexo','fechaNacimiento','fechaAltaOrigen','estadoOrigen','observacionesMigracion','asesorId','asesorNombre','moneda']) if(row[k]!==undefined&&row[k]!==null&&String(row[k]).trim()!=='') selected[k]=stable(row[k]);
+      rows.push({id,fields:selected,relations});
+    }
+    out.identityCandidateGroups.push({key:group.key,rows});
+  }
+
   out.joseHumberto=[...nameGroups.entries()].filter(([k])=>k==='jose humberto aguilar luna').flatMap(([,v])=>v);
   const josePhone='50232114013';
   const joseCluster=(phoneGroups.get(josePhone)||[]).map(x=>({id:x.id,nombre:x.nombre}));
