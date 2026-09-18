@@ -1,0 +1,41 @@
+{
+  "schema": "GRAVICENTRA_I6_RELEASE_MECHANISM_ANTI_DESYNC_LOCK_V1",
+  "status": "FROZEN_ACTIVE",
+  "date": "2026-09-18",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "detectedAtHead": "c22de36dfda56164652f9ac86f243e2b3efb3f78",
+  "findings": [
+    {
+      "id": "WORKFLOW_DUPLICATE_JOB_IDS",
+      "status": "RESOLVED",
+      "evidence": "The I6 workflow previously contained duplicate job IDs and GitHub rejected workflow execution before jobs were created.",
+      "correction": "Canonical workflow reduced to unique job IDs before operational closure rerun."
+    },
+    {
+      "id": "PREVIEW_CHANNEL_REFERENCE_CHECK_WRONG_CWD",
+      "status": "RESOLVED_IN_THIS_CANDIDATE",
+      "evidence": "Preview deploy log emitted fatal: not a git repository because git grep ran after cd into the packaged bundle.",
+      "risk": "A referenced Preview channel could be misclassified as unreferenced.",
+      "correction": "All Preview channel reference checks now run git -C $GITHUB_WORKSPACE grep against the versioned repository."
+    },
+    {
+      "id": "OPERATIONAL_PROOF_ROLE_SURFACE_MISMATCH",
+      "status": "RESOLVED_IN_THIS_CANDIDATE",
+      "evidence": "Operational proof returned NO_MANAGER while previous authenticated hydration evidence had a verified Dirección/SuperAdmin actor.",
+      "cause": "Proof role extractor omitted rolesDisponibles/activeRole surfaces.",
+      "correction": "Proof actor discovery now recognizes the same canonical membership role surfaces used by product/runtime evidence while retaining disabled=false and emailVerified=true requirements."
+    }
+  ],
+  "invariants": [
+    "No LIVE promotion after failed Preview proof.",
+    "Same immutable artifact is promoted Preview to LIVE.",
+    "Rollback candidate remains bound before promotion.",
+    "No hardcoded Samuel/Carlos/Paula identity is used by product or proof selection.",
+    "Operational proof selects an eligible verified manager by membership data, not by name/email.",
+    "Preview channel reuse is allowed only when the channel ID is not referenced anywhere in the versioned repository.",
+    "Data mutation remains forbidden for this code-only operational closure candidate.",
+    "I6.5 receipt/portfolio deterministic writes are not repeated."
+  ],
+  "nextStep": "RERUN_SAME_BOUNDED_OPERATIONAL_CLOSURE_CANDIDATE"
+}

@@ -1063,7 +1063,7 @@ jobs:
           CHANNEL_ID=''
           while IFS= read -r CANDIDATE; do
             test -n "$CANDIDATE" || continue
-            if ! git grep -F -q -- "$CANDIDATE"; then
+            if ! git -C "$GITHUB_WORKSPACE" grep -F -q -- "$CANDIDATE"; then
               CHANNEL_ID="$CANDIDATE"
               break
             fi
@@ -1892,7 +1892,7 @@ jobs:
           CHANNEL_ID=''
           while IFS= read -r CANDIDATE; do
             test -n "$CANDIDATE" || continue
-            if ! git grep -F -q -- "$CANDIDATE"; then
+            if ! git -C "$GITHUB_WORKSPACE" grep -F -q -- "$CANDIDATE"; then
               CHANNEL_ID="$CANDIDATE"
               break
             fi

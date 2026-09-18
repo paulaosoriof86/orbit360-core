@@ -1768,5 +1768,16 @@
     "multiCollectionAtomicityRequired": true,
     "paymentLifecycleGate": "I6.6",
     "conversationDependent": false
+  },
+  "i65ReleaseMechanismAntiDesync": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_RELEASE_MECHANISM_ANTI_DESYNC_LOCK_20260918.json",
+    "blobSha": "b8071f011fac5ad9942790929d640a0bca4377fa",
+    "status": "FROZEN_ACTIVE",
+    "duplicateJobIdsResolved": true,
+    "previewReferenceCheckResolved": true,
+    "proofRoleSurfaceResolved": true,
+    "noHardcodedIdentities": true,
+    "dataMutationAuthorized": false,
+    "deterministicApplyRepeatAuthorized": false
   }
 }
