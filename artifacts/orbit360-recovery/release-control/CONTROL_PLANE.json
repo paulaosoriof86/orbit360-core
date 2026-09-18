@@ -1135,7 +1135,22 @@
         "add non-blocking PWA build marker checking and one-time stale-tab reload",
         "prove KPI stability after rerender/search in Preview and LIVE before requesting Paula visual acceptance"
       ]
-    }
+    },
+    "latestFailedReleaseRunId": 35368276211,
+    "latestFailedReleaseStage": "POST_LIVE_SEAL_PREFLIGHT",
+    "latestFailedReleaseAssertion": "I6_4_DEFECT_PARENT_INVALID",
+    "latestFailedReleasePreviewPass": true,
+    "latestFailedReleasePreviewReadbackExact": true,
+    "latestFailedReleaseLivePass": true,
+    "latestFailedReleaseLiveReadbackExact": true,
+    "latestFailedReleasePromotedThenRolledBack": true,
+    "latestFailedReleaseRollbackChannelId": "gi-i64-rb-35368276211",
+    "latestFailedReleaseRollbackExecuted": true,
+    "latestFailedReleaseBuildId": "gi-i64-19a6fd878282-57f234755dc1",
+    "latestFailedReleaseArtifactId": 10557292907,
+    "latestFailedReleaseLiveEvidenceArtifactId": 10557502741,
+    "latestFailedReleaseOperationalWrites": 0,
+    "latestFailedReleaseDiagnosis": "Preview and LIVE functional proofs passed, including single KPI owner, stable rerender/search values, build-bound index assets and PWA freshness. Seal preflight rejected a valid successor-of-successor parent because the guard only admitted preI64 or newly certified source; automatic rollback restored the previous certified artifact. Guard now admits the explicitly bound previousCertifiedSourceSha."
   },
   "preI64CertifiedCandidate": {
     "sourceSha": "9fff255410675c6dbf319ddf1d684b663420bae0",

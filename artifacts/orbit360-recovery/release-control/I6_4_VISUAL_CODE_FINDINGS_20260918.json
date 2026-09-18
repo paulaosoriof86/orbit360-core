@@ -172,5 +172,19 @@
     "promotedToLive": false,
     "operationalWrites": 0,
     "proofCorrection": "Assert immutable build binding on generated index-declared JS/CSS resources. Dynamically injected optional importer scripts are tracked separately and do not substitute the entrypoint proof."
+  },
+  "releaseSealRegression": {
+    "status": "PIPELINE_GUARD_CORRECTION_PENDING_RERUN",
+    "failedRunId": 35368276211,
+    "stage": "POST_LIVE_SEAL_PREFLIGHT",
+    "assertion": "I6_4_DEFECT_PARENT_INVALID",
+    "previewFunctionalPass": true,
+    "liveFunctionalPass": true,
+    "exactPreviewReadback": true,
+    "exactLiveReadback": true,
+    "automaticRollbackPass": true,
+    "operationalWrites": 0,
+    "cause": "The I6.4 guard did not admit a successor-of-successor whose parent is the explicitly recorded previousCertifiedSourceSha.",
+    "correction": "Allow parentCertifiedSourceSha to equal i64CodeDefect.previousCertifiedSourceSha in addition to preI64/current certified bindings."
   }
 }

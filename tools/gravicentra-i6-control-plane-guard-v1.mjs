@@ -257,7 +257,7 @@ if(i63DefectPending||i63DefectLive){
 }
 if(i64DefectPending||i64DefectLive){
  need(i64CodeDefect.classification==='CODE_DEFECT','I6_4_DEFECT_CLASS_INVALID');
- need(i64CodeDefect.parentCertifiedSourceSha===C.preI64CertifiedCandidate?.sourceSha||i64CodeDefect.parentCertifiedSourceSha===C.certifiedCandidate?.sourceSha,'I6_4_DEFECT_PARENT_INVALID');
+ need(i64CodeDefect.parentCertifiedSourceSha===C.preI64CertifiedCandidate?.sourceSha||i64CodeDefect.parentCertifiedSourceSha===C.certifiedCandidate?.sourceSha||i64CodeDefect.parentCertifiedSourceSha===i64CodeDefect.previousCertifiedSourceSha,'I6_4_DEFECT_PARENT_INVALID');
  need(Array.isArray(i64CodeDefect.allowedProductFiles)&&i64CodeDefect.allowedProductFiles.length===5,'I6_4_DEFECT_SCOPE_INVALID');
  need(i64CodeDefect.allowedProductFiles.includes('orbit360-platform/modules/polizas.js'),'I6_4_DEFECT_POLIZAS_OWNER_MISSING');
  need(i64CodeDefect.allowedProductFiles.includes('orbit360-platform/modules/cliente360.js'),'I6_4_DEFECT_CLIENTE360_OWNER_MISSING');
