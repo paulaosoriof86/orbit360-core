@@ -237,9 +237,9 @@ if(i63DefectPending||i63DefectLive){
  if(i63DefectLive){need(/^[0-9a-f]{40}$/.test(String(i63CodeDefect.sourceSha||'')),'I6_3_DEFECT_SOURCE_INVALID');need(i63CodeDefect.productionReadbackExact===true&&i63CodeDefect.functionalPass===true,'I6_3_DEFECT_LIVE_PROOF_INVALID');}
 }
 if(successor){
- need(frozenI60||frozenI61||activeI62V5||waitingI63||activeI63V5,'I6_1_SUCCESSOR_OUTSIDE_ACTIVE_SUBGATE');
+ need(frozenI60||frozenI61||activeI62V5||waitingI63||activeI63V5||activeI64V5,'I6_1_SUCCESSOR_OUTSIDE_ACTIVE_SUBGATE');
  need(/^[0-9a-f]{40}$/.test(String(successor.sourceSha||'')),'I6_1_SUCCESSOR_SHA_INVALID');
- need(successor.parentCertifiedSourceSha===(frozenI61||activeI62V5||waitingI63||activeI63V5?C.preI61CertifiedCandidate?.sourceSha:R.sourceSha),'I6_1_SUCCESSOR_PARENT_MISMATCH');
+ need(successor.parentCertifiedSourceSha===(frozenI61||activeI62V5||waitingI63||activeI63V5||activeI64V5?C.preI61CertifiedCandidate?.sourceSha:R.sourceSha),'I6_1_SUCCESSOR_PARENT_MISMATCH');
  need(['PREVIEW_TECHNICAL_PASS_AWAITING_AUTHENTICATED_HUMAN_ACCEPTANCE','I6_1_PRODUCT_SUCCESSOR_PREVIEW_PASS','I6_1_PRODUCT_SUCCESSOR_LIVE_PASS'].includes(successor.status),'I6_1_SUCCESSOR_STATUS_INVALID');
  need(successor.readbackExact===true&&Number(successor.readbackFileCount)>0,'I6_1_SUCCESSOR_READBACK_INVALID');
  try{execFileSync('git',['merge-base','--is-ancestor',successor.sourceSha,current],{stdio:'ignore'});}catch{throw new Error('I6_1_SUCCESSOR_NOT_ANCESTOR');}
