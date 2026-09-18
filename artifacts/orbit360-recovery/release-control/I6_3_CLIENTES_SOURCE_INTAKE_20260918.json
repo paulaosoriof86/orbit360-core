@@ -109,7 +109,7 @@
     "technicalFunctionalDiscrepancy": "READ_PATH_COUNTRY_VALIDATION_AND_KPI_COMPOSITION_CODE_DEFECT",
     "codeDefect": {
       "classification": "CODE_DEFECT",
-      "status": "BLOCKING_VISUAL_ACCEPTANCE",
+      "status": "TECHNICAL_LIVE_PASS_PENDING_PAULA_VISUAL",
       "reimportForbidden": true,
       "causes": [
         "CLIENTE360_DETAIL_RAW_CLIENT_BYPASSES_CONTACT_ALIAS_PROJECTION",
@@ -123,7 +123,7 @@
         "contactAliasProjection": "WHATSAPP_TO_PHONE_AND_EMAIL_VISIBLE",
         "releaseFreshness": "BUILD_SCOPED_SW_CACHE_AND_NO_CACHE_BOOTSTRAP"
       },
-      "releaseRunId": 35318710856,
+      "releaseRunId": 35320527779,
       "runtimeVisibleAfterFix": 442,
       "controlSamplesVisible": 5,
       "kpiAmounts": {
