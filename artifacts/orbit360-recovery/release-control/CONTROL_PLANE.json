@@ -709,7 +709,10 @@
     "liveEvidenceArtifactId": 10536386425,
     "liveEvidenceArtifactDigest": "2d794dfa8128194a431b86db55d17d73ed50e3f6201e7a41cf845f668aea2f45",
     "contactProjectionFixRequired": true,
-    "releaseFreshnessFenceRequired": true
+    "releaseFreshnessFenceRequired": true,
+    "previousCertifiedSourceSha": "0b613afa02a89aeddee1047c27f7d0e629c34b52",
+    "previousCertifiedBuildId": "gi-i63-0b613afa02a8-57f234755dc1",
+    "previousCertifiedArtifactId": 10536461082
   },
   "i63NameCaseNormalization": {
     "status": "APPLIED_READBACK_PASS",
