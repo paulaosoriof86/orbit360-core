@@ -113,10 +113,10 @@
         "postWriteContextsFail": 0
       },
       "I6": {
-        "status": "I6_4_DATA_UPDATE_V5_ACTIVE",
-        "activeSubgate": "I6.4",
+        "status": "I6_5_RECIBOS_CARTERA_SOURCE_PINNED_SYNC_PREFLIGHT_BLOCK",
+        "activeSubgate": "I6.5",
         "dataMutationAuthorized": false,
-        "lastFrozenMiniGate": "I6.3"
+        "lastFrozenMiniGate": "I6.4"
       }
     },
     "lastFormallyCompletedMiniGate": "I6.3"
@@ -404,7 +404,7 @@
     "authorizedAt": "2026-09-14T08:57:00-06:00",
     "authorizationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_EXPLICIT_AUTHORIZATION_RECEIPT_20260914.json",
     "activeSubgate": "I6.4",
-    "productMutationAuthorized": false,
+    "productMutationAuthorized": true,
     "sourceDataApplyAuthorized": false,
     "perBlockApplyRequiresExplicitAuthorization": false,
     "dataUpdateMode": "EVERGREEN_V5_DELTA_FIRST",
@@ -417,7 +417,7 @@
     "activeSourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_4_POLIZAS_RIESGOS_SOURCE_INTAKE_20260918.json",
     "activeSourceIntakeBlobSha": "73228ccc746cf372f20def30d6a2257cc7da5897",
     "activeModule": "POLIZAS_RIESGOS_VEHICULOS",
-    "activeModuleStatus": "PENDING_USER_VISUAL",
+    "activeModuleStatus": "I6_5_SOURCE_PINNED_SYNC_PREFLIGHT_BLOCK",
     "i6_0": {
       "status": "I6_0_BASELINE_FROZEN",
       "executorPath": ".github/workflows/gravicentra-material-baseline-freeze.yml",
@@ -462,7 +462,7 @@
       "receiptBlobSha": "c4ceccd2b69d0b07b547974b690b8232864c8d75"
     },
     "i6_4": {
-      "status": "POST_WRITE_READBACK_INTEGRITY_PASS",
+      "status": "I6_4_POLIZAS_RIESGOS_LIVE_PASS",
       "readbackRunId": 35325748631,
       "readbackArtifactId": 10539073435,
       "readbackArtifactDigest": "00489c6e2673aed0eabdd7f406e9e2c2e41dd2fb9b0fb3f034f16a65bef761cf",
@@ -527,7 +527,7 @@
       "integrityPassed": true,
       "functionalPassed": true,
       "rollbackExecuted": false,
-      "paulaVisualAcceptance": "PENDING",
+      "paulaVisualAcceptance": "ACCEPTED",
       "visualCorrectionStatus": "APPLIED_READBACK_INTEGRITY_FUNCTIONAL_PASS",
       "visualCorrectionRunId": 35342948207,
       "visualCorrectionArtifactId": 10545429790,
@@ -536,7 +536,17 @@
       "domiciliadoRemaining": 0,
       "countryCurrencyMismatchesRemaining": 0,
       "codeFindingsStatus": "TECHNICAL_LIVE_PASS_PENDING_PAULA_VISUAL",
-      "codeFindingsPath": "artifacts/orbit360-recovery/release-control/I6_4_VISUAL_CODE_FINDINGS_20260918.json"
+      "codeFindingsPath": "artifacts/orbit360-recovery/release-control/I6_4_VISUAL_CODE_FINDINGS_20260918.json",
+      "paulaVisualAcceptedAt": "2026-09-18T10:49:56-06:00",
+      "closureReceiptPath": "artifacts/orbit360-recovery/release-control/I6_4_POLIZAS_RIESGOS_LIVE_PASS_20260918.json"
+    },
+    "i6_5": {
+      "status": "SOURCE_PINNED_SYNC_PREFLIGHT_BLOCK",
+      "sourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_5_RECIBOS_CARTERA_SOURCE_INTAKE_20260918.json",
+      "sourceBundleSha256": "f445e2f4a20b9eb7a526bda8896472dab9e7ac4617b3c5d8124a939a0dee0e6a",
+      "syncPreflightPath": "artifacts/orbit360-recovery/release-control/I6_5_SYNC_COMPOSITION_PREFLIGHT_20260918.json",
+      "writes": 0,
+      "nextRequiredStep": "FIX_AND_CERTIFY_I6_5_READ_PATH_COMPOSITION_THEN_LIVE_READBACK_CURRENT_STATE"
     }
   },
   "postproductionDataUpdateControl": {
@@ -548,17 +558,17 @@
     "executionDisciplineBlobSha": "7af17759086da336dbf755d72ad85692f892b71b",
     "mechanismRegistryPath": "artifacts/orbit360-recovery/release-control/DATA_UPDATE_MECHANISM_REGISTRY.json",
     "mechanismRegistryBlobSha": "7b762c92b7babc88c7d2942041c66aadd1e8a471",
-    "activeModule": "POLIZAS_RIESGOS_VEHICULOS",
-    "activeSourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_4_POLIZAS_RIESGOS_SOURCE_INTAKE_20260918.json",
+    "activeModule": "RECIBOS_CARTERA",
+    "activeSourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_5_RECIBOS_CARTERA_SOURCE_INTAKE_20260918.json",
     "activeSourceIntakeBlobSha": "73228ccc746cf372f20def30d6a2257cc7da5897",
-    "sourceSha256": "7130ed56467da438f5c6e2823ede65f73d6356de63de94e19da30f3aed26c68f",
+    "sourceSha256": "f445e2f4a20b9eb7a526bda8896472dab9e7ac4617b3c5d8124a939a0dee0e6a",
     "conversationAsAuthority": false,
     "requestCurrentSourceBeforeEveryNewModule": true,
     "liveVisualRefreshRequiredForClosure": true,
     "pureDataUpdateRequiresBuildOrDeploy": false,
     "reimportForVisibilityFailureForbidden": true,
-    "nextRequiredStep": "USER_VISUAL_REFRESH_CHECK",
-    "executionCursor": "PENDING_USER_VISUAL"
+    "nextRequiredStep": "FIX_AND_CERTIFY_I6_5_READ_PATH_COMPOSITION_THEN_LIVE_READBACK_CURRENT_STATE",
+    "executionCursor": "SOURCE_PINNED_SYNC_PREFLIGHT_BLOCK"
   },
   "governanceSyncChecklist": {
     "frozenPlanMaterialized": true,
@@ -635,7 +645,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_4_USER_VISUAL_REFRESH_CHECK",
+  "nextAction": "I6_5_FIX_READ_PATH_COMPOSITION_NO_DATA_WRITES",
   "postproductionExitProgress": {
     "formalPercent": 40,
     "frozenMiniGates": 4,
@@ -983,7 +993,7 @@
   },
   "i64CodeDefect": {
     "classification": "CODE_DEFECT",
-    "status": "I6_4_CODE_DEFECT_SUCCESSOR_LIVE_PASS_PENDING_PAULA_VISUAL",
+    "status": "I6_4_POLIZAS_RIESGOS_LIVE_PASS_FROZEN",
     "cause": "The global policy view normalized mixed currencies into one display value, counted renewals from a literal status instead of the 0-45 day term window, omitted evidenced historical edition states, and rendered missing renewability as explicit false.",
     "parentCertifiedSourceSha": "8bf2642d767e86718b559e1a3d2bdb178d34eacd",
     "previousCertifiedSourceSha": "8bf2642d767e86718b559e1a3d2bdb178d34eacd",
@@ -1150,7 +1160,10 @@
     "latestFailedReleaseArtifactId": 10557292907,
     "latestFailedReleaseLiveEvidenceArtifactId": 10557502741,
     "latestFailedReleaseOperationalWrites": 0,
-    "latestFailedReleaseDiagnosis": "Preview and LIVE functional proofs passed, including single KPI owner, stable rerender/search values, build-bound index assets and PWA freshness. Seal preflight rejected a valid successor-of-successor parent because the guard only admitted preI64 or newly certified source; automatic rollback restored the previous certified artifact. Guard now admits the explicitly bound previousCertifiedSourceSha."
+    "latestFailedReleaseDiagnosis": "Preview and LIVE functional proofs passed, including single KPI owner, stable rerender/search values, build-bound index assets and PWA freshness. Seal preflight rejected a valid successor-of-successor parent because the guard only admitted preI64 or newly certified source; automatic rollback restored the previous certified artifact. Guard now admits the explicitly bound previousCertifiedSourceSha.",
+    "paulaVisualAcceptance": "ACCEPTED",
+    "paulaVisualAcceptedAt": "2026-09-18T10:49:56-06:00",
+    "reopenOnlyOn": "CONCRETE_REPRODUCIBLE_CAUSAL_REGRESSION"
   },
   "preI64CertifiedCandidate": {
     "sourceSha": "9fff255410675c6dbf319ddf1d684b663420bae0",
