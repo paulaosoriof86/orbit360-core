@@ -415,7 +415,7 @@
     "mechanismRegistryPath": "artifacts/orbit360-recovery/release-control/DATA_UPDATE_MECHANISM_REGISTRY.json",
     "mechanismRegistryBlobSha": "4f9c0d1726ea07aeb157018cc525dea87aa8c5de",
     "activeSourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_3_CLIENTES_SOURCE_INTAKE_20260918.json",
-    "activeSourceIntakeBlobSha": "cfa4d9350f41979f055814a7fdb7b37f7705dc78",
+    "activeSourceIntakeBlobSha": "d2b36dc05d9412e01593a0c07891c9902b91062c",
     "activeModule": "CLIENTES",
     "activeModuleStatus": "CODE_DEFECT_SUCCESSOR_RELEASE_IN_PROGRESS",
     "i6_0": {
@@ -454,7 +454,7 @@
     "mechanismRegistryBlobSha": "4f9c0d1726ea07aeb157018cc525dea87aa8c5de",
     "activeModule": "CLIENTES",
     "activeSourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_3_CLIENTES_SOURCE_INTAKE_20260918.json",
-    "activeSourceIntakeBlobSha": "cfa4d9350f41979f055814a7fdb7b37f7705dc78",
+    "activeSourceIntakeBlobSha": "d2b36dc05d9412e01593a0c07891c9902b91062c",
     "sourceSha256": "4f0a1307605ad5dcc947355dbbc98a50b510358e5f6a9835b75d02e45f5a8c7c",
     "conversationAsAuthority": false,
     "requestCurrentSourceBeforeEveryNewModule": true,
