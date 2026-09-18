@@ -369,10 +369,20 @@
       }
     },
     "i64CodeFindings": {
-      "status": "PENDING_CAUSAL_CODE_FIX_BEFORE_I6_4_VISUAL_ACCEPTANCE",
+      "status": "CAUSAL_CODE_FIX_READY_FOR_IMMUTABLE_RELEASE",
       "path": "artifacts/orbit360-recovery/release-control/I6_4_VISUAL_CODE_FINDINGS_20260918.json",
       "nextRequiredDiscipline": "CODE_DEFECT_SOURCE_FIX_WITH_IMMUTABLE_BUILD_SAME_ARTIFACT_PREVIEW_TO_LIVE",
-      "reimportForbidden": true
+      "reimportForbidden": true,
+      "codeDefect": {
+        "status": "I6_4_CODE_DEFECT_CANDIDATE_PENDING_BUILD",
+        "allowedProductFiles": [
+          "orbit360-platform/modules/polizas.js",
+          "orbit360-platform/modules/cliente360.js"
+        ],
+        "dataMutationAuthorized": false,
+        "operationalWrites": 0,
+        "sameArtifactPreviewToProductionRequired": true
+      }
     }
   }
 }

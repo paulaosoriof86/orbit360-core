@@ -10,6 +10,12 @@ Orbit.modules.cliente360 = (function () {
   const U = Orbit.ui, q = Orbit.q, S = () => Orbit.store;
   const esRenovable = p => p && (p.estado === 'Vigente' || p.estado === 'Por renovar');
   const policyTotal = p => U.finiteNumber(p && p.primaTotal);
+  const renovabilidad = p => {
+    if (!p || !Object.prototype.hasOwnProperty.call(p, 'renovable') || p.renovable == null || String(p.renovable).trim() === '') return 'UNKNOWN';
+    if (p.renovable === true || ['true', 'si', 'sí', 'renovable'].includes(String(p.renovable).trim().toLowerCase())) return 'YES';
+    if (p.renovable === false || ['false', 'no', 'no renovable'].includes(String(p.renovable).trim().toLowerCase())) return 'NO';
+    return 'UNKNOWN';
+  };
 
   let host;
   let filtros = { q: '', pais: '', tipo: '', asesor: '', seg: '' };
@@ -1022,7 +1028,8 @@ Orbit.modules.cliente360 = (function () {
     back = document.createElement('div'); back.id = 'c360-edit'; back.className = 'drawer-back open';
     back.style.display = 'grid'; back.style.placeItems = 'center';
     const estBadge = U.estadoBadge(p.estado);
-    const renBadge = p.renovable ? '<span class="badge ok">Renovable</span>' : '<span class="badge neutral">No renovable</span>';
+    const renState = renovabilidad(p);
+    const renBadge = renState === 'YES' ? '<span class="badge ok">Renovable</span>' : renState === 'NO' ? '<span class="badge neutral">No renovable</span>' : '<span class="badge warn">Renovabilidad pendiente de validar</span>';
     back.innerHTML = `<div class="card" style="width:min(960px,96vw);max-height:92vh;overflow:auto;padding:0">
       <div class="vp-head">
         <div><div class="crumb" style="margin-bottom:4px;color:rgba(255,255,255,.8)">Póliza · ${p.tipoPoliza || 'Individual'}</div>
@@ -1098,7 +1105,7 @@ Orbit.modules.cliente360 = (function () {
         <button class="btn ghost" onclick="Orbit.modules.cliente360.correoPoliza('${polId}')">✉ Correo</button>
         <button class="btn ghost" onclick="Orbit.ciclo.solicitarGestion('${cid}','${polId}')">🗂 Solicitar gestión</button>
         <button class="btn ghost" onclick="Orbit.modules.cliente360.comparativo('${polId}')">⚖ Comparar renovación</button>
-        ${p.renovable ? `<button class="btn primary" onclick="Orbit.modules.cliente360.renovar('${polId}')">🔄 Renovar</button>` : ''}
+        ${renState === 'YES' ? `<button class="btn primary" onclick="Orbit.modules.cliente360.renovar('${polId}')">🔄 Renovar</button>` : ''}
       </div>
     </div>`;
     document.body.appendChild(back);
@@ -1623,5 +1630,5 @@ Orbit.modules.cliente360 = (function () {
     tab = 'siniestros'; detalle(cid);
   }
 
-  return { render, edit, renovar, comparativo, verPoliza, editarPoliza, endoso, verVehiculo, correoPoliza, nuevaPoliza, reabrir: (cid, t) => { tab = t || 'resumen'; detalle(cid); }, nuevoCliente, nuevoReclamo, addBitacora };
+  return { render, edit, renovar, comparativo, verPoliza, editarPoliza, endoso, verVehiculo, correoPoliza, nuevaPoliza, reabrir: (cid, t) => { tab = t || 'resumen'; detalle(cid); }, nuevoCliente, nuevoReclamo, addBitacora, renovabilidad };
 })();

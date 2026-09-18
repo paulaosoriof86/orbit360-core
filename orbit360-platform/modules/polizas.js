@@ -18,6 +18,34 @@ Orbit.modules.polizas = (function () {
   const policyPremiumTotal = p => numberOrNull(p && (p.primaTotal != null ? p.primaTotal : p.prima));
   const policyPremiumNet = p => numberOrNull(p && (p.primaNeta != null ? p.primaNeta : p.prima));
   const M = (v, cur) => { const n = numberOrNull(v); return n == null ? 'Pendiente de completar' : U.money(n, cur); };
+  const ACTIVE_STATES = new Set(['Vigente', 'Por renovar']);
+  const HISTORICAL_STATES = new Set(['Renovada', 'Cancelada', 'Histórica', 'No Renovada', 'Reexpedida', 'Vencida', 'Anulada', 'Rechazada']);
+  const isActivePolicy = p => !!p && ACTIVE_STATES.has(p.estado);
+  const isHistoricalNoPortfolio = p => !!p && HISTORICAL_STATES.has(p.estado);
+  const renewabilityState = p => {
+    if (!p || !Object.prototype.hasOwnProperty.call(p, 'renovable') || p.renovable == null || String(p.renovable).trim() === '') return 'UNKNOWN';
+    if (p.renovable === true || ['true', 'si', 'sí', 'renovable'].includes(String(p.renovable).trim().toLowerCase())) return 'YES';
+    if (p.renovable === false || ['false', 'no', 'no renovable'].includes(String(p.renovable).trim().toLowerCase())) return 'NO';
+    return 'UNKNOWN';
+  };
+  const isRenewalWithin45Days = p => {
+    const d = U.daysFromNow(p && (p.vigenciaFin || p.fechaFin || p.fechaVencimiento || p.finVigencia));
+    return isActivePolicy(p) && renewabilityState(p) !== 'NO' && d != null && d >= 0 && d <= 45;
+  };
+  const premiumByCurrency = policies => {
+    const out = {};
+    (policies || []).filter(isActivePolicy).forEach(p => {
+      const n = policyPremiumNet(p);
+      if (n == null) return;
+      const cli = PC(p.clienteId) || {};
+      const cur = String(p.moneda || p.divisa || cli.moneda || 'SIN_MONEDA').trim() || 'SIN_MONEDA';
+      out[cur] = (out[cur] || 0) + n;
+    });
+    return out;
+  };
+  const currencyRank = x => x === 'GTQ' ? 0 : x === 'COP' ? 1 : 2;
+  const premiumByCurrencyHtml = totals => Object.keys(totals).sort((a, b) => currencyRank(a) - currencyRank(b) || a.localeCompare(b))
+    .map(cur => `<span style="display:block;font-size:${Object.keys(totals).length > 1 ? '14px' : '22px'}">${U.esc(cur)} ${Number(totals[cur] || 0).toLocaleString('es-GT', { maximumFractionDigits: 0 })}</span>`).join('') || '<span class="muted">Sin valores</span>';
 
   const FDEFS = () => [
     { id: 'fq', type: 'search', ph: 'Buscar póliza, cliente, placa, vehículo…' },
@@ -42,7 +70,8 @@ Orbit.modules.polizas = (function () {
       const placa = (veh && (veh.placa || veh.placaNormalizada || veh.placaFuente)) || p.placa || '';
       const clienteTxt = cli ? [cli.nombre, cli.identificacion, cli.email, cli.telefono].filter(Boolean).join(' ') : '';
       const txt = [p.numero, p.producto, p.subramo, clienteTxt, placa, veh && veh.marca, veh && veh.linea].filter(Boolean).join(' ').toLowerCase();
-      return (!st.fq || txt.includes(st.fq.toLowerCase())) &&
+      const grouped = !st.fkind || (st.fkind === 'renewals45' ? isRenewalWithin45Days(p) : st.fkind === 'historical' ? isHistoricalNoPortfolio(p) : true);
+      return grouped && (!st.fq || txt.includes(st.fq.toLowerCase())) &&
         (!st.framo || p.ramo === st.framo) &&
         (!st.fasg || p.aseguradoraId === st.fasg) &&
         (!st.fase || p.asesorId === st.fase) &&
@@ -53,8 +82,10 @@ Orbit.modules.polizas = (function () {
   function render(host) {
     const all = S().all('polizas') || [];
     const I = buildIndexes();
-    const vig = all.filter(p => p.estado === 'Vigente' || p.estado === 'Por renovar');
-    const primaVig = vig.reduce((s, p) => s + q.norm((policyPremiumNet(p) || 0), p.moneda), 0);
+    const vig = all.filter(isActivePolicy);
+    const primaVigentePorMoneda = premiumByCurrency(all);
+    const renovaciones45 = all.filter(isRenewalWithin45Days);
+    const historicasSinCartera = all.filter(isHistoricalNoPortfolio);
     const r = rows(I);
     const pages = Math.max(1, Math.ceil(r.length / PAGE_SIZE));
     if (st.page >= pages) st.page = 0;
@@ -66,9 +97,9 @@ Orbit.modules.polizas = (function () {
       ${K.bannerFor('polizas', `<button class="btn primary" onclick="Orbit.modules.cliente360.nuevaPoliza()">+ Nueva póliza</button>`)}
       ${K.kpis([
         { label: 'Pólizas vigentes', val: vig.length + ' <small>/ ' + all.length + '</small>', color: 'var(--red)', foot: 'activas en cartera', onclick: "Orbit.modules.polizas.filtrarEstado('Vigente')" },
-        { label: 'Prima neta vigente', val: U.moneyShort(primaVig, Orbit.q.monedaPais()), color: 'var(--ok)', foot: 'anualizada · no producción', onclick: "Orbit.modules.polizas.filtrarEstado('Vigente')" },
-        { label: 'Por renovar ≤45 d', val: all.filter(p => p.estado === 'Por renovar').length, color: 'var(--warn)', foot: 'requieren gestión', onclick: "Orbit.modules.polizas.filtrarEstado('Por renovar')" },
-        { label: 'Histórico / sin cartera', onclick: "Orbit.modules.polizas.filtrarEstado('Cancelada')", val: all.filter(p => ['Cancelada', 'Vencida', 'Anulada', 'Rechazada'].includes(p.estado)).length, color: 'var(--danger)', foot: 'cancel./venc./anul./rech.' }
+        { label: 'Prima neta vigente', val: premiumByCurrencyHtml(primaVigentePorMoneda), color: 'var(--ok)', foot: 'separada por moneda · no se suman GTQ y COP', onclick: "Orbit.modules.polizas.filtrarEstado('Vigente')" },
+        { label: 'Por renovar ≤45 d', val: renovaciones45.length, color: 'var(--warn)', foot: 'vigentes con vencimiento en 0–45 días', onclick: "Orbit.modules.polizas.filtrarGrupo('renewals45')" },
+        { label: 'Histórico / sin cartera', onclick: "Orbit.modules.polizas.filtrarGrupo('historical')", val: historicasSinCartera.length, color: 'var(--danger)', foot: 'ediciones no vigentes sin cartera activa' }
       ])}
       <div class="card" style="overflow:hidden">
         ${K.filterBar(FDEFS(), st)}
@@ -98,7 +129,8 @@ Orbit.modules.polizas = (function () {
     });
   }
   function emptyRow(n) { return `<tr><td colspan="${n}" class="muted" style="text-align:center;padding:30px">Sin resultados.</td></tr>`; }
-  function filtrarEstado(e) { st.fest = st.fest === e ? '' : e; st.page = 0; const host = document.getElementById('host'); if (host) render(host); }
+  function filtrarEstado(e) { st.fkind = ''; st.fest = st.fest === e ? '' : e; st.page = 0; const host = document.getElementById('host'); if (host) render(host); }
+  function filtrarGrupo(kind) { st.fest = ''; st.fkind = st.fkind === kind ? '' : kind; st.page = 0; const host = document.getElementById('host'); if (host) render(host); }
   function pagina(delta) { st.page = Math.max(0, st.page + delta); const host = document.getElementById('host'); if (host) render(host); }
 
   function receiptBreakdown(id) {
@@ -164,5 +196,5 @@ Orbit.modules.polizas = (function () {
     back.addEventListener('click', e => { if (e.target === back) close(); });
     back.querySelector('#pd-x').onclick = close; back.querySelector('#pd-close').onclick = close;
   }
-  return { render, filtrarEstado, pagina, verDesglose, buildIndexes, PAGE_SIZE };
+  return { render, filtrarEstado, filtrarGrupo, pagina, verDesglose, buildIndexes, PAGE_SIZE, policyMetrics: { isActivePolicy, isHistoricalNoPortfolio, isRenewalWithin45Days, renewabilityState, premiumByCurrency } };
 })();

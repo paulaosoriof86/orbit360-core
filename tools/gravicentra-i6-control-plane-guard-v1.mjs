@@ -65,6 +65,9 @@ const i63IdentityMergePending=activeI63V5&&i63IdentityMerge.status==='AUTHORIZED
 const i63DataCorrectionPending=i63NameCasePending||i63IdentityMergePending;
 const i64VisualCorrection=C.i64VisualCorrection||{};
 const i64VisualCorrectionPending=activeI64V5&&i64VisualCorrection.status==='AUTHORIZED_PENDING_APPLY';
+const i64CodeDefect=C.i64CodeDefect||{};
+const i64DefectPending=activeI64V5&&i64CodeDefect.status==='I6_4_CODE_DEFECT_CANDIDATE_PENDING_BUILD';
+const i64DefectLive=activeI64V5&&String(i64CodeDefect.status||'').startsWith('I6_4_CODE_DEFECT_SUCCESSOR_LIVE_PASS');
 const dataCorrectionPending=i63DataCorrectionPending||i64VisualCorrectionPending;
 need(!(i63NameCasePending&&i63IdentityMergePending),'I6_3_MULTIPLE_DATA_CORRECTIONS_FORBIDDEN');
 need(!(i63DataCorrectionPending&&i64VisualCorrectionPending),'I6_MULTIPLE_GATE_DATA_CORRECTIONS_FORBIDDEN');
@@ -83,7 +86,7 @@ if(i64VisualCorrectionPending){
  need(i64VisualCorrection.userAuthorized===true&&Number(i64VisualCorrection.expectedDomiciliadoPolicies)===319&&Number(i64VisualCorrection.expectedUniquePolicyWrites)===320&&Number(i64VisualCorrection.expectedCountryCurrencyCorrections)===2,'I6_4_VISUAL_CORRECTION_SCOPE_INVALID');
  need(i64VisualCorrection.writePath==='orbit360ProductOperationalCommand'&&i64VisualCorrection.reimportAuthorized===false&&i64VisualCorrection.deletesAuthorized===false&&i64VisualCorrection.receiptsWritesAuthorized===false&&i64VisualCorrection.carteraWritesAuthorized===false&&i64VisualCorrection.cobrosWritesAuthorized===false&&i64VisualCorrection.commissionWritesAuthorized===false&&i64VisualCorrection.rollbackRequired===true,'I6_4_VISUAL_CORRECTION_BOUNDARY_INVALID');
 }
-need(i63DefectPending?C.i6Execution?.productMutationAuthorized===true:C.i6Execution?.productMutationAuthorized===false,'I6_PRODUCT_MUTATION_AUTH_STATE_INVALID');
+need((i63DefectPending||i64DefectPending)?C.i6Execution?.productMutationAuthorized===true:C.i6Execution?.productMutationAuthorized===false,'I6_PRODUCT_MUTATION_AUTH_STATE_INVALID');
 need(postDiffCursor||C.i6Execution?.sourceDataApplyAuthorized===false,'I6_SOURCE_APPLY_AUTHORIZED_TOO_EARLY');
 need(C.i6Execution?.requiresDiff===true&&C.i6Execution?.requiresDeduplication===true,'I6_DIFF_DEDUP_CONTRACT_INVALID');
 need(C.i6Execution?.requiresAudit===true&&C.i6Execution?.requiresRollback===true,'I6_AUDIT_ROLLBACK_CONTRACT_INVALID');
@@ -186,7 +189,8 @@ if(activeI64V5){
   need(G.lastFormallyCompletedMiniGate==='I6.3'&&g.I6?.lastFrozenMiniGate==='I6.3','I6_4_LAST_MINIGATE_INVALID');
   need(p.formalPercent===40&&p.frozenMiniGates===4&&p.totalMiniGates===10&&p.lastFrozenMiniGate==='I6.3'&&p.activeMiniGate==='I6.4','I6_4_PROGRESS_INVALID');
   need(Object.prototype.hasOwnProperty.call(nextByCursor,cursor),'I6_4_SOURCE_CURSOR_INVALID');
-  need(C.nextAction===actionByCursor[cursor],'I6_4_NEXT_ACTION_INVALID');
+  const expectedI64Action=i64DefectPending?'I6_4_CODE_DEFECT_SUCCESSOR_RELEASE':actionByCursor[cursor];
+  need(C.nextAction===expectedI64Action,'I6_4_NEXT_ACTION_INVALID');
   need(C.i6Execution?.activeModule==='POLIZAS_RIESGOS_VEHICULOS','I6_4_MODULE_INVALID');
   need(C.postproductionDataUpdateControl?.activeModule==='POLIZAS_RIESGOS_VEHICULOS'&&C.postproductionDataUpdateControl?.executionCursor===cursor&&C.postproductionDataUpdateControl?.nextRequiredStep===nextByCursor[cursor],'I6_4_CONTROL_CURSOR_INVALID');
   need(SRC4.status==='PINNED_FOR_V5_DELTA'&&SRC4.module==='POLIZAS_RIESGOS_VEHICULOS'&&SRC4.execution?.nextRequiredStep===nextByCursor[cursor],'I6_4_SOURCE_STATE_INVALID');
@@ -201,7 +205,13 @@ if(activeI64V5){
 }
 
 const R=C.certifiedCandidate||{};
-if(activeI63V5&&i63DefectPending&&i63CodeDefect.previousCertifiedSourceSha){
+if(activeI64V5&&i64DefectPending&&i64CodeDefect.previousCertifiedSourceSha){
+  need(R.sourceSha===i64CodeDefect.previousCertifiedSourceSha,'I6_4_PREVIOUS_CERTIFIED_SOURCE_DRIFT');
+  need(R.buildId===i64CodeDefect.previousCertifiedBuildId,'I6_4_PREVIOUS_CERTIFIED_BUILD_DRIFT');
+  need(Number(R.artifactId)===Number(i64CodeDefect.previousCertifiedArtifactId),'I6_4_PREVIOUS_CERTIFIED_ARTIFACT_DRIFT');
+}
+else if(activeI64V5&&i64DefectLive){need(R.sourceSha===i64CodeDefect.sourceSha,'I6_4_CERTIFIED_SOURCE_DRIFT');need(R.buildId===i64CodeDefect.buildId,'I6_4_CERTIFIED_BUILD_DRIFT');need(Number(R.artifactId)===Number(i64CodeDefect.artifactId),'I6_4_CERTIFIED_ARTIFACT_DRIFT');}
+else if(activeI63V5&&i63DefectPending&&i63CodeDefect.previousCertifiedSourceSha){
   need(R.sourceSha===i63CodeDefect.previousCertifiedSourceSha,'I6_3_PREVIOUS_CERTIFIED_SOURCE_DRIFT');
   need(R.buildId===i63CodeDefect.previousCertifiedBuildId,'I6_3_PREVIOUS_CERTIFIED_BUILD_DRIFT');
   need(Number(R.artifactId)===Number(i63CodeDefect.previousCertifiedArtifactId),'I6_3_PREVIOUS_CERTIFIED_ARTIFACT_DRIFT');
@@ -232,7 +242,8 @@ const changed=git('diff','--name-only',R.sourceSha+'..'+current).split(/\r?\n/).
 const successor=C.nextCandidate&&C.nextCandidate.gate==='I6.1'?C.nextCandidate:null;
 const allowedSuccessorProduct=new Set(successor&&Array.isArray(successor.allowedProductFiles)?successor.allowedProductFiles:[]);
 const allowedI63Product=new Set((i63DefectPending||i63DefectLive)&&Array.isArray(i63CodeDefect.allowedProductFiles)?i63CodeDefect.allowedProductFiles:[]);
-const forbidden=changed.filter(p=>!allowedPrefixes.some(prefix=>p.startsWith(prefix))&&!allowedSuccessorProduct.has(p)&&!allowedI63Product.has(p));
+const allowedI64Product=new Set((i64DefectPending||i64DefectLive)&&Array.isArray(i64CodeDefect.allowedProductFiles)?i64CodeDefect.allowedProductFiles:[]);
+const forbidden=changed.filter(p=>!allowedPrefixes.some(prefix=>p.startsWith(prefix))&&!allowedSuccessorProduct.has(p)&&!allowedI63Product.has(p)&&!allowedI64Product.has(p));
 need(forbidden.length===0,'I6_PRODUCT_SOURCE_DRIFT_OUTSIDE_BOUND_SUCCESSOR:'+forbidden.slice(0,20).join(','));
 if(i63DefectPending||i63DefectLive){
  need(i63CodeDefect.classification==='CODE_DEFECT','I6_3_DEFECT_CLASS_INVALID');
@@ -243,6 +254,15 @@ if(i63DefectPending||i63DefectLive){
  need(i63CodeDefect.allowedProductFiles.includes('orbit360-platform/modules/cliente360.js'),'I6_3_DEFECT_UI_OWNER_MISSING');
  need(i63CodeDefect.reimportAuthorized===false&&i63CodeDefect.dataMutationAuthorized===false,'I6_3_DEFECT_DATA_BOUNDARY_INVALID');
  if(i63DefectLive){need(/^[0-9a-f]{40}$/.test(String(i63CodeDefect.sourceSha||'')),'I6_3_DEFECT_SOURCE_INVALID');need(i63CodeDefect.productionReadbackExact===true&&i63CodeDefect.functionalPass===true,'I6_3_DEFECT_LIVE_PROOF_INVALID');}
+}
+if(i64DefectPending||i64DefectLive){
+ need(i64CodeDefect.classification==='CODE_DEFECT','I6_4_DEFECT_CLASS_INVALID');
+ need(i64CodeDefect.parentCertifiedSourceSha===C.preI64CertifiedCandidate?.sourceSha||i64CodeDefect.parentCertifiedSourceSha===C.certifiedCandidate?.sourceSha,'I6_4_DEFECT_PARENT_INVALID');
+ need(Array.isArray(i64CodeDefect.allowedProductFiles)&&i64CodeDefect.allowedProductFiles.length===2,'I6_4_DEFECT_SCOPE_INVALID');
+ need(i64CodeDefect.allowedProductFiles.includes('orbit360-platform/modules/polizas.js'),'I6_4_DEFECT_POLIZAS_OWNER_MISSING');
+ need(i64CodeDefect.allowedProductFiles.includes('orbit360-platform/modules/cliente360.js'),'I6_4_DEFECT_CLIENTE360_OWNER_MISSING');
+ need(i64CodeDefect.reimportAuthorized===false&&i64CodeDefect.dataMutationAuthorized===false,'I6_4_DEFECT_DATA_BOUNDARY_INVALID');
+ if(i64DefectLive){need(/^[0-9a-f]{40}$/.test(String(i64CodeDefect.sourceSha||'')),'I6_4_DEFECT_SOURCE_INVALID');need(i64CodeDefect.productionReadbackExact===true&&i64CodeDefect.functionalPass===true,'I6_4_DEFECT_LIVE_PROOF_INVALID');}
 }
 if(successor){
  need(frozenI60||frozenI61||activeI62V5||waitingI63||activeI63V5||activeI64V5,'I6_1_SUCCESSOR_OUTSIDE_ACTIVE_SUBGATE');
