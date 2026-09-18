@@ -619,7 +619,7 @@ jobs:
         run: |
           set -euo pipefail
           cd "$RUNNER_TEMP/i65-package/bundle"
-          CHANNEL_ID="gi-i65-$GITHUB_RUN_ID"
+          CHANNEL_ID="gi-i65-35376440434"
           npx --yes firebase-tools@14.10.1 hosting:channel:deploy "$CHANNEL_ID" --config firebase.json --project "$PROJECT_ID" --expires 7d --non-interactive --json > "$RUNNER_TEMP/preview.json"
           export DEPLOY="$RUNNER_TEMP/preview.json"
           PREVIEW_URL=$(python3 - <<'PY'
