@@ -48,7 +48,7 @@ try{
     id:d.id,docSha256:digest(x),polizaId:clean(x.polizaId,256),clienteId:clean(x.clienteId,256),
     placaHash:sha(normPlate(first(x,['placa','placaNormalizada','placaFuente']))),vinHash:sha(norm(first(x,['vin','numeroSerie','numeroSerieAuto']))),
     inciso:clean(x.inciso,80),marca:clean(x.marca,120),linea:clean(first(x,['linea','tipo']),160),tipo:clean(x.tipo,160),
-    modelo:clean(first(x,['modelo','anio']),50),motorHash:sha(norm(first(x,['motor']))),
+    modelo:clean(x.modelo,80),anio:clean(x.anio,50),uso:clean(x.uso,100),motorHash:sha(norm(first(x,['motor']))),
     estado:clean(x.estado,100),pais:clean(first(x,['pais','country']),20),sourceRef:clean(x.sourceRef,300),numeroFila:x._numeroFila??null
   };});
   need(out.collections.polizas.length===1373,'I64_DIFF_POLICY_BASELINE_DRIFT');
