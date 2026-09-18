@@ -404,7 +404,7 @@
     "authorizedAt": "2026-09-14T08:57:00-06:00",
     "authorizationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_EXPLICIT_AUTHORIZATION_RECEIPT_20260914.json",
     "activeSubgate": "I6.5",
-    "productMutationAuthorized": false,
+    "productMutationAuthorized": true,
     "sourceDataApplyAuthorized": false,
     "perBlockApplyRequiresExplicitAuthorization": false,
     "dataUpdateMode": "EVERGREEN_V5_DELTA_FIRST",
@@ -679,7 +679,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_HYDRATION_CODE_FIX",
+  "nextAction": "I6_5_HYDRATION_CODE_DEFECT_SUCCESSOR_RELEASE",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -1314,14 +1314,14 @@
     "path": "artifacts/orbit360-recovery/release-control/I6_5_MINI_CIERRE_OPERATIVO_DECISION_LOCK_20260918.json",
     "frozenAtHead": "bb940461f1ec39469d1778bd2f9d875573ad300f",
     "blockAStatus": "OPEN_BUT_MUST_NOT_CONTAMINATE_I65_BASELINE",
-    "blockBStatus": "HYDRATION_DIAGNOSTIC_PASS_CODE_FIX_PENDING",
-    "blockCStatus": "BLOCKED_ON_BLOCK_B_HYDRATION_FIX",
+    "blockBStatus": "HYDRATION_CODE_DEFECT_CANDIDATE_PENDING_BUILD",
+    "blockCStatus": "BLOCKED_ON_BLOCK_B_HYDRATION_LIVE_PASS",
     "blockDStatus": "PENDING_REUSE_ONLY",
     "cobrosWritesDuringI65": false,
-    "nextMaterialCursor": "HYDRATION_CODE_FIX"
+    "nextMaterialCursor": "HYDRATION_CODE_DEFECT_SUCCESSOR_RELEASE"
   },
   "i65HydrationDefect": {
-    "status": "I6_5_HYDRATION_DIAGNOSTIC_PASS",
+    "status": "I6_5_HYDRATION_CODE_DEFECT_CANDIDATE_PENDING_BUILD",
     "classification": "CODE_DEFECT",
     "detectedAfterDirectLiveReadback": true,
     "evidence": {
@@ -1352,9 +1352,9 @@
     "dataMutationAuthorized": false,
     "cobrosWritesAuthorized": false,
     "reimportAuthorized": false,
-    "productMutationAuthorized": false,
+    "productMutationAuthorized": true,
     "diagnosticTool": "tools/gravicentra-i6-5-hydration-diagnostic.mjs",
-    "nextRequiredStep": "I6_5_HYDRATION_CODE_FIX",
+    "nextRequiredStep": "I6_5_HYDRATION_CODE_DEFECT_SUCCESSOR_RELEASE",
     "diagnosticRunId": 35385483059,
     "diagnosticArtifactId": 10563647769,
     "diagnosticArtifactDigest": "94c7bdc444eb5573317eea2f8907a641c2033f788206f5ab02e89fe6508f8581",
@@ -1481,6 +1481,30 @@
         "ready": true,
         "errors": {}
       }
-    }
+    },
+    "rootCause": "PRODUCT_HYDRATION_REQUIRED_OPTIONAL_CONTRACT_MISMATCH",
+    "rootCauseDetail": "recibosEsperados, carteraPrimas and vehiculos were optional/deferred in the public runtime hydration contract although Cliente360/Polizas require them; V920 readiness did not imply snapshot attachment.",
+    "hydrationContractVersionBefore": "fase-a-i2-20260905.3-ledger-server-owned",
+    "hydrationContractVersionCandidate": "fase-a-i2-20260918.4-receipts-portfolio-required",
+    "previousCertifiedSourceSha": "ccd014bc52238991b92bbff3c2aac7a71aac71ab",
+    "previousCertifiedBuildId": "gi-i65-ccd014bc5223-57f234755dc1",
+    "previousCertifiedArtifactId": 10561387342,
+    "parentCertifiedSourceSha": "ccd014bc52238991b92bbff3c2aac7a71aac71ab",
+    "allowedProductFiles": [
+      "orbit360-platform/product-runtime-config.js"
+    ],
+    "receiptsWritesAuthorized": false,
+    "carteraWritesAuthorized": false,
+    "expectedDirectCounts": {
+      "recibosEsperados": 1294,
+      "carteraPrimas": 673
+    },
+    "requiredServerConfirmedCollections": [
+      "vehiculos",
+      "recibosEsperados",
+      "carteraPrimas"
+    ],
+    "proofMustCompareRuntimeToDirectCanonical": true,
+    "rootCauseFreezePath": "artifacts/orbit360-recovery/release-control/I6_5_BLOCK_B_HYDRATION_ROOT_CAUSE_FREEZE_20260918.json"
   }
 }

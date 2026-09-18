@@ -1,0 +1,36 @@
+{
+  "schema": "GRAVICENTRA_I6_5_BLOCK_B_HYDRATION_ROOT_CAUSE_FREEZE_V1",
+  "status": "ROOT_CAUSE_FROZEN_FIX_CANDIDATE_PENDING",
+  "date": "2026-09-18",
+  "gate": "I6.5",
+  "block": "B_READ_PATH_COMPOSITION_RECIBOS_CARTERA",
+  "diagnosticRunId": 35385483059,
+  "diagnosticArtifactId": 10563647769,
+  "directCanonicalCounts": {
+    "recibosEsperados": 1294,
+    "carteraPrimas": 673
+  },
+  "runtimeObservedCounts": {
+    "recibosEsperados": 0,
+    "carteraPrimas": 0
+  },
+  "runtimeState": {
+    "receiptAttached": false,
+    "receiptServerConfirmed": false,
+    "portfolioAttached": false,
+    "portfolioServerConfirmed": false,
+    "activeRole": "Dirección",
+    "scope": "all",
+    "countries": [
+      "CO",
+      "GT"
+    ]
+  },
+  "rootCause": "The product startup hydration contract classified vehiculos, recibosEsperados and carteraPrimas as deferred optional collections although visual-runtime route contracts require them for Cliente360/Polizas. Product/V920 could therefore report ready while receipt/portfolio snapshots were not attached or server-confirmed.",
+  "correction": "Make vehiculos, recibosEsperados and carteraPrimas required startup collections in source and immutable package materializer; harden I6.5 functional proof so runtime receipt/portfolio counts must equal direct canonical Firestore counts and a real Cliente360/receipt-detail sample must execute.",
+  "candidateHydrationContractVersion": "fase-a-i2-20260918.4-receipts-portfolio-required",
+  "dataWritesAuthorized": false,
+  "reimportAuthorized": false,
+  "cobrosWritesAuthorized": false,
+  "nextMaterialStep": "BUILD_ONCE_PREVIEW_FUNCTIONAL_SAME_ARTIFACT_LIVE"
+}

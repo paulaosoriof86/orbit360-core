@@ -20,10 +20,15 @@ async function activate(page,auth,a){const token=await auth.createCustomToken(a.
 
 const app=initializeApp({credential:cert(sa()),projectId:PROJECT},'i65-sync-'+STAGE),auth=getAuth(app),db=(await import('firebase-admin/firestore')).getFirestore(app);
 let browser;
-const ev={schema:'GRAVICENTRA_I6_5_SYNC_FUNCTIONAL_V1',stage:STAGE,status:'FAIL',release:{},owner:{},counts:{},sample:{},i64Sentinels:{},errors:[],writes:0,containsPII:false,containsSecrets:false};
+const ev={schema:'GRAVICENTRA_I6_5_SYNC_FUNCTIONAL_V2',stage:STAGE,status:'FAIL',release:{},owner:{},counts:{},sample:{},i64Sentinels:{},errors:[],writes:0,containsPII:false,containsSecrets:false};
 try{
   need(/^https:\/\//.test(TARGET),'I65_PROOF_TARGET');
   const a=await actor(db,auth);
+  const directReceiptSnap=await db.collection('tenants').doc(TENANT).collection('data').doc('recibosEsperados').collection('items').get();
+  const directPortfolioSnap=await db.collection('tenants').doc(TENANT).collection('data').doc('carteraPrimas').collection('items').get();
+  const direct={recibosEsperados:directReceiptSnap.size,carteraPrimas:directPortfolioSnap.size};
+  need(direct.recibosEsperados>0&&direct.carteraPrimas>0,'I65_DIRECT_CANONICAL_DATA_EMPTY:'+JSON.stringify(direct));
+  ev.directCounts=direct;
   browser=await chromium.launch({headless:true});
   const page=await browser.newPage({viewport:{width:1440,height:1000}}),pageErrors=[],http404=[];
   page.on('pageerror',e=>pageErrors.push(clean(e?.stack||e?.message||e)));
@@ -36,6 +41,10 @@ try{
   await page.waitForFunction(expected=>window.OrbitPwaBuildFreshness?.status==='current'&&window.OrbitPwaBuildFreshness?.serverBuild===expected,EXPECTED_BUILD,{timeout:10000});
   ev.release={...marker,buildFreshnessPass:true};
 
+  await page.waitForFunction(()=>{
+    const ps=window.Orbit?.store?._productStatus?.()||{},confirmed=ps.serverConfirmedCollections||[];
+    return ['vehiculos','recibosEsperados','carteraPrimas'].every(x=>confirmed.includes(x));
+  },null,{timeout:30000});
   await page.waitForFunction(()=>window.Orbit?.receiptsPortfolioProjectionV920?.status?.().ready===true,null,{timeout:20000});
   const owner=await page.evaluate(()=>{
     const rp=Orbit.receiptsPortfolioProjectionV920,st=rp.status(),S=Orbit.store,ps=S._productStatus();
@@ -44,12 +53,16 @@ try{
       alias:Orbit.receiptsPortfolioProjection===rp,
       version:st.version,ready:st.ready,owners:st.owners,directFirestoreListeners:st.directFirestoreListeners,parallelCache:st.parallelCache,
       tenantId:t,readOnly:S.__productReadOnlyP0===true,
+      serverConfirmedCollections:(ps.serverConfirmedCollections||[]).slice(),
+      requiredStartupCollections:(ps.requiredStartupCollections||[]).slice(),
       receiptPath:paths.dataCollectionPath(t,'recibosEsperados'),portfolioPath:paths.dataCollectionPath(t,'carteraPrimas')
     };
   });
   need(owner.alias&&owner.ready&&owner.readOnly,'I65_CANONICAL_OWNER_NOT_READY');
   need(owner.directFirestoreListeners===0&&owner.parallelCache===false,'I65_PARALLEL_READ_OWNER');
   need(Object.values(owner.owners||{}).every(Boolean),'I65_OWNER_COMPONENT_NOT_READY:'+JSON.stringify(owner.owners));
+  need(['vehiculos','recibosEsperados','carteraPrimas'].every(x=>(owner.serverConfirmedCollections||[]).includes(x)),'I65_REQUIRED_COLLECTIONS_NOT_SERVER_CONFIRMED:'+JSON.stringify(owner.serverConfirmedCollections));
+  need(['vehiculos','recibosEsperados','carteraPrimas'].every(x=>(owner.requiredStartupCollections||[]).includes(x)),'I65_REQUIRED_STARTUP_CONTRACT_MISSING:'+JSON.stringify(owner.requiredStartupCollections));
   need(/\/recibosEsperados\/items$/.test(owner.receiptPath)&&/\/carteraPrimas\/items$/.test(owner.portfolioPath),'I65_CANONICAL_PATH_INVALID');
   ev.owner=owner;
 
@@ -67,6 +80,9 @@ try{
       sPortfolio:cid?Orbit.store.where('carteraPrimas',r=>(r.clienteId||(Orbit.store.get('polizas',r.polizaId)||{}).clienteId||'')===cid).length:0
     };
   });
+  need(baseline.receiptCount===direct.recibosEsperados&&baseline.portfolioCount===direct.carteraPrimas,'I65_RUNTIME_DIRECT_COUNT_DRIFT:'+JSON.stringify({runtime:{r:baseline.receiptCount,p:baseline.portfolioCount},direct}));
+  need(baseline.receiptCount>0&&baseline.portfolioCount>0,'I65_RUNTIME_COUNTS_ZERO');
+  need(!!baseline.cid&&!!baseline.receiptId&&!!baseline.policyId,'I65_REAL_RECEIPT_SAMPLE_REQUIRED');
   need(baseline.qReceipts===baseline.sReceipts&&baseline.qPortfolio===baseline.sPortfolio,'I65_QUERY_STORE_COUNT_DRIFT');
   ev.counts={recibosEsperados:baseline.receiptCount,carteraPrimas:baseline.portfolioCount};
   ev.sample={hasReceipt:!!baseline.receiptId,queryReceipts:baseline.qReceipts,storeReceipts:baseline.sReceipts,queryPortfolio:baseline.qPortfolio,storePortfolio:baseline.sPortfolio};
