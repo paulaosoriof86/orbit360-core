@@ -23,9 +23,11 @@ const out={schema:'GRAVICENTRA_I6_4_SANITIZED_LIVE_DIFF_SNAPSHOT_V1',status:'FAI
 try{
   const names=['clientes','aseguradoras','asesores','polizas','vehiculos'];
   const snaps={};for(const n of names)snaps[n]=await col(db,n).get();
-  out.collections.clientes=snaps.clientes.docs.map(d=>{const x=d.data()||{},t=x.fusionado===true||!!clean(x.mergedIntoClientId,256);return{id:d.id,nameHash:sha(norm(first(x,['nombre','name']))),tombstone:t,canonicalId:t?clean(x.mergedIntoClientId,256):d.id,pais:clean(first(x,['pais','country']),20)};});
-  out.collections.aseguradoras=snaps.aseguradoras.docs.map(d=>{const x=d.data()||{};return{id:d.id,nameHash:sha(norm(first(x,['nombre','name','razonSocial']))),pais:clean(first(x,['pais','country']),20),active:x.activo!==false&&x.vinculada!==false};});
+  out.collections.clientes=snaps.clientes.docs.map(d=>{const x=d.data()||{},t=x.fusionado===true||!!clean(x.mergedIntoClientId,256);return{id:d.id,nameHash:sha(norm(first(x,['nombre','name']))),tombstone:t,canonicalId:t?clean(x.mergedIntoClientId,256):d.id,pais:clean(first(x,['pais','country']),20),asesorId:clean(x.asesorId,256)};});
+  out.collections.aseguradoras=snaps.aseguradoras.docs.map(d=>{const x=d.data()||{};return{id:d.id,nombre:clean(first(x,['nombre','name','razonSocial']),180),codigo:clean(first(x,['codigo','code']),80),nameHash:sha(norm(first(x,['nombre','name','razonSocial']))),pais:clean(first(x,['pais','country']),20),active:x.activo!==false&&x.vinculada!==false};});
   out.collections.asesores=snaps.asesores.docs.map(d=>{const x=d.data()||{};return{id:d.id,nameHash:sha(norm(first(x,['nombre','name']))),active:x.activo!==false&&x.active!==false};});
+  const members=await db.collection('tenants').doc(TENANT).collection('members').get();
+  out.collections.members=members.docs.map(d=>{const x=d.data()||{};return{id:d.id,uid:clean(x.uid||d.id,256),asesorId:clean(x.asesorId,256),nameHash:sha(norm(first(x,['nombre','name','displayName']))),roles:[].concat(x.roles||[],x.rolesAsignados||[],x.role||[],x.rol||[]).map(v=>clean(v,80)).filter(Boolean),active:x.activo!==false&&x.active!==false};});
   out.collections.polizas=snaps.polizas.docs.map(d=>{const x=d.data()||{};return{
     id:d.id,numeroHash:sha(normPolicy(first(x,['numero','poliza','numeroPoliza']))),
     numeroNormHash:sha(norm(first(x,['numero','poliza','numeroPoliza']))),
