@@ -1583,5 +1583,23 @@
     "sourceMutatedAfterBuild": false,
     "productionUrl": "https://ays-orbit-360-lab.web.app",
     "promotedLiveRunId": 35379229395
+  },
+  "i65DeterministicDiffSnapshot": {
+    "status": "ENCRYPTED_LIVE_SNAPSHOT_PENDING",
+    "publicKeyPath": "artifacts/orbit360-recovery/release-control/I6_5_DIFF_SNAPSHOT_PUBLIC_KEY_20260918.pem",
+    "publicKeySha256": "e08d3d244cb985eca764be7f3564142c8829e349b8b1c1ccfb9d2e887c1e5540",
+    "toolPath": "tools/gravicentra-i6-5-encrypted-live-snapshot.mjs",
+    "encryptedOnly": true,
+    "containsPII": true,
+    "repositoryPlaintextForbidden": true,
+    "expectedCounts": {
+      "polizas": 1414,
+      "clientes": 442,
+      "recibosEsperados": 1294,
+      "carteraPrimas": 673,
+      "cobros": 5
+    },
+    "writes": 0,
+    "nextRequiredStep": "ENCRYPTED_LIVE_SNAPSHOT"
   }
 }

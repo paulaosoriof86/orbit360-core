@@ -1439,6 +1439,78 @@ jobs:
           git push origin HEAD:recovery/fase-a-clean-20260831
 
 
+  i65-encrypted-diff-snapshot:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Resolve I6.5 encrypted diff snapshot applicability
+        id: snap
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          node - <<'NODE'
+          const fs=require('node:fs'),c=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8')),s=c.i65DeterministicDiffSnapshot||{};
+          const ok=c.nextAction==='I6_5_DETERMINISTIC_DIFF'&&c.i65MiniClosurePlan?.blockBStatus==='READ_PATH_HYDRATION_LIVE_PASS'&&s.status==='ENCRYPTED_LIVE_SNAPSHOT_PENDING'&&c.i6Execution?.dataMutationAuthorized===false&&c.i6Execution?.sourceDataApplyAuthorized===false;
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(ok?'true':'false')+'\n');
+          console.log('I65_DIFF_SNAPSHOT_APPLICABLE='+(ok?'true':'false'));
+          NODE
+      - name: Install encrypted snapshot dependency
+        if: steps.snap.outputs.run == 'true'
+        run: npm install --no-save --package-lock=false firebase-admin@13.4.0 >/dev/null
+      - name: Build encrypted LIVE baseline with zero writes
+        if: steps.snap.outputs.run == 'true'
+        env:
+          I65_DIFF_SNAPSHOT_FILE: ${{ runner.temp }}/i65-diff-live-snapshot.enc.json
+          I65_DIFF_PUBLIC_KEY: artifacts/orbit360-recovery/release-control/I6_5_DIFF_SNAPSHOT_PUBLIC_KEY_20260918.pem
+        run: node tools/gravicentra-i6-5-encrypted-live-snapshot.mjs
+      - name: Upload encrypted LIVE baseline
+        if: steps.snap.outputs.run == 'true'
+        id: snapart
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i6-5-encrypted-diff-live-snapshot-${{ github.run_id }}
+          path: ${{ runner.temp }}/i65-diff-live-snapshot.enc.json
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 1
+      - name: Freeze encrypted snapshot pointer
+        if: steps.snap.outputs.run == 'true'
+        env:
+          SNAP_ARTIFACT_ID: ${{ steps.snapart.outputs.artifact-id }}
+          SNAP_ARTIFACT_DIGEST: ${{ steps.snapart.outputs.artifact-digest }}
+          SNAP_FILE: ${{ runner.temp }}/i65-diff-live-snapshot.enc.json
+        run: |
+          set -euo pipefail
+          git fetch origin recovery/fase-a-clean-20260831
+          git reset --hard origin/recovery/fase-a-clean-20260831
+          node - <<'NODE'
+          const fs=require('node:fs'),C=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8')),E=JSON.parse(fs.readFileSync(process.env.SNAP_FILE,'utf8'));
+          const s=C.i65DeterministicDiffSnapshot||{};
+          if(s.status!=='ENCRYPTED_LIVE_SNAPSHOT_PENDING'||C.nextAction!=='I6_5_DETERMINISTIC_DIFF')throw new Error('I65_DIFF_SNAPSHOT_CURSOR_CHANGED');
+          if(E.encrypted!==true||E.writes!==0||E.operationalWrites!==0)throw new Error('I65_DIFF_SNAPSHOT_ENVELOPE_INVALID');
+          C.i65DeterministicDiffSnapshot={...s,status:'ENCRYPTED_LIVE_SNAPSHOT_READY',runId:Number(process.env.GITHUB_RUN_ID),artifactId:Number(process.env.SNAP_ARTIFACT_ID),artifactDigest:process.env.SNAP_ARTIFACT_DIGEST,plaintextSha256:E.plaintextSha256,compressedSha256:E.compressedSha256,sourceHeadSha:E.sourceHeadSha,counts:E.counts,writes:0,nextRequiredStep:'LOCAL_DECRYPT_AND_DETERMINISTIC_DIFF'};
+          fs.writeFileSync(process.env.CONTROL,JSON.stringify(C,null,2)+'\n');
+          NODE
+          git config user.name "gravicentra-governance-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add "$CONTROL"
+          git commit -m "recovery(i6.5): freeze encrypted LIVE diff snapshot"
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          git push origin HEAD:recovery/fase-a-clean-20260831
+
+
   i65-live-readback:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
