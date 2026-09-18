@@ -1039,7 +1039,33 @@ jobs:
         run: |
           set -euo pipefail
           cd "$RUNNER_TEMP/i65-package/bundle"
-          CHANNEL_ID="i65h-$GITHUB_RUN_ID"
+          npx --yes firebase-tools@14.10.1 hosting:channel:list --site "$HOSTING_SITE" --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/i65-preview-channels.json"
+          export CHANNELS_JSON="$RUNNER_TEMP/i65-preview-channels.json"
+          node - <<'NODE' > "$RUNNER_TEMP/i65-preview-channel-candidates.txt"
+          const fs=require('node:fs'),d=JSON.parse(fs.readFileSync(process.env.CHANNELS_JSON,'utf8')),ids=new Set();
+          function walk(v,k){
+            if(v==null)return;
+            if(typeof v==='string'){
+              const m=v.match(/\/channels\/([^/]+)$/);if(m)ids.add(m[1]);
+              if((k==='channelId'||k==='id')&&/^[a-z0-9-]+$/i.test(v)&&v!=='live')ids.add(v);
+              return;
+            }
+            if(Array.isArray(v)){for(const x of v)walk(x,'');return;}
+            if(typeof v==='object')for(const [kk,x] of Object.entries(v))walk(x,kk);
+          }
+          walk(d,'');
+          for(const id of [...ids].filter(x=>x&&x!=='live').sort())console.log(id);
+          NODE
+          CHANNEL_ID=''
+          while IFS= read -r CANDIDATE; do
+            test -n "$CANDIDATE" || continue
+            if ! git grep -F -q -- "$CANDIDATE"; then
+              CHANNEL_ID="$CANDIDATE"
+              break
+            fi
+          done < "$RUNNER_TEMP/i65-preview-channel-candidates.txt"
+          test -n "$CHANNEL_ID" || { echo I65_NO_UNREFERENCED_PREVIEW_CHANNEL_AVAILABLE >&2; cat "$RUNNER_TEMP/i65-preview-channel-candidates.txt" >&2; exit 44; }
+          echo "I65_REUSING_UNREFERENCED_PREVIEW_CHANNEL=$CHANNEL_ID"
           set +e
           npx --yes firebase-tools@14.10.1 hosting:channel:deploy "$CHANNEL_ID" --config firebase.json --project "$PROJECT_ID" --expires 7d --non-interactive --json > "$RUNNER_TEMP/preview.json" 2> "$RUNNER_TEMP/preview.err"
           RC=$?
