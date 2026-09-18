@@ -72,7 +72,9 @@ function decryptPayload(e,privateKey){
   need(sha(gz)===GZIP_SHA,'I64_GZIP_HASH_MISMATCH');
   const plain=zlib.gunzipSync(gz);need(sha(plain)===PAYLOAD_SHA,'I64_PAYLOAD_HASH_MISMATCH');
   const compact=JSON.parse(plain.toString('utf8'));
-  need(compact.schema==='GRAVICENTRA_I6_4_COMPACT_APPLY_V1'&&compact.b===SOURCE_SHA&&Array.isArray(compact.m),'I64_COMPACT_PAYLOAD_INVALID');
+  console.log('I64_COMPACT_FORMAT='+clean(compact.s,20));
+  console.log('I64_COMPACT_MUTATIONS='+(Array.isArray(compact.m)?compact.m.length:0));
+  need(compact.s==='I64C2'&&compact.b===SOURCE_SHA&&Array.isArray(compact.m),'I64_COMPACT_PAYLOAD_INVALID');
   const collections=['polizas','vehiculos'], actions=['update','insert'];
   return compact.m.map((m,i)=>{need(Array.isArray(m)&&m.length===4,'I64_MUTATION_TUPLE_'+i);const [ci,ai,id,payload]=m;need(collections[ci]&&actions[ai]&&clean(id,256)&&payload&&typeof payload==='object'&&!Array.isArray(payload),'I64_MUTATION_TUPLE_VALUES_'+i);return{collection:collections[ci],action:actions[ai],id:clean(id,256),payload};});
 }
