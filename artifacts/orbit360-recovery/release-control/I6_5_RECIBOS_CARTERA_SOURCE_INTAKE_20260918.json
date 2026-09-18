@@ -153,10 +153,10 @@
     "receiptIdentityRule": "Do not deduplicate only by policy+series+receiptStart+dueDate. Twelve observed base keys contain multiple legitimate amounts; deterministic identity must include source identity/external receipt identity and amount or equivalent distinguishing evidence."
   },
   "execution": {
-    "cursorState": "SOURCE_PINNED",
+    "cursorState": "LIVE_READBACK_PASS",
     "writeApplied": false,
     "writes": 0,
-    "nextRequiredStep": "LIVE_READBACK_CURRENT_STATE",
+    "nextRequiredStep": "DETERMINISTIC_DIFF",
     "syncCodeDefect": {
       "status": "I6_5_SYNC_CODE_DEFECT_SUCCESSOR_LIVE_PASS",
       "runId": 35379229395,
@@ -164,6 +164,37 @@
       "buildId": "gi-i65-ccd014bc5223-57f234755dc1",
       "artifactId": 10561387342,
       "operationalWrites": 0
+    },
+    "readbackPassed": true,
+    "readbackRunId": 35385036125,
+    "readbackArtifactId": 10563297338,
+    "readbackArtifactDigest": "f25f2b723a8ca2c6416d721f7ab947a8caf9e52687f9752aa7daab9127ea8d7e",
+    "canonicalLiveCounts": {
+      "polizas": 1414,
+      "clientes": 442,
+      "recibosEsperados": 1294,
+      "carteraPrimas": 673,
+      "cobros": 5,
+      "finmovs": 0
+    },
+    "legacyLiveCounts": {
+      "recibosEsperados": 1294,
+      "carteraPrimas": 673,
+      "cobros": 5,
+      "finmovs": 0
+    },
+    "pathState": "CANONICAL_AND_LEGACY_PRESENT",
+    "relationshipBaseline": {
+      "canonical": {
+        "receiptPolicyMissing": 0,
+        "portfolioPolicyMissing": 0,
+        "portfolioReceiptMissing": 0
+      },
+      "legacy": {
+        "receiptPolicyMissing": 0,
+        "portfolioPolicyMissing": 0,
+        "portfolioReceiptMissing": 0
+      }
     }
   }
 }
