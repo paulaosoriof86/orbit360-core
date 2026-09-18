@@ -1788,6 +1788,8 @@ jobs:
           grep -Fq "orbit360-build-reload-retries" orbit360-platform/core/pwa.js
           grep -Fq "Cargando recibos y cartera" orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js
           grep -Fq "function syncPortfolio" orbit360-platform/core/policy-receipts-engine.js
+          grep -Fq "rawUser.emailVerified!==true" orbit360-platform/core/auth-product-runtime-p0.js
+          grep -Fq "ACCOUNT_NOT_READY" orbit360-platform/core/auth-product-runtime-p0.js
 
 
       - name: Install runtime proof dependencies

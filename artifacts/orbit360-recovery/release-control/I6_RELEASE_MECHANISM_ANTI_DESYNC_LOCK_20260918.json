@@ -21,10 +21,11 @@
     },
     {
       "id": "OPERATIONAL_PROOF_ROLE_SURFACE_MISMATCH",
-      "status": "RESOLVED_IN_THIS_CANDIDATE",
+      "status": "RESOLVED",
       "evidence": "Operational proof returned NO_MANAGER while previous authenticated hydration evidence had a verified Dirección/SuperAdmin actor.",
       "cause": "Proof role extractor omitted rolesDisponibles/activeRole surfaces.",
-      "correction": "Proof actor discovery now recognizes the same canonical membership role surfaces used by product/runtime evidence while retaining disabled=false and emailVerified=true requirements."
+      "correction": "Proof actor discovery now recognizes the same canonical membership role surfaces used by product/runtime evidence while retaining disabled=false and emailVerified=true requirements.",
+      "followup": "Current tenant has no selectable emailVerified manager for CI proof. Runtime proof may use an active non-disabled manager via Firebase custom token only; public login remains independently fail-closed on emailVerified=true."
     }
   ],
   "invariants": [
@@ -35,7 +36,9 @@
     "Operational proof selects an eligible verified manager by membership data, not by name/email.",
     "Preview channel reuse is allowed only when the channel ID is not referenced anywhere in the versioned repository.",
     "Data mutation remains forbidden for this code-only operational closure candidate.",
-    "I6.5 receipt/portfolio deterministic writes are not repeated."
+    "I6.5 receipt/portfolio deterministic writes are not repeated.",
+    "CI custom-token proof may select an active non-disabled manager even if email is unverified only to exercise runtime; it must never alter the product login requirement or claim email verification.",
+    "Public login source contract must continue to reject rawUser.emailVerified!==true and ACCOUNT_NOT_READY."
   ],
-  "nextStep": "RERUN_SAME_BOUNDED_OPERATIONAL_CLOSURE_CANDIDATE"
+  "nextStep": "RERUN_BOUNDED_OPERATIONAL_CLOSURE_WITH_NON_HARDCODED_CI_ACTOR"
 }
