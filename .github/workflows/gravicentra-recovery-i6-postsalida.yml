@@ -1439,6 +1439,60 @@ jobs:
           git push origin HEAD:recovery/fase-a-clean-20260831
 
 
+  i65-apply-public-key:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      I65_APPLY_PUBLIC_KEY: artifacts/orbit360-recovery/release-control/I6_5_APPLY_PUBLIC_KEY_20260918.pem
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: ${{ github.sha }}, fetch-depth: 0, persist-credentials: true}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Resolve I6.5 apply key applicability
+        id: key
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          node - <<'NODE'
+          const fs=require('node:fs'),c=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8'));
+          const ok=c.nextAction==='I6_5_APPLY_DETERMINISTIC_DELTA'&&c.i65ApplyPayload?.status==='PUBLIC_KEY_PENDING'&&c.i65DeterministicDiff?.status==='DETERMINISTIC_DIFF_READY';
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(ok?'true':'false')+'\n');
+          NODE
+      - name: Derive public encryption key from existing Firebase authority
+        if: steps.key.outputs.run == 'true'
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('node:fs'),crypto=require('node:crypto');let sa=null;
+          for(const k of ['SA_DEFAULT','SA_ORBIT360_LAB','SA_ORBIT_360_LAB']){try{const x=JSON.parse(process.env[k]||'');if(x?.type==='service_account'&&x?.project_id==='ays-orbit-360-lab'&&x?.private_key){sa=x;break;}}catch{}}
+          if(!sa)throw new Error('I65_APPLY_SERVICE_ACCOUNT_NOT_FOUND');
+          fs.writeFileSync(process.env.I65_APPLY_PUBLIC_KEY,crypto.createPublicKey(sa.private_key).export({type:'spki',format:'pem'}).toString());
+          NODE
+      - name: Freeze apply public key pointer
+        if: steps.key.outputs.run == 'true'
+        run: |
+          set -euo pipefail
+          git fetch origin recovery/fase-a-clean-20260831
+          git reset --hard origin/recovery/fase-a-clean-20260831
+          test -s "$I65_APPLY_PUBLIC_KEY"
+          export PUB_SHA=$(sha256sum "$I65_APPLY_PUBLIC_KEY" | awk '{print $1}')
+          node - <<'NODE'
+          const fs=require('node:fs'),C=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8'));
+          if(C.i65ApplyPayload?.status!=='PUBLIC_KEY_PENDING'||C.nextAction!=='I6_5_APPLY_DETERMINISTIC_DELTA')throw new Error('I65_APPLY_KEY_CURSOR_CHANGED');
+          C.i65ApplyPayload={...C.i65ApplyPayload,status:'PUBLIC_KEY_READY',publicKeySha256:process.env.PUB_SHA,publicKeyRunId:Number(process.env.GITHUB_RUN_ID),dataWritesAuthorized:false,nextRequiredStep:'ENCRYPT_PRIVATE_APPLY_PAYLOAD'};
+          fs.writeFileSync(process.env.CONTROL,JSON.stringify(C,null,2)+'\n');
+          NODE
+          git config user.name "gravicentra-governance-bot"; git config user.email "actions@users.noreply.github.com"
+          git add "$CONTROL" "$I65_APPLY_PUBLIC_KEY"
+          git commit -m "recovery(i6.5): freeze apply encryption public key"
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          git push origin HEAD:recovery/fase-a-clean-20260831
+
+
   i65-encrypted-diff-snapshot:
     runs-on: ubuntu-24.04
     timeout-minutes: 20

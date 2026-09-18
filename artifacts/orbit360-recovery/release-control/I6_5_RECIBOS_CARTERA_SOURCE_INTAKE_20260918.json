@@ -153,10 +153,10 @@
     "receiptIdentityRule": "Do not deduplicate only by policy+series+receiptStart+dueDate. Twelve observed base keys contain multiple legitimate amounts; deterministic identity must include source identity/external receipt identity and amount or equivalent distinguishing evidence."
   },
   "execution": {
-    "cursorState": "LIVE_READBACK_PASS",
+    "cursorState": "DETERMINISTIC_DIFF_READY",
     "writeApplied": false,
     "writes": 0,
-    "nextRequiredStep": "DETERMINISTIC_DIFF",
+    "nextRequiredStep": "APPLY_DETERMINISTIC_DELTA_ONLY",
     "syncCodeDefect": {
       "status": "I6_5_SYNC_CODE_DEFECT_SUCCESSOR_LIVE_PASS",
       "runId": 35379229395,
@@ -205,6 +205,23 @@
       "operationalWrites": 0,
       "receiptCount": 1294,
       "portfolioCount": 673
+    },
+    "deterministicDiff": {
+      "status": "DETERMINISTIC_DIFF_READY",
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_DETERMINISTIC_DIFF_20260918.json",
+      "sha256": "c1cf6d0c62d4dd30bfa80c70abfa7a8751e58630c2ffcc3484e5544d76e55749",
+      "operationalWrites": 2227,
+      "targetCounts": {
+        "polizas": 1414,
+        "clientes": 442,
+        "aseguradoras": 31,
+        "recibosEsperados": 1842,
+        "carteraPrimas": 1283,
+        "cobros": 5
+      },
+      "receiptDeletes": 0,
+      "portfolioDeletesPositivePaymentEvidenceOnly": 24,
+      "holds": 36
     }
   },
   "repinVerification20260918": {

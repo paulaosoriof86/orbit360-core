@@ -272,7 +272,11 @@ if(activeI65){
   need(RGT.modules?.RECIBOS_CARTERA?.sourceIntakePath===I65_SOURCE,'I6_5_REGISTRY_SOURCE_PATH_INVALID');
   need(R64.status==='I6_4_POLIZAS_RIESGOS_LIVE_PASS'&&R64.humanAcceptance?.status==='ACCEPTED'&&seal.status==='I6_4_POLIZAS_RIESGOS_LIVE_PASS','I6_4_ACCEPTANCE_NOT_FROZEN');
   need(SYNC5.status==='BLOCKING_CAUSAL_DESYNC_FOUND_BEFORE_DATA_WRITE'&&SYNC5.decision==='FAIL_CLOSED_NO_I6_5_DATA_WRITES'&&Number(SYNC5.operationalWrites)===0,'I6_5_SYNC_PREFLIGHT_INVALID');
-  if(i65HydrationDiagnosticPending||i65HydrationDiagnosticPass||i65HydrationDefectPending||i65HydrationDefectLive){need(i65HydrationDefect.classification==='CODE_DEFECT'&&i65HydrationDefect.dataMutationAuthorized===false&&i65HydrationDefect.cobrosWritesAuthorized===false&&i65HydrationDefect.reimportAuthorized===false,'I6_5_HYDRATION_BOUNDARY_INVALID');need(cursor==='LIVE_READBACK_PASS','I6_5_HYDRATION_CURSOR_INVALID');}
+  if(i65HydrationDiagnosticPending||i65HydrationDiagnosticPass||i65HydrationDefectPending||i65HydrationDefectLive){
+    need(i65HydrationDefect.classification==='CODE_DEFECT'&&i65HydrationDefect.dataMutationAuthorized===false&&i65HydrationDefect.cobrosWritesAuthorized===false&&i65HydrationDefect.reimportAuthorized===false,'I6_5_HYDRATION_BOUNDARY_INVALID');
+    if(i65HydrationDiagnosticPending||i65HydrationDiagnosticPass||i65HydrationDefectPending)need(cursor==='LIVE_READBACK_PASS','I6_5_HYDRATION_CURSOR_INVALID');
+    if(i65HydrationDefectLive)need(['LIVE_READBACK_PASS','DETERMINISTIC_DIFF_READY','DETERMINISTIC_APPLY_DONE','POST_WRITE_READBACK_INTEGRITY_PASS','PENDING_USER_VISUAL','LIVE_PASS'].includes(cursor),'I6_5_HYDRATION_SUCCESSOR_CURSOR_INVALID');
+  }
 }
 
 const R=C.certifiedCandidate||{};

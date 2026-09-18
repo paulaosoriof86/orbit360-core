@@ -1,0 +1,98 @@
+{
+  "schema": "GRAVICENTRA_I6_5_DETERMINISTIC_DIFF_V1",
+  "status": "DETERMINISTIC_DIFF_READY",
+  "date": "2026-09-18",
+  "gate": "I6.5",
+  "module": "RECIBOS_CARTERA",
+  "sourceBundleSha256": "f445e2f4a20b9eb7a526bda8896472dab9e7ac4617b3c5d8124a939a0dee0e6a",
+  "baselineSnapshot": {
+    "plaintextSha256": "1100380e3fc876370864bd3b365c83ae3cb7d6fe6e8c5f0b58b9d0868bc803e9",
+    "counts": {
+      "polizas": 1414,
+      "clientes": 442,
+      "aseguradoras": 31,
+      "recibosEsperados": 1294,
+      "carteraPrimas": 673,
+      "cobros": 5
+    }
+  },
+  "sourceIdentity": {
+    "baseReceiptKeys": 3681,
+    "deterministicEvidenceGroups": 3714,
+    "baseKeysWithMultipleAmounts": 12,
+    "baseKeysWithMultipleNonblankEndosos": 7,
+    "identityRule": "policy canonical number + exact vigencia start + series + due date; split by endoso whenever multiple endosos exist and by amount for observed multi-amount bases"
+  },
+  "sourceClassification": {
+    "HIST_PAID": 1215,
+    "HIST_SCHEDULE_OR_REPORT_ONLY": 1251,
+    "ACTIVE_SCHEDULE": 1111,
+    "HIST_OVERDUE_EXPLICIT": 101,
+    "HOLD_POLICY": 34,
+    "HOLD_FUTURE_POLICY": 2
+  },
+  "decisions": {
+    "receiptInserts": 548,
+    "receiptUpdates": 798,
+    "receiptDeletes": 0,
+    "portfolioInserts": 634,
+    "portfolioUpdates": 223,
+    "portfolioDeletesPositivePaymentEvidenceOnly": 24,
+    "totalOperationalWrites": 2227,
+    "receiptInsertByClass": {
+      "HIST_OVERDUE_EXPLICIT": 48,
+      "ACTIVE_SCHEDULE": 500
+    },
+    "receiptUpdateByClass": {
+      "ACTIVE_SCHEDULE": 604,
+      "HIST_PAID": 141,
+      "HIST_OVERDUE_EXPLICIT": 53
+    },
+    "portfolioInsertByReceiptClass": {
+      "ACTIVE_SCHEDULE": 561,
+      "HIST_OVERDUE_EXPLICIT": 73
+    },
+    "portfolioDeleteByReceiptClass": {
+      "HIST_PAID": 2,
+      "ACTIVE_SCHEDULE": 22
+    },
+    "newHistoricalPaidEvidenceOnlyNoReceipt": 1074,
+    "historicalScheduleReportHoldNoMaterialize": 1162,
+    "existingHistoricalScheduleReportPreserved": 89,
+    "existingActivePastWithoutStrongNewEvidencePreserved": 7,
+    "holdPolicyNoExactI64Edition": 34,
+    "holdFuturePolicy": 2
+  },
+  "targetCounts": {
+    "polizas": 1414,
+    "clientes": 442,
+    "aseguradoras": 31,
+    "recibosEsperados": 1842,
+    "carteraPrimas": 1283,
+    "cobros": 5
+  },
+  "invariants": {
+    "receiptDeletesByAbsence": 0,
+    "portfolioDeletesByAbsence": 0,
+    "allPortfolioDeletesHavePositivePaymentEvidence": true,
+    "policyWrites": 0,
+    "clientWrites": 0,
+    "insurerWrites": 0,
+    "vehicleWrites": 0,
+    "cobrosWrites": 0,
+    "finmovWrites": 0,
+    "targetRelationshipErrors": 0,
+    "paymentFilesComplementaryNotAdditive": true,
+    "oneSourceCobroInferenceForbidden": true,
+    "reportsAreCrosschecksNotIndependentCreators": true,
+    "scheduleDoesNotProvePayment": true,
+    "sourcePolicyStatusDoesNotOverrideI64": true,
+    "historicalPaidNewRowsRetainedAsEvidenceOnly": true
+  },
+  "privateApplyPayload": {
+    "plaintextSha256": "44f642b4f9390ef686b84564362af94f533bc52d70e871f93f76e18e7b1738ff",
+    "repositoryPlaintextForbidden": true,
+    "encryptionPending": true
+  },
+  "nextRequiredStep": "ENCRYPT_APPLY_PAYLOAD_THEN_APPLY_DETERMINISTIC_DELTA_ONLY"
+}

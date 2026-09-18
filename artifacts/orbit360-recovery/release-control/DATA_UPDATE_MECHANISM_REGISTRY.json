@@ -157,8 +157,8 @@
       "sourceBundleSha256": "f445e2f4a20b9eb7a526bda8896472dab9e7ac4617b3c5d8124a939a0dee0e6a",
       "syncPreflightPath": "artifacts/orbit360-recovery/release-control/I6_5_SYNC_COMPOSITION_PREFLIGHT_20260918.json",
       "currentGate": "I6.5",
-      "resumeCursor": "LIVE_READBACK_PASS",
-      "nextMaterialStep": "DETERMINISTIC_DIFF",
+      "resumeCursor": "DETERMINISTIC_DIFF_READY",
+      "nextMaterialStep": "APPLY_DETERMINISTIC_DELTA_ONLY",
       "dataWritesAuthorized": false,
       "cobrosWritesAuthorized": false,
       "readPathAuthority": "recibosEsperados+carteraPrimas",
@@ -215,6 +215,20 @@
           "carteraPrimas"
         ],
         "writes": 0
+      },
+      "deterministicDiff": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_DETERMINISTIC_DIFF_20260918.json",
+        "sha256": "c1cf6d0c62d4dd30bfa80c70abfa7a8751e58630c2ffcc3484e5544d76e55749",
+        "operationalWrites": 2227,
+        "targetCounts": {
+          "polizas": 1414,
+          "clientes": 442,
+          "aseguradoras": 31,
+          "recibosEsperados": 1842,
+          "carteraPrimas": 1283,
+          "cobros": 5
+        },
+        "holds": 36
       }
     },
     "COBROS_CONCILIACION": {
