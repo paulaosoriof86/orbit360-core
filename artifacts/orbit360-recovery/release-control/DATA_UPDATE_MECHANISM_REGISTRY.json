@@ -150,15 +150,15 @@
     "RECIBOS_CARTERA": {
       "gate": "I6.5",
       "sourceRequiredBeforeStart": true,
-      "sourceState": "CURRENT_SOURCE_PINNED_SYNC_PREFLIGHT_BLOCK",
+      "sourceState": "CURRENT_SOURCE_PINNED",
       "mechanism": "REUSE_APPROVED_EXISTING_WRITE_CONTRACT_FROM_LINEAGE_AND_ACCEPTANCE_EVIDENCE; LOCATE POINTERS ONLY, DO_NOT REDISCOVER_ARCHITECTURE",
       "liveClosure": "READBACK_PASS_THEN_USER_REFRESH_MUST_SHOW_UPDATED_DATA",
       "sourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_5_RECIBOS_CARTERA_SOURCE_INTAKE_20260918.json",
       "sourceBundleSha256": "f445e2f4a20b9eb7a526bda8896472dab9e7ac4617b3c5d8124a939a0dee0e6a",
       "syncPreflightPath": "artifacts/orbit360-recovery/release-control/I6_5_SYNC_COMPOSITION_PREFLIGHT_20260918.json",
       "currentGate": "I6.5",
-      "resumeCursor": "SOURCE_PINNED_SYNC_PREFLIGHT_BLOCK",
-      "nextMaterialStep": "FIX_AND_CERTIFY_I6_5_READ_PATH_COMPOSITION_THEN_LIVE_READBACK_CURRENT_STATE",
+      "resumeCursor": "SOURCE_PINNED",
+      "nextMaterialStep": "LIVE_READBACK_CURRENT_STATE",
       "dataWritesAuthorized": false,
       "cobrosWritesAuthorized": false,
       "readPathAuthority": "recibosEsperados+carteraPrimas",
@@ -167,7 +167,8 @@
         "finmovs",
         "policy/client/insurer/vehicle rewrites",
         "reimport-for-visibility"
-      ]
+      ],
+      "syncCodeDefectStatus": "I6_5_SYNC_CODE_DEFECT_SUCCESSOR_LIVE_PASS"
     },
     "COBROS_CONCILIACION": {
       "gate": "I6.6",

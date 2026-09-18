@@ -11,11 +11,11 @@
   "previousLedgerBlobSha": "09c98a60b3221da29931ea32611fcf528c7f8af7",
   "previousLedgerEvidencePreservedByGitHistory": true,
   "releaseBinding": {
-    "sourceSha": "8838aa98abf8573064f8e160389cf6f1c554bdc1",
-    "buildId": "gi-i64-8838aa98abf8-57f234755dc1",
-    "artifactId": 10556619616,
-    "artifactArchiveDigest": "0304499ac6b70f57116752a908ab438ba156ffde05afa271f9bd2939d23dfc0f",
-    "previewChannelId": "gi-i64-35368653501"
+    "sourceSha": "ccd014bc52238991b92bbff3c2aac7a71aac71ab",
+    "buildId": "gi-i65-ccd014bc5223-57f234755dc1",
+    "artifactId": 10561387342,
+    "artifactArchiveDigest": "fbd599e0e84459cc4abfc8513a7d3889bf51585f78e6c9856ddc0e372c04d852",
+    "previewChannelId": "gi-i65-35376440434"
   },
   "successorCandidate": {
     "sourceSha": "03b03690b5583442dd448e954fb66c3c78648fb3",
@@ -653,5 +653,17 @@
     "sourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_5_RECIBOS_CARTERA_SOURCE_INTAKE_20260918.json",
     "syncPreflightPath": "artifacts/orbit360-recovery/release-control/I6_5_SYNC_COMPOSITION_PREFLIGHT_20260918.json",
     "writes": 0
+  },
+  "i65SyncAcceptance": {
+    "status": "I6_5_SYNC_CODE_DEFECT_SUCCESSOR_LIVE_PASS",
+    "sourceSha": "ccd014bc52238991b92bbff3c2aac7a71aac71ab",
+    "buildId": "gi-i65-ccd014bc5223-57f234755dc1",
+    "artifactId": 10561387342,
+    "liveRunId": 35379229395,
+    "canonicalOwner": "receiptsPortfolioProjectionV920",
+    "receiptCount": 0,
+    "portfolioCount": 0,
+    "i64SentinelsPreserved": true,
+    "operationalWrites": 0
   }
 }
