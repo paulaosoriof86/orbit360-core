@@ -1,0 +1,54 @@
+{
+  "schema": "GRAVICENTRA_I6_4_POLIZAS_RIESGOS_LIVE_PASS_V1",
+  "gate": "I6.4",
+  "module": "POLIZAS_RIESGOS_VEHICULOS",
+  "status": "I6_4_POLIZAS_RIESGOS_LIVE_PASS",
+  "technical": {
+    "sourceSha": "8838aa98abf8573064f8e160389cf6f1c554bdc1",
+    "buildId": "gi-i64-8838aa98abf8-57f234755dc1",
+    "artifactId": 10556619616,
+    "artifactDigest": "0304499ac6b70f57116752a908ab438ba156ffde05afa271f9bd2939d23dfc0f",
+    "liveRunId": 35368653501,
+    "liveEvidenceArtifactId": 10556569722,
+    "liveEvidenceArtifactDigest": "b99602e9538486ec587528c8b60d60dcd812c16123a064190727b8108b107232",
+    "productionReadbackExact": true,
+    "functionalPass": true,
+    "operationalWritesInCodeRelease": 0
+  },
+  "data": {
+    "sourceBundleSha256": "7130ed56467da438f5c6e2823ede65f73d6356de63de94e19da30f3aed26c68f",
+    "policies": 1414,
+    "vehicles": 1063,
+    "policyUpdates": 486,
+    "policyInserts": 41,
+    "vehicleUniqueUpdateTargets": 350,
+    "vehicleInserts": 31,
+    "deletes": 0,
+    "visualCorrectionWrites": 320,
+    "domiciliadoRemaining": 0,
+    "countryCurrencyMismatchesRemaining": 0
+  },
+  "finalSemantics": {
+    "policyKpiOwner": "orbit360-platform/modules/polizas.js",
+    "buildBoundAssets": true,
+    "pwaBuildFreshnessFence": true,
+    "kpiStableAcrossSearchAndRerender": true,
+    "premiumByCurrency": {
+      "GTQ": 627419,
+      "COP": 175456570
+    },
+    "renewals45": 11,
+    "historicalNoPortfolio": 1191,
+    "renewabilityUnknownDisplay": "Renovabilidad pendiente de validar"
+  },
+  "humanAcceptance": {
+    "status": "ACCEPTED",
+    "acceptedBy": "Paula",
+    "acceptedAt": "2026-09-18T10:49:56-06:00",
+    "evidence": "User visually confirmed the updated/inserted policies are visible and said: 'listo, ya todas aparecen'."
+  },
+  "frozen": true,
+  "reopenOnlyOn": "CONCRETE_REPRODUCIBLE_CAUSAL_REGRESSION",
+  "nextGate": "I6.5",
+  "nextModule": "RECIBOS_CARTERA"
+}
