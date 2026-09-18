@@ -12,6 +12,7 @@ on:
       - 'tools/gravicentra-i6-1-preview-package.mjs'
       - 'tools/gravicentra-i6-3-clientes-postwrite-functional.mjs'
       - 'tools/gravicentra-i6-3-client-name-case.mjs'
+      - 'tools/gravicentra-i6-3-contact-sample-readonly.mjs'
       - 'orbit360-platform/core/tenant-access-policy-contract-p0.js'
       - 'orbit360-platform/core/access-scope.js'
       - 'orbit360-platform/modules/cliente360.js'
@@ -88,6 +89,8 @@ jobs:
           grep -Fq "REQUIERE_VALIDACION" orbit360-platform/core/tenant-access-policy-contract-p0.js
           grep -Fq "Prima neta vigente" orbit360-platform/modules/cliente360.js
           grep -Fq "no se suman GTQ y COP" orbit360-platform/modules/cliente360.js
+          grep -Fq "c360-client-name-case-style" orbit360-platform/modules/cliente360.js
+          node --check tools/gravicentra-i6-3-contact-sample-readonly.mjs
 
       - name: Install runtime proof dependencies
         if: steps.mode.outputs.mode == 'release'
@@ -120,6 +123,24 @@ jobs:
           cp "$SEL" "$RUNNER_TEMP/i63-sa.json"
           chmod 600 "$RUNNER_TEMP/i63-sa.json"
           echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/i63-sa.json" >> "$GITHUB_ENV"
+
+      - name: Extract read-only contact-change samples
+        if: steps.mode.outputs.mode == 'release'
+        env:
+          I63_CONTACT_SAMPLE_FILE: ${{ runner.temp }}/i63-contact-sample.json
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-i6-3-contact-sample-readonly.mjs
+
+      - name: Upload contact-change sample evidence
+        if: steps.mode.outputs.mode == 'release'
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i6-3-contact-sample-${{ github.run_id }}
+          path: ${{ runner.temp }}/i63-contact-sample.json
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 7
 
       - name: Materialize immutable package once
         if: steps.mode.outputs.mode == 'release'

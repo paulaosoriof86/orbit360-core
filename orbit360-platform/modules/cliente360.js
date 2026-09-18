@@ -19,6 +19,13 @@ Orbit.modules.cliente360 = (function () {
   let listPage = 1;
   let listRenderSeq = 0;
   const perfNow = () => (typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now());
+  function ensureClientNameCaseStyle() {
+    if (document.getElementById('c360-client-name-case-style')) return;
+    const style = document.createElement('style');
+    style.id = 'c360-client-name-case-style';
+    style.textContent = '.c360-client-name,#crm-kpi-v1198 [data-client] b{text-transform:uppercase;}';
+    document.head.appendChild(style);
+  }
   // visibilidad por rol (la comisión de empresa es interna/configurable)
   const ROLE = () => (Orbit.session && Orbit.session.rol && Orbit.session.rol()) || (Orbit.auth && Orbit.auth.user() && Orbit.auth.user().rol) || 'Dirección';
   const verEmpresa = () => ['Dirección', 'Admin', 'Finanzas'].includes(ROLE());
@@ -40,6 +47,7 @@ Orbit.modules.cliente360 = (function () {
   // ---------- entry ----------
   function render(h) {
     host = h;
+    ensureClientNameCaseStyle();
     const p = (Orbit.route && Orbit.route.params) || {};
     const cid = p.c || null;
     if (cid && S().get('clientes', cid)) {
@@ -139,7 +147,7 @@ Orbit.modules.cliente360 = (function () {
             return `<tr class="clickable" onclick="location.hash='#/cliente360?c=${c.id}'">
               <td><div style="display:flex;align-items:center;gap:11px">
                 ${U.avatar(c.nombre, c.tipo === 'Empresa' ? '#1E2227' : '#C5162E', 'md')}
-                <div><div style="font-weight:700">${U.esc(c.nombre)}</div>
+                <div><div class="c360-client-name" style="font-weight:700">${U.esc(c.nombre)}</div>
                 <div class="muted" style="font-size:11.5px">${U.esc(U.text(c.tipo, 'Pendiente de completar'))} · ${U.esc(U.text(c.ciudad, 'Pendiente de completar'))} · ${U.esc(U.text(c.pais, 'Pendiente de completar'))}</div></div>
               </div></td>
               <td><div style="display:flex;align-items:center;gap:7px"><span class="dot-s" style="background:${ase ? ase.color : '#999'}"></span>${U.esc(ase ? ase.nombre : '—')}</div></td>
@@ -246,7 +254,7 @@ Orbit.modules.cliente360 = (function () {
     const waMsg = encodeURIComponent('Hola ' + c.nombre.split(' ')[0] + ', te saluda tu asesor.');
 
     host.innerHTML = `<div class="page">
-      <div class="crumb" style="margin-bottom:14px"><a style="cursor:pointer;color:var(--red)" onclick="location.hash='#/cliente360'">‹ Clientes 360</a> / ${U.esc(c.nombre)}</div>
+      <div class="crumb" style="margin-bottom:14px"><a style="cursor:pointer;color:var(--red)" onclick="location.hash='#/cliente360'">‹ Clientes 360</a> / <span class="c360-client-name">${U.esc(c.nombre)}</span></div>
 
       <!-- HEADER cerebro -->
       <div class="card fichahdr" style="overflow:hidden">
@@ -257,7 +265,7 @@ Orbit.modules.cliente360 = (function () {
           </div>
           <div style="flex:1;min-width:240px">
             <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-              <h2 style="font-family:var(--f-display);font-weight:800;font-size:25px;letter-spacing:-.02em;margin:0">${U.esc(c.nombre)}</h2>
+              <h2 class="c360-client-name" style="font-family:var(--f-display);font-weight:800;font-size:25px;letter-spacing:-.02em;margin:0">${U.esc(c.nombre)}</h2>
               <span class="badge ${c.tipo === 'Empresa' ? 'info' : 'neutral'}">${c.tipo}</span>
               ${c.etiquetas.map(t => `<span class="badge ${t === 'VIP' ? 'danger' : 'neutral'}">${t}</span>`).join('')}
             </div>
