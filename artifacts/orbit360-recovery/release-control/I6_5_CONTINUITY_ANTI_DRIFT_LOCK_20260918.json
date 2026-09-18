@@ -8,7 +8,7 @@
     "controlPlane": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
     "microplan": {
       "path": "artifacts/orbit360-recovery/release-control/I6_5_MINI_CIERRE_OPERATIVO_DECISION_LOCK_20260918.json",
-      "blobSha": "2d2f1680fd3953a7c63f0619b938e16126e1a628",
+      "blobSha": "2f1128dfbdedcbd8c4d0b316602f2f316aa8c514",
       "status": "FROZEN_ACTIVE"
     },
     "phaseB": {
@@ -21,6 +21,11 @@
       "sourceBundleSha256": "f445e2f4a20b9eb7a526bda8896472dab9e7ac4617b3c5d8124a939a0dee0e6a",
       "baselineBlobSha": "db6db64604a936b0c12d31a5b8b943d25bad0c37",
       "mutableExecutionSnapshotAllowed": true
+    },
+    "selfAdministration": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_BLOCK_A_D_SELF_ADMINISTRATION_LOCK_20260918.json",
+      "blobSha": "584c7945fed8dda48abc3bc6fb30f09218e23727",
+      "status": "FROZEN_ACTIVE"
     }
   },
   "continuityRules": [
@@ -33,7 +38,8 @@
     "Every product-source correction must prove same-artifact Preview to LIVE, exact hosted readback, authenticated functional behavior, preserved I6.4 sentinels, and zero unrelated/data writes.",
     "Every pure data step must bind pinned source SHA, current LIVE readback, deterministic diff, exact allowed collections, write counts, post-write readback, and rollback evidence.",
     "Recibos Esperados, Cartera Primas and Cobros remain semantically separate. No payment/cobro may be inferred from schedule, balance disappearance, commission evidence, one-source evidence, proposal, HOLD, or frequency alone.",
-    "Only the source-intake execution subtree and explicit repin evidence may evolve during I6.5. sourceBundle, coverage, temporalScope, sourcePrecedence and invariants are frozen and must deep-match this anti-drift lock on every executor run."
+    "Only the source-intake execution subtree and explicit repin evidence may evolve during I6.5. sourceBundle, coverage, temporalScope, sourcePrecedence and invariants are frozen and must deep-match this anti-drift lock on every executor run.",
+    "The A/D self-administration lock is mandatory continuity authority. User/client/policy/insurer persistence and transversal workflow closure cannot be omitted because a chat ends or a new visual finding appears."
   ],
   "sourceComplementarity": {
     "schedule": [

@@ -1347,17 +1347,18 @@
     "status": "FROZEN_ACTIVE",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_MINI_CIERRE_OPERATIVO_DECISION_LOCK_20260918.json",
     "frozenAtHead": "bb940461f1ec39469d1778bd2f9d875573ad300f",
-    "blockAStatus": "A1_EMAIL_VERIFICATION_PENDING_A2_A3_A4_CODE_FIX_CANDIDATE",
+    "blockAStatus": "SELF_ADMIN_PERSISTENCE_CLOSURE_ACTIVE",
     "blockBStatus": "READ_PATH_HYDRATION_LIVE_PASS",
     "blockCStatus": "TECHNICAL_PASS_VISUAL_COMPOSITION_FIX_PENDING",
-    "blockDStatus": "PENDING_REUSE_ONLY",
+    "blockDStatus": "TRANSVERSAL_SELF_ADMIN_E2E_FROZEN_PENDING_EXECUTION",
     "cobrosWritesDuringI65": false,
     "nextMaterialCursor": "OPERATIONAL_CLOSURE_SUCCESSOR_RELEASE",
-    "blobSha": "2d2f1680fd3953a7c63f0619b938e16126e1a628",
+    "blobSha": "2f1128dfbdedcbd8c4d0b316602f2f316aa8c514",
     "conversationDependent": false,
     "structuralPlanImmutable": true,
     "blockBFreezePath": "artifacts/orbit360-recovery/release-control/I6_5_BLOCK_B_HYDRATION_LIVE_FREEZE_20260918.json",
-    "blockCTechnicalReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_RECIBOS_CARTERA_TECHNICAL_PASS_20260918.json"
+    "blockCTechnicalReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_RECIBOS_CARTERA_TECHNICAL_PASS_20260918.json",
+    "selfAdministrationLockPath": "artifacts/orbit360-recovery/release-control/I6_5_BLOCK_A_D_SELF_ADMINISTRATION_LOCK_20260918.json"
   },
   "i65HydrationDefect": {
     "status": "I6_5_HYDRATION_CODE_DEFECT_SUCCESSOR_LIVE_PASS",
@@ -1575,7 +1576,7 @@
   },
   "i65ContinuityAntiDrift": {
     "path": "artifacts/orbit360-recovery/release-control/I6_5_CONTINUITY_ANTI_DRIFT_LOCK_20260918.json",
-    "blobSha": "786c4ee767163ae5c3e21bb598d1bdd2e61719fe",
+    "blobSha": "e0bca76a3819a3b5220dc197d66de166a2117bd9",
     "status": "FROZEN_ACTIVE",
     "sourceBundleSha256": "f445e2f4a20b9eb7a526bda8896472dab9e7ac4617b3c5d8124a939a0dee0e6a",
     "sourceRepinStatus": "EXACT_MATCH_8_OF_8",
@@ -1731,7 +1732,10 @@
       "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js",
       "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
       "orbit360-platform/core/pwa.js",
-      "orbit360-platform/index.html"
+      "orbit360-platform/index.html",
+      "orbit360-platform/data/store-firestore-product-operational-p0.js",
+      "orbit360-platform/modules/equipo.js",
+      "orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js"
     ],
     "expectedLiveCounts": {
       "polizas": 1414,
@@ -1746,8 +1750,23 @@
     "productMutationAuthorized": true,
     "nextRequiredStep": "I6_5_OPERATIONAL_CLOSURE_SUCCESSOR_RELEASE",
     "users": {
-      "samuel": "PROVISIONED_ACTIVE_MEMBERSHIP_EMAIL_VERIFICATION_PENDING",
-      "carlos": "PROVISIONED_ACTIVE_MEMBERSHIP_EMAIL_VERIFICATION_PENDING"
-    }
+      "policy": "NO_HARDCODED_IDENTITIES_PLATFORM_SELF_ADMIN_ONLY",
+      "status": "TEAM_SAVE_FRONTEND_BACKEND_SURFACE_DESYNC_FIX_CANDIDATE"
+    },
+    "selfAdministrationLockPath": "artifacts/orbit360-recovery/release-control/I6_5_BLOCK_A_D_SELF_ADMINISTRATION_LOCK_20260918.json"
+  },
+  "i65SelfAdministrationClosure": {
+    "status": "FROZEN_ACTIVE",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_BLOCK_A_D_SELF_ADMINISTRATION_LOCK_20260918.json",
+    "blobSha": "584c7945fed8dda48abc3bc6fb30f09218e23727",
+    "parentMicroplanPath": "artifacts/orbit360-recovery/release-control/I6_5_MINI_CIERRE_OPERATIVO_DECISION_LOCK_20260918.json",
+    "parentMicroplanBlobSha": "2f1128dfbdedcbd8c4d0b316602f2f316aa8c514",
+    "noHardcodedIdentities": true,
+    "optimisticUiIsNotPersistence": true,
+    "backendCommitRequired": true,
+    "canonicalReadbackRequired": true,
+    "multiCollectionAtomicityRequired": true,
+    "paymentLifecycleGate": "I6.6",
+    "conversationDependent": false
   }
 }

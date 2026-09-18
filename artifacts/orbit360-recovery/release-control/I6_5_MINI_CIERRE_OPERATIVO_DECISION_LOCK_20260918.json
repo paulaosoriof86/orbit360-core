@@ -12,7 +12,8 @@
     "operatingPlan": "artifacts/orbit360-recovery/release-control/POSTPROD_DATA_UPDATE_OPERATING_PLAN_LOCK_20260917.json",
     "executionDiscipline": "artifacts/orbit360-recovery/release-control/I6_DATA_UPDATE_EXECUTION_DISCIPLINE_LOCK_20260917.json",
     "mechanismRegistry": "artifacts/orbit360-recovery/release-control/DATA_UPDATE_MECHANISM_REGISTRY.json",
-    "sourceIntake": "artifacts/orbit360-recovery/release-control/I6_5_RECIBOS_CARTERA_SOURCE_INTAKE_20260918.json"
+    "sourceIntake": "artifacts/orbit360-recovery/release-control/I6_5_RECIBOS_CARTERA_SOURCE_INTAKE_20260918.json",
+    "selfAdministrationLock": "artifacts/orbit360-recovery/release-control/I6_5_BLOCK_A_D_SELF_ADMINISTRATION_LOCK_20260918.json"
   },
   "currentState": {
     "formalPostproductionProgressPercent": 50,
@@ -59,14 +60,15 @@
   "blocks": {
     "A": {
       "name": "PENDIENTES_OPERATIVOS_PEQUENOS",
-      "status": "OPEN_BUT_MUST_NOT_CONTAMINATE_I65_BASELINE",
+      "status": "SELF_ADMIN_PERSISTENCE_CLOSURE_ACTIVE",
       "work": [
-        "A1_CREATE_AND_AUTHENTICATE_SAMUEL_AND_RETEST_CARLOS",
-        "A2_NEW_POLICY_END_TO_END_FROM_EXISTING_PLATFORM_FORM",
-        "A3_REAL_RENEWAL_FLOW_WITH_HISTORY_PRESERVED",
-        "A4_FAVICON_AND_LOGIN_LOGO_SMALL_UI_FIXES"
+        "A1_TEAM_SELF_ADMIN_CREATE_EDIT_PERSIST_AUTH_MEMBERSHIP",
+        "A2_CLIENT_SELF_ADMIN_CREATE_EDIT_PERSIST",
+        "A3_POLICY_SELF_ADMIN_CREATE_EDIT_ATOMIC_RECEIPTS_PORTFOLIO_ZERO_AUTO_COBRO",
+        "A4_INSURER_EDIT_PERSIST_LOGIN_LOGO_FAVICON_BUILD_FRESHNESS"
       ],
-      "executionBoundary": "Analysis/preparation may run in parallel. LIVE writes that change policies, receipts, users or product source must use isolated controlled fixtures/rollback or wait until the I6.5 current-state/diff baseline is frozen. Do not contaminate receipt counts before I6.5 reconciliation."
+      "executionBoundary": "Closure checks/minifixes only. No hardcoded identities. Save is PASS only after protected server commit and canonical readback.",
+      "selfAdministrationLock": "artifacts/orbit360-recovery/release-control/I6_5_BLOCK_A_D_SELF_ADMINISTRATION_LOCK_20260918.json"
     },
     "B": {
       "name": "READ_PATH_COMPOSITION_RECIBOS_CARTERA",
@@ -128,8 +130,9 @@
     },
     "D": {
       "name": "E2E_OX_LEADS_CLIENTE360_POLIZAS_PAGOS_NOTIFICACIONES",
-      "status": "PENDING_REUSE_ONLY",
-      "rule": "Recover and test approved flows; do not redesign OX/Leads. Payment-dependent E2E closes after the relevant I6.6 cobro state exists; non-payment flows may be tested earlier only when they do not disturb I6.5 baseline."
+      "status": "TRANSVERSAL_SELF_ADMIN_E2E_FROZEN_PENDING_EXECUTION",
+      "rule": "Reuse approved Ops/Leads/Cliente360/Portal/Payments/Notifications/Automation owners. Payment durable closure continues in I6.6; no parallel persistence owner or optimistic-only success.",
+      "selfAdministrationLock": "artifacts/orbit360-recovery/release-control/I6_5_BLOCK_A_D_SELF_ADMINISTRATION_LOCK_20260918.json"
     }
   },
   "derivedDecisions": [
@@ -139,7 +142,10 @@
     "I6.5 does not write cobros. Cobros and payment reconciliation materialization remain I6.6.",
     "A bugs remain inside Block A and D bugs inside Block D; no new top-level blocks are created.",
     "Any product-source change uses immutable build Preview to same-artifact LIVE; pure data deltas do not rebuild.",
-    "After every material step, CONTROL_PLANE plus source-intake cursor is updated; conversation continuity is never required."
+    "After every material step, CONTROL_PLANE plus source-intake cursor is updated; conversation continuity is never required.",
+    "Self-administration of users, clients, policies and insurers is mandatory closure nested in A/D and cannot be dropped by later visual findings.",
+    "Samuel/Carlos are operational examples only; no named person is a product-source authority or hardcoded requirement.",
+    "Critical self-admin saves await protected backend commit; multi-collection policy changes require an atomic server-owned contract."
   ],
   "stopConditions": [
     "destructive operation",

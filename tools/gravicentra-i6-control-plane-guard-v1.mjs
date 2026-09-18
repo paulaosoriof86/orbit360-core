@@ -18,6 +18,7 @@ const I64_SOURCE='artifacts/orbit360-recovery/release-control/I6_4_POLIZAS_RIESG
 const I64_RECEIPT='artifacts/orbit360-recovery/release-control/I6_4_POLIZAS_RIESGOS_LIVE_PASS_20260918.json';
 const I65_SOURCE='artifacts/orbit360-recovery/release-control/I6_5_RECIBOS_CARTERA_SOURCE_INTAKE_20260918.json';
 const I65_MINI='artifacts/orbit360-recovery/release-control/I6_5_MINI_CIERRE_OPERATIVO_DECISION_LOCK_20260918.json';
+const I65_SELF_ADMIN='artifacts/orbit360-recovery/release-control/I6_5_BLOCK_A_D_SELF_ADMINISTRATION_LOCK_20260918.json';
 const I65_ANTI_DRIFT='artifacts/orbit360-recovery/release-control/I6_5_CONTINUITY_ANTI_DRIFT_LOCK_20260918.json';
 const I65_SYNC='artifacts/orbit360-recovery/release-control/I6_5_SYNC_COMPOSITION_PREFLIGHT_20260918.json';
 const I65_DIFF='artifacts/orbit360-recovery/release-control/I6_5_DETERMINISTIC_DIFF_20260918.json';
@@ -232,6 +233,10 @@ if(activeI65){
   const p=C.postproductionExitProgress||{},seal=C.i6Execution?.i6_4||{},cursor=SRC5.execution?.cursorState||'SOURCE_PINNED';
   need(C.i65MiniClosurePlan?.path===I65_MINI&&C.i65MiniClosurePlan?.status==='FROZEN_ACTIVE'&&C.i65MiniClosurePlan?.conversationDependent===false&&C.i65MiniClosurePlan?.structuralPlanImmutable===true,'I6_5_MINIPLAN_AUTHORITY_INVALID');
   need(git('hash-object',I65_MINI)===C.i65MiniClosurePlan?.blobSha,'I6_5_MINIPLAN_BLOB_DRIFT');
+  need(C.i65SelfAdministrationClosure?.path===I65_SELF_ADMIN&&C.i65SelfAdministrationClosure?.status==='FROZEN_ACTIVE'&&C.i65SelfAdministrationClosure?.conversationDependent===false&&C.i65SelfAdministrationClosure?.noHardcodedIdentities===true&&C.i65SelfAdministrationClosure?.backendCommitRequired===true,'I6_5_SELF_ADMIN_AUTHORITY_INVALID');
+  need(git('hash-object',I65_SELF_ADMIN)===C.i65SelfAdministrationClosure?.blobSha,'I6_5_SELF_ADMIN_BLOB_DRIFT');
+  const SA=readJson(I65_SELF_ADMIN);
+  need(SA.status==='FROZEN_ACTIVE'&&SA.parentMicroplanBlobSha===C.i65MiniClosurePlan?.blobSha&&SA.acceptance?.users==='NO_HARDCODED_IDENTITIES; CREATED_AND_EDITED_RECORDS_PERSIST_AFTER_REFRESH','I6_5_SELF_ADMIN_BINDING_INVALID');
   need(C.i65ContinuityAntiDrift?.path===I65_ANTI_DRIFT&&C.i65ContinuityAntiDrift?.status==='FROZEN_ACTIVE'&&C.i65ContinuityAntiDrift?.conversationAsAuthority===false&&C.i65ContinuityAntiDrift?.parallelPlanForbidden===true,'I6_5_ANTI_DRIFT_AUTHORITY_INVALID');
   need(git('hash-object',I65_ANTI_DRIFT)===C.i65ContinuityAntiDrift?.blobSha,'I6_5_ANTI_DRIFT_BLOB_DRIFT');
   const AD=readJson(I65_ANTI_DRIFT);

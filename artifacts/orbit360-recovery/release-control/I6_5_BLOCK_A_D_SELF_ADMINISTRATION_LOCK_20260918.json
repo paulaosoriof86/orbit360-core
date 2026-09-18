@@ -1,0 +1,83 @@
+{
+  "schema": "GRAVICENTRA_I6_5_BLOCK_A_D_SELF_ADMINISTRATION_LOCK_V1",
+  "status": "FROZEN_ACTIVE",
+  "date": "2026-09-18",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentMicroplanPath": "artifacts/orbit360-recovery/release-control/I6_5_MINI_CIERRE_OPERATIVO_DECISION_LOCK_20260918.json",
+  "scope": "NESTED_UNDER_EXISTING_BLOCKS_A_AND_D_NO_NEW_TOP_LEVEL_BLOCK",
+  "objective": "Close the approved product as genuinely self-administered. Code presence is not acceptance; each save must persist through the server-owned write authority and be visible again from canonical reads.",
+  "invariants": [
+    "No person identity, including Samuel or Carlos, may be hardcoded as product behavior or a required user record.",
+    "Team users are created, edited, activated/deactivated, assigned roles/countries/scopes and access-provisioned from Equipo y permisos.",
+    "Browser optimistic state is never proof of persistence; self-admin Save is successful only after the protected backend commit resolves.",
+    "Multi-collection business operations use one server-owned transaction/batch or another explicit atomic contract.",
+    "Canonical readback after commit is the visual authority; localStorage, seed, legacy namespaces and conversation history are not operational authority.",
+    "Approved modules are reused; findings are mini-corrections inside A or D, not redesigns or parallel methodologies.",
+    "Cobro is never inferred from a receipt schedule or cartera balance; confirmed payment lifecycle closes separately in I6.6.",
+    "Cross-module workflows preserve actor, tenant, role, audit, notification/synchronization outcome and fail-closed behavior."
+  ],
+  "blockA": {
+    "status": "SELF_ADMIN_PERSISTENCE_CLOSURE_ACTIVE",
+    "items": [
+      {
+        "id": "A1_TEAM_SELF_ADMIN",
+        "required": "Create/edit users from Equipo, persist advisor, optionally provision/sync Auth+membership, roles, countries, scopes and credentials; no hardcoded people.",
+        "current": "FRONTEND_BACKEND_WRITE_SURFACE_DESYNC_IDENTIFIED_FIX_CANDIDATE"
+      },
+      {
+        "id": "A2_CLIENT_SELF_ADMIN",
+        "required": "Create/edit clients from platform and confirm canonical readback plus linked activity.",
+        "current": "DURABLE_COMMIT_VERIFICATION_REQUIRED"
+      },
+      {
+        "id": "A3_POLICY_SELF_ADMIN",
+        "required": "Create/edit policy from platform; policy+receipts+cartera remain synchronized and atomic; no automatic cobro.",
+        "current": "ATOMIC_DURABILITY_VERIFICATION_REQUIRED"
+      },
+      {
+        "id": "A4_INSURER_AND_BRAND",
+        "required": "Modify insurers with persistent readback; secure credentials stay protected; login logo/favicon/build freshness corrected.",
+        "current": "PRODUCT_FIX_CANDIDATE_PENDING_RELEASE"
+      }
+    ]
+  },
+  "blockD": {
+    "status": "TRANSVERSAL_SELF_ADMIN_E2E_FROZEN_PENDING_EXECUTION",
+    "items": [
+      {
+        "id": "D1_PAYMENTS_AND_COBROS",
+        "required": "Create/update/reconcile confirmed payments from platform with auditable links to receipt/policy and no inference.",
+        "gate": "I6.6"
+      },
+      {
+        "id": "D2_OPS_LEADS",
+        "required": "Ops/Leads transitions remain server-owned semantic workflows and synchronize Cliente360, policy/client links and activity."
+      },
+      {
+        "id": "D3_CLIENT_PORTAL",
+        "required": "Client portal and Cliente360 consume the same canonical state and never create alternate persistence."
+      },
+      {
+        "id": "D4_NOTIFICATIONS_AUTOMATION",
+        "required": "Notifications/automation fire only after committed domain events and expose failure/retry state without duplicating records."
+      }
+    ]
+  },
+  "acceptance": {
+    "eachCrud": "AUTHENTICATED_UI_ACTION -> SERVER_COMMIT -> CANONICAL_READBACK -> UI_REFRESH -> AUDIT",
+    "policyCreate": "ONE_ATOMIC_BUSINESS_OPERATION_FOR_POLICY_RECEIPTS_PORTFOLIO; COBROS=0",
+    "users": "NO_HARDCODED_IDENTITIES; CREATED_AND_EDITED_RECORDS_PERSIST_AFTER_REFRESH",
+    "crossModule": "NO_SILENT_OPTIMISTIC_SUCCESS; NO_DIVERGENT_OWNER",
+    "release": "BUILD_ONCE -> PREVIEW -> AUTHENTICATED_PROOF -> SAME_ARTIFACT_LIVE -> EXACT_READBACK -> FREEZE_OR_ROLLBACK"
+  },
+  "forbidden": [
+    "hardcoded operational users",
+    "browser direct Firestore writes",
+    "silent fire-and-forget success for self-admin saves",
+    "parallel workflow or repo",
+    "new top-level recovery blocks",
+    "reimport as UI fix"
+  ],
+  "parentMicroplanBlobSha": "2f1128dfbdedcbd8c4d0b316602f2f316aa8c514"
+}
