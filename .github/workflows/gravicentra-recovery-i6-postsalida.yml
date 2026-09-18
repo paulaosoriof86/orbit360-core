@@ -26,7 +26,6 @@ jobs:
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
       SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
-      I62_EVIDENCE_DIR: ${{ runner.temp }}/gravicentra-i62-evidence
     steps:
       - uses: actions/checkout@v4
         with:
@@ -62,6 +61,8 @@ jobs:
           npm install --no-save --package-lock=false firebase-admin@13.10.0 @google-cloud/secret-manager@6.1.0 playwright@1.55.0 >/dev/null
           npx playwright install --with-deps chromium >/dev/null
       - name: Apply deterministic delta, read back and prove updated values
+        env:
+          I62_EVIDENCE_DIR: ${{ runner.temp }}/gravicentra-i62-evidence
         run: node tools/gravicentra-i6-2-delta-executor-ephemeral.mjs
       - name: LIVE authenticated role regression after data update
         env:
