@@ -1,5 +1,5 @@
 name: Gravicentra I6 Post-Salida
-# I6.3 Clientes secure apply-bridge key publication after LIVE readback PASS.
+# I6.3 Clientes deterministic DATA_UPDATE apply/readback/functional executor — Evergreen V5.
 on:
   workflow_dispatch:
   push:
@@ -8,18 +8,22 @@ on:
     paths:
       - 'artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json'
       - 'artifacts/orbit360-recovery/release-control/I6_3_CLIENTES_SOURCE_INTAKE_20260918.json'
-      - 'tools/gravicentra-i6-control-plane-guard-v1.mjs'
+      - '.github/i6-ephemeral/i63-clientes-apply-envelope.encrypted.json'
+      - 'tools/gravicentra-i6-3-clientes-delta-executor-ephemeral.mjs'
       - '.github/workflows/gravicentra-recovery-i6-postsalida.yml'
 permissions:
   contents: read
   actions: read
+concurrency:
+  group: gravicentra-i6-postsalida-${{ github.ref }}
+  cancel-in-progress: false
 env:
   PROJECT_ID: ays-orbit-360-lab
   TENANT_ID: alianzas-soluciones
 jobs:
-  i63-secure-bridge-key:
+  i63-deterministic-delta:
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
+    timeout-minutes: 35
     env:
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
       SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
@@ -33,7 +37,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Canonical I6.3 readback-pass authority
+      - name: Canonical I6.3 authority
         run: |
           set -euo pipefail
           node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
@@ -41,16 +45,42 @@ jobs:
           const fs=require('node:fs');
           const c=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json','utf8'));
           const s=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_3_CLIENTES_SOURCE_INTAKE_20260918.json','utf8'));
-          if(c.nextAction!=='I6_3_DETERMINISTIC_DIFF'||s.execution?.cursorState!=='LIVE_READBACK_PASS'||s.execution?.readbackRunId!==35306248860)throw new Error('I63_READBACK_PASS_NOT_BOUND');
-          console.log('I63_READBACK_PASS_BOUND=true');
+          const need=(x,m)=>{if(!x)throw new Error(m)};
+          need(c.status==='PRODUCTION_ACCEPTED','I63_BASELINE');
+          need(c.gateState?.gates?.I6?.status==='I6_3_DATA_UPDATE_V5_ACTIVE','I63_GATE');
+          need(c.gateState?.gates?.I6?.activeSubgate==='I6.3','I63_SUBGATE');
+          need(c.nextAction==='I6_3_APPLY_DETERMINISTIC_DELTA','I63_ACTION');
+          need(s.execution?.cursorState==='DETERMINISTIC_DIFF_READY','I63_CURSOR');
+          need(s.source?.sha256==='4f0a1307605ad5dcc947355dbbc98a50b510358e5f6a9835b75d02e45f5a8c7c','I63_SOURCE');
+          need(s.execution?.diffSummary?.updates===300&&s.execution?.diffSummary?.inserts===12&&s.execution?.diffSummary?.deletes===0,'I63_DIFF');
+          console.log('I63_AUTHORITY=PASS');
           NODE
-      - name: Publish service-account public key for encrypted ephemeral apply bridge
+      - name: Install execution dependencies
         run: |
-          node - <<'NODE'
-          const crypto=require('node:crypto');
-          let sa=null;
-          for(const k of ['SA_DEFAULT','SA_ORBIT360_LAB','SA_ORBIT_360_LAB']){try{const x=JSON.parse(process.env[k]||'');if(x?.type==='service_account'&&x?.project_id===process.env.PROJECT_ID&&x?.private_key){sa=x;break;}}catch{}}
-          if(!sa)throw new Error('I63_SERVICE_ACCOUNT_NOT_AVAILABLE');
-          const pub=crypto.createPublicKey(sa.private_key).export({type:'spki',format:'pem'});
-          console.log('I63_APPLY_PUBLIC_KEY_B64='+Buffer.from(pub).toString('base64'));
-          NODE
+          npm install --no-save --package-lock=false firebase-admin@13.10.0 playwright@1.55.0 >/dev/null
+          npx playwright install --with-deps chromium >/dev/null
+      - name: Apply deterministic Clientes delta, read back and verify Cliente360
+        env:
+          I63_EVIDENCE_DIR: ${{ runner.temp }}/gravicentra-i63-evidence
+        run: node tools/gravicentra-i6-3-clientes-delta-executor-ephemeral.mjs
+      - name: Verify safe physical evidence
+        if: success()
+        env:
+          E: ${{ runner.temp }}/gravicentra-i63-evidence/i63-apply-readback-functional.json
+        run: |
+          set -euo pipefail
+          test "$(jq -r .status "$E")" = PASS
+          test "$(jq -r .apply.operationalMutations "$E")" = 312
+          test "$(jq -r .readback.status "$E")" = PASS
+          test "$(jq -r .readback.documentCount "$E")" = 442
+          test "$(jq -r .functional.status "$E")" = PASS
+          test "$(jq -r .containsPII "$E")" = false
+          test "$(jq -r .containsSecrets "$E")" = false
+          echo I63_PHYSICAL_TECHNICAL_PASS=true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gravicentra-i6-3-apply-evidence-${{ github.run_id }}
+          path: ${{ runner.temp }}/gravicentra-i63-evidence
+          if-no-files-found: error
+          retention-days: 90

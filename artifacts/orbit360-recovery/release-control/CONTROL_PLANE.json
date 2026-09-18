@@ -416,9 +416,9 @@
     "mechanismRegistryPath": "artifacts/orbit360-recovery/release-control/DATA_UPDATE_MECHANISM_REGISTRY.json",
     "mechanismRegistryBlobSha": "4f9c0d1726ea07aeb157018cc525dea87aa8c5de",
     "activeSourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_3_CLIENTES_SOURCE_INTAKE_20260918.json",
-    "activeSourceIntakeBlobSha": "079259ad49c6867d01f7e8cd2df5a74aff8083b7",
+    "activeSourceIntakeBlobSha": "3f757e9b3829a7686b7073a504fd3e2e83c3225a",
     "activeModule": "CLIENTES",
-    "activeModuleStatus": "LIVE_READBACK_PASS",
+    "activeModuleStatus": "DETERMINISTIC_DIFF_READY",
     "i6_0": {
       "status": "I6_0_BASELINE_FROZEN",
       "executorPath": ".github/workflows/gravicentra-material-baseline-freeze.yml",
@@ -455,15 +455,15 @@
     "mechanismRegistryBlobSha": "4f9c0d1726ea07aeb157018cc525dea87aa8c5de",
     "activeModule": "CLIENTES",
     "activeSourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_3_CLIENTES_SOURCE_INTAKE_20260918.json",
-    "activeSourceIntakeBlobSha": "079259ad49c6867d01f7e8cd2df5a74aff8083b7",
+    "activeSourceIntakeBlobSha": "3f757e9b3829a7686b7073a504fd3e2e83c3225a",
     "sourceSha256": "4f0a1307605ad5dcc947355dbbc98a50b510358e5f6a9835b75d02e45f5a8c7c",
     "conversationAsAuthority": false,
     "requestCurrentSourceBeforeEveryNewModule": true,
     "liveVisualRefreshRequiredForClosure": true,
     "pureDataUpdateRequiresBuildOrDeploy": false,
     "reimportForVisibilityFailureForbidden": true,
-    "nextRequiredStep": "DETERMINISTIC_DIFF",
-    "executionCursor": "LIVE_READBACK_PASS"
+    "nextRequiredStep": "APPLY_DETERMINISTIC_DELTA_ONLY",
+    "executionCursor": "DETERMINISTIC_DIFF_READY"
   },
   "governanceSyncChecklist": {
     "frozenPlanMaterialized": true,
@@ -537,9 +537,10 @@
     "i62TerminalReceiptMaterialized": true,
     "i6ModuleHandoffDisciplineMaterialized": true,
     "i63CurrentSourcePinned": true,
-    "i63LiveReadbackPass": true
+    "i63LiveReadbackPass": true,
+    "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_3_DETERMINISTIC_DIFF",
+  "nextAction": "I6_3_APPLY_DETERMINISTIC_DELTA",
   "postproductionExitProgress": {
     "formalPercent": 30,
     "frozenMiniGates": 3,

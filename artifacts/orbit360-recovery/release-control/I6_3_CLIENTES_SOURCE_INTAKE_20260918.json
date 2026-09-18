@@ -44,14 +44,55 @@
   },
   "execution": {
     "method": "DATA_UPDATE_DELTA_FIRST",
-    "cursorState": "LIVE_READBACK_PASS",
+    "cursorState": "DETERMINISTIC_DIFF_READY",
     "writeApplied": false,
     "readbackPassed": true,
     "liveVisualConfirmed": false,
-    "nextRequiredStep": "DETERMINISTIC_DIFF",
+    "nextRequiredStep": "APPLY_DETERMINISTIC_DELTA_ONLY",
     "readbackRunId": 35306248860,
     "readbackDocumentCount": 430,
-    "readbackWritesExecuted": 0
+    "readbackWritesExecuted": 0,
+    "deterministicDiffReady": true,
+    "diffPayloadSha256": "85af65dec822dad6a4c40be5d89202ae5c9f44d302e4e9ea0b4d850f01cc9af7",
+    "diffSummary": {
+      "sourceRows": 450,
+      "sourceUniqueEntities": 442,
+      "liveDocuments": 430,
+      "updates": 300,
+      "inserts": 12,
+      "unchanged": 130,
+      "deletes": 0,
+      "duplicateExtraRows": 8,
+      "ambiguousFieldConflicts": 3,
+      "ambiguousEntityCount": 3,
+      "advisorChangesExisting": 0,
+      "newCountryValidatedGT": 6,
+      "newCountryRequiresValidation": 6,
+      "fieldChangeCounts": {
+        "fechaNacimiento": 288,
+        "whatsapp": 33,
+        "telefonoAlterno": 21,
+        "tipoPersona": 16,
+        "fechaAltaOrigen": 16,
+        "sexo": 16,
+        "estadoOrigen": 15,
+        "telefono": 13,
+        "ciudadMunicipio": 12,
+        "departamentoProvincia": 12,
+        "contactoPrincipal": 11,
+        "direccion": 8,
+        "zonaSectorBarrio": 6,
+        "observacionesMigracion": 3,
+        "numeroDocumento": 2
+      }
+    },
+    "diffRules": {
+      "noDeleteByAbsence": true,
+      "duplicateProbablesNotAutoMerged": true,
+      "ambiguousFieldsPreserveLiveValue": true,
+      "ambiguousFieldsPreservedCount": 3,
+      "ageNotAuthoritativeWhenBirthDateAvailable": true
+    }
   },
   "guards": {
     "doNotCommitPIIWorkbook": true,
