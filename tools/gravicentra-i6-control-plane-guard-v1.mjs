@@ -15,6 +15,9 @@ const I62_RECEIPT='artifacts/orbit360-recovery/release-control/I6_2_DIRECTORIO_L
 const I63_SOURCE='artifacts/orbit360-recovery/release-control/I6_3_CLIENTES_SOURCE_INTAKE_20260918.json';
 const I63_RECEIPT='artifacts/orbit360-recovery/release-control/I6_3_CLIENTES_LIVE_PASS_20260918.json';
 const I64_SOURCE='artifacts/orbit360-recovery/release-control/I6_4_POLIZAS_RIESGOS_SOURCE_INTAKE_20260918.json';
+const I64_RECEIPT='artifacts/orbit360-recovery/release-control/I6_4_POLIZAS_RIESGOS_LIVE_PASS_20260918.json';
+const I65_SOURCE='artifacts/orbit360-recovery/release-control/I6_5_RECIBOS_CARTERA_SOURCE_INTAKE_20260918.json';
+const I65_SYNC='artifacts/orbit360-recovery/release-control/I6_5_SYNC_COMPOSITION_PREFLIGHT_20260918.json';
 const MODE=(process.argv.find(x=>x.startsWith('--mode='))||'--mode=governance').split('=')[1];
 const need=(ok,code)=>{if(!ok)throw new Error(code);};
 const readJson=p=>JSON.parse(fs.readFileSync(p,'utf8'));
@@ -22,9 +25,9 @@ const git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
 const exists=p=>fs.existsSync(p);
 
 need(MODE==='governance'||MODE==='i6','I6_GUARD_MODE_INVALID:'+MODE);
-for(const p of [CONTROL,STATUS_LEDGER,AUTH_RECEIPT,I6_ADDENDUM,I6_PLAN_LOCK,V5_MANIFEST,DATA_UPDATE_PLAN,DATA_UPDATE_DISCIPLINE,DATA_UPDATE_REGISTRY,ACTIVE_SOURCE_INTAKE,I63_SOURCE,I63_RECEIPT,I64_SOURCE]) need(exists(p),'I6_REQUIRED_FILE_MISSING:'+p);
+for(const p of [CONTROL,STATUS_LEDGER,AUTH_RECEIPT,I6_ADDENDUM,I6_PLAN_LOCK,V5_MANIFEST,DATA_UPDATE_PLAN,DATA_UPDATE_DISCIPLINE,DATA_UPDATE_REGISTRY,ACTIVE_SOURCE_INTAKE,I63_SOURCE,I63_RECEIPT,I64_SOURCE,I64_RECEIPT,I65_SOURCE,I65_SYNC]) need(exists(p),'I6_REQUIRED_FILE_MISSING:'+p);
 const C=readJson(CONTROL),S=readJson(STATUS_LEDGER),A=readJson(AUTH_RECEIPT),M=readJson(V5_MANIFEST);
-const P=readJson(DATA_UPDATE_PLAN),D=readJson(DATA_UPDATE_DISCIPLINE),RGT=readJson(DATA_UPDATE_REGISTRY),SRC=readJson(ACTIVE_SOURCE_INTAKE),SRC3=readJson(I63_SOURCE),R63=readJson(I63_RECEIPT),SRC4=readJson(I64_SOURCE);
+const P=readJson(DATA_UPDATE_PLAN),D=readJson(DATA_UPDATE_DISCIPLINE),RGT=readJson(DATA_UPDATE_REGISTRY),SRC=readJson(ACTIVE_SOURCE_INTAKE),SRC3=readJson(I63_SOURCE),R63=readJson(I63_RECEIPT),SRC4=readJson(I64_SOURCE),R64=readJson(I64_RECEIPT),SRC5=readJson(I65_SOURCE),SYNC5=readJson(I65_SYNC);
 need(C.schemaVersion==='gravicentra-control-plane-v2','I6_CONTROL_SCHEMA_INVALID');
 need(C.controlPlaneId==='GRAVICENTRA-INSURANCE-FASE-A','I6_CONTROL_ID_INVALID');
 need(C.repository==='paulaosoriof86/orbit360-core','I6_REPOSITORY_INVALID');
@@ -46,11 +49,12 @@ const activeI62V5=g.I6?.status==='I6_2_DATA_UPDATE_V5_ACTIVE'&&g.I6?.activeSubga
 const waitingI63=g.I6?.status==='I6_3_WAITING_FOR_CURRENT_SOURCE'&&g.I6?.activeSubgate==='I6.3';
 const activeI63V5=g.I6?.status==='I6_3_DATA_UPDATE_V5_ACTIVE'&&g.I6?.activeSubgate==='I6.3';
 const activeI64V5=g.I6?.status==='I6_4_DATA_UPDATE_V5_ACTIVE'&&g.I6?.activeSubgate==='I6.4';
-need(activeI60||frozenI60||frozenI61||activeI62V5||waitingI63||activeI63V5||activeI64V5,'I6_GATE_STATE_INVALID');
+const activeI65Sync=g.I6?.status==='I6_5_RECIBOS_CARTERA_SOURCE_PINNED_SYNC_PREFLIGHT_BLOCK'&&g.I6?.activeSubgate==='I6.5';
+need(activeI60||frozenI60||frozenI61||activeI62V5||waitingI63||activeI63V5||activeI64V5||activeI65Sync,'I6_GATE_STATE_INVALID');
 
 need(C.i6Execution?.authorized===true,'I6_NOT_AUTHORIZED');
 need(C.i6Execution?.authorizationReceiptPath===AUTH_RECEIPT,'I6_AUTH_RECEIPT_PATH_MISMATCH');
-need((activeI60&&C.i6Execution?.activeSubgate==='I6.0')||(frozenI60&&C.i6Execution?.activeSubgate==='I6.1')||((frozenI61||activeI62V5)&&C.i6Execution?.activeSubgate==='I6.2')||((waitingI63||activeI63V5)&&C.i6Execution?.activeSubgate==='I6.3')||(activeI64V5&&C.i6Execution?.activeSubgate==='I6.4'),'I6_EXECUTION_SUBGATE_INVALID');
+need((activeI60&&C.i6Execution?.activeSubgate==='I6.0')||(frozenI60&&C.i6Execution?.activeSubgate==='I6.1')||((frozenI61||activeI62V5)&&C.i6Execution?.activeSubgate==='I6.2')||((waitingI63||activeI63V5)&&C.i6Execution?.activeSubgate==='I6.3')||(activeI64V5&&C.i6Execution?.activeSubgate==='I6.4')||(activeI65Sync&&C.i6Execution?.activeSubgate==='I6.5'),'I6_EXECUTION_SUBGATE_INVALID');
 need(C.i6Execution?.dryRunPrepared===false,'I6_DRYRUN_PREPARED_STATE_INVALID');
 const dataUpdateCursor=SRC.execution?.cursorState||'SOURCE_PINNED';
 const postDiffCursor=['DETERMINISTIC_DIFF_READY','DETERMINISTIC_APPLY_DONE','POST_WRITE_READBACK_INTEGRITY_PASS','PENDING_USER_VISUAL','LIVE_PASS'].includes(dataUpdateCursor);
@@ -68,6 +72,9 @@ const i64VisualCorrectionPending=activeI64V5&&i64VisualCorrection.status==='AUTH
 const i64CodeDefect=C.i64CodeDefect||{};
 const i64DefectPending=activeI64V5&&i64CodeDefect.status==='I6_4_CODE_DEFECT_CANDIDATE_PENDING_BUILD';
 const i64DefectLive=activeI64V5&&String(i64CodeDefect.status||'').startsWith('I6_4_CODE_DEFECT_SUCCESSOR_LIVE_PASS');
+const i65SyncCodeDefect=C.i65SyncCodeDefect||{};
+const i65SyncDefectPending=activeI65Sync&&i65SyncCodeDefect.status==='I6_5_SYNC_CODE_DEFECT_CANDIDATE_PENDING_BUILD';
+const i65SyncDefectLive=activeI65Sync&&String(i65SyncCodeDefect.status||'').startsWith('I6_5_SYNC_CODE_DEFECT_SUCCESSOR_LIVE_PASS');
 const dataCorrectionPending=i63DataCorrectionPending||i64VisualCorrectionPending;
 need(!(i63NameCasePending&&i63IdentityMergePending),'I6_3_MULTIPLE_DATA_CORRECTIONS_FORBIDDEN');
 need(!(i63DataCorrectionPending&&i64VisualCorrectionPending),'I6_MULTIPLE_GATE_DATA_CORRECTIONS_FORBIDDEN');
@@ -86,7 +93,7 @@ if(i64VisualCorrectionPending){
  need(i64VisualCorrection.userAuthorized===true&&Number(i64VisualCorrection.expectedDomiciliadoPolicies)===319&&Number(i64VisualCorrection.expectedUniquePolicyWrites)===320&&Number(i64VisualCorrection.expectedCountryCurrencyCorrections)===2,'I6_4_VISUAL_CORRECTION_SCOPE_INVALID');
  need(i64VisualCorrection.writePath==='orbit360ProductOperationalCommand'&&i64VisualCorrection.reimportAuthorized===false&&i64VisualCorrection.deletesAuthorized===false&&i64VisualCorrection.receiptsWritesAuthorized===false&&i64VisualCorrection.carteraWritesAuthorized===false&&i64VisualCorrection.cobrosWritesAuthorized===false&&i64VisualCorrection.commissionWritesAuthorized===false&&i64VisualCorrection.rollbackRequired===true,'I6_4_VISUAL_CORRECTION_BOUNDARY_INVALID');
 }
-need((i63DefectPending||i64DefectPending)?C.i6Execution?.productMutationAuthorized===true:C.i6Execution?.productMutationAuthorized===false,'I6_PRODUCT_MUTATION_AUTH_STATE_INVALID');
+need((i63DefectPending||i64DefectPending||i65SyncDefectPending)?C.i6Execution?.productMutationAuthorized===true:C.i6Execution?.productMutationAuthorized===false,'I6_PRODUCT_MUTATION_AUTH_STATE_INVALID');
 need(postDiffCursor||C.i6Execution?.sourceDataApplyAuthorized===false,'I6_SOURCE_APPLY_AUTHORIZED_TOO_EARLY');
 need(C.i6Execution?.requiresDiff===true&&C.i6Execution?.requiresDeduplication===true,'I6_DIFF_DEDUP_CONTRACT_INVALID');
 need(C.i6Execution?.requiresAudit===true&&C.i6Execution?.requiresRollback===true,'I6_AUDIT_ROLLBACK_CONTRACT_INVALID');
@@ -204,8 +211,40 @@ if(activeI64V5){
   need(git('hash-object',I63_RECEIPT)===seal.receiptBlobSha,'I6_3_RECEIPT_BLOB_DRIFT');
 }
 
+if(activeI65Sync){
+  const p=C.postproductionExitProgress||{},seal=C.i6Execution?.i6_4||{};
+  need(G.lastFormallyCompletedMiniGate==='I6.4'&&g.I6?.lastFrozenMiniGate==='I6.4','I6_5_LAST_MINIGATE_INVALID');
+  need(p.formalPercent===50&&p.frozenMiniGates===5&&p.totalMiniGates===10&&p.lastFrozenMiniGate==='I6.4'&&p.activeMiniGate==='I6.5','I6_5_PROGRESS_INVALID');
+  need(C.i6Execution?.activeModule==='RECIBOS_CARTERA','I6_5_MODULE_INVALID');
+  need(C.i6Execution?.activeSourceIntakePath===I65_SOURCE&&C.postproductionDataUpdateControl?.activeSourceIntakePath===I65_SOURCE,'I6_5_SOURCE_PATH_MISMATCH');
+  need(git('hash-object',I65_SOURCE)===C.i6Execution?.activeSourceIntakeBlobSha&&git('hash-object',I65_SOURCE)===C.postproductionDataUpdateControl?.activeSourceIntakeBlobSha,'I6_5_SOURCE_BLOB_DRIFT');
+  need(SRC5.module==='RECIBOS_CARTERA'&&SRC5.execution?.writeApplied===false&&Number(SRC5.execution?.writes||0)===0,'I6_5_SOURCE_STATE_INVALID');
+  if(i65SyncDefectLive){
+    need(SRC5.status==='PINNED_FOR_V5_DELTA'&&SRC5.execution?.cursorState==='SOURCE_PINNED'&&SRC5.execution?.nextRequiredStep==='LIVE_READBACK_CURRENT_STATE','I6_5_POST_SYNC_SOURCE_CURSOR_INVALID');
+    need(C.postproductionDataUpdateControl?.activeModule==='RECIBOS_CARTERA'&&C.postproductionDataUpdateControl?.executionCursor==='SOURCE_PINNED'&&C.postproductionDataUpdateControl?.nextRequiredStep==='LIVE_READBACK_CURRENT_STATE','I6_5_POST_SYNC_CONTROL_CURSOR_INVALID');
+    need(RGT.modules?.RECIBOS_CARTERA?.sourceState==='CURRENT_SOURCE_PINNED'&&RGT.modules?.RECIBOS_CARTERA?.resumeCursor==='SOURCE_PINNED','I6_5_POST_SYNC_REGISTRY_INVALID');
+  }else{
+    need(SRC5.status==='SOURCE_PINNED_SYNC_PREFLIGHT_BLOCK'&&SRC5.execution?.cursorState==='SOURCE_PINNED_SYNC_PREFLIGHT_BLOCK','I6_5_PREFLIGHT_SOURCE_CURSOR_INVALID');
+    need(C.postproductionDataUpdateControl?.activeModule==='RECIBOS_CARTERA'&&C.postproductionDataUpdateControl?.executionCursor==='SOURCE_PINNED_SYNC_PREFLIGHT_BLOCK','I6_5_CONTROL_CURSOR_INVALID');
+    need(RGT.modules?.RECIBOS_CARTERA?.sourceState==='CURRENT_SOURCE_PINNED_SYNC_PREFLIGHT_BLOCK','I6_5_REGISTRY_SOURCE_NOT_PINNED');
+  }
+  need(SRC5.sourceBundle?.sha256===C.postproductionDataUpdateControl?.sourceSha256,'I6_5_SOURCE_SHA_MISMATCH');
+  need(git('hash-object',DATA_UPDATE_REGISTRY)===C.i6Execution?.mechanismRegistryBlobSha&&git('hash-object',DATA_UPDATE_REGISTRY)===C.postproductionDataUpdateControl?.mechanismRegistryBlobSha,'I6_5_REGISTRY_BLOB_DRIFT');
+  need(RGT.modules?.RECIBOS_CARTERA?.sourceIntakePath===I65_SOURCE,'I6_5_REGISTRY_SOURCE_PATH_INVALID');
+  need(R64.status==='I6_4_POLIZAS_RIESGOS_LIVE_PASS'&&R64.humanAcceptance?.status==='ACCEPTED'&&seal.status==='I6_4_POLIZAS_RIESGOS_LIVE_PASS','I6_4_ACCEPTANCE_NOT_FROZEN');
+  need(SYNC5.status==='BLOCKING_CAUSAL_DESYNC_FOUND_BEFORE_DATA_WRITE'&&SYNC5.decision==='FAIL_CLOSED_NO_I6_5_DATA_WRITES'&&Number(SYNC5.operationalWrites)===0,'I6_5_SYNC_PREFLIGHT_INVALID');
+  const expected=i65SyncDefectPending?'I6_5_SYNC_CODE_DEFECT_SUCCESSOR_RELEASE':(i65SyncDefectLive?'I6_5_LIVE_READBACK_CURRENT_STATE':'I6_5_FIX_READ_PATH_COMPOSITION_NO_DATA_WRITES');
+  need(C.nextAction===expected,'I6_5_NEXT_ACTION_INVALID');
+}
+
 const R=C.certifiedCandidate||{};
-if(activeI64V5&&i64DefectPending&&i64CodeDefect.previousCertifiedSourceSha){
+if(activeI65Sync&&i65SyncDefectPending&&i65SyncCodeDefect.previousCertifiedSourceSha){
+  need(R.sourceSha===i65SyncCodeDefect.previousCertifiedSourceSha,'I6_5_PREVIOUS_CERTIFIED_SOURCE_DRIFT');
+  need(R.buildId===i65SyncCodeDefect.previousCertifiedBuildId,'I6_5_PREVIOUS_CERTIFIED_BUILD_DRIFT');
+  need(Number(R.artifactId)===Number(i65SyncCodeDefect.previousCertifiedArtifactId),'I6_5_PREVIOUS_CERTIFIED_ARTIFACT_DRIFT');
+}
+else if(activeI65Sync&&i65SyncDefectLive){need(R.sourceSha===i65SyncCodeDefect.sourceSha,'I6_5_CERTIFIED_SOURCE_DRIFT');need(R.buildId===i65SyncCodeDefect.buildId,'I6_5_CERTIFIED_BUILD_DRIFT');need(Number(R.artifactId)===Number(i65SyncCodeDefect.artifactId),'I6_5_CERTIFIED_ARTIFACT_DRIFT');}
+else if(activeI64V5&&i64DefectPending&&i64CodeDefect.previousCertifiedSourceSha){
   need(R.sourceSha===i64CodeDefect.previousCertifiedSourceSha,'I6_4_PREVIOUS_CERTIFIED_SOURCE_DRIFT');
   need(R.buildId===i64CodeDefect.previousCertifiedBuildId,'I6_4_PREVIOUS_CERTIFIED_BUILD_DRIFT');
   need(Number(R.artifactId)===Number(i64CodeDefect.previousCertifiedArtifactId),'I6_4_PREVIOUS_CERTIFIED_ARTIFACT_DRIFT');
@@ -217,7 +256,7 @@ else if(activeI63V5&&i63DefectPending&&i63CodeDefect.previousCertifiedSourceSha)
   need(Number(R.artifactId)===Number(i63CodeDefect.previousCertifiedArtifactId),'I6_3_PREVIOUS_CERTIFIED_ARTIFACT_DRIFT');
 }
 else if((activeI63V5||activeI64V5)&&i63DefectLive){need(R.sourceSha===i63CodeDefect.sourceSha,'I6_3_CERTIFIED_SOURCE_DRIFT');need(R.buildId===i63CodeDefect.buildId,'I6_3_CERTIFIED_BUILD_DRIFT');need(Number(R.artifactId)===Number(i63CodeDefect.artifactId),'I6_3_CERTIFIED_ARTIFACT_DRIFT');}
-else if(frozenI61||activeI62V5||waitingI63||activeI63V5||activeI64V5){need(R.sourceSha===C.i61LiveSeal?.sourceSha,'I6_CERTIFIED_SOURCE_DRIFT');need(R.buildId===C.i61LiveSeal?.buildId,'I6_CERTIFIED_BUILD_DRIFT');need(Number(R.artifactId)===Number(C.i61LiveSeal?.artifactId),'I6_CERTIFIED_ARTIFACT_DRIFT');}
+else if(frozenI61||activeI62V5||waitingI63||activeI63V5||activeI64V5||activeI65Sync){need(R.sourceSha===C.i61LiveSeal?.sourceSha,'I6_CERTIFIED_SOURCE_DRIFT');need(R.buildId===C.i61LiveSeal?.buildId,'I6_CERTIFIED_BUILD_DRIFT');need(Number(R.artifactId)===Number(C.i61LiveSeal?.artifactId),'I6_CERTIFIED_ARTIFACT_DRIFT');}
 else{need(R.sourceSha==='16f174d087024085eff18079c486f717ef98d691','I6_CERTIFIED_SOURCE_DRIFT');need(R.buildId==='gi-i3-16f174d08702-57f234755dc1','I6_CERTIFIED_BUILD_DRIFT');need(Number(R.artifactId)===10183074943,'I6_CERTIFIED_ARTIFACT_DRIFT');}
 need(S.schemaVersion==='gravicentra-capability-status-ledger-v1','I6_LEDGER_SCHEMA_INVALID');
 need(Array.isArray(S.capabilities)&&S.capabilities.length===15,'I6_LEDGER_COUNT_INVALID');
@@ -243,7 +282,8 @@ const successor=C.nextCandidate&&C.nextCandidate.gate==='I6.1'?C.nextCandidate:n
 const allowedSuccessorProduct=new Set(successor&&Array.isArray(successor.allowedProductFiles)?successor.allowedProductFiles:[]);
 const allowedI63Product=new Set((i63DefectPending||i63DefectLive)&&Array.isArray(i63CodeDefect.allowedProductFiles)?i63CodeDefect.allowedProductFiles:[]);
 const allowedI64Product=new Set((i64DefectPending||i64DefectLive)&&Array.isArray(i64CodeDefect.allowedProductFiles)?i64CodeDefect.allowedProductFiles:[]);
-const forbidden=changed.filter(p=>!allowedPrefixes.some(prefix=>p.startsWith(prefix))&&!allowedSuccessorProduct.has(p)&&!allowedI63Product.has(p)&&!allowedI64Product.has(p));
+const allowedI65Product=new Set((i65SyncDefectPending||i65SyncDefectLive)&&Array.isArray(i65SyncCodeDefect.allowedProductFiles)?i65SyncCodeDefect.allowedProductFiles:[]);
+const forbidden=changed.filter(p=>!allowedPrefixes.some(prefix=>p.startsWith(prefix))&&!allowedSuccessorProduct.has(p)&&!allowedI63Product.has(p)&&!allowedI64Product.has(p)&&!allowedI65Product.has(p));
 need(forbidden.length===0,'I6_PRODUCT_SOURCE_DRIFT_OUTSIDE_BOUND_SUCCESSOR:'+forbidden.slice(0,20).join(','));
 if(i63DefectPending||i63DefectLive){
  need(i63CodeDefect.classification==='CODE_DEFECT','I6_3_DEFECT_CLASS_INVALID');
@@ -267,10 +307,18 @@ if(i64DefectPending||i64DefectLive){
  need(i64CodeDefect.reimportAuthorized===false&&i64CodeDefect.dataMutationAuthorized===false,'I6_4_DEFECT_DATA_BOUNDARY_INVALID');
  if(i64DefectLive){need(/^[0-9a-f]{40}$/.test(String(i64CodeDefect.sourceSha||'')),'I6_4_DEFECT_SOURCE_INVALID');need(i64CodeDefect.productionReadbackExact===true&&i64CodeDefect.functionalPass===true,'I6_4_DEFECT_LIVE_PROOF_INVALID');}
 }
+if(i65SyncDefectPending||i65SyncDefectLive){
+ need(i65SyncCodeDefect.classification==='CODE_DEFECT','I6_5_SYNC_DEFECT_CLASS_INVALID');
+ need(i65SyncCodeDefect.parentCertifiedSourceSha===i65SyncCodeDefect.previousCertifiedSourceSha,'I6_5_SYNC_DEFECT_PARENT_INVALID');
+ need(Array.isArray(i65SyncCodeDefect.allowedProductFiles)&&i65SyncCodeDefect.allowedProductFiles.length===4,'I6_5_SYNC_DEFECT_SCOPE_INVALID');
+ for(const p of ['orbit360-platform/index.html','orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js','orbit360-platform/modules/polizas.js','orbit360-platform/modules/policy-receipts-v1199-detail-guard.js'])need(i65SyncCodeDefect.allowedProductFiles.includes(p),'I6_5_SYNC_DEFECT_OWNER_MISSING:'+p);
+ need(i65SyncCodeDefect.reimportAuthorized===false&&i65SyncCodeDefect.dataMutationAuthorized===false&&i65SyncCodeDefect.cobrosWritesAuthorized===false,'I6_5_SYNC_DEFECT_DATA_BOUNDARY_INVALID');
+ if(i65SyncDefectLive){need(/^[0-9a-f]{40}$/.test(String(i65SyncCodeDefect.sourceSha||'')),'I6_5_SYNC_DEFECT_SOURCE_INVALID');need(i65SyncCodeDefect.productionReadbackExact===true&&i65SyncCodeDefect.functionalPass===true,'I6_5_SYNC_DEFECT_LIVE_PROOF_INVALID');}
+}
 if(successor){
- need(frozenI60||frozenI61||activeI62V5||waitingI63||activeI63V5||activeI64V5,'I6_1_SUCCESSOR_OUTSIDE_ACTIVE_SUBGATE');
+ need(frozenI60||frozenI61||activeI62V5||waitingI63||activeI63V5||activeI64V5||activeI65Sync,'I6_1_SUCCESSOR_OUTSIDE_ACTIVE_SUBGATE');
  need(/^[0-9a-f]{40}$/.test(String(successor.sourceSha||'')),'I6_1_SUCCESSOR_SHA_INVALID');
- need(successor.parentCertifiedSourceSha===(frozenI61||activeI62V5||waitingI63||activeI63V5||activeI64V5?C.preI61CertifiedCandidate?.sourceSha:R.sourceSha),'I6_1_SUCCESSOR_PARENT_MISMATCH');
+ need(successor.parentCertifiedSourceSha===(frozenI61||activeI62V5||waitingI63||activeI63V5||activeI64V5||activeI65Sync?C.preI61CertifiedCandidate?.sourceSha:R.sourceSha),'I6_1_SUCCESSOR_PARENT_MISMATCH');
  need(['PREVIEW_TECHNICAL_PASS_AWAITING_AUTHENTICATED_HUMAN_ACCEPTANCE','I6_1_PRODUCT_SUCCESSOR_PREVIEW_PASS','I6_1_PRODUCT_SUCCESSOR_LIVE_PASS'].includes(successor.status),'I6_1_SUCCESSOR_STATUS_INVALID');
  need(successor.readbackExact===true&&Number(successor.readbackFileCount)>0,'I6_1_SUCCESSOR_READBACK_INVALID');
  try{execFileSync('git',['merge-base','--is-ancestor',successor.sourceSha,current],{stdio:'ignore'});}catch{throw new Error('I6_1_SUCCESSOR_NOT_ANCESTOR');}

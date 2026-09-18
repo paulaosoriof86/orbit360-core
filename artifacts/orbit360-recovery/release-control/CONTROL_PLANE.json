@@ -119,7 +119,7 @@
         "lastFrozenMiniGate": "I6.4"
       }
     },
-    "lastFormallyCompletedMiniGate": "I6.3"
+    "lastFormallyCompletedMiniGate": "I6.4"
   },
   "productionProgress": {
     "formalPercent": 100,
@@ -403,7 +403,7 @@
     "requiresRollback": true,
     "authorizedAt": "2026-09-14T08:57:00-06:00",
     "authorizationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_EXPLICIT_AUTHORIZATION_RECEIPT_20260914.json",
-    "activeSubgate": "I6.4",
+    "activeSubgate": "I6.5",
     "productMutationAuthorized": true,
     "sourceDataApplyAuthorized": false,
     "perBlockApplyRequiresExplicitAuthorization": false,
@@ -413,11 +413,11 @@
     "executionDisciplinePath": "artifacts/orbit360-recovery/release-control/I6_DATA_UPDATE_EXECUTION_DISCIPLINE_LOCK_20260917.json",
     "executionDisciplineBlobSha": "7af17759086da336dbf755d72ad85692f892b71b",
     "mechanismRegistryPath": "artifacts/orbit360-recovery/release-control/DATA_UPDATE_MECHANISM_REGISTRY.json",
-    "mechanismRegistryBlobSha": "7b762c92b7babc88c7d2942041c66aadd1e8a471",
-    "activeSourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_4_POLIZAS_RIESGOS_SOURCE_INTAKE_20260918.json",
-    "activeSourceIntakeBlobSha": "73228ccc746cf372f20def30d6a2257cc7da5897",
-    "activeModule": "POLIZAS_RIESGOS_VEHICULOS",
-    "activeModuleStatus": "I6_5_SOURCE_PINNED_SYNC_PREFLIGHT_BLOCK",
+    "mechanismRegistryBlobSha": "60cb7b5f45d1d40b6a9e233fbd6d96a42f957a3c",
+    "activeSourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_5_RECIBOS_CARTERA_SOURCE_INTAKE_20260918.json",
+    "activeSourceIntakeBlobSha": "b836b34d48d7745e63e4a719afca5e7954b29d48",
+    "activeModule": "RECIBOS_CARTERA",
+    "activeModuleStatus": "CODE_DEFECT_CANDIDATE_PENDING_BUILD",
     "i6_0": {
       "status": "I6_0_BASELINE_FROZEN",
       "executorPath": ".github/workflows/gravicentra-material-baseline-freeze.yml",
@@ -557,10 +557,10 @@
     "executionDisciplinePath": "artifacts/orbit360-recovery/release-control/I6_DATA_UPDATE_EXECUTION_DISCIPLINE_LOCK_20260917.json",
     "executionDisciplineBlobSha": "7af17759086da336dbf755d72ad85692f892b71b",
     "mechanismRegistryPath": "artifacts/orbit360-recovery/release-control/DATA_UPDATE_MECHANISM_REGISTRY.json",
-    "mechanismRegistryBlobSha": "7b762c92b7babc88c7d2942041c66aadd1e8a471",
+    "mechanismRegistryBlobSha": "60cb7b5f45d1d40b6a9e233fbd6d96a42f957a3c",
     "activeModule": "RECIBOS_CARTERA",
     "activeSourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_5_RECIBOS_CARTERA_SOURCE_INTAKE_20260918.json",
-    "activeSourceIntakeBlobSha": "73228ccc746cf372f20def30d6a2257cc7da5897",
+    "activeSourceIntakeBlobSha": "b836b34d48d7745e63e4a719afca5e7954b29d48",
     "sourceSha256": "f445e2f4a20b9eb7a526bda8896472dab9e7ac4617b3c5d8124a939a0dee0e6a",
     "conversationAsAuthority": false,
     "requestCurrentSourceBeforeEveryNewModule": true,
@@ -645,13 +645,13 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FIX_READ_PATH_COMPOSITION_NO_DATA_WRITES",
+  "nextAction": "I6_5_SYNC_CODE_DEFECT_SUCCESSOR_RELEASE",
   "postproductionExitProgress": {
-    "formalPercent": 40,
-    "frozenMiniGates": 4,
+    "formalPercent": 50,
+    "frozenMiniGates": 5,
     "totalMiniGates": 10,
-    "lastFrozenMiniGate": "I6.3",
-    "activeMiniGate": "I6.4",
+    "lastFrozenMiniGate": "I6.4",
+    "activeMiniGate": "I6.5",
     "method": "frozenMiniGates / 10 * 100; no partial mini-gate credit"
   },
   "i6BaselineSeal": {
@@ -765,11 +765,11 @@
     "mandatoryPaulaVisualAcceptanceBeforeNextSource": true,
     "assistantDefinesNextModuleInformationAndTemporalScope": true,
     "current": {
-      "technicalModule": "I6.3 Clientes",
-      "technicalStatus": "I6_3_CLIENTES_LIVE_PASS",
+      "technicalModule": "I6.4 Pólizas/Renovaciones/Vehículos/Riesgos",
+      "technicalStatus": "I6_4_POLIZAS_RIESGOS_LIVE_PASS",
       "paulaVisualAcceptance": "ACCEPTED",
-      "paulaVisualAcceptedAt": "2026-09-18T02:27:00-06:00",
-      "nextModule": "I6.4 Pólizas/Renovaciones/Vehículos/Riesgos",
+      "paulaVisualAcceptedAt": "2026-09-18T10:49:56-06:00",
+      "nextModule": "I6.5 Recibos/Cartera",
       "nextSourceRequestBlocked": false,
       "nextSource": "PINNED"
     },
@@ -1190,5 +1190,38 @@
     "sourceMutatedAfterBuild": false,
     "productionUrl": "https://ays-orbit-360-lab.web.app",
     "promotedLiveRunId": 35321985423
+  },
+  "i65SyncCodeDefect": {
+    "classification": "CODE_DEFECT",
+    "status": "I6_5_SYNC_CODE_DEFECT_CANDIDATE_PENDING_BUILD",
+    "cause": "The certified I6.4 artifact calls a V910 receipt-detail owner that is not packaged, while Cliente360 legacy receipt/payment surfaces can remain bound to cobros instead of canonical recibosEsperados/carteraPrimas.",
+    "parentCertifiedSourceSha": "8838aa98abf8573064f8e160389cf6f1c554bdc1",
+    "previousCertifiedSourceSha": "8838aa98abf8573064f8e160389cf6f1c554bdc1",
+    "previousCertifiedBuildId": "gi-i64-8838aa98abf8-57f234755dc1",
+    "previousCertifiedArtifactId": 10556619616,
+    "allowedProductFiles": [
+      "orbit360-platform/index.html",
+      "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+      "orbit360-platform/modules/polizas.js",
+      "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js"
+    ],
+    "dataMutationAuthorized": false,
+    "reimportAuthorized": false,
+    "cobrosWritesAuthorized": false,
+    "finmovWritesAuthorized": false,
+    "receiptsWritesAuthorized": false,
+    "carteraWritesAuthorized": false,
+    "sameArtifactPreviewToProductionRequired": true,
+    "paulaVisualAcceptanceRequired": false,
+    "syncPreflightPath": "artifacts/orbit360-recovery/release-control/I6_5_SYNC_COMPOSITION_PREFLIGHT_20260918.json",
+    "sourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_5_RECIBOS_CARTERA_SOURCE_INTAKE_20260918.json",
+    "requiredProof": [
+      "CANONICAL_PRODUCT_STORE_OWNER",
+      "V920_RECEIPT_DETAIL_OWNER",
+      "CLIENTE360_RECEIPTS_MATCH_STORE",
+      "POLICY_RECEIPT_DETAIL_OPENS",
+      "I6_4_SENTINELS_PRESERVED",
+      "ZERO_OPERATIONAL_WRITES"
+    ]
   }
 }

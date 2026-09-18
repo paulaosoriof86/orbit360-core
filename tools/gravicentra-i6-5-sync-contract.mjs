@@ -1,0 +1,15 @@
+import fs from 'node:fs';
+const need=(ok,code)=>{if(!ok)throw new Error(code);};
+const index=fs.readFileSync('orbit360-platform/index.html','utf8');
+const bridge=fs.readFileSync('orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js','utf8');
+const pol=fs.readFileSync('orbit360-platform/modules/polizas.js','utf8');
+const detail=fs.readFileSync('orbit360-platform/modules/policy-receipts-v1199-detail-guard.js','utf8');
+const q=fs.readFileSync('orbit360-platform/core/queries.js','utf8');
+need(index.includes('core/backend-lab-receipts-portfolio-native-bridge-v20260801.js?v=20260918-i65'),'I65_BRIDGE_NOT_LOADED');
+need(index.indexOf('policy-receipts-v1199-detail-guard.js')<index.indexOf('backend-lab-receipts-portfolio-native-bridge-v20260801.js'),'I65_BRIDGE_LOAD_ORDER');
+for(const token of ['__productReadOnlyP0','dataCollectionPath','recibosEsperados','carteraPrimas','receiptsPortfolioProjectionV920','receiptsPortfolioProjection=Orbit.receiptsPortfolioProjectionV920','openReceiptDetail','data-rp-native-owner'])need(bridge.includes(token),'I65_BRIDGE_CONTRACT:'+token);
+need(!bridge.includes(".collection('tenantId')")&&!bridge.includes('.onSnapshot('),'I65_PARALLEL_FIRESTORE_OWNER_FORBIDDEN');
+need(!pol.includes('receiptsPortfolioProjectionV910')&&!detail.includes('receiptsPortfolioProjectionV910'),'I65_V910_CALLER_REMAINS');
+need(pol.includes('Orbit.receiptsPortfolioProjection')&&detail.includes('Orbit.receiptsPortfolioProjection'),'I65_CANONICAL_ALIAS_CALLER_MISSING');
+for(const token of ["S().all('recibosEsperados')","S().all('carteraPrimas')","source: 'cobros+carteraPrimas'"])need(q.includes(token),'I65_QUERY_AUTHORITY_DRIFT:'+token);
+console.log('I65_SYNC_CONTRACT=PASS');
