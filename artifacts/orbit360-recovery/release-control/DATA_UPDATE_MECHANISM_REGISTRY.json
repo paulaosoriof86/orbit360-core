@@ -99,7 +99,7 @@
     "POLIZAS_RIESGOS_VEHICULOS": {
       "gate": "I6.4",
       "sourceRequiredBeforeStart": true,
-      "sourceState": "CURRENT_SOURCE_PINNED",
+      "sourceState": "I6_4_POLIZAS_RIESGOS_LIVE_PASS",
       "mechanism": "REUSE_APPROVED_EXISTING_WRITE_CONTRACT_FROM_LINEAGE_AND_ACCEPTANCE_EVIDENCE; LOCATE POINTERS ONLY, DO_NOT REDISCOVER ARCHITECTURE",
       "liveClosure": "READBACK_PASS_THEN_USER_REFRESH_MUST_SHOW_UPDATED_DATA",
       "sourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_4_POLIZAS_RIESGOS_SOURCE_INTAKE_20260918.json",
@@ -114,8 +114,8 @@
       "clientAliasRule": "RESOLVE_ALIAS_TO_CANONICAL_BEFORE_POLICY_LINK",
       "supplementRule": "SUPPLEMENTS_ENRICH_MATCHING_PRIMARY_POLICY_EDITIONS; NO_POLICY_INSERT_FROM_SUPPLEMENT_ONLY",
       "currentGate": "I6.4",
-      "nextMaterialStep": "LIVE_READBACK_CURRENT_STATE",
-      "resumeCursor": "SOURCE_PINNED",
+      "nextMaterialStep": "FROZEN_CLOSED",
+      "resumeCursor": "LIVE_PASS",
       "businessRuleCorrection": {
         "status": "APPLIED_READBACK_INTEGRITY_FUNCTIONAL_PASS",
         "lockPath": "artifacts/orbit360-recovery/release-control/I6_4_VISUAL_CORRECTION_LOCK_20260918.json",
@@ -142,14 +142,32 @@
         "writes": 320,
         "domiciliadoRemaining": 0,
         "countryCurrencyMismatchesRemaining": 0
-      }
+      },
+      "liveClosureStatus": "I6_4_POLIZAS_RIESGOS_LIVE_PASS",
+      "closureReceiptPath": "artifacts/orbit360-recovery/release-control/I6_4_POLIZAS_RIESGOS_LIVE_PASS_20260918.json",
+      "reopenOnlyOn": "CONCRETE_REPRODUCIBLE_CAUSAL_REGRESSION"
     },
     "RECIBOS_CARTERA": {
       "gate": "I6.5",
       "sourceRequiredBeforeStart": true,
-      "sourceState": "WAITING_FOR_PAULA_SOURCE",
+      "sourceState": "CURRENT_SOURCE_PINNED_SYNC_PREFLIGHT_BLOCK",
       "mechanism": "REUSE_APPROVED_EXISTING_WRITE_CONTRACT_FROM_LINEAGE_AND_ACCEPTANCE_EVIDENCE; LOCATE POINTERS ONLY, DO_NOT REDISCOVER_ARCHITECTURE",
-      "liveClosure": "READBACK_PASS_THEN_USER_REFRESH_MUST_SHOW_UPDATED_DATA"
+      "liveClosure": "READBACK_PASS_THEN_USER_REFRESH_MUST_SHOW_UPDATED_DATA",
+      "sourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_5_RECIBOS_CARTERA_SOURCE_INTAKE_20260918.json",
+      "sourceBundleSha256": "f445e2f4a20b9eb7a526bda8896472dab9e7ac4617b3c5d8124a939a0dee0e6a",
+      "syncPreflightPath": "artifacts/orbit360-recovery/release-control/I6_5_SYNC_COMPOSITION_PREFLIGHT_20260918.json",
+      "currentGate": "I6.5",
+      "resumeCursor": "SOURCE_PINNED_SYNC_PREFLIGHT_BLOCK",
+      "nextMaterialStep": "FIX_AND_CERTIFY_I6_5_READ_PATH_COMPOSITION_THEN_LIVE_READBACK_CURRENT_STATE",
+      "dataWritesAuthorized": false,
+      "cobrosWritesAuthorized": false,
+      "readPathAuthority": "recibosEsperados+carteraPrimas",
+      "forbiddenDuringI65": [
+        "cobros",
+        "finmovs",
+        "policy/client/insurer/vehicle rewrites",
+        "reimport-for-visibility"
+      ]
     },
     "COBROS_CONCILIACION": {
       "gate": "I6.6",
