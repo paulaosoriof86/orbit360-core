@@ -5,7 +5,7 @@
   "gate": "I6.4",
   "module": "POLIZAS_RIESGOS_VEHICULOS",
   "classification": "CODE_DEFECTS_FROM_LIVE_VISUAL_REVIEW",
-  "sourceMutationRequired": false,
+  "sourceMutationRequired": true,
   "dataReimportForbidden": true,
   "findings": [
     {
@@ -84,5 +84,16 @@
     "clientsCanonicalActive": 439,
     "policyClientMissing": 0,
     "vehiclePolicyMissing": 0
+  },
+  "runtimeOverrideFinding": {
+    "status": "AUTHORIZED_FOR_CAUSAL_FIX",
+    "discoveredByPreviewRunId": 35358915432,
+    "owner": "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+    "evidence": "The post-render bridge asynchronously overwrote all four policy KPI labels, values, footers and click handlers after polizas.js rendered canonical metrics.",
+    "failedAssertion": "I64_PREMIUM_KPI_FOOT",
+    "previewReadbackExact": true,
+    "promotedToLive": false,
+    "operationalWrites": 0,
+    "authorizedByPaula": true
   }
 }

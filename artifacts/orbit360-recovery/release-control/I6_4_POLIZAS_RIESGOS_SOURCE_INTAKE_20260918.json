@@ -377,11 +377,15 @@
         "status": "I6_4_CODE_DEFECT_CANDIDATE_PENDING_BUILD",
         "allowedProductFiles": [
           "orbit360-platform/modules/polizas.js",
-          "orbit360-platform/modules/cliente360.js"
+          "orbit360-platform/modules/cliente360.js",
+          "orbit360-platform/modules/policy-receipts-v1199-bridge.js"
         ],
         "dataMutationAuthorized": false,
         "operationalWrites": 0,
-        "sameArtifactPreviewToProductionRequired": true
+        "sameArtifactPreviewToProductionRequired": true,
+        "failedPreviewRunId": 35358915432,
+        "failedPreviewPromotedToLive": false,
+        "runtimeBridgeScopeAuthorizedByPaula": true
       }
     }
   }

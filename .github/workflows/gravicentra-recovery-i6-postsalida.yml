@@ -34,6 +34,7 @@ on:
       - 'orbit360-platform/core/access-scope.js'
       - 'orbit360-platform/modules/cliente360.js'
       - 'orbit360-platform/modules/polizas.js'
+      - 'orbit360-platform/modules/policy-receipts-v1199-bridge.js'
       - '.github/workflows/gravicentra-recovery-i6-postsalida.yml'
 
 permissions:
@@ -106,6 +107,7 @@ jobs:
           set -euo pipefail
           node --check orbit360-platform/modules/cliente360.js
           node --check orbit360-platform/modules/polizas.js
+          node --check orbit360-platform/modules/policy-receipts-v1199-bridge.js
           node --check tools/gravicentra-i6-4-code-defect-functional.mjs
           node --check tools/gravicentra-i6-4-code-defect-contract.mjs
           node tools/gravicentra-i6-4-code-defect-contract.mjs

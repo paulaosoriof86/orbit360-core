@@ -33,5 +33,7 @@ need(fixtures.filter(metrics.isHistoricalNoPortfolio).length===3,'I64_HISTORICAL
 need(metrics.renewabilityState(fixtures[1])==='UNKNOWN'&&metrics.renewabilityState(fixtures[3])==='NO'&&metrics.renewabilityState(fixtures[0])==='YES','I64_RENEWABILITY_TRI_STATE');
 need(Orbit.modules.cliente360.renovabilidad({})==='UNKNOWN'&&Orbit.modules.cliente360.renovabilidad({renovable:false})==='NO'&&Orbit.modules.cliente360.renovabilidad({renovable:true})==='YES','I64_CLIENTE360_RENEWABILITY_TRI_STATE');
 need(!fs.readFileSync('orbit360-platform/modules/polizas.js','utf8').includes('q.norm((policyPremiumNet'),'I64_CURRENCY_NORMALIZATION_STILL_PRESENT');
+const bridge=fs.readFileSync('orbit360-platform/modules/policy-receipts-v1199-bridge.js','utf8');
+for(const token of ['policyMetrics','isRenewalWithin45Days','isHistoricalNoPortfolio','premiumByCurrency'])need(bridge.includes(token),'I64_RUNTIME_BRIDGE_CONTRACT:'+token);
 console.log('GRAVICENTRA_I6_4_CODE_DEFECT_CONTRACT=PASS');
 console.log('I64_OPERATIONAL_WRITES=0');
