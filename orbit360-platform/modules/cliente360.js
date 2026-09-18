@@ -51,6 +51,14 @@ Orbit.modules.cliente360 = (function () {
     const p = (Orbit.route && Orbit.route.params) || {};
     const cid = p.c || null;
     if (cid && S().get('clientes', cid)) {
+      const requested = S().get('clientes', cid);
+      if (requested && String(requested.mergedIntoClientId || '').trim()) {
+        const canonicalId = String(requested.mergedIntoClientId || '').trim();
+        if (S().get('clientes', canonicalId)) {
+          location.hash = '#/cliente360?c=' + encodeURIComponent(canonicalId) + (p.t ? '&t=' + encodeURIComponent(p.t) : '');
+          return;
+        }
+      }
       // al abrir un cliente distinto, o llegar con pestaña explícita, fijar la pestaña
       if (p.t && TABS.includes(p.t)) tab = p.t;
       else if (cid !== shownCid) tab = 'resumen';
@@ -75,7 +83,8 @@ Orbit.modules.cliente360 = (function () {
       polizas: source.polizas || [],
       cobros: source.cobros || []
     })) : null;
-    const clientes = listBatch ? listBatch.clientes : S().all('clientes');
+    const clientesRaw = listBatch ? listBatch.clientes : S().all('clientes');
+    const clientes = (clientesRaw || []).filter(c => !(c && (c.fusionado === true || String(c.mergedIntoClientId || '').trim())));
     const policiesForList = listBatch ? listBatch.polizas : S().all('polizas');
     const collectionsForList = listBatch ? listBatch.cobros : S().all('cobros');
     const asesores = S().all('asesores');

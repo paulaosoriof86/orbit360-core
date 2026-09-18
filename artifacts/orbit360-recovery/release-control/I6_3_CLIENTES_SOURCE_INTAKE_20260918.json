@@ -109,11 +109,11 @@
     "technicalFunctionalDiscrepancy": "READ_PATH_COUNTRY_VALIDATION_AND_KPI_COMPOSITION_CODE_DEFECT",
     "codeDefect": {
       "classification": "CODE_DEFECT",
-      "status": "TECHNICAL_LIVE_PASS_PENDING_PAULA_VISUAL",
+      "status": "BLOCKING_VISUAL_ACCEPTANCE",
       "reimportForbidden": true,
       "causes": [
-        "CLIENTE360_DETAIL_RAW_CLIENT_BYPASSES_CONTACT_ALIAS_PROJECTION",
-        "PWA_SW_CACHE_NAMESPACE_STATIC_ACROSS_CERTIFIED_BUILDS"
+        "IDENTITY_MERGE_TOMBSTONES_MUST_BE_HIDDEN_FROM_ACTIVE_CLIENT_PROJECTION",
+        "CERTIFIED_RUNTIME_MUST_BE_VERIFIED_AGAINST_LIVE_BUILD_ON_EVERY_I6_EXECUTION"
       ],
       "expectedAfterFix": {
         "backendDocuments": 442,
@@ -121,7 +121,9 @@
         "controlSamplesVisible": 5,
         "kpi": "PRIMA_NETA_VIGENTE_SEPARADA_POR_MONEDA",
         "contactAliasProjection": "WHATSAPP_TO_PHONE_AND_EMAIL_VISIBLE",
-        "releaseFreshness": "BUILD_SCOPED_SW_CACHE_AND_NO_CACHE_BOOTSTRAP"
+        "releaseFreshness": "BUILD_SCOPED_SW_CACHE_AND_NO_CACHE_BOOTSTRAP",
+        "mergedIdentityTombstones": "HIDDEN_AND_REDIRECT_TO_CANONICAL",
+        "runtimeAuthority": "CERTIFIED_CANDIDATE_LIVE_BINDING"
       },
       "releaseRunId": 35320527779,
       "runtimeVisibleAfterFix": 442,

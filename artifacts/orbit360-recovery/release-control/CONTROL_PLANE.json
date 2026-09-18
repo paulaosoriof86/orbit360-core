@@ -404,7 +404,7 @@
     "authorizedAt": "2026-09-14T08:57:00-06:00",
     "authorizationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_EXPLICIT_AUTHORIZATION_RECEIPT_20260914.json",
     "activeSubgate": "I6.3",
-    "productMutationAuthorized": false,
+    "productMutationAuthorized": true,
     "sourceDataApplyAuthorized": false,
     "perBlockApplyRequiresExplicitAuthorization": false,
     "dataUpdateMode": "EVERGREEN_V5_DELTA_FIRST",
@@ -417,7 +417,7 @@
     "activeSourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_3_CLIENTES_SOURCE_INTAKE_20260918.json",
     "activeSourceIntakeBlobSha": "cfa4d9350f41979f055814a7fdb7b37f7705dc78",
     "activeModule": "CLIENTES",
-    "activeModuleStatus": "PENDING_USER_VISUAL",
+    "activeModuleStatus": "CODE_DEFECT_SUCCESSOR_RELEASE_IN_PROGRESS",
     "i6_0": {
       "status": "I6_0_BASELINE_FROZEN",
       "executorPath": ".github/workflows/gravicentra-material-baseline-freeze.yml",
@@ -539,7 +539,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_3_USER_VISUAL_REFRESH_CHECK",
+  "nextAction": "I6_3_CODE_DEFECT_SUCCESSOR_RELEASE",
   "postproductionExitProgress": {
     "formalPercent": 30,
     "frozenMiniGates": 3,
@@ -671,8 +671,8 @@
   },
   "i63CodeDefect": {
     "classification": "CODE_DEFECT",
-    "status": "I6_3_CODE_DEFECT_SUCCESSOR_LIVE_PASS_PENDING_PAULA_VISUAL",
-    "cause": "Cliente360 detail used raw client instead of canonical contact aliases, so WhatsApp-only records could render without phone; release packaging also used a static PWA/service-worker cache namespace, allowing a previous certified artifact to remain visible during propagation/cached fallback.",
+    "status": "I6_3_CODE_DEFECT_CANDIDATE_PENDING_BUILD",
+    "cause": "Identity-merge tombstones require canonical-only Cliente360 visibility; release governance now also verifies LIVE build/source/service-worker cache namespace against the latest certified candidate before every I6 execution.",
     "parentCertifiedSourceSha": "03b03690b5583442dd448e954fb66c3c78648fb3",
     "applyEvidenceRunId": 35308586373,
     "applyArtifactId": 10532811723,
@@ -710,9 +710,9 @@
     "liveEvidenceArtifactDigest": "cfb67ccbe36a649a6d3365c056d6b5e3ef1e8a9ffc3634d3f7d8bce0e65e2da9",
     "contactProjectionFixRequired": true,
     "releaseFreshnessFenceRequired": true,
-    "previousCertifiedSourceSha": "0b613afa02a89aeddee1047c27f7d0e629c34b52",
-    "previousCertifiedBuildId": "gi-i63-0b613afa02a8-57f234755dc1",
-    "previousCertifiedArtifactId": 10536461082
+    "previousCertifiedSourceSha": "4f1194caab311aa25b6c6f5ce297db962953c0c2",
+    "previousCertifiedBuildId": "gi-i63-4f1194caab31-57f234755dc1",
+    "previousCertifiedArtifactId": 10537380037
   },
   "i63NameCaseNormalization": {
     "status": "APPLIED_READBACK_PASS",
@@ -762,5 +762,17 @@
     "sourceMutatedAfterBuild": false,
     "productionUrl": "https://ays-orbit-360-lab.web.app",
     "promotedLiveRunId": 35136211332
+  },
+  "releaseSynchronization": {
+    "authority": "CERTIFIED_CANDIDATE_NOT_BRANCH_HEAD",
+    "liveBindingRequired": true,
+    "liveBindingFields": [
+      "sourceSha",
+      "buildId",
+      "serviceWorkerBuildId",
+      "serviceWorkerCacheNamespace"
+    ],
+    "staleArtifactFallbackForbidden": true,
+    "i5PushAutotriggerDisabledAfterProductionAcceptance": true
   }
 }

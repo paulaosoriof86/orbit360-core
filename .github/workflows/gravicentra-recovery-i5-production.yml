@@ -2,18 +2,6 @@ name: Gravicentra Recovery I5 Production Promotion
 # I5_NO_REBUILD=true
 on:
   workflow_dispatch:
-  push:
-    branches: [recovery/fase-a-clean-20260831]
-    paths:
-      - artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json
-      - artifacts/orbit360-recovery/release-control/I5_EXECUTION_INTENT.json
-      - tools/gravicentra-i5-controlled-writes-v1.mjs
-      - tools/gravicentra-i5-residual-cleanup-v1.mjs
-      - tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs
-      - tools/gravicentra-i4a-authenticated-browser-v2.mjs
-      - tools/gravicentra-i4a-authenticated-browser-v2-base.mjs
-      - tools/gravicentra-i4b-transversal-v2.mjs
-      - .github/workflows/gravicentra-recovery-i5-production.yml
 permissions: {contents: read, actions: read}
 concurrency:
   group: gravicentra-recovery-i5-${{ github.ref }}

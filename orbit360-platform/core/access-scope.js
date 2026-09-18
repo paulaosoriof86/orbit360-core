@@ -286,13 +286,18 @@ Orbit.access = (function () {
     opts = opts || {};
     return canAccessRecord({ asesorId: advisorId, pais: opts.pais }, moduleKey, opts);
   }
+  function mergedClient(rec) {
+    return !!(rec && (rec.fusionado === true || clean(rec.mergedIntoClientId)));
+  }
   function canView(collection, rec, moduleKey) {
     if (!rec) return false;
+    if (collection === 'clientes' && mergedClient(rec)) return false;
     if (SENSITIVE.indexOf(collection) >= 0 && ALL_ROLES.indexOf(activeRole()) < 0) return false;
     return canAccessRecord(rec, moduleKey || OP_COLLS[collection] || collection, { collection: collection });
   }
   function filter(collection, rows, moduleKey) {
     var list = Array.isArray(rows) ? rows : [];
+    if (collection === 'clientes') list = list.filter(function (rec) { return !mergedClient(rec); });
     if (!list.length) return [];
     try {
       // v20260816 candidate: resolve invariant role/scope plus relational advisor indexes once per filter call.
@@ -400,6 +405,7 @@ Orbit.access = (function () {
     var exact = [], probable = [];
     clients.forEach(function (raw) {
       if (input.id && raw.id === input.id) return;
+      if (mergedClient(raw)) return;
       var c = projected(raw);
       var isExact = (idn && norm(c.identificacion) === idn) || (email && clean(c.email).toLowerCase() === email);
       if (isExact) { exact.push(raw.id); return; }

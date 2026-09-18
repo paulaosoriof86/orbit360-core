@@ -14,6 +14,7 @@ on:
       - 'tools/gravicentra-i6-3-client-name-case.mjs'
       - 'tools/gravicentra-i6-3-contact-sample-readonly.mjs'
       - 'tools/gravicentra-i6-3-client-completeness-audit.mjs'
+      - 'tools/gravicentra-certified-live-binding-check.mjs'
       - 'orbit360-platform/core/tenant-access-policy-contract-p0.js'
       - 'orbit360-platform/core/access-scope.js'
       - 'orbit360-platform/modules/cliente360.js'
@@ -73,6 +74,11 @@ jobs:
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'mode='+mode+'\n');
           console.log('I63_MODE='+mode);
           NODE
+
+      - name: Assert LIVE equals latest certified candidate
+        env:
+          LIVE_BINDING_ATTEMPTS: 12
+        run: node tools/gravicentra-certified-live-binding-check.mjs
 
       - name: No-op after technical seal
         if: steps.mode.outputs.mode == 'noop'
