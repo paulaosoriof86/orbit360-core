@@ -72,9 +72,12 @@ function decryptPayload(e,privateKey){
   need(sha(gz)===GZIP_SHA,'I64_GZIP_HASH_MISMATCH');
   const plain=zlib.gunzipSync(gz);need(sha(plain)===PAYLOAD_SHA,'I64_PAYLOAD_HASH_MISMATCH');
   const compact=JSON.parse(plain.toString('utf8'));
-  console.log('I64_COMPACT_FORMAT='+clean(compact.s,80));
+  const compactFormat=clean(compact.s,120);
+  const compactSourceOk=compact.b===SOURCE_SHA;
+  console.log('I64_COMPACT_FORMAT='+compactFormat);
+  console.log('I64_COMPACT_SOURCE_OK='+String(compactSourceOk));
   console.log('I64_COMPACT_MUTATIONS='+(Array.isArray(compact.m)?compact.m.length:0));
-  need(clean(compact.s,120).startsWith('GRAVICENTRA_I6_4_COMPACT_APPLY')&&compact.b===SOURCE_SHA&&Array.isArray(compact.m),'I64_COMPACT_PAYLOAD_INVALID');
+  need(compactFormat.startsWith('GRAVICENTRA_I6_4_COMPACT')&&compactSourceOk&&Array.isArray(compact.m),'I64_COMPACT_PAYLOAD_INVALID');
   const collections=['polizas','vehiculos'], actions=['update','insert'];
   return compact.m.map((m,i)=>{need(Array.isArray(m)&&m.length===4,'I64_MUTATION_TUPLE_'+i);const [ci,ai,id,payload]=m;need(collections[ci]&&actions[ai]&&clean(id,256)&&payload&&typeof payload==='object'&&!Array.isArray(payload),'I64_MUTATION_TUPLE_VALUES_'+i);return{collection:collections[ci],action:actions[ai],id:clean(id,256),payload};});
 }
