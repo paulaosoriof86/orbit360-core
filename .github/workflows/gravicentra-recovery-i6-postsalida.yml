@@ -3,6 +3,7 @@ name: Gravicentra I6 Post-Salida
 # Same approved operational write chain; encrypted ephemeral source bridge only.
 # Resume I6.2 after causal executor role-selector correction.
 # Resume I6.2 physical seal with the role harness aligned to the active contract.
+# Resume I6.2 seal from physically passed APPLY/readback/functional/role evidence.
 on:
   workflow_dispatch:
   push:
@@ -64,11 +65,11 @@ jobs:
       - name: Resume physically passed APPLY and readback evidence
         uses: actions/download-artifact@v4
         with:
-          name: gravicentra-i6-2-apply-evidence-35300186514
+          name: gravicentra-i6-2-apply-evidence-35300483580
           path: ${{ runner.temp }}/gravicentra-i62-evidence
           github-token: ${{ github.token }}
           repository: paulaosoriof86/orbit360-core
-          run-id: 35300186514
+          run-id: 35300483580
       - name: Bind prior physical PASS without repeating writes
         env:
           I62_EVIDENCE_DIR: ${{ runner.temp }}/gravicentra-i62-evidence
@@ -78,15 +79,14 @@ jobs:
           test "$(jq -r .apply.credentialUpdates "$I62_EVIDENCE_DIR/i62-apply-readback-functional.json")" = 3
           test "$(jq -r .readback.status "$I62_EVIDENCE_DIR/i62-apply-readback-functional.json")" = PASS
           test "$(jq -r .functional.status "$I62_EVIDENCE_DIR/i62-apply-readback-functional.json")" = PASS
-      - name: LIVE authenticated role regression after data update
+      - name: Bind physically passed LIVE authenticated role regression
         env:
-          PREVIEW_URL: ${{ env.PRODUCTION_URL }}
-          SOURCE_SHA: 03b03690b5583442dd448e954fb66c3c78648fb3
-          BUILD_ID: gi-i61-03b03690b558-57f234755dc1
-          I4A_AUTH_EVIDENCE_DIR: ${{ runner.temp }}/gravicentra-i62-evidence/live-auth
-        run: node tools/gravicentra-i4a-authenticated-browser-v2.mjs
+          I62_EVIDENCE_DIR: ${{ runner.temp }}/gravicentra-i62-evidence
+        run: test "$(jq -r .status "$I62_EVIDENCE_DIR/live-auth/i4a-authenticated-browser.json")" = AUTH_BROWSER_PASS
       - name: Seal physical I6.2 evidence
         shell: bash
+        env:
+          I62_EVIDENCE_DIR: ${{ runner.temp }}/gravicentra-i62-evidence
         run: |
           set -euo pipefail
           E="$I62_EVIDENCE_DIR"
