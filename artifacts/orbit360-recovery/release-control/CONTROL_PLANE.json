@@ -113,7 +113,7 @@
         "postWriteContextsFail": 0
       },
       "I6": {
-        "status": "I6_3_WAITING_FOR_CURRENT_SOURCE",
+        "status": "I6_3_BLOCKED_PENDING_I6_2_PAULA_VISUAL_ACCEPTANCE",
         "activeSubgate": "I6.3",
         "dataMutationAuthorized": false,
         "lastFrozenMiniGate": "I6.2"
@@ -412,13 +412,13 @@
     "operatingPlanPath": "artifacts/orbit360-recovery/release-control/POSTPROD_DATA_UPDATE_OPERATING_PLAN_LOCK_20260917.json",
     "operatingPlanBlobSha": "d071b2840cf7df4f55426d3caa25f35599909470",
     "executionDisciplinePath": "artifacts/orbit360-recovery/release-control/I6_DATA_UPDATE_EXECUTION_DISCIPLINE_LOCK_20260917.json",
-    "executionDisciplineBlobSha": "65959801b82a29d07f274ce9b359d77e30bc8214",
+    "executionDisciplineBlobSha": "7af17759086da336dbf755d72ad85692f892b71b",
     "mechanismRegistryPath": "artifacts/orbit360-recovery/release-control/DATA_UPDATE_MECHANISM_REGISTRY.json",
     "mechanismRegistryBlobSha": "052e793657f1e54525d6d1d4d65e49ae9dd7af7b",
     "activeSourceIntakePath": null,
     "activeSourceIntakeBlobSha": null,
     "activeModule": "CLIENTES",
-    "activeModuleStatus": "WAITING_FOR_PAULA_SOURCE",
+    "activeModuleStatus": "BLOCKED_PENDING_I6_2_PAULA_VISUAL_ACCEPTANCE",
     "i6_0": {
       "status": "I6_0_BASELINE_FROZEN",
       "executorPath": ".github/workflows/gravicentra-material-baseline-freeze.yml",
@@ -450,7 +450,7 @@
     "operatingPlanPath": "artifacts/orbit360-recovery/release-control/POSTPROD_DATA_UPDATE_OPERATING_PLAN_LOCK_20260917.json",
     "operatingPlanBlobSha": "d071b2840cf7df4f55426d3caa25f35599909470",
     "executionDisciplinePath": "artifacts/orbit360-recovery/release-control/I6_DATA_UPDATE_EXECUTION_DISCIPLINE_LOCK_20260917.json",
-    "executionDisciplineBlobSha": "65959801b82a29d07f274ce9b359d77e30bc8214",
+    "executionDisciplineBlobSha": "7af17759086da336dbf755d72ad85692f892b71b",
     "mechanismRegistryPath": "artifacts/orbit360-recovery/release-control/DATA_UPDATE_MECHANISM_REGISTRY.json",
     "mechanismRegistryBlobSha": "052e793657f1e54525d6d1d4d65e49ae9dd7af7b",
     "activeModule": "CLIENTES",
@@ -462,8 +462,8 @@
     "liveVisualRefreshRequiredForClosure": true,
     "pureDataUpdateRequiresBuildOrDeploy": false,
     "reimportForVisibilityFailureForbidden": true,
-    "nextRequiredStep": "REQUEST_CURRENT_SOURCE_FROM_PAULA",
-    "executionCursor": "WAITING_FOR_SOURCE"
+    "nextRequiredStep": "REPORT_I6_2_CHANGES_AND_GET_PAULA_VISUAL_ACCEPTANCE_BEFORE_I6_3_SOURCE",
+    "executionCursor": "I6_2_TECHNICAL_PASS_PENDING_PAULA_VISUAL_ACCEPTANCE"
   },
   "governanceSyncChecklist": {
     "frozenPlanMaterialized": true,
@@ -534,9 +534,10 @@
     "i6ExecutorStateGated": true,
     "i6AuthorizationReceiptMaterialized": true,
     "i62DirectoryLivePass": true,
-    "i62TerminalReceiptMaterialized": true
+    "i62TerminalReceiptMaterialized": true,
+    "i6ModuleHandoffDisciplineMaterialized": true
   },
-  "nextAction": "I6_3_REQUEST_CURRENT_CLIENTES_SOURCE",
+  "nextAction": "I6_2_REPORT_CHANGES_AND_PAULA_VISUAL_VALIDATE_BEFORE_I6_3_SOURCE",
   "postproductionExitProgress": {
     "formalPercent": 30,
     "frozenMiniGates": 3,
@@ -647,5 +648,20 @@
     "liveRunId": 35136211332,
     "dataTouched": false,
     "augustDataTouched": false
+  },
+  "moduleHandoffControl": {
+    "status": "FROZEN_ACTIVE",
+    "disciplinePath": "artifacts/orbit360-recovery/release-control/I6_DATA_UPDATE_EXECUTION_DISCIPLINE_LOCK_20260917.json",
+    "disciplineBlobSha": "7af17759086da336dbf755d72ad85692f892b71b",
+    "mandatoryChangeReportBeforeNextSource": true,
+    "mandatoryPaulaVisualAcceptanceBeforeNextSource": true,
+    "assistantDefinesNextModuleInformationAndTemporalScope": true,
+    "current": {
+      "technicalModule": "I6.2 Aseguradoras",
+      "technicalStatus": "I6_2_DIRECTORIO_LIVE_PASS",
+      "paulaVisualAcceptance": "PENDING",
+      "nextModule": "I6.3 Clientes",
+      "nextSourceRequestBlocked": true
+    }
   }
 }
