@@ -38,6 +38,19 @@ try{
   out.duplicateExactNameGroups=[...nameGroups.entries()].filter(([,v])=>v.length>1).map(([key,rows])=>({key,count:rows.length,rows}));
   out.duplicateStrongPhoneGroups=[...phoneGroups.entries()].filter(([,v])=>v.length>1).map(([phone,rows])=>({phone,count:rows.length,rows}));
   out.joseHumberto=[...nameGroups.entries()].filter(([k])=>k==='jose humberto aguilar luna').flatMap(([,v])=>v);
+  const josePhone='50232114013';
+  const joseCluster=(phoneGroups.get(josePhone)||[]).map(x=>({id:x.id,nombre:x.nombre}));
+  const relationCollections=['polizas','vehiculos','cobros','comisiones','cancelaciones','actividades','renovaciones','siniestros'];
+  out.josePhoneCluster=[];
+  for(const item of joseCluster){
+    const row=byId.get(item.id)||{};
+    const relations={};
+    for(const collection of relationCollections){
+      const rs=await db.collection('tenants').doc(TENANT).collection('data').doc(collection).collection('items').where('clienteId','==',item.id).get();
+      relations[collection]=rs.size;
+    }
+    out.josePhoneCluster.push({id:item.id,nombre:item.nombre,fechaNacimiento:clean(row.fechaNacimiento||row.fechaNac||'',100),fechaAlta:clean(row.fechaAltaOrigen||row.fechaAlta||'',100),direccion:clean(row.direccion||'',260),telefono:clean(row.telefono||'',80),whatsapp:clean(row.whatsapp||'',80),relations});
+  }
   const mon=[...nameGroups.entries()].filter(([k])=>k==='monica jose chavarria salazar').flatMap(([,v])=>v);
   out.monica=mon.length?mon[0]:null;
   need(out.mutationsVerified===312&&out.mismatchCount===0,'I63_AUDIT_MUTATION_PARITY');
