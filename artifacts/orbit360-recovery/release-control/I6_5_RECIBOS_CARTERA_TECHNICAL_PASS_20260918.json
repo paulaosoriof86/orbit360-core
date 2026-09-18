@@ -1,0 +1,49 @@
+{
+  "schema": "GRAVICENTRA_I6_5_RECIBOS_CARTERA_TECHNICAL_PASS_V1",
+  "status": "PASS_PENDING_PAULA_VISUAL",
+  "date": "2026-09-18",
+  "gate": "I6.5",
+  "module": "RECIBOS_CARTERA",
+  "runId": 35394421053,
+  "artifactId": 10566973363,
+  "artifactDigest": "f8dc7e59259965a84bb2c832053a959a3aa7300d8cb108e89cbe0f8e8b98ae1f",
+  "sourceBundleSha256": "f445e2f4a20b9eb7a526bda8896472dab9e7ac4617b3c5d8124a939a0dee0e6a",
+  "deterministicDiffSha256": "c1cf6d0c62d4dd30bfa80c70abfa7a8751e58630c2ffcc3484e5544d76e55749",
+  "applied": {
+    "receiptInserts": 548,
+    "receiptUpdates": 798,
+    "receiptDeletes": 0,
+    "portfolioInserts": 634,
+    "portfolioUpdates": 223,
+    "portfolioDeletesPositivePaymentEvidenceOnly": 24,
+    "totalWrites": 2227,
+    "holds": 36
+  },
+  "liveCounts": {
+    "polizas": 1414,
+    "clientes": 442,
+    "aseguradoras": 31,
+    "vehiculos": 1063,
+    "recibosEsperados": 1842,
+    "carteraPrimas": 1283,
+    "cobros": 5,
+    "finmovs": 0,
+    "renovaciones": 0
+  },
+  "integrity": {
+    "relationshipErrors": 0,
+    "forbiddenCollectionsUnchanged": true,
+    "legacyNamespaceUnchanged": true,
+    "unrelatedAllowedDocsUnchanged": true
+  },
+  "functional": {
+    "status": "PASS",
+    "receiptCount": 1842,
+    "portfolioCount": 1283,
+    "i64SentinelsPreserved": true
+  },
+  "cobrosWrites": 0,
+  "finmovWrites": 0,
+  "rollbackExecuted": false,
+  "nextRequiredStep": "PAULA_LIVE_VISUAL_VALIDATION"
+}

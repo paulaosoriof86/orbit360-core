@@ -683,5 +683,23 @@
     ],
     "i64SentinelsPreserved": true,
     "operationalWrites": 0
+  },
+  "i65DataUpdateTechnicalAcceptance": {
+    "status": "PASS_PENDING_PAULA_VISUAL",
+    "runId": 35394421053,
+    "artifactId": 10566973363,
+    "artifactDigest": "f8dc7e59259965a84bb2c832053a959a3aa7300d8cb108e89cbe0f8e8b98ae1f",
+    "sourceBundleSha256": "f445e2f4a20b9eb7a526bda8896472dab9e7ac4617b3c5d8124a939a0dee0e6a",
+    "deterministicDiffSha256": "c1cf6d0c62d4dd30bfa80c70abfa7a8751e58630c2ffcc3484e5544d76e55749",
+    "writes": 2227,
+    "receiptCount": 1842,
+    "portfolioCount": 1283,
+    "cobrosCount": 5,
+    "holds": 36,
+    "legacyNamespaceUnchanged": true,
+    "forbiddenCollectionsUnchanged": true,
+    "relationshipErrors": 0,
+    "functionalPass": true,
+    "i64SentinelsPreserved": true
   }
 }

@@ -153,10 +153,10 @@
     "receiptIdentityRule": "Do not deduplicate only by policy+series+receiptStart+dueDate. Twelve observed base keys contain multiple legitimate amounts; deterministic identity must include source identity/external receipt identity and amount or equivalent distinguishing evidence."
   },
   "execution": {
-    "cursorState": "DETERMINISTIC_DIFF_READY",
-    "writeApplied": false,
-    "writes": 0,
-    "nextRequiredStep": "APPLY_DETERMINISTIC_DELTA_ONLY",
+    "cursorState": "POST_WRITE_READBACK_INTEGRITY_PASS",
+    "writeApplied": true,
+    "writes": 2227,
+    "nextRequiredStep": "USER_VISUAL_REFRESH_CHECK",
     "syncCodeDefect": {
       "status": "I6_5_SYNC_CODE_DEFECT_SUCCESSOR_LIVE_PASS",
       "runId": 35379229395,
@@ -222,7 +222,35 @@
       "receiptDeletes": 0,
       "portfolioDeletesPositivePaymentEvidenceOnly": 24,
       "holds": 36
-    }
+    },
+    "applyRunId": 35394421053,
+    "applyArtifactId": 10566973363,
+    "applyArtifactDigest": "f8dc7e59259965a84bb2c832053a959a3aa7300d8cb108e89cbe0f8e8b98ae1f",
+    "appliedCounts": {
+      "receiptInserts": 548,
+      "receiptUpdates": 798,
+      "receiptDeletes": 0,
+      "portfolioInserts": 634,
+      "portfolioUpdates": 223,
+      "portfolioDeletes": 24,
+      "operationalWrites": 2227,
+      "holds": 36
+    },
+    "liveCountsAfter": {
+      "polizas": 1414,
+      "clientes": 442,
+      "aseguradoras": 31,
+      "vehiculos": 1063,
+      "recibosEsperados": 1842,
+      "carteraPrimas": 1283,
+      "cobros": 5,
+      "finmovs": 0,
+      "renovaciones": 0
+    },
+    "postWriteReadbackPassed": true,
+    "integrityPassed": true,
+    "functionalPassed": true,
+    "legacyNamespaceUnchanged": true
   },
   "repinVerification20260918": {
     "status": "EXACT_MATCH_8_OF_8",

@@ -157,8 +157,8 @@
       "sourceBundleSha256": "f445e2f4a20b9eb7a526bda8896472dab9e7ac4617b3c5d8124a939a0dee0e6a",
       "syncPreflightPath": "artifacts/orbit360-recovery/release-control/I6_5_SYNC_COMPOSITION_PREFLIGHT_20260918.json",
       "currentGate": "I6.5",
-      "resumeCursor": "DETERMINISTIC_DIFF_READY",
-      "nextMaterialStep": "APPLY_DETERMINISTIC_DELTA_ONLY",
+      "resumeCursor": "POST_WRITE_READBACK_INTEGRITY_PASS",
+      "nextMaterialStep": "USER_VISUAL_REFRESH_CHECK",
       "dataWritesAuthorized": false,
       "cobrosWritesAuthorized": false,
       "readPathAuthority": "recibosEsperados+carteraPrimas",
@@ -229,6 +229,20 @@
           "cobros": 5
         },
         "holds": 36
+      },
+      "technicalApply": {
+        "status": "PASS_PENDING_USER_VISUAL",
+        "runId": 35394421053,
+        "artifactId": 10566973363,
+        "artifactDigest": "f8dc7e59259965a84bb2c832053a959a3aa7300d8cb108e89cbe0f8e8b98ae1f",
+        "writes": 2227,
+        "receiptCount": 1842,
+        "portfolioCount": 1283,
+        "cobrosCount": 5,
+        "holds": 36,
+        "legacyNamespaceUnchanged": true,
+        "forbiddenCollectionsUnchanged": true,
+        "relationshipErrors": 0
       }
     },
     "COBROS_CONCILIACION": {
