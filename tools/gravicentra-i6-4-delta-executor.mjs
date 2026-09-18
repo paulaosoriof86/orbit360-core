@@ -92,23 +92,25 @@ async function relationAudit(db){
 }
 
 fs.mkdirSync(OUT,{recursive:true});
-const evidence={schema:'GRAVICENTRA_I6_4_APPLY_READBACK_INTEGRITY_FUNCTIONAL_V1',gate:'I6.4',module:'POLIZAS_RIESGOS_VEHICULOS',status:'FAIL',sourceBundleSha256:SOURCE_SHA,diff:{policyUpdates:486,policyInserts:41,vehicleUpdates:352,vehicleInserts:31,totalMutations:910,deletes:0,hardHolds:2},apply:{operationalMutations:0,batchesCommitted:0,deletes:0},readback:{},integrity:{},functional:{},rollback:{executed:false},containsPII:false,containsSecrets:false,errors:[]};
+const evidence={schema:'GRAVICENTRA_I6_4_APPLY_READBACK_INTEGRITY_FUNCTIONAL_V1',gate:'I6.4',module:'POLIZAS_RIESGOS_VEHICULOS',status:'FAIL',sourceBundleSha256:SOURCE_SHA,diff:{policyUpdates:486,policyInserts:41,vehicleUpdates:352,vehicleInserts:31,logicalMutations:910,operationalMutationTargets:908,coalescedDuplicateUpdateTargets:2,deletes:0,hardHolds:2},apply:{operationalMutations:0,batchesCommitted:0,coalescedDuplicateUpdateTargets:2,deletes:0},readback:{},integrity:{},functional:{},rollback:{executed:false},containsPII:false,containsSecrets:false,errors:[]};
 const cp=JSON.parse(fs.readFileSync(CONTROL,'utf8')),src=JSON.parse(fs.readFileSync(SOURCE,'utf8')),receipt=JSON.parse(fs.readFileSync(RECEIPT,'utf8'));
 need(cp.gateState?.gates?.I6?.status==='I6_4_DATA_UPDATE_V5_ACTIVE'&&cp.gateState?.gates?.I6?.activeSubgate==='I6.4','I64_GATE_NOT_ACTIVE');
 need(cp.nextAction==='I6_4_APPLY_DETERMINISTIC_DELTA','I64_APPLY_NOT_CURRENT_ACTION');
 need(src.status==='PINNED_FOR_V5_DELTA'&&src.execution?.cursorState==='DETERMINISTIC_DIFF_READY'&&src.sourceBundle?.sha256===SOURCE_SHA,'I64_SOURCE_OR_CURSOR_MISMATCH');
 need(receipt.status==='DETERMINISTIC_DIFF_READY'&&receipt.diff?.totalMutations===910&&receipt.applyContract?.writePath==='orbit360ProductOperationalCommand','I64_DIFF_RECEIPT_INVALID');
 
-const sa=serviceAccount(),mutations=decryptPayload(readEnvelope(),sa.private_key);
-need(mutations.length===910,'I64_MUTATION_COUNT');
-need(mutations.filter(m=>m.collection==='polizas'&&m.action==='update').length===486,'I64_POLICY_UPDATE_COUNT');
-need(mutations.filter(m=>m.collection==='polizas'&&m.action==='insert').length===41,'I64_POLICY_INSERT_COUNT');
-need(mutations.filter(m=>m.collection==='vehiculos'&&m.action==='update').length===352,'I64_VEHICLE_UPDATE_COUNT');
-need(mutations.filter(m=>m.collection==='vehiculos'&&m.action==='insert').length===31,'I64_VEHICLE_INSERT_COUNT');
-need(mutations.every(m=>['polizas','vehiculos'].includes(m.collection)&&['update','insert'].includes(m.action)&&noSecretKeys(m.payload)),'I64_UNSAFE_OPERATIONAL_PAYLOAD');
+const sa=serviceAccount(),logicalMutations=decryptPayload(readEnvelope(),sa.private_key);
+need(logicalMutations.length===910,'I64_MUTATION_COUNT');
+need(logicalMutations.filter(m=>m.collection==='polizas'&&m.action==='update').length===486,'I64_POLICY_UPDATE_COUNT');
+need(logicalMutations.filter(m=>m.collection==='polizas'&&m.action==='insert').length===41,'I64_POLICY_INSERT_COUNT');
+need(logicalMutations.filter(m=>m.collection==='vehiculos'&&m.action==='update').length===352,'I64_VEHICLE_UPDATE_COUNT');
+need(logicalMutations.filter(m=>m.collection==='vehiculos'&&m.action==='insert').length===31,'I64_VEHICLE_INSERT_COUNT');
+need(logicalMutations.every(m=>['polizas','vehiculos'].includes(m.collection)&&['update','insert'].includes(m.action)&&noSecretKeys(m.payload)),'I64_UNSAFE_OPERATIONAL_PAYLOAD');
+
 const targetGroups=new Map();
-for(const m of mutations){const k=m.collection+'|'+m.id;if(!targetGroups.has(k))targetGroups.set(k,[]);targetGroups.get(k).push(m);}
-const duplicateTargets=[...targetGroups.entries()].filter(([,rows])=>rows.length>1).map(([k,rows])=>({
+for(const m of logicalMutations){const k=m.collection+'|'+m.id;if(!targetGroups.has(k))targetGroups.set(k,[]);targetGroups.get(k).push(m);}
+const duplicateEntries=[...targetGroups.entries()].filter(([,rows])=>rows.length>1);
+const duplicateTargets=duplicateEntries.map(([k,rows])=>({
   collection:k.split('|')[0],
   idHash:sha(k).slice(0,16),
   actions:rows.map(x=>x.action),
@@ -117,7 +119,38 @@ const duplicateTargets=[...targetGroups.entries()].filter(([,rows])=>rows.length
   differingKeys:[...new Set(rows.flatMap(x=>Object.keys(x.payload||{})))].filter(key=>new Set(rows.map(x=>JSON.stringify(stable((x.payload||{})[key])))).size>1)
 }));
 console.log('I64_DUPLICATE_TARGETS='+JSON.stringify(duplicateTargets));
-need(targetGroups.size===910,'I64_DUPLICATE_MUTATION_TARGET');
+need(duplicateEntries.length===2,'I64_DUPLICATE_TARGET_COUNT');
+need(duplicateEntries.every(([,rows])=>rows.length===2&&rows.every(m=>m.collection==='vehiculos'&&m.action==='update')),'I64_DUPLICATE_TARGET_SCOPE');
+
+function coalesceGroup(rows){
+  const first=rows[0],payload={};
+  for(const row of rows){
+    need(row.collection===first.collection&&row.id===first.id&&row.action===first.action,'I64_COALESCE_IDENTITY_CONFLICT');
+    for(const [key,value] of Object.entries(row.payload||{})){
+      if(Object.prototype.hasOwnProperty.call(payload,key)){
+        need(JSON.stringify(stable(payload[key]))===JSON.stringify(stable(value)),'I64_DUPLICATE_UPDATE_CONFLICT:'+key);
+      }else payload[key]=value;
+    }
+  }
+  return{collection:first.collection,action:first.action,id:first.id,payload};
+}
+const mutations=[];
+const emitted=new Set();
+for(const m of logicalMutations){
+  const k=m.collection+'|'+m.id;
+  if(emitted.has(k))continue;
+  emitted.add(k);
+  const rows=targetGroups.get(k)||[];
+  mutations.push(rows.length===1?m:coalesceGroup(rows));
+}
+need(mutations.length===908,'I64_OPERATIONAL_TARGET_COUNT');
+need(mutations.filter(m=>m.collection==='polizas'&&m.action==='update').length===486,'I64_OPERATIONAL_POLICY_UPDATE_COUNT');
+need(mutations.filter(m=>m.collection==='polizas'&&m.action==='insert').length===41,'I64_OPERATIONAL_POLICY_INSERT_COUNT');
+need(mutations.filter(m=>m.collection==='vehiculos'&&m.action==='update').length===350,'I64_OPERATIONAL_VEHICLE_UPDATE_COUNT');
+need(mutations.filter(m=>m.collection==='vehiculos'&&m.action==='insert').length===31,'I64_OPERATIONAL_VEHICLE_INSERT_COUNT');
+console.log('I64_LOGICAL_MUTATIONS=910');
+console.log('I64_OPERATIONAL_MUTATIONS=908');
+console.log('I64_COALESCED_DUPLICATE_TARGETS=2');
 
 const app=initializeApp({credential:cert(sa),projectId:PROJECT},'i64-delta'),db=getFirestore(app),auth=getAuth(app);
 let browser=null,anyCommitted=false;
@@ -130,7 +163,7 @@ try{
   for(const m of mutations)targetSets[m.collection].add(m.id);
   for(const [name,snap] of [['polizas',polBefore],['vehiculos',vehBefore]])for(const d of snap.docs){if(targetSets[name].has(d.id))beforeDocs.set(name+'|'+d.id,d.data()||{});else unrelatedBefore[name].set(d.id,digest(d.data()||{}));}
   need(unrelatedBefore.polizas.size===887,'I64_UNRELATED_POLICY_BASELINE_COUNT');
-  need(unrelatedBefore.vehiculos.size===680,'I64_UNRELATED_VEHICLE_BASELINE_COUNT');
+  need(unrelatedBefore.vehiculos.size===682,'I64_UNRELATED_VEHICLE_BASELINE_COUNT');
   for(const m of mutations){const snap=await dataRef(db,m.collection,m.id).get();if(m.action==='update')need(snap.exists,'I64_UPDATE_TARGET_MISSING:'+m.collection);else need(!snap.exists,'I64_INSERT_TARGET_EXISTS:'+m.collection);}
 
   const actor=await selectManager(db,auth);
@@ -151,7 +184,7 @@ try{
     need(opResult?.ok===true&&opResult?.serverOwned===true&&Number(opResult?.mutationCount)===batch.length,'I64_OPERATIONAL_APPLY_REJECTED_BATCH_'+String(i+1));
     anyCommitted=true;evidence.apply.batchesCommitted=i+1;evidence.apply.operationalMutations+=batch.length;
   }
-  need(evidence.apply.operationalMutations===910,'I64_APPLY_COUNT_MISMATCH');
+  need(evidence.apply.operationalMutations===908,'I64_APPLY_COUNT_MISMATCH');
 
   const [clientsAfter,polAfter,vehAfter,renAfter]=await Promise.all([dataCol(db,'clientes').get(),dataCol(db,'polizas').get(),dataCol(db,'vehiculos').get(),dataCol(db,'renovaciones').get()]);
   need(clientsAfter.size===442&&polAfter.size===1414&&vehAfter.size===1063&&renAfter.size===0,'I64_POSTWRITE_COUNT_MISMATCH');
@@ -160,7 +193,7 @@ try{
   for(const name of ['polizas','vehiculos'])for(const [id,h] of unrelatedBefore[name]){const snap=await dataRef(db,name,id).get();need(snap.exists&&digest(snap.data()||{})===h,'I64_UNRELATED_DOC_CHANGED:'+name);}
   const rel=await relationAudit(db);
   need(rel.policyClientMissing===0&&rel.policyClientTombstone===0&&rel.vehiclePolicyMissing===0&&rel.vehicleClientMissing===0&&rel.vehicleClientTombstone===0&&rel.canonicalClients===439,'I64_RELATIONSHIP_INTEGRITY_FAIL');
-  evidence.readback={status:'PASS',polizas:1414,vehiculos:1063,clientesPhysical:442,clientesCanonicalActive:439,renovaciones:0,mutatedRowsMatched:910,unrelatedPoliciesVerified:887,unrelatedVehiclesVerified:680,deletes:0};
+  evidence.readback={status:'PASS',polizas:1414,vehiculos:1063,clientesPhysical:442,clientesCanonicalActive:439,renovaciones:0,mutatedRowsMatched:908,logicalMutationIntentsMatched:910,coalescedDuplicateUpdateTargets:2,unrelatedPoliciesVerified:887,unrelatedVehiclesVerified:682,deletes:0};
   evidence.integrity={status:'PASS',...rel,clientCollectionUnchanged:true,noPolicyDelete:true,noVehicleDelete:true};
 
   await page.reload({waitUntil:'domcontentloaded',timeout:25000});

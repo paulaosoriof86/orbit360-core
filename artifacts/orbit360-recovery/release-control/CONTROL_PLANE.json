@@ -415,7 +415,7 @@
     "mechanismRegistryPath": "artifacts/orbit360-recovery/release-control/DATA_UPDATE_MECHANISM_REGISTRY.json",
     "mechanismRegistryBlobSha": "785a71f234d372db3fd23e16aa6800e1c1a62041",
     "activeSourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_4_POLIZAS_RIESGOS_SOURCE_INTAKE_20260918.json",
-    "activeSourceIntakeBlobSha": "2bb27b2619cb566c9b29c4d326567d5404f51aea",
+    "activeSourceIntakeBlobSha": "19afe5515b7d3497b48b8e9f3a55fbdc26f8e923",
     "activeModule": "POLIZAS_RIESGOS_VEHICULOS",
     "activeModuleStatus": "DETERMINISTIC_DIFF_READY",
     "i6_0": {
@@ -483,7 +483,7 @@
       "publicKeySha256": "342371840986ee008bdef3ee9523fe9e52509d12a654ac1d4c0fa6b3cb781579",
       "deterministicDiffReady": true,
       "diffReceiptPath": "artifacts/orbit360-recovery/release-control/I6_4_DETERMINISTIC_DIFF_20260918.json",
-      "diffReceiptBlobSha": "fe72f96946c307ade3b57d863022460b6cc17427",
+      "diffReceiptBlobSha": "d7a670cc3ffe0c35bc78784a1d26271948aaa069",
       "diffSnapshot": {
         "runId": 35332413544,
         "artifactId": 10541996118,
@@ -504,7 +504,12 @@
         "renovaciones": 0
       },
       "envelopeSha256": "e9964f4a671e9c1858da86eb2c5519fb55a0eea2861ecdb015817dc0d4c53fd3",
-      "payloadSha256": "925dd4fbbda44e2532cec253d9d47949358c84df0e0d0c596c48e8153d7ad358"
+      "payloadSha256": "925dd4fbbda44e2532cec253d9d47949358c84df0e0d0c596c48e8153d7ad358",
+      "logicalMutations": 910,
+      "operationalMutationTargets": 908,
+      "vehicleUniqueUpdateTargets": 350,
+      "coalescedDuplicateUpdateTargets": 2,
+      "executionCorrection": "COALESCE_COMPATIBLE_VEHICLE_PATCHES_TO_CANONICAL_TARGET"
     }
   },
   "postproductionDataUpdateControl": {
@@ -518,7 +523,7 @@
     "mechanismRegistryBlobSha": "785a71f234d372db3fd23e16aa6800e1c1a62041",
     "activeModule": "POLIZAS_RIESGOS_VEHICULOS",
     "activeSourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_4_POLIZAS_RIESGOS_SOURCE_INTAKE_20260918.json",
-    "activeSourceIntakeBlobSha": "2bb27b2619cb566c9b29c4d326567d5404f51aea",
+    "activeSourceIntakeBlobSha": "19afe5515b7d3497b48b8e9f3a55fbdc26f8e923",
     "sourceSha256": "7130ed56467da438f5c6e2823ede65f73d6356de63de94e19da30f3aed26c68f",
     "conversationAsAuthority": false,
     "requestCurrentSourceBeforeEveryNewModule": true,

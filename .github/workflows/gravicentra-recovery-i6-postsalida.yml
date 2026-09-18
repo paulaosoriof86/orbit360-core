@@ -841,7 +841,7 @@ jobs:
           const C=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8'));
           const S=JSON.parse(fs.readFileSync(process.env.I64_SOURCE_INTAKE,'utf8'));
           const E=JSON.parse(fs.readFileSync(process.env.I64_EVIDENCE,'utf8'));
-          if(E.status!=='PASS'||E.apply?.operationalMutations!==910||E.apply?.batchesCommitted!==12||E.readback?.status!=='PASS'||E.integrity?.status!=='PASS'||E.functional?.status!=='PASS'||E.rollback?.executed===true)throw new Error('I64_APPLY_EVIDENCE_INVALID');
+          if(E.status!=='PASS'||E.diff?.logicalMutations!==910||E.diff?.operationalMutationTargets!==908||E.apply?.operationalMutations!==908||E.apply?.coalescedDuplicateUpdateTargets!==2||E.apply?.batchesCommitted!==12||E.readback?.status!=='PASS'||E.integrity?.status!=='PASS'||E.functional?.status!=='PASS'||E.rollback?.executed===true)throw new Error('I64_APPLY_EVIDENCE_INVALID');
           if(E.readback.polizas!==1414||E.readback.vehiculos!==1063||E.readback.clientesPhysical!==442||E.readback.clientesCanonicalActive!==439||E.readback.renovaciones!==0)throw new Error('I64_POSTWRITE_COUNTS_INVALID');
           if(E.integrity.policyClientMissing!==0||E.integrity.policyClientTombstone!==0||E.integrity.vehiclePolicyMissing!==0||E.integrity.vehicleClientMissing!==0||E.integrity.vehicleClientTombstone!==0)throw new Error('I64_RELATIONSHIP_EVIDENCE_INVALID');
 
@@ -850,7 +850,7 @@ jobs:
           S.execution.applyRunId=Number(process.env.GITHUB_RUN_ID);
           S.execution.applyArtifactId=Number(process.env.APPLY_ARTIFACT_ID);
           S.execution.applyArtifactDigest=process.env.APPLY_ARTIFACT_DIGEST;
-          S.execution.appliedCounts={policyUpdates:486,policyInserts:41,vehicleUpdates:352,vehicleInserts:31,totalMutations:910,deletes:0};
+          S.execution.appliedCounts={policyUpdates:486,policyInserts:41,vehicleLogicalUpdates:352,vehicleUniqueUpdateTargets:350,vehicleInserts:31,logicalMutationIntents:910,operationalWrites:908,coalescedDuplicateUpdateTargets:2,deletes:0};
           S.execution.liveCountsAfter={clientes:442,clientesCanonicalActive:439,polizas:1414,vehiculos:1063,renovaciones:0};
           S.execution.postWriteReadbackPassed=true;
           S.execution.integrityPassed=true;
@@ -872,7 +872,9 @@ jobs:
             applyRunId:Number(process.env.GITHUB_RUN_ID),
             applyArtifactId:Number(process.env.APPLY_ARTIFACT_ID),
             applyArtifactDigest:process.env.APPLY_ARTIFACT_DIGEST,
-            writesExecuted:910,
+            writesExecuted:908,
+            logicalMutationsApplied:910,
+            coalescedDuplicateUpdateTargets:2,
             batchesCommitted:12,
             deletes:0,
             postWriteCounts:S.execution.liveCountsAfter,

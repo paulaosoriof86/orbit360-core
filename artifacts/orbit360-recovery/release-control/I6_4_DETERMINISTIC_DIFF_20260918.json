@@ -43,7 +43,8 @@
       "unchanged": 3,
       "referenceOnly": 10,
       "existingDuplicateCandidatesIsolated": 1,
-      "deletes": 0
+      "deletes": 0,
+      "uniqueUpdateTargets": 350
     },
     "totalMutations": 910,
     "totalDeletes": 0,
@@ -106,7 +107,9 @@
     "duplicateConflict": {
       "count": 1,
       "resolution": "DETERMINISTIC_CANONICAL_EDITION_NO_DOUBLE_INSERT"
-    }
+    },
+    "operationalMutationTargets": 908,
+    "coalescedDuplicateUpdateTargets": 2
   },
   "applyContract": {
     "writePath": "orbit360ProductOperationalCommand",
@@ -120,14 +123,16 @@
     ],
     "maxBatchSize": 80,
     "expectedBatches": 12,
-    "expectedOperationalMutations": 910,
+    "expectedOperationalMutations": 908,
     "noDeletes": true,
     "noClientWrites": true,
     "noInsurerWrites": true,
     "noFinancialWrites": true,
     "rollbackRequired": true,
     "aggregateBaselineDigestGuard": true,
-    "supplementsDoNotCreatePolicies": true
+    "supplementsDoNotCreatePolicies": true,
+    "expectedLogicalMutations": 910,
+    "coalescedDuplicateUpdateTargets": 2
   },
   "envelope": {
     "schema": "GRAVICENTRA_I6_4_COMPACT_APPLY_ENVELOPE_V1",
@@ -153,5 +158,16 @@
     "vehicleClientTombstoneAfter": 0,
     "noDeleteByAbsence": true,
     "ambiguousCasesIsolatedWithoutBlockingDeterministicRows": true
+  },
+  "executionCorrection": {
+    "classification": "CAUSAL_EXECUTION_PACKAGING_CORRECTION",
+    "reason": "Two compatible vehicle source patches target the same canonical LIVE document; coalesce before operational write to preserve one-document-one-write atomicity.",
+    "logicalMutationIntents": 910,
+    "operationalMutationTargets": 908,
+    "coalescedDuplicateUpdateTargets": 2,
+    "sourceBundleUnchanged": true,
+    "encryptedPayloadUnchanged": true,
+    "deterministicDiffRecalculated": false,
+    "deletes": 0
   }
 }

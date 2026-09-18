@@ -171,7 +171,7 @@
     },
     "publicKeySha256": "342371840986ee008bdef3ee9523fe9e52509d12a654ac1d4c0fa6b3cb781579",
     "diffReceiptPath": "artifacts/orbit360-recovery/release-control/I6_4_DETERMINISTIC_DIFF_20260918.json",
-    "diffReceiptBlobSha": "fe72f96946c307ade3b57d863022460b6cc17427",
+    "diffReceiptBlobSha": "d7a670cc3ffe0c35bc78784a1d26271948aaa069",
     "diffSnapshot": {
       "runId": 35332413544,
       "artifactId": 10541996118,
@@ -197,7 +197,8 @@
         "unchanged": 3,
         "referenceOnly": 10,
         "existingDuplicateCandidatesIsolated": 1,
-        "deletes": 0
+        "deletes": 0,
+        "uniqueUpdateTargets": 350
       },
       "totalMutations": 910,
       "totalDeletes": 0,
@@ -260,7 +261,9 @@
       "duplicateConflict": {
         "count": 1,
         "resolution": "DETERMINISTIC_CANONICAL_EDITION_NO_DOUBLE_INSERT"
-      }
+      },
+      "operationalMutationTargets": 908,
+      "coalescedDuplicateUpdateTargets": 2
     },
     "applyEnvelope": {
       "schema": "GRAVICENTRA_I6_4_COMPACT_APPLY_ENVELOPE_V1",
@@ -283,6 +286,16 @@
       "polizas": 1414,
       "vehiculos": 1063,
       "renovaciones": 0
+    },
+    "executionCorrection": {
+      "classification": "CAUSAL_EXECUTION_PACKAGING_CORRECTION",
+      "logicalMutationIntents": 910,
+      "operationalMutationTargets": 908,
+      "coalescedDuplicateUpdateTargets": 2,
+      "rule": "COALESCE_COMPATIBLE_PATCHES_TO_SAME_CANONICAL_DOCUMENT_BEFORE_WRITE",
+      "sourceBundleUnchanged": true,
+      "encryptedPayloadUnchanged": true,
+      "deterministicDiffRecalculated": false
     }
   },
   "guards": {
