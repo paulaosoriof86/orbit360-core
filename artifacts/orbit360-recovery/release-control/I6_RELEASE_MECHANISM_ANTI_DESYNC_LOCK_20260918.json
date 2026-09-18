@@ -21,10 +21,10 @@
     },
     {
       "id": "OPERATIONAL_PROOF_ROLE_SURFACE_MISMATCH",
-      "status": "RESOLVED",
+      "status": "RESOLVED_WITH_EFFECTIVE_SCOPE_SELECTION",
       "evidence": "Operational proof returned NO_MANAGER while previous authenticated hydration evidence had a verified Dirección/SuperAdmin actor.",
       "cause": "Proof role extractor omitted rolesDisponibles/activeRole surfaces.",
-      "correction": "Proof actor discovery now recognizes the same canonical membership role surfaces used by product/runtime evidence while retaining disabled=false and emailVerified=true requirements.",
+      "correction": "CI actor selection is identity-agnostic: choose the active Auth-linked member with the strongest effective scope/role signal; no person name/email is encoded.",
       "followup": "Current tenant has no selectable emailVerified manager for CI proof. Runtime proof may use an active non-disabled manager via Firebase custom token only; public login remains independently fail-closed on emailVerified=true."
     }
   ],
@@ -38,7 +38,8 @@
     "Data mutation remains forbidden for this code-only operational closure candidate.",
     "I6.5 receipt/portfolio deterministic writes are not repeated.",
     "CI custom-token proof may select an active non-disabled manager even if email is unverified only to exercise runtime; it must never alter the product login requirement or claim email verification.",
-    "Public login source contract must continue to reject rawUser.emailVerified!==true and ACCOUNT_NOT_READY."
+    "Public login source contract must continue to reject rawUser.emailVerified!==true and ACCOUNT_NOT_READY.",
+    "CI proof actor selection is based on effective membership scope and Auth linkage, not a required textual manager label."
   ],
-  "nextStep": "RERUN_BOUNDED_OPERATIONAL_CLOSURE_WITH_NON_HARDCODED_CI_ACTOR"
+  "nextStep": "RERUN_BOUNDED_OPERATIONAL_CLOSURE_WITH_EFFECTIVE_SCOPE_ACTOR"
 }

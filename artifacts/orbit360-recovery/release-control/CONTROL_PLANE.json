@@ -1771,7 +1771,7 @@
   },
   "i65ReleaseMechanismAntiDesync": {
     "path": "artifacts/orbit360-recovery/release-control/I6_RELEASE_MECHANISM_ANTI_DESYNC_LOCK_20260918.json",
-    "blobSha": "d7e0a43aad5ea749b0ab71c6acc69d1abd625c09",
+    "blobSha": "311477092f233a22c55b7d2595f33ca62c9ba3c4",
     "status": "FROZEN_ACTIVE",
     "duplicateJobIdsResolved": true,
     "previewReferenceCheckResolved": true,
@@ -1780,6 +1780,7 @@
     "dataMutationAuthorized": false,
     "deterministicApplyRepeatAuthorized": false,
     "ciActorMayUseUnverifiedActiveManager": true,
-    "publicLoginStillRequiresEmailVerified": true
+    "publicLoginStillRequiresEmailVerified": true,
+    "proofActorSelection": "ACTIVE_AUTH_LINKED_EFFECTIVE_SCOPE_NO_PERSON_HARDCODE"
   }
 }
