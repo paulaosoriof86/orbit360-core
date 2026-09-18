@@ -159,6 +159,8 @@ try{
   await page.waitForFunction(cid=>Orbit?.route?.key==='cliente360'&&!!Orbit.store?.get?.('clientes',cid),rel.cid,{timeout:12000});
   ev.relations={clientPolicyRelation:true};
 
+  if(pageErrors.length) console.error('I63_PAGE_ERRORS='+JSON.stringify(pageErrors.slice(0,10)));
+  if(http404.length) console.error('I63_HTTP404='+JSON.stringify(http404.slice(0,10)));
   need(pageErrors.length===0,'I63_PROOF_PAGE_ERRORS');
   need(http404.length===0,'I63_PROOF_HTTP404');
   ev.ui.pageErrors=0;ev.ui.http404=0;ev.status='PASS';
