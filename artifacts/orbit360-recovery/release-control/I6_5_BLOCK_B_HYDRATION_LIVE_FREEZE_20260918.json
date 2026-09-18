@@ -1,0 +1,27 @@
+{
+  "schema": "GRAVICENTRA_I6_5_BLOCK_B_HYDRATION_LIVE_FREEZE_V1",
+  "status": "LIVE_PASS",
+  "date": "2026-09-18",
+  "gate": "I6.5",
+  "block": "B_READ_PATH_COMPOSITION_RECIBOS_CARTERA",
+  "sourceSha": "63a837194988d3f3e9c758f5bf411c1da9a7c50a",
+  "buildId": "gi-i65-63a837194988-57f234755dc1",
+  "artifactId": 10565330652,
+  "runId": 35389248840,
+  "rootCause": "recibosEsperados/carteraPrimas/vehiculos were deferred optional product hydration while Cliente360/Polizas depended on them; V920 could become visually ready before those snapshots attached/server-confirmed.",
+  "fix": "Promote vehiculos, recibosEsperados and carteraPrimas to required startup hydration and make I6.5 proof compare runtime counts against direct canonical Firestore counts.",
+  "hydrationContractVersion": "fase-a-i2-20260918.4-receipts-portfolio-required",
+  "receiptCount": 1294,
+  "portfolioCount": 673,
+  "directReceiptCount": 1294,
+  "directPortfolioCount": 673,
+  "serverConfirmedRequiredCollections": [
+    "vehiculos",
+    "recibosEsperados",
+    "carteraPrimas"
+  ],
+  "i64SentinelsPreserved": true,
+  "operationalWrites": 0,
+  "dataWrites": 0,
+  "nextMaterialCursor": "DETERMINISTIC_DIFF"
+}

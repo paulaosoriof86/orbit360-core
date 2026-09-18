@@ -195,6 +195,16 @@
         "portfolioPolicyMissing": 0,
         "portfolioReceiptMissing": 0
       }
+    },
+    "hydrationCodeDefect": {
+      "status": "I6_5_HYDRATION_CODE_DEFECT_SUCCESSOR_LIVE_PASS",
+      "runId": 35389248840,
+      "sourceSha": "63a837194988d3f3e9c758f5bf411c1da9a7c50a",
+      "buildId": "gi-i65-63a837194988-57f234755dc1",
+      "artifactId": 10565330652,
+      "operationalWrites": 0,
+      "receiptCount": 1294,
+      "portfolioCount": 673
     }
   },
   "repinVerification20260918": {

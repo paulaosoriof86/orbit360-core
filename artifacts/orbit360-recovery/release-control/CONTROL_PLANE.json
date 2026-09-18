@@ -22,7 +22,7 @@
     "capabilityCount": 15,
     "mayGovernGate": false,
     "mayGovernReleaseIdentity": false,
-    "latestBlobSha": "1f13fee4143b69a0f625fb157f35cd6f8ed5f02b"
+    "latestBlobSha": "263a9a4073405cb7202f880a57edb69dc2b8420b"
   },
   "projectSources": {
     "activePackage": "GRAVICENTRA_PROJECT_SOURCES_EVERGREEN_V5",
@@ -128,30 +128,30 @@
     "iterationsRemaining": []
   },
   "certifiedCandidate": {
-    "sourceSha": "ccd014bc52238991b92bbff3c2aac7a71aac71ab",
-    "sourceTree": "bdc9ad285879dc3959919eddc085706a3a4de17f",
-    "i3RunId": 35379229395,
+    "sourceSha": "63a837194988d3f3e9c758f5bf411c1da9a7c50a",
+    "sourceTree": "d8c77f0b99fcfd3453b305377f1c8e8cf861cd1d",
+    "i3RunId": 35389248840,
     "i3Conclusion": "success",
-    "runnerCommit": "ccd014bc52238991b92bbff3c2aac7a71aac71ab",
-    "buildId": "gi-i65-ccd014bc5223-57f234755dc1",
-    "artifactId": 10561387342,
-    "artifactName": "gravicentra-i6-5-sync-code-defect-build-35379229395",
-    "artifactArchiveDigest": "fbd599e0e84459cc4abfc8513a7d3889bf51585f78e6c9856ddc0e372c04d852",
-    "previewChannelId": "gi-i65-35376440434",
-    "previewUrl": "https://ays-orbit-360-lab--gi-i65-35376440434-yyalztwi.web.app",
+    "runnerCommit": "63a837194988d3f3e9c758f5bf411c1da9a7c50a",
+    "buildId": "gi-i65-63a837194988-57f234755dc1",
+    "artifactId": 10565330652,
+    "artifactName": "gravicentra-i6-5-hydration-code-defect-build-35389248840",
+    "artifactArchiveDigest": "e491d6662aee914772d88f74c5ee22452fe2b1637ecc99adf30cf1e4ceb3c87c",
+    "previewChannelId": "gi-i3-34545182877",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i3-34545182877-03clhzs0.web.app",
     "hostedFileCount": 203,
-    "hostedPayloadDigest": "7acbafd21e6cb5c709f7f38e44764a23ce54ea815df1c282a26c29b4dd9b8b76",
+    "hostedPayloadDigest": "26b2299c2d48a7a679afb7fa226c98e50c87b1db5162d138a71b8aaad388fa3e",
     "backendFileCount": 17,
     "backendSourceDigest": "b317ee5d6c7346bdb0abfa6bb71b5f246cd7647ed7272551065c2053f497f805",
     "bundleFileCount": 222,
-    "bundleDigest": "e609a77211da9a7232c3201a43d657fcda2b38ab001561ea587a02fd93bad4f4",
+    "bundleDigest": "036915a0f338458b1430db3a6a959a22374a552d68a23abcb8a6bf754a1e227d",
     "readbackExact": true,
     "readbackFileCount": 203,
     "sameFrontendArtifactPreviewToProductionRequired": true,
     "sameBackendSourcePackageRequiredForI5": false,
     "sourceMutatedAfterBuild": false,
     "productionUrl": "https://ays-orbit-360-lab.web.app",
-    "promotedLiveRunId": 35379229395
+    "promotedLiveRunId": 35389248840
   },
   "supersededCertifiedCandidate": {
     "sourceSha": "73674c5f0a0b28ed5b0df65e0c6e182345851375",
@@ -404,7 +404,7 @@
     "authorizedAt": "2026-09-14T08:57:00-06:00",
     "authorizationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_EXPLICIT_AUTHORIZATION_RECEIPT_20260914.json",
     "activeSubgate": "I6.5",
-    "productMutationAuthorized": true,
+    "productMutationAuthorized": false,
     "sourceDataApplyAuthorized": false,
     "perBlockApplyRequiresExplicitAuthorization": false,
     "dataUpdateMode": "EVERGREEN_V5_DELTA_FIRST",
@@ -413,9 +413,9 @@
     "executionDisciplinePath": "artifacts/orbit360-recovery/release-control/I6_DATA_UPDATE_EXECUTION_DISCIPLINE_LOCK_20260917.json",
     "executionDisciplineBlobSha": "7af17759086da336dbf755d72ad85692f892b71b",
     "mechanismRegistryPath": "artifacts/orbit360-recovery/release-control/DATA_UPDATE_MECHANISM_REGISTRY.json",
-    "mechanismRegistryBlobSha": "180a839332b1c0c9705d7b284ae8cf59f65fa0b0",
+    "mechanismRegistryBlobSha": "bd3fe3e12a7e5f1360c6f3a4a339bfc9d9296796",
     "activeSourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_5_RECIBOS_CARTERA_SOURCE_INTAKE_20260918.json",
-    "activeSourceIntakeBlobSha": "db6db64604a936b0c12d31a5b8b943d25bad0c37",
+    "activeSourceIntakeBlobSha": "3f8ced7e1a123ec1cafb6a72a146dc16c9340b44",
     "activeModule": "RECIBOS_CARTERA",
     "activeModuleStatus": "LIVE_READBACK_PASS",
     "i6_0": {
@@ -579,7 +579,8 @@
           "portfolioPolicyMissing": 0,
           "portfolioReceiptMissing": 0
         }
-      }
+      },
+      "hydrationCodeDefectStatus": "I6_5_HYDRATION_CODE_DEFECT_SUCCESSOR_LIVE_PASS"
     }
   },
   "postproductionDataUpdateControl": {
@@ -590,10 +591,10 @@
     "executionDisciplinePath": "artifacts/orbit360-recovery/release-control/I6_DATA_UPDATE_EXECUTION_DISCIPLINE_LOCK_20260917.json",
     "executionDisciplineBlobSha": "7af17759086da336dbf755d72ad85692f892b71b",
     "mechanismRegistryPath": "artifacts/orbit360-recovery/release-control/DATA_UPDATE_MECHANISM_REGISTRY.json",
-    "mechanismRegistryBlobSha": "180a839332b1c0c9705d7b284ae8cf59f65fa0b0",
+    "mechanismRegistryBlobSha": "bd3fe3e12a7e5f1360c6f3a4a339bfc9d9296796",
     "activeModule": "RECIBOS_CARTERA",
     "activeSourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_5_RECIBOS_CARTERA_SOURCE_INTAKE_20260918.json",
-    "activeSourceIntakeBlobSha": "db6db64604a936b0c12d31a5b8b943d25bad0c37",
+    "activeSourceIntakeBlobSha": "3f8ced7e1a123ec1cafb6a72a146dc16c9340b44",
     "sourceSha256": "f445e2f4a20b9eb7a526bda8896472dab9e7ac4617b3c5d8124a939a0dee0e6a",
     "conversationAsAuthority": false,
     "requestCurrentSourceBeforeEveryNewModule": true,
@@ -679,7 +680,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_HYDRATION_CODE_DEFECT_SUCCESSOR_RELEASE",
+  "nextAction": "I6_5_DETERMINISTIC_DIFF",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -1315,17 +1316,18 @@
     "path": "artifacts/orbit360-recovery/release-control/I6_5_MINI_CIERRE_OPERATIVO_DECISION_LOCK_20260918.json",
     "frozenAtHead": "bb940461f1ec39469d1778bd2f9d875573ad300f",
     "blockAStatus": "OPEN_BUT_MUST_NOT_CONTAMINATE_I65_BASELINE",
-    "blockBStatus": "HYDRATION_CODE_DEFECT_CANDIDATE_PENDING_BUILD",
-    "blockCStatus": "BLOCKED_ON_BLOCK_B_HYDRATION_LIVE_PASS",
+    "blockBStatus": "READ_PATH_HYDRATION_LIVE_PASS",
+    "blockCStatus": "READY_FOR_DETERMINISTIC_DIFF",
     "blockDStatus": "PENDING_REUSE_ONLY",
     "cobrosWritesDuringI65": false,
-    "nextMaterialCursor": "HYDRATION_CODE_DEFECT_SUCCESSOR_RELEASE",
+    "nextMaterialCursor": "DETERMINISTIC_DIFF",
     "blobSha": "2d2f1680fd3953a7c63f0619b938e16126e1a628",
     "conversationDependent": false,
-    "structuralPlanImmutable": true
+    "structuralPlanImmutable": true,
+    "blockBFreezePath": "artifacts/orbit360-recovery/release-control/I6_5_BLOCK_B_HYDRATION_LIVE_FREEZE_20260918.json"
   },
   "i65HydrationDefect": {
-    "status": "I6_5_HYDRATION_CODE_DEFECT_CANDIDATE_PENDING_BUILD",
+    "status": "I6_5_HYDRATION_CODE_DEFECT_SUCCESSOR_LIVE_PASS",
     "classification": "CODE_DEFECT",
     "detectedAfterDirectLiveReadback": true,
     "evidence": {
@@ -1358,7 +1360,7 @@
     "reimportAuthorized": false,
     "productMutationAuthorized": true,
     "diagnosticTool": "tools/gravicentra-i6-5-hydration-diagnostic.mjs",
-    "nextRequiredStep": "I6_5_HYDRATION_CODE_DEFECT_SUCCESSOR_RELEASE",
+    "nextRequiredStep": "I6_5_DETERMINISTIC_DIFF",
     "diagnosticRunId": 35385483059,
     "diagnosticArtifactId": 10563647769,
     "diagnosticArtifactDigest": "94c7bdc444eb5573317eea2f8907a641c2033f788206f5ab02e89fe6508f8581",
@@ -1509,7 +1511,34 @@
       "carteraPrimas"
     ],
     "proofMustCompareRuntimeToDirectCanonical": true,
-    "rootCauseFreezePath": "artifacts/orbit360-recovery/release-control/I6_5_BLOCK_B_HYDRATION_ROOT_CAUSE_FREEZE_20260918.json"
+    "rootCauseFreezePath": "artifacts/orbit360-recovery/release-control/I6_5_BLOCK_B_HYDRATION_ROOT_CAUSE_FREEZE_20260918.json",
+    "sourceSha": "63a837194988d3f3e9c758f5bf411c1da9a7c50a",
+    "sourceTree": "d8c77f0b99fcfd3453b305377f1c8e8cf861cd1d",
+    "buildId": "gi-i65-63a837194988-57f234755dc1",
+    "artifactId": 10565330652,
+    "artifactDigest": "e491d6662aee914772d88f74c5ee22452fe2b1637ecc99adf30cf1e4ceb3c87c",
+    "previewChannelId": "gi-i3-34545182877",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i3-34545182877-03clhzs0.web.app",
+    "liveRunId": 35389248840,
+    "productionUrl": "https://ays-orbit-360-lab.web.app",
+    "productionReadbackExact": true,
+    "functionalPass": true,
+    "hydrationContractVersion": "fase-a-i2-20260918.4-receipts-portfolio-required",
+    "receiptCount": 1294,
+    "portfolioCount": 673,
+    "directReceiptCount": 1294,
+    "directPortfolioCount": 673,
+    "canonicalOwner": "receiptsPortfolioProjectionV920",
+    "serverConfirmedRequiredCollections": [
+      "vehiculos",
+      "recibosEsperados",
+      "carteraPrimas"
+    ],
+    "rollbackChannelId": "gi-i65-35376440434",
+    "liveEvidenceArtifactId": 10564969691,
+    "liveEvidenceArtifactDigest": "5f3fc473e00c01cd4f859511593358e1f5865078b29a995b93d1c12b5a35837d",
+    "operationalWrites": 0,
+    "acceptanceReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_BLOCK_B_HYDRATION_LIVE_FREEZE_20260918.json"
   },
   "i65ContinuityAntiDrift": {
     "path": "artifacts/orbit360-recovery/release-control/I6_5_CONTINUITY_ANTI_DRIFT_LOCK_20260918.json",
@@ -1528,5 +1557,31 @@
       "sourcePrecedence",
       "invariants"
     ]
+  },
+  "preI65HydrationCertifiedCandidate": {
+    "sourceSha": "ccd014bc52238991b92bbff3c2aac7a71aac71ab",
+    "sourceTree": "bdc9ad285879dc3959919eddc085706a3a4de17f",
+    "i3RunId": 35379229395,
+    "i3Conclusion": "success",
+    "runnerCommit": "ccd014bc52238991b92bbff3c2aac7a71aac71ab",
+    "buildId": "gi-i65-ccd014bc5223-57f234755dc1",
+    "artifactId": 10561387342,
+    "artifactName": "gravicentra-i6-5-sync-code-defect-build-35379229395",
+    "artifactArchiveDigest": "fbd599e0e84459cc4abfc8513a7d3889bf51585f78e6c9856ddc0e372c04d852",
+    "previewChannelId": "gi-i65-35376440434",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-35376440434-yyalztwi.web.app",
+    "hostedFileCount": 203,
+    "hostedPayloadDigest": "7acbafd21e6cb5c709f7f38e44764a23ce54ea815df1c282a26c29b4dd9b8b76",
+    "backendFileCount": 17,
+    "backendSourceDigest": "b317ee5d6c7346bdb0abfa6bb71b5f246cd7647ed7272551065c2053f497f805",
+    "bundleFileCount": 222,
+    "bundleDigest": "e609a77211da9a7232c3201a43d657fcda2b38ab001561ea587a02fd93bad4f4",
+    "readbackExact": true,
+    "readbackFileCount": 203,
+    "sameFrontendArtifactPreviewToProductionRequired": true,
+    "sameBackendSourcePackageRequiredForI5": false,
+    "sourceMutatedAfterBuild": false,
+    "productionUrl": "https://ays-orbit-360-lab.web.app",
+    "promotedLiveRunId": 35379229395
   }
 }

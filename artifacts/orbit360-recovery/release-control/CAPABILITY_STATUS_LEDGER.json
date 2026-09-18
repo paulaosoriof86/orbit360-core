@@ -11,11 +11,11 @@
   "previousLedgerBlobSha": "09c98a60b3221da29931ea32611fcf528c7f8af7",
   "previousLedgerEvidencePreservedByGitHistory": true,
   "releaseBinding": {
-    "sourceSha": "ccd014bc52238991b92bbff3c2aac7a71aac71ab",
-    "buildId": "gi-i65-ccd014bc5223-57f234755dc1",
-    "artifactId": 10561387342,
-    "artifactArchiveDigest": "fbd599e0e84459cc4abfc8513a7d3889bf51585f78e6c9856ddc0e372c04d852",
-    "previewChannelId": "gi-i65-35376440434"
+    "sourceSha": "63a837194988d3f3e9c758f5bf411c1da9a7c50a",
+    "buildId": "gi-i65-63a837194988-57f234755dc1",
+    "artifactId": 10565330652,
+    "artifactArchiveDigest": "e491d6662aee914772d88f74c5ee22452fe2b1637ecc99adf30cf1e4ceb3c87c",
+    "previewChannelId": "gi-i3-34545182877"
   },
   "successorCandidate": {
     "sourceSha": "03b03690b5583442dd448e954fb66c3c78648fb3",
@@ -663,6 +663,24 @@
     "canonicalOwner": "receiptsPortfolioProjectionV920",
     "receiptCount": 0,
     "portfolioCount": 0,
+    "i64SentinelsPreserved": true,
+    "operationalWrites": 0
+  },
+  "i65HydrationAcceptance": {
+    "status": "I6_5_HYDRATION_CODE_DEFECT_SUCCESSOR_LIVE_PASS",
+    "sourceSha": "63a837194988d3f3e9c758f5bf411c1da9a7c50a",
+    "buildId": "gi-i65-63a837194988-57f234755dc1",
+    "artifactId": 10565330652,
+    "liveRunId": 35389248840,
+    "hydrationContractVersion": "fase-a-i2-20260918.4-receipts-portfolio-required",
+    "canonicalOwner": "receiptsPortfolioProjectionV920",
+    "receiptCount": 1294,
+    "portfolioCount": 673,
+    "serverConfirmedRequiredCollections": [
+      "vehiculos",
+      "recibosEsperados",
+      "carteraPrimas"
+    ],
     "i64SentinelsPreserved": true,
     "operationalWrites": 0
   }

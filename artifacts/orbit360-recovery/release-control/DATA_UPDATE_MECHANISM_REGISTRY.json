@@ -201,6 +201,20 @@
           }
         },
         "writes": 0
+      },
+      "hydrationCodeDefectStatus": "I6_5_HYDRATION_CODE_DEFECT_SUCCESSOR_LIVE_PASS",
+      "liveHydration": {
+        "runId": 35389248840,
+        "sourceSha": "63a837194988d3f3e9c758f5bf411c1da9a7c50a",
+        "buildId": "gi-i65-63a837194988-57f234755dc1",
+        "receiptCount": 1294,
+        "portfolioCount": 673,
+        "requiredServerConfirmed": [
+          "vehiculos",
+          "recibosEsperados",
+          "carteraPrimas"
+        ],
+        "writes": 0
       }
     },
     "COBROS_CONCILIACION": {
