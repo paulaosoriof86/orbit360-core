@@ -13,6 +13,7 @@ on:
       - 'tools/gravicentra-i6-3-clientes-postwrite-functional.mjs'
       - 'tools/gravicentra-i6-3-client-name-case.mjs'
       - 'tools/gravicentra-i6-3-contact-sample-readonly.mjs'
+      - 'tools/gravicentra-i6-3-client-completeness-audit.mjs'
       - 'orbit360-platform/core/tenant-access-policy-contract-p0.js'
       - 'orbit360-platform/core/access-scope.js'
       - 'orbit360-platform/modules/cliente360.js'
@@ -415,3 +416,48 @@ jobs:
           set -euo pipefail
           npx --yes firebase-tools@14.10.1 hosting:clone "$HOSTING_SITE:${{ steps.promote.outputs.rollback_channel }}" "$HOSTING_SITE:live" --project "$PROJECT_ID" --non-interactive
           echo I63_AUTOMATIC_ROLLBACK=PASS
+
+
+  i63-readonly-completeness-audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      CONTROL: artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Resolve audit applicability
+        id: applicability
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('node:fs'),c=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8'));
+          const ok=c.gateState?.gates?.I6?.activeSubgate==='I6.3' && ['I6_3_USER_VISUAL_REFRESH_CHECK','I6_3_CODE_DEFECT_SUCCESSOR_RELEASE'].includes(c.nextAction);
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(ok?'true':'false')+'\n');
+          console.log('I63_AUDIT_APPLICABLE='+(ok?'true':'false'));
+          NODE
+      - name: Install audit dependency
+        if: steps.applicability.outputs.run == 'true'
+        run: npm install --no-save --package-lock=false firebase-admin@13.4.0 >/dev/null
+      - name: Run full I6.3 read-only completeness audit
+        if: steps.applicability.outputs.run == 'true'
+        env:
+          I63_COMPLETENESS_AUDIT_FILE: ${{ runner.temp }}/i63-client-completeness-audit.json
+        run: node tools/gravicentra-i6-3-client-completeness-audit.mjs
+      - name: Upload I6.3 completeness audit
+        if: steps.applicability.outputs.run == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i6-3-completeness-audit-${{ github.run_id }}
+          path: ${{ runner.temp }}/i63-client-completeness-audit.json
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 7
