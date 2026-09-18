@@ -1049,13 +1049,14 @@
     ],
     "detailGuardScopeAuthorizedByPaula": true,
     "detailGuardScopeAuthorizedAt": "2026-09-18T09:28:00-06:00",
-    "latestFailedPreviewRunId": 35360790960,
-    "latestFailedPreviewBuildId": "gi-i64-8393106ff9aa-57f234755dc1",
-    "latestFailedPreviewUrl": "https://ays-orbit-360-lab--gi-i64-35360790960-jug2xhfx.web.app",
-    "latestFailedPreviewHostedPayloadDigest": "9b7834ecc4a0d336e3386672a2b22711f87fe3135aea13fb4e7836bf9dfafe6d",
+    "latestFailedPreviewRunId": 35363107801,
+    "latestFailedPreviewBuildId": "gi-i64-30981d1817fd-57f234755dc1",
+    "latestFailedPreviewUrl": "https://ays-orbit-360-lab--gi-i64-35363107801-g8if3hc5.web.app",
+    "latestFailedPreviewHostedPayloadDigest": "830ed78759b20a15f91dd58f48bd43f0df675887a0404cddff9660d8375015f5",
     "latestFailedPreviewReadbackExact": true,
-    "latestFailedPreviewAssertion": "I64_RENEWABILITY_UNKNOWN_DISPLAY_FULLPAGE_OWNER",
+    "latestFailedPreviewAssertion": "I64_RENEWABILITY_UNKNOWN_DISPLAY",
     "latestFailedPreviewPromotedToLive": false,
-    "latestFailedPreviewOperationalWrites": 0
+    "latestFailedPreviewOperationalWrites": 0,
+    "latestFailedPreviewDiagnosis": "QA assertion inspected whole full-page text; source review proves the canonical field uses tri-state helper. Proof tightened to the exact Renovación label/value pair; no runtime self-patch."
   }
 }
