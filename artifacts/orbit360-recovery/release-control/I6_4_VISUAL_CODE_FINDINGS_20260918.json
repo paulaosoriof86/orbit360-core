@@ -165,6 +165,12 @@
     "staticIndexAssetVersions": true,
     "generatedBuildBoundAssetUrls": false,
     "pwaDeployedBuildFreshnessFence": false,
-    "requiredFix": "BUILD_ID_BINDING_PLUS_NON_BLOCKING_FRESHNESS_FENCE"
+    "requiredFix": "BUILD_ID_BINDING_PLUS_NON_BLOCKING_FRESHNESS_FENCE",
+    "latestFailedPreviewRunId": 35367984640,
+    "latestFailedPreviewAssertion": "I64_BUILD_ASSET_BINDING_DYNAMIC_RUNTIME_ASSETS",
+    "previewReadbackExact": true,
+    "promotedToLive": false,
+    "operationalWrites": 0,
+    "proofCorrection": "Assert immutable build binding on generated index-declared JS/CSS resources. Dynamically injected optional importer scripts are tracked separately and do not substitute the entrypoint proof."
   }
 }

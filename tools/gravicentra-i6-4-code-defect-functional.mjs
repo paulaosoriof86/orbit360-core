@@ -32,12 +32,17 @@ try{
   await activate(page,auth,actor);
   const marker=await page.evaluate(()=>({source:window.__ORBIT360_PRODUCT_PUBLIC_CONFIG__?.sourceSha||'',build:window.__ORBIT360_PRODUCT_PUBLIC_CONFIG__?.buildId||''}));
   need(marker.source===EXPECTED_SOURCE&&marker.build===EXPECTED_BUILD,'I64_PROOF_RELEASE_MARKER');
-  const assetBinding=await page.evaluate(expected=>{
-    const rows=[...document.querySelectorAll('script[src],link[rel="stylesheet"][href]')].map(el=>{
-      const raw=el.src||el.href||'',u=new URL(raw,location.href);
+  const assetBinding=await page.evaluate(async expected=>{
+    const response=await fetch('/index.html?i64asset='+Date.now(),{cache:'no-store',headers:{'Cache-Control':'no-cache, no-store','Pragma':'no-cache'}});
+    const html=await response.text(),doc=new DOMParser().parseFromString(html,'text/html');
+    const rows=[...doc.querySelectorAll('script[src],link[rel="stylesheet"][href]')].map(el=>{
+      const raw=el.getAttribute('src')||el.getAttribute('href')||'',u=new URL(raw,location.href);
       return{path:u.pathname,local:u.origin===location.origin,bound:u.searchParams.get('orbitBuild')===expected};
     }).filter(x=>x.local&&/\.(?:js|css)$/i.test(x.path));
-    return{count:rows.length,unbound:rows.filter(x=>!x.bound).map(x=>x.path)};
+    const dynamicUnbound=[...document.querySelectorAll('script[src],link[rel="stylesheet"][href]')].map(el=>{
+      const raw=el.src||el.href||'',u=new URL(raw,location.href);return{path:u.pathname,local:u.origin===location.origin,bound:u.searchParams.get('orbitBuild')===expected};
+    }).filter(x=>x.local&&/\.(?:js|css)$/i.test(x.path)&&!x.bound).map(x=>x.path);
+    return{count:rows.length,unbound:rows.filter(x=>!x.bound).map(x=>x.path),dynamicUnbound};
   },EXPECTED_BUILD);
   need(assetBinding.count>=10&&assetBinding.unbound.length===0,'I64_BUILD_ASSET_BINDING:'+JSON.stringify(assetBinding.unbound.slice(0,8)));
   await page.waitForFunction(()=>!!window.Orbit?.pwa?.checkBuildFreshness,null,{timeout:6000});
