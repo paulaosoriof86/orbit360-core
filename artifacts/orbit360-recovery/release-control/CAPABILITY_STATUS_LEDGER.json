@@ -11,11 +11,11 @@
   "previousLedgerBlobSha": "09c98a60b3221da29931ea32611fcf528c7f8af7",
   "previousLedgerEvidencePreservedByGitHistory": true,
   "releaseBinding": {
-    "sourceSha": "8bf2642d767e86718b559e1a3d2bdb178d34eacd",
-    "buildId": "gi-i64-8bf2642d767e-57f234755dc1",
-    "artifactId": 10555384684,
-    "artifactArchiveDigest": "d33b1947830f6f28891c3566b0bde78c8996ebe88cd4d1775ba6ab5d54b28693",
-    "previewChannelId": "gi-i64-35364888190"
+    "sourceSha": "8838aa98abf8573064f8e160389cf6f1c554bdc1",
+    "buildId": "gi-i64-8838aa98abf8-57f234755dc1",
+    "artifactId": 10556619616,
+    "artifactArchiveDigest": "0304499ac6b70f57116752a908ab438ba156ffde05afa271f9bd2939d23dfc0f",
+    "previewChannelId": "gi-i64-35368653501"
   },
   "successorCandidate": {
     "sourceSha": "03b03690b5583442dd448e954fb66c3c78648fb3",
@@ -527,6 +527,12 @@
             "artifactId": 10555384684,
             "artifactDigest": "d33b1947830f6f28891c3566b0bde78c8996ebe88cd4d1775ba6ab5d54b28693",
             "evidence": "I6.4 causal successor technical LIVE proof: policy KPIs separated by currency, temporal 45-day renewals, complete historical/no-portfolio semantics, and tri-state renewability display. Paula visual acceptance pending."
+          },
+          {
+            "runId": 35368653501,
+            "artifactId": 10556619616,
+            "artifactDigest": "0304499ac6b70f57116752a908ab438ba156ffde05afa271f9bd2939d23dfc0f",
+            "evidence": "I6.4 causal successor technical LIVE proof: policy KPIs separated by currency, temporal 45-day renewals, complete historical/no-portfolio semantics, and tri-state renewability display. Paula visual acceptance pending."
           }
         ]
       }
@@ -617,10 +623,10 @@
   },
   "i64LiveAcceptance": {
     "status": "TECHNICAL_LIVE_PASS_PENDING_PAULA_VISUAL",
-    "sourceSha": "8bf2642d767e86718b559e1a3d2bdb178d34eacd",
-    "buildId": "gi-i64-8bf2642d767e-57f234755dc1",
-    "artifactId": 10555384684,
-    "liveRunId": 35364888190,
+    "sourceSha": "8838aa98abf8573064f8e160389cf6f1c554bdc1",
+    "buildId": "gi-i64-8838aa98abf8-57f234755dc1",
+    "artifactId": 10556619616,
+    "liveRunId": 35368653501,
     "policies": 1414,
     "kpis": [
       "PRIMA_NETA_VIGENTE_BY_CURRENCY",

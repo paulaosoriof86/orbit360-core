@@ -330,7 +330,7 @@
     "liveVisualConfirmed": false,
     "codeDefect": {
       "status": "TECHNICAL_LIVE_PASS_PENDING_PAULA_VISUAL",
-      "releaseRunId": 35364888190,
+      "releaseRunId": 35368653501,
       "policyCount": 1414,
       "kpiAmounts": {
         "GTQ": 627419,
