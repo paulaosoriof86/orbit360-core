@@ -679,7 +679,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_HYDRATION_DIAGNOSTIC",
+  "nextAction": "I6_5_HYDRATION_CODE_FIX",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -1314,14 +1314,14 @@
     "path": "artifacts/orbit360-recovery/release-control/I6_5_MINI_CIERRE_OPERATIVO_DECISION_LOCK_20260918.json",
     "frozenAtHead": "bb940461f1ec39469d1778bd2f9d875573ad300f",
     "blockAStatus": "OPEN_BUT_MUST_NOT_CONTAMINATE_I65_BASELINE",
-    "blockBStatus": "DIRECT_DATA_READBACK_PASS_UI_HYDRATION_GAP_CONFIRMED",
+    "blockBStatus": "HYDRATION_DIAGNOSTIC_PASS_CODE_FIX_PENDING",
     "blockCStatus": "BLOCKED_ON_BLOCK_B_HYDRATION_FIX",
     "blockDStatus": "PENDING_REUSE_ONLY",
     "cobrosWritesDuringI65": false,
-    "nextMaterialCursor": "HYDRATION_DIAGNOSTIC"
+    "nextMaterialCursor": "HYDRATION_CODE_FIX"
   },
   "i65HydrationDefect": {
-    "status": "I6_5_HYDRATION_DIAGNOSTIC_PENDING",
+    "status": "I6_5_HYDRATION_DIAGNOSTIC_PASS",
     "classification": "CODE_DEFECT",
     "detectedAfterDirectLiveReadback": true,
     "evidence": {
@@ -1354,6 +1354,133 @@
     "reimportAuthorized": false,
     "productMutationAuthorized": false,
     "diagnosticTool": "tools/gravicentra-i6-5-hydration-diagnostic.mjs",
-    "nextRequiredStep": "I6_5_HYDRATION_DIAGNOSTIC"
+    "nextRequiredStep": "I6_5_HYDRATION_CODE_FIX",
+    "diagnosticRunId": 35385483059,
+    "diagnosticArtifactId": 10563647769,
+    "diagnosticArtifactDigest": "94c7bdc444eb5573317eea2f8907a641c2033f788206f5ab02e89fe6508f8581",
+    "diagnosis": [
+      "SNAPSHOT_OR_QUERY_HYDRATION_ZERO_DESPITE_DIRECT_DATA"
+    ],
+    "directCounts": {
+      "recibosEsperados": 1294,
+      "carteraPrimas": 673
+    },
+    "runtimeSummary": {
+      "productUser": {
+        "roles": [
+          "AdminTenant",
+          "Asesor",
+          "Dirección",
+          "Operativo",
+          "SuperAdmin"
+        ],
+        "activeRole": "Dirección",
+        "defaultRole": "Dirección",
+        "countries": [
+          "CO",
+          "GT"
+        ],
+        "dataScopes": {
+          "default": "all",
+          "modules": {
+            "aseguradoras": "all",
+            "importar": "all"
+          }
+        }
+      },
+      "session": {
+        "active": "Dirección",
+        "assigned": [
+          "AdminTenant",
+          "Asesor",
+          "Dirección",
+          "Operativo",
+          "SuperAdmin"
+        ]
+      },
+      "receipts": {
+        "all": 0,
+        "whereTrue": 0,
+        "attached": false,
+        "serverConfirmed": false,
+        "denied": false,
+        "error": "",
+        "queryPlan": {
+          "ok": true,
+          "hardError": false,
+          "collection": "recibosEsperados",
+          "constraints": [
+            {
+              "field": "tenantId",
+              "op": "==",
+              "value": "alianzas-soluciones"
+            },
+            {
+              "field": "__relation_country__",
+              "op": "in",
+              "value": [
+                "CO",
+                "GT"
+              ]
+            }
+          ],
+          "errors": []
+        }
+      },
+      "portfolio": {
+        "all": 0,
+        "whereTrue": 0,
+        "attached": false,
+        "serverConfirmed": false,
+        "denied": false,
+        "error": "",
+        "queryPlan": {
+          "ok": true,
+          "hardError": false,
+          "collection": "carteraPrimas",
+          "constraints": [
+            {
+              "field": "tenantId",
+              "op": "==",
+              "value": "alianzas-soluciones"
+            },
+            {
+              "field": "__relation_country__",
+              "op": "in",
+              "value": [
+                "CO",
+                "GT"
+              ]
+            }
+          ],
+          "errors": []
+        }
+      },
+      "policies": {
+        "all": 1414,
+        "whereTrue": 1414
+      },
+      "owner": {
+        "version": "9.2.0-native-store",
+        "ownerRevision": "20260801-canonical-single-read-owner",
+        "tenantId": "alianzas-soluciones",
+        "readOnly": true,
+        "directFirestoreListeners": 0,
+        "parallelCache": false,
+        "storeOwner": "Orbit.store",
+        "counts": {
+          "recibosEsperados": 0,
+          "carteraPrimas": 0
+        },
+        "owners": {
+          "store": true,
+          "query": true,
+          "client": true,
+          "policies": true
+        },
+        "ready": true,
+        "errors": {}
+      }
+    }
   }
 }
