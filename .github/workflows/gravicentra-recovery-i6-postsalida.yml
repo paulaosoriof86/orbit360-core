@@ -2,6 +2,7 @@ name: Gravicentra I6 Post-Salida
 # I6.2 authoritative DATA_UPDATE executor — Evergreen V5.
 # Same approved operational write chain; encrypted ephemeral source bridge only.
 # Resume I6.2 after causal executor role-selector correction.
+# Resume I6.2 physical seal with the role harness aligned to the active contract.
 on:
   workflow_dispatch:
   push:
