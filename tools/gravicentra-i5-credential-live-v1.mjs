@@ -19,7 +19,7 @@ const clean=v=>String(v==null?'':v).trim();
 const need=(ok,code)=>{if(!ok)throw new Error(code);};
 const fail=(code,diagnostic)=>{const e=new Error(code);e.diagnostic=diagnostic||null;throw e;};
 const canon=v=>{const k=clean(v).toLowerCase().replace(/\s+/g,' ');return ({'dirección':'Dirección','direccion':'Dirección','director':'Dirección','superadmin':'SuperAdmin','super admin':'SuperAdmin','super_admin':'SuperAdmin','super-admin':'SuperAdmin','admin':'AdminTenant','administrador':'AdminTenant','admin tenant':'AdminTenant','admin_tenant':'AdminTenant','admintenant':'AdminTenant','operativo':'Operativo','operaciones':'Operativo','asesor':'Asesor'})[k]||clean(v);};
-const roles=m=>[...new Set((Array.isArray(m?.roles)?m.roles:Array.isArray(m?.rolesAsignados)?m.rolesAsignados:(m?.role||m?.rol?[m.role||m.rol]:[])).map(canon).filter(Boolean))];
+const roles=m=>[...new Set([].concat(m?.roles||[],m?.rolesAsignados||[],m?.assignedRoles||[],m?.rolesDisponibles||[]).map(canon).filter(Boolean))];
 const activeRole=(m,rs)=>canon(m?.activeRole||m?.rolActivo||m?.defaultRole||m?.rolDefault||m?.roleDefault||rs[0]);
 function serviceAccount(){for(const raw of [process.env.SA_DEFAULT,process.env.SA_ORBIT360_LAB,process.env.SA_ORBIT_360_LAB].filter(Boolean)){try{const x=JSON.parse(raw);if(x?.type==='service_account'&&x?.project_id===PROJECT&&x?.client_email&&x?.private_key)return x;}catch{}}throw new Error('I5_CREDENTIAL_SERVICE_ACCOUNT_UNAVAILABLE');}
 function telemetry(page){const t={console:[],page:[],req:[],http:[]};page.on('console',m=>{if(m.type()==='error')t.console.push(m.text().slice(0,240));});page.on('pageerror',e=>t.page.push(String(e?.message||e).slice(0,240)));page.on('requestfailed',q=>{try{if(new URL(q.url()).origin===new URL(URL).origin)t.req.push(q.url());}catch{}});page.on('response',q=>{try{if(new URL(q.url()).origin===new URL(URL).origin&&q.status()>=400)t.http.push({status:q.status(),url:q.url()});}catch{}});return t;}
@@ -45,7 +45,7 @@ async function probe(page,target){await route(page,'#/aseguradoras',()=>Orbit?.r
   return ev;
 }
 
-need(/^[0-9a-f]{40}$/.test(SOURCE),'SOURCE_SHA_INVALID');need(/^gi-i3-[0-9a-f]{12}-[0-9a-f]{12}$/.test(BUILD)&&BUILD.includes(SOURCE.slice(0,12)),'BUILD_ID_INVALID');need(/^https:\/\/[A-Za-z0-9._-]+\.web\.app$/.test(URL),'PRODUCTION_URL_INVALID');
+need(/^[0-9a-f]{40}$/.test(SOURCE),'SOURCE_SHA_INVALID');need(/^gi-i(?:3|61)-[0-9a-f]{12}-[0-9a-f]{12}$/.test(BUILD)&&BUILD.includes(SOURCE.slice(0,12)),'BUILD_ID_INVALID');need(/^https:\/\/[A-Za-z0-9._-]+\.web\.app$/.test(URL),'PRODUCTION_URL_INVALID');
 const sa=serviceAccount(),app=initializeApp({credential:cert(sa),projectId:PROJECT},'gravicentra-i5-credential-live'),auth=getAuth(app),db=getFirestore(app);
 const snap=await db.collection('tenants').doc(TENANT).collection('members').get(),listed=await auth.listUsers(1000),users=new Map(listed.users.map(u=>[u.uid,u])),pool=[];
 for(const doc of snap.docs){const m=doc.data()||{},uid=clean(m.uid||doc.id),u=users.get(uid);if(!u||u.disabled||u.emailVerified!==true||!['active','activo'].includes(clean(m.status||m.estado).toLowerCase()))continue;const rs=roles(m);pool.push({uid,roles:rs,active:activeRole(m,rs)});}
