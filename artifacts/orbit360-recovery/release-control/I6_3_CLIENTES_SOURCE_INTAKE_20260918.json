@@ -44,11 +44,14 @@
   },
   "execution": {
     "method": "DATA_UPDATE_DELTA_FIRST",
-    "cursorState": "SOURCE_PINNED",
+    "cursorState": "LIVE_READBACK_PASS",
     "writeApplied": false,
-    "readbackPassed": false,
+    "readbackPassed": true,
     "liveVisualConfirmed": false,
-    "nextRequiredStep": "LIVE_READBACK_CURRENT_STATE"
+    "nextRequiredStep": "DETERMINISTIC_DIFF",
+    "readbackRunId": 35306248860,
+    "readbackDocumentCount": 430,
+    "readbackWritesExecuted": 0
   },
   "guards": {
     "doNotCommitPIIWorkbook": true,

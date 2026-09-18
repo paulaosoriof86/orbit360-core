@@ -416,9 +416,9 @@
     "mechanismRegistryPath": "artifacts/orbit360-recovery/release-control/DATA_UPDATE_MECHANISM_REGISTRY.json",
     "mechanismRegistryBlobSha": "4f9c0d1726ea07aeb157018cc525dea87aa8c5de",
     "activeSourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_3_CLIENTES_SOURCE_INTAKE_20260918.json",
-    "activeSourceIntakeBlobSha": "6ed7c93161da270d83e7134a4acf134b9a58c83c",
+    "activeSourceIntakeBlobSha": "079259ad49c6867d01f7e8cd2df5a74aff8083b7",
     "activeModule": "CLIENTES",
-    "activeModuleStatus": "SOURCE_PINNED",
+    "activeModuleStatus": "LIVE_READBACK_PASS",
     "i6_0": {
       "status": "I6_0_BASELINE_FROZEN",
       "executorPath": ".github/workflows/gravicentra-material-baseline-freeze.yml",
@@ -455,15 +455,15 @@
     "mechanismRegistryBlobSha": "4f9c0d1726ea07aeb157018cc525dea87aa8c5de",
     "activeModule": "CLIENTES",
     "activeSourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_3_CLIENTES_SOURCE_INTAKE_20260918.json",
-    "activeSourceIntakeBlobSha": "6ed7c93161da270d83e7134a4acf134b9a58c83c",
+    "activeSourceIntakeBlobSha": "079259ad49c6867d01f7e8cd2df5a74aff8083b7",
     "sourceSha256": "4f0a1307605ad5dcc947355dbbc98a50b510358e5f6a9835b75d02e45f5a8c7c",
     "conversationAsAuthority": false,
     "requestCurrentSourceBeforeEveryNewModule": true,
     "liveVisualRefreshRequiredForClosure": true,
     "pureDataUpdateRequiresBuildOrDeploy": false,
     "reimportForVisibilityFailureForbidden": true,
-    "nextRequiredStep": "LIVE_READBACK_CURRENT_STATE",
-    "executionCursor": "SOURCE_PINNED"
+    "nextRequiredStep": "DETERMINISTIC_DIFF",
+    "executionCursor": "LIVE_READBACK_PASS"
   },
   "governanceSyncChecklist": {
     "frozenPlanMaterialized": true,
@@ -536,9 +536,10 @@
     "i62DirectoryLivePass": true,
     "i62TerminalReceiptMaterialized": true,
     "i6ModuleHandoffDisciplineMaterialized": true,
-    "i63CurrentSourcePinned": true
+    "i63CurrentSourcePinned": true,
+    "i63LiveReadbackPass": true
   },
-  "nextAction": "I6_3_LIVE_READBACK_CURRENT_STATE",
+  "nextAction": "I6_3_DETERMINISTIC_DIFF",
   "postproductionExitProgress": {
     "formalPercent": 30,
     "frozenMiniGates": 3,

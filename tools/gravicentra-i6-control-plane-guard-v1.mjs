@@ -127,13 +127,16 @@ if(waitingI63){
   need(git('hash-object',I62_RECEIPT)===seal.receiptBlobSha,'I6_2_RECEIPT_BLOB_DRIFT');
 }
 if(activeI63V5){
-  const p=C.postproductionExitProgress||{},seal=C.i6Execution?.i6_2||{};
+  const p=C.postproductionExitProgress||{},seal=C.i6Execution?.i6_2||{},cursor=SRC3.execution?.cursorState||'SOURCE_PINNED';
+  const nextByCursor={SOURCE_PINNED:'LIVE_READBACK_CURRENT_STATE',LIVE_READBACK_PASS:'DETERMINISTIC_DIFF',DETERMINISTIC_DIFF_READY:'APPLY_DETERMINISTIC_DELTA_ONLY',DETERMINISTIC_APPLY_DONE:'POST_WRITE_READBACK_AND_INTEGRITY',POST_WRITE_READBACK_INTEGRITY_PASS:'USER_VISUAL_REFRESH_CHECK',PENDING_USER_VISUAL:'USER_VISUAL_REFRESH_CHECK',LIVE_PASS:'NEXT_MODULE'};
+  const actionByCursor={SOURCE_PINNED:'I6_3_LIVE_READBACK_CURRENT_STATE',LIVE_READBACK_PASS:'I6_3_DETERMINISTIC_DIFF',DETERMINISTIC_DIFF_READY:'I6_3_APPLY_DETERMINISTIC_DELTA',DETERMINISTIC_APPLY_DONE:'I6_3_POST_WRITE_READBACK_INTEGRITY',POST_WRITE_READBACK_INTEGRITY_PASS:'I6_3_USER_VISUAL_REFRESH_CHECK',PENDING_USER_VISUAL:'I6_3_USER_VISUAL_REFRESH_CHECK',LIVE_PASS:'I6_4_REQUEST_CURRENT_SOURCE'};
   need(G.lastFormallyCompletedMiniGate==='I6.2'&&g.I6?.lastFrozenMiniGate==='I6.2','I6_3_LAST_MINIGATE_INVALID');
   need(p.formalPercent===30&&p.frozenMiniGates===3&&p.totalMiniGates===10&&p.lastFrozenMiniGate==='I6.2'&&p.activeMiniGate==='I6.3','I6_3_PROGRESS_INVALID');
-  need(C.nextAction==='I6_3_LIVE_READBACK_CURRENT_STATE','I6_3_NEXT_ACTION_INVALID');
-  need(C.i6Execution?.activeModule==='CLIENTES'&&C.i6Execution?.activeModuleStatus==='SOURCE_PINNED','I6_3_MODULE_STATE_INVALID');
-  need(C.postproductionDataUpdateControl?.activeModule==='CLIENTES'&&C.postproductionDataUpdateControl?.executionCursor==='SOURCE_PINNED'&&C.postproductionDataUpdateControl?.nextRequiredStep==='LIVE_READBACK_CURRENT_STATE','I6_3_CONTROL_CURSOR_INVALID');
-  need(SRC3.status==='PINNED_FOR_V5_DELTA'&&SRC3.module==='CLIENTES'&&SRC3.execution?.cursorState==='SOURCE_PINNED'&&SRC3.execution?.nextRequiredStep==='LIVE_READBACK_CURRENT_STATE','I6_3_SOURCE_CURSOR_INVALID');
+  need(Object.prototype.hasOwnProperty.call(nextByCursor,cursor),'I6_3_SOURCE_CURSOR_INVALID');
+  need(C.nextAction===actionByCursor[cursor],'I6_3_NEXT_ACTION_INVALID');
+  need(C.i6Execution?.activeModule==='CLIENTES','I6_3_MODULE_INVALID');
+  need(C.postproductionDataUpdateControl?.activeModule==='CLIENTES'&&C.postproductionDataUpdateControl?.executionCursor===cursor&&C.postproductionDataUpdateControl?.nextRequiredStep===nextByCursor[cursor],'I6_3_CONTROL_CURSOR_INVALID');
+  need(SRC3.status==='PINNED_FOR_V5_DELTA'&&SRC3.module==='CLIENTES'&&SRC3.execution?.nextRequiredStep===nextByCursor[cursor],'I6_3_SOURCE_STATE_INVALID');
   need(C.i6Execution?.activeSourceIntakePath===I63_SOURCE&&C.postproductionDataUpdateControl?.activeSourceIntakePath===I63_SOURCE,'I6_3_SOURCE_PATH_MISMATCH');
   need(git('hash-object',I63_SOURCE)===C.i6Execution?.activeSourceIntakeBlobSha&&git('hash-object',I63_SOURCE)===C.postproductionDataUpdateControl?.activeSourceIntakeBlobSha,'I6_3_SOURCE_BLOB_DRIFT');
   need(SRC3.source?.sha256===C.postproductionDataUpdateControl?.sourceSha256,'I6_3_SOURCE_SHA_MISMATCH');
