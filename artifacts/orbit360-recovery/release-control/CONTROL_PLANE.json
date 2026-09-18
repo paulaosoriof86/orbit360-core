@@ -404,7 +404,7 @@
     "authorizedAt": "2026-09-14T08:57:00-06:00",
     "authorizationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_EXPLICIT_AUTHORIZATION_RECEIPT_20260914.json",
     "activeSubgate": "I6.5",
-    "productMutationAuthorized": false,
+    "productMutationAuthorized": true,
     "sourceDataApplyAuthorized": false,
     "perBlockApplyRequiresExplicitAuthorization": false,
     "dataUpdateMode": "EVERGREEN_V5_DELTA_FIRST",
@@ -712,7 +712,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_USER_VISUAL_REFRESH_CHECK",
+  "nextAction": "I6_5_OPERATIONAL_CLOSURE_SUCCESSOR_RELEASE",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -1347,12 +1347,12 @@
     "status": "FROZEN_ACTIVE",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_MINI_CIERRE_OPERATIVO_DECISION_LOCK_20260918.json",
     "frozenAtHead": "bb940461f1ec39469d1778bd2f9d875573ad300f",
-    "blockAStatus": "OPEN_BUT_MUST_NOT_CONTAMINATE_I65_BASELINE",
+    "blockAStatus": "A1_EMAIL_VERIFICATION_PENDING_A2_A3_A4_CODE_FIX_CANDIDATE",
     "blockBStatus": "READ_PATH_HYDRATION_LIVE_PASS",
-    "blockCStatus": "TECHNICAL_PASS_PENDING_USER_VISUAL",
+    "blockCStatus": "TECHNICAL_PASS_VISUAL_COMPOSITION_FIX_PENDING",
     "blockDStatus": "PENDING_REUSE_ONLY",
     "cobrosWritesDuringI65": false,
-    "nextMaterialCursor": "USER_VISUAL_REFRESH_CHECK",
+    "nextMaterialCursor": "OPERATIONAL_CLOSURE_SUCCESSOR_RELEASE",
     "blobSha": "2d2f1680fd3953a7c63f0619b938e16126e1a628",
     "conversationDependent": false,
     "structuralPlanImmutable": true,
@@ -1716,5 +1716,38 @@
     "forbiddenCollectionsUnchanged": true,
     "relationshipErrors": 0,
     "rollbackExecuted": false
+  },
+  "i65OperationalClosureDefect": {
+    "status": "I6_5_OPERATIONAL_CLOSURE_CODE_DEFECT_CANDIDATE_PENDING_BUILD",
+    "classification": "CODE_DEFECT",
+    "scope": "I6_5_OPERATIONAL_CLOSURE_MINIFIX",
+    "previousCertifiedSourceSha": "63a837194988d3f3e9c758f5bf411c1da9a7c50a",
+    "previousCertifiedBuildId": "gi-i65-63a837194988-57f234755dc1",
+    "previousCertifiedArtifactId": 10565330652,
+    "parentCertifiedSourceSha": "63a837194988d3f3e9c758f5bf411c1da9a7c50a",
+    "allowedProductFiles": [
+      "orbit360-platform/core/policy-receipts-engine.js",
+      "orbit360-platform/modules/cliente360.js",
+      "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js",
+      "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+      "orbit360-platform/core/pwa.js",
+      "orbit360-platform/index.html"
+    ],
+    "expectedLiveCounts": {
+      "polizas": 1414,
+      "recibosEsperados": 1842,
+      "carteraPrimas": 1283,
+      "cobros": 5
+    },
+    "dataMutationAuthorized": false,
+    "reimportAuthorized": false,
+    "cobrosWritesAuthorized": false,
+    "sourceDataApplyAuthorized": false,
+    "productMutationAuthorized": true,
+    "nextRequiredStep": "I6_5_OPERATIONAL_CLOSURE_SUCCESSOR_RELEASE",
+    "users": {
+      "samuel": "PROVISIONED_ACTIVE_MEMBERSHIP_EMAIL_VERIFICATION_PENDING",
+      "carlos": "PROVISIONED_ACTIVE_MEMBERSHIP_EMAIL_VERIFICATION_PENDING"
+    }
   }
 }
