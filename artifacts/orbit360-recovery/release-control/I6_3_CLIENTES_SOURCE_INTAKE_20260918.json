@@ -123,14 +123,23 @@
       }
     },
     "nameCaseNormalization": {
-      "status": "AUTHORIZED_PENDING_APPLY",
+      "status": "APPLIED_READBACK_PASS",
       "scope": "TWELVE_I6_3_INSERTS_NAME_FIELD_ONLY",
       "targetCount": 12,
       "transform": "UPPERCASE_PRESERVE_CHARACTERS_AND_ACCENTS",
       "reimport": false,
       "deletes": 0,
       "otherFields": false,
-      "authorizedByPaulaAt": "2026-09-18T00:40:00-06:00"
+      "authorizedByPaulaAt": "2026-09-18T00:40:00-06:00",
+      "applyRunId": 35316614706,
+      "evidenceArtifactId": 10535322658,
+      "evidenceArtifactDigest": "sha256:f5de5f4064d06ab35224469f8b8dcb1ac49fc25fb44a4bbd7b240a4cdbae981a",
+      "targets": 12,
+      "writes": 2,
+      "alreadyUppercase": 10,
+      "backendCount": 442,
+      "readback": true,
+      "rollbackExecuted": false
     }
   },
   "guards": {

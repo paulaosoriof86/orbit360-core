@@ -30,7 +30,7 @@ function serviceAccount(){
   }
   throw new Error('I63_PROOF_SERVICE_ACCOUNT');
 }
-function rolesOf(m){return [...new Set([].concat(m?.roles||[],m?.rolesAsignados||[],m?.assignedRoles||[],m?.rolesDisponibles||[],m?.role||[],m?.rol||[],m?.rolDefault||[],m?.defaultRole||[]).map(clean).filter(Boolean))];}
+function rolesOf(m){return [...new Set([].concat(m?.roles||[],m?.rolesAsignados||[],m?.assignedRoles||[],m?.rolesDisponibles||[],m?.role||[],m?.rol||[],m?.rolDefault||[],m?.defaultRole||[]).map(v=>clean(v)).filter(Boolean))];}
 async function selectManager(db,auth){
   const snap=await db.collection('tenants').doc(TENANT).collection('members').get();
   for(const p of ['direccion','superadmin','super_admin','admintenant','admin_tenant','admin']){
