@@ -31,7 +31,20 @@ try{
   page.on('response',r=>{if(r.status()===404&&r.url().startsWith(TARGET))http404.push(new URL(r.url()).pathname);});
   await activate(page,auth,actor);
   const marker=await page.evaluate(()=>({source:window.__ORBIT360_PRODUCT_PUBLIC_CONFIG__?.sourceSha||'',build:window.__ORBIT360_PRODUCT_PUBLIC_CONFIG__?.buildId||''}));
-  need(marker.source===EXPECTED_SOURCE&&marker.build===EXPECTED_BUILD,'I64_PROOF_RELEASE_MARKER');ev.release=marker;
+  need(marker.source===EXPECTED_SOURCE&&marker.build===EXPECTED_BUILD,'I64_PROOF_RELEASE_MARKER');
+  const assetBinding=await page.evaluate(expected=>{
+    const rows=[...document.querySelectorAll('script[src],link[rel="stylesheet"][href]')].map(el=>{
+      const raw=el.src||el.href||'',u=new URL(raw,location.href);
+      return{path:u.pathname,local:u.origin===location.origin,bound:u.searchParams.get('orbitBuild')===expected};
+    }).filter(x=>x.local&&/\.(?:js|css)$/i.test(x.path));
+    return{count:rows.length,unbound:rows.filter(x=>!x.bound).map(x=>x.path)};
+  },EXPECTED_BUILD);
+  need(assetBinding.count>=10&&assetBinding.unbound.length===0,'I64_BUILD_ASSET_BINDING:'+JSON.stringify(assetBinding.unbound.slice(0,8)));
+  await page.waitForFunction(()=>!!window.Orbit?.pwa?.checkBuildFreshness,null,{timeout:6000});
+  await page.evaluate(()=>Orbit.pwa.checkBuildFreshness('qa'));
+  await page.waitForFunction(expected=>window.OrbitPwaBuildFreshness?.status==='current'&&window.OrbitPwaBuildFreshness?.serverBuild===expected,EXPECTED_BUILD,{timeout:10000});
+  const freshness=await page.evaluate(()=>({...window.OrbitPwaBuildFreshness}));
+  ev.release={...marker,assetBindingPass:true,assetBindingCount:assetBinding.count,buildFreshnessPass:true,buildFreshness:freshness};
   await page.evaluate(()=>{location.hash='#/polizas';});
   await page.waitForFunction(()=>Orbit?.route?.key==='polizas'&&[...document.querySelectorAll('.kpi-row .kpi .k-label')].some(x=>/prima neta vigente/i.test(x.textContent||'')),null,{timeout:22000});
   const result=await page.evaluate(()=>{
@@ -41,7 +54,9 @@ try{
     const totals=metrics.premiumByCurrency(all),rounded=Object.fromEntries(Object.entries(totals).map(([k,v])=>[k,Math.round(v)]));
     const renewalCount=all.filter(metrics.isRenewalWithin45Days).length,canonicalRenewalCount=Orbit.q.renovacionesProximas(45).length,historicalCount=all.filter(metrics.isHistoricalNoPortfolio).length;
     const target=all.find(p=>String(p.numero||'').trim()==='AUTO-490658');
-    return{count:all.length,rounded,renewalCount,canonicalRenewalCount,historicalCount,targetId:target?.id||'',targetState:target?metrics.renewabilityState(target):'',premium:card('Prima neta vigente'),renewals:card('Por renovar ≤45 d'),historical:card('Histórico / sin cartera')};
+    const first=cards[0]?{label:(cards[0].querySelector('.k-label')?.textContent||'').trim(),value:(cards[0].querySelector('.k-val')?.textContent||'').replace(/\s+/g,' ').trim(),foot:(cards[0].querySelector('.k-foot')?.textContent||'').replace(/\s+/g,' ').trim()}:{};
+    const owner=Orbit.modules.polizas?.__policyReceiptsV1199||{};
+    return{count:all.length,rounded,renewalCount,canonicalRenewalCount,historicalCount,targetId:target?.id||'',targetState:target?metrics.renewabilityState(target):'',premium:card('Prima neta vigente'),renewals:card('Por renovar ≤45 d'),historical:card('Histórico / sin cartera'),first,owner:{kpiOwner:owner.kpiOwner||'',kpiOwnerDelegated:owner.kpiOwnerDelegated===true}};
   });
   need(result.count===1414,'I64_POLICY_COUNT');
   need(Object.keys(result.rounded).includes('GTQ')&&Object.keys(result.rounded).includes('COP'),'I64_CURRENCIES_MISSING');
@@ -49,6 +64,23 @@ try{
   need(/no se suman GTQ y COP/i.test(result.premium.foot),'I64_PREMIUM_KPI_FOOT');
   need(result.renewalCount===result.canonicalRenewalCount&&Number(result.renewals.value)===result.renewalCount,'I64_RENEWALS_KPI:'+JSON.stringify({computed:result.renewalCount,canonical:result.canonicalRenewalCount,displayed:result.renewals.value}));
   need(result.historicalCount===1191&&Number(result.historical.value)===result.historicalCount,'I64_HISTORICAL_KPI');
+  need(result.first.label==='Pólizas vigentes'&&result.first.value.includes('/ 1414'),'I64_CANONICAL_POLICY_KPI_OWNER_INITIAL:'+JSON.stringify(result.first));
+  need(result.owner.kpiOwner==='polizas.js'&&result.owner.kpiOwnerDelegated===true,'I64_POLICY_KPI_OWNER_CONTRACT:'+JSON.stringify(result.owner));
+  const sampleKpis=async()=>page.evaluate(()=>[...document.querySelectorAll('.kpi-row .kpi')].map(k=>({label:(k.querySelector('.k-label')?.textContent||'').trim(),value:(k.querySelector('.k-val')?.textContent||'').replace(/\s+/g,' ').trim(),foot:(k.querySelector('.k-foot')?.textContent||'').replace(/\s+/g,' ').trim()})));
+  await page.waitForTimeout(650);
+  const stableBefore=await sampleKpis();
+  const search=page.locator('#fq');
+  need(await search.count()===1,'I64_POLICY_SEARCH_MISSING');
+  await search.fill('pamela'); await page.waitForTimeout(700);
+  const stableSearch=await sampleKpis();
+  await search.fill(''); await page.waitForTimeout(700);
+  const stableAfter=await sampleKpis();
+  const canonicalLabels=['Pólizas vigentes','Prima neta vigente','Por renovar ≤45 d','Histórico / sin cartera'];
+  for(const [stage,cards] of [['before',stableBefore],['search',stableSearch],['after',stableAfter]]){
+    need(cards.length>=4&&canonicalLabels.every((x,i)=>cards[i]?.label===x),'I64_KPI_OWNER_FLIP_'+stage+':'+JSON.stringify(cards.slice(0,4)));
+    need(Number(cards[2]?.value)===result.renewalCount,'I64_RENEWALS_UNSTABLE_'+stage+':'+String(cards[2]?.value));
+  }
+  ev.composition={singlePolicyKpiOwner:true,kpiStableAfterRerender:true,canonicalOwner:'polizas.js',samples:{before:stableBefore.slice(0,4),search:stableSearch.slice(0,4),after:stableAfter.slice(0,4)}};
   need(result.targetId&&result.targetState==='UNKNOWN','I64_RENEWABILITY_TARGET');
   await page.evaluate(id=>Orbit.modules.cliente360.verPoliza(id),result.targetId);
   await page.waitForSelector('.orbit-policy-fullpage[data-policy-fullpage="1"] [data-policy-renewability="1"]');
@@ -56,7 +88,7 @@ try{
   need(renewalDisplay==='Renovabilidad pendiente de validar','I64_RENEWABILITY_UNKNOWN_DISPLAY:'+renewalDisplay);
   need(pageErrors.length===0,'I64_PROOF_PAGE_ERRORS');need(http404.length===0,'I64_PROOF_HTTP404');
   ev.policies={count:result.count,actorRole:actor.role};
-  ev.kpis={multiCurrency:{status:'PASS',amounts:result.rounded},renewals45:{status:'PASS',count:result.renewalCount,canonicalCount:result.canonicalRenewalCount,canonicalMatch:true},historicalNoPortfolio:{status:'PASS',count:result.historicalCount}};
+  ev.kpis={multiCurrency:{status:'PASS',amounts:result.rounded},renewals45:{status:'PASS',count:result.renewalCount,canonicalCount:result.canonicalRenewalCount,canonicalMatch:true},historicalNoPortfolio:{status:'PASS',count:result.historicalCount},stableAfterRerender:true};
   ev.renewability={status:'PASS',policyNumber:'AUTO-490658',sourceState:'UNKNOWN',display:'Renovabilidad pendiente de validar'};
   ev.status='PASS';
 }catch(e){ev.errors.push(clean(e?.message||e,220));console.error('I64_PROOF_ERROR='+clean(e?.message||e,220));process.exitCode=1;}

@@ -36,6 +36,7 @@ on:
       - 'orbit360-platform/modules/polizas.js'
       - 'orbit360-platform/modules/policy-receipts-v1199-bridge.js'
       - 'orbit360-platform/modules/policy-receipts-v1199-detail-guard.js'
+      - 'orbit360-platform/core/pwa.js'
       - '.github/workflows/gravicentra-recovery-i6-postsalida.yml'
 
 permissions:
@@ -110,6 +111,8 @@ jobs:
           node --check orbit360-platform/modules/polizas.js
           node --check orbit360-platform/modules/policy-receipts-v1199-bridge.js
           node --check orbit360-platform/modules/policy-receipts-v1199-detail-guard.js
+          node --check orbit360-platform/core/pwa.js
+          node --check tools/gravicentra-i6-1-preview-package.mjs
           node --check tools/gravicentra-i6-4-code-defect-functional.mjs
           node --check tools/gravicentra-i6-4-code-defect-contract.mjs
           node tools/gravicentra-i6-4-code-defect-contract.mjs
@@ -117,6 +120,9 @@ jobs:
           grep -Fq "no se suman GTQ y COP" orbit360-platform/modules/polizas.js
           grep -Fq "Renovabilidad pendiente de validar" orbit360-platform/modules/cliente360.js
           grep -Fq "Renovabilidad pendiente de validar" orbit360-platform/modules/policy-receipts-v1199-detail-guard.js
+          grep -Fq "kpiOwnerDelegated:true" orbit360-platform/modules/policy-receipts-v1199-bridge.js
+          grep -Fq "checkBuildFreshness" orbit360-platform/core/pwa.js
+          grep -Fq "bindBuildAssetsInIndex" tools/gravicentra-i6-1-preview-package.mjs
 
       - name: Install runtime proof dependencies
         if: steps.mode.outputs.mode == 'release'
@@ -370,7 +376,7 @@ jobs:
           const S=JSON.parse(fs.readFileSync(process.env.SOURCE_INTAKE,'utf8'));
           const L=JSON.parse(fs.readFileSync(process.env.LEDGER,'utf8'));
           const live=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/i64-live-functional.json','utf8'));
-          if(live.status!=='PASS'||live.policies?.count!==1414||live.kpis?.multiCurrency?.status!=='PASS'||live.kpis?.renewals45?.status!=='PASS'||live.kpis?.renewals45?.canonicalMatch!==true||live.kpis?.historicalNoPortfolio?.count!==1191||live.renewability?.status!=='PASS')throw new Error('I64_SEAL_LIVE_PROOF_INVALID');
+          if(live.status!=='PASS'||live.policies?.count!==1414||live.kpis?.multiCurrency?.status!=='PASS'||live.kpis?.renewals45?.status!=='PASS'||live.kpis?.renewals45?.canonicalMatch!==true||live.kpis?.historicalNoPortfolio?.count!==1191||live.kpis?.stableAfterRerender!==true||live.renewability?.status!=='PASS'||live.release?.assetBindingPass!==true||live.release?.buildFreshnessPass!==true||live.composition?.singlePolicyKpiOwner!==true||live.composition?.kpiStableAfterRerender!==true)throw new Error('I64_SEAL_LIVE_PROOF_INVALID');
           const old=JSON.parse(JSON.stringify(C.certifiedCandidate||{}));
           const release={
             sourceSha:process.env.GITHUB_SHA,

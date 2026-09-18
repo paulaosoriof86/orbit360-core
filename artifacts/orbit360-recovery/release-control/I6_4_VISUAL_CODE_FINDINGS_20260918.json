@@ -1,10 +1,10 @@
 {
   "schema": "GRAVICENTRA_I6_4_VISUAL_CODE_FINDINGS_V1",
-  "status": "PENDING_CAUSAL_CODE_FIX_BEFORE_I6_4_VISUAL_ACCEPTANCE",
+  "status": "CAUSAL_LIVE_REGRESSION_REOPENED_PENDING_IMMUTABLE_RELEASE",
   "date": "2026-09-18",
   "gate": "I6.4",
   "module": "POLIZAS_RIESGOS_VEHICULOS",
-  "classification": "CODE_DEFECTS_FROM_LIVE_VISUAL_REVIEW",
+  "classification": "RELEASE_COMPOSITION_PLUS_PRODUCT_OWNER_COLLISION",
   "sourceMutationRequired": true,
   "dataReimportForbidden": true,
   "findings": [
@@ -75,6 +75,22 @@
       "requiredBehavior": "Do not repair by policy reimport or synthetic receipt generation. Reconcile in I6.5/I6.6 using current cobranza/account statements and later commission evidence under the frozen receipt rules.",
       "blocksI64DataSeal": false,
       "blocksFinalFinancialAcceptance": true
+    },
+    {
+      "id": "POLIZAS_RUNTIME_OWNER_COLLISION_AND_BUILD_ASSET_VERSION_MIXING",
+      "classification": "RELEASE_COMPOSITION_PLUS_PRODUCT_OWNER_COLLISION",
+      "owners": [
+        "orbit360-platform/modules/polizas.js",
+        "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+        "orbit360-platform/core/pwa.js",
+        "tools/gravicentra-i6-1-preview-package.mjs"
+      ],
+      "evidence": "Paula production screenshots show 1414 total policies but two different first-KPI owners within minutes ('Pólizas activas' vs 'Pólizas vigentes') and renewal value 10, while the certified LIVE proof on the promoted artifact measured canonical renewal count 11. The bridge source asynchronously rewrites the KPI DOM after polizas.js render, and generated index asset URLs are not build-bound.",
+      "dataLossAssessment": "NOT_PROVEN; Firestore/apply evidence shows 1414 policies, 1063 vehicles, 41 policy inserts, 31 vehicle inserts and zero deletes.",
+      "requiredBehavior": "One canonical KPI owner, build-bound JS/CSS assets, automatic non-blocking stale-tab build detection, stable KPI values after rerender/search, exact Preview/LIVE readback, zero operational data writes.",
+      "dataReimportForbidden": true,
+      "operationalWritesAuthorized": 0,
+      "paulaVisualAcceptanceRequiredAfterLiveProof": true
     }
   ],
   "closureRule": "I6.4 MUST NOT BE SEALED LIVE_PASS UNTIL blocking code findings are fixed through immutable build -> isolated Preview -> exact readback -> same artifact LIVE -> functional proof -> Paula visual acceptance.",
@@ -130,5 +146,25 @@
     "runtimeCollisionCause": "Global generic DOM text replacement of 'pendiente de validar' -> 'pendiente de revisión/conciliación'.",
     "outOfScopeOwnerModified": false,
     "causalMitigation": "Authorized detail owner emits the exact visible renewability sentence as adjacent text nodes, preventing unrelated portal copy rewriting while preserving visible semantics."
+  },
+  "runtimeOwnerCollisionRegression": {
+    "status": "CAUSAL_REPRODUCIBLE_FROM_SOURCE_AND_LIVE_SCREENSHOTS",
+    "canonicalOwner": "orbit360-platform/modules/polizas.js",
+    "shadowingOwner": "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+    "shadowingMechanism": "setTimeout(enhancePolicies,0) post-render DOM rewrite",
+    "visibleEvidence": [
+      "Pólizas activas",
+      "Pólizas vigentes"
+    ],
+    "dataCountVisible": 1414,
+    "automatedCanonicalRenewalCount": 11,
+    "paulaDisplayedRenewalCount": 10
+  },
+  "releaseAssetBindingRegression": {
+    "status": "CAUSAL_RISK_CONFIRMED_IN_PACKAGER",
+    "staticIndexAssetVersions": true,
+    "generatedBuildBoundAssetUrls": false,
+    "pwaDeployedBuildFreshnessFence": false,
+    "requiredFix": "BUILD_ID_BINDING_PLUS_NON_BLOCKING_FRESHNESS_FENCE"
   }
 }

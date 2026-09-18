@@ -16,6 +16,42 @@
   function waitForWorkerControl(registration) { if (controllerMatches(registration)) return Promise.resolve(registration); return new Promise(function (resolve) { var settled = false; var timer = setTimeout(finish, 10000); function finish() { if (settled) return; settled = true; clearTimeout(timer); navigator.serviceWorker.removeEventListener('controllerchange', check); resolve(registration); } function check() { if (controllerMatches(registration)) finish(); } navigator.serviceWorker.addEventListener('controllerchange', check); check(); }); }
   function registerServiceWorker() { if (!('serviceWorker' in navigator)) { signalWorker('unsupported'); return Promise.resolve(workerState); } try { return navigator.serviceWorker.register('sw.js?v=' + RUNTIME_BUILD).then(function (registration) { return registration.update().catch(function () { return registration; }).then(function () { return waitForWorkerActivation(registration); }).then(function () { return waitForWorkerControl(registration); }).then(function () { workerState.scriptPath = workerPath(navigator.serviceWorker.controller || registration.active); signalWorker(controllerMatches(registration) ? 'controlled' : 'uncontrolled'); return workerState; }); }).catch(function () { signalWorker('error'); return workerState; }); } catch (error) { signalWorker('error'); return Promise.resolve(workerState); } }
   window.OrbitPwaWorkerReady = registerServiceWorker();
+  var buildFreshness = window.OrbitPwaBuildFreshness = { runtimeBuild: RUNTIME_BUILD, serverBuild: '', status: 'idle', checks: 0, lastReason: '' };
+  function reloadForBuild(targetBuild) {
+    try {
+      var key = 'orbit360-build-reload-target';
+      if (sessionStorage.getItem(key) === targetBuild) return;
+      sessionStorage.setItem(key, targetBuild);
+      var u = new URL(window.location.href);
+      u.searchParams.set('orbitBuild', targetBuild);
+      window.location.replace(u.href);
+    } catch (e) { window.location.reload(); }
+  }
+  function checkBuildFreshness(reason) {
+    buildFreshness.status = 'checking';
+    buildFreshness.lastReason = reason || 'manual';
+    buildFreshness.checks += 1;
+    var marker = new URL('__recovery__/build.json?fresh=' + Date.now(), document.baseURI).href;
+    return fetch(marker, { cache: 'no-store', credentials: 'same-origin', headers: { 'Cache-Control': 'no-cache, no-store', 'Pragma': 'no-cache' } })
+      .then(function (response) { if (!response.ok) throw new Error('BUILD_MARKER_HTTP_' + response.status); return response.json(); })
+      .then(function (meta) {
+        var serverBuild = String(meta && meta.buildId || '');
+        buildFreshness.serverBuild = serverBuild;
+        if (serverBuild && serverBuild !== RUNTIME_BUILD) {
+          buildFreshness.status = 'stale';
+          reloadForBuild(serverBuild);
+          return buildFreshness;
+        }
+        if (serverBuild === RUNTIME_BUILD) {
+          buildFreshness.status = 'current';
+          try { sessionStorage.removeItem('orbit360-build-reload-target'); } catch (e) {}
+          return buildFreshness;
+        }
+        buildFreshness.status = 'unverified';
+        return buildFreshness;
+      })
+      .catch(function () { buildFreshness.status = 'unverified'; return buildFreshness; });
+  }
   function clientLogo() { try { var t = Orbit.tenant && Orbit.tenant.get(); return (t && t.branding && t.branding.logo) || localStorage.getItem('orbit360_logo') || ''; } catch (e) { return ''; } }
   function clientName() { try { var t = Orbit.tenant && Orbit.tenant.get(); return (t && t.empresa) || 'Orbit 360'; } catch (e) { return 'Orbit 360'; } }
   function themeColor() { try { return getComputedStyle(document.documentElement).getPropertyValue('--red').trim() || '#C5162E'; } catch (e) { return '#C5162E'; } }
@@ -25,6 +61,6 @@
   var deferredPrompt = null;
   function showInstall(estado) { var prev = document.getElementById('pwa-install'); if (prev) prev.remove(); var btn = document.createElement('button'); btn.id = 'pwa-install'; if (estado === 'instalada') { btn.textContent = '✓ App instalada'; btn.setAttribute('data-state', 'instalada'); } else if (estado === 'ios') { btn.textContent = '📲 Instalar en iPhone/iPad'; btn.setAttribute('data-state', 'ios'); } else { btn.textContent = '⬇ Instalar como app'; btn.setAttribute('data-state', 'instalar'); } var bg = estado === 'instalada' ? 'var(--ok,#1F8A5B)' : 'var(--red,#C5162E)'; btn.style.cssText = 'position:fixed;right:18px;bottom:18px;z-index:300;background:' + bg + ';color:#fff;border:none;border-radius:30px;padding:11px 20px;font-weight:700;font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,.25);cursor:pointer;font-family:var(--f-display,sans-serif);transition:opacity .3s'; btn.onclick = function () { if (estado === 'instalada') { btn.style.opacity = '0'; setTimeout(function () { btn.remove(); }, 300); return; } if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt.userChoice.then(function () { deferredPrompt = null; btn.remove(); }); } else { iosHint(); } }; document.body.appendChild(btn); if (estado === 'instalada') setTimeout(function () { if (btn.parentNode) { btn.style.opacity = '0'; setTimeout(function () { btn.remove(); }, 300); } }, 4000); else setTimeout(function () { if (document.getElementById('pwa-install')) btn.style.opacity = '0.85'; }, 8000); }
   function iosHint() { var d = document.createElement('div'); d.style.cssText = 'position:fixed;left:50%;bottom:74px;transform:translateX(-50%);z-index:301;background:#1E2227;color:#fff;padding:12px 16px;border-radius:12px;font-size:13px;max-width:300px;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.3)'; d.innerHTML = 'Para instalar en iPhone/iPad: toca <b>Compartir</b> ⬆ y luego <b>"Agregar a inicio"</b>.'; document.body.appendChild(d); setTimeout(function () { d.remove(); }, 6000); }
-  function init() { try { setFavicons(); buildManifest(); } catch (e) {} var _ab = Orbit.applyBrand; if (_ab) Orbit.applyBrand = function () { try { _ab.apply(this, arguments); } catch (e) {} try { setFavicons(); buildManifest(); } catch (e) {} }; window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); deferredPrompt = e; if (!(window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true)) showInstall('instalar'); }); window.addEventListener('appinstalled', function () { deferredPrompt = null; showInstall('instalada'); }); var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent); var standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone; if (standalone) { setTimeout(function () { if (!document.body.classList.contains('pre-auth')) showInstall('instalada'); }, 2500); } else if (isIOS) { setTimeout(function () { if (!document.body.classList.contains('pre-auth')) showInstall('ios'); }, 4000); } Orbit.pwa = { refresh: function () { try { setFavicons(); buildManifest(); } catch (e) {} }, install: showInstall, workerReady: window.OrbitPwaWorkerReady }; }
+  function init() { try { setFavicons(); buildManifest(); } catch (e) {} var _ab = Orbit.applyBrand; if (_ab) Orbit.applyBrand = function () { try { _ab.apply(this, arguments); } catch (e) {} try { setFavicons(); buildManifest(); } catch (e) {} }; window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); deferredPrompt = e; if (!(window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true)) showInstall('instalar'); }); window.addEventListener('appinstalled', function () { deferredPrompt = null; showInstall('instalada'); }); var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent); var standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone; if (standalone) { setTimeout(function () { if (!document.body.classList.contains('pre-auth')) showInstall('instalada'); }, 2500); } else if (isIOS) { setTimeout(function () { if (!document.body.classList.contains('pre-auth')) showInstall('ios'); }, 4000); } Orbit.pwa = { refresh: function () { try { setFavicons(); buildManifest(); } catch (e) {} }, install: showInstall, workerReady: window.OrbitPwaWorkerReady, buildFreshness: buildFreshness, checkBuildFreshness: checkBuildFreshness }; setTimeout(function () { checkBuildFreshness('startup'); }, 1200); window.addEventListener('focus', function () { checkBuildFreshness('focus'); }); document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') checkBuildFreshness('visible'); }); setInterval(function () { if (document.visibilityState !== 'hidden') checkBuildFreshness('interval'); }, 60000); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();

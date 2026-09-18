@@ -94,6 +94,28 @@ pinReleaseRuntime('sw.js',[
   [/var CRITICAL_RELEASE = '[^']+';/, "var CRITICAL_RELEASE = '"+buildId+"';",'sw-critical']
 ]);
 
+function bindBuildAssetsInIndex(){
+  const target=path.join(SITE,'index.html');
+  let html=read(target),bound=0;
+  const bind=url=>{
+    const raw=String(url||'');
+    if(!raw||/^(?:https?:|data:|blob:|\/\/|#)/i.test(raw)||!/.(?:js|css)(?:[?#]|$)/i.test(raw))return raw;
+    const hashAt=raw.indexOf('#'),hash=hashAt>=0?raw.slice(hashAt):'',base=hashAt>=0?raw.slice(0,hashAt):raw;
+    const next=/([?&])orbitBuild=[^&#]*/.test(base)
+      ? base.replace(/([?&])orbitBuild=[^&#]*/,'$1orbitBuild='+encodeURIComponent(buildId))
+      : base+(base.includes('?')?'&':'?')+'orbitBuild='+encodeURIComponent(buildId);
+    bound++;
+    return next+hash;
+  };
+  html=html.replace(/(<script\b[^>]*\bsrc=["'])([^"']+)(["'])/gi,(m,a,u,z)=>a+bind(u)+z);
+  html=html.replace(/(<link\b[^>]*\brel=["']stylesheet["'][^>]*\bhref=["'])([^"']+)(["'])/gi,(m,a,u,z)=>a+bind(u)+z);
+  html=html.replace(/(<link\b[^>]*\bhref=["'])([^"']+\.css(?:[^"']*)?)(["'][^>]*\brel=["']stylesheet["'])/gi,(m,a,u,z)=>a+bind(u)+z);
+  if(bound<10)throw new Error('BUILD_BOUND_ASSET_COUNT_TOO_LOW:'+bound);
+  fs.writeFileSync(target,html);
+  return bound;
+}
+const buildBoundAssetCount=bindBuildAssetsInIndex();
+
 const freshnessHeaders=[
   {source:'/index.html',headers:[{key:'Cache-Control',value:'no-cache, no-store, must-revalidate, max-age=0'}]},
   {source:'/product-runtime-config.js',headers:[{key:'Cache-Control',value:'no-cache, no-store, must-revalidate, max-age=0'}]},
@@ -106,5 +128,5 @@ fs.writeFileSync(path.join(BUNDLE,'firebase.json'),JSON.stringify({hosting:{site
 fs.writeFileSync(path.join(BUNDLE,'.firebaserc'),JSON.stringify({projects:{default:PROJECT_ID}})+'\n');
 function manifest(root,out){const files=[];const walk=d=>{for(const e of fs.readdirSync(d,{withFileTypes:true})){const p=path.join(d,e.name);if(e.isDirectory()&&e.name!=='node_modules')walk(p);else if(e.isFile())files.push(p);}};walk(root);files.sort();const rows=files.map(p=>crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex')+'  '+path.relative(root,p).split(path.sep).join('/'));const text=rows.join('\n')+'\n';fs.writeFileSync(out,text);return{count:rows.length,digest:crypto.createHash('sha256').update(text).digest('hex')};}
 const siteM=manifest(SITE,path.join(EVIDENCE,'site-manifest.sha256')); const backendM=manifest(BACKEND,path.join(EVIDENCE,'backend-manifest.sha256')); const bundleM=manifest(BUNDLE,path.join(EVIDENCE,'bundle-manifest.sha256'));
-const output={buildId,hostedFileCount:siteM.count,hostedPayloadDigest:siteM.digest,backendFileCount:backendM.count,backendSourceDigest:backendM.digest,bundleFileCount:bundleM.count,bundleDigest:bundleM.digest,reachableProductFiles:seen.size};
+const output={buildId,buildBoundAssetCount,hostedFileCount:siteM.count,hostedPayloadDigest:siteM.digest,backendFileCount:backendM.count,backendSourceDigest:backendM.digest,bundleFileCount:bundleM.count,bundleDigest:bundleM.digest,reachableProductFiles:seen.size};
 fs.writeFileSync(path.join(EVIDENCE,'package-output.json'),JSON.stringify(output)+'\n'); console.log(JSON.stringify(output));

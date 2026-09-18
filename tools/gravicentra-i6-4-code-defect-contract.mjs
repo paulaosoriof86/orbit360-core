@@ -35,6 +35,12 @@ need(Orbit.modules.cliente360.renovabilidad({})==='UNKNOWN'&&Orbit.modules.clien
 need(!fs.readFileSync('orbit360-platform/modules/polizas.js','utf8').includes('q.norm((policyPremiumNet'),'I64_CURRENCY_NORMALIZATION_STILL_PRESENT');
 const bridge=fs.readFileSync('orbit360-platform/modules/policy-receipts-v1199-bridge.js','utf8');
 for(const token of ['policyMetrics','isRenewalWithin45Days','isHistoricalNoPortfolio','premiumByCurrency'])need(bridge.includes(token),'I64_RUNTIME_BRIDGE_CONTRACT:'+token);
+need(!bridge.includes('setTimeout(()=>enhancePolicies(host),0)'),'I64_POLICY_KPI_ASYNC_OVERRIDE_STILL_ACTIVE');
+need(bridge.includes("kpiOwner:'polizas.js'")&&bridge.includes('kpiOwnerDelegated:true'),'I64_POLICY_KPI_OWNER_NOT_DELEGATED');
+const pwa=fs.readFileSync('orbit360-platform/core/pwa.js','utf8');
+for(const token of ['OrbitPwaBuildFreshness','checkBuildFreshness','__recovery__/build.json','orbit360-build-reload-target'])need(pwa.includes(token),'I64_PWA_FRESHNESS_FENCE:'+token);
+const packager=fs.readFileSync('tools/gravicentra-i6-1-preview-package.mjs','utf8');
+for(const token of ['bindBuildAssetsInIndex','orbitBuild','buildBoundAssetCount'])need(packager.includes(token),'I64_BUILD_ASSET_BINDING_CONTRACT:'+token);
 const detailGuard=fs.readFileSync('orbit360-platform/modules/policy-receipts-v1199-detail-guard.js','utf8');
 need(!detailGuard.includes("out.renovable = p.renovable !== undefined ? !!p.renovable : activePolicy(p);"),'I64_DETAIL_GUARD_BOOLEAN_COERCION');
 for(const token of ['renewabilityState','renewabilityLabel','renewabilityHtml','Renovabilidad pendiente de validar'])need(detailGuard.includes(token),'I64_DETAIL_GUARD_TRI_STATE:'+token);

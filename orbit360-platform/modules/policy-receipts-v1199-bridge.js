@@ -221,5 +221,10 @@ Orbit.modules = Orbit.modules || {};
     const originalRender=cob.render.bind(cob); cob.render=function(host){const out=originalRender(host);setTimeout(()=>enhanceCollections(host),0);return out;};
   }
   const pol=Orbit.modules.polizas;
-  if(pol){const originalRender=pol.render.bind(pol);pol.__policyReceiptsV1199={render:originalRender};pol.render=function(host){const out=originalRender(host);setTimeout(()=>enhancePolicies(host),0);return out;};}
+  if(pol){
+    const canonicalRender=pol.render.bind(pol);
+    pol.__policyReceiptsV1199={render:canonicalRender,kpiOwner:'polizas.js',kpiOwnerDelegated:true};
+    // Pólizas KPIs are owned only by modules/polizas.js. This bridge retains receipt/payment
+    // workflows but must not asynchronously overwrite canonical policy metrics after render.
+  }
 })();
