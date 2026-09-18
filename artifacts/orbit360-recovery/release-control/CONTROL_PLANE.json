@@ -405,7 +405,7 @@
     "authorizedAt": "2026-09-14T08:57:00-06:00",
     "authorizationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_EXPLICIT_AUTHORIZATION_RECEIPT_20260914.json",
     "activeSubgate": "I6.3",
-    "productMutationAuthorized": false,
+    "productMutationAuthorized": true,
     "sourceDataApplyAuthorized": false,
     "perBlockApplyRequiresExplicitAuthorization": false,
     "dataUpdateMode": "EVERGREEN_V5_DELTA_FIRST",
@@ -416,9 +416,9 @@
     "mechanismRegistryPath": "artifacts/orbit360-recovery/release-control/DATA_UPDATE_MECHANISM_REGISTRY.json",
     "mechanismRegistryBlobSha": "4f9c0d1726ea07aeb157018cc525dea87aa8c5de",
     "activeSourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_3_CLIENTES_SOURCE_INTAKE_20260918.json",
-    "activeSourceIntakeBlobSha": "3f757e9b3829a7686b7073a504fd3e2e83c3225a",
+    "activeSourceIntakeBlobSha": "6213e08e6e12f8f3a14f6ba26959c8b506dd59aa",
     "activeModule": "CLIENTES",
-    "activeModuleStatus": "DETERMINISTIC_DIFF_READY",
+    "activeModuleStatus": "CODE_DEFECT_SUCCESSOR_RELEASE_IN_PROGRESS",
     "i6_0": {
       "status": "I6_0_BASELINE_FROZEN",
       "executorPath": ".github/workflows/gravicentra-material-baseline-freeze.yml",
@@ -455,15 +455,15 @@
     "mechanismRegistryBlobSha": "4f9c0d1726ea07aeb157018cc525dea87aa8c5de",
     "activeModule": "CLIENTES",
     "activeSourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_3_CLIENTES_SOURCE_INTAKE_20260918.json",
-    "activeSourceIntakeBlobSha": "3f757e9b3829a7686b7073a504fd3e2e83c3225a",
+    "activeSourceIntakeBlobSha": "6213e08e6e12f8f3a14f6ba26959c8b506dd59aa",
     "sourceSha256": "4f0a1307605ad5dcc947355dbbc98a50b510358e5f6a9835b75d02e45f5a8c7c",
     "conversationAsAuthority": false,
     "requestCurrentSourceBeforeEveryNewModule": true,
     "liveVisualRefreshRequiredForClosure": true,
     "pureDataUpdateRequiresBuildOrDeploy": false,
     "reimportForVisibilityFailureForbidden": true,
-    "nextRequiredStep": "APPLY_DETERMINISTIC_DELTA_ONLY",
-    "executionCursor": "DETERMINISTIC_DIFF_READY"
+    "nextRequiredStep": "USER_VISUAL_REFRESH_CHECK",
+    "executionCursor": "POST_WRITE_READBACK_INTEGRITY_PASS"
   },
   "governanceSyncChecklist": {
     "frozenPlanMaterialized": true,
@@ -540,7 +540,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_3_APPLY_DETERMINISTIC_DELTA",
+  "nextAction": "I6_3_CODE_DEFECT_SUCCESSOR_RELEASE",
   "postproductionExitProgress": {
     "formalPercent": 30,
     "frozenMiniGates": 3,
@@ -669,5 +669,24 @@
       "nextSource": "PINNED"
     },
     "guardCompatibleStateNote": "I6.3 remains mechanically prepared, but conversational/source intake is blocked by this handoff control until Paula explicitly validates I6.2 LIVE."
+  },
+  "i63CodeDefect": {
+    "classification": "CODE_DEFECT",
+    "status": "I6_3_CODE_DEFECT_CANDIDATE_PENDING_BUILD",
+    "cause": "Backend readback is 442 while authorized Cliente360 runtime is 436 because country-constrained hydration excludes REQUIERE_VALIDACION; base KPI separately renders a mixed-currency Prima vigente before an async bridge repairs it.",
+    "parentCertifiedSourceSha": "03b03690b5583442dd448e954fb66c3c78648fb3",
+    "applyEvidenceRunId": 35308586373,
+    "applyArtifactId": 10532811723,
+    "backendDocumentCount": 442,
+    "runtimeVisibleBeforeFix": 436,
+    "allowedProductFiles": [
+      "orbit360-platform/core/tenant-access-policy-contract-p0.js",
+      "orbit360-platform/core/access-scope.js",
+      "orbit360-platform/modules/cliente360.js"
+    ],
+    "dataMutationAuthorized": false,
+    "reimportAuthorized": false,
+    "sameArtifactPreviewToProductionRequired": true,
+    "paulaVisualAcceptanceRequired": true
   }
 }

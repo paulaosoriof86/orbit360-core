@@ -165,11 +165,15 @@ Orbit.access = (function () {
     var a = actorAdvisor();
     return [].concat(a.countries || a.paises || a.paisesAutorizados || []).map(clean).filter(Boolean);
   }
+  function unresolvedCountryValue(value) {
+    var marker = norm(value).replace(/_+/g, '');
+    return marker === 'requierevalidacion' || marker === 'porvalidar' || marker === 'pendiente';
+  }
   function countryAllowed(record) {
     var allowed = permittedCountries();
     if (!allowed.length) return true;
     var pais = clean(record && record.pais);
-    return !pais || allowed.indexOf(pais) >= 0;
+    return !pais || allowed.indexOf(pais) >= 0 || unresolvedCountryValue(pais);
   }
   function teamAdvisorIds() {
     var a = actorAdvisor(), own = actorAdvisorId(), out = new Set(own ? [own] : []);
@@ -301,7 +305,7 @@ Orbit.access = (function () {
       if (scope === 'none') return [];
       function countryOk(rec) {
         var pais = clean(rec && rec.pais);
-        return !allowedCountries.length || !pais || allowedCountries.indexOf(pais) >= 0;
+        return !allowedCountries.length || !pais || allowedCountries.indexOf(pais) >= 0 || unresolvedCountryValue(pais);
       }
       if (scope === 'all') {
         if (!allowedCountries.length) return list.slice();

@@ -44,11 +44,11 @@
   },
   "execution": {
     "method": "DATA_UPDATE_DELTA_FIRST",
-    "cursorState": "DETERMINISTIC_DIFF_READY",
-    "writeApplied": false,
+    "cursorState": "POST_WRITE_READBACK_INTEGRITY_PASS",
+    "writeApplied": true,
     "readbackPassed": true,
     "liveVisualConfirmed": false,
-    "nextRequiredStep": "APPLY_DETERMINISTIC_DELTA_ONLY",
+    "nextRequiredStep": "USER_VISUAL_REFRESH_CHECK",
     "readbackRunId": 35306248860,
     "readbackDocumentCount": 430,
     "readbackWritesExecuted": 0,
@@ -92,6 +92,35 @@
       "ambiguousFieldsPreserveLiveValue": true,
       "ambiguousFieldsPreservedCount": 3,
       "ageNotAuthoritativeWhenBirthDateAvailable": true
+    },
+    "applyRunId": 35308586373,
+    "applyArtifactId": 10532811723,
+    "applyArtifactDigest": "sha256:d0e23362f1373d372656bfb21cb4a314594bd2df05b7c35d5b75b06cb8123299",
+    "writesExecuted": 312,
+    "updatesApplied": 300,
+    "insertsApplied": 12,
+    "deletesApplied": 0,
+    "postWriteReadbackDocumentCount": 442,
+    "unchangedRowsVerified": 130,
+    "ambiguousFieldsPreserved": 3,
+    "technicalFunctionalPass": true,
+    "technicalFunctionalRuntimeVisibleClientCount": 436,
+    "technicalFunctionalBackendCount": 442,
+    "technicalFunctionalDiscrepancy": "READ_PATH_COUNTRY_VALIDATION_AND_KPI_COMPOSITION_CODE_DEFECT",
+    "codeDefect": {
+      "classification": "CODE_DEFECT",
+      "status": "BLOCKING_VISUAL_ACCEPTANCE",
+      "reimportForbidden": true,
+      "causes": [
+        "CLIENTES_REQUIERE_VALIDACION_EXCLUDED_BY_COUNTRY_QUERY_AND_SCOPE_FILTER",
+        "CLIENTE360_BASE_KPI_MIXED_CURRENCIES_AND_WAS_REPATCHED_ASYNCHRONOUSLY"
+      ],
+      "expectedAfterFix": {
+        "backendDocuments": 442,
+        "cliente360VisibleClients": 442,
+        "controlSamplesVisible": 5,
+        "kpi": "PRIMA_NETA_VIGENTE_SEPARADA_POR_MONEDA"
+      }
     }
   },
   "guards": {

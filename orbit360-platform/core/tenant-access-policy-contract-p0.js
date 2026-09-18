@@ -128,11 +128,17 @@
     return VALID_SCOPES.indexOf(m.defaultScope) >= 0 ? m.defaultScope : 'none';
   }
 
-  function countryAllowed(membershipInput, record) {
+  function unresolvedCountry(record) {
+    var country = text(record && (record.country || record.pais)).toUpperCase().replace(/[ _-]+/g, '_');
+    return country === 'REQUIERE_VALIDACION' || country === 'POR_VALIDAR' || country === 'PENDIENTE';
+  }
+
+  function countryAllowed(membershipInput, record, collection) {
     var m = normalizeMembership(membershipInput);
     var country = text(record && (record.country || record.pais)).toUpperCase();
     if (!country || !m.countries.length) return true;
-    return m.countries.indexOf(country) >= 0;
+    if (m.countries.indexOf(country) >= 0) return true;
+    return collection === 'clientes' && unresolvedCountry(record);
   }
 
   function recordTenant(record) {
@@ -166,7 +172,7 @@
     var p = policyFor(collection, context.collectionPolicy);
     if (!activeMembership(m)) return decision(false, 'membresia_inactiva');
     if (!sameTenant(m, record || { tenantId: context.tenantId })) return decision(false, 'tenant_no_coincide');
-    if (!countryAllowed(m, record)) return decision(false, 'pais_fuera_de_scope');
+    if (!countryAllowed(m, record, collection)) return decision(false, 'pais_fuera_de_scope');
     if (!p.module) return decision(false, 'coleccion_sin_politica');
     if (!moduleVisible(m, p.module)) return decision(false, 'modulo_no_visible', { module: p.module });
 
@@ -260,8 +266,10 @@
     var m = normalizeMembership(membershipInput);
     var p = policyFor(collection, context.collectionPolicy);
     var constraints = [{ field: 'tenantId', op: '==', value: m.tenantId }];
-    if (m.countries.length === 1) constraints.push({ field: 'country', op: '==', value: m.countries[0] });
-    if (m.countries.length > 1) constraints.push({ field: 'country', op: 'in', value: m.countries.slice(0, 10) });
+    var queryCountries = m.countries.slice(0, 10);
+    if (collection === 'clientes' && queryCountries.length && queryCountries.indexOf('REQUIERE_VALIDACION') < 0 && queryCountries.length < 10) queryCountries.push('REQUIERE_VALIDACION');
+    if (queryCountries.length === 1) constraints.push({ field: 'country', op: '==', value: queryCountries[0] });
+    if (queryCountries.length > 1) constraints.push({ field: 'country', op: 'in', value: queryCountries });
     if (p.scoped) {
       var scope = effectiveScope(m, p.module);
       if (scope === 'own') constraints.push({ field: 'advisorId', op: '==', value: m.advisorId });

@@ -111,14 +111,21 @@ Orbit.modules.cliente360 = (function () {
     };
     const summaryAggregateStartedAt = perfNow();
     const clientById = new Map(clientes.filter(c => c && c.id != null).map(c => [c.id, c]));
-    const totPrima = policiesForList.reduce((s, p) => {
-      if (!esRenovable(p)) return s;
+    const primaNetaVigentePorMoneda = {};
+    policiesForList.forEach(p => {
+      if (!esRenovable(p)) return;
       const cli = clientById.get(p.clienteId);
-      if (!cli) return s;
-      const total = policyTotal(p);
-      if (total == null) return s;
-      return s + (cli.moneda === 'COP' ? total / 1000 : total);
-    }, 0);
+      if (!cli) return;
+      const neta = U.finiteNumber(p.primaNeta != null ? p.primaNeta : p.prima);
+      if (neta == null) return;
+      const moneda = String(p.moneda || p.divisa || cli.moneda || 'SIN_MONEDA').trim() || 'SIN_MONEDA';
+      primaNetaVigentePorMoneda[moneda] = (primaNetaVigentePorMoneda[moneda] || 0) + neta;
+    });
+    const primaNetaVigenteKeys = Object.keys(primaNetaVigentePorMoneda);
+    const primaNetaVigenteHtml = primaNetaVigenteKeys.sort((a, b) => {
+      const rank = x => x === 'GTQ' ? 0 : x === 'COP' ? 1 : 2;
+      return rank(a) - rank(b) || a.localeCompare(b);
+    }).map(moneda => '<span style="display:block;font-size:' + (primaNetaVigenteKeys.length > 1 ? '14px' : '22px') + '">' + U.esc(moneda) + ' ' + Number(primaNetaVigentePorMoneda[moneda] || 0).toLocaleString('es-GT', { maximumFractionDigits: 0 }) + '</span>').join('') || '<span class="muted">Sin valores</span>';
     const activePolicyCount = policiesForList.filter(esRenovable).length;
     const totalPolicyCount = policiesForList.length;
     const renewals45Count = policiesForList.filter(p => { const d = U.daysFromNow(p.vigenciaFin); return esRenovable(p) && d != null && d >= 0 && d <= 45; }).length;
@@ -152,7 +159,7 @@ Orbit.modules.cliente360 = (function () {
       <div class="kpi-row" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px">
         <button class="kpi kpi-click" onclick="Orbit.modules.cliente360.render(document.getElementById('mod-host'))" title="Ver todos"><div class="k-accent"></div><div class="k-label">Clientes</div><div class="k-val">${clientes.length}</div><div class="k-foot muted">${clientes.filter(c => c.tipo === 'Empresa').length} empresas · ${clientes.filter(c => c.tipo === 'Persona').length} personas</div></button>
         <button class="kpi kpi-click" onclick="Orbit.kpi('polizas-vigentes')" title="Ver pólizas"><div class="k-accent" style="background:var(--info)"></div><div class="k-label">Pólizas activas</div><div class="k-val">${activePolicyCount}</div><div class="k-foot muted">de ${totalPolicyCount} históricas</div></button>
-        <div class="kpi"><div class="k-accent" style="background:var(--ok)"></div><div class="k-label">Prima vigente</div><div class="k-val">${U.moneyShort(totPrima, Orbit.q.monedaPais())}</div><div class="k-foot muted">cartera total estimada</div></div>
+        <div class="kpi"><div class="k-accent" style="background:var(--ok)"></div><div class="k-label">Prima neta vigente</div><div class="k-val">${primaNetaVigenteHtml}</div><div class="k-foot muted">Separada por moneda; no se suman GTQ y COP</div></div>
         <div class="kpi"><div class="k-accent" style="background:var(--warn)"></div><div class="k-label">Por renovar ≤45 d</div><div class="k-val">${renewals45Count}</div><div class="k-foot muted">requieren gestión</div></div>
       </div>
 

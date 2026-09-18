@@ -1,5 +1,5 @@
 name: Gravicentra I6 Post-Salida
-# I6.3 Clientes deterministic DATA_UPDATE apply/readback/functional executor — Evergreen V5.
+
 on:
   workflow_dispatch:
   push:
@@ -8,22 +8,35 @@ on:
     paths:
       - 'artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json'
       - 'artifacts/orbit360-recovery/release-control/I6_3_CLIENTES_SOURCE_INTAKE_20260918.json'
-      - '.github/i6-ephemeral/i63-clientes-apply-envelope.encrypted.json'
-      - 'tools/gravicentra-i6-3-clientes-delta-executor-ephemeral.mjs'
+      - 'tools/gravicentra-i6-control-plane-guard-v1.mjs'
+      - 'tools/gravicentra-i6-1-preview-package.mjs'
+      - 'tools/gravicentra-i6-3-clientes-postwrite-functional.mjs'
+      - 'orbit360-platform/core/tenant-access-policy-contract-p0.js'
+      - 'orbit360-platform/core/access-scope.js'
+      - 'orbit360-platform/modules/cliente360.js'
       - '.github/workflows/gravicentra-recovery-i6-postsalida.yml'
+
 permissions:
-  contents: read
+  contents: write
   actions: read
+
 concurrency:
   group: gravicentra-i6-postsalida-${{ github.ref }}
   cancel-in-progress: false
+
 env:
   PROJECT_ID: ays-orbit-360-lab
-  TENANT_ID: alianzas-soluciones
+  HOSTING_SITE: ays-orbit-360-lab
+  TENANT_HINT: alianzas-soluciones
+  PRODUCTION_URL: https://ays-orbit-360-lab.web.app
+  CONTROL: artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json
+  SOURCE_INTAKE: artifacts/orbit360-recovery/release-control/I6_3_CLIENTES_SOURCE_INTAKE_20260918.json
+  LEDGER: artifacts/orbit360-recovery/release-control/CAPABILITY_STATUS_LEDGER.json
+
 jobs:
-  i63-deterministic-delta:
+  i63-code-defect-successor:
     runs-on: ubuntu-24.04
-    timeout-minutes: 35
+    timeout-minutes: 50
     env:
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
       SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
@@ -33,54 +46,333 @@ jobs:
         with:
           ref: ${{ github.sha }}
           fetch-depth: 0
-          persist-credentials: false
+          persist-credentials: true
+
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Canonical I6.3 authority
+
+      - name: Gate and causal boundary
+        id: mode
         run: |
           set -euo pipefail
+          test "$GITHUB_REF_NAME" = "recovery/fase-a-clean-20260831"
           node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
           node - <<'NODE'
           const fs=require('node:fs');
-          const c=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json','utf8'));
-          const s=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_3_CLIENTES_SOURCE_INTAKE_20260918.json','utf8'));
-          const need=(x,m)=>{if(!x)throw new Error(m)};
-          need(c.status==='PRODUCTION_ACCEPTED','I63_BASELINE');
-          need(c.gateState?.gates?.I6?.status==='I6_3_DATA_UPDATE_V5_ACTIVE','I63_GATE');
-          need(c.gateState?.gates?.I6?.activeSubgate==='I6.3','I63_SUBGATE');
-          need(c.nextAction==='I6_3_APPLY_DETERMINISTIC_DELTA','I63_ACTION');
-          need(s.execution?.cursorState==='DETERMINISTIC_DIFF_READY','I63_CURSOR');
-          need(s.source?.sha256==='4f0a1307605ad5dcc947355dbbc98a50b510358e5f6a9835b75d02e45f5a8c7c','I63_SOURCE');
-          need(s.execution?.diffSummary?.updates===300&&s.execution?.diffSummary?.inserts===12&&s.execution?.diffSummary?.deletes===0,'I63_DIFF');
-          console.log('I63_AUTHORITY=PASS');
+          const c=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8')),d=c.i63CodeDefect||{};
+          const mode=d.status==='I6_3_CODE_DEFECT_CANDIDATE_PENDING_BUILD'?'release':'noop';
+          if(mode==='release'){
+            if(c.nextAction!=='I6_3_CODE_DEFECT_SUCCESSOR_RELEASE')throw new Error('I63_RELEASE_ACTION_INVALID');
+            if(c.i6Execution?.productMutationAuthorized!==true)throw new Error('I63_RELEASE_PRODUCT_AUTH_MISSING');
+            if(d.classification!=='CODE_DEFECT'||d.dataMutationAuthorized!==false||d.reimportAuthorized!==false)throw new Error('I63_RELEASE_BOUNDARY_INVALID');
+          }
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'mode='+mode+'\n');
+          console.log('I63_MODE='+mode);
           NODE
-      - name: Install execution dependencies
-        run: |
-          npm install --no-save --package-lock=false firebase-admin@13.10.0 playwright@1.55.0 >/dev/null
-          npx playwright install --with-deps chromium >/dev/null
-      - name: Apply deterministic Clientes delta, read back and verify Cliente360
-        env:
-          I63_EVIDENCE_DIR: ${{ runner.temp }}/gravicentra-i63-evidence
-        run: node tools/gravicentra-i6-3-clientes-delta-executor-ephemeral.mjs
-      - name: Verify safe physical evidence
-        if: success()
-        env:
-          E: ${{ runner.temp }}/gravicentra-i63-evidence/i63-apply-readback-functional.json
+
+      - name: No-op after technical seal
+        if: steps.mode.outputs.mode == 'noop'
+        run: node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+
+      - name: Source contracts
+        if: steps.mode.outputs.mode == 'release'
         run: |
           set -euo pipefail
-          test "$(jq -r .status "$E")" = PASS
-          test "$(jq -r .apply.operationalMutations "$E")" = 312
-          test "$(jq -r .readback.status "$E")" = PASS
-          test "$(jq -r .readback.documentCount "$E")" = 442
-          test "$(jq -r .functional.status "$E")" = PASS
-          test "$(jq -r .containsPII "$E")" = false
-          test "$(jq -r .containsSecrets "$E")" = false
-          echo I63_PHYSICAL_TECHNICAL_PASS=true
-      - uses: actions/upload-artifact@v4
-        if: always()
+          node --check orbit360-platform/core/tenant-access-policy-contract-p0.js
+          node --check orbit360-platform/core/access-scope.js
+          node --check orbit360-platform/modules/cliente360.js
+          node --check tools/gravicentra-i6-3-clientes-postwrite-functional.mjs
+          node tools/orbit360-recovery-i2-product-active-role-contract-test.mjs
+          grep -Fq "REQUIERE_VALIDACION" orbit360-platform/core/tenant-access-policy-contract-p0.js
+          grep -Fq "Prima neta vigente" orbit360-platform/modules/cliente360.js
+          grep -Fq "no se suman GTQ y COP" orbit360-platform/modules/cliente360.js
+
+      - name: Install runtime proof dependencies
+        if: steps.mode.outputs.mode == 'release'
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false playwright@1.55.0 firebase-admin@13.4.0 >/dev/null
+          npx playwright install --with-deps chromium >/dev/null
+
+      - name: Select existing Firebase authority
+        if: steps.mode.outputs.mode == 'release'
+        run: |
+          set -euo pipefail
+          ROOT="$RUNNER_TEMP/i63-auth"; mkdir -p "$ROOT"; export ROOT
+          python3 - <<'PY'
+          import json,os,pathlib
+          rows=[]
+          for i,k in enumerate(['SA_DEFAULT','SA_ORBIT360_LAB','SA_ORBIT_360_LAB']):
+              try:d=json.loads(os.environ.get(k,''))
+              except:continue
+              if d.get('type')=='service_account' and d.get('project_id')=='ays-orbit-360-lab' and d.get('private_key') and d.get('client_email'):
+                  p=pathlib.Path(os.environ['ROOT'])/f'{i}.json';p.write_text(json.dumps(d));p.chmod(0o600);rows.append(str(p))
+          if not rows:raise SystemExit('I63_NO_SERVICE_ACCOUNT')
+          pathlib.Path(os.environ['ROOT']+'/files').write_text('\n'.join(rows)+'\n')
+          PY
+          SEL=''
+          while read -r F; do
+            if GOOGLE_APPLICATION_CREDENTIALS="$F" npx --yes firebase-tools@14.10.1 hosting:sites:get "$HOSTING_SITE" --project "$PROJECT_ID" --non-interactive --json >/dev/null 2>&1; then SEL="$F"; break; fi
+          done < "$ROOT/files"
+          test -n "$SEL" || { echo I63_FIREBASE_AUTH_NOT_PROVEN >&2; exit 42; }
+          cp "$SEL" "$RUNNER_TEMP/i63-sa.json"
+          chmod 600 "$RUNNER_TEMP/i63-sa.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/i63-sa.json" >> "$GITHUB_ENV"
+
+      - name: Materialize immutable package once
+        if: steps.mode.outputs.mode == 'release'
+        id: build
+        run: |
+          set -euo pipefail
+          npx --yes firebase-tools@14.10.1 apps:list WEB --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/apps.json"
+          export APPS="$RUNNER_TEMP/apps.json"
+          APP_ID=$(python3 - <<'PY'
+          import json,os
+          d=json.load(open(os.environ['APPS']));a=d.get('result') if isinstance(d,dict) else None
+          if not isinstance(a,list):raise SystemExit('I63_WEB_APP_LIST_INVALID')
+          web=[x for x in a if str(x.get('platform','')).upper() in ('WEB','PLATFORM_WEB','')]
+          if len(web)!=1:raise SystemExit('I63_WEB_APP_CARDINALITY:'+str(len(web)))
+          print(web[0].get('appId',''))
+          PY
+          )
+          test -n "$APP_ID"
+          npx --yes firebase-tools@14.10.1 apps:sdkconfig WEB "$APP_ID" --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/public-config.json"
+          export SOURCE_SHA="$GITHUB_SHA"
+          export RELEASE_GATE="I6.3"
+          export BUILD_PREFIX="gi-i63"
+          export ENVIRONMENT_REF="firebase-hosting-preview-i6-3"
+          node tools/gravicentra-i6-1-preview-package.mjs . "$RUNNER_TEMP/i63-package" "$RUNNER_TEMP/public-config.json" > "$RUNNER_TEMP/package-output.json"
+          cat "$RUNNER_TEMP/package-output.json"
+          node - <<'NODE'
+          const fs=require('node:fs'),d=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/package-output.json','utf8'));
+          const m={build_id:d.buildId,hosted_file_count:d.hostedFileCount,hosted_payload_digest:d.hostedPayloadDigest,backend_file_count:d.backendFileCount,backend_source_digest:d.backendSourceDigest,bundle_file_count:d.bundleFileCount,bundle_digest:d.bundleDigest};
+          for(const [k,v] of Object.entries(m))fs.appendFileSync(process.env.GITHUB_OUTPUT,k+'='+v+'\n');
+          NODE
+
+      - name: Deploy exact package to isolated Preview
+        if: steps.mode.outputs.mode == 'release'
+        id: preview
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/i63-package/bundle"
+          CHANNEL_ID="gi-i63-$GITHUB_RUN_ID"
+          npx --yes firebase-tools@14.10.1 hosting:channel:deploy "$CHANNEL_ID" --config firebase.json --project "$PROJECT_ID" --expires 7d --non-interactive --json > "$RUNNER_TEMP/preview.json"
+          export DEPLOY="$RUNNER_TEMP/preview.json"
+          PREVIEW_URL=$(python3 - <<'PY'
+          import os,re
+          raw=open(os.environ['DEPLOY']).read();prod='https://'+os.environ['HOSTING_SITE']+'.web.app'
+          urls=[u.rstrip('/') for u in re.findall(r'https://[A-Za-z0-9._-]+\.web\.app',raw) if u.rstrip('/')!=prod]
+          if not urls:raise SystemExit('I63_PREVIEW_URL_NOT_FOUND')
+          print(urls[-1])
+          PY
+          )
+          echo "channel_id=$CHANNEL_ID" >> "$GITHUB_OUTPUT"
+          echo "preview_url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
+
+      - name: Exact Preview readback
+        if: steps.mode.outputs.mode == 'release'
+        env:
+          TARGET_URL: ${{ steps.preview.outputs.preview_url }}
+          EXPECTED_BUILD_ID: ${{ steps.build.outputs.build_id }}
+          EXPECTED_DIGEST: ${{ steps.build.outputs.hosted_payload_digest }}
+        run: |
+          set -euo pipefail
+          export MANIFEST="$RUNNER_TEMP/i63-package/evidence/site-manifest.sha256"
+          python3 - <<'PY'
+          import hashlib,json,os,urllib.parse,urllib.request
+          rows=[tuple(x.split('  ',1)) for x in open(os.environ['MANIFEST']).read().splitlines() if x.strip()]
+          base=os.environ['TARGET_URL'].rstrip('/');bad=[]
+          for want,rel in rows:
+              req=urllib.request.Request(base+'/'+urllib.parse.quote(rel,safe='/')+'?i63='+os.environ['EXPECTED_DIGEST'][:16],headers={'Accept-Encoding':'identity','Cache-Control':'no-cache'})
+              with urllib.request.urlopen(req,timeout=30) as r:got=hashlib.sha256(r.read()).hexdigest()
+              if got!=want:bad.append((rel,want,got))
+          if bad:raise SystemExit('I63_PREVIEW_READBACK_MISMATCH:'+json.dumps(bad[:3]))
+          with urllib.request.urlopen(urllib.request.Request(base+'/__recovery__/build.json?i63=1',headers={'Cache-Control':'no-cache'}),timeout=30) as r:m=json.loads(r.read())
+          if m.get('sourceSha')!=os.environ['GITHUB_SHA'] or m.get('buildId')!=os.environ['EXPECTED_BUILD_ID'] or m.get('gate')!='I6.3':raise SystemExit('I63_PREVIEW_MARKER_MISMATCH')
+          print('I63_PREVIEW_READBACK='+str(len(rows)))
+          PY
+
+      - name: Preview Cliente360 proof
+        if: steps.mode.outputs.mode == 'release'
+        env:
+          TARGET_URL: ${{ steps.preview.outputs.preview_url }}
+          EXPECTED_SOURCE_SHA: ${{ github.sha }}
+          EXPECTED_BUILD_ID: ${{ steps.build.outputs.build_id }}
+          I63_PROOF_STAGE: preview
+          I63_PROOF_FILE: ${{ runner.temp }}/i63-package/evidence/i63-clientes-preview-functional.json
+        run: node tools/gravicentra-i6-3-clientes-postwrite-functional.mjs
+
+      - name: Upload immutable build artifact before promotion
+        if: steps.mode.outputs.mode == 'release'
+        id: buildart
+        uses: actions/upload-artifact@v4
         with:
-          name: gravicentra-i6-3-apply-evidence-${{ github.run_id }}
-          path: ${{ runner.temp }}/gravicentra-i63-evidence
+          name: gravicentra-i6-3-build-${{ github.run_id }}
+          path: ${{ runner.temp }}/i63-package
+          include-hidden-files: true
+          compression-level: 0
           if-no-files-found: error
-          retention-days: 90
+          retention-days: 30
+
+      - name: Create rollback and promote exact Preview channel
+        if: steps.mode.outputs.mode == 'release'
+        id: promote
+        run: |
+          set -euo pipefail
+          RB="gi-i63-rb-$GITHUB_RUN_ID"
+          npx --yes firebase-tools@14.10.1 hosting:clone "$HOSTING_SITE:live" "$HOSTING_SITE:$RB" --project "$PROJECT_ID" --non-interactive
+          echo "rollback_channel=$RB" >> "$GITHUB_OUTPUT"
+          npx --yes firebase-tools@14.10.1 hosting:clone "$HOSTING_SITE:${{ steps.preview.outputs.channel_id }}" "$HOSTING_SITE:live" --project "$PROJECT_ID" --non-interactive
+          echo "promoted=true" >> "$GITHUB_OUTPUT"
+          echo I63_SAME_ARTIFACT_PROMOTION=PASS
+
+      - name: Exact LIVE readback
+        if: steps.mode.outputs.mode == 'release'
+        env:
+          TARGET_URL: ${{ env.PRODUCTION_URL }}
+          EXPECTED_BUILD_ID: ${{ steps.build.outputs.build_id }}
+          EXPECTED_DIGEST: ${{ steps.build.outputs.hosted_payload_digest }}
+        run: |
+          set -euo pipefail
+          export MANIFEST="$RUNNER_TEMP/i63-package/evidence/site-manifest.sha256"
+          python3 - <<'PY'
+          import hashlib,json,os,urllib.parse,urllib.request
+          rows=[tuple(x.split('  ',1)) for x in open(os.environ['MANIFEST']).read().splitlines() if x.strip()]
+          base=os.environ['TARGET_URL'].rstrip('/');bad=[]
+          for want,rel in rows:
+              req=urllib.request.Request(base+'/'+urllib.parse.quote(rel,safe='/')+'?i63live='+os.environ['EXPECTED_DIGEST'][:16],headers={'Accept-Encoding':'identity','Cache-Control':'no-cache'})
+              with urllib.request.urlopen(req,timeout=30) as r:got=hashlib.sha256(r.read()).hexdigest()
+              if got!=want:bad.append((rel,want,got))
+          if bad:raise SystemExit('I63_LIVE_READBACK_MISMATCH:'+json.dumps(bad[:3]))
+          with urllib.request.urlopen(urllib.request.Request(base+'/__recovery__/build.json?i63live=1',headers={'Cache-Control':'no-cache'}),timeout=30) as r:m=json.loads(r.read())
+          if m.get('sourceSha')!=os.environ['GITHUB_SHA'] or m.get('buildId')!=os.environ['EXPECTED_BUILD_ID'] or m.get('gate')!='I6.3':raise SystemExit('I63_LIVE_MARKER_MISMATCH')
+          print('I63_LIVE_READBACK='+str(len(rows)))
+          PY
+
+      - name: LIVE Cliente360 proof
+        if: steps.mode.outputs.mode == 'release'
+        env:
+          TARGET_URL: ${{ env.PRODUCTION_URL }}
+          EXPECTED_SOURCE_SHA: ${{ github.sha }}
+          EXPECTED_BUILD_ID: ${{ steps.build.outputs.build_id }}
+          I63_PROOF_STAGE: live
+          I63_PROOF_FILE: ${{ runner.temp }}/i63-live-functional.json
+        run: node tools/gravicentra-i6-3-clientes-postwrite-functional.mjs
+
+      - name: Upload LIVE evidence
+        if: steps.mode.outputs.mode == 'release'
+        id: liveart
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i6-3-live-evidence-${{ github.run_id }}
+          path: ${{ runner.temp }}/i63-live-functional.json
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Seal technical LIVE pending Paula visual
+        if: steps.mode.outputs.mode == 'release'
+        env:
+          BUILD_ID: ${{ steps.build.outputs.build_id }}
+          HOSTED_FILE_COUNT: ${{ steps.build.outputs.hosted_file_count }}
+          HOSTED_PAYLOAD_DIGEST: ${{ steps.build.outputs.hosted_payload_digest }}
+          BACKEND_FILE_COUNT: ${{ steps.build.outputs.backend_file_count }}
+          BACKEND_SOURCE_DIGEST: ${{ steps.build.outputs.backend_source_digest }}
+          BUNDLE_FILE_COUNT: ${{ steps.build.outputs.bundle_file_count }}
+          BUNDLE_DIGEST: ${{ steps.build.outputs.bundle_digest }}
+          PREVIEW_CHANNEL_ID: ${{ steps.preview.outputs.channel_id }}
+          PREVIEW_URL: ${{ steps.preview.outputs.preview_url }}
+          ROLLBACK_CHANNEL_ID: ${{ steps.promote.outputs.rollback_channel }}
+          ARTIFACT_ID: ${{ steps.buildart.outputs.artifact-id }}
+          ARTIFACT_DIGEST: ${{ steps.buildart.outputs.artifact-digest }}
+          LIVE_EVIDENCE_ARTIFACT_ID: ${{ steps.liveart.outputs.artifact-id }}
+          LIVE_EVIDENCE_ARTIFACT_DIGEST: ${{ steps.liveart.outputs.artifact-digest }}
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('node:fs'),cp=require('node:child_process');
+          const C=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8'));
+          const S=JSON.parse(fs.readFileSync(process.env.SOURCE_INTAKE,'utf8'));
+          const L=JSON.parse(fs.readFileSync(process.env.LEDGER,'utf8'));
+          const live=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/i63-live-functional.json','utf8'));
+          if(live.status!=='PASS'||live.backend?.documentCount!==442||live.ui?.runtimeVisibleClientCount!==442||live.ui?.controlSamplesHydrated!==5||live.kpi?.status!=='PASS')throw new Error('I63_SEAL_LIVE_PROOF_INVALID');
+          const old=JSON.parse(JSON.stringify(C.certifiedCandidate||{}));
+          const release={
+            sourceSha:process.env.GITHUB_SHA,
+            sourceTree:cp.execFileSync('git',['rev-parse','HEAD^{tree}'],{encoding:'utf8'}).trim(),
+            i3RunId:Number(process.env.GITHUB_RUN_ID),i3Conclusion:'success',runnerCommit:process.env.GITHUB_SHA,
+            buildId:process.env.BUILD_ID,artifactId:Number(process.env.ARTIFACT_ID),
+            artifactName:'gravicentra-i6-3-build-'+process.env.GITHUB_RUN_ID,artifactArchiveDigest:process.env.ARTIFACT_DIGEST,
+            previewChannelId:process.env.PREVIEW_CHANNEL_ID,previewUrl:process.env.PREVIEW_URL,
+            hostedFileCount:Number(process.env.HOSTED_FILE_COUNT),hostedPayloadDigest:process.env.HOSTED_PAYLOAD_DIGEST,
+            backendFileCount:Number(process.env.BACKEND_FILE_COUNT),backendSourceDigest:process.env.BACKEND_SOURCE_DIGEST,
+            bundleFileCount:Number(process.env.BUNDLE_FILE_COUNT),bundleDigest:process.env.BUNDLE_DIGEST,
+            readbackExact:true,readbackFileCount:Number(process.env.HOSTED_FILE_COUNT),
+            sameFrontendArtifactPreviewToProductionRequired:true,sameBackendSourcePackageRequiredForI5:false,sourceMutatedAfterBuild:false,
+            productionUrl:process.env.PRODUCTION_URL,promotedLiveRunId:Number(process.env.GITHUB_RUN_ID)
+          };
+          C.preI63CertifiedCandidate=C.preI63CertifiedCandidate||old;
+          C.certifiedCandidate=release;
+          C.i63CodeDefect={...(C.i63CodeDefect||{}),
+            status:'I6_3_CODE_DEFECT_SUCCESSOR_LIVE_PASS_PENDING_PAULA_VISUAL',
+            sourceSha:release.sourceSha,sourceTree:release.sourceTree,buildId:release.buildId,artifactId:release.artifactId,artifactDigest:release.artifactArchiveDigest,
+            previewChannelId:release.previewChannelId,previewUrl:release.previewUrl,liveRunId:Number(process.env.GITHUB_RUN_ID),
+            productionReadbackExact:true,functionalPass:true,backendDocumentCount:442,runtimeVisibleAfterFix:442,controlSamplesVisible:5,
+            kpiLabel:'Prima neta vigente',kpiSeparatedByCurrency:true,kpiAmounts:live.kpi.amounts,rollbackChannelId:process.env.ROLLBACK_CHANNEL_ID,
+            liveEvidenceArtifactId:Number(process.env.LIVE_EVIDENCE_ARTIFACT_ID),liveEvidenceArtifactDigest:process.env.LIVE_EVIDENCE_ARTIFACT_DIGEST,
+            dataMutationAuthorized:false,reimportAuthorized:false
+          };
+          C.i6Execution.productMutationAuthorized=false;
+          C.i6Execution.activeModuleStatus='PENDING_USER_VISUAL';
+          C.nextAction='I6_3_USER_VISUAL_REFRESH_CHECK';
+          C.postproductionDataUpdateControl.executionCursor='PENDING_USER_VISUAL';
+          C.postproductionDataUpdateControl.nextRequiredStep='USER_VISUAL_REFRESH_CHECK';
+
+          S.execution.cursorState='PENDING_USER_VISUAL';
+          S.execution.nextRequiredStep='USER_VISUAL_REFRESH_CHECK';
+          S.execution.liveVisualConfirmed=false;
+          S.execution.codeDefect.status='TECHNICAL_LIVE_PASS_PENDING_PAULA_VISUAL';
+          S.execution.codeDefect.releaseRunId=Number(process.env.GITHUB_RUN_ID);
+          S.execution.codeDefect.runtimeVisibleAfterFix=442;
+          S.execution.codeDefect.controlSamplesVisible=5;
+          S.execution.codeDefect.kpiAmounts=live.kpi.amounts;
+          fs.writeFileSync(process.env.SOURCE_INTAKE,JSON.stringify(S,null,2)+'\n');
+          const sourceBlob=cp.execFileSync('git',['hash-object',process.env.SOURCE_INTAKE],{encoding:'utf8'}).trim();
+          C.i6Execution.activeSourceIntakeBlobSha=sourceBlob;
+          C.postproductionDataUpdateControl.activeSourceIntakeBlobSha=sourceBlob;
+
+          L.releaseBinding={
+            sourceSha:release.sourceSha,buildId:release.buildId,artifactId:release.artifactId,
+            artifactArchiveDigest:release.artifactArchiveDigest,previewChannelId:release.previewChannelId
+          };
+          L.i63LiveAcceptance={
+            status:'TECHNICAL_LIVE_PASS_PENDING_PAULA_VISUAL',sourceSha:release.sourceSha,buildId:release.buildId,
+            artifactId:release.artifactId,liveRunId:Number(process.env.GITHUB_RUN_ID),backendClients:442,cliente360Clients:442,
+            controlSamples:5,kpi:'PRIMA_NETA_VIGENTE_BY_CURRENCY',unaffectedCapabilitiesPreserved:true
+          };
+          const cap=(L.capabilities||[]).find(x=>x.id==='CLIENTE360_PRIMARY_RUNTIME');
+          if(cap){
+            cap.liveAcceptance=cap.liveAcceptance||{status:'LATEST_APPROVED_VERSION_LIVE_PASS',evidence:[]};
+            cap.liveAcceptance.evidence=cap.liveAcceptance.evidence||[];
+            cap.liveAcceptance.evidence.push({
+              runId:Number(process.env.GITHUB_RUN_ID),artifactId:release.artifactId,artifactDigest:release.artifactArchiveDigest,
+              evidence:'I6.3 causal successor technical LIVE proof: backend/runtime 442; five control inserts hydrated/searchable; unresolved-country clients visible; net premium separated by currency. Paula visual acceptance pending.'
+            });
+          }
+          fs.writeFileSync(process.env.LEDGER,JSON.stringify(L,null,2)+'\n');
+          fs.writeFileSync(process.env.CONTROL,JSON.stringify(C,null,2)+'\n');
+          NODE
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          git config user.name "gravicentra-governance-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add "$CONTROL" "$SOURCE_INTAKE" "$LEDGER"
+          git commit -m "recovery(i6.3): seal Cliente360 technical LIVE pending Paula visual"
+          git push origin HEAD:recovery/fase-a-clean-20260831
+
+      - name: Roll back LIVE on post-promotion failure
+        if: failure() && steps.promote.outputs.promoted == 'true'
+        run: |
+          set -euo pipefail
+          npx --yes firebase-tools@14.10.1 hosting:clone "$HOSTING_SITE:${{ steps.promote.outputs.rollback_channel }}" "$HOSTING_SITE:live" --project "$PROJECT_ID" --non-interactive
+          echo I63_AUTOMATIC_ROLLBACK=PASS
