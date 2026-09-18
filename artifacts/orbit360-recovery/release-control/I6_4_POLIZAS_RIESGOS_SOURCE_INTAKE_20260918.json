@@ -148,11 +148,11 @@
   },
   "execution": {
     "method": "DATA_UPDATE_DELTA_FIRST",
-    "cursorState": "DETERMINISTIC_DIFF_READY",
-    "writeApplied": false,
+    "cursorState": "POST_WRITE_READBACK_INTEGRITY_PASS",
+    "writeApplied": true,
     "readbackPassed": true,
     "deterministicDiffReady": true,
-    "nextRequiredStep": "APPLY_DETERMINISTIC_DELTA_ONLY",
+    "nextRequiredStep": "USER_VISUAL_REFRESH_CHECK",
     "readbackRunId": 35325748631,
     "readbackArtifactId": 10539073435,
     "readbackArtifactDigest": "00489c6e2673aed0eabdd7f406e9e2c2e41dd2fb9b0fb3f034f16a65bef761cf",
@@ -296,7 +296,31 @@
       "sourceBundleUnchanged": true,
       "encryptedPayloadUnchanged": true,
       "deterministicDiffRecalculated": false
-    }
+    },
+    "applyRunId": 35336966387,
+    "applyArtifactId": 10543444384,
+    "applyArtifactDigest": "ab04c328857ac3f4b51d0746064158160c48d5cdf40a5c20432017328a4e8ef5",
+    "appliedCounts": {
+      "policyUpdates": 486,
+      "policyInserts": 41,
+      "vehicleLogicalUpdates": 352,
+      "vehicleUniqueUpdateTargets": 350,
+      "vehicleInserts": 31,
+      "logicalMutationIntents": 910,
+      "operationalWrites": 908,
+      "coalescedDuplicateUpdateTargets": 2,
+      "deletes": 0
+    },
+    "liveCountsAfter": {
+      "clientes": 442,
+      "clientesCanonicalActive": 439,
+      "polizas": 1414,
+      "vehiculos": 1063,
+      "renovaciones": 0
+    },
+    "postWriteReadbackPassed": true,
+    "integrityPassed": true,
+    "functionalPassed": true
   },
   "guards": {
     "doNotCommitPIISourceFiles": true,

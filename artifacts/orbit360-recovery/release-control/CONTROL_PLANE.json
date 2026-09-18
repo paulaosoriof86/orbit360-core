@@ -415,9 +415,9 @@
     "mechanismRegistryPath": "artifacts/orbit360-recovery/release-control/DATA_UPDATE_MECHANISM_REGISTRY.json",
     "mechanismRegistryBlobSha": "785a71f234d372db3fd23e16aa6800e1c1a62041",
     "activeSourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_4_POLIZAS_RIESGOS_SOURCE_INTAKE_20260918.json",
-    "activeSourceIntakeBlobSha": "19afe5515b7d3497b48b8e9f3a55fbdc26f8e923",
+    "activeSourceIntakeBlobSha": "887b24a2eb7db4c8eb6d65330fe14c249085bb3e",
     "activeModule": "POLIZAS_RIESGOS_VEHICULOS",
-    "activeModuleStatus": "DETERMINISTIC_DIFF_READY",
+    "activeModuleStatus": "POST_WRITE_READBACK_INTEGRITY_PASS",
     "i6_0": {
       "status": "I6_0_BASELINE_FROZEN",
       "executorPath": ".github/workflows/gravicentra-material-baseline-freeze.yml",
@@ -462,11 +462,11 @@
       "receiptBlobSha": "c4ceccd2b69d0b07b547974b690b8232864c8d75"
     },
     "i6_4": {
-      "status": "DETERMINISTIC_DIFF_READY",
+      "status": "POST_WRITE_READBACK_INTEGRITY_PASS",
       "readbackRunId": 35325748631,
       "readbackArtifactId": 10539073435,
       "readbackArtifactDigest": "00489c6e2673aed0eabdd7f406e9e2c2e41dd2fb9b0fb3f034f16a65bef761cf",
-      "writesExecuted": 0,
+      "writesExecuted": 908,
       "liveCounts": {
         "clientes": 442,
         "polizas": 1373,
@@ -509,7 +509,25 @@
       "operationalMutationTargets": 908,
       "vehicleUniqueUpdateTargets": 350,
       "coalescedDuplicateUpdateTargets": 2,
-      "executionCorrection": "COALESCE_COMPATIBLE_VEHICLE_PATCHES_TO_CANONICAL_TARGET"
+      "executionCorrection": "COALESCE_COMPATIBLE_VEHICLE_PATCHES_TO_CANONICAL_TARGET",
+      "writeApplied": true,
+      "applyRunId": 35336966387,
+      "applyArtifactId": 10543444384,
+      "applyArtifactDigest": "ab04c328857ac3f4b51d0746064158160c48d5cdf40a5c20432017328a4e8ef5",
+      "logicalMutationsApplied": 910,
+      "batchesCommitted": 12,
+      "postWriteCounts": {
+        "clientes": 442,
+        "clientesCanonicalActive": 439,
+        "polizas": 1414,
+        "vehiculos": 1063,
+        "renovaciones": 0
+      },
+      "readbackPassed": true,
+      "integrityPassed": true,
+      "functionalPassed": true,
+      "rollbackExecuted": false,
+      "paulaVisualAcceptance": "PENDING"
     }
   },
   "postproductionDataUpdateControl": {
@@ -523,15 +541,15 @@
     "mechanismRegistryBlobSha": "785a71f234d372db3fd23e16aa6800e1c1a62041",
     "activeModule": "POLIZAS_RIESGOS_VEHICULOS",
     "activeSourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_4_POLIZAS_RIESGOS_SOURCE_INTAKE_20260918.json",
-    "activeSourceIntakeBlobSha": "19afe5515b7d3497b48b8e9f3a55fbdc26f8e923",
+    "activeSourceIntakeBlobSha": "887b24a2eb7db4c8eb6d65330fe14c249085bb3e",
     "sourceSha256": "7130ed56467da438f5c6e2823ede65f73d6356de63de94e19da30f3aed26c68f",
     "conversationAsAuthority": false,
     "requestCurrentSourceBeforeEveryNewModule": true,
     "liveVisualRefreshRequiredForClosure": true,
     "pureDataUpdateRequiresBuildOrDeploy": false,
     "reimportForVisibilityFailureForbidden": true,
-    "nextRequiredStep": "APPLY_DETERMINISTIC_DELTA_ONLY",
-    "executionCursor": "DETERMINISTIC_DIFF_READY"
+    "nextRequiredStep": "USER_VISUAL_REFRESH_CHECK",
+    "executionCursor": "POST_WRITE_READBACK_INTEGRITY_PASS"
   },
   "governanceSyncChecklist": {
     "frozenPlanMaterialized": true,
@@ -608,7 +626,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_4_APPLY_DETERMINISTIC_DELTA",
+  "nextAction": "I6_4_USER_VISUAL_REFRESH_CHECK",
   "postproductionExitProgress": {
     "formalPercent": 40,
     "frozenMiniGates": 4,
