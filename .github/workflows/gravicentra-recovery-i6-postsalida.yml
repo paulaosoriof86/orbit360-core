@@ -18,6 +18,7 @@ on:
       - 'tools/gravicentra-i6-3-client-completeness-audit.mjs'
       - 'tools/gravicentra-i6-3-identity-merge-executor.mjs'
       - 'tools/gravicentra-i6-4-live-readback.mjs'
+      - 'tools/gravicentra-i6-4-diff-snapshot.mjs'
       - 'tools/gravicentra-certified-live-binding-check.mjs'
       - 'orbit360-platform/core/tenant-access-policy-contract-p0.js'
       - 'orbit360-platform/core/access-scope.js'
@@ -710,3 +711,53 @@ jobs:
           git commit -m "recovery(i6.4): freeze LIVE policy-risk readback"
           node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
           git push origin HEAD:recovery/fase-a-clean-20260831
+
+
+  i64-diff-snapshot:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      I64_SOURCE_INTAKE: artifacts/orbit360-recovery/release-control/I6_4_POLIZAS_RIESGOS_SOURCE_INTAKE_20260918.json
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Resolve I6.4 diff snapshot applicability
+        id: i64diff
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const c=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8'));
+          const s=JSON.parse(fs.readFileSync(process.env.I64_SOURCE_INTAKE,'utf8'));
+          const ok=c.gateState?.gates?.I6?.activeSubgate==='I6.4' &&
+            c.nextAction==='I6_4_DETERMINISTIC_DIFF' &&
+            s.execution?.cursorState==='LIVE_READBACK_PASS';
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(ok?'true':'false')+'\n');
+          console.log('I64_DIFF_SNAPSHOT_APPLICABLE='+(ok?'true':'false'));
+          NODE
+      - name: Install diff snapshot dependency
+        if: steps.i64diff.outputs.run == 'true'
+        run: npm install --no-save --package-lock=false firebase-admin@13.4.0 >/dev/null
+      - name: Build sanitized LIVE diff snapshot
+        if: steps.i64diff.outputs.run == 'true'
+        env:
+          I64_DIFF_SNAPSHOT_FILE: ${{ runner.temp }}/i64-diff-live-snapshot.json
+        run: node tools/gravicentra-i6-4-diff-snapshot.mjs
+      - name: Upload sanitized LIVE diff snapshot
+        if: steps.i64diff.outputs.run == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i6-4-diff-snapshot-${{ github.run_id }}
+          path: ${{ runner.temp }}/i64-diff-live-snapshot.json
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 7
