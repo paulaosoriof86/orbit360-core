@@ -11,11 +11,11 @@
   "previousLedgerBlobSha": "09c98a60b3221da29931ea32611fcf528c7f8af7",
   "previousLedgerEvidencePreservedByGitHistory": true,
   "releaseBinding": {
-    "sourceSha": "63a837194988d3f3e9c758f5bf411c1da9a7c50a",
-    "buildId": "gi-i65-63a837194988-57f234755dc1",
-    "artifactId": 10565330652,
-    "artifactArchiveDigest": "e491d6662aee914772d88f74c5ee22452fe2b1637ecc99adf30cf1e4ceb3c87c",
-    "previewChannelId": "gi-i3-34545182877"
+    "sourceSha": "7408b41a392b441fc88175584270895313ca5231",
+    "buildId": "gi-i65-7408b41a392b-57f234755dc1",
+    "artifactId": 10571206572,
+    "artifactArchiveDigest": "ce25f20a788f6c8283470228e90a31f820ab947002729a4aa9cd192818e651a3",
+    "previewChannelId": "gi-i5-rb-34723234361"
   },
   "successorCandidate": {
     "sourceSha": "03b03690b5583442dd448e954fb66c3c78648fb3",
@@ -701,5 +701,15 @@
     "relationshipErrors": 0,
     "functionalPass": true,
     "i64SentinelsPreserved": true
+  },
+  "i65OperationalClosureAcceptance": {
+    "status": "LIVE_PASS_PENDING_FINAL_PAULA_VISUAL",
+    "sourceSha": "7408b41a392b441fc88175584270895313ca5231",
+    "buildId": "gi-i65-7408b41a392b-57f234755dc1",
+    "artifactId": 10571206572,
+    "liveRunId": 35402014747,
+    "globalPortfolioCount": 1283,
+    "globalCobrosCount": 5,
+    "dataWrites": 0
   }
 }
