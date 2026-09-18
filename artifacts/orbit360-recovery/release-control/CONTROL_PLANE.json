@@ -1049,15 +1049,23 @@
     ],
     "detailGuardScopeAuthorizedByPaula": true,
     "detailGuardScopeAuthorizedAt": "2026-09-18T09:28:00-06:00",
-    "latestFailedPreviewRunId": 35363551935,
-    "latestFailedPreviewBuildId": "gi-i64-265a3dd54a43-57f234755dc1",
-    "latestFailedPreviewUrl": "https://ays-orbit-360-lab--gi-i64-35363551935-4ykt62pm.web.app",
-    "latestFailedPreviewHostedPayloadDigest": "7ba3fdb1c5ef896a4679aff9f88b3ec94d80230b0c050efc47dbeea4159f3e91",
+    "latestFailedPreviewRunId": 35364152724,
+    "latestFailedPreviewBuildId": "gi-i64-e36085700a66-57f234755dc1",
+    "latestFailedPreviewUrl": "https://ays-orbit-360-lab--gi-i64-35364152724-70q2g921.web.app",
+    "latestFailedPreviewHostedPayloadDigest": "8b10a1057c7cd8b0ccc875c8da1c051356de8f620e46f8bbc1e1bb0601a41038",
     "latestFailedPreviewReadbackExact": true,
     "latestFailedPreviewAssertion": "I64_RENEWABILITY_UNKNOWN_DISPLAY:Renovabilidad pendiente de revisión/conciliación",
     "latestFailedPreviewPromotedToLive": false,
     "latestFailedPreviewOperationalWrites": 0,
     "latestFailedPreviewDiagnosis": "QA assertion inspected whole full-page text; source review proves the canonical field uses tri-state helper. Proof tightened to the exact Renovación label/value pair; no runtime self-patch.",
-    "renewabilityProofBinding": "CANONICAL_FULLPAGE_FIELD_MARKER:data-policy-renewability=1"
+    "renewabilityProofBinding": "CANONICAL_FULLPAGE_FIELD_MARKER:data-policy-renewability=1",
+    "legacyPortalCopyCollision": {
+      "status": "CAUSAL_RUNTIME_COLLISION_MITIGATED_WITHIN_AUTHORIZED_DETAIL_OWNER",
+      "observedPhrase": "Renovabilidad pendiente de revisión/conciliación",
+      "cause": "portal-v1142-copyfix globally rewrites the generic phrase 'pendiente de validar' in DOM text nodes, although its intent is payment/portal copy.",
+      "productOwnerModified": "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+      "outOfScopePortalOwnerModified": false,
+      "mitigation": "Render the canonical renewability sentence across adjacent text nodes so visible wording remains exactly 'Renovabilidad pendiente de validar' without invoking the unrelated generic portal rewrite."
+    }
   }
 }

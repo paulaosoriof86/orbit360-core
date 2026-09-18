@@ -44,6 +44,14 @@ Orbit.modules = Orbit.modules || {};
     const state = renewabilityState(p);
     return state === 'YES' ? 'Renovable' : state === 'NO' ? 'No renovable' : 'Renovabilidad pendiente de validar';
   };
+  const renewabilityHtml = p => {
+    const state = renewabilityState(p);
+    if (state === 'YES') return '<span data-policy-renewability="1">Renovable</span>';
+    if (state === 'NO') return '<span data-policy-renewability="1">No renovable</span>';
+    // Split the legacy phrase into adjacent text nodes so the unrelated portal copy bridge cannot
+    // rewrite this policy-domain semantic while preserving the exact visible sentence.
+    return '<span data-policy-renewability="1">Renovabilidad pendiente de <span>validar</span></span>';
+  };
 
   function policyVisual(p) {
     if (!p || typeof p !== 'object') return p;
@@ -276,7 +284,7 @@ Orbit.modules = Orbit.modules || {};
             field('Cliente / asegurado', cli.nombre || p.aseguradoNombreFuente), field('Aseguradora', asg.nombre || p.aseguradoraFuenteNombre), field('Asesor', ase.nombre || p.asesorFuenteNombre),
             field('N.º de póliza', p.numero, {mono:true}), field('Estado', p.estado), field('País / moneda', `${p.pais || cli.pais || '—'} · ${cur || '—'}`),
             field('Ramo', p.ramo), field('Subramo / producto', p.subramo || p.producto), field('Tipo de póliza', p.tipoPoliza),
-            field('Inicio de vigencia', fmtDate(p.vigenciaInicio)), field('Fin de vigencia', fmtDate(p.vigenciaFin)), field('Renovación', `<span data-policy-renewability="1">${esc(renewabilityLabel(p))}</span>`, {html:true}),
+            field('Inicio de vigencia', fmtDate(p.vigenciaInicio)), field('Fin de vigencia', fmtDate(p.vigenciaFin)), field('Renovación', renewabilityHtml(p), {html:true}),
             field('Suma asegurada', moneyDetail(p.sumaAsegurada, cur)), field('Concepto / riesgo', p.concepto), field('Calidad de información', qualityBlock(p, vehicle), {html:true})
           ], 3))}
           ${section('Prima y condiciones de pago', `<div class="orbit-premium-grid" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 24px">${[

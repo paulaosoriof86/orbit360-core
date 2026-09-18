@@ -116,15 +116,19 @@
     "operationalWrites": 0,
     "authorizedByPaula": true,
     "authorizedAt": "2026-09-18T09:28:00-06:00",
-    "latestPreviewRunId": 35363551935,
-    "latestPreviewBuildId": "gi-i64-265a3dd54a43-57f234755dc1",
-    "latestPreviewUrl": "https://ays-orbit-360-lab--gi-i64-35363551935-4ykt62pm.web.app",
+    "latestPreviewRunId": 35364152724,
+    "latestPreviewBuildId": "gi-i64-e36085700a66-57f234755dc1",
+    "latestPreviewUrl": "https://ays-orbit-360-lab--gi-i64-35364152724-70q2g921.web.app",
     "latestPreviewReadbackExact": true,
     "latestPreviewPromotedToLive": false,
     "latestPreviewOperationalWrites": 0,
     "latestPreviewAssertion": "I64_RENEWABILITY_UNKNOWN_DISPLAY",
     "proofCorrection": "Bind functional proof to the canonical full-page Renovación field emitted by the authorized detail owner.",
     "latestPreviewObservedUnscopedRenewalText": "Renovabilidad pendiente de revisión/conciliación",
-    "canonicalFieldProofBinding": "data-policy-renewability=1"
+    "canonicalFieldProofBinding": "data-policy-renewability=1",
+    "runtimeCollisionOwner": "orbit360-platform/modules/portal-v1142-copyfix.js",
+    "runtimeCollisionCause": "Global generic DOM text replacement of 'pendiente de validar' -> 'pendiente de revisión/conciliación'.",
+    "outOfScopeOwnerModified": false,
+    "causalMitigation": "Authorized detail owner emits the exact visible renewability sentence as adjacent text nodes, preventing unrelated portal copy rewriting while preserving visible semantics."
   }
 }
