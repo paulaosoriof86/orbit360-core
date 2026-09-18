@@ -1040,7 +1040,16 @@ jobs:
           set -euo pipefail
           cd "$RUNNER_TEMP/i65-package/bundle"
           CHANNEL_ID="i65h-$GITHUB_RUN_ID"
-          npx --yes firebase-tools@14.10.1 hosting:channel:deploy "$CHANNEL_ID" --config firebase.json --project "$PROJECT_ID" --expires 7d --non-interactive --json > "$RUNNER_TEMP/preview.json"
+          set +e
+          npx --yes firebase-tools@14.10.1 hosting:channel:deploy "$CHANNEL_ID" --config firebase.json --project "$PROJECT_ID" --expires 7d --non-interactive --json > "$RUNNER_TEMP/preview.json" 2> "$RUNNER_TEMP/preview.err"
+          RC=$?
+          set -e
+          if [ "$RC" -ne 0 ]; then
+            echo "I65_PREVIEW_DEPLOY_FAILED_RC=$RC" >&2
+            test ! -s "$RUNNER_TEMP/preview.err" || cat "$RUNNER_TEMP/preview.err" >&2
+            test ! -s "$RUNNER_TEMP/preview.json" || cat "$RUNNER_TEMP/preview.json" >&2
+            exit "$RC"
+          fi
           export DEPLOY="$RUNNER_TEMP/preview.json"
           PREVIEW_URL=$(python3 - <<'PY'
           import os,re

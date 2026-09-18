@@ -1,0 +1,78 @@
+{
+  "schema": "GRAVICENTRA_I6_5_CONTINUITY_ANTI_DRIFT_LOCK_V1",
+  "status": "FROZEN_ACTIVE",
+  "date": "2026-09-18",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "authority": {
+    "controlPlane": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+    "microplan": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_MINI_CIERRE_OPERATIVO_DECISION_LOCK_20260918.json",
+      "blobSha": "2d2f1680fd3953a7c63f0619b938e16126e1a628",
+      "status": "FROZEN_ACTIVE"
+    },
+    "phaseB": {
+      "path": "artifacts/orbit360-recovery/release-control/PHASE_B_WORK_PLAN_LOCK_20260917.json",
+      "blobSha": "1b85b08ec9a450d1c798149dea56de6954a09bce",
+      "status": "FROZEN_BACKLOG_NOT_ACTIVE"
+    },
+    "sourceIntake": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_RECIBOS_CARTERA_SOURCE_INTAKE_20260918.json",
+      "blobSha": "db6db64604a936b0c12d31a5b8b943d25bad0c37",
+      "sourceBundleSha256": "f445e2f4a20b9eb7a526bda8896472dab9e7ac4617b3c5d8124a939a0dee0e6a"
+    }
+  },
+  "continuityRules": [
+    "Conversation history is never an execution authority.",
+    "The structural A-B-C-D microplan may not be replaced by a new plan because of an integration defect, visualization defect, new source re-upload, or intermediate finding.",
+    "New findings are nested inside their existing block and must update CONTROL_PLANE cursor/evidence, not create a parallel block, workflow, importer, repo, Firebase project, or methodology.",
+    "Completed modules I6.0-I6.4 are not reopened without a concrete reproducible causal regression.",
+    "I6.5 remains fail-closed for data writes until Block B read-path hydration is LIVE PASS and deterministic diff is physically frozen.",
+    "A source re-upload with identical SHA-256 is provenance reinforcement only; it never resets the cursor or creates a new source version.",
+    "Every product-source correction must prove same-artifact Preview to LIVE, exact hosted readback, authenticated functional behavior, preserved I6.4 sentinels, and zero unrelated/data writes.",
+    "Every pure data step must bind pinned source SHA, current LIVE readback, deterministic diff, exact allowed collections, write counts, post-write readback, and rollback evidence.",
+    "Recibos Esperados, Cartera Primas and Cobros remain semantically separate. No payment/cobro may be inferred from schedule, balance disappearance, commission evidence, one-source evidence, proposal, HOLD, or frequency alone."
+  ],
+  "sourceComplementarity": {
+    "schedule": [
+      "CobranzaCendoso (28).xlsx",
+      "CobranzaCendoso (26).xlsx",
+      "CobranzaCendoso (27).xlsx"
+    ],
+    "paidEvidencePrimary": "CobranzaCendoso (24).xlsx",
+    "paidEvidenceCorroboration": "CobranzaCendoso (25).xlsx",
+    "overdueSnapshot": "CobranzaVencida.xlsx",
+    "crosschecks": [
+      "Reporte-2026-09-18-061226.xlsx",
+      "Reporte-2026-09-18-061143.xlsx"
+    ],
+    "precedence": "No single file replaces another. Field-level evidence is combined only under the frozen policy/receipt identity and inference rules."
+  },
+  "semanticInvariants": {
+    "receiptExpected": "contractual installment/receipt obligation; never payment proof by itself",
+    "portfolio": "premium balance/obligation state; balance reconciliation is not payment",
+    "cobro": "confirmed/evidenced payment under accepted reconciliation contract only",
+    "oneSourceAutoCobroForbidden": true,
+    "bankEvidenceAutoCobroForbidden": true,
+    "frequencySyntheticPendingOnInactivePolicyForbidden": true,
+    "historicalPaidMayRemainHistoryWithoutCurrentPortfolio": true,
+    "futurePendingRequiresActivePolicyTermAndNoContradictoryCancellation": true,
+    "dedupMustIncludeDistinguishingEvidenceBeyondBasePolicySeriesDates": true
+  },
+  "currentCursor": {
+    "gate": "I6.5",
+    "lastFrozenMiniGate": "I6.4",
+    "structuralBlock": "B",
+    "controlPlaneNextAction": "I6_5_HYDRATION_CODE_DEFECT_SUCCESSOR_RELEASE",
+    "dataMutationAuthorized": false,
+    "sourceDataApplyAuthorized": false
+  },
+  "stopOn": [
+    "authority hash drift",
+    "source bundle hash drift",
+    "unexpected product file drift",
+    "runtime/direct Firestore count mismatch",
+    "unrelated collection write",
+    "new business rule requiring owner decision"
+  ]
+}

@@ -415,7 +415,7 @@
     "mechanismRegistryPath": "artifacts/orbit360-recovery/release-control/DATA_UPDATE_MECHANISM_REGISTRY.json",
     "mechanismRegistryBlobSha": "180a839332b1c0c9705d7b284ae8cf59f65fa0b0",
     "activeSourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_5_RECIBOS_CARTERA_SOURCE_INTAKE_20260918.json",
-    "activeSourceIntakeBlobSha": "fb37609cc36b5dc55ef8b6a44770429f3e0c588e",
+    "activeSourceIntakeBlobSha": "db6db64604a936b0c12d31a5b8b943d25bad0c37",
     "activeModule": "RECIBOS_CARTERA",
     "activeModuleStatus": "LIVE_READBACK_PASS",
     "i6_0": {
@@ -593,7 +593,7 @@
     "mechanismRegistryBlobSha": "180a839332b1c0c9705d7b284ae8cf59f65fa0b0",
     "activeModule": "RECIBOS_CARTERA",
     "activeSourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_5_RECIBOS_CARTERA_SOURCE_INTAKE_20260918.json",
-    "activeSourceIntakeBlobSha": "fb37609cc36b5dc55ef8b6a44770429f3e0c588e",
+    "activeSourceIntakeBlobSha": "db6db64604a936b0c12d31a5b8b943d25bad0c37",
     "sourceSha256": "f445e2f4a20b9eb7a526bda8896472dab9e7ac4617b3c5d8124a939a0dee0e6a",
     "conversationAsAuthority": false,
     "requestCurrentSourceBeforeEveryNewModule": true,
@@ -1307,7 +1307,8 @@
   "phaseBWorkPlan": {
     "path": "artifacts/orbit360-recovery/release-control/PHASE_B_WORK_PLAN_LOCK_20260917.json",
     "status": "FROZEN_BACKLOG_NOT_ACTIVE",
-    "entryCondition": "I6.9 / FASE_A_POSTSALIDA_PRODUCTION_ACCEPTED"
+    "entryCondition": "I6.9 / FASE_A_POSTSALIDA_PRODUCTION_ACCEPTED",
+    "blobSha": "1b85b08ec9a450d1c798149dea56de6954a09bce"
   },
   "i65MiniClosurePlan": {
     "status": "FROZEN_ACTIVE",
@@ -1318,7 +1319,10 @@
     "blockCStatus": "BLOCKED_ON_BLOCK_B_HYDRATION_LIVE_PASS",
     "blockDStatus": "PENDING_REUSE_ONLY",
     "cobrosWritesDuringI65": false,
-    "nextMaterialCursor": "HYDRATION_CODE_DEFECT_SUCCESSOR_RELEASE"
+    "nextMaterialCursor": "HYDRATION_CODE_DEFECT_SUCCESSOR_RELEASE",
+    "blobSha": "2d2f1680fd3953a7c63f0619b938e16126e1a628",
+    "conversationDependent": false,
+    "structuralPlanImmutable": true
   },
   "i65HydrationDefect": {
     "status": "I6_5_HYDRATION_CODE_DEFECT_CANDIDATE_PENDING_BUILD",
@@ -1506,5 +1510,15 @@
     ],
     "proofMustCompareRuntimeToDirectCanonical": true,
     "rootCauseFreezePath": "artifacts/orbit360-recovery/release-control/I6_5_BLOCK_B_HYDRATION_ROOT_CAUSE_FREEZE_20260918.json"
+  },
+  "i65ContinuityAntiDrift": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_CONTINUITY_ANTI_DRIFT_LOCK_20260918.json",
+    "blobSha": "1dd8c70fcc07f6b8ac2bbea159ec906237eab337",
+    "status": "FROZEN_ACTIVE",
+    "sourceBundleSha256": "f445e2f4a20b9eb7a526bda8896472dab9e7ac4617b3c5d8124a939a0dee0e6a",
+    "sourceRepinStatus": "EXACT_MATCH_8_OF_8",
+    "conversationAsAuthority": false,
+    "parallelPlanForbidden": true,
+    "dataMutationAuthorized": false
   }
 }

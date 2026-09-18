@@ -196,5 +196,64 @@
         "portfolioReceiptMissing": 0
       }
     }
+  },
+  "repinVerification20260918": {
+    "status": "EXACT_MATCH_8_OF_8",
+    "verifiedAgainstCurrentUploads": true,
+    "sourceBundleSemanticIdentityUnchanged": true,
+    "sourceBundleSha256": "f445e2f4a20b9eb7a526bda8896472dab9e7ac4617b3c5d8124a939a0dee0e6a",
+    "uploadedAliases": [
+      {
+        "uploaded": "CobranzaCendoso (28)(1).xlsx",
+        "canonical": "CobranzaCendoso (28).xlsx",
+        "sha256": "1dd905a5ff483a905e3f2298efbd8ebb20d9146357e0c5732fd89fdd88ebc8c7",
+        "rows": 1745
+      },
+      {
+        "uploaded": "CobranzaCendoso (27)(1).xlsx",
+        "canonical": "CobranzaCendoso (27).xlsx",
+        "sha256": "f17774ef0f8730a0d35f7300510f5eebc73c4d567ccf3b03bc8917421937f834",
+        "rows": 312
+      },
+      {
+        "uploaded": "CobranzaCendoso (26)(1).xlsx",
+        "canonical": "CobranzaCendoso (26).xlsx",
+        "sha256": "8400b6fb3e74b78361870d2eec65822e4dc544511bef90391abb10f0f862ff25",
+        "rows": 1560
+      },
+      {
+        "uploaded": "Reporte-2026-09-18-061226(1).xlsx",
+        "canonical": "Reporte-2026-09-18-061226.xlsx",
+        "sha256": "5681c8d92c94ddd9aa904cede6157004726d70d6da86e179aca6e933f05a000a",
+        "rows": 1188
+      },
+      {
+        "uploaded": "Reporte-2026-09-18-061143(1).xlsx",
+        "canonical": "Reporte-2026-09-18-061143.xlsx",
+        "sha256": "714407074727167bef52eec34572ea84ee1f6d91da7655572437f03bad7887cd",
+        "rows": 982
+      },
+      {
+        "uploaded": "CobranzaCendoso (25)(1).xlsx",
+        "canonical": "CobranzaCendoso (25).xlsx",
+        "sha256": "0cb6af82ebeccc75c9fcf54b2e4e98db28be0b6c64e1cedb69b2b99d0f20cd90",
+        "rows": 1441
+      },
+      {
+        "uploaded": "CobranzaCendoso (24)(1).xlsx",
+        "canonical": "CobranzaCendoso (24).xlsx",
+        "sha256": "36de3d35055716af4ca85d48719d4ef58154286a3136f41fac35287e740c03db",
+        "rows": 1559
+      },
+      {
+        "uploaded": "CobranzaVencida(1).xlsx",
+        "canonical": "CobranzaVencida.xlsx",
+        "sha256": "58708e3ef3fe2e5ebc65873575a5dbfe336ce39e9bafae66b38efa6ea5093ff7",
+        "rows": 320
+      }
+    ],
+    "decision": "Current uploads are exact byte-identical copies of the already pinned I6.5 source universe. Do not create a second source bundle, do not prefer a later filename suffix, and do not reset the I6.5 cursor.",
+    "complementarityPreserved": true,
+    "inferenceBoundaryPreserved": true
   }
 }

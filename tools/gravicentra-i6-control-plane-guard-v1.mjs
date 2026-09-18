@@ -17,6 +17,8 @@ const I63_RECEIPT='artifacts/orbit360-recovery/release-control/I6_3_CLIENTES_LIV
 const I64_SOURCE='artifacts/orbit360-recovery/release-control/I6_4_POLIZAS_RIESGOS_SOURCE_INTAKE_20260918.json';
 const I64_RECEIPT='artifacts/orbit360-recovery/release-control/I6_4_POLIZAS_RIESGOS_LIVE_PASS_20260918.json';
 const I65_SOURCE='artifacts/orbit360-recovery/release-control/I6_5_RECIBOS_CARTERA_SOURCE_INTAKE_20260918.json';
+const I65_MINI='artifacts/orbit360-recovery/release-control/I6_5_MINI_CIERRE_OPERATIVO_DECISION_LOCK_20260918.json';
+const I65_ANTI_DRIFT='artifacts/orbit360-recovery/release-control/I6_5_CONTINUITY_ANTI_DRIFT_LOCK_20260918.json';
 const I65_SYNC='artifacts/orbit360-recovery/release-control/I6_5_SYNC_COMPOSITION_PREFLIGHT_20260918.json';
 const MODE=(process.argv.find(x=>x.startsWith('--mode='))||'--mode=governance').split('=')[1];
 const need=(ok,code)=>{if(!ok)throw new Error(code);};
@@ -220,6 +222,13 @@ if(activeI64V5){
 
 if(activeI65){
   const p=C.postproductionExitProgress||{},seal=C.i6Execution?.i6_4||{},cursor=SRC5.execution?.cursorState||'SOURCE_PINNED';
+  need(C.i65MiniClosurePlan?.path===I65_MINI&&C.i65MiniClosurePlan?.status==='FROZEN_ACTIVE'&&C.i65MiniClosurePlan?.conversationDependent===false&&C.i65MiniClosurePlan?.structuralPlanImmutable===true,'I6_5_MINIPLAN_AUTHORITY_INVALID');
+  need(git('hash-object',I65_MINI)===C.i65MiniClosurePlan?.blobSha,'I6_5_MINIPLAN_BLOB_DRIFT');
+  need(C.i65ContinuityAntiDrift?.path===I65_ANTI_DRIFT&&C.i65ContinuityAntiDrift?.status==='FROZEN_ACTIVE'&&C.i65ContinuityAntiDrift?.conversationAsAuthority===false&&C.i65ContinuityAntiDrift?.parallelPlanForbidden===true,'I6_5_ANTI_DRIFT_AUTHORITY_INVALID');
+  need(git('hash-object',I65_ANTI_DRIFT)===C.i65ContinuityAntiDrift?.blobSha,'I6_5_ANTI_DRIFT_BLOB_DRIFT');
+  const AD=readJson(I65_ANTI_DRIFT);
+  need(AD.status==='FROZEN_ACTIVE'&&AD.authority?.microplan?.blobSha===C.i65MiniClosurePlan?.blobSha&&AD.authority?.sourceIntake?.blobSha===C.i6Execution?.activeSourceIntakeBlobSha,'I6_5_ANTI_DRIFT_BINDING_INVALID');
+  need(AD.authority?.sourceIntake?.sourceBundleSha256===SRC5.sourceBundle?.sha256&&C.i65ContinuityAntiDrift?.sourceBundleSha256===SRC5.sourceBundle?.sha256,'I6_5_ANTI_DRIFT_SOURCE_BUNDLE_INVALID');
   const nextByCursor={SOURCE_PINNED:'LIVE_READBACK_CURRENT_STATE',LIVE_READBACK_PASS:'DETERMINISTIC_DIFF',DETERMINISTIC_DIFF_READY:'APPLY_DETERMINISTIC_DELTA_ONLY',DETERMINISTIC_APPLY_DONE:'POST_WRITE_READBACK_AND_INTEGRITY',POST_WRITE_READBACK_INTEGRITY_PASS:'USER_VISUAL_REFRESH_CHECK',PENDING_USER_VISUAL:'USER_VISUAL_REFRESH_CHECK',LIVE_PASS:'NEXT_MODULE'};
   const actionByCursor={SOURCE_PINNED:'I6_5_LIVE_READBACK_CURRENT_STATE',LIVE_READBACK_PASS:'I6_5_DETERMINISTIC_DIFF',DETERMINISTIC_DIFF_READY:'I6_5_APPLY_DETERMINISTIC_DELTA',DETERMINISTIC_APPLY_DONE:'I6_5_POST_WRITE_READBACK_INTEGRITY',POST_WRITE_READBACK_INTEGRITY_PASS:'I6_5_USER_VISUAL_REFRESH_CHECK',PENDING_USER_VISUAL:'I6_5_USER_VISUAL_REFRESH_CHECK',LIVE_PASS:'I6_6_REQUEST_CURRENT_SOURCE'};
   need(G.lastFormallyCompletedMiniGate==='I6.4'&&g.I6?.lastFrozenMiniGate==='I6.4','I6_5_LAST_MINIGATE_INVALID');
