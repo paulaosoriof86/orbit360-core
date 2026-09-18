@@ -1,0 +1,161 @@
+{
+  "schema": "GRAVICENTRA_I6_5_RECIBOS_CARTERA_SOURCE_INTAKE_V1",
+  "status": "SOURCE_PINNED_SYNC_PREFLIGHT_BLOCK",
+  "date": "2026-09-18",
+  "productBrand": "Gravicentra Insurance",
+  "gate": "I6.5",
+  "module": "RECIBOS_CARTERA",
+  "sourceBundle": {
+    "sha256": "f445e2f4a20b9eb7a526bda8896472dab9e7ac4617b3c5d8124a939a0dee0e6a",
+    "committedToRepository": false,
+    "containsPII": true,
+    "files": [
+      {
+        "role": "SCHEDULE_BY_DUE_DATE_2025",
+        "filename": "CobranzaCendoso (28).xlsx",
+        "sha256": "1dd905a5ff483a905e3f2298efbd8ebb20d9146357e0c5732fd89fdd88ebc8c7",
+        "bytes": 372571,
+        "rows": 1745,
+        "uniquePolicies": 364,
+        "dueDateRange": [
+          "2025-01-01",
+          "2025-12-31"
+        ]
+      },
+      {
+        "role": "SCHEDULE_BY_DUE_DATE_2026",
+        "filename": "CobranzaCendoso (26).xlsx",
+        "sha256": "8400b6fb3e74b78361870d2eec65822e4dc544511bef90391abb10f0f862ff25",
+        "bytes": 343678,
+        "rows": 1560,
+        "uniquePolicies": 345,
+        "dueDateRange": [
+          "2026-01-01",
+          "2026-12-31"
+        ]
+      },
+      {
+        "role": "SCHEDULE_BY_DUE_DATE_2027_FUTURE",
+        "filename": "CobranzaCendoso (27).xlsx",
+        "sha256": "f17774ef0f8730a0d35f7300510f5eebc73c4d567ccf3b03bc8917421937f834",
+        "bytes": 136848,
+        "rows": 312,
+        "uniquePolicies": 76,
+        "dueDateRange": [
+          "2027-01-01",
+          "2027-12-22"
+        ]
+      },
+      {
+        "role": "PAID_EVIDENCE_BY_ACTUAL_PAYMENT_DATE_PRIMARY",
+        "filename": "CobranzaCendoso (24).xlsx",
+        "sha256": "36de3d35055716af4ca85d48719d4ef58154286a3136f41fac35287e740c03db",
+        "bytes": 344691,
+        "rows": 1559,
+        "uniquePolicies": 364,
+        "paidDateRange": [
+          "2025-01-02",
+          "2026-09-17"
+        ]
+      },
+      {
+        "role": "PAID_EVIDENCE_BY_RECEIPT_TERM_CORROBORATION",
+        "filename": "CobranzaCendoso (25).xlsx",
+        "sha256": "0cb6af82ebeccc75c9fcf54b2e4e98db28be0b6c64e1cedb69b2b99d0f20cd90",
+        "bytes": 332226,
+        "rows": 1441,
+        "uniquePolicies": 357,
+        "paidDateRange": [
+          "2024-04-17",
+          "2026-09-17"
+        ]
+      },
+      {
+        "role": "CURRENT_OVERDUE_SNAPSHOT",
+        "filename": "CobranzaVencida.xlsx",
+        "sha256": "58708e3ef3fe2e5ebc65873575a5dbfe336ce39e9bafae66b38efa6ea5093ff7",
+        "bytes": 140456,
+        "rows": 320,
+        "uniquePolicies": 123,
+        "dueDateRange": [
+          "2026-01-01",
+          "2026-09-18"
+        ]
+      },
+      {
+        "role": "RECEIPT_UNIVERSE_CROSSCHECK_2025_2026",
+        "filename": "Reporte-2026-09-18-061226.xlsx",
+        "sha256": "5681c8d92c94ddd9aa904cede6157004726d70d6da86e179aca6e933f05a000a",
+        "bytes": 169877,
+        "rows": 1188,
+        "uniquePolicies": 261,
+        "dueDateRange": [
+          "2024-08-03",
+          "2027-07-16"
+        ]
+      },
+      {
+        "role": "RECEIPT_UNIVERSE_CROSSCHECK_2026_2027",
+        "filename": "Reporte-2026-09-18-061143.xlsx",
+        "sha256": "714407074727167bef52eec34572ea84ee1f6d91da7655572437f03bad7887cd",
+        "bytes": 153977,
+        "rows": 982,
+        "uniquePolicies": 215,
+        "dueDateRange": [
+          "2025-04-19",
+          "2028-07-16"
+        ]
+      }
+    ]
+  },
+  "coverage": {
+    "scheduledPrimaryUniqueReceiptKeys2025To2027": 3590,
+    "crosscheckUniqueReceiptKeys": 2146,
+    "crosscheckOnlyKeys": 3,
+    "paidEvidenceUniqueReceiptKeys": 1536,
+    "paidEvidenceOnlyOutside2025To2027Schedule": 90,
+    "overdueSnapshotKeys": 320,
+    "overdueOutsidePrimarySchedule": 0,
+    "combinedUniqueReceiptKeys": 3681,
+    "ambiguousBaseReceiptKeysWithMultipleAmounts": 12
+  },
+  "temporalScope": {
+    "historicalPaymentEvidenceFrom": "2025-01-02",
+    "currentCutoff": "2026-09-18",
+    "scheduledDueDatesPrimaryFrom": "2025-01-01",
+    "scheduledDueDatesPrimaryThrough": "2027-12-22",
+    "future2028ReportOnlyHoldCount": 1,
+    "historical2024PaidOrCrosscheckOnly": "HISTORICAL_EVIDENCE_NOT_ACTIVE_CARTERA",
+    "rule": "Historical paid evidence may predate the primary schedule window; future installments are eligible only through the evidenced active policy term. Report-only 2024 rows remain historical evidence and the isolated 2028 row is HOLD until exact policy-term proof."
+  },
+  "sourcePrecedence": [
+    "I6.4 frozen policy edition and lifecycle are identity authority; receipt files must never regress policy identity, country, currency, status or payment-method normalization.",
+    "CobranzaCendoso (24) actual payment date is primary direct payment evidence.",
+    "CobranzaCendoso (25) corroborates payment evidence and must not double count rows already proven by (24).",
+    "CobranzaCendoso (28)/(26)/(27) define scheduled receipt evidence by due year; they do not by themselves prove payment.",
+    "CobranzaVencida corroborates current overdue status for matching scheduled rows; it is not an independent creator when a match exists.",
+    "Reporte files are crosschecks; report-only rows require exact policy-term validation before materialization."
+  ],
+  "invariants": {
+    "noPolicyWrites": true,
+    "noClientWrites": true,
+    "noInsurerWrites": true,
+    "noVehicleWrites": true,
+    "noCobrosWritesInI65": true,
+    "noFinmovWrites": true,
+    "noDeleteByAbsence": true,
+    "noBlindReimport": true,
+    "preserveI64PaymentNormalization": "Domiciliado values in these source exports remain raw trace only and must not regress the I6.4 canonical payment normalization.",
+    "preserveI64CountryCurrency": true,
+    "inactivePolicyRule": "Non-current policies do not receive synthetic pending cartera from frequency alone.",
+    "paidHistoricalRule": "Historical/non-current policies may retain evidenced paid receipt history but must not create current cartera.",
+    "activeFutureRule": "For active policies, future pending installments may be materialized only after the last evidenced paid installment, through policy end, with source evidence and no contradictory cancellation/termination evidence.",
+    "receiptIdentityRule": "Do not deduplicate only by policy+series+receiptStart+dueDate. Twelve observed base keys contain multiple legitimate amounts; deterministic identity must include source identity/external receipt identity and amount or equivalent distinguishing evidence."
+  },
+  "execution": {
+    "cursorState": "SOURCE_PINNED_SYNC_PREFLIGHT_BLOCK",
+    "writeApplied": false,
+    "writes": 0,
+    "nextRequiredStep": "FIX_AND_CERTIFY_I6_5_READ_PATH_COMPOSITION_THEN_LIVE_READBACK_CURRENT_STATE"
+  }
+}
