@@ -113,7 +113,7 @@
         "postWriteContextsFail": 0
       },
       "I6": {
-        "status": "I6_5_RECIBOS_CARTERA_SOURCE_PINNED_READBACK_PENDING",
+        "status": "I6_5_DATA_UPDATE_V5_ACTIVE",
         "activeSubgate": "I6.5",
         "dataMutationAuthorized": false,
         "lastFrozenMiniGate": "I6.4"

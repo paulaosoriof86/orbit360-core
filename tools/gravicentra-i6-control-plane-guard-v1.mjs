@@ -50,11 +50,13 @@ const waitingI63=g.I6?.status==='I6_3_WAITING_FOR_CURRENT_SOURCE'&&g.I6?.activeS
 const activeI63V5=g.I6?.status==='I6_3_DATA_UPDATE_V5_ACTIVE'&&g.I6?.activeSubgate==='I6.3';
 const activeI64V5=g.I6?.status==='I6_4_DATA_UPDATE_V5_ACTIVE'&&g.I6?.activeSubgate==='I6.4';
 const activeI65Sync=g.I6?.status==='I6_5_RECIBOS_CARTERA_SOURCE_PINNED_SYNC_PREFLIGHT_BLOCK'&&g.I6?.activeSubgate==='I6.5';
-need(activeI60||frozenI60||frozenI61||activeI62V5||waitingI63||activeI63V5||activeI64V5||activeI65Sync,'I6_GATE_STATE_INVALID');
+const activeI65V5=g.I6?.status==='I6_5_DATA_UPDATE_V5_ACTIVE'&&g.I6?.activeSubgate==='I6.5';
+const activeI65=activeI65Sync||activeI65V5;
+need(activeI60||frozenI60||frozenI61||activeI62V5||waitingI63||activeI63V5||activeI64V5||activeI65,'I6_GATE_STATE_INVALID');
 
 need(C.i6Execution?.authorized===true,'I6_NOT_AUTHORIZED');
 need(C.i6Execution?.authorizationReceiptPath===AUTH_RECEIPT,'I6_AUTH_RECEIPT_PATH_MISMATCH');
-need((activeI60&&C.i6Execution?.activeSubgate==='I6.0')||(frozenI60&&C.i6Execution?.activeSubgate==='I6.1')||((frozenI61||activeI62V5)&&C.i6Execution?.activeSubgate==='I6.2')||((waitingI63||activeI63V5)&&C.i6Execution?.activeSubgate==='I6.3')||(activeI64V5&&C.i6Execution?.activeSubgate==='I6.4')||(activeI65Sync&&C.i6Execution?.activeSubgate==='I6.5'),'I6_EXECUTION_SUBGATE_INVALID');
+need((activeI60&&C.i6Execution?.activeSubgate==='I6.0')||(frozenI60&&C.i6Execution?.activeSubgate==='I6.1')||((frozenI61||activeI62V5)&&C.i6Execution?.activeSubgate==='I6.2')||((waitingI63||activeI63V5)&&C.i6Execution?.activeSubgate==='I6.3')||(activeI64V5&&C.i6Execution?.activeSubgate==='I6.4')||(activeI65&&C.i6Execution?.activeSubgate==='I6.5'),'I6_EXECUTION_SUBGATE_INVALID');
 need(C.i6Execution?.dryRunPrepared===false,'I6_DRYRUN_PREPARED_STATE_INVALID');
 const dataUpdateCursor=SRC.execution?.cursorState||'SOURCE_PINNED';
 const postDiffCursor=['DETERMINISTIC_DIFF_READY','DETERMINISTIC_APPLY_DONE','POST_WRITE_READBACK_INTEGRITY_PASS','PENDING_USER_VISUAL','LIVE_PASS'].includes(dataUpdateCursor);
@@ -74,7 +76,7 @@ const i64DefectPending=activeI64V5&&i64CodeDefect.status==='I6_4_CODE_DEFECT_CAN
 const i64DefectLive=activeI64V5&&String(i64CodeDefect.status||'').startsWith('I6_4_CODE_DEFECT_SUCCESSOR_LIVE_PASS');
 const i65SyncCodeDefect=C.i65SyncCodeDefect||{};
 const i65SyncDefectPending=activeI65Sync&&i65SyncCodeDefect.status==='I6_5_SYNC_CODE_DEFECT_CANDIDATE_PENDING_BUILD';
-const i65SyncDefectLive=activeI65Sync&&String(i65SyncCodeDefect.status||'').startsWith('I6_5_SYNC_CODE_DEFECT_SUCCESSOR_LIVE_PASS');
+const i65SyncDefectLive=activeI65&&String(i65SyncCodeDefect.status||'').startsWith('I6_5_SYNC_CODE_DEFECT_SUCCESSOR_LIVE_PASS');
 const dataCorrectionPending=i63DataCorrectionPending||i64VisualCorrectionPending;
 need(!(i63NameCasePending&&i63IdentityMergePending),'I6_3_MULTIPLE_DATA_CORRECTIONS_FORBIDDEN');
 need(!(i63DataCorrectionPending&&i64VisualCorrectionPending),'I6_MULTIPLE_GATE_DATA_CORRECTIONS_FORBIDDEN');
@@ -211,39 +213,49 @@ if(activeI64V5){
   need(git('hash-object',I63_RECEIPT)===seal.receiptBlobSha,'I6_3_RECEIPT_BLOB_DRIFT');
 }
 
-if(activeI65Sync){
-  const p=C.postproductionExitProgress||{},seal=C.i6Execution?.i6_4||{};
+if(activeI65){
+  const p=C.postproductionExitProgress||{},seal=C.i6Execution?.i6_4||{},cursor=SRC5.execution?.cursorState||'SOURCE_PINNED';
+  const nextByCursor={SOURCE_PINNED:'LIVE_READBACK_CURRENT_STATE',LIVE_READBACK_PASS:'DETERMINISTIC_DIFF',DETERMINISTIC_DIFF_READY:'APPLY_DETERMINISTIC_DELTA_ONLY',DETERMINISTIC_APPLY_DONE:'POST_WRITE_READBACK_AND_INTEGRITY',POST_WRITE_READBACK_INTEGRITY_PASS:'USER_VISUAL_REFRESH_CHECK',PENDING_USER_VISUAL:'USER_VISUAL_REFRESH_CHECK',LIVE_PASS:'NEXT_MODULE'};
+  const actionByCursor={SOURCE_PINNED:'I6_5_LIVE_READBACK_CURRENT_STATE',LIVE_READBACK_PASS:'I6_5_DETERMINISTIC_DIFF',DETERMINISTIC_DIFF_READY:'I6_5_APPLY_DETERMINISTIC_DELTA',DETERMINISTIC_APPLY_DONE:'I6_5_POST_WRITE_READBACK_INTEGRITY',POST_WRITE_READBACK_INTEGRITY_PASS:'I6_5_USER_VISUAL_REFRESH_CHECK',PENDING_USER_VISUAL:'I6_5_USER_VISUAL_REFRESH_CHECK',LIVE_PASS:'I6_6_REQUEST_CURRENT_SOURCE'};
   need(G.lastFormallyCompletedMiniGate==='I6.4'&&g.I6?.lastFrozenMiniGate==='I6.4','I6_5_LAST_MINIGATE_INVALID');
   need(p.formalPercent===50&&p.frozenMiniGates===5&&p.totalMiniGates===10&&p.lastFrozenMiniGate==='I6.4'&&p.activeMiniGate==='I6.5','I6_5_PROGRESS_INVALID');
   need(C.i6Execution?.activeModule==='RECIBOS_CARTERA','I6_5_MODULE_INVALID');
   need(C.i6Execution?.activeSourceIntakePath===I65_SOURCE&&C.postproductionDataUpdateControl?.activeSourceIntakePath===I65_SOURCE,'I6_5_SOURCE_PATH_MISMATCH');
   need(git('hash-object',I65_SOURCE)===C.i6Execution?.activeSourceIntakeBlobSha&&git('hash-object',I65_SOURCE)===C.postproductionDataUpdateControl?.activeSourceIntakeBlobSha,'I6_5_SOURCE_BLOB_DRIFT');
-  need(SRC5.module==='RECIBOS_CARTERA'&&SRC5.execution?.writeApplied===false&&Number(SRC5.execution?.writes||0)===0,'I6_5_SOURCE_STATE_INVALID');
-  if(i65SyncDefectLive){
-    need(SRC5.status==='PINNED_FOR_V5_DELTA'&&SRC5.execution?.cursorState==='SOURCE_PINNED'&&SRC5.execution?.nextRequiredStep==='LIVE_READBACK_CURRENT_STATE','I6_5_POST_SYNC_SOURCE_CURSOR_INVALID');
-    need(C.postproductionDataUpdateControl?.activeModule==='RECIBOS_CARTERA'&&C.postproductionDataUpdateControl?.executionCursor==='SOURCE_PINNED'&&C.postproductionDataUpdateControl?.nextRequiredStep==='LIVE_READBACK_CURRENT_STATE','I6_5_POST_SYNC_CONTROL_CURSOR_INVALID');
-    need(RGT.modules?.RECIBOS_CARTERA?.sourceState==='CURRENT_SOURCE_PINNED'&&RGT.modules?.RECIBOS_CARTERA?.resumeCursor==='SOURCE_PINNED','I6_5_POST_SYNC_REGISTRY_INVALID');
+  need(SRC5.module==='RECIBOS_CARTERA','I6_5_SOURCE_MODULE_INVALID');
+  if(i65SyncDefectPending){
+    need(activeI65Sync&&SRC5.status==='SOURCE_PINNED_SYNC_PREFLIGHT_BLOCK'&&cursor==='SOURCE_PINNED_SYNC_PREFLIGHT_BLOCK','I6_5_PREFLIGHT_SOURCE_CURSOR_INVALID');
+    need(C.postproductionDataUpdateControl?.executionCursor==='SOURCE_PINNED_SYNC_PREFLIGHT_BLOCK','I6_5_PREFLIGHT_CONTROL_CURSOR_INVALID');
+    need(RGT.modules?.RECIBOS_CARTERA?.sourceState==='CURRENT_SOURCE_PINNED_SYNC_PREFLIGHT_BLOCK','I6_5_PREFLIGHT_REGISTRY_INVALID');
+    need(C.nextAction==='I6_5_SYNC_CODE_DEFECT_SUCCESSOR_RELEASE','I6_5_SYNC_RELEASE_ACTION_INVALID');
+  }else if(i65SyncDefectLive){
+    need(SRC5.status==='PINNED_FOR_V5_DELTA'&&Object.prototype.hasOwnProperty.call(nextByCursor,cursor),'I6_5_SOURCE_CURSOR_INVALID');
+    need(SRC5.execution?.nextRequiredStep===nextByCursor[cursor],'I6_5_SOURCE_NEXT_STEP_INVALID');
+    const preApply=['SOURCE_PINNED','LIVE_READBACK_PASS','DETERMINISTIC_DIFF_READY'].includes(cursor);
+    if(preApply)need(SRC5.execution?.writeApplied===false&&Number(SRC5.execution?.writes||0)===0,'I6_5_PREAPPLY_WRITE_STATE_INVALID');
+    need(C.postproductionDataUpdateControl?.activeModule==='RECIBOS_CARTERA'&&C.postproductionDataUpdateControl?.executionCursor===cursor&&C.postproductionDataUpdateControl?.nextRequiredStep===nextByCursor[cursor],'I6_5_CONTROL_CURSOR_INVALID');
+    need(RGT.modules?.RECIBOS_CARTERA?.sourceState==='CURRENT_SOURCE_PINNED'&&RGT.modules?.RECIBOS_CARTERA?.resumeCursor===cursor,'I6_5_REGISTRY_CURSOR_INVALID');
+    need(C.nextAction===actionByCursor[cursor],'I6_5_NEXT_ACTION_INVALID');
   }else{
-    need(SRC5.status==='SOURCE_PINNED_SYNC_PREFLIGHT_BLOCK'&&SRC5.execution?.cursorState==='SOURCE_PINNED_SYNC_PREFLIGHT_BLOCK','I6_5_PREFLIGHT_SOURCE_CURSOR_INVALID');
-    need(C.postproductionDataUpdateControl?.activeModule==='RECIBOS_CARTERA'&&C.postproductionDataUpdateControl?.executionCursor==='SOURCE_PINNED_SYNC_PREFLIGHT_BLOCK','I6_5_CONTROL_CURSOR_INVALID');
+    need(activeI65Sync&&SRC5.status==='SOURCE_PINNED_SYNC_PREFLIGHT_BLOCK'&&cursor==='SOURCE_PINNED_SYNC_PREFLIGHT_BLOCK','I6_5_PREFLIGHT_SOURCE_CURSOR_INVALID');
+    need(C.postproductionDataUpdateControl?.executionCursor==='SOURCE_PINNED_SYNC_PREFLIGHT_BLOCK','I6_5_CONTROL_CURSOR_INVALID');
     need(RGT.modules?.RECIBOS_CARTERA?.sourceState==='CURRENT_SOURCE_PINNED_SYNC_PREFLIGHT_BLOCK','I6_5_REGISTRY_SOURCE_NOT_PINNED');
+    need(C.nextAction==='I6_5_FIX_READ_PATH_COMPOSITION_NO_DATA_WRITES','I6_5_FIX_ACTION_INVALID');
   }
   need(SRC5.sourceBundle?.sha256===C.postproductionDataUpdateControl?.sourceSha256,'I6_5_SOURCE_SHA_MISMATCH');
   need(git('hash-object',DATA_UPDATE_REGISTRY)===C.i6Execution?.mechanismRegistryBlobSha&&git('hash-object',DATA_UPDATE_REGISTRY)===C.postproductionDataUpdateControl?.mechanismRegistryBlobSha,'I6_5_REGISTRY_BLOB_DRIFT');
   need(RGT.modules?.RECIBOS_CARTERA?.sourceIntakePath===I65_SOURCE,'I6_5_REGISTRY_SOURCE_PATH_INVALID');
   need(R64.status==='I6_4_POLIZAS_RIESGOS_LIVE_PASS'&&R64.humanAcceptance?.status==='ACCEPTED'&&seal.status==='I6_4_POLIZAS_RIESGOS_LIVE_PASS','I6_4_ACCEPTANCE_NOT_FROZEN');
   need(SYNC5.status==='BLOCKING_CAUSAL_DESYNC_FOUND_BEFORE_DATA_WRITE'&&SYNC5.decision==='FAIL_CLOSED_NO_I6_5_DATA_WRITES'&&Number(SYNC5.operationalWrites)===0,'I6_5_SYNC_PREFLIGHT_INVALID');
-  const expected=i65SyncDefectPending?'I6_5_SYNC_CODE_DEFECT_SUCCESSOR_RELEASE':(i65SyncDefectLive?'I6_5_LIVE_READBACK_CURRENT_STATE':'I6_5_FIX_READ_PATH_COMPOSITION_NO_DATA_WRITES');
-  need(C.nextAction===expected,'I6_5_NEXT_ACTION_INVALID');
 }
 
 const R=C.certifiedCandidate||{};
-if(activeI65Sync&&i65SyncDefectPending&&i65SyncCodeDefect.previousCertifiedSourceSha){
+if(activeI65&&i65SyncDefectPending&&i65SyncCodeDefect.previousCertifiedSourceSha){
   need(R.sourceSha===i65SyncCodeDefect.previousCertifiedSourceSha,'I6_5_PREVIOUS_CERTIFIED_SOURCE_DRIFT');
   need(R.buildId===i65SyncCodeDefect.previousCertifiedBuildId,'I6_5_PREVIOUS_CERTIFIED_BUILD_DRIFT');
   need(Number(R.artifactId)===Number(i65SyncCodeDefect.previousCertifiedArtifactId),'I6_5_PREVIOUS_CERTIFIED_ARTIFACT_DRIFT');
 }
-else if(activeI65Sync&&i65SyncDefectLive){need(R.sourceSha===i65SyncCodeDefect.sourceSha,'I6_5_CERTIFIED_SOURCE_DRIFT');need(R.buildId===i65SyncCodeDefect.buildId,'I6_5_CERTIFIED_BUILD_DRIFT');need(Number(R.artifactId)===Number(i65SyncCodeDefect.artifactId),'I6_5_CERTIFIED_ARTIFACT_DRIFT');}
+else if(activeI65&&i65SyncDefectLive){need(R.sourceSha===i65SyncCodeDefect.sourceSha,'I6_5_CERTIFIED_SOURCE_DRIFT');need(R.buildId===i65SyncCodeDefect.buildId,'I6_5_CERTIFIED_BUILD_DRIFT');need(Number(R.artifactId)===Number(i65SyncCodeDefect.artifactId),'I6_5_CERTIFIED_ARTIFACT_DRIFT');}
 else if(activeI64V5&&i64DefectPending&&i64CodeDefect.previousCertifiedSourceSha){
   need(R.sourceSha===i64CodeDefect.previousCertifiedSourceSha,'I6_4_PREVIOUS_CERTIFIED_SOURCE_DRIFT');
   need(R.buildId===i64CodeDefect.previousCertifiedBuildId,'I6_4_PREVIOUS_CERTIFIED_BUILD_DRIFT');
