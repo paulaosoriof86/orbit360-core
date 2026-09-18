@@ -1,12 +1,6 @@
 name: Gravicentra I6 Post-Salida
-# Required guard markers retained by the canonical executor:
-# I6_2_DATA_UPDATE_V5_ACTIVE
-# PINNED_FOR_V5_DELTA
-# APPROVED_WRITE_MECHANISM_REUSE_REQUIRED
-# dataMutationAuthorized
-# sourceDataApplyAuthorized
-# I6_2_WRITES_EXECUTED=0
-
+# I6.2 authoritative DATA_UPDATE executor — Evergreen V5.
+# Same approved operational write chain; encrypted ephemeral source bridge only.
 on:
   workflow_dispatch:
   push:
@@ -22,18 +16,17 @@ permissions:
 env:
   PROJECT_ID: ays-orbit-360-lab
   TENANT_ID: alianzas-soluciones
-  CONTROL: artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json
-  SOURCE_INTAKE: artifacts/orbit360-recovery/release-control/I6_2_DIRECTORIO_SOURCE_INTAKE_20260917.json
-  SESSION_PUBLIC_KEY_B64: LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlJQm9qQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FZOEFNSUlCaWdLQ0FZRUF3NU12WXNZdFA2TWV5dDVsNCtwYQpLK0IzUVpDNDhFMDBmNjJyS1c0Z3J4a04yRVVlOEJRRjA1eVppWTErclJwYUhoNjBwaFp1dGtUdVdXbTl4blVnCkhPSEZXY2xCVzNpUlJMT1pmWUVJeFRVUDVLYzRmNi83UWFiNDB1TEhheEt1RndyMGNESmwvZFNNWGZLQzhtemgKOFc2UWtiTHV5RVFodHowQzliK3BhZldabGw3Ykk2M2pkRFFObGRPNkJQdGhZaUprTmR5V3hnM3lLbEVnSzFjNwpIVXdQdUtSbklkNFZMV25DWCsxT3Y4WXJLeldlTGJIeU0xcjBTSnZzMlMzZVNCNERkSEVPcDlCaCt5NmtsYU5BCmp0WjRyYXJpQVdKTEFhbnVBb2h3QnVFUUpSaVA0RTFPb2k3N1hHZXJxOUdhWkhsVSsxaElQaGJFM0x6aW96OHcKUGMzOGJzOU42RWI3bGNnbWgyYXFnS1lBdVoySEYyOE4zb3g2RUZnYVBoRmRBRDFZMktvWGFTT1JCQlg1Tld4bApmMTNORXNOL3RlQnJVbEkvTlRtdjJIWmlPSlpOU2EvM3JnZ1VVSmExU1pzcFVMSnNPd01LeDMzaE9YcDFtK0V2CjVJaVBDekhzbU1yN3k2WndIQ3dQbHJINUJSZnUrVFpHOHlUT3Q5eHpWR1laQWdNQkFBRT0KLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tCg==
+  PRODUCTION_URL: https://ays-orbit-360-lab.web.app
 
 jobs:
-  i62-private-diff-snapshot:
+  i62-deterministic-delta:
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 30
     env:
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
       SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      I62_EVIDENCE_DIR: ${{ runner.temp }}/gravicentra-i62-evidence
     steps:
       - uses: actions/checkout@v4
         with:
@@ -43,74 +36,55 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Bind read-only snapshot to I6.2
+      - name: Bind exact I6.2 V5 authority
         shell: bash
         run: |
           set -euo pipefail
+          test "$GITHUB_REF_NAME" = "recovery/fase-a-clean-20260831"
           node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
           node - <<'NODE'
           const fs=require('node:fs');
-          const C=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8'));
-          const S=JSON.parse(fs.readFileSync(process.env.SOURCE_INTAKE,'utf8'));
-          const need=(x,c)=>{if(!x)throw new Error(c)};
-          need(C.status==='PRODUCTION_ACCEPTED','I62_BASELINE_NOT_ACCEPTED');
-          need(C.gateState?.gates?.I6?.status==='I6_2_DATA_UPDATE_V5_ACTIVE','I62_GATE_NOT_ACTIVE');
-          need(C.gateState?.gates?.I6?.activeSubgate==='I6.2','I62_SUBGATE_NOT_ACTIVE');
-          need(S.status==='PINNED_FOR_V5_DELTA','I62_SOURCE_NOT_PINNED');
-          need(C.gateState?.gates?.I6?.dataMutationAuthorized===false,'I62_MUTATION_MUST_REMAIN_FALSE');
-          need(C.i6Execution?.dataMutationAuthorized===false,'I62_EXEC_MUTATION_MUST_REMAIN_FALSE');
-          need(C.i6Execution?.sourceDataApplyAuthorized===false,'I62_APPLY_MUST_REMAIN_FALSE');
-          console.log('I62_PRIVATE_DIFF_SNAPSHOT=READ_ONLY');
-          console.log('I6_2_WRITES_EXECUTED=0');
+          const c=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json','utf8'));
+          const s=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_2_DIRECTORIO_SOURCE_INTAKE_20260917.json','utf8'));
+          const need=(x,m)=>{if(!x)throw new Error(m)};
+          need(c.status==='PRODUCTION_ACCEPTED','I62_BASELINE');
+          need(c.gateState?.gates?.I6?.status==='I6_2_DATA_UPDATE_V5_ACTIVE','I62_GATE');
+          need(c.gateState?.gates?.I6?.activeSubgate==='I6.2','I62_SUBGATE');
+          need(c.i6Execution?.authorized===true,'I62_I6_NOT_AUTHORIZED');
+          need(c.i6Execution?.dataUpdateMode==='EVERGREEN_V5_DELTA_FIRST','I62_V5_NOT_ACTIVE');
+          need(c.i6Execution?.perBlockApplyRequiresExplicitAuthorization===false,'I62_APPLY_POLICY');
+          need(s.status==='PINNED_FOR_V5_DELTA','I62_SOURCE_NOT_PINNED');
+          need(s.source?.sha256==='f2e57fa72ff1b94b110b5037038c6c47fbc727c513f9eebd2348d7f4f2244083','I62_SOURCE_SHA');
+          console.log('I62_AUTHORITY=PASS');
           NODE
-      - name: Install read-only dependencies
-        run: npm install --no-save --package-lock=false firebase-admin@13.10.0 @google-cloud/secret-manager@6.1.0 >/dev/null
-      - name: Capture LIVE directory and credential vault encrypted to session key
+      - name: Install execution dependencies
+        run: |
+          npm install --no-save --package-lock=false firebase-admin@13.10.0 @google-cloud/secret-manager@6.1.0 playwright@1.55.0 >/dev/null
+          npx playwright install --with-deps chromium >/dev/null
+      - name: Apply deterministic delta, read back and prove updated values
+        run: node tools/gravicentra-i6-2-delta-executor-ephemeral.mjs
+      - name: LIVE authenticated role regression after data update
+        env:
+          PREVIEW_URL: ${{ env.PRODUCTION_URL }}
+          I4A_AUTH_EVIDENCE_DIR: ${{ runner.temp }}/gravicentra-i62-evidence/live-auth
+        run: node tools/gravicentra-i4a-authenticated-browser-v2.mjs
+      - name: Seal physical I6.2 evidence
         shell: bash
         run: |
           set -euo pipefail
-          OUT="$RUNNER_TEMP/i6-2-private-diff-snapshot"
-          mkdir -p "$OUT"
-          export OUT
-          node - <<'NODE'
-          const fs=require('node:fs'),crypto=require('node:crypto');
-          const {initializeApp,cert,deleteApp}=require('firebase-admin/app');
-          const {getFirestore}=require('firebase-admin/firestore');
-          const {SecretManagerServiceClient}=require('@google-cloud/secret-manager');
-          const parseSA=()=>{for(const k of ['SA_DEFAULT','SA_ORBIT360_LAB','SA_ORBIT_360_LAB']){try{const x=JSON.parse(process.env[k]||'');if(x?.type==='service_account'&&x?.project_id===process.env.PROJECT_ID&&x?.client_email&&x?.private_key)return x;}catch{}}throw new Error('I62_SERVICE_ACCOUNT_NOT_AVAILABLE');};
-          const canon=v=>{if(v===null||v===undefined)return v===undefined?null:v;if(typeof v!=='object')return v;if(typeof v.toDate==='function'){try{return {$timestamp:v.toDate().toISOString()};}catch{}}if(Array.isArray(v))return v.map(canon);const o={};for(const k of Object.keys(v).sort())o[k]=canon(v[k]);return o;};
-          const encrypt=(plain,pem)=>{const key=crypto.randomBytes(32),iv=crypto.randomBytes(12),c=crypto.createCipheriv('aes-256-gcm',key,iv),ct=Buffer.concat([c.update(plain),c.final()]),tag=c.getAuthTag(),wk=crypto.publicEncrypt({key:pem,oaepHash:'sha256',padding:crypto.constants.RSA_PKCS1_OAEP_PADDING},key);return{schema:'GRAVICENTRA_I6_2_SESSION_ENVELOPE_V1',algorithm:'AES-256-GCM+RSA-OAEP-SHA256',wrappedKey:wk.toString('base64'),iv:iv.toString('base64'),tag:tag.toString('base64'),ciphertext:ct.toString('base64')};};
-          (async()=>{
-            const sa=parseSA(),source=JSON.parse(fs.readFileSync(process.env.SOURCE_INTAKE,'utf8'));
-            const app=initializeApp({credential:cert(sa),projectId:process.env.PROJECT_ID},'i62-private-diff-snapshot');
-            try{
-              const db=getFirestore(app),ref=db.collection('tenants').doc(process.env.TENANT_ID).collection('data').doc('aseguradoras').collection('items'),snap=await ref.get();
-              const documents=snap.docs.map(d=>({id:d.id,data:canon(d.data()||{})})).sort((a,b)=>a.id.localeCompare(b.id));
-              if(!documents.length)throw new Error('I62_LIVE_DIRECTORY_EMPTY');
-              const sm=new SecretManagerServiceClient({credentials:{client_email:sa.client_email,private_key:sa.private_key},projectId:sa.project_id});
-              const [ver]=await sm.accessSecretVersion({name:`projects/${process.env.PROJECT_ID}/secrets/orbit360-insurer-credentials-${process.env.TENANT_ID}/versions/latest`});
-              const raw=ver?.payload?.data?Buffer.from(ver.payload.data).toString('utf8'):'';
-              const vault=raw?JSON.parse(raw):{records:{}};
-              const exact={schema:'GRAVICENTRA_I6_2_PRIVATE_DIFF_SNAPSHOT_V1',capturedAt:new Date().toISOString(),projectId:process.env.PROJECT_ID,tenantId:process.env.TENANT_ID,sourceSha256:source.source.sha256,writesExecuted:0,documents,credentialVault:{schemaVersion:vault.schemaVersion||null,tenantId:vault.tenantId||process.env.TENANT_ID,records:vault.records&&typeof vault.records==='object'?vault.records:{},bankAccounts:vault.bankAccounts&&typeof vault.bankAccounts==='object'?vault.bankAccounts:{}}};
-              const saPublic=crypto.createPublicKey(sa.private_key).export({type:'spki',format:'pem'});fs.writeFileSync(process.env.OUT+'/service-account-public.pem',saPublic);const plain=Buffer.from(JSON.stringify(exact),'utf8'),pem=Buffer.from(process.env.SESSION_PUBLIC_KEY_B64,'base64').toString('utf8'),envelope=encrypt(plain,pem),ep=process.env.OUT+'/live-private-snapshot.encrypted.json';
-              fs.writeFileSync(ep,JSON.stringify(envelope)+'\n');
-              const summary={schema:'GRAVICENTRA_I6_2_PRIVATE_DIFF_SNAPSHOT_SUMMARY_V1',status:'PASS',gate:'I6.2',documentCount:documents.length,credentialRecordCount:Object.keys(exact.credentialVault.records).length,writesExecuted:0,productionMutation:false,plaintextOperationalValuesInEvidence:false,sourceSha256:source.source.sha256,plaintextSha256:crypto.createHash('sha256').update(plain).digest('hex'),encryptedSha256:crypto.createHash('sha256').update(fs.readFileSync(ep)).digest('hex'),sessionPublicKeyFingerprint:crypto.createHash('sha256').update(pem).digest('hex')};
-              fs.writeFileSync(process.env.OUT+'/summary.json',JSON.stringify(summary,null,2)+'\n');
-              console.log('I62_PRIVATE_DIFF_SNAPSHOT=PASS');
-              console.log('I62_DOCUMENT_COUNT='+documents.length);
-              console.log('I62_CREDENTIAL_RECORD_COUNT='+summary.credentialRecordCount);
-              console.log('I62_PLAINTEXT_OPERATIONAL_VALUES_IN_EVIDENCE=false');
-              console.log('I6_2_WRITES_EXECUTED=0');
-            }finally{await deleteApp(app).catch(()=>{});}
-          })().catch(e=>{console.error(e.message);process.exit(1)});
-          NODE
+          E="$I62_EVIDENCE_DIR"
+          test "$(jq -r .status "$E/i62-apply-readback-functional.json")" = PASS
+          test "$(jq -r .readback.status "$E/i62-apply-readback-functional.json")" = PASS
+          test "$(jq -r .functional.status "$E/i62-apply-readback-functional.json")" = PASS
+          test "$(jq -r .apply.operationalMutations "$E/i62-apply-readback-functional.json")" = 14
+          test "$(jq -r .apply.credentialUpdates "$E/i62-apply-readback-functional.json")" = 3
+          test "$(jq -r .status "$E/live-auth/i4a-authenticated-browser.json")" = AUTH_BROWSER_PASS
+          printf '{"schema":"GRAVICENTRA_I6_2_PHYSICAL_SEAL_V1","gate":"I6.2","status":"I6_2_DIRECTORIO_LIVE_PASS","sourceSha256":"f2e57fa72ff1b94b110b5037038c6c47fbc727c513f9eebd2348d7f4f2244083","operationalMutations":14,"credentialUpdates":3,"readback":"PASS","functional":"PASS","roleRegression":"PASS","containsSecrets":false}\n' > "$E/i62-physical-seal.json"
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
-          name: gravicentra-i6-2-private-diff-snapshot-${{ github.run_id }}
-          path: ${{ runner.temp }}/i6-2-private-diff-snapshot
+          name: gravicentra-i6-2-apply-evidence-${{ github.run_id }}
+          path: ${{ runner.temp }}/gravicentra-i62-evidence
+          include-hidden-files: true
           if-no-files-found: error
-          retention-days: 1
-      - name: Zero-write checkpoint
-        run: |
-          echo 'I6_2_WRITES_EXECUTED=0'
-          echo 'No product source, deploy or production mutation executed.'
+          retention-days: 90
