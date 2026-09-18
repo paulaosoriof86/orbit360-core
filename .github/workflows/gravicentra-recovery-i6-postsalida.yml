@@ -1714,6 +1714,52 @@ jobs:
           git push origin HEAD:recovery/fase-a-clean-20260831
 
 
+  i65-operational-closure-diagnostic:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Resolve operational closure diagnostic
+        id: opdiag
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          node - <<'NODE'
+          const fs=require('node:fs'),c=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8'));
+          const ok=c.gateState?.gates?.I6?.activeSubgate==='I6.5'&&c.nextAction==='I6_5_USER_VISUAL_REFRESH_CHECK';
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(ok?'true':'false')+'\n');
+          NODE
+      - name: Install read-only diagnostic dependencies
+        if: steps.opdiag.outputs.run == 'true'
+        run: |
+          npm install --no-save --package-lock=false firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
+          npx playwright install --with-deps chromium >/dev/null
+      - name: Diagnose users login branding and operational owners
+        if: steps.opdiag.outputs.run == 'true'
+        env:
+          I65_OP_DIAG_DIR: ${{ runner.temp }}/i65-op-diag
+        run: node tools/gravicentra-i6-5-operational-closure-diagnostic.mjs
+      - name: Upload operational closure diagnostic
+        if: steps.opdiag.outputs.run == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i6-5-operational-closure-diagnostic-${{ github.run_id }}
+          path: ${{ runner.temp }}/i65-op-diag/*
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 7
+
+
   i65-live-readback:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
