@@ -385,7 +385,9 @@
         "sameArtifactPreviewToProductionRequired": true,
         "failedPreviewRunId": 35358915432,
         "failedPreviewPromotedToLive": false,
-        "runtimeBridgeScopeAuthorizedByPaula": true
+        "runtimeBridgeScopeAuthorizedByPaula": true,
+        "latestFailedPreviewRunId": 35359881380,
+        "latestFailedPreviewAssertion": "I64_RENEWALS_KPI"
       }
     }
   }

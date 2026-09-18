@@ -415,7 +415,7 @@
     "mechanismRegistryPath": "artifacts/orbit360-recovery/release-control/DATA_UPDATE_MECHANISM_REGISTRY.json",
     "mechanismRegistryBlobSha": "7b762c92b7babc88c7d2942041c66aadd1e8a471",
     "activeSourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_4_POLIZAS_RIESGOS_SOURCE_INTAKE_20260918.json",
-    "activeSourceIntakeBlobSha": "d2c039a1149c35e045ab728a0ef4db1def3fe2f3",
+    "activeSourceIntakeBlobSha": "64959cbef2b6e306a00120ccf2f8ac97c346fbe1",
     "activeModule": "POLIZAS_RIESGOS_VEHICULOS",
     "activeModuleStatus": "CODE_DEFECT_CANDIDATE_PENDING_BUILD",
     "i6_0": {
@@ -550,7 +550,7 @@
     "mechanismRegistryBlobSha": "7b762c92b7babc88c7d2942041c66aadd1e8a471",
     "activeModule": "POLIZAS_RIESGOS_VEHICULOS",
     "activeSourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_4_POLIZAS_RIESGOS_SOURCE_INTAKE_20260918.json",
-    "activeSourceIntakeBlobSha": "d2c039a1149c35e045ab728a0ef4db1def3fe2f3",
+    "activeSourceIntakeBlobSha": "64959cbef2b6e306a00120ccf2f8ac97c346fbe1",
     "sourceSha256": "7130ed56467da438f5c6e2823ede65f73d6356de63de94e19da30f3aed26c68f",
     "conversationAsAuthority": false,
     "requestCurrentSourceBeforeEveryNewModule": true,
@@ -1015,6 +1015,26 @@
     "failedPreviewReadbackExact": true,
     "failedPreviewFunctionalAssertion": "I64_PREMIUM_KPI_FOOT",
     "failedPreviewPromotedToLive": false,
-    "failedPreviewOperationalWrites": 0
+    "failedPreviewOperationalWrites": 0,
+    "failedPreviewRuns": [
+      {
+        "runId": 35358915432,
+        "buildId": "gi-i64-293f9f96611e-57f234755dc1",
+        "functionalAssertion": "I64_PREMIUM_KPI_FOOT",
+        "readbackExact": true,
+        "promotedToLive": false,
+        "operationalWrites": 0
+      },
+      {
+        "runId": 35359881380,
+        "buildId": "gi-i64-0c72da8d4517-57f234755dc1",
+        "previewUrl": "https://ays-orbit-360-lab--gi-i64-35359881380-qu6v5ba0.web.app",
+        "hostedPayloadDigest": "618b6eed47aabbeb61efb2348b9803b2f6ccc012fe2a62e77fca2ae4e780b2d9",
+        "functionalAssertion": "I64_RENEWALS_KPI",
+        "readbackExact": true,
+        "promotedToLive": false,
+        "operationalWrites": 0
+      }
+    ]
   }
 }

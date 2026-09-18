@@ -94,6 +94,11 @@
     "previewReadbackExact": true,
     "promotedToLive": false,
     "operationalWrites": 0,
-    "authorizedByPaula": true
+    "authorizedByPaula": true,
+    "bridgeOverrideAlignedBySourceSha": "0c72da8d4517c01e5a2f8866c90c5e5af90093a1",
+    "followupPreviewRunId": 35359881380,
+    "followupAssertion": "I64_RENEWALS_KPI",
+    "followupCause": "The temporal helper incorrectly added renovable!=false, diverging from the frozen Cliente360/Renovaciones rule of active status plus term end within 0-45 days.",
+    "followupPromotedToLive": false
   }
 }

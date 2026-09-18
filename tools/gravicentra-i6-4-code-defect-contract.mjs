@@ -28,7 +28,7 @@ const fixtures=[
 ];
 const totals=metrics.premiumByCurrency(fixtures);
 need(totals.GTQ===175&&totals.COP===200&&Object.keys(totals).length===2,'I64_MULTI_CURRENCY_COMPOSITION');
-need(fixtures.filter(metrics.isRenewalWithin45Days).length===2,'I64_RENEWALS_45D_SEMANTICS');
+need(fixtures.filter(metrics.isRenewalWithin45Days).length===3,'I64_RENEWALS_45D_SEMANTICS');
 need(fixtures.filter(metrics.isHistoricalNoPortfolio).length===3,'I64_HISTORICAL_SEMANTICS');
 need(metrics.renewabilityState(fixtures[1])==='UNKNOWN'&&metrics.renewabilityState(fixtures[3])==='NO'&&metrics.renewabilityState(fixtures[0])==='YES','I64_RENEWABILITY_TRI_STATE');
 need(Orbit.modules.cliente360.renovabilidad({})==='UNKNOWN'&&Orbit.modules.cliente360.renovabilidad({renovable:false})==='NO'&&Orbit.modules.cliente360.renovabilidad({renovable:true})==='YES','I64_CLIENTE360_RENEWABILITY_TRI_STATE');
