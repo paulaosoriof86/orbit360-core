@@ -44,7 +44,7 @@
   },
   "execution": {
     "method": "DATA_UPDATE_DELTA_FIRST",
-    "cursorState": "POST_WRITE_READBACK_INTEGRITY_PASS",
+    "cursorState": "PENDING_USER_VISUAL",
     "writeApplied": true,
     "readbackPassed": true,
     "liveVisualConfirmed": false,
@@ -109,7 +109,7 @@
     "technicalFunctionalDiscrepancy": "READ_PATH_COUNTRY_VALIDATION_AND_KPI_COMPOSITION_CODE_DEFECT",
     "codeDefect": {
       "classification": "CODE_DEFECT",
-      "status": "BLOCKING_VISUAL_ACCEPTANCE",
+      "status": "TECHNICAL_LIVE_PASS_PENDING_PAULA_VISUAL",
       "reimportForbidden": true,
       "causes": [
         "CLIENTES_REQUIERE_VALIDACION_EXCLUDED_BY_COUNTRY_QUERY_AND_SCOPE_FILTER",
@@ -120,6 +120,13 @@
         "cliente360VisibleClients": 442,
         "controlSamplesVisible": 5,
         "kpi": "PRIMA_NETA_VIGENTE_SEPARADA_POR_MONEDA"
+      },
+      "releaseRunId": 35318710856,
+      "runtimeVisibleAfterFix": 442,
+      "controlSamplesVisible": 5,
+      "kpiAmounts": {
+        "GTQ": 652832,
+        "COP": 85871878
       }
     },
     "nameCaseNormalization": {

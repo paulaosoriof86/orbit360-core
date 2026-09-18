@@ -11,11 +11,11 @@
   "previousLedgerBlobSha": "09c98a60b3221da29931ea32611fcf528c7f8af7",
   "previousLedgerEvidencePreservedByGitHistory": true,
   "releaseBinding": {
-    "sourceSha": "03b03690b5583442dd448e954fb66c3c78648fb3",
-    "buildId": "gi-i61-03b03690b558-57f234755dc1",
-    "artifactId": 10422922481,
-    "artifactArchiveDigest": "sha256:a7107ef0cc61d41e7e69146186b5c3b7b9c7d0b015e17e6a9dc43722ab4a6f1f",
-    "previewChannelId": "gi-i61-35034732459"
+    "sourceSha": "0b613afa02a89aeddee1047c27f7d0e629c34b52",
+    "buildId": "gi-i63-0b613afa02a8-57f234755dc1",
+    "artifactId": 10536461082,
+    "artifactArchiveDigest": "44f5ceb7da95bcd5333af345af5ccc585c6d854a701b8f4c79232d2d7a1cdcd3",
+    "previewChannelId": "gi-i63-35318710856"
   },
   "successorCandidate": {
     "sourceSha": "03b03690b5583442dd448e954fb66c3c78648fb3",
@@ -285,6 +285,12 @@
             "artifactId": 10311055390,
             "artifactDigest": "sha256:5aad2082722a0c8eedcc3d2b6d48c702c1fab8ad3d57815f4bf5382963747ceb",
             "evidence": "Cliente360 route and canonical read-model/relationship checks passed in both terminal LIVE matrices."
+          },
+          {
+            "runId": 35318710856,
+            "artifactId": 10536461082,
+            "artifactDigest": "44f5ceb7da95bcd5333af345af5ccc585c6d854a701b8f4c79232d2d7a1cdcd3",
+            "evidence": "I6.3 causal successor technical LIVE proof: backend/runtime 442; five control inserts hydrated/searchable; unresolved-country clients visible; net premium separated by currency. Paula visual acceptance pending."
           }
         ]
       }
@@ -577,6 +583,18 @@
     "liveRunId": 35136211332,
     "rolesPass": 5,
     "operationalWritesExecuted": 0,
+    "unaffectedCapabilitiesPreserved": true
+  },
+  "i63LiveAcceptance": {
+    "status": "TECHNICAL_LIVE_PASS_PENDING_PAULA_VISUAL",
+    "sourceSha": "0b613afa02a89aeddee1047c27f7d0e629c34b52",
+    "buildId": "gi-i63-0b613afa02a8-57f234755dc1",
+    "artifactId": 10536461082,
+    "liveRunId": 35318710856,
+    "backendClients": 442,
+    "cliente360Clients": 442,
+    "controlSamples": 5,
+    "kpi": "PRIMA_NETA_VIGENTE_BY_CURRENCY",
     "unaffectedCapabilitiesPreserved": true
   }
 }
