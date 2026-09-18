@@ -25,6 +25,8 @@ const need=(ok,code)=>{if(!ok)throw new Error(code);};
 const readJson=p=>JSON.parse(fs.readFileSync(p,'utf8'));
 const git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
 const exists=p=>fs.existsSync(p);
+const stable=v=>{if(v===null||typeof v!=='object')return v;if(Array.isArray(v))return v.map(stable);const o={};for(const k of Object.keys(v).sort())o[k]=stable(v[k]);return o;};
+const sameJson=(a,b)=>JSON.stringify(stable(a))===JSON.stringify(stable(b));
 
 need(MODE==='governance'||MODE==='i6','I6_GUARD_MODE_INVALID:'+MODE);
 for(const p of [CONTROL,STATUS_LEDGER,AUTH_RECEIPT,I6_ADDENDUM,I6_PLAN_LOCK,V5_MANIFEST,DATA_UPDATE_PLAN,DATA_UPDATE_DISCIPLINE,DATA_UPDATE_REGISTRY,ACTIVE_SOURCE_INTAKE,I63_SOURCE,I63_RECEIPT,I64_SOURCE,I64_RECEIPT,I65_SOURCE,I65_SYNC]) need(exists(p),'I6_REQUIRED_FILE_MISSING:'+p);
@@ -227,8 +229,16 @@ if(activeI65){
   need(C.i65ContinuityAntiDrift?.path===I65_ANTI_DRIFT&&C.i65ContinuityAntiDrift?.status==='FROZEN_ACTIVE'&&C.i65ContinuityAntiDrift?.conversationAsAuthority===false&&C.i65ContinuityAntiDrift?.parallelPlanForbidden===true,'I6_5_ANTI_DRIFT_AUTHORITY_INVALID');
   need(git('hash-object',I65_ANTI_DRIFT)===C.i65ContinuityAntiDrift?.blobSha,'I6_5_ANTI_DRIFT_BLOB_DRIFT');
   const AD=readJson(I65_ANTI_DRIFT);
-  need(AD.status==='FROZEN_ACTIVE'&&AD.authority?.microplan?.blobSha===C.i65MiniClosurePlan?.blobSha&&AD.authority?.sourceIntake?.blobSha===C.i6Execution?.activeSourceIntakeBlobSha,'I6_5_ANTI_DRIFT_BINDING_INVALID');
+  need(AD.status==='FROZEN_ACTIVE'&&AD.authority?.microplan?.blobSha===C.i65MiniClosurePlan?.blobSha&&AD.authority?.sourceIntake?.path===I65_SOURCE&&AD.authority?.sourceIntake?.mutableExecutionSnapshotAllowed===true,'I6_5_ANTI_DRIFT_BINDING_INVALID');
+  need(/^[0-9a-f]{40}$/.test(String(AD.authority?.sourceIntake?.baselineBlobSha||'')),'I6_5_ANTI_DRIFT_BASELINE_BLOB_INVALID');
   need(AD.authority?.sourceIntake?.sourceBundleSha256===SRC5.sourceBundle?.sha256&&C.i65ContinuityAntiDrift?.sourceBundleSha256===SRC5.sourceBundle?.sha256,'I6_5_ANTI_DRIFT_SOURCE_BUNDLE_INVALID');
+  need(SRC5.repinVerification20260918?.status==='EXACT_MATCH_8_OF_8'&&SRC5.repinVerification20260918?.sourceBundleSemanticIdentityUnchanged===true&&SRC5.repinVerification20260918?.sourceBundleSha256===SRC5.sourceBundle?.sha256,'I6_5_SOURCE_REPIN_EVIDENCE_INVALID');
+  const frozenContract=AD.sourceContract||{};
+  need(sameJson(frozenContract.sourceBundle,SRC5.sourceBundle),'I6_5_SOURCE_BUNDLE_STRUCTURE_DRIFT');
+  need(sameJson(frozenContract.coverage,SRC5.coverage),'I6_5_SOURCE_COVERAGE_DRIFT');
+  need(sameJson(frozenContract.temporalScope,SRC5.temporalScope),'I6_5_SOURCE_TEMPORAL_SCOPE_DRIFT');
+  need(sameJson(frozenContract.sourcePrecedence,SRC5.sourcePrecedence),'I6_5_SOURCE_PRECEDENCE_DRIFT');
+  need(sameJson(frozenContract.invariants,SRC5.invariants),'I6_5_SOURCE_INVARIANTS_DRIFT');
   const nextByCursor={SOURCE_PINNED:'LIVE_READBACK_CURRENT_STATE',LIVE_READBACK_PASS:'DETERMINISTIC_DIFF',DETERMINISTIC_DIFF_READY:'APPLY_DETERMINISTIC_DELTA_ONLY',DETERMINISTIC_APPLY_DONE:'POST_WRITE_READBACK_AND_INTEGRITY',POST_WRITE_READBACK_INTEGRITY_PASS:'USER_VISUAL_REFRESH_CHECK',PENDING_USER_VISUAL:'USER_VISUAL_REFRESH_CHECK',LIVE_PASS:'NEXT_MODULE'};
   const actionByCursor={SOURCE_PINNED:'I6_5_LIVE_READBACK_CURRENT_STATE',LIVE_READBACK_PASS:'I6_5_DETERMINISTIC_DIFF',DETERMINISTIC_DIFF_READY:'I6_5_APPLY_DETERMINISTIC_DELTA',DETERMINISTIC_APPLY_DONE:'I6_5_POST_WRITE_READBACK_INTEGRITY',POST_WRITE_READBACK_INTEGRITY_PASS:'I6_5_USER_VISUAL_REFRESH_CHECK',PENDING_USER_VISUAL:'I6_5_USER_VISUAL_REFRESH_CHECK',LIVE_PASS:'I6_6_REQUEST_CURRENT_SOURCE'};
   need(G.lastFormallyCompletedMiniGate==='I6.4'&&g.I6?.lastFrozenMiniGate==='I6.4','I6_5_LAST_MINIGATE_INVALID');

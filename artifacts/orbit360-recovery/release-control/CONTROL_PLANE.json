@@ -1513,12 +1513,20 @@
   },
   "i65ContinuityAntiDrift": {
     "path": "artifacts/orbit360-recovery/release-control/I6_5_CONTINUITY_ANTI_DRIFT_LOCK_20260918.json",
-    "blobSha": "1dd8c70fcc07f6b8ac2bbea159ec906237eab337",
+    "blobSha": "786c4ee767163ae5c3e21bb598d1bdd2e61719fe",
     "status": "FROZEN_ACTIVE",
     "sourceBundleSha256": "f445e2f4a20b9eb7a526bda8896472dab9e7ac4617b3c5d8124a939a0dee0e6a",
     "sourceRepinStatus": "EXACT_MATCH_8_OF_8",
     "conversationAsAuthority": false,
     "parallelPlanForbidden": true,
-    "dataMutationAuthorized": false
+    "dataMutationAuthorized": false,
+    "mutableSourceExecutionAllowed": true,
+    "frozenSourceContractFields": [
+      "sourceBundle",
+      "coverage",
+      "temporalScope",
+      "sourcePrecedence",
+      "invariants"
+    ]
   }
 }
