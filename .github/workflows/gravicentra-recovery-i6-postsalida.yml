@@ -499,9 +499,9 @@ jobs:
           node - <<'NODE'
           const fs=require('node:fs');
           const c=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8')),d=c.i65SyncCodeDefect||{};
-          const mode=d.status==='I6_4_CODE_DEFECT_CANDIDATE_PENDING_BUILD'?'release':'noop';
+          const mode=d.status==='I6_5_SYNC_CODE_DEFECT_CANDIDATE_PENDING_BUILD'?'release':'noop';
           if(mode==='release'){
-            if(c.nextAction!=='I6_4_CODE_DEFECT_SUCCESSOR_RELEASE')throw new Error('I65_RELEASE_ACTION_INVALID');
+            if(c.nextAction!=='I6_5_SYNC_CODE_DEFECT_SUCCESSOR_RELEASE')throw new Error('I65_RELEASE_ACTION_INVALID');
             if(c.i6Execution?.productMutationAuthorized!==true)throw new Error('I65_RELEASE_PRODUCT_AUTH_MISSING');
             if(d.classification!=='CODE_DEFECT'||d.dataMutationAuthorized!==false||d.reimportAuthorized!==false)throw new Error('I65_RELEASE_BOUNDARY_INVALID');
           }
