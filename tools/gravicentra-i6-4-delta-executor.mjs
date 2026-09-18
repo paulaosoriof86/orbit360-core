@@ -106,7 +106,18 @@ need(mutations.filter(m=>m.collection==='polizas'&&m.action==='insert').length==
 need(mutations.filter(m=>m.collection==='vehiculos'&&m.action==='update').length===352,'I64_VEHICLE_UPDATE_COUNT');
 need(mutations.filter(m=>m.collection==='vehiculos'&&m.action==='insert').length===31,'I64_VEHICLE_INSERT_COUNT');
 need(mutations.every(m=>['polizas','vehiculos'].includes(m.collection)&&['update','insert'].includes(m.action)&&noSecretKeys(m.payload)),'I64_UNSAFE_OPERATIONAL_PAYLOAD');
-need(new Set(mutations.map(m=>m.collection+'|'+m.id)).size===910,'I64_DUPLICATE_MUTATION_TARGET');
+const targetGroups=new Map();
+for(const m of mutations){const k=m.collection+'|'+m.id;if(!targetGroups.has(k))targetGroups.set(k,[]);targetGroups.get(k).push(m);}
+const duplicateTargets=[...targetGroups.entries()].filter(([,rows])=>rows.length>1).map(([k,rows])=>({
+  collection:k.split('|')[0],
+  idHash:sha(k).slice(0,16),
+  actions:rows.map(x=>x.action),
+  sourceRows:rows.map(x=>x.payload?._numeroFila??null),
+  payloadDigests:rows.map(x=>digest(x.payload).slice(0,16)),
+  differingKeys:[...new Set(rows.flatMap(x=>Object.keys(x.payload||{})))].filter(key=>new Set(rows.map(x=>JSON.stringify(stable((x.payload||{})[key])))).size>1)
+}));
+console.log('I64_DUPLICATE_TARGETS='+JSON.stringify(duplicateTargets));
+need(targetGroups.size===910,'I64_DUPLICATE_MUTATION_TARGET');
 
 const app=initializeApp({credential:cert(sa),projectId:PROJECT},'i64-delta'),db=getFirestore(app),auth=getAuth(app);
 let browser=null,anyCommitted=false;
