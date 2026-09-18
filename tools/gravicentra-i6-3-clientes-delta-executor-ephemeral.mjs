@@ -135,8 +135,12 @@ try{
   for(const x of payload.conflictPreserve){const snap=await dataRef(db,x.id).get();need(snap.exists,'I63_CONFLICT_POSTWRITE_TARGET_MISSING');need(sha(JSON.stringify(stable((snap.data()||{})[x.field])))===x.beforeValueSha256,'I63_AMBIGUOUS_FIELD_CHANGED');}
   evidence.readback={status:'PASS',documentCount:allAfter.size,operationalRowsMatched:312,updatesMatched:300,insertsMatched:12,unchangedRowsVerified:130,ambiguousFieldsPreserved:3,deletes:0};
 
+  await page.reload({waitUntil:'domcontentloaded',timeout:25000});
+  await page.waitForFunction(()=>!!window.Orbit?.productRuntimeBrowserProvidersP0&&!!window.Orbit?.productAppP0,null,{timeout:12000});
+  await page.evaluate(async()=>Orbit.productAppP0.status?.().started===true?Orbit.productAppP0.status():await Orbit.productAppP0.activate());
+  await page.waitForFunction(()=>Orbit?.productAppP0?.status?.().started===true&&!document.body.classList.contains('pre-auth'),null,{timeout:15000});
   await page.evaluate(()=>{location.hash='#/cliente360';});
-  await page.waitForFunction(()=>Orbit?.route?.key==='cliente360'&&Array.isArray(Orbit.store?.all?.('clientes'))&&Orbit.store.all('clientes').length===442,null,{timeout:20000});
+  await page.waitForFunction(()=>Orbit?.route?.key==='cliente360'&&OrbitRuntimeDiagnostics?.cliente360?.list?.totalRows===442,null,{timeout:20000});
   const insertSample=payload.mutations.find(m=>m.action==='insert');
   const updateSample=payload.mutations.find(m=>m.action==='update'&&Object.prototype.hasOwnProperty.call(m.payload||{},'fechaNacimiento'))||payload.mutations.find(m=>m.action==='update');
   need(insertSample&&updateSample,'I63_FUNCTIONAL_SAMPLE_MISSING');
