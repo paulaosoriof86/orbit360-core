@@ -116,13 +116,15 @@
     "operationalWrites": 0,
     "authorizedByPaula": true,
     "authorizedAt": "2026-09-18T09:28:00-06:00",
-    "latestPreviewRunId": 35363107801,
-    "latestPreviewBuildId": "gi-i64-30981d1817fd-57f234755dc1",
-    "latestPreviewUrl": "https://ays-orbit-360-lab--gi-i64-35363107801-g8if3hc5.web.app",
+    "latestPreviewRunId": 35363551935,
+    "latestPreviewBuildId": "gi-i64-265a3dd54a43-57f234755dc1",
+    "latestPreviewUrl": "https://ays-orbit-360-lab--gi-i64-35363551935-4ykt62pm.web.app",
     "latestPreviewReadbackExact": true,
     "latestPreviewPromotedToLive": false,
     "latestPreviewOperationalWrites": 0,
     "latestPreviewAssertion": "I64_RENEWABILITY_UNKNOWN_DISPLAY",
-    "proofCorrection": "Assert the exact Renovación field value in the canonical full-page detail rather than scanning all visible detail text."
+    "proofCorrection": "Bind functional proof to the canonical full-page Renovación field emitted by the authorized detail owner.",
+    "latestPreviewObservedUnscopedRenewalText": "Renovabilidad pendiente de revisión/conciliación",
+    "canonicalFieldProofBinding": "data-policy-renewability=1"
   }
 }

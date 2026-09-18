@@ -38,5 +38,6 @@ for(const token of ['policyMetrics','isRenewalWithin45Days','isHistoricalNoPortf
 const detailGuard=fs.readFileSync('orbit360-platform/modules/policy-receipts-v1199-detail-guard.js','utf8');
 need(!detailGuard.includes("out.renovable = p.renovable !== undefined ? !!p.renovable : activePolicy(p);"),'I64_DETAIL_GUARD_BOOLEAN_COERCION');
 for(const token of ['renewabilityState','renewabilityLabel','Renovabilidad pendiente de validar'])need(detailGuard.includes(token),'I64_DETAIL_GUARD_TRI_STATE:'+token);
+need(detailGuard.includes('data-policy-renewability="1"'),'I64_DETAIL_GUARD_CANONICAL_FIELD_MARKER');
 console.log('GRAVICENTRA_I6_4_CODE_DEFECT_CONTRACT=PASS');
 console.log('I64_OPERATIONAL_WRITES=0');

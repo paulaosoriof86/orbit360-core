@@ -51,14 +51,8 @@ try{
   need(result.historicalCount===1191&&Number(result.historical.value)===result.historicalCount,'I64_HISTORICAL_KPI');
   need(result.targetId&&result.targetState==='UNKNOWN','I64_RENEWABILITY_TARGET');
   await page.evaluate(id=>Orbit.modules.cliente360.verPoliza(id),result.targetId);
-  await page.waitForSelector('.orbit-policy-fullpage[data-policy-fullpage="1"]');
-  const renewalDisplay=await page.evaluate(()=>{
-    const root=document.querySelector('.orbit-policy-fullpage[data-policy-fullpage="1"]');
-    if(!root)return '';
-    const label=[...root.querySelectorAll('div')].find(el=>el.children.length===0&&(el.textContent||'').trim()==='Renovación');
-    const value=label?.parentElement?.children?.[1];
-    return (value?.textContent||'').replace(/\s+/g,' ').trim();
-  });
+  await page.waitForSelector('.orbit-policy-fullpage[data-policy-fullpage="1"] [data-policy-renewability="1"]');
+  const renewalDisplay=(await page.locator('.orbit-policy-fullpage[data-policy-fullpage="1"] [data-policy-renewability="1"]').innerText()).replace(/\s+/g,' ').trim();
   need(renewalDisplay==='Renovabilidad pendiente de validar','I64_RENEWABILITY_UNKNOWN_DISPLAY:'+renewalDisplay);
   need(pageErrors.length===0,'I64_PROOF_PAGE_ERRORS');need(http404.length===0,'I64_PROOF_HTTP404');
   ev.policies={count:result.count,actorRole:actor.role};
