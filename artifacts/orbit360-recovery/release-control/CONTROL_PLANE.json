@@ -679,7 +679,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_DETERMINISTIC_DIFF",
+  "nextAction": "I6_5_HYDRATION_DIAGNOSTIC",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -1314,10 +1314,46 @@
     "path": "artifacts/orbit360-recovery/release-control/I6_5_MINI_CIERRE_OPERATIVO_DECISION_LOCK_20260918.json",
     "frozenAtHead": "bb940461f1ec39469d1778bd2f9d875573ad300f",
     "blockAStatus": "OPEN_BUT_MUST_NOT_CONTAMINATE_I65_BASELINE",
-    "blockBStatus": "READ_PATH_AND_DUAL_PATH_LIVE_READBACK_PASS",
-    "blockCStatus": "BLOCKED_ON_BLOCK_B_READBACK",
+    "blockBStatus": "DIRECT_DATA_READBACK_PASS_UI_HYDRATION_GAP_CONFIRMED",
+    "blockCStatus": "BLOCKED_ON_BLOCK_B_HYDRATION_FIX",
     "blockDStatus": "PENDING_REUSE_ONLY",
     "cobrosWritesDuringI65": false,
-    "nextMaterialCursor": "DETERMINISTIC_DIFF"
+    "nextMaterialCursor": "HYDRATION_DIAGNOSTIC"
+  },
+  "i65HydrationDefect": {
+    "status": "I6_5_HYDRATION_DIAGNOSTIC_PENDING",
+    "classification": "CODE_DEFECT",
+    "detectedAfterDirectLiveReadback": true,
+    "evidence": {
+      "directCanonicalReceipts": 1294,
+      "directCanonicalPortfolio": 673,
+      "directLegacyReceipts": 1294,
+      "directLegacyPortfolio": 673,
+      "directRelationshipMissing": {
+        "canonical": {
+          "receiptPolicyMissing": 0,
+          "portfolioPolicyMissing": 0,
+          "portfolioReceiptMissing": 0
+        },
+        "legacy": {
+          "receiptPolicyMissing": 0,
+          "portfolioPolicyMissing": 0,
+          "portfolioReceiptMissing": 0
+        }
+      },
+      "previousBrowserStoreCounts": {
+        "recibosEsperados": 0,
+        "carteraPrimas": 0
+      },
+      "directReadbackRunId": 35385036125,
+      "directReadbackArtifactId": 10563297338
+    },
+    "hypothesis": "Data is present and relation-integral in canonical Firestore, while the product runtime visual/store count previously observed 0/0. Diagnose product hydration/query-scope composition before deterministic diff.",
+    "dataMutationAuthorized": false,
+    "cobrosWritesAuthorized": false,
+    "reimportAuthorized": false,
+    "productMutationAuthorized": false,
+    "diagnosticTool": "tools/gravicentra-i6-5-hydration-diagnostic.mjs",
+    "nextRequiredStep": "I6_5_HYDRATION_DIAGNOSTIC"
   }
 }

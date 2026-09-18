@@ -885,6 +885,80 @@ jobs:
           echo I65_AUTOMATIC_ROLLBACK=PASS
 
 
+  i65-hydration-diagnostic:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Resolve I6.5 hydration diagnostic applicability
+        id: hyd
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          node - <<'NODE'
+          const fs=require('node:fs'),c=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8'));
+          const ok=c.gateState?.gates?.I6?.activeSubgate==='I6.5'&&c.nextAction==='I6_5_HYDRATION_DIAGNOSTIC'&&c.i65HydrationDefect?.status==='I6_5_HYDRATION_DIAGNOSTIC_PENDING';
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(ok?'true':'false')+'\n');console.log('I65_HYDRATION_APPLICABLE='+(ok?'true':'false'));
+          NODE
+      - name: Install hydration diagnostic dependencies
+        if: steps.hyd.outputs.run == 'true'
+        run: |
+          npm install --no-save --package-lock=false playwright@1.55.0 firebase-admin@13.4.0 >/dev/null
+          npx playwright install --with-deps chromium >/dev/null
+      - name: Diagnose LIVE product hydration without writes
+        if: steps.hyd.outputs.run == 'true'
+        env:
+          TARGET_URL: https://ays-orbit-360-lab.web.app
+          I65_HYDRATION_DIR: ${{ runner.temp }}/i65-hydration
+        run: node tools/gravicentra-i6-5-hydration-diagnostic.mjs
+      - name: Upload hydration diagnostic evidence
+        if: steps.hyd.outputs.run == 'true'
+        id: hydart
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i6-5-hydration-diagnostic-${{ github.run_id }}
+          path: ${{ runner.temp }}/i65-hydration/*
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 7
+      - name: Freeze hydration diagnosis
+        if: steps.hyd.outputs.run == 'true'
+        env:
+          HYD_ARTIFACT_ID: ${{ steps.hydart.outputs.artifact-id }}
+          HYD_ARTIFACT_DIGEST: ${{ steps.hydart.outputs.artifact-digest }}
+        run: |
+          set -euo pipefail
+          git fetch origin recovery/fase-a-clean-20260831
+          git reset --hard origin/recovery/fase-a-clean-20260831
+          export HYD_EVIDENCE="$RUNNER_TEMP/i65-hydration/i65-hydration-diagnostic.json"
+          node - <<'NODE'
+          const fs=require('node:fs'),C=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8')),E=JSON.parse(fs.readFileSync(process.env.HYD_EVIDENCE,'utf8'));
+          if(C.i65HydrationDefect?.status!=='I6_5_HYDRATION_DIAGNOSTIC_PENDING'||C.nextAction!=='I6_5_HYDRATION_DIAGNOSTIC')throw new Error('I65_HYDRATION_CURSOR_CHANGED');
+          if(E.status!=='PASS'||E.writes!==0||E.operationalWrites!==0)throw new Error('I65_HYDRATION_EVIDENCE_INVALID');
+          C.i65HydrationDefect={...C.i65HydrationDefect,status:'I6_5_HYDRATION_DIAGNOSTIC_PASS',diagnosticRunId:Number(process.env.GITHUB_RUN_ID),diagnosticArtifactId:Number(process.env.HYD_ARTIFACT_ID),diagnosticArtifactDigest:process.env.HYD_ARTIFACT_DIGEST,diagnosis:E.diagnosis,directCounts:E.direct,runtimeSummary:E.runtime,dataMutationAuthorized:false,cobrosWritesAuthorized:false,reimportAuthorized:false,productMutationAuthorized:false,nextRequiredStep:'I6_5_HYDRATION_CODE_FIX'};
+          C.i65MiniClosurePlan.blockBStatus='HYDRATION_DIAGNOSTIC_PASS_CODE_FIX_PENDING';C.i65MiniClosurePlan.blockCStatus='BLOCKED_ON_BLOCK_B_HYDRATION_FIX';C.i65MiniClosurePlan.nextMaterialCursor='HYDRATION_CODE_FIX';
+          C.nextAction='I6_5_HYDRATION_CODE_FIX';C.i6Execution.dataMutationAuthorized=false;C.i6Execution.sourceDataApplyAuthorized=false;C.i6Execution.productMutationAuthorized=false;
+          fs.writeFileSync(process.env.CONTROL,JSON.stringify(C,null,2)+'\n');
+          NODE
+          git config user.name "gravicentra-governance-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add "$CONTROL"
+          git commit -m "recovery(i6.5): freeze LIVE hydration diagnosis"
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          git push origin HEAD:recovery/fase-a-clean-20260831
+
+
   i65-live-readback:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
