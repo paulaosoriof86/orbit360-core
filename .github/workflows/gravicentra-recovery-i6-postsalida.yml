@@ -11,6 +11,7 @@ on:
       - 'tools/gravicentra-i6-control-plane-guard-v1.mjs'
       - 'tools/gravicentra-i6-1-preview-package.mjs'
       - 'tools/gravicentra-i6-3-clientes-postwrite-functional.mjs'
+      - 'tools/gravicentra-i6-3-client-name-case.mjs'
       - 'orbit360-platform/core/tenant-access-policy-contract-p0.js'
       - 'orbit360-platform/core/access-scope.js'
       - 'orbit360-platform/modules/cliente360.js'
