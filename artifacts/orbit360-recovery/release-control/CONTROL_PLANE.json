@@ -415,9 +415,9 @@
     "mechanismRegistryPath": "artifacts/orbit360-recovery/release-control/DATA_UPDATE_MECHANISM_REGISTRY.json",
     "mechanismRegistryBlobSha": "785a71f234d372db3fd23e16aa6800e1c1a62041",
     "activeSourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_4_POLIZAS_RIESGOS_SOURCE_INTAKE_20260918.json",
-    "activeSourceIntakeBlobSha": "ec14feb7c9acf62189b7327b233e21f4e291757b",
+    "activeSourceIntakeBlobSha": "2bb27b2619cb566c9b29c4d326567d5404f51aea",
     "activeModule": "POLIZAS_RIESGOS_VEHICULOS",
-    "activeModuleStatus": "LIVE_READBACK_PASS",
+    "activeModuleStatus": "DETERMINISTIC_DIFF_READY",
     "i6_0": {
       "status": "I6_0_BASELINE_FROZEN",
       "executorPath": ".github/workflows/gravicentra-material-baseline-freeze.yml",
@@ -462,7 +462,7 @@
       "receiptBlobSha": "c4ceccd2b69d0b07b547974b690b8232864c8d75"
     },
     "i6_4": {
-      "status": "LIVE_READBACK_PASS",
+      "status": "DETERMINISTIC_DIFF_READY",
       "readbackRunId": 35325748631,
       "readbackArtifactId": 10539073435,
       "readbackArtifactDigest": "00489c6e2673aed0eabdd7f406e9e2c2e41dd2fb9b0fb3f034f16a65bef761cf",
@@ -480,7 +480,31 @@
         "vehicleClientMissing": 0,
         "vehicleClientTombstone": 0
       },
-      "publicKeySha256": "342371840986ee008bdef3ee9523fe9e52509d12a654ac1d4c0fa6b3cb781579"
+      "publicKeySha256": "342371840986ee008bdef3ee9523fe9e52509d12a654ac1d4c0fa6b3cb781579",
+      "deterministicDiffReady": true,
+      "diffReceiptPath": "artifacts/orbit360-recovery/release-control/I6_4_DETERMINISTIC_DIFF_20260918.json",
+      "diffReceiptBlobSha": "fe72f96946c307ade3b57d863022460b6cc17427",
+      "diffSnapshot": {
+        "runId": 35332413544,
+        "artifactId": 10541996118,
+        "artifactDigest": "sha256:e759bdd0833a12d633f74203d28385d7c322051b1b43ef722c2935ffd0bc1448"
+      },
+      "mutations": 910,
+      "policyUpdates": 486,
+      "policyInserts": 41,
+      "vehicleUpdates": 352,
+      "vehicleInserts": 31,
+      "deletes": 0,
+      "hardHolds": 2,
+      "expectedAfter": {
+        "clientesPhysical": 442,
+        "clientesCanonicalActive": 439,
+        "polizas": 1414,
+        "vehiculos": 1063,
+        "renovaciones": 0
+      },
+      "envelopeSha256": "e9964f4a671e9c1858da86eb2c5519fb55a0eea2861ecdb015817dc0d4c53fd3",
+      "payloadSha256": "925dd4fbbda44e2532cec253d9d47949358c84df0e0d0c596c48e8153d7ad358"
     }
   },
   "postproductionDataUpdateControl": {
@@ -494,15 +518,15 @@
     "mechanismRegistryBlobSha": "785a71f234d372db3fd23e16aa6800e1c1a62041",
     "activeModule": "POLIZAS_RIESGOS_VEHICULOS",
     "activeSourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_4_POLIZAS_RIESGOS_SOURCE_INTAKE_20260918.json",
-    "activeSourceIntakeBlobSha": "ec14feb7c9acf62189b7327b233e21f4e291757b",
+    "activeSourceIntakeBlobSha": "2bb27b2619cb566c9b29c4d326567d5404f51aea",
     "sourceSha256": "7130ed56467da438f5c6e2823ede65f73d6356de63de94e19da30f3aed26c68f",
     "conversationAsAuthority": false,
     "requestCurrentSourceBeforeEveryNewModule": true,
     "liveVisualRefreshRequiredForClosure": true,
     "pureDataUpdateRequiresBuildOrDeploy": false,
     "reimportForVisibilityFailureForbidden": true,
-    "nextRequiredStep": "DETERMINISTIC_DIFF",
-    "executionCursor": "LIVE_READBACK_PASS"
+    "nextRequiredStep": "APPLY_DETERMINISTIC_DELTA_ONLY",
+    "executionCursor": "DETERMINISTIC_DIFF_READY"
   },
   "governanceSyncChecklist": {
     "frozenPlanMaterialized": true,
@@ -579,7 +603,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_4_DETERMINISTIC_DIFF",
+  "nextAction": "I6_4_APPLY_DETERMINISTIC_DELTA",
   "postproductionExitProgress": {
     "formalPercent": 40,
     "frozenMiniGates": 4,

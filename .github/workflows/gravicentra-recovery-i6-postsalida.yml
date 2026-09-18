@@ -19,6 +19,12 @@ on:
       - 'tools/gravicentra-i6-3-identity-merge-executor.mjs'
       - 'tools/gravicentra-i6-4-live-readback.mjs'
       - 'tools/gravicentra-i6-4-diff-snapshot.mjs'
+      - 'tools/gravicentra-i6-4-delta-executor.mjs'
+      - 'artifacts/orbit360-recovery/release-control/I6_4_DETERMINISTIC_DIFF_20260918.json'
+      - '.github/i6-ephemeral/i64-apply-envelope.part01'
+      - '.github/i6-ephemeral/i64-apply-envelope.part02'
+      - '.github/i6-ephemeral/i64-apply-envelope.part03'
+      - '.github/i6-ephemeral/i64-apply-envelope.part04'
       - 'tools/gravicentra-certified-live-binding-check.mjs'
       - 'orbit360-platform/core/tenant-access-policy-contract-p0.js'
       - 'orbit360-platform/core/access-scope.js'
@@ -761,3 +767,128 @@ jobs:
           compression-level: 0
           if-no-files-found: error
           retention-days: 7
+
+
+  i64-deterministic-apply:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      I64_SOURCE_INTAKE: artifacts/orbit360-recovery/release-control/I6_4_POLIZAS_RIESGOS_SOURCE_INTAKE_20260918.json
+      I64_DIFF_RECEIPT: artifacts/orbit360-recovery/release-control/I6_4_DETERMINISTIC_DIFF_20260918.json
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Resolve I6.4 deterministic apply applicability
+        id: i64apply
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const c=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8'));
+          const s=JSON.parse(fs.readFileSync(process.env.I64_SOURCE_INTAKE,'utf8'));
+          const d=JSON.parse(fs.readFileSync(process.env.I64_DIFF_RECEIPT,'utf8'));
+          const ok=c.gateState?.gates?.I6?.activeSubgate==='I6.4' &&
+            c.nextAction==='I6_4_APPLY_DETERMINISTIC_DELTA' &&
+            s.execution?.cursorState==='DETERMINISTIC_DIFF_READY' &&
+            s.execution?.nextRequiredStep==='APPLY_DETERMINISTIC_DELTA_ONLY' &&
+            d.status==='DETERMINISTIC_DIFF_READY';
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(ok?'true':'false')+'\n');
+          console.log('I64_APPLY_APPLICABLE='+(ok?'true':'false'));
+          NODE
+      - name: Install apply and functional proof dependencies
+        if: steps.i64apply.outputs.run == 'true'
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false playwright@1.55.0 firebase-admin@13.4.0 >/dev/null
+          npx playwright install --with-deps chromium >/dev/null
+      - name: Apply deterministic policy and risk delta with LIVE readback
+        if: steps.i64apply.outputs.run == 'true'
+        env:
+          I64_EVIDENCE_DIR: ${{ runner.temp }}/i64-evidence
+        run: node tools/gravicentra-i6-4-delta-executor.mjs
+      - name: Upload I6.4 apply readback integrity evidence
+        if: ${{ steps.i64apply.outputs.run == 'true' && always() }}
+        id: i64applyart
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i6-4-apply-readback-integrity-${{ github.run_id }}
+          path: ${{ runner.temp }}/i64-evidence/i64-apply-readback-integrity-functional.json
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 30
+      - name: Seal I6.4 technical pass pending Paula visual
+        if: ${{ steps.i64apply.outputs.run == 'true' && success() }}
+        env:
+          APPLY_ARTIFACT_ID: ${{ steps.i64applyart.outputs.artifact-id }}
+          APPLY_ARTIFACT_DIGEST: ${{ steps.i64applyart.outputs.artifact-digest }}
+        run: |
+          set -euo pipefail
+          git fetch origin recovery/fase-a-clean-20260831
+          git reset --hard origin/recovery/fase-a-clean-20260831
+          export I64_EVIDENCE="$RUNNER_TEMP/i64-evidence/i64-apply-readback-integrity-functional.json"
+          node - <<'NODE'
+          const fs=require('node:fs'),{execFileSync}=require('node:child_process');
+          const C=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8'));
+          const S=JSON.parse(fs.readFileSync(process.env.I64_SOURCE_INTAKE,'utf8'));
+          const E=JSON.parse(fs.readFileSync(process.env.I64_EVIDENCE,'utf8'));
+          if(E.status!=='PASS'||E.apply?.operationalMutations!==910||E.apply?.batchesCommitted!==12||E.readback?.status!=='PASS'||E.integrity?.status!=='PASS'||E.functional?.status!=='PASS'||E.rollback?.executed===true)throw new Error('I64_APPLY_EVIDENCE_INVALID');
+          if(E.readback.polizas!==1414||E.readback.vehiculos!==1063||E.readback.clientesPhysical!==442||E.readback.clientesCanonicalActive!==439||E.readback.renovaciones!==0)throw new Error('I64_POSTWRITE_COUNTS_INVALID');
+          if(E.integrity.policyClientMissing!==0||E.integrity.policyClientTombstone!==0||E.integrity.vehiclePolicyMissing!==0||E.integrity.vehicleClientMissing!==0||E.integrity.vehicleClientTombstone!==0)throw new Error('I64_RELATIONSHIP_EVIDENCE_INVALID');
+
+          S.execution.cursorState='POST_WRITE_READBACK_INTEGRITY_PASS';
+          S.execution.writeApplied=true;
+          S.execution.applyRunId=Number(process.env.GITHUB_RUN_ID);
+          S.execution.applyArtifactId=Number(process.env.APPLY_ARTIFACT_ID);
+          S.execution.applyArtifactDigest=process.env.APPLY_ARTIFACT_DIGEST;
+          S.execution.appliedCounts={policyUpdates:486,policyInserts:41,vehicleUpdates:352,vehicleInserts:31,totalMutations:910,deletes:0};
+          S.execution.liveCountsAfter={clientes:442,clientesCanonicalActive:439,polizas:1414,vehiculos:1063,renovaciones:0};
+          S.execution.postWriteReadbackPassed=true;
+          S.execution.integrityPassed=true;
+          S.execution.functionalPassed=true;
+          S.execution.nextRequiredStep='USER_VISUAL_REFRESH_CHECK';
+          fs.writeFileSync(process.env.I64_SOURCE_INTAKE,JSON.stringify(S,null,2)+'\n');
+          const sourceBlob=execFileSync('git',['hash-object',process.env.I64_SOURCE_INTAKE],{encoding:'utf8'}).trim();
+
+          C.i6Execution.activeSourceIntakeBlobSha=sourceBlob;
+          C.i6Execution.activeModuleStatus='POST_WRITE_READBACK_INTEGRITY_PASS';
+          C.postproductionDataUpdateControl.activeSourceIntakeBlobSha=sourceBlob;
+          C.postproductionDataUpdateControl.executionCursor='POST_WRITE_READBACK_INTEGRITY_PASS';
+          C.postproductionDataUpdateControl.nextRequiredStep='USER_VISUAL_REFRESH_CHECK';
+          C.nextAction='I6_4_USER_VISUAL_REFRESH_CHECK';
+          C.i6Execution.i6_4={
+            ...(C.i6Execution.i6_4||{}),
+            status:'POST_WRITE_READBACK_INTEGRITY_PASS',
+            writeApplied:true,
+            applyRunId:Number(process.env.GITHUB_RUN_ID),
+            applyArtifactId:Number(process.env.APPLY_ARTIFACT_ID),
+            applyArtifactDigest:process.env.APPLY_ARTIFACT_DIGEST,
+            writesExecuted:910,
+            batchesCommitted:12,
+            deletes:0,
+            postWriteCounts:S.execution.liveCountsAfter,
+            readbackPassed:true,
+            integrityPassed:true,
+            functionalPassed:true,
+            rollbackExecuted:false,
+            paulaVisualAcceptance:'PENDING'
+          };
+          C.i6Execution.dataMutationAuthorized=false;
+          C.gateState.gates.I6.dataMutationAuthorized=false;
+          fs.writeFileSync(process.env.CONTROL,JSON.stringify(C,null,2)+'\n');
+          NODE
+          git config user.name "gravicentra-governance-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add "$CONTROL" "$I64_SOURCE_INTAKE"
+          git commit -m "recovery(i6.4): seal policy-risk delta technical pass"
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          git push origin HEAD:recovery/fase-a-clean-20260831

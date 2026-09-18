@@ -148,11 +148,11 @@
   },
   "execution": {
     "method": "DATA_UPDATE_DELTA_FIRST",
-    "cursorState": "LIVE_READBACK_PASS",
+    "cursorState": "DETERMINISTIC_DIFF_READY",
     "writeApplied": false,
     "readbackPassed": true,
-    "deterministicDiffReady": false,
-    "nextRequiredStep": "DETERMINISTIC_DIFF",
+    "deterministicDiffReady": true,
+    "nextRequiredStep": "APPLY_DETERMINISTIC_DELTA_ONLY",
     "readbackRunId": 35325748631,
     "readbackArtifactId": 10539073435,
     "readbackArtifactDigest": "00489c6e2673aed0eabdd7f406e9e2c2e41dd2fb9b0fb3f034f16a65bef761cf",
@@ -169,7 +169,121 @@
       "vehicleClientMissing": 0,
       "vehicleClientTombstone": 0
     },
-    "publicKeySha256": "342371840986ee008bdef3ee9523fe9e52509d12a654ac1d4c0fa6b3cb781579"
+    "publicKeySha256": "342371840986ee008bdef3ee9523fe9e52509d12a654ac1d4c0fa6b3cb781579",
+    "diffReceiptPath": "artifacts/orbit360-recovery/release-control/I6_4_DETERMINISTIC_DIFF_20260918.json",
+    "diffReceiptBlobSha": "fe72f96946c307ade3b57d863022460b6cc17427",
+    "diffSnapshot": {
+      "runId": 35332413544,
+      "artifactId": 10541996118,
+      "artifactDigest": "sha256:e759bdd0833a12d633f74203d28385d7c322051b1b43ef722c2935ffd0bc1448"
+    },
+    "diffCounts": {
+      "primarySourceRows": 530,
+      "canonicalPrimaryRows": 529,
+      "duplicateExtraRows": 1,
+      "deterministicPolicyEditions": 527,
+      "policyHardHolds": 2,
+      "policies": {
+        "updates": 486,
+        "inserts": 41,
+        "unchangedOutsidePrimary": 887,
+        "deletes": 0
+      },
+      "vehicles": {
+        "sourceRows": 396,
+        "inScope": 386,
+        "updates": 352,
+        "inserts": 31,
+        "unchanged": 3,
+        "referenceOnly": 10,
+        "existingDuplicateCandidatesIsolated": 1,
+        "deletes": 0
+      },
+      "totalMutations": 910,
+      "totalDeletes": 0,
+      "clientsWrites": 0,
+      "insurersWrites": 0,
+      "receiptsWrites": 0,
+      "carteraWrites": 0,
+      "cobrosWrites": 0,
+      "commissionsWrites": 0,
+      "expectedAfter": {
+        "clientesPhysical": 442,
+        "clientesCanonicalActive": 439,
+        "polizas": 1414,
+        "vehiculos": 1063,
+        "renovaciones": 0
+      },
+      "policyInsertBreakdown": {
+        "vigente": 35,
+        "historica": 6,
+        "gtq": 34,
+        "cop": 7,
+        "requiresValidation": 12
+      },
+      "policyFieldChangeCounts": {
+        "_numeroFila": 486,
+        "conductoPago": 236,
+        "estado": 52,
+        "estadoFuenteContradiceVigencia": 85,
+        "estadoFuenteOriginal": 72,
+        "fechaCancelacion": 116,
+        "fechaEmision": 486,
+        "moneda": 1,
+        "pais": 1,
+        "primaNeta": 1,
+        "primaTotal": 1,
+        "sourceBundleSha256": 486,
+        "sourceRef": 486,
+        "tipoEmisionFuente": 486,
+        "vigenciaFin": 1
+      },
+      "vehicleFieldChangeCounts": {
+        "anio": 351,
+        "inciso": 1,
+        "linea": 1,
+        "pais": 1,
+        "vin": 1
+      },
+      "isolatedCases": [
+        {
+          "sourceRow": 421,
+          "reason": "MISSING_INSURER",
+          "action": "HOLD_NO_WRITE"
+        },
+        {
+          "sourceRow": 503,
+          "reason": "INVERTED_TERM",
+          "action": "HOLD_NO_WRITE"
+        }
+      ],
+      "duplicateConflict": {
+        "count": 1,
+        "resolution": "DETERMINISTIC_CANONICAL_EDITION_NO_DOUBLE_INSERT"
+      }
+    },
+    "applyEnvelope": {
+      "schema": "GRAVICENTRA_I6_4_COMPACT_APPLY_ENVELOPE_V1",
+      "parts": [
+        ".github/i6-ephemeral/i64-apply-envelope.part01",
+        ".github/i6-ephemeral/i64-apply-envelope.part02",
+        ".github/i6-ephemeral/i64-apply-envelope.part03",
+        ".github/i6-ephemeral/i64-apply-envelope.part04"
+      ],
+      "envelopeSha256": "e9964f4a671e9c1858da86eb2c5519fb55a0eea2861ecdb015817dc0d4c53fd3",
+      "payloadSha256": "925dd4fbbda44e2532cec253d9d47949358c84df0e0d0c596c48e8153d7ad358",
+      "plaintextGzipSha256": "24dc9e60e39f6eef4771716090268952d3f8fec3c233670fea31fd5af794b8e6",
+      "publicKeySha256": "342371840986ee008bdef3ee9523fe9e52509d12a654ac1d4c0fa6b3cb781579",
+      "containsPIIInEncryptedCiphertext": true,
+      "plaintextCommitted": false
+    },
+    "expectedAfter": {
+      "clientesPhysical": 442,
+      "clientesCanonicalActive": 439,
+      "polizas": 1414,
+      "vehiculos": 1063,
+      "renovaciones": 0
+    }
   },
   "guards": {
     "doNotCommitPIISourceFiles": true,
