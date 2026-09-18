@@ -645,28 +645,33 @@ jobs:
           python3 - <<'PY'
           import hashlib,json,os,time,urllib.error,urllib.parse,urllib.request
           rows=[tuple(x.split('  ',1)) for x in open(os.environ['MANIFEST']).read().splitlines() if x.strip()]
-          base=os.environ['TARGET_URL'].rstrip('/');bad=[]
-          def read_with_preview_settle(req, attempts=8):
-              last=None
-              for n in range(attempts):
+          base=os.environ['TARGET_URL'].rstrip('/')
+          last_bad=[];last_marker=None
+          def read_once(req):
+              with urllib.request.urlopen(req,timeout=30) as r:return r.read()
+          for attempt in range(1,9):
+              bad=[];stamp=str(attempt)+'-'+str(int(time.time()))
+              for want,rel in rows:
                   try:
-                      with urllib.request.urlopen(req,timeout=30) as r:return r.read()
-                  except urllib.error.HTTPError as e:
-                      last=e
-                      if e.code not in (404,429,500,502,503,504) or n==attempts-1:raise
-                  except urllib.error.URLError as e:
-                      last=e
-                      if n==attempts-1:raise
-                  time.sleep(2)
-              raise last
-          for want,rel in rows:
-              req=urllib.request.Request(base+'/'+urllib.parse.quote(rel,safe='/')+'?i65='+os.environ['EXPECTED_DIGEST'][:16],headers={'Accept-Encoding':'identity','Cache-Control':'no-cache'})
-              got=hashlib.sha256(read_with_preview_settle(req)).hexdigest()
-              if got!=want:bad.append((rel,want,got))
-          if bad:raise SystemExit('I65_PREVIEW_READBACK_MISMATCH:'+json.dumps(bad[:3]))
-          m=json.loads(read_with_preview_settle(urllib.request.Request(base+'/__recovery__/build.json?i65=1',headers={'Cache-Control':'no-cache'})))
-          if m.get('sourceSha')!=os.environ['GITHUB_SHA'] or m.get('buildId')!=os.environ['EXPECTED_BUILD_ID'] or m.get('gate')!='I6.5':raise SystemExit('I65_PREVIEW_MARKER_MISMATCH')
-          print('I65_PREVIEW_READBACK='+str(len(rows)))
+                      req=urllib.request.Request(base+'/'+urllib.parse.quote(rel,safe='/')+'?i65='+os.environ['EXPECTED_DIGEST'][:16]+'-'+stamp,headers={'Accept-Encoding':'identity','Cache-Control':'no-cache, no-store','Pragma':'no-cache'})
+                      got=hashlib.sha256(read_once(req)).hexdigest()
+                  except (urllib.error.HTTPError,urllib.error.URLError) as e:
+                      got='HTTP_ERROR:'+type(e).__name__
+                  if got!=want:bad.append((rel,want,got))
+              marker=None
+              try:
+                  marker=json.loads(read_once(urllib.request.Request(base+'/__recovery__/build.json?i65='+stamp,headers={'Cache-Control':'no-cache, no-store','Pragma':'no-cache'})))
+              except Exception as e:
+                  marker={'error':type(e).__name__}
+              marker_ok=marker.get('sourceSha')==os.environ['GITHUB_SHA'] and marker.get('buildId')==os.environ['EXPECTED_BUILD_ID'] and marker.get('gate')=='I6.5'
+              if not bad and marker_ok:
+                  print('I65_PREVIEW_READBACK='+str(len(rows)))
+                  print('I65_PREVIEW_PROPAGATION_ATTEMPT='+str(attempt))
+                  break
+              last_bad=bad;last_marker=marker
+              if attempt<8:time.sleep(3)
+          else:
+              raise SystemExit('I65_PREVIEW_READBACK_MISMATCH:'+json.dumps({'bad':last_bad[:3],'marker':last_marker},ensure_ascii=False))
           PY
 
       - name: Preview I6.5 code-defect proof
