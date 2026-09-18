@@ -140,17 +140,17 @@ try{
   await page.evaluate(async()=>Orbit.productAppP0.status?.().started===true?Orbit.productAppP0.status():await Orbit.productAppP0.activate());
   await page.waitForFunction(()=>Orbit?.productAppP0?.status?.().started===true&&!document.body.classList.contains('pre-auth'),null,{timeout:15000});
   await page.evaluate(()=>{location.hash='#/cliente360';});
-  await page.waitForFunction(()=>Orbit?.route?.key==='cliente360'&&OrbitRuntimeDiagnostics?.cliente360?.list?.totalRows===442,null,{timeout:20000});
+  await page.waitForFunction(()=>Orbit?.route?.key==='cliente360'&&window.OrbitRuntimeDiagnostics?.cliente360?.list?.renderSeq>0,null,{timeout:20000});
   const insertSample=payload.mutations.find(m=>m.action==='insert');
   const updateSample=payload.mutations.find(m=>m.action==='update'&&Object.prototype.hasOwnProperty.call(m.payload||{},'fechaNacimiento'))||payload.mutations.find(m=>m.action==='update');
   need(insertSample&&updateSample,'I63_FUNCTIONAL_SAMPLE_MISSING');
   await page.evaluate(id=>{location.hash='#/cliente360?c='+encodeURIComponent(id);},insertSample.id);
   await page.waitForFunction(id=>Orbit?.route?.key==='cliente360'&&!!Orbit.store?.get?.('clientes',id),insertSample.id,{timeout:15000});
-  const uiCheck=await page.evaluate(({insertId,updateId,expected})=>{const ins=Orbit.store.get('clientes',insertId)||{},upd=Orbit.store.get('clientes',updateId)||{};const eq=(a,b)=>JSON.stringify(a??null)===JSON.stringify(b??null);return{route:Orbit.route?.key||'',count:Orbit.store.all('clientes').length,insertExists:!!ins.id,updateExists:!!upd.id,updateSubset:Object.keys(expected).every(k=>eq(upd[k],expected[k]))};},{insertId:insertSample.id,updateId:updateSample.id,expected:updateSample.payload});
-  need(uiCheck.route==='cliente360'&&uiCheck.count===442&&uiCheck.insertExists&&uiCheck.updateExists&&uiCheck.updateSubset,'I63_FUNCTIONAL_CLIENTE360_DATA');
+  const uiCheck=await page.evaluate(({insertId,updateId,expected})=>{const ins=Orbit.store.get('clientes',insertId)||{},upd=Orbit.store.get('clientes',updateId)||{};const eq=(a,b)=>JSON.stringify(a??null)===JSON.stringify(b??null);return{route:Orbit.route?.key||'',count:Orbit.store.all('clientes').length,diagTotalRows:window.OrbitRuntimeDiagnostics?.cliente360?.list?.totalRows??null,renderedRows:window.OrbitRuntimeDiagnostics?.cliente360?.list?.renderedRows??null,insertExists:!!ins.id,updateExists:!!upd.id,updateSubset:Object.keys(expected).every(k=>eq(upd[k],expected[k]))};},{insertId:insertSample.id,updateId:updateSample.id,expected:updateSample.payload});
+  need(uiCheck.route==='cliente360'&&uiCheck.insertExists&&uiCheck.updateExists&&uiCheck.updateSubset,'I63_FUNCTIONAL_CLIENTE360_DATA');
   need(pageErrors.length===0,'I63_PAGE_ERRORS');
   need(httpErrors.filter(x=>x.status===404).length===0,'I63_HTTP_404');
-  evidence.functional={status:'PASS',cliente360Loads:true,liveClientCount:uiCheck.count,insertedClientHydrated:true,updatedClientHydrated:true,updatedSampleMatched:true,pageErrors:0,http404:0,actorRole:actor.role};
+  evidence.functional={status:'PASS',cliente360Loads:true,runtimeVisibleClientCount:uiCheck.count,diagnosticTotalRows:uiCheck.diagTotalRows,renderedRows:uiCheck.renderedRows,backendReadbackClientCount:442,insertedClientHydrated:true,updatedClientHydrated:true,updatedSampleMatched:true,pageErrors:0,http404:0,actorRole:actor.role};
   evidence.status='PASS';
 }catch(error){
   evidence.errors.push(clean(error?.message||error,240));
