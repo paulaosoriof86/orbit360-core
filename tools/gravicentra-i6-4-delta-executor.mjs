@@ -204,11 +204,22 @@ try{
   await page.waitForFunction(()=>Orbit?.route?.key==='polizas',null,{timeout:15000});
   const insertPolicy=mutations.find(m=>m.collection==='polizas'&&m.action==='insert'),insertVehicle=mutations.find(m=>m.collection==='vehiculos'&&m.action==='insert');
   need(insertPolicy&&insertVehicle,'I64_FUNCTIONAL_INSERT_SAMPLE_MISSING');
-  const ui=await page.evaluate(({pid,vid})=>({route:Orbit.route?.key||'',polizas:(Orbit.store?.all?.('polizas')||[]).length,vehiculos:(Orbit.store?.all?.('vehiculos')||[]).length,policySample:!!Orbit.store?.get?.('polizas',pid),vehicleSample:!!Orbit.store?.get?.('vehiculos',vid)}),{pid:insertPolicy.id,vid:insertVehicle.id});
-  need(ui.route==='polizas'&&ui.polizas===1414&&ui.vehiculos===1063&&ui.policySample&&ui.vehicleSample,'I64_FUNCTIONAL_RUNTIME_DATA');
+  await page.waitForFunction(({pid,vid})=>{
+    const st=Orbit.store&&typeof Orbit.store._productStatus==='function'?Orbit.store._productStatus():{};
+    const confirmed=Array.isArray(st.serverConfirmedCollections)?st.serverConfirmedCollections:[];
+    return confirmed.includes('polizas')&&confirmed.includes('vehiculos')&&
+      (Orbit.store?.all?.('polizas')||[]).length===1414&&
+      (Orbit.store?.all?.('vehiculos')||[]).length===1063&&
+      !!Orbit.store?.get?.('polizas',pid)&&!!Orbit.store?.get?.('vehiculos',vid);
+  },{pid:insertPolicy.id,vid:insertVehicle.id},{timeout:30000});
+  const ui=await page.evaluate(({pid,vid})=>{
+    const st=Orbit.store&&typeof Orbit.store._productStatus==='function'?Orbit.store._productStatus():{};
+    return{route:Orbit.route?.key||'',polizas:(Orbit.store?.all?.('polizas')||[]).length,vehiculos:(Orbit.store?.all?.('vehiculos')||[]).length,policySample:!!Orbit.store?.get?.('polizas',pid),vehicleSample:!!Orbit.store?.get?.('vehiculos',vid),serverConfirmedCollections:st.serverConfirmedCollections||[],snapshotSources:st.snapshotSources||{}};
+  },{pid:insertPolicy.id,vid:insertVehicle.id});
+  need(ui.route==='polizas'&&ui.polizas===1414&&ui.vehiculos===1063&&ui.policySample&&ui.vehicleSample&&ui.serverConfirmedCollections.includes('polizas')&&ui.serverConfirmedCollections.includes('vehiculos'),'I64_FUNCTIONAL_RUNTIME_DATA');
   need(pageErrors.length===0,'I64_PAGE_ERRORS');
   need(httpErrors.filter(x=>x.status===404).length===0,'I64_HTTP_404');
-  evidence.functional={status:'PASS',polizasRouteLoads:true,runtimePolicyCount:ui.polizas,runtimeVehicleCount:ui.vehiculos,insertedPolicyHydrated:true,insertedVehicleHydrated:true,pageErrors:0,http404:0,actorRole:actor.role};
+  evidence.functional={status:'PASS',polizasRouteLoads:true,runtimePolicyCount:ui.polizas,runtimeVehicleCount:ui.vehiculos,insertedPolicyHydrated:true,insertedVehicleHydrated:true,polizasServerConfirmed:true,vehiculosServerConfirmed:true,snapshotSources:ui.snapshotSources,pageErrors:0,http404:0,actorRole:actor.role};
   evidence.status='PASS';
 }catch(error){
   evidence.errors.push(clean(error?.message||error,300));
