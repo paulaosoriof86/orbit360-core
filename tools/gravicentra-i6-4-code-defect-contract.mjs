@@ -35,5 +35,8 @@ need(Orbit.modules.cliente360.renovabilidad({})==='UNKNOWN'&&Orbit.modules.clien
 need(!fs.readFileSync('orbit360-platform/modules/polizas.js','utf8').includes('q.norm((policyPremiumNet'),'I64_CURRENCY_NORMALIZATION_STILL_PRESENT');
 const bridge=fs.readFileSync('orbit360-platform/modules/policy-receipts-v1199-bridge.js','utf8');
 for(const token of ['policyMetrics','isRenewalWithin45Days','isHistoricalNoPortfolio','premiumByCurrency'])need(bridge.includes(token),'I64_RUNTIME_BRIDGE_CONTRACT:'+token);
+const detailGuard=fs.readFileSync('orbit360-platform/modules/policy-receipts-v1199-detail-guard.js','utf8');
+need(!detailGuard.includes("out.renovable = p.renovable !== undefined ? !!p.renovable : activePolicy(p);"),'I64_DETAIL_GUARD_BOOLEAN_COERCION');
+for(const token of ['renewabilityState','renewabilityLabel','Renovabilidad pendiente de validar'])need(detailGuard.includes(token),'I64_DETAIL_GUARD_TRI_STATE:'+token);
 console.log('GRAVICENTRA_I6_4_CODE_DEFECT_CONTRACT=PASS');
 console.log('I64_OPERATIONAL_WRITES=0');

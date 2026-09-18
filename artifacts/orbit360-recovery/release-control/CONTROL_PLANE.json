@@ -991,7 +991,8 @@
     "allowedProductFiles": [
       "orbit360-platform/modules/polizas.js",
       "orbit360-platform/modules/cliente360.js",
-      "orbit360-platform/modules/policy-receipts-v1199-bridge.js"
+      "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+      "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js"
     ],
     "blockingFindings": [
       "POLIZAS_KPI_MULTI_CURRENCY_COMPOSITION",
@@ -1045,6 +1046,16 @@
         "promotedToLive": false,
         "operationalWrites": 0
       }
-    ]
+    ],
+    "detailGuardScopeAuthorizedByPaula": true,
+    "detailGuardScopeAuthorizedAt": "2026-09-18T09:28:00-06:00",
+    "latestFailedPreviewRunId": 35360790960,
+    "latestFailedPreviewBuildId": "gi-i64-8393106ff9aa-57f234755dc1",
+    "latestFailedPreviewUrl": "https://ays-orbit-360-lab--gi-i64-35360790960-jug2xhfx.web.app",
+    "latestFailedPreviewHostedPayloadDigest": "9b7834ecc4a0d336e3386672a2b22711f87fe3135aea13fb4e7836bf9dfafe6d",
+    "latestFailedPreviewReadbackExact": true,
+    "latestFailedPreviewAssertion": "I64_RENEWABILITY_UNKNOWN_DISPLAY_FULLPAGE_OWNER",
+    "latestFailedPreviewPromotedToLive": false,
+    "latestFailedPreviewOperationalWrites": 0
   }
 }

@@ -51,9 +51,9 @@ try{
   need(result.historicalCount===1191&&Number(result.historical.value)===result.historicalCount,'I64_HISTORICAL_KPI');
   need(result.targetId&&result.targetState==='UNKNOWN','I64_RENEWABILITY_TARGET');
   await page.evaluate(id=>Orbit.modules.cliente360.verPoliza(id),result.targetId);
-  await page.waitForSelector('#c360-edit .vp-tags');
-  const drawer=await page.locator('#c360-edit').innerText();
-  need(/Renovabilidad pendiente de validar/i.test(drawer)&&!/No renovable/i.test(drawer),'I64_RENEWABILITY_UNKNOWN_DISPLAY');
+  await page.waitForSelector('.orbit-policy-fullpage[data-policy-fullpage="1"]');
+  const policyDetail=await page.locator('.orbit-policy-fullpage[data-policy-fullpage="1"]').innerText();
+  need(/Renovabilidad pendiente de validar/i.test(policyDetail)&&!/No renovable/i.test(policyDetail),'I64_RENEWABILITY_UNKNOWN_DISPLAY');
   need(pageErrors.length===0,'I64_PROOF_PAGE_ERRORS');need(http404.length===0,'I64_PROOF_HTTP404');
   ev.policies={count:result.count,actorRole:actor.role};
   ev.kpis={multiCurrency:{status:'PASS',amounts:result.rounded},renewals45:{status:'PASS',count:result.renewalCount,canonicalCount:result.canonicalRenewalCount,canonicalMatch:true},historicalNoPortfolio:{status:'PASS',count:result.historicalCount}};

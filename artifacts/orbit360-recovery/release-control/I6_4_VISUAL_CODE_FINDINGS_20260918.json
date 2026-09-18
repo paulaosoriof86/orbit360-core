@@ -61,7 +61,8 @@
       "id": "POLICY_RENEWABLE_UNKNOWN_DISPLAYED_FALSE",
       "owners": [
         "orbit360-platform/modules/cliente360.js",
-        "orbit360-platform/modules/polizas.js"
+        "orbit360-platform/modules/polizas.js",
+        "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js"
       ],
       "evidence": "AUTO-490658 historical renewed edition is visibly Renovada but detail renders Renovación: No renovable because missing/falsy renovable is treated as explicit false.",
       "problem": "Unknown/missing renewability must not be rendered as a factual No renovable.",
@@ -103,5 +104,17 @@
     "latestPreviewRunId": 35360367065,
     "latestPreviewAssertion": "I64_RENEWALS_KPI",
     "renewalProofRule": "DISPLAYED_COUNT_EQUALS_POLICY_METRICS_COUNT_EQUALS_ORBIT_Q_RENOVACIONES_PROXIMAS_45"
+  },
+  "detailGuardOverrideFinding": {
+    "status": "AUTHORIZED_FOR_CAUSAL_FIX",
+    "discoveredByPreviewRunId": 35360790960,
+    "owner": "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+    "evidence": "The full-page policy detail owner coerced missing renovable into a boolean and rendered unknown as No renovable; the same owner replaces cliente360.verPoliza with full-page routing.",
+    "requiredBehavior": "Preserve tri-state renewability and render unknown as Renovabilidad pendiente de validar in the canonical full-page detail.",
+    "previewReadbackExact": true,
+    "promotedToLive": false,
+    "operationalWrites": 0,
+    "authorizedByPaula": true,
+    "authorizedAt": "2026-09-18T09:28:00-06:00"
   }
 }

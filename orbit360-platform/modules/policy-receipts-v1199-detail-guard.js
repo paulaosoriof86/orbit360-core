@@ -33,6 +33,17 @@ Orbit.modules = Orbit.modules || {};
   const shown = v => safe(v) || 'Pendiente de completar';
   const badge = status => U.estadoBadge ? U.estadoBadge(status || 'Requiere validación') : `<span class="badge neutral">${esc(status || 'Requiere validación')}</span>`;
   const activePolicy = p => p && (p.estado === 'Vigente' || p.estado === 'Por renovar');
+  const renewabilityState = p => {
+    if (!p || !Object.prototype.hasOwnProperty.call(p, 'renovable') || p.renovable == null || safe(p.renovable) === '') return 'UNKNOWN';
+    const v = safe(p.renovable).toLowerCase();
+    if (p.renovable === true || ['true','si','sí','renovable'].includes(v)) return 'YES';
+    if (p.renovable === false || ['false','no','no renovable'].includes(v)) return 'NO';
+    return 'UNKNOWN';
+  };
+  const renewabilityLabel = p => {
+    const state = renewabilityState(p);
+    return state === 'YES' ? 'Renovable' : state === 'NO' ? 'No renovable' : 'Renovabilidad pendiente de validar';
+  };
 
   function policyVisual(p) {
     if (!p || typeof p !== 'object') return p;
@@ -57,7 +68,6 @@ Orbit.modules = Orbit.modules || {};
     out.comVendedorPct = numberOrNull(first(p.comVendedorPct, p.comisionVendedorPct));
     out.tipoPoliza = first(p.tipoPoliza, p.tipo, 'Individual');
     out.concepto = first(p.concepto, p.descripcionRiesgo, p.descripcion);
-    out.renovable = p.renovable !== undefined ? !!p.renovable : activePolicy(p);
     return out;
   }
 
@@ -266,7 +276,7 @@ Orbit.modules = Orbit.modules || {};
             field('Cliente / asegurado', cli.nombre || p.aseguradoNombreFuente), field('Aseguradora', asg.nombre || p.aseguradoraFuenteNombre), field('Asesor', ase.nombre || p.asesorFuenteNombre),
             field('N.º de póliza', p.numero, {mono:true}), field('Estado', p.estado), field('País / moneda', `${p.pais || cli.pais || '—'} · ${cur || '—'}`),
             field('Ramo', p.ramo), field('Subramo / producto', p.subramo || p.producto), field('Tipo de póliza', p.tipoPoliza),
-            field('Inicio de vigencia', fmtDate(p.vigenciaInicio)), field('Fin de vigencia', fmtDate(p.vigenciaFin)), field('Renovación', p.renovable ? 'Renovable' : 'No renovable'),
+            field('Inicio de vigencia', fmtDate(p.vigenciaInicio)), field('Fin de vigencia', fmtDate(p.vigenciaFin)), field('Renovación', renewabilityLabel(p)),
             field('Suma asegurada', moneyDetail(p.sumaAsegurada, cur)), field('Concepto / riesgo', p.concepto), field('Calidad de información', qualityBlock(p, vehicle), {html:true})
           ], 3))}
           ${section('Prima y condiciones de pago', `<div class="orbit-premium-grid" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 24px">${[
