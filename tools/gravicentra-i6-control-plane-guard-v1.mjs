@@ -57,7 +57,7 @@ const postDiffCursor=['DETERMINISTIC_DIFF_READY','DETERMINISTIC_APPLY_DONE','POS
 need(postDiffCursor||C.i6Execution?.dataMutationAuthorized===false,'I6_DATA_MUTATION_AUTHORIZED_TOO_EARLY');
 const i63CodeDefect=C.i63CodeDefect||{};
 const i63DefectPending=activeI63V5&&i63CodeDefect.status==='I6_3_CODE_DEFECT_CANDIDATE_PENDING_BUILD';
-const i63DefectLive=activeI63V5&&String(i63CodeDefect.status||'').startsWith('I6_3_CODE_DEFECT_SUCCESSOR_LIVE_PASS');
+const i63DefectLive=(activeI63V5||activeI64V5)&&String(i63CodeDefect.status||'').startsWith('I6_3_CODE_DEFECT_SUCCESSOR_LIVE_PASS');
 const i63NameCase=C.i63NameCaseNormalization||{};
 const i63NameCasePending=activeI63V5&&i63NameCase.status==='AUTHORIZED_PENDING_APPLY';
 const i63IdentityMerge=C.i63IdentityMerge||{};
