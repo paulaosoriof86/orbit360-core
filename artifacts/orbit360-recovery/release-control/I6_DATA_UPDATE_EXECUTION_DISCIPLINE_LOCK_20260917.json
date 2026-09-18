@@ -101,5 +101,44 @@
     "parallelImporterForbidden": true,
     "phaseBImporterWorkMustNotBlockPhaseADataUpdate": true
   },
-  "resumeRule": "On every continuation, read CONTROL_PLANE, this lock, the operating plan, registry, and active module source intake; then execute only the source-intake nextRequiredStep. Conversation text is context, not authority, and interrupted responses do not reset progress."
+  "resumeRule": "On every continuation, read CONTROL_PLANE, this lock, the operating plan, registry, and active module source intake; then execute only the source-intake nextRequiredStep. Conversation text is context, not authority, and interrupted responses do not reset progress.",
+  "moduleHandoffDiscipline": {
+    "mandatoryAfterTechnicalPass": true,
+    "sequence": [
+      "REPORT_EXACT_APPLIED_CHANGES_TO_PAULA",
+      "PAULA_LIVE_VISUAL_VALIDATION",
+      "PAULA_VISUAL_ACCEPTANCE",
+      "DEFINE_NEXT_MODULE_INFORMATION_AND_TEMPORAL_SCOPE",
+      "REQUEST_NEXT_MODULE_CURRENT_SOURCE",
+      "START_NEXT_MODULE"
+    ],
+    "changeReportRequiredBeforeNextSourceRequest": true,
+    "changeReportMinimum": [
+      "named_records_changed_when_safe",
+      "updates_inserts_disables_and_unchanged_counts",
+      "field_categories_changed",
+      "sensitive_change_counts_without_secret_values",
+      "deduplication_or_relationship_effects",
+      "live_readback_result",
+      "functional_result"
+    ],
+    "technicalAutomationDoesNotReplacePaulaVisualAcceptance": true,
+    "nextModuleSourceRequestBlockedUntilPaulaVisualAcceptance": true,
+    "nextModuleTemporalScope": {
+      "assistantMustDefineScope": true,
+      "rule": "Derive the period or as-of cutoff from the next module contract, LIVE state and business semantics; do not use one generic date window and do not ask Paula to guess the period.",
+      "masterData": "May require a current complete master as-of date rather than a from/to history.",
+      "transactionalData": "Use the historical start and current cutoff required to preserve continuity for that module."
+    },
+    "sourceDiscipline": {
+      "askExactlyWhatInformationIsNeeded": true,
+      "doNotUseHistoricalDriveFilesAsCurrentSource": true,
+      "doNotRequestNextModuleSourceBeforePriorVisualAcceptance": true
+    },
+    "currentCorrection": {
+      "technicalModule": "I6.2 Aseguradoras",
+      "technicalStatus": "I6_2_DIRECTORIO_LIVE_PASS",
+      "paulaVisualAcceptance": "PENDING_BEFORE_I6_3_SOURCE_REQUEST"
+    }
+  }
 }
