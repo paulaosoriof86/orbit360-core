@@ -160,14 +160,15 @@ Orbit.modules.equipo = (function () {
         const roles = rolesOf(a);
         const paises = userCountries(a);
         const access = a.accessProvisioned || a.invitacionEstado === 'enviada' ? 'Habilitado' : 'Pendiente';
-        return `<tr class="clickable" onclick="Orbit.modules.equipo.editar('${a.id}')">
+        const canonicalId = canonicalAdvisorId(a), writable = !!canonicalId;
+        return `<tr class="${writable ? 'clickable' : ''}" ${writable ? `onclick="Orbit.modules.equipo.editar('${canonicalId}')"` : 'data-projection-only="1"'}>
           <td><div style="display:flex;align-items:center;gap:9px">${U.avatar(a.nombre, a.color, 'sm')}<div><b>${U.esc(a.nombre)}</b><div class="muted" style="font-size:11px">${U.esc(a.email || 'Sin correo')}</div></div></div></td>
           <td>${roles.map(roleBadge).join('') || '<span class="badge warn">Sin rol</span>'}</td>
           <td>${roleBadge(a.rolDefault || a.rol || 'Sin definir')}</td>
           <td>${paises.map(p => `<span class="badge neutral">${p === 'CO' ? '🇨🇴 CO' : '🇬🇹 GT'}</span>`).join(' ') || '<span class="badge warn">Sin país</span>'}</td>
           <td><span class="badge ${access === 'Habilitado' ? 'ok' : 'warn'}">${access}</span></td>
           <td><span class="badge ${active(a) ? 'ok' : 'neutral'}">${active(a) ? 'Activo' : 'Inactivo'}</span></td>
-          <td style="text-align:right;color:var(--ink-3)">›</td></tr>`;
+          <td style="text-align:right;color:var(--ink-3)">${writable ? '›' : '<span class="badge neutral">Sincronizando…</span>'}</td></tr>`;
       }).join('') || '<tr><td colspan="7" class="muted" style="text-align:center;padding:22px">No hay usuarios para este filtro.</td></tr>'}</tbody>
     </table></div></div>`;
   }
@@ -295,6 +296,12 @@ Orbit.modules.equipo = (function () {
     const fields = ['roles', 'rolDefault', 'scopeDatos', 'paises', 'paisDefault', 'modulosExtra', 'modulosRestringidos', 'inactivo'];
     return fields.some(k => JSON.stringify(before[k] || null) !== JSON.stringify(after[k] || null));
   }
+  function canonicalAdvisorId(row, fallback) {
+    row = row || {};
+    if (row.projectionOnly === true) return '';
+    return String(row.canonicalDocumentId || row.id || fallback || '').trim();
+  }
+
   function nextStableId(name) {
     const base = 'ase-' + slug(name);
     if (!S().get('asesores', base)) return base;
@@ -304,6 +311,7 @@ Orbit.modules.equipo = (function () {
 
   function editarUsuario(id) {
     const existing = id ? S().get('asesores', id) : null;
+    if (id && existing && existing.projectionOnly === true) { toast('El registro todavía no tiene identidad canónica confirmada.'); return; }
     const a = existing || { id: '', nombre: '', roles: [], rol: '', rolDefault: '', color: '#1f3a5f', comModo: 'comision', shareCom: 50, scopeDatos: 'propios', paises: [], modulosExtra: [], modulosRestringidos: [] };
     const existingRoles = rolesOf(a);
     const availableRoles = uniq(ROLE_ORDER.concat(existingRoles.includes(LEGACY_ROLE) ? [LEGACY_ROLE] : []));
@@ -419,7 +427,8 @@ Orbit.modules.equipo = (function () {
         inactivo: $('#eu-inact').checked, estado: $('#eu-inact').checked ? 'inactivo' : 'activo', activo: !$('#eu-inact').checked, updatedAt: new Date().toISOString() };
       const after = userSnapshot(data); let motivo = 'Alta manual desde Equipo';
       if (id && sensitiveChanged(before, after)) { motivo = Orbit.ui && Orbit.ui.prompt ? await Orbit.ui.prompt('Indica el motivo del cambio de roles, permisos, países, alcance o estado:', { title: 'Motivo del cambio' }) : ''; if (String(motivo || '').trim().length < 5) return alert('Indica un motivo claro de al menos 5 caracteres.'); }
-      const advisorId = id || nextStableId(nombre);
+      const advisorId = id ? canonicalAdvisorId(a, id) : nextStableId(nombre);
+      if (id && !advisorId) return toast('No fue posible resolver la identidad canónica del usuario.');
       if (!id) { data.id = advisorId; data.iniciales = nombre.split(' ').map(x => x[0]).slice(0, 2).join('').toUpperCase(); data.comModo = 'comision'; data.shareCom = 50; data.accessProvisioned = false; data.invitacionEstado = 'pendiente_habilitacion'; data.createdAt = new Date().toISOString(); }
       const st = S(); saveButton.dataset.busy = '1'; saveButton.disabled = true; saveButton.textContent = 'Guardando…';
       try {
