@@ -1790,7 +1790,7 @@
   "i65SelfAdministrationClosure": {
     "status": "FROZEN_ACTIVE",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_BLOCK_A_D_SELF_ADMINISTRATION_LOCK_20260918.json",
-    "blobSha": "f7609f2c2159c0a712166d5dd40031a0a90f54e5",
+    "blobSha": "b3a940b7e896c3a48f67b6bd3e2a805eee112e60",
     "parentMicroplanPath": "artifacts/orbit360-recovery/release-control/I6_5_MINI_CIERRE_OPERATIVO_DECISION_LOCK_20260918.json",
     "parentMicroplanBlobSha": "67c6eaa0555e9654a5b4ebbaf6e663c6884f18f3",
     "noHardcodedIdentities": true,
