@@ -117,10 +117,20 @@ async function reopen(page,id){
   await renderEquipo(page);
   await page.evaluate(v=>Orbit.modules.equipo.editar(v),id);
   await page.waitForSelector('#eq-edit #eu-ok',{timeout:10000});
+  await page.waitForSelector('#eu-access-panel',{timeout:5000}).catch(()=>{});
+}
+async function acceptLegalGate(page){
+  const gate=page.locator('[data-legal-gate]').last();
+  if(!await gate.count()) return false;
+  await gate.locator('#lg-chk').check();
+  await gate.locator('#lg-ok').click();
+  await gate.waitFor({state:'detached',timeout:10000});
+  return true;
 }
 async function reloadAuthenticated(page,auth,a){
   await page.reload({waitUntil:'domcontentloaded',timeout:30000});
   await activate(page,auth,a);
+  await acceptLegalGate(page);
   await waitAdvisorHydration(page);
 }
 async function submitCustomPrompt(page,reason,label){
@@ -259,6 +269,7 @@ try{
   const a=await actor(db,auth);
   ev.auth.proofActor={roles:a.roles,emailHash:crypto.createHash('sha256').update(a.email||'').digest('hex')};
   await activate(page,auth,a);
+  ev.auth.managerLegalGateAccepted=await acceptLegalGate(page);
   const hydrated=await waitAdvisorHydration(page);
   ev.team.hydration={
     serverConfirmed:hydrated.status.serverConfirmedCollections?.includes('asesores')===true,
@@ -315,6 +326,8 @@ try{
 
   await renderEquipo(page);
   await page.click('#eq-add');
+  await page.waitForSelector('#eq-edit #eu-ok',{timeout:10000});
+  await page.waitForSelector('#eu-access-panel',{timeout:5000}).catch(()=>{});
   await page.fill('#eu-nombre',syntheticName);
   await page.fill('#eu-email',synthetic.email);
   await page.locator('.eu-role').evaluateAll(es=>es.forEach(e=>{e.checked=false;e.dispatchEvent(new Event('change',{bubbles:true}));}));
@@ -413,6 +426,7 @@ try{
   await loginPage.fill('#lg-pass',syntheticPassword);
   await loginPage.click('#login-form button[type="submit"]');
   await loginPage.waitForFunction(()=>!!window.Orbit?.productAppP0?.status?.().started&&!!window.Orbit?.auth?.productUser?.uid,null,{timeout:25000});
+  ev.auth.syntheticLegalGateAccepted=await acceptLegalGate(loginPage);
   await loginPage.waitForSelector('#sidebar [data-route]',{timeout:15000});
   const loginState=await loginPage.evaluate(({extra,restricted})=>({
     user:{advisorId:String(Orbit.auth.productUser?.advisorId||''),roles:Orbit.auth.productUser?.roles||[],countries:Orbit.auth.productUser?.countries||[]},
