@@ -831,8 +831,8 @@ Orbit.modules.cliente360 = (function () {
     selPais.addEventListener('change', () => fillDeptos());
     selDep.addEventListener('change', () => fillCiudades());
     fillDeptos(c.departamento, c.ciudad);
-    back.querySelector('#ce-save').addEventListener('click', () => {
-      S().update('clientes', cid, {
+    back.querySelector('#ce-save').addEventListener('click', async () => {
+      const patch = {
         nombre: val('ce-nombre') || c.nombre,
         email: val('ce-email'), telefono: val('ce-tel'),
         pais: selPais.value, departamento: selDep.value, ciudad: selCiu.value, direccion: val('ce-dir'),
@@ -842,8 +842,17 @@ Orbit.modules.cliente360 = (function () {
         moneda: selPais.value === 'CO' ? 'COP' : 'GTQ',
         driveLink: val('ce-drive'), notas: val('ce-notas'),
         contactoAlt: chk.checked ? val('ce-cont') : ''
-      });
-      closeM(); detalle(cid);
+      };
+      const opId = 'cli_edit_' + cid + '_' + Date.now().toString(36), save = back.querySelector('#ce-save');
+      const activity = { id: 'act_' + opId, clienteId: cid, asesorId: patch.asesorId, tipo: 'sistema', icon: '✏', fecha: Orbit.ui.today(), titulo: 'Cliente actualizado', detalle: 'Actualización confirmada desde Cliente 360.', operacionId: opId };
+      if (!S().batchDurable) return c360toast('Guardado server-owned no disponible; no se aplicaron cambios.');
+      save.disabled = true; save.textContent = 'Guardando…';
+      try {
+        await S().batchDurable([{ action: 'update', collection: 'clientes', id: cid, payload: patch }, { action: 'insert', collection: 'actividades', id: activity.id, payload: activity }], { requestId: opId, timeoutMs: 20000 });
+        closeM(); detalle(cid); c360toast('✓ Cliente actualizado y confirmado.');
+      } catch (error) {
+        save.disabled = false; save.textContent = 'Guardar cambios'; c360toast('No fue posible confirmar el guardado; revisa y reintenta.');
+      }
     });
   }
   function field(label, id, value) {
@@ -1417,14 +1426,14 @@ Orbit.modules.cliente360 = (function () {
     }
     ['#np-neta', '#np-gem', '#np-otros', '#np-frec', '#np-pagos'].forEach(s => $(s).addEventListener('input', recalc));
     syncSub(); recalc();
-    $('#np-ok').addEventListener('click', () => {
+    $('#np-ok').addEventListener('click', async () => {
       const cid = $('#np-cli').value, p = pais(), cur = p === 'CO' ? 'COP' : 'GTQ', d = back._d;
       const cli = S().get('clientes', cid), asg = S().get('aseguradoras', $('#np-asg').value);
       const num = $('#np-num').value || ((p === 'GT' ? 'GT-' : 'CO-') + (asg ? asg.id.slice(-2).toUpperCase() : 'XX') + '-' + Math.floor(10000 + Math.random() * 89999));
       const fin = new Date(Orbit.ui.today()); fin.setFullYear(fin.getFullYear() + 1);
       if (!Orbit.policyReceipts || typeof Orbit.policyReceipts.createPolicy !== 'function') return c360toast('Motor operativo de pólizas no disponible; no se creó nada.');
       const vehicle = (/Auto|Veh/i.test($('#np-ramo').value) && $('#np-vmarca').value) ? { marca: $('#np-vmarca').value, linea: '', anio: $('#np-vanio').value, placa: $('#np-vplaca').value, uso: $('#np-vuso').value, chasis: '', motor: '', sumaAsegurada: +$('#np-suma').value || 0 } : null;
-      const result = Orbit.policyReceipts.createPolicy({ id: 'pol_' + Date.now().toString(36), numero: num, clienteId: cid, asesorId: cli && cli.asesorId || '', aseguradoraId: $('#np-asg').value, pais: p, moneda: cur, divisa: cur, ramo: $('#np-ramo').value, subramo: $('#np-sub').value, producto: $('#np-sub').value, tipoPoliza: 'Individual', frecuencia: $('#np-frec').value, forma: $('#np-frec').value, formaPago: $('#np-forma').value, cuotas: back._cuotas, primaNeta: d.neta, gastosEmision: d.gastosEmision, gastosFinan: d.gastosFinan, otros: d.otros, ivaPct: d.ivaPct, ivaMonto: d.iva, recargoFinPct: d.recargoPct, sumaAsegurada: +$('#np-suma').value || 0, comAseguradoraPct: (asg && asg.comisiones && asg.comisiones[$('#np-ramo').value]) || (asg && asg.comisionDefault) || 12, comVendedorPct: 50, concepto: [$('#np-ramo').value, $('#np-sub').value].join(' · '), vigenciaInicio: Orbit.ui.today(), vigenciaFin: fin.toISOString().slice(0, 10), emisionEn: back._emisionEn, recargoEn: back._recargoEn, renovable: true, contadorRenovaciones: 0, estado: 'Vigente', vehiculo: vehicle }, { motivo: 'Alta manual desde Cliente 360' });
+      const result = await Orbit.policyReceipts.createPolicy({ id: 'pol_' + Date.now().toString(36), numero: num, clienteId: cid, asesorId: cli && cli.asesorId || '', aseguradoraId: $('#np-asg').value, pais: p, moneda: cur, divisa: cur, ramo: $('#np-ramo').value, subramo: $('#np-sub').value, producto: $('#np-sub').value, tipoPoliza: 'Individual', frecuencia: $('#np-frec').value, forma: $('#np-frec').value, formaPago: $('#np-forma').value, cuotas: back._cuotas, primaNeta: d.neta, gastosEmision: d.gastosEmision, gastosFinan: d.gastosFinan, otros: d.otros, ivaPct: d.ivaPct, ivaMonto: d.iva, recargoFinPct: d.recargoPct, sumaAsegurada: +$('#np-suma').value || 0, comAseguradoraPct: (asg && asg.comisiones && asg.comisiones[$('#np-ramo').value]) || (asg && asg.comisionDefault) || 12, comVendedorPct: 50, concepto: [$('#np-ramo').value, $('#np-sub').value].join(' · '), vigenciaInicio: Orbit.ui.today(), vigenciaFin: fin.toISOString().slice(0, 10), emisionEn: back._emisionEn, recargoEn: back._recargoEn, renovable: true, contadorRenovaciones: 0, estado: 'Vigente', vehiculo: vehicle }, { motivo: 'Alta manual desde Cliente 360' });
       if (!result || !result.ok) return c360toast('No se creó la póliza: ' + ((result && result.errors || []).join(', ') || 'validación operativa'));
       c360toast('✓ Póliza creada con ' + (result.receipts && result.receipts.expected || 0) + ' recibo(s) y cartera separada; sin crear cobros.');
       close(); location.hash = '#/cliente360?c=' + cid; tab = 'polizas'; setTimeout(() => detalle(cid), 30);
@@ -1492,13 +1501,20 @@ Orbit.modules.cliente360 = (function () {
     function loadGeo() { const ps = paisSel.value, deps = Object.keys(geo[ps]||{}); depSel.innerHTML = '<option value="">— Seleccionar —</option>' + deps.map(d=>'<option>'+d+'</option>').join(''); ciuSel.innerHTML = '<option value="">— Seleccionar —</option>'; }
     depSel.addEventListener('change', () => { const cids = (geo[paisSel.value]||{})[depSel.value]||[]; ciuSel.innerHTML = '<option value="">— Seleccionar —</option>' + cids.map(c=>'<option>'+c+'</option>').join(''); });
     paisSel.addEventListener('change', loadGeo); loadGeo();
-    $('#nc-ok').addEventListener('click', () => {
+    $('#nc-ok').addEventListener('click', async () => {
       const nombre = $('#nc-nombre').value.trim(); if (!nombre) { $('#nc-nombre').focus(); return; }
       const pais = paisSel.value;
       const cli = { id: 'cli' + Date.now().toString().slice(-8), tipo: $('#nc-tipo').value, nombre, identificacion: $('#nc-id').value, pais, moneda: pais==='CO'?'COP':'GTQ', telefono: $('#nc-tel').value, email: $('#nc-email').value, departamento: depSel.value, ciudad: ciuSel.value, direccion: $('#nc-dir').value, sexo: $('#nc-sex').value, fechaNac: $('#nc-nac').value, segmento: $('#nc-seg').value, canal: $('#nc-canal').value, asesorId: $('#nc-ase').value, notas: $('#nc-notas').value, fechaAlta: new Date().toISOString().slice(0,10), etiquetas: ['Nuevo'], encuestasActivas: true };
-      S().insert('clientes', cli);
-      S().insert('actividades', { id: 'act'+Date.now(), clienteId: cli.id, asesorId: cli.asesorId, tipo: 'sistema', icon: '🧑‍💼', fecha: cli.fechaAlta, titulo: 'Cliente creado', detalle: 'Alta manual.' });
-      close(); location.hash = '#/cliente360?c=' + cli.id;
+      const opId = 'cli_create_' + cli.id + '_' + Date.now().toString(36), save = $('#nc-ok');
+      const activity = { id: 'act_' + opId, clienteId: cli.id, asesorId: cli.asesorId, tipo: 'sistema', icon: '🧑‍💼', fecha: cli.fechaAlta, titulo: 'Cliente creado', detalle: 'Alta manual confirmada.', operacionId: opId };
+      if (!S().batchDurable) return c360toast('Guardado server-owned no disponible; no se creó el cliente.');
+      save.disabled = true; save.textContent = 'Guardando…';
+      try {
+        await S().batchDurable([{ action: 'insert', collection: 'clientes', id: cli.id, payload: cli }, { action: 'insert', collection: 'actividades', id: activity.id, payload: activity }], { requestId: opId, timeoutMs: 20000 });
+        close(); location.hash = '#/cliente360?c=' + cli.id; c360toast('✓ Cliente creado y confirmado.');
+      } catch (error) {
+        save.disabled = false; save.textContent = '💾 Crear cliente'; c360toast('No fue posible confirmar la creación; no se cerró el formulario.');
+      }
     });
   }
 

@@ -49,7 +49,14 @@
         }
         if (serverBuild === RUNTIME_BUILD) {
           buildFreshness.status = 'current';
-          try { sessionStorage.removeItem('orbit360-build-reload-target'); sessionStorage.removeItem('orbit360-build-reload-retries'); } catch (e) {}
+          try {
+            sessionStorage.removeItem('orbit360-build-reload-target'); sessionStorage.removeItem('orbit360-build-reload-retries');
+            var currentUrl = new URL(window.location.href);
+            if (currentUrl.searchParams.has('orbitBuild') || currentUrl.searchParams.has('orbitFresh')) {
+              currentUrl.searchParams.delete('orbitBuild'); currentUrl.searchParams.delete('orbitFresh');
+              window.history.replaceState(window.history.state, '', currentUrl.pathname + currentUrl.search + currentUrl.hash);
+            }
+          } catch (e) {}
           return buildFreshness;
         }
         buildFreshness.status = 'unverified';

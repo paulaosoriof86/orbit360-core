@@ -142,9 +142,9 @@ Orbit.modules = Orbit.modules || {};
     $('[data-start]').addEventListener('change', () => { if (!$('[data-end]').value) $('[data-end]').value = plusYear($('[data-start]').value); preview(); });
     b.querySelectorAll('input,select').forEach(el => el.addEventListener('input', preview));
     $('[data-import]').addEventListener('click', () => { b.remove(); Orbit.importa.open('polizas', { scope: { clienteId: selectedClient.id } }); });
-    $('[data-save]').addEventListener('click', () => {
+    $('[data-save]').addEventListener('click', async () => {
       const payload = raw(), reason = existing ? $('[data-reason]').value.trim() : 'Alta operativa desde plataforma';
-      const result = existing ? E.updatePolicy(existing.id, payload, { motivo: reason }) : E.createPolicy(payload, { motivo: reason });
+      const result = existing ? await E.updatePolicy(existing.id, payload, { motivo: reason }) : await E.createPolicy(payload, { motivo: reason });
       const err = $('[data-error]');
       if (!result.ok) { err.style.display = ''; err.textContent = errorText(result.errors); return; }
       err.style.display = 'none'; b.remove(); toast(existing ? 'Póliza actualizada; recibos sincronizados' : 'Póliza creada; recibos generados');

@@ -23,22 +23,26 @@
       {
         "id": "A1_TEAM_SELF_ADMIN",
         "required": "Create/edit users from Equipo, persist advisor, optionally provision/sync Auth+membership, roles, countries, scopes and credentials; no hardcoded people.",
-        "current": "PRODUCT_PROVIDER_AUTH_ADAPTER_DESYNC_FIX_CANDIDATE"
+        "current": "TECHNICAL_LIVE_PASS_PENDING_PAULA_VISUAL",
+        "evidence": "Equipo awaits server-owned durable write, canonical advisor readback and audit; onboarding uses the modular product provider."
       },
       {
         "id": "A2_CLIENT_SELF_ADMIN",
         "required": "Create/edit clients from platform and confirm canonical readback plus linked activity.",
-        "current": "DURABLE_COMMIT_VERIFICATION_REQUIRED"
+        "current": "ATOMIC_DURABLE_BATCH_CANDIDATE_PENDING_RELEASE",
+        "evidence": "Create/edit client await one server-owned batch with linked activity and canonical readback before close/refresh."
       },
       {
         "id": "A3_POLICY_SELF_ADMIN",
         "required": "Create/edit policy from platform; policy+receipts+cartera remain synchronized and atomic; no automatic cobro.",
-        "current": "ATOMIC_DURABILITY_VERIFICATION_REQUIRED"
+        "current": "ATOMIC_POLICY_RECEIPTS_PORTFOLIO_CANDIDATE_PENDING_RELEASE",
+        "evidence": "Create/edit policy plan póliza + recibosEsperados + carteraPrimas (+ vehicle/activity when applicable) and commit via one existing orbit360ProductOperationalCommand transaction; zero cobros are synthesized."
       },
       {
         "id": "A4_INSURER_AND_BRAND",
         "required": "Modify insurers with persistent readback; secure credentials stay protected; login logo/favicon/build freshness corrected.",
-        "current": "PRODUCT_FIX_CANDIDATE_PENDING_RELEASE"
+        "current": "DURABLE_INSURER_AND_FRESHNESS_CANDIDATE_PENDING_RELEASE",
+        "evidence": "Insurer edit awaits server-owned durable batch/readback; sensitive credentials stay with secure owner; stale orbitBuild is removed only after runtime/server build equality."
       }
     ]
   },
@@ -81,7 +85,7 @@
   ],
   "parentMicroplanBlobSha": "67c6eaa0555e9654a5b4ebbaf6e663c6884f18f3",
   "runtimeCompositionFinding": {
-    "status": "CAUSAL_DESYNC_FIX_CANDIDATE",
+    "status": "A2_A3_A4_CAUSAL_FIX_CANDIDATE",
     "teamModuleVisible": true,
     "durableAdvisorSaveOwner": "orbit360ProductOperationalCommand",
     "userOnboardingSourceExists": true,
@@ -97,7 +101,11 @@
     "probeFalseFailureCause": "Operational duplicate-insert probe omitted an explicit requestId, so deterministic idempotent replay could return a previously committed result before duplicate-target validation.",
     "fix": "Reuse existing owners only: bind user onboarding to productRuntimeBrowserProvidersP0 initialize/callFunction and modular sendPasswordResetEmail; keep duplicate-insert zero-write proof but use a unique requestId per run.",
     "noBackendParallel": true,
-    "noDataMutationRequired": true
+    "noDataMutationRequired": true,
+    "a2RootCause": "Cliente 360 create/edit closed after optimistic Orbit.store writes without waiting for canonical server readback.",
+    "a3RootCause": "Policy engine issued policy, receipts and portfolio as independent operational commands; browser try/catch could not guarantee all-or-nothing multi-collection persistence.",
+    "a4RootCause": "Insurer save waited legacy backend events while product facade emits operational events; current runtime retained a stale orbitBuild query after freshness was already current.",
+    "correction": "Reuse existing orbit360ProductOperationalCommand through batchDurable with canonical readback; no backend parallel, no new collections, no cobros synthesis."
   },
   "branding": {
     "status": "TENANT_PUBLIC_BRAND_FIX_PENDING_RELEASE",

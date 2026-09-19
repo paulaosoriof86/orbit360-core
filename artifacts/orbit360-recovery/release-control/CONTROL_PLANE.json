@@ -404,7 +404,7 @@
     "authorizedAt": "2026-09-14T08:57:00-06:00",
     "authorizationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_EXPLICIT_AUTHORIZATION_RECEIPT_20260914.json",
     "activeSubgate": "I6.5",
-    "productMutationAuthorized": false,
+    "productMutationAuthorized": true,
     "sourceDataApplyAuthorized": false,
     "perBlockApplyRequiresExplicitAuthorization": false,
     "dataUpdateMode": "EVERGREEN_V5_DELTA_FIRST",
@@ -546,7 +546,7 @@
       "sourceBundleSha256": "f445e2f4a20b9eb7a526bda8896472dab9e7ac4617b3c5d8124a939a0dee0e6a",
       "syncPreflightPath": "artifacts/orbit360-recovery/release-control/I6_5_SYNC_COMPOSITION_PREFLIGHT_20260918.json",
       "writes": 2227,
-      "nextRequiredStep": "USER_VISUAL_REFRESH_CHECK",
+      "nextRequiredStep": "I6_5_OPERATIONAL_CLOSURE_SUCCESSOR_RELEASE",
       "syncCodeDefectStatus": "I6_5_SYNC_CODE_DEFECT_SUCCESSOR_LIVE_PASS",
       "miniClosurePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_MINI_CIERRE_OPERATIVO_DECISION_LOCK_20260918.json",
       "prewriteDualPathReadbackRequired": true,
@@ -613,7 +613,7 @@
       "functionalPassed": true,
       "legacyNamespaceUnchanged": true,
       "paulaVisualAcceptance": "PENDING",
-      "operationalClosureStatus": "I6_5_OPERATIONAL_CLOSURE_CODE_DEFECT_SUCCESSOR_LIVE_PASS"
+      "operationalClosureStatus": "I6_5_OPERATIONAL_CLOSURE_CODE_DEFECT_CANDIDATE_PENDING_BUILD"
     }
   },
   "postproductionDataUpdateControl": {
@@ -713,7 +713,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_USER_VISUAL_REFRESH_CHECK",
+  "nextAction": "I6_5_OPERATIONAL_CLOSURE_SUCCESSOR_RELEASE",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -1348,12 +1348,12 @@
     "status": "FROZEN_ACTIVE",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_MINI_CIERRE_OPERATIVO_DECISION_LOCK_20260918.json",
     "frozenAtHead": "bb940461f1ec39469d1778bd2f9d875573ad300f",
-    "blockAStatus": "A1_EMAIL_VERIFICATION_PENDING_A2_A3_A4_PRODUCT_FIX_LIVE_PASS",
+    "blockAStatus": "A2_A3_A4_CAUSAL_FIX_CANDIDATE_PENDING_BUILD",
     "blockBStatus": "READ_PATH_HYDRATION_LIVE_PASS",
     "blockCStatus": "TECHNICAL_PASS_PENDING_USER_VISUAL",
     "blockDStatus": "TRANSVERSAL_SELF_ADMIN_E2E_FROZEN_PENDING_EXECUTION",
     "cobrosWritesDuringI65": false,
-    "nextMaterialCursor": "USER_VISUAL_REFRESH_CHECK",
+    "nextMaterialCursor": "I6_5_OPERATIONAL_CLOSURE_SUCCESSOR_RELEASE",
     "blobSha": "67c6eaa0555e9654a5b4ebbaf6e663c6884f18f3",
     "conversationDependent": false,
     "structuralPlanImmutable": true,
@@ -1721,13 +1721,13 @@
     "rollbackExecuted": false
   },
   "i65OperationalClosureDefect": {
-    "status": "I6_5_OPERATIONAL_CLOSURE_CODE_DEFECT_SUCCESSOR_LIVE_PASS",
+    "status": "I6_5_OPERATIONAL_CLOSURE_CODE_DEFECT_CANDIDATE_PENDING_BUILD",
     "classification": "CODE_DEFECT",
     "scope": "I6_5_OPERATIONAL_CLOSURE_MINIFIX",
-    "previousCertifiedSourceSha": "7408b41a392b441fc88175584270895313ca5231",
-    "previousCertifiedBuildId": "gi-i65-7408b41a392b-57f234755dc1",
-    "previousCertifiedArtifactId": 10571206572,
-    "parentCertifiedSourceSha": "7408b41a392b441fc88175584270895313ca5231",
+    "previousCertifiedSourceSha": "dfc998703a9bb984d46d23a83fdd5c346dfa0925",
+    "previousCertifiedBuildId": "gi-i65-dfc998703a9b-57f234755dc1",
+    "previousCertifiedArtifactId": 10574994713,
+    "parentCertifiedSourceSha": "dfc998703a9bb984d46d23a83fdd5c346dfa0925",
     "allowedProductFiles": [
       "orbit360-platform/core/policy-receipts-engine.js",
       "orbit360-platform/modules/cliente360.js",
@@ -1741,7 +1741,9 @@
       "orbit360-platform/core/user-onboarding.js",
       "orbit360-platform/data/tenant-public-branding-index.js",
       "orbit360-platform/core/public-tenant-branding.js",
-      "orbit360-platform/assets/tenant/alianzas-soluciones/logo-bolita-96.png"
+      "orbit360-platform/assets/tenant/alianzas-soluciones/logo-bolita-96.png",
+      "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+      "orbit360-platform/modules/aseguradoras.js"
     ],
     "expectedLiveCounts": {
       "polizas": 1414,
@@ -1754,7 +1756,7 @@
     "cobrosWritesAuthorized": false,
     "sourceDataApplyAuthorized": false,
     "productMutationAuthorized": true,
-    "nextRequiredStep": "I6_5_USER_VISUAL_REFRESH_CHECK",
+    "nextRequiredStep": "I6_5_OPERATIONAL_CLOSURE_SUCCESSOR_RELEASE",
     "users": {
       "policy": "NO_HARDCODED_IDENTITIES_PLATFORM_SELF_ADMIN_ONLY",
       "status": "PRODUCT_PROVIDER_AUTH_ADAPTER_AND_IDEMPOTENCE_SAFE_PROBE_FIX_PENDING_RELEASE",
@@ -1785,7 +1787,7 @@
       "faviconSource": "user-approved-logo-bolita-2025",
       "preAuthTenantBrandRequired": true
     },
-    "cause": "A1 runtime composition loaded the existing onboarding owner but that owner still depended on legacy window.firebase compat auth instead of the certified product modular provider; the zero-write team command probe also reused deterministic request identity and could be satisfied by idempotent replay.",
+    "cause": "A2/A3/A4 self-administration persistence semantics were not fully fail-closed: clients used optimistic writes, policy+receipts+portfolio were separate commands, insurer save waited legacy events, and a stale orbitBuild marker was not normalized after current-build confirmation.",
     "sourceSha": "dfc998703a9bb984d46d23a83fdd5c346dfa0925",
     "sourceTree": "6aa0e37517621b146a85b393d027b375a2c4e05f",
     "buildId": "gi-i65-dfc998703a9b-57f234755dc1",
@@ -1799,12 +1801,29 @@
     "functionalPass": true,
     "rollbackChannelId": "gi-i5-rb-34723234361",
     "liveEvidenceArtifactId": 10575129589,
-    "liveEvidenceArtifactDigest": "a999bc836ed082fa9b2005ece873771c3b4f82ba8ba2dcafee00a6d3c7705c26"
+    "liveEvidenceArtifactDigest": "a999bc836ed082fa9b2005ece873771c3b4f82ba8ba2dcafee00a6d3c7705c26",
+    "clients": {
+      "status": "DURABLE_BATCH_CANONICAL_READBACK_PENDING_RELEASE",
+      "linkedActivityAtomic": true
+    },
+    "policies": {
+      "status": "ATOMIC_POLICY_RECEIPTS_PORTFOLIO_PENDING_RELEASE",
+      "singleServerTransaction": true,
+      "automaticCobros": 0
+    },
+    "insurers": {
+      "status": "DURABLE_BATCH_CANONICAL_READBACK_PENDING_RELEASE",
+      "secureCredentialOwnerPreserved": true
+    },
+    "freshness": {
+      "status": "STALE_ORBITBUILD_CLEANUP_PENDING_RELEASE",
+      "reloadLoopForbidden": true
+    }
   },
   "i65SelfAdministrationClosure": {
     "status": "FROZEN_ACTIVE",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_BLOCK_A_D_SELF_ADMINISTRATION_LOCK_20260918.json",
-    "blobSha": "b3a940b7e896c3a48f67b6bd3e2a805eee112e60",
+    "blobSha": "786dfc2eefcb9de6bbe8067c112588d1d92d612c",
     "parentMicroplanPath": "artifacts/orbit360-recovery/release-control/I6_5_MINI_CIERRE_OPERATIVO_DECISION_LOCK_20260918.json",
     "parentMicroplanBlobSha": "67c6eaa0555e9654a5b4ebbaf6e663c6884f18f3",
     "noHardcodedIdentities": true,

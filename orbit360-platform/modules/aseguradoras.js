@@ -492,9 +492,8 @@ Orbit.modules.aseguradoras = (function () {
       if (cambios.length) {
         const patch = Object.assign({}, st.draft, { actividad: log(before, { cambio: 'Actualización de ficha (' + cambios.join(', ') + ')', motivo, camposCambiados: cambios }) });
         delete patch.id;
-        const ack = waitBackendWrite('aseguradoras', id, 'update', 20000);
-        up(id, patch);
-        await ack;
+        if (!S().batchDurable) throw new Error('PRODUCT_INSURER_DURABLE_BATCH_MISSING');
+        await S().batchDurable([{ action: 'update', collection: 'aseguradoras', id, payload: patch }], { requestId: 'asg_edit_' + id + '_' + Date.now().toString(36), timeoutMs: 20000 });
         if (cambios.indexOf('cotTasas') >= 0 || cambios.indexOf('cotTasasValidadas') >= 0) tarifaValidacionAudit(id, before, st.draft, motivo);
       }
       st.editing = false; st.draft = null; st.credentialDrafts = {}; st.snapshotCurrent = null; st.saving = false;

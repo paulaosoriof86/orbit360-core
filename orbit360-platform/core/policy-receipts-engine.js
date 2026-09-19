@@ -340,6 +340,36 @@ Orbit.policyReceipts = (function () {
     return result;
   }
 
+  function activityRow(policy,title,detail,opId){return{id:'act_'+clean(opId),tenantId:policy.tenantId,clienteId:policy.clienteId,asesorId:policy.asesorId,tipo:'poliza',icon:'📑',fecha:today(),titulo:title,detalle:detail,operacionId:opId};}
+  function planReceipts(policy,opId,mutations){
+    const existing=(S().where('recibosEsperados',c=>c.polizaId===policy.id)||[]).slice().sort((a,b)=>sequenceOf(a)-sequenceOf(b)),expected=expectedReceipts(policy),used=new Set(),finalRows=new Map(existing.map(x=>[x.id,clone(x)]));
+    const result={inserted:[],updated:[],preserved:[],annulled:[],expected:expected.length,operationId:opId,collection:'recibosEsperados'};
+    const addUpdate=(id,patch)=>{mutations.push({action:'update',collection:'recibosEsperados',id,payload:patch});finalRows.set(id,Object.assign({},finalRows.get(id)||{},clone(patch)));};
+    expected.forEach((target,index)=>{const seq=index+1,candidates=existing.filter(c=>!used.has(c.id)&&sequenceOf(c)===seq),paid=candidates.find(isPaidReceipt),reusable=paid||candidates[0];
+      if(reusable){used.add(reusable.id);if(isPaidReceipt(reusable))result.preserved.push(reusable.id);else{const patch=Object.assign({},target,{id:reusable.id,estado:norm(reusable.estado)==='vencido'||String(target.vence)<today()?'Vencido':'Pendiente',reportado:reusable.reportado||null,validadoReporte:!!reusable.validadoReporte,soporteNombre:reusable.soporteNombre||'',operationId:opId,actualizado:now()});addUpdate(reusable.id,patch);result.updated.push(reusable.id);}candidates.filter(x=>x.id!==reusable.id&&!isPaidReceipt(x)).forEach(x=>{used.add(x.id);addUpdate(x.id,{estado:'Anulado',carteraActiva:false,anuladoMotivo:'duplicado_recibo_misma_secuencia',operationId:opId,actualizado:now()});result.annulled.push(x.id);});}
+      else{const row=Object.assign({},target,{operationId:opId,creado:now(),actualizado:now()});mutations.push({action:'insert',collection:'recibosEsperados',id:row.id,payload:row});finalRows.set(row.id,clone(row));used.add(row.id);result.inserted.push(row.id);}
+    });
+    existing.filter(c=>!used.has(c.id)&&!isPaidReceipt(c)&&norm(c.estado)!=='anulado').forEach(c=>{addUpdate(c.id,{estado:'Anulado',carteraActiva:false,anuladoMotivo:isActiveState(policy.estado)?'plan_pago_reemplazado':'poliza_sin_cartera',operationId:opId,actualizado:now()});result.annulled.push(c.id);});
+    result.expectedTotal=Orbit.primas.r2(expected.reduce((s,c)=>s+(+c.monto||0),0));result.policyTotal=Orbit.primas.r2(+policy.primaTotal||+policy.prima||0);result.totalMatches=Math.abs(result.expectedTotal-result.policyTotal)<0.02;
+    return{result,rows:[...finalRows.values()]};
+  }
+  function planPortfolio(policy,receipts,opId,mutations){
+    const activeReceipts=[].concat(receipts||[]).filter(r=>norm(r.estado)!=='anulado'),existing=(S().where('carteraPrimas',r=>r.polizaId===policy.id)||[]).slice(),byReceipt=new Map(existing.filter(x=>clean(x.reciboId)).map(x=>[clean(x.reciboId),x])),keep=new Set(),result={inserted:[],updated:[],closed:[],expected:0,operationId:opId,collection:'carteraPrimas'};
+    const update=(id,patch)=>mutations.push({action:'update',collection:'carteraPrimas',id,payload:patch});
+    activeReceipts.forEach(receipt=>{const prior=byReceipt.get(clean(receipt.id));if(isPaidReceipt(receipt)||!isActiveState(policy.estado)||receipt.carteraActiva===false){if(prior&&prior.carteraActiva!==false){update(prior.id,{carteraActiva:false,estado:'Cerrada',estadoOperativo:'cerrado_sin_saldo',exigibilidad:'cerrada',operationId:opId,actualizado:now()});result.closed.push(prior.id);}return;}
+      const st=portfolioState(receipt),id=prior?prior.id:portfolioId(receipt.id),row=Object.assign({},prior||{},{id,tenantId:policy.tenantId,polizaId:policy.id,reciboId:receipt.id,clienteId:policy.clienteId,asesorId:policy.asesorId,aseguradoraId:policy.aseguradoraId,pais:policy.pais,moneda:policy.moneda,secuencia:receipt.secuencia,cuota:receipt.cuota,monto:receipt.monto,montoTotal:receipt.montoTotal,primaTotal:receipt.montoTotal||receipt.monto,vence:receipt.vence,fechaLimite:receipt.fechaLimite||receipt.vence,fechaVencimiento:receipt.fechaLimite||receipt.vence,estado:st.estado,estadoOperativo:st.estadoOperativo,exigibilidad:st.exigibilidad,carteraTipo:'cartera_activa',historicalExigible:false,carteraActiva:true,fuente:receipt.fuente||policy.fuente,operationId:opId,actualizado:now()});
+      if(!prior){row.creado=now();row.saldoConciliado=false;row.estadoConciliacionSaldo='pendiente_conciliacion';row.requiereValidacion=false;mutations.push({action:'insert',collection:'carteraPrimas',id,payload:row});result.inserted.push(id);}else{update(id,row);result.updated.push(id);}keep.add(id);result.expected+=1;
+    });
+    existing.filter(x=>!keep.has(x.id)&&x.carteraActiva!==false).forEach(x=>{update(x.id,{carteraActiva:false,estado:'Cerrada',estadoOperativo:isActiveState(policy.estado)?'cerrado_plan_reemplazado':'cerrado_poliza_no_activa',exigibilidad:'cerrada',operationId:opId,actualizado:now()});result.closed.push(x.id);});
+    return result;
+  }
+  function buildAtomicWritePlan(prepared,raw,existing,opId,activityTitle,activityDetail){
+    const mutations=[{action:existing?'update':'insert',collection:'polizas',id:prepared.id,payload:prepared}];let vehicle=null;
+    if(!existing&&raw&&raw.vehiculo&&Object.keys(raw.vehiculo).some(k=>clean(raw.vehiculo[k]))){vehicle=Object.assign({},raw.vehiculo,{id:clean(raw.vehiculo.id||('veh_'+Date.now().toString(36))),tenantId:prepared.tenantId,clienteId:prepared.clienteId,polizaId:prepared.id,asesorId:prepared.asesorId,pais:prepared.pais,fuente:prepared.fuente,operationId:opId});mutations.push({action:'insert',collection:'vehiculos',id:vehicle.id,payload:vehicle});}
+    const receiptPlan=planReceipts(prepared,opId,mutations),portfolio=planPortfolio(prepared,receiptPlan.rows,opId,mutations),activity=activityRow(prepared,activityTitle,activityDetail,opId);mutations.push({action:'insert',collection:'actividades',id:activity.id,payload:activity});
+    return{mutations,receipts:receiptPlan.result,portfolio,vehicle,activity};
+  }
+
   function updateClientState(clientId) {
     if (!clientId || !A() || !A().deriveClientState) return null;
     const c = S().get('clientes', clientId);
@@ -361,80 +391,23 @@ Orbit.policyReceipts = (function () {
     } catch (e) {}
   }
 
-  function createPolicy(raw, options) {
-    options = options || {};
-    if (!canManagePolicies()) return { ok: false, errors: ['permiso_poliza_denegado'] };
-    const opId = options.operationId || operationId('pol');
-    const prepared = preparePolicy(raw, null, opId);
-    const check = validatePolicy(prepared, '');
-    if (!check.ok) return Object.assign({ ok: false, policy: prepared }, check);
-    prepared.policyKey = check.key;
-    prepared.policyVersionKey = check.versionKey;
-    prepared.requiereValidacion = check.warnings.length > 0;
-    prepared.validacion = { estado: prepared.requiereValidacion ? 'REQUIERE_VALIDACION' : 'VALIDADA_EN_CAPTURA', alertas: check.warnings, fecha: now() };
-    prepared.historial = [].concat(prepared.historial || [], [{ icon: '✳', fecha: today(), t: 'Emisión de póliza', d: 'Alta desde plataforma · operación ' + opId }]);
-    try {
-      S().insert('polizas', prepared);
-      let vehicle = null;
-      if (raw.vehiculo && Object.keys(raw.vehiculo).some(k => clean(raw.vehiculo[k]))) {
-        vehicle = Object.assign({}, raw.vehiculo, {
-          id: clean(raw.vehiculo.id || ('veh_' + Date.now().toString(36))),
-          tenantId: prepared.tenantId, clienteId: prepared.clienteId, polizaId: prepared.id,
-          asesorId: prepared.asesorId, pais: prepared.pais, fuente: prepared.fuente, operationId: opId
-        });
-        S().insert('vehiculos', vehicle);
-      }
-      const receipts = syncReceipts(prepared, { operationId: opId });
-      const portfolio = syncPortfolio(prepared, { operationId: opId });
-      updateClientState(prepared.clienteId);
-      recordActivity(prepared, 'Póliza creada: ' + prepared.numero, prepared.ramo + ' · ' + prepared.moneda + ' ' + prepared.primaTotal, opId);
-      if (A() && A().audit) A().audit('crear_con_recibos', 'polizas', prepared.id, null, prepared, options.motivo || 'Alta operativa de póliza', { operacionId: opId, recibos: receipts, cartera: portfolio });
-      return { ok: true, policy: prepared, receipts, portfolio, vehicle, warnings: check.warnings, operationId: opId };
-    } catch (error) {
-      try { S().update('polizas', prepared.id, { estado: 'Requiere validación', requiereValidacion: true, operacionError: String(error && (error.message || error)), operationId: opId }); } catch (ignore) {}
-      return { ok: false, errors: ['operacion_incompleta'], error: String(error && (error.message || error)), policy: prepared, operationId: opId };
-    }
+  async function createPolicy(raw, options) {
+    options=options||{};if(!canManagePolicies())return{ok:false,errors:['permiso_poliza_denegado']};if(!S()||typeof S().batchDurable!=='function')return{ok:false,errors:['contrato_atomico_no_disponible']};
+    const opId=options.operationId||operationId('pol'),prepared=preparePolicy(raw,null,opId),check=validatePolicy(prepared,'');if(!check.ok)return Object.assign({ok:false,policy:prepared},check);
+    prepared.policyKey=check.key;prepared.policyVersionKey=check.versionKey;prepared.requiereValidacion=check.warnings.length>0;prepared.validacion={estado:prepared.requiereValidacion?'REQUIERE_VALIDACION':'VALIDADA_EN_CAPTURA',alertas:check.warnings,fecha:now()};prepared.historial=[].concat(prepared.historial||[],[{icon:'✳',fecha:today(),t:'Emisión de póliza',d:'Alta desde plataforma · operación '+opId}]);
+    const plan=buildAtomicWritePlan(prepared,raw,null,opId,'Póliza creada: '+prepared.numero,prepared.ramo+' · '+prepared.moneda+' '+prepared.primaTotal);
+    try{await S().batchDurable(plan.mutations,{requestId:opId,timeoutMs:25000});try{await updateClientState(prepared.clienteId);}catch(ignore){}try{if(A()&&A().audit)A().audit('crear_con_recibos','polizas',prepared.id,null,prepared,options.motivo||'Alta operativa de póliza',{operacionId:opId,recibos:plan.receipts,cartera:plan.portfolio,atomicServerCommit:true});}catch(ignore){}return{ok:true,policy:prepared,receipts:plan.receipts,portfolio:plan.portfolio,vehicle:plan.vehicle,warnings:check.warnings,operationId:opId,atomicServerCommit:true};}
+    catch(error){return{ok:false,errors:['operacion_atomica_no_confirmada'],error:String(error&&(error.code||error.message||error)),policy:prepared,operationId:opId};}
   }
 
-  function updatePolicy(id, patch, options) {
-    options = options || {};
-    if (!canManagePolicies()) return { ok: false, errors: ['permiso_poliza_denegado'] };
-    const current = S().get('polizas', id);
-    if (!current) return { ok: false, errors: ['poliza_no_encontrada'] };
-    const before = clone(current);
-    const opId = options.operationId || operationId('polupd');
-    const merged = preparePolicy(Object.assign({}, current, patch || {}, { id }), current, opId);
-    const changedCritical = Object.keys(patch || {}).filter(k => CRITICAL_FIELDS.has(k) && JSON.stringify(before[k]) !== JSON.stringify(merged[k]));
-    const paidReceipts = (S().where('cobros', c => c.polizaId === id) || []).filter(isPaidReceipt);
-    const lockedChanges = changedCritical.filter(k => LOCKED_AFTER_PAYMENT.has(k));
-    const reactivatingWithPayments = paidReceipts.length && !isActiveState(before.estado) && isActiveState(merged.estado);
-    if (paidReceipts.length && (lockedChanges.length || reactivatingWithPayments)) {
-      return { ok: false, errors: ['pagos_existentes_requieren_endoso'], lockedChanges, paidReceipts: paidReceipts.map(c => c.id) };
-    }
-    if (changedCritical.length && !clean(options.motivo)) return { ok: false, errors: ['motivo_requerido'], changedCritical };
-    const check = validatePolicy(merged, id);
-    if (!check.ok) return Object.assign({ ok: false, policy: merged }, check);
-    merged.policyKey = check.key;
-    merged.policyVersionKey = check.versionKey;
-    merged.requiereValidacion = check.warnings.length > 0;
-    merged.validacion = { estado: merged.requiereValidacion ? 'REQUIERE_VALIDACION' : 'VALIDADA_EN_CAPTURA', alertas: check.warnings, fecha: now() };
-    merged.historial = [].concat(current.historial || [], [{
-      icon: '✏', fecha: today(), t: 'Actualización de póliza',
-      d: (options.motivo || 'Actualización') + (changedCritical.length ? ' · ' + changedCritical.join(', ') : '')
-    }]);
-    try {
-      S().update('polizas', id, merged);
-      const receipts = syncReceipts(merged, { operationId: opId });
-      const portfolio = syncPortfolio(merged, { operationId: opId });
-      updateClientState(before.clienteId);
-      updateClientState(merged.clienteId);
-      recordActivity(merged, 'Póliza actualizada: ' + merged.numero, options.motivo || 'Actualización operativa', opId);
-      if (A() && A().audit) A().audit('actualizar_con_recibos', 'polizas', id, before, merged, options.motivo, { operacionId: opId, recibos: receipts, cartera: portfolio, camposCriticos: changedCritical });
-      return { ok: true, policy: merged, receipts, portfolio, warnings: check.warnings, operationId: opId };
-    } catch (error) {
-      try { S().update('polizas', id, Object.assign({}, before, { operacionError: String(error && (error.message || error)), operationId: opId })); } catch (ignore) {}
-      return { ok: false, errors: ['operacion_incompleta'], error: String(error && (error.message || error)), operationId: opId };
-    }
+  async function updatePolicy(id, patch, options) {
+    options=options||{};if(!canManagePolicies())return{ok:false,errors:['permiso_poliza_denegado']};if(!S()||typeof S().batchDurable!=='function')return{ok:false,errors:['contrato_atomico_no_disponible']};
+    const current=S().get('polizas',id);if(!current)return{ok:false,errors:['poliza_no_encontrada']};const before=clone(current),opId=options.operationId||operationId('polupd'),merged=preparePolicy(Object.assign({},current,patch||{},{id}),current,opId),changedCritical=Object.keys(patch||{}).filter(k=>CRITICAL_FIELDS.has(k)&&JSON.stringify(before[k])!==JSON.stringify(merged[k])),paidReceipts=(S().where('cobros',c=>c.polizaId===id)||[]).filter(isPaidReceipt),lockedChanges=changedCritical.filter(k=>LOCKED_AFTER_PAYMENT.has(k)),reactivatingWithPayments=paidReceipts.length&&!isActiveState(before.estado)&&isActiveState(merged.estado);
+    if(paidReceipts.length&&(lockedChanges.length||reactivatingWithPayments))return{ok:false,errors:['pagos_existentes_requieren_endoso'],lockedChanges,paidReceipts:paidReceipts.map(c=>c.id)};if(changedCritical.length&&!clean(options.motivo))return{ok:false,errors:['motivo_requerido'],changedCritical};
+    const check=validatePolicy(merged,id);if(!check.ok)return Object.assign({ok:false,policy:merged},check);merged.policyKey=check.key;merged.policyVersionKey=check.versionKey;merged.requiereValidacion=check.warnings.length>0;merged.validacion={estado:merged.requiereValidacion?'REQUIERE_VALIDACION':'VALIDADA_EN_CAPTURA',alertas:check.warnings,fecha:now()};merged.historial=[].concat(current.historial||[],[{icon:'✏',fecha:today(),t:'Actualización de póliza',d:(options.motivo||'Actualización')+(changedCritical.length?' · '+changedCritical.join(', '):'')}]);
+    const plan=buildAtomicWritePlan(merged,patch||{},current,opId,'Póliza actualizada: '+merged.numero,options.motivo||'Actualización operativa');
+    try{await S().batchDurable(plan.mutations,{requestId:opId,timeoutMs:25000});try{await updateClientState(before.clienteId);if(merged.clienteId!==before.clienteId)await updateClientState(merged.clienteId);}catch(ignore){}try{if(A()&&A().audit)A().audit('actualizar_con_recibos','polizas',id,before,merged,options.motivo,{operacionId:opId,recibos:plan.receipts,cartera:plan.portfolio,camposCriticos:changedCritical,atomicServerCommit:true});}catch(ignore){}return{ok:true,policy:merged,receipts:plan.receipts,portfolio:plan.portfolio,warnings:check.warnings,operationId:opId,atomicServerCommit:true};}
+    catch(error){return{ok:false,errors:['operacion_atomica_no_confirmada'],error:String(error&&(error.code||error.message||error)),operationId:opId};}
   }
 
   function applyPayment(receiptIdValue, payment, options) {
@@ -455,7 +428,7 @@ Orbit.policyReceipts = (function () {
 
   return {
     ACTIVE, isActiveState, isPaidReceipt, canManagePolicies, canApplyPayments,
-    canonicalPolicyKey, policyVersionKey, validatePolicy, preparePolicy, expectedReceipts, syncReceipts, syncPortfolio,
+    canonicalPolicyKey, policyVersionKey, validatePolicy, preparePolicy, expectedReceipts, syncReceipts, syncPortfolio, buildAtomicWritePlan,
     createPolicy, updatePolicy, applyPayment, createReconciliationProposal, updateClientState,
     receiptId, sequenceOf
   };
