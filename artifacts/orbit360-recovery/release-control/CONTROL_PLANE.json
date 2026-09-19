@@ -713,7 +713,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_USER_VISUAL_REFRESH_CHECK",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B1_PREVIEW",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -1910,5 +1910,28 @@
       "SYNC_DRIFT"
     ],
     "nextAfterAudit": "FORENSIC_FINDINGS_AND_MINI_FIX_PLAN_WITHOUT_REOPENING_I6_4"
+  },
+  "i65ForensicRemediationPlan": {
+    "status": "FROZEN_ACTIVE",
+    "planPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_20260919.json",
+    "addendumPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_ADDENDUM_20260919.md",
+    "forensicAuditPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_AUDIT_20260919.json",
+    "candidateMode": "ONE_ACCUMULATIVE_INCREMENTAL_CANDIDATE",
+    "currentBlock": "B1",
+    "currentReadinessPercent": 70,
+    "nextTargetPercent": 80,
+    "previewAfterEveryBlockRequired": true,
+    "sameArtifactPreviewToLiveRequired": true,
+    "noParallelMethodology": true,
+    "noReimportForUiFix": true,
+    "noHardcodedPeople": true,
+    "unresolvedBusinessDecision": "B3_AUTO_COMMIT_HIGH_CONFIDENCE_INFERRED_PAYMENT_MATCH_VS_HUMAN_CONFIRMATION",
+    "semantics": {
+      "renewalCreatesExpectedReceiptsAndPortfolio": true,
+      "policyImportCreatesExpectedReceiptsAndPortfolio": true,
+      "obligationAloneDoesNotCreateConfirmedCobro": true,
+      "evidenceBasedInferenceAllowedForMatching": true,
+      "client360AndCobrosUseSamePaymentCommand": true
+    }
   }
 }
