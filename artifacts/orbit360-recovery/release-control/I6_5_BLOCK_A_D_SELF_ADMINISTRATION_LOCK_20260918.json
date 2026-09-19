@@ -23,7 +23,7 @@
       {
         "id": "A1_TEAM_SELF_ADMIN",
         "required": "Create/edit users from Equipo, persist advisor, optionally provision/sync Auth+membership, roles, countries, scopes and credentials; no hardcoded people.",
-        "current": "FRONTEND_BACKEND_WRITE_SURFACE_DESYNC_IDENTIFIED_FIX_CANDIDATE"
+        "current": "PRODUCT_PROVIDER_AUTH_ADAPTER_DESYNC_FIX_CANDIDATE"
       },
       {
         "id": "A2_CLIENT_SELF_ADMIN",
@@ -81,7 +81,7 @@
   ],
   "parentMicroplanBlobSha": "67c6eaa0555e9654a5b4ebbaf6e663c6884f18f3",
   "runtimeCompositionFinding": {
-    "status": "CAUSAL_DESYNC_FROZEN",
+    "status": "CAUSAL_DESYNC_FIX_CANDIDATE",
     "teamModuleVisible": true,
     "durableAdvisorSaveOwner": "orbit360ProductOperationalCommand",
     "userOnboardingSourceExists": true,
@@ -91,7 +91,13 @@
       "equipoOnboardingBridgeLoaded": false
     },
     "decision": "LOAD_EXISTING_OWNERS_IN_PRODUCT_ENTRYPOINT_NO_PARALLEL_BACKEND_NO_HARDCODED_PEOPLE",
-    "canonicalSaveProof": "DURABLE_COMMIT_PLUS_DIRECT_CANONICAL_FIRESTORE_READBACK_REQUIRED"
+    "canonicalSaveProof": "DURABLE_COMMIT_PLUS_DIRECT_CANONICAL_FIRESTORE_READBACK_REQUIRED",
+    "onboardingCoreRuntimeBeforeFix": false,
+    "rootCause": "core/user-onboarding.js depended on legacy window.firebase compat auth while the certified product runtime authenticates through productRuntimeBrowserProvidersP0 modular Firebase; onboarding bridge therefore loaded but declared backend unavailable.",
+    "probeFalseFailureCause": "Operational duplicate-insert probe omitted an explicit requestId, so deterministic idempotent replay could return a previously committed result before duplicate-target validation.",
+    "fix": "Reuse existing owners only: bind user onboarding to productRuntimeBrowserProvidersP0 initialize/callFunction and modular sendPasswordResetEmail; keep duplicate-insert zero-write proof but use a unique requestId per run.",
+    "noBackendParallel": true,
+    "noDataMutationRequired": true
   },
   "branding": {
     "status": "TENANT_PUBLIC_BRAND_FIX_PENDING_RELEASE",
