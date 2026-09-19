@@ -43,7 +43,18 @@ La conciliación de pagos puede recibir evidencia real desde:
 
 La **inferencia está permitida para vincular evidencia real** con cliente, póliza, recibo y pago. La inferencia no puede inventar la existencia de un pago por el solo hecho de que exista una obligación o haya vencido.
 
-Queda una única decisión funcional pendiente para B3: cuando una evidencia real tenga un match único y de alta confianza, definir si la plataforma debe **confirmar automáticamente** la conciliación/pago o dejar una **propuesta para validación humana con un clic**.
+Decisión B3 RESUELTA y congelada: cuando una evidencia real tenga un **match único y de alta confianza**, la plataforma debe **confirmar automáticamente** la conciliación/pago. Si la evidencia directa corresponde a una cuota N, también debe cerrar por inferencia las cuotas anteriores contiguas 1..N-1 que continúen abiertas y no tengan evidencia contradictoria. Cada cierre debe conservar procedencia directa o inferida. Si el match no es único, hay contradicción, pago parcial, secuencia rota o falta información, el sistema queda fail-closed y crea una propuesta para revisión humana.
+
+## 2.1. Inferencia secuencial aprobada
+
+La inferencia secuencial queda autorizada con evidencia real y trazabilidad:
+
+- **Factura/recibo del pago N:** N queda directo; 1..N-1 se cierran por inferencia si siguen abiertos y no hay contradicción.
+- **Estado de cuenta que muestra pendientes desde N:** 1..N-1 quedan pagados por inferencia; N y posteriores permanecen pendientes salvo otra evidencia.
+- **Planilla/estado de comisiones que liquida comisión de la cuota N:** N queda directo; 1..N-1 se cierran por inferencia.
+- **Estado bancario:** confirma el match directo; el backfill anterior solo procede cuando la secuencia contractual y la evidencia permiten alta confianza.
+
+No se inventa una fecha histórica de pago para cuotas inferidas cuando la fuente no la informa. Se conserva `inferredPaid=true`, la fecha/as-of de la evidencia, el ancla N, la regla de inferencia y la referencia documental. Si una evidencia posterior confirma directamente una cuota previamente inferida, se **enriquece su procedencia** y no se crea un cobro duplicado.
 
 ## 3. Aplicación de pagos
 
