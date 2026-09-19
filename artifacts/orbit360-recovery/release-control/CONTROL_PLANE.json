@@ -713,7 +713,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B1_PREVIEW",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B1_VISUAL",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -1951,23 +1951,15 @@
       "livePromotion": false
     },
     "b1ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B1_EXECUTION_LOCK_20260919.json",
-    "b1ExecutionLockBlobSha": "de5467c30a73a886c6c4b448d0569eede2ac2bf6",
+    "b1ExecutionLockBlobSha": "41fd4dbd7e440b2309984f9b746462ba0a7051d1",
     "b1": {
-      "status": "CANDIDATE_PENDING_PREVIEW",
-      "sourceBinding": "THIS_COMMIT_GITHUB_SHA",
-      "parentHead": "1efa2d70f86efa5927a8dff7ecd0bc4ec07e7f43",
-      "livePromoted": false,
-      "lastAttemptRunId": 35455984646,
-      "lastFailureStage": "PREVIEW_CHANNEL_DEPLOY",
-      "backendDeployed": false,
-      "previewDeployed": false,
-      "operationalWrites": 0,
-      "cause": "static proof false positive on internal tenant-config-live token",
-      "functionCreated": false,
-      "brandingSeedWritten": false,
-      "functionRollback": true,
-      "brandingRollback": true,
-      "canonicalPreviewChannelId": "gi-i65-b1-35455766715"
+      "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+      "sourceSha": "6c8ffff3cd7d23edc6e5a68fd4822db77dfa7fb0",
+      "buildId": "gi-i65-b1-6c8ffff3cd7d-57f234755dc1",
+      "previewUrl": "https://ays-orbit-360-lab--gi-i65-b1-35455766715-ylc10xr5.web.app",
+      "runId": 35456167585,
+      "artifactId": 10588218021,
+      "livePromoted": false
     }
   }
 }
