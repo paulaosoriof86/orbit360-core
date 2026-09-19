@@ -1937,6 +1937,18 @@
       "inferredPaymentDateMustNotBeInvented": true
     },
     "paymentInferenceLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_20260919.json",
-    "paymentInferenceDecision": "AUTO_COMMIT_UNIQUE_HIGH_CONFIDENCE_MATCH_AND_BACKFILL_PRIOR_CONTIGUOUS_INSTALLMENTS_WITH_PROVENANCE"
+    "paymentInferenceDecision": "AUTO_COMMIT_UNIQUE_HIGH_CONFIDENCE_MATCH_AND_BACKFILL_PRIOR_CONTIGUOUS_INSTALLMENTS_WITH_PROVENANCE",
+    "planBlobSha": "54461ef14f5226aa6b633303a51c5a31e16ece6c",
+    "addendumBlobSha": "05099a90cfb4862eec97e0359d55932828cb930b",
+    "forensicAuditBlobSha": "fcfdf29c9eb851d76cebf67bcbe36d8ed308eb0f",
+    "paymentInferenceBlobSha": "cfb026ded52c36083528de658a70191c8380d725",
+    "mechanismSyncStatus": "GUARD_BINDING_CANDIDATE",
+    "guardFailureBeforeFix": {
+      "runId": 35450692628,
+      "code": "I6_5_NEXT_ACTION_INVALID",
+      "cause": "Frozen forensic remediation cursor was added to CONTROL_PLANE before the I6 guard recognized the new versioned cursor.",
+      "dataWrites": 0,
+      "livePromotion": false
+    }
   }
 }

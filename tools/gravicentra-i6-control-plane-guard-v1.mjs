@@ -21,6 +21,10 @@ const I65_MINI='artifacts/orbit360-recovery/release-control/I6_5_MINI_CIERRE_OPE
 const I65_SELF_ADMIN='artifacts/orbit360-recovery/release-control/I6_5_BLOCK_A_D_SELF_ADMINISTRATION_LOCK_20260918.json';
 const I65_ANTI_DRIFT='artifacts/orbit360-recovery/release-control/I6_5_CONTINUITY_ANTI_DRIFT_LOCK_20260918.json';
 const I65_RELEASE_SYNC='artifacts/orbit360-recovery/release-control/I6_RELEASE_MECHANISM_ANTI_DESYNC_LOCK_20260918.json';
+const I65_FORENSIC_AUDIT='artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_AUDIT_20260919.json';
+const I65_FORENSIC_PLAN='artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_20260919.json';
+const I65_FORENSIC_ADDENDUM='artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_ADDENDUM_20260919.md';
+const I65_PAYMENT_INFERENCE='artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_20260919.json';
 const I65_SYNC='artifacts/orbit360-recovery/release-control/I6_5_SYNC_COMPOSITION_PREFLIGHT_20260918.json';
 const I65_DIFF='artifacts/orbit360-recovery/release-control/I6_5_DETERMINISTIC_DIFF_20260918.json';
 const I65_APPLY_ENC='artifacts/orbit360-recovery/release-control/I6_5_DETERMINISTIC_APPLY_PAYLOAD_20260918.enc.json';
@@ -34,8 +38,8 @@ const stable=v=>{if(v===null||typeof v!=='object')return v;if(Array.isArray(v))r
 const sameJson=(a,b)=>JSON.stringify(stable(a))===JSON.stringify(stable(b));
 
 need(MODE==='governance'||MODE==='i6','I6_GUARD_MODE_INVALID:'+MODE);
-for(const p of [CONTROL,STATUS_LEDGER,AUTH_RECEIPT,I6_ADDENDUM,I6_PLAN_LOCK,V5_MANIFEST,DATA_UPDATE_PLAN,DATA_UPDATE_DISCIPLINE,DATA_UPDATE_REGISTRY,ACTIVE_SOURCE_INTAKE,I63_SOURCE,I63_RECEIPT,I64_SOURCE,I64_RECEIPT,I65_SOURCE,I65_SYNC]) need(exists(p),'I6_REQUIRED_FILE_MISSING:'+p);
-const C=readJson(CONTROL),S=readJson(STATUS_LEDGER),A=readJson(AUTH_RECEIPT),M=readJson(V5_MANIFEST);
+for(const p of [CONTROL,STATUS_LEDGER,AUTH_RECEIPT,I6_ADDENDUM,I6_PLAN_LOCK,V5_MANIFEST,DATA_UPDATE_PLAN,DATA_UPDATE_DISCIPLINE,DATA_UPDATE_REGISTRY,ACTIVE_SOURCE_INTAKE,I63_SOURCE,I63_RECEIPT,I64_SOURCE,I64_RECEIPT,I65_SOURCE,I65_SYNC,I65_FORENSIC_AUDIT,I65_FORENSIC_PLAN,I65_FORENSIC_ADDENDUM,I65_PAYMENT_INFERENCE]) need(exists(p),'I6_REQUIRED_FILE_MISSING:'+p);
+const C=readJson(CONTROL),S=readJson(STATUS_LEDGER),A=readJson(AUTH_RECEIPT),M=readJson(V5_MANIFEST),FRA=readJson(I65_FORENSIC_AUDIT),FRP=readJson(I65_FORENSIC_PLAN),PAY=readJson(I65_PAYMENT_INFERENCE);
 const P=readJson(DATA_UPDATE_PLAN),D=readJson(DATA_UPDATE_DISCIPLINE),RGT=readJson(DATA_UPDATE_REGISTRY),SRC=readJson(ACTIVE_SOURCE_INTAKE),SRC3=readJson(I63_SOURCE),R63=readJson(I63_RECEIPT),SRC4=readJson(I64_SOURCE),R64=readJson(I64_RECEIPT),SRC5=readJson(I65_SOURCE),SYNC5=readJson(I65_SYNC);
 need(C.schemaVersion==='gravicentra-control-plane-v2','I6_CONTROL_SCHEMA_INVALID');
 need(C.controlPlaneId==='GRAVICENTRA-INSURANCE-FASE-A','I6_CONTROL_ID_INVALID');
@@ -242,6 +246,13 @@ if(activeI65){
   need(git('hash-object',I65_ANTI_DRIFT)===C.i65ContinuityAntiDrift?.blobSha,'I6_5_ANTI_DRIFT_BLOB_DRIFT');
   need(C.i65ReleaseMechanismAntiDesync?.path===I65_RELEASE_SYNC&&C.i65ReleaseMechanismAntiDesync?.status==='FROZEN_ACTIVE'&&C.i65ReleaseMechanismAntiDesync?.duplicateJobIdsResolved===true&&C.i65ReleaseMechanismAntiDesync?.previewReferenceCheckResolved===true&&C.i65ReleaseMechanismAntiDesync?.proofRoleSurfaceResolved===true&&C.i65ReleaseMechanismAntiDesync?.noHardcodedIdentities===true&&C.i65ReleaseMechanismAntiDesync?.dataMutationAuthorized===false&&C.i65ReleaseMechanismAntiDesync?.deterministicApplyRepeatAuthorized===false,'I6_5_RELEASE_ANTI_DESYNC_INVALID');
   need(git('hash-object',I65_RELEASE_SYNC)===C.i65ReleaseMechanismAntiDesync?.blobSha,'I6_5_RELEASE_ANTI_DESYNC_BLOB_DRIFT');
+  const FR=C.i65ForensicRemediationPlan||{};
+  need(FR.status==='FROZEN_ACTIVE'&&FR.planPath===I65_FORENSIC_PLAN&&FR.addendumPath===I65_FORENSIC_ADDENDUM&&FR.forensicAuditPath===I65_FORENSIC_AUDIT&&FR.paymentInferenceLockPath===I65_PAYMENT_INFERENCE,'I6_5_FORENSIC_AUTHORITY_INVALID');
+  need(git('hash-object',I65_FORENSIC_PLAN)===FR.planBlobSha&&git('hash-object',I65_FORENSIC_ADDENDUM)===FR.addendumBlobSha&&git('hash-object',I65_FORENSIC_AUDIT)===FR.forensicAuditBlobSha&&git('hash-object',I65_PAYMENT_INFERENCE)===FR.paymentInferenceBlobSha,'I6_5_FORENSIC_BLOB_DRIFT');
+  need(FRP.status==='FROZEN_ACTIVE'&&FRP.candidateRule==='ONE_ACCUMULATIVE_INCREMENTAL_CANDIDATE_ONLY'&&FRP.visualizationRule.includes('EVERY_BLOCK'),'I6_5_FORENSIC_PLAN_INVALID');
+  need(FRA.status==='PASS_WITH_BLOCKING_FINDINGS'&&FRA.mode==='READ_ONLY_AUDIT_NO_PRODUCT_OR_DATA_WRITES','I6_5_FORENSIC_AUDIT_INVALID');
+  need(PAY.status==='FROZEN_ACTIVE'&&PAY.autoCommitPolicy?.enabled===true&&PAY.backfillBehavior?.createMissingConfirmedCobrosForPriorInstallments===true,'I6_5_PAYMENT_INFERENCE_LOCK_INVALID');
+
   const AD=readJson(I65_ANTI_DRIFT);
   need(AD.status==='FROZEN_ACTIVE'&&AD.authority?.microplan?.blobSha===C.i65MiniClosurePlan?.blobSha&&AD.authority?.sourceIntake?.path===I65_SOURCE&&AD.authority?.sourceIntake?.mutableExecutionSnapshotAllowed===true,'I6_5_ANTI_DRIFT_BINDING_INVALID');
   need(/^[0-9a-f]{40}$/.test(String(AD.authority?.sourceIntake?.baselineBlobSha||'')),'I6_5_ANTI_DRIFT_BASELINE_BLOB_INVALID');
@@ -274,7 +285,13 @@ if(activeI65){
     need(C.postproductionDataUpdateControl?.activeModule==='RECIBOS_CARTERA'&&C.postproductionDataUpdateControl?.executionCursor===cursor&&C.postproductionDataUpdateControl?.nextRequiredStep===nextByCursor[cursor],'I6_5_CONTROL_CURSOR_INVALID');
     need(RGT.modules?.RECIBOS_CARTERA?.sourceState==='CURRENT_SOURCE_PINNED'&&RGT.modules?.RECIBOS_CARTERA?.resumeCursor===cursor,'I6_5_REGISTRY_CURSOR_INVALID');
     const expectedI65Action=i65OperationalClosurePending?'I6_5_OPERATIONAL_CLOSURE_SUCCESSOR_RELEASE':(i65HydrationDiagnosticPending?'I6_5_HYDRATION_DIAGNOSTIC':(i65HydrationDefectPending?'I6_5_HYDRATION_CODE_DEFECT_SUCCESSOR_RELEASE':(i65HydrationDiagnosticPass?'I6_5_HYDRATION_CODE_FIX':actionByCursor[cursor])));
-    need(C.nextAction===expectedI65Action,'I6_5_NEXT_ACTION_INVALID');
+    const forensicBlock=String(FR.currentBlock||'');
+    if(FR.status==='FROZEN_ACTIVE'&&forensicBlock==='B1'){
+      need(FR.currentReadinessPercent===70&&FR.nextTargetPercent===80&&FR.previewAfterEveryBlockRequired===true&&FR.sameArtifactPreviewToLiveRequired===true,'I6_5_FORENSIC_B1_STATE_INVALID');
+      need(['I6_5_FORENSIC_REMEDIATION_B1_PREVIEW','I6_5_FORENSIC_REMEDIATION_B1_VISUAL'].includes(C.nextAction),'I6_5_FORENSIC_B1_ACTION_INVALID');
+    }else{
+      need(C.nextAction===expectedI65Action,'I6_5_NEXT_ACTION_INVALID');
+    }
   }else{
     need(activeI65Sync&&SRC5.status==='SOURCE_PINNED_SYNC_PREFLIGHT_BLOCK'&&cursor==='SOURCE_PINNED_SYNC_PREFLIGHT_BLOCK','I6_5_PREFLIGHT_SOURCE_CURSOR_INVALID');
     need(C.postproductionDataUpdateControl?.executionCursor==='SOURCE_PINNED_SYNC_PREFLIGHT_BLOCK','I6_5_CONTROL_CURSOR_INVALID');
