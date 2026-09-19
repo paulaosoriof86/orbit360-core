@@ -1721,7 +1721,7 @@
     "rollbackExecuted": false
   },
   "i65OperationalClosureDefect": {
-    "status": "I6_5_OPERATIONAL_CLOSURE_CODE_DEFECT_CANDIDATE_PENDING_BUILD",
+    "status": "I6_5_OPERATIONAL_CLOSURE_CODE_DEFECT_SUCCESSOR_CAUSAL_FIX_PENDING_BUILD",
     "classification": "CODE_DEFECT",
     "scope": "I6_5_OPERATIONAL_CLOSURE_MINIFIX",
     "previousCertifiedSourceSha": "7408b41a392b441fc88175584270895313ca5231",
@@ -1738,6 +1738,7 @@
       "orbit360-platform/data/store-firestore-product-operational-p0.js",
       "orbit360-platform/modules/equipo.js",
       "orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js",
+      "orbit360-platform/core/user-onboarding.js",
       "orbit360-platform/data/tenant-public-branding-index.js",
       "orbit360-platform/core/public-tenant-branding.js",
       "orbit360-platform/assets/tenant/alianzas-soluciones/logo-bolita-96.png"
@@ -1756,7 +1757,7 @@
     "nextRequiredStep": "I6_5_OPERATIONAL_CLOSURE_SUCCESSOR_RELEASE",
     "users": {
       "policy": "NO_HARDCODED_IDENTITIES_PLATFORM_SELF_ADMIN_ONLY",
-      "status": "SELF_ADMIN_RUNTIME_COMPOSITION_AND_CANONICAL_READBACK_FIX_PENDING",
+      "status": "PRODUCT_PROVIDER_AUTH_ADAPTER_AND_IDEMPOTENCE_SAFE_PROBE_FIX_PENDING_RELEASE",
       "frontendOwners": [
         "core/user-onboarding.js",
         "modules/equipo-onboarding-v20260804-bridge.js"
@@ -1765,7 +1766,9 @@
         "orbit360ProductOperationalCommand",
         "orbit360ProvisionTeamAccess"
       ],
-      "runtimeProbe": "NO_WRITE_EXPECTED_ERRORS_ONLY"
+      "runtimeProbe": "NO_WRITE_EXPECTED_ERRORS_ONLY_WITH_UNIQUE_REQUEST_ID",
+      "onboardingTransport": "productRuntimeBrowserProvidersP0.callFunction",
+      "invitationTransport": "productRuntimeBrowserProvidersP0 modular auth sendPasswordResetEmail"
     },
     "selfAdministrationLockPath": "artifacts/orbit360-recovery/release-control/I6_5_BLOCK_A_D_SELF_ADMINISTRATION_LOCK_20260918.json",
     "globalPortfolioCount": 1283,
@@ -1781,7 +1784,8 @@
       "source": "tenant-public-branding-index",
       "faviconSource": "user-approved-logo-bolita-2025",
       "preAuthTenantBrandRequired": true
-    }
+    },
+    "cause": "A1 runtime composition loaded the existing onboarding owner but that owner still depended on legacy window.firebase compat auth instead of the certified product modular provider; the zero-write team command probe also reused deterministic request identity and could be satisfied by idempotent replay."
   },
   "i65SelfAdministrationClosure": {
     "status": "FROZEN_ACTIVE",
