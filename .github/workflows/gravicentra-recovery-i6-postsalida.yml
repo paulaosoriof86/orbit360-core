@@ -1789,6 +1789,10 @@ jobs:
           node --check orbit360-platform/core/pwa.js
           node --check orbit360-platform/data/store-firestore-product-operational-p0.js
           node --check orbit360-platform/modules/equipo.js
+          node --check orbit360-platform/core/tenant-access-policy-effective-p0.js
+          node --check orbit360-platform/data/store-firestore-product-readonly-p0.js
+          node --check tools/gravicentra-i6-5-b1-branding-snapshot.mjs
+          node --check tools/gravicentra-i6-5-b1-advisor-normalize.mjs
           node --check orbit360-platform/modules/equipo.js
           node --check orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js
           node --check orbit360-platform/modules/aseguradoras.js
@@ -2936,6 +2940,12 @@ jobs:
           echo "FIREBASE_CLI_BIN=$CLI" >> "$GITHUB_ENV"
           SEL='';while read -r F;do if GOOGLE_APPLICATION_CREDENTIALS="$F" node "$CLI" functions:list --project "$PROJECT_ID" --non-interactive --json >/dev/null 2>&1;then SEL="$F";break;fi;done<"$ROOT/files"
           test -n "$SEL";cp "$SEL" "$RUNNER_TEMP/b1-sa.json";chmod 600 "$RUNNER_TEMP/b1-sa.json";echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/b1-sa.json" >> "$GITHUB_ENV"
+      - name: Snapshot canonical branding for first paint
+        if: steps.mode.outputs.mode == 'preview'
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-i6-5-b1-branding-snapshot.mjs "$RUNNER_TEMP/b1-branding-snapshot.json"
+          echo "TENANT_BRANDING_SNAPSHOT_FILE=$RUNNER_TEMP/b1-branding-snapshot.json" >> "$GITHUB_ENV"
       - name: Materialize immutable accumulated B1 package
         if: steps.mode.outputs.mode == 'preview'
         id: build
@@ -2956,6 +2966,12 @@ jobs:
           node - <<'NODE'
           const fs=require('fs'),d=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/b1-package-output.json'));for(const[k,v]of Object.entries({build_id:d.buildId,hosted_payload_digest:d.hostedPayloadDigest,backend_source_digest:d.backendSourceDigest,bundle_digest:d.bundleDigest}))fs.appendFileSync(process.env.GITHUB_OUTPUT,k+'='+v+'\n');
           NODE
+      - name: Normalize missing canonical advisor identities
+        if: steps.mode.outputs.mode == 'preview'
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-i6-5-b1-advisor-normalize.mjs "$RUNNER_TEMP/b1-advisor-normalization.json"
+          cp "$RUNNER_TEMP/b1-advisor-normalization.json" "$RUNNER_TEMP/b1-package/evidence/b1-advisor-normalization.json"
       - name: Deploy B1 backend owners and verify canonical branding config
         if: steps.mode.outputs.mode == 'preview'
         run: |
@@ -3052,7 +3068,7 @@ jobs:
       - name: B1 failure leaves operational data untouched
         if: ${{ failure() && steps.mode.outputs.mode == 'preview' }}
         continue-on-error: true
-        run: echo "B1_R2_DATA_WRITES=0"
+        run: echo "B1_R3_ONLY_AUTHORIZED_NORMALIZATION_AND_REVERSIBLE_TEST_WRITES"
 
   i65-b1-advisor-identity-diagnostic:
     runs-on: ubuntu-24.04
