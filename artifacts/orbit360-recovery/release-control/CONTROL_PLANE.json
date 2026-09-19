@@ -1925,13 +1925,18 @@
     "noParallelMethodology": true,
     "noReimportForUiFix": true,
     "noHardcodedPeople": true,
-    "unresolvedBusinessDecision": "B3_AUTO_COMMIT_HIGH_CONFIDENCE_INFERRED_PAYMENT_MATCH_VS_HUMAN_CONFIRMATION",
+    "unresolvedBusinessDecision": null,
     "semantics": {
       "renewalCreatesExpectedReceiptsAndPortfolio": true,
       "policyImportCreatesExpectedReceiptsAndPortfolio": true,
       "obligationAloneDoesNotCreateConfirmedCobro": true,
       "evidenceBasedInferenceAllowedForMatching": true,
-      "client360AndCobrosUseSamePaymentCommand": true
-    }
+      "client360AndCobrosUseSamePaymentCommand": true,
+      "autoReconcileUniqueHighConfidenceEvidence": true,
+      "backfillPriorContiguousInstallments": true,
+      "inferredPaymentDateMustNotBeInvented": true
+    },
+    "paymentInferenceLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_20260919.json",
+    "paymentInferenceDecision": "AUTO_COMMIT_UNIQUE_HIGH_CONFIDENCE_MATCH_AND_BACKFILL_PRIOR_CONTIGUOUS_INSTALLMENTS_WITH_PROVENANCE"
   }
 }
