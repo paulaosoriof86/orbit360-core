@@ -107,7 +107,7 @@ const brandingScript=/<script\s+src=["']core\/public-tenant-branding\.js[^"']*["
 if(!brandingScript.test(artifactIndex))throw new Error('PUBLIC_BRANDING_SCRIPT_TAG_MISSING');
 artifactIndex=artifactIndex.replace(
   brandingScript,
-  '<script src="data/tenant-public-branding-snapshot.generated.js"></script>\n  '<script src="data/tenant-public-branding-snapshot.generated.js"></script>\nfs.writeFileSync(path.join(EVIDENCE,'public-config-descriptor.json'),JSON.stringify({projectId:cfg.projectId,authDomain:cfg.authDomain,appIdPresent:true,apiKeyPresent:true,storageBucketPresent:!!cfg.storageBucket,configSha256:cfgHash})+'\n');''
+  '<script src="data/tenant-public-branding-snapshot.generated.js"></script>\n$&'
 );
 fs.writeFileSync(path.join(SITE,'index.html'),artifactIndex);
 fs.writeFileSync(
