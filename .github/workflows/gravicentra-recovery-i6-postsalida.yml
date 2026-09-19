@@ -182,7 +182,7 @@ jobs:
         id: build
         run: |
           set -euo pipefail
-          npx --yes firebase-tools@14.10.1 apps:list WEB --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/apps.json"
+          node "$FIREBASE_CLI_BIN" apps:list WEB --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/apps.json"
           export APPS="$RUNNER_TEMP/apps.json"
           APP_ID=$(python3 - <<'PY'
           import json,os
@@ -194,7 +194,7 @@ jobs:
           PY
           )
           test -n "$APP_ID"
-          npx --yes firebase-tools@14.10.1 apps:sdkconfig WEB "$APP_ID" --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/public-config.json"
+          node "$FIREBASE_CLI_BIN" apps:sdkconfig WEB "$APP_ID" --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/public-config.json"
           export SOURCE_SHA="$GITHUB_SHA"
           export RELEASE_GATE="I6.4"
           export BUILD_PREFIX="gi-i64"
@@ -228,7 +228,7 @@ jobs:
           set -euo pipefail
           cd "$RUNNER_TEMP/i64-package/bundle"
           CHANNEL_ID="gi-i64-$GITHUB_RUN_ID"
-          npx --yes firebase-tools@14.10.1 hosting:channel:deploy "$CHANNEL_ID" --config firebase.json --project "$PROJECT_ID" --expires 7d --non-interactive --json > "$RUNNER_TEMP/preview.json"
+          node "$FIREBASE_CLI_BIN" hosting:channel:deploy "$CHANNEL_ID" --config firebase.json --project "$PROJECT_ID" --expires 7d --non-interactive --json > "$RUNNER_TEMP/preview.json"
           export DEPLOY="$RUNNER_TEMP/preview.json"
           PREVIEW_URL=$(python3 - <<'PY'
           import os,re
@@ -589,7 +589,7 @@ jobs:
         id: build
         run: |
           set -euo pipefail
-          npx --yes firebase-tools@14.10.1 apps:list WEB --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/apps.json"
+          node "$FIREBASE_CLI_BIN" apps:list WEB --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/apps.json"
           export APPS="$RUNNER_TEMP/apps.json"
           APP_ID=$(python3 - <<'PY'
           import json,os
@@ -601,7 +601,7 @@ jobs:
           PY
           )
           test -n "$APP_ID"
-          npx --yes firebase-tools@14.10.1 apps:sdkconfig WEB "$APP_ID" --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/public-config.json"
+          node "$FIREBASE_CLI_BIN" apps:sdkconfig WEB "$APP_ID" --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/public-config.json"
           export SOURCE_SHA="$GITHUB_SHA"
           export RELEASE_GATE="I6.5"
           export BUILD_PREFIX="gi-i65"
@@ -635,7 +635,7 @@ jobs:
           set -euo pipefail
           cd "$RUNNER_TEMP/i65-package/bundle"
           CHANNEL_ID="gi-i65-35376440434"
-          npx --yes firebase-tools@14.10.1 hosting:channel:deploy "$CHANNEL_ID" --config firebase.json --project "$PROJECT_ID" --expires 7d --non-interactive --json > "$RUNNER_TEMP/preview.json"
+          node "$FIREBASE_CLI_BIN" hosting:channel:deploy "$CHANNEL_ID" --config firebase.json --project "$PROJECT_ID" --expires 7d --non-interactive --json > "$RUNNER_TEMP/preview.json"
           export DEPLOY="$RUNNER_TEMP/preview.json"
           PREVIEW_URL=$(python3 - <<'PY'
           import os,re
@@ -1009,7 +1009,7 @@ jobs:
         id: build
         run: |
           set -euo pipefail
-          npx --yes firebase-tools@14.10.1 apps:list WEB --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/apps.json"
+          node "$FIREBASE_CLI_BIN" apps:list WEB --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/apps.json"
           export APPS="$RUNNER_TEMP/apps.json"
           APP_ID=$(python3 - <<'PY'
           import json,os
@@ -1021,7 +1021,7 @@ jobs:
           PY
           )
           test -n "$APP_ID"
-          npx --yes firebase-tools@14.10.1 apps:sdkconfig WEB "$APP_ID" --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/public-config.json"
+          node "$FIREBASE_CLI_BIN" apps:sdkconfig WEB "$APP_ID" --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/public-config.json"
           export SOURCE_SHA="$GITHUB_SHA"
           export RELEASE_GATE="I6.5"
           export BUILD_PREFIX="gi-i65"
@@ -1082,7 +1082,7 @@ jobs:
           test -n "$CHANNEL_ID" || { echo I65_NO_UNREFERENCED_PREVIEW_CHANNEL_AVAILABLE >&2; cat "$RUNNER_TEMP/i65-preview-channel-candidates.txt" >&2; exit 44; }
           echo "I65_REUSING_UNREFERENCED_PREVIEW_CHANNEL=$CHANNEL_ID"
           set +e
-          npx --yes firebase-tools@14.10.1 hosting:channel:deploy "$CHANNEL_ID" --config firebase.json --project "$PROJECT_ID" --expires 7d --non-interactive --json > "$RUNNER_TEMP/preview.json" 2> "$RUNNER_TEMP/preview.err"
+          node "$FIREBASE_CLI_BIN" hosting:channel:deploy "$CHANNEL_ID" --config firebase.json --project "$PROJECT_ID" --expires 7d --non-interactive --json > "$RUNNER_TEMP/preview.json" 2> "$RUNNER_TEMP/preview.err"
           RC=$?
           set -e
           if [ "$RC" -ne 0 ]; then
@@ -1857,7 +1857,7 @@ jobs:
         id: build
         run: |
           set -euo pipefail
-          npx --yes firebase-tools@14.10.1 apps:list WEB --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/apps.json"
+          node "$FIREBASE_CLI_BIN" apps:list WEB --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/apps.json"
           export APPS="$RUNNER_TEMP/apps.json"
           APP_ID=$(python3 - <<'PY'
           import json,os
@@ -1869,7 +1869,7 @@ jobs:
           PY
           )
           test -n "$APP_ID"
-          npx --yes firebase-tools@14.10.1 apps:sdkconfig WEB "$APP_ID" --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/public-config.json"
+          node "$FIREBASE_CLI_BIN" apps:sdkconfig WEB "$APP_ID" --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/public-config.json"
           export SOURCE_SHA="$GITHUB_SHA"
           export RELEASE_GATE="I6.5"
           export BUILD_PREFIX="gi-i65"
@@ -1930,7 +1930,7 @@ jobs:
           test -n "$CHANNEL_ID" || { echo I65_NO_UNREFERENCED_PREVIEW_CHANNEL_AVAILABLE >&2; cat "$RUNNER_TEMP/i65-preview-channel-candidates.txt" >&2; exit 44; }
           echo "I65_REUSING_UNREFERENCED_PREVIEW_CHANNEL=$CHANNEL_ID"
           set +e
-          npx --yes firebase-tools@14.10.1 hosting:channel:deploy "$CHANNEL_ID" --config firebase.json --project "$PROJECT_ID" --expires 7d --non-interactive --json > "$RUNNER_TEMP/preview.json" 2> "$RUNNER_TEMP/preview.err"
+          node "$FIREBASE_CLI_BIN" hosting:channel:deploy "$CHANNEL_ID" --config firebase.json --project "$PROJECT_ID" --expires 7d --non-interactive --json > "$RUNNER_TEMP/preview.json" 2> "$RUNNER_TEMP/preview.err"
           RC=$?
           set -e
           if [ "$RC" -ne 0 ]; then
@@ -2923,14 +2923,18 @@ jobs:
           if not rows:raise SystemExit('B1_NO_SERVICE_ACCOUNT')
           pathlib.Path(os.environ['ROOT']+'/files').write_text('\n'.join(rows)+'\n')
           PY
-          SEL='';while read -r F;do if GOOGLE_APPLICATION_CREDENTIALS="$F" npx --yes firebase-tools@14.10.1 functions:list --project "$PROJECT_ID" --non-interactive --json >/dev/null 2>&1;then SEL="$F";break;fi;done<"$ROOT/files"
+          CROOT="$RUNNER_TEMP/b1-firebase-cli";npm install --prefix "$CROOT" --ignore-scripts --no-audit --no-fund firebase-tools@14.10.1 >/dev/null
+          node tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs "$CROOT"
+          CLI="$CROOT/node_modules/firebase-tools/lib/bin/firebase.js"
+          echo "FIREBASE_CLI_BIN=$CLI" >> "$GITHUB_ENV"
+          SEL='';while read -r F;do if GOOGLE_APPLICATION_CREDENTIALS="$F" node "$CLI" functions:list --project "$PROJECT_ID" --non-interactive --json >/dev/null 2>&1;then SEL="$F";break;fi;done<"$ROOT/files"
           test -n "$SEL";cp "$SEL" "$RUNNER_TEMP/b1-sa.json";chmod 600 "$RUNNER_TEMP/b1-sa.json";echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/b1-sa.json" >> "$GITHUB_ENV"
       - name: Materialize immutable accumulated B1 package
         if: steps.mode.outputs.mode == 'preview'
         id: build
         run: |
           set -euo pipefail
-          npx --yes firebase-tools@14.10.1 apps:list WEB --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/apps.json";export APPS="$RUNNER_TEMP/apps.json"
+          node "$FIREBASE_CLI_BIN" apps:list WEB --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/apps.json";export APPS="$RUNNER_TEMP/apps.json"
           APP_ID=$(python3 - <<'PY'
           import json,os
           d=json.load(open(os.environ['APPS']));a=d.get('result') if isinstance(d,dict) else None
@@ -2939,7 +2943,7 @@ jobs:
           print(web[0].get('appId',''))
           PY
           )
-          npx --yes firebase-tools@14.10.1 apps:sdkconfig WEB "$APP_ID" --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/public-config.json"
+          node "$FIREBASE_CLI_BIN" apps:sdkconfig WEB "$APP_ID" --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/public-config.json"
           export SOURCE_SHA="$GITHUB_SHA" RELEASE_GATE="I6.5" BUILD_PREFIX="gi-i65-b1" ENVIRONMENT_REF="firebase-hosting-preview-i6-5-forensic-b1"
           node tools/gravicentra-i6-1-preview-package.mjs . "$RUNNER_TEMP/b1-package" "$RUNNER_TEMP/public-config.json" > "$RUNNER_TEMP/b1-package-output.json"
           node - <<'NODE'
@@ -2950,7 +2954,7 @@ jobs:
         run: |
           set -euo pipefail
           E="$RUNNER_TEMP/b1-package/evidence";mkdir -p "$E"
-          npx --yes firebase-tools@14.10.1 functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/b1-functions-before.json";export BEFORE="$RUNNER_TEMP/b1-functions-before.json"
+          node "$FIREBASE_CLI_BIN" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/b1-functions-before.json";export BEFORE="$RUNNER_TEMP/b1-functions-before.json"
           PRESENT=$(node - <<'NODE'
           const fs=require('fs'),r=JSON.parse(fs.readFileSync(process.env.BEFORE)),a=Array.isArray(r.result)?r.result:r,n=new Set(a.flatMap(x=>[x.entryPoint,x.id||x.name].map(String)));process.stdout.write(n.has('orbit360TenantBranding')?'true':'false');
           NODE
@@ -2958,7 +2962,7 @@ jobs:
           test "$PRESENT" = false || { echo B1_BRANDING_FUNCTION_ALREADY_PRESENT_UNEXPECTED >&2; exit 41; }
           echo "B1_FUNCTION_PREEXISTED=false" >> "$GITHUB_ENV"
           FROOT="$RUNNER_TEMP/b1-functions";mkdir -p "$FROOT";cp -a "$RUNNER_TEMP/b1-package/bundle/backend" "$FROOT/backend";(cd "$FROOT/backend"&&npm ci --ignore-scripts --no-audit --no-fund >/dev/null);echo '{"functions":{"source":"backend"}}' > "$FROOT/firebase.json"
-          npx --yes firebase-tools@14.10.1 deploy --only functions:orbit360TenantBranding --config "$FROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
+          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360TenantBranding --config "$FROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
           export E TENANT_HINT GITHUB_RUN_ID
           (cd "$FROOT/backend" && node - <<'NODE'
           const fs=require('fs');const {initializeApp,cert}=require('firebase-admin/app');const {getFirestore,Timestamp}=require('firebase-admin/firestore');const sa=JSON.parse(fs.readFileSync(process.env.GOOGLE_APPLICATION_CREDENTIALS));initializeApp({credential:cert(sa),projectId:process.env.PROJECT_ID});const db=getFirestore(),ref=db.collection('tenants').doc(process.env.TENANT_HINT).collection('config').doc('branding'),eventId='b1_brand_seed_'+process.env.GITHUB_RUN_ID,eventRef=db.collection('tenants').doc(process.env.TENANT_HINT).collection('configEvents').doc(eventId),encode=v=>{if(v&&typeof v.toMillis==='function')return{__timestampMillis:v.toMillis()};if(Array.isArray(v))return v.map(encode);if(v&&typeof v==='object')return Object.fromEntries(Object.entries(v).map(([k,x])=>[k,encode(x)]));return v;};(async()=>{const snap=await ref.get();fs.writeFileSync(process.env.E+'/b1-branding-before.json',JSON.stringify({exists:snap.exists,data:snap.exists?encode(snap.data()):null,eventId},null,2)+'\n');if(snap.exists&&String((snap.data()||{}).schemaVersion||'')!=='orbit360-tenant-branding-v1')throw Error('B1_BRANDING_CONFIG_PREEXISTING_UNKNOWN_OWNER');const next={schemaVersion:'orbit360-tenant-branding-v1',displayName:'Alianzas & Soluciones',legalName:'Alianzas & Soluciones Corredores de Seguros',logo:'assets/tenant/alianzas-soluciones/logo-oficial-360.png',favicon:'assets/tenant/alianzas-soluciones/logo-bolita-96.png',seededBy:'I6.5-B1',updatedAt:Timestamp.now()};await db.runTransaction(async tx=>{tx.set(ref,next,{merge:false});tx.set(eventRef,{schemaVersion:'orbit360-branding-config-event-v1',tenantId:process.env.TENANT_HINT,action:'B1_SEED',sourceSha:process.env.GITHUB_SHA||'',createdAt:Timestamp.now(),containsPII:false},{merge:false});});console.log('B1_BRANDING_CONFIG_SEED=PASS');})().catch(e=>{console.error(e);process.exit(1);});
@@ -2971,7 +2975,7 @@ jobs:
         run: |
           set -euo pipefail
           cd "$RUNNER_TEMP/b1-package/bundle";CHANNEL_ID="gi-i65-b1-$GITHUB_RUN_ID";CHANNEL_ID=$(echo "$CHANNEL_ID"|cut -c1-30)
-          npx --yes firebase-tools@14.10.1 hosting:channel:deploy "$CHANNEL_ID" --config firebase.json --project "$PROJECT_ID" --expires 7d --non-interactive --json > "$RUNNER_TEMP/b1-preview.json";export DEPLOY="$RUNNER_TEMP/b1-preview.json"
+          node "$FIREBASE_CLI_BIN" hosting:channel:deploy "$CHANNEL_ID" --config firebase.json --project "$PROJECT_ID" --expires 7d --non-interactive --json > "$RUNNER_TEMP/b1-preview.json";export DEPLOY="$RUNNER_TEMP/b1-preview.json"
           PREVIEW_URL=$(python3 - <<'PY'
           import os,re
           raw=open(os.environ['DEPLOY']).read();prod='https://'+os.environ['HOSTING_SITE']+'.web.app';urls=[u.rstrip('/') for u in re.findall(r'https://[A-Za-z0-9._-]+\.web\.app',raw) if u.rstrip('/')!=prod]
@@ -3043,7 +3047,7 @@ jobs:
         continue-on-error: true
         run: |
           set -euo pipefail
-          if test "${B1_FUNCTION_PREEXISTED:-true}" = false;then npx --yes firebase-tools@14.10.1 functions:delete orbit360TenantBranding --region us-central1 --project "$PROJECT_ID" --force || true;fi
+          if test "${B1_FUNCTION_PREEXISTED:-true}" = false;then node "$FIREBASE_CLI_BIN" functions:delete orbit360TenantBranding --region us-central1 --project "$PROJECT_ID" --force || true;fi
           SNAP="$RUNNER_TEMP/b1-package/evidence/b1-branding-before.json"
           if test -f "$SNAP" && test -f "${GOOGLE_APPLICATION_CREDENTIALS:-}";then export SNAP;FROOT="$RUNNER_TEMP/b1-functions/backend";if test -d "$FROOT";then (cd "$FROOT" && node - <<'NODE'
           const fs=require('fs');const {initializeApp,cert}=require('firebase-admin/app');const {getFirestore,Timestamp}=require('firebase-admin/firestore');const sa=JSON.parse(fs.readFileSync(process.env.GOOGLE_APPLICATION_CREDENTIALS));initializeApp({credential:cert(sa),projectId:process.env.PROJECT_ID});const db=getFirestore(),s=JSON.parse(fs.readFileSync(process.env.SNAP)),revive=v=>{if(v&&typeof v==='object'&&Object.keys(v).length===1&&v.__timestampMillis!=null)return Timestamp.fromMillis(v.__timestampMillis);if(Array.isArray(v))return v.map(revive);if(v&&typeof v==='object')return Object.fromEntries(Object.entries(v).map(([k,x])=>[k,revive(x)]));return v;};(async()=>{const ref=db.collection('tenants').doc(process.env.TENANT_HINT).collection('config').doc('branding');if(s.exists)await ref.set(revive(s.data),{merge:false});else await ref.delete();if(process.env.B1_SEED_EVENT_ID)await db.collection('tenants').doc(process.env.TENANT_HINT).collection('configEvents').doc(process.env.B1_SEED_EVENT_ID).delete();console.log('B1_ROLLBACK=PASS');})().catch(e=>{console.error(e);process.exit(1);});

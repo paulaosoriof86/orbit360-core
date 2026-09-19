@@ -87,13 +87,14 @@
   },
   "candidatePreparedAt": "2026-09-19",
   "lastAttempt": {
-    "runId": 35455524722,
-    "jobId": 105929991048,
-    "status": "FAILED_PRE_DEPLOY_SOURCE_CONTRACT",
-    "cause": "Workflow assertion searched for exported function name inside bootstrap, while bootstrap correctly composes the module through require('./tenant-branding').",
-    "backendDeployed": false,
+    "runId": 35455592819,
+    "jobId": 105930168443,
+    "status": "FAILED_PRE_PREVIEW_FIREBASE_CLI_EXTENSION_DISCOVERY",
+    "cause": "Unpatched firebase-tools queried Firebase Extensions during selective function deploy and received 403. Reusing the already certified empty-extensions CLI workaround from I5.",
+    "functionCreated": false,
     "brandingSeedWritten": false,
     "previewDeployed": false,
-    "operationalWrites": 0
+    "operationalWrites": 0,
+    "rollbackStep": "PASS_NO_NEW_FUNCTION_TO_DELETE"
   }
 }

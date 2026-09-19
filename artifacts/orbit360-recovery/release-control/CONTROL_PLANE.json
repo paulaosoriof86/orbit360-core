@@ -1942,7 +1942,7 @@
     "addendumBlobSha": "05099a90cfb4862eec97e0359d55932828cb930b",
     "forensicAuditBlobSha": "fcfdf29c9eb851d76cebf67bcbe36d8ed308eb0f",
     "paymentInferenceBlobSha": "cfb026ded52c36083528de658a70191c8380d725",
-    "mechanismSyncStatus": "B1_SOURCE_CONTRACT_ASSERTION_FIXED_PENDING_RETRY",
+    "mechanismSyncStatus": "B1_CERTIFIED_FIREBASE_CLI_WORKAROUND_BOUND_PENDING_RETRY",
     "guardFailureBeforeFix": {
       "runId": 35450692628,
       "code": "I6_5_NEXT_ACTION_INVALID",
@@ -1951,17 +1951,20 @@
       "livePromotion": false
     },
     "b1ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B1_EXECUTION_LOCK_20260919.json",
-    "b1ExecutionLockBlobSha": "e880b1c6043a304d19cd8d680eb3b4fc83953962",
+    "b1ExecutionLockBlobSha": "bdaa3f384d37404ef77ec8936d4fe4451d67d4f6",
     "b1": {
       "status": "CANDIDATE_PENDING_PREVIEW",
       "sourceBinding": "THIS_COMMIT_GITHUB_SHA",
       "parentHead": "1efa2d70f86efa5927a8dff7ecd0bc4ec07e7f43",
       "livePromoted": false,
-      "lastAttemptRunId": 35455524722,
-      "lastFailureStage": "PRE_DEPLOY_SOURCE_CONTRACT",
+      "lastAttemptRunId": 35455592819,
+      "lastFailureStage": "PRE_PREVIEW_SELECTIVE_FUNCTION_DEPLOY",
       "backendDeployed": false,
       "previewDeployed": false,
-      "operationalWrites": 0
+      "operationalWrites": 0,
+      "cause": "firebase-tools extension discovery 403; certified I5 workaround reused",
+      "functionCreated": false,
+      "brandingSeedWritten": false
     }
   }
 }
