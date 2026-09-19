@@ -1803,7 +1803,7 @@
   },
   "i65ReleaseMechanismAntiDesync": {
     "path": "artifacts/orbit360-recovery/release-control/I6_RELEASE_MECHANISM_ANTI_DESYNC_LOCK_20260918.json",
-    "blobSha": "311477092f233a22c55b7d2595f33ca62c9ba3c4",
+    "blobSha": "df3e1dab751e016a3ce60e56f24be263a3ecfd4c",
     "status": "FROZEN_ACTIVE",
     "duplicateJobIdsResolved": true,
     "previewReferenceCheckResolved": true,
@@ -1813,7 +1813,12 @@
     "deterministicApplyRepeatAuthorized": false,
     "ciActorMayUseUnverifiedActiveManager": true,
     "publicLoginStillRequiresEmailVerified": true,
-    "proofActorSelection": "ACTIVE_AUTH_LINKED_EFFECTIVE_SCOPE_NO_PERSON_HARDCODE"
+    "proofActorSelection": "ACTIVE_AUTH_LINKED_EFFECTIVE_SCOPE_NO_PERSON_HARDCODE",
+    "sealBrandingSchemaResolved": true,
+    "lastSealFailureRunId": 35415297391,
+    "lastSealFailureStage": "POST_LIVE_SEAL",
+    "lastSealFailureCause": "LEGACY_PUBLIC_UI_FIELD_ASSERTION_AFTER_V3_PROOF_PASS",
+    "lastRollbackStatus": "PASS"
   },
   "preI65OperationalClosureCertifiedCandidate": {
     "sourceSha": "63a837194988d3f3e9c758f5bf411c1da9a7c50a",

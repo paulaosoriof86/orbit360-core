@@ -26,6 +26,13 @@
       "cause": "Proof role extractor omitted rolesDisponibles/activeRole surfaces.",
       "correction": "CI actor selection is identity-agnostic: choose the active Auth-linked member with the strongest effective scope/role signal; no person name/email is encoded.",
       "followup": "Current tenant has no selectable emailVerified manager for CI proof. Runtime proof may use an active non-disabled manager via Firebase custom token only; public login remains independently fail-closed on emailVerified=true."
+    },
+    {
+      "id": "OPERATIONAL_SEAL_BRANDING_SCHEMA_MISMATCH",
+      "status": "RESOLVED_IN_THIS_CANDIDATE",
+      "evidence": "Run 35415297391 passed exact Preview readback, Preview operational closure proof, exact LIVE readback and LIVE operational closure proof with zero writes, then seal rejected legacy publicUi fields and automatic rollback passed.",
+      "cause": "The functional proof schema V3 reports tenantKey, tenantLogo, loginTenantLogo, brandName, eyebrow, faviconTenant and brandingSource, while the seal still asserted deprecated placeholder, brandMark and favicon fields.",
+      "correction": "Seal branding assertion now consumes the same V3 publicUi contract already proven in Preview and LIVE; branding requirements remain strict and unchanged."
     }
   ],
   "invariants": [
@@ -39,7 +46,8 @@
     "I6.5 receipt/portfolio deterministic writes are not repeated.",
     "CI custom-token proof may select an active non-disabled manager even if email is unverified only to exercise runtime; it must never alter the product login requirement or claim email verification.",
     "Public login source contract must continue to reject rawUser.emailVerified!==true and ACCOUNT_NOT_READY.",
-    "CI proof actor selection is based on effective membership scope and Auth linkage, not a required textual manager label."
+    "CI proof actor selection is based on effective membership scope and Auth linkage, not a required textual manager label.",
+    "Operational closure seal must validate the same publicUi evidence schema emitted by the operational closure functional proof."
   ],
-  "nextStep": "RERUN_BOUNDED_OPERATIONAL_CLOSURE_WITH_EFFECTIVE_SCOPE_ACTOR"
+  "nextStep": "RERUN_SAME_OPERATIONAL_CLOSURE_AFTER_SEAL_SCHEMA_SYNC"
 }
