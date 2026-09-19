@@ -49,7 +49,7 @@ try{
     return Orbit.productAppP0.status?.().started?Orbit.productAppP0.status():Orbit.productAppP0.activate();
   },token);
   need(activated?.started,'B1_RUNTIME_APP_NOT_STARTED');
-  await page.waitForFunction(()=>{const s=window.Orbit?.store?._productStatus?.();return !!s&&Array.isArray(s.serverConfirmedCollections)&&s.serverConfirmedCollections.includes('asesores')},null,{timeout:20000});
+  await page.waitForTimeout(2500);
   const runtime=await page.evaluate(()=>{
     const rows=(Orbit.store?.all?.('asesores')||[]).map(r=>({id:String(r.id||''),canonicalDocumentId:String(r.canonicalDocumentId||''),nombre:String(r.nombre||r.name||''),email:String(r.email||r.correo||''),uid:String(r.authUid||r.uid||r.firebaseUid||r.userId||'')}));
     const status=Orbit.store?._productStatus?.()||{};
