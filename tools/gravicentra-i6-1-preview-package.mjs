@@ -11,6 +11,7 @@ const TENANT_HINT=process.env.TENANT_HINT||'';
 const RELEASE_GATE=process.env.RELEASE_GATE||'I6.1';
 const BUILD_PREFIX=process.env.BUILD_PREFIX||'gi-i61';
 const ENVIRONMENT_REF=process.env.ENVIRONMENT_REF||'firebase-hosting-preview-i6-1';
+const TENANT_BRANDING_SNAPSHOT_FILE=process.env.TENANT_BRANDING_SNAPSHOT_FILE||'';
 const SRC=path.resolve(sourceRoot,'orbit360-platform');
 const FUNCTIONS_SRC=path.resolve(sourceRoot,'functions');
 const PACKAGE=path.resolve(packageRoot);
@@ -76,6 +77,49 @@ const payload={enabled:true,environmentRef:ENVIRONMENT_REF,tenantHint:TENANT_HIN
 fs.writeFileSync(path.join(SITE,'product-runtime-config.js'),'/* Generated only inside the certified I6.1 successor artifact. Public Firebase Web config; no secrets. */\nwindow.__ORBIT360_PRODUCT_PUBLIC_CONFIG__ = Object.freeze('+JSON.stringify(payload)+');\n');
 fs.mkdirSync(path.join(SITE,'__recovery__'),{recursive:true});fs.writeFileSync(path.join(SITE,'__recovery__/build.json'),JSON.stringify({product:'Gravicentra Insurance',gate:RELEASE_GATE,sourceSha:SOURCE_SHA,buildId,environmentRef:ENVIRONMENT_REF})+'\n');
 fs.writeFileSync(path.join(EVIDENCE,'public-config-descriptor.json'),JSON.stringify({projectId:cfg.projectId,authDomain:cfg.authDomain,appIdPresent:true,apiKeyPresent:true,storageBucketPresent:!!cfg.storageBucket,configSha256:cfgHash})+'\n');
+if(!TENANT_BRANDING_SNAPSHOT_FILE||!fs.existsSync(TENANT_BRANDING_SNAPSHOT_FILE))throw new Error('TENANT_BRANDING_SNAPSHOT_FILE_REQUIRED');
+const brandingSnapshot=JSON.parse(read(TENANT_BRANDING_SNAPSHOT_FILE));
+if(
+  brandingSnapshot.tenantId!==TENANT_HINT||
+  !brandingSnapshot.branding||
+  !String(brandingSnapshot.branding.displayName||'').trim()||
+  !String(brandingSnapshot.branding.logo||'').trim()||
+  !String(brandingSnapshot.branding.favicon||'').trim()||
+  !/^[0-9a-f]{64}$/.test(String(brandingSnapshot.hash||''))
+)throw new Error('TENANT_BRANDING_SNAPSHOT_INVALID');
+const generatedBranding={
+  schemaVersion:'gravicentra-tenant-branding-build-snapshot-v1',
+  tenantId:TENANT_HINT,
+  version:String(brandingSnapshot.version||''),
+  hash:brandingSnapshot.hash,
+  sourcePath:String(brandingSnapshot.sourcePath||''),
+  sourceUpdatedAt:String(brandingSnapshot.sourceUpdatedAt||''),
+  generatedAt:String(brandingSnapshot.generatedAt||''),
+  branding:brandingSnapshot.branding
+};
+fs.mkdirSync(path.join(SITE,'data'),{recursive:true});
+fs.writeFileSync(
+  path.join(SITE,'data/tenant-public-branding-snapshot.generated.js'),
+  '/* Generated inside certified artifact; public tenant branding, no secrets. */\nwindow.__ORBIT360_TENANT_BRANDING_SNAPSHOT__ = Object.freeze('+JSON.stringify(generatedBranding)+');\n'
+);
+let artifactIndex=read(path.join(SITE,'index.html'));
+const brandingScript=/<script\s+src=["']core\/public-tenant-branding\.js[^"']*["']\s*><\/script>/i;
+if(!brandingScript.test(artifactIndex))throw new Error('PUBLIC_BRANDING_SCRIPT_TAG_MISSING');
+artifactIndex=artifactIndex.replace(
+  brandingScript,
+  '<script src="data/tenant-public-branding-snapshot.generated.js"></script>\nfs.writeFileSync(path.join(EVIDENCE,'public-config-descriptor.json'),JSON.stringify({projectId:cfg.projectId,authDomain:cfg.authDomain,appIdPresent:true,apiKeyPresent:true,storageBucketPresent:!!cfg.storageBucket,configSha256:cfgHash})+'\n');'
+);
+fs.writeFileSync(path.join(SITE,'index.html'),artifactIndex);
+fs.writeFileSync(
+  path.join(EVIDENCE,'tenant-branding-snapshot-descriptor.json'),
+  JSON.stringify({
+    tenantId:TENANT_HINT,
+    hash:brandingSnapshot.hash,
+    version:brandingSnapshot.version,
+    sourcePath:brandingSnapshot.sourcePath,
+    sourceUpdatedAt:brandingSnapshot.sourceUpdatedAt
+  })+'\n'
+);
 
 function pinReleaseRuntime(rel,replacements){
   const target=path.join(SITE,rel);
