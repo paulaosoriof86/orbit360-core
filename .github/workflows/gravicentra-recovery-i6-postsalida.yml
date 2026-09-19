@@ -3146,7 +3146,7 @@ jobs:
           B1_EQUIPO_RUNTIME_OUT: ${{ runner.temp }}/b1-equipo-runtime
         run: node tools/gravicentra-i6-5-b1-equipo-runtime-readonly.mjs
       - name: Upload Equipo runtime read-only evidence
-        if: steps.mode.outputs.run == 'true'
+        if: always() && steps.mode.outputs.run == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: gravicentra-i6-5-b1-equipo-runtime-${{ github.run_id }}

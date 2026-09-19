@@ -65,5 +65,6 @@ finally{
   console.log('B1_EQUIPO_RUNTIME='+ev.status);
   console.log('B1_EQUIPO_STORE='+JSON.stringify(ev.store));
   console.log('B1_EQUIPO_UI='+JSON.stringify(ev.ui));
+  console.log('B1_EQUIPO_ERRORS='+JSON.stringify(ev.errors));
   console.log('B1_EQUIPO_WRITES=0');
 }
