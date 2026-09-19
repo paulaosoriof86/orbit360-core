@@ -226,8 +226,9 @@ try{
   browser=await chromium.launch({headless:true});
   context=await browser.newContext({viewport:{width:1500,height:1000}});
   page=await context.newPage();
-  const pageErrors=[];
+  const pageErrors=[],consoleEvents=[];
   page.on('pageerror',e=>pageErrors.push(clean(e?.message||e)));
+  page.on('console',m=>consoleEvents.push({type:m.type(),text:clean(m.text(),1200)}));
 
   let brandingReleased=false;
   await page.route('**/orbit360TenantBranding',async route=>{
@@ -295,14 +296,46 @@ try{
   need(incomplete,'B1_NO_EXISTING_INCOMPLETE_USER');
   const beforeReal=semanticAdvisor(incomplete);
   realRollback={id:incomplete.id,before:incomplete};
-  ev.team.realExisting={advisorId:incomplete.id,incomplete:true,before:beforeReal};
+  ev.team.realExisting={
+    advisorId:incomplete.id,
+    dataId:clean(incomplete.id,180),
+    storedId:clean(incomplete.id||'',180),
+    canonicalDocumentId:clean(incomplete.canonicalDocumentId||incomplete.id,180),
+    incomplete:true,
+    before:beforeReal
+  };
 
   await reopen(page,incomplete.id);
+  ev.team.realExisting.uiIdentity=await page.evaluate(id=>{
+    const row=Orbit.store.get('asesores',id);
+    return row?{
+      id:String(row.id||''),
+      canonicalDocumentId:String(row.canonicalDocumentId||''),
+      legacyDataId:String(row.legacyDataId||''),
+      projectionOnly:row.projectionOnly===true,
+      nombre:String(row.nombre||''),
+      roles:[].concat(row.roles||row.rol||[]),
+      paises:[].concat(row.paises||row.pais||[])
+    }:null;
+  },incomplete.id);
   if(await page.locator('#eu-sync-access').count()) await page.locator('#eu-sync-access').uncheck();
   const tempPhone=beforeReal.telefono==='+502 0000 0000'?'+502 0000 0001':'+502 0000 0000';
   await page.fill('#eu-tel',tempPhone);
   await page.click('#eu-ok');
-  await page.waitForSelector('#eq-edit',{state:'detached',timeout:15000});
+  const firstSaveOutcome=await Promise.race([
+    page.waitForSelector('#eq-edit',{state:'detached',timeout:15000}).then(()=>({closed:true})),
+    page.waitForFunction(()=>[...document.querySelectorAll('.ciclo-toast')].some(x=>/No fue posible guardar|identidad canónica|Indica /i.test(x.textContent||'')),null,{timeout:15000})
+      .then(()=>page.evaluate(()=>({
+        closed:!document.getElementById('eq-edit'),
+        toasts:[...document.querySelectorAll('.ciclo-toast')].map(x=>String(x.textContent||'')),
+        saveText:String(document.querySelector('#eu-ok')?.textContent||''),
+        saveBusy:String(document.querySelector('#eu-ok')?.dataset?.busy||''),
+        storeStatus:Orbit.store?._productStatus?.()||null
+      })))
+  ]).catch(e=>({timeout:true,error:String(e?.message||e)}));
+  ev.team.realExisting.firstSaveOutcome=firstSaveOutcome;
+  ev.team.realExisting.consoleEvents=consoleEvents.slice(-12);
+  need(firstSaveOutcome.closed===true,'B1_REAL_EDIT_UI_SAVE_FAILED:'+JSON.stringify(firstSaveOutcome)+':'+JSON.stringify(consoleEvents.slice(-8)));
   const changedReal=await waitFor(async()=>{const x=await canonical(db,incomplete.id);return x&&clean(x.telefono,120)===tempPhone?x:null;},'B1_REAL_EDIT_READBACK');
   ev.writes.advisorOperational++;ev.writes.auditOperational++;
 
