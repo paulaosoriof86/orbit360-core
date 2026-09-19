@@ -15,13 +15,17 @@ const need=(ok,msg)=>{if(!ok)throw new Error(msg)};
 function sa(){for(const k of ['SA_DEFAULT','SA_ORBIT360_LAB','SA_ORBIT_360_LAB']){try{const x=JSON.parse(process.env[k]||'');if(x?.type==='service_account'&&x?.project_id===PROJECT&&x?.client_email&&x?.private_key)return x;}catch{}}throw new Error('B1_RUNTIME_SERVICE_ACCOUNT_MISSING')}
 function roles(m){return [...new Set([].concat(m?.roles||[],m?.rolesAsignados||[],m?.assignedRoles||[],m?.role||[],m?.rol||[],m?.rolDefault||[],m?.defaultRole||[],m?.activeRole||[]).map(clean).filter(Boolean))]}
 async function actor(db,auth){
-  const s=await db.collection('tenants').doc(TENANT).collection('members').get(),rows=[];
-  for(const d of s.docs){
+  const snap=await db.collection('tenants').doc(TENANT).collection('members').get(),rows=[];
+  for(const d of snap.docs){
     const m=d.data()||{},uid=clean(m.uid||d.id),st=norm(m.status||m.estado||'active');
     if(!uid||m.active===false||m.activo===false||['inactive','inactivo','blocked','bloqueado','suspended','suspendido'].includes(st))continue;
-    try{const u=await auth.getUser(uid);if(u.disabled)continue;const rr=roles(m),manager=rr.some(r=>['direccion','superadmin','super_admin','admintenant','admin_tenant','admin'].includes(norm(r)));if(manager)rows.push({uid,verified:u.emailVerified===true,roles:rr});}catch{}
+    try{
+      const u=await auth.getUser(uid);if(u.disabled)continue;
+      const rr=roles(m),manager=rr.some(r=>['direccion','superadmin','super_admin','admintenant','admin_tenant','admin'].includes(norm(r)));
+      rows.push({uid,verified:u.emailVerified===true,roles:rr,score:(manager?100:0)+(u.emailVerified?5:0)});
+    }catch{}
   }
-  rows.sort((a,b)=>(b.verified?1:0)-(a.verified?1:0));need(rows.length,'B1_RUNTIME_NO_MANAGER_ACTOR');return rows[0];
+  rows.sort((a,b)=>b.score-a.score);need(rows.length,'B1_RUNTIME_NO_ACTIVE_ACTOR');return rows[0];
 }
 fs.mkdirSync(OUT,{recursive:true});
 const lock=JSON.parse(fs.readFileSync(LOCK,'utf8'));
