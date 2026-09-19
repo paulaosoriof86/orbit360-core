@@ -1,6 +1,6 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B1_EXECUTION_LOCK_V1",
-  "status": "VISUAL_REJECTED_R2_ROOT_CAUSE_REQUIRED",
+  "status": "CANDIDATE_PENDING_PREVIEW",
   "date": "2026-09-19",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -84,7 +84,19 @@
       "syntheticAdvisorCreateRefreshCleanup": true,
       "authLifecycleAllowedOnlyForSyntheticIdentity": true,
       "membershipLifecycleAllowedOnlyForSyntheticIdentity": true,
-      "cleanupRequired": true
+      "cleanupRequired": true,
+      "cleanupAdminWritesAuthorized": true,
+      "cleanupOnlySyntheticIdentity": true,
+      "cleanupCollections": [
+        "asesores",
+        "auditoria",
+        "members",
+        "onboardingRequests",
+        "auditEvents"
+      ],
+      "operationalRequestAndEventEvidenceMayRemain": true,
+      "realUserAuthMutationForbidden": true,
+      "realUserMembershipMutationForbidden": true
     }
   },
   "requiredFixes": [
@@ -110,9 +122,10 @@
   "conversationDependent": false,
   "productCandidate": {
     "binding": "THIS_COMMIT_GITHUB_SHA",
-    "parentHead": "486b19ace88f6671af3af72041f95016d2202c12",
-    "revision": 2,
-    "livePromoted": false
+    "parentHead": "a97a9d7d5c2bc9860480d816f23f4c7043d62161",
+    "revision": 3,
+    "livePromoted": false,
+    "rootCauseStatus": "CONFIRMED_R3"
   },
   "candidatePreparedAt": "2026-09-19",
   "lastAttempt": {
@@ -140,7 +153,7 @@
     "operationalWrites": 0,
     "livePromoted": false
   },
-  "revision": 2,
+  "revision": 3,
   "previousPreview": {
     "sourceSha": "6c8ffff3cd7d23edc6e5a68fd4822db77dfa7fb0",
     "buildId": "gi-i65-b1-6c8ffff3cd7d-57f234755dc1",
@@ -253,5 +266,16 @@
       "projectionRowsVisible": true,
       "activeMembershipsWithoutCanonicalAdvisor": 5
     }
+  },
+  "r3Execution": {
+    "status": "AUTHORIZED_PENDING_PREVIEW",
+    "rootCauseFrozen": true,
+    "proofVersion": "GRAVICENTRA_I6_5_B1_PREVIEW_PROOF_V3",
+    "requiresRealOperationalWrites": true,
+    "requiresCanonicalReadback": true,
+    "requiresRefreshReopen": true,
+    "requiresRestore": true,
+    "requiresSyntheticCreateAuthLoginCleanup": true,
+    "liveHostingPromotionAuthorized": false
   }
 }
