@@ -3048,3 +3048,6 @@ jobs:
           NODE
           git add "$CONTROL";git config user.name gravicentra-recovery-bot;git config user.email gravicentra-recovery-bot@users.noreply.github.com;git commit -m "freeze(i6.5): B1 preview pass pending visual";git push origin "HEAD:$GITHUB_REF_NAME"
       - name: B1 failure leaves operational data untouched
+        if: ${{ failure() && steps.mode.outputs.mode == 'preview' }}
+        continue-on-error: true
+        run: echo "B1_R2_DATA_WRITES=0"
