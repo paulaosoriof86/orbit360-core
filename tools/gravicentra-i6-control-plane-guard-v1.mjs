@@ -291,7 +291,7 @@ if(activeI65){
     const forensicBlock=String(FR.currentBlock||'');
     if(FR.status==='FROZEN_ACTIVE'&&forensicBlock==='B1'){
       need(FR.currentReadinessPercent===70&&FR.nextTargetPercent===80&&FR.previewAfterEveryBlockRequired===true&&FR.sameArtifactPreviewToLiveRequired===true,'I6_5_FORENSIC_B1_STATE_INVALID');
-      need(['I6_5_FORENSIC_REMEDIATION_B1_PREVIEW','I6_5_FORENSIC_REMEDIATION_B1_VISUAL'].includes(C.nextAction),'I6_5_FORENSIC_B1_ACTION_INVALID');
+      need(['I6_5_FORENSIC_REMEDIATION_B1_PREVIEW','I6_5_FORENSIC_REMEDIATION_B1_VISUAL','I6_5_FORENSIC_REMEDIATION_B1_R3_ROOT_CAUSE'].includes(C.nextAction),'I6_5_FORENSIC_B1_ACTION_INVALID');
     }else{
       need(C.nextAction===expectedI65Action,'I6_5_NEXT_ACTION_INVALID');
     }
@@ -389,7 +389,7 @@ const allowedI64Product=new Set((i64DefectPending||i64DefectLive)&&Array.isArray
 const allowedI65Product=new Set((i65SyncDefectPending||i65SyncDefectLive)&&Array.isArray(i65SyncCodeDefect.allowedProductFiles)?i65SyncCodeDefect.allowedProductFiles:[]);
 const allowedI65HydrationProduct=new Set((i65HydrationDefectPending||i65HydrationDefectLive)&&Array.isArray(i65HydrationDefect.allowedProductFiles)?i65HydrationDefect.allowedProductFiles:[]);
 const allowedI65OperationalProduct=new Set((i65OperationalClosurePending||i65OperationalClosureLive)&&Array.isArray(i65OperationalClosure.allowedProductFiles)?i65OperationalClosure.allowedProductFiles:[]);
-const b1Active=activeI65&&C.i65ForensicRemediationPlan?.currentBlock==='B1'&&['PREPARED_FOR_CANDIDATE','CANDIDATE_PENDING_PREVIEW','PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL'].includes(String(B1.status||''));
+const b1Active=activeI65&&C.i65ForensicRemediationPlan?.currentBlock==='B1'&&['PREPARED_FOR_CANDIDATE','CANDIDATE_PENDING_PREVIEW','PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL','VISUAL_REJECTED_R2_ROOT_CAUSE_REQUIRED'].includes(String(B1.status||''));
 const allowedI65ForensicB1Product=new Set(b1Active&&Array.isArray(B1.allowedProductFiles)?B1.allowedProductFiles:[]);
 const forbidden=changed.filter(p=>!allowedPrefixes.some(prefix=>p.startsWith(prefix))&&!allowedSuccessorProduct.has(p)&&!allowedI63Product.has(p)&&!allowedI64Product.has(p)&&!allowedI65Product.has(p)&&!allowedI65HydrationProduct.has(p)&&!allowedI65OperationalProduct.has(p)&&!allowedI65ForensicB1Product.has(p));
 need(forbidden.length===0,'I6_PRODUCT_SOURCE_DRIFT_OUTSIDE_BOUND_SUCCESSOR:'+forbidden.slice(0,20).join(','));

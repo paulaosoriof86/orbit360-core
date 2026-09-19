@@ -1,6 +1,6 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B1_EXECUTION_LOCK_V1",
-  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+  "status": "VISUAL_REJECTED_R2_ROOT_CAUSE_REQUIRED",
   "date": "2026-09-19",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -158,5 +158,45 @@
     "exactReadback": true,
     "functionalPass": true,
     "operationalWrites": 0
-  }
+  },
+  "visualReview": {
+    "status": "REJECTED",
+    "reviewedAt": "2026-09-19T16:27:00-06:00",
+    "evidence": "Paula screenshots in continuation chat",
+    "findings": [
+      {
+        "id": "B1R2_LOGO_FIRST_PAINT",
+        "status": "CONFIRMED",
+        "rootCauseStatus": "CONFIRMED",
+        "rootCause": "Branding runtime hides the company-logo containers until an asynchronous callable fetch completes. Therefore the first paint can be blank and the logo appears later.",
+        "requiredFix": "Inject the last-known canonical branding snapshot into the immutable build artifact at build time (not source code), render it on first paint, then refresh from the live branding owner without visual jump."
+      },
+      {
+        "id": "B1R2_LOGO_FIT_CENTER",
+        "status": "CONFIRMED",
+        "rootCauseStatus": "CONFIRMED",
+        "rootCause": "The same full logo asset is rendered in three contexts with runtime inline sizing that does not preserve a centered context-specific frame, producing disproportion/cropping/alignment differences.",
+        "requiredFix": "Use explicit context-specific aspect-ratio-safe wrappers with object-fit contain and centered object-position; no duplicated tenant text around the logo."
+      },
+      {
+        "id": "B1R2_TEAM_EDIT_NOT_FOUND",
+        "status": "CONFIRMED",
+        "rootCauseStatus": "NOT_YET_PROVEN",
+        "knownFacts": [
+          "The callable endpoints are reachable; the B1 R2 automated proof only tested reachability and intentionally executed 0 business writes.",
+          "The operational backend returns functions/not-found when an UPDATE targets a canonical document ID that does not exist.",
+          "The product read store currently prefers row data.id over Firestore doc.id, so a legacy/stale data.id can be shown in the UI and then sent as the update target."
+        ],
+        "requiredDiagnostic": "Read-only compare every visible asesores row: Firestore doc.id vs stored data.id vs UI id used by Equipo. Reproduce the failing user and capture the exact mutation target and backend message. Do not patch until this is proven."
+      },
+      {
+        "id": "B1R2_TEST_GAP",
+        "status": "CONFIRMED",
+        "rootCauseStatus": "CONFIRMED",
+        "rootCause": "The technical B1 proof declared PASS after endpoint reachability and zero operational writes; it never executed the exact user edit/save transaction that Paula was asked to validate.",
+        "requiredFix": "B1 cannot pass again until an authenticated controlled edit performs server commit + canonical readback + refresh persistence on a real test record, with cleanup or idempotent restoration."
+      }
+    ]
+  },
+  "readinessCurrent": 70
 }

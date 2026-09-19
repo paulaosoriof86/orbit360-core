@@ -713,7 +713,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B1_VISUAL",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B1_R3_ROOT_CAUSE",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -1942,7 +1942,7 @@
     "addendumBlobSha": "05099a90cfb4862eec97e0359d55932828cb930b",
     "forensicAuditBlobSha": "fcfdf29c9eb851d76cebf67bcbe36d8ed308eb0f",
     "paymentInferenceBlobSha": "cfb026ded52c36083528de658a70191c8380d725",
-    "mechanismSyncStatus": "B1_R2_PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+    "mechanismSyncStatus": "B1_R2_VISUAL_REJECTED_ROOT_CAUSE_REQUIRED",
     "guardFailureBeforeFix": {
       "runId": 35450692628,
       "code": "I6_5_NEXT_ACTION_INVALID",
@@ -1951,9 +1951,9 @@
       "livePromotion": false
     },
     "b1ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B1_EXECUTION_LOCK_20260919.json",
-    "b1ExecutionLockBlobSha": "31a4d4e094e1cadbcaf4d9ea23715086a6179cba",
+    "b1ExecutionLockBlobSha": "7b62bf0846852603f1ec6f1c16b6b461a75fa51a",
     "b1": {
-      "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+      "status": "VISUAL_REJECTED_R2_ROOT_CAUSE_REQUIRED",
       "sourceSha": "e2cad9e8872267a24a41af9dfee765a49a33f673",
       "buildId": "gi-i65-b1-e2cad9e88722-57f234755dc1",
       "previewUrl": "https://ays-orbit-360-lab--gi-i65-b1-35455766715-ylc10xr5.web.app",
@@ -1964,7 +1964,15 @@
       "artifactDigest": "148fce7c65598e7558bf09faebb6f4c41835c4b5853525844c831babbd6eb3c7",
       "exactReadback": true,
       "functionalPass": true,
-      "operationalWrites": 0
+      "operationalWrites": 0,
+      "visualAccepted": false,
+      "rootCauseRequiredBeforeCodeChange": true,
+      "rejectedFindings": [
+        "LOGO_FIRST_PAINT",
+        "LOGO_FIT_CENTER",
+        "TEAM_EDIT_NOT_FOUND",
+        "TEST_GAP"
+      ]
     }
   }
 }
