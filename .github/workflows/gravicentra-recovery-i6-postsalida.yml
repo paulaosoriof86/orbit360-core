@@ -52,6 +52,7 @@ on:
       - 'artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B1_EXECUTION_LOCK_20260919.json'
       - 'tools/gravicentra-i6-5-b1-functional.mjs'
       - 'tools/gravicentra-i6-5-b1-advisor-identity-readonly.mjs'
+      - 'tools/gravicentra-i6-5-b1-equipo-runtime-readonly.mjs'
       - 'functions/tenant-branding.js'
       - 'orbit360-platform/core/public-tenant-branding.js'
       - 'orbit360-platform/modules/configuracion.js'
@@ -3099,5 +3100,56 @@ jobs:
         with:
           name: gravicentra-i6-5-b1-advisor-identity-${{ github.run_id }}
           path: ${{ runner.temp }}/b1-advisor-identity/*
+          compression-level: 0
+          retention-days: 14
+
+  i65-b1-equipo-runtime-diagnostic:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      B1_LOCK: artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B1_EXECUTION_LOCK_20260919.json
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Gate B1 R3 authenticated runtime diagnostic
+        id: mode
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          node - <<'NODE'
+          const fs=require('node:fs'),c=JSON.parse(fs.readFileSync(process.env.CONTROL)),b=JSON.parse(fs.readFileSync(process.env.B1_LOCK));
+          const run=b.status==='VISUAL_REJECTED_R2_ROOT_CAUSE_REQUIRED'&&c.nextAction==='I6_5_FORENSIC_REMEDIATION_B1_R3_ROOT_CAUSE'&&c.i65ForensicRemediationPlan?.currentBlock==='B1';
+          if(run&&(c.i6Execution?.dataMutationAuthorized!==false||b.boundaries?.liveHostingPromotionAuthorized!==false))throw Error('B1_R3_RUNTIME_READONLY_BOUNDARY_INVALID');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(run?'true':'false')+'\n');
+          NODE
+      - name: Assert LIVE unchanged
+        if: steps.mode.outputs.run == 'true'
+        run: node tools/gravicentra-certified-live-binding-check.mjs
+      - name: Install runtime diagnostic dependencies
+        if: steps.mode.outputs.run == 'true'
+        run: |
+          npm install --no-save --package-lock=false firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
+          npx playwright install --with-deps chromium >/dev/null
+      - name: Execute authenticated Equipo runtime read-only diagnostic
+        if: steps.mode.outputs.run == 'true'
+        env:
+          B1_LOCK_FILE: ${{ env.B1_LOCK }}
+          B1_EQUIPO_RUNTIME_OUT: ${{ runner.temp }}/b1-equipo-runtime
+        run: node tools/gravicentra-i6-5-b1-equipo-runtime-readonly.mjs
+      - name: Upload Equipo runtime read-only evidence
+        if: steps.mode.outputs.run == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i6-5-b1-equipo-runtime-${{ github.run_id }}
+          path: ${{ runner.temp }}/b1-equipo-runtime/*
           compression-level: 0
           retention-days: 14
