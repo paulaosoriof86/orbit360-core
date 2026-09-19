@@ -1,0 +1,113 @@
+{
+  "schema": "GRAVICENTRA_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V1",
+  "status": "FROZEN_ACTIVE",
+  "date": "2026-09-19",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "scope": "I6.5 remediation + I6.6 payments/cobros/reconciliation",
+  "authority": "USER_APPROVED_BUSINESS_RULE",
+  "decision": "AUTO_RECONCILE_HIGH_CONFIDENCE_EVIDENCE_AND_BACKFILL_PRIOR_CONTIGUOUS_INSTALLMENTS",
+  "principles": [
+    "An expected receipt is an obligation, not proof of payment.",
+    "A real payment evidence item may directly confirm a specific installment and may also prove prior contiguous installments by business-sequence inference.",
+    "Inference is allowed only from real external/internal payment evidence, never from the mere existence, due date, or overdue status of an obligation.",
+    "The reconciliation engine must preserve direct-vs-inferred provenance for every installment it marks paid/conciliated.",
+    "A later direct evidence item must never create duplicate cobros for installments already reconciled."
+  ],
+  "evidenceRules": [
+    {
+      "id": "INVOICE_INSTALLMENT_N",
+      "evidence": "Factura/recibo de aseguradora que identifica el pago/cuota N de una póliza",
+      "directEffect": "Cuota N queda confirmada y conciliada con esa evidencia.",
+      "inferredEffect": "Cuotas anteriores contiguas 1..N-1 se consideran pagadas/conciliadas por inferencia si continúan abiertas y no existe evidencia contradictoria.",
+      "example": "Factura del pago 5 -> pago 5 directo; pagos 1,2,3,4 se cierran por inferencia si estaban pendientes."
+    },
+    {
+      "id": "INSURER_STATEMENT_PENDING_FROM_N",
+      "evidence": "Estado de cuenta de aseguradora indica que la póliza presenta pagos pendientes a partir de la cuota N",
+      "directEffect": "La evidencia prueba que N y posteriores señalados continúan pendientes según el estado.",
+      "inferredEffect": "Cuotas anteriores 1..N-1 se consideran pagadas/conciliadas por inferencia si no hay contradicción.",
+      "example": "Pendientes desde pago 3 -> pagos 1 y 2 se consideran pagados; 3 en adelante permanecen pendientes salvo otra evidencia."
+    },
+    {
+      "id": "COMMISSION_STATEMENT_INSTALLMENT_N",
+      "evidence": "Planilla/estado de comisiones paga comisión correspondiente a la cuota N de una póliza/cliente",
+      "directEffect": "La cuota N se considera recaudada/pagada y puede materializar/reconciliar su cobro.",
+      "inferredEffect": "Cuotas anteriores contiguas 1..N-1 se consideran ya pagadas/conciliadas si seguían abiertas y no hay contradicción.",
+      "example": "Comisión pagada por cuota 4 -> cuota 4 directa; cuotas 1,2,3 por inferencia."
+    },
+    {
+      "id": "BANK_STATEMENT_MATCH",
+      "evidence": "Estado de cuenta bancario contiene pago identificable a cliente/póliza/recibo",
+      "directEffect": "Se materializa/reconcilia el cobro correspondiente al match.",
+      "inferredEffect": "Solo se backfillean cuotas anteriores cuando la propia evidencia y la secuencia contractual permiten concluir continuidad de pagos con alta confianza."
+    },
+    {
+      "id": "EXPLICIT_MANUAL_CONFIRMATION",
+      "evidence": "Usuario autorizado confirma expresamente pago de una cuota desde Cliente 360 o Cobros y cartera",
+      "directEffect": "Se materializa/reconcilia el cobro de la cuota seleccionada con fecha/método/evidencia disponible.",
+      "inferredEffect": "No se infieren cuotas anteriores únicamente por una confirmación manual aislada, salvo que el usuario seleccione explícitamente la opción de conciliar la secuencia anterior o adjunte evidencia que active otra regla."
+    }
+  ],
+  "autoCommitPolicy": {
+    "enabled": true,
+    "mode": "AUTO_COMMIT_WHEN_UNIQUE_HIGH_CONFIDENCE_MATCH",
+    "requiredConditions": [
+      "Existe una única póliza/cliente/recibo compatible con la evidencia.",
+      "La moneda y el contexto contractual son compatibles.",
+      "La numeración/periodicidad de cuotas permite inferir una secuencia contigua.",
+      "No existe evidencia contradictoria de impago, reversión, anulación, pago parcial, refinanciación, cambio de plan o endoso que rompa la secuencia.",
+      "La misma evidencia no fue aplicada previamente.",
+      "El cobro/conciliación se ejecuta idempotentemente en un comando server-owned."
+    ],
+    "failClosedCases": [
+      "Más de un match plausible.",
+      "Monto/moneda/identidad contractual inconsistente.",
+      "Secuencia de cuotas no contigua o renumerada.",
+      "Pago parcial o distribución entre varias obligaciones.",
+      "Evidencia contradictoria.",
+      "Documento sin información suficiente.",
+      "Cobro previamente conciliado con otra evidencia incompatible."
+    ],
+    "failClosedAction": "Crear propuesta de conciliación para revisión humana; no autoescribir cobro."
+  },
+  "backfillBehavior": {
+    "createMissingConfirmedCobrosForPriorInstallments": true,
+    "updateReceiptStatus": true,
+    "updatePortfolioBalance": true,
+    "preserveOriginalDueDate": true,
+    "preservePaymentDateRule": "For inferred prior installments, store inferredPaid=true and evidence date/reference; do not invent an exact historical payment date unless the source provides one. Use evidenceAsOfDate/effectiveReconciliationDate separately from paidDate when the actual paid date is unknown.",
+    "provenanceRequired": [
+      "evidenceType",
+      "evidenceId/sourceRef",
+      "directOrInferred",
+      "anchorInstallment",
+      "inferenceRuleId",
+      "matchedPolicyId",
+      "matchedReceiptId",
+      "reconciledAt",
+      "reconciledBy/systemActor",
+      "confidence"
+    ]
+  },
+  "surfaces": [
+    "Cliente 360 > Recibos y pagos",
+    "Cobros y cartera > listado/detalle",
+    "Importador de factura",
+    "Importador de estado de cuenta",
+    "Importador de planilla/estado de comisiones",
+    "Importador de soporte de pago"
+  ],
+  "antiDuplication": [
+    "One canonical payment/reconciliation command is used by every surface.",
+    "Direct evidence on installment N and inferred closure of prior installments must be committed atomically when possible.",
+    "Later evidence for an already inferred installment enriches provenance instead of creating a second cobro.",
+    "Retries and double-submits must return the prior committed result through idempotency."
+  ],
+  "examples": [
+    "Factura pago 5 + pago 4 pendiente -> conciliar 5 directo y 1-4 por inferencia si siguen abiertos y no hay contradicción.",
+    "Estado aseguradora: pendientes desde pago 3 -> 1 y 2 pagados por inferencia; 3+ pendientes.",
+    "Planilla comisiones paga pago 4 -> pago 4 directo; 1-3 pagados por inferencia."
+  ],
+  "conversationDependent": false
+}
