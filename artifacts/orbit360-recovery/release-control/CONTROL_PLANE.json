@@ -1721,7 +1721,7 @@
     "rollbackExecuted": false
   },
   "i65OperationalClosureDefect": {
-    "status": "I6_5_OPERATIONAL_CLOSURE_CODE_DEFECT_SUCCESSOR_CAUSAL_FIX_PENDING_BUILD",
+    "status": "I6_5_OPERATIONAL_CLOSURE_CODE_DEFECT_CANDIDATE_PENDING_BUILD",
     "classification": "CODE_DEFECT",
     "scope": "I6_5_OPERATIONAL_CLOSURE_MINIFIX",
     "previousCertifiedSourceSha": "7408b41a392b441fc88175584270895313ca5231",
