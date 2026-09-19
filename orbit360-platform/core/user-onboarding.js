@@ -14,28 +14,25 @@ Orbit.userOnboarding = (function () {
 
   function text(value) { return String(value == null ? '' : value).trim(); }
   function backend() { return window.OrbitBackend || {}; }
-  function tenantId() { return text(backend().tenantId || backend().tenant); }
-  function isFirestoreRuntime() {
-    return text(backend().mode).indexOf('firestore') >= 0 && !!tenantId();
+  function provider() { return Orbit.productRuntimeBrowserProvidersP0 || null; }
+  function productUser() { return Orbit.auth && Orbit.auth.productUser || null; }
+  function tenantId() {
+    const user = productUser();
+    const configured = window.__ORBIT360_PRODUCT_PUBLIC_CONFIG__ || {};
+    return text(user && user.tenantId || configured.tenantHint || backend().tenantId || backend().tenant);
   }
-  function firebaseUser() {
-    try { return window.firebase && typeof firebase.auth === 'function' ? firebase.auth().currentUser : null; }
-    catch (error) { return null; }
+  function isFirestoreRuntime() {
+    const p = provider();
+    return !!tenantId() && !!(p && p.serverWriteTransport === 'firebase-functions' && p.noFallback === true && typeof p.initialize === 'function' && typeof p.callFunction === 'function');
   }
   function actor() {
     try { return Orbit.auth && typeof Orbit.auth.user === 'function' ? Orbit.auth.user() || {} : {}; }
     catch (error) { return {}; }
   }
   function available() {
-    const user = firebaseUser();
-    return isFirestoreRuntime() && !!(user && typeof user.getIdToken === 'function');
-  }
-  function endpoint() {
-    let projectId = '';
-    try { projectId = text(firebase.app().options && firebase.app().options.projectId); } catch (error) {}
-    if (!projectId) throw friendly('BACKEND_PROJECT_UNAVAILABLE');
-    const region = text(backend().functionsRegion || DEFAULT_REGION);
-    return `https://${region}-${projectId}.cloudfunctions.net/${FUNCTION_NAME}`;
+    const p = provider();
+    const user = productUser();
+    return isFirestoreRuntime() && !!(p && user && text(user.uid) && text(user.tenantId));
   }
   function friendly(code, details) {
     const error = new Error(code || 'ONBOARDING_FAILED');
@@ -52,24 +49,17 @@ Orbit.userOnboarding = (function () {
   }
   async function call(payload) {
     if (!available()) throw friendly('ONBOARDING_BACKEND_UNAVAILABLE');
-    const current = firebaseUser();
-    const token = await current.getIdToken(true);
-    const response = await fetch(endpoint(), {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        authorization: `Bearer ${token}`
-      },
-      body: JSON.stringify({ data: payload }),
-      credentials: 'omit',
-      cache: 'no-store'
-    });
-    let body = null;
-    try { body = await response.json(); } catch (error) { body = null; }
-    if (!response.ok || body && body.error) throw friendly(errorCode(body, response), body && body.error && body.error.details);
-    const result = body && (body.result || body.data);
-    if (!result || result.ok !== true) throw friendly('ONBOARDING_INVALID_RESPONSE');
-    return result;
+    const p = provider();
+    try {
+      const result = await p.callFunction(FUNCTION_NAME, payload, text(backend().functionsRegion || DEFAULT_REGION));
+      if (!result || result.ok !== true) throw friendly('ONBOARDING_INVALID_RESPONSE');
+      return result;
+    } catch (error) {
+      const code = text(error && (error.code || error.message) || 'ONBOARDING_FAILED');
+      const wrapped = friendly(code.replace(/^functions\//, ''), error && error.details || null);
+      wrapped.cause = error;
+      throw wrapped;
+    }
   }
   function resetContinueUrl() {
     const origin = location.origin;
@@ -79,8 +69,11 @@ Orbit.userOnboarding = (function () {
   async function sendInvitation(email) {
     const target = text(email).toLowerCase();
     if (!target) throw friendly('INVITATION_EMAIL_REQUIRED');
-    if (!window.firebase || typeof firebase.auth !== 'function') throw friendly('AUTH_NOT_AVAILABLE');
-    await firebase.auth().sendPasswordResetEmail(target, { url: resetContinueUrl(), handleCodeInApp: false });
+    const p = provider();
+    if (!p || typeof p.initialize !== 'function') throw friendly('AUTH_NOT_AVAILABLE');
+    const ctx = await p.initialize();
+    if (!ctx || !ctx.auth || !ctx.modules || !ctx.modules.auth || typeof ctx.modules.auth.sendPasswordResetEmail !== 'function') throw friendly('AUTH_NOT_AVAILABLE');
+    await ctx.modules.auth.sendPasswordResetEmail(ctx.auth, target, { url: resetContinueUrl(), handleCodeInApp: false });
     return true;
   }
   async function execute(options) {
