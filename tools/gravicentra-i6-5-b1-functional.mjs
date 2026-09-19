@@ -113,25 +113,28 @@ async function renderEquipo(page){
   });
   await page.waitForSelector('#eq-add',{timeout:10000});
 }
-async function reopen(page,id){
-  await renderEquipo(page);
-  await page.evaluate(v=>Orbit.modules.equipo.editar(v),id);
-  await page.waitForSelector('#eq-edit #eu-ok',{timeout:10000});
-  await page.waitForSelector('#eu-access-panel',{timeout:5000}).catch(()=>{});
-}
-async function acceptLegalGate(page){
+async function acceptLegalGate(page,timeout=7000){
   const gate=page.locator('[data-legal-gate]').last();
-  if(!await gate.count()) return false;
+  const appeared=await gate.waitFor({state:'visible',timeout}).then(()=>true).catch(()=>false);
+  if(!appeared) return false;
   await gate.locator('#lg-chk').check();
   await gate.locator('#lg-ok').click();
   await gate.waitFor({state:'detached',timeout:10000});
   return true;
 }
+async function reopen(page,id){
+  await acceptLegalGate(page,3000);
+  await renderEquipo(page);
+  await page.evaluate(v=>Orbit.modules.equipo.editar(v),id);
+  await page.waitForSelector('#eq-edit #eu-ok',{timeout:10000});
+  await acceptLegalGate(page,3000);
+  await page.waitForSelector('#eu-access-panel',{timeout:5000}).catch(()=>{});
+}
 async function reloadAuthenticated(page,auth,a){
   await page.reload({waitUntil:'domcontentloaded',timeout:30000});
   await activate(page,auth,a);
-  await acceptLegalGate(page);
   await waitAdvisorHydration(page);
+  await acceptLegalGate(page,8000);
 }
 async function submitCustomPrompt(page,reason,label){
   const input=page.locator('.drawer-back [data-in]').last();
@@ -269,8 +272,8 @@ try{
   const a=await actor(db,auth);
   ev.auth.proofActor={roles:a.roles,emailHash:crypto.createHash('sha256').update(a.email||'').digest('hex')};
   await activate(page,auth,a);
-  ev.auth.managerLegalGateAccepted=await acceptLegalGate(page);
   const hydrated=await waitAdvisorHydration(page);
+  ev.auth.managerLegalGateAccepted=await acceptLegalGate(page,8000);
   ev.team.hydration={
     serverConfirmed:hydrated.status.serverConfirmedCollections?.includes('asesores')===true,
     count:hydrated.rows.length,
@@ -324,7 +327,9 @@ try{
   need(!(await canonical(db,synthetic.id)),'B1_SYNTHETIC_ID_PREEXISTS');
   need(!(await authByEmail(auth,synthetic.email)),'B1_SYNTHETIC_AUTH_PREEXISTS');
 
+  await acceptLegalGate(page,3000);
   await renderEquipo(page);
+  await acceptLegalGate(page,3000);
   await page.click('#eq-add');
   await page.waitForSelector('#eq-edit #eu-ok',{timeout:10000});
   await page.waitForSelector('#eu-access-panel',{timeout:5000}).catch(()=>{});
