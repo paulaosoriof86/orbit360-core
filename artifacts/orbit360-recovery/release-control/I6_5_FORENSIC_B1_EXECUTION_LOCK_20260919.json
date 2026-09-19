@@ -105,11 +105,11 @@
   },
   "canonicalPreviewChannelId": "gi-i65-b1-35455766715",
   "latestSuccessfulRun": {
-    "runId": 35456167585,
-    "sourceSha": "6c8ffff3cd7d23edc6e5a68fd4822db77dfa7fb0",
-    "buildId": "gi-i65-b1-6c8ffff3cd7d-57f234755dc1",
-    "artifactId": 10588218021,
-    "artifactDigest": "f0792ac7b1431ef7ad0d45ef6ba1f56ff2fc18688a8146aeb423bb773843ec4a",
+    "runId": 35467672819,
+    "sourceSha": "e2cad9e8872267a24a41af9dfee765a49a33f673",
+    "buildId": "gi-i65-b1-e2cad9e88722-57f234755dc1",
+    "artifactId": 10591921034,
+    "artifactDigest": "148fce7c65598e7558bf09faebb6f4c41835c4b5853525844c831babbd6eb3c7",
     "previewUrl": "https://ays-orbit-360-lab--gi-i65-b1-35455766715-ylc10xr5.web.app",
     "exactReadback": true,
     "functionalPass": true,
@@ -146,5 +146,17 @@
     "exactReadback": true,
     "functionalPass": true,
     "livePromoted": false
+  },
+  "r2TechnicalResolution": {
+    "status": "PASS_PENDING_PAULA_VISUAL",
+    "loginTenantTextLiteralRemoved": true,
+    "logoFitContractPass": true,
+    "faviconPreserved": true,
+    "operationalCallableReachable": true,
+    "onboardingCallableReachable": true,
+    "nativeEquipoPromptRemoved": true,
+    "exactReadback": true,
+    "functionalPass": true,
+    "operationalWrites": 0
   }
 }
