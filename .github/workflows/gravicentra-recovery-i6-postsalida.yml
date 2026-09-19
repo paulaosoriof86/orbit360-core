@@ -51,6 +51,7 @@ on:
       - 'orbit360-platform/core/pwa.js'
       - 'artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B1_EXECUTION_LOCK_20260919.json'
       - 'tools/gravicentra-i6-5-b1-functional.mjs'
+      - 'tools/gravicentra-i6-5-b1-advisor-identity-readonly.mjs'
       - 'functions/tenant-branding.js'
       - 'orbit360-platform/core/public-tenant-branding.js'
       - 'orbit360-platform/modules/configuracion.js'
@@ -3051,3 +3052,52 @@ jobs:
         if: ${{ failure() && steps.mode.outputs.mode == 'preview' }}
         continue-on-error: true
         run: echo "B1_R2_DATA_WRITES=0"
+
+  i65-b1-advisor-identity-diagnostic:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      B1_LOCK: artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B1_EXECUTION_LOCK_20260919.json
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Gate B1 R3 read-only identity diagnostic
+        id: mode
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          node - <<'NODE'
+          const fs=require('node:fs'),c=JSON.parse(fs.readFileSync(process.env.CONTROL)),b=JSON.parse(fs.readFileSync(process.env.B1_LOCK));
+          const run=b.status==='VISUAL_REJECTED_R2_ROOT_CAUSE_REQUIRED'&&c.nextAction==='I6_5_FORENSIC_REMEDIATION_B1_R3_ROOT_CAUSE'&&c.i65ForensicRemediationPlan?.currentBlock==='B1';
+          if(run&&(c.i6Execution?.dataMutationAuthorized!==false||b.boundaries?.liveHostingPromotionAuthorized!==false))throw Error('B1_R3_READONLY_BOUNDARY_INVALID');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(run?'true':'false')+'\n');
+          console.log('B1_R3_IDENTITY_DIAGNOSTIC='+(run?'RUN':'NOOP'));
+          NODE
+      - name: Assert LIVE unchanged
+        if: steps.mode.outputs.run == 'true'
+        run: node tools/gravicentra-certified-live-binding-check.mjs
+      - name: Install read-only diagnostic dependency
+        if: steps.mode.outputs.run == 'true'
+        run: npm install --no-save --package-lock=false firebase-admin@13.4.0 >/dev/null
+      - name: Execute LIVE advisor identity diagnostic
+        if: steps.mode.outputs.run == 'true'
+        env:
+          B1_ADVISOR_IDENTITY_OUT: ${{ runner.temp }}/b1-advisor-identity
+        run: node tools/gravicentra-i6-5-b1-advisor-identity-readonly.mjs
+      - name: Upload read-only identity evidence
+        if: steps.mode.outputs.run == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i6-5-b1-advisor-identity-${{ github.run_id }}
+          path: ${{ runner.temp }}/b1-advisor-identity/*
+          compression-level: 0
+          retention-days: 14
