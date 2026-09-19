@@ -137,7 +137,7 @@
       panel.id = 'eu-access-panel';
       panel.innerHTML = `<div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap">
         <div><b>Acceso:</b> <span class="badge ${info.tone}">${Orbit.ui.esc(info.label)}</span><div class="muted" style="font-size:11px;margin-top:3px">${Orbit.ui.esc(info.detail)}</div></div>
-        <label class="ce-l ck" style="margin:0"><input type="checkbox" id="eu-sync-access" ${active(current) ? 'checked' : ''}> ${id ? 'Sincronizar acceso al guardar' : 'Crear acceso seguro al guardar'}</label>
+        <label class="ce-l ck" style="margin:0"><input type="checkbox" id="eu-sync-access" ${active(current) && !!text(current.email) ? 'checked' : ''}> ${id ? 'Sincronizar acceso al guardar' : 'Crear acceso seguro al guardar'}</label>
       </div>`;
       content.insertBefore(panel, content.lastElementChild || null);
     }
@@ -155,8 +155,8 @@
         const desired = formData(drawer);
         if (!confirmScopeOpening(current, desired)) return;
         const operation = info.id === 'blocked' ? 'reactivate' : (hasProvisionedAccess(current) ? 'sync' : 'provision');
-        const reason = window.prompt('Motivo de la gestión de acceso:') || '';
-        if (reason.trim().length < 5) return alert('Indica un motivo claro de al menos 5 caracteres.');
+        const reason = Orbit.ui && Orbit.ui.prompt ? await Orbit.ui.prompt('Indica el motivo de la gestión de acceso:', { title: 'Motivo de la gestión' }) : '';
+        if (String(reason || '').trim().length < 5) return alert('Indica un motivo claro de al menos 5 caracteres.');
         try {
           saveBusy = true;
           button.disabled = true;
@@ -215,5 +215,5 @@
     const host = document.getElementById('host') || document.getElementById('mod-host');
     if (host) decorateTable(host);
   });
-  window.Orbit.equipoOnboardingBridgeV20260804=Object.freeze({VERSION:'20260919.b1',loaded:true,identityAgnostic:true,backendOwned:true,noHardcodedIdentities:true});
+  window.Orbit.equipoOnboardingBridgeV20260804=Object.freeze({VERSION:'20260919.b1r2',loaded:true,identityAgnostic:true,backendOwned:true,noHardcodedIdentities:true});
 })();

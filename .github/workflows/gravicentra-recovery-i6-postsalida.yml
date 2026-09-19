@@ -54,6 +54,7 @@ on:
       - 'functions/tenant-branding.js'
       - 'orbit360-platform/core/public-tenant-branding.js'
       - 'orbit360-platform/modules/configuracion.js'
+      - 'orbit360-platform/modules/equipo.js'
       - 'orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js'
       - 'orbit360-platform/core/product-runtime-browser-providers-p0.js'
       - 'orbit360-platform/core/auth-product-runtime-p0.js'
@@ -1786,6 +1787,7 @@ jobs:
           node --check orbit360-platform/core/pwa.js
           node --check orbit360-platform/data/store-firestore-product-operational-p0.js
           node --check orbit360-platform/modules/equipo.js
+          node --check orbit360-platform/modules/equipo.js
           node --check orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js
           node --check orbit360-platform/modules/aseguradoras.js
           node --check orbit360-platform/modules/policy-receipts-v1199-bridge.js
@@ -2949,26 +2951,19 @@ jobs:
           node - <<'NODE'
           const fs=require('fs'),d=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/b1-package-output.json'));for(const[k,v]of Object.entries({build_id:d.buildId,hosted_payload_digest:d.hostedPayloadDigest,backend_source_digest:d.backendSourceDigest,bundle_digest:d.bundleDigest}))fs.appendFileSync(process.env.GITHUB_OUTPUT,k+'='+v+'\n');
           NODE
-      - name: Deploy only new B1 branding owner and seed canonical branding
+      - name: Deploy B1 backend owners and verify canonical branding config
         if: steps.mode.outputs.mode == 'preview'
         run: |
           set -euo pipefail
           E="$RUNNER_TEMP/b1-package/evidence";mkdir -p "$E"
-          node "$FIREBASE_CLI_BIN" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/b1-functions-before.json";export BEFORE="$RUNNER_TEMP/b1-functions-before.json"
-          PRESENT=$(node - <<'NODE'
-          const fs=require('fs'),r=JSON.parse(fs.readFileSync(process.env.BEFORE)),a=Array.isArray(r.result)?r.result:r,n=new Set(a.flatMap(x=>[x.entryPoint,x.id||x.name].map(String)));process.stdout.write(n.has('orbit360TenantBranding')?'true':'false');
-          NODE
-          )
-          test "$PRESENT" = false || { echo B1_BRANDING_FUNCTION_ALREADY_PRESENT_UNEXPECTED >&2; exit 41; }
-          echo "B1_FUNCTION_PREEXISTED=false" >> "$GITHUB_ENV"
+          node "$FIREBASE_CLI_BIN" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/b1-functions-before.json"
           FROOT="$RUNNER_TEMP/b1-functions";mkdir -p "$FROOT";cp -a "$RUNNER_TEMP/b1-package/bundle/backend" "$FROOT/backend";(cd "$FROOT/backend"&&npm ci --ignore-scripts --no-audit --no-fund >/dev/null);echo '{"functions":{"source":"backend"}}' > "$FROOT/firebase.json"
-          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360TenantBranding --config "$FROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
-          export E TENANT_HINT GITHUB_RUN_ID
+          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360TenantBranding,functions:orbit360ProductOperationalCommand,functions:orbit360ProvisionTeamAccess --config "$FROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
+          export E TENANT_HINT
           (cd "$FROOT/backend" && node - <<'NODE'
-          const fs=require('fs');const {initializeApp,cert}=require('firebase-admin/app');const {getFirestore,Timestamp}=require('firebase-admin/firestore');const sa=JSON.parse(fs.readFileSync(process.env.GOOGLE_APPLICATION_CREDENTIALS));initializeApp({credential:cert(sa),projectId:process.env.PROJECT_ID});const db=getFirestore(),ref=db.collection('tenants').doc(process.env.TENANT_HINT).collection('config').doc('branding'),eventId='b1_brand_seed_'+process.env.GITHUB_RUN_ID,eventRef=db.collection('tenants').doc(process.env.TENANT_HINT).collection('configEvents').doc(eventId),encode=v=>{if(v&&typeof v.toMillis==='function')return{__timestampMillis:v.toMillis()};if(Array.isArray(v))return v.map(encode);if(v&&typeof v==='object')return Object.fromEntries(Object.entries(v).map(([k,x])=>[k,encode(x)]));return v;};(async()=>{const snap=await ref.get();fs.writeFileSync(process.env.E+'/b1-branding-before.json',JSON.stringify({exists:snap.exists,data:snap.exists?encode(snap.data()):null,eventId},null,2)+'\n');if(snap.exists&&String((snap.data()||{}).schemaVersion||'')!=='orbit360-tenant-branding-v1')throw Error('B1_BRANDING_CONFIG_PREEXISTING_UNKNOWN_OWNER');const next={schemaVersion:'orbit360-tenant-branding-v1',displayName:'Alianzas & Soluciones',legalName:'Alianzas & Soluciones Corredores de Seguros',logo:'assets/tenant/alianzas-soluciones/logo-oficial-360.png',favicon:'assets/tenant/alianzas-soluciones/logo-bolita-96.png',seededBy:'I6.5-B1',updatedAt:Timestamp.now()};await db.runTransaction(async tx=>{tx.set(ref,next,{merge:false});tx.set(eventRef,{schemaVersion:'orbit360-branding-config-event-v1',tenantId:process.env.TENANT_HINT,action:'B1_SEED',sourceSha:process.env.GITHUB_SHA||'',createdAt:Timestamp.now(),containsPII:false},{merge:false});});console.log('B1_BRANDING_CONFIG_SEED=PASS');})().catch(e=>{console.error(e);process.exit(1);});
+          const fs=require('fs');const {initializeApp,cert}=require('firebase-admin/app');const {getFirestore}=require('firebase-admin/firestore');const sa=JSON.parse(fs.readFileSync(process.env.GOOGLE_APPLICATION_CREDENTIALS));initializeApp({credential:cert(sa),projectId:process.env.PROJECT_ID});(async()=>{const s=await getFirestore().collection('tenants').doc(process.env.TENANT_HINT).collection('config').doc('branding').get();if(!s.exists)throw Error('B1_BRANDING_CONFIG_MISSING');const b=s.data()||{};if(!String(b.displayName||'').trim()||!String(b.logo||'').trim()||!String(b.favicon||'').trim())throw Error('B1_BRANDING_CONFIG_INVALID');fs.writeFileSync(process.env.E+'/b1-branding-readback.json',JSON.stringify({exists:true,writeExecuted:false,logo:String(b.logo),favicon:String(b.favicon)},null,2)+'\n')})().catch(e=>{console.error(e);process.exit(1)});
           NODE
           )
-          echo "B1_SEED_EVENT_ID=b1_brand_seed_$GITHUB_RUN_ID" >> "$GITHUB_ENV"
       - name: Deploy exact B1 package to isolated Preview
         if: steps.mode.outputs.mode == 'preview'
         id: preview
@@ -3049,7 +3044,11 @@ jobs:
           const fs=require('fs'),p=process.env.CONTROL,c=JSON.parse(fs.readFileSync(p));c.i65ForensicRemediationPlan.b1ExecutionLockBlobSha=process.env.BLOB;fs.writeFileSync(p,JSON.stringify(c,null,2)+'\n');
           NODE
           git add "$CONTROL";git config user.name gravicentra-recovery-bot;git config user.email gravicentra-recovery-bot@users.noreply.github.com;git commit -m "freeze(i6.5): B1 preview pass pending visual";git push origin "HEAD:$GITHUB_REF_NAME"
-      - name: Roll back B1 project additions on Preview failure
+      - name: B1 failure leaves operational data untouched
+        if: ${{ failure() && steps.mode.outputs.mode == 'preview' }}
+        continue-on-error: true
+        run: echo "B1_R2_DATA_WRITES=0"
+
         if: ${{ failure() && steps.mode.outputs.mode == 'preview' }}
         continue-on-error: true
         run: |

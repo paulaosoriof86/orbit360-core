@@ -418,7 +418,7 @@ Orbit.modules.equipo = (function () {
         modulosExtra: selectedMods.filter(m => !base.includes(m)), modulosRestringidos: base.filter(m => !selectedMods.includes(m)), modulosOverride: selectedMods,
         inactivo: $('#eu-inact').checked, estado: $('#eu-inact').checked ? 'inactivo' : 'activo', activo: !$('#eu-inact').checked, updatedAt: new Date().toISOString() };
       const after = userSnapshot(data); let motivo = 'Alta manual desde Equipo';
-      if (id && sensitiveChanged(before, after)) { motivo = window.prompt('Motivo del cambio de roles, permisos, países, alcance o estado:') || ''; if (motivo.trim().length < 5) return alert('Indica un motivo claro de al menos 5 caracteres.'); }
+      if (id && sensitiveChanged(before, after)) { motivo = Orbit.ui && Orbit.ui.prompt ? await Orbit.ui.prompt('Indica el motivo del cambio de roles, permisos, países, alcance o estado:', { title: 'Motivo del cambio' }) : ''; if (String(motivo || '').trim().length < 5) return alert('Indica un motivo claro de al menos 5 caracteres.'); }
       const advisorId = id || nextStableId(nombre);
       if (!id) { data.id = advisorId; data.iniciales = nombre.split(' ').map(x => x[0]).slice(0, 2).join('').toUpperCase(); data.comModo = 'comision'; data.shareCom = 50; data.accessProvisioned = false; data.invitacionEstado = 'pendiente_habilitacion'; data.createdAt = new Date().toISOString(); }
       const st = S(); saveButton.dataset.busy = '1'; saveButton.disabled = true; saveButton.textContent = 'Guardando…';

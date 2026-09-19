@@ -1,6 +1,6 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B1_EXECUTION_LOCK_V1",
-  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+  "status": "CANDIDATE_PENDING_PREVIEW",
   "date": "2026-09-19",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -15,6 +15,7 @@
     "orbit360-platform/core/public-tenant-branding.js",
     "orbit360-platform/data/tenant-public-branding-index.js",
     "orbit360-platform/modules/configuracion.js",
+    "orbit360-platform/modules/equipo.js",
     "orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js",
     "orbit360-platform/core/product-runtime-browser-providers-p0.js",
     "orbit360-platform/core/auth-product-runtime-p0.js",
@@ -26,16 +27,19 @@
     "orbit360-platform/assets/tenant/alianzas-soluciones/logo-bolita-96.png"
   ],
   "backend": {
-    "newFunctionTarget": "orbit360TenantBranding",
-    "existingFunctionsMustRemainUntouched": true,
-    "deployTargetOnly": true,
-    "rollbackDeletesNewTargetIfItWasAbsentBefore": true
+    "deployTargets": [
+      "orbit360TenantBranding",
+      "orbit360ProductOperationalCommand",
+      "orbit360ProvisionTeamAccess"
+    ],
+    "deployExactCurrentSource": true,
+    "sharedProjectBackendRequiredForPreviewAndLive": true
   },
   "brandingConfig": {
     "path": "tenants/alianzas-soluciones/config/branding",
     "publicReadOwner": "orbit360TenantBranding",
     "authenticatedWriteOwner": "orbit360TenantBranding",
-    "seedWriteAuthorized": true,
+    "seedWriteAuthorized": false,
     "seedFields": [
       "displayName",
       "legalName",
@@ -57,7 +61,7 @@
     "liveHostingPromotionAuthorized": false,
     "authUserMutationAuthorized": false,
     "membershipMutationAuthorized": false,
-    "tenantBrandingConfigSeedAuthorized": true
+    "tenantBrandingConfigSeedAuthorized": false
   },
   "requiredFixes": [
     "SINGLE_PREAUTH_TENANT_BRANDING_OWNER",
@@ -82,7 +86,8 @@
   "conversationDependent": false,
   "productCandidate": {
     "binding": "THIS_COMMIT_GITHUB_SHA",
-    "parentHead": "1efa2d70f86efa5927a8dff7ecd0bc4ec07e7f43",
+    "parentHead": "486b19ace88f6671af3af72041f95016d2202c12",
+    "revision": 2,
     "livePromoted": false
   },
   "candidatePreparedAt": "2026-09-19",
@@ -99,18 +104,6 @@
     "rollbackBrandingRestored": true
   },
   "canonicalPreviewChannelId": "gi-i65-b1-35455766715",
-  "preview": {
-    "sourceSha": "6c8ffff3cd7d23edc6e5a68fd4822db77dfa7fb0",
-    "buildId": "gi-i65-b1-6c8ffff3cd7d-57f234755dc1",
-    "channelId": "gi-i65-b1-35455766715",
-    "url": "https://ays-orbit-360-lab--gi-i65-b1-35455766715-ylc10xr5.web.app",
-    "runId": 35456167585,
-    "artifactId": 10588218021,
-    "artifactDigest": "f0792ac7b1431ef7ad0d45ef6ba1f56ff2fc18688a8146aeb423bb773843ec4a",
-    "exactReadback": true,
-    "functionalPass": true,
-    "livePromoted": false
-  },
   "latestSuccessfulRun": {
     "runId": 35456167585,
     "sourceSha": "6c8ffff3cd7d23edc6e5a68fd4822db77dfa7fb0",
@@ -122,5 +115,24 @@
     "functionalPass": true,
     "operationalWrites": 0,
     "livePromoted": false
-  }
+  },
+  "revision": 2,
+  "previousPreview": {
+    "sourceSha": "6c8ffff3cd7d23edc6e5a68fd4822db77dfa7fb0",
+    "buildId": "gi-i65-b1-6c8ffff3cd7d-57f234755dc1",
+    "channelId": "gi-i65-b1-35455766715",
+    "url": "https://ays-orbit-360-lab--gi-i65-b1-35455766715-ylc10xr5.web.app",
+    "runId": 35456167585,
+    "artifactId": 10588218021,
+    "artifactDigest": "f0792ac7b1431ef7ad0d45ef6ba1f56ff2fc18688a8146aeb423bb773843ec4a",
+    "exactReadback": true,
+    "functionalPass": true,
+    "livePromoted": false
+  },
+  "visualFindingsR2": [
+    "LOGIN_TEXT_DUPLICATION",
+    "LOGO_FIT",
+    "TEAM_SAVE_NOT_FOUND",
+    "NATIVE_REASON_PROMPT"
+  ]
 }
