@@ -110,5 +110,17 @@
     "exactReadback": true,
     "functionalPass": true,
     "livePromoted": false
+  },
+  "latestSuccessfulRun": {
+    "runId": 35456167585,
+    "sourceSha": "6c8ffff3cd7d23edc6e5a68fd4822db77dfa7fb0",
+    "buildId": "gi-i65-b1-6c8ffff3cd7d-57f234755dc1",
+    "artifactId": 10588218021,
+    "artifactDigest": "f0792ac7b1431ef7ad0d45ef6ba1f56ff2fc18688a8146aeb423bb773843ec4a",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b1-35455766715-ylc10xr5.web.app",
+    "exactReadback": true,
+    "functionalPass": true,
+    "operationalWrites": 0,
+    "livePromoted": false
   }
 }
