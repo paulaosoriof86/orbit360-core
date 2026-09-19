@@ -87,16 +87,16 @@
   },
   "candidatePreparedAt": "2026-09-19",
   "lastAttempt": {
-    "runId": 35455766715,
-    "jobId": 105930627949,
-    "status": "FAILED_AUTHENTICATED_PROOF_ASSERTION_ONLY",
-    "cause": "The static proof scanned internal technical token tenant-config-live as if it were visible UI copy. Runtime first-paint and settled-DOM checks already enforce that no technical Tenant wording is visible.",
+    "runId": 35455984646,
+    "jobId": 105931203797,
+    "status": "FAILED_PREVIEW_CHANNEL_DEPLOY_AFTER_BACKEND_PASS",
+    "cause": "Run-scoped channel creation failed after backend deploy and branding seed. B1 now reuses the already-created canonical B1 preview channel from the prior exact-readback run, avoiding preview-channel proliferation; deploy output is surfaced fail-closed.",
     "functionCreated": true,
     "brandingSeedWritten": true,
-    "previewDeployed": true,
-    "exactPreviewReadback": true,
+    "previewDeployed": false,
     "operationalWrites": 0,
     "rollbackFunctionDeleted": true,
     "rollbackBrandingRestored": true
-  }
+  },
+  "canonicalPreviewChannelId": "gi-i65-b1-35455766715"
 }
