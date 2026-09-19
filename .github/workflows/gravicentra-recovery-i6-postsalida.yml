@@ -2893,12 +2893,15 @@ jobs:
           (cd functions && npm run check >/dev/null)
           node --check orbit360-platform/core/public-tenant-branding.js
           node --check orbit360-platform/modules/configuracion.js
+          node --check orbit360-platform/modules/equipo.js
           node --check orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js
           node --check orbit360-platform/core/product-runtime-browser-providers-p0.js
           node --check orbit360-platform/core/auth-product-runtime-p0.js
           node --check orbit360-platform/core/auth-password-change-v20260805.js
           node --check tools/gravicentra-i6-5-b1-functional.mjs
           ! grep -Fq "CONFIRMAR TODOS" orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js
+          ! grep -Fq "window.prompt('Motivo del cambio" orbit360-platform/modules/equipo.js
+          ! grep -Fq "window.prompt('Motivo de la gestión de acceso" orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js
           ! grep -Eq "window\\.firebase|firebase\\.auth" orbit360-platform/core/auth-password-change-v20260805.js
           grep -Fq "tenant-branding" functions/bootstrap.js
           ! grep -Fq "tenant-public-branding-index.js" orbit360-platform/index.html
@@ -3045,17 +3048,3 @@ jobs:
           NODE
           git add "$CONTROL";git config user.name gravicentra-recovery-bot;git config user.email gravicentra-recovery-bot@users.noreply.github.com;git commit -m "freeze(i6.5): B1 preview pass pending visual";git push origin "HEAD:$GITHUB_REF_NAME"
       - name: B1 failure leaves operational data untouched
-        if: ${{ failure() && steps.mode.outputs.mode == 'preview' }}
-        continue-on-error: true
-        run: echo "B1_R2_DATA_WRITES=0"
-
-        if: ${{ failure() && steps.mode.outputs.mode == 'preview' }}
-        continue-on-error: true
-        run: |
-          set -euo pipefail
-          if test "${B1_FUNCTION_PREEXISTED:-true}" = false;then node "$FIREBASE_CLI_BIN" functions:delete orbit360TenantBranding --region us-central1 --project "$PROJECT_ID" --force || true;fi
-          SNAP="$RUNNER_TEMP/b1-package/evidence/b1-branding-before.json"
-          if test -f "$SNAP" && test -f "${GOOGLE_APPLICATION_CREDENTIALS:-}";then export SNAP;FROOT="$RUNNER_TEMP/b1-functions/backend";if test -d "$FROOT";then (cd "$FROOT" && node - <<'NODE'
-          const fs=require('fs');const {initializeApp,cert}=require('firebase-admin/app');const {getFirestore,Timestamp}=require('firebase-admin/firestore');const sa=JSON.parse(fs.readFileSync(process.env.GOOGLE_APPLICATION_CREDENTIALS));initializeApp({credential:cert(sa),projectId:process.env.PROJECT_ID});const db=getFirestore(),s=JSON.parse(fs.readFileSync(process.env.SNAP)),revive=v=>{if(v&&typeof v==='object'&&Object.keys(v).length===1&&v.__timestampMillis!=null)return Timestamp.fromMillis(v.__timestampMillis);if(Array.isArray(v))return v.map(revive);if(v&&typeof v==='object')return Object.fromEntries(Object.entries(v).map(([k,x])=>[k,revive(x)]));return v;};(async()=>{const ref=db.collection('tenants').doc(process.env.TENANT_HINT).collection('config').doc('branding');if(s.exists)await ref.set(revive(s.data),{merge:false});else await ref.delete();if(process.env.B1_SEED_EVENT_ID)await db.collection('tenants').doc(process.env.TENANT_HINT).collection('configEvents').doc(process.env.B1_SEED_EVENT_ID).delete();console.log('B1_ROLLBACK=PASS');})().catch(e=>{console.error(e);process.exit(1);});
-          NODE
-          );fi;fi
