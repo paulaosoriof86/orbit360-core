@@ -1,0 +1,237 @@
+{
+  "schema": "GRAVICENTRA_I6_5_FORENSIC_AUDIT_20260919_V1",
+  "status": "PASS_WITH_BLOCKING_FINDINGS",
+  "date": "2026-09-19",
+  "mode": "READ_ONLY_AUDIT_NO_PRODUCT_OR_DATA_WRITES",
+  "authority": {
+    "repo": "paulaosoriof86/orbit360-core",
+    "branch": "recovery/fase-a-clean-20260831",
+    "auditedHead": "9201b9bbc420c4dcec7acf652a161b8496aed543",
+    "certifiedProductSource": "4bf67a3738751fe2432a130fd23254a6f1c7d16e",
+    "certifiedBuild": "gi-i65-4bf67a373875-57f234755dc1",
+    "live": "https://ays-orbit-360-lab.web.app"
+  },
+  "evidence": {
+    "authenticatedLiveProof": {
+      "runId": 35416730679,
+      "artifactId": 10576176702,
+      "status": "PASS",
+      "writes": 0
+    },
+    "currentReadOnlyDiagnostic": {
+      "runId": 35448396360,
+      "artifactId": 10586237198,
+      "status": "PASS",
+      "writes": 0,
+      "authWrites": 0,
+      "firestoreWrites": 0
+    },
+    "externalLiveLoginAudit": {
+      "runId": "4e12d05d-963a-42dc-a1bc-50970c35006c",
+      "scope": "PRE_AUTH_ONLY"
+    },
+    "certifiedBuildArtifact": {
+      "artifactId": 10575873579,
+      "readbackExact": true
+    }
+  },
+  "blockingFindings": [
+    {
+      "id": "F01_LOGIN_MULTI_AUTHORITY",
+      "severity": "HIGH",
+      "domain": "LOGIN_BRANDING",
+      "fact": "Static index renders generic Gravicentra login before public-tenant-branding patches tenant content after DOMContentLoaded; visible Tenant wording is hardcoded.",
+      "cause": "Multiple render-time branding authorities.",
+      "fix": "Single live tenant branding owner available before first paint; no technical Tenant label; platform/tenant hierarchy explicit."
+    },
+    {
+      "id": "F02_BRAND_STATIC_TENANT_CONFIG",
+      "severity": "HIGH",
+      "domain": "LOGIN_BRANDING",
+      "fact": "tenant-public-branding-index.js contains Alianzas & Soluciones and asset paths as static code.",
+      "cause": "Tenant branding is registry-coded, not administrable tenant data.",
+      "fix": "Move tenant displayName/legalName/loginLogo/platformLogo/favicon to canonical tenant configuration editable from UI; static fallback only generic and non-tenant-specific."
+    },
+    {
+      "id": "F03_FAVICON_WRONG_ASSET_SEMANTICS",
+      "severity": "HIGH",
+      "domain": "LOGIN_BRANDING",
+      "fact": "Current runtime favicon resolves to logo-bolita-96.png, but deployed asset is not the newly supplied approved A&S ball and same tenant branding path is reused for login/logo use cases.",
+      "fix": "Use official full A&S logo for login/header and newly supplied A&S ball only for favicon; both configurable."
+    },
+    {
+      "id": "F04_DUPLICATE_LOGIN_ERROR_DOM",
+      "severity": "MEDIUM",
+      "domain": "LOGIN_AUTH",
+      "fact": "External LIVE audit reproduced two #login-error nodes after failed login.",
+      "fix": "One auth error owner and one unique DOM id."
+    },
+    {
+      "id": "F05_USER_SCOPE_CONFIRM_LOOP",
+      "severity": "HIGH",
+      "domain": "TEAM",
+      "fact": "equipo onboarding intercept requires exact phrase CONFIRMAR TODOS when scope expands to all; entering todos cancels save and next click repeats prompt.",
+      "fix": "Replace text challenge with explicit confirmation dialog; do not loop; preserve validation and audit."
+    },
+    {
+      "id": "F06_USERS_EXIST_BUT_LOGIN_BLOCKED",
+      "severity": "CRITICAL",
+      "domain": "TEAM_AUTH",
+      "fact": "Read-only LIVE diagnostic: Samuel and Carlos advisor+Auth+active membership exist, both emailVerified=false. Public login requires emailVerified=true.",
+      "fix": "Complete legitimate email verification/activation workflow; no artificial verification bypass. Then test real login and first-login credential change."
+    },
+    {
+      "id": "F07_PASSWORD_CHANGE_LEGACY_AUTH",
+      "severity": "HIGH",
+      "domain": "TEAM_AUTH",
+      "fact": "auth-password-change-v20260805.js still depends on legacy window.firebase compat while product auth runtime is modular.",
+      "fix": "Bind password-change owner to productRuntimeBrowserProvidersP0 modular auth."
+    },
+    {
+      "id": "F08_TEMP_PASSWORD_NOT_COMPLETE_ONBOARDING",
+      "severity": "HIGH",
+      "domain": "TEAM_AUTH",
+      "fact": "Credential admin suggests FirstName123* but password creation does not resolve required email verification, so pattern alone cannot make user login-ready.",
+      "fix": "Treat temporary password as optional credential step only after/with verified activation; never advertise as working until E2E login passes."
+    },
+    {
+      "id": "F09_CLIENT_MODAL_DATA_LOSS",
+      "severity": "HIGH",
+      "domain": "CLIENTS",
+      "fact": "cliente360 create and edit modals close on backdrop click; unsaved data is lost.",
+      "fix": "Dirty-state guard; backdrop must not close silently."
+    },
+    {
+      "id": "F10_CLIENT_SAVE_LIFECYCLE",
+      "severity": "HIGH",
+      "domain": "CLIENTS",
+      "fact": "User reproduced create with no visible completion and edit stuck in Guardando. Code has mixed durable and legacy client write surfaces.",
+      "fix": "One durable owner per create/edit, canonical readback, finally reset, explicit success/error, close only after confirmed readback."
+    },
+    {
+      "id": "F11_POLICY_CREATE_MISSING_SELLER",
+      "severity": "HIGH",
+      "domain": "POLICIES",
+      "fact": "Current create form derives asesorId from selected client; no seller/advisor selector, while legacy edit form has Asesor que comercializó.",
+      "fix": "Expose seller/advisor in create with live advisor catalog; unify create/edit schema."
+    },
+    {
+      "id": "F12_POLICY_MODAL_DATA_LOSS",
+      "severity": "HIGH",
+      "domain": "POLICIES",
+      "fact": "Policy bridge and Cliente360 policy modals close on backdrop.",
+      "fix": "Dirty-state protected modal/drawer."
+    },
+    {
+      "id": "F13_POLICY_CREATE_EDIT_AUTHORITY_DUPLICATION",
+      "severity": "CRITICAL",
+      "domain": "POLICIES",
+      "fact": "At least two policy create/edit surfaces coexist: v1199 bridge and legacy Cliente360 editor with different fields and behavior.",
+      "fix": "Choose one canonical UI owner; retire/delegate legacy surface without losing approved fields."
+    },
+    {
+      "id": "F14_VEHICLE_FORM_INCOMPLETE",
+      "severity": "HIGH",
+      "domain": "VEHICLES",
+      "fact": "Create surfaces capture only brand/plate/year/use while display expects color/VIN/chassis/motor and no clear vehicle edit action is surfaced.",
+      "fix": "Full vehicle schema create/edit and same detail hierarchy."
+    },
+    {
+      "id": "F15_RECEIPT_UI_AUTHORITY_SPLIT",
+      "severity": "CRITICAL",
+      "domain": "RECEIPTS",
+      "fact": "Base Cliente360 receipts/cobros tabs still read cobros while native bridge overlays recibosEsperados/carteraPrimas. Multiple authorities remain.",
+      "fix": "One receipts projection owner; base tab delegates to receiptsPortfolioProjectionV920."
+    },
+    {
+      "id": "F16_PAYMENT_FLOW_BACKWARDS",
+      "severity": "CRITICAL",
+      "domain": "PAYMENTS",
+      "fact": "openPayment/applyPayment look up cobros by receipt id, but cobros contains only confirmed payments. Expected receipts cannot be paid through this path.",
+      "fix": "I6.6 D1 server-owned command must start from reciboEsperado/cartera item and create/reconcile confirmed cobro atomically with evidence/audit."
+    },
+    {
+      "id": "F17_ORIGINAL_COBROS_OPTIMISTIC_WRITES",
+      "severity": "CRITICAL",
+      "domain": "PAYMENTS",
+      "fact": "Original cobros.js payment/validation/conciliation actions use non-awaited S().update/insert and can show success before canonical readback.",
+      "fix": "Convert D1 actions to durable server-owned commands and remove browser-authoritative payment writes."
+    },
+    {
+      "id": "F18_COBROS_FRONTEND_REPLACED",
+      "severity": "CRITICAL",
+      "domain": "COBROS_UI",
+      "fact": "cobros-cartera-i65-closure-bridge.js replaces mod.render entirely instead of feeding approved cobros.js visual shell.",
+      "fix": "Restore approved Cobros y cartera shell; bridge becomes projection/data adapter only."
+    },
+    {
+      "id": "F19_COBROS_SEARCH_COMPLEXITY",
+      "severity": "CRITICAL",
+      "domain": "PERFORMANCE",
+      "fact": "New global cartera search performs per-row vehicle scans and full rerender over ~1.3k portfolio rows; matches reported multi-minute freezes.",
+      "fix": "Pre-index clients/policies/vehicles once; debounce; paginate/virtualize; no full DOM rebuild per keystroke."
+    },
+    {
+      "id": "F20_COBROS_KPI_CURRENCY_SEMANTICS",
+      "severity": "HIGH",
+      "domain": "COBROS_UI",
+      "fact": "Global query normalizes COP to GTQ with hardcoded TC_COP_GTQ=1000 when country TODOS, unlike policy KPI rule that currencies must remain separated.",
+      "fix": "Never synthesize cross-currency total; KPIs grouped by currency/country."
+    },
+    {
+      "id": "F21_RENEWAL_CAN_WRITE_COBROS",
+      "severity": "CRITICAL",
+      "domain": "SEMANTIC_SYNC",
+      "fact": "Current read-only diagnostic source contract reports renewalWritesCobros=true.",
+      "fix": "Block any renewal/new-policy path that creates pending cobros; only recibosEsperados+carteraPrimas until confirmed payment."
+    },
+    {
+      "id": "F22_MODAL_HIERARCHY_INCONSISTENT",
+      "severity": "HIGH",
+      "domain": "FRONTEND",
+      "fact": "Aseguradoras uses stable full-page/tabbed ficha; policy/receipt/vehicle/client actions use multiple drawers/modals with inconsistent hierarchy and backdrop behavior.",
+      "fix": "Adopt approved ficha hierarchy and common modal component; preserve backend contracts."
+    },
+    {
+      "id": "F23_SYSTEMIC_OPTIMISTIC_WRITE_DEBT",
+      "severity": "CRITICAL",
+      "domain": "CROSS_MODULE",
+      "fact": "Certified build still contains many direct S()/Orbit.store insert/update/remove calls across Cliente360, Cobros, Renovaciones, Cancelaciones, Siniestros, Cronograma, Ciclo, Importa and others.",
+      "fix": "Prioritize production-critical modules; server-owned durable command + canonical readback + audit; do not bulk-rewrite unrelated modules."
+    },
+    {
+      "id": "F24_HARDCODED_IDENTITY_REMAINS",
+      "severity": "HIGH",
+      "domain": "CROSS_MODULE",
+      "fact": "Certified build contains hardcoded advisor id ase001 in academia activity paths and core/ciclo has identity/tenant-sensitive hardcodes.",
+      "fix": "Remove person IDs from product behavior; resolve actor/current advisor through runtime membership."
+    }
+  ],
+  "nonBlockingButRequired": [
+    {
+      "id": "N01_COUNTS_CHANGED_AFTER_HUMAN_TEST",
+      "fact": "Paula screenshots show 1415 policies and 1284 portfolio versus certified 1414/1283. This may be the one policy created during live acceptance and must be read back before classifying as drift."
+    },
+    {
+      "id": "N02_AGING_IS_LIVE_NOT_LITERAL",
+      "fact": "agingVencido() is computed from carteraPrimas; issue is hierarchy/currency/performance, not a literal aging number hardcode."
+    },
+    {
+      "id": "N03_GLOBAL_COBROS_BRIDGE_COUNTS_ARE_LIVE",
+      "fact": "New bridge derives counts from store; however UI replacement and data composition remain unacceptable."
+    }
+  ],
+  "claudeDecision": {
+    "recommendation": "DO_NOT_SEND_TO_CLAUDE_YET",
+    "reason": "Primary blockers are authority, authentication, persistence, semantic and performance defects. Sending an old package now risks integration delay and another visual fork.",
+    "laterUse": "After functional owners are frozen, optionally send one final frontend-only polish pass with exact current candidate, locked API/DOM contracts, and explicit no-backend/no-data/no-auth changes."
+  },
+  "nextPlan": [
+    "Freeze forensic findings and keep I6.5 open.",
+    "Mini-fix authority/auth first: branding single owner + favicon assets + user activation/login + scope confirmation.",
+    "Restore approved frontend shell and canonical UI owner for Cobros/Policies/Receipts; no redesign.",
+    "Fix client/policy modal dirty-state and save lifecycle; unify create/edit fields including seller and vehicle.",
+    "Eliminate renewal-to-cobros path and implement payment creation only in I6.6 D1.",
+    "Run authenticated E2E regression matrix and one final Paula visual review."
+  ]
+}
