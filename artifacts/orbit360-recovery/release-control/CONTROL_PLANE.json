@@ -1951,7 +1951,7 @@
       "livePromotion": false
     },
     "b1ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B1_EXECUTION_LOCK_20260919.json",
-    "b1ExecutionLockBlobSha": "7b62bf0846852603f1ec6f1c16b6b461a75fa51a",
+    "b1ExecutionLockBlobSha": "0cf4e72c67190d44d34566e7f70a1bc5b0cf8706",
     "b1": {
       "status": "VISUAL_REJECTED_R2_ROOT_CAUSE_REQUIRED",
       "sourceSha": "e2cad9e8872267a24a41af9dfee765a49a33f673",
@@ -1972,7 +1972,13 @@
         "LOGO_FIT_CENTER",
         "TEAM_EDIT_NOT_FOUND",
         "TEST_GAP"
-      ]
+      ],
+      "rootCauseStatus": "CONFIRMED_R3",
+      "rootCauseEvidence": {
+        "advisorIdentityRunId": 35474844151,
+        "equipoRuntimeRunId": 35475192026,
+        "writes": 0
+      }
     }
   }
 }
