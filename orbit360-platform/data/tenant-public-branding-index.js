@@ -1,4 +1,2 @@
-/* Gravicentra Insurance · public tenant branding index · no secrets */
-(function(){'use strict';window.OrbitTenantPublicBrandingIndex=Object.freeze({
-'alianzas-soluciones':Object.freeze({tenantId:'alianzas-soluciones',displayName:'Alianzas & Soluciones',legalName:'Alianzas & Soluciones Corredores de Seguros',logo:'assets/tenant/alianzas-soluciones/logo-bolita-96.png',favicon:'assets/tenant/alianzas-soluciones/logo-bolita-96.png',logoSource:'tenant-public-branding-index',faviconSource:'user-approved-logo-bolita-2025'})
-});})();
+/* Deprecated B1: company branding is server-owned and loaded by core/public-tenant-branding.js. */
+window.OrbitTenantPublicBrandingIndex=Object.freeze({deprecated:true,authority:'server'});

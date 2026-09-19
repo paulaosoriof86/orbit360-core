@@ -1,48 +1,21 @@
-/* ============================================================
-   Orbit 360 · Product Auth owner P0
-   Firebase Auth only. No demo user, no localStorage session,
-   no tenant from URL and no technical copy in client messages.
-   ============================================================ */
+/* Gravicentra Insurance · Product Auth owner B1 */
 (function(){
   'use strict';
   window.Orbit=window.Orbit||{};
-  var provider=function(){return window.Orbit.productRuntimeBrowserProvidersP0;};
-  var rawUser=null,restorePromise=null;
+  var provider=function(){return window.Orbit.productRuntimeBrowserProvidersP0;},rawUser=null,restorePromise=null;
   function productUser(){return window.Orbit.auth&&window.Orbit.auth.productUser?window.Orbit.auth.productUser:null;}
   function user(){var p=productUser();if(p)return p;if(!rawUser)return null;return{nombre:rawUser.displayName||rawUser.email||'Usuario',email:rawUser.email||'',uid:rawUser.uid||'',rol:'',tipo:'interno',backend:'product'};}
   function initials(value){var text=String(value||'').trim();if(!text)return'U';if(text.indexOf('@')>0)text=text.split('@')[0].replace(/[._-]+/g,' ');return text.split(/\s+/).filter(Boolean).slice(0,2).map(function(x){return x.charAt(0).toUpperCase();}).join('')||'U';}
   function paintIdentity(){var u=user()||{},box=document.getElementById('tb-user');if(!box)return;var label=String((rawUser&&rawUser.displayName)||u.nombre||u.email||'Usuario').trim(),avatar=box.querySelector('.av'),name=box.querySelector('.who b');if(avatar)avatar.textContent=initials(label);if(name)name.textContent=label;box.title='Cuenta';}
-  function paintError(message){var box=document.querySelector('.lg-box');if(!box)return;var el=document.getElementById('login-error');if(!el){el=document.createElement('div');el.id='login-error';el.className='hint error';box.appendChild(el);}el.textContent=message||'';}
-  function setSubmitting(form,active){if(!form)return;var button=form.querySelector('button[type="submit"]');form.dataset.submitting=active?'1':'0';if(!button)return;if(!button.dataset.label)button.dataset.label=button.textContent||'Ingresar al Orbit 360';button.disabled=!!active;button.textContent=active?'Validando acceso…':button.dataset.label;}
+  function paintError(message){var box=document.querySelector('.lg-box');if(!box)return;var all=[].slice.call(document.querySelectorAll('#login-error')),el=all.shift();all.forEach(function(n){n.remove();});if(!el){el=document.createElement('div');el.id='login-error';el.className='hint error';box.appendChild(el);}el.textContent=message||'';el.style.display=message?'':'none';}
+  function setSubmitting(form,active){if(!form)return;var button=form.querySelector('button[type="submit"]');form.dataset.submitting=active?'1':'0';if(!button)return;if(!button.dataset.label)button.dataset.label=button.textContent||'Ingresar';button.disabled=!!active;button.textContent=active?'Validando acceso…':button.dataset.label;}
   function showLogin(){var lg=document.getElementById('login');if(lg){lg.style.display='';lg.classList.remove('hidden');}document.body.classList.add('pre-auth');}
-  function showApp(){paintIdentity();var lg=document.getElementById('login');if(lg){lg.classList.add('hidden');setTimeout(function(){lg.style.display='none';},300);}document.body.classList.remove('pre-auth');setTimeout(function(){var u=user()||{};var tipo=u.tipo==='socio'?'socio':'interno';var scopeId='user:'+(u.email||u.uid||'product');if(Orbit.legal&&Orbit.legal.gate)Orbit.legal.gate(tipo,scopeId);},350);}
-  function friendly(){return 'No fue posible iniciar sesión. Verifica tu usuario y contraseña e intenta nuevamente.';}
-  function restore(p){
-    if(restorePromise)return restorePromise;
-    restorePromise=Promise.resolve().then(function(){return p.initialUser?p.initialUser():null;}).then(function(existing){
-      if(!existing)return null;
-      rawUser=existing;
-      if(rawUser.emailVerified!==true)return Promise.resolve(p.signOut?p.signOut():null).catch(function(){}).then(function(){rawUser=null;return null;});
-      if(!Orbit.productAppP0||typeof Orbit.productAppP0.activate!=='function')throw new Error('PRODUCT_APP_OWNER_MISSING');
-      return Orbit.productAppP0.activate();
-    }).catch(function(){rawUser=null;paintError('El acceso todavía no está disponible.');return null;});
-    return restorePromise;
-  }
-  function init(){
-    showLogin();
-    var p=provider();
-    if(!p||!p.enabled||!p.enabled()){paintError('El acceso todavía no está habilitado.');return;}
-    p.initialize().then(function(){return restore(p);}).catch(function(){paintError('El acceso todavía no está disponible.');});
-    var form=document.getElementById('login-form');
-    if(!form||form.dataset.productBound==='1')return;
-    form.dataset.productBound='1';
-    var email=document.getElementById('lg-user'),pass=document.getElementById('lg-pass');
-    if(email)email.value='';if(pass)pass.value='';
-    form.addEventListener('submit',function(ev){
-      ev.preventDefault();if(form.dataset.submitting==='1')return;paintError('');setSubmitting(form,true);
-      p.signIn(email&&email.value,pass&&pass.value).then(function(cred){rawUser=cred&&cred.user?cred.user:null;if(!rawUser||rawUser.emailVerified!==true)throw new Error('ACCOUNT_NOT_READY');return Orbit.productAppP0.activate();}).catch(function(){paintError(friendly());}).finally(function(){setSubmitting(form,false);});
-    });
-  }
+  function showApp(){paintIdentity();var lg=document.getElementById('login');if(lg){lg.classList.add('hidden');setTimeout(function(){lg.style.display='none';},300);}document.body.classList.remove('pre-auth');setTimeout(function(){var u=user()||{},tipo=u.tipo==='socio'?'socio':'interno',scopeId='user:'+(u.email||u.uid||'product');if(Orbit.legal&&Orbit.legal.gate)Orbit.legal.gate(tipo,scopeId);},350);}
+  function code(error){return String(error&&(error.code||error.message)||'').toLowerCase();}
+  function friendly(error){var c=code(error);if(c.indexOf('account_not_ready')>=0||c.indexOf('email-not-verified')>=0)return 'Tu acceso ya está creado, pero falta verificar el correo. Revisa tu bandeja y abre el enlace de verificación antes de ingresar.';return 'No fue posible iniciar sesión. Verifica tu usuario y contraseña e intenta nuevamente.';}
+  function unverified(p,u,sendNow){var send=Promise.resolve();if(sendNow&&p&&typeof p.sendVerificationEmail==='function'){var key='orbit360-verification-sent-'+String(u&&u.uid||''),last=Number(sessionStorage.getItem(key)||0);if(!last||Date.now()-last>300000)send=Promise.resolve(p.sendVerificationEmail(u)).then(function(){sessionStorage.setItem(key,String(Date.now()));}).catch(function(){});}return send.then(function(){return p&&p.signOut?p.signOut():null;}).catch(function(){}).then(function(){rawUser=null;var e=new Error('ACCOUNT_NOT_READY');e.code='ACCOUNT_NOT_READY';throw e;});}
+  function restore(p){if(restorePromise)return restorePromise;restorePromise=Promise.resolve().then(function(){return p.initialUser?p.initialUser():null;}).then(function(existing){if(!existing)return null;rawUser=existing;if(rawUser.emailVerified!==true)return Promise.resolve(p.signOut?p.signOut():null).catch(function(){}).then(function(){rawUser=null;paintError(friendly({code:'ACCOUNT_NOT_READY'}));return null;});if(!Orbit.productAppP0||typeof Orbit.productAppP0.activate!=='function')throw new Error('PRODUCT_APP_OWNER_MISSING');return Orbit.productAppP0.activate();}).catch(function(error){rawUser=null;paintError(friendly(error));return null;});return restorePromise;}
+  function init(){showLogin();var p=provider();if(!p||!p.enabled||!p.enabled()){paintError('El acceso todavía no está habilitado.');return;}p.initialize().then(function(){return restore(p);}).catch(function(){paintError('El acceso todavía no está disponible.');});var form=document.getElementById('login-form');if(!form||form.dataset.productBound==='1')return;form.dataset.productBound='1';var email=document.getElementById('lg-user'),pass=document.getElementById('lg-pass');if(email)email.value='';if(pass)pass.value='';form.addEventListener('submit',function(ev){ev.preventDefault();if(form.dataset.submitting==='1')return;paintError('');setSubmitting(form,true);p.signIn(email&&email.value,pass&&pass.value).then(function(cred){rawUser=cred&&cred.user?cred.user:null;if(!rawUser)throw new Error('AUTH_USER_NOT_AVAILABLE');if(rawUser.emailVerified!==true)return unverified(p,rawUser,true);return Orbit.productAppP0.activate();}).catch(function(error){if(code(error).indexOf('account_not_ready')<0){rawUser=null;Promise.resolve(p.signOut?p.signOut():null).catch(function(){});}paintError(friendly(error));}).finally(function(){setSubmitting(form,false);});});}
   function logout(){var p=provider();return Promise.resolve(p&&p.signOut?p.signOut():null).catch(function(){}).then(function(){rawUser=null;location.reload();});}
-  window.Orbit.auth={VERSION:'product-p0-session-reload-20260910.1',init:init,user:user,authed:function(){return!!user();},login:function(){return user();},logout:logout,showLogin:showLogin,showApp:showApp,paintIdentity:paintIdentity,productUser:null,writeAuthorized:false,noLocalSession:true,sessionPersistence:'firebase-browser-local'};
+  window.Orbit.auth={VERSION:'product-b1-20260919.1',init:init,user:user,authed:function(){return!!user();},login:function(){return user();},logout:logout,showLogin:showLogin,showApp:showApp,paintIdentity:paintIdentity,productUser:null,writeAuthorized:false,noLocalSession:true,sessionPersistence:'firebase-browser-local',emailVerificationRequired:true};
 })();

@@ -4,6 +4,7 @@ module.exports = Object.assign(
   {},
   require('./user-onboarding'),
   require('./tenant-domain-config'),
+  require('./tenant-branding'),
   require('./ops-leads-domain'),
   require('./product-ops-leads-domain'),
   require('./ops-advisor-inbox'),

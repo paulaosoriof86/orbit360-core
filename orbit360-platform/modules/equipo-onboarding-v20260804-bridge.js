@@ -73,8 +73,7 @@
   }
   function confirmScopeOpening(before, after) {
     if (allScope(after) && !allScope(before)) {
-      const confirmation = window.prompt('Este cambio abre el alcance de datos a “Todos”. Escribe CONFIRMAR TODOS para continuar:');
-      return confirmation === 'CONFIRMAR TODOS';
+      return window.confirm('Este cambio ampliará el alcance de datos a “Todos”. ¿Deseas continuar?');
     }
     return true;
   }
@@ -216,5 +215,5 @@
     const host = document.getElementById('host') || document.getElementById('mod-host');
     if (host) decorateTable(host);
   });
-  window.Orbit.equipoOnboardingBridgeV20260804=Object.freeze({VERSION:'20260918.1',loaded:true,identityAgnostic:true,backendOwned:true,noHardcodedIdentities:true});
+  window.Orbit.equipoOnboardingBridgeV20260804=Object.freeze({VERSION:'20260919.b1',loaded:true,identityAgnostic:true,backendOwned:true,noHardcodedIdentities:true});
 })();

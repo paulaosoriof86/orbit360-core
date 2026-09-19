@@ -1,6 +1,6 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B1_EXECUTION_LOCK_V1",
-  "status": "PREPARED_FOR_CANDIDATE",
+  "status": "CANDIDATE_PENDING_PREVIEW",
   "date": "2026-09-19",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -79,5 +79,11 @@
   ],
   "visualAcceptanceRequired": true,
   "sameArtifactPreviewToLiveRequired": true,
-  "conversationDependent": false
+  "conversationDependent": false,
+  "productCandidate": {
+    "binding": "THIS_COMMIT_GITHUB_SHA",
+    "parentHead": "1efa2d70f86efa5927a8dff7ecd0bc4ec07e7f43",
+    "livePromoted": false
+  },
+  "candidatePreparedAt": "2026-09-19"
 }

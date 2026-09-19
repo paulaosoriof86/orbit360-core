@@ -4,7 +4,7 @@
    · Self-service del cliente (según plan): marca, usuarios/roles,
      países/monedas, add-ons, APIs, portal.
    · Interna (nuestra): módulos activos por cliente, plan, white-label.
-   Fuente de verdad: Orbit.tenant. El sidebar lee modulosActivos.
+   Fuente de verdad de marca pública: Orbit.publicTenantBranding (backend). Orbit.tenant conserva configuración local no relacionada con identidad pública.
    ============================================================ */
 window.Orbit = window.Orbit || {};
 Orbit.modules = Orbit.modules || {};
@@ -52,16 +52,20 @@ Orbit.modules.configuracion = (function () {
 
   /* ---------- MARCA ---------- */
   function marca() {
-    const t = T().get(), plan = Orbit.PLANES[t.plan];
+    const t = T().get(), plan = Orbit.PLANES[t.plan] || { nombre: t.plan || 'Actual', personalizacion: true };
     const lock = !plan.personalizacion;
-    return `${sectionHead('Marca y apariencia', 'Logo, paleta y menú — white-label')}
-      ${lock ? `<div class="cfg-lock">🔒 El plan <b>${plan.nombre}</b> usa plantillas estándar. La personalización de marca está disponible en planes Profesional y Personalizado.</div>` : ''}
-      ${row('Nombre de la empresa', `<input class="o-sel" id="cf-empresa" value="${U.esc(t.empresa)}" ${lock ? 'disabled' : ''} style="min-width:240px">`)}
-      ${row('Logo del cliente', `<div style="display:flex;align-items:center;gap:10px"><span class="cfg-logo">${t.branding.logo ? `<img src="${U.esc(t.branding.logo)}">` : '🏢'}</span><button class="btn ghost sm" ${lock ? 'disabled' : ''} onclick="(function(){var fi=document.createElement('input');fi.type='file';fi.accept='image/*';fi.onchange=function(){var r=new FileReader();r.onload=function(e){try{Orbit.store.setPref('logo',e.target.result);}catch(x){}try{var b=Orbit.tenant.get().branding||{};b.logo=e.target.result;Orbit.tenant.setDeep('branding',b);}catch(x){}if(Orbit.applyBrand)Orbit.applyBrand();var img=document.getElementById('cfg-logo-prev');if(img){img.src=e.target.result;img.style.display='inline-block';}var t=document.createElement('div');t.className='ciclo-toast';t.textContent='\u2713 Logo aplicado en cintilla y login';document.body.appendChild(t);setTimeout(function(){t.remove();},2600);};r.readAsDataURL(fi.files[0]);};fi.click();})()">Subir logo</button><button class="btn ghost sm" ${lock ? 'disabled' : ''} onclick="(function(){try{Orbit.store.setPref('logo','');var b=Orbit.tenant.get().branding||{};b.logo='';Orbit.tenant.setDeep('branding',b);}catch(x){}if(Orbit.applyBrand)Orbit.applyBrand();})()">Quitar</button><img id="cfg-logo-prev" style="height:36px;border-radius:6px;margin-left:8px;vertical-align:middle;display:none"></div>`, 'Se refleja en la cintilla y el login. Sube el logo del cliente para white-label.')}
+    const b = (Orbit.publicTenantBranding && Orbit.publicTenantBranding.current && Orbit.publicTenantBranding.current()) || {};
+    return `${sectionHead('Marca y apariencia', 'Identidad pública de la empresa, logo y favicon — configuración viva')}
+      ${lock ? `<div class="cfg-lock">🔒 El plan <b>${plan.nombre}</b> usa plantillas estándar. La personalización de marca está disponible en planes con white-label.</div>` : ''}
+      ${row('Nombre de la empresa', `<input class="o-sel" id="cf-empresa" value="${U.esc(b.displayName || '')}" ${lock ? 'disabled' : ''} style="min-width:280px">`)}
+      ${row('Razón social', `<input class="o-sel" id="cf-legal" value="${U.esc(b.legalName || '')}" ${lock ? 'disabled' : ''} style="min-width:320px">`)}
+      ${row('Logo oficial', `<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span class="cfg-logo" id="cfg-logo-prev">${b.logo ? `<img src="${U.esc(b.logo)}">` : 'Sin logo'}</span><button class="btn ghost sm" id="cf-logo-upload" ${lock ? 'disabled' : ''}>Subir logo</button></div>`, 'Se utiliza en login y cintilla. Se guarda en la configuración canónica de esta empresa.')}
+      ${row('Favicon', `<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span class="cfg-logo" id="cfg-favicon-prev">${b.favicon ? `<img src="${U.esc(b.favicon)}">` : 'Sin favicon'}</span><button class="btn ghost sm" id="cf-favicon-upload" ${lock ? 'disabled' : ''}>Subir favicon</button></div>`, 'Ícono compacto de la pestaña del navegador.')}
+      ${row('Guardar identidad', `<button class="btn primary" id="cf-brand-save" ${lock ? 'disabled' : ''}>Guardar marca</button>`, 'Nombre, razón social y recursos visuales se leen desde una sola autoridad viva.')}
       ${row('Paleta de marca', `<button class="btn ghost sm" ${lock ? 'disabled' : ''} onclick="Orbit.theme.picker(this)">🎨 Elegir paleta</button>`, 'Cambia el acento en toda la plataforma')}
       ${row('Menú lateral', `<div class="cfg-seg" id="cf-sb">${['oscuro', 'claro'].map(m => `<button data-sb="${m}" class="${Orbit.theme.getSidebar() === m ? 'on' : ''}" ${lock ? 'disabled' : ''}>${m === 'oscuro' ? 'Oscuro' : 'Claro'}</button>`).join('')}</div>`)}
       ${row('Auto-branding por IA', `<button class="btn ghost sm" ${lock ? 'disabled' : ''} onclick="Orbit.modules.configuracion.subirManualMarca()">📄 Subir manual de marca</button>`, 'La IA lee tu manual y propone tipografía y colores corporativos (plan Personalizado)')}
-      ${row('Ocultar etiquetas técnicas', toggle('hideTechnicalBadges', !!t.hideTechnicalBadges), 'Oculta los distintivos NÚCLEO/BETA/PRÓX. del menú para el modo cliente/implementación')}`;
+      ${row('Ocultar etiquetas técnicas', toggle('hideTechnicalBadges', !!t.hideTechnicalBadges), 'Oculta los distintivos técnicos del menú para el modo cliente/implementación')}`;
   }
 
   /* ---------- USUARIOS Y PERMISOS ---------- */
@@ -306,9 +310,34 @@ Orbit.modules.configuracion = (function () {
     }));
     // sidebar seg
     host.querySelectorAll('#cf-sb button').forEach(b => b.addEventListener('click', () => { Orbit.theme.applySidebar(b.dataset.sb); paint(host); }));
-    // empresa
-    const emp = document.getElementById('cf-empresa');
-    if (emp) emp.addEventListener('change', () => { T().setDeep('empresa', emp.value); applyBrandToTopbar(); });
+    // identidad pública de empresa: una sola autoridad server-owned
+    const brandSave = document.getElementById('cf-brand-save');
+    if (brandSave) brandSave.addEventListener('click', async () => {
+      const emp = document.getElementById('cf-empresa'), legal = document.getElementById('cf-legal');
+      if (!Orbit.publicTenantBranding || typeof Orbit.publicTenantBranding.save !== 'function') return Orbit.ui.toast('La configuración de marca todavía no está disponible.');
+      try {
+        brandSave.disabled = true; brandSave.textContent = 'Guardando…';
+        await Orbit.publicTenantBranding.save({ displayName: (emp && emp.value || '').trim(), legalName: (legal && legal.value || '').trim() }, 'Actualización de identidad desde Configuración');
+        Orbit.ui.toast('Marca guardada y confirmada.');
+        paint(host);
+      } catch (error) { Orbit.ui.toast('No fue posible guardar la marca.'); brandSave.disabled = false; brandSave.textContent = 'Guardar marca'; }
+    });
+    function pickBrandImage(field) {
+      const fi = document.createElement('input'); fi.type = 'file'; fi.accept = 'image/png,image/jpeg,image/webp';
+      fi.onchange = () => {
+        const file = fi.files && fi.files[0]; if (!file) return;
+        if (file.size > 350000) return alert('La imagen debe pesar máximo 350 KB.');
+        const reader = new FileReader();
+        reader.onload = async e => {
+          try { await Orbit.publicTenantBranding.save({ [field]: e.target.result }, field === 'favicon' ? 'Actualización de favicon desde Configuración' : 'Actualización de logo desde Configuración'); Orbit.ui.toast(field === 'favicon' ? 'Favicon actualizado.' : 'Logo actualizado.'); paint(host); }
+          catch (error) { Orbit.ui.toast('No fue posible guardar la imagen.'); }
+        };
+        reader.readAsDataURL(file);
+      };
+      fi.click();
+    }
+    const logoUpload = document.getElementById('cf-logo-upload'); if (logoUpload) logoUpload.addEventListener('click', () => pickBrandImage('logo'));
+    const faviconUpload = document.getElementById('cf-favicon-upload'); if (faviconUpload) faviconUpload.addEventListener('click', () => pickBrandImage('favicon'));
     // plan interno
     const pl = document.getElementById('cf-plan');
     if (pl) pl.addEventListener('change', () => { T().setDeep('plan', pl.value); paint(host); });
@@ -334,22 +363,8 @@ Orbit.modules.configuracion = (function () {
     host.querySelectorAll('.cfg-mod input').forEach(i => i.addEventListener('change', () => i.closest('.cfg-mod').classList.toggle('on', i.checked)));
   }
   function applyBrandToTopbar() {
-    const t = T().get();
-    const logo = (t.branding && t.branding.logo) || Orbit.store.pref('logo', '') || '';
-    const tieneMarca = !!(t.empresa && t.empresa !== 'Tu marca') || !!logo;
-    const cn = document.querySelector('.tb-logo .cn');
-    if (cn) { cn.innerHTML = (t.empresa && t.empresa !== 'Tu marca' ? U.esc(t.empresa) : 'Tu marca') + '<small>' + (tieneMarca ? 'Cliente' : 'White-label') + '</small>'; }
-    // logo en el slot del topbar
-    const slot = document.getElementById('client-logo');
-    if (slot) { if (logo) { slot.innerHTML = '<img src="' + logo + '" style="width:100%;height:100%;object-fit:contain">'; slot.style.border = 'none'; } else { slot.textContent = '🏢'; slot.style.borderStyle = 'dashed'; } }
-    // logo en el login (slot inferior)
-    const lgSlot = document.querySelector('.lf-logoslot .slot');
-    if (lgSlot) { if (logo) { lgSlot.innerHTML = '<img src="' + logo + '" style="width:100%;height:100%;object-fit:contain">'; lgSlot.style.borderStyle = 'solid'; } }
-    // nombre de empresa en el login
-    const lgName = document.querySelector('.lf-logoslot .lf-cn');
-    if (lgName && t.empresa && t.empresa !== 'Tu marca') lgName.textContent = t.empresa;
+    if (Orbit.publicTenantBranding && typeof Orbit.publicTenantBranding.apply === 'function') Orbit.publicTenantBranding.apply();
   }
-  // exponer para que el shell lo invoque al cargar
   Orbit.applyBrand = applyBrandToTopbar;
 
   function editarPlan(id) {
