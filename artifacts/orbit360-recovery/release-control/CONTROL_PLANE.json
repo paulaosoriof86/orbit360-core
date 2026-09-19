@@ -1884,5 +1884,31 @@
     "sourceMutatedAfterBuild": false,
     "productionUrl": "https://ays-orbit-360-lab.web.app",
     "promotedLiveRunId": 35415555116
+  },
+  "i65ForensicAudit": {
+    "status": "READ_ONLY_FORENSIC_AUDIT_REQUESTED",
+    "requestedAt": "2026-09-19T08:05:00-06:00",
+    "triggerReason": "Paula visual acceptance rejected; audit must verify code, LIVE behavior, backend/Auth/membership, frontend regressions and synchronization before any further I6.5 closure.",
+    "productionWritesAuthorized": false,
+    "authWritesAuthorized": false,
+    "sourceDataApplyAuthorized": false,
+    "reimportAuthorized": false,
+    "livePromotionAuthorized": false,
+    "preserveCertifiedCandidate": true,
+    "auditScope": [
+      "LOGIN_BRANDING",
+      "TEAM_USERS_AUTH",
+      "CLIENTS",
+      "POLICIES",
+      "VEHICLES",
+      "RECEIPTS",
+      "COBROS_PORTFOLIO",
+      "INSURERS",
+      "ROUTE_REGRESSION",
+      "FRONTEND_HIERARCHY",
+      "PERFORMANCE",
+      "SYNC_DRIFT"
+    ],
+    "nextAfterAudit": "FORENSIC_FINDINGS_AND_MINI_FIX_PLAN_WITHOUT_REOPENING_I6_4"
   }
 }
