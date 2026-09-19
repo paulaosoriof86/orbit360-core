@@ -435,7 +435,7 @@ if(b1Active){
  need(B1.allowedProductFiles.length===14,'I6_5_B1_SCOPE_COUNT_INVALID');
  const b1Required=["orbit360-platform/index.html","orbit360-platform/core/public-tenant-branding.js","orbit360-platform/data/tenant-public-branding-index.js","orbit360-platform/modules/configuracion.js","orbit360-platform/modules/equipo.js","orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js","orbit360-platform/core/product-runtime-browser-providers-p0.js","orbit360-platform/core/auth-product-runtime-p0.js","orbit360-platform/core/auth-password-change-v20260805.js","functions/tenant-branding.js","functions/bootstrap.js","functions/package.json","orbit360-platform/assets/tenant/alianzas-soluciones/logo-oficial-360.png","orbit360-platform/assets/tenant/alianzas-soluciones/logo-bolita-96.png"];
  need(b1Required.every(p=>B1.allowedProductFiles.includes(p)),'I6_5_B1_SCOPE_INVALID');
- need(B1.backend?.newFunctionTarget==='orbit360TenantBranding'&&B1.brandingConfig?.publicReadOwner==='orbit360TenantBranding'&&B1.brandingConfig?.authenticatedWriteOwner==='orbit360TenantBranding','I6_5_B1_OWNER_INVALID');
+ need(Array.isArray(B1.backend?.deployTargets)&&['orbit360TenantBranding','orbit360ProductOperationalCommand','orbit360ProvisionTeamAccess'].every(x=>B1.backend.deployTargets.includes(x))&&B1.backend?.deployExactCurrentSource===true&&B1.brandingConfig?.publicReadOwner==='orbit360TenantBranding'&&B1.brandingConfig?.authenticatedWriteOwner==='orbit360TenantBranding','I6_5_B1_OWNER_INVALID');
 }
 if(i65OperationalClosurePending||i65OperationalClosureLive){
  need(i65OperationalClosure.classification==='CODE_DEFECT'&&i65OperationalClosure.scope==='I6_5_OPERATIONAL_CLOSURE_MINIFIX','I6_5_OPERATIONAL_CLASS_INVALID');
