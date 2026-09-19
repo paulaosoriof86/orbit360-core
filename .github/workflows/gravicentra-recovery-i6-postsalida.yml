@@ -49,6 +49,15 @@ on:
       - 'orbit360-platform/modules/aseguradoras.js'
       - 'orbit360-platform/data/store-firestore-product-operational-p0.js'
       - 'orbit360-platform/core/pwa.js'
+      - 'artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B1_EXECUTION_LOCK_20260919.json'
+      - 'tools/gravicentra-i6-5-b1-functional.mjs'
+      - 'functions/tenant-branding.js'
+      - 'orbit360-platform/core/public-tenant-branding.js'
+      - 'orbit360-platform/modules/configuracion.js'
+      - 'orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js'
+      - 'orbit360-platform/core/product-runtime-browser-providers-p0.js'
+      - 'orbit360-platform/core/auth-product-runtime-p0.js'
+      - 'orbit360-platform/core/auth-password-change-v20260805.js'
       - '.github/workflows/gravicentra-recovery-i6-postsalida.yml'
 
 permissions:
@@ -2839,3 +2848,204 @@ jobs:
           git commit -m "recovery(i6.4): seal causal country currency and payment normalization"
           node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
           git push origin HEAD:recovery/fase-a-clean-20260831
+
+
+  i65-forensic-b1-preview:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    env:
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      B1_LOCK: artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B1_EXECUTION_LOCK_20260919.json
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Gate B1 and preserve certified LIVE
+        id: mode
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          node - <<'NODE'
+          const fs=require('node:fs'),c=JSON.parse(fs.readFileSync(process.env.CONTROL)),b=JSON.parse(fs.readFileSync(process.env.B1_LOCK));
+          const mode=b.status==='CANDIDATE_PENDING_PREVIEW'&&c.nextAction==='I6_5_FORENSIC_REMEDIATION_B1_PREVIEW'?'preview':'noop';
+          if(mode==='preview'&&(c.i65ForensicRemediationPlan?.currentBlock!=='B1'||b.boundaries?.liveHostingPromotionAuthorized!==false))throw Error('B1_GATE');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'mode='+mode+'\n');console.log('B1_MODE='+mode);
+          NODE
+      - name: Assert LIVE still equals certified candidate
+        run: node tools/gravicentra-certified-live-binding-check.mjs
+      - name: No-op until B1 product candidate exists
+        if: steps.mode.outputs.mode == 'noop'
+        run: node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+      - name: Validate B1 source contracts
+        if: steps.mode.outputs.mode == 'preview'
+        run: |
+          set -euo pipefail
+          node --check functions/tenant-branding.js
+          (cd functions && npm run check >/dev/null)
+          node --check orbit360-platform/core/public-tenant-branding.js
+          node --check orbit360-platform/modules/configuracion.js
+          node --check orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js
+          node --check orbit360-platform/core/product-runtime-browser-providers-p0.js
+          node --check orbit360-platform/core/auth-product-runtime-p0.js
+          node --check orbit360-platform/core/auth-password-change-v20260805.js
+          node --check tools/gravicentra-i6-5-b1-functional.mjs
+          ! grep -Fq "CONFIRMAR TODOS" orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js
+          ! grep -Eq "window\\.firebase|firebase\\.auth" orbit360-platform/core/auth-password-change-v20260805.js
+          grep -Fq "orbit360TenantBranding" functions/bootstrap.js
+          ! grep -Fq "tenant-public-branding-index.js" orbit360-platform/index.html
+          test -s orbit360-platform/assets/tenant/alianzas-soluciones/logo-oficial-360.png
+          test -s orbit360-platform/assets/tenant/alianzas-soluciones/logo-bolita-96.png
+      - name: Install B1 proof dependencies
+        if: steps.mode.outputs.mode == 'preview'
+        run: |
+          npm install --no-save --package-lock=false playwright@1.55.0 firebase-admin@13.4.0 >/dev/null
+          npx playwright install --with-deps chromium >/dev/null
+      - name: Select existing Firebase authority
+        if: steps.mode.outputs.mode == 'preview'
+        run: |
+          set -euo pipefail
+          ROOT="$RUNNER_TEMP/b1-auth";mkdir -p "$ROOT";export ROOT
+          python3 - <<'PY'
+          import json,os,pathlib
+          rows=[]
+          for i,k in enumerate(['SA_DEFAULT','SA_ORBIT360_LAB','SA_ORBIT_360_LAB']):
+              try:d=json.loads(os.environ.get(k,''))
+              except:continue
+              if d.get('type')=='service_account' and d.get('project_id')=='ays-orbit-360-lab' and d.get('private_key'):
+                  p=pathlib.Path(os.environ['ROOT'])/f'{i}.json';p.write_text(json.dumps(d));p.chmod(0o600);rows.append(str(p))
+          if not rows:raise SystemExit('B1_NO_SERVICE_ACCOUNT')
+          pathlib.Path(os.environ['ROOT']+'/files').write_text('\n'.join(rows)+'\n')
+          PY
+          SEL='';while read -r F;do if GOOGLE_APPLICATION_CREDENTIALS="$F" npx --yes firebase-tools@14.10.1 functions:list --project "$PROJECT_ID" --non-interactive --json >/dev/null 2>&1;then SEL="$F";break;fi;done<"$ROOT/files"
+          test -n "$SEL";cp "$SEL" "$RUNNER_TEMP/b1-sa.json";chmod 600 "$RUNNER_TEMP/b1-sa.json";echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/b1-sa.json" >> "$GITHUB_ENV"
+      - name: Materialize immutable accumulated B1 package
+        if: steps.mode.outputs.mode == 'preview'
+        id: build
+        run: |
+          set -euo pipefail
+          npx --yes firebase-tools@14.10.1 apps:list WEB --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/apps.json";export APPS="$RUNNER_TEMP/apps.json"
+          APP_ID=$(python3 - <<'PY'
+          import json,os
+          d=json.load(open(os.environ['APPS']));a=d.get('result') if isinstance(d,dict) else None
+          web=[x for x in (a or []) if str(x.get('platform','')).upper() in ('WEB','PLATFORM_WEB','')]
+          if len(web)!=1:raise SystemExit('B1_WEB_APP_CARDINALITY:'+str(len(web)))
+          print(web[0].get('appId',''))
+          PY
+          )
+          npx --yes firebase-tools@14.10.1 apps:sdkconfig WEB "$APP_ID" --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/public-config.json"
+          export SOURCE_SHA="$GITHUB_SHA" RELEASE_GATE="I6.5" BUILD_PREFIX="gi-i65-b1" ENVIRONMENT_REF="firebase-hosting-preview-i6-5-forensic-b1"
+          node tools/gravicentra-i6-1-preview-package.mjs . "$RUNNER_TEMP/b1-package" "$RUNNER_TEMP/public-config.json" > "$RUNNER_TEMP/b1-package-output.json"
+          node - <<'NODE'
+          const fs=require('fs'),d=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/b1-package-output.json'));for(const[k,v]of Object.entries({build_id:d.buildId,hosted_payload_digest:d.hostedPayloadDigest,backend_source_digest:d.backendSourceDigest,bundle_digest:d.bundleDigest}))fs.appendFileSync(process.env.GITHUB_OUTPUT,k+'='+v+'\n');
+          NODE
+      - name: Deploy only new B1 branding owner and seed canonical branding
+        if: steps.mode.outputs.mode == 'preview'
+        run: |
+          set -euo pipefail
+          E="$RUNNER_TEMP/b1-package/evidence";mkdir -p "$E"
+          npx --yes firebase-tools@14.10.1 functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/b1-functions-before.json";export BEFORE="$RUNNER_TEMP/b1-functions-before.json"
+          PRESENT=$(node - <<'NODE'
+          const fs=require('fs'),r=JSON.parse(fs.readFileSync(process.env.BEFORE)),a=Array.isArray(r.result)?r.result:r,n=new Set(a.flatMap(x=>[x.entryPoint,x.id||x.name].map(String)));process.stdout.write(n.has('orbit360TenantBranding')?'true':'false');
+          NODE
+          )
+          test "$PRESENT" = false || { echo B1_BRANDING_FUNCTION_ALREADY_PRESENT_UNEXPECTED >&2; exit 41; }
+          echo "B1_FUNCTION_PREEXISTED=false" >> "$GITHUB_ENV"
+          FROOT="$RUNNER_TEMP/b1-functions";mkdir -p "$FROOT";cp -a "$RUNNER_TEMP/b1-package/bundle/backend" "$FROOT/backend";(cd "$FROOT/backend"&&npm ci --ignore-scripts --no-audit --no-fund >/dev/null);echo '{"functions":{"source":"backend"}}' > "$FROOT/firebase.json"
+          npx --yes firebase-tools@14.10.1 deploy --only functions:orbit360TenantBranding --config "$FROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
+          export E TENANT_HINT GITHUB_RUN_ID
+          (cd "$FROOT/backend" && node - <<'NODE'
+          const fs=require('fs');const {initializeApp,cert}=require('firebase-admin/app');const {getFirestore,Timestamp}=require('firebase-admin/firestore');const sa=JSON.parse(fs.readFileSync(process.env.GOOGLE_APPLICATION_CREDENTIALS));initializeApp({credential:cert(sa),projectId:process.env.PROJECT_ID});const db=getFirestore(),ref=db.collection('tenants').doc(process.env.TENANT_HINT).collection('config').doc('branding'),eventId='b1_brand_seed_'+process.env.GITHUB_RUN_ID,eventRef=db.collection('tenants').doc(process.env.TENANT_HINT).collection('configEvents').doc(eventId),encode=v=>{if(v&&typeof v.toMillis==='function')return{__timestampMillis:v.toMillis()};if(Array.isArray(v))return v.map(encode);if(v&&typeof v==='object')return Object.fromEntries(Object.entries(v).map(([k,x])=>[k,encode(x)]));return v;};(async()=>{const snap=await ref.get();fs.writeFileSync(process.env.E+'/b1-branding-before.json',JSON.stringify({exists:snap.exists,data:snap.exists?encode(snap.data()):null,eventId},null,2)+'\n');if(snap.exists&&String((snap.data()||{}).schemaVersion||'')!=='orbit360-tenant-branding-v1')throw Error('B1_BRANDING_CONFIG_PREEXISTING_UNKNOWN_OWNER');const next={schemaVersion:'orbit360-tenant-branding-v1',displayName:'Alianzas & Soluciones',legalName:'Alianzas & Soluciones Corredores de Seguros',logo:'assets/tenant/alianzas-soluciones/logo-oficial-360.png',favicon:'assets/tenant/alianzas-soluciones/logo-bolita-96.png',seededBy:'I6.5-B1',updatedAt:Timestamp.now()};await db.runTransaction(async tx=>{tx.set(ref,next,{merge:false});tx.set(eventRef,{schemaVersion:'orbit360-branding-config-event-v1',tenantId:process.env.TENANT_HINT,action:'B1_SEED',sourceSha:process.env.GITHUB_SHA||'',createdAt:Timestamp.now(),containsPII:false},{merge:false});});console.log('B1_BRANDING_CONFIG_SEED=PASS');})().catch(e=>{console.error(e);process.exit(1);});
+          NODE
+          )
+          echo "B1_SEED_EVENT_ID=b1_brand_seed_$GITHUB_RUN_ID" >> "$GITHUB_ENV"
+      - name: Deploy exact B1 package to isolated Preview
+        if: steps.mode.outputs.mode == 'preview'
+        id: preview
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/b1-package/bundle";CHANNEL_ID="gi-i65-b1-$GITHUB_RUN_ID";CHANNEL_ID=$(echo "$CHANNEL_ID"|cut -c1-30)
+          npx --yes firebase-tools@14.10.1 hosting:channel:deploy "$CHANNEL_ID" --config firebase.json --project "$PROJECT_ID" --expires 7d --non-interactive --json > "$RUNNER_TEMP/b1-preview.json";export DEPLOY="$RUNNER_TEMP/b1-preview.json"
+          PREVIEW_URL=$(python3 - <<'PY'
+          import os,re
+          raw=open(os.environ['DEPLOY']).read();prod='https://'+os.environ['HOSTING_SITE']+'.web.app';urls=[u.rstrip('/') for u in re.findall(r'https://[A-Za-z0-9._-]+\.web\.app',raw) if u.rstrip('/')!=prod]
+          if not urls:raise SystemExit('B1_PREVIEW_URL_NOT_FOUND')
+          print(urls[-1])
+          PY
+          )
+          echo "channel_id=$CHANNEL_ID" >> "$GITHUB_OUTPUT";echo "preview_url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
+      - name: Exact B1 Preview readback
+        if: steps.mode.outputs.mode == 'preview'
+        env:
+          TARGET_URL: ${{ steps.preview.outputs.preview_url }}
+          EXPECTED_BUILD_ID: ${{ steps.build.outputs.build_id }}
+        run: |
+          set -euo pipefail
+          export MANIFEST="$RUNNER_TEMP/b1-package/evidence/site-manifest.sha256"
+          python3 - <<'PY'
+          import hashlib,json,os,time,urllib.parse,urllib.request
+          rows=[tuple(x.split('  ',1)) for x in open(os.environ['MANIFEST']).read().splitlines() if x.strip()];base=os.environ['TARGET_URL'].rstrip('/')
+          for attempt in range(1,9):
+              bad=[]
+              for want,rel in rows:
+                  try:
+                      with urllib.request.urlopen(urllib.request.Request(base+'/'+urllib.parse.quote(rel,safe='/')+'?b1='+str(attempt)+'-'+str(int(time.time())),headers={'Accept-Encoding':'identity','Cache-Control':'no-cache, no-store'}),timeout=30) as z:got=hashlib.sha256(z.read()).hexdigest()
+                  except Exception as e:got=type(e).__name__
+                  if got!=want:bad.append(rel)
+              with urllib.request.urlopen(base+'/__recovery__/build.json?b1='+str(time.time()),timeout=30) as z:marker=json.loads(z.read())
+              if not bad and marker.get('sourceSha')==os.environ['GITHUB_SHA'] and marker.get('buildId')==os.environ['EXPECTED_BUILD_ID']:break
+              if attempt==8:raise SystemExit('B1_READBACK:'+str(bad[:5])+':'+str(marker))
+              time.sleep(3)
+          print('B1_PREVIEW_READBACK=PASS')
+          PY
+      - name: Authenticated B1 functional proof
+        if: steps.mode.outputs.mode == 'preview'
+        env:
+          TARGET_URL: ${{ steps.preview.outputs.preview_url }}
+          B1_PROOF_FILE: ${{ runner.temp }}/b1-package/evidence/b1-functional.json
+        run: node tools/gravicentra-i6-5-b1-functional.mjs
+      - name: Upload accumulated B1 Preview artifact
+        if: steps.mode.outputs.mode == 'preview'
+        id: artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i6-5-b1-preview-${{ github.run_id }}
+          path: ${{ runner.temp }}/b1-package
+          include-hidden-files: true
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 30
+      - name: Freeze B1 Preview pending Paula visual acceptance
+        if: steps.mode.outputs.mode == 'preview'
+        env:
+          B1_BUILD_ID: ${{ steps.build.outputs.build_id }}
+          B1_PREVIEW_URL: ${{ steps.preview.outputs.preview_url }}
+          B1_CHANNEL_ID: ${{ steps.preview.outputs.channel_id }}
+          B1_ARTIFACT_ID: ${{ steps.artifact.outputs.artifact-id }}
+          B1_ARTIFACT_DIGEST: ${{ steps.artifact.outputs.artifact-digest }}
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('fs'),cpPath=process.env.CONTROL,lockPath=process.env.B1_LOCK,c=JSON.parse(fs.readFileSync(cpPath)),b=JSON.parse(fs.readFileSync(lockPath));b.status='PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL';b.preview={sourceSha:process.env.GITHUB_SHA,buildId:process.env.B1_BUILD_ID,channelId:process.env.B1_CHANNEL_ID,url:process.env.B1_PREVIEW_URL,runId:Number(process.env.GITHUB_RUN_ID),artifactId:Number(process.env.B1_ARTIFACT_ID),artifactDigest:process.env.B1_ARTIFACT_DIGEST||'',exactReadback:true,functionalPass:true,livePromoted:false};fs.writeFileSync(lockPath,JSON.stringify(b,null,2)+'\n');c.nextAction='I6_5_FORENSIC_REMEDIATION_B1_VISUAL';c.i65ForensicRemediationPlan.b1={status:b.status,sourceSha:process.env.GITHUB_SHA,buildId:process.env.B1_BUILD_ID,previewUrl:process.env.B1_PREVIEW_URL,runId:Number(process.env.GITHUB_RUN_ID),artifactId:Number(process.env.B1_ARTIFACT_ID),livePromoted:false};fs.writeFileSync(cpPath,JSON.stringify(c,null,2)+'\n');
+          NODE
+          git add "$B1_LOCK";BLOB=$(git hash-object "$B1_LOCK");export BLOB;node - <<'NODE'
+          const fs=require('fs'),p=process.env.CONTROL,c=JSON.parse(fs.readFileSync(p));c.i65ForensicRemediationPlan.b1ExecutionLockBlobSha=process.env.BLOB;fs.writeFileSync(p,JSON.stringify(c,null,2)+'\n');
+          NODE
+          git add "$CONTROL";git config user.name gravicentra-recovery-bot;git config user.email gravicentra-recovery-bot@users.noreply.github.com;git commit -m "freeze(i6.5): B1 preview pass pending visual";git push origin "HEAD:$GITHUB_REF_NAME"
+      - name: Roll back B1 project additions on Preview failure
+        if: ${{ failure() && steps.mode.outputs.mode == 'preview' }}
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          if test "${B1_FUNCTION_PREEXISTED:-true}" = false;then npx --yes firebase-tools@14.10.1 functions:delete orbit360TenantBranding --region us-central1 --project "$PROJECT_ID" --force || true;fi
+          SNAP="$RUNNER_TEMP/b1-package/evidence/b1-branding-before.json"
+          if test -f "$SNAP" && test -f "${GOOGLE_APPLICATION_CREDENTIALS:-}";then export SNAP;FROOT="$RUNNER_TEMP/b1-functions/backend";if test -d "$FROOT";then (cd "$FROOT" && node - <<'NODE'
+          const fs=require('fs');const {initializeApp,cert}=require('firebase-admin/app');const {getFirestore,Timestamp}=require('firebase-admin/firestore');const sa=JSON.parse(fs.readFileSync(process.env.GOOGLE_APPLICATION_CREDENTIALS));initializeApp({credential:cert(sa),projectId:process.env.PROJECT_ID});const db=getFirestore(),s=JSON.parse(fs.readFileSync(process.env.SNAP)),revive=v=>{if(v&&typeof v==='object'&&Object.keys(v).length===1&&v.__timestampMillis!=null)return Timestamp.fromMillis(v.__timestampMillis);if(Array.isArray(v))return v.map(revive);if(v&&typeof v==='object')return Object.fromEntries(Object.entries(v).map(([k,x])=>[k,revive(x)]));return v;};(async()=>{const ref=db.collection('tenants').doc(process.env.TENANT_HINT).collection('config').doc('branding');if(s.exists)await ref.set(revive(s.data),{merge:false});else await ref.delete();if(process.env.B1_SEED_EVENT_ID)await db.collection('tenants').doc(process.env.TENANT_HINT).collection('configEvents').doc(process.env.B1_SEED_EVENT_ID).delete();console.log('B1_ROLLBACK=PASS');})().catch(e=>{console.error(e);process.exit(1);});
+          NODE
+          );fi;fi

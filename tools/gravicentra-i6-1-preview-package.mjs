@@ -60,6 +60,8 @@ fs.writeFileSync(path.join(EVIDENCE,'reachable-files.txt'),[...seen].sort().join
 
 function copyTree(src,dst){for(const e of fs.readdirSync(src,{withFileTypes:true})){if(e.name==='node_modules'||e.name==='.git'||e.name.endsWith('.local'))continue;const a=path.join(src,e.name),b=path.join(dst,e.name);if(e.isDirectory()){fs.mkdirSync(b,{recursive:true});copyTree(a,b);}else if(e.isFile()){fs.mkdirSync(path.dirname(b),{recursive:true});fs.copyFileSync(a,b);}}}
 copyTree(FUNCTIONS_SRC,BACKEND);
+const TENANT_ASSETS=path.join(SRC,'assets','tenant');
+if(fs.existsSync(TENANT_ASSETS)) copyTree(TENANT_ASSETS,path.join(SITE,'assets','tenant'));
 for(const p of ['package.json','package-lock.json','bootstrap.js','product-active-role-contract.js','product-insurer-credentials.js']) if(!fs.existsSync(path.join(BACKEND,p)))throw new Error('BACKEND_REQUIRED_FILE_MISSING:'+p);
 
 let raw=JSON.parse(read(publicConfigPath)); let result=raw&&raw.result||{}; let cfg=result.sdkConfig;

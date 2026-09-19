@@ -1,0 +1,83 @@
+{
+  "schema": "GRAVICENTRA_I6_5_FORENSIC_B1_EXECUTION_LOCK_V1",
+  "status": "PREPARED_FOR_CANDIDATE",
+  "date": "2026-09-19",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "eaaf1e458f34bd3860b32876927cfe4476860c3a",
+  "parentCertifiedSourceSha": "4bf67a3738751fe2432a130fd23254a6f1c7d16e",
+  "block": "B1",
+  "readinessBefore": 70,
+  "readinessAfterAcceptance": 80,
+  "objective": "Correct branding authority, Equipo onboarding UX, account verification and modular password-change path on the single accumulated candidate, then expose one isolated Preview for immediate Paula visual acceptance.",
+  "allowedProductFiles": [
+    "orbit360-platform/index.html",
+    "orbit360-platform/core/public-tenant-branding.js",
+    "orbit360-platform/data/tenant-public-branding-index.js",
+    "orbit360-platform/modules/configuracion.js",
+    "orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js",
+    "orbit360-platform/core/product-runtime-browser-providers-p0.js",
+    "orbit360-platform/core/auth-product-runtime-p0.js",
+    "orbit360-platform/core/auth-password-change-v20260805.js",
+    "functions/tenant-branding.js",
+    "functions/bootstrap.js",
+    "functions/package.json",
+    "orbit360-platform/assets/tenant/alianzas-soluciones/logo-oficial-360.png",
+    "orbit360-platform/assets/tenant/alianzas-soluciones/logo-bolita-96.png"
+  ],
+  "backend": {
+    "newFunctionTarget": "orbit360TenantBranding",
+    "existingFunctionsMustRemainUntouched": true,
+    "deployTargetOnly": true,
+    "rollbackDeletesNewTargetIfItWasAbsentBefore": true
+  },
+  "brandingConfig": {
+    "path": "tenants/alianzas-soluciones/config/branding",
+    "publicReadOwner": "orbit360TenantBranding",
+    "authenticatedWriteOwner": "orbit360TenantBranding",
+    "seedWriteAuthorized": true,
+    "seedFields": [
+      "displayName",
+      "legalName",
+      "logo",
+      "favicon",
+      "schemaVersion"
+    ],
+    "logoAsset": "assets/tenant/alianzas-soluciones/logo-oficial-360.png",
+    "faviconAsset": "assets/tenant/alianzas-soluciones/logo-bolita-96.png",
+    "operationalBusinessDataWriteAuthorized": false
+  },
+  "boundaries": {
+    "productMutationAuthorized": true,
+    "dataMutationAuthorized": false,
+    "sourceDataApplyAuthorized": false,
+    "reimportAuthorized": false,
+    "cobrosWritesAuthorized": false,
+    "repeatI65DeterministicApplyAuthorized": false,
+    "liveHostingPromotionAuthorized": false,
+    "authUserMutationAuthorized": false,
+    "membershipMutationAuthorized": false,
+    "tenantBrandingConfigSeedAuthorized": true
+  },
+  "requiredFixes": [
+    "SINGLE_PREAUTH_TENANT_BRANDING_OWNER",
+    "NO_TECHNICAL_TENANT_WORDING",
+    "OFFICIAL_TENANT_LOGO_AND_APPROVED_FAVICON",
+    "TENANT_BRANDING_SELF_ADMIN_SERVER_PERSISTED",
+    "TEAM_SCOPE_CONFIRMATION_NO_TEXT_CHALLENGE_LOOP",
+    "UNVERIFIED_USER_VERIFICATION_EMAIL_FLOW_WITHOUT_BYPASS",
+    "MODULAR_FIRST_LOGIN_PASSWORD_CHANGE",
+    "NO_DUPLICATE_LOGIN_ERROR_NODE"
+  ],
+  "previewAcceptance": [
+    "No wrong-tenant flash on first paint.",
+    "Tenant full logo and favicon render from canonical branding config.",
+    "Equipo create/edit surfaces remain available; non-default scope change no longer loops on typed confirmation.",
+    "Unverified credentials receive a verification-email path while public login remains fail-closed until verified.",
+    "Password change uses modular Firebase provider.",
+    "No customer/policy/receipt/portfolio/cobro operational data write is executed by the B1 proof."
+  ],
+  "visualAcceptanceRequired": true,
+  "sameArtifactPreviewToLiveRequired": true,
+  "conversationDependent": false
+}
