@@ -2890,7 +2890,11 @@ jobs:
         run: node tools/gravicentra-certified-live-binding-check.mjs
       - name: No-op until B1 product candidate exists
         if: steps.mode.outputs.mode == 'noop'
-        run: node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+        run: |
+          node --check tools/gravicentra-i6-5-b1-functional.mjs
+          node --check tools/gravicentra-i6-5-b1-branding-snapshot.mjs
+          node --check tools/gravicentra-i6-5-b1-advisor-normalize.mjs
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
       - name: Validate B1 source contracts
         if: steps.mode.outputs.mode == 'preview'
         run: |
