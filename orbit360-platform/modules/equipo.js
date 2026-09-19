@@ -443,9 +443,9 @@ Orbit.modules.equipo = (function () {
 
   function wire(host) {
     const ps = host.querySelector('#perm-save');
-    if (ps) ps.addEventListener('click', () => {
-      const motivo = window.prompt('Motivo del cambio de la matriz de permisos:') || '';
-      if (motivo.trim().length < 5) return alert('Indica un motivo claro de al menos 5 caracteres.');
+    if (ps) ps.addEventListener('click', async () => {
+      const motivo = Orbit.ui && Orbit.ui.prompt ? await Orbit.ui.prompt('Indica el motivo del cambio de la matriz de permisos:', { title: 'Motivo del cambio' }) : '';
+      if (String(motivo || '').trim().length < 5) return alert('Indica un motivo claro de al menos 5 caracteres.');
       const before = getPermisos();
       const next = {};
       host.querySelectorAll('[data-perm]').forEach(c => {
@@ -454,9 +454,9 @@ Orbit.modules.equipo = (function () {
       Orbit.cat.setList('permisos', next); audit('editar_matriz_permisos', motivo, before, next); toast('✓ Matriz de permisos guardada');
     });
     const pr = host.querySelector('#perm-reset');
-    if (pr) pr.addEventListener('click', () => {
-      const ok = window.prompt('Escribe RESTABLECER para volver a los permisos estándar:'); if (ok !== 'RESTABLECER') return;
-      const motivo = window.prompt('Motivo del restablecimiento:') || ''; if (motivo.trim().length < 5) return alert('Indica un motivo claro.');
+    if (pr) pr.addEventListener('click', async () => {
+      const ok = Orbit.ui && Orbit.ui.confirm ? await Orbit.ui.confirm('¿Deseas restablecer la matriz a los permisos estándar?', { title: 'Restablecer permisos', danger: true }) : false; if (!ok) return;
+      const motivo = Orbit.ui && Orbit.ui.prompt ? await Orbit.ui.prompt('Indica el motivo del restablecimiento:', { title: 'Motivo del restablecimiento' }) : ''; if (String(motivo || '').trim().length < 5) return alert('Indica un motivo claro.');
       const before = getPermisos(), next = defaultPermissions(); Orbit.cat.setList('permisos', next); audit('restablecer_permisos', motivo, before, next); render(host);
     });
     host.querySelectorAll('[data-modo]').forEach(sel => sel.addEventListener('change', () => { Orbit.comeng.setVendModo(sel.dataset.modo, sel.value); render(host); }));
