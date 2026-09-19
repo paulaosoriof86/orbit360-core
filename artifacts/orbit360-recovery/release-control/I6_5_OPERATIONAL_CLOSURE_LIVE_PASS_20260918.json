@@ -2,10 +2,10 @@
   "schema": "GRAVICENTRA_I6_5_OPERATIONAL_CLOSURE_LIVE_PASS_V1",
   "status": "LIVE_PASS_PENDING_FINAL_PAULA_VISUAL",
   "date": "2026-09-18",
-  "sourceSha": "7408b41a392b441fc88175584270895313ca5231",
-  "buildId": "gi-i65-7408b41a392b-57f234755dc1",
-  "artifactId": 10571206572,
-  "runId": 35402014747,
+  "sourceSha": "dfc998703a9bb984d46d23a83fdd5c346dfa0925",
+  "buildId": "gi-i65-dfc998703a9b-57f234755dc1",
+  "artifactId": 10574994713,
+  "runId": 35415555116,
   "globalPortfolioCount": 1283,
   "globalCobrosCount": 5,
   "loginBrandPass": true,
@@ -14,9 +14,11 @@
   "policyFlowContractPass": true,
   "dataWrites": 0,
   "semanticBoundary": "recibosEsperados+carteraPrimas separate from cobros",
-  "userAccess": {
-    "samuel": "PROVISIONED_ACTIVE_MEMBERSHIP_EMAIL_VERIFICATION_PENDING",
-    "carlos": "PROVISIONED_ACTIVE_MEMBERSHIP_EMAIL_VERIFICATION_PENDING"
+  "selfAdministration": {
+    "identityPolicy": "NO_HARDCODED_IDENTITIES",
+    "teamModule": "PLATFORM_MANAGED",
+    "backendCommitRequired": true,
+    "canonicalReadbackRequired": true
   },
   "nextRequiredStep": "PAULA_VISUAL_REFRESH_ON_CURRENT_BUILD"
 }
