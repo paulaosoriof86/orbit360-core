@@ -2898,7 +2898,7 @@ jobs:
           node --check tools/gravicentra-i6-5-b1-functional.mjs
           ! grep -Fq "CONFIRMAR TODOS" orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js
           ! grep -Eq "window\\.firebase|firebase\\.auth" orbit360-platform/core/auth-password-change-v20260805.js
-          grep -Fq "orbit360TenantBranding" functions/bootstrap.js
+          grep -Fq "tenant-branding" functions/bootstrap.js
           ! grep -Fq "tenant-public-branding-index.js" orbit360-platform/index.html
           test -s orbit360-platform/assets/tenant/alianzas-soluciones/logo-oficial-360.png
           test -s orbit360-platform/assets/tenant/alianzas-soluciones/logo-bolita-96.png

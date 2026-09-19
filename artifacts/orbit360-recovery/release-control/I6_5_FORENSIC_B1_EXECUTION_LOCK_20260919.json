@@ -85,5 +85,15 @@
     "parentHead": "1efa2d70f86efa5927a8dff7ecd0bc4ec07e7f43",
     "livePromoted": false
   },
-  "candidatePreparedAt": "2026-09-19"
+  "candidatePreparedAt": "2026-09-19",
+  "lastAttempt": {
+    "runId": 35455524722,
+    "jobId": 105929991048,
+    "status": "FAILED_PRE_DEPLOY_SOURCE_CONTRACT",
+    "cause": "Workflow assertion searched for exported function name inside bootstrap, while bootstrap correctly composes the module through require('./tenant-branding').",
+    "backendDeployed": false,
+    "brandingSeedWritten": false,
+    "previewDeployed": false,
+    "operationalWrites": 0
+  }
 }
