@@ -461,6 +461,7 @@ try{
   await page.locator('.eu-role[value="Operativo"]').uncheck();
   await page.locator('.eu-pais[value="CO"]').uncheck();
   await page.selectOption('#eu-scope','propios');
+  if(!(await modulesDetails.evaluate(el=>el.open))) await modulesDetails.locator('summary').click();
   await page.click('#eu-reset-mod');
   if(await page.locator('#eu-sync-access').count())await page.locator('#eu-sync-access').uncheck();
   const restoreAccessPromise=page.click('#eu-ok');
