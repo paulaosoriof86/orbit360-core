@@ -407,7 +407,7 @@ try{
 
   await page.locator('.eu-role[value="Operativo"]').check();
   await page.locator('.eu-pais[value="CO"]').check();
-  await page.selectOption('#eu-scope','equipo');
+  await page.selectOption('#eu-scope','todos');
   if(await page.locator('#eu-sync-access').count())await page.locator('#eu-sync-access').uncheck();
   const moduleChoice=await page.evaluate(()=>{
     const nav=new Set();
@@ -427,6 +427,7 @@ try{
   await page.locator('.eu-mod[value="'+moduleChoice.restrict+'"]').uncheck();
   await page.locator('.eu-mod[value="'+moduleChoice.extra+'"]').check();
 
+  page.once('dialog',async dialog=>{ if(dialog.type()==='confirm') await dialog.accept(); else await dialog.dismiss(); });
   const savePromise=page.click('#eu-ok');
   await submitCustomPrompt(page,'Prueba B1 R3 reversible de rol país alcance y módulos','B1_SENSITIVE_REASON');
   ev.nativeUi.customReasonPrompts++;
@@ -435,7 +436,7 @@ try{
   const sensitive=await waitFor(async()=>{
     const x=await canonical(db,synthetic.id);if(!x)return null;
     const q=semanticAdvisor(x);
-    return q.roles.includes('Asesor')&&q.roles.includes('Operativo')&&q.paises.includes('GT')&&q.paises.includes('CO')&&q.scopeDatos==='equipo'&&q.modulosExtra.includes(moduleChoice.extra)&&q.modulosRestringidos.includes(moduleChoice.restrict)?x:null;
+    return q.roles.includes('Asesor')&&q.roles.includes('Operativo')&&q.paises.includes('GT')&&q.paises.includes('CO')&&q.scopeDatos==='todos'&&q.modulosExtra.includes(moduleChoice.extra)&&q.modulosRestringidos.includes(moduleChoice.restrict)?x:null;
   },'B1_SYNTHETIC_SENSITIVE_READBACK');
   ev.writes.advisorOperational++;ev.writes.auditOperational++;
   ev.team.synthetic.sensitive={
@@ -448,7 +449,7 @@ try{
   await reopen(page,synthetic.id);
   need(await page.locator('.eu-role[value="Operativo"]').isChecked(),'B1_ROLE_REFRESH_NOT_PERSISTED');
   need(await page.locator('.eu-pais[value="CO"]').isChecked(),'B1_COUNTRY_REFRESH_NOT_PERSISTED');
-  need((await page.inputValue('#eu-scope'))==='equipo','B1_SCOPE_REFRESH_NOT_PERSISTED');
+  need((await page.inputValue('#eu-scope'))==='todos','B1_SCOPE_REFRESH_NOT_PERSISTED');
   need(!(await page.locator('.eu-mod[value="'+moduleChoice.restrict+'"]').isChecked()),'B1_RESTRICTED_MODULE_REFRESH_NOT_PERSISTED');
   need(await page.locator('.eu-mod[value="'+moduleChoice.extra+'"]').isChecked(),'B1_EXTRA_MODULE_REFRESH_NOT_PERSISTED');
 
