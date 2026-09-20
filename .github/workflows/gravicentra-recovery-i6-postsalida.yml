@@ -2917,6 +2917,8 @@ jobs:
           ! grep -Fq "CONFIRMAR TODOS" orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js
           ! grep -Fq "window.prompt('Motivo del cambio" orbit360-platform/modules/equipo.js
           ! grep -Fq "window.prompt('Motivo de la gestión de acceso" orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js
+          ! grep -Eq "return[[:space:]]+alert[[:space:]]*\\(" orbit360-platform/modules/equipo.js
+          ! grep -Eq "return[[:space:]]+alert[[:space:]]*\\(" orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js
           ! grep -Eq "window\\.firebase|firebase\\.auth" orbit360-platform/core/auth-password-change-v20260805.js
           grep -Fq "tenant-branding" functions/bootstrap.js
           ! grep -Fq "tenant-public-branding-index.js" orbit360-platform/index.html

@@ -25,6 +25,10 @@
   function toast(message) {
     try { if (Orbit.ui && Orbit.ui.toast) return Orbit.ui.toast(message); } catch (error) {}
   }
+  function inform(message, title) {
+    try { if (Orbit.ui && typeof Orbit.ui.alert === 'function') return Orbit.ui.alert(message, { title: title || 'Revisa la información' }); } catch (error) {}
+    toast(message); return Promise.resolve(false);
+  }
   function stableId(name) {
     const base = 'ase-' + slug(name);
     if (!store().get('asesores', base)) return base;
@@ -156,7 +160,7 @@
         if (!confirmScopeOpening(current, desired)) return;
         const operation = info.id === 'blocked' ? 'reactivate' : (hasProvisionedAccess(current) ? 'sync' : 'provision');
         const reason = Orbit.ui && Orbit.ui.prompt ? await Orbit.ui.prompt('Indica el motivo de la gestión de acceso:', { title: 'Motivo de la gestión' }) : '';
-        if (String(reason || '').trim().length < 5) return alert('Indica un motivo claro de al menos 5 caracteres.');
+        if (String(reason || '').trim().length < 5) return inform('Indica un motivo claro de al menos 5 caracteres.', 'Motivo requerido');
         try {
           saveBusy = true;
           button.disabled = true;

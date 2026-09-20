@@ -1942,7 +1942,7 @@
     "addendumBlobSha": "05099a90cfb4862eec97e0359d55932828cb930b",
     "forensicAuditBlobSha": "fcfdf29c9eb851d76cebf67bcbe36d8ed308eb0f",
     "paymentInferenceBlobSha": "cfb026ded52c36083528de658a70191c8380d725",
-    "mechanismSyncStatus": "B1_R3_ROOT_CAUSE_CONFIRMED_CANDIDATE_PENDING_PREVIEW",
+    "mechanismSyncStatus": "B1_R3_PROOF_DESIGN_ROOT_CAUSE_CORRECTED",
     "guardFailureBeforeFix": {
       "runId": 35450692628,
       "code": "I6_5_NEXT_ACTION_INVALID",
@@ -1951,7 +1951,7 @@
       "livePromotion": false
     },
     "b1ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B1_EXECUTION_LOCK_20260919.json",
-    "b1ExecutionLockBlobSha": "93d6be9381f583113746e852f3fbdecd3134c6ff",
+    "b1ExecutionLockBlobSha": "e12d2a6d29c7ff416a65da01d8cb601fb1e9a4ef",
     "b1": {
       "status": "CANDIDATE_PENDING_PREVIEW",
       "sourceSha": "e2cad9e8872267a24a41af9dfee765a49a33f673",
@@ -1979,7 +1979,10 @@
         "equipoRuntimeRunId": 35475192026,
         "writes": 0
       },
-      "realCrudProofRequired": true
+      "realCrudProofRequired": true,
+      "proofDesign": "INCOMPLETE_EXISTING_NO_WRITE_PLUS_SYNTHETIC_FULL_CRUD_AUTH",
+      "realUserOperationalWriteRequired": false,
+      "syntheticFullCrudRequired": true
     }
   }
 }

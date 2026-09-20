@@ -80,7 +80,7 @@
     "syntheticCrudProof": {
       "authorized": true,
       "scope": "B1_PREVIEW_TEST_ONLY",
-      "realExistingRecordEditRestore": true,
+      "realExistingRecordEditRestore": false,
       "syntheticAdvisorCreateRefreshCleanup": true,
       "authLifecycleAllowedOnlyForSyntheticIdentity": true,
       "membershipLifecycleAllowedOnlyForSyntheticIdentity": true,
@@ -96,7 +96,10 @@
       ],
       "operationalRequestAndEventEvidenceMayRemain": true,
       "realUserAuthMutationForbidden": true,
-      "realUserMembershipMutationForbidden": true
+      "realUserMembershipMutationForbidden": true,
+      "incompleteExistingRecordNoWriteValidation": true,
+      "syntheticAdvisorCreateRefreshEditRestoreCleanup": true,
+      "realOperationalMutationForbidden": true
     }
   },
   "requiredFixes": [
@@ -276,6 +279,9 @@
     "requiresRefreshReopen": true,
     "requiresRestore": true,
     "requiresSyntheticCreateAuthLoginCleanup": true,
-    "liveHostingPromotionAuthorized": false
+    "liveHostingPromotionAuthorized": false,
+    "proofDesign": "INCOMPLETE_EXISTING_NO_WRITE_PLUS_SYNTHETIC_FULL_CRUD_AUTH",
+    "realOperationalMutationAuthorized": false,
+    "syntheticOperationalMutationAuthorized": true
   }
 }

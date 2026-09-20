@@ -114,6 +114,10 @@ Orbit.modules.equipo = (function () {
     const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = text;
     document.body.appendChild(t); setTimeout(() => t.remove(), 2800);
   }
+  function inform(message, title) {
+    if (Orbit.ui && typeof Orbit.ui.alert === 'function') return Orbit.ui.alert(message, { title: title || 'Revisa la información' });
+    toast(message); return Promise.resolve(false);
+  }
 
   function render(host) {
     const TABS = [
@@ -414,19 +418,19 @@ Orbit.modules.equipo = (function () {
     $('#eu-ok').addEventListener('click', async () => {
       const saveButton = $('#eu-ok'); if (saveButton.dataset.busy === '1') return;
       const nombre = $('#eu-nombre').value.trim(), roles = selectedRoles(), paises = selectedCountries();
-      if (!nombre) return alert('Indica el nombre del usuario.');
-      if (!roles.length) return alert('Selecciona al menos un rol.');
-      if (!paises.length) return alert('Selecciona al menos un país autorizado.');
+      if (!nombre) return inform('Indica el nombre del usuario.');
+      if (!roles.length) return inform('Selecciona al menos un rol.');
+      if (!paises.length) return inform('Selecciona al menos un país autorizado.');
       const rolDefault = $('#eu-role-default').value, paisDefault = $('#eu-pais-default').value;
-      if (!roles.includes(rolDefault)) return alert('El rol predeterminado debe estar entre los roles seleccionados.');
-      if (!paises.includes(paisDefault)) return alert('El país predeterminado debe estar entre los países seleccionados.');
+      if (!roles.includes(rolDefault)) return inform('El rol predeterminado debe estar entre los roles seleccionados.');
+      if (!paises.includes(paisDefault)) return inform('El país predeterminado debe estar entre los países seleccionados.');
       const selectedMods = $$('.eu-mod:checked').map(c => c.value), base = baseModules(roles);
       const data = { nombre, telefono: $('#eu-tel').value.trim(), email: $('#eu-email').value.trim().toLowerCase(), color: $('#eu-color').value,
         roles, rol: rolDefault, rolDefault, scopeDatos: $('#eu-scope').value, paises, pais: paisDefault, paisDefault,
         modulosExtra: selectedMods.filter(m => !base.includes(m)), modulosRestringidos: base.filter(m => !selectedMods.includes(m)), modulosOverride: selectedMods,
         inactivo: $('#eu-inact').checked, estado: $('#eu-inact').checked ? 'inactivo' : 'activo', activo: !$('#eu-inact').checked, updatedAt: new Date().toISOString() };
       const after = userSnapshot(data); let motivo = 'Alta manual desde Equipo';
-      if (id && sensitiveChanged(before, after)) { motivo = Orbit.ui && Orbit.ui.prompt ? await Orbit.ui.prompt('Indica el motivo del cambio de roles, permisos, países, alcance o estado:', { title: 'Motivo del cambio' }) : ''; if (String(motivo || '').trim().length < 5) return alert('Indica un motivo claro de al menos 5 caracteres.'); }
+      if (id && sensitiveChanged(before, after)) { motivo = Orbit.ui && Orbit.ui.prompt ? await Orbit.ui.prompt('Indica el motivo del cambio de roles, permisos, países, alcance o estado:', { title: 'Motivo del cambio' }) : ''; if (String(motivo || '').trim().length < 5) return inform('Indica un motivo claro de al menos 5 caracteres.', 'Motivo requerido'); }
       const advisorId = id ? canonicalAdvisorId(a, id) : nextStableId(nombre);
       if (id && !advisorId) return toast('No fue posible resolver la identidad canónica del usuario.');
       if (!id) { data.id = advisorId; data.iniciales = nombre.split(' ').map(x => x[0]).slice(0, 2).join('').toUpperCase(); data.comModo = 'comision'; data.shareCom = 50; data.accessProvisioned = false; data.invitacionEstado = 'pendiente_habilitacion'; data.createdAt = new Date().toISOString(); }
@@ -454,7 +458,7 @@ Orbit.modules.equipo = (function () {
     const ps = host.querySelector('#perm-save');
     if (ps) ps.addEventListener('click', async () => {
       const motivo = Orbit.ui && Orbit.ui.prompt ? await Orbit.ui.prompt('Indica el motivo del cambio de la matriz de permisos:', { title: 'Motivo del cambio' }) : '';
-      if (String(motivo || '').trim().length < 5) return alert('Indica un motivo claro de al menos 5 caracteres.');
+      if (String(motivo || '').trim().length < 5) return inform('Indica un motivo claro de al menos 5 caracteres.', 'Motivo requerido');
       const before = getPermisos();
       const next = {};
       host.querySelectorAll('[data-perm]').forEach(c => {
@@ -465,7 +469,7 @@ Orbit.modules.equipo = (function () {
     const pr = host.querySelector('#perm-reset');
     if (pr) pr.addEventListener('click', async () => {
       const ok = Orbit.ui && Orbit.ui.confirm ? await Orbit.ui.confirm('¿Deseas restablecer la matriz a los permisos estándar?', { title: 'Restablecer permisos', danger: true }) : false; if (!ok) return;
-      const motivo = Orbit.ui && Orbit.ui.prompt ? await Orbit.ui.prompt('Indica el motivo del restablecimiento:', { title: 'Motivo del restablecimiento' }) : ''; if (String(motivo || '').trim().length < 5) return alert('Indica un motivo claro.');
+      const motivo = Orbit.ui && Orbit.ui.prompt ? await Orbit.ui.prompt('Indica el motivo del restablecimiento:', { title: 'Motivo del restablecimiento' }) : ''; if (String(motivo || '').trim().length < 5) return inform('Indica un motivo claro.', 'Motivo requerido');
       const before = getPermisos(), next = defaultPermissions(); Orbit.cat.setList('permisos', next); audit('restablecer_permisos', motivo, before, next); render(host);
     });
     host.querySelectorAll('[data-modo]').forEach(sel => sel.addEventListener('change', () => { Orbit.comeng.setVendModo(sel.dataset.modo, sel.value); render(host); }));

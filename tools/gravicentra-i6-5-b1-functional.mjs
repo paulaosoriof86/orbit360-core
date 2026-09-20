@@ -222,6 +222,7 @@ try{
   need(/canonicalDocumentId/.test(source['orbit360-platform/data/store-firestore-product-readonly-p0.js']),'B1_CANONICAL_DOCUMENT_ID_NOT_EXPOSED');
   need(/asesores:\s*\{\s*module:\s*'equipo'/.test(source['orbit360-platform/core/tenant-access-policy-effective-p0.js']),'B1_ADVISOR_QUERY_POLICY_MISSING');
   need(!/window\.prompt\(/.test(source['orbit360-platform/modules/equipo.js'])&&!/window\.prompt\(/.test(source['orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js']),'B1_NATIVE_PROMPT_SOURCE');
+  need(!/\breturn\s+alert\s*\(/.test(source['orbit360-platform/modules/equipo.js'])&&!/\breturn\s+alert\s*\(/.test(source['orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js']),'B1_NATIVE_ALERT_SOURCE');
 
   browser=await chromium.launch({headless:true});
   context=await browser.newContext({viewport:{width:1500,height:1000}});
@@ -291,68 +292,56 @@ try{
     window.alert=function(){window.__b1NativeCalls.push('alert');throw new Error('B1_NATIVE_ALERT_USED');};
   });
 
-  const canonicalSnap=await db.collection('tenants').doc(TENANT).collection('data').doc('asesores').collection('items').get();
-  const incomplete=canonicalSnap.docs.map(d=>({id:d.id,...d.data()})).find(r=>!clean(r.authUid||r.uid||r.userId,180));
+  const advisorCollection=db.collection('tenants').doc(TENANT).collection('data').doc('asesores').collection('items');
+  const canonicalSnap=await advisorCollection.get();
+  const canonicalRows=canonicalSnap.docs.map(d=>({id:d.id,...d.data()}));
+  const incomplete=canonicalRows.find(r=>{
+    const q=semanticAdvisor(r);
+    return !clean(r.authUid||r.uid||r.userId,180) && (!q.roles.length||!q.paises.length||!q.rolDefault||!q.paisDefault);
+  });
   need(incomplete,'B1_NO_EXISTING_INCOMPLETE_USER');
-  const beforeReal=semanticAdvisor(incomplete);
-  realRollback={id:incomplete.id,before:incomplete};
-  ev.team.realExisting={
-    advisorId:incomplete.id,
-    dataId:clean(incomplete.id,180),
-    storedId:clean(incomplete.id||'',180),
-    canonicalDocumentId:clean(incomplete.canonicalDocumentId||incomplete.id,180),
-    incomplete:true,
-    before:beforeReal
-  };
+  const beforeIncomplete=semanticAdvisor(incomplete),incompleteRef=advisorCollection.doc(incomplete.id);
+  const incompleteBeforeSnap=await incompleteRef.get(),incompleteUpdateBefore=incompleteBeforeSnap.updateTime?.toMillis?.()||0;
+  ev.team.incompleteExisting={advisorId:incomplete.id,incomplete:true,before:beforeIncomplete};
 
   await reopen(page,incomplete.id);
-  ev.team.realExisting.uiIdentity=await page.evaluate(id=>{
+  ev.team.incompleteExisting.uiIdentity=await page.evaluate(id=>{
     const row=Orbit.store.get('asesores',id);
+    const roles=[].concat(row?.roles&&row.roles.length?row.roles:(row?.rol?[row.rol]:[])).filter(Boolean);
+    const countries=[].concat(row?.paises&&row.paises.length?row.paises:(row?.pais?[row.pais]:[])).filter(Boolean);
     return row?{
-      id:String(row.id||''),
-      canonicalDocumentId:String(row.canonicalDocumentId||''),
-      legacyDataId:String(row.legacyDataId||''),
-      projectionOnly:row.projectionOnly===true,
-      nombre:String(row.nombre||''),
-      roles:[].concat(row.roles||row.rol||[]),
-      paises:[].concat(row.paises||row.pais||[])
+      id:String(row.id||''),canonicalDocumentId:String(row.canonicalDocumentId||''),
+      legacyDataId:String(row.legacyDataId||''),projectionOnly:row.projectionOnly===true,
+      nombre:String(row.nombre||''),roles,countries,
+      roleDefault:String(row.rolDefault||row.rol||''),countryDefault:String(row.paisDefault||row.pais||'')
     }:null;
   },incomplete.id);
-  if(await page.locator('#eu-sync-access').count()) await page.locator('#eu-sync-access').uncheck();
-  const tempPhone=beforeReal.telefono==='+502 0000 0000'?'+502 0000 0001':'+502 0000 0000';
-  await page.fill('#eu-tel',tempPhone);
+  need(ev.team.incompleteExisting.uiIdentity&&!ev.team.incompleteExisting.uiIdentity.projectionOnly,'B1_INCOMPLETE_USER_NOT_CANONICAL_UI');
+  const missing=await page.evaluate(()=>({
+    roles:[...document.querySelectorAll('.eu-role:checked')].map(x=>x.value),
+    countries:[...document.querySelectorAll('.eu-pais:checked')].map(x=>x.value),
+    roleDefault:String(document.querySelector('#eu-role-default')?.value||''),
+    countryDefault:String(document.querySelector('#eu-pais-default')?.value||'')
+  }));
+  ev.team.incompleteExisting.form=missing;
+  let expectedValidation='';
+  if(!missing.roles.length) expectedValidation='Selecciona al menos un rol.';
+  else if(!missing.countries.length) expectedValidation='Selecciona al menos un país autorizado.';
+  else if(!missing.roles.includes(missing.roleDefault)) expectedValidation='El rol predeterminado debe estar entre los roles seleccionados.';
+  else if(!missing.countries.includes(missing.countryDefault)) expectedValidation='El país predeterminado debe estar entre los países seleccionados.';
+  need(expectedValidation,'B1_EXISTING_USER_NOT_INCOMPLETE_AS_EXPECTED');
   await page.click('#eu-ok');
-  const firstSaveOutcome=await Promise.race([
-    page.waitForSelector('#eq-edit',{state:'detached',timeout:15000}).then(()=>({closed:true})),
-    page.waitForFunction(()=>[...document.querySelectorAll('.ciclo-toast')].some(x=>/No fue posible guardar|identidad canónica|Indica /i.test(x.textContent||'')),null,{timeout:15000})
-      .then(()=>page.evaluate(()=>({
-        closed:!document.getElementById('eq-edit'),
-        toasts:[...document.querySelectorAll('.ciclo-toast')].map(x=>String(x.textContent||'')),
-        saveText:String(document.querySelector('#eu-ok')?.textContent||''),
-        saveBusy:String(document.querySelector('#eu-ok')?.dataset?.busy||''),
-        storeStatus:Orbit.store?._productStatus?.()||null
-      })))
-  ]).catch(e=>({timeout:true,error:String(e?.message||e)}));
-  ev.team.realExisting.firstSaveOutcome=firstSaveOutcome;
-  ev.team.realExisting.consoleEvents=consoleEvents.slice(-12);
-  need(firstSaveOutcome.closed===true,'B1_REAL_EDIT_UI_SAVE_FAILED:'+JSON.stringify(firstSaveOutcome)+':'+JSON.stringify(consoleEvents.slice(-8)));
-  const changedReal=await waitFor(async()=>{const x=await canonical(db,incomplete.id);return x&&clean(x.telefono,120)===tempPhone?x:null;},'B1_REAL_EDIT_READBACK');
-  ev.writes.advisorOperational++;ev.writes.auditOperational++;
-
-  await reloadAuthenticated(page,auth,a);
-  await reopen(page,incomplete.id);
-  need((await page.inputValue('#eu-tel'))===tempPhone,'B1_REAL_EDIT_REFRESH_NOT_PERSISTED');
-  if(await page.locator('#eu-sync-access').count()) await page.locator('#eu-sync-access').uncheck();
-  await page.fill('#eu-tel',beforeReal.telefono);
-  await page.click('#eu-ok');
-  await page.waitForSelector('#eq-edit',{state:'detached',timeout:15000});
-  await waitFor(async()=>{const x=await canonical(db,incomplete.id);return x&&clean(x.telefono,120)===beforeReal.telefono?x:null;},'B1_REAL_RESTORE_READBACK');
-  ev.writes.advisorOperational++;ev.writes.auditOperational++;
-  await reloadAuthenticated(page,auth,a);
-  await reopen(page,incomplete.id);
-  need((await page.inputValue('#eu-tel'))===beforeReal.telefono,'B1_REAL_RESTORE_REFRESH_NOT_PERSISTED');
+  const validationModal=page.locator('.drawer-back').filter({hasText:expectedValidation}).last();
+  await validationModal.waitFor({state:'visible',timeout:8000});
+  need(await validationModal.locator('[data-ok]').count()===1,'B1_INCOMPLETE_VALIDATION_NOT_ORBIT_UI');
+  ev.team.incompleteExisting.validation={message:expectedValidation,orbitUi:true,writeAttempted:false};
+  await validationModal.locator('[data-ok]').click();
+  await validationModal.waitFor({state:'detached',timeout:8000});
+  const incompleteAfterSnap=await incompleteRef.get(),incompleteUpdateAfter=incompleteAfterSnap.updateTime?.toMillis?.()||0;
+  need(incompleteUpdateAfter===incompleteUpdateBefore,'B1_INCOMPLETE_VALIDATION_MUTATED_RECORD');
+  need(JSON.stringify(semanticAdvisor(incompleteAfterSnap.data()||{}))===JSON.stringify(beforeIncomplete),'B1_INCOMPLETE_VALIDATION_CHANGED_DATA');
   await page.click('#eu-cancel');
-  ev.team.realExisting.restored=true;
+  await page.waitForSelector('#eq-edit',{state:'detached',timeout:8000});
 
   const syntheticName='B1 R3 Synthetic '+RUN;
   synthetic.id='ase-'+slug(syntheticName);
@@ -388,6 +377,28 @@ try{
   need((await page.inputValue('#eu-email')).toLowerCase()===synthetic.email,'B1_SYNTHETIC_CREATE_REFRESH_EMAIL');
   need(await page.locator('.eu-role[value="Asesor"]').isChecked(),'B1_SYNTHETIC_CREATE_REFRESH_ROLE');
   need(await page.locator('.eu-pais[value="GT"]').isChecked(),'B1_SYNTHETIC_CREATE_REFRESH_COUNTRY');
+
+  const syntheticPhone='+502 5555 0101';
+  await page.fill('#eu-tel',syntheticPhone);
+  if(await page.locator('#eu-sync-access').count())await page.locator('#eu-sync-access').uncheck();
+  await page.click('#eu-ok');
+  await page.waitForSelector('#eq-edit',{state:'detached',timeout:15000});
+  await waitFor(async()=>{const x=await canonical(db,synthetic.id);return x&&clean(x.telefono,120)===syntheticPhone?x:null;},'B1_SYNTHETIC_EDIT_READBACK');
+  ev.writes.advisorOperational++;ev.writes.auditOperational++;
+  await reloadAuthenticated(page,auth,a);
+  await reopen(page,synthetic.id);
+  need((await page.inputValue('#eu-tel'))===syntheticPhone,'B1_SYNTHETIC_EDIT_REFRESH_NOT_PERSISTED');
+
+  await page.fill('#eu-tel','');
+  if(await page.locator('#eu-sync-access').count())await page.locator('#eu-sync-access').uncheck();
+  await page.click('#eu-ok');
+  await page.waitForSelector('#eq-edit',{state:'detached',timeout:15000});
+  await waitFor(async()=>{const x=await canonical(db,synthetic.id);return x&&clean(x.telefono,120)===''?x:null;},'B1_SYNTHETIC_RESTORE_READBACK');
+  ev.writes.advisorOperational++;ev.writes.auditOperational++;
+  await reloadAuthenticated(page,auth,a);
+  await reopen(page,synthetic.id);
+  need((await page.inputValue('#eu-tel'))==='','B1_SYNTHETIC_RESTORE_REFRESH_NOT_PERSISTED');
+  ev.team.synthetic.harmlessEditRestore={editReadback:true,refresh:true,restoreReadback:true,restoreRefresh:true};
 
   await page.locator('.eu-role[value="Operativo"]').check();
   await page.locator('.eu-pais[value="CO"]').check();
