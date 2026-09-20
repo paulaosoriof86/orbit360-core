@@ -713,7 +713,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B1_VISUAL",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B1_ROOT_CAUSE_DIAGNOSTIC",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -1942,7 +1942,7 @@
     "addendumBlobSha": "05099a90cfb4862eec97e0359d55932828cb930b",
     "forensicAuditBlobSha": "fcfdf29c9eb851d76cebf67bcbe36d8ed308eb0f",
     "paymentInferenceBlobSha": "cfb026ded52c36083528de658a70191c8380d725",
-    "mechanismSyncStatus": "B1_R5_CAUSAL_REMEDIATION_PENDING_PREVIEW",
+    "mechanismSyncStatus": "B1_VISUAL_REJECTED_ROOT_CAUSE_DIAGNOSTIC_ACTIVE",
     "guardFailureBeforeFix": {
       "runId": 35450692628,
       "code": "I6_5_NEXT_ACTION_INVALID",
@@ -1951,15 +1951,44 @@
       "livePromotion": false
     },
     "b1ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B1_EXECUTION_LOCK_20260919.json",
-    "b1ExecutionLockBlobSha": "2d6f417c37f8021161ff3a44563a13a9f446bb78",
+    "b1ExecutionLockBlobSha": "623e4c53059196e51c9459633b187a30db112703",
     "b1": {
-      "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+      "status": "CANDIDATE_PENDING_PREVIEW",
       "sourceSha": "122bc60bf74a99002a4a56baf544694e91e02f0d",
       "buildId": "gi-i65-b1-122bc60bf74a-57f234755dc1",
       "previewUrl": "https://ays-orbit-360-lab--gi-i65-b1-35455766715-ylc10xr5.web.app",
       "runId": 35496130125,
       "artifactId": 10600660869,
-      "livePromoted": false
+      "livePromoted": false,
+      "visualAccepted": false,
+      "rejectedPreviewSourceSha": "122bc60bf74a99002a4a56baf544694e91e02f0d",
+      "rejectedPreviewRunId": 35496130125,
+      "rejectedPreviewArtifactId": 10600660869,
+      "rejectedPreviewBuildId": "gi-i65-b1-122bc60bf74a-57f234755dc1",
+      "rejectedPreviewDigest": "38154482c4f47f5b17878188fb873a276ea8ac22f2be9e425d66ce135a05ca91",
+      "rejectionFindings": [
+        "LOGO_RATIO_VISUAL_REJECTED",
+        "REAL_PAULA_REFRESH_SESSION_LOSS",
+        "STARTUP_TRANSIENT_BLACK_OR_EMPTY_SHELL",
+        "MULTI_STAGE_VISIBLE_RENDER"
+      ],
+      "preserveConfirmedVisualPasses": [
+        "TEAM_7_CANONICAL_USERS",
+        "TEAM_EDIT_SAVE_PAULA",
+        "TEAM_EDIT_SAVE_SAMUEL",
+        "TEAM_EDIT_SAVE_FERNANDO",
+        "TEAM_DELETE_ACTION_VISIBLE",
+        "TEAM_AUDIT_HISTORY_VISIBLE",
+        "TEAM_ACCESS_STATUS_SEMANTICS_CORRECT"
+      ],
+      "rootCauseRequiredBeforeSourceChange": true
+    },
+    "lastVisualRejection": {
+      "recordedAt": "2026-09-20T01:30:00-06:00",
+      "status": "FORMALLY_RECORDED",
+      "advanceToB2Authorized": false,
+      "dataMutationAuthorized": false,
+      "productionMutationAuthorized": false
     }
   }
 }
