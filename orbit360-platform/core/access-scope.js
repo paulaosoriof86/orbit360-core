@@ -109,17 +109,23 @@ Orbit.access = (function () {
     var normalized = normalizeScope(scope);
     return Object.prototype.hasOwnProperty.call(SCOPE_LEVEL, normalized) ? SCOPE_LEVEL[normalized] : 0;
   }
+  function accessConfig() {
+    try { var cfg=tenantConfig(),dc=cfg&&cfg.domainConfig&&cfg.domainConfig.access;return dc&&typeof dc==='object'?dc:{}; }
+    catch(e){return {};}
+  }
   function roleScopeCeiling(moduleKey) {
     var role = activeRole();
     try {
+      var ac=accessConfig(),rs=ac.roleScopes||{},configured=normalizeScope(rs[role]);
+      if(configured)return configured;
       var def = Orbit.ROLES && Orbit.ROLES[role];
       if (def && def.scopes && def.scopes[moduleKey] != null) {
         var fromRole = normalizeScope(def.scopes[moduleKey]);
         if (fromRole) return fromRole;
       }
     } catch (e) {}
-    if (ALL_ROLES.indexOf(role) >= 0) return 'all';
-    if (TEAM_ROLES.indexOf(role) >= 0) return 'team';
+    if (ALL_ROLES.indexOf(role) >= 0 || role === 'Finanzas' || role === 'Operativo') return 'all';
+    if (role === 'Marketing') return 'team';
     if (OWN_ROLES.indexOf(role) >= 0 || /Asesor/i.test(role)) return 'own';
     return 'none';
   }
@@ -177,7 +183,8 @@ Orbit.access = (function () {
   }
   function teamAdvisorIds() {
     var a = actorAdvisor(), own = actorAdvisorId(), out = new Set(own ? [own] : []);
-    [].concat(a.equipoAsesorIds || a.teamAdvisorIds || a.asesoresEquipo || []).forEach(function (x) { if (x) out.add(String(x)); });
+    var roleMap=a&&a.roleVisibleAdvisorIds&&typeof a.roleVisibleAdvisorIds==='object'?a.roleVisibleAdvisorIds:{};
+    [].concat(roleMap[activeRole()]||[],a.equipoAsesorIds || a.teamAdvisorIds || a.asesoresEquipo || []).forEach(function (x) { if (x) out.add(String(x)); });
     var teamId = clean(a.equipoId || a.teamId || '');
     try {
       (S().all('asesores') || []).forEach(function (x) {
@@ -215,9 +222,12 @@ Orbit.access = (function () {
       if (Orbit.tenant && Orbit.tenant.isActive && !Orbit.tenant.isActive(moduleKey)) return false;
       var a = actorAdvisor(), lists = moduleLists(a);
       if (lists.restricted.indexOf(moduleKey) >= 0) return false;
+      if (lists.extras.indexOf(moduleKey) >= 0) return true;
+      var matrix = matrixPermission(moduleKey, 'ver');
+      if (matrix != null) return matrix === true;
       var role = activeRole(), base = [];
       if (Orbit.ROLES && Orbit.ROLES[role]) base = Orbit.ROLES[role].modulos || Orbit.ROLES[role].modules || [];
-      if (base.indexOf(moduleKey) >= 0 || lists.extras.indexOf(moduleKey) >= 0) return true;
+      if (base.indexOf(moduleKey) >= 0) return true;
       if (Orbit.session && Orbit.session.canSee) return !!Orbit.session.canSee(moduleKey);
       return dataScope(moduleKey) !== 'none';
     } catch (e) { return false; }
@@ -231,7 +241,7 @@ Orbit.access = (function () {
     return [].concat(a.restricciones || []).indexOf(key) >= 0;
   }
   function matrixPermission(moduleKey, action) {
-    var role = activeRole(), cfg = tenantConfig(), P = cfg.permisosMatriz || cfg.matrizPermisos;
+    var role = activeRole(), cfg = tenantConfig(), ac=accessConfig(), P = ac.rolePermissions || cfg.permisosMatriz || cfg.matrizPermisos;
     try {
       if (P && P[role] && P[role][moduleKey] && P[role][moduleKey][action] != null) return !!P[role][moduleKey][action];
       var cat = Orbit.cat && Orbit.cat.all ? Orbit.cat.all() : {};
@@ -535,6 +545,7 @@ Orbit.access = (function () {
     tenantConfig: tenantConfig, tenantId: tenantId, countryConfig: countryConfig, currencyFor: currencyFor,
     dataScope: dataScope, scopeCanon: scopeCanon, scopeUI: scopeUI,
     roleScopeCeiling: roleScopeCeiling, applyRoleScopeCeiling: applyRoleScopeCeiling, scopeLevel: scopeLevel,
+    matrixPermission: matrixPermission, accessConfig: accessConfig,
     recordAdvisorId: recordAdvisorId, teamAdvisorIds: teamAdvisorIds,
     puedeVerModulo: puedeVerModulo, can: can, puedeGestionar: puedeGestionar, esRestringidoCredenciales: esRestringidoCredenciales,
     filtrarPorAsesor: filtrarPorAsesor, canAccessRecord: canAccessRecord, puedeAccederRegistro: puedeAccederRegistro,

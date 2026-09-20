@@ -1,115 +1,17 @@
-/* ============================================================
-   Orbit 360 · Configuración autoadministrable de dominios
-   Usa Orbit.tenant como fuente local del prototipo y sincroniza con
-   el servicio protegido cuando la compuerta runtime está activa.
-   ============================================================ */
-(function () {
-  'use strict';
-  window.Orbit = window.Orbit || {};
-
-  const VERSION = 'orbit360-tenant-domain-config-client-v1';
-  const FUNCTION_NAME = 'orbit360TenantDomainConfig';
-  const text = value => String(value == null ? '' : value).trim();
-  const clone = value => { try { return JSON.parse(JSON.stringify(value)); } catch (e) { return Object.assign({}, value || {}); } };
-  const backend = () => window.OrbitBackend || {};
-  const tenantId = () => text(backend().tenantId || backend().tenant || (Orbit.tenant && Orbit.tenant.get && Orbit.tenant.get().id));
-  const region = () => text(backend().functionsRegion || 'us-central1');
-  const enabled = () => !!((backend().featureFlags || {}).tenantDomainConfigBackendActive === true);
-  const available = () => !!(enabled() && tenantId() && window.firebase && typeof firebase.functions === 'function');
-
-  function defaultWorkflow() {
-    const stages = {};
-    const list = (Orbit.ciclo && Orbit.ciclo.ETAPAS) || [];
-    list.forEach(stage => {
-      const id = text(stage.id);
-      stages[id] = {
-        label: text(stage.label || stage.leads || id),
-        leads: stage.leads !== null && stage.leads !== false,
-        ops: !!stage.ops,
-        opsList: text(stage.ops || ''),
-        terminal: ['emitido', 'perdido'].includes(id),
-        next: [],
-        probability: 0,
-        slaHours: stage.ops ? 48 : 72
-      };
-    });
-    const flow = (Orbit.ciclo && Orbit.ciclo.FLUJO) || Object.keys(stages);
-    flow.forEach((id, index) => { if (stages[id] && flow[index + 1]) stages[id].next = [flow[index + 1]]; });
-    if (stages.negociacion) stages.negociacion.next = ['inspeccion', 'emision', 'perdido'];
-    if (stages.propuesta) stages.propuesta.next = ['negociacion', 'inspeccion', 'emision', 'perdido'];
-    if (stages.perdido) stages.perdido.next = ['contactado'];
-    return {
-      storageMode: 'legacyCompatible', stages,
-      notificationChannels: ['portal', 'in_app'],
-      advisorManagementProjection: true,
-      portalResponseEnabled: true,
-      cadenceEnabled: true,
-      escalationEnabled: true,
-      duplicateDetectionEnabled: true,
-      defaultManagementSlaHours: 72,
-      priorities: ['Baja', 'Media', 'Alta', 'Crítica'],
-      managementTypes: []
-    };
-  }
-  function defaultReconciliation() {
-    return {
-      inferenceEnabled: true,
-      commissionRecognitionEnabled: true,
-      commissionSequenceEnabled: true,
-      completePortfolioSequenceEnabled: true,
-      bankSupportRequiresCounterpart: true,
-      absenceAloneNeverReconciles: true,
-      amountTolerance: 0.02,
-      dateToleranceDays: 7,
-      requireSameCurrency: true,
-      requireSameTerm: true,
-      holdOnNegative: true,
-      holdOnReversal: true,
-      holdOnDuplicate: true,
-      humanConfirmationRequired: true,
-      evidencePriority: ['INSURER_PAYMENT', 'COMMISSION_RECOGNITION', 'PORTFOLIO_SNAPSHOT', 'PLATFORM_PAYMENT_REPORT', 'BANK_SUPPORT']
-    };
-  }
-  function defaults(domain) { return domain === 'workflow' ? defaultWorkflow() : defaultReconciliation(); }
-  function localGet(domain) {
-    try {
-      const tenant = Orbit.tenant && Orbit.tenant.get ? Orbit.tenant.get() : {};
-      const config = tenant && tenant.domainConfig && tenant.domainConfig[domain];
-      return Object.assign({}, defaults(domain), clone(config || {}));
-    } catch (e) { return defaults(domain); }
-  }
-  function localSave(domain, config) {
-    if (!Orbit.tenant || !Orbit.tenant.get || !Orbit.tenant.setDeep) return config;
-    const current = Orbit.tenant.get().domainConfig || {};
-    current[domain] = clone(config);
-    Orbit.tenant.setDeep('domainConfig', current);
-    return config;
-  }
-  function callable() {
-    if (!available()) throw new Error('TENANT_DOMAIN_CONFIG_BACKEND_NOT_ACTIVE');
-    return firebase.app().functions(region()).httpsCallable(FUNCTION_NAME);
-  }
-  async function get(domain) {
-    const local = localGet(domain);
-    if (!available()) return { ok: true, domain, config: local, source: 'tenant' };
-    try {
-      const response = await callable()({ tenantId: tenantId(), action: 'get', domain });
-      const data = response && response.data ? response.data : response;
-      if (data && data.config) localSave(domain, data.config);
-      return Object.assign({ source: 'tenant' }, data || {}, { config: data && data.config ? data.config : local });
-    } catch (error) {
-      return { ok: true, domain, config: local, source: 'tenant', syncPending: true, error: text(error && (error.message || error)) };
-    }
-  }
-  async function save(domain, config, reason) {
-    const stored = localSave(domain, config);
-    if (!available()) return { ok: true, domain, config: stored, source: 'tenant', syncPending: true };
-    const response = await callable()({ tenantId: tenantId(), action: 'save', domain, config: stored, reason: text(reason || 'Configuración actualizada desde Orbit 360') });
-    const data = response && response.data ? response.data : response;
-    if (data && data.config) localSave(domain, data.config);
-    return Object.assign({ source: 'protected' }, data || {}, { config: data && data.config ? data.config : stored });
-  }
-  function status() { return Object.freeze({ version: VERSION, functionName: FUNCTION_NAME, tenantId: tenantId(), enabled: enabled(), available: available() }); }
-
-  Orbit.domainConfig = Object.freeze({ VERSION, defaults, get, save, status });
+/* Gravicentra Insurance · tenant domain config client v2 · B1 R8 */
+(function(){'use strict';window.Orbit=window.Orbit||{};
+const VERSION='orbit360-tenant-domain-config-client-v2',FUNCTION_NAME='orbit360TenantDomainConfig';
+const text=v=>String(v==null?'':v).trim(),clone=v=>{try{return JSON.parse(JSON.stringify(v));}catch(e){return Object.assign({},v||{});}};
+const tenantId=()=>text((window.__ORBIT360_PRODUCT_PUBLIC_CONFIG__||{}).tenantHint||(window.OrbitBackend&&(OrbitBackend.tenantId||OrbitBackend.tenant))||(Orbit.tenant&&Orbit.tenant.get&&Orbit.tenant.get().id));
+function defaultAccess(){return{schemaVersion:'gravicentra-access-policy-v1',rolePermissions:{},roleScopes:{'Dirección':'all','SuperAdmin':'all','AdminTenant':'all','Admin':'all','Finanzas':'all','Operativo':'all','Marketing':'team','Asesor':'own','Asistente':'team','Comercial':'own'}};}
+function defaults(domain){if(domain==='access')return defaultAccess();return{};}
+function localGet(domain){try{const t=Orbit.tenant&&Orbit.tenant.get?Orbit.tenant.get():{},c=t&&t.domainConfig&&t.domainConfig[domain];return Object.assign({},defaults(domain),clone(c||{}));}catch(e){return defaults(domain);}}
+function localSave(domain,config){if(!Orbit.tenant||!Orbit.tenant.get||!Orbit.tenant.setDeep)return config;const t=Orbit.tenant.get(),current=Object.assign({},t.domainConfig||{});current[domain]=clone(config);Orbit.tenant.setDeep('domainConfig',current);return config;}
+function provider(){return Orbit.productRuntimeBrowserProvidersP0&&typeof Orbit.productRuntimeBrowserProvidersP0.callFunction==='function'?Orbit.productRuntimeBrowserProvidersP0:null;}
+function compat(){try{return window.firebase&&typeof firebase.functions==='function'?firebase.app().functions(text((window.OrbitBackend||{}).functionsRegion||'us-central1')).httpsCallable(FUNCTION_NAME):null;}catch(e){return null;}}
+function available(){return !!(tenantId()&&(provider()||compat()));}
+async function request(payload){const p=provider();if(p)return p.callFunction(FUNCTION_NAME,payload,'us-central1');const fn=compat();if(!fn)throw new Error('TENANT_DOMAIN_CONFIG_BACKEND_NOT_ACTIVE');const r=await fn(payload);return r&&r.data?r.data:r;}
+async function get(domain){const local=localGet(domain);if(!available())return{ok:true,domain,config:local,source:'local-fallback',syncPending:true};try{const data=await request({tenantId:tenantId(),action:'get',domain});if(data&&data.config)localSave(domain,data.config);return Object.assign({source:'protected'},data||{},{config:data&&data.config?data.config:local});}catch(error){return{ok:true,domain,config:local,source:'local-fallback',syncPending:true,error:text(error&&(error.message||error))};}}
+async function save(domain,config,reason){if(domain==='access'&&!available())throw new Error('ACCESS_CONFIG_SERVER_REQUIRED');if(!available()){const stored=localSave(domain,config);return{ok:true,domain,config:stored,source:'local-fallback',syncPending:true};}const data=await request({tenantId:tenantId(),action:'save',domain,config:clone(config||{}),reason:text(reason||'Configuración actualizada desde Gravicentra Insurance')});if(!data||data.ok!==true||!data.config)throw new Error('TENANT_DOMAIN_CONFIG_SAVE_NOT_CONFIRMED');localSave(domain,data.config);return Object.assign({source:'protected'},data,{config:data.config});}
+Orbit.domainConfig=Object.freeze({VERSION,defaults,get,save,status:()=>Object.freeze({version:VERSION,functionName:FUNCTION_NAME,tenantId:tenantId(),available:available()})});
 })();

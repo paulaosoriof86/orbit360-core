@@ -9,9 +9,9 @@ const REGION = process.env.ORBIT360_FUNCTIONS_REGION || 'us-central1';
 const VERSION = 'orbit360-tenant-domain-config-v1';
 const app = getApps()[0] || initializeApp();
 const db = getFirestore(app);
-const DOMAINS = new Set(['workflow', 'reconciliation']);
+const DOMAINS = new Set(['workflow', 'reconciliation', 'access']);
 const ADMIN_ROLES = new Set(['superadmin', 'admintenant', 'direccion', 'admin']);
-const PERMISSIONS = new Set(['config_manage', 'workflow_config_manage', 'reconciliation_config_manage']);
+const PERMISSIONS = new Set(['config_manage', 'workflow_config_manage', 'reconciliation_config_manage', 'access_config_manage']);
 
 const text = (value, max = 1000) => String(value == null ? '' : value).replace(/\u0000/g, '').trim().slice(0, max);
 const norm = value => text(value, 160).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
@@ -50,7 +50,7 @@ function active(member) {
   return !!member && member.active !== false && member.activo !== false && !['inactive', 'inactivo', 'blocked', 'bloqueado'].includes(state);
 }
 function canManage(member, domain) {
-  const needed = domain === 'workflow' ? 'workflow_config_manage' : 'reconciliation_config_manage';
+  const needed = domain === 'workflow' ? 'workflow_config_manage' : domain === 'access' ? 'access_config_manage' : 'reconciliation_config_manage';
   return roles(member).some(role => ADMIN_ROLES.has(role)) || permissions(member).some(permission => PERMISSIONS.has(permission) || permission === needed);
 }
 async function authorize(request, domain, write) {
@@ -124,9 +124,13 @@ function validateReconciliation(input) {
     evidencePriority: unique(input.evidencePriority || ['INSURER_PAYMENT', 'COMMISSION_RECOGNITION', 'PORTFOLIO_SNAPSHOT', 'PLATFORM_PAYMENT_REPORT', 'BANK_SUPPORT'])
   };
 }
-function validate(domain, input) {
-  return domain === 'workflow' ? validateWorkflow(input) : validateReconciliation(input);
+function validateAccess(input){
+  input=input&&typeof input==='object'?input:{};const valid=new Set(['own','team','all','none']),rolePermissions={},roleScopes={};
+  Object.entries(input.rolePermissions&&typeof input.rolePermissions==='object'?input.rolePermissions:{}).slice(0,30).forEach(([role,mods])=>{const rk=text(role,100);if(!rk||!mods||typeof mods!=='object')return;rolePermissions[rk]={};Object.entries(mods).slice(0,120).forEach(([moduleKey,actions])=>{const mk=norm(moduleKey);if(!mk||!actions||typeof actions!=='object')return;rolePermissions[rk][mk]={ver:actions.ver===true,editar:actions.editar===true};});});
+  Object.entries(input.roleScopes&&typeof input.roleScopes==='object'?input.roleScopes:{}).slice(0,30).forEach(([role,value])=>{const rk=text(role,100),sc=norm(value);if(rk&&valid.has(sc))roleScopes[rk]=sc;});
+  return{schemaVersion:'gravicentra-access-policy-v1',rolePermissions,roleScopes};
 }
+function validate(domain,input){return domain==='workflow'?validateWorkflow(input):domain==='access'?validateAccess(input):validateReconciliation(input);}
 
 async function execute(request) {
   const data = request.data || {};
