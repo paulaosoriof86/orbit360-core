@@ -1,6 +1,6 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B1_EXECUTION_LOCK_V1",
-  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+  "status": "CANDIDATE_PENDING_PREVIEW",
   "date": "2026-09-19",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -161,7 +161,7 @@
     "parentHead": "a97a9d7d5c2bc9860480d816f23f4c7043d62161",
     "revision": 5,
     "livePromoted": false,
-    "rootCauseStatus": "DEMONSTRATED_AND_PATCHED_PENDING_PREVIEW",
+    "rootCauseStatus": "R7_DIRECTED_DIAGNOSTIC_REQUIRED",
     "sourceSha": "6fb85a6b8379cc38eeac00ed48f9a28714dbd230"
   },
   "candidatePreparedAt": "2026-09-19",
@@ -638,5 +638,47 @@
     "reimport": false,
     "livePromotion": false,
     "advanceToB2": false
+  },
+  "visualRejection20260920R7": {
+    "status": "FORMALLY_RECORDED",
+    "reviewedPreview": {
+      "sourceSha": "2627d78a75f5c40e0851a5015d16594dcbd498ba",
+      "buildId": "gi-i65-b1-2627d78a75f5-57f234755dc1",
+      "channelId": "gi-i65-b1-35455766715",
+      "url": "https://ays-orbit-360-lab--gi-i65-b1-35455766715-ylc10xr5.web.app",
+      "runId": 35498006195,
+      "artifactId": 10601522877,
+      "artifactDigest": "fdbbf4d8e890b475a0c8701f2b596fb4cffa52d9acfca8db6681e38fa576b567",
+      "exactReadback": true,
+      "functionalPass": true,
+      "livePromoted": false
+    },
+    "findings": [
+      "LOGO_VISUAL_PROPORTION_STILL_REJECTED",
+      "SAMUEL_LOGIN_FAILURE_AFTER_EMAIL_VERIFICATION_AND_ADMIN_PASSWORD_CHANGE",
+      "CARLOS_AND_SAMUEL_AUTH_VERIFIED_NOT_PROJECTED_TO_TEAM_ACCESS_STATUS",
+      "CARLOS_LOGIN_LANDS_ON_FORBIDDEN_PRIOR_HASH_ROUTE",
+      "PASSWORD_RESET_EMAIL_RESEND_NOT_RELIABLY_AVAILABLE_FROM_TEAM_ADMIN"
+    ],
+    "observedFacts": [
+      "PAULA_REFRESH_NOW_SHOWS_CONTROLLED_GRAVICENTRA_RESTORING_STATE_INSTEAD_OF_BLACK_SHELL",
+      "TEAM_STILL_SHOWS_7_CANONICAL_USERS",
+      "AUDIT_HISTORY_VISIBLE",
+      "CARLOS_CAN_AUTHENTICATE_AND_ENTER_APPLICATION",
+      "CARLOS_ACTIVE_ROLE_OPERATIVO_IS_DENIED_ON_EQUIPO_ROUTE",
+      "SAMUEL_LOGIN_RETURNS_GENERIC_AUTH_OR_ACTIVATION_ERROR"
+    ],
+    "requiredDiagnostics": [
+      "AUTH_UID_EMAIL_MEMBERSHIP_ADVISOR_BINDING_FOR_CARLOS_SAMUEL_FERNANDO",
+      "AUTH_EMAIL_VERIFIED_VS_FIRESTORE_PROJECTION",
+      "TEMP_PASSWORD_WRITE_AUDIT_AND_TARGET_UID_BINDING_FOR_SAMUEL",
+      "PASSWORD_RESET_EMAIL_PATH_AND_DELIVERY_TRIGGER_FOR_FERNANDO",
+      "POST_LOGIN_ROUTE_NORMALIZATION_BY_ACTIVE_ROLE",
+      "CURRENT_PREVIEW_LOGO_NATURAL_RENDER_WRAPPER_ALPHA_BBOX"
+    ],
+    "noDataReimport": true,
+    "productionMutationAuthorized": false,
+    "dataMutationAuthorized": false,
+    "advanceToB2Authorized": false
   }
 }
