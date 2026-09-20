@@ -713,7 +713,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B1_PREVIEW",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B1_VISUAL",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -1951,69 +1951,15 @@
       "livePromotion": false
     },
     "b1ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B1_EXECUTION_LOCK_20260919.json",
-    "b1ExecutionLockBlobSha": "ab35ca2de63868057984f123e2999e8beab2e90b",
+    "b1ExecutionLockBlobSha": "d18ec49cd77c08582b903ca3f47064475d71d248",
     "b1": {
-      "status": "CANDIDATE_PENDING_PREVIEW",
-      "sourceSha": "122bc60bf74a99002a4a56baf544694e91e02f0d",
-      "buildId": "gi-i65-b1-122bc60bf74a-57f234755dc1",
+      "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+      "sourceSha": "2627d78a75f5c40e0851a5015d16594dcbd498ba",
+      "buildId": "gi-i65-b1-2627d78a75f5-57f234755dc1",
       "previewUrl": "https://ays-orbit-360-lab--gi-i65-b1-35455766715-ylc10xr5.web.app",
-      "runId": 35496130125,
-      "artifactId": 10600660869,
-      "livePromoted": false,
-      "visualAccepted": false,
-      "rejectedPreviewSourceSha": "122bc60bf74a99002a4a56baf544694e91e02f0d",
-      "rejectedPreviewRunId": 35496130125,
-      "rejectedPreviewArtifactId": 10600660869,
-      "rejectedPreviewBuildId": "gi-i65-b1-122bc60bf74a-57f234755dc1",
-      "rejectedPreviewDigest": "38154482c4f47f5b17878188fb873a276ea8ac22f2be9e425d66ce135a05ca91",
-      "rejectionFindings": [
-        "LOGO_RATIO_VISUAL_REJECTED",
-        "REAL_PAULA_REFRESH_SESSION_LOSS",
-        "STARTUP_TRANSIENT_BLACK_OR_EMPTY_SHELL",
-        "MULTI_STAGE_VISIBLE_RENDER"
-      ],
-      "preserveConfirmedVisualPasses": [
-        "TEAM_7_CANONICAL_USERS",
-        "TEAM_EDIT_SAVE_PAULA",
-        "TEAM_EDIT_SAVE_SAMUEL",
-        "TEAM_EDIT_SAVE_FERNANDO",
-        "TEAM_DELETE_ACTION_VISIBLE",
-        "TEAM_AUDIT_HISTORY_VISIBLE",
-        "TEAM_ACCESS_STATUS_SEMANTICS_CORRECT"
-      ],
-      "rootCauseRequiredBeforeSourceChange": true,
-      "rootCauseDiagnosticLabel": "R6_DIRECTED_DIAGNOSTIC_UNDER_EXISTING_R3_ROOT_CAUSE_ACTION",
-      "rootCauseStatus": "DEMONSTRATED_AND_PATCHED_PENDING_PREVIEW",
-      "rootCauseEvidence": {
-        "runId": 35497621514,
-        "jobId": 106043531452,
-        "artifactId": 10601746482
-      },
-      "owners": [
-        "orbit360-platform/index.html",
-        "orbit360-platform/styles/infra.css",
-        "orbit360-platform/core/public-tenant-branding.js",
-        "orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js"
-      ],
-      "candidateSourceSha": "6fb85a6b8379cc38eeac00ed48f9a28714dbd230",
-      "productPatchFiles": [
-        {
-          "path": "orbit360-platform/index.html",
-          "blobSha": "0e6ee3f0adeeaf520aeebbf3ed14bfc22492dd2c"
-        },
-        {
-          "path": "orbit360-platform/styles/infra.css",
-          "blobSha": "35ae45ded9ab8da091869c5820705e53038f3b0e"
-        },
-        {
-          "path": "orbit360-platform/core/public-tenant-branding.js",
-          "blobSha": "495df818594b8bdb735e797072d764e098d3c019"
-        },
-        {
-          "path": "orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js",
-          "blobSha": "09db785be4b1432f4ba3d0c49c6dda2eb950cd69"
-        }
-      ]
+      "runId": 35498006195,
+      "artifactId": 10601522877,
+      "livePromoted": false
     },
     "lastVisualRejection": {
       "recordedAt": "2026-09-20T01:30:00-06:00",
