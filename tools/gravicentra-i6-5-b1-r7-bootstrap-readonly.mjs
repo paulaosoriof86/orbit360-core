@@ -47,6 +47,11 @@ try{
           const au=await deps.authProvider.waitForAuthenticatedUser(ctx);
           const member=await deps.membershipProvider.getByUid(String(au.uid||''),ctx);
           const hydration=Orbit.productHydrationRequiredOptionalP0.contract(member);
+          const catalog=Orbit.productQueryPlannerP0.compileCatalog(
+            hydration.required,
+            member,
+            {accessPolicy:Orbit.tenantAccessPolicyProductP0}
+          );
           const started=await Orbit.backendProductReadOnlyBootstrapP0.start(deps,{
             mode:'product',authorizedProductReadOnly:true,runtimeAuthorized:true,
             collections:hydration.required.concat(hydration.optional),
@@ -57,13 +62,14 @@ try{
             route:location.hash,
             auth:{uid:String(au.uid||''),emailVerified:au.emailVerified===true},
             membership:{
-              tenantId:String(member?.tenantId||''),advisorId:String(member?.advisorId||''),
+              tenantId:String(member?.tenantId||''),advisorId:String(member?.advisorId||''),teamId:String(member?.teamId||member?.equipoId||''),
               roles:member?.roles||[],activeRole:String(member?.activeRole||''),
               modulesExtra:member?.modulesExtra||[],modulesRestricted:member?.modulesRestricted||[],
               dataScopes:member?.dataScopes||{},status:String(member?.status||member?.estado||''),
               mustChangePassword:member?.mustChangePassword===true,credentialState:String(member?.credentialState||'')
             },
             hydration,
+            requiredQueryCatalog:catalog,
             start:{
               ok:started?.ok===true,ready:started?.ready===true,writeAuthorized:started?.writeAuthorized===true,
               plan:started?.plan||null,readiness:started?.readiness||null,status:started?.status||null,
@@ -77,6 +83,7 @@ try{
           auth:{uidHash:hash(result.auth.uid),emailVerified:result.auth.emailVerified},
           membership:result.membership,
           hydration:result.hydration,
+          requiredQueryCatalog:result.requiredQueryCatalog,
           start:result.start,
           storeStatus:result.storeStatus
         };
