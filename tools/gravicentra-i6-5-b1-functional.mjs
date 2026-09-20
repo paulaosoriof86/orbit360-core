@@ -509,6 +509,38 @@ try{
       window.Orbit.createFirestoreProductReadOnlyStoreP0=function(){
         const store=originalFactory.apply(this,arguments);
         window.__b1LastBootstrapStore=store;
+        const originalAttach=store&&typeof store._attachSnapshots==='function'?store._attachSnapshots.bind(store):null;
+        if(originalAttach){
+          store._attachSnapshots=function(){
+            const ok=originalAttach();
+            try{
+              const st=store._productStatus?.()||{};
+              const failures={};
+              for(const [name,plan] of Object.entries(st.queryPlans||{})){
+                if(plan&&(plan.ok===false||plan.hardError===true||plan.denied===true)){
+                  failures[name]={
+                    ok:plan.ok,
+                    hardError:plan.hardError===true,
+                    denied:plan.denied===true,
+                    module:plan.module||'',
+                    scope:plan.scope||'',
+                    errors:plan.errors||[],
+                    constraints:(plan.constraints||[]).map(x=>({field:x.field,op:x.op,value:Array.isArray(x.value)?x.value.slice(0,4):x.value}))
+                  };
+                }
+              }
+              window.__b1AttachSnapshot={
+                ok,
+                status:st.status||'',
+                deniedCollections:st.deniedCollections||[],
+                snapshotErrors:st.snapshotErrors||{},
+                requiredStartupCollections:st.requiredStartupCollections||[],
+                queryPlanFailures:failures
+              };
+            }catch(e){window.__b1AttachSnapshot={diagnosticError:String(e?.message||e)};}
+            return ok;
+          };
+        }
         return store;
       };
     }
@@ -545,19 +577,7 @@ try{
         storeStatus:window.Orbit?.store?._productStatus?.()||null,
         providerState,
         bootstrapEvents:Array.isArray(window.__b1BootstrapEvents)?window.__b1BootstrapEvents.slice(-12):[],
-        bootstrapStoreStatus:(()=>{
-          try{
-            const s=window.__b1LastBootstrapStore?._productStatus?.()||null;
-            if(!s)return null;
-            return{
-              status:s.status||'',
-              deniedCollections:s.deniedCollections||[],
-              snapshotErrors:s.snapshotErrors||{},
-              requiredStartupCollections:s.requiredStartupCollections||[],
-              queryPlans:s.queryPlans||{}
-            };
-          }catch(e){return{diagnosticError:String(e?.message||e)};}
-        })(),
+        bootstrapAttachSnapshot:window.__b1AttachSnapshot||null,
         hash:location.hash
       };
     }).catch(e=>({diagnosticError:String(e?.message||e)}));
