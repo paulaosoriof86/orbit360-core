@@ -1,6 +1,6 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B1_EXECUTION_LOCK_V1",
-  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+  "status": "VISUAL_REJECTED_R8_ROOT_CAUSE_REQUIRED",
   "date": "2026-09-19",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -761,5 +761,49 @@
     "dataReimport": false,
     "livePromotion": false,
     "advanceToB2": false
+  },
+  "visualRejection20260920R8": {
+    "status": "FORMALLY_RECORDED",
+    "recordedAt": "2026-09-20T03:24:00-06:00",
+    "reviewedPreview": {
+      "sourceSha": "7129b4807b1a0229d9c46c4f1245cbfce75d2dd7",
+      "buildId": "gi-i65-b1-7129b4807b1a-57f234755dc1",
+      "url": "https://ays-orbit-360-lab--gi-i65-b1-35455766715-ylc10xr5.web.app",
+      "runId": 35501230046,
+      "artifactId": 10602761150,
+      "artifactDigest": "aa1c47e7c68a83d7298df0c63b92467ae7b14c8078c1c6c6171574870edd10c1",
+      "exactReadback": true,
+      "functionalPass": true,
+      "livePromoted": false
+    },
+    "findings": [
+      "LOGO_VISUAL_REJECTED_AFTER_INTRINSIC_RATIO_TECHNICAL_PASS",
+      "ROLE_PERMISSION_MATRIX_NOT_EFFECTIVE_IN_RUNTIME_NAVIGATION",
+      "ROLE_SWITCH_DOES_NOT_NARROW_DATA_SCOPE_TO_ACTIVE_ROLE",
+      "TEAM_VISIBILITY_RELATIONSHIP_ADMINISTRATION_NOT_EXPOSED_OR_NOT_EFFECTIVE",
+      "FERNANDO_PASSWORD_RESET_FIREBASE_ACCEPTED_BUT_EMAIL_NOT_DELIVERED"
+    ],
+    "observedFacts": [
+      "SAMUEL_CAN_NOW_AUTHENTICATE_AND_ENTER_APPLICATION",
+      "CARLOS_CAN_AUTHENTICATE_AND_ENTER_APPLICATION",
+      "CARLOS_AND_SAMUEL_SHOW_ACCESS_ACTIVE_AFTER_VERIFICATION_SYNC",
+      "SAMUEL_DEFAULT_ACTIVE_ROLE_IS_ADMINTENANT_IN_CURRENT_PREVIEW",
+      "CARLOS_ACTIVE_ROLE_OPERATIVO_RUNTIME_MENU_OMITS_COTIZADOR_AND_COMPARATIVO_DESPITE_ROLE_MATRIX_VIEW_ENABLED",
+      "SWITCHING_MULTIROLE_USER_TO_ASESOR_DOES_NOT_RESTRICT_DATA_TO_OWN",
+      "EQUIPO_RETains_7_CANONICAL_USERS"
+    ],
+    "requiredDiagnostics": [
+      "BRANDING_RENDER_CONTENT_BBOX_AND_CORRECT_ASSET_IDENTITY_NOT_JUST_BITMAP_RATIO",
+      "PERMISSIONS_MATRIX_PERSISTENCE_OWNER_TO_EFFECTIVE_MODULES_TO_SIDEBAR_CAN",
+      "ACTIVE_ROLE_TO_EFFECTIVE_DATA_SCOPE_PRECEDENCE_AND_ROLE_SWITCH_RECOMPUTE",
+      "TEAM_RELATION_VISIBILITY_MODEL_AND_ADMIN_UI",
+      "PASSWORD_RESET_EMAIL_ACCEPTANCE_VS_DELIVERY_DIAGNOSTIC_AND_PROVIDER_LIMITS"
+    ],
+    "boundaries": {
+      "dataMutationAuthorized": false,
+      "reimportAuthorized": false,
+      "livePromotionAuthorized": false,
+      "advanceToB2Authorized": false
+    }
   }
 }
