@@ -412,8 +412,14 @@ try{
   const moduleChoice=await page.evaluate(()=>{
     const nav=new Set();
     (Orbit.NAV||[]).forEach(b=>{if(b.route)nav.add(b.route);(b.items||[]).forEach(i=>nav.add(i.route));});
-    const rows=[...document.querySelectorAll('.eu-mod')].map(c=>({id:c.value,checked:c.checked})).filter(x=>nav.has(x.id)&&!['inicio','equipo'].includes(x.id));
-    return {restrict:(rows.find(x=>x.checked)||{}).id||'',extra:(rows.find(x=>!x.checked)||{}).id||''};
+    const selectedRoles=[...document.querySelectorAll('.eu-role:checked')].map(c=>c.value);
+    const base=new Set();
+    selectedRoles.forEach(role=>(Orbit.ROLES?.[role]?.modulos||[]).forEach(m=>base.add(typeof m==='string'?m:(m?.route||m?.id))));
+    const rows=[...document.querySelectorAll('.eu-mod')].map(c=>({id:c.value,checked:c.checked,inBase:base.has(c.value)})).filter(x=>nav.has(x.id)&&!['inicio','equipo'].includes(x.id));
+    return {
+      restrict:(rows.find(x=>x.checked&&x.inBase)||{}).id||'',
+      extra:(rows.find(x=>!x.checked&&!x.inBase)||{}).id||''
+    };
   });
   need(moduleChoice.restrict&&moduleChoice.extra&&moduleChoice.restrict!==moduleChoice.extra,'B1_MODULE_TEST_CHOICES_MISSING');
   const modulesDetails=page.locator('#eu-mod-details');
