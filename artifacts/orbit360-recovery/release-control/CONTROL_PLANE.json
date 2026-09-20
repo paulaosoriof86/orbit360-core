@@ -713,7 +713,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B1_ROOT_CAUSE_DIAGNOSTIC",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B1_R3_ROOT_CAUSE",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -1981,7 +1981,8 @@
         "TEAM_AUDIT_HISTORY_VISIBLE",
         "TEAM_ACCESS_STATUS_SEMANTICS_CORRECT"
       ],
-      "rootCauseRequiredBeforeSourceChange": true
+      "rootCauseRequiredBeforeSourceChange": true,
+      "rootCauseDiagnosticLabel": "R6_DIRECTED_DIAGNOSTIC_UNDER_EXISTING_R3_ROOT_CAUSE_ACTION"
     },
     "lastVisualRejection": {
       "recordedAt": "2026-09-20T01:30:00-06:00",
