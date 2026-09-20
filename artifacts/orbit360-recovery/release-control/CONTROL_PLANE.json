@@ -713,7 +713,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B1_PREVIEW",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B1_VISUAL",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -1951,80 +1951,15 @@
       "livePromotion": false
     },
     "b1ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B1_EXECUTION_LOCK_20260919.json",
-    "b1ExecutionLockBlobSha": "58b0c2e087f0689a9baaecd3c3ac834bd01eea55",
+    "b1ExecutionLockBlobSha": "d9488af22110832a4ab26a294cdc946cd0f31f20",
     "b1": {
-      "status": "CANDIDATE_PENDING_PREVIEW",
-      "sourceSha": "539df6238c16b99f540fbf30c4b534be572114b4",
-      "buildId": "gi-i65-b1-539df6238c16-57f234755dc1",
+      "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+      "sourceSha": "b8e8e9021852d8c2c6c3bbb0cbde71553aaffcb3",
+      "buildId": "gi-i65-b1-b8e8e9021852-57f234755dc1",
       "previewUrl": "https://ays-orbit-360-lab--gi-i65-b1-35455766715-ylc10xr5.web.app",
-      "runId": 35488185372,
-      "artifactId": 10597863877,
-      "livePromoted": false,
-      "revision": 3,
-      "artifactDigest": "e8ba91aa1209c99184c456fffee4e04866f20a6eed632c68dbd85d54b6729e0a",
-      "exactReadback": true,
-      "functionalPass": true,
-      "operationalWrites": 10,
-      "visualAccepted": false,
-      "rootCauseRequiredBeforeCodeChange": true,
-      "rejectedFindings": [
-        "LOGO_FIRST_PAINT",
-        "LOGO_FIT_CENTER",
-        "TEAM_EDIT_NOT_FOUND",
-        "TEST_GAP"
-      ],
-      "rootCauseStatus": "CONFIRMED_R3",
-      "rootCauseEvidence": {
-        "advisorIdentityRunId": 35474844151,
-        "equipoRuntimeRunId": 35475192026,
-        "writes": 0
-      },
-      "realCrudProofRequired": true,
-      "proofDesign": "INCOMPLETE_EXISTING_NO_WRITE_PLUS_SYNTHETIC_FULL_CRUD_AUTH",
-      "realUserOperationalWriteRequired": false,
-      "syntheticFullCrudRequired": true,
-      "advisorDirectoryQuery": "TENANT_ONLY_FOR_AUTHORIZED_TEAM_DIRECTORY_ROLES",
-      "advisorCountryFilter": false,
-      "runtimeCanonicalParityRequired": true,
-      "membershipScopeRootCause": {
-        "status": "PROVEN",
-        "runId": 35479982109,
-        "jobId": 105995928796,
-        "owners": [
-          "functions/user-onboarding.js",
-          "functions/product-operational-domain.js"
-        ],
-        "fixScope": "CANONICALIZE_MEMBERSHIP_DATASCOPES_SCHEMA_ONLY",
-        "livePromoted": false
-      },
-      "membershipVisibleModulesRootCause": {
-        "status": "PROVEN",
-        "classification": "CODE_DEFECT_PRODUCT_BOOTSTRAP_MEMBERSHIP_EFFECTIVE_MODULES",
-        "proofRunId": 35486839150,
-        "proofJobId": 106014660144,
-        "owner": "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js",
-        "observedFailure": "PRODUCT_READONLY_BOOTSTRAP_NOT_READY:snapshots_no_adjuntos",
-        "fixScope": "MATERIALIZE_EFFECTIVE_MEMBERSHIP_MODULES_ONLY",
-        "livePromoted": false
-      },
-      "authSyntheticWrites": 2,
-      "membershipSyntheticWrites": 1,
-      "syntheticCleanupWrites": 11,
-      "syntheticFinalAbsent": true,
-      "visualFixR3": {
-        "status": "CONFIRMED_AND_PATCHED_PENDING_PREVIEW",
-        "findings": [
-          "B1R3_DUPLICATE_TENANT_LOGO",
-          "B1R3_THEME_HINT_RESIDUE"
-        ],
-        "productFiles": [
-          "orbit360-platform/index.html",
-          "orbit360-platform/core/public-tenant-branding.js"
-        ],
-        "noBackendFunctionalChange": true,
-        "noDataMutation": true,
-        "livePromoted": false
-      }
+      "runId": 35488766659,
+      "artifactId": 10598569261,
+      "livePromoted": false
     }
   }
 }
