@@ -13,19 +13,34 @@
   'use strict';
 
   window.Orbit = window.Orbit || {};
-  var VERSION = 'p0-20260919-team-canonical-required-4';
+  var VERSION = 'p0-20260919-team-canonical-policy-required-5';
   var MARKER = 'PRODUCT_HYDRATION_AUTHORITATIVE_REQUIRED_OPTIONAL_P0';
   var originalCreate = window.Orbit.createFirestoreProductReadOnlyStoreP0;
 
   function text(value) { return String(value == null ? '' : value).trim(); }
   function clone(value) { try { return JSON.parse(JSON.stringify(value)); } catch (error) { return value && typeof value === 'object' ? Object.assign({}, value) : value; } }
   function unique(values) { var out = []; (Array.isArray(values) ? values : []).forEach(function (value) { var clean = text(value); if (clean && out.indexOf(clean) < 0) out.push(clean); }); return out; }
-  function contract() {
+  function contract(membership) {
     var cfg = window.__ORBIT360_PRODUCT_PUBLIC_CONFIG__ || {};
     var required = unique(cfg.requiredCollections);
     var optional = unique(cfg.optionalCollections).filter(function (name) { return required.indexOf(name) < 0; });
+    var teamDirectoryRequired = false;
+    try {
+      var policy = window.Orbit.tenantAccessPolicyProductP0;
+      var plan = policy && typeof policy.queryConstraints === 'function'
+        ? policy.queryConstraints('asesores', membership || {}, { tenantId: text(membership && membership.tenantId) })
+        : null;
+      teamDirectoryRequired = !!(plan && plan.ok === true && plan.scope === 'tenant');
+    } catch (error) { teamDirectoryRequired = false; }
+    if (teamDirectoryRequired) {
+      if (required.indexOf('asesores') < 0) required.push('asesores');
+      optional = optional.filter(function (name) { return name !== 'asesores'; });
+    } else {
+      required = required.filter(function (name) { return name !== 'asesores'; });
+      if (optional.indexOf('asesores') < 0) optional.push('asesores');
+    }
     if (!required.length) throw new Error('product_required_hydration_contract_missing');
-    return { version: text(cfg.hydrationContractVersion) || 'unversioned', source: text(cfg.hydrationContractSource) || 'public-runtime-config', required: required, optional: optional, all: required.concat(optional) };
+    return { version: text(cfg.hydrationContractVersion) || 'unversioned', source: text(cfg.hydrationContractSource) || 'public-runtime-config', required: required, optional: optional, all: required.concat(optional), teamDirectoryRequired: teamDirectoryRequired };
   }
   function rowId(row) { return row && (row.id || row.uid || row.codigo || row.numero || row.key); }
 
@@ -87,6 +102,7 @@
       var currentStatus = baseStatus() || {};
       var confirmed = unique(currentStatus.serverConfirmedCollections);
       if (confirmed.indexOf('asesores') >= 0) return durable.map(clone);
+      if (hydration.teamDirectoryRequired === true) return durable.map(clone);
       if (durable.length) return durable.map(clone);
       if (advisorProjectionCache) return advisorProjectionCache.map(clone);
       var map = {};
@@ -104,13 +120,13 @@
     base.get = function (collection, id) { if (collection !== 'asesores') return baseGet(collection, id); return advisorProjection().find(function (row) { return rowId(row) === id; }) || null; };
     base.where = function (collection, fieldOrPredicate, opOrValue, maybeValue) { if (collection !== 'asesores') return baseWhere.apply(null, arguments); var rows = advisorProjection(); if (typeof fieldOrPredicate === 'function') return rows.filter(fieldOrPredicate); if (fieldOrPredicate && typeof fieldOrPredicate === 'object') return rows.filter(function (row) { return Object.keys(fieldOrPredicate).every(function (key) { return row[key] === fieldOrPredicate[key]; }); }); var op = arguments.length >= 4 ? opOrValue : '=='; var value = arguments.length >= 4 ? maybeValue : opOrValue; return rows.filter(function (row) { return (op === '==' || op === '=') ? row[fieldOrPredicate] === value : op === '!=' ? row[fieldOrPredicate] !== value : false; }); };
     base.find = function (collection, predicate) { if (collection !== 'asesores') return baseFind(collection, predicate); return typeof predicate === 'function' ? (advisorProjection().find(predicate) || null) : null; };
-    base.__productHydrationRequiredOptionalP0 = Object.freeze({ version: VERSION, marker: MARKER, writes: 0, noFallback: true, authoritativeServerSnapshotRequired: true, authoritativeFirstReadRequired: true, advisorProjectionMemoized: true });
+    base.__productHydrationRequiredOptionalP0 = Object.freeze({ version: VERSION, marker: MARKER, writes: 0, noFallback: true, authoritativeServerSnapshotRequired: true, authoritativeFirstReadRequired: true, advisorProjectionMemoized: true, teamDirectoryRequired: hydration.teamDirectoryRequired === true });
     return base;
   }
 
   if (typeof originalCreate !== 'function') throw new Error('product_readonly_store_factory_missing');
   window.Orbit.createFirestoreProductReadOnlyStoreP0 = function (deps, options) {
-    var hydration = contract();
+    var hydration = contract(options && options.membership);
     var next = Object.assign({}, options || {}, {
       collections: hydration.all.slice(),
       requiredCollections: hydration.required.slice(),

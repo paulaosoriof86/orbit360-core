@@ -268,6 +268,7 @@
         : { db: firebaseContext && firebaseContext.db };
       store = window.Orbit.createFirestoreProductReadOnlyStoreP0(storeDeps, {
         tenantId: tenantId,
+        membership: membership,
         collections: plan.collections,
         queryPlanner: queryPlanner,
         paths: window.Orbit.tenantCanonicalPathsP0
