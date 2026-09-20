@@ -161,7 +161,7 @@
     "parentHead": "a97a9d7d5c2bc9860480d816f23f4c7043d62161",
     "revision": 5,
     "livePromoted": false,
-    "rootCauseStatus": "R7_DIRECTED_DIAGNOSTIC_REQUIRED",
+    "rootCauseStatus": "R7_DEMONSTRATED_PENDING_CUMULATIVE_PATCH",
     "sourceSha": "6fb85a6b8379cc38eeac00ed48f9a28714dbd230"
   },
   "candidatePreparedAt": "2026-09-19",
@@ -680,5 +680,48 @@
     "productionMutationAuthorized": false,
     "dataMutationAuthorized": false,
     "advanceToB2Authorized": false
+  },
+  "r7DirectedRootCause": {
+    "status": "ROOT_CAUSE_DEMONSTRATED_PENDING_SINGLE_CUMULATIVE_PATCH",
+    "evidence": {
+      "authTeamRunId": 35499678687,
+      "authTeamJobId": 106049086701,
+      "authTeamArtifactId": 10602360047,
+      "bootstrapRunId": 35499941482,
+      "bootstrapJobId": 106049797658,
+      "priorBrandingRunId": 35499595388,
+      "priorBrandingJobId": 106048856521
+    },
+    "causes": {
+      "logo": "A&S PNG natural ratio is correct, but runtime renders 230x72.83 inside a 230x50 overflow:hidden login wrapper; header has the same fixed-wrapper clipping pattern.",
+      "verificationProjection": "Carlos and Samuel are emailVerified=true in Firebase Auth with correct UID bindings, while canonical advisor records remain authEmailVerified=false because verification-link completion has no automatic Auth-to-advisor projection sync.",
+      "carlosLanding": "Fresh credential login preserves the prior URL hash #/equipo; Carlos activeRole Operativo correctly cannot use Equipo, so the security denial is valid but the post-login landing is wrong.",
+      "samuelBootstrap": "Samuel membership has scope=equipo across required modules but teamId is empty. Product query planner emits empty equipoId/__relation_team__ constraints, six required plans fail, snapshots cannot attach, and bootstrap blocks.",
+      "samuelPasswordAdmin": "No recent team_access.set_temporary_password audit exists for Samuel. Backend writes that audit only after Firebase Auth updateUser(password) succeeds, so the attempted admin password change is not proven to have reached Firebase Auth.",
+      "fernandoResetEmail": "Multiple recent team_access.invitation_sent events exist for Fernando; the client records these only after Firebase sendPasswordResetEmail resolves. Firebase accepted the reset-email requests, but inbox delivery is not evidenced by the platform."
+    },
+    "approvedCompatibility": {
+      "historicalTeamScope": "Legacy approved access-scope teamAdvisorIds always included the actor advisorId and expanded by explicit team/supervisor relations. Missing teamId did not mean global access.",
+      "safeFallback": "When scope=team but no team binding exists, use own/advisor constraint only. Never broaden to all."
+    },
+    "owners": [
+      "orbit360-platform/core/public-tenant-branding.js",
+      "orbit360-platform/core/auth-product-runtime-p0.js",
+      "orbit360-platform/core/tenant-access-policy-product-p0.js",
+      "functions/user-onboarding.js",
+      "orbit360-platform/modules/equipo-credential-admin-v20260805-bridge.js",
+      "orbit360-platform/index.html"
+    ],
+    "minimumPatch": [
+      "REMOVE_FIXED_LOGO_CLIPPING_AND_RENDER_AT_INTRINSIC_RATIO",
+      "NORMALIZE_FRESH_CREDENTIAL_LOGIN_TO_INICIO_WHILE_PRESERVING_RESTORE_ROUTE",
+      "ADD_IDEMPOTENT_SELF_AUTH_STATE_PROJECTION_SYNC",
+      "TEAM_SCOPE_WITHOUT_TEAM_BINDING_FAILS_CLOSED_TO_OWN",
+      "MAKE_TEMP_PASSWORD_SUCCESS_EXPLICITLY_SERVER_CONFIRMED_AND_FAILURE_VISIBLE",
+      "ADD_EXPLICIT_PASSWORD_RESET_RESEND_ACTION_WITH_FIREBASE_ACCEPTANCE_WORDING"
+    ],
+    "noOperationalDataReimport": true,
+    "noLivePromotion": true,
+    "noB2": true
   }
 }

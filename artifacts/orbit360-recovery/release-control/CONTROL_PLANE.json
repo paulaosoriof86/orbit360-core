@@ -1942,7 +1942,7 @@
     "addendumBlobSha": "05099a90cfb4862eec97e0359d55932828cb930b",
     "forensicAuditBlobSha": "fcfdf29c9eb851d76cebf67bcbe36d8ed308eb0f",
     "paymentInferenceBlobSha": "cfb026ded52c36083528de658a70191c8380d725",
-    "mechanismSyncStatus": "B1_R7_VISUAL_REJECTED_DIRECTED_DIAGNOSTIC_ACTIVE",
+    "mechanismSyncStatus": "B1_R7_ROOT_CAUSE_DEMONSTRATED_PATCH_PENDING",
     "guardFailureBeforeFix": {
       "runId": 35450692628,
       "code": "I6_5_NEXT_ACTION_INVALID",
@@ -1951,7 +1951,7 @@
       "livePromotion": false
     },
     "b1ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B1_EXECUTION_LOCK_20260919.json",
-    "b1ExecutionLockBlobSha": "599640ca2d61b8d43f88c27308e1961e089ad2a0",
+    "b1ExecutionLockBlobSha": "1a9d6822b58a03ce4c84d946ce50af2d25b4d68e",
     "b1": {
       "status": "CANDIDATE_PENDING_PREVIEW",
       "sourceSha": "2627d78a75f5c40e0851a5015d16594dcbd498ba",
@@ -1961,7 +1961,7 @@
       "artifactId": 10601522877,
       "livePromoted": false,
       "visualAccepted": false,
-      "rootCauseStatus": "R7_DIRECTED_DIAGNOSTIC_REQUIRED",
+      "rootCauseStatus": "R7_DEMONSTRATED_PENDING_CUMULATIVE_PATCH",
       "rejectedPreviewRunId": 35498006195,
       "rejectedPreviewArtifactId": 10601522877,
       "rejectedPreviewBuildId": "gi-i65-b1-2627d78a75f5-57f234755dc1",
@@ -1972,6 +1972,23 @@
         "CARLOS_AND_SAMUEL_AUTH_VERIFIED_NOT_PROJECTED_TO_TEAM_ACCESS_STATUS",
         "CARLOS_LOGIN_LANDS_ON_FORBIDDEN_PRIOR_HASH_ROUTE",
         "PASSWORD_RESET_EMAIL_RESEND_NOT_RELIABLY_AVAILABLE_FROM_TEAM_ADMIN"
+      ],
+      "rootCauseEvidence": {
+        "authTeamRunId": 35499678687,
+        "authTeamJobId": 106049086701,
+        "authTeamArtifactId": 10602360047,
+        "bootstrapRunId": 35499941482,
+        "bootstrapJobId": 106049797658,
+        "priorBrandingRunId": 35499595388,
+        "priorBrandingJobId": 106048856521
+      },
+      "owners": [
+        "orbit360-platform/core/public-tenant-branding.js",
+        "orbit360-platform/core/auth-product-runtime-p0.js",
+        "orbit360-platform/core/tenant-access-policy-product-p0.js",
+        "functions/user-onboarding.js",
+        "orbit360-platform/modules/equipo-credential-admin-v20260805-bridge.js",
+        "orbit360-platform/index.html"
       ]
     },
     "lastVisualRejection": {
