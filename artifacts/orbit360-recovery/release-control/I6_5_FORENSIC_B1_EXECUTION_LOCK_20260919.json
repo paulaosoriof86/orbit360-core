@@ -163,8 +163,9 @@
     "parentHead": "a97a9d7d5c2bc9860480d816f23f4c7043d62161",
     "revision": 5,
     "livePromoted": false,
-    "rootCauseStatus": "R7_DEMONSTRATED_PENDING_CUMULATIVE_PATCH",
-    "sourceSha": "6fb85a6b8379cc38eeac00ed48f9a28714dbd230"
+    "rootCauseStatus": "R7_DEMONSTRATED_AND_PATCHED_PENDING_PREVIEW",
+    "sourceSha": "9b34f47c099b0d8af8de130a2b7b7a5d3b514bc5",
+    "proofHeadSha": "1fb3f12184bbadd47cf8f9668cc6172a656029ef"
   },
   "candidatePreparedAt": "2026-09-19",
   "lastAttempt": {
@@ -744,5 +745,21 @@
       "livePromotionAuthorized": false,
       "reimportAuthorized": false
     }
+  },
+  "r7CumulativePatch": {
+    "status": "PRODUCT_AND_PROOF_READY_PENDING_SINGLE_BUILD_PREVIEW",
+    "productSourceSha": "9b34f47c099b0d8af8de130a2b7b7a5d3b514bc5",
+    "proofHeadSha": "1fb3f12184bbadd47cf8f9668cc6172a656029ef",
+    "fixes": [
+      "LOGO_INTRINSIC_RATIO_WITHOUT_FIXED_HEIGHT_CLIPPING",
+      "FRESH_LOGIN_NORMALIZES_TO_INICIO_RESTORE_PRESERVES_ROUTE",
+      "SELF_AUTH_VERIFICATION_PROJECTION_SYNC",
+      "TEAM_SCOPE_WITHOUT_TEAM_BINDING_FAILS_CLOSED_TO_OWN",
+      "TEMP_PASSWORD_REQUIRES_EXPLICIT_SERVER_CONFIRMATION",
+      "DEDICATED_PASSWORD_RESET_RESEND_WITH_DELIVERY_LIMITATION_WORDING"
+    ],
+    "dataReimport": false,
+    "livePromotion": false,
+    "advanceToB2": false
   }
 }

@@ -713,7 +713,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B1_R3_ROOT_CAUSE",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B1_PREVIEW",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -1942,7 +1942,7 @@
     "addendumBlobSha": "05099a90cfb4862eec97e0359d55932828cb930b",
     "forensicAuditBlobSha": "fcfdf29c9eb851d76cebf67bcbe36d8ed308eb0f",
     "paymentInferenceBlobSha": "cfb026ded52c36083528de658a70191c8380d725",
-    "mechanismSyncStatus": "B1_R7_ROOT_CAUSE_DEMONSTRATED_PATCH_PENDING",
+    "mechanismSyncStatus": "B1_R7_CANDIDATE_PENDING_PREVIEW",
     "guardFailureBeforeFix": {
       "runId": 35450692628,
       "code": "I6_5_NEXT_ACTION_INVALID",
@@ -1951,7 +1951,7 @@
       "livePromotion": false
     },
     "b1ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B1_EXECUTION_LOCK_20260919.json",
-    "b1ExecutionLockBlobSha": "07c7b8b584b66c8a9d034cead8e2d7d845dfb504",
+    "b1ExecutionLockBlobSha": "870c19d56d359d1a40bfd7e5c6da1b0d78d7f0e5",
     "b1": {
       "status": "CANDIDATE_PENDING_PREVIEW",
       "sourceSha": "2627d78a75f5c40e0851a5015d16594dcbd498ba",
@@ -1961,7 +1961,7 @@
       "artifactId": 10601522877,
       "livePromoted": false,
       "visualAccepted": false,
-      "rootCauseStatus": "R7_DEMONSTRATED_PENDING_CUMULATIVE_PATCH",
+      "rootCauseStatus": "R7_DEMONSTRATED_AND_PATCHED_PENDING_PREVIEW",
       "rejectedPreviewRunId": 35498006195,
       "rejectedPreviewArtifactId": 10601522877,
       "rejectedPreviewBuildId": "gi-i65-b1-2627d78a75f5-57f234755dc1",
@@ -1993,7 +1993,9 @@
       "allowedProductFilesR7": [
         "orbit360-platform/core/tenant-access-policy-product-p0.js",
         "orbit360-platform/modules/equipo-credential-admin-v20260805-bridge.js"
-      ]
+      ],
+      "candidateProductSourceSha": "9b34f47c099b0d8af8de130a2b7b7a5d3b514bc5",
+      "candidateProofHeadSha": "1fb3f12184bbadd47cf8f9668cc6172a656029ef"
     },
     "lastVisualRejection": {
       "recordedAt": "2026-09-20T01:30:00-06:00",
