@@ -103,7 +103,7 @@
     } else if (result.state === 'blocked') {
       toast('Acceso bloqueado correctamente.');
     } else if (result.state === 'invited') {
-      toast('Acceso creado y correo de establecimiento enviado.');
+      toast('Acceso creado. Firebase aceptó la solicitud de correo; la entrega al buzón no está confirmada.');
     } else {
       toast('Acceso y permisos sincronizados.');
     }

@@ -12,6 +12,7 @@ Orbit.modules.equipo = (function () {
   const U = Orbit.ui, K = Orbit.kit, S = () => Orbit.store;
   let tab = 'usuarios';
   let userFilter = 'todos';
+  let accessConfigCache = null, accessConfigLoading = null;
   const now = U.NOW ? new Date(U.NOW) : new Date();
   let metaPeriodo = now.toISOString().slice(0, 7);
   let metaPais = (Orbit.pais && Orbit.pais !== 'TODOS') ? Orbit.pais : 'GT';
@@ -132,6 +133,7 @@ Orbit.modules.equipo = (function () {
     host.querySelectorAll('.tab[data-t]').forEach(el => el.addEventListener('click', () => { tab = el.dataset.t; render(host); }));
     host.querySelector('#eq-add').addEventListener('click', () => editarUsuario(''));
     document.getElementById('eq-body').innerHTML = ({ usuarios, permisos, comisiones, metas, auditoria: auditoriaView }[tab] || usuarios)();
+    if(tab==='permisos')ensureAccessConfig().then(()=>{if(tab==='permisos'&&document.getElementById('eq-body')){document.getElementById('eq-body').innerHTML=permisos();wire(host);}}).catch(()=>{});
     bindAuditRefresh(host);
     wire(host);
   }
@@ -194,14 +196,30 @@ Orbit.modules.equipo = (function () {
     });
     return def;
   }
+  function defaultRoleScopes() {
+    return { 'Dirección':'all','Admin':'all','AdminTenant':'all','SuperAdmin':'all','Finanzas':'all','Operativo':'all','Marketing':'team','Asesor':'own','Asistente':'team','Comercial':'own' };
+  }
+  function getAccessConfig() {
+    try { const tenant=Orbit.tenant&&Orbit.tenant.get?Orbit.tenant.get():{},canonical=tenant&&tenant.domainConfig&&tenant.domainConfig.access;if(canonical&&typeof canonical==='object')return canonical; } catch(e){}
+    return accessConfigCache||{};
+  }
   function getPermisos() {
+    const canonical=getAccessConfig().rolePermissions;
+    if(canonical&&Object.keys(canonical).length)return canonical;
     const cfg = Orbit.cat.all();
     return cfg.permisos || defaultPermissions();
   }
+  function getRoleScopes(){ return Object.assign({},defaultRoleScopes(),getAccessConfig().roleScopes||{}); }
+  function ensureAccessConfig(){
+    if(accessConfigLoading||!Orbit.domainConfig||typeof Orbit.domainConfig.get!=='function')return accessConfigLoading||Promise.resolve(null);
+    accessConfigLoading=Orbit.domainConfig.get('access').then(out=>{if(out&&out.config)accessConfigCache=out.config;return out;}).finally(()=>{accessConfigLoading=null;});
+    return accessConfigLoading;
+  }
   function permisos() {
-    const P = getPermisos();
+    const P = getPermisos(), scopes=getRoleScopes();
     const roles = [...ROLE_ORDER, LEGACY_ROLE].filter(r => Orbit.ROLES && Orbit.ROLES[r]);
-    return `<div class="cfg-note" style="margin-bottom:14px">🔐 Esta matriz define los módulos estándar de cada rol. Los ajustes particulares se hacen dentro de la ficha del usuario como <b>extras</b> o <b>restricciones</b>. Los cambios se guardan juntos y exigen un motivo.</div>
+    return `<div class="cfg-note" style="margin-bottom:14px">🔐 Esta matriz es la política canónica por rol. <b>Ver/Editar</b> controla módulos y <b>Alcance de datos</b> controla qué cartera se ve al seleccionar ese rol. Las restricciones particulares del usuario siguen prevaleciendo.</div>
+    <div class="card pad" style="margin-bottom:12px"><b style="font-family:var(--f-display)">Alcance de datos por rol</b><div class="muted" style="font-size:12px;margin:4px 0 10px">Propios = solo cartera del usuario. Equipo = usuarios del mismo grupo de visibilidad. Todos = cartera autorizada del tenant y países del usuario.</div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:9px">${roles.map(r=>`<label class="ce-l">${U.esc(r)}<select class="o-sel" data-role-scope="${U.esc(r)}"><option value="own" ${scopes[r]==='own'?'selected':''}>Solo propios</option><option value="team" ${scopes[r]==='team'?'selected':''}>Equipo</option><option value="all" ${scopes[r]==='all'?'selected':''}>Todos</option><option value="none" ${scopes[r]==='none'?'selected':''}>Ninguno</option></select></label>`).join('')}</div></div>
     <div class="card" style="overflow:hidden"><div style="overflow-x:auto"><table class="tbl perm-tbl">
       <thead><tr><th>Módulo</th>${roles.map(r => `<th colspan="2" style="text-align:center;border-left:1px solid var(--line)">${U.esc(r)}${r === LEGACY_ROLE ? ' · legado' : ''}</th>`).join('')}</tr>
       <tr><th></th>${roles.map(() => ACCIONES.map(a => `<th style="text-align:center;font-size:10.5px;font-weight:600;color:var(--ink-3)">${a[1]}</th>`).join('')).join('')}</tr></thead>
@@ -373,8 +391,9 @@ Orbit.modules.equipo = (function () {
         </div>
         <div class="cgrid">
           <label class="ce-l">Rol predeterminado<select id="eu-role-default" class="o-sel"></select></label>
-          <label class="ce-l">Alcance de datos<select id="eu-scope" class="o-sel">${Object.entries(SCOPE_LABELS).map(([v, l]) => `<option value="${v}" ${(a.scopeDatos || 'propios') === v ? 'selected' : ''}>${l}</option>`).join('')}</select></label>
+          <label class="ce-l">Alcance máximo del usuario<select id="eu-scope" class="o-sel">${Object.entries(SCOPE_LABELS).map(([v, l]) => `<option value="${v}" ${(a.scopeDatos || 'propios') === v ? 'selected' : ''}>${l}</option>`).join('')}</select></label>
         </div>
+        <label class="ce-l">Grupo de visibilidad <span class="muted">(cuando el rol activo usa alcance Equipo)</span><input id="eu-team" class="o-sel" value="${U.esc(a.teamId||a.equipoId||'')}" placeholder="Ej. Operación Guatemala"><span class="muted" style="font-size:11px">Usuarios con el mismo grupo se ven entre sí. Si queda vacío, el alcance Equipo se limita a propios.</span></label>
         <div>
           <div class="ce-l" style="margin-bottom:6px">Países autorizados</div>
           <div style="display:flex;gap:8px;flex-wrap:wrap">${activeCountries.map(p => `<label class="chiprole"><input type="checkbox" class="eu-pais" value="${p.id}" ${initialCountries.includes(p.id) ? 'checked' : ''}> ${p.id === 'CO' ? '🇨🇴' : '🇬🇹'} ${p.label} · ${p.moneda}</label>`).join('')}</div>
@@ -471,7 +490,7 @@ Orbit.modules.equipo = (function () {
       if (!paises.includes(paisDefault)) return inform('El país predeterminado debe estar entre los países seleccionados.');
       const selectedMods = $$('.eu-mod:checked').map(c => c.value), base = baseModules(roles);
       const data = { nombre, telefono: $('#eu-tel').value.trim(), email: $('#eu-email').value.trim().toLowerCase(), color: $('#eu-color').value,
-        roles, rol: rolDefault, rolDefault, scopeDatos: $('#eu-scope').value, paises, pais: paisDefault, paisDefault,
+        roles, rol: rolDefault, rolDefault, scopeDatos: $('#eu-scope').value, teamId: $('#eu-team').value.trim(), equipoId: $('#eu-team').value.trim(), paises, pais: paisDefault, paisDefault,
         modulosExtra: selectedMods.filter(m => !base.includes(m)), modulosRestringidos: base.filter(m => !selectedMods.includes(m)), modulosOverride: selectedMods,
         inactivo: $('#eu-inact').checked, estado: $('#eu-inact').checked ? 'inactivo' : 'activo', activo: !$('#eu-inact').checked, updatedAt: new Date().toISOString() };
       const after = userSnapshot(data); let motivo = 'Alta manual desde Equipo';
@@ -509,7 +528,16 @@ Orbit.modules.equipo = (function () {
       host.querySelectorAll('[data-perm]').forEach(c => {
         const [rol, m, ac] = c.dataset.perm.split('|'); next[rol] = next[rol] || {}; next[rol][m] = next[rol][m] || {}; next[rol][m][ac] = c.checked;
       });
-      Orbit.cat.setList('permisos', next); audit('editar_matriz_permisos', motivo, before, next); toast('✓ Matriz de permisos guardada');
+      const roleScopes={};host.querySelectorAll('[data-role-scope]').forEach(sel=>{roleScopes[sel.dataset.roleScope]=sel.value;});
+      if(!Orbit.domainConfig||typeof Orbit.domainConfig.save!=='function')return inform('La configuración canónica de acceso no está disponible.','No guardado');
+      try{
+        const out=await Orbit.domainConfig.save('access',{rolePermissions:next,roleScopes},motivo);
+        if(!out||out.ok!==true||!out.config)throw new Error('ACCESS_CONFIG_SERVER_CONFIRMATION_MISSING');
+        accessConfigCache=out.config; Orbit.cat.setList('permisos',next);
+        await audit('editar_matriz_permisos',motivo,before,{rolePermissions:next,roleScopes});
+        if(Orbit.router&&Orbit.router.rebuildSidebar)Orbit.router.rebuildSidebar();
+        toast('✓ Permisos y alcance guardados y confirmados por servidor');
+      }catch(error){inform('No fue posible confirmar la política de acceso en el servidor. No se declaró guardada.','No guardado');}
     });
     const pr = host.querySelector('#perm-reset');
     if (pr) pr.addEventListener('click', async () => {

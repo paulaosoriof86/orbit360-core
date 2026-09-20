@@ -46,7 +46,8 @@
     "deployTargets": [
       "orbit360TenantBranding",
       "orbit360ProductOperationalCommand",
-      "orbit360ProvisionTeamAccess"
+      "orbit360ProvisionTeamAccess",
+      "orbit360TenantDomainConfig"
     ],
     "deployExactCurrentSource": true,
     "sharedProjectBackendRequiredForPreviewAndLive": true,
@@ -869,5 +870,21 @@
       "livePromotionAuthorized": false,
       "advanceToB2Authorized": false
     }
+  },
+  "r8CumulativePatch": {
+    "status": "SOURCE_PATCHED_PENDING_PROOF",
+    "fixes": [
+      "TENANT_CANONICAL_ROLE_PERMISSION_MATRIX_SERVER_CONFIRMED",
+      "MATRIX_CAN_EXPAND_OR_DENY_ROLE_MODULES_WITH_USER_RESTRICTIONS_DENY_FIRST",
+      "ACTIVE_ROLE_SCOPED_RENDER_AND_IMMEDIATE_RERENDER_ON_ROLE_SWITCH",
+      "ASESOR_ROLE_CEILING_OWN_OPERATIVO_DEFAULT_CEILING_ALL",
+      "TEAM_VISIBILITY_GROUP_ADMINISTRABLE_PER_USER",
+      "EMAIL_REQUEST_WORDING_DISTINGUISHES_FIREBASE_ACCEPTANCE_FROM_DELIVERY"
+    ],
+    "brandingTouched": false,
+    "dataReimport": false,
+    "operationalDataWrites": 0,
+    "livePromotion": false,
+    "advanceToB2": false
   }
 }

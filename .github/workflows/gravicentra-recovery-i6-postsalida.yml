@@ -2923,6 +2923,10 @@ jobs:
           node --check orbit360-platform/core/tenant-access-policy-effective-p0.js
           node --check orbit360-platform/core/tenant-access-policy-product-p0.js
           node --check orbit360-platform/modules/equipo-credential-admin-v20260805-bridge.js
+          node --check orbit360-platform/core/access-scope.js
+          node --check orbit360-platform/core/router.js
+          node --check orbit360-platform/core/tenant-domain-config-client.js
+          node --check functions/tenant-domain-config.js
           node --check tools/gravicentra-i6-5-b1-advisor-normalize.mjs
           node --check tools/gravicentra-i6-5-b1-branding-snapshot.mjs
           node --check tools/gravicentra-i6-1-preview-package.mjs
@@ -3002,7 +3006,7 @@ jobs:
           E="$RUNNER_TEMP/b1-package/evidence";mkdir -p "$E"
           node "$FIREBASE_CLI_BIN" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/b1-functions-before.json"
           FROOT="$RUNNER_TEMP/b1-functions";mkdir -p "$FROOT";cp -a "$RUNNER_TEMP/b1-package/bundle/backend" "$FROOT/backend";(cd "$FROOT/backend"&&npm ci --ignore-scripts --no-audit --no-fund >/dev/null);echo '{"functions":{"source":"backend"}}' > "$FROOT/firebase.json"
-          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360TenantBranding,functions:orbit360ProductOperationalCommand,functions:orbit360ProvisionTeamAccess --config "$FROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
+          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360TenantBranding,functions:orbit360ProductOperationalCommand,functions:orbit360ProvisionTeamAccess,functions:orbit360TenantDomainConfig --config "$FROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
           export E TENANT_HINT
           (cd "$FROOT/backend" && node - <<'NODE'
           const fs=require('fs');const {initializeApp,cert}=require('firebase-admin/app');const {getFirestore}=require('firebase-admin/firestore');const sa=JSON.parse(fs.readFileSync(process.env.GOOGLE_APPLICATION_CREDENTIALS));initializeApp({credential:cert(sa),projectId:process.env.PROJECT_ID});(async()=>{const s=await getFirestore().collection('tenants').doc(process.env.TENANT_HINT).collection('config').doc('branding').get();if(!s.exists)throw Error('B1_BRANDING_CONFIG_MISSING');const b=s.data()||{};if(!String(b.displayName||'').trim()||!String(b.logo||'').trim()||!String(b.favicon||'').trim())throw Error('B1_BRANDING_CONFIG_INVALID');fs.writeFileSync(process.env.E+'/b1-branding-readback.json',JSON.stringify({exists:true,writeExecuted:false,logo:String(b.logo),favicon:String(b.favicon)},null,2)+'\n')})().catch(e=>{console.error(e);process.exit(1)});
