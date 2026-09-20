@@ -357,10 +357,15 @@
   },
   "technicalClosure": {
     "status": "PASS_PENDING_PAULA_VISUAL",
-    "runId": 35488185372,
+    "runId": 35488766659,
     "proof": "I65_B1_PREVIEW_PROOF=PASS",
     "exactReadback": true,
+    "functionalPass": true,
     "syntheticFinalAbsent": true,
+    "sourceSha": "b8e8e9021852d8c2c6c3bbb0cbde71553aaffcb3",
+    "buildId": "gi-i65-b1-b8e8e9021852-57f234755dc1",
+    "artifactId": 10598569261,
+    "artifactDigest": "580da5bf28659e3ff2a8f858831291ef3b59391a6ba0b06f00fa44249268c507",
     "livePromotionAuthorized": false
   },
   "visualAccepted": false
