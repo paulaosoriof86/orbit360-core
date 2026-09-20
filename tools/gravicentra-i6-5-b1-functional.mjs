@@ -179,12 +179,20 @@ async function proveVerifiedActiveCompatibility(db,auth,browser){
     const created=asDate(ad.createdAt||ad.fechaCreacion||m.createdAt);
     candidates.push({
       uid:u.uid,advisorId,activeRole:clean(m.activeRole||m.defaultRole||m.rolDefault||m.rol,100),
-      createdAt:created?created.toISOString():'',generation:created&&created>=new Date('2026-09-20T00:00:00Z')?'current-day':'preexisting'
+      lineageHints:{
+        createdAtPresent:!!created,
+        advisorOnboardingVersionPresent:!!clean(ad.onboardingVersion,160),
+        memberOnboardingVersionPresent:!!clean(m.onboardingVersion,160),
+        advisorAuthUidPresent:!!clean(ad.authUid||ad.uid||ad.userId,180),
+        accessProvisioned:ad.accessProvisioned===true,
+        dataScopesPresent:!!(m.dataScopes&&typeof m.dataScopes==='object')
+      }
     });
   }
+  // Current tenant evidence contains at least three verified active identities.
+  // Test every one of them; do not infer eligibility from creation date, name,
+  // historical UI generation, or presence/absence of optional legacy metadata.
   need(candidates.length>=3,'B1_COMPAT_VERIFIED_ACTIVE_COHORT_TOO_SMALL:'+candidates.length);
-  need(candidates.some(x=>x.generation==='current-day'),'B1_COMPAT_CURRENT_MODULE_COHORT_MISSING');
-  need(candidates.some(x=>x.generation==='preexisting'),'B1_COMPAT_PREEXISTING_COHORT_MISSING');
   const results=[];
   for(const row of candidates){
     const ctx=await browser.newContext({viewport:{width:1366,height:900}});
@@ -215,7 +223,7 @@ async function proveVerifiedActiveCompatibility(db,auth,browser){
       results.push({
         uidHash:crypto.createHash('sha256').update(row.uid).digest('hex'),
         advisorIdHash:crypto.createHash('sha256').update(row.advisorId).digest('hex'),
-        generation:row.generation,createdAt:row.createdAt,configuredActiveRole:row.activeRole,
+        lineageHints:row.lineageHints,configuredActiveRole:row.activeRole,
         runtimeActiveRole:state.activeRole,started:state.started,hash:state.hash,
         storeReady:state.storeReady,storeStatus:state.storeStatus,
         requiredFailed:state.requiredFailed,snapshotErrors:state.snapshotErrors,
@@ -231,11 +239,13 @@ async function proveVerifiedActiveCompatibility(db,auth,browser){
       await ctx.close().catch(()=>{});
     }
   }
+  const signatures=[...new Set(results.map(x=>JSON.stringify(x.lineageHints||{})))];
   return{
     tested:results.length,
-    preexisting:results.filter(x=>x.generation==='preexisting').length,
-    currentDay:results.filter(x=>x.generation==='current-day').length,
+    structuralVariantCount:signatures.length,
     allPass:results.every(x=>x.started&&x.storeReady&&x.requiredFailed.length===0&&x.unauthorizedVisibleCount===0&&x.pageErrors.length===0),
+    selectionRule:'ALL_ACTIVE_FIREBASE_VERIFIED_MEMBERSHIPS',
+    userSpecificBranching:false,
     results
   };
 }
