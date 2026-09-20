@@ -601,6 +601,58 @@ try{
   need(loginState.unauthorizedVisible.length===0,'B1_UNAUTHORIZED_VISIBLE_ROUTE:'+JSON.stringify(loginState.unauthorizedVisible));
   need(loginErrors.length===0,'B1_SYNTHETIC_LOGIN_PAGE_ERRORS:'+JSON.stringify(loginErrors.slice(0,4)));
   ev.auth.login={pass:true,standardRole:true,standardCountry:true,extraModuleHidden:true,unauthorizedVisible:0,extraModule:moduleChoice.extra};
+
+  // True browser-session persistence proof: no custom token, no helper re-authentication.
+  await loginPage.reload({waitUntil:'domcontentloaded',timeout:30000});
+  try{
+    await loginPage.waitForFunction(()=>!!window.Orbit?.productAppP0?.status?.().started&&!!window.Orbit?.auth?.productUser?.uid&&!document.body.classList.contains('pre-auth'),null,{timeout:30000});
+  }catch(refreshError){
+    const refreshDiag=await loginPage.evaluate(async()=>{
+      let providerState={};
+      try{
+        const p=window.Orbit?.productRuntimeBrowserProvidersP0;
+        const ctx=p&&typeof p.initialize==='function'?await p.initialize():null;
+        const u=ctx?.auth?.currentUser||null;
+        providerState={
+          enabled:!!(p&&p.enabled&&p.enabled()),
+          currentUser:!!u,
+          emailVerified:u?u.emailVerified===true:null,
+          currentUserEmail:String(u?.email||''),
+          authPersistence:String(p?.authPersistence||'')
+        };
+      }catch(e){providerState={providerError:String(e?.code||e?.message||e)};}
+      return{
+        loginVisible:document.getElementById('login')?getComputedStyle(document.getElementById('login')).display!=='none':null,
+        preAuth:document.body.classList.contains('pre-auth'),
+        authRestoring:document.documentElement.getAttribute('data-auth-restoring'),
+        appStatus:window.Orbit?.productAppP0?.status?.()||null,
+        productUser:window.Orbit?.auth?.productUser?{
+          uid:String(window.Orbit.auth.productUser.uid||''),
+          advisorId:String(window.Orbit.auth.productUser.advisorId||''),
+          email:String(window.Orbit.auth.productUser.email||'')
+        }:null,
+        rawAuthUser:window.Orbit?.auth?.user?{
+          uid:String(window.Orbit.auth.user()?.uid||''),
+          email:String(window.Orbit.auth.user()?.email||'')
+        }:null,
+        providerState,
+        loginError:String(document.querySelector('#login-error')?.textContent||'')
+      };
+    }).catch(e=>({diagnosticError:String(e?.message||e)}));
+    throw new Error('B1_NATIVE_REFRESH_SESSION_LOST:'+JSON.stringify(refreshDiag));
+  }
+  const refreshedState=await loginPage.evaluate(()=>({
+    uid:String(Orbit.auth.productUser?.uid||''),
+    advisorId:String(Orbit.auth.productUser?.advisorId||''),
+    email:String(Orbit.auth.productUser?.email||''),
+    preAuth:document.body.classList.contains('pre-auth'),
+    started:!!Orbit.productAppP0?.status?.().started
+  }));
+  need(refreshedState.uid===synthetic.uid,'B1_NATIVE_REFRESH_UID_CHANGED');
+  need(refreshedState.advisorId===synthetic.id,'B1_NATIVE_REFRESH_ADVISOR_CHANGED');
+  need(refreshedState.preAuth===false&&refreshedState.started===true,'B1_NATIVE_REFRESH_APP_NOT_RESTORED');
+  ev.auth.nativeRefresh={pass:true,uidStable:true,advisorStable:true,preAuth:false};
+
   await loginPage.screenshot({path:path.join(evidenceDir,'b1-synthetic-login-modules.png'),fullPage:true});
   await loginContext.close();
 
