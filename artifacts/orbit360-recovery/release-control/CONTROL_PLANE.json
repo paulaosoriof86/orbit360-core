@@ -1951,7 +1951,7 @@
       "livePromotion": false
     },
     "b1ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B1_EXECUTION_LOCK_20260919.json",
-    "b1ExecutionLockBlobSha": "7b1178d5c6c9245e752ac30ac324a9c09a66241e",
+    "b1ExecutionLockBlobSha": "52aa8c40e556eb5be2b5c29e94f88444eaac1e6e",
     "b1": {
       "status": "CANDIDATE_PENDING_PREVIEW",
       "sourceSha": "5d79f675f2fcb76025c1f75faab02601c9142ab3",

@@ -33,10 +33,7 @@
     "orbit360-platform/product-runtime-config.js",
     "orbit360-platform/core/product-hydration-required-optional-p0.js",
     "orbit360-platform/core/user-onboarding.js",
-    "orbit360-platform/styles/infra.css",
-    "tools/gravicentra-i6-1-preview-package.mjs",
-    "tools/gravicentra-i6-5-b1-advisor-normalize.mjs",
-    "tools/gravicentra-i6-5-b1-functional.mjs"
+    "orbit360-platform/styles/infra.css"
   ],
   "backend": {
     "deployTargets": [
