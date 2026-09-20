@@ -1942,7 +1942,7 @@
     "addendumBlobSha": "05099a90cfb4862eec97e0359d55932828cb930b",
     "forensicAuditBlobSha": "fcfdf29c9eb851d76cebf67bcbe36d8ed308eb0f",
     "paymentInferenceBlobSha": "cfb026ded52c36083528de658a70191c8380d725",
-    "mechanismSyncStatus": "B1_VISUAL_REJECTED_ROOT_CAUSE_DIAGNOSTIC_ACTIVE",
+    "mechanismSyncStatus": "B1_ROOT_CAUSE_DEMONSTRATED_PRODUCT_PATCH_PENDING",
     "guardFailureBeforeFix": {
       "runId": 35450692628,
       "code": "I6_5_NEXT_ACTION_INVALID",
@@ -1982,7 +1982,19 @@
         "TEAM_ACCESS_STATUS_SEMANTICS_CORRECT"
       ],
       "rootCauseRequiredBeforeSourceChange": true,
-      "rootCauseDiagnosticLabel": "R6_DIRECTED_DIAGNOSTIC_UNDER_EXISTING_R3_ROOT_CAUSE_ACTION"
+      "rootCauseDiagnosticLabel": "R6_DIRECTED_DIAGNOSTIC_UNDER_EXISTING_R3_ROOT_CAUSE_ACTION",
+      "rootCauseStatus": "DEMONSTRATED_PENDING_CUMULATIVE_PATCH",
+      "rootCauseEvidence": {
+        "runId": 35497621514,
+        "jobId": 106043531452,
+        "artifactId": 10601746482
+      },
+      "owners": [
+        "orbit360-platform/index.html",
+        "orbit360-platform/styles/infra.css",
+        "orbit360-platform/core/public-tenant-branding.js",
+        "orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js"
+      ]
     },
     "lastVisualRejection": {
       "recordedAt": "2026-09-20T01:30:00-06:00",

@@ -161,7 +161,7 @@
     "parentHead": "a97a9d7d5c2bc9860480d816f23f4c7043d62161",
     "revision": 5,
     "livePromoted": false,
-    "rootCauseStatus": "R6_DIRECTED_ROOT_CAUSE_DIAGNOSTIC_REQUIRED"
+    "rootCauseStatus": "DEMONSTRATED_PENDING_CUMULATIVE_PATCH"
   },
   "candidatePreparedAt": "2026-09-19",
   "lastAttempt": {
@@ -492,5 +492,118 @@
     "dataMutationAuthorized": false,
     "reimportAuthorized": false,
     "advanceToB2Authorized": false
+  },
+  "r6DirectedRootCause": {
+    "status": "ROOT_CAUSE_DEMONSTRATED_PENDING_CUMULATIVE_PRODUCT_PATCH",
+    "evidence": {
+      "runId": 35497621514,
+      "jobId": 106043531452,
+      "artifactId": 10601746482,
+      "diagnosticHead": "1b121faedd737377ca02001623ff2dbc94b6906c",
+      "writes": 0,
+      "pageErrors": 0
+    },
+    "authRestore": {
+      "actorAdvisorId": "ase-paula-osorio",
+      "emailVerified": true,
+      "nativeReloadSameUid": true,
+      "postReloadSignInRequests": 0,
+      "readyMs": 1348,
+      "firebasePersistence": "firebase-default-local",
+      "finding": "FIREBASE_SESSION_PERSISTS_BUT_LOGIN_IS_PAINTED_BEFORE_AUTH_RESTORE_RESOLVES",
+      "finalNormalCredentialPaulaF5StillRequired": true
+    },
+    "startup": {
+      "initialLoginVisibleAtMs": 62.3,
+      "loginVisibleSamples25ms": 41,
+      "firstAppVisibleAtMs": 1383.4,
+      "hiddenLoginAndShellSamples25ms": 1,
+      "darkHiddenSamples25ms": 1,
+      "equipoInitialRows": 7,
+      "equipoRenderCallsObserved": 1,
+      "repeatedHostMutationsAfterMs": [
+        3520.1,
+        3556.5,
+        3624.1,
+        3628.1,
+        3647,
+        3692.3,
+        3767.6,
+        3811.5,
+        3819.5,
+        3827.1,
+        3835.4
+      ],
+      "causes": [
+        "INDEX_STARTS_PRE_AUTH_WITH_LOGIN_VISIBLE_BEFORE_AUTH_INIT",
+        "INFRA_CSS_LITERAL_BACKSLASH_N_BREAKS_RESTORING_BACKGROUND_RULE",
+        "EQUIPO_ONBOARDING_BRIDGE_REDECORATES_TABLE_ON_EVERY_ORBIT_STORE_EVENT_INCLUDING_UNRELATED_DEFERRED_COLLECTIONS"
+      ]
+    },
+    "branding": {
+      "asset": {
+        "naturalWidth": 360,
+        "naturalHeight": 114,
+        "naturalRatio": 3.1578947368421053,
+        "alphaBoundingBox": {
+          "x": 6,
+          "y": 4,
+          "width": 340,
+          "height": 92,
+          "ratio": 3.6956521739130435
+        }
+      },
+      "login": {
+        "wrapper": {
+          "width": 230,
+          "height": 50,
+          "overflow": "hidden"
+        },
+        "image": {
+          "width": 229.96875,
+          "height": 72.828125,
+          "ratio": 3.157691482514482
+        }
+      },
+      "header": {
+        "wrapper": {
+          "width": 116,
+          "height": 28,
+          "overflow": "hidden"
+        },
+        "image": {
+          "width": 111.953125,
+          "height": 35.453125,
+          "ratio": 3.1577787571617453
+        }
+      },
+      "finding": "BITMAP_RATIO_IS_PRESERVED_BUT_IMAGE_ELEMENT_EXCEEDS_WRAPPER_HEIGHT_AND_IS_CLIPPED",
+      "cause": "PUBLIC_BRANDING_INLINE_AUTO_SIZE_WITH_PERCENT_MAX_CONSTRAINT_DOES_NOT_FIT_RENDER_BOX_TO_FIXED_WRAPPER"
+    },
+    "owners": [
+      "orbit360-platform/index.html",
+      "orbit360-platform/styles/infra.css",
+      "orbit360-platform/core/public-tenant-branding.js",
+      "orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js"
+    ],
+    "minimumCumulativePatch": [
+      "RESTORING_STATE_FROM_FIRST_PAINT_WITH_LOGIN_AND_SHELL_HIDDEN_UNTIL_AUTH_DECISION",
+      "FIX_LITERAL_CSS_NEWLINE_AND_RENDER_CLEAN_RESTORING_SURFACE",
+      "FIT_LOGO_BOX_EXACTLY_INSIDE_MEASURED_WRAPPERS_WITH_OBJECT_FIT_CONTAIN",
+      "FILTER_EQUIPO_DECORATION_TO_ASESORES_STORE_EVENTS_ONLY"
+    ],
+    "preserve": [
+      "TEAM_7_CANONICAL_USERS",
+      "TEAM_EDIT_SAVE_PAULA",
+      "TEAM_EDIT_SAVE_SAMUEL",
+      "TEAM_EDIT_SAVE_FERNANDO",
+      "TEAM_DELETE_ACTION_VISIBLE",
+      "TEAM_AUDIT_HISTORY_VISIBLE",
+      "TEAM_ACCESS_STATUS_SEMANTICS_CORRECT"
+    ],
+    "noDataWrites": true,
+    "noReimport": true,
+    "noLivePromotion": true,
+    "noB2": true
   }
 }
