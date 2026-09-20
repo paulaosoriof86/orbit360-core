@@ -487,7 +487,39 @@ try{
   await loginPage.fill('#lg-user',synthetic.email);
   await loginPage.fill('#lg-pass',syntheticPassword);
   await loginPage.click('#login-form button[type="submit"]');
-  await loginPage.waitForFunction(()=>!!window.Orbit?.productAppP0?.status?.().started&&!!window.Orbit?.auth?.productUser?.uid,null,{timeout:25000});
+  try{
+    await loginPage.waitForFunction(()=>!!window.Orbit?.productAppP0?.status?.().started&&!!window.Orbit?.auth?.productUser?.uid,null,{timeout:25000});
+  }catch(loginActivationError){
+    const loginDiag=await loginPage.evaluate(async()=>{
+      let providerState={};
+      try{
+        const p=window.Orbit?.productRuntimeBrowserProvidersP0;
+        const ctx=p&&typeof p.initialize==='function'?await p.initialize():null;
+        const u=ctx?.auth?.currentUser||null;
+        providerState={
+          enabled:!!(p&&p.enabled&&p.enabled()),
+          currentUser:!!u,
+          emailVerified:u?u.emailVerified===true:null,
+          currentUserEmail:String(u?.email||'')
+        };
+      }catch(e){providerState={providerError:String(e?.code||e?.message||e)};}
+      return {
+        loginError:String(document.querySelector('#login-error')?.textContent||''),
+        submitting:String(document.querySelector('#login-form')?.dataset?.submitting||''),
+        preAuth:document.body.classList.contains('pre-auth'),
+        appStatus:window.Orbit?.productAppP0?.status?.()||null,
+        productUser:window.Orbit?.auth?.productUser?{
+          advisorId:String(window.Orbit.auth.productUser.advisorId||''),
+          roles:window.Orbit.auth.productUser.roles||[],
+          countries:window.Orbit.auth.productUser.countries||[]
+        }:null,
+        storeStatus:window.Orbit?.store?._productStatus?.()||null,
+        providerState,
+        hash:location.hash
+      };
+    }).catch(e=>({diagnosticError:String(e?.message||e)}));
+    throw new Error('B1_SYNTHETIC_LOGIN_ACTIVATION:'+JSON.stringify(loginDiag));
+  }
   ev.auth.syntheticLegalGateAccepted=await acceptLegalGate(loginPage);
   await loginPage.waitForSelector('#sidebar [data-route]',{timeout:15000});
   const loginState=await loginPage.evaluate(({extra,restricted})=>({
