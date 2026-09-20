@@ -1,6 +1,6 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B1_EXECUTION_LOCK_V1",
-  "status": "CANDIDATE_PENDING_PREVIEW",
+  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
   "date": "2026-09-19",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -149,15 +149,19 @@
   },
   "canonicalPreviewChannelId": "gi-i65-b1-35455766715",
   "latestSuccessfulRun": {
-    "runId": 35467672819,
-    "sourceSha": "e2cad9e8872267a24a41af9dfee765a49a33f673",
-    "buildId": "gi-i65-b1-e2cad9e88722-57f234755dc1",
-    "artifactId": 10591921034,
-    "artifactDigest": "148fce7c65598e7558bf09faebb6f4c41835c4b5853525844c831babbd6eb3c7",
+    "runId": 35488185372,
+    "sourceSha": "539df6238c16b99f540fbf30c4b534be572114b4",
+    "buildId": "gi-i65-b1-539df6238c16-57f234755dc1",
+    "artifactId": 10597863877,
+    "artifactDigest": "e8ba91aa1209c99184c456fffee4e04866f20a6eed632c68dbd85d54b6729e0a",
     "previewUrl": "https://ays-orbit-360-lab--gi-i65-b1-35455766715-ylc10xr5.web.app",
     "exactReadback": true,
     "functionalPass": true,
-    "operationalWrites": 0,
+    "operationalWrites": 10,
+    "authSyntheticWrites": 2,
+    "membershipSyntheticWrites": 1,
+    "syntheticCleanupWrites": 11,
+    "syntheticFinalAbsent": true,
     "livePromoted": false
   },
   "revision": 3,
@@ -180,13 +184,13 @@
     "NATIVE_REASON_PROMPT"
   ],
   "preview": {
-    "sourceSha": "e2cad9e8872267a24a41af9dfee765a49a33f673",
-    "buildId": "gi-i65-b1-e2cad9e88722-57f234755dc1",
+    "sourceSha": "539df6238c16b99f540fbf30c4b534be572114b4",
+    "buildId": "gi-i65-b1-539df6238c16-57f234755dc1",
     "channelId": "gi-i65-b1-35455766715",
     "url": "https://ays-orbit-360-lab--gi-i65-b1-35455766715-ylc10xr5.web.app",
-    "runId": 35467672819,
-    "artifactId": 10591921034,
-    "artifactDigest": "148fce7c65598e7558bf09faebb6f4c41835c4b5853525844c831babbd6eb3c7",
+    "runId": 35488185372,
+    "artifactId": 10597863877,
+    "artifactDigest": "e8ba91aa1209c99184c456fffee4e04866f20a6eed632c68dbd85d54b6729e0a",
     "exactReadback": true,
     "functionalPass": true,
     "livePromoted": false
@@ -338,5 +342,13 @@
     "livePromotionAuthorized": false,
     "dataMutationAuthorized": false,
     "reimportAuthorized": false
+  },
+  "technicalClosure": {
+    "status": "PASS_PENDING_PAULA_VISUAL",
+    "runId": 35488185372,
+    "proof": "I65_B1_PREVIEW_PROOF=PASS",
+    "exactReadback": true,
+    "syntheticFinalAbsent": true,
+    "livePromotionAuthorized": false
   }
 }

@@ -713,7 +713,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B1_PREVIEW",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B1_VISUAL",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -1942,7 +1942,7 @@
     "addendumBlobSha": "05099a90cfb4862eec97e0359d55932828cb930b",
     "forensicAuditBlobSha": "fcfdf29c9eb851d76cebf67bcbe36d8ed308eb0f",
     "paymentInferenceBlobSha": "cfb026ded52c36083528de658a70191c8380d725",
-    "mechanismSyncStatus": "B1_R3_MEMBERSHIP_VISIBLE_MODULES_OWNER_BOUND",
+    "mechanismSyncStatus": "B1_R3_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
     "guardFailureBeforeFix": {
       "runId": 35450692628,
       "code": "I6_5_NEXT_ACTION_INVALID",
@@ -1951,20 +1951,20 @@
       "livePromotion": false
     },
     "b1ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B1_EXECUTION_LOCK_20260919.json",
-    "b1ExecutionLockBlobSha": "65a0f26cd207bc06546bfe230b71210a567cf557",
+    "b1ExecutionLockBlobSha": "ad212a2a264f46e16b98f7dc13cabe2d63ea32b1",
     "b1": {
-      "status": "CANDIDATE_PENDING_PREVIEW",
-      "sourceSha": "e2cad9e8872267a24a41af9dfee765a49a33f673",
-      "buildId": "gi-i65-b1-e2cad9e88722-57f234755dc1",
+      "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+      "sourceSha": "539df6238c16b99f540fbf30c4b534be572114b4",
+      "buildId": "gi-i65-b1-539df6238c16-57f234755dc1",
       "previewUrl": "https://ays-orbit-360-lab--gi-i65-b1-35455766715-ylc10xr5.web.app",
-      "runId": 35467672819,
-      "artifactId": 10591921034,
+      "runId": 35488185372,
+      "artifactId": 10597863877,
       "livePromoted": false,
       "revision": 3,
-      "artifactDigest": "148fce7c65598e7558bf09faebb6f4c41835c4b5853525844c831babbd6eb3c7",
+      "artifactDigest": "e8ba91aa1209c99184c456fffee4e04866f20a6eed632c68dbd85d54b6729e0a",
       "exactReadback": true,
       "functionalPass": true,
-      "operationalWrites": 0,
+      "operationalWrites": 10,
       "visualAccepted": false,
       "rootCauseRequiredBeforeCodeChange": true,
       "rejectedFindings": [
@@ -2006,7 +2006,11 @@
         "observedFailure": "PRODUCT_READONLY_BOOTSTRAP_NOT_READY:snapshots_no_adjuntos",
         "fixScope": "MATERIALIZE_EFFECTIVE_MEMBERSHIP_MODULES_ONLY",
         "livePromoted": false
-      }
+      },
+      "authSyntheticWrites": 2,
+      "membershipSyntheticWrites": 1,
+      "syntheticCleanupWrites": 11,
+      "syntheticFinalAbsent": true
     }
   }
 }
