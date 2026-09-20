@@ -3083,6 +3083,59 @@ jobs:
         continue-on-error: true
         run: echo "B1_R3_ONLY_AUTHORIZED_NORMALIZATION_AND_REVERSIBLE_TEST_WRITES"
 
+  i65-b1-hosting-byte-diagnostic:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      B1_LOCK: artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B1_EXECUTION_LOCK_20260919.json
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Compare Preview bytes to source
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib,json,os,urllib.request,time
+          lock=json.load(open(os.environ['B1_LOCK']))
+          base=(lock.get('latestSuccessfulRun',{}).get('previewUrl') or lock.get('canonicalPreviewUrl') or '').rstrip('/')
+          if not base: raise SystemExit('B1_BYTE_DIAG_PREVIEW_URL_MISSING')
+          rels=[
+            'core/backend-lab-receipts-portfolio-native-bridge-v20260801.js',
+            'core/config.js',
+            'core/policy-receipts-engine.js',
+            'core/product-prebootstrap-store-p0.js',
+            'modules/configuracion.js',
+            'core/tenant-access-policy-effective-p0.js'
+          ]
+          out=[]
+          for rel in rels:
+            local=open('orbit360-platform/'+rel,'rb').read()
+            req=urllib.request.Request(base+'/'+rel+'?byteDiag='+str(time.time_ns()),headers={'Accept-Encoding':'identity','Cache-Control':'no-cache, no-store'})
+            with urllib.request.urlopen(req,timeout=30) as z:
+              remote=z.read(); headers={k.lower():v for k,v in z.headers.items()}
+            first=None
+            for i,(a,b) in enumerate(zip(local,remote)):
+              if a!=b: first=i; break
+            if first is None and len(local)!=len(remote): first=min(len(local),len(remote))
+            row={
+              'rel':rel,'status':200,'contentType':headers.get('content-type',''),
+              'contentEncoding':headers.get('content-encoding',''),
+              'cacheControl':headers.get('cache-control',''),
+              'localLen':len(local),'remoteLen':len(remote),
+              'localSha256':hashlib.sha256(local).hexdigest(),
+              'remoteSha256':hashlib.sha256(remote).hexdigest(),
+              'equal':local==remote,'firstDiffOffset':first,
+              'remotePrefixHex':remote[:32].hex()
+            }
+            out.append(row)
+            print('B1_BYTE_DIAG='+json.dumps(row,separators=(',',':')))
+          print('B1_BYTE_DIAG_EQUAL_COUNT='+str(sum(1 for x in out if x['equal'])))
+          print('B1_BYTE_DIAG_TOTAL='+str(len(out)))
+          PY
+
   i65-b1-advisor-identity-diagnostic:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
