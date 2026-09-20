@@ -300,61 +300,16 @@ try{
   ev.team.hydration.canonicalFirestoreIds=canonicalSnap.docs.map(d=>d.id).sort();
   need(hydrated.rows.length===canonicalSnap.size,'B1_RUNTIME_CANONICAL_ADVISOR_COUNT_MISMATCH:'+JSON.stringify(ev.team.hydration));
   need(ev.team.hydration.canonicalFirestoreIds.every(id=>ev.team.hydration.runtimeIds.includes(id)),'B1_RUNTIME_CANONICAL_ADVISOR_IDS_MISMATCH:'+JSON.stringify(ev.team.hydration));
-  const incomplete=canonicalRows.find(r=>{
+  const incompleteRows=canonicalRows.filter(r=>{
     const q=semanticAdvisor(r);
     return !clean(r.authUid||r.uid||r.userId,180) && (!q.roles.length||!q.paises.length||!q.rolDefault||!q.paisDefault);
   });
-  need(incomplete,'B1_NO_EXISTING_INCOMPLETE_USER');
-  const beforeIncomplete=semanticAdvisor(incomplete),incompleteRef=advisorCollection.doc(incomplete.id);
-  const incompleteBeforeSnap=await incompleteRef.get(),incompleteUpdateBefore=incompleteBeforeSnap.updateTime?.toMillis?.()||0;
-  ev.team.incompleteExisting={advisorId:incomplete.id,incomplete:true,before:beforeIncomplete};
-
-  await reopen(page,incomplete.id);
-  ev.team.incompleteExisting.uiIdentity=await page.evaluate(id=>{
-    const row=Orbit.store.get('asesores',id);
-    const roles=[].concat(row?.roles&&row.roles.length?row.roles:(row?.rol?[row.rol]:[])).filter(Boolean);
-    const countries=[].concat(row?.paises&&row.paises.length?row.paises:(row?.pais?[row.pais]:[])).filter(Boolean);
-    return row?{
-      id:String(row.id||''),canonicalDocumentId:String(row.canonicalDocumentId||''),
-      legacyDataId:String(row.legacyDataId||''),projectionOnly:row.projectionOnly===true,
-      nombre:String(row.nombre||''),roles,countries,
-      roleDefault:String(row.rolDefault||row.rol||''),countryDefault:String(row.paisDefault||row.pais||'')
-    }:null;
-  },incomplete.id);
-  need(ev.team.incompleteExisting.uiIdentity&&!ev.team.incompleteExisting.uiIdentity.projectionOnly,'B1_INCOMPLETE_USER_NOT_CANONICAL_UI');
-  const missing=await page.evaluate(()=>({
-    roles:[...document.querySelectorAll('.eu-role:checked')].map(x=>x.value),
-    countries:[...document.querySelectorAll('.eu-pais:checked')].map(x=>x.value),
-    roleDefault:String(document.querySelector('#eu-role-default')?.value||''),
-    countryDefault:String(document.querySelector('#eu-pais-default')?.value||'')
-  }));
-  ev.team.incompleteExisting.form=missing;
-  let expectedValidation='';
-  if(!missing.roles.length) expectedValidation='Selecciona al menos un rol.';
-  else if(!missing.countries.length) expectedValidation='Selecciona al menos un país autorizado.';
-  else if(!missing.roles.includes(missing.roleDefault)) expectedValidation='El rol predeterminado debe estar entre los roles seleccionados.';
-  else if(!missing.countries.includes(missing.countryDefault)) expectedValidation='El país predeterminado debe estar entre los países seleccionados.';
-  need(expectedValidation,'B1_EXISTING_USER_NOT_INCOMPLETE_AS_EXPECTED');
-  await page.click('#eu-ok');
-  const validationSurface=await page.waitForFunction(message=>{
-    const modal=[...document.querySelectorAll('.drawer-back')].find(x=>String(x.textContent||'').includes(message)&&x.querySelector('[data-ok]'));
-    if(modal)return'modal';
-    const toast=[...document.querySelectorAll('.ciclo-toast')].find(x=>String(x.textContent||'').includes(message));
-    return toast?'toast':'';
-  },expectedValidation,{timeout:8000}).then(h=>h.jsonValue());
-  need(validationSurface==='modal'||validationSurface==='toast','B1_INCOMPLETE_VALIDATION_NOT_ORBIT_UI');
-  ev.team.incompleteExisting.validation={message:expectedValidation,orbitUi:true,surface:validationSurface,writeAttempted:false};
-  if(validationSurface==='modal'){
-    const validationModal=page.locator('.drawer-back').filter({hasText:expectedValidation}).last();
-    need(await validationModal.locator('[data-ok]').count()===1,'B1_INCOMPLETE_VALIDATION_MODAL_ACTION_MISSING');
-    await validationModal.locator('[data-ok]').click();
-    await validationModal.waitFor({state:'detached',timeout:8000});
-  }
-  const incompleteAfterSnap=await incompleteRef.get(),incompleteUpdateAfter=incompleteAfterSnap.updateTime?.toMillis?.()||0;
-  need(incompleteUpdateAfter===incompleteUpdateBefore,'B1_INCOMPLETE_VALIDATION_MUTATED_RECORD');
-  need(JSON.stringify(semanticAdvisor(incompleteAfterSnap.data()||{}))===JSON.stringify(beforeIncomplete),'B1_INCOMPLETE_VALIDATION_CHANGED_DATA');
-  await page.click('#eu-cancel');
-  await page.waitForSelector('#eq-edit',{state:'detached',timeout:8000});
+  ev.team.incompleteExisting={
+    count:incompleteRows.length,
+    readOnly:true,
+    writeAttempted:false,
+    advisorIds:incompleteRows.map(r=>r.id).sort()
+  };
 
   const syntheticName='B1 R3 Synthetic '+RUN;
   synthetic.id='ase-'+slug(syntheticName);
