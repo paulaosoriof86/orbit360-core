@@ -473,6 +473,20 @@ try{
   need(clean(member.data().advisorId,180)===synthetic.id,'B1_SYNTHETIC_MEMBER_ADVISOR_ID');
   need(sameSet(member.data().roles,['Asesor','Operativo']),'B1_SYNTHETIC_MEMBER_ROLES');
   need(sameSet(member.data().countries,['GT','CO']),'B1_SYNTHETIC_MEMBER_COUNTRIES');
+  const membershipContractCheck=await page.evaluate((row)=>{
+    const owner=window.Orbit?.membershipMultirolEffectiveP0;
+    if(!owner||typeof owner.validate!=='function')return{ok:false,errors:['B1_MEMBERSHIP_CONTRACT_OWNER_MISSING']};
+    const result=owner.validate(row)||{};
+    return{ok:result.ok===true,errors:Array.isArray(result.errors)?result.errors:[],membership:result.membership||null};
+  },member.data());
+  ev.auth.membershipContract={
+    ok:membershipContractCheck.ok,
+    errors:membershipContractCheck.errors,
+    dataScopes:membershipContractCheck.membership?.dataScopes||null,
+    roles:membershipContractCheck.membership?.roles||[],
+    activeRole:membershipContractCheck.membership?.activeRole||''
+  };
+  need(membershipContractCheck.ok,'B1_SYNTHETIC_MEMBERSHIP_CONTRACT:'+JSON.stringify(ev.auth.membershipContract));
   ev.auth.provision={uidHash:crypto.createHash('sha256').update(authUser.uid).digest('hex'),advisorLinked:true,membershipLinked:true};
 
   const syntheticPassword='B1r3!'+crypto.randomBytes(12).toString('hex')+'Aa1';
@@ -484,6 +498,12 @@ try{
   const loginPage=await loginContext.newPage();
   const loginErrors=[];loginPage.on('pageerror',e=>loginErrors.push(clean(e?.message||e)));
   await loginPage.goto(TARGET+'/?b1login='+Date.now(),{waitUntil:'domcontentloaded',timeout:30000});
+  await loginPage.evaluate(()=>{
+    window.__b1BootstrapEvents=[];
+    document.addEventListener('orbit:product-readonly-bootstrap',event=>{
+      try{window.__b1BootstrapEvents.push(JSON.parse(JSON.stringify(event.detail||{})));}catch(e){}
+    });
+  });
   await loginPage.fill('#lg-user',synthetic.email);
   await loginPage.fill('#lg-pass',syntheticPassword);
   await loginPage.click('#login-form button[type="submit"]');
@@ -515,6 +535,7 @@ try{
         }:null,
         storeStatus:window.Orbit?.store?._productStatus?.()||null,
         providerState,
+        bootstrapEvents:Array.isArray(window.__b1BootstrapEvents)?window.__b1BootstrapEvents.slice(-12):[],
         hash:location.hash
       };
     }).catch(e=>({diagnosticError:String(e?.message||e)}));
