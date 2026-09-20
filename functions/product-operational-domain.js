@@ -7,7 +7,7 @@ const { HttpsError, onCall } = require('firebase-functions/v2/https');
 const { resolveProductActiveRole } = require('./product-active-role-contract');
 
 const REGION = process.env.ORBIT360_FUNCTIONS_REGION || 'us-central1';
-const VERSION = 'gravicentra-product-operational-domain-v1';
+const VERSION = 'gravicentra-product-operational-domain-v2';
 const app = getApps()[0] || initializeApp();
 const db = getFirestore(app);
 
@@ -214,11 +214,22 @@ async function execute(request) {
     const reads = [];
     for (const mutation of mutations) {
       const ref = canonicalRef(tenantId, mutation.collection, mutation.id);
-      reads.push({ mutation, ref, snap: await tx.get(ref) });
+      const snap = await tx.get(ref);
+      let linkedMemberRef = null, linkedMemberSnap = null;
+      if (mutation.collection === 'asesores' && mutation.action !== 'remove') {
+        const before = snap.exists ? snap.data() || {} : {};
+        const prospective = Object.assign({}, before, mutation.payload || {}, { id: mutation.id, tenantId });
+        const authUid = text(prospective.authUid || prospective.uid || prospective.userId, 180);
+        if (authUid) {
+          linkedMemberRef = memberRef(tenantId, authUid);
+          linkedMemberSnap = await tx.get(linkedMemberRef);
+        }
+      }
+      reads.push({ mutation, ref, snap, linkedMemberRef, linkedMemberSnap });
     }
 
     for (const item of reads) {
-      const { mutation, ref, snap } = item;
+      const { mutation, ref, snap, linkedMemberRef, linkedMemberSnap } = item;
       const before = snap.exists ? snap.data() : null;
       if (mutation.action === 'insert' && before) throw new HttpsError('already-exists', `${mutation.collection}/${mutation.id} ya existe.`);
       if ((mutation.action === 'update' || mutation.action === 'remove') && !before) throw new HttpsError('not-found', `${mutation.collection}/${mutation.id} no existe.`);
@@ -242,16 +253,11 @@ async function execute(request) {
         row.createdByUid = row.createdByUid || actor.uid;
       }
       tx.set(ref, row, { merge: mutation.action === 'update' });
-      if (mutation.collection === 'asesores') {
-        const authUid = text(row.authUid || row.uid || row.userId, 180);
-        if (authUid) {
-          const mref = memberRef(tenantId, authUid);
-          const msnap = await tx.get(mref);
-          if (msnap.exists && text(msnap.data().advisorId, 180) && text(msnap.data().advisorId, 180) !== mutation.id) {
-            throw new HttpsError('failed-precondition', 'La identidad está vinculada a otro usuario del equipo.');
-          }
-          tx.set(mref, membershipPatchFromAdvisor(row, msnap.exists ? msnap.data() : {}), { merge: true });
+      if (mutation.collection === 'asesores' && linkedMemberRef) {
+        if (linkedMemberSnap && linkedMemberSnap.exists && text(linkedMemberSnap.data().advisorId, 180) && text(linkedMemberSnap.data().advisorId, 180) !== mutation.id) {
+          throw new HttpsError('failed-precondition', 'La identidad está vinculada a otro usuario del equipo.');
         }
+        tx.set(linkedMemberRef, membershipPatchFromAdvisor(row, linkedMemberSnap && linkedMemberSnap.exists ? linkedMemberSnap.data() : {}), { merge: true });
       }
     }
 

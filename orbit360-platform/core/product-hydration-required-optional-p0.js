@@ -13,7 +13,7 @@
   'use strict';
 
   window.Orbit = window.Orbit || {};
-  var VERSION = 'p0-20260902-authoritative-required-optional-3';
+  var VERSION = 'p0-20260919-team-canonical-required-4';
   var MARKER = 'PRODUCT_HYDRATION_AUTHORITATIVE_REQUIRED_OPTIONAL_P0';
   var originalCreate = window.Orbit.createFirestoreProductReadOnlyStoreP0;
 
@@ -84,6 +84,9 @@
 
     function advisorProjection() {
       var durable = baseAll('asesores') || [];
+      var currentStatus = baseStatus() || {};
+      var confirmed = unique(currentStatus.serverConfirmedCollections);
+      if (confirmed.indexOf('asesores') >= 0) return durable.map(clone);
       if (durable.length) return durable.map(clone);
       if (advisorProjectionCache) return advisorProjectionCache.map(clone);
       var map = {};

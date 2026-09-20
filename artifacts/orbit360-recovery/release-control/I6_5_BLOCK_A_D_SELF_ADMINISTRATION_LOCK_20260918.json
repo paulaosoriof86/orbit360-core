@@ -22,9 +22,9 @@
     "items": [
       {
         "id": "A1_TEAM_SELF_ADMIN",
-        "required": "Create/edit users from Equipo, persist advisor, optionally provision/sync Auth+membership, roles, countries, scopes and credentials; no hardcoded people.",
-        "current": "TECHNICAL_LIVE_PASS_PENDING_PAULA_VISUAL",
-        "evidence": "Equipo awaits server-owned durable write, canonical advisor readback and audit; onboarding uses the modular product provider."
+        "required": "Create/edit/delete users from Equipo, persist advisor, activate/deactivate access safely, optionally provision/sync Auth+membership, roles, countries, scopes and credentials; no hardcoded people.",
+        "current": "ROOT_CAUSE_R4_DEFINITIVE_FIX_PENDING_PREVIEW",
+        "evidence": "R4: canonical Team hydration; refresh-safe Auth restore; linked-membership prereads before writes; auditable logical delete with access blocking; canonical readback; explicit verification-mail result."
       },
       {
         "id": "A2_CLIENT_SELF_ADMIN",
@@ -71,7 +71,7 @@
   "acceptance": {
     "eachCrud": "AUTHENTICATED_UI_ACTION -> SERVER_COMMIT -> CANONICAL_READBACK -> UI_REFRESH -> AUDIT",
     "policyCreate": "ONE_ATOMIC_BUSINESS_OPERATION_FOR_POLICY_RECEIPTS_PORTFOLIO; COBROS=0",
-    "users": "NO_HARDCODED_IDENTITIES; CREATED_AND_EDITED_RECORDS_PERSIST_AFTER_REFRESH",
+    "users": "NO_HARDCODED_IDENTITIES; CREATE_EDIT_DELETE_ACTIVATE_DEACTIVATE; SERVER_COMMIT; CANONICAL_READBACK; RECORDS_AND_SESSION_PERSIST_AFTER_REFRESH",
     "crossModule": "NO_SILENT_OPTIMISTIC_SUCCESS; NO_DIVERGENT_OWNER",
     "release": "BUILD_ONCE -> PREVIEW -> AUTHENTICATED_PROOF -> SAME_ARTIFACT_LIVE -> EXACT_READBACK -> FREEZE_OR_ROLLBACK"
   },
@@ -118,7 +118,7 @@
     "implementation": "PUBLIC_TENANT_BRANDING_INDEX_SELECTED_BY_MATERIALIZED_TENANT_HINT"
   },
   "executionOrderAfterCurrentFix": [
-    "A1_TEAM_SELF_ADMIN_CREATE_EDIT_PERSIST_ACCESS_PROVISIONING_PROOF",
+    "A1_TEAM_SELF_ADMIN_CREATE_EDIT_DELETE_PERSIST_ACCESS_PROVISIONING_PROOF",
     "A4_TENANT_LOGIN_BRAND_AND_FAVICON",
     "A2_CLIENT_CREATE_EDIT_PERSIST_AND_INSURER_EDIT_PERSIST",
     "A3_POLICY_CREATE_EDIT_ATOMIC_POLICY_RECEIPTS_PORTFOLIO_ZERO_AUTO_COBRO",
@@ -130,5 +130,18 @@
   "conversationDependent": false,
   "noHardcodedIdentities": true,
   "backendCommitRequired": true,
-  "canonicalReadbackRequired": true
+  "canonicalReadbackRequired": true,
+  "r4DefinitiveClosure": {
+    "status": "AUTHORIZED_PENDING_PREVIEW",
+    "confirmedRootCauses": [
+      "AUTH_INIT_PAINTED_LOGIN_BEFORE_FIREBASE_PERSISTED_USER_RESOLUTION",
+      "ASESORES_OPTIONAL_PLUS_ADVISOR_PROJECTION_ALLOWED_NON_CANONICAL_FIRST_RENDER",
+      "PRODUCT_OPERATIONAL_TRANSACTION_READ_MEMBERSHIP_AFTER_ADVISOR_WRITE",
+      "TEAM_DELETE_NOT_EXPOSED",
+      "UNVERIFIED_LOGIN_SWALLOWED_VERIFICATION_SEND_RESULT"
+    ],
+    "deleteSemantics": "LOGICAL_DELETE_PRESERVE_RELATION_HISTORY_PLUS_ACCESS_DEACTIVATION",
+    "hardDeleteForbiddenWhenHistoricalRelationsMayExist": true,
+    "noReimport": true
+  }
 }

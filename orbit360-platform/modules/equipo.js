@@ -143,8 +143,9 @@ Orbit.modules.equipo = (function () {
     return team;
   }
 
+  function teamRows() { return teamRows().filter(a => !(a && (a.deleted === true || a.eliminado === true || a.estado === 'eliminado'))); }
   function usuarios() {
-    const team = S().all('asesores') || [];
+    const team = teamRows();
     const shown = filteredTeam(team);
     const asesores = team.filter(a => hasRole(a, 'Asesor')).length;
     const operativos = team.filter(a => hasRole(a, 'Operativo')).length;
@@ -210,7 +211,7 @@ Orbit.modules.equipo = (function () {
   }
 
   function comisiones() {
-    const team = (S().all('asesores') || []).filter(a => hasRole(a, 'Asesor'));
+    const team = teamRows().filter(a => hasRole(a, 'Asesor'));
     return `<div class="cfg-note" style="margin-bottom:14px">💵 Esquema de comisión de asesores. Las metas comerciales y de recaudo se configuran en la pestaña <b>Metas</b>, separadas por país y moneda.</div>
     <div class="card" style="overflow:hidden"><div style="overflow-x:auto"><table class="tbl">
       <thead><tr><th>Asesor</th><th>País predeterminado</th><th>Modelo</th><th class="num">Valor</th></tr></thead>
@@ -255,7 +256,7 @@ Orbit.modules.equipo = (function () {
     };
   }
   function metas() {
-    const all = (S().all('asesores') || []).filter(a => hasRole(a, 'Asesor'));
+    const all = teamRows().filter(a => hasRole(a, 'Asesor'));
     const team = all.filter(a => { const ps = userCountries(a); return !ps.length || ps.includes(metaPais); });
     const cur = currencyForCountry(metaPais);
     const totN = team.reduce((s, a) => s + metaDe(a.id, metaPeriodo, metaPais).nueva, 0);
@@ -375,6 +376,7 @@ Orbit.modules.equipo = (function () {
         <div class="cfg-note">🎯 Las metas no se definen aquí. Usa la pestaña <b>Metas</b> para separarlas por mes, país, moneda, producción nueva, renovación y recaudo.</div>
       </div>
       <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end">
+        ${id ? '<button class="btn ghost" id="eu-delete" style="margin-right:auto;color:var(--red)">Eliminar usuario</button>' : ''}
         <button class="btn ghost" id="eu-cancel">Cancelar</button><button class="btn primary" id="eu-ok">Guardar</button></div>
     </div>`;
     document.body.appendChild(back);
@@ -414,6 +416,34 @@ Orbit.modules.equipo = (function () {
     back.querySelectorAll('input,select').forEach(el => el.addEventListener('change', markDirty));
     $('#eu-reset-mod').addEventListener('click', () => { modulesTouched = false; refreshModuleHints(true); markDirty(); });
     refreshRoleDefault(); refreshCountryDefault(); refreshModuleHints(false);
+
+    if (id && $('#eu-delete')) $('#eu-delete').addEventListener('click', async () => {
+      const advisorId = canonicalAdvisorId(a, id);
+      if (!advisorId) return toast('No fue posible resolver la identidad canónica del usuario.');
+      const ok = Orbit.ui && Orbit.ui.confirm ? await Orbit.ui.confirm('¿Eliminar este usuario del directorio? Se bloqueará su acceso y se conservará el historial para no romper relaciones.', { title: 'Eliminar usuario', danger: true }) : false;
+      if (!ok) return;
+      const motivo = Orbit.ui && Orbit.ui.prompt ? await Orbit.ui.prompt('Indica el motivo de la eliminación:', { title: 'Motivo de eliminación' }) : '';
+      if (String(motivo || '').trim().length < 5) return inform('Indica un motivo claro de al menos 5 caracteres.', 'Motivo requerido');
+      const st=S(), deleted=Object.assign({},a,{inactivo:true,activo:false,estado:'eliminado',deleted:true,eliminado:true,deletedAt:new Date().toISOString(),deleteReason:String(motivo).trim(),updatedAt:new Date().toISOString()});
+      const delButton=$('#eu-delete');delButton.disabled=true;delButton.textContent='Eliminando…';
+      try {
+        if (Orbit.userOnboarding && Orbit.userOnboarding.available && Orbit.userOnboarding.available() && (a.authUid || a.uid || a.userId || a.accessProvisioned === true)) {
+          await Orbit.userOnboarding.execute({advisorId,advisor:deleted,operation:'deactivate',reason:String(motivo).trim(),sendInvitation:false});
+        }
+        if (!st || st.__productOperationalWriteP0 !== true || typeof st.updateDurable !== 'function') throw new Error('PRODUCT_TEAM_DURABLE_UPDATE_MISSING');
+        await st.updateDurable('asesores',advisorId,deleted);
+        const p=Orbit.productRuntimeBrowserProvidersP0,u=Orbit.auth&&Orbit.auth.productUser||{},ctx=await p.initialize(),m=ctx.modules&&ctx.modules.store;
+        const snap=await (typeof m.getDocFromServer==='function'?m.getDocFromServer:m.getDoc)(m.doc(ctx.db,'tenants/'+u.tenantId+'/data/asesores/items/'+advisorId));
+        if(!snap.exists()||snap.data().deleted!==true||snap.data().inactivo!==true)throw new Error('EQUIPO_DELETE_READBACK_MISMATCH');
+        await audit('eliminar_usuario',String(motivo).trim(),before,{deleted:true,inactivo:true});
+        toast('✓ Usuario eliminado y acceso bloqueado');
+        dirty=false;close(true);render(document.getElementById('host')||document.getElementById('mod-host'));
+      } catch(error) {
+        delButton.disabled=false;delButton.textContent='Eliminar usuario';
+        const code=String(error&&error.code||error&&error.message||'EQUIPO_DELETE_FAILED').replace(/^functions\//,'');
+        toast('No fue posible eliminar: '+code);
+      }
+    });
 
     $('#eu-ok').addEventListener('click', async () => {
       const saveButton = $('#eu-ok'); if (saveButton.dataset.busy === '1') return;

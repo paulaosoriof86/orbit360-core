@@ -1,6 +1,6 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B1_EXECUTION_LOCK_V1",
-  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+  "status": "CANDIDATE_PENDING_PREVIEW",
   "date": "2026-09-19",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -29,7 +29,9 @@
     "orbit360-platform/data/store-firestore-product-readonly-p0.js",
     "functions/user-onboarding.js",
     "functions/product-operational-domain.js",
-    "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js"
+    "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js",
+    "orbit360-platform/product-runtime-config.js",
+    "orbit360-platform/core/product-hydration-required-optional-p0.js"
   ],
   "backend": {
     "deployTargets": [
@@ -114,7 +116,12 @@
     "TEAM_SCOPE_CONFIRMATION_NO_TEXT_CHALLENGE_LOOP",
     "UNVERIFIED_USER_VERIFICATION_EMAIL_FLOW_WITHOUT_BYPASS",
     "MODULAR_FIRST_LOGIN_PASSWORD_CHANGE",
-    "NO_DUPLICATE_LOGIN_ERROR_NODE"
+    "NO_DUPLICATE_LOGIN_ERROR_NODE",
+    "AUTH_REFRESH_NO_FALSE_LOGOUT_FIRST_PAINT",
+    "TEAM_CANONICAL_SINGLE_RENDER",
+    "TEAM_LINKED_MEMBER_TRANSACTION_READS_BEFORE_WRITES",
+    "TEAM_SELF_ADMIN_DELETE",
+    "VERIFICATION_EMAIL_RESULT_EXPLICIT"
   ],
   "previewAcceptance": [
     "No wrong-tenant flash on first paint.",
@@ -368,5 +375,28 @@
     "artifactDigest": "580da5bf28659e3ff2a8f858831291ef3b59391a6ba0b06f00fa44249268c507",
     "livePromotionAuthorized": false
   },
-  "visualAccepted": false
+  "visualAccepted": false,
+  "r4DefinitiveClosure": {
+    "status": "PATCHED_PENDING_PREVIEW",
+    "confirmedBy": "PAULA_LIVE_SCREENSHOTS_PLUS_CURRENT_SOURCE_CAUSAL_READ",
+    "rootCauses": [
+      "AUTH_INIT_PAINTED_LOGIN_BEFORE_FIREBASE_PERSISTED_USER_RESOLUTION",
+      "ASESORES_OPTIONAL_PLUS_ADVISOR_PROJECTION_ALLOWED_NON_CANONICAL_FIRST_RENDER",
+      "PRODUCT_OPERATIONAL_TRANSACTION_READ_MEMBERSHIP_AFTER_ADVISOR_WRITE",
+      "TEAM_DELETE_NOT_EXPOSED",
+      "UNVERIFIED_LOGIN_SWALLOWED_VERIFICATION_SEND_RESULT"
+    ],
+    "productFiles": [
+      "orbit360-platform/core/auth-product-runtime-p0.js",
+      "orbit360-platform/product-runtime-config.js",
+      "orbit360-platform/core/product-hydration-required-optional-p0.js",
+      "functions/product-operational-domain.js",
+      "orbit360-platform/modules/equipo.js",
+      "orbit360-platform/core/public-tenant-branding.js"
+    ],
+    "deleteSemantics": "LOGICAL_DELETE_PRESERVE_RELATION_HISTORY_PLUS_ACCESS_DEACTIVATION",
+    "livePromoted": false,
+    "dataMutationAuthorized": false,
+    "reimportAuthorized": false
+  }
 }

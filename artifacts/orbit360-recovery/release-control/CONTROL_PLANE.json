@@ -713,7 +713,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B1_VISUAL",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B1_PREVIEW",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -1829,7 +1829,7 @@
   "i65SelfAdministrationClosure": {
     "status": "FROZEN_ACTIVE",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_BLOCK_A_D_SELF_ADMINISTRATION_LOCK_20260918.json",
-    "blobSha": "786dfc2eefcb9de6bbe8067c112588d1d92d612c",
+    "blobSha": "067eb7c975a6a326c74d6653f394bb38523371f9",
     "parentMicroplanPath": "artifacts/orbit360-recovery/release-control/I6_5_MINI_CIERRE_OPERATIVO_DECISION_LOCK_20260918.json",
     "parentMicroplanBlobSha": "67c6eaa0555e9654a5b4ebbaf6e663c6884f18f3",
     "noHardcodedIdentities": true,
@@ -1942,7 +1942,7 @@
     "addendumBlobSha": "05099a90cfb4862eec97e0359d55932828cb930b",
     "forensicAuditBlobSha": "fcfdf29c9eb851d76cebf67bcbe36d8ed308eb0f",
     "paymentInferenceBlobSha": "cfb026ded52c36083528de658a70191c8380d725",
-    "mechanismSyncStatus": "B1_R3_VISUAL_CLEANUP_TECHNICAL_PASS_METADATA_SYNCED",
+    "mechanismSyncStatus": "B1_R4_DEFINITIVE_SELF_ADMIN_FIX_PENDING_PREVIEW",
     "guardFailureBeforeFix": {
       "runId": 35450692628,
       "code": "I6_5_NEXT_ACTION_INVALID",
@@ -1951,15 +1951,39 @@
       "livePromotion": false
     },
     "b1ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B1_EXECUTION_LOCK_20260919.json",
-    "b1ExecutionLockBlobSha": "7c3c77197beb3bd65c1ee42c88d802c91f9177e5",
+    "b1ExecutionLockBlobSha": "cc744cd2ea7ad16ff4cc6fd01d8a8b071d931c6b",
     "b1": {
-      "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+      "status": "CANDIDATE_PENDING_PREVIEW",
       "sourceSha": "b8e8e9021852d8c2c6c3bbb0cbde71553aaffcb3",
       "buildId": "gi-i65-b1-b8e8e9021852-57f234755dc1",
       "previewUrl": "https://ays-orbit-360-lab--gi-i65-b1-35455766715-ylc10xr5.web.app",
       "runId": 35488766659,
       "artifactId": 10598569261,
-      "livePromoted": false
+      "livePromoted": false,
+      "visualAccepted": false,
+      "r4DefinitiveClosure": {
+        "status": "PATCHED_PENDING_PREVIEW",
+        "confirmedBy": "PAULA_LIVE_SCREENSHOTS_PLUS_CURRENT_SOURCE_CAUSAL_READ",
+        "rootCauses": [
+          "AUTH_INIT_PAINTED_LOGIN_BEFORE_FIREBASE_PERSISTED_USER_RESOLUTION",
+          "ASESORES_OPTIONAL_PLUS_ADVISOR_PROJECTION_ALLOWED_NON_CANONICAL_FIRST_RENDER",
+          "PRODUCT_OPERATIONAL_TRANSACTION_READ_MEMBERSHIP_AFTER_ADVISOR_WRITE",
+          "TEAM_DELETE_NOT_EXPOSED",
+          "UNVERIFIED_LOGIN_SWALLOWED_VERIFICATION_SEND_RESULT"
+        ],
+        "productFiles": [
+          "orbit360-platform/core/auth-product-runtime-p0.js",
+          "orbit360-platform/product-runtime-config.js",
+          "orbit360-platform/core/product-hydration-required-optional-p0.js",
+          "functions/product-operational-domain.js",
+          "orbit360-platform/modules/equipo.js",
+          "orbit360-platform/core/public-tenant-branding.js"
+        ],
+        "deleteSemantics": "LOGICAL_DELETE_PRESERVE_RELATION_HISTORY_PLUS_ACCESS_DEACTIVATION",
+        "livePromoted": false,
+        "dataMutationAuthorized": false,
+        "reimportAuthorized": false
+      }
     }
   }
 }
