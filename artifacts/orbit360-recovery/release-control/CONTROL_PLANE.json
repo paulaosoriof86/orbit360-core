@@ -713,7 +713,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B1_PREVIEW",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B1_VISUAL",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -1951,35 +1951,15 @@
       "livePromotion": false
     },
     "b1ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B1_EXECUTION_LOCK_20260919.json",
-    "b1ExecutionLockBlobSha": "ff647e7b7f6785b0682b235cde5d20db08207e12",
+    "b1ExecutionLockBlobSha": "c48f827646258c65568b5c9c3282c64f0fec43dc",
     "b1": {
-      "status": "CANDIDATE_PENDING_PREVIEW",
-      "sourceSha": "94ef159042b33afef98134e698885b134bf334e7",
-      "buildId": "gi-i65-b1-94ef159042b3-57f234755dc1",
+      "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+      "sourceSha": "5d79f675f2fcb76025c1f75faab02601c9142ab3",
+      "buildId": "gi-i65-b1-5d79f675f2fc-57f234755dc1",
       "previewUrl": "https://ays-orbit-360-lab--gi-i65-b1-35455766715-ylc10xr5.web.app",
-      "runId": 35492703801,
-      "artifactId": 10600115489,
-      "livePromoted": false,
-      "r4DefinitiveClosure": {
-        "status": "TECHNICAL_PASS_PENDING_PAULA_VISUAL",
-        "terminalRunId": 35492703801,
-        "sourceSha": "94ef159042b33afef98134e698885b134bf334e7",
-        "buildId": "gi-i65-b1-94ef159042b3-57f234755dc1",
-        "artifactId": 10600115489,
-        "artifactDigest": "5997aca5046af032df1a993e3af3b8c71d4eaa5d1c9a725ecc17aa706a3757d9",
-        "exactReadback": true,
-        "functionalPass": true,
-        "syntheticFinalAbsent": true
-      },
-      "visualAccepted": false,
-      "nativeRefreshRejection": {
-        "status": "PROVEN_BY_LIVE_VISUAL_REVIEW",
-        "previousProofInvalid": true,
-        "previousProofInvalidReason": "QA helper reauthenticated with a newly minted custom token after reload.",
-        "correctedProofCommit": "4540165e30204dc8e1a4f8058bdf4014c3d03011",
-        "requiredBehavior": "Browser refresh preserves authenticated Firebase user and restores product session without any reauthentication call.",
-        "livePromoted": false
-      }
+      "runId": 35493532360,
+      "artifactId": 10600016888,
+      "livePromoted": false
     }
   }
 }
