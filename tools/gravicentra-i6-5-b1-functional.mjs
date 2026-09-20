@@ -504,8 +504,8 @@ try{
     return x&&x.accessProvisioned===true&&clean(x.authUid,180)===authUser.uid?x:null;
   },'B1_SYNTHETIC_ADVISOR_ACCESS_READBACK',20000,400);
   need(clean(member.data().advisorId,180)===synthetic.id,'B1_SYNTHETIC_MEMBER_ADVISOR_ID');
-  need(sameSet(member.data().roles,['Asesor','Operativo']),'B1_SYNTHETIC_MEMBER_ROLES');
-  need(sameSet(member.data().countries,['GT','CO']),'B1_SYNTHETIC_MEMBER_COUNTRIES');
+  need(sameSet(member.data().roles,['Asesor']),'B1_SYNTHETIC_MEMBER_ROLES');
+  need(sameSet(member.data().countries,['GT']),'B1_SYNTHETIC_MEMBER_COUNTRIES');
   const membershipContractCheck=await page.evaluate((row)=>{
     const owner=window.Orbit?.membershipMultirolEffectiveP0;
     if(!owner||typeof owner.validate!=='function')return{ok:false,errors:['B1_MEMBERSHIP_CONTRACT_OWNER_MISSING']};
@@ -520,6 +520,7 @@ try{
     activeRole:membershipContractCheck.membership?.activeRole||''
   };
   need(membershipContractCheck.ok,'B1_SYNTHETIC_MEMBERSHIP_CONTRACT:'+JSON.stringify(ev.auth.membershipContract));
+  need(membershipContractCheck.membership?.dataScopes?.default==='propios','B1_SYNTHETIC_MEMBERSHIP_SCOPE');
   ev.auth.provision={uidHash:crypto.createHash('sha256').update(authUser.uid).digest('hex'),advisorLinked:true,membershipLinked:true};
 
   const syntheticPassword='B1r3!'+crypto.randomBytes(12).toString('hex')+'Aa1';
@@ -618,17 +619,22 @@ try{
   }
   ev.auth.syntheticLegalGateAccepted=await acceptLegalGate(loginPage);
   await loginPage.waitForSelector('#sidebar [data-route]',{timeout:15000});
-  const loginState=await loginPage.evaluate(({extra,restricted})=>({
-    user:{advisorId:String(Orbit.auth.productUser?.advisorId||''),roles:Orbit.auth.productUser?.roles||[],countries:Orbit.auth.productUser?.countries||[]},
-    routes:[...document.querySelectorAll('#sidebar [data-route]')].map(x=>x.getAttribute('data-route')),
-    extraCan:Orbit.access?.can?Orbit.access.can(extra,'view'):null,
-    restrictedCan:Orbit.access?.can?Orbit.access.can(restricted,'view'):null
-  }),{extra:moduleChoice.extra,restricted:moduleChoice.restrict});
+  const loginState=await loginPage.evaluate(({extra})=>{
+    const routes=[...document.querySelectorAll('#sidebar [data-route]')].map(x=>x.getAttribute('data-route'));
+    return{
+      user:{advisorId:String(Orbit.auth.productUser?.advisorId||''),roles:Orbit.auth.productUser?.roles||[],countries:Orbit.auth.productUser?.countries||[]},
+      routes,
+      unauthorizedVisible:routes.filter(route=>Orbit.access?.can?Orbit.access.can(route,'view')!==true:false),
+      extraCan:Orbit.access?.can?Orbit.access.can(extra,'view'):null
+    };
+  },{extra:moduleChoice.extra});
   need(loginState.user.advisorId===synthetic.id,'B1_SYNTHETIC_LOGIN_ADVISOR');
-  need(loginState.routes.includes(moduleChoice.extra)&&loginState.extraCan===true,'B1_EXTRA_MODULE_NOT_VISIBLE_AFTER_LOGIN');
-  need(!loginState.routes.includes(moduleChoice.restrict)&&loginState.restrictedCan===false,'B1_RESTRICTED_MODULE_VISIBLE_AFTER_LOGIN');
+  need(sameSet(loginState.user.roles,['Asesor']),'B1_SYNTHETIC_LOGIN_ROLE');
+  need(sameSet(loginState.user.countries,['GT']),'B1_SYNTHETIC_LOGIN_COUNTRY');
+  need(!loginState.routes.includes(moduleChoice.extra)&&loginState.extraCan===false,'B1_STANDARD_EXTRA_MODULE_VISIBLE_AFTER_LOGIN');
+  need(loginState.unauthorizedVisible.length===0,'B1_UNAUTHORIZED_VISIBLE_ROUTE:'+JSON.stringify(loginState.unauthorizedVisible));
   need(loginErrors.length===0,'B1_SYNTHETIC_LOGIN_PAGE_ERRORS:'+JSON.stringify(loginErrors.slice(0,4)));
-  ev.auth.login={pass:true,extraModuleVisible:true,restrictedModuleHidden:true,extraModule:moduleChoice.extra,restrictedModule:moduleChoice.restrict};
+  ev.auth.login={pass:true,standardRole:true,standardCountry:true,extraModuleHidden:true,unauthorizedVisible:0,extraModule:moduleChoice.extra};
   await loginPage.screenshot({path:path.join(evidenceDir,'b1-synthetic-login-modules.png'),fullPage:true});
   await loginContext.close();
 
