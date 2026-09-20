@@ -137,6 +137,12 @@ function membershipPatchFromAdvisor(row, current) {
     activeRole,
     countries: unique(row.paises && row.paises.length ? row.paises : [row.paisDefault || row.pais]).map(v => text(v, 8).toUpperCase()),
     dataScopes: dataScopesForAdvisor(row),
+    modulesVisible: unique(
+      (row.modulosOverride && row.modulosOverride.length ? row.modulosOverride : null) ||
+      (row.modulesVisible && row.modulesVisible.length ? row.modulesVisible : null) ||
+      (current && current.modulesVisible) ||
+      []
+    ),
     modulesExtra: unique(row.modulosExtra || row.modulesExtra),
     modulesRestricted: unique(row.modulosRestringidos || row.modulesRestricted),
     updatedAt: now(),

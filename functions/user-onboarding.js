@@ -230,6 +230,7 @@ function membershipShape(tenantId, uid, advisor) {
     advisorId: advisor.id,
     countries: advisor.paises,
     dataScopes: advisor.dataScopes,
+    modulesVisible: advisor.modulosOverride,
     modulesExtra: advisor.modulosExtra,
     modulesRestricted: advisor.modulosRestringidos,
     onboardingVersion: ONBOARDING_VERSION
