@@ -4,7 +4,7 @@
    ============================================================ */
 
 /* ---------- PRE-AUTH (oculta el shell tras el login) ---------- */
-body.pre-auth #shell, body.pre-auth .topbar{filter:blur(0);}
+body.pre-auth #shell, body.pre-auth .topbar{visibility:hidden;pointer-events:none;}\nhtml[data-auth-restoring="1"] body{background:var(--surface);}
 #login{position:fixed;inset:0;z-index:200;display:flex;background:var(--surface);transition:opacity .45s ease, visibility .45s}
 #login.hidden{opacity:0;visibility:hidden;pointer-events:none}
 

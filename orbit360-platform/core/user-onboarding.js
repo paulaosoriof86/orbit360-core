@@ -120,12 +120,15 @@ Orbit.userOnboarding = (function () {
     }
     if (state === 'error') return { id: 'error', label: 'Requiere atención', tone: 'danger', detail: 'El alta no terminó correctamente' };
     if (state === 'provisioning') return { id: 'provisioning', label: 'Habilitando', tone: 'info', detail: 'Creando o vinculando acceso' };
-    if (state === 'invited' || invitation === 'enviada') return { id: 'invited', label: 'Invitado', tone: 'info', detail: 'Debe establecer su contraseña' };
-    if (record.accessProvisioned === true && ['active', 'activo'].includes(state || 'active')) {
-      return { id: 'active', label: 'Activo', tone: 'ok', detail: 'Auth y membresía vinculados' };
+    if (record.accessProvisioned === true && record.authDisabled !== true && ['active', 'activo'].includes(state || 'active') && record.authEmailVerified !== false) {
+      return { id: 'active', label: 'Activo', tone: 'ok', detail: 'Auth, membresía y correo verificado' };
     }
-    if (invitation === 'pendiente_envio') return { id: 'pending_delivery', label: 'Acceso creado', tone: 'warn', detail: 'Invitación pendiente de envío' };
-    return { id: 'pending', label: 'Pendiente', tone: 'warn', detail: 'Registro de equipo sin acceso vinculado' };
+    if (record.accessProvisioned === true && record.authDisabled !== true && record.authEmailVerified === false) {
+      return { id: 'verification_pending', label: 'Verificación pendiente', tone: 'warn', detail: 'Debe verificar su correo para iniciar sesión' };
+    }
+    if (state === 'invited' || invitation === 'enviada') return { id: 'invited', label: 'Invitación enviada', tone: 'info', detail: 'Debe completar la activación de su acceso' };
+    if (invitation === 'pendiente_envio') return { id: 'pending_delivery', label: 'Invitación pendiente', tone: 'warn', detail: 'El acceso existe; falta enviar la invitación' };
+    return { id: 'pending', label: 'Sin acceso', tone: 'warn', detail: 'Registro de equipo sin Auth/membresía vinculados' };
   }
   function message(error) {
     const code = text(error && error.code).toLowerCase();

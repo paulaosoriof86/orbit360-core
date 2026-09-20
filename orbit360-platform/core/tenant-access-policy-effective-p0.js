@@ -13,7 +13,8 @@
   var VERSION = 'p0-effective-20260919.b1r3.2';
   var PRODUCT_COLLECTION_POLICY_OVERRIDE = Object.freeze({
     negocios: { module: 'leads', scoped: true, advisorRead: true, advisorWrite: false },
-    asesores: { module: 'equipo', scoped: false, advisorRead: false, advisorWrite: false }
+    asesores: { module: 'equipo', scoped: false, advisorRead: false, advisorWrite: false },
+    auditoria: { module: 'equipo', scoped: false, advisorRead: false, advisorWrite: false, restricted: true, audit: true }
   });
   var TEAM_DIRECTORY_ROLES = Object.freeze(['Dirección', 'SuperAdmin', 'AdminTenant', 'Admin']);
 
@@ -105,10 +106,10 @@
   function canRead(collection, record, membership, context) {
     var base = basePolicy();
     if (!base || typeof base.canRead !== 'function') return unavailable();
-    if (collection === 'asesores') {
+    if (collection === 'asesores' || collection === 'auditoria') {
       var m = normalizeMembership(membership);
       var allowed = canUseTeamDirectory(m) && sameTenant(m, record || { tenantId: context && context.tenantId });
-      return { ok: allowed, allowed: allowed, writeAuthorized: false, code: allowed ? 'directorio_equipo_tenant_permitido' : 'directorio_equipo_bloqueado', module: 'equipo', scope: 'tenant' };
+      return { ok: allowed, allowed: allowed, writeAuthorized: false, code: allowed ? (collection === 'auditoria' ? 'auditoria_equipo_tenant_permitida' : 'directorio_equipo_tenant_permitido') : 'equipo_tenant_bloqueado', module: 'equipo', scope: 'tenant' };
     }
     return base.canRead(collection, record, membership, contextWithOverrides(context));
   }
@@ -146,12 +147,12 @@
     if (!base || typeof base.queryConstraints !== 'function') {
       return { ok: false, writeAuthorized: false, collection: text(collection), constraints: [], errors: ['politica_base_faltante'] };
     }
-    if (collection === 'asesores') {
+    if (collection === 'asesores' || collection === 'auditoria') {
       var m = normalizeMembership(membership);
       var allowed = canUseTeamDirectory(m) && !!text(m.tenantId);
       var constraints = text(m.tenantId) ? [{ field: 'tenantId', op: '==', value: text(m.tenantId) }] : [];
       if (!allowed) constraints.push({ field: '__deny__', op: '==', value: true });
-      return { ok: allowed, writeAuthorized: false, collection: 'asesores', module: 'equipo', scope: allowed ? 'tenant' : 'none', constraints: constraints, countryFiltered: false };
+      return { ok: allowed, writeAuthorized: false, collection: collection, module: 'equipo', scope: allowed ? 'tenant' : 'none', constraints: constraints, countryFiltered: false };
     }
     return base.queryConstraints(collection, membership, contextWithOverrides(context));
   }

@@ -39,8 +39,14 @@
       required = required.filter(function (name) { return name !== 'asesores'; });
       if (optional.indexOf('asesores') < 0) optional.push('asesores');
     }
+    var equipoRoute=false;
+    try { equipoRoute=/^#\/equipo(?:[/?#]|$)/.test(String(window.location&&window.location.hash||'')); } catch (error) {}
+    if (equipoRoute && teamDirectoryRequired) {
+      optional = unique(required.concat(optional)).filter(function (name) { return name !== 'asesores'; });
+      required = ['asesores'];
+    }
     if (!required.length) throw new Error('product_required_hydration_contract_missing');
-    return { version: text(cfg.hydrationContractVersion) || 'unversioned', source: text(cfg.hydrationContractSource) || 'public-runtime-config', required: required, optional: optional, all: required.concat(optional), teamDirectoryRequired: teamDirectoryRequired };
+    return { version: text(cfg.hydrationContractVersion) || 'unversioned', source: text(cfg.hydrationContractSource) || 'public-runtime-config', required: required, optional: optional, all: required.concat(optional), teamDirectoryRequired: teamDirectoryRequired, routeOptimized: equipoRoute && teamDirectoryRequired };
   }
   function rowId(row) { return row && (row.id || row.uid || row.codigo || row.numero || row.key); }
 

@@ -1,6 +1,6 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B1_EXECUTION_LOCK_V1",
-  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+  "status": "CANDIDATE_PENDING_PREVIEW",
   "date": "2026-09-19",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -31,7 +31,12 @@
     "functions/product-operational-domain.js",
     "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js",
     "orbit360-platform/product-runtime-config.js",
-    "orbit360-platform/core/product-hydration-required-optional-p0.js"
+    "orbit360-platform/core/product-hydration-required-optional-p0.js",
+    "orbit360-platform/core/user-onboarding.js",
+    "orbit360-platform/styles/infra.css",
+    "tools/gravicentra-i6-1-preview-package.mjs",
+    "tools/gravicentra-i6-5-b1-advisor-normalize.mjs",
+    "tools/gravicentra-i6-5-b1-functional.mjs"
   ],
   "backend": {
     "deployTargets": [
@@ -72,11 +77,24 @@
     "tenantBrandingConfigSeedAuthorized": false,
     "advisorCanonicalNormalization": {
       "authorized": true,
-      "scope": "ONLY_ACTIVE_MEMBERSHIP_ADVISOR_IDS_MISSING_CANONICAL_WITH_MATCHING_LEGACY_SOURCE",
-      "expectedCreates": 5,
-      "maxCreates": 5,
-      "updatesExisting": false,
-      "deletes": false,
+      "scope": "ACTIVE_MEMBERSHIP_ACCESS_METADATA_PLUS_ORPHAN_B1_SYNTHETIC_QA_CLEANUP",
+      "maxCreates": 0,
+      "updatesExisting": true,
+      "maxUpdates": 10,
+      "allowedUpdateFields": [
+        "authUid",
+        "accessProvisioned",
+        "authEmailVerified",
+        "authDisabled",
+        "membershipStatus",
+        "onboardingState",
+        "invitacionEstado",
+        "lastAccessSyncAt"
+      ],
+      "deletes": true,
+      "maxDeletes": 5,
+      "syntheticDeletePattern": "^ase-b1-r[34]-synthetic-[0-9]+$",
+      "deleteRequiresNoAuthAndNoMembership": true,
       "legacyWrites": false,
       "authWrites": false,
       "membershipWrites": false,
@@ -121,7 +139,14 @@
     "TEAM_CANONICAL_SINGLE_RENDER",
     "TEAM_LINKED_MEMBER_TRANSACTION_READS_BEFORE_WRITES",
     "TEAM_SELF_ADMIN_DELETE",
-    "VERIFICATION_EMAIL_RESULT_EXPLICIT"
+    "VERIFICATION_EMAIL_RESULT_EXPLICIT",
+    "AUTH_NATIVE_REFRESH_PRIVILEGED_ACTOR",
+    "TEAM_ACCESS_STATUS_FROM_RECONCILED_AUTH_MEMBERSHIP",
+    "TEAM_AUDIT_READBACK_VISIBLE",
+    "TEAM_NO_SYNTHETIC_QA_RESIDUE",
+    "TEAM_ROUTE_FAST_FIRST_RENDER",
+    "PREAUTH_NO_GENERIC_SHELL_FLASH",
+    "TENANT_LOGO_INTRINSIC_ASPECT_RATIO"
   ],
   "previewAcceptance": [
     "No wrong-tenant flash on first paint.",
@@ -137,9 +162,9 @@
   "productCandidate": {
     "binding": "THIS_COMMIT_GITHUB_SHA",
     "parentHead": "a97a9d7d5c2bc9860480d816f23f4c7043d62161",
-    "revision": 3,
+    "revision": 5,
     "livePromoted": false,
-    "rootCauseStatus": "CONFIRMED_R3"
+    "rootCauseStatus": "CONFIRMED_R5_VISUAL_REJECTION"
   },
   "candidatePreparedAt": "2026-09-19",
   "lastAttempt": {
@@ -171,7 +196,7 @@
     "syntheticFinalAbsent": true,
     "livePromoted": false
   },
-  "revision": 3,
+  "revision": 5,
   "previousPreview": {
     "sourceSha": "6c8ffff3cd7d23edc6e5a68fd4822db77dfa7fb0",
     "buildId": "gi-i65-b1-6c8ffff3cd7d-57f234755dc1",
@@ -215,7 +240,7 @@
     "operationalWrites": 0
   },
   "visualReview": {
-    "status": "REJECTED_R4_NATIVE_REFRESH_SESSION_LOSS",
+    "status": "REJECTED_R5_MULTI_FINDING",
     "reviewedAt": "2026-09-19T22:15:00-06:00",
     "evidence": "Paula screenshots in continuation chat",
     "findings": [
@@ -271,7 +296,15 @@
       "observedBehavior": "Authenticated session is always lost on browser refresh.",
       "previousProofInvalidReason": "reloadAuthenticated() performed page.reload() and then activate(), whose helper minted a custom token and signed in again when currentUser was absent. It did not prove native Firebase session restoration.",
       "requiredProof": "Login normally, reload browser, do not mint token or call sign-in helper, require same Firebase user and product session to restore automatically."
-    }
+    },
+    "r5Findings": [
+      "NATIVE_REFRESH_VISUAL_LOGOUT_OR_RESTORE_FLASH",
+      "SLOW_DOUBLE_RENDER_ON_EQUIPO",
+      "TENANT_LOGO_STILL_DISPROPORTIONATE",
+      "TEAM_ACCESS_STATUS_STALE_VS_AUTH_MEMBERSHIP",
+      "TEAM_AUDIT_HISTORY_EMPTY_AFTER_EDITS",
+      "TWO_ORPHAN_SYNTHETIC_ROWS_VISIBLE"
+    ]
   },
   "readinessCurrent": 70,
   "rootCauseR3": {
@@ -417,5 +450,19 @@
     "livePromoted": false,
     "dataMutationAuthorized": false,
     "reimportAuthorized": false
+  },
+  "r5DefinitiveRemediation": {
+    "status": "PATCHED_PENDING_PREVIEW",
+    "noReimport": true,
+    "livePromoted": false,
+    "boundedDataRepair": "ACCESS_METADATA_FOR_ACTIVE_MEMBERSHIP_ROWS_PLUS_ORPHAN_B1_SYNTHETIC_QA_DELETE_ONLY",
+    "requiredProof": [
+      "PRIVILEGED_ACTOR_NATIVE_REFRESH_NO_REAUTH",
+      "EQUIPO_STARTUP_ONLY_WAITS_ASESORES",
+      "AUDITORIA_OPTIONAL_VISIBLE",
+      "ACCESS_STATUS_MATCHES_AUTH_MEMBERSHIP",
+      "SYNTHETIC_ORPHANS_ABSENT",
+      "LOGO_INTRINSIC_FIT"
+    ]
   }
 }

@@ -504,9 +504,11 @@ async function executeProvision(request) {
         ...desired,
         authUid: user ? user.uid : '',
         accessProvisioned: !!user && !desiredDisabled,
+        authEmailVerified: !!(user && user.emailVerified === true),
+        authDisabled: !!desiredDisabled,
         membershipStatus: desiredDisabled ? 'blocked' : (user ? 'active' : 'missing'),
-        onboardingState: finalState,
-        invitacionEstado: invitationState === 'pending_delivery' ? 'pendiente_envio' : (desiredDisabled ? 'bloqueada' : 'no_requerida'),
+        onboardingState: desiredDisabled ? 'blocked' : (user ? (user.emailVerified === true ? 'active' : 'invited') : 'missing'),
+        invitacionEstado: invitationState === 'pending_delivery' ? 'pendiente_verificacion' : (desiredDisabled ? 'bloqueada' : 'no_requerida'),
         onboardingVersion: ONBOARDING_VERSION,
         lastAccessSyncAt: FieldValue.serverTimestamp(),
         updatedAt: FieldValue.serverTimestamp()

@@ -132,6 +132,7 @@ Orbit.modules.equipo = (function () {
     host.querySelectorAll('.tab[data-t]').forEach(el => el.addEventListener('click', () => { tab = el.dataset.t; render(host); }));
     host.querySelector('#eq-add').addEventListener('click', () => editarUsuario(''));
     document.getElementById('eq-body').innerHTML = ({ usuarios, permisos, comisiones, metas, auditoria: auditoriaView }[tab] || usuarios)();
+    bindAuditRefresh(host);
     wire(host);
   }
 
@@ -164,14 +165,16 @@ Orbit.modules.equipo = (function () {
       <tbody>${shown.map(a => {
         const roles = rolesOf(a);
         const paises = userCountries(a);
-        const access = a.accessProvisioned || a.invitacionEstado === 'enviada' ? 'Habilitado' : 'Pendiente';
+        const accessInfo = Orbit.userOnboarding && typeof Orbit.userOnboarding.status === 'function'
+          ? Orbit.userOnboarding.status(a)
+          : (a.accessProvisioned ? { label: 'Activo', tone: 'ok', detail: 'Acceso vinculado' } : { label: 'Sin acceso', tone: 'warn', detail: 'Sin Auth/membresía vinculados' });
         const canonicalId = canonicalAdvisorId(a), writable = !!canonicalId;
         return `<tr class="${writable ? 'clickable' : ''}" ${writable ? `onclick="Orbit.modules.equipo.editar('${canonicalId}')"` : 'data-projection-only="1"'}>
           <td><div style="display:flex;align-items:center;gap:9px">${U.avatar(a.nombre, a.color, 'sm')}<div><b>${U.esc(a.nombre)}</b><div class="muted" style="font-size:11px">${U.esc(a.email || 'Sin correo')}</div></div></div></td>
           <td>${roles.map(roleBadge).join('') || '<span class="badge warn">Sin rol</span>'}</td>
           <td>${roleBadge(a.rolDefault || a.rol || 'Sin definir')}</td>
           <td>${paises.map(p => `<span class="badge neutral">${p === 'CO' ? '🇨🇴 CO' : '🇬🇹 GT'}</span>`).join(' ') || '<span class="badge warn">Sin país</span>'}</td>
-          <td><span class="badge ${access === 'Habilitado' ? 'ok' : 'warn'}">${access}</span></td>
+          <td><span class="badge ${accessInfo.tone}">${U.esc(accessInfo.label)}</span><div class="muted" style="font-size:10.5px;margin-top:3px">${U.esc(accessInfo.detail || '')}</div></td>
           <td><span class="badge ${active(a) ? 'ok' : 'neutral'}">${active(a) ? 'Activo' : 'Inactivo'}</span></td>
           <td style="text-align:right;color:var(--ink-3)">${writable ? '›' : '<span class="badge neutral">Sincronizando…</span>'}</td></tr>`;
       }).join('') || '<tr><td colspan="7" class="muted" style="text-align:center;padding:22px">No hay usuarios para este filtro.</td></tr>'}</tbody>
@@ -280,6 +283,18 @@ Orbit.modules.equipo = (function () {
     </table></div></div>`;
   }
 
+  let auditStoreRef = null, auditUnsubscribe = null;
+  function bindAuditRefresh(host) {
+    const st=S();
+    if (!st || typeof st.on !== 'function' || auditStoreRef === st) return;
+    if (typeof auditUnsubscribe === 'function') { try { auditUnsubscribe(); } catch (e) {} }
+    auditStoreRef=st;
+    auditUnsubscribe=st.on('auditoria', () => {
+      if (tab !== 'auditoria') return;
+      const body=(host&&host.querySelector&&host.querySelector('#eq-body'))||document.getElementById('eq-body');
+      if (body) body.innerHTML=auditoriaView();
+    });
+  }
   function auditoriaView() {
     const rows = (S().all('auditoria') || []).filter(x => x.modulo === 'equipo').sort((a, b) => String(b.fecha || '').localeCompare(String(a.fecha || '')));
     return `<div class="cfg-note" style="margin-bottom:14px">📝 Los motivos no son solicitudes enviadas a otra persona. Son registros de auditoría del tenant y se consultan aquí por Dirección/Admin.</div>

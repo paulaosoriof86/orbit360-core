@@ -278,6 +278,21 @@ try{
   const a=await actor(db,auth);
   ev.auth.proofActor={roles:a.roles,emailHash:crypto.createHash('sha256').update(a.email||'').digest('hex')};
   await activate(page,auth,a);
+  await page.evaluate(()=>{location.hash='#/equipo';});
+  const managerRefreshStarted=Date.now();
+  await page.reload({waitUntil:'domcontentloaded',timeout:30000});
+  try{
+    await page.waitForFunction(expectedUid=>!!window.Orbit?.productAppP0?.status?.().started&&String(window.Orbit?.auth?.productUser?.uid||'')===String(expectedUid||'')&&!document.body.classList.contains('pre-auth'),a.uid,{timeout:15000});
+  }catch(error){
+    const managerRefreshDiag=await page.evaluate(async()=>{
+      let provider={};try{const p=window.Orbit?.productRuntimeBrowserProvidersP0,ctx=p&&typeof p.initialize==='function'?await p.initialize():null,u=ctx?.auth?.currentUser||null;provider={currentUser:!!u,uid:String(u?.uid||''),emailVerified:u?u.emailVerified===true:null,persistence:String(p?.authPersistence||'')};}catch(e){provider={error:String(e?.code||e?.message||e)};}
+      return{preAuth:document.body.classList.contains('pre-auth'),authRestoring:document.documentElement.getAttribute('data-auth-restoring'),app:window.Orbit?.productAppP0?.status?.()||null,productUid:String(window.Orbit?.auth?.productUser?.uid||''),provider,hash:location.hash};
+    }).catch(e=>({diagnosticError:String(e?.message||e)}));
+    throw new Error('B1_MANAGER_NATIVE_REFRESH_SESSION_LOST:'+JSON.stringify(managerRefreshDiag));
+  }
+  const managerRefreshMs=Date.now()-managerRefreshStarted;
+  need(managerRefreshMs<15000,'B1_MANAGER_NATIVE_REFRESH_TOO_SLOW:'+managerRefreshMs);
+  ev.auth.managerNativeRefresh={pass:true,uidStable:true,noHelperReauth:true,elapsedMs:managerRefreshMs,route:'equipo'};
   const hydrated=await waitAdvisorHydration(page);
   ev.auth.managerLegalGateAccepted=await acceptLegalGate(page,8000);
   ev.team.hydration={

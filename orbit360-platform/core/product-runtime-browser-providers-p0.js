@@ -28,7 +28,7 @@
       var c=config();
       var app=m.app.getApps().length?m.app.getApps()[0]:m.app.initializeApp({apiKey:c.apiKey,authDomain:c.authDomain,projectId:c.projectId,appId:c.appId,storageBucket:c.storageBucket||undefined});
       var auth=m.auth.getAuth(app);
-      return m.auth.setPersistence(auth,m.auth.browserLocalPersistence).then(function(){return{modules:m,app:app,auth:auth,db:m.store.getFirestore(app),functionsByRegion:{}};});
+      return{modules:m,app:app,auth:auth,db:m.store.getFirestore(app),functionsByRegion:{}};
     });
     return contextPromise;
   }
@@ -36,7 +36,7 @@
     var c=config();
     return Promise.resolve({projectId:'configured',authDomain:'configured',appId:'configured',hasApiKey:true,storageBucket:c.storageBucket?'configured':'',environmentRef:c.environmentRef||'product-runtime',controlledExistingIdentity:true,existingProjectReconciled:true,identitySource:'membership_only',readOnly:true,writeAuthorized:false,serverWriteTransport:'firebase-functions'});
   }
-  function initialUser(){return initialize().then(function(ctx){return new Promise(function(resolve,reject){var off=function(){};off=ctx.modules.auth.onAuthStateChanged(ctx.auth,function(user){off();resolve(user||null);},function(error){off();reject(error);});});});}
+  function initialUser(){return initialize().then(function(ctx){if(ctx.auth&&typeof ctx.auth.authStateReady==='function')return ctx.auth.authStateReady().then(function(){return ctx.auth.currentUser||null;});return new Promise(function(resolve,reject){var off=function(){};off=ctx.modules.auth.onAuthStateChanged(ctx.auth,function(user){off();resolve(user||null);},function(error){off();reject(error);});});});}
   function waitUser(){return initialize().then(function(ctx){if(ctx.auth.currentUser)return ctx.auth.currentUser;return new Promise(function(resolve,reject){var off=ctx.modules.auth.onAuthStateChanged(ctx.auth,function(user){if(user){off();resolve(user);}},reject);});});}
   function membershipByUid(uid){
     return initialize().then(function(ctx){var c=config();var ref=ctx.modules.store.doc(ctx.db,'tenants/'+c.tenantHint+'/members/'+uid);return ctx.modules.store.getDoc(ref).then(function(snap){if(!snap.exists())throw new Error('MEMBERSHIP_NOT_AVAILABLE');var row=snap.data()||{};if(String(row.uid||'')!==String(uid||'')||String(row.tenantId||'')!==String(c.tenantHint||''))throw new Error('MEMBERSHIP_IDENTITY_MISMATCH');return row;});});
@@ -69,5 +69,5 @@
   function updateCurrentUserPassword(password){
     return initialize().then(function(ctx){var target=ctx.auth.currentUser;if(!target)throw new Error('AUTH_USER_NOT_AVAILABLE');return ctx.modules.auth.updatePassword(target,String(password||''));});
   }
-  window.Orbit.productRuntimeBrowserProvidersP0=Object.freeze({VERSION:'p0-b1-20260919.1',enabled:enabled,initialize:initialize,dependencies:dependencies,signIn:signIn,signOut:signOut,sendVerificationEmail:sendVerificationEmail,updateCurrentUserPassword:updateCurrentUserPassword,initialUser:initialUser,waitForUser:waitUser,readTenantConfig:readTenantConfig,callFunction:callFunction,configDescriptor:publicDescriptor,containsSecrets:false,tenantSource:'membership_only',browserFirestoreWriteAuthorized:false,serverWriteTransport:'firebase-functions',authoritativeFirstRead:true,authPersistence:'browserLocalPersistence',noFallback:true});
+  window.Orbit.productRuntimeBrowserProvidersP0=Object.freeze({VERSION:'p0-b1-20260919.1',enabled:enabled,initialize:initialize,dependencies:dependencies,signIn:signIn,signOut:signOut,sendVerificationEmail:sendVerificationEmail,updateCurrentUserPassword:updateCurrentUserPassword,initialUser:initialUser,waitForUser:waitUser,readTenantConfig:readTenantConfig,callFunction:callFunction,configDescriptor:publicDescriptor,containsSecrets:false,tenantSource:'membership_only',browserFirestoreWriteAuthorized:false,serverWriteTransport:'firebase-functions',authoritativeFirstRead:true,authPersistence:'firebase-default-local',noFallback:true});
 })();
