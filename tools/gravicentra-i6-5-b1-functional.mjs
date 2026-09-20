@@ -483,7 +483,7 @@ try{
     activeRole:membershipContractCheck.membership?.activeRole||''
   };
   need(membershipContractCheck.ok,'B1_SYNTHETIC_MEMBERSHIP_CONTRACT:'+JSON.stringify(ev.auth.membershipContract));
-  need(membershipContractCheck.membership?.dataScopes?.default==='propios','B1_SYNTHETIC_MEMBERSHIP_SCOPE');
+  need(membershipContractCheck.membership?.dataScopes?.default==='own','B1_SYNTHETIC_MEMBERSHIP_SCOPE');
   ev.auth.provision={uidHash:crypto.createHash('sha256').update(authUser.uid).digest('hex'),advisorLinked:true,membershipLinked:true};
 
   const syntheticPassword='B1r3!'+crypto.randomBytes(12).toString('hex')+'Aa1';
