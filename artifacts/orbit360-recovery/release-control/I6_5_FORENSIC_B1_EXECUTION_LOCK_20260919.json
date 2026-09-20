@@ -1,6 +1,6 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B1_EXECUTION_LOCK_V1",
-  "status": "VISUAL_REJECTED_ROOT_CAUSE_DIAGNOSTIC_ACTIVE",
+  "status": "CANDIDATE_PENDING_PREVIEW",
   "date": "2026-09-19",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -163,7 +163,7 @@
     "parentHead": "a97a9d7d5c2bc9860480d816f23f4c7043d62161",
     "revision": 5,
     "livePromoted": false,
-    "rootCauseStatus": "R7_DEMONSTRATED_AND_PATCHED_PENDING_PREVIEW",
+    "rootCauseStatus": "R8_VISUAL_REJECTED_DIRECTED_DIAGNOSTIC_ACTIVE",
     "sourceSha": "9b34f47c099b0d8af8de130a2b7b7a5d3b514bc5",
     "proofHeadSha": "1fb3f12184bbadd47cf8f9668cc6172a656029ef"
   },
