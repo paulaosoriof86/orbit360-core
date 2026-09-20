@@ -56,6 +56,7 @@ on:
       - 'tools/gravicentra-i6-5-b1-r6-directed-readonly.mjs'
       - 'tools/gravicentra-i6-5-b1-r7-auth-team-readonly.mjs'
       - 'tools/gravicentra-i6-5-b1-r7-bootstrap-readonly.mjs'
+      - 'tools/gravicentra-i6-5-b1-r8-access-email-readonly.mjs'
       - 'functions/tenant-branding.js'
       - 'functions/user-onboarding.js'
       - 'functions/product-operational-domain.js'
@@ -3410,5 +3411,55 @@ jobs:
         with:
           name: gravicentra-i6-5-b1-r7-bootstrap-${{ github.run_id }}
           path: ${{ runner.temp }}/b1-r7-bootstrap/*
+          compression-level: 0
+          retention-days: 14
+
+
+  i65-b1-r8-access-email-diagnostic:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      B1_LOCK: artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B1_EXECUTION_LOCK_20260919.json
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Gate B1 R8 access email diagnostic
+        id: mode
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          node - <<'NODE'
+          const fs=require('node:fs'),c=JSON.parse(fs.readFileSync(process.env.CONTROL)),b=JSON.parse(fs.readFileSync(process.env.B1_LOCK));
+          const run=b.status==='CANDIDATE_PENDING_PREVIEW'&&c.nextAction==='I6_5_FORENSIC_REMEDIATION_B1_R3_ROOT_CAUSE'&&c.i65ForensicRemediationPlan?.currentBlock==='B1';
+          if(run&&(c.i6Execution?.dataMutationAuthorized!==false||b.boundaries?.liveHostingPromotionAuthorized!==false||b.visualRejection20260920R8?.boundaries?.advanceToB2Authorized!==false))throw Error('B1_R8_READONLY_BOUNDARY_INVALID');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(run?'true':'false')+'\n');
+          console.log('B1_R8_ACCESS_EMAIL_MODE='+(run?'RUN':'NOOP'));
+          NODE
+      - name: Validate R8 diagnostic source
+        if: steps.mode.outputs.run == 'true'
+        run: node --check tools/gravicentra-i6-5-b1-r8-access-email-readonly.mjs
+      - name: Install Firebase Admin
+        if: steps.mode.outputs.run == 'true'
+        run: npm install --no-save --package-lock=false firebase-admin@13.4.0 >/dev/null
+      - name: Execute B1 R8 access and email read-only diagnostic
+        if: steps.mode.outputs.run == 'true'
+        env:
+          B1_R8_OUT: ${{ runner.temp }}/b1-r8
+        run: node tools/gravicentra-i6-5-b1-r8-access-email-readonly.mjs
+      - name: Upload B1 R8 diagnostic evidence
+        if: always() && steps.mode.outputs.run == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i6-5-b1-r8-access-email-${{ github.run_id }}
+          path: ${{ runner.temp }}/b1-r8/*
           compression-level: 0
           retention-days: 14
