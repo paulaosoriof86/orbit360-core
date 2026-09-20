@@ -287,6 +287,10 @@ const sourceFiles=[
   'orbit360-platform/modules/equipo.js',
   'orbit360-platform/modules/equipo-credential-admin-v20260805-bridge.js',
   'orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js',
+  'orbit360-platform/core/access-scope.js',
+  'orbit360-platform/core/router.js',
+  'orbit360-platform/core/tenant-domain-config-client.js',
+  'functions/tenant-domain-config.js',
   'functions/tenant-branding.js',
   'functions/product-operational-domain.js',
   'functions/user-onboarding.js'
@@ -324,10 +328,61 @@ try{
   need(source['orbit360-platform/core/tenant-access-policy-product-p0.js'].includes('TEAM_WITHOUT_BINDING_TO_OWN'),'B1_TEAM_SCOPE_SAFE_FALLBACK_MISSING');
   need(source['orbit360-platform/core/auth-product-runtime-p0.js'].includes("location.hash='#/inicio'"),'B1_FRESH_LOGIN_ROUTE_NORMALIZATION_MISSING');
   need(source['orbit360-platform/modules/equipo-credential-admin-v20260805-bridge.js'].includes('TEMP_PASSWORD_SERVER_CONFIRMATION_MISSING'),'B1_TEMP_PASSWORD_SERVER_CONFIRMATION_UI_MISSING');
+  need(source['orbit360-platform/modules/equipo.js'].includes("Orbit.domainConfig.save('access'"),'B1_ROLE_MATRIX_NOT_CANONICAL_SERVER_OWNED');
+  need(source['functions/tenant-domain-config.js'].includes("'access'"),'B1_ACCESS_CONFIG_BACKEND_DOMAIN_MISSING');
+  need(source['orbit360-platform/core/access-scope.js'].includes("ac.rolePermissions"),'B1_RUNTIME_CANONICAL_ROLE_MATRIX_MISSING');
+  need(source['orbit360-platform/core/router.js'].includes("Orbit.access.withScope(route"),'B1_ROUTER_SCOPED_RENDER_MISSING');
+  need(source['orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js'].includes('la entrega al buzón no está confirmada'),'B1_EMAIL_DELIVERY_WORDING_NOT_FAIL_CLOSED');
   need(!/window\.prompt\(/.test(source['orbit360-platform/modules/equipo.js'])&&!/window\.prompt\(/.test(source['orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js']),'B1_NATIVE_PROMPT_SOURCE');
   need(!/\breturn\s+alert\s*\(/.test(source['orbit360-platform/modules/equipo.js'])&&!/\breturn\s+alert\s*\(/.test(source['orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js']),'B1_NATIVE_ALERT_SOURCE');
 
   browser=await chromium.launch({headless:true});
+
+  // R8 pure access-policy proof. No Firebase or tenant writes: verifies that a
+  // role matrix may expand a base-hidden module, and that changing only the
+  // selected assigned role immediately narrows the same identity from all to own.
+  const policyContext=await browser.newContext();
+  const policyPage=await policyContext.newPage();
+  await policyPage.setContent('<!doctype html><html><body></body></html>');
+  await policyPage.evaluate(()=>{
+    window.Orbit={};window.__role='Operativo';
+    const actor={id:'ase-test',nombre:'Test',email:'test@example.invalid',scopeDatos:'todos',paises:['GT'],roles:['Operativo','Asesor'],rolDefault:'Operativo',teamId:''};
+    const other={id:'ase-other',nombre:'Other',email:'other@example.invalid',scopeDatos:'propios',paises:['GT'],roles:['Asesor'],rolDefault:'Asesor',teamId:''};
+    const rows={asesores:[actor,other],clientes:[{id:'c-own',asesorId:'ase-test',pais:'GT'},{id:'c-other',asesorId:'ase-other',pais:'GT'}],polizas:[]};
+    Orbit.store={all:c=>(rows[c]||[]).slice(),get:(c,id)=>(rows[c]||[]).find(x=>x.id===id)||null,where:(c,p)=>(rows[c]||[]).filter(p),find:(c,p)=>(rows[c]||[]).find(p),insert:()=>{},update:()=>{},remove:()=>{}};
+    Orbit.session={rol:()=>window.__role,asesorId:()=> 'ase-test',rolesAsignados:()=>['Operativo','Asesor'],canSee:()=>false};
+    Orbit.auth={user:()=>({uid:'u-test',email:'test@example.invalid'})};
+    Orbit.ROLES={Operativo:{nivel:2,modulos:['inicio','cliente360','polizas']},Asesor:{nivel:1,modulos:['inicio','cliente360','polizas']}};
+    Orbit.cat={all:()=>({})};
+    window.__accessCfg={rolePermissions:{Operativo:{cotizador:{ver:true,editar:true}}},roleScopes:{Operativo:'all',Asesor:'own'}};
+    Orbit.tenant={get:()=>({paises:['GT'],domainConfig:{access:window.__accessCfg}}),isActive:()=>true};
+  });
+  await policyPage.addScriptTag({content:source['orbit360-platform/core/access-scope.js']});
+  const policyProof=await policyPage.evaluate(()=>{
+    const oper={
+      cotizador:Orbit.access.can('cotizador','view'),
+      scope:Orbit.access.dataScope('cliente360'),
+      visible:Orbit.access.filter('clientes',Orbit.store.all('clientes'),'cliente360').map(x=>x.id)
+    };
+    window.__role='Asesor';
+    const asesor={
+      scope:Orbit.access.dataScope('cliente360'),
+      visible:Orbit.access.filter('clientes',Orbit.store.all('clientes'),'cliente360').map(x=>x.id)
+    };
+    window.__role='Operativo';window.__accessCfg.roleScopes.Operativo='team';
+    const teamNoBinding={
+      scope:Orbit.access.dataScope('cliente360'),
+      visible:Orbit.access.filter('clientes',Orbit.store.all('clientes'),'cliente360').map(x=>x.id)
+    };
+    return{oper,asesor,teamNoBinding};
+  });
+  need(policyProof.oper.cotizador===true,'B1_R8_MATRIX_CANNOT_EXPAND_MODULE:'+JSON.stringify(policyProof));
+  need(policyProof.oper.scope==='all'&&policyProof.oper.visible.length===2,'B1_R8_OPERATIVO_ALL_SCOPE_FAILED:'+JSON.stringify(policyProof));
+  need(policyProof.asesor.scope==='own'&&JSON.stringify(policyProof.asesor.visible)===JSON.stringify(['c-own']),'B1_R8_ASESOR_ROLE_DID_NOT_NARROW_TO_OWN:'+JSON.stringify(policyProof));
+  need(policyProof.teamNoBinding.scope==='team'&&JSON.stringify(policyProof.teamNoBinding.visible)===JSON.stringify(['c-own']),'B1_R8_TEAM_WITHOUT_BINDING_NOT_FAIL_CLOSED:'+JSON.stringify(policyProof));
+  ev.auth.rolePolicy={pass:true,userSpecificBranching:false,matrixExpandsModule:true,operativoAll:true,asesorOwn:true,teamNoBindingOwnOnly:true};
+  await policyContext.close();
+
   context=await browser.newContext({viewport:{width:1500,height:1000}});
   page=await context.newPage();
   const pageErrors=[],consoleEvents=[];
