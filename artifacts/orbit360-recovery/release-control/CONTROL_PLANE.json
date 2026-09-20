@@ -1951,7 +1951,7 @@
       "livePromotion": false
     },
     "b1ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B1_EXECUTION_LOCK_20260919.json",
-    "b1ExecutionLockBlobSha": "c51f2946fcff0f7fe093680b839dd21fc1adacdd",
+    "b1ExecutionLockBlobSha": "352e00d9d3ed36ce06f5ba993cb7f0d1dae465f8",
     "b1": {
       "status": "CANDIDATE_PENDING_PREVIEW",
       "sourceSha": "e2cad9e8872267a24a41af9dfee765a49a33f673",
@@ -1985,7 +1985,18 @@
       "syntheticFullCrudRequired": true,
       "advisorDirectoryQuery": "TENANT_ONLY_FOR_AUTHORIZED_TEAM_DIRECTORY_ROLES",
       "advisorCountryFilter": false,
-      "runtimeCanonicalParityRequired": true
+      "runtimeCanonicalParityRequired": true,
+      "membershipScopeRootCause": {
+        "status": "PROVEN",
+        "runId": 35479982109,
+        "jobId": 105995928796,
+        "owners": [
+          "functions/user-onboarding.js",
+          "functions/product-operational-domain.js"
+        ],
+        "fixScope": "CANONICALIZE_MEMBERSHIP_DATASCOPES_SCHEMA_ONLY",
+        "livePromoted": false
+      }
     }
   }
 }

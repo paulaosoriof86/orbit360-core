@@ -26,7 +26,9 @@
     "orbit360-platform/assets/tenant/alianzas-soluciones/logo-oficial-360.png",
     "orbit360-platform/assets/tenant/alianzas-soluciones/logo-bolita-96.png",
     "orbit360-platform/core/tenant-access-policy-effective-p0.js",
-    "orbit360-platform/data/store-firestore-product-readonly-p0.js"
+    "orbit360-platform/data/store-firestore-product-readonly-p0.js",
+    "functions/user-onboarding.js",
+    "functions/product-operational-domain.js"
   ],
   "backend": {
     "deployTargets": [
@@ -35,7 +37,8 @@
       "orbit360ProvisionTeamAccess"
     ],
     "deployExactCurrentSource": true,
-    "sharedProjectBackendRequiredForPreviewAndLive": true
+    "sharedProjectBackendRequiredForPreviewAndLive": true,
+    "membershipScopeSchema": "orbit360-tenant-membership-v2:{dataScopes:{default,modules}}"
   },
   "brandingConfig": {
     "path": "tenants/alianzas-soluciones/config/branding",
@@ -294,5 +297,33 @@
       "remediation": "Effective asesores query is tenant-only for authorized team-directory roles; non-authorized roles fail closed.",
       "noDataRewrite": true
     }
+  },
+  "rootCauseMembershipScopeContract": {
+    "status": "PROVEN",
+    "classification": "CODE_DEFECT_CROSS_BACKEND_WRITERS",
+    "proofRunId": 35479982109,
+    "proofJobId": 105995928796,
+    "observed": {
+      "operationalWrites": 8,
+      "authSyntheticWrites": 2,
+      "membershipSyntheticWrites": 1,
+      "loginActivation": false,
+      "productAppLastError": "PRODUCT_READONLY_BOOTSTRAP_NOT_READY"
+    },
+    "causalChain": [
+      "functions/user-onboarding.js scopeMap writes dataScopes as a flat domain map",
+      "functions/product-operational-domain.js dataScopesForAdvisor can write the same flat shape after Auth linkage",
+      "orbit360-platform/core/membership-multirol-contract-p0.js normalizeScopes requires dataScopes.default and dataScopes.modules",
+      "flat dataScopes normalizes to empty default scope",
+      "membership validation rejects the new identity before product read-only bootstrap can become ready"
+    ],
+    "requiredFix": [
+      "functions/user-onboarding.js",
+      "functions/product-operational-domain.js"
+    ],
+    "dataWritesAuthorized": false,
+    "realUserAuthMutationAuthorized": false,
+    "realUserMembershipMutationAuthorized": false,
+    "reimportAuthorized": false
   }
 }
