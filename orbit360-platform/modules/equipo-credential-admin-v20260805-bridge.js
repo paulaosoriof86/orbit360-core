@@ -18,6 +18,12 @@
     try { if (Orbit.ui && Orbit.ui.toast) Orbit.ui.toast(message); }
     catch (error) {}
   }
+  function inform(message, title) {
+    try { if (Orbit.ui && typeof Orbit.ui.alert === 'function') return Orbit.ui.alert(message, { title: title || 'Credenciales' }); }
+    catch (error) {}
+    window.alert(message);
+    return Promise.resolve(true);
+  }
   function canManage() {
     try {
       var user = Orbit.auth && typeof Orbit.auth.user === 'function' ? Orbit.auth.user() || {} : {};
@@ -47,13 +53,16 @@
       '<label class="ce-l">Contraseña temporal<input id="eu-temp-password" class="o-sel" type="password" autocomplete="new-password" value="' + (Orbit.ui ? Orbit.ui.esc(pattern) : pattern) + '"></label>' +
       '<label class="ce-l">Confirmar contraseña<input id="eu-temp-password-confirm" class="o-sel" type="password" autocomplete="new-password" value="' + (Orbit.ui ? Orbit.ui.esc(pattern) : pattern) + '"></label>' +
       '</div>' +
-      '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button type="button" class="btn ghost" id="eu-set-temp-password">Asignar contraseña temporal</button><span class="muted" style="font-size:11.5px">Cambio obligatorio en el próximo ingreso.</span></div>' +
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button type="button" class="btn ghost" id="eu-set-temp-password">Asignar contraseña temporal</button><button type="button" class="btn ghost" id="eu-resend-password-reset">Reenviar restablecimiento</button><span class="muted" style="font-size:11.5px">Cambio obligatorio en el próximo ingreso.</span></div>' +
       '</div>';
     content.insertBefore(panel, content.lastElementChild || null);
     var button = panel.querySelector('#eu-set-temp-password');
+    var resetButton = panel.querySelector('#eu-resend-password-reset');
     if (!canManage()) {
       button.disabled = true;
+      resetButton.disabled = true;
       button.title = 'Requiere Dirección o Administración';
+      resetButton.title = 'Requiere Dirección o Administración';
       return;
     }
     button.addEventListener('click', async function () {
@@ -68,14 +77,32 @@
       try {
         button.disabled = true;
         button.textContent = 'Asignando…';
-        await Orbit.credentialSelfService.setTemporaryPassword({ advisorId:id, temporaryPassword:password, reason:reason });
-        toast('Contraseña temporal asignada. El usuario deberá cambiarla al ingresar.');
+        var result = await Orbit.credentialSelfService.setTemporaryPassword({ advisorId:id, temporaryPassword:password, reason:reason });
+        if (!result || result.ok !== true || result.operation !== 'set_temporary_password' || result.state !== 'temporary_password') throw new Error('TEMP_PASSWORD_SERVER_CONFIRMATION_MISSING');
+        await inform('Firebase Auth confirmó la nueva contraseña temporal para este usuario. Deberá cambiarla en su próximo ingreso.', 'Contraseña confirmada por servidor');
       } catch (error) {
         var message = Orbit.userOnboarding && Orbit.userOnboarding.message ? Orbit.userOnboarding.message(error) : 'No fue posible asignar la contraseña temporal.';
         toast(message);
       } finally {
         button.disabled = false;
         button.textContent = 'Asignar contraseña temporal';
+      }
+    });
+    resetButton.addEventListener('click', async function () {
+      if (!record || !text(record.email)) return inform('Este usuario no tiene un correo válido configurado.', 'Correo requerido');
+      var reason = window.prompt('Motivo del reenvío de restablecimiento de contraseña:') || '';
+      if (reason.trim().length < 5) return inform('Indica un motivo claro de al menos 5 caracteres.', 'Motivo requerido');
+      try {
+        resetButton.disabled = true;
+        resetButton.textContent = 'Enviando…';
+        if (!Orbit.userOnboarding || typeof Orbit.userOnboarding.sendInvitation !== 'function') throw new Error('PASSWORD_RESET_PROVIDER_UNAVAILABLE');
+        await Orbit.userOnboarding.sendInvitation(record.email);
+        await inform('Firebase aceptó la solicitud de envío del correo de restablecimiento. Esto confirma el envío solicitado, no la entrega final al buzón.', 'Solicitud aceptada por Firebase');
+      } catch (error) {
+        await inform('Firebase no confirmó la solicitud de restablecimiento. Intenta nuevamente o revisa el estado del correo del usuario.', 'No confirmado');
+      } finally {
+        resetButton.disabled = false;
+        resetButton.textContent = 'Reenviar restablecimiento';
       }
     });
   }

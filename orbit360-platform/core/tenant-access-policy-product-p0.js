@@ -10,7 +10,7 @@
 
   window.Orbit = window.Orbit || {};
 
-  var VERSION = 'p0-product-m6-20260730.4';
+  var VERSION = 'p0-product-b1-r7-20260920.1';
   var QUERY_FIELD_ALIASES = Object.freeze({ country: 'pais', advisorId: 'asesorId', teamId: 'equipoId' });
   var RELATION_SCOPED_COLLECTIONS = Object.freeze({ recibosEsperados: true, carteraPrimas: true, cobros: true });
 
@@ -113,7 +113,19 @@
     if (!owner || typeof owner.queryConstraints !== 'function') {
       return { ok: false, writeAuthorized: false, collection: String(collection || ''), constraints: [], errors: ['politica_acceso_base_faltante'] };
     }
-    return translateQueryProposal(owner.queryConstraints(collection, canonicalMembership(membership), context), collection);
+    var canonical = canonicalMembership(membership);
+    var normalized = normalizeMembership(canonical);
+    var proposal = owner.queryConstraints(collection, canonical, context);
+    if (proposal && proposal.scope === 'team' && !String(normalized.teamId || '').trim() && String(normalized.advisorId || '').trim()) {
+      proposal = Object.assign({}, proposal, {
+        scope: 'own',
+        compatibilityFallback: 'TEAM_WITHOUT_BINDING_TO_OWN',
+        constraints: (Array.isArray(proposal.constraints) ? proposal.constraints : []).filter(function (row) {
+          return row && row.field !== 'teamId' && row.field !== 'equipoId';
+        }).concat([{ field: 'advisorId', op: '==', value: String(normalized.advisorId).trim() }])
+      });
+    }
+    return translateQueryProposal(proposal, collection);
   }
 
   function delegate(name) {

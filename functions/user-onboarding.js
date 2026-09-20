@@ -18,7 +18,7 @@ const MANAGE_PERMISSIONS = new Set([
   'users_manage'
 ]);
 const VALID_SCOPES = new Set(['propios', 'equipo', 'todos', 'ninguno']);
-const VALID_OPERATIONS = new Set(['provision', 'sync', 'deactivate', 'reactivate', 'mark_invitation_sent', 'set_temporary_password', 'complete_password_change']);
+const VALID_OPERATIONS = new Set(['provision', 'sync', 'deactivate', 'reactivate', 'mark_invitation_sent', 'set_temporary_password', 'complete_password_change', 'sync_self_auth_state']);
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 const ADVISOR_ID_RE = /^[A-Za-z0-9][A-Za-z0-9._:-]{1,159}$/;
 
@@ -367,6 +367,51 @@ async function rollbackAuth(authBefore, user, created) {
   }
 }
 
+async function syncSelfAuthState(request, tenantId) {
+  if (!request.auth || !request.auth.uid) throw new HttpsError('unauthenticated', 'Autenticación requerida.');
+  const uid = text(request.auth.uid, 160);
+  const memberRef = db.collection('tenants').doc(tenantId).collection('members').doc(uid);
+  const memberSnap = await memberRef.get();
+  if (!memberSnap.exists) throw new HttpsError('permission-denied', 'Membresía requerida.');
+  const member = memberSnap.data() || {};
+  const memberStatus = normalized(member.status || member.estado, 40);
+  if (text(member.tenantId, 160) !== tenantId || !['active', 'activo'].includes(memberStatus)) {
+    throw new HttpsError('permission-denied', 'La membresía no está activa.');
+  }
+  const advisorId = text(member.advisorId || member.asesorId, 160);
+  if (!advisorId) throw new HttpsError('failed-precondition', 'La membresía no está vinculada con Equipo.');
+  const located = await locateAdvisor(tenantId, advisorId);
+  if (!located.snap) throw new HttpsError('failed-precondition', 'El registro de Equipo no existe.');
+  const user = await auth.getUser(uid);
+  const current = located.data || {};
+  const patch = {
+    authUid: uid,
+    accessProvisioned: true,
+    authEmailVerified: user.emailVerified === true,
+    authDisabled: user.disabled === true,
+    membershipStatus: memberStatus === 'activo' ? 'active' : memberStatus,
+    onboardingState: user.disabled === true ? 'blocked' : (user.emailVerified === true ? 'active' : 'invited'),
+    invitacionEstado: user.disabled === true ? 'bloqueada' : (user.emailVerified === true ? 'no_requerida' : 'pendiente_verificacion')
+  };
+  const changed = Object.keys(patch).some((key) => current[key] !== patch[key]);
+  if (changed) {
+    patch.lastAccessSyncAt = FieldValue.serverTimestamp();
+    await located.ref.set(patch, { merge: true });
+  }
+  return {
+    ok: true,
+    schemaVersion: ONBOARDING_VERSION,
+    operation: 'sync_self_auth_state',
+    advisorId,
+    state: patch.onboardingState,
+    authEmailVerified: patch.authEmailVerified,
+    authDisabled: patch.authDisabled,
+    changed,
+    containsPII: false,
+    containsSecrets: false
+  };
+}
+
 async function executeProvision(request) {
   const input = request.data || {};
   const tenantId = text(input.tenantId, 160);
@@ -376,6 +421,9 @@ async function executeProvision(request) {
   if (!VALID_OPERATIONS.has(operation)) throw new HttpsError('invalid-argument', 'Operación de acceso inválida.');
   if (operation === 'complete_password_change') {
     return credentialSelfService.completePasswordChange({ request, tenantId, db, FieldValue, HttpsError, sha, text, locateAdvisor });
+  }
+  if (operation === 'sync_self_auth_state') {
+    return syncSelfAuthState(request, tenantId);
   }
   const actor = await authorize(request, tenantId, operation);
   const located = await locateAdvisor(tenantId, advisorId);
