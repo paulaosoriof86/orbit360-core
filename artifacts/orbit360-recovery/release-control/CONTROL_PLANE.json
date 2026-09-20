@@ -713,7 +713,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B1_VISUAL",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B1_PREVIEW",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -1942,7 +1942,7 @@
     "addendumBlobSha": "05099a90cfb4862eec97e0359d55932828cb930b",
     "forensicAuditBlobSha": "fcfdf29c9eb851d76cebf67bcbe36d8ed308eb0f",
     "paymentInferenceBlobSha": "cfb026ded52c36083528de658a70191c8380d725",
-    "mechanismSyncStatus": "B1_R4_DEFINITIVE_TECHNICAL_PASS_METADATA_SYNCED",
+    "mechanismSyncStatus": "B1_R4_NATIVE_REFRESH_VISUAL_REJECTION_REOPENED",
     "guardFailureBeforeFix": {
       "runId": 35450692628,
       "code": "I6_5_NEXT_ACTION_INVALID",
@@ -1951,9 +1951,9 @@
       "livePromotion": false
     },
     "b1ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B1_EXECUTION_LOCK_20260919.json",
-    "b1ExecutionLockBlobSha": "e19161ac02adb8ef3e4d0a37d575ce124a31ec99",
+    "b1ExecutionLockBlobSha": "ff647e7b7f6785b0682b235cde5d20db08207e12",
     "b1": {
-      "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+      "status": "CANDIDATE_PENDING_PREVIEW",
       "sourceSha": "94ef159042b33afef98134e698885b134bf334e7",
       "buildId": "gi-i65-b1-94ef159042b3-57f234755dc1",
       "previewUrl": "https://ays-orbit-360-lab--gi-i65-b1-35455766715-ylc10xr5.web.app",
@@ -1970,6 +1970,15 @@
         "exactReadback": true,
         "functionalPass": true,
         "syntheticFinalAbsent": true
+      },
+      "visualAccepted": false,
+      "nativeRefreshRejection": {
+        "status": "PROVEN_BY_LIVE_VISUAL_REVIEW",
+        "previousProofInvalid": true,
+        "previousProofInvalidReason": "QA helper reauthenticated with a newly minted custom token after reload.",
+        "correctedProofCommit": "4540165e30204dc8e1a4f8058bdf4014c3d03011",
+        "requiredBehavior": "Browser refresh preserves authenticated Firebase user and restores product session without any reauthentication call.",
+        "livePromoted": false
       }
     }
   }

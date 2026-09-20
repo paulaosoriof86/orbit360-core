@@ -1,6 +1,6 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B1_EXECUTION_LOCK_V1",
-  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+  "status": "CANDIDATE_PENDING_PREVIEW",
   "date": "2026-09-19",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -215,7 +215,7 @@
     "operationalWrites": 0
   },
   "visualReview": {
-    "status": "REJECTED_R3_VISUAL_CLEANUP_REQUIRED",
+    "status": "REJECTED_R4_NATIVE_REFRESH_SESSION_LOSS",
     "reviewedAt": "2026-09-19T22:15:00-06:00",
     "evidence": "Paula screenshots in continuation chat",
     "findings": [
@@ -264,7 +264,14 @@
         "rootCause": "legacy lg-themehint remained in canonical index and rendered Paleta: without useful control.",
         "requiredFix": "Remove legacy pre-auth theme hint from canonical index."
       }
-    ]
+    ],
+    "nativeRefresh": {
+      "status": "REJECTED",
+      "observedByPaula": true,
+      "observedBehavior": "Authenticated session is always lost on browser refresh.",
+      "previousProofInvalidReason": "reloadAuthenticated() performed page.reload() and then activate(), whose helper minted a custom token and signed in again when currentUser was absent. It did not prove native Firebase session restoration.",
+      "requiredProof": "Login normally, reload browser, do not mint token or call sign-in helper, require same Firebase user and product session to restore automatically."
+    }
   },
   "readinessCurrent": 70,
   "rootCauseR3": {
@@ -363,7 +370,7 @@
     "reimportAuthorized": false
   },
   "technicalClosure": {
-    "status": "PASS_PENDING_PAULA_VISUAL",
+    "status": "SUPERSEDED_BY_VISUAL_REJECTION_NATIVE_REFRESH",
     "runId": 35492703801,
     "proof": "I65_B1_PREVIEW_PROOF=PASS",
     "exactReadback": true,
@@ -384,7 +391,8 @@
       "delete": true,
       "authDisabledOnDelete": true
     },
-    "livePromotionAuthorized": false
+    "livePromotionAuthorized": false,
+    "nativeRefreshPreviouslyProven": false
   },
   "visualAccepted": false,
   "r4DefinitiveClosure": {
