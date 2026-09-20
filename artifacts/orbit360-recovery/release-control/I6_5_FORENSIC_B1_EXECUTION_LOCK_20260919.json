@@ -282,6 +282,17 @@
     "liveHostingPromotionAuthorized": false,
     "proofDesign": "INCOMPLETE_EXISTING_NO_WRITE_PLUS_SYNTHETIC_FULL_CRUD_AUTH",
     "realOperationalMutationAuthorized": false,
-    "syntheticOperationalMutationAuthorized": true
+    "syntheticOperationalMutationAuthorized": true,
+    "advisorDirectoryTenantQueryRequired": true,
+    "advisorDirectoryCountryFilterForbidden": true,
+    "runtimeAdvisorCountMustEqualCanonicalFirestore": true
+  },
+  "rootCauseEvidence": {
+    "advisorDirectoryCountryFilter": {
+      "status": "CONFIRMED_R3",
+      "cause": "Base queryConstraints applied membership country filter to asesores despite scoped=false, excluding incomplete/cross-country tenant advisor rows from administrative Equipo hydration.",
+      "remediation": "Effective asesores query is tenant-only for authorized team-directory roles; non-authorized roles fail closed.",
+      "noDataRewrite": true
+    }
   }
 }

@@ -10,11 +10,12 @@
 
   window.Orbit = window.Orbit || {};
 
-  var VERSION = 'p0-effective-20260919.b1r3';
+  var VERSION = 'p0-effective-20260919.b1r3.2';
   var PRODUCT_COLLECTION_POLICY_OVERRIDE = Object.freeze({
     negocios: { module: 'leads', scoped: true, advisorRead: true, advisorWrite: false },
     asesores: { module: 'equipo', scoped: false, advisorRead: false, advisorWrite: false }
   });
+  var TEAM_DIRECTORY_ROLES = Object.freeze(['Dirección', 'SuperAdmin', 'AdminTenant', 'Admin']);
 
   function text(value) {
     return String(value == null ? '' : value).trim();
@@ -81,6 +82,11 @@
     return !!(base && typeof base.moduleVisible === 'function' && base.moduleVisible(input, moduleKey));
   }
 
+  function canUseTeamDirectory(input) {
+    var m = normalizeMembership(input);
+    return activeMembership(m) && TEAM_DIRECTORY_ROLES.indexOf(text(m.activeRole)) >= 0 && moduleVisible(m, 'equipo');
+  }
+
   function effectiveScope(input, moduleKey) {
     var base = basePolicy();
     return base && typeof base.effectiveScope === 'function' ? base.effectiveScope(input, moduleKey) : 'none';
@@ -99,6 +105,11 @@
   function canRead(collection, record, membership, context) {
     var base = basePolicy();
     if (!base || typeof base.canRead !== 'function') return unavailable();
+    if (collection === 'asesores') {
+      var m = normalizeMembership(membership);
+      var allowed = canUseTeamDirectory(m) && sameTenant(m, record || { tenantId: context && context.tenantId });
+      return { ok: allowed, allowed: allowed, writeAuthorized: false, code: allowed ? 'directorio_equipo_tenant_permitido' : 'directorio_equipo_bloqueado', module: 'equipo', scope: 'tenant' };
+    }
     return base.canRead(collection, record, membership, contextWithOverrides(context));
   }
 
@@ -135,6 +146,13 @@
     if (!base || typeof base.queryConstraints !== 'function') {
       return { ok: false, writeAuthorized: false, collection: text(collection), constraints: [], errors: ['politica_base_faltante'] };
     }
+    if (collection === 'asesores') {
+      var m = normalizeMembership(membership);
+      var allowed = canUseTeamDirectory(m) && !!text(m.tenantId);
+      var constraints = text(m.tenantId) ? [{ field: 'tenantId', op: '==', value: text(m.tenantId) }] : [];
+      if (!allowed) constraints.push({ field: '__deny__', op: '==', value: true });
+      return { ok: allowed, writeAuthorized: false, collection: 'asesores', module: 'equipo', scope: allowed ? 'tenant' : 'none', constraints: constraints, countryFiltered: false };
+    }
     return base.queryConstraints(collection, membership, contextWithOverrides(context));
   }
 
@@ -149,6 +167,7 @@
   window.Orbit.tenantAccessPolicyEffectiveP0 = Object.freeze({
     VERSION: VERSION,
     COLLECTION_POLICY: collectionPolicy(),
+    TEAM_DIRECTORY_ROLES: TEAM_DIRECTORY_ROLES,
     policyOverrides: policyOverrides,
     collectionPolicy: collectionPolicy,
     contextWithOverrides: contextWithOverrides,

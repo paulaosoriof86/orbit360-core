@@ -295,6 +295,11 @@ try{
   const advisorCollection=db.collection('tenants').doc(TENANT).collection('data').doc('asesores').collection('items');
   const canonicalSnap=await advisorCollection.get();
   const canonicalRows=canonicalSnap.docs.map(d=>({id:d.id,...d.data()}));
+  ev.team.hydration.canonicalFirestoreCount=canonicalSnap.size;
+  ev.team.hydration.runtimeIds=hydrated.rows.map(x=>x.id).sort();
+  ev.team.hydration.canonicalFirestoreIds=canonicalSnap.docs.map(d=>d.id).sort();
+  need(hydrated.rows.length===canonicalSnap.size,'B1_RUNTIME_CANONICAL_ADVISOR_COUNT_MISMATCH:'+JSON.stringify(ev.team.hydration));
+  need(ev.team.hydration.canonicalFirestoreIds.every(id=>ev.team.hydration.runtimeIds.includes(id)),'B1_RUNTIME_CANONICAL_ADVISOR_IDS_MISMATCH:'+JSON.stringify(ev.team.hydration));
   const incomplete=canonicalRows.find(r=>{
     const q=semanticAdvisor(r);
     return !clean(r.authUid||r.uid||r.userId,180) && (!q.roles.length||!q.paises.length||!q.rolDefault||!q.paisDefault);

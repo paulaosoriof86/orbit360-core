@@ -1790,6 +1790,8 @@ jobs:
           node --check orbit360-platform/data/store-firestore-product-operational-p0.js
           node --check orbit360-platform/modules/equipo.js
           node --check orbit360-platform/core/tenant-access-policy-effective-p0.js
+          grep -Fq "countryFiltered: false" orbit360-platform/core/tenant-access-policy-effective-p0.js
+          grep -Fq "TEAM_DIRECTORY_ROLES" orbit360-platform/core/tenant-access-policy-effective-p0.js
           node --check orbit360-platform/data/store-firestore-product-readonly-p0.js
           node --check tools/gravicentra-i6-5-b1-branding-snapshot.mjs
           node --check tools/gravicentra-i6-5-b1-advisor-normalize.mjs
