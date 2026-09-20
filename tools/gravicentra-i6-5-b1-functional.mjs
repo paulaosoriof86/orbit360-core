@@ -453,6 +453,37 @@ try{
   need(!(await page.locator('.eu-mod[value="'+moduleChoice.restrict+'"]').isChecked()),'B1_RESTRICTED_MODULE_REFRESH_NOT_PERSISTED');
   need(await page.locator('.eu-mod[value="'+moduleChoice.extra+'"]').isChecked(),'B1_EXTRA_MODULE_REFRESH_NOT_PERSISTED');
 
+  // The non-default configuration above proves durable edit semantics.
+  // Provision/login is intentionally exercised only after returning the same
+  // synthetic user to a valid standard Asesor configuration. This keeps B1
+  // focused on user administration instead of manufacturing an invalid
+  // cross-module startup combination.
+  await page.locator('.eu-role[value="Operativo"]').uncheck();
+  await page.locator('.eu-pais[value="CO"]').uncheck();
+  await page.selectOption('#eu-scope','propios');
+  await page.click('#eu-reset-mod');
+  if(await page.locator('#eu-sync-access').count())await page.locator('#eu-sync-access').uncheck();
+  const restoreAccessPromise=page.click('#eu-ok');
+  await submitCustomPrompt(page,'Restauración B1 a configuración estándar antes de activar acceso','B1_PRE_ACCESS_RESTORE_REASON');
+  ev.nativeUi.customReasonPrompts++;
+  await restoreAccessPromise;
+  await page.waitForSelector('#eq-edit',{state:'detached',timeout:15000});
+  const accessReady=await waitFor(async()=>{
+    const x=await canonical(db,synthetic.id);if(!x)return null;
+    const q=semanticAdvisor(x);
+    return sameSet(q.roles,['Asesor'])&&sameSet(q.paises,['GT'])&&q.scopeDatos==='propios'&&q.modulosExtra.length===0&&q.modulosRestringidos.length===0?x:null;
+  },'B1_SYNTHETIC_PRE_ACCESS_STANDARD_READBACK');
+  ev.writes.advisorOperational++;ev.writes.auditOperational++;
+  ev.team.synthetic.preAccessStandard={
+    roles:semanticAdvisor(accessReady).roles,paises:semanticAdvisor(accessReady).paises,
+    scopeDatos:semanticAdvisor(accessReady).scopeDatos,restored:true
+  };
+  await reloadAuthenticated(page,auth,a);
+  await reopen(page,synthetic.id);
+  need(!(await page.locator('.eu-role[value="Operativo"]').isChecked()),'B1_PRE_ACCESS_ROLE_RESTORE_REFRESH');
+  need(!(await page.locator('.eu-pais[value="CO"]').isChecked()),'B1_PRE_ACCESS_COUNTRY_RESTORE_REFRESH');
+  need((await page.inputValue('#eu-scope'))==='propios','B1_PRE_ACCESS_SCOPE_RESTORE_REFRESH');
+
   const accessButton=page.locator('#eu-access-now');
   await accessButton.waitFor({state:'visible',timeout:8000});
   const accessClick=accessButton.click();
