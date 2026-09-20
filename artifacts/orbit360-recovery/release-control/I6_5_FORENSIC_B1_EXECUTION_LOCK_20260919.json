@@ -872,7 +872,7 @@
     }
   },
   "r8CumulativePatch": {
-    "status": "PRODUCT_AND_PROOF_READY_PENDING_SINGLE_BUILD_PREVIEW",
+    "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
     "fixes": [
       "TENANT_CANONICAL_ROLE_PERMISSION_MATRIX_SERVER_CONFIRMED",
       "MATRIX_CAN_EXPAND_OR_DENY_ROLE_MODULES_WITH_USER_RESTRICTIONS_DENY_FIRST",
@@ -887,6 +887,11 @@
     "livePromotion": false,
     "advanceToB2": false,
     "sourceSha": "f9c849d8c2316f673bd0a4a45039bc781a20c51c",
-    "proofFile": "tools/gravicentra-i6-5-b1-functional.mjs"
+    "proofFile": "tools/gravicentra-i6-5-b1-functional.mjs",
+    "previewSourceSha": "68fe78c31b01d7cbffbf189b266dec221e9e33a7",
+    "buildId": "gi-i65-b1-68fe78c31b01-57f234755dc1",
+    "runId": 35519356695,
+    "exactReadback": true,
+    "functionalPass": true
   }
 }
