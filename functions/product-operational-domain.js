@@ -84,11 +84,45 @@ function requestRef(tenantId, requestId) {
 function eventRef(tenantId, eventId) {
   return db.collection('tenants').doc(tenantId).collection('operationalEvents').doc(eventId);
 }
+function membershipScope(value) {
+  const scope = norm(value);
+  if (['propios','propio','own','mios'].includes(scope)) return 'propios';
+  if (['equipo','team'].includes(scope)) return 'equipo';
+  if (['todos','all','global'].includes(scope)) return 'todos';
+  if (['ninguno','none','sin_acceso','sinacceso'].includes(scope)) return 'ninguno';
+  return '';
+}
 function dataScopesForAdvisor(row) {
-  if (row.dataScopes && typeof row.dataScopes === 'object' && !Array.isArray(row.dataScopes)) return row.dataScopes;
-  const scope = text(row.scopeDatos || row.dataScope || 'propios', 40);
-  const domains = ['clientes','polizas','vehiculos','recibos','cartera','cobros','comisiones','gestiones','leads','workflow'];
-  return Object.fromEntries(domains.map(domain => [domain, scope]));
+  row = row || {};
+  const explicit = row.dataScopes;
+  const modules = {};
+  let explicitDefault = '';
+  const legacyScopes = [];
+  if (explicit && typeof explicit === 'object' && !Array.isArray(explicit)) {
+    explicitDefault = membershipScope(explicit.default || explicit['*']);
+    const explicitModules = explicit.modules && typeof explicit.modules === 'object' && !Array.isArray(explicit.modules)
+      ? explicit.modules
+      : null;
+    if (explicitModules) {
+      for (const [key,value] of Object.entries(explicitModules)) {
+        const scope = membershipScope(value), moduleKey = norm(key);
+        if (scope && moduleKey) modules[moduleKey] = scope;
+      }
+    } else {
+      for (const [key,value] of Object.entries(explicit)) {
+        if (['default','*','modules'].includes(key)) continue;
+        const scope = membershipScope(value), moduleKey = norm(key);
+        if (scope && moduleKey) {
+          modules[moduleKey] = scope;
+          legacyScopes.push(scope);
+        }
+      }
+    }
+  }
+  let scope = membershipScope(row.scopeDatos || row.dataScope) || explicitDefault;
+  if (!scope && legacyScopes.length && legacyScopes.every(value => value === legacyScopes[0])) scope = legacyScopes[0];
+  if (!scope) scope = 'propios';
+  return { default: scope, modules };
 }
 function membershipPatchFromAdvisor(row, current) {
   const roles = unique(row.roles && row.roles.length ? row.roles : [row.rolDefault || row.rol]);

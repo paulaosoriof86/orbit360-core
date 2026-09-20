@@ -117,28 +117,61 @@ function moduleList(value) {
   return unique(value).map((item) => normalized(item, 100)).filter(Boolean);
 }
 
+function canonicalScope(value) {
+  const scope = normalized(value, 30);
+  if (['propios', 'propio', 'own', 'mios'].includes(scope)) return 'propios';
+  if (['equipo', 'team'].includes(scope)) return 'equipo';
+  if (['todos', 'all', 'global'].includes(scope)) return 'todos';
+  if (['ninguno', 'none', 'sin_acceso', 'sinacceso'].includes(scope)) return 'ninguno';
+  return '';
+}
+
 function scopeMap(record, roles) {
-  const explicit = record && record.dataScopes;
+  record = record || {};
+  const explicit = record.dataScopes;
+  const modules = {};
+  let explicitDefault = '';
+  const legacyScopes = [];
+
   if (explicit && typeof explicit === 'object' && !Array.isArray(explicit)) {
-    const out = {};
-    for (const [key, value] of Object.entries(explicit)) {
-      const scope = normalized(value, 30);
-      if (VALID_SCOPES.has(scope)) out[normalized(key, 80)] = scope;
+    explicitDefault = canonicalScope(explicit.default || explicit['*']);
+    const explicitModules = explicit.modules && typeof explicit.modules === 'object' && !Array.isArray(explicit.modules)
+      ? explicit.modules
+      : null;
+    if (explicitModules) {
+      for (const [key, value] of Object.entries(explicitModules)) {
+        const scope = canonicalScope(value);
+        const moduleKey = normalized(key, 80);
+        if (scope && moduleKey) modules[moduleKey] = scope;
+      }
+    } else {
+      for (const [key, value] of Object.entries(explicit)) {
+        if (['default', '*', 'modules'].includes(key)) continue;
+        const scope = canonicalScope(value);
+        const moduleKey = normalized(key, 80);
+        if (scope && moduleKey) {
+          modules[moduleKey] = scope;
+          legacyScopes.push(scope);
+        }
+      }
     }
-    if (Object.keys(out).length) return out;
   }
-  let scope = normalized(record && (record.scopeDatos || record.dataScope), 30);
-  if (!VALID_SCOPES.has(scope)) {
+
+  let scope = canonicalScope(record.scopeDatos || record.dataScope) || explicitDefault;
+  if (!scope && legacyScopes.length && legacyScopes.every((value) => value === legacyScopes[0])) scope = legacyScopes[0];
+  if (!scope) {
     if (roles.includes('SuperAdmin') || roles.includes('AdminTenant') || roles.includes('Operativo')) scope = 'todos';
     else if (roles.includes('Asesor')) scope = 'propios';
     else scope = 'ninguno';
   }
-  const domains = ['clientes', 'polizas', 'vehiculos', 'recibos', 'cartera', 'cobros', 'comisiones', 'gestiones', 'leads'];
-  return Object.fromEntries(domains.map((domain) => [domain, scope]));
+  return { default: scope, modules };
 }
 
 function hasAllScope(scopes) {
-  return Object.values(scopes || {}).some((value) => normalized(value, 30) === 'todos');
+  scopes = scopes && typeof scopes === 'object' ? scopes : {};
+  if (canonicalScope(scopes.default || scopes['*']) === 'todos') return true;
+  return Object.values(scopes.modules && typeof scopes.modules === 'object' ? scopes.modules : {})
+    .some((value) => canonicalScope(value) === 'todos');
 }
 
 function sanitizeAdvisor(raw, advisorId) {
