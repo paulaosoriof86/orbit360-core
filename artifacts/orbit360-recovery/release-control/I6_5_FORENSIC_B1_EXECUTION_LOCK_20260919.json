@@ -161,7 +161,8 @@
     "parentHead": "a97a9d7d5c2bc9860480d816f23f4c7043d62161",
     "revision": 5,
     "livePromoted": false,
-    "rootCauseStatus": "DEMONSTRATED_PENDING_CUMULATIVE_PATCH"
+    "rootCauseStatus": "DEMONSTRATED_AND_PATCHED_PENDING_PREVIEW",
+    "sourceSha": "6fb85a6b8379cc38eeac00ed48f9a28714dbd230"
   },
   "candidatePreparedAt": "2026-09-19",
   "lastAttempt": {
@@ -605,5 +606,37 @@
     "noReimport": true,
     "noLivePromotion": true,
     "noB2": true
+  },
+  "r6CumulativePatch": {
+    "status": "PRODUCT_SOURCE_PATCHED_PENDING_BUILD_PREVIEW",
+    "sourceSha": "6fb85a6b8379cc38eeac00ed48f9a28714dbd230",
+    "files": [
+      {
+        "path": "orbit360-platform/index.html",
+        "blobSha": "0e6ee3f0adeeaf520aeebbf3ed14bfc22492dd2c"
+      },
+      {
+        "path": "orbit360-platform/styles/infra.css",
+        "blobSha": "35ae45ded9ab8da091869c5820705e53038f3b0e"
+      },
+      {
+        "path": "orbit360-platform/core/public-tenant-branding.js",
+        "blobSha": "495df818594b8bdb735e797072d764e098d3c019"
+      },
+      {
+        "path": "orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js",
+        "blobSha": "09db785be4b1432f4ba3d0c49c6dda2eb950cd69"
+      }
+    ],
+    "fixes": [
+      "AUTH_RESTORING_FROM_FIRST_PAINT",
+      "RESTORING_BACKGROUND_CSS_PARSE_FIX",
+      "LOGO_WRAPPER_CONTAIN_NO_CLIP",
+      "EQUIPO_STORE_REPAINT_FILTER"
+    ],
+    "dataWrites": 0,
+    "reimport": false,
+    "livePromotion": false,
+    "advanceToB2": false
   }
 }

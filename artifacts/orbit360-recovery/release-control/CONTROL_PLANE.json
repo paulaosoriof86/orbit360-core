@@ -713,7 +713,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B1_R3_ROOT_CAUSE",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B1_PREVIEW",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -1942,7 +1942,7 @@
     "addendumBlobSha": "05099a90cfb4862eec97e0359d55932828cb930b",
     "forensicAuditBlobSha": "fcfdf29c9eb851d76cebf67bcbe36d8ed308eb0f",
     "paymentInferenceBlobSha": "cfb026ded52c36083528de658a70191c8380d725",
-    "mechanismSyncStatus": "B1_ROOT_CAUSE_DEMONSTRATED_PRODUCT_PATCH_PENDING",
+    "mechanismSyncStatus": "B1_CANDIDATE_PENDING_PREVIEW",
     "guardFailureBeforeFix": {
       "runId": 35450692628,
       "code": "I6_5_NEXT_ACTION_INVALID",
@@ -1951,7 +1951,7 @@
       "livePromotion": false
     },
     "b1ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B1_EXECUTION_LOCK_20260919.json",
-    "b1ExecutionLockBlobSha": "7eece1c60714c0c20ca7e3ab17b04c3794ad1af0",
+    "b1ExecutionLockBlobSha": "ab35ca2de63868057984f123e2999e8beab2e90b",
     "b1": {
       "status": "CANDIDATE_PENDING_PREVIEW",
       "sourceSha": "122bc60bf74a99002a4a56baf544694e91e02f0d",
@@ -1983,7 +1983,7 @@
       ],
       "rootCauseRequiredBeforeSourceChange": true,
       "rootCauseDiagnosticLabel": "R6_DIRECTED_DIAGNOSTIC_UNDER_EXISTING_R3_ROOT_CAUSE_ACTION",
-      "rootCauseStatus": "DEMONSTRATED_PENDING_CUMULATIVE_PATCH",
+      "rootCauseStatus": "DEMONSTRATED_AND_PATCHED_PENDING_PREVIEW",
       "rootCauseEvidence": {
         "runId": 35497621514,
         "jobId": 106043531452,
@@ -1994,6 +1994,25 @@
         "orbit360-platform/styles/infra.css",
         "orbit360-platform/core/public-tenant-branding.js",
         "orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js"
+      ],
+      "candidateSourceSha": "6fb85a6b8379cc38eeac00ed48f9a28714dbd230",
+      "productPatchFiles": [
+        {
+          "path": "orbit360-platform/index.html",
+          "blobSha": "0e6ee3f0adeeaf520aeebbf3ed14bfc22492dd2c"
+        },
+        {
+          "path": "orbit360-platform/styles/infra.css",
+          "blobSha": "35ae45ded9ab8da091869c5820705e53038f3b0e"
+        },
+        {
+          "path": "orbit360-platform/core/public-tenant-branding.js",
+          "blobSha": "495df818594b8bdb735e797072d764e098d3c019"
+        },
+        {
+          "path": "orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js",
+          "blobSha": "09db785be4b1432f4ba3d0c49c6dda2eb950cd69"
+        }
       ]
     },
     "lastVisualRejection": {
