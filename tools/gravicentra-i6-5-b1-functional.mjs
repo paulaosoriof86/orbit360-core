@@ -500,7 +500,7 @@ try{
   await loginPage.goto(TARGET+'/?b1login='+Date.now(),{waitUntil:'domcontentloaded',timeout:30000});
   await loginPage.evaluate(()=>{
     window.__b1BootstrapEvents=[];
-    document.addEventListener('orbit:product-readonly-bootstrap',event=>{
+    window.addEventListener('orbit:product-readonly-bootstrap',event=>{
       try{window.__b1BootstrapEvents.push(JSON.parse(JSON.stringify(event.detail||{})));}catch(e){}
     });
   });
