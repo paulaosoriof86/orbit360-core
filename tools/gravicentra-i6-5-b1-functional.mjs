@@ -68,22 +68,25 @@ async function waitFor(fn,label,timeout=20000,interval=250){
 
 async function actor(db,auth){
   const snap=await db.collection('tenants').doc(TENANT).collection('members').get(),rows=[];
+  const managerRoles=new Set(['direccion','superadmin','super_admin','admintenant','admin_tenant','admin']);
   for(const d of snap.docs){
     const m=d.data()||{},st=norm(m.status||m.estado||'active');
     if(m.active===false||m.activo===false||['inactive','inactivo','blocked','bloqueado','suspended','suspendido'].includes(st))continue;
+    const rr=roles(m);
+    const active=norm(m.activeRole||m.defaultRole||m.rolDefault||m.rol||'');
+    const activeManager=managerRoles.has(active);
+    if(!activeManager)continue;
     const candidates=uniq([d.id,m.uid]);
     for(const uid of candidates){
       try{
         const u=await auth.getUser(uid);if(u.disabled)continue;
-        const rr=roles(m),manager=rr.some(r=>['direccion','superadmin','super_admin','admintenant','admin_tenant','admin'].includes(norm(r)));
-        rows.push({uid,score:(manager?100:0)+(u.emailVerified?5:0),roles:rr,email:u.email||''});
+        rows.push({uid,score:200+(u.emailVerified?5:0),roles:rr,activeRole:active,email:u.email||''});
         break;
       }catch{}
     }
   }
   rows.sort((a,b)=>b.score-a.score);
-  need(rows.length,'B1_NO_ACTIVE_ACTOR');
-  need(rows[0].score>=100,'B1_NO_MANAGER_ACTOR');
+  need(rows.length,'B1_NO_ACTIVE_MANAGER_ACTOR');
   return rows[0];
 }
 async function activate(page,auth,a){
@@ -155,6 +158,86 @@ async function canonical(db,id){
 }
 async function authByEmail(auth,email){
   try{return await auth.getUserByEmail(email);}catch(e){if(e?.code==='auth/user-not-found')return null;throw e;}
+}
+function asDate(value){
+  try{if(value&&typeof value.toDate==='function')return value.toDate();}catch{}
+  const d=value instanceof Date?value:new Date(String(value||''));
+  return Number.isFinite(d.getTime())?d:null;
+}
+async function proveVerifiedActiveCompatibility(db,auth,browser){
+  const tenant=db.collection('tenants').doc(TENANT);
+  const members=await tenant.collection('members').get();
+  const candidates=[];
+  for(const d of members.docs){
+    const m=d.data()||{},st=norm(m.status||m.estado||'active');
+    if(m.active===false||m.activo===false||['inactive','inactivo','blocked','bloqueado','suspended','suspendido'].includes(st))continue;
+    let u=null;try{u=await auth.getUser(clean(m.uid||d.id,180));}catch{}
+    if(!u||u.disabled||u.emailVerified!==true)continue;
+    const advisorId=clean(m.advisorId||m.asesorId,180);
+    const a=advisorId?await tenant.collection('data').doc('asesores').collection('items').doc(advisorId).get():null;
+    const ad=a&&a.exists?a.data()||{}:{};
+    const created=asDate(ad.createdAt||ad.fechaCreacion||m.createdAt);
+    candidates.push({
+      uid:u.uid,advisorId,activeRole:clean(m.activeRole||m.defaultRole||m.rolDefault||m.rol,100),
+      createdAt:created?created.toISOString():'',generation:created&&created>=new Date('2026-09-20T00:00:00Z')?'current-day':'preexisting'
+    });
+  }
+  need(candidates.length>=3,'B1_COMPAT_VERIFIED_ACTIVE_COHORT_TOO_SMALL:'+candidates.length);
+  need(candidates.some(x=>x.generation==='current-day'),'B1_COMPAT_CURRENT_MODULE_COHORT_MISSING');
+  need(candidates.some(x=>x.generation==='preexisting'),'B1_COMPAT_PREEXISTING_COHORT_MISSING');
+  const results=[];
+  for(const row of candidates){
+    const ctx=await browser.newContext({viewport:{width:1366,height:900}});
+    const pg=await ctx.newPage(),pageErrors=[];
+    pg.on('pageerror',e=>pageErrors.push(clean(e?.message||e,700)));
+    try{
+      await pg.goto(TARGET+'/?b1compat='+Date.now()+'#/inicio',{waitUntil:'domcontentloaded',timeout:30000});
+      await pg.waitForFunction(()=>!!window.Orbit?.productRuntimeBrowserProvidersP0&&!!window.Orbit?.productAppP0,null,{timeout:20000});
+      const tok=await auth.createCustomToken(row.uid,{b1GeneralCompatibility:true});
+      const state=await pg.evaluate(async token=>{
+        const p=Orbit.productRuntimeBrowserProvidersP0,c=await p.initialize();
+        await c.modules.auth.signInWithCustomToken(c.auth,token);
+        const app=await Orbit.productAppP0.activate();
+        const store=Orbit.store?._productStatus?.()||{};
+        const routes=[...document.querySelectorAll('#sidebar [data-route]')].map(x=>x.getAttribute('data-route'));
+        return{
+          started:app?.started===true||Orbit.productAppP0.status?.().started===true,
+          advisorId:String(Orbit.auth?.productUser?.advisorId||''),
+          activeRole:String(Orbit.auth?.productUser?.activeRole||''),
+          hash:location.hash,
+          storeReady:store.ready===true,
+          storeStatus:String(store.status||''),
+          requiredFailed:store.requiredFailed||[],
+          snapshotErrors:store.snapshotErrors||{},
+          visibleUnauthorized:routes.filter(route=>Orbit.access?.can?Orbit.access.can(route,'view')!==true:false)
+        };
+      },tok);
+      results.push({
+        uidHash:crypto.createHash('sha256').update(row.uid).digest('hex'),
+        advisorIdHash:crypto.createHash('sha256').update(row.advisorId).digest('hex'),
+        generation:row.generation,createdAt:row.createdAt,configuredActiveRole:row.activeRole,
+        runtimeActiveRole:state.activeRole,started:state.started,hash:state.hash,
+        storeReady:state.storeReady,storeStatus:state.storeStatus,
+        requiredFailed:state.requiredFailed,snapshotErrors:state.snapshotErrors,
+        unauthorizedVisibleCount:state.visibleUnauthorized.length,pageErrors
+      });
+      need(state.started===true&&state.storeReady===true&&state.storeStatus==='ready-read-only','B1_COMPAT_RUNTIME_START_FAILED:'+JSON.stringify(results[results.length-1]));
+      need(state.advisorId===row.advisorId,'B1_COMPAT_ADVISOR_BINDING_FAILED');
+      need(state.hash==='#/inicio','B1_COMPAT_START_ROUTE_FAILED:'+state.hash);
+      need((state.requiredFailed||[]).length===0&&Object.keys(state.snapshotErrors||{}).length===0,'B1_COMPAT_HYDRATION_ERRORS:'+JSON.stringify(results[results.length-1]));
+      need(state.visibleUnauthorized.length===0,'B1_COMPAT_UNAUTHORIZED_ROUTE_VISIBLE:'+JSON.stringify(state.visibleUnauthorized));
+      need(pageErrors.length===0,'B1_COMPAT_PAGE_ERRORS:'+JSON.stringify(pageErrors));
+    }finally{
+      await ctx.close().catch(()=>{});
+    }
+  }
+  return{
+    tested:results.length,
+    preexisting:results.filter(x=>x.generation==='preexisting').length,
+    currentDay:results.filter(x=>x.generation==='current-day').length,
+    allPass:results.every(x=>x.started&&x.storeReady&&x.requiredFailed.length===0&&x.unauthorizedVisibleCount===0&&x.pageErrors.length===0),
+    results
+  };
 }
 async function cleanupSynthetic({db,auth,id,email,uid}){
   const receipt={advisorDeleted:false,memberDeleted:false,authDeleted:false,auditDeleted:0,onboardingDeleted:0,onboardingAuditDeleted:0};
@@ -330,6 +413,14 @@ try{
   ev.team.hydration.canonicalFirestoreIds=canonicalSnap.docs.map(d=>d.id).sort();
   need(hydrated.rows.length===canonicalSnap.size,'B1_RUNTIME_CANONICAL_ADVISOR_COUNT_MISMATCH:'+JSON.stringify(ev.team.hydration));
   need(ev.team.hydration.canonicalFirestoreIds.every(id=>ev.team.hydration.runtimeIds.includes(id)),'B1_RUNTIME_CANONICAL_ADVISOR_IDS_MISMATCH:'+JSON.stringify(ev.team.hydration));
+
+  // General compatibility proof: every active + Firebase-verified membership must
+  // bootstrap under its own active role. This intentionally covers both
+  // pre-existing users and records created by the current Equipo module without
+  // naming, special-casing, or changing any real user's permissions/data.
+  ev.auth.generalCompatibility=await proveVerifiedActiveCompatibility(db,auth,browser);
+  need(ev.auth.generalCompatibility.allPass===true,'B1_GENERAL_COMPATIBILITY_FAILED');
+
   const incompleteRows=canonicalRows.filter(r=>{
     const q=semanticAdvisor(r);
     return !clean(r.authUid||r.uid||r.userId,180) && (!q.roles.length||!q.paises.length||!q.rolDefault||!q.paisDefault);
