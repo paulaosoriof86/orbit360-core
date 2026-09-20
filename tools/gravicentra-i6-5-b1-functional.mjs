@@ -416,6 +416,8 @@ try{
     return {restrict:(rows.find(x=>x.checked)||{}).id||'',extra:(rows.find(x=>!x.checked)||{}).id||''};
   });
   need(moduleChoice.restrict&&moduleChoice.extra&&moduleChoice.restrict!==moduleChoice.extra,'B1_MODULE_TEST_CHOICES_MISSING');
+  const modulesDetails=page.locator('#eu-mod-details');
+  if(!(await modulesDetails.evaluate(el=>el.open))) await modulesDetails.locator('summary').click();
   await page.locator('.eu-mod[value="'+moduleChoice.restrict+'"]').uncheck();
   await page.locator('.eu-mod[value="'+moduleChoice.extra+'"]').check();
 
