@@ -188,8 +188,11 @@ const sourceFiles=[
   'orbit360-platform/index.html',
   'orbit360-platform/core/public-tenant-branding.js',
   'orbit360-platform/core/tenant-access-policy-effective-p0.js',
+  'orbit360-platform/core/tenant-access-policy-product-p0.js',
+  'orbit360-platform/core/auth-product-runtime-p0.js',
   'orbit360-platform/data/store-firestore-product-readonly-p0.js',
   'orbit360-platform/modules/equipo.js',
+  'orbit360-platform/modules/equipo-credential-admin-v20260805-bridge.js',
   'orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js',
   'functions/tenant-branding.js',
   'functions/product-operational-domain.js',
@@ -225,6 +228,9 @@ try{
   need(!source['orbit360-platform/index.html'].includes(ev.branding.firestore.displayName)&&!source['orbit360-platform/core/public-tenant-branding.js'].includes(ev.branding.firestore.displayName),'B1_TENANT_LITERAL_IN_SOURCE');
   need(/canonicalDocumentId/.test(source['orbit360-platform/data/store-firestore-product-readonly-p0.js']),'B1_CANONICAL_DOCUMENT_ID_NOT_EXPOSED');
   need(/asesores:\s*\{\s*module:\s*'equipo'/.test(source['orbit360-platform/core/tenant-access-policy-effective-p0.js']),'B1_ADVISOR_QUERY_POLICY_MISSING');
+  need(source['orbit360-platform/core/tenant-access-policy-product-p0.js'].includes('TEAM_WITHOUT_BINDING_TO_OWN'),'B1_TEAM_SCOPE_SAFE_FALLBACK_MISSING');
+  need(source['orbit360-platform/core/auth-product-runtime-p0.js'].includes("location.hash='#/inicio'"),'B1_FRESH_LOGIN_ROUTE_NORMALIZATION_MISSING');
+  need(source['orbit360-platform/modules/equipo-credential-admin-v20260805-bridge.js'].includes('TEMP_PASSWORD_SERVER_CONFIRMATION_MISSING'),'B1_TEMP_PASSWORD_SERVER_CONFIRMATION_UI_MISSING');
   need(!/window\.prompt\(/.test(source['orbit360-platform/modules/equipo.js'])&&!/window\.prompt\(/.test(source['orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js']),'B1_NATIVE_PROMPT_SOURCE');
   need(!/\breturn\s+alert\s*\(/.test(source['orbit360-platform/modules/equipo.js'])&&!/\breturn\s+alert\s*\(/.test(source['orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js']),'B1_NATIVE_ALERT_SOURCE');
 
@@ -249,6 +255,9 @@ try{
       source:String(b.source||''),displayName:String(b.displayName||''),
       rect:r?{x:Math.round(r.x),y:Math.round(r.y),width:Math.round(r.width),height:Math.round(r.height)}:null,
       card:card?{x:Math.round(card.x),y:Math.round(card.y),width:Math.round(card.width),height:Math.round(card.height)}:null,
+      natural:img?{width:img.naturalWidth,height:img.naturalHeight,ratio:img.naturalWidth/(img.naturalHeight||1)}:null,
+      parent:img&&img.parentElement?{width:img.parentElement.getBoundingClientRect().width,height:img.parentElement.getBoundingClientRect().height,overflow:getComputedStyle(img.parentElement).overflow}:null,
+      renderedRatio:r?r.width/(r.height||1):0,
       objectFit:img?getComputedStyle(img).objectFit:'',objectPosition:img?getComputedStyle(img).objectPosition:'',
       loginText:String(document.getElementById('login')?.innerText||'')
     };
@@ -257,6 +266,8 @@ try{
   need(ev.branding.firstPaint.source==='build-snapshot','B1_FIRST_PAINT_NOT_BUILD_SNAPSHOT');
   need(ev.branding.firstPaint.rect?.width>0&&ev.branding.firstPaint.rect?.height>0,'B1_FIRST_PAINT_LOGO_MISSING');
   need(ev.branding.firstPaint.objectFit==='contain','B1_FIRST_PAINT_OBJECT_FIT');
+  need(Math.abs(ev.branding.firstPaint.renderedRatio-ev.branding.firstPaint.natural.ratio)<0.03,'B1_FIRST_PAINT_INTRINSIC_RATIO_MISMATCH:'+JSON.stringify(ev.branding.firstPaint));
+  need(ev.branding.firstPaint.parent.overflow!=='hidden'&&ev.branding.firstPaint.parent.height+1>=ev.branding.firstPaint.rect.height,'B1_FIRST_PAINT_LOGO_CLIPPED:'+JSON.stringify(ev.branding.firstPaint));
   need(!ev.branding.firstPaint.loginText.includes(ev.branding.firestore.displayName),'B1_VISIBLE_TENANT_TEXT_DUPLICATION');
 
   await page.waitForFunction(()=>!document.documentElement.hasAttribute('data-tenant-branding-loading'),null,{timeout:10000});
@@ -512,7 +523,7 @@ try{
   const loginContext=await browser.newContext({viewport:{width:1500,height:1000}});
   const loginPage=await loginContext.newPage();
   const loginErrors=[];loginPage.on('pageerror',e=>loginErrors.push(clean(e?.message||e)));
-  await loginPage.goto(TARGET+'/?b1login='+Date.now(),{waitUntil:'domcontentloaded',timeout:30000});
+  await loginPage.goto(TARGET+'/?b1login='+Date.now()+'#/equipo',{waitUntil:'domcontentloaded',timeout:30000});
   await loginPage.evaluate(()=>{
     window.__b1BootstrapEvents=[];
     window.__b1LastBootstrapStore=null;
@@ -606,10 +617,15 @@ try{
       user:{advisorId:String(Orbit.auth.productUser?.advisorId||''),roles:Orbit.auth.productUser?.roles||[],countries:Orbit.auth.productUser?.countries||[]},
       routes,
       unauthorizedVisible:routes.filter(route=>Orbit.access?.can?Orbit.access.can(route,'view')!==true:false),
-      extraCan:Orbit.access?.can?Orbit.access.can(extra,'view'):null
+      extraCan:Orbit.access?.can?Orbit.access.can(extra,'view'):null,
+      hash:location.hash,
+      headerBrand:(()=>{const img=document.querySelector('[data-company-brand-logo]'),r=img?.getBoundingClientRect(),p=img?.parentElement?.getBoundingClientRect?.();return img&&r?{naturalRatio:img.naturalWidth/(img.naturalHeight||1),renderedRatio:r.width/(r.height||1),width:r.width,height:r.height,parentWidth:p?.width||0,parentHeight:p?.height||0,parentOverflow:getComputedStyle(img.parentElement).overflow}:null;})()
     };
   },{extra:moduleChoice.extra});
   need(loginState.user.advisorId===synthetic.id,'B1_SYNTHETIC_LOGIN_ADVISOR');
+  need(loginState.hash==='#/inicio','B1_FRESH_LOGIN_DID_NOT_NORMALIZE_TO_INICIO:'+loginState.hash);
+  need(loginState.headerBrand&&Math.abs(loginState.headerBrand.renderedRatio-loginState.headerBrand.naturalRatio)<0.03,'B1_HEADER_BRAND_INTRINSIC_RATIO_MISMATCH:'+JSON.stringify(loginState.headerBrand));
+  need(loginState.headerBrand.parentOverflow!=='hidden'&&loginState.headerBrand.parentHeight+1>=loginState.headerBrand.height,'B1_HEADER_BRAND_CLIPPED:'+JSON.stringify(loginState.headerBrand));
   need(sameSet(loginState.user.roles,['Asesor']),'B1_SYNTHETIC_LOGIN_ROLE');
   need(sameSet(loginState.user.countries,['GT']),'B1_SYNTHETIC_LOGIN_COUNTRY');
   need(!loginState.routes.includes(moduleChoice.extra)&&loginState.extraCan===false,'B1_STANDARD_EXTRA_MODULE_VISIBLE_AFTER_LOGIN');

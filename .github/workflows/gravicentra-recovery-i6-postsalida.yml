@@ -2920,6 +2920,8 @@ jobs:
           node --check tools/gravicentra-i6-5-b1-functional.mjs
           node --check orbit360-platform/data/store-firestore-product-readonly-p0.js
           node --check orbit360-platform/core/tenant-access-policy-effective-p0.js
+          node --check orbit360-platform/core/tenant-access-policy-product-p0.js
+          node --check orbit360-platform/modules/equipo-credential-admin-v20260805-bridge.js
           node --check tools/gravicentra-i6-5-b1-advisor-normalize.mjs
           node --check tools/gravicentra-i6-5-b1-branding-snapshot.mjs
           node --check tools/gravicentra-i6-1-preview-package.mjs
