@@ -54,6 +54,8 @@ on:
       - 'tools/gravicentra-i6-5-b1-advisor-identity-readonly.mjs'
       - 'tools/gravicentra-i6-5-b1-equipo-runtime-readonly.mjs'
       - 'functions/tenant-branding.js'
+      - 'functions/user-onboarding.js'
+      - 'functions/product-operational-domain.js'
       - 'orbit360-platform/core/public-tenant-branding.js'
       - 'orbit360-platform/modules/configuracion.js'
       - 'orbit360-platform/modules/equipo.js'
@@ -2902,6 +2904,8 @@ jobs:
         run: |
           set -euo pipefail
           node --check functions/tenant-branding.js
+          node --check functions/user-onboarding.js
+          node --check functions/product-operational-domain.js
           (cd functions && npm run check >/dev/null)
           node --check orbit360-platform/core/public-tenant-branding.js
           node --check orbit360-platform/modules/configuracion.js
