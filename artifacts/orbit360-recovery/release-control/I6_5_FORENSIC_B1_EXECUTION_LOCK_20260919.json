@@ -28,7 +28,8 @@
     "orbit360-platform/core/tenant-access-policy-effective-p0.js",
     "orbit360-platform/data/store-firestore-product-readonly-p0.js",
     "functions/user-onboarding.js",
-    "functions/product-operational-domain.js"
+    "functions/product-operational-domain.js",
+    "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js"
   ],
   "backend": {
     "deployTargets": [
@@ -324,6 +325,18 @@
     "dataWritesAuthorized": false,
     "realUserAuthMutationAuthorized": false,
     "realUserMembershipMutationAuthorized": false,
+    "reimportAuthorized": false
+  },
+  "causalOwnerExtension20260919": {
+    "status": "PROVEN_AND_BOUND",
+    "classification": "CODE_DEFECT_PRODUCT_BOOTSTRAP_MEMBERSHIP_EFFECTIVE_MODULES",
+    "owner": "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js",
+    "proofRunId": 35486839150,
+    "proofJobId": 106014660144,
+    "observedFailure": "PRODUCT_READONLY_BOOTSTRAP_NOT_READY:snapshots_no_adjuntos",
+    "requiredFix": "Materialize membership.modulesVisible from effectiveModules before product bootstrap planning/attach.",
+    "livePromotionAuthorized": false,
+    "dataMutationAuthorized": false,
     "reimportAuthorized": false
   }
 }

@@ -1942,7 +1942,7 @@
     "addendumBlobSha": "05099a90cfb4862eec97e0359d55932828cb930b",
     "forensicAuditBlobSha": "fcfdf29c9eb851d76cebf67bcbe36d8ed308eb0f",
     "paymentInferenceBlobSha": "cfb026ded52c36083528de658a70191c8380d725",
-    "mechanismSyncStatus": "B1_R3_ADVISOR_DIRECTORY_COUNTRY_FILTER_ROOT_CAUSE_CORRECTED",
+    "mechanismSyncStatus": "B1_R3_MEMBERSHIP_VISIBLE_MODULES_OWNER_BOUND",
     "guardFailureBeforeFix": {
       "runId": 35450692628,
       "code": "I6_5_NEXT_ACTION_INVALID",
@@ -1951,7 +1951,7 @@
       "livePromotion": false
     },
     "b1ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B1_EXECUTION_LOCK_20260919.json",
-    "b1ExecutionLockBlobSha": "352e00d9d3ed36ce06f5ba993cb7f0d1dae465f8",
+    "b1ExecutionLockBlobSha": "65a0f26cd207bc06546bfe230b71210a567cf557",
     "b1": {
       "status": "CANDIDATE_PENDING_PREVIEW",
       "sourceSha": "e2cad9e8872267a24a41af9dfee765a49a33f673",
@@ -1995,6 +1995,16 @@
           "functions/product-operational-domain.js"
         ],
         "fixScope": "CANONICALIZE_MEMBERSHIP_DATASCOPES_SCHEMA_ONLY",
+        "livePromoted": false
+      },
+      "membershipVisibleModulesRootCause": {
+        "status": "PROVEN",
+        "classification": "CODE_DEFECT_PRODUCT_BOOTSTRAP_MEMBERSHIP_EFFECTIVE_MODULES",
+        "proofRunId": 35486839150,
+        "proofJobId": 106014660144,
+        "owner": "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js",
+        "observedFailure": "PRODUCT_READONLY_BOOTSTRAP_NOT_READY:snapshots_no_adjuntos",
+        "fixScope": "MATERIALIZE_EFFECTIVE_MEMBERSHIP_MODULES_ONLY",
         "livePromoted": false
       }
     }
