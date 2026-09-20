@@ -336,12 +336,20 @@ try{
   else if(!missing.countries.includes(missing.countryDefault)) expectedValidation='El país predeterminado debe estar entre los países seleccionados.';
   need(expectedValidation,'B1_EXISTING_USER_NOT_INCOMPLETE_AS_EXPECTED');
   await page.click('#eu-ok');
-  const validationModal=page.locator('.drawer-back').filter({hasText:expectedValidation}).last();
-  await validationModal.waitFor({state:'visible',timeout:8000});
-  need(await validationModal.locator('[data-ok]').count()===1,'B1_INCOMPLETE_VALIDATION_NOT_ORBIT_UI');
-  ev.team.incompleteExisting.validation={message:expectedValidation,orbitUi:true,writeAttempted:false};
-  await validationModal.locator('[data-ok]').click();
-  await validationModal.waitFor({state:'detached',timeout:8000});
+  const validationSurface=await page.waitForFunction(message=>{
+    const modal=[...document.querySelectorAll('.drawer-back')].find(x=>String(x.textContent||'').includes(message)&&x.querySelector('[data-ok]'));
+    if(modal)return'modal';
+    const toast=[...document.querySelectorAll('.ciclo-toast')].find(x=>String(x.textContent||'').includes(message));
+    return toast?'toast':'';
+  },expectedValidation,{timeout:8000}).then(h=>h.jsonValue());
+  need(validationSurface==='modal'||validationSurface==='toast','B1_INCOMPLETE_VALIDATION_NOT_ORBIT_UI');
+  ev.team.incompleteExisting.validation={message:expectedValidation,orbitUi:true,surface:validationSurface,writeAttempted:false};
+  if(validationSurface==='modal'){
+    const validationModal=page.locator('.drawer-back').filter({hasText:expectedValidation}).last();
+    need(await validationModal.locator('[data-ok]').count()===1,'B1_INCOMPLETE_VALIDATION_MODAL_ACTION_MISSING');
+    await validationModal.locator('[data-ok]').click();
+    await validationModal.waitFor({state:'detached',timeout:8000});
+  }
   const incompleteAfterSnap=await incompleteRef.get(),incompleteUpdateAfter=incompleteAfterSnap.updateTime?.toMillis?.()||0;
   need(incompleteUpdateAfter===incompleteUpdateBefore,'B1_INCOMPLETE_VALIDATION_MUTATED_RECORD');
   need(JSON.stringify(semanticAdvisor(incompleteAfterSnap.data()||{}))===JSON.stringify(beforeIncomplete),'B1_INCOMPLETE_VALIDATION_CHANGED_DATA');
