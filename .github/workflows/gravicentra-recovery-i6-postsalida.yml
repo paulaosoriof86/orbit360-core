@@ -3152,7 +3152,9 @@ jobs:
           node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
           node - <<'NODE'
           const fs=require('node:fs'),c=JSON.parse(fs.readFileSync(process.env.CONTROL)),b=JSON.parse(fs.readFileSync(process.env.B1_LOCK));
-          const run=b.status==='VISUAL_REJECTED_R2_ROOT_CAUSE_REQUIRED'&&c.nextAction==='I6_5_FORENSIC_REMEDIATION_B1_R3_ROOT_CAUSE'&&c.i65ForensicRemediationPlan?.currentBlock==='B1';
+          const rootCause=b.status==='VISUAL_REJECTED_R2_ROOT_CAUSE_REQUIRED'&&c.nextAction==='I6_5_FORENSIC_REMEDIATION_B1_R3_ROOT_CAUSE';
+          const candidate=b.status==='CANDIDATE_PENDING_PREVIEW'&&c.nextAction==='I6_5_FORENSIC_REMEDIATION_B1_PREVIEW';
+          const run=(rootCause||candidate)&&c.i65ForensicRemediationPlan?.currentBlock==='B1';
           if(run&&(c.i6Execution?.dataMutationAuthorized!==false||b.boundaries?.liveHostingPromotionAuthorized!==false))throw Error('B1_R3_RUNTIME_READONLY_BOUNDARY_INVALID');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(run?'true':'false')+'\n');
           NODE
