@@ -215,9 +215,11 @@
     catch (error) { toast(Orbit.userOnboarding.message(error)); }
   });
 
-  document.addEventListener('orbit:store', () => {
+  document.addEventListener('orbit:store', event => {
+    const collection = text(event && event.detail && event.detail.collection);
+    if (!collection || (collection !== 'asesores' && collection !== '*')) return;
     const host = document.getElementById('host') || document.getElementById('mod-host');
     if (host) decorateTable(host);
   });
-  window.Orbit.equipoOnboardingBridgeV20260804=Object.freeze({VERSION:'20260919.b1r2',loaded:true,identityAgnostic:true,backendOwned:true,noHardcodedIdentities:true});
+  window.Orbit.equipoOnboardingBridgeV20260804=Object.freeze({VERSION:'20260920.b1r6',loaded:true,identityAgnostic:true,backendOwned:true,noHardcodedIdentities:true});
 })();

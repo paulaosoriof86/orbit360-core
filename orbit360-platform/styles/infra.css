@@ -4,7 +4,17 @@
    ============================================================ */
 
 /* ---------- PRE-AUTH (oculta el shell tras el login) ---------- */
-body.pre-auth #shell, body.pre-auth .topbar{visibility:hidden;pointer-events:none;}\nhtml[data-auth-restoring="1"] body{background:var(--surface);}
+body.pre-auth #shell, body.pre-auth .topbar{visibility:hidden;pointer-events:none;}
+html[data-auth-restoring="1"] body{background:var(--surface);}
+#auth-restoring{display:none;position:fixed;inset:0;z-index:300;align-items:center;justify-content:center;background:var(--surface);color:var(--ink)}
+html[data-auth-restoring="1"] #auth-restoring{display:flex}
+html[data-auth-restoring="1"] #login,
+html[data-auth-restoring="1"] #shell,
+html[data-auth-restoring="1"] .topbar{visibility:hidden!important;pointer-events:none!important}
+.auth-restoring-card{display:flex;align-items:center;gap:12px;padding:14px 18px;border:1px solid var(--line);border-radius:14px;background:var(--card);box-shadow:var(--sh-1);font-family:var(--f-display)}
+.auth-restoring-card b{display:block;font-size:14px;color:var(--ink)}
+.auth-restoring-card small{display:block;margin-top:2px;font-family:var(--f-text);font-size:12px;color:var(--ink-3)}
+.auth-restoring-mark{width:18px;height:18px;border-radius:50%;flex:0 0 auto;background:radial-gradient(circle at 32% 30%,#e8364c 0%,var(--red) 42%,var(--red-700) 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.35)}
 #login{position:fixed;inset:0;z-index:200;display:flex;background:var(--surface);transition:opacity .45s ease, visibility .45s}
 #login.hidden{opacity:0;visibility:hidden;pointer-events:none}
 
