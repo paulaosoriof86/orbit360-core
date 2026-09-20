@@ -500,9 +500,18 @@ try{
   await loginPage.goto(TARGET+'/?b1login='+Date.now(),{waitUntil:'domcontentloaded',timeout:30000});
   await loginPage.evaluate(()=>{
     window.__b1BootstrapEvents=[];
+    window.__b1LastBootstrapStore=null;
     window.addEventListener('orbit:product-readonly-bootstrap',event=>{
       try{window.__b1BootstrapEvents.push(JSON.parse(JSON.stringify(event.detail||{})));}catch(e){}
     });
+    const originalFactory=window.Orbit?.createFirestoreProductReadOnlyStoreP0;
+    if(typeof originalFactory==='function'){
+      window.Orbit.createFirestoreProductReadOnlyStoreP0=function(){
+        const store=originalFactory.apply(this,arguments);
+        window.__b1LastBootstrapStore=store;
+        return store;
+      };
+    }
   });
   await loginPage.fill('#lg-user',synthetic.email);
   await loginPage.fill('#lg-pass',syntheticPassword);
@@ -536,6 +545,19 @@ try{
         storeStatus:window.Orbit?.store?._productStatus?.()||null,
         providerState,
         bootstrapEvents:Array.isArray(window.__b1BootstrapEvents)?window.__b1BootstrapEvents.slice(-12):[],
+        bootstrapStoreStatus:(()=>{
+          try{
+            const s=window.__b1LastBootstrapStore?._productStatus?.()||null;
+            if(!s)return null;
+            return{
+              status:s.status||'',
+              deniedCollections:s.deniedCollections||[],
+              snapshotErrors:s.snapshotErrors||{},
+              requiredStartupCollections:s.requiredStartupCollections||[],
+              queryPlans:s.queryPlans||{}
+            };
+          }catch(e){return{diagnosticError:String(e?.message||e)};}
+        })(),
         hash:location.hash
       };
     }).catch(e=>({diagnosticError:String(e?.message||e)}));
