@@ -322,7 +322,6 @@ try{
 
   await acceptLegalGate(page,3000);
   await renderEquipo(page);
-  await acceptLegalGate(page,3000);
   await page.click('#eq-add');
   await page.waitForSelector('#eq-edit #eu-ok',{timeout:10000});
   await page.waitForSelector('#eu-access-panel',{timeout:5000}).catch(()=>{});
