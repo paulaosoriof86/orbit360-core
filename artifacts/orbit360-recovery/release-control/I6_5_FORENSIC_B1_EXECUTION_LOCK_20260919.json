@@ -169,8 +169,8 @@
     "parentHead": "a97a9d7d5c2bc9860480d816f23f4c7043d62161",
     "revision": 5,
     "livePromoted": false,
-    "rootCauseStatus": "R8_DEMONSTRATED_PENDING_CUMULATIVE_PATCH",
-    "sourceSha": "9b34f47c099b0d8af8de130a2b7b7a5d3b514bc5",
+    "rootCauseStatus": "R8_DEMONSTRATED_AND_PATCHED_PENDING_PREVIEW",
+    "sourceSha": "f9c849d8c2316f673bd0a4a45039bc781a20c51c",
     "proofHeadSha": "1fb3f12184bbadd47cf8f9668cc6172a656029ef"
   },
   "candidatePreparedAt": "2026-09-19",
@@ -872,7 +872,7 @@
     }
   },
   "r8CumulativePatch": {
-    "status": "SOURCE_PATCHED_PENDING_PROOF",
+    "status": "PRODUCT_AND_PROOF_READY_PENDING_SINGLE_BUILD_PREVIEW",
     "fixes": [
       "TENANT_CANONICAL_ROLE_PERMISSION_MATRIX_SERVER_CONFIRMED",
       "MATRIX_CAN_EXPAND_OR_DENY_ROLE_MODULES_WITH_USER_RESTRICTIONS_DENY_FIRST",
@@ -885,6 +885,8 @@
     "dataReimport": false,
     "operationalDataWrites": 0,
     "livePromotion": false,
-    "advanceToB2": false
+    "advanceToB2": false,
+    "sourceSha": "f9c849d8c2316f673bd0a4a45039bc781a20c51c",
+    "proofFile": "tools/gravicentra-i6-5-b1-functional.mjs"
   }
 }
