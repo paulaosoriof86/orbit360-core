@@ -713,7 +713,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B1_VISUAL",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B1_PREVIEW",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -1942,7 +1942,7 @@
     "addendumBlobSha": "05099a90cfb4862eec97e0359d55932828cb930b",
     "forensicAuditBlobSha": "fcfdf29c9eb851d76cebf67bcbe36d8ed308eb0f",
     "paymentInferenceBlobSha": "cfb026ded52c36083528de658a70191c8380d725",
-    "mechanismSyncStatus": "B1_R3_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+    "mechanismSyncStatus": "B1_R3_VISUAL_CLEANUP_PENDING_PREVIEW",
     "guardFailureBeforeFix": {
       "runId": 35450692628,
       "code": "I6_5_NEXT_ACTION_INVALID",
@@ -1951,9 +1951,9 @@
       "livePromotion": false
     },
     "b1ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B1_EXECUTION_LOCK_20260919.json",
-    "b1ExecutionLockBlobSha": "ad212a2a264f46e16b98f7dc13cabe2d63ea32b1",
+    "b1ExecutionLockBlobSha": "58b0c2e087f0689a9baaecd3c3ac834bd01eea55",
     "b1": {
-      "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+      "status": "CANDIDATE_PENDING_PREVIEW",
       "sourceSha": "539df6238c16b99f540fbf30c4b534be572114b4",
       "buildId": "gi-i65-b1-539df6238c16-57f234755dc1",
       "previewUrl": "https://ays-orbit-360-lab--gi-i65-b1-35455766715-ylc10xr5.web.app",
@@ -2010,7 +2010,21 @@
       "authSyntheticWrites": 2,
       "membershipSyntheticWrites": 1,
       "syntheticCleanupWrites": 11,
-      "syntheticFinalAbsent": true
+      "syntheticFinalAbsent": true,
+      "visualFixR3": {
+        "status": "CONFIRMED_AND_PATCHED_PENDING_PREVIEW",
+        "findings": [
+          "B1R3_DUPLICATE_TENANT_LOGO",
+          "B1R3_THEME_HINT_RESIDUE"
+        ],
+        "productFiles": [
+          "orbit360-platform/index.html",
+          "orbit360-platform/core/public-tenant-branding.js"
+        ],
+        "noBackendFunctionalChange": true,
+        "noDataMutation": true,
+        "livePromoted": false
+      }
     }
   }
 }

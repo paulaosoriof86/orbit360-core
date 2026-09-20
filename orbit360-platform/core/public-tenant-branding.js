@@ -18,9 +18,9 @@
     document.documentElement.setAttribute('data-tenant-public-brand',companyId());
     document.documentElement.setAttribute('data-tenant-branding-ready','1');
     var bottom=document.querySelector('.lf-logoslot'),slot=bottom&&bottom.querySelector('.slot'),name=bottom&&bottom.querySelector('.lf-cn');
-    if(bottom)bottom.style.cssText='visibility:hidden;min-height:72px;display:flex;align-items:center;justify-content:center;padding:12px 18px;overflow:hidden';
-    if(slot){slot.innerHTML='';slot.style.cssText='width:min(250px,70vw);height:48px;display:grid;place-items:center;overflow:hidden;border:0;background:transparent';if(b.logo)slot.appendChild(img(b.logo,'data-company-brand-logo','width:100%;height:100%;object-fit:contain;object-position:center;display:block'));}
-    if(name){name.textContent='';name.style.display='none';}show(bottom);
+    if(slot)slot.innerHTML='';
+    if(name){name.textContent='';name.style.display='none';}
+    if(bottom)bottom.style.cssText='display:none!important;visibility:hidden!important';
     var top=document.querySelector('.tb-logo'),topSlot=document.getElementById('client-logo'),topName=top&&top.querySelector('.cn');
     if(top)top.style.cssText='visibility:hidden;display:flex;align-items:center;justify-content:center;gap:0;min-width:150px;max-width:190px;height:44px;overflow:hidden';
     if(topSlot){topSlot.innerHTML='';topSlot.style.cssText='width:170px;height:38px;display:grid;place-items:center;overflow:hidden;border:0;background:transparent';if(b.logo)topSlot.appendChild(img(b.logo,'data-company-brand-logo','width:100%;height:100%;object-fit:contain;object-position:center;display:block'));}

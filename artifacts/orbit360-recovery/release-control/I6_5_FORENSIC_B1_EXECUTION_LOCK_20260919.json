@@ -1,6 +1,6 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B1_EXECUTION_LOCK_V1",
-  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+  "status": "CANDIDATE_PENDING_PREVIEW",
   "date": "2026-09-19",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -193,7 +193,8 @@
     "artifactDigest": "e8ba91aa1209c99184c456fffee4e04866f20a6eed632c68dbd85d54b6729e0a",
     "exactReadback": true,
     "functionalPass": true,
-    "livePromoted": false
+    "livePromoted": false,
+    "supersededByVisualFix": true
   },
   "r2TechnicalResolution": {
     "status": "PASS_PENDING_PAULA_VISUAL",
@@ -208,8 +209,8 @@
     "operationalWrites": 0
   },
   "visualReview": {
-    "status": "REJECTED",
-    "reviewedAt": "2026-09-19T16:27:00-06:00",
+    "status": "REJECTED_R3_VISUAL_CLEANUP_REQUIRED",
+    "reviewedAt": "2026-09-19T22:15:00-06:00",
     "evidence": "Paula screenshots in continuation chat",
     "findings": [
       {
@@ -244,6 +245,18 @@
         "rootCauseStatus": "CONFIRMED",
         "rootCause": "The technical B1 proof declared PASS after endpoint reachability and zero operational writes; it never executed the exact user edit/save transaction that Paula was asked to validate.",
         "requiredFix": "B1 cannot pass again until an authenticated controlled edit performs server commit + canonical readback + refresh persistence on a real test record, with cleanup or idempotent restoration."
+      },
+      {
+        "id": "B1R3_DUPLICATE_TENANT_LOGO",
+        "status": "CONFIRMED",
+        "rootCause": "public-tenant-branding painted tenant logo in both login card and left footer slot.",
+        "requiredFix": "Keep one tenant logo in login card; hide legacy left footer tenant slot."
+      },
+      {
+        "id": "B1R3_THEME_HINT_RESIDUE",
+        "status": "CONFIRMED",
+        "rootCause": "legacy lg-themehint remained in canonical index and rendered Paleta: without useful control.",
+        "requiredFix": "Remove legacy pre-auth theme hint from canonical index."
       }
     ]
   },
@@ -350,5 +363,6 @@
     "exactReadback": true,
     "syntheticFinalAbsent": true,
     "livePromotionAuthorized": false
-  }
+  },
+  "visualAccepted": false
 }
