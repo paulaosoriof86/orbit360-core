@@ -35,7 +35,12 @@
     "orbit360-platform/core/user-onboarding.js",
     "orbit360-platform/styles/infra.css",
     "orbit360-platform/core/tenant-access-policy-product-p0.js",
-    "orbit360-platform/modules/equipo-credential-admin-v20260805-bridge.js"
+    "orbit360-platform/modules/equipo-credential-admin-v20260805-bridge.js",
+    "orbit360-platform/core/access-role-session-owner-v20260728.js",
+    "orbit360-platform/core/access-scope.js",
+    "orbit360-platform/core/router.js",
+    "orbit360-platform/core/tenant-domain-config-client.js",
+    "functions/tenant-domain-config.js"
   ],
   "backend": {
     "deployTargets": [
@@ -163,7 +168,7 @@
     "parentHead": "a97a9d7d5c2bc9860480d816f23f4c7043d62161",
     "revision": 5,
     "livePromoted": false,
-    "rootCauseStatus": "R8_VISUAL_REJECTED_DIRECTED_DIAGNOSTIC_ACTIVE",
+    "rootCauseStatus": "R8_DEMONSTRATED_PENDING_CUMULATIVE_PATCH",
     "sourceSha": "9b34f47c099b0d8af8de130a2b7b7a5d3b514bc5",
     "proofHeadSha": "1fb3f12184bbadd47cf8f9668cc6172a656029ef"
   },
@@ -809,6 +814,60 @@
       "resolvedBy": "TENANT_ADMIN_SELF_SERVICE_BRANDING_UPLOAD",
       "preserveCurrentCanonicalBranding": true,
       "sourcePatchForbiddenForR8": true
+    }
+  },
+  "r8DirectedRootCause": {
+    "status": "ROOT_CAUSE_DEMONSTRATED_PENDING_CUMULATIVE_PATCH",
+    "evidence": {
+      "runId": 35502777213,
+      "jobId": 106057420952,
+      "writes": 0
+    },
+    "causes": {
+      "rolePermissionMatrix": "Equipo persists role matrix in Orbit.cat/localStorage only; access runtime canSee/puedeVerModulo uses static Orbit.ROLES before matrix evaluation, so matrix cannot expand modules such as cotizador/comparativo for Operativo and is not tenant-canonical.",
+      "activeRoleDataScope": "Active role switch is stored correctly, and access-scope computes role ceilings, but normal router/module renders use raw Orbit.store rather than scopedStore/withScope. Therefore changing to Asesor does not constrain module datasets.",
+      "teamVisibilityAdministration": "Runtime can derive team visibility from teamId/teamAdvisorIds/supervisorId, but canonical tenant currently has no team relation bindings and Equipo exposes no administration for them.",
+      "emailDelivery": "Firebase Auth uses DEFAULT sender with no tenant SMTP/provider and exposes no delivery receipt. UI cannot truthfully equate API acceptance with inbox delivery; latest Fernando action lacks canonical delivery proof."
+    },
+    "approvedGeneralSemantics": {
+      "noUserSpecificBranching": true,
+      "roleMatrix": "Canonical tenant permission matrix governs module visibility for the currently selected assigned role; individual restrictions remain deny-first.",
+      "multiRole": "Selected active/view role determines the effective data ceiling. Asesor must be own even when another assigned role has broader reach.",
+      "teamScope": "Team visibility is explicit and administrable; absent relation fails closed to own, never all.",
+      "branding": "PRESERVE_CURRENT_CANONICAL_REUPLOAD_NO_SOURCE_PATCH"
+    },
+    "owners": [
+      "orbit360-platform/core/access-role-session-owner-v20260728.js",
+      "orbit360-platform/core/access-scope.js",
+      "orbit360-platform/core/router.js",
+      "orbit360-platform/core/tenant-domain-config-client.js",
+      "functions/tenant-domain-config.js"
+    ],
+    "boundaries": {
+      "dataMutationAuthorized": false,
+      "realUserAuthMutationAuthorized": false,
+      "reimportAuthorized": false,
+      "livePromotionAuthorized": false,
+      "advanceToB2Authorized": false
+    }
+  },
+  "causalOwnerExtensionR8": {
+    "status": "PROVEN_AND_BOUND",
+    "owners": [
+      "orbit360-platform/core/access-role-session-owner-v20260728.js",
+      "orbit360-platform/core/access-scope.js",
+      "orbit360-platform/core/router.js",
+      "orbit360-platform/core/tenant-domain-config-client.js",
+      "functions/tenant-domain-config.js"
+    ],
+    "evidenceRunId": 35502777213,
+    "evidenceJobId": 106057420952,
+    "boundaries": {
+      "dataMutationAuthorized": false,
+      "realUserAuthMutationAuthorized": false,
+      "reimportAuthorized": false,
+      "livePromotionAuthorized": false,
+      "advanceToB2Authorized": false
     }
   }
 }
