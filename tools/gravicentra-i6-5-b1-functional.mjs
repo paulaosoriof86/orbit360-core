@@ -1,3 +1,4 @@
+// B1 trace: validates effective membership modules materialized by product bootstrap.
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
