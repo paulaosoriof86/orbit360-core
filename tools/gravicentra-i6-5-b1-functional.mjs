@@ -1,3 +1,4 @@
+// B1 governance trace: effective membership bootstrap owner bound in lock/control/guard.
 // B1 trigger: contents-api push for causal product validation.
 // B1 trace: validates effective membership modules materialized by product bootstrap.
 import fs from 'node:fs';
