@@ -1,6 +1,6 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B1_EXECUTION_LOCK_V1",
-  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+  "status": "CANDIDATE_PENDING_PREVIEW",
   "date": "2026-09-19",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -161,7 +161,7 @@
     "parentHead": "a97a9d7d5c2bc9860480d816f23f4c7043d62161",
     "revision": 5,
     "livePromoted": false,
-    "rootCauseStatus": "CONFIRMED_R5_VISUAL_REJECTION"
+    "rootCauseStatus": "R6_DIRECTED_ROOT_CAUSE_DIAGNOSTIC_REQUIRED"
   },
   "candidatePreparedAt": "2026-09-19",
   "lastAttempt": {
@@ -449,7 +449,7 @@
     "reimportAuthorized": false
   },
   "r5DefinitiveRemediation": {
-    "status": "PATCHED_PENDING_PREVIEW",
+    "status": "VISUAL_REJECTED_PENDING_ROOT_CAUSE_DIAGNOSTIC",
     "noReimport": true,
     "livePromoted": false,
     "boundedDataRepair": "ACCESS_METADATA_FOR_ACTIVE_MEMBERSHIP_ROWS_PLUS_ORPHAN_B1_SYNTHETIC_QA_DELETE_ONLY",
@@ -461,5 +461,36 @@
       "SYNTHETIC_ORPHANS_ABSENT",
       "LOGO_INTRINSIC_FIT"
     ]
+  },
+  "visualRejection20260920": {
+    "status": "FORMALLY_RECORDED",
+    "recordedAt": "2026-09-20T01:30:00-06:00",
+    "reviewedPreview": {
+      "sourceSha": "122bc60bf74a99002a4a56baf544694e91e02f0d",
+      "runId": 35496130125,
+      "artifactId": 10600660869,
+      "buildId": "gi-i65-b1-122bc60bf74a-57f234755dc1",
+      "digest": "38154482c4f47f5b17878188fb873a276ea8ac22f2be9e425d66ce135a05ca91"
+    },
+    "findings": [
+      "LOGO_RATIO_VISUAL_REJECTED",
+      "REAL_PAULA_REFRESH_SESSION_LOSS",
+      "STARTUP_TRANSIENT_BLACK_OR_EMPTY_SHELL",
+      "MULTI_STAGE_VISIBLE_RENDER"
+    ],
+    "preserveVisualPasses": [
+      "TEAM_7_CANONICAL_USERS",
+      "TEAM_EDIT_SAVE_PAULA",
+      "TEAM_EDIT_SAVE_SAMUEL",
+      "TEAM_EDIT_SAVE_FERNANDO",
+      "TEAM_DELETE_ACTION_VISIBLE",
+      "TEAM_AUDIT_HISTORY_VISIBLE",
+      "TEAM_ACCESS_STATUS_SEMANTICS_CORRECT"
+    ],
+    "requiredNext": "DIRECTED_ROOT_CAUSE_DIAGNOSTIC_BEFORE_PRODUCT_SOURCE_CHANGE",
+    "productionMutationAuthorized": false,
+    "dataMutationAuthorized": false,
+    "reimportAuthorized": false,
+    "advanceToB2Authorized": false
   }
 }
