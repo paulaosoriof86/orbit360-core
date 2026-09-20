@@ -1951,7 +1951,7 @@
       "livePromotion": false
     },
     "b1ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B1_EXECUTION_LOCK_20260919.json",
-    "b1ExecutionLockBlobSha": "1a9d6822b58a03ce4c84d946ce50af2d25b4d68e",
+    "b1ExecutionLockBlobSha": "07c7b8b584b66c8a9d034cead8e2d7d845dfb504",
     "b1": {
       "status": "CANDIDATE_PENDING_PREVIEW",
       "sourceSha": "2627d78a75f5c40e0851a5015d16594dcbd498ba",
@@ -1989,6 +1989,10 @@
         "functions/user-onboarding.js",
         "orbit360-platform/modules/equipo-credential-admin-v20260805-bridge.js",
         "orbit360-platform/index.html"
+      ],
+      "allowedProductFilesR7": [
+        "orbit360-platform/core/tenant-access-policy-product-p0.js",
+        "orbit360-platform/modules/equipo-credential-admin-v20260805-bridge.js"
       ]
     },
     "lastVisualRejection": {

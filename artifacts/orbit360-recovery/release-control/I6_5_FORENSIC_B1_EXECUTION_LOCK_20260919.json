@@ -33,7 +33,9 @@
     "orbit360-platform/product-runtime-config.js",
     "orbit360-platform/core/product-hydration-required-optional-p0.js",
     "orbit360-platform/core/user-onboarding.js",
-    "orbit360-platform/styles/infra.css"
+    "orbit360-platform/styles/infra.css",
+    "orbit360-platform/core/tenant-access-policy-product-p0.js",
+    "orbit360-platform/modules/equipo-credential-admin-v20260805-bridge.js"
   ],
   "backend": {
     "deployTargets": [
@@ -723,5 +725,24 @@
     "noOperationalDataReimport": true,
     "noLivePromotion": true,
     "noB2": true
+  },
+  "causalOwnerExtensionR7": {
+    "status": "PROVEN_AND_BOUND",
+    "evidenceRunId": 35499941482,
+    "evidenceJobId": 106049797658,
+    "owners": [
+      "orbit360-platform/core/tenant-access-policy-product-p0.js",
+      "orbit360-platform/modules/equipo-credential-admin-v20260805-bridge.js"
+    ],
+    "causes": [
+      "TEAM_SCOPE_WITH_EMPTY_TEAM_ID_BREAKS_REQUIRED_QUERY_ATTACH",
+      "TEMP_PASSWORD_ADMIN_UI_LACKS_EXPLICIT_SERVER_CONFIRMED_RESULT_AND_DEDICATED_RESET_RESEND"
+    ],
+    "boundaries": {
+      "dataMutationAuthorized": false,
+      "realUserAuthMutationAuthorized": false,
+      "livePromotionAuthorized": false,
+      "reimportAuthorized": false
+    }
   }
 }
