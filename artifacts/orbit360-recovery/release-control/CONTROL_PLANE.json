@@ -713,7 +713,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B1_PREVIEW",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B1_VISUAL",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -1951,39 +1951,15 @@
       "livePromotion": false
     },
     "b1ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B1_EXECUTION_LOCK_20260919.json",
-    "b1ExecutionLockBlobSha": "cc744cd2ea7ad16ff4cc6fd01d8a8b071d931c6b",
+    "b1ExecutionLockBlobSha": "5455c970d46ba161a741cf5f7331965e0fa8602b",
     "b1": {
-      "status": "CANDIDATE_PENDING_PREVIEW",
-      "sourceSha": "b8e8e9021852d8c2c6c3bbb0cbde71553aaffcb3",
-      "buildId": "gi-i65-b1-b8e8e9021852-57f234755dc1",
+      "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+      "sourceSha": "94ef159042b33afef98134e698885b134bf334e7",
+      "buildId": "gi-i65-b1-94ef159042b3-57f234755dc1",
       "previewUrl": "https://ays-orbit-360-lab--gi-i65-b1-35455766715-ylc10xr5.web.app",
-      "runId": 35488766659,
-      "artifactId": 10598569261,
-      "livePromoted": false,
-      "visualAccepted": false,
-      "r4DefinitiveClosure": {
-        "status": "PATCHED_PENDING_PREVIEW",
-        "confirmedBy": "PAULA_LIVE_SCREENSHOTS_PLUS_CURRENT_SOURCE_CAUSAL_READ",
-        "rootCauses": [
-          "AUTH_INIT_PAINTED_LOGIN_BEFORE_FIREBASE_PERSISTED_USER_RESOLUTION",
-          "ASESORES_OPTIONAL_PLUS_ADVISOR_PROJECTION_ALLOWED_NON_CANONICAL_FIRST_RENDER",
-          "PRODUCT_OPERATIONAL_TRANSACTION_READ_MEMBERSHIP_AFTER_ADVISOR_WRITE",
-          "TEAM_DELETE_NOT_EXPOSED",
-          "UNVERIFIED_LOGIN_SWALLOWED_VERIFICATION_SEND_RESULT"
-        ],
-        "productFiles": [
-          "orbit360-platform/core/auth-product-runtime-p0.js",
-          "orbit360-platform/product-runtime-config.js",
-          "orbit360-platform/core/product-hydration-required-optional-p0.js",
-          "functions/product-operational-domain.js",
-          "orbit360-platform/modules/equipo.js",
-          "orbit360-platform/core/public-tenant-branding.js"
-        ],
-        "deleteSemantics": "LOGICAL_DELETE_PRESERVE_RELATION_HISTORY_PLUS_ACCESS_DEACTIVATION",
-        "livePromoted": false,
-        "dataMutationAuthorized": false,
-        "reimportAuthorized": false
-      }
+      "runId": 35492703801,
+      "artifactId": 10600115489,
+      "livePromoted": false
     }
   }
 }
