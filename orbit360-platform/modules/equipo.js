@@ -143,7 +143,7 @@ Orbit.modules.equipo = (function () {
     return team;
   }
 
-  function teamRows() { return teamRows().filter(a => !(a && (a.deleted === true || a.eliminado === true || a.estado === 'eliminado'))); }
+  function teamRows() { return (S().all('asesores') || []).filter(a => !(a && (a.deleted === true || a.eliminado === true || a.estado === 'eliminado'))); }
   function usuarios() {
     const team = teamRows();
     const shown = filteredTeam(team);
