@@ -139,6 +139,9 @@
     if (membershipEmail && membershipEmail !== authEmail) errors.push('membership_email_no_coincide');
     if (text(normalized.status).toLowerCase() !== 'active') errors.push('membership_inactiva');
     if (!normalized.activeRole || normalized.roles.indexOf(normalized.activeRole) < 0) errors.push('membership_rol_activo_invalido');
+    normalized.modulesVisible = owner && typeof owner.effectiveModules === 'function'
+      ? owner.effectiveModules(normalized)
+      : [];
     return { ok: errors.length === 0, membership: normalized, errors: unique(errors) };
   }
 
@@ -157,6 +160,7 @@
       dataScopes: clone(membership.dataScopes || {}),
       modulesExtra: (membership.modulesExtra || []).slice(),
       modulesRestricted: (membership.modulesRestricted || []).slice(),
+      modulesVisible: (membership.modulesVisible || []).slice(),
       productReadOnly: true
     };
   }
