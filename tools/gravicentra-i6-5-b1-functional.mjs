@@ -95,6 +95,7 @@ async function activate(page,auth,a){
     return Orbit.productAppP0.status?.().started?Orbit.productAppP0.status():Orbit.productAppP0.activate();
   },tok);
   need(st?.started,'B1_APP_START');
+  await page.waitForFunction(()=>!document.body.classList.contains('pre-auth')&&document.documentElement.getAttribute('data-auth-restoring')!=='1',null,{timeout:12000});
 }
 async function waitAdvisorHydration(page){
   await page.waitForFunction(()=>{
@@ -603,6 +604,27 @@ try{
   await loginPage.screenshot({path:path.join(evidenceDir,'b1-synthetic-login-modules.png'),fullPage:true});
   await loginContext.close();
 
+  // R4 self-administration acceptance: delete must be executable from Equipo,
+  // persist as logical deletion, block Auth, preserve history, then cleanup the synthetic residue.
+  await reloadAuthenticated(page,auth,a);
+  await reopen(page,synthetic.id);
+  const deleteClick=page.click('#eu-delete');
+  const deleteConfirm=page.locator('.drawer-back').filter({hasText:'Eliminar usuario'}).last();
+  await deleteConfirm.waitFor({state:'visible',timeout:8000});
+  await deleteConfirm.locator('[data-yes]').click();
+  await submitCustomPrompt(page,'Eliminación sintética B1 R4 con bloqueo de acceso','B1_DELETE_REASON');
+  ev.nativeUi.customReasonPrompts++;
+  await deleteClick;
+  await page.waitForSelector('#eq-edit',{state:'detached',timeout:15000});
+  const deletedRow=await waitFor(async()=>{
+    const x=await canonical(db,synthetic.id);
+    return x&&x.deleted===true&&x.inactivo===true&&String(x.estado||'')==='eliminado'?x:null;
+  },'B1_SYNTHETIC_DELETE_READBACK',20000,400);
+  const disabledAuth=await auth.getUser(synthetic.uid);
+  need(disabledAuth.disabled===true,'B1_SYNTHETIC_DELETE_AUTH_NOT_DISABLED');
+  ev.team.synthetic.delete={ui:true,logicalDelete:true,canonicalReadback:true,authDisabled:true,advisorId:deletedRow.id};
+  ev.writes.advisorOperational++;ev.writes.auditOperational++;
+
   const nativeCalls=await page.evaluate(()=>window.__b1NativeCalls||[]);
   ev.nativeUi.promptCalls=nativeCalls.filter(x=>x==='prompt').length;
   ev.nativeUi.alertCalls=nativeCalls.filter(x=>x==='alert').length;
@@ -611,7 +633,7 @@ try{
 
   ev.backend={
     operationalRealCommit:true,canonicalReadback:true,refreshReopen:true,realRestore:true,
-    syntheticCreate:true,syntheticConfigEdit:true,syntheticAuthMembership:true,syntheticLogin:true
+    syntheticCreate:true,syntheticConfigEdit:true,syntheticAuthMembership:true,syntheticLogin:true,syntheticDelete:true,syntheticDeleteAuthDisabled:true
   };
 
   ev.cleanup=await cleanupSynthetic({db,auth,...synthetic});
