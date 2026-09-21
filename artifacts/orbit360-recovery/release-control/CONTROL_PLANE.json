@@ -2008,13 +2008,23 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "8e1fbfb8c3ccbdad2eda5d4df02795fcccc1ee8a",
+    "b2ExecutionLockBlobSha": "a1c703af003f8f59a92ee34dd30d3797ff01a039",
     "b2": {
-      "status": "READ_ONLY_DIAGNOSTIC_ACTIVE",
+      "status": "CAUSE_DEMONSTRATED_PATCH_AUTHORIZED",
       "parentB1SourceSha": "a763f6a991418cba2c59eac475edf3eb57fd1320",
       "activeRoleScopeSpotCheckCarryForward": true,
       "dashboardRealityCarryForward": true,
-      "livePromoted": false
+      "livePromoted": false,
+      "allowedProductFiles": [
+        "orbit360-platform/index.html",
+        "orbit360-platform/modules/cliente360.js",
+        "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+        "orbit360-platform/core/policy-receipts-engine.js",
+        "orbit360-platform/core/issuance-workflow-v1201.js",
+        "orbit360-platform/modules/issuance-endosos-v1201-bridge.js",
+        "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js"
+      ],
+      "productMutationAuthorized": true
     }
   }
 }
