@@ -11,11 +11,20 @@
 
   window.Orbit = window.Orbit || {};
 
-  var VERSION = 'p0-20260713';
+  var VERSION = 'p0-b1-r12-20260921';
   var PRIVILEGED_ROLES = Object.freeze(['Dirección', 'SuperAdmin', 'AdminTenant']);
   var OPERATIONS_ROLES = Object.freeze(['Dirección', 'SuperAdmin', 'AdminTenant', 'Operativo']);
   var FINANCE_ROLES = Object.freeze(['Dirección', 'SuperAdmin', 'AdminTenant', 'Finanzas']);
   var VALID_SCOPES = Object.freeze(['own', 'team', 'all', 'none']);
+  var SCOPE_LEVEL = Object.freeze({ none: 0, own: 1, team: 2, all: 3 });
+  var MODULE_SCOPE_ALIASES = Object.freeze({
+    cliente360: Object.freeze(['cliente360', 'clientes']),
+    clientes: Object.freeze(['clientes', 'cliente360']),
+    ops: Object.freeze(['ops', 'gestiones']),
+    gestiones: Object.freeze(['gestiones', 'ops'])
+  });
+  var TEAM_SCOPE_ROLES = Object.freeze(['Marketing']);
+  var OWN_SCOPE_ROLES = Object.freeze(['Asesor', 'Asesora', 'Asesor Sr.', 'Asesora Sr.', 'Asesor Jr.', 'Asesora Jr.', 'Comercial', 'Asistente']);
   var ADVISOR_CLIENT_PATCH_FIELDS = Object.freeze([
     'whatsapp', 'telefonoAlterno', 'correo', 'direccion', 'zona', 'sector', 'barrio',
     'departamento', 'provincia', 'ciudad', 'municipio', 'fechaNacimiento', 'sexo',
@@ -121,11 +130,39 @@
     return m.modulesExtra.indexOf(moduleKey) >= 0;
   }
 
+  function moduleScopeValue(moduleScopes, moduleKey) {
+    var source = moduleScopes && typeof moduleScopes === 'object' ? moduleScopes : {};
+    var key = text(moduleKey);
+    var keys = MODULE_SCOPE_ALIASES[key] || [key];
+    for (var i = 0; i < keys.length; i++) {
+      if (Object.prototype.hasOwnProperty.call(source, keys[i])) return source[keys[i]];
+    }
+    return undefined;
+  }
+
+  function roleScopeCeiling(role) {
+    role = text(role);
+    if (PRIVILEGED_ROLES.indexOf(role) >= 0 || role === 'Admin' || role === 'Operativo' || role === 'Finanzas') return 'all';
+    if (TEAM_SCOPE_ROLES.indexOf(role) >= 0) return 'team';
+    if (OWN_SCOPE_ROLES.indexOf(role) >= 0 || /Asesor/i.test(role)) return 'own';
+    return 'none';
+  }
+
+  function boundedScope(requested, ceiling) {
+    requested = normalizeScope(requested);
+    ceiling = normalizeScope(ceiling);
+    if (VALID_SCOPES.indexOf(requested) < 0) return 'none';
+    if (VALID_SCOPES.indexOf(ceiling) < 0) return 'none';
+    return SCOPE_LEVEL[requested] <= SCOPE_LEVEL[ceiling] ? requested : ceiling;
+  }
+
   function effectiveScope(membershipInput, moduleKey) {
     var m = normalizeMembership(membershipInput);
-    var explicit = normalizeScope(m.moduleScopes[moduleKey]);
-    if (VALID_SCOPES.indexOf(explicit) >= 0) return explicit;
-    return VALID_SCOPES.indexOf(m.defaultScope) >= 0 ? m.defaultScope : 'none';
+    var explicit = normalizeScope(moduleScopeValue(m.moduleScopes, moduleKey));
+    var requested = VALID_SCOPES.indexOf(explicit) >= 0
+      ? explicit
+      : (VALID_SCOPES.indexOf(m.defaultScope) >= 0 ? m.defaultScope : 'none');
+    return boundedScope(requested, roleScopeCeiling(m.activeRole));
   }
 
   function unresolvedCountry(record) {

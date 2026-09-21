@@ -25,7 +25,7 @@ Orbit.modules = Orbit.modules || {};
     document.body.appendChild(b);
     const close = () => b.remove();
     b.querySelectorAll('[data-close]').forEach(x => x.addEventListener('click', close));
-    b.addEventListener('click', e => { if (e.target === b) { e.preventDefault(); e.stopPropagation(); } });
+    b.addEventListener('click', e => { if (e.target === b) close(); });
     return b;
   }
   const ERROR_LABELS = {
@@ -71,9 +71,6 @@ Orbit.modules = Orbit.modules || {};
     const cur = existing && existing.moneda || A.currencyFor(country);
     const rs = ramos(country), initialRamo = existing && existing.ramo || rs[0] || '';
     const initialSubs = subramos(country, initialRamo), insurers = linkedInsurers(country);
-    const advisors = S().all('asesores') || [];
-    const existingVehicle = existing ? ((S().all('vehiculos') || []).find(v => v.polizaId === existing.id && String(v.estado || '').toLowerCase() !== 'histórico') || null) : null;
-    const initialAdvisorId = existing && existing.asesorId || selectedClient.asesorId || '';
     const frequencies = Object.keys(Orbit.primas.FRECUENCIAS || { Contado: 1 });
     const forms = Orbit.primas.FORMAS_PAGO || ['Transferencia'];
     const status = ['Vigente','Por renovar','Vencida','Cancelada','Anulada','Rechazada','Requiere validación'];
@@ -86,7 +83,6 @@ Orbit.modules = Orbit.modules || {};
         <div class="cfg-note">Vigente y Por renovar generan recibos. Los demás estados quedan como histórico. Los pagos existentes se preservan y ningún recibo se elimina físicamente.</div>
         <div class="cgrid">
           <label class="ce-l">Cliente *<select class="o-sel" data-client>${clients.map(c => `<option value="${esc(c.id)}" ${c.id === selectedClient.id ? 'selected' : ''}>${esc(c.nombre)}</option>`).join('')}</select></label>
-          <label class="ce-l">Asesor / vendedor *<select class="o-sel" data-advisor>${advisors.map(a => '<option value="'+esc(a.id)+'" '+(a.id === initialAdvisorId ? 'selected' : '')+'>'+esc(a.nombre)+'</option>').join('')}</select></label>
           <label class="ce-l">País / moneda<input class="o-sel" data-country value="${esc(country + ' · ' + cur)}" disabled></label>
           <label class="ce-l">Aseguradora *<select class="o-sel" data-insurer>${insurers.map(a => `<option value="${esc(a.id)}" ${existing && a.id === existing.aseguradoraId ? 'selected' : ''}>${esc(a.nombre)}</option>`).join('')}</select></label>
           <label class="ce-l">N.º real de póliza *<input class="o-sel" data-number value="${esc(existing && existing.numero || '')}" placeholder="No se genera un número ficticio"></label>
@@ -106,13 +102,13 @@ Orbit.modules = Orbit.modules || {};
           <label class="ce-l">Suma asegurada<input type="number" min="0" step="0.01" class="o-sel" data-sum value="${esc(existing && existing.sumaAsegurada || 0)}"></label>
         </div>
         <div class="card pad" data-preview></div>
-        <div data-vehicle style="display:none"><b style="font-family:var(--f-display)">Vehículo asegurado</b><div class="cgrid" style="margin-top:8px"><label class="ce-l">Marca<input class="o-sel" data-vbrand value="${esc(existingVehicle && existingVehicle.marca || '')}"></label><label class="ce-l">Línea<input class="o-sel" data-vline value="${esc(existingVehicle && existingVehicle.linea || '')}"></label><label class="ce-l">Placa<input class="o-sel" data-vplate value="${esc(existingVehicle && existingVehicle.placa || '')}"></label><label class="ce-l">Año<input type="number" class="o-sel" data-vyear value="${esc(existingVehicle && existingVehicle.anio || '')}"></label><label class="ce-l">Uso<input class="o-sel" data-vuse value="${esc(existingVehicle && existingVehicle.uso || 'Particular')}"></label><label class="ce-l">Color<input class="o-sel" data-vcolor value="${esc(existingVehicle && existingVehicle.color || '')}"></label><label class="ce-l">VIN<input class="o-sel" data-vvin value="${esc(existingVehicle && existingVehicle.vin || '')}"></label><label class="ce-l">Chasis<input class="o-sel" data-vchasis value="${esc(existingVehicle && existingVehicle.chasis || '')}"></label><label class="ce-l">Motor<input class="o-sel" data-vmotor value="${esc(existingVehicle && existingVehicle.motor || '')}"></label></div></div>
+        <div data-vehicle style="display:none"><b style="font-family:var(--f-display)">Vehículo asegurado</b><div class="cgrid" style="margin-top:8px"><label class="ce-l">Marca / línea<input class="o-sel" data-vbrand></label><label class="ce-l">Placa<input class="o-sel" data-vplate></label><label class="ce-l">Año<input type="number" class="o-sel" data-vyear></label><label class="ce-l">Uso<input class="o-sel" data-vuse value="Particular"></label></div></div>
         ${existing ? '<label class="ce-l">Motivo del cambio *<textarea class="o-sel" data-reason style="min-height:58px"></textarea></label>' : ''}
         <div class="hint error" data-error style="display:none"></div>
       </div>
       <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end;position:sticky;bottom:0;background:var(--card)"><button class="btn ghost" data-close>Cancelar</button><button class="btn primary" data-save>${existing ? 'Guardar y sincronizar recibos' : 'Crear póliza y recibos'}</button></div>`;
     const b = modal('policy-v1199', inner, 800), $ = s => b.querySelector(s);
-    const clientEl = $('[data-client]'), advisorEl = $('[data-advisor]'), insurerEl = $('[data-insurer]'), ramoEl = $('[data-ramo]'), productEl = $('[data-product]');
+    const clientEl = $('[data-client]'), insurerEl = $('[data-insurer]'), ramoEl = $('[data-ramo]'), productEl = $('[data-product]');
     function client() { return S().get('clientes', clientEl.value) || selectedClient; }
     function refreshCountry() {
       const c = client(), country2 = c.pais || '', currency2 = A.currencyFor(country2);
@@ -127,7 +123,7 @@ Orbit.modules = Orbit.modules || {};
     function raw() {
       const c = client(), country2 = c.pais || '', currency2 = A.currencyFor(country2);
       return {
-        id: existing && existing.id, tenantId: existing && existing.tenantId || A.tenantId(), clienteId: c.id, asesorId: advisorEl && advisorEl.value || c.asesorId,
+        id: existing && existing.id, tenantId: existing && existing.tenantId || A.tenantId(), clienteId: c.id, asesorId: c.asesorId,
         pais: country2, moneda: currency2, aseguradoraId: insurerEl.value, numero: $('[data-number]').value.trim(), estado: $('[data-status]').value,
         ramo: ramoEl.value, subramo: productEl.value, producto: productEl.value, vigenciaInicio: $('[data-start]').value, vigenciaFin: $('[data-end]').value,
         frecuencia: $('[data-frequency]').value, formaPago: $('[data-payment-form]').value, conducto: $('[data-conduct]').value,
@@ -135,29 +131,24 @@ Orbit.modules = Orbit.modules || {};
         otros: +$('[data-other]').value || 0, recargoFinPct: +$('[data-surcharge]').value || 0, sumaAsegurada: +$('[data-sum]').value || 0,
         comAseguradoraPct: existing && existing.comAseguradoraPct || 0, comVendedorPct: existing && existing.comVendedorPct || 0,
         fuente: existing && existing.fuente || 'ingreso_manual_plataforma',
-        vehiculo: /auto|veh/i.test(ramoEl.value) ? { id: existingVehicle && existingVehicle.id || '', marca: $('[data-vbrand]').value.trim(), linea: $('[data-vline]').value.trim(), placa: $('[data-vplate]').value.trim(), anio: $('[data-vyear]').value, uso: $('[data-vuse]').value.trim(), color: $('[data-vcolor]').value.trim(), vin: $('[data-vvin]').value.trim(), chasis: $('[data-vchasis]').value.trim(), motor: $('[data-vmotor]').value.trim(), sumaAsegurada: +$('[data-sum]').value || 0 } : null
+        vehiculo: /auto|veh/i.test(ramoEl.value) ? { marca: $('[data-vbrand]').value.trim(), placa: $('[data-vplate]').value.trim(), anio: $('[data-vyear]').value, uso: $('[data-vuse]').value.trim(), sumaAsegurada: +$('[data-sum]').value || 0 } : null
       };
     }
     function preview() {
       const prepared = E.preparePolicy(raw(), existing || null, 'preview'), recs = E.expectedReceipts(prepared), active = E.isActiveState(prepared.estado);
       $('[data-preview]').innerHTML = `<div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start"><div><small class="muted">Resultado antes de guardar</small><b style="display:block">${active ? recs.length + ' recibo(s) en cartera' : 'Histórico · sin cartera nueva'}</b></div><b>${money(prepared.moneda, prepared.primaTotal)}</b></div><div class="asg197-info-grid" style="margin-top:10px"><div><small>Prima neta</small><b>${money(prepared.moneda, prepared.primaNeta)}</b></div><div><small>Gastos financieros</small><b>${money(prepared.moneda, prepared.gastosFinan)}</b></div><div><small>IVA</small><b>${money(prepared.moneda, prepared.ivaMonto)}</b></div><div><small>Total</small><b>${money(prepared.moneda, prepared.primaTotal)}</b></div></div>`;
     }
-    clientEl.addEventListener('change', () => { if (!existing && advisorEl) { const own = client().asesorId; if (own && advisors.some(a => a.id === own)) advisorEl.value = own; } refreshCountry(); }); ramoEl.addEventListener('change', refreshProducts);
+    clientEl.addEventListener('change', refreshCountry); ramoEl.addEventListener('change', refreshProducts);
     $('[data-start]').addEventListener('change', () => { if (!$('[data-end]').value) $('[data-end]').value = plusYear($('[data-start]').value); preview(); });
     b.querySelectorAll('input,select').forEach(el => el.addEventListener('input', preview));
     $('[data-import]').addEventListener('click', () => { b.remove(); Orbit.importa.open('polizas', { scope: { clienteId: selectedClient.id } }); });
     $('[data-save]').addEventListener('click', async () => {
-      const save = $('[data-save]'), payload = raw(), reason = existing ? $('[data-reason]').value.trim() : 'Alta operativa desde plataforma';
-      const err = $('[data-error]'), originalText = save.textContent; save.disabled = true; save.textContent = 'Guardando…';
-      try {
-        const result = existing ? await E.updatePolicy(existing.id, payload, { motivo: reason }) : await E.createPolicy(payload, { motivo: reason });
-        if (!result.ok) { err.style.display = ''; err.textContent = errorText(result.errors); save.disabled = false; save.textContent = originalText; return; }
-        err.style.display = 'none'; b.remove(); toast(existing ? 'Póliza actualizada; recibos y vehículo confirmados' : 'Póliza creada; recibos y vehículo confirmados');
-        location.hash = '#/cliente360?c=' + encodeURIComponent(result.policy.clienteId) + '&t=polizas';
-      } catch (error) {
-        err.style.display = ''; err.textContent = 'No fue posible confirmar el guardado. Revisa y reintenta.';
-        save.disabled = false; save.textContent = originalText;
-      }
+      const payload = raw(), reason = existing ? $('[data-reason]').value.trim() : 'Alta operativa desde plataforma';
+      const result = existing ? await E.updatePolicy(existing.id, payload, { motivo: reason }) : await E.createPolicy(payload, { motivo: reason });
+      const err = $('[data-error]');
+      if (!result.ok) { err.style.display = ''; err.textContent = errorText(result.errors); return; }
+      err.style.display = 'none'; b.remove(); toast(existing ? 'Póliza actualizada; recibos sincronizados' : 'Póliza creada; recibos generados');
+      location.hash = '#/cliente360?c=' + encodeURIComponent(result.policy.clienteId) + '&t=polizas';
     });
     refreshProducts(); preview();
   }

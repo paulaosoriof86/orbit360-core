@@ -26,7 +26,7 @@ Orbit.modules = Orbit.modules || {};
     b = document.createElement('div'); b.id = id; b.className = 'drawer-back open'; b.style.cssText = 'display:grid;place-items:center;z-index:245';
     b.innerHTML = `<div class="card" style="width:min(${width || 720}px,96vw);max-height:92vh;display:flex;flex-direction:column;padding:0"><div style="padding:16px 20px;background:linear-gradient(120deg,var(--graph),#10141a);display:flex;justify-content:space-between;gap:12px"><div><small style="color:rgba(255,255,255,.68)">Orbit Ops</small><b style="display:block;color:#fff;font-family:var(--f-display);font-size:17px">${esc(title)}</b></div><button class="imp-x" data-close style="color:#fff">✕</button></div><div style="padding:18px 20px;overflow:auto;flex:1">${body}</div><div style="padding:13px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">${actions || ''}<button class="btn ghost" data-close>Cancelar</button></div></div>`;
     document.body.appendChild(b);
-    const close = () => b.remove(); b.querySelectorAll('[data-close]').forEach(x => x.onclick = close); b.addEventListener('click', e => { if (e.target === b) { e.preventDefault(); e.stopPropagation(); } });
+    const close = () => b.remove(); b.querySelectorAll('[data-close]').forEach(x => x.onclick = close); b.addEventListener('click', e => { if (e.target === b) close(); });
     return b;
   }
   function frequencyFromPayments(n) { return ({1:'Contado',2:'Semestral',3:'Cuatrimestral',4:'Trimestral',6:'Bimestral',12:'Mensual'})[+n] || (+n > 1 ? 'Mensual' : 'Contado'); }
@@ -162,9 +162,8 @@ Orbit.modules = Orbit.modules || {};
     </div>`;
     const b = modal('issue-policy-v1201','Registrar emisión real',body,'<button class="btn primary" data-issue>Crear póliza y recibos</button>',760);
     const $ = s => b.querySelector(s);
-    b.querySelector('[data-issue]').onclick = async () => {
-      const issueBtn = b.querySelector('[data-issue]'), originalText = issueBtn.textContent; issueBtn.disabled = true; issueBtn.textContent = 'Guardando…';
-      const result = await I.issueRequest(request.id, {
+    b.querySelector('[data-issue]').onclick = () => {
+      const result = I.issueRequest(request.id, {
         numero: $('#iss-num').value.trim(), documentRef: $('#iss-doc').value.trim(),
         vigenciaInicio: $('#iss-start').value, vigenciaFin: $('#iss-end').value,
         frecuencia: $('#iss-freq').value, cuotas: +$('#iss-payments').value || 1,
@@ -173,7 +172,7 @@ Orbit.modules = Orbit.modules || {};
         gastosFinan: +$('#iss-gfin').value || 0, otros: +$('#iss-other').value || 0,
         sourceRef: $('#iss-source').value.trim()
       }, { motivo: 'Póliza emitida recibida y verificada' });
-      if (!result.ok) { issueBtn.disabled = false; issueBtn.textContent = originalText; return toast('No se emitió: ' + (result.errors || []).join(', ')); }
+      if (!result.ok) return toast('No se emitió: ' + (result.errors || []).join(', '));
       b.remove(); const base = document.getElementById('ciclo-modal'); if (base) base.remove();
       toast(result.alreadyIssued ? 'La solicitud ya tenía una póliza vinculada.' : 'Póliza y recibos creados correctamente.');
       Orbit.modules.cliente360.verPoliza(result.policy.id);

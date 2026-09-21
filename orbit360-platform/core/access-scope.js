@@ -33,8 +33,12 @@ Orbit.access = (function () {
   }
   function S() { return Orbit.store; }
   function rawS() {
-    var store = S();
-    return store && Object.prototype.hasOwnProperty.call(store, '_scopedFor') ? Object.getPrototypeOf(store) : store;
+    var store = S(), hops = 0;
+    while (store && Object.prototype.hasOwnProperty.call(store, '_scopedFor') && hops < 16) {
+      store = Object.getPrototypeOf(store);
+      hops += 1;
+    }
+    return store;
   }
 
   function activeRole() {
@@ -541,7 +545,10 @@ Orbit.access = (function () {
     return facade;
   }
   function withScope(moduleKey, fn) {
-    var base = Orbit.store, facade = scopedStore(moduleKey);
+    var base = Orbit.store;
+    var alreadyScoped = !!(base && Object.prototype.hasOwnProperty.call(base, '_scopedFor') && clean(base._scopedFor) === clean(moduleKey));
+    if (alreadyScoped) return fn(base, rawS());
+    var facade = scopedStore(moduleKey);
     Orbit.store = facade;
     try { return fn(facade, base); } finally { Orbit.store = base; }
   }

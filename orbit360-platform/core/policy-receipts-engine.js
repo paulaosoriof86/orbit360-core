@@ -365,19 +365,7 @@ Orbit.policyReceipts = (function () {
   }
   function buildAtomicWritePlan(prepared,raw,existing,opId,activityTitle,activityDetail){
     const mutations=[{action:existing?'update':'insert',collection:'polizas',id:prepared.id,payload:prepared}];let vehicle=null;
-    if(raw&&raw.vehiculo&&Object.keys(raw.vehiculo).some(k=>k!=='id'&&clean(raw.vehiculo[k]))){
-      const prior=existing?(
-        clean(raw.vehiculo.id)?S().get('vehiculos',clean(raw.vehiculo.id)):
-        (S().all('vehiculos')||[]).find(v=>v&&v.polizaId===prepared.id&&norm(v.estado)!=='historico')
-      ):null;
-      vehicle=Object.assign({},prior||{},raw.vehiculo,{
-        id:prior&&prior.id||clean(raw.vehiculo.id)||('veh_'+Date.now().toString(36)),
-        tenantId:prepared.tenantId,clienteId:prepared.clienteId,polizaId:prepared.id,asesorId:prepared.asesorId,
-        pais:prepared.pais,fuente:prepared.fuente,operationId:opId,actualizado:now()
-      });
-      if(!prior)vehicle.creado=now();
-      mutations.push({action:prior?'update':'insert',collection:'vehiculos',id:vehicle.id,payload:vehicle});
-    }
+    if(!existing&&raw&&raw.vehiculo&&Object.keys(raw.vehiculo).some(k=>clean(raw.vehiculo[k]))){vehicle=Object.assign({},raw.vehiculo,{id:clean(raw.vehiculo.id||('veh_'+Date.now().toString(36))),tenantId:prepared.tenantId,clienteId:prepared.clienteId,polizaId:prepared.id,asesorId:prepared.asesorId,pais:prepared.pais,fuente:prepared.fuente,operationId:opId});mutations.push({action:'insert',collection:'vehiculos',id:vehicle.id,payload:vehicle});}
     const receiptPlan=planReceipts(prepared,opId,mutations),portfolio=planPortfolio(prepared,receiptPlan.rows,opId,mutations),activity=activityRow(prepared,activityTitle,activityDetail,opId);mutations.push({action:'insert',collection:'actividades',id:activity.id,payload:activity});
     return{mutations,receipts:receiptPlan.result,portfolio,vehicle,activity};
   }
@@ -418,7 +406,7 @@ Orbit.policyReceipts = (function () {
     if(paidReceipts.length&&(lockedChanges.length||reactivatingWithPayments))return{ok:false,errors:['pagos_existentes_requieren_endoso'],lockedChanges,paidReceipts:paidReceipts.map(c=>c.id)};if(changedCritical.length&&!clean(options.motivo))return{ok:false,errors:['motivo_requerido'],changedCritical};
     const check=validatePolicy(merged,id);if(!check.ok)return Object.assign({ok:false,policy:merged},check);merged.policyKey=check.key;merged.policyVersionKey=check.versionKey;merged.requiereValidacion=check.warnings.length>0;merged.validacion={estado:merged.requiereValidacion?'REQUIERE_VALIDACION':'VALIDADA_EN_CAPTURA',alertas:check.warnings,fecha:now()};merged.historial=[].concat(current.historial||[],[{icon:'✏',fecha:today(),t:'Actualización de póliza',d:(options.motivo||'Actualización')+(changedCritical.length?' · '+changedCritical.join(', '):'')}]);
     const plan=buildAtomicWritePlan(merged,patch||{},current,opId,'Póliza actualizada: '+merged.numero,options.motivo||'Actualización operativa');
-    try{await S().batchDurable(plan.mutations,{requestId:opId,timeoutMs:25000});try{await updateClientState(before.clienteId);if(merged.clienteId!==before.clienteId)await updateClientState(merged.clienteId);}catch(ignore){}try{if(A()&&A().audit)A().audit('actualizar_con_recibos','polizas',id,before,merged,options.motivo,{operacionId:opId,recibos:plan.receipts,cartera:plan.portfolio,camposCriticos:changedCritical,atomicServerCommit:true});}catch(ignore){}return{ok:true,policy:merged,receipts:plan.receipts,portfolio:plan.portfolio,vehicle:plan.vehicle,warnings:check.warnings,operationId:opId,atomicServerCommit:true};}
+    try{await S().batchDurable(plan.mutations,{requestId:opId,timeoutMs:25000});try{await updateClientState(before.clienteId);if(merged.clienteId!==before.clienteId)await updateClientState(merged.clienteId);}catch(ignore){}try{if(A()&&A().audit)A().audit('actualizar_con_recibos','polizas',id,before,merged,options.motivo,{operacionId:opId,recibos:plan.receipts,cartera:plan.portfolio,camposCriticos:changedCritical,atomicServerCommit:true});}catch(ignore){}return{ok:true,policy:merged,receipts:plan.receipts,portfolio:plan.portfolio,warnings:check.warnings,operationId:opId,atomicServerCommit:true};}
     catch(error){return{ok:false,errors:['operacion_atomica_no_confirmada'],error:String(error&&(error.code||error.message||error)),operationId:opId};}
   }
 
