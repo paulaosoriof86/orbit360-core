@@ -1,6 +1,6 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B1_EXECUTION_LOCK_V1",
-  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+  "status": "ACCEPTED_FOR_B2_EMAIL_DEFERRED",
   "date": "2026-09-19",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -1043,5 +1043,39 @@
     "emailTransportChanged": false,
     "livePromotion": false,
     "advanceToB2": false
+  },
+  "b1Closure20260920": {
+    "decision": "ACCEPTED_FOR_PROGRESSION_TO_B2",
+    "basis": {
+      "ownerProgressionAuthorizationPath": "artifacts/orbit360-recovery/release-control/I6_5_B1_OWNER_PROGRESSION_AUTHORIZATION_20260920.json",
+      "ownerEmailDeferral": true,
+      "priorPaulaVisualPassesPreserved": true,
+      "r9PreviewRunId": 35551713416,
+      "r9SourceSha": "a763f6a991418cba2c59eac475edf3eb57fd1320",
+      "r9BuildId": "gi-i65-b1-a763f6a99141-57f234755dc1",
+      "r9ArtifactId": 10619180286,
+      "r9ArtifactDigest": "40eed43501e3d2d762cd0e05998d4bfec08dc0325af06fef0323089b19602793",
+      "exactReadback": true,
+      "authenticatedFunctionalPass": true,
+      "syntheticFinalAbsent": true
+    },
+    "emailDeliveryFernando": {
+      "status": "DEFERRED_NON_BLOCKING_OPEN_DEBT",
+      "delivered": false,
+      "resolved": false,
+      "blockingB1": false,
+      "treatment": "PLATFORM_TRANSACTIONAL_EMAIL_CONFIGURATION"
+    },
+    "activeRoleScope": {
+      "status": "TECHNICAL_FUNCTIONAL_PASS",
+      "visualSpotCheck": "CARRY_FORWARD_TO_FIRST_B2_PREVIEW_BEFORE_B3"
+    },
+    "dashboardReality": {
+      "status": "CARRY_FORWARD_REQUIRED",
+      "id": "DASHBOARD_INICIO_REALITY_RECONCILIATION_REQUIRED"
+    },
+    "readinessPercent": 80,
+    "livePromotion": false,
+    "productionTouched": false
   }
 }
