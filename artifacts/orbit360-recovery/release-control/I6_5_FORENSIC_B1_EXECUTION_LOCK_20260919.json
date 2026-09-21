@@ -1,6 +1,6 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B1_EXECUTION_LOCK_V1",
-  "status": "ACCEPTED_FOR_B2_EMAIL_DEFERRED",
+  "status": "VISUAL_REJECTED_R3_PERFORMANCE_AND_UNIVERSE_ROOT_CAUSE_REQUIRED",
   "date": "2026-09-19",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -971,7 +971,7 @@
   },
   "dashboardRealityCarryForward": {
     "id": "DASHBOARD_INICIO_REALITY_RECONCILIATION_REQUIRED",
-    "status": "FROZEN_CARRY_FORWARD_AFTER_B1_SCOPE_CLOSURE",
+    "status": "MANDATORY_PREPRODUCTION_GATE_NOT_OPTIONAL_CARRY_FORWARD",
     "reason": "A KPI changing with active role proves scope sensitivity, not business-value correctness.",
     "requiredComparison": "UI -> Firestore canonical source -> calculation -> projection -> displayed result",
     "metrics": [
@@ -988,7 +988,20 @@
     "assignment": "B2_OR_B3_PER_CANONICAL_MATRIX_AFTER_B1",
     "noReimport": true,
     "doNotReopenAuth": true,
-    "doNotMixWithPermissionsAfterScopePass": true
+    "doNotMixWithPermissionsAfterScopePass": true,
+    "requiredBeforeProductionAccepted": true,
+    "requiredMetrics": [
+      "clientes",
+      "polizas vigentes",
+      "prima vigente",
+      "cobros",
+      "vencidos",
+      "recaudo confirmado",
+      "renovaciones",
+      "prioridades",
+      "avance por asesor"
+    ],
+    "requiredMethod": "UI_TO_FIRESTORE_CANONICAL_SOURCE_TO_CALCULATION_TO_PROJECTION_TO_DISPLAYED_RESULT"
   },
   "emailDeliveryFernando": {
     "status": "FAIL_NOT_RECEIVED_USER_OBSERVED",
@@ -1077,5 +1090,120 @@
     "readinessPercent": 80,
     "livePromotion": false,
     "productionTouched": false
+  },
+  "visualRejection20260920R10": {
+    "status": "FORMALLY_RECORDED",
+    "reviewedPreview": {
+      "sourceSha": "a763f6a991418cba2c59eac475edf3eb57fd1320",
+      "buildId": "gi-i65-b1-a763f6a99141-57f234755dc1",
+      "channelId": "gi-i65-b1-35455766715",
+      "url": "https://ays-orbit-360-lab--gi-i65-b1-35455766715-ylc10xr5.web.app",
+      "runId": 35551713416,
+      "artifactId": 10619180286,
+      "artifactDigest": "40eed43501e3d2d762cd0e05998d4bfec08dc0325af06fef0323089b19602793",
+      "exactReadback": true,
+      "functionalPass": true,
+      "livePromoted": false
+    },
+    "observedByPaula": {
+      "operativoInicio": {
+        "clientes": 12,
+        "polizas": 1415,
+        "cobrosVencidos": 1037,
+        "renovaciones45": 11,
+        "primaVigenteApprox": "Q1.0M",
+        "advisorRows": "MULTIPLE"
+      },
+      "asesorInicio": {
+        "clientes": 12,
+        "polizas": 25,
+        "cobrosVencidos": 29,
+        "renovaciones45": 2,
+        "primaVigenteApprox": "Q111K",
+        "advisorRows": [
+          "Carlos Castro"
+        ]
+      },
+      "cliente360": "CLICK_CAUSES_PLATFORM_BLOCK_AND_WHITE_SCREEN_FOR_MINUTES",
+      "polizas": "HASH_CHANGES_TO_POLIZAS_BUT_INICIO_CONTENT_REMAINS_DURING_BLOCK",
+      "otherModulesNotVerifiable": [
+        "cliente360",
+        "cobros",
+        "polizas"
+      ],
+      "operativoClientNames": "NOT_AVAILABLE_TO_VALIDATE_DUE_TO_BLOCK"
+    },
+    "conclusions": {
+      "activeRoleScope": "VISUAL_IMPROVEMENT_DEMONSTRATED_NOT_FULLY_CLOSED",
+      "performanceRouting": "REJECTED_REPRODUCIBLE",
+      "dataUniverse": "INCONSISTENT_CLIENT_POLICY_UNIVERSE_REQUIRES_ROOT_CAUSE",
+      "dashboardReality": "UNRECONCILED"
+    },
+    "independentRuntimeEvidence": {
+      "runId": 35559198932,
+      "previewType": "B2_ACCUMULATED_PREVIEW_DIAGNOSTIC_EVIDENCE_ONLY_NOT_B1_ACCEPTANCE",
+      "milestones": {
+        "operativo": {
+          "clientes": 439,
+          "polizas": 1415,
+          "recibosEsperados": 1843,
+          "carteraPrimas": 1284,
+          "asesores": 7
+        },
+        "asesor": {
+          "clientes": 395,
+          "polizas": 1239,
+          "recibosEsperados": 1650,
+          "carteraPrimas": 1155,
+          "asesores": 1,
+          "leakCount": 0
+        },
+        "failure": "B2_AUTH_CLIENT_OPEN_TIMEOUT",
+        "cleanupDeleted": 0
+      },
+      "interpretation": "Authenticated browser independently reproduced main-thread/client-route unresponsiveness and exposed role/universe inconsistency; it does not replace B1 exact-artifact visual acceptance."
+    },
+    "boundaries": {
+      "advanceToB2": false,
+      "advanceToB3": false,
+      "productMutationAuthorized": false,
+      "diagnosticReadOnly": true,
+      "reimportAuthorized": false,
+      "livePromotionAuthorized": false
+    }
+  },
+  "rootCausePare20260920": {
+    "status": "IN_PROGRESS_READ_ONLY",
+    "demonstratedFacts": [
+      "B1_R9_EXACT_PREVIEW_STILL_SERVES_SOURCE_a763f6a99141_AND_BUILD_gi-i65-b1-a763f6a99141-57f234755dc1",
+      "CARLOS_OPERATIVO_CLIENT_COUNT_12_WHILE_POLICY_COUNT_1415",
+      "CARLOS_ASESOR_SINGLE_ADVISOR_ROW_AND_REDUCED_POLICY_OVERDUE_RENEWAL_COUNTS",
+      "CLIENTE360_ROUTE_CAN_BLOCK_MAIN_THREAD_FOR_MORE_THAN_15_SECONDS",
+      "POLIZAS_HASH_CAN_CHANGE_WHILE_PREVIOUS_INICIO_CONTENT_REMAINS",
+      "BACKEND_PRODUCT_QUERY_PLANNER_IS_COMPILED_FROM_FROZEN_LOGIN_MEMBERSHIP_ACTIVE_ROLE_SCOPES",
+      "CLIENT_SIDE_ROLE_SWITCH_DOES_NOT_REBUILD_FIRESTORE_QUERY_PLANNER",
+      "RELATION_SCOPED_COLLECTIONS_USE_IN_MEMORY_LINEAR_POLICY_CLIENT_LOOKUPS"
+    ],
+    "causes": {
+      "universeHydration": {
+        "status": "ARCHITECTURAL_CAUSE_DEMONSTRATED_MEMBER_SPECIFIC_CONFIG_PENDING_READ_ONLY_CONFIRMATION",
+        "ownerChain": [
+          "core/backend-product-readonly-bootstrap-p0.js",
+          "core/product-query-planner-contract-p0.js",
+          "core/tenant-access-policy-product-p0.js",
+          "core/tenant-access-policy-contract-p0.js"
+        ],
+        "cause": "Firestore query planner is frozen from authenticated membership at bootstrap while active-role switching and tenant role-scope administration occur later client-side; collection universes can therefore remain based on login membership/module scopes instead of the currently selected role."
+      },
+      "client360Performance": {
+        "status": "REPRODUCED_ROOT_PHASE_NOT_YET_MICROPROFILED",
+        "ownerChain": [
+          "modules/cliente360.js",
+          "data/store-firestore-product-readonly-p0.js",
+          "core/access-scope.js"
+        ],
+        "evidence": "Authenticated runtime reached CLIENT_CREATE_OPEN then timed out >15s before modal could execute, consistent with route/main-thread blocking."
+      }
+    }
   }
 }

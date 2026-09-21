@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+  "status": "PAUSED_PENDING_B1_REACCEPTANCE",
   "recordedAt": "2026-09-20T19:55:00-06:00",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -268,5 +268,14 @@
         "policies": 0
       }
     }
-  ]
+  ],
+  "pause20260920": {
+    "reason": "B1_VISUAL_REJECTION_R3_PERFORMANCE_ROUTING_UNIVERSE",
+    "preserveAllB2Work": true,
+    "productSourceMustNotAdvance": true,
+    "authenticatedQaRetry2FailedRunId": 35559198932,
+    "authenticatedQaFailure": "B2_AUTH_CLIENT_OPEN_TIMEOUT",
+    "syntheticCleanupObservedInRun": true,
+    "resumeCondition": "B1_EXACT_ARTIFACT_VISUAL_AND_RUNTIME_ACCEPTED_AFTER_ROOT_CAUSE_FIX"
+  }
 }
