@@ -331,6 +331,8 @@ try{
   need(source['orbit360-platform/modules/equipo.js'].includes("Orbit.domainConfig.save('access'"),'B1_ROLE_MATRIX_NOT_CANONICAL_SERVER_OWNED');
   need(source['functions/tenant-domain-config.js'].includes("'access'"),'B1_ACCESS_CONFIG_BACKEND_DOMAIN_MISSING');
   need(source['orbit360-platform/core/access-scope.js'].includes("ac.rolePermissions"),'B1_RUNTIME_CANONICAL_ROLE_MATRIX_MISSING');
+  need(source['orbit360-platform/core/access-scope.js'].includes("recibosEsperados: 'cobros'")&&source['orbit360-platform/core/access-scope.js'].includes("carteraPrimas: 'cobros'"),'B1_R9_FINANCIAL_READ_MODELS_NOT_SCOPED');
+  need(source['orbit360-platform/core/access-scope.js'].includes("asesores: 'inicio'")&&source['orbit360-platform/core/access-scope.js'].includes("metas: 'inicio'"),'B1_R9_INICIO_AGGREGATE_SOURCES_NOT_SCOPED');
   need(source['orbit360-platform/core/router.js'].includes("Orbit.access.withScope(route"),'B1_ROUTER_SCOPED_RENDER_MISSING');
   need(source['orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js'].includes('la entrega al buzón no está confirmada'),'B1_EMAIL_DELIVERY_WORDING_NOT_FAIL_CLOSED');
   need(!/window\.prompt\(/.test(source['orbit360-platform/modules/equipo.js'])&&!/window\.prompt\(/.test(source['orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js']),'B1_NATIVE_PROMPT_SOURCE');
@@ -348,7 +350,17 @@ try{
     window.Orbit={};window.__role='Operativo';
     const actor={id:'ase-test',nombre:'Test',email:'test@example.invalid',scopeDatos:'todos',paises:['GT'],roles:['Operativo','Asesor'],rolDefault:'Operativo',teamId:''};
     const other={id:'ase-other',nombre:'Other',email:'other@example.invalid',scopeDatos:'propios',paises:['GT'],roles:['Asesor'],rolDefault:'Asesor',teamId:''};
-    const rows={asesores:[actor,other],clientes:[{id:'c-own',asesorId:'ase-test',pais:'GT'},{id:'c-other',asesorId:'ase-other',pais:'GT'}],polizas:[]};
+    const rows={
+      asesores:[actor,other],
+      clientes:[{id:'c-own',asesorId:'ase-test',pais:'GT'},{id:'c-other',asesorId:'ase-other',pais:'GT'}],
+      polizas:[{id:'p-own',clienteId:'c-own',asesorId:'ase-test',pais:'GT'},{id:'p-other',clienteId:'c-other',asesorId:'ase-other',pais:'GT'}],
+      vehiculos:[{id:'v-own',polizaId:'p-own',clienteId:'c-own',pais:'GT'},{id:'v-other',polizaId:'p-other',clienteId:'c-other',pais:'GT'}],
+      recibosEsperados:[{id:'r-own',polizaId:'p-own',clienteId:'c-own',pais:'GT'},{id:'r-other',polizaId:'p-other',clienteId:'c-other',pais:'GT'}],
+      carteraPrimas:[{id:'cp-own',polizaId:'p-own',clienteId:'c-own',pais:'GT'},{id:'cp-other',polizaId:'p-other',clienteId:'c-other',pais:'GT'}],
+      cobros:[{id:'cb-own',polizaId:'p-own',clienteId:'c-own',asesorId:'ase-test',pais:'GT'},{id:'cb-other',polizaId:'p-other',clienteId:'c-other',asesorId:'ase-other',pais:'GT'}],
+      metas:[{id:'m-own',asesorId:'ase-test',tipo:'prima'},{id:'m-other',asesorId:'ase-other',tipo:'prima'}],
+      negocios:[{id:'n-own',asesorId:'ase-test',pais:'GT'},{id:'n-other',asesorId:'ase-other',pais:'GT'}]
+    };
     Orbit.store={all:c=>(rows[c]||[]).slice(),get:(c,id)=>(rows[c]||[]).find(x=>x.id===id)||null,where:(c,p)=>(rows[c]||[]).filter(p),find:(c,p)=>(rows[c]||[]).find(p),insert:()=>{},update:()=>{},remove:()=>{}};
     Orbit.session={rol:()=>window.__role,asesorId:()=> 'ase-test',rolesAsignados:()=>['Operativo','Asesor'],canSee:()=>false};
     Orbit.auth={user:()=>({uid:'u-test',email:'test@example.invalid'})};
@@ -359,20 +371,27 @@ try{
   });
   await policyPage.addScriptTag({content:source['orbit360-platform/core/access-scope.js']});
   const policyProof=await policyPage.evaluate(()=>{
+    const snap=()=>Orbit.access.withScope('inicio',()=>Object.fromEntries(
+      ['clientes','polizas','vehiculos','recibosEsperados','carteraPrimas','cobros','asesores','metas','negocios']
+        .map(col=>[col,(Orbit.store.all(col)||[]).map(x=>x.id).sort()])
+    ));
     const oper={
       cotizador:Orbit.access.can('cotizador','view'),
       scope:Orbit.access.dataScope('cliente360'),
-      visible:Orbit.access.filter('clientes',Orbit.store.all('clientes'),'cliente360').map(x=>x.id)
+      visible:Orbit.access.filter('clientes',Orbit.store.all('clientes'),'cliente360').map(x=>x.id),
+      inicio:snap()
     };
     window.__role='Asesor';
     const asesor={
       scope:Orbit.access.dataScope('cliente360'),
-      visible:Orbit.access.filter('clientes',Orbit.store.all('clientes'),'cliente360').map(x=>x.id)
+      visible:Orbit.access.filter('clientes',Orbit.store.all('clientes'),'cliente360').map(x=>x.id),
+      inicio:snap()
     };
     window.__role='Operativo';window.__accessCfg.roleScopes.Operativo='team';
     const teamNoBinding={
       scope:Orbit.access.dataScope('cliente360'),
-      visible:Orbit.access.filter('clientes',Orbit.store.all('clientes'),'cliente360').map(x=>x.id)
+      visible:Orbit.access.filter('clientes',Orbit.store.all('clientes'),'cliente360').map(x=>x.id),
+      inicio:snap()
     };
     return{oper,asesor,teamNoBinding};
   });
@@ -380,7 +399,18 @@ try{
   need(policyProof.oper.scope==='all'&&policyProof.oper.visible.length===2,'B1_R8_OPERATIVO_ALL_SCOPE_FAILED:'+JSON.stringify(policyProof));
   need(policyProof.asesor.scope==='own'&&JSON.stringify(policyProof.asesor.visible)===JSON.stringify(['c-own']),'B1_R8_ASESOR_ROLE_DID_NOT_NARROW_TO_OWN:'+JSON.stringify(policyProof));
   need(policyProof.teamNoBinding.scope==='team'&&JSON.stringify(policyProof.teamNoBinding.visible)===JSON.stringify(['c-own']),'B1_R8_TEAM_WITHOUT_BINDING_NOT_FAIL_CLOSED:'+JSON.stringify(policyProof));
-  ev.auth.rolePolicy={pass:true,userSpecificBranching:false,matrixExpandsModule:true,operativoAll:true,asesorOwn:true,teamNoBindingOwnOnly:true};
+  const ownExpected={
+    clientes:['c-own'],polizas:['p-own'],vehiculos:['v-own'],recibosEsperados:['r-own'],
+    carteraPrimas:['cp-own'],cobros:['cb-own'],asesores:['ase-test'],metas:['m-own'],negocios:['n-own']
+  };
+  const allExpected={
+    clientes:['c-other','c-own'],polizas:['p-other','p-own'],vehiculos:['v-other','v-own'],recibosEsperados:['r-other','r-own'],
+    carteraPrimas:['cp-other','cp-own'],cobros:['cb-other','cb-own'],asesores:['ase-other','ase-test'],metas:['m-other','m-own'],negocios:['n-other','n-own']
+  };
+  need(JSON.stringify(policyProof.oper.inicio)===JSON.stringify(allExpected),'B1_R9_OPERATIVO_INICIO_SCOPE_NOT_ALL:'+JSON.stringify(policyProof));
+  need(JSON.stringify(policyProof.asesor.inicio)===JSON.stringify(ownExpected),'B1_R9_ASESOR_INICIO_MIXED_SCOPE:'+JSON.stringify(policyProof));
+  need(JSON.stringify(policyProof.teamNoBinding.inicio)===JSON.stringify(ownExpected),'B1_R9_TEAM_NO_BINDING_INICIO_LEAK:'+JSON.stringify(policyProof));
+  ev.auth.rolePolicy={pass:true,userSpecificBranching:false,matrixExpandsModule:true,operativoAll:true,asesorOwn:true,teamNoBindingOwnOnly:true,inicioFinancialReadModelsScoped:true,advisorAggregateScoped:true,metasScoped:true};
   await policyContext.close();
 
   context=await browser.newContext({viewport:{width:1500,height:1000}});
