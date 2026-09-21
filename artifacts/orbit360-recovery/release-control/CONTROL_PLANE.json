@@ -713,7 +713,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B1_VISUAL",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B2_DIAGNOSTIC",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -1917,9 +1917,9 @@
     "addendumPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_ADDENDUM_20260919.md",
     "forensicAuditPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_AUDIT_20260919.json",
     "candidateMode": "ONE_ACCUMULATIVE_INCREMENTAL_CANDIDATE",
-    "currentBlock": "B1",
-    "currentReadinessPercent": 70,
-    "nextTargetPercent": 80,
+    "currentBlock": "B2",
+    "currentReadinessPercent": 80,
+    "nextTargetPercent": 90,
     "previewAfterEveryBlockRequired": true,
     "sameArtifactPreviewToLiveRequired": true,
     "noParallelMethodology": true,
@@ -1942,7 +1942,7 @@
     "addendumBlobSha": "05099a90cfb4862eec97e0359d55932828cb930b",
     "forensicAuditBlobSha": "fcfdf29c9eb851d76cebf67bcbe36d8ed308eb0f",
     "paymentInferenceBlobSha": "cfb026ded52c36083528de658a70191c8380d725",
-    "mechanismSyncStatus": "B1_R9_CANDIDATE_PENDING_PREVIEW",
+    "mechanismSyncStatus": "B1_ACCEPTED_B2_READ_ONLY_DIAGNOSTIC_ACTIVE",
     "guardFailureBeforeFix": {
       "runId": 35450692628,
       "code": "I6_5_NEXT_ACTION_INVALID",
@@ -1951,15 +1951,19 @@
       "livePromotion": false
     },
     "b1ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B1_EXECUTION_LOCK_20260919.json",
-    "b1ExecutionLockBlobSha": "6aa9b356ee708c0717adcbb5634abfb5fe70d6ff",
+    "b1ExecutionLockBlobSha": "25ad3a2903db1992b5d7630d9ec44864e6a362ce",
     "b1": {
-      "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+      "status": "ACCEPTED_FOR_B2_EMAIL_DEFERRED",
       "sourceSha": "a763f6a991418cba2c59eac475edf3eb57fd1320",
       "buildId": "gi-i65-b1-a763f6a99141-57f234755dc1",
       "previewUrl": "https://ays-orbit-360-lab--gi-i65-b1-35455766715-ylc10xr5.web.app",
       "runId": 35551713416,
       "artifactId": 10619180286,
-      "livePromoted": false
+      "livePromoted": false,
+      "exactReadback": true,
+      "functionalPass": true,
+      "visualAccepted": "PRIOR_SURFACES_PRESERVED_SCOPE_SPOTCHECK_CARRY_FORWARD",
+      "emailDeliveryFernando": "DEFERRED_NON_BLOCKING_OPEN_DEBT"
     },
     "lastVisualRejection": {
       "recordedAt": "2026-09-20T19:17:00-06:00",
@@ -1990,6 +1994,27 @@
       "minimumFix": "complete canonical scoped collection registry and generic advisor identity filtering; preserve role matrix/router/branding passes",
       "productSourceCommit": "7b9e92e053f479f3f8b38d019c997ea3ac2fde27",
       "proofHeadSha": "8aad57ca2ec62e6da1263ceb97467d6da83297e7"
+    },
+    "b1OwnerProgressionAuthorization": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B1_OWNER_PROGRESSION_AUTHORIZATION_20260920.json",
+      "blobSha": "927abb1039e61e0bc2d1d6d0c74044344c1704ee",
+      "decision": "AUTHORIZED",
+      "emailDeliveryBlocking": false
+    },
+    "emailDeliveryDebt": {
+      "status": "OPEN_DEFERRED_NON_BLOCKING",
+      "target": "PLATFORM_TRANSACTIONAL_EMAIL_CONFIGURATION",
+      "mayBeDeclaredResolved": false,
+      "blocksCurrentForensicProgression": false
+    },
+    "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
+    "b2ExecutionLockBlobSha": "8e1fbfb8c3ccbdad2eda5d4df02795fcccc1ee8a",
+    "b2": {
+      "status": "READ_ONLY_DIAGNOSTIC_ACTIVE",
+      "parentB1SourceSha": "a763f6a991418cba2c59eac475edf3eb57fd1320",
+      "activeRoleScopeSpotCheckCarryForward": true,
+      "dashboardRealityCarryForward": true,
+      "livePromoted": false
     }
   }
 }
