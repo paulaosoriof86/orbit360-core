@@ -1,6 +1,6 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B1_EXECUTION_LOCK_V1",
-  "status": "VISUAL_REJECTED_R2_ROOT_CAUSE_REQUIRED",
+  "status": "CANDIDATE_PENDING_PREVIEW",
   "date": "2026-09-19",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -999,5 +999,49 @@
     "currentTransport": "FIREBASE_AUTH_DEFAULT",
     "rootCauseOfMailboxNonDelivery": "NOT_YET_DEMONSTRATED",
     "observabilityGapDemonstrated": true
+  },
+  "r9CumulativePatch": {
+    "status": "PRODUCT_AND_PROOF_READY_PENDING_SINGLE_BUILD_PREVIEW",
+    "classification": "CODE_DEFECT_ACTIVE_ROLE_SCOPE",
+    "productSourceCommit": "7b9e92e053f479f3f8b38d019c997ea3ac2fde27",
+    "proofHeadSha": "8aad57ca2ec62e6da1263ceb97467d6da83297e7",
+    "productFiles": [
+      "orbit360-platform/core/access-scope.js"
+    ],
+    "proofFiles": [
+      "tools/gravicentra-i6-5-b1-functional.mjs"
+    ],
+    "fixes": [
+      "SCOPE_RECIBOS_ESPERADOS_BY_ACTIVE_ROLE",
+      "SCOPE_CARTERA_PRIMAS_BY_ACTIVE_ROLE",
+      "SCOPE_ASESOR_AGGREGATE_ROWS_BY_ACTIVE_ROLE",
+      "SCOPE_METAS_BY_ACTIVE_ROLE",
+      "RAW_ACTOR_ADVISOR_LOOKUP_AVOIDS_SCOPED_RECURSION",
+      "TEAM_RELATION_LOOKUP_USES_RAW_ADVISOR_DIRECTORY"
+    ],
+    "preserved": [
+      "ROLE_PERMISSION_MATRIX_R8",
+      "ACTIVE_ROLE_RERENDER_R8",
+      "OPERATIVO_COTIZADOR_COMPARATIVO_VISUAL_PASS",
+      "VISIBILITY_GROUP_UI_PASS",
+      "BRANDING_VISUAL_PASS_NO_SOURCE_TOUCH",
+      "CARLOS_LOGIN_PASS",
+      "SAMUEL_LOGIN_PASS",
+      "TEAM_7_CANONICAL_USERS_PASS"
+    ],
+    "expectedProof": [
+      "Operativo all sees all synthetic records in scoped Inicio",
+      "Asesor own sees only actor synthetic records across clientes/polizas/vehiculos/recibosEsperados/carteraPrimas/cobros/asesores/metas/negocios",
+      "Team without binding fails closed to actor own records",
+      "No person/email/UID hardcodes",
+      "No operational data writes"
+    ],
+    "dataMutationAuthorized": false,
+    "operationalDataWrites": 0,
+    "reimport": false,
+    "brandingTouched": false,
+    "emailTransportChanged": false,
+    "livePromotion": false,
+    "advanceToB2": false
   }
 }
