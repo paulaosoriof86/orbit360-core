@@ -60,6 +60,7 @@ on:
       - 'artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json'
       - 'tools/gravicentra-i6-5-b2-functional.mjs'
       - 'tools/gravicentra-i6-5-b2-authenticated-preview.mjs'
+      - 'tools/gravicentra-i6-5-b2-synthetic-cleanup.mjs'
       - 'orbit360-platform/core/policy-receipts-engine.js'
       - 'orbit360-platform/core/issuance-workflow-v1201.js'
       - 'orbit360-platform/modules/issuance-endosos-v1201-bridge.js'
@@ -3802,3 +3803,78 @@ jobs:
         if: ${{ failure() && steps.mode.outputs.run == 'true' }}
         continue-on-error: true
         run: echo "B2_AUTHENTICATED_PROOF_FAILED_NO_LIVE_NO_REIMPORT_CLEANUP_REQUIRED"
+
+
+  i65-b2-synthetic-cleanup:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    env:
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      B2_LOCK: artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Gate timed-out B2 synthetic cleanup
+        id: mode
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          node - <<'NODE'
+          const fs=require('node:fs'),c=JSON.parse(fs.readFileSync(process.env.CONTROL)),b=JSON.parse(fs.readFileSync(process.env.B2_LOCK)),q=b.orphanSyntheticCleanup||{},x=q.boundaries||{};
+          const run=c.i65ForensicRemediationPlan?.currentBlock==='B2'&&q.status==='AUTHORIZED_PENDING_RUN'&&Number(q.orphanRunId)>0;
+          if(run&&(x.deleteOnlyMatchingSyntheticRows!==true||x.businessDataMutationAuthorized!==false||x.reimportAuthorized!==false||x.livePromotionAuthorized!==false||x.emailSendAuthorized!==false))throw Error('B2_CLEANUP_BOUNDARY_INVALID');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(run?'true':'false')+'\n');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'orphan='+(q.orphanRunId||'')+'\n');
+          NODE
+      - name: Assert LIVE unchanged before cleanup
+        if: steps.mode.outputs.run == 'true'
+        run: node tools/gravicentra-certified-live-binding-check.mjs
+      - name: Install cleanup dependency
+        if: steps.mode.outputs.run == 'true'
+        run: npm install --no-save --package-lock=false firebase-admin@13.4.0 >/dev/null
+      - name: Execute exact-marker synthetic cleanup
+        id: cleanup
+        if: steps.mode.outputs.run == 'true'
+        env:
+          B2_ORPHAN_RUN: ${{ steps.mode.outputs.orphan }}
+          B2_CLEANUP_OUT: ${{ runner.temp }}/b2-synthetic-cleanup.json
+        run: node tools/gravicentra-i6-5-b2-synthetic-cleanup.mjs
+      - name: Upload cleanup evidence
+        if: always() && steps.mode.outputs.run == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i6-5-b2-cleanup-${{ github.run_id }}
+          path: ${{ runner.temp }}/b2-synthetic-cleanup.json
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 30
+      - name: Freeze cleanup verification
+        if: steps.mode.outputs.run == 'true' && steps.cleanup.conclusion == 'success'
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('node:fs'),cpPath=process.env.CONTROL,lockPath=process.env.B2_LOCK,ev=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/b2-synthetic-cleanup.json')),c=JSON.parse(fs.readFileSync(cpPath)),b=JSON.parse(fs.readFileSync(lockPath));
+          if(ev.status!=='PASS'||ev.after?.clients!==0||ev.after?.policies!==0)throw Error('B2_CLEANUP_EVIDENCE_INVALID');
+          b.orphanSyntheticCleanup={...(b.orphanSyntheticCleanup||{}),status:'PASS',runId:Number(process.env.GITHUB_RUN_ID),before:ev.before,deleted:ev.deleted,after:ev.after};
+          fs.writeFileSync(lockPath,JSON.stringify(b,null,2)+'\n');
+          c.i65ForensicRemediationPlan.b2={...(c.i65ForensicRemediationPlan.b2||{}),orphanSyntheticCleanup:'PASS',orphanSyntheticCleanupRunId:Number(process.env.GITHUB_RUN_ID)};
+          fs.writeFileSync(cpPath,JSON.stringify(c,null,2)+'\n');
+          NODE
+          git add "$B2_LOCK"
+          BLOB=$(git hash-object "$B2_LOCK");export BLOB
+          node - <<'NODE'
+          const fs=require('node:fs'),p=process.env.CONTROL,c=JSON.parse(fs.readFileSync(p));c.i65ForensicRemediationPlan.b2ExecutionLockBlobSha=process.env.BLOB;fs.writeFileSync(p,JSON.stringify(c,null,2)+'\n');
+          NODE
+          git add "$CONTROL"
+          git config user.name gravicentra-recovery-bot
+          git config user.email gravicentra-recovery-bot@users.noreply.github.com
+          git commit -m "freeze(i6.5): B2 synthetic cleanup verified"
+          git push origin "HEAD:$GITHUB_REF_NAME"
