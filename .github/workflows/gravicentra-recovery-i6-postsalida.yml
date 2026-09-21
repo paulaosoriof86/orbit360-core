@@ -57,6 +57,7 @@ on:
       - 'tools/gravicentra-i6-5-b1-r7-auth-team-readonly.mjs'
       - 'tools/gravicentra-i6-5-b1-r7-bootstrap-readonly.mjs'
       - 'tools/gravicentra-i6-5-b1-r8-access-email-readonly.mjs'
+      - 'tools/gravicentra-i6-5-b1-r10-rootcause-readonly.mjs'
       - 'artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json'
       - 'tools/gravicentra-i6-5-b2-functional.mjs'
       - 'tools/gravicentra-i6-5-b2-authenticated-preview.mjs'
@@ -3878,3 +3879,74 @@ jobs:
           git config user.email gravicentra-recovery-bot@users.noreply.github.com
           git commit -m "freeze(i6.5): B2 synthetic cleanup verified"
           git push origin "HEAD:$GITHUB_REF_NAME"
+
+  i65-b1-r10-rootcause-readonly:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    env:
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      B1_LOCK: artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B1_EXECUTION_LOCK_20260919.json
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Gate B1 R10 read-only root-cause diagnostic
+        id: gate
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          node - <<'NODE'
+          const fs=require('fs'),c=JSON.parse(fs.readFileSync(process.env.CONTROL)),b=JSON.parse(fs.readFileSync(process.env.B1_LOCK)),d=b.r10ReadOnlyDiagnostic||{};
+          const run=c.i65ForensicRemediationPlan?.currentBlock==='B1'&&c.nextAction==='I6_5_FORENSIC_REMEDIATION_B1_R3_ROOT_CAUSE'&&b.status==='VISUAL_REJECTED_R3_PERFORMANCE_AND_UNIVERSE_ROOT_CAUSE_REQUIRED'&&d.status==='AUTHORIZED_PENDING_RUN';
+          if(run&&(d.boundaries?.readOnly!==true||d.boundaries?.dataWrites!==0||d.boundaries?.productMutationAuthorized!==false||d.boundaries?.reimportAuthorized!==false||d.boundaries?.livePromotionAuthorized!==false))throw Error('B1_R10_BOUNDARY_INVALID');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(run?'true':'false')+'\n');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'target='+(d.exactPreview?.url||'')+'\n');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'source='+(d.exactPreview?.sourceSha||'')+'\n');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'build='+(d.exactPreview?.buildId||'')+'\n');
+          NODE
+      - name: Assert LIVE unchanged
+        if: steps.gate.outputs.run == 'true'
+        run: node tools/gravicentra-certified-live-binding-check.mjs
+      - name: Validate exact B1 Preview marker
+        if: steps.gate.outputs.run == 'true'
+        env:
+          TARGET_URL: ${{ steps.gate.outputs.target }}
+          EXPECTED_SOURCE: ${{ steps.gate.outputs.source }}
+          EXPECTED_BUILD: ${{ steps.gate.outputs.build }}
+        run: |
+          python3 - <<'PY'
+          import json,os,urllib.request,time
+          u=os.environ['TARGET_URL'].rstrip('/')+'/__recovery__/build.json?r10='+str(time.time())
+          with urllib.request.urlopen(u,timeout=30) as z:d=json.loads(z.read())
+          if d.get('sourceSha')!=os.environ['EXPECTED_SOURCE'] or d.get('buildId')!=os.environ['EXPECTED_BUILD']:raise SystemExit('B1_R10_PREVIEW_DRIFT:'+str(d))
+          print('B1_R10_PREVIEW_MARKER=PASS')
+          PY
+      - name: Install read-only diagnostic dependencies
+        if: steps.gate.outputs.run == 'true'
+        run: |
+          npm install --no-save --package-lock=false firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
+          npx playwright install --with-deps chromium >/dev/null
+      - name: Execute B1 R10 read-only diagnostic
+        id: diag
+        if: steps.gate.outputs.run == 'true'
+        env:
+          TARGET_URL: ${{ steps.gate.outputs.target }}
+          B1_R10_OUT: ${{ runner.temp }}/b1-r10-rootcause-readonly.json
+        run: node tools/gravicentra-i6-5-b1-r10-rootcause-readonly.mjs | tee "${{ runner.temp }}/b1-r10-rootcause-readonly.log"
+      - name: Upload B1 R10 evidence
+        if: always() && steps.gate.outputs.run == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i6-5-b1-r10-rootcause-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/b1-r10-rootcause-readonly.json
+            ${{ runner.temp }}/b1-r10-rootcause-readonly.log
+          if-no-files-found: warn
+          compression-level: 0
+          retention-days: 30

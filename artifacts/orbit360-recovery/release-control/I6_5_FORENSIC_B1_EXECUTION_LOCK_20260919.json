@@ -1205,5 +1205,30 @@
         "evidence": "Authenticated runtime reached CLIENT_CREATE_OPEN then timed out >15s before modal could execute, consistent with route/main-thread blocking."
       }
     }
+  },
+  "r10ReadOnlyDiagnostic": {
+    "status": "AUTHORIZED_PENDING_RUN",
+    "script": "tools/gravicentra-i6-5-b1-r10-rootcause-readonly.mjs",
+    "exactPreview": {
+      "sourceSha": "a763f6a991418cba2c59eac475edf3eb57fd1320",
+      "buildId": "gi-i65-b1-a763f6a99141-57f234755dc1",
+      "url": "https://ays-orbit-360-lab--gi-i65-b1-35455766715-ylc10xr5.web.app",
+      "artifactId": 10619180286
+    },
+    "objectives": [
+      "CONFIRM_MEMBER_AND_ADVISOR_SCOPE_CONFIGURATION",
+      "COMPARE_FROZEN_FIRESTORE_QUERY_PLANS_TO_ACTIVE_ROLE_SCOPE",
+      "COMPARE_HYDRATED_UNIVERSE_OPERATIVO_VS_ASESOR",
+      "MICROPROFILE_CLIENTE360_SCOPED_READS",
+      "REPRODUCE_CLIENTE360_AND_POLIZAS_ROUTE_BLOCK_READ_ONLY"
+    ],
+    "boundaries": {
+      "readOnly": true,
+      "dataWrites": 0,
+      "productMutationAuthorized": false,
+      "reimportAuthorized": false,
+      "livePromotionAuthorized": false,
+      "emailSendAuthorized": false
+    }
   }
 }
