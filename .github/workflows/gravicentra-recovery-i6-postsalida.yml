@@ -57,6 +57,11 @@ on:
       - 'tools/gravicentra-i6-5-b1-r7-auth-team-readonly.mjs'
       - 'tools/gravicentra-i6-5-b1-r7-bootstrap-readonly.mjs'
       - 'tools/gravicentra-i6-5-b1-r8-access-email-readonly.mjs'
+      - 'artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json'
+      - 'tools/gravicentra-i6-5-b2-functional.mjs'
+      - 'orbit360-platform/core/policy-receipts-engine.js'
+      - 'orbit360-platform/core/issuance-workflow-v1201.js'
+      - 'orbit360-platform/modules/issuance-endosos-v1201-bridge.js'
       - 'functions/tenant-branding.js'
       - 'functions/user-onboarding.js'
       - 'functions/product-operational-domain.js'
@@ -3467,3 +3472,165 @@ jobs:
           path: ${{ runner.temp }}/b1-r8/*
           compression-level: 0
           retention-days: 14
+
+  i65-forensic-b2-preview:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      B2_LOCK: artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Gate B2 and preserve LIVE
+        id: mode
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          node - <<'NODE'
+          const fs=require('node:fs'),c=JSON.parse(fs.readFileSync(process.env.CONTROL)),b=JSON.parse(fs.readFileSync(process.env.B2_LOCK));
+          const mode=b.status==='CANDIDATE_PENDING_PREVIEW'&&c.nextAction==='I6_5_FORENSIC_REMEDIATION_B2_PREVIEW'?'preview':'noop';
+          if(mode==='preview'&&(c.i65ForensicRemediationPlan?.currentBlock!=='B2'||b.boundaries?.liveHostingPromotionAuthorized!==false||b.boundaries?.dataMutationAuthorized!==false))throw Error('B2_GATE');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'mode='+mode+'\n');console.log('B2_MODE='+mode);
+          NODE
+      - name: Assert LIVE still equals certified candidate
+        run: node tools/gravicentra-certified-live-binding-check.mjs
+      - name: Validate B2 source contracts
+        if: steps.mode.outputs.mode == 'preview'
+        run: |
+          set -euo pipefail
+          node --check orbit360-platform/modules/cliente360.js
+          node --check orbit360-platform/modules/policy-receipts-v1199-bridge.js
+          node --check orbit360-platform/core/policy-receipts-engine.js
+          node --check orbit360-platform/core/issuance-workflow-v1201.js
+          node --check orbit360-platform/modules/issuance-endosos-v1201-bridge.js
+          node --check orbit360-platform/modules/policy-receipts-v1199-detail-guard.js
+          node --check tools/gravicentra-i6-5-b2-functional.mjs
+          node tools/gravicentra-i6-5-b2-functional.mjs
+      - name: Install Firebase CLI
+        if: steps.mode.outputs.mode == 'preview'
+        run: |
+          set -euo pipefail
+          ROOT="$RUNNER_TEMP/b2-auth";mkdir -p "$ROOT";export ROOT
+          python3 - <<'PY'
+          import json,os,pathlib
+          rows=[]
+          for i,k in enumerate(['SA_DEFAULT','SA_ORBIT360_LAB','SA_ORBIT_360_LAB']):
+              try:d=json.loads(os.environ.get(k,''))
+              except:continue
+              if d.get('type')=='service_account' and d.get('project_id')=='ays-orbit-360-lab' and d.get('private_key'):
+                  p=pathlib.Path(os.environ['ROOT'])/f'{i}.json';p.write_text(json.dumps(d));p.chmod(0o600);rows.append(str(p))
+          if not rows:raise SystemExit('B2_NO_SERVICE_ACCOUNT')
+          pathlib.Path(os.environ['ROOT']+'/files').write_text('\n'.join(rows)+'\n')
+          PY
+          CROOT="$RUNNER_TEMP/b2-firebase-cli";npm install --prefix "$CROOT" --ignore-scripts --no-audit --no-fund firebase-tools@14.10.1 >/dev/null
+          node tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs "$CROOT"
+          CLI="$CROOT/node_modules/firebase-tools/lib/bin/firebase.js";echo "FIREBASE_CLI_BIN=$CLI" >> "$GITHUB_ENV"
+          SEL='';while read -r F;do if GOOGLE_APPLICATION_CREDENTIALS="$F" node "$CLI" apps:list WEB --project "$PROJECT_ID" --non-interactive --json >/dev/null 2>&1;then SEL="$F";break;fi;done<"$ROOT/files"
+          test -n "$SEL";cp "$SEL" "$RUNNER_TEMP/b2-sa.json";chmod 600 "$RUNNER_TEMP/b2-sa.json";echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/b2-sa.json" >> "$GITHUB_ENV"
+      - name: Materialize immutable accumulated B2 package
+        if: steps.mode.outputs.mode == 'preview'
+        id: build
+        run: |
+          set -euo pipefail
+          node "$FIREBASE_CLI_BIN" apps:list WEB --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/apps-b2.json";export APPS="$RUNNER_TEMP/apps-b2.json"
+          APP_ID=$(python3 - <<'PY'
+          import json,os
+          d=json.load(open(os.environ['APPS']));a=d.get('result') if isinstance(d,dict) else None
+          web=[x for x in (a or []) if str(x.get('platform','')).upper() in ('WEB','PLATFORM_WEB','')]
+          if len(web)!=1:raise SystemExit('B2_WEB_APP_CARDINALITY:'+str(len(web)))
+          print(web[0].get('appId',''))
+          PY
+          )
+          node "$FIREBASE_CLI_BIN" apps:sdkconfig WEB "$APP_ID" --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/public-config-b2.json"
+          export SOURCE_SHA="$GITHUB_SHA" RELEASE_GATE="I6.5" BUILD_PREFIX="gi-i65-b2" ENVIRONMENT_REF="firebase-hosting-preview-i6-5-forensic-b2"
+          node tools/gravicentra-i6-1-preview-package.mjs . "$RUNNER_TEMP/b2-package" "$RUNNER_TEMP/public-config-b2.json" > "$RUNNER_TEMP/b2-package-output.json"
+          node - <<'NODE'
+          const fs=require('fs'),d=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/b2-package-output.json'));for(const[k,v]of Object.entries({build_id:d.buildId,hosted_payload_digest:d.hostedPayloadDigest,backend_source_digest:d.backendSourceDigest,bundle_digest:d.bundleDigest}))fs.appendFileSync(process.env.GITHUB_OUTPUT,k+'='+v+'\n');
+          NODE
+      - name: Deploy exact B2 package to isolated Preview
+        if: steps.mode.outputs.mode == 'preview'
+        id: preview
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/b2-package/bundle"
+          CHANNEL_ID="gi-i65-b2-$GITHUB_RUN_ID"
+          node "$FIREBASE_CLI_BIN" hosting:channel:deploy "$CHANNEL_ID" --config firebase.json --project "$PROJECT_ID" --expires 7d --non-interactive --json > "$RUNNER_TEMP/b2-preview.json" 2>&1
+          cat "$RUNNER_TEMP/b2-preview.json";export DEPLOY="$RUNNER_TEMP/b2-preview.json"
+          PREVIEW_URL=$(python3 - <<'PY'
+          import os,re
+          raw=open(os.environ['DEPLOY']).read();prod='https://'+os.environ['HOSTING_SITE']+'.web.app';urls=[u.rstrip('/') for u in re.findall(r'https://[A-Za-z0-9._-]+\.web\.app',raw) if u.rstrip('/')!=prod]
+          if not urls:raise SystemExit('B2_PREVIEW_URL_NOT_FOUND')
+          print(urls[-1])
+          PY
+          )
+          echo "channel_id=$CHANNEL_ID" >> "$GITHUB_OUTPUT";echo "preview_url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
+      - name: Exact B2 Preview readback
+        if: steps.mode.outputs.mode == 'preview'
+        env:
+          TARGET_URL: ${{ steps.preview.outputs.preview_url }}
+          EXPECTED_BUILD_ID: ${{ steps.build.outputs.build_id }}
+        run: |
+          set -euo pipefail
+          export MANIFEST="$RUNNER_TEMP/b2-package/evidence/site-manifest.sha256"
+          python3 - <<'PY'
+          import hashlib,json,os,time,urllib.parse,urllib.request
+          rows=[tuple(x.split('  ',1)) for x in open(os.environ['MANIFEST']).read().splitlines() if x.strip()];base=os.environ['TARGET_URL'].rstrip('/')
+          for attempt in range(1,9):
+              bad=[]
+              for want,rel in rows:
+                  try:
+                      with urllib.request.urlopen(urllib.request.Request(base+'/'+urllib.parse.quote(rel,safe='/')+'?b2='+str(attempt)+'-'+str(int(time.time())),headers={'Accept-Encoding':'identity','Cache-Control':'no-cache, no-store'}),timeout=30) as z:got=hashlib.sha256(z.read()).hexdigest()
+                  except Exception as e:got=type(e).__name__
+                  if got!=want:bad.append(rel)
+              with urllib.request.urlopen(base+'/__recovery__/build.json?b2='+str(time.time()),timeout=30) as z:marker=json.loads(z.read())
+              if not bad and marker.get('sourceSha')==os.environ['GITHUB_SHA'] and marker.get('buildId')==os.environ['EXPECTED_BUILD_ID']:break
+              if attempt==8:raise SystemExit('B2_READBACK:'+str(bad[:5])+':'+str(marker))
+              time.sleep(3)
+          print('B2_PREVIEW_READBACK=PASS')
+          PY
+      - name: B2 functional proof on exact source
+        if: steps.mode.outputs.mode == 'preview'
+        run: node tools/gravicentra-i6-5-b2-functional.mjs | tee "$RUNNER_TEMP/b2-package/evidence/b2-functional.log"
+      - name: Upload accumulated B2 Preview artifact
+        if: steps.mode.outputs.mode == 'preview'
+        id: artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i6-5-b2-preview-${{ github.run_id }}
+          path: ${{ runner.temp }}/b2-package
+          include-hidden-files: true
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 30
+      - name: Freeze B2 Preview pending visual acceptance
+        if: steps.mode.outputs.mode == 'preview'
+        env:
+          B2_BUILD_ID: ${{ steps.build.outputs.build_id }}
+          B2_PREVIEW_URL: ${{ steps.preview.outputs.preview_url }}
+          B2_CHANNEL_ID: ${{ steps.preview.outputs.channel_id }}
+          B2_ARTIFACT_ID: ${{ steps.artifact.outputs.artifact-id }}
+          B2_ARTIFACT_DIGEST: ${{ steps.artifact.outputs.artifact-digest }}
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('fs'),cpPath=process.env.CONTROL,lockPath=process.env.B2_LOCK,c=JSON.parse(fs.readFileSync(cpPath)),b=JSON.parse(fs.readFileSync(lockPath));
+          b.status='PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL';b.preview={sourceSha:process.env.GITHUB_SHA,buildId:process.env.B2_BUILD_ID,channelId:process.env.B2_CHANNEL_ID,url:process.env.B2_PREVIEW_URL,runId:Number(process.env.GITHUB_RUN_ID),artifactId:Number(process.env.B2_ARTIFACT_ID),artifactDigest:process.env.B2_ARTIFACT_DIGEST||'',exactReadback:true,functionalPass:true,livePromoted:false};
+          fs.writeFileSync(lockPath,JSON.stringify(b,null,2)+'\n');c.nextAction='I6_5_FORENSIC_REMEDIATION_B2_VISUAL';c.i65ForensicRemediationPlan.b2={...(c.i65ForensicRemediationPlan.b2||{}),status:b.status,sourceSha:process.env.GITHUB_SHA,buildId:process.env.B2_BUILD_ID,previewUrl:process.env.B2_PREVIEW_URL,runId:Number(process.env.GITHUB_RUN_ID),artifactId:Number(process.env.B2_ARTIFACT_ID),livePromoted:false,exactReadback:true,functionalPass:true};fs.writeFileSync(cpPath,JSON.stringify(c,null,2)+'\n');
+          NODE
+          git add "$B2_LOCK";BLOB=$(git hash-object "$B2_LOCK");export BLOB;node - <<'NODE'
+          const fs=require('fs'),p=process.env.CONTROL,c=JSON.parse(fs.readFileSync(p));c.i65ForensicRemediationPlan.b2ExecutionLockBlobSha=process.env.BLOB;fs.writeFileSync(p,JSON.stringify(c,null,2)+'\n');
+          NODE
+          git add "$CONTROL";git config user.name gravicentra-recovery-bot;git config user.email gravicentra-recovery-bot@users.noreply.github.com;git commit -m "freeze(i6.5): B2 preview pass pending visual";git push origin "HEAD:$GITHUB_REF_NAME"
+      - name: B2 failure leaves operational data untouched
+        if: ${{ failure() && steps.mode.outputs.mode == 'preview' }}
+        continue-on-error: true
+        run: echo "B2_PREVIEW_FAILED_NO_LIVE_NO_DATA_APPLY"
