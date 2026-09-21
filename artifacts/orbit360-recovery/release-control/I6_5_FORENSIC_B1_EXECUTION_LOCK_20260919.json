@@ -1246,7 +1246,7 @@
     "artifactId": 10623883845
   },
   "r11ReadOnlyDiagnostic": {
-    "status": "AUTHORIZED_RETRY_AFTER_WORKFLOW_SCHEMA_FAILURE",
+    "status": "AUTHORIZED_PENDING_RUN",
     "script": "tools/gravicentra-i6-5-b1-r11-route-trace-readonly.mjs",
     "exactPreview": {
       "sourceSha": "a763f6a991418cba2c59eac475edf3eb57fd1320",
@@ -1270,6 +1270,9 @@
     "failedRunId": 35620443152,
     "failedRunConclusion": "failure",
     "failedRunJobs": 0,
-    "workflowSchemaFailure": true
+    "workflowSchemaFailure": true,
+    "schemaRetryCommit": "34455aed4e91c5531c63e4184c3da3d362f0a0b2",
+    "skippedRunId": 35655386396,
+    "skippedReason": "GATE_STATUS_MISMATCH"
   }
 }
