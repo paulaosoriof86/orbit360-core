@@ -1,6 +1,6 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B1_EXECUTION_LOCK_V1",
-  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+  "status": "VISUAL_REJECTED_R2_ROOT_CAUSE_REQUIRED",
   "date": "2026-09-19",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -893,5 +893,111 @@
     "runId": 35519356695,
     "exactReadback": true,
     "functionalPass": true
+  },
+  "visualRejection20260920R9": {
+    "status": "FORMALLY_RECORDED",
+    "recordedAt": "2026-09-20T19:17:00-06:00",
+    "reviewedPreview": {
+      "sourceSha": "68fe78c31b01d7cbffbf189b266dec221e9e33a7",
+      "buildId": "gi-i65-b1-68fe78c31b01-57f234755dc1",
+      "runId": 35519356695,
+      "artifactId": 10607933027,
+      "artifactDigest": "caf30e10b38fb5993a0a14c166a8626b22f2c777985ab3738bb51f3bd1e35206",
+      "url": "https://ays-orbit-360-lab--gi-i65-b1-35455766715-ylc10xr5.web.app",
+      "exactReadback": true,
+      "priorFunctionalProof": true,
+      "livePromoted": false
+    },
+    "visualPasses": [
+      "ROLE_MODULE_MATRIX_VISUAL_PASS",
+      "OPERATIVO_COTIZADOR_COMPARATIVO_PASS",
+      "ROLE_SCOPE_ADMIN_UI_PASS",
+      "VISIBILITY_GROUP_UI_PASS",
+      "BRANDING_VISUAL_PASS_PRESERVE",
+      "CARLOS_LOGIN_PASS",
+      "SAMUEL_LOGIN_PASS",
+      "TEAM_7_CANONICAL_USERS_PASS"
+    ],
+    "rejected": [
+      "ACTIVE_ROLE_DATA_SCOPE_PARTIAL_REJECTED",
+      "INICIO_MIXED_SCOPE_DETECTED",
+      "EMAIL_DELIVERY_FERNANDO_NOT_RECEIVED"
+    ],
+    "carlosOperativoToAsesorObserved": {
+      "policies": "1415_TO_25",
+      "activePremium": "ABOUT_Q1M_TO_ABOUT_Q111K",
+      "renewals45": "11_TO_2",
+      "overdueExpectedReceipts": "1036_UNCHANGED",
+      "interpretation": "ACTIVE_ROLE_SCOPE_APPLIES_TO_SOME_READS_BUT_NOT_ALL"
+    },
+    "boundaries": {
+      "brandingSourceChangeForbidden": true,
+      "dataMutationAuthorized": false,
+      "reimportAuthorized": false,
+      "livePromotionAuthorized": false,
+      "advanceToB2Authorized": false,
+      "userSpecificFixForbidden": true
+    }
+  },
+  "r9DirectedRootCause": {
+    "status": "ROOT_CAUSE_DEMONSTRATED_READ_ONLY",
+    "evidenceType": "CURRENT_BRANCH_SOURCE_TRACE",
+    "chain": [
+      "router.render executes module render inside Orbit.access.withScope(activeRoute)",
+      "withScope swaps Orbit.store for scopedStore(activeRoute)",
+      "scopedStore filters only collections present in access-scope OP_COLLS",
+      "clientes/polizas/cobros are registered and therefore react to active role",
+      "recibosEsperados/carteraPrimas/asesores/metas are not registered and therefore remain raw/global during Inicio aggregation",
+      "queries.cobrosVencidos reads recibosEsperados, so the 1036 badge can remain unchanged",
+      "queries.carteraGlobal reads carteraPrimas for pending/overdue, so those monetary KPIs can remain global",
+      "queries.leaderboard iterates asesores and Inicio metas iterates metas, so advisor rows/targets can remain broader than the active role"
+    ],
+    "owner": "orbit360-platform/core/access-scope.js",
+    "dependentReaders": [
+      "orbit360-platform/core/queries.js",
+      "orbit360-platform/modules/inicio.js",
+      "orbit360-platform/core/router.js"
+    ],
+    "minimumProductFix": "COMPLETE_CANONICAL_SCOPED_COLLECTION_REGISTRY_AND_ADVISOR_IDENTITY_FILTER_WITHOUT_PERSON_HARDCODES",
+    "expectedNoChangeReaders": [
+      "pólizas/clientes already scoped",
+      "router active-role rerender already present",
+      "role permission matrix already canonical"
+    ],
+    "sourceMutationExecuted": false,
+    "operationalWrites": 0,
+    "reimport": false,
+    "livePromotion": false
+  },
+  "dashboardRealityCarryForward": {
+    "id": "DASHBOARD_INICIO_REALITY_RECONCILIATION_REQUIRED",
+    "status": "FROZEN_CARRY_FORWARD_AFTER_B1_SCOPE_CLOSURE",
+    "reason": "A KPI changing with active role proves scope sensitivity, not business-value correctness.",
+    "requiredComparison": "UI -> Firestore canonical source -> calculation -> projection -> displayed result",
+    "metrics": [
+      "clientes",
+      "polizas vigentes",
+      "prima vigente",
+      "cobros",
+      "vencidos",
+      "recaudo confirmado",
+      "renovaciones",
+      "prioridades",
+      "avance por asesor"
+    ],
+    "assignment": "B2_OR_B3_PER_CANONICAL_MATRIX_AFTER_B1",
+    "noReimport": true,
+    "doNotReopenAuth": true,
+    "doNotMixWithPermissionsAfterScopePass": true
+  },
+  "emailDeliveryFernando": {
+    "status": "FAIL_NOT_RECEIVED_USER_OBSERVED",
+    "firebaseRequestAccepted": true,
+    "inboxDeliveryConfirmed": false,
+    "spamDeliveryConfirmed": false,
+    "providerReceiptAvailable": false,
+    "currentTransport": "FIREBASE_AUTH_DEFAULT",
+    "rootCauseOfMailboxNonDelivery": "NOT_YET_DEMONSTRATED",
+    "observabilityGapDemonstrated": true
   }
 }
