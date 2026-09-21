@@ -1,0 +1,53 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B1_OWNER_PROGRESSION_AUTHORIZATION_V1",
+  "recordedAt": "2026-09-20T19:55:00-06:00",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "owner": "PAULA",
+  "sourceConversationRole": "OWNER_EXPLICIT_CURRENT_INSTRUCTION_MATERIALIZED_TO_REPO",
+  "decision": "AUTHORIZE_B1_PROGRESSION_TO_B2_WITH_EMAIL_DELIVERY_DEFERRED_NON_BLOCKING",
+  "scope": {
+    "b1EmailDeliveryFernando": {
+      "observedStatus": "FAIL_NOT_RECEIVED_USER_OBSERVED",
+      "firebaseRequestAccepted": true,
+      "deliveryConfirmed": false,
+      "treatment": "DEFER_TO_PLATFORM_TRANSACTIONAL_EMAIL_CONFIGURATION",
+      "blockingB1": false,
+      "blockingB2": false,
+      "blockingB3": false,
+      "blockingB4": false,
+      "mayBeDeclaredResolved": false,
+      "mustRemainVisibleDebt": true
+    },
+    "activeRoleDataScope": {
+      "rootCause": "DEMONSTRATED",
+      "previewRunId": 35551713416,
+      "previewSourceSha": "a763f6a991418cba2c59eac475edf3eb57fd1320",
+      "buildId": "gi-i65-b1-a763f6a99141-57f234755dc1",
+      "artifactId": 10619180286,
+      "artifactDigest": "40eed43501e3d2d762cd0e05998d4bfec08dc0325af06fef0323089b19602793",
+      "exactReadback": true,
+      "authenticatedFunctionalProof": true,
+      "scopeVisualSpotCheck": "CARRY_FORWARD_TO_FIRST_B2_PREVIEW_BEFORE_B3"
+    },
+    "preservedVisualPasses": [
+      "BRANDING",
+      "LOGIN_CARLOS",
+      "LOGIN_SAMUEL",
+      "ROLE_MODULE_MATRIX",
+      "OPERATIVO_COTIZADOR_COMPARATIVO",
+      "ROLE_SCOPE_ADMIN_UI",
+      "VISIBILITY_GROUP_UI",
+      "TEAM_7_CANONICAL_USERS"
+    ]
+  },
+  "constraints": {
+    "noProductionPromotionYet": true,
+    "noReimport": true,
+    "noUserHardcodes": true,
+    "noEmailFalseDeliveryPass": true,
+    "sameAccumulatedCandidate": true,
+    "dashboardRealityReconciliationCarryForwardRequired": true
+  },
+  "nextBlock": "B2"
+}
