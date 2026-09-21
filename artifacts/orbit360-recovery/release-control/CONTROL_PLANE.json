@@ -713,7 +713,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B1_PREVIEW",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B1_VISUAL",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -1951,27 +1951,15 @@
       "livePromotion": false
     },
     "b1ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B1_EXECUTION_LOCK_20260919.json",
-    "b1ExecutionLockBlobSha": "ed1741e4fc68b1607ea813e888139337a8429ea9",
+    "b1ExecutionLockBlobSha": "51a798048bb273f23d7680867e28b55d60ea8961",
     "b1": {
-      "status": "CANDIDATE_PENDING_PREVIEW",
-      "sourceSha": "a763f6a991418cba2c59eac475edf3eb57fd1320",
-      "buildId": "gi-i65-b1-a763f6a99141-57f234755dc1",
+      "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+      "sourceSha": "c1477d05450eb7a60162b8c1fcb48a4bca8b89e4",
+      "buildId": "gi-i65-b1-c1477d05450e-57f234755dc1",
       "previewUrl": "https://ays-orbit-360-lab--gi-i65-b1-35455766715-ylc10xr5.web.app",
-      "runId": 35551713416,
-      "artifactId": 10619180286,
-      "livePromoted": false,
-      "exactReadback": true,
-      "functionalPass": true,
-      "visualAccepted": false,
-      "emailDeliveryFernando": "DEFERRED_NON_BLOCKING_OPEN_DEBT",
-      "activeRoleDataScope": "PARTIAL_VISUAL_PASS_PENDING_FULL_MODULE_VALIDATION",
-      "performanceRouting": "REJECTED_REPRODUCIBLE",
-      "universeHydration": "ROOT_CAUSE_DEMONSTRATED",
-      "dashboardReality": "MANDATORY_PREPRODUCTION_GATE",
-      "r10ReadOnlyDiagnostic": "PARTIAL_EVIDENCE",
-      "r11ReadOnlyDiagnostic": "PASS_ROOT_CAUSE_EVIDENCE",
-      "rootCauseStatus": "PATCHED_PENDING_PREVIEW",
-      "r12Proof": "REQUIRED"
+      "runId": 35656921823,
+      "artifactId": 10666101952,
+      "livePromoted": false
     },
     "lastVisualRejection": {
       "recordedAt": "2026-09-20T19:17:00-06:00",
