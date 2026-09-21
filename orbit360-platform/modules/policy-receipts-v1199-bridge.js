@@ -106,7 +106,7 @@ Orbit.modules = Orbit.modules || {};
           <label class="ce-l">Suma asegurada<input type="number" min="0" step="0.01" class="o-sel" data-sum value="${esc(existing && existing.sumaAsegurada || 0)}"></label>
         </div>
         <div class="card pad" data-preview></div>
-        <div data-vehicle style="display:none"><b style="font-family:var(--f-display)">Vehículo asegurado</b><div class="cgrid" style="margin-top:8px"><label class="ce-l">Marca / línea<input class="o-sel" data-vbrand></label><label class="ce-l">Placa<input class="o-sel" data-vplate></label><label class="ce-l">Año<input type="number" class="o-sel" data-vyear></label><label class="ce-l">Uso<input class="o-sel" data-vuse value="Particular"></label></div></div>
+        <div data-vehicle style="display:none"><b style="font-family:var(--f-display)">Vehículo asegurado</b><div class="cgrid" style="margin-top:8px"><label class="ce-l">Marca<input class="o-sel" data-vbrand value="${esc(existingVehicle && existingVehicle.marca || '')}"></label><label class="ce-l">Línea<input class="o-sel" data-vline value="${esc(existingVehicle && existingVehicle.linea || '')}"></label><label class="ce-l">Placa<input class="o-sel" data-vplate value="${esc(existingVehicle && existingVehicle.placa || '')}"></label><label class="ce-l">Año<input type="number" class="o-sel" data-vyear value="${esc(existingVehicle && existingVehicle.anio || '')}"></label><label class="ce-l">Uso<input class="o-sel" data-vuse value="${esc(existingVehicle && existingVehicle.uso || 'Particular')}"></label><label class="ce-l">Color<input class="o-sel" data-vcolor value="${esc(existingVehicle && existingVehicle.color || '')}"></label><label class="ce-l">VIN<input class="o-sel" data-vvin value="${esc(existingVehicle && existingVehicle.vin || '')}"></label><label class="ce-l">Chasis<input class="o-sel" data-vchasis value="${esc(existingVehicle && existingVehicle.chasis || '')}"></label><label class="ce-l">Motor<input class="o-sel" data-vmotor value="${esc(existingVehicle && existingVehicle.motor || '')}"></label></div></div>
         ${existing ? '<label class="ce-l">Motivo del cambio *<textarea class="o-sel" data-reason style="min-height:58px"></textarea></label>' : ''}
         <div class="hint error" data-error style="display:none"></div>
       </div>
@@ -135,7 +135,7 @@ Orbit.modules = Orbit.modules || {};
         otros: +$('[data-other]').value || 0, recargoFinPct: +$('[data-surcharge]').value || 0, sumaAsegurada: +$('[data-sum]').value || 0,
         comAseguradoraPct: existing && existing.comAseguradoraPct || 0, comVendedorPct: existing && existing.comVendedorPct || 0,
         fuente: existing && existing.fuente || 'ingreso_manual_plataforma',
-        vehiculo: /auto|veh/i.test(ramoEl.value) ? { marca: $('[data-vbrand]').value.trim(), placa: $('[data-vplate]').value.trim(), anio: $('[data-vyear]').value, uso: $('[data-vuse]').value.trim(), sumaAsegurada: +$('[data-sum]').value || 0 } : null
+        vehiculo: /auto|veh/i.test(ramoEl.value) ? { id: existingVehicle && existingVehicle.id || '', marca: $('[data-vbrand]').value.trim(), linea: $('[data-vline]').value.trim(), placa: $('[data-vplate]').value.trim(), anio: $('[data-vyear]').value, uso: $('[data-vuse]').value.trim(), color: $('[data-vcolor]').value.trim(), vin: $('[data-vvin]').value.trim(), chasis: $('[data-vchasis]').value.trim(), motor: $('[data-vmotor]').value.trim(), sumaAsegurada: +$('[data-sum]').value || 0 } : null
       };
     }
     function preview() {
@@ -147,12 +147,17 @@ Orbit.modules = Orbit.modules || {};
     b.querySelectorAll('input,select').forEach(el => el.addEventListener('input', preview));
     $('[data-import]').addEventListener('click', () => { b.remove(); Orbit.importa.open('polizas', { scope: { clienteId: selectedClient.id } }); });
     $('[data-save]').addEventListener('click', async () => {
-      const payload = raw(), reason = existing ? $('[data-reason]').value.trim() : 'Alta operativa desde plataforma';
-      const result = existing ? await E.updatePolicy(existing.id, payload, { motivo: reason }) : await E.createPolicy(payload, { motivo: reason });
-      const err = $('[data-error]');
-      if (!result.ok) { err.style.display = ''; err.textContent = errorText(result.errors); return; }
-      err.style.display = 'none'; b.remove(); toast(existing ? 'Póliza actualizada; recibos sincronizados' : 'Póliza creada; recibos generados');
-      location.hash = '#/cliente360?c=' + encodeURIComponent(result.policy.clienteId) + '&t=polizas';
+      const save = $('[data-save]'), payload = raw(), reason = existing ? $('[data-reason]').value.trim() : 'Alta operativa desde plataforma';
+      const err = $('[data-error]'), originalText = save.textContent; save.disabled = true; save.textContent = 'Guardando…';
+      try {
+        const result = existing ? await E.updatePolicy(existing.id, payload, { motivo: reason }) : await E.createPolicy(payload, { motivo: reason });
+        if (!result.ok) { err.style.display = ''; err.textContent = errorText(result.errors); save.disabled = false; save.textContent = originalText; return; }
+        err.style.display = 'none'; b.remove(); toast(existing ? 'Póliza actualizada; recibos y vehículo confirmados' : 'Póliza creada; recibos y vehículo confirmados');
+        location.hash = '#/cliente360?c=' + encodeURIComponent(result.policy.clienteId) + '&t=polizas';
+      } catch (error) {
+        err.style.display = ''; err.textContent = 'No fue posible confirmar el guardado. Revisa y reintenta.';
+        save.disabled = false; save.textContent = originalText;
+      }
     });
     refreshProducts(); preview();
   }
