@@ -59,6 +59,7 @@ on:
       - 'tools/gravicentra-i6-5-b1-r8-access-email-readonly.mjs'
       - 'tools/gravicentra-i6-5-b1-r10-rootcause-readonly.mjs'
       - 'tools/gravicentra-i6-5-b1-r11-route-trace-readonly.mjs'
+      - 'tools/gravicentra-i6-5-b1-r12-role-route-readonly.mjs'
       - 'artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json'
       - 'tools/gravicentra-i6-5-b2-functional.mjs'
       - 'tools/gravicentra-i6-5-b2-authenticated-preview.mjs'
@@ -1805,6 +1806,7 @@ jobs:
           node --check orbit360-platform/data/store-firestore-product-operational-p0.js
           node --check orbit360-platform/modules/equipo.js
           node --check orbit360-platform/core/tenant-access-policy-effective-p0.js
+          node --check orbit360-platform/core/tenant-access-policy-contract-p0.js
           grep -Fq "countryFiltered: false" orbit360-platform/core/tenant-access-policy-effective-p0.js
           grep -Fq "TEAM_DIRECTORY_ROLES" orbit360-platform/core/tenant-access-policy-effective-p0.js
           node --check orbit360-platform/data/store-firestore-product-readonly-p0.js
@@ -2933,6 +2935,8 @@ jobs:
           node --check orbit360-platform/core/tenant-access-policy-product-p0.js
           node --check orbit360-platform/modules/equipo-credential-admin-v20260805-bridge.js
           node --check orbit360-platform/core/access-scope.js
+          node --check orbit360-platform/modules/crm-v1198-operational-bridge.js
+          node --check tools/gravicentra-i6-5-b1-r12-role-route-readonly.mjs
           node --check orbit360-platform/core/router.js
           node --check orbit360-platform/core/tenant-domain-config-client.js
           node --check functions/tenant-domain-config.js
@@ -3073,6 +3077,13 @@ jobs:
           TARGET_URL: ${{ steps.preview.outputs.preview_url }}
           B1_PROOF_FILE: ${{ runner.temp }}/b1-package/evidence/b1-functional.json
         run: node tools/gravicentra-i6-5-b1-functional.mjs
+      - name: Authenticated B1 R12 active-role and route proof
+        if: steps.mode.outputs.mode == 'preview'
+        env:
+          TARGET_URL: ${{ steps.preview.outputs.preview_url }}
+          B1_R12_OUT: ${{ runner.temp }}/b1-package/evidence/b1-r12-role-route-readonly.json
+        run: node tools/gravicentra-i6-5-b1-r12-role-route-readonly.mjs
+
       - name: Upload accumulated B1 Preview artifact
         if: steps.mode.outputs.mode == 'preview'
         id: artifact

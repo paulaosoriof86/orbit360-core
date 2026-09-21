@@ -1,6 +1,6 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B1_EXECUTION_LOCK_V1",
-  "status": "VISUAL_REJECTED_R3_PERFORMANCE_AND_UNIVERSE_ROOT_CAUSE_REQUIRED",
+  "status": "CANDIDATE_PENDING_PREVIEW",
   "date": "2026-09-19",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -1188,7 +1188,7 @@
     ],
     "causes": {
       "universeHydration": {
-        "status": "ROOT_CAUSE_DEMONSTRATED",
+        "status": "PATCHED_PENDING_PREVIEW",
         "cause": "Membership dataScopes stores the legacy key clientes=todos, while the backend collection policy maps clientes to canonical module cliente360. effectiveScope() looks up moduleScopes.cliente360, does not find it, and falls back to default=propios, generating asesorId==actor for clientes. polizas uses canonical key polizas=todos and therefore hydrates the whole allowed country universe.",
         "evidence": {
           "membershipActiveRole": "Operativo",
@@ -1215,7 +1215,7 @@
         ]
       },
       "client360Performance": {
-        "status": "ROOT_CAUSE_DEMONSTRATED",
+        "status": "PATCHED_PENDING_PREVIEW",
         "cause": "router.js already executes module.render inside Orbit.access.withScope(route). crm-v1198-operational-bridge.js wraps cliente360 again with A.withScope(moduleKey). access-scope.rawS() peels only one _scopedFor facade. Under the second facade actorAdvisor()/scope resolution re-enters the first scoped facade while filtering clientes, causing recursive/non-terminating scoped resolution.",
         "evidence": {
           "runId": 35655585085,
@@ -1326,5 +1326,35 @@
     "noDataWrites": true,
     "noReimport": true,
     "noLive": true
+  },
+  "r12ReadOnlyProof": {
+    "status": "REQUIRED_IN_PREVIEW",
+    "script": "tools/gravicentra-i6-5-b1-r12-role-route-readonly.mjs",
+    "writes": 0
+  },
+  "r12CumulativePatch": {
+    "status": "SOURCE_READY_PENDING_PREVIEW",
+    "productSourceCommit": "f55a1a84821d235888f7cc6f060720b8c4e8cf0c",
+    "productFiles": [
+      "orbit360-platform/core/tenant-access-policy-contract-p0.js",
+      "orbit360-platform/core/access-scope.js",
+      "orbit360-platform/modules/crm-v1198-operational-bridge.js",
+      "orbit360-platform/index.html"
+    ],
+    "fixes": [
+      "LEGACY_SCOPE_KEYS_CLIENTES_CLIENTE360_AND_GESTIONES_OPS_CANONICALIZED",
+      "ACTIVE_ROLE_SCOPE_CEILING_APPLIED_IN_BACKEND_QUERY_POLICY",
+      "RAW_STORE_UNWRAPS_ALL_SCOPED_FACADES",
+      "SAME_MODULE_WITH_SCOPE_IS_IDEMPOTENT",
+      "CRM_BRIDGE_DOES_NOT_DOUBLE_WRAP_ALREADY_SCOPED_RENDER",
+      "CACHE_BUST_FOR_CHANGED_RUNTIME_OWNERS"
+    ],
+    "pausedB2SourceCommit": "84870177ecacd4776ba844495afa99b1b2b10a6f",
+    "pausedB2ProductExcludedFromB1Candidate": true,
+    "dataWrites": 0,
+    "reimport": false,
+    "live": false,
+    "brandingTouched": false,
+    "emailTransportChanged": false
   }
 }
