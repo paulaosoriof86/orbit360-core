@@ -3962,9 +3962,12 @@ jobs:
       B1_LOCK: artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B1_EXECUTION_LOCK_20260919.json
     steps:
       - uses: actions/checkout@v4
-        with: { ref: ${{ github.sha }}, fetch-depth: 0 }
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
       - uses: actions/setup-node@v4
-        with: { node-version: '22' }
+        with:
+          node-version: '22'
       - name: Gate B1 R11 read-only route trace
         id: gate
         run: |

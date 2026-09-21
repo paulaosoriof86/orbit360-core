@@ -1246,7 +1246,7 @@
     "artifactId": 10623883845
   },
   "r11ReadOnlyDiagnostic": {
-    "status": "AUTHORIZED_PENDING_RUN",
+    "status": "AUTHORIZED_RETRY_AFTER_WORKFLOW_SCHEMA_FAILURE",
     "script": "tools/gravicentra-i6-5-b1-r11-route-trace-readonly.mjs",
     "exactPreview": {
       "sourceSha": "a763f6a991418cba2c59eac475edf3eb57fd1320",
@@ -1266,6 +1266,10 @@
       "productMutationAuthorized": false,
       "reimportAuthorized": false,
       "livePromotionAuthorized": false
-    }
+    },
+    "failedRunId": 35620443152,
+    "failedRunConclusion": "failure",
+    "failedRunJobs": 0,
+    "workflowSchemaFailure": true
   }
 }
