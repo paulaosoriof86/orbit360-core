@@ -26,6 +26,7 @@ const I65_FORENSIC_PLAN='artifacts/orbit360-recovery/release-control/I6_5_FORENS
 const I65_FORENSIC_ADDENDUM='artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_ADDENDUM_20260919.md';
 const I65_PAYMENT_INFERENCE='artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_20260919.json';
 const I65_FORENSIC_B1='artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B1_EXECUTION_LOCK_20260919.json';
+const I65_FORENSIC_B2='artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json';
 const I65_SYNC='artifacts/orbit360-recovery/release-control/I6_5_SYNC_COMPOSITION_PREFLIGHT_20260918.json';
 const I65_DIFF='artifacts/orbit360-recovery/release-control/I6_5_DETERMINISTIC_DIFF_20260918.json';
 const I65_APPLY_ENC='artifacts/orbit360-recovery/release-control/I6_5_DETERMINISTIC_APPLY_PAYLOAD_20260918.enc.json';
@@ -39,8 +40,8 @@ const stable=v=>{if(v===null||typeof v!=='object')return v;if(Array.isArray(v))r
 const sameJson=(a,b)=>JSON.stringify(stable(a))===JSON.stringify(stable(b));
 
 need(MODE==='governance'||MODE==='i6','I6_GUARD_MODE_INVALID:'+MODE);
-for(const p of [CONTROL,STATUS_LEDGER,AUTH_RECEIPT,I6_ADDENDUM,I6_PLAN_LOCK,V5_MANIFEST,DATA_UPDATE_PLAN,DATA_UPDATE_DISCIPLINE,DATA_UPDATE_REGISTRY,ACTIVE_SOURCE_INTAKE,I63_SOURCE,I63_RECEIPT,I64_SOURCE,I64_RECEIPT,I65_SOURCE,I65_SYNC,I65_FORENSIC_AUDIT,I65_FORENSIC_PLAN,I65_FORENSIC_ADDENDUM,I65_PAYMENT_INFERENCE,I65_FORENSIC_B1]) need(exists(p),'I6_REQUIRED_FILE_MISSING:'+p);
-const C=readJson(CONTROL),S=readJson(STATUS_LEDGER),A=readJson(AUTH_RECEIPT),M=readJson(V5_MANIFEST),FRA=readJson(I65_FORENSIC_AUDIT),FRP=readJson(I65_FORENSIC_PLAN),PAY=readJson(I65_PAYMENT_INFERENCE),B1=readJson(I65_FORENSIC_B1);
+for(const p of [CONTROL,STATUS_LEDGER,AUTH_RECEIPT,I6_ADDENDUM,I6_PLAN_LOCK,V5_MANIFEST,DATA_UPDATE_PLAN,DATA_UPDATE_DISCIPLINE,DATA_UPDATE_REGISTRY,ACTIVE_SOURCE_INTAKE,I63_SOURCE,I63_RECEIPT,I64_SOURCE,I64_RECEIPT,I65_SOURCE,I65_SYNC,I65_FORENSIC_AUDIT,I65_FORENSIC_PLAN,I65_FORENSIC_ADDENDUM,I65_PAYMENT_INFERENCE,I65_FORENSIC_B1,I65_FORENSIC_B2]) need(exists(p),'I6_REQUIRED_FILE_MISSING:'+p);
+const C=readJson(CONTROL),S=readJson(STATUS_LEDGER),A=readJson(AUTH_RECEIPT),M=readJson(V5_MANIFEST),FRA=readJson(I65_FORENSIC_AUDIT),FRP=readJson(I65_FORENSIC_PLAN),PAY=readJson(I65_PAYMENT_INFERENCE),B1=readJson(I65_FORENSIC_B1),B2=readJson(I65_FORENSIC_B2);
 const P=readJson(DATA_UPDATE_PLAN),D=readJson(DATA_UPDATE_DISCIPLINE),RGT=readJson(DATA_UPDATE_REGISTRY),SRC=readJson(ACTIVE_SOURCE_INTAKE),SRC3=readJson(I63_SOURCE),R63=readJson(I63_RECEIPT),SRC4=readJson(I64_SOURCE),R64=readJson(I64_RECEIPT),SRC5=readJson(I65_SOURCE),SYNC5=readJson(I65_SYNC);
 need(C.schemaVersion==='gravicentra-control-plane-v2','I6_CONTROL_SCHEMA_INVALID');
 need(C.controlPlaneId==='GRAVICENTRA-INSURANCE-FASE-A','I6_CONTROL_ID_INVALID');
@@ -292,6 +293,11 @@ if(activeI65){
     if(FR.status==='FROZEN_ACTIVE'&&forensicBlock==='B1'){
       need(FR.currentReadinessPercent===70&&FR.nextTargetPercent===80&&FR.previewAfterEveryBlockRequired===true&&FR.sameArtifactPreviewToLiveRequired===true,'I6_5_FORENSIC_B1_STATE_INVALID');
       need(['I6_5_FORENSIC_REMEDIATION_B1_PREVIEW','I6_5_FORENSIC_REMEDIATION_B1_VISUAL','I6_5_FORENSIC_REMEDIATION_B1_R3_ROOT_CAUSE'].includes(C.nextAction),'I6_5_FORENSIC_B1_ACTION_INVALID');
+    }else if(FR.status==='FROZEN_ACTIVE'&&forensicBlock==='B2'){
+      need(FR.currentReadinessPercent===80&&FR.nextTargetPercent===90&&FR.previewAfterEveryBlockRequired===true&&FR.sameArtifactPreviewToLiveRequired===true,'I6_5_FORENSIC_B2_STATE_INVALID');
+      need(FR.b2ExecutionLockPath===I65_FORENSIC_B2&&git('hash-object',I65_FORENSIC_B2)===FR.b2ExecutionLockBlobSha,'I6_5_B2_LOCK_DRIFT');
+      need(B2.block==='B2'&&B2.conversationDependent===false&&B2.boundaries?.dataMutationAuthorized===false&&B2.boundaries?.reimportAuthorized===false&&B2.boundaries?.liveHostingPromotionAuthorized===false,'I6_5_B2_BOUNDARY_INVALID');
+      need(['I6_5_FORENSIC_REMEDIATION_B2_DIAGNOSTIC','I6_5_FORENSIC_REMEDIATION_B2_PREVIEW','I6_5_FORENSIC_REMEDIATION_B2_VISUAL'].includes(C.nextAction),'I6_5_FORENSIC_B2_ACTION_INVALID');
     }else{
       need(C.nextAction===expectedI65Action,'I6_5_NEXT_ACTION_INVALID');
     }
@@ -389,9 +395,13 @@ const allowedI64Product=new Set((i64DefectPending||i64DefectLive)&&Array.isArray
 const allowedI65Product=new Set((i65SyncDefectPending||i65SyncDefectLive)&&Array.isArray(i65SyncCodeDefect.allowedProductFiles)?i65SyncCodeDefect.allowedProductFiles:[]);
 const allowedI65HydrationProduct=new Set((i65HydrationDefectPending||i65HydrationDefectLive)&&Array.isArray(i65HydrationDefect.allowedProductFiles)?i65HydrationDefect.allowedProductFiles:[]);
 const allowedI65OperationalProduct=new Set((i65OperationalClosurePending||i65OperationalClosureLive)&&Array.isArray(i65OperationalClosure.allowedProductFiles)?i65OperationalClosure.allowedProductFiles:[]);
-const b1Active=activeI65&&C.i65ForensicRemediationPlan?.currentBlock==='B1'&&['PREPARED_FOR_CANDIDATE','CANDIDATE_PENDING_PREVIEW','PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL','VISUAL_REJECTED_R2_ROOT_CAUSE_REQUIRED'].includes(String(B1.status||''));
-const allowedI65ForensicB1Product=new Set(b1Active&&Array.isArray(B1.allowedProductFiles)?B1.allowedProductFiles:[]);
-const forbidden=changed.filter(p=>!allowedPrefixes.some(prefix=>p.startsWith(prefix))&&!allowedSuccessorProduct.has(p)&&!allowedI63Product.has(p)&&!allowedI64Product.has(p)&&!allowedI65Product.has(p)&&!allowedI65HydrationProduct.has(p)&&!allowedI65OperationalProduct.has(p)&&!allowedI65ForensicB1Product.has(p));
+const forensicActiveBlock=String(C.i65ForensicRemediationPlan?.currentBlock||'');
+const b1Retained=activeI65&&['B1','B2','B3','B4'].includes(forensicActiveBlock)&&Array.isArray(B1.allowedProductFiles);
+const b1Active=activeI65&&forensicActiveBlock==='B1'&&['PREPARED_FOR_CANDIDATE','CANDIDATE_PENDING_PREVIEW','PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL','VISUAL_REJECTED_R2_ROOT_CAUSE_REQUIRED','ACCEPTED_FOR_B2_EMAIL_DEFERRED'].includes(String(B1.status||''));
+const b2Active=activeI65&&forensicActiveBlock==='B2'&&['READ_ONLY_DIAGNOSTIC_ACTIVE','CAUSE_DEMONSTRATED_PATCH_AUTHORIZED','CANDIDATE_PENDING_PREVIEW','PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL'].includes(String(B2.status||''));
+const allowedI65ForensicB1Product=new Set(b1Retained?B1.allowedProductFiles:[]);
+const allowedI65ForensicB2Product=new Set(b2Active&&Array.isArray(B2.boundaries?.allowedProductFiles)?B2.boundaries.allowedProductFiles:[]);
+const forbidden=changed.filter(p=>!allowedPrefixes.some(prefix=>p.startsWith(prefix))&&!allowedSuccessorProduct.has(p)&&!allowedI63Product.has(p)&&!allowedI64Product.has(p)&&!allowedI65Product.has(p)&&!allowedI65HydrationProduct.has(p)&&!allowedI65OperationalProduct.has(p)&&!allowedI65ForensicB1Product.has(p)&&!allowedI65ForensicB2Product.has(p));
 need(forbidden.length===0,'I6_PRODUCT_SOURCE_DRIFT_OUTSIDE_BOUND_SUCCESSOR:'+forbidden.slice(0,20).join(','));
 if(i63DefectPending||i63DefectLive){
  need(i63CodeDefect.classification==='CODE_DEFECT','I6_3_DEFECT_CLASS_INVALID');
@@ -431,7 +441,7 @@ if(i65HydrationDefectPending||i65HydrationDefectLive){
  need(i65HydrationDefect.reimportAuthorized===false&&i65HydrationDefect.dataMutationAuthorized===false&&i65HydrationDefect.cobrosWritesAuthorized===false,'I6_5_HYDRATION_DEFECT_DATA_BOUNDARY_INVALID');
  if(i65HydrationDefectLive){need(/^[0-9a-f]{40}$/.test(String(i65HydrationDefect.sourceSha||'')),'I6_5_HYDRATION_DEFECT_SOURCE_INVALID');need(i65HydrationDefect.productionReadbackExact===true&&i65HydrationDefect.functionalPass===true&&Number(i65HydrationDefect.receiptCount)>0&&Number(i65HydrationDefect.portfolioCount)>0,'I6_5_HYDRATION_DEFECT_LIVE_PROOF_INVALID');}
 }
-if(b1Active){
+if(b1Retained){
  need(B1.allowedProductFiles.length===30,'I6_5_B1_SCOPE_COUNT_INVALID');
  const b1Required=["orbit360-platform/index.html","orbit360-platform/core/public-tenant-branding.js","orbit360-platform/data/tenant-public-branding-index.js","orbit360-platform/modules/configuracion.js","orbit360-platform/modules/equipo.js","orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js","orbit360-platform/core/product-runtime-browser-providers-p0.js","orbit360-platform/core/auth-product-runtime-p0.js","orbit360-platform/core/auth-password-change-v20260805.js","functions/tenant-branding.js","functions/bootstrap.js","functions/package.json","orbit360-platform/assets/tenant/alianzas-soluciones/logo-oficial-360.png","orbit360-platform/assets/tenant/alianzas-soluciones/logo-bolita-96.png","orbit360-platform/core/tenant-access-policy-effective-p0.js","orbit360-platform/data/store-firestore-product-readonly-p0.js","functions/user-onboarding.js","functions/product-operational-domain.js","orbit360-platform/core/backend-product-readonly-bootstrap-p0.js","orbit360-platform/product-runtime-config.js","orbit360-platform/core/product-hydration-required-optional-p0.js","orbit360-platform/core/user-onboarding.js","orbit360-platform/styles/infra.css","orbit360-platform/core/tenant-access-policy-product-p0.js","orbit360-platform/modules/equipo-credential-admin-v20260805-bridge.js","orbit360-platform/core/access-role-session-owner-v20260728.js","orbit360-platform/core/access-scope.js","orbit360-platform/core/router.js","orbit360-platform/core/tenant-domain-config-client.js","functions/tenant-domain-config.js"];
  need(b1Required.every(p=>B1.allowedProductFiles.includes(p)),'I6_5_B1_SCOPE_INVALID');
