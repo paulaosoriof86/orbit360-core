@@ -713,7 +713,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B2_DIAGNOSTIC",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B2_PREVIEW",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -1942,7 +1942,7 @@
     "addendumBlobSha": "05099a90cfb4862eec97e0359d55932828cb930b",
     "forensicAuditBlobSha": "fcfdf29c9eb851d76cebf67bcbe36d8ed308eb0f",
     "paymentInferenceBlobSha": "cfb026ded52c36083528de658a70191c8380d725",
-    "mechanismSyncStatus": "B1_ACCEPTED_B2_READ_ONLY_DIAGNOSTIC_ACTIVE",
+    "mechanismSyncStatus": "B2_CANDIDATE_PENDING_PREVIEW",
     "guardFailureBeforeFix": {
       "runId": 35450692628,
       "code": "I6_5_NEXT_ACTION_INVALID",
@@ -2008,9 +2008,9 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "a1c703af003f8f59a92ee34dd30d3797ff01a039",
+    "b2ExecutionLockBlobSha": "2c22e544647afea9e94316bc3f37d7e261a71431",
     "b2": {
-      "status": "CAUSE_DEMONSTRATED_PATCH_AUTHORIZED",
+      "status": "CANDIDATE_PENDING_PREVIEW",
       "parentB1SourceSha": "a763f6a991418cba2c59eac475edf3eb57fd1320",
       "activeRoleScopeSpotCheckCarryForward": true,
       "dashboardRealityCarryForward": true,
@@ -2024,7 +2024,8 @@
         "orbit360-platform/modules/issuance-endosos-v1201-bridge.js",
         "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js"
       ],
-      "productMutationAuthorized": true
+      "productMutationAuthorized": true,
+      "sourcePendingFromHead": "83e148d48ac546b3bde1c73852c95d38062d98f4"
     }
   }
 }
