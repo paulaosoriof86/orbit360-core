@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "CAUSE_DEMONSTRATED_PATCH_AUTHORIZED",
+  "status": "CANDIDATE_PENDING_PREVIEW",
   "recordedAt": "2026-09-20T19:55:00-06:00",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -52,14 +52,14 @@
     "mustRemainOpen": true
   },
   "acceptance": {
-    "clientCreateEditRefreshReadback": false,
-    "policyCreateEditRefreshReadback": false,
-    "sellerAdvisorCreateEdit": false,
-    "renewalReceiptsPortfolioZeroCobro": false,
-    "vehicleCreateEdit": false,
-    "insurerStableEdit": false,
-    "singleReceiptProjection": false,
-    "dirtyFormsProtected": false,
+    "clientCreateEditRefreshReadback": "PENDING_PREVIEW",
+    "policyCreateEditRefreshReadback": "PENDING_PREVIEW",
+    "sellerAdvisorCreateEdit": "PENDING_PREVIEW",
+    "renewalReceiptsPortfolioZeroCobro": "PENDING_PREVIEW",
+    "vehicleCreateEdit": "PENDING_PREVIEW",
+    "insurerStableEdit": "PRESERVED_CURRENT_OWNER_PENDING_VISUAL",
+    "singleReceiptProjection": "CANONICAL_V920_PRESERVED_PENDING_PREVIEW",
+    "dirtyFormsProtected": "SOURCE_PATCHED_PENDING_PREVIEW",
     "dashboardRealityReconciled": false,
     "previewExact": false,
     "functionalPass": false,
@@ -103,5 +103,28 @@
     "receiptProjectionReplacementAuthorized": false,
     "brandingChangeAuthorized": false,
     "noHardcodedIdentities": true
+  },
+  "candidate": {
+    "status": "SOURCE_AND_PROOF_READY_PENDING_SINGLE_BUILD_PREVIEW",
+    "sourceBeforeGovernanceSeal": "84870177ecacd4776ba844495afa99b1b2b10a6f",
+    "productFixCommits": [
+      "6af01bd02686ef7e756baefc3c5c009c99f491b9",
+      "1feee37836b240b098aef4b99b2ee5f3c4d13f4b",
+      "a8bbb0b1c389c8bfffda9a9369cbc8f42a32cf6d",
+      "44a5dd0bea7a396fdc08900448b841a7d5f92b33",
+      "b3464ea9c068820de9462c7fcf631d302f6042f9",
+      "89077038f966b916fdacf3abcbaedb89ac595fb0",
+      "5fcafdfb59c2742cb64ff02c487b66354ed265a3",
+      "0b00ca6b6ba0a102a33d253ee0b0221a744684e3"
+    ],
+    "proofFile": "tools/gravicentra-i6-5-b2-functional.mjs",
+    "proofCommit": "bce0b470aa31ef40b4ec3b38817dec9b04151d53",
+    "workflowCommit": "84870177ecacd4776ba844495afa99b1b2b10a6f",
+    "noDataApply": true,
+    "noReimport": true,
+    "noLivePromotion": true,
+    "noEmailTransportChange": true,
+    "noBrandingChange": true,
+    "preservesB1": true
   }
 }
