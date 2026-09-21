@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "READ_ONLY_DIAGNOSTIC_ACTIVE",
+  "status": "CAUSE_DEMONSTRATED_PATCH_AUTHORIZED",
   "recordedAt": "2026-09-20T19:55:00-06:00",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -28,9 +28,17 @@
     "DASHBOARD_INICIO_REALITY_RECONCILIATION_CARRY_FORWARD_TRIAGE"
   ],
   "boundaries": {
-    "diagnosticReadOnly": true,
-    "allowedProductFiles": [],
-    "productMutationAuthorized": false,
+    "diagnosticReadOnly": false,
+    "allowedProductFiles": [
+      "orbit360-platform/index.html",
+      "orbit360-platform/modules/cliente360.js",
+      "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+      "orbit360-platform/core/policy-receipts-engine.js",
+      "orbit360-platform/core/issuance-workflow-v1201.js",
+      "orbit360-platform/modules/issuance-endosos-v1201-bridge.js",
+      "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js"
+    ],
+    "productMutationAuthorized": true,
     "dataMutationAuthorized": false,
     "reimportAuthorized": false,
     "confirmedCobroWritesAuthorized": false,
@@ -61,5 +69,39 @@
     "activeRoleScopeVisualSpotCheck": "REQUIRED_IN_FIRST_B2_PREVIEW_BEFORE_B3",
     "dashboardReality": "DASHBOARD_INICIO_REALITY_RECONCILIATION_REQUIRED"
   },
-  "conversationDependent": false
+  "conversationDependent": false,
+  "directedDiagnosis": {
+    "mode": "TARGETED_CURRENT_SOURCE_CONFIRMATION_OF_FROZEN_FORENSIC_FINDINGS",
+    "broadAuditRepeated": false,
+    "findings": {
+      "F09_CLIENT_MODAL_DATA_LOSS": "PERSISTS_BACKDROP_CLOSES_EDIT_AND_CREATE",
+      "F10_CLIENT_SAVE_LIFECYCLE": "DURABLE_BATCH_PRESENT_CURRENTLY_RESOLVED_KEEP",
+      "F11_POLICY_CREATE_MISSING_SELLER": "PERSISTS_CANONICAL_BRIDGE_DERIVES_ADVISOR_FROM_CLIENT",
+      "F12_POLICY_MODAL_DATA_LOSS": "PERSISTS_GENERIC_POLICY_BRIDGE_MODAL_CLOSES_ON_BACKDROP",
+      "F13_POLICY_CREATE_EDIT_AUTHORITY_DUPLICATION": "RUNTIME_CANONICAL_BRIDGE_DELEGATES_LEGACY_METHODS_KEEP_SINGLE_EFFECTIVE_OWNER",
+      "F14_VEHICLE_FORM_INCOMPLETE": "PERSISTS_CANONICAL_FORM_ONLY_BRAND_PLATE_YEAR_USE_AND_ENGINE_ONLY_INSERTS_ON_CREATE",
+      "F15_RECEIPT_UI_AUTHORITY_SPLIT": "CURRENT_NATIVE_PROJECTION_V920_PATCHES_CLIENT_RECEIPTS_TAB_CANONICALLY_KEEP",
+      "F21_RENEWAL_CAN_WRITE_COBROS": "CURRENT_POLICY_ENGINE_CREATES_RECEIPTS_PORTFOLIO_ZERO_CONFIRMED_COBRO_KEEP",
+      "NEW_B2_RENEWAL_ASYNC_DEFECT": "ISSUANCE_issueRequest_CALLS_ASYNC_createPolicy_WITHOUT_AWAIT_AND_CALLER_IS_SYNC"
+    },
+    "minimumFix": [
+      "PROTECT_CLIENT_AND_POLICY_FORMS_FROM_ACCIDENTAL_BACKDROP_CLOSE",
+      "ADD_EXPLICIT_SELLER_ADVISOR_TO_CANONICAL_POLICY_CREATE_EDIT",
+      "ADD_COMPLETE_VEHICLE_FIELDS_TO_CANONICAL_POLICY_FORM",
+      "ATOMIC_INSERT_OR_UPDATE_LINKED_VEHICLE_WITH_POLICY",
+      "MAKE_ISSUANCE_RENEWAL_POLICY_CREATION_ASYNC_AWAITED_END_TO_END",
+      "EXPOSE_EDIT_VEHICLE_FROM_FULL_VEHICLE_PAGE_THROUGH_CANONICAL_POLICY_OWNER",
+      "PRESERVE_NATIVE_RECEIPTS_PROJECTION_V920",
+      "PRESERVE_ZERO_CONFIRMED_COBRO_ON_POLICY_OR_RENEWAL"
+    ]
+  },
+  "patchContract": {
+    "dataMutationAuthorized": false,
+    "reimportAuthorized": false,
+    "confirmedCobroWritesAuthorized": false,
+    "insurerUiRewriteAuthorized": false,
+    "receiptProjectionReplacementAuthorized": false,
+    "brandingChangeAuthorized": false,
+    "noHardcodedIdentities": true
+  }
 }
