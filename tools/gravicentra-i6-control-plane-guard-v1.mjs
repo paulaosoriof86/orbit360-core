@@ -398,9 +398,10 @@ const allowedI65OperationalProduct=new Set((i65OperationalClosurePending||i65Ope
 const forensicActiveBlock=String(C.i65ForensicRemediationPlan?.currentBlock||'');
 const b1Retained=activeI65&&['B1','B2','B3','B4'].includes(forensicActiveBlock)&&Array.isArray(B1.allowedProductFiles);
 const b1Active=activeI65&&forensicActiveBlock==='B1'&&['PREPARED_FOR_CANDIDATE','CANDIDATE_PENDING_PREVIEW','PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL','VISUAL_REJECTED_R2_ROOT_CAUSE_REQUIRED','VISUAL_REJECTED_R3_PERFORMANCE_AND_UNIVERSE_ROOT_CAUSE_REQUIRED','ACCEPTED_FOR_B2_EMAIL_DEFERRED'].includes(String(B1.status||''));
+const b2PausedRetained=activeI65&&forensicActiveBlock==='B1'&&String(B2.status||'')==='PAUSED_PENDING_B1_REACCEPTANCE'&&Array.isArray(B2.boundaries?.allowedProductFiles);
 const b2Active=activeI65&&forensicActiveBlock==='B2'&&['READ_ONLY_DIAGNOSTIC_ACTIVE','CAUSE_DEMONSTRATED_PATCH_AUTHORIZED','CANDIDATE_PENDING_PREVIEW','PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL','PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL','ACCEPTED_FOR_B3'].includes(String(B2.status||''));
 const allowedI65ForensicB1Product=new Set(b1Retained?B1.allowedProductFiles:[]);
-const allowedI65ForensicB2Product=new Set(b2Active&&Array.isArray(B2.boundaries?.allowedProductFiles)?B2.boundaries.allowedProductFiles:[]);
+const allowedI65ForensicB2Product=new Set((b2Active||b2PausedRetained)&&Array.isArray(B2.boundaries?.allowedProductFiles)?B2.boundaries.allowedProductFiles:[]);
 const forbidden=changed.filter(p=>!allowedPrefixes.some(prefix=>p.startsWith(prefix))&&!allowedSuccessorProduct.has(p)&&!allowedI63Product.has(p)&&!allowedI64Product.has(p)&&!allowedI65Product.has(p)&&!allowedI65HydrationProduct.has(p)&&!allowedI65OperationalProduct.has(p)&&!allowedI65ForensicB1Product.has(p)&&!allowedI65ForensicB2Product.has(p));
 need(forbidden.length===0,'I6_PRODUCT_SOURCE_DRIFT_OUTSIDE_BOUND_SUCCESSOR:'+forbidden.slice(0,20).join(','));
 if(i63DefectPending||i63DefectLive){
