@@ -167,5 +167,23 @@
       "ZERO_CONFIRMED_COBRO_WITHOUT_PAYMENT_EVIDENCE",
       "SYNTHETIC_CLEANUP_CONFIRMED"
     ]
+  },
+  "orphanSyntheticCleanup": {
+    "status": "AUTHORIZED_PENDING_RUN",
+    "orphanRunId": 35556007094,
+    "cleanupScript": "tools/gravicentra-i6-5-b2-synthetic-cleanup.mjs",
+    "markerSet": {
+      "clientName": "B2 QA 35556007094",
+      "identification": "B2QA-35556007094",
+      "policyNumber": "B2-POL-35556007094",
+      "renewalPolicyNumber": "B2-REN-35556007094"
+    },
+    "boundaries": {
+      "deleteOnlyMatchingSyntheticRows": true,
+      "businessDataMutationAuthorized": false,
+      "reimportAuthorized": false,
+      "livePromotionAuthorized": false,
+      "emailSendAuthorized": false
+    }
   }
 }
