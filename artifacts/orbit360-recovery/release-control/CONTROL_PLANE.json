@@ -713,7 +713,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B1_R3_ROOT_CAUSE",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B1_PREVIEW",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -1942,7 +1942,7 @@
     "addendumBlobSha": "05099a90cfb4862eec97e0359d55932828cb930b",
     "forensicAuditBlobSha": "fcfdf29c9eb851d76cebf67bcbe36d8ed308eb0f",
     "paymentInferenceBlobSha": "cfb026ded52c36083528de658a70191c8380d725",
-    "mechanismSyncStatus": "B1_ACTIVE_ROLE_DATA_SCOPE_PARTIAL_REJECTED_ROOT_CAUSE_DEMONSTRATED",
+    "mechanismSyncStatus": "B1_R9_CANDIDATE_PENDING_PREVIEW",
     "guardFailureBeforeFix": {
       "runId": 35450692628,
       "code": "I6_5_NEXT_ACTION_INVALID",
@@ -1951,19 +1951,19 @@
       "livePromotion": false
     },
     "b1ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B1_EXECUTION_LOCK_20260919.json",
-    "b1ExecutionLockBlobSha": "e26c16590a9025566c78ebe628fed8fb1ee6199b",
+    "b1ExecutionLockBlobSha": "e30a9031165a25a1683fac175651fbbd517a0158",
     "b1": {
-      "status": "VISUAL_REJECTED_R2_ROOT_CAUSE_REQUIRED",
-      "sourceSha": "68fe78c31b01d7cbffbf189b266dec221e9e33a7",
-      "buildId": "gi-i65-b1-68fe78c31b01-57f234755dc1",
-      "previewUrl": "https://ays-orbit-360-lab--gi-i65-b1-35455766715-ylc10xr5.web.app",
-      "runId": 35519356695,
-      "artifactId": 10607933027,
+      "status": "CANDIDATE_PENDING_PREVIEW",
+      "sourceSha": "8aad57ca2ec62e6da1263ceb97467d6da83297e7",
+      "buildId": null,
+      "previewUrl": null,
+      "runId": null,
+      "artifactId": null,
       "livePromoted": false,
-      "exactReadback": true,
-      "functionalPass": true,
+      "exactReadback": false,
+      "functionalPass": false,
       "visualAccepted": false,
-      "activeRoleDataScope": "PARTIAL_REJECTED",
+      "activeRoleDataScope": "ROOT_CAUSE_PATCHED_PENDING_PREVIEW",
       "inicioMixedScopeDetected": true,
       "emailDeliveryFernando": "NOT_RECEIVED"
     },
@@ -1990,10 +1990,12 @@
       "noReimport": true
     },
     "b1RootCause": {
-      "status": "DEMONSTRATED",
+      "status": "PATCHED_PENDING_PREVIEW",
       "owner": "orbit360-platform/core/access-scope.js",
       "cause": "scopedStore filters only OP_COLLS; recibosEsperados, carteraPrimas, asesores and metas bypass active-role scoping during Inicio aggregation while clientes/polizas/cobros are scoped.",
-      "minimumFix": "complete canonical scoped collection registry and generic advisor identity filtering; preserve role matrix/router/branding passes"
+      "minimumFix": "complete canonical scoped collection registry and generic advisor identity filtering; preserve role matrix/router/branding passes",
+      "productSourceCommit": "7b9e92e053f479f3f8b38d019c997ea3ac2fde27",
+      "proofHeadSha": "8aad57ca2ec62e6da1263ceb97467d6da83297e7"
     }
   }
 }
