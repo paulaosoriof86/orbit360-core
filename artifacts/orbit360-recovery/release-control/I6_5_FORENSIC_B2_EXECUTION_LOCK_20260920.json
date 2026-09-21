@@ -1,0 +1,65 @@
+{
+  "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
+  "block": "B2",
+  "status": "READ_ONLY_DIAGNOSTIC_ACTIVE",
+  "recordedAt": "2026-09-20T19:55:00-06:00",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentB1Preview": {
+    "sourceSha": "a763f6a991418cba2c59eac475edf3eb57fd1320",
+    "runId": 35551713416,
+    "buildId": "gi-i65-b1-a763f6a99141-57f234755dc1",
+    "artifactId": 10619180286,
+    "artifactDigest": "40eed43501e3d2d762cd0e05998d4bfec08dc0325af06fef0323089b19602793",
+    "exactReadback": true,
+    "functionalPass": true
+  },
+  "scope": [
+    "CLIENT_CREATE_EDIT_DURABLE_READBACK",
+    "POLICY_SINGLE_CANONICAL_CREATE_EDIT_OWNER_WITH_SELLER",
+    "RENEWAL_NEW_POLICY_RECEIPTS_PORTFOLIO_ZERO_CONFIRMED_COBRO_WITHOUT_EVIDENCE",
+    "VEHICLE_COMPLETE_CREATE_EDIT",
+    "INSURER_APPROVED_FULL_PAGE_TABS_DURABLE_EDIT",
+    "SINGLE_CANONICAL_RECEIPTS_PROJECTION",
+    "PAYMENT_METHODS_WHERE_APPLICABLE",
+    "UNIFORM_SAVE_CANCEL_FEEDBACK_READBACK",
+    "DIRTY_BACKDROP_PROTECTION",
+    "APPROVED_VISUAL_HIERARCHY",
+    "DASHBOARD_INICIO_REALITY_RECONCILIATION_CARRY_FORWARD_TRIAGE"
+  ],
+  "boundaries": {
+    "diagnosticReadOnly": true,
+    "allowedProductFiles": [],
+    "productMutationAuthorized": false,
+    "dataMutationAuthorized": false,
+    "reimportAuthorized": false,
+    "confirmedCobroWritesAuthorized": false,
+    "liveHostingPromotionAuthorized": false,
+    "advanceToB3Authorized": false,
+    "noHardcodedIdentities": true
+  },
+  "emailDebt": {
+    "status": "DEFERRED_NON_BLOCKING_BY_OWNER",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B1_OWNER_PROGRESSION_AUTHORIZATION_20260920.json",
+    "mustRemainOpen": true
+  },
+  "acceptance": {
+    "clientCreateEditRefreshReadback": false,
+    "policyCreateEditRefreshReadback": false,
+    "sellerAdvisorCreateEdit": false,
+    "renewalReceiptsPortfolioZeroCobro": false,
+    "vehicleCreateEdit": false,
+    "insurerStableEdit": false,
+    "singleReceiptProjection": false,
+    "dirtyFormsProtected": false,
+    "dashboardRealityReconciled": false,
+    "previewExact": false,
+    "functionalPass": false,
+    "paulaVisual": false
+  },
+  "carryForward": {
+    "activeRoleScopeVisualSpotCheck": "REQUIRED_IN_FIRST_B2_PREVIEW_BEFORE_B3",
+    "dashboardReality": "DASHBOARD_INICIO_REALITY_RECONCILIATION_REQUIRED"
+  },
+  "conversationDependent": false
+}
