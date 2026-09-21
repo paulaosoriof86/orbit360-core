@@ -25,7 +25,7 @@ Orbit.modules = Orbit.modules || {};
     document.body.appendChild(b);
     const close = () => b.remove();
     b.querySelectorAll('[data-close]').forEach(x => x.addEventListener('click', close));
-    b.addEventListener('click', e => { if (e.target === b) close(); });
+    b.addEventListener('click', e => { if (e.target === b) { e.preventDefault(); e.stopPropagation(); } });
     return b;
   }
   const ERROR_LABELS = {
@@ -71,6 +71,9 @@ Orbit.modules = Orbit.modules || {};
     const cur = existing && existing.moneda || A.currencyFor(country);
     const rs = ramos(country), initialRamo = existing && existing.ramo || rs[0] || '';
     const initialSubs = subramos(country, initialRamo), insurers = linkedInsurers(country);
+    const advisors = S().all('asesores') || [];
+    const existingVehicle = existing ? ((S().all('vehiculos') || []).find(v => v.polizaId === existing.id && String(v.estado || '').toLowerCase() !== 'histórico') || null) : null;
+    const initialAdvisorId = existing && existing.asesorId || selectedClient.asesorId || '';
     const frequencies = Object.keys(Orbit.primas.FRECUENCIAS || { Contado: 1 });
     const forms = Orbit.primas.FORMAS_PAGO || ['Transferencia'];
     const status = ['Vigente','Por renovar','Vencida','Cancelada','Anulada','Rechazada','Requiere validación'];
@@ -83,6 +86,7 @@ Orbit.modules = Orbit.modules || {};
         <div class="cfg-note">Vigente y Por renovar generan recibos. Los demás estados quedan como histórico. Los pagos existentes se preservan y ningún recibo se elimina físicamente.</div>
         <div class="cgrid">
           <label class="ce-l">Cliente *<select class="o-sel" data-client>${clients.map(c => `<option value="${esc(c.id)}" ${c.id === selectedClient.id ? 'selected' : ''}>${esc(c.nombre)}</option>`).join('')}</select></label>
+          <label class="ce-l">Asesor / vendedor *<select class="o-sel" data-advisor>${advisors.map(a => '<option value="'+esc(a.id)+'" '+(a.id === initialAdvisorId ? 'selected' : '')+'>'+esc(a.nombre)+'</option>').join('')}</select></label>
           <label class="ce-l">País / moneda<input class="o-sel" data-country value="${esc(country + ' · ' + cur)}" disabled></label>
           <label class="ce-l">Aseguradora *<select class="o-sel" data-insurer>${insurers.map(a => `<option value="${esc(a.id)}" ${existing && a.id === existing.aseguradoraId ? 'selected' : ''}>${esc(a.nombre)}</option>`).join('')}</select></label>
           <label class="ce-l">N.º real de póliza *<input class="o-sel" data-number value="${esc(existing && existing.numero || '')}" placeholder="No se genera un número ficticio"></label>
@@ -108,7 +112,7 @@ Orbit.modules = Orbit.modules || {};
       </div>
       <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end;position:sticky;bottom:0;background:var(--card)"><button class="btn ghost" data-close>Cancelar</button><button class="btn primary" data-save>${existing ? 'Guardar y sincronizar recibos' : 'Crear póliza y recibos'}</button></div>`;
     const b = modal('policy-v1199', inner, 800), $ = s => b.querySelector(s);
-    const clientEl = $('[data-client]'), insurerEl = $('[data-insurer]'), ramoEl = $('[data-ramo]'), productEl = $('[data-product]');
+    const clientEl = $('[data-client]'), advisorEl = $('[data-advisor]'), insurerEl = $('[data-insurer]'), ramoEl = $('[data-ramo]'), productEl = $('[data-product]');
     function client() { return S().get('clientes', clientEl.value) || selectedClient; }
     function refreshCountry() {
       const c = client(), country2 = c.pais || '', currency2 = A.currencyFor(country2);
@@ -123,7 +127,7 @@ Orbit.modules = Orbit.modules || {};
     function raw() {
       const c = client(), country2 = c.pais || '', currency2 = A.currencyFor(country2);
       return {
-        id: existing && existing.id, tenantId: existing && existing.tenantId || A.tenantId(), clienteId: c.id, asesorId: c.asesorId,
+        id: existing && existing.id, tenantId: existing && existing.tenantId || A.tenantId(), clienteId: c.id, asesorId: advisorEl && advisorEl.value || c.asesorId,
         pais: country2, moneda: currency2, aseguradoraId: insurerEl.value, numero: $('[data-number]').value.trim(), estado: $('[data-status]').value,
         ramo: ramoEl.value, subramo: productEl.value, producto: productEl.value, vigenciaInicio: $('[data-start]').value, vigenciaFin: $('[data-end]').value,
         frecuencia: $('[data-frequency]').value, formaPago: $('[data-payment-form]').value, conducto: $('[data-conduct]').value,
@@ -138,7 +142,7 @@ Orbit.modules = Orbit.modules || {};
       const prepared = E.preparePolicy(raw(), existing || null, 'preview'), recs = E.expectedReceipts(prepared), active = E.isActiveState(prepared.estado);
       $('[data-preview]').innerHTML = `<div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start"><div><small class="muted">Resultado antes de guardar</small><b style="display:block">${active ? recs.length + ' recibo(s) en cartera' : 'Histórico · sin cartera nueva'}</b></div><b>${money(prepared.moneda, prepared.primaTotal)}</b></div><div class="asg197-info-grid" style="margin-top:10px"><div><small>Prima neta</small><b>${money(prepared.moneda, prepared.primaNeta)}</b></div><div><small>Gastos financieros</small><b>${money(prepared.moneda, prepared.gastosFinan)}</b></div><div><small>IVA</small><b>${money(prepared.moneda, prepared.ivaMonto)}</b></div><div><small>Total</small><b>${money(prepared.moneda, prepared.primaTotal)}</b></div></div>`;
     }
-    clientEl.addEventListener('change', refreshCountry); ramoEl.addEventListener('change', refreshProducts);
+    clientEl.addEventListener('change', () => { if (!existing && advisorEl) { const own = client().asesorId; if (own && advisors.some(a => a.id === own)) advisorEl.value = own; } refreshCountry(); }); ramoEl.addEventListener('change', refreshProducts);
     $('[data-start]').addEventListener('change', () => { if (!$('[data-end]').value) $('[data-end]').value = plusYear($('[data-start]').value); preview(); });
     b.querySelectorAll('input,select').forEach(el => el.addEventListener('input', preview));
     $('[data-import]').addEventListener('click', () => { b.remove(); Orbit.importa.open('polizas', { scope: { clienteId: selectedClient.id } }); });
