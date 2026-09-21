@@ -276,6 +276,20 @@
     "authenticatedQaRetry2FailedRunId": 35559198932,
     "authenticatedQaFailure": "B2_AUTH_CLIENT_OPEN_TIMEOUT",
     "syntheticCleanupObservedInRun": true,
-    "resumeCondition": "B1_EXACT_ARTIFACT_VISUAL_AND_RUNTIME_ACCEPTED_AFTER_ROOT_CAUSE_FIX"
+    "resumeCondition": "B1_EXACT_ARTIFACT_VISUAL_AND_RUNTIME_ACCEPTED_AFTER_ROOT_CAUSE_FIX",
+    "exactPreservation": {
+      "candidateSourceCommit": "84870177ecacd4776ba844495afa99b1b2b10a6f",
+      "productFiles": [
+        "orbit360-platform/index.html",
+        "orbit360-platform/modules/cliente360.js",
+        "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+        "orbit360-platform/core/policy-receipts-engine.js",
+        "orbit360-platform/core/issuance-workflow-v1201.js",
+        "orbit360-platform/modules/issuance-endosos-v1201-bridge.js",
+        "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js"
+      ],
+      "strategy": "TEMPORARILY_RESTORE_B1_SOURCE_FOR_EXACT_B1_CERTIFICATION_THEN_REAPPLY_B2_FROM_CANDIDATE_SOURCE_AFTER_B1_ACCEPTANCE",
+      "noWorkLost": true
+    }
   }
 }

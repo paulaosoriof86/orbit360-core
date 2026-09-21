@@ -40,7 +40,9 @@
     "orbit360-platform/core/access-scope.js",
     "orbit360-platform/core/router.js",
     "orbit360-platform/core/tenant-domain-config-client.js",
-    "functions/tenant-domain-config.js"
+    "functions/tenant-domain-config.js",
+    "orbit360-platform/core/tenant-access-policy-contract-p0.js",
+    "orbit360-platform/modules/crm-v1198-operational-bridge.js"
   ],
   "backend": {
     "deployTargets": [
@@ -1213,8 +1215,27 @@
         ]
       },
       "client360Performance": {
-        "status": "ROUTE_BLOCK_REPRODUCED_R11_TRACE_PENDING",
-        "evidence": "R10 proved all raw/scoped batch reads complete before navigation; block begins after ROUTE_CLIENTE360_START and prevents subsequent CDP inspection."
+        "status": "ROOT_CAUSE_DEMONSTRATED",
+        "cause": "router.js already executes module.render inside Orbit.access.withScope(route). crm-v1198-operational-bridge.js wraps cliente360 again with A.withScope(moduleKey). access-scope.rawS() peels only one _scopedFor facade. Under the second facade actorAdvisor()/scope resolution re-enters the first scoped facade while filtering clientes, causing recursive/non-terminating scoped resolution.",
+        "evidence": {
+          "runId": 35655585085,
+          "trace": [
+            "ACCESS_CAN cliente360 1ms",
+            "base clientes 12",
+            "base polizas 1415",
+            "router WITH_SCOPE START",
+            "C360_RENDER START",
+            "second WITH_SCOPE START",
+            "READ_BATCH START",
+            "STORE_ALL clientes START",
+            "STORE_ALL clientes END absent until route timeout"
+          ]
+        },
+        "ownerChain": [
+          "core/router.js",
+          "modules/crm-v1198-operational-bridge.js",
+          "core/access-scope.js"
+        ]
       }
     }
   },
@@ -1246,7 +1267,7 @@
     "artifactId": 10623883845
   },
   "r11ReadOnlyDiagnostic": {
-    "status": "AUTHORIZED_PENDING_RUN",
+    "status": "PASS_ROOT_CAUSE_EVIDENCE",
     "script": "tools/gravicentra-i6-5-b1-r11-route-trace-readonly.mjs",
     "exactPreview": {
       "sourceSha": "a763f6a991418cba2c59eac475edf3eb57fd1320",
@@ -1273,6 +1294,37 @@
     "workflowSchemaFailure": true,
     "schemaRetryCommit": "34455aed4e91c5531c63e4184c3da3d362f0a0b2",
     "skippedRunId": 35655386396,
-    "skippedReason": "GATE_STATUS_MISMATCH"
+    "skippedReason": "GATE_STATUS_MISMATCH",
+    "runId": 35655585085,
+    "jobId": 106518275375,
+    "artifactId": 10664675568,
+    "writes": 0
+  },
+  "r12PatchAuthorization": {
+    "status": "AUTHORIZED",
+    "causes": [
+      "BACKEND_SCOPE_KEY_ALIAS_MISMATCH",
+      "DUPLICATE_SCOPE_FACADE_RECURSION"
+    ],
+    "allowedProductFiles": [
+      "orbit360-platform/core/tenant-access-policy-contract-p0.js",
+      "orbit360-platform/core/access-scope.js",
+      "orbit360-platform/modules/crm-v1198-operational-bridge.js",
+      "orbit360-platform/index.html"
+    ],
+    "requiredProof": [
+      "OPERATIVO_CLIENTES_SCOPE_ALL_WITH_LEGACY_CLIENTES_KEY",
+      "ASESOR_SCOPE_CEILING_OWN",
+      "OPS_GESTIONES_ALIAS",
+      "NESTED_SAME_SCOPE_IDEMPOTENT",
+      "CLIENTE360_ROUTE_RESPONDS",
+      "POLIZAS_ROUTE_RESPONDS",
+      "OPERATIVO_TO_ASESOR_TO_OPERATIVO_COUNTS_RECALCULATE",
+      "NO_PAGEERROR",
+      "NO_LIVE_PROMOTION"
+    ],
+    "noDataWrites": true,
+    "noReimport": true,
+    "noLive": true
   }
 }

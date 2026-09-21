@@ -1942,7 +1942,7 @@
     "addendumBlobSha": "05099a90cfb4862eec97e0359d55932828cb930b",
     "forensicAuditBlobSha": "fcfdf29c9eb851d76cebf67bcbe36d8ed308eb0f",
     "paymentInferenceBlobSha": "cfb026ded52c36083528de658a70191c8380d725",
-    "mechanismSyncStatus": "B1_R11_ROUTE_TRACE_ARMED",
+    "mechanismSyncStatus": "B1_R12_PATCH_AUTHORIZED_B2_SOURCE_PRESERVED",
     "guardFailureBeforeFix": {
       "runId": 35450692628,
       "code": "I6_5_NEXT_ACTION_INVALID",
@@ -1951,7 +1951,7 @@
       "livePromotion": false
     },
     "b1ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B1_EXECUTION_LOCK_20260919.json",
-    "b1ExecutionLockBlobSha": "0ab5cb907dba821e6b218eb8f33d67ec4a1c835c",
+    "b1ExecutionLockBlobSha": "31233b7cce6eba696decfccf08b12d1045f9b0a8",
     "b1": {
       "status": "VISUAL_REJECTED_R3_PERFORMANCE_AND_UNIVERSE_ROOT_CAUSE_REQUIRED",
       "sourceSha": "a763f6a991418cba2c59eac475edf3eb57fd1320",
@@ -1969,7 +1969,8 @@
       "universeHydration": "ROOT_CAUSE_DEMONSTRATED",
       "dashboardReality": "MANDATORY_PREPRODUCTION_GATE",
       "r10ReadOnlyDiagnostic": "PARTIAL_EVIDENCE",
-      "r11ReadOnlyDiagnostic": "AUTHORIZED_PENDING_RUN"
+      "r11ReadOnlyDiagnostic": "PASS_ROOT_CAUSE_EVIDENCE",
+      "rootCauseStatus": "TWO_CAUSES_DEMONSTRATED_PATCH_AUTHORIZED"
     },
     "lastVisualRejection": {
       "recordedAt": "2026-09-20T19:17:00-06:00",
@@ -2014,7 +2015,7 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "60ceaeb71fce21f28f61679eae69001805691e83",
+    "b2ExecutionLockBlobSha": "2c737f2aba292119b3331d833af7d3e60a450a25",
     "b2": {
       "status": "PAUSED_PENDING_B1_REACCEPTANCE",
       "parentB1SourceSha": "a763f6a991418cba2c59eac475edf3eb57fd1320",
@@ -2048,7 +2049,8 @@
       "orphanSyntheticCleanupRunId": 35558851618,
       "orphanSyntheticCleanupTargetRunId": 35557909667,
       "authenticatedPreviewRetryAttempt": 2,
-      "allTimedOutSyntheticMarkersClean": true
+      "allTimedOutSyntheticMarkersClean": true,
+      "preservationCommit": "84870177ecacd4776ba844495afa99b1b2b10a6f"
     },
     "dashboardRealityGate": {
       "id": "DASHBOARD_INICIO_REALITY_RECONCILIATION_REQUIRED",
