@@ -13,10 +13,11 @@ Orbit.access = (function () {
   var SENSITIVE = ['auditLog', 'auditoria', 'historialInterno', 'credenciales', 'secretos'];
   var OP_COLLS = {
     clientes: 'cliente360', polizas: 'polizas', vehiculos: 'polizas',
-    cobros: 'cobros', renovaciones: 'renovaciones', reclamos: 'siniestros',
-    siniestros: 'siniestros', comisiones: 'comisiones', negocios: 'negocios',
-    gestiones: 'ops', actividades: 'cliente360', parchesPendientes: 'ops',
-    correos: 'correo'
+    recibosEsperados: 'cobros', carteraPrimas: 'cobros', cobros: 'cobros',
+    renovaciones: 'renovaciones', reclamos: 'siniestros', siniestros: 'siniestros',
+    comisiones: 'comisiones', negocios: 'negocios', gestiones: 'ops',
+    actividades: 'cliente360', parchesPendientes: 'ops', correos: 'correo',
+    asesores: 'inicio', metas: 'inicio'
   };
   var SCOPE_LEVEL = { none: 0, own: 1, team: 2, all: 3 };
 
@@ -31,6 +32,10 @@ Orbit.access = (function () {
     catch (e) { return nowISO().slice(0, 10); }
   }
   function S() { return Orbit.store; }
+  function rawS() {
+    var store = S();
+    return store && Object.prototype.hasOwnProperty.call(store, '_scopedFor') ? Object.getPrototypeOf(store) : store;
+  }
 
   function activeRole() {
     try { if (Orbit.session && Orbit.session.rol) return clean(Orbit.session.rol()); } catch (e) {}
@@ -53,8 +58,8 @@ Orbit.access = (function () {
   }
   function esAsesor() { return OWN_ROLES.indexOf(activeRole()) >= 0 || /Asesor/i.test(activeRole()); }
   function actorAdvisor() {
-    var id = actorAdvisorId();
-    try { return id && S() && S().get ? (S().get('asesores', id) || {}) : {}; } catch (e) { return {}; }
+    var id = actorAdvisorId(), store = rawS();
+    try { return id && store && store.get ? (store.get('asesores', id) || {}) : {}; } catch (e) { return {}; }
   }
   function actorUser() {
     var au = null, advisor = actorAdvisor(), advisorId = actorAdvisorId();
@@ -187,7 +192,8 @@ Orbit.access = (function () {
     [].concat(roleMap[activeRole()]||[],a.equipoAsesorIds || a.teamAdvisorIds || a.asesoresEquipo || []).forEach(function (x) { if (x) out.add(String(x)); });
     var teamId = clean(a.equipoId || a.teamId || '');
     try {
-      (S().all('asesores') || []).forEach(function (x) {
+      var store = rawS();
+      ((store && store.all && store.all('asesores')) || []).forEach(function (x) {
         if (teamId && clean(x.equipoId || x.teamId) === teamId) out.add(String(x.id));
         if (clean(x.supervisorId) === own) out.add(String(x.id));
       });
@@ -196,6 +202,7 @@ Orbit.access = (function () {
   }
   function recordAdvisorId(collection, rec) {
     if (!rec) return '';
+    if (collection === 'asesores') return clean(rec.id || rec.asesorId);
     if (rec.asesorId) return clean(rec.asesorId);
     var linked = null;
     try {
@@ -328,8 +335,7 @@ Orbit.access = (function () {
       }
       var ownAdvisorId = actorAdvisorId();
       var teamSet = new Set(scope === 'team' ? teamAdvisorIds() : []);
-      var currentStore = S();
-      var rawStore = currentStore && Object.prototype.hasOwnProperty.call(currentStore, '_scopedFor') ? Object.getPrototypeOf(currentStore) : currentStore;
+      var rawStore = rawS();
       var clientRows = collection === 'clientes' ? list : ((rawStore && rawStore.all && rawStore.all('clientes')) || []);
       var clientExists = new Set();
       var clientAdvisor = new Map();
@@ -352,6 +358,7 @@ Orbit.access = (function () {
       });
       function indexedAdvisorId(rec) {
         if (!rec) return '';
+        if (collection === 'asesores') return clean(rec.id || rec.asesorId);
         if (rec.asesorId) return clean(rec.asesorId);
         if (rec.clienteId != null) {
           var cid = clean(rec.clienteId);
