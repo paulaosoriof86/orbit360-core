@@ -15,6 +15,8 @@ const clean=(v,m=500)=>String(v==null?'':v).trim().slice(0,m);
 const norm=v=>clean(v,180).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');
 const need=(v,c)=>{if(!v)throw new Error(c);};
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const milestone=(name,data={})=>console.log('B2_MILESTONE='+name+' '+JSON.stringify(data));
+async function bounded(p,label,ms=45000){let t;try{return await Promise.race([p,new Promise((_,rej)=>{t=setTimeout(()=>rej(new Error(label)),ms);})]);}finally{clearTimeout(t);}}
 const uniq=a=>[...new Set([].concat(a||[]).map(x=>clean(x,180)).filter(Boolean))];
 const hash=v=>crypto.createHash('sha256').update(String(v||'')).digest('hex');
 const evidence={status:'RUNNING',target:TARGET,runId:RUN,scope:{},crud:{},renewal:{},cleanup:{},errors:[],writes:{synthetic:0,cleanup:0}};
@@ -148,23 +150,29 @@ async function cleanupSynthetic(db,state){
 let app,browser,context,page,state={};
 try{
   app=initializeApp({credential:cert(sa()),projectId:PROJECT},'b2-auth-preview-'+RUN);
-  const db=getFirestore(app),auth=getAuth(app),actor=await pickMultiRoleActor(db,auth);
+  const db=getFirestore(app),auth=getAuth(app),actor=await bounded(pickMultiRoleActor(db,auth),'B2_AUTH_ACTOR_TIMEOUT',30000);
+  milestone('ACTOR_READY',{roles:actor.roles});
   evidence.actor={uidHash:hash(actor.uid),advisorIdHash:hash(actor.advisorId),roles:actor.roles,emailVerified:actor.emailVerified};
 
   browser=await chromium.launch({headless:true});
   context=await browser.newContext({viewport:{width:1500,height:1000}});
   page=await context.newPage();
+  page.setDefaultTimeout(15000);page.setDefaultNavigationTimeout(30000);
   const pageErrors=[];page.on('pageerror',e=>pageErrors.push(clean(e?.message||e,1000)));
+  milestone('PREVIEW_NAV_START');
   await page.goto(TARGET+'/?b2auth='+Date.now()+'#/inicio',{waitUntil:'domcontentloaded',timeout:30000});
-  await activate(page,auth,actor);
+  await bounded(activate(page,auth,actor),'B2_AUTH_ACTIVATE_TIMEOUT',45000);
+  milestone('PREVIEW_AUTHENTICATED');
 
   await setRole(page,'Operativo');
   await page.evaluate(()=>{location.hash='#/inicio';});
   await sleep(500);
-  const oper=await scopeSnapshot(page);
+  const oper=await bounded(scopeSnapshot(page),'B2_AUTH_SCOPE_OPERATIVO_TIMEOUT',20000);
+  milestone('SCOPE_OPERATIVO',{counts:oper.counts});
   await setRole(page,'Asesor');
   await sleep(500);
-  const asesor=await scopeSnapshot(page);
+  const asesor=await bounded(scopeSnapshot(page),'B2_AUTH_SCOPE_ASESOR_TIMEOUT',20000);
+  milestone('SCOPE_ASESOR',{counts:asesor.counts,leaks:asesor.leakCount});
   need(oper.scope==='all','B2_AUTH_OPERATIVO_SCOPE_NOT_ALL:'+JSON.stringify(oper));
   need(asesor.scope==='own','B2_AUTH_ASESOR_SCOPE_NOT_OWN:'+JSON.stringify(asesor));
   need(asesor.leakCount===0,'B2_AUTH_ASESOR_SCOPE_LEAK:'+JSON.stringify(asesor));
@@ -179,7 +187,8 @@ try{
 
   await page.evaluate(()=>{location.hash='#/cliente360';});
   await sleep(500);
-  await page.evaluate(()=>Orbit.modules.cliente360.nuevoCliente());
+  milestone('CLIENT_CREATE_OPEN');
+  await bounded(page.evaluate(()=>Orbit.modules.cliente360.nuevoCliente()),'B2_AUTH_CLIENT_OPEN_TIMEOUT',15000);
   await page.waitForSelector('#cli-nuevo #nc-ok',{timeout:8000});
   await page.fill('#nc-nombre',clientName);
   await page.fill('#nc-id',ident);
@@ -191,6 +200,7 @@ try{
   await page.click('#nc-ok');
   await page.waitForSelector('#cli-nuevo',{state:'detached',timeout:25000});
   const client=await waitFor(()=>oneBy(db,'clientes','nombre',clientName),'B2_AUTH_CLIENT_CREATE_READBACK');
+  milestone('CLIENT_CREATE_READBACK',{id:hash(client.id)});
   state.clientId=client.id;evidence.writes.synthetic+=2;
   need(client.asesorId===actor.advisorId,'B2_AUTH_CLIENT_ADVISOR_MISMATCH');
 
@@ -204,9 +214,11 @@ try{
   await page.waitForSelector('#c360-edit',{state:'detached',timeout:25000});
   const edited=await waitFor(async()=>{const x=await dataCol(db,'clientes').doc(client.id).get();const d=x.data()||{};return d.notas==='B2 QA edit '+stamp?d:null;},'B2_AUTH_CLIENT_EDIT_READBACK');
   need(!!edited,'B2_AUTH_CLIENT_EDIT_NOT_DURABLE');evidence.writes.synthetic+=2;
+  milestone('CLIENT_EDIT_READBACK');
 
   await page.waitForFunction(id=>!!Orbit.store.get('clientes',id),client.id,{timeout:15000});
-  await page.evaluate(id=>Orbit.modules.cliente360.nuevaPoliza(id),client.id);
+  milestone('POLICY_CREATE_OPEN');
+  await bounded(page.evaluate(id=>Orbit.modules.cliente360.nuevaPoliza(id),client.id),'B2_AUTH_POLICY_OPEN_TIMEOUT',15000);
   await page.waitForSelector('#policy-v1199 [data-save]',{timeout:10000});
   await page.evaluate(()=>document.getElementById('policy-v1199').dispatchEvent(new MouseEvent('click',{bubbles:true})));
   need(await page.locator('#policy-v1199').count()===1,'B2_AUTH_POLICY_BACKDROP_CLOSED');
@@ -239,6 +251,7 @@ try{
   await page.click('#policy-v1199 [data-save]');
   await page.waitForSelector('#policy-v1199',{state:'detached',timeout:30000});
   const policy=await waitFor(()=>oneBy(db,'polizas','numero',policyNo),'B2_AUTH_POLICY_CREATE_READBACK',30000);
+  milestone('POLICY_CREATE_READBACK',{id:hash(policy.id)});
   state.policyId=policy.id;
   need(policy.asesorId===actor.advisorId,'B2_AUTH_POLICY_SELLER_MISMATCH');
   const vehicleRows=await waitFor(async()=>{const x=await rowsBy(db,'vehiculos','polizaId',policy.id);return x.length===1?x:null;},'B2_AUTH_VEHICLE_CREATE_READBACK');
@@ -259,10 +272,12 @@ try{
   await page.waitForSelector('#policy-v1199',{state:'detached',timeout:30000});
   const vehicleEdited=await waitFor(async()=>{const s=await dataCol(db,'vehiculos').doc(vehicle.id).get();const d=s.data()||{};return d.color==='Azul'?d:null;},'B2_AUTH_VEHICLE_EDIT_READBACK',30000);
   need(!!vehicleEdited,'B2_AUTH_VEHICLE_EDIT_NOT_DURABLE');
+  milestone('VEHICLE_EDIT_READBACK');
   const vehicleCount=(await rowsBy(db,'vehiculos','polizaId',policy.id)).length;
   need(vehicleCount===1,'B2_AUTH_VEHICLE_EDIT_DUPLICATED:'+vehicleCount);
 
-  const renewal=await page.evaluate(async ({policyId,stamp,renewNo})=>{
+  milestone('RENEWAL_RUNTIME_START');
+  const renewal=await bounded(page.evaluate(async ({policyId,stamp,renewNo})=>{
     const p=Orbit.store.get('polizas',policyId),c=Orbit.store.get('clientes',p.clienteId);
     const total=(+p.primaTotal||+p.primaNeta||1000)*1.05;
     const req=Orbit.issuance.createRequest({
@@ -278,7 +293,8 @@ try{
       primaNeta:1100,gastosEmision:55,sourceRef:'b2qa-'+stamp
     },{operationId:'b2qa_emit_'+stamp,motivo:'B2 QA emisión real de renovación'});
     return{ok:!!issued.ok,phase:'issue',errors:issued.errors||[],requestId:req.request.id,policyId:issued.policy&&issued.policy.id};
-  },{policyId:policy.id,stamp,renewNo});
+  },{policyId:policy.id,stamp,renewNo}),'B2_AUTH_RENEWAL_EVALUATE_TIMEOUT',60000);
+  milestone('RENEWAL_RUNTIME_RETURN',{ok:renewal&&renewal.ok,phase:renewal&&renewal.phase});
   need(renewal.ok,'B2_AUTH_RENEWAL_RUNTIME_FAILED:'+JSON.stringify(renewal));
   state.requestId=renewal.requestId;state.renewedPolicyId=renewal.policyId;
   const renewed=await waitFor(()=>oneBy(db,'polizas','numero',renewNo),'B2_AUTH_RENEWED_POLICY_READBACK',30000);
@@ -290,6 +306,7 @@ try{
   need(renewalCobros.length===0,'B2_AUTH_RENEWAL_CREATED_CONFIRMED_COBRO');
   evidence.crud={clientIdHash:hash(client.id),policyIdHash:hash(policy.id),vehicleIdHash:hash(vehicle.id),clientCreateReadback:true,clientEditReadback:true,policyCreateReadback:true,advisorSellerReadback:true,vehicleCreateReadback:true,vehicleEditSameId:true,receipts:receipts.length,portfolio:portfolio.length,cobros:0,dirtyBackdropProtected:true};
   evidence.renewal={requestIdHash:hash(renewal.requestId),newPolicyIdHash:hash(renewed.id),sourceLink:true,receipts:renewalReceipts.length,portfolio:renewalPortfolio.length,cobros:0,awaitedRuntime:true};
+  milestone('RENEWAL_READBACK',{receipts:renewalReceipts.length,portfolio:renewalPortfolio.length});
   need(pageErrors.length===0,'B2_AUTH_PAGE_ERRORS:'+JSON.stringify(pageErrors.slice(0,5)));
   evidence.pageErrors=[];evidence.status='PASS';
 }catch(error){
@@ -298,7 +315,9 @@ try{
   try{
     if(app){
       const db=getFirestore(app);
-      evidence.cleanup.deleted=await cleanupSynthetic(db,state);
+      milestone('CLEANUP_START',{client:!!state.clientId,policy:!!state.policyId,renewed:!!state.renewedPolicyId});
+      evidence.cleanup.deleted=await bounded(cleanupSynthetic(db,state),'B2_AUTH_CLEANUP_TIMEOUT',60000);
+      milestone('CLEANUP_DELETED',{deleted:evidence.cleanup.deleted});
       evidence.writes.cleanup=evidence.cleanup.deleted;
       if(state.clientId){
         const still=await dataCol(db,'clientes').doc(state.clientId).get();
