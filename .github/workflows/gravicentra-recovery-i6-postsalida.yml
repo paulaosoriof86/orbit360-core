@@ -58,6 +58,7 @@ on:
       - 'tools/gravicentra-i6-5-b1-r7-bootstrap-readonly.mjs'
       - 'tools/gravicentra-i6-5-b1-r8-access-email-readonly.mjs'
       - 'tools/gravicentra-i6-5-b1-r10-rootcause-readonly.mjs'
+      - 'tools/gravicentra-i6-5-b1-r11-route-trace-readonly.mjs'
       - 'artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json'
       - 'tools/gravicentra-i6-5-b2-functional.mjs'
       - 'tools/gravicentra-i6-5-b2-authenticated-preview.mjs'
@@ -3947,6 +3948,53 @@ jobs:
           path: |
             ${{ runner.temp }}/b1-r10-rootcause-readonly.json
             ${{ runner.temp }}/b1-r10-rootcause-readonly.log
+          if-no-files-found: warn
+          compression-level: 0
+          retention-days: 30
+
+  i65-b1-r11-route-trace-readonly:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      B1_LOCK: artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B1_EXECUTION_LOCK_20260919.json
+    steps:
+      - uses: actions/checkout@v4
+        with: { ref: ${{ github.sha }}, fetch-depth: 0 }
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - name: Gate B1 R11 read-only route trace
+        id: gate
+        run: |
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          node - <<'NODE'
+          const fs=require('fs'),b=JSON.parse(fs.readFileSync(process.env.B1_LOCK)),d=b.r11ReadOnlyDiagnostic||{};
+          const run=b.status==='VISUAL_REJECTED_R3_PERFORMANCE_AND_UNIVERSE_ROOT_CAUSE_REQUIRED'&&d.status==='AUTHORIZED_PENDING_RUN'&&d.boundaries?.readOnly===true&&d.boundaries?.dataWrites===0;
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(run?'true':'false')+'\n');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'target='+(d.exactPreview?.url||'')+'\n');
+          NODE
+      - name: Install R11 dependencies
+        if: steps.gate.outputs.run == 'true'
+        run: |
+          npm install --no-save --package-lock=false firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
+          npx playwright install --with-deps chromium >/dev/null
+      - name: Execute R11 route trace
+        id: trace
+        if: steps.gate.outputs.run == 'true'
+        env:
+          TARGET_URL: ${{ steps.gate.outputs.target }}
+          B1_R11_OUT: ${{ runner.temp }}/b1-r11-route-trace.json
+        run: node tools/gravicentra-i6-5-b1-r11-route-trace-readonly.mjs | tee "${{ runner.temp }}/b1-r11-route-trace.log"
+      - name: Upload R11 evidence
+        if: always() && steps.gate.outputs.run == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i6-5-b1-r11-route-trace-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/b1-r11-route-trace.json
+            ${{ runner.temp }}/b1-r11-route-trace.log
           if-no-files-found: warn
           compression-level: 0
           retention-days: 30

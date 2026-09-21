@@ -1942,7 +1942,7 @@
     "addendumBlobSha": "05099a90cfb4862eec97e0359d55932828cb930b",
     "forensicAuditBlobSha": "fcfdf29c9eb851d76cebf67bcbe36d8ed308eb0f",
     "paymentInferenceBlobSha": "cfb026ded52c36083528de658a70191c8380d725",
-    "mechanismSyncStatus": "B1_R10_ROOT_CAUSE_READONLY_DIAGNOSTIC_PENDING",
+    "mechanismSyncStatus": "B1_R11_ROUTE_TRACE_PENDING",
     "guardFailureBeforeFix": {
       "runId": 35450692628,
       "code": "I6_5_NEXT_ACTION_INVALID",
@@ -1951,7 +1951,7 @@
       "livePromotion": false
     },
     "b1ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B1_EXECUTION_LOCK_20260919.json",
-    "b1ExecutionLockBlobSha": "0871575b7965ea49fcc3315b6329ead4b8bfc5c8",
+    "b1ExecutionLockBlobSha": "92668d40ecdfdc9160859461ff11158681e3ac64",
     "b1": {
       "status": "VISUAL_REJECTED_R3_PERFORMANCE_AND_UNIVERSE_ROOT_CAUSE_REQUIRED",
       "sourceSha": "a763f6a991418cba2c59eac475edf3eb57fd1320",
@@ -1966,9 +1966,10 @@
       "emailDeliveryFernando": "DEFERRED_NON_BLOCKING_OPEN_DEBT",
       "activeRoleDataScope": "PARTIAL_VISUAL_PASS_PENDING_FULL_MODULE_VALIDATION",
       "performanceRouting": "REJECTED_REPRODUCIBLE",
-      "universeHydration": "ROOT_CAUSE_DIAGNOSTIC_REQUIRED",
+      "universeHydration": "ROOT_CAUSE_DEMONSTRATED",
       "dashboardReality": "MANDATORY_PREPRODUCTION_GATE",
-      "r10ReadOnlyDiagnostic": "AUTHORIZED_PENDING_RUN"
+      "r10ReadOnlyDiagnostic": "PARTIAL_EVIDENCE",
+      "r11ReadOnlyDiagnostic": "AUTHORIZED_PENDING_RUN"
     },
     "lastVisualRejection": {
       "recordedAt": "2026-09-20T19:17:00-06:00",

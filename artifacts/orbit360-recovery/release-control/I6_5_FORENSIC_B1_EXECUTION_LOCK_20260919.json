@@ -1186,28 +1186,40 @@
     ],
     "causes": {
       "universeHydration": {
-        "status": "ARCHITECTURAL_CAUSE_DEMONSTRATED_MEMBER_SPECIFIC_CONFIG_PENDING_READ_ONLY_CONFIRMATION",
+        "status": "ROOT_CAUSE_DEMONSTRATED",
+        "cause": "Membership dataScopes stores the legacy key clientes=todos, while the backend collection policy maps clientes to canonical module cliente360. effectiveScope() looks up moduleScopes.cliente360, does not find it, and falls back to default=propios, generating asesorId==actor for clientes. polizas uses canonical key polizas=todos and therefore hydrates the whole allowed country universe.",
+        "evidence": {
+          "membershipActiveRole": "Operativo",
+          "membershipRoles": [
+            "Operativo",
+            "Asesor"
+          ],
+          "membershipConfiguredClientes": "todos",
+          "membershipDefault": "propios",
+          "queryClientes": [
+            "tenantId==alianzas-soluciones",
+            "pais in CO,GT,REQUIERE_VALIDACION",
+            "asesorId==actor"
+          ],
+          "queryPolizas": [
+            "tenantId==alianzas-soluciones",
+            "pais in CO,GT"
+          ]
+        },
         "ownerChain": [
-          "core/backend-product-readonly-bootstrap-p0.js",
+          "core/tenant-access-policy-contract-p0.js",
           "core/product-query-planner-contract-p0.js",
-          "core/tenant-access-policy-product-p0.js",
-          "core/tenant-access-policy-contract-p0.js"
-        ],
-        "cause": "Firestore query planner is frozen from authenticated membership at bootstrap while active-role switching and tenant role-scope administration occur later client-side; collection universes can therefore remain based on login membership/module scopes instead of the currently selected role."
+          "core/backend-product-readonly-bootstrap-p0.js"
+        ]
       },
       "client360Performance": {
-        "status": "REPRODUCED_ROOT_PHASE_NOT_YET_MICROPROFILED",
-        "ownerChain": [
-          "modules/cliente360.js",
-          "data/store-firestore-product-readonly-p0.js",
-          "core/access-scope.js"
-        ],
-        "evidence": "Authenticated runtime reached CLIENT_CREATE_OPEN then timed out >15s before modal could execute, consistent with route/main-thread blocking."
+        "status": "ROUTE_BLOCK_REPRODUCED_R11_TRACE_PENDING",
+        "evidence": "R10 proved all raw/scoped batch reads complete before navigation; block begins after ROUTE_CLIENTE360_START and prevents subsequent CDP inspection."
       }
     }
   },
   "r10ReadOnlyDiagnostic": {
-    "status": "AUTHORIZED_PENDING_RUN",
+    "status": "CANCELLED_WITH_PARTIAL_EVIDENCE",
     "script": "tools/gravicentra-i6-5-b1-r10-rootcause-readonly.mjs",
     "exactPreview": {
       "sourceSha": "a763f6a991418cba2c59eac475edf3eb57fd1320",
@@ -1229,6 +1241,31 @@
       "reimportAuthorized": false,
       "livePromotionAuthorized": false,
       "emailSendAuthorized": false
+    },
+    "runId": 35565604541,
+    "artifactId": 10623883845
+  },
+  "r11ReadOnlyDiagnostic": {
+    "status": "AUTHORIZED_PENDING_RUN",
+    "script": "tools/gravicentra-i6-5-b1-r11-route-trace-readonly.mjs",
+    "exactPreview": {
+      "sourceSha": "a763f6a991418cba2c59eac475edf3eb57fd1320",
+      "buildId": "gi-i65-b1-a763f6a99141-57f234755dc1",
+      "channelId": "gi-i65-b1-35455766715",
+      "url": "https://ays-orbit-360-lab--gi-i65-b1-35455766715-ylc10xr5.web.app",
+      "runId": 35551713416,
+      "artifactId": 10619180286,
+      "artifactDigest": "40eed43501e3d2d762cd0e05998d4bfec08dc0325af06fef0323089b19602793",
+      "exactReadback": true,
+      "functionalPass": true,
+      "livePromoted": false
+    },
+    "boundaries": {
+      "readOnly": true,
+      "dataWrites": 0,
+      "productMutationAuthorized": false,
+      "reimportAuthorized": false,
+      "livePromotionAuthorized": false
     }
   }
 }
