@@ -59,6 +59,7 @@ on:
       - 'tools/gravicentra-i6-5-b1-r8-access-email-readonly.mjs'
       - 'artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json'
       - 'tools/gravicentra-i6-5-b2-functional.mjs'
+      - 'tools/gravicentra-i6-5-b2-authenticated-preview.mjs'
       - 'orbit360-platform/core/policy-receipts-engine.js'
       - 'orbit360-platform/core/issuance-workflow-v1201.js'
       - 'orbit360-platform/modules/issuance-endosos-v1201-bridge.js'
@@ -3641,3 +3642,163 @@ jobs:
         if: ${{ failure() && steps.mode.outputs.mode == 'preview' }}
         continue-on-error: true
         run: echo "B2_PREVIEW_FAILED_NO_LIVE_NO_DATA_APPLY"
+
+
+  i65-b2-authenticated-preview:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      B2_LOCK: artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Gate authenticated B2 Preview proof
+        id: mode
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          node - <<'NODE'
+          const fs=require('node:fs'),c=JSON.parse(fs.readFileSync(process.env.CONTROL)),b=JSON.parse(fs.readFileSync(process.env.B2_LOCK));
+          const q=b.authenticatedPreviewProof||{},x=q.boundaries||{},p=b.preview||{};
+          const run=b.status==='PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL'
+            && c.nextAction==='I6_5_FORENSIC_REMEDIATION_B2_VISUAL'
+            && c.i65ForensicRemediationPlan?.currentBlock==='B2'
+            && q.status==='AUTHORIZED_PENDING_RUN';
+          if(run){
+            if(!x.syntheticQaWritesAuthorized||!x.syntheticQaOnly||!x.cleanupMandatory||x.businessDataMutationAuthorized!==false||x.reimportAuthorized!==false||x.emailSendAuthorized!==false||x.liveHostingPromotionAuthorized!==false||x.productSourceMutationAuthorized!==false)throw Error('B2_AUTH_PROOF_BOUNDARY_INVALID');
+            if(!p.url||p.exactReadback!==true||p.functionalPass!==true||p.livePromoted!==false)throw Error('B2_AUTH_PREVIEW_NOT_CERTIFIED');
+            if(q.exactPreviewSourceSha!==p.sourceSha||q.exactPreviewBuildId!==p.buildId||q.exactPreviewArtifactId!==p.artifactId||q.exactPreviewUrl!==p.url)throw Error('B2_AUTH_PREVIEW_BINDING_DRIFT');
+          }
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(run?'true':'false')+'\n');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'target='+(p.url||'')+'\n');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'build='+(p.buildId||'')+'\n');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'source='+(p.sourceSha||'')+'\n');
+          console.log('B2_AUTHENTICATED_MODE='+(run?'RUN':'NOOP'));
+          NODE
+      - name: Assert LIVE unchanged before authenticated proof
+        if: steps.mode.outputs.run == 'true'
+        run: node tools/gravicentra-certified-live-binding-check.mjs
+      - name: Validate exact frozen Preview marker
+        if: steps.mode.outputs.run == 'true'
+        env:
+          TARGET_URL: ${{ steps.mode.outputs.target }}
+          EXPECTED_BUILD_ID: ${{ steps.mode.outputs.build }}
+          EXPECTED_SOURCE_SHA: ${{ steps.mode.outputs.source }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,os,urllib.request,time
+          url=os.environ['TARGET_URL'].rstrip('/')+'/__recovery__/build.json?b2auth='+str(time.time())
+          with urllib.request.urlopen(url,timeout=30) as z:d=json.loads(z.read())
+          if d.get('buildId')!=os.environ['EXPECTED_BUILD_ID'] or d.get('sourceSha')!=os.environ['EXPECTED_SOURCE_SHA']:
+              raise SystemExit('B2_AUTH_PREVIEW_MARKER_DRIFT:'+str(d))
+          print('B2_AUTH_PREVIEW_MARKER=PASS')
+          PY
+      - name: Validate authenticated proof source
+        if: steps.mode.outputs.run == 'true'
+        run: node --check tools/gravicentra-i6-5-b2-authenticated-preview.mjs
+      - name: Install authenticated proof dependencies
+        if: steps.mode.outputs.run == 'true'
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
+          npx playwright install --with-deps chromium >/dev/null
+      - name: Execute authenticated reversible B2 Preview proof
+        id: proof
+        if: steps.mode.outputs.run == 'true'
+        env:
+          TARGET_URL: ${{ steps.mode.outputs.target }}
+          B2_AUTH_PROOF_FILE: ${{ runner.temp }}/b2-authenticated-preview.json
+        run: node tools/gravicentra-i6-5-b2-authenticated-preview.mjs
+      - name: Upload authenticated B2 evidence
+        if: always() && steps.mode.outputs.run == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i6-5-b2-authenticated-${{ github.run_id }}
+          path: ${{ runner.temp }}/b2-authenticated-preview.json
+          if-no-files-found: warn
+          compression-level: 0
+          retention-days: 30
+      - name: Freeze authenticated B2 Preview pass
+        if: steps.mode.outputs.run == 'true' && steps.proof.conclusion == 'success'
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('node:fs'),cpPath=process.env.CONTROL,lockPath=process.env.B2_LOCK,proofPath=process.env.RUNNER_TEMP+'/b2-authenticated-preview.json';
+          const c=JSON.parse(fs.readFileSync(cpPath)),b=JSON.parse(fs.readFileSync(lockPath)),e=JSON.parse(fs.readFileSync(proofPath));
+          if(e.status!=='PASS'||e.cleanup?.clientAbsent!==true||e.scope?.asesor?.leakCount!==0||e.crud?.cobros!==0||e.renewal?.cobros!==0)throw Error('B2_AUTH_EVIDENCE_NOT_CLEAN_PASS');
+          b.status='PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL';
+          b.authenticatedPreviewProof={
+            ...(b.authenticatedPreviewProof||{}),
+            status:'PASS',
+            runId:Number(process.env.GITHUB_RUN_ID),
+            exactPreviewUrl:b.preview.url,
+            exactPreviewBuildId:b.preview.buildId,
+            exactPreviewSourceSha:b.preview.sourceSha,
+            exactPreviewArtifactId:b.preview.artifactId,
+            scope:{
+              operativo:e.scope.operativo?.scope||'',
+              asesor:e.scope.asesor?.scope||'',
+              asesorLeakCount:e.scope.asesor?.leakCount,
+              operativoCounts:e.scope.operativo?.counts||{},
+              asesorCounts:e.scope.asesor?.counts||{}
+            },
+            crud:e.crud,
+            renewal:e.renewal,
+            cleanup:e.cleanup,
+            syntheticWrites:e.writes?.synthetic||0,
+            cleanupWrites:e.writes?.cleanup||0
+          };
+          b.acceptance.clientCreateEditRefreshReadback=true;
+          b.acceptance.policyCreateEditRefreshReadback=true;
+          b.acceptance.sellerAdvisorCreateEdit=true;
+          b.acceptance.renewalReceiptsPortfolioZeroCobro=true;
+          b.acceptance.vehicleCreateEdit=true;
+          b.acceptance.singleReceiptProjection=true;
+          b.acceptance.dirtyFormsProtected=true;
+          b.acceptance.previewExact=true;
+          b.acceptance.functionalPass=true;
+          b.acceptance.paulaVisual=false;
+          b.carryForward.activeRoleScopeVisualSpotCheck='AUTHENTICATED_RUNTIME_PASS_VISUAL_CONFIRMATION_PENDING';
+          fs.writeFileSync(lockPath,JSON.stringify(b,null,2)+'\n');
+          c.i65ForensicRemediationPlan.b2={
+            ...(c.i65ForensicRemediationPlan.b2||{}),
+            status:b.status,
+            authenticatedPreviewPass:true,
+            authenticatedPreviewRunId:Number(process.env.GITHUB_RUN_ID),
+            activeRoleScopeRuntimePass:true,
+            clientCreateEditRuntimePass:true,
+            policyVehicleRuntimePass:true,
+            renewalRuntimePass:true,
+            zeroConfirmedCobroWithoutEvidence:true,
+            syntheticCleanupPass:true,
+            livePromoted:false
+          };
+          c.i65ForensicRemediationPlan.mechanismSyncStatus='B2_AUTHENTICATED_PREVIEW_PASS_PENDING_VISUAL';
+          fs.writeFileSync(cpPath,JSON.stringify(c,null,2)+'\n');
+          NODE
+          git add "$B2_LOCK"
+          BLOB=$(git hash-object "$B2_LOCK");export BLOB
+          node - <<'NODE'
+          const fs=require('node:fs'),p=process.env.CONTROL,c=JSON.parse(fs.readFileSync(p));
+          c.i65ForensicRemediationPlan.b2ExecutionLockBlobSha=process.env.BLOB;
+          fs.writeFileSync(p,JSON.stringify(c,null,2)+'\n');
+          NODE
+          git add "$CONTROL"
+          git config user.name gravicentra-recovery-bot
+          git config user.email gravicentra-recovery-bot@users.noreply.github.com
+          git commit -m "freeze(i6.5): B2 authenticated Preview pass pending visual"
+          git push origin "HEAD:$GITHUB_REF_NAME"
+      - name: Authenticated B2 failure remains fail-closed
+        if: ${{ failure() && steps.mode.outputs.run == 'true' }}
+        continue-on-error: true
+        run: echo "B2_AUTHENTICATED_PROOF_FAILED_NO_LIVE_NO_REIMPORT_CLEANUP_REQUIRED"
