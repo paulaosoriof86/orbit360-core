@@ -1,6 +1,6 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B1_EXECUTION_LOCK_V1",
-  "status": "CANDIDATE_PENDING_PREVIEW",
+  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
   "date": "2026-09-19",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -223,13 +223,13 @@
     "NATIVE_REASON_PROMPT"
   ],
   "preview": {
-    "sourceSha": "68fe78c31b01d7cbffbf189b266dec221e9e33a7",
-    "buildId": "gi-i65-b1-68fe78c31b01-57f234755dc1",
+    "sourceSha": "a763f6a991418cba2c59eac475edf3eb57fd1320",
+    "buildId": "gi-i65-b1-a763f6a99141-57f234755dc1",
     "channelId": "gi-i65-b1-35455766715",
     "url": "https://ays-orbit-360-lab--gi-i65-b1-35455766715-ylc10xr5.web.app",
-    "runId": 35519356695,
-    "artifactId": 10607933027,
-    "artifactDigest": "caf30e10b38fb5993a0a14c166a8626b22f2c777985ab3738bb51f3bd1e35206",
+    "runId": 35551713416,
+    "artifactId": 10619180286,
+    "artifactDigest": "40eed43501e3d2d762cd0e05998d4bfec08dc0325af06fef0323089b19602793",
     "exactReadback": true,
     "functionalPass": true,
     "livePromoted": false
