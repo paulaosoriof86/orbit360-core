@@ -174,14 +174,14 @@
     "productRegressionDeclared": false
   },
   "orphanSyntheticCleanup": {
-    "status": "PASS",
-    "orphanRunId": 35556007094,
+    "status": "AUTHORIZED_PENDING_RUN",
+    "orphanRunId": 35557909667,
     "cleanupScript": "tools/gravicentra-i6-5-b2-synthetic-cleanup.mjs",
     "markerSet": {
-      "clientName": "B2 QA 35556007094",
-      "identification": "B2QA-35556007094",
-      "policyNumber": "B2-POL-35556007094",
-      "renewalPolicyNumber": "B2-REN-35556007094"
+      "clientName": "B2 QA 35557909667",
+      "identification": "B2QA-35557909667",
+      "policyNumber": "B2-POL-35557909667",
+      "renewalPolicyNumber": "B2-REN-35557909667"
     },
     "boundaries": {
       "deleteOnlyMatchingSyntheticRows": true,
@@ -189,34 +189,40 @@
       "reimportAuthorized": false,
       "livePromotionAuthorized": false,
       "emailSendAuthorized": false
-    },
-    "runId": 35558678312,
-    "before": {
-      "clients": [],
-      "policies": [],
-      "counts": {
+    }
+  },
+  "orphanSyntheticCleanupHistory": [
+    {
+      "orphanRunId": 35556007094,
+      "status": "PASS",
+      "cleanupRunId": 35558678312,
+      "before": {
+        "clients": [],
+        "policies": [],
+        "counts": {
+          "actividades": 0,
+          "gestiones": 0,
+          "cobros": 0,
+          "carteraPrimas": 0,
+          "recibosEsperados": 0,
+          "vehiculos": 0,
+          "polizas": 0
+        }
+      },
+      "deleted": {
         "actividades": 0,
         "gestiones": 0,
         "cobros": 0,
         "carteraPrimas": 0,
         "recibosEsperados": 0,
         "vehiculos": 0,
-        "polizas": 0
+        "polizas": 0,
+        "clientes": 0
+      },
+      "after": {
+        "clients": 0,
+        "policies": 0
       }
-    },
-    "deleted": {
-      "actividades": 0,
-      "gestiones": 0,
-      "cobros": 0,
-      "carteraPrimas": 0,
-      "recibosEsperados": 0,
-      "vehiculos": 0,
-      "polizas": 0,
-      "clientes": 0
-    },
-    "after": {
-      "clients": 0,
-      "policies": 0
     }
-  }
+  ]
 }
